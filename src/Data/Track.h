@@ -77,6 +77,16 @@ public:
 	int GetMinUnsafe();
 	int GetMaxUnsafe();
 
+	void Reset();
+	BufferBox ReadBuffers(int pos, int length);
+
+
+	enum
+	{
+		TYPE_AUDIO,
+		TYPE_TIME
+	};
+
 // data
 	int type;
 	string name;

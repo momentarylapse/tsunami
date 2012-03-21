@@ -34,6 +34,15 @@ public:
 	int GetMax();
 	int GetLength();
 
+	void Reset();
+	void New();
+	void UpdateSelection();
+	void UnselectAllSubs();
+	void AddTag(const string &key, const string &value);
+
+	void SetCurSub(Track *s);
+	void SetCurTrack(Track *t);
+
 // data
 	bool used;
 	string filename;
@@ -64,5 +73,10 @@ public:
 
 	//History *history;
 };
+
+
+
+int get_track_index(Track *t);
+int get_sub_index(Track *s);
 
 #endif /* AUDIOFILE_H_ */

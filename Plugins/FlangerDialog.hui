@@ -1,0 +1,36 @@
+// IDs
+enum{
+	HMM_CANCEL,
+	HMM_OK,
+	HMM_SPEED_SLIDER,
+	HMM_SPEED,
+	HMM_DELAY_SLIDER,
+	HMM_DELAY,
+	HMM_DEPTH_SLIDER,
+	HMM_DEPTH
+};
+
+
+
+	// dialog
+	FlangerDialog=HuiCreateDialog("Flanger",415,175,MainWin,false,&FlangerDialogFunction);
+	FlangerDialog->AddButton("Abbrechen",90,135,100,25,HMM_CANCEL);
+	FlangerDialog->SetImage(HMM_CANCEL,HuiImageCancel);
+	FlangerDialog->AddDefButton("OK",215,135,100,25,HMM_OK);
+	FlangerDialog->SetImage(HMM_OK,HuiImageOk);
+	FlangerDialog->AddSlider("",115,35,205,25,HMM_SPEED_SLIDER);
+	FlangerDialog->AddEdit("",325,35,50,25,HMM_SPEED);
+	FlangerDialog->AddText("Hz",380,35,30,25,-1);
+	FlangerDialog->AddSlider("",115,65,205,25,HMM_DELAY_SLIDER);
+	FlangerDialog->AddEdit("",325,65,50,25,HMM_DELAY);
+	FlangerDialog->AddText("ms",380,65,30,25,-1);
+	FlangerDialog->AddSlider("",115,95,205,25,HMM_DEPTH_SLIDER);
+	FlangerDialog->AddEdit("",325,95,50,25,HMM_DEPTH);
+	FlangerDialog->AddText("Geschwindigkeit",5,35,110,25,-1);
+	FlangerDialog->AddText("Verz&ogerung",5,65,100,25,-1);
+	FlangerDialog->AddText("Tiefe",5,95,100,25,-1);
+	FlangerDialog->AddText("%",380,95,30,25,-1);
+	FlangerDialog->Update();
+
+
+

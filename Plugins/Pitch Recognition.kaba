@@ -1,0 +1,161 @@
+#include "api.kaba"
+
+#define freq		44100
+#define f_min		50
+#define f_max		5000
+
+#define threshold	0.1
+
+
+#define buf_size	32768
+float buf[]
+complex bufc[]
+
+HuiWindow win
+
+float get_freq(float i)
+	return i / (buf_size / 2) * freq / 2
+
+float Frequency, Volume, Error
+bool LoudEnough
+
+float error
+string get_note(float f)
+	float fl = log(f / 110.0) / log(2.0)
+	int n = f2i(fl * 12.0 + 0.5)
+	while n > 11
+		n -= 12
+	error = fl * 12.0
+	loopf(error, -0.5, 0.5)
+	if n == 0
+		return "A"
+	else if n == 1
+		return "b"
+	else if n == 2
+		return "H"
+	else if n == 3
+		return "C"
+	else if n == 4
+		return "C#"
+	else if n == 5
+		return "D"
+	else if n == 6
+		return "D#"
+	else if n == 7
+		return "E"
+	else if n == 8
+		return "F"
+	else if n == 9
+		return "F#"
+	else if n == 10
+		return "G"
+	return "G#"
+	//loopf(fl, 0, 1)
+	//note = i2s(n)
+
+void DrawVolume(HuiDrawingContext *c)
+	c.SetColor(color(1, 0.8, 0.8, 0.8))
+	float y0 = 30
+	float y1 = c.height - 5
+	float h = y1 - y0
+	c.DrawRect(5, y0 + h * (1 - Volume), 5, h)
+	c.SetColor(color(1, 0.6, 0.6, 0.6))
+	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+
+void Draw()
+	HuiDrawingContext *c = win.BeginDraw("drawing")
+	c.SetColor(White)
+	c.SetFontSize(12)
+	c.DrawRect(0, 0, c.width, c.height)
+	
+	DrawVolume(c)
+	
+	float r = 95
+	float r1 = 90
+	float r2 = 100
+	float x = c.width / 2
+	float y = c.height - 10
+	
+	c.SetColor(color(1, 0.4, 0.4, 0.4))
+	int i
+	for i, 0, 9
+		float w = i * 0.125 * pi - pi / 2
+		c.DrawLine(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
+	
+	c.SetColor(Black)
+	if LoudEnough
+		c.DrawStr(x - 8, y - r2 - 22, get_note(Frequency))
+		c.DrawStr(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
+		c.DrawStr(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
+		c.DrawStr(5, 5, f2s(Frequency, 1) + " Hz")
+		c.DrawLine(x, y, x + r * sin(Error * pi), y - r * cos(Error * pi))
+	else
+		c.DrawStr(x - 30, y - 20, "zu leise")
+	c.End()
+
+void OnClose()
+	HuiWinClose(win)
+	win = nil
+
+void idle()
+	int num = DoCapturing()
+	if num > 0
+		int i
+		buf.resize(buf_size)
+		if num >= buf_size
+			num = buf_size
+		// alten Pufferinhalt verschieben
+		for i, 0, buf_size - num
+			buf[i] = buf[i + num]
+		// neuen Inhalt anfuegen
+		for i, 0, num
+			buf[buf_size - num + i] = (CapturePreviewBuf.r[i] + CapturePreviewBuf.l[i]) / 2
+		/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
+		for i, 0, buf_size
+			float tt = i * w_f
+			buf[i] = f2i(val_max * sin(tt) * 0.1)*/
+		
+		fft_r2c(buf, bufc)
+		float max = 0
+		float fmax = 0, fmax2 = 0
+		for i, 0, bufc.num
+			float f = get_freq(i)
+			if f > f_min and f < f_max
+				float amp = absf(bufc[i].x)
+				//floatout f
+				if (amp > max * 2.5) or (amp > max and f < fmax2)
+					max = amp
+					fmax = f
+					fmax2 = f * 1.5
+		max /= sqrt(buf.num) * 2 * pi
+		Volume = max / threshold / 2
+		clampf(Volume, 0, 1)
+		if max > threshold
+			LoudEnough = true
+			if absf(log(fmax / Frequency)) < 0.1
+				Frequency *= 1 + log(fmax / Frequency) * 0.1
+			else
+				Frequency = fmax
+			//Frequency = fmax
+			Error = error
+		else
+			LoudEnough = false
+		win.Redraw("drawing")
+	HuiDoSingleMainLoop()
+	HuiSleep(5)
+
+
+
+void main()
+	CaptureStart(freq, false)
+	win = HuiCreateDialog("Tonerkennung", 300, 145, MainWin, false)
+	win.AddDrawingArea("", 5, 5, 290, 135, "drawing")
+	win.Update()
+	
+	win.EventX("drawing", "hui:redraw", &Draw)
+	win.Event("hui:close", &OnClose)
+	
+	//HuiWaitTillWindowClosed(win)
+	while(win)
+		idle()
+	CaptureStop()

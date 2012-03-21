@@ -1,0 +1,155 @@
+#include "api.kaba"
+
+#define N		1024
+#define MIN_FREQ	20.0
+#define MAX_FREQ	20000.0
+
+HuiWindow dlg
+
+enum
+	TypeLinear
+	TypeRoot2
+	TypeLogarithm
+
+float x[], yr[], yl[]
+float ffr[], ffl[]
+
+int w, h
+
+void CreateLines(int type)
+
+	x.clear()
+	yr.clear()
+	yl.clear()
+	int i
+	for i, 0, N
+		x.add(i2f(w) * i2f(i) / i2f(N))
+		if type == TypeLinear
+			yr.add(h - 10 - (h - 20) * ffr[i])
+			yl.add(h - 10 - (h - 20) * ffl[i])
+		else if type == TypeRoot2
+			yr.add(h - 10 - (h - 20) * pow(ffr[i], 0.5))
+			yl.add(h - 10 - (h - 20) * pow(ffl[i], 0.5))
+		else //if type == TypeLogarithm
+			yr.add(h - 10 - (h - 20) * (1 + log(ffr[i]) * 0.08))
+			yl.add(h - 10 - (h - 20) * (1 + log(ffl[i]) * 0.08))
+			clampf(yr[i], 10, h - 10)
+			clampf(yl[i], 10, h - 10)
+
+void OnDraw()
+	HuiDrawingContext *c = dlg.BeginDraw("drawing_area")
+	w = c.width
+	h = c.height
+	CreateLines(dlg.GetInt("type"))
+		
+	// Hintergrund
+	c.SetColor(White)
+	c.DrawRect(0, 0, w, h)
+		
+	// Skala
+	int i
+	c.SetLineWidth(0.9)
+	c.SetFontSize(8)
+	float f = MIN_FREQ
+	while f <= MAX_FREQ
+		float fx = log(f / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
+		c.SetColor(color(1, 0.8, 0.8, 0.8))
+		c.DrawLine(fx, 0, fx, h)
+		float fx2 = log(f * sqrt(2) / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
+		c.SetColor(color(1, 0.9, 0.9, 0.9))
+		c.DrawLine(fx2, 0, fx2, h)
+		c.SetColor(color(1, 0.4, 0.4, 0.4))
+		c.DrawStr(fx + 2, 5, f2s(f,0) + " Hz")
+		f *= 2
+		
+	// Spektrum
+	c.SetLineWidth(0.8)
+	c.SetColor(color(1, 0.3, 0.3, 0.6))
+	c.DrawLines(x, yr)
+	c.SetColor(color(1, 0.6, 0.3, 0.3))
+	c.DrawLines(x, yl)
+	c.End()
+
+void OnType()
+	dlg.Redraw("drawing_area")
+
+void OnClose()
+	HuiWinClose(dlg)
+
+void show_spec()
+	dlg = HuiCreateSizableDialog("Spectrum", 600, 460, MainWin, true)
+	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
+	dlg.SetTarget("table1", 0)
+	dlg.AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
+	dlg.AddControlTable("", 0, 1, 2, 1, "table2")
+	dlg.SetTarget("table2", 0)
+	dlg.AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
+	dlg.AddButton("Close", 1, 0, 0, 0, "close")
+	dlg.SetImage("close", "hui:close")
+	dlg.Update()
+	
+	dlg.EventX("drawing_area", "hui:redraw", &OnDraw)
+	dlg.Event("type", &OnType)
+	dlg.Event("hui:close", &OnClose)
+	dlg.Event("close", &OnClose)
+	
+	dlg.SetInt("type", TypeLogarithm)
+	
+	BufferBox buf = AudioFileRender(cur_audio, cur_audio.selection_start, cur_audio.selection_length)
+	
+	complex fr[], fl[]
+	
+	int len2 = buf.r.num / 2 + 1
+	fr.resize(len2)
+	fl.resize(len2)
+	//ff.clear()
+	fft_r2c(buf.r, fr)
+	fft_r2c(buf.l, fl)
+	
+	float ww = i2f(buf.r.num) / cur_audio.sample_rate
+	int i, j
+	for i, 0, N
+		float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
+		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
+		int j0 = fmin * ww
+		int j1 = fmax * ww
+		clamp(j0, 0, len2)
+		clamp(j1, 0, len2)
+		float bmaxr = 0
+		float bmaxl = 0
+		for j, j0, j1
+			float amp = fr[j].x * fr[j].x + fr[j].y * fr[j].y
+			if bmaxr < amp
+				bmaxr = amp
+			amp = fl[j].x * fl[j].x + fl[j].y * fl[j].y
+			if bmaxl < amp
+				bmaxl = amp
+		ffr.add(bmaxr)
+		ffl.add(bmaxl)
+	fr.clear()
+	fl.clear()
+
+	float max = 0
+	for i, 0, ffr.num - 1
+		if ffr[i] > max
+			max = ffr[i]
+		if ffl[i] > max
+			max = ffl[i]
+	if max > 0
+		for i, 0, ffr.num
+			ffr[i] /= max
+			ffl[i] /= max
+
+	dlg.Redraw("drawing_area")
+
+	HuiWaitTillWindowClosed(dlg)
+	
+	x.clear()
+	yr.clear()
+	yl.clear()
+	ffr.clear()
+	ffl.clear()
+
+void main()
+	if cur_audio.cur_track >= 0
+		show_spec()

@@ -1,0 +1,209 @@
+
+#include "api.kaba"
+
+HuiWindow win
+int MouseOver, Selected
+
+class PluginData
+	complex curve[]
+	float Delay
+PluginData data
+
+float level_scale
+
+void compress(float b[])
+	int i, j
+	float in_level = 0
+	for i, 0, b.num
+		// in level
+		float in_level_cur = absf(b[i])
+		in_level *= level_scale
+		if in_level_cur > in_level
+			in_level = in_level_cur
+		
+		// out level
+		float out_level = in_level
+		for j, 1, data.curve.num
+			if (in_level >= data.curve[j - 1].x) and (in_level <= data.curve[j].x)
+				out_level = data.curve[j - 1].y + (data.curve[j].y - data.curve[j - 1].y) * (in_level - data.curve[j - 1].x) / (data.curve[j].x - data.curve[j - 1].x)
+				break
+		
+		// scale
+		float factor = 1
+		if in_level > 0
+			factor = out_level / in_level
+		b[i] = b[i] * factor
+
+float w, h
+
+complex project(complex z)
+	return complex(	20 + (w  - 40) * z.x,
+			20 + (h - 40) * (1 - z.y))
+
+complex unproject(complex z)
+	return complex(	(z.x - 20) / (w  - 40),
+			1.0 - (z.y - 20) / (h - 40))
+
+void DataToDialog()
+	win.Redraw("drawing_area")
+	win.SetFloat("edit", data.Delay * 1000)
+
+void Draw()
+	HuiDrawingContext *c = win.BeginDraw("drawing_area")
+	c.SetLineWidth(0.7)
+	w = c.width
+	h = c.height
+	
+	// background
+	c.SetColor(White)
+	c.DrawRect(0, 0, w, h)
+	
+	// frame
+	int i
+	for i, 0, 9
+		if (i % 4) == 0
+			c.SetColor(color(1, 0.6, 0.6, 0.6))
+		else
+			c.SetColor(color(1, 0.85, 0.85, 0.85))
+		c.DrawLine(20, project(complex(0, i / 8.0)).y, w - 20, project(complex(0, i / 8.0)).y)
+		c.DrawLine(project(complex(i / 8.0, 0)).x, 20, project(complex(i / 8.0, i)).x, h - 20)
+	c.DrawLine(20, h - 20, w - 20, 20)
+	
+	// curve
+	c.SetLineWidth(2)
+	c.SetColor(Black)
+	for i, 1, data.curve.num
+		complex p = project(data.curve[i])
+		complex q = project(data.curve[i - 1])
+		c.DrawLine(q.x, q.y, p.x, p.y)
+	for i, 1, data.curve.num
+		p = project(data.curve[i])
+		c.SetColor(Black)
+		if i == MouseOver
+			c.SetColor(Red)
+		else if i == Selected
+			c.SetColor(color(1, 0.7, 0, 0))
+		c.DrawRect(p.x - 3, p.y - 3, 6, 6)
+	c.End()
+
+// left button down -> select
+void OnLeftButtonDown()
+	Selected = MouseOver
+	win.Redraw("drawing_area")
+
+// left button up -> if moved to a neighbour -> remove point
+void OnLeftButtonUp()
+	if Selected >= 0
+		bool del = (data.curve[Selected] == data.curve[Selected - 1])
+		if Selected < data.curve.num - 1
+			del = del or (data.curve[Selected] == data.curve[Selected + 1])
+		if del
+			data.curve.remove(Selected)
+			Selected = -1
+			win.Redraw("drawing_area")
+
+// right button down -> new point
+void OnRightButtonDown()
+	int mx = HuiGetEvent().mouse_x
+	int my = HuiGetEvent().mouse_y
+	int i
+	for i, 1, data.curve.num
+		complex q = project(data.curve[i - 1])
+		complex p = project(data.curve[i])
+		if (mx > q.x) and (mx < p.x) and (my < q.y) and (my > p.y)
+			data.curve.add(complex(0, 0))
+			// shift...
+			int j = data.curve.num - 1
+			while j > i
+				data.curve[j] = data.curve[j - 1]
+				j --
+			// insert
+			data.curve[i] = unproject(complex(mx, my))
+			Selected = i
+			win.Redraw("drawing_area")
+			break
+
+void OnMouseMove()
+	int mx = HuiGetEvent().mouse_x
+	int my = HuiGetEvent().mouse_y
+	
+	// move
+	if HuiGetEvent().button_l and (Selected > 0)
+		data.curve[Selected] = unproject(complex(mx, my))
+		float xmin = data.curve[Selected - 1].x
+		float xmax = 1
+		float ymin = data.curve[Selected - 1].y
+		float ymax = 1
+		if Selected < data.curve.num - 1
+			xmax = data.curve[Selected + 1].x
+			ymax = data.curve[Selected + 1].y
+		clampf(data.curve[Selected].x, xmin, xmax)
+		clampf(data.curve[Selected].y, ymin, ymax)
+		if Selected == data.curve.num - 1
+			data.curve[Selected].x = 1
+	else
+	// mouse over?
+		MouseOver = -1
+		int i
+		for i, 1, data.curve.num
+			complex p = project(data.curve[i])
+			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+				MouseOver = i
+	win.Redraw("drawing_area")
+
+void OnKeyDown()
+	int k = HuiGetEvent().key
+
+	// [Delete] -> remove point
+	if (k == KeyDelete) and (Selected > 0) and (Selected < data.curve.num - 1)
+		data.curve.remove(Selected)
+		Selected = -1
+		win.Redraw("drawing_area")
+
+void OnEdit()
+	data.Delay = win.GetFloat("") / 1000.0
+
+void ResetData()
+	data.curve.clear()
+	data.curve.add(complex(0, 0))
+	data.curve.add(complex(1, 1))
+	data.Delay = 0.1
+	MouseOver = -1
+	Selected = -1
+
+void Configure()
+	// dialog
+	win = HuiCreateSizableDialog("Compressor", 500, 600, MainWin, false)
+	win.AddControlTable("", 0, 0, 1, 4, "table1")
+	win.SetTarget("table1", 0)
+	win.AddDrawingArea("", 0, 1, 0, 0, "drawing_area")
+	win.AddControlTable("", 0, 2, 2, 1, "table2")
+	win.SetTarget("table2", 0)
+	win.AddText("Delay...ms", 0, 0, 0, 0, "")
+	win.AddEdit("", 1, 0, 0, 0, "edit")
+	win.Update()
+	PutFavoriteBarSizable(win, "table1", 0, 0)
+	PutCommandBarSizable(win, "table1", 3, 0)
+	DataToDialog()
+	
+	win.Event("edit", &OnEdit)
+	win.EventX("drawing-area", "hui:key-down", &OnKeyDown)
+	win.EventX("drawing_area", "hui:redraw", &Draw)
+	win.EventX("drawing_area", "hui:left-button-down", &OnLeftButtonDown)
+	win.EventX("drawing_area", "hui:left-button-up", &OnLeftButtonUp)
+	win.EventX("drawing_area", "hui:right-button-down", &OnRightButtonDown)
+	win.EventX("drawing_area", "hui:mouse-move", &OnMouseMove)
+
+	HuiWaitTillWindowClosed(win)
+
+void ProcessTrack(BufferBox buf, Track t)
+	AudioFile *a = t.root
+	
+	float n_steps = data.Delay * a.sample_rate
+	if n_steps > 0
+		level_scale = exp(- 1 / n_steps)
+	else
+		level_scale = 0
+	compress(buf.r)
+	compress(buf.l)
+		

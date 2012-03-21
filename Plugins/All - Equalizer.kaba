@@ -1,0 +1,230 @@
+// Image = HuiImageZoomIn
+// Deutsch = Equalizer
+
+#include "api.kaba"
+
+
+
+
+#define MIN_FREQ		20.0
+#define MAX_FREQ		20000.0
+#define MIN_VOL			-45
+#define MAX_VOL			45
+
+class PluginData
+	complex curve[]
+
+PluginData data
+
+
+HuiWindow dlg
+int MouseOver, Selected
+
+complex f[]
+
+
+void equalize(float b[])
+	int i, j
+	
+	
+	// transform
+	int len2 = b.num / 2 + 1
+	f.resize(len2)
+	fft_r2c(b, f)
+	
+	// equalize
+	float w = i2f(b.num) / cur_audio.sample_rate
+	for j, 0, f2i(MIN_FREQ * w)
+		f[j] = f[j] * (1.0 / b.num)
+	for j, f2i(MAX_FREQ * w), len2
+		f[j] = f[j] * (1.0 / b.num)
+	for i, 0, data.curve.num - 1
+		float f_min, f_max
+		float db_min, db_max
+		f_min = data.curve[i].x
+		db_min = data.curve[i].y
+		float x_min = log(f_min / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
+		f_max = data.curve[i + 1].x
+		db_max = data.curve[i + 1].y
+		float x_max = log(f_max / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
+		int j0 = f_min * w
+		int j1 = f_max * w
+		clamp(j0, 0, len2)
+		clamp(j1, 0, len2)
+		//float ff = data.Factor[i] / sel_length
+		for j, j0, j1
+			float ff = i2f(j) / w
+			float x = log(ff / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
+			float db = db_min + (db_max - db_min) * (x - x_min) / (x_max - x_min)
+			f[j] = f[j] * (pow(10, db / 20) / b.num)
+		
+	// transform back
+	fft_c2r_inv(f, b)
+
+void ProcessTrack(BufferBox buf, Track t)
+	equalize(buf.r)
+	equalize(buf.l)
+	f.clear()
+
+void ResetData()
+	int i
+	data.curve.clear()
+	data.curve.add(complex(MIN_FREQ, 0))
+	data.curve.add(complex(MAX_FREQ, 0))
+	MouseOver = -1
+	Selected = -1
+
+void DataToDialog()
+	dlg.Redraw("drawing")
+
+float w, h
+
+complex project(complex z)
+	return complex(	log(z.x / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1),
+			h * (MAX_VOL - z.y) / (MAX_VOL - MIN_VOL))
+
+complex unproject(complex z)
+	return complex(	exp(z.x * log(MAX_FREQ / MIN_FREQ) / (w - 1)) * MIN_FREQ,
+			MAX_VOL - z.y / h * (MAX_VOL - MIN_VOL))
+
+
+void Draw()
+	HuiDrawingContext *c = dlg.BeginDraw("drawing")
+	c.SetLineWidth(0.7)
+	
+	// background
+	c.SetColor(White)
+	c.DrawRect(0, 0, c.width, c.height)
+		
+	// frame
+	w = c.width
+	h = c.height
+		
+	// Skala
+	int i
+	c.SetLineWidth(0.9)
+	c.SetFontSize(8)
+	float ff = MIN_FREQ
+	while ff <= MAX_FREQ
+		float fx = log(ff / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
+		c.SetColor(color(1, 0.8, 0.8, 0.8))
+		c.DrawLine(fx, 0, fx, h)
+		float fx2 = log(ff * sqrt(2) / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
+		c.SetColor(color(1, 0.9, 0.9, 0.9))
+		c.DrawLine(fx2, 0, fx2, h)
+		c.SetColor(Black)
+		c.DrawStr(fx, 5, f2s(ff,0) + " Hz")
+		ff *= 2
+	float vol = i2f(f2i(MIN_VOL / 10) * 10)
+	while vol <= MAX_VOL
+		c.SetColor(color(1, 0.8, 0.8, 0.8))
+		float vy = project(complex(MIN_FREQ, vol)).y
+		c.DrawLine(0, vy, c.width, vy)
+		c.SetColor(Black)
+		c.DrawStr(2, vy, f2s(vol,0) + " db")
+		vol += 10
+	
+	// curve
+	c.SetLineWidth(2)
+	c.SetColor(Black)
+	for i, 1, data.curve.num
+		complex p = project(data.curve[i])
+		complex q = project(data.curve[i - 1])
+		c.DrawLine(q.x, q.y, p.x, p.y)
+	for i, 0, data.curve.num
+		p = project(data.curve[i])
+		c.SetColor(Black)
+		if i == MouseOver
+			c.SetColor(Red)
+		else if i == Selected
+			c.SetColor(color(1, 0.7, 0, 0))
+		c.DrawRect(p.x - 3, p.y - 3, 6, 6)
+	c.End()
+
+// left button down -> select
+void OnLeftButtonDown()
+	Selected = MouseOver
+	dlg.Redraw("drawing")
+
+// left button up -> if moved to a neighbour -> remove point
+void OnLeftButtonUp()
+	if Selected >= 0
+		bool del = (data.curve[Selected] == data.curve[Selected - 1])
+		if Selected < data.curve.num - 1
+			del = del or (data.curve[Selected] == data.curve[Selected + 1])
+		if del
+			data.curve.remove(Selected)
+			Selected = -1
+			dlg.Redraw("drawing")
+
+// right button down -> new point
+void OnRightButtonDown()
+	int mx = HuiGetEvent().mouse_x
+	int my = HuiGetEvent().mouse_y
+	int i
+	for i, 1, data.curve.num
+		complex q = project(data.curve[i - 1])
+		complex p = project(data.curve[i])
+		if (mx > q.x) and (mx < p.x)
+			data.curve.add(complex(0, 0))
+			// shift...
+			int j = data.curve.num - 1
+			while j > i
+				data.curve[j] = data.curve[j - 1]
+				j --
+			// insert
+			data.curve[i] = unproject(complex(mx, my))
+			Selected = i
+			dlg.Redraw("drawing")
+			i = data.curve.num
+			break
+
+void OnMouseMove()
+	int mx = HuiGetEvent().mouse_x
+	int my = HuiGetEvent().mouse_y
+	int i
+	// move
+	if HuiGetEvent().button_l and (Selected >= 0)
+		data.curve[Selected] = unproject(complex(mx, my))
+		float xmin = MIN_FREQ
+		float xmax = MAX_FREQ
+		if Selected > 0
+			xmin = data.curve[Selected - 1].x
+		if Selected < data.curve.num - 1
+			xmax = data.curve[Selected + 1].x
+		clampf(data.curve[Selected].x, xmin, xmax)
+		clampf(data.curve[Selected].y, MIN_VOL, MAX_VOL)
+		if Selected == data.curve.num - 1
+			data.curve[Selected].x = MAX_FREQ
+		if Selected == 0
+			data.curve[Selected].x = MIN_FREQ
+	else
+	// mouse over?
+		MouseOver = -1
+		for i, 0, data.curve.num
+			complex p = project(data.curve[i])
+			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+				MouseOver = i
+	dlg.Redraw("drawing")
+
+void Configure()
+	// dialog
+	dlg = HuiCreateSizableDialog("Equalizer",600,400,MainWin,false)
+	dlg.AddControlTable("", 0, 0, 1, 3, "table")
+	dlg.SetTarget("table", 0)
+	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")
+	dlg.Update()
+	
+	dlg.EventX("drawing", "hui:redraw", &Draw)
+	dlg.EventX("drawing", "hui:left-button-down", &OnLeftButtonDown)
+	dlg.EventX("drawing", "hui:left-button-up", &OnLeftButtonUp)
+	dlg.EventX("drawing", "hui:right-button-down", &OnRightButtonDown)
+	dlg.EventX("drawing", "hui:mouse-move", &OnMouseMove)
+
+	PutFavoriteBarSizable(dlg, "table", 0, 0)
+	PutCommandBarSizable(dlg, "table", 0, 2)
+	
+	DataToDialog()
+
+	HuiWaitTillWindowClosed(dlg)
+

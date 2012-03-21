@@ -1,0 +1,66 @@
+// Image = HuiImageZoomIn
+// Deutsch = Lautstärke
+
+#include "api.kaba"
+
+
+HuiWindow VolumeDialog
+
+class PluginData
+	float Volume
+	bool Maximize
+PluginData data
+
+void ResetData()
+	data.Volume = 1
+
+void DataToDialog()
+	SliderSet(VolumeDialog, "volume", data.Volume)
+	VolumeDialog.Check("max", data.Maximize)
+	VolumeDialog.Enable("volume", !data.Maximize)
+	VolumeDialog.Enable("volume_slider", !data.Maximize)
+
+void OnMax()
+	data.Maximize = VolumeDialog.IsChecked("max")
+	VolumeDialog.Enable("volume", !data.Maximize)
+	VolumeDialog.Enable("volume_slider", !data.Maximize)
+
+void OnVolume()
+	data.Volume = SliderGet(VolumeDialog, "volume")
+
+
+void Configure()
+	// dialog
+	VolumeDialog=HuiCreateDialog("Lautstärke",305,105,MainWin,false)
+	VolumeDialog.AddSlider("",5,5,205,25,"volume_slider")
+	VolumeDialog.AddSpinButton("\\0\\1000\\0.1",215,5,60,25,"volume")
+	VolumeDialog.AddText("%",280,5,20,25,"")
+	VolumeDialog.AddCheckBox("Maximieren",5,35,295,25,"max")
+	PutCommandBarFixed(VolumeDialog, 5, 70, 305)
+	AddSlider(VolumeDialog, "volume_slider", "volume", 0, 2, 100, &OnVolume, data.Volume)
+	VolumeDialog.Update()
+	
+	VolumeDialog.Event("max", &OnMax)
+	
+	VolumeDialog.SetDecimals(1)
+	DataToDialog()
+		
+	HuiWaitTillWindowClosed(VolumeDialog)
+
+void ProcessTrack(BufferBox buf, Track t)
+	int i
+	float factor = data.Volume
+	if data.Maximize
+		float max = 0
+		for i, 0, buf.num
+			if absf(buf.r[i]) > max
+				max = absf(buf.r[i])
+			if absf(buf.l[i]) > max
+				max = absf(buf.l[i])
+		factor = 1 / max
+	for i, 0, buf.num
+		buf.r[i] = buf.r[i] * factor
+		buf.l[i] = buf.l[i] * factor
+		clampf(buf.r[i], -1, 1)
+		clampf(buf.l[i], -1, 1)
+

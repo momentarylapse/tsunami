@@ -1,0 +1,26 @@
+#include "api.kaba"
+
+HuiWindow dlg
+
+void OnOk()
+	cur_audio.sample_rate = dlg.GetInt("freq")
+	//ChangeAudioFile(cur_audio)
+	HuiWinClose(dlg)
+
+void OnClose()
+	HuiWinClose(dlg)
+
+void main()
+	dlg = HuiCreateDialog("Frequenz", 210, 65, MainWin, false)
+	dlg.AddEdit("", 5, 5, 200, 25, "freq")
+	dlg.AddButton("Abbrechen", 5, 35, 100, 25, "cancel")
+	dlg.AddDefButton("Ok", 110, 35, 95, 25, "ok")
+	dlg.Update()
+	
+	dlg.Event("ok", &OnOk)
+	dlg.Event("cancel", &OnClose)
+	dlg.Event("hui:close", &OnClose)
+	
+	dlg.SetInt("freq", cur_audio.sample_rate)
+	
+	HuiWaitTillWindowClosed(dlg)

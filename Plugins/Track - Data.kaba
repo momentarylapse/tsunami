@@ -1,0 +1,8 @@
+#include "api.kaba"
+
+void main()
+	if cur_audio.cur_track >= 0
+		Track *cur_track = &cur_audio.track[cur_audio.cur_track]
+		HuiInfoBox(MainWin, cur_track.name, "Punkte:\t" + (cur_track.max - cur_track.min) + "\nAnzeigehöhe:\t" + cur_track.height + "\nSubs:\t" + cur_track.sub.num)
+	else
+		HuiErrorBox(MainWin, "Fehler", "Kein Track ausgewählt")

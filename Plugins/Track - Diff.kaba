@@ -1,0 +1,21 @@
+#include "api.kaba"
+
+void main()
+	if cur_audio.track.num != 2
+		HuiErrorBox(MainWin, "Fehler", "Datei muss genau 2 Tracks besitzen..." + cur_audio.track.num)
+	else
+		int i
+		int max = 0
+		for i, sel_start, sel_end
+			cur_audio.Track[1].buffer_r[i] -= cur_audio.Track[0].buffer_r[i]
+			cur_audio.Track[1].buffer_l[i] -= cur_audio.Track[0].buffer_l[i]
+			if cur_audio.Track[1].buffer_r[i] > max
+				max = cur_audio.Track[1].buffer_r[i]
+			if cur_audio.Track[1].buffer_l[i] > max
+				max = cur_audio.Track[1].buffer_l[i]
+			if -cur_audio.Track[1].buffer_r[i] > max
+				max = -cur_audio.Track[1].buffer_r[i]
+			if -cur_audio.Track[1].buffer_l[i] > max
+				max = -cur_audio.Track[1].buffer_l[i]
+		print max
+		ChangeTrack(cur_audio.Track[1])

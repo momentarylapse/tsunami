@@ -1,0 +1,56 @@
+// IDs
+enum{
+	HMM_CANCEL,
+	HMM_OK,
+	HMM_SLIDER_00,
+	HMM_SLIDER_01,
+	HMM_SLIDER_02,
+	HMM_SLIDER_03,
+	HMM_SLIDER_04,
+	HMM_SLIDER_05,
+	HMM_SLIDER_06,
+	HMM_SLIDER_07,
+	HMM_SLIDER_08,
+	HMM_SLIDER_09,
+	HMM_SLIDER_10,
+	HMM_SLIDER_11,
+	HMM_SLIDER_12,
+	HMM_SLIDER_13,
+	HMM_SLIDER_14
+};
+
+
+
+	// dialog
+	EqualizerDialog=HuiCreateDialog("Equalizer",455,325,MainWin,false,&EqualizerDialogFunction);
+	EqualizerDialog->AddButton("Abbrechen",210,285,100,25,HMM_CANCEL);
+	EqualizerDialog->SetImage(HMM_CANCEL,HuiImageCancel);
+	EqualizerDialog->AddDefButton("OK",335,285,100,25,HMM_OK);
+	EqualizerDialog->SetImage(HMM_OK,HuiImageOk);
+	EqualizerDialog->AddSlider("",5,35,25,210,HMM_SLIDER_00);
+	EqualizerDialog->AddSlider("",35,35,25,210,HMM_SLIDER_01);
+	EqualizerDialog->AddSlider("",65,35,25,210,HMM_SLIDER_02);
+	EqualizerDialog->AddSlider("",95,35,25,210,HMM_SLIDER_03);
+	EqualizerDialog->AddSlider("",125,35,25,210,HMM_SLIDER_04);
+	EqualizerDialog->AddSlider("",155,35,25,210,HMM_SLIDER_05);
+	EqualizerDialog->AddSlider("",185,35,25,210,HMM_SLIDER_06);
+	EqualizerDialog->AddSlider("",215,35,25,210,HMM_SLIDER_07);
+	EqualizerDialog->AddSlider("",245,35,25,210,HMM_SLIDER_08);
+	EqualizerDialog->AddSlider("",275,35,25,210,HMM_SLIDER_09);
+	EqualizerDialog->AddSlider("",305,35,25,210,HMM_SLIDER_10);
+	EqualizerDialog->AddSlider("",335,35,25,210,HMM_SLIDER_11);
+	EqualizerDialog->AddSlider("",365,35,25,210,HMM_SLIDER_12);
+	EqualizerDialog->AddSlider("",395,35,25,210,HMM_SLIDER_13);
+	EqualizerDialog->AddSlider("",425,35,25,210,HMM_SLIDER_14);
+	EqualizerDialog->AddText("20",5,250,25,25,-1);
+	EqualizerDialog->AddText("54",65,250,25,25,-1);
+	EqualizerDialog->AddText("140",125,250,25,25,-1);
+	EqualizerDialog->AddText("390",185,250,25,25,-1);
+	EqualizerDialog->AddText("1k",245,250,25,25,-1);
+	EqualizerDialog->AddText("2k8",305,250,25,25,-1);
+	EqualizerDialog->AddText("7k5",365,250,25,25,-1);
+	EqualizerDialog->AddText("20k",425,250,25,25,-1);
+	EqualizerDialog->Update();
+
+
+

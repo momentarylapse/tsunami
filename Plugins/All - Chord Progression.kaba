@@ -1,0 +1,145 @@
+// Image = HuiImageExecute
+// Deutsch = Akkord Generator
+
+#include "api.kaba"
+
+
+class PluginData
+	string Chords
+	float Volume
+	float Duration
+
+PluginData data
+
+
+HuiWindow GeneratorDialog
+
+float get_freq(int tone)
+	return 220 * pow(2, (tone - 21.0) / 12.0)
+
+int get_tone(char c)
+	if c == 'c'
+		return 0
+	if c == 'd'
+		return 2
+	if c == 'e'
+		return 4
+	if c == 'f'
+		return 5
+	if c == 'g'
+		return 7
+	if c == 'a'
+		return 9
+	if c == 'h'
+		return 11
+
+enum
+	ChordMajor
+	ChordMinor
+
+class Chord
+	int base_tone
+	int type
+
+void ParseChords(AudioFile *a, Chord chord[])
+	int i
+	for i, 0, data.Chords.num
+		Chord c
+		if data.Chords[i] >= 'a' and data.Chords[i] <= 'h'
+			c.type = ChordMinor
+			c.base_tone = get_tone(data.Chords[i]) + 12
+		else if data.Chords[i] >= 'A' and data.Chords[i] <= 'H'
+			c.type = ChordMajor
+			c.base_tone = get_tone(data.Chords[i] + 32) + 12
+		else
+			continue
+		if i < data.Chords.num - 1
+			if data.Chords[i + 1] == '#'
+				c.base_tone ++
+				i ++
+		chord.add(c)
+
+void AddSimpleTone(AudioFile *a, float buf[], int pos0, int pos1, float f, float vol)
+	float f_w = 1.0 / a.sample_rate * f * 2.0 * pi
+	if pos1 >= buf.num
+		pos1 = buf.num
+	int i
+	for i, pos0, pos1
+		float tt = i * f_w
+		float d = sin(tt) * vol
+		if i < pos0 + 1000
+			d *= (i - pos0) * 0.001
+		if i > pos1 - 1000
+			d *= (pos1 - i) * 0.001
+		buf[i] += d
+		clampf(buf[i], -1, 1)
+
+void AddTone(AudioFile *a, float buf[], int pos0, int pos1, float f, float vol)
+	AddSimpleTone(a, buf, pos0, pos1, f,     vol * 0.6)
+	AddSimpleTone(a, buf, pos0, pos1, f * 2, vol * 0.5)
+	AddSimpleTone(a, buf, pos0, pos1, f * 4, vol * 0.3)
+	AddSimpleTone(a, buf, pos0, pos1, f * 8, vol * 0.1)
+
+void AddChord(AudioFile *a, float buf[], int pos0, int pos1, Chord c)
+	float f[]
+	f.add(get_freq(c.base_tone))
+	if c.type == ChordMinor
+		f.add(get_freq(c.base_tone + 3))
+	else
+		f.add(get_freq(c.base_tone + 4))
+	f.add(get_freq(c.base_tone + 7))
+	f.add(get_freq(c.base_tone + 12))
+	
+	int i
+	for i, 0, f.num
+		AddTone(a, buf, pos0, pos1, f[i], data.Volume)
+
+void ProcessTrack(BufferBox buf, Track t)
+	Chord chord[]
+	AudioFile *a = t.root
+	ParseChords(a, chord)
+	
+	int i
+	for i, 0, chord.num
+		int pos0 = f2i(a.sample_rate * data.Duration * i2f(i))
+		int pos1 = f2i(a.sample_rate * data.Duration * i2f(i + 1))
+		AddChord(a, buf.r, pos0, pos1, chord[i])
+		AddChord(a, buf.l, pos0, pos1, chord[i])
+
+void OnChords()
+	data.Chords = GeneratorDialog.GetString("")
+
+void OnVolume()
+	data.Volume = SliderGet(GeneratorDialog, "volume")
+
+void DataToDialog()
+	GeneratorDialog.SetString("chords", data.Chords)
+	SliderSet(GeneratorDialog, "volume", data.Volume)
+
+void ResetData()
+	data.Volume = 0.2
+	data.Chords = "aCGe"
+	data.Duration = 1
+
+void Configure()
+	// dialog
+	GeneratorDialog=HuiCreateDialog("Akkord Generator",415,135,MainWin,false)
+	GeneratorDialog.AddText("Akkorde:",5,35,100,25,"")
+	GeneratorDialog.AddEdit("",110,35,270,25,"chords")
+	GeneratorDialog.AddText("Lautstärke:",5,65,100,25,"")
+	GeneratorDialog.AddSlider("",110,65,200,25,"volume_slider")
+	GeneratorDialog.AddSpinButton("\\0\\100\\0.1",315,65,70,25,"volume")
+	GeneratorDialog.AddText("%",390,65,20,25,"")
+	PutCommandBarFixed(GeneratorDialog, 5, 100, 415)
+	PutFavoriteBarFixed(GeneratorDialog, 5, 5, 415)
+	GeneratorDialog.Update()
+	
+	
+	AddSlider(GeneratorDialog, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
+	GeneratorDialog.Event("chords", &OnChords)
+
+	GeneratorDialog.SetDecimals(1)
+	DataToDialog()
+	
+	HuiWaitTillWindowClosed(GeneratorDialog)
+

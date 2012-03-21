@@ -1,0 +1,62 @@
+// Image = HuiImageZoomIn
+// Deutsch = Pitch Shift
+
+#include "api.kaba"
+
+HuiWindow PitchDialog
+
+complex buf1[]
+complex buf2[]
+
+class PluginData
+	float Pitch
+
+PluginData data
+
+void ResetData()
+	data.Pitch = 1
+
+void DataToDialog()
+	SliderSet(PitchDialog, "pitch", data.Pitch)
+
+void OnPitch()
+	data.Pitch = SliderGet(PitchDialog, "pitch")
+
+void shift_buf(float b[])
+	int i, j
+	fft_r2c(b, buf1)
+	float f = 1.0 / b.num
+	int ll = b.num / 2
+	buf2.resize(ll)
+	for i, 0, ll
+		float i_s = i2f(i) / data.Pitch
+		int ii_s = f2i(i_s)
+		float di_s = i_s - i2f(ii_s)
+		if i < ll and ii_s < ll
+			buf2[i] = f*(buf1[ii_s])// * (1 - di_s) + buf[ii_s + 1] * di_s)
+		else
+			buf2[i] = complex(0, 0)
+	fft_c2r_inv(buf2, b)
+
+
+void Configure()
+	// dialog
+	PitchDialog=HuiCreateDialog("Pitch Shift",305,75,MainWin,false)
+	PitchDialog.AddSlider("",5,5,205,25,"pitch_slider")
+	PitchDialog.AddSpinButton("\\0\\1000\\0.1",215,5,50,25,"pitch")
+	PitchDialog.AddText("%",270,5,30,25,"")
+	PutCommandBarFixed(PitchDialog, 5, 40, 305)
+	AddSlider(PitchDialog, "pitch_slider", "pitch", 0, 2, 100, &OnPitch, data.Pitch)
+	PitchDialog.Update()
+		
+	PitchDialog.SetDecimals(1)
+	DataToDialog()
+		
+	HuiWaitTillWindowClosed(PitchDialog)
+
+void ProcessTrack(BufferBox buf, Track t)
+	shift_buf(buf.r)
+	shift_buf(buf.l)
+	buf1.clear()
+	buf2.clear()
+

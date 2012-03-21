@@ -1,0 +1,89 @@
+#include "types.h"
+
+//------------------------------------------------------------------------------------------------//
+//                                             colors                                             //
+//------------------------------------------------------------------------------------------------//
+
+// create a color from (alpha, red, green blue)
+// (values of set [0..1])
+color SetColorSave(float a,float r,float g, float b)
+{
+	if (a<0)	a=0;	if (a>1)	a=1;
+	if (r<0)	r=0;	if (r>1)	r=1;
+	if (g<0)	g=0;	if (g>1)	g=1;
+	if (b<0)	b=0;	if (b>1)	b=1;
+	color c;
+	c.a=a;	c.r=r;	c.g=g;	c.b=b;
+	return c;
+}
+
+color SetColorHSB(float a,float hue,float saturation,float brightness)
+{
+	int h=int(hue*6)%6;
+	float f=hue*6.0f-int(hue*6);
+	float p=brightness*(1-saturation);
+	float q=brightness*(1-saturation*f);
+	float t=brightness*(1-saturation*(1-f));
+	color c;
+	if (h==0)	c=color(a,brightness,t,p);
+	if (h==1)	c=color(a,q,brightness,p);
+	if (h==2)	c=color(a,p,brightness,t);
+	if (h==3)	c=color(a,p,q,brightness);
+	if (h==4)	c=color(a,t,p,brightness);
+	if (h==5)	c=color(a,brightness,p,q);
+	return c;
+}
+
+// scale the elements of a color
+color ColorScale(const color &c,float f)
+{
+	return color(c.a*f,c.r*f,c.g*f,c.b*f);
+}
+
+// create a mixed color = a * (1-t)  +  b * t
+color ColorInterpolate(const color &a,const color &b,float t)
+{
+	return color(	a.a*(1-t)+b.a*t,
+						a.r*(1-t)+b.r*t,
+						a.g*(1-t)+b.g*t,
+						a.b*(1-t)+b.b*t	);
+}
+
+color ColorMultiply(const color &a,const color &b)
+{
+	return color(	a.a*b.a,
+						a.r*b.r,
+						a.g*b.g,
+						a.b*b.b	);
+}
+
+color ColorFromIntRGB(int *i)
+{
+	return color(	1,
+					(float)i[0]/255.0f,
+					(float)i[1]/255.0f,
+					(float)i[2]/255.0f);
+}
+
+color ColorFromIntARGB(int *i)
+{
+	return color(	(float)i[0]/255.0f,
+					(float)i[1]/255.0f,
+					(float)i[2]/255.0f,
+					(float)i[3]/255.0f);
+}
+
+void Color2IntRGB(const color &c,int *i)
+{
+	i[0]=int(c.r*255.0f);
+	i[1]=int(c.g*255.0f);
+	i[2]=int(c.b*255.0f);
+}
+
+void Color2IntARGB(const color &c,int *i)
+{
+	i[0]=int(c.a*255.0f);
+	i[1]=int(c.r*255.0f);
+	i[2]=int(c.g*255.0f);
+	i[3]=int(c.b*255.0f);
+}

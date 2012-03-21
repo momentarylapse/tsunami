@@ -1,0 +1,25 @@
+// IDs
+enum{
+	HMM_CANCEL,
+	HMM_OK,
+	HMM_VOLUME_SLIDER,
+	HMM_VOLUME,
+	HMM_MAX
+};
+
+
+
+	// dialog
+	VolumeDialog=HuiCreateDialog("Lautst&arke",305,105,MainWin,false,&VolumeDialogFunction);
+	VolumeDialog->AddButton("Abbrechen",45,70,100,25,HMM_CANCEL);
+	VolumeDialog->SetImage(HMM_CANCEL,HuiImageCancel);
+	VolumeDialog->AddDefButton("OK",170,70,100,25,HMM_OK);
+	VolumeDialog->SetImage(HMM_OK,HuiImageOk);
+	VolumeDialog->AddSlider("",5,5,205,25,HMM_VOLUME_SLIDER);
+	VolumeDialog->AddEdit("",215,5,50,25,HMM_VOLUME);
+	VolumeDialog->AddText("%",270,5,30,25,-1);
+	VolumeDialog->AddCheckBox("Maximieren",5,35,295,25,HMM_MAX);
+	VolumeDialog->Update();
+
+
+

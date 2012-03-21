@@ -10,6 +10,7 @@
 
 #include "Stuff/Observer.h"
 #include "lib/hui/hui.h"
+#include "Data/AudioFile.h"
 
 class Observer;
 class CHuiWindow;
@@ -59,6 +60,8 @@ public:
 	void UpdateMenu();
 
 	string CurrentDirectory;
+
+	AudioFile *audio[2];
 };
 
 extern Tsunami *tsunami;

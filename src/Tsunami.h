@@ -12,6 +12,7 @@
 #include "lib/hui/hui.h"
 #include "Data/AudioFile.h"
 #include "View/AudioView.h"
+#include "Storage/Storage.h"
 
 class Observer;
 class CHuiWindow;
@@ -40,6 +41,11 @@ public:
 
 	void OnEvent();
 
+	void OnNew();
+	void OnOpen();
+	void OnSave();
+	void OnSaveAs();
+
 	void SetMessage(const string &message);
 	void RemoveMessage();
 	void ErrorBox(const string &message);
@@ -59,6 +65,8 @@ public:
 	AudioFile *cur_audio;
 
 	AudioView *view;
+
+	Storage *storage;
 };
 
 extern Tsunami *tsunami;

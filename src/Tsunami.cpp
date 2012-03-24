@@ -7,22 +7,20 @@
 
 #include "lib/hui/hui.h"
 #include "Tsunami.h"
+#include "View/Dialog/NewDialog.h"
 
 
 Tsunami *tsunami = NULL;
 extern string AppName;
 
 Tsunami::Tsunami(Array<string> arg) :
-	CHuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable, true)
+	CHuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls, true)
 {
 	tsunami = this;
 
 	// configuration
 	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
-/*	DetailSteps = HuiConfigReadInt("DetailSteps", 1);
-	MouseMinMoveToSelect = HuiConfigReadInt("MouseMinMoveToSelect", 5);
-	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
-	ChosenOutputDevice = HuiConfigReadStr("ChosenOutputDevice", "");
+/*	ChosenOutputDevice = HuiConfigReadStr("ChosenOutputDevice", "");
 	ChosenInputDevice = HuiConfigReadStr("ChosenInputDevice", "");
 	CapturePlaybackDelay = HuiConfigReadFloat("CapturePlaybackDelay", 80.0f);*/
 
@@ -37,11 +35,11 @@ Tsunami::Tsunami(Array<string> arg) :
 	//HuiAddKeyCode("remove_added", KEY_BACKSPACE);
 	HuiAddKeyCode("jump_other_file", KEY_TAB);
 
-	/*HuiAddCommand("new", "hui:new", KEY_N + KEY_CONTROL, &New);
-	HuiAddCommand("open", "hui:open", KEY_O + KEY_CONTROL, &Open);
-	HuiAddCommand("save", "hui:save", KEY_S + KEY_CONTROL, &OnSave);
-	HuiAddCommand("save_as", "hui:save-as", KEY_S + KEY_CONTROL + KEY_SHIFT, &OnSaveAs);
-	HuiAddCommand("copy", "hui:copy", KEY_C + KEY_CONTROL, &Copy);
+	HuiAddCommandM("new", "hui:new", KEY_N + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnNew);
+	HuiAddCommandM("open", "hui:open", KEY_O + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnOpen);
+	HuiAddCommandM("save", "hui:save", KEY_S + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnSave);
+	HuiAddCommandM("save_as", "hui:save-as", KEY_S + KEY_CONTROL + KEY_SHIFT, this, (void(HuiEventHandler::*)())&Tsunami::OnSaveAs);
+	/*HuiAddCommand("copy", "hui:copy", KEY_C + KEY_CONTROL, &Copy);
 	HuiAddCommand("paste", "hui:paste", KEY_V + KEY_CONTROL, &Paste);
 	HuiAddCommand("delete", "", -1, &Delete);
 	HuiAddCommand("export_selection", "", KEY_X + KEY_CONTROL, &Export);
@@ -90,8 +88,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	//ToolBarConfigure(true, true);
 	SetMaximized(maximized);
 
-	view = new AudioView();
-
 	// events
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&Tsunami::OnClose);
 
@@ -104,6 +100,10 @@ Tsunami::Tsunami(Array<string> arg) :
 	audio[1] = new AudioFile();
 
 	cur_audio = audio[0];
+
+	storage = new Storage();
+
+	view = new AudioView();
 
 	/*PreviewInit();
 
@@ -130,6 +130,7 @@ int Tsunami::Run()
 
 void Tsunami::ForceRedraw()
 {
+	view->ForceRedraw();
 }
 
 
@@ -153,6 +154,29 @@ void Tsunami::OnUpdate(Observable *o)
 void Tsunami::OnClose()
 {
 	HuiEnd();
+}
+
+
+void Tsunami::OnNew()
+{
+	NewDialog *d = new NewDialog(tsunami, false, cur_audio);
+	d->Update();
+	HuiWaitTillWindowClosed(d);
+}
+
+
+void Tsunami::OnOpen()
+{
+}
+
+
+void Tsunami::OnSave()
+{
+}
+
+
+void Tsunami::OnSaveAs()
+{
 }
 
 

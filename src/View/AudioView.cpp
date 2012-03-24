@@ -26,9 +26,16 @@ AudioView::AudioView() :
 	ColorSubMO = color(1, 0.6f, 0, 0);
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
+	DetailSteps = HuiConfigReadInt("DetailSteps", 1);
+	MouseMinMoveToSelect = HuiConfigReadInt("MouseMinMoveToSelect", 5);
+	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
+
 
 
 	tsunami->AddDrawingArea("", 0, 0, 0, 0, "area");
+
+	Subscribe(tsunami->audio[0]);
+	Subscribe(tsunami->audio[1]);
 
 	// events
 	tsunami->EventMX("area", "hui:redraw", this, (void(HuiEventHandler::*)())&AudioView::OnDraw);
@@ -44,7 +51,7 @@ AudioView::AudioView() :
 	tsunami->EventM("hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
 	tsunami->EventMX("area", "hui:mouse-wheel", this, (void(HuiEventHandler::*)())&AudioView::OnMouseWheel);
 
-	force_redraw = true;
+	ForceRedraw();
 
 	ShowTempFile = false;
 	ShowMono = false;
@@ -128,6 +135,7 @@ void AudioView::OnLeftButtonDown()
 void AudioView::ForceRedraw()
 {
 	force_redraw = true;
+	tsunami->Redraw("area");
 }
 
 
@@ -363,6 +371,11 @@ void AudioView::DrawGrid(HuiDrawingContext *c, int x, int y, int width, int heig
 			}
 		}
 	}
+}
+
+void AudioView::OnUpdate(Observable *o)
+{
+	ForceRedraw();
 }
 
 void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a)

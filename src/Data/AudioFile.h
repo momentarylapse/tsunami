@@ -40,7 +40,8 @@ public:
 	string get_time_str_fuzzy(int t, float dt);
 
 	void Reset();
-	void New();
+	void NewEmpty(int _sample_rate);
+	void NewWithOneTrack(int _sample_rate);
 	bool Load(const string &filename, bool deep);
 	bool Save(const string &filename);
 	void UpdateSelection();

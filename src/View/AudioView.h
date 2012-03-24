@@ -10,8 +10,9 @@
 
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
+#include "../Stuff/Observer.h"
 
-class AudioView : public HuiEventHandler
+class AudioView : public HuiEventHandler, public Observer
 {
 public:
 	AudioView();
@@ -32,6 +33,8 @@ public:
 	void OnKeyDown();
 	void OnKeyUp();
 	void OnCommand(const string &id);
+
+	void OnUpdate(Observable *o);
 
 
 	void DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int pos, float zoom, const color &col);
@@ -67,6 +70,8 @@ public:
 	bool ShowMono;
 	bool ShowGrid;
 	int DetailSteps;
+	int MouseMinMoveToSelect;
+	int PreviewSleepTime;
 
 	int DrawingWidth;
 };

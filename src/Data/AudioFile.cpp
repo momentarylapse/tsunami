@@ -6,7 +6,7 @@
  */
 
 #include "AudioFile.h"
-
+#include "../Action/ActionAudioAddTrack.h"
 
 
 int get_track_index(Track *t)
@@ -61,12 +61,12 @@ void AudioFile::AddTag(const string &key, const string &value)
 	tag.add(t);
 }
 
-//void NewEmptyAudioFile(AudioFile *a, int sample_rate)
-void AudioFile::New()
+void AudioFile::NewEmpty(int _sample_rate)
 {
-	msg_db_r("AudioFile.New",1);
+	msg_db_r("AudioFile.NewEmpty",1);
 	Reset();
-	//a->sample_rate = sample_rate;
+	used = true;
+	sample_rate = _sample_rate;
 	AddTag("title", "new audio file");//_("neue Audiodatei"));
 	AddTag("album", "tsunami");//AppTitle + " " + AppVersion);
 	AddTag("artist", "tsunami");//AppTitle);
@@ -74,6 +74,19 @@ void AudioFile::New()
 	//a->history->Reset(false);
 	//force_redraw = true;
 	Notify("Change");
+	msg_db_l(1);
+}
+
+void AudioFile::NewWithOneTrack(int _sample_rate)
+{
+	msg_db_r("AudioFile.NewWithOneTrack",1);
+
+	NotifyBegin();
+	NewEmpty(_sample_rate);
+	Execute(new ActionAudioAddTrack(-1));
+	Notify("Change");
+	NotifyEnd();
+
 	msg_db_l(1);
 }
 
@@ -89,6 +102,7 @@ void AudioFile::Reset()
 	view_pos = 0;
 	view_zoom = 1;
 	volume = 1;
+	sample_rate = DEFAULT_SAMPLE_RATE;
 	fx.clear();
 
 	/*for (int i=0;i<a->Track.num;i++)

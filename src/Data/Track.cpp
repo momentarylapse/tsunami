@@ -183,3 +183,8 @@ BufferBox Track::ReadBuffers(int pos, int length)
 	msg_db_l(1);
 	return buf;
 }
+
+string Track::GetNiceName()
+{
+	return i2s(get_track_index(this) + 1) + ": " + name;
+}

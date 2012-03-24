@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.4.12.0";
+string HuiVersion = "0.4.13.0";
 
 
 #include <stdio.h>
@@ -71,8 +71,8 @@ void _so(int i)
 
 
 hui_callback *HuiIdleFunction = NULL, *HuiErrorFunction = NULL;
-CHuiWindow *hui_idle_object = NULL;
-void (CHuiWindow::*hui_idle_member_function)() = NULL;
+HuiEventHandler *hui_idle_object = NULL;
+void (HuiEventHandler::*hui_idle_member_function)() = NULL;
 bool HuiHaveToExit;
 bool HuiRunning;
 bool HuiEndKeepMsgAlive = false;
@@ -135,8 +135,8 @@ Array<sHuiImage> HuiImage;
 	struct HuiRunLaterItem
 	{
 		hui_callback *function;
-		CHuiWindow *member_object;
-		void (CHuiWindow::*member_function)();
+		HuiEventHandler *member_object;
+		void (HuiEventHandler::*member_function)();
 
 		HuiRunLaterItem()
 		{
@@ -177,7 +177,7 @@ void HuiSetIdleFunction(hui_callback *idle_function)
 	HuiIdleFunction = idle_function;
 }
 
-void HuiSetIdleFunctionM(CHuiWindow *object, void (CHuiWindow::*function)())
+void HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*function)())
 {
 #ifdef HUI_API_GTK
 	bool old_idle = (HuiIdleFunction) || ((hui_idle_object) && (hui_idle_member_function));
@@ -206,7 +206,7 @@ void HuiRunLater(int time_ms, hui_callback *function)
 	#endif
 }
 
-void HuiRunLaterM(int time_ms, CHuiWindow *object, void (CHuiWindow::*function)())
+void HuiRunLaterM(int time_ms, HuiEventHandler *object, void (HuiEventHandler::*function)())
 {
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunLater");

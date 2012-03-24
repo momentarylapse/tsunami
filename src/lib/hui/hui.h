@@ -27,6 +27,7 @@ extern string HuiVersion;
 
 class CHuiWindow;
 class CHuiMenu;
+class HuiEventHandler;
 
 
 
@@ -73,9 +74,9 @@ int HuiRun();
 void HuiPushMainLevel();
 void HuiPopMainLevel();
 void HuiSetIdleFunction(hui_callback *idle_function);
-void HuiSetIdleFunctionM(CHuiWindow *object, void (CHuiWindow::*function)());
+void HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*function)());
 void HuiRunLater(int time_ms, hui_callback *function);
-void HuiRunLaterM(int time_ms, CHuiWindow *object, void (CHuiWindow::*function)());
+void HuiRunLaterM(int time_ms, HuiEventHandler *object, void (HuiEventHandler::*function)());
 void HuiDoSingleMainLoop();
 void HuiEnd();
 string HuiWaitTillWindowClosed(CHuiWindow *win);

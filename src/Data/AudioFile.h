@@ -34,8 +34,15 @@ public:
 	int GetMax();
 	int GetLength();
 
+	int screen2sample(int x);
+	int sample2screen(int s);
+	string get_time_str(int t);
+	string get_time_str_fuzzy(int t, float dt);
+
 	void Reset();
 	void New();
+	bool Load(const string &filename, bool deep);
+	bool Save(const string &filename);
 	void UpdateSelection();
 	void UnselectAllSubs();
 	void AddTag(const string &key, const string &value);

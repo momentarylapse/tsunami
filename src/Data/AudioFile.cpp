@@ -169,6 +169,14 @@ void AudioFile::SetCurSub(Track *s)
 }
 
 
+bool AudioFile::Load(const string & filename, bool deep)
+{
+}
+
+bool AudioFile::Save(const string & filename)
+{
+}
+
 void AudioFile::SetCurTrack(Track *t)
 {
 	cur_track = get_track_index(t);
@@ -215,4 +223,53 @@ int AudioFile::GetMax()
 int AudioFile::GetLength()
 {
 	return max(GetMax() - GetMin(), 0);
+}
+
+
+int AudioFile::screen2sample(int _x)
+{
+	return (int)( (_x - x) / view_zoom + view_pos );
+}
+
+int AudioFile::sample2screen(int s)
+{
+	return (int)( x + (s - view_pos) * view_zoom );
+}
+
+
+string AudioFile::get_time_str(int t)
+{
+	int _sample_rate = used ? sample_rate : DEFAULT_SAMPLE_RATE;
+	bool sign = (t < 0);
+	if (sign)
+		t = -t;
+	int _min=(t/60/_sample_rate);
+	int _sec=((t/_sample_rate) %60);
+	int _usec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
+	if (_min > 0)
+		return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_usec);
+	else
+		return format("%s%.2d,%.3d",sign?"-":"",_sec,_usec);
+}
+
+string AudioFile::get_time_str_fuzzy(int t, float dt)
+{
+	int _sample_rate = used ? sample_rate : DEFAULT_SAMPLE_RATE;
+	bool sign = (t < 0);
+	if (sign)
+		t = -t;
+	int _min=(t/60/_sample_rate);
+	int _sec=((t/_sample_rate) %60);
+	int _usec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
+	if (dt < 1.0){
+		if (_min > 0)
+			return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_usec);
+		else
+			return format("%s%.2d,%.3d",sign?"-":"",_sec,_usec);
+	}else{
+		if (_min > 0)
+			return format("%s%d:%.2d",sign?"-":"",_min,_sec);
+		else
+			return format("%s%.2d",sign?"-":"",_sec);
+	}
 }

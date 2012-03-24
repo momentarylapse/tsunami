@@ -11,6 +11,13 @@
 #include "BufferBox.h"
 #include "AudioFile.h"
 
+
+#define NUM_PEAK_LEVELS		24
+#define PEAK_FACTOR			2
+#define MIN_MAX_FACTOR		10
+
+#define DEFAULT_SAMPLE_RATE	44100
+
 class BufferBox;
 class AudioFile;
 
@@ -79,6 +86,8 @@ public:
 
 	void Reset();
 	BufferBox ReadBuffers(int pos, int length);
+
+	string GetNiceName();
 
 
 	enum

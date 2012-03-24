@@ -9,14 +9,16 @@
 #ifndef _HUI_INPUT_EXISTS_
 #define _HUI_INPUT_EXISTS_
 
+class HuiEventHandler;
+
 struct HuiCommand
 {
 	string id, image;
 	int type, key_code;
 	bool enabled;
 	hui_callback *func;
-	CHuiWindow *object;
-	void (CHuiWindow::*member_function)();
+	HuiEventHandler *object;
+	void (HuiEventHandler::*member_function)();
 };
 
 extern Array<HuiCommand> _HuiCommand_;
@@ -47,8 +49,8 @@ void _HuiInitInput_();
 void HuiAddKeyCode(const string &id, int key_code);
 void HuiAddCommand(const string &id, const string &image, int default_key_code, hui_callback *func);
 void HuiAddCommandToggle(const string &id, const string &image, int default_key_code, hui_callback *func);
-void HuiAddCommandM(const string &id, const string &image, int default_key_code, CHuiWindow *object, void (CHuiWindow::*function)());
-void HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, CHuiWindow *object, void (CHuiWindow::*function)());
+void HuiAddCommandM(const string &id, const string &image, int default_key_code, HuiEventHandler *object, void (HuiEventHandler::*function)());
+void HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, HuiEventHandler *object, void (HuiEventHandler::*function)());
 void HuiLoadKeyCodes(const string &filename);
 void HuiSaveKeyCodes(const string &filename);
 

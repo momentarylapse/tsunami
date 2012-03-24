@@ -15,6 +15,8 @@ extern string AppName;
 Tsunami::Tsunami(Array<string> arg) :
 	CHuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable, true)
 {
+	tsunami = this;
+
 	// configuration
 	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
 /*	DetailSteps = HuiConfigReadInt("DetailSteps", 1);
@@ -81,41 +83,29 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetSize(width, height);
 	SetBorderWidth(0);
 	AllowEvents("key");
-	AddDrawingArea("", 0, 0, 0, 0, "area");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);
 
 	SetMenu(HuiCreateResourceMenu("menu"));
 	//ToolBarConfigure(true, true);
 	SetMaximized(maximized);
-	Update();
+
+	view = new AudioView();
 
 	// events
-	/*Event("hui:close", &OnExit);
-	EventX("area", "hui:redraw", &Render);
-	EventX("area", "hui:mouse-move", &OnMouseMove);
-	EventX("area", "hui:left-button-down", &OnLeftButtonDown);
-	EventX("area", "hui:left-double-click", &OnLeftDoubleClick);
-	EventX("area", "hui:left-button-up", &OnLeftButtonUp);
-	EventX("area", "hui:middle-button-down", &OnMiddleButtonDown);
-	EventX("area", "hui:middle-button-up", &OnMiddleButtonUp);
-	EventX("area", "hui:right-button-down", &OnRightButtonDown);
-	EventX("area", "hui:right-button-up", &OnRightButtonUp);
-	//EventX("area", "hui:key-down", &OnKeyDown);
-	Event("hui:key-down", &OnKeyDown);
-	EventX("area", "hui:mouse-wheel", &OnMouseWheel);
+	EventM("hui:close", this, (void(HuiEventHandler::*)())&Tsunami::OnClose);
 
-	AddPluginsToMenu();
+	/*AddPluginsToMenu();
 
 	input_timer = HuiCreateTimer();
 
-	InitHistory();
+	InitHistory();*/
 	audio[0] = new AudioFile();
 	audio[1] = new AudioFile();
 
 	cur_audio = audio[0];
 
-	PreviewInit();
+	/*PreviewInit();
 
 	force_rendering = true;
 
@@ -124,9 +114,8 @@ Tsunami::Tsunami(Array<string> arg) :
 	if (arg.num > 1)
 		LoadFromFile(audio[0], arg[1]);
 
-	UpdateMenu();
-
-	return HuiRun();*/
+	UpdateMenu();*/
+	Update();
 }
 
 Tsunami::~Tsunami()
@@ -158,6 +147,12 @@ void Tsunami::UpdateMenu()
 
 void Tsunami::OnUpdate(Observable *o)
 {
+}
+
+
+void Tsunami::OnClose()
+{
+	HuiEnd();
 }
 
 

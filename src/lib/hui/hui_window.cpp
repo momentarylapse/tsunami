@@ -236,24 +236,24 @@ void CHuiWindow::EventX(const string &id, const string &msg, hui_callback *funct
 	event.add(e);
 }
 
-void CHuiWindow::EventM(const string &id, CHuiWindow *object, void (CHuiWindow::*function)())
+void CHuiWindow::EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
 	HuiWinEvent e;
 	e.id = id;
 	e.message = "*";
 	e.function = NULL;
-	e.object = object;
+	e.object = handler;
 	e.member_function = function;
 	event.add(e);
 }
 
-void CHuiWindow::EventMX(const string &id, const string &msg, CHuiWindow *object, void (CHuiWindow::*function)())
+void CHuiWindow::EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
 	HuiWinEvent e;
 	e.id = id;
 	e.message = msg;
 	e.function = NULL;
-	e.object = object;
+	e.object = handler;
 	e.member_function = function;
 	event.add(e);
 }

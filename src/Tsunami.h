@@ -11,9 +11,12 @@
 #include "Stuff/Observer.h"
 #include "lib/hui/hui.h"
 #include "Data/AudioFile.h"
+#include "View/AudioView.h"
 
 class Observer;
 class CHuiWindow;
+class AudioFile;
+class AudioView;
 
 class Tsunami : public Observer, public CHuiWindow
 {
@@ -35,15 +38,6 @@ public:
 	void OnClose();
 	void OnDraw();
 
-	void OnKeyDown();
-	void OnKeyUp();
-	void OnMouseMove();
-	void OnLeftButtonDown();
-	void OnLeftButtonUp();
-	void OnMiddleButtonDown();
-	void OnMiddleButtonUp();
-	void OnRightButtonDown();
-	void OnRightButtonUp();
 	void OnEvent();
 
 	void SetMessage(const string &message);
@@ -62,6 +56,9 @@ public:
 	string CurrentDirectory;
 
 	AudioFile *audio[2];
+	AudioFile *cur_audio;
+
+	AudioView *view;
 };
 
 extern Tsunami *tsunami;

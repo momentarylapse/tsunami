@@ -6,6 +6,7 @@
  */
 
 #include "BufferBox.h"
+#include "../Tsunami.h"
 
 
 BufferBox::BufferBox()
@@ -146,4 +147,41 @@ void BufferBox::set_16bit(const void *b, int offset, int length)
 		(*pr ++) = (float)(*pb ++) / 32768.0f;
 		(*pl ++) = (float)(*pb ++) / 32768.0f;
 	}
+}
+
+
+#define val_max		32766
+#define val_alert	32770
+
+static bool wtb_overflow;
+
+inline void set_data(short *data, float value)
+{
+	int value_int = (int)(value * 32768.0f);
+	if (value_int > val_max){
+		if (value_int > val_alert)
+			wtb_overflow = true;
+		value_int = val_max;
+	}else if (value_int < - val_max){
+		if (value_int < -val_alert)
+			wtb_overflow = true;
+		value_int = -val_max;
+	}
+	*data = value_int;
+}
+
+void BufferBox::get_16bit_buffer(Array<short> &data)
+{
+	wtb_overflow = false;
+
+	data.resize(num * 2);
+	short *b = &data[0];
+	for (int i=0;i<num;i++){
+		set_data(b ++, r[i]);
+		set_data(b ++, l[i]);
+	}
+
+	if (wtb_overflow)
+		tsunami->Log(Tsunami::LOG_ERROR, _("Amplitude zu gro&s, Signal &ubersteuert."));
+		//msg_error("overflow");
 }

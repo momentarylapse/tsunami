@@ -22,6 +22,9 @@ public:
 	virtual void LoadTrack(Track *t, const string &filename) = 0;
 	virtual void SaveTrack(Track *t, const string &filename) = 0;
 
+	virtual void LoadAudio(AudioFile *a, const string &filename) = 0;
+	virtual void SaveAudio(AudioFile *a, const string &filename) = 0;
+
 	string extension;
 };
 

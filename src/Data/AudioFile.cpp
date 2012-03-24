@@ -83,7 +83,7 @@ void AudioFile::NewWithOneTrack(int _sample_rate)
 
 	NotifyBegin();
 	NewEmpty(_sample_rate);
-	Execute(new ActionAudioAddTrack(-1));
+	AddEmptyTrack(-1);
 	Notify("Change");
 	NotifyEnd();
 
@@ -287,3 +287,11 @@ string AudioFile::get_time_str_fuzzy(int t, float dt)
 			return format("%s%.2d",sign?"-":"",_sec);
 	}
 }
+
+
+
+Track *AudioFile::AddEmptyTrack(int index)
+{
+	return (Track*)Execute(new ActionAudioAddTrack(index));
+}
+

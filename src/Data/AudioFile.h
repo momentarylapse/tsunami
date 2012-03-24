@@ -51,6 +51,10 @@ public:
 	void SetCurSub(Track *s);
 	void SetCurTrack(Track *t);
 
+	// action
+	Track *AddEmptyTrack(int index = -1);
+	BufferBox GetBuffers(int pos, int length);
+
 // data
 	bool used;
 	string filename;

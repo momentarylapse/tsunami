@@ -6,6 +6,8 @@
  */
 
 #include "Track.h"
+#include "../Action/ActionTrackCreateBuffers.h"
+#include "../Action/ActionTrackAddEmptySubTrack.h"
 
 Track::Track()
 {
@@ -154,13 +156,15 @@ int Track::GetMax()
 	return max;
 }
 
+string Track::GetNiceName()
+{
+	return i2s(get_track_index(this) + 1) + ": " + name;
+}
 
 BufferBox Track::ReadBuffers(int pos, int length)
 {
 	BufferBox buf;
-	/*if (!this)
-		return buf;*/
-	msg_db_r("TrackGetBuffersR", 1);
+	msg_db_r("Track.ReadBuffers", 1);
 
 	// is <pos..length> inside a buffer?
 	for (int i=0;i<buffer.num;i++){
@@ -184,7 +188,18 @@ BufferBox Track::ReadBuffers(int pos, int length)
 	return buf;
 }
 
-string Track::GetNiceName()
+BufferBox Track::GetBuffers(int pos, int length)
 {
-	return i2s(get_track_index(this) + 1) + ": " + name;
+	root->Execute(new ActionTrackCreateBuffers(this, pos, length));
+	return ReadBuffers(pos, length);
 }
+
+void Track::UpdatePeaks()
+{}
+
+Track *Track::AddEmptySubTrack(int pos, int length, const string &name)
+{
+	return (Track*)root->Execute(new ActionTrackAddEmptySubTrack(get_track_index(this), pos, length, name));
+}
+
+

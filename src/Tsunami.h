@@ -46,10 +46,13 @@ public:
 	void OnSave();
 	void OnSaveAs();
 
-	void SetMessage(const string &message);
-	void RemoveMessage();
-	void ErrorBox(const string &message);
-	Array<string> message_str;
+	enum{
+		LOG_ERROR,
+		LOG_WARNING,
+		LOG_INFO
+	};
+
+	void Log(int type, const string &message);
 
 	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
 	bool AllowTermination();

@@ -26,4 +26,16 @@ void StorageWave::LoadTrack(Track *t, const string & filename)
 {
 }
 
+void StorageWave::SaveAudio(AudioFile *a, const string & filename)
+{
+}
+
+
+
+void StorageWave::LoadAudio(AudioFile *a, const string & filename)
+{
+}
+
+
+
 

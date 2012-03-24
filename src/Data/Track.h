@@ -85,9 +85,14 @@ public:
 	int GetMaxUnsafe();
 
 	void Reset();
+	void UpdatePeaks();
 	BufferBox ReadBuffers(int pos, int length);
 
 	string GetNiceName();
+
+	// actions
+	BufferBox GetBuffers(int pos, int length);
+	Track *AddEmptySubTrack(int pos, int length, const string &name);
 
 
 	enum

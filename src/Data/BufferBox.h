@@ -29,6 +29,8 @@ public:
 	void add(const BufferBox &b, int offset, float volume);
 	void set_16bit(const void *b, int offset, int length);
 	void set_as_ref(const BufferBox &b, int offset, int length);
+
+	void get_16bit_buffer(Array<short> &data);
 };
 
 #endif /* BUFFERBOX_H_ */

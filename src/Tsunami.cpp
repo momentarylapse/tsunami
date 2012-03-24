@@ -180,4 +180,7 @@ void Tsunami::OnSaveAs()
 }
 
 
-
+void Tsunami::Log(int type, const string &message)
+{
+	msg_error(message);
+}

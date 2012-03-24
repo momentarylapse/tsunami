@@ -1,20 +1,20 @@
 /*
- * StorageWave.h
+ * StorageNami.h
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#ifndef STORAGEWAVE_H_
-#define STORAGEWAVE_H_
+#ifndef STORAGENAMI_H_
+#define STORAGENAMI_H_
 
 #include "StorageAny.h"
 
-class StorageWave: public StorageAny
+class StorageNami : public StorageAny
 {
 public:
-	StorageWave();
-	virtual ~StorageWave();
+	StorageNami();
+	virtual ~StorageNami();
 
 	void LoadTrack(Track *t, const string &filename);
 	void SaveTrack(Track *t, const string &filename);
@@ -23,4 +23,4 @@ public:
 	void SaveAudio(AudioFile *a, const string &filename);
 };
 
-#endif /* STORAGEWAVE_H_ */
+#endif /* STORAGENAMI_H_ */

@@ -8,10 +8,6 @@
 #include "StorageNami.h"
 #include "../Tsunami.h"
 
-#define ProgressStart(x,t)
-#define ProgressStatus(x,t)
-#define ProgressEnd(x)
-
 
 StorageNami::StorageNami() :
 	StorageAny("nami")
@@ -138,7 +134,7 @@ void WriteTrack(CFile *f, Track *t)
 
 void StorageNami::SaveAudio(AudioFile *a, const string & filename)
 {
-	ProgressStart(_("speichere nami"), 0);
+	tsunami->progress->Start(_("speichere nami"), 0);
 	a->filename = filename;
 
 //	int length = a->GetLength();
@@ -155,7 +151,7 @@ void StorageNami::SaveAudio(AudioFile *a, const string & filename)
 
 	foreachi(a->track, track, i){
 		WriteTrack(f, &track);
-		ProgressStatus(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
+		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
 
 	foreach(a->fx, effect)
@@ -164,7 +160,7 @@ void StorageNami::SaveAudio(AudioFile *a, const string & filename)
 	EndChunk(f);
 
 	FileClose(f);
-	ProgressEnd();
+	tsunami->progress->End();
 }
 
 
@@ -248,8 +244,7 @@ void ReadFXList(CFile *f, Array<Effect> &fx)
 
 void load_nami_file_old(CFile *f, AudioFile *a)
 {
-
-//	int file_size = f->GetSize();
+	int file_size = f->GetSize();
 	int ffv = f->ReadFileFormatVersion();
 	msg_write("old format: " + i2s(ffv));
 	Array<short> tdata;
@@ -268,7 +263,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 			buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 		}
-		ProgressStatus(_("lade nami"), (float)f->GetPos() / (float)file_size);
+		tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 		t->UpdatePeaks();
 		msg_db_m("b",1);
 		int NumSubs = f->ReadInt();
@@ -290,7 +285,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 			}
-			ProgressStatus(_("lade nami"), (float)f->GetPos() / (float)file_size);
+			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 			s->UpdatePeaks();
 		}
 	}else if (ffv == 2){
@@ -311,7 +306,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 			}
-			ProgressStatus(_("lade nami"), (float)f->GetPos() / (float)file_size);
+			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 			t->UpdatePeaks();
 			msg_db_m("b",1);
 			int NumSubs = f->ReadInt();
@@ -333,7 +328,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 					buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 					buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 				}
-				ProgressStatus(_("lade nami"), (float)f->GetPos() / (float)file_size);
+				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 				s->UpdatePeaks();
 			}
 		}
@@ -365,7 +360,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 			}
-			ProgressStatus(_("lade nami"), (float)f->GetPos() / (float)file_size);
+			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 			t->UpdatePeaks();
 			if (ffv == 3)
 				ReadFXListOld(f, t->fx);
@@ -390,7 +385,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 					sbuf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 					sbuf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 				}
-				ProgressStatus(_("lade nami"), (float)f->GetPos() / (float)file_size);
+				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 				s->UpdatePeaks();
 				if (ffv == 3)
 					ReadFXListOld(f, s->fx);
@@ -457,7 +452,7 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	f->ReadInt();
 	f->ReadInt();
 	ReadChunkList(f);
-	ProgressStatus(_("lade nami"), (float)f->GetPos() / (float)f->GetSize());
+	tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());
 }
 
 void ReadChunkSub(CFile *f, Track *t)
@@ -572,7 +567,7 @@ void load_nami_file_new(CFile *f, AudioFile *a)
 void StorageNami::LoadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_r("load_nami_file", 1);
-	ProgressStatus(_("lade nami"), 0);
+	tsunami->progress->Set(_("lade nami"), 0);
 	msg_db_m("a",1);
 
 	// TODO?

@@ -26,13 +26,12 @@ Storage::~Storage()
 bool Storage::Load(AudioFile *a, const string &filename)
 {
 	msg_db_r("LoadFromFile", 1);
-//	ProgressStart(_("lade"), 0);
+	tsunami->progress->Start(_("lade"), 0);
 
 	a->NotifyBegin();
 
 	a->Reset();
 	a->used = true;
-//	SelectTrack(t, false);
 	a->filename = filename;
 
 	CurrentDirectory = dirname(filename);
@@ -63,18 +62,17 @@ bool Storage::Load(AudioFile *a, const string &filename)
 	}else{ //if (ext == "nami")
 		format[0]->LoadAudio(a, filename);
 	}*/
-//	ProgressEnd();
+	tsunami->progress->End();
 	tsunami->ForceRedraw();
-	if (a->track.num > 0){
-//		a->OptimizeView();
+	if (a->track.num > 0)
 		a->SetCurTrack(&a->track[0]);
-	}else
+	else
 		a->used = false;
 	a->action_manager->Reset();
 	a->NotifyEnd();
 
 	msg_db_l(1);
-	return true;
+	return a->used;
 }
 
 bool Storage::Save(AudioFile *a, const string &filename)

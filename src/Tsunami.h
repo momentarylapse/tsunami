@@ -13,6 +13,7 @@
 #include "Data/AudioFile.h"
 #include "View/AudioView.h"
 #include "Storage/Storage.h"
+#include "Stuff/Progress.h"
 
 class Observer;
 class CHuiWindow;
@@ -68,6 +69,8 @@ public:
 	AudioView *view;
 
 	Storage *storage;
+
+	Progress *progress;
 };
 
 extern Tsunami *tsunami;

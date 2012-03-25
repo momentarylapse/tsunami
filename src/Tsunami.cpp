@@ -104,6 +104,8 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	view = new AudioView();
 
+	progress = new Progress;
+
 	/*PreviewInit();
 
 	force_rendering = true;

@@ -10,9 +10,10 @@
 #include "../lib/hui/hui.h"
 #include <assert.h>
 
-ActionAudioAddTrack::ActionAudioAddTrack(int _index)
+ActionAudioAddTrack::ActionAudioAddTrack(int _index, int _type)
 {
 	index = _index;
+	type = _type;
 }
 
 ActionAudioAddTrack::~ActionAudioAddTrack()
@@ -51,6 +52,7 @@ void *ActionAudioAddTrack::execute(Data *d)
 	t->root = a;
 	t->parent = -1;
 	t->is_selected = true;
+	t->type = type;
 
 	return t;
 }

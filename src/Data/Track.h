@@ -60,6 +60,7 @@ class BarCollection
 {
 public:
 	//BarCollection(){	HistoryStructReset("BarCollection", this);	}
+	void Update();
 
 	int pos;
 	int length;

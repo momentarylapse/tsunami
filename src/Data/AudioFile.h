@@ -53,6 +53,7 @@ public:
 
 	// action
 	Track *AddEmptyTrack(int index = -1);
+	Track *AddTimeTrack(int index = -1);
 
 	Track *get_track(int track_no, int sub_no);
 

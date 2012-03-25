@@ -9,6 +9,15 @@
 #include "../Action/ActionTrackCreateBuffers.h"
 #include "../Action/ActionTrackAddEmptySubTrack.h"
 
+
+
+void BarCollection::Update()
+{
+	length = 0;
+	foreach(bar, b)
+		length += b.length;
+}
+
 Track::Track()
 {
 	//HistoryStructReset("Track", this);

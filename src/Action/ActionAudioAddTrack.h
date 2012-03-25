@@ -13,7 +13,7 @@
 class ActionAudioAddTrack : public Action
 {
 public:
-	ActionAudioAddTrack(int _index);
+	ActionAudioAddTrack(int _index, int _type);
 	virtual ~ActionAudioAddTrack();
 
 	void *execute(Data *d);
@@ -21,7 +21,7 @@ public:
 	void redo(Data *d);
 
 private:
-	int index;
+	int index, type;
 	int old_cur_track;
 };
 

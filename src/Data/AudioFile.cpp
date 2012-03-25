@@ -307,7 +307,23 @@ Track *AudioFile::AddEmptyTrack(int index)
 {
 	if (index < 0)
 		index = cur_track + 1;
-	return (Track*)Execute(new ActionAudioAddTrack(index));
+	return (Track*)Execute(new ActionAudioAddTrack(index, Track::TYPE_AUDIO));
+}
+
+
+
+Track *AudioFile::AddTimeTrack(int index)
+{
+	// force single time track
+	foreach(track, tt)
+		if (tt.type == Track::TYPE_TIME){
+			tsunami->Log(Tsunami::LOG_ERROR, _("Es existiert schon eine Rhythmus-Spur."));
+			return NULL;
+		}
+
+	if (index < 0)
+		index = cur_track + 1;
+	return (Track*)Execute(new ActionAudioAddTrack(index, Track::TYPE_TIME));
 }
 
 Track *AudioFile::get_track(int track_no, int sub_no)

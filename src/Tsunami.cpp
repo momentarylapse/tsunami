@@ -19,7 +19,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	tsunami = this;
 
 	// configuration
-	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
 /*	ChosenOutputDevice = HuiConfigReadStr("ChosenOutputDevice", "");
 	ChosenInputDevice = HuiConfigReadStr("ChosenInputDevice", "");
 	CapturePlaybackDelay = HuiConfigReadFloat("CapturePlaybackDelay", 80.0f);*/

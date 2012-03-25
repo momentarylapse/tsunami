@@ -62,8 +62,6 @@ public:
 	bool force_redraw;
 	void UpdateMenu();
 
-	string CurrentDirectory;
-
 	AudioFile *audio[2];
 	AudioFile *cur_audio;
 

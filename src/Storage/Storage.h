@@ -29,6 +29,7 @@ public:
 
 private:
 	Array<StorageAny*> format;
+	string CurrentDirectory;
 };
 
 #endif /* STORAGE_H_ */

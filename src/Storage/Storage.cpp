@@ -9,11 +9,14 @@
 #include "StorageWave.h"
 #include "StorageNami.h"
 #include "../Tsunami.h"
+#include "../lib/hui/hui.h"
 
 Storage::Storage()
 {
 	format.add(new StorageNami());
 	format.add(new StorageWave());
+
+	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
 }
 
 Storage::~Storage()
@@ -32,7 +35,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 //	SelectTrack(t, false);
 	a->filename = filename;
 
-	tsunami->CurrentDirectory = dirname(filename);
+	CurrentDirectory = dirname(filename);
 
 	string ext = file_extension(filename);
 	//msg_write(ext);
@@ -81,20 +84,20 @@ bool Storage::Save(AudioFile *a, const string &filename)
 
 bool Storage::AskOpen(CHuiWindow *win)
 {
-	return HuiFileDialogOpen(win, _("Datei &offnen"), tsunami->CurrentDirectory, "*.nami,*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac;*.nami");
+	return HuiFileDialogOpen(win, _("Datei &offnen"), CurrentDirectory, "*.nami,*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac;*.nami");
 }
 
 bool Storage::AskSave(CHuiWindow *win)
 {
-	return HuiFileDialogSave(win, _("Datei speichern"), tsunami->CurrentDirectory, "*.nami,*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac;*.nami");
+	return HuiFileDialogSave(win, _("Datei speichern"), CurrentDirectory, "*.nami,*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac;*.nami");
 }
 
 bool Storage::AskOpenImport(CHuiWindow *win)
 {
-	return HuiFileDialogOpen(win, _("Datei importieren"), tsunami->CurrentDirectory, "**.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac");
+	return HuiFileDialogOpen(win, _("Datei importieren"), CurrentDirectory, "**.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac");
 }
 
 bool Storage::AskSaveExport(CHuiWindow *win)
 {
-	return HuiFileDialogSave(win, _("Datei exportieren"), tsunami->CurrentDirectory, "*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac");
+	return HuiFileDialogSave(win, _("Datei exportieren"), CurrentDirectory, "*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac");
 }

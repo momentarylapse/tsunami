@@ -64,9 +64,9 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommand("play_loop", "", -1, &OnPlayLoop);
 	HuiAddCommand("stop", "", -1, &OnStop);
 	HuiAddCommand("record", "", -1, &Record);
-	HuiAddCommand("show_log", "", -1, &OnShowLog);
-	HuiAddCommand("about", "", -1, &OnAbout);
-	HuiAddCommand("view_temp_file", "", -1, &OnViewTempFile);
+	HuiAddCommand("show_log", "", -1, &OnShowLog);*/
+	HuiAddCommandM("about", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAbout);
+	/*HuiAddCommand("view_temp_file", "", -1, &OnViewTempFile);
 	HuiAddCommand("view_mono", "", -1, &OnViewMono);
 	HuiAddCommand("view_grid", "", -1, &OnViewGrid);
 	HuiAddCommand("view_optimal", "", -1, &OnViewOptimal);
@@ -137,6 +137,7 @@ void Tsunami::ForceRedraw()
 
 void Tsunami::OnAbout()
 {
+	HuiAboutBox(this);
 }
 
 
@@ -167,6 +168,8 @@ void Tsunami::OnNew()
 
 void Tsunami::OnOpen()
 {
+	if (storage->AskOpen(this))
+		storage->Load(cur_audio, HuiFilename);
 }
 
 

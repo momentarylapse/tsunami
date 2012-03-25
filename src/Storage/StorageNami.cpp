@@ -251,7 +251,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 
 //	int file_size = f->GetSize();
 	int ffv = f->ReadFileFormatVersion();
-	msg_write(ffv);
+	msg_write("old format: " + i2s(ffv));
 	Array<short> tdata;
 	if (ffv == 1){
 		int length = f->ReadInt();
@@ -575,6 +575,7 @@ void StorageNami::LoadAudio(AudioFile *a, const string & filename)
 	ProgressStatus(_("lade nami"), 0);
 	msg_db_m("a",1);
 
+	// TODO?
 	a->tag.clear();
 
 	CFile *f = OpenFile(a->filename);

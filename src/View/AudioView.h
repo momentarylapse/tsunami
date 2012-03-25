@@ -45,6 +45,8 @@ public:
 	void DrawGrid(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a, const color &bg, bool show_time = false);
 	void DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a);
 
+	void OptimizeView(AudioFile *a);
+
 
 	color ColorBackground;
 	color ColorBackgroundCurWave;

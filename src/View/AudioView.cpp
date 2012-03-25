@@ -171,7 +171,7 @@ inline int fill_line_buffer(int width, int di, float pos, float zoom, float f, f
 void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int pos, float zoom, const color &col)
 {
 	msg_db_r("DrawBuffer", 1);
-	int l = 0;
+//	int l = 0;
 	float f = 1.0f;
 
 	// which level of detail?
@@ -187,7 +187,6 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int he
 	// zero heights of both channels
 	float y0r = (float)y + (float)height / 4;
 	float y0l = (float)y + (float)height * 3 / 4;
-	float y1, y2;
 
 	float hf = (float)height / 4;
 
@@ -350,7 +349,7 @@ void AudioView::DrawGrid(HuiDrawingContext *c, int x, int y, int width, int heig
 	float exp_s_mod = exp_s - log10(dt);
 	dt = pow(10, exp_s);
 	dl = dt * a->sample_rate;
-	float dw = dl * a->view_zoom;
+//	float dw = dl * a->view_zoom;
 	int nx0 = a->screen2sample(x - 1) / dl + 1;
 	int nx1 = a->screen2sample(x + width) / dl + 1;
 	color c1 = ColorInterpolate(bg, ColorGrid, exp_s_mod);
@@ -375,7 +374,11 @@ void AudioView::DrawGrid(HuiDrawingContext *c, int x, int y, int width, int heig
 
 void AudioView::OnUpdate(Observable *o)
 {
-	ForceRedraw();
+	msg_write("view: " + o->GetName() + " - " + o->GetMessage());
+	if (o->GetMessage() == "New")
+		OptimizeView(dynamic_cast<AudioFile*>(o));
+	else
+		ForceRedraw();
 }
 
 void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a)
@@ -510,7 +513,7 @@ void AudioView::OnDraw()
 	msg_db_l(1);
 }
 
-/*void AudioView::OptimizeView(AudioFile *a)
+void AudioView::OptimizeView(AudioFile *a)
 {
 	msg_db_r("OptimizeView", 1);
 	if (a->width <= 0)
@@ -523,4 +526,4 @@ void AudioView::OnDraw()
 	a->view_pos = (float)a->GetMin();
 	ForceRedraw();
 	msg_db_l(1);
-}*/
+}

@@ -10,6 +10,7 @@
 #include "ActionTrack__GrowBufferBox.h"
 #include "ActionTrack__AbsorbBufferBox.h"
 #include "../Data/Track.h"
+#include <assert.h>
 
 ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int pos, int length)
 {
@@ -28,25 +29,25 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int pos, int length
 //	msg_write(n_before);
 
 	if (n_pos >= 0){
-		msg_write("inside");
+		//msg_write("inside");
 
 		// use base buffers
 		BufferBox *b = &t->buffer[n_pos];
 
 		// too small?
 		if (pos + length > b->offset + b->num)
-			AddSubAction(new ActionTrack__GrowBufferBox(get_track_index(t), n_pos, pos - b->offset + length), t->root);
+			AddSubAction(new ActionTrack__GrowBufferBox(t, n_pos, pos - b->offset + length), t->root);
 	}else{
 
 		// insert new buffers
 		n_pos = n_before + 1;
-		AddSubAction(new ActionTrack__AddBufferBox(get_track_index(t), n_pos, pos, length), t->root);
+		AddSubAction(new ActionTrack__AddBufferBox(t, n_pos, pos, length), t->root);
 	}
 
 	// collision???  -> absorb
 	for (int i=t->buffer.num-1;i>n_pos;i--)
 		if (t->buffer[i].offset < pos + length)
-			AddSubAction(new ActionTrack__AbsorbBufferBox(get_track_index(t), n_pos, i), t->root);
+			AddSubAction(new ActionTrack__AbsorbBufferBox(t, n_pos, i), t->root);
 
 //	for (int i=0;i<t->buffer_r.num;i++)
 //		msg_write(format("%d   %d  %s", t->buffer_r[i].offset, t->buffer_r[i].b.num, (i == n_pos) ? "(*)" : ""));

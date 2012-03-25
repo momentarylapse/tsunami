@@ -53,7 +53,8 @@ public:
 
 	// action
 	Track *AddEmptyTrack(int index = -1);
-	BufferBox GetBuffers(int pos, int length);
+
+	Track *get_track(int track_no, int sub_no);
 
 // data
 	bool used;
@@ -90,5 +91,6 @@ public:
 
 int get_track_index(Track *t);
 int get_sub_index(Track *s);
+void get_track_sub_index(Track *t, int &track_no, int &sub_no);
 
 #endif /* AUDIOFILE_H_ */

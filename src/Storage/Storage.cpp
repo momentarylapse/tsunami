@@ -18,10 +18,77 @@ Storage::Storage()
 
 Storage::~Storage()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void Storage::Load(AudioFile *a, const string &filename)
 {
+	msg_db_r("LoadFromFile", 1);
+//	ProgressStart(_("lade"), 0);
+
+	a->NotifyBegin();
+
+	a->Reset();
+	a->used = true;
+//	SelectTrack(t, false);
+	a->filename = filename;
+
 	tsunami->CurrentDirectory = dirname(filename);
+
+	string ext = file_extension(filename);
+	//msg_write(ext);
+
+	foreach(format, f)
+		if (f->CanHandle(ext))
+			f->LoadAudio(a, filename);
+
+/*
+	//-----------------------------------------  import wave / ogg / flac
+	if ((ext == "wav") or (ext == "ogg") or (ext == "flac")){
+		int channels, bits, samples, freq;
+		char *data = NULL;
+		if (load_audio_file(filename, channels, bits, samples, freq, data)){
+			ProgressStatus(_("importiere Daten"), perc_import);
+			a->sample_rate = (int)freq;
+			Track *t = AddEmptyTrack(a);
+			ImportData(t, data, channels, bits, samples);
+			ProgressStatus(_("erzeuge Peaks"), perc_peaks);
+			UpdatePeaks(t);
+			//strcat(a->filename, ".nami");
+			delete[](data);
+		}
+	//-----------------------------------------  load native format
+	}else{ //if (ext == "nami")
+		format[0]->LoadAudio(a, filename);
+	}*/
+//	ProgressEnd();
+	tsunami->ForceRedraw();
+	if (a->track.num > 0){
+//		a->OptimizeView();
+		a->SetCurTrack(&a->track[0]);
+	}else
+		a->used = false;
+	a->action_manager->Reset();
+	a->NotifyEnd();
+
+	msg_db_l(1);
+}
+
+bool Storage::AskOpen(CHuiWindow *win)
+{
+	return HuiFileDialogOpen(win, _("Datei &offnen"), tsunami->CurrentDirectory, "*.nami,*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac;*.nami");
+}
+
+bool Storage::AskSave(CHuiWindow *win)
+{
+	return HuiFileDialogSave(win, _("Datei speichern"), tsunami->CurrentDirectory, "*.nami,*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac;*.nami");
+}
+
+bool Storage::AskOpenImport(CHuiWindow *win)
+{
+	return HuiFileDialogOpen(win, _("Datei importieren"), tsunami->CurrentDirectory, "**.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac");
+}
+
+bool Storage::AskSaveExport(CHuiWindow *win)
+{
+	return HuiFileDialogSave(win, _("Datei exportieren"), tsunami->CurrentDirectory, "*.wav,*.ogg,*.flac", "*.wav;*.ogg;*flac");
 }

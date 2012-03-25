@@ -10,6 +10,7 @@
 
 #include "StorageAny.h"
 #include "../lib/file/file.h"
+#include "../lib/hui/hui.h"
 
 class Storage
 {
@@ -20,6 +21,13 @@ public:
 	void Load(AudioFile *a, const string &filename);
 	void Save(AudioFile *a, const string &filename);
 
+
+	bool AskOpen(CHuiWindow *win);
+	bool AskSave(CHuiWindow *win);
+	bool AskOpenImport(CHuiWindow *win);
+	bool AskSaveExport(CHuiWindow *win);
+
+private:
 	Array<StorageAny*> format;
 };
 

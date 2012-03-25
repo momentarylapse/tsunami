@@ -16,6 +16,7 @@ class StorageAny
 public:
 	StorageAny(const string &_extension);
 	virtual ~StorageAny();
+	bool CanHandle(const string &_extension);
 
 	void ImportData(Track *t, void *data, int channels, int bits, int samples);
 

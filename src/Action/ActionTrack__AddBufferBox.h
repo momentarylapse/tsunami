@@ -9,11 +9,12 @@
 #define ACTIONTRACK__ADDBUFFERBOX_H_
 
 #include "Action.h"
+#include "../Data/Track.h"
 
 class ActionTrack__AddBufferBox : public Action
 {
 public:
-	ActionTrack__AddBufferBox(int _track_no, int index, int _pos, int _length);
+	ActionTrack__AddBufferBox(Track *t, int index, int _pos, int _length);
 	virtual ~ActionTrack__AddBufferBox();
 
 	void *execute(Data *d);
@@ -21,7 +22,7 @@ public:
 	void redo(Data *d);
 
 private:
-	int track_no;
+	int track_no, sub_no;
 	int pos, length, index;
 };
 

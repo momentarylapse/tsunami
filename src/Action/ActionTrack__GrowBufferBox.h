@@ -9,11 +9,12 @@
 #define ACTIONTRACKGROWBUFFERBOX_H_
 
 #include "Action.h"
+#include "../Data/Track.h"
 
 class ActionTrack__GrowBufferBox : public Action
 {
 public:
-	ActionTrack__GrowBufferBox(int _track_no, int _index, int _new_length);
+	ActionTrack__GrowBufferBox(Track *t, int _index, int _new_length);
 	virtual ~ActionTrack__GrowBufferBox();
 
 	void *execute(Data *d);
@@ -21,7 +22,7 @@ public:
 	void redo(Data *d);
 
 private:
-	int track_no, index;
+	int track_no, sub_no, index;
 	int old_length, new_length;
 };
 

@@ -56,3 +56,10 @@ void StorageAny::ImportData(Track *t, void *data, int channels, int bits, int sa
 	}*/
 	msg_db_l(1);
 }
+
+
+bool StorageAny::CanHandle(const string & _extension)
+{
+	return (extension == _extension);
+}
+

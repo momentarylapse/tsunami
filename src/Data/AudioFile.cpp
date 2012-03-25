@@ -7,6 +7,7 @@
 
 #include "AudioFile.h"
 #include "../Action/ActionAudioAddTrack.h"
+#include <assert.h>
 
 
 int get_track_index(Track *t)
@@ -33,6 +34,15 @@ int get_sub_index(Track *s)
 		}
 	}
 	return -1;
+}
+
+void get_track_sub_index(Track *t, int &track_no, int &sub_no)
+{
+	sub_no = get_sub_index(t);
+	if (sub_no >= 0)
+		track_no = get_track_index(t->GetParent());
+	else
+		track_no = get_track_index(t);
 }
 
 AudioFile::AudioFile()
@@ -64,9 +74,12 @@ void AudioFile::AddTag(const string &key, const string &value)
 void AudioFile::NewEmpty(int _sample_rate)
 {
 	msg_db_r("AudioFile.NewEmpty",1);
+
 	Reset();
 	used = true;
 	sample_rate = _sample_rate;
+
+	// default tags
 	AddTag("title", "new audio file");//_("neue Audiodatei"));
 	AddTag("album", "tsunami");//AppTitle + " " + AppVersion);
 	AddTag("artist", "tsunami");//AppTitle);
@@ -84,7 +97,6 @@ void AudioFile::NewWithOneTrack(int _sample_rate)
 	NotifyBegin();
 	NewEmpty(_sample_rate);
 	AddEmptyTrack(-1);
-	Notify("Change");
 	NotifyEnd();
 
 	msg_db_l(1);
@@ -104,15 +116,13 @@ void AudioFile::Reset()
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	fx.clear();
-
-	/*for (int i=0;i<a->Track.num;i++)
-		delete(a->Track[i]);*/
 	track.clear();
 	cur_track = -1;
 
 	action_manager->Reset();
 
 	Notify("Change");
+	Notify("New");
 
 	msg_db_l(1);
 }
@@ -294,4 +304,17 @@ Track *AudioFile::AddEmptyTrack(int index)
 {
 	return (Track*)Execute(new ActionAudioAddTrack(index));
 }
+
+Track *AudioFile::get_track(int track_no, int sub_no)
+{
+	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_track");
+	Track *t = &track[track_no];
+	if (sub_no < 0)
+		return t;
+
+	assert((sub_no < t->sub.num) && "AudioFile.get_track");
+	return &t->sub[sub_no];
+}
+
+
 

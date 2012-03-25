@@ -9,11 +9,12 @@
 #define ACTIONTRACK__ABSORBBUFFERBOX_H_
 
 #include "Action.h"
+#include "../Data/Track.h"
 
 class ActionTrack__AbsorbBufferBox : public Action
 {
 public:
-	ActionTrack__AbsorbBufferBox(int _track_no, int _dest, int _src);
+	ActionTrack__AbsorbBufferBox(Track *t, int _dest, int _src);
 	virtual ~ActionTrack__AbsorbBufferBox();
 
 	void *execute(Data *d);
@@ -21,7 +22,7 @@ public:
 	void redo(Data *d);
 
 private:
-	int track_no;
+	int track_no, sub_no;
 	int dest, src;
 };
 

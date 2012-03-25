@@ -18,8 +18,8 @@ public:
 	Storage();
 	virtual ~Storage();
 
-	void Load(AudioFile *a, const string &filename);
-	void Save(AudioFile *a, const string &filename);
+	bool Load(AudioFile *a, const string &filename);
+	bool Save(AudioFile *a, const string &filename);
 
 
 	bool AskOpen(CHuiWindow *win);

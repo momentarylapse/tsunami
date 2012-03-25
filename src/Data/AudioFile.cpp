@@ -7,6 +7,7 @@
 
 #include "AudioFile.h"
 #include "../Action/ActionAudioAddTrack.h"
+#include "../Tsunami.h"
 #include <assert.h>
 
 
@@ -195,10 +196,12 @@ void AudioFile::SetCurSub(Track *s)
 
 bool AudioFile::Load(const string & filename, bool deep)
 {
+	return tsunami->storage->Load(this, filename);
 }
 
 bool AudioFile::Save(const string & filename)
 {
+	return tsunami->storage->Save(this, filename);
 }
 
 void AudioFile::SetCurTrack(Track *t)

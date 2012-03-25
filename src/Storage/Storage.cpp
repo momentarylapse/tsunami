@@ -20,7 +20,7 @@ Storage::~Storage()
 {
 }
 
-void Storage::Load(AudioFile *a, const string &filename)
+bool Storage::Load(AudioFile *a, const string &filename)
 {
 	msg_db_r("LoadFromFile", 1);
 //	ProgressStart(_("lade"), 0);
@@ -71,6 +71,12 @@ void Storage::Load(AudioFile *a, const string &filename)
 	a->NotifyEnd();
 
 	msg_db_l(1);
+	return true;
+}
+
+bool Storage::Save(AudioFile *a, const string &filename)
+{
+	return false;
 }
 
 bool Storage::AskOpen(CHuiWindow *win)

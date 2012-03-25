@@ -76,6 +76,66 @@ public:
 	const int SUB_FRAME_HEIGHT;
 	const int TIME_SCALE_HEIGHT;
 
+	enum
+	{
+		SEL_TYPE_NONE,
+		SEL_TYPE_SELECTION_START,
+		SEL_TYPE_SELECTION_END,
+		SEL_TYPE_PLAYBACK_START,
+		SEL_TYPE_PLAYBACK_END,
+		SEL_TYPE_PLAYBACK,
+		SEL_TYPE_AUDIO,
+		SEL_TYPE_TIME,
+		SEL_TYPE_TRACK,
+		SEL_TYPE_SUB
+	};
+
+	struct SelectionType
+	{
+		int type;
+		AudioFile *audio;
+		Track *track, *sub;
+		int pos;
+		int sub_offset;
+		Array<int> barrier;
+	};
+
+	SelectionType Selection;
+
+	int MousePossiblySelecting, MousePossiblySelectingStart;
+	const int BarrierDist;
+	float ScrollSpeed;
+	const float ScrollSpeedFast;
+	const float ZoomSpeed;
+
+	int mx,my;
+	int mx0,my0;
+
+	void SelectNone(AudioFile *a);
+
+	void SetMouse();
+	void ClearMouseOver(AudioFile *a);
+	bool MouseOverAudio(AudioFile *a);
+	bool MouseOverTrack(Track *t);
+	int MouseOverSub(Track *s);
+	void SelectionUpdatePos(SelectionType &s);
+	SelectionType GetMouseOver();
+	void SelectUnderMouse();
+	void SetBarriers(AudioFile *a, SelectionType *s);
+	void ApplyBarriers(int &pos);
+	SelectionType mo_old;
+
+	void SelectSub(Track *s, bool diff);
+	void SelectTrack(Track *t, bool diff);
+
+	void SetCurSub(AudioFile *a, Track *s);
+	void SetCurTrack(AudioFile *a, Track *t);
+	void SetCurAudioFile(AudioFile *a);
+
+
+
+	void ZoomAudioFile(AudioFile *a, float f);
+	void MoveView(AudioFile *a, float dpos);
 
 
 	bool force_redraw;

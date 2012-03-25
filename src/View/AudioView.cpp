@@ -11,7 +11,12 @@
 AudioView::AudioView() :
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
-	TIME_SCALE_HEIGHT(20)
+	TIME_SCALE_HEIGHT(20),
+	BarrierDist(3),
+	ScrollSpeed(300),
+	ScrollSpeedFast(3000),
+	ZoomSpeed(0.1f),
+	MouseMinMoveToSelect(5)
 {
 	ColorBackground = White;
 	ColorBackgroundCurWave = color(1, 0.93f, 0.93f, 1);
@@ -32,6 +37,7 @@ AudioView::AudioView() :
 	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
 
 
+	MousePossiblySelecting = -1;
 
 	tsunami->AddDrawingArea("", 0, 0, 0, 0, "area");
 
@@ -50,6 +56,7 @@ AudioView::AudioView() :
 	tsunami->EventMX("area", "hui:right-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnRightButtonUp);
 	//tsunami->EventMX("area", "hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
 	tsunami->EventM("hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
+	tsunami->EventM("hui:key-up", this, (void(HuiEventHandler::*)())&AudioView::OnKeyUp);
 	tsunami->EventMX("area", "hui:mouse-wheel", this, (void(HuiEventHandler::*)())&AudioView::OnMouseWheel);
 
 
@@ -76,8 +83,355 @@ AudioView::~AudioView()
 {
 }
 
-void AudioView::OnMouseWheel()
+
+void AudioView::SetMouse()
 {
+	mx = HuiGetEvent()->mx;
+	my = HuiGetEvent()->my;
+}
+
+void AudioView::ClearMouseOver(AudioFile *a)
+{
+	a->mo_sel_start = false;
+	a->mo_sel_end = false;
+	foreach(a->track, t){
+		t.is_mouse_over = false;
+		foreach(t.sub, s)
+			s.is_mouse_over = false;
+	}
+}
+
+bool AudioView::MouseOverAudio(AudioFile *a)
+{
+	return ((mx >= a->x) && (mx < a->x + a->width) && (my >= a->y) && (my < a->y + a->height));
+}
+
+bool AudioView::MouseOverTrack(Track *t)
+{
+	return ((mx >= t->x) && (mx < t->x + t->width) && (my >= t->y) && (my < t->y + t->height));
+}
+
+int AudioView::MouseOverSub(Track *s)
+{
+	if ((mx >= s->x) && (mx < s->x + s->width)){
+		int offset = s->root->screen2sample(mx) - s->pos;
+		if ((my >= s->y) && (my < s->y + SUB_FRAME_HEIGHT))
+			return offset;
+		if ((my >= s->y + s->height - SUB_FRAME_HEIGHT) && (my < s->y + s->height))
+			return offset;
+	}
+	return -1;
+}
+
+void AudioView::SelectionUpdatePos(SelectionType &s)
+{
+	if (s.audio)
+		s.pos = s.audio->screen2sample(mx);
+}
+
+AudioView::SelectionType AudioView::GetMouseOver()
+{
+	msg_db_r("GetMouseOver", 2);
+
+	ClearMouseOver(tsunami->audio[0]);
+	ClearMouseOver(tsunami->audio[1]);
+	SelectionType s;
+	s.type = SEL_TYPE_NONE;
+	s.audio = NULL;
+	s.track = NULL;
+	s.sub = NULL;
+	s.sub_offset = 0;
+
+	// audio file?
+	for (int i=0;i<2;i++)
+		if (MouseOverAudio(tsunami->audio[i])){
+			s.audio = tsunami->audio[i];
+			s.type = SEL_TYPE_AUDIO;
+		}
+
+	// ???
+	if (s.audio){
+		SelectionUpdatePos(s);
+		if (s.audio->selection){
+			int ssx = s.audio->sample2screen(s.audio->sel_start_raw);
+			if ((mx >= ssx - 5) && (mx <= ssx + 5)){
+				s.type = SEL_TYPE_SELECTION_START;
+				s.audio->mo_sel_start = true;
+				msg_db_l(2);
+				return s;
+			}
+			int sex = s.audio->sample2screen(s.audio->sel_end_raw);
+			if ((mx >= sex - 5) && (mx <= sex + 5)){
+				s.type = SEL_TYPE_SELECTION_END;
+				s.audio->mo_sel_end = true;
+				msg_db_l(2);
+				return s;
+			}
+		}
+	}
+
+	// track?
+	if (s.audio){
+		foreach(s.audio->track, t){
+			if (MouseOverTrack(&t)){
+				s.track = &t;
+				s.type = SEL_TYPE_TRACK;
+				t.is_mouse_over = true;
+			}
+		}
+	}
+
+	// sub?
+	if (s.track){
+		// TODO: prefer selected subs
+		foreach(s.track->sub, ss){
+			int offset = MouseOverSub(&ss);
+			if (offset >= 0){
+				s.sub = &ss;
+				s.type = SEL_TYPE_SUB;
+				s.sub_offset = offset;
+				ss.is_mouse_over = true;
+			}
+		}
+	}
+
+	msg_db_l(2);
+	return s;
+}
+
+
+void AudioView::SelectUnderMouse()
+{
+	msg_db_r("SelectUnderMouse", 2);
+	Selection = GetMouseOver();
+	SetCurAudioFile(Selection.audio);
+	tsunami->cur_audio = Selection.audio;
+	Track *t = Selection.track;
+	Track *s = Selection.sub;
+	bool control = tsunami->GetKey(KEY_CONTROL);
+
+	// track
+	if (Selection.type == SEL_TYPE_TRACK){
+		SelectTrack(t, control);
+		if (t->is_selected)
+			SetCurTrack(tsunami->cur_audio, t);
+		if (!control)
+			tsunami->cur_audio->UnselectAllSubs();
+	}
+
+	// sub
+	if (Selection.type == SEL_TYPE_SUB){
+		SelectSub(s, control);
+		if (s->is_selected)
+			SetCurSub(tsunami->cur_audio, s);
+	}
+	msg_db_l(2);
+}
+
+void AudioView::SetBarriers(AudioFile *a, SelectionType *s)
+{
+	msg_db_r("SetBarriers", 2);
+	s->barrier.clear();
+	if (s->type == SEL_TYPE_NONE){
+		msg_db_l(2);
+		return;
+	}
+
+	int dpos = 0;
+	if (s->type == SEL_TYPE_SUB)
+		dpos = s->sub_offset;
+
+	foreach(a->track, t){
+		// add subs
+		foreach(t.sub, sub){
+			s->barrier.add(sub.pos + dpos);
+		}
+
+		// time bar...
+		foreach(t.bar_col, bc){
+			int x0 = bc.pos;
+			foreach(bc.bar, b){
+				for (int i=0;i<b.num_beats;i++)
+					s->barrier.add(x0 + (int)((float)b.length * i / (float)b.num_beats) + dpos);
+				x0 += b.length;
+			}
+		}
+	}
+
+	// selection marker
+	if (a->selection){
+		s->barrier.add(a->sel_start_raw);
+		if (MousePossiblySelecting < 0)
+			s->barrier.add(a->sel_end_raw);
+	}
+	msg_db_l(2);
+}
+
+void AudioView::ApplyBarriers(int &pos)
+{
+	msg_db_r("ApplyBarriers", 2);
+	AudioFile *a = Selection.audio;
+	foreach(Selection.barrier, b){
+		int dpos = a->sample2screen(b) - a->sample2screen(pos);
+		if (abs(dpos) <= BarrierDist){
+			//msg_write(format("barrier:  %d  ->  %d", pos, b));
+			pos = b;
+		}
+	}
+	msg_db_l(2);
+}
+
+void AudioView::OnMouseMove()
+{
+	msg_db_r("OnMouseMove", 2);
+	SetMouse();
+	bool _force_redraw_ = false;
+
+	if (HuiGetEvent()->lbut)
+		SelectionUpdatePos(Selection);
+	else{
+		SelectionType mo = GetMouseOver();
+		_force_redraw_ |= (mo.type != mo_old.type) || (mo.sub != mo_old.sub);
+		mo_old = mo;
+	}
+
+	// mouse over?
+	/*if (Selector < 0){
+		int mo = MouseOver;
+		Track *so = SubMouseOver;
+		MouseOver = -1;
+		SubMouseOver = NULL;
+		int ssx = sample2screen(cur_audio, cur_audio->selection_start);
+		int sex = sample2screen(cur_audio, cur_audio->selection_end);
+		if ((mx>ssx-5) && (mx<ssx+5))
+			MouseOver = MOSelectionStart;
+		else if ((mx>sex-5) && (mx<sex+5))
+			MouseOver = MOSelectionEnd;
+		else{
+			if (MouseOverSub(cur_sub, cur_track, cur_audio)){
+				MouseOver = MOAdded;
+				SubMouseOver = cur_sub;
+				added_off = MouseOverSubOffset;
+				mo_sub = cur_audio->cur_sub;
+			}else{
+				foreach(cur_audio->track, t){
+					foreachi(t->sub, s, i){
+						if (MouseOverSub(s, t, cur_audio)){
+							MouseOver = MOAdded;
+							SubMouseOver = s;
+							added_off = MouseOverSubOffset;
+							mo_sub = i;
+						}
+					}
+				}
+			}
+		}*/
+	//}
+
+
+	// drag & drop
+	if (Selection.type == SEL_TYPE_SELECTION_END){
+		ApplyBarriers(Selection.pos);
+		Selection.audio->sel_end_raw = Selection.pos;
+		Selection.audio->selection = true;
+		Selection.audio->UpdateSelection();
+		//_force_redraw_ = true;
+		_force_redraw_ = false;
+		int x, w;
+		int r = 4;
+		if (HuiGetEvent()->dx < 0){
+			x = mx - r;
+			w = - HuiGetEvent()->dx + 2*r;
+		}else{
+			x = mx + r;
+			w = - HuiGetEvent()->dx - 2*r;
+		}
+		tsunami->RedrawRect("area", x, Selection.audio->y, w, Selection.audio->height);
+	}else if (Selection.type == SEL_TYPE_SUB){
+		ApplyBarriers(Selection.pos);
+		int dpos = (float)Selection.pos - Selection.sub_offset - Selection.sub->pos;
+		foreach(tsunami->cur_audio->track, tt){
+			foreach(tt.sub, s){
+				if (s.is_selected)
+					s.pos += dpos;
+			}
+		}
+		//ChangeTrack(cur_sub);
+		_force_redraw_ = true;
+	}
+
+	// selection:
+	if (!HuiGetEvent()->lbut){
+		MousePossiblySelecting = -1;
+	}
+	if (MousePossiblySelecting >= 0)
+		MousePossiblySelecting += abs(HuiGetEvent()->dx);
+	if (MousePossiblySelecting > MouseMinMoveToSelect){
+		tsunami->cur_audio->sel_start_raw = MousePossiblySelectingStart;
+		tsunami->cur_audio->sel_end_raw = Selection.pos;
+		tsunami->cur_audio->selection = true;
+		tsunami->cur_audio->mo_sel_end = true;
+		SetBarriers(tsunami->cur_audio, &Selection);
+		tsunami->cur_audio->UpdateSelection();
+		Selection.type = SEL_TYPE_SELECTION_END;
+		_force_redraw_ = true;
+		MousePossiblySelecting = -1;
+	}
+
+	if (_force_redraw_)
+		ForceRedraw();
+
+	msg_db_l(2);
+}
+
+
+
+void AudioView::OnLeftButtonDown()
+{
+	msg_db_r("OnLBD", 2);
+	SelectUnderMouse();
+	UpdateMenu();
+
+	if (!tsunami->cur_audio->used){
+		msg_db_l(2);
+		return;
+	}
+
+	// selection:
+	//   start after lb down and moving
+	if ((Selection.type == SEL_TYPE_TRACK) || (Selection.type == SEL_TYPE_AUDIO) || (Selection.type == SEL_TYPE_TIME)){
+		MousePossiblySelecting = 0;
+		int pos = tsunami->cur_audio->screen2sample(mx);
+		MousePossiblySelectingStart = pos;
+	}else if (Selection.type == SEL_TYPE_SELECTION_START){
+		// switch end / start
+		Selection.type = SEL_TYPE_SELECTION_END;
+		int t = tsunami->cur_audio->sel_start_raw;
+		tsunami->cur_audio->sel_start_raw = tsunami->cur_audio->sel_end_raw;
+		tsunami->cur_audio->sel_end_raw = t;
+		tsunami->cur_audio->mo_sel_start = false;
+		tsunami->cur_audio->mo_sel_end = true;
+	}
+
+	SetBarriers(tsunami->cur_audio, &Selection);
+
+	ForceRedraw();
+	UpdateMenu();
+	msg_db_l(2);
+}
+
+
+
+void AudioView::OnLeftButtonUp()
+{
+	msg_db_r("OnLBU", 2);
+/*	if (Selection.type == SEL_TYPE_SUB)
+		tsunami->cur_audio->history->Change();*/
+	// TODO !!!!!!!!
+	Selection.type = SEL_TYPE_NONE;
+	ForceRedraw();
+	UpdateMenu();
+	msg_db_l(2);
 }
 
 
@@ -94,18 +448,6 @@ void AudioView::OnCommand(const string & id)
 
 
 
-void AudioView::OnMouseMove()
-{
-}
-
-
-
-void AudioView::OnLeftButtonUp()
-{
-}
-
-
-
 void AudioView::OnRightButtonUp()
 {
 }
@@ -117,19 +459,8 @@ void AudioView::OnMiddleButtonDown()
 }
 
 
+
 void AudioView::OnLeftDoubleClick()
-{
-}
-
-
-
-void AudioView::OnKeyDown()
-{
-}
-
-
-
-void AudioView::OnKeyUp()
 {
 }
 
@@ -141,8 +472,40 @@ void AudioView::OnRightButtonDown()
 
 
 
-void AudioView::OnLeftButtonDown()
+void AudioView::OnKeyDown()
 {
+	int k = HuiGetEvent()->key;
+
+// view
+	// moving
+	float dt = 0.05f;
+	if (k == KEY_RIGHT)
+		MoveView(tsunami->cur_audio,  ScrollSpeed * dt / tsunami->cur_audio->view_zoom);
+	if (k == KEY_LEFT)
+		MoveView(tsunami->cur_audio, - ScrollSpeed * dt / tsunami->cur_audio->view_zoom);
+	if (k == KEY_NEXT)
+		MoveView(tsunami->cur_audio,  ScrollSpeedFast * dt / tsunami->cur_audio->view_zoom);
+	if (k == KEY_PRIOR)
+		MoveView(tsunami->cur_audio, - ScrollSpeedFast * dt / tsunami->cur_audio->view_zoom);
+	// zoom
+	if (k == KEY_ADD)
+		ZoomAudioFile(tsunami->cur_audio, exp(  ZoomSpeed));
+	if (k == KEY_SUBTRACT)
+		ZoomAudioFile(tsunami->cur_audio, exp(- ZoomSpeed));
+	UpdateMenu();
+}
+
+
+
+void AudioView::OnKeyUp()
+{
+}
+
+
+
+void AudioView::OnMouseWheel()
+{
+	ZoomAudioFile(tsunami->cur_audio, exp(ZoomSpeed * HuiGetEvent()->dz));
 }
 
 
@@ -609,3 +972,90 @@ void AudioView::OnSelectNothing()
 {
 }
 
+
+
+void AudioView::SelectSub(Track *s, bool diff)
+{
+	if (!s)
+		return;
+	if (diff){
+		s->is_selected = !s->is_selected;
+	}else{
+		if (!s->is_selected)
+			s->root->UnselectAllSubs();
+
+		// select this sub
+		s->is_selected = true;
+	}
+}
+
+void AudioView::SelectTrack(Track *t, bool diff)
+{
+	if (!t)
+		return;
+	if (diff){
+		bool is_only_selected = true;
+		foreach(t->root->track, tt)
+			if ((tt.is_selected) && (&tt != t))
+				is_only_selected = false;
+		t->is_selected = !t->is_selected || is_only_selected;
+	}else{
+		if (!t->is_selected){
+			// unselect all tracks
+			foreach(t->root->track, tt)
+				tt.is_selected = false;
+		}
+
+		// select this track
+		t->is_selected = true;
+	}
+	t->root->UpdateSelection();
+}
+
+void AudioView::SetCurSub(AudioFile *a, Track *s)
+{
+	msg_db_r("SetCurSub", 2);
+	// unset
+	foreach(a->track, t)
+		t.cur_sub = -1;
+
+	if (s){
+		// set
+		Track *t = s->GetParent();
+		if (t)
+			t->cur_sub = get_sub_index(s);
+	}
+	msg_db_l(2);
+}
+
+
+void AudioView::SetCurTrack(AudioFile *a, Track *t)
+{
+	a->cur_track = get_track_index(t);
+}
+
+void AudioView::SetCurAudioFile(AudioFile *a)
+{
+	tsunami->cur_audio = a;
+	ForceRedraw();
+}
+
+
+void AudioView::ZoomAudioFile(AudioFile *a, float f)
+{
+	// max zoom: 8 pixel per sample
+	// min zoom: whole file on 100 pixel
+	int length = a->GetLength();
+	if (length == 0)
+		length = 10 * a->sample_rate;
+	clampf(f, 100.0 / (length * a->view_zoom), 8.0f / a->view_zoom);
+	a->view_zoom *= f;
+	a->view_pos += float(mx - a->x) / (a->view_zoom / (f - 1));
+	ForceRedraw();
+}
+
+void AudioView::MoveView(AudioFile *a, float dpos)
+{
+	a->view_pos += dpos;
+	ForceRedraw();
+}

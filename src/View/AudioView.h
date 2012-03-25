@@ -36,8 +36,8 @@ public:
 
 	void OnUpdate(Observable *o);
 
-	void OnOnSelectNone();
-	void OnOnSelectAll();
+	void OnSelectNone();
+	void OnSelectAll();
 	void OnSelectNothing();
 
 	void OnViewTempFile();
@@ -57,6 +57,7 @@ public:
 	void DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a);
 
 	void OptimizeView(AudioFile *a);
+	void UpdateMenu();
 
 
 	color ColorBackground;

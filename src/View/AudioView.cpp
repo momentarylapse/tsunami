@@ -53,7 +53,7 @@ AudioView::AudioView() :
 	tsunami->EventMX("area", "hui:mouse-wheel", this, (void(HuiEventHandler::*)())&AudioView::OnMouseWheel);
 
 
-	/*HuiAddCommandM("select_none", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnSelectNone);
+	HuiAddCommandM("select_none", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnSelectNone);
 	HuiAddCommandM("select_all", "", KEY_A + KEY_CONTROL, this, (void(HuiEventHandler::*)())&AudioView::OnSelectAll);
 	HuiAddCommandM("select_nothing", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnSelectNothing);
 	HuiAddCommandM("view_temp_file", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewTempFile);
@@ -62,9 +62,10 @@ AudioView::AudioView() :
 	HuiAddCommandM("view_optimal", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewOptimal);
 	HuiAddCommandM("zoom_in", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnZoomIn);
 	HuiAddCommandM("zoom_out", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnZoomOut);
-	HuiAddCommandM("jump_other_file", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnJumpOtherFile);*/
+	HuiAddCommandM("jump_other_file", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnJumpOtherFile);
 
 	ForceRedraw();
+	UpdateMenu();
 
 	ShowTempFile = false;
 	ShowMono = false;
@@ -390,8 +391,10 @@ void AudioView::OnUpdate(Observable *o)
 	msg_write("view: " + o->GetName() + " - " + o->GetMessage());
 	if (o->GetMessage() == "New")
 		OptimizeView(dynamic_cast<AudioFile*>(o));
-	else
+	else{
 		ForceRedraw();
+		UpdateMenu();
+	}
 }
 
 void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a)
@@ -540,3 +543,69 @@ void AudioView::OptimizeView(AudioFile *a)
 	ForceRedraw();
 	msg_db_l(1);
 }
+
+void AudioView::UpdateMenu()
+{
+	// edit
+	tsunami->Enable("select_all", tsunami->cur_audio->used);
+	tsunami->Enable("select_nothing", tsunami->cur_audio->used);
+	// view
+	tsunami->Check("view_temp_file", ShowTempFile);
+	tsunami->Check("view_mono", ShowMono);
+	tsunami->Check("view_grid", ShowGrid);
+	tsunami->Enable("zoom_in", tsunami->cur_audio->used);
+	tsunami->Enable("zoom_out", tsunami->cur_audio->used);
+	tsunami->Enable("view_optimal", tsunami->cur_audio->used);
+	tsunami->Enable("view_samples", false);//tsunami->cur_audio->used);
+}
+
+void AudioView::OnViewTempFile()
+{
+	ShowTempFile = !ShowTempFile;
+	ForceRedraw();
+	UpdateMenu();
+}
+
+void AudioView::OnViewOptimal()
+{
+	OptimizeView(tsunami->cur_audio);
+}
+
+void AudioView::OnSelectNone()
+{
+}
+
+void AudioView::OnViewMono()
+{
+	ShowMono = !ShowMono;
+	ForceRedraw();
+	UpdateMenu();
+}
+
+void AudioView::OnZoomIn()
+{
+}
+
+void AudioView::OnSelectAll()
+{
+}
+
+void AudioView::OnZoomOut()
+{
+}
+
+void AudioView::OnJumpOtherFile()
+{
+}
+
+void AudioView::OnViewGrid()
+{
+	ShowGrid= !ShowGrid;
+	ForceRedraw();
+	UpdateMenu();
+}
+
+void AudioView::OnSelectNothing()
+{
+}
+

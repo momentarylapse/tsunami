@@ -281,6 +281,20 @@ void Tsunami::OnRecord()
 {
 }
 
+
+string title_filename(const string &filename)
+{
+	if (filename.num > 0)
+		return basename(filename);// + " (" + dirname(filename) + ")";
+	return _("Unbenannt");
+}
+
+Track *Tsunami::GetCurTrack()
+{	return cur_audio->GetCurTrack();	}
+
+Track *Tsunami::GetCurSub()
+{	return cur_audio->GetCurSub();	}
+
 void Tsunami::UpdateMenu()
 {
 	msg_db_r("UpdateMenu", 1);
@@ -288,43 +302,41 @@ void Tsunami::UpdateMenu()
 	// edit
 	Enable("undo", cur_audio->action_manager->Undoable());
 	Enable("redo", cur_audio->action_manager->Redoable());
-	/*m->EnableItem("select_all", cur_audio->used);
-	m->EnableItem("select_nothing", cur_audio->used);
-	m->EnableItem("copy", cur_audio->used);
-	MainWin->Enable("copy", cur_audio->used);
-	m->EnableItem("delete", cur_audio->used);
-	MainWin->Enable("delete", cur_audio->used);
+	Enable("copy", cur_audio->used);
+	Enable("delete", cur_audio->used);
 	// file
-	m->EnableItem("save", cur_audio->used);
-	MainWin->Enable("save", cur_audio->used);
-	m->EnableItem("save_as", cur_audio->used);
-	m->EnableItem("cut_out", cur_audio->used);
-	m->EnableItem("close_file", cur_audio->used);
-	m->EnableItem("wave_properties", cur_audio->used);
+	Enable("save", cur_audio->used);
+	Enable("save", cur_audio->used);
+	Enable("save_as", cur_audio->used);
+	Enable("cut_out", cur_audio->used);
+	Enable("close_file", cur_audio->used);
+	Enable("export_selection", cur_audio->used);
+	Enable("wave_properties", cur_audio->used);
 	// track
-	m->EnableItem("track_import", cur_audio->used);
-	m->EnableItem("add_track", cur_audio->used);
-	m->EnableItem("delete_track", GetCurTrack());
-	m->EnableItem("track_properties", GetCurTrack());
+	Enable("track_import", cur_audio->used);
+	Enable("add_time_track", cur_audio->used);
+	Enable("delete_track", GetCurTrack());
+	Enable("track_properties", GetCurTrack());
 	// sub
-	m->EnableItem("sub_import", GetCurTrack());
-	//m->EnableItem(HMM_INSERT_ADDED, cur_sub);
-	//m->EnableItem(HMM_REMOVE_ADDED, cur_sub);
-	//m->EnableItem(HMM_SUB_PROPERTIES, cur_sub);
-	// view
-	m->CheckItem("view_temp_file", ShowTempFile);
-	m->CheckItem("view_mono", ShowMono);
-	m->CheckItem("view_grid", ShowGrid);
-	m->EnableItem("zoom_in", cur_audio->used);
-	m->EnableItem("zoom_out", cur_audio->used);
-	m->EnableItem("view_optimal", cur_audio->used);
-	m->EnableItem("view_samples", false);//cur_audio->used);
+	Enable("sub_import", GetCurTrack());
+	//Enable(HMM_INSERT_ADDED, cur_sub);
+	//Enable(HMM_REMOVE_ADDED, cur_sub);
+	//Enable(HMM_SUB_PROPERTIES, cur_sub);
 	// sound
-	m->EnableItem("play", cur_audio->used);
-	m->EnableItem("stop", Preview.playing);
-	m->CheckItem("play_loop", PreviewPlayLoop);
-	MainWin->Enable("play", cur_audio->used);
-	MainWin->Enable("stop", Preview.playing);*/
+	Enable("play", cur_audio->used);
+//	Enable("stop", Preview.playing);
+//	Check("play_loop", PreviewPlayLoop);
+	Enable("play", cur_audio->used);
+//	Enable("stop", Preview.playing);
+
+
+	if (cur_audio->used){
+		string title = title_filename(cur_audio->filename) + " - " + AppName;
+		if (!cur_audio->action_manager->IsSave())
+			title = "*" + title;
+		SetTitle(title);
+	}else
+		SetTitle(AppName);
 	msg_db_l(1);
 }
 

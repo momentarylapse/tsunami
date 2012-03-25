@@ -92,6 +92,9 @@ public:
 	AudioFile *audio[2];
 	AudioFile *cur_audio;
 
+	Track *GetCurTrack();
+	Track *GetCurSub();
+
 	AudioView *view;
 
 	Storage *storage;

@@ -19,17 +19,17 @@ Observer::~Observer()
 
 void Observer::Subscribe(Observable *o, const string &message)
 {
-	o->Subscribe(this, message);
+	o->AddObserver(this, message);
 }
 
 void Observer::Subscribe(Observable *o)
 {
-	o->Subscribe(this);
+	o->AddObserver(this);
 }
 
 void Observer::Unsubscribe(Observable *o)
 {
-	o->Unsubscribe(this);
+	o->RemoveObserver(this);
 }
 
 

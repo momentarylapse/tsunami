@@ -86,7 +86,6 @@ void AudioFile::NewEmpty(int _sample_rate)
 	AddTag("artist", "tsunami");//AppTitle);
 
 	//a->history->Reset(false);
-	//force_redraw = true;
 	Notify("Change");
 	msg_db_l(1);
 }
@@ -97,7 +96,8 @@ void AudioFile::NewWithOneTrack(int _sample_rate)
 
 	NotifyBegin();
 	NewEmpty(_sample_rate);
-	AddEmptyTrack(-1);
+	AddEmptyTrack();
+	action_manager->Reset();
 	NotifyEnd();
 
 	msg_db_l(1);
@@ -305,6 +305,8 @@ string AudioFile::get_time_str_fuzzy(int t, float dt)
 
 Track *AudioFile::AddEmptyTrack(int index)
 {
+	if (index < 0)
+		index = cur_track + 1;
 	return (Track*)Execute(new ActionAudioAddTrack(index));
 }
 

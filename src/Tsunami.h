@@ -37,7 +37,6 @@ public:
 
 	void OnUpdate(Observable *o);
 	void OnCommand(const string &id);
-	void OnClose();
 	void OnDraw();
 
 	void OnEvent();
@@ -46,6 +45,33 @@ public:
 	void OnOpen();
 	void OnSave();
 	void OnSaveAs();
+
+
+	void OnCopy();
+	void OnPaste();
+	void OnDelete();
+	void OnExport();
+	void OnUndo();
+	void OnRedo();
+	void OnAddTrack();
+	void OnAddTimeTrack();
+	void OnDeleteTrack();
+	void OnInsertAdded();
+	void OnRemoveAdded();
+	void OnTrackImport();
+	void OnSubImport();
+	void OnAudioProperties();
+	void OnTrackProperties();
+	void OnSubProperties();
+	void OnSettings();
+	void OnCloseFile();
+	void OnPlay();
+	void OnPlayLoop();
+	void OnStop();
+	void OnRecord();
+	void OnShowLog();
+	void OnFindAndExecutePlugin();
+	void OnExit();
 
 	enum{
 		LOG_ERROR,
@@ -56,7 +82,7 @@ public:
 	void Log(int type, const string &message);
 
 	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
-	bool AllowTermination();
+	bool AllowTermination(AudioFile *a = NULL);
 
 	//void Draw();
 	void ForceRedraw();

@@ -19,9 +19,9 @@ public:
 	Observable(const string &name);
 	virtual ~Observable();
 
-	void Subscribe(Observer *o);
-	void Subscribe(Observer *o, const string &message);
-	void Unsubscribe(Observer *o);
+	void AddObserver(Observer *o);
+	void AddObserver(Observer *o, const string &message);
+	void RemoveObserver(Observer *o);
 	string GetName();
 	string GetMessage();
 

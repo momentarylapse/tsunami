@@ -12,7 +12,7 @@
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
 
-class AudioView : public HuiEventHandler, public Observer
+class AudioView : public HuiEventHandler, public Observer, public Observable
 {
 public:
 	AudioView();
@@ -36,6 +36,17 @@ public:
 
 	void OnUpdate(Observable *o);
 
+	void OnOnSelectNone();
+	void OnOnSelectAll();
+	void OnSelectNothing();
+
+	void OnViewTempFile();
+	void OnViewMono();
+	void OnViewGrid();
+	void OnViewOptimal();
+	void OnZoomIn();
+	void OnZoomOut();
+	void OnJumpOtherFile();
 
 	void DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int pos, float zoom, const color &col);
 	void DrawSubFrame(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, AudioFile *a, const color &col, int delay);

@@ -257,7 +257,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		f->ReadInt(); // bits per sample
 		tdata.resize(length * 2);
 		f->ReadBuffer((char*)&tdata[0], length * 4);
-		Track *t = a->AddEmptyTrack(-1);
+		Track *t = a->AddEmptyTrack();
 		BufferBox buf = t->GetBuffers(0, length);
 		for (int i=0;i<length;i++){
 			buf.r[i] = (float)tdata[i*2  ] / 32768.0f;

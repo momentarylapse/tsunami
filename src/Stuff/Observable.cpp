@@ -19,18 +19,18 @@ Observable::~Observable()
 	observer.clear();
 }
 
-void Observable::Subscribe(Observer *o, const string &message)
+void Observable::AddObserver(Observer *o, const string &message)
 {
 	observer.add(o);
 	observer_message.add(message);
 }
 
-void Observable::Subscribe(Observer *o)
-{	Subscribe(o, "");	}
+void Observable::AddObserver(Observer *o)
+{	AddObserver(o, "");	}
 
 
 
-void Observable::Unsubscribe(Observer *o)
+void Observable::RemoveObserver(Observer *o)
 {
 	foreachi(observer, obs, i)
 		if (obs == o){

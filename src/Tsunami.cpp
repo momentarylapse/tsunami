@@ -307,6 +307,7 @@ void Tsunami::UpdateMenu()
 	Enable("redo", cur_audio->action_manager->Redoable());
 	Enable("copy", cur_audio->used);
 	Enable("delete", cur_audio->used);
+	Enable("resize", false); // deprecated
 	// file
 	Enable("save", cur_audio->used);
 	Enable("save", cur_audio->used);
@@ -317,14 +318,15 @@ void Tsunami::UpdateMenu()
 	Enable("wave_properties", cur_audio->used);
 	// track
 	Enable("track_import", cur_audio->used);
+	Enable("add_track", cur_audio->used);
 	Enable("add_time_track", cur_audio->used);
 	Enable("delete_track", GetCurTrack());
 	Enable("track_properties", GetCurTrack());
 	// sub
 	Enable("sub_import", GetCurTrack());
-	//Enable(HMM_INSERT_ADDED, cur_sub);
-	//Enable(HMM_REMOVE_ADDED, cur_sub);
-	//Enable(HMM_SUB_PROPERTIES, cur_sub);
+	Enable("insert_added", GetCurSub());
+	Enable("remove_added", GetCurSub());
+	Enable("sub_properties", GetCurSub());
 	// sound
 	Enable("play", cur_audio->used);
 //	Enable("stop", Preview.playing);

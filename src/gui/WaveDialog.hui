@@ -1,0 +1,50 @@
+// IDs
+enum{
+	HMM_WAVE_DIALOG,
+	HMM_CANCEL,
+	HMM_OK,
+	HMM_TAB_CONTROL,
+	HMM_WD_T_TIME,
+	HMM_TIME,
+	HMM_WD_T_SAMPLES,
+	HMM_SAMPLES,
+	HMM_WD_T_FREQ,
+	HMM_FREQUENCY,
+	HMM_HERTZ,
+	HMM_WD_T_FORMAT,
+	HMM_FORMAT,
+	HMM_WAVE_LIST,
+	HMM_FX_LIST,
+	HMM_TAGS
+};
+
+
+	// dialog
+	WaveDialog=HuiCreateDialog("Sound-Datei",430,375,MainWin,false,&WaveDialogFunction);
+	WaveDialog->SetID(HMM_WAVE_DIALOG);
+	WaveDialog->AddDefButton("Schlie&sen",305,335,100,25,HMM_CLOSE);
+	WaveDialog->SetImage(HMM_CLOSE,HuiImageClose);
+	WaveDialog->AddTabControl("Daten\\Tags\\Spuren\\Effekte",5,5,420,315,HMM_TAB_CONTROL);
+	WaveDialog->SetTabCreationPage(HMM_TAB_CONTROL,0);
+	WaveDialog->AddText("Dauer:",10,10,60,25,HMM_WD_T_TIME);
+	WaveDialog->AddEdit("",75,10,300,25,HMM_TIME);
+	WaveDialog->Enable(HMM_TIME,false);
+	WaveDialog->AddText("Samples:",10,40,60,25,HMM_WD_T_SAMPLES);
+	WaveDialog->AddEdit("",75,40,300,25,HMM_SAMPLES);
+	WaveDialog->Enable(HMM_SAMPLES,false);
+	WaveDialog->AddText("Rate:",10,70,60,25,HMM_WD_T_FREQ);
+	WaveDialog->AddEdit("",75,70,300,25,HMM_FREQUENCY);
+	WaveDialog->Enable(HMM_FREQUENCY,false);
+	WaveDialog->AddText("Hz",380,70,35,25,HMM_HERTZ);
+	WaveDialog->AddText("Format:",10,100,60,25,HMM_WD_T_FORMAT);
+	WaveDialog->AddEdit("",75,100,300,25,HMM_FORMAT);
+	WaveDialog->Enable(HMM_FORMAT,false);
+	WaveDialog->SetTabCreationPage(HMM_TAB_CONTROL,2);
+	WaveDialog->AddListView("!tree,format=tttC\\#\\Name\\Lautst&arke\\Stumm",10,10,400,265,HMM_WAVE_LIST);
+	WaveDialog->SetTabCreationPage(HMM_TAB_CONTROL,3);
+	WaveDialog->AddListView("!nobar\\Effekte",10,10,400,265,HMM_FX_LIST);
+	WaveDialog->SetTabCreationPage(HMM_TAB_CONTROL,1);
+	WaveDialog->AddListView("!format=tT\\Tag\\Wert",10,10,400,265,HMM_TAGS);
+	WaveDialog->Update();
+
+

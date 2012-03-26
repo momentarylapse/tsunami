@@ -1,0 +1,34 @@
+// IDs
+enum{
+	HMM_TRACK_DIALOG,
+	HMM_LD_T_NAME,
+	HMM_NAME,
+	HMM_LD_T_VOLUME,
+	HMM_VOLUME,
+	HMM_OK,
+	HMM_PERCENT,
+	HMM_MUTE,
+	HMM_FX_LIST,
+	HMM_CANCEL,
+	HMM_VOLUME_SLIDER,
+	HMM_LD_T_EFFECTS
+};
+
+
+	// dialog
+	TrackDialog=HuiCreateDialog("Spur",375,390,MainWin,false,&TrackDialogFunction);
+	TrackDialog->SetID(HMM_TRACK_DIALOG);
+	TrackDialog->AddText("!bold\\Name",5,5,365,25,HMM_LD_T_NAME);
+	TrackDialog->AddEdit("",25,35,340,25,HMM_NAME);
+	TrackDialog->AddText("!bold\\Lautst&arke",5,75,365,25,HMM_LD_T_VOLUME);
+	TrackDialog->AddSpinButton("\\0\\1000\\0.1",275,105,70,25,HMM_VOLUME);
+	TrackDialog->AddDefButton("Schlie&sen",265,350,100,25,HMM_CLOSE);
+	TrackDialog->SetImage(HMM_CLOSE,HuiImageClose);
+	TrackDialog->AddText("%",350,105,20,25,HMM_PERCENT);
+	TrackDialog->AddCheckBox("Stumm",25,135,345,25,HMM_MUTE);
+	TrackDialog->AddListView("!nobar\\Effekte",25,205,340,135,HMM_FX_LIST);
+	TrackDialog->AddSlider("",25,105,245,25,HMM_VOLUME_SLIDER);
+	TrackDialog->AddText("!bold\\Effekte",5,175,365,25,HMM_LD_T_EFFECTS);
+	TrackDialog->Update();
+
+

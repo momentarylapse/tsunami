@@ -1,0 +1,15 @@
+// IDs
+enum{
+	HMM_PLAY,
+	HMM_STOP
+};
+
+
+
+	// menu
+	CHuiMenu *menu_root=new CHuiMenu();
+	menu_root->AddEntry("Abspielen",HMM_PLAY);
+	menu_root->AddEntry("Stopp",HMM_STOP);
+
+
+

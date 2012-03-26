@@ -1,0 +1,38 @@
+// IDs
+enum{
+	HMM_TOOLBAR,
+	HMM_NEW,
+	HMM_OPEN,
+	HMM_SAVE,
+	HMM_UNDO,
+	HMM_REDO,
+	HMM_COPY,
+	HMM_PASTE,
+	HMM_DELETE,
+	HMM_PLAY,
+	HMM_STOP,
+	HMM_RECORD
+};
+
+
+
+	// toolbar
+	MainWin->ToolBarSetID(HMM_TOOLBAR);
+	MainWin->ToolBarAddItem("Neu","Neu",HuiImageNew,HMM_NEW);
+	MainWin->ToolBarAddItem("&Offnen...","&Offnen...",HuiImageOpen,HMM_OPEN);
+	MainWin->ToolBarAddItem("Speichern","Speichern",HuiImageSave,HMM_SAVE);
+	MainWin->ToolBarAddSeparator();
+	MainWin->ToolBarAddItem("R&uckg&angig","R&uckg&angig",HuiImageUndo,HMM_UNDO);
+	MainWin->ToolBarAddItem("Wiederherstellen","Wiederherstellen",HuiImageRedo,HMM_REDO);
+	MainWin->ToolBarAddSeparator();
+	MainWin->ToolBarAddItem("Kopieren","Kopieren",HuiImageCopy,HMM_COPY);
+	MainWin->ToolBarAddItem("Einf&ugen","Einf&ugen",HuiImagePaste,HMM_PASTE);
+	MainWin->ToolBarAddItem("L&oschen","L&oschen",HuiImageDelete,HMM_DELETE);
+	MainWin->ToolBarAddSeparator();
+	MainWin->ToolBarAddItem("Start","Start",HuiImageMediaPlay,HMM_PLAY);
+	MainWin->ToolBarAddItem("Stopp","Stopp",HuiImageMediaStop,HMM_STOP);
+	MainWin->ToolBarAddItem("Aufnehmen","Aufnehmen",HuiImageMediaRecord,HMM_RECORD);
+	MainWin->EnableToolBar(true);
+
+
+

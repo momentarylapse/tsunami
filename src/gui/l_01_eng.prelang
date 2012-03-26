@@ -1,0 +1,261 @@
+// Language
+English
+// Num IDs
+116
+// Data (ID,Text)
+about
+About
+add_time_track
+
+add_track
+Add Track
+cancel
+Cancel
+capture_delete
+Delete
+capture_pause
+Pause
+capture_playback
+Playback
+capture_start
+Start
+capture_time
+0:00
+close
+Close
+close_file
+Close
+copy
+Copy
+cut_out
+Cut out
+delete
+Delete
+delete_effect
+Delete
+delete_track
+Delete Track
+dummy_favorite_dialog
+sdiufh
+exit
+Exit
+export_selection
+Export selection...
+favorite_list
+- Default -
+fx_dialog
+Effect
+fx_list
+!nobar\\Effects
+fxdt_filename
+!bold\\Filename
+fxdt_params
+!bold\\Parameters
+help
+Help
+hertz
+Hz
+insert_added
+Insert firmly
+jump_other_file
+Jump into other file
+kbitpersec
+kbit/s
+ld_t_effects
+!bold\\Effects
+ld_t_name
+!bold\\Name:
+ld_t_repdelay
+
+ld_t_repetition
+
+ld_t_repnum
+
+ld_t_track
+Track
+ld_t_volume
+!bold\\Volume:
+level_dialog
+Level
+log_clear
+Clear
+log_close
+Close
+menu_edit
+Edit
+menu_file
+File
+menu_help
+?
+menu_plugins
+Plugins
+menu_sound
+Sound
+menu_sub
+Level
+menu_track
+Track
+menu_view
+View
+ms
+ms
+mute
+Muted
+nd_t_frequency
+Frequency:
+new
+New...
+new_dialog
+New file
+ogg_bitrate
+64\\96\\128\\160\\196\\256
+ok
+OK
+open
+Open...
+paste
+Paste
+pdp_capture
+!bold\\Recording
+pdp_general
+!bold\\General
+pdp_language
+Language
+pdp_preview
+!bold\\Output
+pdp_previewdevice
+Device
+pdt_capturedelay
+Playback delay
+pdt_oggrate
+OGG bitrate
+pdt_previewsleep
+Sleep
+pdt_volume
+Volume
+per_second
+/s
+percent
+%
+play
+Play
+play_loop
+Loop
+preview
+Preview
+progress_cancelable_dialog
+in progress
+progress_dialog
+in progress
+properties_dialog
+Settings
+rdt_source
+!bold\\Source
+rdt_target
+!bold\\Target
+record
+Record
+record_dialog
+Record
+redo
+Redo
+remove_added
+Delete level
+repdelay
+
+repnum
+
+resize
+Resize
+run_plugin
+Run plugin...
+save
+Save
+save_as
+Save as...
+select_all
+Select all
+select_nothing
+Select none
+settings
+Settings
+show_log
+Show log
+stop
+Stop
+sub_import
+Import from file...
+sub_properties
+Properties
+tab_control
+Data\\Tags\\Tracks\\Effects
+tags
+!format=tT\\Tag\\Value
+track_dialog
+Track
+track_import
+Import from file...
+track_list
+Track
+track_properties
+Properties
+trackdest_dialog
+Destination track
+undo
+Undo
+view_grid
+Grid
+view_mono
+Mono
+view_optimal
+Optimal
+view_samples
+Samples
+view_single_track
+Single track
+view_temp_file
+Second file
+volume
+\\0\\1000\\0.1
+wave_dialog
+Sound file
+wave_list
+!tree\\#\\Name\\Volume
+wave_properties
+Properties
+wd_t_format
+Format:
+wd_t_freq
+Frequency:
+wd_t_samples
+Samples:
+wd_t_time
+Duration:
+zoom_in
+Zoom in
+zoom_out
+Zoom out
+// Num Language Strings
+10
+// Data (ID,Text)
+(stumm)
+(muted)
+- Standard -
+- Default -
+Audio-Datei ist leer
+Audio file is empty
+Das neue Gerät wird erst beim nächsten Start verwendet!
+The new device will only be used after the next program start.
+Fehler
+Error
+Info
+Info
+Keine Ebene ausgewählt
+No level selected
+Keine Spur ausgewählt
+No track selected
+Meldungen
+Messages
+keine Datei
+no file
+#

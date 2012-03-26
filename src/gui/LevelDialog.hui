@@ -1,0 +1,42 @@
+// IDs
+enum{
+	HMM_LEVEL_DIALOG,
+	HMM_LEVEL_TRACK,
+	HMM_LD_T_TRACK,
+	HMM_LD_T_NAME,
+	HMM_NAME,
+	HMM_LD_T_VOLUME,
+	HMM_VOLUME,
+	HMM_OK,
+	HMM_PERCENT,
+	HMM_MUTE,
+	HMM_FX_LIST,
+	HMM_CANCEL,
+	HMM_VOLUME_SLIDER,
+	HMM_LD_T_EFFECTS
+};
+
+
+	// dialog
+	LevelDialog=HuiCreateDialog("Ebene",375,390,MainWin,false,&LevelDialogFunction);
+	LevelDialog->SetID(HMM_LEVEL_DIALOG);
+	LevelDialog->AddComboBox("",90,65,275,25,HMM_LEVEL_TRACK);
+	LevelDialog->AddText("Spur:",25,65,60,25,HMM_LD_T_TRACK);
+	LevelDialog->AddText("!bold\\Name",5,5,365,25,HMM_LD_T_NAME);
+	LevelDialog->AddEdit("",25,35,340,25,HMM_NAME);
+	LevelDialog->AddText("!bold\\Lautst&arke",5,105,365,25,HMM_LD_T_VOLUME);
+	LevelDialog->AddSpinButton("\\0\\1000\\0.1",190,135,70,25,HMM_VOLUME);
+	LevelDialog->AddDefButton("Schlie&sen",265,350,100,25,HMM_CLOSE);
+	LevelDialog->SetImage(HMM_CLOSE,HuiImageClose);
+	LevelDialog->AddText("%",265,135,20,25,HMM_PERCENT);
+	LevelDialog->AddCheckBox("Stumm",290,135,80,25,HMM_MUTE);
+	LevelDialog->AddSlider("",25,135,160,25,HMM_VOLUME_SLIDER);
+	LevelDialog->AddText("!bold\\Wiederholungen",5,175,365,25,HMM_LD_T_REPETITION);
+	LevelDialog->AddText("Anzahl:",25,205,60,25,HMM_LD_T_REPNUM);
+	LevelDialog->AddSpinButton("1\\1",90,205,245,25,HMM_REPNUM);
+	LevelDialog->AddText("Abstand:",25,235,60,25,HMM_LD_T_REPDELAY);
+	LevelDialog->AddSpinButton("0\\0\\100000\\0.1",90,235,245,25,HMM_REPDELAY);
+	LevelDialog->AddText("ms",340,235,25,25,HMM_MS);
+	LevelDialog->Update();
+
+

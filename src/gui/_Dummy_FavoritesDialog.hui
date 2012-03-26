@@ -1,0 +1,36 @@
+// IDs
+enum{
+	HMM_DUMMY_FAVORITE_DIALOG,
+	HMM_FAVORITE_LIST,
+	HMM_FAVORITE_NAME,
+	HMM_FAVORITE_SAVE,
+	HMM_FAVORITE_DELETE,
+	HMM_OK,
+	HMM_CANCEL,
+	HMM_DELETE,
+	HMM_PREVIEW
+};
+
+
+
+	// dialog
+	FXDialog=HuiCreateDialog("Effekt",400,355,MainWin,false,&FXMessageFunc);
+	FXDialog->SetID(HMM_DUMMY_FAVORITE_DIALOG);
+	FXDialog->AddComboBox("- Standard -",5,120,140,25,HMM_FAVORITE_LIST);
+	FXDialog->AddEdit("",150,120,145,25,HMM_FAVORITE_NAME);
+	FXDialog->AddButton("",300,120,40,25,HMM_FAVORITE_SAVE);
+	FXDialog->SetImage(HMM_FAVORITE_SAVE,HuiImageSave);
+	FXDialog->AddButton("",345,120,40,25,HMM_FAVORITE_DELETE);
+	FXDialog->SetImage(HMM_FAVORITE_DELETE,HuiImageDelete);
+	FXDialog->AddDefButton("OK",270,205,100,25,HMM_OK);
+	FXDialog->SetImage(HMM_OK,HuiImageOk);
+	FXDialog->AddButton("Abbrechen",165,205,100,25,HMM_CANCEL);
+	FXDialog->SetImage(HMM_CANCEL,HuiImageCancel);
+	FXDialog->AddButton("L&oschen",60,190,100,25,HMM_DELETE);
+	FXDialog->SetImage(HMM_DELETE,HuiImageDelete);
+	FXDialog->AddButton("Vorschau",60,220,100,25,HMM_PREVIEW);
+	FXDialog->SetImage(HMM_PREVIEW,HuiImageMediaPlay);
+	FXDialog->Update();
+
+
+

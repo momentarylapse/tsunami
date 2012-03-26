@@ -1,0 +1,30 @@
+// IDs
+enum{
+	HMM_FX_DIALOG,
+	HMM_FXDT_FILENAME,
+	HMM_FILENAME,
+	HMM_OK,
+	HMM_CANCEL,
+	HMM_FXDT_PARAMS,
+	HMM_DELETE_EFFECT
+};
+
+
+
+	// dialog
+	FXDialog=HuiCreateDialog("Effekt",400,355,MainWin,false,&FXMessageFunc);
+	FXDialog->SetID(HMM_FX_DIALOG);
+	FXDialog->AddText("!bold\\Dateiname",5,5,390,25,HMM_FXDT_FILENAME);
+	FXDialog->AddEdit("",20,30,370,25,HMM_FILENAME);
+	FXDialog->Enable(HMM_FILENAME,false);
+	FXDialog->AddDefButton("OK",280,315,100,25,HMM_OK);
+	FXDialog->SetImage(HMM_OK,HuiImageOk);
+	FXDialog->AddButton("Abbrechen",175,315,100,25,HMM_CANCEL);
+	FXDialog->SetImage(HMM_CANCEL,HuiImageCancel);
+	FXDialog->AddText("!bold\\Parameter",5,65,390,25,HMM_FXDT_PARAMS);
+	FXDialog->AddButton("L&oschen",35,315,100,25,HMM_DELETE_EFFECT);
+	FXDialog->SetImage(HMM_DELETE_EFFECT,HuiImageDelete);
+	FXDialog->Update();
+
+
+

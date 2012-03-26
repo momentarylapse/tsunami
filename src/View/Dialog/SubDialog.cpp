@@ -10,11 +10,77 @@
 SubDialog::SubDialog(CHuiWindow *_parent, bool _allow_parent, Track *s):
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
 {
-	// TODO Auto-generated constructor stub
+	sub = s;
+	FromResource("level_dialog");
 
+	SetString("name", s->name);
+	SetDecimals(1);
+	volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&SubDialog::OnVolume, s->volume);
+	Check("mute", s->muted);
+	Enable("volume", !s->muted);
+	Enable("volume_slider", !s->muted);
+	foreach(s->root->track, t)
+		AddString("level_track", t.GetNiceName());
+	SetInt("level_track", s->parent);
+//	AddEffectList(LevelDialog, "fx_list", s->fx);
+	SetInt("repnum", s->rep_num + 1);
+	SetFloat("repdelay", (float)s->rep_delay / (float)s->root->sample_rate * 1000.0f);
+	Enable("repdelay", s->rep_num > 0);
+
+	EventM("mute", this, (void(HuiEventHandler::*)())&SubDialog::OnMute);
+	EventM("name", this, (void(HuiEventHandler::*)())&SubDialog::OnName);
+	EventM("level_track", this, (void(HuiEventHandler::*)())&SubDialog::OnLevelTrack);
+	EventM("repnum", this, (void(HuiEventHandler::*)())&SubDialog::OnRepNum);
+	EventM("repdelay", this, (void(HuiEventHandler::*)())&SubDialog::OnRepDelay);
+	EventM("close", this, (void(HuiEventHandler::*)())&SubDialog::OnClose);
+	EventM("hui:close", this, (void(HuiEventHandler::*)())&SubDialog::OnClose);
 }
 
 SubDialog::~SubDialog()
 {
-	// TODO Auto-generated destructor stub
+	delete(volume_slider);
+}
+
+
+void SubDialog::OnName()
+{
+	sub->name = GetString("");
+	//sub->root->history->ChangeLater();
+}
+
+void SubDialog::OnMute()
+{
+	sub->muted = IsChecked("");
+	//sub->root->history->Change();
+	volume_slider->Enabled(!sub->muted);
+}
+
+void SubDialog::OnLevelTrack()
+{
+	int n = GetInt("");
+	//sub->root->history->Change();
+}
+
+void SubDialog::OnVolume()
+{
+	sub->volume = volume_slider->Get();
+	//sub->root->history->ChangeLater();
+}
+
+void SubDialog::OnRepNum()
+{
+	sub->rep_num = GetInt("repnum") - 1;
+	Enable("repdelay", sub->rep_num > 0);
+	//sub->root->history->ChangeLater();
+}
+
+void SubDialog::OnRepDelay()
+{
+	sub->rep_delay = (int)(GetFloat("repdelay") * (float)sub->root->sample_rate / 1000.0f);
+	//sub->root->history->ChangeLater();
+}
+
+void SubDialog::OnClose()
+{
+	delete(this);
 }

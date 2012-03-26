@@ -10,6 +10,7 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../Data/Track.h"
+#include "Slider.h"
 
 class SubDialog: public CHuiWindow
 {
@@ -22,8 +23,15 @@ public:
 
 	void OnOk();
 	void OnClose();
+	void OnName();
+	void OnMute();
+	void OnLevelTrack();
+	void OnVolume();
+	void OnRepNum();
+	void OnRepDelay();
 
 	Track *sub;
+	Slider *volume_slider;
 };
 
 #endif /* SUBDIALOG_H_ */

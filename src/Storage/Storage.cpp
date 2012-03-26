@@ -21,6 +21,11 @@ Storage::Storage()
 
 Storage::~Storage()
 {
+	HuiConfigWriteStr("CurrentDirectory", CurrentDirectory);
+
+	foreach(format, f)
+		delete(f);
+	format.clear();
 }
 
 bool Storage::Load(AudioFile *a, const string &filename)

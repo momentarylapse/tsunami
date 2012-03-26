@@ -105,8 +105,8 @@ public:
 	int MousePossiblySelecting, MousePossiblySelectingStart;
 	const int BarrierDist;
 	float ScrollSpeed;
-	const float ScrollSpeedFast;
-	const float ZoomSpeed;
+	float ScrollSpeedFast;
+	float ZoomSpeed;
 
 	int mx,my;
 	int mx0,my0;

@@ -26,9 +26,9 @@ Tsunami::Tsunami(Array<string> arg) :
 	renderer = new AudioRenderer;
 
 
-	int width = HuiConfigReadInt("Width", 800);
-	int height = HuiConfigReadInt("Height", 600);
-	bool maximized = HuiConfigReadBool("Maximized", true);
+	int width = HuiConfigReadInt("Window.Width", 800);
+	int height = HuiConfigReadInt("Window.Height", 600);
+	bool maximized = HuiConfigReadBool("Window.Maximized", true);
 /*	OggQuality = HuiConfigReadFloat("OggQuality", 0.5f); // -> StorageOgg*/
 
 	//HuiAddKeyCode("insert_added", KEY_RETURN);
@@ -114,7 +114,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	UpdateMenu();
 
-	/*PreviewInit();
+	/*
 
 	if (arg.num > 1)
 		LoadFromFile(audio[0], arg[1]);
@@ -126,6 +126,19 @@ Tsunami::Tsunami(Array<string> arg) :
 
 Tsunami::~Tsunami()
 {
+	irect r = GetOuteriorDesired();
+	HuiConfigWriteInt("Window.Width", r.x2 - r.x1);
+	HuiConfigWriteInt("Window.Height", r.y2 - r.y1);
+	HuiConfigWriteInt("Window.X", r.x1);
+	HuiConfigWriteInt("Window.Y", r.y1);
+	HuiConfigWriteBool("Window.Maximized", IsMaximized());
+
+	delete(plugins);
+	delete(storage);
+	delete(view);
+	delete(output);
+	delete(input);
+	HuiEnd();
 }
 
 
@@ -410,7 +423,7 @@ void Tsunami::OnUpdate(Observable *o)
 void Tsunami::OnExit()
 {
 	if (AllowTermination())
-		HuiEnd();
+		delete(this);
 }
 
 

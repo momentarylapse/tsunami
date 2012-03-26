@@ -15,11 +15,7 @@ AudioView::AudioView() :
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
 	TIME_SCALE_HEIGHT(20),
-	BarrierDist(3),
-	ScrollSpeed(300),
-	ScrollSpeedFast(3000),
-	ZoomSpeed(0.1f),
-	MouseMinMoveToSelect(5)
+	BarrierDist(5)
 {
 	ColorBackground = White;
 	ColorBackgroundCurWave = color(1, 0.93f, 0.93f, 1);
@@ -39,9 +35,12 @@ AudioView::AudioView() :
 	ShowTempFile = false;
 	ShowMono = false;
 	ShowGrid = true;
-	DetailSteps = HuiConfigReadInt("DetailSteps", 1);
-	MouseMinMoveToSelect = HuiConfigReadInt("MouseMinMoveToSelect", 5);
+	DetailSteps = HuiConfigReadInt("View.DetailSteps", 1);
+	MouseMinMoveToSelect = HuiConfigReadInt("View.MouseMinMoveToSelect", 5);
 	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
+	ScrollSpeed = HuiConfigReadInt("View.ScrollSpeed", 300);
+	ScrollSpeedFast = HuiConfigReadInt("View.ScrollSpeedFast", 3000);
+	ZoomSpeed = HuiConfigReadInt("View.ZoomSpeed", 0.1f);
 
 
 	MousePossiblySelecting = -1;
@@ -86,6 +85,9 @@ AudioView::AudioView() :
 
 AudioView::~AudioView()
 {
+	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
+	HuiConfigWriteInt("View.ScrollSpeedFast", ScrollSpeedFast);
+	HuiConfigWriteInt("View.ZoomSpeed", ZoomSpeed);
 }
 
 

@@ -48,14 +48,16 @@ AudioOutput::AudioOutput() :
 
 	PlayLoop = false;
 
-	// TODO Auto-generated constructor stub
-	ChosenDevice = HuiConfigReadStr("ChosenOutputDevice", "");
-	volume = HuiConfigReadFloat("Volume", 1.0f);
+	ChosenDevice = HuiConfigReadStr("Output.ChosenDevice", "");
+	volume = HuiConfigReadFloat("Output.Volume", 1.0f);
+
+	Init();
 }
 
 AudioOutput::~AudioOutput()
 {
-	// TODO Auto-generated destructor stub
+	HuiConfigWriteStr("Output.ChosenDevice", ChosenDevice);
+	HuiConfigWriteFloat("Output.Volume", volume);
 }
 
 

@@ -9,7 +9,7 @@
 #include "Tsunami.h"
 
 string AppName = "Tsunami";
-string AppVersion = "0.3.2.0 alpha";
+string AppVersion = "0.3.3.0 alpha";
 
 int hui_main(Array<string> arg)
 {

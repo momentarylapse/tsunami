@@ -137,6 +137,10 @@ public:
 	void ZoomAudioFile(AudioFile *a, float f);
 	void MoveView(AudioFile *a, float dpos);
 
+	void ExecuteSubDialog(CHuiWindow *win, Track *s);
+	void ExecuteTrackDialog(CHuiWindow *win, Track *t);
+	void ExecuteAudioDialog(CHuiWindow *win, AudioFile *a);
+
 
 	bool force_redraw;
 

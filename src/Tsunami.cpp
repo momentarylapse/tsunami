@@ -164,6 +164,10 @@ void Tsunami::OnAddTimeTrack()
 	}
 }
 
+void Tsunami::OnDeleteTrack()
+{
+}
+
 void Tsunami::OnCloseFile()
 {
 	cur_audio->Reset();
@@ -179,13 +183,20 @@ void Tsunami::LoadKeyCodes()
 
 void Tsunami::OnAudioProperties()
 {
+	view->ExecuteAudioDialog(this, cur_audio);
+}
+
+void Tsunami::OnTrackProperties()
+{
+	view->ExecuteTrackDialog(this, GetCurTrack());
+}
+
+void Tsunami::OnSubProperties()
+{
+	view->ExecuteSubDialog(this, GetCurSub());
 }
 
 void Tsunami::OnShowLog()
-{
-}
-
-void Tsunami::OnDeleteTrack()
 {
 }
 
@@ -249,15 +260,7 @@ bool Tsunami::HandleArguments(Array<string> arg)
 	return false;
 }
 
-void Tsunami::OnTrackProperties()
-{
-}
-
 void Tsunami::OnRemoveAdded()
-{
-}
-
-void Tsunami::OnSubProperties()
 {
 }
 

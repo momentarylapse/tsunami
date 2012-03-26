@@ -37,7 +37,6 @@ public:
 
 	void OnUpdate(Observable *o);
 	void OnCommand(const string &id);
-	void OnDraw();
 
 	void OnEvent();
 

@@ -7,6 +7,9 @@
 
 #include "AudioView.h"
 #include "../Tsunami.h"
+#include "../View/Dialog/AudioFileDialog.h"
+#include "../View/Dialog/TrackDialog.h"
+#include "../View/Dialog/SubDialog.h"
 
 AudioView::AudioView() :
 	Observable("AudioView"),
@@ -436,14 +439,28 @@ void AudioView::OnLeftButtonUp()
 
 
 
+void AudioView::OnMiddleButtonDown()
+{
+	SelectUnderMouse();
+
+	SelectNone(tsunami->cur_audio);
+	UpdateMenu();
+}
+
+
+
 void AudioView::OnMiddleButtonUp()
 {
 }
 
 
 
-void AudioView::OnCommand(const string & id)
+void AudioView::OnRightButtonDown()
 {
+	SelectUnderMouse();
+
+	// pop up menu...
+	UpdateMenu();
 }
 
 
@@ -454,19 +471,26 @@ void AudioView::OnRightButtonUp()
 
 
 
-void AudioView::OnMiddleButtonDown()
-{
-}
-
-
-
 void AudioView::OnLeftDoubleClick()
 {
+	SelectUnderMouse();
+
+	if (MousePossiblySelecting < MouseMinMoveToSelect)
+		if (tsunami->cur_audio->used){
+			if (Selection.type == SEL_TYPE_SUB)
+				ExecuteSubDialog(tsunami, Selection.sub);
+			else if (Selection.type == SEL_TYPE_TRACK)
+				ExecuteTrackDialog(tsunami, Selection.track);
+			else
+				ExecuteAudioDialog(tsunami, tsunami->cur_audio);
+			Selection.type = SEL_TYPE_NONE;
+		}
+	UpdateMenu();
 }
 
 
 
-void AudioView::OnRightButtonDown()
+void AudioView::OnCommand(const string & id)
 {
 }
 
@@ -953,6 +977,15 @@ void AudioView::OnSelectAll()
 {
 }
 
+void AudioView::SelectNone(AudioFile *a)
+{
+	// select all/none
+	a->selection = false;
+	a->UpdateSelection();
+	a->UnselectAllSubs();
+	SetCurSub(a, NULL);
+}
+
 void AudioView::OnZoomOut()
 {
 }
@@ -1059,3 +1092,29 @@ void AudioView::MoveView(AudioFile *a, float dpos)
 	a->view_pos += dpos;
 	ForceRedraw();
 }
+
+void AudioView::ExecuteTrackDialog(CHuiWindow *win, Track *t)
+{
+}
+
+
+
+void AudioView::ExecuteSubDialog(CHuiWindow *win, Track *s)
+{
+}
+
+
+
+void AudioView::ExecuteAudioDialog(CHuiWindow *win, AudioFile *a)
+{
+	if (!a->used){
+		HuiErrorBox(win, _("Fehler"), _("Audio-Datei ist leer"));
+		return;
+	}
+
+	AudioFileDialog *dlg = new AudioFileDialog(win, false, a);
+	dlg->Update();
+	HuiWaitTillWindowClosed(dlg);
+}
+
+

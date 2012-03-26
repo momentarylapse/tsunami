@@ -315,6 +315,16 @@ int AudioOutput::GetPos(AudioFile * a)
 	return -1;
 }
 
+float AudioOutput::GetVolume()
+{
+	return volume;
+}
+
+void AudioOutput::SetVolume(float _volume)
+{
+	volume = _volume;
+}
+
 void AudioOutput::GetPeaks(float &peak_r, float &peak_l)
 {
 	peak_r = peak_l = 0;

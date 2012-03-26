@@ -18,9 +18,16 @@ Tsunami::Tsunami(Array<string> arg) :
 {
 	tsunami = this;
 
+	progress = new Progress;
+	log = new Log;
 
-	int width = HuiConfigReadInt("Width", 1024);
-	int height = HuiConfigReadInt("Height", 768);
+	output = new AudioOutput;
+	input = new AudioInput;
+	renderer = new AudioRenderer;
+
+
+	int width = HuiConfigReadInt("Width", 800);
+	int height = HuiConfigReadInt("Height", 600);
 	bool maximized = HuiConfigReadBool("Maximized", true);
 /*	OggQuality = HuiConfigReadFloat("OggQuality", 0.5f); // -> StorageOgg*/
 
@@ -50,10 +57,10 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("sub_properties", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSubProperties);
 	HuiAddCommandM("settings", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSettings);
 	HuiAddCommandM("close_file", "hui:close", KEY_W + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnCloseFile);
-	HuiAddCommandM("play", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPlay);
+	HuiAddCommandM("play", "hui:media-play", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPlay);
 	HuiAddCommandM("play_loop", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPlayLoop);
-	HuiAddCommandM("stop", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnStop);
-	HuiAddCommandM("record", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRecord);
+	HuiAddCommandM("stop", "hui:media-stop", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnStop);
+	HuiAddCommandM("record", "hui:media-record", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRecord);
 	HuiAddCommandM("show_log", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnShowLog);
 	HuiAddCommandM("about", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAbout);
 	HuiAddCommandM("run_plugin", "hui:execute", KEY_RETURN + KEY_SHIFT, this, (void(HuiEventHandler::*)())&Tsunami::OnFindAndExecutePlugin);
@@ -73,7 +80,10 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddCheckBox("", 2, 0, 0, 0, "play_loop");
 	AddDrawingArea("", 3, 0, 0, 0, "peaks");
 	peak_meter = new PeakMeter(this, "peaks");
-	AddButton("", 4, 0, 0, 0, "record");
+	AddSlider("", 4, 0, 0, 0, "volume_slider");
+	AddSpinButton("", 5, 0, 0, 0, "volume");
+	volume_slider = new Slider(this, "volume_slider", "volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
+	AddButton("", 6, 0, 0, 0, "record");
 	AllowEvents("key");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);
@@ -85,11 +95,8 @@ Tsunami::Tsunami(Array<string> arg) :
 	// events
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
 
-	/*AddPluginsToMenu();
+	/*AddPluginsToMenu();*/
 
-	input_timer = HuiCreateTimer();
-
-	InitHistory();*/
 	audio[0] = new AudioFile;
 	audio[1] = new AudioFile;
 
@@ -98,13 +105,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	storage = new Storage;
 
 	view = new AudioView;
-
-	progress = new Progress;
-	log = new Log;
-
-	output = new AudioOutput;
-	input = new AudioInput;
-	renderer = new AudioRenderer;
 
 	Subscribe(view);
 	Subscribe(audio[0]);
@@ -312,6 +312,11 @@ void Tsunami::OnPlay()
 void Tsunami::OnStop()
 {
 	output->Stop();
+}
+
+void Tsunami::OnVolume()
+{
+	output->SetVolume(volume_slider->Get());
 }
 
 void Tsunami::OnPaste()

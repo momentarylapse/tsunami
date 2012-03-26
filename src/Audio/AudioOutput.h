@@ -33,6 +33,9 @@ public:
 	int GetPos(AudioFile * a);
 	void GetPeaks(float &peak_r, float &peak_l);
 
+	float GetVolume();
+	void SetVolume(float _volume);
+
 private:
 	bool TestError(const string &msg);
 	bool TestError2(const string &msg, void *d);

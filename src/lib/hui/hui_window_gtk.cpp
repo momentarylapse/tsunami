@@ -703,8 +703,10 @@ void CHuiWindow::SetPosition(int x, int y)
 
 void CHuiWindow::SetSize(int width, int height)
 {
-	//gtk_window_resize(GTK_WINDOW(window), width, height);
-	gtk_widget_set_size_request(window, width, height);
+	if (parent)
+		gtk_widget_set_size_request(window, width, height);
+	else
+		gtk_window_resize(GTK_WINDOW(window), width, height);
 }
 
 // set the current window position and size (including the frame and menu/toolbars...)

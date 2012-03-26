@@ -16,6 +16,7 @@
 #include "Stuff/Progress.h"
 #include "Stuff/Log.h"
 #include "Stuff/PeakMeter.h"
+#include "View/Dialog/Slider.h"
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioInput.h"
 #include "Audio/AudioRenderer.h"
@@ -72,6 +73,7 @@ public:
 	void OnPlay();
 	void OnPlayLoop();
 	void OnStop();
+	void OnVolume();
 	void OnRecord();
 	void OnShowLog();
 	void OnFindAndExecutePlugin();
@@ -94,6 +96,7 @@ public:
 	AudioView *view;
 
 	PeakMeter *peak_meter;
+	Slider *volume_slider;
 
 	Storage *storage;
 

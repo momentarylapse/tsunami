@@ -385,4 +385,6 @@ void Tsunami::OnSaveAs()
 void Tsunami::Log(int type, const string &message)
 {
 	msg_error(message);
+	if (type == LOG_ERROR)
+		HuiErrorBox(this, _("Fehler"), message);
 }

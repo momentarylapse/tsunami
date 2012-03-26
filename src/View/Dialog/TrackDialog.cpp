@@ -10,11 +10,48 @@
 TrackDialog::TrackDialog(CHuiWindow *_parent, bool _allow_parent, Track *t):
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
 {
-	// TODO Auto-generated constructor stub
+	track = t;
+	FromResource("track_dialog");
 
+	SetString("name", t->name);
+	SetDecimals(1);
+	Check("mute", t->muted);
+	volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, t->volume);
+	volume_slider->Enabled(!t->muted);
+//	AddEffectList(this, "fx_list", t->fx);
+
+	EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
+	EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
+	EventM("close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
+	EventM("hui:close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
 }
 
 TrackDialog::~TrackDialog()
 {
-	// TODO Auto-generated destructor stub
+	delete(volume_slider);
+	//RemoveEffectLists(this);
+}
+
+void TrackDialog::OnName()
+{
+	track->name = GetString("");
+	//track->root->history->ChangeLater();
+}
+
+void TrackDialog::OnVolume()
+{
+	track->volume = volume_slider->Get();
+	//track->root->history->ChangeLater();
+}
+
+void TrackDialog::OnMute()
+{
+	track->muted = IsChecked("");
+	volume_slider->Enabled(!track->muted);
+	//track->root->history->Change();
+}
+
+void TrackDialog::OnClose()
+{
+	delete(this);
 }

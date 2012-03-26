@@ -1095,12 +1095,26 @@ void AudioView::MoveView(AudioFile *a, float dpos)
 
 void AudioView::ExecuteTrackDialog(CHuiWindow *win, Track *t)
 {
+	if (!t){
+		tsunami->Log(Tsunami::LOG_ERROR, _("Keine Spur ausgew&ahlt"));
+		return;
+	}
+	TrackDialog *dlg = new TrackDialog(win, false, t);
+	dlg->Update();
+	HuiWaitTillWindowClosed(dlg);
 }
 
 
 
 void AudioView::ExecuteSubDialog(CHuiWindow *win, Track *s)
 {
+	if (!s){
+		tsunami->Log(Tsunami::LOG_ERROR, _("Keine Ebene ausgew&ahlt"));
+		return;
+	}
+	SubDialog *dlg = new SubDialog(win, false, s);
+	dlg->Update();
+	HuiWaitTillWindowClosed(dlg);
 }
 
 
@@ -1108,7 +1122,7 @@ void AudioView::ExecuteSubDialog(CHuiWindow *win, Track *s)
 void AudioView::ExecuteAudioDialog(CHuiWindow *win, AudioFile *a)
 {
 	if (!a->used){
-		HuiErrorBox(win, _("Fehler"), _("Audio-Datei ist leer"));
+		tsunami->Log(Tsunami::LOG_ERROR, _("Audio-Datei ist leer"));
 		return;
 	}
 

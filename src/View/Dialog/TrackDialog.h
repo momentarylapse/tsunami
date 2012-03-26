@@ -11,6 +11,7 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../Data/Track.h"
+#include "Slider.h"
 
 class TrackDialog: public CHuiWindow
 {
@@ -23,8 +24,12 @@ public:
 
 	void OnOk();
 	void OnClose();
+	void OnName();
+	void OnVolume();
+	void OnMute();
 
 	Track *track;
+	Slider *volume_slider;
 };
 
 #endif /* TRACKDIALOG_H_ */

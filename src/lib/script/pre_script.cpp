@@ -662,7 +662,7 @@ int CPreScript::AddConstant(sType *type)
 	sConstant *c = &Constant.back();
 	strcpy(c->name, "-none-");
 	c->type = type;
-	int s = (type->Size>PointerSize) ? type->Size : PointerSize;
+	int s = (type->Size > (int)PointerSize) ? type->Size : PointerSize;
 	if (type == TypeString)
 		s = 256;
 	c->data = new char[s];
@@ -950,17 +950,18 @@ sType *CPreScript::GetConstantType()
 	sType *type = TypeInt;
 	bool hex = (cur_name[0] == '0') && (cur_name[1] == 'x');
 	for (unsigned int c=0;c<strlen(cur_name);c++)
-		if ((cur_name[c] < '0') || (cur_name[c] > '9'))
+		if ((cur_name[c] < '0') || (cur_name[c] > '9')){
 			if (hex){
 				if ((c >= 2) && (cur_name[c] < 'a') && (cur_name[c] > 'f'))
 					_return_(4, TypeUnknown);
-			}else if (cur_name[c] == '.')
+			}else if (cur_name[c] == '.'){
 				type = TypeFloat;
-			else{
+			}else{
 				//if ((type != TypeFloat) || (cur_name[c] != 'f')) // f in floats erlauben
 					if ((c != 0) || (cur_name[c] != '-')) // Vorzeichen erlauben
 						_return_(4, TypeUnknown);
 			}
+		}
 
 	// super array [...]
 	if (strcmp(cur_name, "[") == 0){
@@ -1301,7 +1302,7 @@ bool CPreScript::GetSpecialFunctionCall(const char *f_name, sCommand *Operand, s
 			(*(int*)(Constant[nc].data)) = Type[nt]->Size;
 		else if ((GetExistence(cur_name, f)) && ((GetExistenceLink.Kind == KindVarGlobal) || (GetExistenceLink.Kind == KindVarLocal) || (GetExistenceLink.Kind == KindVarExternal)))
 			(*(int*)(Constant[nc].data)) = GetExistenceLink.Type->Size;
-		else if (type = GetConstantType())
+		else if (type == GetConstantType())
 			(*(int*)(Constant[nc].data)) = type->Size;
 		else{
 			DoError("type-name or variable name expected in sizeof(...)");
@@ -2267,7 +2268,7 @@ void CPreScript::TestArrayDefinition(sType **type, bool is_pointer)
 		(*type) = GetPointerType((*type));
 	}
 	if (strcmp(cur_name, "[") == 0){
-		sType nt,*pt = &nt;
+		sType nt;
 		int array_size;
 		char or_name[SCRIPT_MAX_NAME];
 		strcpy(or_name, (*type)->Name);
@@ -2867,7 +2868,7 @@ void CPreScript::Parser()
 		}else{
 
 			// type of definition
-			sType *tType = GetType(Exp.cur_exp, true);
+			GetType(Exp.cur_exp, true);
 			if (Error){
 				msg_db_l(4);
 				return;
@@ -3007,7 +3008,10 @@ void CPreScript::ConvertCallByReference()
 	msg_db_m("a", 3);
 
 	// convert function calls
-	foreach(Command, c){
+	foreach(Command, ccc){
+		// Command array might be reallocated in the loop!
+		sCommand *c = ccc;
+
 		if (c->Kind == KindCompilerFunction)
 			if (c->LinkNr == CommandReturn){
 				if ((c->Param[0]->Type->IsArray) /*|| (c->Param[j]->Type->IsSuperArray)*/){

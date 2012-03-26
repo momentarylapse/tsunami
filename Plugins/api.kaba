@@ -36,6 +36,7 @@ class Sub
 	int dummy
 
 class BufferBox
+	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int offset, num
 	float r[], l[]
 
@@ -65,6 +66,7 @@ enum
 	TRACK_TYPE_TIME
 
 class Track
+	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int type
 	string name
 	BufferBox buffer[]
@@ -97,6 +99,19 @@ class Tag
 	string key, value
 
 class AudioFile
+	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
+
+	string _Data_filename
+	int _Data_file_time
+	bool _Data_binary_file_format
+	void *_Data_action_manager
+	string _Observable_observable_name
+	int _Observable_observer[]
+	string _Observable_observer_message[]
+	string _Observable_message_queue[]
+	string _Observable_cur_message
+	int _Observable_notify_level
+	
 	bool used
 	string filename
 	Tag tag[]

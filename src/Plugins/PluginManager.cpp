@@ -436,6 +436,7 @@ bool PluginManager::PluginConfigure(bool deletable, bool previewable)
 		PluginAddDelete = deletable;
 		PluginAddPreview = previewable;
 		cur_plugin->f_configure();
+		GlobalRemoveSliders(NULL);
 		msg_db_l(1);
 		return !PluginCancelled;
 	}else if (deletable){
@@ -712,34 +713,25 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 
 void PluginManager::PluginProcessTrack(CScript *s, Track *t, int pos, int length)
 {
-	msg_write("--process");
 	//tsunami->cur_audio->history->ChangeBegin();
 	//HistoryOpStartEditBuffer(t, s_start, s_end);
 	BufferBox buf = t->GetBuffers(pos, length);
-	msg_write("--process2");
-	msg_write(p2s(&buf));
-	msg_write(buf.num);
-	//s->ExecuteScriptFunction("ProcessTrack", &buf, t);
+	s->ExecuteScriptFunction("ProcessTrack", &buf, t);
 	//t->UpdatePeaks();
 	//cur_audio->history->ChangeEnd();
-	msg_write("--/process");
 }
 
 void PluginManager::ExecutePlugin(const string &filename)
 {
 	msg_db_r("ExecutePlugin", 1);
-	msg_write("a");
 
 	if (LoadAndCompilePlugin(filename)){
-		msg_write("b");
 		CScript *s = cur_plugin->s;
 
 		// run
 //		cur_audio->history->ChangeBegin();
 		PluginResetData();
-		msg_write("c");
 		if (PluginConfigure(false, true)){
-			msg_write("d");
 			if (s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){
 				if (tsunami->cur_audio->used){
 //					tsunami->cur_audio->history->ChangeBegin();

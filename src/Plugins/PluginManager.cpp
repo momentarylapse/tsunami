@@ -778,3 +778,34 @@ void PluginManager::FindAndExecutePlugin()
 	}
 	msg_db_l(1);
 }
+
+
+bool PluginManager::LoadAndCompileEffect(const string &filename)
+{
+	string _filename_ = HuiAppDirectoryStatic + "Plugins/All - " + filename + ".kaba";
+
+	return LoadAndCompilePlugin(_filename_);
+}
+
+void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect *fx)
+{
+	msg_db_r("ApplyEffects", 1);
+
+	if (LoadAndCompileEffect(fx->filename)){
+		// run
+		PluginResetData();
+		ImportPluginData(*fx);
+		if (cur_plugin->s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){
+			cur_plugin->s->ExecuteScriptFunction("ProcessTrack", &buf, t);
+		}
+		t->root->UpdateSelection();
+	}else{
+		if (cur_plugin->s)
+			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: %s %s)"), fx->filename.c_str(), cur_plugin->s->ErrorMsgExt[0].c_str(), cur_plugin->s->ErrorMsgExt[1].c_str()));
+		else
+			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: Datei nicht ladbar)"), fx->filename.c_str()));
+	}
+	PopCurPlugin();
+
+	msg_db_l(1);
+}

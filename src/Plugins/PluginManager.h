@@ -37,6 +37,9 @@ public:
 	void OnMenuExecutePlugin();
 	void ExecutePlugin(const string &filename);
 
+	bool LoadAndCompileEffect(const string &filename);
+	void ApplyEffects(BufferBox &buf, Track *t, Effect *fx);
+
 
 	bool LoadAndCompilePlugin(const string&);
 	void PluginResetData();

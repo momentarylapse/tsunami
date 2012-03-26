@@ -6,6 +6,7 @@
  */
 
 #include "AudioRenderer.h"
+#include "../Tsunami.h"
 
 AudioRenderer::AudioRenderer()
 {
@@ -91,7 +92,6 @@ void AudioRenderer::make_fake_track(Track &t, AudioFile *a, BufferBox &buf, int 
 
 void AudioRenderer::bb_apply_fx(BufferBox &buf, AudioFile *a, Track *t, Array<Effect> &fx_list, int pos, int length)
 {
-#if 0
 	msg_db_r("bb_apply_fx", 1);
 
 	buf.make_own();
@@ -101,17 +101,16 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, AudioFile *a, Track *t, Array<Ef
 
 	// apply preview plugin?
 	if (t)
-		if (Preview.effect){
-			ApplyEffects(Preview.effect, &fake_track, pos, length);
+		if (effect){
+			tsunami->plugins->ApplyEffects(buf, &fake_track, effect);
 			//msg_write("preview  .....");
 		}
 
 	// apply fx
 	foreach(fx_list, fx)
-		ApplyEffects(&fx, &fake_track, pos, length);
+		tsunami->plugins->ApplyEffects(buf, &fake_track, &fx);
 
 	msg_db_l(1);
-#endif
 }
 
 void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track &t, int pos, int length)

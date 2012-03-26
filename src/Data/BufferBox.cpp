@@ -182,6 +182,6 @@ void BufferBox::get_16bit_buffer(Array<short> &data)
 	}
 
 	if (wtb_overflow)
-		tsunami->Log(Tsunami::LOG_ERROR, _("Amplitude zu gro&s, Signal &ubersteuert."));
+		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
 		//msg_error("overflow");
 }

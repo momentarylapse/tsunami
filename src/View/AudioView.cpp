@@ -857,18 +857,15 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 		}
 	}
 
-	// TODO!!!!!!!!
 	//NixDrawStr(x,y,get_time_str((int)a->ViewPos,a));
-#if 0
 	// playing position
-	int pos = GetPreviewPos(a);
-	if (pos != -1){
-		int px = sample2screen(a, pos);
+	if (tsunami->output->IsPlaying()){
+		int pos = tsunami->output->GetPos(a);
+		int px = a->sample2screen(pos);
 		c->SetColor(ColorPreviewMarker);
 		c->DrawLine(px, y, px, y + height);
-		c->DrawStr(px, y + height / 2, get_time_str(pos, a));
+		c->DrawStr(px, y + height / 2, a->get_time_str(pos));
 	}
-#endif
 
 	color col = (a==tsunami->cur_audio) ? ColorWaveCur : ColorWave;
 	c->SetColor(col);
@@ -1096,7 +1093,7 @@ void AudioView::MoveView(AudioFile *a, float dpos)
 void AudioView::ExecuteTrackDialog(CHuiWindow *win, Track *t)
 {
 	if (!t){
-		tsunami->Log(Tsunami::LOG_ERROR, _("Keine Spur ausgew&ahlt"));
+		tsunami->log->Error(_("Keine Spur ausgew&ahlt"));
 		return;
 	}
 	TrackDialog *dlg = new TrackDialog(win, false, t);
@@ -1109,7 +1106,7 @@ void AudioView::ExecuteTrackDialog(CHuiWindow *win, Track *t)
 void AudioView::ExecuteSubDialog(CHuiWindow *win, Track *s)
 {
 	if (!s){
-		tsunami->Log(Tsunami::LOG_ERROR, _("Keine Ebene ausgew&ahlt"));
+		tsunami->log->Error(_("Keine Ebene ausgew&ahlt"));
 		return;
 	}
 	SubDialog *dlg = new SubDialog(win, false, s);
@@ -1122,7 +1119,7 @@ void AudioView::ExecuteSubDialog(CHuiWindow *win, Track *s)
 void AudioView::ExecuteAudioDialog(CHuiWindow *win, AudioFile *a)
 {
 	if (!a->used){
-		tsunami->Log(Tsunami::LOG_ERROR, _("Audio-Datei ist leer"));
+		tsunami->log->Error(_("Audio-Datei ist leer"));
 		return;
 	}
 

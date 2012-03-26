@@ -129,7 +129,7 @@ int Track::GetMinUnsafe()
 	int min = 2147483640;
 	if (buffer.num > 0)
 		min = buffer[0].offset;
-	foreach(sub, s)
+	foreachc(sub, s)
 		if (s.pos < min)
 			min = s.pos;
 	return min;
@@ -140,7 +140,7 @@ int Track::GetMaxUnsafe()
 	int max = -2147483640;
 	if (buffer.num > 0)
 		max = buffer.back().offset + buffer.back().num;
-	foreach(sub, s)
+	foreachc(sub, s)
 		for (int i=0;i<s.rep_num+1;i++){
 			int smax = s.pos + s.length + s.rep_num * s.rep_delay;
 			if (smax > max)
@@ -176,12 +176,12 @@ BufferBox Track::ReadBuffers(int pos, int length)
 	msg_db_r("Track.ReadBuffers", 1);
 
 	// is <pos..length> inside a buffer?
-	for (int i=0;i<buffer.num;i++){
-		int p0 = pos - buffer[i].offset;
-		int p1 = pos - buffer[i].offset + length;
-		if ((p0 >= 0) && (p1 <= buffer[i].num)){
+	foreach(buffer, b){
+		int p0 = pos - b.offset;
+		int p1 = pos - b.offset + length;
+		if ((p0 >= 0) && (p1 <= b.num)){
 			// set as reference to subarrays
-			buf.set_as_ref(buffer[i], p0, p1 - p0);
+			buf.set_as_ref(b, p0, p1 - p0);
 			return buf;
 		}
 	}
@@ -190,8 +190,8 @@ BufferBox Track::ReadBuffers(int pos, int length)
 	buf.resize(length);
 
 	// fill with overlapp
-	for (int i=0;i<buffer.num;i++)
-		buf.set(buffer[i], buffer[i].offset - pos, 1.0f);
+	foreach(buffer, b)
+		buf.set(b, b.offset - pos, 1.0f);
 
 	msg_db_l(1);
 	return buf;

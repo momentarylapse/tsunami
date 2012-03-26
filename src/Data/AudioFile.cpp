@@ -317,7 +317,7 @@ Track *AudioFile::AddTimeTrack(int index)
 	// force single time track
 	foreach(track, tt)
 		if (tt.type == Track::TYPE_TIME){
-			tsunami->Log(Tsunami::LOG_ERROR, _("Es existiert schon eine Rhythmus-Spur."));
+			tsunami->log->Error(_("Es existiert schon eine Rhythmus-Spur."));
 			return NULL;
 		}
 

@@ -19,9 +19,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	tsunami = this;
 
 	// configuration
-/*	ChosenOutputDevice = HuiConfigReadStr("ChosenOutputDevice", "");
-	ChosenInputDevice = HuiConfigReadStr("ChosenInputDevice", "");
-	CapturePlaybackDelay = HuiConfigReadFloat("CapturePlaybackDelay", 80.0f);*/
+/*	CapturePlaybackDelay = HuiConfigReadFloat("CapturePlaybackDelay", 80.0f);*/
 
 	int width = HuiConfigReadInt("Width", 1024);
 	int height = HuiConfigReadInt("Height", 768);
@@ -85,33 +83,36 @@ Tsunami::Tsunami(Array<string> arg) :
 	input_timer = HuiCreateTimer();
 
 	InitHistory();*/
-	audio[0] = new AudioFile();
-	audio[1] = new AudioFile();
+	audio[0] = new AudioFile;
+	audio[1] = new AudioFile;
 
 	cur_audio = audio[0];
 
-	storage = new Storage();
+	storage = new Storage;
 
-	view = new AudioView();
+	view = new AudioView;
 
 	progress = new Progress;
+	log = new Log;
+
+	output = new AudioOutput;
+	input = new AudioInput;
+	renderer = new AudioRenderer;
 
 	Subscribe(view);
 	Subscribe(audio[0]);
 	Subscribe(audio[1]);
+	Subscribe(output);
 
 	UpdateMenu();
 
 	/*PreviewInit();
 
-	force_rendering = true;
-
-	HuiSetIdleFunction(&IdleFunction);
-
 	if (arg.num > 1)
 		LoadFromFile(audio[0], arg[1]);
+*/
 
-	UpdateMenu();*/
+	HuiSetIdleFunctionM(this, (void(HuiEventHandler::*)())&Tsunami::IdleFunction);
 	Update();
 }
 
@@ -173,10 +174,6 @@ void Tsunami::OnCloseFile()
 	cur_audio->Reset();
 }
 
-void Tsunami::OnStop()
-{
-}
-
 void Tsunami::LoadKeyCodes()
 {
 }
@@ -216,6 +213,36 @@ void Tsunami::OnSendBugReport()
 
 void Tsunami::IdleFunction()
 {
+	msg_db_r("IdleFunction", 2);
+	/*bool need_to_render = false;
+	if (force_redraw)
+		need_to_render = true;
+	if (force_rendering)
+		need_to_render = true;*/
+	if (output->IsPlaying()){
+		output->Update();
+
+		HuiSleep(5);//PreviewSleepTime); // evil hack... prevent sound from stuttering....
+	}
+
+	/*force_redraw = false;
+
+	if (need_to_render){
+		MainWin->Redraw("area");
+		UpdateMenu();
+	}*/
+
+	/*if (CapturingByDialog)
+		DoCapturingByDialog();
+
+	if ((!ProgressDialog) && (!Capturing)){
+		if (need_to_render)
+		{}//HuiSleep(5);
+		else
+			HuiSleep(20);
+	}*/
+
+	msg_db_l(2);
 }
 
 bool Tsunami::AllowTermination(AudioFile *a)
@@ -266,10 +293,18 @@ void Tsunami::OnRemoveAdded()
 
 void Tsunami::OnPlayLoop()
 {
+	output->PlayLoop = !output->PlayLoop;
+	UpdateMenu();
 }
 
 void Tsunami::OnPlay()
 {
+	output->Play(cur_audio, output->PlayLoop);
+}
+
+void Tsunami::OnStop()
+{
+	output->Stop();
 }
 
 void Tsunami::OnPaste()
@@ -329,10 +364,10 @@ void Tsunami::UpdateMenu()
 	Enable("sub_properties", GetCurSub());
 	// sound
 	Enable("play", cur_audio->used);
-//	Enable("stop", Preview.playing);
-//	Check("play_loop", PreviewPlayLoop);
+	Enable("stop", output->IsPlaying());
+	Check("play_loop", output->PlayLoop);
 	Enable("play", cur_audio->used);
-//	Enable("stop", Preview.playing);
+	Enable("stop", output->IsPlaying());
 
 
 	if (cur_audio->used){
@@ -348,7 +383,11 @@ void Tsunami::UpdateMenu()
 
 void Tsunami::OnUpdate(Observable *o)
 {
-	UpdateMenu();
+	if (o->GetName() == "AudioOutput"){
+		ForceRedraw();
+		UpdateMenu();
+	}else // "Data" or "AudioView"
+		UpdateMenu();
 }
 
 
@@ -381,12 +420,4 @@ void Tsunami::OnSave()
 
 void Tsunami::OnSaveAs()
 {
-}
-
-
-void Tsunami::Log(int type, const string &message)
-{
-	msg_error(message);
-	if (type == LOG_ERROR)
-		HuiErrorBox(this, _("Fehler"), message);
 }

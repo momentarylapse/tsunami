@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.4.13.0";
+string HuiVersion = "0.4.13.1";
 
 
 #include <stdio.h>
@@ -462,11 +462,21 @@ void HuiDoSingleMainLoop()
 		HuiIdleFunction();*/
 #endif
 #ifdef HUI_API_GTK
+
+	// push idle function
 	hui_callback *_if_ = HuiIdleFunction;
+	HuiEventHandler *_io_ = hui_idle_object;
+	void (HuiEventHandler::*_imf_)() = hui_idle_member_function;
+
 	HuiSetIdleFunction(NULL);
 	while(gtk_events_pending())
 		gtk_main_iteration();
-	HuiSetIdleFunction(_if_);
+
+	// pop idle function
+	if (_if_)
+		HuiSetIdleFunction(_if_);
+	else if ((_io_) && (_imf_))
+		HuiSetIdleFunctionM(_io_, _imf_);
 #endif
 	msg_db_l(1);
 }

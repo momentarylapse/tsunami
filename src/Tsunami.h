@@ -14,6 +14,10 @@
 #include "View/AudioView.h"
 #include "Storage/Storage.h"
 #include "Stuff/Progress.h"
+#include "Stuff/Log.h"
+#include "Audio/AudioOutput.h"
+#include "Audio/AudioInput.h"
+#include "Audio/AudioRenderer.h"
 
 class Observer;
 class CHuiWindow;
@@ -72,14 +76,6 @@ public:
 	void OnFindAndExecutePlugin();
 	void OnExit();
 
-	enum{
-		LOG_ERROR,
-		LOG_WARNING,
-		LOG_INFO
-	};
-
-	void Log(int type, const string &message);
-
 	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
 	bool AllowTermination(AudioFile *a = NULL);
 
@@ -99,6 +95,11 @@ public:
 	Storage *storage;
 
 	Progress *progress;
+	Log *log;
+
+	AudioOutput *output;
+	AudioInput *input;
+	AudioRenderer *renderer;
 };
 
 extern Tsunami *tsunami;

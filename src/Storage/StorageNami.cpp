@@ -396,7 +396,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		else
 			ReadFXList(f, a->fx);
 	}else
-		tsunami->Log(Tsunami::LOG_ERROR, format(_("Falsche Version des Dateiformats: %d  (%d erwartet)"), ffv, 5));
+		tsunami->log->Error(format(_("Falsche Version des Dateiformats: %d  (%d erwartet)"), ffv, 5));
 	tdata.clear();
 
 

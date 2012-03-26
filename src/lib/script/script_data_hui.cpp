@@ -374,7 +374,7 @@ void SIAddPackageHui()
 	add_func("HuiGetEvent",	TypeHuiEventP,		(void*)HuiGetEvent);
 	add_func("HuiRun",				TypeVoid,		(void*)&HuiRun);
 	add_func("HuiEnd",				TypeVoid,		(void*)&HuiEnd);
-	add_func("HuiWaitTillWindowClosed",		TypeVoid,	(void*)&HuiWaitTillWindowClosed);
+	add_func("HuiWaitTillWindowClosed",		TypeString,	(void*)&HuiWaitTillWindowClosed);
 		func_add_param("w",			TypeHuiWindowP);
 	add_func("HuiDoSingleMainLoop",	TypeVoid,	(void*)&HuiDoSingleMainLoop);
 	add_func("HuiSleep",			TypeVoid,	(void*)&HuiSleep);

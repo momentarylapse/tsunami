@@ -4,7 +4,7 @@
 #define MIN_FREQ	20.0
 #define MAX_FREQ	20000.0
 
-HuiWindow dlg
+window dlg
 
 enum
 	TypeLinear
@@ -33,11 +33,11 @@ void CreateLines(int type)
 		else //if type == TypeLogarithm
 			yr.add(h - 10 - (h - 20) * (1 + log(ffr[i]) * 0.08))
 			yl.add(h - 10 - (h - 20) * (1 + log(ffl[i]) * 0.08))
-			clampf(yr[i], 10, h - 10)
-			clampf(yl[i], 10, h - 10)
+			clamp(yr[i], 10, h - 10)
+			clamp(yl[i], 10, h - 10)
 
 void OnDraw()
-	HuiDrawingContext *c = dlg.BeginDraw("drawing_area")
+	context c = dlg.BeginDraw("drawing_area")
 	w = c.width
 	h = c.height
 	CreateLines(dlg.GetInt("type"))

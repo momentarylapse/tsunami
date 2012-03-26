@@ -19,7 +19,8 @@ public:
 
 	void Set(float value);
 	float Get();
-	void Enabled(bool enabled);
+	void Enable(bool enabled);
+	bool Match(const string &id);
 
 	void OnSlide();
 	void OnEdit();

@@ -16,7 +16,7 @@ class PluginData
 PluginData data
 
 
-HuiWindow EqualizerDialog
+window EqualizerDialog
 float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
 
 complex f[]
@@ -69,7 +69,7 @@ void DataToDialog()
 		EqualizerDialog.SetFloat("slider_" + i, data.Factor[i] / 2)
 
 void OnEvent()
-	HuiEvent *e = HuiGetEvent()
+	event e = HuiGetEvent()
 	int i
 	for i, 0, NUM_BANDS
 		if e.id == ("slider_" + i)

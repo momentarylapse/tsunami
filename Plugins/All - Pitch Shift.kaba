@@ -3,7 +3,7 @@
 
 #include "api.kaba"
 
-HuiWindow PitchDialog
+window PitchDialog
 
 complex buf1[]
 complex buf2[]

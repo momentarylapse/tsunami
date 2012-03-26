@@ -501,6 +501,5 @@ void HuiFuncIgnore()
 
 void HuiFuncClose()
 {
-	msg_write("HuiFuncClose");
 	delete(HuiGetEvent()->win);
 }

@@ -6,7 +6,7 @@
 bool not_first_time
 
 
-HuiWindow FlangerDialog
+window FlangerDialog
 
 class PluginData
 	float Delay

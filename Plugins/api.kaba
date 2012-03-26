@@ -121,7 +121,7 @@ class AudioFile
 	
 	void *history
 
-extern HuiWindow MainWin
+extern window MainWin
 extern AudioFile /* *audio[2],*/ *cur_audio
 
 extern Track *AddEmptyTrack(AudioFile *a)
@@ -154,14 +154,14 @@ extern void Progress(string s, float progress)
 
 extern BufferBox AudioFileRender(AudioFile *a, int pos, int length)
 
-extern void PutFavoriteBarFixed(HuiWindow win, int x, int y, int w)
-extern void PutFavoriteBarSizable(HuiWindow win, string root_id, int x, int y)
-extern void PutCommandBarFixed(HuiWindow win, int x, int y, int w)
-extern void PutCommandBarSizable(HuiWindow win, string root_id, int x, int y)
-extern void AddSlider(HuiWindow win, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
-extern void SliderSet(HuiWindow win, string id, float value)
-extern float SliderGet(HuiWindow win, string id)
-extern void RemoveSliders(HuiWindow win)
+extern void PutFavoriteBarFixed(window win, int x, int y, int w)
+extern void PutFavoriteBarSizable(window win, string root_id, int x, int y)
+extern void PutCommandBarFixed(window win, int x, int y, int w)
+extern void PutCommandBarSizable(window win, string root_id, int x, int y)
+extern void AddSlider(window win, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
+extern void SliderSet(window win, string id, float value)
+extern float SliderGet(window win, string id)
+extern void RemoveSliders(window win)
 
 
 int abra

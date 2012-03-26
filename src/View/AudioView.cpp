@@ -35,6 +35,10 @@ AudioView::AudioView() :
 	ColorSubMO = color(1, 0.6f, 0, 0);
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
+
+	ShowTempFile = false;
+	ShowMono = false;
+	ShowGrid = true;
 	DetailSteps = HuiConfigReadInt("DetailSteps", 1);
 	MouseMinMoveToSelect = HuiConfigReadInt("MouseMinMoveToSelect", 5);
 	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
@@ -78,10 +82,6 @@ AudioView::AudioView() :
 
 	ForceRedraw();
 	UpdateMenu();
-
-	ShowTempFile = false;
-	ShowMono = false;
-	ShowGrid = true;
 }
 
 AudioView::~AudioView()

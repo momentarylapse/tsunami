@@ -10,7 +10,7 @@ class PluginData
 PluginData data
 
 
-HuiWindow GeneratorDialog
+window GeneratorDialog
 
 void ProcessTrack(BufferBox buf, Track t)
 	AudioFile *a = t.root
@@ -25,8 +25,8 @@ void ProcessTrack(BufferBox buf, Track t)
 		float d = sin(tt) * data.Volume
 		buf.r[i] += d
 		buf.l[i] += d
-		clampf(buf.r[i], -1, 1)
-		clampf(buf.l[i], -1, 1)
+		clamp(buf.r[i], -1, 1)
+		clamp(buf.l[i], -1, 1)
 
 float get_freq(int tone)
 	return 220 * pow(2, (tone - 21.0) / 12.0)

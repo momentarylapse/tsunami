@@ -22,6 +22,7 @@ public:
 	void End();
 
 	void Cancel();
+	bool IsCancelled();
 
 private:
 	CHuiWindow *dlg;

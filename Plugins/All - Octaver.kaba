@@ -1,6 +1,6 @@
 #include "api.kaba"
 
-HuiWindow dlg
+window dlg
 
 class PluginData
 	float Level

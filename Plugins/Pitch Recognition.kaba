@@ -11,7 +11,7 @@
 float buf[]
 complex bufc[]
 
-HuiWindow win
+window win
 
 float get_freq(float i)
 	return i / (buf_size / 2) * freq / 2
@@ -26,7 +26,7 @@ string get_note(float f)
 	while n > 11
 		n -= 12
 	error = fl * 12.0
-	loopf(error, -0.5, 0.5)
+	loop(error, -0.5, 0.5)
 	if n == 0
 		return "A"
 	else if n == 1
@@ -53,7 +53,7 @@ string get_note(float f)
 	//loopf(fl, 0, 1)
 	//note = i2s(n)
 
-void DrawVolume(HuiDrawingContext *c)
+void DrawVolume(context c)
 	c.SetColor(color(1, 0.8, 0.8, 0.8))
 	float y0 = 30
 	float y1 = c.height - 5
@@ -63,7 +63,7 @@ void DrawVolume(HuiDrawingContext *c)
 	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 void Draw()
-	HuiDrawingContext *c = win.BeginDraw("drawing")
+	context c = win.BeginDraw("drawing")
 	c.SetColor(White)
 	c.SetFontSize(12)
 	c.DrawRect(0, 0, c.width, c.height)
@@ -121,7 +121,7 @@ void idle()
 		for i, 0, bufc.num
 			float f = get_freq(i)
 			if f > f_min and f < f_max
-				float amp = absf(bufc[i].x)
+				float amp = abs(bufc[i].x)
 				//floatout f
 				if (amp > max * 2.5) or (amp > max and f < fmax2)
 					max = amp
@@ -129,10 +129,10 @@ void idle()
 					fmax2 = f * 1.5
 		max /= sqrt(buf.num) * 2 * pi
 		Volume = max / threshold / 2
-		clampf(Volume, 0, 1)
+		clamp(Volume, 0, 1)
 		if max > threshold
 			LoudEnough = true
-			if absf(log(fmax / Frequency)) < 0.1
+			if abs(log(fmax / Frequency)) < 0.1
 				Frequency *= 1 + log(fmax / Frequency) * 0.1
 			else
 				Frequency = fmax

@@ -65,10 +65,16 @@ float Slider::Get()
 }
 
 
-void Slider::Enabled(bool enabled)
+void Slider::Enable(bool enabled)
 {
 	win->Enable(id_slider, enabled);
 	win->Enable(id_edit, enabled);
+}
+
+
+bool Slider::Match(const string &id)
+{
+	return ((id == id_slider) or (id == id_edit));
 }
 
 

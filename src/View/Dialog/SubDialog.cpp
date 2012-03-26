@@ -52,7 +52,7 @@ void SubDialog::OnMute()
 {
 	sub->muted = IsChecked("");
 	//sub->root->history->Change();
-	volume_slider->Enabled(!sub->muted);
+	volume_slider->Enable(!sub->muted);
 }
 
 void SubDialog::OnLevelTrack()

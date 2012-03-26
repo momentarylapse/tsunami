@@ -12,7 +12,7 @@ enum
 	HMM_PITCH_SLIDER
 	HMM_PITCH
 
-HuiWindow PitchDialog
+window PitchDialog
 float Pitch
 bool Cancelled
 

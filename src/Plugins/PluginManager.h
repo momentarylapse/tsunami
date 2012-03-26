@@ -1,0 +1,90 @@
+/*
+ * PluginManager.h
+ *
+ *  Created on: 26.03.2012
+ *      Author: michi
+ */
+
+#ifndef PLUGINMANAGER_H_
+#define PLUGINMANAGER_H_
+
+#include "../lib/hui/hui.h"
+#include "../lib/script/script.h"
+#include "../Data/AudioFile.h"
+
+class PluginManager : public HuiEventHandler
+{
+public:
+	PluginManager();
+	virtual ~PluginManager();
+
+	void LinkAppScriptData();
+	void AddPluginsToMenu();
+	void FindAndExecutePlugin();
+	void DoPlugins(int message);
+
+	void PushCurPlugin(CScript *s);
+	void PopCurPlugin();
+
+	void ImportPluginData(Effect &fx);
+	void ExportPluginData(Effect &fx);
+
+	void PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w);
+	void PutFavoriteBarSizable(CHuiWindow *win, const string &root_id, int x, int y);
+	void PutCommandBarFixed(CHuiWindow *win, int x, int y, int w);
+	void PutCommandBarSizable(CHuiWindow *win, const string &root_id, int x, int y);
+
+	void OnMenuExecutePlugin();
+	void ExecutePlugin(const string &filename);
+
+
+	bool LoadAndCompilePlugin(const string&);
+	void PluginResetData();
+	bool PluginConfigure(bool deletable, bool previewable);
+	void InitPluginData();
+	void FinishPluginData();
+	void InitFavorites(CHuiWindow *win);
+
+	void PluginDataToDialog();
+	void WritePluginDataToFile(const string &name);
+	void LoadPluginDataFromFile(const string &name);
+	void PluginPreview();
+	void PluginProcessTrack(CScript *s, Track *t, int pos, int length);
+
+	void OnFavoriteName();
+	void OnFavoriteList();
+	void OnFavoriteSave();
+	void OnFavoriteDelete();
+	void OnPluginFavoriteName();
+	void OnPluginFavoriteList();
+	void OnPluginFavoriteSave();
+	void OnPluginOk();
+	void OnPluginDelete();
+	void OnPluginClose();
+
+	struct Plugin
+	{
+		string filename;
+		CScript *s;
+		hui_callback *f_reset, *f_data2dialog, *f_configure;
+		int index;
+	};
+
+
+
+	Array<string> PluginFile;
+	bool ErrorApplyingEffect;
+
+	Array<string> PluginFavoriteName;
+
+	bool PluginCancelled;
+	bool PluginDeleted;
+	bool PluginAddDelete;
+	bool PluginAddPreview;
+
+	Array<Plugin> plugin;
+	Plugin *cur_plugin;
+	Array<int> cur_plugin_stack;
+};
+
+#endif /* PLUGINMANAGER_H_ */

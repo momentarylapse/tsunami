@@ -17,7 +17,7 @@ class PluginData
 PluginData data
 
 
-HuiWindow dlg
+window dlg
 int MouseOver, Selected
 
 complex f[]
@@ -89,7 +89,7 @@ complex unproject(complex z)
 
 
 void Draw()
-	HuiDrawingContext *c = dlg.BeginDraw("drawing")
+	context c = dlg.BeginDraw("drawing")
 	c.SetLineWidth(0.7)
 	
 	// background
@@ -192,8 +192,8 @@ void OnMouseMove()
 			xmin = data.curve[Selected - 1].x
 		if Selected < data.curve.num - 1
 			xmax = data.curve[Selected + 1].x
-		clampf(data.curve[Selected].x, xmin, xmax)
-		clampf(data.curve[Selected].y, MIN_VOL, MAX_VOL)
+		clamp(data.curve[Selected].x, xmin, xmax)
+		clamp(data.curve[Selected].y, MIN_VOL, MAX_VOL)
 		if Selected == data.curve.num - 1
 			data.curve[Selected].x = MAX_FREQ
 		if Selected == 0

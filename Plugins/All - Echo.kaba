@@ -5,7 +5,7 @@
 
 bool not_first_time
 
-HuiWindow DelayDialog
+window DelayDialog
 
 class PluginData
 	float Delay

@@ -1,7 +1,7 @@
 
 #include "api.kaba"
 
-HuiWindow win
+window win
 int MouseOver, Selected
 
 class PluginData
@@ -16,7 +16,7 @@ void compress(float b[])
 	float in_level = 0
 	for i, 0, b.num
 		// in level
-		float in_level_cur = absf(b[i])
+		float in_level_cur = abs(b[i])
 		in_level *= level_scale
 		if in_level_cur > in_level
 			in_level = in_level_cur
@@ -49,7 +49,7 @@ void DataToDialog()
 	win.SetFloat("edit", data.Delay * 1000)
 
 void Draw()
-	HuiDrawingContext *c = win.BeginDraw("drawing_area")
+	context c = win.BeginDraw("drawing_area")
 	c.SetLineWidth(0.7)
 	w = c.width
 	h = c.height
@@ -137,8 +137,8 @@ void OnMouseMove()
 		if Selected < data.curve.num - 1
 			xmax = data.curve[Selected + 1].x
 			ymax = data.curve[Selected + 1].y
-		clampf(data.curve[Selected].x, xmin, xmax)
-		clampf(data.curve[Selected].y, ymin, ymax)
+		clamp(data.curve[Selected].x, xmin, xmax)
+		clamp(data.curve[Selected].y, ymin, ymax)
 		if Selected == data.curve.num - 1
 			data.curve[Selected].x = 1
 	else

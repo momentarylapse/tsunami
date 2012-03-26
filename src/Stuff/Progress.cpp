@@ -64,6 +64,11 @@ void Progress::Cancel()
 	Cancelled = true;
 }
 
+bool Progress::IsCancelled()
+{
+	return Cancelled;
+}
+
 void OnProgressClose()
 {	_progress_->Cancel();	}
 

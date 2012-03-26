@@ -6,7 +6,7 @@ float x_in[8]
 float x_out[8]
 
 float dist(float x)
-	float f = absf(x)
+	float f = abs(x)
 	float sign = 1
 	if x < 0
 		sign = -1

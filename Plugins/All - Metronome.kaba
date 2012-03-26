@@ -13,7 +13,7 @@ class PluginData
 PluginData data
 
 
-HuiWindow dlg
+window dlg
 
 void ProcessTrack(BufferBox buf, Track t)
 	AudioFile *a = t.root
@@ -39,8 +39,8 @@ void ProcessTrack(BufferBox buf, Track t)
 				float d = sin(tt) * data.Volume * envelope
 				buf.r[j] += d
 				buf.l[j] += d
-				clampf(buf.r[j], -1, 1)
-				clampf(buf.l[j], -1, 1)
+				clamp(buf.r[j], -1, 1)
+				clamp(buf.l[j], -1, 1)
 
 void ResetData()
 	data.Volume = 0.3

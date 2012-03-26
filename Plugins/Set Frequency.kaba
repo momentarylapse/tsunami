@@ -1,6 +1,6 @@
 #include "api.kaba"
 
-HuiWindow dlg
+window dlg
 
 void OnOk()
 	cur_audio.sample_rate = dlg.GetInt("freq")

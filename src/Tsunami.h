@@ -20,6 +20,7 @@
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioInput.h"
 #include "Audio/AudioRenderer.h"
+#include "Plugins/PluginManager.h"
 
 class Observer;
 class CHuiWindow;
@@ -106,6 +107,8 @@ public:
 	AudioOutput *output;
 	AudioInput *input;
 	AudioRenderer *renderer;
+
+	PluginManager *plugins;
 };
 
 extern Tsunami *tsunami;

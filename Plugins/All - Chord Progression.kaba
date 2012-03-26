@@ -12,7 +12,7 @@ class PluginData
 PluginData data
 
 
-HuiWindow GeneratorDialog
+window GeneratorDialog
 
 float get_freq(int tone)
 	return 220 * pow(2, (tone - 21.0) / 12.0)
@@ -72,7 +72,7 @@ void AddSimpleTone(AudioFile *a, float buf[], int pos0, int pos1, float f, float
 		if i > pos1 - 1000
 			d *= (pos1 - i) * 0.001
 		buf[i] += d
-		clampf(buf[i], -1, 1)
+		clamp(buf[i], -1, 1)
 
 void AddTone(AudioFile *a, float buf[], int pos0, int pos1, float f, float vol)
 	AddSimpleTone(a, buf, pos0, pos1, f,     vol * 0.6)

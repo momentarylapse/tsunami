@@ -95,7 +95,8 @@ Tsunami::Tsunami(Array<string> arg) :
 	// events
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
 
-	/*AddPluginsToMenu();*/
+	plugins = new PluginManager;
+	plugins->AddPluginsToMenu();
 
 	audio[0] = new AudioFile;
 	audio[1] = new AudioFile;

@@ -31,6 +31,7 @@ public:
 
 	bool IsPlaying();
 	int GetPos(AudioFile * a);
+	void GetPeaks(float &peak_r, float &peak_l);
 
 private:
 	bool TestError(const string &msg);

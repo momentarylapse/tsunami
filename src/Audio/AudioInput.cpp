@@ -10,6 +10,8 @@
 AudioInput::AudioInput()
 {
 	// TODO Auto-generated constructor stub
+	//ChosenDevice = HuiConfigReadStr("ChosenInputDevice", "");
+	//CapturePlaybackDelay = HuiConfigReadFloat("CapturePlaybackDelay", 80.0f);
 
 }
 

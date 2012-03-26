@@ -15,6 +15,7 @@
 #include "Storage/Storage.h"
 #include "Stuff/Progress.h"
 #include "Stuff/Log.h"
+#include "Stuff/PeakMeter.h"
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioInput.h"
 #include "Audio/AudioRenderer.h"
@@ -91,6 +92,8 @@ public:
 	Track *GetCurSub();
 
 	AudioView *view;
+
+	PeakMeter *peak_meter;
 
 	Storage *storage;
 

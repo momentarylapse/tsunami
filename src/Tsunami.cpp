@@ -18,15 +18,11 @@ Tsunami::Tsunami(Array<string> arg) :
 {
 	tsunami = this;
 
-	// configuration
-/*	CapturePlaybackDelay = HuiConfigReadFloat("CapturePlaybackDelay", 80.0f);*/
 
 	int width = HuiConfigReadInt("Width", 1024);
 	int height = HuiConfigReadInt("Height", 768);
 	bool maximized = HuiConfigReadBool("Maximized", true);
-/*	OggQuality = HuiConfigReadFloat("OggQuality", 0.5f);
-	Preview.volume = HuiConfigReadFloat("Volume", 1.0f);
-	DrawingWidth = width;*/
+/*	OggQuality = HuiConfigReadFloat("OggQuality", 0.5f); // -> StorageOgg*/
 
 	//HuiAddKeyCode("insert_added", KEY_RETURN);
 	//HuiAddKeyCode("remove_added", KEY_BACKSPACE);
@@ -67,6 +63,17 @@ Tsunami::Tsunami(Array<string> arg) :
 	// create the window
 	SetSize(width, height);
 	SetBorderWidth(0);
+	AddControlTable("", 0, 0, 1, 2, "main_table");
+	SetTarget("main_table", 0);
+	SetBorderWidth(8);
+	AddControlTable("", 0, 1, 8, 1, "audio_table");
+	SetTarget("audio_table", 0);
+	AddButton("", 0, 0, 0, 0, "play");
+	AddButton("", 1, 0, 0, 0, "stop");
+	AddCheckBox("", 2, 0, 0, 0, "play_loop");
+	AddDrawingArea("", 3, 0, 0, 0, "peaks");
+	peak_meter = new PeakMeter(this, "peaks");
+	AddButton("", 4, 0, 0, 0, "record");
 	AllowEvents("key");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);
@@ -386,6 +393,9 @@ void Tsunami::OnUpdate(Observable *o)
 	if (o->GetName() == "AudioOutput"){
 		ForceRedraw();
 		UpdateMenu();
+		float peak_r, peak_l;
+		output->GetPeaks(peak_r, peak_l);
+		peak_meter->Set(peak_r, peak_l);
 	}else // "Data" or "AudioView"
 		UpdateMenu();
 }

@@ -49,9 +49,8 @@ AudioOutput::AudioOutput() :
 	PlayLoop = false;
 
 	// TODO Auto-generated constructor stub
-	/*ChosenOutputDevice = HuiConfigReadStr("ChosenOutputDevice", "");
-	ChosenInputDevice = HuiConfigReadStr("ChosenInputDevice", "");*/
-
+	ChosenDevice = HuiConfigReadStr("ChosenOutputDevice", "");
+	volume = HuiConfigReadFloat("Volume", 1.0f);
 }
 
 AudioOutput::~AudioOutput()
@@ -314,6 +313,36 @@ int AudioOutput::GetPos(AudioFile * a)
 		}
 	}
 	return -1;
+}
+
+void AudioOutput::GetPeaks(float &peak_r, float &peak_l)
+{
+	peak_r = peak_l = 0;
+
+	if (playing){
+
+		// (sample) position within current stream/buffer
+		int dpos = 0;
+		alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
+
+		// translate relative to data
+		int pos_0 = dpos + stream_pos - AL_BUFFER_SIZE * 2;
+		if (pos_0 < 0)
+			pos_0 = 0;
+
+		// data...
+		int num_samples = 2000;
+		Array<short> tmp = data.sub(pos_0 * 2, num_samples * 2);
+
+		for (int i=0;i<tmp.num/2;i++){
+			float amp_r = fabs((float)tmp[i * 2    ] / 32768.0f);
+			float amp_l = fabs((float)tmp[i * 2 + 1] / 32768.0f);
+			if (amp_r > peak_r)
+				peak_r = amp_r;
+			if (amp_l > peak_l)
+				peak_l = amp_l;
+		}
+	}
 }
 
 bool AudioOutput::TestError(const string &msg)

@@ -42,6 +42,8 @@ AudioView::AudioView() :
 
 	MousePossiblySelecting = -1;
 
+	tsunami->SetBorderWidth(0);
+	tsunami->SetTarget("main_table", 0);
 	tsunami->AddDrawingArea("", 0, 0, 0, 0, "area");
 
 	Subscribe(tsunami->audio[0]);

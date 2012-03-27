@@ -424,9 +424,11 @@ void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id,
 
 void PluginManager::PluginResetData()
 {
+	msg_db_r("PluginResetData", 1);
 	if (cur_plugin)
 		if (cur_plugin->f_reset)
 			cur_plugin->f_reset();
+	msg_db_l(1);
 }
 
 bool PluginManager::PluginConfigure(bool deletable, bool previewable)
@@ -713,12 +715,14 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 
 void PluginManager::PluginProcessTrack(CScript *s, Track *t, int pos, int length)
 {
+	msg_db_r("PluginProcessTrack", 1);
 	//tsunami->cur_audio->history->ChangeBegin();
 	//HistoryOpStartEditBuffer(t, s_start, s_end);
 	BufferBox buf = t->GetBuffers(pos, length);
 	s->ExecuteScriptFunction("ProcessTrack", &buf, t);
 	//t->UpdatePeaks();
 	//cur_audio->history->ChangeEnd();
+	msg_db_l(1);
 }
 
 void PluginManager::ExecutePlugin(const string &filename)

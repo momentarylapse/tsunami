@@ -19,14 +19,11 @@ void ProcessTrack(BufferBox buf, Track t)
 
 	float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
 
-	int i
-	for i, 0, buf.num
+	for int i, 0, buf.num
 		float tt = i * w_f
 		float d = sin(tt) * data.Volume
-		buf.r[i] += d
-		buf.l[i] += d
-		clamp(buf.r[i], -1, 1)
-		clamp(buf.l[i], -1, 1)
+		buf.r[i] = clamp(buf.r[i] + d, -1, 1)
+		buf.l[i] = clamp(buf.l[i] + d, -1, 1)
 
 float get_freq(int tone)
 	return 220 * pow(2, (tone - 21.0) / 12.0)

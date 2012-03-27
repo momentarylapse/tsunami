@@ -114,11 +114,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	UpdateMenu();
 
-	/*
-
-	if (arg.num > 1)
-		LoadFromFile(audio[0], arg[1]);
-*/
+	HandleArguments(arg);
 
 	HuiSetIdleFunctionM(this, (void(HuiEventHandler::*)())&Tsunami::IdleFunction);
 	Update();
@@ -305,6 +301,8 @@ void Tsunami::OnTrackImport()
 
 bool Tsunami::HandleArguments(Array<string> arg)
 {
+	if (arg.num > 1)
+		return storage->Load(cur_audio, arg[1]);
 	return false;
 }
 

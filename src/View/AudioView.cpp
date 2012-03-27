@@ -31,6 +31,7 @@ AudioView::AudioView() :
 	ColorSubMO = color(1, 0.6f, 0, 0);
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
+	DrawingWidth = 800;
 
 	ShowTempFile = false;
 	ShowMono = false;
@@ -40,7 +41,7 @@ AudioView::AudioView() :
 	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
 	ScrollSpeed = HuiConfigReadInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = HuiConfigReadInt("View.ScrollSpeedFast", 3000);
-	ZoomSpeed = HuiConfigReadInt("View.ZoomSpeed", 0.1f);
+	ZoomSpeed = HuiConfigReadFloat("View.ZoomSpeed", 0.1f);
 
 
 	MousePossiblySelecting = -1;
@@ -87,7 +88,7 @@ AudioView::~AudioView()
 {
 	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
 	HuiConfigWriteInt("View.ScrollSpeedFast", ScrollSpeedFast);
-	HuiConfigWriteInt("View.ZoomSpeed", ZoomSpeed);
+	HuiConfigWriteFloat("View.ZoomSpeed", ZoomSpeed);
 }
 
 

@@ -27,9 +27,9 @@ void ProcessTrack(BufferBox buf, Track t)
 	int sm_d = data.Length * a.sample_rate
 	float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
 
-	int nm = buf.num / sm_m + 1, m, i
-	for m, 0, nm
-		for i, 0, sm_d
+	int nm = buf.num / sm_m + 1
+	for int m, 0, nm
+		for int i, 0, sm_d
 			float fi = i2f(i) / sm_d
 			float envelope = 1 //sin(fi * pi)
 			
@@ -37,10 +37,8 @@ void ProcessTrack(BufferBox buf, Track t)
 			int j = m * sm_m + i
 			if j < buf.num
 				float d = sin(tt) * data.Volume * envelope
-				buf.r[j] += d
-				buf.l[j] += d
-				clamp(buf.r[j], -1, 1)
-				clamp(buf.l[j], -1, 1)
+				buf.r[j] = clamp(buf.r[j] + d, -1, 1)
+				buf.l[j] = clamp(buf.l[j] + d, -1, 1)
 
 void ResetData()
 	data.Volume = 0.3

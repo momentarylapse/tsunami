@@ -42,8 +42,7 @@ class Chord
 	int type
 
 void ParseChords(AudioFile *a, Chord chord[])
-	int i
-	for i, 0, data.Chords.num
+	for int i, 0, data.Chords.num
 		Chord c
 		if data.Chords[i] >= 'a' and data.Chords[i] <= 'h'
 			c.type = ChordMinor
@@ -63,16 +62,14 @@ void AddSimpleTone(AudioFile *a, float buf[], int pos0, int pos1, float f, float
 	float f_w = 1.0 / a.sample_rate * f * 2.0 * pi
 	if pos1 >= buf.num
 		pos1 = buf.num
-	int i
-	for i, pos0, pos1
+	for int i, pos0, pos1
 		float tt = i * f_w
 		float d = sin(tt) * vol
 		if i < pos0 + 1000
 			d *= (i - pos0) * 0.001
 		if i > pos1 - 1000
 			d *= (pos1 - i) * 0.001
-		buf[i] += d
-		clamp(buf[i], -1, 1)
+		buf[i] = clamp(buf[i] + d, -1, 1)
 
 void AddTone(AudioFile *a, float buf[], int pos0, int pos1, float f, float vol)
 	AddSimpleTone(a, buf, pos0, pos1, f,     vol * 0.6)
@@ -90,8 +87,7 @@ void AddChord(AudioFile *a, float buf[], int pos0, int pos1, Chord c)
 	f.add(get_freq(c.base_tone + 7))
 	f.add(get_freq(c.base_tone + 12))
 	
-	int i
-	for i, 0, f.num
+	for int i, 0, f.num
 		AddTone(a, buf, pos0, pos1, f[i], data.Volume)
 
 void ProcessTrack(BufferBox buf, Track t)
@@ -99,8 +95,7 @@ void ProcessTrack(BufferBox buf, Track t)
 	AudioFile *a = t.root
 	ParseChords(a, chord)
 	
-	int i
-	for i, 0, chord.num
+	for int i, 0, chord.num
 		int pos0 = f2i(a.sample_rate * data.Duration * i2f(i))
 		int pos1 = f2i(a.sample_rate * data.Duration * i2f(i + 1))
 		AddChord(a, buf.r, pos0, pos1, chord[i])

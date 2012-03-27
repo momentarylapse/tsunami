@@ -1,8 +1,8 @@
 #include "api.kaba"
 
-#define N		1024
-#define MIN_FREQ	20.0
-#define MAX_FREQ	20000.0
+const int N = 1024
+const float MIN_FREQ = 20.0
+const float MAX_FREQ = 20000.0
 
 window dlg
 
@@ -33,8 +33,8 @@ void CreateLines(int type)
 		else //if type == TypeLogarithm
 			yr.add(h - 10 - (h - 20) * (1 + log(ffr[i]) * 0.08))
 			yl.add(h - 10 - (h - 20) * (1 + log(ffl[i]) * 0.08))
-			clamp(yr[i], 10, h - 10)
-			clamp(yl[i], 10, h - 10)
+			yr[i] = clamp(yr[i], 10, h - 10)
+			yl[i] = clamp(yl[i], 10, h - 10)
 
 void OnDraw()
 	context c = dlg.BeginDraw("drawing_area")
@@ -113,8 +113,8 @@ void show_spec()
 		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
 		int j0 = fmin * ww
 		int j1 = fmax * ww
-		clamp(j0, 0, len2)
-		clamp(j1, 0, len2)
+		j0 = clamp(j0, 0, len2)
+		j1 = clamp(j1, 0, len2)
 		float bmaxr = 0
 		float bmaxl = 0
 		for j, j0, j1

@@ -182,6 +182,7 @@ BufferBox Track::ReadBuffers(int pos, int length)
 		if ((p0 >= 0) && (p1 <= b.num)){
 			// set as reference to subarrays
 			buf.set_as_ref(b, p0, p1 - p0);
+			msg_db_l(1);
 			return buf;
 		}
 	}

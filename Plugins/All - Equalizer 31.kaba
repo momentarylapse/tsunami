@@ -6,9 +6,9 @@
 
 
 
-#define NUM_BANDS		31
-#define MIN_FREQ		20.0
-#define MAX_FREQ		20000.0
+const int NUM_BANDS = 31
+const float MIN_FREQ = 20.0
+const float MAX_FREQ = 20000.0
 
 class PluginData
 	float Factor[NUM_BANDS]
@@ -22,7 +22,6 @@ float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
 complex f[]
 
 void equalize(float b[])
-	int i, j
 	
 /*	// normalize parameters...
 	float max_factor = 0
@@ -41,13 +40,11 @@ void equalize(float b[])
 	
 	// equalize
 	float w = i2f(b.num) / cur_audio.sample_rate
-	for i, 0, NUM_BANDS
-		int j0 = FreqMin[i] * w
-		int j1 = FreqMax[i] * w
-		clamp(j0, 0, len2)
-		clamp(j1, 0, len2)
+	for int i, 0, NUM_BANDS
+		int j0 = clamp(FreqMin[i] * w, 0, len2)
+		int j1 = clamp(FreqMax[i] * w, 0, len2)
 		float ff = data.Factor[i] / b.num
-		for j, j0, j1
+		for int j, j0, j1
 			f[j] = f[j] * ff
 		
 	// transform back
@@ -59,19 +56,16 @@ void ProcessTrack(BufferBox buf, Track t)
 	f.clear()
 
 void ResetData()
-	int i
-	for i, 0, NUM_BANDS
+	for int i, 0, NUM_BANDS
 		data.Factor[i] = 1
 
 void DataToDialog()
-	int i
-	for i, 0, NUM_BANDS
+	for int i, 0, NUM_BANDS
 		EqualizerDialog.SetFloat("slider_" + i, data.Factor[i] / 2)
 
 void OnEvent()
 	event e = HuiGetEvent()
-	int i
-	for i, 0, NUM_BANDS
+	for int i, 0, NUM_BANDS
 		if e.id == ("slider_" + i)
 			data.Factor[i] = EqualizerDialog.GetFloat("") * 2
 
@@ -79,8 +73,7 @@ void OnEvent()
 void Configure()
 	// dialog
 	EqualizerDialog=HuiCreateDialog("Equalizer",630,325,MainWin,false)
-	int i
-	for i, 0, NUM_BANDS
+	for int i, 0, NUM_BANDS
 		EqualizerDialog.AddSlider("",5 + i*20,35,20,210,"slider_" + i)
 	EqualizerDialog.AddText("20",5,250,40,25,"")
 	EqualizerDialog.AddText("40",65,250,40,25,"")
@@ -101,7 +94,7 @@ void Configure()
 	PutFavoriteBarFixed(EqualizerDialog, 5, 5, 630)
 
 
-	for i, 0, NUM_BANDS
+	for int i, 0, NUM_BANDS
 		FreqMin[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i - 0.5))
 		FreqMax[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i + 0.5))
 	FreqMin[0] = 0

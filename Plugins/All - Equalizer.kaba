@@ -6,10 +6,10 @@
 
 
 
-#define MIN_FREQ		20.0
-#define MAX_FREQ		20000.0
-#define MIN_VOL			-45
-#define MAX_VOL			45
+const float MIN_FREQ = 20.0
+const float MAX_FREQ = 20000.0
+const int MIN_VOL = -45
+const int MAX_VOL = 45
 
 class PluginData
 	complex curve[]
@@ -24,7 +24,6 @@ complex f[]
 
 
 void equalize(float b[])
-	int i, j
 	
 	
 	// transform
@@ -34,11 +33,11 @@ void equalize(float b[])
 	
 	// equalize
 	float w = i2f(b.num) / cur_audio.sample_rate
-	for j, 0, f2i(MIN_FREQ * w)
+	for int j, 0, f2i(MIN_FREQ * w)
 		f[j] = f[j] * (1.0 / b.num)
-	for j, f2i(MAX_FREQ * w), len2
+	for int j, f2i(MAX_FREQ * w), len2
 		f[j] = f[j] * (1.0 / b.num)
-	for i, 0, data.curve.num - 1
+	for int i, 0, data.curve.num - 1
 		float f_min, f_max
 		float db_min, db_max
 		f_min = data.curve[i].x
@@ -47,12 +46,10 @@ void equalize(float b[])
 		f_max = data.curve[i + 1].x
 		db_max = data.curve[i + 1].y
 		float x_max = log(f_max / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
-		int j0 = f_min * w
-		int j1 = f_max * w
-		clamp(j0, 0, len2)
-		clamp(j1, 0, len2)
+		int j0 = clamp(f_min * w, 0, len2)
+		int j1 = clamp(f_max * w, 0, len2)
 		//float ff = data.Factor[i] / sel_length
-		for j, j0, j1
+		for int j, j0, j1
 			float ff = i2f(j) / w
 			float x = log(ff / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
 			float db = db_min + (db_max - db_min) * (x - x_min) / (x_max - x_min)
@@ -67,7 +64,6 @@ void ProcessTrack(BufferBox buf, Track t)
 	f.clear()
 
 void ResetData()
-	int i
 	data.curve.clear()
 	data.curve.add(complex(MIN_FREQ, 0))
 	data.curve.add(complex(MAX_FREQ, 0))
@@ -101,7 +97,6 @@ void Draw()
 	h = c.height
 		
 	// Skala
-	int i
 	c.SetLineWidth(0.9)
 	c.SetFontSize(8)
 	float ff = MIN_FREQ
@@ -127,11 +122,11 @@ void Draw()
 	// curve
 	c.SetLineWidth(2)
 	c.SetColor(Black)
-	for i, 1, data.curve.num
+	for int i, 1, data.curve.num
 		complex p = project(data.curve[i])
 		complex q = project(data.curve[i - 1])
 		c.DrawLine(q.x, q.y, p.x, p.y)
-	for i, 0, data.curve.num
+	for int i, 0, data.curve.num
 		p = project(data.curve[i])
 		c.SetColor(Black)
 		if i == MouseOver
@@ -161,8 +156,7 @@ void OnLeftButtonUp()
 void OnRightButtonDown()
 	int mx = HuiGetEvent().mouse_x
 	int my = HuiGetEvent().mouse_y
-	int i
-	for i, 1, data.curve.num
+	for int i, 1, data.curve.num
 		complex q = project(data.curve[i - 1])
 		complex p = project(data.curve[i])
 		if (mx > q.x) and (mx < p.x)
@@ -182,7 +176,6 @@ void OnRightButtonDown()
 void OnMouseMove()
 	int mx = HuiGetEvent().mouse_x
 	int my = HuiGetEvent().mouse_y
-	int i
 	// move
 	if HuiGetEvent().button_l and (Selected >= 0)
 		data.curve[Selected] = unproject(complex(mx, my))
@@ -192,8 +185,8 @@ void OnMouseMove()
 			xmin = data.curve[Selected - 1].x
 		if Selected < data.curve.num - 1
 			xmax = data.curve[Selected + 1].x
-		clamp(data.curve[Selected].x, xmin, xmax)
-		clamp(data.curve[Selected].y, MIN_VOL, MAX_VOL)
+		data.curve[Selected].x = clamp(data.curve[Selected].x, xmin, xmax)
+		data.curve[Selected].y = clamp(data.curve[Selected].y, MIN_VOL, MAX_VOL)
 		if Selected == data.curve.num - 1
 			data.curve[Selected].x = MAX_FREQ
 		if Selected == 0
@@ -201,7 +194,7 @@ void OnMouseMove()
 	else
 	// mouse over?
 		MouseOver = -1
-		for i, 0, data.curve.num
+		for int i, 0, data.curve.num
 			complex p = project(data.curve[i])
 			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 				MouseOver = i

@@ -28,9 +28,8 @@ void OnDelay()
 
 void DoDelay(float b[])
 	temp = 0
-	int i
 	int p = 0
-	for i, 0, b.num
+	for int i, 0, b.num
 	
 		// old value
 		float b0 = b[i]

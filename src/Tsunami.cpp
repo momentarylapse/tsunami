@@ -8,6 +8,7 @@
 #include "lib/hui/hui.h"
 #include "Tsunami.h"
 #include "View/Dialog/NewDialog.h"
+#include "View/Dialog/CaptureDialog.h"
 
 
 Tsunami *tsunami = NULL;
@@ -116,7 +117,6 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	HandleArguments(arg);
 
-//	HuiSetIdleFunctionM(this, (void(HuiEventHandler::*)())&Tsunami::IdleFunction);
 	Update();
 }
 
@@ -228,40 +228,6 @@ void Tsunami::OnSendBugReport()
 {
 }
 
-void Tsunami::IdleFunction()
-{
-	msg_db_r("IdleFunction", 2);
-	/*bool need_to_render = false;
-	if (force_redraw)
-		need_to_render = true;
-	if (force_rendering)
-		need_to_render = true;*/
-	if (output->IsPlaying()){
-		output->Update();
-
-		HuiSleep(5);//PreviewSleepTime); // evil hack... prevent sound from stuttering....
-	}
-
-	/*force_redraw = false;
-
-	if (need_to_render){
-		MainWin->Redraw("area");
-		UpdateMenu();
-	}*/
-
-	/*if (CapturingByDialog)
-		DoCapturingByDialog();
-
-	if ((!ProgressDialog) && (!Capturing)){
-		if (need_to_render)
-		{}//HuiSleep(5);
-		else
-			HuiSleep(20);
-	}*/
-
-	msg_db_l(2);
-}
-
 bool Tsunami::AllowTermination(AudioFile *a)
 {
 	return true;
@@ -341,6 +307,9 @@ void Tsunami::OnInsertAdded()
 
 void Tsunami::OnRecord()
 {
+	CaptureDialog *dlg = new CaptureDialog(this, false, cur_audio);
+	dlg->Update();
+	HuiWaitTillWindowClosed(dlg);
 }
 
 

@@ -29,6 +29,8 @@
 #define AL_BUFFER_SIZE		65536
 //#define AL_BUFFER_SIZE		16384
 
+#define UPDATE_TIME		30
+
 AudioOutput::AudioOutput() :
 	Observable("AudioOutput")
 {
@@ -292,7 +294,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	pos = _pos;
 	loop = _loop;
 
-	HuiRunLaterM(5, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
+	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
 
 	Notify("Play");
 	msg_db_l(1);
@@ -422,7 +424,7 @@ void AudioOutput::Update()
 		}else{
 		}
 
-		HuiRunLaterM(5, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
+		HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
 	}
 	msg_db_l(1);
 }

@@ -8,11 +8,49 @@
 #ifndef AUDIOINPUT_H_
 #define AUDIOINPUT_H_
 
-class AudioInput
+#include "../lib/file/file.h"
+#include "../lib/hui/hui.h"
+#include "../Data/AudioFile.h"
+#include "../Stuff/Observable.h"
+
+
+#define NUM_CAPTURE_SAMPLES		8192
+
+class AudioInput : public HuiEventHandler, public Observable
 {
 public:
 	AudioInput();
 	virtual ~AudioInput();
+
+
+	bool Capturing, CapturingByDialog, CaptureAddData, CapturePlayback;
+	BufferBox CaptureBuf, CapturePreviewBuf;
+	float CapturePlaybackDelay;
+
+	Array<string> Device;
+	string ChosenDevice;
+
+	void CaptureInit();
+
+	bool CaptureStart(int sample_rate, bool add_data);
+	void CaptureStop();
+	void AddToCaptureBuf(int a);
+	void AddToCapturePreviewBuf(int a);
+	int DoCapturing();
+	void Update();
+	void FindPeaks(int a, float &peak_r, float &peak_l);
+
+
+	int capture_temp[NUM_CAPTURE_SAMPLES];
+	float CaptureLevelR, CaptureLevelL;
+	int CaptureSampleRate;
+	int CaptureMaxDelay;
+
+	int CaptureCurrentSamples;
+
+	string dev_name;
+	void *capture;
+
 };
 
 #endif /* AUDIOINPUT_H_ */

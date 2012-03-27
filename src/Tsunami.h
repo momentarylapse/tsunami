@@ -37,8 +37,6 @@ public:
 	void LoadKeyCodes();
 	int Run();
 
-	void IdleFunction();
-
 	void OnAbout();
 	void OnSendBugReport();
 

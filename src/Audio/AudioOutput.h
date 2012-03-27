@@ -9,10 +9,11 @@
 #define AUDIOOUTPUT_H_
 
 #include "../lib/file/file.h"
+#include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observable.h"
 
-class AudioOutput : public Observable
+class AudioOutput : public HuiEventHandler, public Observable
 {
 public:
 	AudioOutput();

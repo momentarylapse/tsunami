@@ -116,7 +116,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	HandleArguments(arg);
 
-	HuiSetIdleFunctionM(this, (void(HuiEventHandler::*)())&Tsunami::IdleFunction);
+//	HuiSetIdleFunctionM(this, (void(HuiEventHandler::*)())&Tsunami::IdleFunction);
 	Update();
 }
 

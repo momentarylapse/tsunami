@@ -292,6 +292,8 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	pos = _pos;
 	loop = _loop;
 
+	HuiRunLaterM(5, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
+
 	Notify("Play");
 	msg_db_l(1);
 }
@@ -419,6 +421,8 @@ void AudioOutput::Update()
 				Stop();
 		}else{
 		}
+
+		HuiRunLaterM(5, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
 	}
 	msg_db_l(1);
 }

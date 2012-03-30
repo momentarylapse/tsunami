@@ -11,6 +11,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
+#include "../Action/ActionSubTrackMove.h"
 
 class AudioView : public HuiEventHandler, public Observer, public Observable
 {
@@ -101,6 +102,7 @@ public:
 	};
 
 	SelectionType Selection;
+	ActionSubTrackMove *cur_action;
 
 	int MousePossiblySelecting, MousePossiblySelectingStart;
 	const int BarrierDist;

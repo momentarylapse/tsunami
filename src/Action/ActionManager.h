@@ -22,6 +22,8 @@ public:
 	virtual ~ActionManager();
 	void Reset();
 
+	void BeginGroup();
+	void EndGroup();
 	void *Execute(Action *a);
 	void add(Action *a);
 	void Undo();
@@ -34,9 +36,14 @@ public:
 
 	Data *data;
 
+	/*typedef Array<Action*> ActionArray;
+	Array<ActionArray> action;
+	ActionArray temp_action;*/
 	Array<Action*> action;
 	int cur_pos;
 	int save_pos;
+
+	int cur_level;
 };
 
 #endif /* ACTIONMANAGER_H_ */

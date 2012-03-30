@@ -45,6 +45,7 @@ AudioView::AudioView() :
 
 
 	MousePossiblySelecting = -1;
+	cur_action = NULL;
 
 	tsunami->SetBorderWidth(0);
 	tsunami->SetTarget("main_table", 0);
@@ -358,12 +359,14 @@ void AudioView::OnMouseMove()
 	}else if (Selection.type == SEL_TYPE_SUB){
 		ApplyBarriers(Selection.pos);
 		int dpos = (float)Selection.pos - Selection.sub_offset - Selection.sub->pos;
-		foreach(tsunami->cur_audio->track, tt){
+		if (cur_action)
+			cur_action->set_param_and_notify(tsunami->cur_audio, dpos);
+		/*foreach(tsunami->cur_audio->track, tt){
 			foreach(tt.sub, s){
 				if (s.is_selected)
 					s.pos += dpos;
 			}
-		}
+		}*/
 		//ChangeTrack(cur_sub);
 		_force_redraw_ = true;
 	}
@@ -419,6 +422,8 @@ void AudioView::OnLeftButtonDown()
 		tsunami->cur_audio->sel_end_raw = t;
 		tsunami->cur_audio->mo_sel_start = false;
 		tsunami->cur_audio->mo_sel_end = true;
+	}else if (Selection.type == SEL_TYPE_SUB){
+		cur_action = new ActionSubTrackMove(tsunami->cur_audio);
 	}
 
 	SetBarriers(tsunami->cur_audio, &Selection);
@@ -433,8 +438,11 @@ void AudioView::OnLeftButtonDown()
 void AudioView::OnLeftButtonUp()
 {
 	msg_db_r("OnLBU", 2);
-/*	if (Selection.type == SEL_TYPE_SUB)
-		tsunami->cur_audio->history->Change();*/
+	if (Selection.type == SEL_TYPE_SUB)
+		if (cur_action)
+			tsunami->cur_audio->Execute(cur_action);
+	cur_action = NULL;
+
 	// TODO !!!!!!!!
 	Selection.type = SEL_TYPE_NONE;
 	ForceRedraw();

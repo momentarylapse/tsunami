@@ -14,6 +14,7 @@ ActionManager::ActionManager(Data *_data)
 	data = _data;
 	cur_pos = 0;
 	save_pos = 0;
+	cur_level = 0;
 }
 
 ActionManager::~ActionManager()

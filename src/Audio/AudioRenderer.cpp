@@ -38,7 +38,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track &t, int po
 
 	// track buffer
 	BufferBox buf0 = t.ReadBuffers(pos, length);
-	buf.swap(buf0);
+	buf.swap_ref(buf0);
 
 	// subs
 	foreach(t.sub, s){

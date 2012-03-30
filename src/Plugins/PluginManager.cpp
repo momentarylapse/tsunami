@@ -9,6 +9,7 @@
 #include "../Tsunami.h"
 #include "FastFourierTransform.h"
 #include "../View/Dialog/Slider.h"
+#include "../Action/ActionTrackEditBuffer.h"
 
 PluginManager::PluginManager()
 {
@@ -716,12 +717,11 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 void PluginManager::PluginProcessTrack(CScript *s, Track *t, int pos, int length)
 {
 	msg_db_r("PluginProcessTrack", 1);
-	//tsunami->cur_audio->history->ChangeBegin();
-	//HistoryOpStartEditBuffer(t, s_start, s_end);
 	BufferBox buf = t->GetBuffers(pos, length);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, pos, length);
 	s->ExecuteScriptFunction("ProcessTrack", &buf, t);
+	t->root->Execute(a);
 	//t->UpdatePeaks();
-	//cur_audio->history->ChangeEnd();
 	msg_db_l(1);
 }
 
@@ -738,11 +738,10 @@ void PluginManager::ExecutePlugin(const string &filename)
 		if (PluginConfigure(false, true)){
 			if (s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){
 				if (tsunami->cur_audio->used){
-//					tsunami->cur_audio->history->ChangeBegin();
 					foreach(tsunami->cur_audio->track, t)
-						if (t.is_selected)
+						if (t.is_selected){
 							PluginProcessTrack(s, &t, tsunami->cur_audio->selection_start, tsunami->cur_audio->selection_length);
-//					cur_audio->history->ChangeEnd();
+						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 				}

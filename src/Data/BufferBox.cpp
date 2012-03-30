@@ -7,6 +7,7 @@
 
 #include "BufferBox.h"
 #include "../Tsunami.h"
+#include <assert.h>
 
 
 BufferBox::BufferBox()
@@ -18,7 +19,8 @@ BufferBox::BufferBox()
 }
 
 BufferBox::~BufferBox()
-{	clear();	}
+{
+}
 
 void BufferBox::clear()
 {
@@ -55,7 +57,7 @@ void BufferBox::make_own()
 	}
 }
 
-void BufferBox::swap(BufferBox &b)
+void BufferBox::swap_ref(BufferBox &b)
 {
 	// buffer
 	r.exchange(b.r);
@@ -70,6 +72,23 @@ void BufferBox::swap(BufferBox &b)
 	t = offset;
 	offset = b.offset;
 	b.offset = t;
+}
+
+void float_array_swap_values(Array<float> &a, Array<float> &b)
+{
+	for (int i=0;i<a.num;i++){
+		float t = a[i];
+		a[i] = b[i];
+		b[i] = t;
+	}
+}
+
+void BufferBox::swap_value(BufferBox &b)
+{
+	assert(num == b.num && "BufferBox.swap_value");
+	// buffer
+	float_array_swap_values(r, b.r);
+	float_array_swap_values(l, b.l);
 }
 
 void BufferBox::scale(float volume)

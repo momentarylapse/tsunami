@@ -37,6 +37,13 @@ AudioOutput::AudioOutput() :
 	al_initialized = false;
 	al_last_error = AL_NO_ERROR;
 
+
+	start = pos = 0;
+	audio = NULL;
+	stream_pos = 0;
+	stream_size = 0;
+	stream_pos_0 = 0;
+
 	playing = false;
 	loop = false;
 	volume = 1;

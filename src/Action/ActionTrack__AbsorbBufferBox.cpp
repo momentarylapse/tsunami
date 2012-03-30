@@ -27,10 +27,13 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 
 	BufferBox &b_src  = t->buffer[src];
 	BufferBox &b_dest = t->buffer[dest];
+	dest_old_length = b_dest.num;
 	int new_size = b_src.offset + b_src.num - b_dest.offset;
 	if (new_size > b_dest.num)
 		b_dest.resize(new_size);
 
+	src_offset = t->buffer[src].offset;
+	src_length = t->buffer[src].num;
 	b_dest.set(b_src, b_src.offset - b_dest.offset, 1.0f);
 
 	t->buffer.erase(src);
@@ -50,8 +53,18 @@ void ActionTrack__AbsorbBufferBox::redo(Data *d)
 void ActionTrack__AbsorbBufferBox::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Track *t = a->get_track(track_no, sub_no);
 
-	msg_todo("absorb undo...");
+	//msg_todo("absorb undo...");
+	BufferBox dummy;
+	t->buffer.insert(dummy, src);
+	BufferBox &b_src  = t->buffer[src];
+	BufferBox &b_dest = t->buffer[dest];
+	b_src.offset = src_offset;
+	b_src.resize(src_length);
+
+	b_src.set(b_dest, b_dest.offset - b_src.offset, 1.0f);
+	b_dest.resize(dest_old_length);
 }
 
 

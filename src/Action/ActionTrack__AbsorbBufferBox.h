@@ -24,6 +24,8 @@ public:
 private:
 	int track_no, sub_no;
 	int dest, src;
+	int dest_old_length;
+	int src_offset, src_length;
 };
 
 #endif /* ACTIONTRACK__ABSORBBUFFERBOX_H_ */

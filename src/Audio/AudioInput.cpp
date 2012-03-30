@@ -32,6 +32,19 @@
 AudioInput::AudioInput() :
 	Observable("AudioInput")
 {
+	Capturing = false;
+	capture = NULL;
+	CapturingByDialog = false;
+	CaptureAddData = false;
+	CapturePlayback = false;
+	CapturePlaybackDelay = 0;
+	memset(capture_temp, 0, sizeof(capture_temp));
+	CaptureLevelR = 0;
+	CaptureLevelL = 0;
+	CaptureSampleRate = DEFAULT_SAMPLE_RATE;
+	CaptureMaxDelay = 0;
+	CaptureCurrentSamples = 0;
+
 	ChosenDevice = HuiConfigReadStr("Input.ChosenDevice", "");
 	CapturePlaybackDelay = HuiConfigReadFloat("Input.PlaybackDelay", 80.0f);
 

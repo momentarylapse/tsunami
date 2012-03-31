@@ -91,6 +91,15 @@ void GlobalRemoveSliders(CHuiWindow *win)
 	global_slider.clear();
 }
 
+void GlobalCaptureStart(int sample_rate, bool add_data)
+{	tsunami->input->CaptureStart(sample_rate, add_data);	}
+
+void GlobalCaptureStop()
+{	tsunami->input->CaptureStop();	}
+
+void GlobalBufferBoxClear(BufferBox *box)
+{	box->clear();	}
+
 CHuiWindow *GlobalMainWin = NULL;
 
 void PluginManager::LinkAppScriptData()
@@ -103,10 +112,10 @@ void PluginManager::LinkAppScriptData()
 	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
 	ScriptLinkSemiExternalVar("MainWin",		&GlobalMainWin);
 	ScriptLinkSemiExternalVar("cur_audio",		&tsunami->cur_audio);
-/*	ScriptLinkSemiExternalVar("CaptureBuf",		&CaptureBuf);
-	ScriptLinkSemiExternalVar("CaptureAddData",	&CaptureAddData);
-	ScriptLinkSemiExternalVar("CapturePreviewBuf",&CapturePreviewBuf);
-	ScriptLinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
+	ScriptLinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
+	ScriptLinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
+	ScriptLinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);
+/*	ScriptLinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
 	ScriptLinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
 	ScriptLinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
 	ScriptLinkSemiExternalFunc("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
@@ -115,14 +124,15 @@ void PluginManager::LinkAppScriptData()
 //	ScriptLinkSemiExternalFunc("UpdatePeaks",	(void*)&UpdatePeaks);
 //	ScriptLinkSemiExternalFunc("ChangeAudioFile",(void*)&ChangeAudioFile);
 //	ScriptLinkSemiExternalFunc("ChangeTrack",	(void*)&ChangeTrack);
+	ScriptLinkSemiExternalFunc("BufferBoxClear",(void*)&GlobalBufferBoxClear);
 	ScriptLinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
 	ScriptLinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
 	ScriptLinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
 	ScriptLinkSemiExternalFunc("fft_i2c",		(void*)&FastFourierTransform::fft_i2c);
 	ScriptLinkSemiExternalFunc("fft_c2i_inv",	(void*)&FastFourierTransform::fft_c2i_inv);
-/*	ScriptLinkSemiExternalFunc("CaptureStart",	(void*)&CaptureStart);
-	ScriptLinkSemiExternalFunc("CaptureStop",	(void*)&CaptureStop);
-	ScriptLinkSemiExternalFunc("DoCapturing",	(void*)&DoCapturing);
+	ScriptLinkSemiExternalFunc("CaptureStart",	(void*)&GlobalCaptureStart);
+	ScriptLinkSemiExternalFunc("CaptureStop",	(void*)&GlobalCaptureStop);
+/*	ScriptLinkSemiExternalFunc("DoCapturing",	(void*)&DoCapturing);
 	ScriptLinkSemiExternalFunc("ProgressStart",	(void*)&ProgressStart);
 	ScriptLinkSemiExternalFunc("ProgressEnd",	(void*)&ProgressEnd);
 	ScriptLinkSemiExternalFunc("Progress",		(void*)&ProgressStatus);*/

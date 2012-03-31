@@ -145,6 +145,7 @@ extern Track *AddEmptySubTrack(Track *t, float pos, int length, string name)
 extern void CreateNew(AudioFile *a, int length, int sample_rate)
 extern void UpdatePeaks(Track *t)
 extern void CreateTrackBuffers(Track *t)
+extern void BufferBoxClear(BufferBox box)
 
 extern BufferBox TrackGetBuffers(Track *t, int pos, int length)
 extern BufferBox TrackGetBuffersR(Track *t, int pos, int length)
@@ -160,7 +161,7 @@ extern void fft_c2i_inv(complex in[], int out[])
 
 extern bool CaptureStart(int sample_rate, bool add_data)
 extern void CaptureStop()
-extern int DoCapturing()
+//extern int DoCapturing()
 extern BufferBox CaptureBuf, CapturePreviewBuf
 
 extern void ProgressStart(string s, float progress)

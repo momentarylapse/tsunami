@@ -96,21 +96,23 @@ void OnClose()
 	win = nil
 
 void idle()
-	int num = DoCapturing()
+	int num = clampi(CapturePreviewBuf.num, 0, buf_size)
 	if num > 0
 		buf.resize(buf_size)
-		if num >= buf_size
-			num = buf_size
+	
 		// alten Pufferinhalt verschieben
 		for int i, 0, buf_size - num
 			buf[i] = buf[i + num]
+			
 		// neuen Inhalt anfuegen
 		for int i, 0, num
 			buf[buf_size - num + i] = (CapturePreviewBuf.r[i] + CapturePreviewBuf.l[i]) / 2
+			
 		/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
 		for int i, 0, buf_size
 			float tt = i * w_f
 			buf[i] = f2i(val_max * sin(tt) * 0.1)*/
+		BufferBoxClear(CapturePreviewBuf)
 		
 		fft_r2c(buf, bufc)
 		float max = 0

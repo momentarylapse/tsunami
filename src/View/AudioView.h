@@ -121,7 +121,7 @@ public:
 	bool MouseOverTrack(Track *t);
 	int MouseOverSub(Track *s);
 	void SelectionUpdatePos(SelectionType &s);
-	SelectionType GetMouseOver();
+	SelectionType GetMouseOver(bool set = true);
 	void SelectUnderMouse();
 	void SetBarriers(AudioFile *a, SelectionType *s);
 	void ApplyBarriers(int &pos);

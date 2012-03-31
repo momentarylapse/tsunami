@@ -138,12 +138,14 @@ void AudioView::SelectionUpdatePos(SelectionType &s)
 		s.pos = s.audio->screen2sample(mx);
 }
 
-AudioView::SelectionType AudioView::GetMouseOver()
+AudioView::SelectionType AudioView::GetMouseOver(bool set)
 {
 	msg_db_r("GetMouseOver", 2);
 
-	ClearMouseOver(tsunami->audio[0]);
-	ClearMouseOver(tsunami->audio[1]);
+	if (set){
+		ClearMouseOver(tsunami->audio[0]);
+		ClearMouseOver(tsunami->audio[1]);
+	}
 	SelectionType s;
 	s.type = SEL_TYPE_NONE;
 	s.audio = NULL;
@@ -158,34 +160,37 @@ AudioView::SelectionType AudioView::GetMouseOver()
 			s.type = SEL_TYPE_AUDIO;
 		}
 
-	// ???
-	if (s.audio){
-		SelectionUpdatePos(s);
-		if (s.audio->selection){
-			int ssx = s.audio->sample2screen(s.audio->sel_start_raw);
-			if ((mx >= ssx - 5) && (mx <= ssx + 5)){
-				s.type = SEL_TYPE_SELECTION_START;
-				s.audio->mo_sel_start = true;
-				msg_db_l(2);
-				return s;
-			}
-			int sex = s.audio->sample2screen(s.audio->sel_end_raw);
-			if ((mx >= sex - 5) && (mx <= sex + 5)){
-				s.type = SEL_TYPE_SELECTION_END;
-				s.audio->mo_sel_end = true;
-				msg_db_l(2);
-				return s;
-			}
-		}
-	}
-
 	// track?
 	if (s.audio){
 		foreach(s.audio->track, t){
 			if (MouseOverTrack(&t)){
 				s.track = &t;
 				s.type = SEL_TYPE_TRACK;
-				t.is_mouse_over = true;
+				if (set)
+					t.is_mouse_over = true;
+			}
+		}
+	}
+
+	// selection boundaries?
+	if (s.audio){
+		SelectionUpdatePos(s);
+		if (s.audio->selection){
+			int ssx = s.audio->sample2screen(s.audio->sel_start_raw);
+			if ((mx >= ssx - 5) && (mx <= ssx + 5)){
+				s.type = SEL_TYPE_SELECTION_START;
+				if (set)
+					s.audio->mo_sel_start = true;
+				msg_db_l(1);
+				return s;
+			}
+			int sex = s.audio->sample2screen(s.audio->sel_end_raw);
+			if ((mx >= sex - 5) && (mx <= sex + 5)){
+				s.type = SEL_TYPE_SELECTION_END;
+				if (set)
+					s.audio->mo_sel_end = true;
+				msg_db_l(1);
+				return s;
 			}
 		}
 	}
@@ -199,7 +204,8 @@ AudioView::SelectionType AudioView::GetMouseOver()
 				s.sub = &ss;
 				s.type = SEL_TYPE_SUB;
 				s.sub_offset = offset;
-				ss.is_mouse_over = true;
+				if (set)
+					ss.is_mouse_over = true;
 			}
 		}
 	}
@@ -296,9 +302,9 @@ void AudioView::OnMouseMove()
 	SetMouse();
 	bool _force_redraw_ = false;
 
-	if (HuiGetEvent()->lbut)
+	if (HuiGetEvent()->lbut){
 		SelectionUpdatePos(Selection);
-	else{
+	}else{
 		SelectionType mo = GetMouseOver();
 		_force_redraw_ |= (mo.type != mo_old.type) || (mo.sub != mo_old.sub);
 		mo_old = mo;
@@ -340,6 +346,11 @@ void AudioView::OnMouseMove()
 
 	// drag & drop
 	if (Selection.type == SEL_TYPE_SELECTION_END){
+		SelectionType mo = GetMouseOver(false);
+		if (mo.audio == tsunami->cur_audio)
+			if (mo.track)
+				mo.track->is_selected = true;
+
 		ApplyBarriers(Selection.pos);
 		Selection.audio->sel_end_raw = Selection.pos;
 		Selection.audio->selection = true;
@@ -788,7 +799,7 @@ void AudioView::DrawGrid(HuiDrawingContext *c, int x, int y, int width, int heig
 
 void AudioView::OnUpdate(Observable *o)
 {
-	msg_write("view: " + o->GetName() + " - " + o->GetMessage());
+	//msg_write("view: " + o->GetName() + " - " + o->GetMessage());
 	if (o->GetMessage() == "New")
 		OptimizeView(dynamic_cast<AudioFile*>(o));
 	else{

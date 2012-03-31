@@ -18,7 +18,7 @@ TrackDialog::TrackDialog(CHuiWindow *_parent, bool _allow_parent, Track *t):
 	Check("mute", t->muted);
 	volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, t->volume);
 	volume_slider->Enable(!t->muted);
-//	AddEffectList(this, "fx_list", t->fx);
+	fx_list = new FxList(this, "fx_list", t->fx);
 
 	EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
 	EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
@@ -29,7 +29,7 @@ TrackDialog::TrackDialog(CHuiWindow *_parent, bool _allow_parent, Track *t):
 TrackDialog::~TrackDialog()
 {
 	delete(volume_slider);
-	//RemoveEffectLists(this);
+	delete(fx_list);
 }
 
 void TrackDialog::OnName()

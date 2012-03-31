@@ -23,7 +23,7 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 	SetInt("frequency", a->sample_rate);
 	SetString("format", "16 bit stereo (nami)");
 	RefillAudioList();
-//	AddEffectList(this, "fx_list", a->fx);
+	fx_list = new FxList(this, "fx_list", a->fx);
 
 	EventM("wave_list", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTrackList);
 	EventM("close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
@@ -33,6 +33,7 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 AudioFileDialog::~AudioFileDialog()
 {
 	//WaveDialog = NULL;
+	delete(fx_list);
 }
 
 

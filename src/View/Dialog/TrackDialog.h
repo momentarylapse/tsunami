@@ -12,6 +12,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../Data/Track.h"
 #include "Slider.h"
+#include "FxList.h"
 
 class TrackDialog: public CHuiWindow
 {
@@ -30,6 +31,7 @@ public:
 
 	Track *track;
 	Slider *volume_slider;
+	FxList *fx_list;
 };
 
 #endif /* TRACKDIALOG_H_ */

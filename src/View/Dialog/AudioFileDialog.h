@@ -10,6 +10,7 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../Data/AudioFile.h"
+#include "FxList.h"
 
 class AudioFileDialog: public CHuiWindow
 {
@@ -29,6 +30,7 @@ public:
 	void RefillAudioList();
 
 	AudioFile *audio;
+	FxList *fx_list;
 };
 
 #endif /* AUDIOFILEDIALOG_H_ */

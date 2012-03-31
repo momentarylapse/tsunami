@@ -116,6 +116,14 @@ HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int wid
 				op_x = GtkAttachOptions(GTK_FILL);
 			else if (OptionString.find("expandx") >= 0)
 				op_x = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
+			if (OptionString.find("width") >= 0){
+				string ww = OptionString.substr(OptionString.find("width") + 6, -1);
+				if (ww.find(","))
+					ww = ww.substr(0, ww.find(","));
+				int width = s2i(ww);
+				gtk_widget_set_size_request(frame, width, 30);
+				op_x = GtkAttachOptions(0);
+			}
 
 			// TODO
 			unsigned int nx, ny;
@@ -221,6 +229,16 @@ void NotifyWindowByWidget(CHuiWindow *win, GtkWidget *widget, const string &mess
 	}
 }
 
+void SetImageById(CHuiWindow *win, const string &id)
+{
+	if ((id == "ok") || (id == "cancel") || (id == "apply"))
+		win->SetImage(id, "hui:" + id);
+	else if (id != "")
+		foreach(_HuiCommand_, c)
+			if ((c.id == id) && (c.image != ""))
+				win->SetImage(id, c.image);
+}
+
 
 void OnGtkButtonPress(GtkWidget *widget, gpointer data)
 {	NotifyWindowByWidget((CHuiWindow*)data, widget);	}
@@ -232,8 +250,7 @@ void CHuiWindow::AddButton(const string &title,int x,int y,int width,int height,
 	g_signal_connect(G_OBJECT(b), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	_InsertControl_(b, x, y, width, height, id, HuiKindButton);
 
-	if ((id == "ok") || (id == "cancel") || (id == "apply"))
-		SetImage(id, "hui:" + id);
+	SetImageById(this, id);
 }
 
 void CHuiWindow::AddColorButton(const string &title,int x,int y,int width,int height,const string &id)
@@ -259,8 +276,7 @@ void CHuiWindow::AddDefButton(const string &title,int x,int y,int width,int heig
 #endif
 	gtk_widget_grab_default(b);
 
-	if ((id == "ok") || (id == "cancel") || (id == "apply"))
-		SetImage(id, "hui:" + id);
+	SetImageById(this, id);
 }
 
 

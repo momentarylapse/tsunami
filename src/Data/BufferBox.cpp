@@ -169,6 +169,43 @@ void BufferBox::set_16bit(const void *b, int offset, int length)
 }
 
 
+
+void BufferBox::import(void *data, int channels, int bits, int samples)
+{
+	char *cb = (char*)data;
+	short *sb = (short*)data;
+
+	for (int i=0;i<samples;i++){
+		if (channels == 2){
+			if (bits == 8){
+				r[i] = (float)cb[i*2] / 128.0f;
+				l[i] = (float)cb[i*2+1] / 128.0f;
+			}else if (bits == 16){
+				r[i] = (float)sb[i*2] / 32768.0f;
+				l[i] = (float)sb[i*2+1] / 32768.0f;
+			}else if (bits == 24){
+				r[i] = (float)*(short*)&cb[i*6 + 1] / 32768.0f; // only high 16 bits
+				l[i] = (float)*(short*)&cb[i*6 + 4] / 32768.0f;
+			}else{ // 32
+				r[i] = (float)sb[i*4+1] / 32768.0f; // only high 16 bits...
+				l[i] = (float)sb[i*4+3] / 32768.0f;
+			}
+		}else{
+			if (bits == 8){
+				r[i] = (float)cb[i] / 128.0f;
+			}else if (bits == 16){
+				r[i] = (float)sb[i] / 32768.0f;
+			}else if (bits == 24){
+				r[i] = (float)*(short*)&cb[i*3 + 1] / 32768.0f;
+			}else{ // 32
+				r[i] = (float)sb[i*2+1] / 32768.0f;
+			}
+			l[i] = r[i];
+		}
+	}
+}
+
+
 #define val_max		32766
 #define val_alert	32770
 

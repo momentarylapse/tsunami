@@ -8,7 +8,7 @@
 #include "StorageWave.h"
 
 StorageWave::StorageWave() :
-	StorageAny("wav")
+	StorageAny("wav", FLAG_SINGLE_TRACK)
 {
 }
 

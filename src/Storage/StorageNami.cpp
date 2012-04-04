@@ -10,7 +10,7 @@
 
 
 StorageNami::StorageNami() :
-	StorageAny("nami")
+	StorageAny("nami", FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS)
 {
 }
 

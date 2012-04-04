@@ -7,9 +7,10 @@
 
 #include "StorageAny.h"
 
-StorageAny::StorageAny(const string &_extension)
+StorageAny::StorageAny(const string &_extension, int _flags)
 {
 	extension = _extension;
+	flags = _flags;
 }
 
 StorageAny::~StorageAny()

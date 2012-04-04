@@ -237,10 +237,6 @@ void Tsunami::OnCopy()
 {
 }
 
-void Tsunami::OnExport()
-{
-}
-
 void Tsunami::OnFindAndExecutePlugin()
 {
 }
@@ -411,9 +407,27 @@ void Tsunami::OnOpen()
 
 void Tsunami::OnSave()
 {
+	if (!cur_audio->used)
+		return;
+	if (cur_audio->filename == "")
+		OnSaveAs();
+	else
+		storage->Save(cur_audio, cur_audio->filename);
 }
 
 
 void Tsunami::OnSaveAs()
 {
+	if (!cur_audio->used)
+		return;
+	if (storage->AskSave(this))
+		storage->Save(cur_audio, HuiFilename);
+}
+
+void Tsunami::OnExport()
+{
+	if (!cur_audio->used)
+		return;
+	if (storage->AskSaveExport(this))
+		storage->Export(cur_audio, HuiFilename);
 }

@@ -20,7 +20,11 @@ public:
 
 	bool Load(AudioFile *a, const string &filename);
 	bool Save(AudioFile *a, const string &filename);
+	bool Export(AudioFile *a, const string &filename);
 
+	bool TestFormatCompatibility(AudioFile *a, StorageAny *f);
+
+	bool AskByFlags(CHuiWindow *win, const string &title, bool save, int flags);
 
 	bool AskOpen(CHuiWindow *win);
 	bool AskSave(CHuiWindow *win);

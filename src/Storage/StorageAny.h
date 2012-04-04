@@ -14,7 +14,7 @@
 class StorageAny
 {
 public:
-	StorageAny(const string &_extension);
+	StorageAny(const string &_extension, int _flags);
 	virtual ~StorageAny();
 	bool CanHandle(const string &_extension);
 
@@ -27,6 +27,15 @@ public:
 	virtual void SaveAudio(AudioFile *a, const string &filename) = 0;
 
 	string extension;
+	int flags;
+
+	enum{
+		FLAG_SINGLE_TRACK = 1,
+		FLAG_TAGS = 2,
+		FLAG_FX = 4,
+		FLAG_MULTITRACK = 8,
+		FLAG_SUBS = 16,
+	};
 };
 
 #endif /* STORAGEANY_H_ */

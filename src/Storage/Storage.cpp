@@ -137,6 +137,7 @@ bool Storage::Export(AudioFile *a, const string &filename)
 			tsunami->progress->Start(_("exportiere"), 0);
 
 			// render audio...
+			tsunami->progress->Set(_("rendere Audio"), 0);
 			int pos = a->GetMin();
 			int length = a->GetMax() - pos;
 			if (a->selection){

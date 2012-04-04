@@ -6,6 +6,7 @@
  */
 
 #include "StorageWave.h"
+#include "../Tsunami.h"
 
 StorageWave::StorageWave() :
 	StorageAny("wav", FLAG_SINGLE_TRACK)
@@ -19,7 +20,7 @@ StorageWave::~StorageWave()
 void StorageWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 	msg_db_r("write_wave_file", 1);
-	//ProgressStatus(_("exportiere wave"), 0);
+	tsunami->progress->Set(_("exportiere wave"), 0);
 
 	Array<short> buf16;
 	b->get_16bit_buffer(buf16);
@@ -46,7 +47,7 @@ void StorageWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	int size = b->num * 4;
 	int chunk_size = 1 << 15;
 	for (int i=0;i<size / chunk_size;i++){
-		//ProgressStatus(_("exportiere wave"), float(i * chunk_size) / (float)size);
+		tsunami->progress->Set(float(i * chunk_size) / (float)size);
 		f->WriteBuffer(&data[i * chunk_size], chunk_size);
 	}
 	f->WriteBuffer(&data[(size / chunk_size) * chunk_size], size & (chunk_size - 1));

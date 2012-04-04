@@ -30,8 +30,9 @@ Storage::~Storage()
 
 bool Storage::Load(AudioFile *a, const string &filename)
 {
-	msg_db_r("LoadFromFile", 1);
-	bool ok;
+	msg_db_r("Storage.Load", 1);
+	bool ok = false;
+	bool found = false;
 
 	CurrentDirectory = dirname(filename);
 	string ext = file_extension(filename);
@@ -76,7 +77,12 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			a->action_manager->Reset();
 			a->NotifyEnd();
 			ok = a->used;
+			found = true;
+			break;
 		}
+
+	if (!found)
+		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
 	msg_db_l(1);
 	return ok;
@@ -86,6 +92,7 @@ bool Storage::Save(AudioFile *a, const string &filename)
 {
 	msg_db_r("Storage.Save", 1);
 	bool ok = false;
+	bool found = false;
 
 	CurrentDirectory = dirname(filename);
 	string ext = file_extension(filename);
@@ -105,8 +112,12 @@ bool Storage::Save(AudioFile *a, const string &filename)
 			tsunami->progress->End();
 			tsunami->UpdateMenu();
 			ok = true;
+			found = true;
 			break;
 		}
+
+	if (!found)
+		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
 	msg_db_l(1);
 	return ok;
@@ -116,6 +127,7 @@ bool Storage::Export(AudioFile *a, const string &filename)
 {
 	msg_db_r("Storage.Export", 1);
 	bool ok = false;
+	bool found = false;
 
 	CurrentDirectory = dirname(filename);
 	string ext = file_extension(filename);
@@ -124,12 +136,26 @@ bool Storage::Export(AudioFile *a, const string &filename)
 		if (f->CanHandle(ext)){
 			tsunami->progress->Start(_("exportiere"), 0);
 
-			f->SaveAudio(a, filename);
+			// render audio...
+			int pos = a->GetMin();
+			int length = a->GetMax() - pos;
+			if (a->selection){
+				pos = a->selection_start;
+				length = a->selection_length;
+			}
+			BufferBox buf = tsunami->renderer->RenderAudioFile(a, pos, length);
+
+			// save
+			f->SaveBuffer(a, &buf, filename);
 
 			tsunami->progress->End();
 			ok = true;
+			found = true;
 			break;
 		}
+
+	if (!found)
+		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
 	msg_db_l(1);
 	return ok;

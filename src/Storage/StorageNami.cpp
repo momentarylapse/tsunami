@@ -165,7 +165,7 @@ void StorageNami::SaveAudio(AudioFile *a, const string & filename)
 
 
 
-void StorageNami::SaveTrack(Track *t, const string & filename)
+void StorageNami::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 }
 

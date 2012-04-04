@@ -21,7 +21,7 @@ public:
 	void ImportData(Track *t, void *data, int channels, int bits, int samples);
 
 	virtual void LoadTrack(Track *t, const string &filename) = 0;
-	virtual void SaveTrack(Track *t, const string &filename) = 0;
+	virtual void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename) = 0;
 
 	virtual void LoadAudio(AudioFile *a, const string &filename) = 0;
 	virtual void SaveAudio(AudioFile *a, const string &filename) = 0;

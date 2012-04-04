@@ -17,7 +17,7 @@ public:
 	virtual ~StorageWave();
 
 	void LoadTrack(Track *t, const string &filename);
-	void SaveTrack(Track *t, const string &filename);
+	void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename);
 
 	void LoadAudio(AudioFile *a, const string &filename);
 	void SaveAudio(AudioFile *a, const string &filename);

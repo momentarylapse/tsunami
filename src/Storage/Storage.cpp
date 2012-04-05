@@ -7,6 +7,8 @@
 
 #include "Storage.h"
 #include "StorageWave.h"
+#include "StorageOgg.h"
+#include "StorageFlac.h"
 #include "StorageNami.h"
 #include "../Tsunami.h"
 #include "../lib/hui/hui.h"
@@ -15,6 +17,8 @@ Storage::Storage()
 {
 	format.add(new StorageNami());
 	format.add(new StorageWave());
+	format.add(new StorageOgg());
+	format.add(new StorageFlac());
 
 	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
 }

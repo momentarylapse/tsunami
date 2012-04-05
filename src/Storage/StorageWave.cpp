@@ -74,7 +74,7 @@ void StorageWave::LoadTrack(Track *t, const string & filename)
 		return;
 	}
 	if (*(int*)&header[4] != f->GetSize())
-		msg_write("wave file gives wrong size");
+		msg_write(format("wave file gives wrong size: %d  (real: %d)", *(int*)&header[4], f->GetSize()));
 		// sometimes 0x2400ff7f
 	if ((header[8] != 'W') or (header[9] != 'A') or (header[10] != 'V') or (header[11] != 'E') or (header[12] != 'f') or (header[13] != 'm') or (header[14] != 't') or (header[15] != ' ')){
 		msg_error("\"WAVEfmt \" expected in wave file");
@@ -88,6 +88,7 @@ void StorageWave::LoadTrack(Track *t, const string & filename)
 	}
 	int channels = *(short*)&header[22];
 	int freq = *(int*)&header[24];
+	t->root->sample_rate = freq;
 	int block_align = *(short*)&header[32];
 	int bits = *(short*)&header[34];
 	int byte_per_sample = (bits / 8) * channels;

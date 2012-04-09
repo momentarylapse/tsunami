@@ -10,6 +10,8 @@
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
 
+#include "Action/ActionAudioDeleteSelection.h"
+
 
 Tsunami *tsunami = NULL;
 extern string AppName;
@@ -243,6 +245,9 @@ void Tsunami::OnFindAndExecutePlugin()
 
 void Tsunami::OnDelete()
 {
+	if (cur_audio->used)
+		if (cur_audio->selection)
+			cur_audio->Execute(new ActionAudioDeleteSelection(cur_audio));
 }
 
 void Tsunami::OnSubImport()

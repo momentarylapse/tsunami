@@ -656,10 +656,8 @@ int GetStrWidth(const string &s)
 void AudioView::DrawSubFrame(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, AudioFile *a, const color &col, int delay)
 {
 	// frame
-	int asx = a->sample2screen(s->pos + delay);
-	int aex = a->sample2screen(s->pos + s->length + delay);
-	clampi(asx, x, x + width);
-	clampi(aex, x, x + width);
+	int asx = clampi(a->sample2screen(s->pos + delay), x, x + width);
+	int aex = clampi(a->sample2screen(s->pos + s->length + delay), x, x + width);
 
 	if (delay == 0){
 		s->x = asx;
@@ -705,8 +703,7 @@ void AudioView::DrawSub(HuiDrawingContext *c, int x, int y, int width, int heigh
 	DrawBuffer(	c, x, y, width, height,
 				s, int(a->view_pos - s->pos), a->view_zoom, col);
 
-	int asx = a->sample2screen(s->pos);
-	clampi(asx, x, x + width);
+	int asx = clampi(a->sample2screen(s->pos), x, x + width);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
 		//NixDrawStr(asx, y + height/2 - 10, s->name);
 		c->DrawStr(asx, y + height - SUB_FRAME_HEIGHT, s->name);
@@ -852,9 +849,8 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 	if (a->selection){
 		int sx1 = a->sample2screen(a->sel_start_raw);
 		int sx2 = a->sample2screen(a->sel_end_raw);
-		int sxx1 = sx1, sxx2 = sx2;
-		clampi(sxx1, x, width + x);
-		clampi(sxx2, x, width + x);
+		int sxx1 = clampi(sx1, x, width + x);
+		int sxx2 = clampi(sx2, x, width + x);
 		bool mo_s = a->mo_sel_start;
 		bool mo_e = a->mo_sel_end;
 		if (sxx1 > sxx2){
@@ -1102,7 +1098,7 @@ void AudioView::ZoomAudioFile(AudioFile *a, float f)
 	int length = a->GetLength();
 	if (length == 0)
 		length = 10 * a->sample_rate;
-	clampf(f, 100.0 / (length * a->view_zoom), 8.0f / a->view_zoom);
+	f = clampf(f, 100.0 / (length * a->view_zoom), 8.0f / a->view_zoom);
 	a->view_zoom *= f;
 	a->view_pos += float(mx - a->x) / (a->view_zoom / (f - 1));
 	ForceRedraw();

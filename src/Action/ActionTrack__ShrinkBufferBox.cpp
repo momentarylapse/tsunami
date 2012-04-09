@@ -41,6 +41,8 @@ void *ActionTrack__ShrinkBufferBox::execute(Data *d)
 	Track *t = a->get_track(track_no, sub_no);
 	BufferBox &b = t->buffer[index];
 
+	//msg_write(format("shrink %d   %d -> %d", index, b.num, new_length));
+
 	assert(new_length < b.num);
 
 	// copy data

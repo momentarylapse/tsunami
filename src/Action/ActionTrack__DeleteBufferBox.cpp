@@ -29,10 +29,11 @@ void ActionTrack__DeleteBufferBox::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no, sub_no);
-	//BufferBox &b = t->buffer[index];
 
+	// restore
 	t->buffer.insert(buf, index);
 
+	// clean up
 	buf.clear();
 }
 
@@ -40,6 +41,7 @@ void ActionTrack__DeleteBufferBox::undo(Data *d)
 
 void *ActionTrack__DeleteBufferBox::execute(Data *d)
 {
+	//msg_write("delete " + i2s(index));
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no, sub_no);
 	BufferBox &b = t->buffer[index];

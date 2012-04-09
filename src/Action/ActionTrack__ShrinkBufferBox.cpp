@@ -37,7 +37,6 @@ void ActionTrack__ShrinkBufferBox::undo(Data *d)
 
 void *ActionTrack__ShrinkBufferBox::execute(Data *d)
 {
-	msg_write("shrink");
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no, sub_no);
 	BufferBox &b = t->buffer[index];

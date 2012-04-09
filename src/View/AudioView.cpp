@@ -994,6 +994,15 @@ void AudioView::OnZoomIn()
 
 void AudioView::OnSelectAll()
 {
+	SelectAll(tsunami->cur_audio);
+}
+
+void AudioView::SelectAll(AudioFile *a)
+{
+	a->selection = true;
+	a->sel_start_raw = a->GetMin();
+	a->sel_end_raw = a->GetMax();
+	a->UpdateSelection();
 }
 
 void AudioView::SelectNone(AudioFile *a)

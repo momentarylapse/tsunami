@@ -114,6 +114,7 @@ public:
 	int mx0,my0;
 
 	void SelectNone(AudioFile *a);
+	void SelectAll(AudioFile *a);
 
 	void SetMouse();
 	void ClearMouseOver(AudioFile *a);

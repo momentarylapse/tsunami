@@ -11,6 +11,7 @@
 #include "View/Dialog/CaptureDialog.h"
 
 #include "Action/ActionAudioDeleteSelection.h"
+#include "Action/ActionAudioDeleteTrack.h"
 
 
 Tsunami *tsunami = NULL;
@@ -186,6 +187,16 @@ void Tsunami::OnAddTimeTrack()
 
 void Tsunami::OnDeleteTrack()
 {
+	if (cur_audio->used){
+		if (cur_audio->track.num < 2){
+			log->Error(_("Es muss mindestens eine Spur existieren"));
+			return;
+		}
+		Track *t = GetCurTrack();
+		int index = get_track_index(t);
+		if (index >= 0)
+			cur_audio->Execute(new ActionAudioDeleteTrack(cur_audio, index));
+	}
 }
 
 void Tsunami::OnCloseFile()

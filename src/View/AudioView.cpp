@@ -87,6 +87,8 @@ AudioView::AudioView() :
 
 AudioView::~AudioView()
 {
+	HuiConfigWriteInt("View.DetailSteps", DetailSteps);
+	HuiConfigWriteInt("View.MouseMinMoveToSelect", MouseMinMoveToSelect);
 	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
 	HuiConfigWriteInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	HuiConfigWriteFloat("View.ZoomSpeed", ZoomSpeed);

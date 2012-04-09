@@ -55,13 +55,6 @@ void ActionSubTrackMove::undo(Data *d)
 
 
 
-void ActionSubTrackMove::redo(Data *d)
-{
-	execute(d);
-}
-
-
-
 void ActionSubTrackMove::set_param_and_notify(Data *d, int _param)
 {
 	param += _param;

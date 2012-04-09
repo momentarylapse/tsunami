@@ -57,10 +57,3 @@ void *ActionTrack__ShrinkBufferBox::execute(Data *d)
 }
 
 
-
-void ActionTrack__ShrinkBufferBox::redo(Data *d)
-{
-	execute(d);
-}
-
-

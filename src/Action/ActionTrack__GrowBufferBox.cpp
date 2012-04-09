@@ -43,10 +43,3 @@ void ActionTrack__GrowBufferBox::undo(Data *d)
 }
 
 
-
-void ActionTrack__GrowBufferBox::redo(Data *d)
-{
-	execute(d);
-}
-
-

@@ -48,3 +48,11 @@ void Action::redo_and_notify(Data *d)
 }
 
 
+
+// default behavior for redo...
+void Action::redo(Data *d)
+{
+	execute(d);
+}
+
+

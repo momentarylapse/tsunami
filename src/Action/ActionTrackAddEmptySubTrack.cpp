@@ -51,10 +51,3 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 }
 
 
-
-void ActionTrackAddEmptySubTrack::redo(Data *d)
-{
-	execute(d);
-}
-
-

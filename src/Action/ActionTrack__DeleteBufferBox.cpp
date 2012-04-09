@@ -18,11 +18,6 @@ ActionTrack__DeleteBufferBox::~ActionTrack__DeleteBufferBox()
 {
 }
 
-void ActionTrack__DeleteBufferBox::redo(Data *d)
-{
-	execute(d);
-}
-
 
 
 void ActionTrack__DeleteBufferBox::undo(Data *d)

@@ -19,11 +19,6 @@ ActionTrack__CutBufferBox::~ActionTrack__CutBufferBox()
 {
 }
 
-void ActionTrack__CutBufferBox::redo(Data *d)
-{
-	execute(d);
-}
-
 
 
 void ActionTrack__CutBufferBox::undo(Data *d)

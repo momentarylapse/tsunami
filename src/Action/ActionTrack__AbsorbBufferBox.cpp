@@ -43,13 +43,6 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 
 
 
-void ActionTrack__AbsorbBufferBox::redo(Data *d)
-{
-	execute(d);
-}
-
-
-
 void ActionTrack__AbsorbBufferBox::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);

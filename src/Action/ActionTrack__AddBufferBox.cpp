@@ -32,13 +32,6 @@ void ActionTrack__AddBufferBox::undo(Data *d)
 
 
 
-void ActionTrack__AddBufferBox::redo(Data *d)
-{
-	execute(d);
-}
-
-
-
 void *ActionTrack__AddBufferBox::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);

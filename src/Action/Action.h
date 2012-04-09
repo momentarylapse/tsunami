@@ -20,7 +20,7 @@ public:
 
 	virtual void *execute(Data *d) = 0;
 	virtual void undo(Data *d) = 0;
-	virtual void redo(Data *d) = 0;
+	virtual void redo(Data *d);
 
 	void *execute_and_notify(Data *d);
 	void undo_and_notify(Data *d);

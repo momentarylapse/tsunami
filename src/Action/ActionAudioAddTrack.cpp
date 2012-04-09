@@ -29,13 +29,6 @@ void ActionAudioAddTrack::undo(Data *d)
 
 
 
-void ActionAudioAddTrack::redo(Data *d)
-{
-	execute(d);
-}
-
-
-
 void *ActionAudioAddTrack::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);

@@ -232,15 +232,12 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	if (!al_initialized)
 		Init();
 
-	int _pos = a->GetMin();
-	int _length = a->GetMax() - _pos;
-	if (a->selection){
-		_pos = a->selection_start;
-		_length = a->selection_length;
-	}
+	Range _range = a->GetRange();
+	if (!a->selection.empty())
+		_range = a->selection;
 
 	//AudioFileToBuffer(a, true, true);
-	BufferBox buf = tsunami->renderer->RenderAudioFile(a, _pos, _length);
+	BufferBox buf = tsunami->renderer->RenderAudioFile(a, _range);
 	buf.get_16bit_buffer(data);
 	//int size = 4 * length;
 
@@ -258,7 +255,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	TestError("alGenBuffers (play)");
 
 	stream_pos = 0;
-	stream_size = _length;
+	stream_size = _range.get_length();
 	stream_pos_0 = 0;
 	audio = a;
 
@@ -297,8 +294,8 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	}
 
 	playing = true;
-	start = _pos;
-	pos = _pos;
+	start = _range.get_offset();
+	pos = start;
 	loop = _loop;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);

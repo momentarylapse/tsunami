@@ -143,7 +143,7 @@ void CaptureDialog::Insert()
 	int dpos = 0;
 	int i0;
 	if (audio->used){
-		int s_start = audio->selection_start;
+		int s_start = audio->selection.get_offset();
 
 		// insert recorded data with some delay
 		dpos = - tsunami->input->CaptureMaxDelay - (tsunami->input->CapturePlaybackDelay / 1000.0f) * (float)audio->sample_rate;
@@ -155,7 +155,7 @@ void CaptureDialog::Insert()
 			i0 = s_start - dpos;
 		}else{
 			// sub track
-			t = audio->track[target - 1].AddEmptySubTrack(s_start + dpos, length, _("Aufnahme"));
+			t = audio->track[target - 1].AddEmptySubTrack(Range(s_start + dpos, length), _("Aufnahme"));
 			dpos = 0;
 			i0 = 0;
 		}
@@ -167,7 +167,7 @@ void CaptureDialog::Insert()
 	}
 
 	// insert data
-	BufferBox buf = t->GetBuffers(i0, length);
+	BufferBox buf = t->GetBuffers(Range(i0, length));
 	buf.set(tsunami->input->CaptureBuf, 0, 1.0f);
 	tsunami->input->CaptureBuf.clear();
 	t->UpdatePeaks();

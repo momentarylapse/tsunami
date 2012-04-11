@@ -8,6 +8,7 @@
 #ifndef TRACK_H_
 #define TRACK_H_
 
+#include "Range.h"
 #include "BufferBox.h"
 #include "AudioFile.h"
 
@@ -80,20 +81,18 @@ public:
 	virtual ~Track();
 	Track *GetCurSub();
 	Track *GetParent();
-	int GetMin();
-	int GetMax();
-	int GetMinUnsafe();
-	int GetMaxUnsafe();
+	Range GetRange();
+	Range GetRangeUnsafe();
 
 	void Reset();
 	void UpdatePeaks();
-	BufferBox ReadBuffers(int pos, int length);
+	BufferBox ReadBuffers(const Range &r);
 
 	string GetNiceName();
 
 	// actions
-	BufferBox GetBuffers(int pos, int length);
-	Track *AddEmptySubTrack(int pos, int length, const string &name);
+	BufferBox GetBuffers(const Range &r);
+	Track *AddEmptySubTrack(const Range &r, const string &name);
 
 
 	enum

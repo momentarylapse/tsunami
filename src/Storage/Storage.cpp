@@ -142,13 +142,10 @@ bool Storage::Export(AudioFile *a, const string &filename)
 
 			// render audio...
 			tsunami->progress->Set(_("rendere Audio"), 0);
-			int pos = a->GetMin();
-			int length = a->GetMax() - pos;
-			if (a->selection){
-				pos = a->selection_start;
-				length = a->selection_length;
-			}
-			BufferBox buf = tsunami->renderer->RenderAudioFile(a, pos, length);
+			Range r = a->GetRange();
+			if (!a->selection.empty())
+				r = a->selection;
+			BufferBox buf = tsunami->renderer->RenderAudioFile(a, r);
 
 			// save
 			f->SaveBuffer(a, &buf, filename);

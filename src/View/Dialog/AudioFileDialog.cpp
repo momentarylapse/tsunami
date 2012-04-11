@@ -18,8 +18,9 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 
 	foreach(a->tag, t)
 		AddString("tags", t.key + "\\" + t.value);
-	SetString("time", a->get_time_str(a->GetLength()));
-	SetInt("samples", a->GetLength());
+	int samples = a->GetRange().get_length();
+	SetString("time", a->get_time_str(samples));
+	SetInt("samples", samples);
 	SetInt("frequency", a->sample_rate);
 	SetString("format", "16 bit stereo (nami)");
 	RefillAudioList();

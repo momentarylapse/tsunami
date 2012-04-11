@@ -8,11 +8,10 @@
 #include "ActionTrackAddEmptySubTrack.h"
 #include "../Data/AudioFile.h"
 
-ActionTrackAddEmptySubTrack::ActionTrackAddEmptySubTrack(int _track_no, int _pos, int _length, const string &_name)
+ActionTrackAddEmptySubTrack::ActionTrackAddEmptySubTrack(int _track_no, const Range &_range, const string &_name)
 {
 	track_no = _track_no;
-	pos = _pos;
-	length = _length;
+	range = _range;
 	name = _name;
 }
 
@@ -40,8 +39,8 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 
 	Track *s = &t.sub.back();
 	s->name = name;
-	s->pos = pos;
-	s->length = length;
+	s->pos = range.get_offset();
+	s->length = range.get_length();
 	s->parent = get_track_index(&t);
 	s->root = a;
 

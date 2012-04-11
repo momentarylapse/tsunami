@@ -124,45 +124,36 @@ Track *Track::GetParent()
 	return NULL;
 }
 
-int Track::GetMinUnsafe()
+Range Track::GetRangeUnsafe()
 {
+	// sub
+	if (parent >= 0)
+		return Range(pos, length);
+
 	int min = 2147483640;
-	if (buffer.num > 0)
+	int max = -2147483640;
+	if (buffer.num > 0){
 		min = buffer[0].offset;
-	foreachc(sub, s)
+		max = buffer.back().offset + buffer.back().num;
+	}
+	foreachc(sub, s){
 		if (s.pos < min)
 			min = s.pos;
-	return min;
-}
-
-int Track::GetMaxUnsafe()
-{
-	int max = -2147483640;
-	if (buffer.num > 0)
-		max = buffer.back().offset + buffer.back().num;
-	foreachc(sub, s)
 		for (int i=0;i<s.rep_num+1;i++){
 			int smax = s.pos + s.length + s.rep_num * s.rep_delay;
 			if (smax > max)
 				max = smax;
 		}
-	return max;
+	}
+	return Range(min, max - min);
 }
 
-int Track::GetMin()
+Range Track::GetRange()
 {
-	int min = GetMinUnsafe();
-	if (min == 2147483640)
-		return 0;
-	return min;
-}
-
-int Track::GetMax()
-{
-	int max = GetMaxUnsafe();
-	if (max == -2147483640)
-		return 0;
-	return max;
+	Range r = GetRangeUnsafe();
+	if (r.get_length() < 0)
+		return Range(0, 0);
+	return r;
 }
 
 string Track::GetNiceName()
@@ -170,15 +161,15 @@ string Track::GetNiceName()
 	return i2s(get_track_index(this) + 1) + ": " + name;
 }
 
-BufferBox Track::ReadBuffers(int pos, int length)
+BufferBox Track::ReadBuffers(const Range &r)
 {
 	BufferBox buf;
 	msg_db_r("Track.ReadBuffers", 1);
 
-	// is <pos..length> inside a buffer?
+	// is <r> inside a buffer?
 	foreach(buffer, b){
-		int p0 = pos - b.offset;
-		int p1 = pos - b.offset + length;
+		int p0 = r.offset - b.offset;
+		int p1 = r.offset - b.offset + r.length;
 		if ((p0 >= 0) && (p1 <= b.num)){
 			// set as reference to subarrays
 			buf.set_as_ref(b, p0, p1 - p0);
@@ -188,28 +179,28 @@ BufferBox Track::ReadBuffers(int pos, int length)
 	}
 
 	// create own...
-	buf.resize(length);
+	buf.resize(r.length);
 
 	// fill with overlapp
 	foreach(buffer, b)
-		buf.set(b, b.offset - pos, 1.0f);
+		buf.set(b, b.offset - r.offset, 1.0f);
 
 	msg_db_l(1);
 	return buf;
 }
 
-BufferBox Track::GetBuffers(int pos, int length)
+BufferBox Track::GetBuffers(const Range &r)
 {
-	root->Execute(new ActionTrackCreateBuffers(this, pos, length));
-	return ReadBuffers(pos, length);
+	root->Execute(new ActionTrackCreateBuffers(this, r));
+	return ReadBuffers(r);
 }
 
 void Track::UpdatePeaks()
 {}
 
-Track *Track::AddEmptySubTrack(int pos, int length, const string &name)
+Track *Track::AddEmptySubTrack(const Range &r, const string &name)
 {
-	return (Track*)root->Execute(new ActionTrackAddEmptySubTrack(get_track_index(this), pos, length, name));
+	return (Track*)root->Execute(new ActionTrackAddEmptySubTrack(get_track_index(this), r, name));
 }
 
 

@@ -177,8 +177,8 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 	// selection boundaries?
 	if (s.audio){
 		SelectionUpdatePos(s);
-		if (s.audio->selection){
-			int ssx = s.audio->sample2screen(s.audio->sel_start_raw);
+		if (!s.audio->selection.empty()){
+			int ssx = s.audio->sample2screen(s.audio->sel_raw.get_offset());
 			if ((mx >= ssx - 5) && (mx <= ssx + 5)){
 				s.type = SEL_TYPE_SELECTION_START;
 				if (set)
@@ -186,7 +186,7 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 				msg_db_l(1);
 				return s;
 			}
-			int sex = s.audio->sample2screen(s.audio->sel_end_raw);
+			int sex = s.audio->sample2screen(s.audio->sel_raw.get_end());
 			if ((mx >= sex - 5) && (mx <= sex + 5)){
 				s.type = SEL_TYPE_SELECTION_END;
 				if (set)
@@ -276,10 +276,10 @@ void AudioView::SetBarriers(AudioFile *a, SelectionType *s)
 	}
 
 	// selection marker
-	if (a->selection){
-		s->barrier.add(a->sel_start_raw);
+	if (!a->selection.empty()){
+		s->barrier.add(a->sel_raw.get_offset());
 		if (MousePossiblySelecting < 0)
-			s->barrier.add(a->sel_end_raw);
+			s->barrier.add(a->sel_raw.get_end());
 	}
 	msg_db_l(2);
 }
@@ -354,8 +354,7 @@ void AudioView::OnMouseMove()
 				mo.track->is_selected = true;
 
 		ApplyBarriers(Selection.pos);
-		Selection.audio->sel_end_raw = Selection.pos;
-		Selection.audio->selection = true;
+		Selection.audio->sel_raw.set_end(Selection.pos);
 		Selection.audio->UpdateSelection();
 		//_force_redraw_ = true;
 		_force_redraw_ = false;
@@ -391,9 +390,8 @@ void AudioView::OnMouseMove()
 	if (MousePossiblySelecting >= 0)
 		MousePossiblySelecting += abs(HuiGetEvent()->dx);
 	if (MousePossiblySelecting > MouseMinMoveToSelect){
-		tsunami->cur_audio->sel_start_raw = MousePossiblySelectingStart;
-		tsunami->cur_audio->sel_end_raw = Selection.pos;
-		tsunami->cur_audio->selection = true;
+		tsunami->cur_audio->sel_raw.offset = MousePossiblySelectingStart;
+		tsunami->cur_audio->sel_raw.length = Selection.pos - MousePossiblySelectingStart;
 		tsunami->cur_audio->mo_sel_end = true;
 		SetBarriers(tsunami->cur_audio, &Selection);
 		tsunami->cur_audio->UpdateSelection();
@@ -430,9 +428,7 @@ void AudioView::OnLeftButtonDown()
 	}else if (Selection.type == SEL_TYPE_SELECTION_START){
 		// switch end / start
 		Selection.type = SEL_TYPE_SELECTION_END;
-		int t = tsunami->cur_audio->sel_start_raw;
-		tsunami->cur_audio->sel_start_raw = tsunami->cur_audio->sel_end_raw;
-		tsunami->cur_audio->sel_end_raw = t;
+		tsunami->cur_audio->sel_raw.invert();
 		tsunami->cur_audio->mo_sel_start = false;
 		tsunami->cur_audio->mo_sel_end = true;
 	}else if (Selection.type == SEL_TYPE_SUB){
@@ -848,9 +844,9 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 
 
 	// selection
-	if (a->selection){
-		int sx1 = a->sample2screen(a->sel_start_raw);
-		int sx2 = a->sample2screen(a->sel_end_raw);
+	if (!a->selection.empty()){
+		int sx1 = a->sample2screen(a->sel_raw.get_offset());
+		int sx2 = a->sample2screen(a->sel_raw.get_end());
 		int sxx1 = clampi(sx1, x, width + x);
 		int sxx2 = clampi(sx2, x, width + x);
 		bool mo_s = a->mo_sel_start;
@@ -941,11 +937,13 @@ void AudioView::OptimizeView(AudioFile *a)
 	if (a->width <= 0)
 		a->width = DrawingWidth;
 
-	int length = a->GetLength();
+	Range r = a->GetRange();
+
+	int length = r.get_length();
 	if (length == 0)
 		length = 10 * a->sample_rate;
 	a->view_zoom = (float)a->width / (float)length;
-	a->view_pos = (float)a->GetMin();
+	a->view_pos = (float)r.get_offset();
 	ForceRedraw();
 	msg_db_l(1);
 }
@@ -999,16 +997,14 @@ void AudioView::OnSelectAll()
 
 void AudioView::SelectAll(AudioFile *a)
 {
-	a->selection = true;
-	a->sel_start_raw = a->GetMin();
-	a->sel_end_raw = a->GetMax();
+	a->sel_raw = a->GetRange();
 	a->UpdateSelection();
 }
 
 void AudioView::SelectNone(AudioFile *a)
 {
 	// select all/none
-	a->selection = false;
+	a->sel_raw.clear();
 	a->UpdateSelection();
 	a->UnselectAllSubs();
 	SetCurSub(a, NULL);
@@ -1106,7 +1102,7 @@ void AudioView::ZoomAudioFile(AudioFile *a, float f)
 {
 	// max zoom: 8 pixel per sample
 	// min zoom: whole file on 100 pixel
-	int length = a->GetLength();
+	int length = a->GetRange().get_length();
 	if (length == 0)
 		length = 10 * a->sample_rate;
 	f = clampf(f, 100.0 / (length * a->view_zoom), 8.0f / a->view_zoom);

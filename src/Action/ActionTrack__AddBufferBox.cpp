@@ -9,12 +9,11 @@
 #include "../Data/AudioFile.h"
 #include <assert.h>
 
-ActionTrack__AddBufferBox::ActionTrack__AddBufferBox(Track *t, int _index, int _pos, int _length)
+ActionTrack__AddBufferBox::ActionTrack__AddBufferBox(Track *t, int _index, Range r)
 {
 	get_track_sub_index(t, track_no, sub_no);
 	index = _index;
-	pos = _pos;
-	length = _length;
+	range = r;
 }
 
 ActionTrack__AddBufferBox::~ActionTrack__AddBufferBox()
@@ -43,8 +42,8 @@ void *ActionTrack__AddBufferBox::execute(Data *d)
 
 	// reserve memory
 	BufferBox &b = t->buffer[index];
-	b.offset = pos;
-	b.resize(length);
+	b.offset = range.get_offset();
+	b.resize(range.get_length());
 	return &b;
 }
 

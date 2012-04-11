@@ -52,7 +52,7 @@ public:
 	void WritePluginDataToFile(const string &name);
 	void LoadPluginDataFromFile(const string &name);
 	void PluginPreview();
-	void PluginProcessTrack(CScript *s, Track *t, int pos, int length);
+	void PluginProcessTrack(CScript *s, Track *t, Range r);
 
 	void OnFavoriteName();
 	void OnFavoriteList();

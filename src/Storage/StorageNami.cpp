@@ -258,7 +258,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		tdata.resize(length * 2);
 		f->ReadBuffer((char*)&tdata[0], length * 4);
 		Track *t = a->AddEmptyTrack();
-		BufferBox buf = t->GetBuffers(0, length);
+		BufferBox buf = t->GetBuffers(Range(0, length));
 		for (int i=0;i<length;i++){
 			buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 			buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -271,7 +271,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			string name = f->ReadStr();
 			int pos = (float)f->ReadInt();
 			int slength = f->ReadInt();
-			Track *s = t->AddEmptySubTrack(pos, slength, name);
+			Track *s = t->AddEmptySubTrack(Range(pos, slength), name);
 			//msg_write(s->Length);
 			s->volume = f->ReadFloat();
 			f->ReadBool(); // s->echo_enabled
@@ -280,7 +280,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			f->ReadFloat(); // s->echo_damp
 			tdata.resize(length * 2);
 			f->ReadBuffer((char*)&tdata[0], length * 4);
-			buf = s->GetBuffers(0, slength);
+			buf = s->GetBuffers(Range(0, slength));
 			for (int i=0;i<slength;i++){
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -301,7 +301,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			tdata.resize(length * 2);
 			ReadCompressed(f, (char*)&tdata[0], length * 4);
 			//f->ReadBuffer((char*)&tdata[0], length * 4);
-			BufferBox buf = t->GetBuffers(0, length);
+			BufferBox buf = t->GetBuffers(Range(0, length));
 			for (int i=0;i<length;i++){
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -314,7 +314,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				string name = f->ReadStr();
 				int pos = (float)f->ReadInt();
 				int slength = f->ReadInt();
-				Track *s = t->AddEmptySubTrack(pos, slength, name);
+				Track *s = t->AddEmptySubTrack(Range(pos, slength), name);
 				//msg_write(s->Length);
 				s->volume = f->ReadFloat();
 				f->ReadBool(); // s->echo_enabled
@@ -323,7 +323,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				f->ReadFloat(); // s->echo_damp
 				tdata.resize(slength * 2);
 				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				buf = s->GetBuffers(0, slength);
+				buf = s->GetBuffers(Range(0, slength));
 				for (int i=0;i<slength;i++){
 					buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 					buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -355,7 +355,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			tdata.resize(length * 2);
 			ReadCompressed(f, (char*)&tdata[0], length * 4);
 			//f->ReadBuffer((char*)&tdata[0], length * 4);
-			BufferBox buf = t->GetBuffers(0, length);
+			BufferBox buf = t->GetBuffers(Range(0, length));
 			for (int i=0;i<length;i++){
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -374,13 +374,13 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				string name = f->ReadStr();
 				int pos = (float)f->ReadInt();
 				int slength = f->ReadInt();
-				Track *s = t->AddEmptySubTrack(pos, slength, name);
+				Track *s = t->AddEmptySubTrack(Range(pos, slength), name);
 				//msg_write(s->Length);
 				s->volume = f->ReadFloat();
 				s->muted = f->ReadBool();
 				tdata.resize(slength * 2);
 				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				BufferBox sbuf = s->GetBuffers(0, slength);
+				BufferBox sbuf = s->GetBuffers(Range(0, slength));
 				for (int i=0;i<slength;i++){
 					sbuf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 					sbuf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -460,7 +460,7 @@ void ReadChunkSub(CFile *f, Track *t)
 	string name = f->ReadStr();
 	int pos = f->ReadInt();
 	int length = f->ReadInt();
-	Track *s = t->AddEmptySubTrack(pos, length, name);
+	Track *s = t->AddEmptySubTrack(Range(pos, length), name);
 	chunk_data.s = s;
 	s->volume = f->ReadFloat();
 	s->muted = f->ReadBool();

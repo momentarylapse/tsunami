@@ -12,8 +12,8 @@
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a)
 {
-	int i0 = a->selection_start;
-	int i1 = a->selection_end;
+	int i0 = a->selection.get_offset();
+	int i1 = a->selection.get_end();
 	foreach(a->track, t)
 		if (t.is_selected){
 			// buffer boxes

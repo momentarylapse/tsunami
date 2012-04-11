@@ -44,13 +44,13 @@ void PluginManager::PopCurPlugin()
 }
 
 BufferBox TrackGetBuffers(Track *t, int pos, int length)
-{	return t->GetBuffers(pos, length);	}
+{	return t->GetBuffers(Range(pos, length));	}
 
 BufferBox TrackReadBuffers(Track *t, int pos, int length)
-{	return t->ReadBuffers(pos, length);	}
+{	return t->ReadBuffers(Range(pos, length));	}
 
 BufferBox AudioFileRender(AudioFile *a, int pos, int length)
-{	return tsunami->renderer->RenderAudioFile(a, pos, length);	}
+{	return tsunami->renderer->RenderAudioFile(a, Range(pos, length));	}
 
 void GlobalPutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w)
 {	tsunami->plugins->PutFavoriteBarFixed(win, x, y, w);	}
@@ -669,7 +669,7 @@ void PluginManager::PluginPreview()
 		HuiSleep(10);
 		HuiDoSingleMainLoop();
 		int pos = tsunami->output->GetPos(tsunami->cur_audio);
-		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->cur_audio->selection_start) / tsunami->cur_audio->selection_length);
+		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->cur_audio->selection.get_offset()) / tsunami->cur_audio->selection.get_length());
 		if (tsunami->progress->IsCancelled()){
 			tsunami->output->Stop();
 			break;
@@ -724,11 +724,11 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	return !s.s->Error;
 }
 
-void PluginManager::PluginProcessTrack(CScript *s, Track *t, int pos, int length)
+void PluginManager::PluginProcessTrack(CScript *s, Track *t, Range r)
 {
 	msg_db_r("PluginProcessTrack", 1);
-	BufferBox buf = t->GetBuffers(pos, length);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, pos, length);
+	BufferBox buf = t->GetBuffers(r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, r);
 	s->ExecuteScriptFunction("ProcessTrack", &buf, t);
 	t->root->Execute(a);
 	//t->UpdatePeaks();
@@ -750,7 +750,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 				if (tsunami->cur_audio->used){
 					foreach(tsunami->cur_audio->track, t)
 						if (t.is_selected){
-							PluginProcessTrack(s, &t, tsunami->cur_audio->selection_start, tsunami->cur_audio->selection_length);
+							PluginProcessTrack(s, &t, tsunami->cur_audio->selection);
 						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));

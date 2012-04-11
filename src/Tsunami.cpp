@@ -257,7 +257,7 @@ void Tsunami::OnFindAndExecutePlugin()
 void Tsunami::OnDelete()
 {
 	if (cur_audio->used)
-		if (cur_audio->selection)
+		if (!cur_audio->selection.empty())
 			cur_audio->Execute(new ActionAudioDeleteSelection(cur_audio));
 }
 

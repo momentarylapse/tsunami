@@ -14,7 +14,7 @@
 class ActionTrackEditBuffer : public Action
 {
 public:
-	ActionTrackEditBuffer(Track *t, int _pos, int _length);
+	ActionTrackEditBuffer(Track *t, Range _range);
 	virtual ~ActionTrackEditBuffer();
 
 	void *execute(Data *d);
@@ -23,7 +23,7 @@ public:
 
 private:
 	int track_no, sub_no;
-	int pos, length;
+	Range range;
 	BufferBox box;
 };
 

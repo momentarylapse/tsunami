@@ -30,9 +30,7 @@ public:
 	virtual ~AudioFile();
 	Track *GetCurTrack();
 	Track *GetCurSub();
-	int GetMin();
-	int GetMax();
-	int GetLength();
+	Range GetRange();
 
 	int screen2sample(int x);
 	int sample2screen(int s);
@@ -73,8 +71,7 @@ public:
 	int x, y, width, height;
 
 	// selection within the buffer?
-	bool selection;
-	int selection_start, selection_end, selection_length;
+	Range selection;
 	bool mo_sel_start, mo_sel_end;
 	// (T_T)  -> global
 
@@ -83,7 +80,7 @@ public:
 	float view_pos;
 	float view_zoom;
 
-	int sel_start_raw, sel_end_raw;
+	Range sel_raw;
 
 	//History *history;
 };

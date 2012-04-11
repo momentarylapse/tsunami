@@ -12,16 +12,16 @@
 #include "../Data/Track.h"
 #include <assert.h>
 
-ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int pos, int length)
+ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, const Range &r)
 {
 	// is <pos> inside a buffer?
 	// last buffer before <pos>?
 	int n_pos = -1;
 	int n_before = -1;
 	for (int i=0;i<t->buffer.num;i++){
-		if ((pos >= t->buffer[i].offset) && (pos <= t->buffer[i].offset + t->buffer[i].num))
+		if ((r.offset >= t->buffer[i].offset) && (r.offset <= t->buffer[i].offset + t->buffer[i].num))
 			n_pos = i;
-		if (pos >= t->buffer[i].offset)
+		if (r.offset >= t->buffer[i].offset)
 			n_before = i;
 	}
 //	msg_write("get buf");
@@ -35,18 +35,18 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int pos, int length
 		BufferBox *b = &t->buffer[n_pos];
 
 		// too small?
-		if (pos + length > b->offset + b->num)
-			AddSubAction(new ActionTrack__GrowBufferBox(t, n_pos, pos - b->offset + length), t->root);
+		if (r.get_end() > b->offset + b->num)
+			AddSubAction(new ActionTrack__GrowBufferBox(t, n_pos, r.get_end() - b->offset), t->root);
 	}else{
 
 		// insert new buffers
 		n_pos = n_before + 1;
-		AddSubAction(new ActionTrack__AddBufferBox(t, n_pos, pos, length), t->root);
+		AddSubAction(new ActionTrack__AddBufferBox(t, n_pos, r), t->root);
 	}
 
 	// collision???  -> absorb
 	for (int i=t->buffer.num-1;i>n_pos;i--)
-		if (t->buffer[i].offset <= pos + length)
+		if (t->buffer[i].offset <= r.get_end())
 			AddSubAction(new ActionTrack__AbsorbBufferBox(t, n_pos, i), t->root);
 
 //	for (int i=0;i<t->buffer_r.num;i++)

@@ -9,11 +9,12 @@
 #define ACTIONTRACKADDEMPTYSUBTRACK_H_
 
 #include "Action.h"
+#include "../Data/Range.h"
 
 class ActionTrackAddEmptySubTrack : public Action
 {
 public:
-	ActionTrackAddEmptySubTrack(int _track_no, int _pos, int _length, const string &_name);
+	ActionTrackAddEmptySubTrack(int _track_no, const Range &_range, const string &_name);
 	virtual ~ActionTrackAddEmptySubTrack();
 
 	void *execute(Data *d);
@@ -21,7 +22,8 @@ public:
 
 private:
 	int track_no;
-	int pos, length, index;
+	int index;
+	Range range;
 	string name;
 };
 

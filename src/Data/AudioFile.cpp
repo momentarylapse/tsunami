@@ -52,7 +52,7 @@ AudioFile::AudioFile()
 
 	used = false;
 	volume = 1;
-	selection = false;
+	selection.clear();
 	cur_track = -1;
 
 	/*history = new History();
@@ -111,7 +111,7 @@ void AudioFile::Reset()
 	filename = "";
 	tag.clear();
 	width = -1;
-	selection = false;
+	selection.clear();
 	view_pos = 0;
 	view_zoom = 1;
 	volume = 1;
@@ -137,29 +137,14 @@ AudioFile::~AudioFile()
 void AudioFile::UpdateSelection()
 {
 	msg_db_r("UpdateSelection", 1);
-	if (!selection){
-		sel_start_raw = GetMin();
-		sel_end_raw = GetMax();
-	}
-	if (sel_start_raw > sel_end_raw){
-		selection_start = sel_end_raw;
-		selection_end = sel_start_raw;
-	}else{
-		selection_start = sel_start_raw;
-		selection_end = sel_end_raw;
-	}
-	selection_length = selection_end - selection_start;
+	selection = sel_raw;
+	if (selection.length < 0)
+		selection.invert();
 
 	// subs
-	foreach(track, t){
-		foreach(t.sub, s){
-			if (selection){
-				s.is_selected = (t.is_selected) && ((selection_start <= s.pos + s.length) && (selection_end >= s.pos));
-			}else{
-				s.is_selected = false;
-			}
-		}
-	}
+	foreach(track, t)
+		foreach(t.sub, s)
+			s.is_selected = (t.is_selected) && selection.overlaps(s.GetRange());
 	Notify("SelectionChange");
 	msg_db_l(1);
 }
@@ -225,31 +210,20 @@ Track *AudioFile::GetCurSub()
 	return NULL;
 }
 
-int AudioFile::GetMin()
+Range AudioFile::GetRange()
 {
 	int min = 2147483640;
-	foreach(track, t)
-		if (t.GetMinUnsafe() < min)
-			min = t.GetMinUnsafe();
-	if (min == 2147483640)
-		return 0;
-	return min;
-}
-
-int AudioFile::GetMax()
-{
 	int max = -2147483640;
-	foreach(track, t)
-		if (t.GetMaxUnsafe() > max)
-			max = t.GetMaxUnsafe();
-	if (max == -2147483640)
-		return 0;
-	return max;
-}
-
-int AudioFile::GetLength()
-{
-	return max(GetMax() - GetMin(), 0);
+	foreach(track, t){
+		Range r = t.GetRangeUnsafe();
+		if (r.get_offset() < min)
+			min = r.get_offset();
+		if (r.get_end() > max)
+			max = r.get_end();
+	}
+	if (min > max)
+		return Range(0, 0);
+	return Range(min, max - min);
 }
 
 

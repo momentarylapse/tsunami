@@ -9,6 +9,7 @@
 #define BUFFERBOX_H_
 
 #include "../lib/file/file.h"
+#include "Range.h"
 
 class BufferBox
 {
@@ -18,6 +19,8 @@ public:
 
 	int offset, num;
 	Array<float> r, l;
+
+	Range range();
 
 	void clear();
 	void resize(int length);

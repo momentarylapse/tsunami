@@ -241,3 +241,8 @@ void BufferBox::get_16bit_buffer(Array<short> &data)
 		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
 		//msg_error("overflow");
 }
+
+Range BufferBox::range()
+{
+	return Range(offset, num);
+}

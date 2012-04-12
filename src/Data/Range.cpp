@@ -79,11 +79,20 @@ bool Range::empty() const
 	return num <= 0;
 }
 
+// do <this> and <r> overlap?
 bool Range::overlaps(const Range &r) const
 {
 	if (empty() || r.empty())
 		return false;
 	return ((start() <= r.end()) && (end() >= r.start()));
+}
+
+// does <this> cover <r>?
+bool Range::covers(const Range &r) const
+{
+	if (empty() || r.empty())
+		return false;
+	return ((start() <= r.start()) && (end() >= r.end()));
 }
 
 bool Range::is_inside(int pos) const

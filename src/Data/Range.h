@@ -14,7 +14,7 @@ public:
 	Range();
 	Range(int _offset, int _length);
 	Range(const Range &r);
-	virtual ~Range();
+	~Range();
 
 	void clear();
 

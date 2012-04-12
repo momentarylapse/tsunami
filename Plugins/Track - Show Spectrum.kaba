@@ -151,5 +151,8 @@ void show_spec()
 	ffl.clear()
 
 void main()
-	if cur_audio.cur_track >= 0
-		show_spec()
+	if cur_audio.selection.length > 0
+		if cur_audio.cur_track >= 0
+			show_spec()
+	else
+		HuiErrorBox(MainWin, "error", "needs some selection!")

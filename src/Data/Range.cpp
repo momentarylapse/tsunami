@@ -6,6 +6,7 @@
  */
 
 #include "Range.h"
+#include "../lib/file/file.h"
 
 Range::Range(const Range & r)
 {
@@ -90,6 +91,13 @@ bool Range::is_inside(int pos) const
 	if (empty())
 		return false;
 	return ((pos >= offset) && (pos < offset + length));
+}
+
+Range Range::intersect(const Range &r) const
+{
+	int i0 = max(offset, r.get_offset());
+	int i1 = min(offset + length, r.get_end());
+	return Range(i0, i1 - i0);
 }
 
 

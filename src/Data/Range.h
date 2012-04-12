@@ -32,6 +32,7 @@ public:
 
 	bool is_inside(int pos) const;
 	bool overlaps(const Range &r) const;
+	Range intersect(const Range &r) const;
 };
 
 #endif /* RANGE_H_ */

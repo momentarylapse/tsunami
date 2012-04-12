@@ -20,14 +20,14 @@ AudioRenderer::~AudioRenderer()
 bool intersect_sub(Track &s, const Range &r, Range &ir, int &bpos)
 {
 	// intersected intervall (track-coordinates)
-	int i0 = max(s.pos, r.get_offset());
-	int i1 = min(s.pos + s.length, r.get_end());
+	int i0 = max(s.pos, r.start());
+	int i1 = min(s.pos + s.length, r.end());
 
 	// beginning of the intervall (relative to sub)
 	ir.offset = i0 - s.pos;
 	// ~ (relative to old intervall)
-	bpos = i0 - r.get_offset();
-	ir.length = i1 - i0;
+	bpos = i0 - r.start();
+	ir.num = i1 - i0;
 
 	return !ir.empty();
 }
@@ -68,7 +68,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t, const R
 	msg_db_r("bb_render_time_track_no_fx", 1);
 
 	// silence... TODO...
-	buf.resize(r.get_length());
+	buf.resize(r.length());
 
 	msg_db_l(1);
 }
@@ -90,7 +90,7 @@ void AudioRenderer::make_fake_track(Track &t, AudioFile *a, BufferBox &buf, cons
 	//msg_write("fake track");
 	t.root = a;
 	t.buffer.resize(1);
-	t.buffer[0].set_as_ref(buf, 0, range.get_length());
+	t.buffer[0].set_as_ref(buf, 0, range.length());
 }
 
 void AudioRenderer::bb_apply_fx(BufferBox &buf, AudioFile *a, Track *t, Array<Effect> &fx_list, const Range &range)
@@ -144,7 +144,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf, AudioFile *a, const Ra
 	int i0 = get_first_usable_track(a);
 	if (i0 < 0){
 		// no -> return silence
-		buf.resize(range.get_length());
+		buf.resize(range.length());
 	}
 
 	// first (un-muted) track

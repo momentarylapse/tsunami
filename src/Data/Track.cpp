@@ -151,7 +151,7 @@ Range Track::GetRangeUnsafe()
 Range Track::GetRange()
 {
 	Range r = GetRangeUnsafe();
-	if (r.get_length() < 0)
+	if (r.length() < 0)
 		return Range(0, 0);
 	return r;
 }
@@ -169,7 +169,7 @@ BufferBox Track::ReadBuffers(const Range &r)
 	// is <r> inside a buffer?
 	foreach(buffer, b){
 		int p0 = r.offset - b.offset;
-		int p1 = r.offset - b.offset + r.length;
+		int p1 = r.offset - b.offset + r.num;
 		if ((p0 >= 0) && (p1 <= b.num)){
 			// set as reference to subarrays
 			buf.set_as_ref(b, p0, p1 - p0);
@@ -179,7 +179,7 @@ BufferBox Track::ReadBuffers(const Range &r)
 	}
 
 	// create own...
-	buf.resize(r.length);
+	buf.resize(r.num);
 
 	// fill with overlapp
 	foreach(buffer, b)

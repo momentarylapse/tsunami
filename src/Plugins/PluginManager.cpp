@@ -669,7 +669,7 @@ void PluginManager::PluginPreview()
 		HuiSleep(10);
 		HuiDoSingleMainLoop();
 		int pos = tsunami->output->GetPos(tsunami->cur_audio);
-		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->cur_audio->selection.get_offset()) / tsunami->cur_audio->selection.get_length());
+		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->cur_audio->selection.start()) / tsunami->cur_audio->selection.length());
 		if (tsunami->progress->IsCancelled()){
 			tsunami->output->Stop();
 			break;

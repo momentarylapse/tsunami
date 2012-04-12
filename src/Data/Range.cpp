@@ -11,19 +11,19 @@
 Range::Range(const Range & r)
 {
 	offset = r.offset;
-	length = r.length;
+	num = r.num;
 }
 
 Range::Range()
 {
 	offset = 0;
-	length = 0;
+	num = 0;
 }
 
 Range::Range(int _offset, int _length)
 {
 	offset = _offset;
-	length = _length;
+	num = _length;
 }
 
 Range::~Range()
@@ -33,7 +33,7 @@ Range::~Range()
 void Range::clear()
 {
 	offset = 0;
-	length = 0;
+	num = 0;
 }
 
 void Range::move(int dpos)
@@ -43,60 +43,60 @@ void Range::move(int dpos)
 
 void Range::resize(int new_length)
 {
-	length = new_length;
+	num = new_length;
 }
 
 void Range::set_end(int end)
 {
-	length = end - offset;
+	num = end - offset;
 }
 
 void Range::invert()
 {
-	offset += length;
-	length = - length;
+	offset += num;
+	num = - num;
 }
 
 
 
-int Range::get_offset() const
+int Range::start() const
 {
 	return offset;
 }
 
-int Range::get_length() const
+int Range::length() const
 {
-	return length;
+	return num;
 }
 
-int Range::get_end() const
+int Range::end() const
 {
-	return offset + length;
+	return offset + num;
 }
 
 bool Range::empty() const
 {
-	return length <= 0;
+	return num <= 0;
 }
 
 bool Range::overlaps(const Range &r) const
 {
 	if (empty() || r.empty())
 		return false;
-	return ((offset <= r.offset + r.length) && (offset + length >= r.offset));
+	return ((start() <= r.end()) && (end() >= r.start()));
 }
 
 bool Range::is_inside(int pos) const
 {
 	if (empty())
 		return false;
-	return ((pos >= offset) && (pos < offset + length));
+	return ((pos >= start()) && (pos < end()));
 }
 
 Range Range::intersect(const Range &r) const
 {
-	int i0 = max(offset, r.get_offset());
-	int i1 = min(offset + length, r.get_end());
+	int i0 = max(start(), r.start());
+	int i1 = min(end(), r.end());
 	return Range(i0, i1 - i0);
 }
 

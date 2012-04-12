@@ -35,8 +35,8 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, const Range &r)
 		BufferBox *b = &t->buffer[n_pos];
 
 		// too small?
-		if (r.get_end() > b->offset + b->num)
-			AddSubAction(new ActionTrack__GrowBufferBox(t, n_pos, r.get_end() - b->offset), t->root);
+		if (r.end() > b->offset + b->num)
+			AddSubAction(new ActionTrack__GrowBufferBox(t, n_pos, r.end() - b->offset), t->root);
 	}else{
 
 		// insert new buffers
@@ -46,7 +46,7 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, const Range &r)
 
 	// collision???  -> absorb
 	for (int i=t->buffer.num-1;i>n_pos;i--)
-		if (t->buffer[i].offset <= r.get_end())
+		if (t->buffer[i].offset <= r.end())
 			AddSubAction(new ActionTrack__AbsorbBufferBox(t, n_pos, i), t->root);
 
 //	for (int i=0;i<t->buffer_r.num;i++)

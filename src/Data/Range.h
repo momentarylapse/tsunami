@@ -24,10 +24,10 @@ public:
 
 	void invert();
 
-	int offset, length;
-	int get_offset() const;
-	int get_length() const;
-	int get_end() const;
+	int offset, num;
+	int start() const;
+	int length() const;
+	int end() const;
 	bool empty() const;
 
 	bool is_inside(int pos) const;

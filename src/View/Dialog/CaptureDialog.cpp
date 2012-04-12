@@ -143,7 +143,7 @@ void CaptureDialog::Insert()
 	int dpos = 0;
 	int i0;
 	if (audio->used){
-		int s_start = audio->selection.get_offset();
+		int s_start = audio->selection.start();
 
 		// insert recorded data with some delay
 		dpos = - tsunami->input->CaptureMaxDelay - (tsunami->input->CapturePlaybackDelay / 1000.0f) * (float)audio->sample_rate;

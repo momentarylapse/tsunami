@@ -138,7 +138,7 @@ void AudioFile::UpdateSelection()
 {
 	msg_db_r("UpdateSelection", 1);
 	selection = sel_raw;
-	if (selection.length < 0)
+	if (selection.num < 0)
 		selection.invert();
 
 	// subs
@@ -216,10 +216,10 @@ Range AudioFile::GetRange()
 	int max = -2147483640;
 	foreach(track, t){
 		Range r = t.GetRangeUnsafe();
-		if (r.get_offset() < min)
-			min = r.get_offset();
-		if (r.get_end() > max)
-			max = r.get_end();
+		if (r.start() < min)
+			min = r.start();
+		if (r.end() > max)
+			max = r.end();
 	}
 	if (min > max)
 		return Range(0, 0);

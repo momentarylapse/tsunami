@@ -39,8 +39,8 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 
 	Track *s = &t.sub.back();
 	s->name = name;
-	s->pos = range.get_offset();
-	s->length = range.get_length();
+	s->pos = range.start();
+	s->length = range.length();
 	s->parent = get_track_index(&t);
 	s->root = a;
 

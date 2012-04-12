@@ -42,8 +42,8 @@ void *ActionTrack__AddBufferBox::execute(Data *d)
 
 	// reserve memory
 	BufferBox &b = t->buffer[index];
-	b.offset = range.get_offset();
-	b.resize(range.get_length());
+	b.offset = range.start();
+	b.resize(range.length());
 	return &b;
 }
 

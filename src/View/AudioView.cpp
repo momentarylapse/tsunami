@@ -178,7 +178,7 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 	if (s.audio){
 		SelectionUpdatePos(s);
 		if (!s.audio->selection.empty()){
-			int ssx = s.audio->sample2screen(s.audio->sel_raw.get_offset());
+			int ssx = s.audio->sample2screen(s.audio->sel_raw.start());
 			if ((mx >= ssx - 5) && (mx <= ssx + 5)){
 				s.type = SEL_TYPE_SELECTION_START;
 				if (set)
@@ -186,7 +186,7 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 				msg_db_l(1);
 				return s;
 			}
-			int sex = s.audio->sample2screen(s.audio->sel_raw.get_end());
+			int sex = s.audio->sample2screen(s.audio->sel_raw.end());
 			if ((mx >= sex - 5) && (mx <= sex + 5)){
 				s.type = SEL_TYPE_SELECTION_END;
 				if (set)
@@ -277,9 +277,9 @@ void AudioView::SetBarriers(AudioFile *a, SelectionType *s)
 
 	// selection marker
 	if (!a->selection.empty()){
-		s->barrier.add(a->sel_raw.get_offset());
+		s->barrier.add(a->sel_raw.start());
 		if (MousePossiblySelecting < 0)
-			s->barrier.add(a->sel_raw.get_end());
+			s->barrier.add(a->sel_raw.end());
 	}
 	msg_db_l(2);
 }
@@ -391,7 +391,7 @@ void AudioView::OnMouseMove()
 		MousePossiblySelecting += abs(HuiGetEvent()->dx);
 	if (MousePossiblySelecting > MouseMinMoveToSelect){
 		tsunami->cur_audio->sel_raw.offset = MousePossiblySelectingStart;
-		tsunami->cur_audio->sel_raw.length = Selection.pos - MousePossiblySelectingStart;
+		tsunami->cur_audio->sel_raw.num = Selection.pos - MousePossiblySelectingStart;
 		tsunami->cur_audio->mo_sel_end = true;
 		SetBarriers(tsunami->cur_audio, &Selection);
 		tsunami->cur_audio->UpdateSelection();
@@ -845,8 +845,8 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 
 	// selection
 	if (!a->selection.empty()){
-		int sx1 = a->sample2screen(a->sel_raw.get_offset());
-		int sx2 = a->sample2screen(a->sel_raw.get_end());
+		int sx1 = a->sample2screen(a->sel_raw.start());
+		int sx2 = a->sample2screen(a->sel_raw.end());
 		int sxx1 = clampi(sx1, x, width + x);
 		int sxx2 = clampi(sx2, x, width + x);
 		bool mo_s = a->mo_sel_start;
@@ -939,11 +939,11 @@ void AudioView::OptimizeView(AudioFile *a)
 
 	Range r = a->GetRange();
 
-	int length = r.get_length();
+	int length = r.length();
 	if (length == 0)
 		length = 10 * a->sample_rate;
 	a->view_zoom = (float)a->width / (float)length;
-	a->view_pos = (float)r.get_offset();
+	a->view_pos = (float)r.start();
 	ForceRedraw();
 	msg_db_l(1);
 }
@@ -1102,7 +1102,7 @@ void AudioView::ZoomAudioFile(AudioFile *a, float f)
 {
 	// max zoom: 8 pixel per sample
 	// min zoom: whole file on 100 pixel
-	int length = a->GetRange().get_length();
+	int length = a->GetRange().length();
 	if (length == 0)
 		length = 10 * a->sample_rate;
 	f = clampf(f, 100.0 / (length * a->view_zoom), 8.0f / a->view_zoom);

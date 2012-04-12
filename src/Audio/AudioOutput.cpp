@@ -255,7 +255,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	TestError("alGenBuffers (play)");
 
 	stream_pos = 0;
-	stream_size = _range.get_length();
+	stream_size = _range.length();
 	stream_pos_0 = 0;
 	audio = a;
 
@@ -294,7 +294,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	}
 
 	playing = true;
-	start = _range.get_offset();
+	start = _range.start();
 	pos = start;
 	loop = _loop;
 

@@ -18,7 +18,7 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 
 	foreach(a->tag, t)
 		AddString("tags", t.key + "\\" + t.value);
-	int samples = a->GetRange().get_length();
+	int samples = a->GetRange().length();
 	SetString("time", a->get_time_str(samples));
 	SetInt("samples", samples);
 	SetInt("frequency", a->sample_rate);

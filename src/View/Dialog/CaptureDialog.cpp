@@ -8,6 +8,8 @@
 #include "CaptureDialog.h"
 #include "../../Tsunami.h"
 
+#include "../../Action/ActionTrackEditBuffer.h"
+
 CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a):
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
 {
@@ -42,10 +44,10 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 
 	Enable("capture_playback", a->used);
 
-	AddString("capture_target", _("neue Spur anlegen"));
 	foreach(a->track, t)
-		AddString("capture_target", format(_("%s (als Unterspur)"), t.GetNiceName().c_str()));
-	SetInt("capture_target", 0);
+		AddString("capture_target", t.GetNiceName());
+	AddString("capture_target", _("neue Spur anlegen"));
+	SetInt("capture_target", (a->cur_track >= 0) ? a->cur_track : a->track.num);
 
 	EventM("cancel", this, (void(HuiEventHandler::*)())&CaptureDialog::OnClose);
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&CaptureDialog::OnClose);
@@ -149,15 +151,15 @@ void CaptureDialog::Insert()
 		dpos = - tsunami->input->CaptureMaxDelay - (tsunami->input->CapturePlaybackDelay / 1000.0f) * (float)audio->sample_rate;
 		//msg_write(f2s((float)CaptureMaxDelay / (float)audio->sample_rate * 1000,3));
 
-		if (target == 0){
+		if (target >= audio->track.num){
 			// new track
 			t = audio->AddEmptyTrack();
 			i0 = s_start - dpos;
 		}else{
 			// sub track
-			t = audio->track[target - 1].AddEmptySubTrack(Range(s_start + dpos, length), _("Aufnahme"));
-			dpos = 0;
-			i0 = 0;
+			t = &audio->track[target];
+			//dpos = s_start + dpos;
+			i0 = s_start - dpos;
 		}
 	}else{
 		// new file
@@ -167,8 +169,11 @@ void CaptureDialog::Insert()
 	}
 
 	// insert data
-	BufferBox buf = t->GetBuffers(Range(i0, length));
+	Range r = Range(i0, length);
+	BufferBox buf = t->GetBuffers(r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, r);
 	buf.set(tsunami->input->CaptureBuf, 0, 1.0f);
+	audio->Execute(a);
 	tsunami->input->CaptureBuf.clear();
 	t->UpdatePeaks();
 	//cur_audio->history->ResetHistory();

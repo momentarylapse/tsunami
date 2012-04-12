@@ -43,14 +43,14 @@ void PluginManager::PopCurPlugin()
 	}
 }
 
-BufferBox TrackGetBuffers(Track *t, int pos, int length)
-{	return t->GetBuffers(Range(pos, length));	}
+BufferBox TrackGetBuffers(Track *t, const Range &r)
+{	return t->GetBuffers(r);	}
 
-BufferBox TrackReadBuffers(Track *t, int pos, int length)
-{	return t->ReadBuffers(Range(pos, length));	}
+BufferBox TrackReadBuffers(Track *t, const Range &r)
+{	return t->ReadBuffers(r);	}
 
-BufferBox AudioFileRender(AudioFile *a, int pos, int length)
-{	return tsunami->renderer->RenderAudioFile(a, Range(pos, length));	}
+BufferBox AudioFileRender(AudioFile *a, const Range &r)
+{	return tsunami->renderer->RenderAudioFile(a, r);	}
 
 void GlobalPutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w)
 {	tsunami->plugins->PutFavoriteBarFixed(win, x, y, w);	}

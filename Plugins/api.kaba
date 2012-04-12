@@ -35,6 +35,9 @@ class sAudioFile
 class Sub
 	int dummy
 
+class Range
+	int offset, length
+
 class BufferBox
 	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int offset, num
@@ -124,31 +127,28 @@ class AudioFile
 
 	int x, y, width, height
 
-	bool selection
-	int selection_start, selection_end, selection_length
+	Range selection
 	bool mo_sel_start, mo_sel_end
 	int cur_track
 
 	float view_pos
 	float view_zoom
 	
-	int sel_start_raw, sel_end_raw
-	
-	void *history
+	Range sel_raw
 
 extern window MainWin
 extern AudioFile /* *audio[2],*/ *cur_audio
 
 extern Track *AddEmptyTrack(AudioFile *a)
 extern void DeleteTrack(AudioFile *a, int n)
-extern Track *AddEmptySubTrack(Track *t, float pos, int length, string name)
+extern Track *AddEmptySubTrack(Track *t, Range r, string name)
 extern void CreateNew(AudioFile *a, int length, int sample_rate)
 extern void UpdatePeaks(Track *t)
 extern void CreateTrackBuffers(Track *t)
 extern void BufferBoxClear(BufferBox box)
 
-extern BufferBox TrackGetBuffers(Track *t, int pos, int length)
-extern BufferBox TrackGetBuffersR(Track *t, int pos, int length)
+extern BufferBox TrackGetBuffers(Track *t, Range r)
+extern BufferBox TrackGetBuffersR(Track *t, Range r)
 
 //extern void ChangeAudioFile(AudioFile *a)
 //extern void ChangeTrack(Track *t)
@@ -168,7 +168,7 @@ extern void ProgressStart(string s, float progress)
 extern void ProgressEnd()
 extern void Progress(string s, float progress)
 
-extern BufferBox AudioFileRender(AudioFile *a, int pos, int length)
+extern BufferBox AudioFileRender(AudioFile *a, Range r)
 
 extern void PutFavoriteBarFixed(window win, int x, int y, int w)
 extern void PutFavoriteBarSizable(window win, string root_id, int x, int y)

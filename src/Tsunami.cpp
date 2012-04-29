@@ -275,6 +275,12 @@ void Tsunami::OnSettings()
 
 void Tsunami::OnTrackImport()
 {
+	if (!cur_audio->used)
+		return;
+	if (storage->AskOpenImport(this)){
+		Track *t = cur_audio->AddEmptyTrack();
+		storage->LoadTrack(t, HuiFilename);
+	}
 }
 
 bool Tsunami::HandleArguments(Array<string> arg)

@@ -92,6 +92,38 @@ bool Storage::Load(AudioFile *a, const string &filename)
 	return ok;
 }
 
+bool Storage::LoadTrack(Track *t, const string &filename)
+{
+	msg_db_r("Storage.LoadTrack", 1);
+	bool ok = false;
+	bool found = false;
+
+	CurrentDirectory = dirname(filename);
+	string ext = file_extension(filename);
+
+	foreach(format, f)
+		if (f->CanHandle(ext)){
+			tsunami->progress->Start(_("lade"), 0);
+
+			AudioFile *a = t->root;
+			a->NotifyBegin();
+
+			f->LoadTrack(t, filename);
+
+			tsunami->progress->End();
+			tsunami->ForceRedraw();
+			a->NotifyEnd();
+			found = true;
+			break;
+		}
+
+	if (!found)
+		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
+
+	msg_db_l(1);
+	return ok;
+}
+
 bool Storage::Save(AudioFile *a, const string &filename)
 {
 	msg_db_r("Storage.Save", 1);

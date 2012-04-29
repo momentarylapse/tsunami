@@ -84,7 +84,7 @@ void show_spec()
 	dlg.AddControlTable("", 0, 1, 2, 1, "table2")
 	dlg.SetTarget("table2", 0)
 	dlg.AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
-	dlg.AddButton("Close", 1, 0, 0, 0, "close")
+	dlg.AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 	dlg.SetImage("close", "hui:close")
 	dlg.Update()
 	

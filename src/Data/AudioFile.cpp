@@ -6,7 +6,7 @@
  */
 
 #include "AudioFile.h"
-#include "../Action/ActionAudioAddTrack.h"
+#include "../Action/AudioFile/ActionAudioAddTrack.h"
 #include "../Tsunami.h"
 #include <assert.h>
 

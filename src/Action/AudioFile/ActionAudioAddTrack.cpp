@@ -6,8 +6,8 @@
  */
 
 #include "ActionAudioAddTrack.h"
-#include "../Data/AudioFile.h"
-#include "../lib/hui/hui.h"
+#include "../../Data/AudioFile.h"
+#include "../../lib/hui/hui.h"
 #include <assert.h>
 
 ActionAudioAddTrack::ActionAudioAddTrack(int _index, int _type)

@@ -10,8 +10,8 @@
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
 
-#include "Action/ActionAudioDeleteSelection.h"
-#include "Action/ActionAudioDeleteTrack.h"
+#include "Action/AudioFile/ActionAudioDeleteSelection.h"
+#include "Action/AudioFile/ActionAudioDeleteTrack.h"
 
 
 Tsunami *tsunami = NULL;

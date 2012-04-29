@@ -8,8 +8,8 @@
 #ifndef ACTIONTRACKADDEMPTYSUBTRACK_H_
 #define ACTIONTRACKADDEMPTYSUBTRACK_H_
 
-#include "Action.h"
-#include "../Data/Range.h"
+#include "../Action.h"
+#include "../../Data/Range.h"
 
 class ActionTrackAddEmptySubTrack : public Action
 {

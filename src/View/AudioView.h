@@ -11,7 +11,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
-#include "../Action/ActionSubTrackMove.h"
+#include "../Action/SubTrack/ActionSubTrackMove.h"
 
 class AudioView : public HuiEventHandler, public Observer, public Observable
 {

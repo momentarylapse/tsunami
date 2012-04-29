@@ -6,7 +6,7 @@
  */
 
 #include "ActionAudioDeleteTrack.h"
-#include "ActionTrack__DeleteBufferBox.h"
+#include "../Track/ActionTrack__DeleteBufferBox.h"
 #include "ActionAudio__DeleteTrack.h"
 #include <assert.h>
 

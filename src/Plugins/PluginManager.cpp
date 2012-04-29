@@ -9,7 +9,7 @@
 #include "../Tsunami.h"
 #include "FastFourierTransform.h"
 #include "../View/Dialog/Slider.h"
-#include "../Action/ActionTrackEditBuffer.h"
+#include "../Action/Track/ActionTrackEditBuffer.h"
 
 PluginManager::PluginManager()
 {

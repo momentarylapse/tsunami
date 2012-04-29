@@ -8,8 +8,8 @@
 #ifndef ACTIONSUBTRACKMOVE_H_
 #define ACTIONSUBTRACKMOVE_H_
 
-#include "Action.h"
-#include "../Data/AudioFile.h"
+#include "../Action.h"
+#include "../../Data/AudioFile.h"
 
 class ActionSubTrackMove: public Action
 {

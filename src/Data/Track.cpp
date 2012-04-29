@@ -6,8 +6,8 @@
  */
 
 #include "Track.h"
-#include "../Action/ActionTrackCreateBuffers.h"
-#include "../Action/ActionTrackAddEmptySubTrack.h"
+#include "../Action/Track/ActionTrackCreateBuffers.h"
+#include "../Action/Track/ActionTrackAddEmptySubTrack.h"
 
 
 

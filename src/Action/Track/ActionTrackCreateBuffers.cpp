@@ -9,7 +9,7 @@
 #include "ActionTrack__AddBufferBox.h"
 #include "ActionTrack__GrowBufferBox.h"
 #include "ActionTrack__AbsorbBufferBox.h"
-#include "../Data/Track.h"
+#include "../../Data/Track.h"
 #include <assert.h>
 
 ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, const Range &r)

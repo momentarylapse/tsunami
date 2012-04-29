@@ -8,7 +8,7 @@
 #ifndef ACTIONAUDIOADDTRACK_H_
 #define ACTIONAUDIOADDTRACK_H_
 
-#include "Action.h"
+#include "../Action.h"
 
 class ActionAudioAddTrack : public Action
 {

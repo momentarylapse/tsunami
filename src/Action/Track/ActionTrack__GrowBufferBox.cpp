@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrack__GrowBufferBox.h"
-#include "../Data/Track.h"
+#include "../../Data/Track.h"
 
 ActionTrack__GrowBufferBox::ActionTrack__GrowBufferBox(Track *t, int _index, int _new_length)
 {

@@ -8,7 +8,7 @@
 #include "CaptureDialog.h"
 #include "../../Tsunami.h"
 
-#include "../../Action/ActionTrackEditBuffer.h"
+#include "../../Action/Track/ActionTrackEditBuffer.h"
 
 CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a):
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)

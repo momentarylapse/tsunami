@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrackAddEmptySubTrack.h"
-#include "../Data/AudioFile.h"
+#include "../../Data/AudioFile.h"
 
 ActionTrackAddEmptySubTrack::ActionTrackAddEmptySubTrack(int _track_no, const Range &_range, const string &_name)
 {

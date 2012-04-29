@@ -8,8 +8,8 @@
 #ifndef ACTIONTRACK__SHRINKBUFFERBOX_H_
 #define ACTIONTRACK__SHRINKBUFFERBOX_H_
 
-#include "Action.h"
-#include "../Data/Track.h"
+#include "../Action.h"
+#include "../../Data/Track.h"
 
 class ActionTrack__ShrinkBufferBox : public Action
 {

@@ -8,8 +8,8 @@
 #ifndef ACTIONTRACK__ADDBUFFERBOX_H_
 #define ACTIONTRACK__ADDBUFFERBOX_H_
 
-#include "Action.h"
-#include "../Data/Track.h"
+#include "../Action.h"
+#include "../../Data/Track.h"
 
 class ActionTrack__AddBufferBox : public Action
 {

@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrack__AddBufferBox.h"
-#include "../Data/AudioFile.h"
+#include "../../Data/AudioFile.h"
 #include <assert.h>
 
 ActionTrack__AddBufferBox::ActionTrack__AddBufferBox(Track *t, int _index, Range r)

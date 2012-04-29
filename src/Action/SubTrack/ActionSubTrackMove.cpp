@@ -6,7 +6,7 @@
  */
 
 #include "ActionSubTrackMove.h"
-#include "../Data/AudioFile.h"
+#include "../../Data/AudioFile.h"
 
 ActionSubTrackMove::ActionSubTrackMove(AudioFile *a)
 {

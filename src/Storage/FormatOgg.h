@@ -1,20 +1,20 @@
 /*
- * StorageOgg.h
+ * FormatOgg.h
  *
  *  Created on: 06.04.2012
  *      Author: michi
  */
 
-#ifndef STORAGEOGG_H_
-#define STORAGEOGG_H_
+#ifndef FORMATOGG_H_
+#define FORMATOGG_H_
 
-#include "StorageAny.h"
+#include "Format.h"
 
-class StorageOgg: public StorageAny
+class FormatOgg: public Format
 {
 public:
-	StorageOgg();
-	virtual ~StorageOgg();
+	FormatOgg();
+	virtual ~FormatOgg();
 
 	void LoadTrack(Track *t, const string &filename);
 	void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename);
@@ -23,4 +23,4 @@ public:
 	void SaveAudio(AudioFile *a, const string &filename);
 };
 
-#endif /* STORAGEOGG_H_ */
+#endif /* FORMATOGG_H_ */

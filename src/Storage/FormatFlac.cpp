@@ -1,11 +1,11 @@
 /*
- * StorageFlac.cpp
+ * FormatFlac.cpp
  *
  *  Created on: 06.04.2012
  *      Author: michi
  */
 
-#include "StorageFlac.h"
+#include "FormatFlac.h"
 #include "../Tsunami.h"
 
 #include <FLAC/all.h>
@@ -66,16 +66,16 @@ void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoder
 	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
 }
 
-StorageFlac::StorageFlac() :
-	StorageAny("flac", FLAG_SINGLE_TRACK | FLAG_TAGS)
+FormatFlac::FormatFlac() :
+	Format("flac", FLAG_SINGLE_TRACK | FLAG_TAGS)
 {
 }
 
-StorageFlac::~StorageFlac()
+FormatFlac::~FormatFlac()
 {
 }
 
-void StorageFlac::LoadTrack(Track *t, const string & filename)
+void FormatFlac::LoadTrack(Track *t, const string & filename)
 {
 	msg_db_r("load_flac_file", 1);
 	tsunami->progress->Set(_("lade flac"), 0);
@@ -139,13 +139,13 @@ static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 
 
-void StorageFlac::SaveAudio(AudioFile *a, const string & filename)
+void FormatFlac::SaveAudio(AudioFile *a, const string & filename)
 {
 }
 
 
 
-void StorageFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
+void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 {
 	tsunami->progress->Set(_("exportiere flac"), 0);
 
@@ -233,7 +233,7 @@ void StorageFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename
 
 
 
-void StorageFlac::LoadAudio(AudioFile *a, const string & filename)
+void FormatFlac::LoadAudio(AudioFile *a, const string & filename)
 {
 	Track *t = a->AddEmptyTrack();
 	LoadTrack(t, filename);

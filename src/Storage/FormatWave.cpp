@@ -1,26 +1,26 @@
 /*
- * StorageWave.cpp
+ * FormatWave.cpp
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#include "StorageWave.h"
+#include "FormatWave.h"
 #include "../Tsunami.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 15;
 
-StorageWave::StorageWave() :
-	StorageAny("wav", FLAG_SINGLE_TRACK)
+FormatWave::FormatWave() :
+	Format("wav", FLAG_SINGLE_TRACK)
 {
 }
 
-StorageWave::~StorageWave()
+FormatWave::~FormatWave()
 {
 }
 
-void StorageWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 	msg_db_r("write_wave_file", 1);
 	tsunami->progress->Set(_("exportiere wave"), 0);
@@ -58,7 +58,7 @@ void StorageWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	msg_db_l(1);
 }
 
-void StorageWave::LoadTrack(Track *t, const string & filename)
+void FormatWave::LoadTrack(Track *t, const string & filename)
 {
 	msg_db_r("load_wave_file", 1);
 	tsunami->progress->Set(_("lade wave"), 0);
@@ -135,13 +135,13 @@ void StorageWave::LoadTrack(Track *t, const string & filename)
 	msg_db_l(1);
 }
 
-void StorageWave::SaveAudio(AudioFile *a, const string & filename)
+void FormatWave::SaveAudio(AudioFile *a, const string & filename)
 {
 }
 
 
 
-void StorageWave::LoadAudio(AudioFile *a, const string & filename)
+void FormatWave::LoadAudio(AudioFile *a, const string & filename)
 {
 	Track *t = a->AddEmptyTrack();
 	LoadTrack(t, filename);

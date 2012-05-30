@@ -1,20 +1,20 @@
 /*
- * StorageNami.h
+ * FormatWave.h
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#ifndef STORAGENAMI_H_
-#define STORAGENAMI_H_
+#ifndef FORMATWAVE_H_
+#define FORMATWAVE_H_
 
-#include "StorageAny.h"
+#include "Format.h"
 
-class StorageNami : public StorageAny
+class FormatWave: public Format
 {
 public:
-	StorageNami();
-	virtual ~StorageNami();
+	FormatWave();
+	virtual ~FormatWave();
 
 	void LoadTrack(Track *t, const string &filename);
 	void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename);
@@ -23,4 +23,4 @@ public:
 	void SaveAudio(AudioFile *a, const string &filename);
 };
 
-#endif /* STORAGENAMI_H_ */
+#endif /* FORMATWAVE_H_ */

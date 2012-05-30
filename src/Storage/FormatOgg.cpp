@@ -1,11 +1,11 @@
 /*
- * StorageOgg.cpp
+ * FormatOgg.cpp
  *
  *  Created on: 06.04.2012
  *      Author: michi
  */
 
-#include "StorageOgg.h"
+#include "FormatOgg.h"
 #include "../Tsunami.h"
 
 #include <vorbis/codec.h>
@@ -26,16 +26,16 @@ float OggQualityList[NumOggQualities] = {0, 0.2f, 0.4f, 0.5f, 0.6f, 0.8f};
 OggVorbis_File vf;
 char ogg_buffer[4096];
 
-StorageOgg::StorageOgg() :
-	StorageAny("ogg", FLAG_SINGLE_TRACK | FLAG_TAGS)
+FormatOgg::FormatOgg() :
+	Format("ogg", FLAG_SINGLE_TRACK | FLAG_TAGS)
 {
 }
 
-StorageOgg::~StorageOgg()
+FormatOgg::~FormatOgg()
 {
 }
 
-void StorageOgg::SaveAudio(AudioFile *a, const string & filename)
+void FormatOgg::SaveAudio(AudioFile *a, const string & filename)
 {
 }
 
@@ -52,7 +52,7 @@ int oe_write_page(ogg_page *page, FILE *fp)
 }
 
 
-void StorageOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
+void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 {
 	msg_db_r("write_ogg_file", 1);
 	tsunami->progress->Set(_("exportiere ogg"), 0);
@@ -188,7 +188,7 @@ void StorageOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 
 
-void StorageOgg::LoadAudio(AudioFile *a, const string & filename)
+void FormatOgg::LoadAudio(AudioFile *a, const string & filename)
 {
 	Track *t = a->AddEmptyTrack();
 	LoadTrack(t, filename);
@@ -196,7 +196,7 @@ void StorageOgg::LoadAudio(AudioFile *a, const string & filename)
 
 
 
-void StorageOgg::LoadTrack(Track *t, const string & filename)
+void FormatOgg::LoadTrack(Track *t, const string & filename)
 {
 	msg_db_r("Ogg.LoadTracl", 1);
 	tsunami->progress->Set(_("lade ogg"), 0);

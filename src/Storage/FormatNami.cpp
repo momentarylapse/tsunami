@@ -1,20 +1,20 @@
 /*
- * StorageNami.cpp
+ * FormatNami.cpp
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#include "StorageNami.h"
+#include "FormatNami.h"
 #include "../Tsunami.h"
 
 
-StorageNami::StorageNami() :
-	StorageAny("nami", FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS)
+FormatNami::FormatNami() :
+	Format("nami", FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS)
 {
 }
 
-StorageNami::~StorageNami()
+FormatNami::~FormatNami()
 {
 }
 
@@ -132,7 +132,7 @@ void WriteTrack(CFile *f, Track *t)
 	EndChunk(f);
 }
 
-void StorageNami::SaveAudio(AudioFile *a, const string & filename)
+void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 {
 	tsunami->progress->Start(_("speichere nami"), 0);
 	a->filename = filename;
@@ -165,7 +165,7 @@ void StorageNami::SaveAudio(AudioFile *a, const string & filename)
 
 
 
-void StorageNami::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatNami::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 }
 
@@ -564,7 +564,7 @@ void load_nami_file_new(CFile *f, AudioFile *a)
 
 
 
-void StorageNami::LoadAudio(AudioFile *a, const string & filename)
+void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_r("load_nami_file", 1);
 	tsunami->progress->Set(_("lade nami"), 0);
@@ -593,7 +593,7 @@ void StorageNami::LoadAudio(AudioFile *a, const string & filename)
 
 
 
-void StorageNami::LoadTrack(Track *t, const string & filename)
+void FormatNami::LoadTrack(Track *t, const string & filename)
 {
 }
 

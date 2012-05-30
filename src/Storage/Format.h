@@ -1,21 +1,21 @@
 /*
- * StorageAny.h
+ * Format.h
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#ifndef STORAGEANY_H_
-#define STORAGEANY_H_
+#ifndef FORMAT_H_
+#define FORMAT_H_
 
 #include "../Data/Track.h"
 #include "../Data/AudioFile.h"
 
-class StorageAny
+class Format
 {
 public:
-	StorageAny(const string &_extension, int _flags);
-	virtual ~StorageAny();
+	Format(const string &_extension, int _flags);
+	virtual ~Format();
 	bool CanHandle(const string &_extension);
 
 	void ImportData(Track *t, void *data, int channels, int bits, int samples, int offset);
@@ -38,4 +38,4 @@ public:
 	};
 };
 
-#endif /* STORAGEANY_H_ */
+#endif /* FORMAT_H_ */

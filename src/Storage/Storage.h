@@ -8,7 +8,7 @@
 #ifndef STORAGE_H_
 #define STORAGE_H_
 
-#include "StorageAny.h"
+#include "Format.h"
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 
@@ -23,7 +23,7 @@ public:
 	bool Save(AudioFile *a, const string &filename);
 	bool Export(AudioFile *a, const string &filename);
 
-	bool TestFormatCompatibility(AudioFile *a, StorageAny *f);
+	bool TestFormatCompatibility(AudioFile *a, Format *f);
 
 	bool AskByFlags(CHuiWindow *win, const string &title, bool save, int flags);
 
@@ -33,7 +33,7 @@ public:
 	bool AskSaveExport(CHuiWindow *win);
 
 private:
-	Array<StorageAny*> format;
+	Array<Format*> format;
 	string CurrentDirectory;
 };
 

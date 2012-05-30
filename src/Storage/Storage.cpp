@@ -5,20 +5,20 @@
  *      Author: michi
  */
 
-#include "Storage.h"
-#include "StorageWave.h"
-#include "StorageOgg.h"
-#include "StorageFlac.h"
-#include "StorageNami.h"
+#include "Format.h"
+#include "FormatWave.h"
+#include "FormatOgg.h"
+#include "FormatFlac.h"
+#include "FormatNami.h"
 #include "../Tsunami.h"
 #include "../lib/hui/hui.h"
 
 Storage::Storage()
 {
-	format.add(new StorageNami());
-	format.add(new StorageWave());
-	format.add(new StorageOgg());
-	format.add(new StorageFlac());
+	format.add(new FormatNami());
+	format.add(new FormatWave());
+	format.add(new FormatOgg());
+	format.add(new FormatFlac());
 
 	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
 }
@@ -195,7 +195,7 @@ bool Storage::Export(AudioFile *a, const string &filename)
 	return ok;
 }
 
-bool Storage::TestFormatCompatibility(AudioFile *a, StorageAny *f)
+bool Storage::TestFormatCompatibility(AudioFile *a, Format *f)
 {
 	int num_subs = 0;
 	int num_fx = a->fx.num;
@@ -204,13 +204,13 @@ bool Storage::TestFormatCompatibility(AudioFile *a, StorageAny *f)
 		num_fx += t.fx.num;
 	}
 
-	if ((a->track.num > 1) && ((f->flags & StorageAny::FLAG_MULTITRACK) == 0))
+	if ((a->track.num > 1) && ((f->flags & Format::FLAG_MULTITRACK) == 0))
 		return false;
 	/*if ((a->tag.num > 0) && ((f->flags & StorageAny::FLAG_TAGS) == 0))
 		return false;*/
-	if ((num_fx > 0) && ((f->flags & StorageAny::FLAG_FX) == 0))
+	if ((num_fx > 0) && ((f->flags & Format::FLAG_FX) == 0))
 		return false;
-	if ((num_subs > 0) && ((f->flags & StorageAny::FLAG_SUBS) == 0))
+	if ((num_subs > 0) && ((f->flags & Format::FLAG_SUBS) == 0))
 		return false;
 	return true;
 }
@@ -245,10 +245,10 @@ bool Storage::AskSave(CHuiWindow *win)
 
 bool Storage::AskOpenImport(CHuiWindow *win)
 {
-	return AskByFlags(win, _("Datei importieren"), false, StorageAny::FLAG_SINGLE_TRACK);
+	return AskByFlags(win, _("Datei importieren"), false, Format::FLAG_SINGLE_TRACK);
 }
 
 bool Storage::AskSaveExport(CHuiWindow *win)
 {
-	return AskByFlags(win, _("Datei exportieren"), true, StorageAny::FLAG_SINGLE_TRACK);
+	return AskByFlags(win, _("Datei exportieren"), true, Format::FLAG_SINGLE_TRACK);
 }

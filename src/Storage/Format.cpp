@@ -1,23 +1,23 @@
 /*
- * StorageAny.cpp
+ * Format.cpp
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#include "StorageAny.h"
+#include "Format.h"
 
-StorageAny::StorageAny(const string &_extension, int _flags)
+Format::Format(const string &_extension, int _flags)
 {
 	extension = _extension;
 	flags = _flags;
 }
 
-StorageAny::~StorageAny()
+Format::~Format()
 {
 }
 
-void StorageAny::ImportData(Track *t, void *data, int channels, int bits, int samples, int offset)
+void Format::ImportData(Track *t, void *data, int channels, int bits, int samples, int offset)
 {
 	msg_db_r("ImportData", 1);
 
@@ -28,7 +28,7 @@ void StorageAny::ImportData(Track *t, void *data, int channels, int bits, int sa
 }
 
 
-bool StorageAny::CanHandle(const string & _extension)
+bool Format::CanHandle(const string & _extension)
 {
 	return (extension == _extension);
 }

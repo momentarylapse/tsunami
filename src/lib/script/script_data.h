@@ -73,7 +73,7 @@ struct sType{
 
 	bool ForceCallByValue;
 	bool UsesCallByReference()
-	{	return (!ForceCallByValue) && ((IsArray) || (IsSuperArray) || (Element.num > 0));	}
+	{	return (!ForceCallByValue) && (!IsPointer) && ((IsArray) || (IsSuperArray) || (Element.num > 0));	}
 	int GetFunc(const string &name)
 	{
 		foreachi(Function, f, i)

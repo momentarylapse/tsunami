@@ -21,7 +21,7 @@
 	#include "../x/x.h"
 #endif
 
-string ScriptVersion = "0.10.1.1";
+string ScriptVersion = "0.10.1.2";
 
 //#define ScriptDebug
 
@@ -608,7 +608,7 @@ void OCAddInstruction(char *oc, int &ocs, int inst, int kind, void *param = NULL
 			else if (kind == KindRefToGlobal)
 				OCAddInstruction(oc, ocs, inMovEdxM, KindVarGlobal, param);
 			if (offset != 0)
-				OCAddInstruction(oc, ocs, inAddEdxM, KindConstant, (char*)offset);
+				OCAddInstruction(oc, ocs, inAddEdxM, KindConstant, (char*)(long)offset);
 			pk[m] = PKDerefRegister;
 			p[m] = (void*)RegEdx;
 		}else{
@@ -643,14 +643,14 @@ void OCAddEspAdd(char *oc,int &ocs,int d)
 {
 	if (d>0){
 		if (d>120)
-			AsmAddInstruction(oc, ocs, inst_add, PKRegister, (void*)RegEsp, PKConstant32, (void*)d);
+			AsmAddInstruction(oc, ocs, inst_add, PKRegister, (void*)RegEsp, PKConstant32, (void*)(long)d);
 		else
-			AsmAddInstruction(oc, ocs, inst_add_b, PKRegister, (void*)RegEsp, PKConstant8, (void*)d);
+			AsmAddInstruction(oc, ocs, inst_add_b, PKRegister, (void*)RegEsp, PKConstant8, (void*)(long)d);
 	}else if (d<0){
 		if (d<-120)
-			AsmAddInstruction(oc, ocs, inst_sub, PKRegister, (void*)RegEsp, PKConstant32, (void*)(-d));
+			AsmAddInstruction(oc, ocs, inst_sub, PKRegister, (void*)RegEsp, PKConstant32, (void*)(long)(-d));
 		else
-			AsmAddInstruction(oc, ocs, inst_sub_b, PKRegister, (void*)RegEsp, PKConstant8, (void*)(-d));
+			AsmAddInstruction(oc, ocs, inst_sub_b, PKRegister, (void*)RegEsp, PKConstant8, (void*)(long)(-d));
 	}
 }
 
@@ -755,7 +755,7 @@ void CScript::MapGlobalVariablesToMemory()
 	g_var.resize(pre_script->RootOfAllEvil.Var.num);
 	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++){
 		if (pre_script->FlagOverwriteVariablesOffset)
-			g_var[i] = (char*)(MemorySize + pre_script->VariablesOffset);
+			g_var[i] = (char*)(long)(MemorySize + pre_script->VariablesOffset);
 		else
 			g_var[i] = &Memory[MemorySize];
 		so(format("%d: %s", MemorySize, pre_script->RootOfAllEvil.Var[i].Name.c_str()));
@@ -785,7 +785,7 @@ void CScript::CompileOsEntryPoint()
 			int offset = 0;
 			if (pre_script->AsmMetaInfo)
 				offset = ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->CodeOrigin;
-			cnst[i] = (char*)(OpcodeSize + offset);
+			cnst[i] = (char*)(long)(OpcodeSize + offset);
 			int s = c.type->Size;
 			if (c.type == TypeString)
 				s = strlen(c.data) + 1;

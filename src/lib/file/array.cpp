@@ -206,7 +206,7 @@ bool DynamicArray::iterate(void *&p)
 
 	// still within list?
 	//msg_write(format("%d  %d  %d  %d", (int)p, (int)data, element_size, num));
-	dummy_summy = format("%d  %d  %d  %d", (int)p, (int)data, element_size, num);
+	dummy_summy = format("%d  %d  %d  %d", (int)(long)p, (int)(long)data, element_size, num);
 	if ((long)p < (long)data + element_size * num)
 		return true;
 	//msg_write("f");

@@ -43,11 +43,11 @@ void PluginManager::PopCurPlugin()
 	}
 }
 
-BufferBox TrackGetBuffers(Track *t, const Range &r)
+/*BufferBox TrackGetBuffers(Track *t, const Range &r)
 {	return t->GetBuffers(r);	}
 
 BufferBox TrackReadBuffers(Track *t, const Range &r)
-{	return t->ReadBuffers(r);	}
+{	return t->ReadBuffers(r);	}*/
 
 BufferBox AudioFileRender(AudioFile *a, const Range &r)
 {	return tsunami->renderer->RenderAudioFile(a, r);	}
@@ -97,8 +97,8 @@ void GlobalCaptureStart(int sample_rate, bool add_data)
 void GlobalCaptureStop()
 {	tsunami->input->CaptureStop();	}
 
-void GlobalBufferBoxClear(BufferBox *box)
-{	box->clear();	}
+/*void GlobalBufferBoxClear(BufferBox *box)
+{	box->clear();	}*/
 
 CHuiWindow *GlobalMainWin = NULL;
 
@@ -119,12 +119,13 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
 	ScriptLinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
 	ScriptLinkSemiExternalFunc("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
-	ScriptLinkSemiExternalFunc("TrackGetBuffers",	(void*)&TrackGetBuffers);
-	ScriptLinkSemiExternalFunc("TrackReadBuffers",	(void*)&TrackReadBuffers);
+	ScriptLinkSemiExternalFunc("Track.GetBuffers",	(void*)&Track::GetBuffers);
+	ScriptLinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
 //	ScriptLinkSemiExternalFunc("UpdatePeaks",	(void*)&UpdatePeaks);
 //	ScriptLinkSemiExternalFunc("ChangeAudioFile",(void*)&ChangeAudioFile);
 //	ScriptLinkSemiExternalFunc("ChangeTrack",	(void*)&ChangeTrack);
-	ScriptLinkSemiExternalFunc("BufferBoxClear",(void*)&GlobalBufferBoxClear);
+	ScriptLinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
+	ScriptLinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::operator=);
 	ScriptLinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
 	ScriptLinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
 	ScriptLinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
@@ -162,15 +163,15 @@ void PluginManager::AddPluginsToMenu()
 	ScriptInit();
 
 	// alle finden
-	int n = dir_search(HuiAppDirectoryStatic + "Plugins", "*.kaba", false);
+	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins", "*.kaba", false);
 	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
-	for (int i=0;i<n;i++)
-		if (dir_search_name[i] != "api.kaba"){
-			PluginFile.add(dir_search_name[i]);
+	foreach(list, e)
+		if (e.name != "api.kaba"){
+			PluginFile.add(e.name);
 		}
 
 	// "All - "..
-	n = 0;
+	int n = 0;
 	for (int i=0;i<PluginFile.num;i++)
 		if (PluginFile[i].find("All - ") == 0){
 			if (n == 0){
@@ -274,11 +275,11 @@ void PluginManager::InitFavorites(CHuiWindow *win)
 	string init = basename(cur_plugin->s->pre_script->Filename) + "___";
 
 	dir_create(HuiAppDirectory + "Plugins/Favorites");
-	int n = dir_search(HuiAppDirectory + "Plugins/Favorites", "*", false);
-	for (int i=0;i<n;i++){
-		if (dir_search_name[i].find(init) < 0)
+	Array<DirEntry> list = dir_search(HuiAppDirectory + "Plugins/Favorites", "*", false);
+	foreach(list, e){
+		if (e.name.find(init) < 0)
 			continue;
-		PluginFavoriteName.add(dir_search_name[i].substr(init.num, -1));
+		PluginFavoriteName.add(e.name.substr(init.num, -1));
 		win->AddString("favorite_list", PluginFavoriteName.back());
 	}
 
@@ -569,7 +570,7 @@ void PluginManager::ExportPluginData(Effect &fx)
 	fx.param.clear();
 	for (int i=0;i<cur_plugin->s->pre_script->RootOfAllEvil.Var.num;i++){
 		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
-		if (strcmp(t->Name, "PluginData") == 0){
+		if (t->Name == "PluginData"){
 			fx.param.resize(t->Element.num);
 			for (int j=0;j<t->Element.num;j++){
 				sClassElement *e = &t->Element[j];
@@ -586,7 +587,7 @@ void PluginManager::ImportPluginData(Effect &fx)
 	msg_db_r("ImportPluginData", 1);
 	for (int i=0;i<cur_plugin->s->pre_script->RootOfAllEvil.Var.num;i++){
 		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
-		if (strcmp(t->Name, "PluginData") == 0){
+		if (t->Name == "PluginData"){
 			for (int j=0;j<t->Element.num;j++){
 				sClassElement *e = &t->Element[j];
 				for (int k=0;k<fx.param.num;k++)
@@ -724,12 +725,18 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	return !s.s->Error;
 }
 
+typedef void process_track_func(BufferBox*, Track*);
+typedef void main_audiofile_func(AudioFile*);
+
 void PluginManager::PluginProcessTrack(CScript *s, Track *t, Range r)
 {
+	process_track_func *f = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track");
+	if (!f)
+		return;
 	msg_db_r("PluginProcessTrack", 1);
 	BufferBox buf = t->GetBuffers(r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, r);
-	s->ExecuteScriptFunction("ProcessTrack", &buf, t);
+	f(&buf, t);
 	t->root->Execute(a);
 	//t->UpdatePeaks();
 	msg_db_l(1);
@@ -746,6 +753,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 //		cur_audio->history->ChangeBegin();
 		PluginResetData();
 		if (PluginConfigure(false, true)){
+			main_audiofile_func *f = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			if (s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){
 				if (tsunami->cur_audio->used){
 					foreach(tsunami->cur_audio->track, t)
@@ -755,9 +763,9 @@ void PluginManager::ExecutePlugin(const string &filename)
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 				}
-			}else if (s->MatchFunction("main", "void", 1, "AudioFile*")){
+			}else if (f){
 				if (tsunami->cur_audio->used)
-					s->ExecuteScriptFunction("main", tsunami->cur_audio);
+					f(tsunami->cur_audio);
 				else
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 			}else{
@@ -808,9 +816,9 @@ void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect *fx)
 		// run
 		PluginResetData();
 		ImportPluginData(*fx);
-		if (cur_plugin->s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){
-			cur_plugin->s->ExecuteScriptFunction("ProcessTrack", &buf, t);
-		}
+		process_track_func *f = (process_track_func*)cur_plugin->s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track");
+		if (f)
+			f(&buf, t);
 		t->root->UpdateSelection();
 	}else{
 		if (cur_plugin->s)

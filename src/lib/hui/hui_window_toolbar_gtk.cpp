@@ -24,7 +24,7 @@ void CHuiWindow::ToolbarConfigure(bool text_enabled, bool large_icons)
 }
 
 // -> hui_window_control_gtk.cpp
-void NotifyWindowByWidget(CHuiWindow *win, GtkWidget *widget, const string &message = "");
+void NotifyWindowByWidget(CHuiWindow *win, GtkWidget *widget, const string &message = "", bool is_default = true);
 
 void OnGtkToolbarItemPress(GtkWidget *widget, gpointer data)
 {	NotifyWindowByWidget((CHuiWindow*)data, widget);	}

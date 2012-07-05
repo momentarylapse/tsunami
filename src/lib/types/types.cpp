@@ -72,7 +72,7 @@ float loopf(float f,float min,float max)
 		int n= (int)( (min-f) / d ) + 1;
 		return f + d * (float)n;
 	}
-	if (f>max){
+	if (f>=max){
 		int n= (int)( (f-max) / d ) + 1;
 		return f - d * (float)n;
 	}

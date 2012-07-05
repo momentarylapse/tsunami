@@ -21,15 +21,13 @@
 	#include "../x/x.h"
 #endif
 
-string ScriptVersion = "0.9.4.1";
+string ScriptVersion = "0.10.1.1";
 
 //#define ScriptDebug
 
 int GlobalWaitingMode;
 float GlobalTimeToWait;
 
-static char *GlobalOpcode = NULL;
-static int GlobalOpcodeSize;
 bool ScriptCompileSilently = false;
 bool ScriptShowCompilerStats = true;
 
@@ -262,12 +260,12 @@ void reset_script(CScript *s)
 	
 	s->ErrorLine = 0;
 	s->ErrorColumn = 0;
+	s->cur_func = NULL;
 	s->WaitingMode = 0;
 	s->TimeToWait = 0;
 	s->ShowCompilerStats = (!ScriptCompileSilently) && ScriptShowCompilerStats;
 	
 	s->pre_script = NULL;
-	s->user_data = NULL;
 
 	s->Opcode = NULL;
 	s->OpcodeSize = 0;
@@ -294,6 +292,7 @@ CScript::CScript(const string &filename, bool just_analyse)
 	ShowCompilerStats = (!ScriptCompileSilently) && ScriptShowCompilerStats;
 
 	pre_script = new CPreScript(filename,just_analyse);
+	pre_script->script = this;
 	ParserError = Error = pre_script->Error;
 	LinkerError = pre_script->IncludeLinkerError;
 	ErrorLine = pre_script->ErrorLine;
@@ -339,6 +338,8 @@ void CScript::DoErrorInternal(const string &str)
 	Error = true;
 	
 	ErrorMsg = "internal compiler error (Call Michi!): " + str;
+	if (cur_func)
+		ErrorMsg += " (in function '" + cur_func->Name  + "')";
 	ErrorMsgExt[0] = ErrorMsg;
 	ErrorMsgExt[1] = "";
 	ErrorLine = 0;
@@ -359,9 +360,8 @@ void CScript::SetVariable(const string &name, void *data)
 {
 	msg_db_r("SetVariable", 4);
 	//msg_write(name);
-	const char *cname = name.c_str();
 	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++)
-		if (strcmp(pre_script->RootOfAllEvil.Var[i].Name, cname) == 0){
+		if (pre_script->RootOfAllEvil.Var[i].Name == name){
 			/*msg_write("var");
 			msg_write(pre_script->RootOfAllEvil.Var[i].Type->Size);
 			msg_write((int)g_var[i]);*/
@@ -369,7 +369,7 @@ void CScript::SetVariable(const string &name, void *data)
 			msg_db_l(4);
 			return;
 		}
-	msg_error("CScript::SetVariable: variable " + name + " not found");
+	msg_error("CScript.SetVariable: variable " + name + " not found");
 	msg_db_l(4);
 }
 
@@ -659,7 +659,7 @@ void init_sub_super_array(CPreScript *ps, sFunction *f, sType *t, char* g_var, i
 	// direct
 	if (t->IsSuperArray){
 		if (g_var)
-			((CSuperArray*)(g_var + offset))->init_by_type(t->SubType);
+			((DynamicArray*)(g_var + offset))->init(t->SubType->Size);
 		if (f){}
 	}
 
@@ -677,53 +677,8 @@ void find_all_super_arrays(CPreScript *ps, sFunction *f, Array<char*> &g_var)
 		init_sub_super_array(ps, f, f->Var[i].Type, g_var[i], 0);
 }
 
-void FindVariableOffsets(CPreScript *p)
+void CScript::AllocateMemory()
 {
-	msg_db_r("FindVariableOffsets", 1);
-	for (int i=0;i<p->Function.num;i++){
-		sFunction *f = &p->Function[i];
-		f->_ParamSize = 8; // space for return value and eBP
-		if (f->Type->Size > 4)
-			f->_ParamSize += 4;
-		f->_VarSize = 0;
-		// parameters
-		for (int j=0;j<f->NumParams;j++){
-			int s = mem_align(f->Var[j].Type->Size);
-			f->Var[j]._Offset = f->_ParamSize;
-			f->_ParamSize += s;
-		}
-		// "real" local variables
-		for (int j=f->NumParams;j<f->Var.num;j++){
-			int s = mem_align(f->Var[j].Type->Size);
-			f->Var[j]._Offset = - f->_VarSize - s;
-			f->_VarSize += s;
-		}
-	}
-	msg_db_l(1);
-}
-
-extern void CompileSerialized(char *Opcode, int &OpcodeSize);
-
-// Opcode generieren
-void CScript::Compiler()
-{
-	int nf, OCORA;
-	if (Error)	return;
-	msg_db_r("Compiler",2);
-
-	FindVariableOffsets(pre_script);
-	
-	if (!Error)
-		pre_script->BreakDownComplicatedCommands();
-#ifdef ScriptDebug
-	pre_script->Show();
-#endif
-	
-	if (!Error)
-		pre_script->Simplify();
-	if (!Error)
-		pre_script->PreProcessor(this);
-
 	// get memory size needed
 	MemorySize = 0;
 	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++)
@@ -738,55 +693,24 @@ void CScript::Compiler()
 	}
 	if (MemorySize > 0)
 		Memory = new char[MemorySize];
+}
 
+void CScript::AllocateStack()
+{
 	// use your own stack if needed
 	//   wait() used -> needs to switch stacks ("tasks")
 	Stack = NULL;
-	for (int i=0;i<pre_script->Command.num;i++){
-		sCommand *cmd = pre_script->Command[i];
+	foreach(pre_script->Command, cmd){
 		if (cmd->Kind == KindCompilerFunction)
 			if ((cmd->LinkNr == CommandWait) || (cmd->LinkNr == CommandWaitRT) || (cmd->LinkNr == CommandWaitOneFrame)){
-				Stack=new char[ScriptStackSize];
+				Stack = new char[ScriptStackSize];
 				break;
 			}
 	}
+}
 
-	MemorySize = 0;
-	// global variables -> into Memory
-	so("glob.Var.");
-	g_var.resize(pre_script->RootOfAllEvil.Var.num);
-	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++){
-		if (pre_script->FlagOverwriteVariablesOffset)
-			g_var[i] = (char*)(MemorySize + pre_script->VariablesOffset);
-		else
-			g_var[i] = &Memory[MemorySize];
-		so(format("%d: %s", MemorySize, pre_script->RootOfAllEvil.Var[i].Name));
-		MemorySize += mem_align(pre_script->RootOfAllEvil.Var[i].Type->Size);
-	}
-	memset(Memory, 0, MemorySize); // reset all global variables to 0
-	// initialize global super arrays
-	find_all_super_arrays(pre_script, &pre_script->RootOfAllEvil, g_var);
-
-	// constants -> Memory
-	so("Konstanten");
-	cnst.resize(pre_script->Constant.num);
-	foreachi(pre_script->Constant, c, i){
-		cnst[i] = &Memory[MemorySize];
-		int s = c.type->Size;
-		if (c.type == TypeString){
-			// const string -> variable Laenge
-			s = strlen(pre_script->Constant[i].data) + 1;
-			
-			*(void**)&Memory[MemorySize] = &Memory[MemorySize + 16]; // .data
-			*(int*)&Memory[MemorySize + 4] = s - 1; // .num
-			*(int*)&Memory[MemorySize + 8] = 0; // .reserved
-			*(int*)&Memory[MemorySize + 12] = 1; // .item_size
-			MemorySize += 16;
-		}
-		memcpy(&Memory[MemorySize], (void*)c.data, s);
-		MemorySize += mem_align(s);
-	}
-
+void CScript::AllocateOpcode()
+{
 	// allocate some memory for the opcode......    has to be executable!!!   (important on amd64)
 #ifdef FILE_OS_WINDOWS
 	Opcode=(char*)VirtualAlloc(NULL,SCRIPT_MAX_OPCODE,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
@@ -799,130 +723,85 @@ void CScript::Compiler()
 		_do_error_int_("CScript:  could not allocate executable memory", 2,);
 	OpcodeSize=0;
 	ThreadOpcodeSize=0;
+}
 
-	
-	if (!Error)
-		pre_script->PreProcessorAddresses(this);
+void CScript::MapConstantsToMemory()
+{
+	// constants -> Memory
+	so("Konstanten");
+	cnst.resize(pre_script->Constant.num);
+	foreachi(pre_script->Constant, c, i){
+		cnst[i] = &Memory[MemorySize];
+		int s = c.type->Size;
+		if (c.type == TypeString){
+			// const string -> variable Laenge
+			s = strlen(pre_script->Constant[i].data) + 1;
 
+			*(void**)&Memory[MemorySize] = &Memory[MemorySize + 16]; // .data
+			*(int*)&Memory[MemorySize + 4] = s - 1; // .num
+			*(int*)&Memory[MemorySize + 8] = 0; // .reserved
+			*(int*)&Memory[MemorySize + 12] = 1; // .item_size
+			MemorySize += 16;
+		}
+		memcpy(&Memory[MemorySize], (void*)c.data, s);
+		MemorySize += mem_align(s);
+	}
+}
 
-	
-// compiling an operating system?
-//   -> create an entry point for execution... so we can just call Opcode like a function
-	sFunction *ff;
-	if ((pre_script->FlagCompileOS)||(pre_script->FlagCompileInitialRealMode)){
-		nf=-1;
-		foreachi(pre_script->Function, ff, index)
-			if (strcmp(ff.Name, "main") == 0)
-				nf = index;
-		// call
-		if (nf>=0)
-			OCAddInstruction(Opcode,OpcodeSize,inCallRel32,KindConstant,NULL);
-		TaskReturnOffset=OpcodeSize;
-		OCORA=OCOParam;
+void CScript::MapGlobalVariablesToMemory()
+{
+	// global variables -> into Memory
+	so("glob.Var.");
+	g_var.resize(pre_script->RootOfAllEvil.Var.num);
+	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++){
+		if (pre_script->FlagOverwriteVariablesOffset)
+			g_var[i] = (char*)(MemorySize + pre_script->VariablesOffset);
+		else
+			g_var[i] = &Memory[MemorySize];
+		so(format("%d: %s", MemorySize, pre_script->RootOfAllEvil.Var[i].Name.c_str()));
+		MemorySize += mem_align(pre_script->RootOfAllEvil.Var[i].Type->Size);
+	}
+	memset(Memory, 0, MemorySize); // reset all global variables to 0
+	// initialize global super arrays
+	find_all_super_arrays(pre_script, &pre_script->RootOfAllEvil, g_var);
+}
 
-		// put strings into Opcode!
-		foreachi(pre_script->Constant, c, i){
-			if ((pre_script->FlagCompileOS) || (c.type == TypeString)){
-				int offset = 0;
-				if (pre_script->AsmMetaInfo)
-					offset = ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->CodeOrigin;
-				cnst[i] = (char*)(OpcodeSize + offset);
-				int s = c.type->Size;
-				if (c.type == TypeString)
-					s = strlen(c.data) + 1;
-				memcpy(&Opcode[OpcodeSize], (void*)c.data, s);
-				OpcodeSize += s;
-			}
+static int OCORA;
+void CScript::CompileOsEntryPoint()
+{
+	int nf=-1;
+	foreachi(pre_script->Function, ff, index)
+		if (ff->Name == "main")
+			nf = index;
+	// call
+	if (nf>=0)
+		OCAddInstruction(Opcode,OpcodeSize,inCallRel32,KindConstant,NULL);
+	TaskReturnOffset=OpcodeSize;
+	OCORA=OCOParam;
+
+	// put strings into Opcode!
+	foreachi(pre_script->Constant, c, i){
+		if ((pre_script->FlagCompileOS) || (c.type == TypeString)){
+			int offset = 0;
+			if (pre_script->AsmMetaInfo)
+				offset = ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->CodeOrigin;
+			cnst[i] = (char*)(OpcodeSize + offset);
+			int s = c.type->Size;
+			if (c.type == TypeString)
+				s = strlen(c.data) + 1;
+			memcpy(&Opcode[OpcodeSize], (void*)c.data, s);
+			OpcodeSize += s;
 		}
 	}
+}
 
-
-// compile functions into Opcode
-	so("Funktionen");
-	func.resize(pre_script->Function.num);
-	foreachi(pre_script->Function, ff, i){
-		right();
-		func[i] = (t_func*)&Opcode[OpcodeSize];
-		SerializeFunction(&ff);
-
-		CompileSerialized(Opcode, OpcodeSize);
-		left();
-	}
-	if (!Error)
-		if (pre_script->AsmMetaInfo)
-			if (((sAsmMetaInfo*)pre_script->AsmMetaInfo)->WantedLabel.num > 0)
-				_do_error_(format("unknown name in assembler code:  \"%s\"", ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->WantedLabel[0].Name), 2,);
-
-	/*CFile *oo = FileCreate("o");
-	oo->WriteStrL(Opcode, OpcodeSize);
-	FileClose(oo);*/
-
-	// "stack" usage for waiting:
-	//  -4 - ebp (before execution)
-	//  -8 - ebp (script continue)
-	// -12 - esp (script continue)
-	// -16 - eip (script continue)
-	// -20 - script stack...
-
-
-// "task" for the first execution of main() -> ThreadOpcode
-	if (!pre_script->FlagCompileOS){
-		first_execution=(t_func*)&ThreadOpcode[ThreadOpcodeSize];
-		// intro
-		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // within the actual program
-		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
-		if (Stack){
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,(char*)&Stack[ScriptStackSize]); // zum Anfang des Script-Stacks
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // adress of the old stack
-			OCAddEspAdd(ThreadOpcode,ThreadOpcodeSize,-12); // space for wait() task data
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEaxM,KindConstant,(char*)WaitingModeNone); // "reset"
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovMEax,KindVarGlobal,(char*)&WaitingMode);
-		}
-		// call
-		nf = -1;
-		foreachi(pre_script->Function, ff, index){
-			if (strcmp(ff.Name, "main") == 0)
-				if (ff.NumParams == 0)
-					nf = index;
-		}
-		if (nf >= 0){
-			// call main() ...correct adress will be put here later!
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inCallRel32,KindConstant,NULL);
-			*(int*)&ThreadOpcode[OCOParam]=((long)func[nf]-(long)&ThreadOpcode[ThreadOpcodeSize]);
-		}
-		// outro
-		if (Stack){
-			OCAddEspAdd(ThreadOpcode,ThreadOpcodeSize,12); // make space for wait() task data
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPopEsp,-1);
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
-		}
-		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inLeave,-1);
-		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inRet,-1);
-
-	// "task" for execution after some wait()
-		continue_execution=(t_func*)&ThreadOpcode[ThreadOpcodeSize];
-		// Intro
-		if (Stack){
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // within the external program
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovMEbp,KindVarGlobal,&Stack[ScriptStackSize-4]); // save the external ebp
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,&Stack[ScriptStackSize-16]); // to the eIP of the script
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPopEax,-1);
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inAddEaxM,KindConstant,(char*)AfterWaitOCSize);
-			OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inJmpEax,-1);
-			//OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inLeave,-1);
-			//OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inRet,-1);
-			/*OCAddChar(0x90);
-			OCAddChar(0x90);
-			OCAddChar(0x90);*/
-		}
-	}
-
-
-
-
-	if ((pre_script->FlagCompileOS)&&(nf>=0)){
+void CScript::LinkOsEntryPoint()
+{
+	int nf=-1;
+	foreachi(pre_script->Function, ff, index)
+		if (ff->Name == "main")
+			nf = index;
+	if (nf>=0){
 		int lll=((long)func[nf]-(long)&Opcode[TaskReturnOffset]);
 		if (pre_script->FlagCompileInitialRealMode)
 			lll+=5;
@@ -933,6 +812,135 @@ void CScript::Compiler()
 		//msg_write(d2h(&lll,4,false));
 		*(int*)&Opcode[OCORA]=lll;
 	}
+}
+
+void CScript::CompileTaskEntryPoint()
+{
+	// "stack" usage for waiting:
+	//  -4 - ebp (before execution)
+	//  -8 - ebp (script continue)
+	// -12 - esp (script continue)
+	// -16 - eip (script continue)
+	// -20 - script stack...
+
+	first_execution=(t_func*)&ThreadOpcode[ThreadOpcodeSize];
+	// intro
+	OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // within the actual program
+	OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
+	if (Stack){
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,(char*)&Stack[ScriptStackSize]); // zum Anfang des Script-Stacks
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // adress of the old stack
+		OCAddEspAdd(ThreadOpcode,ThreadOpcodeSize,-12); // space for wait() task data
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEaxM,KindConstant,(char*)WaitingModeNone); // "reset"
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovMEax,KindVarGlobal,(char*)&WaitingMode);
+	}
+	// call
+	int nf = -1;
+	foreachi(pre_script->Function, ff, index){
+		if (ff->Name == "main")
+			if (ff->NumParams == 0)
+				nf = index;
+	}
+	if (nf >= 0){
+		// call main() ...correct adress will be put here later!
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inCallRel32,KindConstant,NULL);
+		*(int*)&ThreadOpcode[OCOParam]=((long)func[nf]-(long)&ThreadOpcode[ThreadOpcodeSize]);
+	}
+	// outro
+	if (Stack){
+		OCAddEspAdd(ThreadOpcode,ThreadOpcodeSize,12); // make space for wait() task data
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPopEsp,-1);
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
+	}
+	OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inLeave,-1);
+	OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inRet,-1);
+
+// "task" for execution after some wait()
+	continue_execution=(t_func*)&ThreadOpcode[ThreadOpcodeSize];
+	// Intro
+	if (Stack){
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // within the external program
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovMEbp,KindVarGlobal,&Stack[ScriptStackSize-4]); // save the external ebp
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,&Stack[ScriptStackSize-16]); // to the eIP of the script
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPopEax,-1);
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inAddEaxM,KindConstant,(char*)AfterWaitOCSize);
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inJmpEax,-1);
+		//OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inLeave,-1);
+		//OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inRet,-1);
+		/*OCAddChar(0x90);
+		OCAddChar(0x90);
+		OCAddChar(0x90);*/
+	}
+}
+
+// Opcode generieren
+void CScript::Compiler()
+{
+	if (Error)	return;
+	msg_db_r("Compiler",2);
+
+	pre_script->MapLocalVariablesToStack();
+	
+	if (!Error)
+		pre_script->BreakDownComplicatedCommands();
+#ifdef ScriptDebug
+	pre_script->Show();
+#endif
+	
+	if (!Error)
+		pre_script->Simplify();
+	if (!Error)
+		pre_script->PreProcessor(this);
+
+
+	AllocateMemory();
+	AllocateStack();
+
+	MemorySize = 0;
+	MapGlobalVariablesToMemory();
+	MapConstantsToMemory();
+
+	AllocateOpcode();
+
+	
+	if (!Error)
+		pre_script->PreProcessorAddresses(this);
+
+
+	
+// compiling an operating system?
+//   -> create an entry point for execution... so we can just call Opcode like a function
+	if ((pre_script->FlagCompileOS)||(pre_script->FlagCompileInitialRealMode))
+		CompileOsEntryPoint();
+
+
+// compile functions into Opcode
+	so("Funktionen");
+	func.resize(pre_script->Function.num);
+	foreachi(pre_script->Function, f, i){
+		right();
+		func[i] = (t_func*)&Opcode[OpcodeSize];
+		CompileFunction(f, Opcode, OpcodeSize);
+		left();
+
+		if (!Error)
+			if (pre_script->AsmMetaInfo)
+				if (((sAsmMetaInfo*)pre_script->AsmMetaInfo)->WantedLabel.num > 0)
+					_do_error_(format("unknown name in assembler code:  \"%s\"", ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->WantedLabel[0].Name.c_str()), 2,);
+	}
+
+
+// "task" for the first execution of main() -> ThreadOpcode
+	if (!pre_script->FlagCompileOS)
+		CompileTaskEntryPoint();
+
+
+
+
+	if (pre_script->FlagCompileOS)
+		LinkOsEntryPoint();
 
 	//msg_db_out(1,GetAsm(Opcode,OpcodeSize));
 
@@ -955,6 +963,7 @@ CScript::CScript()
 	WaitingMode = WaitingModeFirst;
 
 	pre_script = new CPreScript();
+	pre_script->script = this;
 	
 	pre_script->Filename = "-console script-";
 
@@ -984,8 +993,6 @@ CScript::~CScript()
 	}
 	if (Stack)
 		delete[](Stack);
-	g_var.clear();
-	cnst.clear();
 	//msg_write(string2("-----------            Memory:         %p",Memory));
 	delete(pre_script);
 	msg_db_l(4);
@@ -1021,13 +1028,13 @@ void ExecuteSingleScriptCommand(const string &cmd)
 // analyse syntax
 
 	// create a main() function
-	int func = ps->AddFunction("main", TypeVoid);
-	sFunction *f = &ps->Function[func];
+	sFunction *f = ps->AddFunction("--command-func--", TypeVoid);
 	f->_VarSize = 0; // set to -1...
 
 	// parse
 	ps->Exp.cur_line = &ps->Exp.line[0];
 	ps->Exp.cur_exp = 0;
+	ps->Exp._cur_ = ps->Exp.cur_line->exp[ps->Exp.cur_exp].name;
 	ps->GetCompleteCommand(f->Block, f);
 	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&f);
 	s->Error |= ps->Error;
@@ -1045,8 +1052,12 @@ void ExecuteSingleScriptCommand(const string &cmd)
 		//msg_write(Opcode2Asm(Opcode,OpcodeSize));
 	}*/
 // execute
-	if (!s->Error)
-		s->Execute();
+	if (!s->Error){
+		typedef void void_func();
+		void_func *f = (void_func*)s->MatchFunction("--command-func--", "void", 0);
+		if (f)
+			f();
+	}
 
 	delete(s);
 	msg_db_l(2);
@@ -1059,110 +1070,31 @@ void *CScript::MatchFunction(const string &name, const string &return_type, int 
 	// process argument list
 	va_list marker;
 	va_start(marker, num_params);
-	char *param_type[SCRIPT_MAX_PARAMS];
+	string param_type[SCRIPT_MAX_PARAMS];
 	for (int p=0;p<num_params;p++)
-		param_type[p] = va_arg(marker, char*);
+		param_type[p] = string(va_arg(marker, char*));
 	va_end(marker);
 
 	// match
-	for (int i=0;i<pre_script->Function.num;i++)
-		if (name == pre_script->Function[i].Name)
-			if (num_params == pre_script->Function[i].NumParams){
+	foreachi(pre_script->Function, f, i)
+		if ((f->Name == name) && (f->LiteralType->Name == return_type) && (num_params == f->NumParams)){
 
-				bool params_ok = true;
-				for (int j=0;j<num_params;j++)
-					if (pre_script->Function[i].Var[j].Type->Name == param_type[j])
-						params_ok = false;
-				if (params_ok){
-					msg_db_l(2);
-					if (func.num > 0)
-						return (void*)func[i];
-					else
-						return (void*)0xdeadbeaf;
-				}
+			bool params_ok = true;
+			for (int j=0;j<num_params;j++)
+				//if (f->Var[j].Type->Name != param_type[j])
+				if (f->LiteralParamType[j]->Name != param_type[j])
+					params_ok = false;
+			if (params_ok){
+				msg_db_l(2);
+				if (func.num > 0)
+					return (void*)func[i];
+				else
+					return (void*)NULL;//0xdeadbeaf;
 			}
+		}
 
 	msg_db_l(2);
 	return NULL;
-}
-
-bool CScript::ExecuteScriptFunction(const string &name,...)
-{
-	msg_db_m("-ExecuteScriptFunction",2);
-	msg_db_m(name.c_str(),2);
-	msg_db_m(pre_script->Filename.c_str(),2);
-
-	const char *cname = name.c_str();
-
-	if ((pre_script->GetExistence(cname, &pre_script->RootOfAllEvil))&&(pre_script->GetExistenceLink.Kind==KindFunction)){
-
-		sFunction *f=&pre_script->Function[pre_script->GetExistenceLink.LinkNr];
-
-		if (f->NumParams==0)
-			// no arguments -> directly execute function
-			func[pre_script->GetExistenceLink.LinkNr]();
-		else{
-
-			// compile a function (with no arguments) that calls the function we actually want
-			// to call and that pushes the given arguments onto the stack before
-
-			// process argument list
-			va_list marker;
-			va_start(marker,name);
-			char *param[SCRIPT_MAX_PARAMS];
-			int pk[SCRIPT_MAX_PARAMS];
-			for (int p=0;p<f->NumParams;p++){
-				param[p]=va_arg(marker,char*);
-				pk[p]=KindVarGlobal;
-				if ((f->Var[p].Type->IsPointer) || (f->Var[p].Type == TypeInt)) // TODO
-					pk[p]=KindConstant;
-			}
-			va_end(marker);
-
-			if (!GlobalOpcode){
-				#ifdef FILE_OS_WINDOWS
-					GlobalOpcode=(char*)VirtualAlloc(0,SCRIPT_MAX_OPCODE,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
-				#else
-					GlobalOpcode=(char*)mmap(0,SCRIPT_MAX_OPCODE,PROT_READ|PROT_WRITE|PROT_EXEC,MAP_SHARED|MAP_ANON,0,0);
-				#endif
-				if ((long)GlobalOpcode==-1){
-					GlobalOpcode=NULL;
-					DoErrorInternal("CScript:  could not allocate executable memory (single command)");
-					return false;
-				}
-			}
-
-			GlobalOpcodeSize=0;
-			t_func *code=(t_func*)GlobalOpcode;
-
-			// intro
-			OCAddInstruction(GlobalOpcode,GlobalOpcodeSize,inPushEbp,-1);
-			OCAddInstruction(GlobalOpcode,GlobalOpcodeSize,inMovEbpEsp,-1);
-
-			// decrease stack by the size of the local variables/parameters of our function
-			int dp=0;
-			for (int p=f->NumParams-1;p>=0;p--){
-				int s = mem_align(f->Var[p].Type->Size);
-				// push parameters onto the stack
-				for (int j=0;j<s/4;j++)
-					OCAddInstruction(GlobalOpcode,GlobalOpcodeSize,inPushM,pk[p],param[p],s-4-j*4);
-				dp += s;
-			}
-
-			// the actual call
-			OCAddInstruction(GlobalOpcode,GlobalOpcodeSize,inCallRel32,KindConstant,(char*)((long)func[pre_script->GetExistenceLink.LinkNr]-(long)&GlobalOpcode[GlobalOpcodeSize]-5));
-			OCAddEspAdd(GlobalOpcode,GlobalOpcodeSize,dp+8);
-
-			OCAddInstruction(GlobalOpcode,GlobalOpcodeSize,inLeave,-1);
-			OCAddInstruction(GlobalOpcode,GlobalOpcodeSize,inRet,-1);
-
-			// finally execute!
-			code();
-		}
-		return true;
-	}
-	//msg_ok();
-	return false;
 }
 
 void CScript::ShowVars(bool include_consts)

@@ -1,0 +1,79 @@
+#include "api.kaba"
+
+const int SAMPLES = 1024
+const int NUM_FREQS = 512
+const float QUANT_FACTOR = 80.0
+
+window win
+
+float r[], r2[], d[]
+float dmax
+complex c[]
+
+void OnDraw()
+	context c = win.BeginDraw("area")
+	c.SetColor(White)
+	c.DrawRect(0, 0, c.width, c.height)
+	c.SetColor(Black)
+	for int i, 1, 1024
+		c.DrawLine(i - 1, r[i - 1] * 100 + 100, i, r[i] * 100 + 100)
+	c.SetColor(Blue)
+	for int i, 1, 1024
+		c.DrawLine(i - 1, r2[i - 1] * 100 + 100, i, r2[i] * 100 + 100)
+	c.SetColor(Red)
+	for int i, 1, 1024
+		c.DrawLine(i - 1, d[i - 1] * 100 + 100, i, d[i] * 100 + 100)
+	c.DrawStr(10, 10, f2s(dmax, 6))
+	c.End()
+
+file fout
+
+complex quant(complex z)
+	int a = f2i(z.x * QUANT_FACTOR)
+	int b = f2i(z.y * QUANT_FACTOR)
+	fout.WriteInt(a)
+	fout.WriteInt(b)
+	complex r = complex(i2f(a), i2f(b))
+	print r
+	return r
+
+void quantize(complex cc[])
+	for int i, 0, NUM_FREQS
+		cc[i] = quant(cc[i])
+	for int i, NUM_FREQS, cc.num
+		cc[i] = complex(0, 0)
+	
+
+void main()
+	file f = FileOpen("ooo")
+	f.SetBinaryMode(true)
+	for int i, 0, SAMPLES
+		r.add(f.ReadFloat())
+		f.ReadFloat()
+	FileClose(f)
+	
+	fout = FileCreate("comp_out")
+	fout.SetBinaryMode(true)
+	
+	fft_r2c(r, c)
+	quantize(c)
+	fft_c2r_inv(c, r2)
+	r2 *= 1.0 / SAMPLES / QUANT_FACTOR
+	d = r
+	d -= r2
+	dmax = 0
+	for int i, 0, d.num
+		if abs(d[i]) > dmax
+			dmax = abs(d[i])
+		fout.WriteInt(f2i(d[i] * 32768))
+	
+	FileClose(fout)
+
+	win = HuiCreateSizableDialog("test", 800, 600, MainWin, false)
+	win.AddDrawingArea("", 0, 0, 0, 0, "area")
+	win.Update()
+	
+	win.EventX("area", "hui:redraw", &OnDraw)
+	
+	HuiWaitTillWindowClosed(win)
+	

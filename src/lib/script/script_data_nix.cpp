@@ -36,6 +36,7 @@ void SIAddPackageNix()
 		func_add_param("filename",		TypeString);
 	
 		// user input
+	add_func("NixUpdateInput",			TypeVoid,	nix_p(&NixUpdateInput));
 	add_func("GetKey",								TypeBool,	nix_p(&NixGetKey));
 		func_add_param("id",		TypeInt);
 	add_func("GetKeyDown",								TypeBool,	nix_p(&NixGetKeyDown));

@@ -52,6 +52,14 @@ public:
 	}
 	friend quaternion operator * (float f,const quaternion &q)
 	{	return q*f;	}
+	string str()
+	{	return format("(%f, %f, %f, %f)", x, y, z, w);	}
+
+	// kaba
+	void imul(const quaternion &q)
+	{	*this = (*this) * q;	}
+	quaternion mul(const quaternion &q) const
+	{	return (*this) * q;	}
 };
 // qaternions
 void _cdecl QuaternionRotationA(quaternion &q, const vector &axis, float w);

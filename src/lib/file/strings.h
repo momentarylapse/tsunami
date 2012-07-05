@@ -16,6 +16,7 @@ class string : public DynamicArray
 	string(const string &s);
 	string(const char *str);
 	string(const char *str, int l);
+	void __init__();
 	~string();
 
 	// functions
@@ -64,10 +65,22 @@ class string : public DynamicArray
 	}
 	bool operator != (const string &s) const
 	{	return !(*this == s);	}
+	bool operator < (const string &s) const
+	{	return compare(s) < 0;	}
+	bool operator > (const string &s) const
+	{	return compare(s) > 0;	}
+	bool operator <= (const string &s) const
+	{	return compare(s) <= 0;	}
+	bool operator >= (const string &s) const
+	{	return compare(s) >= 0;	}
 	char operator[] (int index) const
 	{	return ((char*)data)[index];	}
 	char &operator[] (int index)
 	{	return ((char*)data)[index];	}
+	char &back()
+	{	return (*this)[num - 1];	}
+	char back() const
+	{	return (*this)[num - 1];	}
 };
 
 
@@ -81,9 +94,6 @@ string i2s2(int i, int l);
 string f2s(float f, int dez);
 string f2sf(float f);
 string b2s(bool b);
-string ffff2s(float *f);
-string fff2s(float *f);
-string ff2s(float *f);
 string p2s(void *p);
 string ia2s(const Array<int> &a);
 string fa2s(const Array<float> &a);

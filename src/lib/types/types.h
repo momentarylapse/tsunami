@@ -32,6 +32,7 @@ struct quaternion;
 #include "plane.h"
 #include "rect.h"
 #include "complex.h"
+#include "interpolation.h"
 
 
 

@@ -18,40 +18,27 @@ extern void script_db_left();
 
 //#ifdef ScriptDebug
 
+bool UseConstAsGlobalVar = false;
+
 
 extern int GlobalWaitingMode;
 extern float GlobalTimeToWait;
 
-static Array<sSerialCommand> cmd;
-static int NumMarkers;
-extern CScript *cur_script;
-static sFunction *cur_func;
-static bool call_used;
-static int LastCommandSize;
-static sCommand *NextCommand;
-static bool TempVarRangesDefined;
 
-
-static Array<int> MapReg;
 struct sRegChannel
 {
 	int reg;
 	int first, last;
 };
-static Array<sRegChannel> RegChannel;
-inline void add_reg_channel(int reg, int first, int last)
-{
-	sRegChannel c = {reg, first, last};
-	RegChannel.add(c);
-}
 #define max_reg		8 // >= all RegXXX used...
-bool RegUsed[max_reg];
 
-inline bool is_reg_used_in_interval(int reg, int first, int last);
+
+inline bool is_reg_used_in_interval(SerializerData *d, int reg, int first, int last);
 
 enum{
 	inst_marker = 1000,
 	inst_asm,
+	inst_end,
 };
 
 struct sLoopData
@@ -59,12 +46,9 @@ struct sLoopData
 	int marker_continue, marker_break;
 	int level, index;
 };
-Array<sLoopData> LoopData;
 
 static sSerialCommandParam p_eax, p_eax_int, p_deref_eax, p_ax, p_al, p_ah, p_al_bool, p_al_char, p_st0, p_st1;
 static const sSerialCommandParam p_none = {-1, NULL, NULL, 0};
-
-static int StackOffset, StackMaxSize;
 
 struct sTempVar
 {
@@ -74,25 +58,64 @@ struct sTempVar
 	int entangled;
 };
 
-void add_cmd_constructor(sSerialCommandParam &param, bool is_temp);
+struct sStuffToAdd
+{
+	int kind, marker, level, index;
+};
 
-static Array<sTempVar> TempVar;
-inline void add_temp(sType *t, sSerialCommandParam &param)
+enum{
+	StuffKindMarker,
+	StuffKindJump,
+};
+
+
+struct SerializerData
+{
+	Array<sSerialCommand> cmd;
+	int NumMarkers;
+	CScript *cur_script;
+	sFunction *cur_func;
+	bool call_used;
+	int LastCommandSize;
+	sCommand *NextCommand;
+	bool TempVarRangesDefined;
+
+	Array<int> MapReg;
+	Array<sRegChannel> RegChannel;
+
+	bool RegUsed[max_reg];
+	Array<sLoopData> LoopData;
+
+	int StackOffset, StackMaxSize;
+	Array<sTempVar> TempVar;
+
+	Array<sStuffToAdd> StuffToAdd;
+};
+
+inline void add_reg_channel(SerializerData *d, int reg, int first, int last)
+{
+	sRegChannel c = {reg, first, last};
+	d->RegChannel.add(c);
+}
+
+void add_cmd_constructor(SerializerData *d, sSerialCommandParam &param, bool is_temp);
+
+inline void add_temp(SerializerData *d, sType *t, sSerialCommandParam &param)
 {
 	if (t != TypeVoid){
 		sTempVar v;
 		v.type = t;
 		v.referenced = (t->IsSuperArray);
 		v.entangled = 0;
-		TempVar.add(v);
+		d->TempVar.add(v);
 		param.kind = KindVarTemp;
-		param.p = (char*)(TempVar.num - 1);
+		param.p = (char*)(d->TempVar.num - 1);
 		param.type = t;
 		param.shift = 0;
 		
 
-		if (t->IsSuperArray)
-			add_cmd_constructor(param, true);
+		if (t->Element.num > 0)
+			add_cmd_constructor(d, param, true);
 	}else{
 		param = p_none;
 	}
@@ -102,8 +125,8 @@ inline sType *get_subtype(sType *t)
 {
 	if (t->SubType)
 		return t->SubType;
-	msg_error(format("subtype wanted of... %s", t->Name));
-	msg_write(cur_func->Name);
+	msg_error("subtype wanted of... " + t->Name);
+	//msg_write(cur_func->Name);
 	return TypeUnknown;
 }
 
@@ -180,7 +203,7 @@ inline void param_out(string &str, sSerialCommandParam &p)
 {
 	//msg_db_r("param_out", 4);
 	if (p.kind >= 0){
-		str += format("   %s %p (%s)", Kind2Str(p.kind).c_str(), p.p, p.type->Name);
+		str += format("   %s %p (%s)", Kind2Str(p.kind).c_str(), p.p, p.type->Name.c_str());
 		if (p.shift > 0)
 			str += format(" + shift %d", p.shift);
 	}
@@ -227,108 +250,108 @@ void cmd_list_out()
 #endif
 }
 
-inline void add_cmd(int inst, sSerialCommandParam p1, sSerialCommandParam p2)
+inline void add_cmd(SerializerData *d, int inst, sSerialCommandParam p1, sSerialCommandParam p2)
 {
 	sSerialCommand c;
 	c.inst = inst;
 	c.p1 = p1;
 	c.p2 = p2;
-	cmd.add(c);
+	d->cmd.add(c);
 
 	// call violates all used registers...
 	if (inst == inst_call)
-		for (int i=0;i<MapReg.num;i++)
-			add_reg_channel(MapReg[i], cmd.num - 1, cmd.num - 1);
+		for (int i=0;i<d->MapReg.num;i++)
+			add_reg_channel(d, d->MapReg[i], d->cmd.num - 1, d->cmd.num - 1);
 }
 
-inline void add_cmd(int inst, sSerialCommandParam p)
+inline void add_cmd(SerializerData *d, int inst, sSerialCommandParam p)
 {
-	add_cmd(inst, p, p_none);
+	add_cmd(d, inst, p, p_none);
 }
 
-inline void add_cmd(int inst)
+inline void add_cmd(SerializerData *d, int inst)
 {
-	add_cmd(inst, p_none, p_none);
+	add_cmd(d, inst, p_none, p_none);
 }
 
-inline void move_last_cmd(int index)
+inline void move_last_cmd(SerializerData *d, int index)
 {
-	sSerialCommand c = cmd.back();
-	for (int i=cmd.num-1;i>index;i--)
-		cmd[i] = cmd[i - 1];
-	cmd[index] = c;
+	sSerialCommand c = d->cmd.back();
+	for (int i=d->cmd.num-1;i>index;i--)
+		d->cmd[i] = d->cmd[i - 1];
+	d->cmd[index] = c;
 
 	// adjust temp vars
-	if (TempVarRangesDefined)
-		for (int i=0;i<TempVar.num;i++){
-			if (TempVar[i].first >= index)
-				TempVar[i].first ++;
-			if (TempVar[i].last >= index)
-				TempVar[i].last ++;
+	if (d->TempVarRangesDefined)
+		foreach(d->TempVar, v){
+			if (v.first >= index)
+				v.first ++;
+			if (v.last >= index)
+				v.last ++;
 		}
 
 	// adjust reg channels
-	for (int i=0;i<RegChannel.num;i++){
-		if (RegChannel[i].first >= index)
-			RegChannel[i].first ++;
-		if (RegChannel[i].last >= index)
-			RegChannel[i].last ++;
+	foreach(d->RegChannel, r){
+		if (r.first >= index)
+			r.first ++;
+		if (r.last >= index)
+			r.last ++;
 	}
 }
 
-inline void remove_cmd(int index)
+inline void remove_cmd(SerializerData *d, int index)
 {
-	cmd.erase(index);
+	d->cmd.erase(index);
 
 	// adjust temp vars
-	for (int i=0;i<TempVar.num;i++){
-		if (TempVar[i].first >= index)
-			TempVar[i].first --;
-		if (TempVar[i].last >= index)
-			TempVar[i].last --;
+	foreach(d->TempVar, v){
+		if (v.first >= index)
+			v.first --;
+		if (v.last >= index)
+			v.last --;
 	}
 
 	// adjust reg channels
-	for (int i=0;i<RegChannel.num;i++){
-		if (RegChannel[i].first >= index)
-			RegChannel[i].first --;
-		if (RegChannel[i].last >= index)
-			RegChannel[i].last --;
+	foreach(d->RegChannel, r){
+		if (r.first >= index)
+			r.first --;
+		if (r.last >= index)
+			r.last --;
 	}
 }
 
-inline void remove_temp_var(int v)
+inline void remove_temp_var(SerializerData *d, int v)
 {
-	for (int i=0;i<cmd.num;i++){
-		if ((cmd[i].p1.kind == KindVarTemp) || (cmd[i].p1.kind == KindDerefVarTemp))
-			if ((long)cmd[i].p1.p > v)
-				cmd[i].p1.p = (char*)((long)cmd[i].p1.p - 1);
-		if ((cmd[i].p2.kind == KindVarTemp) || (cmd[i].p2.kind == KindDerefVarTemp))
-			if ((long)cmd[i].p2.p > v)
-				cmd[i].p2.p = (char*)((long)cmd[i].p2.p - 1);
+	foreach(d->cmd, c){
+		if ((c.p1.kind == KindVarTemp) || (c.p1.kind == KindDerefVarTemp))
+			if ((long)c.p1.p > v)
+				c.p1.p = (char*)((long)c.p1.p - 1);
+		if ((c.p2.kind == KindVarTemp) || (c.p2.kind == KindDerefVarTemp))
+			if ((long)c.p2.p > v)
+				c.p2.p = (char*)((long)c.p2.p - 1);
 	}
-	TempVar.erase(v);
+	d->TempVar.erase(v);
 }
 
-inline void move_param(sSerialCommandParam &p, int from, int to)
+inline void move_param(SerializerData *d, sSerialCommandParam &p, int from, int to)
 {
 	if ((p.kind == KindVarTemp) || (p.kind == KindDerefVarTemp)){
 		so("move_param temp");
 		long v = (long)p.p;
-		if (TempVar[v].last < max(from, to))
-			TempVar[v].last = max(from, to);
-		if (TempVar[v].first > min(from, to))
-			TempVar[v].first = min(from, to);
+		if (d->TempVar[v].last < max(from, to))
+			d->TempVar[v].last = max(from, to);
+		if (d->TempVar[v].first > min(from, to))
+			d->TempVar[v].first = min(from, to);
 	}else if ((p.kind == KindRegister) || (p.kind == KindDerefRegister)){
 		so("move_param reg");
 		long r = (long)p.p;
 		bool found = false;
-		for (int i=0;i<RegChannel.num;i++)
-			if ((r == RegChannel[i].reg) && (from >= RegChannel[i].first) && (from >= RegChannel[i].first)){
-				if (RegChannel[i].last < max(from, to))
-					RegChannel[i].last = max(from, to);
-				if (RegChannel[i].first > min(from, to))
-					RegChannel[i].first = min(from, to);
+		foreach(d->RegChannel, rc)
+			if ((r == rc.reg) && (from >= rc.first) && (from >= rc.first)){
+				if (rc.last < max(from, to))
+					rc.last = max(from, to);
+				if (rc.first > min(from, to))
+					rc.first = min(from, to);
 				found = true;
 			}
 		if (!found)
@@ -336,38 +359,28 @@ inline void move_param(sSerialCommandParam &p, int from, int to)
 	}
 }
 
-inline void add_marker(int m = -1)
+inline void add_marker(SerializerData *d, int m = -1)
 {
 	sSerialCommandParam p = p_none;
 	if (m < 0)
-		p.kind = NumMarkers ++;
+		p.kind = d->NumMarkers ++;
 	else
 		p.kind = m;
-	add_cmd(inst_marker, p);
+	add_cmd(d, inst_marker, p);
 }
 
-struct sStuffToAdd
+inline int add_marker_after_command(SerializerData *d, int level, int index)
 {
-	int kind, marker, level, index;
-};
-Array<sStuffToAdd> StuffToAdd;
-enum{
-	StuffKindMarker,
-	StuffKindJump,
-};
-
-inline int add_marker_after_command(int level, int index)
-{
-	int n = NumMarkers ++;
+	int n = d->NumMarkers ++;
 	sStuffToAdd m = {StuffKindMarker, n, level, index};
-	StuffToAdd.add(m);
+	d->StuffToAdd.add(m);
 	return n;
 }
 
-inline void add_jump_after_command(int level, int index, int marker)
+inline void add_jump_after_command(SerializerData *d, int level, int index, int marker)
 {
 	sStuffToAdd j = {StuffKindJump, marker, level, index};
-	StuffToAdd.add(j);
+	d->StuffToAdd.add(j);
 }
 
 inline int reg_smallify(int reg)
@@ -400,12 +413,12 @@ void AddFuncInstance(sSerialCommandParam &inst)
 	CompilerFunctionInstance = inst;
 }
 
-void AddReference(sSerialCommandParam &param, sType *type, sSerialCommandParam &ret);
+void AddReference(SerializerData *d, sSerialCommandParam &param, sType *type, sSerialCommandParam &ret);
 
-void AddFunctionCall(void *func, sFunction *caller)
+void AddFunctionCall(SerializerData *d, void *func, int func_no = -1)
 {
 	msg_db_r("AddFunctionCall", 4);
-	call_used = true;
+	d->call_used = true;
 	sType *type = CompilerFunctionReturn.type;
 	if (!type)
 		type = TypeVoid;
@@ -414,13 +427,13 @@ void AddFunctionCall(void *func, sFunction *caller)
 	sSerialCommandParam ret_temp, ret_ref;
 	if ((type->Size > 4) && (!type->IsArray)){
 		//add_temp(type, ret_temp);
-		AddReference(/*ret_temp*/ CompilerFunctionReturn, TypePointer, ret_ref);
+		AddReference(d, /*ret_temp*/ CompilerFunctionReturn, TypePointer, ret_ref);
 		//add_ref();
 		//add_cmd(inst_lea, KindRegister, (char*)RegEaxCompilerFunctionReturn.kind, CompilerFunctionReturn.param);
 	}
 
 	// grow stack (down) for local variables of the calling function
-//	add_cmd(, - caller->_VarSize - LocalOffset - 8);
+//	add_cmd(, - d->cur_func->_VarSize - LocalOffset - 8);
 	int dp = 0;
 
 	// push parameters onto stack
@@ -428,7 +441,7 @@ void AddFunctionCall(void *func, sFunction *caller)
 		if (CompilerFunctionParam[p].type){
 			int s = mem_align(CompilerFunctionParam[p].type->Size);
 			for (int j=0;j<s/4;j++)
-				add_cmd(inst_push, param_shift(CompilerFunctionParam[p], s - 4 - j * 4));
+				add_cmd(d, inst_push, param_shift(CompilerFunctionParam[p], s - 4 - j * 4));
 			dp += s;
 		}
 	}
@@ -441,36 +454,36 @@ void AddFunctionCall(void *func, sFunction *caller)
 	
 	// _cdecl: Klassen-Instanz als ersten Parameter push'en
 	if (CompilerFunctionInstance.type){
-		add_cmd(inst_push, CompilerFunctionInstance);
+		add_cmd(d, inst_push, CompilerFunctionInstance);
 		dp += 4;
 	}
 	
 #ifndef NIX_IDE_VCS
 	// more than 4 byte have to be returned -> give return address as very first parameter!
 	if (type->Size > 4)
-		add_cmd(inst_push, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
+		add_cmd(d, inst_push, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
 #endif
 	
-	add_cmd(inst_call, param_const(TypePointer, func)); // the actual call
+	add_cmd(d, inst_call, param_const(TypePointer, func)); // the actual call
 	// function pointer will be shifted later...
 
 	//dp += 8; // esp, eip
 	if (dp > 127)
-		add_cmd(inst_add, param_reg(TypePointer, RegEsp), param_const(TypeInt, (void*)dp));
+		add_cmd(d, inst_add, param_reg(TypePointer, RegEsp), param_const(TypeInt, (void*)dp));
 	else if (dp > 0)
-		add_cmd(inst_add_b, param_reg(TypePointer, RegEsp), param_const(TypeInt, (void*)dp));
+		add_cmd(d, inst_add_b, param_reg(TypePointer, RegEsp), param_const(TypeInt, (void*)dp));
 
 	// return > 4b already got copied to [ret] by the function!
 	if (type != TypeVoid)
 		if (type->Size <= 4){
 			if (type == TypeFloat)
-				add_cmd(inst_fstp, CompilerFunctionReturn);
+				add_cmd(d, inst_fstp, CompilerFunctionReturn);
 			else if (type->Size == 1){
-				add_cmd(inst_mov_b, CompilerFunctionReturn, param_reg(type, RegAl));
-				add_reg_channel(RegEax, cmd.num - 2, cmd.num - 1);
+				add_cmd(d, inst_mov_b, CompilerFunctionReturn, param_reg(type, RegAl));
+				add_reg_channel(d, RegEax, d->cmd.num - 2, d->cmd.num - 1);
 			}else{
-				add_cmd(inst_mov, CompilerFunctionReturn, param_reg(type, RegEax));
-				add_reg_channel(RegEax, cmd.num - 2, cmd.num - 1);
+				add_cmd(d, inst_mov, CompilerFunctionReturn, param_reg(type, RegEax));
+				add_reg_channel(d, RegEax, d->cmd.num - 2, d->cmd.num - 1);
 			}
 		}
 
@@ -483,7 +496,7 @@ void AddFunctionCall(void *func, sFunction *caller)
 
 
 // creates res...
-void AddReference(sSerialCommandParam &param, sType *type, sSerialCommandParam &ret)
+void AddReference(SerializerData *d, sSerialCommandParam &param, sType *type, sSerialCommandParam &ret)
 {
 	msg_db_r("AddReference", 3);
 	so(Kind2Str(param.kind));
@@ -501,15 +514,15 @@ void AddReference(sSerialCommandParam &param, sType *type, sSerialCommandParam &
 		ret = param;
 		param.kind = KindVarTemp;
 	}else{
-		add_temp(type, ret);
-		add_cmd(inst_lea, param_reg(type, RegEax), param);
-		add_cmd(inst_mov, ret, param_reg(type, RegEax));
-		add_reg_channel(RegEax, cmd.num - 2, cmd.num - 1);
+		add_temp(d, type, ret);
+		add_cmd(d, inst_lea, param_reg(type, RegEax), param);
+		add_cmd(d, inst_mov, ret, param_reg(type, RegEax));
+		add_reg_channel(d, RegEax, d->cmd.num - 2, d->cmd.num - 1);
 	}
 	msg_db_l(3);
 }
 
-void AddDereference(sSerialCommandParam &param, sSerialCommandParam &ret, sType *force_type = NULL)
+void AddDereference(SerializerData *d, sSerialCommandParam &param, sSerialCommandParam &ret, sType *force_type = NULL)
 {
 	msg_db_r("AddDereference", 4);
 	/*add_temp(TypePointer, ret);
@@ -528,8 +541,8 @@ void AddDereference(sSerialCommandParam &param, sSerialCommandParam &ret, sType 
 	}else{
 		//msg_error(string("unhandled deref ", Kind2Str(param.kind)));
 		sSerialCommandParam temp;
-		add_temp(param.type, temp);
-		add_cmd(inst_mov, temp, param);
+		add_temp(d, param.type, temp);
+		add_cmd(d, inst_mov, temp, param);
 		deref_temp(temp, ret);
 	}
 	msg_db_l(4);
@@ -537,7 +550,7 @@ void AddDereference(sSerialCommandParam &param, sSerialCommandParam &ret, sType 
 
 // create data for a (function) parameter
 //   and compile its command if the parameter is executable itself
-void CScript::SerializeParameter(sCommand *link, sFunction *f, int level, int index, sSerialCommandParam &p)
+void CScript::SerializeParameter(SerializerData *d, sCommand *link, int level, int index, sSerialCommandParam &p)
 {
 	msg_db_r("SerializeParameter", 4);
 	p.kind = link->Kind;
@@ -569,7 +582,7 @@ void CScript::SerializeParameter(sCommand *link, sFunction *f, int level, int in
 			p.p = g_var[link->LinkNr];
 	}else if (link->Kind == KindVarLocal){
 		so(" -local");
-		p.p = (char*)(long)f->Var[link->LinkNr]._Offset;
+		p.p = (char*)(long)d->cur_func->Var[link->LinkNr]._Offset;
 	}else if (link->Kind == KindLocalMemory){
 		so(" -local mem");
 		p.p = (char*)link->LinkNr;
@@ -582,13 +595,13 @@ void CScript::SerializeParameter(sCommand *link, sFunction *f, int level, int in
 		param.type = TypePointer;
 		param.shift = 0;
 
-		AddReference(param, link->Type, p);
+		AddReference(d, param, link->Type, p);
 	}else if (link->Kind == KindVarExternal){
 		so(" -external-var");
 		p.p = (char*)PreExternalVar[link->LinkNr].Pointer;
 		p.kind = KindVarGlobal;
 		if (!p.p){
-			DoErrorLink(format("external variable is not linkable: %s",PreExternalVar[link->LinkNr].Name));
+			DoErrorLink(format("external variable is not linkable: %s",PreExternalVar[link->LinkNr].Name.c_str()));
 			_return_(4,);
 		}
 	}else if (link->Kind == KindConstant){
@@ -599,21 +612,21 @@ void CScript::SerializeParameter(sCommand *link, sFunction *f, int level, int in
 			p.kind = KindRefToConst;
 		p.p = cnst[link->LinkNr];
 	}else if ((link->Kind==KindOperator) || (link->Kind==KindFunction) || (link->Kind==KindCompilerFunction)){
-		p = SerializeCommand(link,f,level,index);
+		p = SerializeCommand(d, link, level, index);
 		if (Error)	_return_(4,);
 	}else if (link->Kind == KindReference){
 		//so(Kind2Str(link->Meta->Kind));
 		so(" -ref");
 		sSerialCommandParam param;
-		SerializeParameter(link->Param[0], f, level, index, param);
+		SerializeParameter(d, link->Param[0], level, index, param);
 		if (Error)	_return_(4,);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
-		AddReference(param, link->Type, p);
+		AddReference(d, param, link->Type, p);
 		if (Error)	_return_(4,);
 	}else if (link->Kind == KindDereference){
 		so(" -deref...");
 		sSerialCommandParam param;
-		SerializeParameter(link->Param[0], f, level, index, param);
+		SerializeParameter(d, link->Param[0], level, index, param);
 		if (Error)	_return_(4,);
 		/*if ((param.kind == KindVarLocal) || (param.kind == KindVarGlobal)){
 			p.type = param.type->SubType;
@@ -621,117 +634,117 @@ void CScript::SerializeParameter(sCommand *link, sFunction *f, int level, int in
 			if (param.kind == KindVarGlobal)	p.kind = KindRefToGlobal;
 			p.p = param.p;
 		}*/
-		AddDereference(param, p);
+		AddDereference(d, param, p);
 	}else
 		_do_error_int_("unexpected type of parameter: " + Kind2Str(link->Kind), 4,);
 	msg_db_l(4);
 }
 
 
-void CScript::SerializeOperator(sCommand *com, sFunction *p_func, sSerialCommandParam *param, sSerialCommandParam &ret)
+void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommandParam *param, sSerialCommandParam &ret)
 {
 	msg_db_r("SerializeOperator", 4);
 	switch(com->LinkNr){
 		case OperatorIntAssign:
 		case OperatorFloatAssign:
 		case OperatorPointerAssign:
-			add_cmd(inst_mov, param[0], param[1]);
+			add_cmd(d, inst_mov, param[0], param[1]);
 			break;
 		case OperatorCharAssign:
 		case OperatorBoolAssign:
-			add_cmd(inst_mov_b, param[0], param[1]);
+			add_cmd(d, inst_mov_b, param[0], param[1]);
 			break;
 		case OperatorClassAssign:
 			for (int i=0;i<signed(com->Param[0]->Type->Size)/4;i++)
-				add_cmd(inst_mov, param_shift(param[0], i * 4), param_shift(param[1], i * 4));
+				add_cmd(d, inst_mov, param_shift(param[0], i * 4), param_shift(param[1], i * 4));
 			for (int i=4*signed(com->Param[0]->Type->Size/4);i<signed(com->Param[0]->Type->Size);i++)
-				add_cmd(inst_mov, param_shift(param[0], i), param_shift(param[1], i));
+				add_cmd(d, inst_mov, param_shift(param[0], i), param_shift(param[1], i));
 			break;
 // string   TODO: create own code!
 		case OperatorCStringAssignAA:
 			AddFuncParam(param[0]);
 			AddFuncParam(param[1]);
-			AddFunctionCall((void*)&strcpy, p_func);
+			AddFunctionCall(d, (void*)&strcpy);
 			break;
 		case OperatorCStringAddAAS:
 			AddFuncParam(param[0]);
 			AddFuncParam(param[1]);
-			AddFunctionCall((void*)&strcat, p_func);
+			AddFunctionCall(d, (void*)&strcat);
 			break;
 		case OperatorCStringAddAA:{
 			sSerialCommandParam ret_ref;
-			AddReference(ret, TypePointer, ret_ref);
+			AddReference(d, ret, TypePointer, ret_ref);
 			AddFuncParam(ret_ref);
 			AddFuncParam(param[0]);
-			AddFunctionCall((void*)&strcpy, p_func);
+			AddFunctionCall(d, (void*)&strcpy);
 			AddFuncParam(ret_ref);
 			AddFuncParam(param[1]);
-			AddFunctionCall((void*)&strcat, p_func);
+			AddFunctionCall(d, (void*)&strcat);
 			}break;
 		case OperatorCStringEqualAA:
 		case OperatorCStringNotEqualAA:
 			AddFuncParam(param[0]);
 			AddFuncParam(param[1]);
-			AddFunctionCall((void*)&strcmp, p_func); // well... return in eax...
+			AddFunctionCall(d, (void*)&strcmp); // well... return in eax...
 
-			add_cmd(inst_cmp, p_eax_int, param_const(TypeInt, (void*)0x0));
+			add_cmd(d, inst_cmp, p_eax_int, param_const(TypeInt, (void*)0x0));
 			if (com->LinkNr == OperatorCStringEqualAA)
-				add_cmd(inst_setz_b, p_al_bool);
+				add_cmd(d, inst_setz_b, p_al_bool);
 			if (com->LinkNr==OperatorCStringNotEqualAA)
-				add_cmd(inst_setnz_b, p_al_bool);
-			add_cmd(inst_mov_b, ret, p_al_bool);
-			add_reg_channel(RegEax, cmd.num - 3, cmd.num - 1);
+				add_cmd(d, inst_setnz_b, p_al_bool);
+			add_cmd(d, inst_mov_b, ret, p_al_bool);
+			add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 1);
 			break;
 // int
 		case OperatorIntAddS:
-			add_cmd(inst_add, param[0], param[1]);
+			add_cmd(d, inst_add, param[0], param[1]);
 			break;
 		case OperatorIntSubtractS:
-			add_cmd(inst_sub, param[0], param[1]);
+			add_cmd(d, inst_sub, param[0], param[1]);
 			break;
 		case OperatorIntMultiplyS:
-			add_cmd(inst_imul, param[0], param[1]);
+			add_cmd(d, inst_imul, param[0], param[1]);
 			break;
 		case OperatorIntDivideS:
-			add_cmd(inst_mov, p_eax_int, param[0]);
-			add_cmd(inst_mov, param_reg(TypeInt, RegEdx), p_eax_int);
-			add_cmd(inst_sar, param_reg(TypeInt, RegEdx), param_const(TypeChar, (void*)0x1f));
-			add_cmd(inst_idiv, p_eax_int, param[1]);
-			add_cmd(inst_mov, param[0], p_eax_int);
-			add_reg_channel(RegEax, cmd.num - 5, cmd.num - 1);
-			add_reg_channel(RegEdx, cmd.num - 2, cmd.num - 2);
+			add_cmd(d, inst_mov, p_eax_int, param[0]);
+			add_cmd(d, inst_mov, param_reg(TypeInt, RegEdx), p_eax_int);
+			add_cmd(d, inst_sar, param_reg(TypeInt, RegEdx), param_const(TypeChar, (void*)0x1f));
+			add_cmd(d, inst_idiv, p_eax_int, param[1]);
+			add_cmd(d, inst_mov, param[0], p_eax_int);
+			add_reg_channel(d, RegEax, d->cmd.num - 5, d->cmd.num - 1);
+			add_reg_channel(d, RegEdx, d->cmd.num - 2, d->cmd.num - 2);
 			break;
 		case OperatorIntAdd:
-			add_cmd(inst_mov, ret, param[0]);
-			add_cmd(inst_add, ret, param[1]);
+			add_cmd(d, inst_mov, ret, param[0]);
+			add_cmd(d, inst_add, ret, param[1]);
 			break;
 		case OperatorIntSubtract:
-			add_cmd(inst_mov, ret, param[0]);
-			add_cmd(inst_sub, ret, param[1]);
+			add_cmd(d, inst_mov, ret, param[0]);
+			add_cmd(d, inst_sub, ret, param[1]);
 			break;
 		case OperatorIntMultiply:
-			add_cmd(inst_mov, p_eax_int, param[0]);
-			add_cmd(inst_imul, p_eax_int, param[1]);
-			add_cmd(inst_mov, ret, p_eax_int);
-			add_reg_channel(RegEax, cmd.num - 3, cmd.num - 1);
+			add_cmd(d, inst_mov, p_eax_int, param[0]);
+			add_cmd(d, inst_imul, p_eax_int, param[1]);
+			add_cmd(d, inst_mov, ret, p_eax_int);
+			add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 1);
 			break;
 		case OperatorIntDivide:
-			add_cmd(inst_mov, p_eax_int, param[0]);
-			add_cmd(inst_mov, param_reg(TypeInt, RegEdx), p_eax_int);
-			add_cmd(inst_sar, param_reg(TypeInt, RegEdx), param_const(TypeChar, (void*)0x1f));
-			add_cmd(inst_idiv, p_eax_int, param[1]);
-			add_cmd(inst_mov, ret, p_eax_int);
-			add_reg_channel(RegEax, cmd.num - 5, cmd.num - 1);
-			add_reg_channel(RegEdx, cmd.num - 2, cmd.num - 2);
+			add_cmd(d, inst_mov, p_eax_int, param[0]);
+			add_cmd(d, inst_mov, param_reg(TypeInt, RegEdx), p_eax_int);
+			add_cmd(d, inst_sar, param_reg(TypeInt, RegEdx), param_const(TypeChar, (void*)0x1f));
+			add_cmd(d, inst_idiv, p_eax_int, param[1]);
+			add_cmd(d, inst_mov, ret, p_eax_int);
+			add_reg_channel(d, RegEax, d->cmd.num - 5, d->cmd.num - 1);
+			add_reg_channel(d, RegEdx, d->cmd.num - 2, d->cmd.num - 2);
 			break;
 		case OperatorIntModulo:
-			add_cmd(inst_mov, p_eax_int, param[0]);
-			add_cmd(inst_mov, param_reg(TypeInt, RegEdx), p_eax_int);
-			add_cmd(inst_sar, param_reg(TypeInt, RegEdx), param_const(TypeChar, (void*)0x1f));
-			add_cmd(inst_idiv, p_eax_int, param[1]);
-			add_cmd(inst_mov, ret, param_reg(TypeInt, RegEdx));
-			add_reg_channel(RegEax, cmd.num - 5, cmd.num - 2);
-			add_reg_channel(RegEdx, cmd.num - 2, cmd.num - 1);
+			add_cmd(d, inst_mov, p_eax_int, param[0]);
+			add_cmd(d, inst_mov, param_reg(TypeInt, RegEdx), p_eax_int);
+			add_cmd(d, inst_sar, param_reg(TypeInt, RegEdx), param_const(TypeChar, (void*)0x1f));
+			add_cmd(d, inst_idiv, p_eax_int, param[1]);
+			add_cmd(d, inst_mov, ret, param_reg(TypeInt, RegEdx));
+			add_reg_channel(d, RegEax, d->cmd.num - 5, d->cmd.num - 2);
+			add_reg_channel(d, RegEdx, d->cmd.num - 2, d->cmd.num - 1);
 			break;
 		case OperatorIntEqual:
 		case OperatorIntNotEqual:
@@ -741,220 +754,220 @@ void CScript::SerializeOperator(sCommand *com, sFunction *p_func, sSerialCommand
 		case OperatorIntSmallerEqual:
 		case OperatorPointerEqual:
 		case OperatorPointerNotEqual:
-			add_cmd(inst_cmp, param[0], param[1]);
-			if (com->LinkNr==OperatorIntEqual)			add_cmd(inst_setz_b, ret);
-			if (com->LinkNr==OperatorIntNotEqual)		add_cmd(inst_setnz_b, ret);
-			if (com->LinkNr==OperatorIntGreater)		add_cmd(inst_setnle_b, ret);
-			if (com->LinkNr==OperatorIntGreaterEqual)	add_cmd(inst_setnl_b, ret);
-			if (com->LinkNr==OperatorIntSmaller)		add_cmd(inst_setl_b, ret);
-			if (com->LinkNr==OperatorIntSmallerEqual)	add_cmd(inst_setle_b, ret);
-			if (com->LinkNr==OperatorPointerEqual)		add_cmd(inst_setz_b, ret);
-			if (com->LinkNr==OperatorPointerNotEqual)	add_cmd(inst_setnz_b, ret);
+			add_cmd(d, inst_cmp, param[0], param[1]);
+			if (com->LinkNr==OperatorIntEqual)			add_cmd(d, inst_setz_b, ret);
+			if (com->LinkNr==OperatorIntNotEqual)		add_cmd(d, inst_setnz_b, ret);
+			if (com->LinkNr==OperatorIntGreater)		add_cmd(d, inst_setnle_b, ret);
+			if (com->LinkNr==OperatorIntGreaterEqual)	add_cmd(d, inst_setnl_b, ret);
+			if (com->LinkNr==OperatorIntSmaller)		add_cmd(d, inst_setl_b, ret);
+			if (com->LinkNr==OperatorIntSmallerEqual)	add_cmd(d, inst_setle_b, ret);
+			if (com->LinkNr==OperatorPointerEqual)		add_cmd(d, inst_setz_b, ret);
+			if (com->LinkNr==OperatorPointerNotEqual)	add_cmd(d, inst_setnz_b, ret);
 			break;
 		case OperatorIntBitAnd:
-			add_cmd(inst_mov, ret, param[0]);
-			add_cmd(inst_and, ret, param[1]);
+			add_cmd(d, inst_mov, ret, param[0]);
+			add_cmd(d, inst_and, ret, param[1]);
 			break;
 		case OperatorIntBitOr:
-			add_cmd(inst_mov, ret, param[0]);
-			add_cmd(inst_or, ret, param[1]);
+			add_cmd(d, inst_mov, ret, param[0]);
+			add_cmd(d, inst_or, ret, param[1]);
 			break;
 		case OperatorIntShiftRight:
-			add_cmd(inst_mov, param_reg(TypeInt, RegEcx), param[1]);
-			add_cmd(inst_mov, ret, param[0]);
-			add_cmd(inst_shr, ret, param_reg(TypeChar, RegCl));
-			add_reg_channel(RegEcx, cmd.num - 3, cmd.num - 1);
+			add_cmd(d, inst_mov, param_reg(TypeInt, RegEcx), param[1]);
+			add_cmd(d, inst_mov, ret, param[0]);
+			add_cmd(d, inst_shr, ret, param_reg(TypeChar, RegCl));
+			add_reg_channel(d, RegEcx, d->cmd.num - 3, d->cmd.num - 1);
 			break;
 		case OperatorIntShiftLeft:
-			add_cmd(inst_mov, param_reg(TypeInt, RegEcx), param[1]);
-			add_cmd(inst_mov, ret, param[0]);
-			add_cmd(inst_shl, ret, param_reg(TypeChar, RegCl));
-			add_reg_channel(RegEcx, cmd.num - 3, cmd.num - 1);
+			add_cmd(d, inst_mov, param_reg(TypeInt, RegEcx), param[1]);
+			add_cmd(d, inst_mov, ret, param[0]);
+			add_cmd(d, inst_shl, ret, param_reg(TypeChar, RegCl));
+			add_reg_channel(d, RegEcx, d->cmd.num - 3, d->cmd.num - 1);
 			break;
 		case OperatorIntNegate:
-			add_cmd(inst_mov, ret, param_const(TypeInt, (void*)0x0));
-			add_cmd(inst_sub, ret, param[0]);
+			add_cmd(d, inst_mov, ret, param_const(TypeInt, (void*)0x0));
+			add_cmd(d, inst_sub, ret, param[0]);
 			break;
 		case OperatorIntIncrease:
-			add_cmd(inst_add, param[0], param_const(TypeInt, (void*)0x1));
+			add_cmd(d, inst_add, param[0], param_const(TypeInt, (void*)0x1));
 			break;
 		case OperatorIntDecrease:
-			add_cmd(inst_sub, param[0], param_const(TypeInt, (void*)0x1));
+			add_cmd(d, inst_sub, param[0], param_const(TypeInt, (void*)0x1));
 			break;
 // float
 		case OperatorFloatAddS:
 		case OperatorFloatSubtractS:
 		case OperatorFloatMultiplyS:
 		case OperatorFloatDivideS:
-			add_cmd(inst_fld, param[0]);
-			if (com->LinkNr==OperatorFloatAddS)			add_cmd(inst_fadd, param[1]);
-			if (com->LinkNr==OperatorFloatSubtractS)	add_cmd(inst_fsub, param[1]);
-			if (com->LinkNr==OperatorFloatMultiplyS)	add_cmd(inst_fmul, param[1]);
-			if (com->LinkNr==OperatorFloatDivideS)		add_cmd(inst_fdiv, param[1]);
-			add_cmd(inst_fstp, param[0]);
+			add_cmd(d, inst_fld, param[0]);
+			if (com->LinkNr==OperatorFloatAddS)			add_cmd(d, inst_fadd, param[1]);
+			if (com->LinkNr==OperatorFloatSubtractS)	add_cmd(d, inst_fsub, param[1]);
+			if (com->LinkNr==OperatorFloatMultiplyS)	add_cmd(d, inst_fmul, param[1]);
+			if (com->LinkNr==OperatorFloatDivideS)		add_cmd(d, inst_fdiv, param[1]);
+			add_cmd(d, inst_fstp, param[0]);
 			break;
 		case OperatorFloatAdd:
 		case OperatorFloatSubtract:
 		case OperatorFloatMultiply:
 		case OperatorFloatDivide:
-			add_cmd(inst_fld, param[0]);
-			if (com->LinkNr==OperatorFloatAdd)			add_cmd(inst_fadd, param[1]);
-			if (com->LinkNr==OperatorFloatSubtract)		add_cmd(inst_fsub, param[1]);
-			if (com->LinkNr==OperatorFloatMultiply)		add_cmd(inst_fmul, param[1]);
-			if (com->LinkNr==OperatorFloatDivide)		add_cmd(inst_fdiv, param[1]);
-			add_cmd(inst_fstp, ret);
+			add_cmd(d, inst_fld, param[0]);
+			if (com->LinkNr==OperatorFloatAdd)			add_cmd(d, inst_fadd, param[1]);
+			if (com->LinkNr==OperatorFloatSubtract)		add_cmd(d, inst_fsub, param[1]);
+			if (com->LinkNr==OperatorFloatMultiply)		add_cmd(d, inst_fmul, param[1]);
+			if (com->LinkNr==OperatorFloatDivide)		add_cmd(d, inst_fdiv, param[1]);
+			add_cmd(d, inst_fstp, ret);
 			break;
 		case OperatorFloatMultiplyFI:
-			add_cmd(inst_fild, param[1]);
-			add_cmd(inst_fmul, param[0]);
-			add_cmd(inst_fstp, ret);
+			add_cmd(d, inst_fild, param[1]);
+			add_cmd(d, inst_fmul, param[0]);
+			add_cmd(d, inst_fstp, ret);
 			break;
 		case OperatorFloatMultiplyIF:
-			add_cmd(inst_fild, param[0]);
-			add_cmd(inst_fmul, param[1]);
-			add_cmd(inst_fstp, ret);
+			add_cmd(d, inst_fild, param[0]);
+			add_cmd(d, inst_fmul, param[1]);
+			add_cmd(d, inst_fstp, ret);
 			break;
 		case OperatorFloatEqual:
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fld, param[1]);
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
-			add_cmd(inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
-			add_cmd(inst_setz_b, ret);
-			add_reg_channel(RegEax, cmd.num - 4, cmd.num - 2);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fld, param[1]);
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
+			add_cmd(d, inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
+			add_cmd(d, inst_setz_b, ret);
+			add_reg_channel(d, RegEax, d->cmd.num - 4, d->cmd.num - 2);
 			break;
 		case OperatorFloatNotEqual:
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fld, param[1]);
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
-			add_cmd(inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
-			add_cmd(inst_setnz_b, ret);
-			add_reg_channel(RegEax, cmd.num - 4, cmd.num - 2);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fld, param[1]);
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
+			add_cmd(d, inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
+			add_cmd(d, inst_setnz_b, ret);
+			add_reg_channel(d, RegEax, d->cmd.num - 4, d->cmd.num - 2);
 			break;
 		case OperatorFloatGreater:
-			add_cmd(inst_fld, param[1]);
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_test_b, p_ah, param_const(TypeChar, (void*)0x45));
-			add_cmd(inst_setz_b, ret);
-			add_reg_channel(RegEax, cmd.num - 3, cmd.num - 2);
+			add_cmd(d, inst_fld, param[1]);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_test_b, p_ah, param_const(TypeChar, (void*)0x45));
+			add_cmd(d, inst_setz_b, ret);
+			add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 2);
 			break;
 		case OperatorFloatGreaterEqual:
-			add_cmd(inst_fld, param[1]);
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_test_b, p_ah, param_const(TypeChar, (void*)0x05));
-			add_cmd(inst_setz_b, ret);
-			add_reg_channel(RegEax, cmd.num - 3, cmd.num - 2);
+			add_cmd(d, inst_fld, param[1]);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_test_b, p_ah, param_const(TypeChar, (void*)0x05));
+			add_cmd(d, inst_setz_b, ret);
+			add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 2);
 			break;
 		case OperatorFloatSmaller:
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fld, param[1]);
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_test_b, p_ah, param_const(TypeChar, (void*)0x45));
-			add_cmd(inst_setz_b, ret);
-			add_reg_channel(RegEax, cmd.num - 3, cmd.num - 2);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fld, param[1]);
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_test_b, p_ah, param_const(TypeChar, (void*)0x45));
+			add_cmd(d, inst_setz_b, ret);
+			add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 2);
 			break;
 		case OperatorFloatSmallerEqual:
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fld, param[1]);
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_test_b, p_ah, param_const(TypeChar, (void*)0x05));
-			add_cmd(inst_setz_b, ret);
-			add_reg_channel(RegEax, cmd.num - 3, cmd.num - 2);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fld, param[1]);
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_test_b, p_ah, param_const(TypeChar, (void*)0x05));
+			add_cmd(d, inst_setz_b, ret);
+			add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 2);
 			break;
 		case OperatorFloatNegate:
-			add_cmd(inst_mov, ret, param[0]);
-			add_cmd(inst_xor, ret, param_const(TypeInt, (void*)0x80000000));
+			add_cmd(d, inst_mov, ret, param[0]);
+			add_cmd(d, inst_xor, ret, param_const(TypeInt, (void*)0x80000000));
 			break;
 // complex
 		case OperatorComplexAddS:
 		case OperatorComplexSubtractS:
 		//case OperatorComplexMultiplySCF:
 		//case OperatorComplexDivideS:
-			add_cmd(inst_fld, param[0]);
-			if (com->LinkNr == OperatorComplexAddS)			add_cmd(inst_fadd, param[1]);
-			if (com->LinkNr == OperatorComplexSubtractS)	add_cmd(inst_fsub, param[1]);
-			add_cmd(inst_fstp, param[0]);
-			add_cmd(inst_fld, param_shift(param[0], 4));
-			if (com->LinkNr == OperatorComplexAddS)			add_cmd(inst_fadd, param_shift(param[1], 4));
-			if (com->LinkNr == OperatorComplexSubtractS)	add_cmd(inst_fsub, param_shift(param[1], 4));
-			add_cmd(inst_fstp, param_shift(param[0], 4));
+			add_cmd(d, inst_fld, param[0]);
+			if (com->LinkNr == OperatorComplexAddS)			add_cmd(d, inst_fadd, param[1]);
+			if (com->LinkNr == OperatorComplexSubtractS)	add_cmd(d, inst_fsub, param[1]);
+			add_cmd(d, inst_fstp, param[0]);
+			add_cmd(d, inst_fld, param_shift(param[0], 4));
+			if (com->LinkNr == OperatorComplexAddS)			add_cmd(d, inst_fadd, param_shift(param[1], 4));
+			if (com->LinkNr == OperatorComplexSubtractS)	add_cmd(d, inst_fsub, param_shift(param[1], 4));
+			add_cmd(d, inst_fstp, param_shift(param[0], 4));
 			break;
 		case OperatorComplexAdd:
 		case OperatorComplexSubtract:
 //		case OperatorFloatMultiply:
 //		case OperatorFloatDivide:
-			add_cmd(inst_fld, param[0]);
-			if (com->LinkNr == OperatorComplexAdd)		add_cmd(inst_fadd, param[1]);
-			if (com->LinkNr == OperatorComplexSubtract)	add_cmd(inst_fsub, param[1]);
-			add_cmd(inst_fstp, ret);
-			add_cmd(inst_fld, param_shift(param[0], 4));
-			if (com->LinkNr == OperatorComplexAdd)		add_cmd(inst_fadd, param_shift(param[1], 4));
-			if (com->LinkNr == OperatorComplexSubtract)	add_cmd(inst_fsub, param_shift(param[1], 4));
-			add_cmd(inst_fstp, param_shift(ret, 4));
+			add_cmd(d, inst_fld, param[0]);
+			if (com->LinkNr == OperatorComplexAdd)		add_cmd(d, inst_fadd, param[1]);
+			if (com->LinkNr == OperatorComplexSubtract)	add_cmd(d, inst_fsub, param[1]);
+			add_cmd(d, inst_fstp, ret);
+			add_cmd(d, inst_fld, param_shift(param[0], 4));
+			if (com->LinkNr == OperatorComplexAdd)		add_cmd(d, inst_fadd, param_shift(param[1], 4));
+			if (com->LinkNr == OperatorComplexSubtract)	add_cmd(d, inst_fsub, param_shift(param[1], 4));
+			add_cmd(d, inst_fstp, param_shift(ret, 4));
 			break;
 		case OperatorComplexMultiply:
 			// r.x = a.y * b.y
-			add_cmd(inst_fld, param_shift(param[0], 4));
-			add_cmd(inst_fmul, param_shift(param[1], 4));
-			add_cmd(inst_fstp, ret);
+			add_cmd(d, inst_fld, param_shift(param[0], 4));
+			add_cmd(d, inst_fmul, param_shift(param[1], 4));
+			add_cmd(d, inst_fstp, ret);
 			// r.x = a.x * b.x - r.x
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fmul, param[1]);
-			add_cmd(inst_fsub, ret);
-			add_cmd(inst_fstp, ret);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fmul, param[1]);
+			add_cmd(d, inst_fsub, ret);
+			add_cmd(d, inst_fstp, ret);
 			// r.y = a.y * b.x
-			add_cmd(inst_fld, param_shift(param[0], 4));
-			add_cmd(inst_fmul, param[1]);
-			add_cmd(inst_fstp, param_shift(ret, 4));
+			add_cmd(d, inst_fld, param_shift(param[0], 4));
+			add_cmd(d, inst_fmul, param[1]);
+			add_cmd(d, inst_fstp, param_shift(ret, 4));
 			// r.y += a.x * b.y
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fmul, param_shift(param[1], 4));
-			add_cmd(inst_fadd, param_shift(ret, 4));
-			add_cmd(inst_fstp, param_shift(ret, 4));
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fmul, param_shift(param[1], 4));
+			add_cmd(d, inst_fadd, param_shift(ret, 4));
+			add_cmd(d, inst_fstp, param_shift(ret, 4));
 			break;
 		case OperatorComplexMultiplyFC:
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fmul, param[1]);
-			add_cmd(inst_fstp, ret);
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fmul, param_shift(param[1], 4));
-			add_cmd(inst_fstp, param_shift(ret, 4));
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fmul, param[1]);
+			add_cmd(d, inst_fstp, ret);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fmul, param_shift(param[1], 4));
+			add_cmd(d, inst_fstp, param_shift(ret, 4));
 			break;
 		case OperatorComplexMultiplyCF:
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fmul, param[1]);
-			add_cmd(inst_fstp, ret);
-			add_cmd(inst_fld, param_shift(param[0], 4));
-			add_cmd(inst_fmul, param[1]);
-			add_cmd(inst_fstp, param_shift(ret, 4));
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fmul, param[1]);
+			add_cmd(d, inst_fstp, ret);
+			add_cmd(d, inst_fld, param_shift(param[0], 4));
+			add_cmd(d, inst_fmul, param[1]);
+			add_cmd(d, inst_fstp, param_shift(ret, 4));
 			break;
 		case OperatorComplexEqual:
-			add_cmd(inst_fld, param[0]);
-			add_cmd(inst_fld, param[1]);
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
-			add_cmd(inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
-			add_cmd(inst_setz_b, ret);
-			add_reg_channel(RegEax, cmd.num - 4, cmd.num - 2);
-			add_cmd(inst_fld, param_shift(param[0], 4));
-			add_cmd(inst_fld, param_shift(param[1], 4));
-			add_cmd(inst_fucompp, p_st0, p_st1);
-			add_cmd(inst_fnstsw, p_ax);
-			add_cmd(inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
-			add_cmd(inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
-			add_cmd(inst_setz_b, p_ah);
-			add_cmd(inst_and_b, ret, p_ah);
-			add_reg_channel(RegEax, cmd.num - 5, cmd.num - 1);
+			add_cmd(d, inst_fld, param[0]);
+			add_cmd(d, inst_fld, param[1]);
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
+			add_cmd(d, inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
+			add_cmd(d, inst_setz_b, ret);
+			add_reg_channel(d, RegEax, d->cmd.num - 4, d->cmd.num - 2);
+			add_cmd(d, inst_fld, param_shift(param[0], 4));
+			add_cmd(d, inst_fld, param_shift(param[1], 4));
+			add_cmd(d, inst_fucompp, p_st0, p_st1);
+			add_cmd(d, inst_fnstsw, p_ax);
+			add_cmd(d, inst_and_b, p_ah, param_const(TypeChar, (void*)0x45));
+			add_cmd(d, inst_cmp_b, p_ah, param_const(TypeChar, (void*)0x40));
+			add_cmd(d, inst_setz_b, p_ah);
+			add_cmd(d, inst_and_b, ret, p_ah);
+			add_reg_channel(d, RegEax, d->cmd.num - 5, d->cmd.num - 1);
 			break;
 // bool/char
 		case OperatorCharEqual:
@@ -965,234 +978,124 @@ void CScript::SerializeOperator(sCommand *com, sFunction *p_func, sSerialCommand
 		case OperatorBoolGreaterEqual:
 		case OperatorBoolSmaller:
 		case OperatorBoolSmallerEqual:
-			add_cmd(inst_cmp_b, param[0], param[1]);
+			add_cmd(d, inst_cmp_b, param[0], param[1]);
 			if ((com->LinkNr == OperatorCharEqual) || (com->LinkNr == OperatorBoolEqual))
-				add_cmd(inst_setz_b, ret);
+				add_cmd(d, inst_setz_b, ret);
 			else if ((com->LinkNr ==OperatorCharNotEqual) || (com->LinkNr == OperatorBoolNotEqual))
-				add_cmd(inst_setnz_b, ret);
-			else if (com->LinkNr == OperatorBoolGreater)		add_cmd(inst_setnle_b, ret);
-			else if (com->LinkNr == OperatorBoolGreaterEqual)	add_cmd(inst_setnl_b, ret);
-			else if (com->LinkNr == OperatorBoolSmaller)		add_cmd(inst_setl_b, ret);
-			else if (com->LinkNr == OperatorBoolSmallerEqual)	add_cmd(inst_setle_b, ret);
+				add_cmd(d, inst_setnz_b, ret);
+			else if (com->LinkNr == OperatorBoolGreater)		add_cmd(d, inst_setnle_b, ret);
+			else if (com->LinkNr == OperatorBoolGreaterEqual)	add_cmd(d, inst_setnl_b, ret);
+			else if (com->LinkNr == OperatorBoolSmaller)		add_cmd(d, inst_setl_b, ret);
+			else if (com->LinkNr == OperatorBoolSmallerEqual)	add_cmd(d, inst_setle_b, ret);
 			break;
 		case OperatorBoolAnd:
-			add_cmd(inst_mov_b, ret, param[0]);
-			add_cmd(inst_and_b, ret, param[1]);
+			add_cmd(d, inst_mov_b, ret, param[0]);
+			add_cmd(d, inst_and_b, ret, param[1]);
 			break;
 		case OperatorBoolOr:
-			add_cmd(inst_mov_b, ret, param[0]);
-			add_cmd(inst_or_b, ret, param[1]);
+			add_cmd(d, inst_mov_b, ret, param[0]);
+			add_cmd(d, inst_or_b, ret, param[1]);
 			break;
 		case OperatorCharAddS:
-			add_cmd(inst_add_b, param[0], param[1]);
+			add_cmd(d, inst_add_b, param[0], param[1]);
 			break;
 		case OperatorCharSubtractS:
-			add_cmd(inst_sub_b, param[0], param[1]);
+			add_cmd(d, inst_sub_b, param[0], param[1]);
 			break;
 		case OperatorCharAdd:
-			add_cmd(inst_mov_b, ret, param[0]);
-			add_cmd(inst_add_b, ret, param[1]);
+			add_cmd(d, inst_mov_b, ret, param[0]);
+			add_cmd(d, inst_add_b, ret, param[1]);
 			break;
 		case OperatorCharSubtract:
-			add_cmd(inst_mov_b, ret, param[0]);
-			add_cmd(inst_sub_b, ret, param[1]);
+			add_cmd(d, inst_mov_b, ret, param[0]);
+			add_cmd(d, inst_sub_b, ret, param[1]);
 			break;
 		case OperatorCharBitAnd:
-			add_cmd(inst_mov_b, ret, param[0]);
-			add_cmd(inst_and_b, ret, param[1]);
+			add_cmd(d, inst_mov_b, ret, param[0]);
+			add_cmd(d, inst_and_b, ret, param[1]);
 			break;
 		case OperatorCharBitOr:
-			add_cmd(inst_mov_b, ret, param[0]);
-			add_cmd(inst_or_b, ret, param[1]);
+			add_cmd(d, inst_mov_b, ret, param[0]);
+			add_cmd(d, inst_or_b, ret, param[1]);
 			break;
 		case OperatorBoolNegate:
-			add_cmd(inst_mov_b, ret, param[0]);
-			add_cmd(inst_xor_b, ret, param_const(TypeBool, (char*)0x1));
+			add_cmd(d, inst_mov_b, ret, param[0]);
+			add_cmd(d, inst_xor_b, ret, param_const(TypeBool, (char*)0x1));
 			break;
 		case OperatorCharNegate:
-			add_cmd(inst_mov_b, ret, param_const(TypeChar, (char*)0x0));
-			add_cmd(inst_sub_b, ret, param[0]);
+			add_cmd(d, inst_mov_b, ret, param_const(TypeChar, (char*)0x0));
+			add_cmd(d, inst_sub_b, ret, param[0]);
 			break;
 // vector
 		case OperatorVectorAddS:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fadd, param_shift(param[1], i * 4));
-				add_cmd(inst_fstp, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fadd, param_shift(param[1], i * 4));
+				add_cmd(d, inst_fstp, param_shift(param[0], i * 4));
 			}
 			break;
 		case OperatorVectorMultiplyS:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fmul, param[1]);
-				add_cmd(inst_fstp, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fmul, param[1]);
+				add_cmd(d, inst_fstp, param_shift(param[0], i * 4));
 			}
 			break;
 		case OperatorVectorDivideS:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fdiv, param[1]);
-				add_cmd(inst_fstp, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fdiv, param[1]);
+				add_cmd(d, inst_fstp, param_shift(param[0], i * 4));
 			}
 			break;
 		case OperatorVectorSubtractS:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fsub, param_shift(param[1], i * 4));
-				add_cmd(inst_fstp, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fsub, param_shift(param[1], i * 4));
+				add_cmd(d, inst_fstp, param_shift(param[0], i * 4));
 			}
 			break;
 		case OperatorVectorAdd:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fadd, param_shift(param[1], i * 4));
-				add_cmd(inst_fstp, param_shift(ret, i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fadd, param_shift(param[1], i * 4));
+				add_cmd(d, inst_fstp, param_shift(ret, i * 4));
 			}
 			break;
 		case OperatorVectorSubtract:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fsub, param_shift(param[1], i * 4));
-				add_cmd(inst_fstp, param_shift(ret, i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fsub, param_shift(param[1], i * 4));
+				add_cmd(d, inst_fstp, param_shift(ret, i * 4));
 			}
 			break;
 		case OperatorVectorMultiplyVF:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fmul, param[1]);
-				add_cmd(inst_fstp, param_shift(ret, i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fmul, param[1]);
+				add_cmd(d, inst_fstp, param_shift(ret, i * 4));
 			}
 			break;
 		case OperatorVectorMultiplyFV:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param[0]);
-				add_cmd(inst_fmul, param_shift(param[1], i * 4));
-				add_cmd(inst_fstp, param_shift(ret, i * 4));
+				add_cmd(d, inst_fld, param[0]);
+				add_cmd(d, inst_fmul, param_shift(param[1], i * 4));
+				add_cmd(d, inst_fstp, param_shift(ret, i * 4));
 			}
 			break;
 		case OperatorVectorDivideVF:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_fld, param_shift(param[0], i * 4));
-				add_cmd(inst_fdiv, param[1]);
-				add_cmd(inst_fstp, param_shift(ret, i * 4));
+				add_cmd(d, inst_fld, param_shift(param[0], i * 4));
+				add_cmd(d, inst_fdiv, param[1]);
+				add_cmd(d, inst_fstp, param_shift(ret, i * 4));
 			}
 			break;
 		case OperatorVectorNegate:
 			for (int i=0;i<3;i++){
-				add_cmd(inst_mov, param_shift(ret, i * 4), param_shift(param[0], i * 4));
-				add_cmd(inst_xor, param_shift(ret, i * 4), param_const(TypeInt, (void*)0x80000000));
+				add_cmd(d, inst_mov, param_shift(ret, i * 4), param_shift(param[0], i * 4));
+				add_cmd(d, inst_xor, param_shift(ret, i * 4), param_const(TypeInt, (void*)0x80000000));
 			}
 			break;
-// super arrays
-		case OperatorSuperArrayAssign:
-//		case OperatorIntListAssign:
-//		case OperatorFloatListAssign:
-		case OperatorIntListAssignInt:
-		case OperatorFloatListAssignFloat:
-		case OperatorIntListAddS:
-		case OperatorIntListSubtractS:
-		case OperatorIntListMultiplyS:
-		case OperatorIntListDivideS:
-		case OperatorFloatListAddS:
-		case OperatorFloatListSubtractS:
-		case OperatorFloatListMultiplyS:
-		case OperatorFloatListDivideS:
-		case OperatorComplexListAddS:
-		case OperatorComplexListSubtractS:
-		case OperatorComplexListMultiplyS:
-		case OperatorComplexListDivideS:{
-			void *func;
-			if (com->LinkNr == OperatorIntListAssignInt)	func = (void*)&super_array_assign_4_single;
-			if (com->LinkNr == OperatorFloatListAssignFloat)func = (void*)&super_array_assign_4_single;
-			if (com->LinkNr == OperatorSuperArrayAssign)	func = (void*)&super_array_assign;
-			if (com->LinkNr == OperatorIntListAddS)			func = (void*)&super_array_add_s_int;
-			if (com->LinkNr == OperatorIntListSubtractS)	func = (void*)&super_array_sub_s_int;
-			if (com->LinkNr == OperatorIntListMultiplyS)	func = (void*)&super_array_mul_s_int;
-			if (com->LinkNr == OperatorIntListDivideS)		func = (void*)&super_array_div_s_int;
-			if (com->LinkNr == OperatorFloatListAddS)		func = (void*)&super_array_add_s_float;
-			if (com->LinkNr == OperatorFloatListSubtractS)	func = (void*)&super_array_sub_s_float;
-			if (com->LinkNr == OperatorFloatListMultiplyS)	func = (void*)&super_array_mul_s_float;
-			if (com->LinkNr == OperatorFloatListDivideS)	func = (void*)&super_array_div_s_float;
-			if (com->LinkNr == OperatorComplexListAddS)		func = (void*)&super_array_add_s_com;
-			if (com->LinkNr == OperatorComplexListSubtractS)	func = (void*)&super_array_sub_s_com;
-			if (com->LinkNr == OperatorComplexListMultiplyS)	func = (void*)&super_array_mul_s_com;
-			if (com->LinkNr == OperatorComplexListDivideS)	func = (void*)&super_array_div_s_com;
-			AddFuncParam(param[0]);
-			AddFuncParam(param[1]);
-			AddFunctionCall(func, p_func);
-			}break;
-		/*case OperatorIntListAdd:
-		case OperatorIntListSubtract:
-		case OperatorIntListMultiply:
-		case OperatorIntListDivide:{
-			OCAddEspAdd(Opcode,OpcodeSize,-p_func->VarSize-LocalOffset-12);
-			OCAddInstruction(Opcode,OpcodeSize,inPushM,pk[1],param[1]);
-			OCAddInstruction(Opcode,OpcodeSize,inPushM,pk[0],param[0]);
-			OCAddInstruction(Opcode,OpcodeSize,inPushM,rk,ret);
-			long func;
-			if (com->LinkNr == OperatorIntListAdd)			func = (long)&super_array_add_int;
-			if (com->LinkNr == OperatorIntListSubtract)		func = (long)&super_array_sub_int;
-			if (com->LinkNr == OperatorIntListMultiply)		func = (long)&super_array_mul_int;
-			if (com->LinkNr == OperatorIntListDivide)		func = (long)&super_array_div_int;
-			OCAddInstruction(Opcode,OpcodeSize,inCallRel32,KindConstant,(char*)(func-(long)&Opcode[OpcodeSize]-CallRel32OCSize));
-			OCAddEspAdd(Opcode,OpcodeSize,p_func->VarSize+LocalOffset+20);
-		}break;*/
-		case OperatorIntListAddSInt:
-		case OperatorIntListSubtractSInt:
-		case OperatorIntListMultiplySInt:
-		case OperatorIntListDivideSInt:
-		case OperatorFloatListAddSFloat:
-		case OperatorFloatListSubtractSFloat:
-		case OperatorFloatListMultiplySFloat:
-		case OperatorFloatListDivideSFloat:
-		case OperatorComplexListMultiplySFloat:{
-			void* func;
-			if (com->LinkNr == OperatorIntListAddSInt)			func = (void*)&super_array_add_s_int_int;
-			if (com->LinkNr == OperatorIntListSubtractSInt)		func = (void*)&super_array_sub_s_int_int;
-			if (com->LinkNr == OperatorIntListMultiplySInt)		func = (void*)&super_array_mul_s_int_int;
-			if (com->LinkNr == OperatorIntListDivideSInt)		func = (void*)&super_array_div_s_int_int;
-			if (com->LinkNr == OperatorFloatListAddSFloat)		func = (void*)&super_array_add_s_float_float;
-			if (com->LinkNr == OperatorFloatListSubtractSFloat)	func = (void*)&super_array_sub_s_float_float;
-			if (com->LinkNr == OperatorFloatListMultiplySFloat)	func = (void*)&super_array_mul_s_float_float;
-			if (com->LinkNr == OperatorFloatListDivideSFloat)	func = (void*)&super_array_div_s_float_float;
-			if (com->LinkNr == OperatorComplexListMultiplySFloat)	func = (void*)&super_array_mul_s_com_float;
-			AddFuncParam(param[0]);
-			AddFuncParam(param[1]);
-			AddFunctionCall(func, p_func);
-			}break;
-		case OperatorComplexListAssignComplex:
-		case OperatorComplexListAddSComplex:
-		case OperatorComplexListSubtractSComplex:
-		case OperatorComplexListMultiplySComplex:
-		case OperatorComplexListDivideSComplex:
-		case OperatorStringAddS:
-		case OperatorStringAssignCString:
-		case OperatorStringAddCString:{
-			void* func;
-			if (com->LinkNr == OperatorComplexListAssignComplex)		func = (void*)&super_array_assign_8_single;
-			if (com->LinkNr == OperatorComplexListAddSComplex)			func = (void*)&super_array_add_s_com_com;
-			if (com->LinkNr == OperatorComplexListSubtractSComplex)		func = (void*)&super_array_sub_s_com_com;
-			if (com->LinkNr == OperatorComplexListMultiplySComplex)		func = (void*)&super_array_mul_s_com_com;
-			if (com->LinkNr == OperatorComplexListDivideSComplex)		func = (void*)&super_array_div_s_com_com;
-			if (com->LinkNr == OperatorStringAddS)						func = (void*)&super_array_add_s_str;
-			if (com->LinkNr == OperatorStringAssignCString)				func = (void*)&super_array_assign_str_cstr;
-			if (com->LinkNr == OperatorStringAddCString)				func = (void*)&super_array_add_str_cstr;
-			AddFuncParam(param[0]);
-			AddFuncParam(param[1]);
-			AddFunctionCall(func, p_func);
-			}break;
-		case OperatorStringAdd:
-		case OperatorStringEqual:
-		case OperatorStringNotEqual:{
-			void* func;
-			if (com->LinkNr == OperatorStringAdd)						func = (void*)&super_array_add_str;
-			if (com->LinkNr == OperatorStringEqual)						func = (void*)&super_array_equal_str;
-			if (com->LinkNr == OperatorStringNotEqual)					func = (void*)&super_array_notequal_str;
-			AddFuncReturn(ret);
-			AddFuncParam(param[0]);
-			AddFuncParam(param[1]);
-			AddFunctionCall(func, p_func);
-			}break;
 		default:
 			DoErrorInternal("unimplemented operator: " + Operator2Str(pre_script, com->LinkNr));
 	}
@@ -1203,19 +1106,19 @@ void CScript::SerializeOperator(sCommand *com, sFunction *p_func, sSerialCommand
 }
 
 
-sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int level, int index)
+sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, int level, int index)
 {
 	msg_db_r("SerializeCommand", 4);
 	//so(Kind2Str(com->Kind));
 	sSerialCommandParam param[SCRIPT_MAX_PARAMS];
-	sSerialCommandParam ret;// = (char*)( -add_temp_var(s) - p_func->_VarSize);
-	add_temp(com->Type, ret);
+	sSerialCommandParam ret;// = (char*)( -add_temp_var(s) - d->cur_func->_VarSize);
+	add_temp(d, com->Type, ret);
 	//so(d2h((char*)&ret,4,false));
 	//so(string2("return: %d/%d/%d", com->Type->Size, LocalOffset, LocalOffset));
 
 	// compile parameters
 	for (int p=0;p<com->NumParams;p++){
-		SerializeParameter(com->Param[p],f,level,index, param[p]);
+		SerializeParameter(d, com->Param[p], level, index, param[p]);
 		if (Error) _return_(4, ret);
 	}
 
@@ -1226,17 +1129,17 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 			is_class_function = true;
 	if (com->Kind == KindFunction){
 		if (com->script){
-			if (strstr(com->script->pre_script->Function[com->LinkNr].Name, "."))
+			if (com->script->pre_script->Function[com->LinkNr]->Name.find(".") >= 0)
 				is_class_function = true;
 		}else{
-			if (strstr(pre_script->Function[com->LinkNr].Name, "."))
+			if (pre_script->Function[com->LinkNr]->Name.find(".") >= 0)
 				is_class_function = true;
 		}
 	}
 	sSerialCommandParam instance = {-1, NULL, NULL};
 	if (is_class_function){
 		so("member");
-		SerializeParameter(com->Instance, f, level, index, instance);
+		SerializeParameter(d, com->Instance, level, index, instance);
 		if (Error)	_return_(4, ret);
 		so(Kind2Str(instance.kind));
 		// super_array automatically referenced...
@@ -1245,7 +1148,7 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 	    
 	if (com->Kind == KindOperator){
 		//so("---operator");
-		SerializeOperator(com, f, param, ret);
+		SerializeOperator(d, com, param, ret);
 		if (Error)
 			_return_(4, ret);
 		
@@ -1253,7 +1156,7 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 		//so("---func");
 		void *fp = NULL;
 		bool class_function = false;
-		char name[128];
+		string name;
 		if (com->Kind == KindFunction){ // own script Function
 			so("Funktion!!!");
 			if (com->script){
@@ -1263,15 +1166,15 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 				so("   -ok");
 			}else{
 				fp = (void*)func[com->LinkNr];
-				if (strstr(pre_script->Function[com->LinkNr].Name, ".")){
-					msg_error("class   member--------");
+				if (pre_script->Function[com->LinkNr]->Name.find(".") >= 0){
+					so("    class function!!!");
 					class_function = true;
 				}
 			}
 		}else{ // compiler function
 			fp = PreCommand[com->LinkNr].Func;
 			class_function = PreCommand[com->LinkNr].IsClassFunction;
-			strcpy(name, PreCommand[com->LinkNr].Name);
+			name = PreCommand[com->LinkNr].Name;
 		}
 		if (fp){ // a real function
 
@@ -1283,7 +1186,7 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 			if (class_function)
 				AddFuncInstance(instance);
 			
-			AddFunctionCall(fp, f);
+			AddFunctionCall(d, fp);
 			
 		}else if (PreCommand[com->LinkNr].IsSpecial){
 			switch(com->LinkNr){
@@ -1291,50 +1194,50 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 					break;*/
 				case CommandIf:{
 					// cmp;  jz m;  -block-  m;
-					add_cmd(inst_cmp_b, param[0], param_const(TypeBool, (void*)0x0));
-					int m_after_true = add_marker_after_command(level, index + 1);
-					add_cmd(inst_jz, param_marker(m_after_true));
+					add_cmd(d, inst_cmp_b, param[0], param_const(TypeBool, (void*)0x0));
+					int m_after_true = add_marker_after_command(d, level, index + 1);
+					add_cmd(d, inst_jz, param_marker(m_after_true));
 					}break;
 				case CommandIfElse:{
 					// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
-					add_cmd(inst_cmp_b, param[0], param_const(TypeBool, (void*)0x0));
-					int m_after_true = add_marker_after_command(level, index + 1);
-					int m_after_false = add_marker_after_command(level, index + 2);
-					add_cmd(inst_jz, param_marker(m_after_true)); // jz_b ...
-					add_jump_after_command(level, index + 1, m_after_false); // insert before <m_after_true> is inserted!
+					add_cmd(d, inst_cmp_b, param[0], param_const(TypeBool, (void*)0x0));
+					int m_after_true = add_marker_after_command(d, level, index + 1);
+					int m_after_false = add_marker_after_command(d, level, index + 2);
+					add_cmd(d, inst_jz, param_marker(m_after_true)); // jz_b ...
+					add_jump_after_command(d, level, index + 1, m_after_false); // insert before <m_after_true> is inserted!
 					}break;
 				case CommandWhile:
 				case CommandFor:{
 					// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 					// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
-					int m_before_while = NumMarkers ++;
-					add_marker(m_before_while);
-					move_last_cmd(LastCommandSize); // has to be before evaluating the parameter!
-					add_cmd(inst_cmp_b, param[0], param_const(TypeBool, (void*)0x0));
-					int m_after_while = add_marker_after_command(level, index + 1);
-					add_cmd(inst_jz, param_marker(m_after_while));
-					add_jump_after_command(level, index + 1, m_before_while); // insert before <m_after_while> is inserted!
+					int m_before_while = d->NumMarkers ++;
+					add_marker(d, m_before_while);
+					move_last_cmd(d, d->LastCommandSize); // has to be before evaluating the parameter!
+					add_cmd(d, inst_cmp_b, param[0], param_const(TypeBool, (void*)0x0));
+					int m_after_while = add_marker_after_command(d, level, index + 1);
+					add_cmd(d, inst_jz, param_marker(m_after_while));
+					add_jump_after_command(d, level, index + 1, m_before_while); // insert before <m_after_while> is inserted!
 
 					int m_continue = m_before_while;
 					if (com->LinkNr == CommandFor){
 						// NextCommand is a block!
-						if (NextCommand->Kind != KindBlock)
+						if (d->NextCommand->Kind != KindBlock)
 							_do_error_int_("command block in \"for\" loop missing", 4, ret);
-						m_continue = add_marker_after_command(level + 1, pre_script->Block[NextCommand->LinkNr]->Command.num - 2);
+						m_continue = add_marker_after_command(d, level + 1, pre_script->Block[d->NextCommand->LinkNr]->Command.num - 2);
 					}
 					sLoopData l = {m_continue, m_after_while, level, index};
-					LoopData.add(l);
+					d->LoopData.add(l);
 					}break;
 				case CommandBreak:
-					add_cmd(inst_jmp, param_marker(LoopData.back().marker_break));
+					add_cmd(d, inst_jmp, param_marker(d->LoopData.back().marker_break));
 					break;
 				case CommandContinue:
-					add_cmd(inst_jmp, param_marker(LoopData.back().marker_continue));
+					add_cmd(d, inst_jmp, param_marker(d->LoopData.back().marker_continue));
 					break;
 				case CommandReturn:
 					if (com->NumParams > 0){
-						if (f->Type->Size > 4){ // we already got a return address in [ebp+0x08] (> 4 byte)
-							int s = mem_align(f->Type->Size);
+						if (d->cur_func->Type->Size > 4){ // we already got a return address in [ebp+0x08] (> 4 byte)
+							int s = mem_align(d->cur_func->Type->Size);
 
 							// slow
 							/*sSerialCommandParam p, p_deref;
@@ -1344,8 +1247,8 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 							p.shift = 0;
 							for (int j=0;j<s/4;j++){
 								AddDereference(p, p_deref);
-								add_cmd(inst_mov, p_deref, param_shift(param[0], j * 4));
-								add_cmd(inst_add, p, param_const(TypeInt, (void*)0x4));
+								add_cmd(d, inst_mov, p_deref, param_shift(param[0], j * 4));
+								add_cmd(d, inst_add, p, param_const(TypeInt, (void*)0x4));
 							}*/
 
 							// test
@@ -1355,26 +1258,26 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 							p_ret_addr.type = TypeReg32;
 							p_ret_addr.p = (char*)0x8;
 							p_ret_addr.shift = 0;
-							int c_0 = cmd.num;
-							add_cmd(inst_mov, p_edx, p_ret_addr);
-							AddDereference(p_edx, p_deref_edx, TypeReg32);
+							int c_0 = d->cmd.num;
+							add_cmd(d, inst_mov, p_edx, p_ret_addr);
+							AddDereference(d, p_edx, p_deref_edx, TypeReg32);
 							for (int j=0;j<s/4;j++)
-								add_cmd(inst_mov, param_shift(p_deref_edx, j * 4), param_shift(param[0], j * 4));
-							add_reg_channel(RegEdx, c_0, cmd.num - 1);
+								add_cmd(d, inst_mov, param_shift(p_deref_edx, j * 4), param_shift(param[0], j * 4));
+							add_reg_channel(d, RegEdx, c_0, d->cmd.num - 1);
 						}else{ // store return directly in eax / fpu stack (4 byte)
-							if (f->Type == TypeFloat)
-								add_cmd(inst_fld, param[0]);
-							else if (f->Type->Size == 1)
-								add_cmd(inst_mov_b, param_reg(f->Type, RegAl), param[0]);
+							if (d->cur_func->Type == TypeFloat)
+								add_cmd(d, inst_fld, param[0]);
+							else if (d->cur_func->Type->Size == 1)
+								add_cmd(d, inst_mov_b, param_reg(d->cur_func->Type, RegAl), param[0]);
 							else
-								add_cmd(inst_mov, param_reg(f->Type, RegEax), param[0]);
+								add_cmd(d, inst_mov, param_reg(d->cur_func->Type, RegEax), param[0]);
 						}
 					}
-					add_cmd(inst_leave);
-					if (f->Type->Size > 4)
-						add_cmd(inst_ret, param_const(TypeInt, (void*)4));
+					add_cmd(d, inst_leave);
+					if (d->cur_func->Type->Size > 4)
+						add_cmd(d, inst_ret, param_const(TypeInt, (void*)4));
 					else
-						add_cmd(inst_ret);
+						add_cmd(d, inst_ret);
 					break;
 				case CommandWaitOneFrame:
 				case CommandWait:
@@ -1385,117 +1288,117 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 					sSerialCommandParam p_mode = param_global(TypeInt, &GlobalWaitingMode);
 					sSerialCommandParam p_ttw = param_global(TypeFloat, &GlobalTimeToWait);
 					if (com->LinkNr == CommandWaitOneFrame){
-						add_cmd(inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
-						add_cmd(inst_mov, p_ttw, param_const(TypeFloat, NULL));
+						add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
+						add_cmd(d, inst_mov, p_ttw, param_const(TypeFloat, NULL));
 					}else if (com->LinkNr == CommandWait){
-						add_cmd(inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeGT));
-						add_cmd(inst_mov, p_ttw, param[0]);
+						add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeGT));
+						add_cmd(d, inst_mov, p_ttw, param[0]);
 					}else if (com->LinkNr == CommandWaitRT){
-						add_cmd(inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
-						add_cmd(inst_mov, p_ttw, param[0]);
+						add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
+						add_cmd(d, inst_mov, p_ttw, param[0]);
 					}
 					
 				// save script state
 					// stack[ -8] = ebp
 					// stack[-12] = esp
 					// stack[-16] = eip
-					add_cmd(inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-8]));
-					add_cmd(inst_mov, p_deref_eax, param_reg(TypeReg32, RegEbp));
-					add_cmd(inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-12]));
-					add_cmd(inst_mov, p_deref_eax, param_reg(TypeReg32, RegEsp));
-					add_cmd(inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[ScriptStackSize-12]));
-					add_cmd(inst_call, param_const(TypePointer, NULL)); // push eip
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-8]));
+					add_cmd(d, inst_mov, p_deref_eax, param_reg(TypeReg32, RegEbp));
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-12]));
+					add_cmd(d, inst_mov, p_deref_eax, param_reg(TypeReg32, RegEsp));
+					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[ScriptStackSize-12]));
+					add_cmd(d, inst_call, param_const(TypePointer, NULL)); // push eip
 				// load return
 					// mov esp, &stack[-4]
 					// pop esp
 					// mov ebp, esp
 					// leave
 					// ret
-					add_cmd(inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[ScriptStackSize-4])); // start of the script stack
-					add_cmd(inst_pop, param_reg(TypeReg32, RegEsp)); // old stackpointer (real program)
-					add_cmd(inst_mov, param_reg(TypeReg32, RegEbp), param_reg(TypeReg32, RegEsp));
-					add_cmd(inst_leave);
-					add_cmd(inst_ret);
+					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[ScriptStackSize-4])); // start of the script stack
+					add_cmd(d, inst_pop, param_reg(TypeReg32, RegEsp)); // old stackpointer (real program)
+					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEbp), param_reg(TypeReg32, RegEsp));
+					add_cmd(d, inst_leave);
+					add_cmd(d, inst_ret);
 				// here comes the "waiting"...
 
 				// reload script state (eip already loaded)
 					// ebp = &stack[-8]
 					// esp = &stack[-12]
 					// GlobalWaitingMode = WaitingModeNone
-					add_cmd(inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-8]));
-					add_cmd(inst_mov, param_reg(TypeReg32, RegEbp), p_deref_eax);
-					add_cmd(inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-12]));
-					add_cmd(inst_mov, param_reg(TypeReg32, RegEsp), p_deref_eax);
-					add_cmd(inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeNone));
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-8]));
+					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEbp), p_deref_eax);
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-12]));
+					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), p_deref_eax);
+					add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeNone));
 					}break;
 				case CommandIntToFloat:
-					add_cmd(inst_fild, param[0]);
-					add_cmd(inst_fstp, ret);
+					add_cmd(d, inst_fild, param[0]);
+					add_cmd(d, inst_fstp, ret);
 					break;
 				case CommandFloatToInt:
 					// round to nearest...
-					//add_cmd(inst_fld, param[0]);
-					//add_cmd(inst_fistp, ret);
+					//add_cmd(d, inst_fld, param[0]);
+					//add_cmd(d, inst_fistp, ret);
 
 					// round to zero...
 					sSerialCommandParam t1, t2;
-					add_temp(TypeInt, t1);
-					add_temp(TypeInt, t2);
-					add_cmd(inst_fld, param[0]);
-					add_cmd(inst_fnstcw, t1);
-					add_cmd(inst_movzx, p_eax, t1);
-					add_cmd(inst_mov_b, p_ah, param_const(TypeChar, (void*)0x0c));
-					add_cmd(inst_mov, t2, p_eax);
-					add_reg_channel(RegEax, cmd.num - 3, cmd.num - 1);
-					add_cmd(inst_fldcw, t2);
-					add_cmd(inst_fistp, ret);
-					add_cmd(inst_fldcw, t1);
+					add_temp(d, TypeInt, t1);
+					add_temp(d, TypeInt, t2);
+					add_cmd(d, inst_fld, param[0]);
+					add_cmd(d, inst_fnstcw, t1);
+					add_cmd(d, inst_movzx, p_eax, t1);
+					add_cmd(d, inst_mov_b, p_ah, param_const(TypeChar, (void*)0x0c));
+					add_cmd(d, inst_mov, t2, p_eax);
+					add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 1);
+					add_cmd(d, inst_fldcw, t2);
+					add_cmd(d, inst_fistp, ret);
+					add_cmd(d, inst_fldcw, t1);
 					break;
 				case CommandIntToChar:
-					add_cmd(inst_mov, p_eax_int, param[0]);
-					add_cmd(inst_mov_b, ret, p_al_char);
-					add_reg_channel(RegEax, cmd.num - 2, cmd.num - 1);
+					add_cmd(d, inst_mov, p_eax_int, param[0]);
+					add_cmd(d, inst_mov_b, ret, p_al_char);
+					add_reg_channel(d, RegEax, d->cmd.num - 2, d->cmd.num - 1);
 					break;
 				case CommandCharToInt:
-					add_cmd(inst_mov, p_eax_int, param_const(TypeInt, (void*)0x0));
-					add_cmd(inst_mov_b, p_al_char, param[0]);
-					add_cmd(inst_mov, ret, p_eax);
-					add_reg_channel(RegEax, cmd.num - 3, cmd.num - 1);
+					add_cmd(d, inst_mov, p_eax_int, param_const(TypeInt, (void*)0x0));
+					add_cmd(d, inst_mov_b, p_al_char, param[0]);
+					add_cmd(d, inst_mov, ret, p_eax);
+					add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 1);
 					break;
 				case CommandPointerToBool:
-					add_cmd(inst_cmp, param[0], param_const(TypePointer, NULL));
-					add_cmd(inst_setnz_b, ret);
+					add_cmd(d, inst_cmp, param[0], param_const(TypePointer, NULL));
+					add_cmd(d, inst_setnz_b, ret);
 					break;
 				case CommandAsm:
-					add_cmd(inst_asm);
+					add_cmd(d, inst_asm);
 					break;
 				case CommandRectSet:
-					add_cmd(inst_mov, param_shift(ret, 12), param[3]);
+					add_cmd(d, inst_mov, param_shift(ret, 12), param[3]);
 				case CommandVectorSet:
-					add_cmd(inst_mov, param_shift(ret, 8), param[2]);
+					add_cmd(d, inst_mov, param_shift(ret, 8), param[2]);
 				case CommandComplexSet:
-					add_cmd(inst_mov, param_shift(ret, 4), param[1]);
-					add_cmd(inst_mov, param_shift(ret, 0), param[0]);
+					add_cmd(d, inst_mov, param_shift(ret, 4), param[1]);
+					add_cmd(d, inst_mov, param_shift(ret, 0), param[0]);
 					break;
 				case CommandColorSet:
-					add_cmd(inst_mov, param_shift(ret, 12), param[0]);
-					add_cmd(inst_mov, param_shift(ret, 0), param[1]);
-					add_cmd(inst_mov, param_shift(ret, 4), param[2]);
-					add_cmd(inst_mov, param_shift(ret, 8), param[3]);
+					add_cmd(d, inst_mov, param_shift(ret, 12), param[0]);
+					add_cmd(d, inst_mov, param_shift(ret, 0), param[1]);
+					add_cmd(d, inst_mov, param_shift(ret, 4), param[2]);
+					add_cmd(d, inst_mov, param_shift(ret, 8), param[3]);
 					break;
 				default:
- 					_do_error_int_(format("compiler function unimplemented: %s",PreCommand[com->LinkNr].Name), 4, ret);
+ 					_do_error_int_("compiler function unimplemented: " + PreCommand[com->LinkNr].Name, 4, ret);
 			}
 		}else{
 			if (PreCommand[com->LinkNr].IsSemiExternal)
-	 			DoErrorLink(format("external function not linkable: %s",PreCommand[com->LinkNr].Name));
+	 			DoErrorLink("external function not linkable: " + PreCommand[com->LinkNr].Name);
 			else
-	 			DoErrorInternal(format("compiler function not linkable: %s",PreCommand[com->LinkNr].Name));
+	 			DoErrorInternal("compiler function not linkable: " + PreCommand[com->LinkNr].Name);
 			_return_(4, ret);
 		}
 	}else if (com->Kind == KindBlock){
 		//so("---block");
-		SerializeBlock(pre_script->Block[com->LinkNr], f, level + 1);
+		SerializeBlock(d, pre_script->Block[com->LinkNr], level + 1);
 		if (Error)	_return_(4, ret);
 	}else{
 		//so("---???");
@@ -1507,40 +1410,40 @@ sSerialCommandParam CScript::SerializeCommand(sCommand *com, sFunction *f, int l
 	return ret;
 }
 
-void FillInDestructors(bool from_temp);
+void FillInDestructors(SerializerData *d, bool from_temp);
 
-void CScript::SerializeBlock(sBlock *block, sFunction *f, int level)
+void CScript::SerializeBlock(SerializerData *d, sBlock *block, int level)
 {
 	msg_db_r("SerializeBlock", 4);
 	for (int i=0;i<block->Command.num;i++){
 		//so(string2("%d - %d",i,block->NumCommands));
-		StackOffset = f->_VarSize;
-		LastCommandSize = cmd.num;
+		d->StackOffset = d->cur_func->_VarSize;
+		d->LastCommandSize = d->cmd.num;
 		if (block->Command.num > i + 1)
-			NextCommand = block->Command[i + 1];
+			d->NextCommand = block->Command[i + 1];
 
 		// serialize
-		SerializeCommand(block->Command[i], f, level, i);
+		SerializeCommand(d, block->Command[i], level, i);
 		if (Error)	_return_(4,);
 
 		
-		FillInDestructors(true);
+		FillInDestructors(d, true);
 		if (Error)	_return_(4,);
 
 		// any markers / jumps to add?
-		for (int j=StuffToAdd.num-1;j>=0;j--)
-			if ((level == StuffToAdd[j].level) && (i == StuffToAdd[j].index)){
-				if (StuffToAdd[j].kind == StuffKindMarker)
-					add_marker(StuffToAdd[j].marker);
-				else if (StuffToAdd[j].kind == StuffKindJump)
-					add_cmd(inst_jmp, param_marker(StuffToAdd[j].marker));
-				StuffToAdd.erase(j);
+		for (int j=d->StuffToAdd.num-1;j>=0;j--)
+			if ((level == d->StuffToAdd[j].level) && (i == d->StuffToAdd[j].index)){
+				if (d->StuffToAdd[j].kind == StuffKindMarker)
+					add_marker(d, d->StuffToAdd[j].marker);
+				else if (d->StuffToAdd[j].kind == StuffKindJump)
+					add_cmd(d, inst_jmp, param_marker(d->StuffToAdd[j].marker));
+				d->StuffToAdd.erase(j);
 			}
 
 		// end of loop?
-		if (LoopData.num > 0)
-			if ((LoopData.back().level == level) && (LoopData.back().index == i - 1))
-				LoopData.resize(LoopData.num - 1);
+		if (d->LoopData.num > 0)
+			if ((d->LoopData.back().level == level) && (d->LoopData.back().index == i - 1))
+				d->LoopData.pop();
 	}
 	msg_db_l(4);
 }
@@ -1563,90 +1466,109 @@ void _fake_array_clear_(DynamicArray *a)
 Array<sSerialCommandParam> InsertedConstructorFunc;
 Array<sSerialCommandParam> InsertedConstructorTemp;
 
-void add_cmd_constructor(sSerialCommandParam &param, bool is_temp)
+void add_cmd_constructor(SerializerData *d, sSerialCommandParam &param, bool is_temp)
 {
-	sSerialCommandParam inst;
-	AddReference(param, TypePointer, inst);
-	sSerialCommandParam size = param_const(TypeInt, (void*)param.type->SubType->Size);
-	//AddFuncInstance(inst);
-	AddFuncParam(inst);
-	AddFuncParam(size);
-	//void *p = DynamicArray::init;
-	AddFunctionCall((void*)&_fake_array_init_, cur_func);
-	if (is_temp)
-		InsertedConstructorTemp.add(param);
-	else
-		InsertedConstructorFunc.add(param);
+	foreach(param.type->Function, f){
+		if (f.Name == "__init__"){ // TODO test signature "void __init__()"
+			sSerialCommandParam inst;
+			AddReference(d, param, TypePointer, inst);
+			AddFuncInstance(inst);
+			void *fp;
+			if (f.Kind == KindCompilerFunction)
+				fp = PreCommand[f.Nr].Func;
+			else if (f.Kind == KindFunction){
+				fp = (void*)param.type->Owner->script->func[f.Nr];
+				if (!fp)
+					msg_error(param.type->Name + ".__init__() unlinkable compiler function!");
+			}
+
+			AddFunctionCall(d, fp);
+			if (is_temp)
+				InsertedConstructorTemp.add(param);
+			else
+				InsertedConstructorFunc.add(param);
+			return;
+		}
+	}
 }
 
-void add_cmd_destructor(sSerialCommandParam &param)
+void add_cmd_destructor(SerializerData *d, sSerialCommandParam &param)
 {
-	sSerialCommandParam inst;
-	AddReference(param, TypePointer, inst);
-	//AddFuncInstance(inst);
-	AddFuncParam(inst);
-	//void *p = DynamicArray::clear;
-	AddFunctionCall((void*)&_fake_array_clear_, cur_func);
+	foreach(param.type->Function, f)
+		if (f.Name == "__delete__"){ // TODO test signature "void __delete__()"
+			sSerialCommandParam inst;
+			AddReference(d, param, TypePointer, inst);
+			AddFuncInstance(inst);
+			void *fp;
+			if (f.Kind == KindCompilerFunction)
+				fp = PreCommand[f.Nr].Func;
+			else if (f.Kind == KindFunction){
+				fp = (void*)param.type->Owner->script->func[f.Nr];
+				if (!fp)
+					msg_error(param.type->Name + ".__delete__() unlinkable compiler function!");
+			}
+			AddFunctionCall(d, fp);
+		}
 }
 
-void FillInConstructorsFunc()
+void FillInConstructorsFunc(SerializerData *d)
 {
 	msg_db_r("FillInConstructorsFunc", 4);
-	for (int i=0;i<cur_func->Var.num;i++)
-		if (cur_func->Var[i].Type->IsSuperArray){
-			sSerialCommandParam param = param_local(cur_func->Var[i].Type, cur_func->Var[i]._Offset);
-			add_cmd_constructor(param, false);
+	for (int i=0;i<d->cur_func->Var.num;i++)
+		/*if (cur_func->Var[i].Type->Element.num > 0)*/{
+			sSerialCommandParam param = param_local(d->cur_func->Var[i].Type, d->cur_func->Var[i]._Offset);
+			add_cmd_constructor(d, param, false);
 		}
 	msg_db_l(4);
 }
 
-void FillInDestructors(bool from_temp)
+void FillInDestructors(SerializerData *d, bool from_temp)
 {
 	msg_db_r("FillInDestructors", 4);
 	if (from_temp){
 		for (int i=0;i<InsertedConstructorTemp.num;i++)
-			add_cmd_destructor(InsertedConstructorTemp[i]);
+			add_cmd_destructor(d, InsertedConstructorTemp[i]);
 		InsertedConstructorTemp.clear();
 	}else{
 		for (int i=0;i<InsertedConstructorFunc.num;i++)
-			add_cmd_destructor(InsertedConstructorFunc[i]);
+			add_cmd_destructor(d, InsertedConstructorFunc[i]);
 		InsertedConstructorFunc.clear();
 	}
 	msg_db_l(4);
 }
 
-inline int temp_in_cmd(int c, int v)
+inline int temp_in_cmd(SerializerData *d, int c, int v)
 {
-	if (cmd[c].inst >= inst_marker)
+	if (d->cmd[c].inst >= inst_marker)
 		return 0;
 	int r = 0;
-	if ((cmd[c].p1.kind == KindVarTemp) || (cmd[c].p1.kind == KindDerefVarTemp))
-		if ((long)cmd[c].p1.p == v)
-			r = 1 + ((cmd[c].p1.kind == KindDerefVarTemp) ? 4 : 0);
-	if ((cmd[c].p2.kind == KindVarTemp) || (cmd[c].p2.kind == KindDerefVarTemp))
-		if ((long)cmd[c].p2.p == v)
-			r += 2 + ((cmd[c].p2.kind == KindDerefVarTemp) ? 8 : 0);
+	if ((d->cmd[c].p1.kind == KindVarTemp) || (d->cmd[c].p1.kind == KindDerefVarTemp))
+		if ((long)d->cmd[c].p1.p == v)
+			r = 1 + ((d->cmd[c].p1.kind == KindDerefVarTemp) ? 4 : 0);
+	if ((d->cmd[c].p2.kind == KindVarTemp) || (d->cmd[c].p2.kind == KindDerefVarTemp))
+		if ((long)d->cmd[c].p2.p == v)
+			r += 2 + ((d->cmd[c].p2.kind == KindDerefVarTemp) ? 8 : 0);
 	return r;
 }
 
-void ScanTempVarUsage()
+void ScanTempVarUsage(SerializerData *d)
 {
 	msg_db_r("ScanTempVarUsage", 4);
-	for (int i=0;i<TempVar.num;i++){
-		TempVar[i].first = -1;
-		TempVar[i].last = -1;
-		TempVar[i].count = 0;
-		for (int c=0;c<cmd.num;c++){
-			if (temp_in_cmd(c, i) > 0){
-				TempVar[i].count ++;
-				if (TempVar[i].first < 0)
-					TempVar[i].first = c;
-				TempVar[i].last = c;
+	foreachi(d->TempVar, v, i){
+		v.first = -1;
+		v.last = -1;
+		v.count = 0;
+		for (int c=0;c<d->cmd.num;c++){
+			if (temp_in_cmd(d, c, i) > 0){
+				v.count ++;
+				if (v.first < 0)
+					v.first = c;
+				v.last = c;
 			}
 		}
-		//so(string2("var %d:   %d - %d", i, TempVar[i].first, TempVar[i].last));
+		//so(string2("var %d:   %d - %d", i, v.first, v.last));
 	}
-	TempVarRangesDefined = true;
+	d->TempVarRangesDefined = true;
 	msg_db_l(4);
 }
 
@@ -1687,9 +1609,9 @@ inline bool param_combi_allowed(int inst, sSerialCommandParam &p1, sSerialComman
 
 			*pp = temp;
 			if (p.type->Size == 1)
-				add_cmd(inst_mov_b, temp, p);
+				add_cmd(d, inst_mov_b, temp, p);
 			else
-				add_cmd(inst_mov, temp, p);
+				add_cmd(d, inst_mov, temp, p);
 			move_last_cmd(i);
 			//so("...ok");
 		}
@@ -1698,65 +1620,65 @@ inline bool param_combi_allowed(int inst, sSerialCommandParam &p1, sSerialComman
 }*/
 
 // mov [0x..] [0x...]  ->  mov eax, [0x..]   mov [0x..] eax    (etc)
-void CorrectUnallowedParamCombis()
+void CorrectUnallowedParamCombis(SerializerData *d)
 {
 	msg_db_r("CorrectCombis", 3);
-	for (int i=cmd.num-1;i>=0;i--){
-		if (cmd[i].inst >= inst_marker)
+	for (int i=d->cmd.num-1;i>=0;i--){
+		if (d->cmd[i].inst >= inst_marker)
 			continue;
 
 		// bad?
-		if (param_combi_allowed(cmd[i].inst, cmd[i].p1, cmd[i].p2))
+		if (param_combi_allowed(d->cmd[i].inst, d->cmd[i].p1, d->cmd[i].p2))
 			continue;
 
 		// correct
 		so(format("correcting param combi  cmd=%d", i));
-		bool mov_first_param = (cmd[i].p2.kind < 0) || (cmd[i].p1.kind == KindRefToConst) || (cmd[i].p1.kind == KindConstant);
-		sSerialCommandParam *pp = mov_first_param ? &cmd[i].p1 : &cmd[i].p2;
+		bool mov_first_param = (d->cmd[i].p2.kind < 0) || (d->cmd[i].p1.kind == KindRefToConst) || (d->cmd[i].p1.kind == KindConstant);
+		sSerialCommandParam *pp = mov_first_param ? &d->cmd[i].p1 : &d->cmd[i].p2;
 		sSerialCommandParam p = *pp;
 
 		if (p.type->Size == 1){
 			*pp = param_reg(p.type, RegAl);
-			add_cmd(inst_mov_b, *pp, p);
+			add_cmd(d, inst_mov_b, *pp, p);
 		}else{
 			*pp = param_reg(p.type, RegEax);
-			add_cmd(inst_mov, *pp, p);
+			add_cmd(d, inst_mov, *pp, p);
 		}
-		move_last_cmd(i);
+		move_last_cmd(d, i);
 		//so("...ok");
 	}
 	so("scan");
-	ScanTempVarUsage();
+	ScanTempVarUsage(d);
 	msg_db_l(3);
 }
 
-inline int find_unused_reg(int first, int last, bool allow_eax)
+inline int find_unused_reg(SerializerData *d, int first, int last, bool allow_eax)
 {
-	for (int r=0;r<MapReg.num;r++)
-		if (!is_reg_used_in_interval(MapReg[r], first, last))
-			return MapReg[r];
+	for (int r=0;r<d->MapReg.num;r++)
+		if (!is_reg_used_in_interval(d, d->MapReg[r], first, last))
+			return d->MapReg[r];
 	if (allow_eax)
-		if (!is_reg_used_in_interval(RegEax, first, last))
+		if (!is_reg_used_in_interval(d, RegEax, first, last))
 			return RegEax;
 	return -1;
 }
 
 // inst ... [local] ...
 // ->      mov reg, local     inst ...[reg]...
-inline void solve_deref_temp_local(int c, int np, bool is_local)
+inline void solve_deref_temp_local(SerializerData *d, int c, int np, bool is_local)
 {
-	sSerialCommandParam *pp = (np == 0) ? &cmd[c].p1 : &cmd[c].p2;
+	sSerialCommandParam *pp = (np == 0) ? &d->cmd[c].p1 : &d->cmd[c].p2;
 	sSerialCommandParam p = *pp;
 	int shift = p.shift;
 
-	sType *type_pointer = is_local ? TypePointer : TempVar[(long)p.p].type;
+	sType *type_pointer = is_local ? TypePointer : d->TempVar[(long)p.p].type;
 	sType *type_data = p.type;
 	
 	p.kind = is_local ? KindVarLocal : KindVarTemp;
 	p.shift = 0;
 	p.type = type_pointer;
 
-	int reg = find_unused_reg(c, c, true);
+	int reg = find_unused_reg(d, c, c, true);
 	//so(reg);
 	if (reg < 0){
 		cur_script->DoErrorInternal("solve_deref_temp_local... no registers available");
@@ -1771,14 +1693,14 @@ inline void solve_deref_temp_local(int c, int np, bool is_local)
 	
 	*pp = p_deref_reg;
 		
-	add_cmd(inst_mov, p_reg, p);
-	move_last_cmd(c);
+	add_cmd(d, inst_mov, p_reg, p);
+	move_last_cmd(d, c);
 	if (shift > 0){
-		add_cmd(inst_add, p_reg, param_const(TypeInt, (void*)shift));
-		move_last_cmd(c + 1);
-		add_reg_channel(reg, c, c + 2);
+		add_cmd(d, inst_add, p_reg, param_const(TypeInt, (void*)shift));
+		move_last_cmd(d, c + 1);
+		add_reg_channel(d, reg, c, c + 2);
 	}else
-		add_reg_channel(reg, c, c + 1);
+		add_reg_channel(d, reg, c, c + 1);
 }
 
 void add_stack_var(sType *type, int first, int last, sSerialCommandParam &p);
@@ -1847,13 +1769,13 @@ void ResolveDerefLocal()
 			cmd[i].p1 = p_deref_reg2;
 			cmd[i].p2 = p_reg;
 	
-			add_cmd(inst_mov, p_reg2, p2);
+			add_cmd(d, inst_mov, p_reg2, p2);
 			move_last_cmd(i);
 	
-			add_cmd(inst_mov, p_reg, p_deref_reg2);
+			add_cmd(d, inst_mov, p_reg, p_deref_reg2);
 			move_last_cmd(i + 1);
 	
-			add_cmd(inst_mov, p_reg2, p1);
+			add_cmd(d, inst_mov, p_reg2, p1);
 			move_last_cmd(i + 2);
 
 			add_reg_channel(reg, i + 1, i + 3);
@@ -1867,34 +1789,34 @@ void ResolveDerefLocal()
 #endif
 
 
-void ResolveDerefTempAndLocal()
+void ResolveDerefTempAndLocal(SerializerData *d)
 {
 	msg_db_r("ResolveDerefTempAndLocal", 3);
-	for (int i=cmd.num-1;i>=0;i--){
-		if (cmd[i].inst >= inst_marker)
+	for (int i=d->cmd.num-1;i>=0;i--){
+		if (d->cmd[i].inst >= inst_marker)
 			continue;
-		bool dl1 = ((cmd[i].p1.kind == KindDerefVarLocal) || (cmd[i].p1.kind == KindDerefVarTemp));
-		bool dl2 = ((cmd[i].p2.kind == KindDerefVarLocal) || (cmd[i].p2.kind == KindDerefVarTemp));
+		bool dl1 = ((d->cmd[i].p1.kind == KindDerefVarLocal) || (d->cmd[i].p1.kind == KindDerefVarTemp));
+		bool dl2 = ((d->cmd[i].p2.kind == KindDerefVarLocal) || (d->cmd[i].p2.kind == KindDerefVarTemp));
 		if (!(dl1 || dl2))
 			continue;
 
-		bool is_local1 = (cmd[i].p1.kind == KindDerefVarLocal);
-		bool is_local2 = (cmd[i].p2.kind == KindDerefVarLocal);
+		bool is_local1 = (d->cmd[i].p1.kind == KindDerefVarLocal);
+		bool is_local2 = (d->cmd[i].p2.kind == KindDerefVarLocal);
 		
 		so(format("deref temp/local... cmd=%d", i));
 		if (!dl2){
-			solve_deref_temp_local(i, 0, is_local1);
+			solve_deref_temp_local(d, i, 0, is_local1);
 			i ++;
 		}else if (!dl1){
-			solve_deref_temp_local(i, 1, is_local2);
+			solve_deref_temp_local(d, i, 1, is_local2);
 			i ++;
 		}else{
 			// hopefully... p2 is read-only
 
 			sType *type_pointer = TypePointer;
-			sType *type_data = cmd[i].p1.type;
+			sType *type_data = d->cmd[i].p1.type;
 
-			int reg = find_unused_reg(i, i, true);
+			int reg = find_unused_reg(d, i, i, true);
 			so(reg);
 			if (reg < 0){
 				cur_script->DoErrorInternal("deref local... both sides... .no registers available");
@@ -1905,9 +1827,9 @@ void ResolveDerefTempAndLocal()
 			sSerialCommandParam p_reg = param_reg(type_data, reg);
 			if (type_data->Size == 1)
 				p_reg = param_reg(type_data, reg_smallify(reg));
-			add_reg_channel(reg, i, i); // temp
+			add_reg_channel(d, reg, i, i); // temp
 			
-			int reg2 = find_unused_reg(i, i, true);
+			int reg2 = find_unused_reg(d, i, i, true);
 			so(reg2);
 			if (reg2 < 0){
 				cur_script->DoErrorInternal("deref temp/local... both sides... .no registers available");
@@ -1920,7 +1842,7 @@ void ResolveDerefTempAndLocal()
 			p_deref_reg2.p = (char*)reg2;
 			p_deref_reg2.type = type_data;
 			p_deref_reg2.shift = 0;
-			RegChannel.resize(RegChannel.num - 1); // remove temp reg channel...
+			d->RegChannel.pop(); // remove temp reg channel...
 
 			// inst [l1] [l2]
 			// ->
@@ -1930,8 +1852,8 @@ void ResolveDerefTempAndLocal()
 			// mov reg2, l1
 			//   (add reg2, shift1)
 			// inst [reg2], reg
-			sSerialCommandParam p1 = cmd[i].p1;
-			sSerialCommandParam p2 = cmd[i].p2;
+			sSerialCommandParam p1 = d->cmd[i].p1;
+			sSerialCommandParam p2 = d->cmd[i].p2;
 			int shift1 = p1.shift;
 			int shift2 = p2.shift;
 			p1.shift = p2.shift = 0;
@@ -1940,36 +1862,36 @@ void ResolveDerefTempAndLocal()
 			p2.kind = is_local2 ? KindVarLocal : KindVarTemp;
 			p1.type = type_pointer;
 			p2.type = type_pointer;
-			cmd[i].p1 = p_deref_reg2;
-			cmd[i].p2 = p_reg;
+			d->cmd[i].p1 = p_deref_reg2;
+			d->cmd[i].p2 = p_reg;
 			int cmd_pos = i;
 
 			int r2_first = cmd_pos;
-			add_cmd(inst_mov, p_reg2, p2);
-			move_last_cmd(cmd_pos ++);
+			add_cmd(d, inst_mov, p_reg2, p2);
+			move_last_cmd(d, cmd_pos ++);
 
 			if (shift2 > 0){
-				add_cmd(inst_add, p_reg2, param_const(TypeInt, (void*)shift2));
-				move_last_cmd(cmd_pos ++);
+				add_cmd(d, inst_add, p_reg2, param_const(TypeInt, (void*)shift2));
+				move_last_cmd(d, cmd_pos ++);
 			}
 
 			int r1_first = cmd_pos;
 			if (type_data->Size == 1)
-				add_cmd(inst_mov_b, p_reg, p_deref_reg2);
+				add_cmd(d, inst_mov_b, p_reg, p_deref_reg2);
 			else
-				add_cmd(inst_mov, p_reg, p_deref_reg2);
-			move_last_cmd(cmd_pos ++);
+				add_cmd(d, inst_mov, p_reg, p_deref_reg2);
+			move_last_cmd(d, cmd_pos ++);
 	
-			add_cmd(inst_mov, p_reg2, p1);
-			move_last_cmd(cmd_pos ++);
+			add_cmd(d, inst_mov, p_reg2, p1);
+			move_last_cmd(d, cmd_pos ++);
 
 			if (shift1 > 0){
-				add_cmd(inst_add, p_reg2, param_const(TypeInt, (void*)shift1));
-				move_last_cmd(cmd_pos ++);
+				add_cmd(d, inst_add, p_reg2, param_const(TypeInt, (void*)shift1));
+				move_last_cmd(d, cmd_pos ++);
 			}
 
-			add_reg_channel(reg, r1_first, cmd_pos);
-			add_reg_channel(reg2, r2_first, cmd_pos);
+			add_reg_channel(d, reg, r1_first, cmd_pos);
+			add_reg_channel(d, reg2, r2_first, cmd_pos);
 				
 			i = cmd_pos;
 		}
@@ -1977,11 +1899,11 @@ void ResolveDerefTempAndLocal()
 	msg_db_l(3);
 }
 
-bool ParamUntouchedInInterval(sSerialCommandParam &p, int first, int last)
+bool ParamUntouchedInInterval(SerializerData *d, sSerialCommandParam &p, int first, int last)
 {
 	// direct usage?
 	for (int i=first;i<=last;i++)
-		if ((cmd[i].p1 == p) || (cmd[i].p2 == p))
+		if ((d->cmd[i].p1 == p) || (d->cmd[i].p2 == p))
 			return false;
 	
 	// registers may be more subtle..
@@ -1989,47 +1911,47 @@ bool ParamUntouchedInInterval(sSerialCommandParam &p, int first, int last)
 		for (int i=first;i<=last;i++){
 			
 			// call violates all!
-			if (cmd[i].inst == inst_call)
+			if (d->cmd[i].inst == inst_call)
 				return false;
 
 			// div violates eax and edx
-			if (cmd[i].inst == inst_div)
+			if (d->cmd[i].inst == inst_div)
 				if (((long)p.p == RegEdx) || ((long)p.p == RegEax))
 					return false;
 
 			// registers used? (may be part of the same meta-register)
-			if ((cmd[i].p1.kind == KindRegister) || (cmd[i].p1.kind == KindDerefRegister))
-				if (RegRoot[(long)cmd[i].p1.p] == RegRoot[(long)p.p])
+			if ((d->cmd[i].p1.kind == KindRegister) || (d->cmd[i].p1.kind == KindDerefRegister))
+				if (RegRoot[(long)d->cmd[i].p1.p] == RegRoot[(long)p.p])
 					return false;
-			if ((cmd[i].p2.kind == KindRegister) || (cmd[i].p2.kind == KindDerefRegister))
-				if (RegRoot[(long)cmd[i].p2.p] == RegRoot[(long)p.p])
+			if ((d->cmd[i].p2.kind == KindRegister) || (d->cmd[i].p2.kind == KindDerefRegister))
+				if (RegRoot[(long)d->cmd[i].p2.p] == RegRoot[(long)p.p])
 					return false;
 		}
 	}
 	return true;
 }
 
-void SimplifyFPUStack()
+void SimplifyFPUStack(SerializerData *d)
 {
 	msg_db_r("SimplifyFPUStack", 3);
 
 // fstp temp
 // fld temp
-	for (int v=TempVar.num-1;v>=0;v--){
+	for (int v=d->TempVar.num-1;v>=0;v--){
 		// may only appear two times
-		if (TempVar[v].count > 2)
+		if (d->TempVar[v].count > 2)
 			continue;
 
 		// stored then loaded...?
-		if ((cmd[TempVar[v].first].inst != inst_fstp) || (cmd[TempVar[v].last].inst != inst_fld))
+		if ((d->cmd[d->TempVar[v].first].inst != inst_fstp) || (d->cmd[d->TempVar[v].last].inst != inst_fld))
 			continue;
 
 		// value still on the stack?
 		int d_stack = 0, min_d_stack = 0, max_d_stack = 0;
-		for (int i=TempVar[v].first + 1;i<TempVar[v].last;i++){
-			if (cmd[i].inst == inst_fld)
+		for (int i=d->TempVar[v].first + 1;i<d->TempVar[v].last;i++){
+			if (d->cmd[i].inst == inst_fld)
 				d_stack ++;
-			else if (cmd[i].inst == inst_fstp)
+			else if (d->cmd[i].inst == inst_fstp)
 				d_stack --;
 			min_d_stack = min(min_d_stack, d_stack);
 			max_d_stack = max(max_d_stack, d_stack);
@@ -2038,98 +1960,99 @@ void SimplifyFPUStack()
 			continue;
 
 		// reuse value on the stack
-		so(format("fpu (a)  var=%d first=%d last=%d stack: d=%d min=%d max=%d", v, TempVar[v].first, TempVar[v].last, d_stack, min_d_stack, max_d_stack));
-		remove_cmd(TempVar[v].last);
-		remove_cmd(TempVar[v].first);
-		remove_temp_var(v);
+		so(format("fpu (a)  var=%d first=%d last=%d stack: d=%d min=%d max=%d", v, d->TempVar[v].first, d->TempVar[v].last, d_stack, min_d_stack, max_d_stack));
+		remove_cmd(d, d->TempVar[v].last);
+		remove_cmd(d, d->TempVar[v].first);
+		remove_temp_var(d, v);
 	}
 
 // fstp temp
 // mov xxx, temp
-	for (int v=TempVar.num-1;v>=0;v--){
+	for (int v=d->TempVar.num-1;v>=0;v--){
 		// may only appear two times
-		if (TempVar[v].count > 2)
+		if (d->TempVar[v].count > 2)
 			continue;
 
 		// stored then moved...?
-		if ((cmd[TempVar[v].first].inst != inst_fstp) || (cmd[TempVar[v].last].inst != inst_mov))
+		if ((d->cmd[d->TempVar[v].first].inst != inst_fstp) || (d->cmd[d->TempVar[v].last].inst != inst_mov))
 			continue;
-		if (temp_in_cmd(TempVar[v].last, v) != 2)
+		if (temp_in_cmd(d, d->TempVar[v].last, v) != 2)
 			continue;
 		// moved into fstore'able?
-		int kind = cmd[TempVar[v].last].p1.kind;
+		int kind = d->cmd[d->TempVar[v].last].p1.kind;
 		if ((kind != KindVarLocal) && (kind != KindVarGlobal) && (kind != KindVarTemp) && (kind != KindDerefVarTemp) && (kind != KindDerefRegister))
 		    continue;
 
 		// check, if mov target is used in between
-		sSerialCommandParam target = cmd[TempVar[v].last].p1;
-		if (!ParamUntouchedInInterval(target, TempVar[v].first + 1 ,TempVar[v].last - 1))
+		sSerialCommandParam target = d->cmd[d->TempVar[v].last].p1;
+		if (!ParamUntouchedInInterval(d, target, d->TempVar[v].first + 1 ,d->TempVar[v].last - 1))
 			continue;
 		// ...we are lazy...
 		//if (TempVar[v].last - TempVar[v].first != 1)
 		//	continue;
 
 		// store directly into target
-		so(format("fpu (b)  var=%d first=%d last=%d", v, TempVar[v].first, TempVar[v].last));
-		cmd[TempVar[v].first].p1 = target;
-		move_param(target, TempVar[v].last, TempVar[v].first);
-		remove_cmd(TempVar[v].last);
-		remove_temp_var(v);
+		so(format("fpu (b)  var=%d first=%d last=%d", v, d->TempVar[v].first, d->TempVar[v].last));
+		d->cmd[d->TempVar[v].first].p1 = target;
+		move_param(d, target, d->TempVar[v].last, d->TempVar[v].first);
+		remove_cmd(d, d->TempVar[v].last);
+		remove_temp_var(d, v);
 	}
 	msg_db_l(3);
 }
 
 // remove  mov x,...    mov ...,x   (and similar)
 //    (does not affect reg channels)
-void SimplifyMovs()
+void SimplifyMovs(SerializerData *d)
 {
 	// TODO: count > 2 .... first == input && all_other == output?  (only if first == mov (!=eax?)... else count == 2)
 	// should take care of fpu simplification (b)...
 	
 	msg_db_r("SimplifyMovs", 3);
-	for (int v=TempVar.num-1;v>=0;v--){
+	for (int vi=d->TempVar.num-1;vi>=0;vi--){
+		sTempVar &v = d->TempVar[vi];
 		
 		// may only appear two times
-		if (TempVar[v].count > 2)
+		if (v.count > 2)
 			continue;
 
 		// both times in a mov command (or fld as second)
-		if (cmd[TempVar[v].first].inst != inst_mov)
+		if (d->cmd[v.first].inst != inst_mov)
 			continue;
-		int n = cmd[TempVar[v].last].inst;
+		int n = d->cmd[v.last].inst;
 		bool fld = (n == inst_fld) || (n == inst_fadd) || (n == inst_fadd) || (n == inst_fsub) || (n == inst_fmul) || (n == inst_fdiv);
-		if ((cmd[TempVar[v].last].inst != inst_mov) && (!fld))
+		if ((d->cmd[v.last].inst != inst_mov) && (!fld))
 			continue;
 		
 		// used as source/target?   no deref?
-		if ((temp_in_cmd(TempVar[v].first, v) != 1) || (temp_in_cmd(TempVar[v].last, v) != (fld ? 1 : 2)))
+		if ((temp_in_cmd(d, v.first, vi) != 1) || (temp_in_cmd(d, v.last, vi) != (fld ? 1 : 2)))
 			continue;
 
 		// new construction allowed?
-		sSerialCommandParam target = cmd[TempVar[v].last].p1;
-		sSerialCommandParam source = cmd[TempVar[v].first].p2;
+		sSerialCommandParam target = d->cmd[v.last].p1;
+		sSerialCommandParam source = d->cmd[v.first].p2;
 		if (fld){
-			if (!param_combi_allowed(cmd[TempVar[v].last].inst, source, cmd[TempVar[v].last].p2))
+			if (!param_combi_allowed(d->cmd[v.last].inst, source, d->cmd[v.last].p2))
 				continue;
 		}else{
-			if (!param_combi_allowed(cmd[TempVar[v].last].inst, cmd[TempVar[v].last].p1, source))
+			if (!param_combi_allowed(d->cmd[v.last].inst, d->cmd[v.last].p1, source))
 				continue;
 		}
 
 		// check, if mov source or target are used in between
-		if (!ParamUntouchedInInterval(target, TempVar[v].first + 1 ,TempVar[v].last - 1))
+		if (!ParamUntouchedInInterval(d, target, v.first + 1 ,v.last - 1))
 			continue;
-		if (!ParamUntouchedInInterval(source, TempVar[v].first + 1 ,TempVar[v].last - 1))
+		if (!ParamUntouchedInInterval(d, source, v.first + 1 ,v.last - 1))
 			continue;
 		
-		so(format("mov simplification allowed  v=%d first=%d last=%d", v, TempVar[v].first, TempVar[v].last));
+		so(format("mov simplification allowed  v=%d first=%d last=%d", vi, v.first, v.last));
 		if (fld)
-			cmd[TempVar[v].last].p1 = source;
+			d->cmd[v.last].p1 = source;
 		else
-			cmd[TempVar[v].last].p2 = source;
-		move_param(source, TempVar[v].first, TempVar[v].last);
-		remove_cmd(TempVar[v].first);
-		remove_temp_var(v);
+			d->cmd[v.last].p2 = source;
+		move_param(d, source, v.first, v.last);
+		remove_cmd(d, v.first);
+		remove_temp_var(d, vi);
 	}
 
 	// TODO: should happen automatically...
@@ -2154,15 +2077,16 @@ void SimplifyMovs()
 		set_reg_used((long)cmd[c].p2.p);
 }*/
 
-void MapTempVarToReg(int v, int reg)
+void MapTempVarToReg(SerializerData *d, int vi, int reg)
 {
 	msg_db_r("reg", 4);
-	so(format("temp=reg:  %d - %d:   tv %d := reg %d", TempVar[v].first, TempVar[v].last, v, reg));
+	sTempVar &v = d->TempVar[vi];
+	so(format("temp=reg:  %d - %d:   tv %d := reg %d", v.first, v.last, vi, reg));
 
 	int reg32 = reg;
 	
 	// only small register?
-	if (TempVar[v].type->Size == 1){
+	if (v.type->Size == 1){
 		if (reg == RegEax)		reg = RegAl;
 		else if (reg == RegEdx)	reg = RegDl;
 		else if (reg == RegEcx)	reg = RegCl;
@@ -2170,29 +2094,29 @@ void MapTempVarToReg(int v, int reg)
 		else msg_error(format("wrong 8b register: %d", reg));
 	}
 	
-	sSerialCommandParam p = param_reg(TempVar[v].type, reg);
+	sSerialCommandParam p = param_reg(v.type, reg);
 	
 	// map register
-	for (int i=TempVar[v].first;i<=TempVar[v].last;i++){
-		int r = temp_in_cmd(i, v);
+	for (int i=v.first;i<=v.last;i++){
+		int r = temp_in_cmd(d, i, vi);
 		if (r & 1){
-			p.shift = cmd[i].p1.shift;
-			cmd[i].p1 = p;
+			p.shift = d->cmd[i].p1.shift;
+			d->cmd[i].p1 = p;
 			if (r & 4)
-				cmd[i].p1.kind = KindDerefRegister;
+				d->cmd[i].p1.kind = KindDerefRegister;
 		}
 		if (r & 2){
-			p.shift = cmd[i].p2.shift;
-			cmd[i].p2 = p;
+			p.shift = d->cmd[i].p2.shift;
+			d->cmd[i].p2 = p;
 			if (r & 8)
-				cmd[i].p2.kind = KindDerefRegister;
+				d->cmd[i].p2.kind = KindDerefRegister;
 		}
 	}
-	add_reg_channel(reg32, TempVar[v].first, TempVar[v].last);
+	add_reg_channel(d, reg32, v.first, v.last);
 	msg_db_l(4);
 }
 
-void add_stack_var(sType *type, int first, int last, sSerialCommandParam &p)
+void add_stack_var(SerializerData *d, sType *type, int first, int last, sSerialCommandParam &p)
 {
 	so("add_stack_var");
 	so(type->Size);
@@ -2200,10 +2124,10 @@ void add_stack_var(sType *type, int first, int last, sSerialCommandParam &p)
 	// don't mind... use old algorithm: ALWAYS grow stack... remove ALL on each command in a block
 
 	int s = mem_align(type->Size);
-	StackOffset += s;
-	int offset = - StackOffset;
-	if (StackOffset > StackMaxSize)
-		StackMaxSize = StackOffset;
+	d->StackOffset += s;
+	int offset = - d->StackOffset;
+	if (d->StackOffset > d->StackMaxSize)
+		d->StackMaxSize = d->StackOffset;
 
 	p.kind = KindVarLocal;
 	p.p = (char*)offset;
@@ -2211,17 +2135,18 @@ void add_stack_var(sType *type, int first, int last, sSerialCommandParam &p)
 	p.shift = 0;
 }
 
-void MapTempVarToStack(int v)
+void MapTempVarToStack(SerializerData *d, int vi)
 {
 	msg_db_r("stack", 4);
-	so(format("temp=stack: %d   (%d - %d)", v, TempVar[v].first, TempVar[v].last));
+	sTempVar &v = d->TempVar[vi];
+	so(format("temp=stack: %d   (%d - %d)", vi, v.first, v.last));
 
 	sSerialCommandParam p;
-	add_stack_var(TempVar[v].type, TempVar[v].first, TempVar[v].last, p);
+	add_stack_var(d, v.type, v.first, v.last, p);
 	
 	// map
-	for (int i=TempVar[v].first;i<=TempVar[v].last;i++){
-		int r = temp_in_cmd(i, v);
+	for (int i=v.first;i<=v.last;i++){
+		int r = temp_in_cmd(d, i, vi);
 		if (r == 0)
 			continue;
 
@@ -2232,9 +2157,9 @@ void MapTempVarToStack(int v)
 		
 		sSerialCommandParam *p_own;
 		if ((r & 1) > 0){
-			p_own = &cmd[i].p1;
+			p_own = &d->cmd[i].p1;
 		}else{
-			p_own = &cmd[i].p2;
+			p_own = &d->cmd[i].p2;
 		}
 		bool deref = (r > 3);
 
@@ -2276,9 +2201,9 @@ void MapTempVarToStack(int v)
 			if (deref)
 				cur_script->DoErrorInternal("map_stack_var (read, write, deref)");
 			*p_own = p_eax;
-			add_cmd(inst_mov, p_eax, p);
+			add_cmd(d, inst_mov, p_eax, p);
 			move_last_cmd(i);
-			add_cmd(inst_mov, p, p_eax);
+			add_cmd(d, inst_mov, p, p_eax);
 			move_last_cmd(i+2);
 			add_reg_channel(RegEax, i, i + 2);
 			i += 2;
@@ -2288,17 +2213,17 @@ void MapTempVarToStack(int v)
 				//cur_script->DoErrorInternal("map_stack_var (write, deref)");
 				int shift = p_own->shift;
 				*p_own = p_deref_eax;
-				add_cmd(inst_mov, p_eax, p);
+				add_cmd(d, inst_mov, p_eax, p);
 				move_last_cmd(i);
 				if (shift > 0){
-					add_cmd(inst_add, p_eax, param_const(TypeInt, (void*)shift));
+					add_cmd(d, inst_add, p_eax, param_const(TypeInt, (void*)shift));
 					move_last_cmd(i + 1);
 					add_reg_channel(RegEax, i, i + 2);
 				}else
 					add_reg_channel(RegEax, i, i + 1);
 			}else{
 				*p_own = p_eax;
-				add_cmd(inst_mov, p, p_eax);
+				add_cmd(d, inst_mov, p, p_eax);
 				move_last_cmd(i+1);
 				add_reg_channel(RegEax, i, i + 1);
 			}
@@ -2306,10 +2231,10 @@ void MapTempVarToStack(int v)
 		}else{ // read only
 			int shift = p_own->shift;
 			*p_own = deref ? p_deref_eax : p_eax;
-			add_cmd(inst_mov, p_eax, p);
+			add_cmd(d, inst_mov, p_eax, p);
 			move_last_cmd(i);
 			if ((deref) && (shift > 0)){
-				add_cmd(inst_add, p_eax, param_const(TypeInt, (void*)shift));
+				add_cmd(d, inst_add, p_eax, param_const(TypeInt, (void*)shift));
 				move_last_cmd(i + 1);
 				add_reg_channel(RegEax, i, i + 2);
 			}else
@@ -2321,13 +2246,13 @@ void MapTempVarToStack(int v)
 	msg_db_l(4);
 }
 
-inline bool is_reg_used_in_interval(int reg, int first, int last)
+inline bool is_reg_used_in_interval(SerializerData *d, int reg, int first, int last)
 {
 	//so(string2("used?   %d: %d - %d", reg, first, last));
-	for (int i=0;i<RegChannel.num;i++)
-		if (RegChannel[i].reg == reg){
+	for (int i=0;i<d->RegChannel.num;i++)
+		if (d->RegChannel[i].reg == reg){
 			//so(string2("rc   %d: %d - %d", RegChannel[i].reg, RegChannel[i].first, RegChannel[i].last));
-			if ((RegChannel[i].first <= last) && (RegChannel[i].last >= first)){
+			if ((d->RegChannel[i].first <= last) && (d->RegChannel[i].last >= first)){
 				so(i);
 				return true;
 			}
@@ -2336,16 +2261,17 @@ inline bool is_reg_used_in_interval(int reg, int first, int last)
 	return false;
 }
 
-void MapTempVar(int v)
+void MapTempVar(SerializerData *d, int vi)
 {
 	msg_db_r("MapTempVar", 4);
-	int first = TempVar[v].first;
-	int last = TempVar[v].last;
+	sTempVar &v = d->TempVar[vi];
+	int first = v.first;
+	int last = v.last;
 
 	bool reg_allowed = true;
 	for (int i=first;i<=last;i++)
-		if (temp_in_cmd(i, v))
-			if (!GetInstructionAllowGenReg(cmd[i].inst)){
+		if (temp_in_cmd(d, i, vi))
+			if (!GetInstructionAllowGenReg(d->cmd[i].inst)){
 				reg_allowed = false;
 				break;
 			}
@@ -2355,30 +2281,30 @@ void MapTempVar(int v)
 
 		// any register not used in this interval?
 		for (int i=0;i<max_reg;i++)
-			RegUsed[i] = false;
-		for (int i=0;i<RegChannel.num;i++)
-			if ((RegChannel[i].first <= last) && (RegChannel[i].last >= first))
-				RegUsed[RegChannel[i].reg] = true;
-		for (int i=0;i<MapReg.num;i++)
-			if (!RegUsed[MapReg[i]]){
-				reg = MapReg[i];
+			d->RegUsed[i] = false;
+		for (int i=0;i<d->RegChannel.num;i++)
+			if ((d->RegChannel[i].first <= last) && (d->RegChannel[i].last >= first))
+				d->RegUsed[d->RegChannel[i].reg] = true;
+		for (int i=0;i<d->MapReg.num;i++)
+			if (!d->RegUsed[d->MapReg[i]]){
+				reg = d->MapReg[i];
 				break;
 			}
 	}
 
 	if (reg >= 0)
-		MapTempVarToReg(v, reg);
+		MapTempVarToReg(d, vi, reg);
 	else
-		MapTempVarToStack(v);
+		MapTempVarToStack(d, vi);
 	msg_db_l(4);
 }
 
-void MapTempVars()
+void MapTempVars(SerializerData *d)
 {
 	msg_db_r("MapTempVars", 3);
 
-	for (int i=0;i<TempVar.num;i++)
-		MapTempVar(i);
+	for (int i=0;i<d->TempVar.num;i++)
+		MapTempVar(d, i);
 	
 	//cmd_list_out();
 	msg_db_l(3);
@@ -2393,43 +2319,43 @@ inline void try_map_param_to_stack(sSerialCommandParam &p, int v, sSerialCommand
 	}
 }
 
-void MapReferencedTempVars()
+void MapReferencedTempVars(SerializerData *d)
 {
 	msg_db_r("MapReferencedTempVars", 3);
-	for (int i=0;i<cmd.num;i++)
-		if (cmd[i].inst == inst_lea)
-			if (cmd[i].p2.kind == KindVarTemp){
-				TempVar[(long)cmd[i].p2.p].referenced = true;
+	for (int i=0;i<d->cmd.num;i++)
+		if (d->cmd[i].inst == inst_lea)
+			if (d->cmd[i].p2.kind == KindVarTemp){
+				d->TempVar[(long)d->cmd[i].p2.p].referenced = true;
 			}
 
-	for (int i=TempVar.num-1;i>=0;i--)
-		if (TempVar[i].referenced){
+	for (int i=d->TempVar.num-1;i>=0;i--)
+		if (d->TempVar[i].referenced){
 			sSerialCommandParam stackvar;
-			add_stack_var(TempVar[i].type, TempVar[i].first, TempVar[i].last, stackvar);
-			for (int j=0;j<cmd.num;j++){
-				try_map_param_to_stack(cmd[j].p1, i, stackvar);
-				try_map_param_to_stack(cmd[j].p2, i, stackvar);
+			add_stack_var(d, d->TempVar[i].type, d->TempVar[i].first, d->TempVar[i].last, stackvar);
+			for (int j=0;j<d->cmd.num;j++){
+				try_map_param_to_stack(d->cmd[j].p1, i, stackvar);
+				try_map_param_to_stack(d->cmd[j].p2, i, stackvar);
 			}
-			remove_temp_var(i);
+			remove_temp_var(d, i);
 		}
 	msg_db_l(3);
 }
 
-void DisentangleShiftedTempVars()
+void DisentangleShiftedTempVars(SerializerData *d)
 {
 	msg_db_r("DisentangleShiftedTempVars", 3);
-	for (int i=0;i<cmd.num;i++){
-		if ((cmd[i].p1.kind == KindVarTemp) && (cmd[i].p1.shift > 0)){
-			TempVar[(long)cmd[i].p1.p].entangled = max(TempVar[(long)cmd[i].p1.p].entangled, cmd[i].p1.shift);
+	for (int i=0;i<d->cmd.num;i++){
+		if ((d->cmd[i].p1.kind == KindVarTemp) && (d->cmd[i].p1.shift > 0)){
+			d->TempVar[(long)d->cmd[i].p1.p].entangled = max(d->TempVar[(long)d->cmd[i].p1.p].entangled, d->cmd[i].p1.shift);
 		}
-		if ((cmd[i].p2.kind == KindVarTemp) && (cmd[i].p2.shift > 0)){
-			TempVar[(long)cmd[i].p2.p].entangled = max(TempVar[(long)cmd[i].p2.p].entangled, cmd[i].p2.shift);
+		if ((d->cmd[i].p2.kind == KindVarTemp) && (d->cmd[i].p2.shift > 0)){
+			d->TempVar[(long)d->cmd[i].p2.p].entangled = max(d->TempVar[(long)d->cmd[i].p2.p].entangled, d->cmd[i].p2.shift);
 		}
 	}
-	for (int i=TempVar.num-1;i>=0;i--)
-		if (TempVar[i].entangled > 0){
-			int n = TempVar[i].entangled / 4 + 1;
-			sType *t = TempVar[i].type;
+	for (int i=d->TempVar.num-1;i>=0;i--)
+		if (d->TempVar[i].entangled > 0){
+			int n = d->TempVar[i].entangled / 4 + 1;
+			sType *t = d->TempVar[i].type;
 			so("entangled");
 			so(n);
 			sSerialCommandParam *p = new sSerialCommandParam[n];
@@ -2442,51 +2368,51 @@ void DisentangleShiftedTempVars()
 					if (t->Element[k].Offset == j * 4)
 						if (t->Element[k].Type->Size == 4)
 							tt = t->Element[k].Type;
-				add_temp(tt, p[j]);
+				add_temp(d, tt, p[j]);
 			}
 			
-			for (int j=0;j<cmd.num;j++){
-				if ((cmd[j].p1.kind == KindVarTemp) && ((long)cmd[j].p1.p == i))
-					cmd[j].p1 = p[cmd[j].p1.shift / 4];
-				if ((cmd[j].p2.kind == KindVarTemp) && ((long)cmd[j].p2.p == i))
-					cmd[j].p2 = p[cmd[j].p2.shift / 4];
+			for (int j=0;j<d->cmd.num;j++){
+				if ((d->cmd[j].p1.kind == KindVarTemp) && ((long)d->cmd[j].p1.p == i))
+					d->cmd[j].p1 = p[d->cmd[j].p1.shift / 4];
+				if ((d->cmd[j].p2.kind == KindVarTemp) && ((long)d->cmd[j].p2.p == i))
+					d->cmd[j].p2 = p[d->cmd[j].p2.shift / 4];
 			}
 			delete[]p;
-			remove_temp_var(i);
+			remove_temp_var(d, i);
 		}
 
-	ScanTempVarUsage();
+	ScanTempVarUsage(d);
 	msg_db_l(3);
 }
 
 // TODO....
-void ResolveDerefRegShift()
+void ResolveDerefRegShift(SerializerData *d)
 {
 	msg_db_r("ResolveDerefRegShift", 3);
-	for (int i=cmd.num-1;i>=0;i--){
-		if ((cmd[i].p1.kind == KindDerefRegister) && (cmd[i].p1.shift > 0)){
-			int s = cmd[i].p1.shift;
-			cmd[i].p1.shift = 0;
-			add_cmd(inst_add, param_reg(TypeReg32, RegRoot[(long)cmd[i].p1.p]), param_const(TypeInt, (void*)s));
-			move_last_cmd(i);
-			add_cmd(inst_sub, param_reg(TypeReg32, RegRoot[(long)cmd[i].p1.p]), param_const(TypeInt, (void*)s));
-			move_last_cmd(i + 2);
+	for (int i=d->cmd.num-1;i>=0;i--){
+		if ((d->cmd[i].p1.kind == KindDerefRegister) && (d->cmd[i].p1.shift > 0)){
+			int s = d->cmd[i].p1.shift;
+			d->cmd[i].p1.shift = 0;
+			add_cmd(d, inst_add, param_reg(TypeReg32, RegRoot[(long)d->cmd[i].p1.p]), param_const(TypeInt, (void*)s));
+			move_last_cmd(d, i);
+			add_cmd(d, inst_sub, param_reg(TypeReg32, RegRoot[(long)d->cmd[i].p1.p]), param_const(TypeInt, (void*)s));
+			move_last_cmd(d, i + 2);
 			continue;
 		}
-		if ((cmd[i].p2.kind == KindDerefRegister) && (cmd[i].p2.shift > 0)){
-			int s = cmd[i].p2.shift;
-			cmd[i].p2.shift = 0;
-			add_cmd(inst_add, param_reg(TypeReg32, RegRoot[(long)cmd[i].p2.p]), param_const(TypeInt, (void*)s));
-			move_last_cmd(i);
-			add_cmd(inst_sub, param_reg(TypeReg32, RegRoot[(long)cmd[i].p2.p]), param_const(TypeInt, (void*)s));
-			move_last_cmd(i + 2);
+		if ((d->cmd[i].p2.kind == KindDerefRegister) && (d->cmd[i].p2.shift > 0)){
+			int s = d->cmd[i].p2.shift;
+			d->cmd[i].p2.shift = 0;
+			add_cmd(d, inst_add, param_reg(TypeReg32, RegRoot[(long)d->cmd[i].p2.p]), param_const(TypeInt, (void*)s));
+			move_last_cmd(d, i);
+			add_cmd(d, inst_sub, param_reg(TypeReg32, RegRoot[(long)d->cmd[i].p2.p]), param_const(TypeInt, (void*)s));
+			move_last_cmd(d, i + 2);
 			continue;
 		}
 	}
 	msg_db_l(3);
 }
 
-void CScript::SerializeFunction(sFunction *f)
+void CScript::SerializeFunction(SerializerData *d, sFunction *f)
 {
 	msg_db_r("SerializeFunction", 2);
 
@@ -2507,59 +2433,54 @@ void CScript::SerializeFunction(sFunction *f)
 	p_st1 = param_reg(TypeFloat, RegSt1);
 
 	cur_script = this;
-	cur_func = f;
-	cmd.clear();
-	TempVar.clear();
-	NumMarkers = 0;
-	call_used = false;
-	StackOffset = f->_VarSize;
-	StackMaxSize = f->_VarSize;
-	StuffToAdd.clear();
-	LoopData.clear();
+
+	d->cur_func = f;
+	d->NumMarkers = 0;
+	d->call_used = false;
+	d->StackOffset = f->_VarSize;
+	d->StackMaxSize = f->_VarSize;
+	d->TempVarRangesDefined = false;
 	AsmError = false;
-	TempVarRangesDefined = false;
 
 	InsertedConstructorTemp.clear();
 	InsertedConstructorFunc.clear();
 	
-	MapReg.clear();
 #ifdef allow_registers
-	//MapReg.add(RegEax);
-	MapReg.add(RegEcx);
-	MapReg.add(RegEdx);
-	/*MapReg.add(RegEbx);
-	MapReg.add(RegEsi);
-	MapReg.add(RegEdi);*/
+	//d->MapReg.add(RegEax);
+	d->MapReg.add(RegEcx);
+	d->MapReg.add(RegEdx);
+	/*d->MapReg.add(RegEbx);
+	d->MapReg.add(RegEsi);
+	d->MapReg.add(RegEdi);*/
 #endif
-	RegChannel.clear();
 
 // serialize
 
 	// intro
-	add_cmd(inst_push, param_reg(TypeReg32, RegEbp));
-	add_cmd(inst_mov, param_reg(TypeReg32, RegEbp), param_reg(TypeReg32, RegEsp));
+	add_cmd(d, inst_push, param_reg(TypeReg32, RegEbp));
+	add_cmd(d, inst_mov, param_reg(TypeReg32, RegEbp), param_reg(TypeReg32, RegEsp));
 	
 
-	FillInConstructorsFunc();
+	FillInConstructorsFunc(d);
 	if (Error)	_return_(2,);
 
 	// function
-	SerializeBlock(f->Block,f,0);
+	SerializeBlock(d, f->Block, 0);
 	if (Error)	_return_(2,);
 	
-	FillInDestructors(false);
+	FillInDestructors(d, false);
 	if (Error)	_return_(2,);
 
 
-	if (StuffToAdd.num > 0){
+	if (d->StuffToAdd.num > 0){
 		DoErrorInternal("StuffToAdd");
 		msg_write(f->Name);
-		msg_write(StuffToAdd.num);
-		for (int i=0;i<StuffToAdd.num;i++){
-			msg_write(StuffToAdd[i].kind);
-			msg_write(StuffToAdd[i].marker);
-			msg_write(StuffToAdd[i].index);
-			msg_write(StuffToAdd[i].level);
+		msg_write(d->StuffToAdd.num);
+		for (int i=0;i<d->StuffToAdd.num;i++){
+			msg_write(d->StuffToAdd[i].kind);
+			msg_write(d->StuffToAdd[i].marker);
+			msg_write(d->StuffToAdd[i].index);
+			msg_write(d->StuffToAdd[i].level);
 		}
 		_return_(2,);
 	}
@@ -2570,45 +2491,45 @@ void CScript::SerializeFunction(sFunction *f)
 		if ((f->Block->Command.back()->Kind == KindCompilerFunction) && (f->Block->Command.back()->LinkNr == CommandReturn))
 			need_outro = false;
 	if (need_outro){
-		add_cmd(inst_leave);
+		add_cmd(d, inst_leave);
 		if (f->Type->Size > 4)
-			add_cmd(inst_ret, param_const(TypeInt, (void*)4));
+			add_cmd(d, inst_ret, param_const(TypeInt, (void*)4));
 		else
-			add_cmd(inst_ret);
+			add_cmd(d, inst_ret);
 	}
 	
 	cmd_list_out();
 
 // do all the translations...
 
-	MapReferencedTempVars();
+	MapReferencedTempVars(d);
 	if (Error)	_return_(2,);
 
 	//HandleDerefTemp();
 
-	DisentangleShiftedTempVars();
+	DisentangleShiftedTempVars(d);
 	if (Error)	_return_(2,);
 	cmd_list_out();
 
-	ResolveDerefTempAndLocal();
+	ResolveDerefTempAndLocal(d);
 	if (Error)	_return_(2,);
 	cmd_list_out();
 
 #ifdef allow_simplification
-	SimplifyMovs();
+	SimplifyMovs(d);
 	if (Error)	_return_(2,);
 	cmd_list_out();
 
-	SimplifyFPUStack();
+	SimplifyFPUStack(d);
 	if (Error)	_return_(2,);
 	cmd_list_out();
 #endif
 
-	MapTempVars();
+	MapTempVars(d);
 	if (Error)	_return_(2,);
 	cmd_list_out();
 
-	ResolveDerefRegShift();
+	ResolveDerefRegShift(d);
 	if (Error)	_return_(2,);
 	cmd_list_out();
 
@@ -2616,16 +2537,16 @@ void CScript::SerializeFunction(sFunction *f)
 	//if (Error)	_return_(2,);
 	//cmd_list_out();
 
-	CorrectUnallowedParamCombis();
+	CorrectUnallowedParamCombis(d);
 	if (Error)	_return_(2,);
 
 	//if (call_used){
-		if (StackMaxSize > 127){
-			add_cmd(inst_sub, param_reg(TypeReg32, RegEsp), param_const(TypeInt, (void*)StackMaxSize));
-			move_last_cmd(2);
-		}else if (StackMaxSize > 0){
-			add_cmd(inst_sub_b, param_reg(TypeReg32, RegEsp), param_const(TypeInt, (void*)StackMaxSize));
-			move_last_cmd(2);
+		if (d->StackMaxSize > 127){
+			add_cmd(d, inst_sub, param_reg(TypeReg32, RegEsp), param_const(TypeInt, (void*)d->StackMaxSize));
+			move_last_cmd(d, 2);
+		}else if (d->StackMaxSize > 0){
+			add_cmd(d, inst_sub_b, param_reg(TypeReg32, RegEsp), param_const(TypeInt, (void*)d->StackMaxSize));
+			move_last_cmd(d, 2);
 		}
 	//}
 	cmd_list_out();
@@ -2685,28 +2606,28 @@ inline void get_param(int inst, sSerialCommandParam &p, int &param_type, void *&
 
 Array<int> InstructionPos;
 
-void ProcessJumpTargets(char *Opcode, int &OpcodeSize)
+void ProcessJumpTargets(SerializerData *d, char *Opcode, int &OpcodeSize)
 {
 	msg_db_r("ProcessJumpTargets", 3);
-	for (int i=0;i<cmd.num;i++){
-		if (cmd[i].inst < inst_marker)
-			if (cmd[i].p1.kind == KindMarker){
+	foreachi(d->cmd, c, i){
+		if (c.inst < inst_marker)
+			if (c.p1.kind == KindMarker){
 				so("adjust jump");
-				int marker = (long)cmd[i].p1.p;
+				int marker = (long)c.p1.p;
 				so(marker);
 				int pos_after_jump_inst = InstructionPos[i + 1];
 				int target_pos = -1;
-				for (int j=0;j<cmd.num;j++)
-					if (cmd[j].inst == inst_marker)
-						if (cmd[j].p1.kind == marker){
+				for (int j=0;j<d->cmd.num;j++)
+					if (d->cmd[j].inst == inst_marker)
+						if (d->cmd[j].p1.kind == marker){
 							target_pos = InstructionPos[j];
 							break;
 						}
 				if (target_pos >= 0){
 					*(int*)&Opcode[pos_after_jump_inst - 4] = (target_pos - pos_after_jump_inst);
-					cmd[i].p1.p = (char*)(target_pos - pos_after_jump_inst);
-					cmd[i].p1.kind = KindConstant;
-					cmd[i].p1.type = TypePointer;
+					c.p1.p = (char*)(target_pos - pos_after_jump_inst);
+					c.p1.kind = KindConstant;
+					c.p1.type = TypePointer;
 				}else{
 					cur_script->DoErrorInternal("asm error: jump marker not found");
 					_return_(3,);
@@ -2729,11 +2650,11 @@ inline void assemble_cmd(char *Opcode, int &OpcodeSize, sSerialCommand &c)
 	// assemble instruction
 	AsmAddInstruction(Opcode, OpcodeSize, c.inst, param1_type, param1, param2_type, param2);
 	if (AsmError)
-		cur_script->DoErrorInternal(format("asm error (function '%s')", cur_func->Name));
+		cur_script->DoErrorInternal("asm error");
 	//printf("%s", Opcode2Asm(oc, ocs));
 }
 
-void ShrinkOpcode(char *oc, int &ocs, int c, int diff)
+void ShrinkOpcode(SerializerData *d, char *oc, int &ocs, int c, int diff)
 {
 	msg_db_r("ShrinkOpcode", 3);
 
@@ -2743,69 +2664,69 @@ void ShrinkOpcode(char *oc, int &ocs, int c, int diff)
 	ocs -= diff;
 
 	// InstructionPos after c
-	for (int i=c+1;i<cmd.num+1;i++)
+	for (int i=c+1;i<d->cmd.num+1;i++)
 		InstructionPos[i] -= diff;
 
 	// calls after c
-	for (int i=c+1;i<cmd.num;i++)
-		if (cmd[i].inst == inst_call)
-			if (cmd[i].p1.p){ // we need to keep 0x0000...
+	for (int i=c+1;i<d->cmd.num;i++)
+		if (d->cmd[i].inst == inst_call)
+			if (d->cmd[i].p1.p){ // we need to keep 0x0000...
 				so("call");
-				*(int*)&cmd[i].p1.p -= diff;
+				*(int*)&d->cmd[i].p1.p -= diff;
 				*(int*)&oc[InstructionPos[i + 1] - 4] += diff;
 			}
 
 	// jumps over c
-	for (int i=0;i<cmd.num;i++)
-			if ((cmd[i].inst == inst_jmp) || (cmd[i].inst == inst_jz) || (cmd[i].inst == inst_jnz) || (cmd[i].inst == inst_jmp_b) || (cmd[i].inst == inst_jz_b) || (cmd[i].inst == inst_jnz_b)){
+	for (int i=0;i<d->cmd.num;i++)
+			if ((d->cmd[i].inst == inst_jmp) || (d->cmd[i].inst == inst_jz) || (d->cmd[i].inst == inst_jnz) || (d->cmd[i].inst == inst_jmp_b) || (d->cmd[i].inst == inst_jz_b) || (d->cmd[i].inst == inst_jnz_b)){
 				so("jump");
-				int s = cmd[i].p1.type->Size;
-				so(*(int*)&cmd[i].p1.p);
+				int s = d->cmd[i].p1.type->Size;
+				so(*(int*)&d->cmd[i].p1.p);
 				if (i < c)
-					if ((long)cmd[i].p1.p > InstructionPos[c] - InstructionPos[i + 1]){
+					if ((long)d->cmd[i].p1.p > InstructionPos[c] - InstructionPos[i + 1]){
 						so("jump over forward");
-						*(int*)&cmd[i].p1.p -= diff;
+						*(int*)&d->cmd[i].p1.p -= diff;
 						if (s == 1)
 							*(char*)&oc[InstructionPos[i + 1] - 1] -= diff;
 						else
 							*(int*)&oc[InstructionPos[i + 1] - 4] -= diff;
 					}
 				if (i >= c)
-					if (-(long)cmd[i].p1.p > InstructionPos[i + 1] - InstructionPos[c]){
+					if (-(long)d->cmd[i].p1.p > InstructionPos[i + 1] - InstructionPos[c]){
 						so("jump over backward");
-						*(int*)&cmd[i].p1.p += diff;
+						*(int*)&d->cmd[i].p1.p += diff;
 						if (s == 1)
 							*(char*)&oc[InstructionPos[i + 1] - 1] += diff;
 						else
 							*(int*)&oc[InstructionPos[i + 1] - 4] += diff;
 					}
-				so(*(int*)&cmd[i].p1.p);
+				so(*(int*)&d->cmd[i].p1.p);
 			}
 	
 	msg_db_l(3);
 }
 
-void ShrinkJumps(char *Opcode, int &OpcodeSize)
+void ShrinkJumps(SerializerData *d, char *Opcode, int &OpcodeSize)
 {
 	msg_db_r("ShrinkJumps", 3);
-	for (int i=0;i<cmd.num;i++){
-		if ((cmd[i].inst == inst_jmp) || (cmd[i].inst == inst_jz) || (cmd[i].inst == inst_jnz))
-			if ((cmd[i].p1.kind == KindConstant) && ((long)cmd[i].p1.p < 127) && ((long)cmd[i].p1.p > -127)){
+	for (int i=0;i<d->cmd.num;i++){
+		if ((d->cmd[i].inst == inst_jmp) || (d->cmd[i].inst == inst_jz) || (d->cmd[i].inst == inst_jnz))
+			if ((d->cmd[i].p1.kind == KindConstant) && ((long)d->cmd[i].p1.p < 127) && ((long)d->cmd[i].p1.p > -127)){
 				so("jump shrinkable");
 
 				// shrink the command
-				if (cmd[i].inst == inst_jmp)
-					cmd[i].inst = inst_jmp_b;
-				else if (cmd[i].inst == inst_jz)
-					cmd[i].inst = inst_jz_b;
-				else if (cmd[i].inst == inst_jnz)
-					cmd[i].inst = inst_jnz_b;
-				cmd[i].p1.type = TypeChar;
+				if (d->cmd[i].inst == inst_jmp)
+					d->cmd[i].inst = inst_jmp_b;
+				else if (d->cmd[i].inst == inst_jz)
+					d->cmd[i].inst = inst_jz_b;
+				else if (d->cmd[i].inst == inst_jnz)
+					d->cmd[i].inst = inst_jnz_b;
+				d->cmd[i].p1.type = TypeChar;
 
 				// assemble the smaller command
 				char oc[16];
 				int ocs = 0;
-				assemble_cmd(oc, ocs, cmd[i]);
+				assemble_cmd(oc, ocs, d->cmd[i]);
 				if (cur_script->Error)
 					_return_(3,);
 				//msg_write(Opcode2Asm(oc, ocs));
@@ -2822,7 +2743,7 @@ void ShrinkJumps(char *Opcode, int &OpcodeSize)
 					Opcode[InstructionPos[i] + j] = oc[j];
 
 				// correct all other commands...
-				ShrinkOpcode(Opcode, OpcodeSize, i, diff);
+				ShrinkOpcode(d, Opcode, OpcodeSize, i, diff);
 				//break;
 			}
 	}
@@ -2859,17 +2780,17 @@ void CompileAsmBlock(char *Opcode, int &OpcodeSize)
 	msg_db_l(4);
 }
 
-void CompileSerialized(char *Opcode, int &OpcodeSize)
+void CompileSerialized(SerializerData *d, char *Opcode, int &OpcodeSize)
 {
 	msg_db_r("CompileSerialized", 2);
-	InstructionPos.resize(cmd.num + 1);
-	for (int i=0;i<cmd.num;i++){
+	InstructionPos.resize(d->cmd.num + 1);
+	for (int i=0;i<d->cmd.num;i++){
 		InstructionPos[i] = OpcodeSize;
 
-		if (cmd[i].inst == inst_marker)
+		if (d->cmd[i].inst == inst_marker)
 			continue;
 
-		if (cmd[i].inst == inst_asm){
+		if (d->cmd[i].inst == inst_asm){
 			CompileAsmBlock(Opcode, OpcodeSize);
 			if (cur_script->Error)
 				_return_(2,);
@@ -2877,29 +2798,36 @@ void CompileSerialized(char *Opcode, int &OpcodeSize)
 		}
 
 		// make calls relative...
-		if (cmd[i].inst == inst_call)
-			if (cmd[i].p1.p) // we need to keep 0x0000...
-				cmd[i].p1.p = (char*)(  (long)cmd[i].p1.p - (long)&Opcode[OpcodeSize] - 5 );
+		if (d->cmd[i].inst == inst_call)
+			if (d->cmd[i].p1.p) // we need to keep 0x0000...
+				d->cmd[i].p1.p = (char*)(  (long)d->cmd[i].p1.p - (long)&Opcode[OpcodeSize] - 5 );
 
 		// push 8 bit -> push 32 bit
-		if (cmd[i].inst == inst_push)
-			if (cmd[i].p1.kind == KindRegister)
-				cmd[i].p1.p = (char*) RegRoot[(long)cmd[i].p1.p];
+		if (d->cmd[i].inst == inst_push)
+			if (d->cmd[i].p1.kind == KindRegister)
+				d->cmd[i].p1.p = (char*) RegRoot[(long)d->cmd[i].p1.p];
 			
 
-		assemble_cmd(Opcode, OpcodeSize, cmd[i]);
+		assemble_cmd(Opcode, OpcodeSize, d->cmd[i]);
 		if (cur_script->Error)
 			_return_(2,);
 	}
-	InstructionPos[cmd.num] = OpcodeSize;
+	InstructionPos[d->cmd.num] = OpcodeSize;
 
-	ProcessJumpTargets(Opcode, OpcodeSize);
+	ProcessJumpTargets(d, Opcode, OpcodeSize);
 
 	//msg_write(Opcode2Asm(Opcode, OpcodeSize));
 
 #ifdef allow_simplification
-	ShrinkJumps(Opcode, OpcodeSize);
+	ShrinkJumps(d, Opcode, OpcodeSize);
 #endif
 	msg_db_l(2);
 }
 
+void CScript::CompileFunction(sFunction *f, char *Opcode, int &OpcodeSize)
+{
+	cur_func = f;
+	SerializerData d;
+	SerializeFunction(&d, f);
+	CompileSerialized(&d, Opcode, OpcodeSize);
+}

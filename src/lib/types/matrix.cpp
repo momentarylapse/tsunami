@@ -18,7 +18,7 @@
 //                                           matrices                                             //
 //------------------------------------------------------------------------------------------------//
 
-#define _ps(a,b,i,j)	(a._e(i,0)*b._e(0,j) + a._e(i,1)*b._e(1,j) + a._e(i,2)*b._e(2,j) + a._e(i,3)*b._e(3,j))
+#define _ps(a,b,i,j)	(a.__e[0][i]*b.__e[j][0] + a.__e[1][i]*b.__e[j][1] + a.__e[2][i]*b.__e[j][2] + a.__e[3][i]*b.__e[j][3])
 
 // combining two transformation matrices (first do m1, then m2:   m = m2 * m1 )
 void MatrixMultiply(matrix &m,const matrix &m2,const matrix &m1)

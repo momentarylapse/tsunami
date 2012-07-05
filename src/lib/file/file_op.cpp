@@ -155,23 +155,13 @@ string shell_execute(const string &cmd)
 }
 
 
-Array<string> dir_search_name;
-Array<bool> dir_search_is_dir;
-
-inline void dir_search_add(string &name, bool is_dir)
-{
-	dir_search_name.add(name);
-	dir_search_is_dir.add(is_dir);
-}
 
 // seach an directory for files matching a filter
-int dir_search(const string &dir, const string &filter, bool show_directories)
+Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_directories)
 {
 	msg_db_r("dir_search", 1);
-	for (int i=0;i<dir_search_name.num;i++)
-		dir_search_name[i].clear();
-	dir_search_name.clear();
-	dir_search_is_dir.clear();
+	Array<DirEntry> entry_list;
+	DirEntry entry;
 
 
 	string filter2 = filter.substr(1, filter.num - 1);
@@ -185,9 +175,10 @@ int dir_search(const string &dir, const string &filter, bool show_directories)
 	while(e>=0){
 		//if ((strcmp(t.name,".")!=0)&&(strcmp(t.name,"..")!=0)&&(strstr(t.name,"~")==NULL)){
 		if ((t.name[0]!='.')&&(!strstr(t.name,"~"))){
-			string fn = string(t.name);
+			entry.name = string(t.name);
 			if ((fn.find(filter2) >= 0)|| ((show_directories)&&(t.attrib==_A_SUBDIR)) ){
-				dir_search_add(fn, (t.attrib == _A_SUBDIR));
+				entry.is_dir = (t.attrib == _A_SUBDIR);
+				entry_list.add(entry);
 			}
 		}
 		e=_findnext(handle,&t);
@@ -198,7 +189,7 @@ int dir_search(const string &dir, const string &filter, bool show_directories)
 	_dir=opendir(SysFileName(dir2).c_str());
 	if (!_dir){
 		msg_db_l(1);
-		return 0;
+		return entry_list;
 	}
 	struct dirent *dn;
 	dn=readdir(_dir);
@@ -213,8 +204,9 @@ int dir_search(const string &dir, const string &filter, bool show_directories)
 				int sss=strlen(dn->d_name) - filter2.num;
 				if (sss<0)	sss=0;
 				if ( ((is_reg)&&(strcmp(&dn->d_name[sss],filter2.c_str())==0)) || ((show_directories)&&(is_dir)) ){
-					string fn = string(dn->d_name);
-					dir_search_add(fn, is_dir);
+					entry.name = string(dn->d_name);
+					entry.is_dir = is_dir;
+					entry_list.add(entry);
 				}
 			}
 			dn=readdir(_dir);
@@ -224,23 +216,21 @@ int dir_search(const string &dir, const string &filter, bool show_directories)
 
 	
 	// sorting...
-	for (int i=0;i<dir_search_name.num-1;i++)
-		for (int j=i+1;j<dir_search_name.num;j++){
+	for (int i=0;i<entry_list.num-1;i++)
+		for (int j=i+1;j<entry_list.num;j++){
 			bool ok = true;
-			if (dir_search_is_dir[i] == dir_search_is_dir[j]){
-				if (dir_search_name[i].icompare(dir_search_name[j]) > 0)
+			if (entry_list[i].is_dir == entry_list[j].is_dir){
+				if (entry_list[i].name.icompare(entry_list[j].name) > 0)
 					ok = false;
 			}else
-				if ((!dir_search_is_dir[i]) && (dir_search_is_dir[j]))
+				if ((!entry_list[i].is_dir) && (entry_list[j].is_dir))
 					ok = false;
-			if (!ok){
-				dir_search_name.swap(i, j);
-				dir_search_is_dir.swap(i, j);
-			}
+			if (!ok)
+				entry_list.swap(i, j);
 		}
 
 	msg_db_l(1);
-	return dir_search_name.num;
+	return entry_list;
 }
 
 

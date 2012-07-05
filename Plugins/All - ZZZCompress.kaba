@@ -1,0 +1,11 @@
+#include "api.kaba"
+
+void ProcessTrack(BufferBox buf, Track t)
+	file f = FileCreate("ooo")
+	f.SetBinaryMode(true)
+	int i
+	for i, 0, buf.num
+		f.WriteFloat(buf.r[i])
+		f.WriteFloat(buf.l[i])
+	FileClose(f)
+

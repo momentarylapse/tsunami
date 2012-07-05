@@ -100,13 +100,6 @@ typedef bool t_file_try_again_func(const string &filename);
 extern bool SilentFiles;
 extern t_file_try_again_func *FileTryAgainFunc;
 
-enum
-{
-	FileDateAccess,
-	FileDateModification,
-	FileDateCreation
-};
-
 void file_set_archive(const string &filename);
 void file_clean_up_archive();
 
@@ -127,7 +120,9 @@ public:
 	void SetPos(int pos,bool absolute);
 	int GetSize();
 	int GetPos();
-	Date _cdecl GetDate(int type);
+	Date _cdecl GetDateCreation();
+	Date _cdecl GetDateModification();
+	Date _cdecl GetDateAccess();
 
 	// file format version
 	int ReadFileFormatVersion();

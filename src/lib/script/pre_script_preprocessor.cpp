@@ -2,7 +2,7 @@
 
 typedef void op_func(void *r, void *a, void *b);
 
-static sFunction *cur_func;
+//static sFunction *cur_func;
 
 
 
@@ -109,11 +109,17 @@ void CPreScript::PreProcessCommand(CScript *s, sCommand *c)
 	msg_db_l(4);
 }
 
+string LinkNr2Str(CPreScript *s,int kind,int nr);
 
 // may not use AddConstant()!!!
 void CPreScript::PreProcessCommandAddresses(CScript *s, sCommand *c)
 {
 	msg_db_r("PreProcessCommandAddr", 4);
+	/*msg_write(Kind2Str(c->Kind));
+	if (c->script)
+		msg_write(LinkNr2Str(c->script->pre_script, c->Kind, c->LinkNr));
+	else if (s)
+		msg_write(LinkNr2Str(s->pre_script, c->Kind, c->LinkNr));*/
 
 	// recursion
 	if (c->Kind == KindBlock){
@@ -196,10 +202,10 @@ void CPreScript::PreProcessCommandAddresses(CScript *s, sCommand *c)
 void CPreScript::PreProcessor(CScript *s)
 {
 	msg_db_r("PreProcessor", 4);
-	for (int i=0;i<Function.num;i++){
-		cur_func = &Function[i];
-		for (int j=0;j<Function[i].Block->Command.num;j++)
-			PreProcessCommand(s, Function[i].Block->Command[j]);
+	foreach(Function, f){
+		cur_func = f;
+		foreach(f->Block->Command, c)
+			PreProcessCommand(s, c);
 	}
 	//Show();
 	msg_db_l(4);
@@ -208,10 +214,10 @@ void CPreScript::PreProcessor(CScript *s)
 void CPreScript::PreProcessorAddresses(CScript *s)
 {
 	msg_db_r("PreProcessorAddr", 4);
-	for (int i=0;i<Function.num;i++){
-		cur_func = &Function[i];
-		for (int j=0;j<Function[i].Block->Command.num;j++)
-			PreProcessCommandAddresses(s, Function[i].Block->Command[j]);
+	foreach(Function, f){
+		cur_func = f;
+		foreach(f->Block->Command, c)
+			PreProcessCommandAddresses(s, c);
 	}
 	//Show();
 	msg_db_l(4);

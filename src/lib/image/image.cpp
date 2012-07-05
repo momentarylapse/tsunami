@@ -1,15 +1,23 @@
 #include "image.h"
 
 
-string ImageVersion = "0.2.0.0";
+string ImageVersion = "0.2.1.1";
+
+void Image::__init__()
+{
+	data.__init__();
+}
+
+void Image::__delete__()
+{
+	data.clear();
+}
 
 // mode: rgba
 //    = r + g<<8 + b<<16 + a<<24
 void Image::LoadFlipped(const string &filename)
 {
 	msg_db_r("Image.LoadFlipped", 1);
-	if (data.element_size != 4)
-		data.init(4); // script...
 
 	// reset image
 	width = 0;
@@ -53,9 +61,9 @@ unsigned int image_color(const color &c)
 color image_uncolor(unsigned int i)
 {
 	return color((float)(i >> 24) / 255.0f,
-	             (float)((i >> 16) & 255) / 255.0f,
+	             (float)(i & 255) / 255.0f,
 	             (float)((i >> 8) & 255) / 255.0f,
-	             (float)(i & 255) / 255.0f);
+	             (float)((i >> 16) & 255) / 255.0f);
 }
 
 void Image::Create(int _width, int _height, const color &c)
@@ -160,4 +168,26 @@ color Image::GetPixel(int x, int y) const
 	if ((x >= 0) and (x < width) and (y >= 0) and (y < height))
 		return image_uncolor(data[x + y * width]);
 	return Black;
+}
+
+// use bilinear interpolation
+//  x repeats in [0..width)
+//  y repeats in [0..height)
+//  each pixel has its maximum at offset (0.5, 0.5)
+color Image::GetPixelInterpolated(float x, float y) const
+{
+	x = loopf(x, 0, width);
+	y = loopf(y, 0, height);
+	int x0 = (x >= 0.5f) ? (x - 0.5f) : (width - 1);
+	int x1 = (x0 < width - 1) ? (x0 + 1) : 0;
+	int y0 = (y >= 0.5f) ? (y - 0.5f) : (height - 1);
+	int y1 = (y0 < height- 1) ? (y0 + 1) : 0;
+	color c00 = GetPixel(x0, y0);
+	color c01 = GetPixel(x0, y1);
+	color c10 = GetPixel(x1, y0);
+	color c11 = GetPixel(x1, y1);
+	float sx = loopf(x + 0.5f, 0, 1);
+	float sy = loopf(y + 0.5f, 0, 1);
+	// bilinear interpolation
+	return (c00 * (1 - sy) + c01 * sy) * (1 - sx) + (c10 * (1 - sy) + c11 * sy) * sx;
 }

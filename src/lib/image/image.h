@@ -23,6 +23,11 @@ class Image
 	bool alpha_used;
 	bool error;
 	
+	void __init__();
+	void __delete__();
+
+	bool Empty(){	return (data.num == 0);	}
+
 	void Load(const string &filename);
 	void LoadFlipped(const string &filename);
 	void Create(int width, int height, const color &c);
@@ -34,19 +39,8 @@ class Image
 	void FlipV();
 	void SetPixel(int x, int y, const color &c);
 	color GetPixel(int x, int y) const;
+	color GetPixelInterpolated(float x, float y) const;
 };
-
-/*void ImageLoadFlipped(Image &image, const string &filename);
-void ImageLoad(Image &image, const string &filename);
-void ImageCreate(Image &image, int width, int height, const color &c);
-void ImageSave(const Image &image, const string &filename);
-void ImageDelete(Image &image);
-
-void ImageCopy(Image &dest, const Image &source);
-void ImageScale(Image &image, int width, int height);
-void ImageFlipV(Image &image);
-void ImageSetPixel(Image &image, int x, int y, const color &c);
-color ImageGetPixel(Image &image, int x, int y);*/
 
 #include "image_bmp.h"
 #include "image_tga.h"

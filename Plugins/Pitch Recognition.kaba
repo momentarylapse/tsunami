@@ -112,7 +112,7 @@ void idle()
 		for int i, 0, buf_size
 			float tt = i * w_f
 			buf[i] = f2i(val_max * sin(tt) * 0.1)*/
-		BufferBoxClear(CapturePreviewBuf)
+		CapturePreviewBuf.clear()
 		
 		fft_r2c(buf, bufc)
 		float max = 0

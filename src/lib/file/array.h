@@ -54,6 +54,10 @@ class Array : public DynamicArray
 			init(sizeof(T));
 			add(item);
 		}
+		void __init__()
+		{
+			init(sizeof(T));
+		}
 		~Array()
 		{	clear();	}
 		void clear()
@@ -169,6 +173,8 @@ class Array : public DynamicArray
 		T &operator[] (int index)
 		{	return ((T*)data)[index];	}
 		T &back()
+		{	return ((T*)data)[num - 1];	}
+		const T &back() const
 		{	return ((T*)data)[num - 1];	}
 };
 

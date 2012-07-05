@@ -17,7 +17,7 @@
 
 //#define NUM_CAPTURE_SAMPLES		8192
 
-#define NUM_PEAK_LEVELS			24
+const int NUM_PEAK_LEVELS = 24
 
 class EffectParam
 	string name, type, value
@@ -42,6 +42,8 @@ class BufferBox
 	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int offset, num
 	float r[], l[]
+	extern void __assign__(BufferBox other)
+	extern void clear()
 
 class TrackRenderBuffer
 	int dummy
@@ -97,6 +99,9 @@ class Track
 	bool is_mouse_over
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
+	
+	extern BufferBox GetBuffers(Range r)
+	extern BufferBox ReadBuffers(Range r)
 
 class Tag
 	string key, value
@@ -145,10 +150,6 @@ extern Track *AddEmptySubTrack(Track *t, Range r, string name)
 extern void CreateNew(AudioFile *a, int length, int sample_rate)
 extern void UpdatePeaks(Track *t)
 extern void CreateTrackBuffers(Track *t)
-extern void BufferBoxClear(BufferBox box)
-
-extern BufferBox TrackGetBuffers(Track *t, Range r)
-extern BufferBox TrackGetBuffersR(Track *t, Range r)
 
 //extern void ChangeAudioFile(AudioFile *a)
 //extern void ChangeTrack(Track *t)

@@ -13,9 +13,10 @@
 	#include "windows.h"
 #endif
 #include "script.h"
+#include "script_data_common.h"
 #include "../00_config.h"
 
-string ScriptDataVersion = "0.9.4.0";
+string ScriptDataVersion = "0.10.1.0";
 
 
 #ifdef _X_USE_HUI_
@@ -82,7 +83,7 @@ sPackage *cur_package = NULL;
 int cur_package_index = -1;
 
 
-void set_cur_package(const char *name)
+void set_cur_package(const string &name)
 {
 	cur_package_index = Package.num;
 	sPackage p;
@@ -92,37 +93,29 @@ void set_cur_package(const char *name)
 }
 
 Array<sType*> PreType;
-sType *add_type(const char *name, int size)
+sType *add_type(const string &name, int size, TypeFlag flag)
 {
 	msg_db_r("add_type", 4);
 	sType *t = new sType;
-	strcpy(t->Name, name);
-	t->Owner = NULL;
+	t->Name = name;
 	t->Size = size;
-	t->IsArray = false;
-	t->IsSuperArray = false;
-	t->ArrayLength = 0;
-	t->IsPointer = false;
-	t->IsSilent = false;
-	t->SubType = NULL;
+	if ((flag & FLAG_CALL_BY_VALUE) > 0)
+		t->ForceCallByValue = true;
 	PreType.add(t);
 	if (cur_package)
 		cur_package->type.add(t);
 	msg_db_l(4);
 	return t;
 }
-sType *add_type_p(const char *name, sType *sub_type, bool is_silent = false)
+sType *add_type_p(const string &name, sType *sub_type, TypeFlag flag)
 {
 	msg_db_r("add_type_p", 4);
 	sType *t = new sType;
-	strcpy(t->Name, name);
-	t->Owner = NULL;
+	t->Name = name;
 	t->Size = PointerSize;
-	t->IsArray = false;
-	t->IsSuperArray = false;
-	t->ArrayLength = 0;
 	t->IsPointer = true;
-	t->IsSilent = is_silent;
+	if ((flag & FLAG_SILENT) > 0)
+		t->IsSilent = true;
 	t->SubType = sub_type;
 	PreType.add(t);
 	if (cur_package)
@@ -130,27 +123,21 @@ sType *add_type_p(const char *name, sType *sub_type, bool is_silent = false)
 	msg_db_l(4);
 	return t;
 }
-sType *add_type_a(const char *name, sType *sub_type, int array_length)
+sType *add_type_a(const string &name, sType *sub_type, int array_length)
 {
 	msg_db_r("add_type_a", 4);
 	sType *t = new sType;
-	strcpy(t->Name, name);
-	t->Owner = NULL;
-	t->IsPointer = false;
-	t->IsSilent = false;
+	t->Name = name;
 	t->SubType = sub_type;
 	if (array_length < 0){
 		// super array
 		t->Size = SuperArraySize;
-		t->IsArray = false;
 		t->IsSuperArray = true;
-		t->ArrayLength = 0;
 		//script_make_super_array(t); // do it later !!!
 	}else{
 		// standard array
 		t->Size = sub_type->Size * array_length;
 		t->IsArray = true;
-		t->IsSuperArray = false;
 		t->ArrayLength = array_length;
 	}
 	PreType.add(t);
@@ -160,10 +147,10 @@ sType *add_type_a(const char *name, sType *sub_type, int array_length)
 	return t;
 }
 
-sType *ScriptGetPreType(const char *name)
+sType *ScriptGetPreType(const string &name)
 {
 	for (int i=0;i<PreType.num;i++)
-		if (strcmp(name, PreType[i]->Name) == 0)
+		if (name == PreType[i]->Name)
 			return PreType[i];
 	return TypeUnknown;
 }
@@ -173,66 +160,34 @@ sType *ScriptGetPreType(const char *name)
 //------------------------------------------------------------------------------------------------//
 
 //   without type information ("primitive")
-enum{
-	OperatorAssign,			//  =
-	OperatorAdd,			//  +
-	OperatorSubtract,		//  -
-	OperatorMultiply,		//  *
-	OperatorDivide,			//  /
-	OperatorAddS,			// +=
-	OperatorSubtractS,		// -=
-	OperatorMultiplyS,		// *=
-	OperatorDivideS,		// /=
-	OperatorEqual,			// ==
-	OperatorNotEqual,		// !=
-	OperatorNegate,			//  !
-	OperatorSmaller,		//  <
-	OperatorGreater,		//  >
-	OperatorSmallerEqual,	// <=
-	OperatorGreaterEqual,	// >=
-/*	OperatorAnd,			// &&
-	OperatorOr,				// ||  */
-	OperatorAndLiteral,		// and
-	OperatorOrLiteral,		// or
-	OperatorModulo,			//  %
-	OperatorBitAnd,			//  &
-	OperatorBitOr,			//  |
-	OperatorShiftLeft,		// <<
-	OperatorShiftRight,		// >>
-	OperatorIncrease,		// ++
-	OperatorDecrease,		// --
-	NUM_PRIMITIVE_OPERATORS
-};
 int NumPrimitiveOperators = NUM_PRIMITIVE_OPERATORS;
 
 sPrimitiveOperator PrimitiveOperator[NUM_PRIMITIVE_OPERATORS]={
-	{"=",	OperatorAssign,			true,	1},
-	{"+",	OperatorAdd,			false,	11},
-	{"-",	OperatorSubtract,		false,	11},
-	{"*",	OperatorMultiply,		false,	12},
-	{"/",	OperatorDivide,			false,	12},
-	{"+=",	OperatorAddS,			true,	1},
-	{"-=",	OperatorSubtractS,		true,	1},
-	{"*=",	OperatorMultiplyS,		true,	1},
-	{"/=",	OperatorDivideS,		true,	1},
-	{"==",	OperatorEqual,			false,	8},
-	{"!=",	OperatorNotEqual,		false,	8},
-	{"!",	OperatorNegate,			false,	2},
-	{"<",	OperatorSmaller,		false,	9},
-	{">",	OperatorGreater,		false,	9},
-	{"<=",	OperatorSmallerEqual,	false,	9},
-	{">=",	OperatorGreaterEqual,	false,	9},
-/*	{"-&&",	OperatorAnd,			false,	4},
-	{"-||",	OperatorOr,				false,	3},*/
-	{"and",	OperatorAndLiteral,		false,	4},
-	{"or",	OperatorOrLiteral,		false,	3},
-	{"%",	OperatorModulo,			false,	12},
-	{"&",	OperatorBitAnd,			false,	7},
-	{"|",	OperatorBitOr,			false,	5},
-	{"<<",	OperatorShiftLeft,		false,	10},
-	{">>",	OperatorShiftRight,		false,	10},
-	{"++",	OperatorIncrease,		true,	2},
-	{"--",	OperatorDecrease,		true,	2}
+	{"=",	OperatorAssign,			true,	1,	"__assign__"},
+	{"+",	OperatorAdd,			false,	11,	"__add__"},
+	{"-",	OperatorSubtract,		false,	11,	"__sub__"},
+	{"*",	OperatorMultiply,		false,	12,	"__mul__"},
+	{"/",	OperatorDivide,			false,	12,	"__div__"},
+	{"+=",	OperatorAddS,			true,	1,	"__iadd__"},
+	{"-=",	OperatorSubtractS,		true,	1,	"__isub__"},
+	{"*=",	OperatorMultiplyS,		true,	1,	"__imul__"},
+	{"/=",	OperatorDivideS,		true,	1,	"__idiv__"},
+	{"==",	OperatorEqual,			false,	8,	"__eq__"},
+	{"!=",	OperatorNotEqual,		false,	8,	"__ne__"},
+	{"!",	OperatorNegate,			false,	2,	"__not__"},
+	{"<",	OperatorSmaller,		false,	9,	"__lt__"},
+	{">",	OperatorGreater,		false,	9,	"__gt__"},
+	{"<=",	OperatorSmallerEqual,	false,	9,	"__le__"},
+	{">=",	OperatorGreaterEqual,	false,	9,	"__ge__"},
+	{"and",	OperatorAnd,			false,	4,	"__and__"},
+	{"or",	OperatorOr,				false,	3,	"__or__"},
+	{"%",	OperatorModulo,			false,	12,	"__mod__"},
+	{"&",	OperatorBitAnd,			false,	7,	"__bitand__"},
+	{"|",	OperatorBitOr,			false,	5,	"__bitor__"},
+	{"<<",	OperatorShiftLeft,		false,	10,	"__lshift__"},
+	{">>",	OperatorShiftRight,		false,	10,	"__rshift__"},
+	{"++",	OperatorIncrease,		true,	2,	"__inc__"},
+	{"--",	OperatorDecrease,		true,	2,	"__dec__"}
 // Level = 15 - (official C-operator priority)
 // priority from "C als erste Programmiersprache", page 552
 };
@@ -262,6 +217,7 @@ int add_operator(int primitive_op, sType *return_type, sType *param_type1, sType
 
 
 sType *cur_class;
+sClassFunction *cur_class_func = NULL;
 
 void add_class(sType *root_type)//, CPreScript *ps = NULL)
 {
@@ -270,37 +226,35 @@ void add_class(sType *root_type)//, CPreScript *ps = NULL)
 	msg_db_l(4);
 }
 
-void class_add_element(const char *name, sType *type, int offset)
+void class_add_element(const string &name, sType *type, int offset)
 {
 	msg_db_r("add_class_el", 4);
 	sClassElement e;
-	strcpy(e.Name, name);
+	e.Name = name;
 	e.Type = type;
 	e.Offset = offset;
 	cur_class->Element.add(e);
 	msg_db_l(4);
 }
 
-int add_func(const char *name, sType *return_type, void *func, bool is_class = false);
+int add_func(const string &name, sType *return_type, void *func, bool is_class);
 
-void class_add_func(const char *name, sType *return_type, void *func)
+void class_add_func(const string &name, sType *return_type, void *func)
 {
 	msg_db_r("add_class_func", 4);
-	char *tname = cur_class->Name;
+	string tname = cur_class->Name;
 	if (tname[0] == '-')
 		for (int i=0;i<PreType.num;i++)
 			if ((PreType[i]->IsPointer) && (PreType[i]->SubType == cur_class))
 				tname = PreType[i]->Name;
-	char *mname = new char[strlen(tname) + strlen(name) + 2];
-	strcpy(mname, tname);
-	strcat(mname, ".");
-	strcat(mname, name);
-	int cmd = add_func(mname, return_type, func, true);
+	int cmd = add_func(tname + "." + name, return_type, func, true);
 	sClassFunction f;
-	strcpy(f.Name, name);
+	f.Name = name;
 	f.Kind = KindCompilerFunction;
 	f.Nr = cmd;
+	f.ReturnType = return_type;
 	cur_class->Function.add(f);
+	cur_class_func = &cur_class->Function.back();
 	msg_db_l(4);
 }
 
@@ -310,7 +264,7 @@ void class_add_func(const char *name, sType *return_type, void *func)
 //------------------------------------------------------------------------------------------------//
 
 Array<sPreConstant> PreConstant;
-void add_const(const char *name, sType *type, void *value)
+void add_const(const string &name, sType *type, void *value)
 {
 	msg_db_r("add_const", 4);
 	sPreConstant c;
@@ -328,7 +282,7 @@ void add_const(const char *name, sType *type, void *value)
 
 Array<sPreExternalVar> PreExternalVar;
 
-void add_ext_var(const char *name, sType *type, void *var)
+void add_ext_var(const string &name, sType *type, void *var)
 {
 	sPreExternalVar v;
 	v.Name = name;
@@ -354,15 +308,10 @@ void add_ext_var(const char *name, sType *type, void *var)
 void _cdecl _cstringout(char *str){	msg_write(str);	}
 void _cdecl _stringout(string &str){	msg_write(str);	}
 int _cdecl _Float2Int(float f){	return (int)f;	}
+string _cdecl ff2s(complex &x){	return x.str();	}
+string _cdecl fff2s(vector &x){	return x.str();	}
+string _cdecl ffff2s(quaternion &x){	return x.str();	}
 
-
-typedef void (CFile::*tmf)();
-typedef char *tcpa[4];
-void *mf(tmf vmf)
-{
-	tcpa *cpa=(tcpa*)&vmf;
-	return (*cpa)[0];
-}
 
 void *f_cp = (void*)1; // for fake (compiler-) functions
 
@@ -371,7 +320,7 @@ Array<sPreCommand> PreCommand;
 
 int cur_func;
 
-int add_func(const char *name, sType *return_type, void *func, bool is_class)
+int add_func(const string &name, sType *return_type, void *func, bool is_class)
 {
 	sPreCommand c;
 	c.Name = name;
@@ -388,7 +337,7 @@ int add_func(const char *name, sType *return_type, void *func, bool is_class)
 	return cur_func;
 }
 
-int add_func_special(const char *name, sType *return_type, int index)
+int add_func_special(const string &name, sType *return_type, int index)
 {
 	sPreCommand c;
 	c.Name = name;
@@ -402,145 +351,24 @@ int add_func_special(const char *name, sType *return_type, int index)
 		PreCommand.resize(NUM_INTERN_PRE_COMMANDS);
 	PreCommand[index] = c;
 	cur_func = index;
+	cur_class_func = NULL;
 	return cur_func;
 }
 
-void func_add_param(const char *name, sType *type)
+void func_add_param(const string &name, sType *type)
 {
 	sPreCommandParam p;
 	p.Name = name;
 	p.Type = type;
 	PreCommand[cur_func].Param.add(p);
+	if (cur_class_func)
+		cur_class_func->ParamType.add(type);
 }
 
 void CSuperArray::init_by_type(sType *t)
 {	init(t->Size);	}
 
-void CSuperArray::int_sort()
-{	std::sort((int*)data, (int*)data + num);	}
-
-void CSuperArray::int_unique()
-{
-	int ndiff = 0;
-	int i0 = 1;
-	while(((int*)data)[i0] != ((int*)data)[i0-1])
-		i0 ++;
-	for (int i=i0;i<num;i++){
-		if (((int*)data)[i] == ((int*)data)[i-1])
-			ndiff ++;
-		else
-			((int*)data)[i - ndiff] = ((int*)data)[i];
-	}
-	resize(num - ndiff);
-}
-
-void CSuperArray::float_sort()
-{	std::sort((float*)data, (float*)data + num);	}
-
-
-void super_array_assign(CSuperArray *a, CSuperArray *b)
-{
-	a->element_size = b->element_size; // ...
-	a->reserve(b->num);
-	memcpy(a->data, b->data, b->element_size * b->num);
-	a->num = b->num;
-}
-
-// a += b
-void super_array_add_s_int(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	for (int i=0;i<n;i++)	*(pa ++) += *(pb ++);	}
-void super_array_sub_s_int(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	for (int i=0;i<n;i++)	*(pa ++) -= *(pb ++);	}
-void super_array_mul_s_int(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	for (int i=0;i<n;i++)	*(pa ++) *= *(pb ++);	}
-void super_array_div_s_int(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	for (int i=0;i<n;i++)	*(pa ++) /= *(pb ++);	}
-
-// a = b + c
-void super_array_add_int(CSuperArray *a, CSuperArray *b, CSuperArray *c)
-{	int n = min(b->num, c->num);	a->resize(n);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	int *pc = (int*)c->data;	for (int i=0;i<n;i++)	*(pa ++) = *(pb ++) + *(pc ++);	}
-void super_array_sub_int(CSuperArray *a, CSuperArray *b, CSuperArray *c)
-{	int n = min(b->num, c->num);	a->resize(n);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	int *pc = (int*)c->data;	for (int i=0;i<n;i++)	*(pa ++) = *(pb ++) - *(pc ++);	}
-void super_array_mul_int(CSuperArray *a, CSuperArray *b, CSuperArray *c)
-{	int n = min(b->num, c->num);	a->resize(n);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	int *pc = (int*)c->data;	for (int i=0;i<n;i++)	*(pa ++) = *(pb ++) * *(pc ++);	}
-void super_array_div_int(CSuperArray *a, CSuperArray *b, CSuperArray *c)
-{	int n = min(b->num, c->num);	a->resize(n);	int *pa = (int*)a->data;	int *pb = (int*)b->data;	int *pc = (int*)c->data;	for (int i=0;i<n;i++)	*(pa ++) = *(pb ++) / *(pc ++);	}
-
-// a += x
-void super_array_add_s_int_int(CSuperArray *a, int x)
-{	int *pa = (int*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) += x;	}
-void super_array_sub_s_int_int(CSuperArray *a, int x)
-{	int *pa = (int*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) -= x;	}
-void super_array_mul_s_int_int(CSuperArray *a, int x)
-{	int *pa = (int*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
-void super_array_div_s_int_int(CSuperArray *a, int x)
-{	int *pa = (int*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) /= x;	}
-
-void super_array_add_s_float(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	float *pa = (float*)a->data;	float *pb = (float*)b->data;	for (int i=0;i<n;i++)	*(pa ++) += *(pb ++);	}
-void super_array_sub_s_float(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	float *pa = (float*)a->data;	float *pb = (float*)b->data;	for (int i=0;i<n;i++)	*(pa ++) -= *(pb ++);	}
-void super_array_mul_s_float(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	float *pa = (float*)a->data;	float *pb = (float*)b->data;	for (int i=0;i<n;i++)	*(pa ++) *= *(pb ++);	}
-void super_array_div_s_float(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	float *pa = (float*)a->data;	float *pb = (float*)b->data;	for (int i=0;i<n;i++)	*(pa ++) /= *(pb ++);	}
-
-void super_array_add_s_float_float(CSuperArray *a, float x)
-{	float *pa = (float*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) += x;	}
-void super_array_sub_s_float_float(CSuperArray *a, float x)
-{	float *pa = (float*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) -= x;	}
-void super_array_mul_s_float_float(CSuperArray *a, float x)
-{	float *pa = (float*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
-void super_array_div_s_float_float(CSuperArray *a, float x)
-{	float *pa = (float*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) /= x;	}
-
-void super_array_add_s_com(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) += *(pb ++);	}
-void super_array_sub_s_com(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) -= *(pb ++);	}
-void super_array_mul_s_com(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) *= *(pb ++);	}
-void super_array_div_s_com(CSuperArray *a, CSuperArray *b)
-{	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) /= *(pb ++);	}
-
-void super_array_add_s_com_com(CSuperArray *a, complex x)
-{	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) += x;	}
-void super_array_sub_s_com_com(CSuperArray *a, complex x)
-{	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) -= x;	}
-void super_array_mul_s_com_com(CSuperArray *a, complex x)
-{	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
-void super_array_div_s_com_com(CSuperArray *a, complex x)
-{	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) /= x;	}
-void super_array_mul_s_com_float(CSuperArray *a, float x)
-{	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
-
-void super_array_assign_8_single(CSuperArray *a, complex x)
-{
-	complex *p = (complex*)a->data;
-	for (int i=0;i<a->num;i++)
-		*(p ++) = x;
-}
-
-void super_array_assign_4_single(CSuperArray *a, int x)
-{
-	int *p = (int*)a->data;
-	for (int i=0;i<a->num;i++)
-		*(p ++) = x;
-}
-
-void super_array_assign_1_single(CSuperArray *a, char x)
-{
-	char *p = (char*)a->data;
-	for (int i=0;i<a->num;i++)
-		*(p ++) = x;
-}
-
-void super_array_add_s_str(string *a, string *b)
-{
-	a->append(b);
-}
-
-string super_array_add_str(string *a, string *b)
+/*string super_array_add_str(string *a, string *b)
 {
 	string r;
 	//r.init(1); // done by kaba-constructors for temp variables
@@ -562,28 +390,35 @@ void super_array_add_str_cstr(string *a, char *b)
 	int l = strlen(b);
 	a->resize(a->num + l);
 	memcpy(&((char*)a->data)[n_old], b, l);
-}
+}*/
 
-bool super_array_equal_str(string *a, string *b)
-{	return *a == *b;	}
-
-bool super_array_notequal_str(string *a, string *b)
-{	return *a != *b;	}
-
-class string_list : public Array<string>
+bool type_is_simple_class(sType *t)
 {
-};
+	if (!t->UsesCallByReference())
+		return true;
+	/*if (t->IsArray)
+		return false;*/
+	if (t->IsSuperArray)
+		return false;
+	if (t->GetFunc("__init__") >= 0)
+		return false;
+	if (t->GetFunc("__delete__") >= 0)
+		return false;
+	if (t->GetFunc("__assign__") >= 0)
+		return false;
+	foreach(t->Element, e)
+		if (!type_is_simple_class(e.Type))
+			return false;
+	return true;
+}
 
 void script_make_super_array(sType *t, CPreScript *ps)
 {
 	msg_db_r("make_super_array", 4);
 	add_class(t);
 		class_add_element("num", TypeInt, PointerSize);
-		class_add_func("clear", TypeVoid, mf((tmf)&CSuperArray::clear));
-		class_add_func("remove", TypeVoid, mf((tmf)&CSuperArray::delete_single));
-			func_add_param("index",		TypeInt);
-		class_add_func("removep", TypeVoid, mf((tmf)&CSuperArray::delete_single_by_pointer));
-			func_add_param("pointer",		TypePointer);
+
+		// always usable operations
 		class_add_func("swap", TypeVoid, mf((tmf)&CSuperArray::swap));
 			func_add_param("i1",		TypeInt);
 			func_add_param("i2",		TypeInt);
@@ -593,62 +428,47 @@ void script_make_super_array(sType *t, CPreScript *ps)
 			func_add_param("pointer",		TypePointerPs);
 		class_add_func("index", TypeInt, mf((tmf)&CSuperArray::index));
 			func_add_param("pointer",		TypePointer);
-		class_add_func("resize", TypeVoid, mf((tmf)&CSuperArray::resize));
-			func_add_param("num",		TypeInt);
-		class_add_func("ensure_size", TypeVoid, mf((tmf)&CSuperArray::ensure_size));
-			func_add_param("num",		TypeInt);
-		if (t->SubType->Size == 4){
-			class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_4_single));
-				func_add_param("x",		t->SubType);
-		}else if (t->SubType->Size == 1){
-			class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_1_single));
-				func_add_param("x",		t->SubType);
-		}else if (t->SubType == TypeComplex){
-			class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_single));
-				func_add_param("x",		t->SubType);
-		}else if (t->SubType == TypeString){
-			class_add_func("add", TypeVoid, mf((tmf)&string_list::add));
-				func_add_param("x",		t->SubType);
-		}else if ((t->SubType->IsArray) || (t->SubType->Element.num > 0)){
-			class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_single));
-				func_add_param("x",		t->SubType);
-		}else{
-			class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_single));
-				func_add_param("x",		TypePointer);
-		}
-		if (t->SubType == TypeInt){
-			class_add_func("sort", TypeVoid, mf((tmf)&CSuperArray::int_sort));
-			class_add_func("unique", TypeVoid, mf((tmf)&CSuperArray::int_unique));
-		}else if (t->SubType == TypeFloat){
-			class_add_func("sort", TypeVoid, mf((tmf)&CSuperArray::float_sort));
-		}else if (t->SubType == TypeChar){
-			class_add_func("substr", TypeString, mf((tmf)&string::substr));
-				func_add_param("start",		TypeInt);
-				func_add_param("length",	TypeInt);
-			class_add_func("find", TypeInt, mf((tmf)&string::find));
-				func_add_param("str",		TypeString);
-				func_add_param("start",		TypeInt);
-			class_add_func("compare", TypeInt, mf((tmf)&string::compare));
-				func_add_param("str",		TypeString);
-			class_add_func("icompare", TypeInt, mf((tmf)&string::icompare));
-				func_add_param("str",		TypeString);
-			/*class_add_func("replace", TypeInt, mf((tmf)&string::replace));
-				func_add_param("start",		TypeInt);
-				func_add_param("length",	TypeInt);
-				func_add_param("str",		TypeString);*/
-			class_add_func("replace", TypeVoid, mf((tmf)&string::replace));
-				func_add_param("sub",		TypeString);
-				func_add_param("by",		TypeString);
-			class_add_func("explode", TypeStringList, mf((tmf)&string::explode));
-				func_add_param("str",		TypeString);
-		}
 		class_add_func("subarray", t, mf((tmf)&CSuperArray::ref_subarray));
 			func_add_param("start",		TypeInt);
 			func_add_param("num",		TypeInt);
 
-	// until we have automatic initialization... (T_T)
-		class_add_func("_manual_init_", TypeVoid, mf((tmf)&CSuperArray::init));
+		if (type_is_simple_class(t->SubType)){
+			if (!t->SubType->UsesCallByReference()){
+				if (t->SubType->Size == 4){
+					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<int>::__init__));
+					class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_4_single));
+						func_add_param("x",		t->SubType);
+				}else if (t->SubType->Size == 1){
+					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<char>::__init__));
+					class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_1_single));
+						func_add_param("x",		t->SubType);
+				}
+			}else{
+				class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_single));
+					func_add_param("x",		t->SubType);
+			}
+			class_add_func("__delete__",	TypeVoid, mf((tmf)&CSuperArray::clear));
+			class_add_func("clear", TypeVoid, mf((tmf)&CSuperArray::clear));
+			class_add_func("__assign__", TypeVoid, mf((tmf)&CSuperArray::assign));
+				func_add_param("other",		t);
+			class_add_func("remove", TypeVoid, mf((tmf)&CSuperArray::delete_single));
+				func_add_param("index",		TypeInt);
+			class_add_func("removep", TypeVoid, mf((tmf)&CSuperArray::delete_single_by_pointer));
+				func_add_param("pointer",		TypePointer);
+			class_add_func("resize", TypeVoid, mf((tmf)&CSuperArray::resize));
+				func_add_param("num",		TypeInt);
+			class_add_func("ensure_size", TypeVoid, mf((tmf)&CSuperArray::ensure_size));
+				func_add_param("num",		TypeInt);
+		}
+
+		// low level operations
+		class_add_func("__mem_init__", TypeVoid, mf((tmf)&CSuperArray::init));
 			func_add_param("element_size",		TypeInt);
+		class_add_func("__mem_clear__", TypeVoid, mf((tmf)&CSuperArray::clear));
+		class_add_func("__mem_resize__", TypeVoid, mf((tmf)&CSuperArray::resize));
+			func_add_param("size",		TypeInt);
+		class_add_func("__mem_remove__", TypeVoid, mf((tmf)&CSuperArray::delete_single));
+			func_add_param("index",		TypeInt);
 	msg_db_l(4);
 }
 
@@ -733,15 +553,15 @@ char *CastPointer2StringP(void *p)
 }
 char *CastVector2StringP(vector *v)
 {
-	string s = fff2s((float*)v);
+	string s = v->str();
 	char *str = get_type_cast_buf(s.num + 1);
 	memcpy(str, s.data, s.num);
 	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
 	return &CastTemp[0];
 }
-char *CastFFFF2StringP(quaternion *v)
+char *CastFFFF2StringP(quaternion *q)
 {
-	string s = ffff2s((float*)v);
+	string s = q->str();
 	char *str = get_type_cast_buf(s.num + 1);
 	memcpy(str, s.data, s.num);
 	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
@@ -749,7 +569,7 @@ char *CastFFFF2StringP(quaternion *v)
 }
 char *CastComplex2StringP(complex *z)
 {
-	string s = ff2s((float*)z);
+	string s = z->str();
 	char *str = get_type_cast_buf(s.num + 1);
 	memcpy(str, s.data, s.num);
 	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
@@ -757,13 +577,13 @@ char *CastComplex2StringP(complex *z)
 }
 
 Array<sTypeCast> TypeCast;
-void add_type_cast(int penalty, sType *source, sType *dest, const char *cmd, void *func)
+void add_type_cast(int penalty, sType *source, sType *dest, const string &cmd, void *func)
 {
 	sTypeCast c;
 	c.Penalty = penalty;
 	c.Command = -1;
 	for (int i=0;i<PreCommand.num;i++)
-		if (strcmp(PreCommand[i].Name, cmd) == 0){
+		if (PreCommand[i].Name == cmd){
 			c.Command = i;
 			break;
 		}
@@ -783,6 +603,56 @@ void add_type_cast(int penalty, sType *source, sType *dest, const char *cmd, voi
 }
 
 
+class StringList : public Array<string>
+{
+public:
+	void assign(StringList &s){	*this = s;	}
+	string join(const string &glue)
+	{
+		string r;
+		foreachi(*this, s, i){
+			if (i > 0)
+				r += glue;
+			r += s;
+		}
+		return r;
+	}
+};
+
+class IntClass
+{
+	int i;
+public:
+	string str(){	return i2s(i);	}
+};
+
+class FloatClass
+{
+	float f;
+public:
+	string str(){	return f2s(f, 6);	}
+};
+
+class BoolClass
+{
+	bool b;
+public:
+	string str(){	return b2s(b);	}
+};
+
+class CharClass
+{
+	char c;
+public:
+	string str(){	string r;	r.add(c);	return r;	}
+};
+
+class PointerClass
+{
+	void *p;
+public:
+	string str(){	return p2s(p);	}
+};
 
 void SIAddPackageBase()
 {
@@ -800,25 +670,86 @@ void SIAddPackageBase()
 	// "real"
 	TypeVoid			= add_type  ("void",		0);
 	TypeSuperArray		= add_type_a("void[]",		TypeVoid, -1); // substitute for all super arrays
-	TypePointer			= add_type_p("void*",		TypeVoid); // substitute for all pointer types
-	TypePointerPs		= add_type_p("void*&",		TypePointer, true);
+	TypePointer			= add_type_p("void*",		TypeVoid, FLAG_CALL_BY_VALUE); // substitute for all pointer types
+	TypePointerPs		= add_type_p("void*&",		TypePointer, FLAG_SILENT);
 	TypePointerList		= add_type_a("void*[]",		TypePointer, -1);
-	TypeBool			= add_type  ("bool",		sizeof(bool));
+	TypeBool			= add_type  ("bool",		sizeof(bool), FLAG_CALL_BY_VALUE);
 	TypeBoolList		= add_type_a("bool[]",		TypeBool, -11);
-	TypeInt				= add_type  ("int",			sizeof(int));
-	TypeIntPs			= add_type_p("int&",		TypeInt, true);
+	TypeInt				= add_type  ("int",			sizeof(int), FLAG_CALL_BY_VALUE);
+	TypeIntPs			= add_type_p("int&",		TypeInt, FLAG_SILENT);
 	TypeIntList			= add_type_a("int[]",		TypeInt, -1);
 	TypeIntArray		= add_type_a("int[?]",		TypeInt, 1);
-	TypeFloat			= add_type  ("float",		sizeof(float));
-	TypeFloatPs			= add_type_p("float&",		TypeFloat, true);
+	TypeFloat			= add_type  ("float",		sizeof(float), FLAG_CALL_BY_VALUE);
+	TypeFloatPs			= add_type_p("float&",		TypeFloat, FLAG_SILENT);
 	TypeFloatArray		= add_type_a("float[?]",	TypeFloat, 1);
 	TypeFloatArrayP		= add_type_p("float[?]*",	TypeFloatArray);
 	TypeFloatList		= add_type_a("float[]",		TypeFloat, -1);
-	TypeChar			= add_type  ("char",		sizeof(char));
+	TypeChar			= add_type  ("char",		sizeof(char), FLAG_CALL_BY_VALUE);
 	TypeCString			= add_type_a("cstring",		TypeChar, 256);	// cstring := char[256]
 	TypeString			= add_type_a("string",		TypeChar, -1);	// string := char[]
 	TypeStringList		= add_type_a("string[]",	TypeString, -1);
 
+	
+	add_class(TypeInt);
+		class_add_func("str", TypeString, mf((tmf)&IntClass::str));
+	add_class(TypeFloat);
+		class_add_func("str", TypeString, mf((tmf)&FloatClass::str));
+	add_class(TypeBool);
+		class_add_func("str", TypeString, mf((tmf)&BoolClass::str));
+	add_class(TypeChar);
+		class_add_func("str", TypeString, mf((tmf)&CharClass::str));
+	add_class(TypePointer);
+		class_add_func("str", TypeString, mf((tmf)&PointerClass::str));
+	
+	add_class(TypeString);
+		class_add_func("__iadd__", TypeVoid, mf((tmf)&string::operator+=));
+			func_add_param("x",		TypeString);
+		class_add_func("__add__", TypeString, mf((tmf)&string::operator+));
+			func_add_param("x",		TypeString);
+		class_add_func("__eq__", TypeBool, mf((tmf)&string::operator==));
+			func_add_param("x",		TypeString);
+		class_add_func("__ne__", TypeBool, mf((tmf)&string::operator!=));
+			func_add_param("x",		TypeString);
+		class_add_func("__lt__", TypeBool, mf((tmf)&string::operator<));
+			func_add_param("x",		TypeString);
+		class_add_func("__gt__", TypeBool, mf((tmf)&string::operator>));
+			func_add_param("x",		TypeString);
+		class_add_func("__le__", TypeBool, mf((tmf)&string::operator<=));
+			func_add_param("x",		TypeString);
+		class_add_func("__ge__", TypeBool, mf((tmf)&string::operator>=));
+			func_add_param("x",		TypeString);
+		class_add_func("substr", TypeString, mf((tmf)&string::substr));
+			func_add_param("start",		TypeInt);
+			func_add_param("length",	TypeInt);
+		class_add_func("find", TypeInt, mf((tmf)&string::find));
+			func_add_param("str",		TypeString);
+			func_add_param("start",		TypeInt);
+		class_add_func("compare", TypeInt, mf((tmf)&string::compare));
+			func_add_param("str",		TypeString);
+		class_add_func("icompare", TypeInt, mf((tmf)&string::icompare));
+			func_add_param("str",		TypeString);
+		class_add_func("replace", TypeVoid, mf((tmf)&string::replace));
+			func_add_param("sub",		TypeString);
+			func_add_param("by",		TypeString);
+		class_add_func("explode", TypeStringList, mf((tmf)&string::explode));
+			func_add_param("str",		TypeString);
+		class_add_func("lower", TypeString, mf((tmf)&string::lower));
+		class_add_func("upper", TypeString, mf((tmf)&string::upper));
+
+	add_class(TypeStringList);
+		class_add_func("__init__",	TypeVoid, mf((tmf)&StringList::__init__));
+		class_add_func("__delete__",	TypeVoid, mf((tmf)&StringList::clear));
+		class_add_func("add", TypeVoid, mf((tmf)&StringList::add));
+			func_add_param("x",		TypeString);
+		class_add_func("clear", TypeVoid, mf((tmf)&StringList::clear));
+		class_add_func("remove", TypeVoid, mf((tmf)&StringList::erase));
+			func_add_param("index",		TypeInt);
+		class_add_func("resize", TypeVoid, mf((tmf)&StringList::resize));
+			func_add_param("num",		TypeInt);
+		class_add_func("__assign__",	TypeVoid, mf((tmf)&StringList::assign));
+			func_add_param("other",		TypeStringList);
+		class_add_func("join", TypeString, mf((tmf)&StringList::join));
+			func_add_param("glue",		TypeString);
 
 
 	add_const("nil", TypePointer, NULL);
@@ -947,10 +878,8 @@ void SIAddOperators()
 	add_operator(OperatorGreaterEqual,	TypeBool,		TypeBool,		TypeBool);
 	add_operator(OperatorSmaller,		TypeBool,		TypeBool,		TypeBool);
 	add_operator(OperatorSmallerEqual,	TypeBool,		TypeBool,		TypeBool);
-/*	add_operator(OperatorAnd,			TypeBool,		TypeBool,		TypeBool);
-	add_operator(OperatorOr,			TypeBool,		TypeBool,		TypeBool);*/
-	add_operator(OperatorAndLiteral,	TypeBool,		TypeBool,		TypeBool);
-	add_operator(OperatorOrLiteral,		TypeBool,		TypeBool,		TypeBool);
+	add_operator(OperatorAnd,			TypeBool,		TypeBool,		TypeBool);
+	add_operator(OperatorOr,			TypeBool,		TypeBool,		TypeBool);
 	add_operator(OperatorNegate,		TypeBool,		TypeVoid,		TypeBool);	
 	add_operator(OperatorAssign,		TypeVoid,		TypeInt,		TypeInt);
 	add_operator(OperatorAdd,			TypeInt,		TypeInt,		TypeInt,	(void*)op_int_add);
@@ -1026,13 +955,6 @@ void SIAddOperators()
 	add_operator(OperatorMultiplyS,		TypeVoid,		TypeVector,		TypeFloat);
 	add_operator(OperatorDivideS,		TypeVoid,		TypeVector,		TypeFloat);
 	add_operator(OperatorSubtract,		TypeVector,		TypeVoid,		TypeVector);
-
-	add_operator(OperatorAddS,			TypeVoid,		TypeString,		TypeString);
-	add_operator(OperatorAdd,			TypeString,		TypeString,		TypeString);
-	add_operator(OperatorAssign,		TypeVoid,		TypeString,		TypeCString);
-	add_operator(OperatorAddS,			TypeVoid,		TypeString,		TypeCString);
-	add_operator(OperatorEqual,			TypeBool,		TypeString,		TypeString);
-	add_operator(OperatorNotEqual,		TypeBool,		TypeString,		TypeString);
 	
 	msg_db_l(3);
 }
@@ -1046,44 +968,6 @@ void SIAddSuperArrays()
 			//msg_error(string("super array:  ", PreType[i]->Name));
 			script_make_super_array(PreType[i]);
 		}
-	
-	add_operator(OperatorAssign,		TypeVoid,		TypeSuperArray,	TypeSuperArray);
-	add_operator(OperatorAddS,			TypeVoid,		TypeIntList,	TypeIntList);
-	add_operator(OperatorSubtractS,		TypeVoid,		TypeIntList,	TypeIntList);
-	add_operator(OperatorMultiplyS,		TypeVoid,		TypeIntList,	TypeIntList);
-	add_operator(OperatorDivideS,		TypeVoid,		TypeIntList,	TypeIntList);
-	/*add_operator(OperatorAdd,			TypeIntList,	TypeIntList,	TypeIntList);
-	add_operator(OperatorSubtract,		TypeIntList,	TypeIntList,	TypeIntList);
-	add_operator(OperatorMultiply,		TypeIntList,	TypeIntList,	TypeIntList);
-	add_operator(OperatorDivide,		TypeIntList,	TypeIntList,	TypeIntList);*/
-	add_operator(OperatorAssign,		TypeVoid,		TypeIntList,	TypeInt);
-	add_operator(OperatorAddS,			TypeVoid,		TypeIntList,	TypeInt);
-	add_operator(OperatorSubtractS,		TypeVoid,		TypeIntList,	TypeInt);
-	add_operator(OperatorMultiplyS,		TypeVoid,		TypeIntList,	TypeInt);
-	add_operator(OperatorDivideS,		TypeVoid,		TypeIntList,	TypeInt);
-	/*add_operator(OperatorAdd,			TypeIntList,	TypeIntList,	TypeInt);
-	add_operator(OperatorSubtract,		TypeIntList,	TypeIntList,	TypeInt);
-	add_operator(OperatorMultiply,		TypeIntList,	TypeIntList,	TypeInt);
-	add_operator(OperatorDivide,		TypeIntList,	TypeIntList,	TypeInt);*/
-	add_operator(OperatorAddS,			TypeVoid,		TypeFloatList,	TypeFloatList);
-	add_operator(OperatorSubtractS,		TypeVoid,		TypeFloatList,	TypeFloatList);
-	add_operator(OperatorMultiplyS,		TypeVoid,		TypeFloatList,	TypeFloatList);
-	add_operator(OperatorDivideS,		TypeVoid,		TypeFloatList,	TypeFloatList);
-	add_operator(OperatorAssign,		TypeVoid,		TypeFloatList,	TypeFloat);
-	add_operator(OperatorAddS,			TypeVoid,		TypeFloatList,	TypeFloat);
-	add_operator(OperatorSubtractS,		TypeVoid,		TypeFloatList,	TypeFloat);
-	add_operator(OperatorMultiplyS,		TypeVoid,		TypeFloatList,	TypeFloat);
-	add_operator(OperatorDivideS,		TypeVoid,		TypeFloatList,	TypeFloat);
-	add_operator(OperatorAddS,			TypeVoid,		TypeComplexList,TypeComplexList);
-	add_operator(OperatorSubtractS,		TypeVoid,		TypeComplexList,TypeComplexList);
-	add_operator(OperatorMultiplyS,		TypeVoid,		TypeComplexList,TypeComplexList);
-	add_operator(OperatorDivideS,		TypeVoid,		TypeComplexList,TypeComplexList);
-	add_operator(OperatorAssign,		TypeVoid,		TypeComplexList,TypeComplex);
-	add_operator(OperatorAddS,			TypeVoid,		TypeComplexList,TypeComplex);
-	add_operator(OperatorSubtractS,		TypeVoid,		TypeComplexList,TypeComplex);
-	add_operator(OperatorMultiplyS,		TypeVoid,		TypeComplexList,TypeComplex);
-	add_operator(OperatorDivideS,		TypeVoid,		TypeComplexList,TypeComplex);
-	add_operator(OperatorMultiplyS,		TypeVoid,		TypeComplexList,TypeFloat);
 	
 	msg_db_l(3);
 }
@@ -1240,25 +1124,20 @@ void ScriptResetSemiExternalData()
 {
 	msg_db_r("ScriptResetSemiExternalData", 2);
 	for (int i=PreExternalVar.num-1;i>=0;i--)
-		if (PreExternalVar[i].IsSemiExternal){
-			delete[](PreExternalVar[i].Name);
+		if (PreExternalVar[i].IsSemiExternal)
 			PreExternalVar.erase(i);
-		}
 	for (int i=PreCommand.num-1;i>=0;i--)
-		if (PreCommand[i].IsSemiExternal){
-			delete[](PreCommand[i].Name);
+		if (PreCommand[i].IsSemiExternal)
 			PreCommand.erase(i);
-		}
 	msg_db_l(2);
 }
 
 // program variables - specific to the surrounding program, can't always be there...
-void ScriptLinkSemiExternalVar(const char *name, void *pointer)
+void ScriptLinkSemiExternalVar(const string &name, void *pointer)
 {
 	msg_db_r("ScriptLinkSemiExternalVar", 2);
 	sPreExternalVar v;
-	v.Name = new char[strlen(name) + 1];
-	strcpy((char*)v.Name, (char*)name);
+	v.Name = name;
 	v.Pointer = pointer;
 	v.Type = TypeUnknown; // unusable until defined via "extern" in the script!
 	v.IsSemiExternal = true; // ???
@@ -1267,19 +1146,16 @@ void ScriptLinkSemiExternalVar(const char *name, void *pointer)
 }
 
 // program functions - specific to the surrounding program, can't always be there...
-void ScriptLinkSemiExternalFunc(const char *name, void *pointer)
+void ScriptLinkSemiExternalFunc(const string &name, void *pointer)
 {
 	sPreCommand c;
-	c.Name = new char[strlen(name) + 1];
-	strcpy((char*)c.Name, (char*)name);
+	c.Name = name;
 	c.IsClassFunction = false;
 	c.Func = pointer;
 	c.ReturnType = TypeUnknown; // unusable until defined via "extern" in the script!
 	c.IsSemiExternal = true;
 	PreCommand.add(c);
-}	
-
-Array<sScriptLocation> ScriptLocation;
+}
 
 void ScriptEnd()
 {
@@ -1287,20 +1163,11 @@ void ScriptEnd()
 	DeleteAllScripts(true, true);
 
 	ScriptResetSemiExternalData();
-	
-	// locations
-	ScriptLocation.clear();
 
 	PreOperator.clear();
 
-	for (int i=0;i<PreType.num;i++){
-		PreType[i]->Element.clear();
-		for (int j=0;j<PreType[i]->Function.num;j++)
-			if (PreType[i]->Function[j].Kind == KindCompilerFunction) // always true...
-				delete[](PreCommand[PreType[i]->Function[j].Nr].Name);
-		PreType[i]->Function.clear();
+	for (int i=0;i<PreType.num;i++)
 		delete(PreType[i]);
-	}
 	PreType.clear();
 
 	PreConstant.clear();

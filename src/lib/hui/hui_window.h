@@ -31,7 +31,8 @@ struct HuiInputData
 	float x, y, dx, dy, dz;	// position, change
 	float area_x, area_y;
 	float mw;					// drection
-	bool lb,mb,rb;				// keys
+	bool lb,mb,rb;				// buttons
+	int row, column;
 	// keyboard
 	bool key[256];
 	int key_code;
@@ -68,6 +69,7 @@ struct HuiControl
 #endif
 	bool enabled;
 	bool is_button_bar;
+	CHuiWindow *win;
 };
 
 struct HuiToolbarItem
@@ -137,7 +139,7 @@ class CHuiWindow : public HuiEventHandler
 {
 public:
 	CHuiWindow(const string &title, int x, int y, int width, int height, CHuiWindow *parent, bool allow_parent, int mode, bool show);
-	~CHuiWindow();
+	virtual ~CHuiWindow();
 	void _Init_(CHuiWindow *parent, bool allow_parent, int mode);
 	void _CleanUp_();
 
@@ -244,6 +246,10 @@ public:
 	// color
 	void _cdecl SetColor(const string &id, const color &col);
 	color _cdecl GetColor(const string &id);
+	// tree
+	void _cdecl ExpandAll(const string &id, bool expand);
+	void _cdecl Expand(const string &id, int row, bool expand);
+	bool _cdecl IsExpanded(const string &id, int row);
 	// stuff
 	void _cdecl Enable(const string &id, bool enabled);
 	bool _cdecl IsEnabled(const string &id);

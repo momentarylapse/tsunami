@@ -240,7 +240,7 @@ void CHuiWindow::EventM(const string &id, HuiEventHandler *handler, void (HuiEve
 {
 	HuiWinEvent e;
 	e.id = id;
-	e.message = "*";
+	e.message = ":def:";
 	e.function = NULL;
 	e.object = handler;
 	e.member_function = function;
@@ -283,14 +283,16 @@ bool CHuiWindow::_SendEvent_(HuiEvent *e)
 	e->key_code = input.key_code;
 	e->key = (e->key_code % 256);
 	e->text = HuiGetKeyChar(e->key_code);
+	e->row = input.row;
+	e->column = input.column;
 	_HuiEvent_ = *e;
 	if (e->id.num > 0)
 		_SetCurID_(e->id);
 	else
 		_SetCurID_(e->message);
-	
+
 	bool sent = false;
-	foreach(event, ee){	
+	foreach(event, ee){
 		bool send = false;
 		
 		// all events
@@ -299,6 +301,12 @@ bool CHuiWindow::_SendEvent_(HuiEvent *e)
 
 		// direct match ("extended")
 		if ((ee.id == e->id) && (ee.message == e->message))
+			send = true;
+
+		// default match
+		if ((ee.id == e->id) && (ee.message == ":def:") && (e->is_default))
+			send = true;
+		if ((ee.id == e->message) && (e->id == "") && (ee.message == ":def:") && (e->is_default))
 			send = true;
 			
 		// simple match

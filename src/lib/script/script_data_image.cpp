@@ -38,6 +38,8 @@ void SIAddPackageImage()
 		class_add_element("data",			TypeIntList,	GetDAImage(data));
 		class_add_element("error",			TypeBool,		GetDAImage(error));
 		class_add_element("alpha_used",		TypeBool,		GetDAImage(alpha_used));
+		class_add_func("__init__",			TypeVoid,	image_p(mf((tmf)&Image::__init__)));
+		class_add_func("__delete__",		TypeVoid,	image_p(mf((tmf)&Image::__delete__)));
 		class_add_func("Create",			TypeVoid,	image_p(mf((tmf)&Image::Create)));
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);

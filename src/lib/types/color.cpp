@@ -4,6 +4,14 @@
 //                                             colors                                             //
 //------------------------------------------------------------------------------------------------//
 
+void color::clamp()
+{
+	a = clampf(a, 0, 1);
+	r = clampf(r, 0, 1);
+	g = clampf(g, 0, 1);
+	b = clampf(b, 0, 1);
+}
+
 // create a color from (alpha, red, green blue)
 // (values of set [0..1])
 color SetColorSave(float a,float r,float g, float b)

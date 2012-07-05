@@ -20,9 +20,19 @@ string shell_execute(const string &cmd);
 //--------------------------------------------------------------
 // searching directories
 
-extern Array<string> dir_search_name;
-extern Array<bool> dir_search_is_dir;
+struct DirEntry
+{
+	string name;
+	bool is_dir;
 
-int _cdecl dir_search(const string &dir,const string &filter,bool show_directories);
+	void __init__()
+	{	name.__init__();	}
+	void __assign__(const DirEntry &o)
+	{	*this = o;	}
+	string str()
+	{	return "(\"" + name + "\", " + b2s(is_dir) + ")";	}
+};
+
+Array<DirEntry> _cdecl dir_search(const string &dir,const string &filter,bool show_directories);
 
 #endif

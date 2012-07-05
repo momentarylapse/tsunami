@@ -22,36 +22,31 @@ struct ps_exp_buffer_t
 	ps_line_t *cur_line;
 	int cur_exp;
 	int comment_level;
+	string _cur_;
 };
 
 
-#define cur_name		Exp.cur_line->exp[Exp.cur_exp].name
-#define get_name(n)		Exp.cur_line->exp[n].name
-#define next_exp()		Exp.cur_exp ++//;ExpectNoNewline()
+#define cur_name		Exp._cur_
+#define get_name(n)		string(Exp.cur_line->exp[n].name)
+#define next_exp()		{Exp.cur_exp ++; Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;}//;ExpectNoNewline()
+#define rewind_exp()	{Exp.cur_exp --; Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;}
 #define end_of_line()	(Exp.cur_exp >= Exp.cur_line->exp.num - 1) // the last entry is "-eol-"
 #define past_end_of_line()	(Exp.cur_exp >= Exp.cur_line->exp.num)
-#define next_line()		{Exp.cur_line ++;Exp.cur_exp=0;test_indent(Exp.cur_line->indent);}
+#define next_line()		{Exp.cur_line ++; Exp.cur_exp = 0; test_indent(Exp.cur_line->indent);  Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;}
 #define end_of_file()	((long)Exp.cur_line >= (long)&Exp.line[Exp.line.num - 1]) // last line = "-eol-"
 
 
 // macros
 struct sDefine
 {
-	char Source[SCRIPT_MAX_NAME];
+	string Source;
 	Array<string> Dest;
-};
-
-// special macro for execution rules
-struct sPreScriptRule
-{
-	int Location, Level;
-	char Name[SCRIPT_MAX_NAME];
 };
 
 // single enum entries
 /*struct sEnum
 {
-	char Name[SCRIPT_MAX_NAME];
+	string Name;
 	int Value;
 };*/
 
@@ -59,7 +54,7 @@ struct sPreScriptRule
 struct sConstant
 {
 	CPreScript *owner;
-	char name[SCRIPT_MAX_NAME];
+	string name;
 	char *data;
 	sType *type;
 };
@@ -128,20 +123,14 @@ struct sBlock
 struct sLocalVariable
 {
 	sType *Type; // for creating instances
-	char Name[SCRIPT_MAX_NAME];
+	string Name;
 	int _Offset; // for compilation
-};
-
-struct sSuperArrayLocation
-{
-	int Offset, Offset2;
-	sType *SubType;
 };
 
 // user defined functions
 struct sFunction
 {
-	char Name[SCRIPT_MAX_NAME];
+	string Name;
 	// parameters (linked to intern variables)
 	int NumParams;
 	// block of code
@@ -149,7 +138,7 @@ struct sFunction
 	// local variables
 	Array<sLocalVariable> Var;
 	sType *LiteralParamType[SCRIPT_MAX_PARAMS];
-	Array<sSuperArrayLocation> SuArLoc;
+	sType *Class;
 	// return value
 	sType *Type;
 	sType *LiteralType;
@@ -176,6 +165,8 @@ struct sAsmBlock
 	char *block;
 	int Line;
 };
+
+class CScript;
 
 
 // data structures (uncompiled)
@@ -207,31 +198,35 @@ public:
 	void Parser();
 	void ParseEnum();
 	void ParseClass();
-	void ParseFunction(sType *class_type = NULL);
+	void ParseFunction(sType *class_type, bool as_extern);
+	void ParseClassFunction(sType *t, bool as_extern);
 	sType *ParseVariableDefSingle(sType *type, sFunction *f, bool as_param = false);
 	void ParseVariableDef(bool single, sFunction *f);
-	void ParseGlobalConst(const char *name, sType *type);
-	int WhichPrimitiveOperator(const char *name);
-	int WhichCompilerFunction(const char *name);
+	void ParseGlobalConst(const string &name, sType *type);
+	int WhichPrimitiveOperator(const string &name);
+	int WhichCompilerFunction(const string &name);
 	void CommandSetCompilerFunction(int CF,sCommand *Com);
-	int WhichExternalVariable(const char *name);
-	int WhichType(const char *name);
+	int WhichExternalVariable(const string &name);
+	int WhichType(const string &name);
 	void SetExternalVariable(int gv, sCommand *c);
 	void AddType();
 
 	// pre compiler
 	void PreCompiler(bool just_analyse);
 	void HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
+	void CreateImplicitFunctions(sType *t, bool relocate_last_function);
+	void CreateAllImplicitFunctions(bool relocate_last_function);
 
 	// syntax analysis
 	sType *GetConstantType();
 	void *GetConstantValue();
-	sType *GetType(int &ie, bool force);
+	sType *GetType(const string &name, bool force);
 	void AddType(sType **type);
-	sType *CreateNewType(const char *name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, sType *sub);
+	sType *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, sType *sub);
 	void TestArrayDefinition(sType **type, bool is_pointer);
-	bool GetExistence(const char *name, sFunction *f);
+	bool GetExistence(const string &name, sFunction *f);
 	void LinkMostImportantOperator(int &NumOperators, sCommand **Operand, sCommand **Operator, int *op_exp);
+	bool LinkOperator(int op_no, sCommand *param1, sCommand *param2, sCommand **cmd);
 	void GetOperandExtension(sCommand *Operand, sFunction *f);
 	sCommand *GetCommand(sFunction *f);
 	void GetCompleteCommand(sBlock *block, sFunction *f);
@@ -239,21 +234,22 @@ public:
 	sCommand *GetOperator(sFunction *f);
 	void FindFunctionParameters(int &np, sType **WantedType, sFunction *f, sCommand *cmd);
 	void FindFunctionSingleParameter(int p, sType **WantedType, sFunction *f, sCommand *cmd);
-	void GetFunctionCall(const char *f_name, sCommand *Operand, sFunction *f);
-	bool GetSpecialFunctionCall(const char *f_name, sCommand *Operand, sFunction *f);
-	void CheckParamLink(sCommand *link, sType *type, const char *f_name = "", int param_no = -1);
+	void GetFunctionCall(const string &f_name, sCommand *Operand, sFunction *f);
+	bool GetSpecialFunctionCall(const string &f_name, sCommand *Operand, sFunction *f);
+	void CheckParamLink(sCommand *link, sType *type, const string &f_name = "", int param_no = -1);
 	void GetSpecialCommand(sBlock *block, sFunction *f);
 
 	// neccessary conversions
 	void ConvertCallByReference();
 	void BreakDownComplicatedCommands();
 	void BreakDownHighLevelOperators();
+	void MapLocalVariablesToStack();
 
 	// data creation
-	int AddVar(const char *name, sType *type, sFunction *f);
+	int AddVar(const string &name, sType *type, sFunction *f);
 	int AddConstant(sType *type);
 	sBlock *AddBlock();
-	int AddFunction(const char *name, sType *type);
+	sFunction *AddFunction(const string &name, sType *type);
 	sCommand *AddCommand();
 
 	// pre processor
@@ -293,15 +289,17 @@ public:
 	//Array<sEnum> Enum;
 	Array<CScript*> Include;
 	Array<sDefine> Define;
-	Array<sPreScriptRule> PreScriptRule;
 	char *AsmMetaInfo;
 	Array<sAsmBlock> AsmBlock;
 	Array<sConstant> Constant;
 	Array<sBlock*> Block;
-	Array<sFunction> Function;
+	Array<sFunction*> Function;
 	Array<sCommand*> Command;
 
 	sFunction RootOfAllEvil;
+
+	CScript *script;
+	sFunction *cur_func;
 };
 
 #define _do_error_(str,n,r)	{DoError(str);msg_db_l(n);return r;}

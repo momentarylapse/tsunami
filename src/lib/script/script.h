@@ -22,7 +22,7 @@ class CScript;
 extern string ScriptVersion;
 
 
-static bool UseConstAsGlobalVar=false;
+extern bool UseConstAsGlobalVar;
 
 
 enum
@@ -51,7 +51,10 @@ struct sSerialCommand
 {
 	int inst;
 	sSerialCommandParam p1, p2;
+	int pos;
 };
+
+struct SerializerData;
 
 // executable (compiled) data
 class CScript
@@ -63,12 +66,21 @@ public:
 	~CScript();
 
 	// building operational code
-	void Compiler(); 
-	void SerializeFunction(sFunction *f);
-	void SerializeBlock(sBlock *block, sFunction *f, int level);
-	void SerializeParameter(sCommand *link, sFunction *f, int level, int index, sSerialCommandParam &param);
-	sSerialCommandParam SerializeCommand(sCommand *com, sFunction *f, int level, int index);
-	void SerializeOperator(sCommand *com, sFunction *p_func, sSerialCommandParam *param, sSerialCommandParam &ret);
+	void Compiler();
+	void MapConstantsToMemory();
+	void MapGlobalVariablesToMemory();
+	void AllocateMemory();
+	void AllocateStack();
+	void AllocateOpcode();
+	void CompileFunction(sFunction *f, char *Opcode, int &OpcodeSize);
+	void SerializeFunction(SerializerData *d, sFunction *f);
+	void SerializeBlock(SerializerData *d, sBlock *block, int level);
+	void SerializeParameter(SerializerData *d, sCommand *link, int level, int index, sSerialCommandParam &param);
+	sSerialCommandParam SerializeCommand(SerializerData *d, sCommand *com, int level, int index);
+	void SerializeOperator(SerializerData *d, sCommand *com, sSerialCommandParam *param, sSerialCommandParam &ret);
+	void CompileOsEntryPoint();
+	void LinkOsEntryPoint();
+	void CompileTaskEntryPoint();
 
 	// error messages
 	void DoError(const string &msg, int overwrite_line = -1);
@@ -77,7 +89,6 @@ public:
 
 	// execution
 	void Execute();
-	bool ExecuteScriptFunction(const string &name, ...);
 	void *MatchFunction(const string &name, const string &return_type, int num_params, ...);//const string &params);
 	void SetVariable(const string &name, void *data);
 
@@ -89,7 +100,6 @@ public:
 	CPreScript *pre_script;
 
 	int ReferenceCounter;
-	void *user_data; // to associate additional data with the script
 
 	char *Opcode; // executable code
 	int OpcodeSize;
@@ -105,6 +115,7 @@ public:
 	bool Error, ParserError, LinkerError, isCopy, isPrivate, JustAnalyse, ShowCompilerStats;
 	string ErrorMsg, ErrorMsgExt[2];
 	int ErrorLine, ErrorColumn;
+	sFunction *cur_func;
 	int WaitingMode;
 	float TimeToWait;
 

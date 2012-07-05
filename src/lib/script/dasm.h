@@ -1,4 +1,3 @@
-#define ASM_MAX_LABEL_NAME		32
 
 
 // instruction sets
@@ -227,19 +226,19 @@ enum{
 
 struct sAsmGlobalVar
 {
-	char *Name;
+	string Name;
 	void *Pos; // points into the memory of a script
 };
 
 struct sAsmLabel
 {
-	char Name[ASM_MAX_LABEL_NAME];
+	string Name;
 	int Pos; // relative to CodeOrigin (Opcode[0])
 };
 
 struct sAsmWantedLabel
 {
-	char Name[ASM_MAX_LABEL_NAME];
+	string Name;
 	int Pos; // position to fill into     relative to CodeOrigin (Opcode[0])
 	int Size; // number of bytes to fill
 	int Add; // to add to the value...

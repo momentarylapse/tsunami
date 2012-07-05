@@ -9,6 +9,8 @@ static int ExpKind;
 
 char str_eol[] = "-eol-";
 
+#define SCRIPT_MAX_NAME	256
+
 void clear_exp_buffer(ps_exp_buffer_t *e)
 {
 	e->cur_line = NULL;

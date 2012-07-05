@@ -26,6 +26,7 @@ HuiEvent HuiCreateEvent(const string &id, const string &message)
 	e.dz = 0;
 	e.id = id;
 	e.message = message;
+	e.is_default = true;
 	return e;
 }
 

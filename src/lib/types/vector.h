@@ -37,6 +37,8 @@ public:
 	{	return x*v.x + y*v.y + z*v.z;	}
 	vector operator ^ (vector v) const
 	{	return vector( y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x );	}
+	string str()
+	{	return format("(%f, %f, %f)", x, y, z);	}
 };
 // vectors
 float _cdecl VecLength(const vector &v);
@@ -57,7 +59,7 @@ vector _cdecl VecRotate(const vector &v, const vector &ang);
 vector _cdecl VecOrtho(const vector &v);
 int VecImportantPlane(const vector &v);
 float VecLineDistance(const vector &p, const vector &l1, const vector &l2);
-vector VecLineNearestPoint(vector &p, vector &l1,vector &l2);
+vector VecLineNearestPoint(const vector &p, const vector &l1, const vector &l2);
 void _cdecl VecTransform(vector &vo, const matrix &m, const vector &vi);
 void _cdecl VecNormalTransform(vector &vo, const matrix &m, const vector &vi);
 void _cdecl VecTransform3(vector &vo, const matrix3 &m, const vector &vi);

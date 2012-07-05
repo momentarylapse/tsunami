@@ -8,6 +8,26 @@ extern sType *TypeBoolList;
 
 static Date *_date;
 #define	GetDADate(x)			long(&_date->x)-long(_date)
+static DirEntry *_dir_entry;
+#define	GetDADirEntry(x)			long(&_dir_entry->x)-long(_dir_entry)
+
+class DirEntryList : public Array<DirEntry>
+{
+public:
+	void __assign__(const DirEntryList &o)
+	{	*this = o;	}
+	string str()
+	{
+		string s = "[";
+		for (int i=0;i<num;i++){
+			if (i > 0)
+				s += ", ";
+			s += (*this)[i].str();
+		}
+		s += "]";
+		return s;
+	}
+};
 
 void SIAddPackageFile()
 {
@@ -21,6 +41,10 @@ void SIAddPackageFile()
 	TypeFileP			= add_type_p("file",		TypeFile);
 	sType*
 	TypeDate			= add_type  ("Date",		sizeof(Date));
+	sType*
+	TypeDirEntry		= add_type  ("DirEntry",	sizeof(DirEntry));
+	sType*
+	TypeDirEntryList	= add_type_a("DirEntry[]",	TypeDirEntry, -1);
 
 
 	add_class(TypeDate);
@@ -36,8 +60,9 @@ void SIAddPackageFile()
 		class_add_element("day_of_year",	TypeInt,		GetDADate(day_of_year));
 	
 	add_class(TypeFile);
-		class_add_func("GetDate",		TypeDate,		mf((tmf)&CFile::GetDate));
-			func_add_param("type",		TypeInt);
+		class_add_func("GetDateCreation",		TypeDate,		mf((tmf)&CFile::GetDateCreation));
+		class_add_func("GetDateModification",		TypeDate,		mf((tmf)&CFile::GetDateModification));
+		class_add_func("GetDateAccess",		TypeDate,		mf((tmf)&CFile::GetDateAccess));
 		class_add_func("GetSize",		TypeInt,		mf((tmf)&CFile::GetSize));
 		class_add_func("GetPos",		TypeInt,		mf((tmf)&CFile::GetPos));
 		class_add_func("SetPos",		TypeVoid,		mf((tmf)&CFile::SetPos));
@@ -63,6 +88,21 @@ void SIAddPackageFile()
 		class_add_func("ReadStrC",		TypeString,			mf((tmf)&CFile::ReadStrC));
 		class_add_func("ReadComplete",	TypeString,			mf((tmf)&CFile::ReadComplete));
 
+	
+	add_class(TypeDirEntry);
+		class_add_element("name",			TypeString,		GetDADirEntry(name));
+		class_add_element("is_dir",			TypeBool,		GetDADirEntry(is_dir));
+		class_add_func("__init__",		TypeVoid,			mf((tmf)&DirEntry::__init__));
+		class_add_func("__assign__",		TypeVoid,			mf((tmf)&DirEntry::__assign__));
+			func_add_param("other",		TypeDirEntry);
+		class_add_func("str",		TypeString,			mf((tmf)&DirEntry::str));
+	
+	add_class(TypeDirEntryList);
+		class_add_func("__init__",		TypeVoid,			mf((tmf)&DirEntryList::__init__));
+		class_add_func("__assign__",		TypeVoid,			mf((tmf)&DirEntryList::__assign__));
+			func_add_param("other",		TypeDirEntryList);
+		class_add_func("str",		TypeString,			mf((tmf)&DirEntryList::str));
+
 
 	// file access
 	add_func("FileOpen",			TypeFileP,				(void*)&OpenFile);
@@ -81,7 +121,7 @@ void SIAddPackageFile()
 	add_func("FileCopy",			TypeBool,			(void*)&file_copy);
 		func_add_param("source",		TypeString);
 		func_add_param("dest",		TypeString);
-	add_func("DirSearch",			TypeInt,			(void*)&dir_search);
+	add_func("DirSearch",			TypeDirEntryList,			(void*)&dir_search);
 		func_add_param("dir",		TypeString);
 		func_add_param("filter",		TypeString);
 		func_add_param("show_dirs",		TypeBool);
@@ -94,14 +134,6 @@ void SIAddPackageFile()
 		func_add_param("path",		TypeString);
 	add_func("Basename",			TypeString,			(void*)(string (*)(const string&))&basename);
 		func_add_param("path",		TypeString);
-	
-	add_ext_var("DirSearchName",	TypeStringList,	&dir_search_name);
-	add_ext_var("DirSearchIsDir",	TypeBoolList,	&dir_search_is_dir);
-
-	// file date
-	add_const("FileDateModification", TypeInt, (void*)FileDateModification);
-	add_const("FileDateAccess",       TypeInt, (void*)FileDateAccess);
-	add_const("FileDateCreation",     TypeInt, (void*)FileDateCreation);
 
 
 	msg_db_l(3);

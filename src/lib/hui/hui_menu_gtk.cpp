@@ -135,9 +135,11 @@ const char *get_stock_id(const string image)
 	if (image=="hui:close")	return GTK_STOCK_CLOSE;
 	if (image=="hui:edit")	return GTK_STOCK_EDIT;
 	if (image=="hui:find")	return GTK_STOCK_FIND;
+	if (image=="hui:find-and-replace")	return GTK_STOCK_FIND_AND_REPLACE;
+
 
 	if (image=="hui:no")		return GTK_STOCK_NO;
-	if (image=="hui:no")		return GTK_STOCK_YES;
+	if (image=="hui:yes")		return GTK_STOCK_YES;
 	if (image=="hui:ok")		return GTK_STOCK_OK;
 	if (image=="hui:cancel")	return GTK_STOCK_CANCEL;
 	if (image=="hui:apply")	return GTK_STOCK_APPLY;
@@ -158,6 +160,10 @@ const char *get_stock_id(const string image)
 	if (image=="hui:down")	return GTK_STOCK_GO_DOWN;
 	if (image=="hui:back")	return GTK_STOCK_GO_BACK;
 	if (image=="hui:forward")	return GTK_STOCK_GO_FORWARD;
+	if (image=="hui:bottom")		return GTK_STOCK_GOTO_BOTTOM;
+	if (image=="hui:first")	return GTK_STOCK_GOTO_FIRST;
+	if (image=="hui:last")	return GTK_STOCK_GOTO_LAST;
+	if (image=="hui:top")	return GTK_STOCK_GOTO_TOP;
 
 	if (image=="hui:help")	return GTK_STOCK_HELP;
 	if (image=="hui:info")	return GTK_STOCK_INFO;
@@ -177,6 +183,29 @@ const char *get_stock_id(const string image)
 	if (image=="hui:media-stop")return GTK_STOCK_MEDIA_STOP;
 	if (image=="hui:media-pause")return GTK_STOCK_MEDIA_PAUSE;
 	if (image=="hui:media-record")return GTK_STOCK_MEDIA_RECORD;
+	if (image=="hui:media-forward")return GTK_STOCK_MEDIA_FORWARD;
+	if (image=="hui:media-rewind")return GTK_STOCK_MEDIA_REWIND;
+	if (image=="hui:media-next")return GTK_STOCK_MEDIA_NEXT;
+	if (image=="hui:media-previous")return GTK_STOCK_MEDIA_PREVIOUS;
+
+	if (image=="hui:connect")	return GTK_STOCK_CONNECT;
+	if (image=="hui:disconnect")	return GTK_STOCK_DISCONNECT;
+	if (image=="hui:network")	return GTK_STOCK_NETWORK;
+
+	if (image=="hui:error")	return GTK_STOCK_DIALOG_ERROR;
+	//if (image=="hui:info")	return GTK_STOCK_DIALOG_INFO;
+	if (image=="hui:question")	return GTK_STOCK_DIALOG_QUESTION;
+	if (image=="hui:warning")	return GTK_STOCK_DIALOG_WARNING;
+	if (image=="hui:authentication")	return GTK_STOCK_DIALOG_AUTHENTICATION;
+
+	if (image=="hui:home")	return GTK_STOCK_HOME;
+	if (image=="hui:select-color")	return GTK_STOCK_SELECT_COLOR;
+	if (image=="hui:select-font")	return GTK_STOCK_SELECT_FONT;
+	if (image=="hui:sort-ascending")	return GTK_STOCK_SORT_ASCENDING;
+	if (image=="hui:sort-descending")	return GTK_STOCK_SORT_DESCENDING;
+	if (image=="hui:spell-check")	return GTK_STOCK_SPELL_CHECK;
+	if (image=="hui:convert")	return GTK_STOCK_CONVERT;
+	
 	return "";
 }
 
@@ -211,13 +240,7 @@ void *get_gtk_image_pixbuf(const string &image)
 #ifdef _X_USE_IMAGE_
 	if (image.find("hui:") == 0){
 		// internal
-		/*GtkWidget *img = gtk_image_new_from_stock(get_stock_id(image), GTK_ICON_SIZE_MENU);
-		msg_write(gtk_image_get_storage_type(GTK_IMAGE(img)));
-//		gtk_widget_show(img);
-		//gtk_widget_realize(img);
-		void *p = gtk_image_get_pixbuf(GTK_IMAGE(img));//g_object_get_data (G_OBJECT(img), "pixbuf");
-		msg_write(p2s(p));
-		return p;*/
+		return gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_stock_id(image), 24, (GtkIconLookupFlags)0, NULL);
 	}else{
 		// file
 		sHuiImage *img = get_image(image);

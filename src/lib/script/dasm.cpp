@@ -1400,7 +1400,7 @@ const char *Opcode2Asm(void *_code_,int length,bool allow_comments)
 			// labels
 			for (int i=0;i<CurrentAsmMetaInfo->Label.num;i++)
 				if ((long)code - (long)orig == CurrentAsmMetaInfo->Label[i].Pos)
-					bufstr += format("    %s:\n", CurrentAsmMetaInfo->Label[i].Name);
+					bufstr += "    " + CurrentAsmMetaInfo->Label[i].Name + ":\n";
 
 			// data blocks
 			bool inserted = false;
@@ -2028,9 +2028,10 @@ void GetParam(sInstParam &p, char *param, int pn)
 				return;
 			}
 		if (CurrentAsmMetaInfo){
+			string sparam = param;
 			// existing label
 			for (int i=0;i<CurrentAsmMetaInfo->Label.num;i++)
-				if (strcmp(CurrentAsmMetaInfo->Label[i].Name, param) == 0){
+				if (CurrentAsmMetaInfo->Label[i].Name == sparam){
 					p.value = CurrentAsmMetaInfo->Label[i].Pos + CurrentAsmMetaInfo->CodeOrigin;
 					p.type = ParamTImmediate;
 					p.is_label = true;
@@ -2041,7 +2042,7 @@ void GetParam(sInstParam &p, char *param, int pn)
 				}
 			// C-Script variable (global)
 			for (int i=0;i<CurrentAsmMetaInfo->GlobalVar.num;i++){
-				if (strcmp(CurrentAsmMetaInfo->GlobalVar[i].Name,param)==0){
+				if (CurrentAsmMetaInfo->GlobalVar[i].Name == sparam){
 					p.value = (long)CurrentAsmMetaInfo->GlobalVar[i].Pos;
 					p.type = ParamTImmediate;
 					p.deref = true;
@@ -2054,7 +2055,7 @@ void GetParam(sInstParam &p, char *param, int pn)
 			// not yet existing label...
 			if (param[0]=='_'){
 				sAsmWantedLabel w;
-				strcpy(w.Name, param);
+				w.Name = param;
 				w.Size = 0;
 				w.Pos = -1;
 				w.Add = 0;
@@ -2310,7 +2311,7 @@ const char *Asm2Opcode(const char *code)
 				cmd[strlen(cmd)-1]=0;
 				so(cmd);
 				sAsmLabel l;
-				strcpy(l.Name, cmd);
+				l.Name = cmd;
 				l.Pos = CurrentAsmMetaInfo->CurrentOpcodePos;
 				CurrentAsmMetaInfo->Label.add(l);
 
@@ -2318,7 +2319,7 @@ const char *Asm2Opcode(const char *code)
 
 				// die bisherigen Platzhalter ersetzen
 				for (int i=0;i<CurrentAsmMetaInfo->WantedLabel.num;i++)
-					if (strcmp(CurrentAsmMetaInfo->WantedLabel[i].Name, cmd) == 0){
+					if (CurrentAsmMetaInfo->WantedLabel[i].Name == cmd){
 						sAsmWantedLabel *w = &CurrentAsmMetaInfo->WantedLabel[i];
 						//msg_error("    -> wanted");
 						//printf("cop %d   orig %d  add %d  pos %d  pil %d\n", (long)CurrentAsmMetaInfo->CurrentOpcodePos, (long)CurrentAsmMetaInfo->CodeOrigin, (long)w->Add, w->Pos, CurrentAsmMetaInfo->PreInsertionLength);

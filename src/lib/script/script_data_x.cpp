@@ -172,7 +172,7 @@ void SIAddPackageX()
 	TypeModelP			= add_type_p("model",		TypeModel);
 	TypeModelPPs		= add_type_p("model&",		TypeModelP);
 	TypeModelPList		= add_type_a("model[]",		TypeModelP, -1);
-	TypeModelPListPs	= add_type_p("model[]&",	TypeModelPList, true);
+	TypeModelPListPs	= add_type_p("model[]&",	TypeModelPList, FLAG_SILENT);
 	TypeBone			= add_type  ("Bone",		sizeof_Bone);
 	TypeBoneList		= add_type_a("Bone[]",		TypeBone, -1);
 	TypeText			= add_type  ("Text",		0);
@@ -205,6 +205,13 @@ void SIAddPackageX()
 	TypePlaneList		= add_type_a("plane[]",		TypePlane, -1);
 	TypeVectorList		= add_type_a("vector[]",	TypeVector, -1);
 	
+
+	// bone, subskin, material...
+	add_class(TypeVectorList);
+		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<vector>::__init__));
+	add_class(TypePlaneList);
+		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<plane>::__init__));
+
 	add_class(TypePicture);
 		class_add_element("enabled",		TypeBool,		GetDAPicture(enabled));
 		class_add_element("tc_inverted",	TypeBool,		GetDAPicture(tc_inverted));
@@ -653,6 +660,7 @@ void SIAddPackageX()
 	add_ext_var("Terrain",			TypeTerrainPList,god_p(&Terrain));
 	add_ext_var("Gravitation",		TypeVector,		god_p(&GlobalG));
 	add_ext_var("PhysicsEnabled",	TypeBool,		god_p(&PhysicsEnabled));
+	add_ext_var("CollisionsEnabled",	TypeBool,		god_p(&CollisionsEnabled));
 	add_ext_var("Cam",				TypeViewP,		cam_p(&Cam));
 	add_ext_var("SkyBox",			TypeModelPList,	god_p(&SkyBox));
 	add_ext_var("BackGroundColor",	TypeColor,		god_p(&BackGroundColor));

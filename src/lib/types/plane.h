@@ -1,6 +1,9 @@
 
-struct plane{
+struct plane
+{
 	float a,b,c,d;
+	string str()
+	{	return format("(%f, %f, %f, %f)", a, b, c, d);	}
 };
 
 // planes

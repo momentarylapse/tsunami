@@ -31,22 +31,30 @@ public:
 	}
 	matrix3 operator * (float f) const
 	{
-		matrix3 r;
-		for (int i=0;i<9;i++)
-			r.e[i]=e[i]*f;
+		matrix3 r = *this;
+		r *= f;
 		return r;
+	}
+	matrix3 operator *= (float f)
+	{
+		for (int i=0;i<9;i++)
+			e[i] *= f;
+		return *this;
 	}
 	friend matrix3 operator * (float f,const matrix3 &m)
-	{	return m*f;	}
+	{	return m * f;	}
 	matrix3 operator / (float f) const
 	{
-		matrix3 r;
-		for (int i=0;i<9;i++)
-			r.e[i]=e[i]/f;
+		matrix3 r = *this;
+		r /= f;
 		return r;
 	}
-	friend matrix3 operator / (float f,const matrix3 &m)
-	{	return m/f;	}
+	matrix3 operator /= (float f)
+	{
+		for (int i=0;i<9;i++)
+			e[i] /= f;
+		return *this;
+	}
 	matrix3 operator * (const matrix3 &m) const
 	{
 		matrix3 r;
@@ -69,6 +77,8 @@ public:
 	}
 	friend vector operator * (const vector &v, const matrix3 &m)
 	{	return m*v;	}
+	string str()
+	{	return format("(%f, %f, %f; %f, %f, %f; %f, %f, %f)", _00, _01, _02, _10, _11, _12, _20, _21, _22);	}
 };
 
 // matrix3s

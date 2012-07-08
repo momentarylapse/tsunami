@@ -696,6 +696,7 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	foreach(plugin, p){
 		if (filename == p.filename){
 			PushCurPlugin(p.s);
+			msg_db_l(1);
 			return true;
 		}
 	}
@@ -727,6 +728,7 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 
 typedef void process_track_func(BufferBox*, Track*);
 typedef void main_audiofile_func(AudioFile*);
+typedef void main_void_func();
 
 void PluginManager::PluginProcessTrack(CScript *s, Track *t, Range r)
 {
@@ -753,7 +755,8 @@ void PluginManager::ExecutePlugin(const string &filename)
 //		cur_audio->history->ChangeBegin();
 		PluginResetData();
 		if (PluginConfigure(false, true)){
-			main_audiofile_func *f = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
+			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
+			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 			if (s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){
 				if (tsunami->cur_audio->used){
 					foreach(tsunami->cur_audio->track, t)
@@ -763,14 +766,18 @@ void PluginManager::ExecutePlugin(const string &filename)
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 				}
-			}else if (f){
+			}else if (f_audio){
 				if (tsunami->cur_audio->used)
-					f(tsunami->cur_audio);
+					f_audio(tsunami->cur_audio);
 				else
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
-			}else{
-				s->WaitingMode = WaitingModeFirst;
-				s->Execute();
+			}else if (f_void){
+
+				Array<float> fff;
+				Array<complex> ccc;
+				FastFourierTransform::fft_r2c(fff, ccc);
+
+				f_void();
 			}
 		}
 //		cur_audio->history->ChangeEnd();

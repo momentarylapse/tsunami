@@ -100,8 +100,8 @@ void show_spec()
 	complex fr[], fl[]
 	
 	int len2 = buf.r.num / 2 + 1
-	fr.resize(buf.r.num)//len2 + 1024)
-	fl.resize(buf.r.num)//len2 + 1024)
+	fr.resize(len2)
+	fl.resize(len2)
 	//ff.clear()
 	fft_r2c(buf.r, fr)
 	fft_r2c(buf.l, fl)

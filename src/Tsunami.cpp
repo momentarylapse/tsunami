@@ -14,6 +14,7 @@
 #include "Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "Action/AudioFile/ActionAudioDeleteTrack.h"
 
+#include "Plugins/FastFourierTransform.h"
 
 Tsunami *tsunami = NULL;
 extern string AppName;

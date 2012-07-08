@@ -39,7 +39,7 @@ void equalize(float b[])
 	
 	// transform
 	int len2 = b.num / 2 + 1
-	f.resize(len2 + 1024)
+	f.resize(len2)
 	fft_r2c(b, f)
 	
 	FloatInterpolator fi

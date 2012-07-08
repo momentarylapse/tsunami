@@ -25,6 +25,8 @@ void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 
 void fft_r2c(Array<float> &in, Array<complex> &out)
 {
+	if (in.num == 0)
+		return;
 	if (out.num < in.num / 2 + 1){
 		msg_error("fft_r2c: out.num < in.num / 2 + 1");
 		return;
@@ -40,6 +42,8 @@ void fft_r2c(Array<float> &in, Array<complex> &out)
 
 void fft_c2r_inv(Array<complex> &in, Array<float> &out)
 {
+	if (out.num == 0)
+		return;
 	if (in.num < out.num / 2 - 1){
 		msg_error("fft_c2r_inv: in.num < out.num / 2 - 1");
 		return;

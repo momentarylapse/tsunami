@@ -358,7 +358,7 @@ void HuiInitExtended(const string &program, const string &version, hui_callback 
 	HuiAppDirectoryStatic = s2;
 	dir_create(HuiAppDirectory);
 #endif
-//	HuiSetDefaultErrorHandler(program, version, error_cleanup_function);
+	HuiSetDefaultErrorHandler(program, version, error_cleanup_function);
 	//msg_write("");
 
 	

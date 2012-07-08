@@ -9,7 +9,6 @@ const float threshold = 0.1
 
 const int buf_size = 32768
 float buf[]
-complex bufc[]
 
 window win
 
@@ -96,6 +95,8 @@ void OnClose()
 	win = nil
 
 void idle()
+	int stack_corrector[3] // needed for stack alignment (T_T)
+	
 	int num = clampi(CapturePreviewBuf.num, 0, buf_size)
 	if num > 0
 		buf.resize(buf_size)
@@ -114,6 +115,8 @@ void idle()
 			buf[i] = f2i(val_max * sin(tt) * 0.1)*/
 		CapturePreviewBuf.clear()
 		
+		complex bufc[]
+		bufc.resize(buf.num / 2 + 1)
 		fft_r2c(buf, bufc)
 		float max = 0
 		float fmax = 0, fmax2 = 0
@@ -143,6 +146,7 @@ void idle()
 	HuiSleep(5)
 
 
+complex bufc[]
 
 void main()
 	CaptureStart(freq, false)
@@ -153,7 +157,13 @@ void main()
 	win.EventX("drawing", "hui:redraw", &Draw)
 	win.Event("hui:close", &OnClose)
 	
+
+
+	buf.resize(1000)
+	bufc.resize(1000)
+	fft_r2c(buf, bufc)
+	
 	//HuiWaitTillWindowClosed(win)
-	while(win)
+	while win
 		idle()
 	CaptureStop()

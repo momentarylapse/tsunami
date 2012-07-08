@@ -13,11 +13,11 @@
 
 namespace FastFourierTransform
 {
-	void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse);
-	void fft_r2c(Array<float> &in, Array<complex> &out);
-	void fft_c2r_inv(Array<complex> &in, Array<float> &out);
-	void fft_i2c(Array<int> &in, Array<complex> &out);
-	void fft_c2i_inv(Array<complex> &in, Array<int> &out);
+	void _cdecl fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse);
+	void _cdecl fft_r2c(Array<float> &in, Array<complex> &out);
+	void _cdecl fft_c2r_inv(Array<complex> &in, Array<float> &out);
+	void _cdecl fft_i2c(Array<int> &in, Array<complex> &out);
+	void _cdecl fft_c2i_inv(Array<complex> &in, Array<int> &out);
 }
 
 #endif /* FASTFOURIERTRANSFORM_H_ */

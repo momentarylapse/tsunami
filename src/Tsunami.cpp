@@ -18,6 +18,7 @@
 
 Tsunami *tsunami = NULL;
 extern string AppName;
+extern string AppVersion;
 
 Tsunami::Tsunami(Array<string> arg) :
 	CHuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls, true)
@@ -118,6 +119,8 @@ Tsunami::Tsunami(Array<string> arg) :
 	Subscribe(output);
 
 	UpdateMenu();
+
+	log->Info("Tsunami " + AppVersion + _(" - viel Erfolg!"));
 
 	HandleArguments(arg);
 

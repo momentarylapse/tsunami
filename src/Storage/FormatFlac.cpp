@@ -130,7 +130,7 @@ void FormatFlac::LoadTrack(Track *t, const string & filename)
 
 void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate, void *client_data)
 {
-	int length = (int)client_data;
+	long length = (long)client_data;
 	if (samples_written % (FLAC_READSIZE * 128) == 0)
 		tsunami->progress->Set((float)samples_written / (float)length);
 }

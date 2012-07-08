@@ -236,26 +236,154 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-10
+74
 // Data (ID,Text)
+                  Close dialog box to exit program.
+
+  - neuer Effekt -
+
+ ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
+
+!bold\\Kommentar/Geschehnisse:
+
+!bold\\Name:
+
+(anonym)
+
 (stumm)
 (muted)
 - Standard -
 - Default -
+...done
+
+Abbrechen
+
+Amplitude zu groß, Signal übersteuert.
+
 Audio-Datei ist leer
 Audio file is empty
+Auf Audiopuffer
+
+Auf einzelne Spur
+
+Beim Anwenden eines Effekt-Scripts (%s: %s %s)
+
+Beim Anwenden eines Effekt-Scripts (%s: Datei nicht ladbar)
+
+Beschreibung
+
 Das neue Gerät wird erst beim nächsten Start verwendet!
 The new device will only be used after the next program start.
+Datei exportieren
+
+Datei importieren
+
+Datei speichern
+
+Datei öffnen
+
+Datenverlust!
+
+Dieser Effekt ist nicht konfigurierbar.\nWollen Sie ihn löschen?
+
+Editor für Audio Dateien
+
+Es existiert schon eine Rhythmus-Spur.
+
+Es muss mindestens eine Spur existieren
+
+Failed writing header to output stream\n
+
+Falsche Version des Dateiformats: %d  (%d erwartet)
+
 Fehler
 Error
+Fehler in  Script-Datei: \"%s\"\n%s\n%s
+
+Fehlerbericht
+
+Fehlerbericht an Michi senden
+
+Frage
+
 Info
 Info
+Ist halt irgendwie passiert...
+
 Keine Ebene ausgewählt
 No level selected
 Keine Spur ausgewählt
 No track selected
-Meldungen
-Messages
+Konnte Aufnahmegerät nicht öffnen
+
+Löschen
+
+Nachrichten
+
+Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
+
+OK
+
+Plugin kann nicht für eine leere Audiodatei ausgeführt werden
+
+Plugin-Script wählen
+
+Script (*.kaba)
+
+Sonstige
+
+Spur %d
+
+Unbenannt
+
+Vorschau
+
+Wollen Sie diesen Effekt löschen?
+
+benutze OpenAl Device: 
+
+einen Effekt wählen
+
+erzeuge Peaks
+
+exportiere
+
+exportiere flac
+
+exportiere ogg
+
+exportiere wave
+
+i'm now going to clean up...
+
+importiere Daten
+
 keine Datei
 no file
+lade
+
+lade flac
+
+lade nami
+
+lade ogg
+
+lade wave
+
+message.txt öffnen
+
+neue Audiodatei
+
+neue Spur anlegen
+
+program has crashed, error handler has been called... maybe SegFault... m(-_-)m
+
+rendere Audio
+
+speichere
+
+speichere nami
+
+unbekannte Dateiendung: 
+
 #

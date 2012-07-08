@@ -9,6 +9,7 @@
 #include "Tsunami.h"
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
+#include "View/Dialog/SettingsDialog.h"
 
 #include "Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "Action/AudioFile/ActionAudioDeleteTrack.h"
@@ -33,7 +34,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	int width = HuiConfigReadInt("Window.Width", 800);
 	int height = HuiConfigReadInt("Window.Height", 600);
 	bool maximized = HuiConfigReadBool("Window.Maximized", true);
-/*	OggQuality = HuiConfigReadFloat("OggQuality", 0.5f); // -> StorageOgg*/
 
 	//HuiAddKeyCode("insert_added", KEY_RETURN);
 	//HuiAddKeyCode("remove_added", KEY_BACKSPACE);
@@ -271,6 +271,10 @@ void Tsunami::OnCommand(const string & id)
 
 void Tsunami::OnSettings()
 {
+	SettingsDialog *dlg = new SettingsDialog(this, false);
+	dlg->Update();
+
+	HuiWaitTillWindowClosed(dlg);
 }
 
 void Tsunami::OnTrackImport()

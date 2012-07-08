@@ -17,11 +17,6 @@
 
 const int CHUNK_SIZE = 1 << 15;
 
-float OggQuality;
-
-#define NumOggQualities		6
-float OggQualityList[NumOggQualities] = {0, 0.2f, 0.4f, 0.5f, 0.6f, 0.8f};
-
 
 OggVorbis_File vf;
 char ogg_buffer[4096];
@@ -58,6 +53,7 @@ void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	tsunami->progress->Set(_("exportiere ogg"), 0);
 	int size = b->num * 4;
 
+	float OggQuality = HuiConfigReadFloat("OggQuality", 0.5f);
 
 	FILE *f = fopen(filename.c_str(), "wb");
 

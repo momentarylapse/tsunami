@@ -19,8 +19,24 @@ public:
 	void LoadData();
 	void ApplyData();
 
-	void OnOk();
+	void OnLanguage();
+	void OnOggBitrate();
+	void OnPreviewSleep();
+	void OnPreviewDevice();
+	void OnCaptureDelay();
 	void OnClose();
+
+
+private:
+	struct OggQuality
+	{
+		OggQuality(){}
+		OggQuality(float q, int b) : quality(q), bitrate(b){};
+		float quality;
+		int bitrate;
+	};
+
+	Array<OggQuality> ogg_quality;
 };
 
 #endif /* SETTINGSDIALOG_H_ */

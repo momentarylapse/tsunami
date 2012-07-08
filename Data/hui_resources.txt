@@ -2695,7 +2695,7 @@ Neu...
 new_dialog
 Neue Datei
 ogg_bitrate
-64\\96\\128\\160\\196\\256
+64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
 ok
 OK
 open
@@ -3125,7 +3125,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-10
+9
 // Text
 (stumm)
 (muted)
@@ -3143,8 +3143,6 @@ Keine Ebene ausgewählt
 No level selected
 Keine Spur ausgewählt
 No track selected
-Meldungen
-Messages
 keine Datei
 no file
 #

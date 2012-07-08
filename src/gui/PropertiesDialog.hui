@@ -31,7 +31,7 @@ enum{
 	dlg->AddText("Sprache",20,30,100,25,HMM_PDP_LANGUAGE);
 	dlg->AddComboBox("",125,30,195,25,HMM_LANGUAGE);
 	dlg->AddText("OGG-Bitrate",20,60,100,25,HMM_PDT_OGGRATE);
-	dlg->AddComboBox("64\\96\\128\\160\\196\\256",125,60,195,25,HMM_OGG_BITRATE);
+	dlg->AddComboBox("64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500",125,60,195,25,HMM_OGG_BITRATE);
 	dlg->AddText("Lautst&arke",20,150,100,25,HMM_PDT_VOLUME);
 	dlg->AddSlider("",125,150,130,25,HMM_VOLUME_SLIDER);
 	dlg->AddEdit("",260,150,60,25,HMM_VOLUME);

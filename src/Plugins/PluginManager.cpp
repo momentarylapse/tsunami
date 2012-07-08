@@ -125,7 +125,7 @@ void PluginManager::LinkAppScriptData()
 //	ScriptLinkSemiExternalFunc("ChangeAudioFile",(void*)&ChangeAudioFile);
 //	ScriptLinkSemiExternalFunc("ChangeTrack",	(void*)&ChangeTrack);
 	ScriptLinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
-	ScriptLinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::operator=);
+	ScriptLinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
 	ScriptLinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
 	ScriptLinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
 	ScriptLinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
@@ -309,7 +309,7 @@ void PluginManager::PutFavoriteBarSizable(CHuiWindow *win, const string &root_id
 {
 	msg_db_r("PutFavoriteBarSizable", 1);
 	win->SetTarget(root_id, 0);
-	win->AddControlTable("", x, y, 4, 1, "favorite_table");
+	win->AddControlTable("!noexpandy", x, y, 4, 1, "favorite_table");
 	win->SetTarget("favorite_table", 0);
 	win->AddComboBox("", 0, 0, 0, 0, "favorite_list");
 	win->AddEdit("", 1, 0, 0, 0, "favorite_name");
@@ -410,7 +410,7 @@ void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id,
 {
 	msg_db_r("PutCommandBarSizable", 1);
 	win->SetTarget(root_id, 0);
-	win->AddControlTable("", x, y, 4, 1, "command_table");
+	win->AddControlTable("!noexpandy", x, y, 4, 1, "command_table");
 	win->SetTarget("command_table", 0);
 	win->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
 	win->SetImage("ok", "hui:ok");

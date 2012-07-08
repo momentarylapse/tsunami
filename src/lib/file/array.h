@@ -23,6 +23,9 @@ class DynamicArray
 	void append_4_single(int x);
 	void append_1_single(char x);
 	void append_single(const void *d);
+	void insert_4_single(int x, int index);
+	void insert_1_single(char x, int index);
+	void insert_single(const void *d, int index);
 	void delete_single(int index);
 	void delete_single_by_pointer(const void *p);
 	void swap(int i1, int i2);
@@ -96,9 +99,7 @@ class Array : public DynamicArray
 		}
 		void insert(const T item, int index)
 		{
-			resize(num + 1);
-			memmove(&(*this)[index + 1], &(*this)[index], (num - 1 - index) * element_size);
-			memset(&(*this)[index], 0, element_size);
+			insert_blank(index);
 			new(&(*this)[index]) T;
 			(*this)[index] = item;
 		}

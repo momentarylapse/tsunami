@@ -202,15 +202,9 @@ void SIAddPackageX()
 	TypeTerrain			= add_type  ("Terrain",		0);
 	TypeTerrainP		= add_type_p("terrain",		TypeTerrain);
 	TypeTerrainPList	= add_type_a("terrain[]",	TypeTerrainP, -1);
-	TypePlaneList		= add_type_a("plane[]",		TypePlane, -1);
-	TypeVectorList		= add_type_a("vector[]",	TypeVector, -1);
 	
 
 	// bone, subskin, material...
-	add_class(TypeVectorList);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<vector>::__init__));
-	add_class(TypePlaneList);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<plane>::__init__));
 
 	add_class(TypePicture);
 		class_add_element("enabled",		TypeBool,		GetDAPicture(enabled));

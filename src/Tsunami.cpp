@@ -77,7 +77,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddControlTable("", 0, 0, 1, 2, "main_table");
 	SetTarget("main_table", 0);
 	SetBorderWidth(8);
-	AddControlTable("", 0, 1, 8, 1, "audio_table");
+	AddControlTable("!noexpandy", 0, 1, 8, 1, "audio_table");
 	SetTarget("audio_table", 0);
 	AddButton("", 0, 0, 0, 0, "play");
 	AddButton("", 1, 0, 0, 0, "stop");

@@ -8,7 +8,7 @@
 
 const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
-const int MIN_VOL = -45
+const int MIN_VOL = 0-45
 const int MAX_VOL = 45
 
 class PluginData
@@ -20,40 +20,39 @@ PluginData data
 window dlg
 int MouseOver, Selected
 
-complex f[]
+float tofreq(float f)
+	return exp(f * log(MAX_FREQ / MIN_FREQ)) * MIN_FREQ
+
+float fromfreq(float f)
+	return log(f / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
+
+void fill_inter(FloatInterpolator fi)
+	fi.set_type("cubic-spline-notang")
+	fi.add(data.curve[0].y, 0)
+	for int i, 1, data.curve.num
+		fi.add(data.curve[i].y, log(data.curve[i].x / data.curve[i - 1].x))
 
 
 void equalize(float b[])
+	complex f[]
 	
 	
 	// transform
 	int len2 = b.num / 2 + 1
-	f.resize(len2)
+	f.resize(len2 + 1024)
 	fft_r2c(b, f)
 	
+	FloatInterpolator fi
+	fill_inter(fi)
+	
 	// equalize
+	f *= (1.0 / b.num)
 	float w = i2f(b.num) / cur_audio.sample_rate
-	for int j, 0, f2i(MIN_FREQ * w)
-		f[j] = f[j] * (1.0 / b.num)
-	for int j, f2i(MAX_FREQ * w), len2
-		f[j] = f[j] * (1.0 / b.num)
-	for int i, 0, data.curve.num - 1
-		float f_min, f_max
-		float db_min, db_max
-		f_min = data.curve[i].x
-		db_min = data.curve[i].y
-		float x_min = log(f_min / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
-		f_max = data.curve[i + 1].x
-		db_max = data.curve[i + 1].y
-		float x_max = log(f_max / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
-		int j0 = clamp(f_min * w, 0, len2)
-		int j1 = clamp(f_max * w, 0, len2)
-		//float ff = data.Factor[i] / sel_length
-		for int j, j0, j1
-			float ff = i2f(j) / w
-			float x = log(ff / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
-			float db = db_min + (db_max - db_min) * (x - x_min) / (x_max - x_min)
-			f[j] = f[j] * (pow(10, db / 20) / b.num)
+	for int i, 1, f.num
+		float freq = i2f(i) / w
+		float param = fromfreq(freq)
+		float db = fi.get(param)
+		f[i] = f[i] * pow(10, db / 20)
 		
 	// transform back
 	fft_c2r_inv(f, b)
@@ -61,7 +60,6 @@ void equalize(float b[])
 void ProcessTrack(BufferBox buf, Track t)
 	equalize(buf.r)
 	equalize(buf.l)
-	f.clear()
 
 void ResetData()
 	data.curve.clear()
@@ -76,11 +74,11 @@ void DataToDialog()
 float w, h
 
 complex project(complex z)
-	return complex(	log(z.x / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1),
+	return complex(	fromfreq(z.x) * (w - 1),
 			h * (MAX_VOL - z.y) / (MAX_VOL - MIN_VOL))
 
 complex unproject(complex z)
-	return complex(	exp(z.x * log(MAX_FREQ / MIN_FREQ) / (w - 1)) * MIN_FREQ,
+	return complex(	tofreq(z.x / (w - 1)),
 			MAX_VOL - z.y / h * (MAX_VOL - MIN_VOL))
 
 
@@ -96,18 +94,18 @@ void Draw()
 	w = c.width
 	h = c.height
 		
-	// Skala
+	// scale
 	c.SetLineWidth(0.9)
-	c.SetFontSize(8)
+	c.SetFontSize(7)
 	float ff = MIN_FREQ
 	while ff <= MAX_FREQ
-		float fx = log(ff / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
+		float fx = fromfreq(ff) * (w - 1)
 		c.SetColor(color(1, 0.8, 0.8, 0.8))
 		c.DrawLine(fx, 0, fx, h)
-		float fx2 = log(ff * sqrt(2) / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
+		float fx2 = fromfreq(ff) * (w - 1)
 		c.SetColor(color(1, 0.9, 0.9, 0.9))
 		c.DrawLine(fx2, 0, fx2, h)
-		c.SetColor(Black)
+		c.SetColor(color(1, 0.4, 0.4, 0.4))
 		c.DrawStr(fx, 5, f2s(ff,0) + " Hz")
 		ff *= 2
 	float vol = i2f(f2i(MIN_VOL / 10) * 10)
@@ -115,25 +113,45 @@ void Draw()
 		c.SetColor(color(1, 0.8, 0.8, 0.8))
 		float vy = project(complex(MIN_FREQ, vol)).y
 		c.DrawLine(0, vy, c.width, vy)
-		c.SetColor(Black)
+		c.SetColor(color(1, 0.4, 0.4, 0.4))
 		c.DrawStr(2, vy, f2s(vol,0) + " db")
 		vol += 10
 	
-	// curve
+	FloatInterpolator fi
+	fill_inter(fi)
+	
+	// curve + area below
+	float tt[], xx[], yy[]
+	tt = rangef(0, 1, 0.003)
+	yy = fi.get_list(tt)
+	yy *= -1
+	yy -= MIN_VOL
+	yy *= (h-1) / (MAX_VOL - MIN_VOL)
+	xx = tt
+	xx *= w
+	xx.add(w)
+	yy.add(h)
+	xx.add(0)
+	yy.add(h)
+	c.SetColor(color(0.3, 0.3, 0.3, 1))
+	c.DrawPolygon(xx, yy)
+	xx.resize(xx.num - 2)
+	yy.resize(yy.num - 2)
 	c.SetLineWidth(2)
 	c.SetColor(Black)
-	for int i, 1, data.curve.num
-		complex p = project(data.curve[i])
-		complex q = project(data.curve[i - 1])
-		c.DrawLine(q.x, q.y, p.x, p.y)
+	c.DrawLines(xx, yy)
+	
+	// points
 	for int i, 0, data.curve.num
-		p = project(data.curve[i])
+		complex p = project(data.curve[i])
 		c.SetColor(Black)
+		float radius = 3
 		if i == MouseOver
 			c.SetColor(Red)
+			radius = 4
 		else if i == Selected
 			c.SetColor(color(1, 0.7, 0, 0))
-		c.DrawRect(p.x - 3, p.y - 3, 6, 6)
+		c.DrawCircle(p.x, p.y, radius)
 	c.End()
 
 // left button down -> select
@@ -160,14 +178,7 @@ void OnRightButtonDown()
 		complex q = project(data.curve[i - 1])
 		complex p = project(data.curve[i])
 		if (mx > q.x) and (mx < p.x)
-			data.curve.add(complex(0, 0))
-			// shift...
-			int j = data.curve.num - 1
-			while j > i
-				data.curve[j] = data.curve[j - 1]
-				j --
-			// insert
-			data.curve[i] = unproject(complex(mx, my))
+			data.curve.insert(unproject(complex(mx, my)), i)
 			Selected = i
 			dlg.Redraw("drawing")
 			i = data.curve.num

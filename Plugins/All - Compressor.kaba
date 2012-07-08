@@ -11,6 +11,12 @@ PluginData data
 
 float level_scale
 
+void fill_inter(FloatInterpolator fi)
+	fi.set_type("lerp")
+	fi.add(data.curve[0].y, 0)
+	for int i, 1, data.curve.num
+		fi.add(data.curve[i].y, log(data.curve[i].x / data.curve[i - 1].x))
+
 void compress(float b[])
 	float in_level = 0
 	for int i, 0, b.num
@@ -81,7 +87,7 @@ void Draw()
 			c.SetColor(Red)
 		else if i == Selected
 			c.SetColor(color(1, 0.7, 0, 0))
-		c.DrawRect(p.x - 3, p.y - 3, 6, 6)
+		c.DrawCircle(p.x, p.y, 3)
 	c.End()
 
 // left button down -> select
@@ -108,14 +114,7 @@ void OnRightButtonDown()
 		complex q = project(data.curve[i - 1])
 		complex p = project(data.curve[i])
 		if (mx > q.x) and (mx < p.x) and (my < q.y) and (my > p.y)
-			data.curve.add(complex(0, 0))
-			// shift...
-			int j = data.curve.num - 1
-			while j > i
-				data.curve[j] = data.curve[j - 1]
-				j --
-			// insert
-			data.curve[i] = unproject(complex(mx, my))
+			data.curve.insert(unproject(complex(mx, my)), i)
 			Selected = i
 			win.Redraw("drawing_area")
 			break
@@ -173,7 +172,7 @@ void Configure()
 	win.AddControlTable("", 0, 0, 1, 4, "table1")
 	win.SetTarget("table1", 0)
 	win.AddDrawingArea("", 0, 1, 0, 0, "drawing_area")
-	win.AddControlTable("", 0, 2, 2, 1, "table2")
+	win.AddControlTable("!noexpandy", 0, 2, 2, 1, "table2")
 	win.SetTarget("table2", 0)
 	win.AddText("Delay...ms", 0, 0, 0, 0, "")
 	win.AddEdit("", 1, 0, 0, 0, "edit")

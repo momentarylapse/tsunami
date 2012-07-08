@@ -76,7 +76,8 @@ void (HuiEventHandler::*hui_idle_member_function)() = NULL;
 bool HuiHaveToExit;
 bool HuiRunning;
 bool HuiEndKeepMsgAlive = false;
-int HuiMainLevel = 0;
+int HuiMainLevel = -1;
+Array<bool> HuiMainLevelRunning;
 
 Array<CHuiWindow*> HuiWindow;
 Array<HuiClosedWindow> _HuiClosedWindow_;
@@ -168,7 +169,7 @@ void HuiSetIdleFunction(hui_callback *idle_function)
 	if ((new_idle) && (!old_idle))
 		idle_id = g_idle_add_full(300, GtkIdleFunction, NULL, NULL);
 	if ((!new_idle) && (old_idle) && (idle_id >= 0)){
-		gtk_idle_remove(idle_id);
+		g_source_remove(idle_id);
 		idle_id = -1;
 	}
 #endif
@@ -185,7 +186,7 @@ void HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*functi
 	if ((new_idle) && (!old_idle))
 		idle_id = g_idle_add_full(300, GtkIdleFunction, NULL, NULL);
 	if ((!new_idle) && (old_idle) && (idle_id >= 0)){
-		gtk_idle_remove(idle_id);
+		g_source_remove(idle_id);
 		idle_id = -1;
 	}
 #endif
@@ -292,6 +293,8 @@ void HuiInit()
 	HuiLanguaged=false;
 	HuiCreateHiddenWindows=false;
 
+	HuiPushMainLevel();
+
 	// make random numbers...well...random
 	Date d = get_current_date();
 	for (int j=0;j<d.milli_second+d.second;j++)
@@ -355,7 +358,7 @@ void HuiInitExtended(const string &program, const string &version, hui_callback 
 	HuiAppDirectoryStatic = s2;
 	dir_create(HuiAppDirectory);
 #endif
-	HuiSetDefaultErrorHandler(program, version, error_cleanup_function);
+//	HuiSetDefaultErrorHandler(program, version, error_cleanup_function);
 	//msg_write("");
 
 	
@@ -401,7 +404,8 @@ int HuiRun()
 {
 	msg_db_r("HuiRun",1);
 	HuiRunning = true;
-	HuiPushMainLevel();
+	HuiMainLevelRunning[HuiMainLevel] = true;
+	//HuiPushMainLevel();
 #ifdef HUI_API_WIN
 	MSG messages;
 	messages.message = 0;
@@ -483,23 +487,34 @@ void HuiDoSingleMainLoop()
 
 void HuiPushMainLevel()
 {
+	msg_db_r("HuiPushMainLevel",2);
 	HuiMainLevel ++;
+	HuiMainLevelRunning.add(false);
+	msg_db_l(2);
+}
+
+void HuiCleanUpMainLevel()
+{
+	msg_db_r("HuiCleanUpMainLevel",2);
+	foreachb(HuiWindow, w)
+		if (w->_GetMainLevel_() >= HuiMainLevel)
+			delete(w);
+	HuiSetIdleFunction(NULL);
+	msg_db_l(2);
 }
 
 void HuiPopMainLevel()
 {
-	msg_db_r("HuiPopMainLevel",1);
+	msg_db_r("HuiPopMainLevel",2);
+	HuiCleanUpMainLevel();
 	HuiMainLevel --;
 	
-	if (HuiMainLevel == 0)
+	if (HuiMainLevel < 0)
 		HuiSetErrorFunction(NULL);
-	else{
-		foreachb(HuiWindow, w)
-			if (w->_GetMainLevel_() > HuiMainLevel)
-				delete(w);
-	}
+	else
+		HuiMainLevelRunning.pop();
 	HuiDoSingleMainLoop();
-	msg_db_l(1);
+	msg_db_l(2);
 }
 
 // ends the system loop of the HuiRun() command
@@ -507,14 +522,16 @@ void HuiEnd()
 {
 	msg_db_r("HuiEnd",1);
 
-	HuiPopMainLevel();
+	if (HuiMainLevel > 0)
+		HuiCleanUpMainLevel();
 
 	// send "quit" message
 #ifdef HUI_API_WIN
 	PostQuitMessage(0);
 #endif
 #ifdef HUI_API_GTK
-	gtk_main_quit();
+	if (HuiMainLevelRunning.back())
+		gtk_main_quit();
 #endif
 
 	// really end hui?
@@ -526,7 +543,7 @@ void HuiEnd()
 		//	XCloseDisplay(hui_x_display);
 #endif
 
-		gdk_cursor_unref((GdkCursor*)invisible_cursor);
+		g_object_unref(invisible_cursor);
 #endif
 		if (HuiConfigChanged)
 			HuiSaveConfigFile();

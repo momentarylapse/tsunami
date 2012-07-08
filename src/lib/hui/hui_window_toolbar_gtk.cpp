@@ -35,7 +35,7 @@ void CHuiWindow::ToolbarAddItem(const string &title, const string &tool_tip, con
 	GtkWidget *im = (GtkWidget*)get_gtk_image(image, true);
 	gtk_widget_show(im);
 	GtkToolItem *it=gtk_tool_button_new(im,sys_str(title));
-	gtk_tool_item_set_tooltip(it,gtk_tooltips_new(),sys_str(tool_tip),sys_str(tool_tip));
+	gtk_tool_item_set_tooltip_text(it, sys_str(tool_tip));
 	gtk_tool_item_set_homogeneous(it,true);
 	if ((image != "hui:redo") && (image != "hui:open") && (image != "hui:paste") && (image != "hui:media-stop"))
 		gtk_tool_item_set_is_important(it, true);
@@ -52,7 +52,7 @@ void CHuiWindow::ToolbarAddItemCheckable(const string &title, const string &tool
 	GtkWidget *im=(GtkWidget*)get_gtk_image(image, true);
 	gtk_widget_show(im);
 	GtkToolItem *it=gtk_toggle_tool_button_new();
-	gtk_tool_item_set_tooltip(it,gtk_tooltips_new(),sys_str(tool_tip),sys_str(tool_tip));
+	gtk_tool_item_set_tooltip_text(it, sys_str(tool_tip));
 	gtk_tool_item_set_homogeneous(it,true);
 	gtk_tool_button_set_label(GTK_TOOL_BUTTON(it),sys_str(title));
 	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(it),im);
@@ -70,7 +70,7 @@ void CHuiWindow::ToolbarAddItemMenu(const string &title, const string &tool_tip,
 	GtkWidget *im=(GtkWidget*)get_gtk_image(image,true);
 	gtk_widget_show(im);
 	GtkToolItem *it=gtk_menu_tool_button_new(im,sys_str(title));
-	gtk_tool_item_set_tooltip(it,gtk_tooltips_new(),sys_str(tool_tip),sys_str(tool_tip));
+	gtk_tool_item_set_tooltip_text(it, sys_str(tool_tip));
 	gtk_tool_item_set_homogeneous(it,true);
 	gtk_widget_show(GTK_WIDGET(it));
 	gtk_menu_tool_button_set_menu(GTK_MENU_TOOL_BUTTON(it),menu->g_menu);

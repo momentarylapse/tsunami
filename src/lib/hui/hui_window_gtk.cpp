@@ -117,11 +117,13 @@ bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, CHuiWindow *win, bo
 {
 	//printf("%d   %d\n", nk++, event->time);
 	// convert hardware keycode into GDK keyvalue
-	GdkKeymapKey kmk;
+	/*GdkKeymapKey kmk;
 	kmk.keycode = event->hardware_keycode;
 	kmk.group = event->group;
 	kmk.level = 0;
-	int keyvalue = gdk_keymap_lookup_key(NULL, &kmk);
+	int keyvalue = gdk_keymap_lookup_key(NULL, &kmk);*/
+	// TODO GTK3
+	int keyvalue = event->keyval;
 	//msg_write(keyvalue);
 
 	// convert GDK keyvalue into HUI key id
@@ -201,8 +203,13 @@ gboolean OnGtkWindowClose(GtkWidget *widget, GdkEvent *event, gpointer user_data
 	if (win->_SendEvent_(&e))
 		return true;
 	
-	// no message function (and last window): end program
-	if (HuiWindow.num == 1)
+	// no message function (and last window in thie main level): end program
+	// ...or at least end nested main level
+	int n = 0;
+	foreach(HuiWindow, w)
+		if (w->_GetMainLevel_() >= win->_GetMainLevel_())
+			n ++;
+	if (n == 1)
 		HuiEnd();
 	return false;
 }
@@ -223,14 +230,19 @@ gboolean OnGtkWindowMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer
 	int mx, my, mod = 0;
 	if (win->gl_widget){
 		//msg_write("gl");
-		gdk_window_get_pointer(win->gl_widget->window, &mx, &my, (GdkModifierType*)&mod);
+		gdk_window_get_device_position(gtk_widget_get_window(win->gl_widget), event->device, &mx, &my, (GdkModifierType*)&mod);
+		// TODO GTK3
+		//gdk_window_get_pointer(win->gl_widget->window, &mx, &my, (GdkModifierType*)&mod);
 		//mx = event->x;
 		//my = event->y;
-		win->mouse_offset_x = mx - event->x;
-		win->mouse_offset_y = my - event->y;
+		/*win->mouse_offset_x = mx - event->x;
+		win->mouse_offset_y = my - event->y;*/
 		mod = event->state;
+		/*mx = event->x;
+		my = event->y;*/
 	}else{
-		gdk_window_get_pointer(win->window->window, &mx, &my, (GdkModifierType*)&mod);
+		// TODO GTK3
+		//gdk_window_get_pointer(win->window->window, &mx, &my, (GdkModifierType*)&mod);
 		irect ri = win->GetInterior();
 		mx -= ri.x1;
 		my -= ri.y1;
@@ -320,7 +332,7 @@ gboolean OnGtkWindowKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 	return false;
 }
 
-gboolean OnGtkWindowExpose(GtkWidget *widget, GdkEventExpose *event, gpointer user_data)
+gboolean OnGtkWindowExpose(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	CHuiWindow *win = (CHuiWindow*)user_data;
 	HuiEvent e = HuiCreateEvent("", "hui:redraw");
@@ -328,7 +340,7 @@ gboolean OnGtkWindowExpose(GtkWidget *widget, GdkEventExpose *event, gpointer us
 	return false;
 }
 
-gboolean expose_event_gl(GtkWidget *widget, GdkEventExpose *event, gpointer user_data)
+gboolean expose_event_gl(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	//msg_write(string2("expose gl %d", xpi++));
 	CHuiWindow *win = (CHuiWindow*)user_data;
@@ -448,7 +460,8 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 		window = gtk_dialog_new();
 		if (!allow_root)
 			gtk_window_set_modal(GTK_WINDOW(window), true);//false);
-		gtk_dialog_set_has_separator(GTK_DIALOG(window), false);
+		// TODO GTK3
+		//gtk_dialog_set_has_separator(GTK_DIALOG(window), false);
 		//gtk_container_set_border_width(GTK_CONTAINER(window), 0);
 #ifndef HUI_OS_WINDOWS
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
@@ -494,9 +507,10 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 	// fill in some stuff
 	gtk_container_set_border_width(GTK_CONTAINER(window), 0);
 	if (parent){
-		vbox = GTK_DIALOG(window)->vbox;
+		vbox = gtk_dialog_get_content_area(GTK_DIALOG(window));
 	}else{
-		vbox = gtk_vbox_new(FALSE, 0);
+		vbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+		//gtk_box_pack_start(GTK_BOX(window), vbox, TRUE, TRUE, 0);
 		gtk_container_add(GTK_CONTAINER(window), vbox);
 		gtk_widget_show(vbox);
 	}
@@ -512,16 +526,16 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar[HuiToolbarBottom].widget),true);
 	toolbar[HuiToolbarLeft].widget = gtk_toolbar_new();
 	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar[HuiToolbarLeft].widget), true);
-	gtk_toolbar_set_orientation(GTK_TOOLBAR(toolbar[HuiToolbarLeft].widget), GTK_ORIENTATION_VERTICAL);
+	gtk_orientable_set_orientation(GTK_ORIENTABLE(toolbar[HuiToolbarLeft].widget), GTK_ORIENTATION_VERTICAL);
 	toolbar[HuiToolbarRight].widget = gtk_toolbar_new();
 	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar[HuiToolbarRight].widget), true);
-	gtk_toolbar_set_orientation(GTK_TOOLBAR(toolbar[HuiToolbarRight].widget), GTK_ORIENTATION_VERTICAL);
+	gtk_orientable_set_orientation(GTK_ORIENTABLE(toolbar[HuiToolbarRight].widget), GTK_ORIENTATION_VERTICAL);
 
 	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarTop].widget, FALSE, FALSE, 0);
 
 
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(vbox), hbox);
+	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 	//gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
 	gtk_widget_show(hbox);
 
@@ -533,8 +547,8 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 	if (NixMode){
 		// "drawable" (for opengl)
 		gl_widget = gtk_drawing_area_new();
-		g_signal_connect(G_OBJECT(gl_widget), "expose-event", G_CALLBACK(&expose_event_gl), this);
-		gtk_container_add(GTK_CONTAINER(hbox), gl_widget);
+		g_signal_connect(G_OBJECT(gl_widget), "draw", G_CALLBACK(&expose_event_gl), this);
+		gtk_box_pack_start(GTK_BOX(hbox), gl_widget, TRUE, TRUE, 0);
 
 		// show/realize to be done by the nix library!
 		/*gtk_widget_show(gl_widget);
@@ -556,14 +570,14 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 		if (is_resizable){
 			// free to use...
 			//cur_control = hbox;
-			plugable = gtk_hbox_new(FALSE, 0);
+			plugable = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 			gtk_widget_show(plugable);
 			//gtk_container_set_border_width(GTK_CONTAINER(plugable), 0);
-			gtk_container_add(GTK_CONTAINER(hbox), plugable);
+			gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
 		}else{
 			// "fixed" (for buttons etc)
 			plugable = gtk_fixed_new();
-			gtk_container_add(GTK_CONTAINER(hbox), plugable);
+			gtk_box_pack_start(GTK_BOX(hbox), plugable, TRUE, TRUE, 0);
 			gtk_widget_show(plugable);
 			//gl_widget = plugable;
 		}
@@ -595,7 +609,7 @@ CHuiWindow::~CHuiWindow()
 {
 	msg_db_r("~CHuiWindow",1);
 	_CleanUp_();
-	
+
 	gtk_widget_destroy(window);
 	
 	msg_db_l(1);
@@ -620,12 +634,13 @@ void CHuiWindow::AllowEvents(const string &msg)
 	
 	// catch signals
 	if (msg.find("draw") >= 0){
-		//g_signal_connect(G_OBJECT(window), "expose-event", G_CALLBACK(&OnGtkWindowExpose), this);
+		//g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(&OnGtkWindowExpose), this);
 		g_signal_connect(G_OBJECT(window), "visibility-notify-event", G_CALLBACK(&OnGtkWindowVisibilityNotify), this);
 		mask |= GDK_VISIBILITY_NOTIFY_MASK;
 	}
 	if (msg.find("scroll") >= 0){
 		g_signal_connect(G_OBJECT(window), "scroll-event", G_CALLBACK(&OnGtkWindowMouseWheel), this);
+		mask |= GDK_SCROLL_MASK;
 	}
 	if (msg.find("key") >= 0){
 		g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(&OnGtkWindowKeyDown), this);
@@ -734,7 +749,7 @@ irect CHuiWindow::GetOuterior()
 void CHuiWindow::SetOuteriorDesired(irect rect)
 {
 	// bad hack
-	bool maximized = (gdk_window_get_state(window->window) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
+	bool maximized = (gdk_window_get_state(gtk_widget_get_window(window)) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
 	if (maximized)
 		gtk_window_unmaximize(GTK_WINDOW(window));
 	gtk_window_move(GTK_WINDOW(window),rect.x1,rect.y1);
@@ -749,7 +764,7 @@ irect CHuiWindow::GetOuteriorDesired()
 {
 	irect r;
 	// bad hack
-	bool maximized = (gdk_window_get_state(window->window) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
+	bool maximized = (gdk_window_get_state(gtk_widget_get_window(window)) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
 	if (maximized){
 		// very nasty hack   m(-_-)m
 		r .x1 = 50;
@@ -779,16 +794,6 @@ irect CHuiWindow::GetOuteriorDesired()
 	return r;
 }
 
-int _tool_bar_size(HuiToolbar *toolbar)
-{
-	int s=32-4;
-	if (toolbar->large_icons)
-		s+=8;
-	if (toolbar->text_enabled)
-		s+=16;
-	return s;
-}
-
 // get the "usable" part of the window: controllers/graphics area
 //   relative to the outer part!!
 irect CHuiWindow::GetInterior()
@@ -807,11 +812,19 @@ irect CHuiWindow::GetInterior()
 	GtkWidget *interior = (plugable == NULL) ? gl_widget : plugable;
 	if (interior){
 		int w, h, x = 0, y = 0;
-		gdk_window_get_position(interior->window, &x, &y);
-		if (gl_widget)
-			gdk_drawable_get_size(interior->window, &w, &h);
-		else
-			gdk_window_get_size(interior->window, &w, &h);
+		gdk_window_get_position(gtk_widget_get_window(window), &x, &y);
+		if (gl_widget){
+			// TODO GTK3
+			//gdk_drawable_get_size(gtk_widget_get_window(window), &w, &h);
+			w = gdk_window_get_width(gtk_widget_get_window(gl_widget));
+			h = gdk_window_get_height(gtk_widget_get_window(gl_widget));
+			//msg_write(format("gl %d %d (getint)", w, h));
+		}else{
+			// TODO GTK3
+			//gdk_window_get_size(gtk_widget_get_window(interior), &w, &h);
+			w = gdk_window_get_width(gtk_widget_get_window(window));
+			h = gdk_window_get_height(gtk_widget_get_window(window));
+		}
 		//msg_write(string2("getinter2 %d %d %d %d", x, y, w, h));
 		if ((w < 0) || (h < 0) || (w > r.x2) || (h > r.y2))
 			return r;
@@ -844,9 +857,9 @@ void CHuiWindow::ShowCursor(bool show)
 	}
 #else
 	if (show)
-		gdk_window_set_cursor(vbox->window,NULL);
+		gdk_window_set_cursor(gtk_widget_get_window(vbox), NULL);
 	else
-		gdk_window_set_cursor(vbox->window,(GdkCursor*)invisible_cursor);
+		gdk_window_set_cursor(gtk_widget_get_window(vbox), (GdkCursor*)invisible_cursor);
 #endif
 }
 
@@ -917,10 +930,12 @@ void CHuiWindow::SetCursorPos(int x,int y)
 		dy = ynew - input.y;
 		//msg_write(format(" d= %d %d  (%d)", dx, dy, ignore_time));
 		put_events();
-		if (gl_widget)
-			XWarpPointer(hui_x_display, None, GDK_WINDOW_XWINDOW(gl_widget->window), 0, 0, 0, 0, x, y);
-		else
-			XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(window->window), 0, 0, 0, 0, x + ri.x1, y + ri.y1);
+		if (gl_widget){
+			// TODO GTK3
+			XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(gl_widget)), 0, 0, 0, 0, x, y);
+			//XWarpPointer(hui_x_display, None, GDK_WINDOW_XWINDOW(gtk_widget_get_window(gl_widget)), 0, 0, 0, 0, x, y);
+		}else
+			XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(window)), 0, 0, 0, 0, x + ri.x1, y + ri.y1);
 		XFlush(hui_x_display);
 		XFlush(hui_x_display);
 		/*HuiSleep(2);
@@ -957,13 +972,13 @@ void CHuiWindow::SetMaximized(bool maximized)
 
 bool CHuiWindow::IsMaximized()
 {
-	int state=gdk_window_get_state(window->window);
+	int state=gdk_window_get_state(gtk_widget_get_window(window));
 	return ((state & GDK_WINDOW_STATE_MAXIMIZED)>0);
 }
 
 bool CHuiWindow::IsMinimized()
 {
-	int state=gdk_window_get_state(window->window);
+	int state=gdk_window_get_state(gtk_widget_get_window(window));
 	return ((state & GDK_WINDOW_STATE_ICONIFIED)>0);
 }
 

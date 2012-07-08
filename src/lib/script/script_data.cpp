@@ -438,14 +438,23 @@ void script_make_super_array(sType *t, CPreScript *ps)
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<int>::__init__));
 					class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_4_single));
 						func_add_param("x",		t->SubType);
+					class_add_func("insert", TypeVoid, mf((tmf)&CSuperArray::insert_4_single));
+						func_add_param("x",		t->SubType);
+						func_add_param("index",		TypeInt);
 				}else if (t->SubType->Size == 1){
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<char>::__init__));
 					class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_1_single));
 						func_add_param("x",		t->SubType);
+					class_add_func("insert", TypeVoid, mf((tmf)&CSuperArray::insert_1_single));
+						func_add_param("x",		t->SubType);
+						func_add_param("index",		TypeInt);
 				}
 			}else{
 				class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_single));
 					func_add_param("x",		t->SubType);
+				class_add_func("insert", TypeVoid, mf((tmf)&CSuperArray::insert_single));
+					func_add_param("x",		t->SubType);
+					func_add_param("index",		TypeInt);
 			}
 			class_add_func("__delete__",	TypeVoid, mf((tmf)&CSuperArray::clear));
 			class_add_func("clear", TypeVoid, mf((tmf)&CSuperArray::clear));

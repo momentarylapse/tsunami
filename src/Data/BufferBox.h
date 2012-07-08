@@ -16,6 +16,7 @@ class BufferBox
 public:
 	BufferBox();
 	virtual ~BufferBox();
+	void __assign__(const BufferBox &other){	*this = other;	}
 
 	int offset, num;
 	Array<float> r, l;

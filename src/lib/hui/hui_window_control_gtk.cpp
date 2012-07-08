@@ -25,13 +25,14 @@ enum{
 	HuiGtkInsertTabControl,
 };
 
-//#if GTK_MAJOR_VERSION == 2
+#if GTK_MAJOR_VERSION == 2
 #if GTK_MINOR_VERSION < 22
 	void gtk_table_get_size(GtkTable *table, guint *rows, guint *columns)
 	{
 		g_object_get(G_OBJECT(table), "n-rows", rows, NULL);
 		g_object_get(G_OBJECT(table), "n-columns", columns, NULL);
 	}
+#endif
 #endif
 
 HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int width, int height, const string &id, int type, GtkWidget *frame)
@@ -71,7 +72,8 @@ HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int wid
 		// insert
 		if (root_type == HuiGtkInsertContainer){
 			// directly into the window...
-			gtk_container_add(GTK_CONTAINER(target_widget), frame);
+			//gtk_container_add(GTK_CONTAINER(target_widget), frame);
+			gtk_box_pack_start(GTK_BOX(target_widget), frame, true, true, 0);
 	//		_cur_widget_ = frame;
 			/*if ((kind == HuiKindListView) || (kind == HuiKindDrawingArea) || (kind == HuiKindMultilineEdit))
 				gtk_container_set_border_width(GTK_CONTAINER(target_widget), 0);
@@ -102,7 +104,7 @@ HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int wid
 				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
 				gtk_widget_set_size_request(frame, -1, 30);
 			}else if (type == HuiKindControlTable){
-				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
+				//op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
 			}else if (type == HuiKindText){
 				//op_x = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
 				if (!root_is_button_bar)
@@ -396,7 +398,7 @@ void OnGtkComboboxChange(GtkWidget *widget, gpointer data)
 void CHuiWindow::AddComboBox(const string &title,int x,int y,int width,int height,const string &id)
 {
 	GetPartStrings(id, title);
-	GtkWidget *cb = gtk_combo_box_new_text();
+	GtkWidget *cb = gtk_combo_box_text_new();
 	g_signal_connect(G_OBJECT(cb), "changed", G_CALLBACK(&OnGtkComboboxChange), this);
 	_InsertControl_(cb, x, y, width, height, id, HuiKindComboBox);
 	if ((PartString.num > 1) || (PartString[0] != ""))
@@ -442,7 +444,7 @@ void CHuiWindow::AddRadioButton(const string &title,int x,int y,int width,int he
 
 
 
-void OnGtkTabControlSwitch(GtkWidget *widget, GtkNotebookPage *page, guint page_num, gpointer data)
+void OnGtkTabControlSwitch(GtkWidget *widget, GtkWidget *page, guint page_num, gpointer data)
 {
 	CHuiWindow *win = (CHuiWindow *)data;
 	HuiControl *c = win->_GetControlByWidget_(widget);
@@ -459,9 +461,10 @@ void CHuiWindow::AddTabControl(const string &title,int x,int y,int width,int hei
 
 	for (int i=0;i<PartString.num;i++){
 		GtkWidget *inside;
-		if (is_resizable)
-			inside = gtk_hbox_new(true, 0);
-		else
+		if (is_resizable){
+			inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+			gtk_box_set_homogeneous(GTK_BOX(inside), true);
+		}else
 			inside = gtk_fixed_new();
 		gtk_widget_show(inside);
 		GtkWidget *label = gtk_label_new(sys_str(PartString[i]));
@@ -703,10 +706,10 @@ void CHuiWindow::AddSlider(const string &title,int x,int y,int width,int height,
 	GetPartStrings(id, title);
 	GtkWidget *s;
 	if (height > width){
-		s = gtk_vscale_new_with_range(0.0, 1.0, 0.0001);
+		s = gtk_scale_new_with_range(GTK_ORIENTATION_VERTICAL, 0.0, 1.0, 0.0001);
 		gtk_range_set_inverted(GTK_RANGE(s), true);
 	}else
-		s = gtk_hscale_new_with_range(0.0, 1.0, 0.0001);
+		s = gtk_scale_new_with_range(GTK_ORIENTATION_HORIZONTAL, 0.0, 1.0, 0.0001);
 	gtk_scale_set_draw_value(GTK_SCALE(s), false);
 	g_signal_connect(G_OBJECT(s), "value-changed", G_CALLBACK(&OnGtkSliderChange), this);
 	_InsertControl_(s, x, y, width, height, id, HuiKindSlider);
@@ -728,14 +731,14 @@ void CHuiWindow::AddImage(const string &title,int x,int y,int width,int height,c
 
 
 
-gboolean OnGtkAreaExpose(GtkWidget *widget, GdkEventExpose *event, gpointer user_data)
+gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	NotifyWindowByWidget((CHuiWindow*)user_data, widget, "hui:redraw");
 	return false;
 }
 
-void OnGtkAreaResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
-{	NotifyWindowByWidget((CHuiWindow*)user_data, widget, "hui:resize", false);	}
+/*void OnGtkAreaResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
+{	NotifyWindowByWidget((CHuiWindow*)user_data, widget, "hui:resize", false);	}*/
 
 gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
@@ -801,11 +804,10 @@ void CHuiWindow::AddDrawingArea(const string &title,int x,int y,int width,int he
 {
 	GetPartStrings(id, title);
 	GtkWidget *da = gtk_drawing_area_new();
-	g_signal_connect(G_OBJECT(da), "expose-event", G_CALLBACK(OnGtkAreaExpose), this);
-	//g_signal_connect(G_OBJECT(w), "scroll-event", G_CALLBACK(&scroll_event), this);
+	g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
 	//g_signal_connect(G_OBJECT(w), "key-press-event", G_CALLBACK(&key_press_event), this);
 	//g_signal_connect(G_OBJECT(w), "key-release-event", G_CALLBACK(&key_release_event), this);
-	g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
+	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
 	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&OnGtkAreaMouseMove), this);
 	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&OnGtkAreaButtonDown), this);
 	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&OnGtkAreaButtonUp), this);
@@ -813,7 +815,7 @@ void CHuiWindow::AddDrawingArea(const string &title,int x,int y,int width,int he
 	//g_signal_connect(G_OBJECT(w), "focus-in-event", G_CALLBACK(&focus_in_event), this);
 	int mask;
 	g_object_get(G_OBJECT(da), "events", &mask, NULL);
-	mask |= GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_VISIBILITY_NOTIFY_MASK; // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
+	mask |= GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK; // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
 	//mask = GDK_ALL_EVENTS_MASK;
 	g_object_set(G_OBJECT(da), "events", mask, NULL);
 	_InsertControl_(da, x, y, width, height, id, HuiKindDrawingArea);
@@ -911,7 +913,7 @@ void CHuiWindow::Redraw(const string &_id)
 {
 	HuiControl *c = _GetControl_(_id);
 	if (c)
-		gdk_window_invalidate_rect(c->widget->window, NULL, false);
+		gdk_window_invalidate_rect(gtk_widget_get_window(c->widget), NULL, false);
 }
 
 void CHuiWindow::RedrawRect(const string &_id, int x, int y, int w, int h)
@@ -931,7 +933,7 @@ void CHuiWindow::RedrawRect(const string &_id, int x, int y, int w, int h)
 		r.y = y;
 		r.width = w;
 		r.height = h;
-		gdk_window_invalidate_rect(c->widget->window, &r, false);
+		gdk_window_invalidate_rect(gtk_widget_get_window(c->widget), &r, false);
 	}
 }
 
@@ -944,8 +946,10 @@ HuiDrawingContext *CHuiWindow::BeginDraw(const string &_id)
 	hui_drawing_context.id = _id;
 	hui_drawing_context.cr = NULL;
 	if (c){
-		hui_drawing_context.cr = gdk_cairo_create(c->widget->window);
-		gdk_drawable_get_size(c->widget->window, &hui_drawing_context.width, &hui_drawing_context.height);
+		hui_drawing_context.cr = gdk_cairo_create(gtk_widget_get_window(c->widget));
+		//gdk_drawable_get_size(gtk_widget_get_window(c->widget), &hui_drawing_context.width, &hui_drawing_context.height);
+		hui_drawing_context.width = gdk_window_get_width(gtk_widget_get_window(c->widget));
+		hui_drawing_context.height = gdk_window_get_height(gtk_widget_get_window(c->widget));
 		//hui_drawing_context.SetFontSize(16);
 		hui_drawing_context.SetFont("Sans", 16, false, false);
 	}
@@ -1030,6 +1034,22 @@ void HuiDrawingContext::DrawLinesMA(Array<float> &x, Array<float> &y)
 	DrawLines(&x[0], &y[0], x.num - 1);
 }
 
+void HuiDrawingContext::DrawPolygon(float *x, float *y, int num_points)
+{
+	if (!cr)
+		return;
+	cairo_move_to(cr, x[0], y[0]);
+	for (int i=1;i<num_points;i++)
+		cairo_line_to(cr, x[i], y[i]);
+	cairo_close_path(cr);
+	cairo_fill(cr);
+}
+
+void HuiDrawingContext::DrawPolygonMA(Array<float> &x, Array<float> &y)
+{
+	DrawPolygon(&x[0], &y[0], x.num);
+}
+
 void HuiDrawingContext::DrawStr(float x, float y, const string &str)
 {
 	if (!cr)
@@ -1060,6 +1080,14 @@ void HuiDrawingContext::DrawRect(float x, float y, float w, float h)
 	if (!cr)
 		return;
 	cairo_rectangle(cr, x, y, w, h);
+	cairo_fill(cr);
+}
+
+void HuiDrawingContext::DrawCircle(float x, float y, float radius)
+{
+	if (!cr)
+		return;
+	cairo_arc(cr, x, y, radius, 0, 2 * pi);
 	cairo_fill(cr);
 }
 
@@ -1152,7 +1180,7 @@ void CHuiWindow::SetString(const string &_id, const string &str)
 	}else if ((c->type==HuiKindListView)||(c->type==HuiKindTreeView)){
 		AddString(_id, str);
 	}else if (c->type==HuiKindComboBox){
-		gtk_combo_box_append_text(GTK_COMBO_BOX(c->widget),sys_str(str));
+		gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(c->widget),sys_str(str));
 		c->_item_.add(dummy_iter);
 	}else if (c->type==HuiKindProgressBar)
 		gtk_progress_bar_set_text(GTK_PROGRESS_BAR(c->widget),sys_str(str));
@@ -1296,7 +1324,7 @@ void CHuiWindow::AddString(const string &_id, const string &str)
 	if (c->type==HuiKindEdit)
 		{}//gtk_entry_set_text(GTK_ENTRY(c->widget),sys_str(str));
 	else if (c->type==HuiKindComboBox){
-		gtk_combo_box_append_text(GTK_COMBO_BOX(c->widget),sys_str(str));
+		gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(c->widget), NULL, sys_str(str));
 		c->_item_.add(dummy_iter);
 	}else if (c->type==HuiKindTreeView){
 		GetPartStrings("", str);
@@ -1620,8 +1648,7 @@ void CHuiWindow::Reset(const string &_id)
 		//gtk_tree_store_clear(store);
 		msg_write("Todo:  CHuiWindow::ResetControl (IconView)  (Linux)");
 	}else if (c->type==HuiKindComboBox){
-		for (int j=c->_item_.num-1;j>=0;j--)
-			gtk_combo_box_remove_text(GTK_COMBO_BOX(c->widget),j);
+		gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(c->widget));
 	}
 	c->_item_.clear();
 	allow_signal_level--;

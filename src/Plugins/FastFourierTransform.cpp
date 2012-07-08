@@ -25,9 +25,13 @@ void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 
 void fft_r2c(Array<float> &in, Array<complex> &out)
 {
+	if (out.num < in.num / 2 + 1){
+		msg_error("fft_r2c: out.num < in.num / 2 + 1");
+		return;
+	}
 	msg_db_r("fft_r2c", 1);
-	if (out.num < in.num / 2 + 1)
-		out.resize(in.num / 2 + 1);
+	/*if (out.num < in.num / 2 + 1)
+		out.resize(in.num / 2 + 1);*/
 	fftwf_plan plan = fftwf_plan_dft_r2c_1d(in.num, (float*)in.data, (float(*)[2])out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
@@ -36,11 +40,12 @@ void fft_r2c(Array<float> &in, Array<complex> &out)
 
 void fft_c2r_inv(Array<complex> &in, Array<float> &out)
 {
+	if (in.num < out.num / 2 - 1){
+		msg_error("fft_c2r_inv: in.num < out.num / 2 - 1");
+		return;
+	}
 	msg_db_r("fft_c2r_inv", 1);
-	int size = (in.num - 1) * 2;
-	if (out.num < size)
-		out.resize(size);
-	fftwf_plan plan = fftwf_plan_dft_c2r_1d(size, (float(*)[2])in.data, (float*)out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
+	fftwf_plan plan = fftwf_plan_dft_c2r_1d(out.num, (float(*)[2])in.data, (float*)out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
 	msg_db_l(1);

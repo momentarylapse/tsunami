@@ -101,6 +101,24 @@ void DynamicArray::append_single(const void *d)
 	num ++;
 }
 
+void DynamicArray::insert_4_single(int x, int index)
+{
+	insert_blank(index);
+	((int*)data)[index] = x;
+}
+
+void DynamicArray::insert_1_single(char x, int index)
+{
+	insert_blank(index);
+	((char*)data)[index] = x;
+}
+
+void DynamicArray::insert_single(const void *d, int index)
+{
+	insert_blank(index);
+	memcpy(&((char*)data)[index * element_size], d, element_size);
+}
+
 void DynamicArray::swap(int i1, int i2)
 {
 	if ((i1 < 0) || (i1 >= num))

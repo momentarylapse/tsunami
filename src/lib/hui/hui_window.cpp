@@ -110,12 +110,11 @@ void CHuiWindow::_CleanUp_()
 
 	for (int i=0;i<control.num;i++)
 		delete(control[i]);
-	control.clear();
 	
 	// unregister window
-	HuiEvent e = HuiCreateEvent("", "hui:redraw");
+	/*HuiEvent e = HuiCreateEvent("", "hui:redraw");
 	if (parent)
-		parent->_SendEvent_(&e);
+		parent->_SendEvent_(&e);*/
 	for (int i=0;i<HuiWindow.num;i++)
 		if (HuiWindow[i] == this){
 			HuiWindow.erase(i);
@@ -321,10 +320,8 @@ bool CHuiWindow::_SendEvent_(HuiEvent *e)
 		if ((send) && (ee.function)){
 			ee.function();
 			sent = true;
-		}
-
-		// send the event (member)
-		if ((send) && (ee.object) && (ee.member_function)){
+		}else if ((send) && (ee.object) && (ee.member_function)){
+			// send the event (member)
 			(ee.object->*ee.member_function)();
 			sent = true;
 		}

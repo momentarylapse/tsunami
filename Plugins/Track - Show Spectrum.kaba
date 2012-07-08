@@ -11,18 +11,17 @@ enum
 	TypeRoot2
 	TypeLogarithm
 
-float x[], yr[], yl[]
+//float x[], yr[], yl[]
 float ffr[], ffl[]
 
 int w, h
 
-void CreateLines(int type)
+void CreateLines(int type, float x[], float yr[], float yl[])
 
 	x.clear()
 	yr.clear()
 	yl.clear()
-	int i
-	for i, 0, N
+	for int i, 0, N
 		x.add(i2f(w) * i2f(i) / i2f(N))
 		if type == TypeLinear
 			yr.add(h - 10 - (h - 20) * ffr[i])
@@ -40,14 +39,15 @@ void OnDraw()
 	context c = dlg.BeginDraw("drawing_area")
 	w = c.width
 	h = c.height
-	CreateLines(dlg.GetInt("type"))
+	
+	float x[], yr[], yl[]
+	CreateLines(dlg.GetInt("type"), x, yr, yl)
 		
 	// Hintergrund
 	c.SetColor(White)
 	c.DrawRect(0, 0, w, h)
 		
 	// Skala
-	int i
 	c.SetLineWidth(0.9)
 	c.SetFontSize(8)
 	float f = MIN_FREQ
@@ -81,7 +81,7 @@ void show_spec()
 	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
 	dlg.SetTarget("table1", 0)
 	dlg.AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
-	dlg.AddControlTable("", 0, 1, 2, 1, "table2")
+	dlg.AddControlTable("!noexpandy", 0, 1, 2, 1, "table2")
 	dlg.SetTarget("table2", 0)
 	dlg.AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
 	dlg.AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
@@ -100,15 +100,14 @@ void show_spec()
 	complex fr[], fl[]
 	
 	int len2 = buf.r.num / 2 + 1
-	fr.resize(len2)
-	fl.resize(len2)
+	fr.resize(buf.r.num)//len2 + 1024)
+	fl.resize(buf.r.num)//len2 + 1024)
 	//ff.clear()
 	fft_r2c(buf.r, fr)
 	fft_r2c(buf.l, fl)
 	
 	float ww = i2f(buf.r.num) / cur_audio.sample_rate
-	int i, j
-	for i, 0, N
+	for int i, 0, N
 		float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
 		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
 		int j0 = fmin * ww
@@ -117,7 +116,7 @@ void show_spec()
 		j1 = clamp(j1, 0, len2)
 		float bmaxr = 0
 		float bmaxl = 0
-		for j, j0, j1
+		for int j, j0, j1
 			float amp = fr[j].x * fr[j].x + fr[j].y * fr[j].y
 			if bmaxr < amp
 				bmaxr = amp
@@ -126,27 +125,16 @@ void show_spec()
 				bmaxl = amp
 		ffr.add(bmaxr)
 		ffl.add(bmaxl)
-	fr.clear()
-	fl.clear()
 
-	float max = 0
-	for i, 0, ffr.num - 1
-		if ffr[i] > max
-			max = ffr[i]
-		if ffl[i] > max
-			max = ffl[i]
-	if max > 0
-		for i, 0, ffr.num
-			ffr[i] /= max
-			ffl[i] /= max
+	float mmax = max(ffr.max(), ffl.max())
+	if mmax > 0
+		ffr /= mmax
+		ffl /= mmax
 
 	dlg.Redraw("drawing_area")
 
 	HuiWaitTillWindowClosed(dlg)
 	
-	x.clear()
-	yr.clear()
-	yl.clear()
 	ffr.clear()
 	ffl.clear()
 

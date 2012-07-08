@@ -30,8 +30,10 @@
 
 extern sType *TypeComplexList;
 extern sType *TypeFloatList;
+extern sType *TypeVectorList;
 extern sType *TypeMatrix;
 extern sType *TypePlane;
+extern sType *TypePlaneList;
 extern sType *TypeMatrix3;
 extern sType *TypeIntList;
 extern sType *TypeFloatPs;
@@ -142,6 +144,26 @@ void super_array_mul_s_com_float(CSuperArray *a, float x)
 class FloatList : public Array<float>
 {
 public:
+	float _max()
+	{
+		float max = 0;
+		if (num > 0)
+			max = (*this)[0];
+		for (int i=1;i<num;i++)
+			if ((*this)[i] > max)
+				max = (*this)[i];
+		return max;
+	}
+	float _min()
+	{
+		float min = 0;
+		if (num > 0)
+			min = (*this)[0];
+		for (int i=1;i<num;i++)
+			if ((*this)[i] < min)
+				min = (*this)[i];
+		return min;
+	}
 	float sum()
 	{
 		float r = 0;
@@ -239,6 +261,12 @@ Array<float> float_range(float start, float end, float step)
 	return a;
 }
 
+float maxf(float a, float b)
+{	return (a > b) ? a : b;	}
+
+float minf(float a, float b)
+{	return (a < b) ? a : b;	}
+
 void SIAddPackageMath()
 {
 	msg_db_r("SIAddPackageMath", 3);
@@ -247,12 +275,14 @@ void SIAddPackageMath()
 
 	// types
 	TypeComplex		= add_type  ("complex",		sizeof(float) * 2);
-	TypeComplexList		= add_type_a("complex[]",	TypeComplex, -1);
+	TypeComplexList	= add_type_a("complex[]",	TypeComplex, -1);
 	TypeVector		= add_type  ("vector",		sizeof(vector));
+	TypeVectorList	= add_type_a("vector[]",	TypeVector, -1);
 	TypeRect		= add_type  ("rect",		sizeof(rect));
 	TypeMatrix		= add_type  ("matrix",		sizeof(matrix));
-	TypeQuaternion		= add_type  ("quaternion",	sizeof(quaternion));
+	TypeQuaternion	= add_type  ("quaternion",	sizeof(quaternion));
 	TypePlane		= add_type  ("plane",		sizeof(plane));
+	TypePlaneList	= add_type_a("plane[]",		TypePlane, -1);
 	TypeColor		= add_type  ("color",		sizeof(color));
 	TypeMatrix3		= add_type  ("matrix3",		sizeof(matrix3));
 	sType*
@@ -271,6 +301,10 @@ void SIAddPackageMath()
 	TypeVli			= add_type  ("vli",		sizeof(vli));
 	sType*
 	TypeAny			= add_type  ("any",		sizeof(Any));
+	sType*
+	TypeFloatInterpolator	= add_type  ("FloatInterpolator",		sizeof(Interpolator<float>));
+	sType*
+	TypeVectorInterpolator	= add_type  ("VectorInterpolator",		sizeof(Interpolator<vector>));
 	
 	
 	add_class(TypeIntList);
@@ -300,6 +334,8 @@ void SIAddPackageMath()
 		class_add_func("sort", TypeVoid, mf((tmf)&FloatList::sort));
 		class_add_func("sum", TypeFloat, mf((tmf)&FloatList::sum));
 		class_add_func("sum2", TypeFloat, mf((tmf)&FloatList::sum2));
+		class_add_func("max", TypeFloat, mf((tmf)&FloatList::_max));
+		class_add_func("min", TypeFloat, mf((tmf)&FloatList::_min));
 		class_add_func("__iadd__", TypeVoid, mf((tmf)&FloatList::iadd));
 			func_add_param("other",	TypeFloatList);
 		class_add_func("__isub__", TypeVoid, mf((tmf)&FloatList::isub));
@@ -355,8 +391,17 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeComplex);
 		class_add_func("__idiv__", TypeVoid, mf((tmf)&ComplexList::idiv2));
 			func_add_param("other",	TypeComplex);
+		class_add_func("__imul__", TypeVoid, mf((tmf)&ComplexList::imul2f));
+			func_add_param("other",	TypeFloat);
+		class_add_func("__idiv__", TypeVoid, mf((tmf)&ComplexList::idiv2f));
+			func_add_param("other",	TypeFloat);
 		class_add_func("__assign__", TypeVoid, mf((tmf)&ComplexList::assign_complex));
 			func_add_param("other",	TypeComplex);
+	
+	add_class(TypeVectorList);
+		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<vector>::__init__));
+	add_class(TypePlaneList);
+		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<plane>::__init__));
 
 	
 	add_class(TypeComplex);
@@ -525,6 +570,48 @@ void SIAddPackageMath()
 		func_add_param("y1",	TypeFloat);
 		func_add_param("y2",	TypeFloat);
 
+	
+	add_class(TypeFloatInterpolator);
+		class_add_element("type",	TypeInt, 0);
+		class_add_func("__init__",	TypeVoid, mf((tmf)&Interpolator<float>::__init__));
+		class_add_func("clear",	TypeVoid, mf((tmf)&Interpolator<float>::clear));
+		class_add_func("set_type",	TypeVoid, mf((tmf)&Interpolator<float>::set_type));
+			func_add_param("type",	TypeString);
+		class_add_func("add",	TypeVoid, mf((tmf)&Interpolator<float>::add));
+			func_add_param("p",	TypeFloatPs);
+			func_add_param("dt",	TypeFloat);
+		class_add_func("add2",	TypeVoid, mf((tmf)&Interpolator<float>::add2));
+			func_add_param("p",	TypeFloatPs);
+			func_add_param("v",	TypeFloatPs);
+			func_add_param("dt",	TypeFloat);
+		class_add_func("get",	TypeFloat, mf((tmf)&Interpolator<float>::get));
+			func_add_param("t",	TypeFloat);
+		class_add_func("get_tang",	TypeFloat, mf((tmf)&Interpolator<float>::get_tang));
+			func_add_param("t",	TypeFloat);
+		class_add_func("get_list",	TypeFloatList, mf((tmf)&Interpolator<float>::get_list));
+			func_add_param("t",	TypeFloatList);
+
+	
+	add_class(TypeVectorInterpolator);
+		class_add_element("type",	TypeInt, 0);
+		class_add_func("__init__",	TypeVoid, mf((tmf)&Interpolator<vector>::__init__));
+		class_add_func("clear",	TypeVoid, mf((tmf)&Interpolator<vector>::clear));
+		class_add_func("set_type",	TypeVoid, mf((tmf)&Interpolator<vector>::set_type));
+			func_add_param("type",	TypeString);
+		class_add_func("add",	TypeVoid, mf((tmf)&Interpolator<vector>::add));
+			func_add_param("p",	TypeVector);
+			func_add_param("dt",	TypeFloat);
+		class_add_func("add2",	TypeVoid, mf((tmf)&Interpolator<vector>::add2));
+			func_add_param("p",	TypeVector);
+			func_add_param("v",	TypeVector);
+			func_add_param("dt",	TypeFloat);
+		class_add_func("get",	TypeVector, mf((tmf)&Interpolator<vector>::get));
+			func_add_param("t",	TypeFloat);
+		class_add_func("get_tang",	TypeVector, mf((tmf)&Interpolator<vector>::get_tang));
+			func_add_param("t",	TypeFloat);
+		class_add_func("get_list",	TypeVectorList, mf((tmf)&Interpolator<vector>::get_list));
+			func_add_param("t",	TypeFloatList);
+
 	// mathematical
 	add_func("sin",			TypeFloat,	(void*)&sinf);
 		func_add_param("x",		TypeFloat);
@@ -562,6 +649,12 @@ void SIAddPackageMath()
 		func_add_param("max",	TypeFloat);
 	add_func("abs",			TypeFloat,		(void*)&fabsf);
 		func_add_param("f",		TypeFloat);
+	add_func("min",			TypeFloat,		(void*)&minf);
+		func_add_param("a",		TypeFloat);
+		func_add_param("b",		TypeFloat);
+	add_func("max",			TypeFloat,		(void*)&maxf);
+		func_add_param("a",		TypeFloat);
+		func_add_param("b",		TypeFloat);
 	// int
 	add_func("clampi",		TypeInt,		(void*)&clampi);
 		func_add_param("i",		TypeInt);

@@ -129,7 +129,10 @@ class HuiDrawingContext
 	void _cdecl DrawLine(float x1, float y1, float x2, float y2);
 	void _cdecl DrawLines(float *x, float *y, int num_lines);
 	void _cdecl DrawLinesMA(Array<float> &x, Array<float> &y);
+	void _cdecl DrawPolygon(float *x, float *y, int num_points);
+	void _cdecl DrawPolygonMA(Array<float> &x, Array<float> &y);
 	void _cdecl DrawRect(float x1, float y1, float w, float h);
+	void _cdecl DrawCircle(float x, float y, float radius);
 	void _cdecl DrawStr(float x, float y, const string &str);
 	void _cdecl DrawImage(float x, float y, const Image &image);
 	int width, height;

@@ -100,7 +100,7 @@ void SettingsDialog::OnPreviewDevice()
 		tsunami->output->ChosenDevice = "";
 	HuiConfigWriteStr("ChosenOutputDevice", tsunami->output->ChosenDevice);
 	HuiSaveConfigFile();
-	tsunami->log->Info(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
+	tsunami->log->Warning(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
 	//KillPreview();
 	//PreviewInit();
 }

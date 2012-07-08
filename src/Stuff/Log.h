@@ -9,8 +9,9 @@
 #define LOG_H_
 
 #include "../lib/file/file.h"
+#include "../lib/hui/hui.h"
 
-class Log
+class Log : public HuiEventHandler
 {
 public:
 	Log();
@@ -22,6 +23,7 @@ public:
 
 	void Show();
 	void Clear();
+	void Close();
 
 	enum{
 		TYPE_ERROR,
@@ -37,6 +39,7 @@ public:
 private:
 	void AddMessage(int type, const string &message);
 	Array<Message> message;
+	CHuiWindow *dlg;
 };
 
 #endif /* LOG_H_ */

@@ -7,16 +7,24 @@
 
 #include "Log.h"
 #include "../lib/hui/hui.h"
+#include "../Tsunami.h"
 
 Log::Log()
 {
-	// TODO Auto-generated constructor stub
+	dlg = HuiCreateSizableDialog(_("Meldungen"), 500, 300, tsunami, true);
+	dlg->ToolbarSetByID("log_toolbar");
+	dlg->AddListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
+	dlg->Hide(true);
+	dlg->Update();
 
+	dlg->EventM("hui:close", this, (void(HuiEventHandler::*)())&Log::Close);
+	dlg->EventM("log_close", this, (void(HuiEventHandler::*)())&Log::Close);
+	dlg->EventM("log_clear", this, (void(HuiEventHandler::*)())&Log::Clear);
 }
 
 Log::~Log()
 {
-	// TODO Auto-generated destructor stub
+	delete(dlg);
 }
 
 
@@ -41,6 +49,19 @@ void Log::Info(const string &message)
 void Log::Clear()
 {
 	message.clear();
+	dlg->Reset("log_list");
+}
+
+
+void Log::Close()
+{
+	dlg->Hide(true);
+}
+
+
+void Log::Show()
+{
+	dlg->Hide(false);
 }
 
 
@@ -51,7 +72,18 @@ void Log::AddMessage(int type, const string &_message)
 	m.text = _message;
 	message.add(m);
 
-	msg_error(_message);
-	if (type == TYPE_ERROR)
-		HuiErrorBox(HuiCurWindow, _("Fehler"), _message);
+	if (type == TYPE_ERROR){
+		msg_error(_message);
+		dlg->AddString("log_list", "hui:error\\" + _message);
+	}else if (type == TYPE_WARNING){
+		msg_write(_message);
+		dlg->AddString("log_list", "hui:warning\\" + _message);
+	}else{
+		msg_write(_message);
+		dlg->AddString("log_list", "hui:info\\" + _message);
+	}
+
+	if ((type == TYPE_ERROR) || (type == TYPE_WARNING))
+		Show();
+		//HuiErrorBox(HuiCurWindow, _("Fehler"), _message);
 }

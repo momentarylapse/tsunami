@@ -225,6 +225,7 @@ void Tsunami::OnSubProperties()
 
 void Tsunami::OnShowLog()
 {
+	log->Show();
 }
 
 void Tsunami::OnUndo()

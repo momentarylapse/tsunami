@@ -43,7 +43,7 @@ public:
 
 	bool LoadAndCompilePlugin(const string&);
 	void PluginResetData();
-	bool PluginConfigure(bool deletable, bool previewable);
+	bool PluginConfigure(bool previewable);
 	void InitPluginData();
 	void FinishPluginData();
 	void InitFavorites(CHuiWindow *win);
@@ -62,7 +62,6 @@ public:
 	void OnPluginFavoriteList();
 	void OnPluginFavoriteSave();
 	void OnPluginOk();
-	void OnPluginDelete();
 	void OnPluginClose();
 
 	struct Plugin
@@ -81,8 +80,6 @@ public:
 	Array<string> PluginFavoriteName;
 
 	bool PluginCancelled;
-	bool PluginDeleted;
-	bool PluginAddDelete;
 	bool PluginAddPreview;
 
 	Array<Plugin> plugin;

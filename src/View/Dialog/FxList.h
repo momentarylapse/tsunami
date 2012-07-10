@@ -14,19 +14,24 @@
 class FxList : public HuiEventHandler
 {
 public:
-	FxList(CHuiWindow *_dlg, const string &_id, Array<Effect> &_fx);
+	FxList(CHuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_edit, const string &_id_delete, Array<Effect> &_fx);
 	virtual ~FxList();
 
 	void FillList();
 	void OnList();
+	void OnListSelect();
+	void OnAdd();
+	void OnEdit();
+	void OnDelete();
 
-	bool UpdateEffectParams(Effect &f, bool deletable);
+	bool UpdateEffectParams(Effect &f);
 	void AddNewEffect(string &filename);
 	void ExecuteFXDialog(int index);
 
 public:
 	CHuiWindow *dlg;
 	string id;
+	string id_add, id_edit, id_delete;
 	Array<Effect> &fx;
 };
 

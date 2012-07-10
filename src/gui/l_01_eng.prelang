@@ -1,10 +1,12 @@
 // Language
 English
 // Num IDs
-116
+117
 // Data (ID,Text)
 about
 About
+add_effect
+
 add_time_track
 
 add_track
@@ -25,6 +27,8 @@ close
 Close
 close_file
 Close
+configure_effect
+
 copy
 Copy
 cut_out
@@ -211,8 +215,6 @@ view_optimal
 Optimal
 view_samples
 Samples
-view_single_track
-Single track
 view_temp_file
 Second file
 volume
@@ -236,11 +238,13 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-74
+75
 // Data (ID,Text)
                   Close dialog box to exit program.
 
   - neuer Effekt -
+
+ - viel Erfolg!
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
 
@@ -306,8 +310,6 @@ Fehlerbericht an Michi senden
 
 Frage
 
-Info
-Info
 Ist halt irgendwie passiert...
 
 Keine Ebene ausgewählt
@@ -317,6 +319,8 @@ No track selected
 Konnte Aufnahmegerät nicht öffnen
 
 Löschen
+
+Meldungen
 
 Nachrichten
 

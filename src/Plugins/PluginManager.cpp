@@ -358,21 +358,12 @@ void PluginManager::OnPluginFavoriteSave()
 void PluginManager::OnPluginOk()
 {
 	PluginCancelled = false;
-	PluginDeleted = false;
-	delete(HuiCurWindow);
-}
-
-void PluginManager::OnPluginDelete()
-{
-	PluginCancelled = true;
-	PluginDeleted = true;
 	delete(HuiCurWindow);
 }
 
 void PluginManager::OnPluginClose()
 {
 	PluginCancelled = true;
-	PluginDeleted = false;
 	delete(HuiCurWindow);
 }
 
@@ -389,17 +380,13 @@ void PluginManager::PutCommandBarFixed(CHuiWindow *win, int x, int y, int w)
 	win->AddButton(_("Abbrechen"),w - ww*2 - 10,y,ww,25,"cancel");
 	//win->SetImage("cancel", "hui:cancel");
 
-	if (PluginAddDelete){
-		win->AddButton(_("L&oschen"),w - ww * 3 - 20,y,ww,25,"delete");
-		win->SetImage("delete", "hui:delete");
-	}else if (PluginAddPreview){
+	if (PluginAddPreview){
 		if (cur_plugin->s->pre_script->Filename.find("All - ") >= 0){
 			win->AddButton(_("Vorschau"),w - ww * 3 - 20,y,ww,25,"preview");
 			win->SetImage("preview", "hui:media-play");
 		}
 	}
 	win->EventM("ok", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginOk);
-	win->EventM("delete", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginDelete);
 	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::PluginPreview);
 	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
@@ -417,17 +404,13 @@ void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id,
 	win->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
 	win->SetImage("cancel", "hui:cancel");
 	win->AddText("", 1, 0, 0, 0, "");
-	if (PluginAddDelete){
-		win->AddButton(_("L&oschen"), 0, 0, 0, 0, "delete");
-		win->SetImage("delete", "hui:delete");
-	}else if (PluginAddPreview){
+	if (PluginAddPreview){
 		if (cur_plugin->s->pre_script->Filename.find("All - ") >= 0){
 			win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 			win->SetImage("preview", "hui:media-play");
 		}
 	}
 	win->EventM("ok", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginOk);
-	win->EventM("delete", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginDelete);
 	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::PluginPreview);
 	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
@@ -443,18 +426,17 @@ void PluginManager::PluginResetData()
 	msg_db_l(1);
 }
 
-bool PluginManager::PluginConfigure(bool deletable, bool previewable)
+bool PluginManager::PluginConfigure(bool previewable)
 {
 	msg_db_r("PluginConfigure", 1);
 	if (cur_plugin->f_configure){
-		PluginAddDelete = deletable;
 		PluginAddPreview = previewable;
 		cur_plugin->f_configure();
 		GlobalRemoveSliders(NULL);
 		msg_db_l(1);
 		return !PluginCancelled;
-	}else if (deletable){
-		PluginDeleted = (HuiQuestionBox(HuiCurWindow, _("Frage"), _("Dieser Effekt ist nicht konfigurierbar.\nWollen Sie ihn l&oschen?")) == "yes");
+	}else{
+		tsunami->log->Info(_("Dieser Effekt ist nicht konfigurierbar."));
 	}
 	msg_db_l(1);
 	return true;
@@ -754,7 +736,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 		// run
 //		cur_audio->history->ChangeBegin();
 		PluginResetData();
-		if (PluginConfigure(false, true)){
+		if (PluginConfigure(true)){
 			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 			if (s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){

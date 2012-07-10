@@ -564,15 +564,15 @@ void AudioView::ForceRedraw()
 
 #define MIN_GRID_DIST	10.0f
 
-float tx[2048], ty[2048];
+float tx[4096], ty[4096], ty2[4096];
 
-inline int fill_line_buffer(int width, int di, float pos, float zoom, float f, float hf, float x, float y0, const Array<float> &buf, int offset, float sign)
+inline void draw_line_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, float zoom, float f, float hf, float x, float y0, const Array<float> &buf, int offset)
 {
 	int nl = 0;
 	float dpos = (float)1/zoom/f;
 	// pixel position
 	// -> buffer position
-	float p0 = pos / f;
+	float p0 = view_pos_rel / f;
 	for (int i=0;i<width-1;i+=di){
 
 		float p = p0 + dpos * (float)i;
@@ -581,31 +581,64 @@ inline int fill_line_buffer(int width, int di, float pos, float zoom, float f, f
 		if ((ip >= 0) && (ip < buf.num))
 		if (((int)(p * f) < offset + buf.num) && (p >= offset)){
 			tx[nl] = (float)x+i;
-			ty[nl] = y0 + buf[ip] * hf * sign;
+			ty[nl] = y0 + buf[ip] * hf;
 //			msg_write(ip);
 //			msg_write(f2s(buf[ip], 5));
 			nl ++;
 		}
 		//p += dpos;
 	}
-	return nl - 1;
+	c->DrawLines(tx, ty, nl -1);
 }
 
-void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int pos, float zoom, const color &col)
+inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, float zoom, float f, float hf, float x, float y0, const string &buf, int offset)
+{
+	int nl = 0;
+	float dpos = (float)1/zoom;
+	// pixel position
+	// -> buffer position
+	float p0 = view_pos_rel;
+	for (int i=0;i<width-1;i+=di){
+
+		float p = p0 + dpos * (float)i;
+		int ip = (int)(p - offset)/f;
+		//printf("%f  %f\n", p1, p2);
+		if ((ip >= 0) && (ip < buf.num))
+		if (((int)(p) < offset + buf.num*f) && (p >= offset)){
+			tx[nl] = (float)x+i;
+			float dy = ((float)((unsigned char)buf[ip])/255.0f) * hf;
+			ty[nl]  = y0 + dy;
+			//ty2[nl] = y0 - dy;
+//			msg_write(ip);
+//			msg_write(f2s(buf[ip], 5));
+			nl ++;
+		}
+		//p += dpos;
+	}
+	for (int i=0;i<nl;i++){
+		tx[nl + i] = tx[nl - i - 1];
+		ty[nl + i] = y0 *2 - ty[nl - i - 1] - 1;
+	}
+	c->DrawPolygon(tx, ty, nl*2 -1);
+//	c->DrawLines(tx, ty, nl*2 -1);
+	//c->DrawLines(tx, ty2, nl -1);
+}
+
+void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int view_pos_rel, float zoom, const color &col)
 {
 	msg_db_r("DrawBuffer", 1);
-//	int l = 0;
+	int l_best = 0;
 	float f = 1.0f;
 
 	// which level of detail?
-	/*if (zoom < 0.8f)
-		for (int i=NUM_PEAK_LEVELS-1;i>=0;i--){
-			float _f = (float)pow(PeakFactor, (float)i);
+	if (zoom < 0.8f)
+		for (int i=24-1;i>=0;i--){
+			float _f = (float)pow(2, (float)i);
 			if (_f > 1.0f / zoom){
-				l = i;
+				l_best = i;
 				f = _f;
 			}
-		}*/
+		}
 
 	// zero heights of both channels
 	float y0r = (float)y + (float)height / 4;
@@ -621,27 +654,17 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int he
 	c->SetColor(col);
 
 	int di = DetailSteps;
-	int nl = 0;
-	for (int i=0;i<t->buffer.num;i++){
-	if (f < MIN_MAX_FACTOR){
-		nl = fill_line_buffer(width, di, pos, zoom, f, hf, x, y0r, t->buffer[i].r, t->buffer[i].offset, -1);
-		c->DrawLines(tx, ty, nl);
-		if (!ShowMono){
-			nl = fill_line_buffer(width, di, pos, zoom, f, hf, x, y0l, t->buffer[i].l, t->buffer[i].offset, -1);
-			c->DrawLines(tx, ty, nl);
+	foreach(t->buffer, b){
+		int l = min(l_best - 1, b.peak.num / 2 - 2);
+		if (l >= 0){//f < MIN_MAX_FACTOR){
+			draw_peak_buffer(c, width, di, view_pos_rel, zoom, f, hf, x, y0r, b.peak[l*2], b.offset);
+			if (!ShowMono)
+				draw_peak_buffer(c, width, di, view_pos_rel, zoom, f, hf, x, y0l, b.peak[l*2+1], b.offset);
+		}else{
+			draw_line_buffer(c, width, di, view_pos_rel, zoom, 1, hf, x, y0r, b.r, b.offset);
+			if (!ShowMono)
+				draw_line_buffer(c, width, di, view_pos_rel, zoom, 1, hf, x, y0l, b.l, b.offset);
 		}
-	}else{
-		nl = fill_line_buffer(width, di, pos, zoom, f, hf, x, y0r, t->buffer[i].r, t->buffer[i].offset, -1);
-		c->DrawLines(tx, ty, nl);
-		nl = fill_line_buffer(width, di, pos, zoom, f, hf, x, y0r, t->buffer[i].r, t->buffer[i].offset, +1);
-		c->DrawLines(tx, ty, nl);
-		if (!ShowMono){
-			nl = fill_line_buffer(width, di, pos, zoom, f, hf, x, y0l, t->buffer[i].l, t->buffer[i].offset, -1);
-			c->DrawLines(tx, ty, nl);
-			nl = fill_line_buffer(width, di, pos, zoom, f, hf, x, y0l, t->buffer[i].l, t->buffer[i].offset, +1);
-			c->DrawLines(tx, ty, nl);
-		}
-	}
 	}
 	msg_db_l(1);
 }

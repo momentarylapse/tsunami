@@ -15,11 +15,15 @@ class BufferBox
 {
 public:
 	BufferBox();
+	BufferBox(const BufferBox &b);
 	virtual ~BufferBox();
+	void operator=(const BufferBox &b);
 	void __assign__(const BufferBox &other){	*this = other;	}
 
 	int offset, num;
 	Array<float> r, l;
+
+	Array<string> peak;
 
 	Range range();
 
@@ -37,6 +41,9 @@ public:
 	void import(void *data, int channels, int bits, int samples);
 
 	void get_16bit_buffer(Array<short> &data);
+
+	void invalidate_peaks();
+	void update_peaks();
 };
 
 #endif /* BUFFERBOX_H_ */

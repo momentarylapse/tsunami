@@ -12,10 +12,24 @@
 
 BufferBox::BufferBox()
 {
-	//HistoryStructReset("BufferBox", this);
-
 	offset = 0;
 	num = 0;
+}
+
+BufferBox::BufferBox(const BufferBox &b)
+{
+	offset = b.offset;
+	num = b.num;
+	r = b.r;
+	l = b.l;
+}
+
+void BufferBox::operator=(const BufferBox &b)
+{
+	offset = b.offset;
+	num = b.num;
+	r = b.r;
+	l = b.l;
 }
 
 BufferBox::~BufferBox()
@@ -27,6 +41,7 @@ void BufferBox::clear()
 	r.clear();
 	l.clear();
 	num = 0;
+	peak.clear();
 }
 
 void BufferBox::resize(int length)
@@ -245,4 +260,41 @@ void BufferBox::get_16bit_buffer(Array<short> &data)
 Range BufferBox::range()
 {
 	return Range(offset, num);
+}
+
+//#define shrink(a, b)	max((a), (b))
+#define shrink(a, b)	(unsigned char)(sqrt(((float)(a) * (float)(a) + (float)(b) * (float)(b)) / 2))
+
+void BufferBox::update_peaks()
+{
+	// first level
+	if (peak.num < 2)
+		peak.resize(2);
+	int n = r.num / 2;
+	if (peak[0].num < n)
+		peak[0].resize(n);
+	if (peak[1].num < n)
+		peak[1].resize(n);
+	for (int i=0;i<n;i++){
+		peak[0][i] = max(fabs(r[i * 2]), fabs(r[i * 2 + 1])) * 255;
+		peak[1][i] = max(fabs(l[i * 2]), fabs(l[i * 2 + 1])) * 255;
+	}
+
+	// higher levels
+	int level = 2;
+	while (n > 4){
+		n /= 2;
+		if (peak.num < level + 2)
+			peak.resize(level + 2);
+		if (peak[level    ].num < n)
+			peak[level    ].resize(n);
+		if (peak[level + 1].num < n)
+			peak[level + 1].resize(n);
+		for (int i=0;i<n;i++){
+			peak[level    ][i] = shrink((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
+			peak[level + 1][i] = shrink((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
+		}
+
+		level += 2;
+	}
 }

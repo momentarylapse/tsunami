@@ -42,6 +42,7 @@ class BufferBox
 	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int offset, num
 	float r[], l[]
+	string peak[]
 	extern void __assign__(BufferBox other)
 	extern void clear()
 

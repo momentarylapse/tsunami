@@ -53,6 +53,14 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 			f->LoadAudio(a, filename);
 
+			tsunami->progress->Set("peaks", 1);
+			foreach(a->track, t){
+				foreach(t.buffer, b)
+					b.update_peaks();
+				foreach(t.sub, s)
+					foreach(s.buffer, b)
+						b.update_peaks();
+			}
 /*
 	//-----------------------------------------  import wave / ogg / flac
 	if ((ext == "wav") or (ext == "ogg") or (ext == "flac")){

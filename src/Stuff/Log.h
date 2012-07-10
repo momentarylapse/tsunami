@@ -14,7 +14,7 @@
 class Log : public HuiEventHandler
 {
 public:
-	Log();
+	Log(CHuiWindow *parent);
 	virtual ~Log();
 
 	void Error(const string &message);

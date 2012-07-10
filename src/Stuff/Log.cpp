@@ -9,9 +9,9 @@
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 
-Log::Log()
+Log::Log(CHuiWindow *parent)
 {
-	dlg = HuiCreateSizableDialog(_("Meldungen"), 500, 300, tsunami, true);
+	dlg = HuiCreateSizableDialog(_("Meldungen"), 500, 300, parent, true);
 	dlg->ToolbarSetByID("log_toolbar");
 	dlg->AddListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
 	dlg->Hide(true);

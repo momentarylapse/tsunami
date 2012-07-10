@@ -464,6 +464,43 @@ string HuiGetKeyChar(int key_code)
 
 extern Array<CHuiWindow*> HuiWindow;
 
+bool _HuiEventMatch_(HuiEvent *e, const string &id, const string &message)
+{
+	// all events
+	if (id == "*")
+		return true;
+
+	// direct match ("extended")
+	if ((id == e->id) && (message == e->message))
+		return true;
+
+	// default match
+	if ((id == e->id) && (message == ":def:") && (e->is_default))
+		return true;
+	if ((id == e->message) && (e->id == "") && (message == ":def:") && (e->is_default))
+		return true;
+
+	// simple match
+	if (message == "*"){
+		if (id == e->id)
+			return true;
+		if ((id == e->message) && (e->id == ""))
+			return true;
+	}
+	return false;
+}
+
+void _HuiSendGlobalCommand_(HuiEvent *e)
+{
+	foreach(_HuiCommand_, c)
+		if (_HuiEventMatch_(e, c.id, ":def:")){
+			if (c.func)
+				c.func();
+			else if (c.member_function)
+				(c.object->*c.member_function)();
+		}
+}
+
 void HuiAddCommand(const string &id, const string &image, int default_key_code, hui_callback *func)
 {
 	HuiCommand c;
@@ -475,10 +512,6 @@ void HuiAddCommand(const string &id, const string &image, int default_key_code, 
 	c.object = NULL;
 	c.member_function = NULL;
 	_HuiCommand_.add(c);
-
-	foreach(HuiWindow, w)
-		if (func)
-			w->Event(id, func);
 }
 
 void HuiAddCommandToggle(const string &id, const string &image, int default_key_code, hui_callback *func)
@@ -509,10 +542,6 @@ void HuiAddCommandM(const string &id, const string &image, int default_key_code,
 	c.object = handler;
 	c.member_function = function;
 	_HuiCommand_.add(c);
-
-	foreach(HuiWindow, w)
-		if ((handler) && (function))
-			w->EventM(id, handler, function);
 }
 
 void HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())
@@ -526,10 +555,6 @@ void HuiAddCommandMToggle(const string &id, const string &image, int default_key
 	c.object = handler;
 	c.member_function = function;
 	_HuiCommand_.add(c);
-
-	foreach(HuiWindow, w)
-		if ((handler) && (function))
-			w->EventM(id, handler, function);
 }
 
 void HuiLoadKeyCodes(const string &filename)

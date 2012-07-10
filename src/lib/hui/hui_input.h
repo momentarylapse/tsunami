@@ -44,7 +44,10 @@ extern HuiEvent _HuiEvent_;
 HuiEvent *HuiGetEvent();
 
 
+// internal
 void _HuiInitInput_();
+bool _HuiEventMatch_(HuiEvent *e, const string &id, const string &message);
+void _HuiSendGlobalCommand_(HuiEvent *e);
 
 // key codes and id table ("shortcuts")
 void HuiAddKeyCode(const string &id, int key_code);

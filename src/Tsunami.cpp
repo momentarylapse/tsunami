@@ -26,7 +26,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	tsunami = this;
 
 	progress = new Progress;
-	log = new Log;
+	log = new Log(this);
 
 	output = new AudioOutput;
 	input = new AudioInput;
@@ -111,7 +111,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	storage = new Storage;
 
-	view = new AudioView;
+	view = new AudioView(this, audio[0], audio[1]);
 
 	Subscribe(view);
 	Subscribe(audio[0]);

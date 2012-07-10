@@ -65,6 +65,7 @@ gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data)
 	HuiEvent e = HuiCreateEvent(id, "hui:click");
 
 	// which window?
+	_HuiSendGlobalCommand_(&e);
 	for (int i=0;i<HuiWindow.num;i++)
 		HuiWindow[i]->_SendEvent_(&e);
 	return FALSE;

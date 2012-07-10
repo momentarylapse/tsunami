@@ -292,29 +292,7 @@ bool CHuiWindow::_SendEvent_(HuiEvent *e)
 
 	bool sent = false;
 	foreach(event, ee){
-		bool send = false;
-		
-		// all events
-		if (ee.id == "*")
-			send = true;
-
-		// direct match ("extended")
-		if ((ee.id == e->id) && (ee.message == e->message))
-			send = true;
-
-		// default match
-		if ((ee.id == e->id) && (ee.message == ":def:") && (e->is_default))
-			send = true;
-		if ((ee.id == e->message) && (e->id == "") && (ee.message == ":def:") && (e->is_default))
-			send = true;
-			
-		// simple match
-		if (ee.message == "*"){
-			if (ee.id == e->id)
-				send = true;
-			if ((ee.id == e->message) && (e->id == ""))
-				send = true;
-		}
+		bool send = _HuiEventMatch_(e, ee.id, ee.message);
 		
 		// send the event
 		if ((send) && (ee.function)){

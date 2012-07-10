@@ -11,7 +11,7 @@
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
 
-AudioView::AudioView() :
+AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2) :
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
 	TIME_SCALE_HEIGHT(20),
@@ -48,26 +48,29 @@ AudioView::AudioView() :
 	cur_action = NULL;
 
 	tsunami->SetBorderWidth(0);
-	tsunami->SetTarget("main_table", 0);
-	tsunami->AddDrawingArea("", 0, 0, 0, 0, "area");
+	parent->SetTarget("main_table", 0);
+	parent->AddDrawingArea("", 0, 0, 0, 0, "area");
 
-	Subscribe(tsunami->audio[0]);
-	Subscribe(tsunami->audio[1]);
+
+	audio[0] = audio_1;
+	audio[1] = audio_2;
+	Subscribe(audio[0]);
+	Subscribe(audio[1]);
 
 	// events
-	tsunami->EventMX("area", "hui:redraw", this, (void(HuiEventHandler::*)())&AudioView::OnDraw);
-	tsunami->EventMX("area", "hui:mouse-move", this, (void(HuiEventHandler::*)())&AudioView::OnMouseMove);
-	tsunami->EventMX("area", "hui:left-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnLeftButtonDown);
-	tsunami->EventMX("area", "hui:left-double-click", this, (void(HuiEventHandler::*)())&AudioView::OnLeftDoubleClick);
-	tsunami->EventMX("area", "hui:left-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnLeftButtonUp);
-	tsunami->EventMX("area", "hui:middle-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnMiddleButtonDown);
-	tsunami->EventMX("area", "hui:middle-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnMiddleButtonUp);
-	tsunami->EventMX("area", "hui:right-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnRightButtonDown);
-	tsunami->EventMX("area", "hui:right-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnRightButtonUp);
-	//tsunami->EventMX("area", "hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
-	tsunami->EventM("hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
-	tsunami->EventM("hui:key-up", this, (void(HuiEventHandler::*)())&AudioView::OnKeyUp);
-	tsunami->EventMX("area", "hui:mouse-wheel", this, (void(HuiEventHandler::*)())&AudioView::OnMouseWheel);
+	parent->EventMX("area", "hui:redraw", this, (void(HuiEventHandler::*)())&AudioView::OnDraw);
+	parent->EventMX("area", "hui:mouse-move", this, (void(HuiEventHandler::*)())&AudioView::OnMouseMove);
+	parent->EventMX("area", "hui:left-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnLeftButtonDown);
+	parent->EventMX("area", "hui:left-double-click", this, (void(HuiEventHandler::*)())&AudioView::OnLeftDoubleClick);
+	parent->EventMX("area", "hui:left-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnLeftButtonUp);
+	parent->EventMX("area", "hui:middle-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnMiddleButtonDown);
+	parent->EventMX("area", "hui:middle-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnMiddleButtonUp);
+	parent->EventMX("area", "hui:right-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnRightButtonDown);
+	parent->EventMX("area", "hui:right-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnRightButtonUp);
+	//parent->EventMX("area", "hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
+	parent->EventM("hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
+	parent->EventM("hui:key-up", this, (void(HuiEventHandler::*)())&AudioView::OnKeyUp);
+	parent->EventMX("area", "hui:mouse-wheel", this, (void(HuiEventHandler::*)())&AudioView::OnMouseWheel);
 
 
 	HuiAddCommandM("select_none", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnSelectNone);
@@ -145,8 +148,8 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 	msg_db_r("GetMouseOver", 2);
 
 	if (set){
-		ClearMouseOver(tsunami->audio[0]);
-		ClearMouseOver(tsunami->audio[1]);
+		ClearMouseOver(audio[0]);
+		ClearMouseOver(audio[1]);
 	}
 	SelectionType s;
 	s.type = SEL_TYPE_NONE;
@@ -157,8 +160,8 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 
 	// audio file?
 	for (int i=0;i<2;i++)
-		if (MouseOverAudio(tsunami->audio[i])){
-			s.audio = tsunami->audio[i];
+		if (MouseOverAudio(audio[i])){
+			s.audio = audio[i];
 			s.type = SEL_TYPE_AUDIO;
 		}
 
@@ -937,15 +940,15 @@ void AudioView::OnDraw()
 	c->SetAntialiasing(false);
 	//c->SetColor(ColorWaveCur);
 
-	int t0 = max(tsunami->audio[0]->track.num, 1);
-	int t1 = max(tsunami->audio[1]->track.num, 1);
+	int t0 = max(audio[0]->track.num, 1);
+	int t1 = max(audio[1]->track.num, 1);
 	float t = (float)t0 / (float)(t0 + t1);
 
 	if (ShowTempFile){
-		DrawWaveFile(c, 0, 0, c->width, c->height * t, tsunami->audio[0]);
-		DrawWaveFile(c, 0, c->height * t, c->width, c->height * (1 - t), tsunami->audio[1]);
+		DrawWaveFile(c, 0, 0, c->width, c->height * t, audio[0]);
+		DrawWaveFile(c, 0, c->height * t, c->width, c->height * (1 - t), audio[1]);
 	}else
-		DrawWaveFile(c, 0, 0, c->width, c->height, tsunami->audio[0]);
+		DrawWaveFile(c, 0, 0, c->width, c->height, audio[0]);
 
 	//c->DrawStr(100, 100, i2s(frame++));
 

@@ -16,7 +16,7 @@
 class AudioView : public HuiEventHandler, public Observer, public Observable
 {
 public:
-	AudioView();
+	AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2);
 	virtual ~AudioView();
 
 	void ForceRedraw();
@@ -155,6 +155,8 @@ public:
 	int PreviewSleepTime;
 
 	int DrawingWidth;
+
+	AudioFile *audio[2];
 };
 
 #endif /* AUDIOVIEW_H_ */

@@ -108,6 +108,7 @@ void WinTrySendByKeyCode(CHuiWindow *win, int key_code)
 			//msg_write>Write("---------------------------------");
 			//msg_write>Write(HuiCommand[kk].id);
 			HuiEvent e = HuiCreateEvent(c.id, "");
+			_HuiSendGlobalCommand_(&e);
 			win->_SendEvent_(&e);
 		}
 }

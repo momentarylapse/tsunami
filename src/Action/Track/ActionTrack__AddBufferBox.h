@@ -14,7 +14,7 @@
 class ActionTrack__AddBufferBox : public Action
 {
 public:
-	ActionTrack__AddBufferBox(Track *t, int index, Range r);
+	ActionTrack__AddBufferBox(Track *t, int _level_no, int index, Range r);
 	virtual ~ActionTrack__AddBufferBox();
 
 	void *execute(Data *d);
@@ -23,6 +23,7 @@ public:
 private:
 	int track_no, sub_no;
 	int index;
+	int level_no;
 	Range range;
 };
 

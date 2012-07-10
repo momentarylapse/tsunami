@@ -170,8 +170,8 @@ void CaptureDialog::Insert()
 
 	// insert data
 	Range r = Range(i0, length);
-	BufferBox buf = t->GetBuffers(r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, r);
+	BufferBox buf = t->GetBuffers(audio->cur_level, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, audio->cur_level, r);
 	buf.set(tsunami->input->CaptureBuf, 0, 1.0f);
 	audio->Execute(a);
 	tsunami->input->CaptureBuf.clear();

@@ -9,11 +9,11 @@
 #include "Tsunami.h"
 
 string AppName = "Tsunami";
-string AppVersion = "0.3.5.0 alpha";
+string AppVersion = "0.3.6.0 alpha";
 
 int hui_main(Array<string> arg)
 {
-	HuiInitExtended("tsunami", AppName + " " + AppVersion, NULL, true, "English");
+	HuiInitExtended("tsunami", AppName + " " + AppVersion, NULL, true, "Deutsch");
 	HuiSetProperty("name", AppName);
 	HuiSetProperty("version", AppVersion);
 	HuiSetProperty("comment", _("Editor f&ur Audio Dateien"));

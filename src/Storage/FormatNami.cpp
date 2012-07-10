@@ -103,7 +103,17 @@ void WriteSubTrack(CFile *f, Track *s)
 	f->WriteInt(0); // reserved
 	f->WriteInt(0);
 
-	foreach(s->buffer, b)
+	foreach(s->level[0].buffer, b)
+		WriteBufferBox(f, &b);
+
+	EndChunk(f);
+}
+
+void WriteTrackLevel(CFile *f, TrackLevel *l)
+{
+	BeginChunk(f, "level");
+
+	foreach(l->buffer, b)
 		WriteBufferBox(f, &b);
 
 	EndChunk(f);
@@ -120,8 +130,8 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0);
 	f->WriteInt(0);
 
-	foreach(t->buffer, buf)
-		WriteBufferBox(f, &buf);
+	foreach(t->level, l)
+		WriteTrackLevel(f, &l);
 
 	foreach(t->sub, sub)
 		WriteSubTrack(f, &sub);
@@ -258,7 +268,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		tdata.resize(length * 2);
 		f->ReadBuffer((char*)&tdata[0], length * 4);
 		Track *t = a->AddEmptyTrack();
-		BufferBox buf = t->GetBuffers(Range(0, length));
+		BufferBox buf = t->GetBuffers(0, Range(0, length));
 		for (int i=0;i<length;i++){
 			buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 			buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -280,7 +290,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			f->ReadFloat(); // s->echo_damp
 			tdata.resize(length * 2);
 			f->ReadBuffer((char*)&tdata[0], length * 4);
-			buf = s->GetBuffers(Range(0, slength));
+			buf = s->GetBuffers(0, Range(0, slength));
 			for (int i=0;i<slength;i++){
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -301,7 +311,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			tdata.resize(length * 2);
 			ReadCompressed(f, (char*)&tdata[0], length * 4);
 			//f->ReadBuffer((char*)&tdata[0], length * 4);
-			BufferBox buf = t->GetBuffers(Range(0, length));
+			BufferBox buf = t->GetBuffers(0, Range(0, length));
 			for (int i=0;i<length;i++){
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -323,7 +333,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				f->ReadFloat(); // s->echo_damp
 				tdata.resize(slength * 2);
 				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				buf = s->GetBuffers(Range(0, slength));
+				buf = s->GetBuffers(0, Range(0, slength));
 				for (int i=0;i<slength;i++){
 					buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 					buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -355,7 +365,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			tdata.resize(length * 2);
 			ReadCompressed(f, (char*)&tdata[0], length * 4);
 			//f->ReadBuffer((char*)&tdata[0], length * 4);
-			BufferBox buf = t->GetBuffers(Range(0, length));
+			BufferBox buf = t->GetBuffers(0, Range(0, length));
 			for (int i=0;i<length;i++){
 				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -380,7 +390,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				s->muted = f->ReadBool();
 				tdata.resize(slength * 2);
 				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				BufferBox sbuf = s->GetBuffers(Range(0, slength));
+				BufferBox sbuf = s->GetBuffers(0, Range(0, slength));
 				for (int i=0;i<slength;i++){
 					sbuf.r[i] = (float)tdata[i*2  ] / 32768.0f;
 					sbuf.l[i] = (float)tdata[i*2+1] / 32768.0f;
@@ -403,20 +413,20 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 
 
 	// compress...
-	foreach(a->track, t){
-		if (t.buffer.num != 1)
-			continue;
-		bool empty = true;
-		for (int i=0;i<t.buffer[0].num;i++)
-			if ((t.buffer[0].r[i] != 0) || (t.buffer[0].l[i] != 0)){
-				empty = false;
-				break;
-			}
+	foreach(a->track, t)
+		foreach(t.level, l){
+			if (l.buffer.num != 1)
+				continue;
+			bool empty = true;
+			for (int i=0;i<l.buffer[0].num;i++)
+				if ((l.buffer[0].r[i] != 0) || (l.buffer[0].l[i] != 0)){
+					empty = false;
+					break;
+				}
 
-		if (empty)
-			t.buffer.clear();
-
-	}
+			if (empty)
+				l.buffer.clear();
+		}
 }
 
 void ReadChunk(CFile *f);
@@ -495,8 +505,8 @@ void ReadChunkEffect(CFile *f, Array<Effect> &fx)
 void ReadChunkBufferBox(CFile *f, Track *t)
 {
 	BufferBox dummy;
-	t->buffer.add(dummy);
-	BufferBox *b = &t->buffer.back();
+	t->level[0].buffer.add(dummy);
+	BufferBox *b = &t->level[0].buffer.back();
 	b->offset = f->ReadInt();
 	int num = f->ReadInt();
 	b->resize(num);

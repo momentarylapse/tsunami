@@ -8,11 +8,12 @@
 #include "ActionTrack__CutBufferBox.h"
 #include <assert.h>
 
-ActionTrack__CutBufferBox::ActionTrack__CutBufferBox(Track *t, int _index, int _offset)
+ActionTrack__CutBufferBox::ActionTrack__CutBufferBox(Track *t, int _level_no, int _index, int _offset)
 {
 	get_track_sub_index(t, track_no, sub_no);
 	index = _index;
 	offset = _offset;
+	level_no = _level_no;
 }
 
 ActionTrack__CutBufferBox::~ActionTrack__CutBufferBox()
@@ -25,15 +26,15 @@ void ActionTrack__CutBufferBox::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no, sub_no);
-	BufferBox &b = t->buffer[index];
-	BufferBox &b2 = t->buffer[index + 1];
+	BufferBox &b = t->level[level_no].buffer[index];
+	BufferBox &b2 = t->level[level_no].buffer[index + 1];
 
 	// transfer data
 	b.resize(b.num + b2.num);
 	b.set(b2, offset, 1.0f);
 
 	// delete
-	t->buffer.erase(index + 1);
+	t->level[level_no].buffer.erase(index + 1);
 }
 
 
@@ -43,15 +44,16 @@ void *ActionTrack__CutBufferBox::execute(Data *d)
 	//msg_write(format("cut %d   at %d", index, offset));
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no, sub_no);
+	TrackLevel &l = t->level[level_no];
 
-	assert(offset > 0 && offset < (t->buffer[index].num - 1));
+	assert(offset > 0 && offset < (l.buffer[index].num - 1));
 
 	// create new
 	BufferBox dummy;
-	t->buffer.insert(dummy, index + 1);
+	l.buffer.insert(dummy, index + 1);
 
-	BufferBox &b = t->buffer[index];
-	BufferBox &b2 = t->buffer[index + 1];
+	BufferBox &b = l.buffer[index];
+	BufferBox &b2 = l.buffer[index + 1];
 
 	// new position
 	b2.offset = b.offset + offset;

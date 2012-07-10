@@ -29,7 +29,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	}
 
 	// read decoded PCM samples
-	BufferBox buf = flac_track->GetBuffers(Range(flac_read_samples, frame->header.blocksize));
+	BufferBox buf = flac_track->GetBuffers(0, Range(flac_read_samples, frame->header.blocksize));
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
 			if (j == 0)

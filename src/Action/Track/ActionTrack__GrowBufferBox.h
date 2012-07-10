@@ -14,7 +14,7 @@
 class ActionTrack__GrowBufferBox : public Action
 {
 public:
-	ActionTrack__GrowBufferBox(Track *t, int _index, int _new_length);
+	ActionTrack__GrowBufferBox(Track *t, int _level_no, int _index, int _new_length);
 	virtual ~ActionTrack__GrowBufferBox();
 
 	void *execute(Data *d);
@@ -22,6 +22,7 @@ public:
 
 private:
 	int track_no, sub_no, index;
+	int level_no;
 	int old_length, new_length;
 };
 

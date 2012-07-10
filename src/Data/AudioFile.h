@@ -76,13 +76,14 @@ public:
 	// (T_T)  -> global
 
 	int cur_track;
+	int cur_level;
 
 	float view_pos;
 	float view_zoom;
 
 	Range sel_raw;
 
-	//History *history;
+	Array<string> level_name;
 };
 
 

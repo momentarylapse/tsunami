@@ -120,6 +120,10 @@ void AudioFile::Reset()
 	track.clear();
 	cur_track = -1;
 
+	level_name.clear();
+	level_name.add("level 1");
+	cur_level = 0;
+
 	action_manager->Reset();
 
 	Notify("Change");

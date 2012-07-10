@@ -46,6 +46,7 @@ void *ActionAudioAddTrack::execute(Data *d)
 	t->parent = -1;
 	t->is_selected = true;
 	t->type = type;
+	t->level.resize(a->level_name.num);
 
 	return t;
 }

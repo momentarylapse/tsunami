@@ -71,11 +71,14 @@ enum
 	TRACK_TYPE_AUDIO
 	TRACK_TYPE_TIME
 
+class TrackLevel
+	BufferBox buffer[]
+
 class Track
 	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int type
 	string name
-	BufferBox buffer[]
+	TrackLevel level[]
 	int length, pos
 
 	float volume
@@ -101,7 +104,7 @@ class Track
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
-	extern BufferBox GetBuffers(Range r)
+	extern BufferBox GetBuffers(int level_no, Range r)
 	extern BufferBox ReadBuffers(Range r)
 
 class Tag
@@ -136,11 +139,14 @@ class AudioFile
 	Range selection
 	bool mo_sel_start, mo_sel_end
 	int cur_track
+	int cur_level
 
 	float view_pos
 	float view_zoom
 	
 	Range sel_raw
+	
+	string level_name[]
 
 extern window MainWin
 extern AudioFile /* *audio[2],*/ *cur_audio

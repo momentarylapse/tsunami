@@ -52,7 +52,7 @@ Track::Track()
 void Track::Reset()
 {
 	msg_db_r("Track.Reset",1);
-	buffer.clear();
+	level.clear();
 	name.clear();
 	length = 0;
 	pos = 0;
@@ -132,10 +132,11 @@ Range Track::GetRangeUnsafe()
 
 	int min = 2147483640;
 	int max = -2147483640;
-	if (buffer.num > 0){
-		min = buffer[0].offset;
-		max = buffer.back().offset + buffer.back().num;
-	}
+	foreach(level, l)
+		if (l.buffer.num > 0){
+			min = min(l.buffer[0].offset, min);
+			max = max(l.buffer.back().offset + l.buffer.back().num, max);
+		}
 	foreachc(sub, s){
 		if (s.pos < min)
 			min = s.pos;
@@ -161,13 +162,13 @@ string Track::GetNiceName()
 	return i2s(get_track_index(this) + 1) + ": " + name;
 }
 
-BufferBox Track::ReadBuffers(const Range &r)
+BufferBox Track::ReadBuffers(int level_no, const Range &r)
 {
 	BufferBox buf;
 	msg_db_r("Track.ReadBuffers", 1);
 
 	// is <r> inside a buffer?
-	foreach(buffer, b){
+	foreach(level[level_no].buffer, b){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.num;
 		if ((p0 >= 0) && (p1 <= b.num)){
@@ -182,17 +183,57 @@ BufferBox Track::ReadBuffers(const Range &r)
 	buf.resize(r.num);
 
 	// fill with overlapp
-	foreach(buffer, b)
+	foreach(level[level_no].buffer, b)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
 	msg_db_l(1);
 	return buf;
 }
 
-BufferBox Track::GetBuffers(const Range &r)
+BufferBox Track::ReadBuffersCol(const Range &r)
 {
-	root->Execute(new ActionTrackCreateBuffers(this, r));
-	return ReadBuffers(r);
+	BufferBox buf;
+	msg_db_r("Track.ReadBuffersCol", 1);
+
+	// is <r> inside a single buffer?
+	int num_inside = 0;
+	int inside_level, inside_no;
+	int inside_p0, inside_p1;
+	foreachi(level, l, li)
+		foreachi(l.buffer, b, bi){
+			int p0 = r.offset - b.offset;
+			int p1 = r.offset - b.offset + r.num;
+			if ((p0 >= 0) && (p1 <= b.num)){
+				num_inside ++;
+				inside_level = li;
+				inside_no = bi;
+				inside_p0 = p0;
+				inside_p1 = p1;
+			}
+		}
+	if (num_inside == 1){
+		// set as reference to subarrays
+		buf.set_as_ref(level[inside_level].buffer[inside_no], inside_p0, inside_p1 - inside_p0);
+		msg_db_l(1);
+		return buf;
+	}
+
+	// create own...
+	buf.resize(r.num);
+
+	// fill with overlapp
+	foreach(level, l)
+		foreach(l.buffer, b)
+			buf.add(b, b.offset - r.offset, 1.0f);
+
+	msg_db_l(1);
+	return buf;
+}
+
+BufferBox Track::GetBuffers(int level_no, const Range &r)
+{
+	root->Execute(new ActionTrackCreateBuffers(this, level_no, r));
+	return ReadBuffers(level_no, r);
 }
 
 void Track::UpdatePeaks()

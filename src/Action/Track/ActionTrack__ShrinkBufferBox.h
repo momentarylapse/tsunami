@@ -14,7 +14,7 @@
 class ActionTrack__ShrinkBufferBox : public Action
 {
 public:
-	ActionTrack__ShrinkBufferBox(Track *t, int _index, int _length);
+	ActionTrack__ShrinkBufferBox(Track *t, int _level_no, int _index, int _length);
 	virtual ~ActionTrack__ShrinkBufferBox();
 
 	void *execute(Data *d);
@@ -23,6 +23,7 @@ public:
 private:
 	int track_no, sub_no;
 	int index;
+	int level_no;
 	int old_length, new_length;
 	BufferBox buf;
 };

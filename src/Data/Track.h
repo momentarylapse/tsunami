@@ -74,6 +74,13 @@ public:
 };
 
 
+class TrackLevel
+{
+public:
+	Array<BufferBox> buffer;
+};
+
+
 class Track
 {
 public:
@@ -86,12 +93,13 @@ public:
 
 	void Reset();
 	void UpdatePeaks();
-	BufferBox ReadBuffers(const Range &r);
+	BufferBox ReadBuffers(int level_no, const Range &r);
+	BufferBox ReadBuffersCol(const Range &r);
 
 	string GetNiceName();
 
 	// actions
-	BufferBox GetBuffers(const Range &r);
+	BufferBox GetBuffers(int level_no, const Range &r);
 	Track *AddEmptySubTrack(const Range &r, const string &name);
 
 
@@ -105,7 +113,7 @@ public:
 	int type;
 	string name;
 
-	Array<BufferBox> buffer;
+	Array<TrackLevel> level;
 	int length, pos; // sub
 
 	float volume;

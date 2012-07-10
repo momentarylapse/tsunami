@@ -55,10 +55,11 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 			tsunami->progress->Set("peaks", 1);
 			foreach(a->track, t){
-				foreach(t.buffer, b)
-					b.update_peaks();
+				foreach(t.level, l)
+					foreach(l.buffer, b)
+						b.update_peaks();
 				foreach(t.sub, s)
-					foreach(s.buffer, b)
+					foreach(s.level[0].buffer, b)
 						b.update_peaks();
 			}
 /*

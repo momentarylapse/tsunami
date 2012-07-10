@@ -37,7 +37,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track &t, const 
 	msg_db_r("bb_render_audio_track_no_fx", 1);
 
 	// track buffer
-	BufferBox buf0 = t.ReadBuffers(range);
+	BufferBox buf0 = t.ReadBuffersCol(range);
 	buf.swap_ref(buf0);
 
 	// subs
@@ -54,7 +54,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track &t, const 
 			if (!intersect_sub(s, rep_range, intersect_range, bpos))
 				continue;
 
-			BufferBox sbuf = s.ReadBuffers(intersect_range);
+			BufferBox sbuf = s.ReadBuffers(0, intersect_range);
 			buf.make_own();
 			buf.add(sbuf, bpos, s.volume);
 		}
@@ -89,8 +89,9 @@ void AudioRenderer::make_fake_track(Track &t, AudioFile *a, BufferBox &buf, cons
 {
 	//msg_write("fake track");
 	t.root = a;
-	t.buffer.resize(1);
-	t.buffer[0].set_as_ref(buf, 0, range.length());
+	t.level.resize(1);
+	t.level[0].buffer.resize(1);
+	t.level[0].buffer[0].set_as_ref(buf, 0, range.length());
 }
 
 void AudioRenderer::bb_apply_fx(BufferBox &buf, AudioFile *a, Track *t, Array<Effect> &fx_list, const Range &range)

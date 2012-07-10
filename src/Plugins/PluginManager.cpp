@@ -708,7 +708,7 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	return !s.s->Error;
 }
 
-typedef void process_track_func(BufferBox*, Track*);
+typedef void process_track_func(BufferBox*, Track*, int);
 typedef void main_audiofile_func(AudioFile*);
 typedef void main_void_func();
 
@@ -718,11 +718,13 @@ void PluginManager::PluginProcessTrack(CScript *s, Track *t, Range r)
 	if (!f)
 		return;
 	msg_db_r("PluginProcessTrack", 1);
-	BufferBox buf = t->GetBuffers(r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, r);
-	f(&buf, t);
-	t->root->Execute(a);
-	//t->UpdatePeaks();
+	foreachi(t->level, l, li){
+		BufferBox buf = t->GetBuffers(li, r);
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, li, r);
+		f(&buf, t, li);
+		t->root->Execute(a);
+		//t->UpdatePeaks();
+	}
 	msg_db_l(1);
 }
 
@@ -807,7 +809,7 @@ void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect *fx)
 		ImportPluginData(*fx);
 		process_track_func *f = (process_track_func*)cur_plugin->s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track");
 		if (f)
-			f(&buf, t);
+			f(&buf, t, 0);
 		t->root->UpdateSelection();
 	}else{
 		if (cur_plugin->s)

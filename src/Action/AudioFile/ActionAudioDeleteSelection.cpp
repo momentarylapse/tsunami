@@ -17,29 +17,30 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a)
 	foreach(a->track, t)
 		if (t.is_selected){
 			// buffer boxes
-			foreachbi(t.buffer, b, n){
+			foreachi(t.level, l, li)
+			foreachbi(l.buffer, b, n){
 				int bi0 = b.offset;
 				int bi1 = b.offset + b.num;
 
 
 				if ((i0 <= bi0) && (i1 >= bi1)){
 					// b completely inside?
-					AddSubAction(new ActionTrack__DeleteBufferBox(&t, n), a);
+					AddSubAction(new ActionTrack__DeleteBufferBox(&t, li, n), a);
 
 				}else if ((i0 > bi0) && (i1 > bi1) && (i0 < bi1)){
 					// overlapping end of b?
-					AddSubAction(new ActionTrack__ShrinkBufferBox(&t, n, i0 - bi0), a);
+					AddSubAction(new ActionTrack__ShrinkBufferBox(&t, li, n, i0 - bi0), a);
 
 				}else if ((i0 <= bi0) && (i1 < bi1) && (i1 > bi0)){
 					// overlapping beginning of b?
-					AddSubAction(new ActionTrack__CutBufferBox(&t, n, i1 - bi0), a);
-					AddSubAction(new ActionTrack__DeleteBufferBox(&t, n), a);
+					AddSubAction(new ActionTrack__CutBufferBox(&t, li, n, i1 - bi0), a);
+					AddSubAction(new ActionTrack__DeleteBufferBox(&t, li, n), a);
 
 				}else if ((i0 > bi0) && (i1 < bi1)){
 					// inside b?
-					AddSubAction(new ActionTrack__CutBufferBox(&t, n, i1 - bi0), a);
-					AddSubAction(new ActionTrack__CutBufferBox(&t, n, i0 - bi0), a);
-					AddSubAction(new ActionTrack__DeleteBufferBox(&t, n + 1), a);
+					AddSubAction(new ActionTrack__CutBufferBox(&t, li, n, i1 - bi0), a);
+					AddSubAction(new ActionTrack__CutBufferBox(&t, li, n, i0 - bi0), a);
+					AddSubAction(new ActionTrack__DeleteBufferBox(&t, li, n + 1), a);
 
 				}
 			}

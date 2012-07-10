@@ -43,6 +43,7 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 	s->length = range.length();
 	s->parent = get_track_index(&t);
 	s->root = a;
+	s->level.resize(1);
 
 	if (a->GetCurTrack() == &t)
 		a->SetCurSub(s);

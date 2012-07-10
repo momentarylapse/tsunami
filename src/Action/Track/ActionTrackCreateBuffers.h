@@ -15,7 +15,7 @@
 class ActionTrackCreateBuffers : public ActionGroup
 {
 public:
-	ActionTrackCreateBuffers(Track *t, const Range &r);
+	ActionTrackCreateBuffers(Track *t, int level_no, const Range &r);
 	virtual ~ActionTrackCreateBuffers();
 };
 

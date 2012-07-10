@@ -14,7 +14,7 @@
 class ActionTrack__AbsorbBufferBox : public Action
 {
 public:
-	ActionTrack__AbsorbBufferBox(Track *t, int _dest, int _src);
+	ActionTrack__AbsorbBufferBox(Track *t, int _level_no, int _dest, int _src);
 	virtual ~ActionTrack__AbsorbBufferBox();
 
 	void *execute(Data *d);
@@ -22,6 +22,7 @@ public:
 
 private:
 	int track_no, sub_no;
+	int level_no;
 	int dest, src;
 	int dest_old_length;
 	int src_offset, src_length;

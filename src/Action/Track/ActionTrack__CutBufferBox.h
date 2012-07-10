@@ -14,7 +14,7 @@
 class ActionTrack__CutBufferBox : public Action
 {
 public:
-	ActionTrack__CutBufferBox(Track *t, int _index, int _offset);
+	ActionTrack__CutBufferBox(Track *t, int _level_no, int _index, int _offset);
 	virtual ~ActionTrack__CutBufferBox();
 
 	void *execute(Data *d);
@@ -23,6 +23,7 @@ public:
 private:
 	int track_no, sub_no;
 	int index;
+	int level_no;
 	int offset;
 };
 

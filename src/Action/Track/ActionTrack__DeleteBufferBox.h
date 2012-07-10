@@ -14,7 +14,7 @@
 class ActionTrack__DeleteBufferBox : public Action
 {
 public:
-	ActionTrack__DeleteBufferBox(Track *t, int _index);
+	ActionTrack__DeleteBufferBox(Track *t, int level_no, int _index);
 	virtual ~ActionTrack__DeleteBufferBox();
 
 	void *execute(Data *d);
@@ -22,6 +22,7 @@ public:
 
 private:
 	int track_no, sub_no;
+	int level_no;
 	int index;
 	BufferBox buf;
 };

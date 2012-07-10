@@ -21,7 +21,7 @@ void Format::ImportData(Track *t, void *data, int channels, int bits, int sample
 {
 	msg_db_r("ImportData", 1);
 
-	BufferBox buf = t->GetBuffers(Range(offset, samples));
+	BufferBox buf = t->GetBuffers(0, Range(offset, samples));
 	buf.import(data, channels, bits, samples);
 
 	msg_db_l(1);

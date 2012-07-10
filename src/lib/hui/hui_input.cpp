@@ -525,10 +525,6 @@ void HuiAddCommandToggle(const string &id, const string &image, int default_key_
 	c.object = NULL;
 	c.member_function = NULL;
 	_HuiCommand_.add(c);
-
-	foreach(HuiWindow, w)
-		if (func)
-			w->Event(id, func);
 }
 
 void HuiAddCommandM(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())

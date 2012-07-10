@@ -231,6 +231,7 @@ void NotifyWindowByWidget(CHuiWindow *win, GtkWidget *widget, const string &mess
 	win->_SetCurID_(id);
 	if (id.num > 0){
 		HuiEvent e = HuiCreateEvent(id, message);
+		_HuiSendGlobalCommand_(&e);
 		e.is_default = is_default;
 		win->_SendEvent_(&e);
 	}

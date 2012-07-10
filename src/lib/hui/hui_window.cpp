@@ -89,13 +89,6 @@ void CHuiWindow::_Init_(CHuiWindow *_root, bool _allow_root, int _mode)
 
 	SetTarget("", 0);
 
-	// inherit commands
-	foreach(_HuiCommand_, c)
-		if (c.func)
-			Event(c.id, c.func);
-		else if ((c.object) && (c.member_function))
-			EventM(c.id, c.object, c.member_function);
-
 	msg_db_l(2);
 }
 
@@ -292,13 +285,14 @@ bool CHuiWindow::_SendEvent_(HuiEvent *e)
 
 	bool sent = false;
 	foreach(event, ee){
-		bool send = _HuiEventMatch_(e, ee.id, ee.message);
+		if (!_HuiEventMatch_(e, ee.id, ee.message))
+			continue;
 		
 		// send the event
-		if ((send) && (ee.function)){
+		if (ee.function){
 			ee.function();
 			sent = true;
-		}else if ((send) && (ee.object) && (ee.member_function)){
+		}else if ((ee.object) && (ee.member_function)){
 			// send the event (member)
 			(ee.object->*ee.member_function)();
 			sent = true;

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+  <mime-type type="application/michisoft-nami">
+         <comment xml:lang="de">Nami Audio-Datei</comment>
+         <comment xml:lang="en">Nami audio file</comment>
+         <desktop:can-edit-with>michisoft-tsunami.desktop</desktop:can-edit-with>
+         <glob pattern="*.nami"/>
+  </mime-type>
+</mime-info>

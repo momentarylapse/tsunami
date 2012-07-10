@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Tsunami Audio Editor
+Name[de]=Tsunami Audio-Editor
+Comment=Edits Audio Files
+Comment[de]=Editor für Audio-Dateien
+Categories=AudioVideo;Audio;
+TryExec=/usr/bin/tsunami
+Exec=/usr/bin/tsunami
+Icon=/usr/share/tsunami/Data/icon.svg
+MimeType=application/michisoft-nami;application/ogg;application/x-ogg;audio/x-wav;application/x-flac;audio/x-flac;
+

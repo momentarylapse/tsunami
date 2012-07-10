@@ -19,7 +19,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2)
 {
 	ColorBackground = White;
 	ColorBackgroundCurWave = color(1, 0.93f, 0.93f, 1);
-	ColorBackgroundCurTrack = color(1, 0.85f, 0.85f, 1);
+	ColorBackgroundCurTrack = color(1, 0.88f, 0.88f, 1);
 	ColorGrid = color(1, 0.75f, 0.75f, 0.9f);
 	ColorSelectionInternal = color(1, 0.7f, 0.7f, 0.9f);
 	ColorSelectionBoundary = Blue;

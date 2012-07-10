@@ -21,7 +21,7 @@ void DynamicArray::reserve(int size)
 			data = malloc(allocated);
 //			printf("          new  %p  ", data);
 		}
-	}else if (size * element_size >= allocated){
+	}else if (size * element_size > allocated){
 		allocated = size * element_size * 2;
 		void *data0 = data;
 		data = realloc(data, allocated);
@@ -34,9 +34,9 @@ void DynamicArray::reserve(int size)
 void DynamicArray::resize(int size)
 {
 //	printf("        resize %d\n", size);
-	reserve(size);
 //	printf("        .\n");
 	if (size > num){
+		reserve(size);
 		memset((char*)data + num * element_size, 0, (size - num) * element_size);
 		/*for (int i=num;i<size;i++)
 			init_sub_super_array(NULL, NULL, */
@@ -65,11 +65,12 @@ void DynamicArray::append(const DynamicArray *a)
 {
 	if (a->num > 0){
 //		printf("        append %d %d %d   - %d %d %d\n", num, element_size, allocated, a->num, a->element_size, a->allocated);
-		int n_old = num;
+		int num_old = num;
+		int num_a_old = a->num; // in case (this = a)
 //		printf("        a\n");
 		resize(num + a->num);
 //		printf("        b\n");
-		memcpy(&((char*)data)[n_old * element_size], a->data, a->num * element_size);
+		memcpy(&((char*)data)[num_old * element_size], a->data, num_a_old * element_size);
 //		printf("        /append\n");
 	}
 }
@@ -162,7 +163,6 @@ void DynamicArray::assign(const DynamicArray *a)
 {
 	if (a != this){
 //		printf("assign\n");
-		clear();
 		element_size = a->element_size;
 		resize(a->num);
 		if (num > 0)

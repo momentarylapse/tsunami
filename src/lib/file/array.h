@@ -110,8 +110,8 @@ class Array : public DynamicArray
 				for (int i=size;i<num;i++)
 					(*this)[i].~T();
 			}
-			reserve(size);
 			if (size > num){
+				reserve(size);
 				// grow -> construct
 				memset((char*)data + num * element_size, 0, (size - num) * element_size);
 				for (int i=num;i<size;i++)

@@ -48,10 +48,10 @@ void ActionManager::add(Action *a)
 
 void *ActionManager::Execute(Action *a)
 {
-	add(a);
-	if (enabled)
+	if (enabled){
+		add(a);
 		return a->execute_and_notify(data);
-	else
+	}else
 		return a->execute(data);
 }
 

@@ -7,6 +7,10 @@
 
 #include "AudioFile.h"
 #include "../Action/AudioFile/ActionAudioAddTrack.h"
+#include "../Action/AudioFile/ActionAudioDeleteTrack.h"
+#include "../Action/AudioFile/ActionAudioAddLevel.h"
+#include "../Action/AudioFile/ActionAudioDeleteSelection.h"
+#include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
 #include "../Tsunami.h"
 #include <assert.h>
 
@@ -322,6 +326,39 @@ void AudioFile::UpdatePeaks()
 void AudioFile::PostActionUpdate()
 {
 	UpdatePeaks();
+}
+
+int AudioFile::GetNumSelectedSubs()
+{
+	int n = 0;
+	foreachi(track, t, ti)
+		foreachbi(t.sub, s, si)
+			if (s.is_selected)
+				n ++;
+	return n;
+}
+
+void AudioFile::InsertSelectedSubs()
+{
+	if (GetNumSelectedSubs() > 0)
+		Execute(new ActionSubTrackInsertSelected(this));
+}
+
+void AudioFile::AddLevel()
+{
+	Execute(new ActionAudioAddLevel());
+}
+
+void AudioFile::DeleteCurrentTrack()
+{
+	if (cur_track >= 0)
+		Execute(new ActionAudioDeleteTrack(this, cur_track));
+}
+
+void AudioFile::DeleteSelection(bool all_levels)
+{
+	if (!selection.empty())
+		Execute(new ActionAudioDeleteSelection(this));
 }
 
 Track *AudioFile::get_track(int track_no, int sub_no)

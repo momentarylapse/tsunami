@@ -52,9 +52,15 @@ public:
 	void SetCurSub(Track *s);
 	void SetCurTrack(Track *t);
 
+	int GetNumSelectedSubs();
+
 	// action
 	Track *AddEmptyTrack(int index = -1);
 	Track *AddTimeTrack(int index = -1);
+	void DeleteCurrentTrack();
+	void AddLevel();
+	void InsertSelectedSubs();
+	void DeleteSelection(bool all_levels);
 
 	Track *get_track(int track_no, int sub_no);
 

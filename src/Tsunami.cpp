@@ -11,11 +11,6 @@
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 
-#include "Action/AudioFile/ActionAudioDeleteSelection.h"
-#include "Action/AudioFile/ActionAudioDeleteTrack.h"
-#include "Action/AudioFile/ActionAudioAddLevel.h"
-#include "Action/SubTrack/ActionSubTrackInsert.h"
-
 #include "Plugins/FastFourierTransform.h"
 
 Tsunami *tsunami = NULL;
@@ -205,10 +200,7 @@ void Tsunami::OnDeleteTrack()
 			log->Error(_("Es muss mindestens eine Spur existieren"));
 			return;
 		}
-		Track *t = GetCurTrack();
-		int index = get_track_index(t);
-		if (index >= 0)
-			cur_audio->Execute(new ActionAudioDeleteTrack(cur_audio, index));
+		cur_audio->DeleteCurrentTrack();
 	}
 }
 
@@ -271,8 +263,7 @@ void Tsunami::OnFindAndExecutePlugin()
 void Tsunami::OnDelete()
 {
 	if (cur_audio->used)
-		if (!cur_audio->selection.empty())
-			cur_audio->Execute(new ActionAudioDeleteSelection(cur_audio));
+		cur_audio->DeleteSelection(false);
 }
 
 void Tsunami::OnSubImport()
@@ -339,10 +330,8 @@ void Tsunami::OnPaste()
 
 void Tsunami::OnInsertAdded()
 {
-	foreachi(cur_audio->track, t, ti)
-		foreachbi(t.sub, s, si)
-			if (s.is_selected)
-				cur_audio->Execute(new ActionSubTrackInsert(cur_audio, ti, si, cur_audio->cur_level));
+	if (cur_audio->used)
+		cur_audio->InsertSelectedSubs();
 }
 
 void Tsunami::OnRecord()
@@ -366,7 +355,7 @@ Track *Tsunami::GetCurTrack()
 void Tsunami::OnAddLevel()
 {
 	if (cur_audio->used)
-		cur_audio->Execute(new ActionAudioAddLevel());
+		cur_audio->AddLevel();
 }
 
 void Tsunami::OnCurLevel()

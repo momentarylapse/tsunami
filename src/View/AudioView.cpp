@@ -654,10 +654,13 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int he
 		hf *= 2;
 	}
 
-	c->SetColor(col);
 
 	int di = DetailSteps;
-	foreach(t->level, lev)
+	foreachi(t->level, lev, level_no){
+		if (level_no == t->root->cur_level)
+			c->SetColor(col);
+		else
+			c->SetColor(ColorWave);
 		foreach(lev.buffer, b){
 			int l = min(l_best - 1, b.peak.num / 2 - 2);
 			if (l >= 0){//f < MIN_MAX_FACTOR){
@@ -670,6 +673,7 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int he
 					draw_line_buffer(c, width, di, view_pos_rel, zoom, 1, hf, x, y0l, b.l, b.offset);
 			}
 		}
+	}
 	msg_db_l(1);
 }
 

@@ -362,6 +362,8 @@ void Tsunami::OnAddLevel()
 
 void Tsunami::OnCurLevel()
 {
+	cur_audio->cur_level = GetInt("");
+	ForceRedraw();
 }
 
 Track *Tsunami::GetCurSub()

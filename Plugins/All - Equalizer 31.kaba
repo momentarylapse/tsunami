@@ -22,6 +22,7 @@ float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
 complex f[]
 
 void equalize(float b[])
+	int _STACK_ALIGNMENT_
 	
 /*	// normalize parameters...
 	float max_factor = 0

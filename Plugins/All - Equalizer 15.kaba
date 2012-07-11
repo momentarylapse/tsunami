@@ -23,6 +23,7 @@ float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
 complex f[]
 
 void equalize(float b[])
+	int _STACK_ALIGNMENT_
 	
 	// transform
 	int len2 = b.num / 2 + 1

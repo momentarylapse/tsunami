@@ -13,6 +13,7 @@
 
 #include "Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "Action/AudioFile/ActionAudioDeleteTrack.h"
+#include "Action/AudioFile/ActionAudioAddLevel.h"
 
 #include "Plugins/FastFourierTransform.h"
 
@@ -355,6 +356,8 @@ Track *Tsunami::GetCurTrack()
 
 void Tsunami::OnAddLevel()
 {
+	if (cur_audio->used)
+		cur_audio->Execute(new ActionAudioAddLevel());
 }
 
 void Tsunami::OnCurLevel()

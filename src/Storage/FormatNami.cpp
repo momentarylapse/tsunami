@@ -20,12 +20,6 @@ FormatNami::~FormatNami()
 
 
 Array<int> ChunkPos;
-struct ChunkData
-{
-	AudioFile *a;
-	Track *t, *s;
-	Effect *fx;
-}chunk_data;
 
 void BeginChunk(CFile *f, const string &name)
 {
@@ -38,7 +32,7 @@ void BeginChunk(CFile *f, const string &name)
 void EndChunk(CFile *f)
 {
 	int pos = ChunkPos.back();
-	ChunkPos.resize(ChunkPos.num -1);
+	ChunkPos.pop();
 
 	int pos0 = f->GetPos();
 	f->SetPos(pos - 4, true);
@@ -109,9 +103,10 @@ void WriteSubTrack(CFile *f, Track *s)
 	EndChunk(f);
 }
 
-void WriteTrackLevel(CFile *f, TrackLevel *l)
+void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
 {
 	BeginChunk(f, "level");
+	f->WriteInt(level_no);
 
 	foreach(l->buffer, b)
 		WriteBufferBox(f, &b);
@@ -122,6 +117,7 @@ void WriteTrackLevel(CFile *f, TrackLevel *l)
 void WriteTrack(CFile *f, Track *t)
 {
 	BeginChunk(f, "track");
+
 	f->WriteStr(t->name);
 	f->WriteFloat(t->volume);
 	f->WriteBool(t->muted);
@@ -130,14 +126,25 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0);
 	f->WriteInt(0);
 
-	foreach(t->level, l)
-		WriteTrackLevel(f, &l);
+	foreachi(t->level, l, i)
+		WriteTrackLevel(f, &l, i);
 
 	foreach(t->sub, sub)
 		WriteSubTrack(f, &sub);
 
 	foreach(t->fx, effect)
 		WriteEffect(f, &effect);
+
+	EndChunk(f);
+}
+
+void WriteLevelName(CFile *f, Array<string> level_name)
+{
+	BeginChunk(f, "lvlname");
+
+	f->WriteInt(level_name.num);
+	foreach(level_name, l)
+		f->WriteStr(l);
 
 	EndChunk(f);
 }
@@ -158,6 +165,8 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 	foreach(a->tag, tag)
 		WriteTag(f, &tag);
+
+	WriteLevelName(f, a->level_name);
 
 	foreachi(a->track, track, i){
 		WriteTrack(f, &track);
@@ -423,56 +432,49 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		}
 }
 
-void ReadChunk(CFile *f);
-void ReadChunkList(CFile *f)
+typedef void chunk_reader(CFile*, void*);
+
+struct ChunkHandler
 {
-	while (f->GetPos() < ChunkPos.back())
-		ReadChunk(f);
+	string tag;
+	chunk_reader *reader;
+	void *data;
+};
+
+struct ChunkLevelData
+{
+	ChunkLevelData(){}
+	ChunkLevelData(const string &_tag, int _pos)
+	{	tag = _tag;	pos = _pos;	}
+	int pos;
+	string tag;
+	Array<ChunkHandler> handler;
+};
+Array<ChunkLevelData> chunk_data;
+
+void AddChunkHandler(const string &tag, chunk_reader *reader, void *data)
+{
+	ChunkHandler h;
+	h.tag = tag;
+	h.reader = reader;
+	h.data = data;
+	chunk_data.back().handler.add(h);
 }
 
-void ReadChunkNami(CFile *f, AudioFile *a)
-{
-	a->sample_rate = f->ReadInt();
-	ReadChunkList(f);
-}
-
-void ReadChunkTag(CFile *f, Array<Tag> &tag)
+void ReadChunkTag(CFile *f, Array<Tag> *tag)
 {
 	Tag t;
 	t.key = f->ReadStr();
 	t.value = f->ReadStr();
-	tag.add(t);
+	tag->add(t);
 }
 
-void ReadChunkTrack(CFile *f, AudioFile *a)
+void ReadChunkLevelName(CFile *f, AudioFile *a)
 {
-	Track *t = a->AddEmptyTrack();
-	chunk_data.t = t;
-	t->name = f->ReadStr();
-	t->volume = f->ReadFloat();
-	t->muted = f->ReadBool();
-	f->ReadInt(); // reserved
-	f->ReadInt();
-	f->ReadInt();
-	f->ReadInt();
-	ReadChunkList(f);
-	tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());
-}
-
-void ReadChunkSub(CFile *f, Track *t)
-{
-	string name = f->ReadStr();
-	int pos = f->ReadInt();
-	int length = f->ReadInt();
-	Track *s = t->AddEmptySubTrack(Range(pos, length), name);
-	chunk_data.s = s;
-	s->volume = f->ReadFloat();
-	s->muted = f->ReadBool();
-	s->rep_num = f->ReadInt();
-	s->rep_delay = f->ReadInt();
-	f->ReadInt(); // reserved
-	f->ReadInt();
-	ReadChunkList(f);
+	int num = f->ReadInt();
+	a->level_name.clear();
+	for (int i=0;i<num;i++)
+		a->level_name.add(f->ReadStr());
 }
 
 void ReadChunkEffectParam(CFile *f, Effect *e)
@@ -484,23 +486,23 @@ void ReadChunkEffectParam(CFile *f, Effect *e)
 	e->param.add(p);
 }
 
-void ReadChunkEffect(CFile *f, Array<Effect> &fx)
+void ReadChunkEffect(CFile *f, Array<Effect> *fx)
 {
 	Effect e;
 	e.filename = f->ReadStr();
 	e.only_on_selection = f->ReadBool();
 	e.start = f->ReadInt();
 	e.end = f->ReadInt();
-	fx.add(e);
-	chunk_data.fx = &fx.back();
-	ReadChunkList(f);
+	fx->add(e);
+
+	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParam, &fx->back());
 }
 
-void ReadChunkBufferBox(CFile *f, Track *t)
+void ReadChunkBufferBox(CFile *f, TrackLevel *l)
 {
 	BufferBox dummy;
-	t->level[0].buffer.add(dummy);
-	BufferBox *b = &t->level[0].buffer.back();
+	l->buffer.add(dummy);
+	BufferBox *b = &l->buffer.back();
 	b->offset = f->ReadInt();
 	int num = f->ReadInt();
 	b->resize(num);
@@ -514,7 +516,62 @@ void ReadChunkBufferBox(CFile *f, Track *t)
 		b->r[i] =  (float)data[i * 2    ] / 32768.0f;
 		b->l[i] =  (float)data[i * 2 + 1] / 32768.0f;
 	}
-	ReadChunkList(f);
+}
+
+void ReadChunkSub(CFile *f, Track *t)
+{
+	string name = f->ReadStr();
+	int pos = f->ReadInt();
+	int length = f->ReadInt();
+	Track *s = t->AddEmptySubTrack(Range(pos, length), name);
+	s->volume = f->ReadFloat();
+	s->muted = f->ReadBool();
+	s->rep_num = f->ReadInt();
+	s->rep_delay = f->ReadInt();
+	f->ReadInt(); // reserved
+	f->ReadInt();
+
+	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &s->level[0]);
+}
+
+void ReadChunkTrackLevel(CFile *f, Track *t)
+{
+	int l = f->ReadInt();
+	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[l]);
+}
+
+void ReadChunkTrack(CFile *f, AudioFile *a)
+{
+	Track *t = a->AddEmptyTrack();
+	t->name = f->ReadStr();
+	t->volume = f->ReadFloat();
+	t->muted = f->ReadBool();
+	f->ReadInt(); // reserved
+	f->ReadInt();
+	f->ReadInt();
+	f->ReadInt();
+	tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());
+
+	AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
+	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
+	AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
+	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &t->fx);
+}
+
+void ReadChunkNami(CFile *f, AudioFile *a)
+{
+	a->sample_rate = f->ReadInt();
+
+	AddChunkHandler("tag", (chunk_reader*)&ReadChunkTag, &a->tag);
+	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &a->fx);
+	AddChunkHandler("lvlname", (chunk_reader*)&ReadChunkLevelName, a);
+	AddChunkHandler("track", (chunk_reader*)&ReadChunkTrack, a);
+}
+
+void strip(string &s)
+{
+	while((s.num > 0) && (s.back() == ' '))
+		s.resize(s.num - 1);
 }
 
 void ReadChunk(CFile *f)
@@ -522,48 +579,42 @@ void ReadChunk(CFile *f)
 	string cname;
 	cname.resize(8);
 	f->ReadBuffer(cname.data, 8);
+	strip(cname);
 	int size = f->ReadInt();
-	ChunkPos.add(f->GetPos() + size);
+	chunk_data.add(ChunkLevelData(cname, f->GetPos() + size));
 
-	if (cname == "nami    "){
-		ReadChunkNami(f, chunk_data.a);
-	}else if (cname == "tag     "){
-		ReadChunkTag(f, chunk_data.a->tag);
-	}else if (cname == "fx      "){
-		if (chunk_data.t)
-			ReadChunkEffect(f, chunk_data.t->fx);
-		else
-			ReadChunkEffect(f, chunk_data.a->fx);
-		chunk_data.fx = NULL;
-	}else if (cname == "fxparam "){
-		if (chunk_data.fx)
-			ReadChunkEffectParam(f, chunk_data.fx);
-	}else if (cname == "track   "){
-		ReadChunkTrack(f, chunk_data.a);
-		chunk_data.t = NULL;
-	}else if (cname == "sub     "){
-		if (chunk_data.t)
-			ReadChunkSub(f, chunk_data.t);
-		chunk_data.s = NULL;
-	}else if (cname == "bufbox  "){
-		if (chunk_data.s)
-			ReadChunkBufferBox(f, chunk_data.s);
-		else if (chunk_data.t)
-			ReadChunkBufferBox(f, chunk_data.t);
+
+	bool handled = false;
+	foreach(chunk_data[chunk_data.num - 2].handler, h)
+		if (cname == h.tag){
+			h.reader(f, h.data);
+			handled = true;
+			break;
+		}
+
+	if (handled){
+
+		// read nested chunks
+		while (f->GetPos() < chunk_data.back().pos)
+			ReadChunk(f);
+
 	}else
-		msg_error("unknown nami chunk: " + cname);
+		tsunami->log->Error("unknown nami chunk: " + cname + " (within " + chunk_data[chunk_data.num - 2].tag + ")");
 
-	f->SetPos(ChunkPos.back(), true);
-	ChunkPos.resize(ChunkPos.num - 1);
+
+	msg_left();
+	f->SetPos(chunk_data.back().pos, true);
+	chunk_data.pop();
 }
 
 void load_nami_file_new(CFile *f, AudioFile *a)
 {
-	chunk_data.a = a;
-	chunk_data.t = NULL;
-	chunk_data.s = NULL;
-	chunk_data.fx = NULL;
+	chunk_data.clear();
+	chunk_data.add(ChunkLevelData("-top level-", 0));
+	AddChunkHandler("nami", (chunk_reader*)&ReadChunkNami, a);
+
 	ReadChunk(f);
+	chunk_data.clear();
 }
 
 

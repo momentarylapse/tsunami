@@ -54,6 +54,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("add_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTrack);
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTimeTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDeleteTrack);
+	HuiAddCommandM("level_add", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddLevel);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRemoveAdded);
 	HuiAddCommandM("track_import", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnTrackImport);
@@ -101,6 +102,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	// events
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
+	EventM("cur_level", this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevel);
 
 	plugins = new PluginManager;
 	plugins->AddPluginsToMenu();
@@ -351,6 +353,14 @@ string title_filename(const string &filename)
 Track *Tsunami::GetCurTrack()
 {	return cur_audio->GetCurTrack();	}
 
+void Tsunami::OnAddLevel()
+{
+}
+
+void Tsunami::OnCurLevel()
+{
+}
+
 Track *Tsunami::GetCurSub()
 {	return cur_audio->GetCurSub();	}
 
@@ -378,6 +388,8 @@ void Tsunami::UpdateMenu()
 	Enable("add_time_track", cur_audio->used);
 	Enable("delete_track", GetCurTrack());
 	Enable("track_properties", GetCurTrack());
+	// level
+	Enable("level_add", cur_audio->used);
 	// sub
 	Enable("sub_import", GetCurTrack());
 	Enable("insert_added", GetCurSub());

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-117
+119
 // Data (ID,Text)
 about
 About
@@ -79,6 +79,8 @@ ld_t_track
 Track
 ld_t_volume
 !bold\\Volume:
+level_add
+
 level_dialog
 Level
 log_clear
@@ -91,6 +93,8 @@ menu_file
 File
 menu_help
 ?
+menu_level
+
 menu_plugins
 Plugins
 menu_sound
@@ -238,11 +242,9 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-75
+71
 // Data (ID,Text)
                   Close dialog box to exit program.
-
-  - neuer Effekt -
 
  - viel Erfolg!
 
@@ -288,7 +290,7 @@ Datei öffnen
 
 Datenverlust!
 
-Dieser Effekt ist nicht konfigurierbar.\nWollen Sie ihn löschen?
+Dieser Effekt ist nicht konfigurierbar.
 
 Editor für Audio Dateien
 
@@ -308,8 +310,6 @@ Fehlerbericht
 
 Fehlerbericht an Michi senden
 
-Frage
-
 Ist halt irgendwie passiert...
 
 Keine Ebene ausgewählt
@@ -317,8 +317,6 @@ No level selected
 Keine Spur ausgewählt
 No track selected
 Konnte Aufnahmegerät nicht öffnen
-
-Löschen
 
 Meldungen
 
@@ -341,8 +339,6 @@ Spur %d
 Unbenannt
 
 Vorschau
-
-Wollen Sie diesen Effekt löschen?
 
 benutze OpenAl Device: 
 

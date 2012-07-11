@@ -551,7 +551,7 @@ Menu
 menu
 
 1
-8
+9
 0
 0
 0
@@ -560,7 +560,7 @@ menu
 0
 
 
-64
+66
 ItemPopup
 menu_file
 
@@ -993,6 +993,32 @@ ItemSeparator
 ItemImage
 track_properties
 hui:properties
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemPopup
+menu_level
+
+1
+1
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+level_add
+hui:add
 1
 0
 0
@@ -2623,7 +2649,7 @@ tab_control
 // Language
 Deutsch
 // NumIDs
-140
+142
 // Text
 about
 Info
@@ -2723,6 +2749,8 @@ ld_t_track
 Spur:
 ld_t_volume
 !bold\\Lautstärke
+level_add
+Hinzufügen
 level_dialog
 Ebene
 level_track
@@ -2741,12 +2769,14 @@ menu_file
 Datei
 menu_help
 ?
+menu_level
+Ebene
 menu_plugins
 Plugins
 menu_sound
 Sound
 menu_sub
-Ebene
+Samples
 menu_track
 Spur
 menu_view
@@ -2911,7 +2941,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-140
+142
 // Text
 about
 About
@@ -3011,6 +3041,8 @@ ld_t_track
 Track
 ld_t_volume
 !bold\\Volume:
+level_add
+
 level_dialog
 Level
 level_track
@@ -3029,6 +3061,8 @@ menu_file
 File
 menu_help
 ?
+menu_level
+
 menu_plugins
 Plugins
 menu_sound

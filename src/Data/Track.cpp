@@ -199,19 +199,19 @@ BufferBox Track::ReadBuffersCol(const Range &r)
 	int num_inside = 0;
 	int inside_level, inside_no;
 	int inside_p0, inside_p1;
+	bool intersected = false;
 	foreachi(level, l, li)
 		foreachi(l.buffer, b, bi){
-			int p0 = r.offset - b.offset;
-			int p1 = r.offset - b.offset + r.num;
-			if ((p0 >= 0) && (p1 <= b.num)){
+			if (b.range().covers(r)){
 				num_inside ++;
 				inside_level = li;
 				inside_no = bi;
-				inside_p0 = p0;
-				inside_p1 = p1;
-			}
+				inside_p0 = r.offset - b.offset;
+				inside_p1 = r.offset - b.offset + r.num;
+			}else if (b.range().overlaps(r))
+				intersected = true;
 		}
-	if (num_inside == 1){
+	if ((num_inside == 1) && (!intersected)){
 		// set as reference to subarrays
 		buf.set_as_ref(level[inside_level].buffer[inside_no], inside_p0, inside_p1 - inside_p0);
 		msg_db_l(1);

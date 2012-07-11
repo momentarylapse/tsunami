@@ -44,6 +44,9 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 	s->parent = get_track_index(&t);
 	s->root = a;
 	s->level.resize(1);
+	s->level[0].buffer.resize(1);
+	s->level[0].buffer[0].resize(s->length);
+	s->is_selected = true;
 
 	if (a->GetCurTrack() == &t)
 		a->SetCurSub(s);

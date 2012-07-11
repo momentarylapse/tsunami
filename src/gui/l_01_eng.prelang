@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-119
+120
 // Data (ID,Text)
 about
 About
@@ -191,6 +191,8 @@ show_log
 Show log
 stop
 Stop
+sub_from_selection
+
 sub_import
 Import from file...
 sub_properties

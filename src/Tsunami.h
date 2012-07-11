@@ -60,6 +60,7 @@ public:
 	void OnAddTrack();
 	void OnAddTimeTrack();
 	void OnDeleteTrack();
+	void OnSubFromSelection();
 	void OnInsertAdded();
 	void OnRemoveAdded();
 	void OnTrackImport();

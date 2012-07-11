@@ -61,6 +61,7 @@ public:
 	void AddLevel();
 	void InsertSelectedSubs();
 	void DeleteSelection(bool all_levels);
+	void CreateSubsFromSelection();
 
 	Track *get_track(int track_no, int sub_no);
 

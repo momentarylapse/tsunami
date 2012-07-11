@@ -54,6 +54,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTimeTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDeleteTrack);
 	HuiAddCommandM("level_add", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddLevel);
+	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSubFromSelection);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRemoveAdded);
 	HuiAddCommandM("track_import", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnTrackImport);
@@ -364,18 +365,26 @@ void Tsunami::OnCurLevel()
 	ForceRedraw();
 }
 
+void Tsunami::OnSubFromSelection()
+{
+	if (cur_audio->used)
+		cur_audio->CreateSubsFromSelection();
+}
+
 Track *Tsunami::GetCurSub()
 {	return cur_audio->GetCurSub();	}
 
 void Tsunami::UpdateMenu()
 {
 	msg_db_r("UpdateMenu", 1);
+	bool selected = cur_audio && !cur_audio->selection.empty();
 // menu / toolbar
 	// edit
 	Enable("undo", cur_audio->action_manager->Undoable());
 	Enable("redo", cur_audio->action_manager->Redoable());
-	Enable("copy", cur_audio->used);
-	Enable("delete", cur_audio->used);
+	Enable("copy", selected || (cur_audio->GetNumSelectedSubs() > 0));
+	Enable("paste", false);
+	Enable("delete", selected || (cur_audio->GetNumSelectedSubs() > 0));
 	Enable("resize", false); // deprecated
 	// file
 	Enable("save", cur_audio->used);
@@ -395,6 +404,7 @@ void Tsunami::UpdateMenu()
 	Enable("level_add", cur_audio->used);
 	// sub
 	Enable("sub_import", GetCurTrack());
+	Enable("sub_from_selection", selected);
 	Enable("insert_added", GetCurSub());
 	Enable("remove_added", GetCurSub());
 	Enable("sub_properties", GetCurSub());

@@ -11,6 +11,7 @@
 #include "../Action/AudioFile/ActionAudioAddLevel.h"
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
+#include "../Action/SubTrack/ActionSubTrackFromSelection.h"
 #include "../Tsunami.h"
 #include <assert.h>
 
@@ -359,6 +360,12 @@ void AudioFile::DeleteSelection(bool all_levels)
 {
 	if (!selection.empty())
 		Execute(new ActionAudioDeleteSelection(this, all_levels));
+}
+
+void AudioFile::CreateSubsFromSelection()
+{
+	if (!selection.empty())
+		Execute(new ActionSubTrackFromSelection(this));
 }
 
 Track *AudioFile::get_track(int track_no, int sub_no)

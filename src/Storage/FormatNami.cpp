@@ -623,7 +623,6 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_r("load_nami_file", 1);
 	tsunami->progress->Set(_("lade nami"), 0);
-	msg_db_m("a",1);
 
 	// TODO?
 	a->tag.clear();
@@ -638,9 +637,9 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 	else
 		load_nami_file_new(f, a);
 
-	msg_db_m("c",1);
 	FileClose(f);
-	msg_db_m("d",1);
+
+	a->UpdateSelection();
 
 
 	msg_db_l(1);

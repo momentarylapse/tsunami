@@ -518,6 +518,23 @@ void ReadChunkBufferBox(CFile *f, TrackLevel *l)
 	}
 }
 
+void ReadChunkSubBufferBox(CFile *f, BufferBox *b)
+{
+	b->offset = f->ReadInt();
+	int num = f->ReadInt();
+	b->resize(num);
+	f->ReadInt(); // channels (2)
+	f->ReadInt(); // bit (16)
+
+	Array<short> data;
+	data.resize(num * 2);
+	f->ReadBuffer(data.data, num * 4);
+	for (int i=0;i<num;i++){
+		b->r[i] =  (float)data[i * 2    ] / 32768.0f;
+		b->l[i] =  (float)data[i * 2 + 1] / 32768.0f;
+	}
+}
+
 void ReadChunkSub(CFile *f, Track *t)
 {
 	string name = f->ReadStr();
@@ -531,7 +548,7 @@ void ReadChunkSub(CFile *f, Track *t)
 	f->ReadInt(); // reserved
 	f->ReadInt();
 
-	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &s->level[0]);
+	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSubBufferBox, &s->level[0].buffer[0]);
 }
 
 void ReadChunkTrackLevel(CFile *f, Track *t)

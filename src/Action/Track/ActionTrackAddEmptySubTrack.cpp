@@ -45,6 +45,7 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 	s->root = a;
 	s->level.resize(1);
 	s->level[0].buffer.resize(1);
+	s->level[0].buffer[0].offset = 0;
 	s->level[0].buffer[0].resize(s->length);
 	s->is_selected = true;
 

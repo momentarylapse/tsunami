@@ -1,6 +1,6 @@
 #include "api.kaba"
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	file f = FileCreate("ooo")
 	f.SetBinaryMode(true)
 	int i

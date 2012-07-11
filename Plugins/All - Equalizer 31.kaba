@@ -50,7 +50,7 @@ void equalize(float b[])
 	// transform back
 	fft_c2r_inv(f, b)
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	equalize(buf.r)
 	equalize(buf.l)
 	f.clear()

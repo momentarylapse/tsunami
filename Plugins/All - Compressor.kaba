@@ -191,7 +191,7 @@ void Configure()
 
 	HuiWaitTillWindowClosed(win)
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	AudioFile *a = t.root
 	
 	float n_steps = data.Delay * a.sample_rate

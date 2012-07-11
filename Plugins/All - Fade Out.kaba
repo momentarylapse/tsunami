@@ -3,7 +3,7 @@
 
 #include "api.kaba"
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	int i
 	for i, 0, buf.num
 		float vol = 1 - i2f(i) / buf.r.num

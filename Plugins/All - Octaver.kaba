@@ -17,7 +17,7 @@ void DoOctaver(float b[])
 	for i, 0, b.num
 		b[i] = (b[i] * b[i]) * data.Level + b[i] * (1 - data.Level)
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	DoOctaver(buf.r)
 	DoOctaver(buf.l)
 

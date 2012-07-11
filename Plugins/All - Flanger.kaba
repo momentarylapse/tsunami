@@ -105,7 +105,7 @@ void Configure()
 	
 	HuiWaitTillWindowClosed(FlangerDialog)
 	
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	a = t.root
 	delay_samples = a.sample_rate * data.Delay + 1
 	temp.resize(delay_samples)

@@ -46,7 +46,7 @@ void Configure()
 
 	HuiWaitTillWindowClosed(VolumeDialog)
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	float factor = data.Volume
 	if data.Maximize
 		float max = 0

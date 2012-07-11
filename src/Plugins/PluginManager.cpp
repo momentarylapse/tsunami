@@ -714,7 +714,7 @@ typedef void main_void_func();
 
 void PluginManager::PluginProcessTrack(CScript *s, Track *t, Range r)
 {
-	process_track_func *f = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track");
+	process_track_func *f = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
 	if (!f)
 		return;
 	msg_db_r("PluginProcessTrack", 1);
@@ -741,7 +741,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 		if (PluginConfigure(true)){
 			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
-			if (s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track")){
+			if (s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int")){
 				if (tsunami->cur_audio->used){
 					foreach(tsunami->cur_audio->track, t)
 						if (t.is_selected){
@@ -807,7 +807,7 @@ void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect *fx)
 		// run
 		PluginResetData();
 		ImportPluginData(*fx);
-		process_track_func *f = (process_track_func*)cur_plugin->s->MatchFunction("ProcessTrack", "void", 2, "BufferBox", "Track");
+		process_track_func *f = (process_track_func*)cur_plugin->s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
 		if (f)
 			f(&buf, t, 0);
 		t->root->UpdateSelection();

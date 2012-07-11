@@ -85,7 +85,7 @@ void ResetData()
 	data.Feedback = 0.5
 	data.Delay = 0.15
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 
 	AudioFile *a = t.root
 	delay_samples = a.sample_rate * data.Delay

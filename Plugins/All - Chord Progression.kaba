@@ -90,7 +90,7 @@ void AddChord(AudioFile *a, float buf[], int pos0, int pos1, Chord c)
 	for int i, 0, f.num
 		AddTone(a, buf, pos0, pos1, f[i], data.Volume)
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	Chord chord[]
 	AudioFile *a = t.root
 	ParseChords(a, chord)

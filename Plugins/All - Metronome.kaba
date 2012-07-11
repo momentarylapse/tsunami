@@ -15,7 +15,7 @@ PluginData data
 
 window dlg
 
-void ProcessTrack(BufferBox buf, Track t)
+void ProcessTrack(BufferBox buf, Track t, int level)
 	AudioFile *a = t.root
 
 	float dt_m = 60.0 / data.BeatsPerMinute

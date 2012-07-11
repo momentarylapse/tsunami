@@ -90,6 +90,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddText("!width=20\\%", 5, 0, 0, 0, "label_percent");
 	volume_slider = new Slider(this, "volume_slider", "volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
 	AddButton("", 6, 0, 0, 0, "record");
+	AddComboBox("!width=100", 7, 0, 0, 0, "cur_level");
 	AllowEvents("key");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);
@@ -389,6 +390,12 @@ void Tsunami::UpdateMenu()
 	Enable("play", cur_audio->used);
 	Enable("stop", output->IsPlaying());
 
+
+	Reset("cur_level");
+	Enable("cur_level", cur_audio->used);
+	foreach(cur_audio->level_name, l)
+		SetString("cur_level", l);
+	SetInt("cur_level", cur_audio->cur_level);
 
 	if (cur_audio->used){
 		string title = title_filename(cur_audio->filename) + " - " + AppName;

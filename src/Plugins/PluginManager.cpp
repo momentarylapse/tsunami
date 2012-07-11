@@ -712,19 +712,16 @@ typedef void process_track_func(BufferBox*, Track*, int);
 typedef void main_audiofile_func(AudioFile*);
 typedef void main_void_func();
 
-void PluginManager::PluginProcessTrack(CScript *s, Track *t, Range r)
+void PluginManager::PluginProcessTrack(CScript *s, Track *t, int level_no, Range r)
 {
 	process_track_func *f = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
 	if (!f)
 		return;
 	msg_db_r("PluginProcessTrack", 1);
-	foreachi(t->level, l, li){
-		BufferBox buf = t->GetBuffers(li, r);
-		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, li, r);
-		f(&buf, t, li);
-		t->root->Execute(a);
-		//t->UpdatePeaks();
-	}
+	BufferBox buf = t->GetBuffers(level_no, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
+	f(&buf, t, level_no);
+	t->root->Execute(a);
 	msg_db_l(1);
 }
 
@@ -735,6 +732,8 @@ void PluginManager::ExecutePlugin(const string &filename)
 	if (LoadAndCompilePlugin(filename)){
 		CScript *s = cur_plugin->s;
 
+		AudioFile *a = tsunami->cur_audio;
+
 		// run
 //		cur_audio->history->ChangeBegin();
 		PluginResetData();
@@ -742,17 +741,17 @@ void PluginManager::ExecutePlugin(const string &filename)
 			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 			if (s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int")){
-				if (tsunami->cur_audio->used){
-					foreach(tsunami->cur_audio->track, t)
+				if (a->used){
+					foreach(a->track, t)
 						if (t.is_selected){
-							PluginProcessTrack(s, &t, tsunami->cur_audio->selection);
+							PluginProcessTrack(s, &t, a->cur_level, a->selection);
 						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 				}
 			}else if (f_audio){
-				if (tsunami->cur_audio->used)
-					f_audio(tsunami->cur_audio);
+				if (a->used)
+					f_audio(a);
 				else
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 			}else if (f_void){

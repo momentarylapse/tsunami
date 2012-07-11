@@ -83,6 +83,7 @@ public:
 
 	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
 	bool AllowTermination(AudioFile *a = NULL);
+	bool Save(AudioFile *a);
 
 	//void Draw();
 	void ForceRedraw();

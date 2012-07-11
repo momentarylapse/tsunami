@@ -30,18 +30,15 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 //	msg_write(n_pos);
 //	msg_write(n_before);
 
-	msg_write(n_pos);
 	if (n_pos >= 0){
-		msg_write("inside");
+		//msg_write("inside");
 
 		// use base buffers
 		BufferBox *b = &l.buffer[n_pos];
 
 		// too small?
-		if (r.end() > b->offset + b->num){
-			msg_write("small");
+		if (r.end() > b->offset + b->num)
 			AddSubAction(new ActionTrack__GrowBufferBox(t, level_no, n_pos, r.end() - b->offset), t->root);
-		}
 	}else{
 
 		// insert new buffers
@@ -51,10 +48,8 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 
 	// collision???  -> absorb
 	for (int i=l.buffer.num-1;i>n_pos;i--)
-		if (l.buffer[i].offset <= r.end()){
-			msg_write("col");
+		if (l.buffer[i].offset <= r.end())
 			AddSubAction(new ActionTrack__AbsorbBufferBox(t, level_no, n_pos, i), t->root);
-		}
 
 //	for (int i=0;i<t->buffer_r.num;i++)
 //		msg_write(format("%d   %d  %s", t->buffer_r[i].offset, t->buffer_r[i].b.num, (i == n_pos) ? "(*)" : ""));

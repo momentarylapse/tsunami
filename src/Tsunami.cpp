@@ -248,8 +248,27 @@ void Tsunami::OnSendBugReport()
 {
 }
 
+
+string title_filename(const string &filename)
+{
+	if (filename.num > 0)
+		return basename(filename);// + " (" + dirname(filename) + ")";
+	return _("Unbenannt");
+}
+
 bool Tsunami::AllowTermination(AudioFile *a)
 {
+	for (int i=0;i<2;i++)
+		if (!audio[i]->action_manager->IsSave()){
+			string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio[i]->filename).c_str()), true);
+			if (answer == "yes"){
+				cur_audio = audio[i];
+				/*if (!OnSave())
+					return false;*/
+				OnSave();
+			}else if (answer == "cancel")
+				return false;
+		}
 	return true;
 }
 
@@ -340,14 +359,6 @@ void Tsunami::OnRecord()
 	CaptureDialog *dlg = new CaptureDialog(this, false, cur_audio);
 	dlg->Update();
 	HuiWaitTillWindowClosed(dlg);
-}
-
-
-string title_filename(const string &filename)
-{
-	if (filename.num > 0)
-		return basename(filename);// + " (" + dirname(filename) + ")";
-	return _("Unbenannt");
 }
 
 Track *Tsunami::GetCurTrack()

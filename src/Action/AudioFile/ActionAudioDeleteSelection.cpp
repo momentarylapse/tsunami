@@ -9,12 +9,13 @@
 #include "../Track/ActionTrack__CutBufferBox.h"
 #include "../Track/ActionTrack__DeleteBufferBox.h"
 #include "../Track/ActionTrack__ShrinkBufferBox.h"
+#include "../SubTrack/ActionSubTrackDelete.h"
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a)
 {
 	int i0 = a->selection.start();
 	int i1 = a->selection.end();
-	foreach(a->track, t)
+	foreachi(a->track, t, track_no)
 		if (t.is_selected){
 			// buffer boxes
 			foreachi(t.level, l, li)
@@ -44,6 +45,11 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a)
 
 				}
 			}
+
+			// subs
+			foreachbi(t.sub, s, n)
+				if (s.is_selected)
+					AddSubAction(new ActionSubTrackDelete(track_no, n), a);
 		}
 }
 

@@ -77,6 +77,7 @@ void AudioFile::NewEmpty(int _sample_rate)
 	msg_db_r("AudioFile.NewEmpty",1);
 
 	Reset();
+	action_manager->Enable(false);
 	used = true;
 	sample_rate = _sample_rate;
 
@@ -85,7 +86,7 @@ void AudioFile::NewEmpty(int _sample_rate)
 	AddTag("album", "tsunami");//AppTitle + " " + AppVersion);
 	AddTag("artist", "tsunami");//AppTitle);
 
-	//a->history->Reset(false);
+	action_manager->Enable(true);
 	Notify("Change");
 	msg_db_l(1);
 }
@@ -96,8 +97,9 @@ void AudioFile::NewWithOneTrack(int _sample_rate)
 
 	NotifyBegin();
 	NewEmpty(_sample_rate);
+	action_manager->Enable(false);
 	AddEmptyTrack();
-	action_manager->Reset();
+	action_manager->Enable(true);
 	NotifyEnd();
 
 	msg_db_l(1);
@@ -302,6 +304,24 @@ Track *AudioFile::AddTimeTrack(int index)
 	if (index < 0)
 		index = cur_track + 1;
 	return (Track*)Execute(new ActionAudioAddTrack(index, Track::TYPE_TIME));
+}
+
+extern int debug_timer;
+
+void AudioFile::UpdatePeaks()
+{
+	msg_db_r("Audio.UpdatePeaks", 2);
+	HuiGetTime(debug_timer);
+	foreach(track, t)
+		t.UpdatePeaks();
+	msg_write(format("up %f", HuiGetTime(debug_timer)));
+	msg_db_l(2);
+}
+
+
+void AudioFile::PostActionUpdate()
+{
+	UpdatePeaks();
 }
 
 Track *AudioFile::get_track(int track_no, int sub_no)

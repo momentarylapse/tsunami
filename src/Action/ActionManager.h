@@ -21,11 +21,11 @@ public:
 	ActionManager(Data *_data);
 	virtual ~ActionManager();
 	void Reset();
+	void Enable(bool _enabled);
 
 	void BeginGroup();
 	void EndGroup();
 	void *Execute(Action *a);
-	void add(Action *a);
 	void Undo();
 	void Redo();
 
@@ -36,6 +36,8 @@ public:
 
 	Data *data;
 
+private:
+	void add(Action *a);
 	/*typedef Array<Action*> ActionArray;
 	Array<ActionArray> action;
 	ActionArray temp_action;*/
@@ -44,6 +46,7 @@ public:
 	int save_pos;
 
 	int cur_level;
+	bool enabled;
 };
 
 #endif /* ACTIONMANAGER_H_ */

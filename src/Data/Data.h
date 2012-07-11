@@ -27,6 +27,8 @@ public:
 	virtual bool Load(const string &_filename, bool deep = true) = 0;
 	virtual bool Save(const string &_filename) = 0;
 
+	virtual void PostActionUpdate(){}
+
 	void ResetHistory();
 	void *Execute(Action *a);
 	void Undo();

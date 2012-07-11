@@ -30,6 +30,7 @@ void BufferBox::operator=(const BufferBox &b)
 	num = b.num;
 	r = b.r;
 	l = b.l;
+	peak.clear();
 }
 
 BufferBox::~BufferBox()
@@ -265,32 +266,85 @@ Range BufferBox::range()
 //#define shrink(a, b)	max((a), (b))
 #define shrink(a, b)	(unsigned char)(sqrt(((float)(a) * (float)(a) + (float)(b) * (float)(b)) / 2))
 
+void BufferBox::invalidate_peaks(const Range &_range)
+{
+	assert(range().covers(_range));
+	int i0 = _range.start() - range().start();
+	int i1 = _range.end() - range().start();
+	int n = r.num;
+
+	if (peak.num < 2)
+		peak.resize(2);
+
+	n /= 2;
+	i0 /= 2;
+	i1 = min(i1 / 2 + 1, n);
+	//msg_write(format("inval %d  %d-%d", n, i0, i1));
+
+	if (peak[0].num < n)
+		peak[0].resize(n);
+	if (peak[1].num < n)
+		peak[1].resize(n);
+	for (int i=i0;i<i1;i++){
+		peak[0][i] = -1;
+		peak[1][i] = -1;
+	}
+}
+
+inline void find_update_peak_range(string &p0, string &p1, int &i0, int &i1, int n)
+{
+	i0 = 0;
+	i1 = n;
+	if ((p0.num < n) || (p1.num < n))
+		return;
+	//msg_write("t");
+	bool found = false;
+	for (int i=0;i<n;i++)
+		if (p0[i] == -1){
+			//msg_write(format("i0: %d (%d)", i, p0[i]));
+			i0 = i;
+			found = true;
+			break;
+		}
+	if (!found)
+		i0 = n;
+	for (int i=n-1;i>i0;i--)
+		if (p0[i] == -1){
+			//msg_write(format("i1: %d (%d)", i, p0[i]));
+			i1 = i + 1;
+			break;
+		}
+}
+
 void BufferBox::update_peaks()
 {
 	// first level
 	if (peak.num < 2)
 		peak.resize(2);
 	int n = r.num / 2;
-	if (peak[0].num < n)
-		peak[0].resize(n);
-	if (peak[1].num < n)
-		peak[1].resize(n);
-	for (int i=0;i<n;i++){
-		peak[0][i] = max(fabs(r[i * 2]), fabs(r[i * 2 + 1])) * 255;
-		peak[1][i] = max(fabs(l[i * 2]), fabs(l[i * 2 + 1])) * 255;
+	int i0 = 0;
+	int i1 = n;
+	if ((peak[0].num >= n) && (peak[1].num >= n))
+		find_update_peak_range(peak[0], peak[1], i0, i1, n);
+	peak[0].resize(n);
+	peak[1].resize(n);
+	//msg_write(format("  %d %d", i0, i1));
+	for (int i=i0;i<i1;i++){
+		peak[0][i] = max(fabs(r[i * 2]), fabs(r[i * 2 + 1])) * 254;
+		peak[1][i] = max(fabs(l[i * 2]), fabs(l[i * 2 + 1])) * 254;
 	}
 
 	// higher levels
 	int level = 2;
 	while (n > 4){
 		n /= 2;
+		i0 /= 2;
+		i1 = min((i1 + 1) / 2, n);
 		if (peak.num < level + 2)
 			peak.resize(level + 2);
-		if (peak[level    ].num < n)
-			peak[level    ].resize(n);
-		if (peak[level + 1].num < n)
-			peak[level + 1].resize(n);
-		for (int i=0;i<n;i++){
+		peak[level    ].resize(n);
+		peak[level + 1].resize(n);
+		for (int i=i0;i<i1;i++){
 			peak[level    ][i] = shrink((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
 			peak[level + 1][i] = shrink((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
 		}

@@ -26,6 +26,7 @@ private:
 	Range range;
 	int level_no;
 	BufferBox box;
+	int index;
 };
 
 #endif /* ACTIONTRACKEDITBUFFER_H_ */

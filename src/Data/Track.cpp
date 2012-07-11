@@ -237,7 +237,13 @@ BufferBox Track::GetBuffers(int level_no, const Range &r)
 }
 
 void Track::UpdatePeaks()
-{}
+{
+	foreach(level, l)
+		foreach(l.buffer, b)
+			b.update_peaks();
+	foreach(sub, s)
+		s.UpdatePeaks();
+}
 
 Track *Track::AddEmptySubTrack(const Range &r, const string &name)
 {

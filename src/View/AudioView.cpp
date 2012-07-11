@@ -657,7 +657,7 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int he
 
 	int di = DetailSteps;
 	foreachi(t->level, lev, level_no){
-		if (level_no == t->root->cur_level)
+		if ((level_no == t->root->cur_level) || (!t->parent))
 			c->SetColor(col);
 		else
 			c->SetColor(ColorWave);

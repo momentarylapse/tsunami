@@ -274,7 +274,6 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 		}
 		tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-		t->UpdatePeaks();
 		msg_db_m("b",1);
 		int NumSubs = f->ReadInt();
 		for (int n=0;n<NumSubs;n++){
@@ -296,7 +295,6 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 			}
 			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-			s->UpdatePeaks();
 		}
 	}else if (ffv == 2){
 		int length = f->ReadInt();
@@ -317,7 +315,6 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 			}
 			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-			t->UpdatePeaks();
 			msg_db_m("b",1);
 			int NumSubs = f->ReadInt();
 			for (int n=0;n<NumSubs;n++){
@@ -339,7 +336,6 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 					buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 				}
 				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-				s->UpdatePeaks();
 			}
 		}
 	}else if ((ffv == 3) || (ffv == 5)){
@@ -371,7 +367,6 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 			}
 			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-			t->UpdatePeaks();
 			if (ffv == 3)
 				ReadFXListOld(f, t->fx);
 			else
@@ -396,7 +391,6 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 					sbuf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 				}
 				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-				s->UpdatePeaks();
 				if (ffv == 3)
 					ReadFXListOld(f, s->fx);
 			}

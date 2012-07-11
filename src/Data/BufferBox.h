@@ -42,7 +42,7 @@ public:
 
 	void get_16bit_buffer(Array<short> &data);
 
-	void invalidate_peaks();
+	void invalidate_peaks(const Range &r);
 	void update_peaks();
 };
 

@@ -12,9 +12,7 @@
 ActionManager::ActionManager(Data *_data)
 {
 	data = _data;
-	cur_pos = 0;
-	save_pos = 0;
-	cur_level = 0;
+	Reset();
 }
 
 ActionManager::~ActionManager()
@@ -29,6 +27,8 @@ void ActionManager::Reset()
 	action.clear();
 	cur_pos = 0;
 	save_pos = 0;
+	cur_level = 0;
+	enabled = true;
 }
 
 
@@ -49,13 +49,18 @@ void ActionManager::add(Action *a)
 void *ActionManager::Execute(Action *a)
 {
 	add(a);
-	return a->execute_and_notify(data);
+	if (enabled)
+		return a->execute_and_notify(data);
+	else
+		return a->execute(data);
 }
 
 
 
 void ActionManager::Undo()
 {
+	if (!enabled)
+		return;
 	if (Undoable())
 		action[-- cur_pos]->undo_and_notify(data);
 }
@@ -64,6 +69,8 @@ void ActionManager::Undo()
 
 void ActionManager::Redo()
 {
+	if (!enabled)
+		return;
 	if (Redoable())
 		action[cur_pos ++]->redo_and_notify(data);
 }
@@ -93,6 +100,12 @@ bool ActionManager::IsSave()
 {
 	return (cur_pos == save_pos);
 }
+
+void ActionManager::Enable(bool _enabled)
+{
+	enabled = _enabled;
+}
+
 
 
 

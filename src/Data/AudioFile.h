@@ -46,6 +46,9 @@ public:
 	void UnselectAllSubs();
 	void AddTag(const string &key, const string &value);
 
+	virtual void PostActionUpdate();
+	void UpdatePeaks();
+
 	void SetCurSub(Track *s);
 	void SetCurTrack(Track *t);
 

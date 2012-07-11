@@ -105,6 +105,8 @@ void BufferBox::swap_value(BufferBox &b)
 	// buffer
 	float_array_swap_values(r, b.r);
 	float_array_swap_values(l, b.l);
+	peak.clear();
+	b.peak.clear();
 }
 
 void BufferBox::scale(float volume)
@@ -140,24 +142,25 @@ void BufferBox::add(const BufferBox &b, int offset, float volume)
 	}
 }
 
-void BufferBox::set(const BufferBox &b, int offset, float volume)
+void BufferBox::set(const BufferBox &b, int _offset, float volume)
 {
 	// relative to b
-	int i0 = max(0, -offset);
-	int i1 = min(b.r.num, r.num - offset);
+	int i0 = max(0, -_offset);
+	int i1 = min(b.r.num, r.num - _offset);
 	if (i1 <= i0)
 		return;
 
 	// set buffers
 	if (volume == 1.0f){
-		memcpy(&r[i0 + offset], (float*)b.r.data + i0, sizeof(float) * (i1 - i0));
-		memcpy(&l[i0 + offset], (float*)b.l.data + i0, sizeof(float) * (i1 - i0));
+		memcpy(&r[i0 + _offset], (float*)b.r.data + i0, sizeof(float) * (i1 - i0));
+		memcpy(&l[i0 + _offset], (float*)b.l.data + i0, sizeof(float) * (i1 - i0));
 	}else{
 		for (int i=i0;i<i1;i++){
-			r[i + offset] = b.r[i] * volume;
-			l[i + offset] = b.l[i] * volume;
+			r[i + _offset] = b.r[i] * volume;
+			l[i + _offset] = b.l[i] * volume;
 		}
 	}
+	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
 void BufferBox::set_as_ref(const BufferBox &b, int _offset, int _length)

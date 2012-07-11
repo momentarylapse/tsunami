@@ -189,10 +189,10 @@ void DynamicArray::clear()
 	if (allocated > 0){
 //		printf("        ~   %p %d  %d\n", data, element_size, num);
 		free(data);
-		data = NULL;
-		allocated = 0;
-		num = 0;
 	}
+	data = NULL;
+	allocated = 0;
+	num = 0;
 }
 
 void DynamicArray::delete_single(int index)

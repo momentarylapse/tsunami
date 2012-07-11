@@ -14,8 +14,10 @@
 class ActionAudioDeleteSelection : public ActionGroup
 {
 public:
-	ActionAudioDeleteSelection(AudioFile *a);
+	ActionAudioDeleteSelection(AudioFile *a, bool all_levels);
 	virtual ~ActionAudioDeleteSelection();
+
+	void DeleteBuffersFromTrackLevel(AudioFile *a, Track &t, TrackLevel &l, int level_no);
 };
 
 #endif /* ACTIONAUDIODELETESELECTION_H_ */

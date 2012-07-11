@@ -358,7 +358,7 @@ void AudioFile::DeleteCurrentTrack()
 void AudioFile::DeleteSelection(bool all_levels)
 {
 	if (!selection.empty())
-		Execute(new ActionAudioDeleteSelection(this));
+		Execute(new ActionAudioDeleteSelection(this, all_levels));
 }
 
 Track *AudioFile::get_track(int track_no, int sub_no)

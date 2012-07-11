@@ -15,6 +15,8 @@ int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
 int flac_read_samples;
 Track *flac_track;
 
+#include "../Action/Track/ActionTrackEditBuffer.h"
+
 
 FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
 {
@@ -29,13 +31,16 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	}
 
 	// read decoded PCM samples
-	BufferBox buf = flac_track->GetBuffers(0, Range(flac_read_samples, frame->header.blocksize));
+	Range range = Range(flac_read_samples, frame->header.blocksize);
+	BufferBox buf = flac_track->GetBuffers(0, range);
+	Action *a = new ActionTrackEditBuffer(flac_track, 0, range);
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
 			if (j == 0)
 				buf.r[i] = buffer[j][i] / 32768.0f;
 			else
 				buf.l[i] = buffer[j][i] / 32768.0f;
+	flac_track->root->Execute(a);
 
 	flac_read_samples += frame->header.blocksize;
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
@@ -79,6 +84,7 @@ void FormatFlac::LoadTrack(Track *t, const string & filename)
 {
 	msg_db_r("load_flac_file", 1);
 	tsunami->progress->Set(_("lade flac"), 0);
+	t->root->action_manager->BeginActionGroup();
 	bool ok = true;
 
 	flac_file_size = 1000000000;
@@ -120,6 +126,7 @@ void FormatFlac::LoadTrack(Track *t, const string & filename)
 	int channels = flac_channels;
 	int freq = flac_freq;
 	t->root->sample_rate = freq;
+	t->root->action_manager->EndActionGroup();
 
 	msg_db_l(1);
 }

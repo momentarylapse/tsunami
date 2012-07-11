@@ -17,8 +17,8 @@ public:
 	ActionTrack__AbsorbBufferBox(Track *t, int _level_no, int _dest, int _src);
 	virtual ~ActionTrack__AbsorbBufferBox();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int track_no, sub_no;

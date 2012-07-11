@@ -17,9 +17,9 @@ public:
 	ActionTrackEditBuffer(Track *t, int _level_no, Range _range);
 	virtual ~ActionTrackEditBuffer();
 
-	void *execute(Data *d);
-	void undo(Data *d);
-	void redo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
+	virtual void redo(Data *d);
 
 private:
 	int track_no, sub_no;

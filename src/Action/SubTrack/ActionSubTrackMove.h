@@ -17,13 +17,13 @@ public:
 	ActionSubTrackMove(AudioFile *a);
 	virtual ~ActionSubTrackMove();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 	// continuous editing
-	void abort(Data *d);
-	void abort_and_notify(Data *d);
-	void set_param_and_notify(Data *d, int _param);
+	virtual void abort(Data *d);
+	virtual void abort_and_notify(Data *d);
+	virtual void set_param_and_notify(Data *d, int _param);
 
 private:
 	struct SubSaveData{

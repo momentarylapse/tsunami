@@ -17,8 +17,8 @@ public:
 	ActionAudio__DeleteTrack(int _index);
 	virtual ~ActionAudio__DeleteTrack();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int index;

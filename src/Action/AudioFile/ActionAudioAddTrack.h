@@ -16,8 +16,8 @@ public:
 	ActionAudioAddTrack(int _index, int _type);
 	virtual ~ActionAudioAddTrack();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int index, type;

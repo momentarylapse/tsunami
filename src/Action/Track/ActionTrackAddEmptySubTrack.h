@@ -17,8 +17,8 @@ public:
 	ActionTrackAddEmptySubTrack(int _track_no, const Range &_range, const string &_name);
 	virtual ~ActionTrackAddEmptySubTrack();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int track_no;

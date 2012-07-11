@@ -17,8 +17,8 @@ public:
 	ActionTrack__AddBufferBox(Track *t, int _level_no, int index, Range r);
 	virtual ~ActionTrack__AddBufferBox();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int track_no, sub_no;

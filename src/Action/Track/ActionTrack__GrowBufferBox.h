@@ -17,8 +17,8 @@ public:
 	ActionTrack__GrowBufferBox(Track *t, int _level_no, int _index, int _new_length);
 	virtual ~ActionTrack__GrowBufferBox();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int track_no, sub_no, index;

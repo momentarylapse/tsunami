@@ -19,9 +19,9 @@ public:
 	ActionGroup();
 	virtual ~ActionGroup();
 
-	void *execute(Data *d);
-	void undo(Data *d);
-	void redo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
+	virtual void redo(Data *d);
 
 protected:
 	void AddSubAction(Action *a, Data *d);

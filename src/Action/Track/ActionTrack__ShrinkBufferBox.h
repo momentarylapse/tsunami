@@ -17,8 +17,8 @@ public:
 	ActionTrack__ShrinkBufferBox(Track *t, int _level_no, int _index, int _length);
 	virtual ~ActionTrack__ShrinkBufferBox();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int track_no, sub_no;

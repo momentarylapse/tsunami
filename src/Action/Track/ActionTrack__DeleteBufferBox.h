@@ -17,8 +17,8 @@ public:
 	ActionTrack__DeleteBufferBox(Track *t, int level_no, int _index);
 	virtual ~ActionTrack__DeleteBufferBox();
 
-	void *execute(Data *d);
-	void undo(Data *d);
+	virtual void *execute(Data *d);
+	virtual void undo(Data *d);
 
 private:
 	int track_no, sub_no;

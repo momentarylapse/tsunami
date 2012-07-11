@@ -14,6 +14,7 @@
 #include "Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "Action/AudioFile/ActionAudioDeleteTrack.h"
 #include "Action/AudioFile/ActionAudioAddLevel.h"
+#include "Action/SubTrack/ActionSubTrackInsert.h"
 
 #include "Plugins/FastFourierTransform.h"
 
@@ -334,6 +335,10 @@ void Tsunami::OnPaste()
 
 void Tsunami::OnInsertAdded()
 {
+	foreachi(cur_audio->track, t, ti)
+		foreachbi(t.sub, s, si)
+			if (s.is_selected)
+				cur_audio->Execute(new ActionSubTrackInsert(cur_audio, ti, si, cur_audio->cur_level));
 }
 
 void Tsunami::OnRecord()

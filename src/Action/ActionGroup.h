@@ -12,19 +12,23 @@
 #include "../Data/Data.h"
 
 class Data;
+class ActionManager;
 
 class ActionGroup: public Action
 {
+	friend class ActionManager;
 public:
 	ActionGroup();
 	virtual ~ActionGroup();
+
+	virtual string name(){	return "-group-";	}
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 	virtual void redo(Data *d);
 
 protected:
-	void AddSubAction(Action *a, Data *d);
+	void *AddSubAction(Action *a, Data *d);
 	virtual void *execute_return(Data *d);
 
 private:

@@ -7,11 +7,14 @@
 
 #include "ActionManager.h"
 #include "Action.h"
+#include "ActionGroup.h"
 #include "../Data/Data.h"
+#include <assert.h>
 
 ActionManager::ActionManager(Data *_data)
 {
 	data = _data;
+	cur_group = NULL;
 	Reset();
 }
 
@@ -29,6 +32,10 @@ void ActionManager::Reset()
 	save_pos = 0;
 	cur_level = 0;
 	enabled = true;
+	cur_group_level = 0;
+	if (cur_group)
+		delete(cur_group);
+	cur_group = NULL;
 }
 
 
@@ -49,6 +56,8 @@ void ActionManager::add(Action *a)
 void *ActionManager::Execute(Action *a)
 {
 	if (enabled){
+		if (cur_group)
+			return cur_group->AddSubAction(a, data);
 		add(a);
 		return a->execute_and_notify(data);
 	}else
@@ -107,6 +116,23 @@ void ActionManager::Enable(bool _enabled)
 }
 
 
+void ActionManager::BeginActionGroup()
+{
+	if (!cur_group){
+		cur_group = new ActionGroup;
+	}
+	cur_group_level ++;
+}
 
+void ActionManager::EndActionGroup()
+{
+	cur_group_level --;
+	assert(cur_group_level >= 0);
 
+	if (cur_group_level == 0){
+		ActionGroup *g = cur_group;
+		cur_group = NULL;
+		Execute(g);
+	}
+}
 

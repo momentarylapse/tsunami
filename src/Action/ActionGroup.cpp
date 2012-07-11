@@ -18,10 +18,10 @@ ActionGroup::~ActionGroup()
 	action.clear();
 }
 
-void ActionGroup::AddSubAction(Action *a, Data *d)
+void *ActionGroup::AddSubAction(Action *a, Data *d)
 {
 	action.add(a);
-	a->execute(d);
+	return a->execute(d);
 }
 
 // to be overwritten by subclasses

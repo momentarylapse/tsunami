@@ -148,6 +148,7 @@ static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 void FormatFlac::SaveAudio(AudioFile *a, const string & filename)
 {
+	ExportAudioAsTrack(a, filename);
 }
 
 

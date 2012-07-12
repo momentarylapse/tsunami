@@ -137,6 +137,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 
 void FormatWave::SaveAudio(AudioFile *a, const string & filename)
 {
+	ExportAudioAsTrack(a, filename);
 }
 
 

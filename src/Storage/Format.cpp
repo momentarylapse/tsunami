@@ -6,6 +6,7 @@
  */
 
 #include "Format.h"
+#include "../Tsunami.h"
 
 Format::Format(const string &_extension, int _flags)
 {
@@ -32,4 +33,11 @@ bool Format::CanHandle(const string & _extension)
 {
 	return (extension == _extension);
 }
+
+void Format::ExportAudioAsTrack(AudioFile* a, const string& filename)
+{
+	BufferBox buf = tsunami->renderer->RenderAudioFile(a, a->GetRange());
+	SaveBuffer(a, &buf, filename);
+}
+
 

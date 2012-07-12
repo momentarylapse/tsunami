@@ -19,6 +19,7 @@ public:
 	bool CanHandle(const string &_extension);
 
 	void ImportData(Track *t, void *data, int channels, int bits, int samples, int offset);
+	void ExportAudioAsTrack(AudioFile *a, const string &filename);
 
 	virtual void LoadTrack(Track *t, const string &filename) = 0;
 	virtual void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename) = 0;

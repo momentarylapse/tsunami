@@ -32,6 +32,7 @@ FormatOgg::~FormatOgg()
 
 void FormatOgg::SaveAudio(AudioFile *a, const string & filename)
 {
+	ExportAudioAsTrack(a, filename);
 }
 
 

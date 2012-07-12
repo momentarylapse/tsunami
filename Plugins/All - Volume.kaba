@@ -1,5 +1,5 @@
-// Image = HuiImageZoomIn
-// Deutsch = Lautstärke
+// Image = hui:zoom-in
+// Title[Deutsch] = Lautstärke
 
 #include "api.kaba"
 

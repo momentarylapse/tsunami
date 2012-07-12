@@ -1,5 +1,5 @@
-// Image = HuiImageExecute
-// Deutsch = Sinus Generator
+// Image = hui:add
+// Title[Deutsch] = Sinus Generator
 
 #include "api.kaba"
 

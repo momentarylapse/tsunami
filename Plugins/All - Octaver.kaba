@@ -1,3 +1,5 @@
+// Image = hui:bottom
+// Title[Deutsch] = Oktavieren
 #include "api.kaba"
 
 window dlg

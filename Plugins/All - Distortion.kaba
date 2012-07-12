@@ -1,4 +1,5 @@
-// German = Verzerrer
+// Image = hui:properies
+// Title[Deutsch] = Verzerrer
 #include "api.kaba"
 
 int num_x

@@ -1,5 +1,4 @@
-// Image = HuiImageZoomIn
-// Deutsch = Pitch Shift
+// Title[Deutsch] = Pitch Shift (chunk)
 
 #include "api.kaba"
 

@@ -1,5 +1,5 @@
-// Image = HuiImageZoomIn
-// Deutsch = Ausblenden
+// Image = hui:zoom-out
+// Title[Deutsch] = Ausblenden
 
 #include "api.kaba"
 

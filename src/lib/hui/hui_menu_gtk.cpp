@@ -222,12 +222,16 @@ sHuiImage *get_image(const string &image)
 
 void *get_gtk_image(const string &image, bool large)
 {
+	if (image == "")
+		return NULL;
 	if (image.find("hui:") == 0){
 		// internal
 		return gtk_image_new_from_stock(get_stock_id(image), large ? GTK_ICON_SIZE_LARGE_TOOLBAR : GTK_ICON_SIZE_MENU);
 	}else{
 		// file
 		sHuiImage *img = get_image(image);
+		if (!img)
+			return NULL;
 		// absolute path?
 		if ((img->filename[0] == '/') || (img->filename[1] == ':'))
 			return gtk_image_new_from_file(sys_str_f(img->filename));
@@ -260,7 +264,8 @@ void CHuiMenu::AddItemImage(const string &name, const string &image, const strin
 	
 	i->widget = gtk_image_menu_item_new_with_label(get_lang_sys(id, name, false));
 	GtkWidget *im = (GtkWidget*)get_gtk_image(image, false);
-	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(i->widget), im);
+	if (im)
+		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(i->widget), im);
 	gtk_menu_shell_append(GTK_MENU_SHELL(g_menu), i->widget);
 	gtk_widget_show(i->widget);
 	g_signal_connect(G_OBJECT(i->widget), "activate", G_CALLBACK(OnGtkMenuClick), this);

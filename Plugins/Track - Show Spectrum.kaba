@@ -1,3 +1,5 @@
+// Image = hui:find
+// Title[Deutsch] = Spektrum zeigen
 #include "api.kaba"
 
 const int N = 1024

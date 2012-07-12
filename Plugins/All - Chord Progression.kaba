@@ -1,5 +1,5 @@
-// Image = HuiImageExecute
-// Deutsch = Akkord Generator
+// Image = hui:add
+// Title[Deutsch] = Akkordfolge
 
 #include "api.kaba"
 

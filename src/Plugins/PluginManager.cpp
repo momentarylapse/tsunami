@@ -153,8 +153,19 @@ void PluginManager::OnMenuExecutePlugin()
 {
 	int n = s2i(HuiGetEvent()->id.substr(strlen("execute_plugin_"), -1));
 
-	if ((n >= 0) && (n <PluginFile.num))
-		ExecutePlugin(HuiAppDirectoryStatic + "Plugins/" + PluginFile[n]);
+	if ((n >= 0) && (n < plugin_file.num))
+		ExecutePlugin(HuiAppDirectoryStatic + "Plugins/" + plugin_file[n].filename);
+}
+
+void get_plugin_file_data(PluginManager::PluginFile &pf)
+{
+	pf.image = "";
+	SilentFiles = true;
+	string content = FileRead(HuiAppDirectoryStatic + "Plugins/" + pf.filename);
+	int p = content.find("// Image = hui:");
+	if (p >= 0)
+		pf.image = content.substr(p + 11, content.find("\n") - p - 11);
+	SilentFiles = false;
 }
 
 void PluginManager::AddPluginsToMenu()
@@ -167,50 +178,53 @@ void PluginManager::AddPluginsToMenu()
 	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
 	foreach(list, e)
 		if (e.name != "api.kaba"){
-			PluginFile.add(e.name);
+			PluginFile pf;
+			pf.filename = e.name;
+			get_plugin_file_data(pf);
+			plugin_file.add(pf);
 		}
 
 	// "All - "..
 	int n = 0;
-	for (int i=0;i<PluginFile.num;i++)
-		if (PluginFile[i].find("All - ") == 0){
+	foreachi(plugin_file, pf, i)
+		if (pf.filename.find("All - ") == 0){
 			if (n == 0){
 				m->AddSeparator();
 				m->AddItem(_("Auf Audiopuffer"), "plugin_on_file");
 				m->EnableItem("plugin_on_file", false);
 			}
-			m->AddItem(PluginFile[i].substr(6, PluginFile[i].num - 11), format("execute_plugin_%d", i));
+			m->AddItemImage(pf.filename.substr(6, -6), pf.image, format("execute_plugin_%d", i));
 			n ++;
 		}
 
 	// "Track - "..
 	n = 0;
-	for (int i=0;i<PluginFile.num;i++)
-		if (PluginFile[i].find("Track - ") == 0){
+	foreachi(plugin_file, pf, i)
+		if (pf.filename.find("Track - ") == 0){
 			if (n == 0){
 				m->AddSeparator();
 				m->AddItem(_("Auf einzelne Spur"), "plugin_on_track");
 				m->EnableItem("plugin_on_track", false);
 			}
-			m->AddItem(PluginFile[i].substr(8, PluginFile[i].num - 13), format("execute_plugin_%d", i));
+			m->AddItemImage(pf.filename.substr(8, -6), pf.image, format("execute_plugin_%d", i));
 			n ++;
 		}
 
 	// rest
 	n = 0;
-	for (int i=0;i<PluginFile.num;i++)
-		if ((PluginFile[i].find("All - ") != 0) && (PluginFile[i].find("Track - ") != 0) && (PluginFile[i].find("Effect - ") != 0)){
+	foreachi(plugin_file, pf, i)
+		if ((pf.filename.find("All - ") != 0) && (pf.filename.find("Track - ") != 0) && (pf.filename.find("Effect - ") != 0)){
 			if (n == 0){
 				m->AddSeparator();
 				m->AddItem(_("Sonstige"), "plugin_other");
 				m->EnableItem("plugin_other", false);
 			}
-			m->AddItem(PluginFile[i].substr(0, PluginFile[i].num - 5), format("execute_plugin_%d", i));
+			m->AddItemImage(pf.filename.substr(0, -6), pf.image, format("execute_plugin_%d", i));
 			n ++;
 		}
 
 	// Events
-	for (int i=0;i<PluginFile.num;i++)
+	for (int i=0;i<plugin_file.num;i++)
 		tsunami->EventM(format("execute_plugin_%d", i), this, (void(HuiEventHandler::*)())&PluginManager::OnMenuExecutePlugin);
 	msg_db_l(2);
 }

@@ -1,5 +1,5 @@
-// Image = HuiImageBack
-// Deutsch = Kanäle L <- R
+// Image = hui:back
+// Title[Deutsch] = Kanäle L <- R
 #include "api.kaba"
 
 

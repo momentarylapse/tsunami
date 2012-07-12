@@ -1,5 +1,5 @@
-// Image = HuiImageZoomIn
-// Deutsch = Equalizer
+// Image = hui:properties
+// Title[Deutsch] = Equalizer (31)
 
 #include "api.kaba"
 

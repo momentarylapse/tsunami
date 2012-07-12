@@ -1,5 +1,5 @@
-// Image = HuiImageExecute
-// Deutsch = Metronom
+// Image = hui:add
+// Title[Deutsch] = Metronom
 
 #include "api.kaba"
 

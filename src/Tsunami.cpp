@@ -49,7 +49,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("delete", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDelete);
 	HuiAddCommandM("export_selection", "", KEY_X + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnExport);
 	HuiAddCommandM("undo", "hui:undo", KEY_Z + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnUndo);
-	HuiAddCommandM("redo", "hui:redo", KEY_Z + KEY_SHIFT + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnRedo);
+	HuiAddCommandM("redo", "hui:redo", KEY_Y + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnRedo);
 	HuiAddCommandM("add_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTrack);
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTimeTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDeleteTrack);

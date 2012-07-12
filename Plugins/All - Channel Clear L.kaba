@@ -1,5 +1,5 @@
-// Image = HuiImageForward
-// Deutsch = Kanal Löschen L
+// Image = hui:clear
+// Title[Deutsch] = Kanal Löschen L
 #include "api.kaba"
 
 void ProcessTrack(BufferBox buf, Track t, int level)

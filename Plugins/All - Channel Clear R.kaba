@@ -1,5 +1,5 @@
-// Image = HuiImageForward
-// Deutsch = Kanal Löschen R
+// Image = hui:clear
+// Title[Deutsch] = Kanal Löschen R
 #include "api.kaba"
 
 

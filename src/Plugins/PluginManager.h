@@ -73,8 +73,14 @@ public:
 	};
 
 
+	struct PluginFile
+	{
+		string filename;
+		string image;
+		Array<string> title;
+	};
 
-	Array<string> PluginFile;
+	Array<PluginFile> plugin_file;
 	bool ErrorApplyingEffect;
 
 	Array<string> PluginFavoriteName;

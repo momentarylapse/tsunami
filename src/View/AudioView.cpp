@@ -84,7 +84,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2)
 	HuiAddCommandM("zoom_out", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnZoomOut);
 	HuiAddCommandM("jump_other_file", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnJumpOtherFile);
 
-	ForceRedraw();
+	//ForceRedraw();
 	UpdateMenu();
 }
 

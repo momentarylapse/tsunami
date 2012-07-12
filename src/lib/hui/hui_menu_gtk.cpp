@@ -242,19 +242,24 @@ void *get_gtk_image(const string &image, bool large)
 
 void *get_gtk_image_pixbuf(const string &image)
 {
-#ifdef _X_USE_IMAGE_
 	if (image.find("hui:") == 0){
 		// internal
-		return gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_stock_id(image), 24, (GtkIconLookupFlags)0, NULL);
+		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_stock_id(image), 24, (GtkIconLookupFlags)0, NULL);
+		if (pb){
+			GdkPixbuf *r = gdk_pixbuf_copy(pb);
+			g_object_unref(pb);
+			return r;
+		}
 	}else{
 		// file
 		sHuiImage *img = get_image(image);
 		if (img->type == 0){
 		}else if (img->type == 1){
+#ifdef _X_USE_IMAGE_
 			return gdk_pixbuf_new_from_data((guchar*)img->image.data.data, GDK_COLORSPACE_RGB, true, 8, img->image.width, img->image.height, img->image.width * 4, NULL, NULL);
+#endif
 		}
 	}
-#endif
 	return NULL;
 }
 

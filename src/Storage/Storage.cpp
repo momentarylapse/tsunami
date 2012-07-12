@@ -58,25 +58,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			a->action_manager->Enable(true);
 			tsunami->progress->Set("peaks", 1);
 			a->UpdatePeaks();
-/*
-	//-----------------------------------------  import wave / ogg / flac
-	if ((ext == "wav") or (ext == "ogg") or (ext == "flac")){
-		int channels, bits, samples, freq;
-		char *data = NULL;
-		if (load_audio_file(filename, channels, bits, samples, freq, data)){
-			ProgressStatus(_("importiere Daten"), perc_import);
-			a->sample_rate = (int)freq;
-			Track *t = AddEmptyTrack(a);
-			ImportData(t, data, channels, bits, samples);
-			ProgressStatus(_("erzeuge Peaks"), perc_peaks);
-			UpdatePeaks(t);
-			//strcat(a->filename, ".nami");
-			delete[](data);
-		}
-	//-----------------------------------------  load native format
-	}else{ //if (ext == "nami")
-		format[0]->LoadAudio(a, filename);
-	}*/
+
 			tsunami->progress->End();
 			tsunami->ForceRedraw();
 			if (a->track.num > 0)

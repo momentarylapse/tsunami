@@ -170,13 +170,13 @@ void CaptureDialog::Insert()
 
 	// insert data
 	Range r = Range(i0, length);
+	audio->action_manager->BeginActionGroup();
 	BufferBox buf = t->GetBuffers(audio->cur_level, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, audio->cur_level, r);
 	buf.set(tsunami->input->CaptureBuf, 0, 1.0f);
 	audio->Execute(a);
+	audio->action_manager->EndActionGroup();
 	tsunami->input->CaptureBuf.clear();
-	t->UpdatePeaks();
-	//cur_audio->history->ResetHistory();
 	msg_db_l(1);
 }
 

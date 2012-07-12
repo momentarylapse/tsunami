@@ -1,0 +1,211 @@
+// Image = hui:zoom-in
+// Title[Deutsch] = Hüllkurve
+
+#include "api.kaba"
+
+
+
+const int MIN_VOL = 0-45
+const int MAX_VOL = 45
+
+class PluginData
+	complex curve[]
+
+PluginData data
+
+
+window dlg
+int MouseOver, Selected
+
+void fill_inter(FloatInterpolator fi)
+	fi.set_type("cubic-spline-notang")
+	fi.add(data.curve[0].y, 0)
+	for int i, 1, data.curve.num
+		fi.add(data.curve[i].y, data.curve[i].x - data.curve[i - 1].x)
+
+
+void hull(float b[])
+	
+	FloatInterpolator fi
+	fill_inter(fi)
+	
+	// hull curve
+	for int i, 1, b.num
+		float param = i2f(i) / b.num
+		float db = fi.get(param)
+		b[i] = b[i] * pow(10, db / 20)
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	hull(buf.r)
+	hull(buf.l)
+
+void ResetData()
+	data.curve.clear()
+	data.curve.add(complex(0, 0))
+	data.curve.add(complex(1, 0))
+	MouseOver = -1
+	Selected = -1
+
+void DataToDialog()
+	dlg.Redraw("drawing")
+
+float w, h
+
+complex project(complex z)
+	return complex(	z.x * (w - 1),
+			h * (MAX_VOL - z.y) / (MAX_VOL - MIN_VOL))
+
+complex unproject(complex z)
+	return complex(	z.x / (w - 1),
+			MAX_VOL - z.y / h * (MAX_VOL - MIN_VOL))
+
+
+void Draw()
+	context c = dlg.BeginDraw("drawing")
+	c.SetLineWidth(0.7)
+	
+	// background
+	c.SetColor(White)
+	c.DrawRect(0, 0, c.width, c.height)
+		
+	// frame
+	w = c.width
+	h = c.height
+		
+	// scale
+	c.SetLineWidth(0.9)
+	c.SetFontSize(7)
+	for int i, 0, 10
+		float fx = i2f(i) * 0.1 * w
+		c.SetColor(color(1, 0.8, 0.8, 0.8))
+		c.DrawLine(fx, 0, fx, h)
+		c.SetColor(color(1, 0.4, 0.4, 0.4))
+		c.DrawStr(fx, 5, i2s(i * 10) + " %")
+	float vol = i2f(f2i(MIN_VOL / 10) * 10)
+	while vol <= MAX_VOL
+		c.SetColor(color(1, 0.8, 0.8, 0.8))
+		float vy = project(complex(0, vol)).y
+		c.DrawLine(0, vy, c.width, vy)
+		c.SetColor(color(1, 0.4, 0.4, 0.4))
+		c.DrawStr(2, vy, f2s(vol,0) + " db")
+		vol += 10
+	
+	FloatInterpolator fi
+	fill_inter(fi)
+	
+	// curve + area below
+	float tt[], xx[], yy[]
+	tt = rangef(0, 1, 0.003)
+	yy = fi.get_list(tt)
+	yy *= -1
+	yy -= MIN_VOL
+	yy *= (h-1) / (MAX_VOL - MIN_VOL)
+	xx = tt
+	xx *= w
+	xx.add(w)
+	yy.add(h)
+	xx.add(0)
+	yy.add(h)
+	c.SetColor(color(0.3, 0.3, 0.3, 1))
+	c.DrawPolygon(xx, yy)
+	xx.resize(xx.num - 2)
+	yy.resize(yy.num - 2)
+	c.SetLineWidth(2)
+	c.SetColor(Black)
+	c.DrawLines(xx, yy)
+	
+	// points
+	for int i, 0, data.curve.num
+		complex p = project(data.curve[i])
+		c.SetColor(Black)
+		float radius = 3
+		if i == MouseOver
+			c.SetColor(Red)
+			radius = 4
+		else if i == Selected
+			c.SetColor(color(1, 0.7, 0, 0))
+		c.DrawCircle(p.x, p.y, radius)
+	c.End()
+
+// left button down -> select
+void OnLeftButtonDown()
+	Selected = MouseOver
+	dlg.Redraw("drawing")
+
+// left button up -> if moved to a neighbour -> remove point
+void OnLeftButtonUp()
+	if Selected >= 0
+		bool del = (data.curve[Selected] == data.curve[Selected - 1])
+		if Selected < data.curve.num - 1
+			del = del or (data.curve[Selected] == data.curve[Selected + 1])
+		if del
+			data.curve.remove(Selected)
+			Selected = -1
+			dlg.Redraw("drawing")
+
+// right button down -> new point
+void OnRightButtonDown()
+	int mx = HuiGetEvent().mouse_x
+	int my = HuiGetEvent().mouse_y
+	for int i, 1, data.curve.num
+		complex q = project(data.curve[i - 1])
+		complex p = project(data.curve[i])
+		if (mx > q.x) and (mx < p.x)
+			data.curve.insert(unproject(complex(mx, my)), i)
+			Selected = i
+			dlg.Redraw("drawing")
+			i = data.curve.num
+			break
+
+void OnMouseMove()
+	int mx = HuiGetEvent().mouse_x
+	int my = HuiGetEvent().mouse_y
+	// move
+	if HuiGetEvent().button_l and (Selected >= 0)
+		data.curve[Selected] = unproject(complex(mx, my))
+		float xmin = 0
+		float xmax = 1
+		if Selected > 0
+			xmin = data.curve[Selected - 1].x
+		if Selected < data.curve.num - 1
+			xmax = data.curve[Selected + 1].x
+		data.curve[Selected].x = clamp(data.curve[Selected].x, xmin, xmax)
+		data.curve[Selected].y = clamp(data.curve[Selected].y, MIN_VOL, MAX_VOL)
+		if Selected == data.curve.num - 1
+			data.curve[Selected].x = 1
+		if Selected == 0
+			data.curve[Selected].x = 0
+	else
+	// mouse over?
+		MouseOver = -1
+		for int i, 0, data.curve.num
+			complex p = project(data.curve[i])
+			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+				MouseOver = i
+	dlg.Redraw("drawing")
+
+void Configure()
+	// dialog
+	dlg = HuiCreateSizableDialog("Hull Curve",600,400,MainWin,false)
+	dlg.AddControlTable("", 0, 0, 1, 4, "table")
+	dlg.SetTarget("table", 0)
+	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")
+	dlg.AddControlTable("!noexpandy", 0, 2, 2, 1, "table2")
+	dlg.SetTarget("table2", 0)
+	dlg.AddComboBox("linear\\log", 0, 0, 0, 0, "type")
+	dlg.AddCheckBox("show buffer", 1, 0, 0, 0, "preview")
+	dlg.Update()
+	
+	dlg.EventX("drawing", "hui:redraw", &Draw)
+	dlg.EventX("drawing", "hui:left-button-down", &OnLeftButtonDown)
+	dlg.EventX("drawing", "hui:left-button-up", &OnLeftButtonUp)
+	dlg.EventX("drawing", "hui:right-button-down", &OnRightButtonDown)
+	dlg.EventX("drawing", "hui:mouse-move", &OnMouseMove)
+
+	PutFavoriteBarSizable(dlg, "table", 0, 0)
+	PutCommandBarSizable(dlg, "table", 0, 3)
+	
+	DataToDialog()
+
+	HuiWaitTillWindowClosed(dlg)
+

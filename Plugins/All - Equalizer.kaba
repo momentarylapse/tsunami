@@ -12,7 +12,7 @@ const int MIN_VOL = 0-45
 const int MAX_VOL = 45
 
 class PluginData
-	complex curve[]
+	vector curve[]
 
 PluginData data
 
@@ -28,9 +28,9 @@ float fromfreq(float f)
 
 void fill_inter(FloatInterpolator fi)
 	fi.set_type("cubic-spline-notang")
-	fi.add(data.curve[0].y, 0)
+	fi.add3(data.curve[0].y, 0.0, exp(data.curve[0].z), 0.0)
 	for int i, 1, data.curve.num
-		fi.add(data.curve[i].y, log(data.curve[i].x / data.curve[i - 1].x))
+		fi.add3(data.curve[i].y, 0.0, exp(data.curve[i].z), log(data.curve[i].x / data.curve[i - 1].x))
 
 
 void equalize(float b[])
@@ -63,8 +63,8 @@ void ProcessTrack(BufferBox buf, Track t, int level)
 
 void ResetData()
 	data.curve.clear()
-	data.curve.add(complex(MIN_FREQ, 0))
-	data.curve.add(complex(MAX_FREQ, 0))
+	data.curve.add(vector(MIN_FREQ, 0, 0))
+	data.curve.add(vector(MAX_FREQ, 0, 0))
 	MouseOver = -1
 	Selected = -1
 
@@ -73,13 +73,13 @@ void DataToDialog()
 
 float w, h
 
-complex project(complex z)
-	return complex(	fromfreq(z.x) * (w - 1),
-			h * (MAX_VOL - z.y) / (MAX_VOL - MIN_VOL))
+vector project(vector z)
+	return vector(	fromfreq(z.x) * (w - 1),
+			h * (MAX_VOL - z.y) / (MAX_VOL - MIN_VOL), z.z)
 
-complex unproject(complex z)
-	return complex(	tofreq(z.x / (w - 1)),
-			MAX_VOL - z.y / h * (MAX_VOL - MIN_VOL))
+vector unproject(vector z)
+	return vector(	tofreq(z.x / (w - 1)),
+			MAX_VOL - z.y / h * (MAX_VOL - MIN_VOL), z.z)
 
 
 void Draw()
@@ -111,7 +111,7 @@ void Draw()
 	float vol = i2f(f2i(MIN_VOL / 10) * 10)
 	while vol <= MAX_VOL
 		c.SetColor(color(1, 0.8, 0.8, 0.8))
-		float vy = project(complex(MIN_FREQ, vol)).y
+		float vy = project(vector(MIN_FREQ, vol, 0)).y
 		c.DrawLine(0, vy, c.width, vy)
 		c.SetColor(color(1, 0.4, 0.4, 0.4))
 		c.DrawStr(2, vy, f2s(vol,0) + " db")
@@ -143,11 +143,12 @@ void Draw()
 	
 	// points
 	for int i, 0, data.curve.num
-		complex p = project(data.curve[i])
+		vector p = project(data.curve[i])
 		c.SetColor(Black)
 		float radius = 3
 		if i == MouseOver
 			c.SetColor(Red)
+			c.DrawStr(p.x, p.y - 20, f2s(p.z, 1))
 			radius = 4
 		else if i == Selected
 			c.SetColor(color(1, 0.7, 0, 0))
@@ -161,27 +162,36 @@ void OnLeftButtonDown()
 
 // left button up -> if moved to a neighbour -> remove point
 void OnLeftButtonUp()
-	if Selected >= 0
-		bool del = (data.curve[Selected] == data.curve[Selected - 1])
+	nil
+	/*if Selected >= 0
+		bool del = false//(data.curve[Selected] == data.curve[Selected - 1])
 		if Selected < data.curve.num - 1
 			del = del or (data.curve[Selected] == data.curve[Selected + 1])
 		if del
 			data.curve.remove(Selected)
 			Selected = -1
-			dlg.Redraw("drawing")
+			dlg.Redraw("drawing")*/
+
+void OnScroll()
+	if MouseOver >= 0
+		if HuiGetEvent().wheel > 0
+			data.curve[MouseOver].z += 0.1
+		else
+			data.curve[MouseOver].z -= 0.1
+		dlg.Redraw("drawing")
 
 // right button down -> new point
 void OnRightButtonDown()
 	int mx = HuiGetEvent().mouse_x
 	int my = HuiGetEvent().mouse_y
 	for int i, 1, data.curve.num
-		complex q = project(data.curve[i - 1])
-		complex p = project(data.curve[i])
+		vector q = project(data.curve[i - 1])
+		vector p = project(data.curve[i])
 		if (mx > q.x) and (mx < p.x)
-			data.curve.insert(unproject(complex(mx, my)), i)
+			data.curve.insert(unproject(vector(mx, my, 0)), i)
 			Selected = i
+			MouseOver = i
 			dlg.Redraw("drawing")
-			i = data.curve.num
 			break
 
 void OnMouseMove()
@@ -189,7 +199,7 @@ void OnMouseMove()
 	int my = HuiGetEvent().mouse_y
 	// move
 	if HuiGetEvent().button_l and (Selected >= 0)
-		data.curve[Selected] = unproject(complex(mx, my))
+		data.curve[Selected] = unproject(vector(mx, my, data.curve[Selected].z))
 		float xmin = MIN_FREQ
 		float xmax = MAX_FREQ
 		if Selected > 0
@@ -206,7 +216,7 @@ void OnMouseMove()
 	// mouse over?
 		MouseOver = -1
 		for int i, 0, data.curve.num
-			complex p = project(data.curve[i])
+			vector p = project(data.curve[i])
 			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 				MouseOver = i
 	dlg.Redraw("drawing")
@@ -224,6 +234,7 @@ void Configure()
 	dlg.EventX("drawing", "hui:left-button-up", &OnLeftButtonUp)
 	dlg.EventX("drawing", "hui:right-button-down", &OnRightButtonDown)
 	dlg.EventX("drawing", "hui:mouse-move", &OnMouseMove)
+	dlg.EventX("drawing", "hui:mouse-wheel", &OnScroll)
 
 	PutFavoriteBarSizable(dlg, "table", 0, 0)
 	PutCommandBarSizable(dlg, "table", 0, 2)

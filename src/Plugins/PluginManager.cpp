@@ -568,10 +568,8 @@ void PluginManager::ExportPluginData(Effect &fx)
 		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
 		if (t->Name == "PluginData"){
 			fx.param.resize(t->Element.num);
-			for (int j=0;j<t->Element.num;j++){
-				sClassElement *e = &t->Element[j];
-				try_write_element(&fx.param[j], e, cur_plugin->s->g_var[i]);
-			}
+			foreachi(t->Element, e, j)
+				try_write_element(&fx.param[j], &e, cur_plugin->s->g_var[i]);
 			break;
 		}
 	}
@@ -584,11 +582,10 @@ void PluginManager::ImportPluginData(Effect &fx)
 	for (int i=0;i<cur_plugin->s->pre_script->RootOfAllEvil.Var.num;i++){
 		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
 		if (t->Name == "PluginData"){
-			for (int j=0;j<t->Element.num;j++){
-				sClassElement *e = &t->Element[j];
-				for (int k=0;k<fx.param.num;k++)
-					if (string(e->Name) == fx.param[k].name)
-						try_read_element(fx.param[k], e, cur_plugin->s->g_var[i]);
+			foreach(t->Element, e){
+				foreach(fx.param, p)
+					if ((e.Name == p.name) && (e.Type->Name == p.type))
+						try_read_element(p, &e, cur_plugin->s->g_var[i]);
 			}
 			break;
 		}
@@ -606,10 +603,10 @@ void PluginManager::WritePluginDataToFile(const string &name)
 	f->WriteInt(0);
 	f->WriteComment("// Data");
 	f->WriteInt(fx.param.num);
-	for (int i=0;i<fx.param.num;i++){
-		f->WriteStr(fx.param[i].name);
-		f->WriteStr(fx.param[i].type);
-		f->WriteStr(fx.param[i].value);
+	foreach(fx.param, p){
+		f->WriteStr(p.name);
+		f->WriteStr(p.type);
+		f->WriteStr(p.value);
 	}
 	fx.param.clear();
 	f->WriteStr("#");
@@ -632,10 +629,10 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 	f->ReadComment();
 	int num = f->ReadInt();
 	fx.param.resize(num);
-	for (int i=0;i<num;i++){
-		fx.param[i].name = f->ReadStr();
-		fx.param[i].type = f->ReadStr();
-		fx.param[i].value = f->ReadStr();
+	foreach(fx.param, p){
+		p.name = f->ReadStr();
+		p.type = f->ReadStr();
+		p.value = f->ReadStr();
 	}
 	ImportPluginData(fx);
 	fx.param.clear();

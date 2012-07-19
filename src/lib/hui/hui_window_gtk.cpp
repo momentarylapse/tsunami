@@ -14,6 +14,10 @@
 //bool TestMenuID(CHuiMenu *menu, int id, message_function *mf);
 void add_key_to_buffer(HuiInputData *d, int key);
 
+#if GTK_MAJOR_VERSION == 2
+GtkWidget *gtk_box_new(GtkOrientation orientation, int spacing); // -> hui_window_control_gtk.cpp
+#endif
+
 
 unsigned int ignore_time = 0;
 
@@ -231,9 +235,11 @@ gboolean OnGtkWindowMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer
 	int mx, my, mod = 0;
 	if (win->gl_widget){
 		//msg_write("gl");
+#if GTK_MAJOR_VERSION >= 3
 		gdk_window_get_device_position(gtk_widget_get_window(win->gl_widget), event->device, &mx, &my, (GdkModifierType*)&mod);
-		// TODO GTK3
-		//gdk_window_get_pointer(win->gl_widget->window, &mx, &my, (GdkModifierType*)&mod);
+#else
+		gdk_window_get_pointer(win->gl_widget->window, &mx, &my, (GdkModifierType*)&mod);
+#endif
 		//mx = event->x;
 		//my = event->y;
 		/*win->mouse_offset_x = mx - event->x;

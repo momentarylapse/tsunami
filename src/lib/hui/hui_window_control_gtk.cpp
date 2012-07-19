@@ -33,6 +33,35 @@ enum{
 		g_object_get(G_OBJECT(table), "n-columns", columns, NULL);
 	}
 #endif
+
+	GtkWidget *gtk_scale_new_with_range(GtkOrientation orientation, double min, double max, double step)
+	{
+		if (orientation == GTK_ORIENTATION_VERTICAL)
+			return gtk_vscale_new_with_range(min, max, step);
+		else
+			return gtk_hscale_new_with_range(min, max, step);
+	}
+
+	void gtk_combo_box_text_remove_all(GtkComboBoxText *c)
+	{
+		GtkTreeModel *m = gtk_combo_box_get_model(GTK_COMBO_BOX(c));
+		int n = gtk_tree_model_iter_n_children(m, NULL);
+		for (int i=0;i<n;i++)
+			gtk_combo_box_text_remove(c, 0);
+	}
+
+	void gtk_combo_box_text_append(GtkComboBoxText *c, const char *id, const char *text)
+	{
+		gtk_combo_box_text_append_text(c, text);
+	}
+
+	GtkWidget *gtk_box_new(GtkOrientation orientation, int spacing)
+	{
+		if (orientation == GTK_ORIENTATION_VERTICAL)
+			return gtk_vbox_new(false, spacing);
+		else
+			return gtk_hbox_new(false, spacing);
+	}
 #endif
 
 HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int width, int height, const string &id, int type, GtkWidget *frame)

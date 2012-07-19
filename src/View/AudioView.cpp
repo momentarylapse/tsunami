@@ -776,7 +776,7 @@ void AudioView::DrawTrack(HuiDrawingContext *c, int x, int y, int width, int hei
 	//c->SetColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 	c->SetColor(ColorWaveCur);
 	c->SetFont("", -1, ((tsunami->cur_audio == a) && (track_no == a->cur_track)), (t->type == Track::TYPE_TIME));
-	c->DrawStr(x + 10, y + height / 2 - 10, t->GetNiceName());
+	c->DrawStr(x + 5, y + 5, t->GetNiceName());
 	c->SetFont("", -1, false, false);
 
 	DrawBuffer(	c, x,y,width,height,
@@ -872,6 +872,9 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 		c->DrawStr(x + width / 2 - 50, y + height / 2 - 10, _("keine Datei"));
 		return;
 	}
+	c->SetColor(ColorGrid);
+	foreach(a->track, t)
+		c->DrawLine(0, t.y, width, t.y);
 
 
 	// selection

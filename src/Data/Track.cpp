@@ -8,6 +8,7 @@
 #include "Track.h"
 #include "../Action/Track/ActionTrackCreateBuffers.h"
 #include "../Action/Track/ActionTrackAddEmptySubTrack.h"
+#include "../lib/hui/hui.h"
 
 
 
@@ -159,7 +160,9 @@ Range Track::GetRange()
 
 string Track::GetNiceName()
 {
-	return i2s(get_track_index(this) + 1) + ": " + name;
+	if (name.num > 0)
+		return name;
+	return _("namenlose Spur");
 }
 
 BufferBox Track::ReadBuffers(int level_no, const Range &r)

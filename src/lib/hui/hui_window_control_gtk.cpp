@@ -1105,6 +1105,31 @@ void HuiDrawingContext::DrawStr(float x, float y, const string &str)
 	//cairo_show_text(cr, str);
 }
 
+float HuiDrawingContext::GetStrWidth(const string &str)
+{
+	if (!cr)
+		return 0;
+	PangoLayout *layout = pango_cairo_create_layout(cr);
+	pango_layout_set_text(layout, (char*)str.data, str.num);//.c_str(), -1);
+	string f = cur_font;
+	if (cur_font_bold)
+		f += " Bold";
+	if (cur_font_italic)
+		f += " Italic";
+	f += " " + i2s(cur_font_size);
+	PangoFontDescription *desc = pango_font_description_from_string(f.c_str());
+	//PangoFontDescription *desc = pango_font_description_new();
+	//pango_font_description_set_family(desc, "Sans");//cur_font);
+	//pango_font_description_set_size(desc, 10);//cur_font_size);
+	pango_layout_set_font_description(layout, desc);
+	pango_font_description_free(desc);
+	int w, h;
+	pango_layout_get_size(layout, &w, &h);
+	g_object_unref(layout);
+
+	return (float)w / 1000.0f;
+}
+
 void HuiDrawingContext::DrawRect(float x, float y, float w, float h)
 {
 	if (!cr)

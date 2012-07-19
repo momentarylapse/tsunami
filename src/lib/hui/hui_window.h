@@ -134,6 +134,7 @@ class HuiDrawingContext
 	void _cdecl DrawRect(float x1, float y1, float w, float h);
 	void _cdecl DrawCircle(float x, float y, float radius);
 	void _cdecl DrawStr(float x, float y, const string &str);
+	float _cdecl GetStrWidth(const string &str);
 	void _cdecl DrawImage(float x, float y, const Image &image);
 	int width, height;
 };

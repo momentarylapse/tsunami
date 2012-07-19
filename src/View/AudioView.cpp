@@ -11,6 +11,9 @@
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
 
+const int FONT_SIZE_NO_FILE = 12;
+const int FONT_SIZE = 10;
+
 AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2) :
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
@@ -576,7 +579,7 @@ inline void draw_line_buffer(HuiDrawingContext *c, int width, int di, float view
 	// pixel position
 	// -> buffer position
 	float p0 = view_pos_rel / f;
-	for (int i=0;i<width-1;i+=di){
+	for (int i=0;i<width+di;i+=di){
 
 		float p = p0 + dpos * (float)i;
 		int ip = (int)p - offset;
@@ -601,7 +604,7 @@ inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view
 	// pixel position
 	// -> buffer position
 	float p0 = view_pos_rel;
-	for (int i=0;i<width-1;i+=di){
+	for (int i=0;i<width+di;i+=di){
 
 		float p = p0 + dpos * (float)i;
 		int ip = (int)(p - offset)/f;
@@ -622,7 +625,7 @@ inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view
 		tx[nl + i] = tx[nl - i - 1];
 		ty[nl + i] = y0 *2 - ty[nl - i - 1] - 1;
 	}
-	c->DrawPolygon(tx, ty, nl*2 -1);
+	c->DrawPolygon(tx, ty, nl*2);
 //	c->DrawLines(tx, ty, nl*2 -1);
 	//c->DrawLines(tx, ty2, nl -1);
 }
@@ -675,11 +678,6 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int he
 		}
 	}
 	msg_db_l(1);
-}
-
-int GetStrWidth(const string &s)
-{
-	return 80;
 }
 
 void AudioView::DrawSubFrame(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, AudioFile *a, const color &col, int delay)
@@ -766,18 +764,21 @@ void AudioView::DrawBarCollection(HuiDrawingContext *c, int x, int y, int width,
 	}
 }
 
+void DrawStrBg(HuiDrawingContext *c, float x, float y, const string &str, const color &fg, const color &bg)
+{
+	color bg2 = bg;
+	bg2.a = 0.6f;
+	c->SetColor(bg2);
+	c->DrawRect(x, y, c->GetStrWidth(str), FONT_SIZE * 1.5f);
+	c->SetColor(fg);
+	c->DrawStr(x, y, str);
+}
+
 void AudioView::DrawTrack(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no)
 {
 	msg_db_r("DrawTrack", 1);
 	t->x = x;
 	t->width = width;
-
-
-	//c->SetColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
-	c->SetColor(ColorWaveCur);
-	c->SetFont("", -1, ((tsunami->cur_audio == a) && (track_no == a->cur_track)), (t->type == Track::TYPE_TIME));
-	c->DrawStr(x + 5, y + 5, t->GetNiceName());
-	c->SetFont("", -1, false, false);
 
 	DrawBuffer(	c, x,y,width,height,
 				t,int(a->view_pos),a->view_zoom,col);
@@ -787,6 +788,14 @@ void AudioView::DrawTrack(HuiDrawingContext *c, int x, int y, int width, int hei
 
 	foreach(t->sub, s)
 		DrawSub(c, x, y, width, height, &s, a);
+
+	//c->SetColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
+//	c->SetColor(ColorWaveCur);
+	c->SetFont("", -1, ((tsunami->cur_audio == a) && (track_no == a->cur_track)), (t->type == Track::TYPE_TIME));
+//	c->DrawStr(x + 3, y + 3, t->GetNiceName());
+	DrawStrBg(c, x + 3, y + 3, t->GetNiceName(), ColorWaveCur, ColorBackgroundCurWave);
+	c->SetFont("", -1, false, false);
+
 	msg_db_l(1);
 }
 
@@ -868,7 +877,7 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 
 	if (!a->used){
 		c->SetColor((a == tsunami->cur_audio) ? ColorWaveCur : ColorWave);
-		c->SetFontSize(12);
+		c->SetFontSize(FONT_SIZE_NO_FILE);
 		c->DrawStr(x + width / 2 - 50, y + height / 2 - 10, _("keine Datei"));
 		return;
 	}
@@ -943,7 +952,7 @@ void AudioView::OnDraw()
 
 	HuiDrawingContext *c = tsunami->BeginDraw("area");
 	DrawingWidth = c->width;
-	c->SetFontSize(10);
+	c->SetFontSize(FONT_SIZE);
 	c->SetLineWidth(1.0f);
 	c->SetAntialiasing(false);
 	//c->SetColor(ColorWaveCur);

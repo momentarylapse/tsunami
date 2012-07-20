@@ -35,20 +35,17 @@ TrackDialog::~TrackDialog()
 void TrackDialog::OnName()
 {
 	track->name = GetString("");
-	//track->root->history->ChangeLater();
 }
 
 void TrackDialog::OnVolume()
 {
 	track->volume = volume_slider->Get();
-	//track->root->history->ChangeLater();
 }
 
 void TrackDialog::OnMute()
 {
 	track->muted = IsChecked("");
 	volume_slider->Enable(!track->muted);
-	//track->root->history->Change();
 }
 
 void TrackDialog::OnClose()

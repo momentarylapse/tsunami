@@ -53,18 +53,10 @@ void get_track_sub_index(Track *t, int &track_no, int &sub_no)
 
 AudioFile::AudioFile()
 {
-	//HistoryStructReset("AudioFile", this);
-
 	used = false;
 	volume = 1;
 	selection.clear();
 	cur_track = -1;
-
-	/*history = new History();
-	history->AddData("AudioFile", this);
-	history->Enable(false);
-	history->OnChange(&HistoryOnChange);
-	history->OnApply(&HistoryOnApply);*/
 }
 
 

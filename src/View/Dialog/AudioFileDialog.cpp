@@ -81,7 +81,6 @@ void WaveDialogFunction(int message)
 			/*dlg_audio->Title = WaveDialog->GetCell(HMM_TAGS, 0, 1);
 			dlg_audio->Album = WaveDialog->GetCell(HMM_TAGS, 1, 1);
 			dlg_audio->Artist = WaveDialog->GetCell(HMM_TAGS, 2, 1);*/
-			dlg_audio->history->Change();
 		case HUI_WIN_CLOSE:
 		case HMM_CANCEL:
 			delete(dlg);

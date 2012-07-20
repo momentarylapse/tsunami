@@ -746,7 +746,6 @@ void PluginManager::ExecutePlugin(const string &filename)
 		AudioFile *a = tsunami->cur_audio;
 
 		// run
-//		cur_audio->history->ChangeBegin();
 		PluginResetData();
 		if (PluginConfigure(true)){
 			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
@@ -774,7 +773,6 @@ void PluginManager::ExecutePlugin(const string &filename)
 				f_void();
 			}
 		}
-//		cur_audio->history->ChangeEnd();
 
 		// data changed?
 		FinishPluginData();

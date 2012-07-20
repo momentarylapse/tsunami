@@ -110,7 +110,6 @@ bool FxList::UpdateEffectParams(Effect &f)
 		tsunami->plugins->ImportPluginData(f);
 
 		if (tsunami->plugins->PluginConfigure(false)){
-			//cur_audio->history->Change();
 			tsunami->plugins->ExportPluginData(f);
 			ok = true;
 		}

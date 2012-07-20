@@ -45,39 +45,33 @@ SubDialog::~SubDialog()
 void SubDialog::OnName()
 {
 	sub->name = GetString("");
-	//sub->root->history->ChangeLater();
 }
 
 void SubDialog::OnMute()
 {
 	sub->muted = IsChecked("");
-	//sub->root->history->Change();
 	volume_slider->Enable(!sub->muted);
 }
 
 void SubDialog::OnLevelTrack()
 {
 	int n = GetInt("");
-	//sub->root->history->Change();
 }
 
 void SubDialog::OnVolume()
 {
 	sub->volume = volume_slider->Get();
-	//sub->root->history->ChangeLater();
 }
 
 void SubDialog::OnRepNum()
 {
 	sub->rep_num = GetInt("repnum") - 1;
 	Enable("repdelay", sub->rep_num > 0);
-	//sub->root->history->ChangeLater();
 }
 
 void SubDialog::OnRepDelay()
 {
 	sub->rep_delay = (int)(GetFloat("repdelay") * (float)sub->root->sample_rate / 1000.0f);
-	//sub->root->history->ChangeLater();
 }
 
 void SubDialog::OnClose()

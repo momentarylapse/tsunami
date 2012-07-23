@@ -16,7 +16,7 @@
 #include "script_data_common.h"
 #include "../00_config.h"
 
-string ScriptDataVersion = "0.10.1.0";
+string ScriptDataVersion = "0.10.2.0";
 
 
 #ifdef _X_USE_HUI_

@@ -173,9 +173,10 @@ class CScript;
 class CPreScript
 {
 public:
-	CPreScript(const string &filename, bool just_analyse = false);
-	CPreScript();
+	CPreScript(CScript *_script);
 	~CPreScript();
+
+	void LoadAndParseFile(const string &filename, bool just_analyse);
 	bool LoadToBuffer(const string &filename, bool just_analyse);
 	void AddIncludeData(CScript *s);
 

@@ -116,6 +116,18 @@ Date get_current_date()
 #endif
 }
 
+string Date::format(const string &f) const
+{
+	char buffer [80];
+	time_t rawtime = this->time;
+	tm * timeinfo = localtime (&rawtime);
+	strftime(buffer, sizeof(buffer), f.c_str(), timeinfo);
+	return buffer;
+}
+
+string Date::str() const
+{	return this->format("%c");	}
+
 
 t_file_try_again_func *FileTryAgainFunc;
 

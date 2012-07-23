@@ -58,6 +58,9 @@ void SIAddPackageFile()
 		class_add_element("milli_second",	TypeInt,		GetDADate(milli_second));
 		class_add_element("day_of_week",	TypeInt,		GetDADate(day_of_week));
 		class_add_element("day_of_year",	TypeInt,		GetDADate(day_of_year));
+		class_add_func("format",			TypeString,		mf((tmf)&Date::format));
+			func_add_param("f",	TypeString);
+		class_add_func("str",				TypeString,		mf((tmf)&Date::str));
 	
 	add_class(TypeFile);
 		class_add_func("GetDateCreation",		TypeDate,		mf((tmf)&CFile::GetDateCreation));

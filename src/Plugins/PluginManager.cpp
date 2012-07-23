@@ -177,7 +177,7 @@ void PluginManager::AddPluginsToMenu()
 	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins", "*.kaba", false);
 	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
 	foreach(list, e)
-		if (e.name != "api.kaba"){
+		if ((e.name != "api.kaba") && (e.name[0] != '_')){
 			PluginFile pf;
 			pf.filename = e.name;
 			get_plugin_file_data(pf);

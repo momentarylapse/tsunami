@@ -85,6 +85,8 @@ struct Date
 	int time;
 	int year, month, day, hour, minute, second, milli_second;
 	int day_of_week, day_of_year;
+	string format(const string &f) const;
+	string str() const;
 };
 
 Date get_current_date();

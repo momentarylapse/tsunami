@@ -68,8 +68,8 @@ sType *TypeBeam;
 sType *TypeBeamP;
 sType *TypeEffect;
 sType *TypeEffectP;
-sType *TypeView;
-sType *TypeViewP;
+sType *TypeCamera;
+sType *TypeCameraP;
 sType *TypeSkin;
 sType *TypeSkinP;
 sType *TypeSkinPArray;
@@ -151,10 +151,10 @@ extern sType *TypePlaneList;
 	#define	GetDAFog(x)			0
 #endif
 #ifdef _X_ALLOW_CAMERA_
-	static CView *_view;
-	#define	GetDAView(x)		long(&_view->x)-long(_view)
+	static Camera *_camera;
+	#define	GetDACamera(x)		long(&_camera->x)-long(_camera)
 #else
-	#define	GetDAView(x)		0
+	#define	GetDACamera(x)		0
 #endif
 #ifdef _X_ALLOW_TERRAIN_
 	static CTerrain *_terrain;
@@ -189,8 +189,8 @@ void SIAddPackageX()
 	TypeBeamP			= add_type_p("beam",		TypeBeam);
 	TypeEffect			= add_type  ("Effect",		0);
 	TypeEffectP			= add_type_p("effect",		TypeEffect);
-	TypeView			= add_type  ("View",		0);
-	TypeViewP			= add_type_p("view",		TypeView);
+	TypeCamera			= add_type  ("Camera",		0);
+	TypeCameraP			= add_type_p("camera",		TypeCamera);
 	TypeSkin			= add_type  ("Skin",		0);
 	TypeSkinP			= add_type_p("skin",		TypeSkin);
 	TypeSkinPArray		= add_type_a("skin[?]",		TypeSkinP, 1);
@@ -216,10 +216,10 @@ void SIAddPackageX()
 		class_add_element("texture",		TypeInt,		GetDAPicture(texture));
 		class_add_element("source",			TypeRect,		GetDAPicture(source));
 		class_add_element("shader",			TypeInt,		GetDAPicture(shader));
+		class_add_func("IsMouseOver",		TypeBool,	gui_p(mf((tmf)&sPicture::IsMouseOver)));
 	
 	add_class(TypePicture3D);
 		class_add_element("enabled",		TypeBool,		GetDAPicture3D(enabled));
-		class_add_element("relative",		TypeBool,		GetDAPicture3D(relative));
 		class_add_element("lighting",		TypeBool,		GetDAPicture3D(lighting));
 		class_add_element("world_3d",		TypeBool,		GetDAPicture3D(world_3d));
 		class_add_element("z",				TypeFloat,		GetDAPicture3D(z));
@@ -240,6 +240,7 @@ void SIAddPackageX()
 		class_add_element("size",			TypeFloat,		GetDAText(size));
 		class_add_element("color",			TypeColor,		GetDAText(_color));
 		class_add_element("text",			TypeString,		GetDAText(text));
+		class_add_func("IsMouseOver",		TypeBool,	gui_p(mf((tmf)&sText::IsMouseOver)));
 	
 	add_class(TypeParticle);
 		class_add_element("enabled",		TypeBool,		GetDAParticle(enabled));
@@ -420,26 +421,32 @@ void SIAddPackageX()
 		class_add_func("GetHeight",			TypeFloat,		god_p(mf((tmf)&CTerrain::gimme_height)));
 			func_add_param("p",			TypeVector);
 
-	add_class(TypeView);
-		class_add_element("enabled",		TypeBool,		GetDAView(enabled));
-		class_add_element("show",			TypeBool,		GetDAView(show));
-		class_add_element("texture_out",	TypeInt,		GetDAView(output_texture));
-		class_add_element("texture_in",	TypeInt,		GetDAView(input_texture));
-		class_add_element("shader",			TypeInt,		GetDAView(shader));
-		class_add_element("shaded_displays",TypeBool,		GetDAView(shaded_displays));
-		class_add_element("pos",			TypeVector,		GetDAView(pos));
-		class_add_element("ang",			TypeVector,		GetDAView(ang));
-		class_add_element("vel",			TypeVector,		GetDAView(vel));
-		class_add_element("rot",			TypeVector,		GetDAView(rot));
-		class_add_element("zoom",			TypeFloat,		GetDAView(zoom));
-		class_add_element("dest",			TypeRect,		GetDAView(dest));
-		class_add_element("z",				TypeFloat,		GetDAView(z));
-		class_add_element("clipping_plane",	TypePlaneList,	GetDAView(clipping_plane));
-		class_add_element("ignore",			TypeModelPList,	GetDAView(ignore));
-		class_add_func("StartScript",		TypeVoid,	cam_p(mf((tmf)&CView::StartScript)));
+	add_class(TypeCamera);
+		class_add_element("enabled",		TypeBool,		GetDACamera(enabled));
+		class_add_element("show",			TypeBool,		GetDACamera(show));
+		class_add_element("texture_out",	TypeInt,		GetDACamera(output_texture));
+		class_add_element("texture_in",	TypeInt,		GetDACamera(input_texture));
+		class_add_element("shader",			TypeInt,		GetDACamera(shader));
+		class_add_element("shaded_displays",TypeBool,		GetDACamera(shaded_displays));
+		class_add_element("pos",			TypeVector,		GetDACamera(pos));
+		class_add_element("ang",			TypeVector,		GetDACamera(ang));
+		class_add_element("vel",			TypeVector,		GetDACamera(vel));
+		class_add_element("rot",			TypeVector,		GetDACamera(rot));
+		class_add_element("zoom",			TypeFloat,		GetDACamera(zoom));
+		class_add_element("dest",			TypeRect,		GetDACamera(dest));
+		class_add_element("z",				TypeFloat,		GetDACamera(z));
+		class_add_element("min_depth",		TypeFloat,		GetDACamera(min_depth));
+		class_add_element("max_depth",		TypeFloat,		GetDACamera(max_depth));
+		class_add_element("clipping_plane",	TypePlaneList,	GetDACamera(clipping_plane));
+		class_add_element("ignore",			TypeModelPList,	GetDACamera(ignore));
+		class_add_func("StartScript",		TypeVoid,	cam_p(mf((tmf)&Camera::StartScript)));
 			func_add_param("filename",		TypeString);
 			func_add_param("dpos",			TypeVector);
-		class_add_func("StopScript",		TypeVoid,	cam_p(mf((tmf)&CView::StopScript)));
+		class_add_func("StopScript",		TypeVoid,	cam_p(mf((tmf)&Camera::StopScript)));
+		class_add_func("Project",		TypeVector,	cam_p(mf((tmf)&Camera::Project)));
+			func_add_param("v",			TypeVector);
+		class_add_func("Unproject",		TypeVector,	cam_p(mf((tmf)&Camera::Unproject)));
+			func_add_param("v",			TypeVector);
 
 	
 
@@ -477,8 +484,6 @@ void SIAddPackageX()
 	add_func("CreateGrouping",										TypeGroupingP,	gui_p(&GuiCreateGrouping));
 		func_add_param("pos",		TypeVector);
 		func_add_param("set_cur",	TypeBool);
-	add_func("GuiIsMouseOver",										TypeBool,	gui_p(&GuiMouseOver));
-		func_add_param("p",		TypePointer);
 	add_func("CreateParticle",										TypeParticleP,	fx_p(&FxParticleCreateDef));
 		func_add_param("pos",		TypeVector);
 		func_add_param("texture",		TypeInt);
@@ -508,7 +513,7 @@ void SIAddPackageX()
 		func_add_param("filename",		TypeString);
 /*	add_func("GetModelOID",												TypeInt,	meta_p(&MetaGetModelOID));
 		func_add_param("filename",		TypeString);*/
-	add_func("CreateView",												TypeViewP,	cam_p(&CameraCreateView));
+	add_func("CreateCamera",												TypeCameraP,	cam_p(&CreateCamera));
 		func_add_param("pos",		TypeVector);
 		func_add_param("ang",		TypeVector);
 		func_add_param("dest",		TypeRect);
@@ -655,7 +660,7 @@ void SIAddPackageX()
 	add_ext_var("Gravitation",		TypeVector,		god_p(&GlobalG));
 	add_ext_var("PhysicsEnabled",	TypeBool,		god_p(&PhysicsEnabled));
 	add_ext_var("CollisionsEnabled",	TypeBool,		god_p(&CollisionsEnabled));
-	add_ext_var("Cam",				TypeViewP,		cam_p(&Cam));
+	add_ext_var("Cam",				TypeCameraP,		cam_p(&Cam));
 	add_ext_var("SkyBox",			TypeModelPList,	god_p(&SkyBox));
 	add_ext_var("BackGroundColor",	TypeColor,		god_p(&BackGroundColor));
 	add_ext_var("GlobalFog",		TypeFog,		god_p(&GlobalFog));
@@ -695,7 +700,6 @@ void SIAddPackageX()
 	add_ext_var("DetailLevel",		TypeInt,		meta_p(&DetailLevel));
 	add_ext_var("DetailFactorInv",	TypeFloat,		meta_p(&DetailFactorInv));
 	add_ext_var("NetworkEnabled",	TypeBool,		meta_p(&NetworkEnabled));
-	add_ext_var("XFontColor",		TypeColor,		meta_p(&XFontColor));
 	add_ext_var("XFontIndex",		TypeInt,		meta_p(&XFontIndex));
 	add_ext_var("DefaultFont",		TypeInt,		meta_p(&DefaultFont));
 	add_ext_var("ResettingGame",	TypeBool,		meta_p(&ResettingGame));

@@ -1129,10 +1129,10 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 			is_class_function = true;
 	if (com->Kind == KindFunction){
 		if (com->script){
-			if (com->script->pre_script->Function[com->LinkNr]->Name.find(".") >= 0)
+			if (com->script->pre_script->Function[com->LinkNr]->Class)
 				is_class_function = true;
 		}else{
-			if (pre_script->Function[com->LinkNr]->Name.find(".") >= 0)
+			if (pre_script->Function[com->LinkNr]->Class)
 				is_class_function = true;
 		}
 	}
@@ -1155,7 +1155,6 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 	}else if ((com->Kind == KindCompilerFunction) || (com->Kind == KindFunction)){
 		//so("---func");
 		void *fp = NULL;
-		bool class_function = false;
 		string name;
 		if (com->Kind == KindFunction){ // own script Function
 			so("Funktion!!!");
@@ -1163,17 +1162,12 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 				//so(com->LinkNr);
 				so("    extern!!!");
 				fp = (void*)com->script->func[com->LinkNr];
-				so("   -ok");
 			}else{
 				fp = (void*)func[com->LinkNr];
-				if (pre_script->Function[com->LinkNr]->Name.find(".") >= 0){
-					so("    class function!!!");
-					class_function = true;
-				}
 			}
+			so("   -ok");
 		}else{ // compiler function
 			fp = PreCommand[com->LinkNr].Func;
-			class_function = PreCommand[com->LinkNr].IsClassFunction;
 			name = PreCommand[com->LinkNr].Name;
 		}
 		if (fp){ // a real function
@@ -1183,7 +1177,7 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 			
 			AddFuncReturn(ret);
 			
-			if (class_function)
+			if (is_class_function)
 				AddFuncInstance(instance);
 			
 			AddFunctionCall(d, fp);

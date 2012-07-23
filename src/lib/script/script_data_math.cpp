@@ -589,6 +589,9 @@ void SIAddPackageMath()
 			func_add_param("v",	TypeFloatPs);
 			func_add_param("w",	TypeFloat);
 			func_add_param("dt",	TypeFloat);
+		class_add_func("jump",	TypeVoid, mf((tmf)&Interpolator<float>::jump));
+			func_add_param("p",	TypeFloatPs);
+			func_add_param("v",	TypeFloatPs);
 		class_add_func("get",	TypeFloat, mf((tmf)&Interpolator<float>::get));
 			func_add_param("t",	TypeFloat);
 		class_add_func("get_tang",	TypeFloat, mf((tmf)&Interpolator<float>::get_tang));
@@ -615,6 +618,9 @@ void SIAddPackageMath()
 			func_add_param("v",	TypeVector);
 			func_add_param("w",	TypeFloat);
 			func_add_param("dt",	TypeFloat);
+		class_add_func("jump",	TypeVoid, mf((tmf)&Interpolator<vector>::jump));
+			func_add_param("p",	TypeVector);
+			func_add_param("v",	TypeVector);
 		class_add_func("get",	TypeVector, mf((tmf)&Interpolator<vector>::get));
 			func_add_param("t",	TypeFloat);
 		class_add_func("get_tang",	TypeVector, mf((tmf)&Interpolator<vector>::get_tang));

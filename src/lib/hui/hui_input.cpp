@@ -8,7 +8,7 @@ Array<HuiCommand> _HuiCommand_;
 	unsigned char HuiKeyID[256];
 #endif
 #ifdef HUI_API_GTK
-	int HuiKeyID[256], KeyID2[256];
+	int HuiKeyID[256], HuiKeyID2[256];
 #endif
 
 
@@ -137,7 +137,7 @@ void _HuiInitInput_()
 	#ifdef HUI_API_GTK
 
 		for (int k=0;k<HUI_NUM_KEYS;k++)
-			HuiKeyID[k]=KeyID2[k]=0;
+			HuiKeyID[k]=HuiKeyID2[k]=0;
 
 		HuiKeyID[KEY_LCONTROL]=GDK_KEY_Control_L;
 		HuiKeyID[KEY_RCONTROL]=GDK_KEY_Control_R;
@@ -184,32 +184,32 @@ void _HuiInitInput_()
 		HuiKeyID[KEY_8]=GDK_KEY_8;
 		HuiKeyID[KEY_9]=GDK_KEY_9;
 		HuiKeyID[KEY_0]=GDK_KEY_0;
-		HuiKeyID[KEY_A]=GDK_KEY_a;		KeyID2[KEY_A]=GDK_KEY_A;
-		HuiKeyID[KEY_B]=GDK_KEY_b;		KeyID2[KEY_B]=GDK_KEY_B;
-		HuiKeyID[KEY_C]=GDK_KEY_c;		KeyID2[KEY_C]=GDK_KEY_C;
-		HuiKeyID[KEY_D]=GDK_KEY_d;		KeyID2[KEY_D]=GDK_KEY_D;
-		HuiKeyID[KEY_E]=GDK_KEY_e;		KeyID2[KEY_E]=GDK_KEY_E;
-		HuiKeyID[KEY_F]=GDK_KEY_f;		KeyID2[KEY_F]=GDK_KEY_F;
-		HuiKeyID[KEY_G]=GDK_KEY_g;		KeyID2[KEY_G]=GDK_KEY_G;
-		HuiKeyID[KEY_H]=GDK_KEY_h;		KeyID2[KEY_H]=GDK_KEY_H;
-		HuiKeyID[KEY_I]=GDK_KEY_i;		KeyID2[KEY_I]=GDK_KEY_I;
-		HuiKeyID[KEY_J]=GDK_KEY_j;		KeyID2[KEY_J]=GDK_KEY_J;
-		HuiKeyID[KEY_K]=GDK_KEY_k;		KeyID2[KEY_K]=GDK_KEY_K;
-		HuiKeyID[KEY_L]=GDK_KEY_l;		KeyID2[KEY_L]=GDK_KEY_L;
-		HuiKeyID[KEY_M]=GDK_KEY_m;		KeyID2[KEY_M]=GDK_KEY_M;
-		HuiKeyID[KEY_N]=GDK_KEY_n;		KeyID2[KEY_N]=GDK_KEY_N;
-		HuiKeyID[KEY_O]=GDK_KEY_o;		KeyID2[KEY_O]=GDK_KEY_O;
-		HuiKeyID[KEY_P]=GDK_KEY_p;		KeyID2[KEY_P]=GDK_KEY_P;
-		HuiKeyID[KEY_Q]=GDK_KEY_q;		KeyID2[KEY_Q]=GDK_KEY_Q;
-		HuiKeyID[KEY_R]=GDK_KEY_r;		KeyID2[KEY_R]=GDK_KEY_R;
-		HuiKeyID[KEY_S]=GDK_KEY_s;		KeyID2[KEY_S]=GDK_KEY_S;
-		HuiKeyID[KEY_T]=GDK_KEY_t;		KeyID2[KEY_T]=GDK_KEY_T;
-		HuiKeyID[KEY_U]=GDK_KEY_u;		KeyID2[KEY_U]=GDK_KEY_U;
-		HuiKeyID[KEY_V]=GDK_KEY_v;		KeyID2[KEY_V]=GDK_KEY_V;
-		HuiKeyID[KEY_W]=GDK_KEY_w;		KeyID2[KEY_W]=GDK_KEY_W;
-		HuiKeyID[KEY_X]=GDK_KEY_x;		KeyID2[KEY_X]=GDK_KEY_X;
-		HuiKeyID[KEY_Y]=GDK_KEY_y;		KeyID2[KEY_Y]=GDK_KEY_Y;
-		HuiKeyID[KEY_Z]=GDK_KEY_z;		KeyID2[KEY_Z]=GDK_KEY_Z;
+		HuiKeyID[KEY_A]=GDK_KEY_a;		HuiKeyID2[KEY_A]=GDK_KEY_A;
+		HuiKeyID[KEY_B]=GDK_KEY_b;		HuiKeyID2[KEY_B]=GDK_KEY_B;
+		HuiKeyID[KEY_C]=GDK_KEY_c;		HuiKeyID2[KEY_C]=GDK_KEY_C;
+		HuiKeyID[KEY_D]=GDK_KEY_d;		HuiKeyID2[KEY_D]=GDK_KEY_D;
+		HuiKeyID[KEY_E]=GDK_KEY_e;		HuiKeyID2[KEY_E]=GDK_KEY_E;
+		HuiKeyID[KEY_F]=GDK_KEY_f;		HuiKeyID2[KEY_F]=GDK_KEY_F;
+		HuiKeyID[KEY_G]=GDK_KEY_g;		HuiKeyID2[KEY_G]=GDK_KEY_G;
+		HuiKeyID[KEY_H]=GDK_KEY_h;		HuiKeyID2[KEY_H]=GDK_KEY_H;
+		HuiKeyID[KEY_I]=GDK_KEY_i;		HuiKeyID2[KEY_I]=GDK_KEY_I;
+		HuiKeyID[KEY_J]=GDK_KEY_j;		HuiKeyID2[KEY_J]=GDK_KEY_J;
+		HuiKeyID[KEY_K]=GDK_KEY_k;		HuiKeyID2[KEY_K]=GDK_KEY_K;
+		HuiKeyID[KEY_L]=GDK_KEY_l;		HuiKeyID2[KEY_L]=GDK_KEY_L;
+		HuiKeyID[KEY_M]=GDK_KEY_m;		HuiKeyID2[KEY_M]=GDK_KEY_M;
+		HuiKeyID[KEY_N]=GDK_KEY_n;		HuiKeyID2[KEY_N]=GDK_KEY_N;
+		HuiKeyID[KEY_O]=GDK_KEY_o;		HuiKeyID2[KEY_O]=GDK_KEY_O;
+		HuiKeyID[KEY_P]=GDK_KEY_p;		HuiKeyID2[KEY_P]=GDK_KEY_P;
+		HuiKeyID[KEY_Q]=GDK_KEY_q;		HuiKeyID2[KEY_Q]=GDK_KEY_Q;
+		HuiKeyID[KEY_R]=GDK_KEY_r;		HuiKeyID2[KEY_R]=GDK_KEY_R;
+		HuiKeyID[KEY_S]=GDK_KEY_s;		HuiKeyID2[KEY_S]=GDK_KEY_S;
+		HuiKeyID[KEY_T]=GDK_KEY_t;		HuiKeyID2[KEY_T]=GDK_KEY_T;
+		HuiKeyID[KEY_U]=GDK_KEY_u;		HuiKeyID2[KEY_U]=GDK_KEY_U;
+		HuiKeyID[KEY_V]=GDK_KEY_v;		HuiKeyID2[KEY_V]=GDK_KEY_V;
+		HuiKeyID[KEY_W]=GDK_KEY_w;		HuiKeyID2[KEY_W]=GDK_KEY_W;
+		HuiKeyID[KEY_X]=GDK_KEY_x;		HuiKeyID2[KEY_X]=GDK_KEY_X;
+		HuiKeyID[KEY_Y]=GDK_KEY_y;		HuiKeyID2[KEY_Y]=GDK_KEY_Y;
+		HuiKeyID[KEY_Z]=GDK_KEY_z;		HuiKeyID2[KEY_Z]=GDK_KEY_Z;
 		HuiKeyID[KEY_BACKSPACE]=GDK_KEY_BackSpace;
 		HuiKeyID[KEY_TAB]=GDK_KEY_Tab;
 		HuiKeyID[KEY_NUM_0]=GDK_KEY_KP_0;
@@ -228,12 +228,12 @@ void _HuiInitInput_()
 		HuiKeyID[KEY_NUM_DIVIDE]=GDK_KEY_KP_Divide;
 		HuiKeyID[KEY_NUM_COMMA]=GDK_KEY_KP_Decimal;
 		HuiKeyID[KEY_NUM_ENTER]=GDK_KEY_KP_Enter;
-		HuiKeyID[KEY_COMMA]=GDK_KEY_comma;				KeyID2[KEY_COMMA]=GDK_KEY_semicolon;
+		HuiKeyID[KEY_COMMA]=GDK_KEY_comma;				HuiKeyID2[KEY_COMMA]=GDK_KEY_semicolon;
 		HuiKeyID[KEY_DOT]=GDK_KEY_period;
-		HuiKeyID[KEY_SMALLER]=GDK_KEY_less;			KeyID2[KEY_AE]=GDK_KEY_greater;
+		HuiKeyID[KEY_SMALLER]=GDK_KEY_less;			HuiKeyID2[KEY_AE]=GDK_KEY_greater;
 		HuiKeyID[KEY_SZ]=GDK_KEY_ssharp;
-		HuiKeyID[KEY_AE]=GDK_KEY_adiaeresis;			KeyID2[KEY_AE]=GDK_KEY_ae;
-		HuiKeyID[KEY_OE]=GDK_KEY_odiaeresis;					KeyID2[KEY_AE]=GDK_KEY_oe;
+		HuiKeyID[KEY_AE]=GDK_KEY_adiaeresis;			HuiKeyID2[KEY_AE]=GDK_KEY_ae;
+		HuiKeyID[KEY_OE]=GDK_KEY_odiaeresis;					HuiKeyID2[KEY_AE]=GDK_KEY_oe;
 		HuiKeyID[KEY_UE]=GDK_KEY_udiaeresis;
 		HuiKeyID[KEY_LWINDOWS]=GDK_KEY_Super_L;
 		HuiKeyID[KEY_RWINDOWS]=GDK_KEY_Super_R;

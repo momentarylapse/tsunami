@@ -90,6 +90,7 @@ void reset_pre_script(CPreScript *ps)
 	ps->RootOfAllEvil.NumParams = 0;
 	ps->RootOfAllEvil.Type = TypeVoid;
 	ps->cur_func = NULL;
+	ps->script = NULL;
 
 	// "include" default stuff
 	ps->NumOwnTypes = 0;
@@ -98,16 +99,16 @@ void reset_pre_script(CPreScript *ps)
 	msg_db_l(2);	
 }
 
-CPreScript::CPreScript()
+CPreScript::CPreScript(CScript *_script)
 {
 	reset_pre_script(this);
+	script = _script;
 }
 
 
-CPreScript::CPreScript(const string &filename,bool just_analyse)
+void CPreScript::LoadAndParseFile(const string &filename, bool just_analyse)
 {
-	msg_db_r("CPreScript",4);
-	reset_pre_script(this);
+	msg_db_r("LoadAndParseFile",4);
 	
 	Filename = SysFileName(filename);
 
@@ -516,6 +517,8 @@ inline void CommandSetClassFunc(CPreScript *ps, sType *class_type, sCommand *c, 
 		c->Type = PreCommand[f.Nr].ReturnType;
 		//c->NumParams = PreCommand[f.Nr].Param.num;
 	}else if (f.Kind == KindFunction){
+		if (class_type->Owner != ps)
+			c->script = class_type->Owner->script;
 		c->Type = class_type->Owner->Function[f.Nr]->Type;
 	}
 }
@@ -909,6 +912,8 @@ void DoClassFunction(CPreScript *ps, sCommand *Operand, sType *t, int f_no, sFun
 
 	// the function
 	Operand->script = NULL;
+	if (t->Owner)
+		Operand->script = t->Owner->script;
     Operand->Kind = t->Function[f_no].Kind;
 	Operand->LinkNr = t->Function[f_no].Nr;
 	if (t->Function[f_no].Kind == KindCompilerFunction){
@@ -916,9 +921,15 @@ void DoClassFunction(CPreScript *ps, sCommand *Operand, sType *t, int f_no, sFun
 		Operand->NumParams = PreCommand[t->Function[f_no].Nr].Param.num;
 		ps->GetFunctionCall(PreCommand[t->Function[f_no].Nr].Name, Operand, f);
 	}else if (t->Function[f_no].Kind == KindFunction){
-		Operand->Type = ps->Function[t->Function[f_no].Nr]->LiteralType;
-		Operand->NumParams = ps->Function[t->Function[f_no].Nr]->NumParams;
-		ps->GetFunctionCall(ps->Function[t->Function[f_no].Nr]->Name, Operand, f);
+		if (t->Owner){
+			Operand->Type = t->Owner->Function[t->Function[f_no].Nr]->LiteralType;
+			Operand->NumParams = t->Owner->Function[t->Function[f_no].Nr]->NumParams;
+			ps->GetFunctionCall(t->Owner->Function[t->Function[f_no].Nr]->Name, Operand, f);
+		}else{
+			Operand->Type = ps->Function[t->Function[f_no].Nr]->LiteralType;
+			Operand->NumParams = ps->Function[t->Function[f_no].Nr]->NumParams;
+			ps->GetFunctionCall(ps->Function[t->Function[f_no].Nr]->Name, Operand, f);
+		}
 		//ps->DoError("script member function call not implemented");
 	}
 	Operand->Instance = ob;

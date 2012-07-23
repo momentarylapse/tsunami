@@ -21,7 +21,7 @@
 	#include "../x/x.h"
 #endif
 
-string ScriptVersion = "0.10.1.2";
+string ScriptVersion = "0.10.2.0";
 
 //#define ScriptDebug
 
@@ -291,8 +291,8 @@ CScript::CScript(const string &filename, bool just_analyse)
 	WaitingMode = WaitingModeFirst;
 	ShowCompilerStats = (!ScriptCompileSilently) && ScriptShowCompilerStats;
 
-	pre_script = new CPreScript(filename,just_analyse);
-	pre_script->script = this;
+	pre_script = new CPreScript(this);
+	pre_script->LoadAndParseFile(filename, just_analyse);
 	ParserError = Error = pre_script->Error;
 	LinkerError = pre_script->IncludeLinkerError;
 	ErrorLine = pre_script->ErrorLine;
@@ -962,8 +962,7 @@ CScript::CScript()
 	reset_script(this);
 	WaitingMode = WaitingModeFirst;
 
-	pre_script = new CPreScript();
-	pre_script->script = this;
+	pre_script = new CPreScript(this);
 	
 	pre_script->Filename = "-console script-";
 

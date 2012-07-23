@@ -573,7 +573,6 @@ string p2s(void *p)
 string d2h(const void *data,int bytes,bool inverted)
 {
 	string str;
-	int pos;
 	if (inverted)
 		str = "0x";
 	unsigned char *c_data = (unsigned char *)data;
@@ -585,14 +584,14 @@ string d2h(const void *data,int bytes,bool inverted)
 			dd = c_data[i];
 		int c1 = (dd & 15);
 		int c2 = (dd >> 4);
-		if (c1 < 10)
-			str.add('0' + c1);
-		else
-			str.add('a' + c1 - 10);
 		if (c2 < 10)
 			str.add('0' + c2);
 		else
 			str.add('a' + c2 - 10);
+		if (c1 < 10)
+			str.add('0' + c1);
+		else
+			str.add('a' + c1 - 10);
 		if (i < bytes - 1)
 			str.add('.');
 	}

@@ -416,8 +416,8 @@ void Tsunami::UpdateMenu()
 	// sub
 	Enable("sub_import", GetCurTrack());
 	Enable("sub_from_selection", selected);
-	Enable("insert_added", GetCurSub());
-	Enable("remove_added", GetCurSub());
+	Enable("insert_added", cur_audio->GetNumSelectedSubs() > 0);
+	Enable("remove_added", cur_audio->GetNumSelectedSubs() > 0);
 	Enable("sub_properties", GetCurSub());
 	// sound
 	Enable("play", cur_audio->used);

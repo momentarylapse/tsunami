@@ -186,6 +186,3 @@ extern void AddSlider(window win, string id_slider, string id_edit, float v_min,
 extern void SliderSet(window win, string id, float value)
 extern float SliderGet(window win, string id)
 extern void RemoveSliders(window win)
-
-
-int abra

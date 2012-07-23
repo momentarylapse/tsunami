@@ -1,0 +1,117 @@
+
+
+enum
+	GridFrequencyLog
+	GridVolumeLog
+	GridVolumeLinear
+
+
+float tolog(float f, float f_min, float f_max)
+	return exp(f * log(f_max / f_min)) * f_min
+
+float fromlog(float f, float f_min, float f_max)
+	return log(f / f_min) / log(f_max / f_min)
+
+class GridData
+	float x0, y0, w, h
+	int type_x
+	float x_val_min, x_val_max
+	string x_unit
+	int type_y
+	float y_val_min, y_val_max
+	string y_unit
+
+	void SetXAxis(int type_x, float x_val_min, float x_val_max)
+		self.type_x = type_x
+		self.x_val_min = x_val_min
+		self.x_val_max = x_val_max
+
+	void SetYAxis(int type_y, float y_val_min, float y_val_max)
+		self.type_y = type_y
+		self.y_val_min = y_val_min
+		self.y_val_max = y_val_max
+
+	vector project(vector z)
+		return vector(	fromlog(z.x, self.x_val_min, self.x_val_max) * (self.w - 1) + self.x0,
+				self.h * (self.y_val_max - z.y) / (self.y_val_max - self.y_val_min) + self.y0, z.z)
+
+	vector unproject(vector z)
+		return vector(	tolog((z.x - self.x0) / (self.w - 1), self.x_val_min, self.x_val_max),
+				self.y_val_max - (z.y - self.y0) / self.h * (self.y_val_max - self.y_val_min), z.z)
+	
+
+	void Draw(context c, float x0, float y0, float w, float h)
+	
+		float x = x0 + 30
+		float y = y0
+		w -= 30
+		h -= 20
+		self.x0 = x
+		self.y0 = y
+		self.w = w
+		self.h = h
+		
+		// background
+		c.SetColor(White)
+		c.DrawRect(x, y, w, h)
+		
+		color col_grid = color(1, 0.8, 0.8, 0.8)
+		color col_grid2 = color(1, 0.9, 0.9, 0.9)
+		color col_text = color(1, 0.4, 0.4, 0.4)
+	
+		c.SetLineWidth(0.9)
+		c.SetFontSize(7)
+		float ff = self.x_val_min
+		while ff <= self.x_val_max
+			float fx = x + fromlog(ff, self.x_val_min, self.x_val_max) * (w - 1)
+			c.SetColor(col_grid)
+			c.DrawLine(fx, y, fx, y + h)
+			c.SetColor(col_text)
+			c.DrawStr(fx, y + h + 5, f2s(ff,0) + " Hz")
+			fx = x + fromlog(ff * sqrt(2), self.x_val_min, self.x_val_max) * (w - 1)
+			c.SetColor(col_grid2)
+			c.DrawLine(fx, y, fx, y + h)
+			ff *= 2
+		float vol = i2f(f2i(self.y_val_min / 10) * 10)
+		while vol <= self.y_val_max
+			c.SetColor(col_grid)
+			float vy = self.project(vector(self.y_val_min, vol, 0)).y
+			c.DrawLine(x, vy, x + w, vy)
+			c.SetColor(col_text)
+			c.DrawStr(x0 + 2, vy - 4, f2s(vol,0) + " db")
+			c.SetColor(col_grid2)
+			vy = self.project(vector(self.y_val_min, vol + 5, 0)).y
+			c.DrawLine(x, vy, x + w, vy)
+			vol += 10
+	
+	void DrawCurve(context c, FloatInterpolator fi, bool fill_below)
+		float tt[], xx[], yy[]
+		tt = rangef(0, 1, 0.003)
+		yy = fi.get_list(tt)
+		for int i, 0, tt.num
+			vector zz = self.project(vector(tolog(tt[i], self.x_val_min, self.x_val_max), yy[i], 0))
+			yy[i] = zz.y
+			xx.add(zz.x)
+		xx.add(self.x0 + self.w)
+		yy.add(self.y0 + self.h)
+		xx.add(self.x0)
+		yy.add(self.y0 + self.h)
+		c.SetColor(color(0.3, 0.3, 0.3, 1))
+		c.DrawPolygon(xx, yy)
+		xx.resize(xx.num - 2)
+		yy.resize(yy.num - 2)
+		c.SetLineWidth(2)
+		c.SetColor(Black)
+		c.DrawLines(xx, yy)
+	
+	void DrawPoint(context c, vector p, bool selected, bool hover)
+		vector pp = self.project(p)
+		c.SetColor(Black)
+		float radius = 3
+		if hover
+			c.SetColor(Red)
+			c.DrawStr(pp.x, pp.y - 20, f2s(pp.z, 1))
+			radius = 4
+		else if selected
+			c.SetColor(color(1, 0.7, 0, 0))
+		c.DrawCircle(pp.x, pp.y, radius)

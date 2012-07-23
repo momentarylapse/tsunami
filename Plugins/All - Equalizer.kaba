@@ -2,7 +2,7 @@
 // Title[Deutsch] = Equalizer
 
 #include "api.kaba"
-
+#include "_grid.kaba"
 
 
 
@@ -20,11 +20,7 @@ PluginData data
 window dlg
 int MouseOver, Selected
 
-float tofreq(float f)
-	return exp(f * log(MAX_FREQ / MIN_FREQ)) * MIN_FREQ
-
-float fromfreq(float f)
-	return log(f / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ)
+GridData grid
 
 void fill_inter(FloatInterpolator fi)
 	fi.set_type("cubic-spline-notang")
@@ -50,7 +46,7 @@ void equalize(float b[])
 	float w = i2f(b.num) / cur_audio.sample_rate
 	for int i, 1, f.num
 		float freq = i2f(i) / w
-		float param = fromfreq(freq)
+		float param = fromlog(freq, MIN_FREQ, MAX_FREQ)
 		float db = fi.get(param)
 		f[i] = f[i] * pow(10, db / 20)
 		
@@ -71,88 +67,21 @@ void ResetData()
 void DataToDialog()
 	dlg.Redraw("drawing")
 
-float w, h
-
-vector project(vector z)
-	return vector(	fromfreq(z.x) * (w - 1),
-			h * (MAX_VOL - z.y) / (MAX_VOL - MIN_VOL), z.z)
-
-vector unproject(vector z)
-	return vector(	tofreq(z.x / (w - 1)),
-			MAX_VOL - z.y / h * (MAX_VOL - MIN_VOL), z.z)
-
-
 void Draw()
 	context c = dlg.BeginDraw("drawing")
-	c.SetLineWidth(0.7)
+	float w = c.width
+	float h = c.height
 	
-	// background
-	c.SetColor(White)
-	c.DrawRect(0, 0, c.width, c.height)
-		
-	// frame
-	w = c.width
-	h = c.height
-		
-	// scale
-	c.SetLineWidth(0.9)
-	c.SetFontSize(7)
-	float ff = MIN_FREQ
-	while ff <= MAX_FREQ
-		float fx = fromfreq(ff) * (w - 1)
-		c.SetColor(color(1, 0.8, 0.8, 0.8))
-		c.DrawLine(fx, 0, fx, h)
-		float fx2 = fromfreq(ff) * (w - 1)
-		c.SetColor(color(1, 0.9, 0.9, 0.9))
-		c.DrawLine(fx2, 0, fx2, h)
-		c.SetColor(color(1, 0.4, 0.4, 0.4))
-		c.DrawStr(fx, 5, f2s(ff,0) + " Hz")
-		ff *= 2
-	float vol = i2f(f2i(MIN_VOL / 10) * 10)
-	while vol <= MAX_VOL
-		c.SetColor(color(1, 0.8, 0.8, 0.8))
-		float vy = project(vector(MIN_FREQ, vol, 0)).y
-		c.DrawLine(0, vy, c.width, vy)
-		c.SetColor(color(1, 0.4, 0.4, 0.4))
-		c.DrawStr(2, vy, f2s(vol,0) + " db")
-		vol += 10
-	
-	FloatInterpolator fi
-	fill_inter(fi)
+	grid.Draw(c, 0, 0, w, h)
 	
 	// curve + area below
-	float tt[], xx[], yy[]
-	tt = rangef(0, 1, 0.003)
-	yy = fi.get_list(tt)
-	yy *= -1
-	yy -= MIN_VOL
-	yy *= (h-1) / (MAX_VOL - MIN_VOL)
-	xx = tt
-	xx *= w
-	xx.add(w)
-	yy.add(h)
-	xx.add(0)
-	yy.add(h)
-	c.SetColor(color(0.3, 0.3, 0.3, 1))
-	c.DrawPolygon(xx, yy)
-	xx.resize(xx.num - 2)
-	yy.resize(yy.num - 2)
-	c.SetLineWidth(2)
-	c.SetColor(Black)
-	c.DrawLines(xx, yy)
+	FloatInterpolator fi
+	fill_inter(fi)
+	grid.DrawCurve(c, fi, true)
 	
 	// points
 	for int i, 0, data.curve.num
-		vector p = project(data.curve[i])
-		c.SetColor(Black)
-		float radius = 3
-		if i == MouseOver
-			c.SetColor(Red)
-			c.DrawStr(p.x, p.y - 20, f2s(p.z, 1))
-			radius = 4
-		else if i == Selected
-			c.SetColor(color(1, 0.7, 0, 0))
-		c.DrawCircle(p.x, p.y, radius)
+		grid.DrawPoint(c, data.curve[i], i == Selected, i == MouseOver)
 	c.End()
 
 // left button down -> select
@@ -185,10 +114,10 @@ void OnRightButtonDown()
 	int mx = HuiGetEvent().mouse_x
 	int my = HuiGetEvent().mouse_y
 	for int i, 1, data.curve.num
-		vector q = project(data.curve[i - 1])
-		vector p = project(data.curve[i])
+		vector q = grid.project(data.curve[i - 1])
+		vector p = grid.project(data.curve[i])
 		if (mx > q.x) and (mx < p.x)
-			data.curve.insert(unproject(vector(mx, my, 0)), i)
+			data.curve.insert(grid.unproject(vector(mx, my, 0)), i)
 			Selected = i
 			MouseOver = i
 			dlg.Redraw("drawing")
@@ -199,7 +128,7 @@ void OnMouseMove()
 	int my = HuiGetEvent().mouse_y
 	// move
 	if HuiGetEvent().button_l and (Selected >= 0)
-		data.curve[Selected] = unproject(vector(mx, my, data.curve[Selected].z))
+		data.curve[Selected] = grid.unproject(vector(mx, my, data.curve[Selected].z))
 		float xmin = MIN_FREQ
 		float xmax = MAX_FREQ
 		if Selected > 0
@@ -216,7 +145,7 @@ void OnMouseMove()
 	// mouse over?
 		MouseOver = -1
 		for int i, 0, data.curve.num
-			vector p = project(data.curve[i])
+			vector p = grid.project(data.curve[i])
 			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 				MouseOver = i
 	dlg.Redraw("drawing")
@@ -238,6 +167,9 @@ void Configure()
 
 	PutFavoriteBarSizable(dlg, "table", 0, 0)
 	PutCommandBarSizable(dlg, "table", 0, 2)
+	
+	grid.SetXAxis(GridFrequencyLog, MIN_FREQ, MAX_FREQ)
+	grid.SetYAxis(GridVolumeLog, MIN_VOL, MAX_VOL)
 	
 	DataToDialog()
 

@@ -1,0 +1,72 @@
+// Title[Deutsch] = Tremolo
+
+#include "api.kaba"
+
+bool not_first_time
+
+
+window dlg
+
+class PluginData
+	float Speed
+	float Depth
+
+PluginData data
+
+AudioFile *a
+
+void OnSpeed()
+	data.Speed = SliderGet(dlg, "speed")
+
+void OnDepth()
+	data.Depth = SliderGet(dlg, "depth")
+
+void DoTremolo(float b[])
+	
+	float f_c = 1.0 / a.sample_rate * 2 * pi * data.Speed
+	
+	for int i, 0, b.num
+		float f = 1 - (1 + cos(i * f_c)) * data.Depth * 0.5
+	
+		// old value
+		b[i] *= f
+
+void DataToDialog()
+	SliderSet(dlg, "speed", data.Speed)
+	SliderSet(dlg, "depth", data.Depth)
+
+void ResetData()
+	data.Depth = 0.5
+	data.Speed = 6
+
+void Configure()
+	// dialog
+	dlg=HuiCreateDialog("Tremolo",415,145,MainWin,false)
+	dlg.AddSlider("",115,35,205,25,"speed_slider")
+	dlg.AddSpinButton("\\0\\10000\\0.1",325,35,50,25,"speed")
+	dlg.AddText("Hz",380,35,30,25,"")
+	dlg.AddSlider("",115,65,205,25,"depth_slider")
+	dlg.AddEdit("",325,65,50,25,"depth")
+	dlg.AddText("%",380,65,30,25,"")
+	dlg.AddText("Geschwindigkeit",5,35,110,25,"")
+	dlg.AddText("Tiefe",5,65,100,25,"")
+	PutCommandBarFixed(dlg, 5, 105, 415)
+	dlg.Update()
+	
+	AddSlider(dlg, "speed_slider", "speed", 0, 20,    1,    &OnSpeed, data.Speed)
+	AddSlider(dlg, "depth_slider", "depth", 0, 1,    100,  &OnDepth, data.Depth)
+	
+	PutFavoriteBarFixed(dlg, 5, 5, 405)
+	
+	dlg.SetDecimals(1)
+	DataToDialog()
+	
+	HuiWaitTillWindowClosed(dlg)
+	
+void ProcessTrack(BufferBox buf, Track t, int level)
+	a = t.root
+		
+	DoTremolo(buf.r)
+	DoTremolo(buf.l)
+	
+

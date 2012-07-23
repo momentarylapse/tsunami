@@ -2,11 +2,12 @@
 // Title[Deutsch] = Hüllkurve
 
 #include "api.kaba"
+#include "_grid.kaba"
 
 
 
-const int MIN_VOL = 0-45
-const int MAX_VOL = 45
+const int MIN_VOL = 0-55
+const int MAX_VOL = 35
 
 class PluginData
 	complex curve[]
@@ -16,6 +17,8 @@ PluginData data
 
 window dlg
 int MouseOver, Selected
+
+GridData grid
 
 void fill_inter(FloatInterpolator fi)
 	fi.set_type("cubic-spline-notang")
@@ -49,82 +52,22 @@ void ResetData()
 void DataToDialog()
 	dlg.Redraw("drawing")
 
-float w, h
-
-complex project(complex z)
-	return complex(	z.x * (w - 1),
-			h * (MAX_VOL - z.y) / (MAX_VOL - MIN_VOL))
-
-complex unproject(complex z)
-	return complex(	z.x / (w - 1),
-			MAX_VOL - z.y / h * (MAX_VOL - MIN_VOL))
-
 
 void Draw()
 	context c = dlg.BeginDraw("drawing")
-	c.SetLineWidth(0.7)
+	float w = c.width
+	float h = c.height
 	
-	// background
-	c.SetColor(White)
-	c.DrawRect(0, 0, c.width, c.height)
-		
-	// frame
-	w = c.width
-	h = c.height
-		
-	// scale
-	c.SetLineWidth(0.9)
-	c.SetFontSize(7)
-	for int i, 0, 10
-		float fx = i2f(i) * 0.1 * w
-		c.SetColor(color(1, 0.8, 0.8, 0.8))
-		c.DrawLine(fx, 0, fx, h)
-		c.SetColor(color(1, 0.4, 0.4, 0.4))
-		c.DrawStr(fx, 5, i2s(i * 10) + " %")
-	float vol = i2f(f2i(MIN_VOL / 10) * 10)
-	while vol <= MAX_VOL
-		c.SetColor(color(1, 0.8, 0.8, 0.8))
-		float vy = project(complex(0, vol)).y
-		c.DrawLine(0, vy, c.width, vy)
-		c.SetColor(color(1, 0.4, 0.4, 0.4))
-		c.DrawStr(2, vy, f2s(vol,0) + " db")
-		vol += 10
-	
-	FloatInterpolator fi
-	fill_inter(fi)
+	grid.Draw(c, 0, 0, w-3, h)
 	
 	// curve + area below
-	float tt[], xx[], yy[]
-	tt = rangef(0, 1, 0.003)
-	yy = fi.get_list(tt)
-	yy *= -1
-	yy -= MIN_VOL
-	yy *= (h-1) / (MAX_VOL - MIN_VOL)
-	xx = tt
-	xx *= w
-	xx.add(w)
-	yy.add(h)
-	xx.add(0)
-	yy.add(h)
-	c.SetColor(color(0.3, 0.3, 0.3, 1))
-	c.DrawPolygon(xx, yy)
-	xx.resize(xx.num - 2)
-	yy.resize(yy.num - 2)
-	c.SetLineWidth(2)
-	c.SetColor(Black)
-	c.DrawLines(xx, yy)
+	FloatInterpolator fi
+	fill_inter(fi)
+	grid.DrawCurve(c, fi, true)
 	
 	// points
 	for int i, 0, data.curve.num
-		complex p = project(data.curve[i])
-		c.SetColor(Black)
-		float radius = 3
-		if i == MouseOver
-			c.SetColor(Red)
-			radius = 4
-		else if i == Selected
-			c.SetColor(color(1, 0.7, 0, 0))
-		c.DrawCircle(p.x, p.y, radius)
+		grid.DrawPoint2(c, data.curve[i], i == Selected, i == MouseOver)
 	c.End()
 
 // left button down -> select
@@ -148,10 +91,10 @@ void OnRightButtonDown()
 	int mx = HuiGetEvent().mouse_x
 	int my = HuiGetEvent().mouse_y
 	for int i, 1, data.curve.num
-		complex q = project(data.curve[i - 1])
-		complex p = project(data.curve[i])
+		complex q = grid.project2(data.curve[i - 1])
+		complex p = grid.project2(data.curve[i])
 		if (mx > q.x) and (mx < p.x)
-			data.curve.insert(unproject(complex(mx, my)), i)
+			data.curve.insert(grid.unproject2(complex(mx, my)), i)
 			Selected = i
 			dlg.Redraw("drawing")
 			i = data.curve.num
@@ -162,7 +105,7 @@ void OnMouseMove()
 	int my = HuiGetEvent().mouse_y
 	// move
 	if HuiGetEvent().button_l and (Selected >= 0)
-		data.curve[Selected] = unproject(complex(mx, my))
+		data.curve[Selected] = grid.unproject2(complex(mx, my))
 		float xmin = 0
 		float xmax = 1
 		if Selected > 0
@@ -179,14 +122,14 @@ void OnMouseMove()
 	// mouse over?
 		MouseOver = -1
 		for int i, 0, data.curve.num
-			complex p = project(data.curve[i])
+			complex p = grid.project2(data.curve[i])
 			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 				MouseOver = i
 	dlg.Redraw("drawing")
 
 void Configure()
 	// dialog
-	dlg = HuiCreateSizableDialog("Hull Curve",600,400,MainWin,false)
+	dlg = HuiCreateSizableDialog("Hull Curve",600,420,MainWin,false)
 	dlg.AddControlTable("", 0, 0, 1, 4, "table")
 	dlg.SetTarget("table", 0)
 	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")
@@ -204,6 +147,9 @@ void Configure()
 
 	PutFavoriteBarSizable(dlg, "table", 0, 0)
 	PutCommandBarSizable(dlg, "table", 0, 3)
+	
+	grid.SetXAxis(0, 1, false, "")
+	grid.SetYAxis(MIN_VOL, MAX_VOL, false, "db")
 	
 	DataToDialog()
 

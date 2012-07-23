@@ -1,101 +1,195 @@
 
 
-enum
-	GridFrequencyLog
-	GridVolumeLog
-	GridVolumeLinear
 
-
-float tolog(float f, float f_min, float f_max)
+float log2lin(float f, float f_min, float f_max)
 	return exp(f * log(f_max / f_min)) * f_min
 
-float fromlog(float f, float f_min, float f_max)
+float lin2log(float f, float f_min, float f_max)
 	return log(f / f_min) / log(f_max / f_min)
 
+vector get_lin_partition(float f_min, float f_max, float w)
+	float d = (f_max - f_min) / w * 100
+	float ee = 1
+	if d > 1000000
+		ee = 1000000
+	else if d > 100000
+		ee = 100000
+	else if d > 10000
+		ee = 10000
+	else if d > 1000
+		ee = 1000
+	else if d > 100
+		ee = 100
+	else if d > 10
+		ee = 10
+	else if d > 1
+		ee = 1
+	else if d > 0.1
+		ee = 0.1
+	else if d > 0.01
+		ee = 0.01
+	else if d > 0.001
+		ee = 0.001
+	else
+		ee = 0.0001
+	f_min = i2f(f2i(f_min / ee) * ee)
+	return vector(f_min, f_max, ee)
+
 class GridData
-	float x0, y0, w, h
-	int type_x
+	float x0, y0, x, y, w, h
 	float x_val_min, x_val_max
+	bool x_log
 	string x_unit
-	int type_y
 	float y_val_min, y_val_max
+	bool y_log
 	string y_unit
+	
+	color col_bg
+	color col_grid
+	color col_grid2
+	color col_text
 
-	void SetXAxis(int type_x, float x_val_min, float x_val_max)
-		self.type_x = type_x
-		self.x_val_min = x_val_min
-		self.x_val_max = x_val_max
+	void SetXAxis(float val_min, float val_max, bool x_log, string unit)
+		self.x_val_min = val_min
+		self.x_val_max = val_max
+		self.x_log = x_log
+		self.x_unit = unit
 
-	void SetYAxis(int type_y, float y_val_min, float y_val_max)
-		self.type_y = type_y
+	void SetYAxis(float y_val_min, float y_val_max, bool y_log, string unit)
 		self.y_val_min = y_val_min
 		self.y_val_max = y_val_max
-
-	vector project(vector z)
-		return vector(	fromlog(z.x, self.x_val_min, self.x_val_max) * (self.w - 1) + self.x0,
-				self.h * (self.y_val_max - z.y) / (self.y_val_max - self.y_val_min) + self.y0, z.z)
-
-	vector unproject(vector z)
-		return vector(	tolog((z.x - self.x0) / (self.w - 1), self.x_val_min, self.x_val_max),
-				self.y_val_max - (z.y - self.y0) / self.h * (self.y_val_max - self.y_val_min), z.z)
+		self.y_log = y_log
+		self.y_unit = unit
 	
+	float rel2valx(float x)
+		if self.x_log
+			return log2lin(x, self.x_val_min, self.x_val_max)
+		return x * (self.x_val_max - self.x_val_min) + self.x_val_min
+		
+	float projectx(float x)
+		if self.x_log
+			return lin2log(x, self.x_val_min, self.x_val_max) * self.w + self.x
+		else
+			return ((x - self.x_val_min) / (self.x_val_max - self.x_val_min)) * self.w + self.x
+		
+	float projecty(float y)
+		if self.y_log
+			return lin2log(y, self.y_val_min, self.y_val_max) * self.h + self.y
+		else
+			return self.h * (self.y_val_max - y) / (self.y_val_max - self.y_val_min) + self.y
+
+	complex project2(complex z)
+		return complex(self.projectx(z.x), self.projecty(z.y))
+
+	vector project3(vector z)
+		return vector(self.projectx(z.x), self.projecty(z.y), z.z)
+	
+	float unprojectx(float x)
+		if self.x_log
+			return log2lin((x - self.x) / self.w, self.x_val_min, self.x_val_max)
+		else
+			return (x - self.x) / self.w * (self.x_val_max - self.x_val_min) + self.x_val_min
+	
+	float unprojecty(float y)
+		if self.y_log
+			return log2lin((y - self.y) / self.h, self.y_val_min, self.y_val_max)
+		else
+			return self.y_val_max - (y - self.y) / self.h * (self.y_val_max - self.y_val_min)
+
+	complex unproject2(complex z)
+		return complex(self.unprojectx(z.x), self.unprojecty(z.y))
+
+	vector unproject3(vector z)
+		return vector(self.unprojectx(z.x), self.unprojecty(z.y), z.z)
+	
+	
+	void DrawLinY(context c, vector part)
+		int dec = f2i(max(-log(part.z) / log(10), 0))
+		c.SetLineWidth(0.9)
+		c.SetFontSize(7)
+		float y = part.x
+		while y <= part.y and part.z > 0
+			c.SetColor(self.col_grid)
+			float vy = self.projecty(y)
+			c.DrawLine(self.x, vy, self.x + self.w, vy)
+			c.SetColor(self.col_text)
+			c.DrawStr(self.x0 + 2, vy - 10, f2s(y, dec) + " " + self.y_unit)
+			c.SetColor(self.col_grid2)
+			vy = self.projecty(y + 5)
+			c.DrawLine(self.x, vy, self.x + self.w, vy)
+			y += part.z
+	
+	void DrawLinX(context c, vector part)
+		int dec = f2i(max(-log(part.z) / log(10), 0))
+		c.SetLineWidth(0.9)
+		c.SetFontSize(7)
+		float x = part.x
+		while x <= part.y and part.z > 0
+			c.SetColor(self.col_grid)
+			float vx = self.projectx(x)
+			c.DrawLine(vx, self.y, vx, self.y + self.h)
+			c.SetColor(self.col_text)
+			c.DrawStr(vx, self.y + self.h + 5, f2s(x, dec) + " " + self.x_unit)
+			c.SetColor(self.col_grid2)
+			vx = self.projectx(x + part.z / 2)
+			c.DrawLine(vx, self.y, vx, self.y + self.h)
+			x += part.z
 
 	void Draw(context c, float x0, float y0, float w, float h)
 	
-		float x = x0 + 30
+		self.x0 = x0
+		self.y0 = y0
+		float x = x0 + 40
 		float y = y0
-		w -= 30
+		w -= 40
 		h -= 20
-		self.x0 = x
-		self.y0 = y
+		self.x = x
+		self.y = y
 		self.w = w
 		self.h = h
 		
-		// background
-		c.SetColor(White)
-		c.DrawRect(x, y, w, h)
 		
-		color col_grid = color(1, 0.8, 0.8, 0.8)
-		color col_grid2 = color(1, 0.9, 0.9, 0.9)
-		color col_text = color(1, 0.4, 0.4, 0.4)
+		self.col_grid = color(1, 0.8, 0.8, 0.8)
+		self.col_grid2 = color(1, 0.9, 0.9, 0.9)
+		self.col_text = color(1, 0.4, 0.4, 0.4)
+		self.col_bg = White
+		
+		// background
+		c.SetColor(self.col_bg)
+		c.DrawRect(x, y, w, h)
 	
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
-		float ff = self.x_val_min
-		while ff <= self.x_val_max
-			float fx = x + fromlog(ff, self.x_val_min, self.x_val_max) * (w - 1)
-			c.SetColor(col_grid)
-			c.DrawLine(fx, y, fx, y + h)
-			c.SetColor(col_text)
-			c.DrawStr(fx, y + h + 5, f2s(ff,0) + " Hz")
-			fx = x + fromlog(ff * sqrt(2), self.x_val_min, self.x_val_max) * (w - 1)
-			c.SetColor(col_grid2)
-			c.DrawLine(fx, y, fx, y + h)
-			ff *= 2
-		float vol = i2f(f2i(self.y_val_min / 10) * 10)
-		while vol <= self.y_val_max
-			c.SetColor(col_grid)
-			float vy = self.project(vector(self.y_val_min, vol, 0)).y
-			c.DrawLine(x, vy, x + w, vy)
-			c.SetColor(col_text)
-			c.DrawStr(x0 + 2, vy - 4, f2s(vol,0) + " db")
-			c.SetColor(col_grid2)
-			vy = self.project(vector(self.y_val_min, vol + 5, 0)).y
-			c.DrawLine(x, vy, x + w, vy)
-			vol += 10
+		if self.x_log
+			float ff = self.x_val_min
+			while ff <= self.x_val_max
+				float fx = self.projectx(ff)
+				c.SetColor(self.col_grid)
+				c.DrawLine(fx, y, fx, y + h)
+				c.SetColor(self.col_text)
+				c.DrawStr(fx, y + h + 5, f2s(ff,0) + " " + self.x_unit)
+				fx = self.projectx(ff * sqrt(2))
+				c.SetColor(self.col_grid2)
+				c.DrawLine(fx, y, fx, y + h)
+				ff *= 2
+		else
+			vector part = get_lin_partition(self.x_val_min, self.x_val_max, w)
+			self.DrawLinX(c, part)
+		part = get_lin_partition(self.y_val_min, self.y_val_max, h)
+		self.DrawLinY(c, part)
 	
 	void DrawCurve(context c, FloatInterpolator fi, bool fill_below)
 		float tt[], xx[], yy[]
 		tt = rangef(0, 1, 0.003)
 		yy = fi.get_list(tt)
 		for int i, 0, tt.num
-			vector zz = self.project(vector(tolog(tt[i], self.x_val_min, self.x_val_max), yy[i], 0))
+			complex zz = self.project2(complex(self.rel2valx(tt[i]), yy[i]))
 			yy[i] = zz.y
 			xx.add(zz.x)
-		xx.add(self.x0 + self.w)
-		yy.add(self.y0 + self.h)
-		xx.add(self.x0)
-		yy.add(self.y0 + self.h)
+		xx.add(self.x + self.w)
+		yy.add(self.y + self.h)
+		xx.add(self.x)
+		yy.add(self.y + self.h)
 		c.SetColor(color(0.3, 0.3, 0.3, 1))
 		c.DrawPolygon(xx, yy)
 		xx.resize(xx.num - 2)
@@ -104,8 +198,19 @@ class GridData
 		c.SetColor(Black)
 		c.DrawLines(xx, yy)
 	
-	void DrawPoint(context c, vector p, bool selected, bool hover)
-		vector pp = self.project(p)
+	void DrawPoint2(context c, complex p, bool selected, bool hover)
+		complex pp = self.project2(p)
+		c.SetColor(Black)
+		float radius = 3
+		if hover
+			c.SetColor(Red)
+			radius = 4
+		else if selected
+			c.SetColor(color(1, 0.7, 0, 0))
+		c.DrawCircle(pp.x, pp.y, radius)
+	
+	void DrawPoint3(context c, vector p, bool selected, bool hover)
+		vector pp = self.project3(p)
 		c.SetColor(Black)
 		float radius = 3
 		if hover

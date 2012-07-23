@@ -115,7 +115,7 @@ class GridData
 			c.SetColor(self.col_text)
 			c.DrawStr(self.x0 + 2, vy - 10, f2s(y, dec) + " " + self.y_unit)
 			c.SetColor(self.col_grid2)
-			vy = self.projecty(y + 5)
+			vy = self.projecty(y + part.z / 2)
 			c.DrawLine(self.x, vy, self.x + self.w, vy)
 			y += part.z
 	
@@ -220,3 +220,22 @@ class GridData
 		else if selected
 			c.SetColor(color(1, 0.7, 0, 0))
 		c.DrawCircle(pp.x, pp.y, radius)
+	
+	complex GetMouse2()
+		float mx = HuiGetEvent().mouse_x
+		float my = HuiGetEvent().mouse_y
+		return self.unproject2(complex(mx, my))
+	
+	vector GetMouse3(float z)
+		float mx = HuiGetEvent().mouse_x
+		float my = HuiGetEvent().mouse_y
+		return self.unproject3(vector(mx, my, z))
+		
+	bool MouseOverPoint2(complex q)
+		float mx = HuiGetEvent().mouse_x
+		float my = HuiGetEvent().mouse_y
+		complex p = self.project2(q)
+		return (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+		
+	bool MouseOverPoint3(vector q)
+		return self.MouseOverPoint2(complex(q.x, q.y))

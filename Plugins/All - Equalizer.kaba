@@ -104,31 +104,26 @@ void OnLeftButtonUp()
 void OnScroll()
 	if MouseOver >= 0
 		if HuiGetEvent().wheel > 0
-			data.curve[MouseOver].z += 0.1
+			data.curve[MouseOver].z += 0.2
 		else
-			data.curve[MouseOver].z -= 0.1
+			data.curve[MouseOver].z -= 0.2
 		dlg.Redraw("drawing")
 
 // right button down -> new point
 void OnRightButtonDown()
-	int mx = HuiGetEvent().mouse_x
-	int my = HuiGetEvent().mouse_y
+	vector m = grid.GetMouse3(0)
 	for int i, 1, data.curve.num
-		vector q = grid.project3(data.curve[i - 1])
-		vector p = grid.project3(data.curve[i])
-		if (mx > q.x) and (mx < p.x)
-			data.curve.insert(grid.unproject3(vector(mx, my, 0)), i)
+		if (m.x > data.curve[i - 1].x) and (m.x < data.curve[i].x)
+			data.curve.insert(m, i)
 			Selected = i
 			MouseOver = i
 			dlg.Redraw("drawing")
 			break
 
 void OnMouseMove()
-	int mx = HuiGetEvent().mouse_x
-	int my = HuiGetEvent().mouse_y
 	// move
 	if HuiGetEvent().button_l and (Selected >= 0)
-		data.curve[Selected] = grid.unproject3(vector(mx, my, data.curve[Selected].z))
+		data.curve[Selected] = grid.GetMouse3(data.curve[Selected].z)
 		float xmin = MIN_FREQ
 		float xmax = MAX_FREQ
 		if Selected > 0
@@ -145,8 +140,7 @@ void OnMouseMove()
 	// mouse over?
 		MouseOver = -1
 		for int i, 0, data.curve.num
-			vector p = grid.project3(data.curve[i])
-			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+			if grid.MouseOverPoint3(data.curve[i])
 				MouseOver = i
 	dlg.Redraw("drawing")
 

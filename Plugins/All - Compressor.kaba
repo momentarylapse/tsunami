@@ -2,6 +2,7 @@
 // Title[Deutsch] = Kompressor
 
 #include "api.kaba"
+#include "_grid.kaba"
 
 window win
 int MouseOver, Selected
@@ -10,6 +11,8 @@ class PluginData
 	complex curve[]
 	float Delay
 PluginData data
+
+GridData grid
 
 float level_scale
 
@@ -41,15 +44,6 @@ void compress(float b[])
 			factor = out_level / in_level
 		b[i] = b[i] * factor
 
-float w, h
-
-complex project(complex z)
-	return complex(	20 + (w  - 40) * z.x,
-			20 + (h - 40) * (1 - z.y))
-
-complex unproject(complex z)
-	return complex(	(z.x - 20) / (w  - 40),
-			1.0 - (z.y - 20) / (h - 40))
 
 void DataToDialog()
 	win.Redraw("drawing_area")
@@ -57,39 +51,20 @@ void DataToDialog()
 
 void Draw()
 	context c = win.BeginDraw("drawing_area")
-	c.SetLineWidth(0.7)
-	w = c.width
-	h = c.height
+	float w = c.width
+	float h = c.height
 	
-	// background
-	c.SetColor(White)
-	c.DrawRect(0, 0, w, h)
-	
-	// frame
-	for int i, 0, 9
-		if (i % 4) == 0
-			c.SetColor(color(1, 0.6, 0.6, 0.6))
-		else
-			c.SetColor(color(1, 0.85, 0.85, 0.85))
-		c.DrawLine(20, project(complex(0, i / 8.0)).y, w - 20, project(complex(0, i / 8.0)).y)
-		c.DrawLine(project(complex(i / 8.0, 0)).x, 20, project(complex(i / 8.0, i)).x, h - 20)
-	c.DrawLine(20, h - 20, w - 20, 20)
+	grid.Draw(c, 0, 0, w-3, h)
 	
 	// curve
 	c.SetLineWidth(2)
 	c.SetColor(Black)
 	for int i, 1, data.curve.num
-		complex p = project(data.curve[i])
-		complex q = project(data.curve[i - 1])
+		complex p = grid.project2(data.curve[i])
+		complex q = grid.project2(data.curve[i - 1])
 		c.DrawLine(q.x, q.y, p.x, p.y)
 	for int i, 1, data.curve.num
-		p = project(data.curve[i])
-		c.SetColor(Black)
-		if i == MouseOver
-			c.SetColor(Red)
-		else if i == Selected
-			c.SetColor(color(1, 0.7, 0, 0))
-		c.DrawCircle(p.x, p.y, 3)
+		grid.DrawPoint2(c, data.curve[i], i == Selected, i == MouseOver)
 	c.End()
 
 // left button down -> select
@@ -110,24 +85,21 @@ void OnLeftButtonUp()
 
 // right button down -> new point
 void OnRightButtonDown()
-	int mx = HuiGetEvent().mouse_x
-	int my = HuiGetEvent().mouse_y
+	complex m = grid.GetMouse2()
 	for int i, 1, data.curve.num
-		complex q = project(data.curve[i - 1])
-		complex p = project(data.curve[i])
-		if (mx > q.x) and (mx < p.x) and (my < q.y) and (my > p.y)
-			data.curve.insert(unproject(complex(mx, my)), i)
+		complex q = data.curve[i - 1]
+		complex p = data.curve[i]
+		if (m.x > q.x) and (m.x < p.x) and (m.y > q.y) and (m.y < p.y)
+			data.curve.insert(m, i)
 			Selected = i
 			win.Redraw("drawing_area")
 			break
 
 void OnMouseMove()
-	int mx = HuiGetEvent().mouse_x
-	int my = HuiGetEvent().mouse_y
 	
 	// move
 	if HuiGetEvent().button_l and (Selected > 0)
-		data.curve[Selected] = unproject(complex(mx, my))
+		data.curve[Selected] = grid.GetMouse2()
 		float xmin = data.curve[Selected - 1].x
 		float xmax = 1
 		float ymin = data.curve[Selected - 1].y
@@ -143,8 +115,7 @@ void OnMouseMove()
 	// mouse over?
 		MouseOver = -1
 		for int i, 1, data.curve.num
-			complex p = project(data.curve[i])
-			if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+			if grid.MouseOverPoint2(data.curve[i])
 				MouseOver = i
 	win.Redraw("drawing_area")
 
@@ -181,6 +152,10 @@ void Configure()
 	win.Update()
 	PutFavoriteBarSizable(win, "table1", 0, 0)
 	PutCommandBarSizable(win, "table1", 3, 0)
+	
+	grid.SetXAxis(0, 1, false, "")
+	grid.SetYAxis(0, 1, false, "")
+	
 	DataToDialog()
 	
 	win.Event("edit", &OnEdit)

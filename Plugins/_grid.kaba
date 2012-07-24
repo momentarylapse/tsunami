@@ -7,33 +7,26 @@ float log2lin(float f, float f_min, float f_max)
 float lin2log(float f, float f_min, float f_max)
 	return log(f / f_min) / log(f_max / f_min)
 
-vector get_lin_partition(float f_min, float f_max, float w)
+class GridPartition
+	float min, max
+	float step
+	float factor
+	int decimals
+
+GridPartition get_lin_partition(float f_min, float f_max, float w)
 	float d = (f_max - f_min) / w * 100
-	float ee = 1
-	if d > 1000000
-		ee = 1000000
-	else if d > 100000
-		ee = 100000
-	else if d > 10000
-		ee = 10000
-	else if d > 1000
-		ee = 1000
-	else if d > 100
-		ee = 100
-	else if d > 10
-		ee = 10
-	else if d > 1
-		ee = 1
-	else if d > 0.1
-		ee = 0.1
-	else if d > 0.01
-		ee = 0.01
-	else if d > 0.001
-		ee = 0.001
-	else
-		ee = 0.0001
-	f_min = i2f(f2i(f_min / ee) * ee)
-	return vector(f_min, f_max, ee)
+	GridPartition r
+	r.step = 1
+	float e = log(d) / log(10)
+	float e_floor = i2f(f2i(e))
+	if e < 0
+		e_floor -= 1
+	r.step = pow(10, e_floor)
+	r.factor = d / r.step
+	r.decimals = f2i(max(-e_floor, 0))
+	r.min = i2f(f2i(f_min / r.step) * r.step)
+	r.max = f_max
+	return r
 
 class GridData
 	float x0, y0, x, y, w, h
@@ -103,37 +96,43 @@ class GridData
 		return vector(self.unprojectx(z.x), self.unprojecty(z.y), z.z)
 	
 	
-	void DrawLinY(context c, vector part)
-		int dec = f2i(max(-log(part.z) / log(10), 0))
+	void DrawLinY(context c, GridPartition part)
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
-		float y = part.x
-		while y <= part.y and part.z > 0
+		float y = part.min
+		while y <= part.max and part.step > 0
 			c.SetColor(self.col_grid)
 			float vy = self.projecty(y)
 			c.DrawLine(self.x, vy, self.x + self.w, vy)
 			c.SetColor(self.col_text)
-			c.DrawStr(self.x0 + 2, vy - 6, f2s(y, dec) + " " + self.y_unit)
-			c.SetColor(self.col_grid2)
-			vy = self.projecty(y + part.z / 2)
-			c.DrawLine(self.x, vy, self.x + self.w, vy)
-			y += part.z
+			string t = f2s(y, part.decimals)
+			t += " "
+			t += self.y_unit
+			c.DrawStr(self.x0 + 2, vy - 6, t)
+			if part.factor < 3
+				c.SetColor(self.col_grid2)
+				vy = self.projecty(y + part.step / 2)
+				c.DrawLine(self.x, vy, self.x + self.w, vy)
+			y += part.step
 	
-	void DrawLinX(context c, vector part)
-		int dec = f2i(max(-log(part.z) / log(10), 0))
+	void DrawLinX(context c, GridPartition part)
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
-		float x = part.x
-		while x <= part.y and part.z > 0
+		float x = part.min
+		while x <= part.max and part.step > 0
 			c.SetColor(self.col_grid)
 			float vx = self.projectx(x)
 			c.DrawLine(vx, self.y, vx, self.y + self.h)
 			c.SetColor(self.col_text)
-			c.DrawStr(vx, self.y + self.h + 5, f2s(x, dec) + " " + self.x_unit)
-			c.SetColor(self.col_grid2)
-			vx = self.projectx(x + part.z / 2)
-			c.DrawLine(vx, self.y, vx, self.y + self.h)
-			x += part.z
+			string t = f2s(x, part.decimals)
+			t += " "
+			t += self.x_unit
+			c.DrawStr(vx, self.y + self.h + 5, t)
+			if part.factor < 3
+				c.SetColor(self.col_grid2)
+				vx = self.projectx(x + part.step / 2)
+				c.DrawLine(vx, self.y, vx, self.y + self.h)
+			x += part.step
 
 	void Draw(context c, float x0, float y0, float w, float h)
 	
@@ -174,7 +173,7 @@ class GridData
 				c.DrawLine(fx, y, fx, y + h)
 				ff *= 2
 		else
-			vector part = get_lin_partition(self.x_val_min, self.x_val_max, w)
+			GridPartition part = get_lin_partition(self.x_val_min, self.x_val_max, w)
 			self.DrawLinX(c, part)
 		part = get_lin_partition(self.y_val_min, self.y_val_max, h)
 		self.DrawLinY(c, part)

@@ -93,6 +93,7 @@ public:
 
 	void Reset();
 	void UpdatePeaks();
+	void InvalidateAllPeaks();
 	BufferBox ReadBuffers(int level_no, const Range &r);
 	BufferBox ReadBuffersCol(const Range &r);
 

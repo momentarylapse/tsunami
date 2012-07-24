@@ -45,6 +45,8 @@ public:
 	void OnViewMono();
 	void OnViewGrid();
 	void OnViewOptimal();
+	void OnViewPeaksMax();
+	void OnViewPeaksMean();
 	void OnZoomIn();
 	void OnZoomOut();
 	void OnJumpOtherFile();
@@ -153,6 +155,13 @@ public:
 	int DetailSteps;
 	int MouseMinMoveToSelect;
 	int PreviewSleepTime;
+
+	enum
+	{
+		PEAK_MODE_MAXIMUM,
+		PEAK_MODE_SQUAREMEAN
+	};
+	int PeakMode;
 
 	int DrawingWidth;
 

@@ -356,9 +356,16 @@ void BufferBox::update_peaks()
 			peak.resize(level + 2);
 		peak[level    ].resize(n);
 		peak[level + 1].resize(n);
-		for (int i=i0;i<i1;i++){
-			peak[level    ][i] = shrink_mean((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
-			peak[level + 1][i] = shrink_mean((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
+		if (tsunami->view->PeakMode == AudioView::PEAK_MODE_MAXIMUM){
+			for (int i=i0;i<i1;i++){
+				peak[level    ][i] = shrink_max((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
+				peak[level + 1][i] = shrink_max((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
+			}
+		}else if (tsunami->view->PeakMode == AudioView::PEAK_MODE_SQUAREMEAN){
+			for (int i=i0;i<i1;i++){
+				peak[level    ][i] = shrink_mean((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
+				peak[level + 1][i] = shrink_mean((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
+			}
 		}
 
 		level += 2;

@@ -48,6 +48,7 @@ public:
 
 	virtual void PostActionUpdate();
 	void UpdatePeaks();
+	void InvalidateAllPeaks();
 
 	void SetCurSub(Track *s);
 	void SetCurTrack(Track *t);

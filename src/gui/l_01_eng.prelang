@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-120
+123
 // Data (ID,Text)
 about
 About
@@ -105,6 +105,8 @@ menu_track
 Track
 menu_view
 View
+menu_view_peaks
+
 ms
 ms
 mute
@@ -219,6 +221,10 @@ view_mono
 Mono
 view_optimal
 Optimal
+view_peaks_max
+
+view_peaks_mean
+
 view_samples
 Samples
 view_temp_file
@@ -244,7 +250,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-71
+72
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -255,6 +261,8 @@ Zoom out
 !bold\\Kommentar/Geschehnisse:
 
 !bold\\Name:
+
+'%s'\nDatei speichern?
 
 (anonym)
 
@@ -312,6 +320,8 @@ Fehlerbericht
 
 Fehlerbericht an Michi senden
 
+Frage
+
 Ist halt irgendwie passiert...
 
 Keine Ebene ausgewählt
@@ -346,8 +356,6 @@ benutze OpenAl Device:
 
 einen Effekt wählen
 
-erzeuge Peaks
-
 exportiere
 
 exportiere flac
@@ -357,8 +365,6 @@ exportiere ogg
 exportiere wave
 
 i'm now going to clean up...
-
-importiere Daten
 
 keine Datei
 no file
@@ -373,6 +379,8 @@ lade ogg
 lade wave
 
 message.txt öffnen
+
+namenlose Spur
 
 neue Audiodatei
 

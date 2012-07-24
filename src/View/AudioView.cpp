@@ -45,6 +45,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2)
 	ScrollSpeed = HuiConfigReadInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = HuiConfigReadInt("View.ScrollSpeedFast", 3000);
 	ZoomSpeed = HuiConfigReadFloat("View.ZoomSpeed", 0.1f);
+	PeakMode = HuiConfigReadInt("View.PeakMode", PEAK_MODE_SQUAREMEAN);
 
 
 	MousePossiblySelecting = -1;
@@ -82,6 +83,8 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2)
 	HuiAddCommandM("view_temp_file", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewTempFile);
 	HuiAddCommandM("view_mono", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewMono);
 	HuiAddCommandM("view_grid", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewGrid);
+	HuiAddCommandM("view_peaks_max", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewPeaksMax);
+	HuiAddCommandM("view_peaks_mean", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewPeaksMean);
 	HuiAddCommandM("view_optimal", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewOptimal);
 	HuiAddCommandM("zoom_in", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnZoomIn);
 	HuiAddCommandM("zoom_out", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnZoomOut);
@@ -1000,10 +1003,36 @@ void AudioView::UpdateMenu()
 	tsunami->Check("view_temp_file", ShowTempFile);
 	tsunami->Check("view_mono", ShowMono);
 	tsunami->Check("view_grid", ShowGrid);
+	tsunami->Check("view_peaks_max", PeakMode == PEAK_MODE_MAXIMUM);
+	tsunami->Check("view_peaks_mean", PeakMode == PEAK_MODE_SQUAREMEAN);
 	tsunami->Enable("zoom_in", tsunami->cur_audio->used);
 	tsunami->Enable("zoom_out", tsunami->cur_audio->used);
 	tsunami->Enable("view_optimal", tsunami->cur_audio->used);
 	tsunami->Enable("view_samples", false);//tsunami->cur_audio->used);
+}
+
+void AudioView::OnViewPeaksMax()
+{
+	PeakMode = PEAK_MODE_MAXIMUM;
+	for (int i=0;i<2;i++)
+		if (audio[i]->used){
+			audio[i]->InvalidateAllPeaks();
+			audio[i]->UpdatePeaks();
+		}
+	ForceRedraw();
+	UpdateMenu();
+}
+
+void AudioView::OnViewPeaksMean()
+{
+	PeakMode = PEAK_MODE_SQUAREMEAN;
+	for (int i=0;i<2;i++)
+		if (audio[i]->used){
+			audio[i]->InvalidateAllPeaks();
+			audio[i]->UpdatePeaks();
+		}
+	ForceRedraw();
+	UpdateMenu();
 }
 
 void AudioView::OnViewTempFile()

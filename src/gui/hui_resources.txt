@@ -560,7 +560,7 @@ menu
 0
 
 
-67
+70
 ItemPopup
 menu_file
 
@@ -1124,7 +1124,7 @@ ItemPopup
 menu_view
 
 1
-10
+11
 0
 0
 0
@@ -1161,6 +1161,45 @@ view_mono
 
 ItemCheckable
 view_grid
+
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemPopup
+menu_view_peaks
+
+1
+2
+0
+0
+0
+0
+0
+0
+
+
+ItemCheckable
+view_peaks_max
+
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemCheckable
+view_peaks_mean
 
 1
 0
@@ -2662,7 +2701,7 @@ tab_control
 // Language
 Deutsch
 // NumIDs
-143
+146
 // Text
 about
 Info
@@ -2794,6 +2833,8 @@ menu_track
 Spur
 menu_view
 Ansicht
+menu_view_peaks
+Peaks
 ms
 ms
 mute
@@ -2924,6 +2965,10 @@ view_mono
 Mono
 view_optimal
 Optimal
+view_peaks_max
+Maximum
+view_peaks_mean
+Quadratisches Mittel
 view_samples
 Sample-Ebene
 view_temp_file
@@ -2956,7 +3001,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-143
+146
 // Text
 about
 About
@@ -3088,6 +3133,8 @@ menu_track
 Track
 menu_view
 View
+menu_view_peaks
+
 ms
 ms
 mute
@@ -3218,6 +3265,10 @@ view_mono
 Mono
 view_optimal
 Optimal
+view_peaks_max
+
+view_peaks_mean
+
 view_samples
 Samples
 view_temp_file

@@ -111,6 +111,10 @@ enum{
 		sub_menu_8830->AddEntryCheckable("Zweite Datei",HMM_VIEW_TEMP_FILE);
 		sub_menu_8830->AddEntryCheckable("Mono",HMM_VIEW_MONO);
 		sub_menu_8830->AddEntryCheckable("Raster",HMM_VIEW_GRID);
+			CHuiMenu *sub_menu_3984=new CHuiMenu();
+			sub_menu_3984->AddEntryCheckable("Maximum",HMM_VIEW_PEAKS_MAX);
+			sub_menu_3984->AddEntryCheckable("Quadratisches Mittel",HMM_VIEW_PEAKS_MEAN);
+		sub_menu_8830->AddSubMenu("Peaks",HMM_MENU_VIEW_PEAKS,sub_menu_3984);
 		sub_menu_8830->AddSeparator();
 		sub_menu_8830->AddEntryImage("Vergr&o&sern",HuiImageZoomIn,HMM_ZOOM_IN);
 		sub_menu_8830->AddEntryImage("Verkleinern",HuiImageZoomOut,HMM_ZOOM_OUT);

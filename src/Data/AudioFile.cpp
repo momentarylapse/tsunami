@@ -360,6 +360,12 @@ void AudioFile::CreateSubsFromSelection()
 		Execute(new ActionSubTrackFromSelection(this));
 }
 
+void AudioFile::InvalidateAllPeaks()
+{
+	foreach(track, t)
+		t.InvalidateAllPeaks();
+}
+
 Track *AudioFile::get_track(int track_no, int sub_no)
 {
 	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_track");

@@ -248,6 +248,15 @@ void Track::UpdatePeaks()
 		s.UpdatePeaks();
 }
 
+void Track::InvalidateAllPeaks()
+{
+	foreach(level, l)
+		foreach(l.buffer, b)
+			b.invalidate_peaks(b.range());
+	foreach(sub, s)
+		s.InvalidateAllPeaks();
+}
+
 Track *Track::AddEmptySubTrack(const Range &r, const string &name)
 {
 	return (Track*)root->Execute(new ActionTrackAddEmptySubTrack(get_track_index(this), r, name));

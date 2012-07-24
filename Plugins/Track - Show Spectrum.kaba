@@ -26,6 +26,8 @@ int w, h
 float todb(float v)
 	return log(v) / log(10) * 10
 
+float peak_max
+
 void CreateLines(int type, float x[], float yr[], float yl[])
 
 	x.clear()
@@ -34,17 +36,19 @@ void CreateLines(int type, float x[], float yr[], float yl[])
 	for int i, 0, N
 		x.add(log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ))
 		if type == TypeLinear
-			grid.SetYAxis(0, 1, false, "")
+			grid.SetYAxis(0, peak_max, false, "")
 			yr.add(ffr[i])
 			yl.add(ffl[i])
 		else if type == TypeRoot2
-			grid.SetYAxis(0, 1, false, "")
+			grid.SetYAxis(0, sqrt(peak_max), false, "")
 			yr.add(pow(ffr[i], 0.5))
 			yl.add(pow(ffl[i], 0.5))
 		else //if type == TypeLogarithm
-			grid.SetYAxis(MIN_VOL, MAX_VOL, false, "db")
-			yr.add(clamp(todb(ffr[i]), MIN_VOL, MAX_VOL))
-			yl.add(clamp(todb(ffl[i]), MIN_VOL, MAX_VOL))
+			float vol_max = todb(peak_max)
+			float vol_min = vol_max - 60
+			grid.SetYAxis(vol_min, vol_max, false, "db")
+			yr.add(clamp(todb(ffr[i]), vol_min, vol_max))
+			yl.add(clamp(todb(ffl[i]), vol_min, vol_max))
 
 void OnDraw()
 	context c = dlg.BeginDraw("drawing_area")
@@ -116,12 +120,12 @@ void show_spec()
 		ffr.add(bmaxr)
 		ffl.add(bmaxl)
 
-	float mmax = max(ffr.max(), ffl.max())
+	peak_max = max(ffr.max(), ffl.max())
+	float mmax = sqr(buf.num) / 4
 	if mmax > 0
 		ffr /= mmax
 		ffl /= mmax
-	print ffr.max()
-	print ffl.max()
+	peak_max /= mmax
 
 	dlg.Redraw("drawing_area")
 
@@ -131,9 +135,8 @@ void show_spec()
 	ffl.clear()
 
 void main()
-	int a
+	char a, b
 	grid.SetXAxis(MIN_FREQ, MAX_FREQ, true, "Hz")
-	grid.SetYAxis(0, 1, false, "")
 	
 	if cur_audio.selection.length > 0
 		if cur_audio.cur_track >= 0

@@ -665,11 +665,11 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int he
 		else
 			c->SetColor(ColorWave);
 		foreach(lev.buffer, b){
-			int l = min(l_best - 1, b.peak.num / 2 - 2);
-			if (l >= 0){//f < MIN_MAX_FACTOR){
-				draw_peak_buffer(c, width, di, view_pos_rel, zoom, f, hf, x, y0r, b.peak[l*2], b.offset);
+			int l = min(l_best - 1, b.peak.num / 2);
+			if (l >= 1){//f < MIN_MAX_FACTOR){
+				draw_peak_buffer(c, width, di, view_pos_rel, zoom, f, hf, x, y0r, b.peak[l*2-2], b.offset);
 				if (!ShowMono)
-					draw_peak_buffer(c, width, di, view_pos_rel, zoom, f, hf, x, y0l, b.peak[l*2+1], b.offset);
+					draw_peak_buffer(c, width, di, view_pos_rel, zoom, f, hf, x, y0l, b.peak[l*2-1], b.offset);
 			}else{
 				draw_line_buffer(c, width, di, view_pos_rel, zoom, 1, hf, x, y0r, b.r, b.offset);
 				if (!ShowMono)

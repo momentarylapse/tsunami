@@ -266,8 +266,8 @@ Range BufferBox::range()
 	return Range(offset, num);
 }
 
-//#define shrink(a, b)	max((a), (b))
-#define shrink(a, b)	(unsigned char)(sqrt(((float)(a) * (float)(a) + (float)(b) * (float)(b)) / 2))
+#define shrink_max(a, b)	max((a), (b))
+#define shrink_mean(a, b)	(unsigned char)(sqrt(((float)(a) * (float)(a) + (float)(b) * (float)(b)) / 2))
 
 void BufferBox::invalidate_peaks(const Range &_range)
 {
@@ -279,9 +279,9 @@ void BufferBox::invalidate_peaks(const Range &_range)
 	if (peak.num < 2)
 		peak.resize(2);
 
-	n /= 2;
-	i0 /= 2;
-	i1 = min(i1 / 2 + 1, n);
+	n /= 4;
+	i0 /= 4;
+	i1 = min(i1 / 4 + 1, n);
 	//msg_write(format("inval %d  %d-%d", n, i0, i1));
 
 	if (peak[0].num < n)
@@ -319,12 +319,21 @@ inline void find_update_peak_range(string &p0, string &p1, int &i0, int &i1, int
 		}
 }
 
+inline float fabsmax(float a, float b, float c, float d)
+{
+	a = fabs(a);
+	b = fabs(b);
+	c = fabs(c);
+	d = fabs(d);
+	return max(max(a, b), max(c, d));
+}
+
 void BufferBox::update_peaks()
 {
 	// first level
 	if (peak.num < 2)
 		peak.resize(2);
-	int n = r.num / 2;
+	int n = r.num / 4;
 	int i0 = 0;
 	int i1 = n;
 	if ((peak[0].num >= n) && (peak[1].num >= n))
@@ -333,8 +342,8 @@ void BufferBox::update_peaks()
 	peak[1].resize(n);
 	//msg_write(format("  %d %d", i0, i1));
 	for (int i=i0;i<i1;i++){
-		peak[0][i] = max(fabs(r[i * 2]), fabs(r[i * 2 + 1])) * 254;
-		peak[1][i] = max(fabs(l[i * 2]), fabs(l[i * 2 + 1])) * 254;
+		peak[0][i] = fabsmax(r[i * 4], r[i * 4 + 1], r[i * 4 + 2], r[i * 4 + 3]) * 254;
+		peak[1][i] = fabsmax(l[i * 4], l[i * 4 + 1], l[i * 4 + 2], l[i * 4 + 3]) * 254;
 	}
 
 	// higher levels
@@ -348,8 +357,8 @@ void BufferBox::update_peaks()
 		peak[level    ].resize(n);
 		peak[level + 1].resize(n);
 		for (int i=i0;i<i1;i++){
-			peak[level    ][i] = shrink((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
-			peak[level + 1][i] = shrink((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
+			peak[level    ][i] = shrink_mean((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
+			peak[level + 1][i] = shrink_mean((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
 		}
 
 		level += 2;

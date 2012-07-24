@@ -1,10 +1,13 @@
 // Image = hui:find
 // Title[Deutsch] = Spektrum zeigen
 #include "api.kaba"
+#include "_grid.kaba"
 
-const int N = 1024
+const int N = 512
 const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
+const float MIN_VOL = 0.0 - 60.0
+const float MAX_VOL = 0.0
 
 window dlg
 
@@ -16,7 +19,12 @@ enum
 //float x[], yr[], yl[]
 float ffr[], ffl[]
 
+GridData grid
+
 int w, h
+
+float todb(float v)
+	return log(v) / log(10) * 10
 
 void CreateLines(int type, float x[], float yr[], float yl[])
 
@@ -24,18 +32,19 @@ void CreateLines(int type, float x[], float yr[], float yl[])
 	yr.clear()
 	yl.clear()
 	for int i, 0, N
-		x.add(i2f(w) * i2f(i) / i2f(N))
+		x.add(log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ))
 		if type == TypeLinear
-			yr.add(h - 10 - (h - 20) * ffr[i])
-			yl.add(h - 10 - (h - 20) * ffl[i])
+			grid.SetYAxis(0, 1, false, "")
+			yr.add(ffr[i])
+			yl.add(ffl[i])
 		else if type == TypeRoot2
-			yr.add(h - 10 - (h - 20) * pow(ffr[i], 0.5))
-			yl.add(h - 10 - (h - 20) * pow(ffl[i], 0.5))
+			grid.SetYAxis(0, 1, false, "")
+			yr.add(pow(ffr[i], 0.5))
+			yl.add(pow(ffl[i], 0.5))
 		else //if type == TypeLogarithm
-			yr.add(h - 10 - (h - 20) * (1 + log(ffr[i]) * 0.08))
-			yl.add(h - 10 - (h - 20) * (1 + log(ffl[i]) * 0.08))
-			yr[i] = clamp(yr[i], 10, h - 10)
-			yl[i] = clamp(yl[i], 10, h - 10)
+			grid.SetYAxis(MIN_VOL, MAX_VOL, false, "db")
+			yr.add(clamp(todb(ffr[i]), MIN_VOL, MAX_VOL))
+			yl.add(clamp(todb(ffl[i]), MIN_VOL, MAX_VOL))
 
 void OnDraw()
 	context c = dlg.BeginDraw("drawing_area")
@@ -44,32 +53,11 @@ void OnDraw()
 	
 	float x[], yr[], yl[]
 	CreateLines(dlg.GetInt("type"), x, yr, yl)
-		
-	// Hintergrund
-	c.SetColor(White)
-	c.DrawRect(0, 0, w, h)
-		
-	// Skala
-	c.SetLineWidth(0.9)
-	c.SetFontSize(8)
-	float f = MIN_FREQ
-	while f <= MAX_FREQ
-		float fx = log(f / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
-		c.SetColor(color(1, 0.8, 0.8, 0.8))
-		c.DrawLine(fx, 0, fx, h)
-		float fx2 = log(f * sqrt(2) / MIN_FREQ) / log(MAX_FREQ / MIN_FREQ) * (w - 1)
-		c.SetColor(color(1, 0.9, 0.9, 0.9))
-		c.DrawLine(fx2, 0, fx2, h)
-		c.SetColor(color(1, 0.4, 0.4, 0.4))
-		c.DrawStr(fx + 2, 5, f2s(f,0) + " Hz")
-		f *= 2
-		
-	// Spektrum
-	c.SetLineWidth(0.8)
-	c.SetColor(color(1, 0.3, 0.3, 0.6))
-	c.DrawLines(x, yr)
-	c.SetColor(color(1, 0.6, 0.3, 0.3))
-	c.DrawLines(x, yl)
+	
+	grid.Draw(c, 0, 0, w, h)
+	grid.DrawCurveB(c, x, yr, true, Red)
+	grid.DrawCurveB(c, x, yl, true, Blue)
+	
 	c.End()
 
 void OnType()
@@ -132,6 +120,8 @@ void show_spec()
 	if mmax > 0
 		ffr /= mmax
 		ffl /= mmax
+	print ffr.max()
+	print ffl.max()
 
 	dlg.Redraw("drawing_area")
 
@@ -141,6 +131,10 @@ void show_spec()
 	ffl.clear()
 
 void main()
+	int a
+	grid.SetXAxis(MIN_FREQ, MAX_FREQ, true, "Hz")
+	grid.SetYAxis(0, 1, false, "")
+	
 	if cur_audio.selection.length > 0
 		if cur_audio.cur_track >= 0
 			show_spec()

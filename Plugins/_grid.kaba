@@ -113,7 +113,7 @@ class GridData
 			float vy = self.projecty(y)
 			c.DrawLine(self.x, vy, self.x + self.w, vy)
 			c.SetColor(self.col_text)
-			c.DrawStr(self.x0 + 2, vy - 10, f2s(y, dec) + " " + self.y_unit)
+			c.DrawStr(self.x0 + 2, vy - 6, f2s(y, dec) + " " + self.y_unit)
 			c.SetColor(self.col_grid2)
 			vy = self.projecty(y + part.z / 2)
 			c.DrawLine(self.x, vy, self.x + self.w, vy)
@@ -137,12 +137,13 @@ class GridData
 
 	void Draw(context c, float x0, float y0, float w, float h)
 	
+		y0 += 3
 		self.x0 = x0
 		self.y0 = y0
 		float x = x0 + 40
 		float y = y0
-		w -= 40
-		h -= 20
+		w -= 43
+		h -= 23
 		self.x = x
 		self.y = y
 		self.w = w
@@ -186,16 +187,38 @@ class GridData
 			complex zz = self.project2(complex(self.rel2valx(tt[i]), yy[i]))
 			yy[i] = zz.y
 			xx.add(zz.x)
-		xx.add(self.x + self.w)
-		yy.add(self.y + self.h)
-		xx.add(self.x)
-		yy.add(self.y + self.h)
-		c.SetColor(color(0.3, 0.3, 0.3, 1))
-		c.DrawPolygon(xx, yy)
-		xx.resize(xx.num - 2)
-		yy.resize(yy.num - 2)
+		if fill_below
+			xx.add(self.x + self.w)
+			yy.add(self.y + self.h)
+			xx.add(self.x)
+			yy.add(self.y + self.h)
+			c.SetColor(color(0.3, 0.3, 0.3, 1))
+			c.DrawPolygon(xx, yy)
+			xx.resize(xx.num - 2)
+			yy.resize(yy.num - 2)
 		c.SetLineWidth(2)
 		c.SetColor(Black)
+		c.DrawLines(xx, yy)
+	
+	void DrawCurveB(context c, float x[], float y[], bool fill_below, color col)
+		float xx[], yy[]
+		for int i, 0, x.num
+			complex zz = self.project2(complex(x[i], y[i]))
+			yy.add(zz.y)
+			xx.add(zz.x)
+		if fill_below
+			xx.add(self.x + self.w)
+			yy.add(self.y + self.h)
+			xx.add(self.x)
+			yy.add(self.y + self.h)
+			color col2 = col
+			col2.a = 0.3
+			c.SetColor(col2)
+			c.DrawPolygon(xx, yy)
+			xx.resize(xx.num - 2)
+			yy.resize(yy.num - 2)
+		c.SetLineWidth(0.9)
+		c.SetColor(col)
 		c.DrawLines(xx, yy)
 	
 	void DrawPoint2(context c, complex p, bool selected, bool hover)

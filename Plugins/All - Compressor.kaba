@@ -20,7 +20,7 @@ void fill_inter(FloatInterpolator fi)
 	fi.set_type("lerp")
 	fi.add(data.curve[0].y, 0)
 	for int i, 1, data.curve.num
-		fi.add(data.curve[i].y, log(data.curve[i].x / data.curve[i - 1].x))
+		fi.add(data.curve[i].y, data.curve[i].x - data.curve[i - 1].x)
 
 void compress(float b[])
 	float in_level = 0
@@ -54,15 +54,19 @@ void Draw()
 	float w = c.width
 	float h = c.height
 	
-	grid.Draw(c, 0, 0, w-3, h)
+	grid.Draw(c, 0, 0, w, h)
+	
+	FloatInterpolator fi
+	fill_inter(fi)
 	
 	// curve
-	c.SetLineWidth(2)
+	grid.DrawCurve(c, fi, true)
+	/*c.SetLineWidth(2)
 	c.SetColor(Black)
 	for int i, 1, data.curve.num
 		complex p = grid.project2(data.curve[i])
 		complex q = grid.project2(data.curve[i - 1])
-		c.DrawLine(q.x, q.y, p.x, p.y)
+		c.DrawLine(q.x, q.y, p.x, p.y)*/
 	for int i, 1, data.curve.num
 		grid.DrawPoint2(c, data.curve[i], i == Selected, i == MouseOver)
 	c.End()

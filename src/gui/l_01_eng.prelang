@@ -1,11 +1,21 @@
 // Language
 English
 // Num IDs
-123
+139
 // Data (ID,Text)
 about
 About
+ad_table_1
+
+ad_table_2
+
+ad_table_5
+
+ad_table_7
+
 add_effect
+
+add_tag
 
 add_time_track
 
@@ -37,6 +47,8 @@ delete
 Delete
 delete_effect
 Delete
+delete_tag
+
 delete_track
 Delete Track
 dummy_favorite_dialog
@@ -57,8 +69,6 @@ fxdt_params
 !bold\\Parameters
 help
 Help
-hertz
-Hz
 insert_added
 Insert firmly
 jump_other_file
@@ -201,8 +211,30 @@ sub_properties
 Properties
 tab_control
 Data\\Tags\\Tracks\\Effects
+table_1
+
+table_2
+
+table_3
+
+table_4
+
+table_5
+
 tags
 !format=tT\\Tag\\Value
+td_table_1
+
+td_table_2
+
+td_table_3
+
+td_table_5
+
+td_table_6
+
+td_table_7
+
 track_dialog
 Track
 track_import

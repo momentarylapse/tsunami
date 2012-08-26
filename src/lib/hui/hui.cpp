@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.4.19.0";
+string HuiVersion = "0.4.20.1";
 
 
 #include <stdio.h>
@@ -86,7 +86,7 @@ Array<HuiClosedWindow> _HuiClosedWindow_;
 extern bool HuiConfigChanged;
 
 // HUI configuration
-char HuiComboBoxSeparator, _Hui_Pseudo_Byte_, *HuiSeparator;
+string HuiComboBoxSeparator;
 bool HuiCreateHiddenWindows;
 
 string HuiAppFilename;
@@ -285,9 +285,7 @@ void HuiInit()
 
 	_HuiInitInput_();
 
-	HuiComboBoxSeparator='\\';
-	_Hui_Pseudo_Byte_=0;
-	HuiSeparator=&HuiComboBoxSeparator;
+	HuiComboBoxSeparator="\\";
 	HuiIdleFunction=NULL;
 	HuiErrorFunction=NULL;
 	HuiLanguaged=false;

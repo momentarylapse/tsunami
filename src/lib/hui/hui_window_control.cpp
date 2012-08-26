@@ -51,14 +51,12 @@ string OptionString, HuiFormatString;
 
 void GetPartStrings(const string &id, const string &title)
 {
-	for (int i=0;i<PartString.num;i++)
-		PartString[i].clear();
 	PartString.clear();
 	OptionString = "";
 	HuiFormatString = "";
 
 	string title2 = get_lang(id, title);
-	PartString = title2.explode(&HuiComboBoxSeparator);
+	PartString = title2.explode(HuiComboBoxSeparator);
 //	msg_write(sa2s(PartString));
 	if (PartString.num > 0)
 		if (PartString[0].num > 0)

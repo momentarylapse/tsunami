@@ -87,7 +87,7 @@ extern bool HuiEndKeepMsgAlive;
 string HuiSetImage(const Image &image);
 
 // HUI configuration
-extern char HuiComboBoxSeparator, *HuiSeparator;
+extern string HuiComboBoxSeparator;
 extern bool HuiCreateHiddenWindows;
 
 // data from hui (...don't change...)

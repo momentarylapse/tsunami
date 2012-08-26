@@ -111,9 +111,10 @@ HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int wid
 		}else if (root_type == HuiGtkInsertTable){
 			GtkAttachOptions op_x = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
 			GtkAttachOptions op_y = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
-			if ((type == HuiKindButton) || (type == HuiKindColorButton)){
+			if (type == HuiKindButton){
 				//gtk_widget_set_size_request(frame, 100, 30);
-				if (strlen(gtk_button_get_label(GTK_BUTTON(widget))) > 0){ // != NULL ... cause set even if ""
+				const char *_label = gtk_button_get_label(GTK_BUTTON(widget));
+				if ((_label) && (strlen(_label) > 0)){ // != NULL ... cause set even if ""
 					if (root_is_button_bar){
 						op_x = GtkAttachOptions(GTK_FILL);
 						//gtk_widget_set_size_request(frame, 120, 30);
@@ -129,9 +130,15 @@ HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int wid
 				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
 			/*}else if ((type == HuiKindEdit) || (kind == HuiKindComboBox)  || (type == HuiKindCheckBox) || (type == HuiKindControlTable)){
 				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);*/
-			}else if ((type == HuiKindEdit) || (type == HuiKindComboBox) || (type == HuiKindCheckBox) || (type == HuiKindSlider) || (type == HuiKindProgressBar)){
+			}else if (type == HuiKindColorButton){
 				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
-				gtk_widget_set_size_request(frame, -1, 30);
+				gtk_widget_set_size_request(frame, 100, 28);
+			}else if (type == HuiKindComboBox){
+				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
+				gtk_widget_set_size_request(frame, -1, 28);
+			}else if ((type == HuiKindEdit) || (type == HuiKindSpinButton) || (type == HuiKindCheckBox) || (type == HuiKindRadioButton) || (type == HuiKindSlider) || (type == HuiKindProgressBar)){
+				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
+				gtk_widget_set_size_request(frame, -1, 25);
 			}else if (type == HuiKindControlTable){
 				//op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
 			}else if (type == HuiKindText){
@@ -153,7 +160,7 @@ HuiControl *CHuiWindow::_InsertControl_(GtkWidget *widget, int x, int y, int wid
 				if (ww.find(","))
 					ww = ww.substr(0, ww.find(","));
 				int width = s2i(ww);
-				gtk_widget_set_size_request(frame, width, 30);
+				gtk_widget_set_size_request(frame, width, 28);
 				op_x = GtkAttachOptions(0);
 			}
 
@@ -862,7 +869,7 @@ void CHuiWindow::AddControlTable(const string &title, int x, int y, int width, i
 	_InsertControl_(t, x, y, width, height, id, HuiKindControlTable);
 }
 
-void CHuiWindow::EmbedDialog(const string &root, int page, const string &id)
+void CHuiWindow::EmbedDialog(const string &id, int x, int y)
 {
 #if 0
 	CHuiWindow *dlg = HuiCreateResourceDialog(id, NULL, NULL);
@@ -896,13 +903,12 @@ void CHuiWindow::EmbedDialog(const string &root, int page, const string &id)
 
 			string target_id = cmd.s_param[0];
 			int target_page = cmd.i_param[4];
-			if (i == 0){
-				target_id = root;
-				target_page = page;
-			}
-			SetTarget(target_id, target_page);
+			if (i > 0)
+				SetTarget(target_id, target_page);
+			int _x = (i == 0) ? x : cmd.i_param[0];
+			int _y = (i == 0) ? y : cmd.i_param[1];
 			HuiWindowAddControl( this, cmd.type, HuiGetLanguage(cmd.id),
-								target_page, 0,
+								_x, _y,
 								cmd.i_param[2], cmd.i_param[3],
 								cmd.id);
 			Enable(cmd.id, cmd.enabled);

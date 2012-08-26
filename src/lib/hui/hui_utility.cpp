@@ -116,7 +116,7 @@ void hui_default_error_handler()
 	msg_write(_("                  Close dialog box to exit program."));
 
 	//HuiMultiline=true;
-	HuiComboBoxSeparator='$';
+	HuiComboBoxSeparator="$";
 
 	//HuiErrorBox(NULL,"Fehler","Fehler");
 

@@ -554,6 +554,7 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 	if (NixMode){
 		// "drawable" (for opengl)
 		gl_widget = gtk_drawing_area_new();
+		gtk_widget_set_double_buffered(gl_widget, false);
 		g_signal_connect(G_OBJECT(gl_widget), "draw", G_CALLBACK(&expose_event_gl), this);
 		gtk_box_pack_start(GTK_BOX(hbox), gl_widget, TRUE, TRUE, 0);
 

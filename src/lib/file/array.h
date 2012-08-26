@@ -224,6 +224,8 @@ class DumbArray : public DynamicArray
 		}
 		void make_own()
 		{
+			if ((num == 0) || (allocated > 0))
+				return;
 			T *dd = (T*)data;
 			int n = num;
 			forget();
@@ -247,21 +249,22 @@ class Set : public Array<T>
 	public:
 		void add(const T &item)
 		{
-			for (int i=0;i<((DynamicArray*)this)->num;i++)
+			int i0 = 0;
+			int i1 = ((DynamicArray*)this)->num;
+			while(i1 > i0){
+				int i = (i1 + i0) >> 1;
 				if ((*this)[i] == item)
 					return;
-			int n = 0;
-			for (int i=0;i<((DynamicArray*)this)->num;i++)
-				if ((*this)[i] < item)
-					n ++;
-				else
-					break;
-			if (n < ((DynamicArray*)this)->num)
-				insert(item, n);
-			else{
-				((DynamicArray*)this)->resize(((DynamicArray*)this)->num + 1);
-				(*this)[((DynamicArray*)this)->num - 1] = item;
+				else if ((*this)[i] > item){
+					i1 = i;
+				}else{
+					i0 = i + 1;
+				}
 			}
+			if (i0 < ((DynamicArray*)this)->num)
+				insert(item, i0);
+			else
+				((Array<T>*)this)->add(item);
 		}
 		void join(const Set &a)
 		{
@@ -270,20 +273,27 @@ class Set : public Array<T>
 		}
 		int find(const T &item) const
 		{
-			for (int i=0;i<((DynamicArray*)this)->num;i++)
+			int i0 = 0;
+			int i1 = ((DynamicArray*)this)->num;
+			while(i1 > i0){
+				int i = (i1 + i0) >> 1;
 				if ((*this)[i] == item)
 					return i;
+				else if ((*this)[i] > item){
+					i1 = i;
+				}else{
+					i0 = i + 1;
+				}
+			}
 			return -1;
 		}
 		void erase(const T &item)
 		{
 			int index = find(item);
-			if (index >= 0){
-				(*this)[index].~T();
-				((DynamicArray*)this)->delete_single(index);
-			}
+			if (index >= 0)
+				((Array<T>*)this)->erase(index);
 		}
-		bool is_in(const T &item) const
+		bool contains(const T &item) const
 		{
 			return (find(item) >= 0);
 		}

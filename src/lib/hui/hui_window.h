@@ -229,7 +229,7 @@ public:
 	void _cdecl AddControlTable(const string &title, int x, int y, int width, int height, const string &id);
 	void _cdecl AddSpinButton(const string &title, int x, int y, int width, int height, const string &id);
 
-	void _cdecl EmbedDialog(const string &root, int page, const string &id);
+	void _cdecl EmbedDialog(const string &id, int x, int y);
 
 // using controls
 	// string

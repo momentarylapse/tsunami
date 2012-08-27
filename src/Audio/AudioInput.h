@@ -11,12 +11,12 @@
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
-#include "../Stuff/Observable.h"
+#include "../Stuff/PeakMeter.h"
 
 
 #define NUM_CAPTURE_SAMPLES		8192
 
-class AudioInput : public HuiEventHandler, public Observable
+class AudioInput : public HuiEventHandler, public PeakMeterSource
 {
 public:
 	AudioInput();
@@ -39,6 +39,10 @@ public:
 	int DoCapturing();
 	void Update();
 	void FindPeaks(int a, float &peak_r, float &peak_l);
+
+
+	float GetSampleRate();
+	BufferBox GetSomeSamples();
 
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];

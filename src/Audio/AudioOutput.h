@@ -11,9 +11,9 @@
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
-#include "../Stuff/Observable.h"
+#include "../Stuff/PeakMeter.h"
 
-class AudioOutput : public HuiEventHandler, public Observable
+class AudioOutput : public HuiEventHandler, public PeakMeterSource
 {
 public:
 	AudioOutput();
@@ -32,7 +32,9 @@ public:
 
 	bool IsPlaying();
 	int GetPos(AudioFile * a);
-	void GetPeaks(float &peak_r, float &peak_l);
+
+	float GetSampleRate();
+	BufferBox GetSomeSamples();
 
 	float GetVolume();
 	void SetVolume(float _volume);

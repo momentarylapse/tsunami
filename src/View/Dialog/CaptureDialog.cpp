@@ -28,7 +28,7 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 
 	// dialog
 	FromResource("record_dialog");
-	peak_meter = new PeakMeter(this, "capture_level");
+	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
 	SetString("capture_time", a->get_time_str(0));
 	Enable("capture_delete", false);
 	Enable("capture_pause", false);
@@ -132,7 +132,6 @@ void CaptureDialog::OnClose()
 
 void CaptureDialog::OnUpdate(Observable *o)
 {
-	peak_meter->Set(tsunami->input->CaptureLevelR, tsunami->input->CaptureLevelL);
 	SetString("capture_time", audio->get_time_str(tsunami->input->CaptureBuf.num));
 }
 

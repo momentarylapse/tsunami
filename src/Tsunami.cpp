@@ -85,7 +85,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddButton("", 0, 0, 0, 0, "play");
 	AddButton("", 1, 0, 0, 0, "stop");
 	AddDrawingArea("!width=100", 2, 0, 0, 0, "peaks");
-	peak_meter = new PeakMeter(this, "peaks");
+	peak_meter = new PeakMeter(this, "peaks", output);
 	AddSlider("!width=100", 3, 0, 0, 0, "volume_slider");
 	AddSpinButton("!width=50\\0\\0\\100", 4, 0, 0, 0, "volume");
 	AddText("!width=20\\%", 5, 0, 0, 0, "label_percent");
@@ -449,9 +449,6 @@ void Tsunami::OnUpdate(Observable *o)
 	if (o->GetName() == "AudioOutput"){
 		ForceRedraw();
 		UpdateMenu();
-		float peak_r, peak_l;
-		output->GetPeaks(peak_r, peak_l);
-		peak_meter->Set(peak_r, peak_l);
 	}else // "Data" or "AudioView"
 		UpdateMenu();
 }

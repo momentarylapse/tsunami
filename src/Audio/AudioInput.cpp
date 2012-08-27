@@ -30,7 +30,7 @@
 #endif
 
 AudioInput::AudioInput() :
-	Observable("AudioInput")
+	PeakMeterSource("AudioInput")
 {
 	Capturing = false;
 	capture = NULL;
@@ -159,6 +159,29 @@ int AudioInput::DoCapturing()
 void AudioInput::Update()
 {
 	CaptureCurrentSamples = DoCapturing();
+}
+
+BufferBox AudioInput::GetSomeSamples()
+{
+	BufferBox buf;
+	if (CaptureAddData){
+		int n = min(CaptureBuf.num, 2048);
+		int i0 = CaptureBuf.num - n;
+		buf.resize(n);
+		for (int i=0;i<n;i++){
+			buf.r[i] = CaptureBuf.r[i0 + i];
+			buf.l[i] = CaptureBuf.l[i0 + i];
+		}
+	}else{
+		//buf.set(CapturePreviewBuf, 0, 1.0f);
+		buf = CapturePreviewBuf;
+	}
+	return buf;
+}
+
+float AudioInput::GetSampleRate()
+{
+	return CaptureSampleRate;
 }
 
 void AudioInput::FindPeaks(int a, float &peak_r, float &peak_l)

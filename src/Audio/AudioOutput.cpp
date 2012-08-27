@@ -32,7 +32,7 @@
 #define UPDATE_TIME		30
 
 AudioOutput::AudioOutput() :
-	Observable("AudioOutput")
+	PeakMeterSource("AudioOutput")
 {
 	al_initialized = false;
 	al_last_error = AL_NO_ERROR;
@@ -335,9 +335,14 @@ void AudioOutput::SetVolume(float _volume)
 	volume = _volume;
 }
 
-void AudioOutput::GetPeaks(float &peak_r, float &peak_l)
+float AudioOutput::GetSampleRate()
 {
-	peak_r = peak_l = 0;
+	return audio->sample_rate;
+}
+
+BufferBox AudioOutput::GetSomeSamples()
+{
+	BufferBox buf;
 
 	if (playing){
 
@@ -354,15 +359,13 @@ void AudioOutput::GetPeaks(float &peak_r, float &peak_l)
 		int num_samples = 2000;
 		Array<short> tmp = data.sub(pos_0 * 2, num_samples * 2);
 
+		buf.resize(tmp.num / 2);
 		for (int i=0;i<tmp.num/2;i++){
-			float amp_r = fabs((float)tmp[i * 2    ] / 32768.0f);
-			float amp_l = fabs((float)tmp[i * 2 + 1] / 32768.0f);
-			if (amp_r > peak_r)
-				peak_r = amp_r;
-			if (amp_l > peak_l)
-				peak_l = amp_l;
+			buf.r[i] = fabs((float)tmp[i * 2    ] / 32768.0f);
+			buf.l[i] = fabs((float)tmp[i * 2 + 1] / 32768.0f);
 		}
 	}
+	return buf;
 }
 
 bool AudioOutput::TestError(const string &msg)

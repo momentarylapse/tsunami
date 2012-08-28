@@ -176,7 +176,6 @@ BufferBox AudioInput::GetSomeSamples(int num_samples)
 		//buf.set(CapturePreviewBuf, 0, 1.0f);
 		buf = CapturePreviewBuf;
 	}
-	msg_write(buf.num);
 	return buf;
 }
 

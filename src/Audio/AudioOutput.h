@@ -34,7 +34,7 @@ public:
 	int GetPos(AudioFile * a);
 
 	float GetSampleRate();
-	BufferBox GetSomeSamples();
+	BufferBox GetSomeSamples(int num_samples);
 
 	float GetVolume();
 	void SetVolume(float _volume);

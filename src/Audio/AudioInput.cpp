@@ -161,11 +161,11 @@ void AudioInput::Update()
 	CaptureCurrentSamples = DoCapturing();
 }
 
-BufferBox AudioInput::GetSomeSamples()
+BufferBox AudioInput::GetSomeSamples(int num_samples)
 {
 	BufferBox buf;
 	if (CaptureAddData){
-		int n = min(CaptureBuf.num, 2048);
+		int n = min(CaptureBuf.num, num_samples);
 		int i0 = CaptureBuf.num - n;
 		buf.resize(n);
 		for (int i=0;i<n;i++){
@@ -176,6 +176,7 @@ BufferBox AudioInput::GetSomeSamples()
 		//buf.set(CapturePreviewBuf, 0, 1.0f);
 		buf = CapturePreviewBuf;
 	}
+	msg_write(buf.num);
 	return buf;
 }
 

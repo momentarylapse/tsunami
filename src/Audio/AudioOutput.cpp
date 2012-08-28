@@ -340,7 +340,7 @@ float AudioOutput::GetSampleRate()
 	return audio->sample_rate;
 }
 
-BufferBox AudioOutput::GetSomeSamples()
+BufferBox AudioOutput::GetSomeSamples(int num_samples)
 {
 	BufferBox buf;
 
@@ -356,7 +356,6 @@ BufferBox AudioOutput::GetSomeSamples()
 			pos_0 = 0;
 
 		// data...
-		int num_samples = 2000;
 		Array<short> tmp = data.sub(pos_0 * 2, num_samples * 2);
 
 		buf.resize(tmp.num / 2);

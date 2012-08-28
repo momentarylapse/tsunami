@@ -8,6 +8,7 @@
 #include "PeakMeter.h"
 #include "../Plugins/FastFourierTransform.h"
 
+const int NUM_SAMPLES = 4096;
 const int SPECTRUM_SIZE = 30;
 const float FREQ_MIN = 40.0f;
 const float FREQ_MAX = 4000.0f;
@@ -109,7 +110,7 @@ void PeakMeter::FindSpectrum()
 		float f0 = i_to_freq(i);
 		float f1 = i_to_freq(i + 1);
 		int n0 = f0 * buf.num / sample_rate;
-		int n1 = f1 * buf.num / sample_rate;
+		int n1 = max(f1 * buf.num / sample_rate, n0 + 1);
 		float s = 0;
 		for (int n=n0;n<n1;n++)
 			if (n < cr.num){
@@ -124,7 +125,7 @@ void PeakMeter::FindSpectrum()
 void PeakMeter::OnUpdate(Observable *o)
 {
 	sample_rate = source->GetSampleRate();
-	buf = source->GetSomeSamples();
+	buf = source->GetSomeSamples(NUM_SAMPLES);
 
 	if (mode == ModePeaks)
 		FindPeaks();

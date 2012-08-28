@@ -42,7 +42,7 @@ public:
 
 
 	float GetSampleRate();
-	BufferBox GetSomeSamples();
+	BufferBox GetSomeSamples(int num_samples);
 
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];

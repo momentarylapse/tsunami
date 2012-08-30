@@ -39,8 +39,6 @@ AudioInput::AudioInput() :
 	CapturePlayback = false;
 	CapturePlaybackDelay = 0;
 	memset(capture_temp, 0, sizeof(capture_temp));
-	CaptureLevelR = 0;
-	CaptureLevelL = 0;
 	CaptureSampleRate = DEFAULT_SAMPLE_RATE;
 	CaptureMaxDelay = 0;
 	CaptureCurrentSamples = 0;
@@ -147,7 +145,6 @@ int AudioInput::DoCapturing()
 			AddToCapturePreviewBuf(a);
 		}
 		Notify("Capture");
-		FindPeaks(a, CaptureLevelR, CaptureLevelL);
 	}else
 		a = 0;
 	if (Capturing)
@@ -182,26 +179,4 @@ BufferBox AudioInput::GetSomeSamples(int num_samples)
 float AudioInput::GetSampleRate()
 {
 	return CaptureSampleRate;
-}
-
-void AudioInput::FindPeaks(int a, float &peak_r, float &peak_l)
-{
-	// which buffer?
-	float *br, *bl;
-	if (CaptureAddData){
-		br = &CaptureBuf.r[CaptureBuf.num - a];
-		bl = &CaptureBuf.l[CaptureBuf.num - a];
-	}else{
-		br = &CapturePreviewBuf.r[0];
-		bl = &CapturePreviewBuf.l[0];
-	}
-
-	// find peaks
-	peak_r = peak_l = 0;
-	for (int i=0;i<a;i++){
-		if (fabs(br[i]) > peak_r)
-			peak_r = fabs(br[i]);
-		if (fabs(bl[i]) > peak_l)
-			peak_l = fabs(bl[i]);
-	}
 }

@@ -38,7 +38,6 @@ public:
 	void AddToCapturePreviewBuf(int a);
 	int DoCapturing();
 	void Update();
-	void FindPeaks(int a, float &peak_r, float &peak_l);
 
 
 	float GetSampleRate();
@@ -46,7 +45,6 @@ public:
 
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];
-	float CaptureLevelR, CaptureLevelL;
 	int CaptureSampleRate;
 	int CaptureMaxDelay;
 

@@ -75,9 +75,6 @@ void PeakMeter::FindPeaks()
 	}
 }
 
-inline float cabs(complex &c)
-{	return sqrt(c.x * c.x + c.y * c.y);	}
-
 inline float i_to_freq(int i)
 {	return FREQ_MIN * exp( (float)i / (float)SPECTRUM_SIZE * log(FREQ_MAX / FREQ_MIN));	}
 
@@ -114,10 +111,10 @@ void PeakMeter::FindSpectrum()
 		float s = 0;
 		for (int n=n0;n<n1;n++)
 			if (n < cr.num){
-				s = max(s, cabs(cr[n]));
-				s = max(s, cabs(cl[n]));
+				s = max(s, cr[n].abs_sqr());
+				s = max(s, cl[n].abs_sqr());
 			}
-		spec_r[i] = spec_l[i] = sqrt(s / (float)SPECTRUM_SIZE / pi / 2);
+		spec_r[i] = spec_l[i] = sqrt(sqrt(s) / (float)SPECTRUM_SIZE / pi / 2);
 	}
 	msg_db_l(1);
 }

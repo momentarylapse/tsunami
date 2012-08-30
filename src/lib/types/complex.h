@@ -40,6 +40,10 @@ struct complex
 	{	return ((x==v.x)&&(y==v.y));	}
 	bool operator != (const complex &v) const
 	{	return !((x==v.x)&&(y==v.y));	}
+	float abs() const
+	{	return sqrt(x*x + y*y);	}
+	float abs_sqr() const
+	{	return x*x + y*y;	}
 	string str()
 	{	return format("(%f, %f)", x, y);	}
 };

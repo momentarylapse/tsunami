@@ -28,6 +28,9 @@
 	#define any_p(p)		NULL
 #endif
 
+// we're always using math types
+#define type_p(p)			(void*)p
+
 extern sType *TypeComplexList;
 extern sType *TypeFloatList;
 extern sType *TypeVectorList;
@@ -216,7 +219,7 @@ public:
 	{
 		float r = 0;
 		for (int i=0;i<num;i++)
-			r += (*this)[i].x * (*this)[i].x + (*this)[i].y * (*this)[i].y;
+			r += (*this)[i].abs_sqr();
 		return r;
 	}
 	
@@ -407,13 +410,15 @@ void SIAddPackageMath()
 	add_class(TypeComplex);
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&complex::str)));
+		class_add_func("abs",		TypeFloat,			mf((tmf)&complex::abs));
+		class_add_func("abs_sqr",	TypeFloat,			mf((tmf)&complex::abs_sqr));
+		class_add_func("str",		TypeString,			mf((tmf)&complex::str));
 	
 	add_class(TypeVector);
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_element("z",		TypeFloat,	8);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&vector::str)));
+		class_add_func("str",		TypeString,			type_p(mf((tmf)&vector::str)));
 	
 	add_class(TypeQuaternion);
 		class_add_element("x",		TypeFloat,	0);
@@ -424,28 +429,28 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeQuaternion);
 		class_add_func("__imul__", TypeVoid, mf((tmf)&quaternion::imul));
 			func_add_param("other",	TypeQuaternion);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&quaternion::str)));
+		class_add_func("str",		TypeString,			mf((tmf)&quaternion::str));
 	
 	add_class(TypeRect);
 		class_add_element("x1",	TypeFloat,	0);
 		class_add_element("x2",	TypeFloat,	4);
 		class_add_element("y1",	TypeFloat,	8);
 		class_add_element("y2",	TypeFloat,	12);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&rect::str)));
+		class_add_func("str",		TypeString,			mf((tmf)&rect::str));
 	
 	add_class(TypeColor);
 		class_add_element("a",		TypeFloat,	12);
 		class_add_element("r",		TypeFloat,	0);
 		class_add_element("g",		TypeFloat,	4);
 		class_add_element("b",		TypeFloat,	8);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&color::str)));
+		class_add_func("str",		TypeString,			mf((tmf)&color::str));
 	
 	add_class(TypePlane);
 		class_add_element("a",		TypeFloat,	0);
 		class_add_element("b",		TypeFloat,	4);
 		class_add_element("c",		TypeFloat,	8);
 		class_add_element("d",		TypeFloat,	12);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&plane::str)));
+		class_add_func("str",		TypeString,			mf((tmf)&plane::str));
 	
 	add_class(TypeMatrix);
 		class_add_element("_00",	TypeFloat,	0);
@@ -472,7 +477,7 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeMatrix);
 		class_add_func("__mul__",	TypeVector,	mf((tmf)&matrix::mul_v));
 			func_add_param("other",	TypeVector);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&matrix::str)));
+		class_add_func("str",		TypeString,			mf((tmf)&matrix::str));
 	
 	add_class(TypeMatrix3);
 		class_add_element("_11",	TypeFloat,	0);
@@ -486,7 +491,7 @@ void SIAddPackageMath()
 		class_add_element("_33",	TypeFloat,	32);
 		class_add_element("e",		TypeFloatArray3x3,	0);
 		class_add_element("_e",		TypeFloatArray9,	0);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&matrix3::str)));
+		class_add_func("str",		TypeString,			mf((tmf)&matrix3::str));
 	
 	add_class(TypeVli);
 		class_add_element("sign",	TypeBool,	0);

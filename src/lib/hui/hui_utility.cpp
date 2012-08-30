@@ -220,12 +220,12 @@ void HuiCopyToClipBoard(const string &buffer)
 		if (buffer[i]=='\n')
 			nn++;
 
-	char *str=new char[num+nn+1];
+	char *str=new char[buffer.num+nn+1];
 	HGLOBAL hglbCopy;
 	EmptyClipboard();
 
 	// Pointer vorbereiten
-	hglbCopy=GlobalAlloc(GMEM_MOVEABLE,sizeof(WCHAR)*(num+nn+1));
+	hglbCopy=GlobalAlloc(GMEM_MOVEABLE,sizeof(WCHAR)*(buffer.num+nn+1));
 	if (!hglbCopy){
 		CloseClipboard();
 		return;
@@ -234,7 +234,7 @@ void HuiCopyToClipBoard(const string &buffer)
 
 	// befuellen
 	int l=0;
-	for (i=0;i<num;i++){
+	for (i=0;i<buffer.num;i++){
 		if (buffer[i]=='\n'){
 			str[l]='\r';
 			l++;
@@ -244,7 +244,7 @@ void HuiCopyToClipBoard(const string &buffer)
 	}
 	str[l+1]=0;
 
-	MultiByteToWideChar(CP_UTF8,0,(LPCSTR)str,-1,wstr,num+nn+1);
+	MultiByteToWideChar(CP_UTF8,0,(LPCSTR)str,-1,wstr,buffer.num+nn+1);
 	delete(str);
 
 	GlobalUnlock(hglbCopy);
@@ -275,22 +275,10 @@ string HuiPasteFromClipBoard()
 	WideCharToMultiByte(CP_UTF8,0,wstr,-1,(LPSTR)str,lll,NULL,NULL);
 	delete[](wstr);
 
+	r = str;
+
 	// doppelte Zeilenumbrueche finden
-	int len=(int)strlen(str);
-	for (int i=0;i<len;i++)
-		if (str[i]=='\r')
-			nn++;
-
-	(*buffer)=new char[len-nn+5];
-	num=0;
-
-	for (int i=0;i<len;i++){
-		if (str[i]=='\r')
-			continue;
-		(*buffer)[num]=str[i];
-		num++;
-	}
-	(*buffer)[num]=0;
+	r.replace("\r", "");
 #endif
 #ifdef HUI_API_GTK
 	//msg_write("--------a");

@@ -43,12 +43,6 @@ void PluginManager::PopCurPlugin()
 	}
 }
 
-/*BufferBox TrackGetBuffers(Track *t, const Range &r)
-{	return t->GetBuffers(r);	}
-
-BufferBox TrackReadBuffers(Track *t, const Range &r)
-{	return t->ReadBuffers(r);	}*/
-
 BufferBox AudioFileRender(AudioFile *a, const Range &r)
 {	return tsunami->renderer->RenderAudioFile(a, r);	}
 
@@ -91,12 +85,6 @@ void GlobalRemoveSliders(CHuiWindow *win)
 	global_slider.clear();
 }
 
-void GlobalCaptureStart(int sample_rate, bool add_data)
-{	tsunami->input->CaptureStart(sample_rate, add_data);	}
-
-void GlobalCaptureStop()
-{	tsunami->input->CaptureStop();	}
-
 /*void GlobalBufferBoxClear(BufferBox *box)
 {	box->clear();	}*/
 
@@ -123,9 +111,6 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalFunc("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
 	ScriptLinkSemiExternalFunc("Track.GetBuffers",	(void*)&Track::GetBuffers);
 	ScriptLinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
-//	ScriptLinkSemiExternalFunc("UpdatePeaks",	(void*)&UpdatePeaks);
-//	ScriptLinkSemiExternalFunc("ChangeAudioFile",(void*)&ChangeAudioFile);
-//	ScriptLinkSemiExternalFunc("ChangeTrack",	(void*)&ChangeTrack);
 	ScriptLinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
 	ScriptLinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
 	ScriptLinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
@@ -133,10 +118,7 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
 	ScriptLinkSemiExternalFunc("fft_i2c",		(void*)&FastFourierTransform::fft_i2c);
 	ScriptLinkSemiExternalFunc("fft_c2i_inv",	(void*)&FastFourierTransform::fft_c2i_inv);
-	ScriptLinkSemiExternalFunc("CaptureStart",	(void*)&GlobalCaptureStart);
-	ScriptLinkSemiExternalFunc("CaptureStop",	(void*)&GlobalCaptureStop);
-/*	ScriptLinkSemiExternalFunc("DoCapturing",	(void*)&DoCapturing);
-	ScriptLinkSemiExternalFunc("ProgressStart",	(void*)&ProgressStart);
+	/*ScriptLinkSemiExternalFunc("ProgressStart",	(void*)&ProgressStart);
 	ScriptLinkSemiExternalFunc("ProgressEnd",	(void*)&ProgressEnd);
 	ScriptLinkSemiExternalFunc("Progress",		(void*)&ProgressStatus);*/
 	ScriptLinkSemiExternalFunc("PutFavoriteBarFixed",	(void*)&GlobalPutFavoriteBarFixed);
@@ -156,6 +138,8 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalFunc("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
 	ScriptLinkSemiExternalFunc("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
 	ScriptLinkSemiExternalFunc("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
+	ScriptLinkSemiExternalFunc("AudioInput.Start",	(void*)&AudioInput::Start);
+	ScriptLinkSemiExternalFunc("AudioInput.Stop",	(void*)&AudioInput::Stop);
 	msg_db_l(2);
 }
 

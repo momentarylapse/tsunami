@@ -30,10 +30,10 @@ public:
 	Array<string> Device;
 	string ChosenDevice;
 
-	void CaptureInit();
+	void Init();
 
-	bool CaptureStart(int sample_rate, bool add_data);
-	void CaptureStop();
+	bool Start(int sample_rate, bool add_data);
+	void Stop();
 	void AddToCaptureBuf(int a);
 	void AddToCapturePreviewBuf(int a);
 	int DoCapturing();

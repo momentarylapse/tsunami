@@ -151,7 +151,7 @@ void idle()
 complex bufc[]
 
 void main()
-	CaptureStart(freq, false)
+	input.Start(freq, false)
 	win = HuiCreateDialog("Tonerkennung", 300, 145, MainWin, false)
 	win.AddDrawingArea("", 5, 5, 290, 135, "drawing")
 	win.Update()
@@ -168,4 +168,4 @@ void main()
 	//HuiWaitTillWindowClosed(win)
 	while win
 		idle()
-	CaptureStop()
+	input.Stop()

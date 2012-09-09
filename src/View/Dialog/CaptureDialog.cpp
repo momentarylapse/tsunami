@@ -19,7 +19,7 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	int sample_rate = (a->used) ? a->sample_rate : DEFAULT_SAMPLE_RATE;
 	//CapturingByDialog = true;
 
-	if (!tsunami->input->CaptureStart(sample_rate, false)){
+	if (!tsunami->input->Start(sample_rate, false)){
 		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
 		CapturingByDialog = false;
 		msg_db_l(1);
@@ -74,7 +74,7 @@ void CaptureDialog::OnDevice()
 		tsunami->input->ChosenDevice = "";
 	HuiConfigWriteStr("Input.ChosenDevice", tsunami->input->ChosenDevice);
 	if (tsunami->input->Capturing)
-		tsunami->input->CaptureStart(tsunami->input->CaptureSampleRate, tsunami->input->CaptureAddData);
+		tsunami->input->Start(tsunami->input->CaptureSampleRate, tsunami->input->CaptureAddData);
 }
 
 void CaptureDialog::OnStart()
@@ -117,15 +117,15 @@ void CaptureDialog::OnPause()
 
 void CaptureDialog::OnOk()
 {
-	tsunami->input->CaptureStop();
+	tsunami->input->Stop();
 	Insert();
-	tsunami->input->CaptureStop();
+	tsunami->input->Stop();
 	delete(this);
 }
 
 void CaptureDialog::OnClose()
 {
-	tsunami->input->CaptureStop();
+	tsunami->input->Stop();
 	delete(this);
 	tsunami->input->CaptureBuf.clear();
 }

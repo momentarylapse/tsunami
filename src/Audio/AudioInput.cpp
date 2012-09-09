@@ -53,7 +53,7 @@ AudioInput::~AudioInput()
 }
 
 
-void AudioInput::CaptureInit()
+void AudioInput::Init()
 {
 	msg_db_r("CaptureInit", 1);
 	Device.clear();
@@ -69,7 +69,7 @@ void AudioInput::CaptureInit()
 	msg_db_l(1);
 }
 
-void AudioInput::CaptureStop()
+void AudioInput::Stop()
 {
 	msg_db_r("CaptureStop", 1);
 	if (Capturing){
@@ -81,13 +81,13 @@ void AudioInput::CaptureStop()
 	msg_db_l(1);
 }
 
-bool AudioInput::CaptureStart(int sample_rate, bool add_data)
+bool AudioInput::Start(int sample_rate, bool add_data)
 {
 	msg_db_r("CaptureStart", 1);
 	if (Capturing)
-		CaptureStop();
+		Stop();
 
-	CaptureInit();
+	Init();
 	CaptureSampleRate = sample_rate;
 	capture = alcCaptureOpenDevice(dev_name.c_str(), sample_rate, AL_FORMAT_STEREO16, NUM_CAPTURE_SAMPLES);
 	//msg_write((int)capture);

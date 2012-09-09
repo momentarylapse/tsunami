@@ -1,0 +1,53 @@
+// Image = hui:media-play
+// Title[Deutsch] = Metronom
+#include "api.kaba"
+
+window dlg
+
+const int SAMPLE_RATE = 44100
+float length
+float freq
+float bpm
+float volume
+
+void fill(int pos, BufferBox buf)
+	float w_f = 1.0 / i2f(SAMPLE_RATE) * freq * 2.0 * pi
+	float dt_m = 60.0 / bpm
+	int sm_m = dt_m * SAMPLE_RATE
+	int sm_d = length * SAMPLE_RATE
+	
+	for int i, 0, buf.num
+		int ii = (i + pos)
+		if loopi(ii, 0, sm_m) < sm_d
+			buf.r[i] = sin(ii * w_f) * volume
+			buf.l[i] = sin(ii * w_f) * volume
+
+void OnBpm()
+	bpm = dlg.GetFloat("")
+
+void OnClose()
+	output.Stop()
+	HuiWinClose(dlg)
+
+void main()
+	dlg = HuiCreateSizableDialog("Metronome", 200, 80, MainWin, false)
+	dlg.AddControlTable("", 0, 0, 1, 2, "table")
+	dlg.SetTarget("table", 0)
+	dlg.AddSpinButton("", 0, 0, 0, 0, "bpm")
+	dlg.AddButton("Close", 0, 1, 0, 0, "close")
+	dlg.SetImage("close", "hui:close")
+	dlg.Update()
+	
+	freq = 880.0
+	length = 0.02
+	volume = 0.8
+	bpm = 90.0
+	dlg.SetFloat("bpm", bpm)
+	
+	dlg.Event("hui:close", &OnClose)
+	dlg.Event("close", &OnClose)
+	dlg.Event("bpm", &OnBpm)
+	
+	output.PlayGenerated(&fill, SAMPLE_RATE)
+	
+	HuiWaitTillWindowClosed(dlg)

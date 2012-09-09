@@ -9,7 +9,7 @@
 #include "Tsunami.h"
 
 string AppName = "Tsunami";
-string AppVersion = "0.3.6.0 alpha";
+string AppVersion = "0.3.7.0 alpha";
 
 #define iforeach(_array_, _it_) \
 	for(typeof((_array_).begin()) _it_ = (_array_).begin(); _it_.valid(); _it_ ++)

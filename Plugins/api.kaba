@@ -148,14 +148,26 @@ class AudioFile
 	
 	string level_name[]
 
+
+class AudioOutput
+	extern void Stop()
+	extern void Play(AudioFile a, bool loop)
+	extern void PlayGenerated(void *func, int sample_rate)
+	extern bool IsPlaying()
+	extern int GetPos(AudioFile a)
+	extern float GetSampleRate()
+	extern float GetVolume()
+	extern void SetVolume(float _volume)
+
 extern window MainWin
 extern AudioFile /* *audio[2],*/ *cur_audio
+extern AudioOutput *output
 
 extern Track *AddEmptyTrack(AudioFile *a)
 extern void DeleteTrack(AudioFile *a, int n)
 extern Track *AddEmptySubTrack(Track *t, Range r, string name)
 extern void CreateNew(AudioFile *a, int length, int sample_rate)
-extern void UpdatePeaks(Track *t)
+//extern void UpdatePeaks(Track *t)
 extern void CreateTrackBuffers(Track *t)
 
 //extern void ChangeAudioFile(AudioFile *a)

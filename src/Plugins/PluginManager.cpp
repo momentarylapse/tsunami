@@ -115,6 +115,8 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
 	ScriptLinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
 	ScriptLinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);
+	ScriptLinkSemiExternalVar("input",			&tsunami->input);
+	ScriptLinkSemiExternalVar("output",			&tsunami->output);
 /*	ScriptLinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
 	ScriptLinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
 	ScriptLinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
@@ -146,6 +148,14 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalFunc("SliderGet",		(void*)&GlobalSliderGet);
 	ScriptLinkSemiExternalFunc("RemoveSliders",	(void*)&GlobalRemoveSliders);
 	ScriptLinkSemiExternalFunc("AudioFileRender",		(void*)&AudioFileRender);
+	ScriptLinkSemiExternalFunc("AudioOutput.Play",	(void*)&AudioOutput::Play);
+	ScriptLinkSemiExternalFunc("AudioOutput.PlayGenerated",	(void*)&AudioOutput::PlayGenerated);
+	ScriptLinkSemiExternalFunc("AudioOutput.Stop",	(void*)&AudioOutput::Stop);
+	ScriptLinkSemiExternalFunc("AudioOutput.IsPlaying",	(void*)&AudioOutput::IsPlaying);
+	ScriptLinkSemiExternalFunc("AudioOutput.GetPos",	(void*)&AudioOutput::GetPos);
+	ScriptLinkSemiExternalFunc("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
+	ScriptLinkSemiExternalFunc("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
+	ScriptLinkSemiExternalFunc("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
 	msg_db_l(2);
 }
 
@@ -765,10 +775,6 @@ void PluginManager::ExecutePlugin(const string &filename)
 				else
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 			}else if (f_void){
-
-				Array<float> fff;
-				Array<complex> ccc;
-				FastFourierTransform::fft_r2c(fff, ccc);
 
 				f_void();
 			}

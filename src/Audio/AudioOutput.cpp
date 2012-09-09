@@ -40,6 +40,7 @@ AudioOutput::AudioOutput() :
 
 	start = pos = 0;
 	audio = NULL;
+	generate_func = NULL;
 	stream_pos = 0;
 	stream_size = 0;
 	stream_pos_0 = 0;
@@ -74,6 +75,7 @@ void AudioOutput::Init()
 {
 	if (al_initialized)
 		return;
+	msg_db_r("Output.Init", 1);
 
 	// which device to use?
 	string dev_name;
@@ -115,7 +117,8 @@ void AudioOutput::Init()
 	}
 
 	if (!ok){
-		tsunami->log->Error(string("OpenAL init:\n") + alutGetErrorString(al_last_error));
+		tsunami->log->Error(string("OpenAL init: ") + alutGetErrorString(al_last_error));
+		msg_db_l(1);
 		return;
 	}
 
@@ -125,13 +128,14 @@ void AudioOutput::Init()
 	//alGenBuffers(1, &buffer);
 	alGenSources(1, &source);
 	al_initialized = true;
+	msg_db_l(1);
 }
 
 void AudioOutput::Kill()
 {
 	if (!al_initialized)
 		return;
-	msg_db_r("KillPreview",1);
+	msg_db_r("Output.Kill",1);
 	Stop();
 	TestError("? (pre kill)");
 	if (buffer[0] >= 0)
@@ -185,7 +189,7 @@ void AudioOutput::Stop()
 {
 	if (!playing)
 		return;
-	msg_db_r("PreviewStop", 1);
+	msg_db_r("Output.Stop", 1);
 	TestError("?  (prestop)");
 	alSourceStop(source);
 	TestError("alSourceStop (stop)");
@@ -210,15 +214,30 @@ void AudioOutput::Stop()
 bool AudioOutput::stream(int buf)
 {
 	msg_db_r("stream", 1);
-	int size = min(AL_BUFFER_SIZE, stream_size - stream_pos);
-	//msg_write(size);
-	if (size == 0){
-		msg_db_l(1);
-		return false;
+	if (audio){
+		int size = min(AL_BUFFER_SIZE, stream_size - stream_pos);
+		//msg_write(size);
+		if (size == 0){
+			msg_db_l(1);
+			return false;
+		}
+		alBufferData(buf, AL_FORMAT_STEREO16, &data[stream_pos * 2], size * 4, sample_rate);
+		TestError("alBufferData (stream)");
+		stream_pos += size;
+	}else if (generate_func){
+		BufferBox box;
+		box.resize(AL_BUFFER_SIZE);
+		(*generate_func)(stream_pos, box);
+		int size = box.num;
+		if (size == 0){
+			msg_db_l(1);
+			return false;
+		}
+		box.get_16bit_buffer(data);
+		alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
+		TestError("alBufferData (stream)");
+		stream_pos += size;
 	}
-	alBufferData(buf, AL_FORMAT_STEREO16, &data[stream_pos * 2], size * 4, audio->sample_rate);
-	TestError("alBufferData (stream)");
-	stream_pos += size;
 	msg_db_l(1);
 	return true;
 }
@@ -258,6 +277,8 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	stream_size = _range.length();
 	stream_pos_0 = 0;
 	audio = a;
+	generate_func = NULL;
+	sample_rate = audio->sample_rate;
 
 	int num_buffers = 0;
 	if (stream(buffer[0]))
@@ -304,6 +325,73 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	msg_db_l(1);
 }
 
+void AudioOutput::PlayGenerated(void *func, int _sample_rate)
+{
+	/*if ((source < 0) || (buffer < 0))
+		return;*/
+	msg_db_r("PlayGenerated", 1);
+
+	if (!al_initialized)
+		Init();
+
+	data.clear();
+
+	/*msg_write((int)buffer);
+	msg_write((int)PVData);
+	msg_write(size);
+	msg_write(a->sample_rate);*/
+
+	//
+	if (playing)
+		Stop();
+
+	alGenBuffers(2, (ALuint*)buffer);
+	TestError("alGenBuffers (play)");
+
+	stream_pos = 0;
+	stream_size = -1;
+	stream_pos_0 = 0;
+	audio = NULL;
+	generate_func = (generate_func_t*)func;
+	sample_rate = _sample_rate;
+
+	int num_buffers = 0;
+	if (stream(buffer[0]))
+		num_buffers ++;
+	if (stream(buffer[1]))
+		num_buffers ++;
+
+//	alSourcei (source, AL_BUFFER,   buffer);
+	alSourcef (source, AL_PITCH,    1.0f);
+	alSourcef (source, AL_GAIN,     volume);
+//	alSourcefv(source, AL_POSITION, SourcePos);
+//	alSourcefv(source, AL_VELOCITY, SourceVel);
+	alSourcei (source, AL_LOOPING,  false);
+	if (TestError("alSourcef... (play)")){
+		msg_db_l(1);
+		return;
+	}
+
+	alSourceQueueBuffers(source, num_buffers, (ALuint*)buffer);
+	TestError("alSourceQueueBuffers (play)");
+
+	alSourcePlay(source);
+	if (TestError("alSourcePlay (play)")){
+		msg_db_l(1);
+		return;
+	}
+
+	playing = true;
+	start = 0;
+	pos = start;
+	loop = false;
+
+	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
+
+	Notify("Play");
+	msg_db_l(1);
+}
+
 bool AudioOutput::IsPlaying()
 {
 	return playing;
@@ -337,7 +425,7 @@ void AudioOutput::SetVolume(float _volume)
 
 float AudioOutput::GetSampleRate()
 {
-	return audio->sample_rate;
+	return sample_rate;
 }
 
 BufferBox AudioOutput::GetSomeSamples(int num_samples)
@@ -351,7 +439,7 @@ BufferBox AudioOutput::GetSomeSamples(int num_samples)
 		alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
 
 		// translate relative to data
-		int pos_0 = dpos + stream_pos - AL_BUFFER_SIZE * 2;
+		int pos_0 = dpos + (audio ? stream_pos : 0) - AL_BUFFER_SIZE * 2;
 		if (pos_0 < 0)
 			pos_0 = 0;
 

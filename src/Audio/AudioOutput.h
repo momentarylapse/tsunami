@@ -28,6 +28,7 @@ public:
 
 	void Stop();
 	void Play(AudioFile *a, bool loop);
+	void PlayGenerated(void *func, int sample_rate);
 	void Update();
 
 	bool IsPlaying();
@@ -49,8 +50,12 @@ private:
 	bool playing;
 	bool loop;
 	int start, pos;
+	int sample_rate;
 
 	AudioFile *audio;
+
+	typedef void generate_func_t(int, BufferBox &);
+	generate_func_t *generate_func;
 
 	Array<short> data;
 	int data_samples;

@@ -283,8 +283,10 @@ public:
 	int _GetMainLevel_();
 	int _GetUniqueID_();
 	HuiControl *_GetControl_(const string &id);
+#ifdef HUI_API_GTK
 	HuiControl *_GetControlByWidget_(GtkWidget *widget);
 	string _GetIDByWidget_(GtkWidget *widget);
+#endif
 	string _GetCurID_();
 	void _SetCurID_(const string &id);
 	bool allow_input;
@@ -295,7 +297,7 @@ private:
 	int tab_creation_page;
 
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 public:
 	HWND hWnd;
 private:

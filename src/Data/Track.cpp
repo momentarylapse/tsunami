@@ -16,7 +16,7 @@ void BarCollection::Update()
 {
 	length = 0;
 	foreach(bar, b)
-		length += b.length;
+		length += b->length;
 }
 
 Track::Track()
@@ -94,14 +94,14 @@ void SelectTrack(Track *t, bool diff)
 	if (diff){
 		bool is_only_selected = true;
 		foreach(t->root->track, tt)
-			if ((tt.is_selected) && (&tt != t))
+			if ((tt->is_selected) && (&*tt != t))
 				is_only_selected = false;
 		t->is_selected = !t->is_selected || is_only_selected;
 	}else{
 		if (!t->is_selected){
 			// unselect all tracks
 			foreach(t->root->track, tt)
-				tt.is_selected = false;
+				tt->is_selected = false;
 		}
 
 		// select this track
@@ -134,15 +134,15 @@ Range Track::GetRangeUnsafe()
 	int min = 2147483640;
 	int max = -2147483640;
 	foreach(level, l)
-		if (l.buffer.num > 0){
-			min = min(l.buffer[0].offset, min);
-			max = max(l.buffer.back().offset + l.buffer.back().num, max);
+		if (l->buffer.num > 0){
+			min = min(l->buffer[0].offset, min);
+			max = max(l->buffer.back().offset + l->buffer.back().num, max);
 		}
-	foreachc(sub, s){
-		if (s.pos < min)
-			min = s.pos;
-		for (int i=0;i<s.rep_num+1;i++){
-			int smax = s.pos + s.length + s.rep_num * s.rep_delay;
+	foreach(sub, s){
+		if (s->pos < min)
+			min = s->pos;
+		for (int i=0;i<s->rep_num+1;i++){
+			int smax = s->pos + s->length + s->rep_num * s->rep_delay;
 			if (smax > max)
 				max = smax;
 		}
@@ -172,11 +172,11 @@ BufferBox Track::ReadBuffers(int level_no, const Range &r)
 
 	// is <r> inside a buffer?
 	foreach(level[level_no].buffer, b){
-		int p0 = r.offset - b.offset;
-		int p1 = r.offset - b.offset + r.num;
-		if ((p0 >= 0) && (p1 <= b.num)){
+		int p0 = r.offset - b->offset;
+		int p1 = r.offset - b->offset + r.num;
+		if ((p0 >= 0) && (p1 <= b->num)){
 			// set as reference to subarrays
-			buf.set_as_ref(b, p0, p1 - p0);
+			buf.set_as_ref(*b, p0, p1 - p0);
 			msg_db_l(1);
 			return buf;
 		}
@@ -187,7 +187,7 @@ BufferBox Track::ReadBuffers(int level_no, const Range &r)
 
 	// fill with overlapp
 	foreach(level[level_no].buffer, b)
-		buf.set(b, b.offset - r.offset, 1.0f);
+		buf.set(*b, b->offset - r.offset, 1.0f);
 
 	msg_db_l(1);
 	return buf;
@@ -204,14 +204,14 @@ BufferBox Track::ReadBuffersCol(const Range &r)
 	int inside_p0, inside_p1;
 	bool intersected = false;
 	foreachi(level, l, li)
-		foreachi(l.buffer, b, bi){
-			if (b.range().covers(r)){
+		foreachi(l->buffer, b, bi){
+			if (b->range().covers(r)){
 				num_inside ++;
 				inside_level = li;
 				inside_no = bi;
-				inside_p0 = r.offset - b.offset;
-				inside_p1 = r.offset - b.offset + r.num;
-			}else if (b.range().overlaps(r))
+				inside_p0 = r.offset - b->offset;
+				inside_p1 = r.offset - b->offset + r.num;
+			}else if (b->range().overlaps(r))
 				intersected = true;
 		}
 	if ((num_inside == 1) && (!intersected)){
@@ -226,8 +226,8 @@ BufferBox Track::ReadBuffersCol(const Range &r)
 
 	// fill with overlapp
 	foreach(level, l)
-		foreach(l.buffer, b)
-			buf.add(b, b.offset - r.offset, 1.0f);
+		foreach(l->buffer, b)
+			buf.add(*b, b->offset - r.offset, 1.0f);
 
 	msg_db_l(1);
 	return buf;
@@ -242,19 +242,19 @@ BufferBox Track::GetBuffers(int level_no, const Range &r)
 void Track::UpdatePeaks()
 {
 	foreach(level, l)
-		foreach(l.buffer, b)
-			b.update_peaks();
+		foreach(l->buffer, b)
+			b->update_peaks();
 	foreach(sub, s)
-		s.UpdatePeaks();
+		s->UpdatePeaks();
 }
 
 void Track::InvalidateAllPeaks()
 {
 	foreach(level, l)
-		foreach(l.buffer, b)
-			b.invalidate_peaks(b.range());
+		foreach(l->buffer, b)
+			b->invalidate_peaks(b->range());
 	foreach(sub, s)
-		s.InvalidateAllPeaks();
+		s->InvalidateAllPeaks();
 }
 
 Track *Track::AddEmptySubTrack(const Range &r, const string &name)

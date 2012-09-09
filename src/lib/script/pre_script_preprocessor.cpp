@@ -1,4 +1,5 @@
 #include "script.h"
+#include "../file/file.h"
 
 typedef void op_func(void *r, void *a, void *b);
 
@@ -203,9 +204,9 @@ void CPreScript::PreProcessor(CScript *s)
 {
 	msg_db_r("PreProcessor", 4);
 	foreach(Function, f){
-		cur_func = f;
-		foreach(f->Block->Command, c)
-			PreProcessCommand(s, c);
+		cur_func = *f;
+		foreach((*f)->Block->Command, c)
+			PreProcessCommand(s, *c);
 	}
 	//Show();
 	msg_db_l(4);
@@ -215,9 +216,9 @@ void CPreScript::PreProcessorAddresses(CScript *s)
 {
 	msg_db_r("PreProcessorAddr", 4);
 	foreach(Function, f){
-		cur_func = f;
-		foreach(f->Block->Command, c)
-			PreProcessCommandAddresses(s, c);
+		cur_func = *f;
+		foreach((*f)->Block->Command, c)
+			PreProcessCommandAddresses(s, *c);
 	}
 	//Show();
 	msg_db_l(4);

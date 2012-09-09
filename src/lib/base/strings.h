@@ -1,6 +1,8 @@
 #if !defined(STRINGS_H__INCLUDED_)
 #define STRINGS_H__INCLUDED_
 
+#include "array.h"
+
 
 #define REGEX_MAX_MATCHES			128
 

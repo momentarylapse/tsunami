@@ -77,7 +77,7 @@ struct sType{
 	int GetFunc(const string &name)
 	{
 		foreachi(Function, f, i)
-			if (f.Name == name)
+			if (f->Name == name)
 				return i;
 		return -1;
 	}

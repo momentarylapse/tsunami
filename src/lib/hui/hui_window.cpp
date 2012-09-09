@@ -285,22 +285,22 @@ bool CHuiWindow::_SendEvent_(HuiEvent *e)
 
 	bool sent = false;
 	foreach(event, ee){
-		if (!_HuiEventMatch_(e, ee.id, ee.message))
+		if (!_HuiEventMatch_(e, ee->id, ee->message))
 			continue;
 		
 		// send the event
-		if (ee.function){
-			ee.function();
+		if (ee->function){
+			ee->function();
 			sent = true;
-		}else if ((ee.object) && (ee.member_function)){
+		}else if ((ee->object) && (ee->member_function)){
 			// send the event (member)
-			(ee.object->*ee.member_function)();
+			(ee->object->*ee->member_function)();
 			sent = true;
 		}
 
 		// window closed by callback?
 		foreach(_HuiClosedWindow_, cw)
-			if (cw.win == this){
+			if (cw->win == this){
 				msg_db_l(2);
 				return sent;
 			}
@@ -400,22 +400,22 @@ void CHuiWindow::FromResource(const string &id)
 	foreach(res->cmd, cmd){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
-			SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			HuiWindowAddControl( this, cmd.type, HuiGetLanguage(cmd.id),
-								cmd.i_param[0], cmd.i_param[1],
-								cmd.i_param[2], cmd.i_param[3],
-								cmd.id);
+			SetTarget(cmd->s_param[0], cmd->i_param[4]);
+			HuiWindowAddControl( this, cmd->type, HuiGetLanguage(cmd->id),
+								cmd->i_param[0], cmd->i_param[1],
+								cmd->i_param[2], cmd->i_param[3],
+								cmd->id);
 		}else if (res->type == "SizableDialog"){
 			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			HuiWindowAddControl( this, cmd.type, HuiGetLanguage(cmd.id),
-								cmd.i_param[0], cmd.i_param[1],
-								cmd.i_param[2], cmd.i_param[3],
-								cmd.id);
+			SetTarget(cmd->s_param[0], cmd->i_param[4]);
+			HuiWindowAddControl( this, cmd->type, HuiGetLanguage(cmd->id),
+								cmd->i_param[0], cmd->i_param[1],
+								cmd->i_param[2], cmd->i_param[3],
+								cmd->id);
 		}
-		Enable(cmd.id, cmd.enabled);
-		if (cmd.image.num > 0)
-			SetImage(cmd.id, cmd.image);
+		Enable(cmd->id, cmd->enabled);
+		if (cmd->image.num > 0)
+			SetImage(cmd->id, cmd->image);
 	}
 	msg_db_m("  \\(^_^)/",1);
 	msg_db_l(1);

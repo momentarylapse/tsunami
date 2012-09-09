@@ -1,6 +1,6 @@
 #include "hui.h"
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <tchar.h>
 	int _tchar_str_size_(TCHAR *str);
 #endif
@@ -110,14 +110,14 @@ string HuiConfigReadStr(const string &name, const string &default_str)
 	return default_str;
 }
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	TCHAR t_dot_end[256],t_desc[256],t_dot_end_desc[256],t_desc_shell[256],t_cmd[256],t_desc_shell_cmd[256],t_desc_shell_cmd_cmd[256],t_cmd_line[256],t_desc_icon[256],t_icon_0[256];
 #endif
 
 void HuiRegisterFileType(const string &ending, const string &description, const string &icon_path, const string &open_with, const string &command_name, bool set_default)
 {
 #if 0
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	_tcscpy(t_dot_end, hui_tchar_str("." + ending));
 	_tcscpy(t_desc, hui_tchar_str(description));
 	_tcscpy(t_dot_end_desc, hui_tchar_str("." + ending + "\\" + description));

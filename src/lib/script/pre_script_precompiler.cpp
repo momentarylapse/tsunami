@@ -74,8 +74,8 @@ void CPreScript::AddIncludeData(CScript *s)
 
 	// constants
 	foreach(ps->Constant, c)
-		if (c.name[0] != '-')
-			Constant.add(c);
+		if (c->name[0] != '-')
+			Constant.add(*c);
 	// TODO... ownership of "big" constants
 	msg_db_l(5);
 }
@@ -249,14 +249,14 @@ void CPreScript::PreCompiler(bool just_analyse)
 			int num_defs_inserted = 0;
 			while(!end_of_line()){
 				foreachi(Define, d, j){
-					if (cur_name == d.Source){
+					if (cur_name == d->Source){
 						int pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 						remove_from_buffer(this, Exp.cur_exp);
-						for (int k=0;k<d.Dest.num;k++){
-							insert_into_buffer(this, d.Dest[k].c_str(), pos, Exp.cur_exp);
+						for (int k=0;k<d->Dest.num;k++){
+							insert_into_buffer(this, d->Dest[k].c_str(), pos, Exp.cur_exp);
 							next_exp();
 						}
-						Exp.cur_exp -= d.Dest.num;
+						Exp.cur_exp -= d->Dest.num;
 						Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
 						num_defs_inserted ++;
 						if (num_defs_inserted > SCRIPT_MAX_DEFINE_RECURSIONS){

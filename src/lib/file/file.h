@@ -20,31 +20,6 @@
 
 
 
-// which operating system?
-
-#ifdef WIN32
-	#define FILE_OS_WINDOWS
-#else
-	#define FILE_OS_LINUX
-#endif
-
-
-
-// which developing environment?
-
-#ifdef _MSC_VER
-	#if _MSC_VER >= 1400
-		#define FILE_IDE_VCS8
-	#else
-		#define FILE_IDE_VCS6
-	#endif
-#else
-	#define FILE_IDE_DEVCPP
-#endif
-//#define FILE_IDE_KDEVELOP ...?
-
-
-
 // ANSI:
 //#include <stdarg.h>
 // UNIX:
@@ -55,23 +30,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#ifndef __cplusplus
-	typedef unsigned char bool;
-	enum{
-		false,
-		true
-	};
-	#define int(x)		(int)(x)
-	#define float(x)	(float)(x)
-#endif
-
-#ifdef FILE_OS_LINUX
-	#define _cdecl
-#endif
 	
 
-#include "array.h"
-#include "strings.h"
+#include "../base/base.h"
 #include "msg.h"
 #include "file_op.h"
 
@@ -198,11 +159,4 @@ extern void FileWrite(const string &filename, const string &str);
 
 #endif
 
-
-#ifndef max
-	#define max(a,b)	(((a) > (b)) ? (a) : (b))
-#endif
-#ifndef min
-	#define min(a,b)	(((a) < (b)) ? (a) : (b))
-#endif
 

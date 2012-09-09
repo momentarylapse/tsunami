@@ -20,7 +20,10 @@ void class_add_func(const string &name, sType *return_type, void *func);
 void add_const(const string &name, sType *type, void *value);
 void add_ext_var(const string &name, sType *type, void *var);
 
-typedef void (CFile::*tmf)();
+class MFDummyClass
+{};
+
+typedef void (MFDummyClass::*tmf)();
 typedef char *tcpa[4];
 static void *mf(tmf vmf)
 {

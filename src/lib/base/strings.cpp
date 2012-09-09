@@ -1,4 +1,4 @@
-#include "file.h"
+#include "base.h"
 
 
 #include <sys/stat.h>
@@ -8,7 +8,7 @@
 #include <time.h>
 #include <locale.h>
 
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <stdio.h>
 	#include <io.h>
 	#include <direct.h>
@@ -17,7 +17,7 @@
 	#include <winbase.h>
 	#include <winnt.h>
 #endif
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	#include <unistd.h>
 	#include <dirent.h>
 	#include <stdarg.h>
@@ -287,12 +287,12 @@ const char *string::c_str() const
 string SysFileName(const string &filename)
 {
 	string str = filename;
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	for (int i=0;i<str.num;i++)
 		if (str[i]=='/')
 			str[i]='\\';
 #endif
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	for (int i=0;i<str.num;i++)
 		if (str[i]=='\\')
 			str[i]='/';
@@ -381,7 +381,7 @@ string format(const string str,...)
 		//format_locale_set = true;
 	//}
 
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	int len = _vscprintf(str.c_str(), args);
 #else
 	int len = vsnprintf(NULL, 0, str.c_str(), args);

@@ -8,7 +8,7 @@
 #ifndef AUDIOINPUT_H_
 #define AUDIOINPUT_H_
 
-#include "../lib/file/file.h"
+#include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Stuff/PeakMeter.h"

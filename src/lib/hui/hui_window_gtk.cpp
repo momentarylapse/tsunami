@@ -3,10 +3,10 @@
 #ifdef HUI_API_GTK
 
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <gdk/gdkwin32.h>
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	#include <gdk/gdkx.h>
 #endif
 
@@ -108,10 +108,10 @@ void WinTrySendByKeyCode(CHuiWindow *win, int key_code)
 	if (key_code <= 0)
 		return;
 	foreach(_HuiCommand_, c)
-		if (key_code == c.key_code){
+		if (key_code == c->key_code){
 			//msg_write>Write("---------------------------------");
 			//msg_write>Write(HuiCommand[kk].id);
-			HuiEvent e = HuiCreateEvent(c.id, "");
+			HuiEvent e = HuiCreateEvent(c->id, "");
 			_HuiSendGlobalCommand_(&e);
 			win->_SendEvent_(&e);
 		}
@@ -142,7 +142,7 @@ bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, CHuiWindow *win, bo
 		return false;
 	}
 
-/*#ifdef HUI_OS_LINUX
+/*#ifdef OS_LINUX
 	char key_map_stat[32];
 	XQueryKeymap(hui_x_display, key_map_stat);
 	bool actual_state = ((key_map_stat[event->hardware_keycode >> 3] >> (event->hardware_keycode & 7)) & 1);
@@ -212,7 +212,7 @@ gboolean OnGtkWindowClose(GtkWidget *widget, GdkEvent *event, gpointer user_data
 	// ...or at least end nested main level
 	int n = 0;
 	foreach(HuiWindow, w)
-		if (w->_GetMainLevel_() >= win->_GetMainLevel_())
+		if ((*w)->_GetMainLevel_() >= win->_GetMainLevel_())
 			n ++;
 	if (n == 1)
 		HuiEnd();
@@ -386,7 +386,7 @@ bool set_button_state(GtkWidget *widget, GdkEventButton *event)
 
 gboolean OnGtkWindowButtonDown(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	// without this... nothing happens.... code optimization???
 	//msg_write("");
 #endif
@@ -470,7 +470,7 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 		// TODO GTK3
 		//gtk_dialog_set_has_separator(GTK_DIALOG(window), false);
 		//gtk_container_set_border_width(GTK_CONTAINER(window), 0);
-#ifndef HUI_OS_WINDOWS
+#ifndef OS_WINDOWS
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
 #endif
 	}else
@@ -570,7 +570,7 @@ CHuiWindow::CHuiWindow(const string &title, int x, int y, int width, int height,
 		gdk_window_process_all_updates();*/
 
 		// prevent the toolbar from using keys...
-#ifndef HUI_OS_WINDOWS
+#ifndef OS_WINDOWS
 		gtk_widget_set_can_focus(gl_widget, true);
 #endif
 		gtk_widget_grab_focus(gl_widget);
@@ -628,7 +628,7 @@ void CHuiWindow::Update()
 {
 	if (!is_hidden)
 		gtk_widget_show(window);
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	hWnd = (HWND)gdk_win32_drawable_get_handle(window->window);
 #endif
 
@@ -854,7 +854,7 @@ irect CHuiWindow::GetInterior()
 
 void CHuiWindow::ShowCursor(bool show)
 {
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	int s=::ShowCursor(show);
 	if (show){
 		while(s<0)
@@ -884,7 +884,7 @@ void ev_out(GdkEvent *e)
 void read_events(const string &msg, bool rem = false)
 {
 	foreach(scp_event, e)
-		gdk_event_free(e);
+		gdk_event_free(*e);
 	scp_event.clear();
 	
 	int n = 0;
@@ -912,7 +912,7 @@ void read_events(const string &msg, bool rem = false)
 void put_events()
 {
 	foreach(scp_event, e)
-		gdk_event_put(e);
+		gdk_event_put(*e);
 }
 
 // relative to Interior
@@ -922,16 +922,16 @@ void CHuiWindow::SetCursorPos(int x,int y)
 	irect ro = GetOuterior();
 	int dx = 0;
 	int dy = 0;
-	#ifdef HUI_OS_LINUX
+	#ifdef OS_LINUX
 		//kill_events();
 		XFlush(hui_x_display);
 		read_events("prae");
 		float xnew = input.x, ynew = input.y;
 		foreach(scp_event, e){
-			if (e->type == 3){
-				xnew = ((GdkEventMotion*)e)->x;
-				ynew = ((GdkEventMotion*)e)->y;
-				ignore_time = gdk_event_get_time(e) + 20;
+			if ((*e)->type == 3){
+				xnew = ((GdkEventMotion*)*e)->x;
+				ynew = ((GdkEventMotion*)*e)->y;
+				ignore_time = gdk_event_get_time(*e) + 20;
 			}
 		}
 		dx = xnew - input.x;
@@ -951,14 +951,14 @@ void CHuiWindow::SetCursorPos(int x,int y)
 
 		read_events("post");
 		foreachb(scp_event, e)
-			if (e->type == 3){
-				((GdkEventMotion*)e)->x = x - dx;
-				((GdkEventMotion*)e)->y = y - dy;
-				((GdkEventMotion*)e)->time += 100;
+			if ((*e)->type == 3){
+				((GdkEventMotion*)*e)->x = x - dx;
+				((GdkEventMotion*)*e)->y = y - dy;
+				((GdkEventMotion*)*e)->time += 100;
 			}
 		put_events();
 	#endif
-	#ifdef HUI_OS_WINDOWS
+	#ifdef OS_WINDOWS
 		// TODO GetInterior gives the wrong position
 		//::SetCursorPos(x + ri.x1, y + ri.y1);
 		::SetCursorPos(x + ri.x1, y + 20);

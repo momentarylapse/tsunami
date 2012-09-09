@@ -13,14 +13,6 @@
 #include "../types/types.h"
 
 
-// which operating system?
-
-#ifdef _WIN32
-	#define NET_OS_WINDOWS
-#else
-	#define NET_OS_LINUX
-#endif
-
 //--------------------------------------------------------------------//
 //                  all about networking                              //
 //--------------------------------------------------------------------//

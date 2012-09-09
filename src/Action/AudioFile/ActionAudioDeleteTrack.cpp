@@ -18,7 +18,7 @@ ActionAudioDeleteTrack::ActionAudioDeleteTrack(AudioFile *a, int index)
 
 	// delete buffers
 	foreachi(t.level, l, li)
-		for (int i=l.buffer.num-1;i>=0;i--)
+		for (int i=l->buffer.num-1;i>=0;i--)
 			AddSubAction(new ActionTrack__DeleteBufferBox(&t, li, i), a);
 
 	// delete subs

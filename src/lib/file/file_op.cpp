@@ -5,11 +5,11 @@
 #include <fcntl.h>
 #include <stdio.h>
 
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <io.h>
 	#include <direct.h>
 #endif
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	#include <unistd.h>
 	#include <dirent.h>
 	//#include <sys/timeb.h>
@@ -63,10 +63,10 @@ bool file_test_existence(const string &filename)
 
 bool dir_create(const string &dir)
 {
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	return (_mkdir(SysFileName(dir).c_str())==0);
 #endif
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	return (mkdir(SysFileName(dir).c_str(),S_IRWXU | S_IRWXG | S_IRWXO)==0);
 #endif
 	return false;
@@ -81,12 +81,12 @@ string get_current_dir()
 {
 	string str;
 	char tmp[256];
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	char *r=_getcwd(tmp, sizeof(tmp));
 	str = tmp;
 	str += "\\";
 #endif
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	char *r=getcwd(tmp, sizeof(tmp));
 	str = tmp;
 	str += "/";
@@ -120,12 +120,12 @@ bool file_copy(const string &source,const string &target)
 	int hs=_open(SysFileName(source).c_str(),O_RDONLY);
 	if (hs<0)
 		return false;
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	int ht=_creat(SysFileName(target).c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
 #endif
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	int ht=creat(SysFileName(target).c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (ht<0){
@@ -168,7 +168,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	string dir2 = dir;
 	dir_ensure_ending(dir2, true);
 
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	static _finddata_t t;
 	int handle=_findfirst(SysFileName(dir2 + "*").c_str(), &t);
 	int e=handle;
@@ -184,7 +184,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 		e=_findnext(handle,&t);
 	}
 #endif
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	DIR *_dir;
 	_dir=opendir(SysFileName(dir2).c_str());
 	if (!_dir){

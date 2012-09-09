@@ -24,7 +24,7 @@ void *ActionAudio__DeleteTrack::execute(Data *d)
 	Track &t = a->track[index];
 	int num_buf = 0;
 	foreach(t.level, l)
-		num_buf += l.buffer.num;
+		num_buf += l->buffer.num;
 	assert(num_buf == 0);
 	assert(t.sub.num == 0);
 

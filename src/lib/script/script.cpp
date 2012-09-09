@@ -7,10 +7,10 @@
 | last updated: 2010.07.07 (c) by MichiSoft TM                                 |
 \*----------------------------------------------------------------------------*/
 #include "../file/file.h"
-#ifdef FILE_OS_LINUX
+#ifdef OS_LINUX
 	#include <sys/mman.h>
 #endif
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include "windows.h"
 #endif
 #include <stdarg.h>
@@ -225,16 +225,16 @@ void DeleteAllScripts(bool even_immortal, bool force)
 
 	// try to erase them...
 	foreachb(PublicScript, s)
-		if ((!s->pre_script->FlagImmortal) || (even_immortal))
-			RemoveScript(s);
+		if ((!(*s)->pre_script->FlagImmortal) || (even_immortal))
+			RemoveScript(*s);
 	foreachb(PrivateScript, s)
-		if ((!s->pre_script->FlagImmortal) || (even_immortal))
-			RemoveScript(s);
+		if ((!(*s)->pre_script->FlagImmortal) || (even_immortal))
+			RemoveScript(*s);
 
 	// undead... really KILL!
 	if (force){
 		foreachb(DeadScript, s)
-			delete(s);
+			delete(*s);
 		DeadScript.clear();
 	}
 
@@ -684,10 +684,10 @@ void CScript::AllocateMemory()
 	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++)
 		MemorySize += mem_align(pre_script->RootOfAllEvil.Var[i].Type->Size);
 	foreachi(pre_script->Constant, c, i){
-		int s = c.type->Size;
-		if (c.type == TypeString){
+		int s = c->type->Size;
+		if (c->type == TypeString){
 			// const string -> variable length   (+ super array frame)
-			s = strlen(c.data) + 1 + 16;
+			s = strlen(c->data) + 1 + 16;
 		}
 		MemorySize += mem_align(s);
 	}
@@ -701,8 +701,8 @@ void CScript::AllocateStack()
 	//   wait() used -> needs to switch stacks ("tasks")
 	Stack = NULL;
 	foreach(pre_script->Command, cmd){
-		if (cmd->Kind == KindCompilerFunction)
-			if ((cmd->LinkNr == CommandWait) || (cmd->LinkNr == CommandWaitRT) || (cmd->LinkNr == CommandWaitOneFrame)){
+		if ((*cmd)->Kind == KindCompilerFunction)
+			if (((*cmd)->LinkNr == CommandWait) || ((*cmd)->LinkNr == CommandWaitRT) || ((*cmd)->LinkNr == CommandWaitOneFrame)){
 				Stack = new char[ScriptStackSize];
 				break;
 			}
@@ -712,7 +712,7 @@ void CScript::AllocateStack()
 void CScript::AllocateOpcode()
 {
 	// allocate some memory for the opcode......    has to be executable!!!   (important on amd64)
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	Opcode=(char*)VirtualAlloc(NULL,SCRIPT_MAX_OPCODE,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
 	ThreadOpcode=(char*)VirtualAlloc(NULL,SCRIPT_MAX_THREAD_OPCODE,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
 #else
@@ -732,8 +732,8 @@ void CScript::MapConstantsToMemory()
 	cnst.resize(pre_script->Constant.num);
 	foreachi(pre_script->Constant, c, i){
 		cnst[i] = &Memory[MemorySize];
-		int s = c.type->Size;
-		if (c.type == TypeString){
+		int s = c->type->Size;
+		if (c->type == TypeString){
 			// const string -> variable Laenge
 			s = strlen(pre_script->Constant[i].data) + 1;
 
@@ -743,7 +743,7 @@ void CScript::MapConstantsToMemory()
 			*(int*)&Memory[MemorySize + 12] = 1; // .item_size
 			MemorySize += 16;
 		}
-		memcpy(&Memory[MemorySize], (void*)c.data, s);
+		memcpy(&Memory[MemorySize], (void*)c->data, s);
 		MemorySize += mem_align(s);
 	}
 }
@@ -771,7 +771,7 @@ void CScript::CompileOsEntryPoint()
 {
 	int nf=-1;
 	foreachi(pre_script->Function, ff, index)
-		if (ff->Name == "main")
+		if ((*ff)->Name == "main")
 			nf = index;
 	// call
 	if (nf>=0)
@@ -781,15 +781,15 @@ void CScript::CompileOsEntryPoint()
 
 	// put strings into Opcode!
 	foreachi(pre_script->Constant, c, i){
-		if ((pre_script->FlagCompileOS) || (c.type == TypeString)){
+		if ((pre_script->FlagCompileOS) || (c->type == TypeString)){
 			int offset = 0;
 			if (pre_script->AsmMetaInfo)
 				offset = ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->CodeOrigin;
 			cnst[i] = (char*)(long)(OpcodeSize + offset);
-			int s = c.type->Size;
-			if (c.type == TypeString)
-				s = strlen(c.data) + 1;
-			memcpy(&Opcode[OpcodeSize], (void*)c.data, s);
+			int s = c->type->Size;
+			if (c->type == TypeString)
+				s = strlen(c->data) + 1;
+			memcpy(&Opcode[OpcodeSize], (void*)c->data, s);
 			OpcodeSize += s;
 		}
 	}
@@ -799,7 +799,7 @@ void CScript::LinkOsEntryPoint()
 {
 	int nf=-1;
 	foreachi(pre_script->Function, ff, index)
-		if (ff->Name == "main")
+		if ((*ff)->Name == "main")
 			nf = index;
 	if (nf>=0){
 		int lll=((long)func[nf]-(long)&Opcode[TaskReturnOffset]);
@@ -838,8 +838,8 @@ void CScript::CompileTaskEntryPoint()
 	// call
 	int nf = -1;
 	foreachi(pre_script->Function, ff, index){
-		if (ff->Name == "main")
-			if (ff->NumParams == 0)
+		if ((*ff)->Name == "main")
+			if ((*ff)->NumParams == 0)
 				nf = index;
 	}
 	if (nf >= 0){
@@ -922,7 +922,7 @@ void CScript::Compiler()
 	foreachi(pre_script->Function, f, i){
 		right();
 		func[i] = (t_func*)&Opcode[OpcodeSize];
-		CompileFunction(f, Opcode, OpcodeSize);
+		CompileFunction(*f, Opcode, OpcodeSize);
 		left();
 
 		if (!Error)
@@ -977,14 +977,14 @@ CScript::~CScript()
 		delete[](Memory);
 	}
 	if (Opcode){
-		#ifdef FILE_OS_WINDOWS
+		#ifdef OS_WINDOWS
 			VirtualFree(Opcode,0,MEM_RELEASE);
 		#else
 			int r=munmap(Opcode,SCRIPT_MAX_OPCODE);
 		#endif
 	}
 	if (ThreadOpcode){
-		#ifdef FILE_OS_WINDOWS
+		#ifdef OS_WINDOWS
 			VirtualFree(ThreadOpcode,0,MEM_RELEASE);
 		#else
 			int r=munmap(ThreadOpcode,SCRIPT_MAX_THREAD_OPCODE);
@@ -1076,12 +1076,12 @@ void *CScript::MatchFunction(const string &name, const string &return_type, int 
 
 	// match
 	foreachi(pre_script->Function, f, i)
-		if ((f->Name == name) && (f->LiteralType->Name == return_type) && (num_params == f->NumParams)){
+		if (((*f)->Name == name) && ((*f)->LiteralType->Name == return_type) && (num_params == (*f)->NumParams)){
 
 			bool params_ok = true;
 			for (int j=0;j<num_params;j++)
-				//if (f->Var[j].Type->Name != param_type[j])
-				if (f->LiteralParamType[j]->Name != param_type[j])
+				//if ((*f)->Var[j].Type->Name != param_type[j])
+				if ((*f)->LiteralParamType[j]->Name != param_type[j])
 					params_ok = false;
 			if (params_ok){
 				msg_db_l(2);

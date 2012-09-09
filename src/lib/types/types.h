@@ -23,7 +23,7 @@ struct matrix3;
 struct quaternion;
 
 
-#include "../file/file.h"
+#include "../base/base.h"
 #include "color.h"
 #include "vector.h"
 #include "matrix.h"

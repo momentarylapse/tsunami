@@ -14,6 +14,7 @@
 
 class CScript;
 
+#include "../base/base.h"
 #include "../types/types.h"
 #include "dasm.h"
 #include "script_data.h"

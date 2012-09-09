@@ -1,5 +1,6 @@
 #include "image.h"
 #include <stdio.h>
+#include "../file/file.h"
 
 static const char *sys_str_f(const string &s)
 {

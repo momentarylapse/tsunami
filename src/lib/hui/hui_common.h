@@ -13,17 +13,9 @@
 
 #include "../00_config.h"
 
-// which operating system?
+// which api?
 
-#ifdef WIN32
-	#define HUI_OS_WINDOWS
-#else
-	#define HUI_OS_LINUX
-#endif
-
-
-
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#ifdef HUI_USE_GTK_ON_WINDOWS
 		#define HUI_API_GTK
 	#else
@@ -35,7 +27,7 @@
 
 
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#ifndef _WIN32_WINDOWS
 		#ifndef _WIN32_WINDOWS
 			#define _WIN32_WINDOWS 0x500
@@ -50,7 +42,7 @@
 	#include <gtk/gtk.h>
 	#include <gdk/gdkkeysyms.h>
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	#define _cdecl
 #endif
 

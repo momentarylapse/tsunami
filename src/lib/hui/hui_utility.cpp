@@ -5,11 +5,11 @@
 	#include "../net/net.h"
 #endif
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <direct.h>
 	#include <tchar.h>
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	#include <sys/time.h>
 	#include <unistd.h>
 #endif
@@ -112,7 +112,7 @@ void hui_default_error_handler()
 	}
 
 	foreachb(HuiWindow, w)
-		delete(w);
+		delete(*w);
 	msg_write(_("                  Close dialog box to exit program."));
 
 	//HuiMultiline=true;
@@ -174,10 +174,10 @@ void HuiSleep(int duration_ms)
 {
 	if (duration_ms<=0)
 		return;
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	Sleep(duration_ms);
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	usleep(duration_ms*1000);
 #endif
 }
@@ -185,22 +185,22 @@ void HuiSleep(int duration_ms)
 // set the default directory
 void HuiSetDirectory(const string &dir)
 {
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	_chdir(sys_str_f(dir));
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	int r=chdir(sys_str_f(dir));
 #endif
 }
 
 int HuiGetCpuCount()
 {
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo(&sysinfo);
 	return sysinfo.dwNumberOfProcessors;
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	return sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 }
@@ -297,10 +297,10 @@ string HuiPasteFromClipBoard()
 
 void HuiOpenDocument(const string &filename)
 {
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	ShellExecute(NULL,_T(""),hui_tchar_str(filename),_T(""),_T(""),SW_SHOW);
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	int r=system(format("gnome-open '%s'", filename.c_str()).c_str());
 #endif
 }
@@ -312,19 +312,19 @@ void HuiOpenDocument(const string &filename)
 // timers
 
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	extern LONGLONG perf_cnt;
 	extern bool perf_flag;
 	extern float time_scale;
 #endif
 struct sHuiTimer
 {
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	LONGLONG CurTime;
 	LONGLONG LastTime;
 	float time_scale;
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	struct timeval CurTime, LastTime;
 #endif
 };
@@ -345,7 +345,7 @@ float HuiGetTime(int index)
 		return 0;*/
 	float elapsed = 1;
 	sHuiTimer *t = &HuiTimer[index];
-	#ifdef HUI_OS_WINDOWS
+	#ifdef OS_WINDOWS
 		if (perf_flag)
 			QueryPerformanceCounter((LARGE_INTEGER *)&t->CurTime);
 		else
@@ -353,7 +353,7 @@ float HuiGetTime(int index)
 		elapsed = (t->CurTime - t->LastTime) * time_scale;
 		t->LastTime = t->CurTime;
 	#endif
-	#ifdef HUI_OS_LINUX
+	#ifdef OS_LINUX
 		gettimeofday(&t->CurTime,NULL);
 		elapsed = float(t->CurTime.tv_sec - t->LastTime.tv_sec) + float(t->CurTime.tv_usec - t->LastTime.tv_usec) * 0.000001f;
 		t->LastTime = t->CurTime;

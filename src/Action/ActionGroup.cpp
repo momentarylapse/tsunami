@@ -14,7 +14,7 @@ ActionGroup::ActionGroup()
 ActionGroup::~ActionGroup()
 {
 	foreach(action, a)
-		delete(a);
+		delete(*a);
 	action.clear();
 }
 
@@ -32,7 +32,7 @@ void *ActionGroup::execute_return(Data *d)
 void *ActionGroup::execute(Data *d)
 {
 	/*foreach(action, a)
-		a->execute(d);*/
+		(*a)->execute(d);*/
 	return execute_return(d);
 }
 
@@ -41,7 +41,7 @@ void *ActionGroup::execute(Data *d)
 void ActionGroup::undo(Data *d)
 {
 	foreachb(action, a)
-		a->undo(d);
+		(*a)->undo(d);
 }
 
 
@@ -49,7 +49,7 @@ void ActionGroup::undo(Data *d)
 void ActionGroup::redo(Data *d)
 {
 	foreach(action, a)
-		a->redo(d);
+		(*a)->redo(d);
 }
 
 

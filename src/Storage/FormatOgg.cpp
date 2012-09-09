@@ -77,7 +77,7 @@ void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	vorbis_comment vc;
 	vorbis_comment_init(&vc);
 	foreach(a->tag, tag)
-		vorbis_comment_add_tag(&vc, (char*)tag.key.c_str(), (char*)tag.value.c_str());
+		vorbis_comment_add_tag(&vc, (char*)tag->key.c_str(), (char*)tag->value.c_str());
 	ogg_packet header_main;
 	ogg_packet header_comments;
 	ogg_packet header_codebooks;

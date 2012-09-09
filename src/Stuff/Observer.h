@@ -9,7 +9,7 @@
 #define OBSERVER_H_
 
 #include "Observable.h"
-#include "../lib/file/file.h"
+#include "../lib/base/base.h"
 
 class Observable;
 

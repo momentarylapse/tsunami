@@ -20,7 +20,7 @@ SubDialog::SubDialog(CHuiWindow *_parent, bool _allow_parent, Track *s):
 	Enable("volume", !s->muted);
 	Enable("volume_slider", !s->muted);
 	foreach(s->root->track, t)
-		AddString("level_track", t.GetNiceName());
+		AddString("level_track", t->GetNiceName());
 	SetInt("level_track", s->parent);
 //	AddEffectList(LevelDialog, "fx_list", s->fx);
 	SetInt("repnum", s->rep_num + 1);

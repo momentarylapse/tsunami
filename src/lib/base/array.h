@@ -2,6 +2,7 @@
 #define ARRAY_H__INCLUDED_
 
 #include <new>
+#include <string.h>
 
 //--------------------------------------------------------------
 // michi-array
@@ -153,6 +154,23 @@ class Array : public DynamicArray
 				allocated = 0;
 			}
 		}
+		void forget()
+		{
+			data = NULL;
+			allocated = 0;
+			num = 0;
+		}
+		void make_own()
+		{
+			if ((num == 0) || (allocated > 0))
+				return;
+			T *dd = (T*)data;
+			int n = num;
+			forget();
+			resize(n);
+			for (int i=0;i<num;i++)
+				(*this)[i] = dd[i];
+		}
 		void operator += (const Array<T> &a)
 		{	append(a);	}
 		void operator += (const T &item)
@@ -177,129 +195,66 @@ class Array : public DynamicArray
 		{	return ((T*)data)[num - 1];	}
 		const T &back() const
 		{	return ((T*)data)[num - 1];	}
+
+		// iterators
+		class Iterator
+		{
+		public:
+			void operator ++()
+			{	index ++;	p ++;	}
+			void operator ++(int)
+			{	index ++;	p ++;	}
+			void operator --()
+			{	index --;	p --;	}
+			void operator --(int)
+			{	index --;	p --;	}
+			bool operator == (const Iterator &i) const
+			{	return p == i.p;	}
+			bool operator != (const Iterator &i) const
+			{	return p != i.p;	}
+			T &operator *()
+			{	return *p;	}
+			T *operator ->()
+			{	return p;	}
+			bool valid() const
+			{	return index < num;	}
+			bool valid_down() const
+			{	return index >= 0;	}
+			int get_index() const
+			{	return index;	}
+		//private:
+			Iterator(Array<T> &a, int n)
+			{	p = &a[n];	index = n;	num = a.num;	}
+		private:
+			T *p;
+			int index;
+			int num;
+		};
+		Iterator begin()
+		{	return Iterator(*this, 0);	}
+		Iterator begin_down()
+		{	return Iterator(*this, num - 1);	}
+		/*void erase(Iterator &it)
+		{	erase(it.get_index());	}*/
 };
 
 
+#define foreach(_array_, _it_) \
+	for(typeof((_array_).begin()) _it_ = (_array_).begin(); _it_.valid(); _it_ ++)
 
-template <class T>
-class DumbArray : public DynamicArray
-{
-	public:
-		DumbArray()
-		{	init(sizeof(T));	}
-		~DumbArray()
-		{	clear();	}
-		void add(const T &item)
-		{
-//			printf("add\n");
-			resize(num + 1);
-			(*this)[num - 1] = item;
-		}
-		void erase(int index)
-		{
-			(*this)[index].~T();
-			delete_single(index);
-		}
-		void resize(int size)
-		{
-			reserve(size);
-			if (size > num)
-				memset((char*)data + num * element_size, 0, (size - num) * element_size);
-			for (int i=num;i<size;i++)
-				(*this)[i] = T();
-			num = size;
-		}
-		void operator = (const DumbArray &a)
-		{
-			num = a.num;
-			data = a.data;
-			element_size = a.element_size;
-			allocated = a.allocated; // ???? TODO
-		}
-		void forget()
-		{
-			data = NULL;
-			allocated = 0;
-			num = 0;
-		}
-		void make_own()
-		{
-			if ((num == 0) || (allocated > 0))
-				return;
-			T *dd = (T*)data;
-			int n = num;
-			forget();
-			resize(n);
-			for (int i=0;i<num;i++)
-				(*this)[i] = dd[i];
-		}
-		T operator[] (int index) const
-		{	return ((T*)data)[index];	}
-		T &operator[] (int index)
-		{	return ((T*)data)[index];	}
-		T &back()
-		{	return ((T*)data)[num - 1];	}
-};
+#define foreachi(_array_, _it_, _i_) \
+	for(typeof((_array_).begin()) _it_ = (_array_).begin(); _it_.valid(); _it_ ++) \
+		for (int _i_ = _it_.get_index(); _i_ >= 0; _i_ = -1)
+
+#define foreachb(_array_, _it_) \
+	for(typeof((_array_).begin()) _it_ = (_array_).begin_down(); _it_.valid_down(); _it_ --)
+
+#define foreachbi(_array_, _it_, _i_) \
+	for(typeof((_array_).begin()) _it_ = (_array_).begin_down(); _it_.valid_down(); _it_ --) \
+		for (int _i_ = _it_.get_index(); _i_ >= 0; _i_ = -1)
 
 
-
-template <class T>
-class Set : public Array<T>
-{
-	public:
-		void add(const T &item)
-		{
-			int i0 = 0;
-			int i1 = ((DynamicArray*)this)->num;
-			while(i1 > i0){
-				int i = (i1 + i0) >> 1;
-				if ((*this)[i] == item)
-					return;
-				else if ((*this)[i] > item){
-					i1 = i;
-				}else{
-					i0 = i + 1;
-				}
-			}
-			if (i0 < ((DynamicArray*)this)->num)
-				insert(item, i0);
-			else
-				((Array<T>*)this)->add(item);
-		}
-		void join(const Set &a)
-		{
-			for (int i=0;i<a.num;i++)
-				add(a[i]);
-		}
-		int find(const T &item) const
-		{
-			int i0 = 0;
-			int i1 = ((DynamicArray*)this)->num;
-			while(i1 > i0){
-				int i = (i1 + i0) >> 1;
-				if ((*this)[i] == item)
-					return i;
-				else if ((*this)[i] > item){
-					i1 = i;
-				}else{
-					i0 = i + 1;
-				}
-			}
-			return -1;
-		}
-		void erase(const T &item)
-		{
-			int index = find(item);
-			if (index >= 0)
-				((Array<T>*)this)->erase(index);
-		}
-		bool contains(const T &item) const
-		{
-			return (find(item) >= 0);
-		}
-};
-
-#define foreach(_array_, _v_)           for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
+/*#define foreach(_array_, _v_)           for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
                                         	for (typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
 #define foreachi(_array_, _v_, _vi_)    for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
                                         	for (typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
@@ -310,23 +265,7 @@ class Set : public Array<T>
 #define foreachc(_array_, _v_)          for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
                                         	for (const typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
 #define foreachci(_array_, _v_, _vi_)   for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
-                                        	for (const typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
-
-
-/*#define foreach(_array_, _v_)			typeof((_array_)[0]) *_v_ = (typeof((_array_)[0]) *) (_array_).data; \
-										for (int _vi_ = 0; _vi_ < (_array_).num;_vi_++, _v_ = &(_array_)[_vi_])
-#define foreachi(_array_, _v_, _vi_)	typeof((_array_)[0]) *_v_ = (typeof((_array_)[0]) *) (_array_).data; \
-										for (int _vi_ = 0; _vi_ < (_array_).num;_vi_++, _v_ = &(_array_)[_vi_])
-
-#define foreach2(_array_, _v_)			_v_ = (typeof((_array_)[0]) *) (_array_).data; \
-										for (int _vi_ = 0; _vi_ < (_array_).num;_vi_++, _v_ = &(_array_)[_vi_])
-#define foreachi2(_array_, _v_, _vi_)	_v_ = (typeof((_array_)[0]) *) (_array_).data; \
-										for (int _vi_ = 0; _vi_ < (_array_).num;_vi_++, _v_ = &(_array_)[_vi_])
-
-#define foreachb(_array_, _v_)			typeof((_array_)[0]) *_v_ = ((_array_).num > 0) ? &(_array_).back() : NULL; \
-										for (int _vi_ = (_array_).num - 1;_vi_ >= 0; _vi_ --, _v_ = &(_array_)[_vi_])
-#define foreachbi(_array_, _v_, _vi_)	typeof((_array_)[0]) *_v_ = ((_array_).num > 0) ? &(_array_).back() : NULL; \
-										for (int _vi_ = (_array_).num - 1; _vi_ >= 0; _vi_ --, _v_ = &(_array_)[_vi_])*/
+                                        	for (const typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))*/
 
 
 #endif

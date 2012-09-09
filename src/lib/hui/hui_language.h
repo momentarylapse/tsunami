@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------------
 // string conversion
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	extern const TCHAR *hui_tchar_str(const string &str);
 	extern const TCHAR *hui_tchar_str_f(const string &str);
 	extern string hui_de_tchar_str(const TCHAR *str);

@@ -299,7 +299,7 @@ void add_ext_var(const string &name, sType *type, void *var)
 
 
 
-#ifndef FILE_OS_WINDOWS
+#ifndef OS_WINDOWS
 	//#define _cdecl
 	#include <stdlib.h>
 #endif
@@ -407,7 +407,7 @@ bool type_is_simple_class(sType *t)
 	if (t->GetFunc("__assign__") >= 0)
 		return false;
 	foreach(t->Element, e)
-		if (!type_is_simple_class(e.Type))
+		if (!type_is_simple_class(e->Type))
 			return false;
 	return true;
 }
@@ -622,7 +622,7 @@ public:
 		foreachi(*this, s, i){
 			if (i > 0)
 				r += glue;
-			r += s;
+			r += *s;
 		}
 		return r;
 	}

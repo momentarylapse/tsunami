@@ -41,7 +41,7 @@ void FxList::FillList()
 	msg_db_r("FillEffectList", 1);
 	dlg->Reset(id);
 	foreach(fx, f)
-		dlg->AddString(id, f.filename);
+		dlg->AddString(id, f->filename);
 	dlg->Enable(id_edit, false);
 	dlg->Enable(id_delete, false);
 	msg_db_l(1);

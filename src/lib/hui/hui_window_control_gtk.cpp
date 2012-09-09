@@ -2,7 +2,7 @@
 #include "hui_internal.h"
 #ifdef HUI_API_GTK
 
-#ifndef HUI_OS_WINDOWS
+#ifndef OS_WINDOWS
 #include <pango/pangocairo.h>
 #endif
 
@@ -223,8 +223,8 @@ HuiControl *CHuiWindow ::_GetControl_(const string &id)
 	// search backwards -> multiple AddText()s with identical ids
 	//   will always set their own text
 	foreachb(control, c)
-		if (c->id == id)
-			return c;
+		if ((*c)->id == id)
+			return *c;
 
 	if (id.num != 0){
 		// ...test if exists in menu/toolbar before reporting an error!
@@ -279,8 +279,8 @@ void SetImageById(CHuiWindow *win, const string &id)
 		win->SetImage(id, "hui:" + id);
 	else if (id != "")
 		foreach(_HuiCommand_, c)
-			if ((c.id == id) && (c.image != ""))
-				win->SetImage(id, c.image);
+			if ((c->id == id) && (c->image != ""))
+				win->SetImage(id, c->image);
 }
 
 
@@ -313,7 +313,7 @@ void CHuiWindow::AddDefButton(const string &title,int x,int y,int width,int heig
 	GtkWidget *b = gtk_button_new_with_label(sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(b),"clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	_InsertControl_(b, x, y, width, height, id, HuiKindButton);
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	GTK_WIDGET_SET_FLAGS(b, GTK_CAN_DEFAULT);
 #else
 	gtk_widget_set_can_default(b, true);
@@ -467,10 +467,10 @@ void CHuiWindow::AddRadioButton(const string &title,int x,int y,int width,int he
 	string group_id = id.substr(0, id.find(":"));
 	GSList *group = NULL;
 	foreach(control, c)
-		if (c->type == HuiKindRadioButton)
-			if (c->id.find(":"))
-				if (c->id.substr(0, c->id.find(":")) == group_id)
-					group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(c->widget));
+		if ((*c)->type == HuiKindRadioButton)
+			if ((*c)->id.find(":"))
+				if ((*c)->id.substr(0, (*c)->id.find(":")) == group_id)
+					group = gtk_radio_button_get_group(GTK_RADIO_BUTTON((*c)->widget));
 		
 	GtkWidget *cb = gtk_radio_button_new_with_label(group, sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(cb), "toggled", G_CALLBACK(&OnGtkRadioButtonToggle), this);
@@ -901,19 +901,19 @@ void CHuiWindow::EmbedDialog(const string &id, int x, int y)
 			//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 			//if ((cmd->type & 1023)==HuiCmdDialogAddControl){
 
-			string target_id = cmd.s_param[0];
-			int target_page = cmd.i_param[4];
+			string target_id = cmd->s_param[0];
+			int target_page = cmd->i_param[4];
 			if (i > 0)
 				SetTarget(target_id, target_page);
-			int _x = (i == 0) ? x : cmd.i_param[0];
-			int _y = (i == 0) ? y : cmd.i_param[1];
-			HuiWindowAddControl( this, cmd.type, HuiGetLanguage(cmd.id),
+			int _x = (i == 0) ? x : cmd->i_param[0];
+			int _y = (i == 0) ? y : cmd->i_param[1];
+			HuiWindowAddControl( this, cmd->type, HuiGetLanguage(cmd->id),
 								_x, _y,
-								cmd.i_param[2], cmd.i_param[3],
-								cmd.id);
-			Enable(cmd.id, cmd.enabled);
-			if (cmd.image.num > 0)
-				SetImage(cmd.id, cmd.image);
+								cmd->i_param[2], cmd->i_param[3],
+								cmd->id);
+			Enable(cmd->id, cmd->enabled);
+			if (cmd->image.num > 0)
+				SetImage(cmd->id, cmd->image);
 		}
 	}
 }

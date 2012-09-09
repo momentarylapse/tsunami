@@ -6,6 +6,7 @@
  */
 
 #include "types.h"
+#include "../file/file.h"
 
 
 
@@ -191,8 +192,8 @@ int Interpolator<T>::canonize(float &t)
 {
 	t = clampf(t, 0, 0.99999f) * t_sum;
 	foreachi(part, p, i)
-		if ((t >= p.t0) && (t <= p.t0 + p.dt)){
-			t = (t - p.t0) / p.dt;
+		if ((t >= p->t0) && (t <= p->t0 + p->dt)){
+			t = (t - p->t0) / p->dt;
 			return i;
 		}
 	return 0;
@@ -239,7 +240,7 @@ inline void Interpolator<float>::print()
 		update();
 	msg_write("---");
 	foreach(part, p)
-		msg_write(format("t0=%f dt=%f (%f  %f) -> (%f  %f)", p.t0, p.dt, p.pos0, p.vel0, p.pos1, p.vel1));
+		msg_write(format("t0=%f dt=%f (%f  %f) -> (%f  %f)", p->t0, p->dt, p->pos0, p->vel0, p->pos1, p->vel1));
 }
 
 template<>
@@ -252,7 +253,7 @@ Array<T> Interpolator<T>::get_list(Array<float> &t)
 	Array<T> r;
 	r.resize(t.num);
 	foreachi(t, tt, i)
-		r[i] = get(tt);
+		r[i] = get(*tt);
 	return r;
 }
 

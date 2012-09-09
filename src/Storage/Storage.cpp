@@ -28,7 +28,7 @@ Storage::~Storage()
 	HuiConfigWriteStr("CurrentDirectory", CurrentDirectory);
 
 	foreach(format, f)
-		delete(f);
+		delete(*f);
 	format.clear();
 }
 
@@ -42,7 +42,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 	string ext = file_extension(filename);
 
 	foreach(format, f)
-		if (f->CanHandle(ext)){
+		if ((*f)->CanHandle(ext)){
 			tsunami->progress->Start(_("lade"), 0);
 
 			a->NotifyBegin();
@@ -52,7 +52,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			a->used = true;
 			a->filename = filename;
 
-			f->LoadAudio(a, filename);
+			(*f)->LoadAudio(a, filename);
 
 
 			a->action_manager->Enable(true);
@@ -89,13 +89,13 @@ bool Storage::LoadTrack(Track *t, const string &filename)
 	string ext = file_extension(filename);
 
 	foreach(format, f)
-		if (f->CanHandle(ext)){
+		if ((*f)->CanHandle(ext)){
 			tsunami->progress->Start(_("lade"), 0);
 
 			AudioFile *a = t->root;
 			a->NotifyBegin();
 
-			f->LoadTrack(t, filename);
+			(*f)->LoadTrack(t, filename);
 
 			tsunami->progress->End();
 			tsunami->ForceRedraw();
@@ -121,15 +121,15 @@ bool Storage::Save(AudioFile *a, const string &filename)
 	string ext = file_extension(filename);
 
 	foreach(format, f)
-		if (f->CanHandle(ext)){
-			if (!TestFormatCompatibility(a, f))
+		if ((*f)->CanHandle(ext)){
+			if (!TestFormatCompatibility(a, *f))
 				tsunami->log->Warning(_("Datenverlust!"));
 
 			tsunami->progress->Start(_("speichere"), 0);
 
 			a->filename = filename;
 
-			f->SaveAudio(a, filename);
+			(*f)->SaveAudio(a, filename);
 
 			a->action_manager->MarkCurrentAsSave();
 			tsunami->progress->End();
@@ -156,7 +156,7 @@ bool Storage::Export(AudioFile *a, const string &filename)
 	string ext = file_extension(filename);
 
 	foreach(format, f)
-		if (f->CanHandle(ext)){
+		if ((*f)->CanHandle(ext)){
 			tsunami->progress->Start(_("exportiere"), 0);
 
 			// render audio...
@@ -167,7 +167,7 @@ bool Storage::Export(AudioFile *a, const string &filename)
 			BufferBox buf = tsunami->renderer->RenderAudioFile(a, r);
 
 			// save
-			f->SaveBuffer(a, &buf, filename);
+			(*f)->SaveBuffer(a, &buf, filename);
 
 			tsunami->progress->End();
 			ok = true;
@@ -187,8 +187,8 @@ bool Storage::TestFormatCompatibility(AudioFile *a, Format *f)
 	int num_subs = 0;
 	int num_fx = a->fx.num;
 	foreach(a->track, t){
-		num_subs += t.sub.num;
-		num_fx += t.fx.num;
+		num_subs += t->sub.num;
+		num_fx += t->fx.num;
 	}
 
 	if ((a->track.num > 1) && ((f->flags & Format::FLAG_MULTITRACK) == 0))
@@ -206,13 +206,13 @@ bool Storage::AskByFlags(CHuiWindow *win, const string &title, bool save, int fl
 {
 	string filter, filter_show;
 	foreach(format, f)
-		if ((f->flags & flags) == flags){
+		if (((*f)->flags & flags) == flags){
 			if (filter != "")
 				filter += ";";
-			filter += "*." + f->extension;
+			filter += "*." + (*f)->extension;
 			if (filter_show != "")
 				filter_show += ",";
-			filter_show += "*." + f->extension;
+			filter_show += "*." + (*f)->extension;
 		}
 	if (save)
 		return HuiFileDialogSave(win, title, CurrentDirectory, filter_show, filter);

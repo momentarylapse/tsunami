@@ -331,12 +331,12 @@ inline bool isLetter(char c)
 	if ((c=='_'))
 		return true;
 	// Umlaute
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	// Windows-Zeichensatz
 	if ((c==-28)||(c==-10)||(c==-4)||(c==-33)||(c==-60)||(c==-42)||(c==-36))
 		return true;
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	// Linux-Zeichensatz??? testen!!!!
 #endif
 	return false;

@@ -17,7 +17,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(Track *t, int _level_no, Range _ran
 
 	index = -1;
 	foreachi(t->level[level_no].buffer, buf, i)
-		if (buf.range().covers(range))
+		if (buf->range().covers(range))
 			index = i;
 	assert(index >= 0);
 

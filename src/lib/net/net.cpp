@@ -8,15 +8,16 @@
 \*----------------------------------------------------------------------------*/
 
 #include "net.h"
+#include "../file/file.h"
 
 
-#ifdef NET_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <winsock.h>
 	#pragma comment(lib,"wsock32.lib")
 
 	static WSADATA wsaData;
 #endif
-#ifdef NET_OS_LINUX
+#ifdef OS_LINUX
 	#include <stdio.h>
 	//#include <stdio.h>
 	#include <string.h>
@@ -101,7 +102,7 @@ void NetInit()
 {
 	if (!msg_inited)
 		msg_init();
-#ifdef NET_OS_WINDOWS
+#ifdef OS_WINDOWS
 	if (WSAStartup(MAKEWORD(1,1),&wsaData)!=0){
 		msg_error("WSAStartup  (Network....)");
 	}
@@ -118,11 +119,11 @@ void NetClose(int &s)
 	if (s < 0)
 		return;
 	//so("close");
-#ifdef NET_OS_WINDOWS
+#ifdef OS_WINDOWS
 	if (con[s].s >= 0)
 		closesocket(con[s].s);
 #endif
-#ifdef NET_OS_LINUX
+#ifdef OS_LINUX
 	if (con[s].s >= 0)
 		close(con[s].s);
 #endif
@@ -132,11 +133,11 @@ void NetClose(int &s)
 
 void NetSetBlocking(int s, bool blocking)
 {
-#ifdef NET_OS_WINDOWS
+#ifdef OS_WINDOWS
 	unsigned long l = blocking ? 0 : 1;
 	ioctlsocket(con[s].s, FIONBIO, &l);
 #endif
-#ifdef NET_OS_LINUX
+#ifdef OS_LINUX
 	fcntl(con[s].s, F_SETFL, blocking ? 0 : O_NONBLOCK);
 #endif
 }
@@ -198,10 +199,10 @@ int NetAccept(int sh)
 	struct sockaddr_in remote_addr;
 	int size = sizeof(remote_addr);
 	int sc;
-#ifdef NET_OS_WINDOWS
+#ifdef OS_WINDOWS
 	sc = accept(con[sh].s, (struct sockaddr *)&remote_addr, &size);
 #endif
-#ifdef NET_OS_LINUX
+#ifdef OS_LINUX
 	socklen_t len = *(socklen_t*)&size;
 	sc = accept(con[sh].s, (struct sockaddr *)&remote_addr, &len);
 #endif
@@ -218,7 +219,7 @@ int NetAccept(int sh)
 	}
 
 	so(1,"  -client found");
-	#ifdef NET_OS_WINDOWS
+	#ifdef OS_WINDOWS
 		so(1, inet_ntoa(remote_addr.sin_addr));//.s_addr));
 	#endif
 	NetSetBlocking(c, true);
@@ -278,7 +279,7 @@ int NetConnect(const string &addr,int port)
 			so(2,"test");
 			so(2,status);
 			struct sockaddr address;
-			#ifdef NET_OS_WINDOWS
+			#ifdef OS_WINDOWS
 				int address_len=sizeof(address);
 			#else
 				socklen_t address_len=sizeof(address);
@@ -300,7 +301,7 @@ int NetConnect(const string &addr,int port)
 	}
 	if (ttt>0){
 		so(1,"  -ERROR (connect)");
-		#ifdef NET_OS_WINDOWS
+		#ifdef OS_WINDOWS
 			so(0,WSAGetLastError());
 		#endif
 		NetClose(c);
@@ -309,7 +310,7 @@ int NetConnect(const string &addr,int port)
 
 	/*if (connect(s, (struct sockaddr *)&host_addr, sizeof(host_addr))==-1){
 		so(0,"  -ERROR (connect)");
-		#ifdef NET_OS_WINDOWS
+		#ifdef OS_WINDOWS
 			so(0,WSAGetLastError());
 		#endif
 		NetClose(s);

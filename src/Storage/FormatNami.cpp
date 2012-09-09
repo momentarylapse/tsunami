@@ -65,7 +65,7 @@ void WriteEffect(CFile *f, Effect *e)
 	f->WriteInt(e->start);
 	f->WriteInt(e->end);
 	foreach(e->param, p)
-		WriteEffectParam(f, &p);
+		WriteEffectParam(f, &*p);
 	EndChunk(f);
 }
 
@@ -98,7 +98,7 @@ void WriteSubTrack(CFile *f, Track *s)
 	f->WriteInt(0);
 
 	foreach(s->level[0].buffer, b)
-		WriteBufferBox(f, &b);
+		WriteBufferBox(f, &*b);
 
 	EndChunk(f);
 }
@@ -109,7 +109,7 @@ void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
 	f->WriteInt(level_no);
 
 	foreach(l->buffer, b)
-		WriteBufferBox(f, &b);
+		WriteBufferBox(f, &*b);
 
 	EndChunk(f);
 }
@@ -127,13 +127,13 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0);
 
 	foreachi(t->level, l, i)
-		WriteTrackLevel(f, &l, i);
+		WriteTrackLevel(f, &*l, i);
 
 	foreach(t->sub, sub)
-		WriteSubTrack(f, &sub);
+		WriteSubTrack(f, &*sub);
 
 	foreach(t->fx, effect)
-		WriteEffect(f, &effect);
+		WriteEffect(f, &*effect);
 
 	EndChunk(f);
 }
@@ -144,7 +144,7 @@ void WriteLevelName(CFile *f, Array<string> level_name)
 
 	f->WriteInt(level_name.num);
 	foreach(level_name, l)
-		f->WriteStr(l);
+		f->WriteStr(*l);
 
 	EndChunk(f);
 }
@@ -164,17 +164,17 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 	f->WriteInt(a->sample_rate);
 
 	foreach(a->tag, tag)
-		WriteTag(f, &tag);
+		WriteTag(f, &*tag);
 
 	WriteLevelName(f, a->level_name);
 
 	foreachi(a->track, track, i){
-		WriteTrack(f, &track);
+		WriteTrack(f, &*track);
 		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
 
 	foreach(a->fx, effect)
-		WriteEffect(f, &effect);
+		WriteEffect(f, &*effect);
 
 	EndChunk(f);
 
@@ -417,18 +417,18 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 
 	// compress...
 	foreach(a->track, t)
-		foreach(t.level, l){
-			if (l.buffer.num != 1)
+		foreach(t->level, l){
+			if (l->buffer.num != 1)
 				continue;
 			bool empty = true;
-			for (int i=0;i<l.buffer[0].num;i++)
-				if ((l.buffer[0].r[i] != 0) || (l.buffer[0].l[i] != 0)){
+			for (int i=0;i<l->buffer[0].num;i++)
+				if ((l->buffer[0].r[i] != 0) || (l->buffer[0].l[i] != 0)){
 					empty = false;
 					break;
 				}
 
 			if (empty)
-				l.buffer.clear();
+				l->buffer.clear();
 		}
 }
 
@@ -603,8 +603,8 @@ void ReadChunk(CFile *f)
 
 	bool handled = false;
 	foreach(chunk_data[chunk_data.num - 2].handler, h)
-		if (cname == h.tag){
-			h.reader(f, h.data);
+		if (cname == h->tag){
+			h->reader(f, h->data);
 			handled = true;
 			break;
 		}

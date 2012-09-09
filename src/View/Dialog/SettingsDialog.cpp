@@ -45,13 +45,13 @@ void SettingsDialog::LoadData()
 {
 	Array<string> lang = HuiGetLanguages();
 	foreachi(lang, l, i){
-		SetString("language", l);
-		if (l == HuiGetCurLanguage())
+		SetString("language", *l);
+		if (*l == HuiGetCurLanguage())
 			SetInt("language", i);
 	}
 	float CurOggQuality = HuiConfigReadFloat("OggQuality", 0.5f);
 	foreachi(ogg_quality, q, i)
-		if (CurOggQuality > q.quality - 0.05f)
+		if (CurOggQuality > q->quality - 0.05f)
 			SetInt("ogg_bitrate", i);
 	SetDecimals(1);
 	//volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, t->volume);
@@ -61,8 +61,8 @@ void SettingsDialog::LoadData()
 	SetString("preview_device", _("- Standard -"));
 	SetInt("preview_device", 0);
 	foreachi(tsunami->output->Device, d, i){
-		AddString("preview_device", d);
-		if (d == tsunami->output->ChosenDevice)
+		AddString("preview_device", *d);
+		if (*d == tsunami->output->ChosenDevice)
 			SetInt("preview_device", i + 1);
 	}
 	SetFloat("capture_delay", tsunami->input->CapturePlaybackDelay);

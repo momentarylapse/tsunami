@@ -4,7 +4,7 @@
 
 
 
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 	extern HINSTANCE hui_win_instance;
 #endif
 #ifdef HUI_API_WIN

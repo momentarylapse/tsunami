@@ -430,7 +430,7 @@ void Tsunami::UpdateMenu()
 	Reset("cur_level");
 	Enable("cur_level", cur_audio->used);
 	foreach(cur_audio->level_name, l)
-		SetString("cur_level", l);
+		SetString("cur_level", *l);
 	SetInt("cur_level", cur_audio->cur_level);
 
 	if (cur_audio->used){

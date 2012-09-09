@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <windows.h>
 #endif
 
@@ -173,7 +173,7 @@ void msg_write2(const char *str,...)
 	va_start(arg,str);
 	msg_write(string2(str,arg));
 #else
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	char tmp[1024];
 	tmp[0]=0;
 

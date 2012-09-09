@@ -1,4 +1,5 @@
 #include "image.h"
+#include "../file/file.h"
 
 static Image EmptyImage;
 

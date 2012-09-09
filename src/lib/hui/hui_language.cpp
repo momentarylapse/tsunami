@@ -2,7 +2,7 @@
 #include "hui_internal.h"
 
 // character set....
-#ifdef HUI_OS_WINDOWS
+#ifdef OS_WINDOWS
 
 	#include <tchar.h>
 
@@ -219,8 +219,8 @@ void HuiSetLanguage(const string &language)
 	cur_lang = NULL;
 	HuiLanguaged = false;
 	foreach(_HuiLanguage_, l)
-		if (l.name == language){
-			cur_lang = &l;
+		if (l->name == language){
+			cur_lang = &*l;
 			HuiLanguaged = true;
 		}
 	if (!HuiLanguaged)
@@ -235,8 +235,8 @@ string HuiGetLanguage(const string &id)
 	if ((!HuiLanguaged) || (id.num == 0))
 		return "";
 	foreach(cur_lang->cmd, c)
-		if (id == c.id)
-			return c.text;
+		if (id == c->id)
+			return c->text;
 	/*if (cur_lang->cmd[id].num == 0)
 		return "???";*/
 	return "";
@@ -248,8 +248,8 @@ string HuiGetLanguageS(const string &str)
 	if (!HuiLanguaged)
 		return str;
 	foreach(cur_lang->trans, t){
-		if (str == t.orig)
-			return t.trans;
+		if (str == t->orig)
+			return t->trans;
 	}
 	return str;
 }
@@ -263,8 +263,8 @@ string get_lang(const string &id, const string &text, bool allow_keys)
 		return text;
 	string r = "";
 	foreach(cur_lang->cmd, c)
-		if (id == c.id)
-			r = c.text;
+		if (id == c->id)
+			r = c->text;
 	if (r.num == 0)
 		return text;
 #ifdef HUI_API_WIN
@@ -308,7 +308,7 @@ Array<string> HuiGetLanguages()
 {
 	Array<string> n;
 	foreach(_HuiLanguage_, l)
-		n.add(l.name);
+		n.add(l->name);
 	return n;
 }
 

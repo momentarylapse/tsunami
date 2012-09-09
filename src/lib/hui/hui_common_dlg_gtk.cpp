@@ -146,8 +146,8 @@ void HuiAboutBox(CHuiWindow *win)
 {
 	Array<char*> _a_;
 	foreach(HuiPropAuthors, author){
-		char *p = new char[author.num + 1];
-		strcpy(p, author.c_str());
+		char *p = new char[author->num + 1];
+		strcpy(p, author->c_str());
 		_a_.add(p);
 	}
 	_a_.add(NULL);
@@ -165,7 +165,7 @@ void HuiAboutBox(CHuiWindow *win)
 		NULL);
 
 	foreach(_a_, aa)
-		delete(aa);
+		delete(*aa);
 }
 
 

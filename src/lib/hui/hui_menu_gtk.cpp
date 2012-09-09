@@ -31,8 +31,8 @@ GtkAccelGroup *accel_group = NULL;
 void try_add_accel(GtkWidget *item, const string &id)
 {
 	foreach(_HuiCommand_, c)
-		if ((id == c.id) && (c.key_code >= 0)){
-			int k = c.key_code;
+		if ((id == c->id) && (c->key_code >= 0)){
+			int k = c->key_code;
 			int mod = (((k&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((k&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0);
 			gtk_widget_add_accelerator(item, "activate", accel_group, HuiKeyID[k & 255], (GdkModifierType)mod, GTK_ACCEL_VISIBLE);
 		}
@@ -41,13 +41,13 @@ void try_add_accel(GtkWidget *item, const string &id)
 string get_menu_id_by_widget(CHuiMenu *m, GtkWidget *widget)
 {
 	foreach(m->item, it){
-		if (it.sub_menu){
-			string id = get_menu_id_by_widget(it.sub_menu, widget);
+		if (it->sub_menu){
+			string id = get_menu_id_by_widget(it->sub_menu, widget);
 			if (id.num > 0)
 				return id;
 		}
-		if (it.widget == widget)
-			return it.id;
+		if (it->widget == widget)
+			return it->id;
 	}
 	return "";
 }
@@ -213,8 +213,8 @@ const char *get_stock_id(const string image)
 sHuiImage *get_image(const string &image)
 {
 	foreach(HuiImage, m)
-		if (m.filename == image)
-			return &m;
+		if (m->filename == image)
+			return &*m;
 	sHuiImage img = {0, image};
 	HuiImage.add(img);
 	return &HuiImage.back();
@@ -319,11 +319,11 @@ void CHuiMenu::CheckItem(const string &id, bool checked)
 {
 	allow_signal_level++;
 	foreach(item, it)
-		if (it.sub_menu)
-			it.sub_menu->CheckItem(id, checked);
-		else if (it.id == id){
-			if (it.checkable)
-				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(it.widget), checked);
+		if (it->sub_menu)
+			it->sub_menu->CheckItem(id, checked);
+		else if (it->id == id){
+			if (it->checkable)
+				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(it->widget), checked);
 		}
 	allow_signal_level--;
 }
@@ -345,11 +345,11 @@ bool CHuiMenu::IsItemChecked(const string &id)
 void CHuiMenu::EnableItem(const string &id,bool enabled)
 {
 	foreach(item, it){
-		if (it.sub_menu)
-			it.sub_menu->EnableItem(id, enabled);
-		if (it.id == id){
-			it.enabled = enabled;
-			gtk_widget_set_sensitive(it.widget, enabled);
+		if (it->sub_menu)
+			it->sub_menu->EnableItem(id, enabled);
+		if (it->id == id){
+			it->enabled = enabled;
+			gtk_widget_set_sensitive(it->widget, enabled);
 		}
 	}
 }
@@ -357,15 +357,15 @@ void CHuiMenu::EnableItem(const string &id,bool enabled)
 void CHuiMenu::SetText(const string &id, const string &text)
 {
 	foreach(item, it){
-		if (it.sub_menu)
-			it.sub_menu->SetText(id, text);
-		if (it.id == id){
-			it.name = text;
+		if (it->sub_menu)
+			it->sub_menu->SetText(id, text);
+		if (it->id == id){
+			it->name = text;
 			
-#ifndef HUI_OS_WINDOWS
-			gtk_menu_item_set_label(GTK_MENU_ITEM(it.widget), sys_str(text));
+#ifndef OS_WINDOWS
+			gtk_menu_item_set_label(GTK_MENU_ITEM(it->widget), sys_str(text));
 #endif
-			try_add_accel(it.widget, id);
+			try_add_accel(it->widget, id);
 		}
 	}
 }

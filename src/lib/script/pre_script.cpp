@@ -2892,7 +2892,7 @@ void CPreScript::ConvertCallByReference()
 	// convert functions
 	foreach(Function, f){
 		
-		// parameter: array/class as refrerence
+		// parameter: array/class as reference
 		for (int j=0;j<(*f)->NumParams;j++)
 			if ((*f)->Var[j].Type->UsesCallByReference()){
 				(*f)->Var[j].Type = GetPointerType((*f)->Var[j].Type);
@@ -2925,6 +2925,7 @@ void CPreScript::ConvertCallByReference()
 					so(c->Param[0]->Type->Name);
 					ref_command(this, c->Param[0]);
 				}
+				ccc.update();
 				continue;
 			}
 		
@@ -2956,6 +2957,7 @@ void CPreScript::ConvertCallByReference()
 					ref_command(this, c->Param[j]);
 				}
 		}
+		ccc.update();
 	}
 	msg_db_l(2);
 }

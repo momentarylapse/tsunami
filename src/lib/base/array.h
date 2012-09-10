@@ -222,10 +222,13 @@ class Array : public DynamicArray
 			{	return index >= 0;	}
 			int get_index() const
 			{	return index;	}
+			void update()
+			{	p = &array[index];	num = array.num;	}
 		//private:
-			Iterator(Array<T> &a, int n)
+			Iterator(Array<T> &a, int n) : array(a)
 			{	p = &a[n];	index = n;	num = a.num;	}
 		private:
+			Array<T> &array;
 			T *p;
 			int index;
 			int num;

@@ -75,7 +75,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t, const R
 
 void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track &t, const Range &range)
 {
-	msg_db_r("bb_render_audio_track_no_fx", 1);
+	msg_db_r("bb_render_track_no_fx", 1);
 
 	if (t.type == Track::TYPE_AUDIO)
 		bb_render_audio_track_no_fx(buf, t, range);

@@ -223,15 +223,15 @@ class Array : public DynamicArray
 			int get_index() const
 			{	return index;	}
 			void update()
-			{	p = &array[index];	num = array.num;	}
+			{	p = &array[index];	}
 		//private:
-			Iterator(Array<T> &a, int n) : array(a)
-			{	p = &a[n];	index = n;	num = a.num;	}
+			Iterator(Array<T> &a, int n) : array(a), num(a.num)
+			{	p = &a[n];	index = n;	}
 		private:
 			Array<T> &array;
 			T *p;
 			int index;
-			int num;
+			int &num;
 		};
 		Iterator begin()
 		{	return Iterator(*this, 0);	}

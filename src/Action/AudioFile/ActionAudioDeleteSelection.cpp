@@ -64,6 +64,7 @@ void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
 			AddSubAction(new ActionTrack__DeleteBufferBox(&t, level_no, n + 1), a);
 
 		}
+		b.update();
 	}
 }
 

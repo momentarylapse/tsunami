@@ -47,6 +47,9 @@ void BufferBox::clear()
 
 void BufferBox::resize(int length)
 {
+	if (length < num)
+		//peak.clear();
+		invalidate_peaks(Range(offset + length, num - length));
 	r.resize(length);
 	l.resize(length);
 	num = length;
@@ -284,10 +287,12 @@ void BufferBox::invalidate_peaks(const Range &_range)
 	i1 = min(i1 / 4 + 1, n);
 	//msg_write(format("inval %d  %d-%d", n, i0, i1));
 
-	if (peak[0].num < n)
-		peak[0].resize(n);
-	if (peak[1].num < n)
-		peak[1].resize(n);
+	for (int k=0;k<2;k++)
+		if (peak[k].num < n){
+			int n0 = peak[k].num;
+			peak[k].resize(n);
+			peak[k][n0] = -1;
+		}
 	for (int i=i0;i<i1;i++){
 		peak[0][i] = -1;
 		peak[1][i] = -1;

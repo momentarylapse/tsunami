@@ -9,6 +9,9 @@
 #include "../Tsunami.h"
 
 
+const int CHUNK_SIZE = 1 << 16;
+
+
 FormatNami::FormatNami() :
 	Format("nami", FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS)
 {
@@ -511,7 +514,17 @@ void ReadChunkBufferBox(CFile *f, TrackLevel *l)
 
 	Array<short> data;
 	data.resize(num * 2);
-	f->ReadBuffer(data.data, num * 4);
+
+	// read chunk'ed
+	int offset = 0;
+	for (int n=0;n<(num * 4) / CHUNK_SIZE;n++){
+		f->ReadBuffer(&data[offset], CHUNK_SIZE);
+		tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());
+		offset += CHUNK_SIZE / 2;
+	}
+	f->ReadBuffer(&data[offset], (num * 4) % CHUNK_SIZE);
+
+	// insert
 	for (int i=0;i<num;i++){
 		b->r[i] =  (float)data[i * 2    ] / 32768.0f;
 		b->l[i] =  (float)data[i * 2 + 1] / 32768.0f;

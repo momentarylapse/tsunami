@@ -63,7 +63,13 @@ public:
 						v.x*_10 + v.y*_11 + v.z*_12 + _13,
 						v.x*_20 + v.y*_21 + v.z*_22 + _23);
 	}
-	string str()
+	vector transform_normal(const vector &v) const
+	{
+		return vector(	v.x*_00 + v.y*_01 + v.z*_02,
+						v.x*_10 + v.y*_11 + v.z*_12,
+						v.x*_20 + v.y*_21 + v.z*_22);
+	}
+	string str() const
 	{	return format("(%f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);	}
 
 	// kaba

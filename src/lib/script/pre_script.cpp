@@ -110,7 +110,7 @@ void CPreScript::LoadAndParseFile(const string &filename, bool just_analyse)
 {
 	msg_db_r("LoadAndParseFile",4);
 	
-	Filename = SysFileName(filename);
+	Filename = filename.sys_filename();
 
 	Error = !LoadToBuffer(ScriptDirectory + Filename, just_analyse);
 
@@ -244,7 +244,7 @@ int s2i2(const string &str)
 		}
 		return r;
 	}else
-		return	s2i(str);
+		return	str._int();
 }
 
 
@@ -608,9 +608,9 @@ bool CPreScript::GetExistence(const string &name, sFunction *f)
 
 	// first test local variables
 	if (lf){
-		foreachi(f->Var, v, i){
-			if (v->Name == name){
-				exlink_make_var_local(this, v->Type, i);
+		foreachi(sLocalVariable &v, f->Var, i){
+			if (v.Name == name){
+				exlink_make_var_local(this, v.Type, i);
 				msg_db_l(3);
 				return true;
 			}
@@ -619,9 +619,9 @@ bool CPreScript::GetExistence(const string &name, sFunction *f)
 
 	// then global variables (=local variables in "RootOfAllEvil")
 	lf = &RootOfAllEvil;
-	foreachi(lf->Var, v, i)
-		if (v->Name == name){
-			GetExistenceLink.Type = v->Type;
+	foreachi(sLocalVariable &v, lf->Var, i)
+		if (v.Name == name){
+			GetExistenceLink.Type = v.Type;
 			GetExistenceLink.LinkNr = i;
 			GetExistenceLink.Kind = KindVarGlobal;
 			msg_db_l(3);
@@ -637,12 +637,12 @@ bool CPreScript::GetExistence(const string &name, sFunction *f)
 	}
 
 	// then the (self-coded) functions
-	foreachi(Function, f, i)
-		if ((*f)->Name == name){
+	foreachi(sFunction *f, Function, i)
+		if (f->Name == name){
 			GetExistenceLink.Kind = KindFunction;
 			GetExistenceLink.LinkNr = i;
-			GetExistenceLink.Type = (*f)->LiteralType;
-			GetExistenceLink.NumParams = (*f)->NumParams;
+			GetExistenceLink.Type = f->LiteralType;
+			GetExistenceLink.NumParams = f->NumParams;
 			msg_db_l(3);
 			return true;
 		}
@@ -677,12 +677,12 @@ bool CPreScript::GetExistence(const string &name, sFunction *f)
 	}
 
 	// in include files (only global)...
-	foreach(Include, i)
-		if ((*i)->pre_script->GetExistence(name, NULL)){
-			if ((*i)->pre_script->GetExistenceLink.script) // nicht rekursiv!!!
+	foreach(CScript *i, Include)
+		if (i->pre_script->GetExistence(name, NULL)){
+			if (i->pre_script->GetExistenceLink.script) // nicht rekursiv!!!
 				continue;
-			memcpy(&GetExistenceLink, &((*i)->pre_script->GetExistenceLink), sizeof(sCommand));
-			GetExistenceLink.script = *i;
+			memcpy(&GetExistenceLink, &(i->pre_script->GetExistenceLink), sizeof(sCommand));
+			GetExistenceLink.script = i;
 			//msg_error(string2("\"%s\" in Include gefunden!  %s", name, GetExistenceLink.Type->Name));
 			msg_db_l(3);
 			return true;
@@ -738,17 +738,17 @@ sType *CPreScript::GetConstantType()
 	NamedConstantNr = -1;
 
 	// predefined constants
-	foreachi(PreConstant, c, i)
-		if (cur_name == c->Name){
+	foreachi(sPreConstant &c, PreConstant, i)
+		if (cur_name == c.Name){
 			PreConstantNr = i;
-			_return_(4, c->Type);
+			_return_(4, c.Type);
 		}
 
 	// named constants
-	foreachi(Constant, c, i)
-		if (cur_name == c->name){
+	foreachi(sConstant &c, Constant, i)
+		if (cur_name == c.name){
 			NamedConstantNr = i;
-			_return_(4, c->type);
+			_return_(4, c.type);
 		}
 
 	// character "..."
@@ -822,7 +822,7 @@ void *CPreScript::GetConstantValue()
 		return &_some_int_;
 	}
 	if (type == TypeFloat){
-		_some_float_ = s2f(cur_name);
+		_some_float_ = cur_name._float();
 		return &_some_float_;
 	}
 	return NULL;
@@ -1585,12 +1585,12 @@ bool CPreScript::LinkOperator(int op_no, sCommand *param1, sCommand *param2, sCo
 
 
 	// exact match as class function?
-	foreach(p1->Function, f)
-		if (f->Name == op_func_name){
-			if (type_match(p2, equal_classes, f->ParamType[0])){
+	foreach(sClassFunction &f, p1->Function)
+		if (f.Name == op_func_name){
+			if (type_match(p2, equal_classes, f.ParamType[0])){
 				sCommand *inst = param1;
 				ref_command(this, inst);
-				CommandSetClassFunc(this, p1, *cmd, *f, inst);
+				CommandSetClassFunc(this, p1, *cmd, f, inst);
 				(*cmd)->NumParams = 1;
 				(*cmd)->Param[0] = param2;
 				msg_db_l(4);
@@ -1623,9 +1623,9 @@ bool CPreScript::LinkOperator(int op_no, sCommand *param1, sCommand *param2, sCo
 					c1_best = c1;
 					c2_best = c2;
 				}
-	foreachi(p1->Function, f, i)
-		if (f->Name == op_func_name)
-			if (type_match_with_cast(p2, equal_classes, false, f->ParamType[0], pen2, c2))
+	foreachi(sClassFunction &f, p1->Function, i)
+		if (f.Name == op_func_name)
+			if (type_match_with_cast(p2, equal_classes, false, f.ParamType[0], pen2, c2))
 				if (pen2 < pen_min){
 					op_found = i;
 					pen_min = pen2;
@@ -1936,8 +1936,8 @@ void CPreScript::GetSpecialCommand(sBlock *block, sFunction *f)
 
 		// ref...
 		f->Var[var_no].Type = GetPointerType(var_type);
-		foreach(loop_block->Command, c)
-			conv_cbr(this, *c, var_no);
+		foreach(sCommand *c, loop_block->Command)
+			conv_cbr(this, c, var_no);
 
 		// force for_var out of scope...
 		f->Var[for_var->LinkNr].Name = "-out-of-scope-";
@@ -2275,8 +2275,8 @@ void CPreScript::ParseClassFunction(sType *t, bool as_extern)
 		cf.Kind = KindCompilerFunction;
 		cf.Nr = ExternalFuncPreCommandIndex;
 		cf.ReturnType = c->ReturnType;
-		foreach(c->Param, p)
-			cf.ParamType.add(p->Type);
+		foreach(sPreCommandParam &p, c->Param)
+			cf.ParamType.add(p.Type);
 	}else{
 		sFunction *f = Function.back();
 		cf.Name = f->Name.substr(t->Name.num + 1, -1);
@@ -2327,9 +2327,9 @@ void CPreScript::ParseClass()
 		}
 		if (ancestor->Function.num > 0){
 			// inheritance of functions
-			foreach(ancestor->Function, f)
-				if ((f->Name != "__init__") && (f->Name != "__delete__") && (f->Name != "__assign__"))
-					t->Function.add(*f);
+			foreach(sClassFunction &f, ancestor->Function)
+				if ((f.Name != "__init__") && (f.Name != "__delete__") && (f.Name != "__assign__"))
+					t->Function.add(f);
 			found = true;
 		}
 		if (!found){
@@ -2408,8 +2408,8 @@ void CPreScript::ParseClass()
 			next_exp();
 		}
 	}
-	foreach(t->Element, e)
-		if (type_needs_alignment(e->Type))
+	foreach(sClassElement &e, t->Element)
+		if (type_needs_alignment(e.Type))
 			_offset = mem_align(_offset);
 	t->Size = _offset;
 
@@ -2810,8 +2810,8 @@ void conv_cbr(CPreScript *ps, sCommand *&c, int var)
 	for (int i=0;i<c->NumParams;i++)
 		conv_cbr(ps, c->Param[i], var);
 	if (c->Kind == KindBlock)
-		foreach(ps->Block[c->LinkNr]->Command, cc)
-			conv_cbr(ps, *cc, var);
+		foreach(sCommand *cc, ps->Block[c->LinkNr]->Command)
+			conv_cbr(ps, cc, var);
 	if (c->Instance)
 		conv_cbr(ps, c->Instance, var);
 	so("a");
@@ -2890,23 +2890,23 @@ void CPreScript::ConvertCallByReference()
 
 
 	// convert functions
-	foreach(Function, f){
+	foreach(sFunction *f, Function){
 		
 		// parameter: array/class as reference
-		for (int j=0;j<(*f)->NumParams;j++)
-			if ((*f)->Var[j].Type->UsesCallByReference()){
-				(*f)->Var[j].Type = GetPointerType((*f)->Var[j].Type);
+		for (int j=0;j<f->NumParams;j++)
+			if (f->Var[j].Type->UsesCallByReference()){
+				f->Var[j].Type = GetPointerType(f->Var[j].Type);
 
 				// internal usage...
-				foreach((*f)->Block->Command, c)
-					conv_cbr(this, *c, j);
+				foreach(sCommand *c, f->Block->Command)
+					conv_cbr(this, c, j);
 			}
 
 		// return: array as reference
-		if (((*f)->Type->IsArray) /*|| ((*f)->Type->IsSuperArray)*/){
-			(*f)->Type = GetPointerType((*f)->Type);
-			/*for (int k=0;k<(*f)->Block->Command.num;k++)
-				conv_return(this, (*f)->Block->Command[k]);*/
+		if ((f->Type->IsArray) /*|| (f->Type->IsSuperArray)*/){
+			f->Type = GetPointerType(f->Type);
+			/*for (int k=0;k<f->Block->Command.num;k++)
+				conv_return(this, f->Block->Command[k]);*/
 			// no need... return gets converted automatically (all calls...)
 		}
 	}
@@ -2914,9 +2914,9 @@ void CPreScript::ConvertCallByReference()
 	msg_db_m("a", 3);
 
 	// convert function calls
-	foreach(Command, ccc){
+	foreach(sCommand *ccc, Command){
 		// Command array might be reallocated in the loop!
-		sCommand *c = *ccc;
+		sCommand *c = ccc;
 
 		if (c->Kind == KindCompilerFunction)
 			if (c->LinkNr == CommandReturn){
@@ -2925,7 +2925,7 @@ void CPreScript::ConvertCallByReference()
 					so(c->Param[0]->Type->Name);
 					ref_command(this, c->Param[0]);
 				}
-				ccc.update();
+				_foreach_it_.update(); // TODO badness10000!!!!!!!!
 				continue;
 			}
 		
@@ -2957,7 +2957,7 @@ void CPreScript::ConvertCallByReference()
 					ref_command(this, c->Param[j]);
 				}
 		}
-		ccc.update();
+		_foreach_it_.update(); // TODO !!!!!
 	}
 	msg_db_l(2);
 }
@@ -2968,9 +2968,9 @@ void CPreScript::Simplify()
 	msg_db_r("Simplify", 2);
 	
 	// remove &*
-	foreach(Function, f)
-		foreach((*f)->Block->Command, c)
-			easyfy(this, *c, 0);
+	foreach(sFunction *f, Function)
+		foreach(sCommand *c, f->Block->Command)
+			easyfy(this, c, 0);
 	
 
 	
@@ -3126,8 +3126,7 @@ void CPreScript::BreakDownComplicatedCommands()
 void CPreScript::MapLocalVariablesToStack()
 {
 	msg_db_r("MapLocalVariablesToStack", 1);
-	foreach(Function, ff){
-		sFunction *f = *ff;
+	foreach(sFunction *f, Function){
 		f->_ParamSize = 8; // space for return value and eBP
 		if (f->Type->Size > 4)
 			f->_ParamSize += 4;
@@ -3135,24 +3134,24 @@ void CPreScript::MapLocalVariablesToStack()
 
 		// map "self" to the first parameter
 		if (f->Class)
-			foreachi(f->Var, v, i)
-				if (v->Name == "self"){
-					int s = mem_align(v->Type->Size);
-					v->_Offset = f->_ParamSize;
+			foreachi(sLocalVariable &v, f->Var, i)
+				if (v.Name == "self"){
+					int s = mem_align(v.Type->Size);
+					v._Offset = f->_ParamSize;
 					f->_ParamSize += s;
 				}
 
-		foreachi(f->Var, v, i){
-			if ((f->Class) && (v->Name == "self"))
+		foreachi(sLocalVariable &v, f->Var, i){
+			if ((f->Class) && (v.Name == "self"))
 				continue;
-			int s = mem_align(v->Type->Size);
+			int s = mem_align(v.Type->Size);
 			if (i < f->NumParams){
 				// parameters
-				v->_Offset = f->_ParamSize;
+				v._Offset = f->_ParamSize;
 				f->_ParamSize += s;
 			}else{
 				// "real" local variables
-				v->_Offset = - f->_VarSize - s;
+				v._Offset = - f->_VarSize - s;
 				f->_VarSize += s;
 			}
 		}
@@ -3174,11 +3173,11 @@ void CreateImplicitConstructor(CPreScript *ps, sType *t)
 	self->Type = ps->GetPointerType(t);
 
 	if (t->IsSuperArray){
-		foreach(t->Function, ff)
-			if (ff->Name == "__mem_init__"){
+		foreach(sClassFunction &ff, t->Function)
+			if (ff.Name == "__mem_init__"){
 				int nc = ps->AddConstant(TypeInt);
 				*(int*)ps->Constant[nc].data = t->SubType->Size;
-				sCommand *c = add_command_classfunc(ps, t, *ff, self);
+				sCommand *c = add_command_classfunc(ps, t, ff, self);
 				sCommand *p = add_command_const(ps, nc);
 				c->Param[0] = p;
 				c->NumParams = 1;
@@ -3187,17 +3186,17 @@ void CreateImplicitConstructor(CPreScript *ps, sType *t)
 	}else{
 
 		// call child constructors
-		foreach(t->Element, e)
-			foreach(e->Type->Function, ff)
-				if (ff->Name == "__init__"){
+		foreach(sClassElement &e, t->Element)
+			foreach(sClassFunction &ff, e.Type->Function)
+				if (ff.Name == "__init__"){
 					sCommand *p = ps->AddCommand();
 					p->Kind = KindDerefAddressShift;
-					p->LinkNr = e->Offset;
-					p->Type = e->Type;
+					p->LinkNr = e.Offset;
+					p->Type = e.Type;
 					p->NumParams = 1;
 					p->Param[0] = self;
 					ref_command(ps, p);
-					sCommand *c = add_command_classfunc(ps, t, *ff, p);
+					sCommand *c = add_command_classfunc(ps, t, ff, p);
 					f->Block->Command.add(c);
 				}
 	}
@@ -3224,28 +3223,29 @@ void CreateImplicitDestructor(CPreScript *ps, sType *t)
 	self->Type = ps->GetPointerType(t);
 
 	if (t->IsSuperArray){
-		foreach(t->Function, ff)
-			if (ff->Name == "clear"){
-				sCommand *c = add_command_classfunc(ps, t, *ff, self);
+		foreach(sClassFunction &ff, t->Function)
+			if (ff.Name == "clear"){
+				sCommand *c = add_command_classfunc(ps, t, ff, self);
 				f->Block->Command.add(c);
 			}
 	}else{
 
 		// call child destructors
-		foreach(t->Element, e)
-			foreach(e->Type->Function, ff)
-				if (ff->Name == "__delete__"){
+		foreach(sClassElement &e, t->Element)
+			foreach(sClassFunction &ff, e.Type->Function)
+				if (ff.Name == "__delete__"){
 					sCommand *p = ps->AddCommand();
 					p->Kind = KindDerefAddressShift;
-					p->LinkNr = e->Offset;
-					p->Type = e->Type;
+					p->LinkNr = e.Offset;
+					p->Type = e.Type;
 					p->NumParams = 1;
 					p->Param[0] = self;
 					ref_command(ps, p);
-					sCommand *c = add_command_classfunc(ps, t, *ff, p);
+					sCommand *c = add_command_classfunc(ps, t, ff, p);
 					f->Block->Command.add(c);
 				}
 	}
+
 
 	sClassFunction cf;
 	cf.Kind = KindFunction;
@@ -3365,23 +3365,23 @@ void CreateImplicitAssign(CPreScript *ps, sType *t)
 	}else{
 
 		// call child assignment
-		foreach(t->Element, e){
+		foreach(sClassElement &e, t->Element){
 			sCommand *p = ps->AddCommand();
 			p->Kind = KindDerefAddressShift;
-			p->LinkNr = e->Offset;
-			p->Type = e->Type;
+			p->LinkNr = e.Offset;
+			p->Type = e.Type;
 			p->NumParams = 1;
 			p->Param[0] = self;
 			sCommand *o = ps->AddCommand();
 			o->Kind = KindDerefAddressShift;
-			o->LinkNr = e->Offset;
-			o->Type = e->Type;
+			o->LinkNr = e.Offset;
+			o->Type = e.Type;
 			o->NumParams = 1;
 			o->Param[0] = cp_command(ps, other); // needed for call-by-ref conversion!
 
 			sCommand *cmd_assign = ps->AddCommand();
 			if (!ps->LinkOperator(OperatorAssign, p, o, &cmd_assign)){
-				ps->DoError(format("%s.__assign__(): no %s.__assign__ for element \"%s\"", t->Name.c_str(), e->Type->Name.c_str(), e->Name.c_str()));
+				ps->DoError(format("%s.__assign__(): no %s.__assign__ for element \"%s\"", t->Name.c_str(), e.Type->Name.c_str(), e.Name.c_str()));
 				return;
 			}
 			f->Block->Command.add(cmd_assign);
@@ -3745,32 +3745,32 @@ void CPreScript::CreateImplicitFunctions(sType *t, bool relocate_last_function)
 		Function.add(f);
 
 		// relink commands
-		foreach(Command, c)
-			if ((*c)->Kind == KindFunction){
-				if ((*c)->script)
+		foreach(sCommand *c, Command)
+			if (c->Kind == KindFunction){
+				if (c->script)
 					continue;
-				if ((*c)->LinkNr == num_funcs - 1)
-					(*c)->LinkNr = Function.num - 1;
-				else if ((*c)->LinkNr > num_funcs - 1)
-					(*c)->LinkNr --;
+				if (c->LinkNr == num_funcs - 1)
+					c->LinkNr = Function.num - 1;
+				else if (c->LinkNr > num_funcs - 1)
+					c->LinkNr --;
 			}
 
 		// relink class functions
-		foreach(Type, t)
-			foreach((*t)->Function, f)
-				if (f->Kind == KindFunction){
-					if (f->Nr == num_funcs - 1)
-						f->Nr = Function.num - 1;
-					else if (f->Nr > num_funcs - 1)
-						f->Nr --;
+		foreach(sType *t, Type)
+			foreach(sClassFunction &f, t->Function)
+				if (f.Kind == KindFunction){
+					if (f.Nr == num_funcs - 1)
+						f.Nr = Function.num - 1;
+					else if (f.Nr > num_funcs - 1)
+						f.Nr --;
 				}
 	}
 }
 
 void CPreScript::CreateAllImplicitFunctions(bool relocate_last_function)
 {
-	foreach(Type, t)
-		CreateImplicitFunctions(*t, relocate_last_function);
+	foreach(sType *t, Type)
+		CreateImplicitFunctions(t, relocate_last_function);
 }
 
 // no included scripts may be deleted before us!!!
@@ -3797,9 +3797,9 @@ CPreScript::~CPreScript()
 	AsmBlock.clear();
 	
 	msg_db_m("const", 8);
-	foreach(Constant, c)
-		if (c->owner == this)
-			delete[](c->data);
+	foreach(sConstant &c, Constant)
+		if (c.owner == this)
+			delete[](c.data);
 	Constant.clear();
 
 	

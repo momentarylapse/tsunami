@@ -64,17 +64,17 @@ bool file_test_existence(const string &filename)
 bool dir_create(const string &dir)
 {
 #ifdef OS_WINDOWS
-	return (_mkdir(SysFileName(dir).c_str())==0);
+	return (_mkdir(dir.sys_filename().c_str())==0);
 #endif
 #ifdef OS_LINUX
-	return (mkdir(SysFileName(dir).c_str(),S_IRWXU | S_IRWXG | S_IRWXO)==0);
+	return (mkdir(dir.sys_filename().c_str(),S_IRWXU | S_IRWXG | S_IRWXO)==0);
 #endif
 	return false;
 }
 
 bool dir_delete(const string &dir)
 {
-	return (_rmdir(SysFileName(dir).c_str())==0);
+	return (_rmdir(dir.sys_filename().c_str())==0);
 }
 
 string get_current_dir()
@@ -97,36 +97,36 @@ string get_current_dir()
 bool file_rename(const string &source,const string &target)
 {
 	char dir[512];
-	for (unsigned int i=0;i<target.num;i++){
+	for (int i=0;i<target.num;i++){
 		dir[i]=target[i];
 		dir[i+1]=0;
 		if (i>3)
 			if ((target[i]=='/')||(target[i]=='\\'))
 				dir_create(string(dir));
 	}
-	return (rename(SysFileName(source).c_str(), SysFileName(target).c_str())==0);
+	return (rename(source.sys_filename().c_str(), target.sys_filename().c_str())==0);
 }
 
 bool file_copy(const string &source,const string &target)
 {
 	char dir[512];
-	for (unsigned int i=0;i<target.num;i++){
+	for (int i=0;i<target.num;i++){
 		dir[i]=target[i];
 		dir[i+1]=0;
 		if (i>3)
 			if ((target[i]=='/')||(target[i]=='\\'))
 				dir_create(string(dir));
 	}
-	int hs=_open(SysFileName(source).c_str(),O_RDONLY);
+	int hs=_open(source.sys_filename().c_str(),O_RDONLY);
 	if (hs<0)
 		return false;
 #ifdef OS_WINDOWS
-	int ht=_creat(SysFileName(target).c_str(),_S_IREAD | _S_IWRITE);
+	int ht=_creat(target.sys_filename().c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
 #endif
 #ifdef OS_LINUX
-	int ht=creat(SysFileName(target).c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	int ht=creat(target.sys_filename().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (ht<0){
 		_close(hs);
@@ -145,7 +145,7 @@ bool file_copy(const string &source,const string &target)
 
 bool file_delete(const string &filename)
 {
-	return (_unlink(SysFileName(filename).c_str())==0);
+	return (_unlink(filename.sys_filename().c_str())==0);
 }
 
 string shell_execute(const string &cmd)
@@ -166,11 +166,11 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 
 	string filter2 = filter.substr(1, filter.num - 1);
 	string dir2 = dir;
-	dir_ensure_ending(dir2, true);
+	dir2.dir_ensure_ending();
 
 #ifdef OS_WINDOWS
 	static _finddata_t t;
-	int handle=_findfirst(SysFileName(dir2 + "*").c_str(), &t);
+	int handle=_findfirst((dir2.sys_filename() + "*").c_str(), &t);
 	int e=handle;
 	while(e>=0){
 		//if ((strcmp(t.name,".")!=0)&&(strcmp(t.name,"..")!=0)&&(strstr(t.name,"~")==NULL)){
@@ -186,7 +186,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 #endif
 #ifdef OS_LINUX
 	DIR *_dir;
-	_dir=opendir(SysFileName(dir2).c_str());
+	_dir=opendir(dir2.sys_filename().c_str());
 	if (!_dir){
 		msg_db_l(1);
 		return entry_list;
@@ -197,7 +197,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	while(dn){
 		//if ((strcmp(dn->d_name,".")!=0)&&(strcmp(dn->d_name,"..")!=0)&&(!strstr(dn->d_name,"~"))){
 			if ((dn->d_name[0]!='.')&&(!strstr(dn->d_name,"~"))){
-				string ffn = SysFileName(dir2) + dn->d_name;
+				string ffn = dir2.sys_filename() + dn->d_name;
 				stat(ffn.c_str(), &s);
 				bool is_reg=(s.st_mode & S_IFREG)>0;
 				bool is_dir=(s.st_mode & S_IFDIR)>0;

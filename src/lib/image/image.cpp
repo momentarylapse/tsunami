@@ -34,7 +34,7 @@ void Image::LoadFlipped(const string &filename)
 		return;
 	}
 	
-	string ext = file_extension(filename);
+	string ext = filename.extension();
 	
 	if (ext == "bmp")
 		image_load_bmp(filename, *this);
@@ -92,7 +92,7 @@ void Image::Save(const string &filename) const
 {
 	msg_db_r("Image.Save", 1);
 	
-	string ext = file_extension(filename);
+	string ext = filename.extension();
 	if (ext == "tga")
 		image_save_tga(filename, *this);
 	else

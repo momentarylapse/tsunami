@@ -128,9 +128,9 @@ void HuiLoadResource(const string &filename)
 
 HuiResource *HuiGetResource(const string &id)
 {
-	foreach(_HuiResource_, r)
-		if (r->id == id)
-			return &*r;
+	foreach(HuiResource &r, _HuiResource_)
+		if (r.id == id)
+			return &r;
 	return NULL;
 }
 
@@ -164,25 +164,25 @@ CHuiWindow *HuiCreateResourceDialog(const string &id, CHuiWindow *root)
 		dlg->ToolbarSetByID(res->s_param[1]);
 
 	// controls
-	foreach(res->cmd, cmd){
+	foreach(HuiResourceCommand &cmd, res->cmd){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
-			dlg->SetTarget(cmd->s_param[0], cmd->i_param[4]);
-			HuiWindowAddControl( dlg, cmd->type, HuiGetLanguage(cmd->id),
-								cmd->i_param[0], cmd->i_param[1],
-								cmd->i_param[2], cmd->i_param[3],
-								cmd->id);
+			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
+			HuiWindowAddControl( dlg, cmd.type, HuiGetLanguage(cmd.id),
+								cmd.i_param[0], cmd.i_param[1],
+								cmd.i_param[2], cmd.i_param[3],
+								cmd.id);
 		}else if (res->type == "SizableDialog"){
 			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			dlg->SetTarget(cmd->s_param[0], cmd->i_param[4]);
-			HuiWindowAddControl( dlg, cmd->type, HuiGetLanguage(cmd->id),
-								cmd->i_param[4], 0,
-								cmd->i_param[2], cmd->i_param[3],
-								cmd->id);
+			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
+			HuiWindowAddControl( dlg, cmd.type, HuiGetLanguage(cmd.id),
+								cmd.i_param[4], 0,
+								cmd.i_param[2], cmd.i_param[3],
+								cmd.id);
 		}
-		dlg->Enable(cmd->id, cmd->enabled);
-		if (cmd->image.num > 0)
-			dlg->SetImage(cmd->id, cmd->image);
+		dlg->Enable(cmd.id, cmd.enabled);
+		if (cmd.image.num > 0)
+			dlg->SetImage(cmd.id, cmd.image);
 	}
 	msg_db_m("  \\(^_^)/",1);
 	msg_db_l(1);

@@ -14,7 +14,7 @@
 	#pragma comment(lib,"winmm.lib")
 	#pragma warning(disable : 4995)
 #endif
-#ifdef HUI_OS_LINUX
+#ifdef OS_LINUX
 	#include <string.h>
 	#include <unistd.h>
 	#include <sys/time.h>

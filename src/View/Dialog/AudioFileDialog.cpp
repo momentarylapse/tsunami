@@ -16,8 +16,8 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 	// dialog
 	FromResource("wave_dialog");
 
-	foreach(a->tag, t)
-		AddString("tags", t->key + "\\" + t->value);
+	foreach(Tag &t, a->tag)
+		AddString("tags", t.key + "\\" + t.value);
 	int samples = a->GetRange().length();
 	SetString("time", a->get_time_str(samples));
 	SetInt("samples", samples);
@@ -47,13 +47,13 @@ void AudioFileDialog::RefillAudioList()
 {
 	msg_db_r("RefillAudioList", 1);
 	Reset("wave_list");
-	foreachi(audio->track, t, i)
-		AddString("wave_list", format("%d\\%s\\%s", i + 1, t->name.c_str(), get_vol(t->volume, t->muted).c_str()));
+	foreachi(Track &t, audio->track, i)
+		AddString("wave_list", format("%d\\%s\\%s", i + 1, t.name.c_str(), get_vol(t.volume, t.muted).c_str()));
 	audio_list.clear();
-	foreachi(audio->track, t, i)
-		foreachi(t->sub, s, j){
-			AddChildString("wave_list", i, format("%d\\%s\\%s", j + 1, s->name.c_str(), get_vol(t->volume * s->volume, t->muted || s->muted).c_str()));
-			audio_list.add(&*s);
+	foreachi(Track &t, audio->track, i)
+		foreachi(Track &s, t.sub, j){
+			AddChildString("wave_list", i, format("%d\\%s\\%s", j + 1, s.name.c_str(), get_vol(t.volume * s.volume, t.muted || s.muted).c_str()));
+			audio_list.add(&s);
 		}
 	msg_db_l(1);
 }

@@ -17,6 +17,7 @@ public:
 	Format(const string &_extension, int _flags);
 	virtual ~Format();
 	bool CanHandle(const string &_extension);
+	bool TestFormatCompatibility(AudioFile *a);
 
 	void ImportData(Track *t, void *data, int channels, int bits, int samples, int offset);
 	void ExportAudioAsTrack(AudioFile *a, const string &filename);

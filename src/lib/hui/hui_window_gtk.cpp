@@ -107,11 +107,11 @@ void WinTrySendByKeyCode(CHuiWindow *win, int key_code)
 {
 	if (key_code <= 0)
 		return;
-	foreach(_HuiCommand_, c)
-		if (key_code == c->key_code){
+	foreach(HuiCommand &c, _HuiCommand_)
+		if (key_code == c.key_code){
 			//msg_write>Write("---------------------------------");
 			//msg_write>Write(HuiCommand[kk].id);
-			HuiEvent e = HuiCreateEvent(c->id, "");
+			HuiEvent e = HuiCreateEvent(c.id, "");
 			_HuiSendGlobalCommand_(&e);
 			win->_SendEvent_(&e);
 		}
@@ -211,8 +211,8 @@ gboolean OnGtkWindowClose(GtkWidget *widget, GdkEvent *event, gpointer user_data
 	// no message function (and last window in thie main level): end program
 	// ...or at least end nested main level
 	int n = 0;
-	foreach(HuiWindow, w)
-		if ((*w)->_GetMainLevel_() >= win->_GetMainLevel_())
+	foreach(CHuiWindow *w, HuiWindow)
+		if (w->_GetMainLevel_() >= win->_GetMainLevel_())
 			n ++;
 	if (n == 1)
 		HuiEnd();
@@ -883,8 +883,8 @@ void ev_out(GdkEvent *e)
 
 void read_events(const string &msg, bool rem = false)
 {
-	foreach(scp_event, e)
-		gdk_event_free(*e);
+	foreach(GdkEvent *e, scp_event)
+		gdk_event_free(e);
 	scp_event.clear();
 	
 	int n = 0;
@@ -911,8 +911,8 @@ void read_events(const string &msg, bool rem = false)
 
 void put_events()
 {
-	foreach(scp_event, e)
-		gdk_event_put(*e);
+	foreach(GdkEvent *e, scp_event)
+		gdk_event_put(e);
 }
 
 // relative to Interior
@@ -927,11 +927,11 @@ void CHuiWindow::SetCursorPos(int x,int y)
 		XFlush(hui_x_display);
 		read_events("prae");
 		float xnew = input.x, ynew = input.y;
-		foreach(scp_event, e){
-			if ((*e)->type == 3){
-				xnew = ((GdkEventMotion*)*e)->x;
-				ynew = ((GdkEventMotion*)*e)->y;
-				ignore_time = gdk_event_get_time(*e) + 20;
+		foreach(GdkEvent *e, scp_event){
+			if (e->type == 3){
+				xnew = ((GdkEventMotion*)e)->x;
+				ynew = ((GdkEventMotion*)e)->y;
+				ignore_time = gdk_event_get_time(e) + 20;
 			}
 		}
 		dx = xnew - input.x;
@@ -950,11 +950,11 @@ void CHuiWindow::SetCursorPos(int x,int y)
 		XFlush(hui_x_display);*/
 
 		read_events("post");
-		foreachb(scp_event, e)
-			if ((*e)->type == 3){
-				((GdkEventMotion*)*e)->x = x - dx;
-				((GdkEventMotion*)*e)->y = y - dy;
-				((GdkEventMotion*)*e)->time += 100;
+		foreachb(GdkEvent *e, scp_event)
+			if (e->type == 3){
+				((GdkEventMotion*)e)->x = x - dx;
+				((GdkEventMotion*)e)->y = y - dy;
+				((GdkEventMotion*)e)->time += 100;
 			}
 		put_events();
 	#endif

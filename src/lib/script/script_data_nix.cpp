@@ -288,12 +288,12 @@ void SIAddPackageNix()
 	add_const("Perspective2DScaleAutoTarget", TypeInt, nix_p(Perspective2DScaleAutoTarget));
 	add_const("Perspective2DScaleAutoScreen", TypeInt, nix_p(Perspective2DScaleAutoScreen));
 	add_const("PerspectiveRatioSet",          TypeInt, nix_p(PerspectiveRatioSet));
-#ifdef NIX_OS_WINDOWS
+#ifdef OS_WINDOWS
 	add_const("OSWindows", TypeInt, (void*)1);
 #else
 	add_const("OSWindows", TypeInt, (void*)-1);
 #endif
-#ifdef NIX_OS_LINUX
+#ifdef OS_LINUX
 	add_const("OSLinux", TypeInt, (void*)1);
 #else
 	add_const("OSLinux", TypeInt, (void*)-1);

@@ -61,20 +61,17 @@ void QuaternionRotationM(quaternion &q,const matrix &m)
 		n.x=(m._21-m._12)*s;
 		n.y=(m._02-m._20)*s;
 		n.z=(m._10-m._01)*s;
-		VecNormalize(n);
+		n.normalize();
 		QuaternionRotationA(q,n,w);
 	}
 }
 
 // invert a quaternion rotation
-void QuaternionInverse(quaternion &qo,const quaternion &qi)
+void quaternion::inverse()
 {
-	float l=(qi.x*qi.x)+(qi.y*qi.y)+(qi.z*qi.z)+(qi.w*qi.w);
-	l=1.0f/l;
-	qo.w= qi.w*l;
-	qo.x=-qi.x*l;
-	qo.y=-qi.y*l;
-	qo.z=-qi.z*l;
+	x = -x;
+	y = -y;
+	z = -z;
 }
 
 // unite 2 rotations (first rotate by q1, then by q2: q = q2*q1)
@@ -136,22 +133,20 @@ void QuaternionInterpolate(quaternion &q,const quaternion &q1,const quaternion &
 }
 
 // convert a quaternion into 3 angles (ZXY)
-vector QuaternionToAngle(const quaternion &q)
+vector quaternion::get_angles() const
 {
 	// really bad!
 	vector ang,v;
-	v=vector(0,0,1000.0f);
 	matrix m,x,y;
-	MatrixRotationQ(m,q);
-	VecTransform(v,m,v);
+	MatrixRotationQ(m,*this);
+	v=m*vector(0,0,1000.0f);
 	ang.y= atan2f(v.x,v.z);
 	ang.x=-atan2f(v.y,sqrt(v.x*v.x+v.z*v.z));
 	MatrixRotationX(x,-ang.x);
 	MatrixRotationY(y,-ang.y);
 	MatrixMultiply(m,y,m);
 	MatrixMultiply(m,x,m);
-	v=vector(1000.0f,0,0);
-	VecTransform(v,m,v);
+	v=m*vector(1000.0f,0,0);
 	ang.z=atan2f(v.y,v.x);
 	return ang;
 }
@@ -159,7 +154,7 @@ vector QuaternionToAngle(const quaternion &q)
 // scale the angle of the rotation
 void QuaternionScale(quaternion &q,float f)
 {
-	float w=GetAngle(q);
+	float w=q.get_angle();
 	if (w==0)	return;
 
 	q.w=cosf(w*f/2);
@@ -170,26 +165,26 @@ void QuaternionScale(quaternion &q,float f)
 }
 
 // quaternion correction
-void QuaternionNormalize(quaternion &qo,const quaternion &qi)
+void quaternion::normalize()
 {
-	float l=sqrtf((qi.x*qi.x)+(qi.y*qi.y)+(qi.z*qi.z)+(qi.w*qi.w));
+	float l=sqrtf((x*x)+(y*y)+(z*z)+(w*w));
 	l=1.0f/l;
-	qo.x=qi.x*l;
-	qo.y=qi.y*l;
-	qo.z=qi.z*l;
-	qo.w=qi.w*l;
+	x *= l;
+	y *= l;
+	z *= l;
+	w *= l;
 }
 
 // the axis of our quaternion rotation
-vector GetAxis(const quaternion &q)
+vector quaternion::get_axis() const
 {
-	vector ax = vector(q.x, q.y, q.z);
-	VecNormalize(ax);
+	vector ax = vector(x, y, z);
+	ax.normalize();
 	return ax;
 }
 
 // angle value of the quaternion
-float GetAngle(const quaternion &q)
+float quaternion::get_angle() const
 {
-	return acosf(q.w)*2;
+	return acosf(w)*2;
 }

@@ -13,20 +13,22 @@
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, bool all_levels)
 {
-	foreachi(a->track, t, track_no)
-		if (t->is_selected){
+	foreachi(Track &t, a->track, track_no)
+		if (t.is_selected){
 			// buffer boxes
 			if (all_levels){
-				foreachi(t->level, l, li)
-					DeleteBuffersFromTrackLevel(a, *t, *l, li);
+				foreachi(TrackLevel &l, t.level, li)
+					DeleteBuffersFromTrackLevel(a, t, l, li);
 			}else{
-				DeleteBuffersFromTrackLevel(a, *t, t->level[a->cur_level], a->cur_level);
+				DeleteBuffersFromTrackLevel(a, t, t.level[a->cur_level], a->cur_level);
 			}
 
 			// subs
-			foreachbi(t->sub, s, n)
-				if (s->is_selected)
+			foreachib(Track &s, t.sub, n)
+				if (s.is_selected){
 					AddSubAction(new ActionSubTrackDelete(track_no, n), a);
+					_foreach_it_.update(); // TODO...
+				}
 		}
 }
 
@@ -39,12 +41,12 @@ void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
 {
 	int i0 = a->selection.start();
 	int i1 = a->selection.end();
-	foreachbi(l.buffer, b, n){
-		int bi0 = b->offset;
-		int bi1 = b->offset + b->num;
+	foreachib(BufferBox &b, l.buffer, n){
+		int bi0 = b.offset;
+		int bi1 = b.offset + b.num;
 
 
-		if (a->selection.covers(b->range())){
+		if (a->selection.covers(b.range())){
 			// b completely inside?
 			AddSubAction(new ActionTrack__DeleteBufferBox(&t, level_no, n), a);
 
@@ -57,14 +59,14 @@ void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
 			AddSubAction(new ActionTrack__CutBufferBox(&t, level_no, n, i1 - bi0), a);
 			AddSubAction(new ActionTrack__DeleteBufferBox(&t, level_no, n), a);
 
-		}else if (b->range().covers(a->selection)){
+		}else if (b.range().covers(a->selection)){
 			// inside b?
 			AddSubAction(new ActionTrack__CutBufferBox(&t, level_no, n, i1 - bi0), a);
 			AddSubAction(new ActionTrack__CutBufferBox(&t, level_no, n, i0 - bi0), a);
 			AddSubAction(new ActionTrack__DeleteBufferBox(&t, level_no, n + 1), a);
 
 		}
-		b.update();
+		_foreach_it_.update();
 	}
 }
 

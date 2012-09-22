@@ -97,6 +97,12 @@ string string::substr(int start, int length) const
 	return r;
 }
 
+string string::head(int size) const
+{	return substr(0, size);	}
+
+string string::tail(int size) const
+{	return substr(num - size, size);	}
+
 int string::find(const string &s, int start) const
 {
 	char *b = (char*)data;
@@ -166,15 +172,15 @@ int string::icompare(const string &s) const
 	return num - s.num;
 }
 
-void string::reverse()
+string string::_reverse() const
 {
+	string r;
+	r.resize(num);
 	char *a = (char*)data;
-	int n = num / 2;
-	for (int i=0;i<n;i++){
-		char t = a[i];
-		a[i] = a[num - i - 1];
-		a[num - i - 1] = t;
-	}
+	char *b = (char*)r.data;
+	for (int i=0;i<num;i++)
+		b[num - i - 1] = a[i];
+	return r;
 }
 
 Array<string> string::explode(const string &s) const
@@ -217,13 +223,15 @@ void string::replace0(int start, int length, const string &str)
 	}
 }
 
-void string::replace(const string &sub, const string &by)
+string string::_replace(const string &sub, const string &by) const
 {
-	int i = this->find(sub, 0);
+	string r = *this;
+	int i = r.find(sub, 0);
 	while (i >= 0){
-		this->replace0(i, sub.num, by);
-		i = this->find(sub, i + by.num);
+		r.replace0(i, sub.num, by);
+		i = r.find(sub, i + by.num);
 	}
+	return r;
 }
 
 string string::lower() const
@@ -284,63 +292,53 @@ const char *string::c_str() const
 
 // transposes path-strings to the current operating system
 // accepts windows and linux paths ("/" and "\\")
-string SysFileName(const string &filename)
+string string::sys_filename() const
 {
-	string str = filename;
+	string r = *this;
 #ifdef OS_WINDOWS
-	for (int i=0;i<str.num;i++)
-		if (str[i]=='/')
-			str[i]='\\';
+	for (int i=0;i<r.num;i++)
+		if (r[i]=='/')
+			r[i]='\\';
 #endif
 #ifdef OS_LINUX
-	for (int i=0;i<str.num;i++)
-		if (str[i]=='\\')
-			str[i]='/';
+	for (int i=0;i<r.num;i++)
+		if (r[i]=='\\')
+			r[i]='/';
 #endif
-	return str;
+	return r;
 }
 
 // ends with '/' or '\'
-string dirname(const string &filename)
+string string::dirname() const
 {
-	string str = filename;
-	for (int i=str.num-1;i>=0;i--){
-		if ((str[i] == '/') || (str[i] == '\\')){
-			str.resize(i + 1);
-			break;
-		}
-		if (i == 0)
-			str.clear();
-	}
-	return str;
+	int i = max(rfind("/"), rfind("\\"));
+	if (i >= 0)
+		return head(i + 1);
+	return *this;
 }
 
-string basename(const string &filename)
+string string::basename() const
 {
-	for (int i=filename.num-1;i>=0;i--){
-		if ((filename[i] == '/') || (filename[i] == '\\')){
-			return filename.substr(i + 1, filename.num - i - 1);
-		}
-	}
-	return filename;
+	int i = max(rfind("/"), rfind("\\"));
+	if (i >= 0)
+		return tail(num - i - 1);
+	return *this;
 }
 
-// make sure the name ends with (or without) a shlash
-void dir_ensure_ending(string &dir, bool slash)
+// make sure the name ends with a shlash
+void string::dir_ensure_ending()
 {
-	if (dir.num > 0){
-		char lc = dir[dir.num - 1];
-		if ((slash) && (lc != '/') && (lc != '\\'))
-			dir += "/";
-		if ((!slash) && ((lc == '/') || (lc == '\\')))
-			dir.resize(dir.num - 1);
+	if (num > 0){
+		char lc = (*this)[num - 1];
+		if ((lc != '/') && (lc != '\\'))
+			add('/');
 	}
 }
 
 // remove "/../"
-string filename_no_recursion(const string &filename)
+string string::no_recursion() const
 {
-	string str = filename;
+	string str = *this;
 	int l1,l2,l3;
 	for (l1=str.num-2;l1>=0;l1--)
 		if ((str[l1]=='.')&&(str[l1+1]=='.')){
@@ -357,11 +355,11 @@ string filename_no_recursion(const string &filename)
 	return str;
 }
 
-string file_extension(const string &filename)
+string string::extension() const
 {
-	int pos = filename.rfind(string("."));
+	int pos = rfind(".");
 	if (pos >= 0)
-		return filename.substr(pos + 1, filename.num - pos - 1).lower();
+		return tail(num - pos - 1).lower();
 	return "";
 }
 
@@ -546,19 +544,7 @@ string b2s(bool b)
 	return string("false");
 }
 
-// convert a vector to a string
-/*string fff2s(float *f)
-{
-	return "(" + f2sf(f[0]) + ", " + f2sf(f[1]) + ", " + f2sf(f[2]) + ")";
-}
-string ff2s(float *f)
-{
-	return "(" + f2sf(f[0]) + ", " + f2sf(f[1]) + ")";
-}
-string ffff2s(float *f)
-{
-	return "(" + f2sf(f[0]) + ", " + f2sf(f[1]) + ", " + f2sf(f[2]) + ", " + f2sf(f[3]) + ")";
-}*/
+// convert a pointer to a string
 string p2s(void *p)
 {
 	char tmp[64];
@@ -570,16 +556,16 @@ string p2s(void *p)
 // inverted:
 //    false:   12.34.56.78
 //    true:    0x78.56.34.12
-string d2h(const void *data,int bytes,bool inverted)
+string string::hex(bool inverted) const
 {
 	string str;
 	if (inverted)
 		str = "0x";
 	unsigned char *c_data = (unsigned char *)data;
-	for (int i=0;i<bytes;i++){
+	for (int i=0;i<num;i++){
 		int dd;
 		if (inverted)
-			dd = c_data[bytes - i - 1];
+			dd = c_data[num - i - 1];
 		else
 			dd = c_data[i];
 		int c1 = (dd & 15);
@@ -592,11 +578,19 @@ string d2h(const void *data,int bytes,bool inverted)
 			str.add('0' + c1);
 		else
 			str.add('a' + c1 - 10);
-		if (i < bytes - 1)
+		if ((!inverted)&&(i < num - 1))
 			str.add('.');
 	}
 	return str;
 }
+
+string string::unhex() const
+{
+	return *this;
+}
+
+string d2h(const void *data, int bytes, bool inverted)
+{	return string((const char*)data, bytes).hex(inverted);	}
 
 string ia2s(const Array<int> &a)
 {
@@ -646,40 +640,44 @@ string sa2s(const Array<string> &a)
 }
 
 // convert a string to an integer
-int s2i(const string &str)
+int string::_int() const
 {
 	bool minus=false;
 	int res=0;
-	for (unsigned int i=0;i<str.num;i++){
-		if (str[i]=='-')
+	for (int i=0;i<num;i++){
+		if ((*this)[i]=='-')
 			minus=true;
-		else res=res*10+(str[i]-48);		
+		else res=res*10+((*this)[i]-48);
 	}
 	if (minus)
 		res=-res;
 	return res;
 }
 
+int s2i(const string &s)
+{	return s._int();	}
+
 // convert a string to a float
-float s2f(const string &str)
+float string::_float() const
 {
 	bool minus=false;
 	int e=-1;
 	float res=0;
-	for (unsigned int i=0;i<str.num;i++){
+	for (int i=0;i<num;i++){
 		if (e>0)
 			e*=10;
-		if (str[i]=='-')
+		if ((*this)[i]=='-'){
 			minus=true;
-		else{
-			if ((str[i]==',')||(str[i]=='.'))
-			e=1;
-			else{
-				if(str[i]!='\n')
+		}else{
+			if (((*this)[i]==',')||((*this)[i]=='.')){
+				e=1;
+			}else{
+				if((*this)[i]!='\n'){
 					if (e<0)
-						res=res*10+(str[i]-48);
+						res=res*10+((*this)[i]-48);
 					else
-						res+=float(str[i]-48)/(float)e;
+						res+=float((*this)[i]-48)/(float)e;
+				}
 			}
 		}
 	}
@@ -689,17 +687,19 @@ float s2f(const string &str)
 }
 
 
-int hash_func(const string &str)
+float s2f(const string &s)
+{	return s._float();	}
+
+int string::hash() const
 {
 	int id = 0;
-	int l = str.num;
-	int n = l / 4;
-	int *str_i = (int*)str.data;
+	int n = num / 4;
+	int *str_i = (int*)data;
 	for (int i=0;i<n;i++){
 		int t = str_i[i];
 		id = id ^ t;
 	}
-	int r = l - (n * 4);
+	int r = num - (n * 4);
 	int t = 0;
 	if (r == 1)
 		t = (str_i[n] & 0x000000ff);
@@ -709,6 +709,22 @@ int hash_func(const string &str)
 		t = (str_i[n] & 0x00ffffff);
 	id = id ^ t;
 	return id;
+}
+
+string string::trim() const
+{
+	return *this; // TODO
+}
+
+string implode(const Array<string> &a, const string &glue)
+{
+	string r;
+	for (int i=0;i<a.num;i++){
+		if (i > 0)
+			r += glue;
+		r += a[i];
+	}
+	return r;
 }
 
 /*

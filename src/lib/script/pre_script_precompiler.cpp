@@ -73,9 +73,9 @@ void CPreScript::AddIncludeData(CScript *s)
 		//Type.insert(ps->Type[i + PreType.num], i);
 
 	// constants
-	foreach(ps->Constant, c)
-		if (c->name[0] != '-')
-			Constant.add(*c);
+	foreach(sConstant &c, ps->Constant)
+		if (c.name[0] != '-')
+			Constant.add(c);
 	// TODO... ownership of "big" constants
 	msg_db_l(5);
 }
@@ -133,8 +133,8 @@ void CPreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *I
 			/*if (!IsIfDefed(NumIfDefs, IfDefed))
 				continue;*/
 
-			filename = dirname(Filename) + cur_name.substr(1, cur_name.num - 2); // remove "
-			filename = filename_no_recursion(filename);
+			filename = Filename.dirname() + cur_name.substr(1, cur_name.num - 2); // remove "
+			filename = filename.no_recursion();
 
 			so("lade Include-Datei");
 			right();
@@ -248,15 +248,15 @@ void CPreScript::PreCompiler(bool just_analyse)
 			// replace by definition?
 			int num_defs_inserted = 0;
 			while(!end_of_line()){
-				foreachi(Define, d, j){
-					if (cur_name == d->Source){
+				foreachi(sDefine &d, Define, j){
+					if (cur_name == d.Source){
 						int pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 						remove_from_buffer(this, Exp.cur_exp);
-						for (int k=0;k<d->Dest.num;k++){
-							insert_into_buffer(this, d->Dest[k].c_str(), pos, Exp.cur_exp);
+						for (int k=0;k<d.Dest.num;k++){
+							insert_into_buffer(this, d.Dest[k].c_str(), pos, Exp.cur_exp);
 							next_exp();
 						}
-						Exp.cur_exp -= d->Dest.num;
+						Exp.cur_exp -= d.Dest.num;
 						Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
 						num_defs_inserted ++;
 						if (num_defs_inserted > SCRIPT_MAX_DEFINE_RECURSIONS){

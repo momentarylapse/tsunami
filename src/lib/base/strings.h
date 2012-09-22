@@ -31,15 +31,31 @@ class string : public DynamicArray
 	int find(const string &s, int start = 0) const;
 	int rfind(const string &s, int start = -1) const;
 	string substr(int start, int length) const;
+	string head(int size) const;
+	string tail(int size) const;
 	int compare(const string &s) const;
 	int icompare(const string &s) const;
 	void replace0(int start, int length, const string &s);
-	void replace(const string &sub, const string &by);
-	void reverse();
+	string _replace(const string &sub, const string &by) const;
+	string _reverse() const;
+	string trim() const;
 	Array<string> explode(const string &s) const;
 	string lower() const;
 	string upper() const;
+	string hex(bool inverted = false) const;
+	string unhex() const;
+	int hash() const;
+	int _int() const;
+	float _float() const;
 	const char *c_str() const;
+
+	// for paths
+	string sys_filename() const;
+	string dirname() const;
+	string basename() const;
+	void dir_ensure_ending();
+	string no_recursion() const;
+	string extension() const;
 
 	// operators
 	void operator = (const string &s)
@@ -107,18 +123,7 @@ float s2f(const string &s);
 string d2h(const void *data, int bytes, bool inverted = true);
 string h2d(const string &hex_str, int bytes);
 
-
-
-int hash_func(const string &s);
-
-
-string SysFileName(const string &filename);
-string dirname(const string &filename);
-string basename(const string &filename);
-void dir_ensure_ending(string &dir,bool slash);
-string filename_no_recursion(const string &filename);
-string file_extension(const string &filename);
-
+string implode(const Array<string> &a, const string &glue);
 
 //--------------------------------------------------------------
 // regular expressions

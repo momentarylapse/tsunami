@@ -492,12 +492,12 @@ bool _HuiEventMatch_(HuiEvent *e, const string &id, const string &message)
 
 void _HuiSendGlobalCommand_(HuiEvent *e)
 {
-	foreach(_HuiCommand_, c)
-		if (_HuiEventMatch_(e, c->id, ":def:")){
-			if (c->func)
-				c->func();
-			else if (c->member_function)
-				(c->object->*c->member_function)();
+	foreach(HuiCommand &c, _HuiCommand_)
+		if (_HuiEventMatch_(e, c.id, ":def:")){
+			if (c.func)
+				c.func();
+			else if (c.member_function)
+				(c.object->*c.member_function)();
 		}
 }
 

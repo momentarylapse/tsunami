@@ -252,7 +252,7 @@ void Tsunami::OnSendBugReport()
 string title_filename(const string &filename)
 {
 	if (filename.num > 0)
-		return basename(filename);// + " (" + dirname(filename) + ")";
+		return filename.basename();// + " (" + filename.dirname() + ")";
 	return _("Unbenannt");
 }
 
@@ -429,8 +429,8 @@ void Tsunami::UpdateMenu()
 
 	Reset("cur_level");
 	Enable("cur_level", cur_audio->used);
-	foreach(cur_audio->level_name, l)
-		SetString("cur_level", *l);
+	foreach(string &l, cur_audio->level_name)
+		SetString("cur_level", l);
 	SetInt("cur_level", cur_audio->cur_level);
 
 	if (cur_audio->used){

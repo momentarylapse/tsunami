@@ -284,19 +284,19 @@ inline void move_last_cmd(SerializerData *d, int index)
 
 	// adjust temp vars
 	if (d->TempVarRangesDefined)
-		foreach(d->TempVar, v){
-			if (v->first >= index)
-				v->first ++;
-			if (v->last >= index)
-				v->last ++;
+		foreach(sTempVar &v, d->TempVar){
+			if (v.first >= index)
+				v.first ++;
+			if (v.last >= index)
+				v.last ++;
 		}
 
 	// adjust reg channels
-	foreach(d->RegChannel, r){
-		if (r->first >= index)
-			r->first ++;
-		if (r->last >= index)
-			r->last ++;
+	foreach(sRegChannel &r, d->RegChannel){
+		if (r.first >= index)
+			r.first ++;
+		if (r.last >= index)
+			r.last ++;
 	}
 }
 
@@ -305,31 +305,31 @@ inline void remove_cmd(SerializerData *d, int index)
 	d->cmd.erase(index);
 
 	// adjust temp vars
-	foreach(d->TempVar, v){
-		if (v->first >= index)
-			v->first --;
-		if (v->last >= index)
-			v->last --;
+	foreach(sTempVar &v, d->TempVar){
+		if (v.first >= index)
+			v.first --;
+		if (v.last >= index)
+			v.last --;
 	}
 
 	// adjust reg channels
-	foreach(d->RegChannel, r){
-		if (r->first >= index)
-			r->first --;
-		if (r->last >= index)
-			r->last --;
+	foreach(sRegChannel &r, d->RegChannel){
+		if (r.first >= index)
+			r.first --;
+		if (r.last >= index)
+			r.last --;
 	}
 }
 
 inline void remove_temp_var(SerializerData *d, int v)
 {
-	foreach(d->cmd, c){
-		if ((c->p1.kind == KindVarTemp) || (c->p1.kind == KindDerefVarTemp))
-			if ((long)c->p1.p > v)
-				c->p1.p = (char*)((long)c->p1.p - 1);
-		if ((c->p2.kind == KindVarTemp) || (c->p2.kind == KindDerefVarTemp))
-			if ((long)c->p2.p > v)
-				c->p2.p = (char*)((long)c->p2.p - 1);
+	foreach(sSerialCommand &c, d->cmd){
+		if ((c.p1.kind == KindVarTemp) || (c.p1.kind == KindDerefVarTemp))
+			if ((long)c.p1.p > v)
+				c.p1.p = (char*)((long)c.p1.p - 1);
+		if ((c.p2.kind == KindVarTemp) || (c.p2.kind == KindDerefVarTemp))
+			if ((long)c.p2.p > v)
+				c.p2.p = (char*)((long)c.p2.p - 1);
 	}
 	d->TempVar.erase(v);
 }
@@ -347,12 +347,12 @@ inline void move_param(SerializerData *d, sSerialCommandParam &p, int from, int 
 		so("move_param reg");
 		long r = (long)p.p;
 		bool found = false;
-		foreach(d->RegChannel, rc)
-			if ((r == rc->reg) && (from >= rc->first) && (from >= rc->first)){
-				if (rc->last < max(from, to))
-					rc->last = max(from, to);
-				if (rc->first > min(from, to))
-					rc->first = min(from, to);
+		foreach(sRegChannel &rc, d->RegChannel)
+			if ((r == rc.reg) && (from >= rc.first) && (from >= rc.first)){
+				if (rc.last < max(from, to))
+					rc.last = max(from, to);
+				if (rc.first > min(from, to))
+					rc.first = min(from, to);
 				found = true;
 			}
 		if (!found)
@@ -1463,16 +1463,16 @@ Array<sSerialCommandParam> InsertedConstructorTemp;
 
 void add_cmd_constructor(SerializerData *d, sSerialCommandParam &param, bool is_temp)
 {
-	foreach(param.type->Function, f){
-		if (f->Name == "__init__"){ // TODO test signature "void __init__()"
+	foreach(sClassFunction &f, param.type->Function){
+		if (f.Name == "__init__"){ // TODO test signature "void __init__()"
 			sSerialCommandParam inst;
 			AddReference(d, param, TypePointer, inst);
 			AddFuncInstance(inst);
 			void *fp;
-			if (f->Kind == KindCompilerFunction)
-				fp = PreCommand[f->Nr].Func;
-			else if (f->Kind == KindFunction){
-				fp = (void*)param.type->Owner->script->func[f->Nr];
+			if (f.Kind == KindCompilerFunction)
+				fp = PreCommand[f.Nr].Func;
+			else if (f.Kind == KindFunction){
+				fp = (void*)param.type->Owner->script->func[f.Nr];
 				if (!fp)
 					msg_error(param.type->Name + ".__init__() unlinkable compiler function!");
 			}
@@ -1489,16 +1489,16 @@ void add_cmd_constructor(SerializerData *d, sSerialCommandParam &param, bool is_
 
 void add_cmd_destructor(SerializerData *d, sSerialCommandParam &param)
 {
-	foreach(param.type->Function, f)
-		if (f->Name == "__delete__"){ // TODO test signature "void __delete__()"
+	foreach(sClassFunction &f, param.type->Function)
+		if (f.Name == "__delete__"){ // TODO test signature "void __delete__()"
 			sSerialCommandParam inst;
 			AddReference(d, param, TypePointer, inst);
 			AddFuncInstance(inst);
 			void *fp;
-			if (f->Kind == KindCompilerFunction)
-				fp = PreCommand[f->Nr].Func;
-			else if (f->Kind == KindFunction){
-				fp = (void*)param.type->Owner->script->func[f->Nr];
+			if (f.Kind == KindCompilerFunction)
+				fp = PreCommand[f.Nr].Func;
+			else if (f.Kind == KindFunction){
+				fp = (void*)param.type->Owner->script->func[f.Nr];
 				if (!fp)
 					msg_error(param.type->Name + ".__delete__() unlinkable compiler function!");
 			}
@@ -1549,16 +1549,16 @@ inline int temp_in_cmd(SerializerData *d, int c, int v)
 void ScanTempVarUsage(SerializerData *d)
 {
 	msg_db_r("ScanTempVarUsage", 4);
-	foreachi(d->TempVar, v, i){
-		v->first = -1;
-		v->last = -1;
-		v->count = 0;
+	foreachi(sTempVar &v, d->TempVar, i){
+		v.first = -1;
+		v.last = -1;
+		v.count = 0;
 		for (int c=0;c<d->cmd.num;c++){
 			if (temp_in_cmd(d, c, i) > 0){
-				v->count ++;
-				if (v->first < 0)
-					v->first = c;
-				v->last = c;
+				v.count ++;
+				if (v.first < 0)
+					v.first = c;
+				v.last = c;
 			}
 		}
 		//so(string2("var %d:   %d - %d", i, v.first, v.last));
@@ -2604,11 +2604,11 @@ Array<int> InstructionPos;
 void ProcessJumpTargets(SerializerData *d, char *Opcode, int &OpcodeSize)
 {
 	msg_db_r("ProcessJumpTargets", 3);
-	foreachi(d->cmd, c, i){
-		if (c->inst < inst_marker)
-			if (c->p1.kind == KindMarker){
+	foreachi(sSerialCommand &c, d->cmd, i){
+		if (c.inst < inst_marker)
+			if (c.p1.kind == KindMarker){
 				so("adjust jump");
-				int marker = (long)c->p1.p;
+				int marker = (long)c.p1.p;
 				so(marker);
 				int pos_after_jump_inst = InstructionPos[i + 1];
 				int target_pos = -1;
@@ -2620,9 +2620,9 @@ void ProcessJumpTargets(SerializerData *d, char *Opcode, int &OpcodeSize)
 						}
 				if (target_pos >= 0){
 					*(int*)&Opcode[pos_after_jump_inst - 4] = (target_pos - pos_after_jump_inst);
-					c->p1.p = (char*)(target_pos - pos_after_jump_inst);
-					c->p1.kind = KindConstant;
-					c->p1.type = TypePointer;
+					c.p1.p = (char*)(target_pos - pos_after_jump_inst);
+					c.p1.kind = KindConstant;
+					c.p1.type = TypePointer;
 				}else{
 					cur_script->DoErrorInternal("asm error: jump marker not found");
 					_return_(3,);

@@ -178,7 +178,7 @@ void file_set_archive(const string &filename)
 	a_num_files=a_f->ReadInt();
 	a_file=new s_a_file[a_num_files];
 	for (int i=0;i<a_num_dirs;i++){
-		a_dir[i].name = SysFileName(a_f->ReadStr());
+		a_dir[i].name = a_f->ReadStr().sys_filename();
 		a_dir[i].first_file=a_f->ReadInt();
 		a_dir[i].num_files=a_f->ReadInt();
 		for (int j=a_dir[i].first_file;j<a_dir[i].first_file+a_dir[i].num_files;j++)
@@ -224,7 +224,7 @@ static void read_tree(const char *in_buffer,int &pos,int i)
 void add_created_dir(const string &dir)
 {
 	for (int i=0;i<a_num_created_dirs;i++)
-		if (a_created_dir[i] == SysFileName(dir))
+		if (a_created_dir[i] == dir.sys_filename())
 			return;
 	a_created_dir[a_num_created_dirs++] = SysFileName(dir);
 }
@@ -437,12 +437,12 @@ void FileWrite(const string &filename, const string &str)
 bool CFile::Open(const string &filename)
 {
 	if (!SilentFileAccess){
-		msg_write("loading file: " + SysFileName(filename));
+		msg_write("loading file: " + filename.sys_filename());
 		msg_right();
 	}
 	Error=Eof=false;
 	Reading = true;
-	handle=_open(SysFileName(filename).c_str(),O_RDONLY);
+	handle=_open(filename.sys_filename().c_str(),O_RDONLY);
 	if (handle<=0){
 		/*if (file_get_from_archive(filename)){
 			handle=_open(SysFileName(filename).c_str(),O_RDONLY);
@@ -450,7 +450,7 @@ bool CFile::Open(const string &filename)
 			return true;
 		}else*/ if (FileTryAgainFunc){
 			if (FileTryAgainFunc(filename)){
-				handle=_open(SysFileName(filename).c_str(),O_RDONLY);
+				handle=_open(filename.sys_filename().c_str(),O_RDONLY);
 				SetBinaryMode(false);
 				return true;
 			}
@@ -474,17 +474,17 @@ bool CFile::Open(const string &filename)
 bool CFile::Create(const string &filename)
 {
 	if (!SilentFileAccess){
-		msg_write("creating file: " + SysFileName(filename));
+		msg_write("creating file: " + filename.sys_filename());
 		msg_right();
 	}
 	Error=false;
 	Reading = false;
 	FloatDecimals=3;
 #ifdef OS_WINDOWS
-	handle=_creat(SysFileName(filename).c_str(),_S_IREAD | _S_IWRITE);
+	handle=_creat(filename.sys_filename().c_str(),_S_IREAD | _S_IWRITE);
 #endif
 #ifdef OS_LINUX
-	handle=creat(SysFileName(filename).c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	handle=creat(filename.sys_filename().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle<=0){
 		Error=ErrorReported=true;
@@ -504,17 +504,17 @@ bool CFile::Create(const string &filename)
 bool CFile::Append(const string &filename)
 {
 	if (!SilentFileAccess){
-		msg_write("appending file: " + SysFileName(filename));
+		msg_write("appending file: " + filename.sys_filename());
 		msg_right();
 	}
 	Error=false;
 	Reading = false;
 	FloatDecimals=3;
 #ifdef OS_WINDOWS
-	handle=_open(SysFileName(filename).c_str(),O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
+	handle=_open(filename.sys_filename().c_str(),O_WRONLY | O_APPEND | O_CREAT,_S_IREAD | _S_IWRITE);
 #endif
 #ifdef OS_LINUX
-	handle=open(SysFileName(filename).c_str(),O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	handle=open(filename.sys_filename().c_str(),O_WRONLY | O_APPEND | O_CREAT,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (handle<=0){
 		Error=ErrorReported=true;

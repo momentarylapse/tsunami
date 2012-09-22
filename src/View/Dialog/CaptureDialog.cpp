@@ -36,16 +36,16 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 
 	SetString("capture_device", _("- Standard -"));
 	SetInt("capture_device", 0);
-	foreachi(tsunami->input->Device, d, i){
-		AddString("capture_device", *d);
-		if (*d == tsunami->input->ChosenDevice)
+	foreachi(string &d, tsunami->input->Device, i){
+		AddString("capture_device", d);
+		if (d == tsunami->input->ChosenDevice)
 			SetInt("capture_device", i + 1);
 	}
 
 	Enable("capture_playback", a->used);
 
-	foreach(a->track, t)
-		AddString("capture_target", t->GetNiceName());
+	foreach(Track &t, a->track)
+		AddString("capture_target", t.GetNiceName());
 	AddString("capture_target", _("neue Spur anlegen"));
 	SetInt("capture_target", (a->cur_track >= 0) ? a->cur_track : a->track.num);
 

@@ -16,7 +16,7 @@
 #include "script_data_common.h"
 #include "../00_config.h"
 
-string ScriptDataVersion = "0.10.2.0";
+string ScriptDataVersion = "0.10.3.0";
 
 
 #ifdef _X_USE_HUI_
@@ -406,8 +406,8 @@ bool type_is_simple_class(sType *t)
 		return false;
 	if (t->GetFunc("__assign__") >= 0)
 		return false;
-	foreach(t->Element, e)
-		if (!type_is_simple_class(e->Type))
+	foreach(sClassElement &e, t->Element)
+		if (!type_is_simple_class(e.Type))
 			return false;
 	return true;
 }
@@ -617,15 +617,7 @@ class StringList : public Array<string>
 public:
 	void assign(StringList &s){	*this = s;	}
 	string join(const string &glue)
-	{
-		string r;
-		foreachi(*this, s, i){
-			if (i > 0)
-				r += glue;
-			r += *s;
-		}
-		return r;
-	}
+	{	return implode((Array<string>)*this, glue);	}
 };
 
 class IntClass
@@ -640,6 +632,7 @@ class FloatClass
 	float f;
 public:
 	string str(){	return f2s(f, 6);	}
+	string str2(int decimals){	return f2s(f, decimals);	}
 };
 
 class BoolClass
@@ -703,6 +696,8 @@ void SIAddPackageBase()
 		class_add_func("str", TypeString, mf((tmf)&IntClass::str));
 	add_class(TypeFloat);
 		class_add_func("str", TypeString, mf((tmf)&FloatClass::str));
+		class_add_func("str2", TypeString, mf((tmf)&FloatClass::str2));
+			func_add_param("decimals",		TypeInt);
 	add_class(TypeBool);
 		class_add_func("str", TypeString, mf((tmf)&BoolClass::str));
 	add_class(TypeChar);
@@ -730,6 +725,10 @@ void SIAddPackageBase()
 		class_add_func("substr", TypeString, mf((tmf)&string::substr));
 			func_add_param("start",		TypeInt);
 			func_add_param("length",	TypeInt);
+		class_add_func("head", TypeString, mf((tmf)&string::head));
+			func_add_param("size",		TypeInt);
+		class_add_func("tail", TypeString, mf((tmf)&string::tail));
+			func_add_param("size",		TypeInt);
 		class_add_func("find", TypeInt, mf((tmf)&string::find));
 			func_add_param("str",		TypeString);
 			func_add_param("start",		TypeInt);
@@ -737,13 +736,24 @@ void SIAddPackageBase()
 			func_add_param("str",		TypeString);
 		class_add_func("icompare", TypeInt, mf((tmf)&string::icompare));
 			func_add_param("str",		TypeString);
-		class_add_func("replace", TypeVoid, mf((tmf)&string::replace));
+		class_add_func("replace", TypeString, mf((tmf)&string::_replace));
 			func_add_param("sub",		TypeString);
 			func_add_param("by",		TypeString);
 		class_add_func("explode", TypeStringList, mf((tmf)&string::explode));
 			func_add_param("str",		TypeString);
 		class_add_func("lower", TypeString, mf((tmf)&string::lower));
 		class_add_func("upper", TypeString, mf((tmf)&string::upper));
+		class_add_func("reverse", TypeString, mf((tmf)&string::reverse));
+		class_add_func("hash", TypeInt, mf((tmf)&string::hash));
+		class_add_func("hex", TypeString, mf((tmf)&string::hex));
+			func_add_param("inverted",		TypeBool);
+		class_add_func("unhex", TypeString, mf((tmf)&string::unhex));
+		class_add_func("int", TypeInt, mf((tmf)&string::_int));
+		class_add_func("float", TypeFloat, mf((tmf)&string::_float));
+		class_add_func("trim", TypeString, mf((tmf)&string::trim));
+		class_add_func("dirname", TypeString, mf((tmf)&string::dirname));
+		class_add_func("basename", TypeString, mf((tmf)&string::basename));
+		class_add_func("extension", TypeString, mf((tmf)&string::extension));
 
 	add_class(TypeStringList);
 		class_add_func("__init__",	TypeVoid, mf((tmf)&StringList::__init__));
@@ -986,43 +996,41 @@ void SIAddCommands()
 	msg_db_r("SIAddCommands", 3);
 	
 	// type casting
-	add_func("s2i",				TypeInt,		(void*)&s2i);
+	add_func("-s2i-",				TypeInt,		(void*)&s2i);
 		func_add_param("s",		TypeString);
-	add_func("s2f",				TypeFloat,		(void*)&s2f);
+	add_func("-s2f-",				TypeFloat,		(void*)&s2f);
 		func_add_param("s",		TypeString);
-	add_func("i2s",				TypeString,	(void*)&i2s);
+	add_func("-i2s-",				TypeString,	(void*)&i2s);
 		func_add_param("i",		TypeInt);
-	add_func("f2s",				TypeString,		(void*)&f2s);
+	add_func("-f2s-",				TypeString,		(void*)&f2s);
 		func_add_param("f",			TypeFloat);
 		func_add_param("decimals",	TypeInt);
-	add_func("f2sf",			TypeString,		(void*)&f2sf);
+	add_func("-f2sf-",			TypeString,		(void*)&f2sf);
 		func_add_param("f",			TypeFloat);
-	add_func("b2s",				TypeString,	(void*)&b2s);
+	add_func("-b2s-",				TypeString,	(void*)&b2s);
 		func_add_param("b",		TypeBool);
 	add_func("p2s",				TypeString,	(void*)&p2s);
 		func_add_param("p",		TypePointer);
-	add_func("v2s",				TypeString,	(void*)&fff2s);
+	add_func("-v2s-",				TypeString,	(void*)&fff2s);
 		func_add_param("v",		TypeVector);
-	add_func("complex2s",		TypeString,	(void*)&ff2s);
+	add_func("-complex2s-",		TypeString,	(void*)&ff2s);
 		func_add_param("z",		TypeComplex);
-	add_func("quaternion2s",	TypeString,	(void*)&ffff2s);
+	add_func("-quaternion2s-",	TypeString,	(void*)&ffff2s);
 		func_add_param("q",		TypeQuaternion);
-	add_func("plane2s",			TypeString,	(void*)&ffff2s);
+	add_func("-plane2s-",			TypeString,	(void*)&ffff2s);
 		func_add_param("p",		TypePlane);
-	add_func("color2s",			TypeString,	(void*)&ffff2s);
+	add_func("-color2s-",			TypeString,	(void*)&ffff2s);
 		func_add_param("c",		TypeColor);
-	add_func("rect2s",			TypeString,	(void*)&ffff2s);
+	add_func("-rect2s-",			TypeString,	(void*)&ffff2s);
 		func_add_param("r",		TypeRect);
-	add_func("ia2s",			TypeString,	(void*)&ia2s);
+	add_func("-ia2s-",			TypeString,	(void*)&ia2s);
 		func_add_param("a",		TypeIntList);
-	add_func("fa2s",			TypeString,	(void*)&fa2s);
+	add_func("-fa2s-",			TypeString,	(void*)&fa2s);
 		func_add_param("a",		TypeFloatList);
-	add_func("ba2s",			TypeString,	(void*)&ba2s);
+	add_func("-ba2s-",			TypeString,	(void*)&ba2s);
 		func_add_param("a",		TypeBoolList);
-	add_func("sa2s",			TypeString,	(void*)&sa2s);
+	add_func("-sa2s-",			TypeString,	(void*)&sa2s);
 		func_add_param("a",		TypeStringList);
-	add_func("hash_func",		TypeInt, (void*)&hash_func);
-		func_add_param("s",		TypeString);
 	// debug output
 	/*add_func("cprint",			TypeVoid,		(void*)&_cstringout);
 		func_add_param("str",	TypeCString);*/
@@ -1092,21 +1100,21 @@ void ScriptInit()
 	add_type_cast(10,	TypeInt,		TypeChar,	"i2c",	(void*)&CastInt2Char);
 	add_type_cast(20,	TypeChar,		TypeInt,	"c2i",	(void*)&CastChar2Int);
 	add_type_cast(50,	TypePointer,	TypeBool,	"p2b",	(void*)&CastPointer2Bool);
-	add_type_cast(50,	TypeInt,		TypeString,	"i2s",	(void*)&CastInt2StringP);
-	add_type_cast(50,	TypeFloat,		TypeString,	"f2sf",	(void*)&CastFloat2StringP);
-	add_type_cast(50,	TypeBool,		TypeString,	"b2s",	(void*)&CastBool2StringP);
+	add_type_cast(50,	TypeInt,		TypeString,	"-i2s-",	(void*)&CastInt2StringP);
+	add_type_cast(50,	TypeFloat,		TypeString,	"-f2sf-",	(void*)&CastFloat2StringP);
+	add_type_cast(50,	TypeBool,		TypeString,	"-b2s-",	(void*)&CastBool2StringP);
 	add_type_cast(50,	TypePointer,	TypeString,	"p2s",	(void*)&CastPointer2StringP);
-	add_type_cast(50,	TypeVector,		TypeString,	"v2s",	(void*)&CastVector2StringP);
-	add_type_cast(50,	TypeComplex,	TypeString,	"complex2s",	(void*)&CastComplex2StringP);
-	add_type_cast(50,	TypeColor,		TypeString,	"color2s",	(void*)&CastFFFF2StringP);
-	add_type_cast(50,	TypeQuaternion,	TypeString,	"quaternion2s",	(void*)&CastFFFF2StringP);
-	add_type_cast(50,	TypePlane,		TypeString,	"plane2s",	(void*)&CastFFFF2StringP);
-	add_type_cast(50,	TypeRect,		TypeString,	"rect2s",	(void*)&CastFFFF2StringP);
-	//add_type_cast(50,	TypeClass,		TypeString,	"f2s",	(void*)&CastFloat2StringP);
-	add_type_cast(50,	TypeIntList,	TypeString,	"ia2s",	NULL);
-	add_type_cast(50,	TypeFloatList,	TypeString,	"fa2s",	NULL);
-	add_type_cast(50,	TypeBoolList,	TypeString,	"ba2s",	NULL);
-	add_type_cast(50,	TypeStringList,	TypeString,	"sa2s",	NULL);
+	add_type_cast(50,	TypeVector,		TypeString,	"-v2s-",	(void*)&CastVector2StringP);
+	add_type_cast(50,	TypeComplex,	TypeString,	"-complex2s-",	(void*)&CastComplex2StringP);
+	add_type_cast(50,	TypeColor,		TypeString,	"-color2s-",	(void*)&CastFFFF2StringP);
+	add_type_cast(50,	TypeQuaternion,	TypeString,	"-quaternion2s-",	(void*)&CastFFFF2StringP);
+	add_type_cast(50,	TypePlane,		TypeString,	"-plane2s-",	(void*)&CastFFFF2StringP);
+	add_type_cast(50,	TypeRect,		TypeString,	"-rect2s-",	(void*)&CastFFFF2StringP);
+	//add_type_cast(50,	TypeClass,		TypeString,	"-f2s-",	(void*)&CastFloat2StringP);
+	add_type_cast(50,	TypeIntList,	TypeString,	"-ia2s-",	NULL);
+	add_type_cast(50,	TypeFloatList,	TypeString,	"-fa2s-",	NULL);
+	add_type_cast(50,	TypeBoolList,	TypeString,	"-ba2s-",	NULL);
+	add_type_cast(50,	TypeStringList,	TypeString,	"-sa2s-",	NULL);
 
 	/*msg_write("------------------test");
 	foreach(PreType, t){

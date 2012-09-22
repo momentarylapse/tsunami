@@ -133,10 +133,6 @@ void SIAddPackageFile()
 	add_func("DirDelete",			TypeBool,			(void*)&dir_delete);
 		func_add_param("dir",		TypeString);
 	add_func("GetCurDir",			TypeString,			(void*)&get_current_dir);
-	add_func("Dirname",				TypeString,			(void*)&dirname);
-		func_add_param("path",		TypeString);
-	add_func("Basename",			TypeString,			(void*)(string (*)(const string&))&basename);
-		func_add_param("path",		TypeString);
 
 
 	msg_db_l(3);

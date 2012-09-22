@@ -270,7 +270,7 @@ void MatrixScale(matrix &m,float fx,float fy,float fz)
 // create a transformation that reflects at a <plane pl>
 void MatrixReflect(matrix &m,const plane &pl)
 {
-	vector n=vector(pl.a,pl.b,pl.c);
+	vector n = pl.n;
 	vector p=-n*pl.d;
 	// mirror: matrix s from transforming the basis vectors:
 	//    e_i' = e_i - 2 < n, e_i >

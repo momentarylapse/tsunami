@@ -224,6 +224,8 @@ class Array : public DynamicArray
 			{	return index;	}
 			void update()
 			{	p = &array[index];	}
+			operator bool() const
+		    {	return false;	}
 		//private:
 			Iterator(Array<T> &a, int n) : array(a), num(a.num)
 			{	p = &a[n];	index = n;	}
@@ -241,20 +243,56 @@ class Array : public DynamicArray
 		{	erase(it.get_index());	}*/
 };
 
+// foreach loop
+// stolen from boost...
 
-#define foreach(_array_, _it_) \
-	for(typeof((_array_).begin()) _it_ = (_array_).begin(); _it_.valid(); _it_ ++)
+inline bool _foreach_set_false_(bool &b)
+{	b = false;	return false;	}
 
-#define foreachi(_array_, _it_, _i_) \
-	for(typeof((_array_).begin()) _it_ = (_array_).begin(); _it_.valid(); _it_ ++) \
-		for (int _i_ = _it_.get_index(); _i_ >= 0; _i_ = -1)
+#define foreach(_var_, _array_) \
+	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin()) {} else \
+	for (bool _foreach_continue = true; \
+		_foreach_continue && _foreach_it_.valid(); \
+		_foreach_continue ? (_foreach_it_ ++) : (void)0) \
+	if  (_foreach_set_false_(_foreach_continue)) {} else \
+	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
 
-#define foreachb(_array_, _it_) \
-	for(typeof((_array_).begin()) _it_ = (_array_).begin_down(); _it_.valid_down(); _it_ --)
+#define foreachi(_var_, _array_, _i_) \
+	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin()) {} else \
+	for (bool _foreach_continue = true; \
+		_foreach_continue && _foreach_it_.valid(); \
+		_foreach_continue ? (_foreach_it_ ++) : (void)0) \
+	if  (_foreach_set_false_(_foreach_continue)) {} else \
+	for (int _i_ = _foreach_it_.get_index(); _i_ >= 0; _i_ = -1) \
+	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
 
-#define foreachbi(_array_, _it_, _i_) \
-	for(typeof((_array_).begin()) _it_ = (_array_).begin_down(); _it_.valid_down(); _it_ --) \
-		for (int _i_ = _it_.get_index(); _i_ >= 0; _i_ = -1)
+
+
+#define foreachb(_var_, _array_) \
+	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin_down()) {} else \
+	for (bool _foreach_continue = true; \
+		_foreach_continue && _foreach_it_.valid_down(); \
+		_foreach_continue ? (_foreach_it_ --) : (void)0) \
+	if  (_foreach_set_false_(_foreach_continue)) {} else \
+	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
+
+#define foreachib(_var_, _array_, _i_) \
+	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin_down()) {} else \
+	for (bool _foreach_continue = true; \
+		_foreach_continue && _foreach_it_.valid_down(); \
+		_foreach_continue ? (_foreach_it_ --) : (void)0) \
+	if  (_foreach_set_false_(_foreach_continue)) {} else \
+	for (int _i_ = _foreach_it_.get_index(); _i_ >= 0; _i_ = -1) \
+	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
+
+/*#define aforeach(_var_, _array_) \
+	foreach(typeof((_array_)[0]) _var_, (_array_))
+#define aforeachi(_var_, _array_, _i_) \
+	foreachi(typeof((_array_)[0]) _var_, (_array_), _i_)
+#define aforeachb(_var_, _array_) \
+	foreachb(typeof((_array_)[0]) _var_, (_array_))
+#define aforeachbi(_var_, _array_, _i_) \
+	foreachbi(typeof((_array_)[0]) _var_, (_array_), _i_)*/
 
 
 /*#define foreach(_array_, _v_)           for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \

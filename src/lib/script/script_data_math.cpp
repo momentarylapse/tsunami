@@ -418,6 +418,21 @@ void SIAddPackageMath()
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_element("z",		TypeFloat,	8);
+		class_add_func("length",			TypeFloat,	type_p(mf((tmf)&vector::length)));
+		class_add_func("length_sqr",		TypeFloat,	type_p(mf((tmf)&vector::length_sqr)));
+		class_add_func("length_fuzzy",		TypeFloat,	type_p(mf((tmf)&vector::length_fuzzy)));
+		class_add_func("normalize",		TypeVoid,	type_p(mf((tmf)&vector::normalize)));
+		class_add_func("dir2ang",			TypeVector,	type_p(mf((tmf)&vector::dir2ang)));
+		class_add_func("dir2ang2",			TypeVector,	type_p(mf((tmf)&vector::dir2ang2)));
+			func_add_param("up",		TypeVector);
+		class_add_func("ang2dir",			TypeVector,	type_p(mf((tmf)&vector::ang2dir)));
+		class_add_func("rotate",			TypeVector,	type_p(mf((tmf)&vector::rotate)));
+			func_add_param("ang",		TypeVector);
+		class_add_func("transform",		TypeVector,	type_p(mf((tmf)&vector::transform)));
+			func_add_param("m",			TypeMatrix);
+		class_add_func("transform_normal",	TypeVector,	type_p(mf((tmf)&vector::transform_normal)));
+			func_add_param("m",			TypeMatrix);
+		class_add_func("ortho",			TypeVector,	type_p(mf((tmf)&vector::ortho)));
 		class_add_func("str",		TypeString,			type_p(mf((tmf)&vector::str)));
 	
 	add_class(TypeQuaternion);
@@ -429,6 +444,9 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeQuaternion);
 		class_add_func("__imul__", TypeVoid, mf((tmf)&quaternion::imul));
 			func_add_param("other",	TypeQuaternion);
+		class_add_func("inverse",	TypeVoid,	mf((tmf)&quaternion::inverse));
+		class_add_func("normalize",	TypeVoid,	mf((tmf)&quaternion::normalize));
+		class_add_func("get_angles",	TypeVector,	mf((tmf)&quaternion::get_angles));
 		class_add_func("str",		TypeString,			mf((tmf)&quaternion::str));
 	
 	add_class(TypeRect);
@@ -450,6 +468,14 @@ void SIAddPackageMath()
 		class_add_element("b",		TypeFloat,	4);
 		class_add_element("c",		TypeFloat,	8);
 		class_add_element("d",		TypeFloat,	12);
+		class_add_element("n",		TypeVector,	0);
+		class_add_func("intersect_line",	TypeBool,	mf((tmf)&plane::intersect_line));
+			func_add_param("l1",		TypeVector);
+			func_add_param("l2",		TypeVector);
+			func_add_param("inter",		TypeVector);
+		class_add_func("inverse",	TypeVoid,	mf((tmf)&plane::inverse));
+		class_add_func("distance",	TypeFloat,	mf((tmf)&plane::distance));
+			func_add_param("p",		TypeVector);
 		class_add_func("str",		TypeString,			mf((tmf)&plane::str));
 	
 	add_class(TypeMatrix);
@@ -560,11 +586,25 @@ void SIAddPackageMath()
 			func_add_param("f",			TypeFloat);
 		class_add_func("__assign__",			TypeVoid,			any_p(mf((tmf)&Any::set_bool)));
 			func_add_param("b",			TypeBool);
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&Any::dump)));
 		class_add_func("__iadd__",			TypeVoid,			any_p(mf((tmf)&Any::_add)));
 			func_add_param("a",			TypeAny);
 		class_add_func("__isub__",			TypeVoid,			any_p(mf((tmf)&Any::_sub)));
 			func_add_param("a",			TypeAny);
+		class_add_func("clear",	TypeVoid, any_p(mf((tmf)&Any::clear)));
+		class_add_func("get",			TypeAny,			any_p(mf((tmf)&Any::get)));
+			func_add_param("key",			TypeString);
+		class_add_func("hset",			TypeVoid,			any_p(mf((tmf)&Any::hset)));
+			func_add_param("key",			TypeString);
+			func_add_param("value",			TypeAny);
+		class_add_func("at",			TypeAny,			any_p(mf((tmf)&Any::at)));
+			func_add_param("index",			TypeInt);
+		class_add_func("aset",			TypeVoid,			any_p(mf((tmf)&Any::aset)));
+			func_add_param("index",			TypeString);
+			func_add_param("value",			TypeAny);
+		class_add_func("bool",		TypeBool,			any_p(mf((tmf)&Any::_bool)));
+		class_add_func("int",		TypeInt,			any_p(mf((tmf)&Any::_int)));
+		class_add_func("float",		TypeFloat,			any_p(mf((tmf)&Any::_float)));
+		class_add_func("str",		TypeString,			any_p(mf((tmf)&Any::str)));
 	
 	add_func_special("complex",		TypeComplex,	CommandComplexSet);
 		func_add_param("x",		TypeFloat);
@@ -698,15 +738,6 @@ void SIAddPackageMath()
 		func_add_param("x",		TypeFloat);
 		func_add_param("y",		TypeFloat);
 		func_add_param("z",		TypeFloat);
-	add_func("VecNormalize",		TypeVoid,	(void*)&VecNormalize);
-		func_add_param("v",			TypeVector);
-	add_func("VecDir2Ang",			TypeVector,	(void*)&VecDir2Ang);
-		func_add_param("dir",		TypeVector);
-	add_func("VecDir2Ang2",			TypeVector,	(void*)&VecDir2Ang2);
-		func_add_param("dir",		TypeVector);
-		func_add_param("up",		TypeVector);
-	add_func("VecAng2Dir",			TypeVector,	(void*)&VecAng2Dir);
-		func_add_param("ang",		TypeVector);
 	add_func("VecAngAdd",			TypeVector,	(void*)&VecAngAdd);
 		func_add_param("ang1",		TypeVector);
 		func_add_param("ang2",		TypeVector);
@@ -714,23 +745,6 @@ void SIAddPackageMath()
 		func_add_param("ang1",		TypeVector);
 		func_add_param("ang2",		TypeVector);
 		func_add_param("t",			TypeFloat);
-	add_func("VecRotate",			TypeVector,	(void*)&VecRotate);
-		func_add_param("v",			TypeVector);
-		func_add_param("ang",		TypeVector);
-	add_func("VecLength",			TypeFloat,	(void*)&VecLength);
-		func_add_param("v",			TypeVector);
-	add_func("VecLengthSqr",		TypeFloat,	(void*)&VecLengthSqr);
-		func_add_param("v",			TypeVector);
-	add_func("VecLengthFuzzy",		TypeFloat,	(void*)&VecLengthFuzzy);
-		func_add_param("v",			TypeVector);
-	add_func("VecTransform",		TypeVoid,	(void*)&VecTransform);
-		func_add_param("v_out",		TypeVector);
-		func_add_param("m",			TypeMatrix);
-		func_add_param("v_in",		TypeVector);
-	add_func("VecNormalTransform",	TypeVoid,	(void*)&VecNormalTransform);
-		func_add_param("v_out",		TypeVector);
-		func_add_param("m",			TypeMatrix);
-		func_add_param("v_in",		TypeVector);
 	add_func("VecDotProduct",		TypeFloat,	(void*)&VecDotProduct);
 		func_add_param("v1",		TypeVector);
 		func_add_param("v2",		TypeVector);
@@ -781,21 +795,9 @@ void SIAddPackageMath()
 		func_add_param("q_out",		TypeQuaternion);
 		func_add_param("axis",		TypeVector);
 		func_add_param("angle",		TypeFloat);
-	add_func("QuaternionMultiply",	TypeVoid,	(void*)&QuaternionMultiply);
-		func_add_param("q_out",		TypeQuaternion);
-		func_add_param("q2",		TypeQuaternion);
-		func_add_param("q1",		TypeQuaternion);
-	add_func("QuaternionInverse",	TypeVoid,	(void*)&QuaternionInverse);
-		func_add_param("q_out",		TypeQuaternion);
-		func_add_param("q_in",		TypeQuaternion);
 	add_func("QuaternionScale",		TypeVoid,	(void*)&QuaternionScale);
 		func_add_param("q",		TypeQuaternion);
 		func_add_param("f",		TypeFloat);
-	add_func("QuaternionNormalize",	TypeVoid,	(void*)&QuaternionNormalize);
-		func_add_param("q_out",		TypeQuaternion);
-		func_add_param("q_in",		TypeQuaternion);
-	add_func("QuaternionToAngle",	TypeVector,	(void*)&QuaternionToAngle);
-		func_add_param("q",		TypeQuaternion);
 	// plane
 	add_func("PlaneFromPoints",	TypeVoid,	(void*)&PlaneFromPoints);
 		func_add_param("pl",		TypePlane);
@@ -810,18 +812,6 @@ void SIAddPackageMath()
 		func_add_param("pl_out",		TypePlane);
 		func_add_param("m",		TypeMatrix);
 		func_add_param("pl_in",		TypePlane);
-	add_func("PlaneGetNormal",	TypeVector,	(void*)&GetNormal);
-		func_add_param("pl",		TypePlane);
-	add_func("PlaneIntersectLine",	TypeBool,	(void*)&PlaneIntersectLine);
-		func_add_param("inter",		TypeVector);
-		func_add_param("pl",		TypePlane);
-		func_add_param("l1",		TypeVector);
-		func_add_param("l2",		TypeVector);
-	add_func("PlaneInverse",	TypeVoid,	(void*)&PlaneInverse);
-		func_add_param("pl",		TypePlane);
-	add_func("PlaneDistance",	TypeFloat,	(void*)&PlaneDistance);
-		func_add_param("pl",		TypePlane);
-		func_add_param("p",		TypeVector);
 	// other types
 	add_func("GetBaryCentric",	TypeVoid,	(void*)&GetBaryCentric);
 		func_add_param("p",		TypeVector);
@@ -854,19 +844,17 @@ void SIAddPackageMath()
 
 	
 	// float
-	add_const("pi", TypeFloat, *(void**)&pi);
+	add_const("pi",  TypeFloat, *(void**)&pi);
 	// complex
-	add_const("ci", TypeComplex, (void**)&ci);
+	add_const("c_i", TypeComplex, (void**)&c_i);
 	// vector
-	add_const("v0",  TypeVector, (void*)&v0);
+	add_const("v_0", TypeVector, (void*)&v_0);
 	add_const("e_x", TypeVector, (void*)&e_x);
 	add_const("e_y", TypeVector, (void*)&e_y);
 	add_const("e_z", TypeVector, (void*)&e_z);
 	// matrix
-	//add_const("MatrixID",TypeMatrix,(void*)&m_id);
 	add_const("m_id", TypeMatrix, (void*)&m_id);
 	// quaternion
-	//add_const("QuaternionID",TypeVector,(void*)&q_id);
 	add_const("q_id", TypeQuaternion, (void*)&q_id);
 	// color
 	add_const("White",  TypeColor, (void*)&White);
@@ -878,7 +866,6 @@ void SIAddPackageMath()
 	add_const("Yellow", TypeColor, (void*)&Yellow);
 	add_const("Orange", TypeColor, (void*)&Orange);
 	// rect
-	//add_const("RectID",TypeRect,(void*)&r_id);
 	add_const("r_id", TypeRect, (void*)&r_id);
 	
 	msg_db_l(3);

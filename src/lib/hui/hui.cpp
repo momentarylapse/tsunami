@@ -238,7 +238,7 @@ void HuiInit()
 				else
 					HuiAppFilename = HuiArgument[0];
 			}
-			HuiAppDirectory = dirname(HuiAppFilename);
+			HuiAppDirectory = HuiAppFilename.dirname();
 		}
 	#endif
 
@@ -319,11 +319,11 @@ void HuiInitExtended(const string &program, const string &version, hui_callback 
 					HuiAppDirectoryStatic = "/usr/share/" + program + "/";
 				}else{
 					HuiAppFilename = HuiArgument[0];
-					HuiAppDirectory = dirname(HuiAppFilename);
+					HuiAppDirectory = HuiAppFilename.dirname();
 					HuiAppDirectoryStatic = HuiAppDirectory;
 				}
 			}else{
-				dir_ensure_ending(HuiAppDirectory, true);
+				HuiAppDirectory.dir_ensure_ending();
 				if (HuiArgument[0][0] == '.'){
 					HuiAppFilename = HuiArgument[0].substr(2, -1);
 					HuiAppDirectory = HuiInitialWorkingDirectory;
@@ -494,9 +494,9 @@ void HuiPushMainLevel()
 void HuiCleanUpMainLevel()
 {
 	msg_db_r("HuiCleanUpMainLevel",2);
-	foreachb(HuiWindow, w)
-		if ((*w)->_GetMainLevel_() >= HuiMainLevel)
-			delete(*w);
+	foreachb(CHuiWindow *w, HuiWindow)
+		if (w->_GetMainLevel_() >= HuiMainLevel)
+			delete(w);
 	HuiSetIdleFunction(NULL);
 	msg_db_l(2);
 }
@@ -599,8 +599,8 @@ string HuiWaitTillWindowClosed(CHuiWindow *win)
 		bool killed = false;
 		while(!killed){
 			HuiDoSingleMainLoop();
-			foreach(_HuiClosedWindow_, cw)
-				if (cw->unique_id == uid)
+			foreach(HuiClosedWindow &cw, _HuiClosedWindow_)
+				if (cw.unique_id == uid)
 					killed = true;
 		}
 	}
@@ -608,9 +608,9 @@ string HuiWaitTillWindowClosed(CHuiWindow *win)
 	//msg_write("cleanup");
 
 	// clean up
-	foreachbi(_HuiClosedWindow_, cw, i)
-		if (cw->unique_id == uid){
-			last_id = cw->last_id;
+	foreachi(HuiClosedWindow &cw, _HuiClosedWindow_, i)
+		if (cw.unique_id == uid){
+			last_id = cw.last_id;
 			_HuiClosedWindow_.erase(i);
 		}
 	msg_db_l(1);

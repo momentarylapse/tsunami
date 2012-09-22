@@ -67,8 +67,8 @@ void WriteEffect(CFile *f, Effect *e)
 	f->WriteBool(e->only_on_selection);
 	f->WriteInt(e->start);
 	f->WriteInt(e->end);
-	foreach(e->param, p)
-		WriteEffectParam(f, &*p);
+	foreach(EffectParam &p, e->param)
+		WriteEffectParam(f, &p);
 	EndChunk(f);
 }
 
@@ -100,8 +100,8 @@ void WriteSubTrack(CFile *f, Track *s)
 	f->WriteInt(0); // reserved
 	f->WriteInt(0);
 
-	foreach(s->level[0].buffer, b)
-		WriteBufferBox(f, &*b);
+	foreach(BufferBox &b, s->level[0].buffer)
+		WriteBufferBox(f, &b);
 
 	EndChunk(f);
 }
@@ -111,8 +111,8 @@ void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
 	BeginChunk(f, "level");
 	f->WriteInt(level_no);
 
-	foreach(l->buffer, b)
-		WriteBufferBox(f, &*b);
+	foreach(BufferBox &b, l->buffer)
+		WriteBufferBox(f, &b);
 
 	EndChunk(f);
 }
@@ -129,14 +129,14 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0);
 	f->WriteInt(0);
 
-	foreachi(t->level, l, i)
-		WriteTrackLevel(f, &*l, i);
+	foreachi(TrackLevel &l, t->level, i)
+		WriteTrackLevel(f, &l, i);
 
-	foreach(t->sub, sub)
-		WriteSubTrack(f, &*sub);
+	foreach(Track &sub, t->sub)
+		WriteSubTrack(f, &sub);
 
-	foreach(t->fx, effect)
-		WriteEffect(f, &*effect);
+	foreach(Effect &effect, t->fx)
+		WriteEffect(f, &effect);
 
 	EndChunk(f);
 }
@@ -146,8 +146,8 @@ void WriteLevelName(CFile *f, Array<string> level_name)
 	BeginChunk(f, "lvlname");
 
 	f->WriteInt(level_name.num);
-	foreach(level_name, l)
-		f->WriteStr(*l);
+	foreach(string &l, level_name)
+		f->WriteStr(l);
 
 	EndChunk(f);
 }
@@ -166,18 +166,18 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 	f->WriteInt(a->sample_rate);
 
-	foreach(a->tag, tag)
-		WriteTag(f, &*tag);
+	foreach(Tag &tag, a->tag)
+		WriteTag(f, &tag);
 
 	WriteLevelName(f, a->level_name);
 
-	foreachi(a->track, track, i){
-		WriteTrack(f, &*track);
+	foreachi(Track &track, a->track, i){
+		WriteTrack(f, &track);
 		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
 
-	foreach(a->fx, effect)
-		WriteEffect(f, &*effect);
+	foreach(Effect &effect, a->fx)
+		WriteEffect(f, &effect);
 
 	EndChunk(f);
 
@@ -419,19 +419,19 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 
 
 	// compress...
-	foreach(a->track, t)
-		foreach(t->level, l){
-			if (l->buffer.num != 1)
+	foreach(Track &t, a->track)
+		foreach(TrackLevel &l, t.level){
+			if (l.buffer.num != 1)
 				continue;
 			bool empty = true;
-			for (int i=0;i<l->buffer[0].num;i++)
-				if ((l->buffer[0].r[i] != 0) || (l->buffer[0].l[i] != 0)){
+			for (int i=0;i<l.buffer[0].num;i++)
+				if ((l.buffer[0].r[i] != 0) || (l.buffer[0].l[i] != 0)){
 					empty = false;
 					break;
 				}
 
 			if (empty)
-				l->buffer.clear();
+				l.buffer.clear();
 		}
 }
 
@@ -615,9 +615,9 @@ void ReadChunk(CFile *f)
 
 
 	bool handled = false;
-	foreach(chunk_data[chunk_data.num - 2].handler, h)
-		if (cname == h->tag){
-			h->reader(f, h->data);
+	foreach(ChunkHandler &h, chunk_data[chunk_data.num - 2].handler)
+		if (cname == h.tag){
+			h.reader(f, h.data);
 			handled = true;
 			break;
 		}

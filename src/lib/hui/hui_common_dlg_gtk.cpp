@@ -16,7 +16,7 @@ bool HuiFileDialogDir(CHuiWindow *win,const string &title,const string &dir/*,co
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_ACCEPT){
 		HuiFilename = gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER (dlg));
-		dir_ensure_ending(HuiFilename, true);
+		HuiFilename.dir_ensure_ending();
 	}
 	gtk_widget_destroy(dlg);
 	return (r == GTK_RESPONSE_ACCEPT);
@@ -70,7 +70,7 @@ static void try_to_ensure_extension(string &filename, const string &filter)
 		return;
 	string filter_ext = filter.substr(2, filter.num - 2); // "*.ext"
 	// not the wanted extension -> add
-	if (file_extension(filename) != filter_ext)
+	if (filename.extension() != filter_ext)
 		filename += "." + filter_ext;
 }
 
@@ -145,9 +145,9 @@ void HuiErrorBox(CHuiWindow *win,const string &title,const string &text)
 void HuiAboutBox(CHuiWindow *win)
 {
 	Array<char*> _a_;
-	foreach(HuiPropAuthors, author){
-		char *p = new char[author->num + 1];
-		strcpy(p, author->c_str());
+	foreach(string &author, HuiPropAuthors){
+		char *p = new char[author.num + 1];
+		strcpy(p, author.c_str());
 		_a_.add(p);
 	}
 	_a_.add(NULL);
@@ -164,8 +164,8 @@ void HuiAboutBox(CHuiWindow *win)
 		"copyright", HuiPropCopyright.c_str(),
 		NULL);
 
-	foreach(_a_, aa)
-		delete(*aa);
+	foreach(char *aa, _a_)
+		delete(aa);
 }
 
 

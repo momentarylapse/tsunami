@@ -27,8 +27,8 @@ Storage::~Storage()
 {
 	HuiConfigWriteStr("CurrentDirectory", CurrentDirectory);
 
-	foreach(format, f)
-		delete(*f);
+	foreach(Format *f, format)
+		delete(f);
 	format.clear();
 }
 
@@ -38,11 +38,11 @@ bool Storage::Load(AudioFile *a, const string &filename)
 	bool ok = false;
 	bool found = false;
 
-	CurrentDirectory = dirname(filename);
-	string ext = file_extension(filename);
+	CurrentDirectory = filename.dirname();
+	string ext = filename.extension();
 
-	foreach(format, f)
-		if ((*f)->CanHandle(ext)){
+	foreach(Format *f, format)
+		if (f->CanHandle(ext)){
 			tsunami->progress->Start(_("lade"), 0);
 
 			a->NotifyBegin();
@@ -52,7 +52,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			a->used = true;
 			a->filename = filename;
 
-			(*f)->LoadAudio(a, filename);
+			f->LoadAudio(a, filename);
 
 
 			a->action_manager->Enable(true);
@@ -85,17 +85,17 @@ bool Storage::LoadTrack(Track *t, const string &filename)
 	bool ok = false;
 	bool found = false;
 
-	CurrentDirectory = dirname(filename);
-	string ext = file_extension(filename);
+	CurrentDirectory = filename.dirname();
+	string ext = filename.extension();
 
-	foreach(format, f)
-		if ((*f)->CanHandle(ext)){
+	foreach(Format *f, format)
+		if (f->CanHandle(ext)){
 			tsunami->progress->Start(_("lade"), 0);
 
 			AudioFile *a = t->root;
 			a->NotifyBegin();
 
-			(*f)->LoadTrack(t, filename);
+			f->LoadTrack(t, filename);
 
 			tsunami->progress->End();
 			tsunami->ForceRedraw();
@@ -117,19 +117,19 @@ bool Storage::Save(AudioFile *a, const string &filename)
 	bool ok = false;
 	bool found = false;
 
-	CurrentDirectory = dirname(filename);
-	string ext = file_extension(filename);
+	CurrentDirectory = filename.dirname();
+	string ext = filename.extension();
 
-	foreach(format, f)
-		if ((*f)->CanHandle(ext)){
-			if (!TestFormatCompatibility(a, *f))
+	foreach(Format *f, format)
+		if (f->CanHandle(ext)){
+			if (!f->TestFormatCompatibility(a))
 				tsunami->log->Warning(_("Datenverlust!"));
 
 			tsunami->progress->Start(_("speichere"), 0);
 
 			a->filename = filename;
 
-			(*f)->SaveAudio(a, filename);
+			f->SaveAudio(a, filename);
 
 			a->action_manager->MarkCurrentAsSave();
 			tsunami->progress->End();
@@ -152,11 +152,11 @@ bool Storage::Export(AudioFile *a, const string &filename)
 	bool ok = false;
 	bool found = false;
 
-	CurrentDirectory = dirname(filename);
-	string ext = file_extension(filename);
+	CurrentDirectory = filename.dirname();
+	string ext = filename.extension();
 
-	foreach(format, f)
-		if ((*f)->CanHandle(ext)){
+	foreach(Format *f, format)
+		if (f->CanHandle(ext)){
 			tsunami->progress->Start(_("exportiere"), 0);
 
 			// render audio...
@@ -167,7 +167,7 @@ bool Storage::Export(AudioFile *a, const string &filename)
 			BufferBox buf = tsunami->renderer->RenderAudioFile(a, r);
 
 			// save
-			(*f)->SaveBuffer(a, &buf, filename);
+			f->SaveBuffer(a, &buf, filename);
 
 			tsunami->progress->End();
 			ok = true;
@@ -182,37 +182,17 @@ bool Storage::Export(AudioFile *a, const string &filename)
 	return ok;
 }
 
-bool Storage::TestFormatCompatibility(AudioFile *a, Format *f)
-{
-	int num_subs = 0;
-	int num_fx = a->fx.num;
-	foreach(a->track, t){
-		num_subs += t->sub.num;
-		num_fx += t->fx.num;
-	}
-
-	if ((a->track.num > 1) && ((f->flags & Format::FLAG_MULTITRACK) == 0))
-		return false;
-	/*if ((a->tag.num > 0) && ((f->flags & StorageAny::FLAG_TAGS) == 0))
-		return false;*/
-	if ((num_fx > 0) && ((f->flags & Format::FLAG_FX) == 0))
-		return false;
-	if ((num_subs > 0) && ((f->flags & Format::FLAG_SUBS) == 0))
-		return false;
-	return true;
-}
-
 bool Storage::AskByFlags(CHuiWindow *win, const string &title, bool save, int flags)
 {
 	string filter, filter_show;
-	foreach(format, f)
-		if (((*f)->flags & flags) == flags){
+	foreach(Format *f, format)
+		if ((f->flags & flags) == flags){
 			if (filter != "")
 				filter += ";";
-			filter += "*." + (*f)->extension;
+			filter += "*." + f->extension;
 			if (filter_show != "")
 				filter_show += ",";
-			filter_show += "*." + (*f)->extension;
+			filter_show += "*." + f->extension;
 		}
 	if (save)
 		return HuiFileDialogSave(win, title, CurrentDirectory, filter_show, filter);

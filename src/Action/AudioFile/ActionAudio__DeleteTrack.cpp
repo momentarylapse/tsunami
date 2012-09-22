@@ -23,8 +23,8 @@ void *ActionAudio__DeleteTrack::execute(Data *d)
 	assert(index >= 0 && index < a->track.num);
 	Track &t = a->track[index];
 	int num_buf = 0;
-	foreach(t.level, l)
-		num_buf += l->buffer.num;
+	foreach(TrackLevel &l, t.level)
+		num_buf += l.buffer.num;
 	assert(num_buf == 0);
 	assert(t.sub.num == 0);
 

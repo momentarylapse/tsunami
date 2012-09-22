@@ -41,22 +41,22 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track &t, const 
 	buf.swap_ref(buf0);
 
 	// subs
-	foreach(t.sub, s){
-		if (s->muted)
+	foreach(Track &s, t.sub){
+		if (s.muted)
 			continue;
 
 		// can be repetitious!
-		for (int i=0;i<s->rep_num+1;i++){
+		for (int i=0;i<s.rep_num+1;i++){
 			Range rep_range = range;
-			rep_range.move(-s->rep_delay * i);
+			rep_range.move(-s.rep_delay * i);
 			Range intersect_range;
 			int bpos;
-			if (!intersect_sub(*s, rep_range, intersect_range, bpos))
+			if (!intersect_sub(s, rep_range, intersect_range, bpos))
 				continue;
 
-			BufferBox sbuf = s->ReadBuffers(0, intersect_range);
+			BufferBox sbuf = s.ReadBuffers(0, intersect_range);
 			buf.make_own();
-			buf.add(sbuf, bpos, s->volume);
+			buf.add(sbuf, bpos, s.volume);
 		}
 	}
 
@@ -111,8 +111,8 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, AudioFile *a, Track *t, Array<Ef
 		}
 
 	// apply fx
-	foreach(fx_list, fx)
-		tsunami->plugins->ApplyEffects(buf, &fake_track, &*fx);
+	foreach(Effect &fx, fx_list)
+		tsunami->plugins->ApplyEffects(buf, &fake_track, &fx);
 
 	msg_db_l(1);
 }
@@ -131,8 +131,8 @@ void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track &t, const Range &ra
 
 int get_first_usable_track(AudioFile *a)
 {
-	foreachi(a->track, t, i)
-		if ((!t->muted) && (t->is_selected))
+	foreachi(Track &t, a->track, i)
+		if ((!t.muted) && (t.is_selected))
 			return i;
 	return -1;
 }

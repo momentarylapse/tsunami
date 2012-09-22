@@ -4,84 +4,84 @@
 //                                            vectors                                             //
 //------------------------------------------------------------------------------------------------//
 // real length of the vector
-float VecLength(const vector &v)
+float vector::length() const
 {
-	return sqrtf( v*v );
+	return sqrtf( x*x + y*y + z*z );
 }
 
 // gibt die laengste Seite zurueck (="unendlich-Norm")
 // (immer <= <echte Laenge>)
-float VecLengthFuzzy(const vector &v)
+float vector::length_fuzzy() const
 {
-	float l=fabs(v.x);
-	float a=fabs(v.y);
+	float l=fabs(x);
+	float a=fabs(y);
 	if (a>l)
 		l=a;
-	a=fabs(v.z);
+	a=fabs(z);
 	if (a>l)
 		l=a;
 	return l;
 }
 
-float VecLengthSqr(const vector &v)
+float vector::length_sqr() const
 {
-	return v.x*v.x + v.y*v.y + v.z*v.z;
+	return x*x + y*y + z*z;
 }
 
 // v in cube(a,b) ?
-bool VecBetween(const vector &v,const vector &a,const vector &b)
+bool vector::between(const vector &a, const vector &b) const
 {
-	/*if ((v.x>a.x)&&(v.x>b.x))	return false;
-	if ((v.x<a.x)&&(v.x<b.x))	return false;
-	if ((v.y>a.y)&&(v.y>b.y))	return false;
-	if ((v.y<a.y)&&(v.y<b.y))	return false;
-	if ((v.z>a.z)&&(v.z>b.z))	return false;
-	if ((v.z<a.z)&&(v.z<b.z))	return false;
+	/*if ((x>a.x)&&(x>b.x))	return false;
+	if ((x<a.x)&&(x<b.x))	return false;
+	if ((y>a.y)&&(y>b.y))	return false;
+	if ((y<a.y)&&(y<b.y))	return false;
+	if ((z>a.z)&&(z>b.z))	return false;
+	if ((z<a.z)&&(z<b.z))	return false;
 	return true;*/
-	float f=VecDotProduct(v-a,b-a);
-	if (f<0)
+	float f = VecDotProduct(*this - a, b - a);
+	if (f < 0)
 		return false;
-	f/=VecDotProduct(b-a,b-a);
-	return (f<=1);
+	f /= (b - a).length_sqr();
+	return (f <= 1);
 }
 
 // v = a + f*( b - a )
 //   get f
-float VecFactorBetween(const vector &v,const vector &a,const vector &b)
+float vector::factor_between(const vector &a, const vector &b) const
 {
 	if (a.x!=b.x)
-		return ((v.x-a.x)/(b.x-a.x));
+		return ((x-a.x)/(b.x-a.x));
 	else if (a.y!=b.y)
-		return ((v.y-a.y)/(b.y-a.y));
+		return ((y-a.y)/(b.y-a.y));
 	else if (a.z!=b.z)
-		return ((v.z-a.z)/(b.z-a.z));
+		return ((z-a.z)/(b.z-a.z));
 	return 0;
 }
 
 // a im Wuerfel mit Radius=d um b ?
-bool VecBoundingBox(const vector &a,const vector &b,float d)
+bool vector::bounding_cube(const vector &a, float r) const
 {
-	if ((a.x-b.x>d)||(a.x-b.x<-d))
+	if ((a.x-x>r)||(a.x-x<-r))
 		return false;
-	if ((a.y-b.y>d)||(a.y-b.y<-d))
+	if ((a.y-y>r)||(a.y-y<-r))
 		return false;
-	if ((a.z-b.z>d)||(a.z-b.z<-d))
+	if ((a.z-z>r)||(a.z-z<-r))
 		return false;
 	return true;
 }
 
 // auf die Laenge 1 bringen
-void VecNormalize(vector &v)
+void vector::normalize()
 {
-	float l=sqrtf(v * v);
+	float l = length();
 	if (l > 0)
-		v /= l;
+		*this /= l;
 	else
-		v = e_z;
+		*this = e_z;
 }
 
 // cos( Winkel zwischen Vektoren) * Laenge1 * Laenge2
-float VecDotProduct(const vector &v1,const vector &v2)
+float VecDotProduct(const vector &v1, const vector &v2)
 {
 	return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z;
 }
@@ -101,58 +101,61 @@ vector VecCrossProduct(const vector &v1,const vector &v2)
 
 // Koordinaten-Transformation
 // matrix * vector(x,y,z,1)
-void VecTransform(vector &vo,const matrix &m,const vector &vi)
+vector vector::transform(const matrix &m) const
 {
-	vector vi_=vi;
-	vo.x= vi_.x*m._00 + vi_.y*m._01 + vi_.z*m._02 + m._03;
-	vo.y= vi_.x*m._10 + vi_.y*m._11 + vi_.z*m._12 + m._13;
-	vo.z= vi_.x*m._20 + vi_.y*m._21 + vi_.z*m._22 + m._23;
+	vector vo;
+	vo.x= x*m._00 + y*m._01 + z*m._02 + m._03;
+	vo.y= x*m._10 + y*m._11 + z*m._12 + m._13;
+	vo.z= x*m._20 + y*m._21 + z*m._22 + m._23;
+	return vo;
 }
 
 // Transformation eines Normalenvektors
 // matrix * vector(x,y,z,0)
-void VecNormalTransform(vector &vo,const matrix &m,const vector &vi)
+vector vector::transform_normal(const matrix &m) const
 {
-	vector vi_=vi;
-	vo.x= vi_.x*m._00 + vi_.y*m._01 + vi_.z*m._02;
-	vo.y= vi_.x*m._10 + vi_.y*m._11 + vi_.z*m._12;
-	vo.z= vi_.x*m._20 + vi_.y*m._21 + vi_.z*m._22;
+	vector vo;
+	vo.x= x*m._00 + y*m._01 + z*m._02;
+	vo.y= x*m._10 + y*m._11 + z*m._12;
+	vo.z= x*m._20 + y*m._21 + z*m._22;
+	return vo;
 }
 
 // Transformation eines Richtungsvektors
 // matrix * vector(x,y,z,0)
-void VecTransform3(vector &vo,const matrix3 &m,const vector &vi)
+vector vector::transform3(const matrix3 &m) const
 {
-	vector vi_=vi;
-	vo.x= vi_.x*m._00 + vi_.y*m._01 + vi_.z*m._02;
-	vo.y= vi_.x*m._10 + vi_.y*m._11 + vi_.z*m._12;
-	vo.z= vi_.x*m._20 + vi_.y*m._21 + vi_.z*m._22;
+	vector vo;
+	vo.x= x*m._00 + y*m._01 + z*m._02;
+	vo.y= x*m._10 + y*m._11 + z*m._12;
+	vo.z= x*m._20 + y*m._21 + z*m._22;
+	return vo;
 }
 
 // vector(0,0,1) wird um ang rotiert
 // ZXY, da nur im Spiel-Koordinaten-System
-vector VecAng2Dir(const vector &ang)
+vector vector::ang2dir() const
 {
-	return vector(		sinf(ang.y)*cos(ang.x),
-					-	sinf(ang.x),
-						cosf(ang.y)*cos(ang.x));
+	return vector(		sinf(y)*cos(x),
+					-	sinf(x),
+						cosf(y)*cos(x));
 }
 
 // um welche Winkel wurde vector(0,0,1) rotiert?
-vector VecDir2Ang(const vector &dir)
+vector vector::dir2ang() const
 {
-	return vector(	-	atan2f(dir.y,sqrt(dir.x*dir.x+dir.z*dir.z)),
-						atan2f(dir.x,dir.z),
+	return vector(	-	atan2f(y,sqrt(x*x+z*z)),
+						atan2f(x,z),
 						0); // too few information to get z!
 }
 
 // um welche Winkel wurde vector(0,0,1) rotiert?
 //    
-vector VecDir2Ang2(const vector &dir,const vector &up)
+vector vector::dir2ang2(const vector &up) const
 {
-	vector right=VecCrossProduct(up,dir);
-	return vector(	-	atan2f(dir.y,sqrt(dir.x*dir.x+dir.z*dir.z)),
-						atan2f(dir.x,dir.z),
+	vector right=VecCrossProduct(up,*this);
+	return vector(	-	atan2f(y,sqrt(x*x+z*z)),
+						atan2f(x,z),
 						atan2f(right.y,up.y)); // atan2( < up, (0,1,0) >, < right, (0,1,0) > )    where: right = up x dir
 /*	// aus den 3 Basis-Vektoren eine Basis-Wechsel-Matrix erzeugen
 	matrix m;
@@ -173,8 +176,8 @@ vector VecAngAdd(const vector &ang1,const vector &ang2)
 	quaternion q,q1,q2;
 	QuaternionRotationV(q1,ang1);
 	QuaternionRotationV(q2,ang2);
-	QuaternionMultiply(q,q2,q1);
-	return QuaternionToAngle(q);
+	q = q2 * q1;
+	return q.get_angles();
 }
 
 vector VecAngInterpolate(const vector &ang1,const vector &ang2,float t)
@@ -183,27 +186,25 @@ vector VecAngInterpolate(const vector &ang1,const vector &ang2,float t)
 	QuaternionRotationV(q1,ang1);
 	QuaternionRotationV(q2,ang2);
 	QuaternionInterpolate(r,q1,q2,t);
-	return QuaternionToAngle(r);
+	return r.get_angles();
 }
 
 // rotate a vector by an angle
-vector VecRotate(const vector &v, const vector &ang)
+vector vector::rotate(const vector &ang) const
 {
 	// slow...indirect
 	matrix m;
 	MatrixRotation(m, ang);
-	vector r;
-	VecNormalTransform(r, m, v);
-	return r;
+	return transform(m);
 }
 
 // which one is the largest coordinate of this vector
-int VecImportantPlane(const vector &v)
+int vector::important_plane() const
 {
 	vector w;
-	w.x=fabs(v.x);
-	w.y=fabs(v.y);
-	w.z=fabs(v.z);
+	w.x=fabs(x);
+	w.y=fabs(y);
+	w.z=fabs(z);
 	if ((w.x<=w.y)&&(w.x<=w.z))
 		return 1;	// Y-Z-Ebene
 	if (w.y<=w.z)
@@ -212,41 +213,41 @@ int VecImportantPlane(const vector &v)
 }
 
 // finds an orthogonal vector to v
-vector _cdecl VecOrtho(const vector &v)
+vector vector::ortho() const
 {
-	int p = VecImportantPlane(v);
+	int p = important_plane();
 	if (p == 0)
-		return vector(v.y, - v.x, 0);
-	return vector(0, v.z, - v.y);
+		return vector(y, - x, 0);
+	return vector(0, z, - y);
 }
 
 // kuerzeste Entfernung von p zur Geraden(l1,l2)
 float VecLineDistance(const vector &p,const vector &l1,const vector &l2)
 {
-	return (float)sqrt( VecLengthSqr(p-l1) - sqr(VecDotProduct(l2-l1,p-l1))/VecLengthSqr(l2-l1) );
+	return (float)sqrt( (p-l1).length_sqr() - sqr(VecDotProduct(l2-l1,p-l1))/(l2-l1).length_sqr() );
 }
 
 // Punkt der Geraden(l1,l2), der p am naechsten ist
 vector VecLineNearestPoint(const vector &p,const vector &l1,const vector &l2)
 {
-	vector n=l2-l1,np;
-	VecNormalize(n);
+	vector n = l2-l1, np;
+	n.normalize();
 	plane pl;
-	PlaneFromPointNormal(pl,p,n);
-	PlaneIntersectLine(np,pl,l1,l2);
+	PlaneFromPointNormal(pl, p, n);
+	pl.intersect_line(l1, l2, np);
 	return np;
 }
 
-void VecMin(vector &v,const vector &test_partner)
+void vector::_min(const vector &test_partner)
 {
-	if (test_partner.x<v.x)	v.x=test_partner.x;
-	if (test_partner.y<v.y)	v.y=test_partner.y;
-	if (test_partner.z<v.z)	v.z=test_partner.z;
+	if (test_partner.x<x)	x=test_partner.x;
+	if (test_partner.y<y)	y=test_partner.y;
+	if (test_partner.z<z)	z=test_partner.z;
 }
 
-void VecMax(vector &v,const vector &test_partner)
+void vector::_max(const vector &test_partner)
 {
-	if (test_partner.x>v.x)	v.x=test_partner.x;
-	if (test_partner.y>v.y)	v.y=test_partner.y;
-	if (test_partner.z>v.z)	v.z=test_partner.z;
+	if (test_partner.x>x)	x=test_partner.x;
+	if (test_partner.y>y)	y=test_partner.y;
+	if (test_partner.z>z)	z=test_partner.z;
 }

@@ -76,8 +76,8 @@ struct sType{
 	{	return (!ForceCallByValue) && (!IsPointer) && ((IsArray) || (IsSuperArray) || (Element.num > 0));	}
 	int GetFunc(const string &name)
 	{
-		foreachi(Function, f, i)
-			if (f->Name == name)
+		foreachi(sClassFunction &f, Function, i)
+			if (f.Name == name)
 				return i;
 		return -1;
 	}

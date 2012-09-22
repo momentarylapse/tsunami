@@ -105,7 +105,7 @@ class GridData
 			float vy = self.projecty(y)
 			c.DrawLine(self.x, vy, self.x + self.w, vy)
 			c.SetColor(self.col_text)
-			string t = f2s(y, part.decimals)
+			string t = y.str2(part.decimals)
 			t += " "
 			t += self.y_unit
 			c.DrawStr(self.x0 + 2, vy - 6, t)
@@ -124,7 +124,7 @@ class GridData
 			float vx = self.projectx(x)
 			c.DrawLine(vx, self.y, vx, self.y + self.h)
 			c.SetColor(self.col_text)
-			string t = f2s(x, part.decimals)
+			string t = x.str2(part.decimals)
 			t += " "
 			t += self.x_unit
 			c.DrawStr(vx, self.y + self.h + 5, t)
@@ -167,7 +167,7 @@ class GridData
 				c.SetColor(self.col_grid)
 				c.DrawLine(fx, y, fx, y + h)
 				c.SetColor(self.col_text)
-				c.DrawStr(fx, y + h + 5, f2s(ff,0) + " " + self.x_unit)
+				c.DrawStr(fx, y + h + 5, ff.str2(0) + " " + self.x_unit)
 				fx = self.projectx(ff * sqrt(2))
 				c.SetColor(self.col_grid2)
 				c.DrawLine(fx, y, fx, y + h)
@@ -237,7 +237,7 @@ class GridData
 		float radius = 3
 		if hover
 			c.SetColor(Red)
-			c.DrawStr(pp.x, pp.y - 20, f2s(pp.z, 1))
+			c.DrawStr(pp.x, pp.y - 20, pp.z.str2(1))
 			radius = 4
 		else if selected
 			c.SetColor(color(1, 0.7, 0, 0))

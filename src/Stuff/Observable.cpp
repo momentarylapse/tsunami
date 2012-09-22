@@ -32,8 +32,8 @@ void Observable::AddObserver(Observer *o)
 
 void Observable::RemoveObserver(Observer *o)
 {
-	foreachi(observer, obs, i)
-		if (*obs == o){
+	foreachi(Observer *obs, observer, i)
+		if (obs == o){
 			observer.erase(i);
 			observer_message.erase(i);
 			break;
@@ -54,12 +54,12 @@ string Observable::GetMessage()
 void Observable::NotifySend()
 {
 	// send
-	foreach(message_queue, m){
-		cur_message = *m;
+	foreach(string &m, message_queue){
+		cur_message = m;
 		//msg_write("send " + observable_name + ": " + m);
-		foreachi(observer, o, i)
-			if ((observer_message[i] == *m) or (observer_message[i].num == 0))
-				(*o)->OnUpdate(this);
+		foreachi(Observer *o, observer, i)
+			if ((observer_message[i] == m) or (observer_message[i].num == 0))
+				o->OnUpdate(this);
 	}
 
 	// clear queue
@@ -70,8 +70,8 @@ void Observable::NotifySend()
 void Observable::NotifyEnqueue(const string &message)
 {
 	// already enqueued?
-	foreach(message_queue, m)
-		if (message == *m)
+	foreach(string &m, message_queue)
+		if (message == m)
 			return;
 
 	// add

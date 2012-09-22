@@ -10,9 +10,9 @@
 
 ActionSubTrackInsertSelected::ActionSubTrackInsertSelected(AudioFile *a)
 {
-	foreachi(a->track, t, ti)
-		foreachbi(t->sub, s, si)
-			if (s->is_selected)
+	foreachi(Track &t, a->track, ti)
+		foreachib(Track &s, t.sub, si)
+			if (s.is_selected)
 				AddSubAction(new ActionSubTrackInsert(a, ti, si, a->cur_level), a);
 }
 

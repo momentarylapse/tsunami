@@ -22,8 +22,8 @@ void* ActionAudioAddLevel::execute(Data* d)
 	a->level_name.add(format("level %d", a->level_name.num + 1));
 
 	TrackLevel new_level;
-	foreach(a->track, t)
-		t->level.add(new_level);
+	foreach(Track &t, a->track)
+		t.level.add(new_level);
 
 	a->cur_level = a->level_name.num - 1;
 
@@ -35,8 +35,8 @@ void ActionAudioAddLevel::undo(Data* d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	a->level_name.pop();
 
-	foreach(a->track, t)
-		t->level.pop();
+	foreach(Track &t, a->track)
+		t.level.pop();
 
 	if (a->cur_level >= a->level_name.num)
 		a->cur_level = a->level_name.num - 1;

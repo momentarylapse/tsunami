@@ -59,7 +59,7 @@ inline bool inf_f(float f)
 	int m=0x7f000000;
 	if ((t&m)==m)   return true;
 	return (f!=f);*/
-#ifdef FILE_OS_WINDOWS
+#ifdef OS_WINDOWS
 	return false;
 #else
 	return !isfinite(f);
@@ -67,10 +67,10 @@ inline bool inf_f(float f)
 }
 
 inline bool inf_v(vector v)
-{   return (inf_f(v.x)||inf_f(v.y)||inf_f(v.z));  }
+{   return (inf_f(v.x) || inf_f(v.y) || inf_f(v.z));  }
 
 inline bool inf_pl(plane p)
-{   return (inf_f(p.a)||inf_f(p.b)||inf_f(p.c)||inf_f(p.d));  }
+{   return (inf_v(p.n) || inf_f(p.d));  }
 
 inline float _vec_length_(const vector &v)
 {	return sqrt(v*v);	}
@@ -101,12 +101,10 @@ inline bool _vec_between_(const vector &v,const vector &a,const vector &b)
 inline float _vec_factor_between_(const vector &v,const vector &a,const vector &b)
 {	return ((v-a)*(b-a)) / ((b-a)*(b-a));	}
 
-#define _get_normal_(pl)	(*(vector*)&pl)
-
 inline void _get_bary_centric_(const vector &p,const plane &pl,const vector &a,const vector &b,const vector &c,float &f,float &g)
 {
 	vector ba=b-a,ca=c-a;
-	vector pvec=_get_normal_(pl)^ca;
+	vector pvec=pl.n^ca;
 	float det=ba*pvec;
 	vector pa;
 	if (det>0)
@@ -117,7 +115,7 @@ inline void _get_bary_centric_(const vector &p,const plane &pl,const vector &a,c
 	}
 	f=pa*pvec;
 	vector qvec=pa^ba;
-	g=_get_normal_(pl)*qvec;
+	g=pl.n*qvec;
 	float inv_det=1.0f/det;
 	f*=inv_det;
 	g*=inv_det;
@@ -125,16 +123,14 @@ inline void _get_bary_centric_(const vector &p,const plane &pl,const vector &a,c
 
 inline void _plane_from_point_normal_(plane &pl,const vector &p,const vector &n)
 {
-	pl.a=n.x;
-	pl.b=n.y;
-	pl.c=n.z;
+	pl.n=n;
 	pl.d=-(n*p);
 }
 
 inline bool _plane_intersect_line_(vector &cp,const plane &pl,const vector &l1,const vector &l2)
 {
-	float e=_get_normal_(pl)*l1;
-	float f=_get_normal_(pl)*l2;
+	float e=pl.n*l1;
+	float f=pl.n*l2;
 	if (e==f) // parallel?
 		return false;
 	float t=-(pl.d+f)/(e-f);
@@ -145,7 +141,7 @@ inline bool _plane_intersect_line_(vector &cp,const plane &pl,const vector &l1,c
 }
 
 inline float _plane_distance_(const plane &pl,const vector &p)
-{	return pl.a*p.x + pl.b*p.y + pl.c*p.z + pl.d;	}
+{	return pl.n*p + pl.d;	}
 
 inline vector *_matrix_get_translation_(const matrix &m)
 {	return (vector*)&m._03;	} // (_03, _13, _23) happens to be aligned the right way...

@@ -40,16 +40,16 @@ void CHuiWindow::ToolbarSetByID(const string &id)
 	}
 	ToolbarReset();
 	//ToolBarConfigure(res->b_param[0], res->b_param[1]);
-	foreach(res->cmd, cmd){
-		if (cmd->type == "Item")
-			ToolbarAddItem(get_lang(cmd->id, "", false), get_lang(cmd->id, "", false), cmd->image, cmd->id);
-		else if (cmd->type == "ItemCheckable")
-			ToolbarAddItemCheckable(get_lang(cmd->id, "", false), get_lang(cmd->id, "", false), cmd->image, cmd->id);
-		else if (cmd->type == "ItemSeparator")
+	foreach(HuiResourceCommand &cmd, res->cmd){
+		if (cmd.type == "Item")
+			ToolbarAddItem(get_lang(cmd.id, "", false), get_lang(cmd.id, "", false), cmd.image, cmd.id);
+		else if (cmd.type == "ItemCheckable")
+			ToolbarAddItemCheckable(get_lang(cmd.id, "", false), get_lang(cmd.id, "", false), cmd.image, cmd.id);
+		else if (cmd.type == "ItemSeparator")
 			ToolbarAddSeparator();
-		else if (cmd->type == "ItemPopup"){
-			string title = get_lang(cmd->id, "", false);
-			ToolbarAddItemMenuByID(title, title, cmd->image, cmd->s_param[0], cmd->id);
+		else if (cmd.type == "ItemPopup"){
+			string title = get_lang(cmd.id, "", false);
+			ToolbarAddItemMenuByID(title, title, cmd.image, cmd.s_param[0], cmd.id);
 		}
 	}
 	EnableToolbar(true);
@@ -62,9 +62,9 @@ void CHuiWindow::ToolbarSetByID(const string &id)
 bool CHuiWindow::_ToolbarIsEnabled_(const string &id)
 {
 	for (int t=0;t<4;t++)
-		foreach(toolbar[t].item, it)
-			if (id == it->id)
-				return it->enabled;
+		foreach(HuiToolbarItem &it, toolbar[t].item)
+			if (id == it.id)
+				return it.enabled;
 	return false;
 }
 

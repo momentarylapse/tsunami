@@ -21,8 +21,8 @@ int get_track_index(Track *t)
 	if (t){
 		AudioFile *a = t->root;
 		if (a){
-			foreachi(a->track, tt, i)
-				if (t == &*tt)
+			foreachi(Track &tt, a->track, i)
+				if (t == &tt)
 					return i;
 		}
 	}
@@ -34,8 +34,8 @@ int get_sub_index(Track *s)
 	if (s){
 		Track *t = s->GetParent();
 		if (t){
-			foreachi(t->sub, ss, i)
-				if (s == &*ss)
+			foreachi(Track &ss, t->sub, i)
+				if (s == &ss)
 					return i;
 		}
 	}
@@ -145,9 +145,9 @@ void AudioFile::UpdateSelection()
 		selection.invert();
 
 	// subs
-	foreach(track, t)
-		foreach(t->sub, s)
-			s->is_selected = (t->is_selected) && selection.overlaps(s->GetRange());
+	foreach(Track &t, track)
+		foreach(Track &s, t.sub)
+			s.is_selected = (t.is_selected) && selection.overlaps(s.GetRange());
 	Notify("SelectionChange");
 	msg_db_l(1);
 }
@@ -155,11 +155,11 @@ void AudioFile::UpdateSelection()
 
 void AudioFile::UnselectAllSubs()
 {
-	foreach(track, t){
-		foreach(t->sub, s){
-			s->is_selected = false;
+	foreach(Track &t, track){
+		foreach(Track &s, t.sub){
+			s.is_selected = false;
 		}
-		t->cur_sub = -1;
+		t.cur_sub = -1;
 	}
 	Notify("SelectionChange");
 }
@@ -169,8 +169,8 @@ void AudioFile::SetCurSub(Track *s)
 {
 	msg_db_r("SetCurSub", 2);
 	// unset
-	foreach(track, t)
-		t->cur_sub = -1;
+	foreach(Track &t, track)
+		t.cur_sub = -1;
 
 	if (s){
 		// set
@@ -217,8 +217,8 @@ Range AudioFile::GetRange()
 {
 	int min = 2147483640;
 	int max = -2147483640;
-	foreach(track, t){
-		Range r = t->GetRangeUnsafe();
+	foreach(Track &t, track){
+		Range r = t.GetRangeUnsafe();
 		if (r.start() < min)
 			min = r.start();
 		if (r.end() > max)
@@ -292,8 +292,8 @@ Track *AudioFile::AddEmptyTrack(int index)
 Track *AudioFile::AddTimeTrack(int index)
 {
 	// force single time track
-	foreach(track, tt)
-		if (tt->type == Track::TYPE_TIME){
+	foreach(Track &tt, track)
+		if (tt.type == Track::TYPE_TIME){
 			tsunami->log->Error(_("Es existiert schon eine Rhythmus-Spur."));
 			return NULL;
 		}
@@ -309,8 +309,8 @@ void AudioFile::UpdatePeaks()
 {
 	msg_db_r("Audio.UpdatePeaks", 2);
 	HuiGetTime(debug_timer);
-	foreach(track, t)
-		t->UpdatePeaks();
+	foreach(Track &t, track)
+		t.UpdatePeaks();
 	msg_write(format("up %f", HuiGetTime(debug_timer)));
 	msg_db_l(2);
 }
@@ -324,9 +324,9 @@ void AudioFile::PostActionUpdate()
 int AudioFile::GetNumSelectedSubs()
 {
 	int n = 0;
-	foreachi(track, t, ti)
-		foreachbi(t->sub, s, si)
-			if (s->is_selected)
+	foreach(Track &t, track)
+		foreach(Track &s, t.sub)
+			if (s.is_selected)
 				n ++;
 	return n;
 }
@@ -362,8 +362,8 @@ void AudioFile::CreateSubsFromSelection()
 
 void AudioFile::InvalidateAllPeaks()
 {
-	foreach(track, t)
-		t->InvalidateAllPeaks();
+	foreach(Track &t, track)
+		t.InvalidateAllPeaks();
 }
 
 Track *AudioFile::get_track(int track_no, int sub_no)

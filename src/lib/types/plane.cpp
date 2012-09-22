@@ -11,48 +11,38 @@ void PlaneFromPoints(plane &pl,const vector &a,const vector &b,const vector &c)
 {
 	vector ba=b-a,ca=c-a,n;
 	n=VecCrossProduct(ba,ca);
-	VecNormalize(n);
-	pl.a=n.x;	pl.b=n.y;	pl.c=n.z;
+	n.normalize();
+	pl.n=n;
 	pl.d=-(n*a);
 }
 
 // plane containing p an having the normal vector n
 void PlaneFromPointNormal(plane &pl,const vector &p,const vector &n)
 {
-	pl.a=n.x;	pl.b=n.y;	pl.c=n.z;
-	pl.d=-(n*p);
+	pl.n = n;
+	pl.d = -(n*p);
 }
 
 // rotate and move a plane with a matrix
 //    please don't scale...
 void PlaneTransform(plane &plo,const matrix &m,const plane &pli)
 {
-	// transform the normalvector  (n' = R n)
-	plo.a= pli.a*m._00 + pli.b*m._01 + pli.c*m._02;
-	plo.b= pli.a*m._10 + pli.b*m._11 + pli.c*m._12;
-	plo.c= pli.a*m._20 + pli.b*m._21 + pli.c*m._22;
+	// transform the normal vector  (n' = R n)
+	plo.n = pli.n.transform_normal(m);
 	// offset (d' = d - < T, n' >)
-	plo.d= pli.d - plo.a*m._03 - plo.b*m._13 - plo.c*m._23;
-}
-
-// return the normal vector of a plane
-vector GetNormal(const plane &pl)
-{
-	vector n=vector(pl.a,pl.b,pl.c);
-	return n;
+	plo.d= pli.d - plo.n.x*m._03 - plo.n.y*m._13 - plo.n.z*m._23;
 }
 
 // intersection of plane <pl> and the line through l1 and l2
 // (false if parallel!)
-bool PlaneIntersectLine(vector &i,const plane &pl,const vector &l1,const vector &l2)
+bool plane::intersect_line(const vector &l1, const vector &l2, vector &i) const
 {
-	vector n=vector(pl.a,pl.b,pl.c);
-	float d=-pl.d;
-	float e=VecDotProduct(n,l1);
-	float f=VecDotProduct(n,l2);
+	float _d = -d;
+	float e = n*l1;
+	float f = n*l2;
 	if (e==f) // parallel?
 		return false;
-	float t=(d-f)/(e-f);
+	float t=(_d-f)/(e-f);
 	//if ((t>=0)&&(t<=1)){
 		//i = l1 + t*(l2-l1);
 		i = l2 + t*(l1-l2);
@@ -60,11 +50,9 @@ bool PlaneIntersectLine(vector &i,const plane &pl,const vector &l1,const vector 
 }
 
 // reflect the plane on itself
-void PlaneInverse(plane &pl)
+void plane::inverse()
 {
-	pl.a=-pl.a;
-	pl.b=-pl.b;
-	pl.c=-pl.c;
+	n = -n;
 }
 
 // P = A + f*( B - A ) + g*( C - A )
@@ -74,7 +62,7 @@ void GetBaryCentric(const vector &P,const vector &A,const vector &B,const vector
 	vector ba=B-A,ca=C-A,dir;
 	plane pl;
 	PlaneFromPoints(pl,A,B,C); // Ebene des Dreiecks
-	dir=GetNormal(pl);//vector(pl.a,pl.b,pl.c); // Normalen-Vektor
+	dir=pl.n; // Normalen-Vektor
 	vector pvec;
 	pvec=VecCrossProduct(dir,ca); // Laenge: |ca|         Richtung: Dreiecks-Ebene, orth zu ca
 	float det=VecDotProduct(ba,pvec); // = |ba| * |ca| * cos( pvec->ba )   -> =Flaeche des Parallelogramms
@@ -103,7 +91,7 @@ bool LineIntersectsTriangle(const vector &t1,const vector &t2,const vector &t3,c
 {
 	plane p;
 	PlaneFromPoints(p,t1,t2,t3);
-	if (!PlaneIntersectLine(col,p,l1,l2))
+	if (!p.intersect_line(l1, l2, col))
 		return false;
 	GetBaryCentric(col,t1,t2,t3,LineIntersectsTriangleF,LineIntersectsTriangleG);
 	if ((LineIntersectsTriangleF>0)&&(LineIntersectsTriangleG>0)&&(LineIntersectsTriangleF+LineIntersectsTriangleG<1))
@@ -116,7 +104,7 @@ bool LineIntersectsTriangle(const vector &t1,const vector &t2,const vector &t3,c
 // ------------ GetBaryCentric....
 bool LineIntersectsTriangle2(const plane &pl,const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col,bool vm)
 {
-	if (!PlaneIntersectLine(col,pl,l1,l2))
+	if (!pl.intersect_line(l1, l2, col))
 		return false;
 	GetBaryCentric(col,t1,t2,t3,LineIntersectsTriangleF,LineIntersectsTriangleG);
 	if ((LineIntersectsTriangleF>0)&&(LineIntersectsTriangleG>0)&&(LineIntersectsTriangleF+LineIntersectsTriangleG<1))
@@ -125,8 +113,8 @@ bool LineIntersectsTriangle2(const plane &pl,const vector &t1,const vector &t2,c
 }
 
 // distance <point p> to <plane pl>
-float PlaneDistance(const plane &pl,const vector &p)
+float plane::distance(const vector &p) const
 {
-	return pl.a*p.x + pl.b*p.y + pl.c*p.z + pl.d;
+	return n * p + d;
 }
 

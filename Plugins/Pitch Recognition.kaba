@@ -86,7 +86,7 @@ void Draw()
 		c.DrawStr(x - 8, y - r2 - 22, get_note(Frequency))
 		c.DrawStr(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
 		c.DrawStr(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
-		c.DrawStr(5, 5, f2s(Frequency, 1) + " Hz")
+		c.DrawStr(5, 5, Frequency.str2(1) + " Hz")
 		c.DrawLine(x, y, x + r * sin(Error * pi), y - r * cos(Error * pi))
 	else
 		c.DrawStr(x - 30, y - 20, "zu leise")

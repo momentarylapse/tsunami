@@ -52,8 +52,14 @@ public:
 	}
 	friend quaternion operator * (float f,const quaternion &q)
 	{	return q*f;	}
-	string str()
+	string str() const
 	{	return format("(%f, %f, %f, %f)", x, y, z, w);	}
+
+	void normalize();
+	void inverse();
+	vector get_axis() const;
+	float get_angle() const;
+	vector get_angles() const;
 
 	// kaba
 	void imul(const quaternion &q)
@@ -66,15 +72,9 @@ void _cdecl QuaternionRotationA(quaternion &q, const vector &axis, float w);
 void _cdecl QuaternionRotationV(quaternion &q, const vector &ang);
 //void QuaternionRotationView(quaternion &q, const vector &ang);
 void _cdecl QuaternionRotationM(quaternion &q, const matrix &m);
-void _cdecl QuaternionInverse(quaternion &qo, const quaternion &qi);
-void _cdecl QuaternionMultiply(quaternion &q, const quaternion &q2, const quaternion &q1);
 void _cdecl QuaternionInterpolate(quaternion &q, const quaternion &q1, const quaternion &q2, float t);
 void _cdecl QuaternionInterpolate(quaternion &q, const quaternion &q1, const quaternion &q2, const quaternion &q3, const quaternion &q4, float t);
-vector _cdecl QuaternionToAngle(const quaternion &q);
 void _cdecl QuaternionScale(quaternion &q, float f);
-void _cdecl QuaternionNormalize(quaternion &qo, const quaternion &qi);
-vector GetAxis(const quaternion &q);
-float GetAngle(const quaternion &q);
 
-const quaternion q_id=quaternion(1, v0);
+const quaternion q_id = quaternion(1, v_0);
 

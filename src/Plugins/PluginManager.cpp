@@ -22,10 +22,10 @@ PluginManager::~PluginManager()
 
 void PluginManager::PushCurPlugin(CScript *s)
 {
-	foreachi(plugin, p, i)
-		if (s == p->s){
+	foreachi(Plugin &p, plugin, i)
+		if (s == p.s){
 			cur_plugin_stack.add(i);
-			cur_plugin = &*p;
+			cur_plugin = &p;
 		}
 }
 
@@ -65,23 +65,23 @@ void GlobalAddSlider(CHuiWindow *win, const string &id_slider, const string &id_
 
 void GlobalSliderSet(CHuiWindow *win, const string &id, float value)
 {
-	foreach(global_slider, s)
-		if ((*s)->Match(id))
-				(*s)->Set(value);
+	foreach(Slider *s, global_slider)
+		if (s->Match(id))
+				s->Set(value);
 }
 
 float GlobalSliderGet(CHuiWindow *win, const string &id)
 {
-	foreach(global_slider, s)
-		if ((*s)->Match(id))
-				return (*s)->Get();
+	foreach(Slider *s, global_slider)
+		if (s->Match(id))
+				return s->Get();
 	return 0;
 }
 
 void GlobalRemoveSliders(CHuiWindow *win)
 {
-	foreach(global_slider, g)
-		delete(*g);
+	foreach(Slider *s, global_slider)
+		delete(s);
 	global_slider.clear();
 }
 
@@ -170,50 +170,50 @@ void PluginManager::AddPluginsToMenu()
 	// alle finden
 	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins", "*.kaba", false);
 	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
-	foreach(list, e)
-		if ((e->name != "api.kaba") && (e->name[0] != '_')){
+	foreach(DirEntry &e, list)
+		if ((e.name != "api.kaba") && (e.name[0] != '_')){
 			PluginFile pf;
-			pf.filename = e->name;
+			pf.filename = e.name;
 			get_plugin_file_data(pf);
 			plugin_file.add(pf);
 		}
 
 	// "All - "..
 	int n = 0;
-	foreachi(plugin_file, pf, i)
-		if (pf->filename.find("All - ") == 0){
+	foreachi(PluginFile &pf, plugin_file, i)
+		if (pf.filename.find("All - ") == 0){
 			if (n == 0){
 				m->AddSeparator();
 				m->AddItem(_("Auf Audiopuffer"), "plugin_on_file");
 				m->EnableItem("plugin_on_file", false);
 			}
-			m->AddItemImage(pf->filename.substr(6, -6), pf->image, format("execute_plugin_%d", i));
+			m->AddItemImage(pf.filename.substr(6, -6), pf.image, format("execute_plugin_%d", i));
 			n ++;
 		}
 
 	// "Track - "..
 	n = 0;
-	foreachi(plugin_file, pf, i)
-		if (pf->filename.find("Track - ") == 0){
+	foreachi(PluginFile &pf, plugin_file, i)
+		if (pf.filename.find("Track - ") == 0){
 			if (n == 0){
 				m->AddSeparator();
 				m->AddItem(_("Auf einzelne Spur"), "plugin_on_track");
 				m->EnableItem("plugin_on_track", false);
 			}
-			m->AddItemImage(pf->filename.substr(8, -6), pf->image, format("execute_plugin_%d", i));
+			m->AddItemImage(pf.filename.substr(8, -6), pf.image, format("execute_plugin_%d", i));
 			n ++;
 		}
 
 	// rest
 	n = 0;
-	foreachi(plugin_file, pf, i)
-		if ((pf->filename.find("All - ") != 0) && (pf->filename.find("Track - ") != 0) && (pf->filename.find("Effect - ") != 0)){
+	foreachi(PluginFile &pf, plugin_file, i)
+		if ((pf.filename.find("All - ") != 0) && (pf.filename.find("Track - ") != 0) && (pf.filename.find("Effect - ") != 0)){
 			if (n == 0){
 				m->AddSeparator();
 				m->AddItem(_("Sonstige"), "plugin_other");
 				m->EnableItem("plugin_other", false);
 			}
-			m->AddItemImage(pf->filename.substr(0, -6), pf->image, format("execute_plugin_%d", i));
+			m->AddItemImage(pf.filename.substr(0, -6), pf.image, format("execute_plugin_%d", i));
 			n ++;
 		}
 
@@ -280,14 +280,14 @@ void PluginManager::InitFavorites(CHuiWindow *win)
 	win->Enable("favorite_save", false);
 	win->Enable("favorite_delete", false);
 
-	string init = basename(cur_plugin->s->pre_script->Filename) + "___";
+	string init = cur_plugin->s->pre_script->Filename.basename() + "___";
 
 	dir_create(HuiAppDirectory + "Plugins/Favorites");
 	Array<DirEntry> list = dir_search(HuiAppDirectory + "Plugins/Favorites", "*", false);
-	foreach(list, e){
-		if (e->name.find(init) < 0)
+	foreach(DirEntry &e, list){
+		if (e.name.find(init) < 0)
 			continue;
-		PluginFavoriteName.add(e->name.substr(init.num, -1));
+		PluginFavoriteName.add(e.name.substr(init.num, -1));
 		win->AddString("favorite_list", PluginFavoriteName.back());
 	}
 
@@ -562,8 +562,8 @@ void PluginManager::ExportPluginData(Effect &fx)
 		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
 		if (t->Name == "PluginData"){
 			fx.param.resize(t->Element.num);
-			foreachi(t->Element, e, j)
-				try_write_element(&fx.param[j], &*e, cur_plugin->s->g_var[i]);
+			foreachi(sClassElement &e, t->Element, j)
+				try_write_element(&fx.param[j], &e, cur_plugin->s->g_var[i]);
 			break;
 		}
 	}
@@ -576,10 +576,10 @@ void PluginManager::ImportPluginData(Effect &fx)
 	for (int i=0;i<cur_plugin->s->pre_script->RootOfAllEvil.Var.num;i++){
 		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
 		if (t->Name == "PluginData"){
-			foreach(t->Element, e){
-				foreach(fx.param, p)
-					if ((e->Name == p->name) && (e->Type->Name == p->type))
-						try_read_element(*p, &*e, cur_plugin->s->g_var[i]);
+			foreach(sClassElement &e, t->Element){
+				foreach(EffectParam &p, fx.param)
+					if ((e.Name == p.name) && (e.Type->Name == p.type))
+						try_read_element(p, &e, cur_plugin->s->g_var[i]);
 			}
 			break;
 		}
@@ -592,15 +592,15 @@ void PluginManager::WritePluginDataToFile(const string &name)
 	msg_db_r("WritePluginDataToFile", 1);
 	Effect fx;
 	ExportPluginData(fx);
-	CFile *f = CreateFile(HuiAppDirectory + "Plugins/Favorites/" + basename(cur_plugin->s->pre_script->Filename) + "___" + name);
+	CFile *f = CreateFile(HuiAppDirectory + "Plugins/Favorites/" + cur_plugin->s->pre_script->Filename.basename() + "___" + name);
 	f->WriteInt(0);
 	f->WriteInt(0);
 	f->WriteComment("// Data");
 	f->WriteInt(fx.param.num);
-	foreach(fx.param, p){
-		f->WriteStr(p->name);
-		f->WriteStr(p->type);
-		f->WriteStr(p->value);
+	foreach(EffectParam &p, fx.param){
+		f->WriteStr(p.name);
+		f->WriteStr(p.type);
+		f->WriteStr(p.value);
 	}
 	fx.param.clear();
 	f->WriteStr("#");
@@ -611,7 +611,7 @@ void PluginManager::WritePluginDataToFile(const string &name)
 void PluginManager::LoadPluginDataFromFile(const string &name)
 {
 	msg_db_r("LoadPluginDataFromFile", 1);
-	CFile *f = OpenFile(HuiAppDirectory + "Plugins/Favorites/" + basename(cur_plugin->s->pre_script->Filename) + "___" + name);
+	CFile *f = OpenFile(HuiAppDirectory + "Plugins/Favorites/" + cur_plugin->s->pre_script->Filename.basename() + "___" + name);
 	if (!f){
 		msg_db_l(1);
 		return;
@@ -623,10 +623,10 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 	f->ReadComment();
 	int num = f->ReadInt();
 	fx.param.resize(num);
-	foreach(fx.param, p){
-		p->name = f->ReadStr();
-		p->type = f->ReadStr();
-		p->value = f->ReadStr();
+	foreach(EffectParam &p, fx.param){
+		p.name = f->ReadStr();
+		p.type = f->ReadStr();
+		p.value = f->ReadStr();
 	}
 	ImportPluginData(fx);
 	fx.param.clear();
@@ -680,9 +680,9 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 
 	//msg_write(filename);
 
-	foreach(plugin, p){
-		if (filename == p->filename){
-			PushCurPlugin(p->s);
+	foreach(Plugin &p, plugin){
+		if (filename == p.filename){
+			PushCurPlugin(p.s);
 			msg_db_l(1);
 			return true;
 		}
@@ -746,9 +746,9 @@ void PluginManager::ExecutePlugin(const string &filename)
 			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 			if (s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int")){
 				if (a->used){
-					foreach(a->track, t)
-						if (t->is_selected){
-							PluginProcessTrack(s, &*t, a->cur_level, a->selection);
+					foreach(Track &t, a->track)
+						if (t.is_selected){
+							PluginProcessTrack(s, &t, a->cur_level, a->selection);
 						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));

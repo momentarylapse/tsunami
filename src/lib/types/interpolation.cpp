@@ -62,7 +62,7 @@ inline float _inter_zero_<float>()
 
 template<>
 inline vector _inter_zero_<vector>()
-{	return v0;	}
+{	return v_0;	}
 
 
 
@@ -178,7 +178,7 @@ inline vector _inter_angular_lerp_(const Interpolator<vector>::Part &p, float t)
 	QuaternionRotationV(q0, p.pos0);
 	QuaternionRotationV(q1, p.pos1);
 	QuaternionInterpolate(q, q0, q1, t);
-	return QuaternionToAngle(q);
+	return q.get_angles();
 }
 template<>
 inline float _inter_angular_lerp_(const Interpolator<float>::Part &p, float t)
@@ -191,9 +191,9 @@ template<class T>
 int Interpolator<T>::canonize(float &t)
 {
 	t = clampf(t, 0, 0.99999f) * t_sum;
-	foreachi(part, p, i)
-		if ((t >= p->t0) && (t <= p->t0 + p->dt)){
-			t = (t - p->t0) / p->dt;
+	foreachi(Part &p, part, i)
+		if ((t >= p.t0) && (t <= p.t0 + p.dt)){
+			t = (t - p.t0) / p.dt;
 			return i;
 		}
 	return 0;
@@ -239,8 +239,8 @@ inline void Interpolator<float>::print()
 	if (!ready)
 		update();
 	msg_write("---");
-	foreach(part, p)
-		msg_write(format("t0=%f dt=%f (%f  %f) -> (%f  %f)", p->t0, p->dt, p->pos0, p->vel0, p->pos1, p->vel1));
+	foreach(Part &p, part)
+		msg_write(format("t0=%f dt=%f (%f  %f) -> (%f  %f)", p.t0, p.dt, p.pos0, p.vel0, p.pos1, p.vel1));
 }
 
 template<>
@@ -252,8 +252,8 @@ Array<T> Interpolator<T>::get_list(Array<float> &t)
 	//print();
 	Array<T> r;
 	r.resize(t.num);
-	foreachi(t, tt, i)
-		r[i] = get(*tt);
+	foreachi( float tt, t, i)
+		r[i] = get(tt);
 	return r;
 }
 

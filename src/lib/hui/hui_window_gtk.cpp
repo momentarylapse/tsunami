@@ -109,8 +109,8 @@ void WinTrySendByKeyCode(CHuiWindow *win, int key_code)
 		return;
 	foreach(HuiCommand &c, _HuiCommand_)
 		if (key_code == c.key_code){
-			//msg_write>Write("---------------------------------");
-			//msg_write>Write(HuiCommand[kk].id);
+			//msg_write("---------------------------------");
+			//msg_write(c.id);
 			HuiEvent e = HuiCreateEvent(c.id, "");
 			_HuiSendGlobalCommand_(&e);
 			win->_SendEvent_(&e);
@@ -168,7 +168,7 @@ bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, CHuiWindow *win, bo
 			key_code += KEY_CONTROL;
 		if ((event->state & GDK_SHIFT_MASK) > 0)
 			key_code += KEY_SHIFT;
-		if (((event->state & GDK_MOD1_MASK) > 0) || ((event->state & GDK_MOD2_MASK) > 0) || ((event->state & GDK_MOD5_MASK) > 0)){
+		if (((event->state & GDK_MOD1_MASK) > 0) /*|| ((event->state & GDK_MOD2_MASK) > 0) || ((event->state & GDK_MOD5_MASK) > 0)*/){
 			key_code += KEY_ALT;
 		}
 		win->input.key_code = key_code;

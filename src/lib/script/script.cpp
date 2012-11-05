@@ -1088,7 +1088,7 @@ void *CScript::MatchFunction(const string &name, const string &return_type, int 
 				if (func.num > 0)
 					return (void*)func[i];
 				else
-					return (void*)NULL;//0xdeadbeaf;
+					return (void*)0xdeadbeaf; // when just analyzing...
 			}
 		}
 

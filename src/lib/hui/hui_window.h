@@ -262,6 +262,7 @@ public:
 	bool _cdecl IsChecked(const string &id);
 	void _cdecl SetImage(const string &id, const string &image);
 	Array<int> _cdecl GetMultiSelection(const string &id);
+	void _cdecl SetMultiSelection(const string &id, Array<int> &sel);
 	void _cdecl Reset(const string &id);
 	void _cdecl RemoveControl(const string &id);
 

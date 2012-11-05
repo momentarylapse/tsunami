@@ -74,6 +74,7 @@ gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data)
 CHuiMenu::CHuiMenu()
 {
 	msg_db_r("CHuiMenu()", 1);
+	_HuiMakeUsable_();
 	
 	g_menu = gtk_menu_new();
 	if (accel_group == NULL)

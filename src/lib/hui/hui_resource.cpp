@@ -176,7 +176,7 @@ CHuiWindow *HuiCreateResourceDialog(const string &id, CHuiWindow *root)
 			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
 			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
 			HuiWindowAddControl( dlg, cmd.type, HuiGetLanguage(cmd.id),
-								cmd.i_param[4], 0,
+								cmd.i_param[0], cmd.i_param[1],
 								cmd.i_param[2], cmd.i_param[3],
 								cmd.id);
 		}

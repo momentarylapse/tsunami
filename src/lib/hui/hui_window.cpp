@@ -51,6 +51,7 @@ void add_key_to_buffer(HuiInputData *d, int key)
 void CHuiWindow::_Init_(CHuiWindow *_root, bool _allow_root, int _mode)
 {
 	msg_db_r("Window::_Init_", 2);
+	_HuiMakeUsable_();
 	HuiWindow.add(this);
 
 	_HuiClosedWindow_.clear();

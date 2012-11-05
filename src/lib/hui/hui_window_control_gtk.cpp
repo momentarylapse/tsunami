@@ -340,7 +340,8 @@ void CHuiWindow::AddText(const string &title,int x,int y,int width,int height,co
 {
 	GetPartStrings(id, title);
 	GtkWidget *l = gtk_label_new("");
-	gtk_label_set_line_wrap(GTK_LABEL(l),true);
+	if (OptionString.find("wrap") >= 0)
+		gtk_label_set_line_wrap(GTK_LABEL(l),true);
 	if (OptionString.find("center") >= 0)
 		gtk_misc_set_alignment(GTK_MISC(l), 0.5f, 0.5f);
 	else if (OptionString.find("right") >= 0)
@@ -1688,6 +1689,20 @@ Array<int> CHuiWindow::GetMultiSelection(const string &_id)
 			}
 	}
 	return sel;
+}
+
+void CHuiWindow::SetMultiSelection(const string &_id, Array<int> &sel)
+{
+	HuiControl *c = _GetControl_(_id);
+	if (!c)
+		return;
+	if (c->type==HuiKindListView){
+		GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(c->widget));
+		gtk_tree_selection_set_mode(s, GTK_SELECTION_MULTIPLE);
+		gtk_tree_selection_unselect_all(s);
+		for (int j=0;j<sel.num;j++)
+			gtk_tree_selection_select_iter(s, &c->_item_[sel[j]]);
+	}
 }
 
 // delete all the content

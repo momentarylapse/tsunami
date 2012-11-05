@@ -27,6 +27,7 @@
 CHuiMenu::CHuiMenu()
 {
 	msg_db_r("CHuiMenu()", 1);
+	_HuiMakeUsable_();
 
 	hMenu = CreateMenu();
 	

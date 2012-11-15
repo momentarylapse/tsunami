@@ -104,8 +104,9 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 
 	int read = 0;
 	int nn = 0;
+	int nice_buffer_size = WAVE_BUFFER_SIZE - (WAVE_BUFFER_SIZE % byte_per_sample);
 	while (read < size){
-		int toread = clampi(WAVE_BUFFER_SIZE, 0, size - read);
+		int toread = clampi(nice_buffer_size, 0, size - read);
 		int r = f->ReadBuffer(data, toread);
 		nn ++;
 		if (nn > 16){

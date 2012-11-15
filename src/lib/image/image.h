@@ -19,10 +19,17 @@ class Image
 {
 	public:
 	int width, height;
+	mutable int mode;
 	Array<unsigned int> data;
 	bool alpha_used;
 	bool error;
 	
+	enum{
+		// little endian OpenGL convention
+		ModeRGBA, // 0xrr 0xgg 0xbb 0xaa = 0xaabbggrr
+		ModeBGRA, // 0xbb 0xgg 0xrr 0xaa = 0xaarrggbb
+	};
+
 	void __init__();
 	void __delete__();
 
@@ -34,9 +41,9 @@ class Image
 	void Save(const string &filename) const;
 	void Delete();
 
-	void CopyTo(Image &dest) const;
 	void Scale(int width, int height);
 	void FlipV();
+	void SetMode(int mode) const;
 	void SetPixel(int x, int y, const color &c);
 	color GetPixel(int x, int y) const;
 	color GetPixelInterpolated(float x, float y) const;

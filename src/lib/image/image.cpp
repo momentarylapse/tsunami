@@ -2,7 +2,7 @@
 #include "../file/file.h"
 
 
-string ImageVersion = "0.2.1.1";
+string ImageVersion = "0.2.3.0";
 
 void Image::__init__()
 {
@@ -23,6 +23,7 @@ void Image::LoadFlipped(const string &filename)
 	// reset image
 	width = 0;
 	height = 0;
+	mode = ModeRGBA;
 	error = false;
 	alpha_used = false;
 	data.clear();
@@ -54,17 +55,30 @@ void Image::Load(const string &filename)
 	FlipV();
 }
 
-unsigned int image_color(const color &c)
+inline unsigned int image_color_rgba(const color &c)
 {
-	return (int(c.a * 255.0f) << 24) + (int(c.b * 255.0f) << 16) + (int(c.g * 255.0f) << 8) + int(c.r * 255.0f);
+	return int(c.r * 255.0f) + (int(c.g * 255.0f) << 8) + (int(c.b * 255.0f) << 16) + (int(c.a * 255.0f) << 24);
 }
 
-color image_uncolor(unsigned int i)
+inline unsigned int image_color_bgra(const color &c)
+{
+	return int(c.b * 255.0f) + (int(c.g * 255.0f) << 8) + (int(c.r * 255.0f) << 16) + (int(c.a * 255.0f) << 24);
+}
+
+inline color image_uncolor_rgba(unsigned int i)
 {
 	return color((float)(i >> 24) / 255.0f,
-	             (float)(i & 255) / 255.0f,
-	             (float)((i >> 8) & 255) / 255.0f,
-	             (float)((i >> 16) & 255) / 255.0f);
+	              (float)(i & 255) / 255.0f,
+	              (float)((i >> 8) & 255) / 255.0f,
+	              (float)((i >> 16) & 255) / 255.0f);
+}
+
+inline color image_uncolor_bgra(unsigned int i)
+{
+	return color((float)(i >> 24) / 255.0f,
+	              (float)((i >> 16) & 255) / 255.0f,
+	              (float)((i >> 8) & 255) / 255.0f,
+	              (float)(i & 255) / 255.0f);
 }
 
 void Image::Create(int _width, int _height, const color &c)
@@ -76,12 +90,13 @@ void Image::Create(int _width, int _height, const color &c)
 	// create
 	width = _width;
 	height = _height;
+	mode = ModeRGBA;
 	error = false;
 	alpha_used = (c.a != 1.0f);
 	
 	// fill image
 	data.resize(width * height);
-	unsigned int ic = image_color(c);
+	unsigned int ic = image_color_rgba(c);
 	for (int i=0;i<data.num;i++)
 		data[i] = ic;
 	
@@ -144,15 +159,39 @@ void Image::FlipV()
 	msg_db_l(1);
 }
 
-void Image::CopyTo(Image &dest) const
+inline void col_conv_rgba_to_bgra(unsigned int &c)
 {
-	msg_db_r("Image.Copy", 1);
+	unsigned int r = (c & 0xff);
+	unsigned int b = (c & 0xff0000) >> 16;
+	c = (c & 0xff00ff00) + b + (r << 16);
+}
 
-	dest.width = width;
-	dest.height = height;
-	dest.data = data;
-	dest.alpha_used = alpha_used;
-	dest.error = error;
+inline void col_conv_bgra_to_rgba(unsigned int &c)
+{
+	unsigned int r = (c & 0xff0000) >> 16;
+	unsigned int b = (c & 0xff);
+	c = (c & 0xff00ff00) + r + (b << 16);
+}
+
+void Image::SetMode(int _mode) const
+{
+	if (_mode == mode)
+		return;
+	msg_db_r("Image.SetMode", 1);
+
+	unsigned int *c = (unsigned int*)data.data;
+	if (mode == ModeRGBA){
+		if (_mode == ModeBGRA){
+			for (int i=0;i<data.num;i++)
+				col_conv_rgba_to_bgra(*(c ++));
+		}
+	}else if (mode == ModeBGRA){
+		if (_mode == ModeRGBA){
+			for (int i=0;i<data.num;i++)
+				col_conv_bgra_to_rgba(*(c ++));
+		}
+	}
+	mode = _mode;
 
 	msg_db_l(1);
 }
@@ -160,14 +199,22 @@ void Image::CopyTo(Image &dest) const
 
 void Image::SetPixel(int x, int y, const color &c)
 {
-	if ((x >= 0) and (x < width) and (y >= 0) and (y < height))
-		data[x + y * width] = image_color(c);
+	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
+		if (mode == ModeBGRA)
+			data[x + y * width] = image_color_bgra(c);
+		else if (mode == ModeRGBA)
+			data[x + y * width] = image_color_rgba(c);
+	}
 }
 
 color Image::GetPixel(int x, int y) const
 {
-	if ((x >= 0) and (x < width) and (y >= 0) and (y < height))
-		return image_uncolor(data[x + y * width]);
+	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
+		if (mode == ModeBGRA)
+			return image_uncolor_bgra(data[x + y * width]);
+		else if (mode == ModeRGBA)
+			return image_uncolor_rgba(data[x + y * width]);
+	}
 	return Black;
 }
 

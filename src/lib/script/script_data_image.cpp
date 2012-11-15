@@ -35,6 +35,7 @@ void SIAddPackageImage()
 	add_class(TypeImage);
 		class_add_element("width",			TypeInt,		GetDAImage(width));
 		class_add_element("height",			TypeInt,		GetDAImage(height));
+		class_add_element("mode",			TypeInt,		GetDAImage(mode));
 		class_add_element("data",			TypeIntList,	GetDAImage(data));
 		class_add_element("error",			TypeBool,		GetDAImage(error));
 		class_add_element("alpha_used",		TypeBool,		GetDAImage(alpha_used));
@@ -58,7 +59,7 @@ void SIAddPackageImage()
 		class_add_func("GetPixel",		TypeColor,	image_p(mf((tmf)&Image::GetPixel)));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
-		class_add_func("CopyTo",			TypeVoid,	image_p(mf((tmf)&Image::CopyTo)));
-			func_add_param("dest",		TypeImage);
 		class_add_func("Delete",			TypeVoid,	image_p(mf((tmf)&Image::Delete)));
+		class_add_func("__assign__",			TypeVoid,	image_p(mf((tmf)&Image::operator=)));
+			func_add_param("other",		TypeImage);
 }

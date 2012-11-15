@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.4.21.0";
+string HuiVersion = "0.4.21.1";
 
 
 #include <stdio.h>
@@ -251,21 +251,18 @@ void HuiInit()
 {
 	#ifdef OS_WINDOWS
 		HuiAppFilename = _pgmptr;
-		HuiAppDirectory = dir_from_filename(HuiAppFilename);
+		HuiAppDirectory = HuiAppFilename.dirname();
 		hui_win_instance = (HINSTANCE)GetModuleHandle(NULL);
 	#endif
 	#ifdef OS_LINUX
 		if (HuiArgument.num > 0){
-			if (HuiArgument[0][0]=='/'){
-				HuiAppFilename = HuiArgument[0];
+			if (HuiArgument[0][0] == '.'){
+				HuiAppFilename = HuiArgument[0].substr(2, -1);
+				HuiAppDirectory = get_current_dir();
 			}else{
-				HuiAppFilename = get_current_dir();
-				if (HuiArgument[0][0] == '.')
-					HuiAppFilename = HuiArgument[0].substr(2, -1);
-				else
-					HuiAppFilename = HuiArgument[0];
+				HuiAppFilename = HuiArgument[0];
+				HuiAppDirectory = HuiAppFilename.dirname();
 			}
-			HuiAppDirectory = HuiAppFilename.dirname();
 		}
 	#endif
 

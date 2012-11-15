@@ -62,44 +62,41 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 {
 	msg_db_r("load_wave_file", 1);
 	tsunami->progress->Set(_("lade wave"), 0);
+
+	char *data = new char[WAVE_BUFFER_SIZE];
 	CFile *f = OpenFile(filename);
+
+	try{
+
 	if (!f)
-		return;
+		throw string("can't open file");
 	f->SetBinaryMode(true);
 	char header[44];
 	f->ReadBuffer(header, 44);
-	if ((header[0] != 'R') or (header[1] != 'I') or (header[2] != 'F') or (header[3] != 'F')){
-		msg_error("wave file does not start with \"RIFF\"");
-		msg_db_l(1);
-		return;
-	}
+	if ((header[0] != 'R') or (header[1] != 'I') or (header[2] != 'F') or (header[3] != 'F'))
+		throw string("wave file does not start with \"RIFF\"");
 	if (*(int*)&header[4] != f->GetSize())
-		msg_write(format("wave file gives wrong size: %d  (real: %d)", *(int*)&header[4], f->GetSize()));
+		tsunami->log->Warning(format("wave file gives wrong size: %d  (real: %d)", *(int*)&header[4], f->GetSize()));
 		// sometimes 0x2400ff7f
-	if ((header[8] != 'W') or (header[9] != 'A') or (header[10] != 'V') or (header[11] != 'E') or (header[12] != 'f') or (header[13] != 'm') or (header[14] != 't') or (header[15] != ' ')){
-		msg_error("\"WAVEfmt \" expected in wave file");
-		msg_db_l(1);
-		return;
-	}
-	if ((*(int*)&header[16] != 16) or (*(short*)&header[20] != 1)){
-		msg_write("wave file does not have format 16/1");
-		msg_db_l(1);
-		return;
-	}
+	if ((header[8] != 'W') or (header[9] != 'A') or (header[10] != 'V') or (header[11] != 'E') or (header[12] != 'f') or (header[13] != 'm') or (header[14] != 't') or (header[15] != ' '))
+		throw string("\"WAVEfmt \" expected in wave file");
+	int header_size = *(int*)&header[16];
+	int format_code = *(short*)&header[20];
+	if (header_size != 16)
+		throw format("wave file gives header size %d (16 expected)", header_size);
+	if ((format_code != 1) && (format_code != 3))
+		throw format("wave file has format %d (1 or 3 expected)", format_code);
 	int channels = *(short*)&header[22];
 	int freq = *(int*)&header[24];
 	t->root->sample_rate = freq;
 	int block_align = *(short*)&header[32];
 	int bits = *(short*)&header[34];
 	int byte_per_sample = (bits / 8) * channels;
-	if ((header[36] != 'd') or (header[37] != 'a') or (header[38] != 't') or (header[39] != 'a')){
-		msg_error("\"data\" expected in wave file");
-		msg_db_l(1);
-		return;
-	}
+	if ((header[36] != 'd') or (header[37] != 'a') or (header[38] != 't') or (header[39] != 'a'))
+		throw string("\"data\" expected in wave file");
 	int size = *(int*)&header[40];
 	if ((size > f->GetSize() - 44) or (size < 0)){
-		msg_write("wave file gives wrong data size");
+		tsunami->log->Warning(format("wave file gives wrong data size (given: %d,  by file size: %d)", size, f->GetSize() - 44));
 		size = f->GetSize() - 44;
 	}
 	int samples = size / byte_per_sample;
@@ -107,7 +104,6 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 
 	int read = 0;
 	int nn = 0;
-	char *data = new char[WAVE_BUFFER_SIZE];
 	while (read < size){
 		int toread = clampi(WAVE_BUFFER_SIZE, 0, size - read);
 		int r = f->ReadBuffer(data, toread);
@@ -124,14 +120,18 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 			ImportData(t, data, channels, bits, dsamples, offset);
 			read += r;
 		}else{
-			msg_error("could not read in wave file...");
-			break;
+			throw string("could not read in wave file...");
 		}
+	}
+
+	}catch(const string &s){
+		tsunami->log->Error(s);
 	}
 
 	delete[](data);
 
-	FileClose(f);
+	if (f)
+		FileClose(f);
 	msg_db_l(1);
 }
 

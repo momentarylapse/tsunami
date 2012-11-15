@@ -1,6 +1,8 @@
 #include "image.h"
 #include "../file/file.h"
 
+#define USE_FAST_COSINE_TRAFO	1
+
 static Image EmptyImage;
 
 //--------------------------------------------------------------------------------------------------
@@ -185,6 +187,55 @@ void jpg_decode_huffman(int ac,int dc,unsigned char *&b,int &bit_off,int &prev,i
 	//msg_write("zzz2");
 }
 
+static const float ww = 1.0f / sqrt(2.0f);
+static const float cc = cos(pi / 8.0f);
+static const float ss = sin(pi / 8.0f);
+static const float cc1 = cos(pi / 16.0f);
+static const float cc3 = cos(pi / 16.0f * 3);
+static const float cc5 = cos(pi / 16.0f * 5);
+static const float cc7 = cos(pi / 16.0f * 7);
+
+inline void _fast_cosine_trafo_(
+	float &in_0, float &in_1, float &in_2, float &in_3, float &in_4, float &in_5, float &in_6, float &in_7,
+	float &out_0, float &out_1, float &out_2, float &out_3, float &out_4, float &out_5, float &out_6, float &out_7)
+{
+	float c2_p_s6 = cc * in_2 + ss * in_6;
+	float s2_m_c6 = ss * in_2 - cc * in_6;
+	float w0_p_w4 = ww * (in_0 + in_4);
+	float w0_m_w4 = ww * (in_0 - in_4);
+	float E0 = w0_p_w4 + c2_p_s6;
+	float E1 = w0_m_w4 + s2_m_c6;
+	float E2 = w0_m_w4 - s2_m_c6;
+	float E3 = w0_p_w4 - c2_p_s6;
+	float c3 = cc * in_3;
+	float s3 = ss * in_3;
+	float c7 = cc * in_7;
+	float s7 = ss * in_7;
+	float c3_p_s7 = c3 + s7;
+	float c3_m_s7 = c3 - s7;
+	float s3_m_c7 = s3 - c7;
+	float s3_p_c7 = s3 + c7;
+	float w5 = ww * in_5;
+	float n1_p_w5 = in_1 + w5;
+	float n1_m_w5 = in_1 - w5;
+	float F0 = n1_p_w5 + c3_p_s7;
+	float F1 = n1_m_w5 + s3_m_c7;
+	float F2 = n1_m_w5 - s3_m_c7;
+	float F3 = n1_p_w5 - c3_p_s7;
+	float G0 = w5 + s3_p_c7;
+	float G1 = w5 + c3_m_s7;
+	float G2 = -w5 + c3_m_s7;
+	float G3 = -w5 + s3_p_c7;
+	out_0 = E0 + cc1 * F0 + cc7 * G0;
+	out_1 = E1 + cc3 * F1 + cc5 * G1;
+	out_2 = E2 + cc5 * F2 + cc3 * G2;
+	out_3 = E3 + cc7 * F3 + cc1 * G3;
+	out_4 = E3 - cc7 * F3 + cc1 * G0;
+	out_5 = E2 - cc5 * F2 + cc3 * G1;
+	out_6 = E1 - cc3 * F1 + cc5 * G2;
+	out_7 = E0 - cc1 * F0 + cc7 * G3;
+}
+
 inline void jpg_cosine_retransform(int *coeff_in,int q,float *coeff_out)
 {
 	// de-quantizing....
@@ -195,23 +246,46 @@ inline void jpg_cosine_retransform(int *coeff_in,int q,float *coeff_out)
 
 //	float inv_sqrt2=1.0f/sqrt(2.0f);
 
-// M[n][x] = sum(m) coeff_in_f[n][m] * jpg_cos_table[x][m]
+	// M[n][x] = sum(m) coeff_in_f[n][m] * jpg_cos_table[x][m]
 	float M[8][8];
-	for (int n=0;n<8;n++)
+	for (int n=0;n<8;n++){
+#if USE_FAST_COSINE_TRAFO
+		int n8 = n * 8;
+		_fast_cosine_trafo_(coeff_in_f[n8    ], coeff_in_f[n8 + 1],
+		                    coeff_in_f[n8 + 2], coeff_in_f[n8 + 3],
+		                    coeff_in_f[n8 + 4], coeff_in_f[n8 + 5],
+		                    coeff_in_f[n8 + 6], coeff_in_f[n8 + 7],
+		                    M[n][0], M[n][1], M[n][2], M[n][3],
+		                    M[n][4], M[n][5], M[n][6], M[n][7]);
+#else
 		for (int x=0;x<8;x++){
 			M[n][x] = 0;
 			for (int m=0;m<8;m++)
 				M[n][x] += coeff_in_f[n * 8 + m] * jpg_cos_table[x][m];
 		}
+#endif
+	}
 
 // coeff_out[y][x] = sum(n) M[n][x] * jpg_cos_table[y][n]
-	for (int x=0;x<8;x++)
+	for (int x=0;x<8;x++){
+#if USE_FAST_COSINE_TRAFO
+		_fast_cosine_trafo_(M[0][x], M[1][x], M[2][x], M[3][x],
+		                    M[4][x], M[5][x], M[6][x], M[7][x],
+		                    coeff_out[        x], coeff_out[    8 + x],
+		                    coeff_out[2 * 8 + x], coeff_out[3 * 8 + x],
+		                    coeff_out[4 * 8 + x], coeff_out[5 * 8 + x],
+		                    coeff_out[6 * 8 + x], coeff_out[7 * 8 + x]);
+		for (int y=0;y<8;y++)
+			coeff_out[y * 8 + x] *= 0.25f;
+#else
 		for (int y=0;y<8;y++){
 			float f = 0;
 			for (int n=0;n<8;n++)
 				f += M[n][x] * jpg_cos_table[y][n];
 			coeff_out[y * 8 + x] = 0.25f * f;
 		}
+#endif
+	}
 
 	// cos transformation
 /*	for (int x=0;x<8;x++)
@@ -228,21 +302,24 @@ inline void jpg_cosine_retransform(int *coeff_in,int q,float *coeff_out)
 }
 
 // combine some 8x8 blocks into a meta block (using sub sampling)
+// TODO: optimize + specialize
 inline void jpg_combine_blocks(float *block,int &sx,int &sy,int &sh,int &sv,int &i,int &j,float *col)
 {
 	int fh=sx/sh/8;
 	int fv=sy/sv/8;
-	for (int x=0;x<8;x++){
-		int x0=(x+i*8)*fh;
-		for (int y=0;y<8;y++){
+	for (int y=0;y<8;y++){
+		int y0=(y+j*8)*fv;
+		for (int x=0;x<8;x++){
+			int x0=(x+i*8)*fh;
 			float c=block[y*8+x];
-			int y0=(y+j*8)*fv;
 			// sub sampling
+
+			//float *tcol=&col[(y0+yy)*sx + x0];
 			for (int yy=0;yy<fv;yy++){
-				float *tcol=&col[(y0+yy)*sx + x0];
 				for (int xx=0;xx<fh;xx++){
-					*tcol=c;
-					tcol++;
+					col[(y0 + yy)*sx + x0 + xx] = c;
+					//*tcol=c;
+					//tcol++;
 				}
 			}
 		}
@@ -254,17 +331,16 @@ inline void jpg_combine_blocks(float *block,int &sx,int &sy,int &sh,int &sv,int 
 
 inline void jpg_insert_into_image(float *col0,float *col1,float *col2,int &sx,int &sy,int &x,int &y)
 {
-	for (int i=0;i<sx;i++){
-		// "real position" in the image
-		int _y = cur_image->height-(i+sy*y+1);
-		int _x0=sx*x;
-		unsigned char *d = (unsigned char*)&cur_image->data[ _y*cur_image->width + _x0 ];
-		for (int j=0;j<sy;j++){
+	for (int j=0;j<sy;j++){
+		int _y = cur_image->height - (sy * y + j + 1);
+		unsigned char *d = (unsigned char*)&cur_image->data[_y * cur_image->width + sx * x];
+		for (int i=0;i<sx;i++){
+			int _x = sx * x + i;
 			// within "real image"?
-			if (_x0+j<cur_image->width)
-				if (_y>=0){
+			if (_x < cur_image->width)
+				if (_y >= 0){
 					// retransform color space YCbCr -> RGB
-					col0[0]+=128.0f;
+					*col0 += 128.0f;
 					float r=_color_clamp_(*col0                     + 1.402f    * *col2);
 					float g=_color_clamp_(*col0 - 0.344136f * *col1 - 0.714136f * *col2);
 					float b=_color_clamp_(*col0 + 1.772f    * *col1                    );
@@ -296,8 +372,6 @@ void jpg_decode(unsigned char *b,s_jpg_color_info ci)
 	int ny = (cur_image->height+(sy-1))/sy;
 	//msg_write(string2("%d x %d",nx,ny));
 	// image dimensions in file (including "nonsense")
-	int iw=nx*sx;
-	int ih=ny*sy;
 
 	// temporary data
 	int coeff[64]; // block
@@ -311,11 +385,6 @@ void jpg_decode(unsigned char *b,s_jpg_color_info ci)
 		for (int j=0;j<8;j++)
 			jpg_cos_table[i][j] = (float)cos( (2*i+1)*j*pi/16.0f ) * ((j == 0) ? 1.0f / sqrt(2.0f) : 1.0f);
 
-
-/*CFile *f=new CFile();
-f->Create("test");
-f->SetBinaryMode(true);*/
-
 	// read data
 	int bit_off=0;
 	int prev[3]={0,0,0};
@@ -325,20 +394,15 @@ f->SetBinaryMode(true);*/
 			// 3 colors
 			for (int c=0;c<3;c++){
 				// sub blocks
-				for (int i=0;i<ci.h[c];i++)
-					for (int j=0;j<ci.v[c];j++){
+				for (int j=0;j<ci.v[c];j++)
+					for (int i=0;i<ci.h[c];i++){
 						jpg_decode_huffman(ci.ac[c],ci.dc[c],b,bit_off,prev[c],coeff);
 						jpg_cosine_retransform(coeff,ci.q[c],col_block);
-						jpg_combine_blocks(col_block,sx,sy,ci.h[c],ci.v[c],j,i,col[c]);
+						jpg_combine_blocks(col_block,sx,sy,ci.h[c],ci.v[c],i,j,col[c]);
 					}
 			}
 			jpg_insert_into_image(col[0],col[1],col[2],sx,sy,x,y);
 		}
-
-		//f->WriteBuffer(image.data,image.width*image.height*3);
-
-/*f->Close();
-delete(f);*/
 
 	delete[](col[0]);
 	delete[](col[1]);

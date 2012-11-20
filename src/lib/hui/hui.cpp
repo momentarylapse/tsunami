@@ -104,7 +104,7 @@ Array<string> HuiArgument;
 	float time_scale;
 #endif
 #ifdef HUI_API_GTK
-	void *invisible_cursor;
+	void *invisible_cursor = NULL;
 #endif
 
 Array<string> HuiMakeArgs(int num_args, char *args[])
@@ -546,7 +546,9 @@ void HuiEnd()
 		//	XCloseDisplay(hui_x_display);
 #endif
 
+#if GTK_MAJOR_VERSION == 3
 		g_object_unref(invisible_cursor);
+#endif
 #endif
 		if (HuiConfigChanged)
 			HuiSaveConfigFile();

@@ -314,7 +314,7 @@ string string::dirname() const
 	int i = max(rfind("/"), rfind("\\"));
 	if (i >= 0)
 		return head(i + 1);
-	return *this;
+	return "";
 }
 
 string string::basename() const

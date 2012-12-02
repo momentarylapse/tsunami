@@ -222,6 +222,7 @@ void AudioOutput::Pause()
 		alSourcePause(source);
 	else if (param == AL_PAUSED)
 		alSourcePlay(source);
+	Notify("Pause");
 }
 
 bool AudioOutput::stream(int buf)

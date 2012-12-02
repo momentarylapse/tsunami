@@ -429,9 +429,8 @@ void Tsunami::UpdateMenu()
 	// sound
 	Enable("play", cur_audio->used);
 	Enable("stop", output->IsPlaying());
+	Enable("pause", output->IsPlaying());
 	Check("play_loop", output->PlayLoop);
-	Enable("play", cur_audio->used);
-	Enable("stop", output->IsPlaying());
 
 
 	Reset("cur_level");

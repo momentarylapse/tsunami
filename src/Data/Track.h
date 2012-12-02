@@ -53,7 +53,6 @@ public:
 
 	// editing
 	bool is_selected;
-	bool is_mouse_over;
 	int x, width;
 };
 
@@ -69,7 +68,6 @@ public:
 
 	// editing
 	bool is_selected;
-	bool is_mouse_over;
 	int x, width;
 };
 
@@ -137,7 +135,6 @@ public:
 	AudioFile *root;
 
 	bool is_selected;
-	bool is_mouse_over;
 
 //	TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS];
 };

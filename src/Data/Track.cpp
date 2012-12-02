@@ -31,7 +31,6 @@ Track::Track()
 	length = 0;
 	pos = 0;
 	is_selected = false;
-	is_mouse_over = false;
 	cur_sub = -1;
 
 	volume = 1;

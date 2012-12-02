@@ -83,8 +83,6 @@ public:
 
 	// selection within the buffer?
 	Range selection;
-	bool mo_sel_start, mo_sel_end;
-	// (T_T)  -> global
 
 	int cur_track;
 	int cur_level;

@@ -57,6 +57,7 @@ public:
 	void DrawBarCollection(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, BarCollection *bc);
 	void DrawTrack(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no);
 	void DrawGrid(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a, const color &bg, bool show_time = false);
+	void DrawTimeLine(HuiDrawingContext *c, AudioFile *a, int pos, int type, color &col, bool show_time = false);
 	void DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a);
 
 	void OptimizeView(AudioFile *a);
@@ -103,7 +104,7 @@ public:
 		Array<int> barrier;
 	};
 
-	SelectionType Selection;
+	SelectionType Hover, Selection;
 	ActionSubTrackMove *cur_action;
 
 	int MousePossiblySelecting, MousePossiblySelectingStart;
@@ -119,16 +120,14 @@ public:
 	void SelectAll(AudioFile *a);
 
 	void SetMouse();
-	void ClearMouseOver(AudioFile *a);
 	bool MouseOverAudio(AudioFile *a);
 	bool MouseOverTrack(Track *t);
 	int MouseOverSub(Track *s);
 	void SelectionUpdatePos(SelectionType &s);
-	SelectionType GetMouseOver(bool set = true);
+	SelectionType GetMouseOver();
 	void SelectUnderMouse();
 	void SetBarriers(AudioFile *a, SelectionType *s);
 	void ApplyBarriers(int &pos);
-	SelectionType mo_old;
 
 	void SelectSub(Track *s, bool diff);
 	void SelectTrack(Track *t, bool diff);

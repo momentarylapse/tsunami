@@ -111,17 +111,6 @@ void AudioView::SetMouse()
 	my = HuiGetEvent()->my;
 }
 
-void AudioView::ClearMouseOver(AudioFile *a)
-{
-	a->mo_sel_start = false;
-	a->mo_sel_end = false;
-	foreach(Track &t, a->track){
-		t.is_mouse_over = false;
-		foreach(Track &s, t.sub)
-			s.is_mouse_over = false;
-	}
-}
-
 bool AudioView::MouseOverAudio(AudioFile *a)
 {
 	return ((mx >= a->x) && (mx < a->x + a->width) && (my >= a->y) && (my < a->y + a->height));
@@ -150,14 +139,14 @@ void AudioView::SelectionUpdatePos(SelectionType &s)
 		s.pos = s.audio->screen2sample(mx);
 }
 
-AudioView::SelectionType AudioView::GetMouseOver(bool set)
+bool mouse_over_time(int mx, AudioFile *a, int pos)
 {
-	msg_db_r("GetMouseOver", 2);
+	int ssx = a->sample2screen(pos);
+	return ((mx >= ssx - 5) && (mx <= ssx + 5));
+}
 
-	if (set){
-		ClearMouseOver(audio[0]);
-		ClearMouseOver(audio[1]);
-	}
+AudioView::SelectionType AudioView::GetMouseOver()
+{
 	SelectionType s;
 	s.type = SEL_TYPE_NONE;
 	s.audio = NULL;
@@ -178,8 +167,6 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 			if (MouseOverTrack(&t)){
 				s.track = &t;
 				s.type = SEL_TYPE_TRACK;
-				if (set)
-					t.is_mouse_over = true;
 			}
 		}
 	}
@@ -188,20 +175,26 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 	if (s.audio){
 		SelectionUpdatePos(s);
 		if (!s.audio->selection.empty()){
-			int ssx = s.audio->sample2screen(s.audio->sel_raw.start());
-			if ((mx >= ssx - 5) && (mx <= ssx + 5)){
+			if (mouse_over_time(mx, s.audio, s.audio->sel_raw.start())){
 				s.type = SEL_TYPE_SELECTION_START;
-				if (set)
-					s.audio->mo_sel_start = true;
-				msg_db_l(1);
 				return s;
 			}
-			int sex = s.audio->sample2screen(s.audio->sel_raw.end());
-			if ((mx >= sex - 5) && (mx <= sex + 5)){
+			if (mouse_over_time(mx, s.audio, s.audio->sel_raw.end())){
 				s.type = SEL_TYPE_SELECTION_END;
-				if (set)
-					s.audio->mo_sel_end = true;
-				msg_db_l(1);
+				return s;
+			}
+		}
+		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == s.audio)){
+			if (mouse_over_time(mx, s.audio, tsunami->output->GetRange().start())){
+				s.type = SEL_TYPE_PLAYBACK_START;
+				return s;
+			}
+			if (mouse_over_time(mx, s.audio, tsunami->output->GetRange().end())){
+				s.type = SEL_TYPE_PLAYBACK_END;
+				return s;
+			}
+			if (mouse_over_time(mx, s.audio, tsunami->output->GetPos())){
+				s.type = SEL_TYPE_PLAYBACK;
 				return s;
 			}
 		}
@@ -216,13 +209,10 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 				s.sub = &ss;
 				s.type = SEL_TYPE_SUB;
 				s.sub_offset = offset;
-				if (set)
-					ss.is_mouse_over = true;
 			}
 		}
 	}
 
-	msg_db_l(2);
 	return s;
 }
 
@@ -230,7 +220,8 @@ AudioView::SelectionType AudioView::GetMouseOver(bool set)
 void AudioView::SelectUnderMouse()
 {
 	msg_db_r("SelectUnderMouse", 2);
-	Selection = GetMouseOver();
+	Hover = GetMouseOver();
+	Selection = Hover;
 	SetCurAudioFile(Selection.audio);
 	tsunami->cur_audio = Selection.audio;
 	Track *t = Selection.track;
@@ -317,48 +308,15 @@ void AudioView::OnMouseMove()
 	if (HuiGetEvent()->lbut){
 		SelectionUpdatePos(Selection);
 	}else{
-		SelectionType mo = GetMouseOver();
-		_force_redraw_ |= (mo.type != mo_old.type) || (mo.sub != mo_old.sub);
-		mo_old = mo;
+		SelectionType mo_old = Hover;
+		Hover = GetMouseOver();
+		_force_redraw_ |= (Hover.type != mo_old.type) || (Hover.sub != mo_old.sub);
 	}
-
-	// mouse over?
-	/*if (Selector < 0){
-		int mo = MouseOver;
-		Track *so = SubMouseOver;
-		MouseOver = -1;
-		SubMouseOver = NULL;
-		int ssx = sample2screen(cur_audio, cur_audio->selection_start);
-		int sex = sample2screen(cur_audio, cur_audio->selection_end);
-		if ((mx>ssx-5) && (mx<ssx+5))
-			MouseOver = MOSelectionStart;
-		else if ((mx>sex-5) && (mx<sex+5))
-			MouseOver = MOSelectionEnd;
-		else{
-			if (MouseOverSub(cur_sub, cur_track, cur_audio)){
-				MouseOver = MOAdded;
-				SubMouseOver = cur_sub;
-				added_off = MouseOverSubOffset;
-				mo_sub = cur_audio->cur_sub;
-			}else{
-				foreach(cur_audio->track, t){
-					foreachi(t->sub, s, i){
-						if (MouseOverSub(*s, *t, cur_audio)){
-							MouseOver = MOAdded;
-							SubMouseOver = s;
-							added_off = MouseOverSubOffset;
-							mo_sub = i;
-						}
-					}
-				}
-			}
-		}*/
-	//}
 
 
 	// drag & drop
 	if (Selection.type == SEL_TYPE_SELECTION_END){
-		SelectionType mo = GetMouseOver(false);
+		SelectionType mo = GetMouseOver();
 		if (mo.audio == tsunami->cur_audio)
 			if (mo.track)
 				mo.track->is_selected = true;
@@ -402,10 +360,10 @@ void AudioView::OnMouseMove()
 	if (MousePossiblySelecting > MouseMinMoveToSelect){
 		tsunami->cur_audio->sel_raw.offset = MousePossiblySelectingStart;
 		tsunami->cur_audio->sel_raw.num = Selection.pos - MousePossiblySelectingStart;
-		tsunami->cur_audio->mo_sel_end = true;
 		SetBarriers(tsunami->cur_audio, &Selection);
 		tsunami->cur_audio->UpdateSelection();
 		Selection.type = SEL_TYPE_SELECTION_END;
+		Hover.type = SEL_TYPE_SELECTION_END;
 		_force_redraw_ = true;
 		MousePossiblySelecting = -1;
 	}
@@ -438,9 +396,8 @@ void AudioView::OnLeftButtonDown()
 	}else if (Selection.type == SEL_TYPE_SELECTION_START){
 		// switch end / start
 		Selection.type = SEL_TYPE_SELECTION_END;
+		Hover.type = SEL_TYPE_SELECTION_END;
 		tsunami->cur_audio->sel_raw.invert();
-		tsunami->cur_audio->mo_sel_start = false;
-		tsunami->cur_audio->mo_sel_end = true;
 	}else if (Selection.type == SEL_TYPE_SUB){
 		cur_action = new ActionSubTrackMove(tsunami->cur_audio);
 	}
@@ -717,7 +674,7 @@ void AudioView::DrawSub(HuiDrawingContext *c, int x, int y, int width, int heigh
 	//bool is_cur = ((s == cur_sub) && (t->IsSelected));
 	if (!s->is_selected)
 		col = ColorSubNotCur;
-	if (s->is_mouse_over)
+	if (Hover.sub == s)
 		col = ColorSubMO;
 	//col.a = 0.2f;
 
@@ -901,6 +858,18 @@ void audio_draw_background(HuiDrawingContext *c, int x, int y, int width, int he
 		c->DrawLine(0, yy, width, yy);
 }
 
+void AudioView::DrawTimeLine(HuiDrawingContext *c, AudioFile *a, int pos, int type, color &col, bool show_time)
+{
+	int p = a->sample2screen(pos);
+	if ((p >= a->x) && (p <= a->x + a->width)){
+		bool mo = ((a == Hover.audio) && (type == Hover.type));
+		c->SetColor(mo ? ColorSelectionBoundaryMO : col);
+		c->DrawLine(p, a->y, p, a->y + a->height);
+		if (show_time)
+			c->DrawStr(p, a->y + a->height / 2, a->get_time_str(pos));
+	}
+}
+
 void AudioView::DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a)
 {
 	a->x = x;
@@ -931,8 +900,6 @@ void AudioView::DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int
 		int sx2 = a->sample2screen(a->sel_raw.end());
 		int sxx1 = clampi(sx1, x, width + x);
 		int sxx2 = clampi(sx2, x, width + x);
-		bool mo_s = a->mo_sel_start;
-		bool mo_e = a->mo_sel_end;
 		if (sxx1 > sxx2){
 			int t = sxx1;	sxx1 = sxx2;	sxx2 = t;
 			//bool bt = mo_s;	mo_s = mo_e;	mo_e = bt; // TODO ???
@@ -943,28 +910,16 @@ void AudioView::DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int
 				c->DrawRect(sxx1, t.y, sxx2 - sxx1, t.height);
 				DrawGrid(c, sxx1, t.y, sxx2 - sxx1, t.height, a, ColorSelectionInternal);
 			}
-		if ((sx1>=x)&&(sx1<=x+width)){
-			color col = mo_s ? ColorSelectionBoundaryMO : ColorSelectionBoundary;
-			c->SetColor(col);
-			c->DrawLine(sx1, y, sx1, y + height);
-			//NixDrawStr(sx1,y,get_time_str(a->SelectionStart,a));
-		}
-		if ((sx2>=x)&&(sx2<=x+width)){
-			color col = mo_e ? ColorSelectionBoundaryMO : ColorSelectionBoundary;
-			c->SetColor(col);
-			c->DrawLine(sx2, y, sx2, y + height);
-			//NixDrawStr(sx2,y+height-TIME_SCALE_HEIGHT,get_time_str(a->SelectionEnd-a->SelectionStart,a));
-		}
+		DrawTimeLine(c, a, a->sel_raw.start(), SEL_TYPE_SELECTION_START, ColorSelectionBoundary);
+		DrawTimeLine(c, a, a->sel_raw.end(), SEL_TYPE_SELECTION_END, ColorSelectionBoundary);
 	}
 
 	//NixDrawStr(x,y,get_time_str((int)a->ViewPos,a));
 	// playing position
 	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == a)){
-		int pos = tsunami->output->GetPos();
-		int px = a->sample2screen(pos);
-		c->SetColor(ColorPreviewMarker);
-		c->DrawLine(px, y, px, y + height);
-		c->DrawStr(px, y + height / 2, a->get_time_str(pos));
+		DrawTimeLine(c, a, tsunami->output->GetRange().start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
+		DrawTimeLine(c, a, tsunami->output->GetRange().end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
+		DrawTimeLine(c, a, tsunami->output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
 	}
 
 	color col = (a==tsunami->cur_audio) ? ColorWaveCur : ColorWave;

@@ -55,7 +55,6 @@ class TimeBar
 	int type
 	
 	bool is_selected
-	bool is_mouse_over
 	int x, width
 
 class BarCollection
@@ -64,7 +63,6 @@ class BarCollection
 	TimeBar bar[]
 	
 	bool is_selected
-	bool is_mouse_over
 	int x, width
 
 enum
@@ -100,7 +98,6 @@ class Track
 	void *root
 
 	bool is_selected
-	bool is_mouse_over
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
@@ -137,7 +134,6 @@ class AudioFile
 	int x, y, width, height
 
 	Range selection
-	bool mo_sel_start, mo_sel_end
 	int cur_track
 	int cur_level
 

@@ -164,7 +164,7 @@ class AudioInput
 	extern void Stop()
 
 extern window MainWin
-extern AudioFile /* *audio[2],*/ *cur_audio
+extern AudioFile *audio[2], *cur_audio
 extern AudioOutput *output
 extern AudioInput *input
 

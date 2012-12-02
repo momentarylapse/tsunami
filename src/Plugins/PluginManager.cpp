@@ -100,6 +100,7 @@ void PluginManager::LinkAppScriptData()
 	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
 	ScriptLinkSemiExternalVar("MainWin",		&GlobalMainWin);
 	ScriptLinkSemiExternalVar("cur_audio",		&tsunami->cur_audio);
+	ScriptLinkSemiExternalVar("audio",			&tsunami->audio);
 	ScriptLinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
 	ScriptLinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
 	ScriptLinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);

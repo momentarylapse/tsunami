@@ -57,7 +57,7 @@ public:
 	void DrawBarCollection(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, BarCollection *bc);
 	void DrawTrack(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no);
 	void DrawGrid(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a, const color &bg, bool show_time = false);
-	void DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a);
+	void DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a);
 
 	void OptimizeView(AudioFile *a);
 	void UpdateMenu();

@@ -13,6 +13,7 @@
 
 const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;
+const int MAX_TRACK_HEIGHT = 250;
 
 AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2) :
 	Observable("AudioView"),
@@ -852,48 +853,76 @@ void AudioView::OnUpdate(Observable *o)
 	}
 }
 
-void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a)
+void plan_track_sizes(int y, int height, AudioFile *a, int TIME_SCALE_HEIGHT)
+{
+	int track_height = (height - TIME_SCALE_HEIGHT) / (a->track.num);
+	if (track_height > MAX_TRACK_HEIGHT){
+		foreachi(Track &t, a->track, i){
+			t.y = y + TIME_SCALE_HEIGHT + i * MAX_TRACK_HEIGHT;
+			t.height = MAX_TRACK_HEIGHT;
+		}
+	}else{
+		foreachi(Track &t, a->track, i){
+			t.y = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * i);
+			t.height = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * (i + 1)) - t.y;
+		}
+	}
+}
+
+void audio_draw_background(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a, AudioView *v)
+{
+	int yy = a->track.back().y + a->track.back().height;
+	//int trackheight = (a->num_tracks > 0) ? (height / a->num_tracks) : height;
+	if (a == tsunami->cur_audio){
+		c->SetColor(v->ColorBackgroundCurWave);
+		c->DrawRect(x, y, width, v->TIME_SCALE_HEIGHT);
+		v->DrawGrid(c, x, y, width, v->TIME_SCALE_HEIGHT, a, v->ColorBackgroundCurWave, true);
+		foreach(Track &t, a->track){
+			c->SetColor((t.is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
+			c->DrawRect(x, t.y, width, t.height);
+			v->DrawGrid(c, x, t.y, width, t.height, a, (t.is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
+		}
+		if (yy < y + height){
+			c->SetColor(v->ColorBackground);
+			c->DrawRect(x, yy, width, height - yy + y);
+			v->DrawGrid(c, x, yy, width, height - yy + y, a, v->ColorBackground, false);
+		}
+	}else{
+		c->SetColor(v->ColorBackground);
+		c->DrawRect(x, y, width, height);
+		v->DrawGrid(c, x, y, width, height, a, v->ColorBackground, true);
+	}
+
+	// lines between tracks
+	c->SetColor(v->ColorGrid);
+	foreach(Track &t, a->track)
+		c->DrawLine(0, t.y, width, t.y);
+	if (yy < y + height)
+		c->DrawLine(0, yy, width, yy);
+}
+
+void AudioView::DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a)
 {
 	a->x = x;
 	a->y = y;
 	a->width = width;
 	a->height = height;
 
-
-	// plan track sizes
-	foreachi(Track &t, a->track, i){
-		t.y = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * i);
-		t.height = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * (i + 1)) - t.y;
-	}
-
-	// background
-	//int trackheight = (a->num_tracks > 0) ? (height / a->num_tracks) : height;
-	if ((a == tsunami->cur_audio) && (a->used)){
-		c->SetColor(ColorBackgroundCurWave);
-		c->DrawRect(x, y, width, TIME_SCALE_HEIGHT);
-		DrawGrid(c, x, y, width, TIME_SCALE_HEIGHT, a, ColorBackgroundCurWave, true);
-		foreach(Track &t, a->track){
-			c->SetColor((t.is_selected) ? ColorBackgroundCurTrack : ColorBackgroundCurWave);
-			c->DrawRect(x, t.y, width, t.height);
-			DrawGrid(c, x, t.y, width, t.height, a, (t.is_selected) ? ColorBackgroundCurTrack : ColorBackgroundCurWave);
-		}
-	}else{
+	// empty file
+	if (!a->used){
 		color col = (a == tsunami->cur_audio) ? ColorBackgroundCurWave : ColorBackground;
 		c->SetColor(col);
 		c->DrawRect(x, y, width, height);
-		if (a->used)
-			DrawGrid(c, x, y, width, height, a, col, true);
-	}
-
-	if (!a->used){
 		c->SetColor((a == tsunami->cur_audio) ? ColorWaveCur : ColorWave);
 		c->SetFontSize(FONT_SIZE_NO_FILE);
 		c->DrawStr(x + width / 2 - 50, y + height / 2 - 10, _("keine Datei"));
 		return;
 	}
-	c->SetColor(ColorGrid);
-	foreach(Track &t, a->track)
-		c->DrawLine(0, t.y, width, t.y);
+
+	plan_track_sizes(y, height, a, TIME_SCALE_HEIGHT);
+
+	// background
+	audio_draw_background(c, x, y, width, height, a, this);
 
 
 	// selection
@@ -972,10 +1001,10 @@ void AudioView::OnDraw()
 	float t = (float)t0 / (float)(t0 + t1);
 
 	if (ShowTempFile){
-		DrawWaveFile(c, 0, 0, c->width, c->height * t, audio[0]);
-		DrawWaveFile(c, 0, c->height * t, c->width, c->height * (1 - t), audio[1]);
+		DrawAudioFile(c, 0, 0, c->width, c->height * t, audio[0]);
+		DrawAudioFile(c, 0, c->height * t, c->width, c->height * (1 - t), audio[1]);
 	}else
-		DrawWaveFile(c, 0, 0, c->width, c->height, audio[0]);
+		DrawAudioFile(c, 0, 0, c->width, c->height, audio[0]);
 
 	//c->DrawStr(100, 100, i2s(frame++));
 

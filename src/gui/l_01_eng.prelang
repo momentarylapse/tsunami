@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-139
+135
 // Data (ID,Text)
 about
 About
@@ -135,6 +135,8 @@ open
 Open...
 paste
 Paste
+pause
+
 pdp_capture
 !bold\\Recording
 pdp_general
@@ -211,16 +213,6 @@ sub_properties
 Properties
 tab_control
 Data\\Tags\\Tracks\\Effects
-table_1
-
-table_2
-
-table_3
-
-table_4
-
-table_5
-
 tags
 !format=tT\\Tag\\Value
 td_table_1

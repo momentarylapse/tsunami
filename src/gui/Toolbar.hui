@@ -30,6 +30,7 @@ enum{
 	MainWin->ToolBarAddItem("L&oschen","L&oschen",HuiImageDelete,HMM_DELETE);
 	MainWin->ToolBarAddSeparator();
 	MainWin->ToolBarAddItem("Start","Start",HuiImageMediaPlay,HMM_PLAY);
+	MainWin->ToolBarAddItem("Pause","Pause",HuiImageMediaPause,HMM_PAUSE);
 	MainWin->ToolBarAddItem("Stopp","Stopp",HuiImageMediaStop,HMM_STOP);
 	MainWin->ToolBarAddItem("Aufnehmen","Aufnehmen",HuiImageMediaRecord,HMM_RECORD);
 	MainWin->EnableToolBar(true);

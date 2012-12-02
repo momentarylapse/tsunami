@@ -822,6 +822,12 @@ void AudioView::DrawGrid(HuiDrawingContext *c, int x, int y, int width, int heig
 		c->DrawLine(a->sample2screen(n * dl), y, a->sample2screen(n * dl), y + height);
 	}
 	if (show_time){
+		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == a)){
+			c->SetColor(ColorPreviewMarker);
+			float x0 = a->sample2screen(tsunami->output->GetRange().start());
+			float x1 = a->sample2screen(tsunami->output->GetRange().end());
+			c->DrawRect(x0, y, x1 - x0, 5);
+		}
 		c->SetColor(ColorGrid);
 		for (int n=nx0;n<nx1;n++){
 			if ((a->sample2screen(dl) - a->sample2screen(0)) > 30){
@@ -854,6 +860,7 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 	a->height = height;
 
 
+	// plan track sizes
 	foreachi(Track &t, a->track, i){
 		t.y = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * i);
 		t.height = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * (i + 1)) - t.y;
@@ -923,8 +930,8 @@ void AudioView::DrawWaveFile(HuiDrawingContext *c, int x, int y, int width, int 
 
 	//NixDrawStr(x,y,get_time_str((int)a->ViewPos,a));
 	// playing position
-	if (tsunami->output->IsPlaying()){
-		int pos = tsunami->output->GetPos(a);
+	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == a)){
+		int pos = tsunami->output->GetPos();
 		int px = a->sample2screen(pos);
 		c->SetColor(ColorPreviewMarker);
 		c->DrawLine(px, y, px, y + height);

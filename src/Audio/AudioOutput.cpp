@@ -38,8 +38,9 @@ AudioOutput::AudioOutput() :
 	al_last_error = AL_NO_ERROR;
 
 
-	start = pos = 0;
+	pos = 0;
 	audio = NULL;
+	range = Range(0, 0);
 	generate_func = NULL;
 	stream_pos = 0;
 	stream_size = 0;
@@ -211,6 +212,18 @@ void AudioOutput::Stop()
 	msg_db_l(1);
 }
 
+void AudioOutput::Pause()
+{
+	if (!playing)
+		return;
+	int param;
+	alGetSourcei(source, AL_SOURCE_STATE, &param);
+	if (param == AL_PLAYING)
+		alSourcePause(source);
+	else if (param == AL_PAUSED)
+		alSourcePlay(source);
+}
+
 bool AudioOutput::stream(int buf)
 {
 	msg_db_r("stream", 1);
@@ -251,12 +264,12 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	if (!al_initialized)
 		Init();
 
-	Range _range = a->GetRange();
+	range = a->GetRange();
 	if (!a->selection.empty())
-		_range = a->selection;
+		range = a->selection;
 
 	//AudioFileToBuffer(a, true, true);
-	BufferBox buf = tsunami->renderer->RenderAudioFile(a, _range);
+	BufferBox buf = tsunami->renderer->RenderAudioFile(a, range);
 	buf.get_16bit_buffer(data);
 	//int size = 4 * length;
 
@@ -274,7 +287,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	TestError("alGenBuffers (play)");
 
 	stream_pos = 0;
-	stream_size = _range.length();
+	stream_size = range.length();
 	stream_pos_0 = 0;
 	audio = a;
 	generate_func = NULL;
@@ -315,8 +328,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	}
 
 	playing = true;
-	start = _range.start();
-	pos = start;
+	pos = range.start();
 	loop = _loop;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
@@ -382,8 +394,8 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 	}
 
 	playing = true;
-	start = 0;
-	pos = start;
+	range = Range(0, 0);
+	pos = 0;
 	loop = false;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
@@ -397,16 +409,16 @@ bool AudioOutput::IsPlaying()
 	return playing;
 }
 
-int AudioOutput::GetPos(AudioFile * a)
+int AudioOutput::GetPos()
 {
-	if ((playing) && (audio == a)){
+	if (playing){
 		int param = 0;
 		alGetSourcei(source, AL_SOURCE_STATE, &param);
 		TestError("alGetSourcei1 (getpos)");
-		if (param == AL_PLAYING){
+		if ((param == AL_PLAYING) || (param == AL_PAUSED)){
 			alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
 			TestError("alGetSourcei2 (getpos)");
-			pos = start + stream_pos_0 + param;
+			pos = range.start() + stream_pos_0 + param;
 			return pos;
 		}
 	}
@@ -509,7 +521,7 @@ void AudioOutput::Update()
 		int param=0;
 		alGetSourcei(source,AL_SOURCE_STATE, &param);
 		TestError("alGetSourcei(state) (idle)");
-		if (param != AL_PLAYING){
+		if ((param != AL_PLAYING) && (param != AL_PAUSED)){
 			//msg_write("hat gestoppt...");
 			if (loop)
 				Play(audio, true);

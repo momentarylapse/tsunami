@@ -1,6 +1,6 @@
 t3
 // Number Of Resources
-16
+15
 // Resource
 Menu
 
@@ -560,7 +560,7 @@ menu
 0
 
 
-70
+71
 ItemPopup
 menu_file
 
@@ -1306,7 +1306,7 @@ ItemPopup
 menu_sound
 
 1
-5
+6
 0
 0
 0
@@ -1318,6 +1318,19 @@ menu_sound
 ItemImage
 play
 hui:media-play
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+pause
+hui:media-pause
 1
 0
 0
@@ -1909,216 +1922,6 @@ ms
 
 
 // Resource
-SizableDialog
-properties_dialog
-
-1
-375
-330
-0
-0
-0
-0
-0
-
-
-15
-ControlTable
-table_1
-
-1
-0
-0
-1
-7
--1
-0
-0
-
-
-Text
-pdp_general
-
-1
-0
-0
-0
-0
-0
-0
-0
-table_1
-
-Text
-pdp_preview
-
-1
-0
-2
-0
-0
-0
-0
-0
-table_1
-
-Text
-pdp_capture
-
-1
-0
-4
-0
-0
-0
-0
-0
-table_1
-
-ControlTable
-table_2
-
-1
-0
-1
-5
-2
-0
-0
-0
-table_1
-
-ControlTable
-table_3
-
-1
-0
-3
-2
-2
-0
-0
-0
-table_1
-
-ControlTable
-table_4
-
-1
-0
-5
-2
-2
-0
-0
-0
-table_1
-
-ControlTable
-table_5
-
-1
-0
-6
-2
-1
-0
-0
-0
-table_1
-
-Text
-pdt_oggrate
-
-1
-2
-1
-0
-0
-0
-0
-0
-table_2
-
-Text
-pdp_language
-
-1
-2
-0
-0
-0
-0
-0
-0
-table_2
-
-ComboBox
-ogg_bitrate
-
-1
-3
-1
-0
-0
-0
-0
-0
-table_2
-
-ComboBox
-language
-
-1
-3
-0
-0
-0
-0
-0
-0
-table_2
-
-Text
-kbitpersec
-
-1
-4
-1
-0
-0
-0
-0
-0
-table_2
-
-Text
-t_dummy
-
-1
-0
-0
-0
-0
-0
-0
-0
-table_5
-
-DefButton
-close
-hui:close
-1
-1
-0
-0
-0
-0
-0
-0
-table_5
-
-// Resource
 Dialog
 record_dialog
 
@@ -2303,7 +2106,7 @@ toolbar
 1
 
 
-14
+15
 Item
 new
 hui:new
@@ -2450,6 +2253,19 @@ hui:about
 Item
 play
 hui:media-play
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+Item
+pause
+hui:media-pause
 1
 0
 0
@@ -3132,7 +2948,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-167
+163
 // Text
 about
 Info
@@ -3302,6 +3118,8 @@ open
 Öffnen
 paste
 Einfügen
+pause
+Pause
 pdp_capture
 !bold\\Aufnahme
 pdp_general
@@ -3390,16 +3208,6 @@ t_dummy
 
 tab_control
 Daten\\Tags\\Spuren\\Effekte
-table_1
-ControlTable 1
-table_2
-!noexpandy
-table_3
-ControlTable 3
-table_4
-ControlTable 4
-table_5
-!noexpandy
 tags
 !format=TT\\Tag\\Wert
 td_table_1
@@ -3474,7 +3282,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-167
+163
 // Text
 about
 About
@@ -3644,6 +3452,8 @@ open
 Open...
 paste
 Paste
+pause
+
 pdp_capture
 !bold\\Recording
 pdp_general
@@ -3732,16 +3542,6 @@ t_dummy
 
 tab_control
 Data\\Tags\\Tracks\\Effects
-table_1
-
-table_2
-
-table_3
-
-table_4
-
-table_5
-
 tags
 !format=tT\\Tag\\Value
 td_table_1

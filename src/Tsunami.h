@@ -73,6 +73,7 @@ public:
 	void OnCloseFile();
 	void OnPlay();
 	void OnPlayLoop();
+	void OnPause();
 	void OnStop();
 	void OnVolume();
 	void OnRecord();

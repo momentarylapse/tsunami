@@ -66,6 +66,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("close_file", "hui:close", KEY_W + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnCloseFile);
 	HuiAddCommandM("play", "hui:media-play", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPlay);
 	HuiAddCommandM("play_loop", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPlayLoop);
+	HuiAddCommandM("pause", "hui:media-pause", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPause);
 	HuiAddCommandM("stop", "hui:media-stop", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnStop);
 	HuiAddCommandM("record", "hui:media-record", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRecord);
 	HuiAddCommandM("show_log", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnShowLog);
@@ -80,18 +81,19 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddControlTable("", 0, 0, 1, 2, "main_table");
 	SetTarget("main_table", 0);
 	SetBorderWidth(8);
-	AddControlTable("!noexpandy", 0, 1, 8, 1, "audio_table");
+	AddControlTable("!noexpandy", 0, 1, 9, 1, "audio_table");
 	SetTarget("audio_table", 0);
 	AddButton("", 0, 0, 0, 0, "play");
-	AddButton("", 1, 0, 0, 0, "stop");
-	AddDrawingArea("!width=100", 2, 0, 0, 0, "peaks");
+	AddButton("", 1, 0, 0, 0, "pause");
+	AddButton("", 2, 0, 0, 0, "stop");
+	AddDrawingArea("!width=100", 3, 0, 0, 0, "peaks");
 	peak_meter = new PeakMeter(this, "peaks", output);
-	AddSlider("!width=100", 3, 0, 0, 0, "volume_slider");
-	AddSpinButton("!width=50\\0\\0\\100", 4, 0, 0, 0, "volume");
-	AddText("!width=20\\%", 5, 0, 0, 0, "label_percent");
+	AddSlider("!width=100", 4, 0, 0, 0, "volume_slider");
+	AddSpinButton("!width=50\\0\\0\\100", 5, 0, 0, 0, "volume");
+	AddText("!width=20\\%", 6, 0, 0, 0, "label_percent");
 	volume_slider = new Slider(this, "volume_slider", "volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
-	AddButton("", 6, 0, 0, 0, "record");
-	AddComboBox("!width=100", 7, 0, 0, 0, "cur_level");
+	AddButton("", 7, 0, 0, 0, "record");
+	AddComboBox("!width=100", 8, 0, 0, 0, "cur_level");
 	AllowEvents("key");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);
@@ -332,6 +334,11 @@ void Tsunami::OnPlayLoop()
 void Tsunami::OnPlay()
 {
 	output->Play(cur_audio, output->PlayLoop);
+}
+
+void Tsunami::OnPause()
+{
+	output->Pause();
 }
 
 void Tsunami::OnStop()

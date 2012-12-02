@@ -29,10 +29,14 @@ public:
 	void Stop();
 	void Play(AudioFile *a, bool loop);
 	void PlayGenerated(void *func, int sample_rate);
+	void Pause();
 	void Update();
 
 	bool IsPlaying();
-	int GetPos(AudioFile * a);
+	bool IsPaused();
+	AudioFile *GetAudio(){	return audio;	}
+	Range GetRange(){	return range;	}
+	int GetPos();
 
 	float GetSampleRate();
 	BufferBox GetSomeSamples(int num_samples);
@@ -49,10 +53,11 @@ private:
 	float volume;
 	bool playing;
 	bool loop;
-	int start, pos;
+	int pos;
 	int sample_rate;
 
 	AudioFile *audio;
+	Range range;
 
 	typedef void generate_func_t(int, BufferBox &);
 	generate_func_t *generate_func;

@@ -125,6 +125,7 @@ enum{
 	m->AddSubMenu("Ansicht",HMM_MENU_VIEW,sub_menu_8830);
 		CHuiMenu *sub_menu_1782=new CHuiMenu();
 		sub_menu_1782->AddEntryImage("Abspielen",HuiImageMediaPlay,HMM_PLAY);
+		sub_menu_1782->AddEntryImage("Pause",HuiImageMediaPause,HMM_PAUSE);
 		sub_menu_1782->AddEntryImage("Stopp",HuiImageMediaStop,HMM_STOP);
 		sub_menu_1782->AddEntryCheckable("Schleife",HMM_PLAY_LOOP);
 		sub_menu_1782->AddSeparator();

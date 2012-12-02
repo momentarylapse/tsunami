@@ -362,6 +362,7 @@ void CHuiWindow::AddEdit(const string &title,int x,int y,int width,int height,co
 {
 	GetPartStrings(id, title);
 	GtkWidget *text = gtk_entry_new();
+	gtk_entry_set_width_chars(GTK_ENTRY(text), 3);
 	gtk_entry_set_text(GTK_ENTRY(text), sys_str(PartString[0]));
 	gtk_entry_set_activates_default(GTK_ENTRY(text), true);
 	g_signal_connect(G_OBJECT(text), "changed", G_CALLBACK(&OnGtkEditChange), this);

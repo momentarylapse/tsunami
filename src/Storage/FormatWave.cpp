@@ -75,7 +75,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 	f->ReadBuffer(header, 44);
 	if ((header[0] != 'R') or (header[1] != 'I') or (header[2] != 'F') or (header[3] != 'F'))
 		throw string("wave file does not start with \"RIFF\"");
-	if (*(int*)&header[4] != f->GetSize())
+	if (*(int*)&header[4] > f->GetSize())
 		tsunami->log->Warning(format("wave file gives wrong size: %d  (real: %d)", *(int*)&header[4], f->GetSize()));
 		// sometimes 0x2400ff7f
 	if ((header[8] != 'W') or (header[9] != 'A') or (header[10] != 'V') or (header[11] != 'E') or (header[12] != 'f') or (header[13] != 'm') or (header[14] != 't') or (header[15] != ' '))

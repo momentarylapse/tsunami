@@ -53,11 +53,13 @@ private:
 	float volume;
 	bool playing;
 	bool loop;
-	int pos;
 	int sample_rate;
 
 	AudioFile *audio;
 	Range range;
+	int stream_offset_next;
+	int stream_offset_current;
+	BufferBox box[2];
 
 	typedef void generate_func_t(int, BufferBox &);
 	generate_func_t *generate_func;
@@ -68,10 +70,8 @@ private:
 	void *al_context;
 	void *al_dev;
 	int buffer[2];
+	int cur_buffer_no;
 	unsigned int source;
-	int stream_pos;
-	int stream_size;
-	int stream_pos_0;
 
 	bool al_initialized;
 	int al_last_error;

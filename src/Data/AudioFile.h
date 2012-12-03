@@ -47,7 +47,7 @@ public:
 	void AddTag(const string &key, const string &value);
 
 	virtual void PostActionUpdate();
-	void UpdatePeaks();
+	void UpdatePeaks(int mode);
 	void InvalidateAllPeaks();
 
 	void SetCurSub(Track *s);

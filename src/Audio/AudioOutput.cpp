@@ -37,14 +37,9 @@ AudioOutput::AudioOutput() :
 	al_initialized = false;
 	al_last_error = AL_NO_ERROR;
 
-
-	pos = 0;
 	audio = NULL;
 	range = Range(0, 0);
 	generate_func = NULL;
-	stream_pos = 0;
-	stream_size = 0;
-	stream_pos_0 = 0;
 
 	playing = false;
 	loop = false;
@@ -228,30 +223,26 @@ void AudioOutput::Pause()
 bool AudioOutput::stream(int buf)
 {
 	msg_db_r("stream", 1);
+	BufferBox *b = (buf == buffer[0]) ? &box[0] : &box[1];
+	int size = 0;
 	if (audio){
-		int size = min(AL_BUFFER_SIZE, stream_size - stream_pos);
+		size = min(AL_BUFFER_SIZE, range.end() - stream_offset_next);
+		*b = tsunami->renderer->RenderAudioFile(audio, Range(stream_offset_next, size));
 		//msg_write(size);
-		if (size == 0){
-			msg_db_l(1);
-			return false;
-		}
-		alBufferData(buf, AL_FORMAT_STEREO16, &data[stream_pos * 2], size * 4, sample_rate);
-		TestError("alBufferData (stream)");
-		stream_pos += size;
 	}else if (generate_func){
-		BufferBox box;
-		box.resize(AL_BUFFER_SIZE);
-		(*generate_func)(stream_pos, box);
-		int size = box.num;
-		if (size == 0){
-			msg_db_l(1);
-			return false;
-		}
-		box.get_16bit_buffer(data);
-		alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
-		TestError("alBufferData (stream)");
-		stream_pos += size;
+		b->resize(AL_BUFFER_SIZE);
+		(*generate_func)(stream_offset_next, *b);
+		size = b->num;
 	}
+	if (size == 0){
+		msg_db_l(1);
+		return false;
+	}
+	b->get_16bit_buffer(data);
+	alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
+	TestError("alBufferData (stream)");
+	stream_offset_next += size;
+
 	msg_db_l(1);
 	return true;
 }
@@ -265,20 +256,9 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	if (!al_initialized)
 		Init();
 
-	range = a->GetRange();
-	if (!a->selection.empty())
-		range = a->selection;
-
-	//AudioFileToBuffer(a, true, true);
-	BufferBox buf = tsunami->renderer->RenderAudioFile(a, range);
-	buf.get_16bit_buffer(data);
-	//int size = 4 * length;
-
-
-	/*msg_write((int)buffer);
-	msg_write((int)PVData);
-	msg_write(size);
-	msg_write(a->sample_rate);*/
+	range = a->selection;
+	if (range.empty())
+		range = a->GetRange();
 
 	//
 	if (playing)
@@ -287,12 +267,11 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	alGenBuffers(2, (ALuint*)buffer);
 	TestError("alGenBuffers (play)");
 
-	stream_pos = 0;
-	stream_size = range.length();
-	stream_pos_0 = 0;
 	audio = a;
 	generate_func = NULL;
 	sample_rate = audio->sample_rate;
+	stream_offset_next = range.start();
+	stream_offset_current = range.start();
 
 	int num_buffers = 0;
 	if (stream(buffer[0]))
@@ -319,6 +298,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 		return;
 	}
 
+	cur_buffer_no = 0;
 	alSourceQueueBuffers(source, num_buffers, (ALuint*)buffer);
 	TestError("alSourceQueueBuffers (play)");
 
@@ -329,7 +309,6 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	}
 
 	playing = true;
-	pos = range.start();
 	loop = _loop;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
@@ -361,12 +340,11 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 	alGenBuffers(2, (ALuint*)buffer);
 	TestError("alGenBuffers (play)");
 
-	stream_pos = 0;
-	stream_size = -1;
-	stream_pos_0 = 0;
 	audio = NULL;
 	generate_func = (generate_func_t*)func;
 	sample_rate = _sample_rate;
+	stream_offset_next = range.start();
+	stream_offset_current = range.start();
 
 	int num_buffers = 0;
 	if (stream(buffer[0]))
@@ -385,6 +363,7 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 		return;
 	}
 
+	cur_buffer_no = 0;
 	alSourceQueueBuffers(source, num_buffers, (ALuint*)buffer);
 	TestError("alSourceQueueBuffers (play)");
 
@@ -396,7 +375,6 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 
 	playing = true;
 	range = Range(0, 0);
-	pos = 0;
 	loop = false;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
@@ -419,8 +397,7 @@ int AudioOutput::GetPos()
 		if ((param == AL_PLAYING) || (param == AL_PAUSED)){
 			alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
 			TestError("alGetSourcei2 (getpos)");
-			pos = range.start() + stream_pos_0 + param;
-			return pos;
+			return stream_offset_current + param;
 		}
 	}
 	return -1;
@@ -451,19 +428,7 @@ BufferBox AudioOutput::GetSomeSamples(int num_samples)
 		int dpos = 0;
 		alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
 
-		// translate relative to data
-		int pos_0 = dpos + (audio ? stream_pos : 0) - AL_BUFFER_SIZE * 2;
-		if (pos_0 < 0)
-			pos_0 = 0;
-
-		// data...
-		Array<short> tmp = data.sub(pos_0 * 2, num_samples * 2);
-
-		buf.resize(tmp.num / 2);
-		for (int i=0;i<tmp.num/2;i++){
-			buf.r[i] = fabs((float)tmp[i * 2    ] / 32768.0f);
-			buf.l[i] = fabs((float)tmp[i * 2 + 1] / 32768.0f);
-		}
+		buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
 	}
 	return buf;
 }
@@ -507,7 +472,8 @@ void AudioOutput::Update()
 		alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
 		TestError("alGetSourcei(processed) (idle)");
 		while(processed--){
-			stream_pos_0 += AL_BUFFER_SIZE;
+			cur_buffer_no = 1 - cur_buffer_no;
+			stream_offset_current += AL_BUFFER_SIZE;
 			ALuint buf;
 			alSourceUnqueueBuffers(source, 1, &buf);
 			TestError("alSourceUnqueueBuffers (idle)");

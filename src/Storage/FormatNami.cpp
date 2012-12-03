@@ -81,7 +81,8 @@ void WriteBufferBox(CFile *f, BufferBox *b)
 	f->WriteInt(16);
 
 	Array<short> data;
-	b->get_16bit_buffer(data);
+	if (!b->get_16bit_buffer(data))
+		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
 	f->WriteBuffer(data.data, data.num * sizeof(short));
 	EndChunk(f);
 }

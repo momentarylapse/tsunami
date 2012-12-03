@@ -34,6 +34,19 @@ PeakMeter::~PeakMeter()
 	Unsubscribe(source);
 }
 
+color peak_color(float peak)
+{
+	if (peak <= 1.001f)
+		return SetColorHSB(1, (1 - pow(peak, 3) * 0.7f) * 0.33f, 0.8f, 0.8f);
+	/*if (peak < 0.5f)
+		return color(1, 0, 0.8f, 0);
+	if (peak < 0.9f)
+		return color(1, 0.2f, 0.7f, 0);
+	if (peak < 1)
+		return color(1, 0.5f, 0.5f, 0);*/
+	return Red;
+}
+
 void PeakMeter::OnDraw()
 {
 	msg_db_r("PeakMeter.OnDraw", 1);
@@ -45,9 +58,10 @@ void PeakMeter::OnDraw()
 		//c->DrawRect(0, 0, w, h);
 		c->DrawRect(2, 2, w-4, h/2 - 2);
 		c->DrawRect(2, h/2 + 2, w-4, h - 2);
-		c->SetColor(SetColorHSB(1, (1 - peak_r) * 0.33f, 1, 1));
-		c->DrawRect(2, 2,       (float)(w - 4) * pow(peak_r, 0.5), h/2 - 2);
-		c->DrawRect(2, h/2 + 2, (float)(w - 4) * pow(peak_l, 0.5), h - 2);
+		c->SetColor(peak_color(peak_r));
+		c->DrawRect(2, 2,       (float)(w - 4) * min(pow(peak_r, 0.8), 1), h/2 - 2);
+		c->SetColor(peak_color(peak_l));
+		c->DrawRect(2, h/2 + 2, (float)(w - 4) * min(pow(peak_l, 0.8), 1), h - 2);
 	}else{
 		c->SetColor(White);
 		c->DrawRect(2, 2, w - 4, h - 4);

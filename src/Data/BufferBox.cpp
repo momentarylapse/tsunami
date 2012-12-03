@@ -6,7 +6,7 @@
  */
 
 #include "BufferBox.h"
-#include "../Tsunami.h"
+#include <math.h>
 #include <assert.h>
 
 
@@ -248,7 +248,7 @@ inline void set_data(short *data, float value)
 	*data = value_int;
 }
 
-void BufferBox::get_16bit_buffer(Array<short> &data)
+bool BufferBox::get_16bit_buffer(Array<short> &data)
 {
 	wtb_overflow = false;
 
@@ -259,9 +259,7 @@ void BufferBox::get_16bit_buffer(Array<short> &data)
 		set_data(b ++, l[i]);
 	}
 
-	if (wtb_overflow)
-		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
-		//msg_error("overflow");
+	return !wtb_overflow;
 }
 
 Range BufferBox::range()
@@ -333,7 +331,7 @@ inline float fabsmax(float a, float b, float c, float d)
 	return max(max(a, b), max(c, d));
 }
 
-void BufferBox::update_peaks()
+void BufferBox::update_peaks(int mode)
 {
 	// first level
 	if (peak.num < 2)
@@ -361,12 +359,12 @@ void BufferBox::update_peaks()
 			peak.resize(level + 2);
 		peak[level    ].resize(n);
 		peak[level + 1].resize(n);
-		if (tsunami->view->PeakMode == AudioView::PEAK_MODE_MAXIMUM){
+		if (mode == PEAK_MODE_MAXIMUM){
 			for (int i=i0;i<i1;i++){
 				peak[level    ][i] = shrink_max((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
 				peak[level + 1][i] = shrink_max((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
 			}
-		}else if (tsunami->view->PeakMode == AudioView::PEAK_MODE_SQUAREMEAN){
+		}else if (mode == PEAK_MODE_SQUAREMEAN){
 			for (int i=i0;i<i1;i++){
 				peak[level    ][i] = shrink_mean((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
 				peak[level + 1][i] = shrink_mean((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);

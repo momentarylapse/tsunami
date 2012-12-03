@@ -238,13 +238,13 @@ BufferBox Track::GetBuffers(int level_no, const Range &r)
 	return ReadBuffers(level_no, r);
 }
 
-void Track::UpdatePeaks()
+void Track::UpdatePeaks(int mode)
 {
 	foreach(TrackLevel &l, level)
 		foreach(BufferBox &b, l.buffer)
-			b.update_peaks();
+			b.update_peaks(mode);
 	foreach(Track &s, sub)
-		s.UpdatePeaks();
+		s.UpdatePeaks(mode);
 }
 
 void Track::InvalidateAllPeaks()

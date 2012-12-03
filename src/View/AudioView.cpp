@@ -46,7 +46,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2)
 	ScrollSpeed = HuiConfigReadInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = HuiConfigReadInt("View.ScrollSpeedFast", 3000);
 	ZoomSpeed = HuiConfigReadFloat("View.ZoomSpeed", 0.1f);
-	PeakMode = HuiConfigReadInt("View.PeakMode", PEAK_MODE_SQUAREMEAN);
+	PeakMode = HuiConfigReadInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
 
 
 	MousePossiblySelecting = -1;
@@ -994,8 +994,8 @@ void AudioView::UpdateMenu()
 	tsunami->Check("view_temp_file", ShowTempFile);
 	tsunami->Check("view_mono", ShowMono);
 	tsunami->Check("view_grid", ShowGrid);
-	tsunami->Check("view_peaks_max", PeakMode == PEAK_MODE_MAXIMUM);
-	tsunami->Check("view_peaks_mean", PeakMode == PEAK_MODE_SQUAREMEAN);
+	tsunami->Check("view_peaks_max", PeakMode == BufferBox::PEAK_MODE_MAXIMUM);
+	tsunami->Check("view_peaks_mean", PeakMode == BufferBox::PEAK_MODE_SQUAREMEAN);
 	tsunami->Enable("zoom_in", tsunami->cur_audio->used);
 	tsunami->Enable("zoom_out", tsunami->cur_audio->used);
 	tsunami->Enable("view_optimal", tsunami->cur_audio->used);
@@ -1004,11 +1004,11 @@ void AudioView::UpdateMenu()
 
 void AudioView::OnViewPeaksMax()
 {
-	PeakMode = PEAK_MODE_MAXIMUM;
+	PeakMode = BufferBox::PEAK_MODE_MAXIMUM;
 	for (int i=0;i<2;i++)
 		if (audio[i]->used){
 			audio[i]->InvalidateAllPeaks();
-			audio[i]->UpdatePeaks();
+			audio[i]->UpdatePeaks(PeakMode);
 		}
 	ForceRedraw();
 	UpdateMenu();
@@ -1016,11 +1016,11 @@ void AudioView::OnViewPeaksMax()
 
 void AudioView::OnViewPeaksMean()
 {
-	PeakMode = PEAK_MODE_SQUAREMEAN;
+	PeakMode = BufferBox::PEAK_MODE_SQUAREMEAN;
 	for (int i=0;i<2;i++)
 		if (audio[i]->used){
 			audio[i]->InvalidateAllPeaks();
-			audio[i]->UpdatePeaks();
+			audio[i]->UpdatePeaks(PeakMode);
 		}
 	ForceRedraw();
 	UpdateMenu();

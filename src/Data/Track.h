@@ -90,7 +90,7 @@ public:
 	Range GetRangeUnsafe();
 
 	void Reset();
-	void UpdatePeaks();
+	void UpdatePeaks(int mode);
 	void InvalidateAllPeaks();
 	BufferBox ReadBuffers(int level_no, const Range &r);
 	BufferBox ReadBuffersCol(const Range &r);

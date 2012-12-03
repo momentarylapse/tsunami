@@ -155,11 +155,6 @@ public:
 	int MouseMinMoveToSelect;
 	int PreviewSleepTime;
 
-	enum
-	{
-		PEAK_MODE_MAXIMUM,
-		PEAK_MODE_SQUAREMEAN
-	};
 	int PeakMode;
 
 	int DrawingWidth;

@@ -57,7 +57,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 			a->action_manager->Enable(true);
 			tsunami->progress->Set("peaks", 1);
-			a->UpdatePeaks();
+			a->UpdatePeaks(tsunami->view->PeakMode);
 
 			tsunami->progress->End();
 			tsunami->ForceRedraw();

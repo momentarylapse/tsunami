@@ -40,10 +40,16 @@ public:
 	void set_as_ref(const BufferBox &b, int offset, int length);
 	void import(void *data, int channels, int bits, int samples);
 
-	void get_16bit_buffer(Array<short> &data);
+	bool get_16bit_buffer(Array<short> &data);
+
+	enum
+	{
+		PEAK_MODE_MAXIMUM,
+		PEAK_MODE_SQUAREMEAN
+	};
 
 	void invalidate_peaks(const Range &r);
-	void update_peaks();
+	void update_peaks(int mode);
 };
 
 #endif /* BUFFERBOX_H_ */

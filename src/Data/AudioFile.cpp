@@ -305,12 +305,12 @@ Track *AudioFile::AddTimeTrack(int index)
 
 extern int debug_timer;
 
-void AudioFile::UpdatePeaks()
+void AudioFile::UpdatePeaks(int mode)
 {
 	msg_db_r("Audio.UpdatePeaks", 2);
 	HuiGetTime(debug_timer);
 	foreach(Track &t, track)
-		t.UpdatePeaks();
+		t.UpdatePeaks(mode);
 	msg_write(format("up %f", HuiGetTime(debug_timer)));
 	msg_db_l(2);
 }
@@ -318,7 +318,7 @@ void AudioFile::UpdatePeaks()
 
 void AudioFile::PostActionUpdate()
 {
-	UpdatePeaks();
+	UpdatePeaks(tsunami->view->PeakMode);
 }
 
 int AudioFile::GetNumSelectedSubs()

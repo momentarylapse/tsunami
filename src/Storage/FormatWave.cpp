@@ -83,8 +83,10 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 		throw string("\"WAVEfmt \" expected in wave file");
 	int header_size = *(int*)&header[16];
 	int format_code = *(short*)&header[20];
-	if (header_size != 16)
-		throw format("wave file gives header size %d (16 expected)", header_size);
+	if ((header_size != 16) && (header_size != 18) && (header_size != 40))
+		throw format("wave file gives header size %d (16, 18 or 40 expected)", header_size);
+	for (int i=0;i<header_size-16;i++)
+		f->ReadByte();
 	if ((format_code != 1) && (format_code != 3))
 		throw format("wave file has format %d (1 or 3 expected)", format_code);
 	int channels = *(short*)&header[22];

@@ -181,11 +181,11 @@ string ALError(int err)
 	return i2s(err);
 }
 
-void AudioOutput::Stop()
+void AudioOutput::stop_play()
 {
 	if (!playing)
 		return;
-	msg_db_r("Output.Stop", 1);
+
 	TestError("?  (prestop)");
 	alSourceStop(source);
 	TestError("alSourceStop (stop)");
@@ -197,11 +197,22 @@ void AudioOutput::Stop()
 		alSourceUnqueueBuffers(source, 1, &buf);
 		TestError(format("alSourceUnqueueBuffers(%d) (stop)", queued));
 	}
+}
+
+void AudioOutput::Stop()
+{
+	if (!playing)
+		return;
+	msg_db_r("Output.Stop", 1);
+
+	stop_play();
+
 	alDeleteBuffers(2, (ALuint*)buffer);
 	TestError("alDeleteBuffers (stop)");
 	buffer[0] = -1;
 	playing = false;
 	loop = false;
+	audio = NULL;
 
 	Notify("Stop");
 	msg_db_l(1);
@@ -247,31 +258,10 @@ bool AudioOutput::stream(int buf)
 	return true;
 }
 
-void AudioOutput::Play(AudioFile *a, bool _loop)
+void AudioOutput::start_play(int pos)
 {
-	/*if ((source < 0) || (buffer < 0))
-		return;*/
-	msg_db_r("PreviewPlay", 1);
-
-	if (!al_initialized)
-		Init();
-
-	range = a->selection;
-	if (range.empty())
-		range = a->GetRange();
-
-	//
-	if (playing)
-		Stop();
-
-	alGenBuffers(2, (ALuint*)buffer);
-	TestError("alGenBuffers (play)");
-
-	audio = a;
-	generate_func = NULL;
-	sample_rate = audio->sample_rate;
-	stream_offset_next = range.start();
-	stream_offset_current = range.start();
+	stream_offset_next = pos;
+	stream_offset_current = pos;
 
 	int num_buffers = 0;
 	if (stream(buffer[0]))
@@ -279,15 +269,6 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	if (stream(buffer[1]))
 		num_buffers ++;
 
-
-	/*alGetError();
-	alBufferData(buffer, AL_FORMAT_STEREO16, data, size, 44100);
-	if (TestError("alBufferData (play)")){
-		msg_db_l(1);
-		return;
-	}*/
-
-//	alSourcei (source, AL_BUFFER,   buffer);
 	alSourcef (source, AL_PITCH,    1.0f);
 	alSourcef (source, AL_GAIN,     volume);
 //	alSourcefv(source, AL_POSITION, SourcePos);
@@ -303,10 +284,32 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	TestError("alSourceQueueBuffers (play)");
 
 	alSourcePlay(source);
-	if (TestError("alSourcePlay (play)")){
-		msg_db_l(1);
+	if (TestError("alSourcePlay (play)"))
 		return;
-	}
+}
+
+void AudioOutput::Play(AudioFile *a, bool _loop)
+{
+	msg_db_r("PreviewPlay", 1);
+
+	if (!al_initialized)
+		Init();
+
+	range = a->selection;
+	if (range.empty())
+		range = a->GetRange();
+
+	if (playing)
+		Stop();
+
+	alGenBuffers(2, (ALuint*)buffer);
+	TestError("alGenBuffers (play)");
+
+	audio = a;
+	generate_func = NULL;
+	sample_rate = audio->sample_rate;
+
+	start_play(range.start());
 
 	playing = true;
 	loop = _loop;
@@ -319,21 +322,11 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 
 void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 {
-	/*if ((source < 0) || (buffer < 0))
-		return;*/
 	msg_db_r("PlayGenerated", 1);
 
 	if (!al_initialized)
 		Init();
 
-	data.clear();
-
-	/*msg_write((int)buffer);
-	msg_write((int)PVData);
-	msg_write(size);
-	msg_write(a->sample_rate);*/
-
-	//
 	if (playing)
 		Stop();
 
@@ -343,38 +336,11 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 	audio = NULL;
 	generate_func = (generate_func_t*)func;
 	sample_rate = _sample_rate;
-	stream_offset_next = range.start();
-	stream_offset_current = range.start();
+	range = Range(0, 0);
 
-	int num_buffers = 0;
-	if (stream(buffer[0]))
-		num_buffers ++;
-	if (stream(buffer[1]))
-		num_buffers ++;
-
-//	alSourcei (source, AL_BUFFER,   buffer);
-	alSourcef (source, AL_PITCH,    1.0f);
-	alSourcef (source, AL_GAIN,     volume);
-//	alSourcefv(source, AL_POSITION, SourcePos);
-//	alSourcefv(source, AL_VELOCITY, SourceVel);
-	alSourcei (source, AL_LOOPING,  false);
-	if (TestError("alSourcef... (play)")){
-		msg_db_l(1);
-		return;
-	}
-
-	cur_buffer_no = 0;
-	alSourceQueueBuffers(source, num_buffers, (ALuint*)buffer);
-	TestError("alSourceQueueBuffers (play)");
-
-	alSourcePlay(source);
-	if (TestError("alSourcePlay (play)")){
-		msg_db_l(1);
-		return;
-	}
+	start_play(0);
 
 	playing = true;
-	range = Range(0, 0);
 	loop = false;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
@@ -400,7 +366,14 @@ void AudioOutput::SetRangeEnd(int pos)
 
 void AudioOutput::Seek(int pos)
 {
-	// TODO
+	if (!playing)
+		return;
+	msg_db_r("Output.Seek", 1);
+
+	stop_play();
+
+	start_play(pos);
+	msg_db_l(1);
 }
 
 bool AudioOutput::IsPlaying()
@@ -511,7 +484,7 @@ void AudioOutput::Update()
 		if ((param != AL_PLAYING) && (param != AL_PAUSED)){
 			//msg_write("hat gestoppt...");
 			if (loop)
-				Play(audio, true);
+				Seek(range.start());
 			else
 				Stop();
 		}else{

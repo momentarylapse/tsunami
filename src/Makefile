@@ -15,9 +15,9 @@ install : all
 	cp -rf ../Plugins/*.kaba           /usr/share/tsunami/Plugins
 	xdg-desktop-menu install ../Data/michisoft-tsunami.desktop
 	xdg-mime install ../Data/michisoft-nami.xml
-	xdg-icon-resource install --context mimetypes --size  32 ../Data/Icons/32.png  application-michisoft-nami
-	xdg-icon-resource install --context mimetypes --size  48 ../Data/Icons/48.png  application-michisoft-nami
-	xdg-icon-resource install --context mimetypes --size  64 ../Data/Icons/64.png  application-michisoft-nami
+	xdg-icon-resource install --context mimetypes --size  32 ../Data/Icons/32.png  application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size  48 ../Data/Icons/48.png  application-michisoft-nami --noupdate
+	xdg-icon-resource install --context mimetypes --size  64 ../Data/Icons/64.png  application-michisoft-nami --noupdate
 	xdg-icon-resource install --context mimetypes --size 128 ../Data/Icons/128.png application-michisoft-nami
 	#xdg-icon-resource install --context mimetypes ../Data/Icons/tsunami.svg application-michisoft-nami
 	cp $(BIN) /usr/bin

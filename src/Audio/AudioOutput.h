@@ -52,6 +52,9 @@ private:
 	bool TestError2(const string &msg, void *d);
 	bool stream(int buf);
 
+	void stop_play();
+	void start_play(int pos);
+
 
 	float volume;
 	bool playing;

@@ -37,6 +37,9 @@ public:
 	AudioFile *GetAudio(){	return audio;	}
 	Range GetRange(){	return range;	}
 	int GetPos();
+	void SetRangeStart(int pos);
+	void SetRangeEnd(int pos);
+	void Seek(int pos);
 
 	float GetSampleRate();
 	BufferBox GetSomeSamples(int num_samples);

@@ -16,6 +16,9 @@ void fill(int pos, BufferBox buf)
 	int sm_m = dt_m * SAMPLE_RATE
 	int sm_d = length * SAMPLE_RATE
 	
+	buf.r = 0
+	buf.l = 0
+	
 	for int i, 0, buf.num
 		int ii = (i + pos)
 		if loopi(ii, 0, sm_m) < sm_d

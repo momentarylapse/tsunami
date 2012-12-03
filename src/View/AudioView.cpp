@@ -336,18 +336,20 @@ void AudioView::OnMouseMove()
 			w = - HuiGetEvent()->dx - 2*r;
 		}
 		tsunami->RedrawRect("area", x, Selection.audio->y, w, Selection.audio->height);
+	}else if (Selection.type == SEL_TYPE_PLAYBACK_START){
+		tsunami->output->SetRangeStart(Selection.pos);
+		_force_redraw_ = true;
+	}else if (Selection.type == SEL_TYPE_PLAYBACK_END){
+		tsunami->output->SetRangeEnd(Selection.pos);
+		_force_redraw_ = true;
+	}else if (Selection.type == SEL_TYPE_PLAYBACK){
+		tsunami->output->Seek(Selection.pos);
+		_force_redraw_ = true;
 	}else if (Selection.type == SEL_TYPE_SUB){
 		ApplyBarriers(Selection.pos);
 		int dpos = (float)Selection.pos - Selection.sub_offset - Selection.sub->pos;
 		if (cur_action)
 			cur_action->set_param_and_notify(tsunami->cur_audio, dpos);
-		/*foreach(tsunami->cur_audio->track, tt){
-			foreach(tt.sub, s){
-				if (s.is_selected)
-					s.pos += dpos;
-			}
-		}*/
-		//ChangeTrack(cur_sub);
 		_force_redraw_ = true;
 	}
 

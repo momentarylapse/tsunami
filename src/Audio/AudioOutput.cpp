@@ -383,6 +383,26 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 	msg_db_l(1);
 }
 
+void AudioOutput::SetRangeStart(int pos)
+{
+	if (pos < range.end()){
+		range.num = range.end() - pos;
+		range.offset = pos;
+	}
+}
+
+void AudioOutput::SetRangeEnd(int pos)
+{
+	if (pos > range.start()){
+		range.num = pos - range.start();
+	}
+}
+
+void AudioOutput::Seek(int pos)
+{
+	// TODO
+}
+
 bool AudioOutput::IsPlaying()
 {
 	return playing;

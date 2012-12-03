@@ -129,6 +129,8 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	log->Info("Tsunami " + AppVersion + _(" - viel Erfolg!"));
 
+	audio[0]->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
+
 	HandleArguments(arg);
 
 	Update();

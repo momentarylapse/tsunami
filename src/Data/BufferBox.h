@@ -40,6 +40,8 @@ public:
 	void set_as_ref(const BufferBox &b, int offset, int length);
 	void import(void *data, int channels, int bits, int samples);
 
+	void add_click(int pos, float volume, float freq, int sample_rate);
+
 	bool get_16bit_buffer(Array<short> &data);
 
 	enum

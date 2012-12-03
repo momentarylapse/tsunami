@@ -45,6 +45,7 @@ class BufferBox
 	string peak[]
 	extern void __assign__(BufferBox other)
 	extern void clear()
+	extern void add_click(int pos, float volume, float freq, int sample_rate)
 
 class TrackRenderBuffer
 	int dummy

@@ -114,6 +114,7 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
 	ScriptLinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
 	ScriptLinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
+	ScriptLinkSemiExternalFunc("BufferBox.add_click",(void*)&BufferBox::add_click);
 	ScriptLinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
 	ScriptLinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
 	ScriptLinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);

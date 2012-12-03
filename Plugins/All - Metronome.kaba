@@ -7,7 +7,6 @@
 class PluginData
 	float BeatsPerMinute
 	float Frequency
-	float Length
 	float Volume
 
 PluginData data
@@ -19,34 +18,20 @@ void ProcessTrack(BufferBox buf, Track t, int level)
 	AudioFile *a = t.root
 
 	float dt_m = 60.0 / data.BeatsPerMinute
-	float f = data.Frequency
 
 	int sm_m = dt_m * a.sample_rate
-	int sm_d = data.Length * a.sample_rate
-	float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
 
 	int nm = buf.num / sm_m + 1
 	for int m, 0, nm
-		for int i, 0, sm_d
-			float fi = i2f(i) / sm_d
-			float envelope = 1 //sin(fi * pi)
-			
-			float tt = i * w_f
-			int j = m * sm_m + i
-			if j < buf.num
-				float d = sin(tt) * data.Volume * envelope
-				buf.r[j] = clamp(buf.r[j] + d, -1, 1)
-				buf.l[j] = clamp(buf.l[j] + d, -1, 1)
+		buf.add_click(m * sm_m, data.Volume, data.Frequency, a.sample_rate)
 
 void ResetData()
 	data.Volume = 0.3
 	data.BeatsPerMinute = 90
 	data.Frequency = 880
-	data.Length = 0.02
 
 void DataToDialog()
 	dlg.SetFloat("beats_per_minute", data.BeatsPerMinute)
-	dlg.SetFloat("length", data.Length * 1000)
 	dlg.SetFloat("frequency", data.Frequency)
 	dlg.SetFloat("volume", data.Volume * 100)
 	//SliderSet(dlg, "volume", data.Volume)
@@ -57,36 +42,29 @@ void OnMetroBeats()
 void OnMetroFrequency()
 	data.Frequency = dlg.GetFloat("")
 
-void OnMetroLength()
-	data.Length = dlg.GetFloat("") / 1000
-
 void OnMetroVolume()
 	data.Volume = dlg.GetFloat("") / 100
 	//data.Volume = SliderGet(dlg, "volume")
 
 void Configure()
 	// dialog
-	dlg=HuiCreateDialog("Metronom",255,165,MainWin,false)
+	dlg=HuiCreateDialog("Metronom",255,135,MainWin,false)
 	dlg.AddText("Geschwindigkeit:",5,5,100,25,"")
 	dlg.AddSpinButton("\\0\\1000\\0.1",110,5,100,25,"beats_per_minute")
 	dlg.AddText("/min",215,5,30,25,"")
-	dlg.AddText("Tondauer:",5,35,100,25,"")
-	dlg.AddSpinButton("\\0",110,35,100,25,"length")
-	dlg.AddText("ms",215,35,30,25,"")
-	dlg.AddText("Tonfrequenz:",5,65,100,25,"")
-	dlg.AddSpinButton("\\0\\10000\\0.1",110,65,100,25,"frequency")
-	dlg.AddText("Hz",215,65,30,25,"")
-	dlg.AddText("Lautstärke:",5,95,100,25,"")
-	dlg.AddSpinButton("\\0\\100\\0.1",110,95,100,25,"volume")
-	dlg.AddText("%",215,95,30,25,"")
-	PutCommandBarFixed(dlg, 5, 130, 255)
+	dlg.AddText("Tonfrequenz:",5,35,100,25,"")
+	dlg.AddSpinButton("\\0\\10000\\0.1",110,35,100,25,"frequency")
+	dlg.AddText("Hz",215,35,30,25,"")
+	dlg.AddText("Lautstärke:",5,65,100,25,"")
+	dlg.AddSpinButton("\\0\\100\\0.1",110,65,100,25,"volume")
+	dlg.AddText("%",215,65,30,25,"")
+	PutCommandBarFixed(dlg, 5, 100, 255)
 	dlg.Update()
 
 	dlg.SetDecimals(1)
 	
 	dlg.Event("beats_per_minute", &OnMetroBeats)
 	dlg.Event("frequency", &OnMetroFrequency)
-	dlg.Event("length", &OnMetroLength)
 	dlg.Event("volume", &OnMetroVolume)
 	
 	DataToDialog()

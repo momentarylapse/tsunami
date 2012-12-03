@@ -11,19 +11,16 @@ float bpm
 float volume
 
 void fill(int pos, BufferBox buf)
-	float w_f = 1.0 / i2f(SAMPLE_RATE) * freq * 2.0 * pi
 	float dt_m = 60.0 / bpm
 	int sm_m = dt_m * SAMPLE_RATE
-	int sm_d = length * SAMPLE_RATE
 	
 	buf.r = 0
 	buf.l = 0
 	
-	for int i, 0, buf.num
-		int ii = (i + pos)
-		if loopi(ii, 0, sm_m) < sm_d
-			buf.r[i] = sin(ii * w_f) * volume
-			buf.l[i] = sin(ii * w_f) * volume
+	int num_clicks = buf.num / sm_m + 2
+	
+	for int i, -1, num_clicks
+		buf.add_click(i * sm_m - (pos % sm_m), volume, freq, SAMPLE_RATE)
 
 void OnBpm()
 	bpm = dlg.GetFloat("")

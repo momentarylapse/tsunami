@@ -228,6 +228,25 @@ void BufferBox::import(void *data, int channels, int bits, int samples)
 }
 
 
+void BufferBox::add_click(int pos, float volume, float freq, int sample_rate)
+{
+	int sm_d = 0.06f * sample_rate;
+	float w_f = 1.0 / sample_rate * freq * 2.0 * 3.14159265358979f;
+
+	for (int i=0; i<sm_d; i++){
+		float fi = (float)i / (float)sm_d;
+		float envelope = 1 - fi;
+		float tt = i * w_f;
+		int j = i + pos;// - offset;
+		if ((j >= 0) && (j < num)){
+			float d = sin(tt) * volume * envelope;
+			r[j] += d;
+			l[j] += d;
+		}
+	}
+}
+
+
 #define val_max		32766
 #define val_alert	32770
 

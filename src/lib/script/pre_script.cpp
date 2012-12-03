@@ -2307,7 +2307,14 @@ void CPreScript::ParseClass()
 	next_exp();
 
 	// create class and type
+	int nt0 = Type.num;
 	sType *t = CreateNewType(name, 0, false, false, false, 0, NULL);
+	if (nt0 == Type.num){
+		rewind_exp();
+		DoError("class already exists");
+		msg_db_l(4);
+		return;
+	}
 
 	// parent class
 	if (cur_name == ":"){

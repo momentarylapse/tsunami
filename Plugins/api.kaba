@@ -22,7 +22,7 @@ const int NUM_PEAK_LEVELS = 24
 class EffectParam
 	string name, type, value
 
-class Effect
+class AudioEffect
 	string filename
 	EffectParam param[]
 	bool only_on_selection
@@ -85,7 +85,7 @@ class Track
 	int rep_num
 	int rep_delay
 	
-	Effect fx[]
+	AudioEffect fx[]
 	Sub sub[]
 	int cur_sub
 	
@@ -128,7 +128,7 @@ class AudioFile
 
 	float volume
 	
-	Effect fx[]
+	AudioEffect fx[]
 	Track track[]
 
 	int x, y, width, height

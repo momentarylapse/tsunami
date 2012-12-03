@@ -21,7 +21,7 @@
 	#include "../x/x.h"
 #endif
 
-string ScriptVersion = "0.10.2.0";
+string ScriptVersion = "0.10.2.1";
 
 //#define ScriptDebug
 

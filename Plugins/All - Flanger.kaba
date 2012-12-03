@@ -15,9 +15,27 @@ class PluginData
 
 PluginData data
 
-float temp[]
-int delay_samples
-AudioFile *a
+void ResetData()
+	data.Depth = 0.5
+	data.Speed = 0.3
+	data.Delay = 0.01
+
+class PluginState
+	float temp_r[]
+	float temp_l[]
+	int delay_samples
+
+PluginState state
+
+void InitState(Track t)
+	AudioFile *a = t.root
+	state.delay_samples = a.sample_rate * data.Delay + 1
+	state.temp_r.resize(state.delay_samples)
+	state.temp_l.resize(state.delay_samples)
+
+void ClearState()
+	state.temp_r.clear()
+	state.temp_l.clear()
 
 void OnSpeed()
 	data.Speed = SliderGet(FlangerDialog, "speed")
@@ -28,39 +46,32 @@ void OnDepth()
 void OnDelay()
 	data.Delay = SliderGet(FlangerDialog, "delay")
 
-/*void FlangerDialogFunction(int message)
-	DoSlider(FlangerDialog, message, HMM_SPEED_SLIDER, HMM_SPEED, 0, 2,    &data.Speed, 1,    0, 0)
-	DoSlider(FlangerDialog, message, HMM_DEPTH_SLIDER, HMM_DEPTH, 0, 1,    &data.Depth, 100,  0, 0)
-	DoSlider(FlangerDialog, message, HMM_DELAY_SLIDER, HMM_DELAY, 0, 0.02, &data.Delay, 1000, 0, 0)
-	PluginDefaultHandler(message)*/
-
-void DoFlanger(float b[])
+void DoFlanger(float b[], float temp[], int sample_rate)
 	temp = 0
-	int i
 	int p = 0
 	
 	float f_a = (1 - 0.5 * data.Depth) * data.Delay
 	float f_b = 0.5 * data.Depth * data.Delay
-	float f_c = 1.0 / a.sample_rate * 2 * pi * data.Speed
+	float f_c = 1.0 / sample_rate * 2 * pi * data.Speed
 	
-	for i, 0, b.num
+	for int i, 0, b.num
 	
 		// old value
 		temp[p] = b[i]
 		
 		// shift
 		float dt = f_a - cos(i * f_c) * f_b
-		int dp = dt * a.sample_rate
+		int dp = dt * sample_rate
 		int p2 = p - dp
 		if p2 < 0
-			p2 += delay_samples
+			p2 += state.delay_samples
 		
 		// add echo
 		b[i] += temp[p2]
 		//clampf(b[i], -1, 1)
 		
 		p ++
-		if p >= delay_samples
+		if p >= state.delay_samples
 			p = 0
 
 void DataToDialog()
@@ -70,11 +81,6 @@ void DataToDialog()
 	/*SetSlider(FlangerDialog, HMM_SPEED_SLIDER, HMM_SPEED, 0, 2,    data.Speed, 1)
 	SetSlider(FlangerDialog, HMM_DEPTH_SLIDER, HMM_DEPTH, 0, 1,    data.Depth, 100)
 	SetSlider(FlangerDialog, HMM_DELAY_SLIDER, HMM_DELAY, 0, 0.02, data.Delay, 1000)*/
-
-void ResetData()
-	data.Depth = 0.5
-	data.Speed = 0.3
-	data.Delay = 0.01
 
 void Configure()
 	// dialog
@@ -106,12 +112,11 @@ void Configure()
 	HuiWaitTillWindowClosed(FlangerDialog)
 	
 void ProcessTrack(BufferBox buf, Track t, int level)
-	a = t.root
-	delay_samples = a.sample_rate * data.Delay + 1
-	temp.resize(delay_samples)
-		
-	DoFlanger(buf.r)
-	DoFlanger(buf.l)
+	InitState(t)
 	
-	temp.clear()
+	AudioFile *a = t.root
+	DoFlanger(buf.r, state.temp_r, a.sample_rate)
+	DoFlanger(buf.l, state.temp_l, a.sample_rate)
+	
+	ClearState()
 

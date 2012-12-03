@@ -74,7 +74,7 @@ string get_name(int tone)
 		name = "A#"
 	if (pitch == 11)
 		name = "H"
-	return name + "\t" + octave + "\t(" + f2s(get_freq(tone), 1) + " Hz)"
+	return name + "\t" + octave + "\t(" + get_freq(tone).str2(1) + " Hz)"
 
 void Configure()
 	// dialog

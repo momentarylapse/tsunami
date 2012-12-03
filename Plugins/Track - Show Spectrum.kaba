@@ -105,7 +105,7 @@ void show_spec()
 		float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
 		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
 		int j0 = fmin * ww
-		int j1 = fmax * ww
+		int j1 = fmax * ww + 1
 		j0 = clamp(j0, 0, len2)
 		j1 = clamp(j1, 0, len2)
 		float bmaxr = 0

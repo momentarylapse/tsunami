@@ -70,6 +70,17 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t, const R
 	// silence... TODO...
 	buf.resize(r.length());
 
+	foreach(BarCollection &bc, t.bar_col){
+		int pos0 = bc.pos;
+		foreach(TimeBar &b, bc.bar){
+			for (int i=0;i<b.num_beats;i++){
+				int pos = pos0 + i * b.length / b.num_beats;
+				buf.add_click(pos - r.offset, 0.7f, (i == 0) ? 880.0f : 660.0f, t.root->sample_rate);
+			}
+			pos0 += b.length;
+		}
+	}
+
 	msg_db_l(1);
 }
 

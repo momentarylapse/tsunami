@@ -43,7 +43,13 @@ class Bar
 public:
 	int num_beats;
 	int length;
-	int type; // reserved
+	int type;
+	int count;
+
+	enum{
+		TYPE_BAR,
+		TYPE_PAUSE
+	};
 
 	// editing
 	bool is_selected;

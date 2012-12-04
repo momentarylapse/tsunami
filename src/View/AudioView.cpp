@@ -700,23 +700,29 @@ void AudioView::DrawSub(HuiDrawingContext *c, int x, int y, int width, int heigh
 void AudioView::DrawBars(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, Array<Bar> &bc)
 {
 	int x0 = 0;
+	int n = 1;
 	foreachi(Bar &bar, bc, i){
 		bar.x     = a->sample2screen(x0);
-		bar.width = a->sample2screen(x0 + bar.length) - bar.x;
-		if ((bar.x >= x) && (bar.x < x + width)){
-			c->SetColor(col);
-			c->DrawStr(bar.x + 2, y + height/2, i2s(i + 1));
-		}
-		for (int i=0;i<bar.num_beats;i++){
-			color cc = (i == 0) ? Red : col;
-			c->SetColor(cc);
+		bar.width = a->sample2screen(x0 + bar.length * bar.count) - bar.x;
+		if (bar.type == bar.TYPE_BAR){
+			for (int j=0;j<bar.count;j++){
+				for (int i=0;i<bar.num_beats;i++){
+					int bx = a->sample2screen(x0 + (int)((float)bar.length * i / bar.num_beats));
 
-			int bx = a->sample2screen(x0 + (int)((float)bar.length * i / bar.num_beats));
+					color cc = (i == 0) ? Red : col;
+					c->SetColor(cc);
+					if (i == 0)
+						c->DrawStr(bx + 2, y + height/2, i2s(n));
 
-			if ((bx >= x) && (bx < x + width))
-				c->DrawLine(bx, y, bx, y + height);
+					if ((bx >= x) && (bx < x + width))
+						c->DrawLine(bx, y, bx, y + height);
+				}
+				x0 += bar.length;
+				n ++;
+			}
+		}else if (bar.type == bar.TYPE_PAUSE){
+			x0 += bar.length;
 		}
-		x0 += bar.length;
 	}
 }
 

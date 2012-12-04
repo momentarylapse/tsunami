@@ -114,6 +114,7 @@ void WriteBar(CFile *f, Bar &b)
 	f->WriteInt(b.type);
 	f->WriteInt(b.length);
 	f->WriteInt(b.num_beats);
+	f->WriteInt(b.count);
 	f->WriteInt(0); // reserved
 
 	EndChunk(f);
@@ -137,8 +138,8 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteStr(t->name);
 	f->WriteFloat(t->volume);
 	f->WriteBool(t->muted);
+	f->WriteInt(t->type);
 	f->WriteInt(0); // reserved
-	f->WriteInt(0);
 	f->WriteInt(0);
 	f->WriteInt(0);
 
@@ -586,6 +587,7 @@ void ReadChunkBar(CFile *f, Array<Bar> *bar)
 	b.type = f->ReadInt();
 	b.length = f->ReadInt();
 	b.num_beats = f->ReadInt();
+	b.count = f->ReadInt();
 	f->ReadInt(); // reserved
 	bar->add(b);
 }
@@ -602,8 +604,8 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	t->name = f->ReadStr();
 	t->volume = f->ReadFloat();
 	t->muted = f->ReadBool();
+	t->type = f->ReadInt();
 	f->ReadInt(); // reserved
-	f->ReadInt();
 	f->ReadInt();
 	f->ReadInt();
 	tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());

@@ -181,17 +181,6 @@ void Tsunami::OnAddTrack()
 void Tsunami::OnAddTimeTrack()
 {
 	Track *t = cur_audio->AddTimeTrack();
-	if (t){
-		// example data...
-		Bar b;
-		b.num_beats = 4;
-		b.length = 90000;
-		t->bar.add(b);
-		t->bar.add(b);
-		t->bar.add(b);
-		t->bar.add(b);
-		t->bar.add(b);
-	}
 }
 
 void Tsunami::OnDeleteTrack()

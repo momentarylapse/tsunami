@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-135
+142
 // Data (ID,Text)
 about
 About
@@ -13,6 +13,10 @@ ad_table_5
 
 ad_table_7
 
+add_bar
+
+add_bar_pause
+
 add_effect
 
 add_tag
@@ -21,6 +25,8 @@ add_time_track
 
 add_track
 Add Track
+bar_list
+
 cancel
 Cancel
 capture_delete
@@ -45,6 +51,8 @@ cut_out
 Cut out
 delete
 Delete
+delete_bar
+
 delete_effect
 Delete
 delete_tag
@@ -75,6 +83,8 @@ jump_other_file
 Jump into other file
 kbitpersec
 kbit/s
+ld_t_bars
+
 ld_t_effects
 !bold\\Effects
 ld_t_name
@@ -217,6 +227,8 @@ tags
 !format=tT\\Tag\\Value
 td_table_1
 
+td_table_10
+
 td_table_2
 
 td_table_3
@@ -235,6 +247,8 @@ track_list
 Track
 track_properties
 Properties
+track_time_dialog
+
 trackdest_dialog
 Destination track
 undo

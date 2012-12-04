@@ -71,13 +71,18 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t, const R
 	buf.resize(r.length());
 
 	int pos0 = 0;
-	foreach(Bar &b, t.bar){
-		for (int i=0;i<b.num_beats;i++){
-			int pos = pos0 + i * b.length / b.num_beats;
-			buf.add_click(pos - r.offset, 0.7f, (i == 0) ? 880.0f : 660.0f, t.root->sample_rate);
+	foreach(Bar &b, t.bar)
+		if (b.type == b.TYPE_BAR){
+			for (int j=0;j<b.count;j++){
+				for (int i=0;i<b.num_beats;i++){
+					int pos = pos0 + i * b.length / b.num_beats;
+					buf.add_click(pos - r.offset, 0.7f, (i == 0) ? 880.0f : 660.0f, t.root->sample_rate);
+				}
+				pos0 += b.length;
+			}
+		}else if (b.type == b.TYPE_PAUSE){
+			pos0 += b.length;
 		}
-		pos0 += b.length;
-	}
 
 	msg_db_l(1);
 }

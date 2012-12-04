@@ -50,18 +50,11 @@ class BufferBox
 class TrackRenderBuffer
 	int dummy
 	
-class TimeBar
+class Bar
 	int num_beats
 	int length
 	int type
-	
-	bool is_selected
-	int x, width
-
-class BarCollection
-	int pos
-	int length
-	TimeBar bar[]
+	int count
 	
 	bool is_selected
 	int x, width
@@ -91,7 +84,7 @@ class Track
 	int cur_sub
 	
 	// time track
-	BarCollection bar_col[]
+	Bar bar[]
 
 	// editing
 	int x, y, width, height

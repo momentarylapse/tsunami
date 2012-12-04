@@ -6,12 +6,19 @@
  */
 
 #include "TrackDialog.h"
+#include "../../Data/Track.h"
+#include "Slider.h"
+#include "FxList.h"
+#include "BarList.h"
 
 TrackDialog::TrackDialog(CHuiWindow *_parent, bool _allow_parent, Track *t):
 	CHuiWindow("dummy", -1, -1, 200, 300, _parent, _allow_parent, HuiWinModeControls | HuiWinModeResizable, true)
 {
 	track = t;
-	FromResource("track_dialog");
+	if (t->type == Track::TYPE_TIME)
+		FromResource("track_time_dialog");
+	else
+		FromResource("track_dialog");
 
 	SetString("name", t->name);
 	SetDecimals(1);
@@ -19,6 +26,9 @@ TrackDialog::TrackDialog(CHuiWindow *_parent, bool _allow_parent, Track *t):
 	volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, t->volume);
 	volume_slider->Enable(!t->muted);
 	fx_list = new FxList(this, "fx_list", "add_effect", "configure_effect", "delete_effect", t->fx);
+	bar_list = NULL;
+	if (t->type == Track::TYPE_TIME)
+		bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", t->bar, t->root->sample_rate);
 
 	EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
 	EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
@@ -30,6 +40,8 @@ TrackDialog::~TrackDialog()
 {
 	delete(volume_slider);
 	delete(fx_list);
+	if (bar_list)
+		delete(bar_list);
 }
 
 void TrackDialog::OnName()

@@ -22,9 +22,9 @@ void fill(int pos, BufferBox buf)
 	for int i, -1, num_clicks
 		int n = pos / sm_m + i
 		if (n % 4) == 0
-			buf.add_click(i * sm_m - (pos % sm_m), volume, freq, SAMPLE_RATE)
+			buf.add_click(i * sm_m - (pos % sm_m), volume, freq*0.75, SAMPLE_RATE)
 		else
-			buf.add_click(i * sm_m - (pos % sm_m), volume, freq * 0.66, SAMPLE_RATE)
+			buf.add_click(i * sm_m - (pos % sm_m), volume*0.33, freq, SAMPLE_RATE)
 
 void OnBpm()
 	bpm = dlg.GetFloat("")

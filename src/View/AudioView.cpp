@@ -812,17 +812,30 @@ void AudioView::OnUpdate(Observable *o)
 
 void plan_track_sizes(int y, int height, AudioFile *a, int TIME_SCALE_HEIGHT)
 {
-	int track_height = (height - TIME_SCALE_HEIGHT) / (a->track.num);
-	if (track_height > MAX_TRACK_HEIGHT){
-		foreachi(Track &t, a->track, i){
-			t.y = y + TIME_SCALE_HEIGHT + i * MAX_TRACK_HEIGHT;
-			t.height = MAX_TRACK_HEIGHT;
+	int opt_track_height = MAX_TRACK_HEIGHT;
+	if (tsunami->view->ShowMono)
+		opt_track_height /= 2;
+
+	int h_wish = TIME_SCALE_HEIGHT;
+	int h_fix = TIME_SCALE_HEIGHT;
+	int n_var = 0;
+	foreach(Track &t, a->track){
+		if (t.type == t.TYPE_TIME){
+			h_wish += TIME_SCALE_HEIGHT * 2;
+			h_fix += TIME_SCALE_HEIGHT * 2;
+		}else{
+			h_wish += opt_track_height;
+			n_var ++;
 		}
-	}else{
-		foreachi(Track &t, a->track, i){
-			t.y = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * i);
-			t.height = (int)((float)y + TIME_SCALE_HEIGHT + (float)(height - TIME_SCALE_HEIGHT) / (float)a->track.num * (i + 1)) - t.y;
-		}
+	}
+
+	int y0 = y + TIME_SCALE_HEIGHT;
+	if (h_wish > height)
+		opt_track_height = (height - h_fix) / n_var;
+	foreachi(Track &t, a->track, i){
+		t.y = y0;
+		t.height = (t.type == t.TYPE_TIME) ? TIME_SCALE_HEIGHT*2 : opt_track_height;
+		y0 += t.height;
 	}
 }
 

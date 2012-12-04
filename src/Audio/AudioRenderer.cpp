@@ -76,7 +76,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t, const R
 			for (int j=0;j<b.count;j++){
 				for (int i=0;i<b.num_beats;i++){
 					int pos = pos0 + i * b.length / b.num_beats;
-					buf.add_click(pos - r.offset, 0.7f, (i == 0) ? 880.0f : 660.0f, t.root->sample_rate);
+					buf.add_click(pos - r.offset, (i == 0) ? 0.7f : 0.35f, (i == 0) ? 660.0f : 880.0f, t.root->sample_rate);
 				}
 				pos0 += b.length;
 			}

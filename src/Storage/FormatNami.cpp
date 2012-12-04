@@ -107,6 +107,18 @@ void WriteSubTrack(CFile *f, Track *s)
 	EndChunk(f);
 }
 
+void WriteBar(CFile *f, Bar &b)
+{
+	BeginChunk(f, "bar");
+
+	f->WriteInt(b.type);
+	f->WriteInt(b.length);
+	f->WriteInt(b.num_beats);
+	f->WriteInt(0); // reserved
+
+	EndChunk(f);
+}
+
 void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
 {
 	BeginChunk(f, "level");
@@ -129,6 +141,9 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0);
 	f->WriteInt(0);
 	f->WriteInt(0);
+
+	foreach(Bar &b, t->bar)
+		WriteBar(f, b);
 
 	foreachi(TrackLevel &l, t->level, i)
 		WriteTrackLevel(f, &l, i);
@@ -565,6 +580,16 @@ void ReadChunkSub(CFile *f, Track *t)
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSubBufferBox, &s->level[0].buffer[0]);
 }
 
+void ReadChunkBar(CFile *f, Array<Bar> *bar)
+{
+	Bar b;
+	b.type = f->ReadInt();
+	b.length = f->ReadInt();
+	b.num_beats = f->ReadInt();
+	f->ReadInt(); // reserved
+	bar->add(b);
+}
+
 void ReadChunkTrackLevel(CFile *f, Track *t)
 {
 	int l = f->ReadInt();
@@ -587,6 +612,7 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
 	AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
 	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &t->fx);
+	AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
 }
 
 void ReadChunkNami(CFile *f, AudioFile *a)

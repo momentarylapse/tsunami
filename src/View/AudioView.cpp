@@ -266,13 +266,11 @@ void AudioView::SetBarriers(AudioFile *a, SelectionType *s)
 		}
 
 		// time bar...
-		foreach(BarCollection &bc, t.bar_col){
-			int x0 = bc.pos;
-			foreach(TimeBar &b, bc.bar){
-				for (int i=0;i<b.num_beats;i++)
-					s->barrier.add(x0 + (int)((float)b.length * i / (float)b.num_beats) + dpos);
-				x0 += b.length;
-			}
+		int x0 = 0;
+		foreach(Bar &b, t.bar){
+			for (int i=0;i<b.num_beats;i++)
+				s->barrier.add(x0 + (int)((float)b.length * i / (float)b.num_beats) + dpos);
+			x0 += b.length;
 		}
 	}
 
@@ -699,10 +697,10 @@ void AudioView::DrawSub(HuiDrawingContext *c, int x, int y, int width, int heigh
 		c->DrawStr(asx, y + height - SUB_FRAME_HEIGHT, s->name);
 }
 
-void AudioView::DrawBarCollection(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, BarCollection *bc)
+void AudioView::DrawBars(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, Array<Bar> &bc)
 {
-	int x0 = bc->pos;
-	foreachi(TimeBar &bar, bc->bar, i){
+	int x0 = 0;
+	foreachi(Bar &bar, bc, i){
 		bar.x     = a->sample2screen(x0);
 		bar.width = a->sample2screen(x0 + bar.length) - bar.x;
 		if ((bar.x >= x) && (bar.x < x + width)){
@@ -719,11 +717,6 @@ void AudioView::DrawBarCollection(HuiDrawingContext *c, int x, int y, int width,
 				c->DrawLine(bx, y, bx, y + height);
 		}
 		x0 += bar.length;
-	}
-
-	if (bc->bar.num > 0){
-		bc->x = bc->bar[0].x;
-		bc->width = bc->bar.back().x + bc->bar.back().width - bc->x;
 	}
 }
 
@@ -746,8 +739,7 @@ void AudioView::DrawTrack(HuiDrawingContext *c, int x, int y, int width, int hei
 	DrawBuffer(	c, x,y,width,height,
 				t,int(a->view_pos),a->view_zoom,col);
 
-	foreach(BarCollection &bc, t->bar_col)
-		DrawBarCollection(c, x, y, width, height, t, col, a, track_no, &bc);
+	DrawBars(c, x, y, width, height, t, col, a, track_no, t->bar);
 
 	foreach(Track &s, t->sub)
 		DrawSub(c, x, y, width, height, &s, a);

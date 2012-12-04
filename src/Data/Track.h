@@ -17,7 +17,7 @@
 #define PEAK_FACTOR			2
 #define MIN_MAX_FACTOR		10
 
-#define DEFAULT_SAMPLE_RATE	44100
+#define DEFAULT_SAMPLE_RATE		44100
 
 class BufferBox;
 class AudioFile;
@@ -25,8 +25,6 @@ class AudioFile;
 class EffectParam
 {
 public:
-//	EffectParam(){	HistoryStructReset("EffectParam", this);	}
-
 	string name, type;
 	string value;
 };
@@ -34,37 +32,18 @@ public:
 class Effect
 {
 public:
-//	Effect(){	HistoryStructReset("Effect", this);	}
-
 	string filename;
 	Array<EffectParam> param;
 	bool only_on_selection;
 	int start, end;
 };
 
-class TimeBar
+class Bar
 {
 public:
-	//TimeBar(){	HistoryStructReset("TimeBar", this);	}
-
 	int num_beats;
 	int length;
 	int type; // reserved
-
-	// editing
-	bool is_selected;
-	int x, width;
-};
-
-class BarCollection
-{
-public:
-	//BarCollection(){	HistoryStructReset("BarCollection", this);	}
-	void Update();
-
-	int pos;
-	int length;
-	Array<TimeBar> bar;
 
 	// editing
 	bool is_selected;
@@ -127,7 +106,7 @@ public:
 	int cur_sub;
 
 	// time track
-	Array<BarCollection> bar_col;
+	Array<Bar> bar;
 
 // editing
 	int x, y, width, height;
@@ -135,8 +114,6 @@ public:
 	AudioFile *root;
 
 	bool is_selected;
-
-//	TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS];
 };
 
 #endif /* TRACK_H_ */

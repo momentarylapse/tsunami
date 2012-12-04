@@ -54,7 +54,7 @@ public:
 	void DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int pos, float zoom, const color &col);
 	void DrawSubFrame(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, AudioFile *a, const color &col, int delay);
 	void DrawSub(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, AudioFile *a);
-	void DrawBarCollection(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, BarCollection *bc);
+	void DrawBars(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, Array<Bar> &bc);
 	void DrawTrack(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no);
 	void DrawGrid(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a, const color &bg, bool show_time = false);
 	void DrawTimeLine(HuiDrawingContext *c, AudioFile *a, int pos, int type, color &col, bool show_time = false);

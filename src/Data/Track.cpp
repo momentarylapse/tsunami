@@ -12,17 +12,8 @@
 
 
 
-void BarCollection::Update()
-{
-	length = 0;
-	foreach(TimeBar &b, bar)
-		length += b.length;
-}
-
 Track::Track()
 {
-	//HistoryStructReset("Track", this);
-
 	type = TYPE_AUDIO;
 	muted = false;
 	volume = 1;
@@ -59,7 +50,7 @@ void Track::Reset()
 	width = -1;
 	volume = 1;
 	muted = false;
-	bar_col.clear();
+	bar.clear();
 	fx.clear();
 	sub.clear();
 	msg_db_l(1);

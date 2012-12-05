@@ -378,4 +378,31 @@ Track *AudioFile::get_track(int track_no, int sub_no)
 }
 
 
+int AudioFile::GetNextBeat(int pos)
+{
+	foreach(Track &t, track)
+		if (t.type == t.TYPE_TIME){
+			int p0 = 0;
+			if (p0 > pos)
+				return p0;
+			foreach(Bar &b, t.bar){
+				if (b.type == b.TYPE_BAR){
+					for (int i=0;i<b.count;i++){
+						int pp = p0;
+						for (int j=0;j<b.num_beats;j++){
+							pp += b.length / b.num_beats;
+							if (pp > pos)
+								return pp;
+						}
+						p0 += b.length;
+					}
+				}else if (b.type == b.TYPE_PAUSE){
+					p0 += b.length;
+					if (p0 > pos)
+						return p0;
+				}
+			}
+		}
+	return pos;
+}
 

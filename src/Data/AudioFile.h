@@ -55,6 +55,8 @@ public:
 
 	int GetNumSelectedSubs();
 
+	int GetNextBeat(int pos);
+
 	// action
 	Track *AddEmptyTrack(int index = -1);
 	Track *AddTimeTrack(int index = -1);

@@ -235,7 +235,7 @@ void BufferBox::add_click(int pos, float volume, float freq, int sample_rate)
 
 	for (int i=0; i<sm_d; i++){
 		float fi = (float)i / (float)sm_d;
-		float envelope = 1 - fi;
+		float envelope = exp(-fi*3);//1 - fi;
 		float tt = i * w_f;
 		int j = i + pos;// - offset;
 		if ((j >= 0) && (j < num)){

@@ -104,16 +104,17 @@ void BarList::OnAdd()
 void BarList::OnAddPause()
 {
 	int s = dlg->GetInt(id);
-	if (s >= 0){
 
-		Bar b;
-		b.num_beats = 1;
-		b.type = b.TYPE_PAUSE;
-		b.length = (int)((float)sample_rate * 2.0f);
-		b.count = 1;
+	Bar b;
+	b.num_beats = 1;
+	b.type = b.TYPE_PAUSE;
+	b.length = (int)((float)sample_rate * 2.0f);
+	b.count = 1;
+	if (s >= 0)
+		bar.insert(b, s + 1);
+	else
 		bar.add(b);
-		FillList();
-	}
+	FillList();
 }
 
 
@@ -134,12 +135,17 @@ void BarList::AddNewBar()
 {
 	msg_db_r("AddNewBar", 1);
 
+	int s = dlg->GetInt(id);
+
 	Bar b;
 	b.num_beats = 4;
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / 90.0f);
 	b.count = 1;
-	bar.add(b);
+	if (s >= 0)
+		bar.insert(b, s + 1);
+	else
+		bar.add(b);
 	FillList();
 
 	msg_db_l(1);

@@ -137,6 +137,8 @@ class AudioFile
 	Range sel_raw
 	
 	string level_name[]
+	
+	extern int GetNextBeat(int pos)
 
 
 class AudioOutput

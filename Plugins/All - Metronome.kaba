@@ -24,9 +24,9 @@ void ProcessTrack(BufferBox buf, Track t, int level)
 	int nm = buf.num / sm_m + 1
 	for int m, 0, nm
 		if (m % data.BeatsPerMeasure) == 0
-			buf.add_click(m * sm_m, data.Volume, 880.0, a.sample_rate)
-		else
 			buf.add_click(m * sm_m, data.Volume, 660.0, a.sample_rate)
+		else
+			buf.add_click(m * sm_m, data.Volume * 0.5, 880.0, a.sample_rate)
 
 void ResetData()
 	data.Volume = 0.3

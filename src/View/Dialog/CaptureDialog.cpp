@@ -43,6 +43,7 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	}
 
 	Enable("capture_playback", a->used);
+	Check("capture_playback", a->used);
 
 	foreach(Track &t, a->track)
 		AddString("capture_target", t.GetNiceName());
@@ -118,8 +119,8 @@ void CaptureDialog::OnPause()
 void CaptureDialog::OnOk()
 {
 	tsunami->input->Stop();
+	tsunami->output->Stop();
 	Insert();
-	tsunami->input->Stop();
 	delete(this);
 }
 

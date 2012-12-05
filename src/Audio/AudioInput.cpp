@@ -130,7 +130,7 @@ int AudioInput::DoCapturing()
 		if (CaptureAddData){
 
 			if (a >= NUM_CAPTURE_SAMPLES)
-				msg_error("too much capture data!!!");
+				tsunami->log->Error(_("too much capture data!!!"));
 
 			// append to buffer
 			alcCaptureSamples((ALCdevice*)capture, capture_temp, a);

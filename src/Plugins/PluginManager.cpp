@@ -110,6 +110,7 @@ void PluginManager::LinkAppScriptData()
 	ScriptLinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
 	ScriptLinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
 	ScriptLinkSemiExternalFunc("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
+	ScriptLinkSemiExternalFunc("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
 	ScriptLinkSemiExternalFunc("Track.GetBuffers",	(void*)&Track::GetBuffers);
 	ScriptLinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
 	ScriptLinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
@@ -749,7 +750,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int")){
 				if (a->used){
 					foreach(Track &t, a->track)
-						if (t.is_selected){
+						if ((t.is_selected) && (t.type == t.TYPE_AUDIO)){
 							PluginProcessTrack(s, &t, a->cur_level, a->selection);
 						}
 				}else{

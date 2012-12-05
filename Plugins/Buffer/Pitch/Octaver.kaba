@@ -1,0 +1,42 @@
+// Image = hui:bottom
+// Title[Deutsch] = Oktavieren
+#include "../../api.kaba"
+
+window dlg
+
+class PluginData
+	float Level
+PluginData data
+
+void ResetData()
+	data.Level = 0.5
+
+void DataToDialog()
+	SliderSet(dlg, "level", data.Level)
+
+void DoOctaver(float b[])
+	int i
+	for i, 0, b.num
+		b[i] = (b[i] * b[i]) * data.Level + b[i] * (1 - data.Level)
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	DoOctaver(buf.r)
+	DoOctaver(buf.l)
+
+void OnLevel()
+	data.Level = SliderGet(dlg, "level")
+
+void Configure()
+	// dialog
+	dlg=HuiCreateDialog("Octaver",305,105,MainWin,false)
+	dlg.AddSlider("",5,5,205,25,"level_slider")
+	dlg.AddSpinButton("\\0\\100\\0.1",215,5,60,25,"level")
+	dlg.AddText("%",280,5,20,25,"")
+	PutCommandBarFixed(dlg, 5, 70, 305)
+	AddSlider(dlg, "level_slider", "level", 0, 1, 100, &OnLevel, data.Level)
+	dlg.Update()
+	
+	dlg.SetDecimals(1)
+	DataToDialog()
+		
+	HuiWaitTillWindowClosed(dlg)

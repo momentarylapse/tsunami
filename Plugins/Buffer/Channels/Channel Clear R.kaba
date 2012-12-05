@@ -1,0 +1,7 @@
+// Image = hui:clear
+// Title[Deutsch] = Kanal Löschen R
+#include "../../api.kaba"
+
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	buf.r = 0

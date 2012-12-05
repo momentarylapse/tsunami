@@ -1,0 +1,21 @@
+#include "../../api.kaba"
+
+void fold(float b[], float k[])
+	float o[]
+	o.resize(b.num)
+	
+	int n = 50000
+	for int i, 0, b.num
+		if (i % 1000) == 0
+			print i
+		o[i] = b[i]
+		for int j, 0, n
+			if i >= j
+				o[i] += b[i - j] * k[j] * 0.07
+	b = o
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	if audio[1].used
+		fold(buf.r, audio[1].track[0].level[0].buffer[0].r)
+		fold(buf.l, audio[1].track[0].level[0].buffer[0].l)
+	

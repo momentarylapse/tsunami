@@ -75,6 +75,7 @@ public:
 
 	struct PluginFile
 	{
+		string name;
 		string filename;
 		string image;
 		Array<string> title;

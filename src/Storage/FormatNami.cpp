@@ -63,7 +63,7 @@ void WriteEffectParam(CFile *f, EffectParam *p)
 void WriteEffect(CFile *f, Effect *e)
 {
 	BeginChunk(f, "fx");
-	f->WriteStr(e->filename);
+	f->WriteStr(e->name);
 	f->WriteBool(e->only_on_selection);
 	f->WriteInt(e->start);
 	f->WriteInt(e->end);
@@ -237,7 +237,7 @@ void ReadFXListOld(CFile *f, Array<Effect> &fx)
 	}
 	for (int i=0;i<n;i++){
 		Effect e;
-		e.filename = f->ReadStr();
+		e.name = f->ReadStr();
 		e.only_on_selection = false;
 		e.start = 0;
 		e.end = -1;
@@ -265,7 +265,7 @@ void ReadFXList(CFile *f, Array<Effect> &fx)
 	}
 	for (int i=0;i<n;i++){
 		Effect e;
-		e.filename = f->ReadStr();
+		e.name = f->ReadStr();
 		e.only_on_selection = f->ReadBool();
 		e.start = f->ReadInt();
 		e.end = f->ReadInt();
@@ -509,7 +509,7 @@ void ReadChunkEffectParam(CFile *f, Effect *e)
 void ReadChunkEffect(CFile *f, Array<Effect> *fx)
 {
 	Effect e;
-	e.filename = f->ReadStr();
+	e.name = f->ReadStr();
 	e.only_on_selection = f->ReadBool();
 	e.start = f->ReadInt();
 	e.end = f->ReadInt();

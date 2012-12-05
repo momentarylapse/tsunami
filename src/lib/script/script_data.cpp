@@ -736,7 +736,7 @@ void SIAddPackageBase()
 			func_add_param("str",		TypeString);
 		class_add_func("icompare", TypeInt, mf((tmf)&string::icompare));
 			func_add_param("str",		TypeString);
-		class_add_func("replace", TypeString, mf((tmf)&string::_replace));
+		class_add_func("replace", TypeString, mf((tmf)&string::replace));
 			func_add_param("sub",		TypeString);
 			func_add_param("by",		TypeString);
 		class_add_func("explode", TypeStringList, mf((tmf)&string::explode));

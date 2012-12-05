@@ -23,7 +23,7 @@ class EffectParam
 	string name, type, value
 
 class AudioEffect
-	string filename
+	string name
 	EffectParam param[]
 	bool only_on_selection
 	int start, end

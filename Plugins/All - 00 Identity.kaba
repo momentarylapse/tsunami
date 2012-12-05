@@ -1,6 +1,0 @@
-// Title[Deutsch] = 00 nichts tun
-
-#include "api.kaba"
-
-void ProcessTrack(BufferBox buf, Track t, int level)
-	nil

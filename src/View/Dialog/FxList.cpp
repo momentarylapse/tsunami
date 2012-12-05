@@ -9,14 +9,6 @@
 #include "../../Tsunami.h"
 
 
-
-bool LoadAndCompileEffect(const string &filename)
-{
-	string _filename_ = HuiAppDirectoryStatic + "Plugins/All - " + filename + ".kaba";
-
-	return tsunami->plugins->LoadAndCompilePlugin(_filename_);
-}
-
 FxList::FxList(CHuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete, Array<Effect> & _fx):
 fx(_fx)
 {
@@ -41,7 +33,7 @@ void FxList::FillList()
 	msg_db_r("FillEffectList", 1);
 	dlg->Reset(id);
 	foreach(Effect &f, fx)
-		dlg->AddString(id, f.filename);
+		dlg->AddString(id, f.name);
 	dlg->Enable(id_edit, false);
 	dlg->Enable(id_delete, false);
 	msg_db_l(1);
@@ -69,7 +61,7 @@ void FxList::OnListSelect()
 
 void FxList::OnAdd()
 {
-	if (HuiFileDialogOpen(dlg, _("einen Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins", "*.kaba", "*.kaba"))
+	if (HuiFileDialogOpen(dlg, _("einen Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins/Buffer/", "*.kaba", "*.kaba"))
 		AddNewEffect(HuiFilename);
 }
 
@@ -103,7 +95,7 @@ bool FxList::UpdateEffectParams(Effect &f)
 	bool ok = false;
 
 
-	if (LoadAndCompileEffect(f.filename)){
+	if (tsunami->plugins->LoadAndCompileEffect(f.name)){
 
 		tsunami->plugins->PluginResetData();
 
@@ -114,7 +106,7 @@ bool FxList::UpdateEffectParams(Effect &f)
 			ok = true;
 		}
 	}else{
-		tsunami->log->Error(format(_("Fehler in  Script-Datei: \"%s\"\n%s\n%s"), f.filename.c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[0].c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[1].c_str()));
+		tsunami->log->Error(format(_("Fehler in  Script-Datei: \"%s\"\n%s\n%s"), f.name.c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[0].c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[1].c_str()));
 	}
 	tsunami->plugins->PopCurPlugin();
 
@@ -127,8 +119,8 @@ void FxList::AddNewEffect(string &filename)
 	msg_db_r("AddNewEffect", 1);
 
 	Effect effect;
-	effect.filename = filename.substr(HuiAppDirectoryStatic.num + 8 + 6, -1); // remove directory    + "All - "
-	effect.filename = effect.filename.substr(0, effect.filename.num - 5); //      and remove ".kaba"
+	effect.name = filename.basename(); // remove directory
+	effect.name = effect.name.substr(0, effect.name.num - 5); //      and remove ".kaba"
 	if (UpdateEffectParams(effect)){
 		fx.add(effect);
 		FillList();

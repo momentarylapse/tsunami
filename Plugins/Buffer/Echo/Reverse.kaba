@@ -1,0 +1,15 @@
+// Image = hui:back
+// Title[Deutsch] = Rückwärts
+#include "../../api.kaba"
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	int n = buf.num / 2
+	for int i, 0, n
+		int j = buf.num - i - 1
+		float x = buf.r[i]
+		buf.r[i] = buf.r[j]
+		buf.r[j] = x
+		x = buf.l[i]
+		buf.l[i] = buf.l[j]
+		buf.l[j] = x
+

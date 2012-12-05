@@ -1,0 +1,8 @@
+// Title[Deutsch] = Rauschen
+#include "../../api.kaba"
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	for int i, 0, buf.r.num
+		buf.r[i] = rand(2.0) - 1.0
+		buf.l[i] = rand(2.0) - 1.0
+

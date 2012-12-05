@@ -172,7 +172,7 @@ int string::icompare(const string &s) const
 	return num - s.num;
 }
 
-string string::_reverse() const
+string string::reverse() const
 {
 	string r;
 	r.resize(num);
@@ -223,7 +223,7 @@ void string::replace0(int start, int length, const string &str)
 	}
 }
 
-string string::_replace(const string &sub, const string &by) const
+string string::replace(const string &sub, const string &by) const
 {
 	string r = *this;
 	int i = r.find(sub, 0);
@@ -338,21 +338,17 @@ void string::dir_ensure_ending()
 // remove "/../"
 string string::no_recursion() const
 {
-	string str = *this;
-	int l1,l2,l3;
-	for (l1=str.num-2;l1>=0;l1--)
-		if ((str[l1]=='.')&&(str[l1+1]=='.')){
-			for (l2=l1-2;l2>=0;l2--)
-				if ((str[l2]=='/')||(str[l2]=='\\')){
-					int ss=str.num+l2-l1-2;
-					for (l3=l2;l3<ss;l3++)
-						str[l3]=str[l3+l1-l2+2];
-					str.resize(ss);
-					l1=l2;
-					break;
-				}
+	string str = replace("\\", "/");
+	Array<string> p = str.explode("/");
+
+	for (int i=1;i<p.num;i++)
+		if (p[i] == ".."){
+			p.erase(i);
+			p.erase(i - 1);
+			i -= 2;
 		}
-	return str;
+
+	return implode(p, "/");
 }
 
 string string::extension() const

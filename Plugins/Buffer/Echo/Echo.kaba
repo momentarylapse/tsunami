@@ -1,0 +1,98 @@
+// Image = hui:copy
+// Title[Deutsch] = Echo
+
+#include "../../api.kaba"
+
+bool not_first_time
+
+window DelayDialog
+
+class PluginData
+	float Delay
+	float Volume
+	float Feedback
+
+PluginData data
+
+float temp[]
+int delay_samples
+
+void OnVolume()
+	data.Volume = SliderGet(DelayDialog, "volume")
+
+void OnFeedback()
+	data.Feedback = SliderGet(DelayDialog, "feedback")
+
+void OnDelay()
+	data.Delay = SliderGet(DelayDialog, "delay")
+
+void DoDelay(float b[])
+	temp = 0
+	int p = 0
+	for int i, 0, b.num
+	
+		// old value
+		float b0 = b[i]
+		
+		// add echo
+		b[i] = b[i] + temp[p] * data.Volume
+		//clampf(b[i], -1, 1)
+		
+		// add to echo
+		temp[p] = b0 + temp[p] * data.Feedback
+		
+		p ++
+		if p >= delay_samples
+			p = 0
+
+void DataToDialog()
+	SliderSet(DelayDialog, "volume", data.Volume)
+	SliderSet(DelayDialog, "feedback", data.Feedback)
+	SliderSet(DelayDialog, "delay", data.Delay)
+
+void Configure()
+	// dialog
+	DelayDialog=HuiCreateDialog("Echo",395,175,MainWin,false)
+	DelayDialog.AddSlider("",95,35,205,25,"volume_slider")
+	DelayDialog.AddEdit("",305,35,50,25,"volume")
+	DelayDialog.AddText("%",360,35,30,25,"")
+	DelayDialog.AddSlider("",95,65,205,25,"delay_slider")
+	DelayDialog.AddEdit("",305,65,50,25,"delay")
+	DelayDialog.AddText("ms",360,65,30,25,"")
+	DelayDialog.AddSlider("",95,95,205,25,"feedback_slider")
+	DelayDialog.AddEdit("",305,95,50,25,"feedback")
+	DelayDialog.AddText("%",360,95,30,25,"")
+	DelayDialog.AddText("Lautstärke",5,35,100,25,"")
+	DelayDialog.AddText("Verzögerung",5,65,100,25,"")
+	DelayDialog.AddText("Feedback",5,95,100,25,"")
+	PutFavoriteBarFixed(DelayDialog, 5, 5, 395)
+	PutCommandBarFixed(DelayDialog, 5, 140, 395)
+	DelayDialog.Update()
+	
+	AddSlider(DelayDialog, "volume_slider", "volume", 0, 2, 100, &OnVolume, data.Volume)
+	AddSlider(DelayDialog, "feedback_slider", "feedback", 0, 1, 100, &OnFeedback, data.Feedback)
+	AddSlider(DelayDialog, "delay_slider", "delay", 0, 1, 1000, &OnDelay, data.Delay)
+
+	
+	DelayDialog.SetDecimals(1)
+	
+	DataToDialog()
+	
+	HuiWaitTillWindowClosed(DelayDialog)
+
+void ResetData()
+	data.Volume = 0.2
+	data.Feedback = 0.5
+	data.Delay = 0.15
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+
+	AudioFile *a = t.root
+	delay_samples = a.sample_rate * data.Delay
+	temp.resize(delay_samples)
+	
+	DoDelay(buf.r)
+	DoDelay(buf.l)
+	
+	temp.clear()
+

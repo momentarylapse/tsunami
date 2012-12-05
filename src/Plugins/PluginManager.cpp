@@ -151,18 +151,31 @@ void PluginManager::OnMenuExecutePlugin()
 	int n = s2i(HuiGetEvent()->id.substr(strlen("execute_plugin_"), -1));
 
 	if ((n >= 0) && (n < plugin_file.num))
-		ExecutePlugin(HuiAppDirectoryStatic + "Plugins/" + plugin_file[n].filename);
+		ExecutePlugin(plugin_file[n].filename);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf)
 {
 	pf.image = "";
 	SilentFiles = true;
-	string content = FileRead(HuiAppDirectoryStatic + "Plugins/" + pf.filename);
+	string content = FileRead(pf.filename);
 	int p = content.find("// Image = hui:");
 	if (p >= 0)
 		pf.image = content.substr(p + 11, content.find("\n") - p - 11);
 	SilentFiles = false;
+}
+
+void find_plugins_in_dir(const string &dir, PluginManager *pm, CHuiMenu *m)
+{
+	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
+	foreach(DirEntry &e, list){
+		PluginManager::PluginFile pf;
+		pf.name = e.name.replace(".kaba", "");
+		pf.filename = HuiAppDirectoryStatic + "Plugins/" + dir + e.name;
+		get_plugin_file_data(pf);
+		m->AddItemImage(pf.name, pf.image, format("execute_plugin_%d", pm->plugin_file.num));
+		pm->plugin_file.add(pf);
+	}
 }
 
 void PluginManager::AddPluginsToMenu()
@@ -170,55 +183,43 @@ void PluginManager::AddPluginsToMenu()
 	msg_db_r("AddPluginsToMenu", 2);
 	ScriptInit();
 
-	// alle finden
-	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins", "*.kaba", false);
 	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
-	foreach(DirEntry &e, list)
-		if ((e.name != "api.kaba") && (e.name[0] != '_')){
-			PluginFile pf;
-			pf.filename = e.name;
-			get_plugin_file_data(pf);
-			plugin_file.add(pf);
-		}
 
-	// "All - "..
-	int n = 0;
-	foreachi(PluginFile &pf, plugin_file, i)
-		if (pf.filename.find("All - ") == 0){
-			if (n == 0){
-				m->AddSeparator();
-				m->AddItem(_("Auf Audiopuffer"), "plugin_on_file");
-				m->EnableItem("plugin_on_file", false);
-			}
-			m->AddItemImage(pf.filename.substr(6, -6), pf.image, format("execute_plugin_%d", i));
-			n ++;
-		}
+	// "Buffer"..
+	m->AddSeparator();
+	m->AddItem(_("Auf Audiopuffer"), "plugin_on_file");
+	m->EnableItem("plugin_on_file", false);
 
-	// "Track - "..
-	n = 0;
-	foreachi(PluginFile &pf, plugin_file, i)
-		if (pf.filename.find("Track - ") == 0){
-			if (n == 0){
-				m->AddSeparator();
-				m->AddItem(_("Auf einzelne Spur"), "plugin_on_track");
-				m->EnableItem("plugin_on_track", false);
-			}
-			m->AddItemImage(pf.filename.substr(8, -6), pf.image, format("execute_plugin_%d", i));
-			n ++;
-		}
+	CHuiMenu *sm = new CHuiMenu();
+	m->AddSubMenu(_("Kan&ale"), "", sm);
+	find_plugins_in_dir("Buffer/Channels/", this, sm);
+	sm = new CHuiMenu();
+	m->AddSubMenu(_("Dynamik"), "", sm);
+	find_plugins_in_dir("Buffer/Dynamics/", this, sm);
+	sm = new CHuiMenu();
+	m->AddSubMenu(_("Echo"), "", sm);
+	find_plugins_in_dir("Buffer/Echo/", this, sm);
+	sm = new CHuiMenu();
+	m->AddSubMenu(_("Tonh&ohe"), "", sm);
+	find_plugins_in_dir("Buffer/Pitch/", this, sm);
+	sm = new CHuiMenu();
+	m->AddSubMenu(_("Klang"), "", sm);
+	find_plugins_in_dir("Buffer/Sound/", this, sm);
+	sm = new CHuiMenu();
+	m->AddSubMenu(_("Synthese"), "", sm);
+	find_plugins_in_dir("Buffer/Synthesizer/", this, sm);
+
+	// "All"
+	m->AddSeparator();
+	m->AddItem(_("Auf alles"), "plugin_on_audio");
+	m->EnableItem("plugin_on_audio", false);
+	find_plugins_in_dir("All/", this, m);
 
 	// rest
-	n = 0;
-	foreachi(PluginFile &pf, plugin_file, i)
-		if ((pf.filename.find("All - ") != 0) && (pf.filename.find("Track - ") != 0) && (pf.filename.find("Effect - ") != 0)){
-			if (n == 0){
-				m->AddSeparator();
-				m->AddItem(_("Sonstige"), "plugin_other");
-				m->EnableItem("plugin_other", false);
-			}
-			m->AddItemImage(pf.filename.substr(0, -6), pf.image, format("execute_plugin_%d", i));
-			n ++;
-		}
+	m->AddSeparator();
+	m->AddItem(_("Eigenst&andig"), "plugin_other");
+	m->EnableItem("plugin_other", false);
+	find_plugins_in_dir("Independent/", this, m);
 
 	// Events
 	for (int i=0;i<plugin_file.num;i++)
@@ -595,6 +596,8 @@ void PluginManager::WritePluginDataToFile(const string &name)
 	msg_db_r("WritePluginDataToFile", 1);
 	Effect fx;
 	ExportPluginData(fx);
+	dir_create(HuiAppDirectory + "Plugins/");
+	dir_create(HuiAppDirectory + "Plugins/Favorites/");
 	CFile *f = CreateFile(HuiAppDirectory + "Plugins/Favorites/" + cur_plugin->s->pre_script->Filename.basename() + "___" + name);
 	f->WriteInt(0);
 	f->WriteInt(0);
@@ -641,8 +644,8 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 void PluginManager::PluginPreview()
 {
 	Effect fx;
-	fx.filename = cur_plugin->s->pre_script->Filename.substr(cur_plugin->s->pre_script->Filename.find("All - ") + 6, -1);
-	fx.filename = fx.filename.substr(0, fx.filename.num - 5);
+	fx.name = cur_plugin->s->pre_script->Filename.substr(cur_plugin->s->pre_script->Filename.find("All - ") + 6, -1);
+	fx.name = fx.name.substr(0, fx.name.num - 5);
 	//msg_write(fx.filename);
 	ExportPluginData(fx);
 	tsunami->renderer->effect = &fx;
@@ -795,16 +798,17 @@ void PluginManager::FindAndExecutePlugin()
 
 bool PluginManager::LoadAndCompileEffect(const string &filename)
 {
-	string _filename_ = HuiAppDirectoryStatic + "Plugins/All - " + filename + ".kaba";
-
-	return LoadAndCompilePlugin(_filename_);
+	foreach(PluginFile &pf, plugin_file)
+		if (filename == pf.name)
+			return LoadAndCompilePlugin(pf.filename);
+	return false;
 }
 
 void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect *fx)
 {
 	msg_db_r("ApplyEffects", 1);
 
-	if (LoadAndCompileEffect(fx->filename)){
+	if (LoadAndCompileEffect(fx->name)){
 		// run
 		PluginResetData();
 		ImportPluginData(*fx);
@@ -814,9 +818,9 @@ void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect *fx)
 		t->root->UpdateSelection();
 	}else{
 		if (cur_plugin->s)
-			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: %s %s)"), fx->filename.c_str(), cur_plugin->s->ErrorMsgExt[0].c_str(), cur_plugin->s->ErrorMsgExt[1].c_str()));
+			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: %s %s)"), fx->name.c_str(), cur_plugin->s->ErrorMsgExt[0].c_str(), cur_plugin->s->ErrorMsgExt[1].c_str()));
 		else
-			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: Datei nicht ladbar)"), fx->filename.c_str()));
+			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: Datei nicht ladbar)"), fx->name.c_str()));
 	}
 	PopCurPlugin();
 

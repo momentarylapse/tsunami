@@ -1,0 +1,7 @@
+// Image = hui:back
+// Title[Deutsch] = Kanäle L <- R
+#include "../../api.kaba"
+
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	buf.l = buf.r

@@ -32,7 +32,7 @@ public:
 class Effect
 {
 public:
-	string filename;
+	string name;
 	Array<EffectParam> param;
 	bool only_on_selection;
 	int start, end;

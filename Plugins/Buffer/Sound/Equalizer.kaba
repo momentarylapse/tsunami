@@ -1,0 +1,171 @@
+// Image = hui:properties
+// Title[Deutsch] = Equalizer
+
+#include "../../api.kaba"
+#include "../../grid.kaba"
+
+
+
+const float MIN_FREQ = 20.0
+const float MAX_FREQ = 20000.0
+const int MIN_VOL = 0-45
+const int MAX_VOL = 45
+
+class PluginData
+	vector curve[]
+
+PluginData data
+
+
+window dlg
+int MouseOver, Selected
+
+GridData grid
+
+void fill_inter(FloatInterpolator fi)
+	fi.set_type("cubic-spline-notang")
+	fi.add3(data.curve[0].y, 0.0, exp(data.curve[0].z), 0.0)
+	for int i, 1, data.curve.num
+		fi.add3(data.curve[i].y, 0.0, exp(data.curve[i].z), log(data.curve[i].x / data.curve[i - 1].x))
+
+
+void equalize(float b[])
+	complex f[]
+	
+	
+	// transform
+	int len2 = b.num / 2 + 1
+	f.resize(len2)
+	fft_r2c(b, f)
+	
+	FloatInterpolator fi
+	fill_inter(fi)
+	
+	// equalize
+	f *= (1.0 / b.num)
+	float w = i2f(b.num) / cur_audio.sample_rate
+	for int i, 1, f.num
+		float freq = i2f(i) / w
+		float param = lin2log(freq, MIN_FREQ, MAX_FREQ)
+		float db = fi.get(param)
+		f[i] = f[i] * pow(10, db / 20)
+		
+	// transform back
+	fft_c2r_inv(f, b)
+
+void ProcessTrack(BufferBox buf, Track t, int level)
+	equalize(buf.r)
+	equalize(buf.l)
+
+void ResetData()
+	data.curve.clear()
+	data.curve.add(vector(MIN_FREQ, 0, 0))
+	data.curve.add(vector(MAX_FREQ, 0, 0))
+	MouseOver = -1
+	Selected = -1
+
+void DataToDialog()
+	dlg.Redraw("drawing")
+
+void Draw()
+	context c = dlg.BeginDraw("drawing")
+	float w = c.width
+	float h = c.height
+	
+	grid.Draw(c, 0, 0, w, h)
+	
+	// curve + area below
+	FloatInterpolator fi
+	fill_inter(fi)
+	grid.DrawCurve(c, fi, true)
+	
+	// points
+	for int i, 0, data.curve.num
+		grid.DrawPoint3(c, data.curve[i], i == Selected, i == MouseOver)
+	c.End()
+
+// left button down -> select
+void OnLeftButtonDown()
+	Selected = MouseOver
+	dlg.Redraw("drawing")
+
+// left button up -> if moved to a neighbour -> remove point
+void OnLeftButtonUp()
+	nil
+	/*if Selected >= 0
+		bool del = false//(data.curve[Selected] == data.curve[Selected - 1])
+		if Selected < data.curve.num - 1
+			del = del or (data.curve[Selected] == data.curve[Selected + 1])
+		if del
+			data.curve.remove(Selected)
+			Selected = -1
+			dlg.Redraw("drawing")*/
+
+void OnScroll()
+	if MouseOver >= 0
+		if HuiGetEvent().wheel > 0
+			data.curve[MouseOver].z += 0.2
+		else
+			data.curve[MouseOver].z -= 0.2
+		dlg.Redraw("drawing")
+
+// right button down -> new point
+void OnRightButtonDown()
+	vector m = grid.GetMouse3(0)
+	for int i, 1, data.curve.num
+		if (m.x > data.curve[i - 1].x) and (m.x < data.curve[i].x)
+			data.curve.insert(m, i)
+			Selected = i
+			MouseOver = i
+			dlg.Redraw("drawing")
+			break
+
+void OnMouseMove()
+	// move
+	if HuiGetEvent().button_l and (Selected >= 0)
+		data.curve[Selected] = grid.GetMouse3(data.curve[Selected].z)
+		float xmin = MIN_FREQ
+		float xmax = MAX_FREQ
+		if Selected > 0
+			xmin = data.curve[Selected - 1].x
+		if Selected < data.curve.num - 1
+			xmax = data.curve[Selected + 1].x
+		data.curve[Selected].x = clamp(data.curve[Selected].x, xmin, xmax)
+		data.curve[Selected].y = clamp(data.curve[Selected].y, MIN_VOL, MAX_VOL)
+		if Selected == data.curve.num - 1
+			data.curve[Selected].x = MAX_FREQ
+		if Selected == 0
+			data.curve[Selected].x = MIN_FREQ
+	else
+	// mouse over?
+		MouseOver = -1
+		for int i, 0, data.curve.num
+			if grid.MouseOverPoint3(data.curve[i])
+				MouseOver = i
+	dlg.Redraw("drawing")
+
+void Configure()
+	// dialog
+	dlg = HuiCreateSizableDialog("Equalizer",600,400,MainWin,false)
+	dlg.AddControlTable("", 0, 0, 1, 3, "table")
+	dlg.SetTarget("table", 0)
+	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")
+	dlg.Update()
+	
+	dlg.EventX("drawing", "hui:redraw", &Draw)
+	dlg.EventX("drawing", "hui:left-button-down", &OnLeftButtonDown)
+	dlg.EventX("drawing", "hui:left-button-up", &OnLeftButtonUp)
+	dlg.EventX("drawing", "hui:right-button-down", &OnRightButtonDown)
+	dlg.EventX("drawing", "hui:mouse-move", &OnMouseMove)
+	dlg.EventX("drawing", "hui:mouse-wheel", &OnScroll)
+
+	PutFavoriteBarSizable(dlg, "table", 0, 0)
+	PutCommandBarSizable(dlg, "table", 0, 2)
+	
+	grid.SetXAxis(MIN_FREQ, MAX_FREQ, true, "Hz")
+	grid.SetYAxis(MIN_VOL, MAX_VOL, false, "db")
+	
+	DataToDialog()
+
+	HuiWaitTillWindowClosed(dlg)
+

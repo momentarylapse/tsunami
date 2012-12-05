@@ -1,0 +1,145 @@
+// Image = hui:find
+// Title[Deutsch] = Spektrum zeigen
+#include "../api.kaba"
+#include "../grid.kaba"
+
+const int N = 512
+const float MIN_FREQ = 20.0
+const float MAX_FREQ = 20000.0
+const float MIN_VOL = 0.0 - 60.0
+const float MAX_VOL = 0.0
+
+window dlg
+
+enum
+	TypeLinear
+	TypeRoot2
+	TypeLogarithm
+
+//float x[], yr[], yl[]
+float ffr[], ffl[]
+
+GridData grid
+
+int w, h
+
+float todb(float v)
+	return log(v) / log(10) * 10
+
+float peak_max
+
+void CreateLines(int type, float x[], float yr[], float yl[])
+
+	x.clear()
+	yr.clear()
+	yl.clear()
+	for int i, 0, N
+		x.add(log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ))
+		if type == TypeLinear
+			grid.SetYAxis(0, peak_max, false, "")
+			yr.add(ffr[i])
+			yl.add(ffl[i])
+		else if type == TypeRoot2
+			grid.SetYAxis(0, sqrt(peak_max), false, "")
+			yr.add(pow(ffr[i], 0.5))
+			yl.add(pow(ffl[i], 0.5))
+		else //if type == TypeLogarithm
+			float vol_max = todb(peak_max)
+			float vol_min = vol_max - 60
+			grid.SetYAxis(vol_min, vol_max, false, "db")
+			yr.add(clamp(todb(ffr[i]), vol_min, vol_max))
+			yl.add(clamp(todb(ffl[i]), vol_min, vol_max))
+
+void OnDraw()
+	context c = dlg.BeginDraw("drawing_area")
+	w = c.width
+	h = c.height
+	
+	float x[], yr[], yl[]
+	CreateLines(dlg.GetInt("type"), x, yr, yl)
+	
+	grid.Draw(c, 0, 0, w, h)
+	grid.DrawCurveB(c, x, yr, true, Red)
+	grid.DrawCurveB(c, x, yl, true, Blue)
+	
+	c.End()
+
+void OnType()
+	dlg.Redraw("drawing_area")
+
+void OnClose()
+	HuiWinClose(dlg)
+
+void show_spec()
+	dlg = HuiCreateSizableDialog("Spectrum", 600, 460, MainWin, true)
+	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
+	dlg.SetTarget("table1", 0)
+	dlg.AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
+	dlg.AddControlTable("!noexpandy", 0, 1, 2, 1, "table2")
+	dlg.SetTarget("table2", 0)
+	dlg.AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
+	dlg.AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
+	dlg.SetImage("close", "hui:close")
+	dlg.Update()
+	
+	dlg.EventX("drawing_area", "hui:redraw", &OnDraw)
+	dlg.Event("type", &OnType)
+	dlg.Event("hui:close", &OnClose)
+	dlg.Event("close", &OnClose)
+	
+	dlg.SetInt("type", TypeLogarithm)
+	
+	BufferBox buf = AudioFileRender(cur_audio, cur_audio.selection)
+	
+	complex fr[], fl[]
+	
+	int len2 = buf.r.num / 2 + 1
+	fr.resize(len2)
+	fl.resize(len2)
+	//ff.clear()
+	fft_r2c(buf.r, fr)
+	fft_r2c(buf.l, fl)
+	
+	float ww = i2f(buf.r.num) / cur_audio.sample_rate
+	for int i, 0, N
+		float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
+		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
+		int j0 = fmin * ww
+		int j1 = fmax * ww + 1
+		j0 = clamp(j0, 0, len2)
+		j1 = clamp(j1, 0, len2)
+		float bmaxr = 0
+		float bmaxl = 0
+		for int j, j0, j1
+			float amp = fr[j].x * fr[j].x + fr[j].y * fr[j].y
+			if bmaxr < amp
+				bmaxr = amp
+			amp = fl[j].x * fl[j].x + fl[j].y * fl[j].y
+			if bmaxl < amp
+				bmaxl = amp
+		ffr.add(bmaxr)
+		ffl.add(bmaxl)
+
+	peak_max = max(ffr.max(), ffl.max())
+	float mmax = sqr(buf.num) / 4
+	if mmax > 0
+		ffr /= mmax
+		ffl /= mmax
+	peak_max /= mmax
+
+	dlg.Redraw("drawing_area")
+
+	HuiWaitTillWindowClosed(dlg)
+	
+	ffr.clear()
+	ffl.clear()
+
+void main()
+	char a, b
+	grid.SetXAxis(MIN_FREQ, MAX_FREQ, true, "Hz")
+	
+	if cur_audio.selection.length > 0
+		if cur_audio.cur_track >= 0
+			show_spec()
+	else
+		HuiErrorBox(MainWin, "error", "needs some selection!")

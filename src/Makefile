@@ -13,6 +13,9 @@ install : all
 	cp -f ../Data/license_small.txt    /usr/share/tsunami/Data
 	mkdir -p /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/*.kaba           /usr/share/tsunami/Plugins
+	cp -rf ../Plugins/Buffer           /usr/share/tsunami/Plugins
+	cp -rf ../Plugins/All              /usr/share/tsunami/Plugins
+	cp -rf ../Plugins/Independent      /usr/share/tsunami/Plugins
 	xdg-desktop-menu install ../Data/michisoft-tsunami.desktop
 	xdg-mime install ../Data/michisoft-nami.xml
 	xdg-icon-resource install --context mimetypes --size  32 ../Data/Icons/32.png  application-michisoft-nami --noupdate

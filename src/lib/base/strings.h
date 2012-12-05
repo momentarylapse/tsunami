@@ -36,8 +36,8 @@ class string : public DynamicArray
 	int compare(const string &s) const;
 	int icompare(const string &s) const;
 	void replace0(int start, int length, const string &s);
-	string _replace(const string &sub, const string &by) const;
-	string _reverse() const;
+	string replace(const string &sub, const string &by) const;
+	string reverse() const;
 	string trim() const;
 	Array<string> explode(const string &s) const;
 	string lower() const;

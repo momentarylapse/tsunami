@@ -616,6 +616,7 @@ void PluginManager::WritePluginDataToFile(const string &name)
 {
 	msg_db_r("WritePluginDataToFile", 1);
 	Effect fx;
+	fx.plugin = cur_plugin;
 	ExportPluginData(fx);
 	dir_create(HuiAppDirectory + "Plugins/");
 	dir_create(HuiAppDirectory + "Plugins/Favorites/");
@@ -644,6 +645,7 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 		return;
 	}
 	Effect fx;
+	fx.plugin = cur_plugin;
 
 	f->ReadInt();
 	f->ReadInt();
@@ -665,6 +667,7 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 void PluginManager::PluginPreview()
 {
 	Effect fx;
+	fx.plugin = cur_plugin;
 	fx.name = cur_plugin->s->pre_script->Filename.substr(cur_plugin->s->pre_script->Filename.find("All - ") + 6, -1);
 	fx.name = fx.name.substr(0, fx.name.num - 5);
 	//msg_write(fx.filename);

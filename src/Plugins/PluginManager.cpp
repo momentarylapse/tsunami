@@ -568,10 +568,8 @@ void PluginManager::ImportPluginData(Effect &fx)
 void PluginManager::ExportPluginState(Effect &fx)
 {
 	msg_db_r("ExportPluginState", 1);
-	if (fx.plugin->state){
-		//msg_write(p2s(fx.state) + " = " + p2s(fx.plugin->state));
+	if (fx.plugin->state)
 		memcpy(fx.state, fx.plugin->state, fx.plugin->state_type->Size);
-	}
 	msg_db_l(1);
 }
 
@@ -585,7 +583,7 @@ void PluginManager::ImportPluginState(Effect &fx)
 
 void PluginManager::PrepareEffect(Effect &fx)
 {
-	msg_db_r("PrepareEffect", 0);
+	msg_db_r("PrepareEffect", 1);
 	fx.plugin = NULL;
 	if (LoadAndCompileEffect(fx)){
 		if (fx.plugin->state){
@@ -596,7 +594,7 @@ void PluginManager::PrepareEffect(Effect &fx)
 			ExportPluginState(fx);
 		}
 	}
-	msg_db_l(0);
+	msg_db_l(1);
 }
 
 void PluginManager::CleanUpEffect(Effect &fx)

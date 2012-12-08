@@ -14,8 +14,17 @@ class PluginData
 
 PluginData data
 
-float temp[]
-int delay_samples
+class PluginState
+	float buf_r[], buf_l[]
+	int offset
+
+PluginState state
+
+void ResetState()
+	state.buf_r.clear()
+	state.buf_l.clear()
+	state.offset = 0
+
 
 void OnVolume()
 	data.Volume = SliderGet(DelayDialog, "volume")
@@ -26,23 +35,22 @@ void OnFeedback()
 void OnDelay()
 	data.Delay = SliderGet(DelayDialog, "delay")
 
-void DoDelay(float b[])
-	temp = 0
-	int p = 0
+void DoDelay(float b[], float d[])
+	int p = state.offset % d.num
 	for int i, 0, b.num
 	
 		// old value
 		float b0 = b[i]
 		
 		// add echo
-		b[i] = b[i] + temp[p] * data.Volume
+		b[i] = b[i] + d[p] * data.Volume
 		//clampf(b[i], -1, 1)
 		
 		// add to echo
-		temp[p] = b0 + temp[p] * data.Feedback
+		d[p] = b0 + d[p] * data.Feedback
 		
 		p ++
-		if p >= delay_samples
+		if p >= d.num
 			p = 0
 
 void DataToDialog()
@@ -88,11 +96,13 @@ void ResetData()
 void ProcessTrack(BufferBox buf, Track t, int level)
 
 	AudioFile *a = t.root
-	delay_samples = a.sample_rate * data.Delay
-	temp.resize(delay_samples)
+	int delay_samples = a.sample_rate * data.Delay
+	state.buf_r.resize(delay_samples)
+	state.buf_l.resize(delay_samples)
 	
-	DoDelay(buf.r)
-	DoDelay(buf.l)
+	DoDelay(buf.r, state.buf_r)
+	DoDelay(buf.l, state.buf_l)
 	
-	temp.clear()
+	state.offset += buf.num
+	
 

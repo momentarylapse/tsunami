@@ -23,19 +23,14 @@ void ResetData()
 class PluginState
 	float temp_r[]
 	float temp_l[]
-	int delay_samples
+	int offset
 
 PluginState state
 
-void InitState(Track t)
-	AudioFile *a = t.root
-	state.delay_samples = a.sample_rate * data.Delay + 1
-	state.temp_r.resize(state.delay_samples)
-	state.temp_l.resize(state.delay_samples)
-
-void ClearState()
+void ResetState()
 	state.temp_r.clear()
 	state.temp_l.clear()
+	state.offset = 0
 
 void OnSpeed()
 	data.Speed = SliderGet(FlangerDialog, "speed")
@@ -47,8 +42,7 @@ void OnDelay()
 	data.Delay = SliderGet(FlangerDialog, "delay")
 
 void DoFlanger(float b[], float temp[], int sample_rate)
-	temp = 0
-	int p = 0
+	int p = state.offset % temp.num
 	
 	float f_a = (1 - 0.5 * data.Depth) * data.Delay
 	float f_b = 0.5 * data.Depth * data.Delay
@@ -60,27 +54,23 @@ void DoFlanger(float b[], float temp[], int sample_rate)
 		temp[p] = b[i]
 		
 		// shift
-		float dt = f_a - cos(i * f_c) * f_b
+		float dt = f_a - cos((i + state.offset) * f_c) * f_b
 		int dp = dt * sample_rate
 		int p2 = p - dp
 		if p2 < 0
-			p2 += state.delay_samples
+			p2 += temp.num
 		
 		// add echo
 		b[i] += temp[p2]
-		//clampf(b[i], -1, 1)
 		
 		p ++
-		if p >= state.delay_samples
+		if p >= temp.num
 			p = 0
 
 void DataToDialog()
 	SliderSet(FlangerDialog, "speed", data.Speed)
 	SliderSet(FlangerDialog, "depth", data.Depth)
 	SliderSet(FlangerDialog, "delay", data.Delay)
-	/*SetSlider(FlangerDialog, HMM_SPEED_SLIDER, HMM_SPEED, 0, 2,    data.Speed, 1)
-	SetSlider(FlangerDialog, HMM_DEPTH_SLIDER, HMM_DEPTH, 0, 1,    data.Depth, 100)
-	SetSlider(FlangerDialog, HMM_DELAY_SLIDER, HMM_DELAY, 0, 0.02, data.Delay, 1000)*/
 
 void Configure()
 	// dialog
@@ -112,11 +102,13 @@ void Configure()
 	HuiWaitTillWindowClosed(FlangerDialog)
 	
 void ProcessTrack(BufferBox buf, Track t, int level)
-	InitState(t)
-	
 	AudioFile *a = t.root
+	int delay_samples = a.sample_rate * data.Delay + 1
+	state.temp_r.resize(delay_samples)
+	state.temp_l.resize(delay_samples)
+	
 	DoFlanger(buf.r, state.temp_r, a.sample_rate)
 	DoFlanger(buf.l, state.temp_l, a.sample_rate)
 	
-	ClearState()
+	state.offset += buf.num
 

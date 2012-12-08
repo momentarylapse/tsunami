@@ -11,6 +11,12 @@ class PluginData
 
 PluginData data
 
+class PluginState
+	int beat
+	int dpos
+
+PluginState state
+
 
 window dlg
 
@@ -18,15 +24,25 @@ void ProcessTrack(BufferBox buf, Track t, int level)
 	AudioFile *a = t.root
 
 	float dt_m = 60.0 / data.BeatsPerMinute
-
 	int sm_m = dt_m * a.sample_rate
 
-	int nm = buf.num / sm_m + 1
-	for int m, 0, nm
-		if (m % data.BeatsPerMeasure) == 0
-			buf.add_click(m * sm_m, data.Volume, 660.0, a.sample_rate)
+	while true
+		if state.beat == 0
+			buf.add_click(state.dpos, data.Volume, 660.0, a.sample_rate)
 		else
-			buf.add_click(m * sm_m, data.Volume * 0.5, 880.0, a.sample_rate)
+			buf.add_click(state.dpos, data.Volume * 0.5, 880.0, a.sample_rate)
+		
+		state.beat ++
+		if state.beat >= data.BeatsPerMeasure
+			state.beat = 0
+		state.dpos += sm_m
+		if state.dpos >= buf.num
+			state.dpos -= buf.num
+			break
+
+void ResetState()
+	state.beat = 0
+	state.dpos = 0
 
 void ResetData()
 	data.Volume = 0.3

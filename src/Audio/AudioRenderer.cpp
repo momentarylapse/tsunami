@@ -120,13 +120,13 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, AudioFile *a, Track *t, Array<Ef
 	// apply preview plugin?
 	if (t)
 		if (effect){
-			tsunami->plugins->ApplyEffects(buf, &fake_track, effect);
+			tsunami->plugins->ApplyEffects(buf, &fake_track, *effect);
 			//msg_write("preview  .....");
 		}
 
 	// apply fx
 	foreach(Effect &fx, fx_list)
-		tsunami->plugins->ApplyEffects(buf, &fake_track, &fx);
+		tsunami->plugins->ApplyEffects(buf, &fake_track, fx);
 
 	msg_db_l(1);
 }
@@ -181,9 +181,9 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf, AudioFile *a, const Ra
 	msg_db_l(1);
 }
 
-BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
+BufferBox AudioRenderer::RenderAudioFilePart(AudioFile *a, const Range &range)
 {
-	msg_db_r("RenderAudioFile", 1);
+	msg_db_r("RenderAudioFilePart", 1);
 
 	// render without fx
 	BufferBox buf;
@@ -195,4 +195,35 @@ BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
 
 	msg_db_l(1);
 	return buf;
+}
+
+BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
+{
+	BufferBox buf;
+	Prepare(a);
+	buf = RenderAudioFilePart(a, range);
+	CleanUp(a);
+	return buf;
+}
+
+void AudioRenderer::Prepare(AudioFile *a)
+{
+	msg_db_r("Renderer.Prepare", 2);
+	foreach(Track &t, a->track)
+		foreach(Effect &fx, t.fx)
+			tsunami->plugins->PrepareEffect(fx);
+	if (effect)
+		tsunami->plugins->PrepareEffect(*effect);
+	msg_db_l(2);
+}
+
+void AudioRenderer::CleanUp(AudioFile *a)
+{
+	msg_db_r("Renderer.CleanUp", 2);
+	foreach(Track &t, a->track)
+		foreach(Effect &fx, t.fx)
+			tsunami->plugins->CleanUpEffect(fx);
+	if (effect)
+		tsunami->plugins->CleanUpEffect(*effect);
+	msg_db_l(2);
 }

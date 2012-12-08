@@ -17,6 +17,9 @@ public:
 	virtual ~AudioRenderer();
 
 	BufferBox RenderAudioFile(AudioFile *a, const Range &range);
+	BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
+	void Prepare(AudioFile *a);
+	void CleanUp(AudioFile *a);
 
 private:
 	void bb_render_audio_track_no_fx(BufferBox &buf, Track &t, const Range &range);

@@ -20,29 +20,6 @@ PluginManager::~PluginManager()
 }
 
 
-void PluginManager::PushCurPlugin(CScript *s)
-{
-	foreachi(Plugin &p, plugin, i)
-		if (s == p.s){
-			cur_plugin_stack.add(i);
-			cur_plugin = &p;
-		}
-}
-
-void PluginManager::PopCurPlugin()
-{
-	cur_plugin_stack.resize(cur_plugin_stack.num - 1);
-	if (cur_plugin_stack.num > 0){
-		int i = cur_plugin_stack.back();
-		cur_plugin = &plugin[i];
-	}else{
-		cur_plugin = NULL;
-		//DeleteAllScripts();
-		//LoadedScript.clear();
-		//msg_write("---DeleteAll--------");
-	}
-}
-
 BufferBox AudioFileRender(AudioFile *a, const Range &r)
 {	return tsunami->renderer->RenderAudioFile(a, r);	}
 
@@ -84,9 +61,6 @@ void GlobalRemoveSliders(CHuiWindow *win)
 		delete(s);
 	global_slider.clear();
 }
-
-/*void GlobalBufferBoxClear(BufferBox *box)
-{	box->clear();	}*/
 
 CHuiWindow *GlobalMainWin = NULL;
 
@@ -250,7 +224,7 @@ void PluginManager::OnFavoriteName()
 void PluginManager::OnFavoriteList()
 {
 	int n = HuiCurWindow->GetInt("");
-	PluginResetData();
+	cur_plugin->ResetData();
 	if (n == 0){
 		HuiCurWindow->SetString("favorite_name", "");
 		HuiCurWindow->Enable("favorite_save", false);
@@ -260,7 +234,7 @@ void PluginManager::OnFavoriteList()
 		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		HuiCurWindow->Enable("favorite_delete", true);
 	}
-	PluginDataToDialog();
+	cur_plugin->DataToDialog();
 }
 
 void PluginManager::OnFavoriteSave()
@@ -345,7 +319,7 @@ void PluginManager::OnPluginFavoriteList()
 {
 	CHuiWindow *win = HuiGetEvent()->win;
 	int n = win->GetInt("");
-	PluginResetData();
+	cur_plugin->ResetData();
 	if (n == 0){
 		win->SetString("favorite_name", "");
 		win->Enable("favorite_save", false);
@@ -355,7 +329,7 @@ void PluginManager::OnPluginFavoriteList()
 		win->SetString("favorite_name", PluginFavoriteName[n - 1].c_str());
 		win->Enable("favorite_delete", true);
 	}
-	PluginDataToDialog();
+	cur_plugin->DataToDialog();
 }
 
 void PluginManager::OnPluginFavoriteSave()
@@ -429,24 +403,31 @@ void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id,
 	msg_db_l(1);
 }
 
-void PluginManager::PluginResetData()
+void Plugin::ResetData()
 {
-	msg_db_r("PluginResetData", 1);
-	if (cur_plugin)
-		if (cur_plugin->f_reset)
-			cur_plugin->f_reset();
+	msg_db_r("Plugin.ResetData", 1);
+	if (f_reset)
+		f_reset();
 	msg_db_l(1);
 }
 
-bool PluginManager::PluginConfigure(bool previewable)
+void Plugin::ResetState()
 {
-	msg_db_r("PluginConfigure", 1);
-	if (cur_plugin->f_configure){
-		PluginAddPreview = previewable;
-		cur_plugin->f_configure();
+	msg_db_r("Plugin.ResetState", 1);
+	if (f_reset_state)
+		f_reset_state();
+	msg_db_l(1);
+}
+
+bool Plugin::Configure(bool previewable)
+{
+	msg_db_r("Plugin.Configure", 1);
+	if (f_configure){
+		tsunami->plugins->PluginAddPreview = previewable;
+		f_configure();
 		GlobalRemoveSliders(NULL);
 		msg_db_l(1);
-		return !PluginCancelled;
+		return !tsunami->plugins->PluginCancelled;
 	}else{
 		tsunami->log->Info(_("Dieser Effekt ist nicht konfigurierbar."));
 	}
@@ -454,10 +435,10 @@ bool PluginManager::PluginConfigure(bool previewable)
 	return true;
 }
 
-void PluginManager::PluginDataToDialog()
+void Plugin::DataToDialog()
 {
-	if (cur_plugin->f_data2dialog)
-		cur_plugin->f_data2dialog();
+	if (f_data2dialog)
+		f_data2dialog();
 }
 
 void try_write_primitive_element(string &var_temp, sType *t, char *v)
@@ -562,14 +543,11 @@ void PluginManager::ExportPluginData(Effect &fx)
 {
 	msg_db_r("ExportPluginData", 1);
 	fx.param.clear();
-	for (int i=0;i<cur_plugin->s->pre_script->RootOfAllEvil.Var.num;i++){
-		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
-		if (t->Name == "PluginData"){
-			fx.param.resize(t->Element.num);
-			foreachi(sClassElement &e, t->Element, j)
-				try_write_element(&fx.param[j], &e, cur_plugin->s->g_var[i]);
-			break;
-		}
+	if (fx.plugin->data){
+		sType *t = fx.plugin->data_type;
+		fx.param.resize(t->Element.num);
+		foreachi(sClassElement &e, t->Element, j)
+			try_write_element(&fx.param[j], &e, (char*)fx.plugin->data);
 	}
 	msg_db_l(1);
 }
@@ -577,15 +555,60 @@ void PluginManager::ExportPluginData(Effect &fx)
 void PluginManager::ImportPluginData(Effect &fx)
 {
 	msg_db_r("ImportPluginData", 1);
-	for (int i=0;i<cur_plugin->s->pre_script->RootOfAllEvil.Var.num;i++){
-		sType *t = cur_plugin->s->pre_script->RootOfAllEvil.Var[i].Type;
-		if (t->Name == "PluginData"){
-			foreach(sClassElement &e, t->Element){
-				foreach(EffectParam &p, fx.param)
-					if ((e.Name == p.name) && (e.Type->Name == p.type))
-						try_read_element(p, &e, cur_plugin->s->g_var[i]);
-			}
-			break;
+	if (fx.plugin->data){
+		sType *t = fx.plugin->data_type;
+		foreach(sClassElement &e, t->Element)
+			foreach(EffectParam &p, fx.param)
+				if ((e.Name == p.name) && (e.Type->Name == p.type))
+					try_read_element(p, &e, (char*)fx.plugin->data);
+	}
+	msg_db_l(1);
+}
+
+void PluginManager::ExportPluginState(Effect &fx)
+{
+	msg_db_r("ExportPluginState", 1);
+	if (fx.plugin->state){
+		//msg_write(p2s(fx.state) + " = " + p2s(fx.plugin->state));
+		memcpy(fx.state, fx.plugin->state, fx.plugin->state_type->Size);
+	}
+	msg_db_l(1);
+}
+
+void PluginManager::ImportPluginState(Effect &fx)
+{
+	msg_db_r("ImportPluginState", 1);
+	if (fx.plugin->state)
+		memcpy(fx.plugin->state, fx.state, fx.plugin->state_type->Size);
+	msg_db_l(1);
+}
+
+void PluginManager::PrepareEffect(Effect &fx)
+{
+	msg_db_r("PrepareEffect", 0);
+	fx.plugin = NULL;
+	if (LoadAndCompileEffect(fx)){
+		if (fx.plugin->state){
+			ImportPluginData(fx);
+			fx.state = new char[fx.plugin->state_type->Size];
+			// TODO (init)
+			fx.plugin->ResetState();
+			ExportPluginState(fx);
+		}
+	}
+	msg_db_l(0);
+}
+
+void PluginManager::CleanUpEffect(Effect &fx)
+{
+	msg_db_r("CleanUpEffect", 1);
+	if (fx.plugin){
+		if (fx.plugin->state){
+			ImportPluginState(fx);
+			fx.plugin->ResetState();
+			// TODO (clear)
+			ExportPluginState(fx);
+			delete[]((char*)fx.state);
 		}
 	}
 	msg_db_l(1);
@@ -686,17 +709,17 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 
 	//msg_write(filename);
 
-	foreach(Plugin &p, plugin){
-		if (filename == p.filename){
-			PushCurPlugin(p.s);
+	foreach(Plugin *p, plugin){
+		if (filename == p->filename){
+			cur_plugin = p;
 			msg_db_l(1);
 			return true;
 		}
 	}
 
-	Plugin s;
-	s.filename = filename;
-	s.index = plugin.num;
+	Plugin *p = new Plugin;
+	p->filename = filename;
+	p->index = plugin.num;
 
 	//InitPluginData();
 
@@ -705,18 +728,33 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 		LinkAppScriptData();
 
 	// load + compile
-	s.s = LoadScript(filename);
+	p->s = LoadScript(filename);
 
-	// NULL if error...
-	s.f_reset = (hui_callback*)s.s->MatchFunction("ResetData", "void", 0);
-	s.f_data2dialog = (hui_callback*)s.s->MatchFunction("DataToDialog", "void", 0);
-	s.f_configure = (hui_callback*)s.s->MatchFunction("Configure", "void", 0);
+	// NULL if error ...
+	p->f_reset = (hui_callback*)p->s->MatchFunction("ResetData", "void", 0);
+	p->f_data2dialog = (hui_callback*)p->s->MatchFunction("DataToDialog", "void", 0);
+	p->f_configure = (hui_callback*)p->s->MatchFunction("Configure", "void", 0);
+	p->f_reset_state = (hui_callback*)p->s->MatchFunction("ResetState", "void", 0);
 
-	plugin.add(s);
-	PushCurPlugin(plugin.back().s);
+	p->data = NULL;
+	p->data_type = NULL;
+	p->state = NULL;
+	p->state_type = NULL;
+
+	foreachi(sLocalVariable &v, p->s->pre_script->RootOfAllEvil.Var, i)
+		if (v.Type->Name == "PluginData"){
+			p->data = p->s->g_var[i];
+			p->data_type = v.Type;
+		}else if (v.Type->Name == "PluginState"){
+			p->state = p->s->g_var[i];
+			p->state_type = v.Type;
+		}
+
+	plugin.add(p);
+	cur_plugin = plugin.back();
 
 	msg_db_l(1);
-	return !s.s->Error;
+	return !p->s->Error;
 }
 
 typedef void process_track_func(BufferBox*, Track*, int);
@@ -746,12 +784,13 @@ void PluginManager::ExecutePlugin(const string &filename)
 		AudioFile *a = tsunami->cur_audio;
 
 		// run
-		PluginResetData();
-		if (PluginConfigure(true)){
+		cur_plugin->ResetData();
+		if (cur_plugin->Configure(true)){
 			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 			if (s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int")){
 				if (a->used){
+					cur_plugin->ResetState();
 					foreach(Track &t, a->track)
 						if ((t.is_selected) && (t.type == t.TYPE_AUDIO)){
 							PluginProcessTrack(s, &t, a->cur_level, a->selection);
@@ -778,7 +817,6 @@ void PluginManager::ExecutePlugin(const string &filename)
 			fn = cur_plugin->s->pre_script->Filename;
 		tsunami->log->Error(format(_("Fehler in  Script-Datei: \"%s\"\n%s\n%s"), fn.c_str(), cur_plugin->s->ErrorMsgExt[0].c_str(), cur_plugin->s->ErrorMsgExt[1].c_str()));
 	}
-	PopCurPlugin();
 
 	msg_db_l(1);
 }
@@ -796,33 +834,37 @@ void PluginManager::FindAndExecutePlugin()
 }
 
 
-bool PluginManager::LoadAndCompileEffect(const string &filename)
+bool PluginManager::LoadAndCompileEffect(Effect &fx)
 {
 	foreach(PluginFile &pf, plugin_file)
-		if (filename == pf.name)
-			return LoadAndCompilePlugin(pf.filename);
+		if (fx.name == pf.name)
+			if (LoadAndCompilePlugin(pf.filename)){
+				fx.plugin = cur_plugin;
+				return true;
+			}
 	return false;
 }
 
-void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect *fx)
+void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect &fx)
 {
 	msg_db_r("ApplyEffects", 1);
 
-	if (LoadAndCompileEffect(fx->name)){
+	if (fx.plugin){
 		// run
-		PluginResetData();
-		ImportPluginData(*fx);
-		process_track_func *f = (process_track_func*)cur_plugin->s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
+		fx.plugin->ResetData();
+		ImportPluginData(fx);
+		ImportPluginState(fx);
+		process_track_func *f = (process_track_func*)fx.plugin->s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
 		if (f)
 			f(&buf, t, 0);
+		ExportPluginState(fx);
 		t->root->UpdateSelection();
 	}else{
-		if (cur_plugin->s)
-			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: %s %s)"), fx->name.c_str(), cur_plugin->s->ErrorMsgExt[0].c_str(), cur_plugin->s->ErrorMsgExt[1].c_str()));
+		if (fx.plugin->s)
+			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: %s %s)"), fx.name.c_str(), fx.plugin->s->ErrorMsgExt[0].c_str(), fx.plugin->s->ErrorMsgExt[1].c_str()));
 		else
-			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: Datei nicht ladbar)"), fx->name.c_str()));
+			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: Datei nicht ladbar)"), fx.name.c_str()));
 	}
-	PopCurPlugin();
 
 	msg_db_l(1);
 }

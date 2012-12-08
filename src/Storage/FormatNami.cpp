@@ -65,8 +65,8 @@ void WriteEffect(CFile *f, Effect *e)
 	BeginChunk(f, "fx");
 	f->WriteStr(e->name);
 	f->WriteBool(e->only_on_selection);
-	f->WriteInt(e->start);
-	f->WriteInt(e->end);
+	f->WriteInt(e->range.offset);
+	f->WriteInt(e->range.num);
 	foreach(EffectParam &p, e->param)
 		WriteEffectParam(f, &p);
 	EndChunk(f);
@@ -239,8 +239,8 @@ void ReadFXListOld(CFile *f, Array<Effect> &fx)
 		Effect e;
 		e.name = f->ReadStr();
 		e.only_on_selection = false;
-		e.start = 0;
-		e.end = -1;
+		e.range.offset = 0;
+		e.range.num = -1;
 		int num_params = f->ReadInt();
 		for (int j=0;j<num_params;j++){
 			EffectParam p;
@@ -267,8 +267,8 @@ void ReadFXList(CFile *f, Array<Effect> &fx)
 		Effect e;
 		e.name = f->ReadStr();
 		e.only_on_selection = f->ReadBool();
-		e.start = f->ReadInt();
-		e.end = f->ReadInt();
+		e.range.offset = f->ReadInt();
+		e.range.num = f->ReadInt();
 		int num_params = f->ReadInt();
 		for (int j=0;j<num_params;j++){
 			EffectParam p;
@@ -511,8 +511,8 @@ void ReadChunkEffect(CFile *f, Array<Effect> *fx)
 	Effect e;
 	e.name = f->ReadStr();
 	e.only_on_selection = f->ReadBool();
-	e.start = f->ReadInt();
-	e.end = f->ReadInt();
+	e.range.offset = f->ReadInt();
+	e.range.num = f->ReadInt();
 	fx->add(e);
 
 	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParam, &fx->back());

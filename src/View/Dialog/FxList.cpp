@@ -95,20 +95,19 @@ bool FxList::UpdateEffectParams(Effect &f)
 	bool ok = false;
 
 
-	if (tsunami->plugins->LoadAndCompileEffect(f.name)){
+	if (tsunami->plugins->LoadAndCompileEffect(f)){
 
-		tsunami->plugins->PluginResetData();
+		f.plugin->ResetData();
 
 		tsunami->plugins->ImportPluginData(f);
 
-		if (tsunami->plugins->PluginConfigure(false)){
+		if (f.plugin->Configure(false)){
 			tsunami->plugins->ExportPluginData(f);
 			ok = true;
 		}
 	}else{
 		tsunami->log->Error(format(_("Fehler in  Script-Datei: \"%s\"\n%s\n%s"), f.name.c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[0].c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[1].c_str()));
 	}
-	tsunami->plugins->PopCurPlugin();
 
 	msg_db_l(1);
 	return ok;

@@ -19,6 +19,9 @@
 
 const int NUM_PEAK_LEVELS = 24
 
+class Range
+	int offset, length
+
 class EffectParam
 	string name, type, value
 
@@ -26,7 +29,8 @@ class AudioEffect
 	string name
 	EffectParam param[]
 	bool only_on_selection
-	int start, end
+	Range range
+	void *state
 
 /*
 class sAudioFile
@@ -34,9 +38,6 @@ class sAudioFile
 
 class Sub
 	int dummy
-
-class Range
-	int offset, length
 
 class BufferBox
 	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
@@ -146,10 +147,10 @@ class AudioOutput
 	extern void Play(AudioFile a, bool loop)
 	extern void PlayGenerated(void *func, int sample_rate)
 	extern bool IsPlaying()
-	extern int GetPos(AudioFile a)
+	extern int GetPos()
 	extern float GetSampleRate()
 	extern float GetVolume()
-	extern void SetVolume(float _volume)
+	extern void SetVolume(float volume)
 
 class AudioInput
 	extern void Start(int sample_rate, bool add_data)

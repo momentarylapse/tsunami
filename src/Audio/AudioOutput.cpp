@@ -26,7 +26,7 @@
 #endif
 
 //#define AL_BUFFER_SIZE		131072
-#define AL_BUFFER_SIZE		65536
+#define AL_BUFFER_SIZE		32768
 //#define AL_BUFFER_SIZE		16384
 
 #define UPDATE_TIME		30
@@ -197,6 +197,9 @@ void AudioOutput::stop_play()
 		alSourceUnqueueBuffers(source, 1, &buf);
 		TestError(format("alSourceUnqueueBuffers(%d) (stop)", queued));
 	}
+
+	if (audio)
+		tsunami->renderer->CleanUp(audio);
 }
 
 void AudioOutput::Stop()
@@ -238,7 +241,7 @@ bool AudioOutput::stream(int buf)
 	int size = 0;
 	if (audio){
 		size = min(AL_BUFFER_SIZE, range.end() - stream_offset_next);
-		*b = tsunami->renderer->RenderAudioFile(audio, Range(stream_offset_next, size));
+		*b = tsunami->renderer->RenderAudioFilePart(audio, Range(stream_offset_next, size));
 		//msg_write(size);
 	}else if (generate_func){
 		b->resize(AL_BUFFER_SIZE);
@@ -260,6 +263,9 @@ bool AudioOutput::stream(int buf)
 
 void AudioOutput::start_play(int pos)
 {
+	if (audio)
+		tsunami->renderer->Prepare(audio);
+
 	stream_offset_next = pos;
 	stream_offset_current = pos;
 

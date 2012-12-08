@@ -12,6 +12,30 @@
 #include "../lib/script/script.h"
 #include "../Data/AudioFile.h"
 
+
+// compiled script
+class Plugin
+{
+public:
+	string filename;
+	CScript *s;
+	hui_callback *f_reset;
+	hui_callback *f_data2dialog;
+	hui_callback *f_configure;
+	hui_callback *f_reset_state;
+	int index;
+	sType *state_type;
+	void *state;
+	sType *data_type;
+	void *data;
+
+
+	void ResetData();
+	void ResetState();
+	bool Configure(bool previewable);
+	void DataToDialog();
+};
+
 class PluginManager : public HuiEventHandler
 {
 public:
@@ -21,13 +45,15 @@ public:
 	void LinkAppScriptData();
 	void AddPluginsToMenu();
 	void FindAndExecutePlugin();
-	void DoPlugins(int message);
-
-	void PushCurPlugin(CScript *s);
-	void PopCurPlugin();
 
 	void ImportPluginData(Effect &fx);
 	void ExportPluginData(Effect &fx);
+	void ImportPluginState(Effect &fx);
+	void ExportPluginState(Effect &fx);
+	void ResetPluginState(Effect &fx);
+
+	void PrepareEffect(Effect &fx);
+	void CleanUpEffect(Effect &fx);
 
 	void PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w);
 	void PutFavoriteBarSizable(CHuiWindow *win, const string &root_id, int x, int y);
@@ -37,18 +63,15 @@ public:
 	void OnMenuExecutePlugin();
 	void ExecutePlugin(const string &filename);
 
-	bool LoadAndCompileEffect(const string &filename);
-	void ApplyEffects(BufferBox &buf, Track *t, Effect *fx);
+	bool LoadAndCompileEffect(Effect &fx);
+	void ApplyEffects(BufferBox &buf, Track *t, Effect &fx);
 
 
 	bool LoadAndCompilePlugin(const string&);
-	void PluginResetData();
-	bool PluginConfigure(bool previewable);
 	void InitPluginData();
 	void FinishPluginData();
 	void InitFavorites(CHuiWindow *win);
 
-	void PluginDataToDialog();
 	void WritePluginDataToFile(const string &name);
 	void LoadPluginDataFromFile(const string &name);
 	void PluginPreview();
@@ -64,15 +87,7 @@ public:
 	void OnPluginOk();
 	void OnPluginClose();
 
-	struct Plugin
-	{
-		string filename;
-		CScript *s;
-		hui_callback *f_reset, *f_data2dialog, *f_configure;
-		int index;
-	};
-
-
+	// not compiled yet
 	struct PluginFile
 	{
 		string name;
@@ -89,9 +104,8 @@ public:
 	bool PluginCancelled;
 	bool PluginAddPreview;
 
-	Array<Plugin> plugin;
+	Array<Plugin*> plugin;
 	Plugin *cur_plugin;
-	Array<int> cur_plugin_stack;
 };
 
 #endif /* PLUGINMANAGER_H_ */

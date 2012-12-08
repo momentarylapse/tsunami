@@ -21,6 +21,7 @@
 
 class BufferBox;
 class AudioFile;
+class Plugin;
 
 class EffectParam
 {
@@ -35,7 +36,9 @@ public:
 	string name;
 	Array<EffectParam> param;
 	bool only_on_selection;
-	int start, end;
+	Range range;
+	Plugin *plugin;
+	void *state;
 };
 
 class Bar

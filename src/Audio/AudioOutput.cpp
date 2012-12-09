@@ -43,6 +43,7 @@ AudioOutput::AudioOutput() :
 
 	playing = false;
 	loop = false;
+	allow_loop = true;
 	volume = 1;
 
 	al_context = NULL;
@@ -51,8 +52,6 @@ AudioOutput::AudioOutput() :
 	buffer[1] = -1;
 	source = -1;
 	data_samples = 0;
-
-	PlayLoop = false;
 
 	ChosenDevice = HuiConfigReadStr("Output.ChosenDevice", "");
 	volume = HuiConfigReadFloat("Output.Volume", 1.0f);
@@ -214,7 +213,7 @@ void AudioOutput::Stop()
 	TestError("alDeleteBuffers (stop)");
 	buffer[0] = -1;
 	playing = false;
-	loop = false;
+	allow_loop = false;
 	audio = NULL;
 
 	Notify("Stop");
@@ -294,7 +293,7 @@ void AudioOutput::start_play(int pos)
 		return;
 }
 
-void AudioOutput::Play(AudioFile *a, bool _loop)
+void AudioOutput::Play(AudioFile *a, bool _allow_loop)
 {
 	msg_db_r("PreviewPlay", 1);
 
@@ -318,7 +317,7 @@ void AudioOutput::Play(AudioFile *a, bool _loop)
 	start_play(range.start());
 
 	playing = true;
-	loop = _loop;
+	allow_loop = _allow_loop;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
 
@@ -347,7 +346,7 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 	start_play(0);
 
 	playing = true;
-	loop = false;
+	allow_loop = false;
 
 	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
 
@@ -489,7 +488,7 @@ void AudioOutput::Update()
 		TestError("alGetSourcei(state) (idle)");
 		if ((param != AL_PLAYING) && (param != AL_PAUSED)){
 			//msg_write("hat gestoppt...");
-			if (loop)
+			if ((loop) && (allow_loop))
 				Seek(range.start());
 			else
 				Stop();

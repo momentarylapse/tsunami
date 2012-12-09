@@ -21,13 +21,12 @@ public:
 
 	Array<string> Device;
 	string ChosenDevice;
-	bool PlayLoop;
 
 	void Init();
 	void Kill();
 
 	void Stop();
-	void Play(AudioFile *a, bool loop);
+	void Play(AudioFile *a, bool allow_loop);
 	void PlayGenerated(void *func, int sample_rate);
 	void Pause();
 	void Update();
@@ -47,6 +46,9 @@ public:
 	float GetVolume();
 	void SetVolume(float _volume);
 
+	bool GetLoop(){	return loop;	}
+	void SetLoop(bool _loop){	loop = _loop;	}
+
 private:
 	bool TestError(const string &msg);
 	bool TestError2(const string &msg, void *d);
@@ -58,6 +60,7 @@ private:
 
 	float volume;
 	bool playing;
+	bool allow_loop;
 	bool loop;
 	int sample_rate;
 

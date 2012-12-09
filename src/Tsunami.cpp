@@ -314,13 +314,13 @@ void Tsunami::OnRemoveAdded()
 
 void Tsunami::OnPlayLoop()
 {
-	output->PlayLoop = !output->PlayLoop;
+	output->SetLoop(!output->GetLoop());
 	UpdateMenu();
 }
 
 void Tsunami::OnPlay()
 {
-	output->Play(cur_audio, output->PlayLoop);
+	output->Play(cur_audio, true);
 }
 
 void Tsunami::OnPause()
@@ -417,7 +417,7 @@ void Tsunami::UpdateMenu()
 	Enable("play", cur_audio->used);
 	Enable("stop", output->IsPlaying());
 	Enable("pause", output->IsPlaying());
-	Check("play_loop", output->PlayLoop);
+	Check("play_loop", output->GetLoop());
 
 
 	Reset("cur_level");

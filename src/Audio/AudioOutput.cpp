@@ -477,7 +477,7 @@ void AudioOutput::Update()
 			if (stream(buf)){
 				alSourceQueueBuffers(source, 1, &buf);
 				TestError("alSourceQueueBuffers (idle)");
-				if (stream_offset_next >= range.end()){
+				if ((stream_offset_next >= range.end()) && (loop) && (allow_loop)){
 					stream_offset_next = range.start();
 					if (audio){
 						tsunami->renderer->CleanUp(audio);

@@ -671,7 +671,13 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 
 void PluginManager::OnUpdate(Observable *o)
 {
-	tsunami->output->Stop();
+	if (o == tsunami->progress){
+		if (o->GetMessage() == "Cancel")
+			tsunami->output->Stop();
+	}else if (o == tsunami->output){
+		int pos = tsunami->output->GetPos();
+		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->output->GetRange().start()) / tsunami->output->GetRange().length());
+	}
 }
 
 void Plugin::Preview()
@@ -687,19 +693,14 @@ void Plugin::Preview()
 
 	tsunami->progress->StartCancelable(_("Vorschau"), 0);
 	tsunami->plugins->Subscribe(tsunami->progress);
+	tsunami->plugins->Subscribe(tsunami->output);
 	tsunami->output->Play(tsunami->cur_audio, false);
 
 	while(tsunami->output->IsPlaying()){
-		tsunami->output->Update();
 		HuiSleep(10);
 		HuiDoSingleMainLoop();
-		int pos = tsunami->output->GetPos();
-		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->output->GetRange().start()) / tsunami->output->GetRange().length());
-		if (tsunami->progress->IsCancelled()){
-			tsunami->output->Stop();
-			break;
-		}
 	}
+	tsunami->plugins->Unsubscribe(tsunami->output);
 	tsunami->plugins->Unsubscribe(tsunami->progress);
 	tsunami->progress->End();
 

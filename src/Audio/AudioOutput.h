@@ -67,7 +67,6 @@ private:
 	AudioFile *audio;
 	Range range;
 	int stream_offset_next;
-	int stream_offset_current;
 	BufferBox box[2];
 
 	typedef void generate_func_t(int, BufferBox &);

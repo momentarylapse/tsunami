@@ -251,6 +251,7 @@ bool AudioOutput::stream(int buf)
 		msg_db_l(1);
 		return false;
 	}
+	b->offset = stream_offset_next;
 	b->get_16bit_buffer(data);
 	alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
 	TestError("alBufferData (stream)");
@@ -266,7 +267,6 @@ void AudioOutput::start_play(int pos)
 		tsunami->renderer->Prepare(audio);
 
 	stream_offset_next = pos;
-	stream_offset_current = pos;
 
 	int num_buffers = 0;
 	if (stream(buffer[0]))
@@ -395,7 +395,7 @@ int AudioOutput::GetPos()
 		if ((param == AL_PLAYING) || (param == AL_PAUSED)){
 			alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
 			TestError("alGetSourcei2 (getpos)");
-			return stream_offset_current + param;
+			return box[cur_buffer_no].offset + param;
 		}
 	}
 	return -1;
@@ -471,13 +471,19 @@ void AudioOutput::Update()
 		TestError("alGetSourcei(processed) (idle)");
 		while(processed--){
 			cur_buffer_no = 1 - cur_buffer_no;
-			stream_offset_current += AL_BUFFER_SIZE;
 			ALuint buf;
 			alSourceUnqueueBuffers(source, 1, &buf);
 			TestError("alSourceUnqueueBuffers (idle)");
 			if (stream(buf)){
 				alSourceQueueBuffers(source, 1, &buf);
 				TestError("alSourceQueueBuffers (idle)");
+				if (stream_offset_next >= range.end()){
+					stream_offset_next = range.start();
+					if (audio){
+						tsunami->renderer->CleanUp(audio);
+						tsunami->renderer->Prepare(audio);
+					}
+				}
 			}
 		}
 		Notify("Update");
@@ -487,7 +493,7 @@ void AudioOutput::Update()
 		alGetSourcei(source,AL_SOURCE_STATE, &param);
 		TestError("alGetSourcei(state) (idle)");
 		if ((param != AL_PLAYING) && (param != AL_PAUSED)){
-			//msg_write("hat gestoppt...");
+			msg_write("hat gestoppt...");
 			if ((loop) && (allow_loop))
 				Seek(range.start());
 			else

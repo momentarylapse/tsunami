@@ -9,8 +9,9 @@
 #define PROGRESS_H_
 
 #include "../lib/hui/hui.h"
+#include "Observable.h"
 
-class Progress
+class Progress : public Observable
 {
 public:
 	Progress();

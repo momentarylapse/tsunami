@@ -11,7 +11,10 @@
 #include "../lib/hui/hui.h"
 #include "../lib/script/script.h"
 #include "../Data/AudioFile.h"
+#include "../Stuff/Observer.h"
 
+
+typedef void process_track_func(BufferBox*, Track*, int);
 
 // compiled script
 class Plugin
@@ -23,20 +26,28 @@ public:
 	hui_callback *f_data2dialog;
 	hui_callback *f_configure;
 	hui_callback *f_reset_state;
+	process_track_func *f_process_track;
 	int index;
 	sType *state_type;
 	void *state;
 	sType *data_type;
 	void *data;
 
+	int type;
+	enum{
+		TYPE_EFFECT,
+		TYPE_OTHER
+	};
 
 	void ResetData();
 	void ResetState();
 	bool Configure(bool previewable);
 	void DataToDialog();
+	void ProcessTrack(Track *t, int level_no, Range r);
+	void Preview();
 };
 
-class PluginManager : public HuiEventHandler
+class PluginManager : public HuiEventHandler, public Observer
 {
 public:
 	PluginManager();
@@ -74,8 +85,6 @@ public:
 
 	void WritePluginDataToFile(const string &name);
 	void LoadPluginDataFromFile(const string &name);
-	void PluginPreview();
-	void PluginProcessTrack(CScript *s, Track *t, int level_no, Range r);
 
 	void OnFavoriteName();
 	void OnFavoriteList();
@@ -84,8 +93,11 @@ public:
 	void OnPluginFavoriteName();
 	void OnPluginFavoriteList();
 	void OnPluginFavoriteSave();
+	void OnPluginPreview();
 	void OnPluginOk();
 	void OnPluginClose();
+
+	virtual void OnUpdate(Observable *o);
 
 	// not compiled yet
 	struct PluginFile

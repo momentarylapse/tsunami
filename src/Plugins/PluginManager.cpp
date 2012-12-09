@@ -367,13 +367,13 @@ void PluginManager::PutCommandBarFixed(CHuiWindow *win, int x, int y, int w)
 	//win->SetImage("cancel", "hui:cancel");
 
 	if (PluginAddPreview){
-		if (cur_plugin->s->pre_script->Filename.find("All - ") >= 0){
+		if (cur_plugin->type == Plugin::TYPE_EFFECT){
 			win->AddButton(_("Vorschau"),w - ww * 3 - 20,y,ww,25,"preview");
 			win->SetImage("preview", "hui:media-play");
 		}
 	}
 	win->EventM("ok", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginOk);
-	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::PluginPreview);
+	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginPreview);
 	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	msg_db_l(1);
@@ -391,16 +391,21 @@ void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id,
 	win->SetImage("cancel", "hui:cancel");
 	win->AddText("", 1, 0, 0, 0, "");
 	if (PluginAddPreview){
-		if (cur_plugin->s->pre_script->Filename.find("All - ") >= 0){
+		if (cur_plugin->type == Plugin::TYPE_EFFECT){
 			win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 			win->SetImage("preview", "hui:media-play");
 		}
 	}
 	win->EventM("ok", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginOk);
-	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::PluginPreview);
+	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginPreview);
 	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	msg_db_l(1);
+}
+
+void PluginManager::OnPluginPreview()
+{
+	cur_plugin->Preview();
 }
 
 void Plugin::ResetData()
@@ -664,22 +669,24 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 	msg_db_l(1);
 }
 
-void PluginManager::PluginPreview()
+void PluginManager::OnUpdate(Observable *o)
+{
+	tsunami->output->Stop();
+}
+
+void Plugin::Preview()
 {
 	Effect fx;
-	fx.plugin = cur_plugin;
-	fx.name = cur_plugin->s->pre_script->Filename.substr(cur_plugin->s->pre_script->Filename.find("All - ") + 6, -1);
+	fx.plugin = this;
+	fx.name = filename.basename();
 	fx.name = fx.name.substr(0, fx.name.num - 5);
 	//msg_write(fx.filename);
-	ExportPluginData(fx);
+	tsunami->plugins->ExportPluginData(fx);
 	tsunami->renderer->effect = &fx;
-
-	//CHuiWindow *dlg = HuiCurWindow;
-	//dlg->Hide(true);
-	//HuiCurWindow = MainWin;
 
 
 	tsunami->progress->StartCancelable(_("Vorschau"), 0);
+	tsunami->plugins->Subscribe(tsunami->progress);
 	tsunami->output->Play(tsunami->cur_audio, false);
 
 	while(tsunami->output->IsPlaying()){
@@ -693,13 +700,12 @@ void PluginManager::PluginPreview()
 			break;
 		}
 	}
+	tsunami->plugins->Unsubscribe(tsunami->progress);
 	tsunami->progress->End();
-	//dlg->Hide(false);
-	//HuiCurWindow = dlg;
 
 
 	tsunami->renderer->effect = NULL;
-	ImportPluginData(fx);
+	tsunami->plugins->ImportPluginData(fx);
 	fx.param.clear();
 }
 
@@ -736,6 +742,9 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	p->f_data2dialog = (hui_callback*)p->s->MatchFunction("DataToDialog", "void", 0);
 	p->f_configure = (hui_callback*)p->s->MatchFunction("Configure", "void", 0);
 	p->f_reset_state = (hui_callback*)p->s->MatchFunction("ResetState", "void", 0);
+	p->f_process_track = (process_track_func*)p->s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
+
+	p->type = p->f_process_track ? p->TYPE_EFFECT : p->TYPE_OTHER;
 
 	p->data = NULL;
 	p->data_type = NULL;
@@ -757,20 +766,17 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	msg_db_l(1);
 	return !p->s->Error;
 }
-
-typedef void process_track_func(BufferBox*, Track*, int);
 typedef void main_audiofile_func(AudioFile*);
 typedef void main_void_func();
 
-void PluginManager::PluginProcessTrack(CScript *s, Track *t, int level_no, Range r)
+void Plugin::ProcessTrack(Track *t, int level_no, Range r)
 {
-	process_track_func *f = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
-	if (!f)
+	if (!f_process_track)
 		return;
 	msg_db_r("PluginProcessTrack", 1);
 	BufferBox buf = t->GetBuffers(level_no, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
-	f(&buf, t, level_no);
+	f_process_track(&buf, t, level_no);
 	t->root->Execute(a);
 	msg_db_l(1);
 }
@@ -789,12 +795,12 @@ void PluginManager::ExecutePlugin(const string &filename)
 		if (cur_plugin->Configure(true)){
 			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
-			if (s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int")){
+			if (cur_plugin->type == Plugin::TYPE_EFFECT){
 				if (a->used){
 					cur_plugin->ResetState();
 					foreach(Track &t, a->track)
 						if ((t.is_selected) && (t.type == t.TYPE_AUDIO)){
-							PluginProcessTrack(s, &t, a->cur_level, a->selection);
+							cur_plugin->ProcessTrack(&t, a->cur_level, a->selection);
 						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
@@ -855,9 +861,8 @@ void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect &fx)
 		fx.plugin->ResetData();
 		ImportPluginData(fx);
 		ImportPluginState(fx);
-		process_track_func *f = (process_track_func*)fx.plugin->s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
-		if (f)
-			f(&buf, t, 0);
+		if (fx.plugin->type == Plugin::TYPE_EFFECT)
+			fx.plugin->f_process_track(&buf, t, 0);
 		ExportPluginState(fx);
 		t->root->UpdateSelection();
 	}else{

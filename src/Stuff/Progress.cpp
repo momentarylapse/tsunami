@@ -10,7 +10,7 @@
 static Progress *_progress_;
 
 Progress::Progress() :
-	dlg(NULL)
+	Observable("Progress"), dlg(NULL)
 {
 	_progress_ = this;
 }
@@ -61,6 +61,7 @@ void Progress::Start(const string &str, float progress)
 
 void Progress::Cancel()
 {
+	Notify("Cancel");
 	Cancelled = true;
 }
 

@@ -15,6 +15,17 @@ const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;
 const int MAX_TRACK_HEIGHT = 250;
 
+
+
+AudioView::SelectionType::SelectionType()
+{
+	type = SEL_TYPE_NONE;
+	audio = NULL;
+	track = sub = NULL;
+	pos = 0;
+	sub_offset = 0;
+}
+
 AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2) :
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
@@ -59,8 +70,11 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2)
 
 	audio[0] = audio_1;
 	audio[1] = audio_2;
-	Subscribe(audio[0]);
-	Subscribe(audio[1]);
+
+	for (int i=0;i<2;i++){
+		audio[i]->x = audio[i]->y = audio[i]->width = audio[i]->height = 0;
+		Subscribe(audio[i]);
+	}
 
 	// events
 	parent->EventMX("area", "hui:redraw", this, (void(HuiEventHandler::*)())&AudioView::OnDraw);
@@ -155,7 +169,7 @@ AudioView::SelectionType AudioView::GetMouseOver()
 	s.sub_offset = 0;
 
 	// audio file?
-	for (int i=0;i<2;i++)
+	for (int i=0;i<(ShowTempFile ? 2 : 1);i++)
 		if (MouseOverAudio(audio[i])){
 			s.audio = audio[i];
 			s.type = SEL_TYPE_AUDIO;

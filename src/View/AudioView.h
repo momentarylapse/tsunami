@@ -102,6 +102,8 @@ public:
 		int pos;
 		int sub_offset;
 		Array<int> barrier;
+
+		SelectionType();
 	};
 
 	SelectionType Hover, Selection;

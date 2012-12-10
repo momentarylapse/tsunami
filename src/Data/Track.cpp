@@ -6,6 +6,7 @@
  */
 
 #include "Track.h"
+#include "../Plugins/Effect.h"
 #include "../Action/Track/ActionTrackCreateBuffers.h"
 #include "../Action/Track/ActionTrackAddEmptySubTrack.h"
 #include "../lib/hui/hui.h"

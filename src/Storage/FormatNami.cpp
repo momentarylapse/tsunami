@@ -7,6 +7,7 @@
 
 #include "FormatNami.h"
 #include "../Tsunami.h"
+#include "../Plugins/Effect.h"
 
 
 const int CHUNK_SIZE = 1 << 16;

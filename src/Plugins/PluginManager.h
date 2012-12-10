@@ -13,39 +13,7 @@
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
 
-
-typedef void process_track_func(BufferBox*, Track*, int);
-
-// compiled script
-class Plugin
-{
-public:
-	string filename;
-	CScript *s;
-	hui_callback *f_reset;
-	hui_callback *f_data2dialog;
-	hui_callback *f_configure;
-	hui_callback *f_reset_state;
-	process_track_func *f_process_track;
-	int index;
-	sType *state_type;
-	void *state;
-	sType *data_type;
-	void *data;
-
-	int type;
-	enum{
-		TYPE_EFFECT,
-		TYPE_OTHER
-	};
-
-	void ResetData();
-	void ResetState();
-	bool Configure(bool previewable);
-	void DataToDialog();
-	void ProcessTrack(Track *t, int level_no, Range r);
-	void Preview();
-};
+class Plugin;
 
 class PluginManager : public HuiEventHandler, public Observer
 {
@@ -57,15 +25,6 @@ public:
 	void AddPluginsToMenu();
 	void FindAndExecutePlugin();
 
-	void ImportPluginData(Effect &fx);
-	void ExportPluginData(Effect &fx);
-	void ImportPluginState(Effect &fx);
-	void ExportPluginState(Effect &fx);
-	void ResetPluginState(Effect &fx);
-
-	void PrepareEffect(Effect &fx);
-	void CleanUpEffect(Effect &fx);
-
 	void PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w);
 	void PutFavoriteBarSizable(CHuiWindow *win, const string &root_id, int x, int y);
 	void PutCommandBarFixed(CHuiWindow *win, int x, int y, int w);
@@ -74,9 +33,7 @@ public:
 	void OnMenuExecutePlugin();
 	void ExecutePlugin(const string &filename);
 
-	bool LoadAndCompileEffect(Effect &fx);
-	void ApplyEffects(BufferBox &buf, Track *t, Effect &fx);
-
+	Plugin *GetPlugin(const string &name);
 
 	bool LoadAndCompilePlugin(const string&);
 	void InitPluginData();

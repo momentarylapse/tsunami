@@ -255,7 +255,15 @@ bool AudioOutput::stream(int buf)
 	b->get_16bit_buffer(data);
 	alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
 	TestError("alBufferData (stream)");
+
 	stream_offset_next += size;
+	if ((stream_offset_next >= range.end()) && (loop) && (allow_loop)){
+		stream_offset_next = range.start();
+		if (audio){
+			tsunami->renderer->CleanUp(audio);
+			tsunami->renderer->Prepare(audio);
+		}
+	}
 
 	msg_db_l(1);
 	return true;
@@ -477,13 +485,6 @@ void AudioOutput::Update()
 			if (stream(buf)){
 				alSourceQueueBuffers(source, 1, &buf);
 				TestError("alSourceQueueBuffers (idle)");
-				if ((stream_offset_next >= range.end()) && (loop) && (allow_loop)){
-					stream_offset_next = range.start();
-					if (audio){
-						tsunami->renderer->CleanUp(audio);
-						tsunami->renderer->Prepare(audio);
-					}
-				}
 			}
 		}
 		Notify("Update");
@@ -493,7 +494,7 @@ void AudioOutput::Update()
 		alGetSourcei(source,AL_SOURCE_STATE, &param);
 		TestError("alGetSourcei(state) (idle)");
 		if ((param != AL_PLAYING) && (param != AL_PAUSED)){
-			msg_write("hat gestoppt...");
+			//msg_write("hat gestoppt...");
 			if ((loop) && (allow_loop))
 				Seek(range.start());
 			else

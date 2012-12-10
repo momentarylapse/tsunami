@@ -9,7 +9,8 @@
 #include "../Tsunami.h"
 #include "FastFourierTransform.h"
 #include "../View/Dialog/Slider.h"
-#include "../Action/Track/ActionTrackEditBuffer.h"
+#include "Plugin.h"
+#include "Effect.h"
 
 PluginManager::PluginManager()
 {
@@ -408,221 +409,12 @@ void PluginManager::OnPluginPreview()
 	cur_plugin->Preview();
 }
 
-void Plugin::ResetData()
-{
-	msg_db_r("Plugin.ResetData", 1);
-	if (f_reset)
-		f_reset();
-	msg_db_l(1);
-}
-
-void Plugin::ResetState()
-{
-	msg_db_r("Plugin.ResetState", 1);
-	if (f_reset_state)
-		f_reset_state();
-	msg_db_l(1);
-}
-
-bool Plugin::Configure(bool previewable)
-{
-	msg_db_r("Plugin.Configure", 1);
-	if (f_configure){
-		tsunami->plugins->PluginAddPreview = previewable;
-		f_configure();
-		GlobalRemoveSliders(NULL);
-		msg_db_l(1);
-		return !tsunami->plugins->PluginCancelled;
-	}else{
-		tsunami->log->Info(_("Dieser Effekt ist nicht konfigurierbar."));
-	}
-	msg_db_l(1);
-	return true;
-}
-
-void Plugin::DataToDialog()
-{
-	if (f_data2dialog)
-		f_data2dialog();
-}
-
-void try_write_primitive_element(string &var_temp, sType *t, char *v)
-{
-	if (t == TypeInt)
-		var_temp += i2s(*(int*)v);
-	else if (t == TypeChar)
-		var_temp += i2s(*(char*)v);
-	else if (t == TypeFloat)
-		var_temp += f2s(*(float*)v, 6);
-	else if (t == TypeBool)
-		var_temp += (*(bool*)v) ? "true" : "false";
-	else if (t == TypeVector)
-		var_temp += format("(%f %f %f)", *(float*)v, ((float*)v)[1], ((float*)v)[2]);
-	else if (t == TypeComplex)
-		var_temp += format("(%f %f)", *(float*)v, ((float*)v)[1]);
-	else
-		var_temp += "-------";
-}
-
-void try_write_element(EffectParam *p, sClassElement *e, char *v)
-{
-	p->name = e->Name;
-	p->type = e->Type->Name;
-	p->value = "";
-	if (e->Type->IsArray){
-		p->value += "[";
-		for (int i=0;i<e->Type->ArrayLength;i++){
-			if (i > 0)
-				p->value += " ";
-			try_write_primitive_element(p->value, e->Type->SubType, &v[e->Offset + i * e->Type->SubType->Size]);
-		}
-		p->value += "]";
-	}else if (e->Type->IsSuperArray){
-		DynamicArray *a = (DynamicArray*)&v[e->Offset];
-		p->value += format("[%d ", a->num);
-		for (int i=0;i<a->num;i++){
-			if (i > 0)
-				p->value += " ";
-			try_write_primitive_element(p->value, e->Type->SubType, &(((char*)a->data)[i * e->Type->SubType->Size]));
-		}
-		p->value += "]";
-	}else
-		try_write_primitive_element(p->value, e->Type, &v[e->Offset]);
-}
-
-string get_next(const string &var_temp, int &pos)
-{
-	int start = pos;
-	for (int i=pos;i<var_temp.num;i++){
-		if ((var_temp[i] != ' ') && (var_temp[i] != ']') && (var_temp[i] != ')') && (var_temp[i] != '[') && (var_temp[i] != '(')){
-			start = i;
-			break;
-		}
-	}
-	for (int i=start;i<var_temp.num;i++){
-		if ((var_temp[i] == ' ') || (var_temp[i] == ']') || (var_temp[i] == ')') || (var_temp[i] == '[') || (var_temp[i] == '(')){
-			pos = i + 1;
-			return var_temp.substr(start, i - start);
-			break;
-		}
-	}
-	return var_temp.substr(start, -1);
-}
-
-void try_read_primitive_element(const string &var_temp, int &pos, sType *t, char *v)
-{
-	if (t == TypeInt)
-		*(int*)v = s2i(get_next(var_temp, pos));
-	else if (t == TypeChar)
-		*(char*)v = s2i(get_next(var_temp, pos));
-	else if (t == TypeFloat)
-		*(float*)v = s2f(get_next(var_temp, pos));
-	else if (t == TypeComplex){
-		((complex*)v)->x = s2f(get_next(var_temp, pos));
-		((complex*)v)->y = s2f(get_next(var_temp, pos));
-	}else if (t == TypeVector){
-		((vector*)v)->x = s2f(get_next(var_temp, pos));
-		((vector*)v)->y = s2f(get_next(var_temp, pos));
-		((vector*)v)->z = s2f(get_next(var_temp, pos));
-	}else if (t == TypeBool)
-		*(bool*)v = (get_next(var_temp, pos) == "true");
-}
-
-void try_read_element(EffectParam &p, sClassElement *e, char *v)
-{
-	int pos = 0;
-	if (e->Type->IsArray){
-		for (int i=0;i<e->Type->ArrayLength;i++)
-			try_read_primitive_element(p.value, pos, e->Type->SubType, &v[e->Offset + i * e->Type->SubType->Size]);
-	}else if (e->Type->IsSuperArray){
-		DynamicArray *a = (DynamicArray*)&v[e->Offset];
-		int num = s2i(get_next(p.value, pos));
-		a->resize(num);
-		for (int i=0;i<num;i++)
-			try_read_primitive_element(p.value, pos, e->Type->SubType, &(((char*)a->data)[i * e->Type->SubType->Size]));
-	}else
-		try_read_primitive_element(p.value, pos, e->Type, &v[e->Offset]);
-}
-
-void PluginManager::ExportPluginData(Effect &fx)
-{
-	msg_db_r("ExportPluginData", 1);
-	fx.param.clear();
-	if (fx.plugin->data){
-		sType *t = fx.plugin->data_type;
-		fx.param.resize(t->Element.num);
-		foreachi(sClassElement &e, t->Element, j)
-			try_write_element(&fx.param[j], &e, (char*)fx.plugin->data);
-	}
-	msg_db_l(1);
-}
-
-void PluginManager::ImportPluginData(Effect &fx)
-{
-	msg_db_r("ImportPluginData", 1);
-	if (fx.plugin->data){
-		sType *t = fx.plugin->data_type;
-		foreach(sClassElement &e, t->Element)
-			foreach(EffectParam &p, fx.param)
-				if ((e.Name == p.name) && (e.Type->Name == p.type))
-					try_read_element(p, &e, (char*)fx.plugin->data);
-	}
-	msg_db_l(1);
-}
-
-void PluginManager::ExportPluginState(Effect &fx)
-{
-	msg_db_r("ExportPluginState", 1);
-	if (fx.plugin->state)
-		memcpy(fx.state, fx.plugin->state, fx.plugin->state_type->Size);
-	msg_db_l(1);
-}
-
-void PluginManager::ImportPluginState(Effect &fx)
-{
-	msg_db_r("ImportPluginState", 1);
-	if (fx.plugin->state)
-		memcpy(fx.plugin->state, fx.state, fx.plugin->state_type->Size);
-	msg_db_l(1);
-}
-
-void PluginManager::PrepareEffect(Effect &fx)
-{
-	msg_db_r("PrepareEffect", 1);
-	fx.plugin = NULL;
-	if (LoadAndCompileEffect(fx)){
-		if (fx.plugin->state){
-			ImportPluginData(fx);
-			fx.state = new char[fx.plugin->state_type->Size];
-			// TODO (init)
-			fx.plugin->ResetState();
-			ExportPluginState(fx);
-		}
-	}
-	msg_db_l(1);
-}
-
-void PluginManager::CleanUpEffect(Effect &fx)
-{
-	msg_db_r("CleanUpEffect", 1);
-	if (fx.plugin){
-		if (fx.plugin->state){
-			ImportPluginState(fx);
-			fx.plugin->ResetState();
-			// TODO (clear)
-			ExportPluginState(fx);
-			delete[]((char*)fx.state);
-		}
-	}
-	msg_db_l(1);
-}
-
 void PluginManager::WritePluginDataToFile(const string &name)
 {
 	msg_db_r("WritePluginDataToFile", 1);
 	Effect fx;
 	fx.plugin = cur_plugin;
-	ExportPluginData(fx);
+	fx.ExportData();
 	dir_create(HuiAppDirectory + "Plugins/");
 	dir_create(HuiAppDirectory + "Plugins/Favorites/");
 	CFile *f = CreateFile(HuiAppDirectory + "Plugins/Favorites/" + cur_plugin->s->pre_script->Filename.basename() + "___" + name);
@@ -662,7 +454,7 @@ void PluginManager::LoadPluginDataFromFile(const string &name)
 		p.type = f->ReadStr();
 		p.value = f->ReadStr();
 	}
-	ImportPluginData(fx);
+	fx.ImportData();
 	fx.param.clear();
 
 	FileClose(f);
@@ -687,7 +479,7 @@ void Plugin::Preview()
 	fx.name = filename.basename();
 	fx.name = fx.name.substr(0, fx.name.num - 5);
 	//msg_write(fx.filename);
-	tsunami->plugins->ExportPluginData(fx);
+	fx.ExportData();
 	tsunami->renderer->effect = &fx;
 
 
@@ -706,7 +498,7 @@ void Plugin::Preview()
 
 
 	tsunami->renderer->effect = NULL;
-	tsunami->plugins->ImportPluginData(fx);
+	fx.ImportData();
 	fx.param.clear();
 }
 
@@ -725,62 +517,23 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 		}
 	}
 
-	Plugin *p = new Plugin;
-	p->filename = filename;
-	p->index = plugin.num;
-
 	//InitPluginData();
 
 	// linking would kill type information already defined in api.kaba...
 	if (plugin.num == 0)
 		LinkAppScriptData();
 
-	// load + compile
-	p->s = LoadScript(filename);
-
-	// NULL if error ...
-	p->f_reset = (hui_callback*)p->s->MatchFunction("ResetData", "void", 0);
-	p->f_data2dialog = (hui_callback*)p->s->MatchFunction("DataToDialog", "void", 0);
-	p->f_configure = (hui_callback*)p->s->MatchFunction("Configure", "void", 0);
-	p->f_reset_state = (hui_callback*)p->s->MatchFunction("ResetState", "void", 0);
-	p->f_process_track = (process_track_func*)p->s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
-
-	p->type = p->f_process_track ? p->TYPE_EFFECT : p->TYPE_OTHER;
-
-	p->data = NULL;
-	p->data_type = NULL;
-	p->state = NULL;
-	p->state_type = NULL;
-
-	foreachi(sLocalVariable &v, p->s->pre_script->RootOfAllEvil.Var, i)
-		if (v.Type->Name == "PluginData"){
-			p->data = p->s->g_var[i];
-			p->data_type = v.Type;
-		}else if (v.Type->Name == "PluginState"){
-			p->state = p->s->g_var[i];
-			p->state_type = v.Type;
-		}
+	Plugin *p = new Plugin(filename);
+	p->index = plugin.num;
 
 	plugin.add(p);
-	cur_plugin = plugin.back();
+	cur_plugin = p;
 
 	msg_db_l(1);
 	return !p->s->Error;
 }
 typedef void main_audiofile_func(AudioFile*);
 typedef void main_void_func();
-
-void Plugin::ProcessTrack(Track *t, int level_no, Range r)
-{
-	if (!f_process_track)
-		return;
-	msg_db_r("PluginProcessTrack", 1);
-	BufferBox buf = t->GetBuffers(level_no, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
-	f_process_track(&buf, t, level_no);
-	t->root->Execute(a);
-	msg_db_l(1);
-}
 
 void PluginManager::ExecutePlugin(const string &filename)
 {
@@ -842,36 +595,11 @@ void PluginManager::FindAndExecutePlugin()
 }
 
 
-bool PluginManager::LoadAndCompileEffect(Effect &fx)
+Plugin *PluginManager::GetPlugin(const string &name)
 {
 	foreach(PluginFile &pf, plugin_file)
-		if (fx.name == pf.name)
-			if (LoadAndCompilePlugin(pf.filename)){
-				fx.plugin = cur_plugin;
-				return true;
-			}
-	return false;
-}
-
-void PluginManager::ApplyEffects(BufferBox &buf, Track *t, Effect &fx)
-{
-	msg_db_r("ApplyEffects", 1);
-
-	if (fx.plugin){
-		// run
-		fx.plugin->ResetData();
-		ImportPluginData(fx);
-		ImportPluginState(fx);
-		if (fx.plugin->type == Plugin::TYPE_EFFECT)
-			fx.plugin->f_process_track(&buf, t, 0);
-		ExportPluginState(fx);
-		t->root->UpdateSelection();
-	}else{
-		if (fx.plugin->s)
-			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: %s %s)"), fx.name.c_str(), fx.plugin->s->ErrorMsgExt[0].c_str(), fx.plugin->s->ErrorMsgExt[1].c_str()));
-		else
-			tsunami->log->Error(format(_("Beim Anwenden eines Effekt-Scripts (%s: Datei nicht ladbar)"), fx.name.c_str()));
-	}
-
-	msg_db_l(1);
+		if (name == pf.name)
+			if (LoadAndCompilePlugin(pf.filename))
+				return cur_plugin;
+	return NULL;
 }

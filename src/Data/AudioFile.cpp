@@ -6,6 +6,7 @@
  */
 
 #include "AudioFile.h"
+#include "../Plugins/Effect.h"
 #include "../Action/AudioFile/ActionAudioAddTrack.h"
 #include "../Action/AudioFile/ActionAudioDeleteTrack.h"
 #include "../Action/AudioFile/ActionAudioAddLevel.h"

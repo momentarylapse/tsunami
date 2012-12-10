@@ -11,6 +11,7 @@
 #include "Range.h"
 #include "BufferBox.h"
 #include "AudioFile.h"
+#include "../Plugins/Effect.h"
 
 
 #define NUM_PEAK_LEVELS		24
@@ -21,25 +22,6 @@
 
 class BufferBox;
 class AudioFile;
-class Plugin;
-
-class EffectParam
-{
-public:
-	string name, type;
-	string value;
-};
-
-class Effect
-{
-public:
-	string name;
-	Array<EffectParam> param;
-	bool only_on_selection;
-	Range range;
-	Plugin *plugin;
-	void *state;
-};
 
 class Bar
 {

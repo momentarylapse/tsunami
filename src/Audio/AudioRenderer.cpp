@@ -6,6 +6,7 @@
  */
 
 #include "AudioRenderer.h"
+#include "../Plugins/Effect.h"
 #include "../Tsunami.h"
 
 AudioRenderer::AudioRenderer()
@@ -120,13 +121,13 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, AudioFile *a, Track *t, Array<Ef
 	// apply preview plugin?
 	if (t)
 		if (effect){
-			tsunami->plugins->ApplyEffects(buf, &fake_track, *effect);
+			effect->Apply(buf, &fake_track);
 			//msg_write("preview  .....");
 		}
 
 	// apply fx
 	foreach(Effect &fx, fx_list)
-		tsunami->plugins->ApplyEffects(buf, &fake_track, fx);
+		fx.Apply(buf, &fake_track);
 
 	msg_db_l(1);
 }
@@ -211,9 +212,9 @@ void AudioRenderer::Prepare(AudioFile *a)
 	msg_db_r("Renderer.Prepare", 2);
 	foreach(Track &t, a->track)
 		foreach(Effect &fx, t.fx)
-			tsunami->plugins->PrepareEffect(fx);
+			fx.Prepare();
 	if (effect)
-		tsunami->plugins->PrepareEffect(*effect);
+		effect->Prepare();
 	msg_db_l(2);
 }
 
@@ -222,8 +223,8 @@ void AudioRenderer::CleanUp(AudioFile *a)
 	msg_db_r("Renderer.CleanUp", 2);
 	foreach(Track &t, a->track)
 		foreach(Effect &fx, t.fx)
-			tsunami->plugins->CleanUpEffect(fx);
+			fx.CleanUp();
 	if (effect)
-		tsunami->plugins->CleanUpEffect(*effect);
+		effect->CleanUp();
 	msg_db_l(2);
 }

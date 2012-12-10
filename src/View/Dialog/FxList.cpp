@@ -6,6 +6,8 @@
  */
 
 #include "FxList.h"
+#include "../../Plugins/Plugin.h"
+#include "../../Plugins/Effect.h"
 #include "../../Tsunami.h"
 
 
@@ -94,15 +96,16 @@ bool FxList::UpdateEffectParams(Effect &f)
 	msg_db_r("UpdateEffectParams", 1);
 	bool ok = false;
 
+	f.LoadAndCompile();
 
-	if (tsunami->plugins->LoadAndCompileEffect(f)){
+	if (f.plugin){
 
 		f.plugin->ResetData();
 
-		tsunami->plugins->ImportPluginData(f);
+		f.ImportData();
 
 		if (f.plugin->Configure(false)){
-			tsunami->plugins->ExportPluginData(f);
+			f.ExportData();
 			ok = true;
 		}
 	}else{

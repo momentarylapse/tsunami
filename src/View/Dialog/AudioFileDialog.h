@@ -10,9 +10,10 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../Data/AudioFile.h"
+#include "../../Stuff/Observer.h"
 #include "FxList.h"
 
-class AudioFileDialog: public CHuiWindow
+class AudioFileDialog: public CHuiWindow, public Observer
 {
 public:
 	AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a);
@@ -24,6 +25,12 @@ public:
 	void OnOk();
 	void OnClose();
 	void OnTrackList();
+	void OnTagsSelect();
+	void OnTagsEdit();
+	void OnAddTag();
+	void OnDeleteTag();
+
+	virtual void OnUpdate(Observable *o);
 
 	Array<Track*> audio_list;
 

@@ -18,9 +18,13 @@ class Track;
 
 struct Tag
 {
-	//Tag(){	HistoryStructReset("Tag", this);	}
-
 	string key, value;
+	Tag(){}
+	Tag(const string &_key, const string &_value)
+	{
+		key = _key;
+		value = _value;
+	}
 };
 
 class AudioFile : public Data
@@ -44,7 +48,6 @@ public:
 	bool Save(const string &filename);
 	void UpdateSelection();
 	void UnselectAllSubs();
-	void AddTag(const string &key, const string &value);
 
 	virtual void PostActionUpdate();
 	void UpdatePeaks(int mode);
@@ -58,6 +61,9 @@ public:
 	int GetNextBeat(int pos);
 
 	// action
+	void AddTag(const string &key, const string &value);
+	void EditTag(int index, const string &key, const string &value);
+	void DeleteTag(int index);
 	Track *AddEmptyTrack(int index = -1);
 	Track *AddTimeTrack(int index = -1);
 	void DeleteCurrentTrack();

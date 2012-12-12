@@ -11,6 +11,9 @@
 #include "../Action/AudioFile/ActionAudioDeleteTrack.h"
 #include "../Action/AudioFile/ActionAudioAddLevel.h"
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
+#include "../Action/AudioFile/ActionAudioAddTag.h"
+#include "../Action/AudioFile/ActionAudioEditTag.h"
+#include "../Action/AudioFile/ActionAudioDeleteTag.h"
 #include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
 #include "../Action/SubTrack/ActionSubTrackFromSelection.h"
 #include "../Tsunami.h"
@@ -64,10 +67,17 @@ AudioFile::AudioFile()
 
 void AudioFile::AddTag(const string &key, const string &value)
 {
-	Tag t;
-	t.key = key;
-	t.value = value;
-	tag.add(t);
+	Execute(new ActionAudioAddTag(Tag(key, value)));
+}
+
+void AudioFile::EditTag(int index, const string &key, const string &value)
+{
+	Execute(new ActionAudioEditTag(index, Tag(key, value)));
+}
+
+void AudioFile::DeleteTag(int index)
+{
+	Execute(new ActionAudioDeleteTag(index));
 }
 
 void AudioFile::NewEmpty(int _sample_rate)

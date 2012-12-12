@@ -16,25 +16,41 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 	// dialog
 	FromResource("wave_dialog");
 
-	foreach(Tag &t, a->tag)
-		AddString("tags", t.key + "\\" + t.value);
-	int samples = a->GetRange().length();
-	SetString("time", a->get_time_str(samples));
-	SetInt("samples", samples);
-	SetInt("frequency", a->sample_rate);
-	SetString("format", "16 bit stereo (nami)");
-	RefillAudioList();
 	fx_list = new FxList(this, "fx_list", "add_effect", "configure_effect", "delete_effect", a->fx);
 
+	LoadData();
+
 	EventM("wave_list", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTrackList);
+	EventMX("tags", "hui:select", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsSelect);
+	EventMX("tags", "hui:change", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsEdit);
+	EventM("add_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnAddTag);
+	EventM("delete_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnDeleteTag);
 	EventM("close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
+
+	Subscribe(audio);
 }
 
 AudioFileDialog::~AudioFileDialog()
 {
+	Unsubscribe(audio);
 	//WaveDialog = NULL;
 	delete(fx_list);
+}
+
+void AudioFileDialog::LoadData()
+{
+	Reset("tags");
+	foreach(Tag &t, audio->tag)
+		AddString("tags", t.key + "\\" + t.value);
+	int samples = audio->GetRange().length();
+	SetString("time", audio->get_time_str(samples));
+	SetInt("samples", samples);
+	SetInt("frequency", audio->sample_rate);
+	SetString("format", "16 bit stereo (nami)");
+	RefillAudioList();
+	Enable("delete_tag", false);
+	fx_list->FillList();
 }
 
 
@@ -101,6 +117,42 @@ void AudioFileDialog::OnTrackList()
 		//ExecuteLevelDialog(this, audio_list[sel - dlg_audio->Track.num]);
 		RefillAudioList();
 	}
+}
+
+void AudioFileDialog::OnTagsSelect()
+{
+	int s = GetInt("tags");
+	Enable("delete_tag", s >= 0);
+}
+
+void AudioFileDialog::OnTagsEdit()
+{
+	int r = HuiGetEvent()->row;
+	if (r < 0)
+		return;
+	Tag t = audio->tag[r];
+	if (HuiGetEvent()->column == 0)
+		t.key = GetCell("tags", r, 0);
+	else
+		t.value = GetCell("tags", r, 1);
+	audio->EditTag(r, t.key, t.value);
+}
+
+void AudioFileDialog::OnAddTag()
+{
+	audio->AddTag("key", "value");
+}
+
+void AudioFileDialog::OnDeleteTag()
+{
+	int s = GetInt("tags");
+	if (s >= 0)
+		audio->DeleteTag(s);
+}
+
+void AudioFileDialog::OnUpdate(Observable *o)
+{
+	LoadData();
 }
 
 void AudioFileDialog::OnClose()

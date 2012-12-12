@@ -36,7 +36,6 @@ Plugin::Plugin(const string &_filename)
 		usable = !s->Error;
 
 		if (usable){
-			msg_write("Plugin() Usable");
 			f_reset = (void_func*)s->MatchFunction("ResetData", "void", 0);
 			f_data2dialog = (void_func*)s->MatchFunction("DataToDialog", "void", 0);
 			f_configure = (void_func*)s->MatchFunction("Configure", "void", 0);
@@ -206,6 +205,7 @@ bool Plugin::Configure(bool previewable)
 {
 	msg_db_r("Plugin.Configure", 1);
 	if (f_configure){
+		tsunami->plugins->cur_plugin = this;
 		tsunami->plugins->PluginAddPreview = previewable;
 		f_configure();
 		GlobalRemoveSliders(NULL);

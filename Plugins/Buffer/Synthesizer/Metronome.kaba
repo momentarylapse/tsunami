@@ -17,7 +17,6 @@ class PluginState
 
 PluginState state
 
-
 window dlg
 
 void ProcessTrack(BufferBox buf, Track t, int level)

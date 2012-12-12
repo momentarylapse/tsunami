@@ -231,7 +231,7 @@ void PluginManager::OnFavoriteList()
 		HuiCurWindow->Enable("favorite_save", false);
 		HuiCurWindow->Enable("favorite_delete", false);
 	}else{
-		LoadPluginDataFromFile(PluginFavoriteName[n - 1]);
+		cur_plugin->LoadDataFromFile(PluginFavoriteName[n - 1]);
 		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		HuiCurWindow->Enable("favorite_delete", true);
 	}
@@ -241,7 +241,7 @@ void PluginManager::OnFavoriteList()
 void PluginManager::OnFavoriteSave()
 {
 	string name = HuiCurWindow->GetString("favorite_name");
-	WritePluginDataToFile(name);
+	cur_plugin->WriteDataToFile(name);
 	PluginFavoriteName.add(name);
 	HuiCurWindow->AddString("favorite_list", name);
 	HuiCurWindow->SetInt("favorite_list", PluginFavoriteName.num);
@@ -326,8 +326,8 @@ void PluginManager::OnPluginFavoriteList()
 		win->Enable("favorite_save", false);
 		win->Enable("favorite_delete", false);
 	}else{
-		LoadPluginDataFromFile(PluginFavoriteName[n - 1].c_str());
-		win->SetString("favorite_name", PluginFavoriteName[n - 1].c_str());
+		cur_plugin->LoadDataFromFile(PluginFavoriteName[n - 1]);
+		win->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		win->Enable("favorite_delete", true);
 	}
 	cur_plugin->DataToDialog();
@@ -336,7 +336,7 @@ void PluginManager::OnPluginFavoriteList()
 void PluginManager::OnPluginFavoriteSave()
 {
 	CHuiWindow *win = HuiGetEvent()->win;
-	WritePluginDataToFile(win->GetString("favorite_name"));
+	cur_plugin->WriteDataToFile(win->GetString("favorite_name"));
 	PluginFavoriteName.add(win->GetString("favorite_name"));
 	win->AddString("favorite_list", win->GetString("favorite_name"));
 	win->SetInt("favorite_list", PluginFavoriteName.num);
@@ -406,59 +406,8 @@ void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id,
 
 void PluginManager::OnPluginPreview()
 {
-	cur_plugin->Preview();
-}
-
-void PluginManager::WritePluginDataToFile(const string &name)
-{
-	msg_db_r("WritePluginDataToFile", 1);
-	Effect fx;
-	fx.plugin = cur_plugin;
-	fx.ExportData();
-	dir_create(HuiAppDirectory + "Plugins/");
-	dir_create(HuiAppDirectory + "Plugins/Favorites/");
-	CFile *f = CreateFile(HuiAppDirectory + "Plugins/Favorites/" + cur_plugin->s->pre_script->Filename.basename() + "___" + name);
-	f->WriteInt(0);
-	f->WriteInt(0);
-	f->WriteComment("// Data");
-	f->WriteInt(fx.param.num);
-	foreach(EffectParam &p, fx.param){
-		f->WriteStr(p.name);
-		f->WriteStr(p.type);
-		f->WriteStr(p.value);
-	}
-	fx.param.clear();
-	f->WriteStr("#");
-	FileClose(f);
-	msg_db_l(1);
-}
-
-void PluginManager::LoadPluginDataFromFile(const string &name)
-{
-	msg_db_r("LoadPluginDataFromFile", 1);
-	CFile *f = OpenFile(HuiAppDirectory + "Plugins/Favorites/" + cur_plugin->s->pre_script->Filename.basename() + "___" + name);
-	if (!f){
-		msg_db_l(1);
-		return;
-	}
-	Effect fx;
-	fx.plugin = cur_plugin;
-
-	f->ReadInt();
-	f->ReadInt();
-	f->ReadComment();
-	int num = f->ReadInt();
-	fx.param.resize(num);
-	foreach(EffectParam &p, fx.param){
-		p.name = f->ReadStr();
-		p.type = f->ReadStr();
-		p.value = f->ReadStr();
-	}
-	fx.ImportData();
-	fx.param.clear();
-
-	FileClose(f);
-	msg_db_l(1);
+	Effect fx(cur_plugin);
+	Preview(fx);
 }
 
 void PluginManager::OnUpdate(Observable *o)
@@ -472,36 +421,6 @@ void PluginManager::OnUpdate(Observable *o)
 	}
 }
 
-void Plugin::Preview()
-{
-	Effect fx;
-	fx.plugin = this;
-	fx.name = filename.basename();
-	fx.name = fx.name.substr(0, fx.name.num - 5);
-	//msg_write(fx.filename);
-	fx.ExportData();
-	tsunami->renderer->effect = &fx;
-
-
-	tsunami->progress->StartCancelable(_("Vorschau"), 0);
-	tsunami->plugins->Subscribe(tsunami->progress);
-	tsunami->plugins->Subscribe(tsunami->output);
-	tsunami->output->Play(tsunami->cur_audio, false);
-
-	while(tsunami->output->IsPlaying()){
-		HuiSleep(10);
-		HuiDoSingleMainLoop();
-	}
-	tsunami->plugins->Unsubscribe(tsunami->output);
-	tsunami->plugins->Unsubscribe(tsunami->progress);
-	tsunami->progress->End();
-
-
-	tsunami->renderer->effect = NULL;
-	fx.ImportData();
-	fx.param.clear();
-}
-
 // always push the script... even if an error occurred
 bool PluginManager::LoadAndCompilePlugin(const string &filename)
 {
@@ -513,13 +432,13 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 		if (filename == p->filename){
 			cur_plugin = p;
 			msg_db_l(1);
-			return true;
+			return p->usable;
 		}
 	}
 
 	//InitPluginData();
 
-	// linking would kill type information already defined in api.kaba...
+	// repeated linking would kill type information already defined in api.kaba...
 	if (plugin.num == 0)
 		LinkAppScriptData();
 
@@ -530,7 +449,7 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	cur_plugin = p;
 
 	msg_db_l(1);
-	return !p->s->Error;
+	return p->usable;
 }
 typedef void main_audiofile_func(AudioFile*);
 typedef void main_void_func();
@@ -573,10 +492,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 		// data changed?
 		FinishPluginData();
 	}else{
-		string fn = filename;
-		if (cur_plugin->s->pre_script)
-			fn = cur_plugin->s->pre_script->Filename;
-		tsunami->log->Error(format(_("Fehler in  Script-Datei: \"%s\"\n%s\n%s"), fn.c_str(), cur_plugin->s->ErrorMsgExt[0].c_str(), cur_plugin->s->ErrorMsgExt[1].c_str()));
+		tsunami->log->Error(cur_plugin->GetError());
 	}
 
 	msg_db_l(1);
@@ -598,8 +514,34 @@ void PluginManager::FindAndExecutePlugin()
 Plugin *PluginManager::GetPlugin(const string &name)
 {
 	foreach(PluginFile &pf, plugin_file)
-		if (name == pf.name)
-			if (LoadAndCompilePlugin(pf.filename))
-				return cur_plugin;
+		if (name == pf.name){
+			LoadAndCompilePlugin(pf.filename);
+			return cur_plugin;
+		}
 	return NULL;
+}
+
+
+void PluginManager::Preview(Effect &fx)
+{
+	fx.ExportData();
+	tsunami->renderer->effect = &fx;
+
+
+	tsunami->progress->StartCancelable(_("Vorschau"), 0);
+	Subscribe(tsunami->progress);
+	Subscribe(tsunami->output);
+	tsunami->output->Play(tsunami->cur_audio, false);
+
+	while(tsunami->output->IsPlaying()){
+		HuiSleep(10);
+		HuiDoSingleMainLoop();
+	}
+	Unsubscribe(tsunami->output);
+	Unsubscribe(tsunami->progress);
+	tsunami->progress->End();
+
+
+	tsunami->renderer->effect = NULL;
+	fx.ImportData();
 }

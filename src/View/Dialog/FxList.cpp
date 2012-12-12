@@ -96,9 +96,9 @@ bool FxList::UpdateEffectParams(Effect &f)
 	msg_db_r("UpdateEffectParams", 1);
 	bool ok = false;
 
-	f.LoadAndCompile();
+	f.make_usable();
 
-	if (f.plugin){
+	if (f.usable){
 
 		f.plugin->ResetData();
 
@@ -109,7 +109,7 @@ bool FxList::UpdateEffectParams(Effect &f)
 			ok = true;
 		}
 	}else{
-		tsunami->log->Error(format(_("Fehler in  Script-Datei: \"%s\"\n%s\n%s"), f.name.c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[0].c_str(), tsunami->plugins->cur_plugin->s->ErrorMsgExt[1].c_str()));
+		tsunami->log->Error(f.GetError());
 	}
 
 	msg_db_l(1);

@@ -26,6 +26,7 @@ class Effect
 {
 public:
 	Effect();
+	Effect(Plugin *p);
 
 	string name;
 	Array<EffectParam> param;
@@ -33,8 +34,7 @@ public:
 	Range range;
 	Plugin *plugin;
 	void *state;
-
-	void LoadAndCompile();
+	bool usable;
 
 	void ExportData();
 	void ImportData();
@@ -42,7 +42,10 @@ public:
 	void ImportState();
 	void Prepare();
 	void CleanUp();
-	void Apply(BufferBox &buf, Track *t);
+	void Apply(BufferBox &buf, Track *t, bool log_error);
+
+	void make_usable();
+	string GetError();
 };
 
 #endif /* EFFECT_H_ */

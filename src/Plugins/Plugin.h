@@ -36,18 +36,25 @@ public:
 	sType *data_type;
 	void *data;
 
+	bool usable;
 	int type;
 	enum{
 		TYPE_EFFECT,
 		TYPE_OTHER
 	};
 
+	void ExportData(Array<EffectParam> &param);
+	void ImportData(Array<EffectParam> &param);
 	void ResetData();
 	void ResetState();
 	bool Configure(bool previewable);
 	void DataToDialog();
 	void ProcessTrack(Track *t, int level_no, Range r);
-	void Preview();
+
+	void WriteDataToFile(const string &name);
+	void LoadDataFromFile(const string &name);
+
+	string GetError();
 };
 
 #endif /* PLUGIN_H_ */

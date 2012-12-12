@@ -40,8 +40,7 @@ public:
 	void FinishPluginData();
 	void InitFavorites(CHuiWindow *win);
 
-	void WritePluginDataToFile(const string &name);
-	void LoadPluginDataFromFile(const string &name);
+	void Preview(Effect &fx);
 
 	void OnFavoriteName();
 	void OnFavoriteList();

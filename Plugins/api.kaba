@@ -30,7 +30,9 @@ class AudioEffect
 	EffectParam param[]
 	bool only_on_selection
 	Range range
+	void *plugin
 	void *state
+	bool usable
 
 /*
 class sAudioFile

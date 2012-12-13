@@ -785,8 +785,8 @@ void AudioView::DrawGrid(HuiDrawingContext *c, int x, int y, int width, int heig
 	dt = pow(10, exp_s);
 	dl = dt * a->sample_rate;
 //	float dw = dl * a->view_zoom;
-	int nx0 = a->screen2sample(x - 1) / dl + 1;
-	int nx1 = a->screen2sample(x + width) / dl + 1;
+	int nx0 = floor((float)a->screen2sample(x - 1) / (float)dl);
+	int nx1 = ceil((float)a->screen2sample(x + width) / (float)dl);
 	color c1 = ColorInterpolate(bg, ColorGrid, exp_s_mod);
 	color c2 = ColorGrid;
 	for (int n=nx0;n<nx1;n++){

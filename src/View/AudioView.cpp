@@ -107,6 +107,8 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2)
 
 	//ForceRedraw();
 	UpdateMenu();
+
+	track_dialog = new TrackDialog(tsunami);
 }
 
 AudioView::~AudioView()
@@ -1209,13 +1211,8 @@ void AudioView::MoveView(AudioFile *a, float dpos)
 
 void AudioView::ExecuteTrackDialog(CHuiWindow *win, Track *t)
 {
-	if (!t){
-		tsunami->log->Error(_("Keine Spur ausgew&ahlt"));
-		return;
-	}
-	TrackDialog *dlg = new TrackDialog(win, false, t);
-	dlg->Update();
-	HuiWaitTillWindowClosed(dlg);
+	track_dialog->SetTrack(t);
+	win->HideControl("tool_table", false);
 }
 
 

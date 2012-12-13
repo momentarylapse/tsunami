@@ -13,6 +13,8 @@
 #include "../Stuff/Observer.h"
 #include "../Action/SubTrack/ActionSubTrackMove.h"
 
+class TrackDialog;
+
 class AudioView : public HuiEventHandler, public Observer, public Observable
 {
 public:
@@ -162,6 +164,8 @@ public:
 	int DrawingWidth;
 
 	AudioFile *audio[2];
+
+	TrackDialog *track_dialog;
 };
 
 #endif /* AUDIOVIEW_H_ */

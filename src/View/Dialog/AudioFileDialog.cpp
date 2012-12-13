@@ -16,7 +16,7 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 	// dialog
 	FromResource("wave_dialog");
 
-	fx_list = new FxList(this, "fx_list", "add_effect", "configure_effect", "delete_effect", a->fx);
+	fx_list = new FxList(this, "fx_list", "add_effect", "configure_effect", "delete_effect", &a->fx);
 
 	LoadData();
 

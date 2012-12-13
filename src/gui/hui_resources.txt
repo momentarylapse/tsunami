@@ -3350,7 +3350,7 @@ Hinzufügen...
 add_bar_pause
 Pause
 add_effect
-Hinzufügen...
+
 add_tag
 Hinzufügen...
 add_time_track
@@ -3384,7 +3384,7 @@ Schließen
 close_file
 Schließen
 configure_effect
-Bearbeiten...
+
 copy
 Kopieren
 cut_out

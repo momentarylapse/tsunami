@@ -14,7 +14,7 @@
 class FxList : public HuiEventHandler
 {
 public:
-	FxList(CHuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_edit, const string &_id_delete, Array<Effect> &_fx);
+	FxList(CHuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_edit, const string &_id_delete, Array<Effect> *_fx);
 	virtual ~FxList();
 
 	void FillList();
@@ -28,11 +28,13 @@ public:
 	void AddNewEffect(string &filename);
 	void ExecuteFXDialog(int index);
 
+	void SetFxList(Array<Effect> *fx);
+
 public:
 	CHuiWindow *dlg;
 	string id;
 	string id_add, id_edit, id_delete;
-	Array<Effect> &fx;
+	Array<Effect> *fx;
 };
 
 #endif /* FXLIST_H_ */

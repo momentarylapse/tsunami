@@ -78,7 +78,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	// create the window
 	SetSize(width, height);
 	SetBorderWidth(0);
-	AddControlTable("", 0, 0, 1, 2, "main_table");
+	/*AddControlTable("", 0, 0, 1, 2, "main_table");
 	SetTarget("main_table", 0);
 	SetBorderWidth(8);
 	AddControlTable("!noexpandy", 0, 1, 9, 1, "audio_table");
@@ -93,7 +93,10 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddText("!width=20\\%", 6, 0, 0, 0, "label_percent");
 	volume_slider = new Slider(this, "volume_slider", "volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
 	AddButton("", 7, 0, 0, 0, "record");
-	AddComboBox("!width=100", 8, 0, 0, 0, "cur_level");
+	AddComboBox("!width=100", 8, 0, 0, 0, "cur_level");*/
+	AddControlTable("", 0, 0, 2, 1, "main_table");
+	SetTarget("main_table", 0);
+	AddControlTable("!noexpandx", 1, 0, 1, 2, "tool_table");
 	AllowEvents("key");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);

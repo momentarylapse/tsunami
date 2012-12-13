@@ -1,6 +1,6 @@
 t3
 // Number Of Resources
-17
+16
 // Resource
 Menu
 
@@ -155,138 +155,6 @@ hui:media-play
 60
 220
 100
-25
--1
-0
-0
-
-
-// Resource
-Dialog
-bar_dialog
-
-1
-265
-140
-0
-0
-0
-0
-0
-
-
-9
-Text
-nb_t_frequency
-
-1
-5
-5
-80
-25
--1
-0
-0
-
-
-Edit
-beats_per_minute
-
-1
-90
-5
-130
-25
--1
-0
-0
-
-
-Text
-per_minute
-
-1
-225
-5
-35
-25
--1
-0
-0
-
-
-DefButton
-ok
-hui:ok
-1
-140
-100
-100
-25
--1
-0
-0
-
-
-Button
-cancel
-hui:cancel
-1
-25
-100
-100
-25
--1
-0
-0
-
-
-Text
-nb_t_beats
-
-1
-5
-35
-80
-25
--1
-0
-0
-
-
-SpinButton
-num_beats
-
-1
-90
-35
-130
-25
--1
-0
-0
-
-
-Text
-nb_t_count
-
-1
-5
-65
-80
-25
--1
-0
-0
-
-
-SpinButton
-bar_count
-
-1
-90
-65
-130
 25
 -1
 0
@@ -3459,7 +3327,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-179
+171
 // Text
 about
 Info
@@ -3482,21 +3350,15 @@ Hinzufügen...
 add_bar_pause
 Pause
 add_effect
-Hinzufügen...
+
 add_tag
 Hinzufügen...
 add_time_track
 Rhythmus Spur hinzufügen...
 add_track
 Leere Spur hinzufügen
-bar_count
-1\\1\\10000\\1
-bar_dialog
-Neuer Takt
 bar_list
 !format=tTTT\\#\\Schläge\\Bpm\\Anzahl
-beats_per_minute
-
 cancel
 Abbrechen
 capture_delay
@@ -3522,7 +3384,7 @@ Schließen
 close_file
 Schließen
 configure_effect
-Bearbeiten...
+
 copy
 Kopieren
 cut_out
@@ -3631,20 +3493,12 @@ mute
 Stumm
 name
 
-nb_t_beats
-Schläge:
-nb_t_count
-Anzahl:
-nb_t_frequency
-Frequenz:
 nd_t_frequency
 Frequenz:
 new
 Neu...
 new_dialog
 Neue Datei
-num_beats
-4\\0\\32\\1
 ogg_bitrate
 64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
 ok
@@ -3673,8 +3527,6 @@ pdt_previewsleep
 Wartezeit
 pdt_volume
 Lautstärke
-per_minute
-/min
 per_second
 /s
 percent
@@ -3825,7 +3677,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-179
+171
 // Text
 about
 About
@@ -3855,13 +3707,7 @@ add_time_track
 
 add_track
 Add Track
-bar_count
-
-bar_dialog
-
 bar_list
-
-beats_per_minute
 
 cancel
 Cancel
@@ -3997,20 +3843,12 @@ mute
 Muted
 name
 
-nb_t_beats
-
-nb_t_count
-
-nb_t_frequency
-
 nd_t_frequency
 Frequency:
 new
 New...
 new_dialog
 New file
-num_beats
-
 ogg_bitrate
 64\\96\\128\\160\\196\\256
 ok
@@ -4039,8 +3877,6 @@ pdt_previewsleep
 Sleep
 pdt_volume
 Volume
-per_minute
-
 per_second
 /s
 percent

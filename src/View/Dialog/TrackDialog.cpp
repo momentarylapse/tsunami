@@ -11,29 +11,30 @@
 #include "FxList.h"
 #include "BarList.h"
 
-TrackDialog::TrackDialog(CHuiWindow *_parent, bool _allow_parent, Track *t):
-	CHuiWindow("dummy", -1, -1, 200, 300, _parent, _allow_parent, HuiWinModeControls | HuiWinModeResizable, true)
+TrackDialog::TrackDialog(CHuiWindow *win):
+	EmbeddedDialog(win)
 {
-	track = t;
-	if (t->type == Track::TYPE_TIME)
+	track = NULL;
+	win->SetTarget("tool_table", 0);
+	win->SetBorderWidth(8);
+	win->EmbedDialog("track_dialog", 1, 0);
+	win->SetDecimals(1);
+	/*if (t->type == Track::TYPE_TIME)
 		FromResource("track_time_dialog");
 	else
-		FromResource("track_dialog");
-
-	SetString("name", t->name);
-	SetDecimals(1);
-	Check("mute", t->muted);
-	volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, t->volume);
-	volume_slider->Enable(!t->muted);
-	fx_list = new FxList(this, "fx_list", "add_effect", "configure_effect", "delete_effect", t->fx);
+		FromResource("track_dialog");*/
+	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0);
+	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect", NULL);
 	bar_list = NULL;
-	if (t->type == Track::TYPE_TIME)
-		bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", t->bar, t->root->sample_rate);
+	/*if (t->type == Track::TYPE_TIME)
+		bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", t->bar, t->root->sample_rate);*/
 
-	EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
-	EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
-	EventM("close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
-	EventM("hui:close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
+	LoadData();
+
+	win->EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
+	win->EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
+	win->EventM("close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
+	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
 }
 
 TrackDialog::~TrackDialog()
@@ -42,6 +43,28 @@ TrackDialog::~TrackDialog()
 	delete(fx_list);
 	if (bar_list)
 		delete(bar_list);
+}
+
+void TrackDialog::LoadData()
+{
+	Enable("name", track);
+	Enable("mute", track);
+	if (track){
+		SetString("name", track->name);
+		Check("mute", track->muted);
+		volume_slider->Set(track->volume);
+		volume_slider->Enable(!track->muted);
+		fx_list->SetFxList(&track->fx);
+	}else{
+		volume_slider->Enable(false);
+		fx_list->SetFxList(NULL);
+	}
+}
+
+void TrackDialog::SetTrack(Track *t)
+{
+	track = t;
+	LoadData();
 }
 
 void TrackDialog::OnName()
@@ -62,5 +85,6 @@ void TrackDialog::OnMute()
 
 void TrackDialog::OnClose()
 {
-	delete(this);
+	//delete(this);
+	win->HideControl("tool_table", true);
 }

@@ -19,11 +19,11 @@
 	TrackDialog->AddListView("!nobar\\Effekte", 2, 0, 0, 0, "fx_list");
 	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_5");
 	TrackDialog->SetTarget("td_table_5", 0);
-	TrackDialog->AddButton("Hinzuf&ugen...", 0, 0, 0, 0, "add_effect");
+	TrackDialog->AddButton("", 0, 0, 0, 0, "add_effect");
 	TrackDialog->SetImage("add_effect", "hui:add");
-	TrackDialog->AddButton("Bearbeiten...", 1, 0, 0, 0, "configure_effect");
+	TrackDialog->AddButton("", 1, 0, 0, 0, "configure_effect");
 	TrackDialog->SetImage("configure_effect", "hui:edit");
-	TrackDialog->AddButton("L&oschen", 2, 0, 0, 0, "delete_effect");
+	TrackDialog->AddButton("", 2, 0, 0, 0, "delete_effect");
 	TrackDialog->SetImage("delete_effect", "hui:delete");
 	TrackDialog->SetTarget("td_table_7", 0);
 	TrackDialog->AddText("", 0, 0, 0, 0, "t_dummy");

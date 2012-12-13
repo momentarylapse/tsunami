@@ -11,7 +11,7 @@
 #include "../../Tsunami.h"
 
 
-FxList::FxList(CHuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete, Array<Effect> & _fx):
+FxList::FxList(CHuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete, Array<Effect> * _fx):
 fx(_fx)
 {
 	dlg = _dlg;
@@ -29,13 +29,22 @@ fx(_fx)
 }
 
 
+void FxList::SetFxList(Array<Effect> *_fx)
+{
+	fx = _fx;
+	FillList();
+}
 
 void FxList::FillList()
 {
 	msg_db_r("FillEffectList", 1);
 	dlg->Reset(id);
-	foreach(Effect &f, fx)
-		dlg->AddString(id, f.name);
+	if (fx){
+		foreach(Effect &f, *fx)
+			dlg->AddString(id, f.name);
+	}
+	dlg->Enable(id, fx);
+	dlg->Enable(id_add, fx);
 	dlg->Enable(id_edit, false);
 	dlg->Enable(id_delete, false);
 	msg_db_l(1);
@@ -63,6 +72,8 @@ void FxList::OnListSelect()
 
 void FxList::OnAdd()
 {
+	if (!fx)
+		return;
 	if (HuiFileDialogOpen(dlg, _("einen Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins/Buffer/", "*.kaba", "*.kaba"))
 		AddNewEffect(HuiFilename);
 }
@@ -70,6 +81,8 @@ void FxList::OnAdd()
 
 void FxList::OnEdit()
 {
+	if (!fx)
+		return;
 	int s = dlg->GetInt(id);
 	if (s >= 0){
 		ExecuteFXDialog(s);
@@ -80,9 +93,11 @@ void FxList::OnEdit()
 
 void FxList::OnDelete()
 {
+	if (!fx)
+		return;
 	int s = dlg->GetInt(id);
 	if (s >= 0){
-		fx.erase(s);
+		fx->erase(s);
 		FillList();
 	}
 }
@@ -118,13 +133,15 @@ bool FxList::UpdateEffectParams(Effect &f)
 
 void FxList::AddNewEffect(string &filename)
 {
+	if (!fx)
+		return;
 	msg_db_r("AddNewEffect", 1);
 
 	Effect effect;
 	effect.name = filename.basename(); // remove directory
 	effect.name = effect.name.substr(0, effect.name.num - 5); //      and remove ".kaba"
 	if (UpdateEffectParams(effect)){
-		fx.add(effect);
+		fx->add(effect);
 		FillList();
 	}
 
@@ -133,9 +150,11 @@ void FxList::AddNewEffect(string &filename)
 
 void FxList::ExecuteFXDialog(int index)
 {
+	if (!fx)
+		return;
 	msg_db_r("ExecuteFXDialog", 1);
 
-	UpdateEffectParams(fx[index]);
+	UpdateEffectParams((*fx)[index]);
 
 	msg_db_l(1);
 }

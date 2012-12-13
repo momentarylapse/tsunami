@@ -9,16 +9,16 @@
 #define TRACKDIALOG_H_
 
 
-#include "../../lib/hui/hui.h"
+#include "EmbeddedDialog.h"
 class Track;
 class Slider;
 class FxList;
 class BarList;
 
-class TrackDialog: public CHuiWindow
+class TrackDialog: public EmbeddedDialog
 {
 public:
-	TrackDialog(CHuiWindow *_parent, bool _allow_parent, Track *t);
+	TrackDialog(CHuiWindow *win);
 	virtual ~TrackDialog();
 
 	void LoadData();
@@ -29,6 +29,8 @@ public:
 	void OnName();
 	void OnVolume();
 	void OnMute();
+
+	void SetTrack(Track *t);
 
 	Track *track;
 	Slider *volume_slider;

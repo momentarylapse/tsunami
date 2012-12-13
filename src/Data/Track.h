@@ -93,7 +93,7 @@ public:
 	int rep_delay;
 
 	Array<Effect> fx;
-	Array<Track> sub;
+	Array<Track*> sub;
 	int cur_sub;
 
 	// time track

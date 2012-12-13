@@ -45,8 +45,8 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	Enable("capture_playback", a->used);
 	Check("capture_playback", a->used);
 
-	foreach(Track &t, a->track)
-		AddString("capture_target", t.GetNiceName());
+	foreach(Track *t, a->track)
+		AddString("capture_target", t->GetNiceName());
 	AddString("capture_target", _("neue Spur anlegen"));
 	SetInt("capture_target", (a->cur_track >= 0) ? a->cur_track : a->track.num);
 
@@ -157,14 +157,14 @@ void CaptureDialog::Insert()
 			i0 = s_start - dpos;
 		}else{
 			// sub track
-			t = &audio->track[target];
+			t = audio->track[target];
 			//dpos = s_start + dpos;
 			i0 = s_start - dpos;
 		}
 	}else{
 		// new file
 		audio->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
-		t = &audio->track[0];
+		t = audio->track[0];
 		i0 = 0;
 	}
 

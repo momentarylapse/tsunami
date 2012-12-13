@@ -22,9 +22,10 @@ ActionTrackAddEmptySubTrack::~ActionTrackAddEmptySubTrack()
 void ActionTrackAddEmptySubTrack::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track &t = a->track[track_no];
+	Track *t = a->track[track_no];
 
-	t.sub.pop();
+	Track *s = t->sub.pop();
+	delete(s);
 }
 
 
@@ -32,16 +33,15 @@ void ActionTrackAddEmptySubTrack::undo(Data *d)
 void *ActionTrackAddEmptySubTrack::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track &t = a->track[track_no];
+	Track *t = a->track[track_no];
 
-	Track ss;
-	t.sub.add(ss);
+	Track *s = new Track;
+	t->sub.add(s);
 
-	Track *s = &t.sub.back();
 	s->name = name;
 	s->pos = range.start();
 	s->length = range.length();
-	s->parent = get_track_index(&t);
+	s->parent = get_track_index(t);
 	s->root = a;
 	s->level.resize(1);
 	s->level[0].buffer.resize(1);
@@ -49,7 +49,7 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 	s->level[0].buffer[0].resize(s->length);
 	s->is_selected = true;
 
-	if (a->GetCurTrack() == &t)
+	if (a->GetCurTrack() == t)
 		a->SetCurSub(s);
 	return s;
 }

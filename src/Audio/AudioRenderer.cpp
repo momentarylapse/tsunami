@@ -18,14 +18,14 @@ AudioRenderer::~AudioRenderer()
 {
 }
 
-bool intersect_sub(Track &s, const Range &r, Range &ir, int &bpos)
+bool intersect_sub(Track *s, const Range &r, Range &ir, int &bpos)
 {
 	// intersected intervall (track-coordinates)
-	int i0 = max(s.pos, r.start());
-	int i1 = min(s.pos + s.length, r.end());
+	int i0 = max(s->pos, r.start());
+	int i1 = min(s->pos + s->length, r.end());
 
 	// beginning of the intervall (relative to sub)
-	ir.offset = i0 - s.pos;
+	ir.offset = i0 - s->pos;
 	// ~ (relative to old intervall)
 	bpos = i0 - r.start();
 	ir.num = i1 - i0;
@@ -33,38 +33,38 @@ bool intersect_sub(Track &s, const Range &r, Range &ir, int &bpos)
 	return !ir.empty();
 }
 
-void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track &t)
+void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_r("bb_render_audio_track_no_fx", 1);
 
 	// track buffer
-	BufferBox buf0 = t.ReadBuffersCol(range);
+	BufferBox buf0 = t->ReadBuffersCol(range);
 	buf.swap_ref(buf0);
 
 	// subs
-	foreach(Track &s, t.sub){
-		if (s.muted)
+	foreach(Track *s, t->sub){
+		if (s->muted)
 			continue;
 
 		// can be repetitious!
-		for (int i=0;i<s.rep_num+1;i++){
+		for (int i=0;i<s->rep_num+1;i++){
 			Range rep_range = range;
-			rep_range.move(-s.rep_delay * i);
+			rep_range.move(-s->rep_delay * i);
 			Range intersect_range;
 			int bpos;
 			if (!intersect_sub(s, rep_range, intersect_range, bpos))
 				continue;
 
-			BufferBox sbuf = s.ReadBuffers(0, intersect_range);
+			BufferBox sbuf = s->ReadBuffers(0, intersect_range);
 			buf.make_own();
-			buf.add(sbuf, bpos, s.volume);
+			buf.add(sbuf, bpos, s->volume);
 		}
 	}
 
 	msg_db_l(1);
 }
 
-void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t)
+void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_r("bb_render_time_track_no_fx", 1);
 
@@ -72,12 +72,12 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t)
 	buf.resize(range.length());
 
 	int pos0 = 0;
-	foreach(Bar &b, t.bar)
+	foreach(Bar &b, t->bar)
 		if (b.type == b.TYPE_BAR){
 			for (int j=0;j<b.count;j++){
 				for (int i=0;i<b.num_beats;i++){
 					int pos = pos0 + i * b.length / b.num_beats;
-					buf.add_click(pos - range.offset, (i == 0) ? 0.7f : 0.35f, (i == 0) ? 660.0f : 880.0f, t.root->sample_rate);
+					buf.add_click(pos - range.offset, (i == 0) ? 0.7f : 0.35f, (i == 0) ? 660.0f : 880.0f, t->root->sample_rate);
 				}
 				pos0 += b.length;
 			}
@@ -88,25 +88,25 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track &t)
 	msg_db_l(1);
 }
 
-void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track &t)
+void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_r("bb_render_track_no_fx", 1);
 
-	if (t.type == Track::TYPE_AUDIO)
+	if (t->type == Track::TYPE_AUDIO)
 		bb_render_audio_track_no_fx(buf, t);
-	else if (t.type == Track::TYPE_TIME)
+	else if (t->type == Track::TYPE_TIME)
 		bb_render_time_track_no_fx(buf, t);
 
 	msg_db_l(1);
 }
 
-void AudioRenderer::make_fake_track(Track &t, BufferBox &buf)
+void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
 {
 	//msg_write("fake track");
-	t.root = audio;
-	t.level.resize(1);
-	t.level[0].buffer.resize(1);
-	t.level[0].buffer[0].set_as_ref(buf, 0, range.length());
+	t->root = audio;
+	t->level.resize(1);
+	t->level[0].buffer.resize(1);
+	t->level[0].buffer[0].set_as_ref(buf, 0, range.length());
 }
 
 void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list)
@@ -116,7 +116,7 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list
 	buf.make_own();
 
 	Track fake_track;
-	make_fake_track(fake_track, buf);
+	make_fake_track(&fake_track, buf);
 
 	// apply preview plugin?
 	if (t)
@@ -132,22 +132,22 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list
 	msg_db_l(1);
 }
 
-void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track &t)
+void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t)
 {
 	msg_db_r("bb_render_track_fx", 1);
 
 	bb_render_track_no_fx(buf, t);
 
-	if ((t.fx.num > 0) || (effect))
-		bb_apply_fx(buf, &t, t.fx);
+	if ((t->fx.num > 0) || (effect))
+		bb_apply_fx(buf, t, t->fx);
 
 	msg_db_l(1);
 }
 
 int get_first_usable_track(AudioFile *a)
 {
-	foreachi(Track &t, a->track, i)
-		if ((!t.muted) && (t.is_selected))
+	foreachi(Track *t, a->track, i)
+		if ((!t->muted) && (t->is_selected))
 			return i;
 	return -1;
 }
@@ -165,16 +165,16 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 
 		// first (un-muted) track
 		bb_render_track_fx(buf, audio->track[i0]);
-		buf.scale(audio->track[i0].volume);
+		buf.scale(audio->track[i0]->volume);
 
 		// other tracks
 		for (int i=i0+1;i<audio->track.num;i++){
-			if ((audio->track[i].muted) || (!audio->track[i].is_selected))
+			if ((audio->track[i]->muted) || (!audio->track[i]->is_selected))
 				continue;
 			BufferBox tbuf;
 			bb_render_track_fx(tbuf, audio->track[i]);
 			buf.make_own();
-			buf.add(tbuf, 0, audio->track[i].volume);
+			buf.add(tbuf, 0, audio->track[i]->volume);
 		}
 
 		buf.scale(audio->volume);
@@ -213,8 +213,8 @@ BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
 void AudioRenderer::Prepare(AudioFile *a)
 {
 	msg_db_r("Renderer.Prepare", 2);
-	foreach(Track &t, a->track)
-		foreach(Effect &fx, t.fx)
+	foreach(Track *t, a->track)
+		foreach(Effect &fx, t->fx)
 			fx.Prepare();
 	if (effect)
 		effect->Prepare();
@@ -224,8 +224,8 @@ void AudioRenderer::Prepare(AudioFile *a)
 void AudioRenderer::CleanUp(AudioFile *a)
 {
 	msg_db_r("Renderer.CleanUp", 2);
-	foreach(Track &t, a->track)
-		foreach(Effect &fx, t.fx)
+	foreach(Track *t, a->track)
+		foreach(Effect &fx, t->fx)
 			fx.CleanUp();
 	if (effect)
 		effect->CleanUp();

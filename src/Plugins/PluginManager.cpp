@@ -471,9 +471,9 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (cur_plugin->type == Plugin::TYPE_EFFECT){
 				if (a->used){
 					cur_plugin->ResetState();
-					foreach(Track &t, a->track)
-						if ((t.is_selected) && (t.type == t.TYPE_AUDIO)){
-							cur_plugin->ProcessTrack(&t, a->cur_level, a->selection);
+					foreach(Track *t, a->track)
+						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
+							cur_plugin->ProcessTrack(t, a->cur_level, a->selection);
 						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));

@@ -63,13 +63,13 @@ void AudioFileDialog::RefillAudioList()
 {
 	msg_db_r("RefillAudioList", 1);
 	Reset("wave_list");
-	foreachi(Track &t, audio->track, i)
-		AddString("wave_list", format("%d\\%s\\%s", i + 1, t.name.c_str(), get_vol(t.volume, t.muted).c_str()));
+	foreachi(Track *t, audio->track, i)
+		AddString("wave_list", format("%d\\%s\\%s", i + 1, t->name.c_str(), get_vol(t->volume, t->muted).c_str()));
 	audio_list.clear();
-	foreachi(Track &t, audio->track, i)
-		foreachi(Track &s, t.sub, j){
-			AddChildString("wave_list", i, format("%d\\%s\\%s", j + 1, s.name.c_str(), get_vol(t.volume * s.volume, t.muted || s.muted).c_str()));
-			audio_list.add(&s);
+	foreachi(Track *t, audio->track, i)
+		foreachi(Track *s, t->sub, j){
+			AddChildString("wave_list", i, format("%d\\%s\\%s", j + 1, s->name.c_str(), get_vol(t->volume * s->volume, t->muted || s->muted).c_str()));
+			audio_list.add(s);
 		}
 	msg_db_l(1);
 }
@@ -111,7 +111,7 @@ void AudioFileDialog::OnTrackList()
 	int sel = GetInt("");
 	if ((sel >= 0) && (sel < audio->track.num)){
 		audio->cur_track = sel;
-		tsunami->view->ExecuteTrackDialog(this, &audio->track[sel]);
+		tsunami->view->ExecuteTrackDialog(this, audio->track[sel]);
 		RefillAudioList();
 	}else if (sel >= audio->track.num){
 		//ExecuteLevelDialog(this, audio_list[sel - dlg_audio->Track.num]);

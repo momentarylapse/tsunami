@@ -46,9 +46,9 @@ bool Format::TestFormatCompatibility(AudioFile *a)
 {
 	int num_subs = 0;
 	int num_fx = a->fx.num;
-	foreach(Track &t, a->track){
-		num_subs += t.sub.num;
-		num_fx += t.fx.num;
+	foreach(Track *t, a->track){
+		num_subs += t->sub.num;
+		num_fx += t->fx.num;
 	}
 
 	if ((a->track.num > 1) && ((flags & Format::FLAG_MULTITRACK) == 0))

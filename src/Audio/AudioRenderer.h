@@ -22,12 +22,12 @@ public:
 	void CleanUp(AudioFile *a);
 
 private:
-	void bb_render_audio_track_no_fx(BufferBox &buf, Track &t);
-	void bb_render_time_track_no_fx(BufferBox &buf, Track &t);
-	void bb_render_track_no_fx(BufferBox &buf, Track &t);
-	void make_fake_track(Track &t, BufferBox &buf);
+	void bb_render_audio_track_no_fx(BufferBox &buf, Track *t);
+	void bb_render_time_track_no_fx(BufferBox &buf, Track *t);
+	void bb_render_track_no_fx(BufferBox &buf, Track *t);
+	void make_fake_track(Track *t, BufferBox &buf);
 	void bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list);
-	void bb_render_track_fx(BufferBox &buf, Track &t);
+	void bb_render_track_fx(BufferBox &buf, Track *t);
 	void bb_render_audio_no_fx(BufferBox &buf);
 
 	AudioFile *audio;

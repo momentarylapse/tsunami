@@ -23,6 +23,7 @@ ActionAudioAddTrack::~ActionAudioAddTrack()
 void ActionAudioAddTrack::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	delete(a->track[index]);
 	a->track.erase(index);
 	a->cur_track = old_cur_track;
 }
@@ -36,17 +37,17 @@ void *ActionAudioAddTrack::execute(Data *d)
 
 	assert((index >= 0) && (index <= a->track.num));
 
-	Track _dummy_, *t;
-	a->cur_track = index;
-	a->track.insert(_dummy_, a->cur_track);
-	t = &a->track[a->cur_track];
+	Track *t = new Track;
 
-	t->name = format(_("Spur %d"), a->track.num);
+	t->name = format(_("Spur %d"), a->track.num + 1);
 	t->root = a;
 	t->parent = -1;
 	t->is_selected = true;
 	t->type = type;
 	t->level.resize(a->level_name.num);
+
+	a->cur_track = index;
+	a->track.insert(t, a->cur_track);
 
 	return t;
 }

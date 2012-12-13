@@ -12,9 +12,9 @@
 
 ActionSubTrackFromSelection::ActionSubTrackFromSelection(AudioFile *a)
 {
-	foreachi(Track &t, a->track, ti)
-		if (t.is_selected)
-			CreateSubsFromTrack(a, &t, t.level[a->cur_level], ti);
+	foreachi(Track *t, a->track, ti)
+		if (t->is_selected)
+			CreateSubsFromTrack(a, t, t->level[a->cur_level], ti);
 }
 
 ActionSubTrackFromSelection::~ActionSubTrackFromSelection()

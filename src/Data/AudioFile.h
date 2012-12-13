@@ -83,7 +83,7 @@ public:
 	float volume;
 
 	Array<Effect> fx;
-	Array<Track> track;
+	Array<Track*> track;
 
 // editing
 	// needed for rendering

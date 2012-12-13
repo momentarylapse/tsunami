@@ -13,19 +13,19 @@
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, bool all_levels)
 {
-	foreachi(Track &t, a->track, track_no)
-		if (t.is_selected){
+	foreachi(Track *t, a->track, track_no)
+		if (t->is_selected){
 			// buffer boxes
 			if (all_levels){
-				foreachi(TrackLevel &l, t.level, li)
+				foreachi(TrackLevel &l, t->level, li)
 					DeleteBuffersFromTrackLevel(a, t, l, li);
 			}else{
-				DeleteBuffersFromTrackLevel(a, t, t.level[a->cur_level], a->cur_level);
+				DeleteBuffersFromTrackLevel(a, t, t->level[a->cur_level], a->cur_level);
 			}
 
 			// subs
-			foreachib(Track &s, t.sub, n)
-				if (s.is_selected){
+			foreachib(Track *s, t->sub, n)
+				if (s->is_selected){
 					AddSubAction(new ActionSubTrackDelete(track_no, n), a);
 					_foreach_it_.update(); // TODO...
 				}
@@ -37,7 +37,7 @@ ActionAudioDeleteSelection::~ActionAudioDeleteSelection()
 }
 
 void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
-		Track& t, TrackLevel& l, int level_no)
+		Track *t, TrackLevel& l, int level_no)
 {
 	int i0 = a->selection.start();
 	int i1 = a->selection.end();
@@ -48,22 +48,22 @@ void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
 
 		if (a->selection.covers(b.range())){
 			// b completely inside?
-			AddSubAction(new ActionTrack__DeleteBufferBox(&t, level_no, n), a);
+			AddSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
 		}else if ((i0 > bi0) && (i1 > bi1) && (i0 < bi1)){
 			// overlapping end of b?
-			AddSubAction(new ActionTrack__ShrinkBufferBox(&t, level_no, n, i0 - bi0), a);
+			AddSubAction(new ActionTrack__ShrinkBufferBox(t, level_no, n, i0 - bi0), a);
 
 		}else if ((i0 <= bi0) && (i1 < bi1) && (i1 > bi0)){
 			// overlapping beginning of b?
-			AddSubAction(new ActionTrack__CutBufferBox(&t, level_no, n, i1 - bi0), a);
-			AddSubAction(new ActionTrack__DeleteBufferBox(&t, level_no, n), a);
+			AddSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
+			AddSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
 		}else if (b.range().covers(a->selection)){
 			// inside b?
-			AddSubAction(new ActionTrack__CutBufferBox(&t, level_no, n, i1 - bi0), a);
-			AddSubAction(new ActionTrack__CutBufferBox(&t, level_no, n, i0 - bi0), a);
-			AddSubAction(new ActionTrack__DeleteBufferBox(&t, level_no, n + 1), a);
+			AddSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
+			AddSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i0 - bi0), a);
+			AddSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n + 1), a);
 
 		}
 		_foreach_it_.update();

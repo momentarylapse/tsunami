@@ -177,9 +177,9 @@ AudioView::SelectionType AudioView::GetMouseOver()
 
 	// track?
 	if (s.audio){
-		foreach(Track &t, s.audio->track){
-			if (MouseOverTrack(&t)){
-				s.track = &t;
+		foreach(Track *t, s.audio->track){
+			if (MouseOverTrack(t)){
+				s.track = t;
 				s.type = SEL_TYPE_TRACK;
 			}
 		}
@@ -217,10 +217,10 @@ AudioView::SelectionType AudioView::GetMouseOver()
 	// sub?
 	if (s.track){
 		// TODO: prefer selected subs
-		foreach(Track &ss, s.track->sub){
-			int offset = MouseOverSub(&ss);
+		foreach(Track *ss, s.track->sub){
+			int offset = MouseOverSub(ss);
 			if (offset >= 0){
-				s.sub = &ss;
+				s.sub = ss;
 				s.type = SEL_TYPE_SUB;
 				s.sub_offset = offset;
 			}
@@ -273,15 +273,15 @@ void AudioView::SetBarriers(AudioFile *a, SelectionType *s)
 	if (s->type == SEL_TYPE_SUB)
 		dpos = s->sub_offset;
 
-	foreach(Track &t, a->track){
+	foreach(Track *t, a->track){
 		// add subs
-		foreach(Track &sub, t.sub){
-			s->barrier.add(sub.pos + dpos);
+		foreach(Track *sub, t->sub){
+			s->barrier.add(sub->pos + dpos);
 		}
 
 		// time bar...
 		int x0 = 0;
-		foreach(Bar &b, t.bar){
+		foreach(Bar &b, t->bar){
 			for (int i=0;i<b.num_beats;i++)
 				s->barrier.add(x0 + (int)((float)b.length * i / (float)b.num_beats) + dpos);
 			x0 += b.length;
@@ -761,8 +761,8 @@ void AudioView::DrawTrack(HuiDrawingContext *c, int x, int y, int width, int hei
 
 	DrawBars(c, x, y, width, height, t, col, a, track_no, t->bar);
 
-	foreach(Track &s, t->sub)
-		DrawSub(c, x, y, width, height, &s, a);
+	foreach(Track *s, t->sub)
+		DrawSub(c, x, y, width, height, s, a);
 
 	//c->SetColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 //	c->SetColor(ColorWaveCur);
@@ -833,8 +833,8 @@ void plan_track_sizes(int y, int height, AudioFile *a, int TIME_SCALE_HEIGHT)
 	int h_wish = TIME_SCALE_HEIGHT;
 	int h_fix = TIME_SCALE_HEIGHT;
 	int n_var = 0;
-	foreach(Track &t, a->track){
-		if (t.type == t.TYPE_TIME){
+	foreach(Track *t, a->track){
+		if (t->type == t->TYPE_TIME){
 			h_wish += TIME_SCALE_HEIGHT * 2;
 			h_fix += TIME_SCALE_HEIGHT * 2;
 		}else{
@@ -846,25 +846,25 @@ void plan_track_sizes(int y, int height, AudioFile *a, int TIME_SCALE_HEIGHT)
 	int y0 = y + TIME_SCALE_HEIGHT;
 	if (h_wish > height)
 		opt_track_height = (height - h_fix) / n_var;
-	foreachi(Track &t, a->track, i){
-		t.y = y0;
-		t.height = (t.type == t.TYPE_TIME) ? TIME_SCALE_HEIGHT*2 : opt_track_height;
-		y0 += t.height;
+	foreachi(Track *t, a->track, i){
+		t->y = y0;
+		t->height = (t->type == t->TYPE_TIME) ? TIME_SCALE_HEIGHT*2 : opt_track_height;
+		y0 += t->height;
 	}
 }
 
 void audio_draw_background(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a, AudioView *v)
 {
-	int yy = a->track.back().y + a->track.back().height;
+	int yy = a->track.back()->y + a->track.back()->height;
 	//int trackheight = (a->num_tracks > 0) ? (height / a->num_tracks) : height;
 	if (a == tsunami->cur_audio){
 		c->SetColor(v->ColorBackgroundCurWave);
 		c->DrawRect(x, y, width, v->TIME_SCALE_HEIGHT);
 		v->DrawGrid(c, x, y, width, v->TIME_SCALE_HEIGHT, a, v->ColorBackgroundCurWave, true);
-		foreach(Track &t, a->track){
-			c->SetColor((t.is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
-			c->DrawRect(x, t.y, width, t.height);
-			v->DrawGrid(c, x, t.y, width, t.height, a, (t.is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
+		foreach(Track *t, a->track){
+			c->SetColor((t->is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
+			c->DrawRect(x, t->y, width, t->height);
+			v->DrawGrid(c, x, t->y, width, t->height, a, (t->is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
 		}
 		if (yy < y + height){
 			c->SetColor(v->ColorBackground);
@@ -879,8 +879,8 @@ void audio_draw_background(HuiDrawingContext *c, int x, int y, int width, int he
 
 	// lines between tracks
 	c->SetColor(v->ColorGrid);
-	foreach(Track &t, a->track)
-		c->DrawLine(0, t.y, width, t.y);
+	foreach(Track *t, a->track)
+		c->DrawLine(0, t->y, width, t->y);
 	if (yy < y + height)
 		c->DrawLine(0, yy, width, yy);
 }
@@ -931,11 +931,11 @@ void AudioView::DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int
 			int t = sxx1;	sxx1 = sxx2;	sxx2 = t;
 			//bool bt = mo_s;	mo_s = mo_e;	mo_e = bt; // TODO ???
 		}
-		foreach(Track &t, a->track)
-			if (t.is_selected){
+		foreach(Track *t, a->track)
+			if (t->is_selected){
 				c->SetColor(ColorSelectionInternal);
-				c->DrawRect(sxx1, t.y, sxx2 - sxx1, t.height);
-				DrawGrid(c, sxx1, t.y, sxx2 - sxx1, t.height, a, ColorSelectionInternal);
+				c->DrawRect(sxx1, t->y, sxx2 - sxx1, t->height);
+				DrawGrid(c, sxx1, t->y, sxx2 - sxx1, t->height, a, ColorSelectionInternal);
 			}
 		DrawTimeLine(c, a, a->sel_raw.start(), SEL_TYPE_SELECTION_START, ColorSelectionBoundary);
 		DrawTimeLine(c, a, a->sel_raw.end(), SEL_TYPE_SELECTION_END, ColorSelectionBoundary);
@@ -959,8 +959,8 @@ void AudioView::DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int
 	}*/
 
 
-	foreachi(Track &tt, a->track, i)
-		DrawTrack(c, x, tt.y, width, tt.height, &tt, col, a, i);
+	foreachi(Track *tt, a->track, i)
+		DrawTrack(c, x, tt->y, width, tt->height, tt, col, a, i);
 
 }
 
@@ -1142,15 +1142,15 @@ void AudioView::SelectTrack(Track *t, bool diff)
 		return;
 	if (diff){
 		bool is_only_selected = true;
-		foreach(Track &tt, t->root->track)
-			if ((tt.is_selected) && (&tt != t))
+		foreach(Track *tt, t->root->track)
+			if ((tt->is_selected) && (tt != t))
 				is_only_selected = false;
 		t->is_selected = !t->is_selected || is_only_selected;
 	}else{
 		if (!t->is_selected){
 			// unselect all tracks
-			foreach(Track &tt, t->root->track)
-				tt.is_selected = false;
+			foreach(Track *tt, t->root->track)
+				tt->is_selected = false;
 		}
 
 		// select this track
@@ -1163,8 +1163,8 @@ void AudioView::SetCurSub(AudioFile *a, Track *s)
 {
 	msg_db_r("SetCurSub", 2);
 	// unset
-	foreach(Track &t, a->track)
-		t.cur_sub = -1;
+	foreach(Track *t, a->track)
+		t->cur_sub = -1;
 
 	if (s){
 		// set

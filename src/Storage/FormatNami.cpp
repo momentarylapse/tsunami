@@ -150,8 +150,8 @@ void WriteTrack(CFile *f, Track *t)
 	foreachi(TrackLevel &l, t->level, i)
 		WriteTrackLevel(f, &l, i);
 
-	foreach(Track &sub, t->sub)
-		WriteSubTrack(f, &sub);
+	foreach(Track *sub, t->sub)
+		WriteSubTrack(f, sub);
 
 	foreach(Effect &effect, t->fx)
 		WriteEffect(f, &effect);
@@ -189,8 +189,8 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 	WriteLevelName(f, a->level_name);
 
-	foreachi(Track &track, a->track, i){
-		WriteTrack(f, &track);
+	foreachi(Track *track, a->track, i){
+		WriteTrack(f, track);
 		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
 
@@ -437,8 +437,8 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 
 
 	// compress...
-	foreach(Track &t, a->track)
-		foreach(TrackLevel &l, t.level){
+	foreach(Track *t, a->track)
+		foreach(TrackLevel &l, t->level){
 			if (l.buffer.num != 1)
 				continue;
 			bool empty = true;

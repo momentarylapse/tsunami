@@ -22,7 +22,7 @@ public:
 
 private:
 	int index;
-	Track track;
+	Track *track;
 };
 
 #endif /* ACTIONAUDIO__DELETETRACK_H_ */

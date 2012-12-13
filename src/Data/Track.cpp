@@ -84,15 +84,15 @@ void SelectTrack(Track *t, bool diff)
 		return;
 	if (diff){
 		bool is_only_selected = true;
-		foreach(Track &tt, t->root->track)
-			if ((tt.is_selected) && (&tt != t))
+		foreach(Track *tt, t->root->track)
+			if ((tt->is_selected) && (tt != t))
 				is_only_selected = false;
 		t->is_selected = !t->is_selected || is_only_selected;
 	}else{
 		if (!t->is_selected){
 			// unselect all tracks
-			foreach(Track &tt, t->root->track)
-				tt.is_selected = false;
+			foreach(Track *tt, t->root->track)
+				tt->is_selected = false;
 		}
 
 		// select this track
@@ -105,14 +105,14 @@ void SelectTrack(Track *t, bool diff)
 Track *Track::GetCurSub()
 {
 	if ((cur_sub >= 0) && (cur_sub < sub.num))
-		return &sub[cur_sub];
+		return sub[cur_sub];
 	return NULL;
 }
 
 Track *Track::GetParent()
 {
 	if (parent >= 0)
-		return &root->track[parent];
+		return root->track[parent];
 	return NULL;
 }
 
@@ -129,11 +129,11 @@ Range Track::GetRangeUnsafe()
 			min = min(l.buffer[0].offset, min);
 			max = max(l.buffer.back().range().end(), max);
 		}
-	foreach(Track &s, sub){
-		if (s.pos < min)
-			min = s.pos;
-		for (int i=0;i<s.rep_num+1;i++){
-			int smax = s.pos + s.length + s.rep_num * s.rep_delay;
+	foreach(Track *s, sub){
+		if (s->pos < min)
+			min = s->pos;
+		for (int i=0;i<s->rep_num+1;i++){
+			int smax = s->pos + s->length + s->rep_num * s->rep_delay;
 			if (smax > max)
 				max = smax;
 		}
@@ -235,8 +235,8 @@ void Track::UpdatePeaks(int mode)
 	foreach(TrackLevel &l, level)
 		foreach(BufferBox &b, l.buffer)
 			b.update_peaks(mode);
-	foreach(Track &s, sub)
-		s.UpdatePeaks(mode);
+	foreach(Track *s, sub)
+		s->UpdatePeaks(mode);
 }
 
 void Track::InvalidateAllPeaks()
@@ -244,8 +244,8 @@ void Track::InvalidateAllPeaks()
 	foreach(TrackLevel &l, level)
 		foreach(BufferBox &b, l.buffer)
 			b.invalidate_peaks(b.range());
-	foreach(Track &s, sub)
-		s.InvalidateAllPeaks();
+	foreach(Track *s, sub)
+		s->InvalidateAllPeaks();
 }
 
 Track *Track::AddEmptySubTrack(const Range &r, const string &name)

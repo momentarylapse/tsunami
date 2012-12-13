@@ -21,12 +21,12 @@ void *ActionAudio__DeleteTrack::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(index >= 0 && index < a->track.num);
-	Track &t = a->track[index];
+	Track *t = a->track[index];
 	int num_buf = 0;
-	foreach(TrackLevel &l, t.level)
+	foreach(TrackLevel &l, t->level)
 		num_buf += l.buffer.num;
 	assert(num_buf == 0);
-	assert(t.sub.num == 0);
+	assert(t->sub.num == 0);
 
 	// save data
 	track = t;

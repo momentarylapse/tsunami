@@ -10,12 +10,12 @@
 
 ActionSubTrackMove::ActionSubTrackMove(AudioFile *a)
 {
-	foreach(Track &t, a->track)
-		foreach(Track &s, t.sub)
-			if (s.is_selected){
+	foreach(Track *t, a->track)
+		foreach(Track *s, t->sub)
+			if (s->is_selected){
 				SubSaveData d;
-				get_track_sub_index(&s, d.track_no, d.sub_no);
-				d.pos_old = s.pos;
+				get_track_sub_index(s, d.track_no, d.sub_no);
+				d.pos_old = s->pos;
 				sub.add(d);
 			}
 	param = 0;

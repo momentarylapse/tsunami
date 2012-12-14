@@ -14,7 +14,7 @@
 class ActionSubTrackInsertSelected : public ActionGroup
 {
 public:
-	ActionSubTrackInsertSelected(AudioFile *a);
+	ActionSubTrackInsertSelected(AudioFile *a, int level_no);
 	virtual ~ActionSubTrackInsertSelected();
 };
 

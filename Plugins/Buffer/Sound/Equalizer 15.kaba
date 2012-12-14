@@ -31,7 +31,7 @@ void equalize(float b[])
 	fft_r2c(b, f)
 
 	// equalize
-	float w = i2f(b.num) / cur_audio.sample_rate
+	float w = i2f(b.num) / audio.sample_rate
 	for int i, 0, NUM_BANDS
 		int j0 = clamp(FreqMin[i] * w, 0, len2)
 		int j1 = clamp(FreqMax[i] * w, 0, len2)

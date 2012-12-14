@@ -10,12 +10,13 @@
 
 
 #include "EmbeddedDialog.h"
+#include "../../Stuff/Observer.h"
 class Track;
 class Slider;
 class FxList;
 class BarList;
 
-class TrackDialog: public EmbeddedDialog
+class TrackDialog: public EmbeddedDialog, public Observer
 {
 public:
 	TrackDialog(CHuiWindow *win);
@@ -31,6 +32,8 @@ public:
 	void OnMute();
 
 	void SetTrack(Track *t);
+
+	virtual void OnUpdate(Observable *o);
 
 	Track *track;
 	Slider *volume_slider;

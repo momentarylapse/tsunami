@@ -18,7 +18,7 @@ class TrackDialog;
 class AudioView : public HuiEventHandler, public Observer, public Observable
 {
 public:
-	AudioView(CHuiWindow *parent, AudioFile *audio_1, AudioFile *audio_2);
+	AudioView(CHuiWindow *parent, AudioFile *audio);
 	virtual ~AudioView();
 
 	void ForceRedraw();
@@ -43,7 +43,6 @@ public:
 	void OnSelectAll();
 	void OnSelectNothing();
 
-	void OnViewTempFile();
 	void OnViewMono();
 	void OnViewGrid();
 	void OnViewOptimal();
@@ -54,15 +53,15 @@ public:
 	void OnJumpOtherFile();
 
 	void DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int pos, float zoom, const color &col);
-	void DrawSubFrame(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, AudioFile *a, const color &col, int delay);
-	void DrawSub(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, AudioFile *a);
-	void DrawBars(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no, Array<Bar> &bc);
-	void DrawTrack(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, AudioFile *a, int track_no);
-	void DrawGrid(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a, const color &bg, bool show_time = false);
-	void DrawTimeLine(HuiDrawingContext *c, AudioFile *a, int pos, int type, color &col, bool show_time = false);
-	void DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int height, AudioFile *a);
+	void DrawSubFrame(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, const color &col, int delay);
+	void DrawSub(HuiDrawingContext *c, int x, int y, int width, int height, Track *s);
+	void DrawBars(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, int track_no, Array<Bar> &bc);
+	void DrawTrack(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, int track_no);
+	void DrawGrid(HuiDrawingContext *c, int x, int y, int width, int height, const color &bg, bool show_time = false);
+	void DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col, bool show_time = false);
+	void DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int height);
 
-	void OptimizeView(AudioFile *a);
+	void OptimizeView();
 	void UpdateMenu();
 
 
@@ -90,7 +89,6 @@ public:
 		SEL_TYPE_PLAYBACK_START,
 		SEL_TYPE_PLAYBACK_END,
 		SEL_TYPE_PLAYBACK,
-		SEL_TYPE_AUDIO,
 		SEL_TYPE_TIME,
 		SEL_TYPE_TRACK,
 		SEL_TYPE_SUB
@@ -99,8 +97,8 @@ public:
 	struct SelectionType
 	{
 		int type;
-		AudioFile *audio;
-		Track *track, *sub;
+		Track *track;
+		Track *sub;
 		int pos;
 		int sub_offset;
 		Array<int> barrier;
@@ -120,17 +118,16 @@ public:
 	int mx,my;
 	int mx0,my0;
 
-	void SelectNone(AudioFile *a);
-	void SelectAll(AudioFile *a);
+	void SelectNone();
+	void SelectAll();
 
 	void SetMouse();
-	bool MouseOverAudio(AudioFile *a);
 	bool MouseOverTrack(Track *t);
 	int MouseOverSub(Track *s);
 	void SelectionUpdatePos(SelectionType &s);
 	SelectionType GetMouseOver();
 	void SelectUnderMouse();
-	void SetBarriers(AudioFile *a, SelectionType *s);
+	void SetBarriers(SelectionType *s);
 	void ApplyBarriers(int &pos);
 
 	void SelectSub(Track *s, bool diff);
@@ -138,21 +135,20 @@ public:
 
 	void SetCurSub(AudioFile *a, Track *s);
 	void SetCurTrack(AudioFile *a, Track *t);
-	void SetCurAudioFile(AudioFile *a);
 
+	int screen2sample(int x);
+	int sample2screen(int s);
 
+	void Zoom(float f);
+	void Move(float dpos);
 
-	void ZoomAudioFile(AudioFile *a, float f);
-	void MoveView(AudioFile *a, float dpos);
-
-	void ExecuteSubDialog(CHuiWindow *win, Track *s);
-	void ExecuteTrackDialog(CHuiWindow *win, Track *t);
-	void ExecuteAudioDialog(CHuiWindow *win, AudioFile *a);
+	void ExecuteSubDialog(CHuiWindow *win);
+	void ExecuteTrackDialog(CHuiWindow *win);
+	void ExecuteAudioDialog(CHuiWindow *win);
 
 
 	bool force_redraw;
 
-	bool ShowTempFile;
 	bool ShowMono;
 	bool ShowGrid;
 	int DetailSteps;
@@ -163,7 +159,16 @@ public:
 
 	int DrawingWidth;
 
-	AudioFile *audio[2];
+	AudioFile *audio;
+
+	void SetCurSub(Track *s);
+	void SetCurTrack(Track *t);
+	Track *cur_track;
+	Track *cur_sub;
+	int cur_level;
+
+	float view_pos;
+	float view_zoom;
 
 	TrackDialog *track_dialog;
 };

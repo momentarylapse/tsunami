@@ -60,7 +60,6 @@ AudioFile::AudioFile()
 	used = false;
 	volume = 1;
 	selection.clear();
-	cur_track = -1;
 }
 
 
@@ -122,17 +121,13 @@ void AudioFile::Reset()
 	tag.clear();
 	width = -1;
 	selection.clear();
-	view_pos = 0;
-	view_zoom = 1;
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	fx.clear();
 	track.clear();
-	cur_track = -1;
 
 	level_name.clear();
 	level_name.add("level 1");
-	cur_level = 0;
 
 	action_manager->Reset();
 
@@ -166,30 +161,10 @@ void AudioFile::UpdateSelection()
 
 void AudioFile::UnselectAllSubs()
 {
-	foreach(Track *t, track){
-		foreach(Track *s, t->sub){
-			s->is_selected = false;
-		}
-		t->cur_sub = -1;
-	}
-	Notify("SelectionChange");
-}
-
-
-void AudioFile::SetCurSub(Track *s)
-{
-	msg_db_r("SetCurSub", 2);
-	// unset
 	foreach(Track *t, track)
-		t->cur_sub = -1;
-
-	if (s){
-		// set
-		Track *t = s->GetParent();
-		if (t)
-			t->cur_sub = get_sub_index(s);
-	}
-	msg_db_l(2);
+		foreach(Track *s, t->sub)
+			s->is_selected = false;
+	Notify("SelectionChange");
 }
 
 
@@ -201,27 +176,6 @@ bool AudioFile::Load(const string & filename, bool deep)
 bool AudioFile::Save(const string & filename)
 {
 	return tsunami->storage->Save(this, filename);
-}
-
-void AudioFile::SetCurTrack(Track *t)
-{
-	cur_track = get_track_index(t);
-}
-
-
-Track *AudioFile::GetCurTrack()
-{
-	if ((cur_track >= 0) && (cur_track < track.num))
-		return track[cur_track];
-	return NULL;
-}
-
-Track *AudioFile::GetCurSub()
-{
-	Track *t = GetCurTrack();
-	if (t)
-		return t->GetCurSub();
-	return NULL;
 }
 
 Range AudioFile::GetRange()
@@ -238,17 +192,6 @@ Range AudioFile::GetRange()
 	if (min > max)
 		return Range(0, 0);
 	return Range(min, max - min);
-}
-
-
-int AudioFile::screen2sample(int _x)
-{
-	return (int)( (_x - x) / view_zoom + view_pos );
-}
-
-int AudioFile::sample2screen(int s)
-{
-	return (int)( x + (s - view_pos) * view_zoom );
 }
 
 
@@ -294,7 +237,7 @@ string AudioFile::get_time_str_fuzzy(int t, float dt)
 Track *AudioFile::AddEmptyTrack(int index)
 {
 	if (index < 0)
-		index = cur_track + 1;
+		index = track.num;
 	return (Track*)Execute(new ActionAudioAddTrack(index, Track::TYPE_AUDIO));
 }
 
@@ -310,7 +253,7 @@ Track *AudioFile::AddTimeTrack(int index)
 		}
 
 	if (index < 0)
-		index = cur_track + 1;
+		index = track.num;
 	return (Track*)Execute(new ActionAudioAddTrack(index, Track::TYPE_TIME));
 }
 
@@ -342,10 +285,10 @@ int AudioFile::GetNumSelectedSubs()
 	return n;
 }
 
-void AudioFile::InsertSelectedSubs()
+void AudioFile::InsertSelectedSubs(int level_no)
 {
 	if (GetNumSelectedSubs() > 0)
-		Execute(new ActionSubTrackInsertSelected(this));
+		Execute(new ActionSubTrackInsertSelected(this, level_no));
 }
 
 void AudioFile::AddLevel()
@@ -353,22 +296,21 @@ void AudioFile::AddLevel()
 	Execute(new ActionAudioAddLevel());
 }
 
-void AudioFile::DeleteCurrentTrack()
+void AudioFile::DeleteTrack(int index)
 {
-	if (cur_track >= 0)
-		Execute(new ActionAudioDeleteTrack(this, cur_track));
+	Execute(new ActionAudioDeleteTrack(this, index));
 }
 
-void AudioFile::DeleteSelection(bool all_levels)
+void AudioFile::DeleteSelection(int level_no, bool all_levels)
 {
 	if (!selection.empty())
-		Execute(new ActionAudioDeleteSelection(this, all_levels));
+		Execute(new ActionAudioDeleteSelection(this, level_no, all_levels));
 }
 
-void AudioFile::CreateSubsFromSelection()
+void AudioFile::CreateSubsFromSelection(int level_no)
 {
 	if (!selection.empty())
-		Execute(new ActionSubTrackFromSelection(this));
+		Execute(new ActionSubTrackFromSelection(this, level_no));
 }
 
 void AudioFile::InvalidateAllPeaks()

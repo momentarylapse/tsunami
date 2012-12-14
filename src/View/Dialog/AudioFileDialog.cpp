@@ -110,8 +110,8 @@ void AudioFileDialog::OnTrackList()
 {
 	int sel = GetInt("");
 	if ((sel >= 0) && (sel < audio->track.num)){
-		audio->cur_track = sel;
-		tsunami->view->ExecuteTrackDialog(this, audio->track[sel]);
+		/*audio->cur_track = sel;
+		tsunami->view->ExecuteTrackDialog(this, audio->track[sel]);*/
 		RefillAudioList();
 	}else if (sel >= audio->track.num){
 		//ExecuteLevelDialog(this, audio_list[sel - dlg_audio->Track.num]);

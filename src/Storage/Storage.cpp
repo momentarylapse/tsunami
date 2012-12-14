@@ -62,7 +62,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			tsunami->progress->End();
 			tsunami->ForceRedraw();
 			if (a->track.num > 0)
-				a->SetCurTrack(a->track[0]);
+			{}//	a->SetCurTrack(a->track[0]);
 			else
 				a->used = false;
 			a->action_manager->Reset();

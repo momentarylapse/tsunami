@@ -43,7 +43,7 @@ void equalize(float b[])
 	
 	// equalize
 	f *= (1.0 / b.num)
-	float w = i2f(b.num) / cur_audio.sample_rate
+	float w = i2f(b.num) / audio.sample_rate
 	for int i, 1, f.num
 		float freq = i2f(i) / w
 		float param = lin2log(freq, MIN_FREQ, MAX_FREQ)

@@ -97,6 +97,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddControlTable("", 0, 0, 2, 1, "main_table");
 	SetTarget("main_table", 0);
 	AddControlTable("!noexpandx", 1, 0, 1, 2, "tool_table");
+	HideControl("tool_table", true);
 	AllowEvents("key");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);
@@ -112,18 +113,14 @@ Tsunami::Tsunami(Array<string> arg) :
 	plugins = new PluginManager;
 	plugins->AddPluginsToMenu();
 
-	audio[0] = new AudioFile;
-	audio[1] = new AudioFile;
-
-	cur_audio = audio[0];
+	audio= new AudioFile;
 
 	storage = new Storage;
 
-	view = new AudioView(this, audio[0], audio[1]);
+	view = new AudioView(this, audio);
 
 	Subscribe(view);
-	Subscribe(audio[0]);
-	Subscribe(audio[1]);
+	Subscribe(audio);
 	Subscribe(output);
 
 	UpdateMenu();
@@ -132,7 +129,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	log->Info("Tsunami " + AppVersion + _(" - viel Erfolg!"));
 
-	audio[0]->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
+	audio->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
 
 	HandleArguments(arg);
 
@@ -141,6 +138,10 @@ Tsunami::Tsunami(Array<string> arg) :
 
 Tsunami::~Tsunami()
 {
+	Unsubscribe(view);
+	Unsubscribe(audio);
+	Unsubscribe(output);
+
 	irect r = GetOuteriorDesired();
 	HuiConfigWriteInt("Window.Width", r.x2 - r.x1);
 	HuiConfigWriteInt("Window.Height", r.y2 - r.y1);
@@ -153,6 +154,7 @@ Tsunami::~Tsunami()
 	delete(view);
 	delete(output);
 	delete(input);
+	delete(audio);
 	HuiEnd();
 }
 
@@ -178,28 +180,28 @@ void Tsunami::OnAbout()
 
 void Tsunami::OnAddTrack()
 {
-	cur_audio->AddEmptyTrack();
+	audio->AddEmptyTrack();
 }
 
 void Tsunami::OnAddTimeTrack()
 {
-	Track *t = cur_audio->AddTimeTrack();
+	Track *t = audio->AddTimeTrack();
 }
 
 void Tsunami::OnDeleteTrack()
 {
-	if (cur_audio->used){
-		if (cur_audio->track.num < 2){
+	if (audio->used){
+		if (audio->track.num < 2){
 			log->Error(_("Es muss mindestens eine Spur existieren"));
 			return;
 		}
-		cur_audio->DeleteCurrentTrack();
+		audio->DeleteTrack(get_track_index(view->cur_track));
 	}
 }
 
 void Tsunami::OnCloseFile()
 {
-	cur_audio->Reset();
+	audio->Reset();
 }
 
 void Tsunami::LoadKeyCodes()
@@ -208,17 +210,17 @@ void Tsunami::LoadKeyCodes()
 
 void Tsunami::OnAudioProperties()
 {
-	view->ExecuteAudioDialog(this, cur_audio);
+	view->ExecuteAudioDialog(this);
 }
 
 void Tsunami::OnTrackProperties()
 {
-	view->ExecuteTrackDialog(this, GetCurTrack());
+	view->ExecuteTrackDialog(this);
 }
 
 void Tsunami::OnSubProperties()
 {
-	view->ExecuteSubDialog(this, GetCurSub());
+	view->ExecuteSubDialog(this);
 }
 
 void Tsunami::OnShowLog()
@@ -228,12 +230,12 @@ void Tsunami::OnShowLog()
 
 void Tsunami::OnUndo()
 {
-	cur_audio->action_manager->Undo();
+	audio->action_manager->Undo();
 }
 
 void Tsunami::OnRedo()
 {
-	cur_audio->action_manager->Redo();
+	audio->action_manager->Redo();
 }
 
 void Tsunami::OnSendBugReport()
@@ -248,19 +250,17 @@ string title_filename(const string &filename)
 	return _("Unbenannt");
 }
 
-bool Tsunami::AllowTermination(AudioFile *a)
+bool Tsunami::AllowTermination()
 {
-	for (int i=0;i<2;i++)
-		if (!audio[i]->action_manager->IsSave()){
-			string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio[i]->filename).c_str()), true);
-			if (answer == "yes"){
-				cur_audio = audio[i];
-				/*if (!OnSave())
-					return false;*/
-				OnSave();
-			}else if (answer == "cancel")
-				return false;
-		}
+	if (!audio->action_manager->IsSave()){
+		string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio->filename).c_str()), true);
+		if (answer == "yes"){
+			/*if (!OnSave())
+				return false;*/
+			OnSave();
+		}else if (answer == "cancel")
+			return false;
+	}
 	return true;
 }
 
@@ -274,8 +274,8 @@ void Tsunami::OnFindAndExecutePlugin()
 
 void Tsunami::OnDelete()
 {
-	if (cur_audio->used)
-		cur_audio->DeleteSelection(false);
+	if (audio->used)
+		audio->DeleteSelection(view->cur_level, false);
 }
 
 void Tsunami::OnSubImport()
@@ -296,10 +296,10 @@ void Tsunami::OnSettings()
 
 void Tsunami::OnTrackImport()
 {
-	if (!cur_audio->used)
+	if (!audio->used)
 		return;
 	if (storage->AskOpenImport(this)){
-		Track *t = cur_audio->AddEmptyTrack();
+		Track *t = audio->AddEmptyTrack();
 		storage->LoadTrack(t, HuiFilename);
 	}
 }
@@ -307,7 +307,7 @@ void Tsunami::OnTrackImport()
 bool Tsunami::HandleArguments(Array<string> arg)
 {
 	if (arg.num > 1)
-		return storage->Load(cur_audio, arg[1]);
+		return storage->Load(audio, arg[1]);
 	return false;
 }
 
@@ -323,7 +323,7 @@ void Tsunami::OnPlayLoop()
 
 void Tsunami::OnPlay()
 {
-	output->Play(cur_audio, true);
+	output->Play(audio, true);
 }
 
 void Tsunami::OnPause()
@@ -347,91 +347,85 @@ void Tsunami::OnPaste()
 
 void Tsunami::OnInsertAdded()
 {
-	if (cur_audio->used)
-		cur_audio->InsertSelectedSubs();
+	if (audio->used)
+		audio->InsertSelectedSubs(view->cur_level);
 }
 
 void Tsunami::OnRecord()
 {
-	CaptureDialog *dlg = new CaptureDialog(this, false, cur_audio);
+	CaptureDialog *dlg = new CaptureDialog(this, false, audio);
 	dlg->Update();
 	HuiWaitTillWindowClosed(dlg);
 }
 
-Track *Tsunami::GetCurTrack()
-{	return cur_audio->GetCurTrack();	}
-
 void Tsunami::OnAddLevel()
 {
-	if (cur_audio->used)
-		cur_audio->AddLevel();
+	if (audio->used)
+		audio->AddLevel();
 }
 
 void Tsunami::OnCurLevel()
 {
-	cur_audio->cur_level = GetInt("");
+	view->cur_level = GetInt("");
 	ForceRedraw();
 }
 
 void Tsunami::OnSubFromSelection()
 {
-	if (cur_audio->used)
-		cur_audio->CreateSubsFromSelection();
+	if (audio->used)
+		audio->CreateSubsFromSelection(view->cur_level);
 }
-
-Track *Tsunami::GetCurSub()
-{	return cur_audio->GetCurSub();	}
 
 void Tsunami::UpdateMenu()
 {
 	msg_db_r("UpdateMenu", 1);
-	bool selected = cur_audio && !cur_audio->selection.empty();
+	bool selected = audio && !audio->selection.empty();
 // menu / toolbar
 	// edit
-	Enable("undo", cur_audio->action_manager->Undoable());
-	Enable("redo", cur_audio->action_manager->Redoable());
-	Enable("copy", selected || (cur_audio->GetNumSelectedSubs() > 0));
+	Enable("undo", audio->action_manager->Undoable());
+	Enable("redo", audio->action_manager->Redoable());
+	Enable("copy", selected || (audio->GetNumSelectedSubs() > 0));
 	Enable("paste", false);
-	Enable("delete", selected || (cur_audio->GetNumSelectedSubs() > 0));
+	Enable("delete", selected || (audio->GetNumSelectedSubs() > 0));
 	Enable("resize", false); // deprecated
 	// file
-	Enable("save", cur_audio->used);
-	Enable("save", cur_audio->used);
-	Enable("save_as", cur_audio->used);
-	Enable("cut_out", cur_audio->used);
-	Enable("close_file", cur_audio->used);
-	Enable("export_selection", cur_audio->used);
-	Enable("wave_properties", cur_audio->used);
+	Enable("save", audio->used);
+	Enable("save", audio->used);
+	Enable("save_as", audio->used);
+	Enable("cut_out", audio->used);
+	Enable("close_file", audio->used);
+	Enable("export_selection", audio->used);
+	Enable("wave_properties", audio->used);
 	// track
-	Enable("track_import", cur_audio->used);
-	Enable("add_track", cur_audio->used);
-	Enable("add_time_track", cur_audio->used);
-	Enable("delete_track", GetCurTrack());
-	Enable("track_properties", GetCurTrack());
+	Enable("track_import", audio->used);
+	Enable("add_track", audio->used);
+	Enable("add_time_track", audio->used);
+	Enable("delete_track", view->cur_track);
+	Enable("track_properties", view->cur_track);
 	// level
-	Enable("level_add", cur_audio->used);
+	Enable("level_add", audio->used);
 	// sub
-	Enable("sub_import", GetCurTrack());
+	Enable("sub_import", view->cur_track);
 	Enable("sub_from_selection", selected);
-	Enable("insert_added", cur_audio->GetNumSelectedSubs() > 0);
-	Enable("remove_added", cur_audio->GetNumSelectedSubs() > 0);
-	Enable("sub_properties", GetCurSub());
+	Enable("insert_added", audio->GetNumSelectedSubs() > 0);
+	Enable("remove_added", audio->GetNumSelectedSubs() > 0);
+	Enable("sub_properties", view->cur_sub);
 	// sound
-	Enable("play", cur_audio->used);
+	Enable("play", audio->used);
 	Enable("stop", output->IsPlaying());
 	Enable("pause", output->IsPlaying());
 	Check("play_loop", output->GetLoop());
 
 
 	Reset("cur_level");
-	Enable("cur_level", cur_audio->used);
-	foreach(string &l, cur_audio->level_name)
+	Enable("cur_level", audio->used);
+	foreach(string &l, audio->level_name)
 		SetString("cur_level", l);
-	SetInt("cur_level", cur_audio->cur_level);
+	SetInt("cur_level", view->cur_level);
 
-	if (cur_audio->used){
-		string title = title_filename(cur_audio->filename) + " - " + AppName;
-		if (!cur_audio->action_manager->IsSave())
+	if (audio->used){
+		string title = title_filename(audio->filename) + " - " + AppName;
+		if (!audio->action_manager->IsSave())
 			title = "*" + title;
 		SetTitle(title);
 	}else
@@ -459,7 +453,7 @@ void Tsunami::OnExit()
 
 void Tsunami::OnNew()
 {
-	NewDialog *d = new NewDialog(tsunami, false, cur_audio);
+	NewDialog *d = new NewDialog(tsunami, false, audio);
 	d->Update();
 	HuiWaitTillWindowClosed(d);
 }
@@ -468,33 +462,33 @@ void Tsunami::OnNew()
 void Tsunami::OnOpen()
 {
 	if (storage->AskOpen(this))
-		storage->Load(cur_audio, HuiFilename);
+		storage->Load(audio, HuiFilename);
 }
 
 
 void Tsunami::OnSave()
 {
-	if (!cur_audio->used)
+	if (!audio->used)
 		return;
-	if (cur_audio->filename == "")
+	if (audio->filename == "")
 		OnSaveAs();
 	else
-		storage->Save(cur_audio, cur_audio->filename);
+		storage->Save(audio, audio->filename);
 }
 
 
 void Tsunami::OnSaveAs()
 {
-	if (!cur_audio->used)
+	if (!audio->used)
 		return;
 	if (storage->AskSave(this))
-		storage->Save(cur_audio, HuiFilename);
+		storage->Save(audio, HuiFilename);
 }
 
 void Tsunami::OnExport()
 {
-	if (!cur_audio->used)
+	if (!audio->used)
 		return;
 	if (storage->AskSaveExport(this))
-		storage->Export(cur_audio, HuiFilename);
+		storage->Export(audio, HuiFilename);
 }

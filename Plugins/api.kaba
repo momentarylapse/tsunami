@@ -80,7 +80,6 @@ class Track
 	
 	AudioEffect fx[]
 	SubPointer sub[]
-	int cur_sub
 	
 	// time track
 	Bar bar[]
@@ -130,12 +129,6 @@ class AudioFile
 	int x, y, width, height
 
 	Range selection
-	int cur_track
-	int cur_level
-
-	float view_pos
-	float view_zoom
-	
 	Range sel_raw
 	
 	string level_name[]
@@ -158,7 +151,7 @@ class AudioInput
 	extern void Stop()
 
 extern window MainWin
-extern AudioFile *audio[2], *cur_audio
+extern AudioFile *audio
 extern AudioOutput *output
 extern AudioInput *input
 

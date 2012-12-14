@@ -32,12 +32,8 @@ class AudioFile : public Data
 public:
 	AudioFile();
 	virtual ~AudioFile();
-	Track *GetCurTrack();
-	Track *GetCurSub();
 	Range GetRange();
 
-	int screen2sample(int x);
-	int sample2screen(int s);
 	string get_time_str(int t);
 	string get_time_str_fuzzy(int t, float dt);
 
@@ -53,9 +49,6 @@ public:
 	void UpdatePeaks(int mode);
 	void InvalidateAllPeaks();
 
-	void SetCurSub(Track *s);
-	void SetCurTrack(Track *t);
-
 	int GetNumSelectedSubs();
 
 	int GetNextBeat(int pos);
@@ -66,11 +59,11 @@ public:
 	void DeleteTag(int index);
 	Track *AddEmptyTrack(int index = -1);
 	Track *AddTimeTrack(int index = -1);
-	void DeleteCurrentTrack();
+	void DeleteTrack(int index);
 	void AddLevel();
-	void InsertSelectedSubs();
-	void DeleteSelection(bool all_levels);
-	void CreateSubsFromSelection();
+	void InsertSelectedSubs(int level_no);
+	void DeleteSelection(int level_no, bool all_levels);
+	void CreateSubsFromSelection(int level_no);
 
 	Track *get_track(int track_no, int sub_no);
 
@@ -91,12 +84,6 @@ public:
 
 	// selection within the buffer?
 	Range selection;
-
-	int cur_track;
-	int cur_level;
-
-	float view_pos;
-	float view_zoom;
 
 	Range sel_raw;
 

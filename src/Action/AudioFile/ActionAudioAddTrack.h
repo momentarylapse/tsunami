@@ -21,7 +21,6 @@ public:
 
 private:
 	int index, type;
-	int old_cur_track;
 };
 
 #endif /* ACTIONAUDIOADDTRACK_H_ */

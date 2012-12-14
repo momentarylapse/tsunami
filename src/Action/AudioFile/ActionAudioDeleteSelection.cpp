@@ -11,7 +11,7 @@
 #include "../Track/ActionTrack__ShrinkBufferBox.h"
 #include "../SubTrack/ActionSubTrackDelete.h"
 
-ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, bool all_levels)
+ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_no, bool all_levels)
 {
 	foreachi(Track *t, a->track, track_no)
 		if (t->is_selected){
@@ -20,7 +20,7 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, bool all_le
 				foreachi(TrackLevel &l, t->level, li)
 					DeleteBuffersFromTrackLevel(a, t, l, li);
 			}else{
-				DeleteBuffersFromTrackLevel(a, t, t->level[a->cur_level], a->cur_level);
+				DeleteBuffersFromTrackLevel(a, t, t->level[level_no], level_no);
 			}
 
 			// subs

@@ -89,7 +89,7 @@ void show_spec()
 	
 	dlg.SetInt("type", TypeLogarithm)
 	
-	BufferBox buf = AudioFileRender(cur_audio, cur_audio.selection)
+	BufferBox buf = AudioFileRender(audio, audio.selection)
 	
 	complex fr[], fl[]
 	
@@ -100,7 +100,7 @@ void show_spec()
 	fft_r2c(buf.r, fr)
 	fft_r2c(buf.l, fl)
 	
-	float ww = i2f(buf.r.num) / cur_audio.sample_rate
+	float ww = i2f(buf.r.num) / audio.sample_rate
 	for int i, 0, N
 		float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
 		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
@@ -138,8 +138,7 @@ void main()
 	char a, b
 	grid.SetXAxis(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
-	if cur_audio.selection.length > 0
-		if cur_audio.cur_track >= 0
-			show_spec()
+	if audio.selection.length > 0
+		show_spec()
 	else
 		HuiErrorBox(MainWin, "error", "needs some selection!")

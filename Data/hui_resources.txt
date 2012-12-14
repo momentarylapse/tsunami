@@ -560,7 +560,7 @@ menu
 0
 
 
-71
+70
 ItemPopup
 menu_file
 
@@ -1124,20 +1124,7 @@ ItemPopup
 menu_view
 
 1
-11
-0
-0
-0
-0
-0
-0
-
-
-ItemCheckable
-view_temp_file
-
-1
-0
+10
 0
 0
 0
@@ -3327,7 +3314,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-171
+170
 // Text
 about
 Info
@@ -3647,8 +3634,6 @@ view_peaks_mean
 Quadratisches Mittel
 view_samples
 Sample-Ebene
-view_temp_file
-Zweite Datei
 volume
 \\0\\1000\\0.1
 volume_slider
@@ -3677,10 +3662,10 @@ Verkleinern
 // Language
 English
 // NumIDs
-171
+170
 // Text
 about
-About
+
 ad_table_1
 
 ad_table_2
@@ -3706,7 +3691,7 @@ add_tag
 add_time_track
 
 add_track
-Add Track
+
 bar_list
 
 cancel
@@ -3732,13 +3717,13 @@ capture_time
 close
 Close
 close_file
-Close
+
 configure_effect
 
 copy
 Copy
 cut_out
-Cut out
+
 delete
 Delete
 delete_bar
@@ -3748,13 +3733,13 @@ Delete
 delete_tag
 
 delete_track
-Delete Track
+
 dummy_favorite_dialog
 sdiufh
 exit
-Exit
+
 export_selection
-Export selection...
+
 favorite_delete
 
 favorite_list
@@ -3778,11 +3763,11 @@ fxdt_filename
 fxdt_params
 !bold\\Parameters
 help
-Help
+
 insert_added
-Insert firmly
+
 jump_other_file
-Jump into other file
+
 kbitpersec
 kbit/s
 language
@@ -3818,23 +3803,23 @@ log_toolbar
 menu
 
 menu_edit
-Edit
+
 menu_file
-File
+
 menu_help
-?
+
 menu_level
 
 menu_plugins
-Plugins
+
 menu_sound
-Sound
+
 menu_sub
-Level
+
 menu_track
-Track
+
 menu_view
-View
+
 menu_view_peaks
 
 ms
@@ -3884,7 +3869,7 @@ percent
 play
 Play
 play_loop
-Loop
+
 preview
 Preview
 preview_device
@@ -3910,15 +3895,15 @@ Record
 redo
 Redo
 remove_added
-Delete level
+
 repdelay
 
 repnum
 
 resize
-Resize
+
 run_plugin
-Run plugin...
+
 sample_rate
 
 samples
@@ -3926,23 +3911,23 @@ samples
 save
 Save
 save_as
-Save as...
+
 select_all
-Select all
+
 select_nothing
-Select none
+
 settings
-Settings
+
 show_log
-Show log
+
 stop
 Stop
 sub_from_selection
 
 sub_import
-Import from file...
+
 sub_properties
-Properties
+
 t_dummy
 
 tab_control
@@ -3974,11 +3959,11 @@ toolbar
 track_dialog
 Track
 track_import
-Import from file...
+
 track_list
 Track
 track_properties
-Properties
+
 track_time_dialog
 
 trackdest_dialog
@@ -3986,19 +3971,17 @@ Destination track
 undo
 Undo
 view_grid
-Grid
+
 view_mono
-Mono
+
 view_optimal
-Optimal
+
 view_peaks_max
 
 view_peaks_mean
 
 view_samples
-Samples
-view_temp_file
-Second file
+
 volume
 \\0\\1000\\0.1
 volume_slider
@@ -4008,7 +3991,7 @@ Sound file
 wave_list
 !tree\\#\\Name\\Volume
 wave_properties
-Properties
+
 wd_t_format
 Format:
 wd_t_freq
@@ -4018,11 +4001,11 @@ Samples:
 wd_t_time
 Duration:
 zoom_in
-Zoom in
+
 zoom_out
-Zoom out
+
 // Num Language Strings
-8
+7
 // Text
 (stumm)
 (muted)
@@ -4036,8 +4019,6 @@ Fehler
 Error
 Keine Ebene ausgewählt
 No level selected
-Keine Spur ausgewählt
-No track selected
 keine Datei
 no file
 #

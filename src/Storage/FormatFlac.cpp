@@ -243,7 +243,7 @@ void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 void FormatFlac::LoadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddEmptyTrack();
+	Track *t = a->AddEmptyTrack(0);
 	LoadTrack(t, filename);
 }
 

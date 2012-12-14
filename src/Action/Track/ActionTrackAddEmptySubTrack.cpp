@@ -48,9 +48,6 @@ void *ActionTrackAddEmptySubTrack::execute(Data *d)
 	s->level[0].buffer[0].offset = 0;
 	s->level[0].buffer[0].resize(s->length);
 	s->is_selected = true;
-
-	if (a->GetCurTrack() == t)
-		a->SetCurSub(s);
 	return s;
 }
 

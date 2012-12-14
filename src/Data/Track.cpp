@@ -23,7 +23,6 @@ Track::Track()
 	length = 0;
 	pos = 0;
 	is_selected = false;
-	cur_sub = -1;
 
 	volume = 1;
 	muted = false;
@@ -99,14 +98,6 @@ void SelectTrack(Track *t, bool diff)
 		t->is_selected = true;
 	}
 	t->root->UpdateSelection();
-}
-
-
-Track *Track::GetCurSub()
-{
-	if ((cur_sub >= 0) && (cur_sub < sub.num))
-		return sub[cur_sub];
-	return NULL;
 }
 
 Track *Track::GetParent()

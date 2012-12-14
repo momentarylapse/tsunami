@@ -108,7 +108,6 @@ enum{
 		sub_menu_6679->AddEntryImage("Eigenschaften",HuiImageProperties,HMM_SUB_PROPERTIES);
 	m->AddSubMenu("Samples",HMM_MENU_SUB,sub_menu_6679);
 		CHuiMenu *sub_menu_8830=new CHuiMenu();
-		sub_menu_8830->AddEntryCheckable("Zweite Datei",HMM_VIEW_TEMP_FILE);
 		sub_menu_8830->AddEntryCheckable("Mono",HMM_VIEW_MONO);
 		sub_menu_8830->AddEntryCheckable("Raster",HMM_VIEW_GRID);
 			CHuiMenu *sub_menu_3984=new CHuiMenu();

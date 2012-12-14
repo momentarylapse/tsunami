@@ -48,7 +48,10 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	foreach(Track *t, a->track)
 		AddString("capture_target", t->GetNiceName());
 	AddString("capture_target", _("neue Spur anlegen"));
-	SetInt("capture_target", (a->cur_track >= 0) ? a->cur_track : a->track.num);
+	if (tsunami->view->cur_track)
+		SetInt("capture_target", get_track_index(tsunami->view->cur_track));
+	else
+		SetInt("capture_target", a->track.num);
 
 	EventM("cancel", this, (void(HuiEventHandler::*)())&CaptureDialog::OnClose);
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&CaptureDialog::OnClose);
@@ -153,7 +156,7 @@ void CaptureDialog::Insert()
 
 		if (target >= audio->track.num){
 			// new track
-			t = audio->AddEmptyTrack();
+			t = audio->AddEmptyTrack(audio->track.num);
 			i0 = s_start - dpos;
 		}else{
 			// sub track
@@ -171,8 +174,8 @@ void CaptureDialog::Insert()
 	// insert data
 	Range r = Range(i0, length);
 	audio->action_manager->BeginActionGroup();
-	BufferBox buf = t->GetBuffers(audio->cur_level, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, audio->cur_level, r);
+	BufferBox buf = t->GetBuffers(tsunami->view->cur_level, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->view->cur_level, r);
 	buf.set(tsunami->input->CaptureBuf, 0, 1.0f);
 	audio->Execute(a);
 	audio->action_manager->EndActionGroup();

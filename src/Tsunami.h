@@ -83,19 +83,15 @@ public:
 	void OnExit();
 
 	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
-	bool AllowTermination(AudioFile *a = NULL);
-	bool Save(AudioFile *a);
+	bool AllowTermination();
+	bool Save();
 
 	//void Draw();
 	void ForceRedraw();
 	bool force_redraw;
 	void UpdateMenu();
 
-	AudioFile *audio[2];
-	AudioFile *cur_audio;
-
-	Track *GetCurTrack();
-	Track *GetCurSub();
+	AudioFile *audio;
 
 	AudioView *view;
 

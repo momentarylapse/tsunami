@@ -54,7 +54,6 @@ class Track
 public:
 	Track();
 	virtual ~Track();
-	Track *GetCurSub();
 	Track *GetParent();
 	Range GetRange();
 	Range GetRangeUnsafe();
@@ -94,7 +93,6 @@ public:
 
 	Array<Effect> fx;
 	Array<Track*> sub;
-	int cur_sub;
 
 	// time track
 	Array<Bar> bar;

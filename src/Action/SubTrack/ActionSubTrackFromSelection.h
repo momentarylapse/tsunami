@@ -14,11 +14,11 @@
 class ActionSubTrackFromSelection : public ActionGroup
 {
 public:
-	ActionSubTrackFromSelection(AudioFile *a);
+	ActionSubTrackFromSelection(AudioFile *a, int level_no);
 	virtual ~ActionSubTrackFromSelection();
 
 private:
-	void CreateSubsFromTrack(AudioFile *a, Track *t, TrackLevel &l, int track_no);
+	void CreateSubsFromTrack(AudioFile *a, Track *t, int track_no, int level_no);
 };
 
 #endif /* ACTIONSUBTRACKFROMSELECTION_H_ */

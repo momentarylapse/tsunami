@@ -25,7 +25,6 @@ void ActionAudioAddTrack::undo(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	delete(a->track[index]);
 	a->track.erase(index);
-	a->cur_track = old_cur_track;
 }
 
 
@@ -33,7 +32,6 @@ void ActionAudioAddTrack::undo(Data *d)
 void *ActionAudioAddTrack::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	old_cur_track = a->cur_track;
 
 	assert((index >= 0) && (index <= a->track.num));
 
@@ -46,8 +44,7 @@ void *ActionAudioAddTrack::execute(Data *d)
 	t->type = type;
 	t->level.resize(a->level_name.num);
 
-	a->cur_track = index;
-	a->track.insert(t, a->cur_track);
+	a->track.insert(t, index);
 
 	return t;
 }

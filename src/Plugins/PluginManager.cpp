@@ -74,7 +74,6 @@ void PluginManager::LinkAppScriptData()
 	ScriptResetSemiExternalData();
 	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
 	ScriptLinkSemiExternalVar("MainWin",		&GlobalMainWin);
-	ScriptLinkSemiExternalVar("cur_audio",		&tsunami->cur_audio);
 	ScriptLinkSemiExternalVar("audio",			&tsunami->audio);
 	ScriptLinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
 	ScriptLinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
@@ -461,7 +460,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 	if (LoadAndCompilePlugin(filename)){
 		CScript *s = cur_plugin->s;
 
-		AudioFile *a = tsunami->cur_audio;
+		AudioFile *a = tsunami->audio;
 
 		// run
 		cur_plugin->ResetData();
@@ -473,7 +472,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 					cur_plugin->ResetState();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
-							cur_plugin->ProcessTrack(t, a->cur_level, a->selection);
+							cur_plugin->ProcessTrack(t, tsunami->view->cur_level, a->selection);
 						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
@@ -531,7 +530,7 @@ void PluginManager::Preview(Effect &fx)
 	tsunami->progress->StartCancelable(_("Vorschau"), 0);
 	Subscribe(tsunami->progress);
 	Subscribe(tsunami->output);
-	tsunami->output->Play(tsunami->cur_audio, false);
+	tsunami->output->Play(tsunami->audio, false);
 
 	while(tsunami->output->IsPlaying()){
 		HuiSleep(10);

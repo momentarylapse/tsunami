@@ -10,6 +10,7 @@
 #include "Slider.h"
 #include "FxList.h"
 #include "BarList.h"
+#include "../../Tsunami.h"
 
 TrackDialog::TrackDialog(CHuiWindow *win):
 	EmbeddedDialog(win)
@@ -30,6 +31,7 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 		bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", t->bar, t->root->sample_rate);*/
 
 	LoadData();
+	Subscribe(tsunami->audio);
 
 	win->EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
 	win->EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
@@ -39,6 +41,7 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 
 TrackDialog::~TrackDialog()
 {
+	Unsubscribe(tsunami->audio);
 	delete(volume_slider);
 	delete(fx_list);
 	if (bar_list)
@@ -87,4 +90,16 @@ void TrackDialog::OnClose()
 {
 	//delete(this);
 	win->HideControl("tool_table", true);
+}
+
+void TrackDialog::OnUpdate(Observable *o)
+{
+	if (!track)
+		return;
+	bool ok = false;
+	foreach(Track *t, tsunami->audio->track)
+		if (track == t)
+			ok = true;
+	if (!ok)
+		SetTrack(NULL);
 }

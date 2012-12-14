@@ -1,10 +1,10 @@
 // Language
 English
 // Num IDs
-140
+139
 // Data (ID,Text)
 about
-About
+
 ad_table_1
 
 ad_table_2
@@ -22,7 +22,7 @@ add_tag
 add_time_track
 
 add_track
-Add Track
+
 bar_list
 
 cancel
@@ -40,11 +40,11 @@ capture_time
 close
 Close
 close_file
-Close
+
 copy
 Copy
 cut_out
-Cut out
+
 delete
 Delete
 delete_bar
@@ -54,13 +54,13 @@ Delete
 delete_tag
 
 delete_track
-Delete Track
+
 dummy_favorite_dialog
 sdiufh
 exit
-Exit
+
 export_selection
-Export selection...
+
 favorite_list
 - Default -
 fx_dialog
@@ -72,11 +72,11 @@ fxdt_filename
 fxdt_params
 !bold\\Parameters
 help
-Help
+
 insert_added
-Insert firmly
+
 jump_other_file
-Jump into other file
+
 kbitpersec
 kbit/s
 ld_t_bars
@@ -104,23 +104,23 @@ Clear
 log_close
 Close
 menu_edit
-Edit
+
 menu_file
-File
+
 menu_help
-?
+
 menu_level
 
 menu_plugins
-Plugins
+
 menu_sound
-Sound
+
 menu_sub
-Level
+
 menu_track
-Track
+
 menu_view
-View
+
 menu_view_peaks
 
 ms
@@ -168,7 +168,7 @@ percent
 play
 Play
 play_loop
-Loop
+
 preview
 Preview
 progress_cancelable_dialog
@@ -188,35 +188,35 @@ Record
 redo
 Redo
 remove_added
-Delete level
+
 repdelay
 
 repnum
 
 resize
-Resize
+
 run_plugin
-Run plugin...
+
 save
 Save
 save_as
-Save as...
+
 select_all
-Select all
+
 select_nothing
-Select none
+
 settings
-Settings
+
 show_log
-Show log
+
 stop
 Stop
 sub_from_selection
 
 sub_import
-Import from file...
+
 sub_properties
-Properties
+
 tab_control
 Data\\Tags\\Tracks\\Effects
 tags
@@ -238,11 +238,11 @@ td_table_7
 track_dialog
 Track
 track_import
-Import from file...
+
 track_list
 Track
 track_properties
-Properties
+
 track_time_dialog
 
 trackdest_dialog
@@ -250,19 +250,17 @@ Destination track
 undo
 Undo
 view_grid
-Grid
+
 view_mono
-Mono
+
 view_optimal
-Optimal
+
 view_peaks_max
 
 view_peaks_mean
 
 view_samples
-Samples
-view_temp_file
-Second file
+
 volume
 \\0\\1000\\0.1
 wave_dialog
@@ -270,7 +268,7 @@ Sound file
 wave_list
 !tree\\#\\Name\\Volume
 wave_properties
-Properties
+
 wd_t_format
 Format:
 wd_t_freq
@@ -280,11 +278,11 @@ Samples:
 wd_t_time
 Duration:
 zoom_in
-Zoom in
+
 zoom_out
-Zoom out
+
 // Num Language Strings
-81
+80
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -372,8 +370,6 @@ Kanäle
 
 Keine Ebene ausgewählt
 No level selected
-Keine Spur ausgewählt
-No track selected
 Klang
 
 Konnte Aufnahmegerät nicht öffnen

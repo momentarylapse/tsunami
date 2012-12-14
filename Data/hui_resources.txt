@@ -3333,7 +3333,7 @@ ad_table_6
 ad_table_7
 !noexpandy
 add_bar
-Hinzufügen...
+Takt
 add_bar_pause
 Pause
 add_effect
@@ -3379,7 +3379,7 @@ Auswahl herausschneiden
 delete
 Löschen
 delete_bar
-Löschen
+
 delete_effect
 Löschen
 delete_tag

@@ -18,17 +18,11 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 	track = NULL;
 	win->SetTarget("tool_table", 0);
 	win->SetBorderWidth(8);
-	win->EmbedDialog("track_dialog", 1, 0);
+	win->EmbedDialog("track_time_dialog", 1, 0);
 	win->SetDecimals(1);
-	/*if (t->type == Track::TYPE_TIME)
-		FromResource("track_time_dialog");
-	else
-		FromResource("track_dialog");*/
 	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);
 	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect", NULL);
-	bar_list = NULL;
-	/*if (t->type == Track::TYPE_TIME)
-		bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", t->bar, t->root->sample_rate);*/
+	bar_list = new BarList(win, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
 	LoadData();
 	Subscribe(tsunami->audio);
@@ -58,9 +52,14 @@ void TrackDialog::LoadData()
 		volume_slider->Set(track->volume);
 		volume_slider->Enable(!track->muted);
 		fx_list->SetFxList(&track->fx);
+		if (track->type == track->TYPE_TIME)
+			bar_list->SetBar(&track->bar, track->root->sample_rate);
+		else
+			bar_list->SetBar(NULL, 0);
 	}else{
 		volume_slider->Enable(false);
 		fx_list->SetFxList(NULL);
+		bar_list->SetBar(NULL, 0);
 	}
 }
 

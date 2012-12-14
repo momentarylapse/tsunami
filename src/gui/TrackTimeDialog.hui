@@ -39,11 +39,11 @@
 	TrackDialog->AddListView("!format=tTTT\\#\\Schl&age\\Bpm\\Anzahl", 2, 0, 0, 0, "bar_list");
 	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_10");
 	TrackDialog->SetTarget("td_table_10", 0);
-	TrackDialog->AddButton("Hinzuf&ugen...", 0, 0, 0, 0, "add_bar");
+	TrackDialog->AddButton("Takt", 0, 0, 0, 0, "add_bar");
 	TrackDialog->SetImage("add_bar", "hui:add");
 	TrackDialog->AddButton("Pause", 1, 0, 0, 0, "add_bar_pause");
 	TrackDialog->SetImage("add_bar_pause", "hui:add");
-	TrackDialog->AddButton("L&oschen", 2, 0, 0, 0, "delete_bar");
+	TrackDialog->AddButton("", 2, 0, 0, 0, "delete_bar");
 	TrackDialog->SetImage("delete_bar", "hui:delete");
 	TrackDialog->Update();
 

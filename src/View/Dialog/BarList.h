@@ -14,7 +14,7 @@
 class BarList : public HuiEventHandler
 {
 public:
-	BarList(CHuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, Array<Bar> &_bar, int _sample_rate);
+	BarList(CHuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete);
 	virtual ~BarList();
 
 	void FillList();
@@ -28,11 +28,13 @@ public:
 	void AddNewBar();
 	void ExecuteBarDialog(int index);
 
+	void SetBar(Array<Bar> *bar, int sample_rate);
+
 public:
 	CHuiWindow *dlg;
 	string id;
 	string id_add, id_add_pause, id_delete;
-	Array<Bar> &bar;
+	Array<Bar> *bar;
 	int sample_rate;
 };
 

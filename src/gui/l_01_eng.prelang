@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-139
+138
 // Data (ID,Text)
 about
 
@@ -47,8 +47,6 @@ cut_out
 
 delete
 Delete
-delete_bar
-
 delete_effect
 Delete
 delete_tag

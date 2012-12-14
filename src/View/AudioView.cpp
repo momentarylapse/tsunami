@@ -16,6 +16,15 @@ const int FONT_SIZE = 10;
 const int MAX_TRACK_HEIGHT = 250;
 
 
+int get_track_index_save(Track *t)
+{
+	if (t){
+		foreachi(Track *tt, tsunami->audio->track, i)
+			if (t == tt)
+				return i;
+	}
+	return -1;
+}
 
 AudioView::SelectionType::SelectionType()
 {
@@ -794,9 +803,10 @@ void AudioView::OnUpdate(Observable *o)
 {
 	//msg_write("view: " + o->GetName() + " - " + o->GetMessage());
 
-	/*if (cur_track)
-		if ()*/
-	msg_todo("cur track sanity");
+	int n = get_track_index_save(cur_track);
+	if (n < 0)
+		if (audio->track.num > 0)
+			SetCurTrack(audio->track[0]);
 
 	if (o->GetMessage() == "New"){
 		OptimizeView();
@@ -1124,6 +1134,7 @@ void AudioView::SetCurSub(Track *s)
 void AudioView::SetCurTrack(Track *t)
 {
 	cur_track = t;
+	track_dialog->SetTrack(cur_track);
 }
 
 
@@ -1159,7 +1170,6 @@ void AudioView::Move(float dpos)
 
 void AudioView::ExecuteTrackDialog(CHuiWindow *win)
 {
-	track_dialog->SetTrack(cur_track);
 	win->HideControl("tool_table", false);
 }
 

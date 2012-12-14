@@ -19,6 +19,7 @@ Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_e
 	factor = _factor;
 	func = _func;
 	member_func = NULL;
+	handler = NULL;
 
 	win->EventM(id_slider, this, (void(HuiEventHandler::*)())&Slider::OnSlide);
 	win->EventM(id_edit, this, (void(HuiEventHandler::*)())&Slider::OnEdit);
@@ -28,7 +29,7 @@ Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_e
 
 
 
-Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, void(HuiEventHandler::*_func)(), float _value)
+Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, void(HuiEventHandler::*_func)(), float _value, HuiEventHandler *_handler)
 {
 	win = _win;
 	id_slider = _id_slider;
@@ -38,6 +39,7 @@ Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_e
 	factor = _factor;
 	func = NULL;
 	member_func = _func;
+	handler = _handler ? _handler : win;
 
 	win->EventM(id_slider, this, (void(HuiEventHandler::*)())&Slider::OnSlide);
 	win->EventM(id_edit, this, (void(HuiEventHandler::*)())&Slider::OnEdit);
@@ -85,7 +87,7 @@ void Slider::OnSlide()
 	if (func)
 		func();
 	if (member_func)
-		(win->*member_func)();
+		(handler->*member_func)();
 }
 
 void Slider::OnEdit()

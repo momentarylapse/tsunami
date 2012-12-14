@@ -24,7 +24,7 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 		FromResource("track_time_dialog");
 	else
 		FromResource("track_dialog");*/
-	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0);
+	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);
 	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect", NULL);
 	bar_list = NULL;
 	/*if (t->type == Track::TYPE_TIME)

@@ -44,6 +44,7 @@ class CHuiMenu
 public:
 	CHuiMenu();
 	~CHuiMenu();
+	void _cdecl Clear();
 	void _cdecl OpenPopup(CHuiWindow *win, int x, int y);
 	void _cdecl AddItem(const string &name, const string &id);
 	void _cdecl AddItemImage(const string &name, const string &image, const string &id);

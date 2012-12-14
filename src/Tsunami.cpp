@@ -54,6 +54,9 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTimeTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDeleteTrack);
 	HuiAddCommandM("level_add", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddLevel);
+	HuiAddCommandM("level_delete", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDeleteLevel);
+	HuiAddCommandM("level_up", "hui:up", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevelUp);
+	HuiAddCommandM("level_down", "hui:down", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevelDown);
 	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSubFromSelection);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRemoveAdded);
@@ -78,10 +81,10 @@ Tsunami::Tsunami(Array<string> arg) :
 	// create the window
 	SetSize(width, height);
 	SetBorderWidth(0);
-	/*AddControlTable("", 0, 0, 1, 2, "main_table");
-	SetTarget("main_table", 0);
+	AddControlTable("", 0, 0, 1, 2, "root_table");
+	SetTarget("root_table", 0);
 	SetBorderWidth(8);
-	AddControlTable("!noexpandy", 0, 1, 9, 1, "audio_table");
+	AddControlTable("!noexpandy", 0, 1, 8, 1, "audio_table");
 	SetTarget("audio_table", 0);
 	AddButton("", 0, 0, 0, 0, "play");
 	AddButton("", 1, 0, 0, 0, "pause");
@@ -93,7 +96,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddText("!width=20\\%", 6, 0, 0, 0, "label_percent");
 	volume_slider = new Slider(this, "volume_slider", "volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
 	AddButton("", 7, 0, 0, 0, "record");
-	AddComboBox("!width=100", 8, 0, 0, 0, "cur_level");*/
+	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 2, 1, "main_table");
 	SetTarget("main_table", 0);
 	AddControlTable("!noexpandx", 1, 0, 1, 2, "tool_table");
@@ -108,7 +111,8 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	// events
 	EventM("hui:close", this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
-	EventM("cur_level", this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevel);
+	for (int i=0;i<256;i++)
+		EventM(format("jump_to_level_%d", i), this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevel);
 
 	plugins = new PluginManager;
 	plugins->AddPluginsToMenu();
@@ -364,10 +368,33 @@ void Tsunami::OnAddLevel()
 		audio->AddLevel();
 }
 
+void Tsunami::OnDeleteLevel()
+{
+}
+
 void Tsunami::OnCurLevel()
 {
-	view->cur_level = GetInt("");
+	view->cur_level = HuiGetEvent()->id.substr(14, -1)._int();
+	UpdateMenu();
 	ForceRedraw();
+}
+
+void Tsunami::OnCurLevelUp()
+{
+	if (view->cur_level < audio->level_name.num - 1){
+		view->cur_level ++;
+		UpdateMenu();
+		ForceRedraw();
+	}
+}
+
+void Tsunami::OnCurLevelDown()
+{
+	if (view->cur_level > 0){
+		view->cur_level --;
+		UpdateMenu();
+		ForceRedraw();
+	}
 }
 
 void Tsunami::OnSubFromSelection()
@@ -404,6 +431,9 @@ void Tsunami::UpdateMenu()
 	Enable("track_properties", view->cur_track);
 	// level
 	Enable("level_add", audio->used);
+	Enable("level_delete", audio->used && (audio->level_name.num > 0));
+	Enable("level_up", audio->used && (view->cur_level < audio->level_name.num -1));
+	Enable("level_down", audio->used && (view->cur_level > 0));
 	// sub
 	Enable("sub_import", view->cur_track);
 	Enable("sub_from_selection", selected);
@@ -416,12 +446,13 @@ void Tsunami::UpdateMenu()
 	Enable("pause", output->IsPlaying());
 	Check("play_loop", output->GetLoop());
 
-
-	Reset("cur_level");
-	Enable("cur_level", audio->used);
-	foreach(string &l, audio->level_name)
-		SetString("cur_level", l);
-	SetInt("cur_level", view->cur_level);
+	CHuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
+	if (m){
+		m->Clear();
+		foreachib(string &l, audio->level_name, i)
+			m->AddItemCheckable(l, format("jump_to_level_%d", i));
+		m->CheckItem(format("jump_to_level_%d", view->cur_level), true);
+	}
 
 	if (audio->used){
 		string title = title_filename(audio->filename) + " - " + AppName;

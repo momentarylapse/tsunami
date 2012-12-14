@@ -65,6 +65,7 @@ public:
 	void OnRemoveAdded();
 	void OnTrackImport();
 	void OnAddLevel();
+	void OnDeleteLevel();
 	void OnSubImport();
 	void OnAudioProperties();
 	void OnTrackProperties();
@@ -78,6 +79,8 @@ public:
 	void OnVolume();
 	void OnRecord();
 	void OnCurLevel();
+	void OnCurLevelUp();
+	void OnCurLevelDown();
 	void OnShowLog();
 	void OnFindAndExecutePlugin();
 	void OnExit();

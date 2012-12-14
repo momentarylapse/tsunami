@@ -560,7 +560,7 @@ menu
 0
 
 
-70
+75
 ItemPopup
 menu_file
 
@@ -1007,7 +1007,7 @@ ItemPopup
 menu_level
 
 1
-1
+6
 0
 0
 0
@@ -1019,6 +1019,71 @@ menu_level
 ItemImage
 level_add
 hui:add
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+level_delete
+hui:delete
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemSeparator
+
+
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemPopup
+menu_level_target
+
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+level_up
+hui:up
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+level_down
+hui:down
 1
 0
 0
@@ -3314,7 +3379,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-170
+174
 // Text
 about
 Info
@@ -3442,10 +3507,16 @@ ld_t_volume
 !bold\\Lautstärke
 level_add
 Hinzufügen
+level_delete
+Löschen
 level_dialog
 Ebene
+level_down
+Runter
 level_track
 
+level_up
+Hoch
 log_clear
 Leeren
 log_close
@@ -3462,6 +3533,8 @@ menu_help
 ?
 menu_level
 Ebene
+menu_level_target
+Gehe zu
 menu_plugins
 Plugins
 menu_sound
@@ -3662,7 +3735,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-170
+174
 // Text
 about
 
@@ -3790,9 +3863,15 @@ ld_t_volume
 !bold\\Volume:
 level_add
 
+level_delete
+
 level_dialog
 Level
+level_down
+
 level_track
+
+level_up
 
 log_clear
 Clear
@@ -3809,6 +3888,8 @@ menu_file
 menu_help
 
 menu_level
+
+menu_level_target
 
 menu_plugins
 

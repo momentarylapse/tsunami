@@ -803,10 +803,17 @@ void AudioView::OnUpdate(Observable *o)
 {
 	//msg_write("view: " + o->GetName() + " - " + o->GetMessage());
 
+	// check cur_track consistency
 	int n = get_track_index_save(cur_track);
 	if (n < 0)
 		if (audio->track.num > 0)
 			SetCurTrack(audio->track[0]);
+
+	// check cur_level consistency
+	if ((cur_level < 0) || (cur_level >= audio->level_name.num)){
+		cur_level = 0;
+		ForceRedraw();
+	}
 
 	if (o->GetMessage() == "New"){
 		OptimizeView();

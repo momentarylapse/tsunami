@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-138
+142
 // Data (ID,Text)
 about
 
@@ -95,8 +95,14 @@ ld_t_volume
 !bold\\Volume:
 level_add
 
+level_delete
+
 level_dialog
 Level
+level_down
+
+level_up
+
 log_clear
 Clear
 log_close
@@ -108,6 +114,8 @@ menu_file
 menu_help
 
 menu_level
+
+menu_level_target
 
 menu_plugins
 

@@ -91,6 +91,13 @@ void CHuiMenu::gtk_realize()
 	g_menu = gtk_menu_new();
 }
 
+void CHuiMenu::Clear()
+{
+	foreach(HuiMenuItem &i, item)
+		gtk_widget_destroy(i.widget);
+	item.clear();
+}
+
 // window coordinate system!
 void CHuiMenu::OpenPopup(CHuiWindow *win, int x, int y)
 {

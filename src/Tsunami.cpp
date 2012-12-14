@@ -83,24 +83,24 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetBorderWidth(0);
 	AddControlTable("", 0, 0, 1, 2, "root_table");
 	SetTarget("root_table", 0);
-	SetBorderWidth(8);
-	AddControlTable("!noexpandy", 0, 1, 8, 1, "audio_table");
-	SetTarget("audio_table", 0);
-	AddButton("", 0, 0, 0, 0, "play");
-	AddButton("", 1, 0, 0, 0, "pause");
-	AddButton("", 2, 0, 0, 0, "stop");
-	AddDrawingArea("!width=100", 3, 0, 0, 0, "peaks");
-	peak_meter = new PeakMeter(this, "peaks", output);
-	AddSlider("!width=100", 4, 0, 0, 0, "volume_slider");
-	AddSpinButton("!width=50\\0\\0\\100", 5, 0, 0, 0, "volume");
-	AddText("!width=20\\%", 6, 0, 0, 0, "label_percent");
-	volume_slider = new Slider(this, "volume_slider", "volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
-	AddButton("", 7, 0, 0, 0, "record");
-	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 2, 1, "main_table");
+	SetBorderWidth(8);
+	AddControlTable("!noexpandy", 0, 1, 7, 1, "output_table");
+	SetBorderWidth(0);
 	SetTarget("main_table", 0);
 	AddControlTable("!noexpandx", 1, 0, 1, 2, "tool_table");
 	HideControl("tool_table", true);
+	SetBorderWidth(8);
+	SetTarget("output_table", 0);
+	AddButton("", 0, 0, 0, 0, "play");
+	AddButton("", 1, 0, 0, 0, "pause");
+	AddButton("", 2, 0, 0, 0, "stop");
+	AddDrawingArea("!width=100", 3, 0, 0, 0, "output_peaks");
+	peak_meter = new PeakMeter(this, "output_peaks", output);
+	AddSlider("!width=100", 4, 0, 0, 0, "output_volume_slider");
+	AddSpinButton("!width=50\\0\\0\\100", 5, 0, 0, 0, "output_volume");
+	AddText("!width=20\\%", 6, 0, 0, 0, "output_label_percent");
+	volume_slider = new Slider(this, "output_volume_slider", "output_volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
 	AllowEvents("key");
 	ToolbarSetByID("toolbar");
 	//ToolbarConfigure(false, true);
@@ -431,7 +431,7 @@ void Tsunami::UpdateMenu()
 	Enable("track_properties", view->cur_track);
 	// level
 	Enable("level_add", audio->used);
-	Enable("level_delete", audio->used && (audio->level_name.num > 0));
+	Enable("level_delete", audio->used && (audio->level_name.num > 1));
 	Enable("level_up", audio->used && (view->cur_level < audio->level_name.num -1));
 	Enable("level_down", audio->used && (view->cur_level > 0));
 	// sub

@@ -2158,7 +2158,7 @@ toolbar
 1
 
 
-15
+12
 Item
 new
 hui:new
@@ -2292,45 +2292,6 @@ hui:delete
 ItemSeparator
 
 hui:about
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-Item
-play
-hui:media-play
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-Item
-pause
-hui:media-pause
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-Item
-stop
-hui:media-stop
 1
 0
 0

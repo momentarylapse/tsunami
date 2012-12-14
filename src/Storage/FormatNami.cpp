@@ -678,6 +678,15 @@ void load_nami_file_new(CFile *f, AudioFile *a)
 }
 
 
+void check_empty_subs(AudioFile *a)
+{
+	foreach(Track *t, a->track)
+		foreachib(Track *s, t->sub, i)
+			if (s->length <= 0){
+				tsunami->log->Error("empty sub: " + s->name);
+				t->sub.erase(i);
+			}
+}
 
 void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 {
@@ -698,6 +707,8 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 		load_nami_file_new(f, a);
 
 	FileClose(f);
+
+	check_empty_subs(a);
 
 	a->UpdateSelection();
 

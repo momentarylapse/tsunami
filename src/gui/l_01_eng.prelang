@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-142
+141
 // Data (ID,Text)
 about
 
@@ -72,8 +72,6 @@ fxdt_params
 help
 
 insert_added
-
-jump_other_file
 
 kbitpersec
 kbit/s

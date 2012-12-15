@@ -560,7 +560,7 @@ menu
 0
 
 
-75
+73
 ItemPopup
 menu_file
 
@@ -1189,7 +1189,7 @@ ItemPopup
 menu_view
 
 1
-10
+8
 0
 0
 0
@@ -1318,32 +1318,6 @@ hui:zoom-fit
 ItemImage
 view_samples
 hui:zoom-one
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-ItemSeparator
-
-
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-ItemImage
-jump_other_file
-hui:forward
 1
 0
 0
@@ -3340,7 +3314,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-174
+173
 // Text
 about
 Info
@@ -3444,8 +3418,6 @@ help
 Hilfe
 insert_added
 Fest einfügen
-jump_other_file
-In andere Datei springen
 kbitpersec
 kbit/s
 language
@@ -3696,7 +3668,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-174
+173
 // Text
 about
 
@@ -3799,8 +3771,6 @@ fxdt_params
 help
 
 insert_added
-
-jump_other_file
 
 kbitpersec
 kbit/s

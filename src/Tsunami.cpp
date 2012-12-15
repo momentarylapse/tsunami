@@ -38,7 +38,6 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	//HuiAddKeyCode("insert_added", KEY_RETURN);
 	//HuiAddKeyCode("remove_added", KEY_BACKSPACE);
-	HuiAddKeyCode("jump_other_file", KEY_TAB);
 
 	HuiAddCommandM("new", "hui:new", KEY_N + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnNew);
 	HuiAddCommandM("open", "hui:open", KEY_O + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnOpen);
@@ -258,11 +257,11 @@ bool Tsunami::AllowTermination()
 {
 	if (!audio->action_manager->IsSave()){
 		string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio->filename).c_str()), true);
-		if (answer == "yes"){
+		if (answer == "hui:yes"){
 			/*if (!OnSave())
 				return false;*/
 			OnSave();
-		}else if (answer == "cancel")
+		}else if (answer == "hui:cancel")
 			return false;
 	}
 	return true;

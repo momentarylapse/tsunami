@@ -125,8 +125,6 @@ enum{
 		sub_menu_8830->AddEntryImage("Verkleinern",HuiImageZoomOut,HMM_ZOOM_OUT);
 		sub_menu_8830->AddEntryImage("Optimal",HuiImageZoomFit,HMM_VIEW_OPTIMAL);
 		sub_menu_8830->AddEntryImage("Sample-Ebene",HuiImageZoomOne,HMM_VIEW_SAMPLES);
-		sub_menu_8830->AddSeparator();
-		sub_menu_8830->AddEntryImage("In andere Datei springen",HuiImageForward,HMM_JUMP_OTHER_FILE);
 	m->AddSubMenu("Ansicht",HMM_MENU_VIEW,sub_menu_8830);
 		CHuiMenu *sub_menu_1782=new CHuiMenu();
 		sub_menu_1782->AddEntryImage("Abspielen",HuiImageMediaPlay,HMM_PLAY);

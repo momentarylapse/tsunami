@@ -560,7 +560,7 @@ menu
 0
 
 
-73
+75
 ItemPopup
 menu_file
 
@@ -1211,8 +1211,34 @@ view_mono
 0
 
 
+ItemPopup
+menu_view_grid
+
+1
+2
+0
+0
+0
+0
+0
+0
+
+
 ItemCheckable
-view_grid
+view_grid_time
+
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemCheckable
+view_grid_bars
 
 1
 0
@@ -3314,7 +3340,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-173
+175
 // Text
 about
 Info
@@ -3478,6 +3504,8 @@ menu_track
 Spur
 menu_view
 Ansicht
+menu_view_grid
+Raster
 menu_view_peaks
 Peaks
 ms
@@ -3628,8 +3656,10 @@ trackdest_dialog
 Ziel-Spur für die Ebenen
 undo
 Rückgängig
-view_grid
-Raster
+view_grid_bars
+Takte
+view_grid_time
+Zeit
 view_mono
 Mono
 view_optimal
@@ -3668,7 +3698,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-173
+175
 // Text
 about
 
@@ -3832,6 +3862,8 @@ menu_track
 
 menu_view
 
+menu_view_grid
+
 menu_view_peaks
 
 ms
@@ -3982,7 +4014,9 @@ trackdest_dialog
 Destination track
 undo
 Undo
-view_grid
+view_grid_bars
+
+view_grid_time
 
 view_mono
 

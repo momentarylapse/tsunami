@@ -44,7 +44,8 @@ public:
 	void OnSelectNothing();
 
 	void OnViewMono();
-	void OnViewGrid();
+	void OnViewGridTime();
+	void OnViewGridBars();
 	void OnViewOptimal();
 	void OnViewPeaksMax();
 	void OnViewPeaksMean();
@@ -52,14 +53,16 @@ public:
 	void OnZoomOut();
 	void OnJumpOtherFile();
 
-	void DrawBuffer(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, int pos, float zoom, const color &col);
-	void DrawSubFrame(HuiDrawingContext *c, int x, int y, int width, int height, Track *s, const color &col, int delay);
-	void DrawSub(HuiDrawingContext *c, int x, int y, int width, int height, Track *s);
-	void DrawBars(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, int track_no, Array<Bar> &bc);
-	void DrawTrack(HuiDrawingContext *c, int x, int y, int width, int height, Track *t, color col, int track_no);
-	void DrawGrid(HuiDrawingContext *c, int x, int y, int width, int height, const color &bg, bool show_time = false);
+	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int pos, float zoom, const color &col);
+	void DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, const color &col, int delay);
+	void DrawSub(HuiDrawingContext *c, const rect &r, Track *s);
+	void DrawBars(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no, Array<Bar> &bc);
+	void DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no);
+	void DrawGrid(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
+	void DrawGridTime(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
+	void DrawGridBars(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col, bool show_time = false);
-	void DrawAudioFile(HuiDrawingContext *c, int x, int y, int width, int height);
+	void DrawAudioFile(HuiDrawingContext *c, const rect &r);
 
 	void OptimizeView();
 	void UpdateMenu();
@@ -149,8 +152,13 @@ public:
 
 	bool force_redraw;
 
-	bool ShowMono;
-	bool ShowGrid;
+	bool show_mono;
+	int grid_mode;
+	enum{
+		GRID_MODE_NONE,
+		GRID_MODE_TIME,
+		GRID_MODE_BARS
+	};
 	int DetailSteps;
 	int MouseMinMoveToSelect;
 	int PreviewSleepTime;

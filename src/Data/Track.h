@@ -12,6 +12,7 @@
 #include "BufferBox.h"
 #include "AudioFile.h"
 #include "../Plugins/Effect.h"
+#include "../lib/types/rect.h"
 
 
 #define NUM_PEAK_LEVELS		24
@@ -98,7 +99,7 @@ public:
 	Array<Bar> bar;
 
 // editing
-	int x, y, width, height;
+	rect area;
 	int parent;
 	AudioFile *root;
 

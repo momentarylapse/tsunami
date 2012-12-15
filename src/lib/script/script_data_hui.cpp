@@ -349,7 +349,7 @@ void SIAddPackageHui()
 		class_add_func("DrawPolygon",								TypeVoid,		mf((tmf)&HuiDrawingContext::DrawPolygonMA));
 			func_add_param("x",			TypeFloatList);
 			func_add_param("y",			TypeFloatList);
-		class_add_func("DrawRect",								TypeVoid,		mf((tmf)&HuiDrawingContext::DrawRect));
+		class_add_func("DrawRect",								TypeVoid,		mf((tmf)(void (HuiDrawingContext::*) (float,float,float,float))&HuiDrawingContext::DrawRect));
 			func_add_param("x",			TypeFloat);
 			func_add_param("y",			TypeFloat);
 			func_add_param("w",			TypeFloat);

@@ -1146,6 +1146,14 @@ void HuiDrawingContext::DrawRect(float x, float y, float w, float h)
 	cairo_fill(cr);
 }
 
+void HuiDrawingContext::DrawRect(const rect &r)
+{
+	if (!cr)
+		return;
+	cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
+	cairo_fill(cr);
+}
+
 void HuiDrawingContext::DrawCircle(float x, float y, float radius)
 {
 	if (!cr)

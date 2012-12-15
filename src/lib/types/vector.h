@@ -1,4 +1,7 @@
 
+#ifndef _TYPES_VECTOR_INCLUDED_
+#define _TYPES_VECTOR_INCLUDED_
+
 struct vector
 {
 public:
@@ -72,3 +75,5 @@ const vector e_x = vector(1, 0, 0);
 const vector e_y = vector(0, 1, 0);
 const vector e_z = vector(0, 0, 1);
 
+
+#endif

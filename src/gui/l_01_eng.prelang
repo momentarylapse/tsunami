@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-141
+143
 // Data (ID,Text)
 about
 
@@ -124,6 +124,8 @@ menu_sub
 menu_track
 
 menu_view
+
+menu_view_grid
 
 menu_view_peaks
 
@@ -253,7 +255,9 @@ trackdest_dialog
 Destination track
 undo
 Undo
-view_grid
+view_grid_bars
+
+view_grid_time
 
 view_mono
 

@@ -1,4 +1,7 @@
 
+#ifndef _TYPES_COMPLEX_INCLUDED_
+#define _TYPES_COMPLEX__INCLUDED_
+
 struct complex
 {
 	float x, y;
@@ -50,3 +53,5 @@ struct complex
 
 // complex
 const complex c_i = complex(0, 1);
+
+#endif

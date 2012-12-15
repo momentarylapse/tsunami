@@ -31,10 +31,7 @@ Track::Track()
 	rep_num = 0;
 	rep_delay = 10000;
 
-	x = 0;
-	y = 0;
-	width = 0;
-	height = 0;
+	area = rect(0, 0, 0, 0);
 }
 
 
@@ -47,7 +44,7 @@ void Track::Reset()
 	name.clear();
 	length = 0;
 	pos = 0;
-	width = -1;
+	area = rect(0, 0, 0, 0);
 	volume = 1;
 	muted = false;
 	bar.clear();

@@ -1,4 +1,7 @@
 
+#ifndef _TYPES_COLOR_INCLUDED_
+#define _TYPES_COLOR_INCLUDED_
+
 struct color
 {
 public:
@@ -47,3 +50,4 @@ static color Blue   = color(1, 0, 0, 1);
 static color Yellow = color(1, 1, 1, 0);
 static color Orange = color(1, 1, 0.5f, 0);
 
+#endif

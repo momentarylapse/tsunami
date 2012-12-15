@@ -85,7 +85,7 @@ class Track
 	Bar bar[]
 
 	// editing
-	int x, y, width, height
+	rect area
 	int parent
 	void *root
 
@@ -126,7 +126,7 @@ class AudioFile
 	AudioEffect fx[]
 	TrackPointer track[]
 
-	int x, y, width, height
+	rect area
 
 	Range selection
 	Range sel_raw

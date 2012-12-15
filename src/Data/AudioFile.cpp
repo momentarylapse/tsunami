@@ -119,7 +119,7 @@ void AudioFile::Reset()
 	used = false;
 	filename = "";
 	tag.clear();
-	width = -1;
+	area = rect(0, 0, 0, 0);
 	selection.clear();
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;

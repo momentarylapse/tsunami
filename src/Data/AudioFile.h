@@ -11,6 +11,7 @@
 #include "Data.h"
 #include "Track.h"
 #include "../lib/base/base.h"
+#include "../lib/types/rect.h"
 
 class Data;
 class Effect;
@@ -80,7 +81,7 @@ public:
 
 // editing
 	// needed for rendering
-	int x, y, width, height;
+	rect area;
 
 	// selection within the buffer?
 	Range selection;

@@ -1,4 +1,7 @@
 
+#ifndef _TYPES_QUATERNION_INCLUDED_
+#define _TYPES_QUATERNION_INCLUDED_
+
 struct quaternion
 {
 public:
@@ -78,3 +81,4 @@ void _cdecl QuaternionScale(quaternion &q, float f);
 
 const quaternion q_id = quaternion(1, v_0);
 
+#endif

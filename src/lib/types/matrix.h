@@ -1,4 +1,7 @@
 
+#ifndef _TYPES_MATRIX_INCLUDED_
+#define _TYPES_MATRIX_INCLUDED_
+
 //#define _element(row,col)	e[row+col*4]
 
 class matrix;
@@ -101,3 +104,4 @@ matrix _cdecl MatrixRotation2(const vector &ang);
 const float f_m_id[16] = { 1,0,0,0 , 0,1,0,0 , 0,0,1,0 , 0,0,0,1 };
 const matrix m_id = matrix(f_m_id);
 
+#endif

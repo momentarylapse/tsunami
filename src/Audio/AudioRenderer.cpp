@@ -213,6 +213,8 @@ BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
 void AudioRenderer::Prepare(AudioFile *a)
 {
 	msg_db_r("Renderer.Prepare", 2);
+	foreach(Effect &fx, a->fx)
+		fx.Prepare();
 	foreach(Track *t, a->track)
 		foreach(Effect &fx, t->fx)
 			fx.Prepare();
@@ -224,6 +226,8 @@ void AudioRenderer::Prepare(AudioFile *a)
 void AudioRenderer::CleanUp(AudioFile *a)
 {
 	msg_db_r("Renderer.CleanUp", 2);
+	foreach(Effect &fx, a->fx)
+		fx.CleanUp();
 	foreach(Track *t, a->track)
 		foreach(Effect &fx, t->fx)
 			fx.CleanUp();

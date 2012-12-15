@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrackEditName.h"
-#include "../../Data/Track.h"
+#include "../../../Data/Track.h"
 
 ActionTrackEditName::ActionTrackEditName(Track *t, const string &_name)
 {

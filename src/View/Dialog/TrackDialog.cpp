@@ -11,9 +11,9 @@
 #include "FxList.h"
 #include "BarList.h"
 #include "../../Tsunami.h"
-#include "../../Action/Track/ActionTrackEditMuted.h"
-#include "../../Action/Track/ActionTrackEditName.h"
-#include "../../Action/Track/ActionTrackEditVolume.h"
+#include "../../Action/Track/Data/ActionTrackEditMuted.h"
+#include "../../Action/Track/Data/ActionTrackEditName.h"
+#include "../../Action/Track/Data/ActionTrackEditVolume.h"
 
 TrackDialog::TrackDialog(CHuiWindow *win):
 	EmbeddedDialog(win)
@@ -24,7 +24,7 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 	win->EmbedDialog("track_time_dialog", 1, 0);
 	win->SetDecimals(1);
 	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);
-	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect", NULL);
+	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect");
 	bar_list = new BarList(win, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
 	LoadData();
@@ -49,19 +49,18 @@ void TrackDialog::LoadData()
 {
 	Enable("name", track);
 	Enable("mute", track);
+	fx_list->SetTrack(track);
 	if (track){
 		SetString("name", track->name);
 		Check("mute", track->muted);
 		volume_slider->Set(track->volume);
 		volume_slider->Enable(!track->muted);
-		fx_list->SetFxList(&track->fx);
 		if (track->type == track->TYPE_TIME)
 			bar_list->SetBar(&track->bar, track->root->sample_rate);
 		else
 			bar_list->SetBar(NULL, 0);
 	}else{
 		volume_slider->Enable(false);
-		fx_list->SetFxList(NULL);
 		bar_list->SetBar(NULL, 0);
 	}
 }

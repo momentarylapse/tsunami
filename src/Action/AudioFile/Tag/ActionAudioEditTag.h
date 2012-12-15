@@ -8,8 +8,8 @@
 #ifndef ACTIONAUDIODEDITTAG_H_
 #define ACTIONAUDIODEDITTAG_H_
 
-#include "../ActionGroup.h"
-#include "../../Data/AudioFile.h"
+#include "../../Action.h"
+#include "../../../Data/AudioFile.h"
 
 class ActionAudioEditTag : public Action
 {

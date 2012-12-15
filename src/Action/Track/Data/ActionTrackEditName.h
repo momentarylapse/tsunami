@@ -8,7 +8,7 @@
 #ifndef ACTIONTRACKEDITNAME_H_
 #define ACTIONTRACKEDITNAME_H_
 
-#include "../Action.h"
+#include "../../Action.h"
 class Track;
 
 class ActionTrackEditName: public Action

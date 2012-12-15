@@ -8,7 +8,7 @@
 #ifndef ACTIONTRACKEDITMUTED_H_
 #define ACTIONTRACKEDITMUTED_H_
 
-#include "../Action.h"
+#include "../../Action.h"
 class Track;
 
 class ActionTrackEditMuted : public Action

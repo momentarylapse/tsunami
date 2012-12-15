@@ -8,7 +8,7 @@
 #ifndef ACTIONTRACKEDITVOLUME_H_
 #define ACTIONTRACKEDITVOLUME_H_
 
-#include "../Action.h"
+#include "../../Action.h"
 class Track;
 
 class ActionTrackEditVolume : public Action

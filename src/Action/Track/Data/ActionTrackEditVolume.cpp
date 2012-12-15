@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrackEditVolume.h"
-#include "../../Data/Track.h"
+#include "../../../Data/Track.h"
 
 ActionTrackEditVolume::ActionTrackEditVolume(Track *t, float _volume)
 {

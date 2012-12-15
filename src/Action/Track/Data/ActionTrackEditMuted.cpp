@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrackEditMuted.h"
-#include "../../Data/Track.h"
+#include "../../../Data/Track.h"
 
 ActionTrackEditMuted::ActionTrackEditMuted(Track *t, bool _muted)
 {

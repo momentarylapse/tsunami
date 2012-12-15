@@ -8,8 +8,8 @@
 #ifndef ACTIONAUDIODELETETAG_H_
 #define ACTIONAUDIODELETETAG_H_
 
-#include "../ActionGroup.h"
-#include "../../Data/AudioFile.h"
+#include "../../Action.h"
+#include "../../../Data/AudioFile.h"
 
 class ActionAudioDeleteTag : public Action
 {

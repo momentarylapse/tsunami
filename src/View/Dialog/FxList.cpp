@@ -6,19 +6,26 @@
  */
 
 #include "FxList.h"
+#include "../../Data/AudioFile.h"
 #include "../../Plugins/Plugin.h"
 #include "../../Plugins/Effect.h"
 #include "../../Tsunami.h"
+#include "../../Action/Track/Effect/ActionTrackAddEffect.h"
+#include "../../Action/Track/Effect/ActionTrackDeleteEffect.h"
+#include "../../Action/Track/Effect/ActionTrackEditEffect.h"
 
 
-FxList::FxList(CHuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete, Array<Effect> * _fx):
-fx(_fx)
+FxList::FxList(CHuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete)
 {
 	dlg = _dlg;
 	id = _id;
 	id_add = _id_add;
 	id_edit = _id_edit;
 	id_delete = _id_delete;
+
+	audio = NULL;
+	track = NULL;
+	fx = NULL;
 
 	FillList();
 	dlg->EventM(id, this, (void(HuiEventHandler::*)())&FxList::OnList);
@@ -29,9 +36,25 @@ fx(_fx)
 }
 
 
-void FxList::SetFxList(Array<Effect> *_fx)
+void FxList::SetAudio(AudioFile *a)
 {
-	fx = _fx;
+	audio = a;
+	track = NULL;
+	fx = NULL;
+	if (a)
+		fx = &a->fx;
+	FillList();
+}
+
+void FxList::SetTrack(Track *t)
+{
+	audio = NULL;
+	track = t;
+	fx = NULL;
+	if (t){
+		audio = t->root;
+		fx = &t->fx;
+	}
 	FillList();
 }
 
@@ -97,7 +120,7 @@ void FxList::OnDelete()
 		return;
 	int s = dlg->GetInt(id);
 	if (s >= 0){
-		fx->erase(s);
+		audio->Execute(new ActionTrackDeleteEffect(track, s));
 		FillList();
 	}
 }
@@ -141,7 +164,7 @@ void FxList::AddNewEffect(string &filename)
 	effect.name = filename.basename(); // remove directory
 	effect.name = effect.name.substr(0, effect.name.num - 5); //      and remove ".kaba"
 	if (UpdateEffectParams(effect)){
-		fx->add(effect);
+		audio->Execute(new ActionTrackAddEffect(track, effect));
 		FillList();
 	}
 
@@ -154,7 +177,9 @@ void FxList::ExecuteFXDialog(int index)
 		return;
 	msg_db_r("ExecuteFXDialog", 1);
 
-	UpdateEffectParams((*fx)[index]);
+	Effect temp = (*fx)[index];
+	UpdateEffectParams(temp);
+	audio->Execute(new ActionTrackEditEffect(track, index, temp));
 
 	msg_db_l(1);
 }

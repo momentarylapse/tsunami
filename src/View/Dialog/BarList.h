@@ -9,7 +9,7 @@
 #define BARLIST_H_
 
 #include "../../lib/hui/hui.h"
-#include "../../Data/AudioFile.h"
+class Track;
 
 class BarList : public HuiEventHandler
 {
@@ -28,14 +28,13 @@ public:
 	void AddNewBar();
 	void ExecuteBarDialog(int index);
 
-	void SetBar(Array<Bar> *bar, int sample_rate);
+	void SetTrack(Track *t);
 
 public:
 	CHuiWindow *dlg;
 	string id;
 	string id_add, id_add_pause, id_delete;
-	Array<Bar> *bar;
-	int sample_rate;
+	Track *track;
 };
 
 #endif /* BARLIST_H_ */

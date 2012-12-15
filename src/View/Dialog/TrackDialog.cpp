@@ -50,18 +50,14 @@ void TrackDialog::LoadData()
 	Enable("name", track);
 	Enable("mute", track);
 	fx_list->SetTrack(track);
+	bar_list->SetTrack(track);
 	if (track){
 		SetString("name", track->name);
 		Check("mute", track->muted);
 		volume_slider->Set(track->volume);
 		volume_slider->Enable(!track->muted);
-		if (track->type == track->TYPE_TIME)
-			bar_list->SetBar(&track->bar, track->root->sample_rate);
-		else
-			bar_list->SetBar(NULL, 0);
 	}else{
 		volume_slider->Enable(false);
-		bar_list->SetBar(NULL, 0);
 	}
 }
 

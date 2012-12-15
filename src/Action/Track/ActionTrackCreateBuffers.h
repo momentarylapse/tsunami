@@ -9,7 +9,8 @@
 #define ACTIONTRACKCREATEBUFFERS_H_
 
 #include "../ActionGroup.h"
-#include "../../Data/Track.h"
+class Track;
+class Range;
 
 class ActionTrackCreateBuffers : public ActionGroup
 {

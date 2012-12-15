@@ -11,6 +11,9 @@
 #include "FxList.h"
 #include "BarList.h"
 #include "../../Tsunami.h"
+#include "../../Action/Track/ActionTrackEditMuted.h"
+#include "../../Action/Track/ActionTrackEditName.h"
+#include "../../Action/Track/ActionTrackEditVolume.h"
 
 TrackDialog::TrackDialog(CHuiWindow *win):
 	EmbeddedDialog(win)
@@ -71,17 +74,17 @@ void TrackDialog::SetTrack(Track *t)
 
 void TrackDialog::OnName()
 {
-	track->name = GetString("");
+	track->root->Execute(new ActionTrackEditName(track, GetString("")));
 }
 
 void TrackDialog::OnVolume()
 {
-	track->volume = volume_slider->Get();
+	track->root->Execute(new ActionTrackEditVolume(track, volume_slider->Get()));
 }
 
 void TrackDialog::OnMute()
 {
-	track->muted = IsChecked("");
+	track->root->Execute(new ActionTrackEditMuted(track, IsChecked("")));
 	volume_slider->Enable(!track->muted);
 }
 
@@ -99,6 +102,8 @@ void TrackDialog::OnUpdate(Observable *o)
 	foreach(Track *t, tsunami->audio->track)
 		if (track == t)
 			ok = true;
-	if (!ok)
+	if (ok)
+		LoadData();
+	else
 		SetTrack(NULL);
 }

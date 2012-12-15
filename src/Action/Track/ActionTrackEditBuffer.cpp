@@ -55,11 +55,3 @@ void *ActionTrackEditBuffer::execute(Data *d)
 	return NULL;
 }
 
-
-
-void ActionTrackEditBuffer::redo(Data *d)
-{
-	undo(d);
-}
-
-

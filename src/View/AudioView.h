@@ -95,6 +95,7 @@ public:
 		SEL_TYPE_PLAYBACK,
 		SEL_TYPE_TIME,
 		SEL_TYPE_TRACK,
+		SEL_TYPE_MUTE,
 		SEL_TYPE_SUB
 	};
 
@@ -181,6 +182,8 @@ public:
 
 	TrackDialog *track_dialog;
 	AudioFileDialog *audio_file_dialog;
+
+	Image image_muted, image_unmuted;
 };
 
 #endif /* AUDIOVIEW_H_ */

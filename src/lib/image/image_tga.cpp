@@ -2,11 +2,6 @@
 #include <stdio.h>
 #include "../file/file.h"
 
-static const char *sys_str_f(const string &s)
-{
-	return s.c_str();
-}
-
 //--------------------------------------------------------------------------------------------------
 // tga files
 //--------------------------------------------------------------------------------------------------
@@ -18,7 +13,7 @@ struct sImageColor
 	unsigned char r,g,b,a;
 };
 
-inline void fill_image_color( Image &image, sImageColor *data, unsigned char *col, unsigned char *pal, int depth, int alpha_bits, bool pal_tga )
+inline void __fill_image_color( Image &image, sImageColor *data, unsigned char *col, unsigned char *pal, int depth, int alpha_bits, bool pal_tga )
 {
 	// 8 bit (paletted tga/bmp)
 	if (depth==8){
@@ -121,7 +116,7 @@ void image_load_tga(const string &filename, Image &image)
 	int bpp = depth / 8;
 
 	fseek(f,offset,SEEK_SET);
-	
+
 	if (depth<16){
 		pal=new unsigned char[3*256];
 		r=fread(pal,3,256,f);
@@ -143,7 +138,7 @@ void image_load_tga(const string &filename, Image &image)
 						//msg_write(string("raw ",i2s(chunkheader)));
 						while (chunkheader-- > 0){
 							r=fread(colorbuffer, 1, bpp, f);
-							fill_image_color(image, (sImageColor*)&image.data[currentpixel], colorbuffer, pal, depth, alpha_bits, true);
+							__fill_image_color(image, (sImageColor*)&image.data[currentpixel], colorbuffer, pal, depth, alpha_bits, true);
 							currentpixel++;
 						}
 					}else{
@@ -151,7 +146,7 @@ void image_load_tga(const string &filename, Image &image)
 						//msg_write(string("rle ",i2s(chunkheader)));
 						r=fread(colorbuffer, 1, bpp, f);
 						while(chunkheader-- > 0){
-							fill_image_color(image, (sImageColor*)&image.data[currentpixel], colorbuffer, pal, depth, alpha_bits, true);
+							__fill_image_color(image, (sImageColor*)&image.data[currentpixel], colorbuffer, pal, depth, alpha_bits, true);
 							currentpixel++;
 						}
 					}
@@ -171,7 +166,7 @@ void image_load_tga(const string &filename, Image &image)
 				data=new unsigned char[bpp*size];
 				r=fread(data,bpp,size,f);
 				for (x=0;x<image.width*image.height;x++)
-					fill_image_color(image, (sImageColor*)&image.data[x], data + x * bpp, pal, depth, alpha_bits, true);
+					__fill_image_color(image, (sImageColor*)&image.data[x], data + x * bpp, pal, depth, alpha_bits, true);
 				break;
 			default:
 				msg_error(format("image_load_tga: unsupported color depth (uncompressed): %d", depth));

@@ -10,6 +10,7 @@
 #include "../View/Dialog/AudioFileDialog.h"
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
+#include "../Action/Track/Data/ActionTrackEditMuted.h"
 
 const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;
@@ -66,6 +67,8 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 	ZoomSpeed = HuiConfigReadFloat("View.ZoomSpeed", 0.1f);
 	PeakMode = HuiConfigReadInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
 
+	image_unmuted.Load(HuiAppDirectoryStatic + "Data/volume.tga");
+	image_muted.Load(HuiAppDirectoryStatic + "Data/mute.tga");
 
 	MousePossiblySelecting = -1;
 	cur_action = NULL;
@@ -204,6 +207,14 @@ AudioView::SelectionType AudioView::GetMouseOver()
 		}
 		if (mouse_over_time(this, tsunami->output->GetPos())){
 			s.type = SEL_TYPE_PLAYBACK;
+			return s;
+		}
+	}
+
+	// mute button?
+	if (s.track){
+		if ((mx >= s.track->area.x1 + 5) && (mx < s.track->area.x1 + 17) && (my >= s.track->area.y1 + 22) && (my < s.track->area.y1 + 34)){
+			s.type = SEL_TYPE_MUTE;
 			return s;
 		}
 	}
@@ -402,6 +413,8 @@ void AudioView::OnLeftButtonDown()
 		Selection.type = SEL_TYPE_SELECTION_END;
 		Hover.type = SEL_TYPE_SELECTION_END;
 		audio->sel_raw.invert();
+	}else if (Selection.type == SEL_TYPE_MUTE){
+		audio->Execute(new ActionTrackEditMuted(Selection.track, !Selection.track->muted));
 	}else if (Selection.type == SEL_TYPE_SUB){
 		cur_action = new ActionSubTrackMove(audio);
 	}
@@ -748,6 +761,8 @@ void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color c
 	c->SetFont("", -1, (t == cur_track), (t->type == Track::TYPE_TIME));
 	DrawStrBg(c, r.x1 + 3, r.y1 + 3, t->GetNiceName(), ColorWaveCur, ColorBackgroundCurWave);
 	c->SetFont("", -1, false, false);
+
+	c->DrawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
 
 	msg_db_l(1);
 }

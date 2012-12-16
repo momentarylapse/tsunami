@@ -161,9 +161,19 @@ void Image::FlipV()
 
 inline void col_conv_rgba_to_bgra(unsigned int &c)
 {
-	unsigned int r = (c & 0xff);
-	unsigned int b = (c & 0xff0000) >> 16;
-	c = (c & 0xff00ff00) + b + (r << 16);
+	unsigned int a = (c & 0xff000000) >> 24;
+	if (a < 255){
+		// cairo wants pre multiplied alpha
+		float aa = (float)((c & 0xff000000) >> 24) / 255.0f;
+		unsigned int r = (float)(c & 0xff) * aa;
+		unsigned int g = (float)((c & 0xff00) >> 8) * aa;
+		unsigned int b = (float)((c & 0xff0000) >> 16) * aa;
+		c = (c & 0xff000000) + b + (r << 16) + (g << 8);
+	}else{
+		unsigned int r = (c & 0xff);
+		unsigned int b = (c & 0xff0000) >> 16;
+		c = (c & 0xff00ff00) + b + (r << 16);
+	}
 }
 
 inline void col_conv_bgra_to_rgba(unsigned int &c)

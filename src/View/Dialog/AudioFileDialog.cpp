@@ -52,7 +52,7 @@ void AudioFileDialog::LoadData()
 	Reset("data_list");
 	int samples = audio->GetRange().length();
 	AddString("data_list", _("Anfang\\") + audio->get_time_str(audio->GetRange().start()));
-	AddString("data_list", _("End\\") + audio->get_time_str(audio->GetRange().end()));
+	AddString("data_list", _("Ende\\") + audio->get_time_str(audio->GetRange().end()));
 	AddString("data_list", _("Dauer\\") + audio->get_time_str(samples));
 	AddString("data_list", _("Samples\\") + i2s(samples));
 	AddString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");

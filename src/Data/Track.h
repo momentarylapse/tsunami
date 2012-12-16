@@ -42,6 +42,22 @@ public:
 	int x, width;
 };
 
+class Beat
+{
+public:
+	Beat(){}
+	Beat(int p, int bar, int beat);
+	int pos;
+	int bar_no;
+	int beat_no;
+};
+
+class BarCollection : public Array<Bar>
+{
+public:
+	Array<Beat> GetBeats(const Range &r);
+};
+
 
 class TrackLevel
 {
@@ -96,7 +112,7 @@ public:
 	Array<Track*> sub;
 
 	// time track
-	Array<Bar> bar;
+	BarCollection bar;
 
 // editing
 	rect area;

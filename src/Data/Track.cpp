@@ -12,6 +12,35 @@
 #include "../lib/hui/hui.h"
 
 
+Beat::Beat(int p, int bar, int beat)
+{
+	pos = p;
+	bar_no = bar;
+	beat_no = beat;
+};
+
+Array<Beat> BarCollection::GetBeats(const Range &r)
+{
+	Array<Beat> beats;
+
+	int pos0 = 0;
+	int bar_no;
+	foreach(Bar &b, *this)
+		if (b.type == b.TYPE_BAR){
+			for (int j=0;j<b.count;j++){
+				for (int i=0;i<b.num_beats;i++){
+					int pos = pos0 + i * b.length / b.num_beats;
+					if (r.is_inside(pos))
+						beats.add(Beat(pos, bar_no, i));
+				}
+				pos0 += b.length;
+				bar_no ++;
+			}
+		}else if (b.type == b.TYPE_PAUSE){
+			pos0 += b.length;
+		}
+	return beats;
+}
 
 Track::Track()
 {

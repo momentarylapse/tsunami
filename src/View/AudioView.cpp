@@ -774,7 +774,8 @@ void AudioView::DrawGridTime(HuiDrawingContext *c, const rect &r, const color &b
 	color c2 = ColorGrid;
 	for (int n=nx0;n<nx1;n++){
 		c->SetColor(((n % 10) == 0) ? c2 : c1);
-		c->DrawLine(sample2screen(n * dl), r.y1, sample2screen(n * dl), r.y2);
+		int xx = sample2screen(n * dl);
+		c->DrawLine(xx, r.y1, xx, r.y2);
 	}
 	if (show_time){
 		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio)){
@@ -798,6 +799,20 @@ void AudioView::DrawGridTime(HuiDrawingContext *c, const rect &r, const color &b
 
 void AudioView::DrawGridBars(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time)
 {
+	Track *t = NULL;
+	foreach(Track *tt, audio->track)
+		if (tt->type == tt->TYPE_TIME)
+			t = tt;
+	if (!t)
+		return;
+	int s0 = screen2sample(r.x1 - 1);
+	int s1 = screen2sample(r.x2);
+	Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
+	foreach(Beat &b, beats){
+		c->SetColor((b.beat_no == 0) ? Red : Black);
+		int xx = sample2screen(b.pos);
+		c->DrawLine(xx, r.y1, xx, r.y2);
+	}
 }
 
 void AudioView::OnUpdate(Observable *o)

@@ -96,6 +96,7 @@ public:
 		SEL_TYPE_TIME,
 		SEL_TYPE_TRACK,
 		SEL_TYPE_MUTE,
+		SEL_TYPE_SOLO,
 		SEL_TYPE_SUB
 	};
 
@@ -183,7 +184,7 @@ public:
 	TrackDialog *track_dialog;
 	AudioFileDialog *audio_file_dialog;
 
-	Image image_muted, image_unmuted;
+	Image image_muted, image_unmuted, image_solo;
 };
 
 #endif /* AUDIOVIEW_H_ */

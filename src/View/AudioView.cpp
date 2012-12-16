@@ -10,7 +10,6 @@
 #include "../View/Dialog/AudioFileDialog.h"
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
-#include "../Action/Track/Data/ActionTrackEditMuted.h"
 
 const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;
@@ -69,6 +68,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 
 	image_unmuted.Load(HuiAppDirectoryStatic + "Data/volume.tga");
 	image_muted.Load(HuiAppDirectoryStatic + "Data/mute.tga");
+	image_solo.Load(HuiAppDirectoryStatic + "Data/solo.tga");
 
 	MousePossiblySelecting = -1;
 	cur_action = NULL;
@@ -215,6 +215,10 @@ AudioView::SelectionType AudioView::GetMouseOver()
 	if (s.track){
 		if ((mx >= s.track->area.x1 + 5) && (mx < s.track->area.x1 + 17) && (my >= s.track->area.y1 + 22) && (my < s.track->area.y1 + 34)){
 			s.type = SEL_TYPE_MUTE;
+			return s;
+		}
+		if ((audio->track.num > 1) && (mx >= s.track->area.x1 + 22) && (mx < s.track->area.x1 + 34) && (my >= s.track->area.y1 + 22) && (my < s.track->area.y1 + 34)){
+			s.type = SEL_TYPE_SOLO;
 			return s;
 		}
 	}
@@ -414,7 +418,12 @@ void AudioView::OnLeftButtonDown()
 		Hover.type = SEL_TYPE_SELECTION_END;
 		audio->sel_raw.invert();
 	}else if (Selection.type == SEL_TYPE_MUTE){
-		audio->Execute(new ActionTrackEditMuted(Selection.track, !Selection.track->muted));
+		Selection.track->SetMuted(!Selection.track->muted);
+	}else if (Selection.type == SEL_TYPE_SOLO){
+		foreach(Track *t, audio->track)
+			t->is_selected = (t == Selection.track);
+		if (Selection.track->muted)
+			Selection.track->SetMuted(false);
 	}else if (Selection.type == SEL_TYPE_SUB){
 		cur_action = new ActionSubTrackMove(audio);
 	}
@@ -487,7 +496,7 @@ void AudioView::OnLeftDoubleClick()
 				ExecuteSubDialog(tsunami);
 			else if (Selection.type == SEL_TYPE_TRACK)
 				ExecuteTrackDialog(tsunami);
-			else
+			else if (!Selection.track)
 				ExecuteAudioDialog(tsunami);
 			Selection.type = SEL_TYPE_NONE;
 		}
@@ -763,6 +772,8 @@ void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color c
 	c->SetFont("", -1, false, false);
 
 	c->DrawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
+	if (audio->track.num > 1)
+		c->DrawImage(r.x1 + 22, r.y1 + 22, image_solo);
 
 	msg_db_l(1);
 }

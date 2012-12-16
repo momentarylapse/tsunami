@@ -10,6 +10,9 @@
 #include "../Action/Track/ActionTrackCreateBuffers.h"
 #include "../Action/Track/ActionTrackAddEmptySubTrack.h"
 #include "../lib/hui/hui.h"
+#include "../Action/Track/Data/ActionTrackEditName.h"
+#include "../Action/Track/Data/ActionTrackEditMuted.h"
+#include "../Action/Track/Data/ActionTrackEditVolume.h"
 
 
 Beat::Beat(int p, int bar, int beat)
@@ -309,6 +312,21 @@ void Track::InvalidateAllPeaks()
 			b.invalidate_peaks(b.range());
 	foreach(Track *s, sub)
 		s->InvalidateAllPeaks();
+}
+
+void Track::SetName(const string& name)
+{
+	root->Execute(new ActionTrackEditName(this, name));
+}
+
+void Track::SetMuted(bool muted)
+{
+	root->Execute(new ActionTrackEditMuted(this, muted));
+}
+
+void Track::SetVolume(float volume)
+{
+	root->Execute(new ActionTrackEditVolume(this, volume));
 }
 
 Track *Track::AddEmptySubTrack(const Range &r, const string &name)

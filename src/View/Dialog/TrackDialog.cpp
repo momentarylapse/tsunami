@@ -11,9 +11,6 @@
 #include "FxList.h"
 #include "BarList.h"
 #include "../../Tsunami.h"
-#include "../../Action/Track/Data/ActionTrackEditMuted.h"
-#include "../../Action/Track/Data/ActionTrackEditName.h"
-#include "../../Action/Track/Data/ActionTrackEditVolume.h"
 
 TrackDialog::TrackDialog(CHuiWindow *win):
 	EmbeddedDialog(win)
@@ -68,18 +65,17 @@ void TrackDialog::SetTrack(Track *t)
 
 void TrackDialog::OnName()
 {
-	track->root->Execute(new ActionTrackEditName(track, GetString("")));
+	track->SetName(GetString(""));
 }
 
 void TrackDialog::OnVolume()
 {
-	track->root->Execute(new ActionTrackEditVolume(track, volume_slider->Get()));
+	track->SetVolume(volume_slider->Get());
 }
 
 void TrackDialog::OnMute()
 {
-	track->root->Execute(new ActionTrackEditMuted(track, IsChecked("")));
-	volume_slider->Enable(!track->muted);
+	track->SetMuted(IsChecked(""));
 }
 
 void TrackDialog::OnClose()

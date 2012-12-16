@@ -86,6 +86,9 @@ public:
 	string GetNiceName();
 
 	// actions
+	void SetName(const string &name);
+	void SetMuted(bool muted);
+	void SetVolume(float volume);
 	BufferBox GetBuffers(int level_no, const Range &r);
 	Track *AddEmptySubTrack(const Range &r, const string &name);
 

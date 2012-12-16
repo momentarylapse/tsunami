@@ -31,9 +31,19 @@ bool EmbeddedDialog::IsChecked(const string& id)
 	return win->IsChecked(id);
 }
 
+void EmbeddedDialog::Reset(const string& id)
+{
+	win->Reset(id);
+}
+
 void EmbeddedDialog::SetString(const string& id, const string& str)
 {
 	win->SetString(id, str);
+}
+
+void EmbeddedDialog::AddString(const string& id, const string& str)
+{
+	win->AddString(id, str);
 }
 
 void EmbeddedDialog::SetFloat(const string& id, float f)
@@ -49,6 +59,11 @@ void EmbeddedDialog::SetInt(const string& id, int i)
 string EmbeddedDialog::GetString(const string& id)
 {
 	return win->GetString(id);
+}
+
+string EmbeddedDialog::GetCell(const string& id, int row, int col)
+{
+	return win->GetCell(id, row, col);
 }
 
 float EmbeddedDialog::GetFloat(const string& id)

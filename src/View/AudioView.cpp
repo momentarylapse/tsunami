@@ -116,6 +116,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 	UpdateMenu();
 
 	track_dialog = new TrackDialog(tsunami);
+	audio_file_dialog = new AudioFileDialog(tsunami, audio);
 }
 
 AudioView::~AudioView()
@@ -1200,7 +1201,8 @@ void AudioView::Move(float dpos)
 
 void AudioView::ExecuteTrackDialog(CHuiWindow *win)
 {
-	win->HideControl("tool_table", false);
+	win->HideControl("track_dialog_table", false);
+	win->HideControl("audio_dialog_table", true);
 }
 
 
@@ -1220,14 +1222,8 @@ void AudioView::ExecuteSubDialog(CHuiWindow *win)
 
 void AudioView::ExecuteAudioDialog(CHuiWindow *win)
 {
-	if (!audio->used){
-		tsunami->log->Error(_("Audio-Datei ist leer"));
-		return;
-	}
-
-	AudioFileDialog *dlg = new AudioFileDialog(win, false, audio);
-	dlg->Update();
-	HuiWaitTillWindowClosed(dlg);
+	win->HideControl("track_dialog_table", true);
+	win->HideControl("audio_dialog_table", false);
 }
 
 

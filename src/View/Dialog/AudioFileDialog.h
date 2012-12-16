@@ -8,15 +8,17 @@
 #ifndef AUDIOFILEDIALOG_H_
 #define AUDIOFILEDIALOG_H_
 
-#include "../../lib/hui/hui.h"
-#include "../../Data/AudioFile.h"
+#include "EmbeddedDialog.h"
 #include "../../Stuff/Observer.h"
-#include "FxList.h"
+class AudioFile;
+class Slider;
+class BarList;
+class FxList;
 
-class AudioFileDialog: public CHuiWindow, public Observer
+class AudioFileDialog: public EmbeddedDialog, public Observer
 {
 public:
-	AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a);
+	AudioFileDialog(CHuiWindow *win, AudioFile *a);
 	virtual ~AudioFileDialog();
 
 	void LoadData();
@@ -32,12 +34,10 @@ public:
 
 	virtual void OnUpdate(Observable *o);
 
-	Array<Track*> audio_list;
-
-	void RefillAudioList();
-
 	AudioFile *audio;
+	Slider *volume_slider;
 	FxList *fx_list;
+	BarList *bar_list;
 };
 
 #endif /* AUDIOFILEDIALOG_H_ */

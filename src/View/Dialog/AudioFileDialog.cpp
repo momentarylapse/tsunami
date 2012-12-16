@@ -7,27 +7,32 @@
 
 #include "AudioFileDialog.h"
 #include "../../Tsunami.h"
+#include "Slider.h"
+#include "FxList.h"
+#include "BarList.h"
 
-AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a):
-	CHuiWindow("dummy", -1, -1, 200, 200, _parent, _allow_parent, HuiWinModeControls | HuiWinModeResizable, true)
+AudioFileDialog::AudioFileDialog(CHuiWindow *win, AudioFile *a):
+	EmbeddedDialog(win)
 {
 	audio = a;
 
 	// dialog
-	FromResource("wave_dialog");
-
-	fx_list = new FxList(this, "fx_list", "add_effect", "configure_effect", "delete_effect");
+	win->SetTarget("audio_dialog_table", 0);
+	win->SetBorderWidth(8);
+	win->EmbedDialog("audio_file_dialog", 0, 0);
+	win->SetDecimals(1);
+	//volume_slider = new Slider(win, "audio_volume_slider", "audio_volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);
+	fx_list = new FxList(win, "audio_fx_list", "audio_add_effect", "audio_configure_effect", "audio_delete_effect");
+	bar_list = new BarList(win, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
 	fx_list->SetAudio(audio);
 
 	LoadData();
 
-	EventM("wave_list", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTrackList);
-	EventMX("tags", "hui:select", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsSelect);
-	EventMX("tags", "hui:change", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsEdit);
-	EventM("add_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnAddTag);
-	EventM("delete_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnDeleteTag);
-	EventM("close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
-	EventM("hui:close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
+	win->EventMX("tags", "hui:select", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsSelect);
+	win->EventMX("tags", "hui:change", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsEdit);
+	win->EventM("add_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnAddTag);
+	win->EventM("delete_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnDeleteTag);
+	win->EventM("close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
 
 	Subscribe(audio);
 }
@@ -35,8 +40,8 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *_parent, bool _allow_parent, AudioF
 AudioFileDialog::~AudioFileDialog()
 {
 	Unsubscribe(audio);
-	//WaveDialog = NULL;
 	delete(fx_list);
+	delete(bar_list);
 }
 
 void AudioFileDialog::LoadData()
@@ -44,12 +49,14 @@ void AudioFileDialog::LoadData()
 	Reset("tags");
 	foreach(Tag &t, audio->tag)
 		AddString("tags", t.key + "\\" + t.value);
+	Reset("data_list");
 	int samples = audio->GetRange().length();
-	SetString("time", audio->get_time_str(samples));
-	SetInt("samples", samples);
-	SetInt("frequency", audio->sample_rate);
-	SetString("format", "16 bit stereo (nami)");
-	RefillAudioList();
+	AddString("data_list", _("Anfang\\") + audio->get_time_str(audio->GetRange().start()));
+	AddString("data_list", _("End\\") + audio->get_time_str(audio->GetRange().end()));
+	AddString("data_list", _("Dauer\\") + audio->get_time_str(samples));
+	AddString("data_list", _("Samples\\") + i2s(samples));
+	AddString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
+	AddString("data_list", _("Format\\16 bit stereo (nami)"));
 	Enable("delete_tag", false);
 	fx_list->FillList();
 }
@@ -58,21 +65,6 @@ void AudioFileDialog::LoadData()
 string get_vol(float volume, bool muted)
 {
 	return muted ? _("(stumm)") : format("%.1f%%", volume * 100.0f);
-}
-
-void AudioFileDialog::RefillAudioList()
-{
-	msg_db_r("RefillAudioList", 1);
-	Reset("wave_list");
-	foreachi(Track *t, audio->track, i)
-		AddString("wave_list", format("%d\\%s\\%s", i + 1, t->name.c_str(), get_vol(t->volume, t->muted).c_str()));
-	audio_list.clear();
-	foreachi(Track *t, audio->track, i)
-		foreachi(Track *s, t->sub, j){
-			AddChildString("wave_list", i, format("%d\\%s\\%s", j + 1, s->name.c_str(), get_vol(t->volume * s->volume, t->muted || s->muted).c_str()));
-			audio_list.add(s);
-		}
-	msg_db_l(1);
 }
 
 #if 0
@@ -106,19 +98,6 @@ void WaveDialogFunction(int message)
 	msg_db_l(1);
 }
 #endif
-
-void AudioFileDialog::OnTrackList()
-{
-	int sel = GetInt("");
-	if ((sel >= 0) && (sel < audio->track.num)){
-		/*audio->cur_track = sel;
-		tsunami->view->ExecuteTrackDialog(this, audio->track[sel]);*/
-		RefillAudioList();
-	}else if (sel >= audio->track.num){
-		//ExecuteLevelDialog(this, audio_list[sel - dlg_audio->Track.num]);
-		RefillAudioList();
-	}
-}
 
 void AudioFileDialog::OnTagsSelect()
 {
@@ -158,5 +137,4 @@ void AudioFileDialog::OnUpdate(Observable *o)
 
 void AudioFileDialog::OnClose()
 {
-	delete(this);
 }

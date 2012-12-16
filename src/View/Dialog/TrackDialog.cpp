@@ -19,9 +19,9 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 	EmbeddedDialog(win)
 {
 	track = NULL;
-	win->SetTarget("tool_table", 0);
+	win->SetTarget("track_dialog_table", 0);
 	win->SetBorderWidth(8);
-	win->EmbedDialog("track_time_dialog", 1, 0);
+	win->EmbedDialog("track_time_dialog", 0, 0);
 	win->SetDecimals(1);
 	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);
 	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect");
@@ -33,7 +33,6 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 	win->EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
 	win->EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
 	win->EventM("close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
-	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
 }
 
 TrackDialog::~TrackDialog()

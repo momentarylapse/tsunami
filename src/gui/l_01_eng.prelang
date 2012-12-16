@@ -1,9 +1,19 @@
 // Language
 English
 // Num IDs
-143
+165
 // Data (ID,Text)
 about
+
+ad_t_bars
+
+ad_t_data
+
+ad_t_effects
+
+ad_t_tags
+
+ad_t_volume
 
 ad_table_1
 
@@ -12,6 +22,14 @@ ad_table_2
 ad_table_5
 
 ad_table_7
+
+ad_table_bars_con
+
+ad_table_fx_con
+
+ad_table_tag_con
+
+ad_table_vol
 
 add_bar
 
@@ -22,6 +40,18 @@ add_tag
 add_time_track
 
 add_track
+
+audio_add_bar
+
+audio_add_bar_pause
+
+audio_bar_list
+
+audio_close
+
+audio_file_dialog
+
+audio_fx_list
 
 bar_list
 
@@ -45,6 +75,8 @@ copy
 Copy
 cut_out
 
+data_list
+
 delete
 Delete
 delete_effect
@@ -65,6 +97,8 @@ fx_dialog
 Effect
 fx_list
 !nobar\\Effects
+fx_samples
+
 fxdt_filename
 !bold\\Filename
 fxdt_params
@@ -86,6 +120,8 @@ ld_t_repdelay
 ld_t_repetition
 
 ld_t_repnum
+
+ld_t_samples
 
 ld_t_track
 Track
@@ -241,6 +277,14 @@ td_table_6
 
 td_table_7
 
+td_table_fx_con
+
+td_table_name
+
+td_table_sam_con
+
+td_table_vol
+
 track_dialog
 Track
 track_import
@@ -290,7 +334,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-80
+85
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -316,10 +360,12 @@ zoom_out
 
 Abbrechen
 
+Abtastrate\\\") + i2s(audio->sample_rate) + 
+
 Amplitude zu groß, Signal übersteuert.
 
-Audio-Datei ist leer
-Audio file is empty
+Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
+
 Auf Audiopuffer
 
 Auf alles
@@ -340,6 +386,8 @@ Datei öffnen
 
 Datenverlust!
 
+Dauer\\\") + audio->get_time_str(samples));
+
 Dieser Effekt ist nicht konfigurierbar.
 
 Dynamik
@@ -351,6 +399,8 @@ Editor für Audio Dateien
 Effekt nicht ladbar: \"%s\"
 
 Eigenständig
+
+End\\\") + audio->get_time_str(audio->GetRange().end()));
 
 Es existiert schon eine Rhythmus-Spur.
 
@@ -369,6 +419,8 @@ Fehler in  Script-Datei: \"%s\"\n%s\n%s
 Fehlerbericht
 
 Fehlerbericht an Michi senden
+
+Format\\16 bit stereo (nami)
 
 Frage
 
@@ -393,6 +445,8 @@ OK
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 
 Plugin-Script wählen
+
+Samples\\\") + i2s(samples));
 
 Script (*.kaba)
 

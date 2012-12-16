@@ -14,6 +14,7 @@
 #include "../Action/SubTrack/ActionSubTrackMove.h"
 
 class TrackDialog;
+class AudioFileDialog;
 
 class AudioView : public HuiEventHandler, public Observer, public Observable
 {
@@ -179,6 +180,7 @@ public:
 	float view_zoom;
 
 	TrackDialog *track_dialog;
+	AudioFileDialog *audio_file_dialog;
 };
 
 #endif /* AUDIOVIEW_H_ */

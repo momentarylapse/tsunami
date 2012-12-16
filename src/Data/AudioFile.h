@@ -52,6 +52,7 @@ public:
 
 	int GetNumSelectedSubs();
 
+	Track *GetTimeTrack();
 	int GetNextBeat(int pos);
 
 	// action

@@ -56,6 +56,8 @@ class BarCollection : public Array<Bar>
 {
 public:
 	Array<Beat> GetBeats(const Range &r);
+	int GetNextBeat(int pos);
+	Range GetRange();
 };
 
 

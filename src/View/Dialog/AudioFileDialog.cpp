@@ -32,7 +32,7 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *win, AudioFile *a):
 	win->EventMX("tags", "hui:change", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsEdit);
 	win->EventM("add_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnAddTag);
 	win->EventM("delete_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnDeleteTag);
-	win->EventM("close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
+	win->EventM("audio_close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
 
 	Subscribe(audio);
 }
@@ -137,4 +137,5 @@ void AudioFileDialog::OnUpdate(Observable *o)
 
 void AudioFileDialog::OnClose()
 {
+	win->HideControl("audio_dialog_table", true);
 }

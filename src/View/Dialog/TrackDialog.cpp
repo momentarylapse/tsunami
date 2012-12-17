@@ -80,8 +80,7 @@ void TrackDialog::OnMute()
 
 void TrackDialog::OnClose()
 {
-	//delete(this);
-	win->HideControl("tool_table", true);
+	win->HideControl("track_dialog_table", true);
 }
 
 void TrackDialog::OnUpdate(Observable *o)

@@ -250,10 +250,10 @@ void AudioView::SelectUnderMouse()
 	bool control = tsunami->GetKey(KEY_CONTROL);
 
 	// track
+	if (Selection.track)
+		SetCurTrack(Selection.track);
 	if (Selection.type == SEL_TYPE_TRACK){
 		SelectTrack(t, control);
-		if (t->is_selected)
-			SetCurTrack(t);
 		if (!control)
 			audio->UnselectAllSubs();
 	}

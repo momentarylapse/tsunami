@@ -63,6 +63,9 @@ public:
 	void DrawGridTime(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawGridBars(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col, bool show_time = false);
+	void DrawSelection(HuiDrawingContext *c, const rect &r);
+	void DrawBackground(HuiDrawingContext *c, const rect &r);
+	void DrawEmptyAudioFile(HuiDrawingContext *c, const rect &r);
 	void DrawAudioFile(HuiDrawingContext *c, const rect &r);
 
 	void OptimizeView();

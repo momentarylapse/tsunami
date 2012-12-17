@@ -44,10 +44,10 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 	ColorBackgroundCurWave = color(1, 0.93f, 0.93f, 1);
 	ColorBackgroundCurTrack = color(1, 0.88f, 0.88f, 1);
 	ColorGrid = color(1, 0.75f, 0.75f, 0.9f);
-	ColorSelectionInternal = color(1, 0.7f, 0.7f, 0.9f);
-	ColorSelectionBoundary = Blue;
-	ColorSelectionBoundaryMO = Red;
-	ColorPreviewMarker = color(1,0, 0.8f, 0);
+	ColorSelectionInternal = color(0.2f, 0.2f, 0.2f, 0.8f);
+	ColorSelectionBoundary = color(1, 0.2f, 0.2f, 0.8f);
+	ColorSelectionBoundaryMO = color(1, 0.8f, 0.2f, 0.2f);
+	ColorPreviewMarker = color(1, 0, 0.7f, 0);
 	ColorWave = Gray;
 	ColorWaveCur = color(1, 0.3f, 0.3f, 0.3f);
 	ColorSub = color(1, 0.6f, 0.6f, 0);
@@ -806,10 +806,12 @@ void AudioView::DrawGridTime(HuiDrawingContext *c, const rect &r, const color &b
 	}
 	if (show_time){
 		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio)){
-			c->SetColor(ColorPreviewMarker);
+			color cc = ColorPreviewMarker;
+			cc.a = 0.25f;
+			c->SetColor(cc);
 			float x0 = sample2screen(tsunami->output->GetRange().start());
 			float x1 = sample2screen(tsunami->output->GetRange().end());
-			c->DrawRect(x0, r.y1, x1 - x0, 5);
+			c->DrawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
 		c->SetColor(ColorGrid);
 		for (int n=nx0;n<nx1;n++){
@@ -897,29 +899,6 @@ void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 
 void audio_draw_background(HuiDrawingContext *c, const rect &r, AudioFile *a, AudioView *v)
 {
-	int yy = a->track.back()->area.y2;
-	//int trackheight = (a->num_tracks > 0) ? (height / a->num_tracks) : height;
-	c->SetColor(v->ColorBackgroundCurWave);
-	c->DrawRect(r.x1, r.y1, r.width(), v->TIME_SCALE_HEIGHT);
-	v->DrawGrid(c, rect(r.x1, r.x2, r.y1, r.y1 + v->TIME_SCALE_HEIGHT), v->ColorBackgroundCurWave, true);
-	foreach(Track *t, a->track){
-		c->SetColor((t->is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
-		c->DrawRect(t->area);
-		v->DrawGrid(c, t->area, (t->is_selected) ? v->ColorBackgroundCurTrack : v->ColorBackgroundCurWave);
-	}
-	if (yy < r.y2){
-		c->SetColor(v->ColorBackground);
-		rect rr = rect(r.x1, r.x2, yy, r.y2);
-		c->DrawRect(rr);
-		v->DrawGrid(c, rr, v->ColorBackground, false);
-	}
-
-	// lines between tracks
-	c->SetColor(v->ColorGrid);
-	foreach(Track *t, a->track)
-		c->DrawLine(0, t->area.y1, r.width(), t->area.y1);
-	if (yy < r.y2)
-		c->DrawLine(0, yy, r.width(), yy);
 }
 
 void AudioView::DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col, bool show_time)
@@ -933,28 +912,53 @@ void AudioView::DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col
 	}
 }
 
-void AudioView::DrawAudioFile(HuiDrawingContext *c, const rect &r)
+void AudioView::DrawEmptyAudioFile(HuiDrawingContext *c, const rect &r)
 {
-	audio->area = r;
+	color col = ColorBackgroundCurWave;
+	c->SetColor(col);
+	c->DrawRect(r.x1, r.y2, r.width(), r.height());
+	c->SetColor(ColorWaveCur);
+	c->SetFontSize(FONT_SIZE_NO_FILE);
+	c->DrawStr(r.x1 + r.width() / 2 - 50, r.y1 + r.height() / 2 - 10, _("keine Datei"));
+}
 
-	// empty file
-	if (!audio->used){
-		color col = ColorBackgroundCurWave;
-		c->SetColor(col);
-		c->DrawRect(r.x1, r.y2, r.width(), r.height());
-		c->SetColor(ColorWaveCur);
-		c->SetFontSize(FONT_SIZE_NO_FILE);
-		c->DrawStr(r.x1 + r.width() / 2 - 50, r.y1 + r.height() / 2 - 10, _("keine Datei"));
-		return;
+void AudioView::DrawBackground(HuiDrawingContext *c, const rect &r)
+{
+	int yy = audio->track.back()->area.y2;
+
+	// time scale
+	c->SetColor(ColorBackgroundCurWave);
+	c->DrawRect(r.x1, r.y1, r.width(), TIME_SCALE_HEIGHT);
+	DrawGrid(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), ColorBackgroundCurWave, true);
+
+	// tracks
+	foreach(Track *t, audio->track){
+		color cc = (t->is_selected) ? ColorBackgroundCurTrack : ColorBackgroundCurWave;
+		c->SetColor(cc);
+		c->DrawRect(t->area);
+		DrawGrid(c, t->area, cc);
 	}
 
-	plan_track_sizes(r, audio, TIME_SCALE_HEIGHT);
+	// free space below tracks
+	if (yy < r.y2){
+		c->SetColor(ColorBackground);
+		rect rr = rect(r.x1, r.x2, yy, r.y2);
+		c->DrawRect(rr);
+		DrawGrid(c, rr, ColorBackground, false);
+	}
 
-	// background
-	audio_draw_background(c, r, audio, this);
+	// lines between tracks
+	c->SetColor(ColorGrid);
+	foreach(Track *t, audio->track)
+		c->DrawLine(0, t->area.y1, r.width(), t->area.y1);
+	if (yy < r.y2)
+		c->DrawLine(0, yy, r.width(), yy);
 
+	//DrawGrid(c, r, ColorBackgroundCurWave, true);
+}
 
-	// selection
+void AudioView::DrawSelection(HuiDrawingContext *c, const rect &r)
+{
 	if (!audio->selection.empty()){
 		int sx1 = sample2screen(audio->sel_raw.start());
 		int sx2 = sample2screen(audio->sel_raw.end());
@@ -962,39 +966,48 @@ void AudioView::DrawAudioFile(HuiDrawingContext *c, const rect &r)
 		int sxx2 = clampi(sx2, r.x1, r.x2);
 		if (sxx1 > sxx2){
 			int t = sxx1;	sxx1 = sxx2;	sxx2 = t;
-			//bool bt = mo_s;	mo_s = mo_e;	mo_e = bt; // TODO ???
 		}
+		c->SetColor(ColorSelectionInternal);
 		foreach(Track *t, audio->track)
-			if (t->is_selected){
-				c->SetColor(ColorSelectionInternal);
-				rect rr = rect(sxx1, sxx2, t->area.y1, t->area.y2);
-				c->DrawRect(rr);
-				DrawGrid(c, rr, ColorSelectionInternal);
-			}
+			if (t->is_selected)
+				c->DrawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 		DrawTimeLine(c, audio->sel_raw.start(), SEL_TYPE_SELECTION_START, ColorSelectionBoundary);
 		DrawTimeLine(c, audio->sel_raw.end(), SEL_TYPE_SELECTION_END, ColorSelectionBoundary);
 	}
+}
 
-	//NixDrawStr(x,y,get_time_str((int)a->ViewPos,a));
+void AudioView::DrawAudioFile(HuiDrawingContext *c, const rect &r)
+{
+	audio->area = r;
+
+	// empty file
+	if (!audio->used){
+		DrawEmptyAudioFile(c, r);
+		return;
+	}
+
+	plan_track_sizes(r, audio, TIME_SCALE_HEIGHT);
+
+	// background
+	DrawBackground(c, r);
+
+
+	c->SetColor(ColorWaveCur);
+
+	// tracks
+	foreachi(Track *tt, audio->track, i)
+		DrawTrack(c, tt->area, tt, ColorWaveCur, i);
+
+
+	// selection
+	DrawSelection(c, r);
+
 	// playing position
 	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio)){
 		DrawTimeLine(c, tsunami->output->GetRange().start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
 		DrawTimeLine(c, tsunami->output->GetRange().end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
 		DrawTimeLine(c, tsunami->output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
 	}
-
-	c->SetColor(ColorWaveCur);
-
-	// boundary of wave file
-	/*if (a->min != a->max){
-		c->DrawLine(sample2screen(a, a->min), y, sample2screen(a, a->min), y + height);
-		c->DrawLine(sample2screen(a, a->max), y, sample2screen(a, a->max), y + height);
-	}*/
-
-
-	foreachi(Track *tt, audio->track, i)
-		DrawTrack(c, tt->area, tt, ColorWaveCur, i);
-
 }
 
 int frame=0;

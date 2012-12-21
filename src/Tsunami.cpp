@@ -7,9 +7,20 @@
 
 #include "lib/hui/hui.h"
 #include "Tsunami.h"
+#include "Data/AudioFile.h"
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
+#include "View/Helper/Slider.h"
+#include "View/Helper/Progress.h"
+#include "View/Helper/PeakMeter.h"
+#include "View/AudioView.h"
+#include "Plugins/PluginManager.h"
+#include "Storage/Storage.h"
+#include "Stuff/Log.h"
+#include "Audio/AudioOutput.h"
+#include "Audio/AudioInput.h"
+#include "Audio/AudioRenderer.h"
 
 #include "Plugins/FastFourierTransform.h"
 

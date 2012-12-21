@@ -7,6 +7,8 @@
 
 #include "AudioOutput.h"
 #include "../Tsunami.h"
+#include "AudioRenderer.h"
+#include "../Stuff/Log.h"
 
 
 #ifdef NIX_OS_WINDOWS
@@ -65,6 +67,15 @@ AudioOutput::~AudioOutput()
 	HuiConfigWriteFloat("Output.Volume", volume);
 }
 
+void AudioOutput::SetDevice(const string &device)
+{
+	ChosenDevice = device;
+	HuiConfigWriteStr("ChosenOutputDevice", ChosenDevice);
+	HuiSaveConfigFile();
+	tsunami->log->Warning(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
+	//KillPreview();
+	//PreviewInit();
+}
 
 void AudioOutput::Init()
 {

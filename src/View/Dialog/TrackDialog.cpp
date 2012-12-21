@@ -7,9 +7,9 @@
 
 #include "TrackDialog.h"
 #include "../../Data/Track.h"
-#include "Slider.h"
-#include "FxList.h"
-#include "BarList.h"
+#include "../Helper/Slider.h"
+#include "../Helper/FxList.h"
+#include "../Helper/BarList.h"
 #include "../../Tsunami.h"
 
 TrackDialog::TrackDialog(CHuiWindow *win):

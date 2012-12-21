@@ -9,8 +9,8 @@
 #define SUBDIALOG_H_
 
 #include "../../lib/hui/hui.h"
-#include "../../Data/Track.h"
-#include "Slider.h"
+class Slider;
+class Track;
 
 class SubDialog: public CHuiWindow
 {

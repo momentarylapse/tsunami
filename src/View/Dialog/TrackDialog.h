@@ -9,7 +9,7 @@
 #define TRACKDIALOG_H_
 
 
-#include "EmbeddedDialog.h"
+#include "../Helper/EmbeddedDialog.h"
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;

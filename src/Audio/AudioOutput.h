@@ -11,7 +11,7 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
-#include "../Stuff/PeakMeter.h"
+#include "../View/Helper/PeakMeter.h"
 
 class AudioOutput : public HuiEventHandler, public PeakMeterSource
 {
@@ -21,6 +21,7 @@ public:
 
 	Array<string> Device;
 	string ChosenDevice;
+	void SetDevice(const string &device);
 
 	void Init();
 	void Kill();

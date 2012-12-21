@@ -10,6 +10,9 @@
 #include "../View/Dialog/AudioFileDialog.h"
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
+#include "../Audio/AudioInput.h"
+#include "../Audio/AudioOutput.h"
+#include "../Stuff/Log.h"
 
 const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;

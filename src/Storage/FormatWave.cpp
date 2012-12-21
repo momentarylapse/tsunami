@@ -7,6 +7,8 @@
 
 #include "FormatWave.h"
 #include "../Tsunami.h"
+#include "../View/Helper/Progress.h"
+#include "../Stuff/Log.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 15;

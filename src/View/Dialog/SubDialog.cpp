@@ -6,6 +6,8 @@
  */
 
 #include "SubDialog.h"
+#include "../../Data/Track.h"
+#include "../Helper/Slider.h"
 
 SubDialog::SubDialog(CHuiWindow *_parent, bool _allow_parent, Track *s):
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)

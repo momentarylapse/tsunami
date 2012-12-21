@@ -7,9 +7,11 @@
 
 #include "AudioFileDialog.h"
 #include "../../Tsunami.h"
-#include "Slider.h"
-#include "FxList.h"
-#include "BarList.h"
+#include "../../Stuff/Observer.h"
+#include "../../Data/AudioFile.h"
+#include "../Helper/Slider.h"
+#include "../Helper/FxList.h"
+#include "../Helper/BarList.h"
 
 AudioFileDialog::AudioFileDialog(CHuiWindow *win, AudioFile *a):
 	EmbeddedDialog(win)

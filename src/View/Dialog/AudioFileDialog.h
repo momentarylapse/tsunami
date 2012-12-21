@@ -8,7 +8,7 @@
 #ifndef AUDIOFILEDIALOG_H_
 #define AUDIOFILEDIALOG_H_
 
-#include "EmbeddedDialog.h"
+#include "../Helper/EmbeddedDialog.h"
 #include "../../Stuff/Observer.h"
 class AudioFile;
 class Slider;

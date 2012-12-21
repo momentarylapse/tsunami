@@ -10,22 +10,20 @@
 
 #include "Stuff/Observer.h"
 #include "lib/hui/hui.h"
-#include "Data/AudioFile.h"
-#include "View/AudioView.h"
-#include "Storage/Storage.h"
-#include "Stuff/Progress.h"
-#include "Stuff/Log.h"
-#include "Stuff/PeakMeter.h"
-#include "View/Dialog/Slider.h"
-#include "Audio/AudioOutput.h"
-#include "Audio/AudioInput.h"
-#include "Audio/AudioRenderer.h"
-#include "Plugins/PluginManager.h"
 
 class Observer;
 class CHuiWindow;
 class AudioFile;
 class AudioView;
+class PluginManager;
+class Slider;
+class Log;
+class AudioInput;
+class AudioOutput;
+class AudioRenderer;
+class Storage;
+class Progress;
+class PeakMeter;
 
 class Tsunami : public Observer, public CHuiWindow
 {

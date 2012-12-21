@@ -7,6 +7,7 @@
 
 #include "Format.h"
 #include "../Tsunami.h"
+#include "../Audio/AudioRenderer.h"
 
 Format::Format(const string &_extension, int _flags)
 {

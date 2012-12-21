@@ -17,6 +17,9 @@
 #include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
 #include "../Action/SubTrack/ActionSubTrackFromSelection.h"
 #include "../Tsunami.h"
+#include "../Storage/Storage.h"
+#include "../Stuff/Log.h"
+#include "../View/AudioView.h"
 #include <assert.h>
 
 

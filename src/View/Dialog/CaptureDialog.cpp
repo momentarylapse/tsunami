@@ -7,6 +7,9 @@
 
 #include "CaptureDialog.h"
 #include "../../Tsunami.h"
+#include "../../Audio/AudioInput.h"
+#include "../../Audio/AudioOutput.h"
+#include "../AudioView.h"
 
 #include "../../Action/Track/ActionTrackEditBuffer.h"
 

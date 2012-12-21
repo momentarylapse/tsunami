@@ -11,7 +11,7 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../Data/AudioFile.h"
-#include "../../Stuff/PeakMeter.h"
+#include "../Helper/PeakMeter.h"
 #include "../../Stuff/Observer.h"
 
 class CaptureDialog : public CHuiWindow, public Observer

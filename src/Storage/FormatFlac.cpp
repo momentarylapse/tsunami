@@ -7,6 +7,7 @@
 
 #include "FormatFlac.h"
 #include "../Tsunami.h"
+#include "../View/Helper/Progress.h"
 
 #include <FLAC/all.h>
 

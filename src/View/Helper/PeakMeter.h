@@ -8,10 +8,10 @@
 #ifndef PEAKMETER_H_
 #define PEAKMETER_H_
 
-#include "../lib/hui/hui.h"
-#include "Observer.h"
-#include "Observable.h"
-#include "../Data/BufferBox.h"
+#include "../../lib/hui/hui.h"
+#include "../../Stuff/Observer.h"
+#include "../../Stuff/Observable.h"
+#include "../../Data/BufferBox.h"
 
 class PeakMeterSource : public Observable
 {

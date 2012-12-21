@@ -10,6 +10,7 @@
 #include "../../Plugins/Plugin.h"
 #include "../../Plugins/Effect.h"
 #include "../../Tsunami.h"
+#include "../../Stuff/Log.h"
 #include "../../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../../Action/Track/Effect/ActionTrackEditEffect.h"

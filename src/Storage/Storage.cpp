@@ -5,6 +5,7 @@
  *      Author: michi
  */
 
+#include "Storage.h"
 #include "Format.h"
 #include "FormatWave.h"
 #include "FormatOgg.h"
@@ -12,6 +13,10 @@
 #include "FormatNami.h"
 #include "../Tsunami.h"
 #include "../lib/hui/hui.h"
+#include "../View/Helper/Progress.h"
+#include "../Stuff/Log.h"
+#include "../Audio/AudioRenderer.h"
+#include "../View/AudioView.h"
 
 Storage::Storage()
 {

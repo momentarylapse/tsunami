@@ -7,6 +7,9 @@
 
 #include "SettingsDialog.h"
 #include "../../Tsunami.h"
+#include "../../Audio/AudioOutput.h"
+#include "../../Audio/AudioInput.h"
+#include "../../Stuff/Log.h"
 
 SettingsDialog::SettingsDialog(CHuiWindow *_parent, bool _allow_parent):
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
@@ -95,14 +98,9 @@ void SettingsDialog::OnPreviewDevice()
 {
 	int dev = GetInt("");
 	if (dev > 0)
-		tsunami->output->ChosenDevice = tsunami->output->Device[dev - 1];
+		tsunami->output->SetDevice(tsunami->output->Device[dev - 1]);
 	else
-		tsunami->output->ChosenDevice = "";
-	HuiConfigWriteStr("ChosenOutputDevice", tsunami->output->ChosenDevice);
-	HuiSaveConfigFile();
-	tsunami->log->Warning(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
-	//KillPreview();
-	//PreviewInit();
+		tsunami->output->SetDevice("");
 }
 
 void SettingsDialog::OnCaptureDelay()

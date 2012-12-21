@@ -7,6 +7,9 @@
 
 #include "Plugin.h"
 #include "../Tsunami.h"
+#include "../lib/script/script.h"
+#include "PluginManager.h"
+#include "../Stuff/Log.h"
 #include "../Action/Track/ActionTrackEditBuffer.h"
 
 

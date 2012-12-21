@@ -9,6 +9,9 @@
 
 #include "Plugin.h"
 #include "../Tsunami.h"
+#include "../lib/script/script.h"
+#include "../Stuff/Log.h"
+#include "PluginManager.h"
 
 Effect::Effect()
 {

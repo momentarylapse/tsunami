@@ -6,7 +6,7 @@
  */
 
 #include "PeakMeter.h"
-#include "../Plugins/FastFourierTransform.h"
+#include "../../Plugins/FastFourierTransform.h"
 
 const int NUM_SAMPLES = 4096;
 const int SPECTRUM_SIZE = 30;

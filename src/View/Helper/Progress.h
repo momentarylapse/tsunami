@@ -8,8 +8,8 @@
 #ifndef PROGRESS_H_
 #define PROGRESS_H_
 
-#include "../lib/hui/hui.h"
-#include "Observable.h"
+#include "../../lib/hui/hui.h"
+#include "../../Stuff/Observable.h"
 
 class Progress : public Observable
 {

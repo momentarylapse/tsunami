@@ -8,6 +8,7 @@
 #include "AudioInput.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
+#include "../Stuff/Log.h"
 
 
 #define UPDATE_TIME		10

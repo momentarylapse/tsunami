@@ -8,6 +8,8 @@
 #include "FormatNami.h"
 #include "../Tsunami.h"
 #include "../Plugins/Effect.h"
+#include "../Stuff/Log.h"
+#include "../View/Helper/Progress.h"
 
 
 const int CHUNK_SIZE = 1 << 16;

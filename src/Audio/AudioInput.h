@@ -11,7 +11,7 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
-#include "../Stuff/PeakMeter.h"
+#include "../View/Helper/PeakMeter.h"
 
 
 #define NUM_CAPTURE_SAMPLES		8192

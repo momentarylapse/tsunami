@@ -24,6 +24,7 @@ class AudioRenderer;
 class Storage;
 class Progress;
 class PeakMeter;
+class Clipboard;
 
 class Tsunami : public Observer, public CHuiWindow
 {
@@ -79,6 +80,17 @@ public:
 	void OnCurLevel();
 	void OnCurLevelUp();
 	void OnCurLevelDown();
+	void OnViewPeaksMax();
+	void OnViewPeaksMean();
+	void OnZoomIn();
+	void OnZoomOut();
+	void OnViewGridTime();
+	void OnViewGridBars();
+	void OnViewMono();
+	void OnViewOptimal();
+	void OnSelectNone();
+	void OnSelectAll();
+	void OnSelectNothing();
 	void OnShowLog();
 	void OnFindAndExecutePlugin();
 	void OnExit();
@@ -109,6 +121,7 @@ public:
 	AudioRenderer *renderer;
 
 	PluginManager *plugins;
+	Clipboard *clipboard;
 };
 
 extern Tsunami *tsunami;

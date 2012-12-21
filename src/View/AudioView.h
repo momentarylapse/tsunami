@@ -40,19 +40,11 @@ public:
 
 	void OnUpdate(Observable *o);
 
-	void OnSelectNone();
-	void OnSelectAll();
-	void OnSelectNothing();
-
-	void OnViewMono();
-	void OnViewGridTime();
-	void OnViewGridBars();
-	void OnViewOptimal();
-	void OnViewPeaksMax();
-	void OnViewPeaksMean();
-	void OnZoomIn();
-	void OnZoomOut();
-	void OnJumpOtherFile();
+	void ToggleShowMono();
+	void SetGridMode(int mode);
+	void SetPeaksMode(int mode);
+	void ZoomIn();
+	void ZoomOut();
 
 	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int pos, float zoom, const color &col);
 	void DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, const color &col, int delay);

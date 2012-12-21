@@ -18,6 +18,7 @@
 #include "Plugins/PluginManager.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
+#include "Stuff/Clipboard.h"
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioInput.h"
 #include "Audio/AudioRenderer.h"
@@ -37,6 +38,8 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	progress = new Progress;
 	log = new Log(this);
+
+	clipboard = new Clipboard;
 
 	output = new AudioOutput;
 	input = new AudioInput;
@@ -87,6 +90,18 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("run_plugin", "hui:execute", KEY_RETURN + KEY_SHIFT, this, (void(HuiEventHandler::*)())&Tsunami::OnFindAndExecutePlugin);
 	HuiAddCommandM("exit", "hui:quit", KEY_Q + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
 
+	HuiAddCommandM("select_none", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectNone);
+	HuiAddCommandM("select_all", "", KEY_A + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectAll);
+	HuiAddCommandM("select_nothing", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectNothing);
+	HuiAddCommandM("view_mono", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewMono);
+	HuiAddCommandM("view_grid_time", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewGridTime);
+	HuiAddCommandM("view_grid_bars", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewGridBars);
+	HuiAddCommandM("view_peaks_max", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewPeaksMax);
+	HuiAddCommandM("view_peaks_mean", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewPeaksMean);
+	HuiAddCommandM("view_optimal", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewOptimal);
+	HuiAddCommandM("zoom_in", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnZoomIn);
+	HuiAddCommandM("zoom_out", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnZoomOut);
+
 
 	// create the window
 	SetSize(width, height);
@@ -129,7 +144,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	plugins = new PluginManager;
 	plugins->AddPluginsToMenu();
 
-	audio= new AudioFile;
+	audio = new AudioFile;
 
 	storage = new Storage;
 
@@ -138,6 +153,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	Subscribe(view);
 	Subscribe(audio);
 	Subscribe(output);
+	Subscribe(clipboard);
 
 	UpdateMenu();
 
@@ -201,7 +217,7 @@ void Tsunami::OnAddTrack()
 
 void Tsunami::OnAddTimeTrack()
 {
-	Track *t = audio->AddTimeTrack();
+	audio->AddTimeTrack();
 }
 
 void Tsunami::OnDeleteTrack()
@@ -416,12 +432,68 @@ void Tsunami::OnSubFromSelection()
 		audio->CreateSubsFromSelection(view->cur_level);
 }
 
+void Tsunami::OnViewOptimal()
+{
+	view->OptimizeView();
+}
+
+void Tsunami::OnSelectNone()
+{
+}
+
+void Tsunami::OnSelectAll()
+{
+	view->SelectAll();
+}
+
+void Tsunami::OnViewPeaksMax()
+{
+	view->SetPeaksMode(BufferBox::PEAK_MODE_MAXIMUM);
+}
+
+void Tsunami::OnViewPeaksMean()
+{
+	view->SetPeaksMode(BufferBox::PEAK_MODE_SQUAREMEAN);
+}
+
+void Tsunami::OnSelectNothing()
+{
+}
+
+void Tsunami::OnViewMono()
+{
+	view->ToggleShowMono();
+}
+
+void Tsunami::OnViewGridBars()
+{
+	view->SetGridMode(view->GRID_MODE_BARS);
+}
+
+void Tsunami::OnViewGridTime()
+{
+	view->SetGridMode(view->GRID_MODE_TIME);
+}
+
+void Tsunami::OnZoomIn()
+{
+	view->ZoomIn();
+}
+
+void Tsunami::OnZoomOut()
+{
+	view->ZoomOut();
+}
+
 void Tsunami::UpdateMenu()
 {
 	msg_db_r("UpdateMenu", 1);
 	bool selected = audio && !audio->selection.empty();
 // menu / toolbar
 	// edit
+	// edit
+	Enable("select_all", audio->used);
+	Enable("select_nothing", audio->used);
 	Enable("undo", audio->action_manager->Undoable());
 	Enable("redo", audio->action_manager->Redoable());
 	Enable("copy", selected || (audio->GetNumSelectedSubs() > 0));

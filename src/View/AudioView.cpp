@@ -104,20 +104,6 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 	parent->EventM("hui:key-up", this, (void(HuiEventHandler::*)())&AudioView::OnKeyUp);
 	parent->EventMX("area", "hui:mouse-wheel", this, (void(HuiEventHandler::*)())&AudioView::OnMouseWheel);
 
-
-	HuiAddCommandM("select_none", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnSelectNone);
-	HuiAddCommandM("select_all", "", KEY_A + KEY_CONTROL, this, (void(HuiEventHandler::*)())&AudioView::OnSelectAll);
-	HuiAddCommandM("select_nothing", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnSelectNothing);
-	HuiAddCommandM("view_mono", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewMono);
-	HuiAddCommandM("view_grid_time", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewGridTime);
-	HuiAddCommandM("view_grid_bars", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewGridBars);
-	HuiAddCommandM("view_peaks_max", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewPeaksMax);
-	HuiAddCommandM("view_peaks_mean", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewPeaksMean);
-	HuiAddCommandM("view_optimal", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnViewOptimal);
-	HuiAddCommandM("zoom_in", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnZoomIn);
-	HuiAddCommandM("zoom_out", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnZoomOut);
-	HuiAddCommandM("jump_other_file", "", -1, this, (void(HuiEventHandler::*)())&AudioView::OnJumpOtherFile);
-
 	//ForceRedraw();
 	UpdateMenu();
 
@@ -900,10 +886,6 @@ void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 	}
 }
 
-void audio_draw_background(HuiDrawingContext *c, const rect &r, AudioFile *a, AudioView *v)
-{
-}
-
 void AudioView::DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col, bool show_time)
 {
 	int p = sample2screen(pos);
@@ -1055,9 +1037,6 @@ void AudioView::OptimizeView()
 
 void AudioView::UpdateMenu()
 {
-	// edit
-	tsunami->Enable("select_all", audio->used);
-	tsunami->Enable("select_nothing", audio->used);
 	// view
 	tsunami->Check("view_mono", show_mono);
 	tsunami->Check("view_grid_time", grid_mode == GRID_MODE_TIME);
@@ -1070,9 +1049,9 @@ void AudioView::UpdateMenu()
 	tsunami->Enable("view_samples", false);//tsunami->cur_audio->used);
 }
 
-void AudioView::OnViewPeaksMax()
+void AudioView::SetPeaksMode(int mode)
 {
-	PeakMode = BufferBox::PEAK_MODE_MAXIMUM;
+	PeakMode = mode;
 	if (audio->used){
 		audio->InvalidateAllPeaks();
 		audio->UpdatePeaks(PeakMode);
@@ -1081,40 +1060,22 @@ void AudioView::OnViewPeaksMax()
 	UpdateMenu();
 }
 
-void AudioView::OnViewPeaksMean()
-{
-	PeakMode = BufferBox::PEAK_MODE_SQUAREMEAN;
-	if (audio->used){
-		audio->InvalidateAllPeaks();
-		audio->UpdatePeaks(PeakMode);
-	}
-	ForceRedraw();
-	UpdateMenu();
-}
-
-void AudioView::OnViewOptimal()
-{
-	OptimizeView();
-}
-
-void AudioView::OnSelectNone()
-{
-}
-
-void AudioView::OnViewMono()
+void AudioView::ToggleShowMono()
 {
 	show_mono = !show_mono;
 	ForceRedraw();
+	//Notify("Settings");
 	UpdateMenu();
 }
 
-void AudioView::OnZoomIn()
+void AudioView::ZoomIn()
 {
+	Zoom(2.0f);
 }
 
-void AudioView::OnSelectAll()
+void AudioView::ZoomOut()
 {
-	SelectAll();
+	Zoom(0.5f);
 }
 
 void AudioView::SelectAll()
@@ -1132,30 +1093,11 @@ void AudioView::SelectNone()
 	SetCurSub(NULL);
 }
 
-void AudioView::OnZoomOut()
+void AudioView::SetGridMode(int mode)
 {
-}
-
-void AudioView::OnJumpOtherFile()
-{
-}
-
-void AudioView::OnViewGridTime()
-{
-	grid_mode = GRID_MODE_TIME;
+	grid_mode = mode;
 	ForceRedraw();
 	UpdateMenu();
-}
-
-void AudioView::OnViewGridBars()
-{
-	grid_mode = GRID_MODE_BARS;
-	ForceRedraw();
-	UpdateMenu();
-}
-
-void AudioView::OnSelectNothing()
-{
 }
 
 

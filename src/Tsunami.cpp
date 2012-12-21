@@ -275,6 +275,7 @@ void Tsunami::OnCopy()
 
 void Tsunami::OnFindAndExecutePlugin()
 {
+	plugins->FindAndExecutePlugin();
 }
 
 void Tsunami::OnDelete()

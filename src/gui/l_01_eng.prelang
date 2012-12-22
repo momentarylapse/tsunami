@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-165
+163
 // Data (ID,Text)
 about
 
@@ -73,8 +73,6 @@ close_file
 
 copy
 Copy
-cut_out
-
 data_list
 
 delete
@@ -234,8 +232,6 @@ remove_added
 repdelay
 
 repnum
-
-resize
 
 run_plugin
 
@@ -400,7 +396,7 @@ Effekt nicht ladbar: \"%s\"
 
 Eigenständig
 
-End\\\") + audio->get_time_str(audio->GetRange().end()));
+Ende\\\") + audio->get_time_str(audio->GetRange().end()));
 
 Es existiert schon eine Rhythmus-Spur.
 

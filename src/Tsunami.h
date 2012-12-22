@@ -90,7 +90,6 @@ public:
 	void OnViewOptimal();
 	void OnSelectNone();
 	void OnSelectAll();
-	void OnSelectNothing();
 	void OnShowLog();
 	void OnFindAndExecutePlugin();
 	void OnExit();

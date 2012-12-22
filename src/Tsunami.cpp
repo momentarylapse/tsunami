@@ -90,9 +90,8 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("run_plugin", "hui:execute", KEY_RETURN + KEY_SHIFT, this, (void(HuiEventHandler::*)())&Tsunami::OnFindAndExecutePlugin);
 	HuiAddCommandM("exit", "hui:quit", KEY_Q + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
 
-	HuiAddCommandM("select_none", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectNone);
 	HuiAddCommandM("select_all", "", KEY_A + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectAll);
-	HuiAddCommandM("select_nothing", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectNothing);
+	HuiAddCommandM("select_nothing", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectNone);
 	HuiAddCommandM("view_mono", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewMono);
 	HuiAddCommandM("view_grid_time", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewGridTime);
 	HuiAddCommandM("view_grid_bars", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewGridBars);
@@ -442,6 +441,7 @@ void Tsunami::OnViewOptimal()
 
 void Tsunami::OnSelectNone()
 {
+	view->SelectNone();
 }
 
 void Tsunami::OnSelectAll()
@@ -457,10 +457,6 @@ void Tsunami::OnViewPeaksMax()
 void Tsunami::OnViewPeaksMean()
 {
 	view->SetPeaksMode(BufferBox::PEAK_MODE_SQUAREMEAN);
-}
-
-void Tsunami::OnSelectNothing()
-{
 }
 
 void Tsunami::OnViewMono()
@@ -502,12 +498,10 @@ void Tsunami::UpdateMenu()
 	Enable("copy", selected || (audio->GetNumSelectedSubs() > 0));
 	Enable("paste", clipboard->HasData());
 	Enable("delete", selected || (audio->GetNumSelectedSubs() > 0));
-	Enable("resize", false); // deprecated
 	// file
 	Enable("save", audio->used);
 	Enable("save", audio->used);
 	Enable("save_as", audio->used);
-	Enable("cut_out", audio->used);
 	Enable("close_file", audio->used);
 	Enable("export_selection", audio->used);
 	Enable("wave_properties", audio->used);

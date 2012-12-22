@@ -926,7 +926,7 @@ menu
 0
 
 
-75
+72
 ItemPopup
 menu_file
 
@@ -1087,7 +1087,7 @@ ItemPopup
 menu_edit
 
 1
-14
+11
 0
 0
 0
@@ -1203,45 +1203,6 @@ hui:paste
 ItemImage
 delete
 hui:delete
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-ItemSeparator
-
-
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-ItemImage
-resize
-hui:cut
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-ItemImage
-cut_out
-hui:cut
 1
 0
 0
@@ -3771,7 +3732,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-210
+208
 // Text
 about
 Info
@@ -3879,8 +3840,6 @@ configure_effect
 
 copy
 Kopieren
-cut_out
-Auswahl herausschneiden
 data_list
 !nobar\\key\\value
 delete
@@ -4075,8 +4034,6 @@ repdelay
 0\\0\\100000\\0.1
 repnum
 1\\1
-resize
-Auf Auswahl zuschneiden
 run_plugin
 Script ausführen...
 sample_rate
@@ -4199,7 +4156,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-210
+208
 // Text
 about
 
@@ -4307,8 +4264,6 @@ configure_effect
 
 copy
 Copy
-cut_out
-
 data_list
 
 delete
@@ -4502,8 +4457,6 @@ remove_added
 repdelay
 
 repnum
-
-resize
 
 run_plugin
 

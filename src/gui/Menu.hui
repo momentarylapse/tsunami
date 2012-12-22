@@ -83,9 +83,6 @@ enum{
 		em->AddEntryImage("Einf&ugen",HuiImagePaste,HMM_PASTE);
 		em->AddEntryImage("L&oschen",HuiImageDelete,HMM_DELETE);
 		em->AddSeparator();
-		em->AddEntryImage("Auf Auswahl zuschneiden",HuiImageCut,HMM_RESIZE);
-		em->AddEntryImage("Auswahl herausschneiden",HuiImageCut,HMM_CUT_OUT);
-		em->AddSeparator();
 		em->AddEntryImage("Einstellungen",HuiImagePreferences,HMM_SETTINGS);
 	m->AddSubMenu("Bearbeiten",HMM_MENU_EDIT,em);
 		CHuiMenu *sub_menu_161=new CHuiMenu();

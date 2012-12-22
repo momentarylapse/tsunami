@@ -1,26 +1,26 @@
 /*
- * ActionAudioAddTrack.cpp
+ * ActionTrackAdd.cpp
  *
  *  Created on: 24.03.2012
  *      Author: michi
  */
 
-#include "ActionAudioAddTrack.h"
+#include "ActionTrackAdd.h"
 #include "../../Data/AudioFile.h"
 #include "../../lib/hui/hui.h"
 #include <assert.h>
 
-ActionAudioAddTrack::ActionAudioAddTrack(int _index, int _type)
+ActionTrackAdd::ActionTrackAdd(int _index, int _type)
 {
 	index = _index;
 	type = _type;
 }
 
-ActionAudioAddTrack::~ActionAudioAddTrack()
+ActionTrackAdd::~ActionTrackAdd()
 {
 }
 
-void ActionAudioAddTrack::undo(Data *d)
+void ActionTrackAdd::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	delete(a->track[index]);
@@ -29,7 +29,7 @@ void ActionAudioAddTrack::undo(Data *d)
 
 
 
-void *ActionAudioAddTrack::execute(Data *d)
+void *ActionTrackAdd::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 

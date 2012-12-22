@@ -7,8 +7,8 @@
 
 #include "Track.h"
 #include "../Plugins/Effect.h"
-#include "../Action/Track/ActionTrackCreateBuffers.h"
-#include "../Action/Track/ActionTrackAddEmptySubTrack.h"
+#include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
+#include "../Action/SubTrack/ActionTrackAddEmptySubTrack.h"
 #include "../lib/hui/hui.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"

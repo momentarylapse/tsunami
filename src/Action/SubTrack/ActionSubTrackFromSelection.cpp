@@ -6,9 +6,9 @@
  */
 
 #include "ActionSubTrackFromSelection.h"
-#include "../Track/ActionTrackAddEmptySubTrack.h"
-#include "../Track/ActionTrackEditBuffer.h"
-#include "../Track/ActionTrack__DeleteBufferBox.h"
+#include "../SubTrack/ActionTrackAddEmptySubTrack.h"
+#include "../Track/Buffer/ActionTrackEditBuffer.h"
+#include "../Track/Buffer/ActionTrack__DeleteBufferBox.h"
 
 ActionSubTrackFromSelection::ActionSubTrackFromSelection(AudioFile *a, int level_no)
 {

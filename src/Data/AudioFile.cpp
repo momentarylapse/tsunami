@@ -7,13 +7,13 @@
 
 #include "AudioFile.h"
 #include "../Plugins/Effect.h"
-#include "../Action/AudioFile/ActionAudioAddTrack.h"
-#include "../Action/AudioFile/ActionAudioDeleteTrack.h"
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "../Action/AudioFile/Level/ActionAudioAddLevel.h"
 #include "../Action/AudioFile/Tag/ActionAudioAddTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioEditTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioDeleteTag.h"
+#include "../Action/Track/ActionTrackAdd.h"
+#include "../Action/Track/ActionTrackDelete.h"
 #include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
 #include "../Action/SubTrack/ActionSubTrackFromSelection.h"
 #include "../Tsunami.h"
@@ -241,7 +241,7 @@ Track *AudioFile::AddEmptyTrack(int index)
 {
 	if (index < 0)
 		index = track.num;
-	return (Track*)Execute(new ActionAudioAddTrack(index, Track::TYPE_AUDIO));
+	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_AUDIO));
 }
 
 
@@ -257,7 +257,7 @@ Track *AudioFile::AddTimeTrack(int index)
 
 	if (index < 0)
 		index = track.num;
-	return (Track*)Execute(new ActionAudioAddTrack(index, Track::TYPE_TIME));
+	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_TIME));
 }
 
 extern int debug_timer;
@@ -301,7 +301,7 @@ void AudioFile::AddLevel()
 
 void AudioFile::DeleteTrack(int index)
 {
-	Execute(new ActionAudioDeleteTrack(this, index));
+	Execute(new ActionTrackDelete(this, index));
 }
 
 void AudioFile::DeleteSelection(int level_no, bool all_levels)

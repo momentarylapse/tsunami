@@ -1,16 +1,16 @@
 /*
- * ActionAudioDeleteTrack.cpp
+ * ActionTrackDelete.cpp
  *
  *  Created on: 09.04.2012
  *      Author: michi
  */
 
-#include "ActionAudioDeleteTrack.h"
-#include "../Track/ActionTrack__DeleteBufferBox.h"
-#include "ActionAudio__DeleteTrack.h"
+#include "ActionTrackDelete.h"
+#include "Buffer/ActionTrack__DeleteBufferBox.h"
+#include "ActionTrack__DeleteEmpty.h"
 #include <assert.h>
 
-ActionAudioDeleteTrack::ActionAudioDeleteTrack(AudioFile *a, int index)
+ActionTrackDelete::ActionTrackDelete(AudioFile *a, int index)
 {
 	assert(index >= 0 && index < a->track.num);
 
@@ -25,9 +25,9 @@ ActionAudioDeleteTrack::ActionAudioDeleteTrack(AudioFile *a, int index)
 	t->sub.clear();
 
 	// delete the track itself
-	AddSubAction(new ActionAudio__DeleteTrack(index), a);
+	AddSubAction(new ActionTrack__DeleteEmpty(index), a);
 }
 
-ActionAudioDeleteTrack::~ActionAudioDeleteTrack()
+ActionTrackDelete::~ActionTrackDelete()
 {
 }

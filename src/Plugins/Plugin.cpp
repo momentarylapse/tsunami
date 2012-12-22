@@ -10,7 +10,7 @@
 #include "../lib/script/script.h"
 #include "PluginManager.h"
 #include "../Stuff/Log.h"
-#include "../Action/Track/ActionTrackEditBuffer.h"
+#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 
 // -> PluginManager.cpp

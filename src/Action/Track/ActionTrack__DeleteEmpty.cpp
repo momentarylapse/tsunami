@@ -1,23 +1,23 @@
 /*
- * ActionAudio__DeleteTrack.cpp
+ * ActionTrack__DeleteEmpty.cpp
  *
  *  Created on: 09.04.2012
  *      Author: michi
  */
 
-#include "ActionAudio__DeleteTrack.h"
+#include "ActionTrack__DeleteEmpty.h"
 #include <assert.h>
 
-ActionAudio__DeleteTrack::ActionAudio__DeleteTrack(int _index)
+ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(int _index)
 {
 	index = _index;
 }
 
-ActionAudio__DeleteTrack::~ActionAudio__DeleteTrack()
+ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()
 {
 }
 
-void *ActionAudio__DeleteTrack::execute(Data *d)
+void *ActionTrack__DeleteEmpty::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(index >= 0 && index < a->track.num);
@@ -38,7 +38,7 @@ void *ActionAudio__DeleteTrack::execute(Data *d)
 
 
 
-void ActionAudio__DeleteTrack::undo(Data *d)
+void ActionTrack__DeleteEmpty::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	a->track.insert(track, index);

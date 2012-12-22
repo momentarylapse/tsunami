@@ -8,8 +8,8 @@
 #ifndef ACTIONTRACKEDITBUFFER_H_
 #define ACTIONTRACKEDITBUFFER_H_
 
-#include "../Action.h"
-#include "../../Data/Track.h"
+#include "../../Action.h"
+#include "../../../Data/Track.h"
 
 class ActionTrackEditBuffer : public Action
 {

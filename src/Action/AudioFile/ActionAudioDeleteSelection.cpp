@@ -6,9 +6,9 @@
  */
 
 #include "ActionAudioDeleteSelection.h"
-#include "../Track/ActionTrack__CutBufferBox.h"
-#include "../Track/ActionTrack__DeleteBufferBox.h"
-#include "../Track/ActionTrack__ShrinkBufferBox.h"
+#include "../Track/Buffer/ActionTrack__CutBufferBox.h"
+#include "../Track/Buffer/ActionTrack__DeleteBufferBox.h"
+#include "../Track/Buffer/ActionTrack__ShrinkBufferBox.h"
 #include "../SubTrack/ActionSubTrackDelete.h"
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_no, bool all_levels)

@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrack__AbsorbBufferBox.h"
-#include "../../Data/AudioFile.h"
+#include "../../../Data/AudioFile.h"
 
 ActionTrack__AbsorbBufferBox::ActionTrack__AbsorbBufferBox(Track *t, int _level_no, int _dest, int _src)
 {

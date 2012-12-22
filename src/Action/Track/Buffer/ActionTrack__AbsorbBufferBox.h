@@ -8,8 +8,8 @@
 #ifndef ACTIONTRACK__ABSORBBUFFERBOX_H_
 #define ACTIONTRACK__ABSORBBUFFERBOX_H_
 
-#include "../Action.h"
-#include "../../Data/Track.h"
+#include "../../Action.h"
+#include "../../../Data/Track.h"
 
 class ActionTrack__AbsorbBufferBox : public Action
 {

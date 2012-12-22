@@ -16,7 +16,7 @@ int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
 int flac_read_samples;
 Track *flac_track;
 
-#include "../Action/Track/ActionTrackEditBuffer.h"
+#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 
 FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)

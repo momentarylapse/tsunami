@@ -7,8 +7,8 @@
 
 #include "ActionSubTrackInsert.h"
 #include "ActionSubTrackDelete.h"
-#include "../Track/ActionTrackCreateBuffers.h"
-#include "../Track/ActionTrackEditBuffer.h"
+#include "../Track/Buffer/ActionTrackCreateBuffers.h"
+#include "../Track/Buffer/ActionTrackEditBuffer.h"
 
 ActionSubTrackInsert::ActionSubTrackInsert(AudioFile *a, int track_no, int index, int level_no)
 {

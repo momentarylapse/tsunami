@@ -298,6 +298,13 @@ bool Tsunami::AllowTermination()
 
 void Tsunami::OnCopy()
 {
+	if (audio->used)
+		clipboard->Copy(audio);
+}
+
+void Tsunami::OnPaste()
+{
+	clipboard->Paste(audio);
 }
 
 void Tsunami::OnFindAndExecutePlugin()
@@ -372,10 +379,6 @@ void Tsunami::OnStop()
 void Tsunami::OnVolume()
 {
 	output->SetVolume(volume_slider->Get());
-}
-
-void Tsunami::OnPaste()
-{
 }
 
 void Tsunami::OnInsertAdded()
@@ -497,7 +500,7 @@ void Tsunami::UpdateMenu()
 	Enable("undo", audio->action_manager->Undoable());
 	Enable("redo", audio->action_manager->Redoable());
 	Enable("copy", selected || (audio->GetNumSelectedSubs() > 0));
-	Enable("paste", false);
+	Enable("paste", clipboard->HasData());
 	Enable("delete", selected || (audio->GetNumSelectedSubs() > 0));
 	Enable("resize", false); // deprecated
 	// file

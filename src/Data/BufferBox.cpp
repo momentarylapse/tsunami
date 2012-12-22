@@ -56,7 +56,7 @@ void BufferBox::resize(int length)
 }
 
 bool BufferBox::is_ref()
-{	return (r.allocated == 0);	}
+{	return ((num > 0) && (r.allocated == 0));	}
 
 void fa_make_own(Array<float> &a)
 {

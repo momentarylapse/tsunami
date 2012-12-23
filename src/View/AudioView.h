@@ -46,7 +46,7 @@ public:
 	void ZoomIn();
 	void ZoomOut();
 
-	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int pos, float zoom, const color &col);
+	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int pos, const color &col);
 	void DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, const color &col, int delay);
 	void DrawSub(HuiDrawingContext *c, const rect &r, Track *s);
 	void DrawBars(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no, Array<Bar> &bc);
@@ -137,8 +137,8 @@ public:
 	void SetCurSub(AudioFile *a, Track *s);
 	void SetCurTrack(AudioFile *a, Track *t);
 
-	int screen2sample(int x);
-	int sample2screen(int s);
+	double screen2sample(double x);
+	double sample2screen(double s);
 
 	void Zoom(float f);
 	void Move(float dpos);
@@ -173,8 +173,8 @@ public:
 	Track *cur_sub;
 	int cur_level;
 
-	float view_pos;
-	float view_zoom;
+	double view_pos;
+	double view_zoom;
 
 	TrackDialog *track_dialog;
 	AudioFileDialog *audio_file_dialog;

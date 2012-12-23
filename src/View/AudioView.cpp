@@ -548,54 +548,46 @@ void AudioView::ForceRedraw()
 
 float tx[4096], ty[4096], ty2[4096];
 
-inline void draw_line_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, float zoom, float f, float hf, float x, float y0, const Array<float> &buf, int offset)
+inline void draw_line_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, double zoom, double f, float hf, float x, float y0, const Array<float> &buf, int offset)
 {
 	int nl = 0;
-	float dpos = (float)1/zoom/f;
+	double dpos = 1.0 / zoom / f;
 	// pixel position
 	// -> buffer position
-	float p0 = view_pos_rel / f;
+	double p0 = view_pos_rel / f;
 	for (int i=0;i<width+di;i+=di){
 
-		float p = p0 + dpos * (float)i;
+		double p = p0 + dpos * (double)i;
 		int ip = (int)p - offset;
-		//printf("%f  %f\n", p1, p2);
 		if ((ip >= 0) && (ip < buf.num))
 		if (((int)(p * f) < offset + buf.num) && (p >= offset)){
 			tx[nl] = (float)x+i;
 			ty[nl] = y0 + buf[ip] * hf;
-//			msg_write(ip);
-//			msg_write(f2s(buf[ip], 5));
 			nl ++;
 		}
-		//p += dpos;
 	}
 	c->DrawLines(tx, ty, nl -1);
 }
 
-inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, float zoom, float f, float hf, float x, float y0, const string &buf, int offset)
+inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
 {
 	int nl = 0;
-	float dpos = (float)1/zoom;
+	double dpos = 1.0 / zoom;
 	// pixel position
 	// -> buffer position
-	float p0 = view_pos_rel;
+	double p0 = view_pos_rel;
 	for (int i=0;i<width+di;i+=di){
 
-		float p = p0 + dpos * (float)i;
+		double p = p0 + dpos * (double)i;
 		int ip = (int)(p - offset)/f;
-		//printf("%f  %f\n", p1, p2);
 		if ((ip >= 0) && (ip < buf.num))
 		if (((int)(p) < offset + buf.num*f) && (p >= offset)){
 			tx[nl] = (float)x+i;
 			float dy = ((float)((unsigned char)buf[ip])/255.0f) * hf;
 			ty[nl]  = y0 + dy;
 			//ty2[nl] = y0 - dy;
-//			msg_write(ip);
-//			msg_write(f2s(buf[ip], 5));
 			nl ++;
 		}
-		//p += dpos;
 	}
 	for (int i=0;i<nl;i++){
 		tx[nl + i] = tx[nl - i - 1];
@@ -606,17 +598,17 @@ inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view
 	//c->DrawLines(tx, ty2, nl -1);
 }
 
-void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int view_pos_rel, float zoom, const color &col)
+void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int view_pos_rel, const color &col)
 {
 	msg_db_r("DrawBuffer", 1);
 	int l_best = 0;
-	float f = 1.0f;
+	double f = 1.0;
 
 	// which level of detail?
-	if (zoom < 0.8f)
+	if (view_zoom < 0.8f)
 		for (int i=24-1;i>=0;i--){
-			float _f = (float)pow(2, (float)i);
-			if (_f > 1.0f / zoom){
+			double _f = pow(2, (double)i);
+			if (_f > 1.0 / view_zoom){
 				l_best = i;
 				f = _f;
 			}
@@ -643,13 +635,13 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int vi
 		foreach(BufferBox &b, lev.buffer){
 			int l = min(l_best - 1, b.peak.num / 2);
 			if (l >= 1){//f < MIN_MAX_FACTOR){
-				draw_peak_buffer(c, r.width(), di, view_pos_rel, zoom, f, hf, r.x1, y0r, b.peak[l*2-2], b.offset);
+				draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, f, hf, r.x1, y0r, b.peak[l*2-2], b.offset);
 				if (!show_mono)
-					draw_peak_buffer(c, r.width(), di, view_pos_rel, zoom, f, hf, r.x1, y0l, b.peak[l*2-1], b.offset);
+					draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, f, hf, r.x1, y0l, b.peak[l*2-1], b.offset);
 			}else{
-				draw_line_buffer(c, r.width(), di, view_pos_rel, zoom, 1, hf, r.x1, y0r, b.r, b.offset);
+				draw_line_buffer(c, r.width(), di, view_pos_rel, view_zoom, 1, hf, r.x1, y0r, b.r, b.offset);
 				if (!show_mono)
-					draw_line_buffer(c, r.width(), di, view_pos_rel, zoom, 1, hf, r.x1, y0l, b.l, b.offset);
+					draw_line_buffer(c, r.width(), di, view_pos_rel, view_zoom, 1, hf, r.x1, y0l, b.l, b.offset);
 			}
 		}
 	}
@@ -697,7 +689,7 @@ void AudioView::DrawSub(HuiDrawingContext *c, const rect &r, Track *s)
 		DrawSubFrame(c, r, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	DrawBuffer(	c, r, s, int(view_pos - s->pos), view_zoom, col);
+	DrawBuffer(	c, r, s, int(view_pos - s->pos), col);
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
@@ -747,7 +739,7 @@ void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color c
 {
 	msg_db_r("DrawTrack", 1);
 
-	DrawBuffer(	c, r, t,int(view_pos),view_zoom,col);
+	DrawBuffer(c, r, t, int(view_pos), col);
 
 	DrawBars(c, r, t, col, track_no, t->bar);
 
@@ -777,15 +769,15 @@ void AudioView::DrawGrid(HuiDrawingContext *c, const rect &r, const color &bg, b
 
 void AudioView::DrawGridTime(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time)
 {
-	float dl = MIN_GRID_DIST / view_zoom; // >= 10 pixel
-	float dt = dl / audio->sample_rate;
-	float exp_s = ceil(log10(dt));
-	float exp_s_mod = exp_s - log10(dt);
+	double dl = MIN_GRID_DIST / view_zoom; // >= 10 pixel
+	double dt = dl / audio->sample_rate;
+	double exp_s = ceil(log10(dt));
+	double exp_s_mod = exp_s - log10(dt);
 	dt = pow(10, exp_s);
 	dl = dt * audio->sample_rate;
-//	float dw = dl * a->view_zoom;
-	int nx0 = floor((float)screen2sample(r.x1 - 1) / (float)dl);
-	int nx1 = ceil((float)screen2sample(r.x2) / (float)dl);
+//	double dw = dl * a->view_zoom;
+	int nx0 = floor(screen2sample(r.x1 - 1) / dl);
+	int nx1 = ceil(screen2sample(r.x2) / dl);
 	color c1 = ColorInterpolate(bg, ColorGrid, exp_s_mod);
 	color c2 = ColorGrid;
 	for (int n=nx0;n<nx1;n++){
@@ -1029,8 +1021,8 @@ void AudioView::OptimizeView()
 	int length = r.length();
 	if (length == 0)
 		length = 10 * audio->sample_rate;
-	view_zoom = audio->area.width() / (float)length;
-	view_pos = (float)r.start();
+	view_zoom = audio->area.width() / (double)length;
+	view_pos = (double)r.start();
 	ForceRedraw();
 	msg_db_l(1);
 }
@@ -1154,26 +1146,23 @@ void AudioView::SetCurTrack(Track *t)
 
 
 
-int AudioView::screen2sample(int _x)
+double AudioView::screen2sample(double _x)
 {
-	return (int)( (_x - audio->area.x1) / view_zoom + view_pos );
+	return (_x - audio->area.x1) / view_zoom + view_pos;
 }
 
-int AudioView::sample2screen(int s)
+double AudioView::sample2screen(double s)
 {
-	return (int)( audio->area.x1 + (s - view_pos) * view_zoom );
+	return audio->area.x1 + (s - view_pos) * view_zoom;
 }
 
 void AudioView::Zoom(float f)
 {
-	// max zoom: 8 pixel per sample
-	// min zoom: whole file on 100 pixel
-	int length = audio->GetRange().length();
-	if (length == 0)
-		length = 10 * audio->sample_rate;
-	f = clampf(f, 100.0 / (length * view_zoom), 8.0f / view_zoom);
-	view_zoom *= f;
-	view_pos += float(mx - audio->area.x1) / (view_zoom / (f - 1));
+	// max zoom: 20 pixel per sample
+	double zoom_new = clampf(view_zoom * f, 0.000001, 20.0);
+
+	view_pos += (mx - audio->area.x1) * (1.0/view_zoom - 1.0/zoom_new);
+	view_zoom = zoom_new;
 	ForceRedraw();
 }
 

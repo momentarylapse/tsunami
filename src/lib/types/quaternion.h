@@ -2,6 +2,9 @@
 #ifndef _TYPES_QUATERNION_INCLUDED_
 #define _TYPES_QUATERNION_INCLUDED_
 
+class vector;
+class matrix;
+
 struct quaternion
 {
 public:

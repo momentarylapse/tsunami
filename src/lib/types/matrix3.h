@@ -2,6 +2,8 @@
 #ifndef _TYPES_MATRIX3_INCLUDED_
 #define _TYPES_MATRIX3_INCLUDED_
 
+class vector;
+
 struct matrix3
 {
 public:

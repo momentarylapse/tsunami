@@ -2,6 +2,9 @@
 #ifndef _TYPES_PLANE_INCLUDED_
 #define _TYPES_PLANE_INCLUDED_
 
+class vector;
+class matrix;
+
 struct plane
 {
 	vector n;

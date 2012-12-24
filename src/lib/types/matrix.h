@@ -5,6 +5,8 @@
 //#define _element(row,col)	e[row+col*4]
 
 class matrix;
+class vector;
+class quaternion;
 matrix MatrixMultiply2(const matrix &m2, const matrix &m1);
 
 

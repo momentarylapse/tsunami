@@ -17,7 +17,7 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 {
 	track = NULL;
 	win->SetTarget("track_dialog_table", 0);
-	win->SetBorderWidth(8);
+	win->SetBorderWidth(5);
 	win->EmbedDialog("track_time_dialog", 0, 0);
 	win->SetDecimals(1);
 	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);

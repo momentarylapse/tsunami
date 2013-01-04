@@ -20,7 +20,7 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *win, AudioFile *a):
 
 	// dialog
 	win->SetTarget("audio_dialog_table", 0);
-	win->SetBorderWidth(8);
+	win->SetBorderWidth(5);
 	win->EmbedDialog("audio_file_dialog", 0, 0);
 	win->SetDecimals(1);
 	//volume_slider = new Slider(win, "audio_volume_slider", "audio_volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);

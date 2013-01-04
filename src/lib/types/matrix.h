@@ -29,8 +29,14 @@ public:
 	matrix(){};
 	matrix(const float f[16]){
 		for (int i=0;i<16;i++)
-			this->e[i]=f[i];
+			e[i]=f[i];
 	};
+	matrix(const vector &a, const vector &b, const vector &c){
+		_00 = a.x;	_01 = b.x;	_02 = c.x;	_03 = 0;
+		_10 = a.y;	_11 = b.y;	_12 = c.y;	_13 = 0;
+		_20 = a.z;	_21 = b.z;	_22 = c.z;	_23 = 0;
+		_30 = 0;	_31 = 0;	_32 = 0;	_33 = 1;
+	}
 	matrix operator + (const matrix &m) const
 	{
 		matrix r;
@@ -74,6 +80,8 @@ public:
 						v.x*_10 + v.y*_11 + v.z*_12,
 						v.x*_20 + v.y*_21 + v.z*_22);
 	}
+	vector project(const vector &v) const
+	{	return (*this * v) / (v.x*_30 + v.y*_31 + v.z*_32 + _33);	}
 	string str() const
 	{	return format("(%f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);	}
 

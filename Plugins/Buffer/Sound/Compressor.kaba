@@ -155,7 +155,7 @@ void Configure()
 	win.AddEdit("", 1, 0, 0, 0, "edit")
 	win.Update()
 	PutFavoriteBarSizable(win, "table1", 0, 0)
-	PutCommandBarSizable(win, "table1", 3, 0)
+	PutCommandBarSizable(win, "table1", 0, 3)
 	
 	grid.SetXAxis(0, 1, false, "")
 	grid.SetYAxis(0, 1, false, "")

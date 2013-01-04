@@ -11,8 +11,10 @@
 #include "../lib/base/strings.h"
 #include "../Data/AudioFile.h"
 
-class CScript;
-class sType;
+namespace Script{
+class Script;
+class Type;
+};
 
 // represents a compiled script
 class Plugin
@@ -24,16 +26,16 @@ public:
 	Plugin(const string &_filename);
 
 	string filename;
-	CScript *s;
+	Script::Script *s;
 	void_func *f_reset;
 	void_func *f_data2dialog;
 	void_func *f_configure;
 	void_func *f_reset_state;
 	process_track_func *f_process_track;
 	int index;
-	sType *state_type;
+	Script::Type *state_type;
 	void *state;
-	sType *data_type;
+	Script::Type *data_type;
 	void *data;
 
 	bool usable;

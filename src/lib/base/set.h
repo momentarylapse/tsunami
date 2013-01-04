@@ -10,6 +10,9 @@ class Set : public Array<T>
 	public:
 		using DynamicArray::num;
 
+		Set() : Array<T>(){}
+		Set(const T &item) : Array<T>(item){}
+
 		int add(const T &item)
 		{
 			int i0 = 0;

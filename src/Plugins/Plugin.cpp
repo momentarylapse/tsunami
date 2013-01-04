@@ -32,7 +32,7 @@ Plugin::Plugin(const string &_filename)
 	f_process_track = NULL;
 
 	// load + compile
-	s = LoadScript(filename);
+	s = Script::Load(filename);
 
 	if (s){
 
@@ -47,13 +47,13 @@ Plugin::Plugin(const string &_filename)
 
 			type = f_process_track ? TYPE_EFFECT : TYPE_OTHER;
 
-			foreachi(sLocalVariable &v, s->pre_script->RootOfAllEvil.Var, i)
-				if (v.Type->Name == "PluginData"){
+			foreachi(Script::LocalVariable &v, s->pre_script->RootOfAllEvil.var, i)
+				if (v.type->name == "PluginData"){
 					data = s->g_var[i];
-					data_type = v.Type;
-				}else if (v.Type->Name == "PluginState"){
+					data_type = v.type;
+				}else if (v.type->name == "PluginState"){
 					state = s->g_var[i];
-					state_type = v.Type;
+					state_type = v.type;
 				}
 		}
 	}
@@ -66,48 +66,48 @@ string Plugin::GetError()
 	return format(_("Fehler in  Script-Datei: \"%s\""), filename.c_str());
 }
 
-void try_write_primitive_element(string &var_temp, sType *t, char *v)
+void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)
 {
-	if (t == TypeInt)
+	if (t == Script::TypeInt)
 		var_temp += i2s(*(int*)v);
-	else if (t == TypeChar)
+	else if (t == Script::TypeChar)
 		var_temp += i2s(*(char*)v);
-	else if (t == TypeFloat)
+	else if (t == Script::TypeFloat)
 		var_temp += f2s(*(float*)v, 6);
-	else if (t == TypeBool)
+	else if (t == Script::TypeBool)
 		var_temp += (*(bool*)v) ? "true" : "false";
-	else if (t == TypeVector)
+	else if (t == Script::TypeVector)
 		var_temp += format("(%f %f %f)", *(float*)v, ((float*)v)[1], ((float*)v)[2]);
-	else if (t == TypeComplex)
+	else if (t == Script::TypeComplex)
 		var_temp += format("(%f %f)", *(float*)v, ((float*)v)[1]);
 	else
 		var_temp += "-------";
 }
 
-void try_write_element(EffectParam *p, sClassElement *e, char *v)
+void try_write_element(EffectParam *p, Script::ClassElement *e, char *v)
 {
-	p->name = e->Name;
-	p->type = e->Type->Name;
+	p->name = e->name;
+	p->type = e->type->name;
 	p->value = "";
-	if (e->Type->IsArray){
+	if (e->type->is_array){
 		p->value += "[";
-		for (int i=0;i<e->Type->ArrayLength;i++){
+		for (int i=0;i<e->type->array_length;i++){
 			if (i > 0)
 				p->value += " ";
-			try_write_primitive_element(p->value, e->Type->SubType, &v[e->Offset + i * e->Type->SubType->Size]);
+			try_write_primitive_element(p->value, e->type->parent, &v[e->offset + i * e->type->parent->size]);
 		}
 		p->value += "]";
-	}else if (e->Type->IsSuperArray){
-		DynamicArray *a = (DynamicArray*)&v[e->Offset];
+	}else if (e->type->is_super_array){
+		DynamicArray *a = (DynamicArray*)&v[e->offset];
 		p->value += format("[%d ", a->num);
 		for (int i=0;i<a->num;i++){
 			if (i > 0)
 				p->value += " ";
-			try_write_primitive_element(p->value, e->Type->SubType, &(((char*)a->data)[i * e->Type->SubType->Size]));
+			try_write_primitive_element(p->value, e->type->parent, &(((char*)a->data)[i * e->type->parent->size]));
 		}
 		p->value += "]";
 	}else
-		try_write_primitive_element(p->value, e->Type, &v[e->Offset]);
+		try_write_primitive_element(p->value, e->type, &v[e->offset]);
 }
 
 string get_next(const string &var_temp, int &pos)
@@ -129,39 +129,39 @@ string get_next(const string &var_temp, int &pos)
 	return var_temp.substr(start, -1);
 }
 
-void try_read_primitive_element(const string &var_temp, int &pos, sType *t, char *v)
+void try_read_primitive_element(const string &var_temp, int &pos, Script::Type *t, char *v)
 {
-	if (t == TypeInt)
+	if (t == Script::TypeInt)
 		*(int*)v = s2i(get_next(var_temp, pos));
-	else if (t == TypeChar)
+	else if (t == Script::TypeChar)
 		*(char*)v = s2i(get_next(var_temp, pos));
-	else if (t == TypeFloat)
+	else if (t == Script::TypeFloat)
 		*(float*)v = s2f(get_next(var_temp, pos));
-	else if (t == TypeComplex){
+	else if (t == Script::TypeComplex){
 		((complex*)v)->x = s2f(get_next(var_temp, pos));
 		((complex*)v)->y = s2f(get_next(var_temp, pos));
-	}else if (t == TypeVector){
+	}else if (t == Script::TypeVector){
 		((vector*)v)->x = s2f(get_next(var_temp, pos));
 		((vector*)v)->y = s2f(get_next(var_temp, pos));
 		((vector*)v)->z = s2f(get_next(var_temp, pos));
-	}else if (t == TypeBool)
+	}else if (t == Script::TypeBool)
 		*(bool*)v = (get_next(var_temp, pos) == "true");
 }
 
-void try_read_element(EffectParam &p, sClassElement *e, char *v)
+void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
 {
 	int pos = 0;
-	if (e->Type->IsArray){
-		for (int i=0;i<e->Type->ArrayLength;i++)
-			try_read_primitive_element(p.value, pos, e->Type->SubType, &v[e->Offset + i * e->Type->SubType->Size]);
-	}else if (e->Type->IsSuperArray){
-		DynamicArray *a = (DynamicArray*)&v[e->Offset];
+	if (e->type->is_array){
+		for (int i=0;i<e->type->array_length;i++)
+			try_read_primitive_element(p.value, pos, e->type->parent, &v[e->offset + i * e->type->parent->size]);
+	}else if (e->type->is_super_array){
+		DynamicArray *a = (DynamicArray*)&v[e->offset];
 		int num = s2i(get_next(p.value, pos));
 		a->resize(num);
 		for (int i=0;i<num;i++)
-			try_read_primitive_element(p.value, pos, e->Type->SubType, &(((char*)a->data)[i * e->Type->SubType->Size]));
+			try_read_primitive_element(p.value, pos, e->type->parent, &(((char*)a->data)[i * e->type->parent->size]));
 	}else
-		try_read_primitive_element(p.value, pos, e->Type, &v[e->Offset]);
+		try_read_primitive_element(p.value, pos, e->type, &v[e->offset]);
 }
 
 void Plugin::ExportData(Array<EffectParam> &param)
@@ -169,8 +169,8 @@ void Plugin::ExportData(Array<EffectParam> &param)
 	msg_db_r("Plugin.ExportData", 1);
 	param.clear();
 	if (data){
-		param.resize(data_type->Element.num);
-		foreachi(sClassElement &e, data_type->Element, j)
+		param.resize(data_type->element.num);
+		foreachi(Script::ClassElement &e, data_type->element, j)
 			try_write_element(&param[j], &e, (char*)data);
 	}
 	msg_db_l(1);
@@ -180,9 +180,9 @@ void Plugin::ImportData(Array<EffectParam> &param)
 {
 	msg_db_r("Plugin.ImportData", 1);
 	if (data){
-		foreach(sClassElement &e, data_type->Element)
+		foreach(Script::ClassElement &e, data_type->element)
 			foreach(EffectParam &p, param)
-				if ((e.Name == p.name) && (e.Type->Name == p.type))
+				if ((e.name == p.name) && (e.type->name == p.type))
 					try_read_element(p, &e, (char*)data);
 	}
 	msg_db_l(1);

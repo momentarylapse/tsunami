@@ -3,8 +3,10 @@
 #include "../00_config.h"
 #include "script_data_common.h"
 
-extern sType *TypeStringList;
-extern sType *TypeBoolList;
+namespace Script{
+
+extern Type *TypeStringList;
+extern Type *TypeBoolList;
 
 static Date *_date;
 #define	GetDADate(x)			long(&_date->x)-long(_date)
@@ -35,15 +37,15 @@ void SIAddPackageFile()
 
 	set_cur_package("file");
 
-	sType*
+	Type*
 	TypeFile			= add_type  ("File",		0);
-	sType*
+	Type*
 	TypeFileP			= add_type_p("file",		TypeFile);
-	sType*
+	Type*
 	TypeDate			= add_type  ("Date",		sizeof(Date));
-	sType*
+	Type*
 	TypeDirEntry		= add_type  ("DirEntry",	sizeof(DirEntry));
-	sType*
+	Type*
 	TypeDirEntryList	= add_type_a("DirEntry[]",	TypeDirEntry, -1);
 
 
@@ -137,3 +139,5 @@ void SIAddPackageFile()
 
 	msg_db_l(3);
 }
+
+};

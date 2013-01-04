@@ -8,13 +8,16 @@
 	#include "../sound/sound.h"
 #endif
 
+
+namespace Script{
+
 #ifdef _X_USE_SOUND_
 	#define sound_p(p)		(void*)p
 #else
 	#define sound_p(p)		NULL
 #endif
 
-extern sType *TypeFloatList;
+extern Type *TypeFloatList;
 
 void SIAddPackageSound()
 {
@@ -75,3 +78,5 @@ void SIAddPackageSound()
 	add_ext_var("VolumeMusic",		TypeFloat,		sound_p(&VolumeMusic));
 	add_ext_var("VolumeSounds",		TypeFloat,		sound_p(&VolumeSound));
 }
+
+};

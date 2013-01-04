@@ -7,6 +7,8 @@
 	#include "../nix/nix.h"
 #endif
 
+namespace Script{
+
 
 #ifdef _X_USE_NIX_
 	#define nix_p(p)		(void*)p
@@ -16,12 +18,12 @@
 
 
 
-extern sType *TypeMatrix;
-extern sType *TypeImage;
-extern sType *TypeFloatArrayP;
-extern sType *TypeVectorArray;
-extern sType *TypeVectorArrayP;
-extern sType *TypeHuiWindowP; // -> script_data_hui.cpp
+extern Type *TypeMatrix;
+extern Type *TypeImage;
+extern Type *TypeFloatArrayP;
+extern Type *TypeVectorArray;
+extern Type *TypeVectorArrayP;
+extern Type *TypeHuiWindowP; // -> script_data_hui.cpp
 
 void SIAddPackageNix()
 {
@@ -303,3 +305,5 @@ void SIAddPackageNix()
 
 	msg_db_l(3);
 }
+
+};

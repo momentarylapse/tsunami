@@ -7,6 +7,8 @@
 	#include "../threads/threads.h"
 #endif
 
+namespace Script{
+
 
 #ifdef _X_USE_THREADS_
 	#define thread_p(p)		(void*)p
@@ -56,3 +58,5 @@ void SIAddPackageThread()
 
 	msg_db_l(3);
 }
+
+};

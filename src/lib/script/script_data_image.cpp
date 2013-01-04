@@ -7,7 +7,9 @@
 	#include "../image/image.h"
 #endif
 
-extern sType *TypeImage;
+namespace Script{
+
+extern Type *TypeImage;
 
 #ifdef _X_USE_IMAGE_
 	static Image *_image;
@@ -23,7 +25,7 @@ extern sType *TypeImage;
 	#define image_p(p)		NULL
 #endif
 
-extern sType *TypeIntList;
+extern Type *TypeIntList;
 
 void SIAddPackageImage()
 {
@@ -63,3 +65,5 @@ void SIAddPackageImage()
 		class_add_func("__assign__",			TypeVoid,	image_p(mf((tmf)&Image::operator=)));
 			func_add_param("other",		TypeImage);
 }
+
+};

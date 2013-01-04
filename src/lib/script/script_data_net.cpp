@@ -12,6 +12,8 @@
 	#include "../networking.h"
 #endif
 
+namespace Script{
+
 #ifdef _X_USE_NET_
 	#define net_p(p)		(void*)p
 #else
@@ -23,7 +25,7 @@
 	#define x_p(p)		NULL
 #endif
 
-extern sType *TypeIntPs;
+extern Type *TypeIntPs;
 
 void SIAddPackageNet()
 {
@@ -93,3 +95,5 @@ void SIAddPackageNet()
 	
 	msg_db_l(3);
 }
+
+};

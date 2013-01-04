@@ -21,18 +21,20 @@
 	#include "../x/x.h"
 #endif
 
-string ScriptVersion = "0.10.2.1";
+namespace Script{
+
+string Version = "0.10.3.0";
 
 //#define ScriptDebug
 
 int GlobalWaitingMode;
 float GlobalTimeToWait;
 
-bool ScriptCompileSilently = false;
-bool ScriptShowCompilerStats = true;
+bool CompileSilently = false;
+bool ShowCompilerStats = true;
 
-static Array<CScript*> cur_script_stack;
-inline void push_cur_script(CScript *s)
+static Array<Script*> cur_script_stack;
+inline void push_cur_script(Script *s)
 {
 	cur_script_stack.add(s);
 	cur_script = s;
@@ -89,20 +91,20 @@ void script_db_left()
 
 
 
-Array<CScript*> PublicScript;
-Array<CScript*> PrivateScript;
-Array<CScript*> DeadScript;
+Array<Script*> PublicScript;
+Array<Script*> PrivateScript;
+Array<Script*> DeadScript;
 
 
-string ScriptDirectory = "";
+string Directory = "";
 
 
 
 
-CScript *LoadScript(const string &filename, bool is_public, bool just_analyse)
+Script *Load(const string &filename, bool is_public, bool just_analyse)
 {
 	//msg_write(string("Lade ",filename));
-	CScript *s = NULL;
+	Script *s = NULL;
 
 	// public und private aus dem Speicher versuchen zu laden
 	if (is_public){
@@ -120,8 +122,8 @@ CScript *LoadScript(const string &filename, bool is_public, bool just_analyse)
 			s=PublicScript[ae].script;
 			//so("...pointer");
 		}else{
-			s=new CScript();
-			memcpy(s,PublicScript[ae].script,sizeof(CScript));
+			s=new Script();
+			memcpy(s,PublicScript[ae].script,sizeof(Script));
 			s->WaitingMode=WaitingModeNone;
 			s->isCopy=true;
 			s->OpcodeSize=0;
@@ -136,7 +138,7 @@ CScript *LoadScript(const string &filename, bool is_public, bool just_analyse)
 #endif
 
 	
-	s = new CScript(filename, just_analyse);
+	s = new Script(filename, just_analyse);
 	s->isPrivate = !is_public;
 
 	// store script in database
@@ -152,7 +154,7 @@ CScript *LoadScript(const string &filename, bool is_public, bool just_analyse)
 }
 
 #if 0
-CScript *LoadScriptAsInclude(char *filename, bool just_analyse)
+Script *LoadAsInclude(char *filename, bool just_analyse)
 {
 	msg_db_r("LoadAsInclude",4);
 	//so(string("Include ",filename));
@@ -165,7 +167,7 @@ CScript *LoadScriptAsInclude(char *filename, bool just_analyse)
 		}
 
 	//so("nnneu");
-	CScript *s = new CScript(filename, just_analyse);
+	Script *s = new Script(filename, just_analyse);
 	so("geladen....");
 	//msg_write("...neu");
 	s->isPrivate = false;
@@ -189,12 +191,12 @@ void ExecuteAllScripts()
 		PublicScript[i]->Execute();
 }
 
-void RemoveScript(CScript *s)
+void Remove(Script *s)
 {
 	msg_db_r("RemoveScript", 1);
 	// remove references
-	for (int i=0;i<s->pre_script->Include.num;i++)
-		s->pre_script->Include[i]->ReferenceCounter --;
+	for (int i=0;i<s->pre_script->Includes.num;i++)
+		s->pre_script->Includes[i]->ReferenceCounter --;
 
 	// put on to-delete-list
 	DeadScript.add(s);
@@ -224,16 +226,16 @@ void DeleteAllScripts(bool even_immortal, bool force)
 	msg_db_r("DeleteAllScripts", 1);
 
 	// try to erase them...
-	foreachb(CScript *s, PublicScript)
+	foreachb(Script *s, PublicScript)
 		if ((!s->pre_script->FlagImmortal) || (even_immortal))
-			RemoveScript(s);
-	foreachb(CScript *s, PrivateScript)
+			Remove(s);
+	foreachb(Script *s, PrivateScript)
 		if ((!s->pre_script->FlagImmortal) || (even_immortal))
-			RemoveScript(s);
+			Remove(s);
 
 	// undead... really KILL!
 	if (force){
-		foreachb(CScript *s, DeadScript)
+		foreachb(Script *s, DeadScript)
 			delete(s);
 		DeadScript.clear();
 	}
@@ -249,7 +251,7 @@ void DeleteAllScripts(bool even_immortal, bool force)
 	msg_db_l(1);
 }
 
-void reset_script(CScript *s)
+void reset_script(Script *s)
 {
 	s->ReferenceCounter = 0;
 	s->Error = false;
@@ -263,7 +265,7 @@ void reset_script(CScript *s)
 	s->cur_func = NULL;
 	s->WaitingMode = 0;
 	s->TimeToWait = 0;
-	s->ShowCompilerStats = (!ScriptCompileSilently) && ScriptShowCompilerStats;
+	s->ShowCompilerStats = (!CompileSilently) && ShowCompilerStats;
 	
 	s->pre_script = NULL;
 
@@ -281,7 +283,7 @@ void reset_script(CScript *s)
 	//cnst.clear();
 }
 
-CScript::CScript(const string &filename, bool just_analyse)
+Script::Script(const string &filename, bool just_analyse)
 {
 	msg_db_r("loading script", 1);
 	reset_script(this);
@@ -289,9 +291,9 @@ CScript::CScript(const string &filename, bool just_analyse)
 	JustAnalyse = just_analyse;
 
 	WaitingMode = WaitingModeFirst;
-	ShowCompilerStats = (!ScriptCompileSilently) && ScriptShowCompilerStats;
+	ShowCompilerStats = (!CompileSilently) && ShowCompilerStats;
 
-	pre_script = new CPreScript(this);
+	pre_script = new PreScript(this);
 	pre_script->LoadAndParseFile(filename, just_analyse);
 	ParserError = Error = pre_script->Error;
 	LinkerError = pre_script->IncludeLinkerError;
@@ -318,7 +320,7 @@ CScript::CScript(const string &filename, bool just_analyse)
 	msg_db_l(1);
 }
 
-void CScript::DoError(const string &str, int overwrite_line)
+void Script::DoError(const string &str, int overwrite_line)
 {
 	pre_script->DoError(str, overwrite_line);
 	Error = true;
@@ -329,7 +331,7 @@ void CScript::DoError(const string &str, int overwrite_line)
 	ErrorMsg = pre_script->ErrorMsg;
 }
 
-void CScript::DoErrorInternal(const string &str)
+void Script::DoErrorInternal(const string &str)
 {
 	if (Error)
 		return;
@@ -339,7 +341,7 @@ void CScript::DoErrorInternal(const string &str)
 	
 	ErrorMsg = "internal compiler error (Call Michi!): " + str;
 	if (cur_func)
-		ErrorMsg += " (in function '" + cur_func->Name  + "')";
+		ErrorMsg += " (in function '" + cur_func->name  + "')";
 	ErrorMsgExt[0] = ErrorMsg;
 	ErrorMsgExt[1] = "";
 	ErrorLine = 0;
@@ -350,22 +352,22 @@ void CScript::DoErrorInternal(const string &str)
 	msg_write("\n\n\n");
 }
 
-void CScript::DoErrorLink(const string &str)
+void Script::DoErrorLink(const string &str)
 {
 	DoError(str);
 	LinkerError = true;
 }
 
-void CScript::SetVariable(const string &name, void *data)
+void Script::SetVariable(const string &name, void *data)
 {
 	msg_db_r("SetVariable", 4);
 	//msg_write(name);
-	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++)
-		if (pre_script->RootOfAllEvil.Var[i].Name == name){
+	for (int i=0;i<pre_script->RootOfAllEvil.var.num;i++)
+		if (pre_script->RootOfAllEvil.var[i].name == name){
 			/*msg_write("var");
 			msg_write(pre_script->RootOfAllEvil.Var[i].Type->Size);
 			msg_write((int)g_var[i]);*/
-			memcpy(g_var[i], data, pre_script->RootOfAllEvil.Var[i].Type->Size);
+			memcpy(g_var[i], data, pre_script->RootOfAllEvil.var[i].type->size);
 			msg_db_l(4);
 			return;
 		}
@@ -375,7 +377,7 @@ void CScript::SetVariable(const string &name, void *data)
 
 int LocalOffset,LocalOffsetMax;
 
-/*int get_func_temp_size(sFunction *f)
+/*int get_func_temp_size(Function *f)
 {
 }*/
 
@@ -654,37 +656,37 @@ void OCAddEspAdd(char *oc,int &ocs,int d)
 	}
 }
 
-void init_sub_super_array(CPreScript *ps, sFunction *f, sType *t, char* g_var, int offset)
+void init_sub_super_array(PreScript *ps, Function *f, Type *t, char* g_var, int offset)
 {
 	// direct
-	if (t->IsSuperArray){
+	if (t->is_super_array){
 		if (g_var)
-			((DynamicArray*)(g_var + offset))->init(t->SubType->Size);
+			((DynamicArray*)(g_var + offset))->init(t->parent->size);
 		if (f){}
 	}
 
 	// indirect
-	if (t->IsArray)
-		for (int i=0;i<t->ArrayLength;i++)
-			init_sub_super_array(ps, f, t->SubType, g_var, offset + i * t->SubType->Size);
-	for (int i=0;i<t->Element.num;i++)
-		init_sub_super_array(ps, f, t->Element[i].Type, g_var, offset + t->Element[i].Offset);
+	if (t->is_array)
+		for (int i=0;i<t->array_length;i++)
+			init_sub_super_array(ps, f, t->parent, g_var, offset + i * t->parent->size);
+	for (int i=0;i<t->element.num;i++)
+		init_sub_super_array(ps, f, t->element[i].type, g_var, offset + t->element[i].offset);
 }
 
-void find_all_super_arrays(CPreScript *ps, sFunction *f, Array<char*> &g_var)
+void find_all_super_arrays(PreScript *ps, Function *f, Array<char*> &g_var)
 {
-	for (int i=0;i<f->Var.num;i++)
-		init_sub_super_array(ps, f, f->Var[i].Type, g_var[i], 0);
+	for (int i=0;i<f->var.num;i++)
+		init_sub_super_array(ps, f, f->var[i].type, g_var[i], 0);
 }
 
-void CScript::AllocateMemory()
+void Script::AllocateMemory()
 {
 	// get memory size needed
 	MemorySize = 0;
-	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++)
-		MemorySize += mem_align(pre_script->RootOfAllEvil.Var[i].Type->Size);
-	foreachi(sConstant &c, pre_script->Constant, i){
-		int s = c.type->Size;
+	for (int i=0;i<pre_script->RootOfAllEvil.var.num;i++)
+		MemorySize += mem_align(pre_script->RootOfAllEvil.var[i].type->size);
+	foreachi(Constant &c, pre_script->Constants, i){
+		int s = c.type->size;
 		if (c.type == TypeString){
 			// const string -> variable length   (+ super array frame)
 			s = strlen(c.data) + 1 + 16;
@@ -695,21 +697,21 @@ void CScript::AllocateMemory()
 		Memory = new char[MemorySize];
 }
 
-void CScript::AllocateStack()
+void Script::AllocateStack()
 {
 	// use your own stack if needed
 	//   wait() used -> needs to switch stacks ("tasks")
 	Stack = NULL;
-	foreach(sCommand *cmd, pre_script->Command){
-		if (cmd->Kind == KindCompilerFunction)
-			if ((cmd->LinkNr == CommandWait) || (cmd->LinkNr == CommandWaitRT) || (cmd->LinkNr == CommandWaitOneFrame)){
-				Stack = new char[ScriptStackSize];
+	foreach(Command *cmd, pre_script->Commands){
+		if (cmd->kind == KindCompilerFunction)
+			if ((cmd->link_nr == CommandWait) || (cmd->link_nr == CommandWaitRT) || (cmd->link_nr == CommandWaitOneFrame)){
+				Stack = new char[StackSize];
 				break;
 			}
 	}
 }
 
-void CScript::AllocateOpcode()
+void Script::AllocateOpcode()
 {
 	// allocate some memory for the opcode......    has to be executable!!!   (important on amd64)
 #ifdef OS_WINDOWS
@@ -725,17 +727,17 @@ void CScript::AllocateOpcode()
 	ThreadOpcodeSize=0;
 }
 
-void CScript::MapConstantsToMemory()
+void Script::MapConstantsToMemory()
 {
 	// constants -> Memory
 	so("Konstanten");
-	cnst.resize(pre_script->Constant.num);
-	foreachi(sConstant &c, pre_script->Constant, i){
+	cnst.resize(pre_script->Constants.num);
+	foreachi(Constant &c, pre_script->Constants, i){
 		cnst[i] = &Memory[MemorySize];
-		int s = c.type->Size;
+		int s = c.type->size;
 		if (c.type == TypeString){
-			// const string -> variable Laenge
-			s = strlen(pre_script->Constant[i].data) + 1;
+			// const string -> variable length
+			s = strlen(pre_script->Constants[i].data) + 1;
 
 			*(void**)&Memory[MemorySize] = &Memory[MemorySize + 16]; // .data
 			*(int*)&Memory[MemorySize + 4] = s - 1; // .num
@@ -748,18 +750,18 @@ void CScript::MapConstantsToMemory()
 	}
 }
 
-void CScript::MapGlobalVariablesToMemory()
+void Script::MapGlobalVariablesToMemory()
 {
 	// global variables -> into Memory
 	so("glob.Var.");
-	g_var.resize(pre_script->RootOfAllEvil.Var.num);
-	for (int i=0;i<pre_script->RootOfAllEvil.Var.num;i++){
+	g_var.resize(pre_script->RootOfAllEvil.var.num);
+	for (int i=0;i<pre_script->RootOfAllEvil.var.num;i++){
 		if (pre_script->FlagOverwriteVariablesOffset)
 			g_var[i] = (char*)(long)(MemorySize + pre_script->VariablesOffset);
 		else
 			g_var[i] = &Memory[MemorySize];
-		so(format("%d: %s", MemorySize, pre_script->RootOfAllEvil.Var[i].Name.c_str()));
-		MemorySize += mem_align(pre_script->RootOfAllEvil.Var[i].Type->Size);
+		so(format("%d: %s", MemorySize, pre_script->RootOfAllEvil.var[i].name.c_str()));
+		MemorySize += mem_align(pre_script->RootOfAllEvil.var[i].type->size);
 	}
 	memset(Memory, 0, MemorySize); // reset all global variables to 0
 	// initialize global super arrays
@@ -767,11 +769,11 @@ void CScript::MapGlobalVariablesToMemory()
 }
 
 static int OCORA;
-void CScript::CompileOsEntryPoint()
+void Script::CompileOsEntryPoint()
 {
 	int nf=-1;
-	foreachi(sFunction *ff, pre_script->Function, index)
-		if (ff->Name == "main")
+	foreachi(Function *ff, pre_script->Functions, index)
+		if (ff->name == "main")
 			nf = index;
 	// call
 	if (nf>=0)
@@ -780,13 +782,13 @@ void CScript::CompileOsEntryPoint()
 	OCORA=OCOParam;
 
 	// put strings into Opcode!
-	foreachi(sConstant &c, pre_script->Constant, i){
+	foreachi(Constant &c, pre_script->Constants, i){
 		if ((pre_script->FlagCompileOS) || (c.type == TypeString)){
 			int offset = 0;
 			if (pre_script->AsmMetaInfo)
 				offset = ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->CodeOrigin;
 			cnst[i] = (char*)(long)(OpcodeSize + offset);
-			int s = c.type->Size;
+			int s = c.type->size;
 			if (c.type == TypeString)
 				s = strlen(c.data) + 1;
 			memcpy(&Opcode[OpcodeSize], (void*)c.data, s);
@@ -795,11 +797,11 @@ void CScript::CompileOsEntryPoint()
 	}
 }
 
-void CScript::LinkOsEntryPoint()
+void Script::LinkOsEntryPoint()
 {
 	int nf=-1;
-	foreachi(sFunction *ff, pre_script->Function, index)
-		if (ff->Name == "main")
+	foreachi(Function *ff, pre_script->Functions, index)
+		if (ff->name == "main")
 			nf = index;
 	if (nf>=0){
 		int lll=((long)func[nf]-(long)&Opcode[TaskReturnOffset]);
@@ -814,7 +816,7 @@ void CScript::LinkOsEntryPoint()
 	}
 }
 
-void CScript::CompileTaskEntryPoint()
+void Script::CompileTaskEntryPoint()
 {
 	// "stack" usage for waiting:
 	//  -4 - ebp (before execution)
@@ -828,7 +830,7 @@ void CScript::CompileTaskEntryPoint()
 	OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // within the actual program
 	OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
 	if (Stack){
-		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,(char*)&Stack[ScriptStackSize]); // zum Anfang des Script-Stacks
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,(char*)&Stack[StackSize]); // zum Anfang des Script-Stacks
 		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // adress of the old stack
 		OCAddEspAdd(ThreadOpcode,ThreadOpcodeSize,-12); // space for wait() task data
 		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
@@ -837,9 +839,9 @@ void CScript::CompileTaskEntryPoint()
 	}
 	// call
 	int nf = -1;
-	foreachi(sFunction *ff, pre_script->Function, index){
-		if (ff->Name == "main")
-			if (ff->NumParams == 0)
+	foreachi(Function *ff, pre_script->Functions, index){
+		if (ff->name == "main")
+			if (ff->num_params == 0)
 				nf = index;
 	}
 	if (nf >= 0){
@@ -862,8 +864,8 @@ void CScript::CompileTaskEntryPoint()
 	if (Stack){
 		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPushEbp,-1); // within the external program
 		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEbpEsp,-1);
-		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovMEbp,KindVarGlobal,&Stack[ScriptStackSize-4]); // save the external ebp
-		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,&Stack[ScriptStackSize-16]); // to the eIP of the script
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovMEbp,KindVarGlobal,&Stack[StackSize-4]); // save the external ebp
+		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inMovEspM,KindConstant,&Stack[StackSize-16]); // to the eIP of the script
 		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inPopEax,-1);
 		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inAddEaxM,KindConstant,(char*)AfterWaitOCSize);
 		OCAddInstruction(ThreadOpcode,ThreadOpcodeSize,inJmpEax,-1);
@@ -876,7 +878,7 @@ void CScript::CompileTaskEntryPoint()
 }
 
 // Opcode generieren
-void CScript::Compiler()
+void Script::Compiler()
 {
 	if (Error)	return;
 	msg_db_r("Compiler",2);
@@ -918,8 +920,8 @@ void CScript::Compiler()
 
 // compile functions into Opcode
 	so("Funktionen");
-	func.resize(pre_script->Function.num);
-	foreachi(sFunction *f, pre_script->Function, i){
+	func.resize(pre_script->Functions.num);
+	foreachi(Function *f, pre_script->Functions, i){
 		right();
 		func[i] = (t_func*)&Opcode[OpcodeSize];
 		CompileFunction(f, Opcode, OpcodeSize);
@@ -955,14 +957,14 @@ void CScript::Compiler()
 	msg_db_l(2);
 }
 
-CScript::CScript()
+Script::Script()
 {
 	so("creating empty script (for console)");
 	right();
 	reset_script(this);
 	WaitingMode = WaitingModeFirst;
 
-	pre_script = new CPreScript(this);
+	pre_script = new PreScript(this);
 	
 	pre_script->Filename = "-console script-";
 
@@ -970,7 +972,7 @@ CScript::CScript()
 	left();
 }
 
-CScript::~CScript()
+Script::~Script()
 {
 	msg_db_r("~CScript", 4);
 	if ((Memory) && (!JustAnalyse)){
@@ -1012,8 +1014,8 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	msg_write("script command: " + single_command);
 
 	// empty script
-	CScript *s = new CScript();
-	CPreScript *ps = s->pre_script;
+	Script *s = new Script();
+	PreScript *ps = s->pre_script;
 
 // find expressions
 	ps->Analyse(single_command.c_str(), false);
@@ -1027,14 +1029,14 @@ void ExecuteSingleScriptCommand(const string &cmd)
 // analyse syntax
 
 	// create a main() function
-	sFunction *f = ps->AddFunction("--command-func--", TypeVoid);
-	f->_VarSize = 0; // set to -1...
+	Function *f = ps->AddFunction("--command-func--", TypeVoid);
+	f->_var_size = 0; // set to -1...
 
 	// parse
 	ps->Exp.cur_line = &ps->Exp.line[0];
 	ps->Exp.cur_exp = 0;
 	ps->Exp._cur_ = ps->Exp.cur_line->exp[ps->Exp.cur_exp].name;
-	ps->GetCompleteCommand(f->Block, f);
+	ps->GetCompleteCommand(f->block, f);
 	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&f);
 	s->Error |= ps->Error;
 
@@ -1062,7 +1064,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	msg_db_l(2);
 }
 
-void *CScript::MatchFunction(const string &name, const string &return_type, int num_params, ...)
+void *Script::MatchFunction(const string &name, const string &return_type, int num_params, ...)
 {
 	msg_db_r("MatchFunction", 2);
 	
@@ -1075,13 +1077,13 @@ void *CScript::MatchFunction(const string &name, const string &return_type, int 
 	va_end(marker);
 
 	// match
-	foreachi(sFunction *f, pre_script->Function, i)
-		if ((f->Name == name) && (f->LiteralType->Name == return_type) && (num_params == f->NumParams)){
+	foreachi(Function *f, pre_script->Functions, i)
+		if ((f->name == name) && (f->literal_return_type->name == return_type) && (num_params == f->num_params)){
 
 			bool params_ok = true;
 			for (int j=0;j<num_params;j++)
-				//if ((*f)->Var[j].Type->Name != param_type[j])
-				if (f->LiteralParamType[j]->Name != param_type[j])
+				//if ((*f)->Var[j].Type->name != param_type[j])
+				if (f->literal_param_type[j]->name != param_type[j])
 					params_ok = false;
 			if (params_ok){
 				msg_db_l(2);
@@ -1096,12 +1098,12 @@ void *CScript::MatchFunction(const string &name, const string &return_type, int 
 	return NULL;
 }
 
-void CScript::ShowVars(bool include_consts)
+void Script::ShowVars(bool include_consts)
 {	
 /*	int ss=0;
 	int i;
 	string name;
-	sType *t;
+	Type *t;
 	int n=pre_script->RootOfAllEvil.Var.num;
 	if (include_consts)
 		n+=pre_script->Constant.num;
@@ -1134,7 +1136,7 @@ void CScript::ShowVars(bool include_consts)
 	}*/
 }
 
-void CScript::Execute()
+void Script::Execute()
 {
 	if (Error)	return;
 	if (WaitingMode==WaitingModeNone)	return;
@@ -1183,3 +1185,5 @@ void CScript::Execute()
 	msg_db_l(1);
 	msg_db_l(1);
 }
+
+};

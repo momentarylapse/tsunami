@@ -58,7 +58,7 @@ void CHuiWindow::_Init_(CHuiWindow *_root, bool _allow_root, int _mode)
 
 	used_by_nix = false;
 	is_resizable = ((_mode & HuiWinModeResizable) > 0);
-	border_width = 8;
+	border_width = 5;
 	allowed = true;
 	allow_keys = true;
 	parent = _root;

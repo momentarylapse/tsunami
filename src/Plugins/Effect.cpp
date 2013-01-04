@@ -49,7 +49,7 @@ void Effect::ExportState()
 	make_usable();
 	if (usable)
 		if (plugin->state)
-			memcpy(state, plugin->state, plugin->state_type->Size);
+			memcpy(state, plugin->state, plugin->state_type->size);
 	msg_db_l(1);
 }
 
@@ -59,7 +59,7 @@ void Effect::ImportState()
 	make_usable();
 	if (usable)
 		if (plugin->state)
-			memcpy(plugin->state, state, plugin->state_type->Size);
+			memcpy(plugin->state, state, plugin->state_type->size);
 	msg_db_l(1);
 }
 
@@ -70,7 +70,7 @@ void Effect::Prepare()
 	if (usable){
 		if (plugin->state){
 			ImportData();
-			state = new char[plugin->state_type->Size];
+			state = new char[plugin->state_type->size];
 			// TODO (init)
 			plugin->ResetState();
 			ExportState();

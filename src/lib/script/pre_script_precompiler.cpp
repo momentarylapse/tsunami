@@ -1,6 +1,8 @@
 #include "script.h"
 #include "../file/file.h"
 
+namespace Script{
+
 //#define ScriptDebug
 
 extern int s2i2(const string &str);
@@ -45,37 +47,37 @@ static void left()
 #endif
 }
 
-void SetImmortal(CPreScript *ps)
+void SetImmortal(PreScript *ps)
 {
 	ps->FlagImmortal = true;
-	for (int i=0;i<ps->Include.num;i++)
-		SetImmortal(ps->Include[i]->pre_script);
+	for (int i=0;i<ps->Includes.num;i++)
+		SetImmortal(ps->Includes[i]->pre_script);
 }
 
 // import data from an included script file
-void CPreScript::AddIncludeData(CScript *s)
+void PreScript::AddIncludeData(Script *s)
 {
 	msg_db_r("AddIncludeData",5);
-	Include.add(s);
-	CPreScript *ps = s->pre_script;
+	Includes.add(s);
+	PreScript *ps = s->pre_script;
 	s->ReferenceCounter ++;
 	if (FlagImmortal)
 		SetImmortal(ps);
 
 	// defines
-	for (int i=0;i<ps->Define.num;i++)
-		Define.add(ps->Define[i]);
+	for (int i=0;i<ps->Defines.num;i++)
+		Defines.add(ps->Defines[i]);
 
 	// types
 //	Type.insert(Type.begin(), ps->Type.begin(), ps->Type.end()); // make sure foreign types precede the "own" types!
-	for (int i=0;i<ps->Type.num;i++)
-		Type.insert(ps->Type[i], i);
+	for (int i=0;i<ps->Types.num;i++)
+		Types.insert(ps->Types[i], i);
 		//Type.insert(ps->Type[i + PreType.num], i);
 
 	// constants
-	foreach(sConstant &c, ps->Constant)
+	foreach(Constant &c, ps->Constants)
 		if (c.name[0] != '-')
-			Constant.add(c);
+			Constants.add(c);
 	// TODO... ownership of "big" constants
 	msg_db_l(5);
 }
@@ -110,7 +112,7 @@ string MacroName[NumMacroNames] =
 	"#code_origin"
 };
 
-void CPreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
+void PreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
 {
 	msg_db_r("HandleMacro", 4);
 	Exp.cur_line = l;
@@ -118,8 +120,8 @@ void CPreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *I
 	Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
 	int ln;
 	string filename;
-	CScript *include;
-	sDefine d;
+	Script *include;
+	Define d;
 
 
 	int macro_no=-1;
@@ -139,7 +141,7 @@ void CPreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *I
 			so("lade Include-Datei");
 			right();
 
-			include = LoadScript(filename, true, just_analyse);
+			include = Load(filename, true, just_analyse);
 
 			left();
 			if ((!include) || (include->Error)){
@@ -160,7 +162,7 @@ void CPreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *I
 					break;
 				d.Dest.add(cur_name);
 			}
-			Define.add(d);
+			Defines.add(d);
 			break;
 		case MacroDisasm:
 			FlagDisassemble=true;
@@ -207,7 +209,7 @@ void CPreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *I
 	msg_db_l(4);
 }
 
-inline void insert_into_buffer(CPreScript *ps, const char *name, int pos, int index = -1)
+inline void insert_into_buffer(PreScript *ps, const char *name, int pos, int index = -1)
 {
 	ps_exp_t e;
 	e.name = ps->Exp.buf_cur;
@@ -221,13 +223,13 @@ inline void insert_into_buffer(CPreScript *ps, const char *name, int pos, int in
 		ps->Exp.cur_line->exp.insert(e, index);
 }
 
-inline void remove_from_buffer(CPreScript *ps, int index)
+inline void remove_from_buffer(PreScript *ps, int index)
 {
 	ps->Exp.cur_line->exp.erase(index);
 }
 
 // ... maybe some time later
-void CPreScript::PreCompiler(bool just_analyse)
+void PreScript::PreCompiler(bool just_analyse)
 {
 	if (Error)	return;
 	msg_db_r("PreCompiler", 4);
@@ -248,7 +250,7 @@ void CPreScript::PreCompiler(bool just_analyse)
 			// replace by definition?
 			int num_defs_inserted = 0;
 			while(!end_of_line()){
-				foreachi(sDefine &d, Define, j){
+				foreachi(Define &d, Defines, j){
 					if (cur_name == d.Source){
 						int pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 						remove_from_buffer(this, Exp.cur_exp);
@@ -310,7 +312,7 @@ void CPreScript::PreCompiler(bool just_analyse)
 	Exp->TempColumn=0;
 	Exp->NumExps=0;
 	char filename[256];
-	CScript *include;
+	Script *include;
 	
 	while(true){
 		int l=(Exp->NumExps==0)?0:Exp->TempLine;
@@ -355,8 +357,8 @@ void CPreScript::PreCompiler(bool just_analyse)
 					Exp->ExpNr++;
 					break;
 				case MacroDefine:
-					Define[NumDefines]=new sDefine;
-					am("Define",sizeof(sDefine),Define[NumDefines]);
+					Define[NumDefines]=new Define;
+					am("Define",sizeof(Define),Define[NumDefines]);
 					Define[NumDefines]->Owner=this;
 					// Source
 					NextExp(Buffer);
@@ -514,3 +516,5 @@ void CPreScript::PreCompiler(bool just_analyse)
 	
 	msg_db_l(4);
 }
+
+};

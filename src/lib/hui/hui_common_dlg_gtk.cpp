@@ -2,10 +2,16 @@
 #ifdef HUI_API_GTK
 
 
-// Dialog zur Wahl eines Verzeichnisses (<dir> ist das anfangs ausgewaehlte)
-bool HuiFileDialogDir(CHuiWindow *win,const string &title,const string &dir/*,const string &root_dir*/)
+static GtkWindow *get_window_save(CHuiWindow *win)
 {
-	GtkWindow *w=win?GTK_WINDOW(win->window):NULL;
+	_HuiMakeUsable_();
+	return win ? GTK_WINDOW(win->window) : NULL;
+}
+
+// choose a directory (<dir> will be selected initially)
+bool HuiFileDialogDir(CHuiWindow *win, const string &title, const string &dir/*, const string &root_dir*/)
+{
+	GtkWindow *w = get_window_save(win);
 	GtkWidget* dlg=gtk_file_chooser_dialog_new(	sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -26,20 +32,17 @@ void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter
 {
 	GtkFileFilter *gtk_filter = gtk_file_filter_new();
 	gtk_file_filter_set_name(gtk_filter, sys_str(show_filter));
-	int pos = 0, pos2;
-	while((pos2 = filter.find(";", pos)) >= 0){
-		gtk_file_filter_add_pattern(gtk_filter, sys_str(filter.substr(pos, pos2 - pos)));
-		pos = pos2 + 1;
-	}
-	gtk_file_filter_add_pattern(gtk_filter, sys_str(filter.substr(pos, filter.num - pos)));
+	Array<string> filters = filter.explode(";");
+	foreach(string &f, filters)
+		gtk_file_filter_add_pattern(gtk_filter, sys_str(f));
 	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dlg), gtk_filter);
 }
 
-// Datei-Auswahl zum Oeffnen (filter in der Form "*.txt")
+// file selection for opening (filter should look like "*.txt")
 bool HuiFileDialogOpen(CHuiWindow *win,const string &title,const string &dir,const string &show_filter,const string &filter)
 {
 	msg_db_r("HuiFileDialogOpen",1);
-	GtkWindow *w=win?GTK_WINDOW(win->window):NULL;
+	GtkWindow *w = get_window_save(win);
 	msg_db_m("dialog_new",1);
 	GtkWidget *dlg=gtk_file_chooser_dialog_new(	sys_str(title),
 												w,
@@ -68,27 +71,31 @@ static void try_to_ensure_extension(string &filename, const string &filter)
 	// multiple choices -> ignore
 	if (filter.find(";") >= 0)
 		return;
-	string filter_ext = filter.substr(2, filter.num - 2); // "*.ext"
+	string filter_ext = filter.extension(); // "*.ext"
 	// not the wanted extension -> add
 	if (filename.extension() != filter_ext)
 		filename += "." + filter_ext;
 }
 
-// Datei-Auswahl zum Speichern
+// file selection for saving
 bool HuiFileDialogSave(CHuiWindow *win,const string &title,const string &dir,const string &show_filter,const string &filter)
 {
-	GtkWindow *w=win?GTK_WINDOW(win->window):NULL;
+	GtkWindow *w = win ? GTK_WINDOW(win->window) : NULL;
 	GtkWidget* dlg=gtk_file_chooser_dialog_new(	sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SAVE,
 												GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
 												GTK_STOCK_SAVE,		GTK_RESPONSE_ACCEPT,
 												NULL);
+	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER (dlg), TRUE);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
 	add_filters(dlg, show_filter, filter);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
-	if (r == GTK_RESPONSE_ACCEPT)
+	if (r == GTK_RESPONSE_ACCEPT){
 		HuiFilename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+		try_to_ensure_extension(HuiFilename, filter);
+		// TODO
+	}
 	gtk_widget_destroy (dlg);
 	return (r==GTK_RESPONSE_ACCEPT);
 }
@@ -101,13 +108,13 @@ bool HuiSelectColor(CHuiWindow *win,int r,int g,int b)
 
 string HuiQuestionBox(CHuiWindow *win,const string &title,const string &text,bool allow_cancel)
 {
-	GtkWindow *w=win?GTK_WINDOW(win->window):NULL;
-	GtkWidget *dlg=gtk_message_dialog_new(w,GTK_DIALOG_MODAL,GTK_MESSAGE_QUESTION,GTK_BUTTONS_YES_NO,"%s",sys_str(text));
-	gtk_window_set_modal(GTK_WINDOW(dlg),true);
-	gtk_window_resize(GTK_WINDOW(dlg),300,100);
-	gtk_window_set_title(GTK_WINDOW(dlg),sys_str(title));
+	GtkWindow *w = get_window_save(win);
+	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", sys_str(text));
+	gtk_window_set_modal(GTK_WINDOW(dlg), true);
+	gtk_window_resize(GTK_WINDOW(dlg), 300, 100);
+	gtk_window_set_title(GTK_WINDOW(dlg), sys_str(title));
 	gtk_widget_show_all(dlg);
-	gint result = gtk_dialog_run (GTK_DIALOG (dlg));
+	gint result = gtk_dialog_run(GTK_DIALOG(dlg));
 	gtk_widget_destroy(dlg);
 	switch (result){
 		case GTK_RESPONSE_YES:
@@ -120,11 +127,11 @@ string HuiQuestionBox(CHuiWindow *win,const string &title,const string &text,boo
 
 void HuiInfoBox(CHuiWindow *win,const string &title,const string &text)
 {
-	GtkWindow *w=win?GTK_WINDOW(win->window):NULL;
-	GtkWidget *dlg=gtk_message_dialog_new( w, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "%s", sys_str(text) );
-	gtk_window_set_modal(GTK_WINDOW(dlg),true);
-	gtk_window_resize(GTK_WINDOW(dlg),300,100);
-	gtk_window_set_title(GTK_WINDOW(dlg),sys_str(title));
+	GtkWindow *w = get_window_save(win);
+	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "%s", sys_str(text));
+	gtk_window_set_modal(GTK_WINDOW(dlg), true);
+	gtk_window_resize(GTK_WINDOW(dlg), 300, 100);
+	gtk_window_set_title(GTK_WINDOW(dlg), sys_str(title));
 	gtk_widget_show_all(dlg);
 	gtk_dialog_run(GTK_DIALOG(dlg));
 	gtk_widget_destroy(dlg);
@@ -132,11 +139,11 @@ void HuiInfoBox(CHuiWindow *win,const string &title,const string &text)
 
 void HuiErrorBox(CHuiWindow *win,const string &title,const string &text)
 {
-	GtkWindow *w=win?GTK_WINDOW(win->window):NULL;
-	GtkWidget *dlg=gtk_message_dialog_new( w, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", sys_str(text) );
-	gtk_window_set_modal(GTK_WINDOW(dlg),true);
-	gtk_window_resize(GTK_WINDOW(dlg),300,100);
-	gtk_window_set_title(GTK_WINDOW(dlg),sys_str(title));
+	GtkWindow *w = get_window_save(win);
+	GtkWidget *dlg=gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "%s", sys_str(text));
+	gtk_window_set_modal(GTK_WINDOW(dlg), true);
+	gtk_window_resize(GTK_WINDOW(dlg), 300, 100);
+	gtk_window_set_title(GTK_WINDOW(dlg), sys_str(title));
 	gtk_widget_show_all(dlg);
 	gtk_dialog_run(GTK_DIALOG(dlg));
 	gtk_widget_destroy(dlg);

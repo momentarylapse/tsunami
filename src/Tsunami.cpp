@@ -108,7 +108,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddControlTable("", 0, 0, 1, 2, "root_table");
 	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 3, 1, "main_table");
-	SetBorderWidth(8);
+	SetBorderWidth(5);
 	AddControlTable("!noexpandy", 0, 1, 7, 1, "output_table");
 	SetBorderWidth(0);
 	SetTarget("main_table", 0);
@@ -116,7 +116,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HideControl("track_dialog_table", true);
 	AddControlTable("!noexpandx", 2, 0, 1, 1, "audio_dialog_table");
 	HideControl("audio_dialog_table", true);
-	SetBorderWidth(8);
+	SetBorderWidth(5);
 	SetTarget("output_table", 0);
 	AddButton("", 0, 0, 0, 0, "play");
 	AddButton("", 1, 0, 0, 0, "pause");

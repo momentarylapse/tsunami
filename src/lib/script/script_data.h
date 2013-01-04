@@ -9,6 +9,7 @@
 #if !defined(SCRIPT_DATA_H__INCLUDED_)
 #define SCRIPT_DATA_H__INCLUDED_
 
+namespace Script{
 
 
 #define SCRIPT_MAX_DEFINE_RECURSIONS	128
@@ -16,7 +17,7 @@
 #define SCRIPT_MAX_OPCODE				(2*65536)	// max. amount of opcode
 #define SCRIPT_MAX_THREAD_OPCODE		1024
 #define SCRIPT_DEFAULT_STACK_SIZE		32768	// max. amount of stack memory
-extern int ScriptStackSize;
+extern int StackSize;
 
 #define PointerSize (sizeof(char*))
 #define SuperArraySize	(sizeof(DynamicArray))
@@ -25,10 +26,10 @@ extern int ScriptStackSize;
 //#define mem_align(x)	((x) + (4 - (x) % 4) % 4)
 #define mem_align(x)	((((x) + 3) / 4 ) * 4)
 
-extern string ScriptDataVersion;
+extern string DataVersion;
 
-class CPreScript;
-struct sType;
+class PreScript;
+struct Type;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -36,75 +37,75 @@ struct sType;
 
 
 
-struct sClassElement{
-	string Name;
-	sType *Type;
-	int Offset;
+struct ClassElement{
+	string name;
+	Type *type;
+	int offset;
 };
-struct sClassFunction{
-	string Name;
-	int Kind, Nr; // PreCommand / Own Function?,  index
+struct ClassFunction{
+	string name;
+	int kind, nr; // PreCommand / Own Function?,  index
 	// _func_(x)  ->  p.func(x)
-	Array<sType*> ParamType;
-	sType *ReturnType;
+	Array<Type*> param_type;
+	Type *return_type;
 };
 
-struct sType{
-	sType(){
-		Owner = NULL;
-		Size = 0;
-		IsArray = false;
-		IsSuperArray = false;
-		ArrayLength = 0;
-		IsPointer = false;
-		IsSilent = false;
-		SubType = NULL;
-		ForceCallByValue = false;
+struct Type{
+	Type(){
+		owner = NULL;
+		size = 0;
+		is_array = false;
+		is_super_array = false;
+		array_length = 0;
+		is_pointer = false;
+		is_silent = false;
+		parent = NULL;
+		force_call_by_value = false;
 	};
-	string Name;
-	int Size; // complete size of type
-	int ArrayLength;
-	bool IsArray, IsSuperArray; // mutially exclusive!
-	bool IsPointer, IsSilent; // pointer silent (&)
-	Array<sClassElement> Element;
-	Array<sClassFunction> Function;
-	sType *SubType;
-	CPreScript *Owner; // to share and be able to delete...
+	string name;
+	int size; // complete size of type
+	int array_length;
+	bool is_array, is_super_array; // mutially exclusive!
+	bool is_pointer, is_silent; // pointer silent (&)
+	Array<ClassElement> element;
+	Array<ClassFunction> function;
+	Type *parent;
+	PreScript *owner; // to share and be able to delete...
 
-	bool ForceCallByValue;
+	bool force_call_by_value;
 	bool UsesCallByReference()
-	{	return (!ForceCallByValue) && (!IsPointer) && ((IsArray) || (IsSuperArray) || (Element.num > 0));	}
+	{	return (!force_call_by_value) && (!is_pointer) && ((is_array) || (is_super_array) || (element.num > 0));	}
 	int GetFunc(const string &name)
 	{
-		foreachi(sClassFunction &f, Function, i)
-			if (f.Name == name)
+		foreachi(ClassFunction &f, function, i)
+			if (f.name == name)
 				return i;
 		return -1;
 	}
 };
-extern Array<sType*> PreType;
-extern sType *TypeUnknown;
-extern sType *TypeReg32; // dummy for compilation
-extern sType *TypeReg16; // dummy for compilation
-extern sType *TypeReg8; // dummy for compilation
-extern sType *TypeVoid;
-extern sType *TypePointer;
-extern sType *TypeClass;
-extern sType *TypeBool;
-extern sType *TypeInt;
-extern sType *TypeFloat;
-extern sType *TypeChar;
-extern sType *TypeCString;
-extern sType *TypeString;
-extern sType *TypeSuperArray;
+extern Array<Type*> PreTypes;
+extern Type *TypeUnknown;
+extern Type *TypeReg32; // dummy for compilation
+extern Type *TypeReg16; // dummy for compilation
+extern Type *TypeReg8; // dummy for compilation
+extern Type *TypeVoid;
+extern Type *TypePointer;
+extern Type *TypeClass;
+extern Type *TypeBool;
+extern Type *TypeInt;
+extern Type *TypeFloat;
+extern Type *TypeChar;
+extern Type *TypeCString;
+extern Type *TypeString;
+extern Type *TypeSuperArray;
 
-extern sType *TypeComplex;
-extern sType *TypeVector;
-extern sType *TypeRect;
-extern sType *TypeColor;
-extern sType *TypeQuaternion;
+extern Type *TypeComplex;
+extern Type *TypeVector;
+extern Type *TypeRect;
+extern Type *TypeColor;
+extern Type *TypeQuaternion;
 
-void script_make_super_array(sType *t, CPreScript *ps = NULL);
+void script_make_super_array(Type *t, PreScript *ps = NULL);
 
 
 
@@ -140,21 +141,21 @@ enum{
 	NUM_PRIMITIVE_OPERATORS
 };
 
-struct sPrimitiveOperator{
-	string Name;
-	int ID;
-	bool LeftModifiable;
-	unsigned char Level; // order of operators ("Punkt vor Strich")
-	string FunctionName;
+struct PrimitiveOperator{
+	string name;
+	int id;
+	bool left_modifiable;
+	unsigned char level; // order of operators ("Punkt vor Strich")
+	string function_name;
 };
 extern int NumPrimitiveOperators;
-extern sPrimitiveOperator PrimitiveOperator[];
-struct sPreOperator{
-	int PrimitiveID;
-	sType *ReturnType, *ParamType1, *ParamType2;
-	void *Func;
+extern PrimitiveOperator PrimitiveOperators[];
+struct PreOperator{
+	int primitive_id;
+	Type *return_type, *param_type_1, *param_type_2;
+	void *func;
 };
-extern Array<sPreOperator> PreOperator;
+extern Array<PreOperator> PreOperators;
 
 
 
@@ -264,13 +265,13 @@ enum{
 //--------------------------------------------------------------------------------------------------
 // constants
 
-struct sPreConstant{
-	string Name;
-	sType *Type;
-	void *Value;
+struct PreConstant{
+	string name;
+	Type *type;
+	void *value;
 	int package;
 };
-extern Array<sPreConstant> PreConstant;
+extern Array<PreConstant> PreConstants;
 
 
 
@@ -278,14 +279,14 @@ extern Array<sPreConstant> PreConstant;
 //--------------------------------------------------------------------------------------------------
 // external variables (in the surrounding program...)
 
-struct sPreExternalVar{
-	string Name;
-	sType *Type;
-	void *Pointer;
-	bool IsSemiExternal;
+struct PreExternalVar{
+	string name;
+	Type *type;
+	void *pointer;
+	bool is_semi_external;
 	int package;
 };
-extern Array<sPreExternalVar> PreExternalVar;
+extern Array<PreExternalVar> PreExternalVars;
 
 //--------------------------------------------------------------------------------------------------
 // semi external variables (in the surrounding program...but has to be defined "extern")
@@ -295,20 +296,20 @@ extern Array<sPreExternalVar> PreExternalVar;
 //--------------------------------------------------------------------------------------------------
 // commands
 
-struct sPreCommandParam{
-	string Name;
-	sType *Type;
+struct PreCommandParam{
+	string name;
+	Type *type;
 };
-struct sPreCommand{
-	string Name;
-	void *Func;
-	bool IsClassFunction, IsSpecial;
-	sType *ReturnType;
-	Array<sPreCommandParam> Param;
-	bool IsSemiExternal;
+struct PreCommand{
+	string name;
+	void *func;
+	bool is_class_function, is_special;
+	Type *return_type;
+	Array<PreCommandParam> param;
+	bool is_semi_external;
 	int package;
 };
-extern Array<sPreCommand> PreCommand;
+extern Array<PreCommand> PreCommands;
 
 
 enum{
@@ -345,24 +346,24 @@ enum{
 // type casting
 
 typedef void *t_cast_func(void*);
-struct sTypeCast{
-	int Penalty;
-	sType *Source, *Dest;
-	int Command;
-	t_cast_func *Func;
+struct TypeCast{
+	int penalty;
+	Type *source, *dest;
+	int command;
+	t_cast_func *func;
 };
-extern Array<sTypeCast> TypeCast;
+extern Array<TypeCast> TypeCasts;
 
 
 typedef void t_func();
 
-extern void ScriptInit();
-extern void ScriptEnd();
-extern void ScriptResetSemiExternalData();
-extern void ScriptLinkSemiExternalVar(const string &name, void *pointer);
-extern void ScriptLinkSemiExternalFunc(const string &name, void *pointer);
-extern void ScriptAddPreGlobalVar(const string &name, sType *type);
-extern sType *ScriptGetPreType(const string &name);
+extern void Init();
+extern void End();
+extern void ResetSemiExternalData();
+extern void LinkSemiExternalVar(const string &name, void *pointer);
+extern void LinkSemiExternalFunc(const string &name, void *pointer);
+extern void AddPreGlobalVar(const string &name, Type *type);
+extern Type *GetPreType(const string &name);
 
 
 
@@ -370,28 +371,29 @@ extern sType *ScriptGetPreType(const string &name);
 //--------------------------------------------------------------------------------------------------
 // packages
 
-struct sPackage
+struct Package
 {
 	string name;
-	Array<sType*> type;
-	Array<sPreCommand> command;
-	Array<sPreExternalVar> external_var;
-	Array<sPreOperator> _operator;
-	Array<sPreConstant> constant;
+	Array<Type*> type;
+	Array<PreCommand> command;
+	Array<PreExternalVar> external_var;
+	Array<PreOperator> _operator;
+	Array<PreConstant> constant;
 };
-extern Array<sPackage> Package;
+extern Array<Package> Packages;
 
 
 //--------------------------------------------------------------------------------------------------
 // other stuff
 
 
-class CSuperArray : public DynamicArray
+class SuperArray : public DynamicArray
 {
 	public:
-	void init_by_type(sType *t);
+	void init_by_type(Type *t);
 	int string_cfind(char *a, int start);
 };
 
+};
 
 #endif

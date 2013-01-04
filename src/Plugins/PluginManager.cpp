@@ -74,55 +74,55 @@ CHuiWindow *GlobalMainWin = NULL;
 void PluginManager::LinkAppScriptData()
 {
 	msg_db_r("LinkAppScriptData", 2);
-	ScriptDirectory = "";
+	Script::Directory = "";
 
 	// api definition
-	ScriptResetSemiExternalData();
+	Script::ResetSemiExternalData();
 	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
-	ScriptLinkSemiExternalVar("MainWin",		&GlobalMainWin);
-	ScriptLinkSemiExternalVar("audio",			&tsunami->audio);
-	ScriptLinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
-	ScriptLinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
-	ScriptLinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);
-	ScriptLinkSemiExternalVar("input",			&tsunami->input);
-	ScriptLinkSemiExternalVar("output",			&tsunami->output);
-/*	ScriptLinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
-	ScriptLinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
-	ScriptLinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
-	ScriptLinkSemiExternalFunc("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
-	ScriptLinkSemiExternalFunc("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
-	ScriptLinkSemiExternalFunc("Track.GetBuffers",	(void*)&Track::GetBuffers);
-	ScriptLinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
-	ScriptLinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
-	ScriptLinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
-	ScriptLinkSemiExternalFunc("BufferBox.add_click",(void*)&BufferBox::add_click);
-	ScriptLinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
-	ScriptLinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
-	ScriptLinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
-	ScriptLinkSemiExternalFunc("fft_i2c",		(void*)&FastFourierTransform::fft_i2c);
-	ScriptLinkSemiExternalFunc("fft_c2i_inv",	(void*)&FastFourierTransform::fft_c2i_inv);
-	/*ScriptLinkSemiExternalFunc("ProgressStart",	(void*)&ProgressStart);
-	ScriptLinkSemiExternalFunc("ProgressEnd",	(void*)&ProgressEnd);
-	ScriptLinkSemiExternalFunc("Progress",		(void*)&ProgressStatus);*/
-	ScriptLinkSemiExternalFunc("PutFavoriteBarFixed",	(void*)&GlobalPutFavoriteBarFixed);
-	ScriptLinkSemiExternalFunc("PutFavoriteBarSizable",	(void*)&GlobalPutFavoriteBarSizable);
-	ScriptLinkSemiExternalFunc("PutCommandBarFixed",	(void*)&GlobalPutCommandBarFixed);
-	ScriptLinkSemiExternalFunc("PutCommandBarSizable",	(void*)&GlobalPutCommandBarSizable);
-	ScriptLinkSemiExternalFunc("AddSlider",		(void*)&GlobalAddSlider);
-	ScriptLinkSemiExternalFunc("SliderSet",		(void*)&GlobalSliderSet);
-	ScriptLinkSemiExternalFunc("SliderGet",		(void*)&GlobalSliderGet);
-	ScriptLinkSemiExternalFunc("RemoveSliders",	(void*)&GlobalRemoveSliders);
-	ScriptLinkSemiExternalFunc("AudioFileRender",		(void*)&AudioFileRender);
-	ScriptLinkSemiExternalFunc("AudioOutput.Play",	(void*)&AudioOutput::Play);
-	ScriptLinkSemiExternalFunc("AudioOutput.PlayGenerated",	(void*)&AudioOutput::PlayGenerated);
-	ScriptLinkSemiExternalFunc("AudioOutput.Stop",	(void*)&AudioOutput::Stop);
-	ScriptLinkSemiExternalFunc("AudioOutput.IsPlaying",	(void*)&AudioOutput::IsPlaying);
-	ScriptLinkSemiExternalFunc("AudioOutput.GetPos",	(void*)&AudioOutput::GetPos);
-	ScriptLinkSemiExternalFunc("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
-	ScriptLinkSemiExternalFunc("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
-	ScriptLinkSemiExternalFunc("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
-	ScriptLinkSemiExternalFunc("AudioInput.Start",	(void*)&AudioInput::Start);
-	ScriptLinkSemiExternalFunc("AudioInput.Stop",	(void*)&AudioInput::Stop);
+	Script::LinkSemiExternalVar("MainWin",		&GlobalMainWin);
+	Script::LinkSemiExternalVar("audio",			&tsunami->audio);
+	Script::LinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
+	Script::LinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
+	Script::LinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);
+	Script::LinkSemiExternalVar("input",			&tsunami->input);
+	Script::LinkSemiExternalVar("output",			&tsunami->output);
+/*	Script::LinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
+	Script::LinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
+	Script::LinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
+	Script::LinkSemiExternalFunc("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
+	Script::LinkSemiExternalFunc("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
+	Script::LinkSemiExternalFunc("Track.GetBuffers",	(void*)&Track::GetBuffers);
+	Script::LinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
+	Script::LinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
+	Script::LinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
+	Script::LinkSemiExternalFunc("BufferBox.add_click",(void*)&BufferBox::add_click);
+	Script::LinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
+	Script::LinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
+	Script::LinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
+	Script::LinkSemiExternalFunc("fft_i2c",		(void*)&FastFourierTransform::fft_i2c);
+	Script::LinkSemiExternalFunc("fft_c2i_inv",	(void*)&FastFourierTransform::fft_c2i_inv);
+	/*Script::LinkSemiExternalFunc("ProgressStart",	(void*)&ProgressStart);
+	Script::LinkSemiExternalFunc("ProgressEnd",	(void*)&ProgressEnd);
+	Script::LinkSemiExternalFunc("Progress",		(void*)&ProgressStatus);*/
+	Script::LinkSemiExternalFunc("PutFavoriteBarFixed",	(void*)&GlobalPutFavoriteBarFixed);
+	Script::LinkSemiExternalFunc("PutFavoriteBarSizable",	(void*)&GlobalPutFavoriteBarSizable);
+	Script::LinkSemiExternalFunc("PutCommandBarFixed",	(void*)&GlobalPutCommandBarFixed);
+	Script::LinkSemiExternalFunc("PutCommandBarSizable",	(void*)&GlobalPutCommandBarSizable);
+	Script::LinkSemiExternalFunc("AddSlider",		(void*)&GlobalAddSlider);
+	Script::LinkSemiExternalFunc("SliderSet",		(void*)&GlobalSliderSet);
+	Script::LinkSemiExternalFunc("SliderGet",		(void*)&GlobalSliderGet);
+	Script::LinkSemiExternalFunc("RemoveSliders",	(void*)&GlobalRemoveSliders);
+	Script::LinkSemiExternalFunc("AudioFileRender",		(void*)&AudioFileRender);
+	Script::LinkSemiExternalFunc("AudioOutput.Play",	(void*)&AudioOutput::Play);
+	Script::LinkSemiExternalFunc("AudioOutput.PlayGenerated",	(void*)&AudioOutput::PlayGenerated);
+	Script::LinkSemiExternalFunc("AudioOutput.Stop",	(void*)&AudioOutput::Stop);
+	Script::LinkSemiExternalFunc("AudioOutput.IsPlaying",	(void*)&AudioOutput::IsPlaying);
+	Script::LinkSemiExternalFunc("AudioOutput.GetPos",	(void*)&AudioOutput::GetPos);
+	Script::LinkSemiExternalFunc("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
+	Script::LinkSemiExternalFunc("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
+	Script::LinkSemiExternalFunc("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
+	Script::LinkSemiExternalFunc("AudioInput.Start",	(void*)&AudioInput::Start);
+	Script::LinkSemiExternalFunc("AudioInput.Stop",	(void*)&AudioInput::Stop);
 	msg_db_l(2);
 }
 
@@ -161,7 +161,7 @@ void find_plugins_in_dir(const string &dir, PluginManager *pm, CHuiMenu *m)
 void PluginManager::AddPluginsToMenu()
 {
 	msg_db_r("AddPluginsToMenu", 2);
-	ScriptInit();
+	Script::Init();
 
 	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
 
@@ -464,7 +464,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 	msg_db_r("ExecutePlugin", 1);
 
 	if (LoadAndCompilePlugin(filename)){
-		CScript *s = cur_plugin->s;
+		Script::Script *s = cur_plugin->s;
 
 		AudioFile *a = tsunami->audio;
 

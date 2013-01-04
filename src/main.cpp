@@ -19,7 +19,7 @@ int hui_main(Array<string> arg)
 	HuiSetProperty("version", AppVersion);
 	HuiSetProperty("comment", _("Editor f&ur Audio Dateien"));
 	HuiSetProperty("website", "http://michi.is-a-geek.org/michisoft");
-	HuiSetProperty("copyright", "© 2007-2012 by MichiSoft TM");
+	HuiSetProperty("copyright", "© 2007-2013 by MichiSoft TM");
 	HuiSetProperty("author", "Michael Ankele <michi@lupina.de>");
 
 	msg_db_r("main",1);

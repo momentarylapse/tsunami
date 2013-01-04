@@ -1330,6 +1330,14 @@ void CHuiWindow::SetImage(const string &_id, const string &image)
 	allow_signal_level--;
 }
 
+void CHuiWindow::SetTooltip(const string &_id, const string &tip)
+{
+	HuiControl *c = _GetControl_(_id);
+	if (!c)
+		return;
+	gtk_widget_set_tooltip_text(c->widget, sys_str(tip));
+}
+
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str)
 {
 	GType type = gtk_tree_model_get_column_type(GTK_TREE_MODEL(store), column);

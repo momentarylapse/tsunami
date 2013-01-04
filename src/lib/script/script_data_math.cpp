@@ -16,6 +16,8 @@
 		typedef int Any;
 #endif
 
+namespace Script{
+
 #ifdef _X_USE_ALGEBRA_
 	#define algebra_p(p)		(void*)p
 #else
@@ -31,15 +33,15 @@
 // we're always using math types
 #define type_p(p)			(void*)p
 
-extern sType *TypeComplexList;
-extern sType *TypeFloatList;
-extern sType *TypeVectorList;
-extern sType *TypeMatrix;
-extern sType *TypePlane;
-extern sType *TypePlaneList;
-extern sType *TypeMatrix3;
-extern sType *TypeIntList;
-extern sType *TypeFloatPs;
+extern Type *TypeComplexList;
+extern Type *TypeFloatList;
+extern Type *TypeVectorList;
+extern Type *TypeMatrix;
+extern Type *TypePlane;
+extern Type *TypePlaneList;
+extern Type *TypeMatrix3;
+extern Type *TypeIntList;
+extern Type *TypeFloatPs;
 
 
 float _cdecl f_sqr(float f){	return f*f;	}
@@ -124,24 +126,24 @@ public:
 
 
 
-void super_array_add_s_com(CSuperArray *a, CSuperArray *b)
+void super_array_add_s_com(SuperArray *a, SuperArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) += *(pb ++);	}
-void super_array_sub_s_com(CSuperArray *a, CSuperArray *b)
+void super_array_sub_s_com(SuperArray *a, SuperArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) -= *(pb ++);	}
-void super_array_mul_s_com(CSuperArray *a, CSuperArray *b)
+void super_array_mul_s_com(SuperArray *a, SuperArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) *= *(pb ++);	}
-void super_array_div_s_com(CSuperArray *a, CSuperArray *b)
+void super_array_div_s_com(SuperArray *a, SuperArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) /= *(pb ++);	}
 
-void super_array_add_s_com_com(CSuperArray *a, complex x)
+void super_array_add_s_com_com(SuperArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) += x;	}
-void super_array_sub_s_com_com(CSuperArray *a, complex x)
+void super_array_sub_s_com_com(SuperArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) -= x;	}
-void super_array_mul_s_com_com(CSuperArray *a, complex x)
+void super_array_mul_s_com_com(SuperArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
-void super_array_div_s_com_com(CSuperArray *a, complex x)
+void super_array_div_s_com_com(SuperArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) /= x;	}
-void super_array_mul_s_com_float(CSuperArray *a, float x)
+void super_array_mul_s_com_float(SuperArray *a, float x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
 
 class FloatList : public Array<float>
@@ -288,25 +290,25 @@ void SIAddPackageMath()
 	TypePlaneList	= add_type_a("plane[]",		TypePlane, -1);
 	TypeColor		= add_type  ("color",		sizeof(color));
 	TypeMatrix3		= add_type  ("matrix3",		sizeof(matrix3));
-	sType*
+	Type*
 	TypeFloatArray3		= add_type_a("float[3]",	TypeFloat, 3);
-	sType*
+	Type*
 	TypeFloatArray4		= add_type_a("float[4]",	TypeFloat, 4);
-	sType*
+	Type*
 	TypeFloatArray4x4	= add_type_a("float[4][4]",	TypeFloatArray4, 4);
-	sType*
+	Type*
 	TypeFloatArray16	= add_type_a("float[16]",	TypeFloat, 16);
-	sType*
+	Type*
 	TypeFloatArray3x3	= add_type_a("float[3][3]",	TypeFloatArray3, 3);
-	sType*
+	Type*
 	TypeFloatArray9		= add_type_a("float[9]",	TypeFloat, 9);
-	sType*
+	Type*
 	TypeVli			= add_type  ("vli",		sizeof(vli));
-	sType*
+	Type*
 	TypeAny			= add_type  ("any",		sizeof(Any));
-	sType*
+	Type*
 	TypeFloatInterpolator	= add_type  ("FloatInterpolator",		sizeof(Interpolator<float>));
-	sType*
+	Type*
 	TypeVectorInterpolator	= add_type  ("VectorInterpolator",		sizeof(Interpolator<vector>));
 	
 	
@@ -870,3 +872,5 @@ void SIAddPackageMath()
 	
 	msg_db_l(3);
 }
+
+};

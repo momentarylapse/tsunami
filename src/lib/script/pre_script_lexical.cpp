@@ -2,6 +2,8 @@
 #include "../file/file.h"
 #include <stdio.h>
 
+namespace Script{
+
 //#define ScriptDebug
 
 static char Temp[1024];
@@ -33,7 +35,7 @@ inline void exp_add_line(ps_exp_buffer_t *e)
 	e->cur_line = &e->line.back();
 }
 
-inline void insert_into_buffer(CPreScript *ps, const char *name, int pos, int index = -1)
+inline void insert_into_buffer(PreScript *ps, const char *name, int pos, int index = -1)
 {
 	ps_exp_t e;
 	e.name = ps->Exp.buf_cur;
@@ -47,12 +49,12 @@ inline void insert_into_buffer(CPreScript *ps, const char *name, int pos, int in
 		ps->Exp.cur_line->exp.insert(e, index);
 }
 
-inline void remove_from_buffer(CPreScript *ps, int index)
+inline void remove_from_buffer(PreScript *ps, int index)
 {
 	ps->Exp.cur_line->exp.erase(index);
 }
 
-int CPreScript::GetKind(char c)
+int PreScript::GetKind(char c)
 {
 	if (isNumber(c))
 		return ExpKindNumber;
@@ -78,7 +80,7 @@ int CPreScript::GetKind(char c)
 	return ExpKindLetter;
 }
 
-void CPreScript::Analyse(const char *buffer, bool just_analyse)
+void PreScript::Analyse(const char *buffer, bool just_analyse)
 {
 	msg_db_r("Analyse", 4);
 	clear_exp_buffer(&Exp);
@@ -140,7 +142,7 @@ void CPreScript::Analyse(const char *buffer, bool just_analyse)
 
 // scan one line
 //   true -> end of file
-bool CPreScript::AnalyseLine(const char *buffer, ps_line_t *l, int &line_no, bool just_analyse)
+bool PreScript::AnalyseLine(const char *buffer, ps_line_t *l, int &line_no, bool just_analyse)
 {
 	msg_db_r("AnalyseLine", 4);
 	int pos = 0;
@@ -165,7 +167,7 @@ bool CPreScript::AnalyseLine(const char *buffer, ps_line_t *l, int &line_no, boo
 
 // reads at most one line
 //   returns true if end_of_line is reached
-bool DoMultiLineComment(CPreScript *ps, const char *buffer, int &pos)
+bool DoMultiLineComment(PreScript *ps, const char *buffer, int &pos)
 {
 	while(true){
 		if (buffer[pos] == '\n')
@@ -189,7 +191,7 @@ bool DoMultiLineComment(CPreScript *ps, const char *buffer, int &pos)
 	//ExpKind = ExpKindSpacing;
 }
 
-void DoAsmBlock(CPreScript *ps, const char *buffer, int &pos, int &line_no)
+void DoAsmBlock(PreScript *ps, const char *buffer, int &pos, int &line_no)
 {
 	int line_breaks = 0;
 	// find beginning
@@ -222,12 +224,12 @@ void DoAsmBlock(CPreScript *ps, const char *buffer, int &pos, int &line_no)
 	int asm_end = pos - 1;
 	pos ++;
 
-	sAsmBlock a;
-	a.Line = ps->Exp.cur_line->physical_line;
+	AsmBlock a;
+	a.line = ps->Exp.cur_line->physical_line;
 	a.block = new char[asm_end - asm_start + 1];
 	memcpy(a.block, &buffer[asm_start], asm_end - asm_start);
 	a.block[asm_end - asm_start] = 0;
-	ps->AsmBlock.add(a);
+	ps->AsmBlocks.add(a);
 
 	line_no += line_breaks;
 }
@@ -235,7 +237,7 @@ void DoAsmBlock(CPreScript *ps, const char *buffer, int &pos, int &line_no)
 // scan one line
 // starts with <pos> and sets <pos> to first character after the expression
 //   true -> end of line (<pos> is on newline)
-bool CPreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, int &line_no, bool just_analyse)
+bool PreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, int &line_no, bool just_analyse)
 {
 	msg_db_r("AnalyseExpression", 4);
 	// skip whitespace and other "invisible" stuff to find the first interesting character
@@ -401,3 +403,5 @@ bool CPreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, i
 	msg_db_l(4);
 	return (buffer[pos] == '\n');
 }
+
+};

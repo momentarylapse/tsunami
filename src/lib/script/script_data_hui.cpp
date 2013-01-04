@@ -9,6 +9,8 @@
 	we are re screwed.... TODO: test for _X_USE_HUI_
 #endif
 
+namespace Script{
+
 #ifdef _X_USE_HUI_
 	static CHuiWindow *_win;
 	static HuiEvent *_event;
@@ -29,11 +31,11 @@
 #endif
 
 
-extern sType *TypeIntList;
-extern sType *TypeIntPs;
-extern sType *TypeFloatList;
-extern sType *TypeImage;
-sType *TypeHuiWindowP;
+extern Type *TypeIntList;
+extern Type *TypeIntPs;
+extern Type *TypeFloatList;
+extern Type *TypeImage;
+Type *TypeHuiWindowP;
 
 void SIAddPackageHui()
 {
@@ -41,20 +43,20 @@ void SIAddPackageHui()
 
 	set_cur_package("hui");
 	
-	sType*
+	Type*
 	TypeHuiMenu				= add_type  ("Menu",	0);
-	sType*
+	Type*
 	TypeHuiMenuP			= add_type_p("menu",		TypeHuiMenu);
-	sType*
+	Type*
 	TypeHuiWindow			= add_type  ("Window",0);
 	TypeHuiWindowP			= add_type_p("window",	TypeHuiWindow);
-	sType*
+	Type*
 	TypeHuiEvent			= add_type  ("Event",		0);
-	sType*
+	Type*
 	TypeHuiEventP			= add_type_p("event",	TypeHuiEvent);
-	sType*
+	Type*
 	TypeHuiDrawingContext	= add_type  ("DrawingContext",	0);
-	sType*
+	Type*
 	TypeHuiDrawingContextP	= add_type_p("context",	TypeHuiDrawingContext);
 
 	
@@ -613,3 +615,5 @@ void SIAddPackageHui()
 
 	msg_db_l(3);
 }
+
+};

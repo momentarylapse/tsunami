@@ -262,6 +262,7 @@ public:
 	void _cdecl Check(const string &id, bool checked);
 	bool _cdecl IsChecked(const string &id);
 	void _cdecl SetImage(const string &id, const string &image);
+	void _cdecl SetTooltip(const string &id, const string &tip);
 	Array<int> _cdecl GetMultiSelection(const string &id);
 	void _cdecl SetMultiSelection(const string &id, Array<int> &sel);
 	void _cdecl Reset(const string &id);

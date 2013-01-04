@@ -1,3 +1,4 @@
+namespace Script{
 
 // character buffer and expressions (syntax analysis)
 
@@ -37,7 +38,7 @@ struct ps_exp_buffer_t
 
 
 // macros
-struct sDefine
+struct Define
 {
 	string Source;
 	Array<string> Dest;
@@ -51,12 +52,12 @@ struct sDefine
 };*/
 
 // for any type of constant used in the script
-struct sConstant
+struct Constant
 {
-	CPreScript *owner;
+	PreScript *owner;
 	string name;
 	char *data;
-	sType *type;
+	Type *type;
 };
 
 enum
@@ -110,75 +111,74 @@ enum
 	ExpKindSign
 };
 
-struct sCommand;
+struct Command;
 
 // {...}-block
-struct sBlock
+struct Block
 {
-	int Root;
-	int Index;
-	Array<sCommand*> Command; // ID of command in global command array
+	int root;
+	int index;
+	Array<Command*> command; // ID of command in global command array
 };
 
-struct sLocalVariable
+struct LocalVariable
 {
-	sType *Type; // for creating instances
-	string Name;
-	int _Offset; // for compilation
+	Type *type; // for creating instances
+	string name;
+	int _offset; // for compilation
 };
 
 // user defined functions
-struct sFunction
+struct Function
 {
-	string Name;
+	string name;
 	// parameters (linked to intern variables)
-	int NumParams;
+	int num_params;
 	// block of code
-	sBlock *Block;
+	Block *block;
 	// local variables
-	Array<sLocalVariable> Var;
-	sType *LiteralParamType[SCRIPT_MAX_PARAMS];
-	sType *Class;
-	// return value
-	sType *Type;
-	sType *LiteralType;
+	Array<LocalVariable> var;
+	Type *literal_param_type[SCRIPT_MAX_PARAMS];
+	Type *_class;
+	Type *return_type;
+	Type *literal_return_type;
 	// for compilation...
-	int _VarSize, _ParamSize;
+	int _var_size, _param_size;
 };
 
 // single operand/command
-struct sCommand
+struct Command
 {
-	int Kind, LinkNr;
-	CScript *script;
+	int kind, link_nr;
+	Script *script;
 	// parameters
-	int NumParams;
-	sCommand *Param[SCRIPT_MAX_PARAMS];
+	int num_params;
+	Command *param[SCRIPT_MAX_PARAMS];
 	// linking of class function instances
-	sCommand *Instance;
+	Command *instance;
 	// return value
-	sType *Type;
+	Type *type;
 };
 
-struct sAsmBlock
+struct AsmBlock
 {
 	char *block;
-	int Line;
+	int line;
 };
 
-class CScript;
+class Script;
 
 
 // data structures (uncompiled)
-class CPreScript
+class PreScript
 {
 public:
-	CPreScript(CScript *_script);
-	~CPreScript();
+	PreScript(Script *_script);
+	~PreScript();
 
 	void LoadAndParseFile(const string &filename, bool just_analyse);
 	bool LoadToBuffer(const string &filename, bool just_analyse);
-	void AddIncludeData(CScript *s);
+	void AddIncludeData(Script *s);
 
 	bool Error, IncludeLinkerError;
 	string ErrorMsg, ErrorMsgExt[2];
@@ -199,46 +199,46 @@ public:
 	void Parser();
 	void ParseEnum();
 	void ParseClass();
-	void ParseFunction(sType *class_type, bool as_extern);
-	void ParseClassFunction(sType *t, bool as_extern);
-	sType *ParseVariableDefSingle(sType *type, sFunction *f, bool as_param = false);
-	void ParseVariableDef(bool single, sFunction *f);
-	void ParseGlobalConst(const string &name, sType *type);
+	void ParseFunction(Type *class_type, bool as_extern);
+	void ParseClassFunction(Type *t, bool as_extern);
+	Type *ParseVariableDefSingle(Type *type, Function *f, bool as_param = false);
+	void ParseVariableDef(bool single, Function *f);
+	void ParseGlobalConst(const string &name, Type *type);
 	int WhichPrimitiveOperator(const string &name);
 	int WhichCompilerFunction(const string &name);
-	void CommandSetCompilerFunction(int CF,sCommand *Com);
+	void CommandSetCompilerFunction(int CF,Command *Com);
 	int WhichExternalVariable(const string &name);
 	int WhichType(const string &name);
-	void SetExternalVariable(int gv, sCommand *c);
+	void SetExternalVariable(int gv, Command *c);
 	void AddType();
 
 	// pre compiler
 	void PreCompiler(bool just_analyse);
 	void HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
-	void CreateImplicitFunctions(sType *t, bool relocate_last_function);
+	void CreateImplicitFunctions(Type *t, bool relocate_last_function);
 	void CreateAllImplicitFunctions(bool relocate_last_function);
 
 	// syntax analysis
-	sType *GetConstantType();
+	Type *GetConstantType();
 	void *GetConstantValue();
-	sType *GetType(const string &name, bool force);
-	void AddType(sType **type);
-	sType *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, sType *sub);
-	void TestArrayDefinition(sType **type, bool is_pointer);
-	bool GetExistence(const string &name, sFunction *f);
-	void LinkMostImportantOperator(int &NumOperators, sCommand **Operand, sCommand **Operator, int *op_exp);
-	bool LinkOperator(int op_no, sCommand *param1, sCommand *param2, sCommand **cmd);
-	void GetOperandExtension(sCommand *Operand, sFunction *f);
-	sCommand *GetCommand(sFunction *f);
-	void GetCompleteCommand(sBlock *block, sFunction *f);
-	sCommand *GetOperand(sFunction *f);
-	sCommand *GetOperator(sFunction *f);
-	void FindFunctionParameters(int &np, sType **WantedType, sFunction *f, sCommand *cmd);
-	void FindFunctionSingleParameter(int p, sType **WantedType, sFunction *f, sCommand *cmd);
-	void GetFunctionCall(const string &f_name, sCommand *Operand, sFunction *f);
-	bool GetSpecialFunctionCall(const string &f_name, sCommand *Operand, sFunction *f);
-	void CheckParamLink(sCommand *link, sType *type, const string &f_name = "", int param_no = -1);
-	void GetSpecialCommand(sBlock *block, sFunction *f);
+	Type *GetType(const string &name, bool force);
+	void AddType(Type **type);
+	Type *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Type *sub);
+	void TestArrayDefinition(Type **type, bool is_pointer);
+	bool GetExistence(const string &name, Function *f);
+	void LinkMostImportantOperator(int &NumOperators, Command **Operand, Command **Operator, int *op_exp);
+	bool LinkOperator(int op_no, Command *param1, Command *param2, Command **cmd);
+	void GetOperandExtension(Command *Operand, Function *f);
+	Command *GetCommand(Function *f);
+	void GetCompleteCommand(Block *block, Function *f);
+	Command *GetOperand(Function *f);
+	Command *GetOperator(Function *f);
+	void FindFunctionParameters(int &np, Type **WantedType, Function *f, Command *cmd);
+	void FindFunctionSingleParameter(int p, Type **WantedType, Function *f, Command *cmd);
+	void GetFunctionCall(const string &f_name, Command *Operand, Function *f);
+	bool GetSpecialFunctionCall(const string &f_name, Command *Operand, Function *f);
+	void CheckParamLink(Command *link, Type *type, const string &f_name = "", int param_no = -1);
+	void GetSpecialCommand(Block *block, Function *f);
 
 	// neccessary conversions
 	void ConvertCallByReference();
@@ -247,23 +247,23 @@ public:
 	void MapLocalVariablesToStack();
 
 	// data creation
-	int AddVar(const string &name, sType *type, sFunction *f);
-	int AddConstant(sType *type);
-	sBlock *AddBlock();
-	sFunction *AddFunction(const string &name, sType *type);
-	sCommand *AddCommand();
+	int AddVar(const string &name, Type *type, Function *f);
+	int AddConstant(Type *type);
+	Block *AddBlock();
+	Function *AddFunction(const string &name, Type *type);
+	Command *AddCommand();
 
 	// pre processor
-	void PreProcessCommand(CScript *s, sCommand *c);
-	void PreProcessor(CScript *s);
-	void PreProcessCommandAddresses(CScript *s, sCommand *c);
-	void PreProcessorAddresses(CScript *s);
+	void PreProcessCommand(Script *s, Command *c);
+	void PreProcessor(Script *s);
+	void PreProcessCommandAddresses(Script *s, Command *c);
+	void PreProcessorAddresses(Script *s);
 	void Simplify();
 
 	// debug displaying
-	void ShowCommand(sCommand *c);
+	void ShowCommand(Command *c);
 	void ShowFunction(int f);
-	void ShowBlock(sBlock *b);
+	void ShowBlock(Block *b);
 	void Show();
 
 // data
@@ -272,7 +272,7 @@ public:
 	string Buffer;
 	int BufferLength, BufferPos;
 	ps_exp_buffer_t Exp;
-	sCommand GetExistenceLink;
+	Command GetExistenceLink;
 
 	// compiler options
 	bool FlagShowPrae;
@@ -286,21 +286,21 @@ public:
 	int VariablesOffset;
 
 	int NumOwnTypes;
-	Array<sType*> Type;
+	Array<Type*> Types;
 	//Array<sEnum> Enum;
-	Array<CScript*> Include;
-	Array<sDefine> Define;
+	Array<Script*> Includes;
+	Array<Define> Defines;
 	char *AsmMetaInfo;
-	Array<sAsmBlock> AsmBlock;
-	Array<sConstant> Constant;
-	Array<sBlock*> Block;
-	Array<sFunction*> Function;
-	Array<sCommand*> Command;
+	Array<AsmBlock> AsmBlocks;
+	Array<Constant> Constants;
+	Array<Block*> Blocks;
+	Array<Function*> Functions;
+	Array<Command*> Commands;
 
-	sFunction RootOfAllEvil;
+	Function RootOfAllEvil;
 
-	CScript *script;
-	sFunction *cur_func;
+	Script *script;
+	Function *cur_func;
 };
 
 #define _do_error_(str,n,r)	{DoError(str);msg_db_l(n);return r;}
@@ -308,10 +308,10 @@ public:
 #define _return_(n,r)		{msg_db_l(n);return r;}
 
 string Kind2Str(int kind);
-string Operator2Str(CPreScript *s,int cmd);
+string Operator2Str(PreScript *s,int cmd);
 void clear_exp_buffer(ps_exp_buffer_t *e);
-void CreateAsmMetaInfo(CPreScript* ps);
-extern CScript *cur_script;
+void CreateAsmMetaInfo(PreScript* ps);
+extern Script *cur_script;
 
 
 
@@ -358,3 +358,4 @@ inline bool isSign(char c)
 	return false;
 }
 
+};

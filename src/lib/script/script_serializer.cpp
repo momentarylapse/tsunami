@@ -2,6 +2,8 @@
 //#include "dasm.h"
 #include "../file/file.h"
 
+namespace Script{
+
 //#define _insert_asm_
 
 #define allow_simplification
@@ -53,7 +55,7 @@ static const sSerialCommandParam p_none = {-1, NULL, NULL, 0};
 
 struct sTempVar
 {
-	sType *type;
+	Type *type;
 	int first, last, count;
 	bool referenced;
 	int entangled;
@@ -74,11 +76,11 @@ struct SerializerData
 {
 	Array<sSerialCommand> cmd;
 	int NumMarkers;
-	CScript *cur_script;
-	sFunction *cur_func;
+	Script *cur_script;
+	Function *cur_func;
 	bool call_used;
 	int LastCommandSize;
-	sCommand *NextCommand;
+	Command *NextCommand;
 	bool TempVarRangesDefined;
 
 	Array<int> MapReg;
@@ -101,12 +103,12 @@ inline void add_reg_channel(SerializerData *d, int reg, int first, int last)
 
 void add_cmd_constructor(SerializerData *d, sSerialCommandParam &param, bool is_temp);
 
-inline void add_temp(SerializerData *d, sType *t, sSerialCommandParam &param)
+inline void add_temp(SerializerData *d, Type *t, sSerialCommandParam &param)
 {
 	if (t != TypeVoid){
 		sTempVar v;
 		v.type = t;
-		v.referenced = (t->IsSuperArray);
+		v.referenced = (t->is_super_array);
 		v.entangled = 0;
 		d->TempVar.add(v);
 		param.kind = KindVarTemp;
@@ -115,18 +117,18 @@ inline void add_temp(SerializerData *d, sType *t, sSerialCommandParam &param)
 		param.shift = 0;
 		
 
-		if (t->Element.num > 0)
+		if (t->element.num > 0)
 			add_cmd_constructor(d, param, true);
 	}else{
 		param = p_none;
 	}
 }
 
-inline sType *get_subtype(sType *t)
+inline Type *get_subtype(Type *t)
 {
-	if (t->SubType)
-		return t->SubType;
-	msg_error("subtype wanted of... " + t->Name);
+	if (t->parent)
+		return t->parent;
+	msg_error("subtype wanted of... " + t->name);
 	//msg_write(cur_func->Name);
 	return TypeUnknown;
 }
@@ -150,7 +152,7 @@ inline sSerialCommandParam param_shift(sSerialCommandParam &param, int shift)
 	return p;
 }
 
-inline sSerialCommandParam param_global(sType *type, void *v)
+inline sSerialCommandParam param_global(Type *type, void *v)
 {
 	sSerialCommandParam p;
 	p.type = type;
@@ -160,7 +162,7 @@ inline sSerialCommandParam param_global(sType *type, void *v)
 	return p;
 }
 
-inline sSerialCommandParam param_local(sType *type, int offset)
+inline sSerialCommandParam param_local(Type *type, int offset)
 {
 	sSerialCommandParam p;
 	p.type = type;
@@ -170,7 +172,7 @@ inline sSerialCommandParam param_local(sType *type, int offset)
 	return p;
 }
 
-inline sSerialCommandParam param_const(sType *type, void *c)
+inline sSerialCommandParam param_const(Type *type, void *c)
 {
 	sSerialCommandParam p;
 	p.type = type;
@@ -190,7 +192,7 @@ inline sSerialCommandParam param_marker(int m)
 	return p;
 }
 
-inline sSerialCommandParam param_reg(sType *type, int reg)
+inline sSerialCommandParam param_reg(Type *type, int reg)
 {
 	sSerialCommandParam p;
 	p.kind = KindRegister;
@@ -204,7 +206,7 @@ inline void param_out(string &str, sSerialCommandParam &p)
 {
 	//msg_db_r("param_out", 4);
 	if (p.kind >= 0){
-		str += format("   %s %p (%s)", Kind2Str(p.kind).c_str(), p.p, p.type->Name.c_str());
+		str += format("   %s %p (%s)", Kind2Str(p.kind).c_str(), p.p, p.type->name.c_str());
 		if (p.shift > 0)
 			str += format(" + shift %d", p.shift);
 	}
@@ -283,13 +285,14 @@ inline void move_last_cmd(SerializerData *d, int index)
 	d->cmd[index] = c;
 
 	// adjust temp vars
-	if (d->TempVarRangesDefined)
+	if (d->TempVarRangesDefined){
 		foreach(sTempVar &v, d->TempVar){
 			if (v.first >= index)
 				v.first ++;
 			if (v.last >= index)
 				v.last ++;
 		}
+	}
 
 	// adjust reg channels
 	foreach(sRegChannel &r, d->RegChannel){
@@ -414,19 +417,19 @@ void AddFuncInstance(sSerialCommandParam &inst)
 	CompilerFunctionInstance = inst;
 }
 
-void AddReference(SerializerData *d, sSerialCommandParam &param, sType *type, sSerialCommandParam &ret);
+void AddReference(SerializerData *d, sSerialCommandParam &param, Type *type, sSerialCommandParam &ret);
 
 void AddFunctionCall(SerializerData *d, void *func, int func_no = -1)
 {
 	msg_db_r("AddFunctionCall", 4);
 	d->call_used = true;
-	sType *type = CompilerFunctionReturn.type;
+	Type *type = CompilerFunctionReturn.type;
 	if (!type)
 		type = TypeVoid;
 
 	// return data too big... push address
 	sSerialCommandParam ret_temp, ret_ref;
-	if ((type->Size > 4) && (!type->IsArray)){
+	if ((type->size > 4) && (!type->is_array)){
 		//add_temp(type, ret_temp);
 		AddReference(d, /*ret_temp*/ CompilerFunctionReturn, TypePointer, ret_ref);
 		//add_ref();
@@ -440,7 +443,7 @@ void AddFunctionCall(SerializerData *d, void *func, int func_no = -1)
 	// push parameters onto stack
 	for (int p=CompilerFunctionParam.num-1;p>=0;p--){
 		if (CompilerFunctionParam[p].type){
-			int s = mem_align(CompilerFunctionParam[p].type->Size);
+			int s = mem_align(CompilerFunctionParam[p].type->size);
 			for (int j=0;j<s/4;j++)
 				add_cmd(d, inst_push, param_shift(CompilerFunctionParam[p], s - 4 - j * 4));
 			dp += s;
@@ -461,7 +464,7 @@ void AddFunctionCall(SerializerData *d, void *func, int func_no = -1)
 	
 #ifndef NIX_IDE_VCS
 	// more than 4 byte have to be returned -> give return address as very first parameter!
-	if (type->Size > 4)
+	if (type->size > 4)
 		add_cmd(d, inst_push, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
 #endif
 	
@@ -476,10 +479,10 @@ void AddFunctionCall(SerializerData *d, void *func, int func_no = -1)
 
 	// return > 4b already got copied to [ret] by the function!
 	if (type != TypeVoid)
-		if (type->Size <= 4){
+		if (type->size <= 4){
 			if (type == TypeFloat)
 				add_cmd(d, inst_fstp, CompilerFunctionReturn);
-			else if (type->Size == 1){
+			else if (type->size == 1){
 				add_cmd(d, inst_mov_b, CompilerFunctionReturn, param_reg(type, RegAl));
 				add_reg_channel(d, RegEax, d->cmd.num - 2, d->cmd.num - 1);
 			}else{
@@ -497,7 +500,7 @@ void AddFunctionCall(SerializerData *d, void *func, int func_no = -1)
 
 
 // creates res...
-void AddReference(SerializerData *d, sSerialCommandParam &param, sType *type, sSerialCommandParam &ret)
+void AddReference(SerializerData *d, sSerialCommandParam &param, Type *type, sSerialCommandParam &ret)
 {
 	msg_db_r("AddReference", 3);
 	so(Kind2Str(param.kind));
@@ -523,7 +526,7 @@ void AddReference(SerializerData *d, sSerialCommandParam &param, sType *type, sS
 	msg_db_l(3);
 }
 
-void AddDereference(SerializerData *d, sSerialCommandParam &param, sSerialCommandParam &ret, sType *force_type = NULL)
+void AddDereference(SerializerData *d, sSerialCommandParam &param, sSerialCommandParam &ret, Type *force_type = NULL)
 {
 	msg_db_r("AddDereference", 4);
 	/*add_temp(TypePointer, ret);
@@ -551,101 +554,101 @@ void AddDereference(SerializerData *d, sSerialCommandParam &param, sSerialComman
 
 // create data for a (function) parameter
 //   and compile its command if the parameter is executable itself
-void CScript::SerializeParameter(SerializerData *d, sCommand *link, int level, int index, sSerialCommandParam &p)
+void Script::SerializeParameter(SerializerData *d, Command *link, int level, int index, sSerialCommandParam &p)
 {
 	msg_db_r("SerializeParameter", 4);
-	p.kind = link->Kind;
-	p.type = link->Type;
+	p.kind = link->kind;
+	p.type = link->type;
 	p.p = NULL;
 	p.shift = 0;
-	//sType *rt=link->;
+	//Type *rt=link->;
 	//so(Kind2Str(link->Kind));
-	if (link->Kind == KindVarFunction){
+	if (link->kind == KindVarFunction){
 		so(" -var-func");
 		if (pre_script->FlagCompileOS)
-			p.p = (char*)((long)func[link->LinkNr] - (long)&Opcode[0] + ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->CodeOrigin);
+			p.p = (char*)((long)func[link->link_nr] - (long)&Opcode[0] + ((sAsmMetaInfo*)pre_script->AsmMetaInfo)->CodeOrigin);
 		else
-			p.p = (char*)func[link->LinkNr];
+			p.p = (char*)func[link->link_nr];
 		p.kind = KindVarGlobal;
-	}else if (link->Kind == KindMemory){
+	}else if (link->kind == KindMemory){
 		so(" -mem");
-		p.p = (char*)link->LinkNr;
+		p.p = (char*)link->link_nr;
 		p.kind = KindVarGlobal;
-	}else if (link->Kind == KindAddress){
+	}else if (link->kind == KindAddress){
 		so(" -addr");
-		p.p = (char*)&link->LinkNr;
+		p.p = (char*)&link->link_nr;
 		p.kind = KindRefToConst;
-	}else if (link->Kind == KindVarGlobal){
+	}else if (link->kind == KindVarGlobal){
 		so(" -global");
 		if (link->script)
-			p.p = link->script->g_var[link->LinkNr];
+			p.p = link->script->g_var[link->link_nr];
 		else
-			p.p = g_var[link->LinkNr];
-	}else if (link->Kind == KindVarLocal){
+			p.p = g_var[link->link_nr];
+	}else if (link->kind == KindVarLocal){
 		so(" -local");
-		p.p = (char*)(long)d->cur_func->Var[link->LinkNr]._Offset;
-	}else if (link->Kind == KindLocalMemory){
+		p.p = (char*)(long)d->cur_func->var[link->link_nr]._offset;
+	}else if (link->kind == KindLocalMemory){
 		so(" -local mem");
-		p.p = (char*)link->LinkNr;
+		p.p = (char*)link->link_nr;
 		p.kind = KindVarLocal;
-	}else if (link->Kind == KindLocalAddress){
+	}else if (link->kind == KindLocalAddress){
 		so(" -local addr");
 		sSerialCommandParam param;
-		param.p = (char*)link->LinkNr;
+		param.p = (char*)link->link_nr;
 		param.kind = KindVarLocal;
 		param.type = TypePointer;
 		param.shift = 0;
 
-		AddReference(d, param, link->Type, p);
-	}else if (link->Kind == KindVarExternal){
+		AddReference(d, param, link->type, p);
+	}else if (link->kind == KindVarExternal){
 		so(" -external-var");
-		p.p = (char*)PreExternalVar[link->LinkNr].Pointer;
+		p.p = (char*)PreExternalVars[link->link_nr].pointer;
 		p.kind = KindVarGlobal;
 		if (!p.p){
-			DoErrorLink(format("external variable is not linkable: %s",PreExternalVar[link->LinkNr].Name.c_str()));
+			DoErrorLink(format("external variable is not linkable: %s",PreExternalVars[link->link_nr].name.c_str()));
 			_return_(4,);
 		}
-	}else if (link->Kind == KindConstant){
+	}else if (link->kind == KindConstant){
 		so(" -const");
 		if ((UseConstAsGlobalVar) || (pre_script->FlagCompileOS))
 			p.kind = KindVarGlobal;
 		else
 			p.kind = KindRefToConst;
-		p.p = cnst[link->LinkNr];
-	}else if ((link->Kind==KindOperator) || (link->Kind==KindFunction) || (link->Kind==KindCompilerFunction)){
+		p.p = cnst[link->link_nr];
+	}else if ((link->kind==KindOperator) || (link->kind==KindFunction) || (link->kind==KindCompilerFunction)){
 		p = SerializeCommand(d, link, level, index);
 		if (Error)	_return_(4,);
-	}else if (link->Kind == KindReference){
+	}else if (link->kind == KindReference){
 		//so(Kind2Str(link->Meta->Kind));
 		so(" -ref");
 		sSerialCommandParam param;
-		SerializeParameter(d, link->Param[0], level, index, param);
+		SerializeParameter(d, link->param[0], level, index, param);
 		if (Error)	_return_(4,);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
-		AddReference(d, param, link->Type, p);
+		AddReference(d, param, link->type, p);
 		if (Error)	_return_(4,);
-	}else if (link->Kind == KindDereference){
+	}else if (link->kind == KindDereference){
 		so(" -deref...");
 		sSerialCommandParam param;
-		SerializeParameter(d, link->Param[0], level, index, param);
+		SerializeParameter(d, link->param[0], level, index, param);
 		if (Error)	_return_(4,);
 		/*if ((param.kind == KindVarLocal) || (param.kind == KindVarGlobal)){
-			p.type = param.type->SubType;
+			p.type = param.type->sub_type;
 			if (param.kind == KindVarLocal)		p.kind = KindRefToLocal;
 			if (param.kind == KindVarGlobal)	p.kind = KindRefToGlobal;
 			p.p = param.p;
 		}*/
 		AddDereference(d, param, p);
 	}else
-		_do_error_int_("unexpected type of parameter: " + Kind2Str(link->Kind), 4,);
+		_do_error_int_("unexpected type of parameter: " + Kind2Str(link->kind), 4,);
 	msg_db_l(4);
 }
 
 
-void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommandParam *param, sSerialCommandParam &ret)
+void Script::SerializeOperator(SerializerData *d, Command *com, sSerialCommandParam *param, sSerialCommandParam &ret)
 {
 	msg_db_r("SerializeOperator", 4);
-	switch(com->LinkNr){
+	switch(com->link_nr){
 		case OperatorIntAssign:
 		case OperatorFloatAssign:
 		case OperatorPointerAssign:
@@ -656,9 +659,9 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 			add_cmd(d, inst_mov_b, param[0], param[1]);
 			break;
 		case OperatorClassAssign:
-			for (int i=0;i<signed(com->Param[0]->Type->Size)/4;i++)
+			for (int i=0;i<signed(com->param[0]->type->size)/4;i++)
 				add_cmd(d, inst_mov, param_shift(param[0], i * 4), param_shift(param[1], i * 4));
-			for (int i=4*signed(com->Param[0]->Type->Size/4);i<signed(com->Param[0]->Type->Size);i++)
+			for (int i=4*signed(com->param[0]->type->size/4);i<signed(com->param[0]->type->size);i++)
 				add_cmd(d, inst_mov, param_shift(param[0], i), param_shift(param[1], i));
 			break;
 // string   TODO: create own code!
@@ -689,9 +692,9 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 			AddFunctionCall(d, (void*)&strcmp); // well... return in eax...
 
 			add_cmd(d, inst_cmp, p_eax_int, param_const(TypeInt, (void*)0x0));
-			if (com->LinkNr == OperatorCStringEqualAA)
+			if (com->link_nr == OperatorCStringEqualAA)
 				add_cmd(d, inst_setz_b, p_al_bool);
-			if (com->LinkNr==OperatorCStringNotEqualAA)
+			if (com->link_nr==OperatorCStringNotEqualAA)
 				add_cmd(d, inst_setnz_b, p_al_bool);
 			add_cmd(d, inst_mov_b, ret, p_al_bool);
 			add_reg_channel(d, RegEax, d->cmd.num - 3, d->cmd.num - 1);
@@ -756,14 +759,14 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 		case OperatorPointerEqual:
 		case OperatorPointerNotEqual:
 			add_cmd(d, inst_cmp, param[0], param[1]);
-			if (com->LinkNr==OperatorIntEqual)			add_cmd(d, inst_setz_b, ret);
-			if (com->LinkNr==OperatorIntNotEqual)		add_cmd(d, inst_setnz_b, ret);
-			if (com->LinkNr==OperatorIntGreater)		add_cmd(d, inst_setnle_b, ret);
-			if (com->LinkNr==OperatorIntGreaterEqual)	add_cmd(d, inst_setnl_b, ret);
-			if (com->LinkNr==OperatorIntSmaller)		add_cmd(d, inst_setl_b, ret);
-			if (com->LinkNr==OperatorIntSmallerEqual)	add_cmd(d, inst_setle_b, ret);
-			if (com->LinkNr==OperatorPointerEqual)		add_cmd(d, inst_setz_b, ret);
-			if (com->LinkNr==OperatorPointerNotEqual)	add_cmd(d, inst_setnz_b, ret);
+			if (com->link_nr==OperatorIntEqual)			add_cmd(d, inst_setz_b, ret);
+			if (com->link_nr==OperatorIntNotEqual)		add_cmd(d, inst_setnz_b, ret);
+			if (com->link_nr==OperatorIntGreater)		add_cmd(d, inst_setnle_b, ret);
+			if (com->link_nr==OperatorIntGreaterEqual)	add_cmd(d, inst_setnl_b, ret);
+			if (com->link_nr==OperatorIntSmaller)		add_cmd(d, inst_setl_b, ret);
+			if (com->link_nr==OperatorIntSmallerEqual)	add_cmd(d, inst_setle_b, ret);
+			if (com->link_nr==OperatorPointerEqual)		add_cmd(d, inst_setz_b, ret);
+			if (com->link_nr==OperatorPointerNotEqual)	add_cmd(d, inst_setnz_b, ret);
 			break;
 		case OperatorIntBitAnd:
 			add_cmd(d, inst_mov, ret, param[0]);
@@ -801,10 +804,10 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 		case OperatorFloatMultiplyS:
 		case OperatorFloatDivideS:
 			add_cmd(d, inst_fld, param[0]);
-			if (com->LinkNr==OperatorFloatAddS)			add_cmd(d, inst_fadd, param[1]);
-			if (com->LinkNr==OperatorFloatSubtractS)	add_cmd(d, inst_fsub, param[1]);
-			if (com->LinkNr==OperatorFloatMultiplyS)	add_cmd(d, inst_fmul, param[1]);
-			if (com->LinkNr==OperatorFloatDivideS)		add_cmd(d, inst_fdiv, param[1]);
+			if (com->link_nr==OperatorFloatAddS)			add_cmd(d, inst_fadd, param[1]);
+			if (com->link_nr==OperatorFloatSubtractS)	add_cmd(d, inst_fsub, param[1]);
+			if (com->link_nr==OperatorFloatMultiplyS)	add_cmd(d, inst_fmul, param[1]);
+			if (com->link_nr==OperatorFloatDivideS)		add_cmd(d, inst_fdiv, param[1]);
 			add_cmd(d, inst_fstp, param[0]);
 			break;
 		case OperatorFloatAdd:
@@ -812,10 +815,10 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 		case OperatorFloatMultiply:
 		case OperatorFloatDivide:
 			add_cmd(d, inst_fld, param[0]);
-			if (com->LinkNr==OperatorFloatAdd)			add_cmd(d, inst_fadd, param[1]);
-			if (com->LinkNr==OperatorFloatSubtract)		add_cmd(d, inst_fsub, param[1]);
-			if (com->LinkNr==OperatorFloatMultiply)		add_cmd(d, inst_fmul, param[1]);
-			if (com->LinkNr==OperatorFloatDivide)		add_cmd(d, inst_fdiv, param[1]);
+			if (com->link_nr==OperatorFloatAdd)			add_cmd(d, inst_fadd, param[1]);
+			if (com->link_nr==OperatorFloatSubtract)		add_cmd(d, inst_fsub, param[1]);
+			if (com->link_nr==OperatorFloatMultiply)		add_cmd(d, inst_fmul, param[1]);
+			if (com->link_nr==OperatorFloatDivide)		add_cmd(d, inst_fdiv, param[1]);
 			add_cmd(d, inst_fstp, ret);
 			break;
 		case OperatorFloatMultiplyFI:
@@ -894,12 +897,12 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 		//case OperatorComplexMultiplySCF:
 		//case OperatorComplexDivideS:
 			add_cmd(d, inst_fld, param[0]);
-			if (com->LinkNr == OperatorComplexAddS)			add_cmd(d, inst_fadd, param[1]);
-			if (com->LinkNr == OperatorComplexSubtractS)	add_cmd(d, inst_fsub, param[1]);
+			if (com->link_nr == OperatorComplexAddS)			add_cmd(d, inst_fadd, param[1]);
+			if (com->link_nr == OperatorComplexSubtractS)	add_cmd(d, inst_fsub, param[1]);
 			add_cmd(d, inst_fstp, param[0]);
 			add_cmd(d, inst_fld, param_shift(param[0], 4));
-			if (com->LinkNr == OperatorComplexAddS)			add_cmd(d, inst_fadd, param_shift(param[1], 4));
-			if (com->LinkNr == OperatorComplexSubtractS)	add_cmd(d, inst_fsub, param_shift(param[1], 4));
+			if (com->link_nr == OperatorComplexAddS)			add_cmd(d, inst_fadd, param_shift(param[1], 4));
+			if (com->link_nr == OperatorComplexSubtractS)	add_cmd(d, inst_fsub, param_shift(param[1], 4));
 			add_cmd(d, inst_fstp, param_shift(param[0], 4));
 			break;
 		case OperatorComplexAdd:
@@ -907,12 +910,12 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 //		case OperatorFloatMultiply:
 //		case OperatorFloatDivide:
 			add_cmd(d, inst_fld, param[0]);
-			if (com->LinkNr == OperatorComplexAdd)		add_cmd(d, inst_fadd, param[1]);
-			if (com->LinkNr == OperatorComplexSubtract)	add_cmd(d, inst_fsub, param[1]);
+			if (com->link_nr == OperatorComplexAdd)		add_cmd(d, inst_fadd, param[1]);
+			if (com->link_nr == OperatorComplexSubtract)	add_cmd(d, inst_fsub, param[1]);
 			add_cmd(d, inst_fstp, ret);
 			add_cmd(d, inst_fld, param_shift(param[0], 4));
-			if (com->LinkNr == OperatorComplexAdd)		add_cmd(d, inst_fadd, param_shift(param[1], 4));
-			if (com->LinkNr == OperatorComplexSubtract)	add_cmd(d, inst_fsub, param_shift(param[1], 4));
+			if (com->link_nr == OperatorComplexAdd)		add_cmd(d, inst_fadd, param_shift(param[1], 4));
+			if (com->link_nr == OperatorComplexSubtract)	add_cmd(d, inst_fsub, param_shift(param[1], 4));
 			add_cmd(d, inst_fstp, param_shift(ret, 4));
 			break;
 		case OperatorComplexMultiply:
@@ -980,14 +983,14 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 		case OperatorBoolSmaller:
 		case OperatorBoolSmallerEqual:
 			add_cmd(d, inst_cmp_b, param[0], param[1]);
-			if ((com->LinkNr == OperatorCharEqual) || (com->LinkNr == OperatorBoolEqual))
+			if ((com->link_nr == OperatorCharEqual) || (com->link_nr == OperatorBoolEqual))
 				add_cmd(d, inst_setz_b, ret);
-			else if ((com->LinkNr ==OperatorCharNotEqual) || (com->LinkNr == OperatorBoolNotEqual))
+			else if ((com->link_nr ==OperatorCharNotEqual) || (com->link_nr == OperatorBoolNotEqual))
 				add_cmd(d, inst_setnz_b, ret);
-			else if (com->LinkNr == OperatorBoolGreater)		add_cmd(d, inst_setnle_b, ret);
-			else if (com->LinkNr == OperatorBoolGreaterEqual)	add_cmd(d, inst_setnl_b, ret);
-			else if (com->LinkNr == OperatorBoolSmaller)		add_cmd(d, inst_setl_b, ret);
-			else if (com->LinkNr == OperatorBoolSmallerEqual)	add_cmd(d, inst_setle_b, ret);
+			else if (com->link_nr == OperatorBoolGreater)		add_cmd(d, inst_setnle_b, ret);
+			else if (com->link_nr == OperatorBoolGreaterEqual)	add_cmd(d, inst_setnl_b, ret);
+			else if (com->link_nr == OperatorBoolSmaller)		add_cmd(d, inst_setl_b, ret);
+			else if (com->link_nr == OperatorBoolSmallerEqual)	add_cmd(d, inst_setle_b, ret);
 			break;
 		case OperatorBoolAnd:
 			add_cmd(d, inst_mov_b, ret, param[0]);
@@ -1098,7 +1101,7 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 			}
 			break;
 		default:
-			DoErrorInternal("unimplemented operator: " + Operator2Str(pre_script, com->LinkNr));
+			DoErrorInternal("unimplemented operator: " + Operator2Str(pre_script, com->link_nr));
 	}
 
 //	if (AsmError)
@@ -1107,73 +1110,73 @@ void CScript::SerializeOperator(SerializerData *d, sCommand *com, sSerialCommand
 }
 
 
-sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, int level, int index)
+sSerialCommandParam Script::SerializeCommand(SerializerData *d, Command *com, int level, int index)
 {
 	msg_db_r("SerializeCommand", 4);
 	//so(Kind2Str(com->Kind));
 	sSerialCommandParam param[SCRIPT_MAX_PARAMS];
 	sSerialCommandParam ret;// = (char*)( -add_temp_var(s) - d->cur_func->_VarSize);
-	add_temp(d, com->Type, ret);
+	add_temp(d, com->type, ret);
 	//so(d2h((char*)&ret,4,false));
-	//so(string2("return: %d/%d/%d", com->Type->Size, LocalOffset, LocalOffset));
+	//so(string2("return: %d/%d/%d", com->type->size, LocalOffset, LocalOffset));
 
 	// compile parameters
-	for (int p=0;p<com->NumParams;p++){
-		SerializeParameter(d, com->Param[p], level, index, param[p]);
+	for (int p=0;p<com->num_params;p++){
+		SerializeParameter(d, com->param[p], level, index, param[p]);
 		if (Error) _return_(4, ret);
 	}
 
 	// class function -> compile instance
 	bool is_class_function = false;
-	if (com->Kind == KindCompilerFunction)
-		if (PreCommand[com->LinkNr].IsClassFunction)
+	if (com->kind == KindCompilerFunction)
+		if (PreCommands[com->link_nr].is_class_function)
 			is_class_function = true;
-	if (com->Kind == KindFunction){
+	if (com->kind == KindFunction){
 		if (com->script){
-			if (com->script->pre_script->Function[com->LinkNr]->Class)
+			if (com->script->pre_script->Functions[com->link_nr]->_class)
 				is_class_function = true;
 		}else{
-			if (pre_script->Function[com->LinkNr]->Class)
+			if (pre_script->Functions[com->link_nr]->_class)
 				is_class_function = true;
 		}
 	}
 	sSerialCommandParam instance = {-1, NULL, NULL};
 	if (is_class_function){
 		so("member");
-		SerializeParameter(d, com->Instance, level, index, instance);
+		SerializeParameter(d, com->instance, level, index, instance);
 		if (Error)	_return_(4, ret);
 		so(Kind2Str(instance.kind));
 		// super_array automatically referenced...
 	}
 
 	    
-	if (com->Kind == KindOperator){
+	if (com->kind == KindOperator){
 		//so("---operator");
 		SerializeOperator(d, com, param, ret);
 		if (Error)
 			_return_(4, ret);
 		
-	}else if ((com->Kind == KindCompilerFunction) || (com->Kind == KindFunction)){
+	}else if ((com->kind == KindCompilerFunction) || (com->kind == KindFunction)){
 		//so("---func");
 		void *fp = NULL;
 		string name;
-		if (com->Kind == KindFunction){ // own script Function
+		if (com->kind == KindFunction){ // own script Function
 			so("Funktion!!!");
 			if (com->script){
-				//so(com->LinkNr);
+				//so(com->link_nr);
 				so("    extern!!!");
-				fp = (void*)com->script->func[com->LinkNr];
+				fp = (void*)com->script->func[com->link_nr];
 			}else{
-				fp = (void*)func[com->LinkNr];
+				fp = (void*)func[com->link_nr];
 			}
 			so("   -ok");
 		}else{ // compiler function
-			fp = PreCommand[com->LinkNr].Func;
-			name = PreCommand[com->LinkNr].Name;
+			fp = PreCommands[com->link_nr].func;
+			name = PreCommands[com->link_nr].name;
 		}
 		if (fp){ // a real function
 
-			for (int p=0;p<com->NumParams;p++)
+			for (int p=0;p<com->num_params;p++)
 				AddFuncParam(param[p]);
 			
 			AddFuncReturn(ret);
@@ -1183,8 +1186,8 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 			
 			AddFunctionCall(d, fp);
 			
-		}else if (PreCommand[com->LinkNr].IsSpecial){
-			switch(com->LinkNr){
+		}else if (PreCommands[com->link_nr].is_special){
+			switch(com->link_nr){
 				/*case CommandSine:
 					break;*/
 				case CommandIf:{
@@ -1214,11 +1217,11 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 					add_jump_after_command(d, level, index + 1, m_before_while); // insert before <m_after_while> is inserted!
 
 					int m_continue = m_before_while;
-					if (com->LinkNr == CommandFor){
+					if (com->link_nr == CommandFor){
 						// NextCommand is a block!
-						if (d->NextCommand->Kind != KindBlock)
+						if (d->NextCommand->kind != KindBlock)
 							_do_error_int_("command block in \"for\" loop missing", 4, ret);
-						m_continue = add_marker_after_command(d, level + 1, pre_script->Block[d->NextCommand->LinkNr]->Command.num - 2);
+						m_continue = add_marker_after_command(d, level + 1, pre_script->Blocks[d->NextCommand->link_nr]->command.num - 2);
 					}
 					sLoopData l = {m_continue, m_after_while, level, index};
 					d->LoopData.add(l);
@@ -1230,9 +1233,9 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 					add_cmd(d, inst_jmp, param_marker(d->LoopData.back().marker_continue));
 					break;
 				case CommandReturn:
-					if (com->NumParams > 0){
-						if (d->cur_func->Type->Size > 4){ // we already got a return address in [ebp+0x08] (> 4 byte)
-							int s = mem_align(d->cur_func->Type->Size);
+					if (com->num_params > 0){
+						if (d->cur_func->return_type->size > 4){ // we already got a return address in [ebp+0x08] (> 4 byte)
+							int s = mem_align(d->cur_func->return_type->size);
 
 							// slow
 							/*sSerialCommandParam p, p_deref;
@@ -1260,16 +1263,16 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 								add_cmd(d, inst_mov, param_shift(p_deref_edx, j * 4), param_shift(param[0], j * 4));
 							add_reg_channel(d, RegEdx, c_0, d->cmd.num - 1);
 						}else{ // store return directly in eax / fpu stack (4 byte)
-							if (d->cur_func->Type == TypeFloat)
+							if (d->cur_func->return_type == TypeFloat)
 								add_cmd(d, inst_fld, param[0]);
-							else if (d->cur_func->Type->Size == 1)
-								add_cmd(d, inst_mov_b, param_reg(d->cur_func->Type, RegAl), param[0]);
+							else if (d->cur_func->return_type->size == 1)
+								add_cmd(d, inst_mov_b, param_reg(d->cur_func->return_type, RegAl), param[0]);
 							else
-								add_cmd(d, inst_mov, param_reg(d->cur_func->Type, RegEax), param[0]);
+								add_cmd(d, inst_mov, param_reg(d->cur_func->return_type, RegEax), param[0]);
 						}
 					}
 					add_cmd(d, inst_leave);
-					if (d->cur_func->Type->Size > 4)
+					if (d->cur_func->return_type->size > 4)
 						add_cmd(d, inst_ret, param_const(TypeInt, (void*)4));
 					else
 						add_cmd(d, inst_ret);
@@ -1282,13 +1285,13 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 					// GlobalWaitingTime = time
 					sSerialCommandParam p_mode = param_global(TypeInt, &GlobalWaitingMode);
 					sSerialCommandParam p_ttw = param_global(TypeFloat, &GlobalTimeToWait);
-					if (com->LinkNr == CommandWaitOneFrame){
+					if (com->link_nr == CommandWaitOneFrame){
 						add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
 						add_cmd(d, inst_mov, p_ttw, param_const(TypeFloat, NULL));
-					}else if (com->LinkNr == CommandWait){
+					}else if (com->link_nr == CommandWait){
 						add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeGT));
 						add_cmd(d, inst_mov, p_ttw, param[0]);
-					}else if (com->LinkNr == CommandWaitRT){
+					}else if (com->link_nr == CommandWaitRT){
 						add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
 						add_cmd(d, inst_mov, p_ttw, param[0]);
 					}
@@ -1297,11 +1300,11 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 					// stack[ -8] = ebp
 					// stack[-12] = esp
 					// stack[-16] = eip
-					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-8]));
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[StackSize-8]));
 					add_cmd(d, inst_mov, p_deref_eax, param_reg(TypeReg32, RegEbp));
-					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-12]));
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[StackSize-12]));
 					add_cmd(d, inst_mov, p_deref_eax, param_reg(TypeReg32, RegEsp));
-					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[ScriptStackSize-12]));
+					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[StackSize-12]));
 					add_cmd(d, inst_call, param_const(TypePointer, NULL)); // push eip
 				// load return
 					// mov esp, &stack[-4]
@@ -1309,7 +1312,7 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 					// mov ebp, esp
 					// leave
 					// ret
-					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[ScriptStackSize-4])); // start of the script stack
+					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), param_const(TypePointer, &Stack[StackSize-4])); // start of the script stack
 					add_cmd(d, inst_pop, param_reg(TypeReg32, RegEsp)); // old stackpointer (real program)
 					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEbp), param_reg(TypeReg32, RegEsp));
 					add_cmd(d, inst_leave);
@@ -1320,9 +1323,9 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 					// ebp = &stack[-8]
 					// esp = &stack[-12]
 					// GlobalWaitingMode = WaitingModeNone
-					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-8]));
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[StackSize-8]));
 					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEbp), p_deref_eax);
-					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[ScriptStackSize-12]));
+					add_cmd(d, inst_mov, p_eax, param_const(TypePointer, &Stack[StackSize-12]));
 					add_cmd(d, inst_mov, param_reg(TypeReg32, RegEsp), p_deref_eax);
 					add_cmd(d, inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeNone));
 					}break;
@@ -1382,18 +1385,18 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 					add_cmd(d, inst_mov, param_shift(ret, 8), param[3]);
 					break;
 				default:
- 					_do_error_int_("compiler function unimplemented: " + PreCommand[com->LinkNr].Name, 4, ret);
+ 					_do_error_int_("compiler function unimplemented: " + PreCommands[com->link_nr].name, 4, ret);
 			}
 		}else{
-			if (PreCommand[com->LinkNr].IsSemiExternal)
-	 			DoErrorLink("external function not linkable: " + PreCommand[com->LinkNr].Name);
+			if (PreCommands[com->link_nr].is_semi_external)
+	 			DoErrorLink("external function not linkable: " + PreCommands[com->link_nr].name);
 			else
-	 			DoErrorInternal("compiler function not linkable: " + PreCommand[com->LinkNr].Name);
+	 			DoErrorInternal("compiler function not linkable: " + PreCommands[com->link_nr].name);
 			_return_(4, ret);
 		}
-	}else if (com->Kind == KindBlock){
+	}else if (com->kind == KindBlock){
 		//so("---block");
-		SerializeBlock(d, pre_script->Block[com->LinkNr], level + 1);
+		SerializeBlock(d, pre_script->Blocks[com->link_nr], level + 1);
 		if (Error)	_return_(4, ret);
 	}else{
 		//so("---???");
@@ -1407,18 +1410,18 @@ sSerialCommandParam CScript::SerializeCommand(SerializerData *d, sCommand *com, 
 
 void FillInDestructors(SerializerData *d, bool from_temp);
 
-void CScript::SerializeBlock(SerializerData *d, sBlock *block, int level)
+void Script::SerializeBlock(SerializerData *d, Block *block, int level)
 {
 	msg_db_r("SerializeBlock", 4);
-	for (int i=0;i<block->Command.num;i++){
+	for (int i=0;i<block->command.num;i++){
 		//so(string2("%d - %d",i,block->NumCommands));
-		d->StackOffset = d->cur_func->_VarSize;
+		d->StackOffset = d->cur_func->_var_size;
 		d->LastCommandSize = d->cmd.num;
-		if (block->Command.num > i + 1)
-			d->NextCommand = block->Command[i + 1];
+		if (block->command.num > i + 1)
+			d->NextCommand = block->command[i + 1];
 
 		// serialize
-		SerializeCommand(d, block->Command[i], level, i);
+		SerializeCommand(d, block->command[i], level, i);
 		if (Error)	_return_(4,);
 
 		
@@ -1463,18 +1466,18 @@ Array<sSerialCommandParam> InsertedConstructorTemp;
 
 void add_cmd_constructor(SerializerData *d, sSerialCommandParam &param, bool is_temp)
 {
-	foreach(sClassFunction &f, param.type->Function){
-		if (f.Name == "__init__"){ // TODO test signature "void __init__()"
+	foreach(ClassFunction &f, param.type->function){
+		if (f.name == "__init__"){ // TODO test signature "void __init__()"
 			sSerialCommandParam inst;
 			AddReference(d, param, TypePointer, inst);
 			AddFuncInstance(inst);
 			void *fp;
-			if (f.Kind == KindCompilerFunction)
-				fp = PreCommand[f.Nr].Func;
-			else if (f.Kind == KindFunction){
-				fp = (void*)param.type->Owner->script->func[f.Nr];
+			if (f.kind == KindCompilerFunction)
+				fp = PreCommands[f.nr].func;
+			else if (f.kind == KindFunction){
+				fp = (void*)param.type->owner->script->func[f.nr];
 				if (!fp)
-					msg_error(param.type->Name + ".__init__() unlinkable compiler function!");
+					msg_error(param.type->name + ".__init__() unlinkable compiler function!");
 			}
 
 			AddFunctionCall(d, fp);
@@ -1489,18 +1492,18 @@ void add_cmd_constructor(SerializerData *d, sSerialCommandParam &param, bool is_
 
 void add_cmd_destructor(SerializerData *d, sSerialCommandParam &param)
 {
-	foreach(sClassFunction &f, param.type->Function)
-		if (f.Name == "__delete__"){ // TODO test signature "void __delete__()"
+	foreach(ClassFunction &f, param.type->function)
+		if (f.name == "__delete__"){ // TODO test signature "void __delete__()"
 			sSerialCommandParam inst;
 			AddReference(d, param, TypePointer, inst);
 			AddFuncInstance(inst);
 			void *fp;
-			if (f.Kind == KindCompilerFunction)
-				fp = PreCommand[f.Nr].Func;
-			else if (f.Kind == KindFunction){
-				fp = (void*)param.type->Owner->script->func[f.Nr];
+			if (f.kind == KindCompilerFunction)
+				fp = PreCommands[f.nr].func;
+			else if (f.kind == KindFunction){
+				fp = (void*)param.type->owner->script->func[f.nr];
 				if (!fp)
-					msg_error(param.type->Name + ".__delete__() unlinkable compiler function!");
+					msg_error(param.type->name + ".__delete__() unlinkable compiler function!");
 			}
 			AddFunctionCall(d, fp);
 		}
@@ -1509,9 +1512,9 @@ void add_cmd_destructor(SerializerData *d, sSerialCommandParam &param)
 void FillInConstructorsFunc(SerializerData *d)
 {
 	msg_db_r("FillInConstructorsFunc", 4);
-	for (int i=0;i<d->cur_func->Var.num;i++)
+	for (int i=0;i<d->cur_func->var.num;i++)
 		/*if (cur_func->Var[i].Type->Element.num > 0)*/{
-			sSerialCommandParam param = param_local(d->cur_func->Var[i].Type, d->cur_func->Var[i]._Offset);
+			sSerialCommandParam param = param_local(d->cur_func->var[i].type, d->cur_func->var[i]._offset);
 			add_cmd_constructor(d, param, false);
 		}
 	msg_db_l(4);
@@ -1632,7 +1635,7 @@ void CorrectUnallowedParamCombis(SerializerData *d)
 		sSerialCommandParam *pp = mov_first_param ? &d->cmd[i].p1 : &d->cmd[i].p2;
 		sSerialCommandParam p = *pp;
 
-		if (p.type->Size == 1){
+		if (p.type->size == 1){
 			*pp = param_reg(p.type, RegAl);
 			add_cmd(d, inst_mov_b, *pp, p);
 		}else{
@@ -1666,8 +1669,8 @@ inline void solve_deref_temp_local(SerializerData *d, int c, int np, bool is_loc
 	sSerialCommandParam p = *pp;
 	int shift = p.shift;
 
-	sType *type_pointer = is_local ? TypePointer : d->TempVar[(long)p.p].type;
-	sType *type_data = p.type;
+	Type *type_pointer = is_local ? TypePointer : d->TempVar[(long)p.p].type;
+	Type *type_data = p.type;
 	
 	p.kind = is_local ? KindVarLocal : KindVarTemp;
 	p.shift = 0;
@@ -1698,7 +1701,7 @@ inline void solve_deref_temp_local(SerializerData *d, int c, int np, bool is_loc
 		add_reg_channel(d, reg, c, c + 1);
 }
 
-void add_stack_var(sType *type, int first, int last, sSerialCommandParam &p);
+void add_stack_var(Type *type, int first, int last, sSerialCommandParam &p);
 
 #if 0
 void ResolveDerefLocal()
@@ -1808,8 +1811,8 @@ void ResolveDerefTempAndLocal(SerializerData *d)
 		}else{
 			// hopefully... p2 is read-only
 
-			sType *type_pointer = TypePointer;
-			sType *type_data = d->cmd[i].p1.type;
+			Type *type_pointer = TypePointer;
+			Type *type_data = d->cmd[i].p1.type;
 
 			int reg = find_unused_reg(d, i, i, true);
 			so(reg);
@@ -1820,7 +1823,7 @@ void ResolveDerefTempAndLocal(SerializerData *d)
 			}
 			
 			sSerialCommandParam p_reg = param_reg(type_data, reg);
-			if (type_data->Size == 1)
+			if (type_data->size == 1)
 				p_reg = param_reg(type_data, reg_smallify(reg));
 			add_reg_channel(d, reg, i, i); // temp
 			
@@ -1871,7 +1874,7 @@ void ResolveDerefTempAndLocal(SerializerData *d)
 			}
 
 			int r1_first = cmd_pos;
-			if (type_data->Size == 1)
+			if (type_data->size == 1)
 				add_cmd(d, inst_mov_b, p_reg, p_deref_reg2);
 			else
 				add_cmd(d, inst_mov, p_reg, p_deref_reg2);
@@ -2081,7 +2084,7 @@ void MapTempVarToReg(SerializerData *d, int vi, int reg)
 	int reg32 = reg;
 	
 	// only small register?
-	if (v.type->Size == 1){
+	if (v.type->size == 1){
 		if (reg == RegEax)		reg = RegAl;
 		else if (reg == RegEdx)	reg = RegDl;
 		else if (reg == RegEcx)	reg = RegCl;
@@ -2111,14 +2114,14 @@ void MapTempVarToReg(SerializerData *d, int vi, int reg)
 	msg_db_l(4);
 }
 
-void add_stack_var(SerializerData *d, sType *type, int first, int last, sSerialCommandParam &p)
+void add_stack_var(SerializerData *d, Type *type, int first, int last, sSerialCommandParam &p)
 {
 	so("add_stack_var");
-	so(type->Size);
+	so(type->size);
 	// find free stack space for the life span of the variable....
 	// don't mind... use old algorithm: ALWAYS grow stack... remove ALL on each command in a block
 
-	int s = mem_align(type->Size);
+	int s = mem_align(type->size);
 	d->StackOffset += s;
 	int offset = - d->StackOffset;
 	if (d->StackOffset > d->StackMaxSize)
@@ -2350,19 +2353,19 @@ void DisentangleShiftedTempVars(SerializerData *d)
 	for (int i=d->TempVar.num-1;i>=0;i--)
 		if (d->TempVar[i].entangled > 0){
 			int n = d->TempVar[i].entangled / 4 + 1;
-			sType *t = d->TempVar[i].type;
+			Type *t = d->TempVar[i].type;
 			so("entangled");
 			so(n);
 			sSerialCommandParam *p = new sSerialCommandParam[n];
 
 			// create small temp vars
 			for (int j=0;j<n;j++){
-				sType *tt = TypeReg32;
+				Type *tt = TypeReg32;
 				// corresponding to element in a class?
-				for (int k=0;k<t->Element.num;k++)
-					if (t->Element[k].Offset == j * 4)
-						if (t->Element[k].Type->Size == 4)
-							tt = t->Element[k].Type;
+				for (int k=0;k<t->element.num;k++)
+					if (t->element[k].offset == j * 4)
+						if (t->element[k].type->size == 4)
+							tt = t->element[k].type;
 				add_temp(d, tt, p[j]);
 			}
 			
@@ -2407,7 +2410,7 @@ void ResolveDerefRegShift(SerializerData *d)
 	msg_db_l(3);
 }
 
-void CScript::SerializeFunction(SerializerData *d, sFunction *f)
+void Script::SerializeFunction(SerializerData *d, Function *f)
 {
 	msg_db_r("SerializeFunction", 2);
 
@@ -2432,8 +2435,8 @@ void CScript::SerializeFunction(SerializerData *d, sFunction *f)
 	d->cur_func = f;
 	d->NumMarkers = 0;
 	d->call_used = false;
-	d->StackOffset = f->_VarSize;
-	d->StackMaxSize = f->_VarSize;
+	d->StackOffset = f->_var_size;
+	d->StackMaxSize = f->_var_size;
 	d->TempVarRangesDefined = false;
 	AsmError = false;
 
@@ -2460,7 +2463,7 @@ void CScript::SerializeFunction(SerializerData *d, sFunction *f)
 	if (Error)	_return_(2,);
 
 	// function
-	SerializeBlock(d, f->Block, 0);
+	SerializeBlock(d, f->block, 0);
 	if (Error)	_return_(2,);
 	
 	FillInDestructors(d, false);
@@ -2469,7 +2472,7 @@ void CScript::SerializeFunction(SerializerData *d, sFunction *f)
 
 	if (d->StuffToAdd.num > 0){
 		DoErrorInternal("StuffToAdd");
-		msg_write(f->Name);
+		msg_write(f->name);
 		msg_write(d->StuffToAdd.num);
 		for (int i=0;i<d->StuffToAdd.num;i++){
 			msg_write(d->StuffToAdd[i].kind);
@@ -2482,12 +2485,12 @@ void CScript::SerializeFunction(SerializerData *d, sFunction *f)
 
 	// outro
 	bool need_outro = true;
-	if (f->Block->Command.num > 0)
-		if ((f->Block->Command.back()->Kind == KindCompilerFunction) && (f->Block->Command.back()->LinkNr == CommandReturn))
+	if (f->block->command.num > 0)
+		if ((f->block->command.back()->kind == KindCompilerFunction) && (f->block->command.back()->link_nr == CommandReturn))
 			need_outro = false;
 	if (need_outro){
 		add_cmd(d, inst_leave);
-		if (f->Type->Size > 4)
+		if (f->return_type->size > 4)
 			add_cmd(d, inst_ret, param_const(TypeInt, (void*)4));
 		else
 			add_cmd(d, inst_ret);
@@ -2581,8 +2584,8 @@ inline void get_param(int inst, sSerialCommandParam &p, int &param_type, void *&
 		param = p.p + p.shift;
 	}else if (p.kind == KindRefToConst){
 		bool imm_allowed = GetInstructionAllowConst(inst);
-		if ((p.type->Size <= 4) && (imm_allowed)){
-			param_type = (p.type->Size == 1) ? PKConstant8 : PKConstant32;
+		if ((p.type->size <= 4) && (imm_allowed)){
+			param_type = (p.type->size == 1) ? PKConstant8 : PKConstant32;
 			param = (char*)*(int*)(p.p + p.shift);
 		}else{
 			param_type = PKDerefConstant;
@@ -2590,7 +2593,7 @@ inline void get_param(int inst, sSerialCommandParam &p, int &param_type, void *&
 		}
 	}else if (p.kind == KindConstant){
 		param_type = PKConstant32;
-		if (p.type->Size == 1)
+		if (p.type->size == 1)
 			param_type = PKConstant8;
 		param = p.p;
 		if (p.shift > 0)
@@ -2675,7 +2678,7 @@ void ShrinkOpcode(SerializerData *d, char *oc, int &ocs, int c, int diff)
 	for (int i=0;i<d->cmd.num;i++)
 			if ((d->cmd[i].inst == inst_jmp) || (d->cmd[i].inst == inst_jz) || (d->cmd[i].inst == inst_jnz) || (d->cmd[i].inst == inst_jmp_b) || (d->cmd[i].inst == inst_jz_b) || (d->cmd[i].inst == inst_jnz_b)){
 				so("jump");
-				int s = d->cmd[i].p1.type->Size;
+				int s = d->cmd[i].p1.type->size;
 				so(*(int*)&d->cmd[i].p1.p);
 				if (i < c)
 					if ((long)d->cmd[i].p1.p > InstructionPos[c] - InstructionPos[i + 1]){
@@ -2749,13 +2752,13 @@ void CompileAsmBlock(char *Opcode, int &OpcodeSize)
 {
 	msg_db_r("CompileAsmBlock", 4);
 	//msg_write(".------------------------------- asm");
-	CPreScript *ps = cur_script->pre_script;
+	PreScript *ps = cur_script->pre_script;
 	CreateAsmMetaInfo(ps);
 	((sAsmMetaInfo*)ps->AsmMetaInfo)->CurrentOpcodePos = OpcodeSize;
 	((sAsmMetaInfo*)ps->AsmMetaInfo)->PreInsertionLength = OpcodeSize;
-	((sAsmMetaInfo*)ps->AsmMetaInfo)->LineOffset = ps->AsmBlock[0].Line;
+	((sAsmMetaInfo*)ps->AsmMetaInfo)->LineOffset = ps->AsmBlocks[0].line;
 	CurrentAsmMetaInfo = (sAsmMetaInfo*)ps->AsmMetaInfo;
-	const char *pac = Asm2Opcode(ps->AsmBlock[0].block);
+	const char *pac = Asm2Opcode(ps->AsmBlocks[0].block);
 	if (!AsmError){
 		//msg_write(AsmCodeLength);
 		//msg_write(d2h(pac, AsmCodeLength, false));
@@ -2770,8 +2773,8 @@ void CompileAsmBlock(char *Opcode, int &OpcodeSize)
 		cur_script->DoError("error in assembler code...", AsmErrorLine);
 		_return_(4,);
 	}
-	delete[](ps->AsmBlock[0].block);
-	ps->AsmBlock.erase(0);
+	delete[](ps->AsmBlocks[0].block);
+	ps->AsmBlocks.erase(0);
 	msg_db_l(4);
 }
 
@@ -2819,10 +2822,12 @@ void CompileSerialized(SerializerData *d, char *Opcode, int &OpcodeSize)
 	msg_db_l(2);
 }
 
-void CScript::CompileFunction(sFunction *f, char *Opcode, int &OpcodeSize)
+void Script::CompileFunction(Function *f, char *Opcode, int &OpcodeSize)
 {
 	cur_func = f;
 	SerializerData d;
 	SerializeFunction(&d, f);
 	CompileSerialized(&d, Opcode, OpcodeSize);
 }
+
+};

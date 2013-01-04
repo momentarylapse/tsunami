@@ -16,7 +16,6 @@
 #include "script_data_common.h"
 #include "../00_config.h"
 
-string ScriptDataVersion = "0.10.3.0";
 
 
 #ifdef _X_USE_HUI_
@@ -25,8 +24,13 @@ string ScriptDataVersion = "0.10.3.0";
 
 
 
+namespace Script{
 
-int ScriptStackSize = SCRIPT_DEFAULT_STACK_SIZE;
+string DataVersion = "0.10.3.0";
+
+
+
+int StackSize = SCRIPT_DEFAULT_STACK_SIZE;
 
 
 
@@ -34,124 +38,124 @@ int ScriptStackSize = SCRIPT_DEFAULT_STACK_SIZE;
 //                                             types                                              //
 //------------------------------------------------------------------------------------------------//
 
-sType *TypeUnknown;
-sType *TypeReg32;
-sType *TypeReg16;
-sType *TypeReg8;
-sType *TypeVoid;
-sType *TypePointer;
-sType *TypeClass;
-sType *TypeBool;
-sType *TypeInt;
-sType *TypeFloat;
-sType *TypeChar;
-sType *TypeString;
-sType *TypeCString;
-sType *TypeSuperArray;
+Type *TypeUnknown;
+Type *TypeReg32;
+Type *TypeReg16;
+Type *TypeReg8;
+Type *TypeVoid;
+Type *TypePointer;
+Type *TypeClass;
+Type *TypeBool;
+Type *TypeInt;
+Type *TypeFloat;
+Type *TypeChar;
+Type *TypeString;
+Type *TypeCString;
+Type *TypeSuperArray;
 
-sType *TypeVector;
-sType *TypeRect;
-sType *TypeColor;
-sType *TypeQuaternion;
+Type *TypeVector;
+Type *TypeRect;
+Type *TypeColor;
+Type *TypeQuaternion;
  // internal:
-sType *TypePointerPs;
-sType *TypePointerList;
-sType *TypeBoolList;
-sType *TypeIntPs;
-sType *TypeIntList;
-sType *TypeIntArray;
-sType *TypeFloatPs;
-sType *TypeFloatList;
-sType *TypeFloatArray;
-sType *TypeFloatArrayP;
-sType *TypeComplex;
-sType *TypeComplexList;
-sType *TypeStringList;
-sType *TypeVectorArray;
-sType *TypeVectorArrayP;
-sType *TypeVectorList;
-sType *TypeMatrix;
-sType *TypePlane;
-sType *TypePlaneList;
-sType *TypeMatrix3;
-sType *TypeDate;
-sType *TypeImage;
+Type *TypePointerPs;
+Type *TypePointerList;
+Type *TypeBoolList;
+Type *TypeIntPs;
+Type *TypeIntList;
+Type *TypeIntArray;
+Type *TypeFloatPs;
+Type *TypeFloatList;
+Type *TypeFloatArray;
+Type *TypeFloatArrayP;
+Type *TypeComplex;
+Type *TypeComplexList;
+Type *TypeStringList;
+Type *TypeVectorArray;
+Type *TypeVectorArrayP;
+Type *TypeVectorList;
+Type *TypeMatrix;
+Type *TypePlane;
+Type *TypePlaneList;
+Type *TypeMatrix3;
+Type *TypeDate;
+Type *TypeImage;
 
 
-Array<sPackage> Package;
-sPackage *cur_package = NULL;
+Array<Package> Packages;
+Package *cur_package = NULL;
 int cur_package_index = -1;
 
 
 void set_cur_package(const string &name)
 {
-	cur_package_index = Package.num;
-	sPackage p;
+	cur_package_index = Packages.num;
+	Package p;
 	p.name = name;
-	Package.add(p);
-	cur_package = &Package.back();
+	Packages.add(p);
+	cur_package = &Packages.back();
 }
 
-Array<sType*> PreType;
-sType *add_type(const string &name, int size, TypeFlag flag)
+Array<Type*> PreTypes;
+Type *add_type(const string &name, int size, TypeFlag flag)
 {
 	msg_db_r("add_type", 4);
-	sType *t = new sType;
-	t->Name = name;
-	t->Size = size;
+	Type *t = new Type;
+	t->name = name;
+	t->size = size;
 	if ((flag & FLAG_CALL_BY_VALUE) > 0)
-		t->ForceCallByValue = true;
-	PreType.add(t);
+		t->force_call_by_value = true;
+	PreTypes.add(t);
 	if (cur_package)
 		cur_package->type.add(t);
 	msg_db_l(4);
 	return t;
 }
-sType *add_type_p(const string &name, sType *sub_type, TypeFlag flag)
+Type *add_type_p(const string &name, Type *sub_type, TypeFlag flag)
 {
 	msg_db_r("add_type_p", 4);
-	sType *t = new sType;
-	t->Name = name;
-	t->Size = PointerSize;
-	t->IsPointer = true;
+	Type *t = new Type;
+	t->name = name;
+	t->size = PointerSize;
+	t->is_pointer = true;
 	if ((flag & FLAG_SILENT) > 0)
-		t->IsSilent = true;
-	t->SubType = sub_type;
-	PreType.add(t);
+		t->is_silent = true;
+	t->parent = sub_type;
+	PreTypes.add(t);
 	if (cur_package)
 		cur_package->type.add(t);
 	msg_db_l(4);
 	return t;
 }
-sType *add_type_a(const string &name, sType *sub_type, int array_length)
+Type *add_type_a(const string &name, Type *sub_type, int array_length)
 {
 	msg_db_r("add_type_a", 4);
-	sType *t = new sType;
-	t->Name = name;
-	t->SubType = sub_type;
+	Type *t = new Type;
+	t->name = name;
+	t->parent = sub_type;
 	if (array_length < 0){
 		// super array
-		t->Size = SuperArraySize;
-		t->IsSuperArray = true;
+		t->size = SuperArraySize;
+		t->is_super_array = true;
 		//script_make_super_array(t); // do it later !!!
 	}else{
 		// standard array
-		t->Size = sub_type->Size * array_length;
-		t->IsArray = true;
-		t->ArrayLength = array_length;
+		t->size = sub_type->size * array_length;
+		t->is_array = true;
+		t->array_length = array_length;
 	}
-	PreType.add(t);
+	PreTypes.add(t);
 	if (cur_package)
 		cur_package->type.add(t);
 	msg_db_l(4);
 	return t;
 }
 
-sType *ScriptGetPreType(const string &name)
+Type *ScriptGetPreType(const string &name)
 {
-	for (int i=0;i<PreType.num;i++)
-		if (name == PreType[i]->Name)
-			return PreType[i];
+	for (int i=0;i<PreTypes.num;i++)
+		if (name == PreTypes[i]->name)
+			return PreTypes[i];
 	return TypeUnknown;
 }
 
@@ -162,7 +166,7 @@ sType *ScriptGetPreType(const string &name)
 //   without type information ("primitive")
 int NumPrimitiveOperators = NUM_PRIMITIVE_OPERATORS;
 
-sPrimitiveOperator PrimitiveOperator[NUM_PRIMITIVE_OPERATORS]={
+PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
 	{"=",	OperatorAssign,			true,	1,	"__assign__"},
 	{"+",	OperatorAdd,			false,	11,	"__add__"},
 	{"-",	OperatorSubtract,		false,	11,	"__sub__"},
@@ -194,19 +198,19 @@ sPrimitiveOperator PrimitiveOperator[NUM_PRIMITIVE_OPERATORS]={
 
 //   with type information
 
-Array<sPreOperator> PreOperator;
-int add_operator(int primitive_op, sType *return_type, sType *param_type1, sType *param_type2, void *func = NULL)
+Array<PreOperator> PreOperators;
+int add_operator(int primitive_op, Type *return_type, Type *param_type1, Type *param_type2, void *func = NULL)
 {
 	msg_db_r("add_op", 4);
-	sPreOperator o;
-	o.PrimitiveID = primitive_op;
-	o.ReturnType = return_type;
-	o.ParamType1 = param_type1;
-	o.ParamType2 = param_type2;
-	o.Func = func;
-	PreOperator.add(o);
+	PreOperator o;
+	o.primitive_id = primitive_op;
+	o.return_type = return_type;
+	o.param_type_1 = param_type1;
+	o.param_type_2 = param_type2;
+	o.func = func;
+	PreOperators.add(o);
 	msg_db_l(4);
-	return PreOperator.num - 1;
+	return PreOperators.num - 1;
 }
 
 
@@ -216,45 +220,45 @@ int add_operator(int primitive_op, sType *return_type, sType *param_type1, sType
 
 
 
-sType *cur_class;
-sClassFunction *cur_class_func = NULL;
+Type *cur_class;
+ClassFunction *cur_class_func = NULL;
 
-void add_class(sType *root_type)//, CPreScript *ps = NULL)
+void add_class(Type *root_type)//, PreScript *ps = NULL)
 {
 	msg_db_r("add_class", 4);
 	cur_class = root_type;
 	msg_db_l(4);
 }
 
-void class_add_element(const string &name, sType *type, int offset)
+void class_add_element(const string &name, Type *type, int offset)
 {
 	msg_db_r("add_class_el", 4);
-	sClassElement e;
-	e.Name = name;
-	e.Type = type;
-	e.Offset = offset;
-	cur_class->Element.add(e);
+	ClassElement e;
+	e.name = name;
+	e.type = type;
+	e.offset = offset;
+	cur_class->element.add(e);
 	msg_db_l(4);
 }
 
-int add_func(const string &name, sType *return_type, void *func, bool is_class);
+int add_func(const string &name, Type *return_type, void *func, bool is_class);
 
-void class_add_func(const string &name, sType *return_type, void *func)
+void class_add_func(const string &name, Type *return_type, void *func)
 {
 	msg_db_r("add_class_func", 4);
-	string tname = cur_class->Name;
+	string tname = cur_class->name;
 	if (tname[0] == '-')
-		for (int i=0;i<PreType.num;i++)
-			if ((PreType[i]->IsPointer) && (PreType[i]->SubType == cur_class))
-				tname = PreType[i]->Name;
+		for (int i=0;i<PreTypes.num;i++)
+			if ((PreTypes[i]->is_pointer) && (PreTypes[i]->parent == cur_class))
+				tname = PreTypes[i]->name;
 	int cmd = add_func(tname + "." + name, return_type, func, true);
-	sClassFunction f;
-	f.Name = name;
-	f.Kind = KindCompilerFunction;
-	f.Nr = cmd;
-	f.ReturnType = return_type;
-	cur_class->Function.add(f);
-	cur_class_func = &cur_class->Function.back();
+	ClassFunction f;
+	f.name = name;
+	f.kind = KindCompilerFunction;
+	f.nr = cmd;
+	f.return_type = return_type;
+	cur_class->function.add(f);
+	cur_class_func = &cur_class->function.back();
 	msg_db_l(4);
 }
 
@@ -263,16 +267,16 @@ void class_add_func(const string &name, sType *return_type, void *func)
 //                                           constants                                            //
 //------------------------------------------------------------------------------------------------//
 
-Array<sPreConstant> PreConstant;
-void add_const(const string &name, sType *type, void *value)
+Array<PreConstant> PreConstants;
+void add_const(const string &name, Type *type, void *value)
 {
 	msg_db_r("add_const", 4);
-	sPreConstant c;
-	c.Name = name;
-	c.Type = type;
-	c.Value = value;
+	PreConstant c;
+	c.name = name;
+	c.type = type;
+	c.value = value;
 	c.package = cur_package_index;
-	PreConstant.add(c);
+	PreConstants.add(c);
 	msg_db_l(4);
 }
 
@@ -280,17 +284,17 @@ void add_const(const string &name, sType *type, void *value)
 //                                    environmental variables                                     //
 //------------------------------------------------------------------------------------------------//
 
-Array<sPreExternalVar> PreExternalVar;
+Array<PreExternalVar> PreExternalVars;
 
-void add_ext_var(const string &name, sType *type, void *var)
+void add_ext_var(const string &name, Type *type, void *var)
 {
-	sPreExternalVar v;
-	v.Name = name;
-	v.Type = type;
-	v.Pointer = var;
-	v.IsSemiExternal = false;
+	PreExternalVar v;
+	v.name = name;
+	v.type = type;
+	v.pointer = var;
+	v.is_semi_external = false;
 	v.package = cur_package_index;
-	PreExternalVar.add(v);
+	PreExternalVars.add(v);
 };
 
 //------------------------------------------------------------------------------------------------//
@@ -316,57 +320,57 @@ string _cdecl ffff2s(quaternion &x){	return x.str();	}
 void *f_cp = (void*)1; // for fake (compiler-) functions
 
 
-Array<sPreCommand> PreCommand;
+Array<PreCommand> PreCommands;
 
 int cur_func;
 
-int add_func(const string &name, sType *return_type, void *func, bool is_class)
+int add_func(const string &name, Type *return_type, void *func, bool is_class)
 {
-	sPreCommand c;
-	c.Name = name;
-	c.ReturnType = return_type;
-	c.Func = func;
-	c.IsSpecial = false;
-	c.IsClassFunction = is_class;
-	c.IsSemiExternal = false;
+	PreCommand c;
+	c.name = name;
+	c.return_type = return_type;
+	c.func = func;
+	c.is_special = false;
+	c.is_class_function = is_class;
+	c.is_semi_external = false;
 	c.package = cur_package_index;
-	if (PreCommand.num < NUM_INTERN_PRE_COMMANDS)
-		PreCommand.resize(NUM_INTERN_PRE_COMMANDS);
-	PreCommand.add(c);
-	cur_func = PreCommand.num - 1;
+	if (PreCommands.num < NUM_INTERN_PRE_COMMANDS)
+		PreCommands.resize(NUM_INTERN_PRE_COMMANDS);
+	PreCommands.add(c);
+	cur_func = PreCommands.num - 1;
 	return cur_func;
 }
 
-int add_func_special(const string &name, sType *return_type, int index)
+int add_func_special(const string &name, Type *return_type, int index)
 {
-	sPreCommand c;
-	c.Name = name;
-	c.ReturnType = return_type;
-	c.Func = NULL;
-	c.IsSpecial = true;
-	c.IsClassFunction = false;
-	c.IsSemiExternal = false;
+	PreCommand c;
+	c.name = name;
+	c.return_type = return_type;
+	c.func = NULL;
+	c.is_special = true;
+	c.is_class_function = false;
+	c.is_semi_external = false;
 	c.package = cur_package_index;
-	if (PreCommand.num < NUM_INTERN_PRE_COMMANDS)
-		PreCommand.resize(NUM_INTERN_PRE_COMMANDS);
-	PreCommand[index] = c;
+	if (PreCommands.num < NUM_INTERN_PRE_COMMANDS)
+		PreCommands.resize(NUM_INTERN_PRE_COMMANDS);
+	PreCommands[index] = c;
 	cur_func = index;
 	cur_class_func = NULL;
 	return cur_func;
 }
 
-void func_add_param(const string &name, sType *type)
+void func_add_param(const string &name, Type *type)
 {
-	sPreCommandParam p;
-	p.Name = name;
-	p.Type = type;
-	PreCommand[cur_func].Param.add(p);
+	PreCommandParam p;
+	p.name = name;
+	p.type = type;
+	PreCommands[cur_func].param.add(p);
 	if (cur_class_func)
-		cur_class_func->ParamType.add(type);
+		cur_class_func->param_type.add(type);
 }
 
-void CSuperArray::init_by_type(sType *t)
-{	init(t->Size);	}
+void SuperArray::init_by_type(Type *t)
+{	init(t->size);	}
 
 /*string super_array_add_str(string *a, string *b)
 {
@@ -392,13 +396,13 @@ void super_array_add_str_cstr(string *a, char *b)
 	memcpy(&((char*)a->data)[n_old], b, l);
 }*/
 
-bool type_is_simple_class(sType *t)
+bool type_is_simple_class(Type *t)
 {
 	if (!t->UsesCallByReference())
 		return true;
 	/*if (t->IsArray)
 		return false;*/
-	if (t->IsSuperArray)
+	if (t->is_super_array)
 		return false;
 	if (t->GetFunc("__init__") >= 0)
 		return false;
@@ -406,77 +410,77 @@ bool type_is_simple_class(sType *t)
 		return false;
 	if (t->GetFunc("__assign__") >= 0)
 		return false;
-	foreach(sClassElement &e, t->Element)
-		if (!type_is_simple_class(e.Type))
+	foreach(ClassElement &e, t->element)
+		if (!type_is_simple_class(e.type))
 			return false;
 	return true;
 }
 
-void script_make_super_array(sType *t, CPreScript *ps)
+void script_make_super_array(Type *t, PreScript *ps)
 {
 	msg_db_r("make_super_array", 4);
 	add_class(t);
 		class_add_element("num", TypeInt, PointerSize);
 
 		// always usable operations
-		class_add_func("swap", TypeVoid, mf((tmf)&CSuperArray::swap));
+		class_add_func("swap", TypeVoid, mf((tmf)&SuperArray::swap));
 			func_add_param("i1",		TypeInt);
 			func_add_param("i2",		TypeInt);
-		class_add_func("iterate", TypeBool, mf((tmf)&CSuperArray::iterate));
+		class_add_func("iterate", TypeBool, mf((tmf)&SuperArray::iterate));
 			func_add_param("pointer",		TypePointerPs);
-		class_add_func("iterate_back", TypeBool, mf((tmf)&CSuperArray::iterate_back));
+		class_add_func("iterate_back", TypeBool, mf((tmf)&SuperArray::iterate_back));
 			func_add_param("pointer",		TypePointerPs);
-		class_add_func("index", TypeInt, mf((tmf)&CSuperArray::index));
+		class_add_func("index", TypeInt, mf((tmf)&SuperArray::index));
 			func_add_param("pointer",		TypePointer);
-		class_add_func("subarray", t, mf((tmf)&CSuperArray::ref_subarray));
+		class_add_func("subarray", t, mf((tmf)&SuperArray::ref_subarray));
 			func_add_param("start",		TypeInt);
 			func_add_param("num",		TypeInt);
 
-		if (type_is_simple_class(t->SubType)){
-			if (!t->SubType->UsesCallByReference()){
-				if (t->SubType->Size == 4){
+		if (type_is_simple_class(t->parent)){
+			if (!t->parent->UsesCallByReference()){
+				if (t->parent->size == 4){
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<int>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_4_single));
-						func_add_param("x",		t->SubType);
-					class_add_func("insert", TypeVoid, mf((tmf)&CSuperArray::insert_4_single));
-						func_add_param("x",		t->SubType);
+					class_add_func("add", TypeVoid, mf((tmf)&SuperArray::append_4_single));
+						func_add_param("x",		t->parent);
+					class_add_func("insert", TypeVoid, mf((tmf)&SuperArray::insert_4_single));
+						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
-				}else if (t->SubType->Size == 1){
+				}else if (t->parent->size == 1){
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<char>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_1_single));
-						func_add_param("x",		t->SubType);
-					class_add_func("insert", TypeVoid, mf((tmf)&CSuperArray::insert_1_single));
-						func_add_param("x",		t->SubType);
+					class_add_func("add", TypeVoid, mf((tmf)&SuperArray::append_1_single));
+						func_add_param("x",		t->parent);
+					class_add_func("insert", TypeVoid, mf((tmf)&SuperArray::insert_1_single));
+						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}
 			}else{
-				class_add_func("add", TypeVoid, mf((tmf)&CSuperArray::append_single));
-					func_add_param("x",		t->SubType);
-				class_add_func("insert", TypeVoid, mf((tmf)&CSuperArray::insert_single));
-					func_add_param("x",		t->SubType);
+				class_add_func("add", TypeVoid, mf((tmf)&SuperArray::append_single));
+					func_add_param("x",		t->parent);
+				class_add_func("insert", TypeVoid, mf((tmf)&SuperArray::insert_single));
+					func_add_param("x",		t->parent);
 					func_add_param("index",		TypeInt);
 			}
-			class_add_func("__delete__",	TypeVoid, mf((tmf)&CSuperArray::clear));
-			class_add_func("clear", TypeVoid, mf((tmf)&CSuperArray::clear));
-			class_add_func("__assign__", TypeVoid, mf((tmf)&CSuperArray::assign));
+			class_add_func("__delete__",	TypeVoid, mf((tmf)&SuperArray::clear));
+			class_add_func("clear", TypeVoid, mf((tmf)&SuperArray::clear));
+			class_add_func("__assign__", TypeVoid, mf((tmf)&SuperArray::assign));
 				func_add_param("other",		t);
-			class_add_func("remove", TypeVoid, mf((tmf)&CSuperArray::delete_single));
+			class_add_func("remove", TypeVoid, mf((tmf)&SuperArray::delete_single));
 				func_add_param("index",		TypeInt);
-			class_add_func("removep", TypeVoid, mf((tmf)&CSuperArray::delete_single_by_pointer));
+			class_add_func("removep", TypeVoid, mf((tmf)&SuperArray::delete_single_by_pointer));
 				func_add_param("pointer",		TypePointer);
-			class_add_func("resize", TypeVoid, mf((tmf)&CSuperArray::resize));
+			class_add_func("resize", TypeVoid, mf((tmf)&SuperArray::resize));
 				func_add_param("num",		TypeInt);
-			class_add_func("ensure_size", TypeVoid, mf((tmf)&CSuperArray::ensure_size));
+			class_add_func("ensure_size", TypeVoid, mf((tmf)&SuperArray::ensure_size));
 				func_add_param("num",		TypeInt);
 		}
 
 		// low level operations
-		class_add_func("__mem_init__", TypeVoid, mf((tmf)&CSuperArray::init));
+		class_add_func("__mem_init__", TypeVoid, mf((tmf)&SuperArray::init));
 			func_add_param("element_size",		TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, mf((tmf)&CSuperArray::clear));
-		class_add_func("__mem_resize__", TypeVoid, mf((tmf)&CSuperArray::resize));
+		class_add_func("__mem_clear__", TypeVoid, mf((tmf)&SuperArray::clear));
+		class_add_func("__mem_resize__", TypeVoid, mf((tmf)&SuperArray::resize));
 			func_add_param("size",		TypeInt);
-		class_add_func("__mem_remove__", TypeVoid, mf((tmf)&CSuperArray::delete_single));
+		class_add_func("__mem_remove__", TypeVoid, mf((tmf)&SuperArray::delete_single));
 			func_add_param("index",		TypeInt);
 	msg_db_l(4);
 }
@@ -585,18 +589,18 @@ char *CastComplex2StringP(complex *z)
 	return &CastTemp[0];
 }
 
-Array<sTypeCast> TypeCast;
-void add_type_cast(int penalty, sType *source, sType *dest, const string &cmd, void *func)
+Array<TypeCast> TypeCasts;
+void add_type_cast(int penalty, Type *source, Type *dest, const string &cmd, void *func)
 {
-	sTypeCast c;
-	c.Penalty = penalty;
-	c.Command = -1;
-	for (int i=0;i<PreCommand.num;i++)
-		if (PreCommand[i].Name == cmd){
-			c.Command = i;
+	TypeCast c;
+	c.penalty = penalty;
+	c.command = -1;
+	for (int i=0;i<PreCommands.num;i++)
+		if (PreCommands[i].name == cmd){
+			c.command = i;
 			break;
 		}
-	if (c.Command < 0){
+	if (c.command < 0){
 #ifdef _X_USE_HUI_
 		HuiErrorBox(NULL, "", "add_type_cast (ScriptInit): " + string(cmd) + " not found");
 		HuiRaiseError("add_type_cast (ScriptInit): " + string(cmd) + " not found");
@@ -605,10 +609,10 @@ void add_type_cast(int penalty, sType *source, sType *dest, const string &cmd, v
 		exit(1);
 #endif
 	}
-	c.Source = source;
-	c.Dest = dest;
-	c.Func = (t_cast_func*) func;
-	TypeCast.add(c);
+	c.source = source;
+	c.dest = dest;
+	c.func = (t_cast_func*) func;
+	TypeCasts.add(c);
 }
 
 
@@ -982,10 +986,10 @@ void SIAddSuperArrays()
 {
 	msg_db_r("SIAddSuperArrays", 3);
 
-	for (int i=0;i<PreType.num;i++)
-		if (PreType[i]->IsSuperArray){
+	for (int i=0;i<PreTypes.num;i++)
+		if (PreTypes[i]->is_super_array){
 			//msg_error(string("super array:  ", PreType[i]->Name));
-			script_make_super_array(PreType[i]);
+			script_make_super_array(PreTypes[i]);
 		}
 	
 	msg_db_l(3);
@@ -1062,7 +1066,7 @@ void SIAddPackageImage();
 void SIAddPackageSound();
 void SIAddPackageX();
 
-void ScriptInit()
+void Init()
 {
 	msg_db_r("ScriptInit", 1);
 
@@ -1085,7 +1089,7 @@ void ScriptInit()
 	SIAddPackageX();
 
 	cur_package_index = 0;
-	cur_package = &Package[0];
+	cur_package = &Packages[0];
 	SIAddCommands();
 	
 	SIAddOperators();
@@ -1137,58 +1141,59 @@ void ScriptInit()
 	msg_db_l(1);
 }
 
-void ScriptResetSemiExternalData()
+void ResetSemiExternalData()
 {
 	msg_db_r("ScriptResetSemiExternalData", 2);
-	for (int i=PreExternalVar.num-1;i>=0;i--)
-		if (PreExternalVar[i].IsSemiExternal)
-			PreExternalVar.erase(i);
-	for (int i=PreCommand.num-1;i>=0;i--)
-		if (PreCommand[i].IsSemiExternal)
-			PreCommand.erase(i);
+	for (int i=PreExternalVars.num-1;i>=0;i--)
+		if (PreExternalVars[i].is_semi_external)
+			PreExternalVars.erase(i);
+	for (int i=PreCommands.num-1;i>=0;i--)
+		if (PreCommands[i].is_semi_external)
+			PreCommands.erase(i);
 	msg_db_l(2);
 }
 
 // program variables - specific to the surrounding program, can't always be there...
-void ScriptLinkSemiExternalVar(const string &name, void *pointer)
+void LinkSemiExternalVar(const string &name, void *pointer)
 {
 	msg_db_r("ScriptLinkSemiExternalVar", 2);
-	sPreExternalVar v;
-	v.Name = name;
-	v.Pointer = pointer;
-	v.Type = TypeUnknown; // unusable until defined via "extern" in the script!
-	v.IsSemiExternal = true; // ???
-	PreExternalVar.add(v);
+	PreExternalVar v;
+	v.name = name;
+	v.pointer = pointer;
+	v.type = TypeUnknown; // unusable until defined via "extern" in the script!
+	v.is_semi_external = true; // ???
+	PreExternalVars.add(v);
 	msg_db_l(2);
 }
 
 // program functions - specific to the surrounding program, can't always be there...
-void ScriptLinkSemiExternalFunc(const string &name, void *pointer)
+void LinkSemiExternalFunc(const string &name, void *pointer)
 {
-	sPreCommand c;
-	c.Name = name;
-	c.IsClassFunction = false;
-	c.Func = pointer;
-	c.ReturnType = TypeUnknown; // unusable until defined via "extern" in the script!
-	c.IsSemiExternal = true;
-	PreCommand.add(c);
+	PreCommand c;
+	c.name = name;
+	c.is_class_function = false;
+	c.func = pointer;
+	c.return_type = TypeUnknown; // unusable until defined via "extern" in the script!
+	c.is_semi_external = true;
+	PreCommands.add(c);
 }
 
-void ScriptEnd()
+void End()
 {
 	msg_db_r("ScriptEnd", 1);
 	DeleteAllScripts(true, true);
 
-	ScriptResetSemiExternalData();
+	ResetSemiExternalData();
 
-	PreOperator.clear();
+	PreOperators.clear();
 
-	for (int i=0;i<PreType.num;i++)
-		delete(PreType[i]);
-	PreType.clear();
+	for (int i=0;i<PreTypes.num;i++)
+		delete(PreTypes[i]);
+	PreTypes.clear();
 
-	PreConstant.clear();
-	PreExternalVar.clear();
+	PreConstants.clear();
+	PreExternalVars.clear();
 	msg_db_l(1);
 }
 
+};

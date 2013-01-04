@@ -9,10 +9,9 @@
 #if !defined(SCRIPT_H__INCLUDED_)
 #define SCRIPT_H__INCLUDED_
 
-
-
-
-class CScript;
+namespace Script{
+class Script;
+}
 
 #include "../base/base.h"
 #include "../types/types.h"
@@ -20,7 +19,9 @@ class CScript;
 #include "script_data.h"
 #include "pre_script.h"
 
-extern string ScriptVersion;
+namespace Script{
+
+extern string Version;
 
 
 extern bool UseConstAsGlobalVar;
@@ -41,7 +42,7 @@ struct sSerialCommandParam
 {
 	int kind;
 	char *p;
-	sType *type;
+	Type *type;
 	int shift;
 	//int c_id, v_id;
 	bool operator == (const sSerialCommandParam &param) const
@@ -58,13 +59,13 @@ struct sSerialCommand
 struct SerializerData;
 
 // executable (compiled) data
-class CScript
+class Script
 {
 public:
 	// don't call yourself.... better use LoadScript(...)
-	CScript(const string &filename, bool just_analyse = false);
-	CScript();
-	~CScript();
+	Script(const string &filename, bool just_analyse = false);
+	Script();
+	~Script();
 
 	// building operational code
 	void Compiler();
@@ -73,12 +74,12 @@ public:
 	void AllocateMemory();
 	void AllocateStack();
 	void AllocateOpcode();
-	void CompileFunction(sFunction *f, char *Opcode, int &OpcodeSize);
-	void SerializeFunction(SerializerData *d, sFunction *f);
-	void SerializeBlock(SerializerData *d, sBlock *block, int level);
-	void SerializeParameter(SerializerData *d, sCommand *link, int level, int index, sSerialCommandParam &param);
-	sSerialCommandParam SerializeCommand(SerializerData *d, sCommand *com, int level, int index);
-	void SerializeOperator(SerializerData *d, sCommand *com, sSerialCommandParam *param, sSerialCommandParam &ret);
+	void CompileFunction(Function *f, char *Opcode, int &OpcodeSize);
+	void SerializeFunction(SerializerData *d, Function *f);
+	void SerializeBlock(SerializerData *d, Block *block, int level);
+	void SerializeParameter(SerializerData *d, Command *link, int level, int index, sSerialCommandParam &param);
+	sSerialCommandParam SerializeCommand(SerializerData *d, Command *com, int level, int index);
+	void SerializeOperator(SerializerData *d, Command *com, sSerialCommandParam *param, sSerialCommandParam &ret);
 	void CompileOsEntryPoint();
 	void LinkOsEntryPoint();
 	void CompileTaskEntryPoint();
@@ -98,7 +99,7 @@ public:
 
 // data
 
-	CPreScript *pre_script;
+	PreScript *pre_script;
 
 	int ReferenceCounter;
 
@@ -116,7 +117,7 @@ public:
 	bool Error, ParserError, LinkerError, isCopy, isPrivate, JustAnalyse, ShowCompilerStats;
 	string ErrorMsg, ErrorMsgExt[2];
 	int ErrorLine, ErrorColumn;
-	sFunction *cur_func;
+	Function *cur_func;
 	int WaitingMode;
 	float TimeToWait;
 
@@ -125,15 +126,15 @@ public:
 	int MemoryUsed;
 };
 
-extern CScript *LoadScript(const string &filename, bool is_public = true, bool just_analyse = false);
-extern void RemoveScript(CScript *s);
-extern string ScriptDirectory;
-extern bool ScriptCompileSilently;
-extern bool ScriptShowCompilerStats;
+extern Script *Load(const string &filename, bool is_public = true, bool just_analyse = false);
+extern void Remove(Script *s);
+extern string Directory;
+extern bool CompileSilently;
+extern bool ShowCompilerStats;
 extern void ExecutePublicScripts();
 extern void DeleteAllScripts(bool even_immortal = false, bool force = false);
 extern void ExecuteSingleScriptCommand(const string &cmd);
 
-
+};
 
 #endif

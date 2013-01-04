@@ -11,6 +11,8 @@
 	#include "../networking.h"
 #endif
 
+namespace Script{
+
 #ifdef _X_ALLOW_META_
 	#define meta_p(p)	(void*)p
 #else
@@ -47,65 +49,65 @@
 	#define x_p(p)		NULL
 #endif
 
-sType *TypeBone;
-sType *TypeBoneList;
-sType *TypeModel;
-sType *TypeModelP;
-sType *TypeModelPPs;
-sType *TypeModelPList;
-sType *TypeModelPListPs;
-sType *TypeText;
-sType *TypeTextP;
-sType *TypePicture;
-sType *TypePictureP;
-sType *TypePicture3D;
-sType *TypePicture3DP;
-sType *TypeGrouping;
-sType *TypeGroupingP;
-sType *TypeParticle;
-sType *TypeParticleP;
-sType *TypeBeam;
-sType *TypeBeamP;
-sType *TypeEffect;
-sType *TypeEffectP;
-sType *TypeCamera;
-sType *TypeCameraP;
-sType *TypeSkin;
-sType *TypeSkinP;
-sType *TypeSkinPArray;
-sType *TypeSubSkin;
-sType *TypeSubSkinList;
-sType *TypeMaterial;
-sType *TypeMaterialList;
-sType *TypeFog;
-sType *TypeTerrain;
-sType *TypeTerrainP;
-sType *TypeTerrainPList;
+Type *TypeBone;
+Type *TypeBoneList;
+Type *TypeModel;
+Type *TypeModelP;
+Type *TypeModelPPs;
+Type *TypeModelPList;
+Type *TypeModelPListPs;
+Type *TypeText;
+Type *TypeTextP;
+Type *TypePicture;
+Type *TypePictureP;
+Type *TypePicture3D;
+Type *TypePicture3DP;
+Type *TypeGrouping;
+Type *TypeGroupingP;
+Type *TypeParticle;
+Type *TypeParticleP;
+Type *TypeBeam;
+Type *TypeBeamP;
+Type *TypeEffect;
+Type *TypeEffectP;
+Type *TypeCamera;
+Type *TypeCameraP;
+Type *TypeSkin;
+Type *TypeSkinP;
+Type *TypeSkinPArray;
+Type *TypeSubSkin;
+Type *TypeSubSkinList;
+Type *TypeMaterial;
+Type *TypeMaterialList;
+Type *TypeFog;
+Type *TypeTerrain;
+Type *TypeTerrainP;
+Type *TypeTerrainPList;
 
-extern sType *TypeMatrix;
-extern sType *TypeMatrix3;
-extern sType *TypeFloatList;
-extern sType *TypeIntList;
-extern sType *TypePointerList;
-extern sType *TypeVectorList;
-extern sType *TypeVectorArray;
-extern sType *TypeIntArray;
-extern sType *TypeFloatArray;
-extern sType *TypeFloatPs;
-extern sType *TypePlaneList;
-extern sType *TypeStringList;
-extern sType *TypePlane;
-extern sType *TypePlaneList;
+extern Type *TypeMatrix;
+extern Type *TypeMatrix3;
+extern Type *TypeFloatList;
+extern Type *TypeIntList;
+extern Type *TypePointerList;
+extern Type *TypeVectorList;
+extern Type *TypeVectorArray;
+extern Type *TypeIntArray;
+extern Type *TypeFloatArray;
+extern Type *TypeFloatPs;
+extern Type *TypePlaneList;
+extern Type *TypeStringList;
+extern Type *TypePlane;
+extern Type *TypePlaneList;
 
 
 #ifdef _X_ALLOW_GUI_
-	static sText *_text;
+	static Gui::Text *_text;
 	#define	GetDAText(x)		long(&_text->x)-long(_text)
-	static sPicture *_picture;
+	static Gui::Picture *_picture;
 	#define	GetDAPicture(x)		long(&_picture->x)-long(_picture)
-	static sPicture3D *_picture3d;
+	static Gui::Picture3d *_picture3d;
 	#define	GetDAPicture3D(x)	long(&_picture3d->x)-long(_picture3d)
-	static sGrouping *_grouping;
+	static Gui::Grouping *_grouping;
 	#define	GetDAGrouping(x)	long(&_grouping->x)-long(_grouping)
 #else
 	#define	GetDAText(x)		0
@@ -114,9 +116,9 @@ extern sType *TypePlaneList;
 	#define	GetDAGrouping(x)	0
 #endif
 #ifdef _X_ALLOW_FX_
-	static sParticle *_particle;
+	static Particle *_particle;
 	#define	GetDAParticle(x)	long(&_particle->x)-long(_particle)
-	static sEffect *_effect;
+	static Effect *_effect;
 	#define	GetDAEffect(x)		long(&_effect->x)-long(_effect)
 #else
 	#define	GetDAParticle(x)	0
@@ -126,7 +128,7 @@ extern sType *TypePlaneList;
 #ifdef _X_ALLOW_MODEL_
 	static Bone *_bone;
 	#define	GetDABone(x)		long(&_bone->x)-long(_bone)
-	static CModel *_model;
+	static Model *_model;
 	#define sizeof_Bone			sizeof(Bone)
 	#define	GetDAModel(x)		long(&_model->x)-long(_model)
 	static Skin *_skin;
@@ -157,7 +159,7 @@ extern sType *TypePlaneList;
 	#define	GetDACamera(x)		0
 #endif
 #ifdef _X_ALLOW_TERRAIN_
-	static CTerrain *_terrain;
+	static Terrain *_terrain;
 	#define	GetDATerrain(x)		long(&_terrain->x)-long(_terrain)
 #else
 	#define	GetDATerrain(x)		0
@@ -216,7 +218,7 @@ void SIAddPackageX()
 		class_add_element("texture",		TypeInt,		GetDAPicture(texture));
 		class_add_element("source",			TypeRect,		GetDAPicture(source));
 		class_add_element("shader",			TypeInt,		GetDAPicture(shader));
-		class_add_func("IsMouseOver",		TypeBool,	gui_p(mf((tmf)&sPicture::IsMouseOver)));
+		class_add_func("IsMouseOver",		TypeBool,	gui_p(mf((tmf)&Gui::Picture::IsMouseOver)));
 	
 	add_class(TypePicture3D);
 		class_add_element("enabled",		TypeBool,		GetDAPicture3D(enabled));
@@ -240,7 +242,7 @@ void SIAddPackageX()
 		class_add_element("size",			TypeFloat,		GetDAText(size));
 		class_add_element("color",			TypeColor,		GetDAText(_color));
 		class_add_element("text",			TypeString,		GetDAText(text));
-		class_add_func("IsMouseOver",		TypeBool,	gui_p(mf((tmf)&sText::IsMouseOver)));
+		class_add_func("IsMouseOver",		TypeBool,	gui_p(mf((tmf)&Gui::Text::IsMouseOver)));
 	
 	add_class(TypeParticle);
 		class_add_element("enabled",		TypeBool,		GetDAParticle(enabled));
@@ -355,14 +357,14 @@ void SIAddPackageX()
 		class_add_element("var_p",			TypePointerList,GetDAModel(script_var));
 		class_add_element("data",			TypePointer,	GetDAModel(script_data));
 		class_add_element("item",			TypeModelPList,	GetDAModel(inventary));
-		class_add_func("AddForce",		TypeVoid,	god_p(mf((tmf)&CObject::AddForce)));
+		class_add_func("AddForce",		TypeVoid,	god_p(mf((tmf)&Object::AddForce)));
 			func_add_param("force",		TypeVector);
 			func_add_param("rho",		TypeVector);
-		class_add_func("AddTorque",		TypeVoid,	god_p(mf((tmf)&CObject::AddTorque)));
+		class_add_func("AddTorque",		TypeVoid,	god_p(mf((tmf)&Object::AddTorque)));
 			func_add_param("torque",		TypeVector);
-		class_add_func("MakeVisible",		TypeVoid,		god_p(mf((tmf)&CObject::MakeVisible)));
+		class_add_func("MakeVisible",		TypeVoid,		god_p(mf((tmf)&Object::MakeVisible)));
 			func_add_param("visible",		TypeBool);
-		class_add_func("UpdateData",		TypeVoid,		god_p(mf((tmf)&CObject::UpdateData)));
+		class_add_func("UpdateData",		TypeVoid,		god_p(mf((tmf)&Object::UpdateData)));
 		class_add_element("skin",			TypeSkinPArray,	GetDAModel(skin));
 		class_add_element("skin0",			TypeSkinP,		GetDAModel(skin[0]));
 		class_add_element("skin1",			TypeSkinP,		GetDAModel(skin[1]));
@@ -373,15 +375,15 @@ void SIAddPackageX()
 		class_add_element("max",			TypeVector,		GetDAModel(max));
 		class_add_element("test_collisions",	TypeBool,		GetDAModel(test_collisions));
 		class_add_element("allow_shadow",	TypeBool,		GetDAModel(allow_shadow));
-/*	add_func("CalcMove",					TypeVoid,		mod_p(mf((tmf)&CModel::CalcMove)));
-	add_func("Draw",						TypeVoid,		mod_p(mf((tmf)&CModel::Draw)));
+/*	add_func("CalcMove",					TypeVoid,		mod_p(mf((tmf)&Model::CalcMove)));
+	add_func("Draw",						TypeVoid,		mod_p(mf((tmf)&Model::Draw)));
 		func_add_param("skin",				TypeInt);
 		func_add_param("fx",				TypeBool);*/
-		class_add_func("GetVertex",		TypeVector,		mod_p(mf((tmf)&CModel::GetVertex)));
+		class_add_func("GetVertex",		TypeVector,		mod_p(mf((tmf)&Model::GetVertex)));
 			func_add_param("index",			TypeInt);
 			func_add_param("skin",			TypeInt);
-		class_add_func("ResetAnimation",		TypeVoid,		mod_p(mf((tmf)&CModel::ResetAnimation)));
-		class_add_func("Animate",				TypeBool,		mod_p(mf((tmf)&CModel::Animate)));
+		class_add_func("ResetAnimation",		TypeVoid,		mod_p(mf((tmf)&Model::ResetAnimation)));
+		class_add_func("Animate",				TypeBool,		mod_p(mf((tmf)&Model::Animate)));
 			func_add_param("operation",		TypeInt);
 			func_add_param("param1",		TypeFloat);
 			func_add_param("param2",		TypeFloat);
@@ -390,18 +392,18 @@ void SIAddPackageX()
 			func_add_param("dt",			TypeFloat);
 			func_add_param("v",				TypeFloat);
 			func_add_param("loop",			TypeBool);
-		class_add_func("GetFrames",		TypeInt,		mod_p(mf((tmf)&CModel::GetFrames)));
+		class_add_func("GetFrames",		TypeInt,		mod_p(mf((tmf)&Model::GetFrames)));
 			func_add_param("move",			TypeInt);
-		class_add_func("BeginEditAnimation",	TypeVoid,		mod_p(mf((tmf)&CModel::BeginEditAnimation)));
-		class_add_func("MakeEditable",		TypeVoid,		mod_p(mf((tmf)&CModel::MakeEditable)));
-		class_add_func("BeginEdit",		TypeVoid,		mod_p(mf((tmf)&CModel::BeginEdit)));
+		class_add_func("BeginEditAnimation",	TypeVoid,		mod_p(mf((tmf)&Model::BeginEditAnimation)));
+		class_add_func("MakeEditable",		TypeVoid,		mod_p(mf((tmf)&Model::MakeEditable)));
+		class_add_func("BeginEdit",		TypeVoid,		mod_p(mf((tmf)&Model::BeginEdit)));
 			func_add_param("skin",			TypeInt);
-		class_add_func("EndEdit",			TypeVoid,		mod_p(mf((tmf)&CModel::EndEdit)));
+		class_add_func("EndEdit",			TypeVoid,		mod_p(mf((tmf)&Model::EndEdit)));
 			func_add_param("skin",			TypeInt);
-		class_add_func("SetBoneModel",		TypeVoid,		mod_p(mf((tmf)&CModel::SetBoneModel)));
+		class_add_func("SetBoneModel",		TypeVoid,		mod_p(mf((tmf)&Model::SetBoneModel)));
 			func_add_param("index",			TypeInt);
 			func_add_param("bone",			TypeModelP);
-		class_add_func("GetFilename",		TypeString,		mod_p(mf((tmf)&CModel::GetFilename)));
+		class_add_func("GetFilename",		TypeString,		mod_p(mf((tmf)&Model::GetFilename)));
 
 	add_class(TypeTerrain);
 		class_add_element("pos",			TypeVector,		GetDATerrain(pos));
@@ -412,13 +414,13 @@ void SIAddPackageX()
 		class_add_element("num_textures",	TypeInt,		GetDATerrain(num_textures));
 		class_add_element("texture",		TypeIntArray,	GetDATerrain(texture));
 		class_add_element("texture_scale",	TypeVectorArray,GetDATerrain(texture_scale));
-		class_add_func("Update",			TypeVoid,		god_p(mf((tmf)&CTerrain::Update)));
+		class_add_func("Update",			TypeVoid,		god_p(mf((tmf)&Terrain::Update)));
 			func_add_param("x1",		TypeInt);
 			func_add_param("x2",		TypeInt);
 			func_add_param("z1",		TypeInt);
 			func_add_param("z2",		TypeInt);
 			func_add_param("mode",		TypeInt);
-		class_add_func("GetHeight",			TypeFloat,		god_p(mf((tmf)&CTerrain::gimme_height)));
+		class_add_func("GetHeight",			TypeFloat,		god_p(mf((tmf)&Terrain::gimme_height)));
 			func_add_param("p",			TypeVector);
 
 	add_class(TypeCamera);
@@ -467,21 +469,21 @@ void SIAddPackageX()
 		func_add_param("s",		TypeString);
 	add_func("LoadFont",			TypeInt,	meta_p(&MetaLoadXFont));
 		func_add_param("filename",		TypeString);
-	add_func("CreatePicture",										TypePictureP,	gui_p(&GuiCreatePicture));
+	add_func("CreatePicture",										TypePictureP,	gui_p(&Gui::CreatePicture));
 		func_add_param("pos",		TypeVector);
 		func_add_param("width",		TypeFloat);
 		func_add_param("height",	TypeFloat);
 		func_add_param("texture",	TypeInt);
-	add_func("CreatePicture3D",								TypePicture3DP,	gui_p(&GuiCreatePicture3D));
+	add_func("CreatePicture3D",								TypePicture3DP,	gui_p(&Gui::CreatePicture3d));
 		func_add_param("m",			TypeModelP);
 		func_add_param("mat",		TypeMatrix);
 		func_add_param("z",			TypeFloat);
-	add_func("CreateText",												TypeTextP,	gui_p(&GuiCreateText));
+	add_func("CreateText",												TypeTextP,	gui_p(&Gui::CreateText));
 		func_add_param("pos",		TypeVector);
 		func_add_param("size",		TypeFloat);
 		func_add_param("c",			TypeColor);
 		func_add_param("str",		TypeString);
-	add_func("CreateGrouping",										TypeGroupingP,	gui_p(&GuiCreateGrouping));
+	add_func("CreateGrouping",										TypeGroupingP,	gui_p(&Gui::CreateGrouping));
 		func_add_param("pos",		TypeVector);
 		func_add_param("set_cur",	TypeBool);
 	add_func("CreateParticle",										TypeParticleP,	fx_p(&FxParticleCreateDef));
@@ -654,9 +656,9 @@ void SIAddPackageX()
 	add_ext_var("InitialWorldFile", TypeString,		god_p(&InitialWorldFile));
 	add_ext_var("CurrentWorldFile", TypeString,		god_p(&CurrentWorldFile));
 	add_ext_var("SecondWorldFile",	TypeString,		god_p(&SecondWorldFile));
-	add_ext_var("Object",			TypeModelPList,	god_p(&Object));
+	add_ext_var("Object",			TypeModelPList,	god_p(&Objects));
 	add_ext_var("Ego",				TypeModelP,		god_p(&Ego));
-	add_ext_var("Terrain",			TypeTerrainPList,god_p(&Terrain));
+	add_ext_var("Terrain",			TypeTerrainPList,god_p(&Terrains));
 	add_ext_var("Gravitation",		TypeVector,		god_p(&GlobalG));
 	add_ext_var("PhysicsEnabled",	TypeBool,		god_p(&PhysicsEnabled));
 	add_ext_var("CollisionsEnabled",	TypeBool,		god_p(&CollisionsEnabled));
@@ -671,7 +673,7 @@ void SIAddPackageX()
 	add_ext_var("TraceHitType",		TypeInt,		god_p(&TraceHitType));
 	add_ext_var("TraceHitIndex",	TypeInt,		god_p(&TraceHitIndex));
 	add_ext_var("TraceHitSubModel", TypeInt,		god_p(&TraceHitSubModel));
-	add_ext_var("CurrentGrouping",	TypeGroupingP,	gui_p(&CurrentGrouping));
+	add_ext_var("CurrentGrouping",	TypeGroupingP,	gui_p(&Gui::CurrentGrouping));
 	add_ext_var("MirrorLevelMax",	TypeInt,		god_p(&MirrorLevelMax));
 	add_ext_var("SessionName",		TypeString,		x_p(&SessionName));
 	add_ext_var("HostNames",		TypeString,		x_p(&HostNames));
@@ -721,3 +723,5 @@ void SIAddPackageX()
 	add_const("MoveOpMix2Factor",  TypeInt, god_p(MoveOpMix2Factor));
 	
 }
+
+};

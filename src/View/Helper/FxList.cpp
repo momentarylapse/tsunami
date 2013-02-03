@@ -29,11 +29,11 @@ FxList::FxList(CHuiWindow *_dlg, const string & _id, const string &_id_add, cons
 	fx = NULL;
 
 	FillList();
-	dlg->EventM(id, this, (void(HuiEventHandler::*)())&FxList::OnList);
-	dlg->EventMX(id, "hui:select", this, (void(HuiEventHandler::*)())&FxList::OnListSelect);
-	dlg->EventM(id_add, this, (void(HuiEventHandler::*)())&FxList::OnAdd);
-	dlg->EventM(id_edit, this, (void(HuiEventHandler::*)())&FxList::OnEdit);
-	dlg->EventM(id_delete, this, (void(HuiEventHandler::*)())&FxList::OnDelete);
+	dlg->EventM(id, this, &FxList::OnList);
+	dlg->EventMX(id, "hui:select", this, &FxList::OnListSelect);
+	dlg->EventM(id_add, this, &FxList::OnAdd);
+	dlg->EventM(id_edit, this, &FxList::OnEdit);
+	dlg->EventM(id_delete, this, &FxList::OnDelete);
 }
 
 

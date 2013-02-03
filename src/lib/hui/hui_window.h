@@ -201,8 +201,14 @@ public:
 	void _cdecl AllowEvents(const string &msg);
 	void _cdecl Event(const string &id, hui_callback *function);
 	void _cdecl EventX(const string &id, const string &msg, hui_callback *function);
-	void EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)());
-	void EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)());
+	void _EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)());
+	void _EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)());
+	template<typename T>
+	void EventM(const string &id, HuiEventHandler* handler, T fun)
+	{	_EventM(id, handler, (void(HuiEventHandler::*)())fun);	}
+	template<typename T>
+	void EventMX(const string &id, const string &msg, HuiEventHandler* handler, T fun)
+	{	_EventMX(id, msg, handler, (void(HuiEventHandler::*)())fun);	}
 	bool _SendEvent_(HuiEvent *e);
 
 	// creating controls

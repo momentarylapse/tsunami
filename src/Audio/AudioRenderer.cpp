@@ -7,6 +7,7 @@
 
 #include "AudioRenderer.h"
 #include "../Plugins/Effect.h"
+#include "../Plugins/ExtendedBufferBox.h"
 #include "../Tsunami.h"
 
 AudioRenderer::AudioRenderer()
@@ -74,7 +75,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	Array<Beat> beats = t->bar.GetBeats(range);
 
 	foreach(Beat &b, beats)
-		buf.add_click(b.pos - range.offset, (b.beat_no == 0) ? 0.8f : 0.3f, (b.beat_no == 0) ? 660.0f : 880.0f, t->root->sample_rate);
+		((ExtendedBufferBox&)buf).add_click(b.pos - range.offset, (b.beat_no == 0) ? 0.8f : 0.3f, (b.beat_no == 0) ? 660.0f : 880.0f, t->root->sample_rate);
 
 	msg_db_l(1);
 }

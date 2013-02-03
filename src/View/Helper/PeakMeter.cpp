@@ -24,8 +24,8 @@ PeakMeter::PeakMeter(CHuiWindow *_win, const string &_id, PeakMeterSource *_sour
 	spec_r.resize(SPECTRUM_SIZE);
 	spec_l.resize(SPECTRUM_SIZE);
 
-	win->EventMX(id, "hui:redraw", this, (void(HuiEventHandler::*)())&PeakMeter::OnDraw);
-	win->EventMX(id, "hui:left-button-down", this, (void(HuiEventHandler::*)())&PeakMeter::OnLeftButtonDown);
+	win->EventMX(id, "hui:redraw", this, &PeakMeter::OnDraw);
+	win->EventMX(id, "hui:left-button-down", this, &PeakMeter::OnLeftButtonDown);
 	Subscribe(source);
 }
 

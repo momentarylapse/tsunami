@@ -42,6 +42,8 @@ class BufferBox
 	extern void __assign__(BufferBox other)
 	extern void clear()
 	extern void add_click(int pos, float volume, float freq, int sample_rate)
+	extern void add_tone(Range range, float volume, float freq, int sample_rate)
+	extern void get_spectrum(complex spec_r[], complex spec_l[], int samples)
 
 class TrackRenderBuffer
 	int dummy

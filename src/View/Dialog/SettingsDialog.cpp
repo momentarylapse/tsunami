@@ -16,13 +16,13 @@ SettingsDialog::SettingsDialog(CHuiWindow *_parent, bool _allow_parent):
 {
 	FromResource("properties_dialog");
 
-	EventM("language", this, (void(HuiEventHandler::*)())&SettingsDialog::OnLanguage);
-	EventM("ogg_bitrate", this, (void(HuiEventHandler::*)())&SettingsDialog::OnOggBitrate);
-	EventM("preview_sleep", this, (void(HuiEventHandler::*)())&SettingsDialog::OnPreviewSleep);
-	EventM("preview_device", this, (void(HuiEventHandler::*)())&SettingsDialog::OnPreviewDevice);
-	EventM("capture_delay", this, (void(HuiEventHandler::*)())&SettingsDialog::OnCaptureDelay);
-	EventM("hui:close", this, (void(HuiEventHandler::*)())&SettingsDialog::OnClose);
-	EventM("close", this, (void(HuiEventHandler::*)())&SettingsDialog::OnClose);
+	EventM("language", this, &SettingsDialog::OnLanguage);
+	EventM("ogg_bitrate", this, &SettingsDialog::OnOggBitrate);
+	EventM("preview_sleep", this, &SettingsDialog::OnPreviewSleep);
+	EventM("preview_device", this, &SettingsDialog::OnPreviewDevice);
+	EventM("capture_delay", this, &SettingsDialog::OnCaptureDelay);
+	EventM("hui:close", this, &SettingsDialog::OnClose);
+	EventM("close", this, &SettingsDialog::OnClose);
 
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
@@ -57,7 +57,7 @@ void SettingsDialog::LoadData()
 		if (CurOggQuality > q.quality - 0.05f)
 			SetInt("ogg_bitrate", i);
 	SetDecimals(1);
-	//volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, t->volume);
+	//volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, &TrackDialog::OnVolume, t->volume);
 	//AddSlider(SettingsDialog, "volume_slider", "volume", 0, 2, 100, &OnSettingsVolume, Preview.volume);
 	//tsunami->output->
 	//SetInt("preview_sleep", PreviewSleepTime);

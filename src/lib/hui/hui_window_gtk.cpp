@@ -21,6 +21,9 @@ GtkWidget *gtk_box_new(GtkOrientation orientation, int spacing); // -> hui_windo
 
 unsigned int ignore_time = 0;
 
+
+int HWCursorDx = 0, HWCursorDy = 0;
+
 //----------------------------------------------------------------------------------
 // window message handling
 
@@ -256,14 +259,14 @@ gboolean OnGtkWindowMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer
 	}
 	//msg_write(format("gtk  %.0f %.0f  ->  %d %d   (%d)", win->input.x, win->input.y, mx, my, gdk_event_get_time((GdkEvent*)event)));
 	
-	if (ignore_time != 0)
+	/*if (ignore_time != 0)
 		if (gdk_event_get_time((GdkEvent*)event) <= ignore_time){
 			//msg_error("ignore");
-			gdk_event_request_motions(event); // too prevent too many signals for slow message processing
+			gdk_event_request_motions(event); // to prevent too many signals for slow message processing
 			return false;
-		}
-	win->input.dx = mx - win->input.x;
-	win->input.dy = my - win->input.y;
+		}*/
+	win->input.dx = mx - win->input.x - HWCursorDx;
+	win->input.dy = my - win->input.y - HWCursorDy;
 	win->input.x = mx;
 	win->input.y = my;
 	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
@@ -272,6 +275,9 @@ gboolean OnGtkWindowMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer
 	HuiEvent e = HuiCreateEvent("", "hui:mouse-move");
 	win->_SendEvent_(&e);
 	
+	HWCursorDx = 0;
+	HWCursorDy = 0;
+
 	/*if (win){
 		// don't listen to "event", it lacks behind
 		int mod = 0, mx, my, x_max, y_max;
@@ -916,8 +922,17 @@ void put_events()
 }
 
 // relative to Interior
-void CHuiWindow::SetCursorPos(int x,int y)
+void CHuiWindow::SetCursorPos(int x, int y)
 {
+	if (gl_widget){
+		//HWCursorDx = x - input.x;
+		//HWCursorDy = y - input.y;
+		input.x = x;
+		input.y = y;
+		// TODO GTK3
+		XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(gl_widget)), 0, 0, 0, 0, x, y);
+	}
+#if 0
 	irect ri = GetInterior();
 	irect ro = GetOuterior();
 	int dx = 0;
@@ -968,6 +983,7 @@ void CHuiWindow::SetCursorPos(int x,int y)
 	input.y = (float)y - dy;
 	input.dx = 0;
 	input.dy = 0;
+#endif
 }
 
 void CHuiWindow::SetMaximized(bool maximized)

@@ -1,0 +1,91 @@
+// Image = hui:media-play
+// Title[Deutsch] = Metronom
+#include "../api.kaba"
+#include "../tone.kaba"
+
+window dlg
+
+const int SAMPLE_RATE = 44100
+float length
+float freq
+float bpm
+int beats
+float volume
+Chord chords[]
+
+void fill(int pos, BufferBox buf)
+	float dt_m = 60.0 / bpm
+	int sm_m = dt_m * SAMPLE_RATE
+	
+	buf.r = 0
+	buf.l = 0
+	
+	int num_clicks = buf.num / sm_m + 2
+	
+	for int i, -1, num_clicks
+		int n = pos / sm_m + i
+		int pos0 = i * sm_m - (pos % sm_m)
+		if (n % beats) == 0
+			buf.add_click(pos0, volume, freq*0.75, SAMPLE_RATE)
+		else
+			buf.add_click(pos0, volume*0.33, freq, SAMPLE_RATE)
+		if chords.num > 0
+			AddChord(SAMPLE_RATE, buf, pos0, pos0 + sm_m, chords[n % chords.num], volume * 0.5)
+
+void Reset()
+	output.Stop()
+	output.PlayGenerated(&fill, SAMPLE_RATE)
+
+void OnBpm()
+	bpm = dlg.GetFloat("")
+	Reset()
+	
+void OnBeats()
+	beats = dlg.GetInt("")
+	Reset()
+	
+void OnChords()
+	string str = dlg.GetString("")
+	ParseChords(str, chords)
+	Reset()
+
+void OnClose()
+	output.Stop()
+	HuiWinClose(dlg)
+
+void main()
+	dlg = HuiCreateSizableDialog("Metronome", 200, 80, MainWin, false)
+	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
+	dlg.SetTarget("table1", 0)
+	dlg.AddControlTable("", 0, 0, 2, 3, "table2")
+	dlg.AddControlTable("", 0, 1, 2, 1, "table_bottom")
+	dlg.SetTarget("table2", 0)
+	dlg.AddText("Beats per Minute", 0, 0, 0, 0, "")
+	dlg.AddSpinButton("", 1, 0, 0, 0, "bpm")
+	dlg.AddText("Beats per Measure", 0, 1, 0, 0, "")
+	dlg.AddSpinButton("\\1", 1, 1, 0, 0, "beats")
+	dlg.AddText("Chords", 0, 2, 0, 0, "")
+	dlg.AddEdit("", 1, 2, 0, 0, "chords")
+	dlg.SetTarget("table_bottom", 0)
+	dlg.AddText("", 0, 0, 0, 0, "")
+	dlg.AddButton("Close", 1, 0, 0, 0, "close")
+	dlg.SetImage("close", "hui:close")
+	dlg.Update()
+	
+	freq = 880.0
+	length = 0.02
+	volume = 0.3
+	bpm = 90.0
+	beats = 4
+	dlg.SetFloat("bpm", bpm)
+	dlg.SetInt("beats", beats)
+	
+	dlg.Event("hui:close", &OnClose)
+	dlg.Event("close", &OnClose)
+	dlg.Event("bpm", &OnBpm)
+	dlg.Event("beats", &OnBeats)
+	dlg.Event("chords", &OnChords)
+	
+	output.PlayGenerated(&fill, SAMPLE_RATE)
+	
+	HuiWaitTillWindowClosed(dlg)

@@ -24,12 +24,12 @@ BarList::BarList(CHuiWindow *_dlg, const string & _id, const string &_id_add, co
 	track = NULL;
 
 	FillList();
-	dlg->EventM(id, this, (void(HuiEventHandler::*)())&BarList::OnList);
-	dlg->EventMX(id, "hui:select", this, (void(HuiEventHandler::*)())&BarList::OnListSelect);
-	dlg->EventMX(id, "hui:change", this, (void(HuiEventHandler::*)())&BarList::OnListEdit);
-	dlg->EventM(id_add, this, (void(HuiEventHandler::*)())&BarList::OnAdd);
-	dlg->EventM(id_add_pause, this, (void(HuiEventHandler::*)())&BarList::OnAddPause);
-	dlg->EventM(id_delete, this, (void(HuiEventHandler::*)())&BarList::OnDelete);
+	dlg->EventM(id, this, &BarList::OnList);
+	dlg->EventMX(id, "hui:select", this, &BarList::OnListSelect);
+	dlg->EventMX(id, "hui:change", this, &BarList::OnListEdit);
+	dlg->EventM(id_add, this, &BarList::OnAdd);
+	dlg->EventM(id_add_pause, this, &BarList::OnAddPause);
+	dlg->EventM(id_delete, this, &BarList::OnDelete);
 }
 
 

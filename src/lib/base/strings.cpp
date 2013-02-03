@@ -580,9 +580,33 @@ string string::hex(bool inverted) const
 	return str;
 }
 
+inline int hex_nibble_to_value(char c)
+{
+	if ((c >= '0') && (c <= '9'))
+		return c - '0';
+	if ((c >= 'a') && (c <= 'f'))
+		return c - 'a' + 10;
+	if ((c >= 'A') && (c <= 'F'))
+		return c - 'A' + 10;
+	return 0;
+}
+
 string string::unhex() const
 {
-	return *this;
+	string r;
+	bool rev = ((*this)[1] == 'x');
+	int i0 = rev ? 2 : 0;
+	for (int i=i0; i<num;i++){
+		if ((*this)[i] == '.')
+			continue;
+		int v1 = hex_nibble_to_value((*this)[i]);
+		i ++;
+		int v2 = hex_nibble_to_value((*this)[i]);
+		r.add(v1 * 16 + v2);
+	}
+	if (rev)
+		return r.reverse();
+	return r;
 }
 
 string d2h(const void *data, int bytes, bool inverted)

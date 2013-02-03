@@ -216,8 +216,10 @@ int vector::important_plane() const
 vector vector::ortho() const
 {
 	int p = important_plane();
-	if (p == 0)
+	if (p == 3)
 		return vector(y, - x, 0);
+	else if (p == 2)
+		return vector(z, 0, - x);
 	return vector(0, z, - y);
 }
 

@@ -8,6 +8,7 @@
 	#include "../algebra/algebra.h"
 #else
 		typedef int vli;
+		typedef int Crypto;
 #endif
 
 #ifdef _X_USE_ANY_
@@ -304,6 +305,8 @@ void SIAddPackageMath()
 	TypeFloatArray9		= add_type_a("float[9]",	TypeFloat, 9);
 	Type*
 	TypeVli			= add_type  ("vli",		sizeof(vli));
+	Type*
+	TypeCrypto		= add_type  ("Crypto",	sizeof(Crypto));
 	Type*
 	TypeAny			= add_type  ("any",		sizeof(Any));
 	Type*
@@ -607,6 +610,20 @@ void SIAddPackageMath()
 		class_add_func("int",		TypeInt,			any_p(mf((tmf)&Any::_int)));
 		class_add_func("float",		TypeFloat,			any_p(mf((tmf)&Any::_float)));
 		class_add_func("str",		TypeString,			any_p(mf((tmf)&Any::str)));
+
+
+	add_class(TypeCrypto);
+		class_add_element("n",	TypeVli, 0);
+		class_add_element("k",	TypeVli, sizeof(vli));
+		class_add_func("__init__",	TypeVoid, algebra_p(mf((tmf)&Crypto::__init__)));
+		class_add_func("str",		TypeString, algebra_p(mf((tmf)&Crypto::str)));
+		class_add_func("from_str",	TypeVoid, algebra_p(mf((tmf)&Crypto::from_str)));
+			func_add_param("str",		TypeString);
+		class_add_func("Encrypt",	TypeString, algebra_p(mf((tmf)&Crypto::Encrypt)));
+			func_add_param("str",		TypeString);
+		class_add_func("Decrypt",	TypeString, algebra_p(mf((tmf)&Crypto::Decrypt)));
+			func_add_param("str",		TypeString);
+			func_add_param("cut",		TypeBool);
 	
 	add_func_special("complex",		TypeComplex,	CommandComplexSet);
 		func_add_param("x",		TypeFloat);
@@ -836,6 +853,11 @@ void SIAddPackageMath()
 		func_add_param("c1",		TypeColor);
 		func_add_param("c2",		TypeColor);
 		func_add_param("t",		TypeFloat);
+	add_func("CryptoCreateKeys",	TypeVoid,		algebra_p(&CryptoCreateKeys));
+		func_add_param("c1",		TypeCrypto);
+		func_add_param("c2",		TypeCrypto);
+		func_add_param("type",		TypeString);
+		func_add_param("bits",		TypeInt);
 	// random numbers
 	add_func("randi",			TypeInt,		(void*)&randi);
 		func_add_param("max",	TypeInt);

@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.10.3.0";
+string DataVersion = "0.10.4.0";
 
 
 
@@ -1176,6 +1176,11 @@ void LinkSemiExternalFunc(const string &name, void *pointer)
 	c.return_type = TypeUnknown; // unusable until defined via "extern" in the script!
 	c.is_semi_external = true;
 	PreCommands.add(c);
+}
+
+void _LinkSemiExternalClassFunc(const string &name, void (DummyClass::*function)())
+{
+	LinkSemiExternalFunc(name, (void*)function);
 }
 
 void End()

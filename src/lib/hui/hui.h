@@ -75,9 +75,15 @@ int HuiRun();
 void HuiPushMainLevel();
 void HuiPopMainLevel();
 void HuiSetIdleFunction(hui_callback *idle_function);
-void HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*function)());
+void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*function)());
+template<typename T>
+void HuiSetIdleFunctionM(HuiEventHandler *object, T fun)
+{	_HuiSetIdleFunctionM(object, (void(HuiEventHandler::*)())fun);	}
 void HuiRunLater(int time_ms, hui_callback *function);
-void HuiRunLaterM(int time_ms, HuiEventHandler *object, void (HuiEventHandler::*function)());
+void _HuiRunLaterM(int time_ms, HuiEventHandler *object, void (HuiEventHandler::*function)());
+template<typename T>
+void HuiRunLaterM(int time_ms, HuiEventHandler *object, T fun)
+{	_HuiRunLaterM(time_ms, object, (void(HuiEventHandler::*)())fun);	}
 void HuiDoSingleMainLoop();
 void HuiEnd();
 string HuiWaitTillWindowClosed(CHuiWindow *win);

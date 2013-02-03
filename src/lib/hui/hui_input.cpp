@@ -527,7 +527,7 @@ void HuiAddCommandToggle(const string &id, const string &image, int default_key_
 	_HuiCommand_.add(c);
 }
 
-void HuiAddCommandM(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+void _HuiAddCommandM(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
 	HuiCommand c;
 	c.type = 0;
@@ -540,7 +540,7 @@ void HuiAddCommandM(const string &id, const string &image, int default_key_code,
 	_HuiCommand_.add(c);
 }
 
-void HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+void _HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
 	HuiCommand c;
 	c.type = 1;

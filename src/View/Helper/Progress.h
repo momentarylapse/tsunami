@@ -11,7 +11,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observable.h"
 
-class Progress : public Observable
+class Progress : public Observable, public HuiEventHandler
 {
 public:
 	Progress();

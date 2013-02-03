@@ -7,12 +7,9 @@
 
 #include "Progress.h"
 
-static Progress *_progress_;
-
 Progress::Progress() :
 	Observable("Progress"), dlg(NULL)
 {
-	_progress_ = this;
 }
 
 Progress::~Progress()
@@ -42,8 +39,6 @@ void Progress::Set(float progress)
 	msg_db_l(2);
 }
 
-void IgnoreEvent(){}
-
 void Progress::Start(const string &str, float progress)
 {
 	msg_db_r("ProgressStart", 2);
@@ -52,7 +47,7 @@ void Progress::Start(const string &str, float progress)
 		dlg->SetString("progress_bar", str);
 		dlg->SetFloat("progress_bar", progress);
 		dlg->Update();
-		dlg->Event("hui:close", &IgnoreEvent);
+		dlg->Event("hui:close", &HuiFuncIgnore);
 		HuiDoSingleMainLoop();
 	}
 	Cancelled = false;
@@ -70,9 +65,6 @@ bool Progress::IsCancelled()
 	return Cancelled;
 }
 
-void OnProgressClose()
-{	_progress_->Cancel();	}
-
 void Progress::StartCancelable(const string &str, float progress)
 {
 	msg_db_r("ProgressStart", 2);
@@ -81,8 +73,8 @@ void Progress::StartCancelable(const string &str, float progress)
 		dlg->SetString("progress_bar", str);
 		dlg->SetFloat("progress_bar", progress);
 		dlg->Update();
-		dlg->Event("hui:close", &OnProgressClose);
-		dlg->Event("cancel", &OnProgressClose);
+		dlg->EventM("hui:close", this, &Progress::Cancel);
+		dlg->EventM("cancel", this, &Progress::Cancel);
 		HuiDoSingleMainLoop();
 	}
 	Cancelled = false;

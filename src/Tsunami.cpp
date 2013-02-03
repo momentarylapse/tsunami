@@ -53,53 +53,53 @@ Tsunami::Tsunami(Array<string> arg) :
 	//HuiAddKeyCode("insert_added", KEY_RETURN);
 	//HuiAddKeyCode("remove_added", KEY_BACKSPACE);
 
-	HuiAddCommandM("new", "hui:new", KEY_N + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnNew);
-	HuiAddCommandM("open", "hui:open", KEY_O + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnOpen);
-	HuiAddCommandM("save", "hui:save", KEY_S + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnSave);
-	HuiAddCommandM("save_as", "hui:save-as", KEY_S + KEY_CONTROL + KEY_SHIFT, this, (void(HuiEventHandler::*)())&Tsunami::OnSaveAs);
-	HuiAddCommandM("copy", "hui:copy", KEY_C + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnCopy);
-	HuiAddCommandM("paste", "hui:paste", KEY_V + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnPaste);
-	HuiAddCommandM("delete", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDelete);
-	HuiAddCommandM("export_selection", "", KEY_X + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnExport);
-	HuiAddCommandM("undo", "hui:undo", KEY_Z + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnUndo);
-	HuiAddCommandM("redo", "hui:redo", KEY_Y + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnRedo);
-	HuiAddCommandM("add_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTrack);
-	HuiAddCommandM("add_time_track", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddTimeTrack);
-	HuiAddCommandM("delete_track", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDeleteTrack);
-	HuiAddCommandM("level_add", "hui:add", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAddLevel);
-	HuiAddCommandM("level_delete", "hui:delete", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnDeleteLevel);
-	HuiAddCommandM("level_up", "hui:up", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevelUp);
-	HuiAddCommandM("level_down", "hui:down", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevelDown);
-	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSubFromSelection);
-	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnInsertAdded);
-	HuiAddCommandM("remove_added", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRemoveAdded);
-	HuiAddCommandM("track_import", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnTrackImport);
-	HuiAddCommandM("sub_import", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSubImport);
-	HuiAddCommandM("wave_properties", "", KEY_F4, this, (void(HuiEventHandler::*)())&Tsunami::OnAudioProperties);
-	HuiAddCommandM("track_properties", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnTrackProperties);
-	HuiAddCommandM("sub_properties", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSubProperties);
-	HuiAddCommandM("settings", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSettings);
-	HuiAddCommandM("close_file", "hui:close", KEY_W + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnCloseFile);
-	HuiAddCommandM("play", "hui:media-play", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPlay);
-	HuiAddCommandM("play_loop", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPlayLoop);
-	HuiAddCommandM("pause", "hui:media-pause", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnPause);
-	HuiAddCommandM("stop", "hui:media-stop", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnStop);
-	HuiAddCommandM("record", "hui:media-record", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnRecord);
-	HuiAddCommandM("show_log", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnShowLog);
-	HuiAddCommandM("about", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnAbout);
-	HuiAddCommandM("run_plugin", "hui:execute", KEY_RETURN + KEY_SHIFT, this, (void(HuiEventHandler::*)())&Tsunami::OnFindAndExecutePlugin);
-	HuiAddCommandM("exit", "hui:quit", KEY_Q + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
+	HuiAddCommandM("new", "hui:new", KEY_N + KEY_CONTROL, this, &Tsunami::OnNew);
+	HuiAddCommandM("open", "hui:open", KEY_O + KEY_CONTROL, this, &Tsunami::OnOpen);
+	HuiAddCommandM("save", "hui:save", KEY_S + KEY_CONTROL, this, &Tsunami::OnSave);
+	HuiAddCommandM("save_as", "hui:save-as", KEY_S + KEY_CONTROL + KEY_SHIFT, this, &Tsunami::OnSaveAs);
+	HuiAddCommandM("copy", "hui:copy", KEY_C + KEY_CONTROL, this, &Tsunami::OnCopy);
+	HuiAddCommandM("paste", "hui:paste", KEY_V + KEY_CONTROL, this, &Tsunami::OnPaste);
+	HuiAddCommandM("delete", "hui:delete", -1, this, &Tsunami::OnDelete);
+	HuiAddCommandM("export_selection", "", KEY_X + KEY_CONTROL, this, &Tsunami::OnExport);
+	HuiAddCommandM("undo", "hui:undo", KEY_Z + KEY_CONTROL, this, &Tsunami::OnUndo);
+	HuiAddCommandM("redo", "hui:redo", KEY_Y + KEY_CONTROL, this, &Tsunami::OnRedo);
+	HuiAddCommandM("add_track", "hui:add", -1, this, &Tsunami::OnAddTrack);
+	HuiAddCommandM("add_time_track", "hui:add", -1, this, &Tsunami::OnAddTimeTrack);
+	HuiAddCommandM("delete_track", "hui:delete", -1, this, &Tsunami::OnDeleteTrack);
+	HuiAddCommandM("level_add", "hui:add", -1, this, &Tsunami::OnAddLevel);
+	HuiAddCommandM("level_delete", "hui:delete", -1, this, &Tsunami::OnDeleteLevel);
+	HuiAddCommandM("level_up", "hui:up", -1, this, &Tsunami::OnCurLevelUp);
+	HuiAddCommandM("level_down", "hui:down", -1, this, &Tsunami::OnCurLevelDown);
+	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
+	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
+	HuiAddCommandM("remove_added", "", -1, this, &Tsunami::OnRemoveAdded);
+	HuiAddCommandM("track_import", "", -1, this, &Tsunami::OnTrackImport);
+	HuiAddCommandM("sub_import", "", -1, this, &Tsunami::OnSubImport);
+	HuiAddCommandM("wave_properties", "", KEY_F4, this, &Tsunami::OnAudioProperties);
+	HuiAddCommandM("track_properties", "", -1, this, &Tsunami::OnTrackProperties);
+	HuiAddCommandM("sub_properties", "", -1, this, &Tsunami::OnSubProperties);
+	HuiAddCommandM("settings", "", -1, this, &Tsunami::OnSettings);
+	HuiAddCommandM("close_file", "hui:close", KEY_W + KEY_CONTROL, this, &Tsunami::OnCloseFile);
+	HuiAddCommandM("play", "hui:media-play", -1, this, &Tsunami::OnPlay);
+	HuiAddCommandM("play_loop", "", -1, this, &Tsunami::OnPlayLoop);
+	HuiAddCommandM("pause", "hui:media-pause", -1, this, &Tsunami::OnPause);
+	HuiAddCommandM("stop", "hui:media-stop", -1, this, &Tsunami::OnStop);
+	HuiAddCommandM("record", "hui:media-record", -1, this, &Tsunami::OnRecord);
+	HuiAddCommandM("show_log", "", -1, this, &Tsunami::OnShowLog);
+	HuiAddCommandM("about", "", -1, this, &Tsunami::OnAbout);
+	HuiAddCommandM("run_plugin", "hui:execute", KEY_RETURN + KEY_SHIFT, this, &Tsunami::OnFindAndExecutePlugin);
+	HuiAddCommandM("exit", "hui:quit", KEY_Q + KEY_CONTROL, this, &Tsunami::OnExit);
 
-	HuiAddCommandM("select_all", "", KEY_A + KEY_CONTROL, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectAll);
-	HuiAddCommandM("select_nothing", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnSelectNone);
-	HuiAddCommandM("view_mono", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewMono);
-	HuiAddCommandM("view_grid_time", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewGridTime);
-	HuiAddCommandM("view_grid_bars", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewGridBars);
-	HuiAddCommandM("view_peaks_max", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewPeaksMax);
-	HuiAddCommandM("view_peaks_mean", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewPeaksMean);
-	HuiAddCommandM("view_optimal", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnViewOptimal);
-	HuiAddCommandM("zoom_in", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnZoomIn);
-	HuiAddCommandM("zoom_out", "", -1, this, (void(HuiEventHandler::*)())&Tsunami::OnZoomOut);
+	HuiAddCommandM("select_all", "", KEY_A + KEY_CONTROL, this, &Tsunami::OnSelectAll);
+	HuiAddCommandM("select_nothing", "", -1, this, &Tsunami::OnSelectNone);
+	HuiAddCommandM("view_mono", "", -1, this, &Tsunami::OnViewMono);
+	HuiAddCommandM("view_grid_time", "", -1, this, &Tsunami::OnViewGridTime);
+	HuiAddCommandM("view_grid_bars", "", -1, this, &Tsunami::OnViewGridBars);
+	HuiAddCommandM("view_peaks_max", "", -1, this, &Tsunami::OnViewPeaksMax);
+	HuiAddCommandM("view_peaks_mean", "", -1, this, &Tsunami::OnViewPeaksMean);
+	HuiAddCommandM("view_optimal", "", -1, this, &Tsunami::OnViewOptimal);
+	HuiAddCommandM("zoom_in", "", -1, this, &Tsunami::OnZoomIn);
+	HuiAddCommandM("zoom_out", "", -1, this, &Tsunami::OnZoomOut);
 
 
 	// create the window
@@ -136,9 +136,9 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetMaximized(maximized);
 
 	// events
-	EventM("hui:close", this, (void(HuiEventHandler::*)())&Tsunami::OnExit);
+	EventM("hui:close", this, &Tsunami::OnExit);
 	for (int i=0;i<256;i++)
-		EventM(format("jump_to_level_%d", i), this, (void(HuiEventHandler::*)())&Tsunami::OnCurLevel);
+		EventM(format("jump_to_level_%d", i), this, &Tsunami::OnCurLevel);
 
 	plugins = new PluginManager;
 	plugins->AddPluginsToMenu();

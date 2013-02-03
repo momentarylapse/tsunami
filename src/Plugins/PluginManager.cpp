@@ -8,6 +8,7 @@
 #include "PluginManager.h"
 #include "../Tsunami.h"
 #include "FastFourierTransform.h"
+#include "ExtendedBufferBox.h"
 #include "../View/Helper/Slider.h"
 #include "../Audio/AudioRenderer.h"
 #include "../Audio/AudioInput.h"
@@ -95,7 +96,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
 	Script::LinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
 	Script::LinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
-	Script::LinkSemiExternalFunc("BufferBox.add_click",(void*)&BufferBox::add_click);
+	Script::LinkSemiExternalFunc("BufferBox.add_click",(void*)&ExtendedBufferBox::add_click);
+	Script::LinkSemiExternalFunc("BufferBox.add_tone",(void*)&ExtendedBufferBox::add_tone);
+	Script::LinkSemiExternalFunc("BufferBox.get_spectrum",(void*)&ExtendedBufferBox::get_spectrum);
 	Script::LinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
 	Script::LinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
 	Script::LinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);

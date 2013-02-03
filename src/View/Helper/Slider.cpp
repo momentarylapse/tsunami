@@ -21,8 +21,8 @@ Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_e
 	member_func = NULL;
 	handler = NULL;
 
-	win->EventM(id_slider, this, (void(HuiEventHandler::*)())&Slider::OnSlide);
-	win->EventM(id_edit, this, (void(HuiEventHandler::*)())&Slider::OnEdit);
+	win->EventM(id_slider, this, &Slider::OnSlide);
+	win->EventM(id_edit, this, &Slider::OnEdit);
 
 	Set(_value);
 }
@@ -41,8 +41,8 @@ Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_e
 	member_func = _func;
 	handler = _handler ? _handler : win;
 
-	win->EventM(id_slider, this, (void(HuiEventHandler::*)())&Slider::OnSlide);
-	win->EventM(id_edit, this, (void(HuiEventHandler::*)())&Slider::OnEdit);
+	win->EventM(id_slider, this, &Slider::OnSlide);
+	win->EventM(id_edit, this, &Slider::OnEdit);
 
 	Set(_value);
 }

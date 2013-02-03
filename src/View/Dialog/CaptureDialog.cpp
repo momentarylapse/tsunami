@@ -56,13 +56,13 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	else
 		SetInt("capture_target", a->track.num);
 
-	EventM("cancel", this, (void(HuiEventHandler::*)())&CaptureDialog::OnClose);
-	EventM("hui:close", this, (void(HuiEventHandler::*)())&CaptureDialog::OnClose);
-	EventM("ok", this, (void(HuiEventHandler::*)())&CaptureDialog::OnOk);
-	EventM("capture_device", this, (void(HuiEventHandler::*)())&CaptureDialog::OnDevice);
-	EventM("capture_start", this, (void(HuiEventHandler::*)())&CaptureDialog::OnStart);
-	EventM("capture_delete", this, (void(HuiEventHandler::*)())&CaptureDialog::OnDelete);
-	EventM("capture_pause", this, (void(HuiEventHandler::*)())&CaptureDialog::OnPause);
+	EventM("cancel", this, &CaptureDialog::OnClose);
+	EventM("hui:close", this, &CaptureDialog::OnClose);
+	EventM("ok", this, &CaptureDialog::OnOk);
+	EventM("capture_device", this, &CaptureDialog::OnDevice);
+	EventM("capture_start", this, &CaptureDialog::OnStart);
+	EventM("capture_delete", this, &CaptureDialog::OnDelete);
+	EventM("capture_pause", this, &CaptureDialog::OnPause);
 	Subscribe(tsunami->input);
 }
 

@@ -1,0 +1,88 @@
+#include "api.kaba"
+
+float get_freq(int tone)
+	return 220 * pow(2, (tone - 21.0) / 12.0)
+
+int get_tone(char c)
+	if c == 'c'
+		return 0
+	if c == 'd'
+		return 2
+	if c == 'e'
+		return 4
+	if c == 'f'
+		return 5
+	if c == 'g'
+		return 7
+	if c == 'a'
+		return 9
+	if c == 'h'
+		return 11
+
+enum
+	ChordMajor
+	ChordMinor
+
+class Chord
+	int base_tone
+	int type
+
+void ParseChords(string str, Chord chord[])
+	chord.clear()
+	for int i, 0, str.num
+		Chord c
+		if str[i] >= 'a' and str[i] <= 'h'
+			c.type = ChordMinor
+			c.base_tone = get_tone(str[i]) + 12
+		else if str[i] >= 'A' and str[i] <= 'H'
+			c.type = ChordMajor
+			c.base_tone = get_tone(str[i] + 32) + 12
+		else
+			continue
+		if i < str.num - 1
+			if str[i + 1] == '#'
+				c.base_tone ++
+				i ++
+		chord.add(c)
+
+/*void AddSimpleTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, float vol)
+	float f_w = 1.0 / sample_rate * f * 2.0 * pi
+	int i0 = max(pos0, 0)
+	int i1 = min(pos1, buf.num)
+	for int i, i0, i1
+		float tt = (i - pos0) * f_w
+		float d = sin(tt) * vol
+		if i < pos0 + 1000
+			d *= (i - pos0) * 0.001
+		if i > pos1 - 1000
+			d *= (pos1 - i) * 0.001
+		buf.r[i] += d
+		buf.l[i] += d
+
+void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, float vol)
+	AddSimpleTone(sample_rate, buf, pos0, pos1, f,     vol * 0.6)
+	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 2, vol * 0.5)
+	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 4, vol * 0.3)
+	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 8, vol * 0.1)*/
+
+void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, float vol)
+	Range r
+	r.offset = pos0
+	r.length = pos1 - pos0
+	buf.add_tone(r, vol * 0.6, f,     sample_rate)
+	buf.add_tone(r, vol * 0.5, f * 2, sample_rate)
+	buf.add_tone(r, vol * 0.3, f * 4, sample_rate)
+	buf.add_tone(r, vol * 0.1, f * 8, sample_rate)
+
+void AddChord(float sample_rate, BufferBox buf, int pos0, int pos1, Chord c, float volume)
+	float f[]
+	f.add(get_freq(c.base_tone))
+	if c.type == ChordMinor
+		f.add(get_freq(c.base_tone + 3))
+	else
+		f.add(get_freq(c.base_tone + 4))
+	f.add(get_freq(c.base_tone + 7))
+	f.add(get_freq(c.base_tone + 12))
+	
+	for int i, 0, f.num
+		AddRichTone(sample_rate, buf, pos0, pos1, f[i], volume)

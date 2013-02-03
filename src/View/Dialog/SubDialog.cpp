@@ -29,13 +29,13 @@ SubDialog::SubDialog(CHuiWindow *_parent, bool _allow_parent, Track *s):
 	SetFloat("repdelay", (float)s->rep_delay / (float)s->root->sample_rate * 1000.0f);
 	Enable("repdelay", s->rep_num > 0);
 
-	EventM("mute", this, (void(HuiEventHandler::*)())&SubDialog::OnMute);
-	EventM("name", this, (void(HuiEventHandler::*)())&SubDialog::OnName);
-	EventM("level_track", this, (void(HuiEventHandler::*)())&SubDialog::OnLevelTrack);
-	EventM("repnum", this, (void(HuiEventHandler::*)())&SubDialog::OnRepNum);
-	EventM("repdelay", this, (void(HuiEventHandler::*)())&SubDialog::OnRepDelay);
-	EventM("close", this, (void(HuiEventHandler::*)())&SubDialog::OnClose);
-	EventM("hui:close", this, (void(HuiEventHandler::*)())&SubDialog::OnClose);
+	EventM("mute", this, &SubDialog::OnMute);
+	EventM("name", this, &SubDialog::OnName);
+	EventM("level_track", this, &SubDialog::OnLevelTrack);
+	EventM("repnum", this, &SubDialog::OnRepNum);
+	EventM("repdelay", this, &SubDialog::OnRepDelay);
+	EventM("close", this, &SubDialog::OnClose);
+	EventM("hui:close", this, &SubDialog::OnClose);
 }
 
 SubDialog::~SubDialog()

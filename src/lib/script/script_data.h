@@ -356,12 +356,23 @@ extern Array<TypeCast> TypeCasts;
 
 
 typedef void t_func();
+class DummyClass
+{
+public:
+	void func(){}
+};
 
 extern void Init();
 extern void End();
 extern void ResetSemiExternalData();
 extern void LinkSemiExternalVar(const string &name, void *pointer);
 extern void LinkSemiExternalFunc(const string &name, void *pointer);
+extern void _LinkSemiExternalClassFunc(const string &name, void (DummyClass::*function)());
+template<typename T>
+void LinkSemiExternalClassFunc(const string &name, T pointer)
+{
+	_LinkSemiExternalClassFunc(name, (void(DummyClass::*)())pointer);
+}
 extern void AddPreGlobalVar(const string &name, Type *type);
 extern Type *GetPreType(const string &name);
 

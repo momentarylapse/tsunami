@@ -893,7 +893,7 @@ void CHuiWindow::EmbedDialog(const string &id, int x, int y)
 	gtk_widget_reparent(dlg->control[0]->widget, p);*/
 #endif
 
-	//border_width = 5;
+	border_width = 8;
 
 	HuiResource *res = HuiGetResource(id);
 	if (res){

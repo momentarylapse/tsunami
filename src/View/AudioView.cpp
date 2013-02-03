@@ -90,19 +90,19 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 	Subscribe(audio);
 
 	// events
-	parent->EventMX("area", "hui:redraw", this, (void(HuiEventHandler::*)())&AudioView::OnDraw);
-	parent->EventMX("area", "hui:mouse-move", this, (void(HuiEventHandler::*)())&AudioView::OnMouseMove);
-	parent->EventMX("area", "hui:left-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnLeftButtonDown);
-	parent->EventMX("area", "hui:left-double-click", this, (void(HuiEventHandler::*)())&AudioView::OnLeftDoubleClick);
-	parent->EventMX("area", "hui:left-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnLeftButtonUp);
-	parent->EventMX("area", "hui:middle-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnMiddleButtonDown);
-	parent->EventMX("area", "hui:middle-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnMiddleButtonUp);
-	parent->EventMX("area", "hui:right-button-down", this, (void(HuiEventHandler::*)())&AudioView::OnRightButtonDown);
-	parent->EventMX("area", "hui:right-button-up", this, (void(HuiEventHandler::*)())&AudioView::OnRightButtonUp);
-	//parent->EventMX("area", "hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
-	parent->EventM("hui:key-down", this, (void(HuiEventHandler::*)())&AudioView::OnKeyDown);
-	parent->EventM("hui:key-up", this, (void(HuiEventHandler::*)())&AudioView::OnKeyUp);
-	parent->EventMX("area", "hui:mouse-wheel", this, (void(HuiEventHandler::*)())&AudioView::OnMouseWheel);
+	parent->EventMX("area", "hui:redraw", this, &AudioView::OnDraw);
+	parent->EventMX("area", "hui:mouse-move", this, &AudioView::OnMouseMove);
+	parent->EventMX("area", "hui:left-button-down", this, &AudioView::OnLeftButtonDown);
+	parent->EventMX("area", "hui:left-double-click", this, &AudioView::OnLeftDoubleClick);
+	parent->EventMX("area", "hui:left-button-up", this, &AudioView::OnLeftButtonUp);
+	parent->EventMX("area", "hui:middle-button-down", this, &AudioView::OnMiddleButtonDown);
+	parent->EventMX("area", "hui:middle-button-up", this, &AudioView::OnMiddleButtonUp);
+	parent->EventMX("area", "hui:right-button-down", this, &AudioView::OnRightButtonDown);
+	parent->EventMX("area", "hui:right-button-up", this, &AudioView::OnRightButtonUp);
+	//parent->EventMX("area", "hui:key-down", this, &AudioView::OnKeyDown);
+	parent->EventM("hui:key-down", this, &AudioView::OnKeyDown);
+	parent->EventM("hui:key-up", this, &AudioView::OnKeyUp);
+	parent->EventMX("area", "hui:mouse-wheel", this, &AudioView::OnMouseWheel);
 
 	//ForceRedraw();
 	UpdateMenu();

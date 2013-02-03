@@ -23,18 +23,18 @@ AudioFileDialog::AudioFileDialog(CHuiWindow *win, AudioFile *a):
 	win->SetBorderWidth(5);
 	win->EmbedDialog("audio_file_dialog", 0, 0);
 	win->SetDecimals(1);
-	//volume_slider = new Slider(win, "audio_volume_slider", "audio_volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);
+	//volume_slider = new Slider(win, "audio_volume_slider", "audio_volume", 0, 2, 100, &TrackDialog::OnVolume, 0, this);
 	fx_list = new FxList(win, "audio_fx_list", "audio_add_effect", "audio_configure_effect", "audio_delete_effect");
 	bar_list = new BarList(win, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
 	fx_list->SetAudio(audio);
 
 	LoadData();
 
-	win->EventMX("tags", "hui:select", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsSelect);
-	win->EventMX("tags", "hui:change", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnTagsEdit);
-	win->EventM("add_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnAddTag);
-	win->EventM("delete_tag", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnDeleteTag);
-	win->EventM("audio_close", this, (void(HuiEventHandler::*)())&AudioFileDialog::OnClose);
+	win->EventMX("tags", "hui:select", this, &AudioFileDialog::OnTagsSelect);
+	win->EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
+	win->EventM("add_tag", this, &AudioFileDialog::OnAddTag);
+	win->EventM("delete_tag", this, &AudioFileDialog::OnDeleteTag);
+	win->EventM("audio_close", this, &AudioFileDialog::OnClose);
 
 	Subscribe(audio);
 }

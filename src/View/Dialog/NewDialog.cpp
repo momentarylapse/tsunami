@@ -17,9 +17,9 @@ NewDialog::NewDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a):
 
 	SetInt("sample_rate", DEFAULT_SAMPLE_RATE);
 
-	EventM("cancel", this, (void(HuiEventHandler::*)())&NewDialog::OnClose);
-	EventM("hui:close", this, (void(HuiEventHandler::*)())&NewDialog::OnClose);
-	EventM("ok", this, (void(HuiEventHandler::*)())&NewDialog::OnOk);
+	EventM("cancel", this, &NewDialog::OnClose);
+	EventM("hui:close", this, &NewDialog::OnClose);
+	EventM("ok", this, &NewDialog::OnOk);
 }
 
 NewDialog::~NewDialog()

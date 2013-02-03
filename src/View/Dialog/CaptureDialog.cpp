@@ -133,12 +133,15 @@ void CaptureDialog::OnOk()
 void CaptureDialog::OnClose()
 {
 	tsunami->input->Stop();
+	tsunami->output->Stop();
 	delete(this);
 	tsunami->input->CaptureBuf.clear();
 }
 
 void CaptureDialog::OnUpdate(Observable *o)
 {
+	//if (tsunami->input->CapturePlayback)
+	//msg_write(tsunami->output->GetPos() - tsunami->input->CaptureBuf.num);
 	SetString("capture_time", audio->get_time_str(tsunami->input->CaptureBuf.num));
 }
 
@@ -154,7 +157,7 @@ void CaptureDialog::Insert()
 		int s_start = audio->selection.start();
 
 		// insert recorded data with some delay
-		dpos = - tsunami->input->CaptureMaxDelay - (tsunami->input->CapturePlaybackDelay / 1000.0f) * (float)audio->sample_rate;
+		dpos = - tsunami->input->CaptureDelay;
 		//msg_write(f2s((float)CaptureMaxDelay / (float)audio->sample_rate * 1000,3));
 
 		if (target >= audio->track.num){

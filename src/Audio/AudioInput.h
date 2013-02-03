@@ -25,7 +25,8 @@ public:
 
 	bool Capturing, CapturingByDialog, CaptureAddData, CapturePlayback;
 	BufferBox CaptureBuf, CapturePreviewBuf;
-	float CapturePlaybackDelay;
+	float CapturePlaybackDelayConst;
+	int CaptureDelay;
 
 	Array<string> Device;
 	string ChosenDevice;
@@ -52,6 +53,10 @@ public:
 
 	string dev_name;
 	void *capture;
+
+private:
+	int num_delay_points;
+	long long int delay_sum;
 
 };
 

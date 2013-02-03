@@ -68,7 +68,7 @@ void SettingsDialog::LoadData()
 		if (d == tsunami->output->ChosenDevice)
 			SetInt("preview_device", i + 1);
 	}
-	SetFloat("capture_delay", tsunami->input->CapturePlaybackDelay);
+	SetFloat("capture_delay", tsunami->input->CapturePlaybackDelayConst);
 }
 
 void SettingsDialog::ApplyData()
@@ -105,8 +105,8 @@ void SettingsDialog::OnPreviewDevice()
 
 void SettingsDialog::OnCaptureDelay()
 {
-	tsunami->input->CapturePlaybackDelay = GetFloat("");
-	HuiConfigWriteFloat("CapturePlaybackDelay", tsunami->input->CapturePlaybackDelay);
+	tsunami->input->CapturePlaybackDelayConst = GetFloat("");
+	HuiConfigWriteFloat("CapturePlaybackDelay", tsunami->input->CapturePlaybackDelayConst);
 }
 
 void SettingsDialog::OnClose()

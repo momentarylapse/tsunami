@@ -6,6 +6,7 @@
  */
 
 #include "AudioInput.h"
+#include "AudioOutput.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
@@ -38,14 +39,13 @@ AudioInput::AudioInput() :
 	CapturingByDialog = false;
 	CaptureAddData = false;
 	CapturePlayback = false;
-	CapturePlaybackDelay = 0;
 	memset(capture_temp, 0, sizeof(capture_temp));
 	CaptureSampleRate = DEFAULT_SAMPLE_RATE;
 	CaptureMaxDelay = 0;
 	CaptureCurrentSamples = 0;
 
 	ChosenDevice = HuiConfigReadStr("Input.ChosenDevice", "");
-	CapturePlaybackDelay = HuiConfigReadFloat("Input.PlaybackDelay", 80.0f);
+	CapturePlaybackDelayConst = HuiConfigReadFloat("Input.PlaybackDelay", 80.0f);
 
 }
 
@@ -78,6 +78,8 @@ void AudioInput::Stop()
 		alcCaptureCloseDevice((ALCdevice*)capture);
 		Capturing = false;
 		CaptureAddData = false;
+
+		CaptureDelay = (delay_sum / num_delay_points) - CapturePlaybackDelayConst * (float)CaptureSampleRate / 1000.0f;
 	}
 	msg_db_l(1);
 }
@@ -89,6 +91,8 @@ bool AudioInput::Start(int sample_rate, bool add_data)
 		Stop();
 
 	Init();
+	num_delay_points = 0;
+	delay_sum = 0;
 	CaptureSampleRate = sample_rate;
 	capture = alcCaptureOpenDevice(dev_name.c_str(), sample_rate, AL_FORMAT_STEREO16, NUM_CAPTURE_SAMPLES);
 	//msg_write((int)capture);
@@ -136,6 +140,11 @@ int AudioInput::DoCapturing()
 			// append to buffer
 			alcCaptureSamples((ALCdevice*)capture, capture_temp, a);
 			AddToCaptureBuf(a);
+
+			if (tsunami->output->IsPlaying()){
+				delay_sum += (tsunami->output->GetPos() - tsunami->output->GetRange().offset - CaptureBuf.num);
+				num_delay_points ++;
+			}
 		}else{
 
 			// fill preview buffer...

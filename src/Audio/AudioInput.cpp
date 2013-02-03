@@ -132,33 +132,32 @@ int AudioInput::DoCapturing()
 	// don't wait, till we really have as much data as we requested
 	//   (or else it might freeze up....)
 	if (a >= NUM_CAPTURE_SAMPLES / 8){
-		if (CaptureAddData){
+		bool too_much_data = (a > NUM_CAPTURE_SAMPLES);
+		if (too_much_data)
+			a = NUM_CAPTURE_SAMPLES;
 
-			if (a >= NUM_CAPTURE_SAMPLES)
-				tsunami->log->Error(_("too much capture data!!!"));
+		alcCaptureSamples((ALCdevice*)capture, capture_temp, a);
+
+		if (CaptureAddData){
+			//if (too_much_data)
+			//	tsunami->log->Error(_("too much capture data!!!"));
 
 			// append to buffer
-			alcCaptureSamples((ALCdevice*)capture, capture_temp, a);
 			AddToCaptureBuf(a);
 
-			if (tsunami->output->IsPlaying()){
+			if ((tsunami->output->IsPlaying()) && (!too_much_data)){
 				delay_sum += (tsunami->output->GetPos() - tsunami->output->GetRange().offset - CaptureBuf.num);
 				num_delay_points ++;
 			}
 		}else{
-
 			// fill preview buffer...
-			if (a >= NUM_CAPTURE_SAMPLES)
-				a = NUM_CAPTURE_SAMPLES;
-			alcCaptureSamples((ALCdevice*)capture, capture_temp, a);
-
 			AddToCapturePreviewBuf(a);
 		}
 		Notify("Capture");
 	}else
 		a = 0;
 	if (Capturing)
-		HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioInput::Update);
+		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
 	msg_db_l(1);
 	return a;
 }

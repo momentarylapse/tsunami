@@ -134,8 +134,8 @@ void CaptureDialog::OnClose()
 {
 	tsunami->input->Stop();
 	tsunami->output->Stop();
-	delete(this);
 	tsunami->input->CaptureBuf.clear();
+	delete(this);
 }
 
 void CaptureDialog::OnUpdate(Observable *o)

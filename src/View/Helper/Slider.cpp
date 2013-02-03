@@ -50,7 +50,6 @@ Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_e
 
 Slider::~Slider()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void Slider::Set(float value)
@@ -97,6 +96,6 @@ void Slider::OnEdit()
 	if (func)
 		func();
 	if (member_func)
-		(win->*member_func)();
+		(handler->*member_func)();
 }
 

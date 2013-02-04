@@ -79,7 +79,9 @@ void AudioInput::Stop()
 		Capturing = false;
 		CaptureAddData = false;
 
-		CaptureDelay = (delay_sum / num_delay_points) - CapturePlaybackDelayConst * (float)CaptureSampleRate / 1000.0f;
+		CaptureDelay = - CapturePlaybackDelayConst * (float)CaptureSampleRate / 1000.0f;
+		if (num_delay_points > 0)
+			CaptureDelay += (delay_sum / num_delay_points);
 	}
 	msg_db_l(1);
 }

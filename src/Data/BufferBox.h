@@ -34,6 +34,7 @@ public:
 	void scale(float volume);
 	void swap_ref(BufferBox &b);
 	void swap_value(BufferBox &b);
+	void append(BufferBox &b);
 	void set(const BufferBox &b, int offset, float volume);
 	void add(const BufferBox &b, int offset, float volume);
 	void set_16bit(const void *b, int offset, int length);

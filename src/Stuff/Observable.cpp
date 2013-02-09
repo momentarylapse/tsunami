@@ -40,6 +40,24 @@ void Observable::RemoveObserver(Observer *o)
 		}
 }
 
+void Observable::AddWrappedObserver(void* handler, void* func)
+{
+	Observer *o = new ObserverWrapper(handler, func);
+	AddObserver(o);
+}
+
+void Observable::RemoveWrappedObserver(void* handler)
+{
+	foreachi(Observer *obs, observer, i)
+		if (dynamic_cast<ObserverWrapper*>(obs)){
+			if (dynamic_cast<ObserverWrapper*>(obs)->handler == handler){
+				observer.erase(i);
+				observer_message.erase(i);
+				break;
+			}
+		}
+}
+
 
 
 string Observable::GetName()
@@ -99,4 +117,5 @@ void Observable::Notify(const string &message)
 	if (notify_level == 0)
 		NotifySend();
 }
+
 

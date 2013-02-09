@@ -82,9 +82,9 @@ void PluginManager::LinkAppScriptData()
 	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
 	Script::LinkSemiExternalVar("MainWin",		&GlobalMainWin);
 	Script::LinkSemiExternalVar("audio",			&tsunami->audio);
-	Script::LinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
+	/*Script::LinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
 	Script::LinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
-	Script::LinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);
+	Script::LinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);*/
 	Script::LinkSemiExternalVar("input",			&tsunami->input);
 	Script::LinkSemiExternalVar("output",			&tsunami->output);
 /*	Script::LinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
@@ -125,7 +125,13 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkSemiExternalFunc("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
 	Script::LinkSemiExternalFunc("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
 	Script::LinkSemiExternalFunc("AudioInput.Start",	(void*)&AudioInput::Start);
-	Script::LinkSemiExternalFunc("AudioInput.Stop",	(void*)&AudioInput::Stop);
+	Script::LinkSemiExternalFunc("AudioInput.ResetSync",	(void*)&AudioInput::ResetSync);
+	Script::LinkSemiExternalFunc("AudioInput.Stop",		(void*)&AudioInput::Stop);
+	Script::LinkSemiExternalFunc("AudioInput.IsCapturing",	(void*)&AudioInput::IsCapturing);
+	Script::LinkSemiExternalFunc("AudioInput.GetDelay",	(void*)&AudioInput::GetDelay);
+	Script::LinkSemiExternalFunc("AudioInput.AddObserver",	(void*)&AudioInput::AddWrappedObserver);
+	Script::LinkSemiExternalFunc("AudioInput.RemoveObserver",	(void*)&AudioInput::RemoveWrappedObserver);
+	//Script::LinkSemiExternalFunc("Observable.AddObserver",	(void*)&Observable::AddWrappedObserver);
 	msg_db_l(2);
 }
 

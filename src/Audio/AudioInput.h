@@ -13,6 +13,8 @@
 #include "../Data/AudioFile.h"
 #include "../View/Helper/PeakMeter.h"
 
+struct ALCdevice_struct;
+
 
 #define NUM_CAPTURE_SAMPLES		8192
 
@@ -23,41 +25,51 @@ public:
 	virtual ~AudioInput();
 
 
-	bool Capturing, CapturingByDialog, CaptureAddData, CapturePlayback;
-	BufferBox CaptureBuf, CapturePreviewBuf;
-	float CapturePlaybackDelayConst;
-	int CaptureDelay;
+	BufferBox CurrentBuffer;
 
 	Array<string> Device;
 	string ChosenDevice;
 
 	void Init();
 
-	bool Start(int sample_rate, bool add_data);
+	bool Start(int sample_rate);
 	void Stop();
-	void AddToCaptureBuf(int a);
-	void AddToCapturePreviewBuf(int a);
-	int DoCapturing();
 	void Update();
 
+	bool IsCapturing();
+	int GetDelay();
+	void ResetSync();
 
-	float GetSampleRate();
-	BufferBox GetSomeSamples(int num_samples);
 
+	virtual float GetSampleRate();
+	virtual BufferBox GetSomeSamples(int num_samples);
 
-	int capture_temp[NUM_CAPTURE_SAMPLES];
-	int CaptureSampleRate;
-	int CaptureMaxDelay;
-
-	int CaptureCurrentSamples;
-
-	string dev_name;
-	void *capture;
+	float GetPlaybackDelayConst();
+	void SetPlaybackDelayConst(float f);
 
 private:
-	int num_delay_points;
-	long long int delay_sum;
+	int DoCapturing();
 
+	int capture_temp[NUM_CAPTURE_SAMPLES];
+	ALCdevice_struct *capture;
+
+	string dev_name;
+
+	struct SyncData
+	{
+		int num_points;
+		long long int delay_sum;
+		int samples_in, offset_out;
+
+		void Reset();
+		void Add(int samples);
+		int GetDelay();
+	};
+	SyncData sync;
+
+	bool Capturing;
+	int SampleRate;
+	float PlaybackDelayConst;
 };
 
 #endif /* AUDIOINPUT_H_ */

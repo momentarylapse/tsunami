@@ -17,12 +17,13 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
 {
 	audio = a;
+	capturing = false;
 
 
 	int sample_rate = (a->used) ? a->sample_rate : DEFAULT_SAMPLE_RATE;
 	//CapturingByDialog = true;
 
-	if (!tsunami->input->Start(sample_rate, false)){
+	if (!tsunami->input->Start(sample_rate)){
 		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
 		CapturingByDialog = false;
 		msg_db_l(1);
@@ -80,16 +81,16 @@ void CaptureDialog::OnDevice()
 	else
 		tsunami->input->ChosenDevice = "";
 	HuiConfigWriteStr("Input.ChosenDevice", tsunami->input->ChosenDevice);
-	if (tsunami->input->Capturing)
-		tsunami->input->Start(tsunami->input->CaptureSampleRate, tsunami->input->CaptureAddData);
+	tsunami->input->Stop();
+	tsunami->input->Start(tsunami->input->GetSampleRate());
 }
 
 void CaptureDialog::OnStart()
 {
-	tsunami->input->CapturePlayback = IsChecked("capture_playback");
-	if (tsunami->input->CapturePlayback)
+	if (IsChecked("capture_playback"))
 		tsunami->output->Play(audio, false);
-	tsunami->input->CaptureAddData = true;
+	tsunami->input->ResetSync();
+	capturing = true;
 	Enable("capture_start", false);
 	Enable("capture_pause", true);
 	Enable("capture_delete", true);
@@ -100,10 +101,10 @@ void CaptureDialog::OnStart()
 
 void CaptureDialog::OnDelete()
 {
-	if (tsunami->input->CapturePlayback)
+	if (tsunami->output->IsPlaying())
 		tsunami->output->Stop();
-	tsunami->input->CaptureAddData = false;
-	tsunami->input->CaptureBuf.clear();
+	buf.clear();
+	capturing = false;
 	Enable("capture_start", true);
 	Enable("capture_pause", false);
 	Enable("capture_delete", false);
@@ -113,9 +114,9 @@ void CaptureDialog::OnDelete()
 void CaptureDialog::OnPause()
 {
 	// TODO...
-	if (tsunami->input->CapturePlayback)
+	if (tsunami->output->IsPlaying())
 		tsunami->output->Stop();
-	tsunami->input->CaptureAddData = false;
+	capturing = false;
 	Enable("capture_start", true);
 	Enable("capture_pause", false);
 	Enable("capture_device", true);
@@ -134,15 +135,17 @@ void CaptureDialog::OnClose()
 {
 	tsunami->input->Stop();
 	tsunami->output->Stop();
-	tsunami->input->CaptureBuf.clear();
 	delete(this);
 }
 
 void CaptureDialog::OnUpdate(Observable *o)
 {
 	//if (tsunami->input->CapturePlayback)
-	//msg_write(tsunami->output->GetPos() - tsunami->input->CaptureBuf.num);
-	SetString("capture_time", audio->get_time_str(tsunami->input->CaptureBuf.num));
+	//msg_write(tsunami->output->GetPos() - buf.num);
+	if (capturing){
+		buf.append(tsunami->input->CurrentBuffer);
+		SetString("capture_time", audio->get_time_str(buf.num));
+	}
 }
 
 void CaptureDialog::Insert()
@@ -150,15 +153,13 @@ void CaptureDialog::Insert()
 	msg_db_r("CaptureInsert", 1);
 	Track *t;
 	int target = GetInt("capture_target");
-	int length = tsunami->input->CaptureBuf.num;
 	int dpos = 0;
 	int i0;
 	if (audio->used){
 		int s_start = audio->selection.start();
 
 		// insert recorded data with some delay
-		dpos = - tsunami->input->CaptureDelay;
-		//msg_write(f2s((float)CaptureMaxDelay / (float)audio->sample_rate * 1000,3));
+		dpos = - tsunami->input->GetDelay();
 
 		if (target >= audio->track.num){
 			// new track
@@ -178,14 +179,14 @@ void CaptureDialog::Insert()
 	}
 
 	// insert data
-	Range r = Range(i0, length);
+	Range r = Range(i0, buf.num);
 	audio->action_manager->BeginActionGroup();
-	BufferBox buf = t->GetBuffers(tsunami->view->cur_level, r);
+	BufferBox tbuf = t->GetBuffers(tsunami->view->cur_level, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->view->cur_level, r);
-	buf.set(tsunami->input->CaptureBuf, 0, 1.0f);
+	tbuf.set(buf, 0, 1.0f);
 	audio->Execute(a);
 	audio->action_manager->EndActionGroup();
-	tsunami->input->CaptureBuf.clear();
+	buf.clear();
 	msg_db_l(1);
 }
 

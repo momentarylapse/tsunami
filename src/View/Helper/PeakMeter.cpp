@@ -8,7 +8,7 @@
 #include "PeakMeter.h"
 #include "../../Plugins/FastFourierTransform.h"
 
-const int NUM_SAMPLES = 4096;
+const int NUM_SAMPLES = 2048;
 const int SPECTRUM_SIZE = 30;
 const float FREQ_MIN = 40.0f;
 const float FREQ_MAX = 4000.0f;

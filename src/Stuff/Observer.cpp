@@ -33,3 +33,27 @@ void Observer::Unsubscribe(Observable *o)
 }
 
 
+
+
+ObserverWrapper::ObserverWrapper(void *_handler, void *_func)
+{
+	handler = _handler;
+	func = _func;
+}
+
+ObserverWrapper::~ObserverWrapper()
+{}
+
+void ObserverWrapper::OnUpdate(Observable *o)
+{
+	if (handler){
+		typedef void mfunct(void *);
+		mfunct *f = (mfunct*)func;
+		f(handler);
+	}else{
+		typedef void funct();
+		funct *f = (funct*)func;
+		f();
+	}
+}
+

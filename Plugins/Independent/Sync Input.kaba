@@ -1,0 +1,43 @@
+#include "../api.kaba"
+
+window dlg
+
+const int SAMPLE_RATE = 44100
+const int offset_out = 20000
+int offset_in
+
+void fill(int pos, BufferBox buf)
+	buf.r = 0
+	buf.l = 0
+	
+	if pos == 0
+		buf.add_click(offset_out, 1, 880, SAMPLE_RATE)
+
+void sync()
+	bool found = false
+	for int i, 0, input.cur_buf.num
+		if abs(input.cur_buf.r[i]) > 0.1
+			offset_in += i
+			print offset_in
+			found = true
+			break
+	if found
+		HuiWinClose(dlg)
+	else
+		offset_in += input.cur_buf.num
+
+void main()
+	dlg = HuiCreateSizableDialog("Sync", 200, 80, MainWin, false)
+	dlg.AddText("Sync...", 0, 0, 0, 0, "")
+	dlg.Update()
+	offset_in = 0
+	
+	input.AddObserver(nil, &sync)
+	output.PlayGenerated(&fill, SAMPLE_RATE)
+	input.Start(SAMPLE_RATE)
+	
+	HuiWaitTillWindowClosed(dlg)
+	
+	input.RemoveObserver(nil)
+	output.Stop()
+	input.Stop()

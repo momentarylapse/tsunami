@@ -31,21 +31,41 @@
 	#include <AL/alc.h>
 #endif
 
+void AudioInput::SyncData::Reset()
+{
+	num_points = 0;
+	delay_sum = 0;
+	samples_in = 0;
+	if (tsunami->output->IsPlaying())
+		offset_out = tsunami->output->GetRange().offset;
+}
+
+void AudioInput::SyncData::Add(int samples)
+{
+	if (tsunami->output->IsPlaying()){
+		samples_in += samples;
+		delay_sum += (tsunami->output->GetPos() - offset_out - samples_in);
+		num_points ++;
+	}
+}
+
+int AudioInput::SyncData::GetDelay()
+{
+	if (num_points > 0)
+		return (delay_sum / num_points);
+	return 0;
+}
+
 AudioInput::AudioInput() :
 	PeakMeterSource("AudioInput")
 {
 	Capturing = false;
 	capture = NULL;
-	CapturingByDialog = false;
-	CaptureAddData = false;
-	CapturePlayback = false;
 	memset(capture_temp, 0, sizeof(capture_temp));
-	CaptureSampleRate = DEFAULT_SAMPLE_RATE;
-	CaptureMaxDelay = 0;
-	CaptureCurrentSamples = 0;
+	SampleRate = DEFAULT_SAMPLE_RATE;
 
 	ChosenDevice = HuiConfigReadStr("Input.ChosenDevice", "");
-	CapturePlaybackDelayConst = HuiConfigReadFloat("Input.PlaybackDelay", 80.0f);
+	PlaybackDelayConst = HuiConfigReadFloat("Input.PlaybackDelay", 80.0f);
 
 }
 
@@ -74,62 +94,52 @@ void AudioInput::Stop()
 {
 	msg_db_r("CaptureStop", 1);
 	if (Capturing){
-		alcCaptureStop((ALCdevice*)capture);
-		alcCaptureCloseDevice((ALCdevice*)capture);
+		alcCaptureStop(capture);
+		alcCaptureCloseDevice(capture);
 		Capturing = false;
-		CaptureAddData = false;
-
-		CaptureDelay = - CapturePlaybackDelayConst * (float)CaptureSampleRate / 1000.0f;
-		if (num_delay_points > 0)
-			CaptureDelay += (delay_sum / num_delay_points);
+		CurrentBuffer.clear();
 	}
 	msg_db_l(1);
 }
 
-bool AudioInput::Start(int sample_rate, bool add_data)
+bool AudioInput::Start(int sample_rate)
 {
 	msg_db_r("CaptureStart", 1);
 	if (Capturing)
 		Stop();
 
 	Init();
-	num_delay_points = 0;
-	delay_sum = 0;
-	CaptureSampleRate = sample_rate;
+	SampleRate = sample_rate;
 	capture = alcCaptureOpenDevice(dev_name.c_str(), sample_rate, AL_FORMAT_STEREO16, NUM_CAPTURE_SAMPLES);
 	//msg_write((int)capture);
 	if (capture){
-		alcCaptureStart((ALCdevice*)capture);
+		alcCaptureStart(capture);
 		Capturing = true;
-		CaptureAddData = add_data;
-		CaptureMaxDelay = 0;
-		HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioInput::Update);
+		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
 	}
-	if ((!Capturing) && (CapturingByDialog))
+	if (!Capturing)
 		tsunami->log->Error(_("Konnte Aufnahmeger&at nicht &offnen"));
+	ResetSync();
 	msg_db_l(1);
 	return Capturing;
 }
 
-
-void AudioInput::AddToCaptureBuf(int a)
+float AudioInput::GetPlaybackDelayConst()
 {
-	int i0 = CaptureBuf.num;
-	CaptureBuf.resize(i0 + a);
-	CaptureBuf.set_16bit(capture_temp, i0, a);
+	return PlaybackDelayConst;
 }
 
-void AudioInput::AddToCapturePreviewBuf(int a)
+void AudioInput::SetPlaybackDelayConst(float f)
 {
-	CapturePreviewBuf.resize(a);
-	CapturePreviewBuf.set_16bit(capture_temp, 0, a);
+	PlaybackDelayConst = f;
+	HuiConfigWriteFloat("Input.PlaybackDelay", PlaybackDelayConst);
 }
 
 int AudioInput::DoCapturing()
 {
 	msg_db_r("DoCapturing", 1);
 	int a = -42;
-	alcGetIntegerv((ALCdevice*)capture, ALC_CAPTURE_SAMPLES, 1, &a);
+	alcGetIntegerv(capture, ALC_CAPTURE_SAMPLES, 1, &a);
 
 	// don't wait, till we really have as much data as we requested
 	//   (or else it might freeze up....)
@@ -138,41 +148,37 @@ int AudioInput::DoCapturing()
 		if (too_much_data)
 			a = NUM_CAPTURE_SAMPLES;
 
-		alcCaptureSamples((ALCdevice*)capture, capture_temp, a);
+		alcCaptureSamples(capture, capture_temp, a);
 
-		if (CaptureAddData){
-			//if (too_much_data)
-			//	tsunami->log->Error(_("too much capture data!!!"));
+		CurrentBuffer.resize(a);
+		CurrentBuffer.set_16bit(capture_temp, 0, a);
 
-			// append to buffer
-			AddToCaptureBuf(a);
+		if (!too_much_data)
+			sync.Add(a);
 
-			if ((tsunami->output->IsPlaying()) && (!too_much_data)){
-				delay_sum += (tsunami->output->GetPos() - tsunami->output->GetRange().offset - CaptureBuf.num);
-				num_delay_points ++;
-			}
-		}else{
-			// fill preview buffer...
-			AddToCapturePreviewBuf(a);
-		}
 		Notify("Capture");
 	}else
 		a = 0;
-	if (Capturing)
-		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
 	msg_db_l(1);
 	return a;
 }
 
 void AudioInput::Update()
 {
-	CaptureCurrentSamples = DoCapturing();
+	DoCapturing();
+	if (Capturing)
+		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
+}
+
+void AudioInput::ResetSync()
+{
+	sync.Reset();
 }
 
 BufferBox AudioInput::GetSomeSamples(int num_samples)
 {
 	BufferBox buf;
-	if (CaptureAddData){
+	/*if (CaptureAddData){
 		int n = min(CaptureBuf.num, num_samples);
 		int i0 = CaptureBuf.num - n;
 		buf.resize(n);
@@ -183,11 +189,22 @@ BufferBox AudioInput::GetSomeSamples(int num_samples)
 	}else{
 		//buf.set(CapturePreviewBuf, 0, 1.0f);
 		buf = CapturePreviewBuf;
-	}
+	}*/
+	buf = CurrentBuffer;
 	return buf;
 }
 
 float AudioInput::GetSampleRate()
 {
-	return CaptureSampleRate;
+	return SampleRate;
+}
+
+bool AudioInput::IsCapturing()
+{
+	return Capturing;
+}
+
+int AudioInput::GetDelay()
+{
+	return sync.GetDelay() - PlaybackDelayConst * (float)SampleRate / 1000.0f;
 }

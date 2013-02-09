@@ -31,7 +31,7 @@
 #define AL_BUFFER_SIZE		32768
 //#define AL_BUFFER_SIZE		16384
 
-#define UPDATE_TIME		30
+#define UPDATE_TIME		50
 
 AudioOutput::AudioOutput() :
 	PeakMeterSource("AudioOutput")

@@ -93,6 +93,13 @@ void BufferBox::swap_ref(BufferBox &b)
 	b.offset = t;
 }
 
+void BufferBox::append(BufferBox &b)
+{
+	int num0 = num;
+	resize(num + b.num);
+	set(b, num0, 1.0f);
+}
+
 void float_array_swap_values(Array<float> &a, Array<float> &b)
 {
 	for (int i=0;i<a.num;i++){

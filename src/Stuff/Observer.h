@@ -26,4 +26,15 @@ public:
 	virtual void OnUpdate(Observable *o) = 0;
 };
 
+class ObserverWrapper : public Observer
+{
+public:
+	ObserverWrapper(void *handler, void *func);
+	virtual ~ObserverWrapper();
+
+	virtual void OnUpdate(Observable *o);
+
+	void *handler, *func;
+};
+
 #endif /* OBSERVER_H_ */

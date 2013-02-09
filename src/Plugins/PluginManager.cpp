@@ -102,8 +102,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
 	Script::LinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
 	Script::LinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
-	Script::LinkSemiExternalFunc("fft_i2c",		(void*)&FastFourierTransform::fft_i2c);
-	Script::LinkSemiExternalFunc("fft_c2i_inv",	(void*)&FastFourierTransform::fft_c2i_inv);
 	/*Script::LinkSemiExternalFunc("ProgressStart",	(void*)&ProgressStart);
 	Script::LinkSemiExternalFunc("ProgressEnd",	(void*)&ProgressEnd);
 	Script::LinkSemiExternalFunc("Progress",		(void*)&ProgressStatus);*/

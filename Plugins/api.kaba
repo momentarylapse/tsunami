@@ -174,8 +174,6 @@ extern AudioInput *input
 extern void fft_c2c(complex in[], complex out[], bool inverse)
 extern void fft_r2c(float in[], complex out[])
 extern void fft_c2r_inv(complex in[], float out[])
-extern void fft_i2c(int in[], complex out[])
-extern void fft_c2i_inv(complex in[], int out[])
 
 //extern BufferBox CaptureBuf, CapturePreviewBuf
 

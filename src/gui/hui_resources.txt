@@ -926,7 +926,7 @@ menu
 0
 
 
-72
+74
 ItemPopup
 menu_file
 
@@ -1525,8 +1525,34 @@ menu_view
 0
 
 
+ItemPopup
+menu_view_channels
+
+1
+2
+0
+0
+0
+0
+0
+0
+
+
 ItemCheckable
 view_mono
+
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemCheckable
+view_stereo
 
 1
 0
@@ -3732,7 +3758,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-208
+210
 // Text
 about
 Info
@@ -3952,6 +3978,8 @@ menu_track
 Spur
 menu_view
 Ansicht
+menu_view_channels
+Kanäle
 menu_view_grid
 Raster
 menu_view_peaks
@@ -4128,6 +4156,8 @@ view_peaks_mean
 Quadratisches Mittel
 view_samples
 Sample-Ebene
+view_stereo
+Stereo
 volume
 \\0\\1000\\0.1
 volume_slider
@@ -4156,7 +4186,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-208
+210
 // Text
 about
 
@@ -4376,6 +4406,8 @@ menu_track
 
 menu_view
 
+menu_view_channels
+
 menu_view_grid
 
 menu_view_peaks
@@ -4551,6 +4583,8 @@ view_peaks_max
 view_peaks_mean
 
 view_samples
+
+view_stereo
 
 volume
 \\0\\1000\\0.1

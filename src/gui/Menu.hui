@@ -111,7 +111,10 @@ enum{
 		sub_menu_6679->AddEntryImage("Eigenschaften",HuiImageProperties,HMM_SUB_PROPERTIES);
 	m->AddSubMenu("Samples",HMM_MENU_SUB,sub_menu_6679);
 		CHuiMenu *sub_menu_8830=new CHuiMenu();
-		sub_menu_8830->AddEntryCheckable("Mono",HMM_VIEW_MONO);
+			CHuiMenu *sub_menu_channels=new CHuiMenu();
+			sub_menu_channels->AddEntryCheckable("Mono",HMM_VIEW_MONO);
+			sub_menu_channels->AddEntryCheckable("Stereo",HMM_VIEW_STEREO);
+		sub_menu_8830->AddSubMenu("Kan&ale",HMM_MENU_VIEW_CHANNELS,sub_menu_channels);
 			CHuiMenu *sub_menu_grid=new CHuiMenu();
 			sub_menu_grid->AddEntryCheckable("Zeit",HMM_VIEW_GRID_TIME);
 			sub_menu_grid->AddEntryCheckable("Takte",HMM_VIEW_GRID_BARS);

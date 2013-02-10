@@ -59,8 +59,8 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 
 	DrawingWidth = 800;
 
-	show_mono = false;
-	grid_mode = GRID_MODE_TIME;
+	show_mono = HuiConfigReadBool("View.Mono", false);
+	grid_mode = HuiConfigReadInt("View.GridMode", GRID_MODE_TIME);
 	DetailSteps = HuiConfigReadInt("View.DetailSteps", 1);
 	MouseMinMoveToSelect = HuiConfigReadInt("View.MouseMinMoveToSelect", 5);
 	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
@@ -115,6 +115,8 @@ AudioView::~AudioView()
 {
 	Unsubscribe(audio);
 
+	HuiConfigWriteBool("View.Mono", show_mono);
+	HuiConfigWriteInt("View.GridMode", grid_mode);
 	HuiConfigWriteInt("View.DetailSteps", DetailSteps);
 	HuiConfigWriteInt("View.MouseMinMoveToSelect", MouseMinMoveToSelect);
 	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
@@ -1031,6 +1033,7 @@ void AudioView::UpdateMenu()
 {
 	// view
 	tsunami->Check("view_mono", show_mono);
+	tsunami->Check("view_stereo", !show_mono);
 	tsunami->Check("view_grid_time", grid_mode == GRID_MODE_TIME);
 	tsunami->Check("view_grid_bars", grid_mode == GRID_MODE_BARS);
 	tsunami->Check("view_peaks_max", PeakMode == BufferBox::PEAK_MODE_MAXIMUM);
@@ -1052,9 +1055,9 @@ void AudioView::SetPeaksMode(int mode)
 	UpdateMenu();
 }
 
-void AudioView::ToggleShowMono()
+void AudioView::SetShowMono(bool mono)
 {
-	show_mono = !show_mono;
+	show_mono = mono;
 	ForceRedraw();
 	//Notify("Settings");
 	UpdateMenu();

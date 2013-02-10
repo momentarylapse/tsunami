@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-163
+165
 // Data (ID,Text)
 about
 
@@ -159,6 +159,8 @@ menu_track
 
 menu_view
 
+menu_view_channels
+
 menu_view_grid
 
 menu_view_peaks
@@ -309,6 +311,8 @@ view_peaks_mean
 
 view_samples
 
+view_stereo
+
 volume
 \\0\\1000\\0.1
 wave_dialog
@@ -330,7 +334,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-85
+84
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -497,8 +501,6 @@ rendere Audio
 speichere
 
 speichere nami
-
-too much capture data!!!
 
 unbekannte Dateiendung: 
 

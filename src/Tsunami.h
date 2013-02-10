@@ -87,6 +87,7 @@ public:
 	void OnViewGridTime();
 	void OnViewGridBars();
 	void OnViewMono();
+	void OnViewStereo();
 	void OnViewOptimal();
 	void OnSelectNone();
 	void OnSelectAll();

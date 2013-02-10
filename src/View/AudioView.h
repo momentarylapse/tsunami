@@ -40,7 +40,7 @@ public:
 
 	void OnUpdate(Observable *o);
 
-	void ToggleShowMono();
+	void SetShowMono(bool mono);
 	void SetGridMode(int mode);
 	void SetPeaksMode(int mode);
 	void ZoomIn();

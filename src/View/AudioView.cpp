@@ -1020,10 +1020,12 @@ void AudioView::OptimizeView()
 
 	Range r = audio->GetRange();
 
-	int length = r.length();
-	if (length == 0)
-		length = 10 * audio->sample_rate;
-	view_zoom = audio->area.width() / (double)length;
+	if (r.num == 0)
+		r.num = 10 * audio->sample_rate;
+	int border = r.num / 15;
+	r.offset -= border;
+	r.num += border * 2;
+	view_zoom = audio->area.width() / (double)r.length();
 	view_pos = (double)r.start();
 	ForceRedraw();
 	msg_db_l(1);

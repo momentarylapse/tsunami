@@ -27,7 +27,7 @@ Array<Beat> BarCollection::GetBeats(const Range &r)
 	Array<Beat> beats;
 
 	int pos0 = 0;
-	int bar_no;
+	int bar_no = 0;
 	foreach(Bar &b, *this)
 		if (b.type == b.TYPE_BAR){
 			for (int j=0;j<b.count;j++){

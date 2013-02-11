@@ -698,35 +698,6 @@ void AudioView::DrawSub(HuiDrawingContext *c, const rect &r, Track *s)
 		c->DrawStr(asx, r.y2 - SUB_FRAME_HEIGHT, s->name);
 }
 
-void AudioView::DrawBars(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no, Array<Bar> &bc)
-{
-	int x0 = 0;
-	int n = 1;
-	foreachi(Bar &bar, bc, i){
-		bar.x     = sample2screen(x0);
-		bar.width = sample2screen(x0 + bar.length * bar.count) - bar.x;
-		if (bar.type == bar.TYPE_BAR){
-			for (int j=0;j<bar.count;j++){
-				for (int i=0;i<bar.num_beats;i++){
-					int bx = sample2screen(x0 + (int)((float)bar.length * i / bar.num_beats));
-
-					color cc = (i == 0) ? Red : col;
-					c->SetColor(cc);
-					if (i == 0)
-						c->DrawStr(bx + 2, r.y1 + r.height()/2, i2s(n));
-
-					if ((bx >= r.x1) && (bx < r.x2))
-						c->DrawLine(bx, r.y1, bx, r.y2);
-				}
-				x0 += bar.length;
-				n ++;
-			}
-		}else if (bar.type == bar.TYPE_PAUSE){
-			x0 += bar.length;
-		}
-	}
-}
-
 void DrawStrBg(HuiDrawingContext *c, float x, float y, const string &str, const color &fg, const color &bg)
 {
 	color bg2 = bg;
@@ -742,8 +713,6 @@ void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color c
 	msg_db_r("DrawTrack", 1);
 
 	DrawBuffer(c, r, t, int(view_pos), col);
-
-	DrawBars(c, r, t, col, track_no, t->bar);
 
 	foreach(Track *s, t->sub)
 		DrawSub(c, r, s);
@@ -820,10 +789,20 @@ void AudioView::DrawGridBars(HuiDrawingContext *c, const rect &r, const color &b
 	int s0 = screen2sample(r.x1 - 1);
 	int s1 = screen2sample(r.x2);
 	Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
+	color c1 = ColorInterpolate(bg, ColorGrid, 0.5f);
 	foreach(Beat &b, beats){
-		c->SetColor((b.beat_no == 0) ? Red : Black);
+		c->SetColor((b.beat_no == 0) ? ColorGrid : c1);
 		int xx = sample2screen(b.pos);
 		c->DrawLine(xx, r.y1, xx, r.y2);
+	}
+	if (!show_time)
+		return;
+	c->SetColor(ColorGrid);
+	foreach(Beat &b, beats){
+		if (b.beat_no == 0){
+			int xx = sample2screen(b.pos);
+			c->DrawStr(xx + 2, r.y1, i2s(b.bar_no + 1));
+		}
 	}
 }
 
@@ -915,7 +894,10 @@ void AudioView::DrawBackground(HuiDrawingContext *c, const rect &r)
 		color cc = (t->is_selected) ? ColorBackgroundCurTrack : ColorBackgroundCurWave;
 		c->SetColor(cc);
 		c->DrawRect(t->area);
-		DrawGrid(c, t->area, cc);
+		if (t->type == t->TYPE_TIME)
+			DrawGridBars(c, t->area, cc, grid_mode == GRID_MODE_TIME);
+		else
+			DrawGrid(c, t->area, cc);
 	}
 
 	// free space below tracks

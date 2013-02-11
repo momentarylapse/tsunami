@@ -483,9 +483,12 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (cur_plugin->type == Plugin::TYPE_EFFECT){
 				if (a->used){
 					cur_plugin->ResetState();
+					Range range = a->selection;
+					if (range.empty())
+						range = a->GetRange();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
-							cur_plugin->ProcessTrack(t, tsunami->view->cur_level, a->selection);
+							cur_plugin->ProcessTrack(t, tsunami->view->cur_level, range);
 						}
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));

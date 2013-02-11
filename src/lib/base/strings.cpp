@@ -747,6 +747,30 @@ string implode(const Array<string> &a, const string &glue)
 	return r;
 }
 
+bool string::match(const string &glob) const
+{
+	Array<string> g = glob.explode("*");
+
+	// no *'s -> direct match
+	if (g.num < 2)
+		return (*this == glob);
+
+	if (head(g[0].num) != g[0])
+		return false;
+	int pos = g[0].num;
+	for (int i=1; i<g.num-1; i++){
+		pos = find(g[i], pos);
+		if (pos < 0)
+			return false;
+		pos += g[i].num;
+	}
+	if (pos > num - g.back().num)
+		return false;
+	if (tail(g.back().num) != g.back())
+		return false;
+	return true;
+}
+
 /*
 char *regex_out_match[REGEX_MAX_MATCHES];
 int regex_out_pos[REGEX_MAX_MATCHES],regex_out_length[REGEX_MAX_MATCHES];

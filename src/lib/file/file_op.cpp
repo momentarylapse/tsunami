@@ -167,16 +167,18 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	string filter2 = filter.substr(1, filter.num - 1);
 	string dir2 = dir;
 	dir2.dir_ensure_ending();
+	dir2 = dir2.sys_filename();
 
 #ifdef OS_WINDOWS
 	static _finddata_t t;
-	int handle=_findfirst((dir2.sys_filename() + "*").c_str(), &t);
+	int handle=_findfirst((dir2 + "*").c_str(), &t);
 	int e=handle;
 	while(e>=0){
+		string name = t.name;
 		//if ((strcmp(t.name,".")!=0)&&(strcmp(t.name,"..")!=0)&&(strstr(t.name,"~")==NULL)){
-		if ((t.name[0]!='.')&&(!strstr(t.name,"~"))){
-			entry.name = string(t.name);
-			if ((fn.find(filter2) >= 0)|| ((show_directories)&&(t.attrib==_A_SUBDIR)) ){
+		if ((name != ".") && (name.back() != '~')){
+			if ((name.match(filter))|| ((show_directories)&&(t.attrib==_A_SUBDIR)) ){
+				entry.name = name;
 				entry.is_dir = (t.attrib == _A_SUBDIR);
 				entry_list.add(entry);
 			}
@@ -186,7 +188,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 #endif
 #ifdef OS_LINUX
 	DIR *_dir;
-	_dir=opendir(dir2.sys_filename().c_str());
+	_dir=opendir(dir2.c_str());
 	if (!_dir){
 		msg_db_l(1);
 		return entry_list;
@@ -196,20 +198,21 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	struct stat s;
 	while(dn){
 		//if ((strcmp(dn->d_name,".")!=0)&&(strcmp(dn->d_name,"..")!=0)&&(!strstr(dn->d_name,"~"))){
-			if ((dn->d_name[0]!='.')&&(!strstr(dn->d_name,"~"))){
-				string ffn = dir2.sys_filename() + dn->d_name;
-				stat(ffn.c_str(), &s);
-				bool is_reg=(s.st_mode & S_IFREG)>0;
-				bool is_dir=(s.st_mode & S_IFDIR)>0;
-				int sss=strlen(dn->d_name) - filter2.num;
-				if (sss<0)	sss=0;
-				if ( ((is_reg)&&(strcmp(&dn->d_name[sss],filter2.c_str())==0)) || ((show_directories)&&(is_dir)) ){
-					entry.name = string(dn->d_name);
-					entry.is_dir = is_dir;
-					entry_list.add(entry);
-				}
+		string name = dn->d_name;
+		if ((name != ".") && (name.back() != '~')){
+			string ffn = dir2 + name;
+			stat(ffn.c_str(), &s);
+			bool is_reg=(s.st_mode & S_IFREG)>0;
+			bool is_dir=(s.st_mode & S_IFDIR)>0;
+			int sss=strlen(dn->d_name) - filter2.num;
+			if (sss<0)	sss=0;
+			if ( ((is_reg)&&(name.match(filter))) || ((show_directories)&&(is_dir)) ){
+				entry.name = name;
+				entry.is_dir = is_dir;
+				entry_list.add(entry);
 			}
-			dn=readdir(_dir);
+		}
+		dn=readdir(_dir);
 	}
 	closedir(_dir);
 #endif

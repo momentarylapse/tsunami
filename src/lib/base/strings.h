@@ -44,6 +44,7 @@ class string : public DynamicArray
 	string upper() const;
 	string hex(bool inverted = false) const;
 	string unhex() const;
+	bool match(const string &glob) const;
 	int hash() const;
 	int _int() const;
 	float _float() const;

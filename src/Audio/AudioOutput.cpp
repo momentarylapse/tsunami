@@ -101,15 +101,15 @@ void AudioOutput::Init()
 	if (dev_name.num > 0){
 		al_dev = alcOpenDevice(dev_name.c_str());
 		if (al_dev){
-			TestError2("alcOpenDevice (init)", (ALCdevice*)al_dev);
-			al_context = alcCreateContext((ALCdevice*)al_dev, NULL);
-			TestError2("alcCreateContext (init)", (ALCdevice*)al_dev);
+			TestError("alcOpenDevice (init)");
+			al_context = alcCreateContext(al_dev, NULL);
+			TestError("alcCreateContext (init)");
 			if (al_context){
-				if (alcMakeContextCurrent((ALCcontext*)al_context)){
+				if (alcMakeContextCurrent(al_context)){
 					tsunami->log->Info(_("benutze OpenAl Device: ") + dev_name);
 					ok = true;
 				}
-				TestError2("alcMakeContextCurrent (init)", (ALCdevice*)al_dev);
+				TestError("alcMakeContextCurrent (init)");
 			}
 		}
 	}
@@ -155,13 +155,13 @@ void AudioOutput::Kill()
 		// manually
 		//msg_write("current context...");
 		alcMakeContextCurrent(NULL);
-		TestError2("alcMakeContextCurrent (kill)", al_dev);
+		TestError("alcMakeContextCurrent (kill)");
 		//msg_write("destroy context...");
-		alcDestroyContext((ALCcontext*)al_context);
-		TestError2("alcDestroyContext (kill)", al_dev);
+		alcDestroyContext(al_context);
+		TestError("alcDestroyContext (kill)");
 		//msg_write("close device...");
-		if (!alcCloseDevice((ALCdevice*)al_dev))
-			TestError2("alcCloseDevice (kill)", al_dev);
+		if (!alcCloseDevice(al_dev))
+			TestError("alcCloseDevice (kill)");
 		//msg_write("ok");
 	}else{
 		// automatically
@@ -453,23 +453,14 @@ BufferBox AudioOutput::GetSomeSamples(int num_samples)
 
 bool AudioOutput::TestError(const string &msg)
 {
-	int error = alGetError();
+	int error;
+	if (al_dev)
+		error = alcGetError(al_dev);
+	else
+		error = alGetError();
 	if (error != AL_NO_ERROR){
 		al_last_error = error;
 		//tsunami->log->Error();
-		msg_error("OpenAL operation: " + msg);
-		msg_write(ALError(error));
-		//msg_write(alutGetErrorString(error));
-		return true;
-	}
-	return false;
-}
-
-bool AudioOutput::TestError2(const string &msg, void *d)
-{
-	int error = alcGetError((ALCdevice*)d);
-	if (error != AL_NO_ERROR){
-		al_last_error = error;
 		msg_error("OpenAL operation: " + msg);
 		msg_write(ALError(error));
 		//msg_write(alutGetErrorString(error));

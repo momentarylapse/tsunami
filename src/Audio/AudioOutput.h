@@ -13,6 +13,9 @@
 #include "../Data/AudioFile.h"
 #include "../View/Helper/PeakMeter.h"
 
+struct ALCdevice_struct;
+struct ALCcontext_struct;
+
 class AudioOutput : public HuiEventHandler, public PeakMeterSource
 {
 public:
@@ -52,7 +55,6 @@ public:
 
 private:
 	bool TestError(const string &msg);
-	bool TestError2(const string &msg, void *d);
 	bool stream(int buf);
 
 	void stop_play();
@@ -76,8 +78,8 @@ private:
 	Array<short> data;
 	int data_samples;
 
-	void *al_context;
-	void *al_dev;
+	ALCcontext_struct *al_context;
+	ALCdevice_struct *al_dev;
 	int buffer[2];
 	int cur_buffer_no;
 	unsigned int source;

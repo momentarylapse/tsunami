@@ -8,11 +8,11 @@ const int SAMPLE_RATE = 44100
 float freq
 float volume
 
-void fill(int pos, BufferBox buf)
+void fill(BufferBox buf)
 	float w_f = 1.0 / i2f(SAMPLE_RATE) * freq * 2.0 * pi
 	for int i, 0, buf.num
-		buf.r[i] = sin((i + pos) * w_f) * volume
-		buf.l[i] = sin((i + pos) * w_f) * volume
+		buf.r[i] = sin((i + buf.offset) * w_f) * volume
+		buf.l[i] = sin((i + buf.offset) * w_f) * volume
 
 void OnFrequency()
 	freq = dlg.GetFloat("")

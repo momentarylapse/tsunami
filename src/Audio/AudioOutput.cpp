@@ -255,7 +255,8 @@ bool AudioOutput::stream(int buf)
 		//msg_write(size);
 	}else if (generate_func){
 		b->resize(AL_BUFFER_SIZE);
-		(*generate_func)(stream_offset_next, *b);
+		b->offset = stream_offset_next;
+		(*generate_func)(*b);
 		size = b->num;
 	}
 	if (size == 0){

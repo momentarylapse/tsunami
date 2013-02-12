@@ -6,11 +6,11 @@ const int SAMPLE_RATE = 44100
 const int offset_out = 20000
 int offset_in
 
-void fill(int pos, BufferBox buf)
+void fill(BufferBox buf)
 	buf.r = 0
 	buf.l = 0
 	
-	if pos == 0
+	if buf.offset == 0
 		buf.add_click(offset_out, 1, 880, SAMPLE_RATE)
 
 void sync()

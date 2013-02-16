@@ -8,6 +8,7 @@
 #include "Storage.h"
 #include "Format.h"
 #include "FormatWave.h"
+#include "FormatRaw.h"
 #include "FormatOgg.h"
 #include "FormatFlac.h"
 #include "FormatNami.h"
@@ -22,6 +23,7 @@ Storage::Storage()
 {
 	format.add(new FormatNami());
 	format.add(new FormatWave());
+	format.add(new FormatRaw());
 	format.add(new FormatOgg());
 	format.add(new FormatFlac());
 

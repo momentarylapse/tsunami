@@ -32,11 +32,10 @@ void Observable::AddObserver(Observer *o)
 
 void Observable::RemoveObserver(Observer *o)
 {
-	foreachi(Observer *obs, observer, i)
-		if (obs == o){
+	for (int i=observer.num-1; i>=0; i--)
+		if (observer[i] == o){
 			observer.erase(i);
 			observer_message.erase(i);
-			break;
 		}
 }
 

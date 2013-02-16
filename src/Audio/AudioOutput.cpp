@@ -33,6 +33,9 @@
 
 #define UPDATE_TIME		50
 
+// sends notifications:
+//   "StateChange", "Update"
+
 AudioOutput::AudioOutput() :
 	PeakMeterSource("AudioOutput")
 {
@@ -227,7 +230,7 @@ void AudioOutput::Stop()
 	allow_loop = false;
 	audio = NULL;
 
-	Notify("Stop");
+	Notify("StateChange");
 	msg_db_l(1);
 }
 
@@ -241,7 +244,7 @@ void AudioOutput::Pause()
 		alSourcePause(source);
 	else if (param == AL_PAUSED)
 		alSourcePlay(source);
-	Notify("Pause");
+	Notify("StateChange");
 }
 
 bool AudioOutput::stream(int buf)
@@ -339,9 +342,9 @@ void AudioOutput::Play(AudioFile *a, bool _allow_loop)
 	playing = true;
 	allow_loop = _allow_loop;
 
-	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
+	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
 
-	Notify("Play");
+	Notify("StateChange");
 	msg_db_l(1);
 }
 
@@ -368,9 +371,9 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 	playing = true;
 	allow_loop = false;
 
-	HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
+	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
 
-	Notify("Play");
+	Notify("StateChange");
 	msg_db_l(1);
 }
 
@@ -505,7 +508,7 @@ void AudioOutput::Update()
 		}else{
 		}
 
-		HuiRunLaterM(UPDATE_TIME, this, (void(HuiEventHandler::*)())&AudioOutput::Update);
+		HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
 	}
 	msg_db_l(1);
 }

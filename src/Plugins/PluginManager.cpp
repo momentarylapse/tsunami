@@ -223,7 +223,7 @@ void PluginManager::InitPluginData()
 void PluginManager::FinishPluginData()
 {
 	msg_db_r("FinishPluginData", 2);
-	tsunami->ForceRedraw();
+	//tsunami->view->ForceRedraw();
 	msg_db_l(2);
 }
 

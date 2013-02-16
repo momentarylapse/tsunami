@@ -109,6 +109,7 @@ void CaptureDialog::OnDelete()
 	Enable("capture_pause", false);
 	Enable("capture_delete", false);
 	Enable("ok", false);
+	SetString("capture_time", audio->get_time_str(buf.num));
 }
 
 void CaptureDialog::OnPause()

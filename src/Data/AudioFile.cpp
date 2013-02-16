@@ -58,7 +58,8 @@ void get_track_sub_index(Track *t, int &track_no, int &sub_no)
 		track_no = get_track_index(t);
 }
 
-AudioFile::AudioFile()
+AudioFile::AudioFile() :
+	Data("AudioFile")
 {
 	used = false;
 	volume = 1;

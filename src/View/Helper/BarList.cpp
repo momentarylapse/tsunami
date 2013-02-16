@@ -52,7 +52,6 @@ void BarList::FillList()
 				dlg->AddString(id, format(_("(Pause)\\-\\-\\%.3f"), (float)b.length / (float)sample_rate));
 			}
 		}
-		tsunami->ForceRedraw();
 	}
 	dlg->Enable(id_delete, false);
 	msg_db_l(1);

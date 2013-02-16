@@ -99,9 +99,6 @@ public:
 	bool AllowTermination();
 	bool Save();
 
-	//void Draw();
-	void ForceRedraw();
-	bool force_redraw;
 	void UpdateMenu();
 
 	AudioFile *audio;

@@ -152,7 +152,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	Subscribe(view);
 	Subscribe(audio);
-	Subscribe(output);
+	Subscribe(output, "StateChange");
 	Subscribe(clipboard);
 
 	UpdateMenu();
@@ -173,6 +173,7 @@ Tsunami::~Tsunami()
 	Unsubscribe(view);
 	Unsubscribe(audio);
 	Unsubscribe(output);
+	Unsubscribe(clipboard);
 
 	irect r = GetOuteriorDesired();
 	HuiConfigWriteInt("Window.Width", r.x2 - r.x1);
@@ -194,11 +195,6 @@ Tsunami::~Tsunami()
 int Tsunami::Run()
 {
 	return HuiRun();
-}
-
-void Tsunami::ForceRedraw()
-{
-	view->ForceRedraw();
 }
 
 
@@ -408,7 +404,7 @@ void Tsunami::OnCurLevel()
 {
 	view->cur_level = HuiGetEvent()->id.substr(14, -1)._int();
 	UpdateMenu();
-	ForceRedraw();
+	view->ForceRedraw();
 }
 
 void Tsunami::OnCurLevelUp()
@@ -416,7 +412,7 @@ void Tsunami::OnCurLevelUp()
 	if (view->cur_level < audio->level_name.num - 1){
 		view->cur_level ++;
 		UpdateMenu();
-		ForceRedraw();
+		view->ForceRedraw();
 	}
 }
 
@@ -425,7 +421,7 @@ void Tsunami::OnCurLevelDown()
 	if (view->cur_level > 0){
 		view->cur_level --;
 		UpdateMenu();
-		ForceRedraw();
+		view->ForceRedraw();
 	}
 }
 
@@ -493,9 +489,8 @@ void Tsunami::OnZoomOut()
 void Tsunami::UpdateMenu()
 {
 	msg_db_r("UpdateMenu", 1);
-	bool selected = audio && !audio->selection.empty();
+	bool selected = !audio->selection.empty();
 // menu / toolbar
-	// edit
 	// edit
 	Enable("select_all", audio->used);
 	Enable("select_nothing", audio->used);
@@ -556,9 +551,9 @@ void Tsunami::UpdateMenu()
 void Tsunami::OnUpdate(Observable *o)
 {
 	if (o->GetName() == "AudioOutput"){
-		ForceRedraw();
+		view->ForceRedraw();
 		UpdateMenu();
-	}else // "Data" or "AudioView"
+	}else // "Clipboard", "AudioFile" or "AudioView"
 		UpdateMenu();
 }
 

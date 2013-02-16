@@ -7,8 +7,8 @@
 
 #include "Data.h"
 
-Data::Data() :
-	Observable("Data")
+Data::Data(const string &name) :
+	Observable(name)
 {
 	action_manager = new ActionManager(this);
 }

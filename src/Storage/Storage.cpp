@@ -65,7 +65,6 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			a->UpdatePeaks(tsunami->view->PeakMode);
 
 			tsunami->progress->End();
-			tsunami->ForceRedraw();
 			if (a->track.num > 0)
 			{}//	a->SetCurTrack(a->track[0]);
 			else
@@ -103,7 +102,6 @@ bool Storage::LoadTrack(Track *t, const string &filename)
 			f->LoadTrack(t, filename);
 
 			tsunami->progress->End();
-			tsunami->ForceRedraw();
 			a->NotifyEnd();
 			found = true;
 			break;

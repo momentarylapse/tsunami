@@ -20,7 +20,7 @@ class Observable;
 class Data : public Observable
 {
 public:
-	Data();
+	Data(const string &name);
 	virtual ~Data();
 
 	virtual void Reset() = 0;

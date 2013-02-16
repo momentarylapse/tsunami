@@ -22,6 +22,7 @@ public:
 	AudioView(CHuiWindow *parent, AudioFile *audio);
 	virtual ~AudioView();
 
+	void CheckConsistency();
 	void ForceRedraw();
 
 	void OnDraw();

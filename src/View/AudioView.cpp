@@ -88,6 +88,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
+	Subscribe(tsunami->output);
 
 	// events
 	parent->EventMX("area", "hui:redraw", this, &AudioView::OnDraw);
@@ -114,6 +115,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 AudioView::~AudioView()
 {
 	Unsubscribe(audio);
+	Unsubscribe(tsunami->output);
 
 	HuiConfigWriteBool("View.Mono", show_mono);
 	HuiConfigWriteInt("View.GridMode", grid_mode);
@@ -806,10 +808,8 @@ void AudioView::DrawGridBars(HuiDrawingContext *c, const rect &r, const color &b
 	}
 }
 
-void AudioView::OnUpdate(Observable *o)
+void AudioView::CheckConsistency()
 {
-	//msg_write("view: " + o->GetName() + " - " + o->GetMessage());
-
 	// check cur_track consistency
 	int n = get_track_index_save(cur_track);
 	if (n < 0)
@@ -821,12 +821,23 @@ void AudioView::OnUpdate(Observable *o)
 		cur_level = 0;
 		ForceRedraw();
 	}
+}
 
-	if (o->GetMessage() == "New"){
-		OptimizeView();
-	}else{
+void AudioView::OnUpdate(Observable *o)
+{
+	//msg_write("view: " + o->GetName() + " - " + o->GetMessage());
+
+	CheckConsistency();
+
+	if (o->GetName() == "AudioFile"){
+		if (o->GetMessage() == "New"){
+			OptimizeView();
+		}else{
+			ForceRedraw();
+			UpdateMenu();
+		}
+	}else if (o->GetName() == "AudioOutput"){
 		ForceRedraw();
-		UpdateMenu();
 	}
 }
 

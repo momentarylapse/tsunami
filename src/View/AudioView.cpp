@@ -68,6 +68,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 	ScrollSpeedFast = HuiConfigReadInt("View.ScrollSpeedFast", 3000);
 	ZoomSpeed = HuiConfigReadFloat("View.ZoomSpeed", 0.1f);
 	PeakMode = HuiConfigReadInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
+	Antialiasing = HuiConfigReadBool("View.Antialiasing", false);
 
 	image_unmuted.Load(HuiAppDirectoryStatic + "Data/volume.tga");
 	image_muted.Load(HuiAppDirectoryStatic + "Data/mute.tga");
@@ -124,6 +125,7 @@ AudioView::~AudioView()
 	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
 	HuiConfigWriteInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	HuiConfigWriteFloat("View.ZoomSpeed", ZoomSpeed);
+	HuiConfigWriteBool("View.Antialiasing", Antialiasing);
 }
 
 
@@ -552,28 +554,28 @@ void AudioView::ForceRedraw()
 
 float tx[4096], ty[4096], ty2[4096];
 
-inline void draw_line_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, double zoom, double f, float hf, float x, float y0, const Array<float> &buf, int offset)
+inline void draw_line_buffer(HuiDrawingContext *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
 {
 	int nl = 0;
-	double dpos = 1.0 / zoom / f;
-	// pixel position
-	// -> buffer position
-	double p0 = view_pos_rel / f;
-	for (int i=0;i<width+di;i+=di){
+	int i0 = max((double) x          / zoom + view_pos - offset    , 0);
+	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, buf.num);
 
-		double p = p0 + dpos * (double)i;
-		int ip = (int)p - offset;
-		if ((ip >= 0) && (ip < buf.num))
-		if (((int)(p * f) < offset + buf.num) && (p >= offset)){
-			tx[nl] = (float)x+i;
-			ty[nl] = y0 + buf[ip] * hf;
-			nl ++;
-		}
+	if (i1 - i0 > 4000)
+		return;
+
+	for (int i=i0;i<i1;i++){
+
+		double p = x + ((double)(i + offset) - view_pos) * zoom;
+		tx[nl] = (float)p;
+		ty[nl] = y0 + buf[i] * hf;
+		if (zoom > 5)
+			c->DrawCircle(p, ty[nl], 2);
+		nl ++;
 	}
 	c->DrawLines(tx, ty, nl -1);
 }
 
-inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
+inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
 {
 	int nl = 0;
 	double dpos = 1.0 / zoom;
@@ -602,7 +604,7 @@ inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, float view
 	//c->DrawLines(tx, ty2, nl -1);
 }
 
-void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int view_pos_rel, const color &col)
+void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, double view_pos_rel, const color &col)
 {
 	msg_db_r("DrawBuffer", 1);
 	int l_best = 0;
@@ -643,9 +645,9 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int vi
 				if (!show_mono)
 					draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, f, hf, r.x1, y0l, b.peak[l*2-1], b.offset);
 			}else{
-				draw_line_buffer(c, r.width(), di, view_pos_rel, view_zoom, 1, hf, r.x1, y0r, b.r, b.offset);
+				draw_line_buffer(c, r.width(), view_pos_rel, view_zoom, hf, r.x1, y0r, b.r, b.offset);
 				if (!show_mono)
-					draw_line_buffer(c, r.width(), di, view_pos_rel, view_zoom, 1, hf, r.x1, y0l, b.l, b.offset);
+					draw_line_buffer(c, r.width(), view_pos_rel, view_zoom, hf, r.x1, y0l, b.l, b.offset);
 			}
 		}
 	}
@@ -693,7 +695,7 @@ void AudioView::DrawSub(HuiDrawingContext *c, const rect &r, Track *s)
 		DrawSubFrame(c, r, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	DrawBuffer(	c, r, s, int(view_pos - s->pos), col);
+	DrawBuffer(	c, r, s, view_pos - (double)s->pos, col);
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
@@ -714,7 +716,7 @@ void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color c
 {
 	msg_db_r("DrawTrack", 1);
 
-	DrawBuffer(c, r, t, int(view_pos), col);
+	DrawBuffer(c, r, t, view_pos, col);
 
 	foreach(Track *s, t->sub)
 		DrawSub(c, r, s);
@@ -993,7 +995,7 @@ void AudioView::OnDraw()
 	DrawingWidth = c->width;
 	c->SetFontSize(FONT_SIZE);
 	c->SetLineWidth(1.0f);
-	c->SetAntialiasing(false);
+	c->SetAntialiasing(Antialiasing);
 	//c->SetColor(ColorWaveCur);
 
 	DrawAudioFile(c, rect(0, c->width, 0, c->height));

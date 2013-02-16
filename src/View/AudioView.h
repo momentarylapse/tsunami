@@ -47,7 +47,7 @@ public:
 	void ZoomIn();
 	void ZoomOut();
 
-	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, int pos, const color &col);
+	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, double pos, const color &col);
 	void DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, const color &col, int delay);
 	void DrawSub(HuiDrawingContext *c, const rect &r, Track *s);
 	void DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no);
@@ -160,6 +160,7 @@ public:
 	int DetailSteps;
 	int MouseMinMoveToSelect;
 	int PreviewSleepTime;
+	bool Antialiasing;
 
 	int PeakMode;
 

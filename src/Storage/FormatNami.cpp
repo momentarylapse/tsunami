@@ -123,6 +123,34 @@ void WriteBar(CFile *f, Bar &b)
 	EndChunk(f);
 }
 
+void WriteMidiNote(CFile *f, MidiNote &n)
+{
+	BeginChunk(f, "midinote");
+
+	f->WriteInt(n.range.offset);
+	f->WriteInt(n.range.num);
+	f->WriteInt(n.pitch);
+	f->WriteFloat(n.volume);
+	f->WriteInt(0); // reserved
+
+	EndChunk(f);
+}
+
+void WriteMidi(CFile *f, MidiData &m)
+{
+	BeginChunk(f, "midi");
+
+	f->WriteStr(m.instrument);
+	f->WriteStr(m.synthesizer);
+	f->WriteStr(m.options);
+	f->WriteInt(0); // reserved
+
+	foreach(MidiNote &n, m)
+		WriteMidiNote(f, n);
+
+	EndChunk(f);
+}
+
 void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
 {
 	BeginChunk(f, "level");
@@ -157,6 +185,9 @@ void WriteTrack(CFile *f, Track *t)
 
 	foreach(Effect &effect, t->fx)
 		WriteEffect(f, &effect);
+
+	if ((t->midi.num > 0) || (t->type == t->TYPE_MIDI))
+		WriteMidi(f, t->midi);
 
 	EndChunk(f);
 }
@@ -595,6 +626,27 @@ void ReadChunkBar(CFile *f, Array<Bar> *bar)
 	bar->add(b);
 }
 
+void ReadChunkMidiNote(CFile *f, MidiData *midi)
+{
+	MidiNote n;
+	n.range.offset = f->ReadInt();
+	n.range.num = f->ReadInt();
+	n.pitch = f->ReadInt();
+	n.volume = f->ReadFloat();
+	f->ReadInt(); // reserved
+	midi->add(n);
+}
+
+void ReadChunkMidiData(CFile *f, MidiData *midi)
+{
+	midi->instrument = f->ReadStr();
+	midi->synthesizer = f->ReadStr();
+	midi->options = f->ReadStr();
+	f->ReadInt(); // reserved
+
+	AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
+}
+
 void ReadChunkTrackLevel(CFile *f, Track *t)
 {
 	int l = f->ReadInt();
@@ -618,6 +670,7 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
 	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &t->fx);
 	AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
+	AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
 }
 
 void ReadChunkNami(CFile *f, AudioFile *a)

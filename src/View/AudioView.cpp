@@ -17,6 +17,7 @@
 const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;
 const int MAX_TRACK_HEIGHT = 250;
+const float LINE_WIDTH = 1.0f;
 
 
 int get_track_index_save(Track *t)
@@ -715,12 +716,16 @@ void DrawStrBg(HuiDrawingContext *c, float x, float y, const string &str, const 
 
 void AudioView::DrawMidi(HuiDrawingContext *c, const rect &r, MidiData &midi, color col)
 {
+	c->SetLineWidth(3.0f);
 	foreach(MidiNote &n, midi){
-		c->SetColor(SetColorHSB(0.1f + n.volume * 0.4f, (float)(n.pitch % 12) / 12.0f, 0.4f, 1));
+		c->SetColor(SetColorHSB(1, (float)(n.pitch % 12) / 12.0f, 0.6f, 1));
 		float x1 = sample2screen(n.range.offset);
 		float x2 = sample2screen(n.range.end());
-		c->DrawRect(rect(x1, x2, r.y1, r.y2));
+		float h = r.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * r.height();
+		//c->DrawRect(rect(x1, x2, r.y1, r.y2));
+		c->DrawLine(x1, h, x2, h);
 	}
+	c->SetLineWidth(LINE_WIDTH);
 }
 
 void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no)
@@ -1007,7 +1012,7 @@ void AudioView::OnDraw()
 	HuiDrawingContext *c = tsunami->BeginDraw("area");
 	DrawingWidth = c->width;
 	c->SetFontSize(FONT_SIZE);
-	c->SetLineWidth(1.0f);
+	c->SetLineWidth(LINE_WIDTH);
 	c->SetAntialiasing(Antialiasing);
 	//c->SetColor(ColorWaveCur);
 

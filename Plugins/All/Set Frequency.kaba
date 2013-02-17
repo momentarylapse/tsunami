@@ -3,7 +3,7 @@
 window dlg
 
 void OnOk()
-	cur_audio.sample_rate = dlg.GetInt("freq")
+	audio.sample_rate = dlg.GetInt("freq")
 	//ChangeAudioFile(cur_audio)
 	HuiWinClose(dlg)
 
@@ -21,6 +21,6 @@ void main()
 	dlg.Event("cancel", &OnClose)
 	dlg.Event("hui:close", &OnClose)
 	
-	dlg.SetInt("freq", cur_audio.sample_rate)
+	dlg.SetInt("freq", audio.sample_rate)
 	
 	HuiWaitTillWindowClosed(dlg)

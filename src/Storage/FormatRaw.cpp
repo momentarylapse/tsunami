@@ -14,7 +14,7 @@
 const int WAVE_BUFFER_SIZE = 1 << 15;
 
 FormatRaw::FormatRaw() :
-	Format("raw", FLAG_SINGLE_TRACK)
+	Format("raw", FLAG_AUDIO | FLAG_SINGLE_TRACK)
 {
 }
 

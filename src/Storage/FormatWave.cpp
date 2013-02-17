@@ -14,7 +14,7 @@
 const int WAVE_BUFFER_SIZE = 1 << 15;
 
 FormatWave::FormatWave() :
-	Format("wav", FLAG_SINGLE_TRACK)
+	Format("wav", FLAG_AUDIO | FLAG_SINGLE_TRACK)
 {
 }
 

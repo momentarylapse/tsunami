@@ -47,9 +47,15 @@ bool Format::TestFormatCompatibility(AudioFile *a)
 {
 	int num_subs = 0;
 	int num_fx = a->fx.num;
+	int num_audio = 0;
+	int num_midi = 0;
 	foreach(Track *t, a->track){
 		num_subs += t->sub.num;
 		num_fx += t->fx.num;
+		if (t->type == t->TYPE_AUDIO)
+			num_audio ++;
+		if (t->type == t->TYPE_MIDI)
+			num_midi ++;
 	}
 
 	if ((a->track.num > 1) && ((flags & Format::FLAG_MULTITRACK) == 0))
@@ -59,6 +65,10 @@ bool Format::TestFormatCompatibility(AudioFile *a)
 	if ((num_fx > 0) && ((flags & Format::FLAG_FX) == 0))
 		return false;
 	if ((num_subs > 0) && ((flags & Format::FLAG_SUBS) == 0))
+		return false;
+	if ((num_audio > 0) && ((flags & Format::FLAG_AUDIO) == 0))
+		return false;
+	if ((num_midi > 0) && ((flags & Format::FLAG_MIDI) == 0))
 		return false;
 	return true;
 }

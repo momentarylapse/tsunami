@@ -37,6 +37,8 @@ public:
 		FLAG_FX = 4,
 		FLAG_MULTITRACK = 8,
 		FLAG_SUBS = 16,
+		FLAG_AUDIO = 32,
+		FLAG_MIDI = 64,
 	};
 };
 

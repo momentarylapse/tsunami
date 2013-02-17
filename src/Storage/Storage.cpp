@@ -11,6 +11,7 @@
 #include "FormatRaw.h"
 #include "FormatOgg.h"
 #include "FormatFlac.h"
+#include "FormatMidi.h"
 #include "FormatNami.h"
 #include "../Tsunami.h"
 #include "../lib/hui/hui.h"
@@ -26,6 +27,7 @@ Storage::Storage()
 	format.add(new FormatRaw());
 	format.add(new FormatOgg());
 	format.add(new FormatFlac());
+	format.add(new FormatMidi());
 
 	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
 }

@@ -926,7 +926,7 @@ menu
 0
 
 
-74
+75
 ItemPopup
 menu_file
 
@@ -1243,7 +1243,7 @@ ItemPopup
 menu_track
 
 1
-6
+7
 0
 0
 0
@@ -1280,6 +1280,19 @@ hui:add
 
 ItemImage
 add_time_track
+hui:add
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+add_midi_track
 hui:add
 1
 0
@@ -3758,7 +3771,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-210
+211
 // Text
 about
 Info
@@ -3808,6 +3821,8 @@ add_bar_pause
 Pause
 add_effect
 
+add_midi_track
+Midi Spur hinzufügen
 add_sample
 
 add_tag
@@ -4186,7 +4201,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-210
+211
 // Text
 about
 
@@ -4235,6 +4250,8 @@ add_bar
 add_bar_pause
 
 add_effect
+
+add_midi_track
 
 add_sample
 

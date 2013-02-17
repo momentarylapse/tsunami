@@ -853,12 +853,12 @@ void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 	int h_fix = TIME_SCALE_HEIGHT;
 	int n_var = 0;
 	foreach(Track *t, a->track){
-		if (t->type == t->TYPE_TIME){
-			h_wish += TIME_SCALE_HEIGHT * 2;
-			h_fix += TIME_SCALE_HEIGHT * 2;
-		}else{
+		if (t->type == t->TYPE_AUDIO){
 			h_wish += opt_track_height;
 			n_var ++;
+		}else{
+			h_wish += TIME_SCALE_HEIGHT * 2;
+			h_fix += TIME_SCALE_HEIGHT * 2;
 		}
 	}
 
@@ -866,7 +866,7 @@ void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 	if (h_wish > r.height())
 		opt_track_height = (r.height() - h_fix) / n_var;
 	foreachi(Track *t, a->track, i){
-		float h = (t->type == t->TYPE_TIME) ? TIME_SCALE_HEIGHT*2 : opt_track_height;
+		float h = (t->type == t->TYPE_AUDIO) ? opt_track_height : TIME_SCALE_HEIGHT*2;
 		t->area = rect(r.x1, r.x2, y0, y0 + h);
 		y0 += h;
 	}

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-165
+166
 // Data (ID,Text)
 about
 
@@ -34,6 +34,8 @@ ad_table_vol
 add_bar
 
 add_bar_pause
+
+add_midi_track
 
 add_tag
 
@@ -334,7 +336,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-84
+86
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -470,6 +472,8 @@ exportiere flac
 
 exportiere ogg
 
+exportiere raw
+
 exportiere wave
 
 i'm now going to clean up...
@@ -483,6 +487,8 @@ lade flac
 lade nami
 
 lade ogg
+
+lade raw
 
 lade wave
 

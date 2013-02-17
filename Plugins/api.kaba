@@ -72,6 +72,18 @@ class Bar
 	bool is_selected
 	int x, width
 
+
+class MidiNote
+	Range range
+	int pitch //float freq
+	float volume
+
+class MidiData
+	MidiNote note[]
+	string synthesizer
+	string instrument
+	string options
+
 enum
 	TRACK_TYPE_AUDIO
 	TRACK_TYPE_TIME
@@ -100,6 +112,9 @@ class Track
 	
 	// time track
 	Bar bar[]
+	
+	// midi track
+	MidiData midi
 
 	// editing
 	rect area

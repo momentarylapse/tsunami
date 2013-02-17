@@ -89,6 +89,7 @@ enum{
 		sub_menu_161->AddEntryImage("Aus Datei importieren...",HuiImageOpen,HMM_TRACK_IMPORT);
 		sub_menu_161->AddEntryImage("Leere Spur hinzuf&ugen",HuiImageAdd,HMM_ADD_TRACK);
 		sub_menu_161->AddEntryImage("Rhythmus Spur hinzuf&ugen...",HuiImageAdd,HMM_ADD_TIME_TRACK);
+		sub_menu_161->AddEntryImage("Midi Spur hinzuf&ugen",HuiImageAdd,HMM_ADD_MIDI_TRACK);
 		sub_menu_161->AddEntryImage("L&oschen",HuiImageDelete,HMM_DELETE_TRACK);
 		sub_menu_161->AddSeparator();
 		sub_menu_161->AddEntryImage("Eigenschaften",HuiImageProperties,HMM_TRACK_PROPERTIES);

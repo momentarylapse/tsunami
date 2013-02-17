@@ -60,6 +60,29 @@ public:
 	Range GetRange();
 };
 
+class MidiNote
+{
+public:
+	MidiNote(){}
+	MidiNote(const Range &range, int pitch, float volume);
+	float GetFrequency();
+	Range range;
+	int pitch; //float freq;
+	float volume;
+};
+
+class MidiData : public Array<MidiNote>
+{
+public:
+	Array<MidiNote> GetNotes(const Range &r);
+	int GetNextNote(int pos);
+	Range GetRange();
+
+	string synthesizer;
+	string instrument;
+	string options;
+};
+
 
 class TrackLevel
 {
@@ -96,7 +119,8 @@ public:
 	enum
 	{
 		TYPE_AUDIO,
-		TYPE_TIME
+		TYPE_TIME,
+		TYPE_MIDI
 	};
 
 // data
@@ -118,6 +142,9 @@ public:
 
 	// time track
 	BarCollection bar;
+
+	// midi track
+	MidiData midi;
 
 // editing
 	rect area;

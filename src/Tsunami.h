@@ -58,6 +58,7 @@ public:
 	void OnRedo();
 	void OnAddTrack();
 	void OnAddTimeTrack();
+	void OnAddMidiTrack();
 	void OnDeleteTrack();
 	void OnSubFromSelection();
 	void OnInsertAdded();

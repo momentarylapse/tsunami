@@ -65,6 +65,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("redo", "hui:redo", KEY_Y + KEY_CONTROL, this, &Tsunami::OnRedo);
 	HuiAddCommandM("add_track", "hui:add", -1, this, &Tsunami::OnAddTrack);
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, &Tsunami::OnAddTimeTrack);
+	HuiAddCommandM("add_midi_track", "hui:add", -1, this, &Tsunami::OnAddMidiTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, &Tsunami::OnDeleteTrack);
 	HuiAddCommandM("level_add", "hui:add", -1, this, &Tsunami::OnAddLevel);
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &Tsunami::OnDeleteLevel);
@@ -214,6 +215,11 @@ void Tsunami::OnAddTrack()
 void Tsunami::OnAddTimeTrack()
 {
 	audio->AddTimeTrack();
+}
+
+void Tsunami::OnAddMidiTrack()
+{
+	audio->AddMidiTrack();
 }
 
 void Tsunami::OnDeleteTrack()

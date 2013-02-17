@@ -261,6 +261,14 @@ Track *AudioFile::AddTimeTrack(int index)
 	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_TIME));
 }
 
+
+Track *AudioFile::AddMidiTrack(int index)
+{
+	if (index < 0)
+		index = track.num;
+	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_MIDI));
+}
+
 extern int debug_timer;
 
 void AudioFile::UpdatePeaks(int mode)

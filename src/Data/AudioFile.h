@@ -61,6 +61,7 @@ public:
 	void DeleteTag(int index);
 	Track *AddEmptyTrack(int index = -1);
 	Track *AddTimeTrack(int index = -1);
+	Track *AddMidiTrack(int index = -1);
 	void DeleteTrack(int index);
 	void AddLevel();
 	void InsertSelectedSubs(int level_no);

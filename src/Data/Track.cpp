@@ -241,6 +241,14 @@ Range Track::GetRangeUnsafe()
 			max = r.end();
 	}
 
+	if ((type == TYPE_MIDI) && (midi.num > 0)){
+		Range r = midi.GetRange();
+		if (min > r.offset)
+			min = r.offset;
+		if (max < r.end())
+			max = r.end();
+	}
+
 	return Range(min, max - min);
 }
 

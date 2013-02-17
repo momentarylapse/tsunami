@@ -80,6 +80,23 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	msg_db_l(1);
 }
 
+void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
+{
+	msg_db_r("bb_render_midi_track_no_fx", 1);
+
+	// silence... TODO...
+	buf.resize(range.length());
+
+	Array<MidiNote> notes = t->midi.GetNotes(range);
+
+	foreach(MidiNote &n, notes){
+		Range r = Range(n.range.offset - range.offset, n.range.num);
+		((ExtendedBufferBox&)buf).add_tone(r, n.volume, n.GetFrequency(), t->root->sample_rate);
+	}
+
+	msg_db_l(1);
+}
+
 void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_r("bb_render_track_no_fx", 1);
@@ -88,6 +105,8 @@ void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t)
 		bb_render_audio_track_no_fx(buf, t);
 	else if (t->type == Track::TYPE_TIME)
 		bb_render_time_track_no_fx(buf, t);
+	else if (t->type == Track::TYPE_MIDI)
+		bb_render_midi_track_no_fx(buf, t);
 
 	msg_db_l(1);
 }

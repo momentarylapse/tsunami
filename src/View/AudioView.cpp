@@ -712,9 +712,22 @@ void DrawStrBg(HuiDrawingContext *c, float x, float y, const string &str, const 
 	c->DrawStr(x, y, str);
 }
 
+
+void AudioView::DrawMidi(HuiDrawingContext *c, const rect &r, MidiData &midi, color col)
+{
+	foreach(MidiNote &n, midi){
+		c->SetColor(SetColorHSB(0.1f + n.volume * 0.4f, (float)(n.pitch % 12) / 12.0f, 0.4f, 1));
+		float x1 = sample2screen(n.range.offset);
+		float x2 = sample2screen(n.range.end());
+		c->DrawRect(rect(x1, x2, r.y1, r.y2));
+	}
+}
+
 void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no)
 {
 	msg_db_r("DrawTrack", 1);
+
+	DrawMidi(c, r, t->midi, col);
 
 	DrawBuffer(c, r, t, view_pos, col);
 

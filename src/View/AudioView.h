@@ -50,6 +50,7 @@ public:
 	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, double pos, const color &col);
 	void DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, const color &col, int delay);
 	void DrawSub(HuiDrawingContext *c, const rect &r, Track *s);
+	void DrawMidi(HuiDrawingContext *c, const rect &r, MidiData &midi, color col);
 	void DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no);
 	void DrawGrid(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawGridTime(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);

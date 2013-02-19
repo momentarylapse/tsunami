@@ -39,6 +39,7 @@
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.202931664" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1340863757" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="m"/>
+									<listOptionValue builtIn="false" value="asound"/>
 									<listOptionValue builtIn="false" value="openal"/>
 									<listOptionValue builtIn="false" value="alut"/>
 									<listOptionValue builtIn="false" value="vorbis"/>
@@ -99,6 +100,7 @@
 							<tool commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS} `pkg-config --cflags --libs gtk+-3.0`" id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.232277773" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
 								<option id="gnu.cpp.link.option.libs.1106987409" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="m"/>
+									<listOptionValue builtIn="false" value="asound"/>
 									<listOptionValue builtIn="false" value="openal"/>
 									<listOptionValue builtIn="false" value="alut"/>
 									<listOptionValue builtIn="false" value="vorbis"/>

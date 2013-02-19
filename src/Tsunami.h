@@ -21,6 +21,7 @@ class Log;
 class AudioInput;
 class AudioOutput;
 class AudioRenderer;
+class MidiInput;
 class Storage;
 class Progress;
 class PeakMeter;
@@ -117,6 +118,7 @@ public:
 	AudioOutput *output;
 	AudioInput *input;
 	AudioRenderer *renderer;
+	MidiInput *midi_input;
 
 	PluginManager *plugins;
 	Clipboard *clipboard;

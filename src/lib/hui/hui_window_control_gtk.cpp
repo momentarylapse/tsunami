@@ -808,6 +808,7 @@ gboolean OnGtkAreaButtonDown(GtkWidget *widget, GdkEventButton *event, gpointer 
 		msg += "-double-click";
 	else
 		msg += "-button-down";
+	gtk_widget_grab_focus(widget);
 	NotifyWindowByWidget((CHuiWindow*)user_data, widget, msg, false);
 	return false;
 }
@@ -859,6 +860,11 @@ void CHuiWindow::AddDrawingArea(const string &title,int x,int y,int width,int he
 	g_object_set(G_OBJECT(da), "events", mask, NULL);
 	_InsertControl_(da, x, y, width, height, id, HuiKindDrawingArea);
 	input_widget = da;
+
+	if (OptionString.find("grabfocus") >= 0){
+		gtk_widget_set_can_focus(da, true);
+		gtk_widget_grab_focus(da);
+	}
 }
 
 

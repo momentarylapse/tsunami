@@ -80,7 +80,7 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 
 	tsunami->SetBorderWidth(0);
 	parent->SetTarget("main_table", 0);
-	parent->AddDrawingArea("", 0, 0, 0, 0, "area");
+	parent->AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
 
 	cur_track = NULL;
 	cur_sub = NULL;

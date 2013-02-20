@@ -103,8 +103,8 @@ AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
 	parent->EventMX("area", "hui:right-button-down", this, &AudioView::OnRightButtonDown);
 	parent->EventMX("area", "hui:right-button-up", this, &AudioView::OnRightButtonUp);
 	//parent->EventMX("area", "hui:key-down", this, &AudioView::OnKeyDown);
-	parent->EventM("hui:key-down", this, &AudioView::OnKeyDown);
-	parent->EventM("hui:key-up", this, &AudioView::OnKeyUp);
+	parent->EventMX("area", "hui:key-down", this, &AudioView::OnKeyDown);
+	parent->EventMX("area", "hui:key-up", this, &AudioView::OnKeyUp);
 	parent->EventMX("area", "hui:mouse-wheel", this, &AudioView::OnMouseWheel);
 
 	//ForceRedraw();
@@ -509,7 +509,7 @@ void AudioView::OnCommand(const string & id)
 
 void AudioView::OnKeyDown()
 {
-	int k = HuiGetEvent()->key;
+	int k = HuiGetEvent()->key_code;
 
 // view
 	// moving
@@ -527,6 +527,13 @@ void AudioView::OnKeyDown()
 		Zoom(exp(  ZoomSpeed));
 	if (k == KEY_SUBTRACT)
 		Zoom(exp(- ZoomSpeed));
+
+	if (k == KEY_SPACE){
+		if (tsunami->output->IsPlaying()){
+			tsunami->output->Pause();
+		}else
+			tsunami->output->Play(audio, true);
+	}
 	UpdateMenu();
 }
 

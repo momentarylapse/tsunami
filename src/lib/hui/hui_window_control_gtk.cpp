@@ -277,10 +277,11 @@ void SetImageById(CHuiWindow *win, const string &id)
 {
 	if ((id == "ok") || (id == "cancel") || (id == "apply"))
 		win->SetImage(id, "hui:" + id);
-	else if (id != "")
+	else if (id != ""){
 		foreach(HuiCommand &c, _HuiCommand_)
 			if ((c.id == id) && (c.image != ""))
 				win->SetImage(id, c.image);
+	}
 }
 
 
@@ -840,13 +841,49 @@ gboolean OnGtkAreaMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer 
 	return false;
 }
 
+void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code);
+
+bool area_process_key(GdkEventKey *event, GtkWidget *widget, CHuiWindow *win, bool down)
+{
+	int key, key_code;
+	_get_hui_key_id_(event, key, key_code);
+	if (key < 0)
+		return false;
+
+	win->input.key_code = key;
+
+	if (down){
+
+		win->input.key_code = key_code;
+		//WinTrySendByKeyCode(win, key_code);
+	}
+
+	NotifyWindowByWidget(win, widget, down ? "hui:key-down" : "hui:key-up", false);
+
+	return true;
+}
+
+
+
+gboolean OnGtkAreaKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+{
+	area_process_key(event, widget, (CHuiWindow*)user_data, true);
+	return false;
+}
+
+gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+{
+	area_process_key(event, widget, (CHuiWindow*)user_data, false);
+	return false;
+}
+
 void CHuiWindow::AddDrawingArea(const string &title,int x,int y,int width,int height,const string &id)
 {
 	GetPartStrings(id, title);
 	GtkWidget *da = gtk_drawing_area_new();
 	g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
-	//g_signal_connect(G_OBJECT(w), "key-press-event", G_CALLBACK(&key_press_event), this);
-	//g_signal_connect(G_OBJECT(w), "key-release-event", G_CALLBACK(&key_release_event), this);
+	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
+	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
 	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
 	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&OnGtkAreaMouseMove), this);
 	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&OnGtkAreaButtonDown), this);

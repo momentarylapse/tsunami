@@ -120,10 +120,8 @@ void WinTrySendByKeyCode(CHuiWindow *win, int key_code)
 		}
 }
 
-
-bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, CHuiWindow *win, bool down)
+void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code)
 {
-	//printf("%d   %d\n", nk++, event->time);
 	// convert hardware keycode into GDK keyvalue
 	GdkKeymapKey kmk;
 	kmk.keycode = event->hardware_keycode;
@@ -135,11 +133,30 @@ bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, CHuiWindow *win, bo
 	//msg_write(keyvalue);
 
 	// convert GDK keyvalue into HUI key id
-	int key=-1;
+	key = -1;
 	for (int i=0;i<HUI_NUM_KEYS;i++)
 		//if ((HuiKeyID[i] == keyvalue)||(HuiKeyID2[i] == keyvalue))
 		if (HuiKeyID[i] == keyvalue)
 			key = i;
+	key_code = key;
+	if (key < 0)
+		return;
+
+
+	// key code?
+	if ((event->state & GDK_CONTROL_MASK) > 0)
+		key_code += KEY_CONTROL;
+	if ((event->state & GDK_SHIFT_MASK) > 0)
+		key_code += KEY_SHIFT;
+	if (((event->state & GDK_MOD1_MASK) > 0) /*|| ((event->state & GDK_MOD2_MASK) > 0) || ((event->state & GDK_MOD5_MASK) > 0)*/)
+		key_code += KEY_ALT;
+}
+
+bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, CHuiWindow *win, bool down)
+{
+	//printf("%d   %d\n", nk++, event->time);
+	int key, key_code;
+	_get_hui_key_id_(event, key, key_code);
 	if (key < 0){
 		//msg_write(format("unknown key: %d", event->hardware_keycode));
 		return false;
@@ -164,16 +181,7 @@ bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, CHuiWindow *win, bo
 	//if ((down) && (win->input.key[key])){
 	if (down){
 		add_key_to_buffer(&win->input, key);
-		
-		// key code?
-		int key_code = key;
-		if ((event->state & GDK_CONTROL_MASK) > 0)
-			key_code += KEY_CONTROL;
-		if ((event->state & GDK_SHIFT_MASK) > 0)
-			key_code += KEY_SHIFT;
-		if (((event->state & GDK_MOD1_MASK) > 0) /*|| ((event->state & GDK_MOD2_MASK) > 0) || ((event->state & GDK_MOD5_MASK) > 0)*/){
-			key_code += KEY_ALT;
-		}
+
 		win->input.key_code = key_code;
 		WinTrySendByKeyCode(win, key_code);
 	}

@@ -18,8 +18,8 @@ SettingsDialog::SettingsDialog(CHuiWindow *_parent, bool _allow_parent):
 
 	EventM("language", this, &SettingsDialog::OnLanguage);
 	EventM("ogg_bitrate", this, &SettingsDialog::OnOggBitrate);
-	EventM("preview_sleep", this, &SettingsDialog::OnPreviewSleep);
 	EventM("preview_device", this, &SettingsDialog::OnPreviewDevice);
+	EventM("capture_device", this, &SettingsDialog::OnCaptureDevice);
 	EventM("capture_delay", this, &SettingsDialog::OnCaptureDelay);
 	EventM("hui:close", this, &SettingsDialog::OnClose);
 	EventM("close", this, &SettingsDialog::OnClose);
@@ -68,6 +68,16 @@ void SettingsDialog::LoadData()
 		if (d == tsunami->output->ChosenDevice)
 			SetInt("preview_device", i + 1);
 	}
+
+
+	SetString("capture_device", _("- Standard -"));
+	SetInt("capture_device", 0);
+	foreachi(string &d, tsunami->input->Device, i){
+		AddString("capture_device", d);
+		if (d == tsunami->input->ChosenDevice)
+			SetInt("capture_device", i + 1);
+	}
+
 	SetFloat("capture_delay", tsunami->input->GetPlaybackDelayConst());
 }
 
@@ -88,10 +98,13 @@ void SettingsDialog::OnOggBitrate()
 	HuiConfigWriteFloat("OggQuality", ogg_quality[GetInt("")].quality);
 }
 
-void SettingsDialog::OnPreviewSleep()
+void SettingsDialog::OnCaptureDevice()
 {
-	//PreviewSleepTime = GetInt("");
-	//HuiConfigWriteInt("PreviewSleepTime", PreviewSleepTime);
+	if (GetInt("") > 0)
+		tsunami->input->ChosenDevice = tsunami->input->Device[GetInt("") - 1];
+	else
+		tsunami->input->ChosenDevice = "";
+	HuiConfigWriteStr("Input.ChosenDevice", tsunami->input->ChosenDevice);
 }
 
 void SettingsDialog::OnPreviewDevice()

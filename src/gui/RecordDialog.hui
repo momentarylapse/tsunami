@@ -1,43 +1,24 @@
-// IDs
-enum{
-	HMM_RECORD_DIALOG,
-	HMM_CAPTURE_START,
-	HMM_CAPTURE_LEVEL,
-	HMM_CAPTURE_PAUSE,
-	HMM_OK,
-	HMM_CANCEL,
-	HMM_CAPTURE_TIME,
-	HMM_CAPTURE_DELETE,
-	HMM_CAPTURE_PLAYBACK,
-	HMM_CAPTURE_TARGET,
-	HMM_RDT_TARGET,
-	HMM_RDT_SOURCE,
-	HMM_CAPTURE_DEVICE
-};
-
-
-
 	// dialog
-	CaptureDialog=HuiCreateDialog("Aufnahme",350,280,MainWin,false,&CaptureDialogFunc);
-	CaptureDialog->SetID(HMM_RECORD_DIALOG);
-	CaptureDialog->AddButton("Start",25,95,100,25,HMM_CAPTURE_START);
-	CaptureDialog->SetImage(HMM_CAPTURE_START,HuiImageMediaRecord);
-	CaptureDialog->AddDrawingArea("",185,65,150,25,HMM_CAPTURE_LEVEL);
-	CaptureDialog->AddButton("Anhalten",130,95,100,25,HMM_CAPTURE_PAUSE);
-	CaptureDialog->SetImage(HMM_CAPTURE_PAUSE,HuiImageMediaPause);
-	CaptureDialog->AddButton("OK",235,235,100,25,HMM_OK);
-	CaptureDialog->SetImage(HMM_OK,HuiImageOk);
-	CaptureDialog->AddButton("Abbrechen",130,235,100,25,HMM_CANCEL);
-	CaptureDialog->SetImage(HMM_CANCEL,HuiImageCancel);
-	CaptureDialog->AddText("0:00",25,65,155,25,HMM_CAPTURE_TIME);
-	CaptureDialog->AddButton("Verwerfen",235,95,100,25,HMM_CAPTURE_DELETE);
-	CaptureDialog->SetImage(HMM_CAPTURE_DELETE,HuiImageDelete);
-	CaptureDialog->AddCheckBox("w&arendher abspielen",25,195,310,25,HMM_CAPTURE_PLAYBACK);
-	CaptureDialog->AddComboBox("",25,165,310,25,HMM_CAPTURE_TARGET);
-	CaptureDialog->AddText("!bold\\Ziel",5,135,330,25,HMM_RDT_TARGET);
-	CaptureDialog->AddText("!bold\\Quelle",5,5,330,25,HMM_RDT_SOURCE);
-	CaptureDialog->AddComboBox("",25,35,310,25,HMM_CAPTURE_DEVICE);
+	CaptureDialog = HuiCreateDialog("Aufnahme", 350, 280, MainWin, false);
+	CaptureDialog->SetID("record_dialog");
+	CaptureDialog->AddButton("Start", 25, 95, 100, 25, "capture_start");
+	CaptureDialog->SetImage("capture_start", "hui:media-record");
+	CaptureDialog->AddDrawingArea("", 185, 65, 150, 25, "capture_level");
+	CaptureDialog->AddButton("Anhalten", 130, 95, 100, 25, "capture_pause");
+	CaptureDialog->SetImage("capture_pause", "hui:media-pause");
+	CaptureDialog->AddButton("OK", 235, 235, 100, 25, "ok");
+	CaptureDialog->SetImage("ok", "hui:ok");
+	CaptureDialog->AddButton("Abbrechen", 130, 235, 100, 25, "cancel");
+	CaptureDialog->SetImage("cancel", "hui:cancel");
+	CaptureDialog->AddText("0:00", 25, 65, 155, 25, "capture_time");
+	CaptureDialog->AddButton("Verwerfen", 235, 95, 100, 25, "capture_delete");
+	CaptureDialog->SetImage("capture_delete", "hui:delete");
+	CaptureDialog->AddCheckBox("w&arendher abspielen", 25, 195, 310, 25, "capture_playback");
+	CaptureDialog->AddComboBox("", 25, 165, 310, 25, "capture_target");
+	CaptureDialog->AddText("!bold\\Ziel", 5, 135, 330, 25, "rdt_target");
+	CaptureDialog->AddText("!bold\\Quelle", 5, 5, 330, 25, "rdt_source");
+	CaptureDialog->AddRadioButton("Audio", 25, 35, 100, 25, "capture_type:audio");
+	CaptureDialog->AddRadioButton("Midi", 130, 35, 100, 25, "capture_type:midi");
 	CaptureDialog->Update();
-
 
 

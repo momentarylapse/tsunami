@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-166
+168
 // Data (ID,Text)
 about
 
@@ -69,6 +69,10 @@ capture_start
 Start
 capture_time
 0:00
+capture_type:audio
+
+capture_type:midi
+
 close
 Close
 close_file
@@ -189,6 +193,8 @@ pause
 
 pdp_capture
 !bold\\Recording
+pdp_capturedevice
+
 pdp_general
 !bold\\General
 pdp_language
@@ -201,8 +207,6 @@ pdt_capturedelay
 Playback delay
 pdt_oggrate
 OGG bitrate
-pdt_previewsleep
-Sleep
 pdt_volume
 Volume
 per_second

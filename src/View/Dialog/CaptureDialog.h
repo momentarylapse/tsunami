@@ -20,7 +20,8 @@ public:
 	CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a);
 	virtual ~CaptureDialog();
 
-	void OnDevice();
+	void OnTypeAudio();
+	void OnTypeMidi();
 	void OnStart();
 	void OnDelete();
 	void OnPause();
@@ -33,6 +34,7 @@ public:
 	AudioFile *audio;
 	PeakMeter *peak_meter;
 	bool capturing;
+	int type;
 	BufferBox buf;
 };
 

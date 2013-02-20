@@ -21,8 +21,8 @@ public:
 
 	void OnLanguage();
 	void OnOggBitrate();
-	void OnPreviewSleep();
 	void OnPreviewDevice();
+	void OnCaptureDevice();
 	void OnCaptureDelay();
 	void OnClose();
 

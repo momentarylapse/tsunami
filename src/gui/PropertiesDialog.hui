@@ -1,56 +1,27 @@
-// IDs
-enum{
-	HMM_PROPERTIES_DIALOG,
-	HMM_PDP_LANGUAGE,
-	HMM_LANGUAGE,
-	HMM_PDT_OGGRATE,
-	HMM_OGG_BITRATE,
-	HMM_PDT_VOLUME,
-	HMM_VOLUME_SLIDER,
-	HMM_VOLUME,
-	HMM_PERCENT,
-	HMM_CLOSE,
-	HMM_KBITPERSEC,
-	HMM_PDT_PREVIEWSLEEP,
-	HMM_PREVIEW_SLEEP,
-	HMM_MS,
-	HMM_PDP_PREVIEWDEVICE,
-	HMM_PREVIEW_DEVICE,
-	HMM_PDP_GENERAL,
-	HMM_PDP_PREVIEW,
-	HMM_PDP_CAPTURE,
-	HMM_PDT_CAPTUREDELAY,
-	HMM_CAPTURE_DELAY
-};
-
-
-
 	// dialog
-	CHuiWindow *dlg=HuiCreateDialog("Einstellungen",375,330,MainWin,false,&MessageFunc);
-	dlg->SetID(HMM_PROPERTIES_DIALOG);
-	dlg->AddText("Sprache",20,30,100,25,HMM_PDP_LANGUAGE);
-	dlg->AddComboBox("",125,30,195,25,HMM_LANGUAGE);
-	dlg->AddText("OGG-Bitrate",20,60,100,25,HMM_PDT_OGGRATE);
-	dlg->AddComboBox("64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500",125,60,195,25,HMM_OGG_BITRATE);
-	dlg->AddText("Lautst&arke",20,150,100,25,HMM_PDT_VOLUME);
-	dlg->AddSlider("",125,150,130,25,HMM_VOLUME_SLIDER);
-	dlg->AddEdit("",260,150,60,25,HMM_VOLUME);
-	dlg->AddText("%",325,150,25,25,HMM_PERCENT);
-	dlg->AddDefButton("Schlie&sen",255,290,100,25,HMM_CLOSE);
-	dlg->SetImage(HMM_CLOSE,HuiImageClose);
-	dlg->AddText("kbit/s",325,60,45,25,HMM_KBITPERSEC);
-	dlg->AddText("Wartezeit",20,180,100,25,HMM_PDT_PREVIEWSLEEP);
-	dlg->AddEdit("",125,180,195,25,HMM_PREVIEW_SLEEP);
-	dlg->AddText("ms",325,180,25,25,HMM_MS);
-	dlg->AddText("Ger&at",20,120,100,25,HMM_PDP_PREVIEWDEVICE);
-	dlg->AddComboBox("",125,120,195,25,HMM_PREVIEW_DEVICE);
-	dlg->AddText("!bold\\Generell",5,5,365,25,HMM_PDP_GENERAL);
-	dlg->AddText("!bold\\Ausgabe",5,95,365,25,HMM_PDP_PREVIEW);
-	dlg->AddText("!bold\\Aufnahme",5,215,365,25,HMM_PDP_CAPTURE);
-	dlg->AddText("Abspiel Verz&og.",20,245,100,25,HMM_PDT_CAPTUREDELAY);
-	dlg->AddEdit("",125,245,195,25,HMM_CAPTURE_DELAY);
-	dlg->AddText("ms",325,245,25,25,HMM_MS);
+	CHuiWindow *dlg = HuiCreateDialog("Einstellungen", 375, 330, MainWin, false);
+	dlg->SetID("properties_dialog");
+	dlg->AddText("Sprache", 20, 30, 100, 25, "pdp_language");
+	dlg->AddComboBox("", 125, 30, 195, 25, "language");
+	dlg->AddText("OGG-Bitrate", 20, 60, 100, 25, "pdt_oggrate");
+	dlg->AddComboBox("64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500", 125, 60, 195, 25, "ogg_bitrate");
+	dlg->AddText("Lautst&arke", 20, 150, 100, 25, "pdt_volume");
+	dlg->AddSlider("", 125, 150, 130, 25, "volume_slider");
+	dlg->AddEdit("", 260, 150, 60, 25, "volume");
+	dlg->AddText("%", 325, 150, 25, 25, "percent");
+	dlg->AddDefButton("Schlie&sen", 255, 290, 100, 25, "close");
+	dlg->SetImage("close", "hui:close");
+	dlg->AddText("kbit/s", 325, 60, 45, 25, "kbitpersec");
+	dlg->AddText("Ger&at", 20, 120, 100, 25, "pdp_previewdevice");
+	dlg->AddComboBox("", 125, 120, 195, 25, "preview_device");
+	dlg->AddText("!bold\\Generell", 5, 5, 365, 25, "pdp_general");
+	dlg->AddText("!bold\\Ausgabe", 5, 95, 365, 25, "pdp_preview");
+	dlg->AddText("!bold\\Aufnahme", 5, 185, 365, 25, "pdp_capture");
+	dlg->AddText("Latenz", 20, 245, 100, 25, "pdt_capturedelay");
+	dlg->AddEdit("", 125, 245, 195, 25, "capture_delay");
+	dlg->AddText("ms", 325, 245, 25, 25, "ms");
+	dlg->AddText("Ger&at", 20, 215, 100, 25, "pdp_capturedevice");
+	dlg->AddComboBox("", 125, 215, 195, 25, "capture_device");
 	dlg->Update();
-
 
 

@@ -2065,7 +2065,7 @@ properties_dialog
 0
 
 
-21
+20
 Text
 pdp_language
 
@@ -2197,45 +2197,6 @@ kbitpersec
 
 
 Text
-pdt_previewsleep
-
-1
-20
-180
-100
-25
--1
-0
-0
-
-
-Edit
-preview_sleep
-
-1
-125
-180
-195
-25
--1
-0
-0
-
-
-Text
-ms
-
-1
-325
-180
-25
-25
--1
-0
-0
-
-
-Text
 pdp_previewdevice
 
 1
@@ -2292,7 +2253,7 @@ pdp_capture
 
 1
 5
-215
+185
 365
 25
 -1
@@ -2339,6 +2300,32 @@ ms
 0
 
 
+Text
+pdp_capturedevice
+
+1
+20
+215
+100
+25
+-1
+0
+0
+
+
+ComboBox
+capture_device
+
+1
+125
+215
+195
+25
+-1
+0
+0
+
+
 // Resource
 Dialog
 record_dialog
@@ -2353,7 +2340,7 @@ record_dialog
 0
 
 
-12
+13
 Button
 capture_start
 hui:media-record
@@ -2497,13 +2484,26 @@ rdt_source
 0
 
 
-ComboBox
-capture_device
+RadioButton
+capture_type:audio
 
 1
 25
 35
-310
+100
+25
+-1
+0
+0
+
+
+RadioButton
+capture_type:midi
+
+1
+130
+35
+100
 25
 -1
 0
@@ -3771,7 +3771,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-211
+212
 // Text
 about
 Info
@@ -3873,6 +3873,10 @@ capture_target
 
 capture_time
 0:00
+capture_type:audio
+Audio
+capture_type:midi
+Midi
 close
 Schließen
 close_file
@@ -4023,6 +4027,8 @@ pause
 Pause
 pdp_capture
 !bold\\Aufnahme
+pdp_capturedevice
+Gerät
 pdp_general
 !bold\\Generell
 pdp_language
@@ -4032,11 +4038,9 @@ pdp_preview
 pdp_previewdevice
 Gerät
 pdt_capturedelay
-Abspiel Verzög.
+Latenz
 pdt_oggrate
 OGG-Bitrate
-pdt_previewsleep
-Wartezeit
 pdt_volume
 Lautstärke
 per_second
@@ -4050,8 +4054,6 @@ Schleife
 preview
 Vorschau
 preview_device
-
-preview_sleep
 
 progress_bar
 
@@ -4201,7 +4203,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-211
+212
 // Text
 about
 
@@ -4303,6 +4305,10 @@ capture_target
 
 capture_time
 0:00
+capture_type:audio
+
+capture_type:midi
+
 close
 Close
 close_file
@@ -4453,6 +4459,8 @@ pause
 
 pdp_capture
 !bold\\Recording
+pdp_capturedevice
+
 pdp_general
 !bold\\General
 pdp_language
@@ -4465,8 +4473,6 @@ pdt_capturedelay
 Playback delay
 pdt_oggrate
 OGG bitrate
-pdt_previewsleep
-Sleep
 pdt_volume
 Volume
 per_second
@@ -4480,8 +4486,6 @@ play_loop
 preview
 Preview
 preview_device
-
-preview_sleep
 
 progress_bar
 

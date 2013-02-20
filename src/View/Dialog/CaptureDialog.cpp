@@ -18,6 +18,7 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 {
 	audio = a;
 	capturing = false;
+	type = Track::TYPE_AUDIO;
 
 
 	int sample_rate = (a->used) ? a->sample_rate : DEFAULT_SAMPLE_RATE;
@@ -32,19 +33,15 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 
 	// dialog
 	FromResource("record_dialog");
+	Check("capture_type:audio", true);
+	Enable("capture_type:audio", false);
+	Enable("capture_type:midi", false);
 	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
 	SetString("capture_time", a->get_time_str(0));
 	Enable("capture_delete", false);
 	Enable("capture_pause", false);
 	Enable("ok", false);
 
-	SetString("capture_device", _("- Standard -"));
-	SetInt("capture_device", 0);
-	foreachi(string &d, tsunami->input->Device, i){
-		AddString("capture_device", d);
-		if (d == tsunami->input->ChosenDevice)
-			SetInt("capture_device", i + 1);
-	}
 
 	Enable("capture_playback", a->used);
 	Check("capture_playback", a->used);
@@ -60,7 +57,8 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	EventM("cancel", this, &CaptureDialog::OnClose);
 	EventM("hui:close", this, &CaptureDialog::OnClose);
 	EventM("ok", this, &CaptureDialog::OnOk);
-	EventM("capture_device", this, &CaptureDialog::OnDevice);
+	EventM("capture_type:audio", this, &CaptureDialog::OnTypeAudio);
+	EventM("capture_type:midi", this, &CaptureDialog::OnTypeMidi);
 	EventM("capture_start", this, &CaptureDialog::OnStart);
 	EventM("capture_delete", this, &CaptureDialog::OnDelete);
 	EventM("capture_pause", this, &CaptureDialog::OnPause);
@@ -74,15 +72,14 @@ CaptureDialog::~CaptureDialog()
 }
 
 
-void CaptureDialog::OnDevice()
+void CaptureDialog::OnTypeAudio()
 {
-	if (GetInt("") > 0)
-		tsunami->input->ChosenDevice = tsunami->input->Device[GetInt("") - 1];
-	else
-		tsunami->input->ChosenDevice = "";
-	HuiConfigWriteStr("Input.ChosenDevice", tsunami->input->ChosenDevice);
-	tsunami->input->Stop();
-	tsunami->input->Start(tsunami->input->GetSampleRate());
+	//tsunami->input->Stop();
+	//tsunami->input->Start(tsunami->input->GetSampleRate());
+}
+
+void CaptureDialog::OnTypeMidi()
+{
 }
 
 void CaptureDialog::OnStart()

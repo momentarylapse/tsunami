@@ -160,7 +160,7 @@ void main()
 	bufc.resize(1000)
 	fft_r2c(buf, bufc)
 	
-	input.Start(freq)
+	input.Start(TRACK_TYPE_AUDIO, freq)
 	input.AddObserver(nil, &UpdateInput)
 	
 	HuiWaitTillWindowClosed(win)

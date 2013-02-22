@@ -24,7 +24,7 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	int sample_rate = (a->used) ? a->sample_rate : DEFAULT_SAMPLE_RATE;
 	//CapturingByDialog = true;
 
-	if (!tsunami->input->Start(sample_rate)){
+	if (!tsunami->input->Start(type, sample_rate)){
 		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
 		CapturingByDialog = false;
 		msg_db_l(1);
@@ -141,7 +141,7 @@ void CaptureDialog::OnUpdate(Observable *o)
 	//if (tsunami->input->CapturePlayback)
 	//msg_write(tsunami->output->GetPos() - buf.num);
 	if (capturing){
-		buf.append(tsunami->input->CurrentBuffer);
+		buf.append(tsunami->input->current_buffer);
 		SetString("capture_time", audio->get_time_str(buf.num));
 	}
 }

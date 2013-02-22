@@ -22,7 +22,6 @@
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioInput.h"
 #include "Audio/AudioRenderer.h"
-#include "Audio/MidiInput.h"
 
 #include "Plugins/FastFourierTransform.h"
 
@@ -45,7 +44,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	output = new AudioOutput;
 	input = new AudioInput;
 	renderer = new AudioRenderer;
-	midi_input = new MidiInput;
 
 
 	int width = HuiConfigReadInt("Window.Width", 800);
@@ -168,8 +166,6 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	HandleArguments(arg);
 
-	//midi_input->Start(44100);
-
 	Update();
 }
 
@@ -194,7 +190,6 @@ Tsunami::~Tsunami()
 	delete(input);
 	delete(audio);
 	delete(renderer);
-	delete(midi_input);
 	HuiEnd();
 }
 

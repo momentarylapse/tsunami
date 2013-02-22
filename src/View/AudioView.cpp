@@ -10,7 +10,7 @@
 #include "../View/Dialog/AudioFileDialog.h"
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
-#include "../Audio/AudioInput.h"
+#include "../Audio/AudioInputAudio.h"
 #include "../Audio/AudioOutput.h"
 #include "../Stuff/Log.h"
 

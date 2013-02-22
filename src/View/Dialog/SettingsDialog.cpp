@@ -9,6 +9,7 @@
 #include "../../Tsunami.h"
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioInput.h"
+#include "../../Audio/AudioInputAudio.h"
 #include "../../Stuff/Log.h"
 
 SettingsDialog::SettingsDialog(CHuiWindow *_parent, bool _allow_parent):
@@ -72,13 +73,13 @@ void SettingsDialog::LoadData()
 
 	SetString("capture_device", _("- Standard -"));
 	SetInt("capture_device", 0);
-	foreachi(string &d, tsunami->input->Device, i){
+	foreachi(string &d, tsunami->input->in_audio->Device, i){
 		AddString("capture_device", d);
-		if (d == tsunami->input->ChosenDevice)
+		if (d == tsunami->input->in_audio->ChosenDevice)
 			SetInt("capture_device", i + 1);
 	}
 
-	SetFloat("capture_delay", tsunami->input->GetPlaybackDelayConst());
+	SetFloat("capture_delay", tsunami->input->in_audio->GetPlaybackDelayConst());
 }
 
 void SettingsDialog::ApplyData()
@@ -101,10 +102,10 @@ void SettingsDialog::OnOggBitrate()
 void SettingsDialog::OnCaptureDevice()
 {
 	if (GetInt("") > 0)
-		tsunami->input->ChosenDevice = tsunami->input->Device[GetInt("") - 1];
+		tsunami->input->in_audio->ChosenDevice = tsunami->input->in_audio->Device[GetInt("") - 1];
 	else
-		tsunami->input->ChosenDevice = "";
-	HuiConfigWriteStr("Input.ChosenDevice", tsunami->input->ChosenDevice);
+		tsunami->input->in_audio->ChosenDevice = "";
+	HuiConfigWriteStr("Input.ChosenDevice", tsunami->input->in_audio->ChosenDevice);
 }
 
 void SettingsDialog::OnPreviewDevice()
@@ -118,7 +119,7 @@ void SettingsDialog::OnPreviewDevice()
 
 void SettingsDialog::OnCaptureDelay()
 {
-	tsunami->input->SetPlaybackDelayConst(GetFloat(""));
+	tsunami->input->in_audio->SetPlaybackDelayConst(GetFloat(""));
 }
 
 void SettingsDialog::OnClose()

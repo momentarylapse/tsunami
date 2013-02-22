@@ -1,41 +1,43 @@
 /*
- * MidiInput.h
+ * AudioInputMidi.h
  *
  *  Created on: 19.02.2013
  *      Author: michi
  */
 
-#ifndef MIDIINPUT_H_
-#define MIDIINPUT_H_
+#ifndef AUDIOINPUTMIDI_H_
+#define AUDIOINPUTMIDI_H_
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
-#include "../View/Helper/PeakMeter.h"
+#include "AudioInputBase.h"
 
 struct _snd_seq;
 
-class MidiInput : public HuiEventHandler, public PeakMeterSource
+class AudioInputMidi : public AudioInputBase
 {
 public:
-	MidiInput();
-	virtual ~MidiInput();
+	AudioInputMidi(MidiData &data);
+	virtual ~AudioInputMidi();
 
 	void Init();
 
-	bool Start(int sample_rate);
-	void Stop();
-	void Update();
+	virtual bool Start(int sample_rate);
+	virtual void Stop();
+	virtual int DoCapturing();
 
-	bool IsCapturing();
+	virtual bool IsCapturing();
+
+	virtual int GetDelay();
+	virtual void ResetSync();
 
 	virtual float GetSampleRate();
 	virtual BufferBox GetSomeSamples(int num_samples);
 
-	MidiData data;
-
 private:
-	int DoCapturing();
+
+	MidiData &data;
 
 	_snd_seq *handle;
 	int npfd;
@@ -48,4 +50,4 @@ private:
 	float tone_volume[128];
 };
 
-#endif /* MIDIINPUT_H_ */
+#endif /* AUDIOINPUTMIDI_H_ */

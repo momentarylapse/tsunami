@@ -87,6 +87,7 @@ class MidiData
 enum
 	TRACK_TYPE_AUDIO
 	TRACK_TYPE_TIME
+	TRACK_TYPE_MIDI
 
 class TrackLevel
 	BufferBox buffer[]
@@ -167,7 +168,8 @@ class AudioOutput
 
 class AudioInput : Observable
 	BufferBox cur_buf
-	extern void Start(int sample_rate)
+	MidiData midi
+	extern void Start(int type, int sample_rate)
 	extern void Stop()
 	extern bool IsCapturing()
 	extern void ResetSync()

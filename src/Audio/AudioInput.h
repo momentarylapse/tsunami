@@ -1,7 +1,7 @@
 /*
  * AudioInput.h
  *
- *  Created on: 26.03.2012
+ *  Created on: 22.02.2013
  *      Author: michi
  */
 
@@ -13,10 +13,9 @@
 #include "../Data/AudioFile.h"
 #include "../View/Helper/PeakMeter.h"
 
-struct ALCdevice_struct;
-
-
-#define NUM_CAPTURE_SAMPLES		8192
+class AudioInputBase;
+class AudioInputAudio;
+class AudioInputMidi;
 
 class AudioInput : public HuiEventHandler, public PeakMeterSource
 {
@@ -24,15 +23,7 @@ public:
 	AudioInput();
 	virtual ~AudioInput();
 
-
-	BufferBox CurrentBuffer;
-
-	Array<string> Device;
-	string ChosenDevice;
-
-	void Init();
-
-	bool Start(int sample_rate);
+	bool Start(int type, int sample_rate);
 	void Stop();
 	void Update();
 
@@ -40,36 +31,16 @@ public:
 	int GetDelay();
 	void ResetSync();
 
-
 	virtual float GetSampleRate();
 	virtual BufferBox GetSomeSamples(int num_samples);
 
-	float GetPlaybackDelayConst();
-	void SetPlaybackDelayConst(float f);
+	BufferBox current_buffer;
+	MidiData midi;
 
-private:
-	int DoCapturing();
-
-	int capture_temp[NUM_CAPTURE_SAMPLES];
-	ALCdevice_struct *capture;
-
-	string dev_name;
-
-	struct SyncData
-	{
-		int num_points;
-		long long int delay_sum;
-		int samples_in, offset_out;
-
-		void Reset();
-		void Add(int samples);
-		int GetDelay();
-	};
-	SyncData sync;
-
-	bool Capturing;
-	int SampleRate;
-	float PlaybackDelayConst;
+	int type;
+	AudioInputBase *in_cur;
+	AudioInputAudio *in_audio;
+	AudioInputMidi *in_midi;
 };
 
 #endif /* AUDIOINPUT_H_ */

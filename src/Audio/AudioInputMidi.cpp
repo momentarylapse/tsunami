@@ -1,30 +1,29 @@
 /*
- * MidiInput.cpp
+ * AudioInputMidi.cpp
  *
  *  Created on: 19.02.2013
  *      Author: michi
  */
 
-#include "MidiInput.h"
+#include "AudioInputMidi.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include <alsa/asoundlib.h>
 
 
-#define UPDATE_TIME		5
 
-MidiInput::MidiInput() :
-	PeakMeterSource("MidiInput")
+AudioInputMidi::AudioInputMidi(MidiData &_data) :
+	data(_data)
 {
 	handle = NULL;
 	timer = HuiCreateTimer();
 }
 
-MidiInput::~MidiInput()
+AudioInputMidi::~AudioInputMidi()
 {
 }
 
-void MidiInput::Init()
+void AudioInputMidi::Init()
 {
 	int portid;
 
@@ -41,7 +40,7 @@ void MidiInput::Init()
 	}
 }
 
-bool MidiInput::Start(int _sample_rate)
+bool AudioInputMidi::Start(int _sample_rate)
 {
 	sample_rate = _sample_rate;
 	offset = 0;
@@ -52,13 +51,10 @@ bool MidiInput::Start(int _sample_rate)
 	for (int i=0;i<128;i++)
 		tone_start[i] = -1;
 
-	if (handle)
-		HuiRunLaterM(UPDATE_TIME, this, &MidiInput::Update);
-
 	return handle;
 }
 
-void MidiInput::Stop()
+void AudioInputMidi::Stop()
 {
 	if (!handle)
 		return;
@@ -67,7 +63,7 @@ void MidiInput::Stop()
 	handle = NULL;
 }
 
-int MidiInput::DoCapturing()
+int AudioInputMidi::DoCapturing()
 {
 	offset += HuiGetTime(timer);
 	int pos = offset * sample_rate;
@@ -101,27 +97,28 @@ int MidiInput::DoCapturing()
 	return 0;
 }
 
-void MidiInput::Update()
-{
-	DoCapturing();
-	if (handle)
-		HuiRunLaterM(UPDATE_TIME, this, &MidiInput::Update);
-}
-
-bool MidiInput::IsCapturing()
+bool AudioInputMidi::IsCapturing()
 {
 	return handle;
 }
 
 
-float MidiInput::GetSampleRate()
+float AudioInputMidi::GetSampleRate()
 {
 	return sample_rate;
 }
 
-BufferBox MidiInput::GetSomeSamples(int num_samples)
+BufferBox AudioInputMidi::GetSomeSamples(int num_samples)
 {
 	BufferBox buf;
 	return buf;
 }
+
+
+int AudioInputMidi::GetDelay()
+{
+	return 0;
+}
+
+void AudioInputMidi::ResetSync(){}
 

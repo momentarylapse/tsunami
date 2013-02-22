@@ -34,7 +34,7 @@ void main()
 	
 	input.AddObserver(nil, &sync)
 	output.PlayGenerated(&fill, SAMPLE_RATE)
-	input.Start(SAMPLE_RATE)
+	input.Start(TRACK_TYPE_AUDIO, SAMPLE_RATE)
 	
 	HuiWaitTillWindowClosed(dlg)
 	

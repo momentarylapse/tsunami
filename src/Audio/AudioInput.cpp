@@ -178,19 +178,8 @@ void AudioInput::ResetSync()
 BufferBox AudioInput::GetSomeSamples(int num_samples)
 {
 	BufferBox buf;
-	/*if (CaptureAddData){
-		int n = min(CaptureBuf.num, num_samples);
-		int i0 = CaptureBuf.num - n;
-		buf.resize(n);
-		for (int i=0;i<n;i++){
-			buf.r[i] = CaptureBuf.r[i0 + i];
-			buf.l[i] = CaptureBuf.l[i0 + i];
-		}
-	}else{
-		//buf.set(CapturePreviewBuf, 0, 1.0f);
-		buf = CapturePreviewBuf;
-	}*/
-	buf = CurrentBuffer;
+	num_samples = min(num_samples, CurrentBuffer.num);
+	buf.set_as_ref(CurrentBuffer, CurrentBuffer.num - num_samples, num_samples);
 	return buf;
 }
 

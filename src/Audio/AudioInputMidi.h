@@ -37,6 +37,8 @@ public:
 
 private:
 
+	void ClearInput();
+
 	MidiData &data;
 
 	_snd_seq *handle;

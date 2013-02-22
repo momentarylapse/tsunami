@@ -17,6 +17,8 @@ AudioInputMidi::AudioInputMidi(MidiData &_data) :
 {
 	handle = NULL;
 	timer = HuiCreateTimer();
+
+	Init();
 }
 
 AudioInputMidi::~AudioInputMidi()
@@ -40,12 +42,25 @@ void AudioInputMidi::Init()
 	}
 }
 
+void AudioInputMidi::ClearInput()
+{
+	while (true){
+		snd_seq_event_t *ev;
+		int r = snd_seq_event_input(handle, &ev);
+		if (r < 0)
+			break;
+		snd_seq_free_event(ev);
+	}
+}
+
 bool AudioInputMidi::Start(int _sample_rate)
 {
 	sample_rate = _sample_rate;
 	offset = 0;
 	data.clear();
-	Init();
+
+	ClearInput();
+
 	HuiGetTime(timer);
 
 	for (int i=0;i<128;i++)

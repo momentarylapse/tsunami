@@ -41,6 +41,11 @@ private:
 	int npfd;
 	struct pollfd *pfd;
 	int sample_rate;
+	int timer;
+	double offset;
+
+	int tone_start[128];
+	float tone_volume[128];
 };
 
 #endif /* MIDIINPUT_H_ */

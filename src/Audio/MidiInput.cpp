@@ -11,12 +11,13 @@
 #include <alsa/asoundlib.h>
 
 
-#define UPDATE_TIME		10
+#define UPDATE_TIME		5
 
 MidiInput::MidiInput() :
 	PeakMeterSource("MidiInput")
 {
 	handle = NULL;
+	timer = HuiCreateTimer();
 }
 
 MidiInput::~MidiInput()
@@ -43,7 +44,13 @@ void MidiInput::Init()
 bool MidiInput::Start(int _sample_rate)
 {
 	sample_rate = _sample_rate;
+	offset = 0;
+	data.clear();
 	Init();
+	HuiGetTime(timer);
+
+	for (int i=0;i<128;i++)
+		tone_start[i] = -1;
 
 	if (handle)
 		HuiRunLaterM(UPDATE_TIME, this, &MidiInput::Update);
@@ -62,6 +69,9 @@ void MidiInput::Stop()
 
 int MidiInput::DoCapturing()
 {
+	offset += HuiGetTime(timer);
+	int pos = offset * sample_rate;
+
 	while (true){
 		snd_seq_event_t *ev;
 		int r = snd_seq_event_input(handle, &ev);
@@ -69,10 +79,21 @@ int MidiInput::DoCapturing()
 			break;
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:
+				tone_start[ev->data.note.note] = pos;
+				tone_volume[ev->data.note.note] = (float)ev->data.note.velocity / 127.0f;
 				msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:
 				msg_write(format("note off %d %d", ev->data.control.channel, ev->data.note.note));
+				if (tone_start[ev->data.note.note] >= 0){
+					MidiNote n;
+					n.pitch = ev->data.note.note;
+					n.volume = tone_volume[ev->data.note.note];
+					n.range.offset = tone_start[ev->data.note.note];
+					n.range.num = pos - tone_start[ev->data.note.note];
+					tone_start[ev->data.note.note] = -1;
+					data.add(n);
+				}
 				break;
 		}
 		snd_seq_free_event(ev);

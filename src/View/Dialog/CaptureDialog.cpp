@@ -34,8 +34,6 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	// dialog
 	FromResource("record_dialog");
 	Check("capture_type:audio", true);
-	Enable("capture_type:audio", false);
-	Enable("capture_type:midi", false);
 	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
 	SetString("capture_time", a->get_time_str(0));
 	Enable("capture_delete", false);
@@ -74,12 +72,14 @@ CaptureDialog::~CaptureDialog()
 
 void CaptureDialog::OnTypeAudio()
 {
+	type = Track::TYPE_AUDIO;
 	//tsunami->input->Stop();
 	//tsunami->input->Start(tsunami->input->GetSampleRate());
 }
 
 void CaptureDialog::OnTypeMidi()
 {
+	type = Track::TYPE_MIDI;
 }
 
 void CaptureDialog::OnStart()
@@ -93,7 +93,8 @@ void CaptureDialog::OnStart()
 	Enable("capture_delete", true);
 	Enable("ok", true);
 	Enable("capture_playback", false);
-	Enable("capture_device", false);
+	Enable("capture_type:audio", false);
+	Enable("capture_type:midi", false);
 }
 
 void CaptureDialog::OnDelete()
@@ -117,7 +118,6 @@ void CaptureDialog::OnPause()
 	capturing = false;
 	Enable("capture_start", true);
 	Enable("capture_pause", false);
-	Enable("capture_device", true);
 }
 
 

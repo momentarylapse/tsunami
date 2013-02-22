@@ -41,6 +41,7 @@ public:
 	AudioInputBase *in_cur;
 	AudioInputAudio *in_audio;
 	AudioInputMidi *in_midi;
+	bool running;
 };
 
 #endif /* AUDIOINPUT_H_ */

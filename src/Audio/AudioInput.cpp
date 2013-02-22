@@ -20,6 +20,7 @@ AudioInput::AudioInput() :
 	in_audio = new AudioInputAudio(current_buffer);
 	in_midi = new AudioInputMidi(midi);
 	in_cur = in_audio;
+	running = false;
 }
 
 AudioInput::~AudioInput()
@@ -31,12 +32,13 @@ AudioInput::~AudioInput()
 bool AudioInput::Start(int type, int sample_rate)
 {
 	in_cur->Stop();
+	msg_write("start");
 
-	if (type == Track::TYPE_AUDIO)
+	if (type == Track::TYPE_AUDIO){
 		in_cur = in_audio;
-	else if (type == Track::TYPE_MIDI)
+	}else if (type == Track::TYPE_MIDI){
 		in_cur = in_midi;
-	else{
+	}else{
 		in_cur = in_audio;
 		tsunami->log->Error(_("Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)"));
 		return false;
@@ -44,7 +46,9 @@ bool AudioInput::Start(int type, int sample_rate)
 
 	if (in_cur->Start(sample_rate)){
 
-		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
+		if (!running)
+			HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
+		running = true;
 		return true;
 	}
 	tsunami->log->Error(_("Konnte Aufnahmeger&at nicht &offnen"));
@@ -62,7 +66,8 @@ void AudioInput::Update()
 	if (in_cur->DoCapturing() > 0)
 		Notify("Capture");
 
-	if (in_cur->IsCapturing())
+	running = in_cur->IsCapturing();
+	if (running)
 		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
 }
 

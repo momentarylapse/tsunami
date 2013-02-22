@@ -72,14 +72,18 @@ CaptureDialog::~CaptureDialog()
 
 void CaptureDialog::OnTypeAudio()
 {
+	if (type == Track::TYPE_AUDIO)
+		return;
 	type = Track::TYPE_AUDIO;
-	//tsunami->input->Stop();
-	//tsunami->input->Start(tsunami->input->GetSampleRate());
+	tsunami->input->Start(type, tsunami->input->GetSampleRate());
 }
 
 void CaptureDialog::OnTypeMidi()
 {
+	if (type == Track::TYPE_MIDI)
+		return;
 	type = Track::TYPE_MIDI;
+	tsunami->input->Start(type, tsunami->input->GetSampleRate());
 }
 
 void CaptureDialog::OnStart()

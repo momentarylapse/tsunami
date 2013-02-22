@@ -47,6 +47,7 @@ private:
 	int sample_rate;
 	int timer;
 	double offset;
+	bool capturing;
 
 	int tone_start[128];
 	float tone_volume[128];

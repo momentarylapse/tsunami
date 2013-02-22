@@ -23,6 +23,8 @@ AudioInputMidi::AudioInputMidi(MidiData &_data) :
 
 AudioInputMidi::~AudioInputMidi()
 {
+	if (handle)
+		snd_seq_close(handle);
 }
 
 void AudioInputMidi::Init()
@@ -55,6 +57,8 @@ void AudioInputMidi::ClearInput()
 
 bool AudioInputMidi::Start(int _sample_rate)
 {
+	if (!handle)
+		return false;
 	sample_rate = _sample_rate;
 	offset = 0;
 	data.clear();
@@ -66,22 +70,20 @@ bool AudioInputMidi::Start(int _sample_rate)
 	for (int i=0;i<128;i++)
 		tone_start[i] = -1;
 
-	return handle;
+	capturing = true;
+	return true;
 }
 
 void AudioInputMidi::Stop()
 {
-	if (!handle)
-		return;
-
-	snd_seq_close(handle);
-	handle = NULL;
+	capturing = false;
 }
 
 int AudioInputMidi::DoCapturing()
 {
+	int pos0 = offset * (double)sample_rate;
 	offset += HuiGetTime(timer);
-	int pos = offset * sample_rate;
+	int pos = offset * (double)sample_rate;
 
 	while (true){
 		snd_seq_event_t *ev;
@@ -92,10 +94,10 @@ int AudioInputMidi::DoCapturing()
 			case SND_SEQ_EVENT_NOTEON:
 				tone_start[ev->data.note.note] = pos;
 				tone_volume[ev->data.note.note] = (float)ev->data.note.velocity / 127.0f;
-				msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
+				//msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:
-				msg_write(format("note off %d %d", ev->data.control.channel, ev->data.note.note));
+				//msg_write(format("note off %d %d", ev->data.control.channel, ev->data.note.note));
 				if (tone_start[ev->data.note.note] >= 0){
 					MidiNote n;
 					n.pitch = ev->data.note.note;
@@ -109,12 +111,12 @@ int AudioInputMidi::DoCapturing()
 		}
 		snd_seq_free_event(ev);
 	}
-	return 0;
+	return pos - pos0;
 }
 
 bool AudioInputMidi::IsCapturing()
 {
-	return handle;
+	return capturing;
 }
 
 
@@ -125,7 +127,13 @@ float AudioInputMidi::GetSampleRate()
 
 BufferBox AudioInputMidi::GetSomeSamples(int num_samples)
 {
+	int pos = offset * (double)sample_rate;
 	BufferBox buf;
+	buf.resize(num_samples);
+	if (data.num > 0)
+		if (data.back().range.end() > pos - num_samples){
+			buf.r.back() = buf.l.back() = 1;
+		}
 	return buf;
 }
 

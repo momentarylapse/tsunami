@@ -36,6 +36,11 @@ void Range::clear()
 	num = 0;
 }
 
+string Range::str() const
+{
+	return format("(%d %d)", offset, num);
+}
+
 void Range::move(int dpos)
 {
 	offset += dpos;
@@ -109,7 +114,17 @@ Range Range::intersect(const Range &r) const
 	return Range(i0, i1 - i0);
 }
 
+Range Range::operator||(const Range &r) const
+{
+	int i0 = min(start(), r.start());
+	int i1 = max(end(), r.end());
+	return Range(i0, i1 - i0);
+}
 
+Range Range::operator&&(const Range &r) const
+{
+	return intersect(r);
+}
 
 
 

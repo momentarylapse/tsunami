@@ -184,18 +184,15 @@ bool AudioFile::Save(const string & filename)
 
 Range AudioFile::GetRange()
 {
-	int min = 2147483640;
-	int max = -2147483640;
-	foreach(Track *t, track){
-		Range r = t->GetRangeUnsafe();
-		if (r.start() < min)
-			min = r.start();
-		if (r.end() > max)
-			max = r.end();
-	}
-	if (min > max)
+	int min =  1073741824;
+	int max = -1073741824;
+	Range r = Range(min, max - min);
+	foreach(Track *t, track)
+		r = r || t->GetRangeUnsafe();
+
+	if (r.length() < 0)
 		return Range(0, 0);
-	return Range(min, max - min);
+	return r;
 }
 
 
@@ -207,11 +204,11 @@ string AudioFile::get_time_str(int t)
 		t = -t;
 	int _min=(t/60/_sample_rate);
 	int _sec=((t/_sample_rate) %60);
-	int _usec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
+	int _msec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
 	if (_min > 0)
-		return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_usec);
+		return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);
 	else
-		return format("%s%.2d,%.3d",sign?"-":"",_sec,_usec);
+		return format("%s%.2d,%.3d",sign?"-":"",_sec,_msec);
 }
 
 string AudioFile::get_time_str_fuzzy(int t, float dt)
@@ -222,12 +219,12 @@ string AudioFile::get_time_str_fuzzy(int t, float dt)
 		t = -t;
 	int _min=(t/60/_sample_rate);
 	int _sec=((t/_sample_rate) %60);
-	int _usec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
+	int _msec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
 	if (dt < 1.0){
 		if (_min > 0)
-			return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_usec);
+			return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);
 		else
-			return format("%s%.2d,%.3d",sign?"-":"",_sec,_usec);
+			return format("%s%.2d,%.3d",sign?"-":"",_sec,_msec);
 	}else{
 		if (_min > 0)
 			return format("%s%d:%.2d",sign?"-":"",_min,_sec);

@@ -8,6 +8,8 @@
 #ifndef RANGE_H_
 #define RANGE_H_
 
+class string;
+
 class Range
 {
 public:
@@ -15,6 +17,8 @@ public:
 	Range(int _offset, int _length);
 	Range(const Range &r);
 	~Range();
+
+	string str() const;
 
 	void clear();
 
@@ -34,6 +38,9 @@ public:
 	bool overlaps(const Range &r) const;
 	bool covers(const Range &r) const;
 	Range intersect(const Range &r) const;
+
+	Range operator||(const Range &r) const;
+	Range operator&&(const Range &r) const;
 };
 
 #endif /* RANGE_H_ */

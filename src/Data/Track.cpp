@@ -113,8 +113,8 @@ Range Track::GetRangeUnsafe()
 	if (parent >= 0)
 		return Range(pos, length);
 
-	int min = 2147483640;
-	int max = -2147483640;
+	int min =  1073741824;
+	int max = -1073741824;
 	foreach(TrackLevel &l, level)
 		if (l.buffer.num > 0){
 			min = min(l.buffer[0].offset, min);
@@ -123,30 +123,19 @@ Range Track::GetRangeUnsafe()
 	foreach(Track *s, sub){
 		if (s->pos < min)
 			min = s->pos;
-		for (int i=0;i<s->rep_num+1;i++){
-			int smax = s->pos + s->length + s->rep_num * s->rep_delay;
-			if (smax > max)
-				max = smax;
-		}
+		int smax = s->pos + s->length + s->rep_num * s->rep_delay;
+		if (smax > max)
+			max = smax;
 	}
+	Range r = Range(min, max - min);
 
-	if ((type == TYPE_TIME) && (bar.num > 0)){
-		Range r = bar.GetRange();
-		if (min > r.offset)
-			min = r.offset;
-		if (max < r.end())
-			max = r.end();
-	}
+	if ((type == TYPE_TIME) && (bar.num > 0))
+		r = r || bar.GetRange();
 
-	if ((type == TYPE_MIDI) && (midi.num > 0)){
-		Range r = midi.GetRange();
-		if (min > r.offset)
-			min = r.offset;
-		if (max < r.end())
-			max = r.end();
-	}
+	if ((type == TYPE_MIDI) && (midi.num > 0))
+		r = r || midi.GetRange();
 
-	return Range(min, max - min);
+	return r;
 }
 
 Range Track::GetRange()

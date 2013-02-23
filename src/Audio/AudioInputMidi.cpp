@@ -46,10 +46,16 @@ void AudioInputMidi::Init()
 
 void AudioInputMidi::Accumulate(bool enable)
 {
+	accumulating = enable;
 }
 
 void AudioInputMidi::ResetAccumulation()
 {
+	data.clear();
+	offset = 0;
+
+	for (int i=0;i<128;i++)
+		tone_start[i] = -1;
 }
 
 int AudioInputMidi::GetSampleCount()
@@ -57,7 +63,7 @@ int AudioInputMidi::GetSampleCount()
 	return offset * (double)sample_rate;
 }
 
-void AudioInputMidi::ClearInput()
+void AudioInputMidi::ClearInputQueue()
 {
 	while (true){
 		snd_seq_event_t *ev;
@@ -73,15 +79,12 @@ bool AudioInputMidi::Start(int _sample_rate)
 	if (!handle)
 		return false;
 	sample_rate = _sample_rate;
-	offset = 0;
-	data.clear();
+	accumulating = false;
+	ResetAccumulation();
 
-	ClearInput();
+	ClearInputQueue();
 
 	HuiGetTime(timer);
-
-	for (int i=0;i<128;i++)
-		tone_start[i] = -1;
 
 	capturing = true;
 	return true;
@@ -94,8 +97,9 @@ void AudioInputMidi::Stop()
 
 int AudioInputMidi::DoCapturing()
 {
-	int pos0 = offset * (double)sample_rate;
-	offset += HuiGetTime(timer);
+	double dt = HuiGetTime(timer);
+	if (accumulating)
+		offset += dt;
 	int pos = offset * (double)sample_rate;
 
 	while (true){
@@ -118,13 +122,14 @@ int AudioInputMidi::DoCapturing()
 					n.range.offset = tone_start[ev->data.note.note];
 					n.range.num = pos - tone_start[ev->data.note.note];
 					tone_start[ev->data.note.note] = -1;
-					data.add(n);
+					if (accumulating)
+						data.add(n);
 				}
 				break;
 		}
 		snd_seq_free_event(ev);
 	}
-	return pos - pos0;
+	return dt * (double)sample_rate;
 }
 
 bool AudioInputMidi::IsCapturing()
@@ -140,13 +145,18 @@ float AudioInputMidi::GetSampleRate()
 
 BufferBox AudioInputMidi::GetSomeSamples(int num_samples)
 {
-	int pos = offset * (double)sample_rate;
+	//int pos = offset * (double)sample_rate;
 	BufferBox buf;
 	buf.resize(num_samples);
-	if (data.num > 0)
+	for (int i=0;i<128;i++)
+		if (tone_start[i] >= 0){
+			buf.r.back() = buf.l.back() = 0.9f;
+			break;
+		}
+	/*if (data.num > 0)
 		if (data.back().range.end() > pos - num_samples){
 			buf.r.back() = buf.l.back() = 1;
-		}
+		}*/
 	return buf;
 }
 

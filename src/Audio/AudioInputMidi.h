@@ -41,7 +41,7 @@ public:
 
 private:
 
-	void ClearInput();
+	void ClearInputQueue();
 
 	MidiData &data;
 
@@ -52,6 +52,7 @@ private:
 	int timer;
 	double offset;
 	bool capturing;
+	bool accumulating;
 
 	int tone_start[128];
 	float tone_volume[128];

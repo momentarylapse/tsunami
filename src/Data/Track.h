@@ -78,6 +78,8 @@ public:
 	int GetNextNote(int pos);
 	Range GetRange();
 
+	void sort();
+
 	string synthesizer;
 	string instrument;
 	string options;
@@ -114,6 +116,7 @@ public:
 	void SetVolume(float volume);
 	BufferBox GetBuffers(int level_no, const Range &r);
 	Track *AddEmptySubTrack(const Range &r, const string &name);
+	void InsertMidiData(int offset, MidiData &midi);
 
 
 	enum

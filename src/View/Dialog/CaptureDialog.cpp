@@ -141,8 +141,6 @@ void CaptureDialog::OnClose()
 
 void CaptureDialog::OnUpdate(Observable *o)
 {
-	//if (tsunami->input->CapturePlayback)
-	//msg_write(tsunami->output->GetPos() - buf.num);
 	SetString("capture_time", audio->get_time_str(tsunami->input->GetSampleCount()));
 }
 
@@ -151,24 +149,21 @@ void CaptureDialog::Insert()
 	msg_db_r("CaptureInsert", 1);
 	Track *t;
 	int target = GetInt("capture_target");
-	int dpos = 0;
 	int i0;
 	if (audio->used){
 		int s_start = audio->selection.start();
 
 		// insert recorded data with some delay
-		dpos = - tsunami->input->GetDelay();
+		int dpos = tsunami->input->GetDelay();
 
 		if (target >= audio->track.num){
 			// new track
 			t = audio->AddEmptyTrack(audio->track.num);
-			i0 = s_start - dpos;
 		}else{
-			// sub track
+			// overwrite
 			t = audio->track[target];
-			//dpos = s_start + dpos;
-			i0 = s_start - dpos;
 		}
+		i0 = s_start + dpos;
 	}else{
 		// new file
 		audio->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
@@ -177,13 +172,17 @@ void CaptureDialog::Insert()
 	}
 
 	// insert data
-	Range r = Range(i0, tsunami->input->GetSampleCount());
-	audio->action_manager->BeginActionGroup();
-	BufferBox tbuf = t->GetBuffers(tsunami->view->cur_level, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->view->cur_level, r);
-	tbuf.set(tsunami->input->buffer, 0, 1.0f);
-	audio->Execute(a);
-	audio->action_manager->EndActionGroup();
+	if (type == t->TYPE_AUDIO){
+		Range r = Range(i0, tsunami->input->GetSampleCount());
+		audio->action_manager->BeginActionGroup();
+		BufferBox tbuf = t->GetBuffers(tsunami->view->cur_level, r);
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->view->cur_level, r);
+		tbuf.set(tsunami->input->buffer, 0, 1.0f);
+		audio->Execute(a);
+		audio->action_manager->EndActionGroup();
+	}else if (type == t->TYPE_MIDI){
+		t->InsertMidiData(i0, tsunami->input->midi);
+	}
 	tsunami->input->ResetAccumulation();
 	msg_db_l(1);
 }

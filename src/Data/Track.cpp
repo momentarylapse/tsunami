@@ -13,6 +13,7 @@
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
+#include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 
 
 Beat::Beat(int p, int bar, int beat)
@@ -116,6 +117,14 @@ Range MidiData::GetRange()
 	int i0 = (*this)[0].range.offset;
 	int i1 = back().range.end();
 	return Range(i0, i1 - i0);
+}
+
+void MidiData::sort()
+{
+	for (int i=0;i<num;i++)
+		for (int j=i+1;j<num;j++)
+			if ((*this)[i].range.offset > (*this)[j].range.offset)
+				swap(i, j);
 }
 
 
@@ -378,5 +387,11 @@ Track *Track::AddEmptySubTrack(const Range &r, const string &name)
 {
 	return (Track*)root->Execute(new ActionTrackAddEmptySubTrack(get_track_index(this), r, name));
 }
+
+void Track::InsertMidiData(int offset, MidiData& midi)
+{
+	root->Execute(new ActionTrackInsertMidi(this, offset, midi));
+}
+
 
 

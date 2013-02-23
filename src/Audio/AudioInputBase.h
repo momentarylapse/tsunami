@@ -20,6 +20,10 @@ public:
 	virtual int GetDelay() = 0;
 	virtual void ResetSync() = 0;
 
+	virtual void Accumulate(bool enable) = 0;
+	virtual void ResetAccumulation() = 0;
+	virtual int GetSampleCount() = 0;
+
 	virtual float GetSampleRate() = 0;
 	virtual BufferBox GetSomeSamples(int num_samples) = 0;
 

@@ -52,8 +52,8 @@ int AudioInputAudio::SyncData::GetDelay()
 	return 0;
 }
 
-AudioInputAudio::AudioInputAudio(BufferBox &buf) :
-	CurrentBuffer(buf)
+AudioInputAudio::AudioInputAudio(BufferBox &buf, BufferBox &cur_buf) :
+	AccumulationBuffer(buf), CurrentBuffer(cur_buf)
 {
 	Capturing = false;
 	capture = NULL;
@@ -105,6 +105,7 @@ bool AudioInputAudio::Start(int sample_rate)
 		Stop();
 
 	Init();
+	accumulate = false;
 	SampleRate = sample_rate;
 	capture = alcCaptureOpenDevice(dev_name.c_str(), sample_rate, AL_FORMAT_STEREO16, NUM_CAPTURE_SAMPLES);
 	//msg_write((int)capture);
@@ -120,6 +121,21 @@ bool AudioInputAudio::Start(int sample_rate)
 float AudioInputAudio::GetPlaybackDelayConst()
 {
 	return PlaybackDelayConst;
+}
+
+void AudioInputAudio::Accumulate(bool enable)
+{
+	accumulate = enable;
+}
+
+void AudioInputAudio::ResetAccumulation()
+{
+	AccumulationBuffer.clear();
+}
+
+int AudioInputAudio::GetSampleCount()
+{
+	return AccumulationBuffer.num;
 }
 
 void AudioInputAudio::SetPlaybackDelayConst(float f)
@@ -148,6 +164,9 @@ int AudioInputAudio::DoCapturing()
 
 		if (!too_much_data)
 			sync.Add(a);
+
+		if (accumulate)
+			AccumulationBuffer.append(CurrentBuffer);
 	}else
 		a = 0;
 	msg_db_l(1);

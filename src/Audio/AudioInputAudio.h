@@ -21,11 +21,8 @@ struct ALCdevice_struct;
 class AudioInputAudio : public AudioInputBase
 {
 public:
-	AudioInputAudio(BufferBox &buf);
+	AudioInputAudio(BufferBox &buf, BufferBox &cur_buf);
 	virtual ~AudioInputAudio();
-
-
-	BufferBox &CurrentBuffer;
 
 	Array<string> Device;
 	string ChosenDevice;
@@ -41,6 +38,10 @@ public:
 
 	virtual int DoCapturing();
 
+	virtual void Accumulate(bool enable);
+	virtual void ResetAccumulation();
+	virtual int GetSampleCount();
+
 	virtual float GetSampleRate();
 	virtual BufferBox GetSomeSamples(int num_samples);
 
@@ -48,6 +49,8 @@ public:
 	void SetPlaybackDelayConst(float f);
 
 private:
+	BufferBox &AccumulationBuffer, &CurrentBuffer;
+	bool accumulate;
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];
 	ALCdevice_struct *capture;

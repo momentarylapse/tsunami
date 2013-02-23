@@ -33,9 +33,7 @@ public:
 
 	AudioFile *audio;
 	PeakMeter *peak_meter;
-	bool capturing;
 	int type;
-	BufferBox buf;
 };
 
 #endif /* CAPTUREDIALOG_H_ */

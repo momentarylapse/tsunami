@@ -17,7 +17,7 @@
 AudioInput::AudioInput() :
 	PeakMeterSource("AudioInput")
 {
-	in_audio = new AudioInputAudio(current_buffer);
+	in_audio = new AudioInputAudio(buffer, current_buffer);
 	in_midi = new AudioInputMidi(midi);
 	in_cur = in_audio;
 	running = false;
@@ -32,7 +32,6 @@ AudioInput::~AudioInput()
 bool AudioInput::Start(int type, int sample_rate)
 {
 	in_cur->Stop();
-	msg_write("start");
 
 	if (type == Track::TYPE_AUDIO){
 		in_cur = in_audio;
@@ -81,6 +80,21 @@ bool AudioInput::IsCapturing()
 float AudioInput::GetSampleRate()
 {
 	return in_cur->GetSampleRate();
+}
+
+void AudioInput::Accumulate(bool enable)
+{
+	in_cur->Accumulate(enable);
+}
+
+void AudioInput::ResetAccumulation()
+{
+	in_cur->ResetAccumulation();
+}
+
+int AudioInput::GetSampleCount()
+{
+	return in_cur->GetSampleCount();
 }
 
 BufferBox AudioInput::GetSomeSamples(int num_samples)

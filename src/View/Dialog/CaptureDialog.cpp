@@ -17,7 +17,6 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
 {
 	audio = a;
-	capturing = false;
 	type = Track::TYPE_AUDIO;
 
 
@@ -91,7 +90,7 @@ void CaptureDialog::OnStart()
 	if (IsChecked("capture_playback"))
 		tsunami->output->Play(audio, false);
 	tsunami->input->ResetSync();
-	capturing = true;
+	tsunami->input->Accumulate(true);
 	Enable("capture_start", false);
 	Enable("capture_pause", true);
 	Enable("capture_delete", true);
@@ -105,13 +104,13 @@ void CaptureDialog::OnDelete()
 {
 	if (tsunami->output->IsPlaying())
 		tsunami->output->Stop();
-	buf.clear();
-	capturing = false;
+	tsunami->input->ResetAccumulation();
+	tsunami->input->Accumulate(false);
 	Enable("capture_start", true);
 	Enable("capture_pause", false);
 	Enable("capture_delete", false);
 	Enable("ok", false);
-	SetString("capture_time", audio->get_time_str(buf.num));
+	OnUpdate(NULL);
 }
 
 void CaptureDialog::OnPause()
@@ -119,7 +118,7 @@ void CaptureDialog::OnPause()
 	// TODO...
 	if (tsunami->output->IsPlaying())
 		tsunami->output->Stop();
-	capturing = false;
+	tsunami->input->Accumulate(false);
 	Enable("capture_start", true);
 	Enable("capture_pause", false);
 }
@@ -144,10 +143,7 @@ void CaptureDialog::OnUpdate(Observable *o)
 {
 	//if (tsunami->input->CapturePlayback)
 	//msg_write(tsunami->output->GetPos() - buf.num);
-	if (capturing){
-		buf.append(tsunami->input->current_buffer);
-		SetString("capture_time", audio->get_time_str(buf.num));
-	}
+	SetString("capture_time", audio->get_time_str(tsunami->input->GetSampleCount()));
 }
 
 void CaptureDialog::Insert()
@@ -181,14 +177,14 @@ void CaptureDialog::Insert()
 	}
 
 	// insert data
-	Range r = Range(i0, buf.num);
+	Range r = Range(i0, tsunami->input->GetSampleCount());
 	audio->action_manager->BeginActionGroup();
 	BufferBox tbuf = t->GetBuffers(tsunami->view->cur_level, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->view->cur_level, r);
-	tbuf.set(buf, 0, 1.0f);
+	tbuf.set(tsunami->input->buffer, 0, 1.0f);
 	audio->Execute(a);
 	audio->action_manager->EndActionGroup();
-	buf.clear();
+	tsunami->input->ResetAccumulation();
 	msg_db_l(1);
 }
 

@@ -126,6 +126,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkSemiExternalFunc("AudioInput.ResetSync",	(void*)&AudioInput::ResetSync);
 	Script::LinkSemiExternalFunc("AudioInput.Stop",		(void*)&AudioInput::Stop);
 	Script::LinkSemiExternalFunc("AudioInput.IsCapturing",	(void*)&AudioInput::IsCapturing);
+	Script::LinkSemiExternalFunc("AudioInput.GetSampleCount",	(void*)&AudioInput::GetSampleCount);
+	Script::LinkSemiExternalFunc("AudioInput.Accumulate",	(void*)&AudioInput::Accumulate);
+	Script::LinkSemiExternalFunc("AudioInput.ResetAccumulation",	(void*)&AudioInput::ResetAccumulation);
 	Script::LinkSemiExternalFunc("AudioInput.GetDelay",	(void*)&AudioInput::GetDelay);
 	Script::LinkSemiExternalFunc("AudioInput.AddObserver",	(void*)&AudioInput::AddWrappedObserver);
 	Script::LinkSemiExternalFunc("AudioInput.RemoveObserver",	(void*)&AudioInput::RemoveWrappedObserver);

@@ -167,13 +167,16 @@ class AudioOutput
 	extern void SetVolume(float volume)
 
 class AudioInput : Observable
-	BufferBox cur_buf
+	BufferBox cur_buf, buf
 	MidiData midi
 	extern void Start(int type, int sample_rate)
 	extern void Stop()
 	extern bool IsCapturing()
 	extern void ResetSync()
 	extern int GetDelay()
+	extern int GetSampleCount()
+	extern void Accumulate(bool enable)
+	extern void ResetAccumulation()
 	extern void AddObserver(void *handler, void *func)
 	extern void RemoveObserver(void *handler)
 

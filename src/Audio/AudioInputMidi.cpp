@@ -44,6 +44,19 @@ void AudioInputMidi::Init()
 	}
 }
 
+void AudioInputMidi::Accumulate(bool enable)
+{
+}
+
+void AudioInputMidi::ResetAccumulation()
+{
+}
+
+int AudioInputMidi::GetSampleCount()
+{
+	return offset * (double)sample_rate;
+}
+
 void AudioInputMidi::ClearInput()
 {
 	while (true){

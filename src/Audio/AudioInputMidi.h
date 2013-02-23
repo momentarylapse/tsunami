@@ -32,6 +32,10 @@ public:
 	virtual int GetDelay();
 	virtual void ResetSync();
 
+	virtual void Accumulate(bool enable);
+	virtual void ResetAccumulation();
+	virtual int GetSampleCount();
+
 	virtual float GetSampleRate();
 	virtual BufferBox GetSomeSamples(int num_samples);
 

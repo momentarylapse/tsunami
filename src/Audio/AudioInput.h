@@ -31,10 +31,14 @@ public:
 	int GetDelay();
 	void ResetSync();
 
+	void Accumulate(bool enable);
+	void ResetAccumulation();
+	int GetSampleCount();
+
 	virtual float GetSampleRate();
 	virtual BufferBox GetSomeSamples(int num_samples);
 
-	BufferBox current_buffer;
+	BufferBox current_buffer, buffer;
 	MidiData midi;
 
 	int type;

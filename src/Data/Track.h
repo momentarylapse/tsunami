@@ -10,6 +10,8 @@
 
 #include "Range.h"
 #include "BufferBox.h"
+#include "MidiData.h"
+#include "Rhythm.h"
 #include "AudioFile.h"
 #include "../Plugins/Effect.h"
 #include "../lib/types/rect.h"
@@ -23,67 +25,6 @@
 
 class BufferBox;
 class AudioFile;
-
-class Bar
-{
-public:
-	int num_beats;
-	int length;
-	int type;
-	int count;
-
-	enum{
-		TYPE_BAR,
-		TYPE_PAUSE
-	};
-
-	// editing
-	bool is_selected;
-	int x, width;
-};
-
-class Beat
-{
-public:
-	Beat(){}
-	Beat(int p, int bar, int beat);
-	int pos;
-	int bar_no;
-	int beat_no;
-};
-
-class BarCollection : public Array<Bar>
-{
-public:
-	Array<Beat> GetBeats(const Range &r);
-	int GetNextBeat(int pos);
-	Range GetRange();
-};
-
-class MidiNote
-{
-public:
-	MidiNote(){}
-	MidiNote(const Range &range, int pitch, float volume);
-	float GetFrequency();
-	Range range;
-	int pitch; //float freq;
-	float volume;
-};
-
-class MidiData : public Array<MidiNote>
-{
-public:
-	Array<MidiNote> GetNotes(const Range &r);
-	int GetNextNote(int pos);
-	Range GetRange();
-
-	void sort();
-
-	string synthesizer;
-	string instrument;
-	string options;
-};
 
 
 class TrackLevel

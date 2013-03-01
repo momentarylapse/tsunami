@@ -394,17 +394,6 @@ struct Package
 extern Array<Package> Packages;
 
 
-//--------------------------------------------------------------------------------------------------
-// other stuff
-
-
-class SuperArray : public DynamicArray
-{
-	public:
-	void init_by_type(Type *t);
-	int string_cfind(char *a, int start);
-};
-
 };
 
 #endif

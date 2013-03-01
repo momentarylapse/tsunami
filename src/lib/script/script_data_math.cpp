@@ -127,24 +127,24 @@ public:
 
 
 
-void super_array_add_s_com(SuperArray *a, SuperArray *b)
+void super_array_add_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) += *(pb ++);	}
-void super_array_sub_s_com(SuperArray *a, SuperArray *b)
+void super_array_sub_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) -= *(pb ++);	}
-void super_array_mul_s_com(SuperArray *a, SuperArray *b)
+void super_array_mul_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) *= *(pb ++);	}
-void super_array_div_s_com(SuperArray *a, SuperArray *b)
+void super_array_div_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) /= *(pb ++);	}
 
-void super_array_add_s_com_com(SuperArray *a, complex x)
+void super_array_add_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) += x;	}
-void super_array_sub_s_com_com(SuperArray *a, complex x)
+void super_array_sub_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) -= x;	}
-void super_array_mul_s_com_com(SuperArray *a, complex x)
+void super_array_mul_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
-void super_array_div_s_com_com(SuperArray *a, complex x)
+void super_array_div_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) /= x;	}
-void super_array_mul_s_com_float(SuperArray *a, float x)
+void super_array_mul_s_com_float(DynamicArray *a, float x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
 
 class FloatList : public Array<float>
@@ -459,6 +459,11 @@ void SIAddPackageMath()
 		class_add_element("x2",	TypeFloat,	4);
 		class_add_element("y1",	TypeFloat,	8);
 		class_add_element("y2",	TypeFloat,	12);
+		class_add_func("width",		TypeFloat,			mf((tmf)&rect::width));
+		class_add_func("height",	TypeFloat,			mf((tmf)&rect::height));
+		class_add_func("inside",	TypeBool,			mf((tmf)&rect::inside));
+			func_add_param("x",	TypeFloat);
+			func_add_param("y",	TypeFloat);
 		class_add_func("str",		TypeString,			mf((tmf)&rect::str));
 	
 	add_class(TypeColor);

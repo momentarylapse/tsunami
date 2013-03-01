@@ -10,31 +10,80 @@
 #ifndef _NET_INCLUDED_
 #define _NET_INCLUDED_
 
-#include "../types/types.h"
+
+class vector;
+class string;
 
 
-//--------------------------------------------------------------------//
-//                  all about networking                              //
-//--------------------------------------------------------------------//
+class Socket
+{
+public:
+	Socket();
+	~Socket();
+	Socket operator=(const Socket &other);
 
+	bool Create(int port);
+	bool Accept(Socket &con);
+	bool Connect(const string &addr, int port);
+	void Close();
+	void SetBlocking(bool blocking);
+	bool IsConnected();
 
-// general
-void _cdecl NetInit();
-void _cdecl NetClose(int &s);
-void _cdecl NetSetBlocking(int s, bool blocking);
-int _cdecl NetCreate(int port, bool blocking);
-int _cdecl NetAccept(int sh);
-int _cdecl NetConnect(const string &addr, int port);
-bool _cdecl NetConnectionLost(int s);
+	// send / receive directly
+	string Read();
+	bool Write(const string &buf);
+	bool CanWrite();
+	bool CanRead();
 
-// send / recieve directly
-string _cdecl NetRead(int s);
-int _cdecl NetWrite(int s, const string &buf);
-bool _cdecl NetReadyToWrite(int s);
-bool _cdecl NetReadyToRead(int s);
+	// buffered read
+	int ReadInt();
+	float ReadFloat();
+	bool ReadBool();
+	char ReadChar();
+	string ReadString();
+	vector ReadVector();
+	void operator>>(int &i);
+	void operator>>(float &f);
+	void operator>>(bool &b);
+	void operator>>(char &c);
+	void operator>>(string &s);
+	void operator>>(vector &v);
+	void _read_buffered_(void *p, int size);
+	void SetBufferPos(int pos);
+	int GetBufferPos();
+
+	// buffered write
+	void WriteInt(int i);
+	void WriteFloat(float f);
+	void WriteBool(bool b);
+	void WriteChar(char c);
+	void WriteString(const string &s);
+	void WriteVector(const vector &v);
+	void operator<<(int i){	WriteInt(i);	}
+	void operator<<(float f){	WriteFloat(f);	}
+	void operator<<(bool b){	WriteBool(b);	}
+	void operator<<(char c){	WriteChar(c);	}
+	void operator<<(const string &s){		WriteString(s);	}
+	void operator<<(const vector &v){		WriteVector(v);	}
+	bool WriteBuffer();
+
+	// kaba interface
+	void __init__();
+	void __delete__();
+	void __assign__(const Socket &other);
+private:
+	int uid;
+	int s;
+	string *buffer;
+	int buffer_pos;
+	bool last_op_reading;
+};
+
+void NetInit();
+
 
 // buffered data
-void _cdecl NetResetBuffer();
+/*void _cdecl NetResetBuffer();
 bool _cdecl NetReadBuffer(int s);
 bool _cdecl NetWriteBuffer(int s);
 // read from buffer
@@ -57,11 +106,9 @@ void _cdecl NetWriteBlockStart(int id);
 void _cdecl NetWriteBlockEnd();
 
 int NetGetBufferPos();
-void NetSetBufferPos(int pos);
+void NetSetBufferPos(int pos);*/
 
 // ...
-bool _cdecl NetSendBugReport(const string &sender, const string &program, const string &version, const string &comment, string &return_msg);
-
-extern float NetConnectTimeout;
+bool NetSendBugReport(const string &sender, const string &program, const string &version, const string &comment, string &return_msg);
 
 #endif

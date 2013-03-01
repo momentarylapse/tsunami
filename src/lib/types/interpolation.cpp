@@ -37,6 +37,10 @@ void Interpolator<T>::set_type(const string &_type)
 		type = TYPE_CUBIC_SPLINE_NOTANG;
 	else if (_type == "angular-lerp")
 		type = TYPE_ANGULAR_LERP;
+	else{
+		type = TYPE_LERP;
+		msg_error("unknown interpolator type: " + _type);
+	}
 	clear();
 }
 

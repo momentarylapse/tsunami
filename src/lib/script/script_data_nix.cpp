@@ -43,8 +43,7 @@ void SIAddPackageNix()
 		func_add_param("id",		TypeInt);
 	add_func("GetKeyDown",								TypeBool,	nix_p(&NixGetKeyDown));
 		func_add_param("id",		TypeInt);
-	add_func("GetKeyDownRep",							TypeBool,	nix_p(&NixGetKeyDownRep));
-		func_add_param("id",		TypeInt);
+	add_func("GetKeyDownRep",							TypeInt,	nix_p(&NixGetKeyDownRep));
 	add_func("GetKeyUp",								TypeBool,	nix_p(&NixGetKeyUp));
 		func_add_param("id",		TypeInt);
 	add_func("GetKeyChar",							TypeString,	nix_p(&NixGetKeyChar));

@@ -98,6 +98,9 @@ extern Type *TypePlaneList;
 extern Type *TypeStringList;
 extern Type *TypePlane;
 extern Type *TypePlaneList;
+extern Type *TypeSocket;
+extern Type *TypeSocketP;
+extern Type *TypeSocketList;
 
 
 #ifdef _X_ALLOW_GUI_
@@ -683,10 +686,9 @@ void SIAddPackageX()
 	add_ext_var("NetIAmClient",		 TypeBool,		x_p(&NetIAmClient));
 	add_ext_var("NetHasRead",		TypeBool,		x_p(&NetHasRead));
 	add_ext_var("NetHasWritten",	TypeBool,		x_p(&NetHasWritten));
-	add_ext_var("NumClients",		TypeInt,		x_p(&NumClients));
-	add_ext_var("SocketToHost",		TypeInt,		x_p(&SocketToHost));
-	add_ext_var("SocketToClient",	TypeIntList,	x_p(&SocketToClient));
-	add_ext_var("CurrentSocket",	TypeInt,		x_p(&CurrentSocket));
+	add_ext_var("SocketToHost",		TypeSocket,		x_p(&SocketToHost));
+	add_ext_var("SocketToClient",	TypeSocketList,	x_p(&SocketToClient));
+	add_ext_var("CurrentSocket",	TypeSocketP,	x_p(&CurrentSocket));
 	add_ext_var("Debug",			TypeBool,		meta_p(&Debug));
 	add_ext_var("ShowTimings",		TypeBool,		meta_p(&ShowTimings));
 	add_ext_var("WireMode",			TypeBool,		meta_p(&WireMode));

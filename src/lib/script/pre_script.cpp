@@ -1170,13 +1170,13 @@ void PreScript::FindFunctionSingleParameter(int p, Type **WantedType, Function *
 
 	WantedType[p] = TypeUnknown;
 	if (cmd->kind == KindFunction){
-		if (cmd->script)
-			WantedType[p] = cmd->script->pre_script->Functions[cmd->link_nr]->literal_param_type[p];
-		else
-			WantedType[p] = Functions[cmd->link_nr]->literal_param_type[p];
+		Function *ff = cmd->script ? cmd->script->pre_script->Functions[cmd->link_nr] : Functions[cmd->link_nr];
+		if (p < ff->num_params)
+			WantedType[p] = ff->literal_param_type[p];
+	}else if (cmd->kind == KindCompilerFunction){
+		if (p < PreCommands[cmd->link_nr].param.num)
+			WantedType[p] = PreCommands[cmd->link_nr].param[p].type;
 	}
-	if (cmd->kind == KindCompilerFunction)
-		WantedType[p] = PreCommands[cmd->link_nr].param[p].type;
 	// link parameters
 	cmd->param[p] = Param;
 	msg_db_l(4);
@@ -1608,6 +1608,22 @@ bool PreScript::LinkOperator(int op_no, Command *param1, Command *param2, Comman
 				msg_db_l(4);
 				return true;
 			}
+
+	// exact match as class function but missing a "&"?
+	foreach(ClassFunction &f, p1->function)
+		if (f.name == op_func_name){
+			if (f.param_type[0]->is_pointer && f.param_type[0]->is_silent)
+				if (direct_type_match(p2, f.param_type[0]->parent)){
+					Command *inst = param1;
+					ref_command(this, inst);
+					CommandSetClassFunc(this, p1, *cmd, f, inst);
+					(*cmd)->num_params = 1;
+					(*cmd)->param[0] = param2;
+					ref_command(this, (*cmd)->param[0]);
+					msg_db_l(4);
+					return true;
+				}
+		}
 
 
 	// needs type casting?
@@ -2818,9 +2834,10 @@ void conv_cbr(PreScript *ps, Command *&c, int var)
 	so(c->num_params);
 	for (int i=0;i<c->num_params;i++)
 		conv_cbr(ps, c->param[i], var);
-	if (c->kind == KindBlock)
+	if (c->kind == KindBlock){
 		foreach(Command *cc, ps->Blocks[c->link_nr]->command)
 			conv_cbr(ps, cc, var);
+	}
 	if (c->instance)
 		conv_cbr(ps, c->instance, var);
 	so("a");

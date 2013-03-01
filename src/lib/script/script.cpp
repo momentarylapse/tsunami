@@ -23,7 +23,7 @@
 
 namespace Script{
 
-string Version = "0.10.3.0";
+string Version = "0.10.5.0";
 
 //#define ScriptDebug
 
@@ -656,27 +656,23 @@ void OCAddEspAdd(char *oc,int &ocs,int d)
 	}
 }
 
-void init_sub_super_array(PreScript *ps, Function *f, Type *t, char* g_var, int offset)
+void init_all_global_objects(PreScript *ps, Function *f, Array<char*> &g_var)
 {
-	// direct
-	if (t->is_super_array){
-		if (g_var)
-			((DynamicArray*)(g_var + offset))->init(t->parent->size);
-		if (f){}
+	foreachi(LocalVariable &v, f->var, i){
+		foreach(ClassFunction &f, v.type->function){
+			typedef void init_func(void *);
+			if (f.name == "__init__"){ // TODO test signature "void __init__()"
+				//msg_write("global init: " + v.type->name);
+				init_func *ff = NULL;
+				if (f.kind == KindCompilerFunction)
+					ff = (init_func*)PreCommands[f.nr].func;
+				else if (f.kind == KindFunction)
+					ff = (init_func*)ps->script->func[f.nr];
+				if (ff)
+					ff(g_var[i]);
+			}
+		}
 	}
-
-	// indirect
-	if (t->is_array)
-		for (int i=0;i<t->array_length;i++)
-			init_sub_super_array(ps, f, t->parent, g_var, offset + i * t->parent->size);
-	for (int i=0;i<t->element.num;i++)
-		init_sub_super_array(ps, f, t->element[i].type, g_var, offset + t->element[i].offset);
-}
-
-void find_all_super_arrays(PreScript *ps, Function *f, Array<char*> &g_var)
-{
-	for (int i=0;i<f->var.num;i++)
-		init_sub_super_array(ps, f, f->var[i].type, g_var[i], 0);
 }
 
 void Script::AllocateMemory()
@@ -764,8 +760,6 @@ void Script::MapGlobalVariablesToMemory()
 		MemorySize += mem_align(pre_script->RootOfAllEvil.var[i].type->size);
 	}
 	memset(Memory, 0, MemorySize); // reset all global variables to 0
-	// initialize global super arrays
-	find_all_super_arrays(pre_script, &pre_script->RootOfAllEvil, g_var);
 }
 
 static int OCORA;
@@ -943,6 +937,10 @@ void Script::Compiler()
 
 	if (pre_script->FlagCompileOS)
 		LinkOsEntryPoint();
+
+
+	// initialize global super arrays and objects
+	init_all_global_objects(pre_script, &pre_script->RootOfAllEvil, g_var);
 
 	//msg_db_out(1,GetAsm(Opcode,OpcodeSize));
 

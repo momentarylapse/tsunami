@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.10.4.0";
+string DataVersion = "0.10.5.0";
 
 
 
@@ -60,6 +60,8 @@ Type *TypeQuaternion;
  // internal:
 Type *TypePointerPs;
 Type *TypePointerList;
+Type *TypeCharPs;
+Type *TypeBoolPs;
 Type *TypeBoolList;
 Type *TypeIntPs;
 Type *TypeIntList;
@@ -369,32 +371,6 @@ void func_add_param(const string &name, Type *type)
 		cur_class_func->param_type.add(type);
 }
 
-void SuperArray::init_by_type(Type *t)
-{	init(t->size);	}
-
-/*string super_array_add_str(string *a, string *b)
-{
-	string r;
-	//r.init(1); // done by kaba-constructors for temp variables
-	r.assign(a);
-	r.append(b);
-	return r;
-}
-
-void super_array_assign_str_cstr(string *a, char *b)
-{
-	int l = strlen(b);
-	a->resize(l);
-	memcpy((char*)a->data, b, l);
-}
-
-void super_array_add_str_cstr(string *a, char *b)
-{
-	int n_old = a->num;
-	int l = strlen(b);
-	a->resize(a->num + l);
-	memcpy(&((char*)a->data)[n_old], b, l);
-}*/
 
 bool type_is_simple_class(Type *t)
 {
@@ -423,16 +399,16 @@ void script_make_super_array(Type *t, PreScript *ps)
 		class_add_element("num", TypeInt, PointerSize);
 
 		// always usable operations
-		class_add_func("swap", TypeVoid, mf((tmf)&SuperArray::swap));
+		class_add_func("swap", TypeVoid, mf((tmf)&DynamicArray::swap));
 			func_add_param("i1",		TypeInt);
 			func_add_param("i2",		TypeInt);
-		class_add_func("iterate", TypeBool, mf((tmf)&SuperArray::iterate));
+		class_add_func("iterate", TypeBool, mf((tmf)&DynamicArray::iterate));
 			func_add_param("pointer",		TypePointerPs);
-		class_add_func("iterate_back", TypeBool, mf((tmf)&SuperArray::iterate_back));
+		class_add_func("iterate_back", TypeBool, mf((tmf)&DynamicArray::iterate_back));
 			func_add_param("pointer",		TypePointerPs);
-		class_add_func("index", TypeInt, mf((tmf)&SuperArray::index));
+		class_add_func("index", TypeInt, mf((tmf)&DynamicArray::index));
 			func_add_param("pointer",		TypePointer);
-		class_add_func("subarray", t, mf((tmf)&SuperArray::ref_subarray));
+		class_add_func("subarray", t, mf((tmf)&DynamicArray::ref_subarray));
 			func_add_param("start",		TypeInt);
 			func_add_param("num",		TypeInt);
 
@@ -440,47 +416,47 @@ void script_make_super_array(Type *t, PreScript *ps)
 			if (!t->parent->UsesCallByReference()){
 				if (t->parent->size == 4){
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<int>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&SuperArray::append_4_single));
+					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_4_single));
 						func_add_param("x",		t->parent);
-					class_add_func("insert", TypeVoid, mf((tmf)&SuperArray::insert_4_single));
+					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_4_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 1){
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<char>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&SuperArray::append_1_single));
+					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_1_single));
 						func_add_param("x",		t->parent);
-					class_add_func("insert", TypeVoid, mf((tmf)&SuperArray::insert_1_single));
+					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_1_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}
 			}else{
-				class_add_func("add", TypeVoid, mf((tmf)&SuperArray::append_single));
+				class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_single));
 					func_add_param("x",		t->parent);
-				class_add_func("insert", TypeVoid, mf((tmf)&SuperArray::insert_single));
+				class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_single));
 					func_add_param("x",		t->parent);
 					func_add_param("index",		TypeInt);
 			}
-			class_add_func("__delete__",	TypeVoid, mf((tmf)&SuperArray::clear));
-			class_add_func("clear", TypeVoid, mf((tmf)&SuperArray::clear));
-			class_add_func("__assign__", TypeVoid, mf((tmf)&SuperArray::assign));
+			class_add_func("__delete__",	TypeVoid, mf((tmf)&DynamicArray::clear));
+			class_add_func("clear", TypeVoid, mf((tmf)&DynamicArray::clear));
+			class_add_func("__assign__", TypeVoid, mf((tmf)&DynamicArray::assign));
 				func_add_param("other",		t);
-			class_add_func("remove", TypeVoid, mf((tmf)&SuperArray::delete_single));
+			class_add_func("remove", TypeVoid, mf((tmf)&DynamicArray::delete_single));
 				func_add_param("index",		TypeInt);
-			class_add_func("removep", TypeVoid, mf((tmf)&SuperArray::delete_single_by_pointer));
+			class_add_func("removep", TypeVoid, mf((tmf)&DynamicArray::delete_single_by_pointer));
 				func_add_param("pointer",		TypePointer);
-			class_add_func("resize", TypeVoid, mf((tmf)&SuperArray::resize));
+			class_add_func("resize", TypeVoid, mf((tmf)&DynamicArray::resize));
 				func_add_param("num",		TypeInt);
-			class_add_func("ensure_size", TypeVoid, mf((tmf)&SuperArray::ensure_size));
+			class_add_func("ensure_size", TypeVoid, mf((tmf)&DynamicArray::ensure_size));
 				func_add_param("num",		TypeInt);
 		}
 
 		// low level operations
-		class_add_func("__mem_init__", TypeVoid, mf((tmf)&SuperArray::init));
+		class_add_func("__mem_init__", TypeVoid, mf((tmf)&DynamicArray::init));
 			func_add_param("element_size",		TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, mf((tmf)&SuperArray::clear));
-		class_add_func("__mem_resize__", TypeVoid, mf((tmf)&SuperArray::resize));
+		class_add_func("__mem_clear__", TypeVoid, mf((tmf)&DynamicArray::clear));
+		class_add_func("__mem_resize__", TypeVoid, mf((tmf)&DynamicArray::resize));
 			func_add_param("size",		TypeInt);
-		class_add_func("__mem_remove__", TypeVoid, mf((tmf)&SuperArray::delete_single));
+		class_add_func("__mem_remove__", TypeVoid, mf((tmf)&DynamicArray::delete_single));
 			func_add_param("index",		TypeInt);
 	msg_db_l(4);
 }
@@ -680,6 +656,7 @@ void SIAddPackageBase()
 	TypePointerPs		= add_type_p("void*&",		TypePointer, FLAG_SILENT);
 	TypePointerList		= add_type_a("void*[]",		TypePointer, -1);
 	TypeBool			= add_type  ("bool",		sizeof(bool), FLAG_CALL_BY_VALUE);
+	TypeBoolPs			= add_type_p("bool&",		TypeBool, FLAG_SILENT);
 	TypeBoolList		= add_type_a("bool[]",		TypeBool, -11);
 	TypeInt				= add_type  ("int",			sizeof(int), FLAG_CALL_BY_VALUE);
 	TypeIntPs			= add_type_p("int&",		TypeInt, FLAG_SILENT);
@@ -691,6 +668,7 @@ void SIAddPackageBase()
 	TypeFloatArrayP		= add_type_p("float[?]*",	TypeFloatArray);
 	TypeFloatList		= add_type_a("float[]",		TypeFloat, -1);
 	TypeChar			= add_type  ("char",		sizeof(char), FLAG_CALL_BY_VALUE);
+	TypeCharPs			= add_type_p("char&",		TypeChar, FLAG_SILENT);
 	TypeCString			= add_type_a("cstring",		TypeChar, 256);	// cstring := char[256]
 	TypeString			= add_type_a("string",		TypeChar, -1);	// string := char[]
 	TypeStringList		= add_type_a("string[]",	TypeString, -1);

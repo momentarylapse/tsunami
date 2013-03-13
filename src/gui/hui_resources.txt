@@ -3048,7 +3048,7 @@ track_time_dialog
 0
 
 
-28
+33
 ControlTable
 td_table_1
 
@@ -3056,7 +3056,7 @@ td_table_1
 0
 0
 1
-9
+11
 -1
 0
 0
@@ -3089,7 +3089,7 @@ ld_t_volume
 td_table_1
 
 Text
-ld_t_effects
+ld_t_panning
 
 1
 0
@@ -3101,8 +3101,34 @@ ld_t_effects
 0
 td_table_1
 
+Text
+ld_t_effects
+
+1
+0
+6
+0
+0
+0
+0
+0
+td_table_1
+
+Text
+ld_t_bars
+
+1
+0
+8
+0
+0
+0
+0
+0
+td_table_1
+
 ControlTable
-td_table_2
+td_table_name
 
 1
 0
@@ -3115,7 +3141,7 @@ td_table_2
 td_table_1
 
 ControlTable
-td_table_3
+td_table_vol
 
 1
 0
@@ -3128,11 +3154,37 @@ td_table_3
 td_table_1
 
 ControlTable
-td_table_4
+td_table_pan
 
 1
 0
 5
+5
+1
+0
+0
+0
+td_table_1
+
+ControlTable
+td_table_fx
+
+1
+0
+7
+3
+2
+0
+0
+0
+td_table_1
+
+ControlTable
+td_table_bar
+
+1
+0
+9
 3
 2
 0
@@ -3145,35 +3197,9 @@ td_table_7
 
 1
 0
-8
+10
 2
 1
-0
-0
-0
-td_table_1
-
-Text
-ld_t_bars
-
-1
-0
-6
-0
-0
-0
-0
-0
-td_table_1
-
-ControlTable
-td_table_8
-
-1
-0
-7
-3
-2
 0
 0
 0
@@ -3190,7 +3216,7 @@ name
 0
 0
 0
-td_table_2
+td_table_name
 
 Slider
 volume_slider
@@ -3203,7 +3229,7 @@ volume_slider
 0
 0
 0
-td_table_3
+td_table_vol
 
 ControlTable
 td_table_6
@@ -3216,7 +3242,7 @@ td_table_6
 0
 0
 0
-td_table_3
+td_table_vol
 
 ListView
 fx_list
@@ -3229,7 +3255,7 @@ fx_list
 0
 0
 0
-td_table_4
+td_table_fx
 
 ControlTable
 td_table_5
@@ -3242,7 +3268,7 @@ td_table_5
 0
 0
 0
-td_table_4
+td_table_fx
 
 Button
 add_effect
@@ -3359,7 +3385,7 @@ bar_list
 0
 0
 0
-td_table_8
+td_table_bar
 
 ControlTable
 td_table_10
@@ -3372,7 +3398,7 @@ td_table_10
 0
 0
 0
-td_table_8
+td_table_bar
 
 Button
 add_bar
@@ -3412,6 +3438,45 @@ hui:delete
 0
 0
 td_table_10
+
+Slider
+panning_slider
+
+1
+2
+0
+0
+0
+0
+0
+0
+td_table_pan
+
+SpinButton
+panning
+
+1
+3
+0
+0
+0
+0
+0
+0
+td_table_pan
+
+Text
+percent
+
+1
+4
+0
+0
+0
+0
+0
+0
+td_table_pan
 
 // Resource
 SizableDialog
@@ -3771,7 +3836,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-212
+213
 // Text
 about
 Info
@@ -3945,6 +4010,8 @@ ld_t_effects
 !bold\\Effekte
 ld_t_name
 !bold\\Name
+ld_t_panning
+!bold\\Balance
 ld_t_repdelay
 Abstand:
 ld_t_repetition
@@ -4021,6 +4088,10 @@ ok
 OK
 open
 Öffnen
+panning
+!noexpandx\\0\\-100\\100\\0.1
+panning_slider
+
 paste
 Einfügen
 pause
@@ -4115,25 +4186,21 @@ td_table_1
 ControlTable 1
 td_table_10
 !noexpandy
-td_table_2
-!noexpandy
-td_table_3
-!noexpandy
-td_table_4
-
 td_table_5
 !noexpandy
 td_table_6
 !noexpandy
 td_table_7
 !noexpandy
-td_table_8
+td_table_bar
 
 td_table_fx
 
 td_table_fx_con
 !noexpandy
 td_table_name
+!noexpandy
+td_table_pan
 !noexpandy
 td_table_sam_con
 !noexpandy
@@ -4203,7 +4270,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-212
+213
 // Text
 about
 
@@ -4377,6 +4444,8 @@ ld_t_effects
 !bold\\Effects
 ld_t_name
 !bold\\Name:
+ld_t_panning
+
 ld_t_repdelay
 
 ld_t_repetition
@@ -4453,6 +4522,10 @@ ok
 OK
 open
 Open...
+panning
+
+panning_slider
+
 paste
 Paste
 pause
@@ -4547,25 +4620,21 @@ td_table_1
 
 td_table_10
 
-td_table_2
-
-td_table_3
-
-td_table_4
-
 td_table_5
 
 td_table_6
 
 td_table_7
 
-td_table_8
+td_table_bar
 
 td_table_fx
 
 td_table_fx_con
 
 td_table_name
+
+td_table_pan
 
 td_table_sam_con
 

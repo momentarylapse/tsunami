@@ -170,8 +170,8 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteFloat(t->volume);
 	f->WriteBool(t->muted);
 	f->WriteInt(t->type);
+	f->WriteFloat(t->panning);
 	f->WriteInt(0); // reserved
-	f->WriteInt(0);
 	f->WriteInt(0);
 
 	foreach(Bar &b, t->bar)
@@ -660,8 +660,8 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	t->volume = f->ReadFloat();
 	t->muted = f->ReadBool();
 	t->type = f->ReadInt();
+	t->panning = f->ReadFloat();
 	f->ReadInt(); // reserved
-	f->ReadInt();
 	f->ReadInt();
 	tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());
 

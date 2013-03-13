@@ -30,6 +30,7 @@ public:
 	void OnName();
 	void OnVolume();
 	void OnMute();
+	void OnPanning();
 
 	void SetTrack(Track *t);
 
@@ -37,6 +38,7 @@ public:
 
 	Track *track;
 	Slider *volume_slider;
+	Slider *panning_slider;
 	FxList *fx_list;
 	BarList *bar_list;
 };

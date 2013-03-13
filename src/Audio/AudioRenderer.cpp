@@ -58,7 +58,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 
 			BufferBox sbuf = s->ReadBuffers(0, intersect_range);
 			buf.make_own();
-			buf.add(sbuf, bpos, s->volume);
+			buf.add(sbuf, bpos, s->volume, 0);
 		}
 	}
 
@@ -176,7 +176,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 
 		// first (un-muted) track
 		bb_render_track_fx(buf, audio->track[i0]);
-		buf.scale(audio->track[i0]->volume);
+		buf.scale(audio->track[i0]->volume, audio->track[i0]->panning);
 
 		// other tracks
 		for (int i=i0+1;i<audio->track.num;i++){
@@ -185,7 +185,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 			BufferBox tbuf;
 			bb_render_track_fx(tbuf, audio->track[i]);
 			buf.make_own();
-			buf.add(tbuf, 0, audio->track[i]->volume);
+			buf.add(tbuf, 0, audio->track[i]->volume, audio->track[i]->panning);
 		}
 
 		buf.scale(audio->volume);

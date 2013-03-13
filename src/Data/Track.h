@@ -55,6 +55,7 @@ public:
 	void SetName(const string &name);
 	void SetMuted(bool muted);
 	void SetVolume(float volume);
+	void SetPanning(float panning);
 	BufferBox GetBuffers(int level_no, const Range &r);
 	Track *AddEmptySubTrack(const Range &r, const string &name);
 	void InsertMidiData(int offset, MidiData &midi);
@@ -74,7 +75,7 @@ public:
 	Array<TrackLevel> level;
 	int length, pos; // sub
 
-	float volume;
+	float volume, panning;
 	bool muted;
 
 	// repetition

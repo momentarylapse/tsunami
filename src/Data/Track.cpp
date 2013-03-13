@@ -13,6 +13,7 @@
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
+#include "../Action/Track/Data/ActionTrackEditPanning.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 
 
@@ -21,6 +22,7 @@ Track::Track()
 	type = TYPE_AUDIO;
 	muted = false;
 	volume = 1;
+	panning = 0;
 	root = NULL;
 	parent = -1;
 	length = 0;
@@ -50,6 +52,7 @@ void Track::Reset()
 	area = rect(0, 0, 0, 0);
 	volume = 1;
 	muted = false;
+	panning = 0;
 	bar.clear();
 	fx.clear();
 	sub.clear();
@@ -215,7 +218,7 @@ BufferBox Track::ReadBuffersCol(const Range &r)
 	// fill with overlapp
 	foreach(TrackLevel &l, level)
 		foreach(BufferBox &b, l.buffer)
-			buf.add(b, b.offset - r.offset, 1.0f);
+			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
 
 	msg_db_l(1);
 	return buf;
@@ -258,6 +261,11 @@ void Track::SetMuted(bool muted)
 void Track::SetVolume(float volume)
 {
 	root->Execute(new ActionTrackEditVolume(this, volume));
+}
+
+void Track::SetPanning(float panning)
+{
+	root->Execute(new ActionTrackEditPanning(this, panning));
 }
 
 Track *Track::AddEmptySubTrack(const Range &r, const string &name)

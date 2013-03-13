@@ -21,6 +21,7 @@ TrackDialog::TrackDialog(CHuiWindow *win):
 	win->EmbedDialog("track_time_dialog", 0, 0);
 	win->SetDecimals(1);
 	volume_slider = new Slider(win, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&TrackDialog::OnVolume, 0, this);
+	panning_slider = new Slider(win, "panning_slider", "panning", -1, 1, 100, (void(HuiEventHandler::*)())&TrackDialog::OnPanning, 0, this);
 	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect");
 	bar_list = new BarList(win, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
@@ -45,6 +46,7 @@ void TrackDialog::LoadData()
 {
 	Enable("name", track);
 	Enable("mute", track);
+	panning_slider->Enable(track);
 	fx_list->SetTrack(track);
 	bar_list->SetTrack(track);
 	if (track){
@@ -52,6 +54,7 @@ void TrackDialog::LoadData()
 		Check("mute", track->muted);
 		volume_slider->Set(track->volume);
 		volume_slider->Enable(!track->muted);
+		panning_slider->Set(track->panning);
 	}else{
 		volume_slider->Enable(false);
 	}
@@ -76,6 +79,11 @@ void TrackDialog::OnVolume()
 void TrackDialog::OnMute()
 {
 	track->SetMuted(IsChecked(""));
+}
+
+void TrackDialog::OnPanning()
+{
+	track->SetPanning(panning_slider->Get());
 }
 
 void TrackDialog::OnClose()

@@ -31,12 +31,12 @@ public:
 	void resize(int length);
 	bool is_ref();
 	void make_own();
-	void scale(float volume);
+	void scale(float volume, float panning = 0);
 	void swap_ref(BufferBox &b);
 	void swap_value(BufferBox &b);
 	void append(BufferBox &b);
 	void set(const BufferBox &b, int offset, float volume);
-	void add(const BufferBox &b, int offset, float volume);
+	void add(const BufferBox &b, int offset, float volume, float panning);
 	void set_16bit(const void *b, int offset, int length);
 	void set_as_ref(const BufferBox &b, int offset, int length);
 	void import(void *data, int channels, int bits, int samples);

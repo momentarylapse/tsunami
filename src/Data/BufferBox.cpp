@@ -10,6 +10,7 @@
 #include <assert.h>
 
 
+
 BufferBox::BufferBox()
 {
 	offset = 0;
@@ -119,35 +120,40 @@ void BufferBox::swap_value(BufferBox &b)
 	b.peak.clear();
 }
 
-void BufferBox::scale(float volume)
+void BufferBox::scale(float volume, float panning)
 {
-	if (volume != 1.0f){
-		make_own();
+	if ((volume == 1.0f) && (panning == 0))
+		return;
+	make_own();
 
-		// scale
-		for (int i=0;i<r.num;i++){
-			r[i] *= volume;
-			l[i] *= volume;
-		}
+	float f_r = volume * sin((panning + 1) / 4 * M_PI) * sqrt(2);
+	float f_l = volume * cos((panning + 1) / 4 * M_PI) * sqrt(2);
+
+	// scale
+	for (int i=0;i<r.num;i++){
+		r[i] *= f_r;
+		l[i] *= f_l;
 	}
 }
 
-void BufferBox::add(const BufferBox &b, int offset, float volume)
+void BufferBox::add(const BufferBox &b, int offset, float volume, float panning)
 {
 	// relative to b
 	int i0 = max(0, -offset);
 	int i1 = min(b.r.num, r.num - offset);
 
 	// add buffers
-	if (volume == 1.0f){
+	if ((volume == 1.0f) && (panning == 0.0f)){
 		for (int i=i0;i<i1;i++){
 			r[i + offset] += b.r[i];
 			l[i + offset] += b.l[i];
 		}
 	}else{
+		float f_r = volume * sin((panning + 1) / 4 * M_PI) * sqrt(2);
+		float f_l = volume * cos((panning + 1) / 4 * M_PI) * sqrt(2);
 		for (int i=i0;i<i1;i++){
-			r[i + offset] += b.r[i] * volume;
-			l[i + offset] += b.l[i] * volume;
+			r[i + offset] += b.r[i] * f_r;
+			l[i + offset] += b.l[i] * f_l;
 		}
 	}
 }

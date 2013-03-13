@@ -176,7 +176,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	while(e>=0){
 		string name = t.name;
 		//if ((strcmp(t.name,".")!=0)&&(strcmp(t.name,"..")!=0)&&(strstr(t.name,"~")==NULL)){
-		if ((name != ".") && (name.back() != '~')){
+		if ((name != ".") && (name != "..") && (name.back() != '~')){
 			if ((name.match(filter))|| ((show_directories)&&(t.attrib==_A_SUBDIR)) ){
 				entry.name = name;
 				entry.is_dir = (t.attrib == _A_SUBDIR);
@@ -199,7 +199,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 	while(dn){
 		//if ((strcmp(dn->d_name,".")!=0)&&(strcmp(dn->d_name,"..")!=0)&&(!strstr(dn->d_name,"~"))){
 		string name = dn->d_name;
-		if ((name != ".") && (name.back() != '~')){
+		if ((name != ".") && (name != "..") && (name.back() != '~')){
 			string ffn = dir2 + name;
 			stat(ffn.c_str(), &s);
 			bool is_reg=(s.st_mode & S_IFREG)>0;

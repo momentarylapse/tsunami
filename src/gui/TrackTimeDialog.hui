@@ -1,23 +1,25 @@
 	// dialog
 	TrackDialog = HuiCreateSizableDialog("Rhythmus Spur", 380, 516, MainWin, false);
 	TrackDialog->SetID("track_time_dialog");
-	TrackDialog->AddControlTable("", 0, 0, 1, 9, "td_table_1");
+	TrackDialog->AddControlTable("", 0, 0, 1, 11, "td_table_1");
 	TrackDialog->SetTarget("td_table_1", 0);
 	TrackDialog->AddText("!bold\\Name", 0, 0, 0, 0, "ld_t_name");
 	TrackDialog->AddText("!bold\\Lautst&arke", 0, 2, 0, 0, "ld_t_volume");
-	TrackDialog->AddText("!bold\\Effekte", 0, 4, 0, 0, "ld_t_effects");
-	TrackDialog->AddControlTable("!noexpandy", 0, 1, 3, 1, "td_table_2");
-	TrackDialog->AddControlTable("!noexpandy", 0, 3, 3, 2, "td_table_3");
-	TrackDialog->AddControlTable("", 0, 5, 3, 2, "td_table_4");
-	TrackDialog->AddControlTable("!noexpandy", 0, 8, 2, 1, "td_table_7");
-	TrackDialog->AddText("!bold\\Takte", 0, 6, 0, 0, "ld_t_bars");
-	TrackDialog->AddControlTable("", 0, 7, 3, 2, "td_table_8");
-	TrackDialog->SetTarget("td_table_2", 0);
+	TrackDialog->AddText("!bold\\Balance", 0, 4, 0, 0, "ld_t_panning");
+	TrackDialog->AddText("!bold\\Effekte", 0, 6, 0, 0, "ld_t_effects");
+	TrackDialog->AddText("!bold\\Takte", 0, 8, 0, 0, "ld_t_bars");
+	TrackDialog->AddControlTable("!noexpandy", 0, 1, 3, 1, "td_table_name");
+	TrackDialog->AddControlTable("!noexpandy", 0, 3, 3, 2, "td_table_vol");
+	TrackDialog->AddControlTable("!noexpandy", 0, 5, 5, 1, "td_table_pan");
+	TrackDialog->AddControlTable("", 0, 7, 3, 2, "td_table_fx");
+	TrackDialog->AddControlTable("", 0, 9, 3, 2, "td_table_bar");
+	TrackDialog->AddControlTable("!noexpandy", 0, 10, 2, 1, "td_table_7");
+	TrackDialog->SetTarget("td_table_name", 0);
 	TrackDialog->AddEdit("", 2, 0, 0, 0, "name");
-	TrackDialog->SetTarget("td_table_3", 0);
+	TrackDialog->SetTarget("td_table_vol", 0);
 	TrackDialog->AddSlider("", 2, 0, 0, 0, "volume_slider");
 	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_6");
-	TrackDialog->SetTarget("td_table_4", 0);
+	TrackDialog->SetTarget("td_table_fx", 0);
 	TrackDialog->AddListView("!nobar\\Effekte", 2, 0, 0, 0, "fx_list");
 	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_5");
 	TrackDialog->SetTarget("td_table_5", 0);
@@ -35,7 +37,7 @@
 	TrackDialog->AddCheckBox("Stumm", 2, 0, 0, 0, "mute");
 	TrackDialog->AddSpinButton("\\0\\1000\\0.1", 0, 0, 0, 0, "volume");
 	TrackDialog->AddText("%", 1, 0, 0, 0, "percent");
-	TrackDialog->SetTarget("td_table_8", 0);
+	TrackDialog->SetTarget("td_table_bar", 0);
 	TrackDialog->AddListView("!format=tTTT\\#\\Schl&age\\Bpm\\Anzahl", 2, 0, 0, 0, "bar_list");
 	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_10");
 	TrackDialog->SetTarget("td_table_10", 0);
@@ -45,6 +47,10 @@
 	TrackDialog->SetImage("add_bar_pause", "hui:add");
 	TrackDialog->AddButton("", 2, 0, 0, 0, "delete_bar");
 	TrackDialog->SetImage("delete_bar", "hui:delete");
+	TrackDialog->SetTarget("td_table_pan", 0);
+	TrackDialog->AddSlider("", 2, 0, 0, 0, "panning_slider");
+	TrackDialog->AddSpinButton("!noexpandx\\0\\-100\\100\\0.1", 3, 0, 0, 0, "panning");
+	TrackDialog->AddText("%", 4, 0, 0, 0, "percent");
 	TrackDialog->Update();
 
 

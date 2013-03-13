@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-168
+169
 // Data (ID,Text)
 about
 
@@ -119,6 +119,8 @@ ld_t_effects
 !bold\\Effects
 ld_t_name
 !bold\\Name:
+ld_t_panning
+
 ld_t_repdelay
 
 ld_t_repetition
@@ -187,6 +189,8 @@ ok
 OK
 open
 Open...
+panning
+
 paste
 Paste
 pause
@@ -271,10 +275,6 @@ td_table_1
 
 td_table_10
 
-td_table_2
-
-td_table_3
-
 td_table_5
 
 td_table_6
@@ -284,6 +284,8 @@ td_table_7
 td_table_fx_con
 
 td_table_name
+
+td_table_pan
 
 td_table_sam_con
 
@@ -340,7 +342,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-86
+87
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -415,6 +417,8 @@ Es muss mindestens eine Spur existieren
 Failed writing header to output stream\n
 
 Falsche Version des Dateiformats: %d  (%d erwartet)
+
+Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)
 
 Fehler
 Error

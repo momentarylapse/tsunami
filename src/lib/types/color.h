@@ -30,7 +30,7 @@ public:
 	void operator *= (const color &c)
 	{	a*=c.a;	r*=c.r;	g*=c.g;	b*=c.b;	}
 	void clamp();
-	string str()
+	string str() const
 	{	return format("(%f, %f, %f, %f)", r, g, b, a);	}
 };
 // colors

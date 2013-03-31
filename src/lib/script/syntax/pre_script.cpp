@@ -1,5 +1,6 @@
-#include "script.h"
-#include "../file/file.h"
+#include "../script.h"
+#include "../asm/asm.h"
+#include "../../file/file.h"
 #include <stdio.h>
 
 namespace Script{
@@ -403,20 +404,18 @@ void CreateAsmMetaInfo(PreScript* ps)
 {
 	msg_db_r("CreateAsmMetaInfo",5);
 	//msg_error("zu coden: CreateAsmMetaInfo");
-	sAsmMetaInfo *m=(sAsmMetaInfo*)ps->AsmMetaInfo;
-	if (!m){
-		m=new sAsmMetaInfo;
-		ps->AsmMetaInfo = (char*)m;
-		m->Mode16 = ps->FlagCompileInitialRealMode;
-		m->CodeOrigin=0; // FIXME:  &Opcode[0] ????
+	if (!ps->AsmMetaInfo){
+		ps->AsmMetaInfo = new Asm::MetaInfo;
+		ps->AsmMetaInfo->Mode16 = ps->FlagCompileInitialRealMode;
+		ps->AsmMetaInfo->CodeOrigin = 0; // FIXME:  &Opcode[0] ????
 	}
-	m->Opcode=cur_script->Opcode;
-	m->GlobalVar.clear();
+	ps->AsmMetaInfo->Opcode = cur_script->Opcode;
+	ps->AsmMetaInfo->global_var.clear();
 	for (int i=0;i<ps->RootOfAllEvil.var.num;i++){
-		sAsmGlobalVar v;
+		Asm::GlobalVar v;
 		v.Name = ps->RootOfAllEvil.var[i].name;
 		v.Pos = cur_script->g_var[i];
-		m->GlobalVar.add(v);
+		ps->AsmMetaInfo->global_var.add(v);
 	}
 	msg_db_l(5);
 }
@@ -3003,36 +3002,10 @@ void PreScript::Simplify()
 	msg_db_l(2);
 }
 
-void PreScript::BreakDownHighLevelOperators()
-{
-	msg_db_r("BreakDownHighLevelOperators", 4);
-	
-	for (int i=0;i<Commands.num;i++){
-		Command *c = Commands[i];
-		if (c->kind != KindOperator)
-			continue;
-		/*switch(c->LinkNr){
-			case OperatorClassAssign:
-				for (int i=0;i<signed(c->Param[0]->Type->Size)/4;i++){
-				OCAddInstruction(Opcode,OpcodeSize,inMovEaxM,pk[1],param[1],i*4);
-				OCAddInstruction(Opcode,OpcodeSize,inMovMEax,pk[0],param[0],i*4);
-			}
-			for (int i=4*signed(com->Param[0]->Type->Size/4);i<signed(com->Param[0]->Type->Size);i++){
-				OCAddInstruction(Opcode,OpcodeSize,inMovAlM8,pk[1],param[1],i);
-				OCAddInstruction(Opcode,OpcodeSize,inMovM8Al,pk[0],param[0],i);
-			}
-			break;
-			}*/
-	}
-	msg_db_l(4);
-}
-
 // split arrays and address shifts into simpler commands...
 void PreScript::BreakDownComplicatedCommands()
 {
 	msg_db_r("BreakDownComplicatedCommands", 4);
-
-	BreakDownHighLevelOperators();
 	
 	for (int i=0;i<Commands.num;i++){
 		Command *c = Commands[i];
@@ -3159,13 +3132,14 @@ void PreScript::MapLocalVariablesToStack()
 		f->_var_size = 0;
 
 		// map "self" to the first parameter
-		if (f->_class)
+		if (f->_class){
 			foreachi(LocalVariable &v, f->var, i)
 				if (v.name == "self"){
 					int s = mem_align(v.type->size);
 					v._offset = f->_param_size;
 					f->_param_size += s;
 				}
+		}
 
 		foreachi(LocalVariable &v, f->var, i){
 			if ((f->_class) && (v.name == "self"))

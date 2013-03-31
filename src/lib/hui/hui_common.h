@@ -11,7 +11,7 @@
 #define _HUI_COMMON_EXISTS_
 
 
-#include "../00_config.h"
+#include "../config.h"
 
 // which api?
 

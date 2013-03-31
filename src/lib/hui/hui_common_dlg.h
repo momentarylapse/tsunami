@@ -18,6 +18,8 @@ bool _cdecl HuiFileDialogDir(CHuiWindow *win, const string &title, const string 
 extern string HuiFilename;
 bool _cdecl HuiSelectColor(CHuiWindow *win, int r, int g, int b);
 extern int HuiColor[4];
+bool _cdecl HuiSelectFont(CHuiWindow *win, const string &title);
+extern string HuiFontname;
 void _cdecl HuiSetProperty(const string &name, const string &value);
 void _cdecl HuiAboutBox(CHuiWindow *win);
 

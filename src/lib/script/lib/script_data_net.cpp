@@ -1,15 +1,15 @@
-#include "../file/file.h"
-#include "script.h"
-#include "../00_config.h"
+#include "../../file/file.h"
+#include "../script.h"
+#include "../../config.h"
 #include "script_data_common.h"
 
 
 #ifdef _X_USE_NET_
-	#include "../net/net.h"
+	#include "../../net/net.h"
 #endif
 
 #ifdef _X_ALLOW_X_
-	#include "../networking.h"
+	#include "../../../networking.h"
 #endif
 
 namespace Script{

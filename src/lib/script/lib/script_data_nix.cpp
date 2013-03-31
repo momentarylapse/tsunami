@@ -1,10 +1,10 @@
-#include "../file/file.h"
-#include "script.h"
-#include "../00_config.h"
+#include "../../file/file.h"
+#include "../script.h"
+#include "../../config.h"
 #include "script_data_common.h"
 
 #ifdef _X_USE_NIX_
-	#include "../nix/nix.h"
+	#include "../../nix/nix.h"
 #endif
 
 namespace Script{
@@ -133,7 +133,6 @@ void SIAddPackageNix()
 	add_func("NixEnableLighting",											TypeVoid,	nix_p(&NixEnableLighting));
 		func_add_param("enabled",		TypeBool);
 
-	add_func("NixCreateLight",											TypeInt,	nix_p(&NixCreateLight));
 	add_func("NixSetLightRadial",										TypeVoid,	nix_p(&NixSetLightRadial));
 		func_add_param("light",			TypeInt);
 		func_add_param("pos",			TypeVector);
@@ -175,6 +174,10 @@ void SIAddPackageNix()
 	add_func("NixCreateDynamicTexture",	TypeInt,	nix_p(&NixCreateDynamicTexture));
 		func_add_param("width",		TypeInt);
 		func_add_param("height",	TypeInt);
+	add_func("NixCreateEmptyTexture",	TypeInt,	nix_p(&NixCreateEmptyTexture));
+	add_func("NixOverwriteTexture",	TypeVoid,	nix_p(&NixOverwriteTexture));
+		func_add_param("tex",		TypeInt);
+		func_add_param("image",		TypeImage);
 	add_func("VecProject",								TypeVoid,	nix_p(&NixGetVecProject));
 		func_add_param("v_out",		TypeVector);
 		func_add_param("v_in",		TypeVector);
@@ -189,7 +192,7 @@ void SIAddPackageNix()
 		func_add_param("v_in",		TypeVector);
 	add_func("NixCreateVB",									TypeInt,	nix_p(&NixCreateVB));
 		func_add_param("max_trias",		TypeInt);
-		func_add_param("index",		TypeInt);
+		func_add_param("num_textures",	TypeInt);
 	add_func("NixVBClear",									TypeVoid,	nix_p(&NixVBClear));
 		func_add_param("vb",		TypeInt);
 	add_func("NixVBAddTria",							TypeVoid,	nix_p(&NixVBAddTria));
@@ -212,6 +215,12 @@ void SIAddPackageNix()
 		func_add_param("p",		TypeVectorArrayP);
 		func_add_param("n",		TypeVectorArrayP);
 		func_add_param("t",		TypeFloatArrayP);
+	add_func("NixLoadShader",										TypeInt,	nix_p(&NixLoadShader));
+		func_add_param("filename",		TypeString);
+	add_func("NixCreateShader",										TypeInt,	nix_p(&NixCreateShader));
+		func_add_param("filename",		TypeString);
+	add_func("NixUnrefShader",										TypeVoid,	nix_p(&NixUnrefShader));
+		func_add_param("index",		TypeInt);
 	add_func("NixSetShaderData",					TypeVoid,	nix_p(&NixSetShaderData));
 		func_add_param("index",		TypeInt);
 		func_add_param("name",		TypeString);

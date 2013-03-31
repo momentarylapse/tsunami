@@ -5,6 +5,8 @@
 string HuiFilename;
 int HuiColor[4];
 
+string HuiFontname;
+
 
 
 // additional application properties

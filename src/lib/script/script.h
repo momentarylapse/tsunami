@@ -15,9 +15,9 @@ class Script;
 
 #include "../base/base.h"
 #include "../types/types.h"
-#include "dasm.h"
-#include "script_data.h"
-#include "pre_script.h"
+#include "asm/asm.h"
+#include "lib/script_data.h"
+#include "syntax/pre_script.h"
 
 namespace Script{
 

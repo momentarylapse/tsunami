@@ -1,10 +1,10 @@
-#include "../file/file.h"
-#include "script.h"
-#include "../00_config.h"
+#include "../../file/file.h"
+#include "../script.h"
+#include "../../config.h"
 #include "script_data_common.h"
 
 #ifdef _X_USE_HUI_
-	#include "../hui/hui.h"
+	#include "../../hui/hui.h"
 #else
 	we are re screwed.... TODO: test for _X_USE_HUI_
 #endif

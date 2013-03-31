@@ -157,3 +157,45 @@ void image_load_bmp(const string &filename, Image &image)
 	delete[]data;
 	fclose(f);
 }
+
+void image_save_bmp(const string &filename, const Image &image)
+{
+	CFile *f = CreateFile(filename);
+	if (!f)
+		return;
+	f->SetBinaryMode(true);
+	image.SetMode(image.ModeRGBA);
+
+	int row_size = 4 * (int)((image.width * 3 + 3) / 4);
+	int data_size = row_size * image.height;
+
+	unsigned char Header[56];
+	memset(Header, 0, 56);
+	Header[0] = 'B';
+	Header[1] = 'M';
+	*(int*)(&Header[2]) = 56 + data_size; // size
+	*(int*)(&Header[10]) = 56; // data offset
+	*(int*)(&Header[14]) = 40;
+	*(int*)(&Header[18]) = image.width;
+	*(int*)(&Header[22]) = image.height;
+	*(short*)(&Header[26]) = 1; // # planes
+	*(short*)(&Header[28]) = 24; // bits
+	*(int*)(&Header[30]) = 0; // compression
+	*(int*)(&Header[34]) = data_size;
+	f->WriteBuffer(Header, 56);
+	unsigned char *row = new unsigned char[row_size + 16];
+	for (int y=image.height-1;y>=0;y--){
+		unsigned int *d = ((unsigned int*)image.data.data) + (y * image.width);
+		unsigned char *p = row;
+		for (int x=0;x<image.width;x++){
+			*(p ++) = (*d) >> 16;
+			*(p ++) = (*d) >> 8;
+			*(p ++) = (*d);
+			d ++;
+		}
+		f->WriteBuffer(row, row_size);
+	}
+	delete[](row);
+
+	FileClose(f);
+}

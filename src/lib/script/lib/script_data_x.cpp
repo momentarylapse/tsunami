@@ -1,14 +1,14 @@
-#include "../file/file.h"
-#include "script.h"
-#include "../00_config.h"
+#include "../../file/file.h"
+#include "../script.h"
+#include "../../config.h"
 #include "script_data_common.h"
 
 
 #ifdef _X_ALLOW_META_
-	#include "../x/x.h"
+	#include "../../x/x.h"
 #endif
 #ifdef _X_ALLOW_X_
-	#include "../networking.h"
+	#include "../../../networking.h"
 #endif
 
 namespace Script{
@@ -32,6 +32,11 @@ namespace Script{
 	#define fx_p(p)	(void*)p
 #else
 	#define fx_p(p)	NULL
+#endif
+#ifdef _X_ALLOW_LIGHT_
+	#define light_p(p)	(void*)p
+#else
+	#define light_p(p)	NULL
 #endif
 #ifdef _X_ALLOW_GUI_
 	#define gui_p(p)	(void*)p
@@ -414,8 +419,7 @@ void SIAddPackageX()
 		class_add_element("num_z",			TypeInt,		GetDATerrain(num_z));
 		class_add_element("height",			TypeFloatList,	GetDATerrain(height));
 		class_add_element("pattern",		TypeVector,		GetDATerrain(pattern));
-		class_add_element("num_textures",	TypeInt,		GetDATerrain(num_textures));
-		class_add_element("texture",		TypeIntArray,	GetDATerrain(texture));
+		class_add_element("material",		TypeMaterial,	GetDATerrain(material));
 		class_add_element("texture_scale",	TypeVectorArray,GetDATerrain(texture_scale));
 		class_add_func("Update",			TypeVoid,		god_p(mf((tmf)&Terrain::Update)));
 			func_add_param("x1",		TypeInt);
@@ -430,7 +434,7 @@ void SIAddPackageX()
 		class_add_element("enabled",		TypeBool,		GetDACamera(enabled));
 		class_add_element("show",			TypeBool,		GetDACamera(show));
 		class_add_element("texture_out",	TypeInt,		GetDACamera(output_texture));
-		class_add_element("texture_in",	TypeInt,		GetDACamera(input_texture));
+		class_add_element("texture_in",		TypeInt,		GetDACamera(input_texture));
 		class_add_element("shader",			TypeInt,		GetDACamera(shader));
 		class_add_element("shaded_displays",TypeBool,		GetDACamera(shaded_displays));
 		class_add_element("pos",			TypeVector,		GetDACamera(pos));
@@ -470,7 +474,7 @@ void SIAddPackageX()
 	add_func("XFGetWidth",			TypeFloat,	meta_p(&XFGetWidth));
 		func_add_param("size",		TypeFloat);
 		func_add_param("s",		TypeString);
-	add_func("LoadFont",			TypeInt,	meta_p(&MetaLoadXFont));
+	add_func("LoadFont",			TypeInt,	meta_p(&MetaLoadFont));
 		func_add_param("filename",		TypeString);
 	add_func("CreatePicture",										TypePictureP,	gui_p(&Gui::CreatePicture));
 		func_add_param("pos",		TypeVector);
@@ -523,29 +527,26 @@ void SIAddPackageX()
 		func_add_param("ang",		TypeVector);
 		func_add_param("dest",		TypeRect);
 		func_add_param("show",		TypeBool);
-	add_func("LoadShader",										TypeInt,	meta_p(&MetaLoadShader));
-		func_add_param("filename",		TypeString);
 	
 	// engine
 	// effects
-	add_func("LightCreate",							TypeInt,	fx_p(&FxLightCreate));
-	add_func("LightSetDirectional",			TypeVoid,	fx_p(&FxLightSetDirectional));
+	add_func("LightCreate",							TypeInt,	light_p(&Light::Create));
+	add_func("LightSetColors",			TypeVoid,	light_p(&Light::SetColors));
 		func_add_param("index",		TypeInt);
-		func_add_param("dir",		TypeVector);
 		func_add_param("ambient",		TypeColor);
 		func_add_param("diffuse",		TypeColor);
 		func_add_param("specular",		TypeColor);
-	add_func("LightSetRadial",					TypeVoid,	fx_p(&FxLightSetRadial));
+	add_func("LightSetDirectional",			TypeVoid,	light_p(&Light::SetDirectional));
+		func_add_param("index",		TypeInt);
+		func_add_param("dir",		TypeVector);
+	add_func("LightSetRadial",					TypeVoid,	light_p(&Light::SetRadial));
 		func_add_param("index",		TypeInt);
 		func_add_param("pos",		TypeVector);
 		func_add_param("radius",		TypeFloat);
-		func_add_param("ambient",		TypeColor);
-		func_add_param("diffuse",		TypeColor);
-		func_add_param("specular",		TypeColor);
-	add_func("LightEnable",							TypeVoid,	fx_p(&FxLightEnable));
+	add_func("LightEnable",							TypeVoid,	light_p(&Light::Enable));
 		func_add_param("index",		TypeInt);
 		func_add_param("enabled",		TypeBool);
-	add_func("LightDelete",							TypeVoid,	fx_p(&FxLightDelete));
+	add_func("LightDelete",							TypeVoid,	light_p(&Light::Delete));
 		func_add_param("index",		TypeInt);
 	// game
 	add_func("ExitProgram",									TypeVoid,	meta_p(MetaExitProgram));

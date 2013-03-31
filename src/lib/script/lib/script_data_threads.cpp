@@ -1,12 +1,12 @@
-#include "../file/file.h"
-#include "script.h"
-#include "../00_config.h"
+#include "../../file/file.h"
+#include "../script.h"
+#include "../../config.h"
 #include "script_data_common.h"
 
 #ifdef _X_USE_THREADS_
-	#include "../threads/threads.h"
-	#include "../threads/mutex.h"
-	#include "../threads/work.h"
+	#include "../../threads/threads.h"
+	#include "../../threads/mutex.h"
+	#include "../../threads/work.h"
 #endif
 
 namespace Script{

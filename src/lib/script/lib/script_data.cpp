@@ -12,21 +12,21 @@
 #ifdef WIN32
 	#include "windows.h"
 #endif
-#include "script.h"
+#include "../script.h"
 #include "script_data_common.h"
-#include "../00_config.h"
+#include "../../config.h"
 
 
 
 #ifdef _X_USE_HUI_
-#include "../hui/hui.h"
+#include "../../hui/hui.h"
 #endif
 
 
 
 namespace Script{
 
-string DataVersion = "0.10.5.0";
+string DataVersion = "0.10.5.1";
 
 
 
@@ -1050,7 +1050,7 @@ void Init()
 {
 	msg_db_r("ScriptInit", 1);
 
-	AsmInit();
+	Asm::Init();
 
 	SIAddPackageBase();
 	SIAddBasicCommands();

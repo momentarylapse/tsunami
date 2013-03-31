@@ -1,5 +1,6 @@
-#include "script.h"
-#include "../file/file.h"
+#include "../script.h"
+#include "../asm/asm.h"
+#include "../../file/file.h"
 
 namespace Script{
 

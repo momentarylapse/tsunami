@@ -1,11 +1,11 @@
-#include "../file/file.h"
-#include "script.h"
-#include "../00_config.h"
+#include "../../file/file.h"
+#include "../script.h"
+#include "../../config.h"
 #include "script_data_common.h"
 
 
 #ifdef _X_USE_SOUND_
-	#include "../sound/sound.h"
+	#include "../../sound/sound.h"
 #endif
 
 

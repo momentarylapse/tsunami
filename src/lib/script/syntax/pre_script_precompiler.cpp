@@ -1,12 +1,11 @@
-#include "script.h"
-#include "../file/file.h"
+#include "../script.h"
+#include "../../file/file.h"
 
 namespace Script{
 
 //#define ScriptDebug
 
 extern int s2i2(const string &str);
-static char Temp[1024];
 
 static int shift_right=0;
 
@@ -194,7 +193,7 @@ void PreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *If
 		case MacroCodeOrigin:
 			next_exp();
 			CreateAsmMetaInfo(this);
-			((sAsmMetaInfo*)AsmMetaInfo)->CodeOrigin = s2i2(cur_name);
+			((Asm::MetaInfo*)AsmMetaInfo)->CodeOrigin = s2i2(cur_name);
 			break;
 		default:
 			DoError("unknown makro atfer \"#\"");

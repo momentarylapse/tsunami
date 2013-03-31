@@ -110,6 +110,8 @@ void Image::Save(const string &filename) const
 	string ext = filename.extension();
 	if (ext == "tga")
 		image_save_tga(filename, *this);
+	else if (ext == "bmp")
+		image_save_bmp(filename, *this);
 	else
 		msg_error("ImageSave: unhandled file extension: " + ext);
 	

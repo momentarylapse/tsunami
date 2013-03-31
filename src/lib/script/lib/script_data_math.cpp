@@ -1,18 +1,18 @@
 #include <algorithm>
-#include "../file/file.h"
-#include "script.h"
-#include "../00_config.h"
+#include "../../file/file.h"
+#include "../script.h"
+#include "../../config.h"
 #include "script_data_common.h"
 
 #ifdef _X_USE_ALGEBRA_
-	#include "../algebra/algebra.h"
+	#include "../../algebra/algebra.h"
 #else
 		typedef int vli;
 		typedef int Crypto;
 #endif
 
 #ifdef _X_USE_ANY_
-	#include "../any/any.h"
+	#include "../../any/any.h"
 #else
 		typedef int Any;
 #endif

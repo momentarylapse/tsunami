@@ -9,7 +9,7 @@
 #define _IMAGE_EXISTS_
 
 
-#include "../00_config.h"
+#include "../config.h"
 #include "../base/base.h"
 #include "../types/types.h"
 

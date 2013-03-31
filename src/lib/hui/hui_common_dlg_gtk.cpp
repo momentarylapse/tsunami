@@ -57,8 +57,11 @@ bool HuiFileDialogOpen(CHuiWindow *win,const string &title,const string &dir,con
 	msg_db_m("dialog_run",1);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	msg_db_m("ok",1);
-	if (r == GTK_RESPONSE_ACCEPT)
-		HuiFilename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+	if (r == GTK_RESPONSE_ACCEPT){
+		gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+		HuiFilename = fn;
+		g_free(fn);
+	}
 	gtk_widget_destroy(dlg);
 	msg_db_l(1);
 	return (r == GTK_RESPONSE_ACCEPT);
@@ -92,7 +95,9 @@ bool HuiFileDialogSave(CHuiWindow *win,const string &title,const string &dir,con
 	add_filters(dlg, show_filter, filter);
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
 	if (r == GTK_RESPONSE_ACCEPT){
-		HuiFilename = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+		gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+		HuiFilename = fn;
+		g_free(fn);
 		try_to_ensure_extension(HuiFilename, filter);
 		// TODO
 	}
@@ -104,6 +109,28 @@ bool HuiSelectColor(CHuiWindow *win,int r,int g,int b)
 {
 	msg_todo("HuiSelectColor (GTK)");
 	return false;
+}
+
+
+bool HuiSelectFont(CHuiWindow *win, const string &title)
+{
+	msg_db_r("HuiSelectFont",1);
+	GtkWindow *w = get_window_save(win);
+	msg_db_m("dialog_new",1);
+	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(title), w);
+	gtk_window_set_modal(GTK_WINDOW(dlg), true);
+	gtk_widget_show_all(dlg);
+	msg_db_m("dialog_run",1);
+	int r = gtk_dialog_run(GTK_DIALOG(dlg));
+	msg_db_m("ok",1);
+	if (r == GTK_RESPONSE_OK){
+		gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(dlg));
+		HuiFontname = fn;
+		g_free(fn);
+	}
+	gtk_widget_destroy(dlg);
+	msg_db_l(1);
+	return (r == GTK_RESPONSE_OK);
 }
 
 string HuiQuestionBox(CHuiWindow *win,const string &title,const string &text,bool allow_cancel)

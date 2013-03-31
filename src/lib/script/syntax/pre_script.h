@@ -1,3 +1,10 @@
+#if !defined(PRESCRIPT_H__INCLUDED_)
+#define PRESCRIPT_H__INCLUDED_
+
+namespace Asm{
+	struct MetaInfo;
+};
+
 namespace Script{
 
 // character buffer and expressions (syntax analysis)
@@ -243,7 +250,6 @@ public:
 	// neccessary conversions
 	void ConvertCallByReference();
 	void BreakDownComplicatedCommands();
-	void BreakDownHighLevelOperators();
 	void MapLocalVariablesToStack();
 
 	// data creation
@@ -290,7 +296,7 @@ public:
 	//Array<sEnum> Enum;
 	Array<Script*> Includes;
 	Array<Define> Defines;
-	char *AsmMetaInfo;
+	Asm::MetaInfo *AsmMetaInfo;
 	Array<AsmBlock> AsmBlocks;
 	Array<Constant> Constants;
 	Array<Block*> Blocks;
@@ -359,3 +365,5 @@ inline bool isSign(char c)
 }
 
 };
+
+#endif

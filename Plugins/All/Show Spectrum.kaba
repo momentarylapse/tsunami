@@ -142,4 +142,4 @@ void main()
 	if audio.selection.length > 0
 		show_spec()
 	else
-		HuiErrorBox(MainWin, "error", "needs some selection!")
+		logging.Error("'Show Spectrum.kaba': Needs some selection!")

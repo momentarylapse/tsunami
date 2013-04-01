@@ -1,0 +1,26 @@
+#include "../api.kaba"
+
+void main()
+	MidiData m
+	int dt = 20000
+	m.add(0     , dt, 69, 1)
+	m.add(dt    , dt, 71, 0.4)
+	m.add(dt * 2, dt, 72, 0.6)
+	m.add(dt * 3, dt, 74, 0.8)
+	m.add(dt * 4, dt, 76, 1)
+	m.add(dt * 5, dt, 81, 1)
+	m.add(dt * 6, dt, 76, 0.7)
+	
+	bool ok = false
+	//forall t in audio.track
+	for int i, 0, audio.track.num
+		Track *t = audio.track[i].p
+		if t.type != TRACK_TYPE_MIDI
+			continue
+		
+		t.InsertMidiData(0, m)
+		ok = true
+		break
+	
+	if !ok
+		logging.Error("'Insert Midi.kaba': No midi track found")

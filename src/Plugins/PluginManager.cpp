@@ -87,6 +87,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);*/
 	Script::LinkSemiExternalVar("input",			&tsunami->input);
 	Script::LinkSemiExternalVar("output",			&tsunami->output);
+	Script::LinkSemiExternalVar("logging",			&tsunami->log);
 /*	Script::LinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
 	Script::LinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
 	Script::LinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
@@ -94,6 +95,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkSemiExternalFunc("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
 	Script::LinkSemiExternalFunc("Track.GetBuffers",	(void*)&Track::GetBuffers);
 	Script::LinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
+	Script::LinkSemiExternalFunc("Track.InsertMidiData",	(void*)&Track::InsertMidiData);
 	Script::LinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
 	Script::LinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
 	Script::LinkSemiExternalFunc("BufferBox.add_click",(void*)&ExtendedBufferBox::add_click);
@@ -133,6 +135,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkSemiExternalFunc("AudioInput.AddObserver",	(void*)&AudioInput::AddWrappedObserver);
 	Script::LinkSemiExternalFunc("AudioInput.RemoveObserver",	(void*)&AudioInput::RemoveWrappedObserver);
 	//Script::LinkSemiExternalFunc("Observable.AddObserver",	(void*)&Observable::AddWrappedObserver);
+	Script::LinkSemiExternalFunc("Log.Error",	(void*)&Log::Error);
+	Script::LinkSemiExternalFunc("Log.Warning",	(void*)&Log::Warning);
+	Script::LinkSemiExternalFunc("Log.Info",	(void*)&Log::Info);
 	msg_db_l(2);
 }
 

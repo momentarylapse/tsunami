@@ -83,6 +83,13 @@ class MidiData
 	string synthesizer
 	string instrument
 	string options
+	void add(int offset, int length, int pitch, float volume)
+		MidiNote n
+		n.range.offset = offset
+		n.range.length = length
+		n.pitch = pitch
+		n.volume = volume
+		self.note.add(n)
 
 enum
 	TRACK_TYPE_AUDIO
@@ -128,6 +135,7 @@ class Track
 	
 	extern BufferBox GetBuffers(int level_no, Range r)
 	extern BufferBox ReadBuffers(Range r)
+	extern void InsertMidiData(int offset, MidiData midi)
 
 class Tag
 	string key, value
@@ -180,22 +188,23 @@ class AudioInput : Observable
 	extern void AddObserver(void *handler, void *func)
 	extern void RemoveObserver(void *handler)
 
+
+class Log
+	extern void Error(string message)
+	extern void Warning(string message)
+	extern void Info(string message)
+
 extern window MainWin
 extern AudioFile *audio
 extern AudioOutput *output
 extern AudioInput *input
+extern Log *logging
 
-//extern Track *AddEmptyTrack(AudioFile *a)
-//extern void DeleteTrack(AudioFile *a, int n)
-//extern Track *AddEmptySubTrack(Track *t, Range r, string name)
-//extern void CreateNew(AudioFile *a, int length, int sample_rate)
-//extern void CreateTrackBuffers(Track *t)
 
 extern void fft_c2c(complex in[], complex out[], bool inverse)
 extern void fft_r2c(float in[], complex out[])
 extern void fft_c2r_inv(complex in[], float out[])
 
-//extern BufferBox CaptureBuf, CapturePreviewBuf
 
 extern void ProgressStart(string s, float progress)
 extern void ProgressEnd()

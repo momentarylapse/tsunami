@@ -54,7 +54,6 @@ void equalize(float b[])
 	fft_c2r_inv(f, b)
 
 void ProcessTrack(BufferBox buf, Track t, int level)
-	char STACK_OFFSET_DUMMY[5]
 	equalize(buf.r)
 	equalize(buf.l)
 

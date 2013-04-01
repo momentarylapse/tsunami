@@ -136,7 +136,7 @@ void show_spec()
 	ffl.clear()
 
 void main()
-	char dummy[3]
+	//char dummy[3]
 	grid.SetXAxis(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
 	if audio.selection.length > 0

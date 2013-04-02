@@ -22,7 +22,7 @@ extern void script_db_left();
 
 void PreScript::PreProcessCommand(Script *s, Command *c)
 {
-	msg_db_r("PreProcessCommand", 4);
+	msg_db_f("PreProcessCommand", 4);
 
 	// recursion
 	if (c->kind == KindBlock){
@@ -110,7 +110,6 @@ void PreScript::PreProcessCommand(Script *s, Command *c)
 			c->NumParams = 0;
 		}
 	}*/
-	msg_db_l(4);
 }
 
 string LinkNr2Str(PreScript *s,int kind,int nr);
@@ -118,7 +117,7 @@ string LinkNr2Str(PreScript *s,int kind,int nr);
 // may not use AddConstant()!!!
 void PreScript::PreProcessCommandAddresses(Script *s, Command *c)
 {
-	msg_db_r("PreProcessCommandAddr", 4);
+	msg_db_f("PreProcessCommandAddr", 4);
 	/*msg_write(Kind2Str(c->Kind));
 	if (c->script)
 		msg_write(LinkNr2Str(c->script->pre_script, c->Kind, c->LinkNr));
@@ -200,31 +199,28 @@ void PreScript::PreProcessCommandAddresses(Script *s, Command *c)
 			c->num_params = 0;
 		}
 	}
-	msg_db_l(4);
 }
 
 void PreScript::PreProcessor(Script *s)
 {
-	msg_db_r("PreProcessor", 4);
+	msg_db_f("PreProcessor", 4);
 	foreach(Function *f, Functions){
 		cur_func = f;
 		foreach(Command *c, f->block->command)
 			PreProcessCommand(s, c);
 	}
 	//Show();
-	msg_db_l(4);
 }
 
 void PreScript::PreProcessorAddresses(Script *s)
 {
-	msg_db_r("PreProcessorAddr", 4);
+	msg_db_f("PreProcessorAddr", 4);
 	foreach(Function *f, Functions){
 		cur_func = f;
 		foreach(Command *c, f->block->command)
 			PreProcessCommandAddresses(s, c);
 	}
 	//Show();
-	msg_db_l(4);
 }
 
 };

@@ -23,7 +23,7 @@ namespace Script{
 
 void SIAddPackageThread()
 {
-	msg_db_r("SIAddThread", 3);
+	msg_db_f("SIAddThread", 3);
 
 	set_cur_package("thread");
 
@@ -62,8 +62,6 @@ void SIAddPackageThread()
 	add_func("WorkGetNumThreads",		TypeInt,	thread_p(&WorkGetNumThreads));
 	add_func("WorkGetTotal",			TypeInt,	thread_p(&WorkGetTotal));
 	add_func("WorkGetDone",				TypeInt,	thread_p(&WorkGetDone));
-
-	msg_db_l(3);
 }
 
 };

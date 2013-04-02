@@ -85,6 +85,7 @@ struct Type{
 };
 extern Array<Type*> PreTypes;
 extern Type *TypeUnknown;
+extern Type *TypeReg64; // dummy for compilation
 extern Type *TypeReg32; // dummy for compilation
 extern Type *TypeReg16; // dummy for compilation
 extern Type *TypeReg8; // dummy for compilation

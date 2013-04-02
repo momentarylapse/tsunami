@@ -56,7 +56,7 @@ void SetImmortal(PreScript *ps)
 // import data from an included script file
 void PreScript::AddIncludeData(Script *s)
 {
-	msg_db_r("AddIncludeData",5);
+	msg_db_f("AddIncludeData",5);
 	Includes.add(s);
 	PreScript *ps = s->pre_script;
 	s->ReferenceCounter ++;
@@ -78,7 +78,6 @@ void PreScript::AddIncludeData(Script *s)
 		if (c.name[0] != '-')
 			Constants.add(c);
 	// TODO... ownership of "big" constants
-	msg_db_l(5);
 }
 
 enum{
@@ -113,7 +112,7 @@ string MacroName[NumMacroNames] =
 
 void PreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
 {
-	msg_db_r("HandleMacro", 4);
+	msg_db_f("HandleMacro", 4);
 	Exp.cur_line = l;
 	Exp.cur_exp = 0;
 	Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
@@ -140,14 +139,19 @@ void PreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *If
 			so("lade Include-Datei");
 			right();
 
-			include = Load(filename, true, just_analyse);
+			try{
+				include = Load(filename, true, just_analyse);
+			}catch(Exception &e){
+				string msg = "in included file:\n\"" + e.message + "\"";
+				DoError(msg);
+			}
 
 			left();
-			if ((!include) || (include->Error)){
+			/*if ((!include) || (include->Error)){
 				IncludeLinkerError |= include->LinkerError;
 				DoError(format("error in inluded file \"%s\":\n[ %s (line %d:) ]", filename.c_str(), include->ErrorMsg.c_str(), include->ErrorLine, include->ErrorColumn));
 				return;
-			}
+			}*/
 			AddIncludeData(include);
 			break;
 		case MacroDefine:
@@ -197,15 +201,12 @@ void PreScript::HandleMacro(ps_line_t *l, int &line_no, int &NumIfDefs, bool *If
 			break;
 		default:
 			DoError("unknown makro atfer \"#\"");
-			msg_db_l(4);
-			return;
 	}
 
 	// remove macro line
 	Exp.line[line_no].exp.clear();
 	Exp.line.erase(line_no);
 	line_no --;
-	msg_db_l(4);
 }
 
 inline void insert_into_buffer(PreScript *ps, const char *name, int pos, int index = -1)
@@ -230,8 +231,7 @@ inline void remove_from_buffer(PreScript *ps, int index)
 // ... maybe some time later
 void PreScript::PreCompiler(bool just_analyse)
 {
-	if (Error)	return;
-	msg_db_r("PreCompiler", 4);
+	msg_db_f("PreCompiler", 4);
 
 	int NumIfDefs = 0;
 	bool IfDefed[1024];
@@ -241,8 +241,6 @@ void PreScript::PreCompiler(bool just_analyse)
 		Exp.cur_line = &Exp.line[i];
 		if (Exp.line[i].exp[0].name[0] == '#'){
 			HandleMacro(Exp.cur_line, i, NumIfDefs, IfDefed, just_analyse);
-			if (Error)
-				_return_(4,);
 		}else{
 			Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
 
@@ -260,11 +258,8 @@ void PreScript::PreCompiler(bool just_analyse)
 						Exp.cur_exp -= d.Dest.num;
 						Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
 						num_defs_inserted ++;
-						if (num_defs_inserted > SCRIPT_MAX_DEFINE_RECURSIONS){
+						if (num_defs_inserted > SCRIPT_MAX_DEFINE_RECURSIONS)
 							DoError("recursion in #define macros");
-							msg_db_l(4);
-							return;
-						}
 						break;
 					}
 				}
@@ -300,7 +295,7 @@ void PreScript::PreCompiler(bool just_analyse)
 
 	
 
-	/*msg_db_r("MakeExps",4);
+	/*msg_db_f("MakeExps",4);
 	int i,NumIfDefs=0,ln;
 	bool IfDefed[1024];
 	Exp=new exp_buffer;
@@ -509,11 +504,7 @@ void PreScript::PreCompiler(bool just_analyse)
 		DoError("\"#ifdef\" found but no matching \"#endif\"",Exp->NumExps);
 		return;
 	}
-	Exp->ExpNr=0;
-	msg_db_l(4);*/
-
-	
-	msg_db_l(4);
+	Exp->ExpNr=0;*/
 }
 
 };

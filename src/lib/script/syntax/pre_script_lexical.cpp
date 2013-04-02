@@ -82,7 +82,7 @@ int PreScript::GetKind(char c)
 
 void PreScript::Analyse(const char *buffer, bool just_analyse)
 {
-	msg_db_r("Analyse", 4);
+	msg_db_f("Analyse", 4);
 	clear_exp_buffer(&Exp);
 	Exp.buffer = new char[strlen(buffer)*2];
 	Exp.buf_cur = Exp.buffer;
@@ -94,10 +94,6 @@ void PreScript::Analyse(const char *buffer, bool just_analyse)
 		Exp.cur_line->physical_line = i;
 		if (AnalyseLine(buf, Exp.cur_line, i, just_analyse))
 			break;
-		if (Error){
-			msg_db_l(4);
-			return;
-		}
 		buf += Exp.cur_line->length + 1;
 	}
 
@@ -136,15 +132,13 @@ void PreScript::Analyse(const char *buffer, bool just_analyse)
 		e.pos = Exp.line[i].length;
 		Exp.line[i].exp.add(e);
 	}
-	
-	msg_db_l(4);
 }
 
 // scan one line
 //   true -> end of file
 bool PreScript::AnalyseLine(const char *buffer, ps_line_t *l, int &line_no, bool just_analyse)
 {
-	msg_db_r("AnalyseLine", 4);
+	msg_db_f("AnalyseLine", 4);
 	int pos = 0;
 	l->indent = 0;
 	l->length = 0;
@@ -153,15 +147,10 @@ bool PreScript::AnalyseLine(const char *buffer, ps_line_t *l, int &line_no, bool
 	for (int i=0;true;i++){
 		if (AnalyseExpression(buffer, pos, l, line_no, just_analyse))
 			break;
-		if (Error){
-			msg_db_l(4);
-			return false;
-		}
 	}
 	l->length = pos;
 	if (l->exp.num > 0)
 		Exp.line.add(*l);
-	msg_db_l(4);
 	return (buffer[pos] == 0);
 }
 
@@ -184,11 +173,11 @@ bool DoMultiLineComment(PreScript *ps, const char *buffer, int &pos)
 			}
 		}else if ((buffer[pos] == 0)){// || (BufferPos>=BufferLength)){
 			ps->DoError("comment exceeds end of file");
-			return true;
 		}
 		pos ++;
 	}
 	//ExpKind = ExpKindSpacing;
+	return false;
 }
 
 void DoAsmBlock(PreScript *ps, const char *buffer, int &pos, int &line_no)
@@ -198,10 +187,8 @@ void DoAsmBlock(PreScript *ps, const char *buffer, int &pos, int &line_no)
 	for (int i=0;i<1024;i++){
 		if (buffer[pos] == '{')
 			break;
-		if ((buffer[pos] != ' ') && (buffer[pos] != '\t') && (buffer[pos] != '\n')){
+		if ((buffer[pos] != ' ') && (buffer[pos] != '\t') && (buffer[pos] != '\n'))
 			ps->DoError("'{' expected after \"asm\"");
-			return;
-		}
 		if (buffer[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -213,10 +200,8 @@ void DoAsmBlock(PreScript *ps, const char *buffer, int &pos, int &line_no)
 	for (int i=0;i<65536;i++){
 		if (buffer[pos] == '}')
 			break;
-		if (buffer[pos] == 0){
+		if (buffer[pos] == 0)
 			ps->DoError("'}' expected to end \"asm\"");
-			return;
-		}
 		if (buffer[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -239,19 +224,19 @@ void DoAsmBlock(PreScript *ps, const char *buffer, int &pos, int &line_no)
 //   true -> end of line (<pos> is on newline)
 bool PreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, int &line_no, bool just_analyse)
 {
-	msg_db_r("AnalyseExpression", 4);
+	msg_db_f("AnalyseExpression", 4);
 	// skip whitespace and other "invisible" stuff to find the first interesting character
 	if (Exp.comment_level > 0)
 		if (DoMultiLineComment(this, buffer, pos))
-			_return_(4, true);
+			return true;
 
 	for (int i=0;true;i++){
 		// end of file
 		if (buffer[pos] == 0){
 			strcpy(Temp, "");
-			_return_(4, true);
+			return true;
 		}else if (buffer[pos]=='\n'){ // line break
-			_return_(4, true);
+			return true;
 		}else if (buffer[pos]=='\t'){ // tab
 			if (l->exp.num == 0)
 				l->indent ++;
@@ -260,24 +245,21 @@ bool PreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, in
 			while (true){
 				pos ++;
 				if ((buffer[pos] == '\n') || (buffer[pos] == 0))
-					_return_(4, true);
+					return true;
 			}
 		}else if ((buffer[pos] == '/') && (buffer[pos + 1] == '*')){ // multi-line comment
 			if (DoMultiLineComment(this, buffer, pos))
-				_return_(4, true);
+				return true;
 			ExpKind = ExpKindSpacing;
 			continue;
 		}else if ((buffer[pos] == 'a') && (buffer[pos + 1] == 's') && (buffer[pos + 2] == 'm')){ // asm block
 			int pos0 = pos;
 			pos += 3;
 			DoAsmBlock(this, buffer, pos, line_no);
-			if (Error)	_return_(4, true);
 			insert_into_buffer(this, "-asm-", pos0);
-			_return_(4, true);
+			return true;
 		}
 		ExpKind = GetKind(buffer[pos]);
-		if (Error)
-			_return_(4, false);
 		if (ExpKind != ExpKindSpacing)
 			break;
 		pos ++;
@@ -294,7 +276,7 @@ bool PreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, in
 			if ((c == '\"') && (i > 0))
 				break;
 			else if ((c == '\n') || (c == 0)){
-				_do_error_("string exceeds line", 4, false);
+				DoError("string exceeds line");
 			}else{
 				// escape sequence
 				if (c == '\\'){
@@ -311,7 +293,7 @@ bool PreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, in
 					else if (buffer[pos] == '0')
 						Temp[TempLength - 1] = '\0';
 					else
-						_do_error_("unknown escape in string", 4, false);
+						DoError("unknown escape in string");
 					pos ++;
 				}
 				continue;
@@ -336,7 +318,7 @@ bool PreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, in
 		Temp[TempLength ++] = buffer[pos ++];
 		Temp[TempLength ++] = buffer[pos ++];
 		if (Temp[TempLength - 1] != '\'')
-			_do_error_("character constant should end with '''", 4, false);
+			DoError("character constant should end with '''");
 
 	// word
 	}else if (ExpKind == ExpKindLetter){
@@ -400,7 +382,6 @@ bool PreScript::AnalyseExpression(const char *buffer, int &pos, ps_line_t *l, in
 	Temp[TempLength] = 0;
 	insert_into_buffer(this, Temp, pos - TempLength);
 
-	msg_db_l(4);
 	return (buffer[pos] == '\n');
 }
 

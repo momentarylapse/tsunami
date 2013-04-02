@@ -1,5 +1,4 @@
 #include "../script.h"
-//#include "dasm.h"
 #include "../../file/file.h"
 
 #ifdef OS_LINUX
@@ -122,7 +121,7 @@ void Script::AllocateOpcode()
 	ThreadOpcode = (char*)mmap(0, SCRIPT_MAX_THREAD_OPCODE, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE, 0, 0);
 #endif
 	if (((long)Opcode==-1)||((long)ThreadOpcode==-1))
-		_do_error_int_("CScript:  could not allocate executable memory", 2,);
+		DoErrorInternal("CScript:  could not allocate executable memory");
 	OpcodeSize=0;
 	ThreadOpcodeSize=0;
 }
@@ -288,21 +287,17 @@ void Script::CompileTaskEntryPoint()
 // generate opcode
 void Script::Compiler()
 {
-	if (Error)	return;
-	msg_db_r("Compiler",2);
+	msg_db_f("Compiler",2);
 
 	pre_script->MapLocalVariablesToStack();
 
-	if (!Error)
-		pre_script->BreakDownComplicatedCommands();
+	pre_script->BreakDownComplicatedCommands();
 #ifdef ScriptDebug
 	pre_script->Show();
 #endif
 
-	if (!Error)
-		pre_script->Simplify();
-	if (!Error)
-		pre_script->PreProcessor(this);
+	pre_script->Simplify();
+	pre_script->PreProcessor(this);
 
 
 	AllocateMemory();
@@ -315,8 +310,7 @@ void Script::Compiler()
 	AllocateOpcode();
 
 
-	if (!Error)
-		pre_script->PreProcessorAddresses(this);
+	pre_script->PreProcessorAddresses(this);
 
 
 
@@ -332,8 +326,6 @@ void Script::Compiler()
 	foreachi(Function *f, pre_script->Functions, i){
 		func[i] = (t_func*)&Opcode[OpcodeSize];
 		CompileFunction(f, Opcode, OpcodeSize);
-		if (Error)
-			_return_(2, );
 	}
 
 
@@ -361,7 +353,6 @@ void Script::Compiler()
 		msg_write("--------------------------------");
 		msg_write(format("Opcode: %db, Memory: %db",OpcodeSize,MemorySize));
 	}
-	msg_db_l(2);
 }
 
 };

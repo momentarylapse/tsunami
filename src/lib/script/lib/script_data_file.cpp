@@ -33,7 +33,7 @@ public:
 
 void SIAddPackageFile()
 {
-	msg_db_r("SIAddPackageFile", 3);
+	msg_db_f("SIAddPackageFile", 3);
 
 	set_cur_package("file");
 
@@ -135,9 +135,6 @@ void SIAddPackageFile()
 	add_func("DirDelete",			TypeBool,			(void*)&dir_delete);
 		func_add_param("dir",		TypeString);
 	add_func("GetCurDir",			TypeString,			(void*)&get_current_dir);
-
-
-	msg_db_l(3);
 }
 
 };

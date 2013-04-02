@@ -51,13 +51,6 @@ struct Define
 	Array<string> Dest;
 };
 
-// single enum entries
-/*struct sEnum
-{
-	string Name;
-	int Value;
-};*/
-
 // for any type of constant used in the script
 struct Constant
 {
@@ -184,16 +177,13 @@ public:
 	~PreScript();
 
 	void LoadAndParseFile(const string &filename, bool just_analyse);
-	bool LoadToBuffer(const string &filename, bool just_analyse);
+	void LoadToBuffer(const string &filename, bool just_analyse);
 	void AddIncludeData(Script *s);
 
-	bool Error, IncludeLinkerError;
-	string ErrorMsg, ErrorMsgExt[2];
-	int ErrorLine,ErrorColumn;
 	void DoError(const string &msg, int overwrite_line = -1);
-	bool ExpectNoNewline();
-	bool ExpectNewline();
-	bool ExpectIndent();
+	void ExpectNoNewline();
+	void ExpectNewline();
+	void ExpectIndent();
 
 	// lexical analysis
 	int GetKind(char c);
@@ -293,7 +283,6 @@ public:
 
 	int NumOwnTypes;
 	Array<Type*> Types;
-	//Array<sEnum> Enum;
 	Array<Script*> Includes;
 	Array<Define> Defines;
 	Asm::MetaInfo *AsmMetaInfo;
@@ -309,15 +298,10 @@ public:
 	Function *cur_func;
 };
 
-#define _do_error_(str,n,r)	{DoError(str);msg_db_l(n);return r;}
-#define _do_error_int_(str,n,r)	{DoErrorInternal(str);msg_db_l(n);return r;}
-#define _return_(n,r)		{msg_db_l(n);return r;}
-
 string Kind2Str(int kind);
 string Operator2Str(PreScript *s,int cmd);
 void clear_exp_buffer(ps_exp_buffer_t *e);
 void CreateAsmMetaInfo(PreScript* ps);
-extern Script *cur_script;
 
 
 

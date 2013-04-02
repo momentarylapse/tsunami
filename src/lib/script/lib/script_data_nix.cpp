@@ -27,7 +27,7 @@ extern Type *TypeHuiWindowP; // -> script_data_hui.cpp
 
 void SIAddPackageNix()
 {
-	msg_db_r("SIAddPackageNix", 3);
+	msg_db_f("SIAddPackageNix", 3);
 	
 	set_cur_package("nix");
 	
@@ -310,8 +310,6 @@ void SIAddPackageNix()
 #endif
 	add_const("VBTemp",     TypeInt,    nix_p(VBTemp));
 	add_const("NixVersion", TypeString, nix_p(&NixVersion));
-
-	msg_db_l(3);
 }
 
 };

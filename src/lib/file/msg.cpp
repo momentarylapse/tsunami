@@ -351,6 +351,17 @@ string msg_get_trace()
 	return str;
 }
 
+int msg_get_trace_depth()
+{
+	return CurrentTraceLevel;
+}
+
+void msg_set_trace_depth(int depth)
+{
+	if (depth < CurrentTraceLevel)
+		depth = CurrentTraceLevel;
+}
+
 void msg_end(bool del_file)
 {
 	//if (!msg_inited)	return;
@@ -415,3 +426,14 @@ void msg_todo(const string &str)
 	msg_error(s);
 }
 
+
+MsgBlockTracer::MsgBlockTracer(const char *str, int _level)
+{
+	msg_trace_r(str, _level);
+	level = _level;
+};
+
+MsgBlockTracer::~MsgBlockTracer()
+{
+	msg_trace_l(level);
+}

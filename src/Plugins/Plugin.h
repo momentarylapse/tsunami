@@ -44,6 +44,7 @@ public:
 		TYPE_EFFECT,
 		TYPE_OTHER
 	};
+	string error_message;
 
 	void ExportData(Array<EffectParam> &param);
 	void ImportData(Array<EffectParam> &param);

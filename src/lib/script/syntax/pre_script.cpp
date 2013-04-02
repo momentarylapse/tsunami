@@ -9,7 +9,7 @@ namespace Script{
 
 
 /*#define PRESCRIPT_DB_LEVEL	2
-#define db_r(msg,level)		msg_db_r(msg,level+PRESCRIPT_DB_LEVEL)*/
+#define db_f(msg,level)		msg_db_f(msg,level+PRESCRIPT_DB_LEVEL)*/
 
 bool type_is_simple_class(Type *t); // -> script_data.cpp
 
@@ -68,16 +68,9 @@ inline void deref_command(PreScript *ps, Command *c)
 
 void reset_pre_script(PreScript *ps)
 {
-	msg_db_r("reset_pre_script", 2);
+	msg_db_f("reset_pre_script", 2);
 	//memset(ps, 0, sizeof(CPreScript));
 	ps->Filename = "";
-	ps->Error = false;
-	ps->ErrorMsg = "";
-	ps->ErrorMsgExt[0] = "";
-	ps->ErrorMsgExt[1] = "";
-	ps->ErrorLine = 0;
-	ps->ErrorColumn = 0;
-	ps->IncludeLinkerError = false;
 	ps->Buffer = "";
 	ps->Exp.buffer = NULL;
 	ps->FlagShow = false;
@@ -99,7 +92,6 @@ void reset_pre_script(PreScript *ps)
 	ps->NumOwnTypes = 0;
 	for (int i=0;i<PreTypes.num;i++)
 		ps->Types.add(PreTypes[i]);
-	msg_db_l(2);	
 }
 
 PreScript::PreScript(Script *_script)
@@ -111,42 +103,35 @@ PreScript::PreScript(Script *_script)
 
 void PreScript::LoadAndParseFile(const string &filename, bool just_analyse)
 {
-	msg_db_r("LoadAndParseFile",4);
+	msg_db_f("LoadAndParseFile",4);
 	
 	Filename = filename.sys_filename();
 
-	Error = !LoadToBuffer(Directory + Filename, just_analyse);
+	LoadToBuffer(Directory + Filename, just_analyse);
 
 	
-	if (!Error)
-		PreCompiler(just_analyse);
+	PreCompiler(just_analyse);
 
-	if (!Error)
-		Parser();
+	Parser();
 	
-	if ((!Error) && (FlagShowPrae))
+	if (FlagShowPrae)
 		Show();
 
-	if (!Error)
-		ConvertCallByReference();
+	ConvertCallByReference();
 
-	/*if ((!Error) && (FlagShow))
+	/*if (FlagShow)
 		Show();*/
 
-	/*if (!Error)
-		BreakDownComplicatedCommands();*/
+	/*BreakDownComplicatedCommands();*/
 
-	if (!Error)
-		Simplify();
+	Simplify();
 	
-	if (!Error)
-		PreProcessor(NULL);
+	PreProcessor(NULL);
 
-	if ((!Error) && (FlagShow))
+	if (FlagShow)
 		Show();
 
 	clear_exp_buffer(&Exp);
-	msg_db_l(4);
 }
 
 
@@ -344,20 +329,14 @@ string LinkNr2Str(PreScript *s,int kind,int nr)
 
 void PreScript::DoError(const string &str, int overwrite_line)
 {
-	if (Error)
-		return;
-	stringout("\n\n\n");
-	stringout("------------------------       Error       -----------------------");	
-	Error = true;
-
 	// what data do we have?
 	int line = -1;
 	int pos = 0;
-	bool exp_known = false;
+	string expr;
 	if (Exp.cur_line){
 		line = Exp.cur_line->physical_line;
 		if (Exp.cur_exp >= 0){
-			exp_known = true;
+			expr = cur_name;
 			pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 		}
 	}
@@ -366,28 +345,7 @@ void PreScript::DoError(const string &str, int overwrite_line)
 		pos = 0;
 	}
 
-	if (exp_known){
-		// full data
-		ErrorMsg = "\"" + cur_name + "\" " + str;
-		ErrorMsgExt[0] = str;
-		ErrorMsgExt[1] = format("\"%s\" , line %d:%d", cur_name.c_str(), line + 1, pos + 1);
-		ErrorLine = line;
-		ErrorColumn = pos;
-	}else{
-		ErrorMsg = str;
-		ErrorMsgExt[0] = str;
-		if (line >= 0)
-			ErrorMsgExt[1] = format("line %d", line + 1);
-		else
-			ErrorMsgExt[1] = "";
-		ErrorLine = (line >= 0) ? line : 0;
-		ErrorColumn = 0;
-	}
-	stringout(str);
-	stringout(ErrorMsgExt[1]);
-	stringout("------------------------------------------------------------------");
-	stringout(Filename);
-	stringout("\n\n\n");
+	throw Exception(str, expr, line, pos, script);
 }
 
 
@@ -399,25 +357,23 @@ bool IsIfDefed(int &num_ifdefs,bool *defed)
 	return true;
 }
 
-Script *cur_script;
 void CreateAsmMetaInfo(PreScript* ps)
 {
-	msg_db_r("CreateAsmMetaInfo",5);
+	msg_db_f("CreateAsmMetaInfo",5);
 	//msg_error("zu coden: CreateAsmMetaInfo");
 	if (!ps->AsmMetaInfo){
 		ps->AsmMetaInfo = new Asm::MetaInfo;
 		ps->AsmMetaInfo->Mode16 = ps->FlagCompileInitialRealMode;
 		ps->AsmMetaInfo->CodeOrigin = 0; // FIXME:  &Opcode[0] ????
 	}
-	ps->AsmMetaInfo->Opcode = cur_script->Opcode;
+	ps->AsmMetaInfo->Opcode = ps->script->Opcode;
 	ps->AsmMetaInfo->global_var.clear();
 	for (int i=0;i<ps->RootOfAllEvil.var.num;i++){
 		Asm::GlobalVar v;
 		v.Name = ps->RootOfAllEvil.var[i].name;
-		v.Pos = cur_script->g_var[i];
+		v.Pos = ps->script->g_var[i];
 		ps->AsmMetaInfo->global_var.add(v);
 	}
-	msg_db_l(5);
 }
 
 
@@ -476,16 +432,14 @@ Function *PreScript::AddFunction(const string &name, Type *type)
 {
 	so("AddFunction");
 	Function *f = new Function();
+	Functions.add(f);
 	f->name = name;
 	f->block = AddBlock();
-	if (Error)
-		return f;
 	f->num_params = 0;
 	f->var.clear();
 	f->return_type = type;
 	f->literal_return_type = type;
 	f->_class = NULL;
-	Functions.add(f);
 	return f;
 }
 Command *PreScript::AddCommand()
@@ -599,7 +553,7 @@ inline void exlink_make_var_local(PreScript *ps, Type *t, int var_no)
 
 bool PreScript::GetExistence(const string &name, Function *f)
 {
-	msg_db_r("GetExistence", 3);
+	msg_db_f("GetExistence", 3);
 	MultipleFunctionList.clear();
 	Function *lf=f;
 	GetExistenceLink.type = TypeUnknown;
@@ -612,7 +566,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 		foreachi(LocalVariable &v, f->var, i){
 			if (v.name == name){
 				exlink_make_var_local(this, v.type, i);
-				msg_db_l(3);
 				return true;
 			}
 		}
@@ -625,7 +578,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 			GetExistenceLink.type = v.type;
 			GetExistenceLink.link_nr = i;
 			GetExistenceLink.kind = KindVarGlobal;
-			msg_db_l(3);
 			return true;
 		}
 
@@ -633,7 +585,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 	int w = WhichExternalVariable(name);
 	if (w >= 0){
 		SetExternalVariable(w, &GetExistenceLink);
-		msg_db_l(3);
 		return true;
 	}
 
@@ -644,7 +595,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 			GetExistenceLink.link_nr = i;
 			GetExistenceLink.type = f->literal_return_type;
 			GetExistenceLink.num_params = f->num_params;
-			msg_db_l(3);
 			return true;
 		}
 
@@ -655,7 +605,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 		GetExistenceLink.link_nr = w;
 		GetExistenceLink.type = PreCommands[w].return_type;
 		GetExistenceLink.num_params = PreCommands[w].param.num;
-		msg_db_l(3);
 		return true;
 	}
 
@@ -664,7 +613,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 	if (w >= 0){
 		GetExistenceLink.kind = KindPrimitiveOperator;
 		GetExistenceLink.link_nr = w;
-		msg_db_l(3);
 		return true;
 	}
 
@@ -673,7 +621,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 	if (w >= 0){
 		GetExistenceLink.kind = KindType;
 		GetExistenceLink.link_nr = w;
-		msg_db_l(3);
 		return true;
 	}
 
@@ -685,7 +632,6 @@ bool PreScript::GetExistence(const string &name, Function *f)
 			memcpy(&GetExistenceLink, &(i->pre_script->GetExistenceLink), sizeof(Command));
 			GetExistenceLink.script = i;
 			//msg_error(string2("\"%s\" in Include gefunden!  %s", name, GetExistenceLink.Type->Name));
-			msg_db_l(3);
 			return true;
 		}
 
@@ -693,18 +639,15 @@ bool PreScript::GetExistence(const string &name, Function *f)
 	GetExistenceLink.type = TypeUnknown;
 	GetExistenceLink.kind = KindUnknown;
 	GetExistenceLink.link_nr = 0;
-	msg_db_l(3);
 	return false;
 }
 
 void PreScript::CommandSetCompilerFunction(int CF, Command *Com)
 {
-	msg_db_r("CommandSetCompilerFunction", 4);
+	msg_db_f("CommandSetCompilerFunction", 4);
 	if (FlagCompileOS)
-		if (!PreCommands[CF].is_special){
+		if (!PreCommands[CF].is_special)
 			DoError(format("external function call (%s) not allowed with #os", PreCommands[CF].name.c_str()));
-			return;
-		}
 	
 // a function the compiler knows
 	Com->kind = KindCompilerFunction;
@@ -716,8 +659,6 @@ void PreScript::CommandSetCompilerFunction(int CF, Command *Com)
 		Com->param[p]->type = PreCommands[CF].param[p].type;
 	}
 	Com->type = PreCommands[CF].return_type;
-			
-	msg_db_l(4);
 }
 
 #define is_variable(kind)	(((kind) == KindVarLocal) || ((kind) == KindVarGlobal) || ((kind) == KindVarExternal))
@@ -734,7 +675,7 @@ void PreScript::SetExternalVariable(int gv, Command *c)
 //  "1.2" -> float
 Type *PreScript::GetConstantType()
 {
-	msg_db_r("GetConstantType", 4);
+	msg_db_f("GetConstantType", 4);
 	PreConstantNr = -1;
 	NamedConstantNr = -1;
 
@@ -742,23 +683,23 @@ Type *PreScript::GetConstantType()
 	foreachi(PreConstant &c, PreConstants, i)
 		if (cur_name == c.name){
 			PreConstantNr = i;
-			_return_(4, c.type);
+			return c.type;
 		}
 
 	// named constants
 	foreachi(Constant &c, Constants, i)
 		if (cur_name == c.name){
 			NamedConstantNr = i;
-			_return_(4, c.type);
+			return c.type;
 		}
 
 	// character "..."
 	if ((cur_name[0] == '\'') && (cur_name.back() == '\''))
-		_return_(4, TypeChar);
+		return TypeChar;
 
 	// string "..."
 	if ((cur_name[0] == '"') && (cur_name.back() == '"'))
-		_return_(4, (FlagCompileOS ? TypeCString : TypeString));
+		return FlagCompileOS ? TypeCString : TypeString;
 
 	// numerical (int/float)
 	Type *type = TypeInt;
@@ -767,13 +708,13 @@ Type *PreScript::GetConstantType()
 		if ((cur_name[c] < '0') || (cur_name[c] > '9')){
 			if (hex){
 				if ((c >= 2) && (cur_name[c] < 'a') && (cur_name[c] > 'f'))
-					_return_(4, TypeUnknown);
+					return TypeUnknown;
 			}else if (cur_name[c] == '.'){
 				type = TypeFloat;
 			}else{
 				//if ((type != TypeFloat) || (cur_name[c] != 'f')) // f in floats erlauben
 					if ((c != 0) || (cur_name[c] != '-')) // Vorzeichen erlauben
-						_return_(4, TypeUnknown);
+						return TypeUnknown;
 			}
 		}
 
@@ -781,9 +722,8 @@ Type *PreScript::GetConstantType()
 	if (cur_name == "["){
 		//msg_error("super array constant");
 		DoError("super array constant");
-		_return_(4, TypeUnknown);
 	}
-	_return_(4, type);
+	return type;
 }
 
 static int _some_int_;
@@ -886,7 +826,7 @@ Type *PreScript::CreateNewType(const string &name, int size, bool is_pointer, bo
 
 void DoClassFunction(PreScript *ps, Command *Operand, Type *t, int f_no, Function *f)
 {
-	msg_db_r("DoClassFunc", 1);
+	msg_db_f("DoClassFunc", 1);
 #if 0
 	switch(Operand->kind){
 		case KindVarLocal:
@@ -902,7 +842,6 @@ void DoClassFunction(PreScript *ps, Command *Operand, Type *t, int f_no, Functio
 			break;
 		default:
 			ps->DoError(string("class functions only allowed for object variables, not for: ", Kind2Str(Operand->kind)));
-			_return_(1,);
 	}
 #endif
 
@@ -934,22 +873,17 @@ void DoClassFunction(PreScript *ps, Command *Operand, Type *t, int f_no, Functio
 		//ps->DoError("script member function call not implemented");
 	}
 	Operand->instance = ob;
-
-	
-	msg_db_l(1);
 }
 
 // find any ".", "->", or "[...]"'s    or operators?
 void PreScript::GetOperandExtension(Command *Operand, Function *f)
 {
-	msg_db_r("GetOperandExtension", 4);
+	msg_db_f("GetOperandExtension", 4);
 
 	// nothing?
 	int op = WhichPrimitiveOperator(cur_name);
-	if ((cur_name != ".") && (cur_name != "[") && (cur_name != "->") && (op < 0)){
-		msg_db_l(4);
+	if ((cur_name != ".") && (cur_name != "[") && (cur_name != "->") && (op < 0))
 		return;
-	}
 	//sLinkData link, temp;
 
 	// class element?
@@ -965,11 +899,8 @@ void PreScript::GetOperandExtension(Command *Operand, Function *f)
 			deref = true;
 		}
 
-		if (get_name(Exp.cur_exp - 1) == "->"){
+		if (get_name(Exp.cur_exp - 1) == "->")
 			DoError("\"->\" deprecated,  use \".\" instead");
-			msg_db_l(4);
-			return;
-		}
 
 		// find element
 		bool ok = false;
@@ -995,21 +926,14 @@ void PreScript::GetOperandExtension(Command *Operand, Function *f)
 					}
 					next_exp();
 					DoClassFunction(this, Operand, type, e, f);
-					if (Error){
-						msg_db_l(4);
-						return;
-					}
 					ok = true;
 					rewind_exp();
 					break;
 				}
 		}
 		
-		if (!ok){
+		if (!ok)
 			DoError("unknown element of " + Type2Str(this,type));
-			msg_db_l(4);
-			return;
-		}
 
 		next_exp();
 
@@ -1027,15 +951,10 @@ void PreScript::GetOperandExtension(Command *Operand, Function *f)
 					pparray = (Operand->type->parent->is_super_array);
 				}else{
 					DoError(format("using pointer type \"%s\" as an array (like in C) is not allowed any more", Operand->type->name.c_str()));
-					msg_db_l(4);
-					return;
 				}
 			}
-		if (!allowed){
+		if (!allowed)
 			DoError(format("type \"%s\" is neither an array nor a pointer to an array", Operand->type->name.c_str()));
-			msg_db_l(4);
-			return;
-		}
 		next_exp();
 
 		Command *t = cp_command(this, Operand);
@@ -1066,22 +985,13 @@ void PreScript::GetOperandExtension(Command *Operand, Function *f)
 
 		// array index...
 		Command *index = GetCommand(f);
-		if (Error){
-			msg_db_l(4);
-			return;
-		}
 		array->param[1] = index;
 		if (index->type != TypeInt){
 			rewind_exp();
 			DoError(format("type of index for an array needs to be (int), not (%s)", index->type->name.c_str()));
-			msg_db_l(4);
-			return;
 		}
-		if (cur_name != "]"){
+		if (cur_name != "]")
 			DoError("\"]\" expected after array index");
-			msg_db_l(4);
-			return;
-		}
 		next_exp();
 
 	// unary operator?
@@ -1094,16 +1004,13 @@ void PreScript::GetOperandExtension(Command *Operand, Function *f)
 					Command *t = cp_command(this, Operand);
 					CommandMakeOperator(Operand, t, NULL, i);
 					next_exp();
-					msg_db_l(4);
 					return;
 				}
-		msg_db_l(4);
 		return;
 	}
 
 	// recursion
 	GetOperandExtension(Operand, f);
-	msg_db_l(4);
 }
 
 inline bool direct_type_match(Type *a, Type *b)
@@ -1113,7 +1020,7 @@ inline bool direct_type_match(Type *a, Type *b)
 
 bool PreScript::GetSpecialFunctionCall(const string &f_name, Command *Operand, Function *f)
 {
-	msg_db_r("GetSpecialFuncCall", 4);
+	msg_db_f("GetSpecialFuncCall", 4);
 
 	// sizeof
 	if ((Operand->kind == KindCompilerFunction) && (Operand->link_nr == CommandSizeof)){
@@ -1131,30 +1038,21 @@ bool PreScript::GetSpecialFunctionCall(const string &f_name, Command *Operand, F
 			(*(int*)(Constants[nc].data)) = GetExistenceLink.type->size;
 		else if (type == GetConstantType())
 			(*(int*)(Constants[nc].data)) = type->size;
-		else{
+		else
 			DoError("type-name or variable name expected in sizeof(...)");
-			msg_db_l(4);
-			return false;
-		}
 		next_exp();
-		if (cur_name != ")"){
+		if (cur_name != ")")
 			DoError("\")\" expected after parameter list");
-			msg_db_l(4);
-			return false;
-		}
 		next_exp();
 		
 		so(*(int*)(Constants[nc].data));
-		msg_db_l(4);
 		return true;
 	}
 
 	// sizeof
-	if ((Operand->kind == KindCompilerFunction) && (Operand->link_nr == CommandReturn)){
+	if ((Operand->kind == KindCompilerFunction) && (Operand->link_nr == CommandReturn))
 		DoError("return");
-	}
 	
-	msg_db_l(4);
 	return false;
 }
 
@@ -1162,10 +1060,8 @@ bool PreScript::GetSpecialFunctionCall(const string &f_name, Command *Operand, F
 // cmd needs to have Param[]'s existing with correct Type!
 void PreScript::FindFunctionSingleParameter(int p, Type **WantedType, Function *f, Command *cmd)
 {
-	msg_db_r("FindFuncSingleParam", 4);
+	msg_db_f("FindFuncSingleParam", 4);
 	Command *Param = GetCommand(f);
-	if (Error)
-		_return_(4,);
 
 	WantedType[p] = TypeUnknown;
 	if (cmd->kind == KindFunction){
@@ -1178,16 +1074,13 @@ void PreScript::FindFunctionSingleParameter(int p, Type **WantedType, Function *
 	}
 	// link parameters
 	cmd->param[p] = Param;
-	msg_db_l(4);
 }
 
 void PreScript::FindFunctionParameters(int &np, Type **WantedType, Function *f, Command *cmd)
 {
-	if (cur_name != "("){
+	if (cur_name != "(")
 		DoError("\"(\" expected in front of function parameter list");
-		return;
-	}
-	msg_db_r("FindFunctionParameters", 4);
+	msg_db_f("FindFunctionParameters", 4);
 	next_exp();
 		    
 	// list of parameters
@@ -1199,19 +1092,15 @@ void PreScript::FindFunctionParameters(int &np, Type **WantedType, Function *f, 
 		// find parameter
 
 		FindFunctionSingleParameter(p, WantedType, f, cmd);
-		if (Error)
-			_return_(4,);
 
 		if (cur_name != ","){
 			if (cur_name == ")")
 				break;
 			DoError("\",\" or \")\" expected after parameter for function");
-			_return_(4,);
 		}
 		next_exp();
 	}
 	next_exp(); // ')'
-	msg_db_l(4);
 }
 
 void apply_type_cast(PreScript *ps, int tc, Command *param);
@@ -1221,7 +1110,7 @@ void apply_type_cast(PreScript *ps, int tc, Command *param);
 //   ...and try to cast, if not
 void PreScript::CheckParamLink(Command *link, Type *type, const string &f_name, int param_no)
 {
-	msg_db_r("CheckParamLink", 4);
+	msg_db_f("CheckParamLink", 4);
 	// type cast needed and possible?
 	Type *pt = link->type;
 	Type *wt = type;
@@ -1239,7 +1128,6 @@ void PreScript::CheckParamLink(Command *link, Type *type, const string &f_name, 
 		}else{
 			rewind_exp();
 			DoError(format("(c) parameter %d for function \"%s\" has type (%s), (%s) expected", param_no + 1, f_name.c_str(), pt->name.c_str(), wt->name.c_str()));
-			_return_(4,);
 		}
 
 	// normal type cast
@@ -1254,17 +1142,15 @@ void PreScript::CheckParamLink(Command *link, Type *type, const string &f_name, 
 			apply_type_cast(this, tc, link);
 		}else{
 			DoError(format("(a) parameter %d for function \"%s\" has type (%s), (%s) expected", param_no + 1, f_name.c_str(), pt->name.c_str(), wt->name.c_str()));
-			_return_(4,);
 		}
 	}
-	msg_db_l(4);
 }
 
 // creates <Operand> to be the function call
 //  on entry <Operand> only contains information from GetExistence (Kind, Nr, Type, NumParams)
 void PreScript::GetFunctionCall(const string &f_name, Command *Operand, Function *f)
 {
-	msg_db_r("GetFunctionCall", 4);
+	msg_db_f("GetFunctionCall", 4);
 	
 	// function as a variable?
 	if (Exp.cur_exp >= 2)
@@ -1274,12 +1160,12 @@ void PreScript::GetFunctionCall(const string &f_name, Command *Operand, Function
 			Operand->kind = KindVarFunction;
 			Operand->type = TypePointer;
 			Operand->num_params = 0;
+			return;
 		}else{
 			rewind_exp();
 			//DoError("\"(\" expected in front of parameter list");
 			DoError("only script functions can be referenced");
 		}
-		_return_(4,);
 	}
 
 	
@@ -1287,8 +1173,8 @@ void PreScript::GetFunctionCall(const string &f_name, Command *Operand, Function
     if (Operand->kind == KindCompilerFunction)
 	    if (Operand->link_nr == CommandSizeof){
 			GetSpecialFunctionCall(f_name, Operand, f);
-			_return_(4,);
-		}
+			return;
+	    }
 
 	so(Type2Str(this, Operand->type));
 	// link operand onto this command
@@ -1308,9 +1194,6 @@ void PreScript::GetFunctionCall(const string &f_name, Command *Operand, Function
 		np = 1;
 		FindFunctionSingleParameter(0, WantedType, f, Operand);
 	}
-	if (Error){
-		_return_(4,);
-	}
 	
 
 	// return: parameter type by function
@@ -1321,21 +1204,15 @@ void PreScript::GetFunctionCall(const string &f_name, Command *Operand, Function
 	if (np != Operand->num_params){
 		rewind_exp();
 		DoError(format("function \"%s\" expects %d parameters, %d were found",f_name.c_str(), Operand->num_params, np));
-		_return_(4,);
 	}
 	for (int p=0;p<np;p++){
-
 		CheckParamLink(Operand->param[p], WantedType[p], f_name, p);
-		if (Error){
-			_return_(4,);
-		}
 	}
-	msg_db_l(4);
 }
 
 Command *PreScript::GetOperand(Function *f)
 {
-	msg_db_r("GetOperand", 4);
+	msg_db_f("GetOperand", 4);
 	Command *Operand = NULL;
 	so(cur_name);
 
@@ -1344,24 +1221,20 @@ Command *PreScript::GetOperand(Function *f)
 		next_exp();
 		Operand = GetCommand(f);
 		if (cur_name != ")")
-			_do_error_("\")\" expected", 4, Operand);
+			DoError("\")\" expected");
 		next_exp();
 	}else if (cur_name == "&"){ // & -> address operator
 		so("<Adress-Operator &>");
 		next_exp();
 		Operand = GetOperand(f);
-		if (Error)
-			_return_(4, Operand);
 		ref_command(this, Operand);
 	}else if (cur_name == "*"){ // * -> dereference
 		so("<Dereferenzierung *>");
 		next_exp();
 		Operand = GetOperand(f);
-		if (Error)
-			_return_(4, Operand);
 		if (!Operand->type->is_pointer){
 			rewind_exp();
-			_do_error_("only pointers can be dereferenced using \"*\"", 4, Operand);
+			DoError("only pointers can be dereferenced using \"*\"");
 		}
 		deref_command(this, Operand);
 	}else{
@@ -1383,8 +1256,6 @@ Command *PreScript::GetOperand(Function *f)
 				so("  => unaerer Operator");
 				int po = Operand->link_nr, o=-1;
 				Command *sub_command = GetOperand(f);
-				if (Error)
-					_return_(4, Operand);
 				Type *r = TypeVoid;
 				Type *p2 = sub_command->type;
 
@@ -1419,23 +1290,20 @@ Command *PreScript::GetOperand(Function *f)
 					// cast
 					if (ok){
 						apply_type_cast(this, c2_best, sub_command);
-						if (Error)
-							_return_(4, Operand);
 					}
 				}
 
 
 				if (!ok){
 					Exp.cur_exp = _ie;
-					_do_error_("unknown unitary operator  " + p2->name, 4, Operand);
+					DoError("unknown unitary operator  " + p2->name);
 				}
 				CommandMakeOperator(Operand, sub_command, NULL, o);
 				so(Operator2Str(this,o));
-				_return_(4, Operand);
+				return Operand;
 			}
 		}else{
 			Type *t = GetConstantType();
-			if (Error)	_return_(4, Operand);
 			if (t != TypeUnknown){
 				so("=> Konstante");
 				Operand = AddCommand();
@@ -1450,41 +1318,36 @@ Command *PreScript::GetOperand(Function *f)
 				next_exp();
 			}else{
 				//Operand.Kind=0;
-				_do_error_("unknown operand", 4, Operand);
+				DoError("unknown operand");
 			}
 		}
 
 	}
-	if (Error)
-			_return_(4, Operand);
 
 	// Arrays, Strukturen aufloessen...
 	GetOperandExtension(Operand,f);
 
 	so("Operand endet mit " + get_name(Exp.cur_exp - 1));
-	_return_(4, Operand);
+	return Operand;
 }
 
 // only "primitive" operator -> no type information
 Command *PreScript::GetOperator(Function *f)
 {
-	msg_db_r("GetOperator",4);
+	msg_db_f("GetOperator",4);
 	so(cur_name);
 	int op = WhichPrimitiveOperator(cur_name);
-	if (op >= 0){
+	if (op < 0)
+		return NULL;
 
-		// command from operator
-		Command *cmd = AddCommand();
-		cmd->kind = KindPrimitiveOperator;
-		cmd->link_nr = op;
-		// only provisional (only operator sign, parameters and their types by GetCommand!!!)
+	// command from operator
+	Command *cmd = AddCommand();
+	cmd->kind = KindPrimitiveOperator;
+	cmd->link_nr = op;
+	// only provisional (only operator sign, parameters and their types by GetCommand!!!)
 
-		next_exp();
-		msg_db_l(4);
-		return cmd;
-	}
-	msg_db_l(4);
-	return NULL;
+	next_exp();
+	return cmd;
 }
 
 inline void CommandMakeOperator(Command *cmd, Command *p1, Command *p2, int op)
@@ -1572,7 +1435,7 @@ void apply_type_cast(PreScript *ps, int tc, Command *param)
 
 bool PreScript::LinkOperator(int op_no, Command *param1, Command *param2, Command **cmd)
 {
-	msg_db_r("LinkOp",4);
+	msg_db_f("LinkOp",4);
 	bool left_modifiable = PrimitiveOperators[op_no].left_modifiable;
 	string op_func_name = PrimitiveOperators[op_no].function_name;
 
@@ -1594,7 +1457,6 @@ bool PreScript::LinkOperator(int op_no, Command *param1, Command *param2, Comman
 				CommandSetClassFunc(this, p1, *cmd, f, inst);
 				(*cmd)->num_params = 1;
 				(*cmd)->param[0] = param2;
-				msg_db_l(4);
 				return true;
 			}
 		}
@@ -1604,7 +1466,6 @@ bool PreScript::LinkOperator(int op_no, Command *param1, Command *param2, Comman
 		if (op_no == PreOperators[i].primitive_id)
 			if (type_match(p1, equal_classes, PreOperators[i].param_type_1) && type_match(p2, equal_classes, PreOperators[i].param_type_2)){
 				CommandMakeOperator(*cmd, param1, param2, i);
-				msg_db_l(4);
 				return true;
 			}
 
@@ -1619,7 +1480,6 @@ bool PreScript::LinkOperator(int op_no, Command *param1, Command *param2, Comman
 					(*cmd)->num_params = 1;
 					(*cmd)->param[0] = param2;
 					ref_command(this, (*cmd)->param[0]);
-					msg_db_l(4);
 					return true;
 				}
 		}
@@ -1654,8 +1514,6 @@ bool PreScript::LinkOperator(int op_no, Command *param1, Command *param2, Comman
 	if (op_found >= 0){
 		apply_type_cast(this, c1_best, param1);
 		apply_type_cast(this, c2_best, param2);
-		if (Error)
-			_return_(4, false);
 		if (op_is_class_func){
 			Command *inst = param1;
 			ref_command(this, inst);
@@ -1665,17 +1523,15 @@ bool PreScript::LinkOperator(int op_no, Command *param1, Command *param2, Comman
 		}else{
 			CommandMakeOperator(*cmd, param1, param2, op_found);
 		}
-		msg_db_l(4);
 		return true;
 	}
 
-	msg_db_l(4);
 	return false;
 }
 
 void PreScript::LinkMostImportantOperator(int &NumOperators, Command **Operand, Command **Operator, int *op_exp)
 {
-	msg_db_r("LinkMostImpOp",4);
+	msg_db_f("LinkMostImpOp",4);
 // find the most important operator (mio)
 	int mio=0;
 	for (int i=0;i<NumOperators;i++){
@@ -1691,7 +1547,7 @@ void PreScript::LinkMostImportantOperator(int &NumOperators, Command **Operand, 
 	int op_no = Operator[mio]->link_nr;
 	if (!LinkOperator(op_no, param1, param2, &Operator[mio])){
 		Exp.cur_exp = op_exp[mio];
-		_do_error_(format("no operator found: (%s) %s (%s)", Type2Str(this, param1->type).c_str(), PrimitiveOperator2Str(op_no).c_str(), Type2Str(this, param2->type).c_str()), 4,);
+		DoError(format("no operator found: (%s) %s (%s)", Type2Str(this, param1->type).c_str(), PrimitiveOperator2Str(op_no).c_str(), Type2Str(this, param2->type).c_str()));
 	}
 
 // remove from list
@@ -1702,12 +1558,11 @@ void PreScript::LinkMostImportantOperator(int &NumOperators, Command **Operand, 
 		op_exp[i] = op_exp[i+1];
 	}
 	NumOperators--;
-	msg_db_l(4);
 }
 
 Command *PreScript::GetCommand(Function *f)
 {
-	msg_db_r("GetCommand", 4);
+	msg_db_f("GetCommand", 4);
 	int NumOperands = 0;
 	Array<Command*> Operand;
 	Array<Command*> Operator;
@@ -1715,10 +1570,6 @@ Command *PreScript::GetCommand(Function *f)
 
 	// find the first operand
 	Operand.add(GetOperand(f));
-	if (Error){
-		msg_db_l(4);
-		return Operand[0];
-	}
 	NumOperands ++;
 
 	// find pairs of operators and operands
@@ -1729,19 +1580,11 @@ Command *PreScript::GetCommand(Function *f)
 			Operator.add(op);
 			if (end_of_line()){
 				//rewind_exp();
-				_do_error_("unexpected end of line after operator", 4, NULL);
+				DoError("unexpected end of line after operator");
 			}
 			Operand.add(GetOperand(f));
-			if (Error){
-				msg_db_l(4);
-				return NULL;
-			}
 			NumOperands++;
 		}else{
-			if (Error){
-				msg_db_l(4);
-				return NULL;
-			}
 			so("(kein weiterer Operator)");
 			so(cur_name);
 			break;
@@ -1753,10 +1596,6 @@ Command *PreScript::GetCommand(Function *f)
 	int NumOperators=NumOperands-1;
 	for (int i=0;i<NumOperands-1;i++){
 		LinkMostImportantOperator(NumOperators, &Operand[0], &Operator[0], &op_exp[0]);
-		if (Error){
-			msg_db_l(4);
-			return Operand[0];
-		}
 	}
 
 	Command *ret = Operand[0];
@@ -1768,7 +1607,6 @@ Command *PreScript::GetCommand(Function *f)
 
 	so("-fertig");
 	so("Command endet mit " + get_name(Exp.cur_exp - 1));
-	msg_db_l(4);
 	return ret;
 }
 
@@ -1776,7 +1614,7 @@ void conv_cbr(PreScript *ps, Command *&c, int var);
 
 void PreScript::GetSpecialCommand(Block *block, Function *f)
 {
-	msg_db_r("GetSpecialCommand", 4);
+	msg_db_f("GetSpecialCommand", 4);
 
 	// special commands...
 	if (cur_name == "for"){
@@ -1795,32 +1633,29 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 		}else{
 			GetExistence(cur_name, f);
  			for_var = cp_command(this, &GetExistenceLink);
-			if (Error)	_return_(4,);
 			if ((!is_variable(for_var->kind)) || ((for_var->type != TypeInt) && (for_var->type != TypeFloat)))
-				_do_error_("int or float variable expected after \"for\"", 4,);
+				DoError("int or float variable expected after \"for\"");
 		}
 		next_exp();
 
 		// first value
 		if (cur_name != ",")
-			_do_error_("\",\" expected after variable in for", 4,);
+			DoError("\",\" expected after variable in for");
 		next_exp();
 		Command *val0 = GetCommand(f);
-		if (Error)	_return_(4,);
 		if (val0->type != for_var->type){
 			rewind_exp();
-			_do_error_(format("%s expected as first value of for", for_var->type->name.c_str()), 4,);
+			DoError(format("%s expected as first value of for", for_var->type->name.c_str()));
 		}
 
 		// last value
 		if (cur_name != ",")
-			_do_error_("\",\" expected after variable in for", 4,);
+			DoError("\",\" expected after variable in for");
 		next_exp();
 		Command *val1 = GetCommand(f);
-		if (Error)	_return_(4,);
 		if (val1->type != for_var->type){
 			rewind_exp();
-			_do_error_(format("%s expected as last value of for", for_var->type->name.c_str()), 4,);
+			DoError(format("%s expected as last value of for", for_var->type->name.c_str()));
 		}
 
 		// implement
@@ -1836,12 +1671,10 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 		Command *cmd_while = add_command_compilerfunc(this, CommandFor);
 		cmd_while->param[0] = cmd_cmp;
 		block->command.add(cmd_while);
-		if (ExpectNewline())
-			_return_(4,);
+		ExpectNewline();
 		// ...block
 		next_line();
-		if (ExpectIndent())
-			_return_(4,);
+		ExpectIndent();
 		int loop_block_no = Blocks.num; // should get created...soon
 		GetCompleteCommand(block, f);
 			
@@ -1876,13 +1709,12 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 
 		// super array
 		if (cur_name != "in")
-			_do_error_("\"in\" expected after variable in forall", 4,);
+			DoError("\"in\" expected after variable in forall");
 		next_exp();
 		GetExistence(cur_name, f);
 		Command *for_array = cp_command(this, &GetExistenceLink);
-		if (Error)	_return_(4,);
 		if ((!is_variable(for_array->kind)) || (!for_array->type->is_super_array))
-			_do_error_("list variable expected as second parameter in \"forall\"", 4,);
+			DoError("list variable expected as second parameter in \"forall\"");
 		next_exp();
 
 		// variable...
@@ -1917,12 +1749,10 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 		Command *cmd_while = add_command_compilerfunc(this, CommandFor);
 		cmd_while->param[0] = cmd_cmp;
 		block->command.add(cmd_while);
-		if (ExpectNewline())
-			_return_(4,);
+		ExpectNewline();
 		// ...block
 		next_line();
-		if (ExpectIndent())
-			_return_(4,);
+		ExpectIndent();
 		int loop_block_no = Blocks.num; // should get created...soon
 		GetCompleteCommand(block, f);
 			
@@ -1963,19 +1793,15 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 	}else if (cur_name == "while"){
 		next_exp();
 		Command *cmd_cmp = GetCommand(f);
-		if (Error)	_return_(4,);
 		CheckParamLink(cmd_cmp, TypeBool, "while", 0);
-		if (Error)	_return_(4,);
-		if (ExpectNewline())
-			_return_(4,);
+		ExpectNewline();
 			
 		Command *cmd_while = add_command_compilerfunc(this, CommandWhile);
 		cmd_while->param[0] = cmd_cmp;
 		block->command.add(cmd_while);
 		// ...block
 		next_line();
-		if (ExpectIndent())
-			_return_(4,);
+		ExpectIndent();
 		GetCompleteCommand(block, f);
  	}else if (cur_name == "break"){
 		next_exp();
@@ -1989,19 +1815,15 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 		int ind = Exp.cur_line->indent;
 		next_exp();
 		Command *cmd_cmp = GetCommand(f);
-		if (Error)	_return_(4,);
 		CheckParamLink(cmd_cmp, TypeBool, "if", 0);
-		if (Error)	_return_(4,);
-		if (ExpectNewline())
-			_return_(4,);
+		ExpectNewline();
 			
 		Command *cmd_if = add_command_compilerfunc(this, CommandIf);
 		cmd_if->param[0] = cmd_cmp;
 		block->command.add(cmd_if);
 		// ...block
 		next_line();
-		if (ExpectIndent())
-			_return_(4,);
+		ExpectIndent();
 		GetCompleteCommand(block, f);
 		next_line();
 
@@ -2013,8 +1835,6 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 			if (cur_name == "if"){
 				// sub-if's in a new block
 				Block *new_block = AddBlock();
-				if (Error)
-					_return_(4,);
 				// parse the next if
 				GetCompleteCommand(new_block, f);
 				// command for the found block
@@ -2023,14 +1843,12 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 				cmd_block->link_nr = new_block->index;
 				// ...
 				block->command.add(cmd_block);
-				_return_(4,);
+				return;
 			}
-			if (ExpectNewline())
-				_return_(4,);
+			ExpectNewline();
 			// ...block
 			next_line();
-			if (ExpectIndent())
-				_return_(4,);
+			ExpectIndent();
 			GetCompleteCommand(block, f);
 			//next_line();
 		}else{
@@ -2039,8 +1857,6 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 			Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
 		}
 	}
-	
-	msg_db_l(4);
 }
 
 /*void ParseBlock(sBlock *block, sFunction *f)
@@ -2050,7 +1866,7 @@ void PreScript::GetSpecialCommand(Block *block, Function *f)
 // we already are in the line to analyse ...indentation for a new block should compare to the last line
 void PreScript::GetCompleteCommand(Block *block, Function *f)
 {
-	msg_db_r("GetCompleteCommand", 4);
+	msg_db_f("GetCompleteCommand", 4);
 	// cur_exp = 0!
 
 	Type *tType = GetType(cur_name, false);
@@ -2061,12 +1877,8 @@ void PreScript::GetCompleteCommand(Block *block, Function *f)
 		indented = false;
 		Exp.cur_exp = 0; // bad hack...
 		Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
-		msg_db_r("Block", 4);
+		msg_db_f("Block", 4);
 		Block *new_block = AddBlock();
-		if (Error){
-			msg_db_l(4);
-			_return_(4,);
-		}
 		new_block->root = block->index;
 
 		Command *c = AddCommand();
@@ -2079,10 +1891,6 @@ void PreScript::GetCompleteCommand(Block *block, Function *f)
 				break;
 
 			GetCompleteCommand(new_block, f);
-			if (Error){
-				msg_db_l(4);
-				_return_(4,);
-			}
 			next_line();
 		}
 		Exp.cur_line --;
@@ -2090,7 +1898,6 @@ void PreScript::GetCompleteCommand(Block *block, Function *f)
 		indented = false;
 		Exp.cur_exp = Exp.cur_line->exp.num - 1;
 		Exp._cur_ = Exp.cur_line->exp[Exp.cur_exp].name;
-		msg_db_l(4);
 
 	// assembler block
 	}else if (cur_name == "-asm-"){
@@ -2109,17 +1916,15 @@ void PreScript::GetCompleteCommand(Block *block, Function *f)
 			if (cur_name == "="){
 				rewind_exp();
 				Command *c = GetCommand(f);
-				if (Error)
-					_return_(4,);
 				block->command.add(c);
 			}
 			if (end_of_line())
 				break;
 			if ((cur_name != ",") && (!end_of_line()))
-				_do_error_("\",\", \"=\" or newline expected after definition of local variable", 4,);
+				DoError("\",\", \"=\" or newline expected after definition of local variable");
 			next_exp();
 		}
-		_return_(4,);
+		return;
 	}else{
 
 		
@@ -2131,23 +1936,19 @@ void PreScript::GetCompleteCommand(Block *block, Function *f)
 
 			// normal commands
 			Command *c = GetCommand(f);
-			if (Error)
-				_return_(4,);
 
 			// link
 			block->command.add(c);
 		}
 	}
 
-	if (ExpectNewline())
-		_return_(4,);
-	msg_db_l(4);
+	ExpectNewline();
 }
 
 // look for array definitions and correct pointers
 void PreScript::TestArrayDefinition(Type **type, bool is_pointer)
 {
-	msg_db_r("TestArrayDef", 4);
+	msg_db_f("TestArrayDef", 4);
 	if (is_pointer){
 		(*type) = GetPointerType((*type));
 	}
@@ -2167,21 +1968,14 @@ void PreScript::TestArrayDefinition(Type **type, bool is_pointer)
 
 			// find array index
 			Command *c = GetCommand(&RootOfAllEvil);
-			if (Error)	_return_(4,);
 			PreProcessCommand(NULL, c);
 
-			if ((c->kind != KindConstant) || (c->type != TypeInt)){
+			if ((c->kind != KindConstant) || (c->type != TypeInt))
 				DoError("only constants of type \"int\" allowed for size of arrays");
-				msg_db_l(4);
-				return;
-			}
 			array_size = *(int*)Constants[c->link_nr].data;
 			//next_exp();
-			if (cur_name != "]"){
+			if (cur_name != "]")
 				DoError("\"]\" expected after array size");
-				msg_db_l(4);
-				return;
-			}
 		}
 		next_exp();
 		// recursion
@@ -2202,22 +1996,19 @@ void PreScript::TestArrayDefinition(Type **type, bool is_pointer)
 			TestArrayDefinition(type, true);
 		}
 	}
-	msg_db_l(4);
 }
 
 
-// Datei auslesen (und Kommentare auslesen)
-bool PreScript::LoadToBuffer(const string &filename,bool just_analyse)
+// read the file and do a lexical analysis
+void PreScript::LoadToBuffer(const string &filename,bool just_analyse)
 {
-	msg_db_r("LoadToBuffer",4);
+	msg_db_f("LoadToBuffer",4);
 
 // read file
 	CFile *f = OpenFile(filename);
 	if (!f){
 		Exp.cur_line = NULL;
 		DoError("script file not loadable");
-		msg_db_l(4);
-		return false;
 	}
 	Buffer = f->ReadComplete();
 	FileClose(f);
@@ -2226,22 +2017,17 @@ bool PreScript::LoadToBuffer(const string &filename,bool just_analyse)
 
 
 	Buffer.clear();
-
-	msg_db_l(4);
-	return !Error;
 }
 
 
 void PreScript::ParseEnum()
 {
-	msg_db_r("ParseEnum", 4);
+	msg_db_f("ParseEnum", 4);
 	next_exp(); // 'enum'
-	if (ExpectNewline())
-		_return_(4,);
+	ExpectNewline();
 	int value = 0;
 	next_line();
-	if (ExpectIndent())
-		_return_(4,);
+	ExpectIndent();
 	for (int i=0;!end_of_file();i++){
 		for (int j=0;!end_of_line();j++){
 			int nc = AddConstant(TypeInt);
@@ -2252,13 +2038,12 @@ void PreScript::ParseEnum()
 			// explicit value
 			if (cur_name == ":"){
 				next_exp();
-				if (ExpectNoNewline())
-					_return_(4,);
+				ExpectNoNewline();
 				Type *type = GetConstantType();
 				if (type == TypeInt)
 					value = *(int*)GetConstantValue();
 				else
-					_do_error_("integer constant expected after \":\" for explicit value of enum", 4,);
+					DoError("integer constant expected after \":\" for explicit value of enum");
 				next_exp();
 			}
 			*(int*)c->data = value ++;
@@ -2266,17 +2051,15 @@ void PreScript::ParseEnum()
 			if (end_of_line())
 				break;
 			if ((cur_name != ","))
-				_do_error_("\",\" or newline expected after enum definition", 4,);
+				DoError("\",\" or newline expected after enum definition");
 			next_exp();
-			if (ExpectNoNewline())
-				_return_(4,);
+			ExpectNoNewline();
 		}
 		next_line();
 		if (unindented)
 			break;
 	}
 	Exp.cur_line --;
-	msg_db_l(4);
 }
 
 static int ExternalFuncPreCommandIndex;
@@ -2315,7 +2098,7 @@ inline bool type_needs_alignment(Type *t)
 
 void PreScript::ParseClass()
 {
-	msg_db_r("ParseClass", 4);
+	msg_db_f("ParseClass", 4);
 
 	int indent0 = Exp.cur_line->indent;
 	int _offset = 0;
@@ -2329,8 +2112,6 @@ void PreScript::ParseClass()
 	if (nt0 == Types.num){
 		rewind_exp();
 		DoError("class already exists");
-		msg_db_l(4);
-		return;
 	}
 
 	// parent class
@@ -2338,10 +2119,6 @@ void PreScript::ParseClass()
 		so("vererbung der struktur");
 		next_exp();
 		Type *ancestor = GetType(cur_name, true);
-		if (Error){
-			msg_db_l(4);
-			return;
-		}
 		bool found = false;
 		if (ancestor->element.num > 0){
 			// inheritance of elements
@@ -2356,16 +2133,10 @@ void PreScript::ParseClass()
 					t->function.add(f);
 			found = true;
 		}
-		if (!found){
+		if (!found)
 			DoError(format("parental type in class definition after \":\" has to be a class, but (%s) is not", ancestor->name.c_str()));
-			msg_db_l(4);
-			return;
-		}
 	}
-	if (ExpectNewline()){
-		msg_db_l(4);
-		return;
-	}
+	ExpectNewline();
 
 	// elements
 	for (int num=0;true;num++){
@@ -2384,10 +2155,6 @@ void PreScript::ParseClass()
 		int ie = Exp.cur_exp;
 
 		Type *tType = GetType(cur_name, true);
-		if (Error){
-			msg_db_l(4);
-			return;
-		}
 		for (int j=0;!end_of_line();j++){
 			//int indent = Exp.cur_line->indent;
 			
@@ -2419,11 +2186,8 @@ void PreScript::ParseClass()
 			if (type_needs_alignment(type))
 				_offset = mem_align(_offset);
 			so(format("Class-Element: %s %s  Offset: %d", type->name.c_str(), el.name.c_str(), _offset));
-			if ((cur_name != ",") && (!end_of_line())){
+			if ((cur_name != ",") && (!end_of_line()))
 				DoError("\",\" or newline expected after class element");
-				msg_db_l(4);
-				return;
-			}
 			el.offset = _offset;
 			_offset += type->size;
 			t->element.add(el);
@@ -2441,34 +2205,24 @@ void PreScript::ParseClass()
 	CreateImplicitFunctions(t, false);
 
 	Exp.cur_line --;
-	msg_db_l(4);
 }
 
-bool PreScript::ExpectNoNewline()
+void PreScript::ExpectNoNewline()
 {
-	if (end_of_line()){
+	if (end_of_line())
 		DoError("unexpected newline");
-		return true;
-	}
-	return false;
 }
 
-bool PreScript::ExpectNewline()
+void PreScript::ExpectNewline()
 {
-	if (!end_of_line()){
+	if (!end_of_line())
 		DoError("newline expected");
-		return true;
-	}
-	return false;
 }
 
-bool PreScript::ExpectIndent()
+void PreScript::ExpectIndent()
 {
-	if (!indented){
+	if (!indented)
 		DoError("additional indent expected");
-		return true;
-	}
-	return false;
 }
 
 void AddExternalVar(const string &name, Type *type)
@@ -2498,33 +2252,26 @@ void AddExternalVar(const string &name, Type *type)
 
 void PreScript::ParseGlobalConst(const string &name, Type *type)
 {
-	msg_db_r("ParseGlobalConst", 6);
+	msg_db_f("ParseGlobalConst", 6);
 	if (cur_name != "=")
-		_do_error_("\"=\" expected after const name", 6, );
+		DoError("\"=\" expected after const name");
 	next_exp();
 
 	// find const value
 	Command *cv = GetCommand(&RootOfAllEvil);
-	if (Error)	_return_(6,);
 	PreProcessCommand(NULL, cv);
-	if (Error)	_return_(6,);
 
-	if ((cv->kind != KindConstant) || (cv->type != type)){
+	if ((cv->kind != KindConstant) || (cv->type != type))
 		DoError(format("only constants of type \"%s\" allowed as value for this constant", type->name.c_str()));
-		msg_db_l(6);
-		return;
-	}
 
 	// give our const the name
 	Constant *c = &Constants[cv->link_nr];
 	c->name = name;
-	
-	msg_db_l(6);
 }
 
 Type *PreScript::ParseVariableDefSingle(Type *type, Function *f, bool as_param)
 {
-	msg_db_r("ParseVariableDefSingle", 6);
+	msg_db_f("ParseVariableDefSingle", 6);
 	
 	bool is_pointer = false;
 	string name;
@@ -2556,31 +2303,21 @@ Type *PreScript::ParseVariableDefSingle(Type *type, Function *f, bool as_param)
 		ParseGlobalConst(name, type);
 	}else
 		AddVar(name, type, f);
-	msg_db_l(6);
 	return type;
 }
 
 void PreScript::ParseVariableDef(bool single, Function *f)
 {
-	msg_db_r("ParseVariableDef", 4);
+	msg_db_f("ParseVariableDef", 4);
 	Type *type = GetType(cur_name, true);
-	if (Error){
-		msg_db_l(4);
-		return;
-	}
 	
 	for (int j=0;true;j++){
-		if (ExpectNoNewline())
-			break;
+		ExpectNoNewline();
 
 		ParseVariableDefSingle(type, f);
-		if (Error)
-			break;
 		
-		if ((cur_name != ",") && (!end_of_line())){
+		if ((cur_name != ",") && (!end_of_line()))
 			DoError("\",\" or newline expected after definition of a global variable");
-			break;
-		}
 
 		// last one?
 		if (end_of_line())
@@ -2588,7 +2325,6 @@ void PreScript::ParseVariableDef(bool single, Function *f)
 		
 		next_exp(); // ','
 	}
-	msg_db_l(4);
 }
 
 void CopyFuncDataToExternal(Function *f, PreCommand *c, bool is_class_func)
@@ -2638,14 +2374,10 @@ void AddExternalFunc(PreScript *ps, Function *f, Type *class_type)
 
 void PreScript::ParseFunction(Type *class_type, bool as_extern)
 {
-	msg_db_r("ParseFunction", 4);
+	msg_db_f("ParseFunction", 4);
 	
 // return type
 	Type *type = GetType(cur_name, true);
-	if (Error){
-		msg_db_l(4);
-		return;
-	}
 
 	// pointer?
 	if (cur_name == "*"){
@@ -2655,10 +2387,6 @@ void PreScript::ParseFunction(Type *class_type, bool as_extern)
 
 	so(cur_name);
 	Function *f = AddFunction(cur_name, type);
-	if (Error){
-		msg_db_l(4);
-		return;
-	}
 	cur_func = f;
 	next_extern = false;
 	
@@ -2675,21 +2403,14 @@ void PreScript::ParseFunction(Type *class_type, bool as_extern)
 
 			// type of parameter variable
 			Type *param_type = GetType(cur_name, true);
-			if (Error){
-				msg_db_l(4);
-				return;
-			}
 			Type *pt = ParseVariableDefSingle(param_type, f, true);
 			f->var.back().type = pt;
 
 			if (cur_name == ")")
 				break;
 
-			if (cur_name != ","){
+			if (cur_name != ",")
 				DoError("\",\" or \")\" expected after parameter");
-				msg_db_l(4);
-				return;
-			}
 			next_exp(); // ','
 		}
 	next_exp(); // ')'
@@ -2698,11 +2419,8 @@ void PreScript::ParseFunction(Type *class_type, bool as_extern)
 	for (int i=0;i<f->num_params;i++)
 		f->literal_param_type[i] = f->var[i].type;
 
-	if (!end_of_line()){
+	if (!end_of_line())
 		DoError("newline expected after parameter list");
-		msg_db_l(4);
-		return;
-	}
 
 
 	// class function
@@ -2717,7 +2435,6 @@ void PreScript::ParseFunction(Type *class_type, bool as_extern)
 	if (as_extern){
 		AddExternalFunc(this, f, class_type);
 		cur_func = NULL;
-		msg_db_l(4);
 		return;
 	}
 
@@ -2739,28 +2456,21 @@ void PreScript::ParseFunction(Type *class_type, bool as_extern)
 
 		// command or local definition
 		GetCompleteCommand(f->block, f);
-		if (Error){
-			msg_db_l(4);
-			return;
-		}
 	}
 	cur_func = NULL;
 
 	Exp.cur_line --;
-	msg_db_l(4);
 }
 
 // convert text into script data
 void PreScript::Parser()
 {
-	if (Error)	return;
-	msg_db_r("Parser", 4);
+	msg_db_f("Parser", 4);
 
 	RootOfAllEvil.name = "RootOfAllEvil";
 	cur_func = NULL;
 
 	// syntax analysis
-	Error = false;
 	shift_right = 0;
 
 	Exp.cur_line = &Exp.line[0];
@@ -2770,8 +2480,6 @@ void PreScript::Parser()
 
 	// global definitions (enum, class, variables and functions)
 	while (!end_of_file()){
-		if (Error)
-			return;
 		next_extern = false;
 		next_const = false;
 
@@ -2799,10 +2507,6 @@ void PreScript::Parser()
 
 			// type of definition
 			GetType(cur_name, true);
-			if (Error){
-				msg_db_l(4);
-				return;
-			}
 			rewind_exp();
 			bool is_function = false;
 			for (int j=1;j<Exp.cur_line->exp.num-1;j++)
@@ -2820,13 +2524,11 @@ void PreScript::Parser()
 		}
 		next_line();
 	}
-
-	msg_db_l(4);
 }
 
 void conv_cbr(PreScript *ps, Command *&c, int var)
 {
-	msg_db_r("conv_cbr", 4);
+	msg_db_f("conv_cbr", 4);
 	//so(Kind2Str(c->Kind));
 	
 	// recursion...
@@ -2848,7 +2550,6 @@ void conv_cbr(PreScript *ps, Command *&c, int var)
 		c->type = ps->GetPointerType(c->type);
 		deref_command(ps, c);
 	}
-	msg_db_l(4);
 }
 
 #if 0
@@ -2869,7 +2570,7 @@ void conv_return(PreScript *ps, command *c)
 // remove &*x and (*x)[] and (*x).y
 void easyfy(PreScript *ps, Command *c, int l)
 {
-	msg_db_r("easyfy", 4);
+	msg_db_f("easyfy", 4);
 	//msg_write(l);
 	//msg_write("a");
 	
@@ -2903,7 +2604,6 @@ void easyfy(PreScript *ps, Command *c, int l)
 		}
 	}
 	//msg_write("ok");
-	msg_db_l(4);
 }
 
 // convert "source code"...
@@ -2911,7 +2611,7 @@ void easyfy(PreScript *ps, Command *c, int l)
 //    return by ref:       array
 void PreScript::ConvertCallByReference()
 {
-	msg_db_r("ConvertCallByReference", 2);
+	msg_db_f("ConvertCallByReference", 2);
 
 
 	// convert functions
@@ -2984,28 +2684,23 @@ void PreScript::ConvertCallByReference()
 		}
 		_foreach_it_.update(); // TODO !!!!!
 	}
-	msg_db_l(2);
 }
 
 
 void PreScript::Simplify()
 {
-	msg_db_r("Simplify", 2);
+	msg_db_f("Simplify", 2);
 	
 	// remove &*
 	foreach(Function *f, Functions)
 		foreach(Command *c, f->block->command)
 			easyfy(this, c, 0);
-	
-
-	
-	msg_db_l(2);
 }
 
 // split arrays and address shifts into simpler commands...
 void PreScript::BreakDownComplicatedCommands()
 {
-	msg_db_r("BreakDownComplicatedCommands", 4);
+	msg_db_f("BreakDownComplicatedCommands", 4);
 	
 	for (int i=0;i<Commands.num;i++){
 		Command *c = Commands[i];
@@ -3119,12 +2814,11 @@ void PreScript::BreakDownComplicatedCommands()
 			c->type = el_type;			
 		}			
 	}
-	msg_db_l(4);
 }
 
 void PreScript::MapLocalVariablesToStack()
 {
-	msg_db_r("MapLocalVariablesToStack", 1);
+	msg_db_f("MapLocalVariablesToStack", 1);
 	foreach(Function *f, Functions){
 		f->_param_size = 8; // space for return value and eBP
 		if (f->return_type->size > 4)
@@ -3156,7 +2850,6 @@ void PreScript::MapLocalVariablesToStack()
 			}
 		}
 	}
-	msg_db_l(1);
 }
 
 void CreateImplicitConstructor(PreScript *ps, Type *t)
@@ -3719,23 +3412,21 @@ void PreScript::CreateImplicitFunctions(Type *t, bool relocate_last_function)
 		needs_init = true;*/
 
 	if (t->is_super_array){
-		if ((!Error) && (t->GetFunc("clear") < 0))
+		if (t->GetFunc("clear") < 0)
 			CreateImplicitArrayClear(this, t);
-		if ((!Error) && (t->GetFunc("resize") < 0))
+		if (t->GetFunc("resize") < 0)
 			CreateImplicitArrayResize(this, t);
-		if ((!Error) && (t->GetFunc("add") < 0))
+		if (t->GetFunc("add") < 0)
 			CreateImplicitArrayAdd(this, t);
 	}
 	if (!type_is_simple_class(t)){//needs_init){
-		if ((!Error) && (t->GetFunc("__init__") < 0))
+		if (t->GetFunc("__init__") < 0)
 			CreateImplicitConstructor(this, t);
-		if ((!Error) && (t->GetFunc("__delete__") < 0))
+		if (t->GetFunc("__delete__") < 0)
 			CreateImplicitDestructor(this, t);
-		if ((!Error) && (t->GetFunc("__assign__") < 0))
+		if (t->GetFunc("__assign__") < 0)
 			CreateImplicitAssign(this, t);
 	}
-	if (Error)
-		return;
 
 	if (relocate_last_function && (num_funcs != Functions.num)){
 		//msg_error("relocate implicit function");
@@ -3776,7 +3467,7 @@ void PreScript::CreateAllImplicitFunctions(bool relocate_last_function)
 // no included scripts may be deleted before us!!!
 PreScript::~PreScript()
 {
-	msg_db_r("~CPreScript", 4);
+	msg_db_f("~CPreScript", 4);
 	
 	clear_exp_buffer(&Exp);
 
@@ -3816,8 +3507,6 @@ PreScript::~PreScript()
 	for (int i=0;i<Functions.num;i++)
 		delete(Functions[i]);
 	Functions.clear();
-	
-	msg_db_l(4);
 }
 
 void PreScript::ShowCommand(Command *c)

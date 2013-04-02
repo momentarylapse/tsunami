@@ -18,6 +18,7 @@ void GlobalRemoveSliders(CHuiWindow *win);
 
 Plugin::Plugin(const string &_filename)
 {
+	s = NULL;
 	filename = _filename;
 	index = -1;
 	usable = false;
@@ -32,38 +33,35 @@ Plugin::Plugin(const string &_filename)
 	f_process_track = NULL;
 
 	// load + compile
-	s = Script::Load(filename);
+	try{
+		s = Script::Load(filename);
 
-	if (s){
+		usable = true;
 
-		usable = !s->Error;
+		f_reset = (void_func*)s->MatchFunction("ResetData", "void", 0);
+		f_data2dialog = (void_func*)s->MatchFunction("DataToDialog", "void", 0);
+		f_configure = (void_func*)s->MatchFunction("Configure", "void", 0);
+		f_reset_state = (void_func*)s->MatchFunction("ResetState", "void", 0);
+		f_process_track = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
 
-		if (usable){
-			f_reset = (void_func*)s->MatchFunction("ResetData", "void", 0);
-			f_data2dialog = (void_func*)s->MatchFunction("DataToDialog", "void", 0);
-			f_configure = (void_func*)s->MatchFunction("Configure", "void", 0);
-			f_reset_state = (void_func*)s->MatchFunction("ResetState", "void", 0);
-			f_process_track = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
+		type = f_process_track ? TYPE_EFFECT : TYPE_OTHER;
 
-			type = f_process_track ? TYPE_EFFECT : TYPE_OTHER;
-
-			foreachi(Script::LocalVariable &v, s->pre_script->RootOfAllEvil.var, i)
-				if (v.type->name == "PluginData"){
-					data = s->g_var[i];
-					data_type = v.type;
-				}else if (v.type->name == "PluginState"){
-					state = s->g_var[i];
-					state_type = v.type;
-				}
-		}
+		foreachi(Script::LocalVariable &v, s->pre_script->RootOfAllEvil.var, i)
+			if (v.type->name == "PluginData"){
+				data = s->g_var[i];
+				data_type = v.type;
+			}else if (v.type->name == "PluginState"){
+				state = s->g_var[i];
+				state_type = v.type;
+			}
+	}catch(Script::Exception &e){
+		error_message = e.message;
 	}
 }
 
 string Plugin::GetError()
 {
-	if (s)
-		return format(_("Fehler in  Script-Datei: \"%s\"\n%s\n%s"), s->pre_script->Filename.c_str(), s->ErrorMsgExt[0].c_str(), s->ErrorMsgExt[1].c_str());
-	return format(_("Fehler in  Script-Datei: \"%s\""), filename.c_str());
+	return format(_("Fehler in  Script-Datei: \"%s\"\n%s"), filename.c_str(), error_message.c_str());
 }
 
 void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)

@@ -26,6 +26,15 @@ extern string Version;
 
 extern bool UseConstAsGlobalVar;
 
+class Exception : public Asm::Exception
+{
+public:
+	Exception(const string &message, const string &expression, int line, int column, Script *s);
+	Exception(const Asm::Exception &e, Script *s);
+};
+/*struct SyntaxException : Exception{};
+struct LinkerException : Exception{};
+struct LinkerException : Exception{};*/
 
 enum
 {
@@ -36,36 +45,15 @@ enum
 };
 #define WaitingModeFinished		WaitingModeNone
 
-
-
-struct sSerialCommandParam
-{
-	int kind;
-	char *p;
-	Type *type;
-	int shift;
-	//int c_id, v_id;
-	bool operator == (const sSerialCommandParam &param) const
-	{	return (kind == param.kind) && (p == param.p) && (type == param.type) && (shift == param.shift);	}
-};
-
-struct sSerialCommand
-{
-	int inst;
-	sSerialCommandParam p1, p2;
-	int pos;
-};
-
-struct SerializerData;
-
 // executable (compiled) data
 class Script
 {
 public:
 	// don't call yourself.... better use LoadScript(...)
-	Script(const string &filename, bool just_analyse = false);
 	Script();
 	~Script();
+
+	void Load(const string &filename, bool just_analyse = false);
 
 	// building operational code
 	void Compiler();
@@ -75,11 +63,6 @@ public:
 	void AllocateStack();
 	void AllocateOpcode();
 	void CompileFunction(Function *f, char *Opcode, int &OpcodeSize);
-	void SerializeFunction(SerializerData *d, Function *f);
-	void SerializeBlock(SerializerData *d, Block *block, int level);
-	void SerializeParameter(SerializerData *d, Command *link, int level, int index, sSerialCommandParam &param);
-	sSerialCommandParam SerializeCommand(SerializerData *d, Command *com, int level, int index);
-	void SerializeOperator(SerializerData *d, Command *com, sSerialCommandParam *param, sSerialCommandParam &ret);
 	void CompileOsEntryPoint();
 	void LinkOsEntryPoint();
 	void CompileTaskEntryPoint();
@@ -114,9 +97,7 @@ public:
 	Array<t_func*> func;
 	t_func *first_execution, *continue_execution;
 
-	bool Error, ParserError, LinkerError, isCopy, isPrivate, JustAnalyse, ShowCompilerStats;
-	string ErrorMsg, ErrorMsgExt[2];
-	int ErrorLine, ErrorColumn;
+	bool isCopy, isPrivate, JustAnalyse, ShowCompilerStats;
 	Function *cur_func;
 	int WaitingMode;
 	float TimeToWait;

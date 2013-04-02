@@ -306,15 +306,23 @@ struct InstructionWithParamsList : public Array<InstructionWithParams>
 	Array<Label> label;
 	Array<WantedLabel> wanted_label;
 	int current_line;
+	int current_col;
 	int current_inst;
 };
 
 void Init();
 bool Assemble(const char *code, char *oc, int &ocs);
 string Disassemble(void *code, int length = -1, bool allow_comments = true);
-extern bool Error;
-extern int ErrorLine;
-extern string ErrorMessage;
+
+class Exception
+{
+public:
+	Exception(const string &message, const string &expression, int line, int column);
+	virtual ~Exception();
+	void print() const;
+	string message;
+	int line, column;
+};
 
 bool AddInstruction(char *oc, int &ocs, int inst, int param1_type = PKNone, void *param1 = NULL, int param2_type = PKNone, void *param2 = NULL);
 void SetInstructionSet(int set);

@@ -18,8 +18,8 @@ SCRIPT_OBJ  = $(SCRIPT_DIR)/script.o \
  $(SCRIPT_DIR)/lib/script_data_x.o \
  $(SCRIPT_DIR)/lib/script_data_image.o \
  $(SCRIPT_DIR)/lib/script_data_sound.o \
- $(SCRIPT_DIR)/compiler/script_serializer.o \
- $(SCRIPT_DIR)/compiler/script_compiler.o \
+ $(SCRIPT_DIR)/compiler/serializer.o \
+ $(SCRIPT_DIR)/compiler/compiler.o \
  $(SCRIPT_DIR)/asm/asm.o
 SCRIPT_CXXFLAGS =  `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
 SCRIPT_DEP =  $(SCRIPT_DIR)/script.h $(SCRIPT_DIR)/asm/asm.h $(SCRIPT_DIR)/syntax/pre_script.h $(SCRIPT_DIR)/lib/script_data.h
@@ -76,11 +76,11 @@ $(SCRIPT_DIR)/lib/script_data_image.o : $(SCRIPT_DIR)/lib/script_data_image.cpp 
 $(SCRIPT_DIR)/lib/script_data_sound.o : $(SCRIPT_DIR)/lib/script_data_sound.cpp $(SCRIPT_DEP)
 	$(CPP) -c $(SCRIPT_DIR)/lib/script_data_sound.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
-$(SCRIPT_DIR)/compiler/script_serializer.o : $(SCRIPT_DIR)/compiler/script_serializer.cpp $(SCRIPT_DEP)
-	$(CPP) -c $(SCRIPT_DIR)/compiler/script_serializer.cpp -o $@ $(SCRIPT_CXXFLAGS)
+$(SCRIPT_DIR)/compiler/serializer.o : $(SCRIPT_DIR)/compiler/serializer.cpp $(SCRIPT_DIR)/compiler/serializer.h $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/compiler/serializer.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
-$(SCRIPT_DIR)/compiler/script_compiler.o : $(SCRIPT_DIR)/compiler/script_compiler.cpp $(SCRIPT_DEP)
-	$(CPP) -c $(SCRIPT_DIR)/compiler/script_compiler.cpp -o $@ $(SCRIPT_CXXFLAGS)
+$(SCRIPT_DIR)/compiler/compiler.o : $(SCRIPT_DIR)/compiler/compiler.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/compiler/compiler.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
 $(SCRIPT_DIR)/asm/asm.o : $(SCRIPT_DIR)/asm/asm.cpp
 	$(CPP) -c $(SCRIPT_DIR)/asm/asm.cpp -o $@ $(SCRIPT_CXXFLAGS)

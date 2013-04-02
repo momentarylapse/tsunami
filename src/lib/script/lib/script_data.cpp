@@ -39,6 +39,7 @@ int StackSize = SCRIPT_DEFAULT_STACK_SIZE;
 //------------------------------------------------------------------------------------------------//
 
 Type *TypeUnknown;
+Type *TypeReg64;
 Type *TypeReg32;
 Type *TypeReg16;
 Type *TypeReg8;
@@ -101,7 +102,7 @@ void set_cur_package(const string &name)
 Array<Type*> PreTypes;
 Type *add_type(const string &name, int size, TypeFlag flag)
 {
-	msg_db_r("add_type", 4);
+	msg_db_f("add_type", 4);
 	Type *t = new Type;
 	t->name = name;
 	t->size = size;
@@ -110,12 +111,11 @@ Type *add_type(const string &name, int size, TypeFlag flag)
 	PreTypes.add(t);
 	if (cur_package)
 		cur_package->type.add(t);
-	msg_db_l(4);
 	return t;
 }
 Type *add_type_p(const string &name, Type *sub_type, TypeFlag flag)
 {
-	msg_db_r("add_type_p", 4);
+	msg_db_f("add_type_p", 4);
 	Type *t = new Type;
 	t->name = name;
 	t->size = PointerSize;
@@ -126,12 +126,11 @@ Type *add_type_p(const string &name, Type *sub_type, TypeFlag flag)
 	PreTypes.add(t);
 	if (cur_package)
 		cur_package->type.add(t);
-	msg_db_l(4);
 	return t;
 }
 Type *add_type_a(const string &name, Type *sub_type, int array_length)
 {
-	msg_db_r("add_type_a", 4);
+	msg_db_f("add_type_a", 4);
 	Type *t = new Type;
 	t->name = name;
 	t->parent = sub_type;
@@ -149,7 +148,6 @@ Type *add_type_a(const string &name, Type *sub_type, int array_length)
 	PreTypes.add(t);
 	if (cur_package)
 		cur_package->type.add(t);
-	msg_db_l(4);
 	return t;
 }
 
@@ -203,7 +201,7 @@ PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
 Array<PreOperator> PreOperators;
 int add_operator(int primitive_op, Type *return_type, Type *param_type1, Type *param_type2, void *func = NULL)
 {
-	msg_db_r("add_op", 4);
+	msg_db_f("add_op", 4);
 	PreOperator o;
 	o.primitive_id = primitive_op;
 	o.return_type = return_type;
@@ -211,7 +209,6 @@ int add_operator(int primitive_op, Type *return_type, Type *param_type1, Type *p
 	o.param_type_2 = param_type2;
 	o.func = func;
 	PreOperators.add(o);
-	msg_db_l(4);
 	return PreOperators.num - 1;
 }
 
@@ -227,27 +224,25 @@ ClassFunction *cur_class_func = NULL;
 
 void add_class(Type *root_type)//, PreScript *ps = NULL)
 {
-	msg_db_r("add_class", 4);
+	msg_db_f("add_class", 4);
 	cur_class = root_type;
-	msg_db_l(4);
 }
 
 void class_add_element(const string &name, Type *type, int offset)
 {
-	msg_db_r("add_class_el", 4);
+	msg_db_f("add_class_el", 4);
 	ClassElement e;
 	e.name = name;
 	e.type = type;
 	e.offset = offset;
 	cur_class->element.add(e);
-	msg_db_l(4);
 }
 
 int add_func(const string &name, Type *return_type, void *func, bool is_class);
 
 void class_add_func(const string &name, Type *return_type, void *func)
 {
-	msg_db_r("add_class_func", 4);
+	msg_db_f("add_class_func", 4);
 	string tname = cur_class->name;
 	if (tname[0] == '-')
 		for (int i=0;i<PreTypes.num;i++)
@@ -261,7 +256,6 @@ void class_add_func(const string &name, Type *return_type, void *func)
 	f.return_type = return_type;
 	cur_class->function.add(f);
 	cur_class_func = &cur_class->function.back();
-	msg_db_l(4);
 }
 
 
@@ -272,14 +266,13 @@ void class_add_func(const string &name, Type *return_type, void *func)
 Array<PreConstant> PreConstants;
 void add_const(const string &name, Type *type, void *value)
 {
-	msg_db_r("add_const", 4);
+	msg_db_f("add_const", 4);
 	PreConstant c;
 	c.name = name;
 	c.type = type;
 	c.value = value;
 	c.package = cur_package_index;
 	PreConstants.add(c);
-	msg_db_l(4);
 }
 
 //------------------------------------------------------------------------------------------------//
@@ -394,7 +387,7 @@ bool type_is_simple_class(Type *t)
 
 void script_make_super_array(Type *t, PreScript *ps)
 {
-	msg_db_r("make_super_array", 4);
+	msg_db_f("make_super_array", 4);
 	add_class(t);
 		class_add_element("num", TypeInt, PointerSize);
 
@@ -458,7 +451,6 @@ void script_make_super_array(Type *t, PreScript *ps)
 			func_add_param("size",		TypeInt);
 		class_add_func("__mem_remove__", TypeVoid, mf((tmf)&DynamicArray::delete_single));
 			func_add_param("index",		TypeInt);
-	msg_db_l(4);
 }
 
 
@@ -638,7 +630,7 @@ public:
 
 void SIAddPackageBase()
 {
-	msg_db_r("SIAddPackageBase", 3);
+	msg_db_f("SIAddPackageBase", 3);
 
 	set_cur_package("base");
 
@@ -759,14 +751,12 @@ void SIAddPackageBase()
 	// bool
 	add_const("false", TypeBool, (void*)false);
 	add_const("true",  TypeBool, (void*)true);
-	
-	msg_db_l(3);
 }
 
 
 void SIAddBasicCommands()
 {
-	msg_db_r("SIAddBasicCommands", 3);
+	msg_db_f("SIAddBasicCommands", 3);
 
 /*
 	CommandReturn,
@@ -826,8 +816,6 @@ void SIAddBasicCommands()
 	add_func_special("p2b",			TypeBool,	CommandPointerToBool);
 		func_add_param("p",		TypePointer);
 	add_func_special("-asm-",		TypeVoid,	CommandAsm);
-	
-	msg_db_l(3);
 }
 
 
@@ -857,7 +845,7 @@ void op_float_div(float &r, float &a, float &b)
 
 void SIAddOperators()
 {
-	msg_db_r("SIAddOperators", 3);
+	msg_db_f("SIAddOperators", 3);
 	
 
 	// same order as in .h file...
@@ -958,26 +946,22 @@ void SIAddOperators()
 	add_operator(OperatorMultiplyS,		TypeVoid,		TypeVector,		TypeFloat);
 	add_operator(OperatorDivideS,		TypeVoid,		TypeVector,		TypeFloat);
 	add_operator(OperatorSubtract,		TypeVector,		TypeVoid,		TypeVector);
-	
-	msg_db_l(3);
 }
 
 void SIAddSuperArrays()
 {
-	msg_db_r("SIAddSuperArrays", 3);
+	msg_db_f("SIAddSuperArrays", 3);
 
 	for (int i=0;i<PreTypes.num;i++)
 		if (PreTypes[i]->is_super_array){
 			//msg_error(string("super array:  ", PreType[i]->Name));
 			script_make_super_array(PreTypes[i]);
 		}
-	
-	msg_db_l(3);
 }
 
 void SIAddCommands()
 {
-	msg_db_r("SIAddCommands", 3);
+	msg_db_f("SIAddCommands", 3);
 	
 	// type casting
 	add_func("-s2i-",				TypeInt,		(void*)&s2i);
@@ -1032,8 +1016,6 @@ void SIAddCommands()
 
 // add_func("ExecuteScript",	TypeVoid);
 //		func_add_param("filename",		TypeString);
-	
-	msg_db_l(3);
 }
 
 void SIAddPackageFile();
@@ -1048,7 +1030,7 @@ void SIAddPackageX();
 
 void Init()
 {
-	msg_db_r("ScriptInit", 1);
+	msg_db_f("ScriptInit", 1);
 
 	Asm::Init();
 
@@ -1116,34 +1098,29 @@ void Init()
 		msg_write(v.Name);
 		msg_write(v.Type->Name);
 	}*/
-
-
-	msg_db_l(1);
 }
 
 void ResetSemiExternalData()
 {
-	msg_db_r("ScriptResetSemiExternalData", 2);
+	msg_db_f("ScriptResetSemiExternalData", 2);
 	for (int i=PreExternalVars.num-1;i>=0;i--)
 		if (PreExternalVars[i].is_semi_external)
 			PreExternalVars.erase(i);
 	for (int i=PreCommands.num-1;i>=0;i--)
 		if (PreCommands[i].is_semi_external)
 			PreCommands.erase(i);
-	msg_db_l(2);
 }
 
 // program variables - specific to the surrounding program, can't always be there...
 void LinkSemiExternalVar(const string &name, void *pointer)
 {
-	msg_db_r("ScriptLinkSemiExternalVar", 2);
+	msg_db_f("ScriptLinkSemiExternalVar", 2);
 	PreExternalVar v;
 	v.name = name;
 	v.pointer = pointer;
 	v.type = TypeUnknown; // unusable until defined via "extern" in the script!
 	v.is_semi_external = true; // ???
 	PreExternalVars.add(v);
-	msg_db_l(2);
 }
 
 // program functions - specific to the surrounding program, can't always be there...
@@ -1165,7 +1142,7 @@ void _LinkSemiExternalClassFunc(const string &name, void (DummyClass::*function)
 
 void End()
 {
-	msg_db_r("ScriptEnd", 1);
+	msg_db_f("ScriptEnd", 1);
 	DeleteAllScripts(true, true);
 
 	ResetSemiExternalData();
@@ -1178,7 +1155,6 @@ void End()
 
 	PreConstants.clear();
 	PreExternalVars.clear();
-	msg_db_l(1);
 }
 
 };

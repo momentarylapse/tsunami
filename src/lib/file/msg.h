@@ -15,6 +15,16 @@
 
 #define MSG_DEBUG_ALLOW_LEVEL		9
 
+struct MsgBlockTracer
+{
+	MsgBlockTracer(const char *str, int _level);
+	~MsgBlockTracer();
+	int level;
+};
+
+#define msg_db_f(text, level)\
+	MsgBlockTracer _MsgBlockTracer_(text, level);
+
 #define msg_db_r(text, level)\
 	{if (level <= MSG_DEBUG_ALLOW_LEVEL)\
 		msg_trace_r(text, level);}
@@ -53,6 +63,8 @@ string msg_get_str(int index);
 int msg_get_buffer_size();
 string msg_get_buffer(int max_size);
 string msg_get_trace();
+int msg_get_trace_depth();
+void msg_set_trace_depth(int depth);
 
 // output only once
 void msg_todo(const string &str);

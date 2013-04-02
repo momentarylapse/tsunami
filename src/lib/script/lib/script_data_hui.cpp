@@ -39,7 +39,7 @@ Type *TypeHuiWindowP;
 
 void SIAddPackageHui()
 {
-	msg_db_r("SIAddPackageHui", 3);
+	msg_db_f("SIAddPackageHui", 3);
 
 	set_cur_package("hui");
 	
@@ -612,8 +612,6 @@ void SIAddPackageHui()
 	add_ext_var("AppDirectory",		TypeString,		hui_p(&HuiAppDirectory));
 	add_ext_var("HuiFilename",		TypeString,		hui_p(&HuiFilename));
 	add_ext_var("HuiRunning",		TypeBool,		hui_p(&HuiRunning));
-
-	msg_db_l(3);
 }
 
 };

@@ -37,7 +37,7 @@ Type *TypeSocketList;
 
 void SIAddPackageNet()
 {
-	msg_db_r("SIAddPackageNet", 3);
+	msg_db_f("SIAddPackageNet", 3);
 
 	set_cur_package("net");
 
@@ -111,9 +111,6 @@ void SIAddPackageNet()
 		func_add_param("v",		TypeVector);
 	add_func("XNetWriteString",		TypeVoid,			x_p(&XNetWriteString));
 		func_add_param("str",		TypeString);
-
-	
-	msg_db_l(3);
 }
 
 };

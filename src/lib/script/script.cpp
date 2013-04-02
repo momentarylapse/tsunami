@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.10.9.0";
+string Version = "0.10.11.0";
 
 //#define ScriptDebug
 
@@ -34,22 +34,18 @@ float GlobalTimeToWait;
 bool CompileSilently = false;
 bool ShowCompilerStats = true;
 
-static Array<Script*> cur_script_stack;
-inline void push_cur_script(Script *s)
+
+Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Script *s) :
+	Asm::Exception(_message, _expression, _line, _column)
 {
-	cur_script_stack.add(s);
-	cur_script = s;
-}
-inline void pop_cur_script()
-{
-	cur_script_stack.resize(cur_script_stack.num - 1);
-	if (cur_script_stack.num >= 1)
-		cur_script = cur_script_stack.back();
-	else
-		cur_script = NULL;
+	message +=  ", " + s->pre_script->Filename;
 }
 
-
+Exception::Exception(const Asm::Exception &e, Script *s) :
+	Asm::Exception(e)
+{
+	message = "assembler: " + message + ", " + s->pre_script->Filename;
+}
 
 
 static int shift_right=0;
@@ -139,7 +135,13 @@ Script *Load(const string &filename, bool is_public, bool just_analyse)
 #endif
 
 	
-	s = new Script(filename, just_analyse);
+	s = new Script();
+	try{
+		s->Load(filename, just_analyse);
+	}catch(const Exception &e){
+		delete(s);
+		throw e;
+	}
 	s->isPrivate = !is_public;
 
 	// store script in database
@@ -157,13 +159,12 @@ Script *Load(const string &filename, bool is_public, bool just_analyse)
 #if 0
 Script *LoadAsInclude(char *filename, bool just_analyse)
 {
-	msg_db_r("LoadAsInclude",4);
+	msg_db_f("LoadAsInclude",4);
 	//so(string("Include ",filename));
 	// aus dem Speicher versuchen zu laden
 	for (int i=0;i<ublicScript.size();i++)
 		if (strcmp(PublicScript[i].filename, SysFileName(filename)) == 0){
 			//so("...pointer");
-			msg_db_l(4);
 			return PublicScript[i].script;
 		}
 
@@ -178,7 +179,6 @@ Script *LoadAsInclude(char *filename, bool just_analyse)
 	strcpy(PublicScript[NumPublicScripts].filename,SysFileName(filename));
 	PublicScript[NumPublicScripts++].script=s;
 
-	msg_db_l(4);
 	return s;
 }
 #endif
@@ -194,7 +194,7 @@ void ExecuteAllScripts()
 
 void Remove(Script *s)
 {
-	msg_db_r("RemoveScript", 1);
+	msg_db_f("RemoveScript", 1);
 	// remove references
 	for (int i=0;i<s->pre_script->Includes.num;i++)
 		s->pre_script->Includes[i]->ReferenceCounter --;
@@ -219,12 +219,11 @@ void Remove(Script *s)
 			delete(DeadScript[i]);
 			DeadScript.erase(i);
 		}
-	msg_db_l(1);
 }
 
 void DeleteAllScripts(bool even_immortal, bool force)
 {
-	msg_db_r("DeleteAllScripts", 1);
+	msg_db_f("DeleteAllScripts", 1);
 
 	// try to erase them...
 	foreachb(Script *s, PublicScript)
@@ -249,20 +248,14 @@ void DeleteAllScripts(bool even_immortal, bool force)
 	for (int i=0;i<num_ps;i++)
 		msg_write(string2("  fehlt:   %s  %p  (%d)",ppn[i],ppp[i],pps[i]));
 	*/
-	msg_db_l(1);
 }
 
 void reset_script(Script *s)
 {
 	s->ReferenceCounter = 0;
-	s->Error = false;
-	s->ParserError = false;
-	s->LinkerError = false;
 	s->isCopy = false;
 	s->isPrivate = false;
 	
-	s->ErrorLine = 0;
-	s->ErrorColumn = 0;
 	s->cur_func = NULL;
 	s->WaitingMode = 0;
 	s->TimeToWait = 0;
@@ -284,31 +277,17 @@ void reset_script(Script *s)
 	//cnst.clear();
 }
 
-Script::Script(const string &filename, bool just_analyse)
+void Script::Load(const string &filename, bool just_analyse)
 {
-	msg_db_r("loading script", 1);
-	reset_script(this);
-	push_cur_script(this);
+	msg_db_f("loading script", 1);
 	JustAnalyse = just_analyse;
-
-	WaitingMode = WaitingModeFirst;
-	ShowCompilerStats = (!CompileSilently) && ShowCompilerStats;
-
-	pre_script = new PreScript(this);
 	pre_script->LoadAndParseFile(filename, just_analyse);
-	ParserError = Error = pre_script->Error;
-	LinkerError = pre_script->IncludeLinkerError;
-	ErrorLine = pre_script->ErrorLine;
-	ErrorColumn = pre_script->ErrorColumn;
-	ErrorMsg = pre_script->ErrorMsg;
-	ErrorMsgExt[0] = pre_script->ErrorMsgExt[0];
-	ErrorMsgExt[1] = pre_script->ErrorMsgExt[1];
 
-	if ((!Error) && (!JustAnalyse))
+	if (!JustAnalyse)
 		Compiler();
 	/*if (pre_script->FlagShow)
 		pre_script->Show();*/
-	if ((!Error) && (!JustAnalyse) && (pre_script->FlagDisassemble)){
+	if ((!JustAnalyse) && (pre_script->FlagDisassemble)){
 		msg_write("disasm");
 		msg_write(OpcodeSize);
 		msg_write(Asm::Disassemble(ThreadOpcode,ThreadOpcodeSize));
@@ -316,52 +295,26 @@ Script::Script(const string &filename, bool just_analyse)
 		//printf("%s\n\n", Asm::Disassemble(Opcode,OpcodeSize));
 		msg_write(Asm::Disassemble(Opcode,OpcodeSize));
 	}
-
-	pop_cur_script();
-	msg_db_l(1);
 }
 
 void Script::DoError(const string &str, int overwrite_line)
 {
 	pre_script->DoError(str, overwrite_line);
-	Error = true;
-	ErrorLine = pre_script->ErrorLine;
-	ErrorColumn = pre_script->ErrorColumn;
-	ErrorMsgExt[0] = pre_script->ErrorMsgExt[0];
-	ErrorMsgExt[1] = pre_script->ErrorMsgExt[1];
-	ErrorMsg = pre_script->ErrorMsg;
 }
 
 void Script::DoErrorInternal(const string &str)
 {
-	if (Error)
-		return;
-	msg_write("\n\n\n");
-	msg_write("------------------------       Error       -----------------------");	
-	Error = true;
-	
-	ErrorMsg = "internal compiler error (Call Michi!): " + str;
-	if (cur_func)
-		ErrorMsg += " (in function '" + cur_func->name  + "')";
-	ErrorMsgExt[0] = ErrorMsg;
-	ErrorMsgExt[1] = "";
-	ErrorLine = 0;
-	ErrorColumn = 0;
-	msg_write(ErrorMsg);
-	msg_write("------------------------------------------------------------------");
-	msg_write(pre_script->Filename);
-	msg_write("\n\n\n");
+	DoError("internal compiler error (Call Michi!): " + str, 0);
 }
 
 void Script::DoErrorLink(const string &str)
 {
 	DoError(str);
-	LinkerError = true;
 }
 
 void Script::SetVariable(const string &name, void *data)
 {
-	msg_db_r("SetVariable", 4);
+	msg_db_f("SetVariable", 4);
 	//msg_write(name);
 	for (int i=0;i<pre_script->RootOfAllEvil.var.num;i++)
 		if (pre_script->RootOfAllEvil.var[i].name == name){
@@ -369,11 +322,9 @@ void Script::SetVariable(const string &name, void *data)
 			msg_write(pre_script->RootOfAllEvil.Var[i].Type->Size);
 			msg_write((int)g_var[i]);*/
 			memcpy(g_var[i], data, pre_script->RootOfAllEvil.var[i].type->size);
-			msg_db_l(4);
 			return;
 		}
 	msg_error("CScript.SetVariable: variable " + name + " not found");
-	msg_db_l(4);
 }
 
 Script::Script()
@@ -393,7 +344,7 @@ Script::Script()
 
 Script::~Script()
 {
-	msg_db_r("~CScript", 4);
+	msg_db_f("~CScript", 4);
 	if ((Memory) && (!JustAnalyse)){
 		delete[](Memory);
 	}
@@ -415,7 +366,6 @@ Script::~Script()
 		delete[](Stack);
 	//msg_write(string2("-----------            Memory:         %p",Memory));
 	delete(pre_script);
-	msg_db_l(4);
 }
 
 
@@ -428,7 +378,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 {
 	if (cmd.num < 1)
 		return;
-	msg_db_r("ExecuteSingleScriptCmd", 2);
+	msg_db_f("ExecuteSingleScriptCmd", 2);
 	single_command = cmd;
 	msg_write("script command: " + single_command);
 
@@ -436,35 +386,33 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	Script *s = new Script();
 	PreScript *ps = s->pre_script;
 
+	try{
+
 // find expressions
 	ps->Analyse(single_command.c_str(), false);
 	if (ps->Exp.line[0].exp.num < 1){
 		//clear_exp_buffer(&ps->Exp);
 		delete(s);
-		msg_db_l(2);
 		return;
 	}
 
 // analyse syntax
 
 	// create a main() function
-	Function *f = ps->AddFunction("--command-func--", TypeVoid);
-	f->_var_size = 0; // set to -1...
+	Function *func = ps->AddFunction("--command-func--", TypeVoid);
+	func->_var_size = 0; // set to -1...
 
 	// parse
 	ps->Exp.cur_line = &ps->Exp.line[0];
 	ps->Exp.cur_exp = 0;
 	ps->Exp._cur_ = ps->Exp.cur_line->exp[ps->Exp.cur_exp].name;
-	ps->GetCompleteCommand(f->block, f);
-	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&f);
-	s->Error |= ps->Error;
+	ps->GetCompleteCommand(func->block, func);
+	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&func);
 
-	if (!s->Error)
-		ps->ConvertCallByReference();
+	ps->ConvertCallByReference();
 
 // compile
-	if (!s->Error)
-		s->Compiler();
+	s->Compiler();
 
 	/*if (true){
 		printf("%s\n\n", Opcode2Asm(s->ThreadOpcode,s->ThreadOpcodeSize));
@@ -472,20 +420,21 @@ void ExecuteSingleScriptCommand(const string &cmd)
 		//msg_write(Opcode2Asm(Opcode,OpcodeSize));
 	}*/
 // execute
-	if (!s->Error){
-		typedef void void_func();
-		void_func *f = (void_func*)s->MatchFunction("--command-func--", "void", 0);
-		if (f)
-			f();
+	typedef void void_func();
+	void_func *f = (void_func*)s->MatchFunction("--command-func--", "void", 0);
+	if (f)
+		f();
+
+	}catch(const Exception &e){
+		e.print();
 	}
 
 	delete(s);
-	msg_db_l(2);
 }
 
 void *Script::MatchFunction(const string &name, const string &return_type, int num_params, ...)
 {
-	msg_db_r("MatchFunction", 2);
+	msg_db_f("MatchFunction", 2);
 	
 	// process argument list
 	va_list marker;
@@ -505,7 +454,6 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 				if (f->literal_param_type[j]->name != param_type[j])
 					params_ok = false;
 			if (params_ok){
-				msg_db_l(2);
 				if (func.num > 0)
 					return (void*)func[i];
 				else
@@ -513,7 +461,6 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 			}
 		}
 
-	msg_db_l(2);
 	return NULL;
 }
 
@@ -557,23 +504,21 @@ void Script::ShowVars(bool include_consts)
 
 void Script::Execute()
 {
-	if (Error)	return;
 	if (WaitingMode==WaitingModeNone)	return;
 	#ifdef ScriptDebug
 		//so("\n\n\n################### fuehre aus ######################\n\n\n");
 	#endif
 	shift_right=0;
-	//msg_db_r(string("Execute ",pre_script->Filename),1);
-	msg_db_r("Execute", 1);
-	msg_db_r(pre_script->Filename.c_str(),1);
+	//msg_db_f(string("Execute ",pre_script->Filename),1);
+	msg_db_f("Execute", 1);{
+	msg_db_f(pre_script->Filename.c_str(),1);
 
 	// handle wait-commands
 	if (WaitingMode==WaitingModeFirst){
 		GlobalWaitingMode=WaitingModeNone;
-		msg_db_r("->First",1);
+		msg_db_f("->First",1);
 		//msg_right();
 		first_execution();
-		msg_db_l(1);
 		//msg_left();
 	}else{
 #ifdef _X_ALLOW_META_
@@ -582,27 +527,22 @@ void Script::Execute()
 		else
 			TimeToWait-=Elapsed;
 		if (TimeToWait>0){
-			msg_db_l(1);
-			msg_db_l(1);
 			return;
 		}
 #endif
 		GlobalWaitingMode=WaitingModeNone;
 		//msg_write(ThisObject);
-		msg_db_r("->Continue",1);
+		msg_db_f("->Continue",1);
 		//msg_write(">---");
 		//msg_right();
 		continue_execution();
 		//msg_write("---<");
-		msg_db_l(1);
 		//msg_write("ok");
 		//msg_left();
 	}
 	WaitingMode=GlobalWaitingMode;
 	TimeToWait=GlobalTimeToWait;
-
-	msg_db_l(1);
-	msg_db_l(1);
+	}
 }
 
 };

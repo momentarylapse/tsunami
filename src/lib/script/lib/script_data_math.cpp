@@ -275,7 +275,7 @@ float minf(float a, float b)
 
 void SIAddPackageMath()
 {
-	msg_db_r("SIAddPackageMath", 3);
+	msg_db_f("SIAddPackageMath", 3);
 
 	set_cur_package("math");
 
@@ -896,8 +896,6 @@ void SIAddPackageMath()
 	add_const("Orange", TypeColor, (void*)&Orange);
 	// rect
 	add_const("r_id", TypeRect, (void*)&r_id);
-	
-	msg_db_l(3);
 }
 
 };

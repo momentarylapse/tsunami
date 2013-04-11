@@ -273,6 +273,43 @@ float maxf(float a, float b)
 float minf(float a, float b)
 {	return (a < b) ? a : b;	}
 
+// amd64 vector return wrappers
+void amd64_vec_dir2ang(vector &r, vector &v)
+{	r = v.dir2ang();	}
+void amd64_vec_dir2ang2(vector &r, vector &v, vector &u)
+{	r = v.dir2ang2(u);	}
+void amd64_vec_ang2dir(vector &r, vector &v)
+{	r = v.ang2dir();	}
+void amd64_vec_rotate(vector &r, vector &v, vector &a)
+{	r = v.rotate(a);	}
+void amd64_vec_transform(vector &r, vector &v, matrix &m)
+{	r = v.transform(m);	}
+void amd64_vec_transform_normal(vector &r, vector &v, matrix &m)
+{	r = v.transform_normal(m);	}
+void amd64_vec_ortho(vector &r, vector &v)
+{	r = v.ortho();	}
+void amd64_quat_get_angles(vector &r, quaternion &q)
+{	r = q.get_angles();	}
+void amd64_vec_inter_get(vector &r, Interpolator<vector> &inter, float t)
+{	r = inter.get(t);	}
+void amd64_vec_inter_get_tang(vector &r, Interpolator<vector> &inter, float t)
+{	r = inter.get_tang(t);	}
+void amd64_mat_vec_mul(vector &r, matrix &m, vector &v)
+{	r = m * v;	}
+void amd64_vec_ang_add(vector &r, vector &a, vector &b)
+{	r = VecAngAdd(a, b);	}
+void amd64_vec_ang_interpolate(vector &r, vector &a, vector &b, float t)
+{	r = VecAngInterpolate(a, b, t);	}
+void amd64_vec_cross_product(vector &r, vector &a, vector &b)
+{	r = VecCrossProduct(a, b);	}
+
+static void *amd64_wrap(void *orig, void *wrap)
+{
+	if (config.instruction_set == Asm::InstructionSetAMD64)
+		return wrap;
+	return orig;
+}
+
 void SIAddPackageMath()
 {
 	msg_db_f("SIAddPackageMath", 3);
@@ -427,17 +464,17 @@ void SIAddPackageMath()
 		class_add_func("length_sqr",		TypeFloat,	type_p(mf((tmf)&vector::length_sqr)));
 		class_add_func("length_fuzzy",		TypeFloat,	type_p(mf((tmf)&vector::length_fuzzy)));
 		class_add_func("normalize",		TypeVoid,	type_p(mf((tmf)&vector::normalize)));
-		class_add_func("dir2ang",			TypeVector,	type_p(mf((tmf)&vector::dir2ang)));
-		class_add_func("dir2ang2",			TypeVector,	type_p(mf((tmf)&vector::dir2ang2)));
+		class_add_func("dir2ang",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::dir2ang)), type_p(&amd64_vec_dir2ang)));
+		class_add_func("dir2ang2",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::dir2ang2)), type_p(&amd64_vec_dir2ang2)));
 			func_add_param("up",		TypeVector);
-		class_add_func("ang2dir",			TypeVector,	type_p(mf((tmf)&vector::ang2dir)));
-		class_add_func("rotate",			TypeVector,	type_p(mf((tmf)&vector::rotate)));
+		class_add_func("ang2dir",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::ang2dir)), type_p(&amd64_vec_ang2dir)));
+		class_add_func("rotate",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::rotate)), type_p(&amd64_vec_rotate)));
 			func_add_param("ang",		TypeVector);
-		class_add_func("transform",		TypeVector,	type_p(mf((tmf)&vector::transform)));
+		class_add_func("transform",		TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::transform)), type_p(&amd64_vec_transform)));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("transform_normal",	TypeVector,	type_p(mf((tmf)&vector::transform_normal)));
+		class_add_func("transform_normal",	TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::transform_normal)), type_p(&amd64_vec_transform_normal)));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("ortho",			TypeVector,	type_p(mf((tmf)&vector::ortho)));
+		class_add_func("ortho",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::ortho)), type_p(&amd64_vec_ortho)));
 		class_add_func("str",		TypeString,			type_p(mf((tmf)&vector::str)));
 	
 	add_class(TypeQuaternion);
@@ -451,7 +488,7 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeQuaternion);
 		class_add_func("inverse",	TypeVoid,	mf((tmf)&quaternion::inverse));
 		class_add_func("normalize",	TypeVoid,	mf((tmf)&quaternion::normalize));
-		class_add_func("get_angles",	TypeVector,	mf((tmf)&quaternion::get_angles));
+		class_add_func("get_angles",	TypeVector,	amd64_wrap(mf((tmf)&quaternion::get_angles), type_p(&amd64_quat_get_angles)));
 		class_add_func("str",		TypeString,			mf((tmf)&quaternion::str));
 	
 	add_class(TypeRect);
@@ -511,7 +548,7 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeMatrix);
 		class_add_func("__mul__",	TypeMatrix,	mf((tmf)&matrix::mul));
 			func_add_param("other",	TypeMatrix);
-		class_add_func("__mul__",	TypeVector,	mf((tmf)&matrix::mul_v));
+		class_add_func("__mul__",	TypeVector,	amd64_wrap(mf((tmf)&matrix::mul_v), type_p(&amd64_mat_vec_mul)));
 			func_add_param("other",	TypeVector);
 		class_add_func("str",		TypeString,			mf((tmf)&matrix::str));
 	
@@ -690,9 +727,9 @@ void SIAddPackageMath()
 		class_add_func("jump",	TypeVoid, mf((tmf)&Interpolator<vector>::jump));
 			func_add_param("p",	TypeVector);
 			func_add_param("v",	TypeVector);
-		class_add_func("get",	TypeVector, mf((tmf)&Interpolator<vector>::get));
+		class_add_func("get",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get), type_p(&amd64_vec_inter_get)));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_tang",	TypeVector, mf((tmf)&Interpolator<vector>::get_tang));
+		class_add_func("get_tang",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get_tang), type_p(&amd64_vec_inter_get_tang)));
 			func_add_param("t",	TypeFloat);
 		class_add_func("get_list",	TypeVectorList, mf((tmf)&Interpolator<vector>::get_list));
 			func_add_param("t",	TypeFloatList);
@@ -762,17 +799,17 @@ void SIAddPackageMath()
 		func_add_param("x",		TypeFloat);
 		func_add_param("y",		TypeFloat);
 		func_add_param("z",		TypeFloat);
-	add_func("VecAngAdd",			TypeVector,	(void*)&VecAngAdd);
+	add_func("VecAngAdd",			TypeVector,	amd64_wrap((void*)&VecAngAdd, type_p(&amd64_vec_ang_add)));
 		func_add_param("ang1",		TypeVector);
 		func_add_param("ang2",		TypeVector);
-	add_func("VecAngInterpolate",	TypeVector,	(void*)&VecAngInterpolate);
+	add_func("VecAngInterpolate",	TypeVector,	amd64_wrap((void*)&VecAngInterpolate, type_p(&amd64_vec_ang_interpolate)));
 		func_add_param("ang1",		TypeVector);
 		func_add_param("ang2",		TypeVector);
 		func_add_param("t",			TypeFloat);
 	add_func("VecDotProduct",		TypeFloat,	(void*)&VecDotProduct);
 		func_add_param("v1",		TypeVector);
 		func_add_param("v2",		TypeVector);
-	add_func("VecCrossProduct",		TypeVector,	(void*)&VecCrossProduct);
+	add_func("VecCrossProduct",		TypeVector,	amd64_wrap((void*)&VecCrossProduct, type_p(&amd64_vec_cross_product)));
 		func_add_param("v1",		TypeVector);
 		func_add_param("v2",		TypeVector);
 	// matrices

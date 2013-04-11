@@ -1632,7 +1632,7 @@ void Serializer::solve_deref_temp_local(int c, int np, bool is_local)
 	add_cmd(Asm::inst_mov, p_reg, p);
 	move_last_cmd(c);
 	if (shift > 0){
-		msg_write("solve_deref_temp_local");
+		so("solve_deref_temp_local");
 		add_cmd(Asm::inst_add, p_reg, param_const(TypeInt, (void*)(long)shift));
 		move_last_cmd(c + 1);
 		add_reg_channel(reg, c, c + 2);
@@ -1788,7 +1788,7 @@ void Serializer::ResolveDerefTempAndLocal()
 			move_last_cmd(cmd_pos ++);
 
 			if (shift2 > 0){
-				msg_write("resolve deref temp&loc 2");
+				so("resolve deref temp&loc 2");
 				add_cmd(Asm::inst_add, p_reg2, param_const(TypeInt, (void*)shift2));
 				move_last_cmd(cmd_pos ++);
 			}
@@ -1801,7 +1801,7 @@ void Serializer::ResolveDerefTempAndLocal()
 			move_last_cmd(cmd_pos ++);
 
 			if (shift1 > 0){
-				msg_write("resolve deref temp&loc 1");
+				so("resolve deref temp&loc 1");
 				add_cmd(Asm::inst_add, p_reg2, param_const(TypeInt, (void*)shift1));
 				move_last_cmd(cmd_pos ++);
 			}
@@ -2702,7 +2702,7 @@ void Serializer::Assemble(char *Opcode, int &OpcodeSize)
 						}
 					}
 					if ((cmd[i].p1.type->size == 8) && (cmd[i].p2.type->size == 4)){
-						if ((cmd[i].p1.kind == KindRegister) && ((cmd[i].p2.kind == KindRegister) || (cmd[i].p2.kind == KindConstant) || (cmd[i].p2.kind == KindRefToConst))){
+						/*if ((cmd[i].p1.kind == KindRegister) && ((cmd[i].p2.kind == KindRegister) || (cmd[i].p2.kind == KindConstant) || (cmd[i].p2.kind == KindRefToConst))){
 #ifdef debug_evil_corrections
 							msg_write("----evil resize b");
 							msg_write(cmd2str(cmd[i]));
@@ -2712,7 +2712,7 @@ void Serializer::Assemble(char *Opcode, int &OpcodeSize)
 #ifdef debug_evil_corrections
 							msg_write(cmd2str(cmd[i]));
 #endif
-						}else if (cmd[i].p2.kind == KindRegister){
+						}else*/ if (cmd[i].p2.kind == KindRegister){
 #ifdef debug_evil_corrections
 							msg_write("----evil resize c");
 							msg_write(cmd2str(cmd[i]));

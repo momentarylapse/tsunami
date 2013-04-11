@@ -1,6 +1,6 @@
 // Title[Deutsch] = Tremolo
 
-#include "../../api.kaba"
+use "../../api.kaba"
 
 bool not_first_time
 

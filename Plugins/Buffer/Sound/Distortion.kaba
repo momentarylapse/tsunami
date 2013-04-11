@@ -1,6 +1,6 @@
 // Image = hui:properties
 // Title[Deutsch] = Verzerrer
-#include "../../api.kaba"
+use "../../api.kaba"
 
 int num_x
 float x_in[8]

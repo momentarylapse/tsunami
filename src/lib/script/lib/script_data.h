@@ -284,14 +284,8 @@ void Init(int instruction_set = -1, int abi = -1);
 void End();
 
 
-struct ExternalLinkData
-{
-	string name;
-	void *pointer;
-};
-extern Array<ExternalLinkData> ExternalLinks;
 
-void ResetSemiExternalData();
+void ResetExternalData();
 void LinkExternal(const string &name, void *pointer);
 void _LinkExternalClassFunc(const string &name, void (DummyClass::*function)());
 template<typename T>
@@ -299,7 +293,12 @@ void LinkExternalClassFunc(const string &name, T pointer)
 {
 	_LinkExternalClassFunc(name, (void(DummyClass::*)())pointer);
 }
+void DeclareClassSize(const string &class_name, int offset);
+void DeclareClassOffset(const string &class_name, const string &element, int offset);
+
 void *GetExternalLink(const string &name);
+int ProcessClassOffset(const string &class_name, const string &element, int offset);
+int ProcessClassSize(const string &class_name, int size);
 
 
 

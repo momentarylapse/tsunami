@@ -1,8 +1,8 @@
 // Image = hui:add
 // Title[Deutsch] = Akkordfolge
 
-#include "../../api.kaba"
-#include "../../tone.kaba"
+use "../../api.kaba"
+use "../../tone.kaba"
 
 
 class PluginData

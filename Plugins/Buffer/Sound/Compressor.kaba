@@ -1,8 +1,8 @@
 // Image = hui:properties
 // Title[Deutsch] = Kompressor
 
-#include "../../api.kaba"
-#include "../../grid.kaba"
+use "../../api.kaba"
+use "../../grid.kaba"
 
 window win
 int MouseOver, Selected

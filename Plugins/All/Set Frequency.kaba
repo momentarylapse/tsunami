@@ -4,7 +4,6 @@ window dlg
 
 void OnOk()
 	audio.sample_rate = dlg.GetInt("freq")
-	//ChangeAudioFile(cur_audio)
 	HuiWinClose(dlg)
 
 void OnClose()

@@ -1,6 +1,6 @@
 // Image = hui:back
 // Title[Deutsch] = Rückwärts
-#include "../../api.kaba"
+use "../../api.kaba"
 
 void ProcessTrack(BufferBox buf, Track t, int level)
 	int n = buf.num / 2

@@ -19,21 +19,6 @@
 
 const int NUM_PEAK_LEVELS = 24
 
-class Observable
-	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
-	string observable_name
-	int observer[]
-	string observer_message[]
-	string message_queue[]
-	string cur_message
-	int notify_level
-
-class Data : Observable
-	string filename
-	int file_time
-	bool binary_file_format
-	void *action_manager
-
 class Range
 	int offset, length
 
@@ -50,7 +35,6 @@ class AudioEffect
 	bool usable
 
 class BufferBox
-	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int offset, num
 	float r[], l[]
 	string peak[]
@@ -70,7 +54,6 @@ class Bar
 	int count
 	
 	bool is_selected
-	int x, width
 
 
 class MidiNote
@@ -103,7 +86,6 @@ class SubPointer // TODO
 	void *p
 
 class Track
-	int _CPLUSPLUS_VIRTUAL_CLASS_DUMMY_
 	int type
 	string name
 	TrackLevel level[]
@@ -143,7 +125,7 @@ class Tag
 class TrackPointer // TODO
 	Track *p
 
-class AudioFile : Data
+class AudioFile
 	bool used
 	string filename
 	Tag tag[]
@@ -174,7 +156,7 @@ class AudioOutput
 	extern float GetVolume()
 	extern void SetVolume(float volume)
 
-class AudioInput : Observable
+class AudioInput //: Observable
 	BufferBox cur_buf, buf
 	MidiData midi
 	extern void Start(int type, int sample_rate)

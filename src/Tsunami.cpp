@@ -144,6 +144,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 
 	audio = new AudioFile;
+	msg_write(p2s(&audio->sample_rate));
 
 	storage = new Storage;
 

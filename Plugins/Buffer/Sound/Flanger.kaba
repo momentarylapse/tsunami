@@ -1,7 +1,7 @@
 // Image = hui:copy
 // Title[Deutsch] = Flanger
 
-#include "../../api.kaba"
+use "../../api.kaba"
 
 bool not_first_time
 

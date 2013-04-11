@@ -1,6 +1,6 @@
 // Image = hui:forward
 // Title[Deutsch] = Kanäle L -> R
-#include "../../api.kaba"
+use "../../api.kaba"
 
 void ProcessTrack(BufferBox buf, Track t, int level)
 	buf.r = buf.l

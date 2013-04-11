@@ -1,4 +1,4 @@
-#include "../../api.kaba"
+use "../../api.kaba"
 
 void fold(float b[], float k[])
 	float o[]
@@ -15,7 +15,7 @@ void fold(float b[], float k[])
 	b = o
 
 void ProcessTrack(BufferBox buf, Track t, int level)
-	if audio[1].used
-		fold(buf.r, audio[1].track[0].level[0].buffer[0].r)
-		fold(buf.l, audio[1].track[0].level[0].buffer[0].l)
+	if audio.used
+		fold(buf.r, audio.track[0].level[0].buffer[0].r)
+		fold(buf.l, audio.track[0].level[0].buffer[0].l)
 	

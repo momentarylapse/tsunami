@@ -1,5 +1,5 @@
 // Title[Deutsch] = Rauschen
-#include "../../api.kaba"
+use "../../api.kaba"
 
 void ProcessTrack(BufferBox buf, Track t, int level)
 	for int i, 0, buf.r.num

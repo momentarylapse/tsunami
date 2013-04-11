@@ -1371,7 +1371,7 @@ void SyntaxTree::ParseClass()
 
 	// create class and type
 	int nt0 = Types.num;
-	Type *t = CreateNewType(name, 0, false, false, false, 0, NULL);
+	Type *_class = CreateNewType(name, 0, false, false, false, 0, NULL);
 	if (nt0 == Types.num){
 		Exp.rewind();
 		DoError("class already exists");
@@ -1385,7 +1385,7 @@ void SyntaxTree::ParseClass()
 		bool found = false;
 		if (ancestor->element.num > 0){
 			// inheritance of elements
-			t->element = ancestor->element;
+			_class->element = ancestor->element;
 			_offset = ancestor->size;
 			found = true;
 		}
@@ -1393,7 +1393,7 @@ void SyntaxTree::ParseClass()
 			// inheritance of functions
 			foreach(ClassFunction &f, ancestor->function)
 				if ((f.name != "__init__") && (f.name != "__delete__") && (f.name != "__assign__"))
-					t->function.add(f);
+					_class->function.add(f);
 			found = true;
 		}
 		if (!found)
@@ -1440,7 +1440,7 @@ void SyntaxTree::ParseClass()
 			if (is_function){
 				Exp.cur_exp = ie;
 				Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
-				ParseClassFunction(t, next_extern);
+				ParseClassFunction(_class, next_extern);
 
 				break;
 			}
@@ -1448,24 +1448,25 @@ void SyntaxTree::ParseClass()
 
 			if (type_needs_alignment(type))
 				_offset = mem_align(_offset, 4);
-			so(format("Class-Element: %s %s  Offset: %d", type->name.c_str(), el.name.c_str(), _offset));
+			_offset = ProcessClassOffset(_class->name, el.name, _offset);
+			so(format("Class-Element: %s %s  Offset: %d", _class->name.c_str(), el.name.c_str(), _offset));
 			if ((Exp.cur != ",") && (!Exp.end_of_line()))
 				DoError("\",\" or newline expected after class element");
 			el.offset = _offset;
 			_offset += type->size;
-			t->element.add(el);
+			_class->element.add(el);
 			if (Exp.end_of_line())
 				break;
 			Exp.next();
 		}
 	}
-	foreach(ClassElement &e, t->element)
+	foreach(ClassElement &e, _class->element)
 		if (type_needs_alignment(e.type))
 			_offset = mem_align(_offset, 4);
-	t->size = _offset;
+	_class->size = ProcessClassSize(_class->name, _offset);
 
 
-	CreateImplicitFunctions(t, false);
+	CreateImplicitFunctions(_class, false);
 
 	Exp.cur_line --;
 }

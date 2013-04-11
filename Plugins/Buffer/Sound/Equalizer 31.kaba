@@ -1,7 +1,7 @@
 // Image = hui:properties
 // Title[Deutsch] = Equalizer (31)
 
-#include "../../api.kaba"
+use "../../api.kaba"
 
 
 

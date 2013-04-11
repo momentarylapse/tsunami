@@ -74,32 +74,16 @@ CHuiWindow *GlobalMainWin = NULL;
 
 void PluginManager::LinkAppScriptData()
 {
-	msg_db_r("LinkAppScriptData", 2);
+	msg_db_f("LinkAppScriptData", 2);
 	Script::config.Directory = "";
 
 	// api definition
 	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
 	Script::LinkExternal("MainWin",		&GlobalMainWin);
 	Script::LinkExternal("audio",			&tsunami->audio);
-	/*Script::LinkExternal("CaptureBuf",		&tsunami->input->CaptureBuf);
-	Script::LinkExternal("CaptureAddData",	&tsunami->input->CaptureAddData);
-	Script::LinkExternal("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);*/
 	Script::LinkExternal("input",			&tsunami->input);
 	Script::LinkExternal("output",			&tsunami->output);
 	Script::LinkExternal("logging",			&tsunami->log);
-/*	Script::LinkExternal("CreateNewAudioFile",(void*)&CreateNewAudioFile);
-	Script::LinkExternal("AddEmptyTrack",	(void*)&AddEmptyTrack);
-	Script::LinkExternal("DeleteTrack",	(void*)&DeleteTrack);
-	Script::LinkExternal("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
-	Script::LinkExternal("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
-	Script::LinkExternal("Track.GetBuffers",	(void*)&Track::GetBuffers);
-	Script::LinkExternal("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
-	Script::LinkExternal("Track.InsertMidiData",	(void*)&Track::InsertMidiData);
-	Script::LinkExternal("BufferBox.clear",(void*)&BufferBox::clear);
-	Script::LinkExternal("BufferBox.__assign__",(void*)&BufferBox::__assign__);
-	Script::LinkExternal("BufferBox.add_click",(void*)&ExtendedBufferBox::add_click);
-	Script::LinkExternal("BufferBox.add_tone",(void*)&ExtendedBufferBox::add_tone);
-	Script::LinkExternal("BufferBox.get_spectrum",(void*)&ExtendedBufferBox::get_spectrum);
 	Script::LinkExternal("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
 	Script::LinkExternal("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
@@ -115,14 +99,98 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("SliderGet",		(void*)&GlobalSliderGet);
 	Script::LinkExternal("RemoveSliders",	(void*)&GlobalRemoveSliders);
 	Script::LinkExternal("AudioFileRender",		(void*)&AudioFileRender);
-	Script::LinkExternal("AudioOutput.Play",	(void*)&AudioOutput::Play);
-	Script::LinkExternal("AudioOutput.PlayGenerated",	(void*)&AudioOutput::PlayGenerated);
-	Script::LinkExternal("AudioOutput.Stop",	(void*)&AudioOutput::Stop);
-	Script::LinkExternal("AudioOutput.IsPlaying",	(void*)&AudioOutput::IsPlaying);
-	Script::LinkExternal("AudioOutput.GetPos",	(void*)&AudioOutput::GetPos);
-	Script::LinkExternal("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
-	Script::LinkExternal("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
-	Script::LinkExternal("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
+
+	Script::DeclareClassSize("Range", sizeof(Range));
+	Script::DeclareClassOffset("Range", "offset", offsetof(Range, offset));
+	Script::DeclareClassOffset("Range", "length", offsetof(Range, num));
+
+	Script::DeclareClassSize("EffectParam", sizeof(EffectParam));
+	Script::DeclareClassOffset("EffectParam", "name", offsetof(EffectParam, name));
+	Script::DeclareClassOffset("EffectParam", "type", offsetof(EffectParam, type));
+	Script::DeclareClassOffset("EffectParam", "value", offsetof(EffectParam, value));
+
+	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
+	Script::DeclareClassOffset("AudioEffect", "name", offsetof(Effect, name));
+	Script::DeclareClassOffset("AudioEffect", "param", offsetof(Effect, param));
+	Script::DeclareClassOffset("AudioEffect", "only_on_selection", offsetof(Effect, only_on_selection));
+	Script::DeclareClassOffset("AudioEffect", "range", offsetof(Effect, range));
+	Script::DeclareClassOffset("AudioEffect", "plugin", offsetof(Effect, plugin));
+	Script::DeclareClassOffset("AudioEffect", "state", offsetof(Effect, state));
+	Script::DeclareClassOffset("AudioEffect", "usable", offsetof(Effect, usable));
+
+	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
+	Script::DeclareClassOffset("BufferBox", "offset", offsetof(BufferBox, offset));
+	Script::DeclareClassOffset("BufferBox", "num", offsetof(BufferBox, num));
+	Script::DeclareClassOffset("BufferBox", "r", offsetof(BufferBox, r));
+	Script::DeclareClassOffset("BufferBox", "l", offsetof(BufferBox, l));
+	Script::DeclareClassOffset("BufferBox", "peak", offsetof(BufferBox, peak));
+	Script::LinkExternal("BufferBox.clear",(void*)&BufferBox::clear);
+	Script::LinkExternal("BufferBox.__assign__",(void*)&BufferBox::__assign__);
+	Script::LinkExternal("BufferBox.add_click",(void*)&ExtendedBufferBox::add_click);
+	Script::LinkExternal("BufferBox.add_tone",(void*)&ExtendedBufferBox::add_tone);
+	Script::LinkExternal("BufferBox.get_spectrum",(void*)&ExtendedBufferBox::get_spectrum);
+
+	Script::DeclareClassSize("Bar", sizeof(Bar));
+	Script::DeclareClassOffset("Bar", "num_beats", offsetof(Bar, num_beats));
+	Script::DeclareClassOffset("Bar", "length", offsetof(Bar, length));
+	Script::DeclareClassOffset("Bar", "type", offsetof(Bar, type));
+	Script::DeclareClassOffset("Bar", "count", offsetof(Bar, count));
+	Script::DeclareClassOffset("Bar", "is_selected", offsetof(Bar, is_selected));
+
+	Script::DeclareClassSize("MidiNote", sizeof(MidiNote));
+	Script::DeclareClassOffset("MidiNote", "range", offsetof(MidiNote, range));
+	Script::DeclareClassOffset("MidiNote", "pitch", offsetof(MidiNote, pitch));
+	Script::DeclareClassOffset("MidiNote", "volume", offsetof(MidiNote, volume));
+
+	Script::DeclareClassSize("MidiData", sizeof(MidiData));
+	Script::DeclareClassOffset("MidiData", "note", 0); //offsetof(MidiData, note));
+	Script::DeclareClassOffset("MidiData", "synthesizer", offsetof(MidiData, synthesizer));
+	Script::DeclareClassOffset("MidiData", "instrument", offsetof(MidiData, instrument));
+	Script::DeclareClassOffset("MidiData", "options", offsetof(MidiData, options));
+
+	Script::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
+	Script::DeclareClassOffset("TrackLevel", "buffer", offsetof(TrackLevel, buffer));
+
+	Script::DeclareClassSize("Track", sizeof(Track));
+	Script::DeclareClassOffset("Track", "type", offsetof(Track, type));
+	Script::DeclareClassOffset("Track", "name", offsetof(Track, name));
+	Script::DeclareClassOffset("Track", "level", offsetof(Track, level));
+	Script::DeclareClassOffset("Track", "length", offsetof(Track, length));
+	Script::DeclareClassOffset("Track", "pos", offsetof(Track, pos));
+	Script::DeclareClassOffset("Track", "volume", offsetof(Track, volume));
+	Script::DeclareClassOffset("Track", "panning", offsetof(Track, panning));
+	Script::DeclareClassOffset("Track", "muted", offsetof(Track, muted));
+	Script::DeclareClassOffset("Track", "rep_num", offsetof(Track, rep_num));
+	Script::DeclareClassOffset("Track", "rep_delay", offsetof(Track, rep_delay));
+	Script::DeclareClassOffset("Track", "fx", offsetof(Track, fx));
+	Script::DeclareClassOffset("Track", "sub", offsetof(Track, sub));
+	Script::DeclareClassOffset("Track", "midi", offsetof(Track, midi));
+	Script::DeclareClassOffset("Track", "area", offsetof(Track, area));
+	Script::DeclareClassOffset("Track", "parent", offsetof(Track, parent));
+	Script::DeclareClassOffset("Track", "root", offsetof(Track, root));
+	Script::DeclareClassOffset("Track", "is_selected", offsetof(Track, is_selected));
+	Script::LinkExternal("Track.GetBuffers",	(void*)&Track::GetBuffers);
+	Script::LinkExternal("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
+	Script::LinkExternal("Track.InsertMidiData",	(void*)&Track::InsertMidiData);
+
+	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
+	Script::DeclareClassOffset("AudioFile", "used", offsetof(AudioFile, used));
+	Script::DeclareClassOffset("AudioFile", "filename", offsetof(AudioFile, filename));
+	Script::DeclareClassOffset("AudioFile", "tag", offsetof(AudioFile, tag));
+	Script::DeclareClassOffset("AudioFile", "sample_rate", offsetof(AudioFile, sample_rate));
+	Script::DeclareClassOffset("AudioFile", "volume", offsetof(AudioFile, volume));
+	Script::DeclareClassOffset("AudioFile", "fx", offsetof(AudioFile, fx));
+	Script::DeclareClassOffset("AudioFile", "track", offsetof(AudioFile, track));
+	Script::DeclareClassOffset("AudioFile", "area", offsetof(AudioFile, area));
+	Script::DeclareClassOffset("AudioFile", "selection", offsetof(AudioFile, selection));
+	Script::DeclareClassOffset("AudioFile", "sel_raw", offsetof(AudioFile, sel_raw));
+	Script::DeclareClassOffset("AudioFile", "level_name", offsetof(AudioFile, level_name));
+	Script::LinkExternal("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
+
+	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
+	Script::DeclareClassOffset("AudioInput", "cur_buf", offsetof(AudioInput, current_buffer));
+	Script::DeclareClassOffset("AudioInput", "buf", offsetof(AudioInput, buffer));
+	Script::DeclareClassOffset("AudioInput", "midi", offsetof(AudioInput, midi));
 	Script::LinkExternal("AudioInput.Start",	(void*)&AudioInput::Start);
 	Script::LinkExternal("AudioInput.ResetSync",	(void*)&AudioInput::ResetSync);
 	Script::LinkExternal("AudioInput.Stop",		(void*)&AudioInput::Stop);
@@ -134,10 +202,19 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioInput.AddObserver",	(void*)&AudioInput::AddWrappedObserver);
 	Script::LinkExternal("AudioInput.RemoveObserver",	(void*)&AudioInput::RemoveWrappedObserver);
 	//Script::LinkExternal("Observable.AddObserver",	(void*)&Observable::AddWrappedObserver);
+
+	Script::LinkExternal("AudioOutput.Play",	(void*)&AudioOutput::Play);
+	Script::LinkExternal("AudioOutput.PlayGenerated",	(void*)&AudioOutput::PlayGenerated);
+	Script::LinkExternal("AudioOutput.Stop",	(void*)&AudioOutput::Stop);
+	Script::LinkExternal("AudioOutput.IsPlaying",	(void*)&AudioOutput::IsPlaying);
+	Script::LinkExternal("AudioOutput.GetPos",	(void*)&AudioOutput::GetPos);
+	Script::LinkExternal("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
+	Script::LinkExternal("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
+	Script::LinkExternal("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
+
 	Script::LinkExternal("Log.Error",	(void*)&Log::Error);
 	Script::LinkExternal("Log.Warning",	(void*)&Log::Warning);
 	Script::LinkExternal("Log.Info",	(void*)&Log::Info);
-	msg_db_l(2);
 }
 
 void PluginManager::OnMenuExecutePlugin()
@@ -174,7 +251,7 @@ void find_plugins_in_dir(const string &dir, PluginManager *pm, CHuiMenu *m)
 
 void PluginManager::AddPluginsToMenu()
 {
-	msg_db_r("AddPluginsToMenu", 2);
+	msg_db_f("AddPluginsToMenu", 2);
 	Script::Init();
 
 	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
@@ -218,20 +295,17 @@ void PluginManager::AddPluginsToMenu()
 	// Events
 	for (int i=0;i<plugin_file.num;i++)
 		tsunami->EventM(format("execute_plugin_%d", i), this, (void(HuiEventHandler::*)())&PluginManager::OnMenuExecutePlugin);
-	msg_db_l(2);
 }
 
 void PluginManager::InitPluginData()
 {
-	msg_db_r("InitPluginData", 2);
-	msg_db_l(2);
+	msg_db_f("InitPluginData", 2);
 }
 
 void PluginManager::FinishPluginData()
 {
-	msg_db_r("FinishPluginData", 2);
+	msg_db_f("FinishPluginData", 2);
 	//tsunami->view->ForceRedraw();
-	msg_db_l(2);
 }
 
 void PluginManager::OnFavoriteName()
@@ -271,7 +345,7 @@ void PluginManager::OnFavoriteDelete()
 
 void PluginManager::InitFavorites(CHuiWindow *win)
 {
-	msg_db_r("InitFavorites", 1);
+	msg_db_f("InitFavorites", 1);
 	PluginFavoriteName.clear();
 
 
@@ -293,12 +367,11 @@ void PluginManager::InitFavorites(CHuiWindow *win)
 	win->EventM("favorite_save", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteSave);
 	win->EventM("favorite_delete", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteDelete);
 	win->EventM("favorite_list", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteList);
-	msg_db_l(1);
 }
 
 void PluginManager::PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w)
 {
-	msg_db_r("PutFavoriteBarFixed", 1);
+	msg_db_f("PutFavoriteBarFixed", 1);
 	w -= 10;
 	win->AddComboBox("", x, y, w / 2 - 35, 25, "favorite_list");
 	win->AddEdit("", x + w / 2 - 30, y, w / 2 - 30, 25, "favorite_name");
@@ -308,12 +381,11 @@ void PluginManager::PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w)
 	win->SetImage("favorite_delete", "hui:delete");
 
 	InitFavorites(win);
-	msg_db_l(1);
 }
 
 void PluginManager::PutFavoriteBarSizable(CHuiWindow *win, const string &root_id, int x, int y)
 {
-	msg_db_r("PutFavoriteBarSizable", 1);
+	msg_db_f("PutFavoriteBarSizable", 1);
 	win->SetTarget(root_id, 0);
 	win->AddControlTable("!noexpandy", x, y, 4, 1, "favorite_table");
 	win->SetTarget("favorite_table", 0);
@@ -325,7 +397,6 @@ void PluginManager::PutFavoriteBarSizable(CHuiWindow *win, const string &root_id
 	win->SetImage("favorite_delete", "hui:delete");
 
 	InitFavorites(win);
-	msg_db_l(1);
 }
 
 void PluginManager::OnPluginFavoriteName()
@@ -375,7 +446,7 @@ void PluginManager::OnPluginClose()
 
 void PluginManager::PutCommandBarFixed(CHuiWindow *win, int x, int y, int w)
 {
-	msg_db_r("PutCommandBarFixed", 1);
+	msg_db_f("PutCommandBarFixed", 1);
 	w -= 10;
 	int ww = (w - 30) / 3;
 	if (ww > 120)
@@ -396,12 +467,11 @@ void PluginManager::PutCommandBarFixed(CHuiWindow *win, int x, int y, int w)
 	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginPreview);
 	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
-	msg_db_l(1);
 }
 
 void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id, int x, int y)
 {
-	msg_db_r("PutCommandBarSizable", 1);
+	msg_db_f("PutCommandBarSizable", 1);
 	win->SetTarget(root_id, 0);
 	win->AddControlTable("!noexpandy", x, y, 4, 1, "command_table");
 	win->SetTarget("command_table", 0);
@@ -420,7 +490,6 @@ void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id,
 	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginPreview);
 	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
-	msg_db_l(1);
 }
 
 void PluginManager::OnPluginPreview()
@@ -443,14 +512,13 @@ void PluginManager::OnUpdate(Observable *o)
 // always push the script... even if an error occurred
 bool PluginManager::LoadAndCompilePlugin(const string &filename)
 {
-	msg_db_r("LoadAndCompilePlugin", 1);
+	msg_db_f("LoadAndCompilePlugin", 1);
 
 	//msg_write(filename);
 
 	foreach(Plugin *p, plugin){
 		if (filename == p->filename){
 			cur_plugin = p;
-			msg_db_l(1);
 			return p->usable;
 		}
 	}
@@ -463,7 +531,6 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	plugin.add(p);
 	cur_plugin = p;
 
-	msg_db_l(1);
 	return p->usable;
 }
 typedef void main_audiofile_func(AudioFile*);
@@ -471,7 +538,7 @@ typedef void main_void_func();
 
 void PluginManager::ExecutePlugin(const string &filename)
 {
-	msg_db_r("ExecutePlugin", 1);
+	msg_db_f("ExecutePlugin", 1);
 
 	if (LoadAndCompilePlugin(filename)){
 		Script::Script *s = cur_plugin->s;
@@ -512,20 +579,17 @@ void PluginManager::ExecutePlugin(const string &filename)
 	}else{
 		tsunami->log->Error(cur_plugin->GetError());
 	}
-
-	msg_db_l(1);
 }
 
 
 void PluginManager::FindAndExecutePlugin()
 {
-	msg_db_r("ExecutePlugin", 1);
+	msg_db_f("ExecutePlugin", 1);
 
 
 	if (HuiFileDialogOpen(tsunami, _("Plugin-Script w&ahlen"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
 		ExecutePlugin(HuiFilename);
 	}
-	msg_db_l(1);
 }
 
 

@@ -1,4 +1,4 @@
-#include "api.kaba"
+use "../api.kaba"
 
 const int SAMPLES = 1024
 const int NUM_FREQS = 512

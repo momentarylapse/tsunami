@@ -2,6 +2,6 @@
 // Title[Deutsch] = Kanäle L -> R
 use "../../api.kaba"
 
-void ProcessTrack(BufferBox buf, Track t, int level)
+void ProcessTrack(BufferBox buf)
 	buf.r = buf.l
 

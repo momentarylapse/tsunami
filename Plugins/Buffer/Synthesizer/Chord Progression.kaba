@@ -17,9 +17,9 @@ PluginData data
 
 window dlg
 
-void ProcessTrack(BufferBox buf, Track t, int level)
+void ProcessTrack(BufferBox buf)
 	Chord chord[]
-	AudioFile *a = t.root
+	AudioFile *a = audio
 	ParseChords(data.Chords, chord)
 	
 	int p0 = a.GetNextBeat(buf.offset)

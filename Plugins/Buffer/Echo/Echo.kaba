@@ -93,9 +93,9 @@ void ResetData()
 	data.Feedback = 0.5
 	data.Delay = 0.15
 
-void ProcessTrack(BufferBox buf, Track t, int level)
+void ProcessTrack(BufferBox buf)
 
-	AudioFile *a = t.root
+	AudioFile *a = audio
 	int delay_samples = a.sample_rate * data.Delay
 	state.buf_r.resize(delay_samples)
 	state.buf_l.resize(delay_samples)

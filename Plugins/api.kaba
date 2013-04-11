@@ -176,11 +176,18 @@ class Log
 	extern void Warning(string message)
 	extern void Info(string message)
 
+class PluginContext
+	Track *track
+	int track_no
+	int level
+	Range range
+
 extern window MainWin
 extern AudioFile *audio
 extern AudioOutput *output
 extern AudioInput *input
 extern Log *logging
+extern PluginContext plugin_context
 
 
 extern void fft_c2c(complex in[], complex out[], bool inverse)

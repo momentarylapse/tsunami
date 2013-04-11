@@ -13,8 +13,6 @@ class PluginData
 
 PluginData data
 
-AudioFile *a
-
 void OnSpeed()
 	data.Speed = SliderGet(dlg, "speed")
 
@@ -23,7 +21,7 @@ void OnDepth()
 
 void DoTremolo(float b[])
 	
-	float f_c = 1.0 / a.sample_rate * 2 * pi * data.Speed
+	float f_c = 1.0 / audio.sample_rate * 2 * pi * data.Speed
 	
 	for int i, 0, b.num
 		float f = 1 - (1 + cos(i * f_c)) * data.Depth * 0.5
@@ -63,8 +61,7 @@ void Configure()
 	
 	HuiWaitTillWindowClosed(dlg)
 	
-void ProcessTrack(BufferBox buf, Track t, int level)
-	a = t.root
+void ProcessTrack(BufferBox buf)
 		
 	DoTremolo(buf.r)
 	DoTremolo(buf.l)

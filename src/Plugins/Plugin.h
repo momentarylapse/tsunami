@@ -21,7 +21,7 @@ class Plugin
 {
 public:
 	typedef void void_func();
-	typedef void process_track_func(BufferBox*, Track*, int);
+	typedef void process_track_func(BufferBox*);
 
 	Plugin(const string &_filename);
 
@@ -52,7 +52,7 @@ public:
 	void ResetState();
 	bool Configure(bool previewable);
 	void DataToDialog();
-	void ProcessTrack(Track *t, int level_no, Range r);
+	void ProcessTrack(Track *t, int level_no, const Range &r);
 
 	void WriteDataToFile(const string &name);
 	void LoadDataFromFile(const string &name);

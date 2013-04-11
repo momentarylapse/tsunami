@@ -42,7 +42,7 @@ Plugin::Plugin(const string &_filename)
 		f_data2dialog = (void_func*)s->MatchFunction("DataToDialog", "void", 0);
 		f_configure = (void_func*)s->MatchFunction("Configure", "void", 0);
 		f_reset_state = (void_func*)s->MatchFunction("ResetState", "void", 0);
-		f_process_track = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 3, "BufferBox", "Track", "int");
+		f_process_track = (process_track_func*)s->MatchFunction("ProcessTrack", "void", 1, "BufferBox");
 
 		type = f_process_track ? TYPE_EFFECT : TYPE_OTHER;
 
@@ -225,14 +225,17 @@ void Plugin::DataToDialog()
 		f_data2dialog();
 }
 
-void Plugin::ProcessTrack(Track *t, int level_no, Range r)
+void Plugin::ProcessTrack(Track *t, int level_no, const Range &r)
 {
 	if (!f_process_track)
 		return;
 	msg_db_r("PluginProcessTrack", 1);
+
+	tsunami->plugins->context.set(t, level_no, r);
+
 	BufferBox buf = t->GetBuffers(level_no, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
-	f_process_track(&buf, t, level_no);
+	f_process_track(&buf);
 	t->root->Execute(a);
 	msg_db_l(1);
 }

@@ -2,7 +2,7 @@
 // Title[Deutsch] = Rückwärts
 use "../../api.kaba"
 
-void ProcessTrack(BufferBox buf, Track t, int level)
+void ProcessTrack(BufferBox buf)
 	int n = buf.num / 2
 	for int i, 0, n
 		int j = buf.num - i - 1

@@ -3,5 +3,5 @@
 use "../../api.kaba"
 
 
-void ProcessTrack(BufferBox buf, Track t, int level)
+void ProcessTrack(BufferBox buf)
 	buf.r = 0

@@ -54,7 +54,7 @@ void Configure()
 		
 	HuiWaitTillWindowClosed(PitchDialog)
 
-void ProcessTrack(BufferBox buf, Track t, int level)
+void ProcessTrack(BufferBox buf)
 	shift_buf(buf.r)
 	shift_buf(buf.l)
 	buf1.clear()

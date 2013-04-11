@@ -74,6 +74,16 @@ public:
 
 	Array<Plugin*> plugin;
 	Plugin *cur_plugin;
+
+	struct PluginContext
+	{
+		Range range;
+		Track *track;
+		int track_no;
+		int level;
+		void set(Track *t, int l, const Range &r);
+	};
+	PluginContext context;
 };
 
 #endif /* PLUGINMANAGER_H_ */

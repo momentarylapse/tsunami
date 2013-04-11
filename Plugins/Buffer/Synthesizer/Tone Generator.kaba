@@ -12,8 +12,8 @@ PluginData data
 
 window GeneratorDialog
 
-void ProcessTrack(BufferBox buf, Track t, int level)
-	AudioFile *a = t.root
+void ProcessTrack(BufferBox buf)
+	AudioFile *a = audio
 
 	float f = data.Frequency
 

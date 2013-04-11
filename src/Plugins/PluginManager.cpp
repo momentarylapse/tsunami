@@ -19,6 +19,15 @@
 #include "Plugin.h"
 #include "Effect.h"
 
+
+void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
+{
+	track = t;
+	level = l;
+	range = r;
+	track_no = get_track_index(t);
+}
+
 PluginManager::PluginManager()
 {
 }
@@ -215,6 +224,13 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Log.Error",	(void*)&Log::Error);
 	Script::LinkExternal("Log.Warning",	(void*)&Log::Warning);
 	Script::LinkExternal("Log.Info",	(void*)&Log::Info);
+
+	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
+	Script::DeclareClassOffset("PluginContext", "track", offsetof(PluginManager::PluginContext, track));
+	Script::DeclareClassOffset("PluginContext", "track_no", offsetof(PluginManager::PluginContext, track_no));
+	Script::DeclareClassOffset("PluginContext", "range", offsetof(PluginManager::PluginContext, range));
+	Script::DeclareClassOffset("PluginContext", "level", offsetof(PluginManager::PluginContext, level));
+	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugins->context);
 }
 
 void PluginManager::OnMenuExecutePlugin()

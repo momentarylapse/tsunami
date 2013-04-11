@@ -125,8 +125,9 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 		plugin->ResetData();
 		ImportData();
 		ImportState();
+		tsunami->plugins->context.set(t, 0, buf.range());
 		if (plugin->type == Plugin::TYPE_EFFECT)
-			plugin->f_process_track(&buf, t, 0);
+			plugin->f_process_track(&buf);
 		ExportState();
 		t->root->UpdateSelection();
 	}else{

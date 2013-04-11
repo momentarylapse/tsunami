@@ -101,8 +101,8 @@ void Configure()
 	
 	HuiWaitTillWindowClosed(FlangerDialog)
 	
-void ProcessTrack(BufferBox buf, Track t, int level)
-	AudioFile *a = t.root
+void ProcessTrack(BufferBox buf)
+	AudioFile *a = audio
 	int delay_samples = a.sample_rate * data.Delay + 1
 	state.temp_r.resize(delay_samples)
 	state.temp_l.resize(delay_samples)

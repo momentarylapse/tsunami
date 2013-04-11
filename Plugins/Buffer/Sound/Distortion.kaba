@@ -18,7 +18,7 @@ float dist(float x)
 			ff = x_out[i] + (x_out[i + 1] - x_out[i]) * (f - x_in[i]) / (x_in[i + 1] - x_in[i])
 	return sign * ff
 
-void ProcessTrack(BufferBox buf, Track t, int level)
+void ProcessTrack(BufferBox buf)
 	
 	num_x = 4
 	x_in[0] = 0

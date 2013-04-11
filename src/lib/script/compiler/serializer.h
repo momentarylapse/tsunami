@@ -8,9 +8,9 @@ namespace Script
 
 #define max_reg			8 // >= all RegXXX used...
 
-struct sRegChannel
+struct RegChannel
 {
-	int reg;
+	int reg_root;
 	int first, last;
 };
 
@@ -18,10 +18,11 @@ struct sRegChannel
 enum{
 	inst_marker = 10000,
 	inst_asm,
-	inst_func_init,
+	inst_func_intro,
+	inst_func_outro,
 };
 
-struct sLoopData
+struct LoopData
 {
 	int marker_continue, marker_break;
 	int level, index;
@@ -46,15 +47,15 @@ struct SerialCommand
 	int pos;
 };
 
-struct sTempVar
+struct TempVar
 {
 	Type *type;
 	int first, last, count;
-	bool referenced;
+	bool force_stack;
 	int entangled;
 };
 
-struct sStuffToAdd
+struct AddLaterData
 {
 	int kind, marker, level, index;
 };
@@ -73,23 +74,22 @@ struct Serializer
 	Array<SerialCommand> cmd;
 	int NumMarkers;
 	Script *script;
-	PreScript *pre_script;
+	SyntaxTree *syntax_tree;
 	Function *cur_func;
 	bool call_used;
-	int LastCommandSize;
 	Command *NextCommand;
 	bool TempVarRangesDefined;
 
-	Array<int> MapReg;
-	Array<sRegChannel> RegChannel;
+	Array<int> MapRegRoot;
+	Array<RegChannel> reg_channel;
 
-	bool RegUsed[max_reg];
-	Array<sLoopData> LoopData;
+	bool RegRootUsed[max_reg];
+	Array<LoopData> loop;
 
-	int StackOffset, StackMaxSize;
-	Array<sTempVar> TempVar;
+	int StackOffset, StackMaxSize, MaxPushSize;
+	Array<TempVar> temp_var;
 
-	Array<sStuffToAdd> StuffToAdd;
+	Array<AddLaterData> add_later;
 
 	Asm::InstructionWithParamsList *list;
 
@@ -103,10 +103,12 @@ struct Serializer
 	void SerializeParameter(Command *link, int level, int index, SerialCommandParam &param);
 	SerialCommandParam SerializeCommand(Command *com, int level, int index);
 	void SerializeOperator(Command *com, SerialCommandParam *param, SerialCommandParam &ret);
+	void AddFunctionIntro(Function *f);
 
+	void cmd_list_out();
 
 	void add_reg_channel(int reg, int first, int last);
-	void add_temp(Type *t, SerialCommandParam &param);
+	void add_temp(Type *t, SerialCommandParam &param, bool add_constructor = true);
 	void add_cmd(int inst, SerialCommandParam p1, SerialCommandParam p2);
 	void add_cmd(int inst, SerialCommandParam p);
 	void add_cmd(int inst);
@@ -114,14 +116,22 @@ struct Serializer
 	void remove_cmd(int index);
 	void remove_temp_var(int v);
 	void move_param(SerialCommandParam &p, int from, int to);
-	void add_marker(int m = -1);
+	int add_marker(int m = -1);
 	int add_marker_after_command(int level, int index);
 	void add_jump_after_command(int level, int index, int marker);
 
-	void add_cmd_constructor(SerialCommandParam &param, bool is_temp);
+
+	Array<SerialCommandParam> InsertedConstructorFunc;
+	Array<SerialCommandParam> InsertedConstructorTemp;
+	void add_cmd_constructor(SerialCommandParam &param, int modus);
 	void add_cmd_destructor(SerialCommandParam &param);
 
-	bool is_reg_used_in_interval(int reg, int first, int last);
+	void DoMapping();
+	void FindReferencedTempVars();
+	void TryMapTempVarsRegisters();
+	void MapRemainingTempVarsToStack();
+
+	bool is_reg_root_used_in_interval(int reg_root, int first, int last);
 	void MapTempVar(int vi);
 	void MapTempVars();
 	void MapReferencedTempVars();
@@ -132,14 +142,17 @@ struct Serializer
 	void ScanTempVarUsage();
 	void CorrectUnallowedParamCombis();
 
-	int find_unused_reg(int first, int last, bool allow_eax);
+	int find_unused_reg(int first, int last, int size, bool allow_eax);
 	void solve_deref_temp_local(int c, int np, bool is_local);
 	void ResolveDerefTempAndLocal();
 	bool ParamUntouchedInInterval(SerialCommandParam &p, int first, int last);
 	void SimplifyFPUStack();
 	void SimplifyMovs();
+	void RemoveUnusedTempVars();
 
-	void AddFunctionCall(void *func, int func_no = -1);
+	void AddFunctionCall(Script *script, int func_no);
+	void add_function_call_x86(Script *script, int func_no);
+	void add_function_call_amd64(Script *script, int func_no);
 	void AddReference(SerialCommandParam &param, Type *type, SerialCommandParam &ret);
 	void AddDereference(SerialCommandParam &param, SerialCommandParam &ret, Type *force_type = NULL);
 

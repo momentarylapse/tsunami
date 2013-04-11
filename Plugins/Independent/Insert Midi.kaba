@@ -1,4 +1,4 @@
-#include "../api.kaba"
+use "../api.kaba"
 
 void main()
 	MidiData m

@@ -1,4 +1,4 @@
-#include "api.kaba"
+use "api.kaba"
 
 float get_freq(int tone)
 	return 220 * pow(2, (tone - 21.0) / 12.0)

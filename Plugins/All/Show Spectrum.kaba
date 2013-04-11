@@ -1,7 +1,7 @@
 // Image = hui:find
 // Title[Deutsch] = Spektrum zeigen
-#include "../api.kaba"
-#include "../grid.kaba"
+use "../api.kaba"
+use "../grid.kaba"
 
 const int N = 512
 const float MIN_FREQ = 20.0

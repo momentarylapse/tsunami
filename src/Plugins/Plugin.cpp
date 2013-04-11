@@ -46,7 +46,7 @@ Plugin::Plugin(const string &_filename)
 
 		type = f_process_track ? TYPE_EFFECT : TYPE_OTHER;
 
-		foreachi(Script::LocalVariable &v, s->pre_script->RootOfAllEvil.var, i)
+		foreachi(Script::LocalVariable &v, s->syntax->RootOfAllEvil.var, i)
 			if (v.type->name == "PluginData"){
 				data = s->g_var[i];
 				data_type = v.type;
@@ -246,7 +246,7 @@ void Plugin::WriteDataToFile(const string &name)
 	ExportData(param);
 	dir_create(HuiAppDirectory + "Plugins/");
 	dir_create(HuiAppDirectory + "Plugins/Favorites/");
-	CFile *f = CreateFile(HuiAppDirectory + "Plugins/Favorites/" + s->pre_script->Filename.basename() + "___" + name);
+	CFile *f = CreateFile(HuiAppDirectory + "Plugins/Favorites/" + s->syntax->Filename.basename() + "___" + name);
 	f->WriteInt(0);
 	f->WriteInt(0);
 	f->WriteComment("// Data");
@@ -266,7 +266,7 @@ void Plugin::LoadDataFromFile(const string &name)
 	if (!usable)
 		return;
 	msg_db_r("Plugin.LoadDataFromFile", 1);
-	CFile *f = OpenFile(HuiAppDirectory + "Plugins/Favorites/" + s->pre_script->Filename.basename() + "___" + name);
+	CFile *f = OpenFile(HuiAppDirectory + "Plugins/Favorites/" + s->syntax->Filename.basename() + "___" + name);
 	if (!f){
 		msg_db_l(1);
 		return;

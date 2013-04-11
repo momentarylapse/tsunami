@@ -20,7 +20,7 @@ extern void script_db_left();
 #define left	script_db_left
 
 
-void PreScript::PreProcessCommand(Script *s, Command *c)
+void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 {
 	msg_db_f("PreProcessCommand", 4);
 
@@ -38,7 +38,15 @@ void PreScript::PreProcessCommand(Script *s, Command *c)
 	// process...
 	if (c->kind == KindOperator){
 		PreOperator *o = &PreOperators[c->link_nr];
-		if (o->func){
+		/*if (c->link_nr == OperatorIntAdd){
+			if (c->param[1]->kind == KindConstant){
+				int v = *(int*)Constants[c->param[1]->link_nr].data;
+				if (v == 0){
+					msg_error("addr + 0");
+					*c = *c->param[0];
+				}
+			}
+		}else*/ if (o->func){
 			bool all_const = true;
 			bool is_address = false;
 			bool is_local = false;
@@ -112,10 +120,10 @@ void PreScript::PreProcessCommand(Script *s, Command *c)
 	}*/
 }
 
-string LinkNr2Str(PreScript *s,int kind,int nr);
+string LinkNr2Str(SyntaxTree *s,int kind,int nr);
 
 // may not use AddConstant()!!!
-void PreScript::PreProcessCommandAddresses(Script *s, Command *c)
+void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 {
 	msg_db_f("PreProcessCommandAddr", 4);
 	/*msg_write(Kind2Str(c->Kind));
@@ -168,17 +176,12 @@ void PreScript::PreProcessCommandAddresses(Script *s, Command *c)
 		}
 	}else if (c->kind == KindReference){
 		if (s){
-			if ((c->param[0]->kind == KindVarGlobal) || (c->param[0]->kind == KindVarLocal) || (c->param[0]->kind == KindVarExternal) || (c->param[0]->kind == KindConstant)){
+			if ((c->param[0]->kind == KindVarGlobal) || (c->param[0]->kind == KindVarLocal) || (c->param[0]->kind == KindConstant)){
 				so("pre process ref var");
 				c->kind = KindAddress;
 				c->num_params = 0;
 				if (c->param[0]->kind == KindVarGlobal){
-					if (c->param[0]->script)
-						c->link_nr = (long)c->param[0]->script->g_var[c->param[0]->link_nr];
-					else
-						c->link_nr = (long)s->g_var[c->param[0]->link_nr];
-				}else if (c->param[0]->kind == KindVarExternal){
-					c->link_nr = (long)PreExternalVars[c->param[0]->link_nr].pointer;
+					c->link_nr = (long)c->param[0]->script->g_var[c->param[0]->link_nr];
 				}else if (c->param[0]->kind == KindVarLocal){
 					c->link_nr = (long)cur_func->var[c->param[0]->link_nr]._offset;
 					c->kind = KindLocalAddress;
@@ -201,7 +204,7 @@ void PreScript::PreProcessCommandAddresses(Script *s, Command *c)
 	}
 }
 
-void PreScript::PreProcessor(Script *s)
+void SyntaxTree::PreProcessor(Script *s)
 {
 	msg_db_f("PreProcessor", 4);
 	foreach(Function *f, Functions){
@@ -212,7 +215,7 @@ void PreScript::PreProcessor(Script *s)
 	//Show();
 }
 
-void PreScript::PreProcessorAddresses(Script *s)
+void SyntaxTree::PreProcessorAddresses(Script *s)
 {
 	msg_db_f("PreProcessorAddr", 4);
 	foreach(Function *f, Functions){

@@ -75,69 +75,68 @@ CHuiWindow *GlobalMainWin = NULL;
 void PluginManager::LinkAppScriptData()
 {
 	msg_db_r("LinkAppScriptData", 2);
-	Script::Directory = "";
+	Script::config.Directory = "";
 
 	// api definition
-	Script::ResetSemiExternalData();
 	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
-	Script::LinkSemiExternalVar("MainWin",		&GlobalMainWin);
-	Script::LinkSemiExternalVar("audio",			&tsunami->audio);
-	/*Script::LinkSemiExternalVar("CaptureBuf",		&tsunami->input->CaptureBuf);
-	Script::LinkSemiExternalVar("CaptureAddData",	&tsunami->input->CaptureAddData);
-	Script::LinkSemiExternalVar("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);*/
-	Script::LinkSemiExternalVar("input",			&tsunami->input);
-	Script::LinkSemiExternalVar("output",			&tsunami->output);
-	Script::LinkSemiExternalVar("logging",			&tsunami->log);
-/*	Script::LinkSemiExternalFunc("CreateNewAudioFile",(void*)&CreateNewAudioFile);
-	Script::LinkSemiExternalFunc("AddEmptyTrack",	(void*)&AddEmptyTrack);
-	Script::LinkSemiExternalFunc("DeleteTrack",	(void*)&DeleteTrack);
-	Script::LinkSemiExternalFunc("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
-	Script::LinkSemiExternalFunc("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
-	Script::LinkSemiExternalFunc("Track.GetBuffers",	(void*)&Track::GetBuffers);
-	Script::LinkSemiExternalFunc("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
-	Script::LinkSemiExternalFunc("Track.InsertMidiData",	(void*)&Track::InsertMidiData);
-	Script::LinkSemiExternalFunc("BufferBox.clear",(void*)&BufferBox::clear);
-	Script::LinkSemiExternalFunc("BufferBox.__assign__",(void*)&BufferBox::__assign__);
-	Script::LinkSemiExternalFunc("BufferBox.add_click",(void*)&ExtendedBufferBox::add_click);
-	Script::LinkSemiExternalFunc("BufferBox.add_tone",(void*)&ExtendedBufferBox::add_tone);
-	Script::LinkSemiExternalFunc("BufferBox.get_spectrum",(void*)&ExtendedBufferBox::get_spectrum);
-	Script::LinkSemiExternalFunc("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
-	Script::LinkSemiExternalFunc("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
-	Script::LinkSemiExternalFunc("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
-	/*Script::LinkSemiExternalFunc("ProgressStart",	(void*)&ProgressStart);
-	Script::LinkSemiExternalFunc("ProgressEnd",	(void*)&ProgressEnd);
-	Script::LinkSemiExternalFunc("Progress",		(void*)&ProgressStatus);*/
-	Script::LinkSemiExternalFunc("PutFavoriteBarFixed",	(void*)&GlobalPutFavoriteBarFixed);
-	Script::LinkSemiExternalFunc("PutFavoriteBarSizable",	(void*)&GlobalPutFavoriteBarSizable);
-	Script::LinkSemiExternalFunc("PutCommandBarFixed",	(void*)&GlobalPutCommandBarFixed);
-	Script::LinkSemiExternalFunc("PutCommandBarSizable",	(void*)&GlobalPutCommandBarSizable);
-	Script::LinkSemiExternalFunc("AddSlider",		(void*)&GlobalAddSlider);
-	Script::LinkSemiExternalFunc("SliderSet",		(void*)&GlobalSliderSet);
-	Script::LinkSemiExternalFunc("SliderGet",		(void*)&GlobalSliderGet);
-	Script::LinkSemiExternalFunc("RemoveSliders",	(void*)&GlobalRemoveSliders);
-	Script::LinkSemiExternalFunc("AudioFileRender",		(void*)&AudioFileRender);
-	Script::LinkSemiExternalFunc("AudioOutput.Play",	(void*)&AudioOutput::Play);
-	Script::LinkSemiExternalFunc("AudioOutput.PlayGenerated",	(void*)&AudioOutput::PlayGenerated);
-	Script::LinkSemiExternalFunc("AudioOutput.Stop",	(void*)&AudioOutput::Stop);
-	Script::LinkSemiExternalFunc("AudioOutput.IsPlaying",	(void*)&AudioOutput::IsPlaying);
-	Script::LinkSemiExternalFunc("AudioOutput.GetPos",	(void*)&AudioOutput::GetPos);
-	Script::LinkSemiExternalFunc("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
-	Script::LinkSemiExternalFunc("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
-	Script::LinkSemiExternalFunc("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
-	Script::LinkSemiExternalFunc("AudioInput.Start",	(void*)&AudioInput::Start);
-	Script::LinkSemiExternalFunc("AudioInput.ResetSync",	(void*)&AudioInput::ResetSync);
-	Script::LinkSemiExternalFunc("AudioInput.Stop",		(void*)&AudioInput::Stop);
-	Script::LinkSemiExternalFunc("AudioInput.IsCapturing",	(void*)&AudioInput::IsCapturing);
-	Script::LinkSemiExternalFunc("AudioInput.GetSampleCount",	(void*)&AudioInput::GetSampleCount);
-	Script::LinkSemiExternalFunc("AudioInput.Accumulate",	(void*)&AudioInput::Accumulate);
-	Script::LinkSemiExternalFunc("AudioInput.ResetAccumulation",	(void*)&AudioInput::ResetAccumulation);
-	Script::LinkSemiExternalFunc("AudioInput.GetDelay",	(void*)&AudioInput::GetDelay);
-	Script::LinkSemiExternalFunc("AudioInput.AddObserver",	(void*)&AudioInput::AddWrappedObserver);
-	Script::LinkSemiExternalFunc("AudioInput.RemoveObserver",	(void*)&AudioInput::RemoveWrappedObserver);
-	//Script::LinkSemiExternalFunc("Observable.AddObserver",	(void*)&Observable::AddWrappedObserver);
-	Script::LinkSemiExternalFunc("Log.Error",	(void*)&Log::Error);
-	Script::LinkSemiExternalFunc("Log.Warning",	(void*)&Log::Warning);
-	Script::LinkSemiExternalFunc("Log.Info",	(void*)&Log::Info);
+	Script::LinkExternal("MainWin",		&GlobalMainWin);
+	Script::LinkExternal("audio",			&tsunami->audio);
+	/*Script::LinkExternal("CaptureBuf",		&tsunami->input->CaptureBuf);
+	Script::LinkExternal("CaptureAddData",	&tsunami->input->CaptureAddData);
+	Script::LinkExternal("CapturePreviewBuf",&tsunami->input->CapturePreviewBuf);*/
+	Script::LinkExternal("input",			&tsunami->input);
+	Script::LinkExternal("output",			&tsunami->output);
+	Script::LinkExternal("logging",			&tsunami->log);
+/*	Script::LinkExternal("CreateNewAudioFile",(void*)&CreateNewAudioFile);
+	Script::LinkExternal("AddEmptyTrack",	(void*)&AddEmptyTrack);
+	Script::LinkExternal("DeleteTrack",	(void*)&DeleteTrack);
+	Script::LinkExternal("AddEmptySubTrack",(void*)&AddEmptySubTrack);*/
+	Script::LinkExternal("AudioFile.GetNextBeat",	(void*)&AudioFile::GetNextBeat);
+	Script::LinkExternal("Track.GetBuffers",	(void*)&Track::GetBuffers);
+	Script::LinkExternal("Track.ReadBuffers",	(void*)&Track::ReadBuffers);
+	Script::LinkExternal("Track.InsertMidiData",	(void*)&Track::InsertMidiData);
+	Script::LinkExternal("BufferBox.clear",(void*)&BufferBox::clear);
+	Script::LinkExternal("BufferBox.__assign__",(void*)&BufferBox::__assign__);
+	Script::LinkExternal("BufferBox.add_click",(void*)&ExtendedBufferBox::add_click);
+	Script::LinkExternal("BufferBox.add_tone",(void*)&ExtendedBufferBox::add_tone);
+	Script::LinkExternal("BufferBox.get_spectrum",(void*)&ExtendedBufferBox::get_spectrum);
+	Script::LinkExternal("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
+	Script::LinkExternal("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
+	Script::LinkExternal("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
+	/*Script::LinkExternal("ProgressStart",	(void*)&ProgressStart);
+	Script::LinkExternal("ProgressEnd",	(void*)&ProgressEnd);
+	Script::LinkExternal("Progress",		(void*)&ProgressStatus);*/
+	Script::LinkExternal("PutFavoriteBarFixed",	(void*)&GlobalPutFavoriteBarFixed);
+	Script::LinkExternal("PutFavoriteBarSizable",	(void*)&GlobalPutFavoriteBarSizable);
+	Script::LinkExternal("PutCommandBarFixed",	(void*)&GlobalPutCommandBarFixed);
+	Script::LinkExternal("PutCommandBarSizable",	(void*)&GlobalPutCommandBarSizable);
+	Script::LinkExternal("AddSlider",		(void*)&GlobalAddSlider);
+	Script::LinkExternal("SliderSet",		(void*)&GlobalSliderSet);
+	Script::LinkExternal("SliderGet",		(void*)&GlobalSliderGet);
+	Script::LinkExternal("RemoveSliders",	(void*)&GlobalRemoveSliders);
+	Script::LinkExternal("AudioFileRender",		(void*)&AudioFileRender);
+	Script::LinkExternal("AudioOutput.Play",	(void*)&AudioOutput::Play);
+	Script::LinkExternal("AudioOutput.PlayGenerated",	(void*)&AudioOutput::PlayGenerated);
+	Script::LinkExternal("AudioOutput.Stop",	(void*)&AudioOutput::Stop);
+	Script::LinkExternal("AudioOutput.IsPlaying",	(void*)&AudioOutput::IsPlaying);
+	Script::LinkExternal("AudioOutput.GetPos",	(void*)&AudioOutput::GetPos);
+	Script::LinkExternal("AudioOutput.GetSampleRate",	(void*)&AudioOutput::GetSampleRate);
+	Script::LinkExternal("AudioOutput.GetVolume",	(void*)&AudioOutput::GetVolume);
+	Script::LinkExternal("AudioOutput.SetVolume",	(void*)&AudioOutput::SetVolume);
+	Script::LinkExternal("AudioInput.Start",	(void*)&AudioInput::Start);
+	Script::LinkExternal("AudioInput.ResetSync",	(void*)&AudioInput::ResetSync);
+	Script::LinkExternal("AudioInput.Stop",		(void*)&AudioInput::Stop);
+	Script::LinkExternal("AudioInput.IsCapturing",	(void*)&AudioInput::IsCapturing);
+	Script::LinkExternal("AudioInput.GetSampleCount",	(void*)&AudioInput::GetSampleCount);
+	Script::LinkExternal("AudioInput.Accumulate",	(void*)&AudioInput::Accumulate);
+	Script::LinkExternal("AudioInput.ResetAccumulation",	(void*)&AudioInput::ResetAccumulation);
+	Script::LinkExternal("AudioInput.GetDelay",	(void*)&AudioInput::GetDelay);
+	Script::LinkExternal("AudioInput.AddObserver",	(void*)&AudioInput::AddWrappedObserver);
+	Script::LinkExternal("AudioInput.RemoveObserver",	(void*)&AudioInput::RemoveWrappedObserver);
+	//Script::LinkExternal("Observable.AddObserver",	(void*)&Observable::AddWrappedObserver);
+	Script::LinkExternal("Log.Error",	(void*)&Log::Error);
+	Script::LinkExternal("Log.Warning",	(void*)&Log::Warning);
+	Script::LinkExternal("Log.Info",	(void*)&Log::Info);
 	msg_db_l(2);
 }
 
@@ -279,7 +278,7 @@ void PluginManager::InitFavorites(CHuiWindow *win)
 	win->Enable("favorite_save", false);
 	win->Enable("favorite_delete", false);
 
-	string init = cur_plugin->s->pre_script->Filename.basename() + "___";
+	string init = cur_plugin->s->syntax->Filename.basename() + "___";
 
 	dir_create(HuiAppDirectory + "Plugins/Favorites");
 	Array<DirEntry> list = dir_search(HuiAppDirectory + "Plugins/Favorites", "*", false);
@@ -457,10 +456,6 @@ bool PluginManager::LoadAndCompilePlugin(const string &filename)
 	}
 
 	//InitPluginData();
-
-	// repeated linking would kill type information already defined in api.kaba...
-	if (plugin.num == 0)
-		LinkAppScriptData();
 
 	Plugin *p = new Plugin(filename);
 	p->index = plugin.num;

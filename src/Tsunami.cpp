@@ -142,14 +142,16 @@ Tsunami::Tsunami(Array<string> arg) :
 	for (int i=0;i<256;i++)
 		EventM(format("jump_to_level_%d", i), this, &Tsunami::OnCurLevel);
 
-	plugins = new PluginManager;
-	plugins->AddPluginsToMenu();
 
 	audio = new AudioFile;
 
 	storage = new Storage;
 
 	view = new AudioView(this, audio);
+
+	plugins = new PluginManager;
+	plugins->AddPluginsToMenu();
+	plugins->LinkAppScriptData();
 
 	Subscribe(view);
 	Subscribe(audio);

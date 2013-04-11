@@ -10,16 +10,55 @@ namespace Asm
 int OCParam;
 
 
+
+enum{
+	Size8 = 1,
+	Size16 = 2,
+	Size32 = 4,
+	Size48 = 6,
+	Size64 = 8,
+	Size128 = 16,
+	/*SizeVariable = -5,
+	Size32or48 = -6,*/
+	SizeUnknown = -7
+};
+
+InstructionSetData InstructionSet;
+
+struct ParserState
+{
+	bool EndOfLine;
+	bool EndOfCode;
+	int LineNo;
+	int ColumnNo;
+	int DefaultSize;
+	int ParamSize, AddrSize;
+	bool ExtendModRMBase;
+	bool ExtendModRMReg;
+	bool ExtendModRMIndex;
+	int FullRegisterSize;
+	void init()
+	{
+		DefaultSize = Size32;
+		FullRegisterSize = InstructionSet.pointer_size;
+
+		if (CurrentMetaInfo)
+			if (CurrentMetaInfo->Mode16)
+				DefaultSize = Size16;
+	}
+	void reset()
+	{
+		ParamSize = DefaultSize;
+		AddrSize = DefaultSize;
+		ExtendModRMBase = false;
+		ExtendModRMReg = false;
+		ExtendModRMIndex = false;
+	}
+};
+static ParserState state;
+
 const char *code_buffer;
-bool EndOfLine;
-bool EndOfCode;
 MetaInfo *CurrentMetaInfo = NULL;
-//bool use_mode16 = false;
-int LineNo;
-int ColumnNo;
-static bool mode16;
-static bool small_param;
-static bool small_addr;
 
 Exception::Exception(const string &_message, const string &_expression, int _line, int _column)
 {
@@ -43,7 +82,7 @@ void Exception::print() const
 void SetError(const string &str)
 {
 	//msg_error(str + format("\nline %d", LineNo + 1));
-	throw Exception(str, "", LineNo, ColumnNo);
+	throw Exception(str, "", state.LineNo, state.ColumnNo);
 }
 
 
@@ -73,51 +112,53 @@ static void so(int i)
 
 
 
-/*string bufstr;
-char *buffer;
-inline void resize_buffer(int size)
-{
-	bufstr.resize(size);
-	buffer = &bufstr[0];
-}*/
-
+// groups of registers
 enum{
-	Size8,
-	Size16,
-	Size32,
-	//Size48,
-	Size16or32,
-	Size32or48,
-	Size64,
-	SizeUnknown
+	RegGroupNone,
+	RegGroupGeneral,
+	RegGroupGeneral2,
+	RegGroupSegment,
+	RegGroupFlags,
+	RegGroupControl,
+	RegGroupX87,
+	RegGroupXmm,
 };
 
-inline int absolute_size(int s)
-{
-	if (s == Size8)		return 1;
-	if (s == Size16)	return 2;
-	if (s == Size32)	return 4;
-	if (s == Size64)	return 8;
-	return 0;
-}
 
 struct Register{
 	string name;
 	int id, group, size;
+	bool extend_mod_rm;
 };
 Array<Register> Registers;
 Array<Register*> RegisterByID;
 int RegRoot[NUM_REGISTERS];
+int RegResize[NUM_REG_ROOTS][MAX_REG_SIZE + 1];
 
-inline void add_reg(const string &name, int id, int group, int size, int root = -1)
+void add_reg(const string &name, int id, int group, int size, int root = -1)
 {
 	Register r;
+	r.extend_mod_rm = false;
 	r.name = name;
 	r.id = id;
 	r.group = group;
+	if (group == RegGroupGeneral2){
+		r.group = RegGroupGeneral;
+		r.extend_mod_rm = true;
+	}
 	r.size = size;
 	Registers.add(r);
-	RegRoot[id] = (root < 0) ? id : root;
+	if (root < 0)
+		root = NUM_REG_ROOTS - 1;
+	RegRoot[id] = root;
+	RegResize[root][size] = id;
+}
+
+string GetRegName(int reg)
+{
+	if ((reg < 0) || (reg >= NUM_REGISTERS))
+		return "INVALID REG: " + i2s(reg);
+	return RegisterByID[reg]->name;
 }
 
 struct InstructionName{
@@ -129,96 +170,63 @@ struct InstructionName{
 // rw1/2: 
 InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{inst_add,		"add",		3, 1},
-	{inst_add_b,	"add.b",	3, 1},
 	{inst_adc,		"adc",		3, 1},
-	{inst_adc_b,	"adc.b",	3, 1},
 	{inst_sub,		"sub",		3, 1},
-	{inst_sub_b,	"sub.b",	3, 1},
 	{inst_sbb,		"sbb",		3, 1},
-	{inst_sbb_b,	"sbb.b",	3, 1},
 	{inst_inc,		"inc",		3},
-	{inst_inc_b,	"inc.b",	3},
 	{inst_dec,		"dec",		3},
-	{inst_dec_b,	"dec.b",	3},
 	{inst_mul,		"mul",		3, 1},
-	{inst_mul_b,	"mul.b",	3, 1},
 	{inst_imul,		"imul",		3, 1},
-	{inst_imul_b,	"imul.b",	3, 1},
 	{inst_div,		"div",		3, 1},
-	{inst_div_b,	"div.b",	3, 1},
 	{inst_idiv,		"idiv",		3, 1},
-	{inst_idiv_b,	"idiv.b",	3, 1},
 	{inst_mov,		"mov",		2, 1},
-	{inst_mov_b,	"mov.b",	2, 1},
 	{inst_movzx,	"movzx",	2, 1},
 	{inst_movsx,	"movsx",	2, 1},
 	{inst_and,		"and",		3, 1},
-	{inst_and_b,	"and.b",	3, 1},
 	{inst_or,		"or",		3, 1},
-	{inst_or_b,		"or.b",		3, 1},
 	{inst_xor,		"xor",		3, 1},
-	{inst_xor_b,	"xor.b",	3, 1},
 	{inst_not,		"not",		3},
-	{inst_not_b,	"not.b",	3},
 	{inst_neg,		"neg",		3},
-	{inst_neg_b,	"neg.b",	3},
 	{inst_pop,		"pop",		2},
 	{inst_popa,		"popa",		2},
 	{inst_push,		"push",		1},
 	{inst_pusha,	"pusha",	1},
 	
 	{inst_jo,		"jo",		1},
-	{inst_jo_b,		"jo.b",		1},
 	{inst_jno,		"jno",		1},
-	{inst_jno_b,	"jno.b",	1},
 	{inst_jb,		"jb",		1},
-	{inst_jb_b,		"jb.b",		1},
 	{inst_jnb,		"jnb",		1},
-	{inst_jnb_b,	"jnb.b",	1},
 	{inst_jz,		"jz",		1},
-	{inst_jz_b,		"jz.b",		1},
 	{inst_jnz,		"jnz",		1},
-	{inst_jnz_b,	"jnz.b",	1},
 	{inst_jbe,		"jbe",		1},
-	{inst_jbe_b,	"jbe.b",	1},
 	{inst_jnbe,		"jnbe",		1},
-	{inst_jnbe_b,	"jnbe.b",	1},
 	{inst_js,		"js",		1},
-	{inst_js_b,		"js.b",		1},
 	{inst_jns,		"jns",		1},
-	{inst_jns_b,	"jns.b",	1},
 	{inst_jp,		"jp",		1},
-	{inst_jp_b,		"jp.b",		1},
 	{inst_jnp,		"jnp",		1},
-	{inst_jnp_b,	"jnp.b",	1},
 	{inst_jl,		"jl",		1},
-	{inst_jl_b,		"jl.b",		1},
 	{inst_jnl,		"jnl",		1},
-	{inst_jnl_b,	"jnl.b",	1},
 	{inst_jle,		"jle",		1},
-	{inst_jle_b,	"jle.b",	1},
 	{inst_jnle,		"jnle",		1},
-	{inst_jnle_b,	"jnle.b",	1},
 	
 	{inst_cmp,		"cmp",		1, 1},
-	{inst_cmp_b,	"cmp.b",	1, 1},
 	
-	{inst_seto_b,	"seto.b",	2},
-	{inst_setno_b,	"setno.b",	2},
-	{inst_setb_b,	"setb.b",	2},
-	{inst_setnb_b,	"setnb.b",	2},
-	{inst_setz_b,	"setz.b",	2},
-	{inst_setnz_b,	"setnz.b",	2},
-	{inst_setbe_b,	"setbe.b",	2},
-	{inst_setnbe_b,	"setnbe.b",	2},
-	{inst_sets_b,	"sets.b",	2},
-	{inst_setns_b,	"setns.b",	2},
-	{inst_setp_b,	"setp.b",	2},
-	{inst_setnp_b,	"setnp.b",	2},
-	{inst_setl_b,	"setl.b",	2},
-	{inst_setnl_b,	"setn.bl",	2},
-	{inst_setle_b,	"setle.b",	2},
-	{inst_setnle_b,	"setnle.b",	2},
+	{inst_seto,		"seto",		2},
+	{inst_setno,	"setno",	2},
+	{inst_setb,		"setb",		2},
+	{inst_setnb,	"setnb",	2},
+	{inst_setz,		"setz",		2},
+	{inst_setnz,	"setnz",	2},
+	{inst_setbe,	"setbe",	2},
+	{inst_setnbe,	"setnbe",	2},
+	{inst_sets,		"sets",		2},
+	{inst_setns,	"setns",	2},
+	{inst_setp,		"setp",		2},
+	{inst_setnp,	"setnp",	2},
+	{inst_setl,		"setl",		2},
+	{inst_setnl,	"setnl",	2},
+	{inst_setle,	"setle",	2},
+	{inst_setnle,	"setnle",	2},
 	
 	{inst_sldt,		"sldt"},
 	{inst_str,		"str"},
@@ -234,9 +242,7 @@ InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{inst_lmsw,		"lmsw"},
 	
 	{inst_test,		"test",		1, 1},
-	{inst_test_b,	"test.b",	1, 1},
 	{inst_xchg,		"xchg",		3, 3},
-	{inst_xchg_b,	"xchg.b",	3, 3},
 	{inst_lea,		"lea", 		2, 1},
 	{inst_nop,		"nop"},
 	{inst_cbw_cwde,	"cbw/cwde"},
@@ -246,19 +252,12 @@ InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{inst_cmps_ds_esi_es_edi,	"cmps_ds:esi,es:edi"},
 	{inst_cmps_b_ds_esi_es_edi,	"cmps.b_ds:esi,es:edi"},
 	{inst_rol,		"rol",		3, 1},
-	{inst_rol_b,	"rol.b",	3, 1},
 	{inst_ror,		"ror",		3, 1},
-	{inst_ror_b,	"ror.b",	3, 1},
 	{inst_rcl,		"rcl",		3, 1},
-	{inst_rcl_b,	"rcl.b",	3, 1},
 	{inst_rcr,		"rcr",		3, 1},
-	{inst_rcr_b,	"rcr.b",	3, 1},
 	{inst_shl,		"shl",		3, 1},
-	{inst_shl_b,	"shl.b",	3, 1},
 	{inst_shr,		"shr",		3, 1},
-	{inst_shr_b,	"shr.b",	3, 1},
 	{inst_sar,		"sar",		3, 1},
-	{inst_sar_b,	"sar.b",	3, 1},
 	{inst_ret,		"ret",		1},
 	{inst_leave,	"leave",	1},
 	{inst_ret_far,	"ret_far",	1},
@@ -292,14 +291,11 @@ InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{inst_loope,	"loope"},
 	{inst_loopne,	"loopne"},
 	{inst_in,		"in",		2, 1},
-	{inst_in_b,		"in.b",		2, 1},
 	{inst_out,		"out",		1, 1},
-	{inst_out_b,	"out.b",	1, 1},
 	
 	{inst_call,		"call",		1},
 	{inst_call_far,	"call_far", 1},
 	{inst_jmp,		"jmp",		1},
-	{inst_jmp_b,	"jmp.b",	1},
 	{inst_lock,		"lock"},
 	{inst_rep,		"rep"},
 	{inst_repne,	"repne"},
@@ -311,25 +307,18 @@ InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{inst_sti,		"sti"},
 	{inst_cld,		"cld"},
 	{inst_std,		"std"},
+
+	{inst_movss,		"movss"},
+	{inst_movsd,		"movsd"},
 	
 	{-1,			"???"}
 };
 
 
 
-// groups of registers
-enum{
-	RegGroupNone,
-	RegGroupGeneral,
-	RegGroupSegment,
-	RegGroupFlags,
-	RegGroupControl
-};
-
 // parameter types
 enum{
 	ParamTImmediate,
-	ParamTImmediateDouble,
 	ParamTRegister,
 	ParamTRegisterOrMem, // ...
 	ParamTMemory,
@@ -341,11 +330,15 @@ enum{
 // short parameter type
 enum{
 	__Dummy__ = 10000,
-	Eb,Ev,Ew,Ed,Gb,Gv,Gw,Gd,
-	Ib,Iv,Iw,Id,Ob,Ov,Ow,Od,
-	Rb,Rv,Rw,Rd,Cb,Cv,Cw,Cd,
-	Mb,Mv,Mw,Md,Jb,Jv,Jw,Jd,
-	Sw,Ap,
+	Eb,Ew,Ed,Eq,
+	Gb,Gw,Gd,Gq,
+	Ib,Iw,Id,Iq,
+	Ob,Ow,Od,Oq,
+	Rb,Rw,Rd,Rq,
+	Cb,Cw,Cd,Cq,
+	Mb,Mw,Md,Mq,
+	Jb,Jw,Jd,Jq,
+	Sw,Xx,
 };
 
 // displacement for registers
@@ -371,6 +364,7 @@ struct InstructionParam{
 	long long value; // disp or immediate
 	bool is_label;
 	bool immediate_is_relative;	// for jump
+	string str();
 };
 
 struct InstructionWithParams{
@@ -378,10 +372,12 @@ struct InstructionWithParams{
 	InstructionParam p1, p2;
 	int line, col;
 	int size;
+	int addr_size;
+	int param_size;
 };
 
 
-InstructionParam _make_param_(int type, long long param);
+InstructionParam _make_param_(int type, int size, long long param);
 
 InstructionWithParamsList::InstructionWithParamsList(int line_no)
 {
@@ -392,12 +388,12 @@ InstructionWithParamsList::InstructionWithParamsList(int line_no)
 InstructionWithParamsList::~InstructionWithParamsList()
 {}
 
-void InstructionWithParamsList::add_easy(int inst, int param1_type, void *param1, int param2_type, void *param2)
+void InstructionWithParamsList::add_easy(int inst, int param1_type, int param1_size, void *param1, int param2_type, int param2_size, void *param2)
 {
 	InstructionWithParams i;
 	i.inst = inst;
-	i.p1 = _make_param_(param1_type, (long)param1);
-	i.p2 = _make_param_(param2_type, (long)param2);
+	i.p1 = _make_param_(param1_type, param1_size, (long)param1);
+	i.p2 = _make_param_(param2_type, param2_size, (long)param2);
 	i.line = current_line;
 	i.col = current_col;
 	add(i);
@@ -430,6 +426,29 @@ int InstructionWithParamsList::add_label(const string &name, bool declaring)
 	return label.num - 1;
 }
 
+void InstructionWithParamsList::add_func_intro(int stack_alloc_size)
+{
+	long reg_bp = (InstructionSet.set == InstructionSetAMD64) ? RegRbp : RegEbp;
+	long reg_sp = (InstructionSet.set == InstructionSetAMD64) ? RegRsp : RegEsp;
+	int s = InstructionSet.pointer_size;
+	add_easy(inst_push, PKRegister, s, (void*)reg_bp);
+	add_easy(inst_mov, PKRegister, s, (void*)reg_bp, PKRegister, s, (void*)reg_sp);
+	if (stack_alloc_size > 127){
+		add_easy(inst_sub, PKRegister, s, (void*)reg_sp, PKConstant, Size32, (void*)(long)stack_alloc_size);
+	}else if (stack_alloc_size > 0){
+		add_easy(inst_sub, PKRegister, s, (void*)reg_sp, PKConstant, Size8, (void*)(long)stack_alloc_size);
+	}
+}
+
+void InstructionWithParamsList::add_func_return(int return_size)
+{
+	add_easy(inst_leave);
+	if (return_size > 4)
+		add_easy(inst_ret, PKConstant, Size16, (void*)4);
+	else
+		add_easy(inst_ret);
+}
+
 // which part of the modr/m byte is used
 enum{
 	MRMNone,
@@ -442,10 +461,26 @@ string SizeOut(int size)
 	if (size == Size8)		return "8";
 	if (size == Size16)		return "16";
 	if (size == Size32)		return "32";
-	if (size == Size16or32)	return "16/32";
-	if (size == Size32or48)	return "32/48";
+	if (size == Size48)		return "48";
 	if (size == Size64)		return "64";
+	if (size == Size128)		return "128";
 	return "???";
+}
+
+
+string get_size_name(int size)
+{
+	if (size == Size8)
+		return "byte";
+	if (size == Size16)
+		return "word";
+	if (size == Size32)
+		return "dword";
+	if (size == Size64)
+		return "qword";
+	if (size == Size128)
+		return "dqword";
+	return "";
 }
 
 // parameter definition (filter for real parameters)
@@ -463,42 +498,45 @@ struct InstructionParamFuzzy{
 	bool immediate_is_relative;	// for jump
 
 
-	void print() const
-	{
-		string t;
-		if (used){
-			if (allow_register)
-				t += "	Reg";
-			if (allow_immediate)
-				t += "	Im";
-			if (allow_memory_address)
-				t += "	[Mem]";
-			if (allow_memory_indirect)
-				t += "	[Mem + ind]";
-
-			if (reg)
-				t += "  " + reg->name;
-			if (size != SizeUnknown)
-				t += "  " + SizeOut(size);
-			if (mrm_mode == MRMReg)
-				t += "   /r";
-			else if (mrm_mode == MRMModRM)
-				t += "   /m";
-		}else{
-			t += "	None";
-		}
-		printf("%s\n", t.c_str());
-	}
+	bool match(InstructionParam &p);
+	void print() const;
 };
 
+void InstructionParamFuzzy::print() const
+{
+	string t;
+	if (used){
+		if (allow_register)
+			t += "	Reg";
+		if (allow_immediate)
+			t += "	Im";
+		if (allow_memory_address)
+			t += "	[Mem]";
+		if (allow_memory_indirect)
+			t += "	[Mem + ind]";
+		if (reg)
+			t += "  " + reg->name;
+		if (size != SizeUnknown)
+			t += "  " + SizeOut(size);
+		if (mrm_mode == MRMReg)
+			t += "   /r";
+		else if (mrm_mode == MRMModRM)
+			t += "   /m";
+	}else{
+		t += "	None";
+	}
+	printf("%s\n", t.c_str());
+}
+
 // an instruction/opcode the cpu offers
-struct sInstruction{
+struct CPUInstruction{
 	int inst;
 	int code, code_size, cap;
-	bool has_modrm;
+	bool has_modrm, has_small_param, has_small_addr, has_big_param, has_big_addr;
 	InstructionParamFuzzy param1, param2;
 	string name;
 
+	bool match(InstructionWithParams &iwp);
 	void print() const
 	{
 		printf("inst: %s   %.4x (%d) %d  %s\n", name.c_str(), code, code_size, cap, has_modrm ? "modr/m" : "");
@@ -507,7 +545,21 @@ struct sInstruction{
 	}
 };
 
-Array<sInstruction> Instruction;
+Array<CPUInstruction> CPUInstructions;
+
+bool CPUInstruction::match(InstructionWithParams &iwp)
+{
+	if (inst != iwp.inst)
+		return false;
+
+	//return (param1.match(iwp.p1)) && (param2.match(iwp.p2));
+	bool b = (param1.match(iwp.p1)) && (param2.match(iwp.p2));
+	/*if (b){
+		msg_write("source: " + iwp.p1.str() + " " + iwp.p2.str());
+		print();
+	}*/
+	return b;
+}
 
 // expands the short instruction parameters
 //   returns true if mod/rm byte needed
@@ -537,7 +589,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 			return false;
 		}
 	// general reg / mem
-	if ((param == Eb) || (param == Ev) || (param == Ew) || (param == Ed)){
+	if ((param == Eb) || (param == Eq) || (param == Ew) || (param == Ed)){
 		ip._type_ = ParamTInvalid;//ParamTRegisterOrMem;
 		ip.allow_register = true;
 		ip.allow_memory_address = true;
@@ -545,90 +597,89 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		ip.reg_group = RegGroupGeneral;
 		ip.mrm_mode = MRMModRM;
 		if (param == Eb)	ip.size = Size8;
-		if (param == Ev)	ip.size = Size16or32;
 		if (param == Ew)	ip.size = Size16;
 		if (param == Ed)	ip.size = Size32;
+		if (param == Eq)	ip.size = Size64;
 		return true;
 	}
 	// general reg (reg)
-	if ((param == Gb) || (param == Gv) || (param == Gw) || (param == Gd)){
+	if ((param == Gb) || (param == Gq) || (param == Gw) || (param == Gd)){
 		ip._type_ = ParamTRegister;
 		ip.allow_register = true;
 		ip.reg_group = RegGroupGeneral;
 		ip.mrm_mode = MRMReg;
 		if (param == Gb)	ip.size = Size8;
-		if (param == Gv)	ip.size = Size16or32;
 		if (param == Gw)	ip.size = Size16;
 		if (param == Gd)	ip.size = Size32;
+		if (param == Gq)	ip.size = Size64;
 		return true;
 	}
 	// general reg (mod)
-	if ((param == Rb) || (param == Rv) || (param == Rw) || (param == Rd)){
+	if ((param == Rb) || (param == Rq) || (param == Rw) || (param == Rd)){
 		ip._type_ = ParamTRegister;
 		ip.allow_register = true;
 		ip.reg_group = RegGroupGeneral;
 		ip.mrm_mode = MRMModRM;
 		if (param == Rb)	ip.size = Size8;
-		if (param == Rv)	ip.size = Size16or32;
 		if (param == Rw)	ip.size = Size16;
 		if (param == Rd)	ip.size = Size32;
+		if (param == Rq)	ip.size = Size64;
 		return true;
 	}
 	// immediate
-	if ((param == Ib) || (param == Iv) || (param == Iw) || (param == Id) || (param == Ap)){
+	if ((param == Ib) || (param == Iq) || (param == Iw) || (param == Id)){
 		ip._type_ = ParamTImmediate;
 		ip.allow_immediate = true;
 		if (param == Ib)	ip.size = Size8;
-		if (param == Iv)	ip.size = Size16or32;
 		if (param == Iw)	ip.size = Size16;
 		if (param == Id)	ip.size = Size32;
-		if (param == Ap){	ip.size = Size32or48;	ip._type_ = ParamTImmediateDouble;	} // TODO allowed??? (instead of ParamTImmediate)
+		if (param == Iq)	ip.size = Size64;
 		return false;
 	}
 	// immediate (relative)
-	if ((param == Jb) || (param == Jv) || (param == Jw) || (param == Jd)){
+	if ((param == Jb) || (param == Jq) || (param == Jw) || (param == Jd)){
 		ip._type_ = ParamTImmediate;
 		ip.allow_immediate = true;
 		ip.immediate_is_relative = true;
 		if (param == Jb)	ip.size = Size8;
-		if (param == Jv)	ip.size = Size16or32;
 		if (param == Jw)	ip.size = Size16;
 		if (param == Jd)	ip.size = Size32;
+		if (param == Jq)	ip.size = Size64;
 		return false;
 	}
 	// mem
-	if ((param == Ob) || (param == Ov) || (param == Ow) || (param == Od)){
+	if ((param == Ob) || (param == Oq) || (param == Ow) || (param == Od)){
 		ip._type_ = ParamTMemory;
 		ip.allow_memory_address = true;
 		if (param == Ob)	ip.size = Size8;
-		if (param == Ov)	ip.size = Size16or32;
 		if (param == Ow)	ip.size = Size16;
 		if (param == Od)	ip.size = Size32;
+		if (param == Oq)	ip.size = Size64;
 		return false;
 	}
 	// mem
-	if ((param == Mb) || (param == Mv) || (param == Mw) || (param == Md)){
+	if ((param == Mb) || (param == Mq) || (param == Mw) || (param == Md)){
 		ip._type_ = ParamTInvalid; // ...
 		ip.allow_memory_address = true;
 		ip.allow_memory_indirect = true;
 		ip.reg_group = RegGroupGeneral;
 		ip.mrm_mode = MRMModRM;
 		if (param == Mb)	ip.size = Size8;
-		if (param == Mv)	ip.size = Size16or32;
 		if (param == Mw)	ip.size = Size16;
 		if (param == Md)	ip.size = Size32;
+		if (param == Mq)	ip.size = Size64;
 		return true;
 	}
 	// control reg
-	if ((param == Cb) || (param == Cv) || (param == Cw) || (param == Cd)){
+	if ((param == Cb) || (param == Cd) || (param == Cw) || (param == Cd)){
 		ip._type_ = ParamTRegister;
 		ip.allow_register = true;
 		ip.reg_group = RegGroupControl;
 		ip.mrm_mode = MRMReg;
 		if (param == Cb)	ip.size = Size8;
-		if (param == Cv)	ip.size = Size16or32;
 		if (param == Cw)	ip.size = Size16;
 		if (param == Cd)	ip.size = Size32;
+		if (param == Cq)	ip.size = Size64;
 		return true;
 	}
 	// segment reg
@@ -640,16 +691,32 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		ip.size = Size16;
 		return true;
 	}
+	// xmm reg (reg)
+	if (param == Xx){
+		ip._type_ = ParamTRegister;
+		ip.allow_register = true;
+		ip.reg_group = RegGroupXmm;
+		ip.mrm_mode = MRMReg;
+		ip.size = Size128;
+		return true;
+	}
 	msg_error("asm: unknown instparam (call Michi!)");
 	msg_write(param);
 	exit(0);
 	return false;
-	
 }
 
-void add_inst(int inst, int code, int code_size, int cap, int param1, int param2)
+enum
 {
-	sInstruction i;
+	OptSmallParam = 1,
+	OptSmallAddr,
+	OptBigParam,
+	OptBigAddr
+};
+
+void add_inst(int inst, int code, int code_size, int cap, int param1, int param2, int opt = 0)
+{
+	CPUInstruction i;
 	memset(&i.param1, 0, sizeof(i.param1));
 	memset(&i.param2, 0, sizeof(i.param2));
 	i.inst = inst;
@@ -659,12 +726,21 @@ void add_inst(int inst, int code, int code_size, int cap, int param1, int param2
 	bool m1 = _get_inst_param_(param1, i.param1);
 	bool m2 = _get_inst_param_(param2, i.param2);
 	i.has_modrm  = m1 || m2 || (cap >= 0);
+	i.has_small_param = (opt == OptSmallParam);
+	i.has_small_addr = (opt == OptSmallAddr);
+	i.has_big_param = (opt == OptBigParam);
+	i.has_big_addr = (opt == OptBigAddr);
+	if ((i.has_big_param) && (InstructionSet.set != InstructionSetAMD64))
+		return;
+
+	if (inst == inst_lea)
+		i.param2.size = SizeUnknown;
 	
 	i.name = InstructionNames[NUM_INSTRUCTION_NAMES].name;
 	for (int j=0;j<NUM_INSTRUCTION_NAMES;j++)
 		if (inst == InstructionNames[j].inst)
 			i.name = InstructionNames[j].name;
-	Instruction.add(i);
+	CPUInstructions.add(i);
 }
 
 string GetInstructionName(int inst)
@@ -688,7 +764,7 @@ void GetInstructionParamFlags(int inst, bool &p1_read, bool &p1_write, bool &p2_
 
 bool GetInstructionAllowConst(int inst)
 {
-	if ((inst == inst_div) || (inst == inst_idiv))
+	if ((inst == inst_div) || (inst == inst_idiv) || (inst == inst_movss))
 		return false;
 	for (int i=0;i<NUM_INSTRUCTION_NAMES;i++)
 		if (InstructionNames[i].inst == inst)
@@ -708,7 +784,7 @@ bool GetInstructionAllowGenReg(int inst)
 
 /*
 #define NumInstructionsX86		319
-sInstruction InstructionX86[NumInstructionsX86]={
+CPUInstruction InstructionX86[NumInstructionsX86]={
 };
 
 int NumInstructions=0;
@@ -743,34 +819,78 @@ void SetInstructionSet(int set)
 
 
 
-void Init()
+void Init(int set)
 {
-	Registers.clear();
-	add_reg("eax",	RegEax,	RegGroupGeneral,	Size32,	RegEax);
-	add_reg("ax",	RegAx,	RegGroupGeneral,	Size16,	RegEax);
-	add_reg("ah",	RegAh,	RegGroupGeneral,	Size8,	RegEax);
-	add_reg("al",	RegAl,	RegGroupGeneral,	Size8,	RegEax);
-	add_reg("ecx",	RegEcx,	RegGroupGeneral,	Size32,	RegEcx);
-	add_reg("cx",	RegCx,	RegGroupGeneral,	Size16,	RegEcx);
-	add_reg("ch",	RegCh,	RegGroupGeneral,	Size8,	RegEcx);
-	add_reg("cl",	RegCl,	RegGroupGeneral,	Size8,	RegEcx);
-	add_reg("edx",	RegEdx,	RegGroupGeneral,	Size32,	RegEdx);
-	add_reg("dx",	RegDx,	RegGroupGeneral,	Size16,	RegEdx);
-	add_reg("dh",	RegDh,	RegGroupGeneral,	Size8,	RegEdx);
-	add_reg("dl",	RegDl,	RegGroupGeneral,	Size8,	RegEdx);
-	add_reg("ebx",	RegEbx,	RegGroupGeneral,	Size32,	RegEbx);
-	add_reg("bx",	RegBx,	RegGroupGeneral,	Size16,	RegEbx);
-	add_reg("bh",	RegBh,	RegGroupGeneral,	Size8,	RegEbx);
-	add_reg("bl",	RegBl,	RegGroupGeneral,	Size8,	RegEbx);
+	if (set < 0){
+		if (sizeof(void*) == 8)
+			set = InstructionSetAMD64;
+		else if (sizeof(void*) == 4)
+			set = InstructionSetX86;
+		else{
+			msg_error("Asm: unknown instruction set");
+			set = InstructionSetX86;
+		}
+	}
+	InstructionSet.set = set;
+	InstructionSet.pointer_size = 4;
+	if (set == InstructionSetAMD64)
+		InstructionSet.pointer_size = 8;
 
-	add_reg("esp",	RegEsp,	RegGroupGeneral,	Size32);
-	add_reg("sp",	RegSp,	RegGroupGeneral,	Size16);
-	add_reg("esi",	RegEsi,	RegGroupGeneral,	Size32);
-	add_reg("si",	RegSi,	RegGroupGeneral,	Size16);
-	add_reg("edi",	RegEdi,	RegGroupGeneral,	Size32);
-	add_reg("di",	RegDi,	RegGroupGeneral,	Size16);
-	add_reg("ebp",	RegEbp,	RegGroupGeneral,	Size32);
-	add_reg("bp",	RegBp,	RegGroupGeneral,	Size16);
+	for (int i=0;i<NUM_REG_ROOTS;i++)
+		for (int j=0;j<=MAX_REG_SIZE;j++)
+			RegResize[i][j] = -1;
+
+	Registers.clear();
+	add_reg("rax",	RegRax,	RegGroupGeneral,	Size64,	0);
+	add_reg("eax",	RegEax,	RegGroupGeneral,	Size32,	0);
+	add_reg("ax",	RegAx,	RegGroupGeneral,	Size16,	0);
+	add_reg("ah",	RegAh,	RegGroupGeneral,	Size8,	0); // RegResize[] will be overwritten by al
+	add_reg("al",	RegAl,	RegGroupGeneral,	Size8,	0);
+	add_reg("rcx",	RegRcx,	RegGroupGeneral,	Size64,	1);
+	add_reg("ecx",	RegEcx,	RegGroupGeneral,	Size32,	1);
+	add_reg("cx",	RegCx,	RegGroupGeneral,	Size16,	1);
+	add_reg("ch",	RegCh,	RegGroupGeneral,	Size8,	1);
+	add_reg("cl",	RegCl,	RegGroupGeneral,	Size8,	1);
+	add_reg("rdx",	RegRdx,	RegGroupGeneral,	Size64,	2);
+	add_reg("edx",	RegEdx,	RegGroupGeneral,	Size32,	2);
+	add_reg("dx",	RegDx,	RegGroupGeneral,	Size16,	2);
+	add_reg("dh",	RegDh,	RegGroupGeneral,	Size8,	2);
+	add_reg("dl",	RegDl,	RegGroupGeneral,	Size8,	2);
+	add_reg("rbx",	RegRbx,	RegGroupGeneral,	Size64,	3);
+	add_reg("ebx",	RegEbx,	RegGroupGeneral,	Size32,	3);
+	add_reg("bx",	RegBx,	RegGroupGeneral,	Size16,	3);
+	add_reg("bh",	RegBh,	RegGroupGeneral,	Size8,	3);
+	add_reg("bl",	RegBl,	RegGroupGeneral,	Size8,	3);
+
+	add_reg("rsp",	RegRsp,	RegGroupGeneral,	Size64,	4);
+	add_reg("esp",	RegEsp,	RegGroupGeneral,	Size32,	4);
+	add_reg("sp",	RegSp,	RegGroupGeneral,	Size16,	4);
+	add_reg("rbp",	RegRbp,	RegGroupGeneral,	Size64,	5);
+	add_reg("ebp",	RegEbp,	RegGroupGeneral,	Size32,	5);
+	add_reg("bp",	RegBp,	RegGroupGeneral,	Size16,	5);
+	add_reg("rsi",	RegRsi,	RegGroupGeneral,	Size64,	6);
+	add_reg("esi",	RegEsi,	RegGroupGeneral,	Size32,	6);
+	add_reg("si",	RegSi,	RegGroupGeneral,	Size16,	6);
+	add_reg("rdi",	RegRdi,	RegGroupGeneral,	Size64,	7);
+	add_reg("edi",	RegEdi,	RegGroupGeneral,	Size32,	7);
+	add_reg("di",	RegDi,	RegGroupGeneral,	Size16,	7);
+
+	add_reg("r8",	RegR8,	RegGroupGeneral2,	Size64,	8);
+	add_reg("r8d",	RegR8d,	RegGroupGeneral2,	Size32,	8);
+	add_reg("r9",	RegR9,	RegGroupGeneral2,	Size64,	9);
+	add_reg("r9d",	RegR9d,	RegGroupGeneral2,	Size32,	9);
+	add_reg("r10",	RegR10,	RegGroupGeneral2,	Size64,	10);
+	add_reg("r10d",	RegR10d,RegGroupGeneral2,	Size32,	10);
+	add_reg("r11",	RegR11,	RegGroupGeneral2,	Size64,	10);
+	add_reg("r11d",	RegR11d,RegGroupGeneral2,	Size32,	11);
+	add_reg("r12",	RegR12,	RegGroupGeneral2,	Size64,	12);
+	add_reg("r12d",	RegR12d,RegGroupGeneral2,	Size32,	12);
+	add_reg("r13",	RegR13,	RegGroupGeneral2,	Size64,	13);
+	add_reg("r13d",	RegR13d,RegGroupGeneral2,	Size32,	13);
+	add_reg("r14",	RegR14,	RegGroupGeneral2,	Size64,	14);
+	add_reg("r14d",	RegR14d,RegGroupGeneral2,	Size32,	14);
+	add_reg("r15",	RegR15,	RegGroupGeneral2,	Size64,	15);
+	add_reg("r15d",	RegR15d,RegGroupGeneral2,	Size32,	15);
 
 	add_reg("cs",	RegCs,	RegGroupSegment,	Size16);
 	add_reg("ss",	RegSs,	RegGroupSegment,	Size16);
@@ -784,24 +904,23 @@ void Init()
 	add_reg("cr2",	RegCr2,	RegGroupControl,	Size32);
 	add_reg("cr3",	RegCr3,	RegGroupControl,	Size32);
 
-	add_reg("st0",	RegSt0,	-1,	Size32); // ??? 32
-	add_reg("st1",	RegSt1,	-1,	Size32);
-	add_reg("st2",	RegSt2,	-1,	Size32);
-	add_reg("st3",	RegSt3,	-1,	Size32);
-	add_reg("st4",	RegSt4,	-1,	Size32);
-	add_reg("st5",	RegSt5,	-1,	Size32);
-	add_reg("st6",	RegSt6,	-1,	Size32);
-	add_reg("st7",	RegSt7,	-1,	Size32);
+	add_reg("st0",	RegSt0,	RegGroupX87,	Size32,	16); // ??? 32
+	add_reg("st1",	RegSt1,	RegGroupX87,	Size32,	17);
+	add_reg("st2",	RegSt2,	RegGroupX87,	Size32,	18);
+	add_reg("st3",	RegSt3,	RegGroupX87,	Size32,	19);
+	add_reg("st4",	RegSt4,	RegGroupX87,	Size32,	20);
+	add_reg("st5",	RegSt5,	RegGroupX87,	Size32,	21);
+	add_reg("st6",	RegSt6,	RegGroupX87,	Size32,	22);
+	add_reg("st7",	RegSt7,	RegGroupX87,	Size32,	23);
 
-
-	add_reg("rax",	RegRax,	RegGroupGeneral,	Size64,	RegEax);
-	add_reg("rdx",	RegRdx,	RegGroupGeneral,	Size64,	RegEdx);
-	add_reg("rcx",	RegRcx,	RegGroupGeneral,	Size64,	RegEcx);
-	add_reg("rbx",	RegRbx,	RegGroupGeneral,	Size64,	RegEdx);
-	add_reg("rsp",	RegRsp,	RegGroupGeneral,	Size64);
-	add_reg("rbp",	RegRbp,	RegGroupGeneral,	Size64);
-	add_reg("rdi",	RegRdi,	RegGroupGeneral,	Size64);
-	add_reg("rdx",	RegRdx,	RegGroupGeneral,	Size64);
+	add_reg("xmm0",	RegXmm0,	RegGroupXmm,	Size128);
+	add_reg("xmm1",	RegXmm1,	RegGroupXmm,	Size128);
+	add_reg("xmm2",	RegXmm2,	RegGroupXmm,	Size128);
+	add_reg("xmm3",	RegXmm3,	RegGroupXmm,	Size128);
+	add_reg("xmm4",	RegXmm4,	RegGroupXmm,	Size128);
+	add_reg("xmm5",	RegXmm5,	RegGroupXmm,	Size128);
+	add_reg("xmm6",	RegXmm6,	RegGroupXmm,	Size128);
+	add_reg("xmm7",	RegXmm7,	RegGroupXmm,	Size128);
 
 	// create easy to access array
 	RegisterByID.clear();
@@ -811,21 +930,33 @@ void Init()
 		RegisterByID[Registers[i].id] = &Registers[i];
 	}
 
-
-	add_inst(inst_add_b		,0x00	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_add		,0x01	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_add_b		,0x02	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_add		,0x03	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_add_b		,0x04	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_add		,0x05	,1	,-1	,RegEax,Iv	);
-	add_inst(inst_push		,0x06	,1	,-1	,RegEs	,-1	);
-	add_inst(inst_pop		,0x07	,1	,-1	,RegEs	,-1	);
-	add_inst(inst_or_b		,0x08	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_or		,0x09	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_or_b		,0x0a	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_or		,0x0b	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_or_b		,0x0c	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_or		,0x0d	,1	,-1	,RegEax,Iv	);
+	CPUInstructions.clear();
+	add_inst(inst_add		,0x00	,1	,-1	,Eb	,Gb);
+	add_inst(inst_add		,0x01	,1	,-1	,Ew	,Gw, OptSmallParam);
+	add_inst(inst_add		,0x01	,1	,-1	,Ed	,Gd);
+	add_inst(inst_add		,0x01	,1	,-1	,Eq	,Gq, OptBigParam);
+	add_inst(inst_add		,0x02	,1	,-1	,Gb	,Eb);
+	add_inst(inst_add		,0x03	,1	,-1	,Gw	,Eq, OptSmallParam);
+	add_inst(inst_add		,0x03	,1	,-1	,Gd	,Ed);
+	add_inst(inst_add		,0x03	,1	,-1	,Gq	,Eq, OptBigParam);
+	add_inst(inst_add		,0x04	,1	,-1	,RegAl	,Ib);
+	add_inst(inst_add		,0x05	,1	,-1	,RegAx, Iw, OptSmallParam);
+	add_inst(inst_add		,0x05	,1	,-1	,RegEax, Id);
+	add_inst(inst_add		,0x05	,1	,-1	,RegRax, Id, OptBigParam);
+	add_inst(inst_push		,0x06	,1	,-1	,RegEs	,-1);
+	add_inst(inst_pop		,0x07	,1	,-1	,RegEs	,-1);
+	add_inst(inst_or		,0x08	,1	,-1	,Eb	,Gb);
+	add_inst(inst_or		,0x09	,1	,-1	,Ew	,Gw, OptSmallParam);
+	add_inst(inst_or		,0x09	,1	,-1	,Ed	,Gd);
+	add_inst(inst_or		,0x09	,1	,-1	,Eq	,Gq, OptBigParam);
+	add_inst(inst_or		,0x0a	,1	,-1	,Gb	,Eb);
+	add_inst(inst_or,	0x0b,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_or,	0x0b,	1,	-1,	Gd,	Ed);
+	add_inst(inst_or,	0x0b,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_or		,0x0c	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_or		,0x0d	,1	,-1	,RegAx,	Iw, OptSmallParam);
+	add_inst(inst_or		,0x0d	,1	,-1	,RegEax,	Id);
+	add_inst(inst_or		,0x0d	,1	,-1	,RegRax,	Id, OptBigParam);
 	add_inst(inst_push		,0x0e	,1	,-1	,RegCs	,-1	);
 	add_inst(inst_sldt		,0x000f	,2	,0	,Ew	,-1	);
 	add_inst(inst_str		,0x000f	,2	,1	,Ew	,-1	);
@@ -833,183 +964,315 @@ void Init()
 	add_inst(inst_ltr		,0x000f	,2	,3	,Ew	,-1	);
 	add_inst(inst_verr		,0x000f	,2	,4	,Ew	,-1	);
 	add_inst(inst_verw		,0x000f	,2	,5	,Ew	,-1	);
-	add_inst(inst_sgdt		,0x010f	,2	,0	,Ev	,-1	);
-	add_inst(inst_sidt		,0x010f	,2	,1	,Ev	,-1	);
-	add_inst(inst_lgdt		,0x010f	,2	,2	,Ev	,-1	);
-	add_inst(inst_lidt		,0x010f	,2	,3	,Ev	,-1	);
+	add_inst(inst_sgdt,	0x010f,	2,	0,	Ew,	-1, OptSmallParam);
+	add_inst(inst_sgdt,	0x010f,	2,	0,	Ed,	-1);
+	add_inst(inst_sgdt,	0x010f,	2,	0,	Eq,	-1, OptBigParam);
+	add_inst(inst_sidt,	0x010f,	2,	1,	Ew,	-1, OptSmallParam);
+	add_inst(inst_sidt,	0x010f,	2,	1,	Ed,	-1);
+	add_inst(inst_sidt,	0x010f,	2,	1,	Eq,	-1, OptBigParam);
+	add_inst(inst_lgdt,	0x010f,	2,	2,	Ew,	-1, OptSmallParam);
+	add_inst(inst_lgdt,	0x010f,	2,	2,	Ed,	-1);
+	add_inst(inst_lgdt,	0x010f,	2,	2,	Eq,	-1, OptBigParam);
+	add_inst(inst_lidt,	0x010f,	2,	3,	Ew,	-1, OptSmallParam);
+	add_inst(inst_lidt,	0x010f,	2,	3,	Ed,	-1);
+	add_inst(inst_lidt,	0x010f,	2,	3,	Eq,	-1, OptBigParam);
 	add_inst(inst_smsw		,0x010f	,2	,4	,Ew	,-1	);
 	add_inst(inst_lmsw		,0x010f	,2	,6	,Ew	,-1	);
 	add_inst(inst_mov		,0x200f	,2	,-1	,Rd	,Cd	); // Fehler im Algorhytmus!!!!  (wirklich ???) -> Fehler in Tabelle?!?
 	add_inst(inst_mov		,0x220f	,2	,-1	,Cd	,Rd	);
-	add_inst(inst_jo		,0x800f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jno		,0x810f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jb		,0x820f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jnb		,0x830f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jz		,0x840f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jnz		,0x850f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jbe		,0x860f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jnbe		,0x870f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_js		,0x880f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jns		,0x890f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jp		,0x8a0f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jnp		,0x8b0f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jl		,0x8c0f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jnl		,0x8d0f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jle		,0x8e0f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_jnle		,0x8f0f	,2	,-1	,Iv	,-1	);
-	add_inst(inst_seto_b	,0x900f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setno_b	,0x910f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setb_b	,0x920f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setnb_b	,0x930f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setz_b	,0x940f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setnz_b	,0x950f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setbe_b	,0x960f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setnbe_b	,0x970f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_sets_b	,0x980f	,2	,-1	,Eb	,-1	); // error in table... "Ev"
-	add_inst(inst_setns_b	,0x990f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setp_b	,0x9a0f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setnp_b	,0x9b0f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setl_b	,0x9c0f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setnl_b	,0x9d0f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setle_b	,0x9e0f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_setnle_b	,0x9f0f	,2	,-1	,Eb	,-1	);
-	add_inst(inst_imul		,0xaf0f	,2	,-1	,Gv	,Ev	);
-	add_inst(inst_movzx		,0xb60f	,2	,-1	,Gv	,Eb	);
-	add_inst(inst_movzx		,0xb70f	,2	,-1	,Gv	,Ew	);
-	add_inst(inst_movsx		,0xbe0f	,2	,-1	,Gv	,Eb	);
-	add_inst(inst_movsx		,0xbf0f	,2	,-1	,Gv	,Ew	);
-	add_inst(inst_adc_b		,0x10	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_adc		,0x11	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_adc_b		,0x12	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_adc		,0x13	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_adc_b		,0x14	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_adc		,0x15	,1	,-1	,RegEax,Iv	);
+	add_inst(inst_jo		,0x800f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jno		,0x810f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jb		,0x820f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jnb		,0x830f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jz		,0x840f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jnz		,0x850f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jbe		,0x860f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jnbe		,0x870f	,2	,-1	,Id	,-1	);
+	add_inst(inst_js		,0x880f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jns		,0x890f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jp		,0x8a0f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jnp		,0x8b0f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jl		,0x8c0f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jnl		,0x8d0f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jle		,0x8e0f	,2	,-1	,Id	,-1	);
+	add_inst(inst_jnle		,0x8f0f	,2	,-1	,Id	,-1	);
+	add_inst(inst_seto		,0x900f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setno		,0x910f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setb		,0x920f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setnb		,0x930f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setz		,0x940f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setnz		,0x950f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setbe		,0x960f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setnbe	,0x970f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_sets		,0x980f	,2	,-1	,Eb	,-1	); // error in table... "Ev"
+	add_inst(inst_setns		,0x990f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setp		,0x9a0f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setnp		,0x9b0f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setl		,0x9c0f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setnl		,0x9d0f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setle		,0x9e0f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_setnle	,0x9f0f	,2	,-1	,Eb	,-1	);
+	add_inst(inst_imul,	0xaf0f,	2,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_imul,	0xaf0f,	2,	-1,	Gd,	Ed);
+	add_inst(inst_imul,	0xaf0f,	2,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_movzx,	0xb60f,	2,	-1,	Gw,	Eb, OptSmallParam);
+	add_inst(inst_movzx,	0xb60f,	2,	-1,	Gd,	Eb);
+	add_inst(inst_movzx,	0xb60f,	2,	-1,	Gq,	Eb, OptBigParam);
+	add_inst(inst_movzx,	0xb70f,	2,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_movzx,	0xb70f,	2,	-1,	Gd,	Ew);
+	add_inst(inst_movzx,	0xb70f,	2,	-1,	Gq,	Ew, OptBigParam);
+	add_inst(inst_movsx,	0xbe0f,	2,	-1,	Gw,	Eb, OptSmallParam);
+	add_inst(inst_movsx,	0xbe0f,	2,	-1,	Gd,	Eb);
+	add_inst(inst_movsx,	0xbe0f,	2,	-1,	Gq,	Eb, OptBigParam);
+	add_inst(inst_movsx,	0xbf0f,	2,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_movsx,	0xbf0f,	2,	-1,	Gd,	Ew);
+	add_inst(inst_movsx,	0xbf0f,	2,	-1,	Gq,	Ew, OptBigParam);
+	add_inst(inst_adc		,0x10	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_adc,	0x11,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_adc,	0x11,	1,	-1,	Ed,	Gd);
+	add_inst(inst_adc,	0x11,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_adc		,0x12	,1	,-1	,Gb	,Eb	);
+	add_inst(inst_adc,	0x13,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_adc,	0x13,	1,	-1,	Gd,	Ed);
+	add_inst(inst_adc,	0x13,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_adc		,0x14	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_adc		,0x15	,1	,-1	,RegAx,	Iw, OptSmallParam);
+	add_inst(inst_adc		,0x15	,1	,-1	,RegEax,	Id);
+	add_inst(inst_adc		,0x15	,1	,-1	,RegRax,	Id, OptBigParam);
 	add_inst(inst_push		,0x16	,1	,-1	,RegSs	,-1	);
 	add_inst(inst_pop		,0x17	,1	,-1	,RegSs	,-1	);
-	add_inst(inst_sbb_b		,0x18	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_sbb		,0x19	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_sbb_b		,0x1a	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_sbb		,0x1b	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_sbb_b		,0x1c	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_sbb		,0x1d	,1	,-1	,RegEax	,Iv	);
+	add_inst(inst_sbb		,0x18	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_sbb,	0x19,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_sbb,	0x19,	1,	-1,	Ed,	Gd);
+	add_inst(inst_sbb,	0x19,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_sbb		,0x1a	,1	,-1	,Gb	,Eb	);
+	add_inst(inst_sbb,	0x1b,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_sbb,	0x1b,	1,	-1,	Gd,	Ed);
+	add_inst(inst_sbb,	0x1b,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_sbb		,0x1c	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_sbb		,0x1d	,1	,-1	,RegAx	,Iw, OptSmallParam);
+	add_inst(inst_sbb		,0x1d	,1	,-1	,RegEax	,Id);
+	add_inst(inst_sbb		,0x1d	,1	,-1	,RegRax	,Id, OptBigParam);
 	add_inst(inst_push		,0x1e	,1	,-1	,RegDs	,-1	);
 	add_inst(inst_pop		,0x1f	,1	,-1	,RegDs	,-1	);
-	add_inst(inst_and_b		,0x20	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_and		,0x21	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_and_b		,0x22	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_and		,0x23	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_and_b		,0x24	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_and		,0x25	,1	,-1	,RegEax	,Iv	);
-	add_inst(inst_sub_b		,0x28	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_sub		,0x29	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_sub_b		,0x2a	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_sub		,0x2b	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_sub_b		,0x2c	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_sub		,0x2d	,1	,-1	,RegEax	,Iv	);
-	add_inst(inst_xor_b		,0x30	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_xor		,0x31	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_xor_b		,0x32	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_xor		,0x33	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_xor_b		,0x34	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_xor		,0x35	,1	,-1	,RegEax	,Iv	);
-	add_inst(inst_cmp_b		,0x38	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_cmp		,0x39	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_cmp_b		,0x3a	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_cmp		,0x3b	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_cmp_b		,0x3c	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_cmp		,0x3d	,1	,-1	,RegEax	,Iv	);
-	add_inst(inst_inc		,0x40	,1	,-1	,RegEax	,-1	);
-	add_inst(inst_inc		,0x41	,1	,-1	,RegEcx	,-1	);
-	add_inst(inst_inc		,0x42	,1	,-1	,RegEdx	,-1	);
-	add_inst(inst_inc		,0x43	,1	,-1	,RegEbx	,-1	);
-	add_inst(inst_inc		,0x44	,1	,-1	,RegEsp	,-1	);
-	add_inst(inst_inc		,0x45	,1	,-1	,RegEbp	,-1	);
-	add_inst(inst_inc		,0x46	,1	,-1	,RegEsi	,-1	);
-	add_inst(inst_inc		,0x47	,1	,-1	,RegEdi	,-1	);
-	add_inst(inst_dec		,0x48	,1	,-1	,RegEax	,-1	);
-	add_inst(inst_dec		,0x49	,1	,-1	,RegEcx	,-1	);
-	add_inst(inst_dec		,0x4a	,1	,-1	,RegEdx	,-1	);
-	add_inst(inst_dec		,0x4b	,1	,-1	,RegEbx	,-1	);
-	add_inst(inst_dec		,0x4c	,1	,-1	,RegEsp	,-1	);
-	add_inst(inst_dec		,0x4d	,1	,-1	,RegEbp	,-1	);
-	add_inst(inst_dec		,0x4e	,1	,-1	,RegEsi	,-1	);
-	add_inst(inst_dec		,0x4f	,1	,-1	,RegEdi	,-1	);
-	add_inst(inst_push		,0x50	,1	,-1	,RegEax	,-1	);
-	add_inst(inst_push		,0x51	,1	,-1	,RegEcx	,-1	);
-	add_inst(inst_push		,0x52	,1	,-1	,RegEdx	,-1	);
-	add_inst(inst_push		,0x53	,1	,-1	,RegEbx	,-1	);
-	add_inst(inst_push		,0x54	,1	,-1	,RegEsp	,-1	);
-	add_inst(inst_push		,0x55	,1	,-1	,RegEbp	,-1	);
-	add_inst(inst_push		,0x56	,1	,-1	,RegEsi	,-1	);
-	add_inst(inst_push		,0x57	,1	,-1	,RegEdi	,-1	);
-	add_inst(inst_pop		,0x58	,1	,-1	,RegEax	,-1	);
-	add_inst(inst_pop		,0x59	,1	,-1	,RegEcx	,-1	);
-	add_inst(inst_pop		,0x5a	,1	,-1	,RegEdx	,-1	);
-	add_inst(inst_pop		,0x5b	,1	,-1	,RegEbx	,-1	);
-	add_inst(inst_pop		,0x5c	,1	,-1	,RegEsp	,-1	);
-	add_inst(inst_pop		,0x5d	,1	,-1	,RegEbp	,-1	);
-	add_inst(inst_pop		,0x5e	,1	,-1	,RegEsi	,-1	);
-	add_inst(inst_pop		,0x5f	,1	,-1	,RegEdi	,-1	);
+	add_inst(inst_and		,0x20	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_and,	0x21,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_and,	0x21,	1,	-1,	Ed,	Gd);
+	add_inst(inst_and,	0x21,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_and		,0x22	,1	,-1	,Gb	,Eb	);
+	add_inst(inst_and,	0x23,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_and,	0x23,	1,	-1,	Gd,	Ed);
+	add_inst(inst_and,	0x23,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_and		,0x24	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_and		,0x25	,1	,-1	,RegAx	,Iw, OptSmallParam);
+	add_inst(inst_and		,0x25	,1	,-1	,RegEax	,Id);
+	add_inst(inst_and		,0x25	,1	,-1	,RegRax	,Id, OptBigParam);
+	add_inst(inst_sub		,0x28	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_sub,	0x29,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_sub,	0x29,	1,	-1,	Ed,	Gd);
+	add_inst(inst_sub,	0x29,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_sub		,0x2a	,1	,-1	,Gb	,Eb	);
+	add_inst(inst_sub,	0x2b,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_sub,	0x2b,	1,	-1,	Gd,	Ed);
+	add_inst(inst_sub,	0x2b,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_sub		,0x2c	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_sub		,0x2d	,1	,-1	,RegAx	,Iw, OptSmallParam);
+	add_inst(inst_sub		,0x2d	,1	,-1	,RegEax	,Id);
+	add_inst(inst_sub		,0x2d	,1	,-1	,RegRax	,Id, OptBigParam);
+	add_inst(inst_xor		,0x30	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_xor,	0x31,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_xor,	0x31,	1,	-1,	Ed,	Gd);
+	add_inst(inst_xor,	0x31,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_xor		,0x32	,1	,-1	,Gb	,Eb	);
+	add_inst(inst_xor,	0x33,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_xor,	0x33,	1,	-1,	Gd,	Ed);
+	add_inst(inst_xor,	0x33,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_xor		,0x34	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_xor		,0x35	,1	,-1	,RegAx	,Iw, OptSmallParam);
+	add_inst(inst_xor		,0x35	,1	,-1	,RegEax	,Id);
+	add_inst(inst_xor		,0x35	,1	,-1	,RegRax	,Iq, OptBigParam);
+	add_inst(inst_cmp		,0x38	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_cmp,	0x39,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_cmp,	0x39,	1,	-1,	Ed,	Gd);
+	add_inst(inst_cmp,	0x39,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_cmp		,0x3a	,1	,-1	,Gb	,Eb	);
+	add_inst(inst_cmp,	0x3b,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_cmp,	0x3b,	1,	-1,	Gd,	Ed);
+	add_inst(inst_cmp,	0x3b,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_cmp		,0x3c	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_cmp		,0x3d	,1	,-1	,RegAx	,Iw, OptSmallParam);
+	add_inst(inst_cmp		,0x3d	,1	,-1	,RegEax	,Id);
+	add_inst(inst_cmp		,0x3d	,1	,-1	,RegRax	,Id, OptBigParam);
+	if (set == InstructionSetX86){
+		add_inst(inst_inc		,0x40	,1	,-1	,RegEax	,-1	);
+		add_inst(inst_inc		,0x41	,1	,-1	,RegEcx	,-1	);
+		add_inst(inst_inc		,0x42	,1	,-1	,RegEdx	,-1	);
+		add_inst(inst_inc		,0x43	,1	,-1	,RegEbx	,-1	);
+		add_inst(inst_inc		,0x44	,1	,-1	,RegEsp	,-1	);
+		add_inst(inst_inc		,0x45	,1	,-1	,RegEbp	,-1	);
+		add_inst(inst_inc		,0x46	,1	,-1	,RegEsi	,-1	);
+		add_inst(inst_inc		,0x47	,1	,-1	,RegEdi	,-1	);
+		add_inst(inst_dec		,0x48	,1	,-1	,RegEax	,-1	);
+		add_inst(inst_dec		,0x49	,1	,-1	,RegEcx	,-1	);
+		add_inst(inst_dec		,0x4a	,1	,-1	,RegEdx	,-1	);
+		add_inst(inst_dec		,0x4b	,1	,-1	,RegEbx	,-1	);
+		add_inst(inst_dec		,0x4c	,1	,-1	,RegEsp	,-1	);
+		add_inst(inst_dec		,0x4d	,1	,-1	,RegEbp	,-1	);
+		add_inst(inst_dec		,0x4e	,1	,-1	,RegEsi	,-1	);
+		add_inst(inst_dec		,0x4f	,1	,-1	,RegEdi	,-1	);
+	}
+	if (set == InstructionSetX86){
+		add_inst(inst_push		,0x50	,1	,-1	,RegEax	,-1	);
+		add_inst(inst_push		,0x51	,1	,-1	,RegEcx	,-1	);
+		add_inst(inst_push		,0x52	,1	,-1	,RegEdx	,-1	);
+		add_inst(inst_push		,0x53	,1	,-1	,RegEbx	,-1	);
+		add_inst(inst_push		,0x54	,1	,-1	,RegEsp	,-1	);
+		add_inst(inst_push		,0x55	,1	,-1	,RegEbp	,-1	);
+		add_inst(inst_push		,0x56	,1	,-1	,RegEsi	,-1	);
+		add_inst(inst_push		,0x57	,1	,-1	,RegEdi	,-1	);
+		add_inst(inst_pop		,0x58	,1	,-1	,RegEax	,-1	);
+		add_inst(inst_pop		,0x59	,1	,-1	,RegEcx	,-1	);
+		add_inst(inst_pop		,0x5a	,1	,-1	,RegEdx	,-1	);
+		add_inst(inst_pop		,0x5b	,1	,-1	,RegEbx	,-1	);
+		add_inst(inst_pop		,0x5c	,1	,-1	,RegEsp	,-1	);
+		add_inst(inst_pop		,0x5d	,1	,-1	,RegEbp	,-1	);
+		add_inst(inst_pop		,0x5e	,1	,-1	,RegEsi	,-1	);
+		add_inst(inst_pop		,0x5f	,1	,-1	,RegEdi	,-1	);
+	}else if (set == InstructionSetAMD64){
+		add_inst(inst_push		,0x50	,1	,-1	,RegRax	,-1	);
+		add_inst(inst_push		,0x51	,1	,-1	,RegRcx	,-1	);
+		add_inst(inst_push		,0x52	,1	,-1	,RegRdx	,-1	);
+		add_inst(inst_push		,0x53	,1	,-1	,RegRbx	,-1	);
+		add_inst(inst_push		,0x54	,1	,-1	,RegRsp	,-1	);
+		add_inst(inst_push		,0x55	,1	,-1	,RegRbp	,-1	);
+		add_inst(inst_push		,0x56	,1	,-1	,RegRsi	,-1	);
+		add_inst(inst_push		,0x57	,1	,-1	,RegRdi	,-1	);
+		add_inst(inst_pop		,0x58	,1	,-1	,RegRax	,-1	);
+		add_inst(inst_pop		,0x59	,1	,-1	,RegRcx	,-1	);
+		add_inst(inst_pop		,0x5a	,1	,-1	,RegRdx	,-1	);
+		add_inst(inst_pop		,0x5b	,1	,-1	,RegRbx	,-1	);
+		add_inst(inst_pop		,0x5c	,1	,-1	,RegRsp	,-1	);
+		add_inst(inst_pop		,0x5d	,1	,-1	,RegRbp	,-1	);
+		add_inst(inst_pop		,0x5e	,1	,-1	,RegRsi	,-1	);
+		add_inst(inst_pop		,0x5f	,1	,-1	,RegRdi	,-1	);
+	}
 	add_inst(inst_pusha		,0x60	,1	,-1	,-1	,-1	);
 	add_inst(inst_popa		,0x61	,1	,-1	,-1	,-1	);
-	add_inst(inst_push		,0x68	,1	,-1	,Iv	,-1	);
-	add_inst(inst_imul		,0x69	,1	,-1	,Ev	,Iv	);
+	add_inst(inst_push,	0x68,	1,	-1,	Iw,	-1, OptSmallParam);
+	add_inst(inst_push,	0x68,	1,	-1,	Id,	-1);
+	add_inst(inst_push,	0x68,	1,	-1,	Iq,	-1, OptBigParam);
+	add_inst(inst_imul,	0x69,	1,	-1,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_imul,	0x69,	1,	-1,	Ed,	Id);
+	add_inst(inst_imul,	0x69,	1,	-1,	Eq,	Id, OptBigParam);
 	add_inst(inst_push		,0x6a	,1	,-1	,Ib	,-1	);
-	add_inst(inst_jo_b		,0x70	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jno_b		,0x71	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jb_b		,0x72	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jnb_b		,0x73	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jz_b		,0x74	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jnz_b		,0x75	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jbe_b		,0x76	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jnbe_b	,0x77	,1	,-1	,Jb	,-1	);
-	add_inst(inst_js_b		,0x78	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jns_b		,0x79	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jp_b		,0x7a	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jnp_b		,0x7b	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jl_b		,0x7c	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jnl_b		,0x7d	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jle_b		,0x7e	,1	,-1	,Jb	,-1	);
-	add_inst(inst_jnle_b	,0x7f	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jo		,0x70	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jno		,0x71	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jb		,0x72	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jnb		,0x73	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jz		,0x74	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jnz		,0x75	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jbe		,0x76	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jnbe		,0x77	,1	,-1	,Jb	,-1	);
+	add_inst(inst_js		,0x78	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jns		,0x79	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jp		,0x7a	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jnp		,0x7b	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jl		,0x7c	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jnl		,0x7d	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jle		,0x7e	,1	,-1	,Jb	,-1	);
+	add_inst(inst_jnle		,0x7f	,1	,-1	,Jb	,-1	);
 	// Immediate Group 1
-	add_inst(inst_add_b		,0x80	,1	,0	,Eb	,Ib	);
-	add_inst(inst_or_b		,0x80	,1	,1	,Eb	,Ib	);
-	add_inst(inst_adc_b		,0x80	,1	,2	,Eb	,Ib	);
-	add_inst(inst_sbb_b		,0x80	,1	,3	,Eb	,Ib	);
-	add_inst(inst_and_b		,0x80	,1	,4	,Eb	,Ib	);
-	add_inst(inst_sub_b		,0x80	,1	,5	,Eb	,Ib	);
-	add_inst(inst_xor_b		,0x80	,1	,6	,Eb	,Ib	);
-	add_inst(inst_cmp_b		,0x80	,1	,7	,Eb	,Ib	);
-	add_inst(inst_add		,0x81	,1	,0	,Ev	,Iv	);
-	add_inst(inst_or		,0x81	,1	,1	,Ev	,Iv	);
-	add_inst(inst_adc		,0x81	,1	,2	,Ev	,Iv	);
-	add_inst(inst_sbb		,0x81	,1	,3	,Ev	,Iv	);
-	add_inst(inst_and		,0x81	,1	,4	,Ev	,Iv	);
-	add_inst(inst_sub		,0x81	,1	,5	,Ev	,Iv	);
-	add_inst(inst_xor		,0x81	,1	,6	,Ev	,Iv	);
-	add_inst(inst_cmp		,0x81	,1	,7	,Ev	,Iv	);
-	add_inst(inst_add_b		,0x83	,1	,0	,Ev	,Ib	);
-	add_inst(inst_or_b		,0x83	,1	,1	,Ev	,Ib	);
-	add_inst(inst_adc_b		,0x83	,1	,2	,Ev	,Ib	);
-	add_inst(inst_sbb_b		,0x83	,1	,3	,Ev	,Ib	);
-	add_inst(inst_and_b		,0x83	,1	,4	,Ev	,Ib	);
-	add_inst(inst_sub_b		,0x83	,1	,5	,Ev	,Ib	);
-	add_inst(inst_xor_b		,0x83	,1	,6	,Ev	,Ib	);
-	add_inst(inst_cmp_b		,0x83	,1	,7	,Ev	,Ib	);
-	add_inst(inst_test_b	,0x84	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_test		,0x85	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_xchg_b	,0x86	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_xchg		,0x87	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_mov_b		,0x88	,1	,-1	,Eb	,Gb	);
-	add_inst(inst_mov		,0x89	,1	,-1	,Ev	,Gv	);
-	add_inst(inst_mov_b		,0x8a	,1	,-1	,Gb	,Eb	);
-	add_inst(inst_mov		,0x8b	,1	,-1	,Gv	,Ev	);
+	add_inst(inst_add		,0x80	,1	,0	,Eb	,Ib	);
+	add_inst(inst_or		,0x80	,1	,1	,Eb	,Ib	);
+	add_inst(inst_adc		,0x80	,1	,2	,Eb	,Ib	);
+	add_inst(inst_sbb		,0x80	,1	,3	,Eb	,Ib	);
+	add_inst(inst_and		,0x80	,1	,4	,Eb	,Ib	);
+	add_inst(inst_sub		,0x80	,1	,5	,Eb	,Ib	);
+	add_inst(inst_xor		,0x80	,1	,6	,Eb	,Ib	);
+	add_inst(inst_cmp		,0x80	,1	,7	,Eb	,Ib	);
+	add_inst(inst_add,	0x81,	1,	0,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_add,	0x81,	1,	0,	Ed,	Id);
+	add_inst(inst_add,	0x81,	1,	0,	Eq,	Id, OptBigParam);
+	add_inst(inst_or,	0x81,	1,	1,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_or,	0x81,	1,	1,	Ed,	Id);
+	add_inst(inst_or,	0x81,	1,	1,	Eq,	Id, OptBigParam);
+	add_inst(inst_adc,	0x81,	1,	2,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_adc,	0x81,	1,	2,	Ed,	Id);
+	add_inst(inst_adc,	0x81,	1,	2,	Eq,	Id, OptBigParam);
+	add_inst(inst_sbb,	0x81,	1,	3,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_sbb,	0x81,	1,	3,	Ed,	Id);
+	add_inst(inst_sbb,	0x81,	1,	3,	Eq,	Id, OptBigParam);
+	add_inst(inst_and,	0x81,	1,	4,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_and,	0x81,	1,	4,	Ed,	Id);
+	add_inst(inst_and,	0x81,	1,	4,	Eq,	Id, OptBigParam);
+	add_inst(inst_sub,	0x81,	1,	5,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_sub,	0x81,	1,	5,	Ed,	Id);
+	add_inst(inst_sub,	0x81,	1,	5,	Eq,	Id, OptBigParam);
+	add_inst(inst_xor,	0x81,	1,	6,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_xor,	0x81,	1,	6,	Ed,	Id);
+	add_inst(inst_xor,	0x81,	1,	6,	Eq,	Id, OptBigParam);
+	add_inst(inst_cmp,	0x81,	1,	7,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_cmp,	0x81,	1,	7,	Ed,	Id);
+	add_inst(inst_cmp,	0x81,	1,	7,	Eq,	Id, OptBigParam);
+	add_inst(inst_add,	0x83,	1,	0,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_add,	0x83,	1,	0,	Ed,	Ib);
+	add_inst(inst_add,	0x83,	1,	0,	Eq,	Ib, OptBigParam);
+	add_inst(inst_or,	0x83,	1,	1,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_or,	0x83,	1,	1,	Ed,	Ib);
+	add_inst(inst_or,	0x83,	1,	1,	Eq,	Ib, OptBigParam);
+	add_inst(inst_adc,	0x83,	1,	2,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_adc,	0x83,	1,	2,	Ed,	Ib);
+	add_inst(inst_adc,	0x83,	1,	2,	Eq,	Ib, OptBigParam);
+	add_inst(inst_sbb,	0x83,	1,	3,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_sbb,	0x83,	1,	3,	Ed,	Ib);
+	add_inst(inst_sbb,	0x83,	1,	3,	Eq,	Ib, OptBigParam);
+	add_inst(inst_and,	0x83,	1,	4,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_and,	0x83,	1,	4,	Ed,	Ib);
+	add_inst(inst_and,	0x83,	1,	4,	Eq,	Ib, OptBigParam);
+	add_inst(inst_sub,	0x83,	1,	5,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_sub,	0x83,	1,	5,	Ed,	Ib);
+	add_inst(inst_sub,	0x83,	1,	5,	Eq,	Ib, OptBigParam);
+	add_inst(inst_xor,	0x83,	1,	6,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_xor,	0x83,	1,	6,	Ed,	Ib);
+	add_inst(inst_xor,	0x83,	1,	6,	Eq,	Ib, OptBigParam);
+	add_inst(inst_cmp,	0x83,	1,	7,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_cmp,	0x83,	1,	7,	Ed,	Ib);
+	add_inst(inst_cmp,	0x83,	1,	7,	Eq,	Ib, OptBigParam);
+	add_inst(inst_test		,0x84	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_test,	0x85,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_test,	0x85,	1,	-1,	Ed,	Gd);
+	add_inst(inst_test,	0x85,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_xchg		,0x86	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_xchg,	0x87,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_xchg,	0x87,	1,	-1,	Ed,	Gd);
+	add_inst(inst_xchg,	0x87,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_mov		,0x88	,1	,-1	,Eb	,Gb	);
+	add_inst(inst_mov,	0x89,	1,	-1,	Ew,	Gw, OptSmallParam);
+	add_inst(inst_mov,	0x89,	1,	-1,	Ed,	Gd);
+	add_inst(inst_mov,	0x89,	1,	-1,	Eq,	Gq, OptBigParam);
+	add_inst(inst_mov		,0x8a	,1	,-1	,Gb	,Eb	);
+	add_inst(inst_mov,	0x8b,	1,	-1,	Gw,	Ew, OptSmallParam);
+	add_inst(inst_mov,	0x8b,	1,	-1,	Gd,	Ed);
+	add_inst(inst_mov,	0x8b,	1,	-1,	Gq,	Eq, OptBigParam);
 	add_inst(inst_mov		,0x8c	,1	,-1	,Ew	,Sw	);
-	//add_inst(inst_lea		,0x8d	,1	,-1	,Gv	,Ev	);
-	add_inst(inst_lea		,0x8d	,1	,-1	,Gv	,Mv	);
+	//add_inst(inst_lea,	0x8d,	1,	-1,	Gw,	Ew, OptSmallParam);
+	//add_inst(inst_lea,	0x8d,	1,	-1,	Gd,	Ed);
+	//add_inst(inst_lea,	0x8d,	1,	-1,	Gq,	Eq, OptBigParam);
+	add_inst(inst_lea,	0x8d,	1,	-1,	Gw,	Mw, OptSmallParam);
+	add_inst(inst_lea,	0x8d,	1,	-1,	Gd,	Md);
+	add_inst(inst_lea,	0x8d,	1,	-1,	Gq,	Mq, OptBigParam);
 	add_inst(inst_mov		,0x8e	,1	,-1	,Sw	,Ew	);
-	add_inst(inst_pop		,0x8f	,1	,-1	,Ev	,-1	);
+	add_inst(inst_pop,	0x8f,	1,	-1,	Ew,	-1, OptSmallParam);
+	add_inst(inst_pop,	0x8f,	1,	-1,	Ed,	-1);
+	add_inst(inst_pop,	0x8f,	1,	-1,	Eq,	-1, OptBigParam);
 	add_inst(inst_nop		,0x90	,1	,-1	,-1	,-1	);
+	add_inst(inst_xchg		,0x91	,1	,-1	,RegAx	,RegCx, OptSmallParam);
+	add_inst(inst_xchg		,0x92	,1	,-1	,RegAx	,RegDx, OptSmallParam);
+	add_inst(inst_xchg		,0x93	,1	,-1	,RegAx	,RegBx, OptSmallParam);
+	add_inst(inst_xchg		,0x94	,1	,-1	,RegAx	,RegSp, OptSmallParam);
+	add_inst(inst_xchg		,0x95	,1	,-1	,RegAx	,RegBp, OptSmallParam);
+	add_inst(inst_xchg		,0x96	,1	,-1	,RegAx	,RegSi, OptSmallParam);
+	add_inst(inst_xchg		,0x97	,1	,-1	,RegAx	,RegDi, OptSmallParam);
 	add_inst(inst_xchg		,0x91	,1	,-1	,RegEax	,RegEcx	);
 	add_inst(inst_xchg		,0x92	,1	,-1	,RegEax	,RegEdx	);
 	add_inst(inst_xchg		,0x93	,1	,-1	,RegEax	,RegEbx	);
@@ -1017,179 +1280,277 @@ void Init()
 	add_inst(inst_xchg		,0x95	,1	,-1	,RegEax	,RegEbp	);
 	add_inst(inst_xchg		,0x96	,1	,-1	,RegEax	,RegEsi	);
 	add_inst(inst_xchg		,0x97	,1	,-1	,RegEax	,RegEdi	);
+	add_inst(inst_xchg		,0x91	,1	,-1	,RegRax	,RegRcx, OptBigParam);
+	add_inst(inst_xchg		,0x92	,1	,-1	,RegRax	,RegRdx, OptBigParam);
+	add_inst(inst_xchg		,0x93	,1	,-1	,RegRax	,RegRbx, OptBigParam);
+	add_inst(inst_xchg		,0x94	,1	,-1	,RegRax	,RegRsp, OptBigParam);
+	add_inst(inst_xchg		,0x95	,1	,-1	,RegRax	,RegRbp, OptBigParam);
+	add_inst(inst_xchg		,0x96	,1	,-1	,RegRax	,RegRsi, OptBigParam);
+	add_inst(inst_xchg		,0x97	,1	,-1	,RegRax	,RegRdi, OptBigParam);
 	add_inst(inst_cbw_cwde	,0x98	,1	,-1	,-1 ,-1	);
 	add_inst(inst_cgq_cwd	,0x99	,1	,-1	,-1 ,-1	);
 	add_inst(inst_mov		,0xa0	,1	,-1	,RegAl	,Ob	);
-	add_inst(inst_mov		,0xa1	,1	,-1	,RegEax	,Ov	);
-	add_inst(inst_mov_b		,0xa2	,1	,-1	,Ob	,RegAl	);
-	add_inst(inst_mov		,0xa3	,1	,-1	,Ov	,RegEax	);
-	add_inst(inst_movs_b_ds_esi_es_edi	,0xa4	,1	,-1	,-1,-1	);
-	add_inst(inst_movs_ds_esi_es_edi	,0xa5	,1	,-1	,-1,-1	);
-	add_inst(inst_cmps_b_ds_esi_es_edi	,0xa6	,1	,-1	,-1,-1	);
-	add_inst(inst_cmps_ds_esi_es_edi	,0xa7	,1	,-1	,-1,-1	);
-	add_inst(inst_mov_b		,0xb0	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_mov_b		,0xb1	,1	,-1	,RegCl	,Ib	);
-	add_inst(inst_mov_b		,0xb2	,1	,-1	,RegDl	,Ib	);
-	add_inst(inst_mov_b		,0xb3	,1	,-1	,RegBl	,Ib	);
-	add_inst(inst_mov_b		,0xb4	,1	,-1	,RegAh	,Ib	);
-	add_inst(inst_mov_b		,0xb5	,1	,-1	,RegCh	,Ib	);
-	add_inst(inst_mov_b		,0xb6	,1	,-1	,RegDh	,Ib	);
-	add_inst(inst_mov_b		,0xb7	,1	,-1	,RegBh	,Ib	);
-	add_inst(inst_mov		,0xb8	,1	,-1	,RegEax	,Iv	);
-	add_inst(inst_mov		,0xb9	,1	,-1	,RegEcx	,Iv	);
-	add_inst(inst_mov		,0xba	,1	,-1	,RegEdx	,Iv	);
-	add_inst(inst_mov		,0xbb	,1	,-1	,RegEbx	,Iv	);
-	add_inst(inst_mov		,0xbc	,1	,-1	,RegEsp	,Iv	);
-	add_inst(inst_mov		,0xbd	,1	,-1	,RegEbp	,Iv	);
-	add_inst(inst_mov		,0xbe	,1	,-1	,RegEsi	,Iv	);
-	add_inst(inst_mov		,0xbf	,1	,-1	,RegEdi	,Iv	);
+	add_inst(inst_mov		,0xa1	,1	,-1	,RegAx	,Ow, OptSmallParam);
+	add_inst(inst_mov		,0xa1	,1	,-1	,RegEax	,Od);
+	add_inst(inst_mov		,0xa1	,1	,-1	,RegRax	,Oq, OptBigParam);
+	add_inst(inst_mov		,0xa2	,1	,-1	,Ob	,RegAl	);
+	add_inst(inst_mov,	0xa3,	1,	-1,	Ow,	RegAx, OptSmallParam);
+	add_inst(inst_mov,	0xa3,	1,	-1,	Od,	RegEax);
+	add_inst(inst_mov,	0xa3,	1,	-1,	Oq,	RegRax, OptBigParam);
+	add_inst(inst_movs_b_ds_esi_es_edi	,0xa4	,1	,-1	,-1,-1);
+	add_inst(inst_movs_ds_esi_es_edi	,0xa5	,1	,-1	,-1,-1);
+	add_inst(inst_cmps_b_ds_esi_es_edi	,0xa6	,1	,-1	,-1,-1);
+	add_inst(inst_cmps_ds_esi_es_edi	,0xa7	,1	,-1	,-1,-1);
+	add_inst(inst_mov		,0xb0	,1	,-1	,RegAl	,Ib);
+	add_inst(inst_mov		,0xb1	,1	,-1	,RegCl	,Ib);
+	add_inst(inst_mov		,0xb2	,1	,-1	,RegDl	,Ib);
+	add_inst(inst_mov		,0xb3	,1	,-1	,RegBl	,Ib);
+	add_inst(inst_mov		,0xb4	,1	,-1	,RegAh	,Ib);
+	add_inst(inst_mov		,0xb5	,1	,-1	,RegCh	,Ib);
+	add_inst(inst_mov		,0xb6	,1	,-1	,RegDh	,Ib);
+	add_inst(inst_mov		,0xb7	,1	,-1	,RegBh	,Ib);
+	add_inst(inst_mov		,0xb8	,1	,-1	,RegEax	,Id);
+	add_inst(inst_mov		,0xb9	,1	,-1	,RegEcx	,Id);
+	add_inst(inst_mov		,0xba	,1	,-1	,RegEdx	,Id);
+	add_inst(inst_mov		,0xbb	,1	,-1	,RegEbx	,Id);
+	add_inst(inst_mov		,0xbc	,1	,-1	,RegEsp	,Id);
+	add_inst(inst_mov		,0xbd	,1	,-1	,RegEbp	,Id);
+	add_inst(inst_mov		,0xbe	,1	,-1	,RegEsi	,Id);
+	add_inst(inst_mov		,0xbf	,1	,-1	,RegEdi	,Id);
+	add_inst(inst_mov		,0xb8	,1	,-1	,RegAx	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xb9	,1	,-1	,RegCx	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xba	,1	,-1	,RegDx	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xbb	,1	,-1	,RegBx	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xbc	,1	,-1	,RegSp	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xbd	,1	,-1	,RegBp	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xbe	,1	,-1	,RegSi	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xbf	,1	,-1	,RegDi	,Iw, OptSmallParam);
+	add_inst(inst_mov		,0xb8	,1	,-1	,RegRax	,Iq, OptBigParam);
+	add_inst(inst_mov		,0xb9	,1	,-1	,RegRcx	,Iq, OptBigParam);
+	add_inst(inst_mov		,0xba	,1	,-1	,RegRdx	,Iq, OptBigParam);
+	add_inst(inst_mov		,0xbb	,1	,-1	,RegRbx	,Iq, OptBigParam);
+	add_inst(inst_mov		,0xbc	,1	,-1	,RegRsp	,Iq, OptBigParam);
+	add_inst(inst_mov		,0xbd	,1	,-1	,RegRbp	,Iq, OptBigParam);
+	add_inst(inst_mov		,0xbe	,1	,-1	,RegRsi	,Iq, OptBigParam);
+	add_inst(inst_mov		,0xbf	,1	,-1	,RegRdi	,Iq, OptBigParam);
 	// Shift Group 2
-	add_inst(inst_rol_b		,0xc0	,1	,0	,Eb	,Ib	);
-	add_inst(inst_ror_b		,0xc0	,1	,1	,Eb	,Ib	);
-	add_inst(inst_rcl_b		,0xc0	,1	,2	,Eb	,Ib	);
-	add_inst(inst_rcr_b		,0xc0	,1	,3	,Eb	,Ib	);
-	add_inst(inst_shl_b		,0xc0	,1	,4	,Eb	,Ib	);
-	add_inst(inst_shr_b		,0xc0	,1	,5	,Eb	,Ib	);
-	add_inst(inst_sar_b		,0xc0	,1	,7	,Eb	,Ib	);
-	add_inst(inst_rol		,0xc1	,1	,0	,Ev	,Ib	); // Ib, auch wenn die Tabelle Iv sagt!!!!
-	add_inst(inst_ror		,0xc1	,1	,1	,Ev	,Ib	);
-	add_inst(inst_rcl		,0xc1	,1	,2	,Ev	,Ib	);
-	add_inst(inst_rcr		,0xc1	,1	,3	,Ev	,Ib	);
-	add_inst(inst_shl		,0xc1	,1	,4	,Ev	,Ib	);
-	add_inst(inst_shr		,0xc1	,1	,5	,Ev	,Ib	);
-	add_inst(inst_sar		,0xc1	,1	,7	,Ev	,Ib	);
+	add_inst(inst_rol		,0xc0	,1	,0	,Eb	,Ib	);
+	add_inst(inst_ror		,0xc0	,1	,1	,Eb	,Ib	);
+	add_inst(inst_rcl		,0xc0	,1	,2	,Eb	,Ib	);
+	add_inst(inst_rcr		,0xc0	,1	,3	,Eb	,Ib	);
+	add_inst(inst_shl		,0xc0	,1	,4	,Eb	,Ib	);
+	add_inst(inst_shr		,0xc0	,1	,5	,Eb	,Ib	);
+	add_inst(inst_sar		,0xc0	,1	,7	,Eb	,Ib	);
+	add_inst(inst_rol,	0xc1,	1,	0,	Ew,	Ib, OptSmallParam); // even though the table says Iv
+	add_inst(inst_rol,	0xc1,	1,	0,	Ed,	Ib);
+	add_inst(inst_rol,	0xc1,	1,	0,	Eq,	Ib, OptBigParam);
+	add_inst(inst_ror,	0xc1,	1,	1,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_ror,	0xc1,	1,	1,	Ed,	Ib);
+	add_inst(inst_ror,	0xc1,	1,	1,	Eq,	Ib, OptBigParam);
+	add_inst(inst_rcl,	0xc1,	1,	2,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_rcl,	0xc1,	1,	2,	Ed,	Ib);
+	add_inst(inst_rcl,	0xc1,	1,	2,	Eq,	Ib, OptBigParam);
+	add_inst(inst_rcr,	0xc1,	1,	3,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_rcr,	0xc1,	1,	3,	Ed,	Ib);
+	add_inst(inst_rcr,	0xc1,	1,	3,	Eq,	Ib, OptBigParam);
+	add_inst(inst_shl,	0xc1,	1,	4,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_shl,	0xc1,	1,	4,	Ed,	Ib);
+	add_inst(inst_shl,	0xc1,	1,	4,	Eq,	Ib, OptBigParam);
+	add_inst(inst_shr,	0xc1,	1,	5,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_shr,	0xc1,	1,	5,	Ed,	Ib);
+	add_inst(inst_shr,	0xc1,	1,	5,	Eq,	Ib, OptBigParam);
+	add_inst(inst_sar,	0xc1,	1,	7,	Ew,	Ib, OptSmallParam);
+	add_inst(inst_sar,	0xc1,	1,	7,	Ed,	Ib);
+	add_inst(inst_sar,	0xc1,	1,	7,	Eq,	Ib, OptBigParam);
 	add_inst(inst_ret		,0xc2	,1	,-1	,Iw	,-1	);
 	add_inst(inst_ret		,0xc3	,1	,-1	,-1	,-1	);
-	add_inst(inst_mov_b		,0xc6	,1	,-1	,Eb	,Ib	);
-	add_inst(inst_mov		,0xc7	,1	,-1	,Ev	,Iv	);
+	add_inst(inst_mov		,0xc6	,1	,-1	,Eb	,Ib	);
+	add_inst(inst_mov,	0xc7,	1,	-1,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_mov,	0xc7,	1,	-1,	Ed,	Id);
+	add_inst(inst_mov,	0xc7,	1,	-1,	Eq,	Id, OptBigParam);
 	add_inst(inst_leave		,0xc9	,1	,-1	,-1	,-1	);
 	add_inst(inst_ret_far	,0xca	,1	,-1	,Iw	,-1	);
 	add_inst(inst_ret_far	,0xcb	,1	,-1	,-1	,-1	);
 	add_inst(inst_int		,0xcd	,1	,-1	,Ib	,-1	);
 	add_inst(inst_iret		,0xcf	,1	,-1	,-1	,-1	);
-	add_inst(inst_rol		,0xd3	,1	,0	,Ev	,RegCl	);
-	add_inst(inst_ror		,0xd3	,1	,1	,Ev	,RegCl	);
-	add_inst(inst_rcl		,0xd3	,1	,2	,Ev	,RegCl	);
-	add_inst(inst_rcr		,0xd3	,1	,3	,Ev	,RegCl	);
-	add_inst(inst_shl		,0xd3	,1	,4	,Ev	,RegCl	);
-	add_inst(inst_shr		,0xd3	,1	,5	,Ev	,RegCl	);
-	add_inst(inst_sar		,0xd3	,1	,7	,Ev	,RegCl	);
-	add_inst(inst_fadd		,0xd8	,1	,0	,Ev	,-1	);
-	add_inst(inst_fmul		,0xd8	,1	,1	,Ev	,-1	);
-	add_inst(inst_fsub		,0xd8	,1	,4	,Ev	,-1	);
-	add_inst(inst_fdiv		,0xd8	,1	,6	,Ev	,-1	);
-	add_inst(inst_fld		,0xd9	,1	,0	,Mv	,-1	);
-	add_inst(inst_fst		,0xd9	,1	,2	,Mv	,-1	);
-	add_inst(inst_fstp		,0xd9	,1	,3	,Mv	,-1	);
-	add_inst(inst_fldcw		,0xd9	,1	,5	,Mw	,-1	);
-	add_inst(inst_fnstcw	,0xd9	,1	,7	,Mw	,-1	);
+	add_inst(inst_rol,	0xd3,	1,	0,	Ew,	RegCl, OptSmallParam);
+	add_inst(inst_rol,	0xd3,	1,	0,	Ed,	RegCl);
+	add_inst(inst_rol,	0xd3,	1,	0,	Eq,	RegCl, OptBigParam);
+	add_inst(inst_ror,	0xd3,	1,	1,	Ew,	RegCl, OptSmallParam);
+	add_inst(inst_ror,	0xd3,	1,	1,	Ed,	RegCl);
+	add_inst(inst_ror,	0xd3,	1,	1,	Eq,	RegCl, OptBigParam);
+	add_inst(inst_rcl,	0xd3,	1,	2,	Ew,	RegCl, OptSmallParam);
+	add_inst(inst_rcl,	0xd3,	1,	2,	Ed,	RegCl);
+	add_inst(inst_rcl,	0xd3,	1,	2,	Eq,	RegCl, OptBigParam);
+	add_inst(inst_rcr,	0xd3,	1,	3,	Ew,	RegCl, OptSmallParam);
+	add_inst(inst_rcr,	0xd3,	1,	3,	Ed,	RegCl);
+	add_inst(inst_rcr,	0xd3,	1,	3,	Eq,	RegCl, OptBigParam);
+	add_inst(inst_shl,	0xd3,	1,	4,	Ew,	RegCl, OptSmallParam);
+	add_inst(inst_shl,	0xd3,	1,	4,	Ed,	RegCl);
+	add_inst(inst_shl,	0xd3,	1,	4,	Eq,	RegCl, OptBigParam);
+	add_inst(inst_shr,	0xd3,	1,	5,	Ew,	RegCl, OptSmallParam);
+	add_inst(inst_shr,	0xd3,	1,	5,	Ed,	RegCl);
+	add_inst(inst_shr,	0xd3,	1,	5,	Eq,	RegCl, OptBigParam);
+	add_inst(inst_sar,	0xd3,	1,	7,	Ew,	RegCl, OptSmallParam);
+	add_inst(inst_sar,	0xd3,	1,	7,	Ed,	RegCl);
+	add_inst(inst_sar,	0xd3,	1,	7,	Eq,	RegCl, OptBigParam);
+	add_inst(inst_fadd,	0xd8,	1,	0,	Ed,	-1);
+	add_inst(inst_fmul,	0xd8,	1,	1,	Ed,	-1);
+	add_inst(inst_fsub,	0xd8,	1,	4,	Ed,	-1);
+	add_inst(inst_fdiv,	0xd8,	1,	6,	Ed,	-1);
+	add_inst(inst_fld,	0xd9,	1,	0,	Md,	-1);
+	add_inst(inst_fst,	0xd9,	1,	2,	Md,	-1);
+	add_inst(inst_fstp,	0xd9,	1,	3,	Md,	-1);
+	add_inst(inst_fldcw,	0xd9,	1,	5,	Mw,	-1);
+	add_inst(inst_fnstcw,	0xd9,	1,	7,	Mw,	-1);
 	add_inst(inst_fxch		,0xc9d9	,2	,-1	,RegSt0	,RegSt1	);
 	add_inst(inst_fucompp	,0xe9da	,2	,-1	,RegSt0	,RegSt1	);
 	add_inst(inst_fistp		,0xdb	,1	,3	,Md	,-1	);
-
-//	FNSTCW
-	add_inst(inst_fild		,0xdb	,1	,0	,Ev	,-1	);
-	add_inst(inst_faddp		,0xde	,1	,0	,Ev	,-1	);
-	add_inst(inst_fmulp		,0xde	,1	,1	,Ev	,-1	);
-	add_inst(inst_fsubp		,0xde	,1	,5	,Ev	,-1	);
-	add_inst(inst_fdivp		,0xde	,1	,7	,Ev	,-1	); // de.f9 ohne Parameter...?
+	add_inst(inst_fild,	0xdb,	1,	0,	Ed,	-1);
+	add_inst(inst_faddp,	0xde,	1,	0,	Ew,	-1, OptSmallParam);
+	add_inst(inst_faddp,	0xde,	1,	0,	Ed,	-1);
+	add_inst(inst_faddp,	0xde,	1,	0,	Eq,	-1, OptBigParam);
+	add_inst(inst_fmulp,	0xde,	1,	1,	Ew,	-1, OptSmallParam);
+	add_inst(inst_fmulp,	0xde,	1,	1,	Ed,	-1);
+	add_inst(inst_fmulp,	0xde,	1,	1,	Eq,	-1, OptBigParam);
+	add_inst(inst_fsubp,	0xde,	1,	5,	Ew,	-1, OptSmallParam);
+	add_inst(inst_fsubp,	0xde,	1,	5,	Ed,	-1);
+	add_inst(inst_fsubp,	0xde,	1,	5,	Eq,	-1, OptBigParam);
+	add_inst(inst_fdivp,	0xde,	1,	7,	Ew,	-1, OptSmallParam);
+	add_inst(inst_fdivp,	0xde,	1,	7,	Ed,	-1);
+	add_inst(inst_fdivp,	0xde,	1,	7,	Eq,	-1, OptBigParam); // de.f9 ohne Parameter...?
 	add_inst(inst_fnstsw	,0xe0df	,2	,-1	,RegAx	,-1	);
 	add_inst(inst_loopne	,0xe0	,1	,-1	,Jb	,-1	);
 	add_inst(inst_loope		,0xe1	,1	,-1	,Jb	,-1	);
 	add_inst(inst_loop		,0xe2	,1	,-1	,Jb	,-1	);
-	add_inst(inst_in_b		,0xe4	,1	,-1	,RegAl	,Ib	);
-	add_inst(inst_in_b		,0xe5	,1	,-1	,RegEax,Ib	);
-	add_inst(inst_out_b		,0xe6	,1	,-1	,Ib	,RegAl	);
-	add_inst(inst_out_b		,0xe7	,1	,-1	,Ib	,RegEax);
-	add_inst(inst_call		,0xe8	,1	,-1	,Jv	,-1	); // well... "Av" in tyble
-	add_inst(inst_jmp		,0xe9	,1	,-1	,Jv	,-1	); // miswritten in the table
-	add_inst(inst_jmp		,0xea	,1	,-1	,Ap	,-1	);
-	add_inst(inst_jmp_b		,0xeb	,1	,-1	,Jb	,-1	);
+	add_inst(inst_in		,0xe4	,1	,-1	,RegAl	,Ib	);
+	add_inst(inst_in		,0xe5	,1	,-1	,RegEax,Ib	);
+	add_inst(inst_out		,0xe6	,1	,-1	,Ib	,RegAl	);
+	add_inst(inst_out		,0xe7	,1	,-1	,Ib	,RegEax);
+	add_inst(inst_call,	0xe8,	1,	-1,	Jw,	-1, OptSmallParam); // well... "Av" in tyble
+	add_inst(inst_call,	0xe8,	1,	-1,	Jd,	-1);
+	add_inst(inst_call,	0xe8,	1,	-1,	Jq,	-1, OptBigParam);
+	add_inst(inst_jmp,	0xe9,	1,	-1,	Jw,	-1, OptSmallParam); // miswritten in the table
+	add_inst(inst_jmp,	0xe9,	1,	-1,	Jd,	-1);
+	add_inst(inst_jmp,	0xe9,	1,	-1,	Jq,	-1, OptBigParam);
+//	add_inst(inst_jmp		,0xea	,1	,-1	,Ap	,-1	); TODO
+	add_inst(inst_jmp		,0xeb	,1	,-1	,Jb	,-1	);
 	add_inst(inst_in		,0xec	,1	,-1	,RegAl	,RegDx	);
 	add_inst(inst_in		,0xed	,1	,-1	,RegEax,RegDx	);
 	add_inst(inst_out		,0xee	,1	,-1	,RegDx	,RegAl	);
 	add_inst(inst_out		,0xef	,1	,-1	,RegDx	,RegEax);
 	add_inst(inst_lock		,0xf0	,1	,-1	,-1	,-1	);
-	add_inst(inst_repne		,0xf2	,1	,-1	,-1	,-1	);
-	add_inst(inst_rep		,0xf3	,1	,-1	,-1	,-1	);
+	/*add_inst(inst_repne		,0xf2	,1	,-1	,-1	,-1	);
+	add_inst(inst_rep		,0xf3	,1	,-1	,-1	,-1	);*/
 	add_inst(inst_hlt		,0xf4	,1	,-1	,-1	,-1	);
 	add_inst(inst_cmc		,0xf5	,1	,-1	,-1	,-1	);
 	// Unary Group 3
-	add_inst(inst_test_b	,0xf6	,1	,0	,Eb	,Ib	);
-	add_inst(inst_not_b		,0xf6	,1	,2	,Eb	,-1	);
-	add_inst(inst_neg_b		,0xf6	,1	,3	,Eb	,-1	);
-	add_inst(inst_mul_b		,0xf6	,1	,4	,RegAl	,Eb	);
-	add_inst(inst_imul_b	,0xf6	,1	,5	,RegAl	,Eb	);
-	add_inst(inst_div_b		,0xf6	,1	,6	,RegAl	,Eb	);
-	add_inst(inst_idiv_b	,0xf6	,1	,7	,Eb	,-1	);
-	add_inst(inst_test		,0xf7	,1	,0	,Ev	,Iv	);
-	add_inst(inst_not		,0xf7	,1	,2	,Ev	,-1	);
-	add_inst(inst_neg		,0xf7	,1	,3	,Ev	,-1	);
-	add_inst(inst_mul		,0xf7	,1	,4	,RegEax	,Ev	);
-	add_inst(inst_imul		,0xf7	,1	,5	,RegEax	,Ev	);
-	add_inst(inst_div		,0xf7	,1	,6	,RegEax	,Ev	);
-	add_inst(inst_idiv		,0xf7	,1	,7	,RegEax	,Ev	);
+	add_inst(inst_test		,0xf6	,1	,0	,Eb	,Ib	);
+	add_inst(inst_not		,0xf6	,1	,2	,Eb	,-1	);
+	add_inst(inst_neg		,0xf6	,1	,3	,Eb	,-1	);
+	add_inst(inst_mul		,0xf6	,1	,4	,RegAl	,Eb	);
+	add_inst(inst_imul		,0xf6	,1	,5	,RegAl	,Eb	);
+	add_inst(inst_div		,0xf6	,1	,6	,RegAl	,Eb	);
+	add_inst(inst_idiv		,0xf6	,1	,7	,Eb	,-1	);
+	add_inst(inst_test,	0xf7,	1,	0,	Ew,	Iw, OptSmallParam);
+	add_inst(inst_test,	0xf7,	1,	0,	Ed,	Id);
+	add_inst(inst_test,	0xf7,	1,	0,	Eq,	Id, OptBigParam);
+	add_inst(inst_not,	0xf7,	1,	2,	Ew,	-1, OptSmallParam);
+	add_inst(inst_not,	0xf7,	1,	2,	Ed,	-1);
+	add_inst(inst_not,	0xf7,	1,	2,	Eq,	-1, OptBigParam);
+	add_inst(inst_neg,	0xf7,	1,	3,	Ew,	-1, OptSmallParam);
+	add_inst(inst_neg,	0xf7,	1,	3,	Ed,	-1);
+	add_inst(inst_neg,	0xf7,	1,	3,	Eq,	-1, OptBigParam);
+	add_inst(inst_mul		,0xf7	,1	,4	,RegEax	,Ed);
+	add_inst(inst_imul		,0xf7	,1	,5	,RegEax	,Ed);
+	add_inst(inst_div		,0xf7	,1	,6	,RegEax	,Ed);
+	add_inst(inst_idiv		,0xf7	,1	,7	,RegEax	,Ed);
+	add_inst(inst_mul		,0xf7	,1	,4	,RegAx	,Ed, OptSmallParam);
+	add_inst(inst_imul		,0xf7	,1	,5	,RegAx	,Ed, OptSmallParam);
+	add_inst(inst_div		,0xf7	,1	,6	,RegAx	,Ed, OptSmallParam);
+	add_inst(inst_idiv		,0xf7	,1	,7	,RegAx	,Ed, OptSmallParam);
+	add_inst(inst_mul		,0xf7	,1	,4	,RegRax	,Eq, OptBigParam);
+	add_inst(inst_imul		,0xf7	,1	,5	,RegRax	,Eq, OptBigParam);
+	add_inst(inst_div		,0xf7	,1	,6	,RegRax	,Eq, OptBigParam);
+	add_inst(inst_idiv		,0xf7	,1	,7	,RegRax	,Eq, OptBigParam);
 	add_inst(inst_clc		,0xf8	,1	,-1	,-1	,-1	);
 	add_inst(inst_stc		,0xf9	,1	,-1	,-1	,-1	);
 	add_inst(inst_cli		,0xfa	,1	,-1	,-1	,-1	);
 	add_inst(inst_sti		,0xfb	,1	,-1	,-1	,-1	);
 	add_inst(inst_cld		,0xfc	,1	,-1	,-1	,-1	);
 	add_inst(inst_std		,0xfd	,1	,-1	,-1	,-1	);
-	add_inst(inst_inc_b		,0xfe	,1	,0	,Eb	,-1	);
-	add_inst(inst_dec_b		,0xfe	,1	,1	,Eb	,-1	);
-	add_inst(inst_inc		,0xff	,1	,0	,Ev	,-1	);
-	add_inst(inst_dec		,0xff	,1	,1	,Ev	,-1	);
-	add_inst(inst_call		,0xff	,1	,2	,Ev	,-1	);
-	add_inst(inst_call_far	,0xff	,1	,3	,Ev	,-1	); // Ep statt Ev...
-	add_inst(inst_jmp		,0xff	,1	,4	,Ev	,-1	);
-//	add_inst(inst_jmp		,0xff	,1	,5	,Ep	,-1	);
-	add_inst(inst_push		,0xff	,1	,6	,Ev	,-1	);
+	add_inst(inst_inc		,0xfe	,1	,0	,Eb	,-1	);
+	add_inst(inst_dec		,0xfe	,1	,1	,Eb	,-1	);
+	add_inst(inst_inc,	0xff,	1,	0,	Ew,	-1, OptSmallParam);
+	add_inst(inst_inc,	0xff,	1,	0,	Ed,	-1);
+	add_inst(inst_inc,	0xff,	1,	0,	Eq,	-1, OptBigParam);
+	add_inst(inst_dec,	0xff,	1,	1,	Ew,	-1, OptSmallParam);
+	add_inst(inst_dec,	0xff,	1,	1,	Ed,	-1);
+	add_inst(inst_dec,	0xff,	1,	1,	Eq,	-1, OptBigParam);
+	add_inst(inst_call,	0xff,	1,	2,	Ew,	-1, OptSmallParam);
+	add_inst(inst_call,	0xff,	1,	2,	Ed,	-1);
+	add_inst(inst_call,	0xff,	1,	2,	Eq,	-1, OptBigParam);
+	add_inst(inst_call_far,	0xff,	1,	3,	Ew,	-1, OptSmallParam); // Ep instead of Ev...
+	add_inst(inst_call_far,	0xff,	1,	3,	Ed,	-1);
+	add_inst(inst_call_far,	0xff,	1,	3,	Eq,	-1, OptBigParam);
+	add_inst(inst_jmp,	0xff,	1,	4,	Ew,	-1, OptSmallParam);
+	add_inst(inst_jmp,	0xff,	1,	4,	Ed,	-1);
+	add_inst(inst_jmp,	0xff,	1,	4,	Eq,	-1, OptBigParam);
+	//	add_inst(inst_jmp		,0xff	,1	,5	,Ep	,-1	);
+	add_inst(inst_push,	0xff,	1,	6,	Ew,	-1, OptSmallParam);
+	add_inst(inst_push,	0xff,	1,	6,	Ed,	-1);
+	add_inst(inst_push,	0xff,	1,	6,	Eq,	-1, OptBigParam);
+
+	// sse
+	add_inst(inst_movss,	0x100ff3,	3,	-1,	Xx, Ed);
+	add_inst(inst_movss,	0x110ff3,	3,	-1,	Ed, Xx);
+	add_inst(inst_movsd,	0x100ff2,	3,	-1,	Xx, Eq);
+	add_inst(inst_movsd,	0x110ff2,	3,	-1,	Eq, Xx);
 }
 
 // convert an asm parameter into a human readable expression
-void AddParam(string &str, InstructionParam &p)
+string InstructionParam::str()
 {
 	msg_db_f("AddParam", 1+ASM_DB_LEVEL);
-	str = "\?\?\?";
 	//msg_write("----");
 	//msg_write(p.type);
-	if (p.type == ParamTInvalid){
-		str = "-\?\?\?-";
-	}else if (p.type == ParamTNone){
-		str = "";
-	}else if (p.type == ParamTRegister){
-			//msg_write((long)p.reg);
-			//msg_write((long)p.disp);
-		if (p.deref){
+	if (type == ParamTInvalid){
+		return "-\?\?\?-";
+	}else if (type == ParamTNone){
+		return "";
+	}else if (type == ParamTRegister){
+			//msg_write((long)reg);
+			//msg_write((long)disp);
+		if (deref){
 			//msg_write("deref");
-			if (p.disp == DispModeNone)
-				str = "[" + p.reg->name + "]";
-			else if (p.disp == DispMode8)
-				str += format("[%s + %2x]", p.reg->name.c_str(), p.value);
-			else if (p.disp == DispMode16)
-				str += format("[%s + %4x]", p.reg->name.c_str(), p.value);
-			else if (p.disp == DispMode32)
-				str += format("[%s + %8x]", p.reg->name.c_str(), p.value);
-			else if (p.disp == DispModeSIB)
-				str = "SIB[...][...]";
-			else if (p.disp == DispMode8SIB)
-				str = format("[SIB... + %2x]", p.value);
-			else if (p.disp == DispMode8Reg2)
-				str = format("[%s + %s + %2x]", p.reg->name.c_str(), p.reg2->name.c_str(), p.value);
-			else if (p.disp == DispModeReg2)
-				str = "[" + p.reg->name + " + " + p.reg2->name + "]";
+			string ss = get_size_name(size);
+			if (disp == DispModeNone)
+				return ss + " [" + reg->name + "]";
+			else if (disp == DispMode8)
+				return ss + format(" [%s + 0x%02x]", reg->name.c_str(), value);
+			else if (disp == DispMode16)
+				return ss + format(" [%s + 0x%04x]", reg->name.c_str(), value);
+			else if (disp == DispMode32)
+				return ss + format(" [%s + 0x%08x]", reg->name.c_str(), value);
+			else if (disp == DispModeSIB)
+				return "SIB[...][...]";
+			else if (disp == DispMode8SIB)
+				return ss + format(" [SIB... + 0x%02x]", value);
+			else if (disp == DispMode8Reg2)
+				return ss + format(" [%s + %s + 0x%02x]", reg->name.c_str(), reg2->name.c_str(), value);
+			else if (disp == DispModeReg2)
+				return ss + " [" + reg->name + " + " + reg2->name + "]";
 		}else
-			str = p.reg->name;
-	}else if (p.type == ParamTImmediate){
+			return reg->name;
+	}else if (type == ParamTImmediate){
 		//msg_write("im");
-		if (p.deref)
-			str = format("[%s]", d2h(&p.value, small_addr ? 2 : 4).c_str());
-		else
-			str = d2h(&p.value, absolute_size(p.size));
-	}else if (p.type == ParamTImmediateDouble){
+		if (deref)
+			return format(" [%s]", d2h(&value, state.AddrSize).c_str());
+		return d2h(&value, size);
+	}/*else if (type == ParamTImmediateDouble){
 		//msg_write("im");
-		str = format("%s:%s", d2h(&((char*)&p.value)[4], 2).c_str(), d2h(&p.value, small_param ? 2 : 4).c_str());
-	}
+		return format("%s:%s", d2h(&((char*)&value)[4], 2).c_str(), d2h(&value, state.ParamSize).c_str());
+	}*/
 #if 0
 	for (int i=0;i<Registers.num;i++)
 		if (param==Registers[i].reg){
@@ -1262,34 +1623,7 @@ void AddParam(string &str, InstructionParam &p)
 		default:	strcat(str,string(i2s(param),": -\?\?- "));	break;
 	};
 #endif
-}
-
-// adjust parameter type to ... 32bit / 16bit
-inline void ApplyParamSize(InstructionParamFuzzy &p)
-{
-	msg_db_f("CorrectParam", 1+ASM_DB_LEVEL);
-	if (small_param){
-		if (p.size == Size16or32){
-			//if ((p.allow_register) || (p.allow_memory_address) || (p.allow_memory_indirect) || (p.allow_immediate))
-				p.size = Size16;
-		}
-		if (p.reg){
-			if (p.reg->id == RegEax){	p.reg = RegisterByID[RegAx];	p.size = Size16;	}
-			if (p.reg->id == RegEcx){	p.reg = RegisterByID[RegCx];	p.size = Size16;	}
-			if (p.reg->id == RegEdx){	p.reg = RegisterByID[RegDx];	p.size = Size16;	}
-			if (p.reg->id == RegEbx){	p.reg = RegisterByID[RegBx];	p.size = Size16;	}
-			if (p.reg->id == RegEsp){	p.reg = RegisterByID[RegSp];	p.size = Size16;	}
-			if (p.reg->id == RegEbp){	p.reg = RegisterByID[RegBp];	p.size = Size16;	}
-			if (p.reg->id == RegEsi){	p.reg = RegisterByID[RegSi];	p.size = Size16;	}
-			if (p.reg->id == RegEdi){	p.reg = RegisterByID[RegDi];	p.size = Size16;	}
-		}
-	}else{
-		if (p.size == Size16or32){
-			//if ((p.type == ParamTRegister) || (p.type == ParamTRegisterOrMem) || (p.type == ParamTImmediate))
-			if ((p.allow_register) || (p.allow_memory_address) || (p.allow_memory_indirect) || (p.allow_immediate))
-				p.size = Size32;
-		}
-	}
+	return "\?\?\?";
 }
 
 inline void UnfuzzyParam(InstructionParam &p, InstructionParamFuzzy &pf)
@@ -1307,6 +1641,65 @@ inline void UnfuzzyParam(InstructionParam &p, InstructionParamFuzzy &pf)
 		p.type = ParamTImmediate;
 		p.deref = true;
 	}
+}
+
+int GetModRMRegister(int reg, int size)
+{
+	if (size == Size8){
+		if (reg == 0x00)	return RegAl;
+		if (reg == 0x01)	return RegCl;
+		if (reg == 0x02)	return RegDl;
+		if (reg == 0x03)	return RegBl;
+		if (reg == 0x04)	return RegAh;
+		if (reg == 0x05)	return RegCh;
+		if (reg == 0x06)	return RegDh;
+		if (reg == 0x07)	return RegBh;
+	}else if (size == Size16){
+		if (reg == 0x00)	return RegAx;
+		if (reg == 0x01)	return RegCx;
+		if (reg == 0x02)	return RegDx;
+		if (reg == 0x03)	return RegBx;
+		if (reg == 0x04)	return RegSp;
+		if (reg == 0x05)	return RegBp;
+		if (reg == 0x06)	return RegSi;
+		if (reg == 0x07)	return RegDi;
+	}else if (size == Size32){
+		if (reg == 0x00)	return RegEax;
+		if (reg == 0x01)	return RegEcx;
+		if (reg == 0x02)	return RegEdx;
+		if (reg == 0x03)	return RegEbx;
+		if (reg == 0x04)	return RegEsp;
+		if (reg == 0x05)	return RegEbp;
+		if (reg == 0x06)	return RegEsi;
+		if (reg == 0x07)	return RegEdi;
+		if (reg == 0x08)	return RegR8d;
+		if (reg == 0x09)	return RegR9d;
+		if (reg == 0x0a)	return RegR10d;
+		if (reg == 0x0b)	return RegR11d;
+		if (reg == 0x0c)	return RegR12d;
+		if (reg == 0x0d)	return RegR13d;
+		if (reg == 0x0e)	return RegR14d;
+		if (reg == 0x0f)	return RegR15d;
+	}else if (size == Size64){
+		if (reg == 0x00)	return RegRax;
+		if (reg == 0x01)	return RegRcx;
+		if (reg == 0x02)	return RegRdx;
+		if (reg == 0x03)	return RegRbx;
+		if (reg == 0x04)	return RegRsp;
+		if (reg == 0x05)	return RegRbp;
+		if (reg == 0x06)	return RegRsi;
+		if (reg == 0x07)	return RegRdi;
+		if (reg == 0x08)	return RegR8;
+		if (reg == 0x09)	return RegR9;
+		if (reg == 0x0a)	return RegR10;
+		if (reg == 0x0b)	return RegR11;
+		if (reg == 0x0c)	return RegR12;
+		if (reg == 0x0d)	return RegR13;
+		if (reg == 0x0e)	return RegR14;
+		if (reg == 0x0f)	return RegR15;
+	}
+	msg_error("unhandled mod/rm register: " + i2s(reg));
+	return 0;
 }
 
 inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigned char modrm)
@@ -1328,21 +1721,18 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 			if (reg == 0x08)	p.reg = RegisterByID[RegCr1];
 			if (reg == 0x10)	p.reg = RegisterByID[RegCr2];
 			if (reg == 0x18)	p.reg = RegisterByID[RegCr3];
+		}else if (pf.reg_group == RegGroupXmm){
+			p.reg = RegisterByID[RegXmm0 + (reg >> 3)];
 		}else{
-			if (reg == 0x00)	p.reg = (p.size == Size8) ? RegisterByID[RegAl] : ((p.size == Size16) ? RegisterByID[RegAx] : RegisterByID[RegEax]);
-			if (reg == 0x08)	p.reg = (p.size == Size8) ? RegisterByID[RegCl] : ((p.size == Size16) ? RegisterByID[RegCx] : RegisterByID[RegEcx]);
-			if (reg == 0x10)	p.reg = (p.size == Size8) ? RegisterByID[RegDl] : ((p.size == Size16) ? RegisterByID[RegDx] : RegisterByID[RegEdx]);
-			if (reg == 0x18)	p.reg = (p.size == Size8) ? RegisterByID[RegBl] : ((p.size == Size16) ? RegisterByID[RegBx] : RegisterByID[RegEbx]);
-			if (reg == 0x20)	p.reg = (p.size == Size8) ? RegisterByID[RegAh] : ((p.size == Size16) ? RegisterByID[RegSp] : RegisterByID[RegEsp]);
-			if (reg == 0x28)	p.reg = (p.size == Size8) ? RegisterByID[RegCh] : ((p.size == Size16) ? RegisterByID[RegBp] : RegisterByID[RegEbp]);
-			if (reg == 0x30)	p.reg = (p.size == Size8) ? RegisterByID[RegDh] : ((p.size == Size16) ? RegisterByID[RegSi] : RegisterByID[RegEsi]);
-			if (reg == 0x38)	p.reg = (p.size == Size8) ? RegisterByID[RegBh] : ((p.size == Size16) ? RegisterByID[RegDi] : RegisterByID[RegEdi]);
+			reg = (reg >> 3) | (state.ExtendModRMReg ? 0x08 : 0x00);
+			p.reg = RegisterByID[GetModRMRegister(reg, p.size)];
 		}
 	}else if (pf.mrm_mode == MRMModRM){
 		unsigned char mod = modrm & 0xc0; // bits 7, 6
 		unsigned char rm = modrm & 0x07; // bits 2, 1, 0
+		if (state.ExtendModRMBase)	rm |= 0x08;
 		if (mod == 0x00){
-			if (small_addr){
+			if (state.AddrSize == Size16){
 				p.type = ParamTRegister;
 				p.deref = true;
 				if (rm == 0x00){p.reg = RegisterByID[RegBx];	p.reg2 = RegisterByID[RegSi];	p.disp = DispModeReg2;	}
@@ -1367,7 +1757,7 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 				if (rm == 0x07)	p.reg = RegisterByID[RegEdi];
 			}
 		}else if ((mod == 0x40) || (mod == 0x80)){
-			if (small_addr){
+			if (state.AddrSize == Size16){
 				p.type = ParamTRegister;
 				p.deref = true;
 				if (rm == 0x00){p.reg = RegisterByID[RegBx];	p.reg2 = RegisterByID[RegSi];	p.disp = (mod == 0x40) ? DispMode8Reg2 : DispMode16Reg2;	}
@@ -1395,14 +1785,8 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 		}else if (mod == 0xc0){
 			p.type = ParamTRegister;
 			p.deref = false;
-			if (rm == 0x00)	p.reg = (p.size == Size8) ? RegisterByID[RegAl] : ((p.size == Size16) ? RegisterByID[RegAx] : RegisterByID[RegEax]);
-			if (rm == 0x01)	p.reg = (p.size == Size8) ? RegisterByID[RegCl] : ((p.size == Size16) ? RegisterByID[RegCx] : RegisterByID[RegEcx]);
-			if (rm == 0x02)	p.reg = (p.size == Size8) ? RegisterByID[RegDl] : ((p.size == Size16) ? RegisterByID[RegDx] : RegisterByID[RegEdx]);
-			if (rm == 0x03)	p.reg = (p.size == Size8) ? RegisterByID[RegBl] : ((p.size == Size16) ? RegisterByID[RegBx] : RegisterByID[RegEbx]);
-			if (rm == 0x04)	p.reg = (p.size == Size8) ? RegisterByID[RegAh] : ((p.size == Size16) ? RegisterByID[RegSp] : RegisterByID[RegEsp]);
-			if (rm == 0x05)	p.reg = (p.size == Size8) ? RegisterByID[RegCh] : ((p.size == Size16) ? RegisterByID[RegBp] : RegisterByID[RegEbp]);
-			if (rm == 0x06)	p.reg = (p.size == Size8) ? RegisterByID[RegDh] : ((p.size == Size16) ? RegisterByID[RegSi] : RegisterByID[RegEsi]);
-			if (rm == 0x07)	p.reg = (p.size == Size8) ? RegisterByID[RegBh] : ((p.size == Size16) ? RegisterByID[RegDi] : RegisterByID[RegEdi]);
+			if (state.ExtendModRMBase)	rm |= 0x08;
+			p.reg = RegisterByID[GetModRMRegister(rm, p.size)];
 		}
 	}
 }
@@ -1445,28 +1829,26 @@ inline void TryGetSIB(InstructionParam &p, char *&cur)
 	}
 }
 
-inline void ReadParamData(char *&cur, InstructionParam &p)
+inline void ReadParamData(char *&cur, InstructionParam &p, bool has_modrm)
 {
 	msg_db_f("ReadParamData", 2+ASM_DB_LEVEL);
 	//char *o = cur;
 	p.value = 0;
 	if (p.type == ParamTImmediate){
 		if (p.deref){
-			if (small_addr){
-				*(short*)&p.value = *(short*)cur;		cur += 2;
-			}else{
-				*(int*)&p.value = *(int*)cur;		cur += 4;
-			}
+			int size = has_modrm ? state.AddrSize : Size64;
+			memcpy(&p.value, cur, size);
+			cur += size;
 		}else{
-			memcpy(&p.value, cur, absolute_size(p.size));
-			cur += absolute_size(p.size);
+			memcpy(&p.value, cur, p.size);
+			cur += p.size;
 		}
-	}else if (p.type == ParamTImmediateDouble){
-		if (small_param){
+	/*}else if (p.type == ParamTImmediateDouble){
+		if (state.ParamSize == Size16){ // addr?
 			*(short*)&p.value = *(short*)cur;	cur += 2;	((short*)&p.value)[2] = *(short*)cur;	cur += 2;
 		}else{
 			memcpy(&p.value, cur, 6);		cur += 6;
-		}
+		}*/
 	}else if (p.type == ParamTRegister){
 		if ((p.disp == DispMode8) || (p.disp == DispMode8Reg2) || (p.disp == DispMode8SIB)){
 			*(char*)&p.value = *cur;		cur ++;
@@ -1483,8 +1865,6 @@ inline void ReadParamData(char *&cur, InstructionParam &p)
 string Disassemble(void *_code_,int length,bool allow_comments)
 {
 	msg_db_f("Disassemble", 1+ASM_DB_LEVEL);
-	/*if (!Instruction)
-		SetInstructionSet(InstructionSetDefault);*/
 
 	char *code = (char*)_code_;
 
@@ -1495,18 +1875,16 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 	char *orig=code;
 	if (length<0)	end=code+65536;
 
-	// code points to the start of the start of the (current) complete command (dword cs: mov ax, ...)
+	// code points to the start of the (current) complete command (dword cs: mov ax, ...)
 	// cur points to the currently processed byte
 	// opcode points to the start of the instruction (mov)
 	char *cur = code;
-	mode16 = false;
-	if (CurrentMetaInfo)
-		mode16 = CurrentMetaInfo->Mode16;
+	state.init();
+	state.DefaultSize = Size32;
 
 
 	while(code < end){
-		small_param = mode16;
-		small_addr = mode16;
+		state.reset();
 		opcode = cur;
 		code = cur;
 
@@ -1554,10 +1932,9 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 			// change of bits (processor mode)
 			for (int i=0;i<CurrentMetaInfo->bit_change.num;i++)
 				if ((long)code-(long)orig == CurrentMetaInfo->bit_change[i].Pos){
-					mode16 = (CurrentMetaInfo->bit_change[i].Bits == 16);
-					small_param = mode16;
-					small_addr = mode16;
-					if (mode16)
+					state.DefaultSize = (CurrentMetaInfo->bit_change[i].Bits == 16) ? Size16 : Size32;
+					state.reset();
+					if (state.DefaultSize == Size16)
 						bufstr += "   bits_16\n";
 					else
 						bufstr += "   bits_32\n";
@@ -1566,10 +1943,26 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 
 		// code
 
-		// praefix (size/segment register)
+		// prefix (size/segment register)
 		Register *seg = NULL;
-		if (cur[0]==0x67){	small_addr = !mode16;		cur++;	}
-		if (cur[0]==0x66){	small_param = !mode16;		cur++;	}
+		if (cur[0]==0x67){
+			state.AddrSize = (state.DefaultSize == Size32) ? Size16 : Size32;
+			cur++;
+		}
+		if (cur[0]==0x66){
+			state.ParamSize = (state.DefaultSize == Size32) ? Size16 : Size32;
+			cur++;
+		}
+		if (InstructionSet.set == InstructionSetAMD64){
+			if ((cur[0] & 0xf0) == 0x40){
+				if ((cur[0] & 0x08) > 0)
+					state.ParamSize = Size64;
+				state.ExtendModRMReg = ((cur[0] & 0x04) > 0);
+				state.ExtendModRMIndex = ((cur[0] & 0x02) > 0);
+				state.ExtendModRMBase = ((cur[0] & 0x01) > 0);
+				cur++;
+			}
+		}
 		if (cur[0]==0x2e){	seg = RegisterByID[RegCs];	cur++;	}
 		else if (cur[0]==0x36){	seg = RegisterByID[RegSs];	cur++;	}
 		else if (cur[0]==0x3e){	seg = RegisterByID[RegDs];	cur++;	}
@@ -1579,18 +1972,22 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 		opcode=cur;
 
 		// instruction
-		sInstruction *inst = NULL;
-		for (int i=0;i<Instruction.num;i++){
+		CPUInstruction *inst = NULL;
+		for (int i=0;i<CPUInstructions.num;i++){
+			if (CPUInstructions[i].has_small_param != (state.ParamSize == Size16))
+				continue;
+			if (CPUInstructions[i].has_big_param != (state.ParamSize == Size64))
+				continue;
 			// opcode correct?
 			bool ok = true;
-			for (int j=0;j<Instruction[i].code_size;j++)
-				if (cur[j] != ((char*)&Instruction[i].code)[j])
+			for (int j=0;j<CPUInstructions[i].code_size;j++)
+				if (cur[j] != ((char*)&CPUInstructions[i].code)[j])
 					ok = false;
 			// cap correct?
-			if (Instruction[i].cap >= 0)
-				ok &= ((unsigned char)Instruction[i].cap == ((unsigned)cur[1] / 8) % 8);
+			if (CPUInstructions[i].cap >= 0)
+				ok &= ((unsigned char)CPUInstructions[i].cap == ((unsigned)cur[1] / 8) % 8);
 			if (ok){
-				inst = &Instruction[i];
+				inst = &CPUInstructions[i];
 				cur += inst->code_size;
 				break;
 			}
@@ -1598,8 +1995,6 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 		if (inst){
 			InstructionParamFuzzy ip1 = inst->param1;
 			InstructionParamFuzzy ip2 = inst->param2;
-			ApplyParamSize(ip1);
-			ApplyParamSize(ip2);
 
 			
 			InstructionParam p1, p2;
@@ -1618,8 +2013,8 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 			}
 
 			// immediate...
-			ReadParamData(cur, p1);
-			ReadParamData(cur, p2);
+			ReadParamData(cur, p1, inst->has_modrm);
+			ReadParamData(cur, p2, inst->has_modrm);
 
 
 
@@ -1634,16 +2029,18 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 			str += inst->name;
 
 			// parameters
-			if (small_param != mode16)
-				str += small_param ? " word" : " dword";
-			if (p1.type != ParamTNone){
-				AddParam(param, p1);
-				str += " " + param;
+			if ((state.ParamSize != state.DefaultSize) && ((p1.type != ParamTRegister) || (p1.deref)) && ((p2.type != ParamTRegister) || p2.deref)){
+				if (state.ParamSize == Size16)
+					str += " word";
+				else if (state.ParamSize == Size32)
+					str += " dword";
+				else if (state.ParamSize == Size64)
+					str += " qword";
 			}
-			if (p2.type != ParamTNone){
-				AddParam(param, p2);
-				str += ", " + param;
-			}
+			if (p1.type != ParamTNone)
+				str += " " + p1.str();
+			if (p2.type != ParamTNone)
+				str += ", " + p2.str();
 			
 			
 			if (allow_comments){
@@ -1871,7 +2268,7 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 			if (seg==ES)	strcat(str,"ES: ");
 			if (seg==FS)	strcat(str,"FS: ");
 			if (seg==GS)	strcat(str,"GS: ");
-			strcat(str,string(Instruction[ae].name,param));
+			strcat(str,string(CPUInstructions[ae].name,param));
 			strcat(buffer,str);
 			if (allow_comments){
 				int l=strlen(str);
@@ -1905,32 +2302,32 @@ bool IgnoreUnimportant(int &pos)
 	// ignore comments and "white space"
 	for (int i=0;i<1048576;i++){
 		if (code_buffer[pos] == 0){
-			EndOfCode = true;
-			EndOfLine = true;
+			state.EndOfCode = true;
+			state.EndOfLine = true;
 			return true;
 		}
 		if (code_buffer[pos] == '\n'){
-			LineNo ++;
-			ColumnNo = 0;
+			state.LineNo ++;
+			state.ColumnNo = 0;
 			CommentLine = false;
 		}
 		// "white space"
 		if ((code_buffer[pos] == '\n') || (code_buffer[pos] == ' ') || (code_buffer[pos] == '\t')){
 			pos ++;
-			ColumnNo ++;
+			state.ColumnNo ++;
 			continue;
 		}
 		// comments
 		if ((code_buffer[pos] == ';') || ((code_buffer[pos] == '/') && (code_buffer[pos] == '/'))){
 			CommentLine = true;
 			pos ++;
-			ColumnNo ++;
+			state.ColumnNo ++;
 			continue;
 		}
 		if (!CommentLine)
 			break;
 		pos ++;
-		ColumnNo ++;
+		state.ColumnNo ++;
 	}
 	return false;
 }
@@ -1939,7 +2336,7 @@ bool IgnoreUnimportant(int &pos)
 string FindMnemonic(int &pos)
 {
 	msg_db_f("GetMne", 1+ASM_DB_LEVEL);
-	EndOfLine = false;
+	state.EndOfLine = false;
 	char mne[128];
 	strcpy(mne, "");
 
@@ -1957,14 +2354,14 @@ string FindMnemonic(int &pos)
 		// end of code
 		if (code_buffer[pos] == 0){
 			mne[i] = 0;
-			EndOfCode = true;
-			EndOfLine = true;
+			state.EndOfCode = true;
+			state.EndOfLine = true;
 			break;
 		}
 		// end of line
 		if (code_buffer[pos] == '\n'){
 			mne[i] = 0;
-			EndOfLine = true;
+			state.EndOfLine = true;
 			break;
 		}
 		if (!in_string){
@@ -1975,14 +2372,14 @@ string FindMnemonic(int &pos)
 				for (int j=0;j<128;j++){
 					if ((code_buffer[pos+j] != ' ') && (code_buffer[pos+j] != '\t') && (code_buffer[pos+j] != ',')){
 						if ((code_buffer[pos + j] == 0) || (code_buffer[pos + j] == '\n'))
-							EndOfLine = true;
+							state.EndOfLine = true;
 						// comment ending the line
 						if ((code_buffer[pos + j] == ';') || ((code_buffer[pos + j] == '/') && (code_buffer[pos + j + 1] == '/')))
-							EndOfLine = true;
+							state.EndOfLine = true;
 						pos += j;
-						ColumnNo += j;
+						state.ColumnNo += j;
 						if (code_buffer[pos] == '\n')
-							ColumnNo = 0;
+							state.ColumnNo = 0;
 						break;
 					}
 				}
@@ -1990,7 +2387,7 @@ string FindMnemonic(int &pos)
 			}
 		}
 		pos ++;
-		ColumnNo ++;
+		state.ColumnNo ++;
 	}
 	/*msg_write>Write(mne);
 	if (EndOfLine)
@@ -2079,7 +2476,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 	// hex const
 	}else if ((param[0] == '0') && (param[1] == 'x')){
 		p.type = ParamTImmediate;
-		int v = 0;
+		long long v = 0;
 		for (int i=2;i<param.num;i++){
 			if (param[i] == '.'){
 			}else if ((param[i] >= 'a') && (param[i] <= 'f')){
@@ -2092,7 +2489,8 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 				v*=16;
 				v+=param[i]-'0';
 			}else if (param[i]==':'){
-				InstructionParam sub;
+				SetError("':' currently not supported");
+				/*InstructionParam sub;
 				GetParam(sub, param.tail(param.num - i), list, pn);
 				if (sub.type != ParamTImmediate){
 					SetError("error in hex parameter:  " + string(param));
@@ -2102,7 +2500,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 				p.value = (long)v;
 				p.value <<= 32;
 				p.value += sub.value;
-				p.type = ParamTImmediateDouble;
+				p.type = ParamTImmediateDouble;*/
 				break;
 			}else{
 				SetError("evil character in hex parameter:  \"" + param + "\"");
@@ -2110,12 +2508,16 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 				return;
 			}
 			p.value = (long)v;
+			p.size = Size8;
+			if (param.num > 4)
+				p.size = Size16;
+			if (param.num > 6)
+				p.size = Size32;
+			if (param.num > 10)
+				p.size = Size64;
 		}
 		if (DebugAsm){
-			if (p.type == ParamTImmediateDouble)
-				printf("hex const:  %s:%s\n",d2h((char*)&p.value+4,2).c_str(),d2h((char*)&p.value,4).c_str());
-			else
-				printf("hex const:  %s\n",d2h((char*)&p.value,4).c_str());
+			printf("hex const:  %s\n",d2h((char*)&p.value,p.size).c_str());
 		}
 
 	// char const
@@ -2129,6 +2531,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 	}else if (param == "$"){
 		p.value = list.add_label(param, true);
 		p.type = ParamTImmediate;
+		p.size = Size32;
 		p.is_label = true;
 		so("label:  " + param + "\n");
 		
@@ -2147,6 +2550,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 			if (list.label[i].Name == param){
 				p.value = i;
 				p.type = ParamTImmediate;
+				p.size = Size32;
 				p.is_label = true;
 				so("label:  " + param + "\n");
 				return;
@@ -2156,6 +2560,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 			if (CurrentMetaInfo->global_var[i].Name == param){
 				p.value = (long)CurrentMetaInfo->global_var[i].Pos;
 				p.type = ParamTImmediate;
+				p.size = CurrentMetaInfo->global_var[i].Size;
 				p.deref = true;
 				so("global variable:  \"" + param + "\"\n");
 				return;
@@ -2167,24 +2572,12 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 			p.value = list.add_label(param, false);
 			p.type = ParamTImmediate;
 			p.is_label = true;
+			p.size = Size32;
 			return;
 		}
 	}
 	if (p.type == ParamTInvalid)
 		SetError("unknown parameter:  \"" + param + "\"\n");
-}
-
-// complete size of command??
-int AppraiseCommandSize(InstructionWithParams &i)
-{
-	msg_db_f("CalcCommandSize", 1+ASM_DB_LEVEL);
-	int size = 4; // 1 prefix + 2 opcode + 1 modrm
-	
-	if ((i.p1.type == ParamTImmediate) && (!i.p1.deref)) // TODO why !deref?!?!?
-		size += absolute_size(i.p1.size);
-	if ((i.p2.type == ParamTImmediate) && (!i.p2.deref))
-		size += absolute_size(i.p2.size);
-	return size;
 }
 
 inline void insert_val(char *oc, int &ocs, long long val, int size)
@@ -2195,6 +2588,8 @@ inline void insert_val(char *oc, int &ocs, long long val, int size)
 		*(short*)&oc[ocs] = (short)val;
 	else if (size == 4)
 		*(int*)&oc[ocs] = (int)val;
+	else if (size == 8)
+		*(long long int*)&oc[ocs] = val;
 	else
 		memcpy(&oc[ocs], &val, size);
 }
@@ -2205,25 +2600,31 @@ inline void append_val(char *oc, int &ocs, long long val, int size)
 	ocs += size;
 }
 
-void OpcodeAddImmideate(char *oc, int &ocs, InstructionParamFuzzy &ip, InstructionParam &p, sInstruction &inst, InstructionWithParamsList &list)
+void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction &inst, InstructionWithParamsList &list, int next_param_size)
 {
+	long long value = p.value;
 	int size = 0;
 	if (p.type == ParamTImmediate){
-		if (p.deref)
-			size = small_addr ? 2 : 4;
-		else
-			size = absolute_size(ip.size);
-	}else if (p.type == ParamTImmediateDouble){
-		size = small_param ? 2 : 4;  // bits 0-15  /  0-31
+		size = p.size;
+		if (p.deref){
+			size = state.AddrSize; // inst.has_big_addr
+			if (InstructionSet.set == InstructionSetAMD64){
+				if (inst.has_modrm)
+					value -= (long)oc + ocs + size + next_param_size; // amd64 uses RIP-relative addressing!
+				else
+					size = Size64;
+			}
+		}
+	/*}else if (p.type == ParamTImmediateDouble){
+		size = state.ParamSize;  // bits 0-15  /  0-31 */
 	}else if (p.type == ParamTRegister){
-		if (p.disp == DispMode8)	size = 1;
-		if (p.disp == DispMode16)	size = 2;
-		if (p.disp == DispMode32)	size = 4;
+		if (p.disp == DispMode8)	size = Size8;
+		if (p.disp == DispMode16)	size = Size16;
+		if (p.disp == DispMode32)	size = Size32;
 	}else
 		return;
 
-	long long value = p.value;
-	bool rel = ((inst.name[0] == 'j') && (inst.param1._type_ != ParamTImmediateDouble)) || (inst.name == "call") || (inst.name.find("loop") >= 0);
+	bool rel = ((inst.name[0] == 'j') /*&& (inst.param1._type_ != ParamTImmediateDouble)*/) || (inst.name == "call") || (inst.name.find("loop") >= 0);
 	if (p.is_label){
 		WantedLabel w;
 		w.Pos = ocs;// + CurrentMetaInfo->PreInsertionLength;
@@ -2235,14 +2636,14 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParamFuzzy &ip, Instructi
 		list.wanted_label.add(w);
 		so("add wanted label");
 	}else if (rel){
-		value -= (long)oc + ocs + size; // TODO ...first byte of next opcode
+		value -= (long)oc + ocs + size + next_param_size; // TODO ...first byte of next opcode
 	}
 
 	append_val(oc, ocs, value, size);
 
 
-	if (p.type == ParamTImmediateDouble)
-		append_val(oc, ocs, p.value >> 32, 2); // bits 33-47
+/*	if (p.type == ParamTImmediateDouble)
+		append_val(oc, ocs, p.value >> 32, 2); // bits 33-47 */
 }
 
 void InstructionWithParamsList::LinkWantedLabels(void *oc)
@@ -2265,9 +2666,11 @@ void InstructionWithParamsList::LinkWantedLabels(void *oc)
 	}
 }
 
-void InstructionWithParamsList::AppendFromSource(const char *code)
+void InstructionWithParamsList::AppendFromSource(const string &_code)
 {
 	msg_db_f("AppendFromSource", 1+ASM_DB_LEVEL);
+
+	const char *code = _code.c_str();
 
 	if (CurrentMetaInfo){
 		CurrentMetaInfo->PreInsertionLength = CurrentMetaInfo->CurrentOpcodePos; // position of the block withing (overall) opcode
@@ -2275,25 +2678,25 @@ void InstructionWithParamsList::AppendFromSource(const char *code)
 		SetError("no CurrentMetaInfo");
 	}
 
-	LineNo = CurrentMetaInfo->LineOffset;
-	ColumnNo = 0;
+	state.LineNo = CurrentMetaInfo->LineOffset;
+	state.ColumnNo = 0;
 
 	// CurrentMetaInfo->CurrentOpcodePos // Anfang aktuelle Zeile im gesammten Opcode
 	code_buffer = code; // Asm-Source-Puffer
 
 	int pos = 0;
 	InstructionParam p1, p2;
-	mode16 = false;
+	state.DefaultSize = Size32;
 	if (CurrentMetaInfo)
-		mode16 = CurrentMetaInfo->Mode16;
-	EndOfCode = false;
-	while((unsigned)pos < strlen(code) - 2){
+		if (CurrentMetaInfo->Mode16)
+			state.DefaultSize = Size16;
+	state.EndOfCode = false;
+	while((unsigned)pos < _code.num - 2){
 
 		string cmd, param1, param2;
 
 		//msg_write("..");
-		small_param = mode16;
-		small_addr = mode16;
+		state.reset();
 #if 0
 		if (CurrentMetaInfo){
 			CurrentMetaInfo->CurrentOpcodePos = CurrentMetaInfo->PreInsertionLength + CodeLength;
@@ -2305,24 +2708,29 @@ void InstructionWithParamsList::AppendFromSource(const char *code)
 	// interpret asm code (1 line)
 		// find command
 		cmd = FindMnemonic(pos);
-		current_line = LineNo;
-		current_col = ColumnNo;
+		current_line = state.LineNo;
+		current_col = state.ColumnNo;
 		//msg_write(cmd);
 		if (cmd.num == 0)
 			break;
 		// find parameters
-		if (!EndOfLine){
+		if (!state.EndOfLine){
 			param1 = FindMnemonic(pos);
-			if ((param1 == "dword") || (param1 == "word")){
-				small_param = (param1 == "word");
-				if (!EndOfLine)
+			if ((param1 == "dword") || (param1 == "word") || (param1 == "qword")){
+				if (param1 == "word")
+					state.ParamSize = Size16;
+				else if (param1 == "dword")
+					state.ParamSize = Size32;
+				else if (param1 == "qword")
+					state.ParamSize = Size64;
+				if (!state.EndOfLine)
 					param1 = FindMnemonic(pos);
 			}
 		}
-		if (!EndOfLine)
+		if (!state.EndOfLine)
 			param2 = FindMnemonic(pos);
 		//msg_write(string2("----: %s %s%s %s", cmd, param1, (strlen(param2)>0)?",":"", param2));
-		if (EndOfCode)
+		if (state.EndOfCode)
 			break;
 		so("------------------------------");
 		so(cmd);
@@ -2339,9 +2747,8 @@ void InstructionWithParamsList::AppendFromSource(const char *code)
 	// special stuff
 		if (cmd == "bits_16"){
 			so("16 bit Modus!");
-			mode16 = true;
-			small_addr = true;
-			small_param = true;
+			state.DefaultSize = Size16;
+			state.reset();
 			if (CurrentMetaInfo){
 				CurrentMetaInfo->Mode16 = true;
 				BitChange b;
@@ -2352,9 +2759,8 @@ void InstructionWithParamsList::AppendFromSource(const char *code)
 			continue;
 		}else if (cmd == "bits_32"){
 			so("32 bit Modus!");
-			mode16 = false;
-			small_addr = false;
-			small_param = false;
+			state.DefaultSize = Size32;
+			state.reset();
 			if (CurrentMetaInfo){
 				CurrentMetaInfo->Mode16 = false;
 				BitChange b;
@@ -2431,7 +2837,7 @@ void InstructionWithParamsList::AppendFromSource(const char *code)
 		if (inst < 0)
 			SetError("unknown instruction:  " + cmd);
 		// prefix
-		if (small_param != mode16){
+		if (state.ParamSize != state.DefaultSize){
 			//buffer[CodeLength ++] = 0x66;
 			SetError("prefix unhandled:  " + cmd);
 		}
@@ -2444,7 +2850,7 @@ void InstructionWithParamsList::AppendFromSource(const char *code)
 		add(iwp);
 
 
-		if (EndOfCode)
+		if (state.EndOfCode)
 			break;
 	}
 }
@@ -2475,8 +2881,8 @@ inline bool _size_match_(InstructionParamFuzzy &inst_p, InstructionParam &wanted
 		return true;
 	if ((inst_p.size == SizeUnknown) || (wanted_p.size == SizeUnknown))
 		return true;
-	if ((inst_p.size == Size16or32) && ((wanted_p.size == Size16) || (wanted_p.size == Size32)))
-		return true;
+/*	if ((inst_p.size == SizeVariable) && ((wanted_p.size == Size16) || (wanted_p.size == Size32)))
+		return true;*/
 	return false;
 }
 
@@ -2487,34 +2893,40 @@ inline bool _deref_match_(InstructionParamFuzzy &inst_p, InstructionParam &wante
 	return true;
 }
 
-inline bool _test_param_(InstructionParamFuzzy &inst_p, InstructionParam &wanted_p)
+bool InstructionParamFuzzy::match(InstructionParam &wanted_p)
 {
 	//ParamFuzzyOut(&inst_p);
 	
 	// none
-	if ((wanted_p.type == ParamTNone) || (!inst_p.used))
-		return (wanted_p.type == ParamTNone) && (!inst_p.used);
+	if ((wanted_p.type == ParamTNone) || (!used))
+		return (wanted_p.type == ParamTNone) && (!used);
+
+	if ((size != SizeUnknown) && (wanted_p.size != SizeUnknown))
+		if (size != wanted_p.size)
+			return false;
 
 	// immediate
 	if (wanted_p.type == ParamTImmediate){
-		if ((inst_p.allow_memory_address) && (wanted_p.deref))
+		if ((allow_memory_address) && (wanted_p.deref))
 			return true;
-		if ((inst_p.allow_immediate) && (!wanted_p.deref))
-			return true;
+		if ((allow_immediate) && (!wanted_p.deref)){
+			//msg_write("imm " + SizeOut(inst_p.size) + " " + SizeOut(wanted_p.size));
+			return (size == wanted_p.size);
+		}
 		return false;
 	}
 
 	// immediate double
-	if (wanted_p.type == ParamTImmediateDouble){
-		if ((inst_p.allow_immediate) && (inst_p._type_ == ParamTImmediateDouble))
+/*	if (wanted_p.type == ParamTImmediateDouble){
+		if ((allow_immediate) && (_type_ == ParamTImmediateDouble))
 			return true;
-	}
+	}*/
 
 	// reg
 	if (wanted_p.type == ParamTRegister){
 		// direct match
-		if ((inst_p.allow_register) && (inst_p.reg)){
-			return ((inst_p.reg == wanted_p.reg) && (_deref_match_(inst_p, wanted_p)));
+		if ((allow_register) && (reg)){
+			return ((reg == wanted_p.reg) && (_deref_match_(*this, wanted_p)));
 		}
 		// fuzzy match
 		/*if (inst_p.allow_register){
@@ -2523,12 +2935,12 @@ inline bool _test_param_(InstructionParamFuzzy &inst_p, InstructionParam &wanted
 			return ((inst_p.reg_group == wanted_p.reg->group) && (_size_match_(inst_p, wanted_p)) && (_deref_match_(inst_p, wanted_p)));
 		}*/
 		// very fuzzy match
-		if ((inst_p.allow_register) || (inst_p.allow_memory_indirect)){
+		if ((allow_register) || (allow_memory_indirect)){
 			if (wanted_p.deref){
-				if (inst_p.allow_memory_indirect)
-					return ((inst_p.reg_group == wanted_p.reg->group) && (_deref_match_(inst_p, wanted_p)));
-			}else if (inst_p.allow_register)
-				return ((inst_p.reg_group == wanted_p.reg->group) && (_size_match_(inst_p, wanted_p))); // FIXME (correct?)
+				if (allow_memory_indirect)
+					return ((reg_group == wanted_p.reg->group) && (_deref_match_(*this, wanted_p)));
+			}else if (allow_register)
+				return ((reg_group == wanted_p.reg->group) && (_size_match_(*this, wanted_p))); // FIXME (correct?)
 		}
 	}
 
@@ -2536,7 +2948,7 @@ inline bool _test_param_(InstructionParamFuzzy &inst_p, InstructionParam &wanted
 }
 
 // translate from easy parameters to assembler usable parameters
-InstructionParam _make_param_(int type, long long param)
+InstructionParam _make_param_(int type, int size, long long param)
 {
 	InstructionParam i;
 	i.reg = NULL;
@@ -2547,17 +2959,9 @@ InstructionParam _make_param_(int type, long long param)
 	i.is_label = false;
 	if (type == PKNone){
 		i.type = ParamTNone;
-	}else if (type == PKConstant8){
+	}else if (type == PKConstant){
 		i.type = ParamTImmediate;
-		i.size = Size8;
-		i.value = param;
-	}else if (type == PKConstant16){
-		i.type = ParamTImmediate;
-		i.size = Size16;
-		i.value = param;
-	}else if (type == PKConstant32){
-		i.type = ParamTImmediate;
-		i.size = Size32;
+		i.size = size;
 		i.value = param;
 	}else if (type == PKLabel){
 		i.type = ParamTImmediate;
@@ -2567,17 +2971,19 @@ InstructionParam _make_param_(int type, long long param)
 	}else if (type == PKDerefConstant){
 		i.type = ParamTImmediate;
 		i.deref = true;
+		i.size = size;
 		i.value = param;
-	}else if ((type == PKLocal) || (type == PKEdxRel)){
+	}else if (type == PKEdxRel){
 		i.type = ParamTRegister;
-		i.reg = (type == PKLocal) ? RegisterByID[RegEbp] : RegisterByID[RegEdx];
+		i.reg = RegisterByID[RegEdx];
 		i.deref = true;
 		i.disp = ((param < 120) && (param > -120)) ? DispMode8 : DispMode32;
 		i.value = param;
 	}else if (type == PKLocal){
 		i.type = ParamTRegister;
-		i.reg = RegisterByID[RegEsp];
+		i.reg = RegisterByID[RegEbp];
 		i.deref = true;
+		i.size = size;
 		i.disp = ((param < 120) && (param > -120)) ? DispMode8 : DispMode32;
 		i.value = param;
 	}else if (type == PKRegister){
@@ -2587,58 +2993,64 @@ InstructionParam _make_param_(int type, long long param)
 	}else if (type == PKDerefRegister){
 		i.type = ParamTRegister;
 		i.reg = RegisterByID[(long)param];
-		//i.size = i.reg->size; // ???
+		i.size = size;
 		i.deref = true;
 	}
 	return i;
 }
 
+char GetModRMReg(Register *r)
+{
+	// TODO  already create REX byte...
+	int id = r->id;
+	if ((id == RegR8)  || (id == RegR8d)  || (id == RegRax) || (id == RegEax) || (id == RegAx) || (id == RegAl))	return 0x00;
+	if ((id == RegR9)  || (id == RegR9d)  || (id == RegRcx) || (id == RegEcx) || (id == RegCx) || (id == RegCl))	return 0x01;
+	if ((id == RegR10) || (id == RegR10d) || (id == RegRdx) || (id == RegEdx) || (id == RegDx) || (id == RegDl))	return 0x02;
+	if ((id == RegR11) || (id == RegR11d) || (id == RegRbx) || (id == RegEbx) || (id == RegBx) || (id == RegBl))	return 0x03;
+	if ((id == RegR12) || (id == RegR12d) || (id == RegRsp) || (id == RegEsp) || (id == RegSp) || (id == RegAh))	return 0x04;
+	if ((id == RegR13) || (id == RegR13d) || (id == RegRbp) || (id == RegEbp) || (id == RegBp) || (id == RegCh))	return 0x05;
+	if ((id == RegR14) || (id == RegR14d) || (id == RegRsi) || (id == RegEsi) || (id == RegSi) || (id == RegDh))	return 0x06;
+	if ((id == RegR15) || (id == RegR15d) || (id == RegRdi) || (id == RegEdi) || (id == RegDi) || (id == RegBh))	return 0x07;
+	if ((id >= RegXmm0) && (id <= RegXmm7))	return (id - RegXmm0);
+	SetError("GetModRMReg: register not allowed: " + r->name);
+	return 0;
+}
+
 inline char CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &p)
 {
+	int r = -1;
+	if (p.reg)
+		r = p.reg->id;
 	if (pf.mrm_mode == MRMReg){
-		if (p.reg == RegisterByID[RegEs])	return 0x00;
-		if (p.reg == RegisterByID[RegCs])	return 0x08;
-		if (p.reg == RegisterByID[RegSs])	return 0x10;
-		if (p.reg == RegisterByID[RegDs])	return 0x18;
-		if (p.reg == RegisterByID[RegFs])	return 0x20;
-		if (p.reg == RegisterByID[RegGs])	return 0x28;
-		if (p.reg == RegisterByID[RegCr0])	return 0x00;
-		if (p.reg == RegisterByID[RegCr1])	return 0x08;
-		if (p.reg == RegisterByID[RegCr2])	return 0x10;
-		if (p.reg == RegisterByID[RegCr3])	return 0x18;
-		if ((p.reg == RegisterByID[RegEax]) || (p.reg == RegisterByID[RegAx]) || (p.reg == RegisterByID[RegAl]))	return 0x00;
-		if ((p.reg == RegisterByID[RegEcx]) || (p.reg == RegisterByID[RegCx]) || (p.reg == RegisterByID[RegCl]))	return 0x08;
-		if ((p.reg == RegisterByID[RegEdx]) || (p.reg == RegisterByID[RegDx]) || (p.reg == RegisterByID[RegDl]))	return 0x10;
-		if ((p.reg == RegisterByID[RegEbx]) || (p.reg == RegisterByID[RegBx]) || (p.reg == RegisterByID[RegBl]))	return 0x18;
-		if ((p.reg == RegisterByID[RegEsp]) || (p.reg == RegisterByID[RegSp]) || (p.reg == RegisterByID[RegAh]))	return 0x20;
-		if ((p.reg == RegisterByID[RegEbp]) || (p.reg == RegisterByID[RegBp]) || (p.reg == RegisterByID[RegCh]))	return 0x28;
-		if ((p.reg == RegisterByID[RegEsi]) || (p.reg == RegisterByID[RegSi]) || (p.reg == RegisterByID[RegDh]))	return 0x30;
-		if ((p.reg == RegisterByID[RegEdi]) || (p.reg == RegisterByID[RegDi]) || (p.reg == RegisterByID[RegBh]))	return 0x38;
+		if (r == RegEs)	return 0x00;
+		if (r == RegCs)	return 0x08;
+		if (r == RegSs)	return 0x10;
+		if (r == RegDs)	return 0x18;
+		if (r == RegFs)	return 0x20;
+		if (r == RegGs)	return 0x28;
+		if (r == RegCr0)	return 0x00;
+		if (r == RegCr1)	return 0x08;
+		if (r == RegCr2)	return 0x10;
+		if (r == RegCr3)	return 0x18;
+		return GetModRMReg(p.reg) << 3;
 	}else if (pf.mrm_mode == MRMModRM){
 		if (p.deref){
-			if (small_addr){
+			if (state.AddrSize == Size16){
 				if ((p.type == ParamTImmediate) && (p.deref))	return 0x06;
 			}else{
-				if (p.reg == RegisterByID[RegEax])	return (p.disp == DispModeNone) ? 0x00 : ((p.disp == DispMode8) ? 0x40 : 0x80); // default = DispMode32
-				if (p.reg == RegisterByID[RegEcx])	return (p.disp == DispModeNone) ? 0x01 : ((p.disp == DispMode8) ? 0x41 : 0x81);
-				if (p.reg == RegisterByID[RegEdx])	return (p.disp == DispModeNone) ? 0x02 : ((p.disp == DispMode8) ? 0x42 : 0x82);
-				if (p.reg == RegisterByID[RegEbx])	return (p.disp == DispModeNone) ? 0x03 : ((p.disp == DispMode8) ? 0x43 : 0x83);
+				if ((r == RegEax) || (r == RegRax))	return (p.disp == DispModeNone) ? 0x00 : ((p.disp == DispMode8) ? 0x40 : 0x80); // default = DispMode32
+				if ((r == RegEcx) || (r == RegRcx))	return (p.disp == DispModeNone) ? 0x01 : ((p.disp == DispMode8) ? 0x41 : 0x81);
+				if ((r == RegEdx) || (r == RegRdx))	return (p.disp == DispModeNone) ? 0x02 : ((p.disp == DispMode8) ? 0x42 : 0x82);
+				if ((r == RegEbx) || (r == RegRbx))	return (p.disp == DispModeNone) ? 0x03 : ((p.disp == DispMode8) ? 0x43 : 0x83);
 				// sib			return 4;
 				// disp32		return 5;
 				if ((p.type == ParamTImmediate) && (p.deref))	return 0x05;
-				if (p.reg == RegisterByID[RegEbp])	return (p.disp == DispMode8) ? 0x045 : 0x85;
-				if (p.reg == RegisterByID[RegEsi])	return (p.disp == DispModeNone) ? 0x06 : ((p.disp == DispMode8) ? 0x46 : 0x86);
-				if (p.reg == RegisterByID[RegEdi])	return (p.disp == DispModeNone) ? 0x07 : ((p.disp == DispMode8) ? 0x47 : 0x87);
+				if ((r == RegEbp) || (r == RegRbp))	return (p.disp == DispMode8) ? 0x45 : 0x85;
+				if ((r == RegEsi) || (r == RegRsi))	return (p.disp == DispModeNone) ? 0x06 : ((p.disp == DispMode8) ? 0x46 : 0x86);
+				if ((r == RegEdi) || (r == RegRdi))	return (p.disp == DispModeNone) ? 0x07 : ((p.disp == DispMode8) ? 0x47 : 0x87);
 			}
 		}else{
-			if ((p.reg == RegisterByID[RegEax]) || (p.reg == RegisterByID[RegAx]) || (p.reg == RegisterByID[RegAl]))	return 0xc0;
-			if ((p.reg == RegisterByID[RegEcx]) || (p.reg == RegisterByID[RegCx]) || (p.reg == RegisterByID[RegCl]))	return 0xc1;
-			if ((p.reg == RegisterByID[RegEdx]) || (p.reg == RegisterByID[RegDx]) || (p.reg == RegisterByID[RegDl]))	return 0xc2;
-			if ((p.reg == RegisterByID[RegEbx]) || (p.reg == RegisterByID[RegBx]) || (p.reg == RegisterByID[RegBl]))	return 0xc3;
-			if ((p.reg == RegisterByID[RegEsp]) || (p.reg == RegisterByID[RegSp]) || (p.reg == RegisterByID[RegAh]))	return 0xc4;
-			if ((p.reg == RegisterByID[RegEbp]) || (p.reg == RegisterByID[RegBp]) || (p.reg == RegisterByID[RegCh]))	return 0xc5;
-			if ((p.reg == RegisterByID[RegEsi]) || (p.reg == RegisterByID[RegSi]) || (p.reg == RegisterByID[RegDh]))	return 0xc6;
-			if ((p.reg == RegisterByID[RegEdi]) || (p.reg == RegisterByID[RegDi]) || (p.reg == RegisterByID[RegBh]))	return 0xc7;
+			return GetModRMReg(p.reg) | 0xc0;
 		}
 	}
 	if (pf.mrm_mode != MRMNone)
@@ -2646,7 +3058,7 @@ inline char CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &
 	return 0x00;
 }
 
-char CreateModRMByte(sInstruction &inst, InstructionParam &p1, InstructionParam &p2)
+char CreateModRMByte(CPUInstruction &inst, InstructionParam &p1, InstructionParam &p2)
 {
 	char mrm = CreatePartialModRMByte(inst.param1, p1) | CreatePartialModRMByte(inst.param2, p2);
 	if (inst.cap >= 0)
@@ -2654,9 +3066,24 @@ char CreateModRMByte(sInstruction &inst, InstructionParam &p1, InstructionParam 
 	return mrm;
 }
 
-void OpcodeAddInstruction(char *oc, int &ocs, sInstruction &inst, InstructionParam &p1, InstructionParam &p2, InstructionWithParamsList &list)
+void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionParam &p1, InstructionParam &p2, InstructionWithParamsList &list)
 {
 	msg_db_f("OpcodeAddInstruction", 1+ASM_DB_LEVEL);
+
+	// 16 bit prefix
+	if (inst.has_small_param)
+		append_val(oc, ocs, 0x66, 1);
+
+	// REX prefix
+	char rex = 0;
+	if (inst.has_big_param)//state.ParamSize == Size64)
+		rex |= 0x08;
+	if (p1.reg && p1.reg->extend_mod_rm)
+		rex |= 0x01;
+	if (p2.reg && p2.reg->extend_mod_rm)
+		rex |= 0x04;
+	if (rex != 0)
+		append_val(oc, ocs, 0x40 | rex, 1);
 
 	// add opcode
 	*(int*)&oc[ocs] = inst.code;
@@ -2666,67 +3093,84 @@ void OpcodeAddInstruction(char *oc, int &ocs, sInstruction &inst, InstructionPar
 	if (inst.has_modrm)
 		oc[ocs ++] = CreateModRMByte(inst, p1, p2);
 
-	InstructionParamFuzzy ip1 = inst.param1;
-	InstructionParamFuzzy ip2 = inst.param2;
-	ApplyParamSize(ip1);
-	ApplyParamSize(ip2);
-
 	OCParam = ocs;
 
-	OpcodeAddImmideate(oc, ocs, ip1, p1, inst, list);
-	OpcodeAddImmideate(oc, ocs, ip2, p2, inst, list);
+	int param2_size = 0;
+	if (p2.type == ParamTImmediate)
+		param2_size = p2.size;
+
+	OpcodeAddImmideate(oc, ocs, p1, inst, list, param2_size);
+	OpcodeAddImmideate(oc, ocs, p2, inst, list, 0);
 }
 
-bool InstructionWithParamsList::AddInstruction(char *oc, int &ocs, int n)
+void InstructionWithParamsList::AddInstruction(char *oc, int &ocs, int n)
 {
 	msg_db_f("AsmAddInstructionLow", 1+ASM_DB_LEVEL);
 
 	int ocs0 = ocs;
 	InstructionWithParams &iwp = (*this)[n];
 	current_inst = n;
+	state.reset();
 
 	// test if any instruction matches our wishes
 	int ninst = -1;
 	bool has_mod_rm = false;
-	for (int i=0;i<Instruction.num;i++)
-		if (Instruction[i].inst == iwp.inst){
-			InstructionParamFuzzy ip1 = Instruction[i].param1;
-			InstructionParamFuzzy ip2 = Instruction[i].param2;
-			ApplyParamSize(ip1);
-			ApplyParamSize(ip2);
-			if ((_test_param_(ip1, iwp.p1)) && (_test_param_(ip2, iwp.p2))){
-
-				if (((!Instruction[i].has_modrm) && (has_mod_rm)) || (ninst < 0)){
-					has_mod_rm = Instruction[i].has_modrm;
-					ninst = i;
-				}
-				
-				if (DebugAsm)
-					Instruction[i].print();
+	for (int i=0;i<CPUInstructions.num;i++)
+		if (CPUInstructions[i].match(iwp)){
+			if (((!CPUInstructions[i].has_modrm) && (has_mod_rm)) || (ninst < 0)){
+				has_mod_rm = CPUInstructions[i].has_modrm;
+				ninst = i;
 			}
 		}
 
-	// compile
-	if (ninst >= 0){
-		OpcodeAddInstruction(oc, ocs, Instruction[ninst], iwp.p1, iwp.p2, *this);
-		iwp.size = ocs - ocs0;
-	}
-	/*else
-		Error(string("unknown instruction:  ",cmd));*/
-	//msg_write(d2h(&oc[ocs0], ocs - ocs0, false));
+/*	// try again with REX prefix?
+ // now done automatically...!
+	if ((ninst < 0) && (InstructionSet.set == InstructionSetAMD64)){
+		state.ParamSize = Size64;
 
-	return (ninst >= 0);
+		for (int i=0;i<CPUInstructions.num;i++)
+			if (CPUInstructions[i].match(iwp)){
+				if (((!CPUInstructions[i].has_modrm) && (has_mod_rm)) || (ninst < 0)){
+					has_mod_rm = CPUInstructions[i].has_modrm;
+					ninst = i;
+				}
+			}
+
+	}*/
+
+	// none found?
+	if (ninst < 0){
+		state.LineNo = iwp.line;
+		for (int i=0;i<NUM_INSTRUCTION_NAMES;i++)
+			if (InstructionNames[i].inst == iwp.inst)
+				SetError("command not compatible with its parameters\n" + InstructionNames[i].name + " " + iwp.p1.str() + " " + iwp.p2.str());
+		SetError(format("instruction unknown: %d", iwp.inst));
+	}
+
+
+	if (DebugAsm)
+		CPUInstructions[ninst].print();
+
+	// compile
+	OpcodeAddInstruction(oc, ocs, CPUInstructions[ninst], iwp.p1, iwp.p2, *this);
+	iwp.size = ocs - ocs0;
+
+	//msg_write(d2h(&oc[ocs0], ocs - ocs0, false));
 }
 
 void InstructionWithParamsList::ShrinkJumps(void *oc, int ocs)
 {
+	// first pass compilation (we need real jump distances)
 	int _ocs = ocs;
 	Compile(oc, _ocs);
 
+	// try shrinking
 	foreachi(InstructionWithParams &iwp, *this, i){
 		if ((iwp.inst == inst_jmp) || (iwp.inst == inst_jz) || (iwp.inst == inst_jnz)){
 			if (iwp.p1.is_label){
 				int target = label[iwp.p1.value].InstNo;
+
+				// jump distance
 				int dist = 0;
 				for (int j=i+1;j<target;j++)
 					dist += (*this)[j].size;
@@ -2736,9 +3180,6 @@ void InstructionWithParamsList::ShrinkJumps(void *oc, int ocs)
 
 				if (dist < 127){
 					so("really shrink");
-					if (iwp.inst == inst_jmp)	iwp.inst = inst_jmp_b;
-					if (iwp.inst == inst_jz)	iwp.inst = inst_jz_b;
-					if (iwp.inst == inst_jnz)	iwp.inst = inst_jnz_b;
 					iwp.p1.size = Size8;
 				}
 			}
@@ -2753,6 +3194,9 @@ void InstructionWithParamsList::Optimize(void *oc, int ocs)
 
 void InstructionWithParamsList::Compile(void *oc, int &ocs)
 {
+	state.DefaultSize = Size32;
+	state.reset();
+
 	for (int i=0;i<num+1;i++){
 		// defining a label?
 		for (int j=0;j<label.num;j++)
@@ -2764,21 +3208,20 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 			break;
 
 		// opcode
-		if (!AddInstruction((char*)oc, ocs, i))
-			SetError("instruction is not compatible with its parameters (a):  ");// + cmd + " " + param1 + " " + param2);
+		AddInstruction((char*)oc, ocs, i);
 	}
 
 	LinkWantedLabels(oc);
 
 	if (wanted_label.num > 0){
-		LineNo = (*this)[wanted_label[0].InstNo].line;
-		ColumnNo = (*this)[wanted_label[0].InstNo].col;
+		state.LineNo = (*this)[wanted_label[0].InstNo].line;
+		state.ColumnNo = (*this)[wanted_label[0].InstNo].col;
 		SetError("undeclared label used: " + wanted_label[0].Name);
 	}
 }
 
 // only used for error messages
-void param2str(string &str, int type, void *param)
+void param2str(string &str, int type, int size, void *param)
 {
 	switch(type){
 		case PKNone:
@@ -2795,7 +3238,7 @@ void param2str(string &str, int type, void *param)
 				str += "-----evil----";
 			break;
 		case PKDerefRegister:
-			str = "deref reg ";
+			str = get_size_name(size) + " deref reg ";
 			if (((long)param >= 0) && ((long)param < RegisterByID.num)){
 				if (RegisterByID[(long)param])
 					str += RegisterByID[(long)param]->name;
@@ -2805,25 +3248,19 @@ void param2str(string &str, int type, void *param)
 				str += "-----evil----";
 			break;
 		case PKLocal:
-			str = "local " + d2h(&param, 4);
+			str = get_size_name(size) + " local " + d2h(&param, 4);
 			break;
 		case PKEdxRel:
 			str = "edx rel " + d2h(&param, 4);
 			break;
-		case PKConstant32:
-			str = "const32 " + d2h(&param, 4);
+		case PKConstant:
+			str = "const " + d2h(&param, size);
 			break;
-		case PKConstant16:
-			str = "const16 " + d2h(&param, 2);
-			break;
-		case PKConstant8:
-			str = "const8 " + d2h(&param, 1);
-			break;
-		case PKConstantDouble:
+		/*case PKConstantDouble:
 			str = "const 2x " + d2h(&param, 6);
-			break;
+			break;*/
 		case PKDerefConstant:
-			str = "deref const [" + d2h(&param, 4) + "]";
+			str = get_size_name(size) + "deref const [" + d2h(&param, 4) + "]";
 			break;
 		default:
 			str = format("??? (%d)", type);
@@ -2831,21 +3268,20 @@ void param2str(string &str, int type, void *param)
 	}
 }
 
-bool AddInstruction(char *oc, int &ocs, int inst, int param1_type, void *param1, int param2_type, void *param2)
+void AddInstruction(char *oc, int &ocs, int inst, int param1_type, int param1_size, void *param1, int param2_type, int param2_size, void *param2)
 {
 	msg_db_f("AsmAddInstruction", 1+ASM_DB_LEVEL);
-	/*if (!Instruction)
+	/*if (!CPUInstructions)
 		SetInstructionSet(InstructionSetDefault);*/
-	mode16 = false;
-	small_param = mode16;
-	small_addr = mode16;
+	state.DefaultSize = Size32;
+	state.reset();
 	/*msg_write("--------");
 	for (int i=0;i<NUM_INSTRUCTION_NAMES;i++)
 		if (InstructionName[i].inst == inst)
 			printf("%s\n", InstructionName[i].name);*/
 
-	InstructionParam wp1 = _make_param_(param1_type, (long)param1);
-	InstructionParam wp2 = _make_param_(param2_type, (long)param2);
+	InstructionParam wp1 = _make_param_(param1_type, param1_size, (long)param1);
+	InstructionParam wp2 = _make_param_(param2_type, param2_size, (long)param2);
 
 	OCParam = ocs;
 	InstructionWithParamsList list = InstructionWithParamsList(0);
@@ -2855,31 +3291,14 @@ bool AddInstruction(char *oc, int &ocs, int inst, int param1_type, void *param1,
 	iwp.p2 = wp2;
 	iwp.line = -1;
 	list.add(iwp);
-	bool ok = list.AddInstruction(oc, ocs, 0);
-	if (!ok){
-		bool found = false;
-		for (int i=0;i<NUM_INSTRUCTION_NAMES;i++)
-			if (InstructionNames[i].inst == inst){
-				string ps1, ps2;
-				param2str(ps1, param1_type, param1);
-				param2str(ps2, param2_type, param2);
-				SetError("command not compatible with its parameters\n" + InstructionNames[i].name + " " + ps1 + " " + ps2);
-				found = true;
-			}
-		if (!found){
-			LineNo = iwp.line;
-			SetError(format("instruction unknown: %d", inst));
-		}
-	}
-	
-	return ok;
+	list.AddInstruction(oc, ocs, 0);
 }
 
 bool ImmediateAllowed(int inst)
 {
-	for (int i=0;i<Instruction.num;i++)
-		if (Instruction[i].inst == inst)
-			if ((Instruction[i].param1.allow_immediate) || (Instruction[i].param2.allow_immediate))
+	for (int i=0;i<CPUInstructions.num;i++)
+		if (CPUInstructions[i].inst == inst)
+			if ((CPUInstructions[i].param1.allow_immediate) || (CPUInstructions[i].param2.allow_immediate))
 				return true;
 	return false;
 }

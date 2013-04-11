@@ -1,4 +1,4 @@
-#include "../api.kaba"
+use "../api.kaba"
 
 window dlg
 

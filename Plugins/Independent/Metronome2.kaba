@@ -1,7 +1,7 @@
 // Image = hui:media-play
 // Title[Deutsch] = Metronom
-#include "../api.kaba"
-#include "../tone.kaba"
+use "../api.kaba"
+use "../tone.kaba"
 
 window dlg
 

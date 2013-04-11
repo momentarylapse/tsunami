@@ -3,11 +3,13 @@
 SCRIPT_DIR = $(LIB_DIR)/script
 SCRIPT_BIN  = $(SCRIPT_DIR)/script.a
 SCRIPT_OBJ  = $(SCRIPT_DIR)/script.o \
- $(SCRIPT_DIR)/syntax/pre_script.o \
- $(SCRIPT_DIR)/syntax/pre_script_lexical.o \
- $(SCRIPT_DIR)/syntax/pre_script_precompiler.o \
- $(SCRIPT_DIR)/syntax/pre_script_preprocessor.o \
- $(SCRIPT_DIR)/syntax/pre_script_parser.o \
+ $(SCRIPT_DIR)/syntax/syntax_tree.o \
+ $(SCRIPT_DIR)/syntax/type.o \
+ $(SCRIPT_DIR)/syntax/lexical.o \
+ $(SCRIPT_DIR)/syntax/precompiler.o \
+ $(SCRIPT_DIR)/syntax/preprocessor.o \
+ $(SCRIPT_DIR)/syntax/parser.o \
+ $(SCRIPT_DIR)/syntax/implicit.o \
  $(SCRIPT_DIR)/lib/script_data.o \
  $(SCRIPT_DIR)/lib/script_data_file.o \
  $(SCRIPT_DIR)/lib/script_data_math.o \
@@ -22,7 +24,12 @@ SCRIPT_OBJ  = $(SCRIPT_DIR)/script.o \
  $(SCRIPT_DIR)/compiler/compiler.o \
  $(SCRIPT_DIR)/asm/asm.o
 SCRIPT_CXXFLAGS =  `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
-SCRIPT_DEP =  $(SCRIPT_DIR)/script.h $(SCRIPT_DIR)/asm/asm.h $(SCRIPT_DIR)/syntax/pre_script.h $(SCRIPT_DIR)/lib/script_data.h
+SCRIPT_DEP =  $(SCRIPT_DIR)/script.h \
+ $(SCRIPT_DIR)/asm/asm.h \
+  $(SCRIPT_DIR)/syntax/syntax_tree.h \
+  $(SCRIPT_DIR)/syntax/type.h \
+  $(SCRIPT_DIR)/syntax/lexical.h \
+  $(SCRIPT_DIR)/lib/script_data.h
 
 $(SCRIPT_BIN) : $(SCRIPT_OBJ) $(SCRIPT_DEP)
 	rm -f $@
@@ -31,20 +38,26 @@ $(SCRIPT_BIN) : $(SCRIPT_OBJ) $(SCRIPT_DEP)
 $(SCRIPT_DIR)/script.o : $(SCRIPT_DIR)/script.cpp $(SCRIPT_DEP)
 	$(CPP) -c $(SCRIPT_DIR)/script.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
-$(SCRIPT_DIR)/pre_script.o : $(SCRIPT_DIR)/syntax/pre_script.cpp $(SCRIPT_DEP)
-	$(CPP) -c $(SCRIPT_DIR)/syntax/pre_script.cpp -o $@ $(SCRIPT_CXXFLAGS)
+$(SCRIPT_DIR)/syntax/syntax_tree.o : $(SCRIPT_DIR)/syntax/syntax_tree.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/syntax/syntax_tree.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
-$(SCRIPT_DIR)/syntax/pre_script_lexical.o : $(SCRIPT_DIR)/syntax/pre_script_lexical.cpp $(SCRIPT_DEP)
-	$(CPP) -c $(SCRIPT_DIR)/syntax/pre_script_lexical.cpp -o $@ $(SCRIPT_CXXFLAGS)
+$(SCRIPT_DIR)/syntax/type.o : $(SCRIPT_DIR)/syntax/type.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/syntax/type.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
-$(SCRIPT_DIR)/syntax/pre_script_parser.o : $(SCRIPT_DIR)/syntax/pre_script_parser.cpp $(SCRIPT_DEP)
-	$(CPP) -c $(SCRIPT_DIR)/syntax/pre_script_parser.cpp -o $@ $(SCRIPT_CXXFLAGS)
+$(SCRIPT_DIR)/syntax/lexical.o : $(SCRIPT_DIR)/syntax/lexical.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/syntax/lexical.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
-$(SCRIPT_DIR)/syntax/pre_script_precompiler.o : $(SCRIPT_DIR)/syntax/pre_script_precompiler.cpp $(SCRIPT_DEP)
-	$(CPP) -c $(SCRIPT_DIR)/syntax/pre_script_precompiler.cpp -o $@ $(SCRIPT_CXXFLAGS)
+$(SCRIPT_DIR)/syntax/parser.o : $(SCRIPT_DIR)/syntax/parser.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/syntax/parser.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
-$(SCRIPT_DIR)/syntax/pre_script_preprocessor.o : $(SCRIPT_DIR)/syntax/pre_script_preprocessor.cpp $(SCRIPT_DEP)
-	$(CPP) -c $(SCRIPT_DIR)/syntax/pre_script_preprocessor.cpp -o $@ $(SCRIPT_CXXFLAGS)
+$(SCRIPT_DIR)/syntax/implicit.o : $(SCRIPT_DIR)/syntax/implicit.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/syntax/implicit.cpp -o $@ $(SCRIPT_CXXFLAGS)
+
+$(SCRIPT_DIR)/syntax/precompiler.o : $(SCRIPT_DIR)/syntax/precompiler.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/syntax/precompiler.cpp -o $@ $(SCRIPT_CXXFLAGS)
+
+$(SCRIPT_DIR)/syntax/preprocessor.o : $(SCRIPT_DIR)/syntax/preprocessor.cpp $(SCRIPT_DEP)
+	$(CPP) -c $(SCRIPT_DIR)/syntax/preprocessor.cpp -o $@ $(SCRIPT_CXXFLAGS)
 
 $(SCRIPT_DIR)/lib/script_data.o : $(SCRIPT_DIR)/lib/script_data.cpp $(SCRIPT_DEP)
 	$(CPP) -c $(SCRIPT_DIR)/lib/script_data.cpp -o $@ $(SCRIPT_CXXFLAGS)

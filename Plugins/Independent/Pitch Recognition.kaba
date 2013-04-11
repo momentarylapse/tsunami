@@ -1,6 +1,6 @@
 // Image = hui:find
 // Title[Deutsch] = Tonerkennung
-#include "../api.kaba"
+use "../api.kaba"
 
 const int freq = 44100
 const int f_min = 50

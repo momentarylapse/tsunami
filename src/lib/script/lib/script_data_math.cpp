@@ -630,10 +630,10 @@ void SIAddPackageMath()
 			func_add_param("str",		TypeString);
 			func_add_param("cut",		TypeBool);
 	
-	add_func_special("complex",		TypeComplex,	CommandComplexSet);
+	add_compiler_func("complex",		TypeComplex,	CommandComplexSet);
 		func_add_param("x",		TypeFloat);
 		func_add_param("y",		TypeFloat);
-	add_func_special("rect",		TypeRect,	CommandRectSet);
+	add_compiler_func("rect",		TypeRect,	CommandRectSet);
 		func_add_param("x1",	TypeFloat);
 		func_add_param("x2",	TypeFloat);
 		func_add_param("y1",	TypeFloat);
@@ -758,7 +758,7 @@ void SIAddPackageMath()
 		func_add_param("end",		TypeFloat);
 		func_add_param("step",		TypeFloat);
 	// vectors
-	add_func_special("vector",		TypeVector,	CommandVectorSet);
+	add_compiler_func("vector",		TypeVector,	CommandVectorSet);
 		func_add_param("x",		TypeFloat);
 		func_add_param("y",		TypeFloat);
 		func_add_param("z",		TypeFloat);
@@ -844,7 +844,7 @@ void SIAddPackageMath()
 		func_add_param("c",		TypeVector);
 		func_add_param("f",		TypeFloatPs);
 		func_add_param("g",		TypeFloatPs);
-	add_func_special("color",		TypeColor,	CommandColorSet);
+	add_compiler_func("color",		TypeColor,	CommandColorSet);
 		func_add_param("a",		TypeFloat);
 		func_add_param("r",		TypeFloat);
 		func_add_param("g",		TypeFloat);

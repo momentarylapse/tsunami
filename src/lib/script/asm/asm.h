@@ -7,10 +7,17 @@ namespace Asm
 
 // instruction sets
 enum{
-	InstructionSetDefault,
 	InstructionSetX86,
 	InstructionSetAMD64
 };
+
+struct InstructionSetData
+{
+	int set;
+	int pointer_size;
+};
+
+extern InstructionSetData InstructionSet;
 
 // single registers
 enum{
@@ -21,10 +28,18 @@ enum{
 	RegCr0, RegCr1, RegCr2, RegCr3,
 	RegSt0, RegSt1, RegSt2, RegSt3, RegSt4, RegSt5, RegSt6, RegSt7,
 	RegRax, RegRcx, RegRdx, RegRbx, RegRsp, RegRsi, RegRdi, RegRbp, // 8 byte
+	RegR8, RegR9, RegR10, RegR11, RegR12, RegR13, RegR14, RegR15,
+	RegR8d, RegR9d, RegR10d, RegR11d, RegR12d, RegR13d, RegR14d, RegR15d,
+	RegXmm0, RegXmm1, RegXmm2, RegXmm3, RegXmm4, RegXmm5, RegXmm6, RegXmm7, // 16 byte
 	NUM_REGISTERS
 };
 
+const int NUM_REG_ROOTS = 32;
+const int MAX_REG_SIZE = 16;
+
 extern int RegRoot[];
+extern int RegResize[NUM_REG_ROOTS][MAX_REG_SIZE + 1];
+string GetRegName(int reg);
 
 enum{
 	PKInvalid,
@@ -33,107 +48,71 @@ enum{
 	PKDerefRegister,	// [eAX]
 	PKLocal,			// [ebp + 0x0000]
 	PKEdxRel,			// [edx + 0x0000]
-	PKConstant32,		// 0x00000000
-	PKConstant16,		// 0x0000
-	PKConstant8,		// 0x00
-	PKConstantDouble,   // 0x00:0x0000   ...
-	PKDerefConstant,	// [0x0000]
+	PKConstant,			// 0x00000000
+	PKDerefConstant,	// [0x00000000]
 	PKLabel				// _label
 };
 
 
 enum{
 	inst_add,
-	inst_add_b,
 	inst_adc,	   // add with carry
-	inst_adc_b,
 	inst_sub,
-	inst_sub_b,
 	inst_sbb,	   // subtract with borrow
-	inst_sbb_b,
 	inst_inc,
-	inst_inc_b,
 	inst_dec,
-	inst_dec_b,
 	inst_mul,
-	inst_mul_b,
 	inst_imul,
-	inst_imul_b,
 	inst_div,
-	inst_div_b,
 	inst_idiv,
-	inst_idiv_b,
 	inst_mov,
-	inst_mov_b,
 	inst_movzx,
 	inst_movsx,
 	inst_and,
-	inst_and_b,
 	inst_or,
-	inst_or_b,
 	inst_xor,
-	inst_xor_b,
 	inst_not,
-	inst_not_b,
 	inst_neg,
-	inst_neg_b,
 	inst_pop,
 	inst_popa,
 	inst_push,
 	inst_pusha,
 	
 	inst_jo,
-	inst_jo_b,
 	inst_jno,
-	inst_jno_b,
 	inst_jb,
-	inst_jb_b,
 	inst_jnb,
-	inst_jnb_b,
 	inst_jz,
-	inst_jz_b,
 	inst_jnz,
-	inst_jnz_b,
 	inst_jbe,
-	inst_jbe_b,
 	inst_jnbe,
-	inst_jnbe_b,
 	inst_js,
-	inst_js_b,
 	inst_jns,
-	inst_jns_b,
 	inst_jp,
-	inst_jp_b,
 	inst_jnp,
-	inst_jnp_b,
 	inst_jl,
-	inst_jl_b,
 	inst_jnl,
-	inst_jnl_b,
 	inst_jle,
-	inst_jle_b,
 	inst_jnle,
-	inst_jnle_b,
 	
 	inst_cmp,
-	inst_cmp_b,
 	
-	inst_seto_b,
-	inst_setno_b,
-	inst_setb_b,
-	inst_setnb_b,
-	inst_setz_b,
-	inst_setnz_b,
-	inst_setbe_b,
-	inst_setnbe_b,
-	inst_sets_b,
-	inst_setns_b,
-	inst_setp_b,
-	inst_setnp_b,
-	inst_setl_b,
-	inst_setnl_b,
-	inst_setle_b,
-	inst_setnle_b,
+	inst_seto,
+	inst_setno,
+	inst_setb,
+	inst_setnb,
+	inst_setz,
+	inst_setnz,
+	inst_setbe,
+	inst_setnbe,
+	inst_sets,
+	inst_setns,
+	inst_setp,
+	inst_setnp,
+	inst_setl,
+	inst_setnl,
+	inst_setle,
+	inst_setnle,
 	
 	inst_sldt,
 	inst_str,
@@ -149,9 +128,7 @@ enum{
 	inst_lmsw,
 	
 	inst_test,
-	inst_test_b,
 	inst_xchg,
-	inst_xchg_b,
 	inst_lea,
 	inst_nop,
 	inst_cbw_cwde,
@@ -161,19 +138,12 @@ enum{
 	inst_cmps_ds_esi_es_edi,	// cmp string
 	inst_cmps_b_ds_esi_es_edi,
 	inst_rol,
-	inst_rol_b,
 	inst_ror,
-	inst_ror_b,
 	inst_rcl,
-	inst_rcl_b,
 	inst_rcr,
-	inst_rcr_b,
 	inst_shl,
-	inst_shl_b,
 	inst_shr,
-	inst_shr_b,
 	inst_sar,
-	inst_sar_b,
 	inst_ret,
 	inst_leave,
 	inst_ret_far,
@@ -208,14 +178,11 @@ enum{
 	inst_loope,
 	inst_loopne,
 	inst_in,
-	inst_in_b,
 	inst_out,
-	inst_out_b,
 	
 	inst_call,
 	inst_call_far,
 	inst_jmp,
-	inst_jmp_b,
 	inst_lock,
 	inst_rep,
 	inst_repne,
@@ -227,6 +194,9 @@ enum{
 	inst_sti,
 	inst_cld,
 	inst_std,
+
+	inst_movss,
+	inst_movsd,
 	
 	NUM_INSTRUCTION_NAMES
 };
@@ -237,6 +207,7 @@ struct GlobalVar
 {
 	string Name;
 	void *Pos; // points into the memory of a script
+	int Size;
 };
 
 struct Label
@@ -293,15 +264,18 @@ struct InstructionWithParamsList : public Array<InstructionWithParams>
 	InstructionWithParamsList(int line_offset);
 	~InstructionWithParamsList();
 
-	void add_easy(int inst, int param1_type = PKNone, void *param1 = NULL, int param2_type = PKNone, void *param2 = NULL);
+	void add_easy(int inst, int param1_type = PKNone, int param1_size = -1, void *param1 = NULL, int param2_type = PKNone, int param2_size = -1, void *param2 = NULL);
 	int add_label(const string &name, bool declaring);
 
-	void AppendFromSource(const char *code);
+	void add_func_intro(int stack_alloc_size);
+	void add_func_return(int return_size);
+
+	void AppendFromSource(const string &code);
 	void ShrinkJumps(void *oc, int ocs);
 	void Optimize(void *oc, int ocs);
 	void Compile(void *oc, int &ocs);
 	void LinkWantedLabels(void *oc);
-	bool AddInstruction(char *oc, int &ocs, int n);
+	void AddInstruction(char *oc, int &ocs, int n);
 
 	Array<Label> label;
 	Array<WantedLabel> wanted_label;
@@ -310,7 +284,7 @@ struct InstructionWithParamsList : public Array<InstructionWithParams>
 	int current_inst;
 };
 
-void Init();
+void Init(int instruction_set = -1);
 bool Assemble(const char *code, char *oc, int &ocs);
 string Disassemble(void *code, int length = -1, bool allow_comments = true);
 
@@ -324,7 +298,7 @@ public:
 	int line, column;
 };
 
-bool AddInstruction(char *oc, int &ocs, int inst, int param1_type = PKNone, void *param1 = NULL, int param2_type = PKNone, void *param2 = NULL);
+void AddInstruction(char *oc, int &ocs, int inst, int param1_type = PKNone, int param1_size = -1, void *param1 = NULL, int param2_type = PKNone, int param2_size = -1, void *param2 = NULL);
 void SetInstructionSet(int set);
 bool ImmediateAllowed(int inst);
 extern int OCParam;

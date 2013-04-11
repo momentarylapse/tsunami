@@ -84,7 +84,6 @@ void SyntaxTree::AddIncludeData(Script *s)
 }
 
 enum{
-	MacroInclude,
 	MacroDefine,
 	MacroDisasm,
 	MacroNoExec,
@@ -100,7 +99,6 @@ enum{
 
 string MacroName[NumMacroNames] =
 {
-	"#include",
 	"#define",
 	"#disasm",
 	"#noexec",
@@ -131,32 +129,6 @@ void SyntaxTree::HandleMacro(ExpressionBuffer::Line *l, int &line_no, int &NumIf
 			macro_no = i;
 	
 	switch(macro_no){
-		case MacroInclude:
-			Exp.next();
-			/*if (!IsIfDefed(NumIfDefs, IfDefed))
-				continue;*/
-
-			filename = Filename.dirname() + Exp.cur.substr(1, Exp.cur.num - 2); // remove "
-			filename = filename.no_recursion();
-
-			so("lade Include-Datei");
-			right();
-
-			try{
-				include = Load(filename, true, just_analyse);
-			}catch(Exception &e){
-				string msg = "in included file:\n\"" + e.message + "\"";
-				DoError(msg);
-			}
-
-			left();
-			/*if ((!include) || (include->Error)){
-				IncludeLinkerError |= include->LinkerError;
-				DoError(format("error in inluded file \"%s\":\n[ %s (line %d:) ]", filename.c_str(), include->ErrorMsg.c_str(), include->ErrorLine, include->ErrorColumn));
-				return;
-			}*/
-			AddIncludeData(include);
-			break;
 		case MacroDefine:
 			// source
 			Exp.next();

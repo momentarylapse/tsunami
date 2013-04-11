@@ -296,7 +296,7 @@ void Serializer::move_param(SerialCommandParam &p, int from, int to)
 			}
 		if (!found){
 			msg_error(format("move_param: no RegChannel...  reg_root=%d  from=%d", r, from));
-			msg_write(script->syntax->Filename + " : " + cur_func->name);
+			msg_write(script->Filename + " : " + cur_func->name);
 		}
 	}
 }

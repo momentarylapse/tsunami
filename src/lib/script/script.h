@@ -79,6 +79,7 @@ public:
 
 // data
 
+	string Filename;
 	SyntaxTree *syntax;
 
 	int ReferenceCounter;
@@ -94,7 +95,7 @@ public:
 	Array<t_func*> func;
 	t_func *first_execution, *continue_execution;
 
-	bool isCopy, isPrivate, JustAnalyse, ShowCompilerStats;
+	bool JustAnalyse, ShowCompilerStats;
 	Function *cur_func;
 	int WaitingMode;
 	float TimeToWait;
@@ -104,7 +105,7 @@ public:
 	int MemoryUsed;
 };
 
-Script *Load(const string &filename, bool is_public = true, bool just_analyse = false);
+Script *Load(const string &filename, bool just_analyse = false);
 void Remove(Script *s);
 void ExecutePublicScripts();
 void DeleteAllScripts(bool even_immortal = false, bool force = false);

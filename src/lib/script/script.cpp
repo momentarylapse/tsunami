@@ -35,13 +35,13 @@ float GlobalTimeToWait;
 Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Script *s) :
 	Asm::Exception(_message, _expression, _line, _column)
 {
-	message +=  ", " + s->syntax->Filename;
+	message +=  ", " + s->Filename;
 }
 
 Exception::Exception(const Asm::Exception &e, Script *s) :
 	Asm::Exception(e)
 {
-	message = "assembler: " + message + ", " + s->syntax->Filename;
+	message = "assembler: " + message + ", " + s->Filename;
 }
 
 
@@ -86,50 +86,23 @@ void script_db_left()
 
 
 Array<Script*> PublicScript;
-Array<Script*> PrivateScript;
 Array<Script*> DeadScript;
 
 
 
 
 
-Script *Load(const string &filename, bool is_public, bool just_analyse)
+Script *Load(const string &filename, bool just_analyse)
 {
 	//msg_write(string("Lade ",filename));
 	Script *s = NULL;
 
-	// public und private aus dem Speicher versuchen zu laden
-	if (is_public){
-		for (int i=0;i<PublicScript.num;i++)
-			if (PublicScript[i]->syntax->Filename == filename.sys_filename())
-				return PublicScript[i];
-	}
-#if 0
-	int ae=-1;
-	for (int i=0;i<NumPublicScripts;i++)
-		if (strcmp(PublicScript[i].filename,SysFileName(filename))==0)
-			ae=i;
-	if (ae>=0){
-		if (is_public){
-			s=PublicScript[ae].script;
-			//so("...pointer");
-		}else{
-			s=new Script();
-			memcpy(s,PublicScript[ae].script,sizeof(Script));
-			s->WaitingMode=WaitingModeNone;
-			s->isCopy=true;
-			s->OpcodeSize=0;
-			s->Compiler();
-			s->isPrivate=!is_public;
-			s->ThisObject=-1;
-			//so("...kopiert (private)");
-			//msg_error(string("Script existiert schon!!! ",filename));
-		}
-		return s;
-	}
-#endif
-
+	// already loaded?
+	for (int i=0;i<PublicScript.num;i++)
+		if (PublicScript[i]->Filename == filename.sys_filename())
+			return PublicScript[i];
 	
+	// load
 	s = new Script();
 	try{
 		s->Load(filename, just_analyse);
@@ -137,54 +110,10 @@ Script *Load(const string &filename, bool is_public, bool just_analyse)
 		delete(s);
 		throw e;
 	}
-	s->isPrivate = !is_public;
 
 	// store script in database
-	if (is_public){
-		//so("...neu (public)");
-		PublicScript.add(s);
-	}else{
-		//so("...neu (private)");
-		PrivateScript.add(s);
-	}
-	//msg_error(i2s(NumPublicScripts));
+	PublicScript.add(s);
 	return s;
-}
-
-#if 0
-Script *LoadAsInclude(char *filename, bool just_analyse)
-{
-	msg_db_f("LoadAsInclude",4);
-	//so(string("Include ",filename));
-	// aus dem Speicher versuchen zu laden
-	for (int i=0;i<ublicScript.size();i++)
-		if (strcmp(PublicScript[i].filename, SysFileName(filename)) == 0){
-			//so("...pointer");
-			return PublicScript[i].script;
-		}
-
-	//so("nnneu");
-	Script *s = new Script(filename, just_analyse);
-	so("geladen....");
-	//msg_write("...neu");
-	s->isPrivate = false;
-
-	// als public speichern
-	PublicScript[NumPublicScripts].filename=new char[strlen(filename)+1];
-	strcpy(PublicScript[NumPublicScripts].filename,SysFileName(filename));
-	PublicScript[NumPublicScripts++].script=s;
-
-	return s;
-}
-#endif
-
-void ExecuteAllScripts()
-{
-	for (int i=0;i<PrivateScript.num;i++)
-		PrivateScript[i]->Execute();
-	
-	for (int i=0;i<PublicScript.num;i++)
-		PublicScript[i]->Execute();
 }
 
 void Remove(Script *s)
@@ -198,15 +127,9 @@ void Remove(Script *s)
 	DeadScript.add(s);
 
 	// remove from normal list
-	if (s->isPrivate){
-		for (int i=0;i<PrivateScript.num;i++)
-			if (PrivateScript[i] == s)
-				PrivateScript.erase(i);
-	}else{
-		for (int i=0;i<PublicScript.num;i++)
-			if (PublicScript[i] == s)
-				PublicScript.erase(i);
-	}
+	for (int i=0;i<PublicScript.num;i++)
+		if (PublicScript[i] == s)
+			PublicScript.erase(i);
 
 	// delete all deletables
 	for (int i=DeadScript.num-1;i>=0;i--)
@@ -222,9 +145,6 @@ void DeleteAllScripts(bool even_immortal, bool force)
 
 	// try to erase them...
 	foreachb(Script *s, PublicScript)
-		if ((!s->syntax->FlagImmortal) || (even_immortal))
-			Remove(s);
-	foreachb(Script *s, PrivateScript)
 		if ((!s->syntax->FlagImmortal) || (even_immortal))
 			Remove(s);
 
@@ -249,7 +169,9 @@ void Script::Load(const string &filename, bool just_analyse)
 {
 	msg_db_f("loading script", 1);
 	JustAnalyse = just_analyse;
+	Filename = filename.sys_filename();
 	syntax->LoadAndParseFile(filename, just_analyse);
+
 
 	if (!JustAnalyse)
 		Compiler();
@@ -298,11 +220,9 @@ void Script::SetVariable(const string &name, void *data)
 
 Script::Script()
 {
-	so("creating empty script");
+	Filename = "-empty script-";
 
 	ReferenceCounter = 0;
-	isCopy = false;
-	isPrivate = false;
 
 	cur_func = NULL;
 	WaitingMode = WaitingModeFirst;
@@ -465,7 +385,7 @@ void Script::Execute()
 	shift_right=0;
 	//msg_db_f(string("Execute ",pre_script->Filename),1);
 	msg_db_f("Execute", 1);{
-	msg_db_f(syntax->Filename.c_str(),1);
+	msg_db_f(Filename.c_str(),1);
 
 	// handle wait-commands
 	if (WaitingMode==WaitingModeFirst){

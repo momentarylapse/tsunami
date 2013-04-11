@@ -565,6 +565,8 @@ void SyntaxTree::CreateImplicitFunctions(Type *t, bool relocate_last_function)
 		// relink class functions
 		foreach(Type *t, Types)
 			foreach(ClassFunction &f, t->function){
+				if (f.script != script)
+					continue;
 				if (f.nr == num_funcs - 1)
 					f.nr = Functions.num - 1;
 				else if (f.nr > num_funcs - 1)

@@ -164,25 +164,22 @@ void *SyntaxTree::GetConstantValue()
 }
 
 
-void DoClassFunction(SyntaxTree *ps, Command *Operand, Type *t, int f_no, Function *f)
+Command *DoClassFunction(SyntaxTree *ps, Command *ob, ClassFunction &cf, Function *f)
 {
 	msg_db_f("DoClassFunc", 1);
 
-	// create a command for the object
-	Command *ob = ps->cp_command(Operand);
-
-	//msg_write(LinkNr2Str(ps, Operand->Kind, Operand->Nr));
+	Command *cmd = ps->AddCommand();
 
 	// the function
-	ClassFunction &cf = t->function[f_no];
-	Operand->script = cf.script;
-    Operand->kind = KindFunction;
-	Operand->link_nr = cf.nr;
+	cmd->script = cf.script;
+	cmd->kind = KindFunction;
+	cmd->link_nr = cf.nr;
 	Function *ff = cf.script->syntax->Functions[cf.nr];
-	Operand->type = ff->literal_return_type;
-	Operand->num_params = ff->num_params;
-	ps->GetFunctionCall(ff->name, Operand, f);
-	Operand->instance = ob;
+	cmd->type = ff->literal_return_type;
+	cmd->num_params = ff->num_params;
+	ps->GetFunctionCall(ff->name, cmd, f);
+	cmd->instance = ob;
+	return cmd;
 }
 
 Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Function *f)
@@ -206,13 +203,12 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Function *f)
 		}
 
 	// class function?
-	for (int e=0;e<type->function.num;e++)
-		if (Exp.cur == type->function[e].name){
+	foreach(ClassFunction &cf, type->function)
+		if (Exp.cur == cf.name){
 			if (!deref)
 				ref_command_old(this, Operand);
 			Exp.next();
-			DoClassFunction(this, Operand, type, e, f);
-			return Operand;
+			return DoClassFunction(this, Operand, cf, f);
 		}
 
 	DoError("unknown element of " + type->name);
@@ -1275,13 +1271,13 @@ void SyntaxTree::ParseImport()
 	string name = Exp.cur;
 	if (name.find(".kaba") >= 0){
 
-		string filename = Filename.dirname() + name.substr(1, name.num - 2); // remove "
+		string filename = script->Filename.dirname() + name.substr(1, name.num - 2); // remove "
 		filename = filename.no_recursion();
 
 		msg_right();
 		Script *include;
 		try{
-			include = Load(filename, true, script->JustAnalyse);
+			include = Load(filename, script->JustAnalyse);
 		}catch(Exception &e){
 			string msg = "in imported file:\n\"" + e.message + "\"";
 			DoError(msg);

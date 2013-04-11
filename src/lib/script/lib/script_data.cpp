@@ -382,6 +382,7 @@ void func_add_param(const string &name, Type *type)
 void script_make_super_array(Type *t, SyntaxTree *ps)
 {
 	msg_db_f("make_super_array", 4);
+
 	add_class(t);
 		class_add_element("num", TypeInt, config.PointerSize);
 

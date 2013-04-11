@@ -236,7 +236,6 @@ public:
 
 // data
 
-	string Filename;
 	string Buffer;
 	int BufferLength, BufferPos;
 	ExpressionBuffer Exp;

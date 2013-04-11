@@ -368,7 +368,7 @@ void PluginManager::InitFavorites(CHuiWindow *win)
 	win->Enable("favorite_save", false);
 	win->Enable("favorite_delete", false);
 
-	string init = cur_plugin->s->syntax->Filename.basename() + "___";
+	string init = cur_plugin->s->Filename.basename() + "___";
 
 	dir_create(HuiAppDirectory + "Plugins/Favorites");
 	Array<DirEntry> list = dir_search(HuiAppDirectory + "Plugins/Favorites", "*", false);

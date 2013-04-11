@@ -121,8 +121,6 @@ Command *SyntaxTree::add_command_operator(Command *p1, Command *p2, int op)
 
 SyntaxTree::SyntaxTree(Script *_script)
 {
-	Filename = "-empty script-";
-	Buffer = "";
 	Exp.buffer = NULL;
 	FlagShow = false;
 	FlagShowPrae = false;
@@ -150,10 +148,8 @@ SyntaxTree::SyntaxTree(Script *_script)
 void SyntaxTree::LoadAndParseFile(const string &filename, bool just_analyse)
 {
 	msg_db_f("LoadAndParseFile",4);
-	
-	Filename = filename.sys_filename();
 
-	LoadToBuffer(config.Directory + Filename, just_analyse);
+	LoadToBuffer(config.Directory + filename, just_analyse);
 
 	
 	PreCompiler(just_analyse);
@@ -1084,7 +1080,7 @@ void SyntaxTree::ShowFunction(Function *f)
 
 void SyntaxTree::Show()
 {
-	msg_write("--------- Syntax of " + Filename + " ---------");
+	msg_write("--------- Syntax of " + script->Filename + " ---------");
 	msg_right();
 	foreach(Function *f, Functions)
 		ShowFunction(f);

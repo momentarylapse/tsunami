@@ -20,10 +20,11 @@ class DynamicArray
 	void append(const DynamicArray *a);
 	void assign(const DynamicArray *a);
 	void exchange(DynamicArray &a);
-	void append_8_single(int x, int y);
+	void append_p_single(void *p);
 	void append_4_single(int x);
 	void append_1_single(char x);
 	void append_single(const void *d);
+	void insert_p_single(void *p, int index);
 	void insert_4_single(int x, int index);
 	void insert_1_single(char x, int index);
 	void insert_single(const void *d, int index);

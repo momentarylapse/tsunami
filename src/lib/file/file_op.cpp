@@ -180,6 +180,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 			if ((name.match(filter))|| ((show_directories)&&(t.attrib==_A_SUBDIR)) ){
 				entry.name = name;
 				entry.is_dir = (t.attrib == _A_SUBDIR);
+				entry.size = t.size;
 				entry_list.add(entry);
 			}
 		}
@@ -209,6 +210,7 @@ Array<DirEntry> dir_search(const string &dir, const string &filter, bool show_di
 			if ( ((is_reg)&&(name.match(filter))) || ((show_directories)&&(is_dir)) ){
 				entry.name = name;
 				entry.is_dir = is_dir;
+				entry.size = s.st_size;
 				entry_list.add(entry);
 			}
 		}

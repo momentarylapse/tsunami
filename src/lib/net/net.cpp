@@ -191,7 +191,7 @@ bool Socket::Accept(Socket &con)
 	con.s = accept(s, (struct sockaddr *)&remote_addr, &size);
 #endif
 #ifdef OS_LINUX
-	socklen_t len = *(socklen_t*)&size;
+	socklen_t len = (socklen_t)size;
 	con.s = accept(s, (struct sockaddr *)&remote_addr, &len);
 #endif
 

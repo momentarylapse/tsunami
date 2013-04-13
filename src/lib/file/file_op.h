@@ -23,6 +23,7 @@ string shell_execute(const string &cmd);
 struct DirEntry
 {
 	string name;
+	int size;
 	bool is_dir;
 
 	void __init__()
@@ -30,7 +31,7 @@ struct DirEntry
 	void __assign__(const DirEntry &o)
 	{	*this = o;	}
 	string str()
-	{	return "(\"" + name + "\", " + b2s(is_dir) + ")";	}
+	{	return "(\"" + name + "\", " + i2s(size) + "\", " + b2s(is_dir) + ")";	}
 };
 
 Array<DirEntry> _cdecl dir_search(const string &dir,const string &filter,bool show_directories);

@@ -70,16 +70,22 @@ void SyntaxTree::AddIncludeData(Script *s)
 	for (int i=0;i<ps->Defines.num;i++)
 		Defines.add(ps->Defines[i]);
 
+	ExpressionBuffer::Line *cur_line = Exp.cur_line;
+	PreCompiler(script->JustAnalyse);
+	Exp.cur_line = cur_line;
+	Exp.cur_exp = 0;
+
+
 	// types
 //	Type.insert(Type.begin(), ps->Type.begin(), ps->Type.end()); // make sure foreign types precede the "own" types!
-	for (int i=0;i<ps->Types.num;i++)
+/*	for (int i=0;i<ps->Types.num;i++)
 		Types.insert(ps->Types[i], i);
 		//Type.insert(ps->Type[i + PreType.num], i);
 
 	// constants
 	foreach(Constant &c, ps->Constants)
 		if (c.name[0] != '-')
-			Constants.add(c);
+			Constants.add(c);*/
 	// TODO... ownership of "big" constants
 }
 

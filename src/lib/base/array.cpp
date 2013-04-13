@@ -75,12 +75,10 @@ void DynamicArray::append(const DynamicArray *a)
 	}
 }
 
-void DynamicArray::append_8_single(int x, int y)
+void DynamicArray::append_p_single(void *p)
 {
 	reserve(num + 1);
-	((int*)data)[num * 2] = x;
-	((int*)data)[num * 2 + 1] = y;
-	num ++;
+	((void**)data)[num ++] = p;
 }
 
 void DynamicArray::append_4_single(int x)
@@ -100,6 +98,12 @@ void DynamicArray::append_single(const void *d)
 	reserve(num + 1);
 	memcpy(&((char*)data)[num * element_size], d, element_size);
 	num ++;
+}
+
+void DynamicArray::insert_p_single(void *p, int index)
+{
+	insert_blank(index);
+	((void**)data)[index] = p;
 }
 
 void DynamicArray::insert_4_single(int x, int index)

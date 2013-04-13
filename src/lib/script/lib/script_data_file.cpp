@@ -96,6 +96,7 @@ void SIAddPackageFile()
 	
 	add_class(TypeDirEntry);
 		class_add_element("name",			TypeString,		GetDADirEntry(name));
+		class_add_element("size",			TypeInt,		GetDADirEntry(size));
 		class_add_element("is_dir",			TypeBool,		GetDADirEntry(is_dir));
 		class_add_func("__init__",		TypeVoid,			mf((tmf)&DirEntry::__init__));
 		class_add_func("__assign__",		TypeVoid,			mf((tmf)&DirEntry::__assign__));

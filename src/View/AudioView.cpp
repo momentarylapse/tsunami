@@ -573,7 +573,7 @@ inline void draw_line_buffer(HuiDrawingContext *c, int width, double view_pos, d
 
 	for (int i=i0;i<i1;i++){
 
-		double p = x + ((double)(i + offset) - view_pos) * zoom;
+		double p = x + ((double)(i + offset) + 0.5 - view_pos) * zoom;
 		tx[nl] = (float)p;
 		ty[nl] = y0 + buf[i] * hf;
 		if (zoom > 5)
@@ -592,7 +592,7 @@ inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, double vie
 	double p0 = view_pos_rel;
 	for (int i=0;i<width+di;i+=di){
 
-		double p = p0 + dpos * (double)i;
+		double p = p0 + dpos * (double)i + 0.5;
 		int ip = (int)(p - offset)/f;
 		if ((ip >= 0) && (ip < buf.num))
 		if (((int)(p) < offset + buf.num*f) && (p >= offset)){

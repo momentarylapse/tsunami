@@ -69,7 +69,6 @@ extern Type *TypeFloat;
 extern Type *TypeChar;
 extern Type *TypeCString;
 extern Type *TypeString;
-extern Type *TypeSuperArray;
 
 extern Type *TypeComplex;
 extern Type *TypeVector;

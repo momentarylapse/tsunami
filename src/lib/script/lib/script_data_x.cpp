@@ -6,6 +6,7 @@
 
 #ifdef _X_ALLOW_META_
 	#include "../../x/x.h"
+	#include "../../x/meta.h"
 #endif
 #ifdef _X_ALLOW_X_
 	#include "../../../networking.h"
@@ -88,6 +89,11 @@ Type *TypeFog;
 Type *TypeTerrain;
 Type *TypeTerrainP;
 Type *TypeTerrainPList;
+Type *TypeEngineData;
+Type *TypeWorldData;
+Type *TypeNetworkData;
+Type *TypeHostData;
+Type *TypeHostDataList;
 
 extern Type *TypeMatrix;
 extern Type *TypeMatrix3;
@@ -154,11 +160,30 @@ extern Type *TypeSocketList;
 	#define	GetDASubSkin(x)		0
 	#define	GetDAMaterial(x)	0
 #endif
-#ifdef _X_ALLOW_GOD_
+#ifdef _X_ALLOW_X_
 	static Fog *_fog;
+	static WorldData *_world_data;
+	static EngineData *_engine_data;
+	static NetworkData *_network_data;
+	static HostData *_host_data;
 	#define	GetDAFog(x)			long(&_fog->x)-long(_fog)
+	#define	GetDAWorld(x)			long(&_world_data->x)-long(_world_data)
+	#define	GetDAEngine(x)			long(&_engine_data->x)-long(_engine_data)
+	#define	GetDANetwork(x)			long(&_network_data->x)-long(_network_data)
+	#define	GetDAHostData(x)			long(&_host_data->x)-long(_host_data)
+	class HostDataList : public Array<HostData>
+	{
+		public:
+			void __init__(){Array<HostData>::__init__();}
+			void __delete__(){clear();}
+			void __assign__(HostDataList &other){*this = other;}
+	};
 #else
 	#define	GetDAFog(x)			0
+	#define	GetDAWorld(x)			0
+	#define	GetDAEngine(x)			0
+	#define	GetDANetwork(x)			0
+	#define	GetDAHostData(x)			0
 #endif
 #ifdef _X_ALLOW_CAMERA_
 	static Camera *_camera;
@@ -233,6 +258,11 @@ void SIAddPackageX()
 	TypeTerrain			= add_type  ("Terrain",		0);
 	TypeTerrainP		= add_type_p("terrain",		TypeTerrain);
 	TypeTerrainPList	= add_type_a("terrain[]",	TypeTerrainP, -1);
+	TypeWorldData		= add_type  ("WorldData",	0);
+	TypeEngineData		= add_type  ("EngineData",	0);
+	TypeNetworkData		= add_type  ("NetworkData",	0);
+	TypeHostData		= add_type  ("HostData",    0);
+	TypeHostDataList	= add_type_a("HostData[]",	TypeHostData, -1);
 	
 
 	// bone, subskin, material...
@@ -477,9 +507,59 @@ void SIAddPackageX()
 			func_add_param("v",			TypeVector);
 		class_add_func("Unproject",		TypeVector,	amd64_wrap(mf((tmf)&Camera::Unproject), (void*)&amd64_camera_unproject));
 			func_add_param("v",			TypeVector);
-
 	
+	add_class(TypeWorldData);
+		class_add_element("filename",		TypeString,		GetDAWorld(filename));
+		class_add_element("gravity",		TypeVector,		GetDAWorld(gravity));
+		class_add_element("skybox",		TypeModelPList,		GetDAWorld(skybox));
+		class_add_element("background",		TypeColor,		GetDAWorld(background));
+		class_add_element("fog",		TypeFog,		GetDAWorld(fog));
+		class_add_element("var",		TypeFloatList,		GetDAWorld(var));
+		class_add_element("ambient",		TypeColor,		GetDAWorld(ambient));
+		class_add_element("sun",		TypeInt,		GetDAWorld(sun));
+		class_add_element("speed_of_sound",		TypeFloat,		GetDAWorld(speed_of_sound));
 
+	add_class(TypeEngineData);
+		class_add_element("initial_world",		TypeString,		GetDAEngine(InitialWorldFile));
+		class_add_element("second_world",		TypeString,		GetDAEngine(SecondWorldFile));
+		class_add_element("physics_enabled",		TypeBool,		GetDAEngine(PhysicsEnabled));
+		class_add_element("collisions_enabled",		TypeBool,		GetDAEngine(CollisionsEnabled));
+		class_add_element("debug",		TypeBool,		GetDAEngine(Debug));
+		class_add_element("show_timings",		TypeBool,		GetDAEngine(ShowTimings));
+		class_add_element("wire_mode",		TypeBool,		GetDAEngine(WireMode));
+		class_add_element("console_enabled",		TypeBool,		GetDAEngine(ConsoleEnabled));
+		class_add_element("record",		TypeBool,		GetDAEngine(Record));
+		class_add_element("resetting_game",		TypeBool,		GetDAEngine(ResettingGame));
+		class_add_element("shadow_lower_detail",		TypeBool,		GetDAEngine(ShadowLowerDetail));
+		class_add_element("shadow_level",		TypeInt,		GetDAEngine(ShadowLevel));
+		class_add_element("fps_max",		TypeFloat,		GetDAEngine(FpsMax));
+		class_add_element("fps_min",		TypeFloat,		GetDAEngine(FpsMin));
+		class_add_element("multisampling",		TypeInt,		GetDAEngine(Multisampling));
+		class_add_element("detail_factor",		TypeFloat,		GetDAEngine(DetailLevel));
+		//class_add_element("detail_factor_inv",		TypeFloat,		GetDAEngine(DetailFactorInv));
+		class_add_element("default_font",		TypeInt,		GetDAEngine(DefaultFont));
+		class_add_element("mirror_level_max",		TypeInt,		GetDAEngine(MirrorLevelMax));
+	
+	add_class(TypeNetworkData);
+		class_add_element("session_name",		TypeString,		GetDANetwork(SessionName));
+		class_add_element("host_names",		TypeString,		GetDANetwork(HostNames));
+		class_add_element("is_host",		TypeBool,		GetDANetwork(IAmHost));
+		class_add_element("is_client",		TypeBool,		GetDANetwork(IAmClient));
+		class_add_element("has_read",		TypeBool,		GetDANetwork(HasRead));
+		class_add_element("has_written",		TypeBool,		GetDANetwork(HasWritten));
+		class_add_element("sock_to_host",		TypeSocket,		GetDANetwork(SocketToHost));
+		class_add_element("sock_to_client",		TypeSocketList,		GetDANetwork(SocketToClient));
+		class_add_element("cur_sock",		TypeSocketP,		GetDANetwork(CurrentSocket));
+
+	add_class(TypeHostData);
+		class_add_element("host",		TypeString,		GetDAHostData(host));
+		class_add_element("session",		TypeString,		GetDAHostData(session));
+	
+	add_class(TypeHostDataList);
+		class_add_func("__init__",		TypeVoid,	x_p(mf((tmf)&HostDataList::__init__)));
+		class_add_func("__delete__",		TypeVoid,	x_p(mf((tmf)&HostDataList::__delete__)));
+		class_add_func("__assign__",		TypeVoid,	x_p(mf((tmf)&HostDataList::__assign__)));
+			func_add_param("other",			TypeHostDataList);
 	
 	add_func("XFDrawStr",			TypeFloat,	meta_p(&XFDrawStr));
 		func_add_param("x",			TypeFloat);
@@ -572,7 +652,7 @@ void SIAddPackageX()
 	// game
 	add_func("ExitProgram",									TypeVoid,	meta_p(MetaExitProgram));
 	add_func("ScreenShot",									TypeVoid,	meta_p(MetaScreenShot));
-	add_func("FindHosts",									TypeVoid,	meta_p(MetaFindHosts));
+	add_func("FindHosts",									TypeHostDataList,	meta_p(MetaFindHosts));
 	add_func("XDelete",											TypeVoid,	meta_p(&MetaDelete));
 		func_add_param("p",		TypePointer);
 	add_func("XDeleteLater",						TypeVoid,	god_p(&MetaDeleteLater));
@@ -581,7 +661,7 @@ void SIAddPackageX()
 	add_func("LoadWorld",									TypeVoid,	meta_p(MetaLoadWorld));
 		func_add_param("filename",		TypeString);
 	add_func("LoadGameFromHost",					TypeVoid,	meta_p(MetaLoadGameFromHost));
-		func_add_param("host",		TypeInt);
+		func_add_param("host",		TypeHostData);
 	add_func("SaveGameState",							TypeVoid,	meta_p(MetaSaveGameState));
 		func_add_param("filename",		TypeString);
 	add_func("LoadGameState",							TypeVoid,	meta_p(MetaLoadGameState));
@@ -678,57 +758,21 @@ void SIAddPackageX()
 	add_ext_var("Elapsed",			TypeFloat,		meta_p(&Elapsed));
 	add_ext_var("ElapsedRT",		TypeFloat,		meta_p(&ElapsedRT));
 	add_ext_var("TimeScale",		TypeFloat,		meta_p(&TimeScale));
-	add_ext_var("InitialWorldFile", TypeString,		god_p(&InitialWorldFile));
-	add_ext_var("CurrentWorldFile", TypeString,		god_p(&CurrentWorldFile));
-	add_ext_var("SecondWorldFile",	TypeString,		god_p(&SecondWorldFile));
+	add_ext_var("World", 			TypeWorldData,	god_p(&World));
+	add_ext_var("Engine", 			TypeEngineData,	x_p(&Engine));
+	add_ext_var("Net", 				TypeNetworkData,x_p(&Net));
 	add_ext_var("Object",			TypeModelPList,	god_p(&Objects));
 	add_ext_var("Ego",				TypeModelP,		god_p(&Ego));
 	add_ext_var("Terrain",			TypeTerrainPList,god_p(&Terrains));
-	add_ext_var("Gravitation",		TypeVector,		god_p(&GlobalG));
-	add_ext_var("PhysicsEnabled",	TypeBool,		god_p(&PhysicsEnabled));
-	add_ext_var("CollisionsEnabled",	TypeBool,		god_p(&CollisionsEnabled));
 	add_ext_var("Cam",				TypeCameraP,		cam_p(&Cam));
-	add_ext_var("SkyBox",			TypeModelPList,	god_p(&SkyBox));
-	add_ext_var("BackGroundColor",	TypeColor,		god_p(&BackGroundColor));
-	add_ext_var("GlobalFog",		TypeFog,		god_p(&GlobalFog));
-	add_ext_var("ScriptVar",		TypeFloatList,	god_p(&ScriptVar));
-	add_ext_var("Ambient",			TypeColor,		god_p(&GlobalAmbient));
-	add_ext_var("SunLight",			TypeInt,		god_p(&SunLight));
-	add_ext_var("SpeedOfSound",		TypeFloat,		god_p(&SpeedOfSound));
 	add_ext_var("TraceHitType",		TypeInt,		god_p(&TraceHitType));
 	add_ext_var("TraceHitIndex",	TypeInt,		god_p(&TraceHitIndex));
 	add_ext_var("TraceHitSubModel", TypeInt,		god_p(&TraceHitSubModel));
 	add_ext_var("CurrentGrouping",	TypeGroupingP,	gui_p(&Gui::CurrentGrouping));
-	add_ext_var("MirrorLevelMax",	TypeInt,		god_p(&MirrorLevelMax));
-	add_ext_var("SessionName",		TypeString,		x_p(&SessionName));
-	add_ext_var("HostNames",		TypeString,		x_p(&HostNames));
-	add_ext_var("AvailableHostName",TypeStringList,	x_p(&AvailableHostName));
-	add_ext_var("AvailableSessionName",	TypeStringList,x_p(&AvailableSessionName));
-	add_ext_var("NetIAmHost",		TypeBool,		x_p(&NetIAmHost));
-	add_ext_var("NetIAmClient",		 TypeBool,		x_p(&NetIAmClient));
-	add_ext_var("NetHasRead",		TypeBool,		x_p(&NetHasRead));
-	add_ext_var("NetHasWritten",	TypeBool,		x_p(&NetHasWritten));
-	add_ext_var("SocketToHost",		TypeSocket,		x_p(&SocketToHost));
-	add_ext_var("SocketToClient",	TypeSocketList,	x_p(&SocketToClient));
-	add_ext_var("CurrentSocket",	TypeSocketP,	x_p(&CurrentSocket));
-	add_ext_var("Debug",			TypeBool,		meta_p(&Debug));
-	add_ext_var("ShowTimings",		TypeBool,		meta_p(&ShowTimings));
-	add_ext_var("WireMode",			TypeBool,		meta_p(&WireMode));
-	add_ext_var("ConsoleEnabled",	TypeBool,		meta_p(&ConsoleEnabled));
-	add_ext_var("Record",			TypeBool,		meta_p(&Record));
-	add_ext_var("ShadowLevel",		TypeInt,		meta_p(&ShadowLevel));
-	add_ext_var("ShadowLowerDetail",TypeBool,		meta_p(&ShadowLowerDetail));
 	add_ext_var("ShadowLight",		TypeInt,		meta_p(&ShadowLight));
 	add_ext_var("ShadowColor",		TypeColor,		meta_p(&ShadowColor));
-	add_ext_var("FpsMax",			TypeFloat,		meta_p(&FpsMax));
-	add_ext_var("FpsMin",			TypeFloat,		meta_p(&FpsMin));
-	add_ext_var("Multisampling",	TypeInt,		meta_p(&Multisampling));
-	add_ext_var("DetailLevel",		TypeInt,		meta_p(&DetailLevel));
-	add_ext_var("DetailFactorInv",	TypeFloat,		meta_p(&DetailFactorInv));
-	add_ext_var("NetworkEnabled",	TypeBool,		meta_p(&NetworkEnabled));
+	add_ext_var("NetworkEnabled",	TypeBool,		x_p(&NetworkEnabled));
 	add_ext_var("XFontIndex",		TypeInt,		meta_p(&XFontIndex));
-	add_ext_var("DefaultFont",		TypeInt,		meta_p(&DefaultFont));
-	add_ext_var("ResettingGame",	TypeBool,		meta_p(&ResettingGame));
 
 	
 	// model skins

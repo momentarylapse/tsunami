@@ -73,7 +73,6 @@ Type *TypeFloat;
 Type *TypeChar;
 Type *TypeString;
 Type *TypeCString;
-Type *TypeSuperArray;
 
 Type *TypeVector;
 Type *TypeRect;
@@ -402,7 +401,14 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 
 		if (t->parent->is_simple_class()){
 			if (!t->parent->UsesCallByReference()){
-				if (t->parent->size == 4){
+				if (t->parent->is_pointer){
+					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<void*>::__init__));
+					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_p_single));
+						func_add_param("x",		t->parent);
+					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_p_single));
+						func_add_param("x",		t->parent);
+						func_add_param("index",		TypeInt);
+				}else if (t->parent->size == 4){
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<int>::__init__));
 					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_4_single));
 						func_add_param("x",		t->parent);
@@ -416,7 +422,8 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_1_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
-				}
+				}else
+					msg_error("evil class type..." + t->name);
 			}else{
 				class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_single));
 					func_add_param("x",		t->parent);
@@ -650,7 +657,6 @@ void SIAddPackageBase()
 
 	// "real"
 	TypeVoid			= add_type  ("void",		0, FLAG_CALL_BY_VALUE);
-	TypeSuperArray		= add_type_a("void[]",		TypeVoid, -1); // substitute for all super arrays
 	TypePointer			= add_type_p("void*",		TypeVoid, FLAG_CALL_BY_VALUE); // substitute for all pointer types
 	TypePointerPs		= add_type_p("void*&",		TypePointer, FLAG_SILENT);
 	TypePointerList		= add_type_a("void*[]",		TypePointer, -1);

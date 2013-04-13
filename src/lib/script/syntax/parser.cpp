@@ -662,8 +662,6 @@ inline bool type_match(Type *type, bool is_class, Type *wanted)
 		return true;
 	if ((is_class) && (wanted == TypeClass))
 		return true;
-	if ((type->is_super_array) && (wanted == TypeSuperArray))
-		return true;
 	return false;
 }
 

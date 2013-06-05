@@ -1451,7 +1451,7 @@ void Serializer::add_cmd_constructor(SerialCommandParam &param, int modus)
 		AddFuncInstance(inst);
 	}
 
-	AddFunctionCall(class_type->owner->script, f->nr);
+	AddFunctionCall(f->script, f->nr);
 	if (modus == KindVarTemp)
 		InsertedConstructorTemp.add(param);
 	else if (modus == KindVarLocal)
@@ -1466,7 +1466,7 @@ void Serializer::add_cmd_destructor(SerialCommandParam &param)
 	SerialCommandParam inst;
 	AddReference(param, TypePointer, inst);
 	AddFuncInstance(inst);
-	AddFunctionCall(param.type->owner->script, f->nr);
+	AddFunctionCall(f->script, f->nr);
 }
 
 void Serializer::FillInConstructorsFunc()

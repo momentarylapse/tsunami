@@ -21,20 +21,15 @@ struct ClassFunction{
 	// _func_(x)  ->  p.func(x)
 	Array<Type*> param_type;
 	Type *return_type;
+	bool is_virtual;
+	ClassFunction(){}
+	ClassFunction(const string &name, Type *return_type, Script *s, int no);
 };
 
 struct Type{
-	Type(){
-		owner = NULL;
-		size = 0;
-		is_array = false;
-		is_super_array = false;
-		array_length = 0;
-		is_pointer = false;
-		is_silent = false;
-		parent = NULL;
-		force_call_by_value = false;
-	};
+	Type();
+	//Type(const string &name, int size, SyntaxTree *owner);
+	~Type();
 	string name;
 	int size; // complete size of type
 	int array_length;
@@ -44,11 +39,13 @@ struct Type{
 	Array<ClassFunction> function;
 	Type *parent;
 	SyntaxTree *owner; // to share and be able to delete...
+	void **vtable;
 
 	bool force_call_by_value;
 	bool UsesCallByReference();
 	bool UsesReturnByMemory();
 	bool is_simple_class();
+	bool IsDerivedFrom(Type *root) const;
 	int GetFunc(const string &name);
 	ClassFunction *GetConstructor();
 	ClassFunction *GetDestructor();

@@ -87,7 +87,6 @@ void Configure()
 	EqualizerDialog.AddText("5k",485,250,40,25,"")
 	EqualizerDialog.AddText("10k",545,250,40,25,"")
 	EqualizerDialog.AddText("20k",600,250,30,25,"")
-	EqualizerDialog.Update()
 	
 	EqualizerDialog.Event("*", &OnEvent)
 
@@ -103,5 +102,5 @@ void Configure()
 	
 	DataToDialog()
 
-	HuiWaitTillWindowClosed(EqualizerDialog)
+	EqualizerDialog.Run()
 

@@ -5,8 +5,6 @@
 
 namespace Script{
 
-extern Script *GlobalDummyScript;
-
 //#define ScriptDebug
 
 
@@ -119,9 +117,29 @@ Command *SyntaxTree::add_command_operator(Command *p1, Command *p2, int op)
 	return cmd;
 }
 
+
+Command *SyntaxTree::add_command_local_var(int no, Type *type)
+{
+	Command *cmd = AddCommand();
+	cmd->kind = KindVarLocal;
+	cmd->link_nr = no;
+	cmd->type = type;
+	return cmd;
+}
+
+Command *SyntaxTree::add_command_parray(Command *p, Command *index, Type *type)
+{
+	Command *cmd_el = AddCommand();
+	cmd_el->kind = KindPointerAsArray;
+	cmd_el->type = type;
+	cmd_el->param[0] = p;
+	cmd_el->param[1] = index;
+	cmd_el->num_params = 2;
+	return cmd_el;
+}
+
 SyntaxTree::SyntaxTree(Script *_script)
 {
-	Exp.buffer = NULL;
 	FlagShow = false;
 	FlagShowPrae = false;
 	FlagDisassemble = false;
@@ -137,11 +155,10 @@ SyntaxTree::SyntaxTree(Script *_script)
 	cur_func = NULL;
 	script = _script;
 
-	NumOwnTypes = 0;
-
 	// "include" default stuff
-	if (GlobalDummyScript)
-		Includes.add(GlobalDummyScript);
+	foreach(Package &p, Packages)
+		if (p.used_by_default)
+			AddIncludeData(p.script);
 }
 
 
@@ -319,7 +336,7 @@ void SyntaxTree::CreateAsmMetaInfo()
 
 int SyntaxTree::AddVar(const string &name, Type *type, Function *f)
 {
-	LocalVariable v;
+	Variable v;
 	v.name = name;
 	v.type = type;
 	v.is_extern = next_extern;
@@ -331,14 +348,14 @@ int SyntaxTree::AddVar(const string &name, Type *type, Function *f)
 
 int SyntaxTree::AddConstant(Type *type)
 {
-	Constants.resize(Constants.num + 1);
-	Constant *c = &Constants.back();
-	c->name = "-none-";
-	c->type = type;
+	Constant c;
+	c.name = "-none-";
+	c.type = type;
 	int s = max(type->size, config.PointerSize);
 	if (type == TypeString)
 		s = 256;
-	c->data = new char[s];
+	c.data = new char[s];
+	Constants.add(c);
 	return Constants.num - 1;
 }
 
@@ -439,27 +456,17 @@ void exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no)
 	ps->GetExistenceLink.instance = NULL;
 }
 
-bool SyntaxTree::GetExistence(const string &name, Function *func)
+bool SyntaxTree::GetExistenceShared(const string &name)
 {
-	msg_db_f("GetExistence", 3);
+	msg_db_f("GetExistenceShared", 3);
 	MultipleFunctionList.clear();
 	GetExistenceLink.type = TypeUnknown;
 	GetExistenceLink.num_params = 0;
 	GetExistenceLink.script = script;
 	GetExistenceLink.instance = NULL;
 
-	// first test local variables
-	if (func){
-		foreachi(LocalVariable &v, func->var, i){
-			if (v.name == name){
-				exlink_make_var_local(this, v.type, i);
-				return true;
-			}
-		}
-	}
-
-	// then global variables (=local variables in "RootOfAllEvil")
-	foreachi(LocalVariable &v, RootOfAllEvil.var, i)
+	// global variables (=local variables in "RootOfAllEvil")
+	foreachi(Variable &v, RootOfAllEvil.var, i)
 		if (v.name == name){
 			GetExistenceLink.type = v.type;
 			GetExistenceLink.link_nr = i;
@@ -476,6 +483,44 @@ bool SyntaxTree::GetExistence(const string &name, Function *func)
 			GetExistenceLink.num_params = f->num_params;
 			return true;
 		}
+
+	// types
+	int w = WhichType(name);
+	if (w >= 0){
+		GetExistenceLink.kind = KindType;
+		GetExistenceLink.link_nr = w;
+		return true;
+	}
+
+	// ...unknown
+	GetExistenceLink.type = TypeUnknown;
+	GetExistenceLink.kind = KindUnknown;
+	GetExistenceLink.link_nr = 0;
+	return false;
+}
+
+bool SyntaxTree::GetExistence(const string &name, Function *func)
+{
+	msg_db_f("GetExistence", 3);
+	MultipleFunctionList.clear();
+	GetExistenceLink.type = TypeUnknown;
+	GetExistenceLink.num_params = 0;
+	GetExistenceLink.script = script;
+	GetExistenceLink.instance = NULL;
+
+	// first test local variables
+	if (func){
+		foreachi(Variable &v, func->var, i){
+			if (v.name == name){
+				exlink_make_var_local(this, v.type, i);
+				return true;
+			}
+		}
+	}
+
+	// shared stuff (global variables, functions)
+	if (GetExistenceShared(name))
+		return true;
 
 	// then the compiler functions
 	int w = WhichCompilerFunction(name);
@@ -495,19 +540,9 @@ bool SyntaxTree::GetExistence(const string &name, Function *func)
 		return true;
 	}
 
-	// types
-	w = WhichType(name);
-	if (w >= 0){
-		GetExistenceLink.kind = KindType;
-		GetExistenceLink.link_nr = w;
-		return true;
-	}
-
 	// in include files (only global)...
 	foreach(Script *i, Includes)
-		if (i->syntax->GetExistence(name, NULL)){
-			if (i->syntax->GetExistenceLink.script != i) // nicht rekursiv!!!
-				continue;
+		if (i->syntax->GetExistenceShared(name)){
 			memcpy(&GetExistenceLink, &(i->syntax->GetExistenceLink), sizeof(Command));
 			GetExistenceLink.script = i;
 			//msg_error(string2("\"%s\" in Include gefunden!  %s", name, GetExistenceLink.Type->Name));
@@ -530,7 +565,7 @@ void SyntaxTree::CommandSetCompilerFunction(int CF, Command *Com)
 // a function the compiler knows
 	Com->kind = KindCompilerFunction;
 	Com->link_nr = CF;
-	Com->script = GlobalDummyScript;
+	Com->script = Packages[0].script;
 	Com->instance = NULL;
 
 	Com->num_params = PreCommands[CF].param.num;
@@ -542,16 +577,22 @@ void SyntaxTree::CommandSetCompilerFunction(int CF, Command *Com)
 }
 
 // expression naming a type
-Type *SyntaxTree::GetType(const string &name,bool force)
+Type *SyntaxTree::FindType(const string &name)
 {
-	Type *type = NULL;
 	for (int i=0;i<Types.num;i++)
 		if (name == Types[i]->name)
-			type = Types[i];
+			return Types[i];
 	foreach(Script *inc, Includes)
 		for (int i=0;i<inc->syntax->Types.num;i++)
 			if (name == inc->syntax->Types[i]->name)
-				type = inc->syntax->Types[i];
+				return inc->syntax->Types[i];
+	return NULL;
+}
+
+// expression naming a type
+Type *SyntaxTree::GetType(const string &name, bool force)
+{
+	Type *type = FindType(name);
 	if ((force) && (!type))
 		DoError("unknown type");
 	if (type)
@@ -580,7 +621,6 @@ void SyntaxTree::AddType(Type **type)
 	so("AddType: " + t->name);
 	(*type) = t;
 	Types.add(t);
-	NumOwnTypes ++;
 
 	if (t->is_super_array)
 		script_make_super_array(t, this);
@@ -619,13 +659,11 @@ void SyntaxTree::LoadToBuffer(const string &filename,bool just_analyse)
 		Exp.cur_line = NULL;
 		DoError("script file not loadable");
 	}
-	Buffer = f->ReadComplete();
+	string Buffer = f->ReadComplete();
+	Buffer.add(0); // compatibility... expected by lexical
 	FileClose(f);
 
-	Exp.Analyse(this, Buffer.c_str());
-
-
-	Buffer.clear();
+	Exp.Analyse(this, Buffer);
 }
 
 void conv_cbr(SyntaxTree *ps, Command *&c, int var)
@@ -723,7 +761,7 @@ void convert_return_by_memory(SyntaxTree *ps, Block *b, Function *f)
 
 		// convert into   *-return- = param
 		Command *p_ret = NULL;
-		foreachi(LocalVariable &v, f->var, i)
+		foreachi(Variable &v, f->var, i)
 			if (v.name == "-return-"){
 				p_ret = ps->AddCommand();
 				p_ret->type = v.type;
@@ -864,8 +902,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 
 			Command *c_index = c->param[1];
 			// & array
-			Command *c_ref_array = cp_command(c->param[0]);
-			ref_command_old(this, c_ref_array);
+			Command *c_ref_array = ref_command(c->param[0]);
 			// create command for size constant
 			int nc = AddConstant(TypeInt);
 			*(int*)Constants[nc].data = el_type->size;
@@ -918,8 +955,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 //        -> shift
 
 			// & struct
-			Command *c_ref_struct = cp_command(c->param[0]);
-			ref_command_old(this, c_ref_struct);
+			Command *c_ref_struct = ref_command(c->param[0]);
 			// create command for shift constant
 			int nc = AddConstant(TypeInt);
 			*(int*)Constants[nc].data = c->link_nr;
@@ -966,7 +1002,7 @@ void SyntaxTree::MapLocalVariablesToStack()
 
 			// map "-return-" to the VERY first parameter
 			if (f->return_type->UsesReturnByMemory()){
-				foreachi(LocalVariable &v, f->var, i)
+				foreachi(Variable &v, f->var, i)
 					if (v.name == "-return-"){
 						v._offset = f->_param_size;
 						f->_param_size += 4;
@@ -975,14 +1011,14 @@ void SyntaxTree::MapLocalVariablesToStack()
 
 			// map "self" to the first parameter
 			if (f->_class){
-				foreachi(LocalVariable &v, f->var, i)
+				foreachi(Variable &v, f->var, i)
 					if (v.name == "self"){
 						v._offset = f->_param_size;
 						f->_param_size += 4;
 					}
 			}
 
-			foreachi(LocalVariable &v, f->var, i){
+			foreachi(Variable &v, f->var, i){
 				if ((f->_class) && (v.name == "self"))
 					continue;
 				if (v.name == "-return-")
@@ -1001,7 +1037,7 @@ void SyntaxTree::MapLocalVariablesToStack()
 		}else if (config.instruction_set == Asm::InstructionSetAMD64){
 			f->_var_size = 0;
 			
-			foreachi(LocalVariable &v, f->var, i){
+			foreachi(Variable &v, f->var, i){
 				int s = mem_align(v.type->size, 4);
 				v._offset = - f->_var_size - s;
 				f->_var_size += s;
@@ -1019,31 +1055,23 @@ SyntaxTree::~SyntaxTree()
 	Exp.clear();
 
 	// delete all types created by this script
-	for (int i=Types.num-NumOwnTypes;i<Types.num;i++)
-		if (Types[i]->owner == this) // redundant...
-			delete(Types[i]);
+	foreach(Type *t, Types)
+		delete(t);
 
-	
-	msg_db_m("asm", 8);
 	if (AsmMetaInfo)
 		delete(AsmMetaInfo);
 	
-	msg_db_m("const", 8);
 	foreach(Constant &c, Constants)
-		if (c.owner == this)
-			delete[](c.data);
+		delete[](c.data);
 
+	foreach(Command *c, Commands)
+		delete(c);
+
+	foreach(Block *b, Blocks)
+		delete(b);
 	
-	msg_db_m("cmd", 8);
-	for (int i=0;i<Commands.num;i++)
-		delete(Commands[i]);
-
-	msg_db_m("rest", 8);
-
-	for (int i=0;i<Blocks.num;i++)
-		delete(Blocks[i]);
-	for (int i=0;i<Functions.num;i++)
-		delete(Functions[i]);
+	foreach(Function *f, Functions)
+		delete(f);
 }
 
 void SyntaxTree::ShowCommand(Command *c)

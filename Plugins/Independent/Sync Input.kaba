@@ -29,14 +29,13 @@ void sync()
 void main()
 	dlg = HuiCreateSizableDialog("Sync", 200, 80, MainWin, false)
 	dlg.AddText("Sync...", 0, 0, 0, 0, "")
-	dlg.Update()
 	offset_in = 0
 	
 	input.AddObserver(nil, &sync)
 	output.PlayGenerated(&fill, SAMPLE_RATE)
 	input.Start(TRACK_TYPE_AUDIO, SAMPLE_RATE)
 	
-	HuiWaitTillWindowClosed(dlg)
+	dlg.Run()
 	
 	input.RemoveObserver(nil)
 	output.Stop()

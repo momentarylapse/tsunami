@@ -32,10 +32,10 @@ extern Array<sHuiImage> HuiImage;
 
 
 // window lists...
-extern Array<CHuiWindow*> HuiWindow;
+extern Array<HuiWindow*> HuiWindows;
 struct HuiClosedWindow
 {
-	CHuiWindow *win;
+	HuiWindow *win;
 	int unique_id;
 	string last_id;
 };

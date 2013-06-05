@@ -1698,7 +1698,7 @@ int GetModRMRegister(int reg, int size)
 		if (reg == 0x0e)	return RegR14;
 		if (reg == 0x0f)	return RegR15;
 	}
-	msg_error("unhandled mod/rm register: " + i2s(reg));
+	msg_error("unhandled mod/rm register: " + i2s(reg) + " (size " + i2s(size) + ")");
 	return 0;
 }
 
@@ -1746,15 +1746,11 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 			}else{
 				p.type = ParamTRegister;
 				p.deref = true;
-				if (rm == 0x00)	p.reg = RegisterByID[RegEax];
-				if (rm == 0x01)	p.reg = RegisterByID[RegEcx];
-				if (rm == 0x02)	p.reg = RegisterByID[RegEdx];
-				if (rm == 0x03)	p.reg = RegisterByID[RegEbx];
 				//if (rm == 0x04){p.reg = NULL;	p.disp = DispModeSIB;	p.type = ParamTImmediate;}//p.type = ParamTInvalid;	Error("kein SIB byte...");}
 				if (rm == 0x04){p.reg = RegisterByID[RegEax];	p.disp = DispModeSIB;	} // eax = provisoric
-				if (rm == 0x05){p.reg = NULL;	p.type = ParamTImmediate;	}
-				if (rm == 0x06)	p.reg = RegisterByID[RegEsi];
-				if (rm == 0x07)	p.reg = RegisterByID[RegEdi];
+				else if (rm == 0x05){p.reg = NULL;	p.type = ParamTImmediate;	}
+				else
+					p.reg = RegisterByID[GetModRMRegister(rm, Size32)];
 			}
 		}else if ((mod == 0x40) || (mod == 0x80)){
 			if (state.AddrSize == Size16){
@@ -1772,15 +1768,10 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 				p.type = ParamTRegister;
 				p.deref = true;
 				p.disp = (mod == 0x40) ? DispMode8 : DispMode32;
-				if (rm == 0x00)	p.reg = RegisterByID[RegEax];
-				if (rm == 0x01)	p.reg = RegisterByID[RegEcx];
-				if (rm == 0x02)	p.reg = RegisterByID[RegEdx];
-				if (rm == 0x03)	p.reg = RegisterByID[RegEbx];
 				//if (rm == 0x04){p.reg = NULL;	p.type = ParamTInvalid;	}
 				if (rm == 0x04){p.reg = RegisterByID[RegEax];	p.disp = DispMode8SIB;	} // eax = provisoric
-				if (rm == 0x05)	p.reg = RegisterByID[RegEbp];
-				if (rm == 0x06)	p.reg = RegisterByID[RegEsi];
-				if (rm == 0x07)	p.reg = RegisterByID[RegEdi];
+				else
+					p.reg = RegisterByID[GetModRMRegister(rm, Size32)];
 			}
 		}else if (mod == 0xc0){
 			p.type = ParamTRegister;
@@ -1836,7 +1827,7 @@ inline void ReadParamData(char *&cur, InstructionParam &p, bool has_modrm)
 	p.value = 0;
 	if (p.type == ParamTImmediate){
 		if (p.deref){
-			int size = has_modrm ? state.AddrSize : Size64;
+			int size = has_modrm ? state.AddrSize : state.FullRegisterSize;
 			memcpy(&p.value, cur, size);
 			cur += size;
 		}else{
@@ -2999,9 +2990,8 @@ InstructionParam _make_param_(int type, int size, long long param)
 	return i;
 }
 
-char GetModRMReg(Register *r)
+int GetModRMReg(Register *r)
 {
-	// TODO  already create REX byte...
 	int id = r->id;
 	if ((id == RegR8)  || (id == RegR8d)  || (id == RegRax) || (id == RegEax) || (id == RegAx) || (id == RegAl))	return 0x00;
 	if ((id == RegR9)  || (id == RegR9d)  || (id == RegRcx) || (id == RegEcx) || (id == RegCx) || (id == RegCl))	return 0x01;
@@ -3016,7 +3006,7 @@ char GetModRMReg(Register *r)
 	return 0;
 }
 
-inline char CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &p)
+inline int CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &p)
 {
 	int r = -1;
 	if (p.reg)
@@ -3032,7 +3022,10 @@ inline char CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &
 		if (r == RegCr1)	return 0x08;
 		if (r == RegCr2)	return 0x10;
 		if (r == RegCr3)	return 0x18;
-		return GetModRMReg(p.reg) << 3;
+		int mrm = GetModRMReg(p.reg) << 3;
+		if (p.reg->extend_mod_rm)
+			mrm += 0x0400; // REXR
+		return mrm;
 	}else if (pf.mrm_mode == MRMModRM){
 		if (p.deref){
 			if (state.AddrSize == Size16){
@@ -3050,7 +3043,10 @@ inline char CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &
 				if ((r == RegEdi) || (r == RegRdi))	return (p.disp == DispModeNone) ? 0x07 : ((p.disp == DispMode8) ? 0x47 : 0x87);
 			}
 		}else{
-			return GetModRMReg(p.reg) | 0xc0;
+			int mrm = GetModRMReg(p.reg) | 0xc0;
+			if (p.reg->extend_mod_rm)
+				mrm += 0x0100; // REXB
+			return mrm;
 		}
 	}
 	if (pf.mrm_mode != MRMNone)
@@ -3058,11 +3054,11 @@ inline char CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &
 	return 0x00;
 }
 
-char CreateModRMByte(CPUInstruction &inst, InstructionParam &p1, InstructionParam &p2)
+int CreateModRMByte(CPUInstruction &inst, InstructionParam &p1, InstructionParam &p2)
 {
-	char mrm = CreatePartialModRMByte(inst.param1, p1) | CreatePartialModRMByte(inst.param2, p2);
+	int mrm = CreatePartialModRMByte(inst.param1, p1) | CreatePartialModRMByte(inst.param2, p2);
 	if (inst.cap >= 0)
-		mrm |= (inst.cap * 8);
+		mrm |= (inst.cap << 3);
 	return mrm;
 }
 
@@ -3074,14 +3070,14 @@ void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionP
 	if (inst.has_small_param)
 		append_val(oc, ocs, 0x66, 1);
 
+	int mod_rm = 0;
+	if (inst.has_modrm)
+		mod_rm = CreateModRMByte(inst, p1, p2);
+
 	// REX prefix
-	char rex = 0;
+	char rex = mod_rm >> 8;
 	if (inst.has_big_param)//state.ParamSize == Size64)
 		rex |= 0x08;
-	if (p1.reg && p1.reg->extend_mod_rm)
-		rex |= 0x01;
-	if (p2.reg && p2.reg->extend_mod_rm)
-		rex |= 0x04;
 	if (rex != 0)
 		append_val(oc, ocs, 0x40 | rex, 1);
 
@@ -3091,7 +3087,7 @@ void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionP
 
 	// create mod/rm-byte
 	if (inst.has_modrm)
-		oc[ocs ++] = CreateModRMByte(inst, p1, p2);
+		oc[ocs ++] = mod_rm;
 
 	OCParam = ocs;
 

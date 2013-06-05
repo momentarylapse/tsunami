@@ -11,9 +11,10 @@
 
 //#include "hui_common.h"
 
-class CHuiMenu;
+class HuiMenu;
 class HuiEvent;
-class CHuiWindow;
+class HuiWindow;
+class rect;
 
 
 struct HuiCompleteWindowMessage
@@ -69,7 +70,7 @@ struct HuiControl
 #endif
 	bool enabled;
 	bool is_button_bar;
-	CHuiWindow *win;
+	HuiWindow *win;
 };
 
 struct HuiToolbarItem
@@ -80,7 +81,7 @@ struct HuiToolbarItem
 	GtkToolItem *widget;
 #endif
 	bool enabled;
-	CHuiMenu *menu;
+	HuiMenu *menu;
 };
 
 struct HuiToolbar
@@ -116,7 +117,7 @@ class HuiDrawingContext
 #ifdef HUI_API_GTK
 	cairo_t *cr;
 #endif
-	CHuiWindow *win;
+	HuiWindow *win;
 	string id;
 	void _cdecl End();
 	color _cdecl GetThemeColor(int i);
@@ -140,17 +141,20 @@ class HuiDrawingContext
 	int width, height;
 };
 
-class CHuiWindow : public HuiEventHandler
+class HuiWindow : public HuiEventHandler
 {
 public:
-	CHuiWindow(const string &title, int x, int y, int width, int height, CHuiWindow *parent, bool allow_parent, int mode, bool show);
-	virtual ~CHuiWindow();
-	void _Init_(CHuiWindow *parent, bool allow_parent, int mode);
+	HuiWindow(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
+	HuiWindow(const string &id, HuiWindow *parent, bool allow_parent);
+	virtual ~HuiWindow();
+	void _Init_(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
+	void _InitGeneric_(HuiWindow *parent, bool allow_parent, int mode);
 	void _CleanUp_();
 
 	// the window
-	void _cdecl Update();
-	void _cdecl Hide(bool hide);
+	string _cdecl Run();
+	void _cdecl Show();
+	void _cdecl Hide();
 	void _cdecl SetMaximized(bool maximized);
 	bool _cdecl IsMaximized();
 	bool _cdecl IsMinimized();
@@ -158,7 +162,7 @@ public:
 	void _cdecl SetFullscreen(bool fullscreen);
 	void _cdecl SetTitle(const string &title);
 	void _cdecl SetPosition(int x, int y);
-	void _cdecl SetPositionSpecial(CHuiWindow *win, int mode);
+	void _cdecl SetPositionSpecial(HuiWindow *win, int mode);
 	void _cdecl SetSize(int width, int height);
 	void _cdecl SetOuterior(irect rect);
 	irect _cdecl GetOuterior();
@@ -167,10 +171,10 @@ public:
 	irect GetInterior();
 	void _cdecl Activate(const string &control_id = "");
 	bool _cdecl IsActive(bool include_sub_windows=false);
-	void _cdecl SetMenu(CHuiMenu *menu);
-	CHuiMenu *GetMenu();
+	void _cdecl SetMenu(HuiMenu *menu);
+	HuiMenu *GetMenu();
 	void _cdecl SetBorderWidth(int width);
-	CHuiWindow *GetParent();
+	HuiWindow *GetParent();
 	void FromResource(const string &id);
 
 
@@ -186,7 +190,7 @@ public:
 	void _cdecl ToolbarConfigure(bool text_enabled, bool large_icons);
 	void _cdecl ToolbarAddItem(const string &title, const string &tool_tip, const string &image, const string &id);
 	void _cdecl ToolbarAddItemCheckable(const string &title, const string &tool_tip, const string &image, const string &id);
-	void _cdecl ToolbarAddItemMenu(const string &title, const string &tool_tip, const string &image, CHuiMenu *menu, const string &id);
+	void _cdecl ToolbarAddItemMenu(const string &title, const string &tool_tip, const string &image, HuiMenu *menu, const string &id);
 	void _cdecl ToolbarAddItemMenuByID(const string &title, const string &tool_tip, const string &image, const string &menu_id, const string &id);
 	void _cdecl ToolbarAddSeparator();
 	void _cdecl ToolbarReset();
@@ -339,31 +343,30 @@ private:
 	HuiControl *cur_control;
 	Array<HuiWinEvent> event;
 	HuiToolbar toolbar[4], *cur_toolbar;
-	CHuiMenu *menu, *popup;
+	HuiMenu *menu, *popup;
 	bool statusbar_enabled;
 	bool allowed, allow_keys;
-	CHuiWindow *parent, *terror_child;
-	Array<CHuiWindow*> sub_window;
+	HuiWindow *parent, *terror_child;
+	Array<HuiWindow*> sub_window;
 
 	int unique_id;
 	string id;
-	bool is_hidden;
 	int main_level;
 	string cur_id;
 
 	//HuiCompleteWindowMessage CompleteWindowMessage;
 };
 
-extern CHuiWindow *HuiCurWindow;
+extern HuiWindow *HuiCurWindow;
 
-void _cdecl HuiWindowAddControl(CHuiWindow *win, const string &type, const string &title, int x, int y, int width, int height, const string &id);
+void _cdecl HuiWindowAddControl(HuiWindow *win, const string &type, const string &title, int x, int y, int width, int height, const string &id);
 
-CHuiWindow *_cdecl HuiCreateWindow(const string &title, int x, int y, int width, int height);
-CHuiWindow *_cdecl HuiCreateNixWindow(const string &title, int x, int y, int width, int height);
-CHuiWindow *_cdecl HuiCreateControlWindow(const string &title, int x, int y, int width, int height);
-CHuiWindow *_cdecl HuiCreateDialog(const string &title, int width, int height, CHuiWindow *root, bool allow_root);
-CHuiWindow *_cdecl HuiCreateSizableDialog(const string &title, int width, int height, CHuiWindow *root, bool allow_root);
-void _cdecl HuiCloseWindow(CHuiWindow *win);
+HuiWindow *_cdecl HuiCreateWindow(const string &title, int x, int y, int width, int height);
+HuiWindow *_cdecl HuiCreateNixWindow(const string &title, int x, int y, int width, int height);
+HuiWindow *_cdecl HuiCreateControlWindow(const string &title, int x, int y, int width, int height);
+HuiWindow *_cdecl HuiCreateDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+HuiWindow *_cdecl HuiCreateSizableDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+void _cdecl HuiCloseWindow(HuiWindow *win);
 
 void HuiFuncIgnore();
 void HuiFuncClose();

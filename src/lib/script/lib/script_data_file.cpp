@@ -35,7 +35,7 @@ void SIAddPackageFile()
 {
 	msg_db_f("SIAddPackageFile", 3);
 
-	set_cur_package("file");
+	add_package("file", false);
 
 	Type*
 	TypeFile			= add_type  ("File",		0);
@@ -117,7 +117,7 @@ void SIAddPackageFile()
 		func_add_param("filename",		TypeString);
 	add_func("FileRead",			TypeString,				(void*)&FileRead);
 		func_add_param("filename",		TypeString);
-	add_func("FileClose",			TypeBool,				(void*)&FileClose);
+	add_func("FileClose",			TypeVoid,				(void*)&FileClose);
 		func_add_param("f",		TypeFileP);
 	add_func("FileExists",			TypeBool,		(void*)&file_test_existence);
 		func_add_param("filename",		TypeString);
@@ -127,6 +127,8 @@ void SIAddPackageFile()
 	add_func("FileCopy",			TypeBool,			(void*)&file_copy);
 		func_add_param("source",		TypeString);
 		func_add_param("dest",		TypeString);
+	add_func("FileDelete",			TypeBool,			(void*)&file_delete);
+		func_add_param("filename",		TypeString);
 	add_func("DirSearch",			TypeDirEntryList,			(void*)&dir_search);
 		func_add_param("dir",		TypeString);
 		func_add_param("filter",		TypeString);

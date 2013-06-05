@@ -9,7 +9,7 @@
 
 
 
-Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_callback *_func, float _value)
+Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_callback *_func, float _value)
 {
 	win = _win;
 	id_slider = _id_slider;
@@ -29,7 +29,7 @@ Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_e
 
 
 
-Slider::Slider(CHuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, void(HuiEventHandler::*_func)(), float _value, HuiEventHandler *_handler)
+Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, void(HuiEventHandler::*_func)(), float _value, HuiEventHandler *_handler)
 {
 	win = _win;
 	id_slider = _id_slider;

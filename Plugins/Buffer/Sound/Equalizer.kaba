@@ -150,7 +150,6 @@ void Configure()
 	dlg.AddControlTable("", 0, 0, 1, 3, "table")
 	dlg.SetTarget("table", 0)
 	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")
-	dlg.Update()
 	
 	dlg.EventX("drawing", "hui:redraw", &Draw)
 	dlg.EventX("drawing", "hui:left-button-down", &OnLeftButtonDown)
@@ -167,5 +166,5 @@ void Configure()
 	
 	DataToDialog()
 
-	HuiWaitTillWindowClosed(dlg)
+	dlg.Run()
 

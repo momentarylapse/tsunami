@@ -11,8 +11,8 @@
 #include "script.h"
 
 #include "../config.h"
-#ifdef _X_ALLOW_META_
-	#include "../x/x.h"
+#ifdef _X_ALLOW_X_
+	#include "../../meta.h"
 #endif
 
 #ifdef OS_LINUX
@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.10.11.0";
+string Version = "0.11.9.0";
 
 //#define ScriptDebug
 
@@ -227,7 +227,7 @@ Script::Script()
 	cur_func = NULL;
 	WaitingMode = WaitingModeFirst;
 	TimeToWait = 0;
-	ShowCompilerStats = (!config.CompileSilently) && ShowCompilerStats;
+	ShowCompilerStats = !config.CompileSilently;
 
 	Opcode = NULL;
 	OpcodeSize = 0;
@@ -269,18 +269,13 @@ Script::~Script()
 }
 
 
-
-static string single_command;
-
-
 // bad:  should clean up in case of errors!
 void ExecuteSingleScriptCommand(const string &cmd)
 {
 	if (cmd.num < 1)
 		return;
 	msg_db_f("ExecuteSingleScriptCmd", 2);
-	single_command = cmd;
-	msg_write("script command: " + single_command);
+	msg_write("script command: " + cmd);
 
 	// empty script
 	Script *s = new Script();
@@ -289,7 +284,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 	try{
 
 // find expressions
-	ps->Exp.Analyse(ps, single_command.c_str());
+	ps->Exp.Analyse(ps, cmd + string("\0", 1));
 	if (ps->Exp.line[0].exp.num < 1){
 		//clear_exp_buffer(&ps->Exp);
 		delete(s);
@@ -304,7 +299,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 
 	// parse
 	ps->Exp.reset_parser();
-	ps->GetCompleteCommand(func->block, func);
+	ps->ParseCompleteCommand(func->block, func);
 	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&func);
 
 	ps->ConvertCallByReference();
@@ -362,6 +357,47 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 	return NULL;
 }
 
+void *Script::MatchClassFunction(const string &_class, bool allow_derived, const string &name, const string &return_type, int num_params, ...)
+{
+	msg_db_f("MatchClassFunction", 2);
+
+	// process argument list
+	va_list marker;
+	va_start(marker, num_params);
+	string param_type[SCRIPT_MAX_PARAMS];
+	for (int p=0;p<num_params;p++)
+		param_type[p] = string(va_arg(marker, char*));
+	va_end(marker);
+
+	Type *root_type = syntax->FindType(_class);
+	if (!root_type)
+		return NULL;
+
+	// match
+	foreachi(Function *f, syntax->Functions, i){
+		if (!f->_class)
+			continue;
+		if (!f->_class->IsDerivedFrom(root_type))
+			continue;
+		if ((f->name.match("*." + name)) && (f->literal_return_type->name == return_type) && (num_params == f->num_params)){
+
+			bool params_ok = true;
+			for (int j=0;j<num_params;j++)
+				//if ((*f)->Var[j].Type->name != param_type[j])
+				if (f->literal_param_type[j]->name != param_type[j])
+					params_ok = false;
+			if (params_ok){
+				if (JustAnalyse)
+					return (void*)0xdeadbeaf;
+				else
+					return (void*)func[i];
+			}
+		}
+	}
+
+	return NULL;
+}
+
 void print_var(void *p, const string &name, Type *t)
 {
 	msg_write(t->name + " " + name + " = " + t->var2str(p));
@@ -369,7 +405,7 @@ void print_var(void *p, const string &name, Type *t)
 
 void Script::ShowVars(bool include_consts)
 {
-	foreachi(LocalVariable &v, syntax->RootOfAllEvil.var, i)
+	foreachi(Variable &v, syntax->RootOfAllEvil.var, i)
 		print_var((void*)g_var[i], v.name, v.type);
 	/*if (include_consts)
 		foreachi(LocalVariable &c, pre_script->Constant, i)
@@ -395,11 +431,11 @@ void Script::Execute()
 		first_execution();
 		//msg_left();
 	}else{
-#ifdef _X_ALLOW_META_
+#ifdef _X_ALLOW_X_
 		if (WaitingMode==WaitingModeRT)
-			TimeToWait-=ElapsedRT;
+			TimeToWait -= Engine.ElapsedRT;
 		else
-			TimeToWait-=Elapsed;
+			TimeToWait -= Engine.Elapsed;
 		if (TimeToWait>0){
 			return;
 		}

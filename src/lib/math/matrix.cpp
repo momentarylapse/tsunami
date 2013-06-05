@@ -1,7 +1,7 @@
-#include "types.h"
+#include "math.h"
 #include "../file/file.h"
 
-// ZXY -> Objekte und Figur-Teile / Modell-Transformationen
+// ZXY -> object transformation
 // der Vektor nach vorne (0,0,1) wird
 // 1. um die z-Achse gedreht (um sich selbst)
 // 2. um die x-Achse gedreht (nach oben oder unten "genickt")
@@ -18,6 +18,97 @@
 //------------------------------------------------------------------------------------------------//
 //                                           matrices                                             //
 //------------------------------------------------------------------------------------------------//
+
+
+matrix::matrix(const float f[16])
+{
+	for (int i=0;i<16;i++)
+		e[i]=f[i];
+}
+
+matrix::matrix(const vector &a, const vector &b, const vector &c)
+{
+	_00 = a.x;	_01 = b.x;	_02 = c.x;	_03 = 0;
+	_10 = a.y;	_11 = b.y;	_12 = c.y;	_13 = 0;
+	_20 = a.z;	_21 = b.z;	_22 = c.z;	_23 = 0;
+	_30 = 0;	_31 = 0;	_32 = 0;	_33 = 1;
+}
+
+matrix matrix::operator + (const matrix &m) const
+{
+	matrix r;
+	for (int i=0;i<16;i++)
+		r.e[i]=e[i]+m.e[i];
+	return r;
+}
+
+matrix matrix::operator - (const matrix &m) const
+{
+	matrix r;
+	for (int i=0;i<16;i++)
+		r.e[i]=e[i]-m.e[i];
+	return r;
+}
+
+matrix matrix::operator * (const matrix &m) const
+{
+	return MatrixMultiply2(*this, m);
+}
+
+matrix matrix::operator *= (const matrix &m)
+{
+	matrix r = (*this * m);
+	*this = r;
+	return *this;
+}
+
+vector matrix::operator * (const vector &v) const
+{
+	return vector(	v.x*_00 + v.y*_01 + v.z*_02 + _03,
+					v.x*_10 + v.y*_11 + v.z*_12 + _13,
+					v.x*_20 + v.y*_21 + v.z*_22 + _23);
+}
+
+matrix matrix::operator * (float f) const
+{
+	matrix r;
+	for (int i=0;i<16;i++)
+		r.e[i] = e[i] * f;
+	return r;
+}
+
+vector matrix::transform_normal(const vector &v) const
+{
+	return vector(	v.x*_00 + v.y*_01 + v.z*_02,
+					v.x*_10 + v.y*_11 + v.z*_12,
+					v.x*_20 + v.y*_21 + v.z*_22);
+}
+vector matrix::untransform(const vector &v) const
+{
+	matrix i;
+	MatrixInverse(i, *this);
+	return i * v;
+}
+
+vector matrix::project(const vector &v) const
+{
+	return (*this * v) / (v.x*_30 + v.y*_31 + v.z*_32 + _33);
+}
+
+string matrix::str() const
+{
+	return format("(%f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f; %f, %f, %f, %f)", _00, _01, _02, _03, _10, _11, _12, _13, _20, _21, _22, _23, _30, _31, _32, _33);
+}
+
+// kaba
+void matrix::imul(const matrix &m)
+{	*this *= m;	}
+matrix matrix::mul(const matrix &m) const
+{	return *this * m;	}
+
+vector matrix::mul_v(const vector &v) const
+{	return *this * v;	}
+
 
 #define _ps(a,b,i,j)	(a.__e[0][i]*b.__e[j][0] + a.__e[1][i]*b.__e[j][1] + a.__e[2][i]*b.__e[j][2] + a.__e[3][i]*b.__e[j][3])
 
@@ -45,13 +136,10 @@ matrix MatrixMultiply2(const matrix &m2, const matrix &m1)
 	return _m;
 }
 
-static const float _IdentityMatrix[16]={	1,0,0,0,	0,1,0,0,	0,0,1,0,	0,0,0,1	};
-
 // identity (no transformation: m*v=v)
 void MatrixIdentity(matrix &m)
 {
-	m = _IdentityMatrix;
-	//memcpy(&m,&_IdentityMatrix,sizeof(matrix));
+	m = m_id;
 	/*
 	m._00=1;	m._01=0;	m._02=0;	m._03=0;
 	m._10=0;	m._11=1;	m._12=0;	m._13=0;
@@ -59,7 +147,7 @@ void MatrixIdentity(matrix &m)
 	m._30=0;	m._31=0;	m._32=0;	m._33=1;*/
 }
 
-float _Determinant(float m[16])
+inline float _Determinant(const float m[16])
 {
 	return
 		m[12]*m[9]*m[6]*m[3]-
@@ -87,6 +175,9 @@ float _Determinant(float m[16])
 		m[4]*m[1]*m[10]*m[15]+
 		m[0]*m[5]*m[10]*m[15];
 }
+
+float matrix::determinant() const
+{	return _Determinant(e);		}
 
 // inverting the transformation
 void MatrixInverse(matrix &mo,const matrix &mi)
@@ -143,7 +234,7 @@ void MatrixTranslation(matrix &m,const vector &t)
 	m._30=0;	m._31=0;	m._32=0;	m._33=1;
 }
 
-// Rotation um die X-Achse (nach unten)
+// rotation around the X axis (down)
 void MatrixRotationX(matrix &m,float w)
 {
 	float sw=sinf(w);
@@ -154,7 +245,7 @@ void MatrixRotationX(matrix &m,float w)
 	m._30=0;	m._31=0;	m._32=0;	m._33=1;
 }
 
-// Rotation um die Y-Achse (nach rechts)
+// rotation around the Y axis (to the right)
 void MatrixRotationY(matrix &m,float w)
 {
 	float sw=sinf(w);
@@ -165,7 +256,7 @@ void MatrixRotationY(matrix &m,float w)
 	m._30=0;	m._31=0;	m._32=0;	m._33=1;
 }
 
-// Rotation um die Z-Achse (gegen den Uhrzeigersinn)
+// rotation around the Z axis (counter clockwise)
 void MatrixRotationZ(matrix &m,float w)
 {
 	float sw=sinf(w);
@@ -176,8 +267,8 @@ void MatrixRotationZ(matrix &m,float w)
 	m._30=0;	m._31=0;	m._32=0;	m._33=1;
 }
 
-// ZXY -> fuer alles IM Spiel
-void MatrixRotation(matrix &m,const vector &ang)
+// ZXY -> for objects
+void MatrixRotation(matrix &m, const vector &ang)
 {
 	/*matrix x,y,z;
 	MatrixRotationX(x,ang.x);
@@ -198,7 +289,7 @@ void MatrixRotation(matrix &m,const vector &ang)
 	m._30= 0;					m._31= 0;					m._32=0;		m._33=1;
 }
 
-// ZXY -> fuer alles IM Spiel
+// ZXY -> for objects
 matrix MatrixRotation2(const vector &ang)
 {
 	matrix m;
@@ -222,8 +313,8 @@ matrix MatrixRotation2(const vector &ang)
 	return m;
 }
 
-// YXZ -> fuer Kamera-Rotationen
-// ist die Inverse zu MatrixRotation!!
+// YXZ -> for camera rotation
+//   is inverse to MatrixRotation!!
 void MatrixRotationView(matrix &m,const vector &ang)
 {
 	/*matrix x,y,z;
@@ -246,41 +337,51 @@ void MatrixRotationView(matrix &m,const vector &ang)
 	m._30= 0;					m._31= 0;		m._32=0;					m._33=1;
 }
 
-// Rotations-Matrix aus Quaternion erzeugen
-void MatrixRotationQ(matrix &m,const quaternion &q)
+// rotation matrix from quaterion
+void MatrixRotationQ(matrix &m, const quaternion &q)
 {
-	m._00=1-2*q.y*q.y-2*q.z*q.z;	m._01=  2*q.x*q.y-2*q.w*q.z;	m._02=  2*q.x*q.z+2*q.w*q.y;	m._03=0;
-	m._10=  2*q.x*q.y+2*q.w*q.z;	m._11=1-2*q.x*q.x-2*q.z*q.z;	m._12=  2*q.y*q.z-2*q.w*q.x;	m._13=0;
-	m._20=  2*q.x*q.z-2*q.w*q.y;	m._21=  2*q.y*q.z+2*q.w*q.x;	m._22=1-2*q.x*q.x-2*q.y*q.y;	m._23=0;
-	m._30=0;						m._31=0;						m._32=0;						m._33=1;
+	m._00 = 1 - 2*q.y*q.y - 2*q.z*q.z; m._01 =     2*q.x*q.y - 2*q.w*q.z; m._02 =     2*q.x*q.z + 2*q.w*q.y; m._03 = 0;
+	m._10 =     2*q.x*q.y + 2*q.w*q.z; m._11 = 1 - 2*q.x*q.x - 2*q.z*q.z; m._12 =     2*q.y*q.z - 2*q.w*q.x; m._13 = 0;
+	m._20 =     2*q.x*q.z - 2*q.w*q.y; m._21 =     2*q.y*q.z + 2*q.w*q.x; m._22 = 1 - 2*q.x*q.x - 2*q.y*q.y; m._23 = 0;
+	m._30 = 0;                         m._31 = 0;                         m._32 = 0;                         m._33 = 1;
 	/* [ 1 - 2y2 - 2z2        2xy - 2wz        2xz + 2wy
 	         2xy + 2wz    1 - 2x2 - 2z2        2yz - 2wx
 		     2xz - 2wy        2yz + 2wx    1 - 2x2 - 2y2 ] */
 }
 
 // scale orthogonally in 3 dimensions
-void MatrixScale(matrix &m,float fx,float fy,float fz)
+void MatrixScale(matrix &m, float fx, float fy, float fz)
 {
-	m._00=fx;	m._01=0;	m._02=0;	m._03=0;
-	m._10=0;	m._11=fy;	m._12=0;	m._13=0;
-	m._20=0;	m._21=0;	m._22=fz;	m._23=0;
-	m._30=0;	m._31=0;	m._32=0;	m._33=1;
+	m._00 = fx; m._01 = 0;  m._02 = 0;  m._03 = 0;
+	m._10 = 0;  m._11 = fy; m._12 = 0;  m._13 = 0;
+	m._20 = 0;  m._21 = 0;  m._22 = fz; m._23 = 0;
+	m._30 = 0;  m._31 = 0;  m._32 = 0;  m._33 = 1;
 }
 
 // create a transformation that reflects at a <plane pl>
-void MatrixReflect(matrix &m,const plane &pl)
+void MatrixReflect(matrix &m, const plane &pl)
 {
 	vector n = pl.n;
-	vector p=-n*pl.d;
+	vector p = -n * pl.d;
 	// mirror: matrix s from transforming the basis vectors:
 	//    e_i' = e_i - 2 < n, e_i >
 	//     or thinking of it as a tensor product (projection): s = id - 2n (x) n
 	// translation by p: t_p
 	// complete reflection is: r = t_p * s * t_(-p) = t_(2p) * s
-	m._00=1-2*n.x*n.x;	m._01= -2*n.y*n.x;	m._02= -2*n.z*n.x;	m._03=2*p.x;
-	m._10= -2*n.x*n.y;	m._11=1-2*n.y*n.y;	m._12= -2*n.z*n.y;	m._13=2*p.y;
-	m._20= -2*n.x*n.z;	m._21= -2*n.y*n.z;	m._22=1-2*n.z*n.z;	m._23=2*p.z;
-	m._30=0;			m._31=0;			m._32=0;			m._33=1;
+	m._00 = 1 - 2 * n.x*n.x; m._01 =   - 2 * n.y*n.x; m._02 =   - 2 * n.z*n.x; m._03 = 2 * p.x;
+	m._10 =   - 2 * n.x*n.y; m._11 = 1 - 2 * n.y*n.y; m._12 =   - 2 * n.z*n.y; m._13 = 2 * p.y;
+	m._20 =   - 2 * n.x*n.z; m._21 =   - 2 * n.y*n.z; m._22 = 1 - 2 * n.z*n.z; m._23 = 2 * p.z;
+	m._30 = 0;               m._31 = 0;               m._32 = 0;               m._33 = 1;
 	//msg_todo("TestMe: MatrixReflect");
+}
+
+void MatrixPerspective(matrix &m, float fovy, float aspect, float z_near, float z_far)
+{
+	float f = 1 / tan(fovy / 2);
+	float ndz = z_near - z_far;
+	m._00 = f / aspect; m._01 = 0; m._02 = 0;                      m._03 = 0;
+	m._10 = 0;          m._11 = f; m._12 = 0;                      m._13 = 0;
+	m._20 = 0;          m._21 = 0; m._22 = (z_near + z_far) / ndz; m._23 = 2 * z_near * z_far / ndz;
+	m._30 = 0;          m._31 = 0; m._32 = -1;                     m._33 = 1;
 }
 

@@ -27,7 +27,7 @@ extern Array<HuiCommand> _HuiCommand_;
 class HuiEvent
 {
 	public:
-	CHuiWindow *win;
+	HuiWindow *win;
 	string message, id;
 	bool is_default;
 	int mx, my;
@@ -37,8 +37,9 @@ class HuiEvent
 	int width, height;
 	bool lbut, mbut, rbut;
 	int row, column;
+	HuiEvent(){}
+	HuiEvent(const string &id, const string &message);
 };
-HuiEvent HuiCreateEvent(const string &id, const string &message);
 
 extern HuiEvent _HuiEvent_;
 HuiEvent *HuiGetEvent();

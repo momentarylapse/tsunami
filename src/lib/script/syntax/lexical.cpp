@@ -77,10 +77,6 @@ void ExpressionBuffer::clear()
 {
 	cur_line = NULL;
 	line.clear();
-	if (buffer){
-		delete[]buffer;
-		buffer = NULL;
-	}
 	cur_line = &temp_line;
 	cur_exp = -1;
 	comment_level = 0;
@@ -96,9 +92,7 @@ void ExpressionBuffer::add_line()
 void ExpressionBuffer::insert(const char *_name, int pos, int index)
 {
 	Expression e;
-	e.name = buf_cur;
-	buf_cur += strlen(_name) + 1;
-	strcpy(e.name, _name);
+	e.name = _name;
 	e.pos = pos;
 	if (index < 0)
 		// at the end...
@@ -130,38 +124,26 @@ int GetKind(char c)
 {
 	if (isNumber(c))
 		return ExpKindNumber;
-	else if (isLetter(c))
-		return ExpKindLetter;
+	/*else if (isLetter(c))
+		return ExpKindLetter;*/
 	else if (isSpacing(c))
 		return ExpKindSpacing;
 	else if (isSign(c))
 		return ExpKindSign;
-	else if (c==0)
+	else if (c == 0)
 		return -1;
-
-/*	msg_write("evil char");
-	insert_into_buffer(this, format("   '%c' (%2x)   ", c, c).c_str(), 0);
-	msg_write(cur_exp);
-	msg_write(p2s(cur_name));
-	msg_write(cur_name);
-	//cur_exp = cur_line->exp.num;
-	//sprintf(cur_line->exp[cur_exp].name, "   '%c' (%2x)   ", c, c);
-	//sprintf(cur_name, "   '%c' (%2x)   ", c, c);
-	DoError("evil character found!");
-	return -1;*/
+	// allow all other characters as letters
 	return ExpKindLetter;
 }
 
-void ExpressionBuffer::Analyse(SyntaxTree *ps, const char *source)
+void ExpressionBuffer::Analyse(SyntaxTree *ps, const string &source)
 {
 	msg_db_f("Analyse", 4);
 	syntax = ps;
 	clear();
-	buffer = new char[strlen(source)*2];
-	buf_cur = buffer;
 
 	// scan all lines
-	const char *buf = source;
+	const char *buf = (char*)source.data;
 	for (int i=0;true;i++){
 		//exp_add_line(&Exp);
 		cur_line->physical_line = i;
@@ -172,15 +154,11 @@ void ExpressionBuffer::Analyse(SyntaxTree *ps, const char *source)
 
 	// glue together lines ending with a "\" or ","
 	for (int i=0;i<(int)line.num-1;i++){
-		if ((strcmp(line[i].exp.back().name, "\\") == 0) || (strcmp(line[i].exp.back().name, ",") == 0)){
-			int d = (strcmp(line[i].exp.back().name, "\\") == 0) ? 1 : 0;
+		if ((line[i].exp.back().name == "\\") || (line[i].exp.back().name == ",")){
 			// glue... (without \\ but with ,)
-			for (int j=d;j<line[i + 1].exp.num;j++){
-				ExpressionBuffer::Expression e;
-				e.name = line[i + 1].exp[j].name;
-				e.pos = 0; // line[i + 1].exp[j].name;
-				line[i].exp.add(e);
-			}
+			if (line[i].exp.back().name == "\\")
+				line[i].exp.pop();
+			line[i].exp.append(line[i + 1].exp);
 			// remove line
 			line.erase(i + 1);
 			i --;
@@ -188,12 +166,7 @@ void ExpressionBuffer::Analyse(SyntaxTree *ps, const char *source)
 		}
 	}
 
-	/*for (int i=0;i<line.num;i++){
-		msg_write("--------------------");
-		msg_write(line[i].indent);
-		for (int j=0;j<line[i].exp.num;j++)
-			msg_write(line[i].exp[j].name);
-	}*/
+	//show();
 
 	
 	// safety
@@ -204,6 +177,16 @@ void ExpressionBuffer::Analyse(SyntaxTree *ps, const char *source)
 		e.name = str_eol;
 		e.pos = line[i].length;
 		line[i].exp.add(e);
+	}
+}
+
+void ExpressionBuffer::show()
+{
+	for (int i=0;i<line.num;i++){
+		msg_write("--------------------");
+		msg_write(line[i].indent);
+		for (int j=0;j<line[i].exp.num;j++)
+			msg_write(line[i].exp[j].name);
 	}
 }
 
@@ -224,7 +207,7 @@ bool ExpressionBuffer::AnalyseLine(const char *source, ExpressionBuffer::Line *l
 	l->length = pos;
 	if (l->exp.num > 0)
 		line.add(*l);
-	return (source[pos] == 0);
+	return source[pos] == 0;
 }
 
 // reads at most one line
@@ -244,7 +227,7 @@ bool ExpressionBuffer::DoMultiLineComment(const char *source, int &pos)
 				pos ++;
 				return false;
 			}
-		}else if ((source[pos] == 0)){// || (BufferPos>=BufferLength)){
+		}else if (source[pos] == 0){
 			syntax->DoError("comment exceeds end of file");
 		}
 		pos ++;

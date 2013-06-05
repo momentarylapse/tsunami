@@ -8,6 +8,7 @@
 #include "FormatFlac.h"
 #include "../Tsunami.h"
 #include "../View/Helper/Progress.h"
+#include <math.h>
 
 #include <FLAC/all.h>
 

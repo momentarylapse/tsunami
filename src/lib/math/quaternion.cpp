@@ -1,9 +1,99 @@
-#include "types.h"
+#include "math.h"
 #include "../file/file.h"
 
 //------------------------------------------------------------------------------------------------//
 //                                          quaternions                                           //
 //------------------------------------------------------------------------------------------------//
+
+
+quaternion::quaternion(const float w, const vector &v)
+{
+	this->w = w;
+	this->x = v.x;
+	this->y = v.y;
+	this->z = v.z;
+}
+
+bool quaternion::operator == (const quaternion& q) const
+{
+	return ((x==q.x)&&(y==q.y)&&(z==q.z)&&(w==q.w));
+}
+
+bool quaternion::operator != (const quaternion& q) const
+{
+	return !((x==q.x)&&(y==q.y)&&(z==q.z)&&(w!=q.w));
+}
+
+quaternion& quaternion::operator += (const quaternion& q)
+{
+	x += q.x;
+	y += q.y;
+	z += q.z;
+	w += q.w;
+	return *this;
+}
+
+quaternion& quaternion::operator -= (const quaternion& q)
+{
+	x -= q.x;
+	y -= q.y;
+	z -= q.z;
+	w -= q.w;
+	return *this;
+}
+
+quaternion quaternion::operator + (const quaternion &q) const
+{
+	quaternion r;
+	r.x = q.x + x;
+	r.y = q.y + y;
+	r.z = q.z + z;
+	r.w = q.w + w;
+	return r;
+}
+
+quaternion quaternion::operator - (const quaternion &q) const
+{
+	quaternion r;
+	r.x = q.x - x;
+	r.y = q.y - y;
+	r.z = q.z - z;
+	r.w = q.w - w;
+	return r;
+}
+
+quaternion quaternion::operator * (float f) const
+{
+	quaternion r;
+	r.x = x * f;
+	r.y = y * f;
+	r.z = z * f;
+	r.w = w * f;
+	return r;
+}
+
+quaternion quaternion::operator * (const quaternion &q) const
+{
+	quaternion r;
+	r.w = w*q.w - x*q.x - y*q.y - z*q.z;
+	r.x = w*q.x + x*q.w + y*q.z - z*q.y;
+	r.y = w*q.y + y*q.w + z*q.x - x*q.z;
+	r.z = w*q.z + z*q.w + x*q.y - y*q.x;
+	return r;
+}
+
+string quaternion::str() const
+{
+	return format("(%f, %f, %f, %f)", x, y, z, w);
+}
+
+
+// kaba
+void quaternion::imul(const quaternion &q)
+{	*this = (*this) * q;	}
+
+quaternion quaternion::mul(const quaternion &q) const
+{	return (*this) * q;	}
 
 void QuaternionIdentity(quaternion &q)
 {

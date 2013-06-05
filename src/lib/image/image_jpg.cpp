@@ -1,5 +1,6 @@
 #include "image.h"
 #include "../file/file.h"
+#include "../math/math.h"
 
 #define USE_FAST_COSINE_TRAFO	1
 

@@ -14,7 +14,7 @@
 class Log : public HuiEventHandler
 {
 public:
-	Log(CHuiWindow *parent);
+	Log(HuiWindow *parent);
 	virtual ~Log();
 
 	void Error(const string &message);
@@ -39,7 +39,7 @@ public:
 private:
 	void AddMessage(int type, const string &message);
 	Array<Message> message;
-	CHuiWindow *dlg;
+	HuiWindow *dlg;
 };
 
 #endif /* LOG_H_ */

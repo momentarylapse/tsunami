@@ -32,7 +32,7 @@ extern string AppVersion;
 int debug_timer;
 
 Tsunami::Tsunami(Array<string> arg) :
-	CHuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls, true)
+	HuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls)
 {
 	tsunami = this;
 
@@ -169,7 +169,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	HandleArguments(arg);
 
-	Update();
+	Show();
 }
 
 Tsunami::~Tsunami()
@@ -335,9 +335,7 @@ void Tsunami::OnCommand(const string & id)
 void Tsunami::OnSettings()
 {
 	SettingsDialog *dlg = new SettingsDialog(this, false);
-	dlg->Update();
-
-	HuiWaitTillWindowClosed(dlg);
+	dlg->Run();
 }
 
 void Tsunami::OnTrackImport()
@@ -396,8 +394,7 @@ void Tsunami::OnInsertAdded()
 void Tsunami::OnRecord()
 {
 	CaptureDialog *dlg = new CaptureDialog(this, false, audio);
-	dlg->Update();
-	HuiWaitTillWindowClosed(dlg);
+	dlg->Run();
 }
 
 void Tsunami::OnAddLevel()
@@ -539,7 +536,7 @@ void Tsunami::UpdateMenu()
 	Enable("pause", output->IsPlaying());
 	Check("play_loop", output->GetLoop());
 
-	CHuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
+	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){
 		m->Clear();
 		foreachib(string &l, audio->level_name, i)
@@ -578,8 +575,7 @@ void Tsunami::OnExit()
 void Tsunami::OnNew()
 {
 	NewDialog *d = new NewDialog(tsunami, false, audio);
-	d->Update();
-	HuiWaitTillWindowClosed(d);
+	d->Run();
 }
 
 

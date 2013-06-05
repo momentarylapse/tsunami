@@ -83,12 +83,11 @@ void Configure()
 	EqualizerDialog.AddText("20k",425,250,25,25,"")
 	PutCommandBarFixed(EqualizerDialog, 5, 285, 455)
 	PutFavoriteBarFixed(EqualizerDialog, 5, 5, 455)
-	EqualizerDialog.Update()
 	
 	EqualizerDialog.Event("*", &OnEvent)
 	
 	
 	DataToDialog()
 
-	HuiWaitTillWindowClosed(EqualizerDialog)
+	EqualizerDialog.Run()
 	

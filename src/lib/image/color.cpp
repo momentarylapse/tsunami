@@ -1,8 +1,22 @@
-#include "types.h"
+#include "color.h"
+#include "../math/math.h"
+
+
+const color White  = color(1, 1, 1, 1);
+const color Black  = color(1, 0, 0, 0);
+const color Grey   = color(1, 0.5f, 0.5f, 0.5f);
+const color Gray   = color(1, 0.5f, 0.5f, 0.5f);
+const color Red    = color(1, 1, 0, 0);
+const color Green  = color(1, 0, 1, 0);
+const color Blue   = color(1, 0, 0, 1);
+const color Yellow = color(1, 1, 1, 0);
+const color Orange = color(1, 1, 0.5f, 0);
+
 
 //------------------------------------------------------------------------------------------------//
 //                                             colors                                             //
 //------------------------------------------------------------------------------------------------//
+
 
 void color::clamp()
 {
@@ -42,27 +56,10 @@ color SetColorHSB(float a,float hue,float saturation,float brightness)
 	return c;
 }
 
-// scale the elements of a color
-color ColorScale(const color &c,float f)
-{
-	return color(c.a*f,c.r*f,c.g*f,c.b*f);
-}
-
 // create a mixed color = a * (1-t)  +  b * t
 color ColorInterpolate(const color &a,const color &b,float t)
 {
-	return color(	a.a*(1-t)+b.a*t,
-						a.r*(1-t)+b.r*t,
-						a.g*(1-t)+b.g*t,
-						a.b*(1-t)+b.b*t	);
-}
-
-color ColorMultiply(const color &a,const color &b)
-{
-	return color(	a.a*b.a,
-						a.r*b.r,
-						a.g*b.g,
-						a.b*b.b	);
+	return (1-t)*a + t*b;
 }
 
 color ColorFromIntRGB(int *i)
@@ -81,17 +78,17 @@ color ColorFromIntARGB(int *i)
 					(float)i[3]/255.0f);
 }
 
-void Color2IntRGB(const color &c,int *i)
+void color::get_int_rgb(int *i) const
 {
-	i[0]=int(c.r*255.0f);
-	i[1]=int(c.g*255.0f);
-	i[2]=int(c.b*255.0f);
+	i[0] = int(r * 255.0f);
+	i[1] = int(g * 255.0f);
+	i[2] = int(b * 255.0f);
 }
 
-void Color2IntARGB(const color &c,int *i)
+void color::get_int_argb(int *i) const
 {
-	i[0]=int(c.a*255.0f);
-	i[1]=int(c.r*255.0f);
-	i[2]=int(c.g*255.0f);
-	i[3]=int(c.b*255.0f);
+	i[0] = int(a * 255.0f);
+	i[1] = int(r * 255.0f);
+	i[2] = int(g * 255.0f);
+	i[3] = int(b * 255.0f);
 }

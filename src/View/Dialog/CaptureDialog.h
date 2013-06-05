@@ -14,10 +14,10 @@
 #include "../Helper/PeakMeter.h"
 #include "../../Stuff/Observer.h"
 
-class CaptureDialog : public CHuiWindow, public Observer
+class CaptureDialog : public HuiWindow, public Observer
 {
 public:
-	CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a);
+	CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a);
 	virtual ~CaptureDialog();
 
 	void OnTypeAudio();

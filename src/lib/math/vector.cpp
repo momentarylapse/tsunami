@@ -1,8 +1,102 @@
-#include "types.h"
+#include "math.h"
 
 //------------------------------------------------------------------------------------------------//
 //                                            vectors                                             //
 //------------------------------------------------------------------------------------------------//
+
+
+vector::vector(float x, float y, float z)
+{
+	this->x = x;
+	this->y = y;
+	this->z = z;
+}
+
+// assignment operators
+vector& vector::operator += (const vector& v)
+{
+	x += v.x;
+	y += v.y;
+	z += v.z;
+	return *this;
+}
+
+vector& vector::operator -= (const vector& v)
+{
+	x -= v.x;
+	y -= v.y;
+	z -= v.z;
+	return *this;
+}
+
+vector& vector::operator *= (float f)
+{
+	x *= f;
+	y *= f;
+	z *= f;
+	return *this;
+}
+
+vector& vector::operator /= (float f)
+{
+	x /= f;
+	y /= f;
+	z /= f;
+	return *this;
+}
+
+// unitary operator(s)
+vector vector::operator - () const
+{
+	return vector(-x, -y, -z);
+}
+
+// binary operators
+vector vector::operator + (const vector &v) const
+{
+	return vector(x+v.x ,y+v.y, z+v.z);
+}
+
+vector vector::operator - (const vector &v) const
+{
+	return vector(x-v.x, y-v.y, z-v.z);
+}
+
+vector vector::operator * (float f) const
+{
+	return vector(x*f, y*f, z*f);
+}
+
+vector vector::operator / (float f) const
+{
+	return vector(x/f, y/f, z/f);
+}
+
+bool vector::operator == (const vector &v) const
+{
+	return ((x==v.x) && (y==v.y) && (z==v.z));
+}
+
+bool vector::operator != (const vector &v) const
+{
+	return !((x==v.x) && (y==v.y) && (z==v.z));
+}
+
+float vector::operator * (const vector &v) const
+{
+	return x*v.x + y*v.y + z*v.z;
+}
+
+vector vector::operator ^ (const vector &v) const
+{
+	return vector( y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x );
+}
+
+string vector::str() const
+{
+	return format("(%f, %f, %f)", x, y, z);
+}
+
 // real length of the vector
 float vector::length() const
 {
@@ -103,11 +197,7 @@ vector VecCrossProduct(const vector &v1,const vector &v2)
 // matrix * vector(x,y,z,1)
 vector vector::transform(const matrix &m) const
 {
-	vector vo;
-	vo.x= x*m._00 + y*m._01 + z*m._02 + m._03;
-	vo.y= x*m._10 + y*m._11 + z*m._12 + m._13;
-	vo.z= x*m._20 + y*m._21 + z*m._22 + m._23;
-	return vo;
+	return m * *this;
 }
 
 // Transformation eines Normalenvektors
@@ -119,6 +209,12 @@ vector vector::transform_normal(const matrix &m) const
 	vo.y= x*m._10 + y*m._11 + z*m._12;
 	vo.z= x*m._20 + y*m._21 + z*m._22;
 	return vo;
+}
+vector vector::untransform(const matrix &m) const
+{
+	matrix i;
+	MatrixInverse(i, m);
+	return i * *this;
 }
 
 // Transformation eines Richtungsvektors
@@ -136,16 +232,16 @@ vector vector::transform3(const matrix3 &m) const
 // ZXY, da nur im Spiel-Koordinaten-System
 vector vector::ang2dir() const
 {
-	return vector(		sinf(y)*cos(x),
-					-	sinf(x),
-						cosf(y)*cos(x));
+	return vector(		sin(y)*cos(x),
+					-	sin(x),
+						cos(y)*cos(x));
 }
 
 // um welche Winkel wurde vector(0,0,1) rotiert?
 vector vector::dir2ang() const
 {
-	return vector(	-	atan2f(y,sqrt(x*x+z*z)),
-						atan2f(x,z),
+	return vector(	-	atan2(y,sqrt(x*x+z*z)),
+						atan2(x,z),
 						0); // too few information to get z!
 }
 
@@ -154,9 +250,9 @@ vector vector::dir2ang() const
 vector vector::dir2ang2(const vector &up) const
 {
 	vector right=VecCrossProduct(up,*this);
-	return vector(	-	atan2f(y,sqrt(x*x+z*z)),
-						atan2f(x,z),
-						atan2f(right.y,up.y)); // atan2( < up, (0,1,0) >, < right, (0,1,0) > )    where: right = up x dir
+	return vector(	-	atan2(y,sqrt(x*x+z*z)),
+						atan2(x,z),
+						atan2(right.y,up.y)); // atan2( < up, (0,1,0) >, < right, (0,1,0) > )    where: right = up x dir
 /*	// aus den 3 Basis-Vektoren eine Basis-Wechsel-Matrix erzeugen
 	matrix m;
 	m._00=right.x;	m._01=up.x;	m._02=dir.x;	m._03=0;

@@ -310,6 +310,7 @@ struct Package
 {
 	string name;
 	Script *script;
+	bool used_by_default;
 };
 extern Array<Package> Packages;
 

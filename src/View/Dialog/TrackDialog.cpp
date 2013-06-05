@@ -12,7 +12,7 @@
 #include "../Helper/BarList.h"
 #include "../../Tsunami.h"
 
-TrackDialog::TrackDialog(CHuiWindow *win):
+TrackDialog::TrackDialog(HuiWindow *win):
 	EmbeddedDialog(win)
 {
 	track = NULL;

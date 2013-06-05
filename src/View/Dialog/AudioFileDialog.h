@@ -18,7 +18,7 @@ class FxList;
 class AudioFileDialog: public EmbeddedDialog, public Observer
 {
 public:
-	AudioFileDialog(CHuiWindow *win, AudioFile *a);
+	AudioFileDialog(HuiWindow *win, AudioFile *a);
 	virtual ~AudioFileDialog();
 
 	void LoadData();

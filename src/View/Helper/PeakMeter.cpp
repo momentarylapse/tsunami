@@ -13,7 +13,7 @@ const int SPECTRUM_SIZE = 30;
 const float FREQ_MIN = 40.0f;
 const float FREQ_MAX = 4000.0f;
 
-PeakMeter::PeakMeter(CHuiWindow *_win, const string &_id, PeakMeterSource *_source)
+PeakMeter::PeakMeter(HuiWindow *_win, const string &_id, PeakMeterSource *_source)
 {
 	win = _win;
 	id = _id;

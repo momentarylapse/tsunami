@@ -75,7 +75,6 @@ void Configure()
 	DelayDialog.AddText("Feedback",5,95,100,25,"")
 	PutFavoriteBarFixed(DelayDialog, 5, 5, 395)
 	PutCommandBarFixed(DelayDialog, 5, 140, 395)
-	DelayDialog.Update()
 	
 	AddSlider(DelayDialog, "volume_slider", "volume", 0, 2, 100, &OnVolume, data.Volume)
 	AddSlider(DelayDialog, "feedback_slider", "feedback", 0, 1, 100, &OnFeedback, data.Feedback)
@@ -86,7 +85,7 @@ void Configure()
 	
 	DataToDialog()
 	
-	HuiWaitTillWindowClosed(DelayDialog)
+	DelayDialog.Run()
 
 void ResetData()
 	data.Volume = 0.2

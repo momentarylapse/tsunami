@@ -1,6 +1,9 @@
 
-#ifndef _TYPES_COLOR_INCLUDED_
-#define _TYPES_COLOR_INCLUDED_
+#ifndef _IMAGE_COLOR_INCLUDED_
+#define _IMAGE_COLOR_INCLUDED_
+
+
+#include "../base/base.h"
 
 struct color
 {
@@ -21,7 +24,7 @@ public:
 	{	return color(a - c.a, r - c.r, g - c.g, b - c.b);	}
 	color operator * (float f) const
 	{	return color(a*f , r*f , g*f , b*f);	}
-	friend color operator * (float f, color &c)
+	friend color operator * (float f, const color &c)
 	{	return c * f;	}
 	void operator *= (float f)
 	{	a *= f;	r *= f;	g *= f;	b *= f;	}
@@ -32,26 +35,25 @@ public:
 	void clamp();
 	string str() const
 	{	return format("(%f, %f, %f, %f)", r, g, b, a);	}
+
+	void get_int_rgb(int *i) const;
+	void get_int_argb(int *i) const;
 };
 // colors
 color _cdecl SetColorSave(float a, float r, float g, float b);
 color _cdecl SetColorHSB(float a, float hue, float saturation, float brightness);
-color _cdecl ColorScale(const color &c, float f);
 color _cdecl ColorInterpolate(const color &a, const color &b, float t);
-color _cdecl ColorMultiply(const color &a, const color &b);
 color _cdecl ColorFromIntRGB(int *i);
 color _cdecl ColorFromIntARGB(int *i);
-void _cdecl Color2IntRGB(const color &c, int *i);
-void _cdecl Color2IntARGB(const color &c, int *i);
 
-static color White  = color(1, 1, 1, 1);
-static color Black  = color(1, 0, 0, 0);
-static color Grey   = color(1, 0.5f, 0.5f, 0.5f);
-static color Gray   = color(1, 0.5f, 0.5f, 0.5f);
-static color Red    = color(1, 1, 0, 0);
-static color Green  = color(1, 0, 1, 0);
-static color Blue   = color(1, 0, 0, 1);
-static color Yellow = color(1, 1, 1, 0);
-static color Orange = color(1, 1, 0.5f, 0);
+extern const color White;
+extern const color Black;
+extern const color Grey;
+extern const color Gray;
+extern const color Red;
+extern const color Green;
+extern const color Blue;
+extern const color Yellow;
+extern const color Orange;
 
 #endif

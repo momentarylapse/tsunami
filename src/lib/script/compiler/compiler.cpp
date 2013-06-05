@@ -61,18 +61,27 @@ void AddEspAdd(Asm::InstructionWithParamsList *list,int d)
 	}
 }
 
-void init_all_global_objects(SyntaxTree *ps, Function *f, Array<char*> &g_var)
+void try_init_global_var(Type *type, char* g_var)
 {
-	foreachi(LocalVariable &v, f->var, i){
-		ClassFunction *cf = v.type->GetConstructor();
-		if (!cf)
-			continue;
-		typedef void init_func(void *);
-		//msg_write("global init: " + v.type->name);
-		init_func *ff = (init_func*)v.type->owner->script->func[cf->nr];
-		if (ff)
-			ff(g_var[i]);
+	if (type->is_array){
+		for (int i=0;i<type->array_length;i++)
+			try_init_global_var(type->parent, g_var + i * type->parent->size);
+		return;
 	}
+	ClassFunction *cf = type->GetConstructor();
+	if (!cf)
+		return;
+	typedef void init_func(void *);
+	//msg_write("global init: " + v.type->name);
+	init_func *ff = (init_func*)type->owner->script->func[cf->nr];
+	if (ff)
+		ff(g_var);
+}
+
+void init_all_global_objects(SyntaxTree *ps, Array<char*> &g_var)
+{
+	foreachi(Variable &v, ps->RootOfAllEvil.var, i)
+		try_init_global_var(v.type, g_var[i]);
 }
 
 void Script::AllocateMemory()
@@ -153,7 +162,7 @@ void Script::MapGlobalVariablesToMemory()
 	// global variables -> into Memory
 	so("glob.Var.");
 	g_var.resize(syntax->RootOfAllEvil.var.num);
-	foreachi(LocalVariable &v, syntax->RootOfAllEvil.var, i){
+	foreachi(Variable &v, syntax->RootOfAllEvil.var, i){
 		if (v.is_extern){
 			g_var[i] = (char*)GetExternalLink(v.name);
 			if (!g_var[i])
@@ -338,6 +347,14 @@ void Script::Compiler()
 		}
 	}
 
+// link virtual functions into vtables
+	foreach(Type *t, syntax->Types){
+		int n = 0;
+		foreach(ClassFunction &cf, t->function)
+			if (cf.is_virtual)
+				t->vtable[n ++] = (void*)cf.script->func[cf.nr];
+	}
+
 
 // "task" for the first execution of main() -> ThreadOpcode
 	if (!syntax->FlagCompileOS)
@@ -351,7 +368,7 @@ void Script::Compiler()
 
 
 	// initialize global super arrays and objects
-	init_all_global_objects(syntax, &syntax->RootOfAllEvil, g_var);
+	init_all_global_objects(syntax, g_var);
 
 	//msg_db_out(1,GetAsm(Opcode,OpcodeSize));
 

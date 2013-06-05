@@ -10,10 +10,10 @@
 
 #include "../../lib/hui/hui.h"
 
-class SettingsDialog: public CHuiWindow
+class SettingsDialog: public HuiWindow
 {
 public:
-	SettingsDialog(CHuiWindow *_parent, bool _allow_parent);
+	SettingsDialog(HuiWindow *_parent, bool _allow_parent);
 	virtual ~SettingsDialog();
 
 	void LoadData();

@@ -497,6 +497,12 @@ void Serializer::add_function_call_amd64(Script *script, int func_no)
 	foreachb(SerialCommandParam &p, stack_param)
 		add_cmd(Asm::inst_push, p);
 	MaxPushSize = max(MaxPushSize, push_size);
+
+	// xmm0-7
+	foreachib(SerialCommandParam &p, xmm_param, i){
+		int reg = Asm::RegXmm0 + i;
+		add_cmd(Asm::inst_movss, param_reg(TypeReg128, reg), p);
+	}
 	
 	// rdi, rsi,rdx, rcx, r8, r9 
 	int param_regs_root[6] = {7, 6, 2, 1, 8, 9};
@@ -505,17 +511,21 @@ void Serializer::add_function_call_amd64(Script *script, int func_no)
 		int reg = get_reg(root, p.type->size);
 		if (reg >= 0){
 			add_cmd(Asm::inst_mov, param_reg(p.type, reg), p);
+			add_reg_channel(reg, cmd.num - 1, -100); // -> call
 		}else{
 			// some registers are not 8bit'able
 			add_cmd(Asm::inst_mov, p_al, p);
-			add_cmd(Asm::inst_mov, param_reg(TypeReg32, get_reg(root, 4)), p_eax);
+			reg = get_reg(root, 4);
+			add_cmd(Asm::inst_mov, param_reg(TypeReg32, reg), p_eax);
+			add_reg_channel(Asm::RegEax, cmd.num - 2, cmd.num - 1);
+			add_reg_channel(reg, cmd.num - 1, -100); // -> call
 		}
 	}
-	// xmm0-7 
-	foreachib(SerialCommandParam &p, xmm_param, i){
-		int reg = Asm::RegXmm0 + i;
-		add_cmd(Asm::inst_movss, param_reg(TypeReg128, reg), p);
-	}
+
+	// extend reg channels to call
+	foreach(RegChannel &r, reg_channel)
+		if (r.last == -100)
+			r.last = cmd.num;
 
 	void *func = (void*)script->func[func_no];
 	if (!func)
@@ -1462,7 +1472,7 @@ void Serializer::add_cmd_destructor(SerialCommandParam &param)
 void Serializer::FillInConstructorsFunc()
 {
 	msg_db_f("FillInConstructorsFunc", 4);
-	foreach(LocalVariable &v, cur_func->var){
+	foreach(Variable &v, cur_func->var){
 		SerialCommandParam param = param_local(v.type, v._offset);
 		add_cmd_constructor(param, (v.name == "-return-") ? -1 : KindVarLocal);
 	}
@@ -2332,16 +2342,16 @@ void Serializer::AddFunctionIntro(Function *f)
 {
 	if (config.instruction_set == Asm::InstructionSetAMD64){
 		// return, instance, params
-		Array<LocalVariable> param;
+		Array<Variable> param;
 		if (f->return_type->UsesReturnByMemory()){
-			foreach(LocalVariable &v, f->var)
+			foreach(Variable &v, f->var)
 				if (v.name == "-return-"){
 					param.add(v);
 					break;
 				}
 		}
 		if (f->_class){
-			foreach(LocalVariable &v, f->var)
+			foreach(Variable &v, f->var)
 				if (v.name == "self"){
 					param.add(v);
 					break;
@@ -2351,10 +2361,10 @@ void Serializer::AddFunctionIntro(Function *f)
 			param.add(f->var[i]);
 
 		// map params...
-		Array<LocalVariable> reg_param;
-		Array<LocalVariable> stack_param;
-		Array<LocalVariable> xmm_param;
-		foreach(LocalVariable &p, param){
+		Array<Variable> reg_param;
+		Array<Variable> stack_param;
+		Array<Variable> xmm_param;
+		foreach(Variable &p, param){
 			if ((p.type == TypeInt) || (p.type == TypeChar) || (p.type == TypeBool) || (p.type->is_pointer)){
 				if (reg_param.num < 6){
 					reg_param.add(p);
@@ -2372,14 +2382,14 @@ void Serializer::AddFunctionIntro(Function *f)
 		}
 	
 		// xmm0-7
-		foreachib(LocalVariable &p, xmm_param, i){
+		foreachib(Variable &p, xmm_param, i){
 			int reg = Asm::RegXmm0 + i;
 			add_cmd(Asm::inst_movss, param_local(p.type, p._offset), param_reg(p.type, reg));
 		}
 	
 		// rdi, rsi,rdx, rcx, r8, r9 
 		int param_regs_root[6] = {7, 6, 2, 1, 8, 9};
-		foreachib(LocalVariable &p, reg_param, i){
+		foreachib(Variable &p, reg_param, i){
 			int root = param_regs_root[i];
 			int reg = get_reg(root, p.type->size);
 			if (reg >= 0){
@@ -2395,7 +2405,7 @@ void Serializer::AddFunctionIntro(Function *f)
 		}
 		
 		// get parameters from stack
-		foreachb(LocalVariable &p, stack_param){
+		foreachb(Variable &p, stack_param){
 			DoError("func with stack...");
 			/*int s = 8;
 			add_cmd(Asm::inst_push, p);

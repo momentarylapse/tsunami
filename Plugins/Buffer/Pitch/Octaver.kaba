@@ -34,9 +34,8 @@ void Configure()
 	dlg.AddText("%",280,5,20,25,"")
 	PutCommandBarFixed(dlg, 5, 70, 305)
 	AddSlider(dlg, "level_slider", "level", 0, 1, 100, &OnLevel, data.Level)
-	dlg.Update()
 	
 	dlg.SetDecimals(1)
 	DataToDialog()
-		
-	HuiWaitTillWindowClosed(dlg)
+	
+	dlg.Run()

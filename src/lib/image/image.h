@@ -11,7 +11,7 @@
 
 #include "../config.h"
 #include "../base/base.h"
-#include "../types/types.h"
+#include "color.h"
 
 extern string ImageVersion;
 

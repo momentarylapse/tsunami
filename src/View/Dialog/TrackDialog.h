@@ -19,7 +19,7 @@ class BarList;
 class TrackDialog: public EmbeddedDialog, public Observer
 {
 public:
-	TrackDialog(CHuiWindow *win);
+	TrackDialog(HuiWindow *win);
 	virtual ~TrackDialog();
 
 	void LoadData();

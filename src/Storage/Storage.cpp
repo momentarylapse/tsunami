@@ -189,7 +189,7 @@ bool Storage::Export(AudioFile *a, const string &filename)
 	return ok;
 }
 
-bool Storage::AskByFlags(CHuiWindow *win, const string &title, bool save, int flags)
+bool Storage::AskByFlags(HuiWindow *win, const string &title, bool save, int flags)
 {
 	string filter, filter_show;
 	foreach(Format *f, format)
@@ -207,22 +207,22 @@ bool Storage::AskByFlags(CHuiWindow *win, const string &title, bool save, int fl
 		return HuiFileDialogOpen(win, title, CurrentDirectory, filter_show, filter);
 }
 
-bool Storage::AskOpen(CHuiWindow *win)
+bool Storage::AskOpen(HuiWindow *win)
 {
 	return AskByFlags(win, _("Datei &offnen"), false, 0);
 }
 
-bool Storage::AskSave(CHuiWindow *win)
+bool Storage::AskSave(HuiWindow *win)
 {
 	return AskByFlags(win, _("Datei speichern"), true, 0);
 }
 
-bool Storage::AskOpenImport(CHuiWindow *win)
+bool Storage::AskOpenImport(HuiWindow *win)
 {
 	return AskByFlags(win, _("Datei importieren"), false, Format::FLAG_SINGLE_TRACK);
 }
 
-bool Storage::AskSaveExport(CHuiWindow *win)
+bool Storage::AskSaveExport(HuiWindow *win)
 {
 	return AskByFlags(win, _("Datei exportieren"), true, Format::FLAG_SINGLE_TRACK);
 }

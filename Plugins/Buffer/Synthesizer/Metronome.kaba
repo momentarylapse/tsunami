@@ -76,7 +76,6 @@ void Configure()
 	dlg.AddSpinButton("\\0\\100\\0.1",110,65,100,25,"volume")
 	dlg.AddText("%",215,65,30,25,"")
 	PutCommandBarFixed(dlg, 5, 100, 255)
-	dlg.Update()
 
 	dlg.SetDecimals(1)
 	
@@ -85,6 +84,6 @@ void Configure()
 	dlg.Event("volume", &OnMetroVolume)
 	
 	DataToDialog()
-	
-	HuiWaitTillWindowClosed(dlg)
+
+	dlg.Run()
 

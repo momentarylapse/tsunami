@@ -1,7 +1,7 @@
 #include "hui.h"
 #include "hui_internal.h"
 
-void CHuiWindow::ToolbarSetCurrent(int index)
+void HuiWindow::ToolbarSetCurrent(int index)
 {
 #ifdef HUI_API_WIN
 	index = HuiToolBarTop; // ... m(-_-)m
@@ -10,7 +10,7 @@ void CHuiWindow::ToolbarSetCurrent(int index)
 }
 
 // just a helper function
-void AddToolbarItem(HuiToolbar *tb, const string &id, int type, CHuiMenu *menu)
+void AddToolbarItem(HuiToolbar *tb, const string &id, int type, HuiMenu *menu)
 {
 	HuiToolbarItem i;
 	i.id = id;
@@ -21,14 +21,14 @@ void AddToolbarItem(HuiToolbar *tb, const string &id, int type, CHuiMenu *menu)
 }
 
 // add a menu to the toolbar by resource id
-void CHuiWindow::ToolbarAddItemMenuByID(const string &title, const string &tool_tip, const string &image, const string &menu_id, const string &id)
+void HuiWindow::ToolbarAddItemMenuByID(const string &title, const string &tool_tip, const string &image, const string &menu_id, const string &id)
 {
-	CHuiMenu *menu = HuiCreateResourceMenu(menu_id);
+	HuiMenu *menu = HuiCreateResourceMenu(menu_id);
 	ToolbarAddItemMenu(title, tool_tip, image, menu,id);
 }
 
 // create and apply a toolbar bar resource id
-void CHuiWindow::ToolbarSetByID(const string &id)
+void HuiWindow::ToolbarSetByID(const string &id)
 {
 	msg_db_r("ToolBarSetByID",1);
 	msg_db_m(id.c_str(),1);
@@ -59,7 +59,7 @@ void CHuiWindow::ToolbarSetByID(const string &id)
 }
 
 //    for all
-bool CHuiWindow::_ToolbarIsEnabled_(const string &id)
+bool HuiWindow::_ToolbarIsEnabled_(const string &id)
 {
 	for (int t=0;t<4;t++)
 		foreach(HuiToolbarItem &it, toolbar[t].item)

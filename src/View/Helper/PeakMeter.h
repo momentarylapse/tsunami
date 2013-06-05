@@ -24,7 +24,7 @@ public:
 class PeakMeter : public HuiEventHandler, public Observer
 {
 public:
-	PeakMeter(CHuiWindow *_win, const string &_id, PeakMeterSource *_source);
+	PeakMeter(HuiWindow *_win, const string &_id, PeakMeterSource *_source);
 	virtual ~PeakMeter();
 
 	void OnDraw();
@@ -37,7 +37,7 @@ private:
 	void FindPeaks();
 	void FindSpectrum();
 
-	CHuiWindow *win;
+	HuiWindow *win;
 	string id;
 	PeakMeterSource *source;
 	int mode;

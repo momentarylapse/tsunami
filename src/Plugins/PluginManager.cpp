@@ -40,31 +40,31 @@ PluginManager::~PluginManager()
 BufferBox AudioFileRender(AudioFile *a, const Range &r)
 {	return tsunami->renderer->RenderAudioFile(a, r);	}
 
-void GlobalPutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w)
+void GlobalPutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
 {	tsunami->plugins->PutFavoriteBarFixed(win, x, y, w);	}
 
-void GlobalPutFavoriteBarSizable(CHuiWindow *win, const string &root_id, int x, int y)
+void GlobalPutFavoriteBarSizable(HuiWindow *win, const string &root_id, int x, int y)
 {	tsunami->plugins->PutFavoriteBarSizable(win, root_id, x, y);	}
 
-void GlobalPutCommandBarFixed(CHuiWindow *win, int x, int y, int w)
+void GlobalPutCommandBarFixed(HuiWindow *win, int x, int y, int w)
 {	tsunami->plugins->PutCommandBarFixed(win, x, y, w);	}
 
-void GlobalPutCommandBarSizable(CHuiWindow *win, const string &root_id, int x, int y)
+void GlobalPutCommandBarSizable(HuiWindow *win, const string &root_id, int x, int y)
 {	tsunami->plugins->PutCommandBarSizable(win, root_id, x, y);	}
 
 Array<Slider*> global_slider;
 
-void GlobalAddSlider(CHuiWindow *win, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
+void GlobalAddSlider(HuiWindow *win, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
 {	global_slider.add(new Slider(win, id_slider, id_edit, v_min, v_max, factor, func, value));	}
 
-void GlobalSliderSet(CHuiWindow *win, const string &id, float value)
+void GlobalSliderSet(HuiWindow *win, const string &id, float value)
 {
 	foreach(Slider *s, global_slider)
 		if (s->Match(id))
 				s->Set(value);
 }
 
-float GlobalSliderGet(CHuiWindow *win, const string &id)
+float GlobalSliderGet(HuiWindow *win, const string &id)
 {
 	foreach(Slider *s, global_slider)
 		if (s->Match(id))
@@ -72,14 +72,14 @@ float GlobalSliderGet(CHuiWindow *win, const string &id)
 	return 0;
 }
 
-void GlobalRemoveSliders(CHuiWindow *win)
+void GlobalRemoveSliders(HuiWindow *win)
 {
 	foreach(Slider *s, global_slider)
 		delete(s);
 	global_slider.clear();
 }
 
-CHuiWindow *GlobalMainWin = NULL;
+HuiWindow *GlobalMainWin = NULL;
 
 void PluginManager::LinkAppScriptData()
 {
@@ -87,7 +87,7 @@ void PluginManager::LinkAppScriptData()
 	Script::config.Directory = "";
 
 	// api definition
-	GlobalMainWin = dynamic_cast<CHuiWindow*>(tsunami);
+	GlobalMainWin = dynamic_cast<HuiWindow*>(tsunami);
 	Script::LinkExternal("MainWin",		&GlobalMainWin);
 	Script::LinkExternal("audio",			&tsunami->audio);
 	Script::LinkExternal("input",			&tsunami->input);
@@ -252,7 +252,7 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 	SilentFiles = false;
 }
 
-void find_plugins_in_dir(const string &dir, PluginManager *pm, CHuiMenu *m)
+void find_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
 {
 	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
 	foreach(DirEntry &e, list){
@@ -270,29 +270,29 @@ void PluginManager::AddPluginsToMenu()
 	msg_db_f("AddPluginsToMenu", 2);
 	Script::Init();
 
-	CHuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
+	HuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
 
 	// "Buffer"..
 	m->AddSeparator();
 	m->AddItem(_("Auf Audiopuffer"), "plugin_on_file");
 	m->EnableItem("plugin_on_file", false);
 
-	CHuiMenu *sm = new CHuiMenu();
+	HuiMenu *sm = new HuiMenu;
 	m->AddSubMenu(_("Kan&ale"), "", sm);
 	find_plugins_in_dir("Buffer/Channels/", this, sm);
-	sm = new CHuiMenu();
+	sm = new HuiMenu;
 	m->AddSubMenu(_("Dynamik"), "", sm);
 	find_plugins_in_dir("Buffer/Dynamics/", this, sm);
-	sm = new CHuiMenu();
+	sm = new HuiMenu;
 	m->AddSubMenu(_("Echo"), "", sm);
 	find_plugins_in_dir("Buffer/Echo/", this, sm);
-	sm = new CHuiMenu();
+	sm = new HuiMenu;
 	m->AddSubMenu(_("Tonh&ohe"), "", sm);
 	find_plugins_in_dir("Buffer/Pitch/", this, sm);
-	sm = new CHuiMenu();
+	sm = new HuiMenu;
 	m->AddSubMenu(_("Klang"), "", sm);
 	find_plugins_in_dir("Buffer/Sound/", this, sm);
-	sm = new CHuiMenu();
+	sm = new HuiMenu;
 	m->AddSubMenu(_("Synthese"), "", sm);
 	find_plugins_in_dir("Buffer/Synthesizer/", this, sm);
 
@@ -359,7 +359,7 @@ void PluginManager::OnFavoriteSave()
 void PluginManager::OnFavoriteDelete()
 {}
 
-void PluginManager::InitFavorites(CHuiWindow *win)
+void PluginManager::InitFavorites(HuiWindow *win)
 {
 	msg_db_f("InitFavorites", 1);
 	PluginFavoriteName.clear();
@@ -385,7 +385,7 @@ void PluginManager::InitFavorites(CHuiWindow *win)
 	win->EventM("favorite_list", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteList);
 }
 
-void PluginManager::PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w)
+void PluginManager::PutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
 {
 	msg_db_f("PutFavoriteBarFixed", 1);
 	w -= 10;
@@ -399,7 +399,7 @@ void PluginManager::PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w)
 	InitFavorites(win);
 }
 
-void PluginManager::PutFavoriteBarSizable(CHuiWindow *win, const string &root_id, int x, int y)
+void PluginManager::PutFavoriteBarSizable(HuiWindow *win, const string &root_id, int x, int y)
 {
 	msg_db_f("PutFavoriteBarSizable", 1);
 	win->SetTarget(root_id, 0);
@@ -417,14 +417,14 @@ void PluginManager::PutFavoriteBarSizable(CHuiWindow *win, const string &root_id
 
 void PluginManager::OnPluginFavoriteName()
 {
-	CHuiWindow *win = HuiGetEvent()->win;
+	HuiWindow *win = HuiGetEvent()->win;
 	win->Enable("favorite_save", win->GetString("favorite_name").num > 0);
 	win->Enable("favorite_delete", win->GetString("favorite_name").num > 0);
 }
 
 void PluginManager::OnPluginFavoriteList()
 {
-	CHuiWindow *win = HuiGetEvent()->win;
+	HuiWindow *win = HuiGetEvent()->win;
 	int n = win->GetInt("");
 	cur_plugin->ResetData();
 	if (n == 0){
@@ -441,7 +441,7 @@ void PluginManager::OnPluginFavoriteList()
 
 void PluginManager::OnPluginFavoriteSave()
 {
-	CHuiWindow *win = HuiGetEvent()->win;
+	HuiWindow *win = HuiGetEvent()->win;
 	cur_plugin->WriteDataToFile(win->GetString("favorite_name"));
 	PluginFavoriteName.add(win->GetString("favorite_name"));
 	win->AddString("favorite_list", win->GetString("favorite_name"));
@@ -460,7 +460,7 @@ void PluginManager::OnPluginClose()
 	delete(HuiCurWindow);
 }
 
-void PluginManager::PutCommandBarFixed(CHuiWindow *win, int x, int y, int w)
+void PluginManager::PutCommandBarFixed(HuiWindow *win, int x, int y, int w)
 {
 	msg_db_f("PutCommandBarFixed", 1);
 	w -= 10;
@@ -485,7 +485,7 @@ void PluginManager::PutCommandBarFixed(CHuiWindow *win, int x, int y, int w)
 	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
 }
 
-void PluginManager::PutCommandBarSizable(CHuiWindow *win, const string &root_id, int x, int y)
+void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, int x, int y)
 {
 	msg_db_f("PutCommandBarSizable", 1);
 	win->SetTarget(root_id, 0);

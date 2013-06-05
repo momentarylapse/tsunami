@@ -13,7 +13,7 @@
 class EmbeddedDialog : public HuiEventHandler
 {
 public:
-	EmbeddedDialog(CHuiWindow *win);
+	EmbeddedDialog(HuiWindow *win);
 	virtual ~EmbeddedDialog();
 
 	void Enable(const string &id, bool enabled);
@@ -30,7 +30,7 @@ public:
 	float GetFloat(const string &id);
 	int GetInt(const string &id);
 
-	CHuiWindow *win;
+	HuiWindow *win;
 };
 
 #endif /* EMBEDDEDDIALOG_H_ */

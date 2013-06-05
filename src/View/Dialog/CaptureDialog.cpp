@@ -13,8 +13,8 @@
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a):
-	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
+CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
+	HuiWindow("record_dialog", _parent, _allow_parent)
 {
 	audio = a;
 	type = Track::TYPE_AUDIO;
@@ -31,7 +31,6 @@ CaptureDialog::CaptureDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile 
 	}
 
 	// dialog
-	FromResource("record_dialog");
 	Check("capture_type:audio", true);
 	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
 	SetString("capture_time", a->get_time_str(0));

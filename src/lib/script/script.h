@@ -14,7 +14,6 @@ class Script;
 }
 
 #include "../base/base.h"
-#include "../types/types.h"
 #include "asm/asm.h"
 #include "lib/script_data.h"
 #include "syntax/syntax_tree.h"
@@ -71,7 +70,8 @@ public:
 
 	// execution
 	void Execute();
-	void *MatchFunction(const string &name, const string &return_type, int num_params, ...);//const string &params);
+	void *MatchFunction(const string &name, const string &return_type, int num_params, ...);
+	void *MatchClassFunction(const string &_class, bool allow_derived, const string &name, const string &return_type, int num_params, ...);
 	void SetVariable(const string &name, void *data);
 
 	//debug displaying

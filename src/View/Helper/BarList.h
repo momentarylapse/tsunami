@@ -14,7 +14,7 @@ class Track;
 class BarList : public HuiEventHandler
 {
 public:
-	BarList(CHuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete);
+	BarList(HuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete);
 	virtual ~BarList();
 
 	void FillList();
@@ -31,7 +31,7 @@ public:
 	void SetTrack(Track *t);
 
 public:
-	CHuiWindow *dlg;
+	HuiWindow *dlg;
 	string id;
 	string id_add, id_add_pause, id_delete;
 	Track *track;

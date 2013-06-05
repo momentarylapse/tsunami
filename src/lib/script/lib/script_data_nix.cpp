@@ -29,7 +29,7 @@ void SIAddPackageNix()
 {
 	msg_db_f("SIAddPackageNix", 3);
 	
-	set_cur_package("nix");
+	add_package("nix", false);
 	
 	TypeVectorArray		= add_type_a("vector[?]",	TypeVector, 1);
 	TypeVectorArrayP	= add_type_p("vector[?]*",	TypeVectorArray);
@@ -115,21 +115,35 @@ void SIAddPackageNix()
 	add_func("NixSetStencil",							TypeVoid,	nix_p(&NixSetStencil));
 		func_add_param("mode",		TypeInt);
 		func_add_param("param",		TypeInt);
-	add_func("NixSetProjection",									TypeVoid,	nix_p(&NixSetProjection));
-		func_add_param("perspective",		TypeBool);
+	add_func("NixSetProjectionPerspective",									TypeVoid,	nix_p(&NixSetProjectionPerspective));
+	add_func("NixSetProjectionPerspectiveExt",									TypeVoid,	nix_p(&NixSetProjectionPerspectiveExt));
+		func_add_param("centerx",		TypeFloat);
+		func_add_param("centery",		TypeFloat);
+		func_add_param("width_1",		TypeFloat);
+		func_add_param("height_1",		TypeFloat);
+		func_add_param("zmin",		TypeFloat);
+		func_add_param("zmax",		TypeFloat);
+	add_func("NixSetProjectionOrtho",									TypeVoid,	nix_p(&NixSetProjectionOrtho));
 		func_add_param("relative",		TypeBool);
+	add_func("NixSetProjectionOrthoExt",									TypeVoid,	nix_p(&NixSetProjectionOrthoExt));
+		func_add_param("centerx",		TypeFloat);
+		func_add_param("centery",		TypeFloat);
+		func_add_param("map_width",		TypeFloat);
+		func_add_param("map_height",	TypeFloat);
+		func_add_param("zmin",		TypeFloat);
+		func_add_param("zmax",		TypeFloat);
+	add_func("NixSetProjectionMatrix",									TypeVoid,	nix_p(&NixSetProjectionMatrix));
+		func_add_param("m",		TypeMatrix);
 	add_func("NixSetViewM",									TypeVoid,	nix_p(&NixSetViewM));
 		func_add_param("view_mat",		TypeMatrix);
 	add_func("NixSetViewV",								TypeVoid,	nix_p(&NixSetViewV));
 		func_add_param("pos",		TypeVector);
 		func_add_param("ang",		TypeVector);
+	add_func("NixScissor",									TypeVoid,	nix_p(&NixScissor));
+		func_add_param("r",		TypeRect);
 	add_func("NixSetZ",											TypeVoid,	nix_p(&NixSetZ));
 		func_add_param("write",		TypeBool);
 		func_add_param("test",		TypeBool);
-	add_func("NixSetPerspectiveMode",											TypeVoid,	nix_p(&NixSetPerspectiveMode));
-		func_add_param("mode",		TypeInt);
-		func_add_param("param1",	TypeFloat);
-		func_add_param("param2",	TypeFloat);
 	add_func("NixEnableLighting",											TypeVoid,	nix_p(&NixEnableLighting));
 		func_add_param("enabled",		TypeBool);
 
@@ -246,8 +260,6 @@ void SIAddPackageNix()
 	add_ext_var("ScreenDepth",		TypeInt,		nix_p(&NixScreenDepth));
 	add_ext_var("Fullscreen",		TypeBool,		nix_p(&NixFullscreen));
 	add_ext_var("Api",				TypeString,		nix_p(&NixApi));
-	add_ext_var("MinDepth",			TypeFloat,		nix_p(&NixMinDepth));
-	add_ext_var("MaxDepth",			TypeFloat,		nix_p(&NixMaxDepth));
 	add_ext_var("Mouse",			TypeVector,		nix_p(&NixMouse));
 	add_ext_var("MouseRel",			TypeVector,		nix_p(&NixMouseRel));
 	add_ext_var("MouseD",			TypeVector,		nix_p(&NixMouseD));
@@ -288,16 +300,7 @@ void SIAddPackageNix()
 	add_const("FogLinear", TypeInt, nix_p(FogLinear));
 	add_const("FogExp",    TypeInt, nix_p(FogExp));
 	add_const("FogExp2",   TypeInt, nix_p(FogExp2));
-	// nix perspetive options
-	add_const("PerspectiveCenterSet",         TypeInt, nix_p(PerspectiveCenterSet));
-	add_const("PerspectiveCenterAutoTarget",  TypeInt, nix_p(PerspectiveCenterAutoTarget));
-	add_const("PerspectiveSizeSet",           TypeInt, nix_p(PerspectiveSizeSet));
-	add_const("PerspectiveSizeAutoTarget",    TypeInt, nix_p(PerspectiveSizeAutoTarget));
-	add_const("PerspectiveSizeAutoScreen",    TypeInt, nix_p(PerspectiveSizeAutoScreen));
-	add_const("Perspective2DScaleSet",        TypeInt, nix_p(Perspective2DScaleSet));
-	add_const("Perspective2DScaleAutoTarget", TypeInt, nix_p(Perspective2DScaleAutoTarget));
-	add_const("Perspective2DScaleAutoScreen", TypeInt, nix_p(Perspective2DScaleAutoScreen));
-	add_const("PerspectiveRatioSet",          TypeInt, nix_p(PerspectiveRatioSet));
+
 	add_const("VBTemp",     TypeInt,    nix_p(VBTemp));
 }
 

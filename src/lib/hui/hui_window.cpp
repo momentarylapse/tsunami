@@ -15,7 +15,7 @@ static int current_uid = 0;
 
 extern int HuiMainLevel;
 
-CHuiWindow *HuiCurWindow = NULL;
+HuiWindow *HuiCurWindow = NULL;
 
 //extern int allow_signal_level; // visual studio needs this line.... (-_-)
 
@@ -48,11 +48,61 @@ void add_key_to_buffer(HuiInputData *d, int key)
 }
 
 
-void CHuiWindow::_Init_(CHuiWindow *_root, bool _allow_root, int _mode)
+HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height, HuiWindow *root, bool allow_root, int mode)
 {
-	msg_db_r("Window::_Init_", 2);
+	_Init_(title, x, y, width, height, root, allow_root, mode);
+}
+
+
+HuiWindow::HuiWindow(const string &id, HuiWindow *parent, bool allow_parent)
+{
+	HuiResource *res = HuiGetResource(id);
+	if (!res){
+		msg_error("HuiWindow: undefined resource id: " + id);
+	}
+
+	int mode = HuiWinModeControls;
+	if (res->type == "SizableDialog")
+		mode = HuiWinModeControls | HuiWinModeResizable;
+	_Init_(HuiGetLanguage(id), -1, -1, res->i_param[0], res->i_param[1], parent, allow_parent, mode);
+
+	// menu?
+	if (res->s_param[0].num > 0)
+		SetMenu(HuiCreateResourceMenu(res->s_param[0]));
+
+	// toolbar?
+	if (res->s_param[1].num > 0)
+		ToolbarSetByID(res->s_param[1]);
+
+	// controls
+	foreach(HuiResourceCommand &cmd, res->cmd){
+		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
+		if (res->type == "Dialog"){
+			SetTarget(cmd.s_param[0], cmd.i_param[4]);
+			HuiWindowAddControl( this, cmd.type, HuiGetLanguage(cmd.id),
+								cmd.i_param[0], cmd.i_param[1],
+								cmd.i_param[2], cmd.i_param[3],
+								cmd.id);
+		}else if (res->type == "SizableDialog"){
+			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
+			SetTarget(cmd.s_param[0], cmd.i_param[4]);
+			HuiWindowAddControl( this, cmd.type, HuiGetLanguage(cmd.id),
+								cmd.i_param[0], cmd.i_param[1],
+								cmd.i_param[2], cmd.i_param[3],
+								cmd.id);
+		}
+		Enable(cmd.id, cmd.enabled);
+		if (cmd.image.num > 0)
+			SetImage(cmd.id, cmd.image);
+	}
+	msg_db_m("  \\(^_^)/",1);
+}
+
+void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
+{
+	msg_db_r("Window::_InitGeneric_", 2);
 	_HuiMakeUsable_();
-	HuiWindow.add(this);
+	HuiWindows.add(this);
 
 	_HuiClosedWindow_.clear();
 
@@ -81,11 +131,10 @@ void CHuiWindow::_Init_(CHuiWindow *_root, bool _allow_root, int _mode)
 	input.reset();
 	tab_creation_page = -1;
 
-	is_hidden = false;
 	id = "";
 	num_float_decimals = 3;
 	unique_id = current_uid ++;
-	allow_input = false; // allow only if ->Update() was called
+	allow_input = false; // allow only if ->Show() was called
 	main_level = HuiMainLevel;
 
 	SetTarget("", 0);
@@ -93,7 +142,7 @@ void CHuiWindow::_Init_(CHuiWindow *_root, bool _allow_root, int _mode)
 	msg_db_l(2);
 }
 
-void CHuiWindow::_CleanUp_()
+void HuiWindow::_CleanUp_()
 {
 	msg_db_r("Window::_CleanUp_", 2);
 	HuiClosedWindow c;
@@ -106,12 +155,9 @@ void CHuiWindow::_CleanUp_()
 		delete(control[i]);
 	
 	// unregister window
-	/*HuiEvent e = HuiCreateEvent("", "hui:redraw");
-	if (parent)
-		parent->_SendEvent_(&e);*/
-	for (int i=0;i<HuiWindow.num;i++)
-		if (HuiWindow[i] == this){
-			HuiWindow.erase(i);
+	for (int i=0;i<HuiWindows.num;i++)
+		if (HuiWindows[i] == this){
+			HuiWindows.erase(i);
 			break;
 		}
 	msg_db_l(2);
@@ -119,7 +165,7 @@ void CHuiWindow::_CleanUp_()
 
 
 // identify window (for automatic title assignment with language strings)
-void CHuiWindow::SetID(const string &_id)
+void HuiWindow::SetID(const string &_id)
 {
 	id = _id;
 	if ((HuiLanguaged) && (id.num > 0))
@@ -127,7 +173,7 @@ void CHuiWindow::SetID(const string &_id)
 }
 
 // align window relative to another window (like..."top right corner")
-void CHuiWindow::SetPositionSpecial(CHuiWindow *win,int mode)
+void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 {
 	irect rp=win->GetOuterior();
 	irect ro=GetOuterior();
@@ -143,47 +189,47 @@ void CHuiWindow::SetPositionSpecial(CHuiWindow *win,int mode)
 	SetPosition(x,y);
 }
 
-void CHuiWindow::SetBorderWidth(int width)
+void HuiWindow::SetBorderWidth(int width)
 {
 	border_width = width;
 }
 
-void CHuiWindow::SetDecimals(int decimals)
+void HuiWindow::SetDecimals(int decimals)
 {
 	num_float_decimals = decimals;
 }
 
-int CHuiWindow::_GetMainLevel_()
+int HuiWindow::_GetMainLevel_()
 {
 	return main_level;
 }
 
-int CHuiWindow::_GetUniqueID_()
+int HuiWindow::_GetUniqueID_()
 {
 	return unique_id;
 }
 
-string CHuiWindow::_GetCurID_()
+string HuiWindow::_GetCurID_()
 {
 	return cur_id;
 }
 
-void CHuiWindow::_SetCurID_(const string &id)
+void HuiWindow::_SetCurID_(const string &id)
 {
 	cur_id = id;
 }
 
-CHuiMenu *CHuiWindow::GetMenu()
+HuiMenu *HuiWindow::GetMenu()
 {
 	return menu;
 }
 
-CHuiWindow *CHuiWindow::GetParent()
+HuiWindow *HuiWindow::GetParent()
 {
 	return parent;
 }
 
-bool CHuiWindow::GetKey(int k)
+bool HuiWindow::GetKey(int k)
 {
 	if (k == KEY_CONTROL)
 		return (input.key[KEY_RCONTROL] || input.key[KEY_LCONTROL]);
@@ -193,7 +239,7 @@ bool CHuiWindow::GetKey(int k)
 		return input.key[k];
 }
 
-bool CHuiWindow::GetMouse(int &x, int &y, int button)
+bool HuiWindow::GetMouse(int &x, int &y, int button)
 {
 	x = input.x;
 	y = input.y;
@@ -206,7 +252,7 @@ bool CHuiWindow::GetMouse(int &x, int &y, int button)
 	}
 }
 
-void CHuiWindow::Event(const string &id, hui_callback *function)
+void HuiWindow::Event(const string &id, hui_callback *function)
 {
 	HuiWinEvent e;
 	e.id = id;
@@ -218,7 +264,7 @@ void CHuiWindow::Event(const string &id, hui_callback *function)
 	
 }
 
-void CHuiWindow::EventX(const string &id, const string &msg, hui_callback *function)
+void HuiWindow::EventX(const string &id, const string &msg, hui_callback *function)
 {
 	HuiWinEvent e;
 	e.id = id;
@@ -229,7 +275,7 @@ void CHuiWindow::EventX(const string &id, const string &msg, hui_callback *funct
 	event.add(e);
 }
 
-void CHuiWindow::_EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+void HuiWindow::_EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
 	HuiWinEvent e;
 	e.id = id;
@@ -240,7 +286,7 @@ void CHuiWindow::_EventM(const string &id, HuiEventHandler *handler, void (HuiEv
 	event.add(e);
 }
 
-void CHuiWindow::_EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+void HuiWindow::_EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
 	HuiWinEvent e;
 	e.id = id;
@@ -251,7 +297,7 @@ void CHuiWindow::_EventMX(const string &id, const string &msg, HuiEventHandler *
 	event.add(e);
 }
 
-bool CHuiWindow::_SendEvent_(HuiEvent *e)
+bool HuiWindow::_SendEvent_(HuiEvent *e)
 {
 	if (!allow_input)
 		return false;
@@ -321,7 +367,7 @@ bool CHuiWindow::_SendEvent_(HuiEvent *e)
 // easy window creation functions
 
 
-void HuiWindowAddControl(CHuiWindow *win, const string &type, const string &title, int x, int y, int width, int height, const string &id)
+void HuiWindowAddControl(HuiWindow *win, const string &type, const string &title, int x, int y, int width, int height, const string &id)
 {
 	//msg_db_m(format("HuiWindowAddControl %s  %s  %d  %d  %d  %d  %d", type.c_str(), title.c_str(), x, y, width, height, id.c_str()).c_str(),2);
 	if (type == "Button")
@@ -368,7 +414,7 @@ void HuiWindowAddControl(CHuiWindow *win, const string &type, const string &titl
 		win->AddToggleButton(title, x, y, width, height, id);
 }
 
-void CHuiWindow::FromResource(const string &id)
+void HuiWindow::FromResource(const string &id)
 {
 	msg_db_r("Window.FromResource",1);
 	HuiResource *res = HuiGetResource(id);
@@ -422,53 +468,48 @@ void CHuiWindow::FromResource(const string &id)
 	msg_db_l(1);
 }
 
-CHuiWindow *HuiCreateWindow(const string &title,int x,int y,int width,int height)
+HuiWindow *HuiCreateWindow(const string &title,int x,int y,int width,int height)
 {
-	return new CHuiWindow(	title,
+	return new HuiWindow(	title,
 							x, y, width, height,
 							NULL, true,
-							HuiWinModeResizable,
-							true);
+							HuiWinModeResizable);
 }
 
-CHuiWindow *HuiCreateNixWindow(const string &title,int x,int y,int width,int height)
+HuiWindow *HuiCreateNixWindow(const string &title,int x,int y,int width,int height)
 {
-	return new CHuiWindow(	title,
+	return new HuiWindow(	title,
 							x, y, width, height,
 							NULL, true,
-							HuiWinModeResizable | HuiWinModeNix,
-							true);
+							HuiWinModeResizable | HuiWinModeNix);
 }
 
-CHuiWindow *HuiCreateControlWindow(const string &title,int x,int y,int width,int height)
+HuiWindow *HuiCreateControlWindow(const string &title,int x,int y,int width,int height)
 {
-	return new CHuiWindow(	title,
+	return new HuiWindow(	title,
 							x, y, width, height,
 							NULL, true,
-							HuiWinModeResizable | HuiWinModeControls,
-							true);
+							HuiWinModeResizable | HuiWinModeControls);
 }
 
-CHuiWindow *HuiCreateDialog(const string &title,int width,int height,CHuiWindow *root,bool allow_root)
+HuiWindow *HuiCreateDialog(const string &title,int width,int height,HuiWindow *root,bool allow_root)
 {
-	return new CHuiWindow(	title,
+	return new HuiWindow(	title,
 							-1, -1, width, height,
 							root, allow_root,
-							HuiWinModeControls,
-							true);
+							HuiWinModeControls);
 }
 
-CHuiWindow *HuiCreateSizableDialog(const string &title,int width,int height,CHuiWindow *root,bool allow_root)
+HuiWindow *HuiCreateSizableDialog(const string &title,int width,int height,HuiWindow *root,bool allow_root)
 {
-	return new CHuiWindow(	title,
+	return new HuiWindow(	title,
 							-1, -1, width, height,
 							root, allow_root,
-							HuiWinModeControls | HuiWinModeResizable,
-							true);
+							HuiWinModeControls | HuiWinModeResizable);
 }
 
 // mainly for script usage...
-void HuiCloseWindow(CHuiWindow *win)
+void HuiCloseWindow(HuiWindow *win)
 {
 	delete(win);
 }

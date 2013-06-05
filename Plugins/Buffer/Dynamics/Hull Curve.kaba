@@ -137,7 +137,6 @@ void Configure()
 	dlg.SetTarget("table2", 0)
 	dlg.AddComboBox("linear\\log", 0, 0, 0, 0, "type")
 	dlg.AddCheckBox("show buffer", 1, 0, 0, 0, "preview")
-	dlg.Update()
 	
 	dlg.EventX("drawing", "hui:redraw", &Draw)
 	dlg.EventX("drawing", "hui:left-button-down", &OnLeftButtonDown)
@@ -153,5 +152,5 @@ void Configure()
 	
 	DataToDialog()
 
-	HuiWaitTillWindowClosed(dlg)
+	dlg.Run()
 

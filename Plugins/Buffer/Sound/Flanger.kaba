@@ -88,7 +88,6 @@ void Configure()
 	FlangerDialog.AddText("Verzögerung",5,65,100,25,"")
 	FlangerDialog.AddText("Tiefe",5,95,100,25,"")
 	PutCommandBarFixed(FlangerDialog, 5, 135, 415)
-	FlangerDialog.Update()
 	
 	AddSlider(FlangerDialog, "speed_slider", "speed", 0, 2,    1,    &OnSpeed, data.Speed)
 	AddSlider(FlangerDialog, "depth_slider", "depth", 0, 1,    100,  &OnDepth, data.Depth)
@@ -99,7 +98,7 @@ void Configure()
 	FlangerDialog.SetDecimals(1)
 	DataToDialog()
 	
-	HuiWaitTillWindowClosed(FlangerDialog)
+	FlangerDialog.Run()
 	
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio

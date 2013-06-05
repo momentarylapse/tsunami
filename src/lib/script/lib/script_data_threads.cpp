@@ -25,7 +25,7 @@ void SIAddPackageThread()
 {
 	msg_db_f("SIAddThread", 3);
 
-	set_cur_package("thread");
+	add_package("thread", false);
 
 	Type *TypeThread    = add_type  ("Thread",		sizeof(Thread));
 	Type *TypeThreadP   = add_type_p("Thread*",		TypeThread);

@@ -23,12 +23,12 @@ public:
 	bool Save(AudioFile *a, const string &filename);
 	bool Export(AudioFile *a, const string &filename);
 
-	bool AskByFlags(CHuiWindow *win, const string &title, bool save, int flags);
+	bool AskByFlags(HuiWindow *win, const string &title, bool save, int flags);
 
-	bool AskOpen(CHuiWindow *win);
-	bool AskSave(CHuiWindow *win);
-	bool AskOpenImport(CHuiWindow *win);
-	bool AskSaveExport(CHuiWindow *win);
+	bool AskOpen(HuiWindow *win);
+	bool AskSave(HuiWindow *win);
+	bool AskOpenImport(HuiWindow *win);
+	bool AskSaveExport(HuiWindow *win);
 
 private:
 	Array<Format*> format;

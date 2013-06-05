@@ -37,14 +37,13 @@ void Configure()
 	VolumeDialog.AddCheckBox("Maximieren",5,35,295,25,"max")
 	PutCommandBarFixed(VolumeDialog, 5, 70, 305)
 	AddSlider(VolumeDialog, "volume_slider", "volume", 0, 2, 100, &OnVolume, data.Volume)
-	VolumeDialog.Update()
 	
 	VolumeDialog.Event("max", &OnMax)
 	
 	VolumeDialog.SetDecimals(1)
 	DataToDialog()
 
-	HuiWaitTillWindowClosed(VolumeDialog)
+	VolumeDialog.Run()
 
 void ProcessTrack(BufferBox buf)
 	float factor = data.Volume

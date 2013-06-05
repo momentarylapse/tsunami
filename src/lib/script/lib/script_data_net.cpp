@@ -39,7 +39,7 @@ void SIAddPackageNet()
 {
 	msg_db_f("SIAddPackageNet", 3);
 
-	set_cur_package("net");
+	add_package("net", false);
 
 	TypeSocket     = add_type  ("Socket",		sizeof(Socket));
 	TypeSocketP    = add_type_p("Socket*",	TypeSocket);

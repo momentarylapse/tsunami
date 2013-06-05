@@ -26,7 +26,7 @@ public:
 	bool IsCancelled();
 
 private:
-	CHuiWindow *dlg;
+	HuiWindow *dlg;
 	bool Cancelled;
 };
 

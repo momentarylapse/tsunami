@@ -26,7 +26,6 @@ struct Define
 // for any type of constant used in the script
 struct Constant
 {
-	SyntaxTree *owner;
 	string name;
 	char *data;
 	Type *type;
@@ -83,7 +82,7 @@ struct Block
 	Array<Command*> command; // ID of command in global command array
 };
 
-struct LocalVariable
+struct Variable
 {
 	Type *type; // for creating instances
 	string name;
@@ -100,7 +99,7 @@ struct Function
 	// block of code
 	Block *block;
 	// local variables
-	Array<LocalVariable> var;
+	Array<Variable> var;
 	Type *literal_param_type[SCRIPT_MAX_PARAMS];
 	Type *_class;
 	Type *return_type;
@@ -155,7 +154,7 @@ public:
 	void ParseEnum();
 	void ParseClass();
 	void ParseFunction(Type *class_type, bool as_extern);
-	void ParseClassFunction(Type *t, bool as_extern);
+	void ParseClassFunction(Type *t, bool as_extern, bool as_virtual);
 	Type *ParseVariableDefSingle(Type *type, Function *f, bool as_param = false);
 	void ParseVariableDef(bool single, Function *f);
 	void ParseGlobalConst(const string &name, Type *type);
@@ -168,25 +167,28 @@ public:
 	// pre compiler
 	void PreCompiler(bool just_analyse);
 	void HandleMacro(ExpressionBuffer::Line *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
+	void ImplementImplicitConstructor(Function *f, Type *t);
+	void ImplementImplicitDestructor(Function *f, Type *t);
 	void CreateImplicitFunctions(Type *t, bool relocate_last_function);
-	void CreateAllImplicitFunctions(bool relocate_last_function);
 
 	// syntax analysis
 	Type *GetConstantType();
 	void *GetConstantValue();
+	Type *FindType(const string &name);
 	Type *GetType(const string &name, bool force);
 	void AddType(Type **type);
 	Type *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Type *sub);
 	Type *GetPointerType(Type *sub);
 	void TestArrayDefinition(Type **type, bool is_pointer);
 	bool GetExistence(const string &name, Function *f);
+	bool GetExistenceShared(const string &name);
 	void LinkMostImportantOperator(Array<Command*> &Operand, Array<Command*> &Operator, Array<int> &op_exp);
 	Command *LinkOperator(int op_no, Command *param1, Command *param2);
 	Command *GetOperandExtension(Command *Operand, Function *f);
 	Command *GetOperandExtensionElement(Command *Operand, Function *f);
 	Command *GetOperandExtensionArray(Command *Operand, Function *f);
 	Command *GetCommand(Function *f);
-	void GetCompleteCommand(Block *block, Function *f);
+	void ParseCompleteCommand(Block *block, Function *f);
 	Command *GetOperand(Function *f);
 	Command *GetPrimitiveOperator(Function *f);
 	void FindFunctionParameters(int &np, Type **WantedType, Function *f, Command *cmd);
@@ -194,7 +196,14 @@ public:
 	void GetFunctionCall(const string &f_name, Command *Operand, Function *f);
 	bool GetSpecialFunctionCall(const string &f_name, Command *Operand, Function *f);
 	void CheckParamLink(Command *link, Type *type, const string &f_name = "", int param_no = -1);
-	void GetSpecialCommand(Block *block, Function *f);
+	void ParseSpecialCommand(Block *block, Function *f);
+	void ParseSpecialCommandFor(Block *block, Function *f);
+	void ParseSpecialCommandForall(Block *block, Function *f);
+	void ParseSpecialCommandWhile(Block *block, Function *f);
+	void ParseSpecialCommandBreak(Block *block, Function *f);
+	void ParseSpecialCommandContinue(Block *block, Function *f);
+	void ParseSpecialCommandReturn(Block *block, Function *f);
+	void ParseSpecialCommandIf(Block *block, Function *f);
 
 	void CreateAsmMetaInfo();
 
@@ -215,6 +224,8 @@ public:
 	Command *add_command_classfunc(Type *class_type, ClassFunction &f, Command *inst);
 	Command *add_command_const(int nc);
 	Command *add_command_operator(Command *p1, Command *p2, int op);
+	Command *add_command_local_var(int no, Type *type);
+	Command *add_command_parray(Command *p, Command *index, Type *type);
 	Command *cp_command(Command *c);
 	Command *cp_command_deep(Command *c);
 	Command *ref_command(Command *sub);
@@ -236,8 +247,6 @@ public:
 
 // data
 
-	string Buffer;
-	int BufferLength, BufferPos;
 	ExpressionBuffer Exp;
 	Command GetExistenceLink;
 
@@ -252,7 +261,6 @@ public:
 	bool FlagOverwriteVariablesOffset;
 	int VariablesOffset;
 
-	int NumOwnTypes;
 	Array<Type*> Types;
 	Array<Script*> Includes;
 	Array<Define> Defines;

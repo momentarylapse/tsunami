@@ -5,7 +5,7 @@
  *      Author: michi
  */
 
-#include "types.h"
+#include "math.h"
 #include "../file/file.h"
 
 
@@ -53,6 +53,14 @@ void Interpolator<T>::clear()
 	ready = false;
 	t_sum = 0;
 	temp.t0 = 0;
+	closed = false;
+}
+
+template<class T>
+void Interpolator<T>::close(float dt)
+{
+	add(part[0].pos0, dt);
+	closed = true;
 }
 
 
@@ -118,8 +126,14 @@ void Interpolator<T>::update()
 {
 	if (type == TYPE_CUBIC_SPLINE_NOTANG){
 		type = TYPE_CUBIC_SPLINE;
-		part[0].vel0 = (part[0].pos1 - part[0].pos0) / part[0].dt;
-		part.back().vel1 = (part.back().pos1 - part.back().pos0) / part.back().dt;
+		if (closed){
+			T v = (part[0].pos1 - part.back().pos0) / (part.back().dt + part[0].dt);
+			part.back().vel1 = v;
+			part[0].vel0 = v;
+		}else{
+			part[0].vel0 = (part[0].pos1 - part[0].pos0) / part[0].dt;
+			part.back().vel1 = (part.back().pos1 - part.back().pos0) / part.back().dt;
+		}
 		for (int i=1;i<part.num;i++){
 			T v = (part[i].pos1 - part[i - 1].pos0) / (part[i - 1].dt + part[i].dt);
 			part[i - 1].vel1 = v;

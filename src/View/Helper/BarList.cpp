@@ -13,7 +13,7 @@
 
 
 
-BarList::BarList(CHuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete)
+BarList::BarList(HuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete)
 {
 	dlg = _dlg;
 	id = _id;

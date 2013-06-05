@@ -14,7 +14,7 @@
 #include "Rhythm.h"
 #include "AudioFile.h"
 #include "../Plugins/Effect.h"
-#include "../lib/types/rect.h"
+#include "../lib/math/rect.h"
 
 
 #define NUM_PEAK_LEVELS		24

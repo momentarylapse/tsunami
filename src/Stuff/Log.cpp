@@ -9,13 +9,11 @@
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 
-Log::Log(CHuiWindow *parent)
+Log::Log(HuiWindow *parent)
 {
 	dlg = HuiCreateSizableDialog(_("Meldungen"), 500, 300, parent, true);
 	dlg->ToolbarSetByID("log_toolbar");
 	dlg->AddListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
-	dlg->Hide(true);
-	dlg->Update();
 
 	dlg->EventM("hui:close", this, (void(HuiEventHandler::*)())&Log::Close);
 	dlg->EventM("log_close", this, (void(HuiEventHandler::*)())&Log::Close);
@@ -55,13 +53,13 @@ void Log::Clear()
 
 void Log::Close()
 {
-	dlg->Hide(true);
+	dlg->Hide();
 }
 
 
 void Log::Show()
 {
-	dlg->Hide(false);
+	dlg->Show();
 }
 
 

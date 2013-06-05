@@ -12,7 +12,7 @@
 #include "lib/hui/hui.h"
 
 class Observer;
-class CHuiWindow;
+class HuiWindow;
 class AudioFile;
 class AudioView;
 class PluginManager;
@@ -26,7 +26,7 @@ class Progress;
 class PeakMeter;
 class Clipboard;
 
-class Tsunami : public Observer, public CHuiWindow
+class Tsunami : public Observer, public HuiWindow
 {
 public:
 	Tsunami(Array<string> arg);

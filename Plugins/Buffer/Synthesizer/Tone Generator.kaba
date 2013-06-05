@@ -88,7 +88,6 @@ void Configure()
 	GeneratorDialog.AddSpinButton("\\0\\100\\0.1",315,35,70,25,"volume")
 	GeneratorDialog.AddText("%",390,35,20,25,"")
 	PutCommandBarFixed(GeneratorDialog, 5, 70, 415)
-	GeneratorDialog.Update()
 	
 	int i
 	GeneratorDialog.Reset("tone")
@@ -103,5 +102,5 @@ void Configure()
 	GeneratorDialog.SetDecimals(1)
 	DataToDialog()
 	
-	HuiWaitTillWindowClosed(GeneratorDialog)
+	GeneratorDialog.Run()
 

@@ -16,7 +16,7 @@
 
 
 extern hui_callback *HuiIdleFunction, *HuiErrorFunction;
-extern Array<CHuiWindow*> HuiWindow;
+extern Array<HuiWindow*> HuiWindows;
 
 // apply a function to be executed when a critical error occures
 void HuiSetErrorFunction(hui_callback *error_function)
@@ -33,7 +33,7 @@ void HuiSetErrorFunction(hui_callback *error_function)
 }
 
 static string _eh_program_, _eh_version_;
-static CHuiWindow *ErrorDialog,*ReportDialog;
+static HuiWindow *ErrorDialog,*ReportDialog;
 static hui_callback *_eh_cleanup_function_;
 
 
@@ -76,9 +76,7 @@ void HuiSendBugReport()
 	ReportDialog->Event("ok", &OnReportDialogOK);
 	ReportDialog->Event("cancel", &OnReportDialogClose);
 
-	ReportDialog->Update();
-
-	HuiWaitTillWindowClosed(ReportDialog);
+	ReportDialog->Run();
 }
 #endif
 
@@ -111,7 +109,7 @@ void hui_default_error_handler()
 		msg_write(_("...done"));
 	}
 
-	foreachb(CHuiWindow *w, HuiWindow)
+	foreachb(HuiWindow *w, HuiWindows)
 		delete(w);
 	msg_write(_("                  Close dialog box to exit program."));
 
@@ -141,9 +139,7 @@ void hui_default_error_handler()
 	ErrorDialog->Event("cancel", &OnErrorDialogClose);
 	ErrorDialog->Event("hui:win_close", &OnErrorDialogClose);
 	ErrorDialog->Event("ok", &OnErrorDialogClose);
-	ErrorDialog->Update();
-
-	HuiWaitTillWindowClosed(ErrorDialog);
+	ErrorDialog->Run();
 
 	//HuiEnd();
 	exit(0);

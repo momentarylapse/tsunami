@@ -13,7 +13,7 @@
 #include "../Helper/FxList.h"
 #include "../Helper/BarList.h"
 
-AudioFileDialog::AudioFileDialog(CHuiWindow *win, AudioFile *a):
+AudioFileDialog::AudioFileDialog(HuiWindow *win, AudioFile *a):
 	EmbeddedDialog(win)
 {
 	audio = a;

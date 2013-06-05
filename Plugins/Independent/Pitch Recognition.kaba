@@ -149,7 +149,6 @@ complex bufc[]
 void main()
 	win = HuiCreateDialog("Tonerkennung", 300, 145, MainWin, false)
 	win.AddDrawingArea("", 5, 5, 290, 135, "drawing")
-	win.Update()
 	
 	win.EventX("drawing", "hui:redraw", &Draw)
 	win.Event("hui:close", &OnClose)
@@ -163,7 +162,7 @@ void main()
 	input.Start(TRACK_TYPE_AUDIO, freq)
 	input.AddObserver(nil, &UpdateInput)
 	
-	HuiWaitTillWindowClosed(win)
+	win.Run()
 	
 	input.RemoveObserver(nil)
 	input.Stop()

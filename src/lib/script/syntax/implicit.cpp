@@ -5,6 +5,43 @@
 
 namespace Script{
 
+void SyntaxTree::ImplementImplicitConstructor(Function *f, Type *t)
+{
+	Command *self = add_command_local_var(0, GetPointerType(t));
+
+	if (t->is_super_array){
+		foreach(ClassFunction &ff, t->function)
+			if (ff.name == "__mem_init__"){
+				int nc = AddConstant(TypeInt);
+				*(int*)Constants[nc].data = t->parent->size;
+				Command *c = add_command_classfunc(t, ff, self);
+				c->param[0] = add_command_const(nc);
+				c->num_params = 1;
+				f->block->command.add(c);
+			}
+	}else{
+
+		if (t->vtable){
+			Command *p = shift_command(self, true, 0, TypePointer);
+			int nc = AddConstant(TypePointer);
+			(*(void**)Constants[nc].data) = t->vtable;
+			Command *cmd_0 = add_command_const(nc);
+			Command *c = add_command_operator(p, cmd_0, OperatorAssign);
+			f->block->command.add(c);
+		}
+
+		// call child constructors
+		foreach(ClassElement &e, t->element){
+			ClassFunction *ff = e.type->GetConstructor();
+			if (!ff)
+				continue;
+			Command *p = shift_command(self, true, e.offset, e.type);
+			Command *c = add_command_classfunc(t, *ff, ref_command(p));
+			f->block->command.add(c);
+		}
+	}
+}
+
 void CreateImplicitConstructor(SyntaxTree *ps, Type *t)
 {
 	// create function
@@ -13,46 +50,34 @@ void CreateImplicitConstructor(SyntaxTree *ps, Type *t)
 	f->_class = t;
 	ps->AddVar("self", ps->GetPointerType(t), f);
 
-	Command *self = ps->AddCommand();
-	self->kind = KindVarLocal;
-	self->link_nr = 0;
-	self->type = ps->GetPointerType(t);
+	ps->ImplementImplicitConstructor(f, t);
+
+	t->function.add(ClassFunction("__init__", TypeVoid, ps->script, fn));
+}
+
+
+void SyntaxTree::ImplementImplicitDestructor(Function *f, Type *t)
+{
+	Command *self = add_command_local_var(0, GetPointerType(t));
 
 	if (t->is_super_array){
 		foreach(ClassFunction &ff, t->function)
-			if (ff.name == "__mem_init__"){
-				int nc = ps->AddConstant(TypeInt);
-				*(int*)ps->Constants[nc].data = t->parent->size;
-				Command *c = ps->add_command_classfunc(t, ff, self);
-				Command *p = ps->add_command_const(nc);
-				c->param[0] = p;
-				c->num_params = 1;
+			if (ff.name == "clear"){
+				Command *c = add_command_classfunc(t, ff, self);
 				f->block->command.add(c);
 			}
 	}else{
 
-		// call child constructors
+		// call child destructors
 		foreach(ClassElement &e, t->element){
-			ClassFunction *ff = e.type->GetConstructor();
+			ClassFunction *ff = e.type->GetDestructor();
 			if (!ff)
 				continue;
-			Command *p = ps->AddCommand();
-			p->kind = KindDerefAddressShift;
-			p->link_nr = e.offset;
-			p->type = e.type;
-			p->num_params = 1;
-			p->param[0] = self;
-			Command *c = ps->add_command_classfunc(t, *ff, ps->ref_command(p));
+			Command *p = shift_command(self, true, e.offset, e.type);
+			Command *c = add_command_classfunc(t, *ff, ref_command(p));
 			f->block->command.add(c);
 		}
 	}
-
-	ClassFunction cf;
-	cf.nr = fn;
-	cf.name = "__init__";
-	cf.return_type = TypeVoid;
-	cf.script = ps->script;
-	t->function.add(cf);
 }
 
 void CreateImplicitDestructor(SyntaxTree *ps, Type *t)
@@ -63,42 +88,9 @@ void CreateImplicitDestructor(SyntaxTree *ps, Type *t)
 	f->_class = t;
 	ps->AddVar("self", ps->GetPointerType(t), f);
 
-	Command *self = ps->AddCommand();
-	self->kind = KindVarLocal;
-	self->link_nr = 0;
-	self->type = ps->GetPointerType(t);
+	ps->ImplementImplicitDestructor(f, t);
 
-	if (t->is_super_array){
-		foreach(ClassFunction &ff, t->function)
-			if (ff.name == "clear"){
-				Command *c = ps->add_command_classfunc(t, ff, self);
-				f->block->command.add(c);
-			}
-	}else{
-
-		// call child destructors
-		foreach(ClassElement &e, t->element){
-			ClassFunction *ff = e.type->GetDestructor();
-			if (!ff)
-				continue;
-			Command *p = ps->AddCommand();
-			p->kind = KindDerefAddressShift;
-			p->link_nr = e.offset;
-			p->type = e.type;
-			p->num_params = 1;
-			p->param[0] = self;
-			Command *c = ps->add_command_classfunc(t, *ff, ps->ref_command(p));
-			f->block->command.add(c);
-		}
-	}
-
-
-	ClassFunction cf;
-	cf.nr = fn;
-	cf.name = "__delete__";
-	cf.return_type = TypeVoid;
-	cf.script = ps->script;
-	t->function.add(cf);
+	t->function.add(ClassFunction("__delete__", TypeVoid, ps->script, fn));
 }
 
 void CreateImplicitAssign(SyntaxTree *ps, Type *t)
@@ -112,15 +104,9 @@ void CreateImplicitAssign(SyntaxTree *ps, Type *t)
 	f->_class = t;
 	ps->AddVar("self", ps->GetPointerType(t), f);
 
-	Command *other = ps->AddCommand();
-	other->kind = KindVarLocal;
-	other->link_nr = 0;
-	other->type = t;
+	Command *other = ps->add_command_local_var(0, t);
 
-	Command *self = ps->AddCommand();
-	self->kind = KindVarLocal;
-	self->link_nr = 1;
-	self->type = ps->GetPointerType(t);
+	Command *self = ps->add_command_local_var(1, ps->GetPointerType(t));
 
 	if (t->is_super_array){
 
@@ -143,10 +129,7 @@ void CreateImplicitAssign(SyntaxTree *ps, Type *t)
 
 		ps->AddVar("i", TypeInt, f);
 
-		Command *for_var = ps->AddCommand();
-		for_var->kind = KindVarLocal;
-		for_var->link_nr = 2;
-		for_var->type = TypeInt;
+		Command *for_var = ps->add_command_local_var(2, TypeInt);
 
 
 		// for_var = 0
@@ -171,21 +154,11 @@ void CreateImplicitAssign(SyntaxTree *ps, Type *t)
 		// el := self.data[for_var]
 		Command *deref_self = ps->deref_command(ps->cp_command(self));
 		Command *self_data = ps->shift_command(deref_self, false, 0, ps->GetPointerType(t->parent));
-		Command *cmd_el = ps->AddCommand();
-		cmd_el->kind = KindPointerAsArray;
-		cmd_el->type = t->parent;
-		cmd_el->param[0] = self_data;
-		cmd_el->param[1] = for_var;
-		cmd_el->num_params = 2;
+		Command *cmd_el = ps->add_command_parray(self_data, for_var, t->parent);
 
 		// el2 := other.data[for_var]
 		Command *other_data = ps->shift_command(other, false, 0, ps->GetPointerType(t->parent));
-		Command *cmd_el2 = ps->AddCommand();
-		cmd_el2->kind = KindPointerAsArray;
-		cmd_el2->type = t->parent;
-		cmd_el2->param[0] = other_data;
-		cmd_el2->param[1] = for_var;
-		cmd_el2->num_params = 2;
+		Command *cmd_el2 = ps->add_command_parray(other_data, for_var, t->parent);
 
 
 		Command *cmd_assign = ps->LinkOperator(OperatorAssign, cmd_el, cmd_el2);
@@ -211,12 +184,8 @@ void CreateImplicitAssign(SyntaxTree *ps, Type *t)
 		}
 	}
 
-	ClassFunction cf;
-	cf.nr = fn;
-	cf.name = "__assign__";
-	cf.return_type = TypeVoid;
+	ClassFunction cf = ClassFunction("__assign__", TypeVoid, ps->script, fn);
 	cf.param_type.add(t);
-	cf.script = ps->script;
 	t->function.add(cf);
 }
 
@@ -230,22 +199,11 @@ void CreateImplicitArrayClear(SyntaxTree *ps, Type *t)
 	ps->AddVar("self", ps->GetPointerType(t), f);
 	ps->AddVar("for_var", TypeInt, f);
 
-	Command *self = ps->AddCommand();
-	self->kind = KindVarLocal;
-	self->link_nr = 0;
-	self->type = ps->GetPointerType(t);
+	Command *self = ps->add_command_local_var(0, ps->GetPointerType(t));
 
-	Command *self_num = ps->AddCommand();
-	self_num->kind = KindDerefAddressShift;
-	self_num->link_nr = config.PointerSize;
-	self_num->type = TypeInt;
-	self_num->num_params = 1;
-	self_num->param[0] = ps->cp_command(self);
+	Command *self_num = ps->shift_command(ps->cp_command(self), true, config.PointerSize, TypeInt);
 
-	Command *for_var = ps->AddCommand();
-	for_var->kind = KindVarLocal;
-	for_var->link_nr = 1;
-	for_var->type = TypeInt;
+	Command *for_var = ps->add_command_local_var(1, TypeInt);
 
 // delete...
 	ClassFunction *f_del = t->parent->GetDestructor();
@@ -272,12 +230,7 @@ void CreateImplicitArrayClear(SyntaxTree *ps, Type *t)
 		// el := self.data[for_var]
 		Command *deref_self = ps->deref_command(ps->cp_command(self));
 		Command *self_data = ps->shift_command(deref_self, false, 0, ps->GetPointerType(t->parent));
-		Command *cmd_el = ps->AddCommand();
-		cmd_el->kind = KindPointerAsArray;
-		cmd_el->type = t->parent;
-		cmd_el->param[0] = self_data;
-		cmd_el->param[1] = for_var;
-		cmd_el->num_params = 2;
+		Command *cmd_el = ps->add_command_parray(self_data, for_var, t->parent);
 
 		// __delete__
 		Command *cmd_delete = ps->add_command_classfunc(t, *f_del, ps->ref_command(cmd_el));
@@ -294,12 +247,7 @@ void CreateImplicitArrayClear(SyntaxTree *ps, Type *t)
 	f->block->command.add(cmd_clear);
 
 
-	ClassFunction cf;
-	cf.nr = fn;
-	cf.name = "clear";
-	cf.return_type = TypeVoid;
-	cf.script = ps->script;
-	t->function.add(cf);
+	t->function.add(ClassFunction("clear", TypeVoid, ps->script, fn));
 }
 
 
@@ -316,32 +264,15 @@ void CreateImplicitArrayResize(SyntaxTree *ps, Type *t)
 	ps->AddVar("for_var", TypeInt, f);
 	ps->AddVar("num_old", TypeInt, f);
 
-	Command *num = ps->AddCommand();
-	num->kind = KindVarLocal;
-	num->link_nr = 0;
-	num->type = TypeInt;
+	Command *num = ps->add_command_local_var(0, TypeInt);
 
-	Command *self = ps->AddCommand();
-	self->kind = KindVarLocal;
-	self->link_nr = 1;
-	self->type = ps->GetPointerType(t);
+	Command *self = ps->add_command_local_var(1, ps->GetPointerType(t));
 
-	Command *self_num = ps->AddCommand();
-	self_num->kind = KindDerefAddressShift;
-	self_num->link_nr = config.PointerSize;
-	self_num->type = TypeInt;
-	self_num->num_params = 1;
-	self_num->param[0] = ps->cp_command(self);
+	Command *self_num = ps->shift_command(ps->cp_command(self), true, config.PointerSize, TypeInt);
 
-	Command *for_var = ps->AddCommand();
-	for_var->kind = KindVarLocal;
-	for_var->link_nr = 2;
-	for_var->type = TypeInt;
+	Command *for_var = ps->add_command_local_var(2, TypeInt);
 
-	Command *num_old = ps->AddCommand();
-	num_old->kind = KindVarLocal;
-	num_old->link_nr = 3;
-	num_old->type = TypeInt;
+	Command *num_old = ps->add_command_local_var(3, TypeInt);
 
 	// num_old = self.num
 	Command *cmd_copy_num = ps->add_command_operator(num_old, self_num, OperatorIntAssign);
@@ -369,12 +300,7 @@ void CreateImplicitArrayResize(SyntaxTree *ps, Type *t)
 		// el := self.data[for_var]
 		Command *deref_self = ps->deref_command(ps->cp_command(self));
 		Command *self_data = ps->shift_command(deref_self, false, 0, ps->GetPointerType(t->parent));
-		Command *cmd_el = ps->AddCommand();
-		cmd_el->kind = KindPointerAsArray;
-		cmd_el->type = t->parent;
-		cmd_el->param[0] = self_data;
-		cmd_el->param[1] = for_var;
-		cmd_el->num_params = 2;
+		Command *cmd_el = ps->add_command_parray(self_data, for_var, t->parent);
 
 		// __delete__
 		Command *cmd_delete = ps->add_command_classfunc(t, *f_del, ps->ref_command(cmd_el));
@@ -414,12 +340,7 @@ void CreateImplicitArrayResize(SyntaxTree *ps, Type *t)
 		// el := self.data[for_var]
 		Command *deref_self = ps->deref_command(ps->cp_command(self));
 		Command *self_data = ps->shift_command(deref_self, false, 0, ps->GetPointerType(t->parent));
-		Command *cmd_el = ps->AddCommand();
-		cmd_el->kind = KindPointerAsArray;
-		cmd_el->type = t->parent;
-		cmd_el->param[0] = self_data;
-		cmd_el->param[1] = for_var;
-		cmd_el->num_params = 2;
+		Command *cmd_el = ps->add_command_parray(self_data, for_var, t->parent);
 
 		// __init__
 		Command *cmd_init = ps->add_command_classfunc(t, *f_init, ps->ref_command(cmd_el));
@@ -432,12 +353,8 @@ void CreateImplicitArrayResize(SyntaxTree *ps, Type *t)
 	}
 
 
-	ClassFunction cf;
-	cf.nr = fn;
-	cf.name = "resize";
-	cf.return_type = TypeVoid;
+	ClassFunction cf = ClassFunction("resize", TypeVoid, ps->script, fn);
 	cf.param_type.add(TypeInt);
-	cf.script = ps->script;
 	t->function.add(cf);
 }
 
@@ -452,22 +369,11 @@ void CreateImplicitArrayAdd(SyntaxTree *ps, Type *t)
 	f->_class = t;
 	ps->AddVar("self", ps->GetPointerType(t), f);
 
-	Command *item = ps->AddCommand();
-	item->kind = KindVarLocal;
-	item->link_nr = 0;
-	item->type = t->parent;
+	Command *item = ps->add_command_local_var(0, t->parent);
 
-	Command *self = ps->AddCommand();
-	self->kind = KindVarLocal;
-	self->link_nr = 1;
-	self->type = ps->GetPointerType(t);
+	Command *self = ps->add_command_local_var(1, ps->GetPointerType(t));
 
-	Command *self_num = ps->AddCommand();
-	self_num->kind = KindDerefAddressShift;
-	self_num->link_nr = config.PointerSize;
-	self_num->type = TypeInt;
-	self_num->num_params = 1;
-	self_num->param[0] = ps->cp_command(self);
+	Command *self_num = ps->shift_command(ps->cp_command(self), true, config.PointerSize, TypeInt);
 
 
 	// resize(self.num + 1)
@@ -486,24 +392,15 @@ void CreateImplicitArrayAdd(SyntaxTree *ps, Type *t)
 	Command *cmd_sub = ps->add_command_operator(ps->cp_command(self_num), cmd_1, OperatorIntSubtract);
 	Command *deref_self = ps->deref_command(ps->cp_command(self));
 	Command *self_data = ps->shift_command(deref_self, false, 0, ps->GetPointerType(t->parent));
-	Command *cmd_el = ps->AddCommand();
-	cmd_el->kind = KindPointerAsArray;
-	cmd_el->type = t->parent;
-	cmd_el->param[0] = self_data;
-	cmd_el->param[1] = cmd_sub;
-	cmd_el->num_params = 2;
+	Command *cmd_el = ps->add_command_parray(self_data, cmd_sub, t->parent);
 
 	Command *cmd_assign = ps->LinkOperator(OperatorAssign, cmd_el, item);
 	if (!cmd_assign)
 		ps->DoError(format("%s.add(): no %s.__assign__ for elements", t->name.c_str(), t->parent->name.c_str()));
 	f->block->command.add(cmd_assign);
 
-	ClassFunction cf;
-	cf.nr = fn;
-	cf.name = "add";
-	cf.return_type = TypeVoid;
+	ClassFunction cf = ClassFunction("add", TypeVoid, ps->script, fn);
 	cf.param_type.add(t->parent);
-	cf.script = ps->script;
 	t->function.add(cf);
 }
 
@@ -573,12 +470,6 @@ void SyntaxTree::CreateImplicitFunctions(Type *t, bool relocate_last_function)
 					f.nr --;
 			}
 	}
-}
-
-void SyntaxTree::CreateAllImplicitFunctions(bool relocate_last_function)
-{
-	foreach(Type *t, Types)
-		CreateImplicitFunctions(t, relocate_last_function);
 }
 
 

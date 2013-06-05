@@ -19,7 +19,7 @@ class AudioFileDialog;
 class AudioView : public HuiEventHandler, public Observer, public Observable
 {
 public:
-	AudioView(CHuiWindow *parent, AudioFile *audio);
+	AudioView(HuiWindow *parent, AudioFile *audio);
 	virtual ~AudioView();
 
 	void CheckConsistency();
@@ -144,9 +144,9 @@ public:
 	void Zoom(float f);
 	void Move(float dpos);
 
-	void ExecuteSubDialog(CHuiWindow *win);
-	void ExecuteTrackDialog(CHuiWindow *win);
-	void ExecuteAudioDialog(CHuiWindow *win);
+	void ExecuteSubDialog(HuiWindow *win);
+	void ExecuteTrackDialog(HuiWindow *win);
+	void ExecuteAudioDialog(HuiWindow *win);
 
 
 	bool force_redraw;

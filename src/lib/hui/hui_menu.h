@@ -12,13 +12,13 @@
 
 
 
-class CHuiWindow;
-class CHuiMenu;
+class HuiWindow;
+class HuiMenu;
 
 class HuiMenuItem
 {
 	public:
-	CHuiMenu *sub_menu;
+	HuiMenu *sub_menu;
 	string image;
 	string id;
 	string name;
@@ -39,24 +39,24 @@ class HuiMenuItem
 	}
 };
 
-class CHuiMenu
+class HuiMenu
 {
 public:
-	CHuiMenu();
-	~CHuiMenu();
+	HuiMenu();
+	~HuiMenu();
 	void _cdecl Clear();
-	void _cdecl OpenPopup(CHuiWindow *win, int x, int y);
+	void _cdecl OpenPopup(HuiWindow *win, int x, int y);
 	void _cdecl AddItem(const string &name, const string &id);
 	void _cdecl AddItemImage(const string &name, const string &image, const string &id);
 	void _cdecl AddItemCheckable(const string &name, const string &id);
 	void _cdecl AddSeparator();
-	void _cdecl AddSubMenu(const string &name, const string &id, CHuiMenu *menu);
+	void _cdecl AddSubMenu(const string &name, const string &id, HuiMenu *menu);
 	void _cdecl CheckItem(const string &id, bool checked);
 	bool _cdecl IsItemChecked(const string &id);
 	void _cdecl EnableItem(const string &id, bool enabled);
 	void _cdecl SetText(const string &id, const string &text);
 	void _cdecl SetID(const string &id);
-	CHuiMenu *GetSubMenuByID(const string &id);
+	HuiMenu *GetSubMenuByID(const string &id);
 
 	void UpdateLanguage();
 	
@@ -72,6 +72,6 @@ public:
 	Array<HuiMenuItem> item;
 };
 
-CHuiMenu *_cdecl HuiCreateMenu();
+HuiMenu *_cdecl HuiCreateMenu();
 
 #endif

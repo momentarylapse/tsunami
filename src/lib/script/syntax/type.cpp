@@ -3,6 +3,37 @@
 
 namespace Script{
 
+
+ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s, int no)
+{
+	name = _name;
+	return_type = _return_type;
+	script = s;
+	nr = no;
+	is_virtual = false;
+}
+
+Type::Type()//const string &_name, int _size, SyntaxTree *_owner)
+{
+	//name = _name;
+	owner = NULL;//_owner;
+	size = 0;//_size;
+	is_array = false;
+	is_super_array = false;
+	array_length = 0;
+	is_pointer = false;
+	is_silent = false;
+	parent = NULL;
+	force_call_by_value = false;
+	vtable = NULL;
+};
+
+Type::~Type()
+{
+	if (vtable)
+		delete[](vtable);
+}
+
 bool Type::UsesCallByReference()
 {	return ((!force_call_by_value) && (!is_pointer)) || (is_array);	}
 
@@ -19,6 +50,8 @@ bool Type::is_simple_class()
 		return false;*/
 	if (is_super_array)
 		return false;
+	if (vtable)
+		return false;
 	if (GetConstructor())
 		return false;
 	if (GetDestructor())
@@ -29,6 +62,17 @@ bool Type::is_simple_class()
 		if (!e.type->is_simple_class())
 			return false;
 	return true;
+}
+
+bool Type::IsDerivedFrom(Type *root) const
+{
+	if (this == root)
+		return true;
+	if ((is_super_array) || (is_array) || (is_pointer))
+		return false;
+	if (!parent)
+		return false;
+	return parent->IsDerivedFrom(root);
 }
 
 int Type::GetFunc(const string &name)

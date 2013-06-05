@@ -7,13 +7,10 @@
 
 #include "NewDialog.h"
 
-NewDialog::NewDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a):
-	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
+NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
+	HuiWindow("new_dialog", _parent, _allow_parent)
 {
 	audio = a;
-
-	// dialog
-	FromResource("new_dialog");
 
 	SetInt("sample_rate", DEFAULT_SAMPLE_RATE);
 

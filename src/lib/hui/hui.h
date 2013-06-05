@@ -13,11 +13,11 @@
 #define _HUI_EXISTS_
 
 #include "hui_common.h"
-#include "../types/types.h"
 #ifdef _X_USE_IMAGE_
 	#include "../image/image.h"
 #else
 	typedef int Image;
+	typedef int color;
 #endif
 
 extern string HuiVersion;
@@ -25,8 +25,8 @@ extern string HuiVersion;
 
 
 
-class CHuiWindow;
-class CHuiMenu;
+class HuiWindow;
+class HuiMenu;
 class HuiEventHandler;
 
 
@@ -86,7 +86,6 @@ void HuiRunLaterM(int time_ms, HuiEventHandler *object, T fun)
 {	_HuiRunLaterM(time_ms, object, (void(HuiEventHandler::*)())fun);	}
 void HuiDoSingleMainLoop();
 void HuiEnd();
-string HuiWaitTillWindowClosed(CHuiWindow *win);
 extern bool HuiEndKeepMsgAlive;
 
 // images

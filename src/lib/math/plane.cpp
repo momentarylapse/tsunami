@@ -1,8 +1,27 @@
-#include "types.h"
+#include "math.h"
 
 //------------------------------------------------------------------------------------------------//
 //                                             planes                                             //
 //------------------------------------------------------------------------------------------------//
+
+
+plane::plane(const vector &p, const vector &n)
+{
+	this->n = n;
+	d = - (p*n);
+}
+
+plane::plane(const vector &a, const vector &b, const vector &c)
+{
+	n = (b-a) ^ (c - a);
+	n.normalize();
+	d = - (n*a);
+}
+
+string plane::str() const
+{
+	return format("(%f, %f, %f, %f)", n.x, n.y, n.z, d);
+}
 
 float LineIntersectsTriangleF, LineIntersectsTriangleG;
 

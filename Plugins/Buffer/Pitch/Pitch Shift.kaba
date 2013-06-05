@@ -47,12 +47,11 @@ void Configure()
 	PitchDialog.AddText("%",270,5,30,25,"")
 	PutCommandBarFixed(PitchDialog, 5, 40, 305)
 	AddSlider(PitchDialog, "pitch_slider", "pitch", 0, 2, 100, &OnPitch, data.Pitch)
-	PitchDialog.Update()
 		
 	PitchDialog.SetDecimals(1)
 	DataToDialog()
-		
-	HuiWaitTillWindowClosed(PitchDialog)
+	
+	PitchDialog.Run()
 
 void ProcessTrack(BufferBox buf)
 	shift_buf(buf.r)

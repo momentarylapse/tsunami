@@ -11,7 +11,7 @@
 #include "Data.h"
 #include "Track.h"
 #include "../lib/base/base.h"
-#include "../lib/types/rect.h"
+#include "../lib/math/rect.h"
 
 class Data;
 class Effect;

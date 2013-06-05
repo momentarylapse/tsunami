@@ -28,6 +28,7 @@ public:
 	void add2(const T &p, const T &v, float dt = 1.0f);
 	void add3(const T &p, const T &v, float weight, float dt = 1.0f);
 	void jump(const T &p, const T &v);
+	void close(float dt = 1.0f);
 
 	// interpolated output
 	T get(float t);
@@ -52,6 +53,7 @@ private:
 	Array<Part> part;
 	Part temp;
 	float t_sum;
+	bool closed;
 };
 
 

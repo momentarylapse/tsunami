@@ -7,7 +7,7 @@
 
 #include "EmbeddedDialog.h"
 
-EmbeddedDialog::EmbeddedDialog(CHuiWindow *_win)
+EmbeddedDialog::EmbeddedDialog(HuiWindow *_win)
 {
 	win = _win;
 }

@@ -83,7 +83,6 @@ void Configure()
 	dlg.AddSpinButton("\\1\\100\\1",315,155,70,25,"beats")
 	PutCommandBarFixed(dlg, 5, 190, 415)
 	PutFavoriteBarFixed(dlg, 5, 5, 415)
-	dlg.Update()
 	
 	
 	AddSlider(dlg, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
@@ -94,6 +93,6 @@ void Configure()
 
 	dlg.SetDecimals(1)
 	DataToDialog()
-	
-	HuiWaitTillWindowClosed(dlg)
+
+	dlg.Run()
 

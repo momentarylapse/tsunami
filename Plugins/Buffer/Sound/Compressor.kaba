@@ -153,7 +153,6 @@ void Configure()
 	win.SetTarget("table2", 0)
 	win.AddText("Delay...ms", 0, 0, 0, 0, "")
 	win.AddEdit("", 1, 0, 0, 0, "edit")
-	win.Update()
 	PutFavoriteBarSizable(win, "table1", 0, 0)
 	PutCommandBarSizable(win, "table1", 0, 3)
 	
@@ -170,7 +169,7 @@ void Configure()
 	win.EventX("drawing_area", "hui:right-button-down", &OnRightButtonDown)
 	win.EventX("drawing_area", "hui:mouse-move", &OnMouseMove)
 
-	HuiWaitTillWindowClosed(win)
+	win.Run()
 
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio

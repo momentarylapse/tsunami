@@ -7,7 +7,7 @@ enum TypeFlag
 	FLAG_SILENT = 2,
 };
 
-void set_cur_package(const string &name);
+void add_package(const string &name, bool used_by_default);
 Type *add_type(const string &name, int size, TypeFlag = FLAG_NONE);
 Type *add_type_p(const string &name, Type *sub_type, TypeFlag = FLAG_NONE);
 Type *add_type_a(const string &name, Type *sub_type, int array_length);
@@ -19,6 +19,7 @@ void class_add_element(const string &name, Type *type, int offset);
 void class_add_func(const string &name, Type *return_type, void *func);
 void add_const(const string &name, Type *type, void *value);
 void add_ext_var(const string &name, Type *type, void *var);
+void add_type_cast(int penalty, Type *source, Type *dest, const string &cmd, void *func);
 
 class MFDummyClass
 {};

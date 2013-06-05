@@ -13,7 +13,7 @@ struct ExpressionBuffer
 
 	struct Expression
 	{
-		char* name; // points into Exp.buffer
+		string name;
 		int pos;
 	};
 
@@ -23,8 +23,6 @@ struct ExpressionBuffer
 		Array<Expression> exp;
 	};
 
-	char *buffer; // holds ALL expressions of the file (0 separated)
-	char *buf_cur; // pointer to the latest one
 	Array<Line> line;
 	Line temp_line;
 	Line *cur_line;
@@ -53,7 +51,9 @@ struct ExpressionBuffer
 	void test_indent(int i);
 	void reset_indent();
 
-	void Analyse(SyntaxTree *ps, const char *source);
+	void show();
+
+	void Analyse(SyntaxTree *ps, const string &source);
 	bool AnalyseExpression(const char *source, int &pos, ExpressionBuffer::Line *l, int &line_no);
 	bool AnalyseLine(const char *source, ExpressionBuffer::Line *l, int &line_no);
 	void AnalyseLogicalLine(const char *source, ExpressionBuffer::Line *l, int &line_no);

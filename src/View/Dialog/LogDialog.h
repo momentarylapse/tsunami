@@ -10,10 +10,10 @@
 
 #include "../../lib/hui/hui.h"
 
-class LogDialog: public CHuiWindow
+class LogDialog: public HuiWindow
 {
 public:
-	LogDialog(CHuiWindow *_parent, bool _allow_parent);
+	LogDialog(HuiWindow *_parent, bool _allow_parent);
 	virtual ~LogDialog();
 
 	void LoadData();

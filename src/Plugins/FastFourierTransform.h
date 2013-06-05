@@ -9,7 +9,7 @@
 #define FASTFOURIERTRANSFORM_H_
 
 #include "../lib/file/file.h"
-#include "../lib/types/types.h"
+#include "../lib/math/math.h"
 
 namespace FastFourierTransform
 {

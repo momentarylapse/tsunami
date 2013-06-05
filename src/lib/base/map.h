@@ -51,7 +51,7 @@ public:
 		for (int i=0;i<num;i++)
 			if (((Entry*)data)[i].hash == hash)
 				return ((Entry*)data)[i].value;
-		resize(num + 1);
+		this->resize(num + 1);
 		int n = num - 1;
 		((Entry*)data)[n].key = key;
 		((Entry*)data)[n].hash = hash;

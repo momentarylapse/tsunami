@@ -13,6 +13,7 @@
 #include "../Audio/AudioInputAudio.h"
 #include "../Audio/AudioOutput.h"
 #include "../Stuff/Log.h"
+#include "../lib/math/math.h"
 
 const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;
@@ -38,7 +39,7 @@ AudioView::SelectionType::SelectionType()
 	sub_offset = 0;
 }
 
-AudioView::AudioView(CHuiWindow *parent, AudioFile *_audio) :
+AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
 	TIME_SCALE_HEIGHT(20),
@@ -1197,7 +1198,7 @@ void AudioView::Move(float dpos)
 	ForceRedraw();
 }
 
-void AudioView::ExecuteTrackDialog(CHuiWindow *win)
+void AudioView::ExecuteTrackDialog(HuiWindow *win)
 {
 	win->HideControl("track_dialog_table", false);
 	win->HideControl("audio_dialog_table", true);
@@ -1205,20 +1206,19 @@ void AudioView::ExecuteTrackDialog(CHuiWindow *win)
 
 
 
-void AudioView::ExecuteSubDialog(CHuiWindow *win)
+void AudioView::ExecuteSubDialog(HuiWindow *win)
 {
 	if (!cur_sub){
 		tsunami->log->Error(_("Keine Ebene ausgew&ahlt"));
 		return;
 	}
 	SubDialog *dlg = new SubDialog(win, false, cur_sub);
-	dlg->Update();
-	HuiWaitTillWindowClosed(dlg);
+	dlg->Run();
 }
 
 
 
-void AudioView::ExecuteAudioDialog(CHuiWindow *win)
+void AudioView::ExecuteAudioDialog(HuiWindow *win)
 {
 	win->HideControl("track_dialog_table", true);
 	win->HideControl("audio_dialog_table", false);

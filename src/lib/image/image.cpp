@@ -1,5 +1,6 @@
 #include "image.h"
 #include "../file/file.h"
+#include "../math/math.h"
 
 
 string ImageVersion = "0.2.3.0";

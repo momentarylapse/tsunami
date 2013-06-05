@@ -70,7 +70,6 @@ void main()
 	dlg.AddText("", 0, 0, 0, 0, "")
 	dlg.AddButton("Close", 1, 0, 0, 0, "close")
 	dlg.SetImage("close", "hui:close")
-	dlg.Update()
 	
 	freq = 880.0
 	length = 0.02
@@ -88,4 +87,4 @@ void main()
 	
 	output.PlayGenerated(&fill, SAMPLE_RATE)
 	
-	HuiWaitTillWindowClosed(dlg)
+	dlg.Run()

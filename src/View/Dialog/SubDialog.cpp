@@ -9,11 +9,10 @@
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
 
-SubDialog::SubDialog(CHuiWindow *_parent, bool _allow_parent, Track *s):
-	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
+SubDialog::SubDialog(HuiWindow *_parent, bool _allow_parent, Track *s):
+	HuiWindow("level_dialog", _parent, _allow_parent)
 {
 	sub = s;
-	FromResource("level_dialog");
 
 	SetString("name", s->name);
 	SetDecimals(1);

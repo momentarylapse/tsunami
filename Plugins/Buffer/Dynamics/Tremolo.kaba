@@ -49,7 +49,6 @@ void Configure()
 	dlg.AddText("Geschwindigkeit",5,35,110,25,"")
 	dlg.AddText("Tiefe",5,65,100,25,"")
 	PutCommandBarFixed(dlg, 5, 105, 415)
-	dlg.Update()
 	
 	AddSlider(dlg, "speed_slider", "speed", 0, 20,    1,    &OnSpeed, data.Speed)
 	AddSlider(dlg, "depth_slider", "depth", 0, 1,    100,  &OnDepth, data.Depth)
@@ -59,7 +58,7 @@ void Configure()
 	dlg.SetDecimals(1)
 	DataToDialog()
 	
-	HuiWaitTillWindowClosed(dlg)
+	dlg.Run()
 	
 void ProcessTrack(BufferBox buf)
 		

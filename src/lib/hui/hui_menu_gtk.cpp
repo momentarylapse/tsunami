@@ -38,7 +38,7 @@ void try_add_accel(GtkWidget *item, const string &id)
 		}
 }
 
-string get_menu_id_by_widget(CHuiMenu *m, GtkWidget *widget)
+string get_menu_id_by_widget(HuiMenu *m, GtkWidget *widget)
 {
 	foreach(HuiMenuItem &it, m->item){
 		if (it.sub_menu){
@@ -59,19 +59,19 @@ gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data)
 	
 	msg_db_m("OnGtkMenuClick", 1);
 
-	CHuiMenu *m = (CHuiMenu*)data;
+	HuiMenu *m = (HuiMenu*)data;
 	string id = get_menu_id_by_widget(m, widget);
 
-	HuiEvent e = HuiCreateEvent(id, "hui:click");
+	HuiEvent e = HuiEvent(id, "hui:click");
 
 	// which window?
 	_HuiSendGlobalCommand_(&e);
-	for (int i=0;i<HuiWindow.num;i++)
-		HuiWindow[i]->_SendEvent_(&e);
+	for (int i=0;i<HuiWindows.num;i++)
+		HuiWindows[i]->_SendEvent_(&e);
 	return FALSE;
 }
 
-CHuiMenu::CHuiMenu()
+HuiMenu::HuiMenu()
 {
 	msg_db_r("CHuiMenu()", 1);
 	_HuiMakeUsable_();
@@ -82,16 +82,16 @@ CHuiMenu::CHuiMenu()
 	msg_db_l(1);
 }
 
-CHuiMenu::~CHuiMenu()
+HuiMenu::~HuiMenu()
 {
 }
 
-void CHuiMenu::gtk_realize()
+void HuiMenu::gtk_realize()
 {
 	g_menu = gtk_menu_new();
 }
 
-void CHuiMenu::Clear()
+void HuiMenu::Clear()
 {
 	foreach(HuiMenuItem &i, item)
 		gtk_widget_destroy(i.widget);
@@ -99,7 +99,7 @@ void CHuiMenu::Clear()
 }
 
 // window coordinate system!
-void CHuiMenu::OpenPopup(CHuiWindow *win, int x, int y)
+void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
 {
 	msg_db_r("CHuiMenu::OpenPopup", 1);
 	gtk_widget_show(g_menu);
@@ -108,7 +108,7 @@ void CHuiMenu::OpenPopup(CHuiWindow *win, int x, int y)
 	msg_db_l(1);
 }
 
-HuiMenuItem *new_item(CHuiMenu *m, const string &name, const string &id)
+HuiMenuItem *new_item(HuiMenu *m, const string &name, const string &id)
 {
 	HuiMenuItem i;
 	i.id = id;
@@ -117,7 +117,7 @@ HuiMenuItem *new_item(CHuiMenu *m, const string &name, const string &id)
 	return &m->item.back();
 }
 
-void CHuiMenu::AddItem(const string &name, const string &id)
+void HuiMenu::AddItem(const string &name, const string &id)
 {
 	HuiMenuItem *i = new_item(this, name, id);
 	
@@ -271,7 +271,7 @@ void *get_gtk_image_pixbuf(const string &image)
 	return NULL;
 }
 
-void CHuiMenu::AddItemImage(const string &name, const string &image, const string &id)
+void HuiMenu::AddItemImage(const string &name, const string &image, const string &id)
 {
 	HuiMenuItem *i = new_item(this, name, id);
 	
@@ -286,7 +286,7 @@ void CHuiMenu::AddItemImage(const string &name, const string &image, const strin
 	try_add_accel(i->widget, id);
 }
 
-void CHuiMenu::AddItemCheckable(const string &name, const string &id)
+void HuiMenu::AddItemCheckable(const string &name, const string &id)
 {
 	HuiMenuItem *i = new_item(this, name, id);
 	i->checkable = true;
@@ -299,7 +299,7 @@ void CHuiMenu::AddItemCheckable(const string &name, const string &id)
 	try_add_accel(i->widget, id);
 }
 
-void CHuiMenu::AddSeparator()
+void HuiMenu::AddSeparator()
 {
 	HuiMenuItem *i = new_item(this, "", "");
 	i->is_separator = true;
@@ -309,7 +309,7 @@ void CHuiMenu::AddSeparator()
 	gtk_widget_show(i->widget);
 }
 
-void CHuiMenu::AddSubMenu(const string &name, const string &id, CHuiMenu *menu)
+void HuiMenu::AddSubMenu(const string &name, const string &id, HuiMenu *menu)
 {
 	HuiMenuItem *i = new_item(this, name, id);
 	i->sub_menu = menu;
@@ -323,7 +323,7 @@ void CHuiMenu::AddSubMenu(const string &name, const string &id, CHuiMenu *menu)
 // only allow menu callback, if we are in layer 0 (if we don't edit it ourself)
 int allow_signal_level=0;
 
-void CHuiMenu::CheckItem(const string &id, bool checked)
+void HuiMenu::CheckItem(const string &id, bool checked)
 {
 	allow_signal_level++;
 	foreach(HuiMenuItem &it, item)
@@ -336,7 +336,7 @@ void CHuiMenu::CheckItem(const string &id, bool checked)
 	allow_signal_level--;
 }
 
-bool CHuiMenu::IsItemChecked(const string &id)
+bool HuiMenu::IsItemChecked(const string &id)
 {
 #ifdef HUI_API_GTK
 	/*for (int i=0;i<NumItems;i++){
@@ -350,7 +350,7 @@ bool CHuiMenu::IsItemChecked(const string &id)
 	return false;
 }
 
-void CHuiMenu::EnableItem(const string &id,bool enabled)
+void HuiMenu::EnableItem(const string &id,bool enabled)
 {
 	foreach(HuiMenuItem &it, item){
 		if (it.sub_menu)
@@ -362,7 +362,7 @@ void CHuiMenu::EnableItem(const string &id,bool enabled)
 	}
 }
 
-void CHuiMenu::SetText(const string &id, const string &text)
+void HuiMenu::SetText(const string &id, const string &text)
 {
 	foreach(HuiMenuItem &it, item){
 		if (it.sub_menu)

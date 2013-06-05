@@ -7,7 +7,7 @@
 
 #include "ExtendedBufferBox.h"
 #include "FastFourierTransform.h"
-#include "../lib/types/types.h"
+#include "../lib/math/math.h"
 #include <math.h>
 
 ExtendedBufferBox::ExtendedBufferBox()

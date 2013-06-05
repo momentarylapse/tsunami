@@ -17,10 +17,6 @@ static Array<HuiConfig> _HuiConfig_;
 static void LoadConfigFile()
 {
 	CFile *f = OpenFileSilent(HuiAppDirectory + "Data/config.txt");
-	/*for (int i=0;i<HuiConfig.num;i++){
-		HuiConfig[i].name.clear();
-		HuiConfig[i].value.clear();
-	}*/
 	_HuiConfig_.clear();
 	if (f){
 		int num = f->ReadIntC();

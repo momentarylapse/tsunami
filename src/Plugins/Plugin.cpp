@@ -8,13 +8,14 @@
 #include "Plugin.h"
 #include "../Tsunami.h"
 #include "../lib/script/script.h"
+#include "../lib/math/math.h"
 #include "PluginManager.h"
 #include "../Stuff/Log.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 
 // -> PluginManager.cpp
-void GlobalRemoveSliders(CHuiWindow *win);
+void GlobalRemoveSliders(HuiWindow *win);
 
 Plugin::Plugin(const string &_filename)
 {
@@ -46,7 +47,7 @@ Plugin::Plugin(const string &_filename)
 
 		type = f_process_track ? TYPE_EFFECT : TYPE_OTHER;
 
-		foreachi(Script::LocalVariable &v, s->syntax->RootOfAllEvil.var, i)
+		foreachi(Script::Variable &v, s->syntax->RootOfAllEvil.var, i)
 			if (v.type->name == "PluginData"){
 				data = s->g_var[i];
 				data_type = v.type;

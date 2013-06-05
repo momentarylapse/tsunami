@@ -12,11 +12,9 @@
 #include "../../Audio/AudioInputAudio.h"
 #include "../../Stuff/Log.h"
 
-SettingsDialog::SettingsDialog(CHuiWindow *_parent, bool _allow_parent):
-	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
+SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
+	HuiWindow("properties_dialog", _parent, _allow_parent)
 {
-	FromResource("properties_dialog");
-
 	EventM("language", this, &SettingsDialog::OnLanguage);
 	EventM("ogg_bitrate", this, &SettingsDialog::OnOggBitrate);
 	EventM("preview_device", this, &SettingsDialog::OnPreviewDevice);

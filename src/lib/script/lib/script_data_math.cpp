@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "../../file/file.h"
+#include "../../math/math.h"
 #include "../script.h"
 #include "../../config.h"
 #include "script_data_common.h"
@@ -273,6 +274,43 @@ float maxf(float a, float b)
 float minf(float a, float b)
 {	return (a < b) ? a : b;	}
 
+string _cdecl ff2s(complex &x){	return x.str();	}
+string _cdecl fff2s(vector &x){	return x.str();	}
+string _cdecl ffff2s(quaternion &x){	return x.str();	}
+
+
+char *get_type_cast_buf(int size);
+extern char CastTemp[];
+
+char *CastVector2StringP(vector *v)
+{
+	string s = v->str();
+	char *str = get_type_cast_buf(s.num + 1);
+	memcpy(str, s.data, s.num);
+	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
+	return &CastTemp[0];
+}
+char *CastFFFF2StringP(quaternion *q)
+{
+	string s = q->str();
+	char *str = get_type_cast_buf(s.num + 1);
+	memcpy(str, s.data, s.num);
+	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
+	return &CastTemp[0];
+}
+char *CastComplex2StringP(complex *z)
+{
+	string s = z->str();
+	char *str = get_type_cast_buf(s.num + 1);
+	memcpy(str, s.data, s.num);
+	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
+	return &CastTemp[0];
+}
+
+// amd64 complex return wrappers
+void amd64_comlist_sum(complex &r, ComplexList &l)
+{	r = l.sum();	}
+
 // amd64 vector return wrappers
 void amd64_vec_dir2ang(vector &r, vector &v)
 {	r = v.dir2ang();	}
@@ -286,6 +324,8 @@ void amd64_vec_transform(vector &r, vector &v, matrix &m)
 {	r = v.transform(m);	}
 void amd64_vec_transform_normal(vector &r, vector &v, matrix &m)
 {	r = v.transform_normal(m);	}
+void amd64_vec_untransform(vector &r, vector &v, matrix &m)
+{	r = v.untransform(m);	}
 void amd64_vec_ortho(vector &r, vector &v)
 {	r = v.ortho();	}
 void amd64_quat_get_angles(vector &r, quaternion &q)
@@ -303,18 +343,29 @@ void amd64_vec_ang_interpolate(vector &r, vector &a, vector &b, float t)
 void amd64_vec_cross_product(vector &r, vector &a, vector &b)
 {	r = VecCrossProduct(a, b);	}
 
-static void *amd64_wrap(void *orig, void *wrap)
-{
-	if (config.instruction_set == Asm::InstructionSetAMD64)
-		return wrap;
-	return orig;
-}
+void amd64_vec_rand_dir(vector &v, Random &r)
+{	v = r.dir();	}
+void amd64_vec_rand_in_ball(vector &v, Random &r, float rad)
+{	v = r.in_ball(rad);	}
+
+
+// amd64 quaternion return wrappers
+void amd64_quat_mul(quaternion &r, quaternion &a, quaternion&b)
+{	r = a * b;	}
+
+// amd64 color return wrappers
+void amd64_col_hsb(color &r, float a, float h, float s, float b)
+{	r = SetColorHSB(a, h, s, b);	}
+void amd64_col_interpolate(color &r, color &a, color &b, float t)
+{	r = ColorInterpolate(a, b, t);	}
+
+#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::InstructionSetAMD64) ? ((void*)(wrap)) : ((void*)(orig)))
 
 void SIAddPackageMath()
 {
 	msg_db_f("SIAddPackageMath", 3);
 
-	set_cur_package("math");
+	add_package("math", false);
 
 	// types
 	TypeComplex		= add_type  ("complex",		sizeof(float) * 2);
@@ -350,6 +401,8 @@ void SIAddPackageMath()
 	TypeFloatInterpolator	= add_type  ("FloatInterpolator",		sizeof(Interpolator<float>));
 	Type*
 	TypeVectorInterpolator	= add_type  ("VectorInterpolator",		sizeof(Interpolator<vector>));
+	Type*
+	TypeRandom		= add_type  ("Random",	sizeof(Random));
 	
 	
 	add_class(TypeIntList);
@@ -410,7 +463,7 @@ void SIAddPackageMath()
 
 	add_class(TypeComplexList);
 		class_add_func("__init__",	TypeVoid, mf((tmf)&ComplexList::__init__));
-		class_add_func("sum",	TypeComplex, mf((tmf)&ComplexList::sum));
+		class_add_func("sum",	TypeComplex, amd64_wrap(mf((tmf)&ComplexList::sum), &amd64_comlist_sum));
 		class_add_func("sum2",	TypeFloat, mf((tmf)&ComplexList::sum2));
 		class_add_func("__iadd__", TypeVoid, mf((tmf)&ComplexList::iadd));
 			func_add_param("other",	TypeComplexList);
@@ -464,31 +517,35 @@ void SIAddPackageMath()
 		class_add_func("length_sqr",		TypeFloat,	type_p(mf((tmf)&vector::length_sqr)));
 		class_add_func("length_fuzzy",		TypeFloat,	type_p(mf((tmf)&vector::length_fuzzy)));
 		class_add_func("normalize",		TypeVoid,	type_p(mf((tmf)&vector::normalize)));
-		class_add_func("dir2ang",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::dir2ang)), type_p(&amd64_vec_dir2ang)));
-		class_add_func("dir2ang2",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::dir2ang2)), type_p(&amd64_vec_dir2ang2)));
+		class_add_func("dir2ang",			TypeVector,	amd64_wrap(mf((tmf)&vector::dir2ang), &amd64_vec_dir2ang));
+		class_add_func("dir2ang2",			TypeVector,	amd64_wrap(mf((tmf)&vector::dir2ang2), &amd64_vec_dir2ang2));
 			func_add_param("up",		TypeVector);
-		class_add_func("ang2dir",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::ang2dir)), type_p(&amd64_vec_ang2dir)));
-		class_add_func("rotate",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::rotate)), type_p(&amd64_vec_rotate)));
+		class_add_func("ang2dir",			TypeVector,	amd64_wrap(mf((tmf)&vector::ang2dir), &amd64_vec_ang2dir));
+		class_add_func("rotate",			TypeVector,	amd64_wrap(mf((tmf)&vector::rotate), &amd64_vec_rotate));
 			func_add_param("ang",		TypeVector);
-		class_add_func("transform",		TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::transform)), type_p(&amd64_vec_transform)));
+		class_add_func("transform",		TypeVector,	amd64_wrap(mf((tmf)&vector::transform), &amd64_vec_transform));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("transform_normal",	TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::transform_normal)), type_p(&amd64_vec_transform_normal)));
+		class_add_func("transform_normal",	TypeVector,	amd64_wrap(mf((tmf)&vector::transform_normal), &amd64_vec_transform_normal));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("ortho",			TypeVector,	amd64_wrap(type_p(mf((tmf)&vector::ortho)), type_p(&amd64_vec_ortho)));
-		class_add_func("str",		TypeString,			type_p(mf((tmf)&vector::str)));
+		class_add_func("untransform",		TypeVector,	amd64_wrap(mf((tmf)&vector::untransform), &amd64_vec_untransform));
+			func_add_param("m",			TypeMatrix);
+		class_add_func("__div__",		TypeVector,	amd64_wrap(mf((tmf)&vector::untransform), &amd64_vec_untransform));
+			func_add_param("m",			TypeMatrix);
+		class_add_func("ortho",			TypeVector,	amd64_wrap(mf((tmf)&vector::ortho), &amd64_vec_ortho));
+		class_add_func("str",		TypeString,			mf((tmf)&vector::str));
 	
 	add_class(TypeQuaternion);
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_element("z",		TypeFloat,	8);
 		class_add_element("w",		TypeFloat,	12);
-		class_add_func("__mul__", TypeQuaternion, mf((tmf)&quaternion::mul));
+		class_add_func("__mul__", TypeQuaternion, amd64_wrap(mf((tmf)&quaternion::mul), &amd64_quat_mul));
 			func_add_param("other",	TypeQuaternion);
 		class_add_func("__imul__", TypeVoid, mf((tmf)&quaternion::imul));
 			func_add_param("other",	TypeQuaternion);
 		class_add_func("inverse",	TypeVoid,	mf((tmf)&quaternion::inverse));
 		class_add_func("normalize",	TypeVoid,	mf((tmf)&quaternion::normalize));
-		class_add_func("get_angles",	TypeVector,	amd64_wrap(mf((tmf)&quaternion::get_angles), type_p(&amd64_quat_get_angles)));
+		class_add_func("get_angles",	TypeVector,	amd64_wrap(mf((tmf)&quaternion::get_angles), &amd64_quat_get_angles));
 		class_add_func("str",		TypeString,			mf((tmf)&quaternion::str));
 	
 	add_class(TypeRect);
@@ -498,6 +555,7 @@ void SIAddPackageMath()
 		class_add_element("y2",	TypeFloat,	12);
 		class_add_func("width",		TypeFloat,			mf((tmf)&rect::width));
 		class_add_func("height",	TypeFloat,			mf((tmf)&rect::height));
+		class_add_func("area",		TypeFloat,			mf((tmf)&rect::area));
 		class_add_func("inside",	TypeBool,			mf((tmf)&rect::inside));
 			func_add_param("x",	TypeFloat);
 			func_add_param("y",	TypeFloat);
@@ -548,7 +606,7 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeMatrix);
 		class_add_func("__mul__",	TypeMatrix,	mf((tmf)&matrix::mul));
 			func_add_param("other",	TypeMatrix);
-		class_add_func("__mul__",	TypeVector,	amd64_wrap(mf((tmf)&matrix::mul_v), type_p(&amd64_mat_vec_mul)));
+		class_add_func("__mul__",	TypeVector,	amd64_wrap(mf((tmf)&matrix::mul_v), &amd64_mat_vec_mul));
 			func_add_param("other",	TypeVector);
 		class_add_func("str",		TypeString,			mf((tmf)&matrix::str));
 	
@@ -666,6 +724,20 @@ void SIAddPackageMath()
 		class_add_func("Decrypt",	TypeString, algebra_p(mf((tmf)&Crypto::Decrypt)));
 			func_add_param("str",		TypeString);
 			func_add_param("cut",		TypeBool);
+
+	add_class(TypeRandom);
+		class_add_element("n",	TypeRandom, 0);
+		class_add_func("seed",		TypeVoid, mf((tmf)&Random::seed));
+			func_add_param("str",		TypeString);
+		class_add_func("geti",		TypeInt, mf((tmf)&Random::geti));
+			func_add_param("max",		TypeInt);
+		class_add_func("getu",		TypeFloat, mf((tmf)&Random::getu));
+		class_add_func("geti",		TypeFloat, mf((tmf)&Random::getf));
+			func_add_param("min",		TypeFloat);
+			func_add_param("max",		TypeFloat);
+		class_add_func("in_ball",		TypeVector, amd64_wrap(mf((tmf)&Random::in_ball), &amd64_vec_rand_in_ball));
+			func_add_param("r",		TypeFloat);
+		class_add_func("dir",		TypeVector, amd64_wrap(mf((tmf)&Random::dir), &amd64_vec_rand_dir));
 	
 	add_compiler_func("complex",		TypeComplex,	CommandComplexSet);
 		func_add_param("x",		TypeFloat);
@@ -727,9 +799,9 @@ void SIAddPackageMath()
 		class_add_func("jump",	TypeVoid, mf((tmf)&Interpolator<vector>::jump));
 			func_add_param("p",	TypeVector);
 			func_add_param("v",	TypeVector);
-		class_add_func("get",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get), type_p(&amd64_vec_inter_get)));
+		class_add_func("get",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get), &amd64_vec_inter_get));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_tang",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get_tang), type_p(&amd64_vec_inter_get_tang)));
+		class_add_func("get_tang",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get_tang), &amd64_vec_inter_get_tang));
 			func_add_param("t",	TypeFloat);
 		class_add_func("get_list",	TypeVectorList, mf((tmf)&Interpolator<vector>::get_list));
 			func_add_param("t",	TypeFloatList);
@@ -799,17 +871,17 @@ void SIAddPackageMath()
 		func_add_param("x",		TypeFloat);
 		func_add_param("y",		TypeFloat);
 		func_add_param("z",		TypeFloat);
-	add_func("VecAngAdd",			TypeVector,	amd64_wrap((void*)&VecAngAdd, type_p(&amd64_vec_ang_add)));
+	add_func("VecAngAdd",			TypeVector,	amd64_wrap(&VecAngAdd, &amd64_vec_ang_add));
 		func_add_param("ang1",		TypeVector);
 		func_add_param("ang2",		TypeVector);
-	add_func("VecAngInterpolate",	TypeVector,	amd64_wrap((void*)&VecAngInterpolate, type_p(&amd64_vec_ang_interpolate)));
+	add_func("VecAngInterpolate",	TypeVector,	amd64_wrap(&VecAngInterpolate, &amd64_vec_ang_interpolate));
 		func_add_param("ang1",		TypeVector);
 		func_add_param("ang2",		TypeVector);
 		func_add_param("t",			TypeFloat);
 	add_func("VecDotProduct",		TypeFloat,	(void*)&VecDotProduct);
 		func_add_param("v1",		TypeVector);
 		func_add_param("v2",		TypeVector);
-	add_func("VecCrossProduct",		TypeVector,	amd64_wrap((void*)&VecCrossProduct, type_p(&amd64_vec_cross_product)));
+	add_func("VecCrossProduct",		TypeVector,	amd64_wrap(&VecCrossProduct, &amd64_vec_cross_product));
 		func_add_param("v1",		TypeVector);
 		func_add_param("v2",		TypeVector);
 	// matrices
@@ -886,12 +958,12 @@ void SIAddPackageMath()
 		func_add_param("r",		TypeFloat);
 		func_add_param("g",		TypeFloat);
 		func_add_param("b",		TypeFloat);
-	add_func("ColorSetHSB",			TypeColor,		(void*)&SetColorHSB);
+	add_func("ColorSetHSB",			TypeColor,		amd64_wrap(&SetColorHSB, &amd64_col_hsb));
 		func_add_param("a",		TypeFloat);
 		func_add_param("h",		TypeFloat);
 		func_add_param("s",		TypeFloat);
 		func_add_param("b",		TypeFloat);
-	add_func("ColorInterpolate",	TypeColor,		(void*)&ColorInterpolate);
+	add_func("ColorInterpolate",	TypeColor,		amd64_wrap(&ColorInterpolate, &amd64_col_interpolate));
 		func_add_param("c1",		TypeColor);
 		func_add_param("c2",		TypeColor);
 		func_add_param("t",		TypeFloat);
@@ -905,7 +977,7 @@ void SIAddPackageMath()
 		func_add_param("max",	TypeInt);
 	add_func("rand",			TypeFloat,		(void*)&randf);
 		func_add_param("max",	TypeFloat);
-	add_func("rand_seed",		TypeInt,		(void*)&srand);
+	add_func("rand_seed",		TypeVoid,		(void*)&srand);
 		func_add_param("seed",	TypeInt);
 
 	
@@ -933,6 +1005,28 @@ void SIAddPackageMath()
 	add_const("Orange", TypeColor, (void*)&Orange);
 	// rect
 	add_const("r_id", TypeRect, (void*)&r_id);
+
+
+
+	// internal type casts
+	add_func("-v2s-",				TypeString,	(void*)&fff2s);
+		func_add_param("v",		TypeVector);
+	add_func("-complex2s-",		TypeString,	(void*)&ff2s);
+		func_add_param("z",		TypeComplex);
+	add_func("-quaternion2s-",	TypeString,	(void*)&ffff2s);
+		func_add_param("q",		TypeQuaternion);
+	add_func("-plane2s-",			TypeString,	(void*)&ffff2s);
+		func_add_param("p",		TypePlane);
+	add_func("-color2s-",			TypeString,	(void*)&ffff2s);
+		func_add_param("c",		TypeColor);
+	add_func("-rect2s-",			TypeString,	(void*)&ffff2s);
+		func_add_param("r",		TypeRect);
+	add_type_cast(50,	TypeVector,		TypeString,	"-v2s-",	(void*)&CastVector2StringP);
+	add_type_cast(50,	TypeComplex,	TypeString,	"-complex2s-",	(void*)&CastComplex2StringP);
+	add_type_cast(50,	TypeColor,		TypeString,	"-color2s-",	(void*)&CastFFFF2StringP);
+	add_type_cast(50,	TypeQuaternion,	TypeString,	"-quaternion2s-",	(void*)&CastFFFF2StringP);
+	add_type_cast(50,	TypePlane,		TypeString,	"-plane2s-",	(void*)&CastFFFF2StringP);
+	add_type_cast(50,	TypeRect,		TypeString,	"-rect2s-",	(void*)&CastFFFF2StringP);
 }
 
 };

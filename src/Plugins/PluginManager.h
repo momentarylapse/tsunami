@@ -25,10 +25,10 @@ public:
 	void AddPluginsToMenu();
 	void FindAndExecutePlugin();
 
-	void PutFavoriteBarFixed(CHuiWindow *win, int x, int y, int w);
-	void PutFavoriteBarSizable(CHuiWindow *win, const string &root_id, int x, int y);
-	void PutCommandBarFixed(CHuiWindow *win, int x, int y, int w);
-	void PutCommandBarSizable(CHuiWindow *win, const string &root_id, int x, int y);
+	void PutFavoriteBarFixed(HuiWindow *win, int x, int y, int w);
+	void PutFavoriteBarSizable(HuiWindow *win, const string &root_id, int x, int y);
+	void PutCommandBarFixed(HuiWindow *win, int x, int y, int w);
+	void PutCommandBarSizable(HuiWindow *win, const string &root_id, int x, int y);
 
 	void OnMenuExecutePlugin();
 	void ExecutePlugin(const string &filename);
@@ -38,7 +38,7 @@ public:
 	bool LoadAndCompilePlugin(const string&);
 	void InitPluginData();
 	void FinishPluginData();
-	void InitFavorites(CHuiWindow *win);
+	void InitFavorites(HuiWindow *win);
 
 	void Preview(Effect &fx);
 

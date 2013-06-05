@@ -18,16 +18,14 @@ HuiEvent *HuiGetEvent()
 	return &_HuiEvent_;
 }
 
-HuiEvent HuiCreateEvent(const string &id, const string &message)
+HuiEvent::HuiEvent(const string &_id, const string &_message)
 {
-	HuiEvent e;
-	e.dx = 0;
-	e.dy = 0;
-	e.dz = 0;
-	e.id = id;
-	e.message = message;
-	e.is_default = true;
-	return e;
+	dx = 0;
+	dy = 0;
+	dz = 0;
+	id = _id;
+	message = _message;
+	is_default = true;
 }
 
 void _HuiInitInput_()
@@ -462,7 +460,7 @@ string HuiGetKeyChar(int key_code)
 	return "";
 }
 
-extern Array<CHuiWindow*> HuiWindow;
+extern Array<HuiWindow*> HuiWindows;
 
 bool _HuiEventMatch_(HuiEvent *e, const string &id, const string &message)
 {

@@ -16,8 +16,8 @@ string str_unescape(const string &str);
 //----------------------------------------------------------------------------------
 // resource handling
 
-CHuiWindow *_cdecl HuiCreateResourceDialog(const string &id, CHuiWindow *root);
-CHuiMenu *_cdecl HuiCreateResourceMenu(const string &id);
+HuiWindow *_cdecl HuiCreateResourceDialog(const string &id, HuiWindow *root);
+HuiMenu *_cdecl HuiCreateResourceMenu(const string &id);
 
 
 

@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.4.25.0";
+string HuiVersion = "0.4.90.0";
 
 
 #include <stdio.h>
@@ -79,7 +79,7 @@ bool HuiEndKeepMsgAlive = false;
 int HuiMainLevel = -1;
 Array<bool> HuiMainLevelRunning;
 
-Array<CHuiWindow*> HuiWindow;
+Array<HuiWindow*> HuiWindows;
 Array<HuiClosedWindow> _HuiClosedWindow_;
 
 
@@ -499,7 +499,7 @@ void HuiPushMainLevel()
 void HuiCleanUpMainLevel()
 {
 	msg_db_r("HuiCleanUpMainLevel",2);
-	foreachb(CHuiWindow *w, HuiWindow)
+	foreachb(HuiWindow *w, HuiWindows)
 		if (w->_GetMainLevel_() >= HuiMainLevel)
 			delete(w);
 	HuiSetIdleFunction(NULL);
@@ -558,71 +558,6 @@ void HuiEnd()
 		msg_end();
 }
 
-
-
-// wartet, bis das Fenster sich geschlossen hat
-string HuiWaitTillWindowClosed(CHuiWindow *win)
-{
-	msg_db_r("HuiWaitTillWindowClosed",1);
-	int uid = win->_GetUniqueID_();
-	/*msg_write((int)win);
-	msg_write(win->uid);*/
-	string last_id = "";
-
-#ifdef HUI_API_WIN
-	MSG messages;
-	messages.message=0;
-	bool got_message;
-	//while ((WM_QUIT!=messages.message)&&(!WindowClosed[win_no])){
-	while (WM_QUIT!=messages.message){
-		bool br=false;
-		for (int i=0;i<_HuiClosedWindow_.size();i++)
-			if (_HuiClosedWindow_[i].UID==uid)
-				br=true;
-		if (br)
-			break;
-		bool allow=true;
-		if (HuiIdleFunction)
-			got_message=(PeekMessage(&messages,NULL,0U,0U,PM_REMOVE)!=0);
-		else
-			got_message=(GetMessage(&messages,NULL,0,0)!=0);
-		if (got_message){
-			allow=false;
-			TranslateMessage(&messages);
-			DispatchMessage(&messages);
-		}
-		if ((HuiIdleFunction)&&(allow))
-			HuiIdleFunction();
-	}
-	if (WM_QUIT==messages.message){
-		HuiHaveToExit=true;
-		//msg_write("EXIT!!!!!!!!!!");
-	}
-#endif
-#ifdef HUI_API_GTK
-	if (win->GetParent())
-		gtk_dialog_run(GTK_DIALOG(win->window));
-	else{
-		bool killed = false;
-		while(!killed){
-			HuiDoSingleMainLoop();
-			foreach(HuiClosedWindow &cw, _HuiClosedWindow_)
-				if (cw.unique_id == uid)
-					killed = true;
-		}
-	}
-#endif
-	//msg_write("cleanup");
-
-	// clean up
-	foreachi(HuiClosedWindow &cw, _HuiClosedWindow_, i)
-		if (cw.unique_id == uid){
-			last_id = cw.last_id;
-			_HuiClosedWindow_.erase(i);
-		}
-	msg_db_l(1);
-	return last_id;
-}
 
 string HuiSetImage(const Image &image)
 {

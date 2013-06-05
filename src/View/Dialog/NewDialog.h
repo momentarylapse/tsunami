@@ -12,10 +12,10 @@
 #include "../../lib/hui/hui.h"
 #include "../../Data/AudioFile.h"
 
-class NewDialog: public CHuiWindow
+class NewDialog: public HuiWindow
 {
 public:
-	NewDialog(CHuiWindow *_parent, bool _allow_parent, AudioFile *a);
+	NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a);
 	virtual ~NewDialog();
 
 	void LoadData();

@@ -9,7 +9,7 @@
 
 #include "net.h"
 #include "../file/file.h"
-#include "../types/vector.h"
+#include "../math/vector.h"
 
 
 #ifdef OS_WINDOWS

@@ -20,16 +20,26 @@ extern Type *TypeImage;
 #endif
 
 #ifdef _X_USE_IMAGE_
-	#define image_p(p)		(void*)p
+	#define image_p(p)		(void*)(p)
 #else
 	#define image_p(p)		NULL
 #endif
 
 extern Type *TypeIntList;
 
+
+#ifdef _X_USE_IMAGE_
+void amd64_image_get_pixel(color &r, Image &i, int x, int y)
+{	r = i.GetPixel(x, y);	}
+#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::InstructionSetAMD64) ? ((void*)(wrap)) : ((void*)(orig)))
+#else
+#define amd64_wrap(orig, wrap)	NULL
+#endif
+
+
 void SIAddPackageImage()
 {
-	set_cur_package("image");
+	add_package("image", false);
 
 	TypeImage			= add_type  ("Image",		sizeof(Image));
 
@@ -58,7 +68,7 @@ void SIAddPackageImage()
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 			func_add_param("c",			TypeColor);
-		class_add_func("GetPixel",		TypeColor,	image_p(mf((tmf)&Image::GetPixel)));
+		class_add_func("GetPixel",		TypeColor,	amd64_wrap(mf((tmf)&Image::GetPixel), &amd64_image_get_pixel));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 		class_add_func("Delete",			TypeVoid,	image_p(mf((tmf)&Image::Delete)));

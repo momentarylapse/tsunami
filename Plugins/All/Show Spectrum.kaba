@@ -80,7 +80,6 @@ void show_spec()
 	dlg.AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
 	dlg.AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 	dlg.SetImage("close", "hui:close")
-	dlg.Update()
 	
 	dlg.EventX("drawing_area", "hui:redraw", &OnDraw)
 	dlg.Event("type", &OnType)
@@ -130,7 +129,7 @@ void show_spec()
 
 	dlg.Redraw("drawing_area")
 
-	HuiWaitTillWindowClosed(dlg)
+	dlg.Run()
 	
 	ffr.clear()
 	ffl.clear()

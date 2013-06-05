@@ -1,7 +1,7 @@
 #include "hui.h"
 
 //    for all
-bool CHuiWindow::IsEnabled(const string &id)
+bool HuiWindow::IsEnabled(const string &id)
 {
 	for (int i=0;i<control.num;i++)
 		if (id == control[i]->id)

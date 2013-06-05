@@ -10,18 +10,18 @@
 
 
 // stupid function for HuiBui....
-void CHuiMenu::SetID(const string &id)
+void HuiMenu::SetID(const string &id)
 {
 }
 
 
-CHuiMenu *CHuiMenu::GetSubMenuByID(const string &id)
+HuiMenu *HuiMenu::GetSubMenuByID(const string &id)
 {
 	foreach(HuiMenuItem &it, item){
 		if (it.sub_menu){
 			if (it.id == id)
 				return it.sub_menu;
-			CHuiMenu *m = it.sub_menu->GetSubMenuByID(id);
+			HuiMenu *m = it.sub_menu->GetSubMenuByID(id);
 			if (m)
 				return m;
 		}
@@ -30,7 +30,7 @@ CHuiMenu *CHuiMenu::GetSubMenuByID(const string &id)
 }
 
 
-void CHuiMenu::UpdateLanguage()
+void HuiMenu::UpdateLanguage()
 {
 	msg_db_r("UpdateMenuLanguage", 1);
 	foreach(HuiMenuItem &it, item){
@@ -56,7 +56,7 @@ void CHuiMenu::UpdateLanguage()
 }
 
 
-CHuiMenu *HuiCreateMenu()
+HuiMenu *HuiCreateMenu()
 {
-	return new CHuiMenu();
+	return new HuiMenu();
 }

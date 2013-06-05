@@ -16,7 +16,7 @@
 #include "../../Action/Track/Effect/ActionTrackEditEffect.h"
 
 
-FxList::FxList(CHuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete)
+FxList::FxList(HuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete)
 {
 	dlg = _dlg;
 	id = _id;

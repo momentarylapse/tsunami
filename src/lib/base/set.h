@@ -28,7 +28,7 @@ class Set : public Array<T>
 				}
 			}
 			if (i0 < num)
-				insert(item, i0);
+				this->insert(item, i0);
 			else
 				((Array<T>*)this)->add(item);
 			return i0;

@@ -7,14 +7,11 @@
 
 #include "LogDialog.h"
 
-LogDialog::LogDialog(CHuiWindow *_parent, bool _allow_parent):
-	CHuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls, true)
+LogDialog::LogDialog(HuiWindow *_parent, bool _allow_parent):
+	HuiWindow("dummy", -1, -1, 800, 600, _parent, _allow_parent, HuiWinModeControls)
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 LogDialog::~LogDialog()
 {
-	// TODO Auto-generated destructor stub
 }

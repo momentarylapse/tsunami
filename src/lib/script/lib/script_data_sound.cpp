@@ -21,7 +21,7 @@ extern Type *TypeFloatList;
 
 void SIAddPackageSound()
 {
-	set_cur_package("sound");
+	add_package("sound", false);
 	
 	// sound
 	add_func("SoundEmit",									TypeInt,	sound_p(&SoundEmit));
@@ -55,15 +55,15 @@ void SIAddPackageSound()
 	// music
 	add_func("MusicLoad",									TypeInt,	sound_p(&MusicLoad));
 		func_add_param("filename",		TypeString);
-	add_func("MusicPlay",									TypeInt,	sound_p(&MusicPlay));
+	add_func("MusicPlay",									TypeVoid,	sound_p(&MusicPlay));
 		func_add_param("index",		TypeInt);
 		func_add_param("loop",		TypeBool);
-	add_func("MusicStop",									TypeInt,	sound_p(&MusicStop));
+	add_func("MusicStop",									TypeVoid,	sound_p(&MusicStop));
 		func_add_param("index",		TypeInt);
-	add_func("MusicPause",									TypeInt,	sound_p(&MusicPause));
+	add_func("MusicPause",									TypeVoid,	sound_p(&MusicPause));
 		func_add_param("index",		TypeInt);
 		func_add_param("pause",		TypeBool);
-	add_func("MusicSetRate",							TypeInt,	sound_p(&MusicSetRate));
+	add_func("MusicSetRate",							TypeVoid,	sound_p(&MusicSetRate));
 		func_add_param("index",		TypeInt);
 		func_add_param("rate",		TypeFloat);
 	// sound creation

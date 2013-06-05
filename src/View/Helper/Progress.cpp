@@ -46,7 +46,7 @@ void Progress::Start(const string &str, float progress)
 		dlg = HuiCreateResourceDialog("progress_dialog", HuiCurWindow);
 		dlg->SetString("progress_bar", str);
 		dlg->SetFloat("progress_bar", progress);
-		dlg->Update();
+		dlg->Show();
 		dlg->Event("hui:close", &HuiFuncIgnore);
 		HuiDoSingleMainLoop();
 	}
@@ -72,7 +72,7 @@ void Progress::StartCancelable(const string &str, float progress)
 		dlg = HuiCreateResourceDialog("progress_cancelable_dialog", HuiCurWindow);
 		dlg->SetString("progress_bar", str);
 		dlg->SetFloat("progress_bar", progress);
-		dlg->Update();
+		dlg->Show();
 		dlg->EventM("hui:close", this, &Progress::Cancel);
 		dlg->EventM("cancel", this, &Progress::Cancel);
 		HuiDoSingleMainLoop();

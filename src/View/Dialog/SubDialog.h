@@ -12,10 +12,10 @@
 class Slider;
 class Track;
 
-class SubDialog: public CHuiWindow
+class SubDialog: public HuiWindow
 {
 public:
-	SubDialog(CHuiWindow *_parent, bool _allow_parent, Track *s);
+	SubDialog(HuiWindow *_parent, bool _allow_parent, Track *s);
 	virtual ~SubDialog();
 
 	void LoadData();

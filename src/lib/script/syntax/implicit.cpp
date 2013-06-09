@@ -1,7 +1,7 @@
 #include "../script.h"
 #include "../asm/asm.h"
-#include "../../file/file.h"
 #include <stdio.h>
+#include "../../file/file.h"
 
 namespace Script{
 
@@ -21,6 +21,16 @@ void SyntaxTree::ImplementImplicitConstructor(Function *f, Type *t)
 			}
 	}else{
 
+		// parent constructor
+		if (t->parent){
+			ClassFunction *ff = t->parent->GetConstructor();
+			if (ff){
+				Command *c = add_command_classfunc(t, *ff, cp_command(self));
+				f->block->command.add(c);
+			}
+		}
+
+		// add vtable reference
 		if (t->vtable){
 			Command *p = shift_command(self, true, 0, TypePointer);
 			int nc = AddConstant(TypePointer);
@@ -31,7 +41,10 @@ void SyntaxTree::ImplementImplicitConstructor(Function *f, Type *t)
 		}
 
 		// call child constructors
-		foreach(ClassElement &e, t->element){
+		int i0 = t->parent ? t->parent->element.num : 0;
+		foreachi(ClassElement &e, t->element, i){
+			if (i < i0)
+				continue;
 			ClassFunction *ff = e.type->GetConstructor();
 			if (!ff)
 				continue;
@@ -69,13 +82,25 @@ void SyntaxTree::ImplementImplicitDestructor(Function *f, Type *t)
 	}else{
 
 		// call child destructors
-		foreach(ClassElement &e, t->element){
+		int i0 = t->parent ? t->parent->element.num : 0;
+		foreachi(ClassElement &e, t->element, i){
+			if (i < i0)
+				continue;
 			ClassFunction *ff = e.type->GetDestructor();
 			if (!ff)
 				continue;
 			Command *p = shift_command(self, true, e.offset, e.type);
 			Command *c = add_command_classfunc(t, *ff, ref_command(p));
 			f->block->command.add(c);
+		}
+
+		// parent destructor
+		if (t->parent){
+			ClassFunction *ff = t->parent->GetDestructor();
+			if (ff){
+				Command *c = add_command_classfunc(t, *ff, cp_command(self));
+				f->block->command.add(c);
+			}
 		}
 	}
 }

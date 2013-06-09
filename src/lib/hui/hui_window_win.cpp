@@ -4,12 +4,13 @@
 #include <windows.h>
 
 
+#if 0
 
 //----------------------------------------------------------------------------------
 // window message handling
 
 // find a toolbar item
-bool TestToolBarID(CHuiWindow *win,int id,message_function *mf)
+bool TestToolBarID(HuiWindow *win,int id,message_function *mf)
 {
 	if (id<0)
 		return false;
@@ -27,7 +28,7 @@ bool TestToolBarID(CHuiWindow *win,int id,message_function *mf)
 static int win_reg_no=0;
 
 
-void UpdateTabPages(CHuiWindow *win)
+void UpdateTabPages(HuiWindow *win)
 {
 	for (unsigned int i=0;i<win->Control.size();i++){
 		int n_tab=-1;
@@ -52,7 +53,7 @@ void UpdateTabPages(CHuiWindow *win)
 	//msg_write>Write("//Tab");
 }
 
-/*static void ExecuteWinMessageFunc(CHuiWindow *win,int id)
+/*static void ExecuteWinMessageFunc(HuiWindow *win,int id)
 {
 	if (win){
 		win->OwnDataOld=win->OwnData;
@@ -134,7 +135,7 @@ HRESULT _win_color_brush_(int c[4],bool enabled)
 static bool win_proc_force_return;
 static HBRUSH bkground;
 
-static LRESULT WindowProcedureDefaultStuff(CHuiWindow *win,HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
+static LRESULT WindowProcedureDefaultStuff(HuiWindow *win,HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	win_proc_force_return=true;
 
@@ -262,7 +263,7 @@ static LRESULT WindowProcedureDefaultStuff(CHuiWindow *win,HWND hwnd,UINT messag
 	return 0;
 }
 
-static LRESULT WindowProcedureWithMF(CHuiWindow *win,message_function *mf,HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
+static LRESULT WindowProcedureWithMF(HuiWindow *win,message_function *mf,HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	win_proc_force_return=true;
 
@@ -407,7 +408,7 @@ static LRESULT WindowProcedureWithMF(CHuiWindow *win,message_function *mf,HWND h
 	return 0;
 }
 
-static LRESULT WindowProcedureNoMF(CHuiWindow *win,HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
+static LRESULT WindowProcedureNoMF(HuiWindow *win,HWND hwnd,UINT message,WPARAM wParam,LPARAM lParam)
 {
 	win_proc_force_return=true;
 	
@@ -459,7 +460,7 @@ static LRESULT CALLBACK WindowProcedure(HWND hwnd,UINT message,WPARAM wParam,LPA
 	//msg_write>Write("WP");
 
 	// find hui window for hwnd...
-	CHuiWindow *win=NULL;
+	HuiWindow *win=NULL;
 	message_function *mf=NULL;
 	for (int i=0;i<_HuiWindow_.size();i++){
 		if (_HuiWindow_[i]->hWnd==hwnd){
@@ -551,9 +552,9 @@ static LRESULT CALLBACK WindowProcedure(HWND hwnd,UINT message,WPARAM wParam,LPA
 
 
 // general window
-CHuiWindow::CHuiWindow(const char *title, int x, int y, int width, int height, CHuiWindow *root, bool allow_root, int mode, bool show, message_function *mf)
+HuiWindow::HuiWindow(const char *title, int x, int y, int width, int height, HuiWindow *root, bool allow_root, int mode, bool show, message_function *mf)
 {
-	msg_db_r("CHuiWindow()",1);
+	msg_db_r("HuiWindow()",1);
 	_Init_(root, allow_root, mf);
 
 	
@@ -589,7 +590,7 @@ CHuiWindow::CHuiWindow(const char *title, int x, int y, int width, int height, C
 		wincl.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
 
 	if (!RegisterClassEx(&wincl)){
-		msg_error("new CHuiWindow - RegisterClassEx");
+		msg_error("new HuiWindow - RegisterClassEx");
 		msg_db_l(1);
 		return;
 	}
@@ -630,7 +631,7 @@ CHuiWindow::CHuiWindow(const char *title, int x, int y, int width, int height, C
 							hui_win_instance,
 							NULL);
 	if (!hWnd){
-		msg_error("new CHuiWindow - CreateWindowEx");
+		msg_error("new HuiWindow - CreateWindowEx");
 		msg_db_l(1);
 		return;
 	}
@@ -670,13 +671,13 @@ CHuiWindow::CHuiWindow(const char *title, int x, int y, int width, int height, C
 
 
 // dummy window
-CHuiWindow::CHuiWindow(const char *title,int x,int y,int width,int height,message_function *mf)
+HuiWindow::HuiWindow(const char *title,int x,int y,int width,int height,message_function *mf)
 {
 }
 
-CHuiWindow::~CHuiWindow()
+HuiWindow::~HuiWindow()
 {
-	msg_db_r("~CHuiWindow",1);
+	msg_db_r("~HuiWindow",1);
 	_CleanUp_();
 	
 	if (Root){
@@ -703,7 +704,7 @@ CHuiWindow::~CHuiWindow()
 }
 
 // should be called after creating (and filling) the window to actually show it
-void CHuiWindow::Update()
+void HuiWindow::Update()
 {
 
 	// cruel hack!!!!
@@ -749,7 +750,7 @@ void CHuiWindow::Update()
 }
 
 // show/hide without closing the window
-void CHuiWindow::Hide(bool hide)
+void HuiWindow::Hide(bool hide)
 {
 	if (hide)
 	    ShowWindow(hWnd,SW_HIDE);
@@ -759,13 +760,13 @@ void CHuiWindow::Hide(bool hide)
 }
 
 // set the string in the title bar
-void CHuiWindow::SetTitle(const char *title)
+void HuiWindow::SetTitle(const char *title)
 {
 	SetWindowText(hWnd,sys_str(title));
 }
 
 // identify window (for automatic title assignment with language strings)
-void CHuiWindow::SetID(int id)
+void HuiWindow::SetID(int id)
 {
 	ID=id;
 	if ((HuiLanguaged)&&(id>=0))
@@ -773,7 +774,7 @@ void CHuiWindow::SetID(int id)
 }
 
 // set the upper left corner of the window in screen corrdinates
-void CHuiWindow::SetPosition(int x,int y)
+void HuiWindow::SetPosition(int x,int y)
 {
 	WINDOWPLACEMENT lpwndpl;
 	GetWindowPlacement(hWnd,&lpwndpl);
@@ -789,7 +790,7 @@ void CHuiWindow::SetPosition(int x,int y)
 }
 
 // align window relative to another window (like..."top right corner")
-void CHuiWindow::SetPositionSpecial(CHuiWindow *win,int mode)
+void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 {
 	irect rp=win->GetOuterior();
 	irect ro=GetOuterior();
@@ -807,7 +808,7 @@ void CHuiWindow::SetPositionSpecial(CHuiWindow *win,int mode)
 
 // set the current window position and size (including the frame and menu/toolbars...)
 //    if maximized this will un-maximize the window!
-void CHuiWindow::SetOuterior(irect rect)
+void HuiWindow::SetOuterior(irect rect)
 {
 	WINDOWPLACEMENT lpwndpl;
 	GetWindowPlacement(hWnd,&lpwndpl);
@@ -821,7 +822,7 @@ void CHuiWindow::SetOuterior(irect rect)
 }
 
 // get the current window position and size (including the frame and menu/toolbars...)
-irect CHuiWindow::GetOuterior()
+irect HuiWindow::GetOuterior()
 {
 	irect r;
 	RECT rect;
@@ -835,7 +836,7 @@ irect CHuiWindow::GetOuterior()
 
 // set the window position and size it had wouldn't it be maximized (including the frame and menu/toolbars...)
 //    if not maximized this behaves like <SetOuterior>
-void CHuiWindow::SetOuteriorDesired(irect rect)
+void HuiWindow::SetOuteriorDesired(irect rect)
 {
 	WINDOWPLACEMENT lpwndpl;
 	GetWindowPlacement(hWnd,&lpwndpl);
@@ -848,7 +849,7 @@ void CHuiWindow::SetOuteriorDesired(irect rect)
 
 // get the window position and size it had wouldn't it be maximized (including the frame and menu/toolbars...)
 //    if not maximized this behaves like <GetOuterior>
-irect CHuiWindow::GetOuteriorDesired()
+irect HuiWindow::GetOuteriorDesired()
 {
 	irect r;
 	WINDOWPLACEMENT lpwndpl;
@@ -872,7 +873,7 @@ int _tool_bar_size(sHuiToolBar *tool_bar)
 
 // get the "usable" part of the window: controllers/graphics area
 //   relative to the outer part!!
-irect CHuiWindow::GetInterior()
+irect HuiWindow::GetInterior()
 {
 	irect r;
 	RECT WindowClient,ToolBarRect;
@@ -897,7 +898,7 @@ irect CHuiWindow::GetInterior()
 	return r;
 }
 
-void CHuiWindow::ShowCursor(bool show)
+void HuiWindow::ShowCursor(bool show)
 {
 	int s=::ShowCursor(show);
 	if (show){
@@ -910,7 +911,7 @@ void CHuiWindow::ShowCursor(bool show)
 }
 
 // relative to Interior
-void CHuiWindow::SetCursorPos(int x,int y)
+void HuiWindow::SetCursorPos(int x,int y)
 {
 	irect ri = GetInterior();
 	irect ro = GetOuterior();
@@ -922,7 +923,7 @@ void CHuiWindow::SetCursorPos(int x,int y)
 	InputData.dy = 0;
 }
 
-void CHuiWindow::SetMaximized(bool maximized)
+void HuiWindow::SetMaximized(bool maximized)
 {
 	WINDOWPLACEMENT lpwndpl;
 	GetWindowPlacement(hWnd,&lpwndpl);
@@ -930,21 +931,21 @@ void CHuiWindow::SetMaximized(bool maximized)
 	SetWindowPlacement(hWnd,&lpwndpl);
 }
 
-bool CHuiWindow::IsMaximized()
+bool HuiWindow::IsMaximized()
 {
 	WINDOWPLACEMENT lpwndpl;
 	GetWindowPlacement(hWnd,&lpwndpl);
 	return (lpwndpl.showCmd==SW_SHOWMAXIMIZED);
 }
 
-bool CHuiWindow::IsMinimized()
+bool HuiWindow::IsMinimized()
 {
 	WINDOWPLACEMENT lpwndpl;
 	GetWindowPlacement(hWnd,&lpwndpl);
 	return ((lpwndpl.showCmd==SW_SHOWMINIMIZED)||(lpwndpl.showCmd==SW_MINIMIZE));
 }
 
-void CHuiWindow::SetFullscreen(bool fullscreen)
+void HuiWindow::SetFullscreen(bool fullscreen)
 {
 		if (fullscreen){
 			// save window data
@@ -967,7 +968,7 @@ void CHuiWindow::SetFullscreen(bool fullscreen)
 		}
 }
 
-void CHuiWindow::EnableStatusBar(bool enabled)
+void HuiWindow::EnableStatusBar(bool enabled)
 {
 	if (enabled)
 		ShowWindow(status_bar,SW_SHOW);
@@ -976,13 +977,13 @@ void CHuiWindow::EnableStatusBar(bool enabled)
 	StatusBarEnabled=enabled;
 }
 
-void CHuiWindow::SetStatusText(const char *str)
+void HuiWindow::SetStatusText(const char *str)
 {
 	SendMessage(status_bar,SB_SETTEXT,0,(LPARAM)sys_str(str));
 }
 
 // give our window the focus....and try to focus the specified control item
-void CHuiWindow::Activate(int control_id)
+void HuiWindow::Activate(int control_id)
 {
 	SetFocus(hWnd);
 	WindowStyle=GetWindowLong(hWnd,GWL_STYLE);
@@ -998,7 +999,7 @@ void CHuiWindow::Activate(int control_id)
 	}*/
 }
 
-bool CHuiWindow::IsActive(bool include_sub_windows)
+bool HuiWindow::IsActive(bool include_sub_windows)
 {
 	bool ia=false;
 	ia=(GetActiveWindow()==hWnd);
@@ -1012,6 +1013,8 @@ bool CHuiWindow::IsActive(bool include_sub_windows)
 
 
 
+
+#endif
 
 
 

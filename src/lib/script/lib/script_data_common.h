@@ -21,6 +21,12 @@ void add_const(const string &name, Type *type, void *value);
 void add_ext_var(const string &name, Type *type, void *var);
 void add_type_cast(int penalty, Type *source, Type *dest, const string &cmd, void *func);
 
+extern void **cur_vtable;
+
+#define class_set_vtable(type) \
+	type type##Instance; \
+	cur_vtable = *(void***)&type##Instance;
+
 class MFDummyClass
 {};
 

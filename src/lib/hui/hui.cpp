@@ -37,6 +37,8 @@ string HuiVersion = "0.4.90.0";
 		#pragma comment(lib,"gdk-win32-2.0.lib")
 		#pragma comment(lib,"gdk_pixbuf-2.0.lib")
 		#pragma comment(lib,"gobject-2.0.lib")
+	#else
+		#pragma comment(linker,"\"/manifestdependency:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 	#endif
 	#pragma warning(disable : 4995)
 #endif
@@ -117,6 +119,50 @@ Array<string> HuiMakeArgs(int num_args, char *args[])
 }
 
 Array<sHuiImage> HuiImage;
+
+
+
+
+
+//----------------------------------------------------------------------------------
+// system independence of main() function
+
+extern Array<string> HuiMakeArgs(int num_args, char *args[]);
+
+
+int hui_main(Array<string>);
+
+// for a system independent usage of this library
+
+#ifdef OS_WINDOWS
+
+int APIENTRY _tWinMain(HINSTANCE hInstance,
+                     HINSTANCE hPrevInstance,
+                     LPTSTR    lpCmdLine,
+                     int       nCmdShow)
+{
+	Array<string> a;
+	return hui_main(a);
+}
+
+#endif
+#ifdef OS_LINUX
+
+int main(int NumArgs, char *Args[])
+{
+	return hui_main(HuiMakeArgs(NumArgs, Args));
+}
+
+#endif
+
+// usage:
+//
+// int hui_main(Array<string> arg)
+// {
+//     HuiInit();
+//     ....
+//     return HuiRun();
+// }
 
 
 
@@ -424,8 +470,8 @@ int HuiRun()
 			allow=false;
 			TranslateMessage(&messages);
 			DispatchMessage(&messages);
-			for (int i=0;i<_HuiWindow_.size();i++)
-				if (_HuiWindow_[i]->hWnd==messages.hwnd){
+			for (int i=0;i<HuiWindows.num;i++)
+				if (HuiWindows[i]->hWnd == messages.hwnd){
 					allow=true;
 					break;
 				}
@@ -459,9 +505,9 @@ void HuiDoSingleMainLoop()
 		allow=false;
 		TranslateMessage(&messages);
 		DispatchMessage(&messages);
-		for (int i=0;i<_HuiWindow_.size();i++)
-			if (_HuiWindow_[i]->hWnd==messages.hwnd){
-				allow=true;
+		for (int i=0;i<HuiWindows.num;i++)
+			if (HuiWindows[i]->hWnd == messages.hwnd){
+				allow = true;
 				return;
 			}
 	}

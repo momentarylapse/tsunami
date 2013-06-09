@@ -1,5 +1,7 @@
 #include "../../base/base.h"
 #include "type.h"
+#include "../script.h"
+#include "../../file/file.h"
 
 namespace Script{
 
@@ -10,7 +12,7 @@ ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s,
 	return_type = _return_type;
 	script = s;
 	nr = no;
-	is_virtual = false;
+	virtual_index = -1;
 }
 
 Type::Type()//const string &_name, int _size, SyntaxTree *_owner)
@@ -26,6 +28,7 @@ Type::Type()//const string &_name, int _size, SyntaxTree *_owner)
 	parent = NULL;
 	force_call_by_value = false;
 	vtable = NULL;
+	num_virtual = 0;
 };
 
 Type::~Type()
@@ -97,6 +100,28 @@ ClassFunction *Type::GetDestructor()
 		if ((f.name == "__delete__") && (f.return_type == TypeVoid) && (f.param_type.num == 0))
 			return &f;
 	return NULL;
+}
+
+ClassFunction *Type::GetVirtualFunction(int virtual_index)
+{
+	foreach(ClassFunction &f, function)
+		if (f.virtual_index == virtual_index)
+			return &f;
+	return NULL;
+}
+
+void Type::LinkVirtualTable()
+{
+	if (!vtable)
+		return;
+
+	// link virtual functions into vtable
+	foreach(ClassFunction &cf, function)
+		if (cf.virtual_index >= 0){
+			if (cf.nr >= 0)
+				vtable[cf.virtual_index] = (void*)cf.script->func[cf.nr];
+			num_virtual = max(cf.virtual_index + 1, num_virtual);
+		}
 }
 
 string Type::var2str(void *p)

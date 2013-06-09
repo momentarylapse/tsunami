@@ -1,6 +1,9 @@
 #include "hui.h"
 #ifdef HUI_API_WIN
 
+	#include <tchar.h>
+	#include <commctrl.h>
+
 /*
 #include "../file/file.h"
 #include <stdio.h>
@@ -24,9 +27,9 @@
 #endif*/
 
 
-CHuiMenu::CHuiMenu()
+HuiMenu::HuiMenu()
 {
-	msg_db_r("CHuiMenu()", 1);
+	msg_db_r("HuiMenu()", 1);
 	_HuiMakeUsable_();
 
 	hMenu = CreateMenu();
@@ -34,15 +37,16 @@ CHuiMenu::CHuiMenu()
 	msg_db_l(1);
 }
 
-CHuiMenu::~CHuiMenu()
+HuiMenu::~HuiMenu()
 {
 }
 
 
 // window coordinate system!
-void CHuiMenu::OpenPopup(CHuiWindow *win, int x, int y)
+void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
 {
-	msg_db_r("CHuiMenu::OpenPopup", 1);
+#if 0
+	msg_db_r("HuiMenu::OpenPopup", 1);
 	tagPOINT pt;
 	pt.x = pt.y = 0;
 	ClientToScreen(win->hWnd, &pt);
@@ -50,18 +54,20 @@ void CHuiMenu::OpenPopup(CHuiWindow *win, int x, int y)
 	AppendMenu(pm, MF_STRING|MF_POPUP, (UINT)hMenu, _T(""));
 	TrackPopupMenu(hMenu, 0, pt.x + x, pt.y + y, 0, win->hWnd, NULL);
 	
-	win->Popup = this;
+	win->popup = this;
 	msg_db_l(1);
+#endif
 }
 
 // stupid function for HuiBui....
-void CHuiMenu::SetID(int id)
+/*void HuiMenu::SetID(const string &id)
 {
-}
+}*/
 
-void CHuiMenu::AddItem(const char *name, int id)
+void HuiMenu::AddItem(const string &name, const string & id)
 {
-	sHuiMenuItem i;
+#if 0
+	HuiMenuItem i;
 	AppendMenu(hMenu, MF_STRING, id, get_lang_sys(id, name, true));
 	
 	i.SubMenu = NULL;
@@ -72,101 +78,97 @@ void CHuiMenu::AddItem(const char *name, int id)
 	i.Checkable = false;
 	i.Checked = false;
 	Item.push_back(i);
+#endif
 }
 
-int get_image_id(int image)
+int get_image_id(const string &image)
 {
-	if (image==HuiImageOpen)	return STD_FILEOPEN;
-	if (image==HuiImageNew)		return STD_FILENEW;
-	if (image==HuiImageSave)	return STD_FILESAVE;
+	if (image == "hui:open")	return STD_FILEOPEN;
+	if (image == "hui:new")		return STD_FILENEW;
+	if (image == "hui:save")	return STD_FILESAVE;
 
-	if (image==HuiImageCopy)	return STD_COPY;
-	if (image==HuiImagePaste)	return STD_PASTE;
-	if (image==HuiImageCut)		return STD_CUT;
-	if (image==HuiImageDelete)	return STD_DELETE;
-	if (image==HuiImageFind)	return STD_FIND;
+	if (image == "hui:copy")	return STD_COPY;
+	if (image == "hui:paste")	return STD_PASTE;
+	if (image == "hui:cut")		return STD_CUT;
+	if (image == "hui:delete")	return STD_DELETE;
+	if (image == "hui:find")	return STD_FIND;
 
-	if (image==HuiImageRedo)	return STD_REDOW;
-	if (image==HuiImageUndo)	return STD_UNDO;
-	if (image==HuiImagePreferences)	return STD_PROPERTIES;
+	if (image == "hui:redo")	return STD_REDOW;
+	if (image == "hui:undo")	return STD_UNDO;
+	if (image == "hui:preferences")	return STD_PROPERTIES;
 
-	if (image==HuiImageHelp)	return STD_HELP;
-	if (image==HuiImagePrint)	return STD_PRINT;
+	if (image == "hui:help")	return STD_HELP;
+	if (image == "hui:print")	return STD_PRINT;
 
 	return STD_FILENEW;
 }
 
-void CHuiMenu::AddItemImage(const char *name,int image,int id)
+void HuiMenu::AddItemImage(const string &name, const string &image, const string &id)
 {
-	sHuiMenuItem i;
+#if 0
+	HuiMenuItem i;
 	AppendMenu(hMenu,MF_STRING,id,get_lang_sys(id,name,true));
 	
-	i.SubMenu=NULL;
-	strcpy(i.Name,get_lang(id,name,false));
-	i.ID=id;
-	i.Enabled=true;
-	i.IsSeparator=false;
-	i.Checkable=false;
-	i.Checked=false;
-	Item.push_back(i);
+	i.name = get_lang(id,name);
+	i.id = id;
+	item.add(i);
+#endif
 }
 
-void CHuiMenu::AddItemCheckable(const char *name,int id)
+void HuiMenu::AddItemCheckable(const string &name, const string &id)
 {
-	sHuiMenuItem i;
+#if 0
+	HuiMenuItem i;
 	AppendMenu(hMenu,MF_STRING,id,get_lang_sys(id,name,true));
 	
-	i.SubMenu=NULL;
-	strcpy(i.Name,get_lang(id,name,false));
-	i.ID=id;
-	i.Enabled=true;
-	i.IsSeparator=false;
-	i.Checkable=true;
-	i.Checked=false;
-	Item.push_back(i);
+	i.name = get_lang(id,name);
+	i.id = id;
+	i.checkable = true;
+	item.add(i);
+#endif
 }
 
-void CHuiMenu::AddSeparator()
+void HuiMenu::AddSeparator()
 {
-	sHuiMenuItem i;
+	HuiMenuItem i;
 	AppendMenu(hMenu,MF_SEPARATOR,0,_T(""));
 	
-	i.SubMenu=NULL;
-	i.ID=-1;
-	i.Enabled=true;
-	i.IsSeparator=true;
-	Item.push_back(i);
+	i.is_separator = true;
+	item.add(i);
 }
 
-void CHuiMenu::AddSubMenu(const char *name,int id,CHuiMenu *menu)
+void HuiMenu::AddSubMenu(const string &name, const string &id, HuiMenu *menu)
 {
-	sHuiMenuItem i;
+#if 0
+	HuiMenuItem i;
 	AppendMenu(hMenu,MF_STRING|MF_POPUP,(UINT)menu->hMenu,get_lang_sys(id,name));
 		
-	i.SubMenu=menu;
-	strcpy(i.Name,get_lang(id,name));
-	i.ID=id;
-	i.Enabled=true;
-	i.IsSeparator=false;
-	Item.push_back(i);
+	i.sub_menu = menu;
+	i.name = get_lang(id,name);
+	i.id = id;
+	item.add(i);
+#endif
 }
 
 // only allow menu callback, if we are in layer 0 (if we don't edit it ourself)
 int allow_signal_level=0;
 
-void CHuiMenu::CheckItem(int id,bool checked)
+void HuiMenu::CheckItem(const string &id, bool checked)
 {
+#if 0
 	CheckMenuItem(hMenu,id,checked?MF_CHECKED:MF_UNCHECKED);
+#endif
 }
 
-bool CHuiMenu::IsItemChecked(int id)
+bool HuiMenu::IsItemChecked(const string &id)
 {
 	//CheckMenuItem(hMenu,id,checked?MF_CHECKED:MF_UNCHECKED);
 	return false;
 }
 
-void CHuiMenu::EnableItem(int id,bool enabled)
+void HuiMenu::EnableItem(const string &id, bool enabled)
 {
+#if 0
 	for (int i=0;i<Item.size();i++){
 		if (Item[i].SubMenu)
 			Item[i].SubMenu->EnableItem(id,enabled);
@@ -181,10 +183,12 @@ void CHuiMenu::EnableItem(int id,bool enabled)
 			}
 		}
 	}
+#endif
 }
 
-void CHuiMenu::SetText(int id,const char *text)
+void HuiMenu::SetText(const string &id, const string &text)
 {
+#if 0
 	for (int i=0;i<Item.size();i++){
 		if (Item[i].SubMenu)
 			Item[i].SubMenu->SetText(id,text);
@@ -193,6 +197,7 @@ void CHuiMenu::SetText(int id,const char *text)
 			ModifyMenu(hMenu,i,MF_STRING | MF_BYPOSITION,id,sys_str(text));
 		}
 	}
+#endif
 }
 
 

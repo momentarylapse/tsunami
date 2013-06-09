@@ -2,6 +2,17 @@
 #ifdef HUI_API_WIN
 
 
+
+void HuiWindow::ToolbarAddItemMenu(const string &title, const string &tool_tip, const string &image, HuiMenu *m, const string &id){}
+void HuiWindow::ToolbarAddItem(const string &title, const string &tool_tip, const string &image, const string &id){}
+void HuiWindow::ToolbarAddItemCheckable(const string &title, const string &tool_tip, const string &image, const string &id){}
+void HuiWindow::ToolbarAddSeparator(){}
+void HuiWindow::ToolbarReset(){}
+void HuiWindow::EnableToolbar(bool enable){}
+
+
+#if 0
+
 void CHuiWindow::EnableToolBar(bool enabled)
 {
 	if (tb!=&tool_bar[HuiToolBarTop])
@@ -209,5 +220,7 @@ bool CHuiWindow::_ToolBarIsChecked_(int id)
 {
 	return false;
 }
+
+#endif
 
 #endif

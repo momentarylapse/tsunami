@@ -38,11 +38,11 @@ enum
 	KindVarLocal,
 	KindVarGlobal,
 	KindVarFunction,
-	KindEnum,				// = single enum entry
 	KindConstant,
 	// execution
-	KindFunction,			// = script defined functions
-	KindCompilerFunction,	// = compiler functions
+	KindFunction,			// = real function call
+	KindVirtualFunction,	// = virtual function call
+	KindCompilerFunction,	// = special internal functions
 	KindBlock,				// = block of commands {...}
 	KindOperator,
 	KindPrimitiveOperator,	// provisorical...
@@ -154,7 +154,7 @@ public:
 	void ParseEnum();
 	void ParseClass();
 	void ParseFunction(Type *class_type, bool as_extern);
-	void ParseClassFunction(Type *t, bool as_extern, bool as_virtual);
+	void ParseClassFunction(Type *t, bool as_extern, int virtual_index);
 	Type *ParseVariableDefSingle(Type *type, Function *f, bool as_param = false);
 	void ParseVariableDef(bool single, Function *f);
 	void ParseGlobalConst(const string &name, Type *type);

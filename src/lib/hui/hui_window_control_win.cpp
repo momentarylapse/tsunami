@@ -1,6 +1,60 @@
 #include "hui.h"
 #ifdef HUI_API_WIN
 
+
+void HuiWindow::SetMenu(HuiMenu *m){}
+void HuiWindow::SetTitle(const string &title){}
+void HuiWindow::SetPosition(int x, int y){}
+void HuiWindow::SetSize(int w, int h){}
+irect HuiWindow::GetOuterior()
+{
+	return irect(0,0,0,0);
+}
+string HuiWindow::Run()
+{
+	return "";
+}
+
+void HuiWindow::AddButton(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddDefButton(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddText(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddGroup(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddComboBox(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddEdit(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddMultilineEdit(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddCheckBox(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddRadioButton(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddListView(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddIconView(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddTabControl(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddTreeView(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddControlTable(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddColorButton(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddToggleButton(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddSpinButton(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddDrawingArea(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddImage(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddSlider(const string &title, int x, int y, int width, int height, const string &id){}
+void HuiWindow::AddProgressBar(const string &title, int x, int y, int width, int height, const string &id){}
+
+void HuiWindow::SetTarget(const string &id, int page){}
+
+void HuiWindow::SetString(const string &id, const string &str){}
+void HuiWindow::AddString(const string &id, const string &str){}
+void HuiWindow::SetInt(const string &id, int i){}
+void HuiWindow::SetFloat(const string &id, float f){}
+void HuiWindow::SetColor(const string &id, const color &c){}
+void HuiWindow::SetImage(const string &id, const string &image){}
+
+void HuiWindow::Enable(const string &id, bool b){}
+void HuiWindow::Check(const string &id, bool b){}
+
+HuiWindow::~HuiWindow(){}
+
+void HuiWindow::_Init_(const string &title,int x, int y, int w, int h, HuiWindow *parent, bool allow_parent, int mode){}
+
+#if 0
+
 void GetPartStrings(int id, const char *title);
 const char *ScanOptions(int id, const char *title);
 extern int NumPartStrings;
@@ -20,7 +74,7 @@ extern bool hui_option_nobar;
 
 
 // general control...just a helper function, don't use!!!
-void AddControl(CHuiWindow *win,sHuiControl *c,int id,int kind)
+void AddControl(HuiWindow *win,sHuiControl *c,int id,int kind)
 {
 	if (c->hWnd)
 		SendMessage(c->hWnd,(UINT)WM_SETFONT,(WPARAM)hui_win_default_font,(LPARAM)TRUE);
@@ -39,7 +93,7 @@ void AddControl(CHuiWindow *win,sHuiControl *c,int id,int kind)
 	win->Control.push_back(*c);
 }
 
-void CHuiWindow::AddButton(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddButton(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	c.hWnd=CreateWindow(	_T("BUTTON"),get_lang_sys(id,title),
@@ -49,7 +103,7 @@ void CHuiWindow::AddButton(const char *title,int x,int y,int width,int height,in
 	AddControl(this,&c,id,HuiKindButton);
 }
 
-void CHuiWindow::AddColorButton(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddColorButton(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	ScanOptions(id, title);
@@ -82,7 +136,7 @@ void CHuiWindow::AddColorButton(const char *title,int x,int y,int width,int heig
 	AddControl(this,&c,id,HuiKindColorButton);
 }
 
-void CHuiWindow::AddDefButton(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddDefButton(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	c.hWnd=CreateWindow(_T("BUTTON"),get_lang_sys(id,title),
@@ -92,7 +146,7 @@ void CHuiWindow::AddDefButton(const char *title,int x,int y,int width,int height
 	AddControl(this,&c,id,HuiKindButton);
 }
 
-void CHuiWindow::AddCheckBox(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddCheckBox(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	c.hWnd=CreateWindow(_T("BUTTON"),get_lang_sys(id,title),
@@ -102,7 +156,7 @@ void CHuiWindow::AddCheckBox(const char *title,int x,int y,int width,int height,
 	AddControl(this,&c,id,HuiKindCheckBox);
 }
 
-void CHuiWindow::AddText(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddText(const char *title,int x,int y,int width,int height,int id)
 {
 	const char *title2 = ScanOptions(id, title);
 	sHuiControl c;
@@ -113,7 +167,7 @@ void CHuiWindow::AddText(const char *title,int x,int y,int width,int height,int 
 	AddControl(this,&c,id,HuiKindText);
 }
 
-void CHuiWindow::AddEdit(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddEdit(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	if (HuiUseFlatButtons){
@@ -138,7 +192,7 @@ void CHuiWindow::AddEdit(const char *title,int x,int y,int width,int height,int 
 	}
 }
 
-void CHuiWindow::AddGroup(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddGroup(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	c.hWnd=CreateWindow(_T("BUTTON"),get_lang_sys(id,title),
@@ -148,7 +202,7 @@ void CHuiWindow::AddGroup(const char *title,int x,int y,int width,int height,int
 	AddControl(this,&c,id,HuiKindGroup);
 }
 
-void CHuiWindow::AddComboBox(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddComboBox(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	c.hWnd=CreateWindow(_T("COMBOBOX"),get_lang_sys(id,title),
@@ -163,7 +217,7 @@ void CHuiWindow::AddComboBox(const char *title,int x,int y,int width,int height,
 	SetInt(id, 0);
 }
 
-void CHuiWindow::AddTabControl(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddTabControl(const char *title,int x,int y,int width,int height,int id)
 {
 	//const char *title2 = ScanOptions(id, title);
 	sHuiControl c;
@@ -202,7 +256,7 @@ void CHuiWindow::AddTabControl(const char *title,int x,int y,int width,int heigh
 	AddControl(this,&c,id,HuiKindTabControl);
 }
 
-void CHuiWindow::SetTabCreationPage(int id,int page)
+void HuiWindow::SetTabCreationPage(int id,int page)
 {
 	TabCreationID=id;
 	TabCreationPage=page;
@@ -235,7 +289,7 @@ enum
 };
 
 
-void CHuiWindow::AddListView(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddListView(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	GetPartStrings(id,title);
@@ -271,7 +325,7 @@ void CHuiWindow::AddListView(const char *title,int x,int y,int width,int height,
 	AddControl(this, &c, id, hui_option_icons ? HuiKindListViewIcons : (hui_option_tree ? HuiKindListViewTree : HuiKindListView));
 }
 
-void CHuiWindow::AddProgressBar(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddProgressBar(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	c.hWnd=CreateWindowEx(0,PROGRESS_CLASS,_T("test"),
@@ -284,7 +338,7 @@ void CHuiWindow::AddProgressBar(const char *title,int x,int y,int width,int heig
 	AddControl(this,&c,id,HuiKindProgressBar);
 }
 
-void CHuiWindow::AddSlider(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddSlider(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	//???
@@ -298,7 +352,7 @@ void CHuiWindow::AddSlider(const char *title,int x,int y,int width,int height,in
 	AddControl(this,&c,id,HuiKindSlider);
 }
 
-void CHuiWindow::AddImage(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddImage(const char *title,int x,int y,int width,int height,int id)
 {
 	sHuiControl c;
 	c.hWnd=CreateWindow(	_T("STATIC"),_T(""),
@@ -310,7 +364,7 @@ void CHuiWindow::AddImage(const char *title,int x,int y,int width,int height,int
 	AddControl(this,&c,id,HuiKindImage);
 }
 
-void CHuiWindow::AddDrawingArea(const char *title,int x,int y,int width,int height,int id)
+void HuiWindow::AddDrawingArea(const char *title,int x,int y,int width,int height,int id)
 {
 	msg_todo("Hui: AddDrawingArea (Windows)");
 	return;
@@ -321,52 +375,52 @@ void CHuiWindow::AddDrawingArea(const char *title,int x,int y,int width,int heig
 //----------------------------------------------------------------------------------
 // drawing
 
-void CHuiWindow::Redraw(int id)
+void HuiWindow::Redraw(int id)
 {
 }
 
-void CHuiWindow::BeginDraw(int id)
+void HuiWindow::BeginDraw(int id)
 {
 }
 
-void CHuiWindow::EndDraw()
+void HuiWindow::EndDraw()
 {
 }
 
-void CHuiWindow::SetDrawingColor(float r, float g, float b)
+void HuiWindow::SetDrawingColor(float r, float g, float b)
 {
 }
 
-void CHuiWindow::SetDrawingColor2(const color &c)
+void HuiWindow::SetDrawingColor2(const color &c)
 {
 }
 
-void CHuiWindow::SetLineWidth(float w)
+void HuiWindow::SetLineWidth(float w)
 {
 }
 
-void CHuiWindow::DrawPoint(float x, float y)
+void HuiWindow::DrawPoint(float x, float y)
 {
 }
 
-void CHuiWindow::DrawLine(float x1, float y1, float x2, float y2)
+void HuiWindow::DrawLine(float x1, float y1, float x2, float y2)
 {
 }
 
-void CHuiWindow::DrawLines(float *x, float *y, int num_lines)
+void HuiWindow::DrawLines(float *x, float *y, int num_lines)
 {
 }
 
-void CHuiWindow::DrawLinesMA(Array<float> &x, Array<float> &y)
+void HuiWindow::DrawLinesMA(Array<float> &x, Array<float> &y)
 {
 	DrawLines(&x[0], &y[0], x.num - 1);
 }
 
-void CHuiWindow::DrawStr(float x, float y, const char *str)
+void HuiWindow::DrawStr(float x, float y, const char *str)
 {
 }
 
-void CHuiWindow::DrawRect(float x1, float y1, float x2, float y2)
+void HuiWindow::DrawRect(float x1, float y1, float x2, float y2)
 {
 }
 
@@ -380,7 +434,7 @@ void CHuiWindow::DrawRect(float x1, float y1, float x2, float y2)
 
 // replace all the text
 //    for all
-void CHuiWindow::SetString(int id, const char *str)
+void HuiWindow::SetString(int id, const char *str)
 {
 	allow_signal_level++;
 	//char *str2=sys_str(str);
@@ -403,7 +457,7 @@ void CHuiWindow::SetString(int id, const char *str)
 //    for all
 // select an item
 //    for ComboBox, TabControl, ListView?
-void CHuiWindow::SetInt(int id, int n)
+void HuiWindow::SetInt(int id, int n)
 {
 	allow_signal_level++;
 	for (int i=0;i<Control.size();i++)
@@ -423,7 +477,7 @@ void CHuiWindow::SetInt(int id, int n)
 
 // replace all the text with a float
 //    for all
-void CHuiWindow::SetFloat(int id, float f)
+void HuiWindow::SetFloat(int id, float f)
 {
 	allow_signal_level++;
 	for (int i=0;i<Control.size();i++)
@@ -436,7 +490,7 @@ void CHuiWindow::SetFloat(int id, float f)
 	allow_signal_level--;
 }
 
-void CHuiWindow::SetImage(int id,int image)
+void HuiWindow::SetImage(int id,int image)
 {
 	allow_signal_level++;
 	for (int i=0;i<Control.size();i++)
@@ -452,7 +506,7 @@ static TVITEM _tvi_;
 
 // add a single line/string
 //    for ComboBox, ListView, ListViewTree, ListViewIcons
-void CHuiWindow::AddString(int id, const char *str)
+void HuiWindow::AddString(int id, const char *str)
 {
 	allow_signal_level++;
 	//char *str2=sys_str(str);
@@ -509,7 +563,7 @@ void CHuiWindow::AddString(int id, const char *str)
 
 // add a single line as a child in the tree of a ListViewTree
 //    for ListViewTree
-void CHuiWindow::AddChildString(int id, int parent_row, const char *str)
+void HuiWindow::AddChildString(int id, int parent_row, const char *str)
 {
 	allow_signal_level++;
 	for (int i=0;i<Control.size();i++)
@@ -536,14 +590,14 @@ void CHuiWindow::AddChildString(int id, int parent_row, const char *str)
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
-void CHuiWindow::ChangeString(int id,int row,const char *str)
+void HuiWindow::ChangeString(int id,int row,const char *str)
 {
 	allow_signal_level++;
 	// TODO
 	allow_signal_level--;
 }
 
-void CHuiWindow::SetColor(int id,int *c,bool use_alpha)
+void HuiWindow::SetColor(int id,int *c,bool use_alpha)
 {
 	allow_signal_level++;
 	for (int i=0;i<Control.size();i++)
@@ -562,7 +616,7 @@ static char ControlText[2048];//,ControlLine[2048];
 
 // retrieve the text
 //    for edit
-const char *CHuiWindow::GetString(int id)
+const char *HuiWindow::GetString(int id)
 {
 	for (int i=0;i<Control.size();i++)
 		if (id==Control[i].ID)
@@ -590,7 +644,7 @@ const char *CHuiWindow::GetString(int id)
 //    for edit
 // which item/line is selected?
 //    for ComboBox, TabControl, ListView
-int CHuiWindow::GetInt(int id)
+int HuiWindow::GetInt(int id)
 {
 	for (int i=0;i<Control.size();i++)
 		if (id==Control[i].ID){
@@ -608,7 +662,7 @@ int CHuiWindow::GetInt(int id)
 
 // retrieve the text as a numerical value (float)
 //    for edit
-float CHuiWindow::GetFloat(int id)
+float HuiWindow::GetFloat(int id)
 {
 	for (int i=0;i<Control.size();i++)
 		if (id==Control[i].ID)
@@ -618,7 +672,7 @@ float CHuiWindow::GetFloat(int id)
 	return s2f(GetString(id));
 }
 
-void CHuiWindow::GetColor(int id,int *c,bool use_alpha)
+void HuiWindow::GetColor(int id,int *c,bool use_alpha)
 {
 	for (int i=0;i<Control.size();i++)
 		if (id==Control[i].ID)
@@ -630,7 +684,7 @@ void CHuiWindow::GetColor(int id,int *c,bool use_alpha)
 
 // switch control to usable/unusable
 //    for all
-void CHuiWindow::Enable(int id,bool enabled)
+void HuiWindow::Enable(int id,bool enabled)
 {
 	if (id<0)
 		return;
@@ -658,7 +712,7 @@ void CHuiWindow::Enable(int id,bool enabled)
 
 // show/hide control
 //    for all
-void CHuiWindow::HideControl(int id,bool hide)
+void HuiWindow::HideControl(int id,bool hide)
 {
 	if (id<0)
 		return;
@@ -676,7 +730,7 @@ void CHuiWindow::HideControl(int id,bool hide)
 
 // mark as "checked"
 //    for CheckBox, ToolBarItemCheckable
-void CHuiWindow::Check(int id,bool checked)
+void HuiWindow::Check(int id,bool checked)
 {
 	allow_signal_level++;
 	for (int i=0;i<Control.size();i++)
@@ -696,7 +750,7 @@ void CHuiWindow::Check(int id,bool checked)
 
 // is marked as "checked"?
 //    for CheckBox
-bool CHuiWindow::IsChecked(int id)
+bool HuiWindow::IsChecked(int id)
 {
 	for (int i=0;i<Control.size();i++)
 		if (id==Control[i].ID)
@@ -715,7 +769,7 @@ bool CHuiWindow::IsChecked(int id)
 
 // which lines are selected?
 //    for ListView
-Array<int> CHuiWindow::GetMultiSelection(int id)
+Array<int> HuiWindow::GetMultiSelection(int id)
 {
 	Array<int> sel;
 	for (int i=0;i<Control.size();i++)
@@ -741,7 +795,7 @@ Array<int> CHuiWindow::GetMultiSelection(int id)
 
 // delete all the content
 //    for ComboBox, ListView
-void CHuiWindow::Reset(int id)
+void HuiWindow::Reset(int id)
 {
 	allow_signal_level++;
 	for (int i=0;i<Control.size();i++)
@@ -753,6 +807,8 @@ void CHuiWindow::Reset(int id)
 		}
 	allow_signal_level--;
 }
+
+#endif
 
 
 #endif

@@ -26,7 +26,7 @@ extern bool next_const;
 inline bool type_match(Type *type, bool is_class, Type *wanted);
 inline bool direct_type_match(Type *a, Type *b)
 {
-	return ( (a==b) || ( (a->is_pointer) && (b->is_pointer) ) );
+	return ( (a==b) || ( (a->is_pointer) && (b->is_pointer) ) || (a->IsDerivedFrom(b)) );
 }
 inline bool type_match_with_cast(Type *type, bool is_class, bool is_modifiable, Type *wanted, int &penalty, int &cast);
 
@@ -172,12 +172,18 @@ Command *DoClassFunction(SyntaxTree *ps, Command *ob, ClassFunction &cf, Functio
 
 	// the function
 	cmd->script = cf.script;
-	cmd->kind = KindFunction;
-	cmd->link_nr = cf.nr;
 	Function *ff = cf.script->syntax->Functions[cf.nr];
 	cmd->type = ff->literal_return_type;
 	cmd->num_params = ff->num_params;
-	ps->GetFunctionCall(ff->name, cmd, f);
+	if (cf.virtual_index >= 0){
+		cmd->kind = KindVirtualFunction;
+		cmd->link_nr = cf.virtual_index;
+		ps->GetFunctionCall("?." + cf.name, cmd, f);
+	}else{
+		cmd->kind = KindFunction;
+		cmd->link_nr = cf.nr;
+		ps->GetFunctionCall(ff->name, cmd, f);
+	}
 	cmd->instance = ob;
 	return cmd;
 }
@@ -475,7 +481,7 @@ void SyntaxTree::GetFunctionCall(const string &f_name, Command *Operand, Functio
 
 
 
-	// find (and provisorically link) the parameters in the source
+	// find (and provisional link) the parameters in the source
 	int np;
 	Type *WantedType[SCRIPT_MAX_PARAMS];
 
@@ -656,6 +662,8 @@ inline bool type_match(Type *type, bool is_class, Type *wanted)
 	if ((type->is_pointer) && (wanted == TypePointer))
 		return true;
 	if ((is_class) && (wanted == TypeClass))
+		return true;
+	if (type->IsDerivedFrom(wanted))
 		return true;
 	return false;
 }
@@ -1390,7 +1398,7 @@ void SyntaxTree::ParseEnum()
 	Exp.cur_line --;
 }
 
-void SyntaxTree::ParseClassFunction(Type *t, bool as_extern, bool as_virtual)
+void SyntaxTree::ParseClassFunction(Type *t, bool as_extern, int virtual_index)
 {
 	ParseFunction(t, as_extern);
 
@@ -1398,11 +1406,22 @@ void SyntaxTree::ParseClassFunction(Type *t, bool as_extern, bool as_virtual)
 	ClassFunction cf;
 	cf.name = f->name.substr(t->name.num + 1, -1);
 	cf.nr = Functions.num - 1;
-	cf.return_type = f->return_type;
 	cf.script = script;
+	cf.return_type = f->return_type;
 	for (int i=0;i<f->num_params;i++)
 		cf.param_type.add(f->var[i].type);
-	cf.is_virtual = as_virtual;
+	cf.virtual_index = virtual_index;
+
+	// overwrite?
+	foreach(ClassFunction &_cf, t->function)
+		if (_cf.name == cf.name)
+			if ((_cf.return_type == cf.return_type) && (_cf.param_type.num == cf.param_type.num)){
+				if ((virtual_index < 0) && (_cf.virtual_index >= 0))
+					DoError("can only overwrite a virtual function with another virtual function");
+				_cf.nr = cf.nr;
+				_cf.script = cf.script;
+				return;
+			}
 	t->function.add(cf);
 }
 
@@ -1413,21 +1432,19 @@ inline bool type_needs_alignment(Type *t)
 	return (t->size >= 4);
 }
 
-bool class_has_virtual_functions(SyntaxTree *ps)
+int class_count_virtual_functions(SyntaxTree *ps)
 {
 	ExpressionBuffer::Line *l = ps->Exp.cur_line;
-	bool found = false;
+	int count = 0;
 	l ++;
 	while(l != &ps->Exp.line[ps->Exp.line.num - 1]){
 		if (l->indent == 0)
 			break;
-		if ((l->indent == 1) && (l->exp[0].name == "virtual")){
-			found = true;
-			break;
-		}
+		if ((l->indent == 1) && (l->exp[0].name == "virtual"))
+			count ++;
 		l ++;
 	}
-	return found;
+	return count;
 }
 
 void SyntaxTree::ParseClass()
@@ -1452,36 +1469,48 @@ void SyntaxTree::ParseClass()
 	if (Exp.cur == ":"){
 		so("vererbung der struktur");
 		Exp.next();
-		Type *ancestor = GetType(Exp.cur, true);
+		Type *parent = GetType(Exp.cur, true);
 		bool found = false;
-		if (ancestor->element.num > 0){
+		if (parent->element.num > 0){
 			// inheritance of elements
-			_class->element = ancestor->element;
-			_offset = ancestor->size;
+			_class->element = parent->element;
 			found = true;
 		}
-		if (ancestor->function.num > 0){
+		if (parent->function.num > 0){
 			// inheritance of functions
-			foreach(ClassFunction &f, ancestor->function)
+			foreach(ClassFunction &f, parent->function)
 				if ((f.name != "__init__") && (f.name != "__delete__") && (f.name != "__assign__"))
 					_class->function.add(f);
 			found = true;
 		}
 		if (!found)
-			DoError(format("parental type in class definition after \":\" has to be a class, but (%s) is not", ancestor->name.c_str()));
-		_class->parent = ancestor;
+			DoError(format("parental type in class definition after \":\" has to be a class, but (%s) is not", parent->name.c_str()));
+		_class->parent = parent;
+		_offset = parent->size;
 	}
 	ExpectNewline();
 
 	// virtual functions?
-	bool has_virtual = class_has_virtual_functions(this);
-	if (has_virtual){
-		ClassElement el;
-		el.name = "-vtable-";
-		el.type = TypePointer;
-		el.offset = 0;
-		_offset = config.PointerSize;
+	int parent_virtual_count = 0;
+	if (_class->parent)
+		parent_virtual_count = _class->parent->num_virtual;
+	int virtual_count = class_count_virtual_functions(this) + parent_virtual_count;
+	if (virtual_count > 0){
+		if (_class->parent){
+			if (!_class->parent->vtable)
+				DoError("no virtual functions allowed when inheriting from class without virtual functions");
+		}else{
+			ClassElement el;
+			el.name = "-vtable-";
+			el.type = TypePointer;
+			el.offset = 0;
+			_class->element.add(el);
+			_offset = config.PointerSize;
+		}
+		_class->vtable = new VirtualTable[virtual_count];
+		_class->num_virtual = virtual_count;
 	}
+	virtual_count = parent_virtual_count;
 
 	// elements
 	for (int num=0;true;num++){
@@ -1529,7 +1558,7 @@ void SyntaxTree::ParseClass()
 			if (is_function){
 				Exp.cur_exp = ie;
 				Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
-				ParseClassFunction(_class, next_extern, next_virtual);
+				ParseClassFunction(_class, next_extern, next_virtual ? (virtual_count ++) : -1);
 
 				break;
 			}
@@ -1566,14 +1595,6 @@ void SyntaxTree::ParseClass()
 		if (type_needs_alignment(e.type))
 			_offset = mem_align(_offset, 4);
 	_class->size = ProcessClassSize(_class->name, _offset);
-	if (has_virtual){
-		int n = 0;
-		foreach(ClassFunction &cf, _class->function)
-			if (cf.is_virtual)
-				n ++;
-		typedef void *__pointer;
-		_class->vtable = new __pointer[n];
-	}
 
 
 

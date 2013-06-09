@@ -34,34 +34,6 @@ class HuiEventHandler;
 
 
 
-//----------------------------------------------------------------------------------
-// system independence of main() function
-
-extern Array<string> HuiMakeArgs(int num_args, char *args[]);
-
-
-
-// for a system independent usage of this library
-
-#define hui_main(p)	\
-_hui_main_(p);\
-int main(int NumArgs, char *Args[])\
-{\
-	return _hui_main_(HuiMakeArgs(NumArgs, Args));\
-}\
-int _hui_main_(p)
-
-// usage:
-//
-// int hui_main(Array<string> arg)
-// {
-//     HuiInit();
-//     ....
-//     return HuiRun();
-// }
-
-
-
 
 //----------------------------------------------------------------------------------
 // hui itself

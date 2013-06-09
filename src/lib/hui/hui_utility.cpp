@@ -8,6 +8,7 @@
 #ifdef OS_WINDOWS
 	#include <direct.h>
 	#include <tchar.h>
+	#include <signal.h>
 #endif
 #ifdef OS_LINUX
 	#include <sys/time.h>
@@ -182,7 +183,7 @@ void HuiSleep(int duration_ms)
 void HuiSetDirectory(const string &dir)
 {
 #ifdef OS_WINDOWS
-	_chdir(sys_str_f(dir));
+	_chdir(dir.sys_filename().c_str());
 #endif
 #ifdef OS_LINUX
 	int r=chdir(sys_str_f(dir));
@@ -230,7 +231,7 @@ void HuiCopyToClipBoard(const string &buffer)
 
 	// befuellen
 	int l=0;
-	for (i=0;i<buffer.num;i++){
+	for (int i=0;i<buffer.num;i++){
 		if (buffer[i]=='\n'){
 			str[l]='\r';
 			l++;

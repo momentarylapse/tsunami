@@ -357,16 +357,9 @@ void AddFuncInstance(SerialCommandParam &inst)
 	CompilerFunctionInstance = inst;
 }
 
-void AddReference(Serializer *d, SerialCommandParam &param, Type *type, SerialCommandParam &ret);
-
-
-void Serializer::add_function_call_x86(Script *script, int func_no)
+int Serializer::fc_x86_begin()
 {
-	msg_db_f("AddFunctionCallX86", 4);
-	call_used = true;
 	Type *type = CompilerFunctionReturn.type;
-	if (!type)
-		type = TypeVoid;
 
 	// return data too big... push address
 	SerialCommandParam ret_temp, ret_ref;
@@ -380,7 +373,7 @@ void Serializer::add_function_call_x86(Script *script, int func_no)
 	// grow stack (down) for local variables of the calling function
 //	add_cmd(- cur_func->_VarSize - LocalOffset - 8);
 	long push_size = 0;
-	
+
 	// push parameters onto stack
 	for (int p=CompilerFunctionParam.num-1;p>=0;p--){
 		if (CompilerFunctionParam[p].type){
@@ -396,24 +389,24 @@ void Serializer::add_function_call_x86(Script *script, int func_no)
 	if (type->UsesReturnByMemory())
 		add_cmd(Asm::inst_push, ret_ref; // nachtraegliche eSP-Korrektur macht die Funktion
 #endif
-	
+
 	// _cdecl: push class instance as first parameter
 	if (CompilerFunctionInstance.type){
 		add_cmd(Asm::inst_push, CompilerFunctionInstance);
 		push_size += config.PointerSize;
 	}
-	
+
 #ifndef NIX_IDE_VCS
 	// more than 4 byte have to be returned -> give return address as very first parameter!
 	if (type->UsesReturnByMemory())
 		add_cmd(Asm::inst_push, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
 #endif
+	return push_size;
+}
 
-	void *func = (void*)script->func[func_no];
-	if (!func)
-		DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);
-	add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
-	// function pointer will be shifted later...
+void Serializer::fc_x86_end(int push_size)
+{
+	Type *type = CompilerFunctionReturn.type;
 
 	if (push_size > 127)
 		add_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegEsp), param_const(TypeInt, (void*)push_size));
@@ -434,13 +427,24 @@ void Serializer::add_function_call_x86(Script *script, int func_no)
 	}
 }
 
-void Serializer::add_function_call_amd64(Script *script, int func_no)
+void Serializer::add_function_call_x86(Script *script, int func_no)
 {
-	msg_db_f("AddFunctionCallAMD64", 4);
-	call_used = true;
+	msg_db_f("AddFunctionCallX86", 4);
+
+	int push_size = fc_x86_begin();
+
+	void *func = (void*)script->func[func_no];
+	if (!func)
+		DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);
+	add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
+	// function pointer will be shifted later...
+
+	fc_x86_end(push_size);
+}
+
+int Serializer::fc_amd64_begin()
+{
 	Type *type = CompilerFunctionReturn.type;
-	if (!type)
-		type = TypeVoid;
 
 	// return data too big... push address
 	SerialCommandParam ret_temp, ret_ref;
@@ -527,12 +531,12 @@ void Serializer::add_function_call_amd64(Script *script, int func_no)
 		if (r.last == -100)
 			r.last = cmd.num;
 
-	void *func = (void*)script->func[func_no];
-	if (!func)
-		DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);
-	//add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
-	add_cmd(Asm::inst_call, param_const(TypeReg32, func)); // the actual call
-	// function pointer will be shifted later...
+	return push_size;
+}
+
+void Serializer::fc_amd64_end(int push_size)
+{
+	Type *type = CompilerFunctionReturn.type;
 
 	// return > 4b already got copied to [ret] by the function!
 	if ((type != TypeVoid) && (!type->UsesReturnByMemory())){
@@ -551,8 +555,48 @@ void Serializer::add_function_call_amd64(Script *script, int func_no)
 	}
 }
 
+void Serializer::add_function_call_amd64(Script *script, int func_no)
+{
+	msg_db_f("AddFunctionCallAMD64", 4);
+
+	int push_size = fc_amd64_begin();
+
+	void *func = (void*)script->func[func_no];
+	if (!func)
+		DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);
+	//add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
+	add_cmd(Asm::inst_call, param_const(TypeReg32, func)); // the actual call
+	// function pointer will be shifted later...
+
+	fc_amd64_end(push_size);
+}
+
+void Serializer::add_virtual_function_call_x86(int virtual_index)
+{
+	msg_db_f("AddFunctionCallX86", 4);
+
+	int push_size = fc_x86_begin();
+
+	add_cmd(Asm::inst_mov, p_eax, CompilerFunctionInstance);
+	add_cmd(Asm::inst_mov, p_eax, p_deref_eax);
+	add_cmd(Asm::inst_add, p_eax, param_const(TypeInt, (void*)(4 * virtual_index)));
+	add_cmd(Asm::inst_mov, param_reg(TypePointer, Asm::RegEdx), p_deref_eax);
+	add_cmd(Asm::inst_call, param_reg(TypePointer, Asm::RegEdx)); // the actual call
+
+	fc_x86_end(push_size);
+}
+
+void Serializer::add_virtual_function_call_amd64(int virtual_index)
+{
+	DoError("virtual function call on amd64 not yet implemented!");
+}
+
 void Serializer::AddFunctionCall(Script *script, int func_no)
 {
+	call_used = true;
+	if (!CompilerFunctionReturn.type)
+		CompilerFunctionReturn.type = TypeVoid;
+
 	if (config.instruction_set== Asm::InstructionSetAMD64)
 		add_function_call_amd64(script, func_no);
 	else if (config.instruction_set == Asm::InstructionSetX86)
@@ -560,7 +604,28 @@ void Serializer::AddFunctionCall(Script *script, int func_no)
 
 	// clean up for next call
 	CompilerFunctionParam.clear();
-	CompilerFunctionReturn.type = NULL;
+	CompilerFunctionReturn.type = TypeVoid;
+	CompilerFunctionInstance.type = NULL;
+}
+
+void Serializer::AddClassFunctionCall(ClassFunction *cf)
+{
+	if (cf->virtual_index < 0){
+		AddFunctionCall(cf->script, cf->nr);
+		return;
+	}
+	call_used = true;
+	if (!CompilerFunctionReturn.type)
+		CompilerFunctionReturn.type = TypeVoid;
+
+	if (config.instruction_set== Asm::InstructionSetAMD64)
+		add_virtual_function_call_amd64(cf->virtual_index);
+	else if (config.instruction_set == Asm::InstructionSetX86)
+		add_virtual_function_call_x86(cf->virtual_index);
+
+	// clean up for next call
+	CompilerFunctionParam.clear();
+	CompilerFunctionReturn.type = TypeVoid;
 	CompilerFunctionInstance.type = NULL;
 }
 
@@ -1138,7 +1203,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 
 	// return value
 	SerialCommandParam ret;
-	bool create_constructor_for_return = ((com->kind != KindCompilerFunction) && (com->kind != KindFunction));
+	bool create_constructor_for_return = ((com->kind != KindCompilerFunction) && (com->kind != KindFunction) && (com->kind != KindVirtualFunction));
 	add_temp(com->type, ret, create_constructor_for_return);
 
 	// compile parameters
@@ -1148,7 +1213,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 
 	// class function -> compile instance
 	bool is_class_function = false;
-	if (com->kind == KindFunction){
+	if ((com->kind == KindFunction) || (com->kind == KindVirtualFunction)){
 		if (com->script->syntax->Functions[com->link_nr]->_class)
 			is_class_function = true;
 	}
@@ -1175,6 +1240,16 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 			AddFuncInstance(instance);
 			
 		AddFunctionCall(com->script, com->link_nr);
+
+	}else if (com->kind == KindVirtualFunction){
+
+		for (int p=0;p<com->num_params;p++)
+			AddFuncParam(param[p]);
+
+		AddFuncReturn(ret);
+		AddFuncInstance(instance);
+
+		AddClassFunctionCall(instance.type->parent->GetVirtualFunction(com->link_nr));
 	}else if (com->kind == KindCompilerFunction){
 			switch(com->link_nr){
 				/*case CommandSine:
@@ -1451,7 +1526,7 @@ void Serializer::add_cmd_constructor(SerialCommandParam &param, int modus)
 		AddFuncInstance(inst);
 	}
 
-	AddFunctionCall(f->script, f->nr);
+	AddClassFunctionCall(f);
 	if (modus == KindVarTemp)
 		InsertedConstructorTemp.add(param);
 	else if (modus == KindVarLocal)
@@ -1466,7 +1541,7 @@ void Serializer::add_cmd_destructor(SerialCommandParam &param)
 	SerialCommandParam inst;
 	AddReference(param, TypePointer, inst);
 	AddFuncInstance(inst);
-	AddFunctionCall(f->script, f->nr);
+	AddClassFunctionCall(f);
 }
 
 void Serializer::FillInConstructorsFunc()

@@ -1,6 +1,10 @@
 #include "hui.h"
 #ifdef HUI_API_WIN
 
+#include <ShlObj.h>
+#include <tchar.h>
+
+#define TCHAR_STRING_LENGTH			1024
 
 
 //#define __T(x)  L ## x
@@ -28,7 +32,7 @@ static int CALLBACK FileDialogDirCallBack(HWND hWnd, UINT uMsg,LPARAM lParam,LPA
 static TCHAR _filename_[512],_complete_name_[512],_path_[512];
 
 // Dialog zur Wahl eines Verzeichnisses (<dir> ist das anfangs ausgewaehlte)
-bool HuiFileDialogDir(CHuiWindow *win,const char *title,const char *dir/*,const char *root_dir*/)
+bool HuiFileDialogDir(HuiWindow *win, const string &title, const string &dir/*, const string &root_dir*/)
 {
 	BROWSEINFO bi;
 	ZeroMemory(&bi,sizeof(bi));
@@ -55,13 +59,13 @@ bool HuiFileDialogDir(CHuiWindow *win,const char *title,const char *dir/*,const 
 			imalloc->Release();
 		}
 	}
-	strcpy(HuiFileDialogPath,de_sys_str_f(_path_));
+	HuiFilename = de_sys_str_f(_path_);
 
-	return strlen(HuiFileDialogPath)>0;
+	return HuiFilename.num > 0;
 }
 
 // Datei-Auswahl zum Oeffnen (filter in der Form "*.txt")
-bool HuiFileDialogOpen(CHuiWindow *win,const char *title,const char *dir,const char *show_filter,const char *filter)
+bool HuiFileDialogOpen(HuiWindow *win, const string &title, const string &dir, const string &show_filter, const string &filter)
 {
 	msg_db_r("HuiFileDialogOpen",1);
 	HWND hWnd=win?win->hWnd:NULL;
@@ -79,28 +83,23 @@ bool HuiFileDialogOpen(CHuiWindow *win,const char *title,const char *dir,const c
 						NULL,0,1,_complete_name_,TCHAR_STRING_LENGTH,
 						_filename_,TCHAR_STRING_LENGTH,_path_,sys_str(title),OFN_FILEMUSTEXIST,0,1,_T("????"),0,NULL,NULL};
 	bool done=(GetOpenFileName(&ofn)==TRUE);
-	strcpy(HuiFileDialogCompleteName,de_sys_str_f(_complete_name_));
-	strcpy(HuiFileDialogFile,de_sys_str_f(_filename_));
-	strcpy(HuiFileDialogPath,HuiFileDialogCompleteName);
-	strstr(HuiFileDialogPath,HuiFileDialogFile)[0]=0;
+	HuiFilename = de_sys_str_f(_complete_name_);
 	msg_db_l(1);
 	return done;
 }
 
-static void try_to_ensure_extension(char *filename, const char *filter)
+static void try_to_ensure_extension(string &filename, const string &filter)
 {
 	// multiple choices -> ignore
-	if (strstr(filter, ";"))
+	if (filter.find(";") >= 0)
 		return;
-	int ln = strlen(filename);
-	int lf = strlen(filter);
-	// not the wanted extension -> add
-	if (strcmp(&filename[ln-lf+1], &filter[1]) != 0)
-		strcat(filename, &filter[1]);
+	string ext = filter.substr(1, -1);
+	if (filename.tail(ext.num) == ext)
+		filename += ext;
 }
 
 // Datei-Auswahl zum Speichern
-bool HuiFileDialogSave(CHuiWindow *win,const char *title,const char *dir,const char *show_filter,const char *filter)
+bool HuiFileDialogSave(HuiWindow *win, const string &title, const string &dir, const string &show_filter, const string &filter)
 {
 	HWND hWnd = win ? win->hWnd : NULL;
 	TCHAR _filter_[256];
@@ -118,15 +117,13 @@ bool HuiFileDialogSave(CHuiWindow *win,const char *title,const char *dir,const c
 						_filename_, TCHAR_STRING_LENGTH, _path_, sys_str(title),
 						OFN_FILEMUSTEXIST, 0, 1, _T( "????" ), 0, NULL, NULL };
 	if ( GetSaveFileName( &ofn ) == TRUE ){
-		strcpy( HuiFileDialogCompleteName, de_sys_str_f( _complete_name_ ) );
-		strcpy( HuiFileDialogFile, de_sys_str_f( _filename_ ) );
-		strcpy( HuiFileDialogPath, HuiFileDialogCompleteName );
-		strstr( HuiFileDialogPath, HuiFileDialogFile )[0] = 0;
+		HuiFilename = de_sys_str_f(_complete_name_);
 		return true;
 	}
+	return false;
 }
 
-bool HuiSelectColor(CHuiWindow *win,int r,int g,int b)
+bool HuiSelectColor(HuiWindow *win, int r, int g, int b)
 {
 	HWND hWnd = win ? win->hWnd : NULL;
 	CHOOSECOLOR cc;
@@ -144,9 +141,10 @@ bool HuiSelectColor(CHuiWindow *win,int r,int g,int b)
 		HuiColor[3] = 255; // alpha.... :---(
 		return true;
 	}
+	return false;
 }
 
-int HuiQuestionBox(CHuiWindow *win,const char *title,const char *text,bool allow_cancel)
+string HuiQuestionBox(HuiWindow *win, const string &title, const string &text, bool allow_cancel)
 {
 	HWND hWnd = win ? win->hWnd : NULL;
 	int r = MessageBox(	hWnd,
@@ -154,13 +152,13 @@ int HuiQuestionBox(CHuiWindow *win,const char *title,const char *text,bool allow
 						sys_str( title ),
 						( allow_cancel ? MB_YESNOCANCEL : MB_YESNO ) | MB_ICONQUESTION );
 	if (r == IDYES)
-		return HUI_YES;
+		return "hui:yes";
 	if (r == IDNO)
-		return HUI_NO;
-	return HUI_CANCEL;
+		return "hui:no";
+	return "hui:cancel";
 }
 
-void HuiInfoBox(CHuiWindow *win,const char *title,const char *text)
+void HuiInfoBox(HuiWindow *win, const string &title, const string &text)
 {
 	HWND hWnd = win ? win->hWnd : NULL;
 	MessageBox(	hWnd,
@@ -169,7 +167,7 @@ void HuiInfoBox(CHuiWindow *win,const char *title,const char *text)
 				MB_OK | MB_ICONINFORMATION );// | MB_RTLREADING);
 }
 
-void HuiErrorBox(CHuiWindow *win,const char *title,const char *text)
+void HuiErrorBox(HuiWindow *win,const string &title,const string &text)
 {
 	HWND hWnd = win ? win->hWnd : NULL;
 	MessageBox(	hWnd,
@@ -178,11 +176,10 @@ void HuiErrorBox(CHuiWindow *win,const char *title,const char *text)
 				MB_OK | MB_ICONERROR);
 }
 
-void HuiAboutBox(CHuiWindow *win)
+void HuiAboutBox(HuiWindow *win)
 {
 	msg_todo("HuiAboutBox (Win)");
-	HuiInfoBox(win,_("Beschreibung"), string2("%s %s %s", HuiPropName.c_str(), HuiPropVersion.c_str(), HuiPropCopyright.c_str()));
+	HuiInfoBox(win,_("Beschreibung"), HuiPropName + " " + HuiPropVersion + " " + HuiPropCopyright);
 }
-
 
 #endif

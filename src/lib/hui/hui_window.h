@@ -285,7 +285,7 @@ public:
 	// drawing
 	void _cdecl Redraw(const string &id);
 	void _cdecl RedrawRect(const string &_id, int x, int y, int w, int h);
-	HuiDrawingContext _cdecl *BeginDraw(const string &id);
+	HuiDrawingContext* _cdecl BeginDraw(const string &id);
 
 	// input
 	bool GetKey(int key);

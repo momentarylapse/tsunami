@@ -259,7 +259,7 @@ void SIAddPackageNix()
 	add_ext_var("ScreenHeight",		TypeInt,		nix_p(&NixScreenHeight));
 	add_ext_var("ScreenDepth",		TypeInt,		nix_p(&NixScreenDepth));
 	add_ext_var("Fullscreen",		TypeBool,		nix_p(&NixFullscreen));
-	add_ext_var("Api",				TypeString,		nix_p(&NixApi));
+	add_ext_var("Api",				TypeString,		nix_p(&NixApiName));
 	add_ext_var("Mouse",			TypeVector,		nix_p(&NixMouse));
 	add_ext_var("MouseRel",			TypeVector,		nix_p(&NixMouseRel));
 	add_ext_var("MouseD",			TypeVector,		nix_p(&NixMouseD));

@@ -21,10 +21,12 @@ struct ClassFunction{
 	// _func_(x)  ->  p.func(x)
 	Array<Type*> param_type;
 	Type *return_type;
-	bool is_virtual;
+	int virtual_index;
 	ClassFunction(){}
 	ClassFunction(const string &name, Type *return_type, Script *s, int no);
 };
+
+typedef void *VirtualTable;
 
 struct Type{
 	Type();
@@ -39,7 +41,8 @@ struct Type{
 	Array<ClassFunction> function;
 	Type *parent;
 	SyntaxTree *owner; // to share and be able to delete...
-	void **vtable;
+	VirtualTable *vtable;
+	int num_virtual;
 
 	bool force_call_by_value;
 	bool UsesCallByReference();
@@ -49,6 +52,8 @@ struct Type{
 	int GetFunc(const string &name);
 	ClassFunction *GetConstructor();
 	ClassFunction *GetDestructor();
+	ClassFunction *GetVirtualFunction(int virtual_index);
+	void LinkVirtualTable();
 	string var2str(void *p);
 };
 extern Type *TypeUnknown;

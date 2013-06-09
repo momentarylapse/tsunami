@@ -12,6 +12,7 @@
 
 
 #include "../config.h"
+#include "../base/base.h"
 
 // which api?
 

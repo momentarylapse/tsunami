@@ -39,12 +39,14 @@ void HuiMenu::UpdateLanguage()
 		if ((it.id.num == 0) || (it.is_separator))
 			continue;
 		bool enabled = it.enabled;
+		/*  TODO
 		#ifdef HUI_API_WIN
 			if (strlen(get_lang(it.ID, "", true)) > 0){
 				strcpy(it.Name, HuiGetLanguage(it.ID));
 				ModifyMenu(m->hMenu, i, MF_STRING | MF_BYPOSITION, it.ID, get_lang_sys(it.ID, "", true));
 			}
 		#endif
+		*/
 		string s = get_lang(it.id, "", true);
 		if (s.num > 0)
 			SetText(it.id, s);

@@ -151,8 +151,15 @@ struct Serializer
 	void RemoveUnusedTempVars();
 
 	void AddFunctionCall(Script *script, int func_no);
+	void AddClassFunctionCall(ClassFunction *cf);
 	void add_function_call_x86(Script *script, int func_no);
 	void add_function_call_amd64(Script *script, int func_no);
+	void add_virtual_function_call_x86(int virtual_index);
+	void add_virtual_function_call_amd64(int virtual_index);
+	int fc_x86_begin();
+	void fc_x86_end(int push_size);
+	int fc_amd64_begin();
+	void fc_amd64_end(int push_size);
 	void AddReference(SerialCommandParam &param, Type *type, SerialCommandParam &ret);
 	void AddDereference(SerialCommandParam &param, SerialCommandParam &ret, Type *force_type = NULL);
 

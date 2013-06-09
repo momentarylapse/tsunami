@@ -23,9 +23,9 @@
 		#endif
 	}
 
-	const TCHAR *hui_tchar_str_f(const char *str)
+	const TCHAR *hui_tchar_str_f(const string &str)
 	{
-		return hui_tchar_str(SysFileName(str));
+		return hui_tchar_str(str.sys_filename().c_str());
 	}
 
 	string hui_de_tchar_str(const TCHAR *str)
@@ -33,7 +33,7 @@
 		#ifdef _UNICODE
 			string s;
 			s.resize(4096);
-			int r = WideCharToMultiByte(CP_UTF8,0,str,-1,(LPSTR)s.data,1,NULL,NULL);
+			int r = WideCharToMultiByte(CP_UTF8,0,str,-1,(LPSTR)s.data,s.num,NULL,NULL);
 			s.resize(r);
 			return s;
 		#else
@@ -43,21 +43,7 @@
 
 	string de_sys_str_f(const TCHAR *str)
 	{
-		#ifdef _UNICODE
-			string s;
-			s.resize(4096);
-			int r = WideCharToMultiByte(CP_UTF8,0,str,-1,(LPSTR)s.data,1,NULL,NULL);
-			s.resize(r);
-			return s;
-		#else
-			return (char*)str;
-		#endif
-		/*char *t2=_file_get_str_();
-		strcpy(t2,t1);
-		int sl=strlen(t2);
-		for (int i=0;i<sl;i++)
-			if (t2[i]=='/')	t2[i]='\\';
-		return t2;*/
+		return hui_de_tchar_str(str).replace("/", "\\");
 	}
 
 	int _tchar_str_size_(TCHAR *str)
@@ -269,9 +255,9 @@ string get_lang(const string &id, const string &text, bool allow_keys)
 		return text;
 #ifdef HUI_API_WIN
 	if (allow_keys)
-		for (int i=0;i<HuiKeyCode.num;i++)
-			if (id==HuiKeyCode[i].ID)
-				return r + "\t", HuiGetKeyCodeName(HuiKeyCode[i].Code);
+		for (int i=0;i<_HuiCommand_.num;i++)
+			if (id == _HuiCommand_[i].id)
+				return r + "\t", HuiGetKeyCodeName(_HuiCommand_[i].key_code);
 #endif
 	return r;
 }

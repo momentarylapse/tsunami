@@ -4,7 +4,7 @@
 void HuiWindow::ToolbarSetCurrent(int index)
 {
 #ifdef HUI_API_WIN
-	index = HuiToolBarTop; // ... m(-_-)m
+	index = HuiToolbarTop; // ... m(-_-)m
 #endif
 	cur_toolbar = &toolbar[index];
 }

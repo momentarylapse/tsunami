@@ -238,6 +238,7 @@ string Kind2Str(int kind)
 	if (kind == KindConstant)			return "constant";
 	if (kind == KindRefToConst)			return "reference to const";
 	if (kind == KindFunction)			return "function";
+	if (kind == KindVirtualFunction)	return "virtual function";
 	if (kind == KindCompilerFunction)	return "compiler function";
 	if (kind == KindOperator)			return "operator";
 	if (kind == KindPrimitiveOperator)	return "PRIMITIVE operator";
@@ -273,6 +274,7 @@ string LinkNr2Str(SyntaxTree *s,int kind,int nr)
 	if (kind == KindVarFunction)		return s->Functions[nr]->name;
 	if (kind == KindConstant)			return i2s(nr);//s->Constants[nr].type->var2str(s->Constants[nr].data);
 	if (kind == KindFunction)			return s->Functions[nr]->name;
+	if (kind == KindVirtualFunction)	return i2s(nr);//s->Functions[nr]->name;
 	if (kind == KindCompilerFunction)	return PreCommands[nr].name;
 	if (kind == KindOperator)			return PreOperators[nr].str();
 	if (kind == KindPrimitiveOperator)	return PrimitiveOperators[nr].name;

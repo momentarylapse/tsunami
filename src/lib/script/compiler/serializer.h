@@ -124,7 +124,7 @@ struct Serializer
 	Array<SerialCommandParam> InsertedConstructorFunc;
 	Array<SerialCommandParam> InsertedConstructorTemp;
 	void add_cmd_constructor(SerialCommandParam &param, int modus);
-	void add_cmd_destructor(SerialCommandParam &param);
+	void add_cmd_destructor(SerialCommandParam &param, bool ref = true);
 
 	void DoMapping();
 	void FindReferencedTempVars();

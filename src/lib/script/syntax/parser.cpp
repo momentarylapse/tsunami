@@ -531,6 +531,17 @@ Command *SyntaxTree::GetOperand(Function *f)
 			DoError("only pointers can be dereferenced using \"*\"");
 		}
 		deref_command_old(this, Operand);
+	}else if (Exp.cur == "new"){ // new operator
+		Exp.next();
+		Type *t = GetType(Exp.cur, true);
+		Operand = add_command_compilerfunc(CommandNew);
+		Operand->type = GetPointerType(t);
+	}else if (Exp.cur == "delete"){ // delete operator
+		Exp.next();
+		Operand = add_command_compilerfunc(CommandDelete);
+		Operand->param[0] = GetOperand(f);
+		if (!Operand->param[0]->type->is_pointer)
+			DoError("pointer expected after delete");
 	}else{
 		// direct operand
 		if (GetExistence(Exp.cur, f)){

@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.11.2.0";
+string DataVersion = "0.12.0.0";
 
 CompilerConfiguration config;
 
@@ -798,6 +798,8 @@ void SIAddBasicCommands()
 	CommandFor,
 	CommandBreak,
 	CommandContinue,
+	CommandNew,
+	CommandDelete,
 	CommandSizeof,
 	CommandWait,
 	CommandWaitRT,
@@ -828,6 +830,9 @@ void SIAddBasicCommands()
 		func_add_param("b",	TypeBool); // internally like a while-loop... but a bit different...
 	add_compiler_func("-break-",		TypeVoid,	CommandBreak);
 	add_compiler_func("-continue-",	TypeVoid,	CommandContinue);
+	add_compiler_func("-new-",	TypePointer,	CommandNew);
+	add_compiler_func("-delete-",	TypeVoid,	CommandDelete);
+		func_add_param("p",	TypePointer);
 	add_compiler_func("sizeof",		TypeInt,	CommandSizeof);
 		func_add_param("type",	TypeVoid);
 	
@@ -1009,9 +1014,9 @@ void SIAddCommands()
 	add_func("print",			TypeVoid,		(void*)&_stringout);
 		func_add_param("str",	TypeString);
 	// memory
-	add_func("_malloc_",			TypePointer,		(void*)&malloc);
+	add_func("-malloc-",			TypePointer,		(void*)&malloc);
 		func_add_param("size",	TypeInt);
-	add_func("_free_",			TypeVoid,		(void*)&free);
+	add_func("-free-",			TypeVoid,		(void*)&free);
 		func_add_param("p",	TypePointer);
 	// system
 	add_func("_exec_",			TypeString,		(void*)&shell_execute);

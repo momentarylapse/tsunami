@@ -204,6 +204,8 @@ enum{
 	CommandFor,
 	CommandBreak,
 	CommandContinue,
+	CommandNew,
+	CommandDelete,
 	CommandSizeof,
 	CommandWait,
 	CommandWaitRT,

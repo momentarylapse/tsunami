@@ -342,17 +342,17 @@ static Array<SerialCommandParam> CompilerFunctionParam;
 static SerialCommandParam CompilerFunctionReturn = {-1, NULL, NULL};
 static SerialCommandParam CompilerFunctionInstance = {-1, NULL, NULL};
 
-void AddFuncParam(SerialCommandParam &p)
+void AddFuncParam(const SerialCommandParam &p)
 {
 	CompilerFunctionParam.add(p);
 }
 
-void AddFuncReturn(SerialCommandParam &r)
+void AddFuncReturn(const SerialCommandParam &r)
 {
 	CompilerFunctionReturn = r;
 }
 
-void AddFuncInstance(SerialCommandParam &inst)
+void AddFuncInstance(const SerialCommandParam &inst)
 {
 	CompilerFunctionInstance = inst;
 }
@@ -409,9 +409,9 @@ void Serializer::fc_x86_end(int push_size)
 	Type *type = CompilerFunctionReturn.type;
 
 	if (push_size > 127)
-		add_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegEsp), param_const(TypeInt, (void*)push_size));
+		add_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegEsp), param_const(TypeInt, (void*)(long)push_size));
 	else if (push_size > 0)
-		add_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegEsp), param_const(TypeChar, (void*)push_size));
+		add_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegEsp), param_const(TypeChar, (void*)(long)push_size));
 
 	// return > 4b already got copied to [ret] by the function!
 	if ((type != TypeVoid) && (!type->UsesReturnByMemory())){
@@ -579,7 +579,7 @@ void Serializer::add_virtual_function_call_x86(int virtual_index)
 
 	add_cmd(Asm::inst_mov, p_eax, CompilerFunctionInstance);
 	add_cmd(Asm::inst_mov, p_eax, p_deref_eax);
-	add_cmd(Asm::inst_add, p_eax, param_const(TypeInt, (void*)(4 * virtual_index)));
+	add_cmd(Asm::inst_add, p_eax, param_const(TypeInt, (void*)(long)(4 * virtual_index)));
 	add_cmd(Asm::inst_mov, param_reg(TypePointer, Asm::RegEdx), p_deref_eax);
 	add_cmd(Asm::inst_call, param_reg(TypePointer, Asm::RegEdx)); // the actual call
 
@@ -588,7 +588,18 @@ void Serializer::add_virtual_function_call_x86(int virtual_index)
 
 void Serializer::add_virtual_function_call_amd64(int virtual_index)
 {
-	DoError("virtual function call on amd64 not yet implemented!");
+	//DoError("virtual function call on amd64 not yet implemented!");
+	msg_db_f("AddFunctionCallAmd64", 4);
+
+	int push_size = fc_amd64_begin();
+
+	add_cmd(Asm::inst_mov, p_rax, CompilerFunctionInstance);
+	add_cmd(Asm::inst_mov, p_eax, p_deref_eax);
+	add_cmd(Asm::inst_add, p_eax, param_const(TypeInt, (void*)(long)(8 * virtual_index)));
+	add_cmd(Asm::inst_mov, p_eax, p_deref_eax);
+	add_cmd(Asm::inst_call, p_eax); // the actual call
+
+	fc_amd64_end(push_size);
 }
 
 void Serializer::AddFunctionCall(Script *script, int func_no)
@@ -1356,6 +1367,21 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 						add_cmd(Asm::inst_ret);
 					}
 					break;
+				case CommandNew:
+					AddFuncParam(param_const(TypeInt, (void*)(long)ret.type->parent->size));
+					AddFuncReturn(ret);
+					if (!syntax_tree->GetExistence("-malloc-", cur_func))
+						DoError("-malloc- not found????");
+					AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_nr);
+					add_cmd_constructor(ret, -1);
+					break;
+				case CommandDelete:
+					add_cmd_destructor(param[0], false);
+					AddFuncParam(param[0]);
+					if (!syntax_tree->GetExistence("-free-", cur_func))
+						DoError("-free- not found????");
+					AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_nr);
+					break;
 				case CommandWaitOneFrame:
 				case CommandWait:
 				case CommandWaitRT:{
@@ -1509,7 +1535,7 @@ void Serializer::SerializeBlock(Block *block, int level)
 }
 
 // modus: KindVarLocal/KindVarTemp
-//    -1: -return-   -> don't destruct
+//    -1: -return-/new   -> don't destruct
 void Serializer::add_cmd_constructor(SerialCommandParam &param, int modus)
 {
 	Type *class_type = param.type;
@@ -1533,15 +1559,23 @@ void Serializer::add_cmd_constructor(SerialCommandParam &param, int modus)
 		InsertedConstructorFunc.add(param);
 }
 
-void Serializer::add_cmd_destructor(SerialCommandParam &param)
+void Serializer::add_cmd_destructor(SerialCommandParam &param, bool ref)
 {
-	ClassFunction *f = param.type->GetDestructor();
-	if (!f)
-		return;
-	SerialCommandParam inst;
-	AddReference(param, TypePointer, inst);
-	AddFuncInstance(inst);
-	AddClassFunctionCall(f);
+	if (ref){
+		ClassFunction *f = param.type->GetDestructor();
+		if (!f)
+			return;
+		SerialCommandParam inst;
+		AddReference(param, TypePointer, inst);
+		AddFuncInstance(inst);
+		AddClassFunctionCall(f);
+	}else{
+		ClassFunction *f = param.type->parent->GetDestructor();
+		if (!f)
+			return;
+		AddFuncInstance(param);
+		AddClassFunctionCall(f);
+	}
 }
 
 void Serializer::FillInConstructorsFunc()

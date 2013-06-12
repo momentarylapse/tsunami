@@ -1,6 +1,11 @@
 #include "base.h"
 #include <stdlib.h>
+#ifdef OS_WINDOWS
+	#include <malloc.h>
+#endif
 //#include <stdio.h>
+
+#define ALIGNMENT		16
 
 
 void DynamicArray::init(int _element_size_)
@@ -18,7 +23,15 @@ void DynamicArray::reserve(int size)
 	if (allocated == 0){
 		if (size > 0){
 			allocated = size * element_size;
+#if ALIGNMENT > 0
+	#ifdef OS_WINDOWS
+			data = _aligned_malloc(ALIGNMENT, allocated);
+	#else
+			posix_memalign(&data, ALIGNMENT, allocated);
+	#endif
+#else
 			data = malloc(allocated);
+#endif
 //			printf("          new  %p  ", data);
 		}
 	}else if (size * element_size > allocated){

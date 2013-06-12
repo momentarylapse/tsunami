@@ -132,8 +132,7 @@ void _init_fft_(int n)
 void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 {
 	msg_db_r("fft_c2c_michi", 1);
-	if (out.num < in.num)
-		out.resize(in.num);
+	out.resize(in.num);
 
 	int n2 = in.num;
 	int n = 0;
@@ -159,11 +158,27 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 	msg_db_l(1);
 }
 
+#define align_stack \
+	void *s; \
+	asm volatile( \
+		"mov %%esp, %%eax\n\t" \
+		"mov %%eax, %0\n\t" \
+		: "=r" (s) \
+		: : "%eax", "%esp"); \
+	string ttt = p2s(s); \
+	int ds = ((int)(long)s & 15); \
+	if (ds != 0){ \
+		asm volatile( \
+			"sub %0, %%esp\n\t" \
+			: : "r" (ds) \
+			: "%esp"); \
+	}
+
 void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 {
 	msg_db_r("fft_c2c", 1);
-	if (out.num < in.num)
-		out.resize(in.num);
+	out.resize(in.num);
+	align_stack
 	fftwf_plan plan = fftwf_plan_dft_1d(in.num, (float(*)[2])in.data, (float(*)[2])out.data, inverse ? FFTW_BACKWARD : FFTW_FORWARD, FFTW_ESTIMATE);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
@@ -175,8 +190,8 @@ void fft_r2c(Array<float> &in, Array<complex> &out)
 	if (in.num == 0)
 		return;
 	msg_db_r("fft_r2c", 1);
-	if (out.num < in.num / 2 + 1)
-		out.resize(in.num / 2 + 1);
+	out.resize(in.num / 2 + 1);
+	align_stack
 	fftwf_plan plan = fftwf_plan_dft_r2c_1d(in.num, (float*)in.data, (float(*)[2])out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
@@ -188,8 +203,8 @@ void fft_c2r_inv(Array<complex> &in, Array<float> &out)
 	if (out.num == 0)
 		return;
 	msg_db_r("fft_c2r_inv", 1);
-	if (in.num < out.num / 2 - 1)
-		out.resize(out.num / 2 - 1);
+	align_stack
+	out.resize(in.num * 2 - 2);
 	fftwf_plan plan = fftwf_plan_dft_c2r_1d(out.num, (float(*)[2])in.data, (float*)out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);

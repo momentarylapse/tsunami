@@ -158,6 +158,25 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 	msg_db_l(1);
 }
 
+#if defined(__x86_64__)
+
+#define align_stack \
+	void *s; \
+	asm volatile( \
+		"movq %%rsp, %%rax\n\t" \
+		"movq %%rax, %0\n\t" \
+		: "=r" (s) \
+		: : "%rax", "%rsp"); \
+	string ttt = p2s(s); \
+	long ds = ((long)s & 15); \
+	if (ds != 0){ \
+		asm volatile( \
+			"subq %0, %%rsp\n\t" \
+			: : "r" (ds) \
+			: "%rsp"); \
+	}
+#elif defined(__i386__)
+
 #define align_stack \
 	void *s; \
 	asm volatile( \
@@ -173,6 +192,13 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 			: : "r" (ds) \
 			: "%esp"); \
 	}
+
+#else
+
+
+#define align_stack
+
+#endif
 
 void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 {

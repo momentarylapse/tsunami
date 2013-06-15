@@ -421,6 +421,13 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_p_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
+				}else if (t->parent == TypeFloat){
+					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<float>::__init__));
+					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_f_single));
+						func_add_param("x",		t->parent);
+					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_f_single));
+						func_add_param("x",		t->parent);
+						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 4){
 					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<int>::__init__));
 					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_4_single));

@@ -47,6 +47,7 @@ void HuiControlComboBox::__SetInt(int i)
 
 int HuiControlComboBox::GetInt()
 {
+	return gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
 }
 
 void HuiControlComboBox::__Reset()

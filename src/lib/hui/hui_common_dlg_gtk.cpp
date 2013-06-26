@@ -186,16 +186,16 @@ void HuiAboutBox(HuiWindow *win)
 	}
 	_a_.add(NULL);
 	GError *error = NULL;
-	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(HuiPropLogo.c_str(), &error);
+	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(HuiGetProperty("logo").c_str(), &error);
 	gtk_show_about_dialog(NULL,
-		"program-name", HuiPropName.c_str(),
-		"website", HuiPropWebsite.c_str(),
-		"version", HuiPropVersion.c_str(),
-		"license", HuiPropLicense.c_str(),
-		"comments", sys_str(HuiPropComment.c_str()),
+		"program-name", HuiGetProperty("name").c_str(),
+		"website", HuiGetProperty("website").c_str(),
+		"version", HuiGetProperty("version").c_str(),
+		"license", HuiGetProperty("license").c_str(),
+		"comments", sys_str(HuiGetProperty("comment").c_str()),
 		"authors", _a_.data,
 		"logo", _logo,
-		"copyright", HuiPropCopyright.c_str(),
+		"copyright", HuiGetProperty("copyright").c_str(),
 		NULL);
 
 	foreach(char *aa, _a_)

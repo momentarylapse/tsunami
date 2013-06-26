@@ -68,7 +68,7 @@ void DataToDialog()
 	dlg.Redraw("drawing")
 
 void Draw()
-	context c = dlg.BeginDraw("drawing")
+	painter c = dlg.BeginDraw("drawing")
 	float w = c.width
 	float h = c.height
 	

@@ -268,16 +268,16 @@ void class_add_func(const string &name, Type *return_type, void *func)
 				tname = t->name;
 	}
 	long p = (long)func;
-	if ((p & 1) > 0){
+	if ((cur_class->vtable) && ((p & 1) > 0)){
 		// virtual function
 		int index = p / sizeof(void*);
 		int cmd = -1;
 		cur_func = NULL;
-		if (cur_vtable){
+		func = NULL;
+		if (cur_vtable)
 			func = cur_vtable[index];
-			cmd = add_func(tname + "." + name + "[virtual]", return_type, func, true);
-			cur_func->_class = cur_class;
-		}
+		cmd = add_func(tname + "." + name + "[virtual]", return_type, func, true);
+		cur_func->_class = cur_class;
 		cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
 		cur_class_func = &cur_class->function.back();
 		cur_class_func->virtual_index = index;

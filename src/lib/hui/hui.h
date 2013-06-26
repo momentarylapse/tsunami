@@ -39,25 +39,6 @@ class HuiEventHandler;
 // hui itself
 
 
-// execution
-void HuiInit();
-void HuiInitExtended(const string &program, const string &version, hui_callback *error_cleanup_function, bool load_res, const string &def_lang);
-void _HuiMakeUsable_();
-int HuiRun();
-void HuiPushMainLevel();
-void HuiPopMainLevel();
-void HuiSetIdleFunction(hui_callback *idle_function);
-void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*function)());
-template<typename T>
-void HuiSetIdleFunctionM(HuiEventHandler *object, T fun)
-{	_HuiSetIdleFunctionM(object, (void(HuiEventHandler::*)())fun);	}
-void HuiRunLater(int time_ms, hui_callback *function);
-void _HuiRunLaterM(int time_ms, HuiEventHandler *object, void (HuiEventHandler::*function)());
-template<typename T>
-void HuiRunLaterM(int time_ms, HuiEventHandler *object, T fun)
-{	_HuiRunLaterM(time_ms, object, (void(HuiEventHandler::*)())fun);	}
-void HuiDoSingleMainLoop();
-void HuiEnd();
 extern bool HuiEndKeepMsgAlive;
 
 // images
@@ -75,14 +56,20 @@ extern bool HuiRunning;
 
 
 
-#include "hui_menu.h"
-#include "hui_window.h"
+#include "hui_main.h"
+#include "HuiMenu.h"
+#include "HuiWindow.h"
 #include "hui_common_dlg.h"
 #include "hui_language.h"
 #include "hui_config.h"
 #include "hui_input.h"
 #include "hui_resource.h"
 #include "hui_utility.h"
+#include "HuiPainter.h"
+#include "HuiTimer.h"
+#include "HuiToolbar.h"
+#include "hui_error.h"
+#include "hui_clipboard.h"
 
 
 #endif

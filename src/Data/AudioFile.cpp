@@ -61,6 +61,7 @@ void get_track_sub_index(Track *t, int &track_no, int &sub_no)
 AudioFile::AudioFile() :
 	Data("AudioFile")
 {
+	sample_rate = DEFAULT_SAMPLE_RATE;
 	used = false;
 	volume = 1;
 	selection.clear();
@@ -266,15 +267,15 @@ Track *AudioFile::AddMidiTrack(int index)
 	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_MIDI));
 }
 
-extern int debug_timer;
+extern HuiTimer debug_timer;
 
 void AudioFile::UpdatePeaks(int mode)
 {
 	msg_db_r("Audio.UpdatePeaks", 2);
-	HuiGetTime(debug_timer);
+	debug_timer.reset();
 	foreach(Track *t, track)
 		t->UpdatePeaks(mode);
-	msg_write(format("up %f", HuiGetTime(debug_timer)));
+	msg_write(format("up %f", debug_timer.get()));
 	msg_db_l(2);
 }
 

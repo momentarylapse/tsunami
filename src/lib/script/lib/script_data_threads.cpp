@@ -34,7 +34,9 @@ void SIAddPackageThread()
 	Type *TypeThreadedWork = add_type  ("ThreadedWork", sizeof(ThreadedWork));
 
 	add_class(TypeThread);
+#ifdef _X_USE_THREADS_
 		class_set_vtable(Thread);
+#endif
 		TypeThread->vtable = new VirtualTable[10];
 		class_add_func("__init__",		TypeVoid,	thread_p(mf((tmf)&Thread::__init__)));
 		class_add_func("__delete__",		TypeVoid,	thread_p(mf((tmf)&Thread::__delete__)));
@@ -52,7 +54,9 @@ void SIAddPackageThread()
 		class_add_func("Unlock",	TypeVoid,	thread_p(mf((tmf)&Mutex::Unlock)));
 
 	add_class(TypeThreadedWork);
+#ifdef _X_USE_THREADS_
 		class_set_vtable(ThreadedWork);
+#endif
 		TypeThreadedWork->vtable = new VirtualTable[10];
 		class_add_func("__init__",		TypeVoid,	thread_p(mf((tmf)&ThreadedWork::__init__)));
 		class_add_func("__delete__",		TypeVoid,	thread_p(mf((tmf)&ThreadedWork::__delete__)));
@@ -61,6 +65,7 @@ void SIAddPackageThread()
 			func_add_param("partition_size", TypeInt);
 		class_add_func("DoStep",		TypeVoid,	thread_p(mf((tmf)&ThreadedWork::DoStep)));
 			func_add_param("index", TypeInt);
+			func_add_param("worker_id", TypeInt);
 		class_add_func("OnStatus",		TypeBool,	thread_p(mf((tmf)&ThreadedWork::OnStatus)));
 		class_add_func("GetTotal",		TypeInt,	thread_p(mf((tmf)&ThreadedWork::GetTotal)));
 		class_add_func("GetDone",		TypeInt,	thread_p(mf((tmf)&ThreadedWork::GetDone)));

@@ -96,7 +96,7 @@ class GridData
 		return vector(self.unprojectx(z.x), self.unprojecty(z.y), z.z)
 	
 	
-	void DrawLinY(context c, GridPartition part)
+	void DrawLinY(painter c, GridPartition part)
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
 		float y = part.min
@@ -115,7 +115,7 @@ class GridData
 				c.DrawLine(self.x, vy, self.x + self.w, vy)
 			y += part.step
 	
-	void DrawLinX(context c, GridPartition part)
+	void DrawLinX(painter c, GridPartition part)
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
 		float x = part.min
@@ -134,7 +134,7 @@ class GridData
 				c.DrawLine(vx, self.y, vx, self.y + self.h)
 			x += part.step
 
-	void Draw(context c, float x0, float y0, float w, float h)
+	void Draw(painter c, float x0, float y0, float w, float h)
 	
 		y0 += 3
 		self.x0 = x0
@@ -178,7 +178,7 @@ class GridData
 		part = get_lin_partition(self.y_val_min, self.y_val_max, h)
 		self.DrawLinY(c, part)
 	
-	void DrawCurve(context c, FloatInterpolator fi, bool fill_below)
+	void DrawCurve(painter c, FloatInterpolator fi, bool fill_below)
 		float tt[], xx[], yy[]
 		tt = rangef(0, 1, 0.003)
 		yy = fi.get_list(tt)
@@ -199,7 +199,7 @@ class GridData
 		c.SetColor(Black)
 		c.DrawLines(xx, yy)
 	
-	void DrawCurveB(context c, float x[], float y[], bool fill_below, color col)
+	void DrawCurveB(painter c, float x[], float y[], bool fill_below, color col)
 		float xx[], yy[]
 		for int i, 0, x.num
 			complex zz = self.project2(complex(x[i], y[i]))
@@ -220,7 +220,7 @@ class GridData
 		c.SetColor(col)
 		c.DrawLines(xx, yy)
 	
-	void DrawPoint2(context c, complex p, bool selected, bool hover)
+	void DrawPoint2(painter c, complex p, bool selected, bool hover)
 		complex pp = self.project2(p)
 		c.SetColor(Black)
 		float radius = 3
@@ -231,7 +231,7 @@ class GridData
 			c.SetColor(color(1, 0.7, 0, 0))
 		c.DrawCircle(pp.x, pp.y, radius)
 	
-	void DrawPoint3(context c, vector p, bool selected, bool hover)
+	void DrawPoint3(painter c, vector p, bool selected, bool hover)
 		vector pp = self.project3(p)
 		c.SetColor(Black)
 		float radius = 3

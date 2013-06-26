@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.4.90.0";
+string HuiVersion = "0.4.92.0";
 
 
 #include <stdio.h>
@@ -242,7 +242,7 @@ void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*funct
 	HuiIdleFunction = NULL;
 }
 
-void HuiRunLater(int time_ms, hui_callback *function)
+void HuiRunLater(float time, hui_callback *function)
 {
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunLater");
@@ -250,11 +250,11 @@ void HuiRunLater(int time_ms, hui_callback *function)
 	#ifdef HUI_API_GTK
 		HuiRunLaterItem *i = new HuiRunLaterItem;
 		i->function = function;
-		g_timeout_add_full(300, time_ms, &GtkRunLaterFunction, (void*)i, NULL);
+		g_timeout_add_full(300, time * 1000, &GtkRunLaterFunction, (void*)i, NULL);
 	#endif
 }
 
-void _HuiRunLaterM(int time_ms, HuiEventHandler *object, void (HuiEventHandler::*function)())
+void _HuiRunLaterM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
 {
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunLater");
@@ -263,7 +263,7 @@ void _HuiRunLaterM(int time_ms, HuiEventHandler *object, void (HuiEventHandler::
 		HuiRunLaterItem *i = new HuiRunLaterItem;
 		i->member_function = function;
 		i->member_object = object;
-		g_timeout_add_full(300, time_ms, &GtkRunLaterFunction, (void*)i, NULL);
+		g_timeout_add_full(300, time * 1000, &GtkRunLaterFunction, (void*)i, NULL);
 	#endif
 }
 
@@ -293,7 +293,7 @@ void _HuiMakeUsable_()
 	_HuiScreenOpened_ = true;
 }
 
-void HuiInit()
+void HuiInitBase()
 {
 	#ifdef OS_WINDOWS
 		HuiAppFilename = _pgmptr;
@@ -344,15 +344,10 @@ void HuiInit()
 
 	HuiPushMainLevel();
 
-	// make random numbers...well...random
-	Date d = get_current_date();
-	for (int j=0;j<d.milli_second+d.second;j++)
-		rand();
-
 	msg_db_l(1);
 }
 
-void HuiInitExtended(const string &program, const string &version, hui_callback *error_cleanup_function, bool load_res, const string &def_lang)
+void HuiInit(const string &program, bool load_res, const string &def_lang)
 {
 	HuiInitialWorkingDirectory = get_current_dir();
 	string s1, s2;
@@ -401,13 +396,13 @@ void HuiInitExtended(const string &program, const string &version, hui_callback 
 	//msg_write("HuiAppDirectory " + HuiAppDirectory);
 		
 
-	HuiInit();
+	HuiInitBase();
 #ifdef OS_LINUX
 	HuiAppDirectory = s1;
 	HuiAppDirectoryStatic = s2;
 	dir_create(HuiAppDirectory);
 #endif
-	HuiSetDefaultErrorHandler(program, version, error_cleanup_function);
+	HuiSetDefaultErrorHandler(NULL);
 	//msg_write("");
 
 	
@@ -428,14 +423,12 @@ void HuiInitExtended(const string &program, const string &version, hui_callback 
 
 	
 
-	if (version.num > 0)
-		HuiPropVersion = version;
 	if (file_test_existence(HuiAppDirectoryStatic + "Data/icon.svg"))
-		HuiPropLogo = HuiAppDirectoryStatic + "Data/icon.svg";
+		HuiSetProperty("logo", HuiAppDirectoryStatic + "Data/icon.svg");
 	else if (file_test_existence(HuiAppDirectoryStatic + "Data/icon.ico"))
-		HuiPropLogo = HuiAppDirectoryStatic + "Data/icon.ico";
+		HuiSetProperty("logo", HuiAppDirectoryStatic + "Data/icon.ico");
 	if (file_test_existence(HuiAppDirectoryStatic + "Data/license_small.txt"))
-		HuiPropLicense = FileRead(HuiAppDirectoryStatic + "Data/license_small.txt");
+		HuiSetProperty("license", FileRead(HuiAppDirectoryStatic + "Data/license_small.txt"));
 }
 
 

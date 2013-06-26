@@ -50,7 +50,7 @@ color peak_color(float peak)
 void PeakMeter::OnDraw()
 {
 	msg_db_r("PeakMeter.OnDraw", 1);
-	HuiDrawingContext *c = win->BeginDraw(id);
+	HuiPainter *c = win->BeginDraw(id);
 	int w = c->width;
 	int h = c->height;
 	if (mode == ModePeaks){

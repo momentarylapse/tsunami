@@ -12,7 +12,7 @@
 Log::Log(HuiWindow *parent)
 {
 	dlg = HuiCreateSizableDialog(_("Meldungen"), 500, 300, parent, true);
-	dlg->ToolbarSetByID("log_toolbar");
+	dlg->toolbar[0]->SetByID("log_toolbar");
 	dlg->AddListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
 
 	dlg->EventM("hui:close", this, (void(HuiEventHandler::*)())&Log::Close);

@@ -1,5 +1,6 @@
 #include "hui.h"
 #include "hui_internal.h"
+#include "Controls/HuiControl.h"
 #ifdef HUI_API_GTK
 
 
@@ -25,7 +26,6 @@
 #endif*/
 
 
-
 GtkAccelGroup *accel_group = NULL;
 
 void try_add_accel(GtkWidget *item, const string &id)
@@ -38,45 +38,13 @@ void try_add_accel(GtkWidget *item, const string &id)
 		}
 }
 
-string get_menu_id_by_widget(HuiMenu *m, GtkWidget *widget)
-{
-	foreach(HuiMenuItem &it, m->item){
-		if (it.sub_menu){
-			string id = get_menu_id_by_widget(it.sub_menu, widget);
-			if (id.num > 0)
-				return id;
-		}
-		if (it.widget == widget)
-			return it.id;
-	}
-	return "";
-}
-
-gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data)
-{
-	if (allow_signal_level > 0)
-		return FALSE;
-	
-	msg_db_m("OnGtkMenuClick", 1);
-
-	HuiMenu *m = (HuiMenu*)data;
-	string id = get_menu_id_by_widget(m, widget);
-
-	HuiEvent e = HuiEvent(id, "hui:click");
-
-	// which window?
-	_HuiSendGlobalCommand_(&e);
-	for (int i=0;i<HuiWindows.num;i++)
-		HuiWindows[i]->_SendEvent_(&e);
-	return FALSE;
-}
-
 HuiMenu::HuiMenu()
 {
 	msg_db_r("CHuiMenu()", 1);
 	_HuiMakeUsable_();
+	win = NULL;
 	
-	g_menu = gtk_menu_new();
+	widget = gtk_menu_new();
 	if (accel_group == NULL)
 		accel_group = gtk_accel_group_new();
 	msg_db_l(1);
@@ -84,48 +52,30 @@ HuiMenu::HuiMenu()
 
 HuiMenu::~HuiMenu()
 {
+	Clear();
 }
 
 void HuiMenu::gtk_realize()
 {
-	g_menu = gtk_menu_new();
-}
-
-void HuiMenu::Clear()
-{
-	foreach(HuiMenuItem &i, item)
-		gtk_widget_destroy(i.widget);
-	item.clear();
+	widget = gtk_menu_new();
 }
 
 // window coordinate system!
 void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
 {
 	msg_db_r("CHuiMenu::OpenPopup", 1);
-	gtk_widget_show(g_menu);
-	gtk_menu_popup(GTK_MENU(g_menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+	gtk_widget_show(widget);
+	gtk_menu_popup(GTK_MENU(widget), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
 //	win->popup = this;
 	msg_db_l(1);
 }
 
-HuiMenuItem *new_item(HuiMenu *m, const string &name, const string &id)
+void HuiMenu::add(HuiControl *c)
 {
-	HuiMenuItem i;
-	i.id = id;
-	i.name = get_lang(id, name, false); // TODO????
-	m->item.add(i);
-	return &m->item.back();
-}
-
-void HuiMenu::AddItem(const string &name, const string &id)
-{
-	HuiMenuItem *i = new_item(this, name, id);
-	
-	i->widget = gtk_menu_item_new_with_label(get_lang_sys(id, name));
-	gtk_menu_shell_append(GTK_MENU_SHELL(g_menu), i->widget);
-	gtk_widget_show(i->widget);
-	g_signal_connect(G_OBJECT(i->widget), "activate", G_CALLBACK(OnGtkMenuClick), this);
-	try_add_accel(i->widget, id);
+	item.add(c);
+	gtk_menu_shell_append(GTK_MENU_SHELL(widget), c->widget);
+	gtk_widget_show(c->widget);
+	c->win = win;
 }
 
 
@@ -271,98 +221,7 @@ void *get_gtk_image_pixbuf(const string &image)
 	return NULL;
 }
 
-void HuiMenu::AddItemImage(const string &name, const string &image, const string &id)
-{
-	HuiMenuItem *i = new_item(this, name, id);
-	
-	i->widget = gtk_image_menu_item_new_with_label(get_lang_sys(id, name, false));
-	GtkWidget *im = (GtkWidget*)get_gtk_image(image, false);
-	if (im)
-		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(i->widget), im);
-	gtk_menu_shell_append(GTK_MENU_SHELL(g_menu), i->widget);
-	gtk_widget_show(i->widget);
-	g_signal_connect(G_OBJECT(i->widget), "activate", G_CALLBACK(OnGtkMenuClick), this);
-
-	try_add_accel(i->widget, id);
-}
-
-void HuiMenu::AddItemCheckable(const string &name, const string &id)
-{
-	HuiMenuItem *i = new_item(this, name, id);
-	i->checkable = true;
-	
-	i->widget = gtk_check_menu_item_new_with_label(get_lang_sys(id, name, false));
-	gtk_menu_shell_append(GTK_MENU_SHELL(g_menu), i->widget);
-	gtk_widget_show(i->widget);
-	g_signal_connect(G_OBJECT(i->widget), "activate", G_CALLBACK(OnGtkMenuClick), this);
-
-	try_add_accel(i->widget, id);
-}
-
-void HuiMenu::AddSeparator()
-{
-	HuiMenuItem *i = new_item(this, "", "");
-	i->is_separator = true;
-	
-	i->widget = gtk_separator_menu_item_new();
-	gtk_menu_shell_append(GTK_MENU_SHELL(g_menu), i->widget);
-	gtk_widget_show(i->widget);
-}
-
-void HuiMenu::AddSubMenu(const string &name, const string &id, HuiMenu *menu)
-{
-	HuiMenuItem *i = new_item(this, name, id);
-	i->sub_menu = menu;
-	
-	i->widget = gtk_menu_item_new_with_label(get_lang_sys(id, name));
-	gtk_widget_show(i->widget);
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(i->widget), menu->g_menu);
-	gtk_menu_shell_append(GTK_MENU_SHELL(g_menu), i->widget);
-}
-
-// only allow menu callback, if we are in layer 0 (if we don't edit it ourself)
-int allow_signal_level=0;
-
-void HuiMenu::CheckItem(const string &id, bool checked)
-{
-	allow_signal_level++;
-	foreach(HuiMenuItem &it, item)
-		if (it.sub_menu)
-			it.sub_menu->CheckItem(id, checked);
-		else if (it.id == id){
-			if (it.checkable)
-				gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(it.widget), checked);
-		}
-	allow_signal_level--;
-}
-
-bool HuiMenu::IsItemChecked(const string &id)
-{
-#ifdef HUI_API_GTK
-	/*for (int i=0;i<NumItems;i++){
-		if (SubMenu[i])
-			SubMenu[i]->CheckItem(id,checked);
-		else if (ItemID[i]==id){
-			return gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(g_item[i]));
-		}
-	}*/
-#endif
-	return false;
-}
-
-void HuiMenu::EnableItem(const string &id,bool enabled)
-{
-	foreach(HuiMenuItem &it, item){
-		if (it.sub_menu)
-			it.sub_menu->EnableItem(id, enabled);
-		if (it.id == id){
-			it.enabled = enabled;
-			gtk_widget_set_sensitive(it.widget, enabled);
-		}
-	}
-}
-
-void HuiMenu::SetText(const string &id, const string &text)
+/*void HuiMenu::SetText(const string &id, const string &text)
 {
 	foreach(HuiMenuItem &it, item){
 		if (it.sub_menu)
@@ -376,7 +235,7 @@ void HuiMenu::SetText(const string &id, const string &text)
 			try_add_accel(it.widget, id);
 		}
 	}
-}
+}*/
 
 
 

@@ -563,7 +563,7 @@ void AudioView::ForceRedraw()
 
 float tx[4096], ty[4096], ty2[4096];
 
-inline void draw_line_buffer(HuiDrawingContext *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
+inline void draw_line_buffer(HuiPainter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
 {
 	int nl = 0;
 	int i0 = max((double) x          / zoom + view_pos - offset    , 0);
@@ -584,7 +584,7 @@ inline void draw_line_buffer(HuiDrawingContext *c, int width, double view_pos, d
 	c->DrawLines(tx, ty, nl -1);
 }
 
-inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
+inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
 {
 	int nl = 0;
 	double dpos = 1.0 / zoom;
@@ -613,7 +613,7 @@ inline void draw_peak_buffer(HuiDrawingContext *c, int width, int di, double vie
 	//c->DrawLines(tx, ty2, nl -1);
 }
 
-void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, double view_pos_rel, const color &col)
+void AudioView::DrawBuffer(HuiPainter *c, const rect &r, Track *t, double view_pos_rel, const color &col)
 {
 	msg_db_r("DrawBuffer", 1);
 	int l_best = 0;
@@ -663,7 +663,7 @@ void AudioView::DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, double
 	msg_db_l(1);
 }
 
-void AudioView::DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, const color &col, int delay)
+void AudioView::DrawSubFrame(HuiPainter *c, const rect &r, Track *s, const color &col, int delay)
 {
 	// frame
 	int asx = clampi(sample2screen(s->pos + delay), r.x1, r.x2);
@@ -686,7 +686,7 @@ void AudioView::DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, cons
 	c->DrawLine(asx, r.y2, aex, r.y2);
 }
 
-void AudioView::DrawSub(HuiDrawingContext *c, const rect &r, Track *s)
+void AudioView::DrawSub(HuiPainter *c, const rect &r, Track *s)
 {
 	color col = ColorSub;
 	//bool is_cur = ((s == cur_sub) && (t->IsSelected));
@@ -711,7 +711,7 @@ void AudioView::DrawSub(HuiDrawingContext *c, const rect &r, Track *s)
 		c->DrawStr(asx, r.y2 - SUB_FRAME_HEIGHT, s->name);
 }
 
-void DrawStrBg(HuiDrawingContext *c, float x, float y, const string &str, const color &fg, const color &bg)
+void DrawStrBg(HuiPainter *c, float x, float y, const string &str, const color &fg, const color &bg)
 {
 	color bg2 = bg;
 	bg2.a = 0.6f;
@@ -722,7 +722,7 @@ void DrawStrBg(HuiDrawingContext *c, float x, float y, const string &str, const 
 }
 
 
-void AudioView::DrawMidi(HuiDrawingContext *c, const rect &r, MidiData &midi, color col)
+void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col)
 {
 	c->SetLineWidth(3.0f);
 	foreach(MidiNote &n, midi){
@@ -736,7 +736,7 @@ void AudioView::DrawMidi(HuiDrawingContext *c, const rect &r, MidiData &midi, co
 	c->SetLineWidth(LINE_WIDTH);
 }
 
-void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no)
+void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no)
 {
 	msg_db_r("DrawTrack", 1);
 
@@ -760,7 +760,7 @@ void AudioView::DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color c
 	msg_db_l(1);
 }
 
-void AudioView::DrawGrid(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time)
+void AudioView::DrawGrid(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
 	if (grid_mode == GRID_MODE_TIME)
 		DrawGridTime(c, r, bg, show_time);
@@ -768,7 +768,7 @@ void AudioView::DrawGrid(HuiDrawingContext *c, const rect &r, const color &bg, b
 		DrawGridBars(c, r, bg, show_time);
 }
 
-void AudioView::DrawGridTime(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time)
+void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
 	double dl = MIN_GRID_DIST / view_zoom; // >= 10 pixel
 	double dt = dl / audio->sample_rate;
@@ -808,7 +808,7 @@ void AudioView::DrawGridTime(HuiDrawingContext *c, const rect &r, const color &b
 	}
 }
 
-void AudioView::DrawGridBars(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time)
+void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
 	Track *t = NULL;
 	foreach(Track *tt, audio->track)
@@ -898,7 +898,7 @@ void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 	}
 }
 
-void AudioView::DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col, bool show_time)
+void AudioView::DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time)
 {
 	int p = sample2screen(pos);
 	if ((p >= audio->area.x1) && (p <= audio->area.x2)){
@@ -909,7 +909,7 @@ void AudioView::DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col
 	}
 }
 
-void AudioView::DrawEmptyAudioFile(HuiDrawingContext *c, const rect &r)
+void AudioView::DrawEmptyAudioFile(HuiPainter *c, const rect &r)
 {
 	color col = ColorBackgroundCurWave;
 	c->SetColor(col);
@@ -919,7 +919,7 @@ void AudioView::DrawEmptyAudioFile(HuiDrawingContext *c, const rect &r)
 	c->DrawStr(r.x1 + r.width() / 2 - 50, r.y1 + r.height() / 2 - 10, _("keine Datei"));
 }
 
-void AudioView::DrawBackground(HuiDrawingContext *c, const rect &r)
+void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 {
 	int yy = audio->track.back()->area.y2;
 
@@ -957,7 +957,7 @@ void AudioView::DrawBackground(HuiDrawingContext *c, const rect &r)
 	//DrawGrid(c, r, ColorBackgroundCurWave, true);
 }
 
-void AudioView::DrawSelection(HuiDrawingContext *c, const rect &r)
+void AudioView::DrawSelection(HuiPainter *c, const rect &r)
 {
 	if (!audio->selection.empty()){
 		int sx1 = sample2screen(audio->sel_raw.start());
@@ -976,7 +976,7 @@ void AudioView::DrawSelection(HuiDrawingContext *c, const rect &r)
 	}
 }
 
-void AudioView::DrawAudioFile(HuiDrawingContext *c, const rect &r)
+void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 {
 	audio->area = r;
 
@@ -1017,7 +1017,7 @@ void AudioView::OnDraw()
 	msg_db_r("OnDraw", 1);
 	force_redraw = false;
 
-	HuiDrawingContext *c = tsunami->BeginDraw("area");
+	HuiPainter *c = tsunami->BeginDraw("area");
 	DrawingWidth = c->width;
 	c->SetFontSize(FONT_SIZE);
 	c->SetLineWidth(LINE_WIDTH);

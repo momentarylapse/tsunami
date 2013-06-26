@@ -1,5 +1,6 @@
 #include "hui.h"
 #include "hui_internal.h"
+#include "Controls/HuiControl.h"
 
 //----------------------------------------------------------------------------------
 // resource functions
@@ -161,7 +162,7 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 
 	// toolbar?
 	if (res->s_param[1].num > 0)
-		dlg->ToolbarSetByID(res->s_param[1]);
+		dlg->toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
 
 	// controls
 	foreach(HuiResourceCommand &cmd, res->cmd){
@@ -214,7 +215,7 @@ HuiMenu *_create_res_menu_(HuiResource *res, int &index, int num)
 			menu->AddSubMenu(get_lang(cmd->id, "", true), cmd->id, sub);
 			index --;
 		}
-		menu->EnableItem(cmd->id, cmd->enabled);
+		menu->item.back()->Enable(cmd->enabled);
 		index ++;
 	}
 	msg_db_l(2);

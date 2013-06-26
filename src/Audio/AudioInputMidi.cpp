@@ -16,7 +16,6 @@ AudioInputMidi::AudioInputMidi(MidiData &_data) :
 	data(_data)
 {
 	handle = NULL;
-	timer = HuiCreateTimer();
 
 	Init();
 }
@@ -84,7 +83,7 @@ bool AudioInputMidi::Start(int _sample_rate)
 
 	ClearInputQueue();
 
-	HuiGetTime(timer);
+	timer.reset();
 
 	capturing = true;
 	return true;
@@ -97,7 +96,7 @@ void AudioInputMidi::Stop()
 
 int AudioInputMidi::DoCapturing()
 {
-	double dt = HuiGetTime(timer);
+	double dt = timer.get();
 	if (accumulating)
 		offset += dt;
 	int pos = offset * (double)sample_rate;

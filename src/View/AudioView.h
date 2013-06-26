@@ -47,19 +47,19 @@ public:
 	void ZoomIn();
 	void ZoomOut();
 
-	void DrawBuffer(HuiDrawingContext *c, const rect &r, Track *t, double pos, const color &col);
-	void DrawSubFrame(HuiDrawingContext *c, const rect &r, Track *s, const color &col, int delay);
-	void DrawSub(HuiDrawingContext *c, const rect &r, Track *s);
-	void DrawMidi(HuiDrawingContext *c, const rect &r, MidiData &midi, color col);
-	void DrawTrack(HuiDrawingContext *c, const rect &r, Track *t, color col, int track_no);
-	void DrawGrid(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
-	void DrawGridTime(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
-	void DrawGridBars(HuiDrawingContext *c, const rect &r, const color &bg, bool show_time = false);
-	void DrawTimeLine(HuiDrawingContext *c, int pos, int type, color &col, bool show_time = false);
-	void DrawSelection(HuiDrawingContext *c, const rect &r);
-	void DrawBackground(HuiDrawingContext *c, const rect &r);
-	void DrawEmptyAudioFile(HuiDrawingContext *c, const rect &r);
-	void DrawAudioFile(HuiDrawingContext *c, const rect &r);
+	void DrawBuffer(HuiPainter *c, const rect &r, Track *t, double pos, const color &col);
+	void DrawSubFrame(HuiPainter *c, const rect &r, Track *s, const color &col, int delay);
+	void DrawSub(HuiPainter *c, const rect &r, Track *s);
+	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col);
+	void DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no);
+	void DrawGrid(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
+	void DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
+	void DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
+	void DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time = false);
+	void DrawSelection(HuiPainter *c, const rect &r);
+	void DrawBackground(HuiPainter *c, const rect &r);
+	void DrawEmptyAudioFile(HuiPainter *c, const rect &r);
+	void DrawAudioFile(HuiPainter *c, const rect &r);
 
 	void OptimizeView();
 	void UpdateMenu();

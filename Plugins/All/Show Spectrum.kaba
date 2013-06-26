@@ -51,7 +51,7 @@ void CreateLines(int type, float x[], float yr[], float yl[])
 			yl.add(clamp(todb(ffl[i]), vol_min, vol_max))
 
 void OnDraw()
-	context c = dlg.BeginDraw("drawing_area")
+	painter c = dlg.BeginDraw("drawing_area")
 	w = c.width
 	h = c.height
 	

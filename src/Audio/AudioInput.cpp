@@ -12,7 +12,7 @@
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 
-#define UPDATE_TIME		5
+#define UPDATE_TIME		0.005f
 
 AudioInput::AudioInput() :
 	PeakMeterSource("AudioInput")

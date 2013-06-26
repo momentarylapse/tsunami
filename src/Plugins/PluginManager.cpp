@@ -270,43 +270,21 @@ void PluginManager::AddPluginsToMenu()
 	msg_db_f("AddPluginsToMenu", 2);
 	Script::Init();
 
-	HuiMenu *m = tsunami->GetMenu()->GetSubMenuByID("menu_plugins");
+	HuiMenu *m = tsunami->GetMenu();
 
-	// "Buffer"..
-	m->AddSeparator();
-	m->AddItem(_("Auf Audiopuffer"), "plugin_on_file");
-	m->EnableItem("plugin_on_file", false);
-
-	HuiMenu *sm = new HuiMenu;
-	m->AddSubMenu(_("Kan&ale"), "", sm);
-	find_plugins_in_dir("Buffer/Channels/", this, sm);
-	sm = new HuiMenu;
-	m->AddSubMenu(_("Dynamik"), "", sm);
-	find_plugins_in_dir("Buffer/Dynamics/", this, sm);
-	sm = new HuiMenu;
-	m->AddSubMenu(_("Echo"), "", sm);
-	find_plugins_in_dir("Buffer/Echo/", this, sm);
-	sm = new HuiMenu;
-	m->AddSubMenu(_("Tonh&ohe"), "", sm);
-	find_plugins_in_dir("Buffer/Pitch/", this, sm);
-	sm = new HuiMenu;
-	m->AddSubMenu(_("Klang"), "", sm);
-	find_plugins_in_dir("Buffer/Sound/", this, sm);
-	sm = new HuiMenu;
-	m->AddSubMenu(_("Synthese"), "", sm);
-	find_plugins_in_dir("Buffer/Synthesizer/", this, sm);
+	// "Buffer"
+	find_plugins_in_dir("Buffer/Channels/", this, m->GetSubMenuByID("menu_plugins_channels"));
+	find_plugins_in_dir("Buffer/Dynamics/", this, m->GetSubMenuByID("menu_plugins_dynamics"));
+	find_plugins_in_dir("Buffer/Echo/", this, m->GetSubMenuByID("menu_plugins_echo"));
+	find_plugins_in_dir("Buffer/Pitch/", this, m->GetSubMenuByID("menu_plugins_pitch"));
+	find_plugins_in_dir("Buffer/Sound/", this, m->GetSubMenuByID("menu_plugins_sound"));
+	find_plugins_in_dir("Buffer/Synthesizer/", this, m->GetSubMenuByID("menu_plugins_synthesizer"));
 
 	// "All"
-	m->AddSeparator();
-	m->AddItem(_("Auf alles"), "plugin_on_audio");
-	m->EnableItem("plugin_on_audio", false);
-	find_plugins_in_dir("All/", this, m);
+	find_plugins_in_dir("All/", this, m->GetSubMenuByID("menu_plugins_on_audio"));
 
 	// rest
-	m->AddSeparator();
-	m->AddItem(_("Eigenst&andig"), "plugin_other");
-	m->EnableItem("plugin_other", false);
-	find_plugins_in_dir("Independent/", this, m);
+	find_plugins_in_dir("Independent/", this, m->GetSubMenuByID("menu_plugins_other"));
 
 	// Events
 	for (int i=0;i<plugin_file.num;i++)

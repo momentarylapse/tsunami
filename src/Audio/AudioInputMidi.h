@@ -49,7 +49,7 @@ private:
 	int npfd;
 	struct pollfd *pfd;
 	int sample_rate;
-	int timer;
+	HuiTimer timer;
 	double offset;
 	bool capturing;
 	bool accumulating;

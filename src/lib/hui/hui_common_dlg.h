@@ -20,17 +20,11 @@ bool _cdecl HuiSelectColor(HuiWindow *win, int r, int g, int b);
 extern int HuiColor[4];
 bool _cdecl HuiSelectFont(HuiWindow *win, const string &title);
 extern string HuiFontname;
-void _cdecl HuiSetProperty(const string &name, const string &value);
-void _cdecl HuiAboutBox(HuiWindow *win);
 
 // additional application properties
-extern string HuiPropName;
-extern string HuiPropVersion;
-extern string HuiPropComment;
-extern string HuiPropLogo;
-extern string HuiPropCopyright;
-extern string HuiPropWebsite;
-extern string HuiPropLicense;
+void _cdecl HuiAboutBox(HuiWindow *win);
+void _cdecl HuiSetProperty(const string &name, const string &value);
+string HuiGetProperty(const string &name);
 extern Array<string> HuiPropAuthors;
 
 // message dialogs

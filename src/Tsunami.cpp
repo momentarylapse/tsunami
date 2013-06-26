@@ -29,7 +29,7 @@ Tsunami *tsunami = NULL;
 extern string AppName;
 extern string AppVersion;
 
-int debug_timer;
+HuiTimer debug_timer;
 
 Tsunami::Tsunami(Array<string> arg) :
 	HuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls)
@@ -130,7 +130,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddText("!width=20\\%", 6, 0, 0, 0, "output_label_percent");
 	volume_slider = new Slider(this, "output_volume_slider", "output_volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
 	AllowEvents("key");
-	ToolbarSetByID("toolbar");
+	toolbar[0]->SetByID("toolbar");
 	//ToolbarConfigure(false, true);
 
 	SetMenu(HuiCreateResourceMenu("menu"));
@@ -144,7 +144,6 @@ Tsunami::Tsunami(Array<string> arg) :
 
 
 	audio = new AudioFile;
-	msg_write(p2s(&audio->sample_rate));
 
 	storage = new Storage;
 
@@ -161,9 +160,8 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	UpdateMenu();
 
-	debug_timer = HuiCreateTimer();
-
-	log->Info("Tsunami " + AppVersion + _(" - viel Erfolg!"));
+	log->Info(AppName + " " + AppVersion);
+	log->Info(_("  viel Erfolg!"));
 
 	audio->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
 
@@ -541,7 +539,7 @@ void Tsunami::UpdateMenu()
 		m->Clear();
 		foreachib(string &l, audio->level_name, i)
 			m->AddItemCheckable(l, format("jump_to_level_%d", i));
-		m->CheckItem(format("jump_to_level_%d", view->cur_level), true);
+		Check(format("jump_to_level_%d", view->cur_level), true);
 	}
 
 	if (audio->used){

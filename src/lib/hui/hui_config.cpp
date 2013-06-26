@@ -1,31 +1,27 @@
 #include "hui.h"
+#include "../base/map.h"
 
 #ifdef OS_WINDOWS
 	#include <tchar.h>
 	int _tchar_str_size_(TCHAR *str);
 #endif
 
-struct HuiConfig
-{
-	string key, value;
-};
-
 static bool HuiConfigLoaded = false;
 bool HuiConfigChanged = false;
-static Array<HuiConfig> _HuiConfig_;
+static Map<string, string> HuiConfig;
+typedef MapEntry<string, string> HuiConfigEntry;
 
 static void LoadConfigFile()
 {
 	CFile *f = OpenFileSilent(HuiAppDirectory + "Data/config.txt");
-	_HuiConfig_.clear();
+	HuiConfig.clear();
 	if (f){
 		int num = f->ReadIntC();
 		for (int i=0;i<num;i++){
-			HuiConfig c;
 			string temp = f->ReadStr();
-			c.key = temp.substr(3, temp.num - 3);
-			c.value = f->ReadStr();
-			_HuiConfig_.add(c);
+			string key = temp.substr(3, temp.num - 3);
+			string value = f->ReadStr();
+			HuiConfig[key] = value;
 		}
 		FileClose(f);
 	}
@@ -37,10 +33,10 @@ void HuiSaveConfigFile()
 	dir_create(HuiAppDirectory + "Data");
 	CFile *f = CreateFileSilent(HuiAppDirectory + "Data/config.txt");
 	f->WriteStr("// NumConfigs");
-	f->WriteInt(_HuiConfig_.num);
-	for (int i=0;i<_HuiConfig_.num;i++){
-		f->WriteStr("// " + _HuiConfig_[i].key);
-		f->WriteStr(_HuiConfig_[i].value);
+	f->WriteInt(HuiConfig.num);
+	foreach(HuiConfigEntry &e, HuiConfig){
+		f->WriteStr("// " + e.key);
+		f->WriteStr(e.value);
 	}
 	f->WriteStr("#");
 	FileClose(f);
@@ -65,17 +61,7 @@ void HuiConfigWriteBool(const string &name, bool val)
 
 void HuiConfigWriteStr(const string &name, const string &str)
 {
-	for (int i=0;i<_HuiConfig_.num;i++)
-		if (_HuiConfig_[i].key == name){
-			_HuiConfig_[i].value = str;
-			HuiConfigChanged = true;
-			//SaveConfigFile();
-			return;
-		}
-	HuiConfig c;
-	c.key = name;
-	c.value = str;
-	_HuiConfig_.add(c);
+	HuiConfig[name] = str;
 	HuiConfigChanged = true;
 	//SaveConfigFile();
 }
@@ -99,10 +85,8 @@ string HuiConfigReadStr(const string &name, const string &default_str)
 {
 	if (!HuiConfigLoaded)
 		LoadConfigFile();
-	for (int i=0;i<_HuiConfig_.num;i++)
-		if (_HuiConfig_[i].key == name){
-			return _HuiConfig_[i].value;
-		}
+	if (HuiConfig.contains(name))
+		return HuiConfig[name];
 	return default_str;
 }
 

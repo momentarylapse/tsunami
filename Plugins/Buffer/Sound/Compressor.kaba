@@ -50,7 +50,7 @@ void DataToDialog()
 	win.SetFloat("edit", data.Delay * 1000)
 
 void Draw()
-	context c = win.BeginDraw("drawing_area")
+	painter c = win.BeginDraw("drawing_area")
 	float w = c.width
 	float h = c.height
 	

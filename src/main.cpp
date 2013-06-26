@@ -9,12 +9,12 @@
 #include "Tsunami.h"
 
 string AppName = "Tsunami";
-string AppVersion = "0.4.1.3";
+string AppVersion = "0.4.2.0";
 
 
 int hui_main(Array<string> arg)
 {
-	HuiInitExtended("tsunami", AppName + " " + AppVersion, NULL, true, "Deutsch");
+	HuiInit("tsunami", true, "Deutsch");
 	HuiSetProperty("name", AppName);
 	HuiSetProperty("version", AppVersion);
 	HuiSetProperty("comment", _("Editor f&ur Audio Dateien"));
@@ -23,9 +23,6 @@ int hui_main(Array<string> arg)
 	HuiSetProperty("author", "Michael Ankele <michi@lupina.de>");
 
 	msg_db_r("main",1);
-	msg_write(AppName + " " + AppVersion);
-	msg_write("");
-
 
 	tsunami = new Tsunami(arg);
 	return tsunami->Run();

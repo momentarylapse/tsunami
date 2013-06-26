@@ -1,5 +1,7 @@
 #include "hui.h"
 #include "hui_internal.h"
+#include "HuiToolbar.h"
+#include "Controls/HuiControl.h"
 #ifdef HUI_API_GTK
 
 
@@ -462,8 +464,9 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 		gtk_widget_set_size_request(window, width, height);
 
 	// icon
-	if (HuiPropLogo.num > 0)
-		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(HuiPropLogo), NULL);
+	string logo = HuiGetProperty("logo");
+	if (logo.num > 0)
+		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), NULL);
 
 	// catch signals
 	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(&OnGtkWindowClose), this);
@@ -486,18 +489,8 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 	gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
 
 	// tool bars
-	toolbar[HuiToolbarTop].widget = gtk_toolbar_new();
-	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar[HuiToolbarTop].widget), true);
-	toolbar[HuiToolbarBottom].widget = gtk_toolbar_new();
-	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar[HuiToolbarBottom].widget),true);
-	toolbar[HuiToolbarLeft].widget = gtk_toolbar_new();
-	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar[HuiToolbarLeft].widget), true);
-	gtk_orientable_set_orientation(GTK_ORIENTABLE(toolbar[HuiToolbarLeft].widget), GTK_ORIENTATION_VERTICAL);
-	toolbar[HuiToolbarRight].widget = gtk_toolbar_new();
-	gtk_toolbar_set_show_arrow(GTK_TOOLBAR(toolbar[HuiToolbarRight].widget), true);
-	gtk_orientable_set_orientation(GTK_ORIENTABLE(toolbar[HuiToolbarRight].widget), GTK_ORIENTATION_VERTICAL);
-
-	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarTop].widget, FALSE, FALSE, 0);
+	gtk_style_context_add_class(gtk_widget_get_style_context(toolbar[HuiToolbarTop]->widget), "primary-toolbar");
+	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarTop]->widget, FALSE, FALSE, 0);
 
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -505,7 +498,7 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 	//gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
 	gtk_widget_show(hbox);
 
-	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HuiToolbarLeft].widget, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HuiToolbarLeft]->widget, FALSE, FALSE, 0);
 
 	plugable = NULL;
 	gl_widget = NULL;
@@ -550,8 +543,8 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 		}
 	}
 
-	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HuiToolbarRight].widget, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarBottom].widget, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HuiToolbarRight]->widget, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarBottom]->widget, FALSE, FALSE, 0);
 
 	// status bar
 	statusbar = gtk_statusbar_new();
@@ -575,6 +568,11 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 HuiWindow::~HuiWindow()
 {
 	msg_db_r("~CHuiWindow",1);
+
+	// quick'n'dirty fix (gtk destroys its widgets recursively)
+	foreach(HuiControl *c, control)
+		c->widget = NULL;
+
 	_CleanUp_();
 
 	gtk_widget_destroy(window);
@@ -697,29 +695,39 @@ void HuiWindow::SetMenu(HuiMenu *_menu)
 	msg_db_r("SetMenu", 1);
 	// remove old menu...
 	if (menu){
+		Array<HuiControl*> list = menu->get_all_controls();
 		// move items from <menu_bar> back to <Menu>
 		for (int i=0;i<gtk_num_menus;i++){
 			gtk_container_remove(GTK_CONTAINER(menubar), GTK_WIDGET(gtk_menu[i]));
-			gtk_menu_shell_append(GTK_MENU_SHELL(menu->g_menu), GTK_WIDGET(gtk_menu[i]));
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu->widget), GTK_WIDGET(gtk_menu[i]));
 		}
 		gtk_menu.clear();
 		gtk_num_menus = 0;
+		menu->set_win(NULL);
+		foreach(HuiControl *c, list){
+			for (int i=0;i<control.num;i++)
+				if (control[i] == c)
+					control.erase(i);
+		}
 	}
 
 	
 	// insert new menu
 	menu = _menu;
 	if (menu){
+		menu->set_win(this);
 		gtk_widget_show(menubar);
 		gtk_num_menus = menu->item.num;
 		for (int i=0;i<menu->item.num;i++){
 			// move items from <Menu> to <menu_bar>
-			HuiMenuItem *it = &menu->item[i];
+			HuiControl *it = menu->item[i];
 			gtk_menu.add(it->widget);
 			gtk_widget_show(gtk_menu[i]);
-			gtk_container_remove(GTK_CONTAINER(menu->g_menu), gtk_menu[i]);
+			gtk_container_remove(GTK_CONTAINER(menu->widget), gtk_menu[i]);
 			gtk_menu_shell_append(GTK_MENU_SHELL(menubar), gtk_menu[i]);
 		}
+		Array<HuiControl*> list = menu->get_all_controls();
+		control.append(list);
 	}else
 		gtk_widget_hide(menubar);
 	msg_db_l(1);
@@ -1048,7 +1056,7 @@ void HuiWindow::Activate(const string &control_id)
 	if (control_id.num > 0)
 		for (int i=0;i<control.num;i++)
 			if (control_id == control[i]->id)
-				gtk_widget_grab_focus(control[i]->widget);
+				control[i]->Focus();
 }
 
 bool HuiWindow::IsActive(bool include_sub_windows)

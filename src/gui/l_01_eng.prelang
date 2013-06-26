@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-169
+178
 // Data (ID,Text)
 about
 
@@ -159,6 +159,22 @@ menu_level_target
 
 menu_plugins
 
+menu_plugins_channels
+
+menu_plugins_dynamics
+
+menu_plugins_echo
+
+menu_plugins_on_audio
+
+menu_plugins_other
+
+menu_plugins_pitch
+
+menu_plugins_sound
+
+menu_plugins_synthesizer
+
 menu_sound
 
 menu_sub
@@ -220,6 +236,8 @@ percent
 play
 Play
 play_loop
+
+plugin_on_file
 
 preview
 Preview
@@ -350,9 +368,11 @@ zoom_out
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
 
-!bold\\Kommentar/Geschehnisse:
+!bold$Kommentar/Geschehnisse:
 
-!bold\\Name:
+!bold$Name:
+
+!wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
 '%s'\nDatei speichern?
 
@@ -373,6 +393,8 @@ Abtastrate\\\") + i2s(audio->sample_rate) +
 Amplitude zu groß, Signal übersteuert.
 
 Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
+
+Anwendung ohne Netzwerk-Unterstützung compiliert...
 
 Auf Audiopuffer
 
@@ -422,9 +444,7 @@ Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)
 
 Fehler
 Error
-Fehler in  Script-Datei: \"%s\"
-
-Fehler in  Script-Datei: \"%s\"\n%s\n%s
+Fehler in  Script-Datei: \"%s\"\n%s
 
 Fehlerbericht
 
@@ -447,8 +467,6 @@ Konnte Aufnahmegerät nicht öffnen
 Meldungen
 
 Nachrichten
-
-Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
 OK
 

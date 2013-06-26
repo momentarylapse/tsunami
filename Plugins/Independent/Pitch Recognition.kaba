@@ -53,7 +53,7 @@ string get_note(float f)
 	//loopf(fl, 0, 1)
 	//note = i2s(n)
 
-void DrawVolume(context c)
+void DrawVolume(painter c)
 	c.SetColor(color(1, 0.8, 0.8, 0.8))
 	float y0 = 30
 	float y1 = c.height - 5
@@ -63,7 +63,7 @@ void DrawVolume(context c)
 	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 void Draw()
-	context c = win.BeginDraw("drawing")
+	painter c = win.BeginDraw("drawing")
 	c.SetColor(White)
 	c.SetFontSize(12)
 	c.DrawRect(0, 0, c.width, c.height)

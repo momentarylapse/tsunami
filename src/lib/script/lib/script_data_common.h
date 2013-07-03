@@ -24,8 +24,8 @@ void add_type_cast(int penalty, Type *source, Type *dest, const string &cmd, voi
 extern void **cur_vtable;
 
 #define class_set_vtable(type) \
-	type type##Instance; \
-	cur_vtable = *(void***)&type##Instance;
+	{type type##Instance; \
+	cur_vtable = *(void***)&type##Instance;}
 
 class MFDummyClass
 {};

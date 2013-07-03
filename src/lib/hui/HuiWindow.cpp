@@ -53,6 +53,22 @@ HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height, H
 	_Init_(title, x, y, width, height, root, allow_root, mode);
 }
 
+HuiWindow::HuiWindow()
+{
+	_Init_("", -1, -1, 0, 0, NULL, true, HuiWinModeDummy);
+}
+
+HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height)
+{
+	_Init_(title, x, y, width, height, NULL, true, HuiWinModeResizable | HuiWinModeControls);
+}
+
+void HuiWindow::__init_ext__(const string& title, int x, int y, int width, int height)
+{
+	msg_write("init ext");
+	new(this) HuiWindow(title, x, y, width, height);
+}
+
 
 HuiWindow::HuiWindow(const string &id, HuiWindow *parent, bool allow_parent)
 {
@@ -695,29 +711,6 @@ bool HuiWindow::IsExpanded(const string &_id, int row)
 
 
 
-HuiWindow *HuiCreateWindow(const string &title,int x,int y,int width,int height)
-{
-	return new HuiWindow(	title,
-							x, y, width, height,
-							NULL, true,
-							HuiWinModeResizable);
-}
-
-HuiWindow *HuiCreateNixWindow(const string &title,int x,int y,int width,int height)
-{
-	return new HuiWindow(	title,
-							x, y, width, height,
-							NULL, true,
-							HuiWinModeResizable | HuiWinModeNix);
-}
-
-HuiWindow *HuiCreateControlWindow(const string &title,int x,int y,int width,int height)
-{
-	return new HuiWindow(	title,
-							x, y, width, height,
-							NULL, true,
-							HuiWinModeResizable | HuiWinModeControls);
-}
 
 HuiWindow *HuiCreateDialog(const string &title,int width,int height,HuiWindow *root,bool allow_root)
 {
@@ -735,12 +728,6 @@ HuiWindow *HuiCreateSizableDialog(const string &title,int width,int height,HuiWi
 							HuiWinModeControls | HuiWinModeResizable);
 }
 
-// mainly for script usage...
-void HuiCloseWindow(HuiWindow *win)
-{
-	delete(win);
-}
-
 void HuiFuncIgnore()
 {
 }
@@ -748,4 +735,34 @@ void HuiFuncIgnore()
 void HuiFuncClose()
 {
 	delete(HuiGetEvent()->win);
+}
+
+HuiNixWindow::HuiNixWindow(const string& title, int x, int y, int width, int height) :
+	HuiWindow(title, x, y, width, height, NULL, true, HuiWinModeResizable | HuiWinModeNix)
+{
+}
+
+void HuiNixWindow::__init_ext__(const string& title, int x, int y, int width, int height)
+{
+	new(this) HuiNixWindow(title, x, y, width, height);
+}
+
+HuiDialog::HuiDialog(const string& title, int width, int height, HuiWindow* root, bool allow_root) :
+	HuiWindow(title, -1, -1, width, height, root, allow_root, HuiWinModeControls | HuiWinModeResizable)
+{
+}
+
+void HuiDialog::__init_ext__(const string& title, int width, int height, HuiWindow* root, bool allow_root)
+{
+	new(this) HuiDialog(title, width, height, root, allow_root);
+}
+
+HuiFixedDialog::HuiFixedDialog(const string& title, int width, int height, HuiWindow* root, bool allow_root) :
+	HuiWindow(title, -1, -1, width, height, root, allow_root, HuiWinModeControls)
+{
+}
+
+void HuiFixedDialog::__init_ext__(const string& title, int width, int height, HuiWindow* root, bool allow_root)
+{
+	new(this) HuiFixedDialog(title, width, height, root, allow_root);
 }

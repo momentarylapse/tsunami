@@ -51,10 +51,10 @@ void OnChords()
 
 void OnClose()
 	output.Stop()
-	HuiWinClose(dlg)
+	delete dlg
 
 void main()
-	dlg = HuiCreateSizableDialog("Metronome 2", 200, 80, MainWin, true)
+	dlg = new Dialog("Metronome 2", 200, 80, MainWin, true)
 	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
 	dlg.SetTarget("table1", 0)
 	dlg.AddControlTable("", 0, 0, 2, 3, "table2")

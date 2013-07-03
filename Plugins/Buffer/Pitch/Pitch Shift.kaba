@@ -41,7 +41,7 @@ void shift_buf(float b[])
 
 void Configure()
 	// dialog
-	PitchDialog=HuiCreateDialog("Pitch Shift",305,75,MainWin,false)
+	PitchDialog = new FixedDialog("Pitch Shift",305,75,MainWin,false)
 	PitchDialog.AddSlider("",5,5,205,25,"pitch_slider")
 	PitchDialog.AddSpinButton("\\0\\1000\\0.1",215,5,50,25,"pitch")
 	PitchDialog.AddText("%",270,5,30,25,"")

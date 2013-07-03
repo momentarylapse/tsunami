@@ -86,9 +86,14 @@ class HuiWindow : public HuiEventHandler
 	friend class HuiControlGrid;
 	friend class HuiControlRadioButton;
 public:
+	HuiWindow();
 	HuiWindow(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
+	HuiWindow(const string &title, int x, int y, int width, int height);
 	HuiWindow(const string &id, HuiWindow *parent, bool allow_parent);
 	virtual ~HuiWindow();
+	void __init_ext__(const string &title, int x, int y, int width, int height);
+	virtual void __delete__();
+
 	void _Init_(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
 	void _InitGeneric_(HuiWindow *parent, bool allow_parent, int mode);
 	void _CleanUp_();
@@ -141,6 +146,23 @@ public:
 	void EventMX(const string &id, const string &msg, HuiEventHandler* handler, T fun)
 	{	_EventMX(id, msg, handler, (void(HuiEventHandler::*)())fun);	}
 	bool _SendEvent_(HuiEvent *e);
+
+	// events by overwriting
+	virtual void OnMouseMove(){}
+	virtual void OnLeftButtonDown(){}
+	virtual void OnMiddleButtonDown(){}
+	virtual void OnRightButtonDown(){}
+	virtual void OnLeftButtonUp(){}
+	virtual void OnMiddleButtonUp(){}
+	virtual void OnRightButtonUp(){}
+	virtual void OnDoubleClick(){}
+	virtual void OnMouseWheel(){}
+	virtual bool CanClose(){ return true; }
+	virtual void OnKeyDown(){}
+	virtual void OnKeyUp(){}
+	virtual void OnResize(){}
+	virtual void OnMove(){}
+	virtual void OnRedraw(){}
 
 	// creating controls
 	void _cdecl AddButton(const string &title,int x,int y,int width,int height,const string &id);
@@ -285,16 +307,32 @@ private:
 	//HuiCompleteWindowMessage CompleteWindowMessage;
 };
 
+
+class HuiNixWindow : public HuiWindow
+{
+public:
+	HuiNixWindow(const string &title, int x, int y, int width, int height);
+	void __init_ext__(const string &title, int x, int y, int width, int height);
+};
+
+class HuiDialog : public HuiWindow
+{
+public:
+	HuiDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+	void __init_ext__(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+};
+
+class HuiFixedDialog : public HuiWindow
+{
+public:
+	HuiFixedDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+	void __init_ext__(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+};
+
 extern HuiWindow *HuiCurWindow;
 
 void _cdecl HuiWindowAddControl(HuiWindow *win, const string &type, const string &title, int x, int y, int width, int height, const string &id);
 
-HuiWindow *_cdecl HuiCreateWindow(const string &title, int x, int y, int width, int height);
-HuiWindow *_cdecl HuiCreateNixWindow(const string &title, int x, int y, int width, int height);
-HuiWindow *_cdecl HuiCreateControlWindow(const string &title, int x, int y, int width, int height);
-HuiWindow *_cdecl HuiCreateDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
-HuiWindow *_cdecl HuiCreateSizableDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
-void _cdecl HuiCloseWindow(HuiWindow *win);
 
 void HuiFuncIgnore();
 void HuiFuncClose();
@@ -304,7 +342,7 @@ enum{
 	HuiWinModeNoFrame = 2,
 	HuiWinModeNoTitle = 4,
 	HuiWinModeControls = 8,
-//	HuiWinModeDummy = 16,
+	HuiWinModeDummy = 16,
 	HuiWinModeNix = 32,
 };
 

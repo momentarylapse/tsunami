@@ -102,7 +102,8 @@ struct Serializer
 	void SerializeBlock(Block *block, int level);
 	void SerializeParameter(Command *link, int level, int index, SerialCommandParam &param);
 	SerialCommandParam SerializeCommand(Command *com, int level, int index);
-	void SerializeOperator(Command *com, SerialCommandParam *param, SerialCommandParam &ret);
+	void SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, int level, int index, int marker_before_params);
+	void SerializeOperator(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret);
 	void AddFunctionIntro(Function *f);
 
 	void cmd_list_out();

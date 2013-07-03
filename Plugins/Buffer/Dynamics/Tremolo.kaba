@@ -39,7 +39,7 @@ void ResetData()
 
 void Configure()
 	// dialog
-	dlg=HuiCreateDialog("Tremolo",415,145,MainWin,false)
+	dlg = new FixedDialog("Tremolo",415,145,MainWin,false)
 	dlg.AddSlider("",115,35,205,25,"speed_slider")
 	dlg.AddSpinButton("\\0\\10000\\0.1",325,35,50,25,"speed")
 	dlg.AddText("Hz",380,35,30,25,"")

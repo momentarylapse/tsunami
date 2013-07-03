@@ -11,7 +11,7 @@
 
 Log::Log(HuiWindow *parent)
 {
-	dlg = HuiCreateSizableDialog(_("Meldungen"), 500, 300, parent, true);
+	dlg = new HuiDialog(_("Meldungen"), 500, 300, parent, true);
 	dlg->toolbar[0]->SetByID("log_toolbar");
 	dlg->AddListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
 

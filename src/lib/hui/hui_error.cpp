@@ -57,7 +57,7 @@ void OnReportDialogClose()
 void HuiSendBugReport()
 {
 	// dialog
-	ReportDialog=HuiCreateDialog(_("Fehlerbericht"),400,295,ErrorDialog,false);
+	ReportDialog = new HuiFixedDialog(_("Fehlerbericht"),400,295,ErrorDialog,false);
 	ReportDialog->AddText(_("!bold$Name:"),5,5,360,25,"brd_t_name");
 	ReportDialog->AddEdit("",5,35,385,25,"report_sender");
 	ReportDialog->AddDefButton(_("OK"),265,255,120,25,"ok");
@@ -118,7 +118,7 @@ void hui_default_error_handler()
 	//HuiErrorBox(NULL,"Fehler","Fehler");
 
 	// dialog
-	ErrorDialog=HuiCreateDialog(_("Fehler"),600,500,NULL,false);
+	ErrorDialog = new HuiFixedDialog(_("Fehler"),600,500,NULL,false);
 	ErrorDialog->AddText(HuiGetProperty("name") + " " + HuiGetProperty("version") + _(" ist abgest&urzt!		Die letzten Zeilen der Datei message.txt:"),5,5,590,20,"error_header");
 	ErrorDialog->AddListView(_("Nachrichten"),5,30,590,420,"message_list");
 	//ErrorDialog->AddEdit("",5,30,590,420,"message_list";

@@ -29,24 +29,20 @@
 
 string::string()
 {
-//	printf("init\n");
 	init(sizeof(char));
 }
 
 string::string(const char *str)
 {
-//	printf("init char*\n");
 	init(sizeof(char));
 	int l = strlen(str);
 	resize(l);
 	if (l > 0)
 		memcpy(data, str, l);
-//	printf("--   %s\n", c_str());
 }
 
 string::string(const char *str, int l)
 {
-//	printf("init len\n");
 	init(sizeof(char));
 	resize(l);
 	if (l > 0)
@@ -55,23 +51,18 @@ string::string(const char *str, int l)
 
 string::string(const string &s)
 {
-//	printf("init string\n");
 	init(sizeof(char));
 	assign(&s);
 }
 
 void string::__init__()
 {
-	init(sizeof(char));
+	new(this) string;
 }
 
 string::~string()
 {
-//	printf("~     %d", num);
-//	printf("'%s'\n", c_str());
-	//printf("   %c\n", ((char*)data)[0]);
 	clear();
-//	printf("/~\n");
 }
 
 string string::substr(int start, int length) const
@@ -277,7 +268,6 @@ inline char *get_str(int size)
 
 const char *string::c_str() const
 {
-	//reserve(num + 1);
 	if (allocated > num){
 		((char*)data)[num] = 0;
 		return (const char*)data;
@@ -294,18 +284,10 @@ const char *string::c_str() const
 // accepts windows and linux paths ("/" and "\\")
 string string::sys_filename() const
 {
-	string r = *this;
 #ifdef OS_WINDOWS
-	for (int i=0;i<r.num;i++)
-		if (r[i]=='/')
-			r[i]='\\';
+	return replace("/", "\\");
 #endif
-#ifdef OS_LINUX
-	for (int i=0;i<r.num;i++)
-		if (r[i]=='\\')
-			r[i]='/';
-#endif
-	return r;
+	return replace("\\", "/");
 }
 
 // ends with '/' or '\'

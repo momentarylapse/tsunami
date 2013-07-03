@@ -72,16 +72,6 @@ void NetInit()
 
 Socket::Socket()
 {
-	__init__();
-}
-
-Socket::~Socket()
-{
-	__delete__();
-}
-
-void Socket::__init__()
-{
 	s = -1;
 	buffer = new string;
 	buffer_pos = 0;
@@ -89,11 +79,21 @@ void Socket::__init__()
 	uid = NetCurrentSocketID ++;
 }
 
-void Socket::__delete__()
+Socket::~Socket()
 {
 	if (s >= 0)
 		Close();
 	delete(buffer);
+}
+
+void Socket::__init__()
+{
+	new(this) Socket;
+}
+
+void Socket::__delete__()
+{
+	this->~Socket();
 }
 
 Socket Socket::operator=(const Socket &other)

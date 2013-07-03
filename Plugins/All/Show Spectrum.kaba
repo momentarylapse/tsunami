@@ -68,10 +68,10 @@ void OnType()
 	dlg.Redraw("drawing_area")
 
 void OnClose()
-	HuiWinClose(dlg)
+	delete dlg
 
 void show_spec()
-	dlg = HuiCreateSizableDialog("Spectrum", 600, 460, MainWin, true)
+	dlg = new Dialog("Spectrum", 600, 460, MainWin, true)
 	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
 	dlg.SetTarget("table1", 0)
 	dlg.AddDrawingArea("", 0, 0, 0, 0, "drawing_area")

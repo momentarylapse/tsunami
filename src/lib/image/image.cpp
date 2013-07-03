@@ -7,12 +7,12 @@ string ImageVersion = "0.2.3.0";
 
 void Image::__init__()
 {
-	data.__init__();
+	new(this) Image;
 }
 
 void Image::__delete__()
 {
-	data.clear();
+	this->~Image();
 }
 
 // mode: rgba

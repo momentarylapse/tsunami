@@ -463,7 +463,7 @@ void SyntaxTree::GetFunctionCall(const string &f_name, Command *Operand, Functio
 		}else{
 			Exp.rewind();
 			//DoError("\"(\" expected in front of parameter list");
-			DoError("only script functions can be referenced");
+			DoError("only functions can be referenced");
 		}
 	}
 
@@ -536,6 +536,13 @@ Command *SyntaxTree::GetOperand(Function *f)
 		Type *t = GetType(Exp.cur, true);
 		Operand = add_command_compilerfunc(CommandNew);
 		Operand->type = GetPointerType(t);
+		if (Exp.cur == "("){
+			ClassFunction *cf = t->GetComplexConstructor();
+			if (!cf)
+				DoError(format("class \"%s\" does not have a constructor with parameters", t->name.c_str()));
+			Operand->param[0] = DoClassFunction(this, NULL, *cf, f);
+			Operand->num_params = 1;
+		}
 	}else if (Exp.cur == "delete"){ // delete operator
 		Exp.next();
 		Operand = add_command_compilerfunc(CommandDelete);
@@ -1481,35 +1488,20 @@ void SyntaxTree::ParseClass()
 		so("vererbung der struktur");
 		Exp.next();
 		Type *parent = GetType(Exp.cur, true);
-		bool found = false;
-		if (parent->element.num > 0){
-			// inheritance of elements
-			_class->element = parent->element;
-			found = true;
-		}
-		if (parent->function.num > 0){
-			// inheritance of functions
-			foreach(ClassFunction &f, parent->function)
-				if ((f.name != "__init__") && (f.name != "__delete__") && (f.name != "__assign__"))
-					_class->function.add(f);
-			found = true;
-		}
-		if (!found)
+		if (!_class->DeriveFrom(parent))
 			DoError(format("parental type in class definition after \":\" has to be a class, but (%s) is not", parent->name.c_str()));
-		_class->parent = parent;
 		_offset = parent->size;
 	}
 	ExpectNewline();
 
-	// virtual functions?
-	int parent_virtual_count = 0;
-	if (_class->parent)
-		parent_virtual_count = _class->parent->num_virtual;
-	int virtual_count = class_count_virtual_functions(this) + parent_virtual_count;
-	if (virtual_count > 0){
+	// virtual functions?     (derived -> _class->num_virtual)
+	int cur_virtual_index = _class->num_virtual;
+	_class->num_virtual += class_count_virtual_functions(this);
+	if (_class->num_virtual > 0){
 		if (_class->parent){
 			if (!_class->parent->vtable)
 				DoError("no virtual functions allowed when inheriting from class without virtual functions");
+			// element "-vtable-" being derived
 		}else{
 			ClassElement el;
 			el.name = "-vtable-";
@@ -1518,10 +1510,8 @@ void SyntaxTree::ParseClass()
 			_class->element.add(el);
 			_offset = config.PointerSize;
 		}
-		_class->vtable = new VirtualTable[virtual_count];
-		_class->num_virtual = virtual_count;
+		_class->vtable = new VirtualTable[_class->num_virtual];
 	}
-	virtual_count = parent_virtual_count;
 
 	// elements
 	for (int num=0;true;num++){
@@ -1569,7 +1559,7 @@ void SyntaxTree::ParseClass()
 			if (is_function){
 				Exp.cur_exp = ie;
 				Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
-				ParseClassFunction(_class, next_extern, next_virtual ? (virtual_count ++) : -1);
+				ParseClassFunction(_class, next_extern, next_virtual ? (cur_virtual_index ++) : -1);
 
 				break;
 			}

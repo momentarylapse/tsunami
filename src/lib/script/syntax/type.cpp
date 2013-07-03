@@ -55,7 +55,12 @@ bool Type::is_simple_class()
 		return false;
 	if (vtable)
 		return false;
-	if (GetConstructor())
+	if (parent)
+		if (!parent->is_simple_class())
+			return false;
+	if (GetDefaultConstructor())
+		return false;
+	if (GetComplexConstructor())
 		return false;
 	if (GetDestructor())
 		return false;
@@ -86,10 +91,18 @@ int Type::GetFunc(const string &name)
 	return -1;
 }
 
-ClassFunction *Type::GetConstructor()
+ClassFunction *Type::GetDefaultConstructor()
 {
 	foreach(ClassFunction &f, function)
 		if ((f.name == "__init__") && (f.return_type == TypeVoid) && (f.param_type.num == 0))
+			return &f;
+	return NULL;
+}
+
+ClassFunction *Type::GetComplexConstructor()
+{
+	foreach(ClassFunction &f, function)
+		if ((f.name == "__init__") && (f.return_type == TypeVoid) && (f.param_type.num > 0))
 			return &f;
 	return NULL;
 }
@@ -115,6 +128,14 @@ void Type::LinkVirtualTable()
 	if (!vtable)
 		return;
 
+	// evil hack: try to overwrite "real" c++ destructor
+	foreach(ClassFunction &cf, function)
+		if (cf.virtual_index >= 0){
+			if ((cf.nr >= 0) && (cf.name == "__delete__"))
+				for (int i=0;i<cf.virtual_index;i++)
+					vtable[i] = (void*)cf.script->func[cf.nr];
+		}
+
 	// link virtual functions into vtable
 	foreach(ClassFunction &cf, function)
 		if (cf.virtual_index >= 0){
@@ -122,6 +143,28 @@ void Type::LinkVirtualTable()
 				vtable[cf.virtual_index] = (void*)cf.script->func[cf.nr];
 			num_virtual = max(cf.virtual_index + 1, num_virtual);
 		}
+}
+
+bool Type::DeriveFrom(Type* root)
+{
+	parent = root;
+	bool found = false;
+	if (parent->element.num > 0){
+		// inheritance of elements
+		element = parent->element;
+		found = true;
+	}
+	if (parent->function.num > 0){
+		// inheritance of functions
+		foreach(ClassFunction &f, parent->function){
+			if ((f.name != "__init__") && (f.name != "__assign__"))
+				function.add(f);
+		}
+		found = true;
+	}
+	size += parent->size;
+	num_virtual += parent->num_virtual;
+	return found;
 }
 
 string Type::var2str(void *p)

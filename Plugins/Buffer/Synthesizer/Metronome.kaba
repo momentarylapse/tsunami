@@ -66,7 +66,7 @@ void OnMetroVolume()
 
 void Configure()
 	// dialog
-	dlg=HuiCreateDialog("Metronom",255,135,MainWin,false)
+	dlg = new FixedDialog("Metronom",255,135,MainWin,false)
 	dlg.AddText("Geschwindigkeit:",5,5,100,25,"")
 	dlg.AddSpinButton("\\0\\1000\\0.1",110,5,100,25,"beats_per_minute")
 	dlg.AddText("/min",215,5,30,25,"")

@@ -9,7 +9,7 @@
 #ifndef _HUI_MENU_EXISTS_
 #define _HUI_MENU_EXISTS_
 
-
+#include "hui_common.h"
 
 
 class HuiWindow;

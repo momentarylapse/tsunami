@@ -19,10 +19,10 @@ void OnFrequency()
 
 void OnClose()
 	output.Stop()
-	HuiWinClose(dlg)
+	delete dlg
 
 void main()
-	dlg = HuiCreateSizableDialog("Pitchfork", 200, 80, MainWin, false)
+	dlg = new Dialog("Pitchfork", 200, 80, MainWin, false)
 	dlg.AddControlTable("", 0, 0, 1, 2, "table")
 	dlg.SetTarget("table", 0)
 	dlg.AddSpinButton("", 0, 0, 0, 0, "frequency")

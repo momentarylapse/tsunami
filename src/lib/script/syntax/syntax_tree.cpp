@@ -93,6 +93,7 @@ Command *SyntaxTree::add_command_compilerfunc(int cf)
 	return c;
 }
 
+// link as NON-VIRTUAL function!
 Command *SyntaxTree::add_command_classfunc(Type *class_type, ClassFunction &f, Command *inst)
 {
 	Command *c = AddCommand();

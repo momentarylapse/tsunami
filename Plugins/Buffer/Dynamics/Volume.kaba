@@ -30,7 +30,7 @@ void OnVolume()
 
 void Configure()
 	// dialog
-	VolumeDialog=HuiCreateDialog("Lautstärke",305,105,MainWin,false)
+	VolumeDialog = new FixedDialog("Lautstärke",305,105,MainWin,false)
 	VolumeDialog.AddSlider("",5,5,205,25,"volume_slider")
 	VolumeDialog.AddSpinButton("\\0\\1000\\0.1",215,5,60,25,"volume")
 	VolumeDialog.AddText("%",280,5,20,25,"")

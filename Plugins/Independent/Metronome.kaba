@@ -31,10 +31,10 @@ void OnBpm()
 
 void OnClose()
 	output.Stop()
-	HuiWinClose(dlg)
+	delete dlg
 
 void main()
-	dlg = HuiCreateSizableDialog("Metronome", 200, 80, MainWin, false)
+	dlg = new Dialog("Metronome", 200, 80, MainWin, false)
 	dlg.AddControlTable("", 0, 0, 1, 2, "table")
 	dlg.SetTarget("table", 0)
 	dlg.AddSpinButton("", 0, 0, 0, 0, "bpm")

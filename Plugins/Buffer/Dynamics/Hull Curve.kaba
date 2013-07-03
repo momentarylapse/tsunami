@@ -129,7 +129,7 @@ void OnMouseMove()
 
 void Configure()
 	// dialog
-	dlg = HuiCreateSizableDialog("Hull Curve",600,420,MainWin,false)
+	dlg = new Dialog("Hull Curve",600,420,MainWin,false)
 	dlg.AddControlTable("", 0, 0, 1, 4, "table")
 	dlg.SetTarget("table", 0)
 	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")

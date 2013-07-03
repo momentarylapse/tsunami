@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.12.0.0";
+string Version = "0.12.1.0";
 
 //#define ScriptDebug
 
@@ -414,7 +414,8 @@ void Script::ShowVars(bool include_consts)
 
 void Script::Execute()
 {
-	if (WaitingMode==WaitingModeNone)	return;
+	if (WaitingMode == WaitingModeNone)
+		return;
 	#ifdef ScriptDebug
 		//so("\n\n\n################### fuehre aus ######################\n\n\n");
 	#endif
@@ -424,8 +425,8 @@ void Script::Execute()
 	msg_db_f(Filename.c_str(),1);
 
 	// handle wait-commands
-	if (WaitingMode==WaitingModeFirst){
-		GlobalWaitingMode=WaitingModeNone;
+	if (WaitingMode == WaitingModeFirst){
+		GlobalWaitingMode = WaitingModeNone;
 		msg_db_f("->First",1);
 		//msg_right();
 		first_execution();

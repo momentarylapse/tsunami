@@ -152,9 +152,9 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 	// dialog
 	HuiWindow *dlg;
 	if (res->type == "SizableDialog")
-		dlg = HuiCreateSizableDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);
+		dlg = new HuiDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);
 	else
-		dlg = HuiCreateDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);
+		dlg = new HuiFixedDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);
 
 	// menu?
 	if (res->s_param[0].num > 0)

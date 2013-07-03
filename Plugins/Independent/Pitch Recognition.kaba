@@ -93,7 +93,7 @@ void Draw()
 	c.End()
 
 void OnClose()
-	HuiWinClose(win)
+	delete win
 	win = nil
 
 void UpdateInput()
@@ -147,7 +147,7 @@ void UpdateInput()
 complex bufc[]
 
 void main()
-	win = HuiCreateDialog("Tonerkennung", 300, 145, MainWin, false)
+	win = new FixedDialog("Tonerkennung", 300, 145, MainWin, false)
 	win.AddDrawingArea("", 5, 5, 290, 135, "drawing")
 	
 	win.EventX("drawing", "hui:redraw", &Draw)

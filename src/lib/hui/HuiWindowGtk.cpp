@@ -167,8 +167,10 @@ gboolean OnGtkWindowClose(GtkWidget *widget, GdkEvent *event, gpointer user_data
 	HuiEvent e = HuiEvent("", "hui:close");
 	if (win->_SendEvent_(&e))
 		return true;
+	if (!win->CanClose())
+		return true;
 	
-	// no message function (and last window in thie main level): end program
+	// no message function (and last window in this main level): end program
 	// ...or at least end nested main level
 	int n = 0;
 	foreach(HuiWindow *w, HuiWindows)
@@ -183,6 +185,7 @@ void OnGtkWindowResize(GtkWidget *widget, GtkRequisition *requisition, gpointer 
 {
 	HuiWindow *win = (HuiWindow *)user_data;
 	HuiEvent e = HuiEvent("", "hui:resize");
+	win->OnResize();
 	win->_SendEvent_(&e);
 }
 
@@ -231,6 +234,7 @@ gboolean OnGtkWindowMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer
 	win->input.rb = ((mod & GDK_BUTTON3_MASK) > 0);
 	HuiEvent e = HuiEvent("", "hui:mouse-move");
 	win->_SendEvent_(&e);
+	win->OnMouseMove();
 
 	/*if (win){
 		// don't listen to "event", it lacks behind
@@ -276,26 +280,29 @@ gboolean OnGtkWindowMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer
 gboolean OnGtkWindowMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
 {
 	HuiWindow *win = (HuiWindow*)user_data;
-	if (win){
-		if (event->direction == GDK_SCROLL_UP)
-			win->input.dz = 1;
-		else if (event->direction == GDK_SCROLL_DOWN)
-			win->input.dz = -1;
-		HuiEvent e = HuiEvent("", "hui:mouse-wheel");
-		win->_SendEvent_(&e);
-	}
+	if (event->direction == GDK_SCROLL_UP)
+		win->input.dz = 1;
+	else if (event->direction == GDK_SCROLL_DOWN)
+		win->input.dz = -1;
+	HuiEvent e = HuiEvent("", "hui:mouse-wheel");
+	win->_SendEvent_(&e);
+	win->OnMouseWheel();
 	return false;
 }
 
 gboolean OnGtkWindowKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-	process_key(event, widget, (HuiWindow*)user_data, true);
+	HuiWindow *win = (HuiWindow*)user_data;
+	process_key(event, widget, win, true);
+	win->OnKeyDown();
 	return false;
 }
 
 gboolean OnGtkWindowKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-	process_key(event, widget, (HuiWindow*)user_data, false);
+	HuiWindow *win = (HuiWindow*)user_data;
+	process_key(event, widget, win, false);
+	win->OnKeyUp();
 	return false;
 }
 
@@ -304,6 +311,7 @@ gboolean OnGtkWindowExpose(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	HuiWindow *win = (HuiWindow*)user_data;
 	HuiEvent e = HuiEvent("", "hui:redraw");
 	win->_SendEvent_(&e);
+	win->OnRedraw();
 	return false;
 }
 
@@ -352,18 +360,28 @@ gboolean OnGtkWindowButtonDown(GtkWidget *widget, GdkEventButton *event, gpointe
 #endif
 	HuiWindow *win = (HuiWindow*)user_data;
 	if (set_button_state(widget, event)){
-		string msg = "hui:";
-		if (event->button == 1)
-			msg += "left";
-		else if (event->button == 2)
-			msg += "middle";
-		else if (event->button == 3)
-			msg += "right";
-		if (event->type == GDK_2BUTTON_PRESS)
-			msg += "-double-click";
-		else
-			msg += "-button-down";
-		HuiEvent e = HuiEvent("", msg);
+		HuiEvent e;
+		if (event->type == GDK_2BUTTON_PRESS){
+			if (event->button == 1){
+				e = HuiEvent("", "hui:left-double-click");
+				win->OnDoubleClick();
+			}else if (event->button == 2){
+				e = HuiEvent("", "hui:middle-double-click");
+			}else if (event->button == 3){
+				e = HuiEvent("", "hui:right-double-click");
+			}
+		}else{
+			if (event->button == 1){
+				e = HuiEvent("", "hui:left-button-down");
+				win->OnLeftButtonDown();
+			}else if (event->button == 2){
+				e = HuiEvent("", "hui:middle-button-down");
+				win->OnMiddleButtonDown();
+			}else if (event->button == 3){
+				e = HuiEvent("", "hui:right-button-down");
+				win->OnRightButtonDown();
+			}
+		}
 		win->_SendEvent_(&e);
 	}
 	return false;
@@ -373,15 +391,17 @@ gboolean OnGtkWindowButtonUp(GtkWidget *widget, GdkEventButton *event, gpointer 
 {
 	HuiWindow *win = (HuiWindow*)user_data;
 	if (set_button_state(widget, event)){
-		string msg = "hui:";
-		if (event->button == 1)
-			msg += "left";
-		else if (event->button == 2)
-			msg += "middle";
-		else if (event->button == 3)
-			msg += "right";
-		msg += "-button-up";
-		HuiEvent e = HuiEvent("", msg);
+		HuiEvent e;
+		if (event->button == 1){
+			e = HuiEvent("", "hui:left-button-up");
+			win->OnLeftButtonUp();
+		}else if (event->button == 2){
+			e = HuiEvent("", "hui:middle-button-up");
+			win->OnMiddleButtonUp();
+		}else if (event->button == 3){
+			e = HuiEvent("", "hui:right-button-up");
+			win->OnRightButtonUp();
+		}
 		win->_SendEvent_(&e);
 	}
 	return false;
@@ -413,7 +433,11 @@ gboolean focus_in_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_d
 
 void HuiWindow::_Init_(const string &title, int x, int y, int width, int height, HuiWindow *root, bool allow_root, int mode)
 {
-	msg_db_r("HuiWindow()",1);
+	msg_db_f("HuiWindow()",1);
+
+	window = NULL;
+	if ((mode & HuiWinModeDummy) > 0)
+		return;
 
 	_InitGeneric_(root, allow_root, mode);
 	
@@ -561,13 +585,14 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 		gtk_widget_show(edit);
 	}*/
 	//###########################################################################################
-
-	msg_db_l(1);
 }
 
 HuiWindow::~HuiWindow()
 {
-	msg_db_r("~CHuiWindow",1);
+	msg_db_f("~CHuiWindow",1);
+
+	if (!window)
+		return;
 
 	// quick'n'dirty fix (gtk destroys its widgets recursively)
 	foreach(HuiControl *c, control)
@@ -576,8 +601,22 @@ HuiWindow::~HuiWindow()
 	_CleanUp_();
 
 	gtk_widget_destroy(window);
-	
-	msg_db_l(1);
+}
+
+void HuiWindow::__delete__()
+{
+	msg_db_f("HuiWindow.del",0);
+
+	if (!window)
+		return;
+
+	// quick'n'dirty fix (gtk destroys its widgets recursively)
+	foreach(HuiControl *c, control)
+		c->widget = NULL;
+
+	_CleanUp_();
+
+	gtk_widget_destroy(window);
 }
 
 // should be called after creating (and filling) the window to actually show it

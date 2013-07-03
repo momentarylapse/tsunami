@@ -68,7 +68,7 @@ void try_init_global_var(Type *type, char* g_var)
 			try_init_global_var(type->parent, g_var + i * type->parent->size);
 		return;
 	}
-	ClassFunction *cf = type->GetConstructor();
+	ClassFunction *cf = type->GetDefaultConstructor();
 	if (!cf)
 		return;
 	typedef void init_func(void *);
@@ -370,7 +370,10 @@ void Script::Compiler()
 
 	//_expand(Opcode,OpcodeSize);
 
-	WaitingMode = WaitingModeFirst;
+	if (first_execution)
+		WaitingMode = WaitingModeFirst;
+	else
+		WaitingMode = WaitingModeNone;
 
 	if (ShowCompilerStats){
 		msg_write("--------------------------------");

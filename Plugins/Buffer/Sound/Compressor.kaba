@@ -145,7 +145,7 @@ void ResetData()
 
 void Configure()
 	// dialog
-	win = HuiCreateSizableDialog("Compressor", 500, 600, MainWin, false)
+	win = new Dialog("Compressor", 500, 600, MainWin, false)
 	win.AddControlTable("", 0, 0, 1, 4, "table1")
 	win.SetTarget("table1", 0)
 	win.AddDrawingArea("", 0, 1, 0, 0, "drawing_area")

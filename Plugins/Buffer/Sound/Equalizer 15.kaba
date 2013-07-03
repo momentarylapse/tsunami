@@ -70,7 +70,7 @@ void OnEvent()
 
 void Configure()
 	// dialog
-	EqualizerDialog=HuiCreateDialog("Equalizer",455,325,MainWin,false)
+	EqualizerDialog =new FixedDialog("Equalizer",455,325,MainWin,false)
 	for int i, 0, NUM_BANDS
 		EqualizerDialog.AddSlider("",5 + i*30,35,25,210,"slider_" + i)
 	EqualizerDialog.AddText("20",5,250,25,25,"")

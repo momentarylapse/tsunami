@@ -78,7 +78,7 @@ string get_name(int tone)
 
 void Configure()
 	// dialog
-	GeneratorDialog=HuiCreateDialog("Ton Generator",415,105,MainWin,false)
+	GeneratorDialog = new FixedDialog("Ton Generator",415,105,MainWin,false)
 	GeneratorDialog.AddText("Tonfrequenz:",5,5,100,25,"")
 	GeneratorDialog.AddComboBox("", 110, 5, 200, 25, "tone")
 	GeneratorDialog.AddSpinButton("\\0\\100000\\0.1",315,5,70,25,"frequency")

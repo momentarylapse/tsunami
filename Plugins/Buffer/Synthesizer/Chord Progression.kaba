@@ -69,7 +69,7 @@ void ResetData()
 
 void Configure()
 	// dialog
-	dlg=HuiCreateDialog("Akkord Generator",415,215,MainWin,false)
+	dlg = new FixedDialog("Akkord Generator",415,215,MainWin,false)
 	dlg.AddText("Akkorde:",5,35,100,25,"")
 	dlg.AddEdit("",110,35,270,25,"chords")
 	dlg.AddText("Lautstärke:",5,65,100,25,"")

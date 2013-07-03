@@ -146,7 +146,7 @@ void OnMouseMove()
 
 void Configure()
 	// dialog
-	dlg = HuiCreateSizableDialog("Equalizer",600,400,MainWin,false)
+	dlg = new Dialog("Equalizer",600,400,MainWin,false)
 	dlg.AddControlTable("", 0, 0, 1, 3, "table")
 	dlg.SetTarget("table", 0)
 	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")

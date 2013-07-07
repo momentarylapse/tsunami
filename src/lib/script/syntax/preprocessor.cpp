@@ -26,8 +26,8 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 
 	// recursion
 	if (c->kind == KindBlock){
-		for (int i=0;i<Blocks[c->link_nr]->command.num;i++)
-			PreProcessCommand(s, Blocks[c->link_nr]->command[i]);
+		for (int i=0;i<Blocks[c->link_no]->command.num;i++)
+			PreProcessCommand(s, Blocks[c->link_no]->command[i]);
 	}
 	for (int i=0;i<c->num_params;i++)
 		PreProcessCommand(s, c->param[i]);
@@ -37,7 +37,7 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 
 	// process...
 	if (c->kind == KindOperator){
-		PreOperator *o = &PreOperators[c->link_nr];
+		PreOperator *o = &PreOperators[c->link_no];
 		/*if (c->link_nr == OperatorIntAdd){
 			if (c->param[1]->kind == KindConstant){
 				int v = *(int*)Constants[c->param[1]->link_nr].data;
@@ -74,13 +74,13 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 				}else{
 					so("pre process operator");
 					int nc = AddConstant(o->return_type);
-					void *d1 = Constants[c->param[0]->link_nr].data;
+					void *d1 = Constants[c->param[0]->link_no].data;
 					void *d2 = NULL;
 					if (c->num_params > 1)
-						d2 = Constants[c->param[1]->link_nr].data;
+						d2 = Constants[c->param[1]->link_no].data;
 					f(Constants[nc].data, d1, d2);
 					c->kind = KindConstant;
-					c->link_nr = nc;
+					c->link_no = nc;
 					c->num_params = 0;
 				}
 			}
@@ -134,8 +134,8 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 
 	// recursion
 	if (c->kind == KindBlock){
-		for (int i=0;i<Blocks[c->link_nr]->command.num;i++)
-			PreProcessCommandAddresses(s, Blocks[c->link_nr]->command[i]);
+		for (int i=0;i<Blocks[c->link_no]->command.num;i++)
+			PreProcessCommandAddresses(s, Blocks[c->link_no]->command[i]);
 	}
 	for (int i=0;i<c->num_params;i++)
 		PreProcessCommandAddresses(s, c->param[i]);
@@ -145,7 +145,7 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 
 	// process...
 	if (c->kind == KindOperator){
-		PreOperator *o = &PreOperators[c->link_nr];
+		PreOperator *o = &PreOperators[c->link_no];
 		if (o->func){
 			bool all_const = true;
 			bool is_address = false;
@@ -161,13 +161,13 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 				op_func *f = (op_func*)o->func;
 				if (is_address){
 					so("pre process address");
-					void *d1 = (void*)&c->param[0]->link_nr;
-					void *d2 = (void*)&c->param[1]->link_nr;
+					void *d1 = (void*)&c->param[0]->link_no;
+					void *d2 = (void*)&c->param[1]->link_no;
 					if (c->param[0]->kind == KindConstant)
-					    d1 = Constants[c->param[0]->link_nr].data;
+					    d1 = Constants[c->param[0]->link_no].data;
 					if (c->param[1]->kind == KindConstant)
-					    d2 = Constants[c->param[1]->link_nr].data;
-					void *r = (void*)&c->link_nr;
+					    d2 = Constants[c->param[1]->link_no].data;
+					void *r = (void*)&c->link_no;
 					f(r, d1, d2);
 					c->kind = is_local ? KindLocalAddress : KindAddress;
 					c->num_params = 0;
@@ -181,24 +181,24 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 				c->kind = KindAddress;
 				c->num_params = 0;
 				if (c->param[0]->kind == KindVarGlobal){
-					c->link_nr = (long)c->param[0]->script->g_var[c->param[0]->link_nr];
+					c->link_no = (long)c->param[0]->script->g_var[c->param[0]->link_no];
 				}else if (c->param[0]->kind == KindVarLocal){
-					c->link_nr = (long)cur_func->var[c->param[0]->link_nr]._offset;
+					c->link_no = (long)cur_func->var[c->param[0]->link_no]._offset;
 					c->kind = KindLocalAddress;
 				}else if (c->param[0]->kind == KindConstant)
-					c->link_nr = (long)s->cnst[c->param[0]->link_nr];
+					c->link_no = (long)s->cnst[c->param[0]->link_no];
 			}
 		}
 	}else if (c->kind == KindDereference){
 		if (c->param[0]->kind == KindAddress){
 			so("pre process deref address");
 			c->kind = KindMemory;
-			c->link_nr = c->param[0]->link_nr;
+			c->link_no = c->param[0]->link_no;
 			c->num_params = 0;
 		}else if (c->param[0]->kind == KindLocalAddress){
 			so("pre process deref local address");
 			c->kind = KindLocalMemory;
-			c->link_nr = c->param[0]->link_nr;
+			c->link_no = c->param[0]->link_no;
 			c->num_params = 0;
 		}
 	}

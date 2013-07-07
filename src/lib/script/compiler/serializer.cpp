@@ -711,34 +711,34 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 	if (link->kind == KindVarFunction){
 		so(" -var-func");
 		if (syntax_tree->FlagCompileOS)
-			p.p = (char*)((long)script->func[link->link_nr] - (long)&script->Opcode[0] + (syntax_tree->AsmMetaInfo)->CodeOrigin);
+			p.p = (char*)((long)script->func[link->link_no] - (long)&script->Opcode[0] + (syntax_tree->AsmMetaInfo)->CodeOrigin);
 		else
-			p.p = (char*)script->func[link->link_nr];
+			p.p = (char*)script->func[link->link_no];
 		p.kind = KindVarGlobal;
 	}else if (link->kind == KindMemory){
 		so(" -mem");
-		p.p = (char*)(long)link->link_nr;
+		p.p = (char*)(long)link->link_no;
 		p.kind = KindVarGlobal;
 	}else if (link->kind == KindAddress){
 		so(" -addr");
-		p.p = (char*)&link->link_nr;
+		p.p = (char*)&link->link_no;
 		p.kind = KindRefToConst;
 	}else if (link->kind == KindVarGlobal){
 		so(" -global");
-		p.p = link->script->g_var[link->link_nr];
+		p.p = link->script->g_var[link->link_no];
 		if (!p.p)
-			script->DoErrorLink("variable is not linkable: " + link->script->syntax->RootOfAllEvil.var[link->link_nr].name);
+			script->DoErrorLink("variable is not linkable: " + link->script->syntax->RootOfAllEvil.var[link->link_no].name);
 	}else if (link->kind == KindVarLocal){
 		so(" -local");
-		p.p = (char*)(long)cur_func->var[link->link_nr]._offset;
+		p.p = (char*)(long)cur_func->var[link->link_no]._offset;
 	}else if (link->kind == KindLocalMemory){
 		so(" -local mem");
-		p.p = (char*)(long)link->link_nr;
+		p.p = (char*)(long)link->link_no;
 		p.kind = KindVarLocal;
 	}else if (link->kind == KindLocalAddress){
 		so(" -local addr");
 		SerialCommandParam param;
-		param.p = (char*)(long)link->link_nr;
+		param.p = (char*)(long)link->link_no;
 		param.kind = KindVarLocal;
 		param.type = TypePointer;
 		param.shift = 0;
@@ -750,7 +750,7 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 			p.kind = KindVarGlobal;
 		else
 			p.kind = KindRefToConst;
-		p.p = script->cnst[link->link_nr];
+		p.p = script->cnst[link->link_no];
 	}else if ((link->kind==KindOperator) || (link->kind==KindFunction) || (link->kind==KindVirtualFunction) || (link->kind==KindCompilerFunction)){
 		p = SerializeCommand(link, level, index);
 	}else if (link->kind == KindReference){
@@ -773,7 +773,7 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 		AddDereference(param, p);
 	}else if (link->kind == KindVarTemp){
 		// only used by <new> operator
-		p.p = (char*)link->link_nr;
+		p.p = (char*)link->link_no;
 	}else{
 		DoError("unexpected type of parameter: " + Kind2Str(link->kind));
 	}
@@ -783,7 +783,7 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret)
 {
 	msg_db_f("SerializeOperator", 4);
-	switch(com->link_nr){
+	switch(com->link_no){
 		case OperatorIntAssign:
 		case OperatorFloatAssign:
 		case OperatorPointerAssign:
@@ -859,14 +859,14 @@ void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &para
 		case OperatorPointerEqual:
 		case OperatorPointerNotEqual:
 			add_cmd(Asm::inst_cmp, param[0], param[1]);
-			if (com->link_nr==OperatorIntEqual)			add_cmd(Asm::inst_setz, ret);
-			if (com->link_nr==OperatorIntNotEqual)		add_cmd(Asm::inst_setnz, ret);
-			if (com->link_nr==OperatorIntGreater)		add_cmd(Asm::inst_setnle, ret);
-			if (com->link_nr==OperatorIntGreaterEqual)	add_cmd(Asm::inst_setnl, ret);
-			if (com->link_nr==OperatorIntSmaller)		add_cmd(Asm::inst_setl, ret);
-			if (com->link_nr==OperatorIntSmallerEqual)	add_cmd(Asm::inst_setle, ret);
-			if (com->link_nr==OperatorPointerEqual)		add_cmd(Asm::inst_setz, ret);
-			if (com->link_nr==OperatorPointerNotEqual)	add_cmd(Asm::inst_setnz, ret);
+			if (com->link_no==OperatorIntEqual)			add_cmd(Asm::inst_setz, ret);
+			if (com->link_no==OperatorIntNotEqual)		add_cmd(Asm::inst_setnz, ret);
+			if (com->link_no==OperatorIntGreater)		add_cmd(Asm::inst_setnle, ret);
+			if (com->link_no==OperatorIntGreaterEqual)	add_cmd(Asm::inst_setnl, ret);
+			if (com->link_no==OperatorIntSmaller)		add_cmd(Asm::inst_setl, ret);
+			if (com->link_no==OperatorIntSmallerEqual)	add_cmd(Asm::inst_setle, ret);
+			if (com->link_no==OperatorPointerEqual)		add_cmd(Asm::inst_setz, ret);
+			if (com->link_no==OperatorPointerNotEqual)	add_cmd(Asm::inst_setnz, ret);
 			break;
 		case OperatorIntBitAnd:
 			add_cmd(Asm::inst_mov, ret, param[0]);
@@ -904,10 +904,10 @@ void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &para
 		case OperatorFloatMultiplyS:
 		case OperatorFloatDivideS:
 			add_cmd(Asm::inst_fld, param[0]);
-			if (com->link_nr==OperatorFloatAddS)			add_cmd(Asm::inst_fadd, param[1]);
-			if (com->link_nr==OperatorFloatSubtractS)	add_cmd(Asm::inst_fsub, param[1]);
-			if (com->link_nr==OperatorFloatMultiplyS)	add_cmd(Asm::inst_fmul, param[1]);
-			if (com->link_nr==OperatorFloatDivideS)		add_cmd(Asm::inst_fdiv, param[1]);
+			if (com->link_no==OperatorFloatAddS)			add_cmd(Asm::inst_fadd, param[1]);
+			if (com->link_no==OperatorFloatSubtractS)	add_cmd(Asm::inst_fsub, param[1]);
+			if (com->link_no==OperatorFloatMultiplyS)	add_cmd(Asm::inst_fmul, param[1]);
+			if (com->link_no==OperatorFloatDivideS)		add_cmd(Asm::inst_fdiv, param[1]);
 			add_cmd(Asm::inst_fstp, param[0]);
 			break;
 		case OperatorFloatAdd:
@@ -915,10 +915,10 @@ void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &para
 		case OperatorFloatMultiply:
 		case OperatorFloatDivide:
 			add_cmd(Asm::inst_fld, param[0]);
-			if (com->link_nr==OperatorFloatAdd)			add_cmd(Asm::inst_fadd, param[1]);
-			if (com->link_nr==OperatorFloatSubtract)		add_cmd(Asm::inst_fsub, param[1]);
-			if (com->link_nr==OperatorFloatMultiply)		add_cmd(Asm::inst_fmul, param[1]);
-			if (com->link_nr==OperatorFloatDivide)		add_cmd(Asm::inst_fdiv, param[1]);
+			if (com->link_no==OperatorFloatAdd)			add_cmd(Asm::inst_fadd, param[1]);
+			if (com->link_no==OperatorFloatSubtract)		add_cmd(Asm::inst_fsub, param[1]);
+			if (com->link_no==OperatorFloatMultiply)		add_cmd(Asm::inst_fmul, param[1]);
+			if (com->link_no==OperatorFloatDivide)		add_cmd(Asm::inst_fdiv, param[1]);
 			add_cmd(Asm::inst_fstp, ret);
 			break;
 		case OperatorFloatMultiplyFI:
@@ -997,12 +997,12 @@ void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &para
 		//case OperatorComplexMultiplySCF:
 		//case OperatorComplexDivideS:
 			add_cmd(Asm::inst_fld, param_shift(param[0], 0, TypeFloat));
-			if (com->link_nr == OperatorComplexAddS)			add_cmd(Asm::inst_fadd, param_shift(param[1], 0, TypeFloat));
-			if (com->link_nr == OperatorComplexSubtractS)	add_cmd(Asm::inst_fsub, param_shift(param[1], 0, TypeFloat));
+			if (com->link_no == OperatorComplexAddS)			add_cmd(Asm::inst_fadd, param_shift(param[1], 0, TypeFloat));
+			if (com->link_no == OperatorComplexSubtractS)	add_cmd(Asm::inst_fsub, param_shift(param[1], 0, TypeFloat));
 			add_cmd(Asm::inst_fstp, param_shift(param[0], 0, TypeFloat));
 			add_cmd(Asm::inst_fld, param_shift(param[0], 4, TypeFloat));
-			if (com->link_nr == OperatorComplexAddS)			add_cmd(Asm::inst_fadd, param_shift(param[1], 4, TypeFloat));
-			if (com->link_nr == OperatorComplexSubtractS)	add_cmd(Asm::inst_fsub, param_shift(param[1], 4, TypeFloat));
+			if (com->link_no == OperatorComplexAddS)			add_cmd(Asm::inst_fadd, param_shift(param[1], 4, TypeFloat));
+			if (com->link_no == OperatorComplexSubtractS)	add_cmd(Asm::inst_fsub, param_shift(param[1], 4, TypeFloat));
 			add_cmd(Asm::inst_fstp, param_shift(param[0], 4, TypeFloat));
 			break;
 		case OperatorComplexAdd:
@@ -1010,12 +1010,12 @@ void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &para
 //		case OperatorFloatMultiply:
 //		case OperatorFloatDivide:
 			add_cmd(Asm::inst_fld, param_shift(param[0], 0, TypeFloat));
-			if (com->link_nr == OperatorComplexAdd)		add_cmd(Asm::inst_fadd, param_shift(param[1], 0, TypeFloat));
-			if (com->link_nr == OperatorComplexSubtract)	add_cmd(Asm::inst_fsub, param_shift(param[1], 0, TypeFloat));
+			if (com->link_no == OperatorComplexAdd)		add_cmd(Asm::inst_fadd, param_shift(param[1], 0, TypeFloat));
+			if (com->link_no == OperatorComplexSubtract)	add_cmd(Asm::inst_fsub, param_shift(param[1], 0, TypeFloat));
 			add_cmd(Asm::inst_fstp, param_shift(ret, 0, TypeFloat));
 			add_cmd(Asm::inst_fld, param_shift(param[0], 4, TypeFloat));
-			if (com->link_nr == OperatorComplexAdd)		add_cmd(Asm::inst_fadd, param_shift(param[1], 4, TypeFloat));
-			if (com->link_nr == OperatorComplexSubtract)	add_cmd(Asm::inst_fsub, param_shift(param[1], 4, TypeFloat));
+			if (com->link_no == OperatorComplexAdd)		add_cmd(Asm::inst_fadd, param_shift(param[1], 4, TypeFloat));
+			if (com->link_no == OperatorComplexSubtract)	add_cmd(Asm::inst_fsub, param_shift(param[1], 4, TypeFloat));
 			add_cmd(Asm::inst_fstp, param_shift(ret, 4, TypeFloat));
 			break;
 		case OperatorComplexMultiply:
@@ -1083,14 +1083,14 @@ void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &para
 		case OperatorBoolSmaller:
 		case OperatorBoolSmallerEqual:
 			add_cmd(Asm::inst_cmp, param[0], param[1]);
-			if ((com->link_nr == OperatorCharEqual) || (com->link_nr == OperatorBoolEqual))
+			if ((com->link_no == OperatorCharEqual) || (com->link_no == OperatorBoolEqual))
 				add_cmd(Asm::inst_setz, ret);
-			else if ((com->link_nr ==OperatorCharNotEqual) || (com->link_nr == OperatorBoolNotEqual))
+			else if ((com->link_no ==OperatorCharNotEqual) || (com->link_no == OperatorBoolNotEqual))
 				add_cmd(Asm::inst_setnz, ret);
-			else if (com->link_nr == OperatorBoolGreater)		add_cmd(Asm::inst_setnle, ret);
-			else if (com->link_nr == OperatorBoolGreaterEqual)	add_cmd(Asm::inst_setnl, ret);
-			else if (com->link_nr == OperatorBoolSmaller)		add_cmd(Asm::inst_setl, ret);
-			else if (com->link_nr == OperatorBoolSmallerEqual)	add_cmd(Asm::inst_setle, ret);
+			else if (com->link_no == OperatorBoolGreater)		add_cmd(Asm::inst_setnle, ret);
+			else if (com->link_no == OperatorBoolGreaterEqual)	add_cmd(Asm::inst_setnl, ret);
+			else if (com->link_no == OperatorBoolSmaller)		add_cmd(Asm::inst_setl, ret);
+			else if (com->link_no == OperatorBoolSmallerEqual)	add_cmd(Asm::inst_setle, ret);
 			break;
 		case OperatorBoolAnd:
 			add_cmd(Asm::inst_mov, ret, param[0]);
@@ -1201,13 +1201,13 @@ void Serializer::SerializeOperator(Command *com, Array<SerialCommandParam> &para
 			}
 			break;
 		default:
-			DoError("unimplemented operator: " + PreOperators[com->link_nr].str());
+			DoError("unimplemented operator: " + PreOperators[com->link_no].str());
 	}
 }
 
 void Serializer::SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, int level, int index, int marker_before_params)
 {
-	switch(com->link_nr){
+	switch(com->link_no){
 		/*case CommandSine:
 			break;*/
 		case CommandIf:{
@@ -1234,11 +1234,11 @@ void Serializer::SerializeCompilerFunction(Command *com, Array<SerialCommandPara
 			add_jump_after_command(level, index + 1, marker_before_params); // insert before <marker_after_while> is inserted!
 
 			int marker_continue = marker_before_params;
-			if (com->link_nr == CommandFor){
+			if (com->link_no == CommandFor){
 				// NextCommand is a block!
 				if (NextCommand->kind != KindBlock)
 					DoError("command block in \"for\" loop missing");
-				marker_continue = add_marker_after_command(level + 1, syntax_tree->Blocks[NextCommand->link_nr]->command.num - 2);
+				marker_continue = add_marker_after_command(level + 1, syntax_tree->Blocks[NextCommand->link_no]->command.num - 2);
 			}
 			LoopData l = {marker_continue, marker_after_while, level, index};
 			loop.add(l);
@@ -1319,17 +1319,11 @@ void Serializer::SerializeCompilerFunction(Command *com, Array<SerialCommandPara
 			AddFuncReturn(ret);
 			if (!syntax_tree->GetExistence("-malloc-", cur_func))
 				DoError("-malloc- not found????");
-			AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_nr);
+			AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_no);
 			if (com->param[0]){
 				// copy + edit command
 				Command sub = *com->param[0];
-				Command c_ret;
-				c_ret.kind = KindVarTemp;
-				c_ret.link_nr = (long)ret.p;
-				c_ret.instance = NULL;
-				c_ret.num_params = 0;
-				c_ret.script = script;
-				c_ret.type = ret.type;
+				Command c_ret(KindVarTemp, (long)ret.p, script, ret.type);
 				sub.instance = &c_ret;
 				SerializeCommand(&sub, level, index);
 			}else
@@ -1340,7 +1334,7 @@ void Serializer::SerializeCompilerFunction(Command *com, Array<SerialCommandPara
 			AddFuncParam(param[0]);
 			if (!syntax_tree->GetExistence("-free-", cur_func))
 				DoError("-free- not found????");
-			AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_nr);
+			AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_no);
 			break;
 		case CommandWaitOneFrame:
 		case CommandWait:
@@ -1351,13 +1345,13 @@ void Serializer::SerializeCompilerFunction(Command *com, Array<SerialCommandPara
 					// GlobalWaitingTime = time
 					SerialCommandParam p_mode = param_global(TypeInt, &GlobalWaitingMode);
 					SerialCommandParam p_ttw = param_global(TypeFloat, &GlobalTimeToWait);
-					if (com->link_nr == CommandWaitOneFrame){
+					if (com->link_no == CommandWaitOneFrame){
 						add_cmd(Asm::inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
 						add_cmd(Asm::inst_mov, p_ttw, param_const(TypeFloat, NULL));
-					}else if (com->link_nr == CommandWait){
+					}else if (com->link_no == CommandWait){
 						add_cmd(Asm::inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeGT));
 						add_cmd(Asm::inst_mov, p_ttw, param[0]);
-					}else if (com->link_nr == CommandWaitRT){
+					}else if (com->link_no == CommandWaitRT){
 						add_cmd(Asm::inst_mov, p_mode, param_const(TypeInt, (void*)WaitingModeRT));
 						add_cmd(Asm::inst_mov, p_ttw, param[0]);
 					}
@@ -1493,7 +1487,7 @@ void Serializer::SerializeCompilerFunction(Command *com, Array<SerialCommandPara
 			add_cmd(Asm::inst_mov, param_shift(ret, 8, TypeFloat), param[3]);
 			break;
 		default:
-			DoError("compiler function unimplemented: " + PreCommands[com->link_nr].name);
+			DoError("compiler function unimplemented: " + PreCommands[com->link_no].name);
 	}
 }
 
@@ -1504,7 +1498,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 
 	// for/while need a marker to this point
 	int marker_before_params = -1;
-	if ((com->kind == KindCompilerFunction) && ((com->link_nr == CommandWhile) || (com->link_nr == CommandFor)))
+	if ((com->kind == KindCompilerFunction) && ((com->link_no == CommandWhile) || (com->link_no == CommandFor)))
 		marker_before_params = add_marker();
 
 	// return value
@@ -1514,7 +1508,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 
 
 	// special new-operator work-around
-	if ((com->kind == KindCompilerFunction) && (com->link_nr == CommandNew)){
+	if ((com->kind == KindCompilerFunction) && (com->link_no == CommandNew)){
 		if (com->num_params > 0){
 			if (!com->param[0]->instance)
 				com->num_params = 0;
@@ -1531,7 +1525,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 	// class function -> compile instance
 	bool is_class_function = false;
 	if ((com->kind == KindFunction) || (com->kind == KindVirtualFunction)){
-		if (com->script->syntax->Functions[com->link_nr]->_class)
+		if (com->script->syntax->Functions[com->link_no]->_class)
 			is_class_function = true;
 	}
 	SerialCommandParam instance = {-1, NULL, NULL};
@@ -1556,7 +1550,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 		if (is_class_function)
 			AddFuncInstance(instance);
 
-		AddFunctionCall(com->script, com->link_nr);
+		AddFunctionCall(com->script, com->link_no);
 
 	}else if (com->kind == KindVirtualFunction){
 
@@ -1566,11 +1560,11 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 		AddFuncReturn(ret);
 		AddFuncInstance(instance);
 
-		AddClassFunctionCall(instance.type->parent->GetVirtualFunction(com->link_nr));
+		AddClassFunctionCall(instance.type->parent->GetVirtualFunction(com->link_no));
 	}else if (com->kind == KindCompilerFunction){
 		SerializeCompilerFunction(com, param, ret, level, index, marker_before_params);
 	}else if (com->kind == KindBlock){
-		SerializeBlock(syntax_tree->Blocks[com->link_nr], level + 1);
+		SerializeBlock(syntax_tree->Blocks[com->link_no], level + 1);
 	}else{
 		//so("---???");
 		//DoError(string("type of command is unimplemented (call Michi!): ",Kind2Str(com->Kind)));
@@ -2665,7 +2659,7 @@ void Serializer::SerializeFunction(Function *f)
 	// outro (if last command != return)
 	bool need_outro = true;
 	if (f->block->command.num > 0)
-		if ((f->block->command.back()->kind == KindCompilerFunction) && (f->block->command.back()->link_nr == CommandReturn))
+		if ((f->block->command.back()->kind == KindCompilerFunction) && (f->block->command.back()->link_no == CommandReturn))
 			need_outro = false;
 	if (need_outro){
 		FillInDestructors(false);

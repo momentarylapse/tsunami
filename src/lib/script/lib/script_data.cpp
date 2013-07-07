@@ -341,9 +341,7 @@ Array<PreCommand> PreCommands;
 
 int add_func(const string &name, Type *return_type, void *func, bool is_class)
 {
-	Function *f = new Function;
-	f->name = name;
-	f->return_type = return_type;
+	Function *f = new Function(name, return_type);
 	f->literal_return_type = return_type;
 	f->num_params = 0;
 	f->_class = NULL;

@@ -28,6 +28,7 @@ HuiControlComboBox::~HuiControlComboBox()
 
 string HuiControlComboBox::GetString()
 {
+	return "TODO";
 }
 
 void HuiControlComboBox::__SetString(const string &str)

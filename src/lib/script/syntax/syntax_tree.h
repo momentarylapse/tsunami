@@ -107,12 +107,14 @@ struct Function
 	bool is_extern;
 	// for compilation...
 	int _var_size, _param_size;
+	Function(const string &name, Type *return_type);
+	int get_var(const string &name);
 };
 
 // single operand/command
 struct Command
 {
-	int kind, link_nr;
+	int kind, link_no;
 	Script *script;
 	// parameters
 	int num_params;
@@ -121,6 +123,7 @@ struct Command
 	Command *instance;
 	// return value
 	Type *type;
+	Command(int kind, int link_no, Script *script, Type *type);
 };
 
 struct AsmBlock
@@ -212,7 +215,7 @@ public:
 	// neccessary conversions
 	void ConvertCallByReference();
 	void BreakDownComplicatedCommands();
-	void MapLocalVariablesToStack();
+	void MapLocalVariablesToStackX86();
 
 	// data creation
 	int AddVar(const string &name, Type *type, Function *f);
@@ -221,7 +224,7 @@ public:
 	Function *AddFunction(const string &name, Type *type);
 
 	// command
-	Command *AddCommand();
+	Command *AddCommand(int kind, int link_no, Type *type);
 	Command *add_command_compilerfunc(int cf);
 	Command *add_command_classfunc(Type *class_type, ClassFunction &f, Command *inst);
 	Command *add_command_const(int nc);

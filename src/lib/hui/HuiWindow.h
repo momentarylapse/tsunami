@@ -85,6 +85,7 @@ class HuiWindow : public HuiEventHandler
 	friend class HuiControlTreeView;
 	friend class HuiControlGrid;
 	friend class HuiControlRadioButton;
+	friend class HuiMenu;
 public:
 	HuiWindow();
 	HuiWindow(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);

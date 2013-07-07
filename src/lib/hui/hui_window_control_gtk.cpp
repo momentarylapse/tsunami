@@ -364,10 +364,6 @@ void HuiWindow::AddGroup(const string &title,int x,int y,int width,int height,co
 void HuiWindow::AddComboBox(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_InsertControl_(new HuiControlComboBox(title, id), x, y, width, height);
-	if ((PartString.num > 1) || (PartString[0] != ""))
-		for (int i=0;i<PartString.num;i++)
-			AddString(id, PartString[i]);
-	SetInt(id, 0);
 }
 
 void HuiWindow::AddToggleButton(const string &title,int x,int y,int width,int height,const string &id)

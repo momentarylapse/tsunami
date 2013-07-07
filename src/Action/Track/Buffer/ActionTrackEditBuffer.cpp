@@ -44,6 +44,11 @@ void ActionTrackEditBuffer::undo(Data *d)
 	box.swap_value(b);
 }
 
+void ActionTrackEditBuffer::redo(Data *d)
+{
+	undo(d);
+}
+
 void *ActionTrackEditBuffer::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);

@@ -19,6 +19,7 @@ public:
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
+	virtual void redo(Data *d);
 
 private:
 	int track_no, sub_no;

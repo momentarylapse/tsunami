@@ -1,6 +1,7 @@
 // Image = hui:find
 // Title[Deutsch] = Tonerkennung
 use "../api.kaba"
+use "../tone.kaba"
 
 const int freq = 44100
 const int f_min = 50
@@ -22,34 +23,10 @@ bool LoudEnough
 
 float error
 string get_note(float f)
-	float fl = log(f / 110.0) / log(2.0)
-	int n = f2i(fl * 12.0 + 0.5)
-	while n > 11
-		n -= 12
-	error = loop(fl * 12.0, -0.5, 0.5)
-	if n == 0
-		return "A"
-	else if n == 1
-		return "b"
-	else if n == 2
-		return "H"
-	else if n == 3
-		return "C"
-	else if n == 4
-		return "C#"
-	else if n == 5
-		return "D"
-	else if n == 6
-		return "D#"
-	else if n == 7
-		return "E"
-	else if n == 8
-		return "F"
-	else if n == 9
-		return "F#"
-	else if n == 10
-		return "G"
-	return "G#"
+	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
+	int rel = f2i(pitch + 0.5) % 12
+	error = loop(pitch, -0.5, 0.5)
+	return rel_pitch_name(rel)
 	//loopf(fl, 0, 1)
 	//note = i2s(n)
 
@@ -147,11 +124,14 @@ void UpdateInput()
 complex bufc[]
 
 void main()
-	win = new FixedDialog("Tonerkennung", 300, 145, MainWin, false)
+	win = new FixedDialog("Tonerkennung", 300, 175, MainWin, false)
 	win.AddDrawingArea("", 5, 5, 290, 135, "drawing")
+	win.AddButton("Schließen", 5, 145, 290, 25, "close")
+	win.SetImage("close", "hui:close")
 	
 	win.EventX("drawing", "hui:redraw", &Draw)
 	win.Event("hui:close", &OnClose)
+	win.Event("close", &OnClose)
 	
 
 

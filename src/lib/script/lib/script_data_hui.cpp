@@ -266,6 +266,13 @@ void SIAddPackageHui()
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
 			func_add_param("id",		TypeString);
+		class_add_func("AddRadioButton",										TypeVoid,		mf((tmf)&HuiWindow::AddRadioButton));
+			func_add_param("title",		TypeString);
+			func_add_param("x",			TypeInt);
+			func_add_param("y",			TypeInt);
+			func_add_param("width",		TypeInt);
+			func_add_param("height",	TypeInt);
+			func_add_param("id",		TypeString);
 		class_add_func("SetString",						TypeVoid,		mf((tmf)&HuiWindow::SetString));
 			func_add_param("id",		TypeString);
 			func_add_param("s",			TypeString);

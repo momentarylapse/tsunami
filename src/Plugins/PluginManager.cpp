@@ -550,10 +550,12 @@ void PluginManager::ExecutePlugin(const string &filename)
 					Range range = a->selection;
 					if (range.empty())
 						range = a->GetRange();
+					a->action_manager->BeginActionGroup();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
 							cur_plugin->ProcessTrack(t, tsunami->view->cur_level, range);
 						}
+					a->action_manager->EndActionGroup();
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 				}

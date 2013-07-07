@@ -40,4 +40,6 @@ void HuiControlButton::SetImage(const string& str)
 {
 	GtkWidget *im = (GtkWidget*)get_gtk_image(str, false);
 	gtk_button_set_image(GTK_BUTTON(widget), im);
+	if (strlen(gtk_button_get_label(GTK_BUTTON(widget))) == 0)
+		gtk_button_set_always_show_image(GTK_BUTTON(widget), true);
 }

@@ -158,6 +158,17 @@ void AudioFile::UpdateSelection()
 	Notify("SelectionChange");
 }
 
+Range AudioFile::GetPlaybackSelection()
+{
+	if (selection.empty()){
+		int num = GetRange().end() - selection.start();
+		if (num <= 0)
+			num = sample_rate; // 1 second
+		return Range(selection.start(), num);
+	}
+	return selection;
+}
+
 
 void AudioFile::UnselectAllSubs()
 {

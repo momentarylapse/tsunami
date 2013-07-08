@@ -44,6 +44,7 @@ public:
 	bool Load(const string &filename, bool deep);
 	bool Save(const string &filename);
 	void UpdateSelection();
+	Range GetPlaybackSelection();
 	void UnselectAllSubs();
 
 	virtual void PostActionUpdate();

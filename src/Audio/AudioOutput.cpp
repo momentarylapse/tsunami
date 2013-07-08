@@ -314,9 +314,7 @@ void AudioOutput::Play(AudioFile *a, bool _allow_loop)
 	if (!al_initialized)
 		Init();
 
-	range = a->selection;
-	if (range.empty())
-		range = a->GetRange();
+	range = a->GetPlaybackSelection();
 
 	if (playing)
 		Stop();

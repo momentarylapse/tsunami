@@ -19,12 +19,12 @@ Format::~Format()
 {
 }
 
-void Format::ImportData(Track *t, void *data, int channels, int bits, int samples, int offset)
+void Format::ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset)
 {
 	msg_db_r("ImportData", 1);
 
 	BufferBox buf = t->GetBuffers(0, Range(offset, samples));
-	buf.import(data, channels, bits, samples);
+	buf.import(data, channels, format, samples);
 
 	msg_db_l(1);
 }

@@ -14,6 +14,7 @@
 
 bool flac_tells_samples;
 int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
+SampleFormat flac_format;
 int flac_read_samples;
 Track *flac_track;
 
@@ -55,6 +56,7 @@ void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stre
 		msg_write("stream info");
 		flac_freq = metadata->data.stream_info.sample_rate;
 		flac_bits = metadata->data.stream_info.bits_per_sample;
+		flac_format = format_for_bits(flac_bits);
 		flac_samples = metadata->data.stream_info.total_samples;
 		flac_tells_samples = (flac_samples != 0);
 		flac_channels = metadata->data.stream_info.channels;
@@ -124,10 +126,7 @@ void FormatFlac::LoadTrack(Track *t, const string & filename)
 	FLAC__stream_decoder_delete(decoder);
 
 
-	int bits = flac_bits;
-	int channels = flac_channels;
-	int freq = flac_freq;
-	t->root->sample_rate = freq;
+	t->root->sample_rate = flac_freq;
 	t->root->action_manager->EndActionGroup();
 
 	msg_db_l(1);

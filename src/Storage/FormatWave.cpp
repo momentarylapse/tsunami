@@ -62,6 +62,14 @@ void FormatWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	msg_db_l(1);
 }
 
+static string read_chunk_name(CFile *f)
+{
+	string s;
+	s.resize(4);
+	*(int*)s.data = f->ReadInt();
+	return s;
+}
+
 void FormatWave::LoadTrack(Track *t, const string & filename)
 {
 	msg_db_r("load_wave_file", 1);
@@ -75,59 +83,86 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 	if (!f)
 		throw string("can't open file");
 	f->SetBinaryMode(true);
-	char header[44];
-	f->ReadBuffer(header, 44);
-	if ((header[0] != 'R') or (header[1] != 'I') or (header[2] != 'F') or (header[3] != 'F'))
+	if (read_chunk_name(f) != "RIFF")
 		throw string("wave file does not start with \"RIFF\"");
-	if (*(int*)&header[4] > f->GetSize())
-		tsunami->log->Warning(format("wave file gives wrong size: %d  (real: %d)", *(int*)&header[4], f->GetSize()));
+	int stated_file_size = f->ReadInt();
+	int real_file_size = f->GetSize();
+	if (stated_file_size > real_file_size)
+		tsunami->log->Warning(format("wave file gives wrong size: %d  (real: %d)", stated_file_size, real_file_size));
 		// sometimes 0x2400ff7f
-	if ((header[8] != 'W') or (header[9] != 'A') or (header[10] != 'V') or (header[11] != 'E') or (header[12] != 'f') or (header[13] != 'm') or (header[14] != 't') or (header[15] != ' '))
-		throw string("\"WAVEfmt \" expected in wave file");
-	int header_size = *(int*)&header[16];
-	int format_code = *(short*)&header[20];
-	if ((header_size != 16) && (header_size != 18) && (header_size != 40))
-		throw format("wave file gives header size %d (16, 18 or 40 expected)", header_size);
-	for (int i=0;i<header_size-16;i++)
-		f->ReadByte();
-	if ((format_code != 1) && (format_code != 3))
-		throw format("wave file has format %d (1 or 3 expected)", format_code);
-	int channels = *(short*)&header[22];
-	int freq = *(int*)&header[24];
-	t->root->sample_rate = freq;
-	int block_align = *(short*)&header[32];
-	int bits = *(short*)&header[34];
-	int byte_per_sample = (bits / 8) * channels;
-	if ((header[36] != 'd') or (header[37] != 'a') or (header[38] != 't') or (header[39] != 'a'))
-		throw string("\"data\" expected in wave file");
-	int size = *(int*)&header[40];
-	if ((size > f->GetSize() - 44) or (size < 0)){
-		tsunami->log->Warning(format("wave file gives wrong data size (given: %d,  by file size: %d)", size, f->GetSize() - 44));
-		size = f->GetSize() - 44;
-	}
-	int samples = size / byte_per_sample;
-	tsunami->progress->Set(0.1f);
+	if (read_chunk_name(f) != "WAVE")
+		throw string("\"WAVE\" expected in wave file");
 
-	int read = 0;
-	int nn = 0;
-	int nice_buffer_size = WAVE_BUFFER_SIZE - (WAVE_BUFFER_SIZE % byte_per_sample);
-	while (read < size){
-		int toread = clampi(nice_buffer_size, 0, size - read);
-		int r = f->ReadBuffer(data, toread);
-		nn ++;
-		if (nn > 16){
-			float perc_read = 0.1f;
-			float dperc_read = 0.9f;
-			tsunami->progress->Set(perc_read + dperc_read * (float)read / (float)size);
-			nn = 0;
-		}
-		if (r > 0){
-			int dsamples = r / byte_per_sample;
-			int offset = read / byte_per_sample;
-			ImportData(t, data, channels, bits, dsamples, offset);
-			read += r;
+
+	int format_code, channels, freq, block_align, bits, byte_per_sample;
+	bool fmt_chunk_read = false;
+	bool data_chunk_read = false;
+
+	// read chunks
+	while (f->GetPos() < real_file_size - 8){
+		string chunk_name = read_chunk_name(f);
+		int chunk_size = f->ReadInt();
+
+		if (chunk_name == "fmt "){
+			if ((chunk_size != 16) && (chunk_size != 18) && (chunk_size != 40))
+				throw format("wave file gives header size %d (16, 18 or 40 expected)", chunk_size);
+			char header[16];
+			f->ReadBuffer(header, 16);
+			for (int i=0;i<chunk_size-16;i++)
+				f->ReadByte();
+
+			format_code = *(short*)&header[0];
+			if ((format_code != 1) && (format_code != 3))
+				throw format("wave file has format %d (1 or 3 expected)", format_code);
+			channels = *(short*)&header[2];
+			freq = *(int*)&header[4];
+			t->root->sample_rate = freq;
+			block_align = *(short*)&header[12];
+			bits = *(short*)&header[14];
+			byte_per_sample = (bits / 8) * channels;
+
+			fmt_chunk_read = true;
+		}else if (chunk_name == "data"){
+			if (!fmt_chunk_read)
+				throw string("\"data\" chunk but no preceeding \"fmt\" chunk");
+
+
+			if ((chunk_size > real_file_size - 44) or (chunk_size < 0)){
+				tsunami->log->Warning(format("wave file gives wrong data size (given: %d,  by file size: %d)", chunk_size, real_file_size));
+				chunk_size = real_file_size - f->GetPos();
+			}
+
+			int samples = chunk_size / byte_per_sample;
+			tsunami->progress->Set(0.1f);
+
+			int read = 0;
+			int nn = 0;
+			int nice_buffer_size = WAVE_BUFFER_SIZE - (WAVE_BUFFER_SIZE % byte_per_sample);
+			while (read < chunk_size){
+				int toread = clampi(nice_buffer_size, 0, chunk_size - read);
+				int r = f->ReadBuffer(data, toread);
+				nn ++;
+				if (nn > 16){
+					float perc_read = 0.1f;
+					float dperc_read = 0.9f;
+					tsunami->progress->Set(perc_read + dperc_read * (float)read / (float)chunk_size);
+					nn = 0;
+				}
+				if (r > 0){
+					int dsamples = r / byte_per_sample;
+					int offset = read / byte_per_sample;
+					ImportData(t, data, channels, format_for_bits(bits), dsamples, offset);
+					read += r;
+				}else{
+					throw string("could not read in wave file...");
+				}
+			}
+			break;
 		}else{
-			throw string("could not read in wave file...");
+			tsunami->log->Warning("unhandled wave chunk: " + chunk_name);
+
+			for (int i=0;i<chunk_size;i++)
+				f->ReadByte();
 		}
 	}
 

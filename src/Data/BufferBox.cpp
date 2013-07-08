@@ -9,6 +9,52 @@
 #include <math.h>
 #include <assert.h>
 
+SampleFormat format_for_bits(int bits)
+{
+	if (bits == 8)
+		return SAMPLE_FORMAT_8;
+	if (bits == 16)
+		return SAMPLE_FORMAT_16;
+	if (bits == 24)
+		return SAMPLE_FORMAT_24;
+	if (bits == 32)
+		return SAMPLE_FORMAT_32;
+	return SAMPLE_FORMAT_UNKNOWN;
+}
+
+int format_get_bits(SampleFormat format)
+{
+	if (format == SAMPLE_FORMAT_8)
+		return 8;
+	if ((format == SAMPLE_FORMAT_16) || (format == SAMPLE_FORMAT_16_BIGENDIAN))
+		return 16;
+	if ((format == SAMPLE_FORMAT_24) || (format == SAMPLE_FORMAT_24_BIGENDIAN))
+		return 24;
+	if ((format == SAMPLE_FORMAT_32) || (format == SAMPLE_FORMAT_32_BIGENDIAN) || (format == SAMPLE_FORMAT_32_FLOAT))
+		return 32;
+	return 0;
+}
+
+string format_name(SampleFormat format)
+{
+	if (format == SAMPLE_FORMAT_8)
+		return "8 bit";
+	if (format == SAMPLE_FORMAT_16)
+		return "16 bit";
+	if (format == SAMPLE_FORMAT_16_BIGENDIAN)
+		return "16 bit BigEndian";
+	if (format == SAMPLE_FORMAT_24)
+		return "24 bit";
+	if (format == SAMPLE_FORMAT_24_BIGENDIAN)
+		return "24 bit BigEndian";
+	if (format == SAMPLE_FORMAT_32)
+		return "32 bit";
+	if (format == SAMPLE_FORMAT_32_BIGENDIAN)
+		return "32 bit BigEndian";
+	if (format == SAMPLE_FORMAT_32_FLOAT)
+		return "32 bit float";
+	return "???";
+}
 
 
 BufferBox::BufferBox()
@@ -203,38 +249,72 @@ void BufferBox::set_16bit(const void *b, int offset, int length)
 	}
 }
 
+inline int invert_16(int i)
+{
+	return ((i & 0xff) << 8) + ((i & 0xff00) >> 8);
+}
+
+inline int invert_24(int i)
+{
+	unsigned int ui = i;
+	unsigned int ext = (i < 0) ? 0xff000000 : 0;
+	ui = ((ui & 0xff) << 16) | (ui & 0xff00) | ((ui & 0xff0000) >> 16) | ext;
+	return (signed)ui;
+}
+
+inline int invert_32(int i)
+{
+	return ((i & 0xff) << 24) + ((i & 0xff00) << 8) + ((i & 0xff0000) >> 8) + ((i & 0xff000000) >> 24);
+}
 
 
-void BufferBox::import(void *data, int channels, int bits, int samples)
+void BufferBox::import(void *data, int channels, SampleFormat format, int samples)
 {
 	char *cb = (char*)data;
 	short *sb = (short*)data;
 
 	for (int i=0;i<samples;i++){
 		if (channels == 2){
-			if (bits == 8){
+			if (format == SAMPLE_FORMAT_8){
 				r[i] = (float)cb[i*2] / 128.0f;
 				l[i] = (float)cb[i*2+1] / 128.0f;
-			}else if (bits == 16){
+			}else if (format == SAMPLE_FORMAT_16){
 				r[i] = (float)sb[i*2] / 32768.0f;
 				l[i] = (float)sb[i*2+1] / 32768.0f;
-			}else if (bits == 24){
+			}else if (format == SAMPLE_FORMAT_16_BIGENDIAN){
+				r[i] = (float)invert_16(sb[i*2]) / 32768.0f;
+				l[i] = (float)invert_16(sb[i*2+1]) / 32768.0f;
+			}else if (format == SAMPLE_FORMAT_24){
 				r[i] = (float)*(short*)&cb[i*6 + 1] / 32768.0f; // only high 16 bits
 				l[i] = (float)*(short*)&cb[i*6 + 4] / 32768.0f;
-			}else{ // 32
+			}else if (format == SAMPLE_FORMAT_24_BIGENDIAN){
+				r[i] = (float)invert_24(*(int*)&cb[i*6 + 0] >> 8) / 32768.0f / 256;
+				l[i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 32768.0f / 256;
+			}else if (format == SAMPLE_FORMAT_32){
 				r[i] = (float)sb[i*4+1] / 32768.0f; // only high 16 bits...
 				l[i] = (float)sb[i*4+3] / 32768.0f;
-			}
+			}else if (format == SAMPLE_FORMAT_32_FLOAT){
+				r[i] = *(float*)&sb[i*4];
+				l[i] = *(float*)&sb[i*4+2];
+			}else
+				throw string("BufferBox.import: unhandled format");
 		}else{
-			if (bits == 8){
+			if (format == SAMPLE_FORMAT_8){
 				r[i] = (float)cb[i] / 128.0f;
-			}else if (bits == 16){
+			}else if (format == SAMPLE_FORMAT_16){
 				r[i] = (float)sb[i] / 32768.0f;
-			}else if (bits == 24){
+			}else if (format == SAMPLE_FORMAT_16_BIGENDIAN){
+				r[i] = (float)invert_16(sb[i]) / 32768.0f;
+			}else if (format == SAMPLE_FORMAT_24){
 				r[i] = (float)*(short*)&cb[i*3 + 1] / 32768.0f;
-			}else{ // 32
+			}else if (format == SAMPLE_FORMAT_24_BIGENDIAN){
+				r[i] = (float)invert_24(*(int*)&cb[i*3] >> 8) / 32768.0f / 256;
+			}else if (format == SAMPLE_FORMAT_32){
 				r[i] = (float)sb[i*2+1] / 32768.0f;
-			}
+			}else if (format == SAMPLE_FORMAT_32_FLOAT){
+				r[i] = *(float*)&sb[i*2];
+			}else
+				throw string("BufferBox.import: unhandled format");
 			l[i] = r[i];
 		}
 	}

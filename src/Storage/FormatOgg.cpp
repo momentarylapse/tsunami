@@ -242,7 +242,7 @@ void FormatOgg::LoadTrack(Track *t, const string & filename)
 		}else{
 			int dsamples = r / 4;
 			int offset = read / 4;
-			ImportData(t, data, channels, bits, dsamples, offset);
+			ImportData(t, data, channels, SAMPLE_FORMAT_16, dsamples, offset);
 			read += r;
 			nn ++;
 			if (nn > 256){

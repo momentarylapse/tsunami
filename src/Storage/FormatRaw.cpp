@@ -10,6 +10,7 @@
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
+#include "Dialog/RawConfigDialog.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 15;
@@ -21,6 +22,14 @@ FormatRaw::FormatRaw() :
 
 FormatRaw::~FormatRaw()
 {
+}
+
+RawConfigData GetRawConfigData()
+{
+	RawConfigData data;
+	RawConfigDialog *dlg = new RawConfigDialog(&data, tsunami);
+	dlg->Run();
+	return data;
 }
 
 void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
@@ -53,6 +62,8 @@ void FormatRaw::LoadTrack(Track *t, const string & filename)
 	msg_db_r("load_raw_file", 1);
 	tsunami->progress->Set(_("lade raw"), 0);
 
+	RawConfigData config = GetRawConfigData();
+
 	char *data = new char[WAVE_BUFFER_SIZE];
 	CFile *f = OpenFile(filename);
 
@@ -61,12 +72,13 @@ void FormatRaw::LoadTrack(Track *t, const string & filename)
 	if (!f)
 		throw string("can't open file");
 	f->SetBinaryMode(true);
-	int channels = 2;
-	int bits = 16;
-	int byte_per_sample = (bits / 8) * channels;
-	int size = f->GetSize();
+	int byte_per_sample = (format_get_bits(config.format) / 8) * config.channels;
+	int size = f->GetSize() - config.offset;
 	int samples = size / byte_per_sample;
 	tsunami->progress->Set(0.1f);
+
+	if (config.offset > 0)
+		f->ReadBuffer(data, config.offset);
 
 	int read = 0;
 	int nn = 0;
@@ -84,7 +96,7 @@ void FormatRaw::LoadTrack(Track *t, const string & filename)
 		if (r > 0){
 			int dsamples = r / byte_per_sample;
 			int offset = read / byte_per_sample;
-			ImportData(t, data, channels, bits, dsamples, offset);
+			ImportData(t, data, config.channels, config.format, dsamples, offset);
 			read += r;
 		}else{
 			throw string("could not read in wave file...");

@@ -34,7 +34,7 @@ RawConfigData GetRawConfigData()
 
 void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
-	msg_db_r("write_raw_file", 1);
+	msg_db_f("write_raw_file", 1);
 	tsunami->progress->Set(_("exportiere raw"), 0);
 
 	Array<short> buf16;
@@ -54,12 +54,11 @@ void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
 
 	FileClose(f);
-	msg_db_l(1);
 }
 
-void FormatRaw::LoadTrack(Track *t, const string & filename)
+void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
-	msg_db_r("load_raw_file", 1);
+	msg_db_f("load_raw_file", 1);
 	tsunami->progress->Set(_("lade raw"), 0);
 
 	RawConfigData config = GetRawConfigData();
@@ -95,8 +94,8 @@ void FormatRaw::LoadTrack(Track *t, const string & filename)
 		}
 		if (r > 0){
 			int dsamples = r / byte_per_sample;
-			int offset = read / byte_per_sample;
-			ImportData(t, data, config.channels, config.format, dsamples, offset);
+			int _offset = read / byte_per_sample + offset;
+			ImportData(t, data, config.channels, config.format, dsamples, _offset, level);
 			read += r;
 		}else{
 			throw string("could not read in wave file...");
@@ -111,7 +110,6 @@ void FormatRaw::LoadTrack(Track *t, const string & filename)
 
 	if (f)
 		FileClose(f);
-	msg_db_l(1);
 }
 
 void FormatRaw::SaveAudio(AudioFile *a, const string & filename)

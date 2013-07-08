@@ -342,7 +342,7 @@ void Tsunami::OnTrackImport()
 		return;
 	if (storage->AskOpenImport(this)){
 		Track *t = audio->AddEmptyTrack();
-		storage->LoadTrack(t, HuiFilename);
+		storage->LoadTrack(t, HuiFilename, audio->selection.start(), view->cur_level);
 	}
 }
 
@@ -493,7 +493,7 @@ void Tsunami::OnZoomOut()
 
 void Tsunami::UpdateMenu()
 {
-	msg_db_r("UpdateMenu", 1);
+	msg_db_f("UpdateMenu", 1);
 	bool selected = !audio->selection.empty();
 // menu / toolbar
 	// edit
@@ -549,7 +549,6 @@ void Tsunami::UpdateMenu()
 		SetTitle(title);
 	}else
 		SetTitle(AppName);
-	msg_db_l(1);
 }
 
 

@@ -53,7 +53,7 @@ void Clipboard::Copy(AudioFile *a)
 void Clipboard::Paste(AudioFile *a)
 {
 	if (a->used){
-		a->Execute(new ActionSubTrackPaste(get_track_index(tsunami->view->cur_track), 0, buf));
+		a->Execute(new ActionSubTrackPaste(get_track_index(tsunami->view->cur_track), a->selection.start(), buf));
 	}else{
 		a->NewWithOneTrack(sample_rate);
 		a->action_manager->Enable(false);

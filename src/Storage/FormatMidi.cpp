@@ -18,7 +18,7 @@ FormatMidi::~FormatMidi()
 {
 }
 
-void FormatMidi::LoadTrack(Track *t, const string &filename)
+void FormatMidi::LoadTrack(Track *t, const string &filename, int offset, int level)
 {}
 
 void FormatMidi::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)

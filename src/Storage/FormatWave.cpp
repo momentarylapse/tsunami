@@ -70,7 +70,7 @@ static string read_chunk_name(CFile *f)
 	return s;
 }
 
-void FormatWave::LoadTrack(Track *t, const string & filename)
+void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_r("load_wave_file", 1);
 	tsunami->progress->Set(_("lade wave"), 0);
@@ -150,8 +150,8 @@ void FormatWave::LoadTrack(Track *t, const string & filename)
 				}
 				if (r > 0){
 					int dsamples = r / byte_per_sample;
-					int offset = read / byte_per_sample;
-					ImportData(t, data, channels, format_for_bits(bits), dsamples, offset);
+					int _offset = read / byte_per_sample + offset;
+					ImportData(t, data, channels, format_for_bits(bits), dsamples, _offset, level);
 					read += r;
 				}else{
 					throw string("could not read in wave file...");

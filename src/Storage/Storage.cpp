@@ -43,7 +43,7 @@ Storage::~Storage()
 
 bool Storage::Load(AudioFile *a, const string &filename)
 {
-	msg_db_r("Storage.Load", 1);
+	msg_db_f("Storage.Load", 1);
 	bool ok = false;
 	bool found = false;
 
@@ -83,13 +83,12 @@ bool Storage::Load(AudioFile *a, const string &filename)
 	if (!found)
 		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
-	msg_db_l(1);
 	return ok;
 }
 
-bool Storage::LoadTrack(Track *t, const string &filename)
+bool Storage::LoadTrack(Track *t, const string &filename, int offset, int level)
 {
-	msg_db_r("Storage.LoadTrack", 1);
+	msg_db_f("Storage.LoadTrack", 1);
 	bool ok = false;
 	bool found = false;
 
@@ -102,10 +101,12 @@ bool Storage::LoadTrack(Track *t, const string &filename)
 
 			AudioFile *a = t->root;
 			a->NotifyBegin();
+			a->action_manager->BeginActionGroup();
 
-			f->LoadTrack(t, filename);
+			f->LoadTrack(t, filename, offset, level);
 
 			tsunami->progress->End();
+			a->action_manager->EndActionGroup();
 			a->NotifyEnd();
 			found = true;
 			break;
@@ -114,13 +115,12 @@ bool Storage::LoadTrack(Track *t, const string &filename)
 	if (!found)
 		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
-	msg_db_l(1);
 	return ok;
 }
 
 bool Storage::Save(AudioFile *a, const string &filename)
 {
-	msg_db_r("Storage.Save", 1);
+	msg_db_f("Storage.Save", 1);
 	bool ok = false;
 	bool found = false;
 
@@ -149,13 +149,12 @@ bool Storage::Save(AudioFile *a, const string &filename)
 	if (!found)
 		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
-	msg_db_l(1);
 	return ok;
 }
 
 bool Storage::Export(AudioFile *a, const string &filename)
 {
-	msg_db_r("Storage.Export", 1);
+	msg_db_f("Storage.Export", 1);
 	bool ok = false;
 	bool found = false;
 
@@ -185,7 +184,6 @@ bool Storage::Export(AudioFile *a, const string &filename)
 	if (!found)
 		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
-	msg_db_l(1);
 	return ok;
 }
 

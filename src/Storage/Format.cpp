@@ -8,6 +8,7 @@
 #include "Format.h"
 #include "../Tsunami.h"
 #include "../Audio/AudioRenderer.h"
+#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 Format::Format(const string &_extension, int _flags)
 {
@@ -19,14 +20,15 @@ Format::~Format()
 {
 }
 
-void Format::ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset)
+void Format::ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level)
 {
-	msg_db_r("ImportData", 1);
+	msg_db_f("ImportData", 1);
 
-	BufferBox buf = t->GetBuffers(0, Range(offset, samples));
+	BufferBox buf = t->GetBuffers(level, Range(offset, samples));
+
+	Action *a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
 	buf.import(data, channels, format, samples);
-
-	msg_db_l(1);
+	t->root->action_manager->Execute(a);
 }
 
 

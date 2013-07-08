@@ -86,7 +86,7 @@ void AudioFile::DeleteTag(int index)
 
 void AudioFile::NewEmpty(int _sample_rate)
 {
-	msg_db_r("AudioFile.NewEmpty",1);
+	msg_db_f("AudioFile.NewEmpty",1);
 
 	Reset();
 	action_manager->Enable(false);
@@ -100,12 +100,11 @@ void AudioFile::NewEmpty(int _sample_rate)
 
 	action_manager->Enable(true);
 	Notify("Change");
-	msg_db_l(1);
 }
 
 void AudioFile::NewWithOneTrack(int _sample_rate)
 {
-	msg_db_r("AudioFile.NewWithOneTrack",1);
+	msg_db_f("AudioFile.NewWithOneTrack",1);
 
 	NotifyBegin();
 	NewEmpty(_sample_rate);
@@ -113,18 +112,17 @@ void AudioFile::NewWithOneTrack(int _sample_rate)
 	AddEmptyTrack();
 	action_manager->Enable(true);
 	NotifyEnd();
-
-	msg_db_l(1);
 }
 
 // delete all data
 void AudioFile::Reset()
 {
-	msg_db_r("AudioFile.Reset",1);
+	msg_db_f("AudioFile.Reset",1);
 	used = false;
 	filename = "";
 	tag.clear();
 	area = rect(0, 0, 0, 0);
+	sel_raw.clear();
 	selection.clear();
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
@@ -138,8 +136,6 @@ void AudioFile::Reset()
 
 	Notify("Change");
 	Notify("New");
-
-	msg_db_l(1);
 }
 
 AudioFile::~AudioFile()
@@ -150,7 +146,7 @@ AudioFile::~AudioFile()
 
 void AudioFile::UpdateSelection()
 {
-	msg_db_r("UpdateSelection", 1);
+	msg_db_f("UpdateSelection", 1);
 	selection = sel_raw;
 	if (selection.num < 0)
 		selection.invert();
@@ -160,7 +156,6 @@ void AudioFile::UpdateSelection()
 		foreach(Track *s, t->sub)
 			s->is_selected = (t->is_selected) && selection.overlaps(s->GetRange());
 	Notify("SelectionChange");
-	msg_db_l(1);
 }
 
 
@@ -271,12 +266,11 @@ extern HuiTimer debug_timer;
 
 void AudioFile::UpdatePeaks(int mode)
 {
-	msg_db_r("Audio.UpdatePeaks", 2);
+	msg_db_f("Audio.UpdatePeaks", 2);
 	debug_timer.reset();
 	foreach(Track *t, track)
 		t->UpdatePeaks(mode);
 	msg_write(format("up %f", debug_timer.get()));
-	msg_db_l(2);
 }
 
 

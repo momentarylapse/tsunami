@@ -19,10 +19,10 @@ public:
 	bool CanHandle(const string &_extension);
 	bool TestFormatCompatibility(AudioFile *a);
 
-	void ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset);
+	void ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
 	void ExportAudioAsTrack(AudioFile *a, const string &filename);
 
-	virtual void LoadTrack(Track *t, const string &filename) = 0;
+	virtual void LoadTrack(Track *t, const string &filename, int offset = 0, int level = 0) = 0;
 	virtual void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename) = 0;
 
 	virtual void LoadAudio(AudioFile *a, const string &filename) = 0;

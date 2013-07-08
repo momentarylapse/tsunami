@@ -13,6 +13,7 @@
 #include <FLAC/all.h>
 
 bool flac_tells_samples;
+int flac_offset, flac_level;
 int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
 SampleFormat flac_format;
 int flac_read_samples;
@@ -34,8 +35,8 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	}
 
 	// read decoded PCM samples
-	Range range = Range(flac_read_samples, frame->header.blocksize);
-	BufferBox buf = flac_track->GetBuffers(0, range);
+	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
+	BufferBox buf = flac_track->GetBuffers(flac_level, range);
 	Action *a = new ActionTrackEditBuffer(flac_track, 0, range);
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
@@ -84,9 +85,9 @@ FormatFlac::~FormatFlac()
 {
 }
 
-void FormatFlac::LoadTrack(Track *t, const string & filename)
+void FormatFlac::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
-	msg_db_r("load_flac_file", 1);
+	msg_db_f("load_flac_file", 1);
 	tsunami->progress->Set(_("lade flac"), 0);
 	t->root->action_manager->BeginActionGroup();
 	bool ok = true;
@@ -98,6 +99,8 @@ void FormatFlac::LoadTrack(Track *t, const string & filename)
 		FileClose(f);
 	}
 
+	flac_level = level;
+	flac_offset = offset;
 	flac_read_samples = 0;
 	flac_track = t;
 	//bits = channels = samples = freq = 0;
@@ -128,8 +131,6 @@ void FormatFlac::LoadTrack(Track *t, const string & filename)
 
 	t->root->sample_rate = flac_freq;
 	t->root->action_manager->EndActionGroup();
-
-	msg_db_l(1);
 }
 
 

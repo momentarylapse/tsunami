@@ -773,7 +773,7 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 
 
 
-void FormatNami::LoadTrack(Track *t, const string & filename)
+void FormatNami::LoadTrack(Track *t, const string &filename, int offset, int level)
 {
 }
 

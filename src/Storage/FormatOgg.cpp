@@ -194,13 +194,12 @@ void FormatOgg::LoadAudio(AudioFile *a, const string & filename)
 
 
 
-void FormatOgg::LoadTrack(Track *t, const string & filename)
+void FormatOgg::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
-	msg_db_r("Ogg.LoadTracl", 1);
+	msg_db_f("Ogg.LoadTracl", 1);
 	tsunami->progress->Set(_("lade ogg"), 0);
 	if (ov_fopen((char*)filename.c_str(), &vf)){
 		msg_error("ogg: ov_fopen failed");
-		msg_db_l(1);
 		return;
 	}
 	vorbis_info *vi = ov_info(&vf, -1);
@@ -241,8 +240,8 @@ void FormatOgg::LoadTrack(Track *t, const string & filename)
 			break;
 		}else{
 			int dsamples = r / 4;
-			int offset = read / 4;
-			ImportData(t, data, channels, SAMPLE_FORMAT_16, dsamples, offset);
+			int _offset = read / 4 + offset;
+			ImportData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, level);
 			read += r;
 			nn ++;
 			if (nn > 256){
@@ -253,7 +252,6 @@ void FormatOgg::LoadTrack(Track *t, const string & filename)
 	}
 	delete[](data);
 	ov_clear(&vf);
-	msg_db_l(1);
 }
 
 

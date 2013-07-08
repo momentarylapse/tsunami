@@ -52,6 +52,8 @@ void Clipboard::Copy(AudioFile *a)
 
 void Clipboard::Paste(AudioFile *a)
 {
+	if (!HasData())
+		return;
 	if (a->used){
 		a->Execute(new ActionSubTrackPaste(get_track_index(tsunami->view->cur_track), a->selection.start(), buf));
 	}else{

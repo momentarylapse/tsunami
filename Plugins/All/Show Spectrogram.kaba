@@ -1,0 +1,112 @@
+// Image = hui:find
+// Title[Deutsch] = Spektrum zeigen
+use "../api.kaba"
+use "../grid.kaba"
+
+const int N = 4096
+const int NT = 512
+const int NF = 512
+const float MIN_FREQ = 80.0
+const float MAX_FREQ = 10000.0
+const float MIN_VOL = 0.0 - 60.0
+const float MAX_VOL = 0.0
+
+window dlg
+
+float sg[NT][NF]
+Image im0
+
+GridData grid
+
+
+void OnDraw()
+	painter c = dlg.BeginDraw("drawing_area")
+	float w = c.width
+	float h = c.height
+	
+	grid.Draw(c, 0, 0, w, h)
+	
+	rect r = grid.GetPlotRegion(0, 0, w, h)
+	
+	Image im = im0
+	im.Scale(r.width(), r.height())
+	c.DrawImage(r.x1, r.y1, im)
+	
+	c.End()
+
+void OnClose()
+	delete dlg
+
+color f2col(float f)
+	f = sqrt(f)
+	if f < 0.333
+		return color(f * 3, 0, 0, f * 3)
+	else if f < 0.6666
+		return color(1, f * 3 - 1, 0, 2 - f * 3)
+	return color(1, 1, f * 3 - 2, 0)
+
+void show_spec()
+	dlg = new Dialog("Spectrum", 600, 460, MainWin, true)
+	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
+	dlg.SetTarget("table1", 0)
+	dlg.AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
+	dlg.AddControlTable("!noexpandy", 0, 1, 2, 1, "table2")
+	dlg.SetTarget("table2", 0)
+	dlg.AddText("", 0, 0, 0, 0, "")
+	dlg.AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
+	dlg.SetImage("close", "hui:close")
+	
+	dlg.EventX("drawing_area", "hui:redraw", &OnDraw)
+	dlg.Event("hui:close", &OnClose)
+	dlg.Event("close", &OnClose)
+	
+	BufferBox buf = AudioFileRender(audio, audio.selection)
+	
+	complex f[]
+	float sub[]
+	sub.resize(N)
+	
+	float _max = 0
+	
+	for int t, 0, NT
+		int offset = (buf.num - N) * t / NT
+		
+		for int j, 0, N
+			sub[j] = buf.r[offset + j]
+		fft_r2c(sub, f)
+		float ww = i2f(N) / audio.sample_rate
+		for int i, 0, NF
+			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NF - 1) * i)
+			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NF - 1) * (i + 1))
+			int j0 = fmin * ww
+			int j1 = fmax * ww + 1
+			j0 = clamp(j0, 0, f.num)
+			j1 = clamp(j1, 0, f.num)
+			float bmaxr = 0
+			for int j, j0, j1
+				float amp = f[j].x * f[j].x + f[j].y * f[j].y
+				if bmaxr < amp
+					bmaxr = amp
+			_max = max(_max, bmaxr)
+			sg[t][i] = bmaxr
+	
+	im0.Create(NT, NF, Black)
+	for int t, 0, NT
+		for int i, 0, NF
+			float ff = sg[t][i] / _max
+			im0.SetPixel(t, NF - i - 1, f2col(ff))
+	
+
+	dlg.Redraw("drawing_area")
+
+	dlg.Run()
+
+void main()
+	grid.x_axis.set(0, 1, false, "")
+	grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
+	//grid.allow_bg = false
+	
+	if audio.selection.length > 0
+		show_spec()
+	else
+		logging.Error("'Show Spectrogram.kaba': Needs some selection!")

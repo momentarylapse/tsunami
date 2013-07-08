@@ -36,17 +36,17 @@ void CreateLines(int type, float x[], float yr[], float yl[])
 	for int i, 0, N
 		x.add(log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ))
 		if type == TypeLinear
-			grid.SetYAxis(0, peak_max, false, "")
+			grid.y_axis.set(0, peak_max, false, "")
 			yr.add(ffr[i])
 			yl.add(ffl[i])
 		else if type == TypeRoot2
-			grid.SetYAxis(0, sqrt(peak_max), false, "")
+			grid.y_axis.set(0, sqrt(peak_max), false, "")
 			yr.add(pow(ffr[i], 0.5))
 			yl.add(pow(ffl[i], 0.5))
 		else //if type == TypeLogarithm
 			float vol_max = todb(peak_max)
 			float vol_min = vol_max - 60
-			grid.SetYAxis(vol_min, vol_max, false, "db")
+			grid.y_axis.set(vol_min, vol_max, false, "db")
 			yr.add(clamp(todb(ffr[i]), vol_min, vol_max))
 			yl.add(clamp(todb(ffl[i]), vol_min, vol_max))
 
@@ -136,7 +136,7 @@ void show_spec()
 
 void main()
 	//char dummy[3]
-	grid.SetXAxis(MIN_FREQ, MAX_FREQ, true, "Hz")
+	grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
 	if audio.selection.length > 0
 		show_spec()

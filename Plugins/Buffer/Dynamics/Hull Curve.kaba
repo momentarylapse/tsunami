@@ -147,8 +147,8 @@ void Configure()
 	PutFavoriteBarSizable(dlg, "table", 0, 0)
 	PutCommandBarSizable(dlg, "table", 0, 3)
 	
-	grid.SetXAxis(0, 1, false, "")
-	grid.SetYAxis(MIN_VOL, MAX_VOL, false, "db")
+	grid.x_axis.set(0, 1, false, "")
+	grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 	
 	DataToDialog()
 

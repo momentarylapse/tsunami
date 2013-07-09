@@ -32,7 +32,7 @@ void NewDialog::OnClose()
 void NewDialog::OnOk()
 {
 	int sample_rate = GetInt("sample_rate");
-	audio->NewWithOneTrack(sample_rate);
+	audio->NewWithOneTrack(Track::TYPE_AUDIO, sample_rate);
 	OnClose();
 }
 

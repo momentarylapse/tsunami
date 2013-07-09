@@ -40,7 +40,7 @@ public:
 
 	void Reset();
 	void NewEmpty(int _sample_rate);
-	void NewWithOneTrack(int _sample_rate);
+	void NewWithOneTrack(int track_type, int _sample_rate);
 	bool Load(const string &filename, bool deep);
 	bool Save(const string &filename);
 	void UpdateSelection();
@@ -60,9 +60,7 @@ public:
 	void AddTag(const string &key, const string &value);
 	void EditTag(int index, const string &key, const string &value);
 	void DeleteTag(int index);
-	Track *AddEmptyTrack(int index = -1);
-	Track *AddTimeTrack(int index = -1);
-	Track *AddMidiTrack(int index = -1);
+	Track *AddTrack(int type, int index = -1);
 	void DeleteTrack(int index);
 	void AddLevel();
 	void InsertSelectedSubs(int level_no);

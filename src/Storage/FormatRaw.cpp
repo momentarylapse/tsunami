@@ -121,7 +121,7 @@ void FormatRaw::SaveAudio(AudioFile *a, const string & filename)
 
 void FormatRaw::LoadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddEmptyTrack();
+	Track *t = a->AddTrack(Track::TYPE_AUDIO);
 	LoadTrack(t, filename);
 }
 

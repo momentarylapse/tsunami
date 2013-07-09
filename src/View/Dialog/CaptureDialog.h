@@ -27,7 +27,9 @@ public:
 	void OnPause();
 	void OnOk();
 	void OnClose();
-	void Insert();
+	bool Insert();
+
+	void FillTrackList();
 
 	void OnUpdate(Observable *o);
 

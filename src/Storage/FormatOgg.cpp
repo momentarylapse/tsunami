@@ -188,7 +188,7 @@ void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 void FormatOgg::LoadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddEmptyTrack();
+	Track *t = a->AddTrack(Track::TYPE_AUDIO);
 	LoadTrack(t, filename);
 }
 

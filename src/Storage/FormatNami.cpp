@@ -330,7 +330,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		f->ReadInt(); // bits per sample
 		tdata.resize(length * 2);
 		f->ReadBuffer((char*)&tdata[0], length * 4);
-		Track *t = a->AddEmptyTrack(0);
+		Track *t = a->AddTrack(Track::TYPE_AUDIO, 0);
 		BufferBox buf = t->GetBuffers(0, Range(0, length));
 		for (int i=0;i<length;i++){
 			buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
@@ -366,7 +366,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		f->ReadInt(); // bits per sample
 		int num_tracks = f->ReadInt();
 		for (int k=0;k<num_tracks;k++){
-			Track *t = a->AddEmptyTrack(k);
+			Track *t = a->AddTrack(Track::TYPE_AUDIO, k);
 			t->name = f->ReadStr();
 			t->volume = f->ReadFloat();
 			tdata.resize(length * 2);
@@ -415,7 +415,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 		}
 		int num_tracks = f->ReadInt();
 		for (int k=0;k<num_tracks;k++){
-			Track *t = a->AddEmptyTrack(k);
+			Track *t = a->AddTrack(Track::TYPE_AUDIO, k);
 			if (ffv == 5)
 				f->ReadInt();
 			t->name = f->ReadStr();
@@ -655,7 +655,7 @@ void ReadChunkTrackLevel(CFile *f, Track *t)
 
 void ReadChunkTrack(CFile *f, AudioFile *a)
 {
-	Track *t = a->AddEmptyTrack();
+	Track *t = a->AddTrack(Track::TYPE_AUDIO);
 	t->name = f->ReadStr();
 	t->volume = f->ReadFloat();
 	t->muted = f->ReadBool();

@@ -102,14 +102,14 @@ void AudioFile::NewEmpty(int _sample_rate)
 	Notify("Change");
 }
 
-void AudioFile::NewWithOneTrack(int _sample_rate)
+void AudioFile::NewWithOneTrack(int track_type, int _sample_rate)
 {
 	msg_db_f("AudioFile.NewWithOneTrack",1);
 
 	NotifyBegin();
 	NewEmpty(_sample_rate);
 	action_manager->Enable(false);
-	AddEmptyTrack();
+	AddTrack(track_type);
 	action_manager->Enable(true);
 	NotifyEnd();
 }
@@ -242,35 +242,18 @@ string AudioFile::get_time_str_fuzzy(int t, float dt)
 
 
 
-Track *AudioFile::AddEmptyTrack(int index)
+Track *AudioFile::AddTrack(int type, int index)
 {
-	if (index < 0)
-		index = track.num;
-	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_AUDIO));
-}
-
-
-
-Track *AudioFile::AddTimeTrack(int index)
-{
-	// force single time track
-	foreach(Track *tt, track)
-		if (tt->type == Track::TYPE_TIME){
+	if (type == Track::TYPE_TIME){
+		// force single time track
+		if (GetTimeTrack()){
 			tsunami->log->Error(_("Es existiert schon eine Rhythmus-Spur."));
 			return NULL;
 		}
-
+	}
 	if (index < 0)
 		index = track.num;
-	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_TIME));
-}
-
-
-Track *AudioFile::AddMidiTrack(int index)
-{
-	if (index < 0)
-		index = track.num;
-	return (Track*)Execute(new ActionTrackAdd(index, Track::TYPE_MIDI));
+	return (Track*)Execute(new ActionTrackAdd(index, type));
 }
 
 extern HuiTimer debug_timer;

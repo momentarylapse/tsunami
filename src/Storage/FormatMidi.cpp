@@ -201,7 +201,7 @@ void FormatMidi::LoadAudio(AudioFile *a, const string &filename)
 			f->SetPos(pos0 + tsize, true);
 
 			if (notes.num > 0){
-				Track *t = a->AddMidiTrack();
+				Track *t = a->AddTrack(Track::TYPE_MIDI);
 				t->midi.append(notes);
 				t->name = track_name;
 			}

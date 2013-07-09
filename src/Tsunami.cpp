@@ -163,7 +163,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	log->Info(AppName + " " + AppVersion);
 	log->Info(_("  viel Erfolg!"));
 
-	audio->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
+	audio->NewWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
 
 	HandleArguments(arg);
 
@@ -211,17 +211,17 @@ void Tsunami::OnAbout()
 
 void Tsunami::OnAddTrack()
 {
-	audio->AddEmptyTrack();
+	audio->AddTrack(Track::TYPE_AUDIO);
 }
 
 void Tsunami::OnAddTimeTrack()
 {
-	audio->AddTimeTrack();
+	audio->AddTrack(Track::TYPE_TIME);
 }
 
 void Tsunami::OnAddMidiTrack()
 {
-	audio->AddMidiTrack();
+	audio->AddTrack(Track::TYPE_MIDI);
 }
 
 void Tsunami::OnDeleteTrack()
@@ -341,7 +341,7 @@ void Tsunami::OnTrackImport()
 	if (!audio->used)
 		return;
 	if (storage->AskOpenImport(this)){
-		Track *t = audio->AddEmptyTrack();
+		Track *t = audio->AddTrack(Track::TYPE_AUDIO);
 		storage->LoadTrack(t, HuiFilename, audio->selection.start(), view->cur_level);
 	}
 }

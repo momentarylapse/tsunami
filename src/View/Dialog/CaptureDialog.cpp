@@ -10,8 +10,20 @@
 #include "../../Audio/AudioInput.h"
 #include "../../Audio/AudioOutput.h"
 #include "../AudioView.h"
+#include "../../Stuff/Log.h"
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
+
+string track_type(int type)
+{
+	if (type == Track::TYPE_AUDIO)
+		return "audio";
+	if (type == Track::TYPE_MIDI)
+		return "midi";
+	if (type == Track::TYPE_TIME)
+		return "time";
+	return "???";
+}
 
 CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
 	HuiWindow("record_dialog", _parent, _allow_parent)
@@ -43,7 +55,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	Check("capture_playback", a->used);
 
 	foreach(Track *t, a->track)
-		AddString("capture_target", t->GetNiceName());
+		AddString("capture_target", t->GetNiceName() + "     (" + track_type(t->type) + ")");
 	AddString("capture_target", _("neue Spur anlegen"));
 	if (tsunami->view->cur_track)
 		SetInt("capture_target", get_track_index(tsunami->view->cur_track));
@@ -127,8 +139,8 @@ void CaptureDialog::OnOk()
 {
 	tsunami->input->Stop();
 	tsunami->output->Stop();
-	Insert();
-	delete(this);
+	if (Insert())
+		delete(this);
 }
 
 void CaptureDialog::OnClose()
@@ -143,9 +155,9 @@ void CaptureDialog::OnUpdate(Observable *o)
 	SetString("capture_time", audio->get_time_str(tsunami->input->GetSampleCount()));
 }
 
-void CaptureDialog::Insert()
+bool CaptureDialog::Insert()
 {
-	msg_db_r("CaptureInsert", 1);
+	msg_db_f("CaptureInsert", 1);
 	Track *t;
 	int target = GetInt("capture_target");
 	int i0;
@@ -157,7 +169,7 @@ void CaptureDialog::Insert()
 
 		if (target >= audio->track.num){
 			// new track
-			t = audio->AddEmptyTrack(audio->track.num);
+			t = audio->AddTrack(type, audio->track.num);
 		}else{
 			// overwrite
 			t = audio->track[target];
@@ -165,9 +177,13 @@ void CaptureDialog::Insert()
 		i0 = s_start + dpos;
 	}else{
 		// new file
-		audio->NewWithOneTrack(DEFAULT_SAMPLE_RATE);
+		audio->NewWithOneTrack(type, DEFAULT_SAMPLE_RATE);
 		t = audio->track[0];
 		i0 = 0;
+	}
+	if (t->type != type){
+		tsunami->log->Error(format(_("Kann aufgenommene Daten (%s) nicht in Ziel (%s) einf&ugen."), track_type(type).c_str(), track_type(t->type).c_str()));
+		return false;
 	}
 
 	// insert data
@@ -183,6 +199,6 @@ void CaptureDialog::Insert()
 		t->InsertMidiData(i0, tsunami->input->midi);
 	}
 	tsunami->input->ResetAccumulation();
-	msg_db_l(1);
+	return true;
 }
 

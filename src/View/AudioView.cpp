@@ -392,6 +392,7 @@ void AudioView::OnMouseMove()
 void AudioView::OnLeftButtonDown()
 {
 	msg_db_f("OnLBD", 2);
+	SetMouse();
 	SelectUnderMouse();
 	UpdateMenu();
 

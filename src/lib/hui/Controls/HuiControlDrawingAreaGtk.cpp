@@ -17,10 +17,9 @@ gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 /*void OnGtkAreaResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
 {	NotifyWindowByWidget((CHuiWindow*)user_data, widget, "hui:resize", false);	}*/
 
-gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+template<class T>
+void win_set_input(HuiWindow *win, T *event)
 {
-	HuiControl *c = (HuiControl*)user_data;
-	HuiWindow *win = c->win;
 	win->input.dx = (int)event->x - win->input.area_x;
 	win->input.dy = (int)event->y - win->input.area_y;
 	win->input.area_x = (int)event->x;
@@ -29,6 +28,12 @@ gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer u
 	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
 	win->input.mb = ((mod & GDK_BUTTON2_MASK) > 0);
 	win->input.rb = ((mod & GDK_BUTTON3_MASK) > 0);
+}
+
+gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+{
+	HuiControl *c = (HuiControl*)user_data;
+	win_set_input(c->win, event);
 	c->Notify("hui:mouse-move", false);
 	gdk_event_request_motions(event); // too prevent too many signals for slow message processing
 	return false;
@@ -36,6 +41,8 @@ gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer u
 
 gboolean OnGtkAreaButtonDown(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
+	HuiControl *c = (HuiControl*)user_data;
+	win_set_input(c->win, event);
 	string msg = "hui:";
 	if (event->button == 1)
 		msg += "left";
@@ -48,12 +55,14 @@ gboolean OnGtkAreaButtonDown(GtkWidget *widget, GdkEventButton *event, gpointer 
 	else
 		msg += "-button-down";
 	gtk_widget_grab_focus(widget);
-	((HuiControl*)user_data)->Notify(msg, false);
+	c->Notify(msg, false);
 	return false;
 }
 
 gboolean OnGtkAreaButtonUp(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
+	HuiControl *c = (HuiControl*)user_data;
+	win_set_input(c->win, event);
 	string msg = "hui:";
 	if (event->button == 1)
 		msg += "left";
@@ -62,7 +71,7 @@ gboolean OnGtkAreaButtonUp(GtkWidget *widget, GdkEventButton *event, gpointer us
 	else if (event->button == 3)
 		msg += "right";
 	msg += "-button-up";
-	((HuiControl*)user_data)->Notify(msg, false);
+	c->Notify(msg, false);
 	return false;
 }
 

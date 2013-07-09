@@ -10,7 +10,7 @@
 #include "../View/Dialog/AudioFileDialog.h"
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
-#include "../Audio/AudioInputAudio.h"
+#include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
@@ -20,6 +20,7 @@ const int FONT_SIZE = 10;
 const int MAX_TRACK_HEIGHT = 250;
 const float LINE_WIDTH = 1.0f;
 
+const float BORDER_FACTOR = 1.0f / 15.0f;
 
 int get_track_index_save(Track *t)
 {
@@ -53,6 +54,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	ColorSelectionBoundary = color(1, 0.2f, 0.2f, 0.8f);
 	ColorSelectionBoundaryMO = color(1, 0.8f, 0.2f, 0.2f);
 	ColorPreviewMarker = color(1, 0, 0.7f, 0);
+	ColorCaptureMarker = color(1, 0.7f, 0, 0);
 	ColorWave = Gray;
 	ColorWaveCur = color(1, 0.3f, 0.3f, 0.3f);
 	ColorSub = color(1, 0.6f, 0.6f, 0);
@@ -92,6 +94,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
 	Subscribe(tsunami->output);
+	Subscribe(tsunami->input);
 
 	// events
 	parent->EventMX("area", "hui:redraw", this, &AudioView::OnDraw);
@@ -119,6 +122,7 @@ AudioView::~AudioView()
 {
 	Unsubscribe(audio);
 	Unsubscribe(tsunami->output);
+	Unsubscribe(tsunami->input);
 
 	HuiConfigWriteBool("View.Mono", show_mono);
 	HuiConfigWriteInt("View.GridMode", grid_mode);
@@ -853,6 +857,12 @@ void AudioView::OnUpdate(Observable *o)
 			UpdateMenu();
 		}
 	}else if (o->GetName() == "AudioOutput"){
+		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio))
+			MakeSampleVisible(tsunami->output->GetPos());
+		ForceRedraw();
+	}else if (o->GetName() == "AudioInput"){
+		if (tsunami->input->IsCapturing())
+			MakeSampleVisible(audio->selection.start() + tsunami->input->GetSampleCount());
 		ForceRedraw();
 	}
 }
@@ -989,8 +999,13 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio)){
 		DrawTimeLine(c, tsunami->output->GetRange().start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
 		DrawTimeLine(c, tsunami->output->GetRange().end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
-		DrawTimeLine(c, tsunami->output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
+		if (!tsunami->input->IsCapturing())
+			DrawTimeLine(c, tsunami->output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
 	}
+
+	// capturing position
+	if (tsunami->input->IsCapturing())
+		DrawTimeLine(c, audio->selection.start() + tsunami->input->GetSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
 }
 
 int frame=0;
@@ -1024,7 +1039,7 @@ void AudioView::OptimizeView()
 
 	if (r.num == 0)
 		r.num = 10 * audio->sample_rate;
-	int border = r.num / 15;
+	int border = r.num * BORDER_FACTOR;
 	r.offset -= border;
 	r.num += border * 2;
 	view_zoom = audio->area.width() / (double)r.length();
@@ -1074,6 +1089,14 @@ void AudioView::ZoomIn()
 void AudioView::ZoomOut()
 {
 	Zoom(0.5f);
+}
+void AudioView::MakeSampleVisible(int sample)
+{
+	double x = sample2screen(sample);
+	if ((x > audio->area.x2) || (x < audio->area.x1)){
+		view_pos = sample - audio->area.width() / view_zoom * BORDER_FACTOR;
+		ForceRedraw();
+	}
 }
 
 void AudioView::SelectAll()

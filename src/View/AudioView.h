@@ -46,6 +46,7 @@ public:
 	void SetPeaksMode(int mode);
 	void ZoomIn();
 	void ZoomOut();
+	void MakeSampleVisible(int sample);
 
 	void DrawBuffer(HuiPainter *c, const rect &r, Track *t, double pos, const color &col);
 	void DrawSubFrame(HuiPainter *c, const rect &r, Track *s, const color &col, int delay);
@@ -73,6 +74,7 @@ public:
 	color ColorSelectionBoundary;
 	color ColorSelectionBoundaryMO;
 	color ColorPreviewMarker;
+	color ColorCaptureMarker;
 	color ColorWave;
 	color ColorWaveCur;
 	color ColorSub;

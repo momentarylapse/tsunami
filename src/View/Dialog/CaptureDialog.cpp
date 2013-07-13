@@ -8,6 +8,7 @@
 #include "CaptureDialog.h"
 #include "../../Tsunami.h"
 #include "../../Audio/AudioInput.h"
+#include "../../Audio/AudioInputMidi.h"
 #include "../../Audio/AudioOutput.h"
 #include "../AudioView.h"
 #include "../../Stuff/Log.h"
@@ -88,11 +89,36 @@ void CaptureDialog::OnTypeAudio()
 	tsunami->input->Start(type, tsunami->input->GetSampleRate());
 }
 
+static Array<AudioInputMidi::MidiPort> ports;
+
+void OnSelectPort()
+{
+	int n = HuiCurWindow->GetInt("");
+	if (n < ports.num)
+		tsunami->input->in_midi->ConnectTo(ports[n]);
+	delete HuiCurWindow;
+}
+
+void SelectMidiPort(HuiWindow *parent)
+{
+	ports = tsunami->input->in_midi->FindPorts();
+	HuiDialog *dlg = new HuiDialog(_("MIDI Quelle ausw&ahlen"), 400, 300, parent, false);
+	dlg->AddListView(_("MIDI Quellen"), 0, 0, 0, 0, "port_list");
+	foreach(AudioInputMidi::MidiPort &p, ports)
+		dlg->SetString("port_list", p.client_name + " : " + p.port_name);
+	dlg->SetString("port_list", _("        - nicht verbinden -"));
+	dlg->SetTooltip("port_list", _("* entweder eine Quelle w&ahlen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen &uberlassen, eine Verbindung herzustellen"));
+	dlg->SetInt("port_list", 0);
+	dlg->Event("port_list", &OnSelectPort);
+	dlg->Run();
+}
+
 void CaptureDialog::OnTypeMidi()
 {
 	if (type == Track::TYPE_MIDI)
 		return;
 	type = Track::TYPE_MIDI;
+	SelectMidiPort(this);
 	tsunami->input->Start(type, tsunami->input->GetSampleRate());
 }
 

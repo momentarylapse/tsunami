@@ -39,6 +39,15 @@ public:
 	virtual float GetSampleRate();
 	virtual BufferBox GetSomeSamples(int num_samples);
 
+	struct MidiPort
+	{
+		int client, port;
+		string client_name, port_name;
+	};
+	Array<MidiPort> FindPorts();
+	bool ConnectTo(MidiPort p);
+	bool Unconnect();
+
 private:
 
 	void ClearInputQueue();
@@ -46,6 +55,7 @@ private:
 	MidiData &data;
 
 	_snd_seq *handle;
+	int portid;
 	int npfd;
 	struct pollfd *pfd;
 	int sample_rate;

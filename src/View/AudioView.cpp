@@ -17,7 +17,7 @@
 
 const int FONT_SIZE_NO_FILE = 12;
 const int FONT_SIZE = 10;
-const int MAX_TRACK_HEIGHT = 250;
+const int MAX_TRACK_CHANNEL_HEIGHT = 125;
 const float LINE_WIDTH = 1.0f;
 
 const float BORDER_FACTOR = 1.0f / 15.0f;
@@ -77,6 +77,9 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	image_unmuted.Load(HuiAppDirectoryStatic + "Data/volume.tga");
 	image_muted.Load(HuiAppDirectoryStatic + "Data/mute.tga");
 	image_solo.Load(HuiAppDirectoryStatic + "Data/solo.tga");
+	image_track_audio.Load(HuiAppDirectoryStatic + "Data/track-audio.tga");
+	image_track_time.Load(HuiAppDirectoryStatic + "Data/track-time.tga");
+	image_track_midi.Load(HuiAppDirectoryStatic + "Data/track-midi.tga");
 
 	MousePossiblySelecting = -1;
 	cur_action = NULL;
@@ -744,9 +747,16 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 
 	//c->SetColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 //	c->SetColor(ColorWaveCur);
-	c->SetFont("", -1, (t == cur_track), (t->type == Track::TYPE_TIME));
-	DrawStrBg(c, r.x1 + 3, r.y1 + 3, t->GetNiceName(), ColorWaveCur, ColorBackgroundCurWave);
+	c->SetFont("", -1, (t == cur_track), false);
+	DrawStrBg(c, r.x1 + 23, r.y1 + 3, t->GetNiceName(), ColorWaveCur, ColorBackgroundCurWave);
 	c->SetFont("", -1, false, false);
+
+	if (t->type == t->TYPE_TIME)
+		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_time);
+	else if (t->type == t->TYPE_MIDI)
+		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_midi);
+	else
+		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_audio);
 
 	c->DrawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
 	if (audio->track.num > 1)
@@ -870,16 +880,17 @@ void AudioView::OnUpdate(Observable *o)
 
 void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 {
-	int opt_track_height = MAX_TRACK_HEIGHT;
-	if (tsunami->view->show_mono)
-		opt_track_height /= 2;
+	int n_ch = tsunami->view->show_mono ? 1 : 2;
 
 	int h_wish = TIME_SCALE_HEIGHT;
 	int h_fix = TIME_SCALE_HEIGHT;
 	int n_var = 0;
 	foreach(Track *t, a->track){
 		if (t->type == t->TYPE_AUDIO){
-			h_wish += opt_track_height;
+			h_wish += MAX_TRACK_CHANNEL_HEIGHT * n_ch;
+			n_var += n_ch;
+		}else if (t->type == t->TYPE_MIDI){
+			h_wish += MAX_TRACK_CHANNEL_HEIGHT;
 			n_var ++;
 		}else{
 			h_wish += TIME_SCALE_HEIGHT * 2;
@@ -888,10 +899,15 @@ void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 	}
 
 	int y0 = r.y1 + TIME_SCALE_HEIGHT;
+	int opt_channel_height = MAX_TRACK_CHANNEL_HEIGHT;
 	if (h_wish > r.height())
-		opt_track_height = (r.height() - h_fix) / n_var;
+		opt_channel_height = (r.height() - h_fix) / n_var;
 	foreachi(Track *t, a->track, i){
-		float h = (t->type == t->TYPE_AUDIO) ? opt_track_height : TIME_SCALE_HEIGHT*2;
+		float h = TIME_SCALE_HEIGHT*2;
+		if (t->type == t->TYPE_AUDIO)
+			h = opt_channel_height * n_ch;
+		else if (t->type == t->TYPE_MIDI)
+			h = opt_channel_height;
 		t->area = rect(r.x1, r.x2, y0, y0 + h);
 		y0 += h;
 	}

@@ -158,6 +158,7 @@ public:
 	void ParseClass();
 	void ParseFunction(Type *class_type, bool as_extern);
 	void ParseClassFunction(Type *t, bool as_extern, int virtual_index);
+	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
 	Type *ParseVariableDefSingle(Type *type, Function *f, bool as_param = false);
 	void ParseVariableDef(bool single, Function *f);
 	void ParseGlobalConst(const string &name, Type *type);
@@ -170,10 +171,17 @@ public:
 	// pre compiler
 	void PreCompiler(bool just_analyse);
 	void HandleMacro(ExpressionBuffer::Line *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
-	void ImplementImplicitConstructor(Function *f, Type *t);
+	void ImplementImplicitConstructor(Function *f, Type *t, bool allow_parent_constructor = true);
 	void ImplementImplicitDestructor(Function *f, Type *t);
+	void CreateImplicitDestructor(Type *t);
 	void ImplementAddVirtualTable(Command *self, Function *f, Type *t);
 	void ImplementAddChildConstructors(Command *self, Function *f, Type *t);
+	void CreateImplicitDefaultConstructor(Type *t);
+	void CreateImplicitComplexConstructor(Type *t);
+	void CreateImplicitAssign(Type *t);
+	void CreateImplicitArrayClear(Type *t);
+	void CreateImplicitArrayResize(Type *t);
+	void CreateImplicitArrayAdd(Type *t);
 	void CreateImplicitFunctions(Type *t, bool relocate_last_function);
 
 	// syntax analysis
@@ -215,7 +223,7 @@ public:
 	// neccessary conversions
 	void ConvertCallByReference();
 	void BreakDownComplicatedCommands();
-	void MapLocalVariablesToStackX86();
+	void MapLocalVariablesToStack();
 
 	// data creation
 	int AddVar(const string &name, Type *type, Function *f);

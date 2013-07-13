@@ -300,7 +300,7 @@ void Script::Compiler()
 {
 	msg_db_f("Compiler",2);
 
-	syntax->MapLocalVariablesToStackX86();
+	syntax->MapLocalVariablesToStack();
 
 	syntax->BreakDownComplicatedCommands();
 #ifdef ScriptDebug

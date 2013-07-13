@@ -174,8 +174,8 @@ Command *DoClassFunction(SyntaxTree *ps, Command *ob, ClassFunction &cf, Functio
 		Command *cmd = ps->AddCommand(KindVirtualFunction, cf.virtual_index, ff->literal_return_type);
 		cmd->num_params = ff->num_params;
 		cmd->script = cf.script;
-		ps->GetFunctionCall("?." + cf.name, cmd, f);
 		cmd->instance = ob;
+		ps->GetFunctionCall("?." + cf.name, cmd, f);
 		return cmd;
 	}
 
@@ -362,6 +362,12 @@ void SyntaxTree::FindFunctionSingleParameter(int p, Type **WantedType, Function 
 		Function *ff = cmd->script->syntax->Functions[cmd->link_no];
 		if (p < ff->num_params)
 			WantedType[p] = ff->literal_param_type[p];
+	}else if (cmd->kind == KindVirtualFunction){
+		ClassFunction *cf = cmd->instance->type->parent->GetVirtualFunction(cmd->link_no);
+		if (!cf)
+			DoError("FindFunctionSingleParameter: cant find virtual function...?!?");
+		if (p < cf->param_type.num)
+			WantedType[p] = cf->param_type[p];
 	}else if (cmd->kind == KindCompilerFunction){
 		if (p < PreCommands[cmd->link_no].param.num)
 			WantedType[p] = PreCommands[cmd->link_no].param[p].type;
@@ -1674,6 +1680,33 @@ void SyntaxTree::ParseVariableDef(bool single, Function *f)
 	}
 }
 
+bool peak_commands_super(ExpressionBuffer &Exp)
+{
+	ExpressionBuffer::Line *l = Exp.cur_line + 1;
+	if (l->exp.num < 3)
+		return false;
+	if ((l->exp[0].name == "super") && (l->exp[1].name == ".") && (l->exp[2].name == "__init__"))
+		return true;
+	return false;
+}
+
+bool SyntaxTree::ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line)
+{
+	Exp.next_line();
+	Exp.indented = false;
+
+	// end of file
+	if (Exp.end_of_file())
+		return false;
+
+	// end of function
+	if (Exp.cur_line->indent <= this_line->indent)
+		return false;
+
+	// command or local definition
+	ParseCompleteCommand(f->block, f);
+	return true;
+}
 
 void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
 {
@@ -1734,6 +1767,8 @@ void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
 	f->_class = class_type;
 	if (class_type){
 		AddVar("self", GetPointerType(class_type), f);
+		if (class_type->parent)
+			AddVar("super", GetPointerType(class_type->parent), f);
 
 		// convert name to Class.Function
 		f->name = class_type->name + "." +  f->name;
@@ -1746,27 +1781,22 @@ void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
 	}
 
 	ExpressionBuffer::Line *this_line = Exp.cur_line;
+	bool more_to_parse = true;
 
 	// auto implement constructor?
-	if (f->name.tail(9) == ".__init__")
-		ImplementImplicitConstructor(f, class_type);
+	if (f->name.tail(9) == ".__init__"){
+		if (peak_commands_super(Exp)){
+			more_to_parse = ParseFunctionCommand(f, this_line);
+
+			ImplementImplicitConstructor(f, class_type, false);
+		}else
+			ImplementImplicitConstructor(f, class_type);
+	}
 
 
 // instructions
-	while(true){
-		Exp.next_line();
-		Exp.indented = false;
-
-		// end of file
-		if (Exp.end_of_file())
-			break;
-
-		// end of function
-		if (Exp.cur_line->indent <= this_line->indent)
-			break;
-
-		// command or local definition
-		ParseCompleteCommand(f->block, f);
+	while(more_to_parse){
+		more_to_parse = ParseFunctionCommand(f, this_line);
 	}
 
 	// auto implement destructor?

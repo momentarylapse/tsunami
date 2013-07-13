@@ -1028,7 +1028,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 	}
 }
 
-void SyntaxTree::MapLocalVariablesToStackX86()
+void SyntaxTree::MapLocalVariablesToStack()
 {
 	msg_db_f("MapLocalVariablesToStack", 1);
 	foreach(Function *f, Functions){
@@ -1051,11 +1051,13 @@ void SyntaxTree::MapLocalVariablesToStackX86()
 					if (v.name == "self"){
 						v._offset = f->_param_size;
 						f->_param_size += 4;
+					}else if (v.name == "super"){
+						v._offset = f->var[f->get_var("self")]._offset;
 					}
 			}
 
 			foreachi(Variable &v, f->var, i){
-				if ((f->_class) && (v.name == "self"))
+				if ((f->_class) && (v.name == "self") && (v.name == "super"))
 					continue;
 				if (v.name == "-return-")
 					continue;
@@ -1074,9 +1076,14 @@ void SyntaxTree::MapLocalVariablesToStackX86()
 			f->_var_size = 0;
 			
 			foreachi(Variable &v, f->var, i){
-				int s = mem_align(v.type->size, 4);
-				v._offset = - f->_var_size - s;
-				f->_var_size += s;
+				if ((f->_class) && (v.name == "super")){
+					// map "super" to "self"
+					v._offset = f->var[f->get_var("self")]._offset;
+				}else{
+					int s = mem_align(v.type->size, 4);
+					v._offset = - f->_var_size - s;
+					f->_var_size += s;
+				}
 			}
 		}
 	}

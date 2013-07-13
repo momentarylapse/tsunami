@@ -184,6 +184,7 @@ public:
 	AudioFileDialog *audio_file_dialog;
 
 	Image image_muted, image_unmuted, image_solo;
+	Image image_track_audio, image_track_time, image_track_midi;
 };
 
 #endif /* AUDIOVIEW_H_ */

@@ -38,6 +38,7 @@ AudioView::SelectionType::SelectionType()
 	track = sub = NULL;
 	pos = 0;
 	sub_offset = 0;
+	show_track_controls = NULL;
 }
 
 AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
@@ -175,16 +176,14 @@ bool mouse_over_time(AudioView *v, int pos)
 AudioView::SelectionType AudioView::GetMouseOver()
 {
 	SelectionType s;
-	s.type = SEL_TYPE_NONE;
-	s.track = NULL;
-	s.sub = NULL;
-	s.sub_offset = 0;
 
 	// track?
 	foreach(Track *t, audio->track){
 		if (MouseOverTrack(t)){
 			s.track = t;
 			s.type = SEL_TYPE_TRACK;
+			if (mx < t->area.x1 + 100)
+				s.show_track_controls = t;
 		}
 	}
 
@@ -316,6 +315,11 @@ void AudioView::ApplyBarriers(int &pos)
 	}
 }
 
+bool hover_changed(AudioView::SelectionType &hover, AudioView::SelectionType &hover_old)
+{
+	return (hover.type != hover_old.type) || (hover.sub != hover_old.sub) || (hover.show_track_controls != hover_old.show_track_controls);
+}
+
 void AudioView::OnMouseMove()
 {
 	msg_db_f("OnMouseMove", 2);
@@ -325,9 +329,9 @@ void AudioView::OnMouseMove()
 	if (HuiGetEvent()->lbut){
 		SelectionUpdatePos(Selection);
 	}else{
-		SelectionType mo_old = Hover;
+		SelectionType hover_old = Hover;
 		Hover = GetMouseOver();
-		_force_redraw_ |= (Hover.type != mo_old.type) || (Hover.sub != mo_old.sub);
+		_force_redraw_ |= hover_changed(Hover, hover_old);
 	}
 
 
@@ -758,8 +762,9 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 	else
 		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_audio);
 
-	c->DrawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
-	if (audio->track.num > 1)
+	if ((t->muted) || (Hover.show_track_controls == t))
+		c->DrawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
+	if ((audio->track.num > 1) && (Hover.show_track_controls == t))
 		c->DrawImage(r.x1 + 22, r.y1 + 22, image_solo);
 }
 

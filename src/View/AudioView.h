@@ -106,6 +106,7 @@ public:
 		int pos;
 		int sub_offset;
 		Array<int> barrier;
+		Track *show_track_controls;
 
 		SelectionType();
 	};

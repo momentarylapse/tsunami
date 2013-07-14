@@ -10,7 +10,7 @@
 
 ActionTrack__CutBufferBox::ActionTrack__CutBufferBox(Track *t, int _level_no, int _index, int _offset)
 {
-	get_track_sub_index(t, track_no, sub_no);
+	track_no = get_track_index(t);
 	index = _index;
 	offset = _offset;
 	level_no = _level_no;
@@ -25,7 +25,7 @@ ActionTrack__CutBufferBox::~ActionTrack__CutBufferBox()
 void ActionTrack__CutBufferBox::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 	BufferBox &b = t->level[level_no].buffer[index];
 	BufferBox &b2 = t->level[level_no].buffer[index + 1];
 
@@ -43,7 +43,7 @@ void *ActionTrack__CutBufferBox::execute(Data *d)
 {
 	//msg_write(format("cut %d   at %d", index, offset));
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 	TrackLevel &l = t->level[level_no];
 
 	assert(offset > 0 && offset < (l.buffer[index].num - 1));

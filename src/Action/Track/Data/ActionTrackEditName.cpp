@@ -21,7 +21,7 @@ ActionTrackEditName::~ActionTrackEditName()
 void *ActionTrackEditName::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, -1);
+	Track *t = a->get_track(track_no);
 
 	string temp = name;
 	name = t->name;

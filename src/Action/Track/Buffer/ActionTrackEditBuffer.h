@@ -22,7 +22,7 @@ public:
 	virtual void redo(Data *d);
 
 private:
-	int track_no, sub_no;
+	int track_no;
 	Range range;
 	int level_no;
 	BufferBox box;

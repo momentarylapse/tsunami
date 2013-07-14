@@ -23,7 +23,7 @@ ActionTrackAddBar::~ActionTrackAddBar()
 void *ActionTrackAddBar::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, -1);
+	Track *t = a->get_track(track_no);
 	assert(index >= 0);
 	assert(index <= t->bar.num);
 
@@ -36,7 +36,7 @@ void ActionTrackAddBar::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	Track *t = a->get_track(track_no, -1);
+	Track *t = a->get_track(track_no);
 	t->bar.erase(index);
 }
 

@@ -12,6 +12,7 @@
 #include "BufferBox.h"
 #include "MidiData.h"
 #include "Rhythm.h"
+#include "Sample.h"
 #include "AudioFile.h"
 #include "../Plugins/Effect.h"
 #include "../lib/math/rect.h"
@@ -73,17 +74,12 @@ public:
 	string name;
 
 	Array<TrackLevel> level;
-	int length, pos; // sub
 
 	float volume, panning;
 	bool muted;
 
-	// repetition
-	int rep_num;
-	int rep_delay;
-
 	Array<Effect> fx;
-	Array<Track*> sub;
+	Array<SampleRef*> sample;
 
 	// time track
 	BarCollection bar;
@@ -93,7 +89,6 @@ public:
 
 // editing
 	rect area;
-	int parent;
 	AudioFile *root;
 
 	bool is_selected;

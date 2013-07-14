@@ -35,9 +35,10 @@ int get_track_index_save(Track *t)
 AudioView::SelectionType::SelectionType()
 {
 	type = SEL_TYPE_NONE;
-	track = sub = NULL;
+	track = NULL;
+	sample = NULL;
 	pos = 0;
-	sub_offset = 0;
+	sample_offset = 0;
 	show_track_controls = NULL;
 }
 
@@ -90,7 +91,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	parent->AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
 
 	cur_track = NULL;
-	cur_sub = NULL;
+	cur_sample = NULL;
 	cur_level = 0;
 
 	audio = _audio;
@@ -150,7 +151,7 @@ bool AudioView::MouseOverTrack(Track *t)
 	return t->area.inside(mx, my);
 }
 
-int AudioView::MouseOverSub(Track *s)
+int AudioView::MouseOverSample(SampleRef *s)
 {
 	if ((mx >= s->area.x1) && (mx < s->area.x2)){
 		int offset = screen2sample(mx) - s->pos;
@@ -229,12 +230,12 @@ AudioView::SelectionType AudioView::GetMouseOver()
 	// sub?
 	if (s.track){
 		// TODO: prefer selected subs
-		foreach(Track *ss, s.track->sub){
-			int offset = MouseOverSub(ss);
+		foreach(SampleRef *ss, s.track->sample){
+			int offset = MouseOverSample(ss);
 			if (offset >= 0){
-				s.sub = ss;
-				s.type = SEL_TYPE_SUB;
-				s.sub_offset = offset;
+				s.sample = ss;
+				s.type = SEL_TYPE_SAMPLE;
+				s.sample_offset = offset;
 			}
 		}
 	}
@@ -249,7 +250,7 @@ void AudioView::SelectUnderMouse()
 	Hover = GetMouseOver();
 	Selection = Hover;
 	Track *t = Selection.track;
-	Track *s = Selection.sub;
+	SampleRef *s = Selection.sample;
 	bool control = tsunami->GetKey(KEY_CONTROL);
 
 	// track
@@ -262,10 +263,10 @@ void AudioView::SelectUnderMouse()
 	}
 
 	// sub
-	if (Selection.type == SEL_TYPE_SUB){
-		SelectSub(s, control);
+	if (Selection.type == SEL_TYPE_SAMPLE){
+		SelectSample(s, control);
 		if (s->is_selected)
-			SetCurSub(s);
+			SetCurSample(s);
 	}
 }
 
@@ -277,13 +278,13 @@ void AudioView::SetBarriers(SelectionType *s)
 		return;
 
 	int dpos = 0;
-	if (s->type == SEL_TYPE_SUB)
-		dpos = s->sub_offset;
+	if (s->type == SEL_TYPE_SAMPLE)
+		dpos = s->sample_offset;
 
 	foreach(Track *t, audio->track){
 		// add subs
-		foreach(Track *sub, t->sub){
-			s->barrier.add(sub->pos + dpos);
+		foreach(SampleRef *sam, t->sample){
+			s->barrier.add(sam->pos + dpos);
 		}
 
 		// time bar...
@@ -317,7 +318,7 @@ void AudioView::ApplyBarriers(int &pos)
 
 bool hover_changed(AudioView::SelectionType &hover, AudioView::SelectionType &hover_old)
 {
-	return (hover.type != hover_old.type) || (hover.sub != hover_old.sub) || (hover.show_track_controls != hover_old.show_track_controls);
+	return (hover.type != hover_old.type) || (hover.sample != hover_old.sample) || (hover.show_track_controls != hover_old.show_track_controls);
 }
 
 void AudioView::OnMouseMove()
@@ -365,9 +366,9 @@ void AudioView::OnMouseMove()
 	}else if (Selection.type == SEL_TYPE_PLAYBACK){
 		tsunami->output->Seek(Selection.pos);
 		_force_redraw_ = true;
-	}else if (Selection.type == SEL_TYPE_SUB){
+	}else if (Selection.type == SEL_TYPE_SAMPLE){
 		ApplyBarriers(Selection.pos);
-		int dpos = (float)Selection.pos - Selection.sub_offset - Selection.sub->pos;
+		int dpos = (float)Selection.pos - Selection.sample_offset - Selection.sample->pos;
 		if (cur_action)
 			cur_action->set_param_and_notify(audio, dpos);
 		_force_redraw_ = true;
@@ -426,7 +427,7 @@ void AudioView::OnLeftButtonDown()
 			t->is_selected = (t == Selection.track);
 		if (Selection.track->muted)
 			Selection.track->SetMuted(false);
-	}else if (Selection.type == SEL_TYPE_SUB){
+	}else if (Selection.type == SEL_TYPE_SAMPLE){
 		cur_action = new ActionSubTrackMove(audio);
 	}
 
@@ -441,7 +442,7 @@ void AudioView::OnLeftButtonDown()
 void AudioView::OnLeftButtonUp()
 {
 	msg_db_f("OnLBU", 2);
-	if (Selection.type == SEL_TYPE_SUB)
+	if (Selection.type == SEL_TYPE_SAMPLE)
 		if (cur_action)
 			audio->Execute(cur_action);
 	cur_action = NULL;
@@ -492,7 +493,7 @@ void AudioView::OnLeftDoubleClick()
 
 	if (MousePossiblySelecting < MouseMinMoveToSelect)
 		if (audio->used){
-			if (Selection.type == SEL_TYPE_SUB)
+			if (Selection.type == SEL_TYPE_SAMPLE)
 				ExecuteSubDialog(tsunami);
 			else if (Selection.type == SEL_TYPE_TRACK)
 				ExecuteTrackDialog(tsunami);
@@ -646,7 +647,7 @@ void AudioView::DrawBuffer(HuiPainter *c, const rect &r, Track *t, double view_p
 
 	int di = DetailSteps;
 	foreachi(TrackLevel &lev, t->level, level_no){
-		if ((level_no == cur_level) || (!t->parent))
+		if ((level_no == cur_level))// || (!t->parent))
 			c->SetColor(col);
 		else
 			c->SetColor(ColorWave);
@@ -665,11 +666,11 @@ void AudioView::DrawBuffer(HuiPainter *c, const rect &r, Track *t, double view_p
 	}
 }
 
-void AudioView::DrawSubFrame(HuiPainter *c, const rect &r, Track *s, const color &col, int delay)
+void AudioView::DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay)
 {
 	// frame
 	int asx = clampi(sample2screen(s->pos + delay), r.x1, r.x2);
-	int aex = clampi(sample2screen(s->pos + s->length + delay), r.x1, r.x2);
+	int aex = clampi(sample2screen(s->pos + s->buf.num + delay), r.x1, r.x2);
 
 	if (delay == 0)
 		s->area = rect(asx, aex, r.y1, r.y2);
@@ -688,25 +689,25 @@ void AudioView::DrawSubFrame(HuiPainter *c, const rect &r, Track *s, const color
 	c->DrawLine(asx, r.y2, aex, r.y2);
 }
 
-void AudioView::DrawSub(HuiPainter *c, const rect &r, Track *s)
+void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
 {
 	color col = ColorSub;
 	//bool is_cur = ((s == cur_sub) && (t->IsSelected));
 	if (!s->is_selected)
 		col = ColorSubNotCur;
-	if (Hover.sub == s)
+	if (Hover.sample == s)
 		col = ColorSubMO;
 	//col.a = 0.2f;
 
-	DrawSubFrame(c, r, s, col, 0);
+	DrawSampleFrame(c, r, s, col, 0);
 
 	color col2 = col;
 	col2.a *= 0.5f;
 	for (int i=0;i<s->rep_num;i++)
-		DrawSubFrame(c, r, s, col2, (i + 1) * s->rep_delay);
+		DrawSampleFrame(c, r, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	DrawBuffer(	c, r, s, view_pos - (double)s->pos, col);
+//	DrawBuffer(	c, r, s, view_pos - (double)s->pos, col);
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
@@ -746,8 +747,8 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 
 	DrawBuffer(c, r, t, view_pos, col);
 
-	foreach(Track *s, t->sub)
-		DrawSub(c, r, s);
+	foreach(SampleRef *s, t->sample)
+		DrawSample(c, r, s);
 
 	//c->SetColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 //	c->SetColor(ColorWaveCur);
@@ -1133,7 +1134,7 @@ void AudioView::SelectNone()
 	audio->sel_raw.clear();
 	audio->UpdateSelection();
 	audio->UnselectAllSubs();
-	SetCurSub(NULL);
+	SetCurSample(NULL);
 }
 
 void AudioView::SetGridMode(int mode)
@@ -1145,7 +1146,7 @@ void AudioView::SetGridMode(int mode)
 
 
 
-void AudioView::SelectSub(Track *s, bool diff)
+void AudioView::SelectSample(SampleRef *s, bool diff)
 {
 	if (!s)
 		return;
@@ -1183,9 +1184,9 @@ void AudioView::SelectTrack(Track *t, bool diff)
 	t->root->UpdateSelection();
 }
 
-void AudioView::SetCurSub(Track *s)
+void AudioView::SetCurSample(SampleRef *s)
 {
-	cur_sub = s;
+	cur_sample = s;
 }
 
 
@@ -1233,11 +1234,11 @@ void AudioView::ExecuteTrackDialog(HuiWindow *win)
 
 void AudioView::ExecuteSubDialog(HuiWindow *win)
 {
-	if (!cur_sub){
-		tsunami->log->Error(_("Keine Ebene ausgew&ahlt"));
+	if (!cur_sample){
+		tsunami->log->Error(_("Kein Sample ausgew&ahlt"));
 		return;
 	}
-	SubDialog *dlg = new SubDialog(win, false, cur_sub);
+	SubDialog *dlg = new SubDialog(win, false, cur_sample);
 	dlg->Run();
 }
 

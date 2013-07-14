@@ -22,9 +22,9 @@ void* ActionSubTrackDelete::execute(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	sub = a->track[track_no]->sub[index];
+	sub = a->track[track_no]->sample[index];
 
-	a->track[track_no]->sub.erase(index);
+	a->track[track_no]->sample.erase(index);
 
 	return NULL;
 }
@@ -33,7 +33,7 @@ void ActionSubTrackDelete::undo(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	a->track[track_no]->sub.insert(sub, index);
+	a->track[track_no]->sample.insert(sub, index);
 }
 
 

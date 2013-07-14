@@ -527,7 +527,7 @@ void Tsunami::UpdateMenu()
 	Enable("sub_from_selection", selected);
 	Enable("insert_added", audio->GetNumSelectedSubs() > 0);
 	Enable("remove_added", audio->GetNumSelectedSubs() > 0);
-	Enable("sub_properties", view->cur_sub);
+	Enable("sub_properties", view->cur_sample);
 	// sound
 	Enable("play", audio->used);
 	Enable("stop", output->IsPlaying());

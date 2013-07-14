@@ -36,12 +36,12 @@ int get_track_index(Track *t)
 	return -1;
 }
 
-int get_sub_index(Track *s)
+int get_sub_index(SampleRef *s)
 {
 	if (s){
 		Track *t = s->GetParent();
 		if (t){
-			foreachi(Track *ss, t->sub, i)
+			foreachi(SampleRef *ss, t->sample, i)
 				if (s == ss)
 					return i;
 		}
@@ -49,13 +49,10 @@ int get_sub_index(Track *s)
 	return -1;
 }
 
-void get_track_sub_index(Track *t, int &track_no, int &sub_no)
+void get_track_sub_index(SampleRef *s, int &track_no, int &sub_no)
 {
-	sub_no = get_sub_index(t);
-	if (sub_no >= 0)
-		track_no = get_track_index(t->GetParent());
-	else
-		track_no = get_track_index(t);
+	sub_no = get_sub_index(s);
+	track_no = get_track_index(s->GetParent());
 }
 
 AudioFile::AudioFile() :
@@ -153,7 +150,7 @@ void AudioFile::UpdateSelection()
 
 	// subs
 	foreach(Track *t, track)
-		foreach(Track *s, t->sub)
+		foreach(SampleRef *s, t->sample)
 			s->is_selected = (t->is_selected) && selection.overlaps(s->GetRange());
 	Notify("SelectionChange");
 }
@@ -173,7 +170,7 @@ Range AudioFile::GetPlaybackSelection()
 void AudioFile::UnselectAllSubs()
 {
 	foreach(Track *t, track)
-		foreach(Track *s, t->sub)
+		foreach(SampleRef *s, t->sample)
 			s->is_selected = false;
 	Notify("SelectionChange");
 }
@@ -264,6 +261,8 @@ void AudioFile::UpdatePeaks(int mode)
 	debug_timer.reset();
 	foreach(Track *t, track)
 		t->UpdatePeaks(mode);
+	foreach(Sample *s, sample)
+		s->buf.update_peaks(mode);
 	msg_write(format("up %f", debug_timer.get()));
 }
 
@@ -277,7 +276,7 @@ int AudioFile::GetNumSelectedSubs()
 {
 	int n = 0;
 	foreach(Track *t, track)
-		foreach(Track *s, t->sub)
+		foreach(SampleRef *s, t->sample)
 			if (s->is_selected)
 				n ++;
 	return n;
@@ -315,17 +314,24 @@ void AudioFile::InvalidateAllPeaks()
 {
 	foreach(Track *t, track)
 		t->InvalidateAllPeaks();
+	foreach(Sample *s, sample)
+		s->buf.invalidate_peaks(s->buf.range());
 }
 
-Track *AudioFile::get_track(int track_no, int sub_no)
+Track *AudioFile::get_track(int track_no)
 {
 	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_track");
-	Track *t = track[track_no];
-	if (sub_no < 0)
-		return t;
+	return track[track_no];
+}
 
-	assert((sub_no < t->sub.num) && "AudioFile.get_track");
-	return t->sub[sub_no];
+SampleRef *AudioFile::get_sub(int track_no, int sub_no)
+{
+	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_sub");
+	Track *t = track[track_no];
+
+	assert((sub_no >= 0) && "AudioFile.get_sub");
+	assert((sub_no < t->sample.num) && "AudioFile.get_sub");
+	return t->sample[sub_no];
 }
 
 Track *AudioFile::GetTimeTrack()

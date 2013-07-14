@@ -9,7 +9,7 @@
 #define ACTIONSUBTRACKDELETE_H_
 
 #include "../Action.h"
-class Track;
+class SampleRef;
 
 class ActionSubTrackDelete : public Action
 {
@@ -22,7 +22,7 @@ public:
 
 private:
 	int track_no, index;
-	Track *sub;
+	SampleRef *sub;
 };
 
 #endif /* ACTIONSUBTRACKDELETE_H_ */

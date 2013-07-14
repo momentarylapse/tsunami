@@ -12,7 +12,7 @@
 
 ActionSubTrackInsert::ActionSubTrackInsert(AudioFile *a, int track_no, int index, int level_no)
 {
-	Track *sub = a->track[track_no]->sub[index];
+	SampleRef *sub = a->track[track_no]->sample[index];
 
 	// get target buffer
 	Range r = sub->GetRange();
@@ -21,7 +21,7 @@ ActionSubTrackInsert::ActionSubTrackInsert(AudioFile *a, int track_no, int index
 
 	// insert sub (ignore muted)
 	ActionTrackEditBuffer *action = new ActionTrackEditBuffer(a->track[track_no], level_no, r);
-	buf.set(sub->level[0].buffer[0], 0, sub->volume);
+	buf.set(sub->buf, 0, sub->volume);
 	AddSubAction(action, a);
 
 	// delete sub

@@ -21,7 +21,7 @@ public:
 	virtual void undo(Data *d);
 
 private:
-	int track_no, sub_no, index;
+	int track_no, index;
 	int level_no;
 	int old_length, new_length;
 };

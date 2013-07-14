@@ -49,8 +49,8 @@ public:
 	void MakeSampleVisible(int sample);
 
 	void DrawBuffer(HuiPainter *c, const rect &r, Track *t, double pos, const color &col);
-	void DrawSubFrame(HuiPainter *c, const rect &r, Track *s, const color &col, int delay);
-	void DrawSub(HuiPainter *c, const rect &r, Track *s);
+	void DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
+	void DrawSample(HuiPainter *c, const rect &r, SampleRef *s);
 	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col);
 	void DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no);
 	void DrawGrid(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
@@ -95,16 +95,16 @@ public:
 		SEL_TYPE_TRACK,
 		SEL_TYPE_MUTE,
 		SEL_TYPE_SOLO,
-		SEL_TYPE_SUB
+		SEL_TYPE_SAMPLE
 	};
 
 	struct SelectionType
 	{
 		int type;
 		Track *track;
-		Track *sub;
+		SampleRef *sample;
 		int pos;
-		int sub_offset;
+		int sample_offset;
 		Array<int> barrier;
 		Track *show_track_controls;
 
@@ -128,17 +128,17 @@ public:
 
 	void SetMouse();
 	bool MouseOverTrack(Track *t);
-	int MouseOverSub(Track *s);
+	int MouseOverSample(SampleRef *s);
 	void SelectionUpdatePos(SelectionType &s);
 	SelectionType GetMouseOver();
 	void SelectUnderMouse();
 	void SetBarriers(SelectionType *s);
 	void ApplyBarriers(int &pos);
 
-	void SelectSub(Track *s, bool diff);
+	void SelectSample(SampleRef *s, bool diff);
 	void SelectTrack(Track *t, bool diff);
 
-	void SetCurSub(AudioFile *a, Track *s);
+	void SetCurSample(AudioFile *a, SampleRef *s);
 	void SetCurTrack(AudioFile *a, Track *t);
 
 	double screen2sample(double x);
@@ -172,10 +172,10 @@ public:
 
 	AudioFile *audio;
 
-	void SetCurSub(Track *s);
+	void SetCurSample(SampleRef *s);
 	void SetCurTrack(Track *t);
 	Track *cur_track;
-	Track *cur_sub;
+	SampleRef *cur_sample;
 	int cur_level;
 
 	double view_pos;

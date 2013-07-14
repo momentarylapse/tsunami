@@ -26,7 +26,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 	foreach(TrackLevel &l, t->level)
 		num_buf += l.buffer.num;
 	assert(num_buf == 0);
-	assert(t->sub.num == 0);
+	assert(t->sample.num == 0);
 
 	// save data
 	track = t;

@@ -90,22 +90,18 @@ void WriteBufferBox(CFile *f, BufferBox *b)
 	EndChunk(f);
 }
 
-void WriteSubTrack(CFile *f, Track *s)
+void WriteSampleRef(CFile *f, SampleRef *s)
 {
-	BeginChunk(f, "sub");
+	BeginChunk(f, "samref");
 
 	f->WriteStr(s->name);
 	f->WriteInt(s->pos);
-	f->WriteInt(s->length);
 	f->WriteFloat(s->volume);
 	f->WriteBool(s->muted);
 	f->WriteInt(s->rep_num);
 	f->WriteInt(s->rep_delay);
 	f->WriteInt(0); // reserved
 	f->WriteInt(0);
-
-	foreach(BufferBox &b, s->level[0].buffer)
-		WriteBufferBox(f, &b);
 
 	EndChunk(f);
 }
@@ -180,8 +176,8 @@ void WriteTrack(CFile *f, Track *t)
 	foreachi(TrackLevel &l, t->level, i)
 		WriteTrackLevel(f, &l, i);
 
-	foreach(Track *sub, t->sub)
-		WriteSubTrack(f, sub);
+	foreach(SampleRef *s, t->sample)
+		WriteSampleRef(f, s);
 
 	foreach(Effect &effect, t->fx)
 		WriteEffect(f, &effect);
@@ -599,7 +595,7 @@ void ReadChunkSubBufferBox(CFile *f, BufferBox *b)
 	}
 }
 
-void ReadChunkSub(CFile *f, Track *t)
+/*void ReadChunkSub(CFile *f, Track *t)
 {
 	string name = f->ReadStr();
 	int pos = f->ReadInt();
@@ -613,7 +609,7 @@ void ReadChunkSub(CFile *f, Track *t)
 	f->ReadInt();
 
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSubBufferBox, &s->level[0].buffer[0]);
-}
+}*/
 
 void ReadChunkBar(CFile *f, Array<Bar> *bar)
 {
@@ -667,7 +663,7 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 
 	AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
-	AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
+//	AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
 	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &t->fx);
 	AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
 	AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
@@ -735,12 +731,12 @@ void load_nami_file_new(CFile *f, AudioFile *a)
 
 void check_empty_subs(AudioFile *a)
 {
-	foreach(Track *t, a->track)
+	/*foreach(Track *t, a->track)
 		foreachib(Track *s, t->sub, i)
 			if (s->length <= 0){
 				tsunami->log->Error("empty sub: " + s->name);
 				t->sub.erase(i);
-			}
+			}*/
 }
 
 void FormatNami::LoadAudio(AudioFile *a, const string & filename)

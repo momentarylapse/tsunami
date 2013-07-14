@@ -24,17 +24,10 @@ Track::Track()
 	volume = 1;
 	panning = 0;
 	root = NULL;
-	parent = -1;
-	length = 0;
-	pos = 0;
 	is_selected = false;
 
 	volume = 1;
 	muted = false;
-
-
-	rep_num = 0;
-	rep_delay = 10000;
 
 	area = rect(0, 0, 0, 0);
 }
@@ -47,15 +40,13 @@ void Track::Reset()
 	msg_db_r("Track.Reset",1);
 	level.clear();
 	name.clear();
-	length = 0;
-	pos = 0;
 	area = rect(0, 0, 0, 0);
 	volume = 1;
 	muted = false;
 	panning = 0;
 	bar.clear();
 	fx.clear();
-	sub.clear();
+	sample.clear();
 	msg_db_l(1);
 }
 
@@ -103,19 +94,8 @@ void SelectTrack(Track *t, bool diff)
 	t->root->UpdateSelection();
 }
 
-Track *Track::GetParent()
-{
-	if (parent >= 0)
-		return root->track[parent];
-	return NULL;
-}
-
 Range Track::GetRangeUnsafe()
 {
-	// sub
-	if (parent >= 0)
-		return Range(pos, length);
-
 	int min =  1073741824;
 	int max = -1073741824;
 	foreach(TrackLevel &l, level)
@@ -123,10 +103,10 @@ Range Track::GetRangeUnsafe()
 			min = min(l.buffer[0].offset, min);
 			max = max(l.buffer.back().range().end(), max);
 		}
-	foreach(Track *s, sub){
+	foreach(SampleRef *s, sample){
 		if (s->pos < min)
 			min = s->pos;
-		int smax = s->pos + s->length + s->rep_num * s->rep_delay;
+		int smax = s->pos + s->buf.num + s->rep_num * s->rep_delay;
 		if (smax > max)
 			max = smax;
 	}
@@ -235,8 +215,6 @@ void Track::UpdatePeaks(int mode)
 	foreach(TrackLevel &l, level)
 		foreach(BufferBox &b, l.buffer)
 			b.update_peaks(mode);
-	foreach(Track *s, sub)
-		s->UpdatePeaks(mode);
 }
 
 void Track::InvalidateAllPeaks()
@@ -244,8 +222,6 @@ void Track::InvalidateAllPeaks()
 	foreach(TrackLevel &l, level)
 		foreach(BufferBox &b, l.buffer)
 			b.invalidate_peaks(b.range());
-	foreach(Track *s, sub)
-		s->InvalidateAllPeaks();
 }
 
 void Track::SetName(const string& name)

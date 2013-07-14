@@ -10,7 +10,7 @@
 
 ActionTrack__AbsorbBufferBox::ActionTrack__AbsorbBufferBox(Track *t, int _level_no, int _dest, int _src)
 {
-	get_track_sub_index(t, track_no, sub_no);
+	track_no = get_track_index(t);
 	dest = _dest;
 	src = _src;
 	level_no = _level_no;
@@ -23,7 +23,7 @@ ActionTrack__AbsorbBufferBox::~ActionTrack__AbsorbBufferBox()
 void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 	TrackLevel &l = t->level[level_no];
 
 
@@ -48,7 +48,7 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 void ActionTrack__AbsorbBufferBox::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 	TrackLevel &l = t->level[level_no];
 
 	//msg_todo("absorb undo...");

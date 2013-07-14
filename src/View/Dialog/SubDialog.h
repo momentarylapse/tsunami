@@ -11,11 +11,12 @@
 #include "../../lib/hui/hui.h"
 class Slider;
 class Track;
+class SampleRef;
 
 class SubDialog: public HuiWindow
 {
 public:
-	SubDialog(HuiWindow *_parent, bool _allow_parent, Track *s);
+	SubDialog(HuiWindow *_parent, bool _allow_parent, SampleRef *s);
 	virtual ~SubDialog();
 
 	void LoadData();
@@ -30,7 +31,7 @@ public:
 	void OnRepNum();
 	void OnRepDelay();
 
-	Track *sub;
+	SampleRef *sample;
 	Slider *volume_slider;
 };
 

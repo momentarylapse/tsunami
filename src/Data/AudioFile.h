@@ -10,12 +10,14 @@
 
 #include "Data.h"
 #include "Track.h"
+#include "Sample.h"
 #include "../lib/base/base.h"
 #include "../lib/math/rect.h"
 
 class Data;
 class Effect;
 class Track;
+class Sample;
 
 struct Tag
 {
@@ -67,7 +69,8 @@ public:
 	void DeleteSelection(int level_no, bool all_levels);
 	void CreateSubsFromSelection(int level_no);
 
-	Track *get_track(int track_no, int sub_no);
+	Track *get_track(int track_no);
+	SampleRef *get_sub(int track_no, int sub_no);
 
 // data
 	bool used;
@@ -79,6 +82,7 @@ public:
 
 	Array<Effect> fx;
 	Array<Track*> track;
+	Array<Sample*> sample;
 
 // editing
 	// needed for rendering
@@ -95,7 +99,7 @@ public:
 
 
 int get_track_index(Track *t);
-int get_sub_index(Track *s);
-void get_track_sub_index(Track *t, int &track_no, int &sub_no);
+int get_sub_index(SampleRef *s);
+void get_track_sub_index(SampleRef *s, int &track_no, int &sub_no);
 
 #endif /* AUDIOFILE_H_ */

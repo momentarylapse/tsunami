@@ -39,7 +39,6 @@ void *ActionTrackAdd::execute(Data *d)
 
 	t->name = format(_("Spur %d"), a->track.num + 1);
 	t->root = a;
-	t->parent = -1;
 	t->is_selected = true;
 	t->type = type;
 	t->level.resize(a->level_name.num);

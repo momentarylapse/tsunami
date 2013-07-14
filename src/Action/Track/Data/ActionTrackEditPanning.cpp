@@ -21,7 +21,7 @@ ActionTrackEditPanning::~ActionTrackEditPanning()
 void *ActionTrackEditPanning::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, -1);
+	Track *t = a->get_track(track_no);
 
 	float temp = panning;
 	panning = t->panning;

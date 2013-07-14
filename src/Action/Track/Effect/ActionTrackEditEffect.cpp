@@ -26,7 +26,7 @@ void *ActionTrackEditEffect::execute(Data *d)
 	assert(index >= 0);
 
 	if (track_no >= 0){
-		Track *t = a->get_track(track_no, -1);
+		Track *t = a->get_track(track_no);
 		assert(t);
 		assert(index < t->fx.num);
 

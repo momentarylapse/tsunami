@@ -13,7 +13,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(Track *t, int _level_no, Range _ran
 	// prepare...
 	range = _range;
 	level_no = _level_no;
-	get_track_sub_index(t, track_no, sub_no);
+	track_no = get_track_index(t);
 
 	index = -1;
 	foreachi(BufferBox &buf, t->level[level_no].buffer, i)
@@ -36,7 +36,7 @@ ActionTrackEditBuffer::~ActionTrackEditBuffer()
 void ActionTrackEditBuffer::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 
 	t->level[level_no].buffer[index].invalidate_peaks(range);
 
@@ -52,7 +52,7 @@ void ActionTrackEditBuffer::redo(Data *d)
 void *ActionTrackEditBuffer::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 
 	t->level[level_no].buffer[index].invalidate_peaks(range);
 

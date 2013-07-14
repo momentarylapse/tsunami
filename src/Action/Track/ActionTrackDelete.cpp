@@ -21,8 +21,8 @@ ActionTrackDelete::ActionTrackDelete(AudioFile *a, int index)
 		for (int i=l.buffer.num-1;i>=0;i--)
 			AddSubAction(new ActionTrack__DeleteBufferBox(t, li, i), a);
 
-	// delete subs
-	t->sub.clear();
+	// FIXME: delete subs
+	t->sample.clear();
 
 	// delete the track itself
 	AddSubAction(new ActionTrack__DeleteEmpty(index), a);

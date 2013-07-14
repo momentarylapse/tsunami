@@ -19,11 +19,11 @@ AudioRenderer::~AudioRenderer()
 {
 }
 
-bool intersect_sub(Track *s, const Range &r, Range &ir, int &bpos)
+bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 {
 	// intersected intervall (track-coordinates)
 	int i0 = max(s->pos, r.start());
-	int i1 = min(s->pos + s->length, r.end());
+	int i1 = min(s->pos + s->buf.num, r.end());
 
 	// beginning of the intervall (relative to sub)
 	ir.offset = i0 - s->pos;
@@ -43,7 +43,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 	buf.swap_ref(buf0);
 
 	// subs
-	foreach(Track *s, t->sub){
+	foreach(SampleRef *s, t->sample){
 		if (s->muted)
 			continue;
 
@@ -56,9 +56,9 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 			if (!intersect_sub(s, rep_range, intersect_range, bpos))
 				continue;
 
-			BufferBox sbuf = s->ReadBuffers(0, intersect_range);
+			/*BufferBox sbuf = s->ReadBuffers(0, intersect_range);
 			buf.make_own();
-			buf.add(sbuf, bpos, s->volume, 0);
+			buf.add(sbuf, bpos, s->volume, 0);*/
 		}
 	}
 

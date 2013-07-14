@@ -9,10 +9,10 @@
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
 
-SubDialog::SubDialog(HuiWindow *_parent, bool _allow_parent, Track *s):
+SubDialog::SubDialog(HuiWindow *_parent, bool _allow_parent, SampleRef *s):
 	HuiWindow("level_dialog", _parent, _allow_parent)
 {
-	sub = s;
+	sample = s;
 
 	SetString("name", s->name);
 	SetDecimals(1);
@@ -45,13 +45,13 @@ SubDialog::~SubDialog()
 
 void SubDialog::OnName()
 {
-	sub->name = GetString("");
+	sample->name = GetString("");
 }
 
 void SubDialog::OnMute()
 {
-	sub->muted = IsChecked("");
-	volume_slider->Enable(!sub->muted);
+	sample->muted = IsChecked("");
+	volume_slider->Enable(!sample->muted);
 }
 
 void SubDialog::OnLevelTrack()
@@ -61,18 +61,18 @@ void SubDialog::OnLevelTrack()
 
 void SubDialog::OnVolume()
 {
-	sub->volume = volume_slider->Get();
+	sample->volume = volume_slider->Get();
 }
 
 void SubDialog::OnRepNum()
 {
-	sub->rep_num = GetInt("repnum") - 1;
-	Enable("repdelay", sub->rep_num > 0);
+	sample->rep_num = GetInt("repnum") - 1;
+	Enable("repdelay", sample->rep_num > 0);
 }
 
 void SubDialog::OnRepDelay()
 {
-	sub->rep_delay = (int)(GetFloat("repdelay") * (float)sub->root->sample_rate / 1000.0f);
+	sample->rep_delay = (int)(GetFloat("repdelay") * (float)sample->root->sample_rate / 1000.0f);
 }
 
 void SubDialog::OnClose()

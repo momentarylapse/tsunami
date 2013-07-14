@@ -9,7 +9,7 @@
 
 ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, MidiData &_midi)
 {
-	get_track_sub_index(t, track_no, sub_no);
+	track_no = get_track_index(t);
 	offset = _offset;
 	midi = _midi;
 	midi.sort();
@@ -26,7 +26,7 @@ ActionTrackInsertMidi::~ActionTrackInsertMidi()
 void *ActionTrackInsertMidi::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 
 	inserted_at.clear();
 
@@ -47,7 +47,7 @@ void *ActionTrackInsertMidi::execute(Data *d)
 void ActionTrackInsertMidi::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->get_track(track_no, sub_no);
+	Track *t = a->get_track(track_no);
 
 	foreachb(int i, inserted_at)
 		t->midi.erase(i);

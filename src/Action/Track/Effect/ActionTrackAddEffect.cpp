@@ -23,7 +23,7 @@ void *ActionTrackAddEffect::execute(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
 	if (track_no >= 0){
-		Track *t = a->get_track(track_no, -1);
+		Track *t = a->get_track(track_no);
 		t->fx.add(effect);
 	}else{
 		a->fx.add(effect);
@@ -36,7 +36,7 @@ void ActionTrackAddEffect::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	if (track_no >= 0){
-		Track *t = a->get_track(track_no, -1);
+		Track *t = a->get_track(track_no);
 		t->fx.pop();
 	}else{
 		a->fx.pop();

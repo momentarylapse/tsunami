@@ -14,6 +14,7 @@
 #include "AudioInputBase.h"
 
 struct _snd_seq;
+struct _snd_seq_port_subscribe;
 
 class AudioInputMidi : public AudioInputBase
 {
@@ -55,6 +56,7 @@ private:
 	MidiData &data;
 
 	_snd_seq *handle;
+	_snd_seq_port_subscribe *subs;
 	int portid;
 	int npfd;
 	struct pollfd *pfd;

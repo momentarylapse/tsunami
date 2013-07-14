@@ -16,12 +16,15 @@ AudioInputMidi::AudioInputMidi(MidiData &_data) :
 	data(_data)
 {
 	handle = NULL;
+	subs = NULL;
 
 	Init();
 }
 
 AudioInputMidi::~AudioInputMidi()
 {
+	if (subs)
+		Unconnect();
 	if (handle)
 		snd_seq_close(handle);
 }
@@ -45,14 +48,15 @@ void AudioInputMidi::Init()
 
 bool AudioInputMidi::ConnectTo(AudioInputMidi::MidiPort p)
 {
+	if (subs)
+		Unconnect();
 	snd_seq_addr_t sender, dest;
 	sender.client = p.client;
 	sender.port = p.port;
 	dest.client = snd_seq_client_id(handle);
 	dest.port = portid;
 
-	snd_seq_port_subscribe_t *subs;
-	snd_seq_port_subscribe_alloca(&subs);
+	snd_seq_port_subscribe_malloc(&subs);
 	snd_seq_port_subscribe_set_sender(subs, &sender);
 	snd_seq_port_subscribe_set_dest(subs, &dest);
 	int r = snd_seq_subscribe_port(handle, subs);
@@ -69,7 +73,14 @@ bool AudioInputMidi::ConnectTo(AudioInputMidi::MidiPort p)
 
 bool AudioInputMidi::Unconnect()
 {
-	return false;
+	if (!subs)
+		return true;
+	int r = snd_seq_unsubscribe_port(handle, subs);
+	if (r != 0)
+		tsunami->log->Error(string("Error unconnecting to midi port: ") + snd_strerror(r));
+	snd_seq_port_subscribe_free(subs);
+	subs = NULL;
+	return r == 0;
 }
 
 

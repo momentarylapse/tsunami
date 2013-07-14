@@ -77,6 +77,10 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 CaptureDialog::~CaptureDialog()
 {
 	Unsubscribe(tsunami->input);
+	tsunami->input->in_midi->Unconnect();
+	tsunami->input->Stop();
+	tsunami->output->Stop();
+	tsunami->input->buffer.clear();
 	delete(peak_meter);
 }
 
@@ -163,16 +167,12 @@ void CaptureDialog::OnPause()
 
 void CaptureDialog::OnOk()
 {
-	tsunami->input->Stop();
-	tsunami->output->Stop();
 	if (Insert())
 		delete(this);
 }
 
 void CaptureDialog::OnClose()
 {
-	tsunami->input->Stop();
-	tsunami->output->Stop();
 	delete(this);
 }
 

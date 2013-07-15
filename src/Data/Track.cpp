@@ -30,6 +30,8 @@ Track::Track()
 	volume = 1;
 	muted = false;
 
+	synth = NULL;
+
 	area = rect(0, 0, 0, 0);
 }
 
@@ -48,6 +50,7 @@ void Track::Reset()
 	bar.clear();
 	fx.clear();
 	sample.clear();
+	synth = NULL;
 	msg_db_l(1);
 }
 

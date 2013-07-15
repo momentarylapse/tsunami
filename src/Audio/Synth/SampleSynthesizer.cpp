@@ -9,6 +9,7 @@
 
 SampleSynthesizer::SampleSynthesizer()
 {
+	name = "SampleSynthesizer";
 }
 
 SampleSynthesizer::~SampleSynthesizer()
@@ -20,7 +21,7 @@ SampleSynthesizer::~SampleSynthesizer()
 
 void SampleSynthesizer::__init__()
 {
-	samples.__init__();
+	new(this) SampleSynthesizer;
 }
 
 void SampleSynthesizer::__delete__()

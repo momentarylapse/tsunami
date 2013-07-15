@@ -18,6 +18,7 @@
 #include "../Action/Track/ActionTrackDelete.h"
 #include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
 #include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
+#include "../Audio/Synth/DummySynthesizer.h"
 #include "../Tsunami.h"
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
@@ -140,6 +141,12 @@ void AudioFile::Reset()
 
 	level_name.clear();
 	level_name.add("level 1");
+
+	foreach(Synthesizer *s, synth)
+		delete(s);
+	synth.clear();
+	synth.add(new DummySynthesizer);
+	synth[0]->audio = this;
 
 	action_manager->Reset();
 

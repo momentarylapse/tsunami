@@ -8,6 +8,8 @@
 #ifndef SYNTHESIZER_H_
 #define SYNTHESIZER_H_
 
+#include "../../lib/base/base.h"
+
 class AudioFile;
 class Range;
 class BufferBox;
@@ -26,7 +28,11 @@ public:
 	//void AddTones(BufferBox &buf, Array<MidiNote> &notes);
 	void AddMetronomeClick(BufferBox &buf, int pos, int level, float volume);
 
+	string name;
 	AudioFile *audio;
+	int ref_count;
+	void ref();
+	void unref();
 };
 
 float pitch_to_freq(int pitch);

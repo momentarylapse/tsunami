@@ -6,8 +6,8 @@
  */
 
 #include "AudioRenderer.h"
+#include "Synth/Synthesizer.h"
 #include "../Plugins/Effect.h"
-#include "../Plugins/ExtendedBufferBox.h"
 #include "../Tsunami.h"
 
 AudioRenderer::AudioRenderer()
@@ -73,7 +73,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	Array<Beat> beats = t->bar.GetBeats(range);
 
 	foreach(Beat &b, beats)
-		((ExtendedBufferBox&)buf).add_click(b.pos - range.offset, (b.beat_no == 0) ? 0.8f : 0.3f, (b.beat_no == 0) ? 660.0f : 880.0f, t->root->sample_rate);
+		t->synth->AddMetronomeClick(buf, b.pos - range.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
 }
 
 void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
@@ -87,7 +87,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 
 	foreach(MidiNote &n, notes){
 		Range r = Range(n.range.offset - range.offset, n.range.num);
-		((ExtendedBufferBox&)buf).add_tone(r, n.volume, n.GetFrequency(), t->root->sample_rate);
+		t->synth->AddTone(buf, r, n.pitch, n.volume);
 	}
 }
 

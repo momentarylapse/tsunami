@@ -26,6 +26,7 @@
 
 class BufferBox;
 class AudioFile;
+class Synthesizer;
 
 
 class TrackLevel
@@ -87,6 +88,7 @@ public:
 
 	// midi track
 	MidiData midi;
+	Synthesizer *synth;
 
 // editing
 	rect area;

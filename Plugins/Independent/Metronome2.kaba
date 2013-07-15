@@ -13,6 +13,8 @@ int beats
 float volume
 Chord chords[]
 
+DummySynthesizer synth
+
 void fill(BufferBox buf)
 	float dt_m = 60.0 / bpm
 	int sm_m = dt_m * SAMPLE_RATE
@@ -26,11 +28,11 @@ void fill(BufferBox buf)
 		int n = buf.offset / sm_m + i
 		int pos0 = i * sm_m - (buf.offset % sm_m)
 		if (n % beats) == 0
-			buf.add_click(pos0, volume, freq*0.75, SAMPLE_RATE)
+			synth.AddMetronomeClick(buf, pos0, 0, volume)
 		else
-			buf.add_click(pos0, volume*0.33, freq, SAMPLE_RATE)
+			synth.AddMetronomeClick(buf, pos0, 1, volume)
 		if chords.num > 0
-			AddChord(SAMPLE_RATE, buf, pos0, pos0 + sm_m, chords[n % chords.num], volume * 0.5)
+			AddChord(synth, buf, pos0, pos0 + sm_m, chords[n % chords.num], volume * 0.5)
 
 void Reset()
 	output.Stop()
@@ -84,6 +86,8 @@ void main()
 	dlg.Event("bpm", &OnBpm)
 	dlg.Event("beats", &OnBeats)
 	dlg.Event("chords", &OnChords)
+	
+	synth.sample_rate = SAMPLE_RATE
 	
 	output.PlayGenerated(&fill, SAMPLE_RATE)
 	

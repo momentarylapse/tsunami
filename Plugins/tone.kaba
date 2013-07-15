@@ -110,16 +110,19 @@ void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, 
 	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 4, vol * 0.3)
 	AddSimpleTone(sample_rate, buf, pos0, pos1, f * 8, vol * 0.1)*/
 
-void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, float vol)
+/*class RichtSynthesizer : DummySynthesizer
+	virtual void AddToneFreq(BufferBox buf, Range r, float freq, float volume)*/
+
+void AddRichTone(Synthesizer s, BufferBox buf, int pos0, int pos1, float f, float vol)
 	Range r
 	r.offset = pos0
 	r.length = pos1 - pos0
-	buf.add_tone(r, vol * 0.6, f,     sample_rate)
-	buf.add_tone(r, vol * 0.5, f * 2, sample_rate)
-	buf.add_tone(r, vol * 0.3, f * 4, sample_rate)
-	buf.add_tone(r, vol * 0.1, f * 8, sample_rate)
+	s.AddToneFreq(buf, r, f,     vol * 0.6)
+	s.AddToneFreq(buf, r, f * 2, vol * 0.5)
+	s.AddToneFreq(buf, r, f * 4, vol * 0.3)
+	s.AddToneFreq(buf, r, f * 8, vol * 0.1)
 
-void AddChord(float sample_rate, BufferBox buf, int pos0, int pos1, Chord c, float volume)
+void AddChord(Synthesizer s, BufferBox buf, int pos0, int pos1, Chord c, float volume)
 	float f[]
 	f.add(pitch_to_freq(c.base_tone))
 	if c.type == ChordMinor
@@ -130,4 +133,4 @@ void AddChord(float sample_rate, BufferBox buf, int pos0, int pos1, Chord c, flo
 	f.add(pitch_to_freq(c.base_tone + 12))
 	
 	for int i, 0, f.num
-		AddRichTone(sample_rate, buf, pos0, pos1, f[i], volume)
+		AddRichTone(s, buf, pos0, pos1, f[i], volume)

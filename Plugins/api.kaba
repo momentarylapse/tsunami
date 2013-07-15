@@ -40,6 +40,7 @@ class BufferBox
 	string peak[]
 	extern void __assign__(BufferBox other)
 	extern void clear()
+	extern Range range()
 	extern void get_spectrum(complex spec_r[], complex spec_l[], int samples)
 
 class Synthesizer

@@ -12,13 +12,19 @@ class PluginData
 
 PluginData data
 
+DummySynthesizer synth
 
 window dlg
 
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio
+	synth.sample_rate = a.sample_rate
+	Range r
+	r.offset = 0
+	r.length = buf.num
+	synth.AddToneFreq(buf, r, data.Frequency, data.Volume)
 
-	float f = data.Frequency
+	/*float f = data.Frequency
 
 	float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
 
@@ -26,7 +32,7 @@ void ProcessTrack(BufferBox buf)
 		float tt = i * w_f
 		float d = sin(tt) * data.Volume
 		buf.r[i] = clamp(buf.r[i] + d, -1, 1)
-		buf.l[i] = clamp(buf.l[i] + d, -1, 1)
+		buf.l[i] = clamp(buf.l[i] + d, -1, 1)*/
 
 void OnFrequency()
 	data.Pitch = -1

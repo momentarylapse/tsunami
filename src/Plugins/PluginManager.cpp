@@ -135,9 +135,10 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("BufferBox", "r", offsetof(BufferBox, r));
 	Script::DeclareClassOffset("BufferBox", "l", offsetof(BufferBox, l));
 	Script::DeclareClassOffset("BufferBox", "peak", offsetof(BufferBox, peak));
-	Script::LinkExternal("BufferBox.clear",(void*)&BufferBox::clear);
-	Script::LinkExternal("BufferBox.__assign__",(void*)&BufferBox::__assign__);
-	Script::LinkExternal("BufferBox.get_spectrum",(void*)&ExtendedBufferBox::get_spectrum);
+	Script::LinkExternal("BufferBox.clear", (void*)&BufferBox::clear);
+	Script::LinkExternal("BufferBox.__assign__", (void*)&BufferBox::__assign__);
+	Script::LinkExternal("BufferBox.range", (void*)&BufferBox::range);
+	Script::LinkExternal("BufferBox.get_spectrum", (void*)&ExtendedBufferBox::get_spectrum);
 
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
 	Script::DeclareClassOffset("Synthesizer", "name", offsetof(Synthesizer, name));

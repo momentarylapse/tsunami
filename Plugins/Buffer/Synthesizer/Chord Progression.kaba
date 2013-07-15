@@ -14,6 +14,8 @@ class PluginData
 
 PluginData data
 
+DummySynthesizer synth
+
 
 window dlg
 
@@ -23,6 +25,7 @@ void ProcessTrack(BufferBox buf)
 	ParseChords(data.Chords, chord)
 	
 	int p0 = a.GetNextBeat(buf.offset)
+	synth.sample_rate = a.sample_rate
 	
 	for int i, 0, chord.num
 		int pos0 = f2i(a.sample_rate * data.Duration * i2f(i))
@@ -32,7 +35,7 @@ void ProcessTrack(BufferBox buf)
 			for int j, 0, data.Beats
 				p0 = a.GetNextBeat(p0)
 			pos1 = p0 - buf.offset
-		AddChord(a.sample_rate, buf, pos0, pos1, chord[i], data.Volume)
+		AddChord(synth, buf, pos0, pos1, chord[i], data.Volume)
 
 void OnChords()
 	data.Chords = dlg.GetString("")

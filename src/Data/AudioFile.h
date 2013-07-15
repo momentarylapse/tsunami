@@ -101,7 +101,7 @@ public:
 
 
 int get_track_index(Track *t);
-int get_sub_index(SampleRef *s);
-void get_track_sub_index(SampleRef *s, int &track_no, int &sub_no);
+int get_sample_ref_index(SampleRef *s);
+int get_sample_index(Sample *s);
 
 #endif /* AUDIOFILE_H_ */

@@ -90,12 +90,25 @@ void WriteBufferBox(CFile *f, BufferBox *b)
 	EndChunk(f);
 }
 
+void WriteSample(CFile *f, Sample *s)
+{
+	BeginChunk(f, "sample");
+	f->WriteStr(s->name);
+	f->WriteFloat(s->volume);
+	f->WriteInt(s->offset);
+	f->WriteInt(0); // reserved
+	f->WriteInt(0);
+	WriteBufferBox(f, &s->buf);
+	EndChunk(f);
+}
+
 void WriteSampleRef(CFile *f, SampleRef *s)
 {
 	BeginChunk(f, "samref");
 
 	f->WriteStr(s->name);
 	f->WriteInt(s->pos);
+	f->WriteInt(get_sample_index(s->origin));
 	f->WriteFloat(s->volume);
 	f->WriteBool(s->muted);
 	f->WriteInt(s->rep_num);
@@ -218,6 +231,9 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 	WriteLevelName(f, a->level_name);
 
+	foreach(Sample *sample, a->sample)
+		WriteSample(f, sample);
+
 	foreachi(Track *track, a->track, i){
 		WriteTrack(f, track);
 		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
@@ -311,13 +327,21 @@ void ReadFXList(CFile *f, Array<Effect> &fx)
 	}
 }
 
+SampleRef *__AddEmptySubTrack(Track *t, const Range &r, const string &name)
+{
+	BufferBox buf;
+	buf.resize(r.length());
+	t->root->AddSample(name, buf);
+	return t->AddSample(r.start(), t->root->sample.num - 1);
+}
+
 void load_nami_file_old(CFile *f, AudioFile *a)
 {
 	int file_size = f->GetSize();
 	int ffv = f->ReadFileFormatVersion();
 	msg_write("old format: " + i2s(ffv));
 	Array<short> tdata;
-#if 0
+
 	if (ffv == 1){
 		int length = f->ReadInt();
 		//msg_write(length);
@@ -340,7 +364,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			string name = f->ReadStr();
 			int pos = (float)f->ReadInt();
 			int slength = f->ReadInt();
-			Track *s = t->AddEmptySubTrack(Range(pos, slength), name);
+			SampleRef *s = __AddEmptySubTrack(t, Range(pos, slength), name);
 			//msg_write(s->Length);
 			s->volume = f->ReadFloat();
 			f->ReadBool(); // s->echo_enabled
@@ -349,10 +373,9 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			f->ReadFloat(); // s->echo_damp
 			tdata.resize(length * 2);
 			f->ReadBuffer((char*)&tdata[0], length * 4);
-			buf = s->GetBuffers(0, Range(0, slength));
 			for (int i=0;i<slength;i++){
-				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
+				s->buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
+				s->buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 			}
 			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 		}
@@ -381,7 +404,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				string name = f->ReadStr();
 				int pos = (float)f->ReadInt();
 				int slength = f->ReadInt();
-				Track *s = t->AddEmptySubTrack(Range(pos, slength), name);
+				SampleRef *s = __AddEmptySubTrack(t, Range(pos, slength), name);
 				//msg_write(s->Length);
 				s->volume = f->ReadFloat();
 				f->ReadBool(); // s->echo_enabled
@@ -390,10 +413,9 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				f->ReadFloat(); // s->echo_damp
 				tdata.resize(slength * 2);
 				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				buf = s->GetBuffers(0, Range(0, slength));
 				for (int i=0;i<slength;i++){
-					buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-					buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
+					s->buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
+					s->buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 				}
 				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 			}
@@ -439,20 +461,21 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				string name = f->ReadStr();
 				int pos = (float)f->ReadInt();
 				int slength = f->ReadInt();
-				Track *s = t->AddEmptySubTrack(Range(pos, slength), name);
+				SampleRef *s = __AddEmptySubTrack(t, Range(pos, slength), name);
 				//msg_write(s->Length);
 				s->volume = f->ReadFloat();
 				s->muted = f->ReadBool();
 				tdata.resize(slength * 2);
 				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				BufferBox sbuf = s->GetBuffers(0, Range(0, slength));
 				for (int i=0;i<slength;i++){
-					sbuf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-					sbuf.l[i] = (float)tdata[i*2+1] / 32768.0f;
+					s->buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
+					s->buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
 				}
 				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-				if (ffv == 3)
-					ReadFXListOld(f, s->fx);
+				if (ffv == 3){
+					Array<Effect> _fx;
+					ReadFXListOld(f, _fx);
+				}
 			}
 		}
 		if (ffv == 3)
@@ -481,7 +504,6 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			if (empty)
 				l.buffer.clear();
 		}
-#endif
 }
 
 typedef void chunk_reader(CFile*, void*);
@@ -580,7 +602,8 @@ void ReadChunkBufferBox(CFile *f, TrackLevel *l)
 	}
 }
 
-void ReadChunkSubBufferBox(CFile *f, BufferBox *b)
+
+void ReadChunkSampleBufferBox(CFile *f, BufferBox *b)
 {
 	b->offset = f->ReadInt();
 	int num = f->ReadInt();
@@ -597,12 +620,40 @@ void ReadChunkSubBufferBox(CFile *f, BufferBox *b)
 	}
 }
 
-/*void ReadChunkSub(CFile *f, Track *t)
+void ReadChunkSample(CFile *f, AudioFile *a)
+{
+	Sample *s = new Sample;
+	a->sample.add(s);
+	s->owner = a;
+	s->name = f->ReadStr();
+	s->volume = f->ReadFloat();
+	s->offset = f->ReadInt();
+	f->ReadInt(); // reserved
+	f->ReadInt();
+
+	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &s->buf);
+}
+
+void ReadSampleRef(CFile *f, Track *t)
+{
+	string name = f->ReadStr();
+	int pos = f->ReadInt();
+	int index = f->ReadInt();
+	SampleRef *s = t->AddSample(pos, index);
+	s->volume = f->ReadFloat();
+	s->muted = f->ReadBool();
+	s->rep_num = f->ReadInt();
+	s->rep_delay = f->ReadInt();
+	f->ReadInt(); // reserved
+	f->ReadInt();
+}
+
+void ReadSub(CFile *f, Track *t)
 {
 	string name = f->ReadStr();
 	int pos = f->ReadInt();
 	int length = f->ReadInt();
-	Track *s = t->AddEmptySubTrack(Range(pos, length), name);
+	SampleRef *s = __AddEmptySubTrack(t, Range(pos, length), name);
 	s->volume = f->ReadFloat();
 	s->muted = f->ReadBool();
 	s->rep_num = f->ReadInt();
@@ -610,8 +661,9 @@ void ReadChunkSubBufferBox(CFile *f, BufferBox *b)
 	f->ReadInt(); // reserved
 	f->ReadInt();
 
-	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSubBufferBox, &s->level[0].buffer[0]);
-}*/
+	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &s->buf);
+	tsunami->log->Error("\"sub\" chunk is deprecated!");
+}
 
 void ReadChunkBar(CFile *f, Array<Bar> *bar)
 {
@@ -665,7 +717,8 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 
 	AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
-//	AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
+	AddChunkHandler("samref", (chunk_reader*)&ReadSampleRef, t);
+	AddChunkHandler("sub", (chunk_reader*)&ReadSub, t);
 	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &t->fx);
 	AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
 	AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
@@ -678,6 +731,7 @@ void ReadChunkNami(CFile *f, AudioFile *a)
 	AddChunkHandler("tag", (chunk_reader*)&ReadChunkTag, &a->tag);
 	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &a->fx);
 	AddChunkHandler("lvlname", (chunk_reader*)&ReadChunkLevelName, a);
+	AddChunkHandler("sample", (chunk_reader*)&ReadChunkSample, a);
 	AddChunkHandler("track", (chunk_reader*)&ReadChunkTrack, a);
 }
 

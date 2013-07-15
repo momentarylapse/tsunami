@@ -14,6 +14,8 @@
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
+#include "../Action/Track/Sample/ActionTrackAddSample.h"
+#include "../Action/Track/Sample/ActionTrackDeleteSample.h"
 
 
 Track::Track()
@@ -221,6 +223,16 @@ void Track::InvalidateAllPeaks()
 	foreach(TrackLevel &l, level)
 		foreach(BufferBox &b, l.buffer)
 			b.invalidate_peaks(b.range());
+}
+
+SampleRef *Track::AddSample(int pos, int index)
+{
+	return (SampleRef*)root->Execute(new ActionTrackAddSample(get_track_index(this), pos, index));
+}
+
+void Track::DeleteSample(int index)
+{
+	root->Execute(new ActionTrackDeleteSample(get_track_index(this), index));
 }
 
 void Track::SetName(const string& name)

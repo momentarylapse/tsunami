@@ -38,7 +38,7 @@ int get_track_index(Track *t)
 	return -1;
 }
 
-int get_sub_index(SampleRef *s)
+int get_sample_ref_index(SampleRef *s)
 {
 	if (s){
 		Track *t = s->GetParent();
@@ -51,10 +51,12 @@ int get_sub_index(SampleRef *s)
 	return -1;
 }
 
-void get_track_sub_index(SampleRef *s, int &track_no, int &sub_no)
+int get_sample_index(Sample *s)
 {
-	sub_no = get_sub_index(s);
-	track_no = get_track_index(s->GetParent());
+	foreachi(Sample *ss, s->owner->sample, i)
+		if (s == ss)
+			return i;
+	return -1;
 }
 
 AudioFile::AudioFile() :

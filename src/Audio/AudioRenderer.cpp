@@ -36,7 +36,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 
 void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 {
-	msg_db_r("bb_render_audio_track_no_fx", 1);
+	msg_db_f("bb_render_audio_track_no_fx", 1);
 
 	// track buffer
 	BufferBox buf0 = t->ReadBuffersCol(range);
@@ -61,13 +61,11 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 			buf.add(s->buf, bpos, s->volume * s->origin->volume, 0);
 		}
 	}
-
-	msg_db_l(1);
 }
 
 void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 {
-	msg_db_r("bb_render_time_track_no_fx", 1);
+	msg_db_f("bb_render_time_track_no_fx", 1);
 
 	// silence... TODO...
 	buf.resize(range.length());
@@ -76,13 +74,11 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	foreach(Beat &b, beats)
 		((ExtendedBufferBox&)buf).add_click(b.pos - range.offset, (b.beat_no == 0) ? 0.8f : 0.3f, (b.beat_no == 0) ? 660.0f : 880.0f, t->root->sample_rate);
-
-	msg_db_l(1);
 }
 
 void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 {
-	msg_db_r("bb_render_midi_track_no_fx", 1);
+	msg_db_f("bb_render_midi_track_no_fx", 1);
 
 	// silence... TODO...
 	buf.resize(range.length());
@@ -93,13 +89,11 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 		Range r = Range(n.range.offset - range.offset, n.range.num);
 		((ExtendedBufferBox&)buf).add_tone(r, n.volume, n.GetFrequency(), t->root->sample_rate);
 	}
-
-	msg_db_l(1);
 }
 
 void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t)
 {
-	msg_db_r("bb_render_track_no_fx", 1);
+	msg_db_f("bb_render_track_no_fx", 1);
 
 	if (t->type == Track::TYPE_AUDIO)
 		bb_render_audio_track_no_fx(buf, t);
@@ -107,8 +101,6 @@ void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t)
 		bb_render_time_track_no_fx(buf, t);
 	else if (t->type == Track::TYPE_MIDI)
 		bb_render_midi_track_no_fx(buf, t);
-
-	msg_db_l(1);
 }
 
 void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
@@ -122,7 +114,7 @@ void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
 
 void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list)
 {
-	msg_db_r("bb_apply_fx", 1);
+	msg_db_f("bb_apply_fx", 1);
 
 	buf.make_own();
 
@@ -139,20 +131,16 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list
 	// apply fx
 	foreach(Effect &fx, fx_list)
 		fx.Apply(buf, &fake_track, false);
-
-	msg_db_l(1);
 }
 
 void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t)
 {
-	msg_db_r("bb_render_track_fx", 1);
+	msg_db_f("bb_render_track_fx", 1);
 
 	bb_render_track_no_fx(buf, t);
 
 	if ((t->fx.num > 0) || (effect))
 		bb_apply_fx(buf, t, t->fx);
-
-	msg_db_l(1);
 }
 
 int get_first_usable_track(AudioFile *a)
@@ -165,7 +153,7 @@ int get_first_usable_track(AudioFile *a)
 
 void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 {
-	msg_db_r("bb_render_audio_no_fx", 1);
+	msg_db_f("bb_render_audio_no_fx", 1);
 
 	// any un-muted track?
 	int i0 = get_first_usable_track(audio);
@@ -190,13 +178,11 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 
 		buf.scale(audio->volume);
 	}
-
-	msg_db_l(1);
 }
 
 BufferBox AudioRenderer::RenderAudioFilePart(AudioFile *a, const Range &_range)
 {
-	msg_db_r("RenderAudioFilePart", 1);
+	msg_db_f("RenderAudioFilePart", 1);
 	audio = a;
 	range = _range;
 
@@ -208,7 +194,6 @@ BufferBox AudioRenderer::RenderAudioFilePart(AudioFile *a, const Range &_range)
 	if (a->fx.num > 0)
 		bb_apply_fx(buf, NULL, audio->fx);
 
-	msg_db_l(1);
 	return buf;
 }
 
@@ -223,7 +208,7 @@ BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
 
 void AudioRenderer::Prepare(AudioFile *a)
 {
-	msg_db_r("Renderer.Prepare", 2);
+	msg_db_f("Renderer.Prepare", 2);
 	foreach(Effect &fx, a->fx)
 		fx.Prepare();
 	foreach(Track *t, a->track)
@@ -231,12 +216,11 @@ void AudioRenderer::Prepare(AudioFile *a)
 			fx.Prepare();
 	if (effect)
 		effect->Prepare();
-	msg_db_l(2);
 }
 
 void AudioRenderer::CleanUp(AudioFile *a)
 {
-	msg_db_r("Renderer.CleanUp", 2);
+	msg_db_f("Renderer.CleanUp", 2);
 	foreach(Effect &fx, a->fx)
 		fx.CleanUp();
 	foreach(Track *t, a->track)
@@ -244,5 +228,4 @@ void AudioRenderer::CleanUp(AudioFile *a)
 			fx.CleanUp();
 	if (effect)
 		effect->CleanUp();
-	msg_db_l(2);
 }

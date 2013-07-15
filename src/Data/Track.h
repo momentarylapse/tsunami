@@ -59,6 +59,8 @@ public:
 	void SetPanning(float panning);
 	BufferBox GetBuffers(int level_no, const Range &r);
 	void InsertMidiData(int offset, MidiData &midi);
+	SampleRef *AddSample(int pos, int index);
+	void DeleteSample(int index);
 
 
 	enum

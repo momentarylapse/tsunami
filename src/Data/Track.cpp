@@ -8,7 +8,6 @@
 #include "Track.h"
 #include "../Plugins/Effect.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
-#include "../Action/SubTrack/ActionTrackAddEmptySubTrack.h"
 #include "../lib/hui/hui.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
@@ -242,11 +241,6 @@ void Track::SetVolume(float volume)
 void Track::SetPanning(float panning)
 {
 	root->Execute(new ActionTrackEditPanning(this, panning));
-}
-
-Track *Track::AddEmptySubTrack(const Range &r, const string &name)
-{
-	return (Track*)root->Execute(new ActionTrackAddEmptySubTrack(get_track_index(this), r, name));
 }
 
 void Track::InsertMidiData(int offset, MidiData& midi)

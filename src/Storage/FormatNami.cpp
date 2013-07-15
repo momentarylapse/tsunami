@@ -317,6 +317,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 	int ffv = f->ReadFileFormatVersion();
 	msg_write("old format: " + i2s(ffv));
 	Array<short> tdata;
+#if 0
 	if (ffv == 1){
 		int length = f->ReadInt();
 		//msg_write(length);
@@ -480,6 +481,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 			if (empty)
 				l.buffer.clear();
 		}
+#endif
 }
 
 typedef void chunk_reader(CFile*, void*);

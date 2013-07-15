@@ -11,8 +11,8 @@
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
-#include "../Action/SubTrack/ActionSubTrackMove.h"
 
+class ActionTrackMoveSample;
 class TrackDialog;
 class AudioFileDialog;
 
@@ -48,7 +48,8 @@ public:
 	void ZoomOut();
 	void MakeSampleVisible(int sample);
 
-	void DrawBuffer(HuiPainter *c, const rect &r, Track *t, double pos, const color &col);
+	void DrawTrackBuffers(HuiPainter *c, const rect &r, Track *t, double pos, const color &col);
+	void DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
 	void DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
 	void DrawSample(HuiPainter *c, const rect &r, SampleRef *s);
 	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col);
@@ -112,7 +113,7 @@ public:
 	};
 
 	SelectionType Hover, Selection;
-	ActionSubTrackMove *cur_action;
+	ActionTrackMoveSample *cur_action;
 
 	int MousePossiblySelecting, MousePossiblySelectingStart;
 	const int BarrierDist;
@@ -180,6 +181,10 @@ public:
 
 	double view_pos;
 	double view_zoom;
+
+	int prefered_buffer_level;
+	double buffer_zoom_factor;
+	void UpdateBufferZoom();
 
 	TrackDialog *track_dialog;
 	AudioFileDialog *audio_file_dialog;

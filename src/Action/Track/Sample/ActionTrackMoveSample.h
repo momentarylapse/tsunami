@@ -1,21 +1,21 @@
 /*
- * ActionSubTrackMove.h
+ * ActionTrackMoveSample.h
  *
  *  Created on: 30.03.2012
  *      Author: michi
  */
 
-#ifndef ACTIONSUBTRACKMOVE_H_
-#define ACTIONSUBTRACKMOVE_H_
+#ifndef ACTIONTRACKMOVESAMPLE_H_
+#define ACTIONTRACKMOVESAMPLE_H_
 
-#include "../Action.h"
-#include "../../Data/AudioFile.h"
+#include "../../Action.h"
+class AudioFile;
 
-class ActionSubTrackMove: public Action
+class ActionTrackMoveSample: public Action
 {
 public:
-	ActionSubTrackMove(AudioFile *a);
-	virtual ~ActionSubTrackMove();
+	ActionTrackMoveSample(AudioFile *a);
+	virtual ~ActionTrackMoveSample();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
@@ -34,4 +34,4 @@ private:
 	int param;
 };
 
-#endif /* ACTIONSUBTRACKMOVE_H_ */
+#endif /* ACTIONTRACKMOVESAMPLE_H_ */

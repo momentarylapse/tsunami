@@ -1,25 +1,25 @@
 /*
- * ActionTrackAddSampleRef.cpp
+ * ActionTrackAddSample.cpp
  *
  *  Created on: 15.07.2013
  *      Author: michi
  */
 
-#include "ActionTrackAddSampleRef.h"
+#include "ActionTrackAddSample.h"
 #include "../../../Data/AudioFile.h"
 
-ActionTrackAddSampleRef::ActionTrackAddSampleRef(int _track_no, int _pos, int _index)
+ActionTrackAddSample::ActionTrackAddSample(int _track_no, int _pos, int _index)
 {
 	track_no = _track_no;
 	pos = _pos;
 	index = _index;
 }
 
-ActionTrackAddSampleRef::~ActionTrackAddSampleRef()
+ActionTrackAddSample::~ActionTrackAddSample()
 {
 }
 
-void ActionTrackAddSampleRef::undo(Data *d)
+void ActionTrackAddSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->track[track_no];
@@ -29,7 +29,7 @@ void ActionTrackAddSampleRef::undo(Data *d)
 
 
 
-void *ActionTrackAddSampleRef::execute(Data *d)
+void *ActionTrackAddSample::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->track[track_no];

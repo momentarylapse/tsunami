@@ -1,16 +1,17 @@
 /*
- * ActionSubTrackInsert.cpp
+ * ActionTrackInsertSample.cpp
  *
  *  Created on: 11.07.2012
  *      Author: michi
  */
 
-#include "ActionSubTrackInsert.h"
-#include "ActionSubTrackDelete.h"
-#include "../Track/Buffer/ActionTrackCreateBuffers.h"
-#include "../Track/Buffer/ActionTrackEditBuffer.h"
+#include "ActionTrackInsertSample.h"
+#include "ActionTrackDeleteSample.h"
+#include "../Buffer/ActionTrackCreateBuffers.h"
+#include "../Buffer/ActionTrackEditBuffer.h"
+#include "../../../Data/AudioFile.h"
 
-ActionSubTrackInsert::ActionSubTrackInsert(AudioFile *a, int track_no, int index, int level_no)
+ActionTrackInsertSample::ActionTrackInsertSample(AudioFile *a, int track_no, int index, int level_no)
 {
 	SampleRef *sub = a->track[track_no]->sample[index];
 
@@ -25,10 +26,10 @@ ActionSubTrackInsert::ActionSubTrackInsert(AudioFile *a, int track_no, int index
 	AddSubAction(action, a);
 
 	// delete sub
-	AddSubAction(new ActionSubTrackDelete(track_no, index), a);
+	AddSubAction(new ActionTrackDeleteSample(track_no, index), a);
 }
 
-ActionSubTrackInsert::~ActionSubTrackInsert()
+ActionTrackInsertSample::~ActionTrackInsertSample()
 {
 }
 

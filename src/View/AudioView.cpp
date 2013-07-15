@@ -10,6 +10,7 @@
 #include "../View/Dialog/AudioFileDialog.h"
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
+#include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
 #include "../Stuff/Log.h"
@@ -428,7 +429,7 @@ void AudioView::OnLeftButtonDown()
 		if (Selection.track->muted)
 			Selection.track->SetMuted(false);
 	}else if (Selection.type == SEL_TYPE_SAMPLE){
-		cur_action = new ActionSubTrackMove(audio);
+		cur_action = new ActionTrackMoveSample(audio);
 	}
 
 	SetBarriers(&Selection);
@@ -617,21 +618,55 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 	//c->DrawLines(tx, ty2, nl -1);
 }
 
-void AudioView::DrawBuffer(HuiPainter *c, const rect &r, Track *t, double view_pos_rel, const color &col)
+void AudioView::UpdateBufferZoom()
 {
-	msg_db_f("DrawBuffer", 1);
-	int l_best = 0;
-	double f = 1.0;
+	prefered_buffer_level = 0;
+	buffer_zoom_factor = 1.0;
 
 	// which level of detail?
 	if (view_zoom < 0.8f)
 		for (int i=24-1;i>=0;i--){
 			double _f = pow(2, (double)i);
 			if (_f > 1.0 / view_zoom){
-				l_best = i;
-				f = _f;
+				prefered_buffer_level = i;
+				buffer_zoom_factor = _f;
 			}
 		}
+}
+
+void AudioView::DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col)
+{
+	msg_db_f("DrawBuffer", 1);
+
+	// zero heights of both channels
+	float y0r = r.y1 + r.height() / 4;
+	float y0l = r.y1 + r.height() * 3 / 4;
+
+	float hf = r.height() / 4;
+
+	if (show_mono){
+		y0r = r.y1 + r.height() / 2;
+		hf *= 2;
+	}
+
+
+	int di = DetailSteps;
+	c->SetColor(col);
+	int l = min(prefered_buffer_level - 1, b.peak.num / 2);
+	if (l >= 1){//f < MIN_MAX_FACTOR){
+		draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, buffer_zoom_factor, hf, r.x1, y0r, b.peak[l*2-2], b.offset);
+		if (!show_mono)
+			draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, buffer_zoom_factor, hf, r.x1, y0l, b.peak[l*2-1], b.offset);
+	}else{
+		draw_line_buffer(c, r.width(), view_pos_rel, view_zoom, hf, r.x1, y0r, b.r, b.offset);
+		if (!show_mono)
+			draw_line_buffer(c, r.width(), view_pos_rel, view_zoom, hf, r.x1, y0l, b.l, b.offset);
+	}
+}
+
+void AudioView::DrawTrackBuffers(HuiPainter *c, const rect &r, Track *t, double view_pos_rel, const color &col)
+{
+	msg_db_f("DrawTrackBuffers", 1);
 
 	// zero heights of both channels
 	float y0r = r.y1 + r.height() / 4;
@@ -647,22 +682,11 @@ void AudioView::DrawBuffer(HuiPainter *c, const rect &r, Track *t, double view_p
 
 	int di = DetailSteps;
 	foreachi(TrackLevel &lev, t->level, level_no){
+		color cc = ColorWave;
 		if ((level_no == cur_level))// || (!t->parent))
-			c->SetColor(col);
-		else
-			c->SetColor(ColorWave);
-		foreach(BufferBox &b, lev.buffer){
-			int l = min(l_best - 1, b.peak.num / 2);
-			if (l >= 1){//f < MIN_MAX_FACTOR){
-				draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, f, hf, r.x1, y0r, b.peak[l*2-2], b.offset);
-				if (!show_mono)
-					draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, f, hf, r.x1, y0l, b.peak[l*2-1], b.offset);
-			}else{
-				draw_line_buffer(c, r.width(), view_pos_rel, view_zoom, hf, r.x1, y0r, b.r, b.offset);
-				if (!show_mono)
-					draw_line_buffer(c, r.width(), view_pos_rel, view_zoom, hf, r.x1, y0l, b.l, b.offset);
-			}
-		}
+			cc = col;
+		foreach(BufferBox &b, lev.buffer)
+			DrawBuffer(c, r, b, view_pos_rel, cc);
 	}
 }
 
@@ -707,7 +731,7 @@ void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
 		DrawSampleFrame(c, r, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-//	DrawBuffer(	c, r, s, view_pos - (double)s->pos, col);
+	DrawBuffer(c, r, s->buf, view_pos - (double)s->pos, col);
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
@@ -745,7 +769,7 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 
 	DrawMidi(c, r, t->midi, col);
 
-	DrawBuffer(c, r, t, view_pos, col);
+	DrawTrackBuffers(c, r, t, view_pos, col);
 
 	foreach(SampleRef *s, t->sample)
 		DrawSample(c, r, s);
@@ -1003,6 +1027,7 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 	}
 
 	plan_track_sizes(r, audio, TIME_SCALE_HEIGHT);
+	UpdateBufferZoom();
 
 	// background
 	DrawBackground(c, r);

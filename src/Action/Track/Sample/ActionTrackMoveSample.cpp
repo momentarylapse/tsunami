@@ -1,14 +1,14 @@
 /*
- * ActionSubTrackMove.cpp
+ * ActionTrackMoveSample.cpp
  *
  *  Created on: 30.03.2012
  *      Author: michi
  */
 
-#include "ActionSubTrackMove.h"
-#include "../../Data/AudioFile.h"
+#include "ActionTrackMoveSample.h"
+#include "../../../Data/AudioFile.h"
 
-ActionSubTrackMove::ActionSubTrackMove(AudioFile *a)
+ActionTrackMoveSample::ActionTrackMoveSample(AudioFile *a)
 {
 	foreach(Track *t, a->track)
 		foreach(SampleRef *s, t->sample)
@@ -23,13 +23,13 @@ ActionSubTrackMove::ActionSubTrackMove(AudioFile *a)
 
 
 
-ActionSubTrackMove::~ActionSubTrackMove()
+ActionTrackMoveSample::~ActionTrackMoveSample()
 {
 }
 
 
 
-void *ActionSubTrackMove::execute(Data *d)
+void *ActionTrackMoveSample::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	foreach(SubSaveData &d, sub)
@@ -39,14 +39,14 @@ void *ActionSubTrackMove::execute(Data *d)
 
 
 
-void ActionSubTrackMove::abort(Data *d)
+void ActionTrackMoveSample::abort(Data *d)
 {
 	undo(d);
 }
 
 
 
-void ActionSubTrackMove::undo(Data *d)
+void ActionTrackMoveSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	foreach(SubSaveData &d, sub)
@@ -55,14 +55,14 @@ void ActionSubTrackMove::undo(Data *d)
 
 
 
-void ActionSubTrackMove::set_param_and_notify(Data *d, int _param)
+void ActionTrackMoveSample::set_param_and_notify(Data *d, int _param)
 {
 	param += _param;
 	execute(d);
 	d->Notify("Change");
 }
 
-void ActionSubTrackMove::abort_and_notify(Data *d)
+void ActionTrackMoveSample::abort_and_notify(Data *d)
 {
 	abort(d);
 	d->Notify("Change");

@@ -27,7 +27,7 @@ void *ActionAudioAddSample::execute(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	sample->owner = a;
 	a->sample.add(sample);
-	return (void*)(long)(a->sample.num - 1);
+	return sample;
 }
 
 void ActionAudioAddSample::undo(Data *d)

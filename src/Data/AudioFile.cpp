@@ -16,8 +16,8 @@
 #include "../Action/AudioFile/Sample/ActionAudioDeleteSample.h"
 #include "../Action/Track/ActionTrackAdd.h"
 #include "../Action/Track/ActionTrackDelete.h"
-#include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
-#include "../Action/SubTrack/ActionSubTrackFromSelection.h"
+#include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
+#include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
 #include "../Tsunami.h"
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
@@ -295,7 +295,7 @@ int AudioFile::GetNumSelectedSubs()
 void AudioFile::InsertSelectedSubs(int level_no)
 {
 	if (GetNumSelectedSubs() > 0)
-		Execute(new ActionSubTrackInsertSelected(this, level_no));
+		Execute(new ActionTrackInsertSelectedSamples(this, level_no));
 }
 
 void AudioFile::AddLevel()
@@ -330,7 +330,7 @@ void AudioFile::DeleteSelection(int level_no, bool all_levels)
 void AudioFile::CreateSubsFromSelection(int level_no)
 {
 	if (!selection.empty())
-		Execute(new ActionSubTrackFromSelection(this, level_no));
+		Execute(new ActionTrackSampleFromSelection(this, level_no));
 }
 
 void AudioFile::InvalidateAllPeaks()

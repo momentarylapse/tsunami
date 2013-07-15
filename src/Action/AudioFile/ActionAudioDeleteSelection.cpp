@@ -9,7 +9,7 @@
 #include "../Track/Buffer/ActionTrack__CutBufferBox.h"
 #include "../Track/Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../Track/Buffer/ActionTrack__ShrinkBufferBox.h"
-#include "../SubTrack/ActionSubTrackDelete.h"
+#include "../Track/Sample/ActionTrackDeleteSample.h"
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_no, bool all_levels)
 {
@@ -26,7 +26,7 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_n
 			// subs
 			foreachib(SampleRef *s, t->sample, n)
 				if (s->is_selected){
-					AddSubAction(new ActionSubTrackDelete(track_no, n), a);
+					AddSubAction(new ActionTrackDeleteSample(track_no, n), a);
 					_foreach_it_.update(); // TODO...
 				}
 		}

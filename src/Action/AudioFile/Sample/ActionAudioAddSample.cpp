@@ -13,6 +13,7 @@ ActionAudioAddSample::ActionAudioAddSample(const string &name, BufferBox &buf)
 {
 	sample = new Sample;
 	sample->buf = buf;
+	sample->buf.offset = 0;
 	sample->name = name;
 }
 

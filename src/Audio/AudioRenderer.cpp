@@ -56,9 +56,9 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 			if (!intersect_sub(s, rep_range, intersect_range, bpos))
 				continue;
 
-			/*BufferBox sbuf = s->ReadBuffers(0, intersect_range);
 			buf.make_own();
-			buf.add(sbuf, bpos, s->volume, 0);*/
+			bpos = s->pos + s->rep_delay * i - range.start();
+			buf.add(s->buf, bpos, s->volume * s->origin->volume, 0);
 		}
 	}
 

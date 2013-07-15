@@ -1460,9 +1460,9 @@ hui:properties
 0
 
 
-ItemImage
-sub_import
-hui:open
+ItemSeparator
+
+
 1
 0
 0
@@ -3992,7 +3992,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-223
+222
 // Text
 about
 Info
@@ -4348,8 +4348,6 @@ stop
 Stopp
 sub_from_selection
 Aus Auswahl herauslösen
-sub_import
-Aus Datei importieren...
 sub_properties
 Eigenschaften
 t_dummy
@@ -4446,7 +4444,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-223
+222
 // Text
 about
 
@@ -4801,8 +4799,6 @@ show_log
 stop
 Stop
 sub_from_selection
-
-sub_import
 
 sub_properties
 

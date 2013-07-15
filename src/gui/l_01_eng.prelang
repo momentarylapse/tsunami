@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-179
+178
 // Data (ID,Text)
 about
 
@@ -283,8 +283,6 @@ stop
 Stop
 sub_from_selection
 
-sub_import
-
 sub_properties
 
 tab_control
@@ -362,7 +360,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-89
+97
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -375,6 +373,8 @@ zoom_out
 !bold$Kommentar/Geschehnisse:
 
 !bold$Name:
+
+!format=TttC\\Name\\Dauer\\Benutzung\\Löschen
 
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
@@ -402,6 +402,8 @@ Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
 
+Aus Auswahl
+
 Beim Anwenden eines Effekts: 
 
 Beschreibung
@@ -425,6 +427,8 @@ Dieser Effekt ist nicht konfigurierbar.
 Editor für Audio Dateien
 
 Effekt nicht ladbar: \"%s\"
+
+Einfügen
 
 Ende\\\") + audio->get_time_str(audio->GetRange().end()));
 
@@ -456,11 +460,17 @@ Ist halt irgendwie passiert...
 
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 
+Kann nur Samples löschen, die nicht benutzt werden!
+
 Kanäle
 
 Kein Sample ausgewählt
 
 Konnte Aufnahmegerät nicht öffnen
+
+Laden...
+
+Löschen
 
 MIDI Quelle auswählen
 
@@ -481,6 +491,8 @@ Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 Plugin-Script wählen
 
 Raw Daten
+
+Sample Manager
 
 Samplerate
 
@@ -507,6 +519,8 @@ exportiere ogg
 exportiere raw
 
 exportiere wave
+
+fügt am Cursor der aktuellen Spur ein
 
 i'm now going to clean up...
 

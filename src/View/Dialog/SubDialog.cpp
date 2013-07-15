@@ -14,7 +14,7 @@ SubDialog::SubDialog(HuiWindow *_parent, bool _allow_parent, SampleRef *s):
 {
 	sample = s;
 
-	SetString("name", s->name);
+	SetString("name", s->origin->name);
 	SetDecimals(1);
 	volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, (void(HuiEventHandler::*)())&SubDialog::OnVolume, s->volume);
 	Check("mute", s->muted);
@@ -29,7 +29,6 @@ SubDialog::SubDialog(HuiWindow *_parent, bool _allow_parent, SampleRef *s):
 	Enable("repdelay", s->rep_num > 0);
 
 	EventM("mute", this, &SubDialog::OnMute);
-	EventM("name", this, &SubDialog::OnName);
 	EventM("level_track", this, &SubDialog::OnLevelTrack);
 	EventM("repnum", this, &SubDialog::OnRepNum);
 	EventM("repdelay", this, &SubDialog::OnRepDelay);
@@ -45,7 +44,7 @@ SubDialog::~SubDialog()
 
 void SubDialog::OnName()
 {
-	sample->name = GetString("");
+	sample->origin->name = GetString("");
 }
 
 void SubDialog::OnMute()

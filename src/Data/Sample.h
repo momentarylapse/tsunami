@@ -45,7 +45,6 @@ public:
 	Track *GetParent();
 	Range GetRange();
 
-	string name;
 	int pos;
 	int sample_index;
 	Sample *origin;

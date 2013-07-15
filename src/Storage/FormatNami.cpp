@@ -106,7 +106,7 @@ void WriteSampleRef(CFile *f, SampleRef *s)
 {
 	BeginChunk(f, "samref");
 
-	f->WriteStr(s->name);
+	f->WriteStr(s->origin->name);
 	f->WriteInt(s->pos);
 	f->WriteInt(get_sample_index(s->origin));
 	f->WriteFloat(s->volume);

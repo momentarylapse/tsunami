@@ -21,6 +21,7 @@ SampleManager::SampleManager(AudioFile *a, HuiWindow* _parent, bool _allow_paren
 	AddButton("+", 0, 0, 0, 0, "add_sample");
 	AddButton("-", 1, 0, 0, 0, "delete_sample");
 
+	EventM("hui:close", this, &SampleManager::OnClose);
 	EventM("add_sample", this, &SampleManager::OnAdd);
 	EventM("delete_sample", this, &SampleManager::OnDelete);
 	EventMX("sample_list", "hui:select", this, &SampleManager::OnListSelect);
@@ -68,7 +69,7 @@ void SampleManager::OnDelete()
 
 void SampleManager::OnClose()
 {
-	delete(this);
+	Hide();
 }
 
 void SampleManager::OnUpdate(Observable *o)

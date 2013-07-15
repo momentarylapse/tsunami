@@ -25,6 +25,7 @@ class Storage;
 class Progress;
 class PeakMeter;
 class Clipboard;
+class SampleManager;
 
 class Tsunami : public Observer, public HuiWindow
 {
@@ -121,6 +122,8 @@ public:
 
 	PluginManager *plugins;
 	Clipboard *clipboard;
+
+	SampleManager *sample_manager;
 };
 
 extern Tsunami *tsunami;

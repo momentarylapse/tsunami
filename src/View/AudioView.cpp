@@ -735,7 +735,7 @@ void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
-		c->DrawStr(asx, r.y2 - SUB_FRAME_HEIGHT, s->name);
+		c->DrawStr(asx, r.y2 - SUB_FRAME_HEIGHT, s->origin->name);
 }
 
 void DrawStrBg(HuiPainter *c, float x, float y, const string &str, const color &fg, const color &bg)

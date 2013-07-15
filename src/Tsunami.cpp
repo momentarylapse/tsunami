@@ -155,6 +155,9 @@ Tsunami::Tsunami(Array<string> arg) :
 	plugins->AddPluginsToMenu();
 	plugins->LinkAppScriptData();
 
+
+	sample_manager = new SampleManager(audio, this, true);
+
 	Subscribe(view);
 	Subscribe(audio);
 	Subscribe(output, "StateChange");
@@ -186,6 +189,7 @@ Tsunami::~Tsunami()
 	HuiConfigWriteInt("Window.Y", r.y1);
 	HuiConfigWriteBool("Window.Maximized", IsMaximized());
 
+	delete(sample_manager);
 	delete(plugins);
 	delete(storage);
 	delete(view);
@@ -326,8 +330,7 @@ void Tsunami::OnDelete()
 
 void Tsunami::OnSampleManager()
 {
-	SampleManager *sm = new SampleManager(audio, this, false);
-	sm->Run();
+	sample_manager->Show();
 }
 
 void Tsunami::OnSubImport()

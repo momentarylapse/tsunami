@@ -13,6 +13,8 @@
 #include "../Audio/AudioRenderer.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
+#include "../Audio/Synth/Synthesizer.h"
+#include "../Audio/Synth/DummySynthesizer.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
@@ -135,9 +137,26 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("BufferBox", "peak", offsetof(BufferBox, peak));
 	Script::LinkExternal("BufferBox.clear",(void*)&BufferBox::clear);
 	Script::LinkExternal("BufferBox.__assign__",(void*)&BufferBox::__assign__);
-	Script::LinkExternal("BufferBox.add_click",(void*)&ExtendedBufferBox::add_click);
-	Script::LinkExternal("BufferBox.add_tone",(void*)&ExtendedBufferBox::add_tone);
 	Script::LinkExternal("BufferBox.get_spectrum",(void*)&ExtendedBufferBox::get_spectrum);
+
+	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
+	Script::DeclareClassOffset("Synthesizer", "name", offsetof(Synthesizer, name));
+	Script::DeclareClassOffset("Synthesizer", "sample_rate", offsetof(Synthesizer, sample_rate));
+	Script::LinkExternal("Synthesizer.__init__", (void*)&Synthesizer::__init__);
+	Script::LinkExternal("Synthesizer.__delete__", (void*)&Synthesizer::__delete__);
+	Script::LinkExternal("Synthesizer.AddTone", (void*)&Synthesizer::AddTone);
+	Script::LinkExternal("Synthesizer.AddToneFreq", (void*)&Synthesizer::AddToneFreq);
+	Script::LinkExternal("Synthesizer.AddClick", (void*)&Synthesizer::AddClick);
+	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf((Script::tmf)&Synthesizer::__delete__));
+	Script::DeclareClassVirtualIndex("Synthesizer", "AddTone", Script::mf((Script::tmf)&Synthesizer::AddTone));
+	Script::DeclareClassVirtualIndex("Synthesizer", "AddToneFreq", Script::mf((Script::tmf)&Synthesizer::AddToneFreq));
+	Script::DeclareClassVirtualIndex("Synthesizer", "AddClick", Script::mf((Script::tmf)&Synthesizer::AddClick));
+	Script::LinkExternal("Synthesizer.AddMetronomeClick", (void*)&Synthesizer::AddMetronomeClick);
+
+	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
+	Script::LinkExternal("DummySynthesizer.__init__", (void*)&DummySynthesizer::__init__);
+	Script::LinkExternal("DummySynthesizer.AddToneFreq", (void*)&DummySynthesizer::AddToneFreq);
+	Script::LinkExternal("DummySynthesizer.AddClick", (void*)&DummySynthesizer::AddClick);
 
 	Script::DeclareClassSize("Bar", sizeof(Bar));
 	Script::DeclareClassOffset("Bar", "num_beats", offsetof(Bar, num_beats));
@@ -174,6 +193,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Track", "fx", offsetof(Track, fx));
 //	Script::DeclareClassOffset("Track", "sub", offsetof(Track, sub));
 	Script::DeclareClassOffset("Track", "midi", offsetof(Track, midi));
+	Script::DeclareClassOffset("Track", "synth", offsetof(Track, synth));
 	Script::DeclareClassOffset("Track", "area", offsetof(Track, area));
 //	Script::DeclareClassOffset("Track", "parent", offsetof(Track, parent));
 	Script::DeclareClassOffset("Track", "root", offsetof(Track, root));
@@ -190,6 +210,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "volume", offsetof(AudioFile, volume));
 	Script::DeclareClassOffset("AudioFile", "fx", offsetof(AudioFile, fx));
 	Script::DeclareClassOffset("AudioFile", "track", offsetof(AudioFile, track));
+	Script::DeclareClassOffset("AudioFile", "synth", offsetof(AudioFile, synth));
 	Script::DeclareClassOffset("AudioFile", "area", offsetof(AudioFile, area));
 	Script::DeclareClassOffset("AudioFile", "selection", offsetof(AudioFile, selection));
 	Script::DeclareClassOffset("AudioFile", "sel_raw", offsetof(AudioFile, sel_raw));

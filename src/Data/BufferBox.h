@@ -32,7 +32,7 @@ class BufferBox
 public:
 	BufferBox();
 	BufferBox(const BufferBox &b);
-	virtual ~BufferBox();
+	~BufferBox();
 	void operator=(const BufferBox &b);
 	void __assign__(const BufferBox &other){	*this = other;	}
 

@@ -72,6 +72,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	Array<Beat> beats = t->bar.GetBeats(range);
 
+	t->synth->sample_rate = audio->sample_rate;
 	foreach(Beat &b, beats)
 		t->synth->AddMetronomeClick(buf, b.pos - range.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
 }
@@ -85,6 +86,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 
 	Array<MidiNote> notes = t->midi.GetNotes(range);
 
+	t->synth->sample_rate = audio->sample_rate;
 	foreach(MidiNote &n, notes){
 		Range r = Range(n.range.offset - range.offset, n.range.num);
 		t->synth->AddTone(buf, r, n.pitch, n.volume);

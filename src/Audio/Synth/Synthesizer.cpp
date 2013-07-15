@@ -16,12 +16,17 @@ float pitch_to_freq(int pitch)
 
 Synthesizer::Synthesizer()
 {
-	audio = NULL;
+	sample_rate = DEFAULT_SAMPLE_RATE;
 	ref_count = 0;
 }
 
 Synthesizer::~Synthesizer()
 {
+}
+
+void Synthesizer::__init__()
+{
+	new(this) Synthesizer;
 }
 
 void Synthesizer::__delete__()
@@ -45,7 +50,7 @@ void Synthesizer::AddTone(BufferBox& buf, const Range& range, int pitch, float v
 
 void Synthesizer::AddClick(BufferBox &buf, int pos, int pitch, float volume)
 {
-	AddTone(buf, Range(pos, pos + audio->sample_rate / 50), pitch, volume);
+	AddTone(buf, Range(pos, pos + sample_rate / 50), pitch, volume);
 }
 
 /*void Synthesizer::AddTones(BufferBox& buf, Array<MidiNote>& notes)
@@ -58,5 +63,5 @@ void Synthesizer::AddMetronomeClick(BufferBox &buf, int pos, int level, float vo
 	if (level == 0)
 		AddClick(buf, pos, 81, volume);
 	else
-		AddClick(buf, pos, 74, volume * 0.8f);
+		AddClick(buf, pos, 74, volume * 0.5f);
 }

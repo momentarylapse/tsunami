@@ -146,7 +146,6 @@ void AudioFile::Reset()
 		delete(s);
 	synth.clear();
 	synth.add(new DummySynthesizer);
-	synth[0]->audio = this;
 
 	action_manager->Reset();
 

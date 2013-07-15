@@ -15,6 +15,7 @@ class DummySynthesizer : public Synthesizer
 public:
 	DummySynthesizer();
 	virtual ~DummySynthesizer();
+	void __init__();
 
 	virtual void AddToneFreq(BufferBox &buf, const Range &range, float freq, float volume);
 	virtual void AddClick(BufferBox &buf, int pos, int pitch, float volume);

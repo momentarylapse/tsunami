@@ -27,15 +27,5 @@ extern void **cur_vtable;
 	{type type##Instance; \
 	cur_vtable = *(void***)&type##Instance;}
 
-class MFDummyClass
-{};
-
-typedef void (MFDummyClass::*tmf)();
-typedef char *tcpa[4];
-static void *mf(tmf vmf)
-{
-	tcpa *cpa=(tcpa*)&vmf;
-	return (*cpa)[0];
-}
 
 };

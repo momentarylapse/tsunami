@@ -1417,7 +1417,7 @@ void SyntaxTree::ParseClassFunction(Type *t, bool as_extern, int virtual_index)
 	cf.return_type = f->return_type;
 	for (int i=0;i<f->num_params;i++)
 		cf.param_type.add(f->var[i].type);
-	cf.virtual_index = virtual_index;
+	cf.virtual_index = ProcessClassOffset(t->name, cf.name, virtual_index);
 
 	// overwrite?
 	foreach(ClassFunction &_cf, t->function)

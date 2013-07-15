@@ -52,6 +52,12 @@ struct ClassSizeData
 Array<ClassSizeData> ClassSizes;
 
 
+void *mf(tmf vmf)
+{
+	tcpa *cpa=(tcpa*)&vmf;
+	return (*cpa)[0];
+}
+
 //------------------------------------------------------------------------------------------------//
 //                                             types                                              //
 //------------------------------------------------------------------------------------------------//
@@ -1178,6 +1184,15 @@ void DeclareClassOffset(const string &class_name, const string &element, int off
 	d.class_name = class_name;
 	d.element = element;
 	d.offset = offset;
+	ClassOffsets.add(d);
+}
+
+void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p)
+{
+	ClassOffsetData d;
+	d.class_name = class_name;
+	d.element = func;
+	d.offset = (int)(long)p / sizeof(void*);
 	ClassOffsets.add(d);
 }
 

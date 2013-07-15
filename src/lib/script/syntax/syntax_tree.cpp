@@ -874,7 +874,7 @@ void SyntaxTree::ConvertCallByReference()
 				continue;
 			}
 		
-		if ((c->kind == KindFunction)|| (c->kind == KindCompilerFunction)){
+		if ((c->kind == KindFunction)|| (c->kind == KindVirtualFunction)|| (c->kind == KindCompilerFunction)){
 			// parameters: array/class as reference
 			for (int j=0;j<c->num_params;j++)
 				if (c->param[j]->type->UsesCallByReference()){

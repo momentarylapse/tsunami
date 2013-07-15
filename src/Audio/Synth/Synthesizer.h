@@ -10,7 +10,6 @@
 
 #include "../../lib/base/base.h"
 
-class AudioFile;
 class Range;
 class BufferBox;
 class MidiNote;
@@ -20,6 +19,7 @@ class Synthesizer
 public:
 	Synthesizer();
 	virtual ~Synthesizer();
+	void __init__();
 	virtual void __delete__();
 
 	virtual void AddTone(BufferBox &buf, const Range &range, int pitch, float volume);
@@ -29,7 +29,7 @@ public:
 	void AddMetronomeClick(BufferBox &buf, int pos, int level, float volume);
 
 	string name;
-	AudioFile *audio;
+	int sample_rate;
 	int ref_count;
 	void ref();
 	void unref();

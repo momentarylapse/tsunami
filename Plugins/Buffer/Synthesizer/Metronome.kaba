@@ -17,6 +17,8 @@ class PluginState
 
 PluginState state
 
+DummySynthesizer synth
+
 window dlg
 
 void ProcessTrack(BufferBox buf)
@@ -24,12 +26,14 @@ void ProcessTrack(BufferBox buf)
 
 	float dt_m = 60.0 / data.BeatsPerMinute
 	int sm_m = dt_m * a.sample_rate
+	
+	synth.sample_rate = a.sample_rate
 
 	while true
 		if state.beat == 0
-			buf.add_click(state.dpos, data.Volume, 660.0, a.sample_rate)
+			synth.AddMetronomeClick(buf, state.dpos, 0, data.Volume)
 		else
-			buf.add_click(state.dpos, data.Volume * 0.5, 880.0, a.sample_rate)
+			synth.AddMetronomeClick(buf, state.dpos, 1, data.Volume)
 		
 		state.beat ++
 		if state.beat >= data.BeatsPerMeasure

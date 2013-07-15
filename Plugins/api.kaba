@@ -40,9 +40,22 @@ class BufferBox
 	string peak[]
 	extern void __assign__(BufferBox other)
 	extern void clear()
-	extern void add_click(int pos, float volume, float freq, int sample_rate)
-	extern void add_tone(Range range, float volume, float freq, int sample_rate)
 	extern void get_spectrum(complex spec_r[], complex spec_l[], int samples)
+
+class Synthesizer
+	string name
+	int sample_rate
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual void AddTone(BufferBox buf, Range range, int pitch, float volume)
+	extern virtual void AddToneFreq(BufferBox buf, Range range, float freq, float volume)
+	extern virtual void AddClick(BufferBox buf, int pos, int pitch, float volume)
+	extern void AddMetronomeClick(BufferBox buf, int pos, int level, float volume)
+
+class DummySynthesizer : Synthesizer
+	extern void __init__()
+	extern virtual void AddToneFreq(BufferBox buf, Range range, float freq, float volume)
+	extern virtual void AddClick(BufferBox buf, int pos, int pitch, float volume)
 
 class TrackRenderBuffer
 	int dummy
@@ -82,8 +95,8 @@ enum
 class TrackLevel
 	BufferBox buffer[]
 
-class SubPointer // TODO
-	void *p
+class SampleRef // TODO
+	int dummy
 
 class Track
 	int type
@@ -98,13 +111,14 @@ class Track
 	int rep_delay
 	
 	AudioEffect fx[]
-	SubPointer sub[]
+	SampleRef *sample[]
 	
 	// time track
 	Bar bar[]
 	
 	// midi track
 	MidiData midi
+	Synthesizer *synth
 
 	// editing
 	rect area
@@ -142,6 +156,8 @@ class AudioFile
 	Range sel_raw
 	
 	string level_name[]
+	
+	Synthesizer *synth[]
 	
 	extern int GetNextBeat(int pos)
 

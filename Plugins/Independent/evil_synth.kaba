@@ -1,0 +1,16 @@
+use "../api.kaba"
+
+DummySynthesizer synth
+
+class MySynth : Synthesizer
+	virtual void AddClick(BufferBox buf, int pos, int pitch, float volume)
+		print "add click"
+		synth.AddClick(buf, pos, 150 - pitch, volume)
+	virtual void AddTone(BufferBox buf, Range r, int pitch, float volume)
+		print "add tone"
+		synth.AddTone(buf, r, 150 - pitch, volume)
+
+void main()
+	forall t in audio.track
+		t.synth = new MySynth
+	synth.sample_rate = audio.sample_rate

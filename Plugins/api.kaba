@@ -136,9 +136,6 @@ class Track
 class Tag
 	string key, value
 
-class TrackPointer // TODO
-	Track *p
-
 class AudioFile
 	bool used
 	string filename
@@ -148,7 +145,7 @@ class AudioFile
 	float volume
 	
 	AudioEffect fx[]
-	TrackPointer track[]
+	Track *track[]
 
 	rect area
 

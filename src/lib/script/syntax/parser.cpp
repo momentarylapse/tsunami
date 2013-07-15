@@ -1449,6 +1449,8 @@ int class_count_virtual_functions(SyntaxTree *ps)
 			break;
 		if ((l->indent == 1) && (l->exp[0].name == "virtual"))
 			count ++;
+		else if ((l->indent == 1) && (l->exp[0].name == "extern") && (l->exp[1].name == "virtual"))
+			count ++;
 		l ++;
 	}
 	return count;

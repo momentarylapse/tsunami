@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-178
+179
 // Data (ID,Text)
 about
 
@@ -265,6 +265,8 @@ repnum
 
 run_plugin
 
+sample_manager
+
 save
 Save
 save_as
@@ -360,11 +362,13 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-87
+89
 // Data (ID,Text)
                   Close dialog box to exit program.
 
- - viel Erfolg!
+        - nicht verbinden -
+
+  viel Erfolg!
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
 
@@ -382,6 +386,8 @@ zoom_out
 
 (stumm)
 (muted)
+* entweder eine Quelle wählen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen überlassen, eine Verbindung herzustellen
+
 - Standard -
 - Default -
 ...done
@@ -395,10 +401,6 @@ Amplitude zu groß, Signal übersteuert.
 Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
-
-Auf Audiopuffer
-
-Auf alles
 
 Beim Anwenden eines Effekts: 
 
@@ -420,15 +422,9 @@ Dauer\\\") + audio->get_time_str(samples));
 
 Dieser Effekt ist nicht konfigurierbar.
 
-Dynamik
-
-Echo
-
 Editor für Audio Dateien
 
 Effekt nicht ladbar: \"%s\"
-
-Eigenständig
 
 Ende\\\") + audio->get_time_str(audio->GetRange().end()));
 
@@ -450,19 +446,25 @@ Fehlerbericht
 
 Fehlerbericht an Michi senden
 
+Format
+
 Format\\16 bit stereo (nami)
 
 Frage
 
 Ist halt irgendwie passiert...
 
+Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
+
 Kanäle
 
-Keine Ebene ausgewählt
-No level selected
-Klang
+Kein Sample ausgewählt
 
 Konnte Aufnahmegerät nicht öffnen
+
+MIDI Quelle auswählen
+
+MIDI Quellen
 
 Meldungen
 
@@ -470,19 +472,23 @@ Nachrichten
 
 OK
 
+Offset
+
+Ok
+
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 
 Plugin-Script wählen
+
+Raw Daten
+
+Samplerate
 
 Samples\\\") + i2s(samples));
 
 Script (*.kaba)
 
 Spur %d
-
-Synthese
-
-Tonhöhe
 
 Unbenannt
 

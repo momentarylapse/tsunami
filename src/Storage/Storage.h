@@ -20,6 +20,7 @@ public:
 
 	bool Load(AudioFile *a, const string &filename);
 	bool LoadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
+	bool LoadBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
 	bool Save(AudioFile *a, const string &filename);
 	bool Export(AudioFile *a, const string &filename);
 

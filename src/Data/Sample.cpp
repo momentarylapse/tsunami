@@ -10,6 +10,8 @@
 
 Sample::Sample()
 {
+	owner = NULL;
+
 	volume = 1;
 	offset = 0;
 

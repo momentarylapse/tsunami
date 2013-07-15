@@ -12,6 +12,7 @@
 #include "../Action/AudioFile/Tag/ActionAudioAddTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioEditTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioDeleteTag.h"
+#include "../Action/AudioFile/Sample/ActionAudioAddSample.h"
 #include "../Action/Track/ActionTrackAdd.h"
 #include "../Action/Track/ActionTrackDelete.h"
 #include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
@@ -115,6 +116,8 @@ void AudioFile::NewWithOneTrack(int track_type, int _sample_rate)
 void AudioFile::Reset()
 {
 	msg_db_f("AudioFile.Reset",1);
+	action_manager->Reset();
+
 	used = false;
 	filename = "";
 	tag.clear();
@@ -124,7 +127,13 @@ void AudioFile::Reset()
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	fx.clear();
+	foreach(Track *t, track)
+		delete(t);
 	track.clear();
+
+	foreach(Sample *s, sample)
+		delete(s);
+	sample.clear();
 
 	level_name.clear();
 	level_name.add("level 1");
@@ -296,6 +305,16 @@ void AudioFile::AddLevel()
 void AudioFile::DeleteTrack(int index)
 {
 	Execute(new ActionTrackDelete(this, index));
+}
+
+Sample *AudioFile::AddSample(const string &name, BufferBox &buf)
+{
+	return (Sample*)Execute(new ActionAudioAddSample(name, buf));
+}
+
+void AudioFile::DeleteSample(int index)
+{
+	//Execute(new ActionAudioDeleteSample(this, index));
 }
 
 void AudioFile::DeleteSelection(int level_no, bool all_levels)

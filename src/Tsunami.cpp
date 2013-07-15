@@ -11,6 +11,7 @@
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
+#include "View/Dialog/SampleManager.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -71,6 +72,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &Tsunami::OnDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &Tsunami::OnCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &Tsunami::OnCurLevelDown);
+	HuiAddCommandM("sample_manager", "", -1, this, &Tsunami::OnSampleManager);
 	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, &Tsunami::OnRemoveAdded);
@@ -320,6 +322,12 @@ void Tsunami::OnDelete()
 {
 	if (audio->used)
 		audio->DeleteSelection(view->cur_level, false);
+}
+
+void Tsunami::OnSampleManager()
+{
+	SampleManager *sm = new SampleManager(audio, this, false);
+	sm->Run();
 }
 
 void Tsunami::OnSubImport()

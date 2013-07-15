@@ -926,7 +926,7 @@ menu
 0
 
 
-86
+87
 ItemPopup
 menu_file
 
@@ -1438,7 +1438,20 @@ ItemPopup
 menu_sub
 
 1
-6
+7
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+sample_manager
+hui:properties
+1
+0
 0
 0
 0
@@ -3979,7 +3992,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-222
+223
 // Text
 about
 Info
@@ -4313,6 +4326,8 @@ repnum
 1\\1
 run_plugin
 Script ausführen...
+sample_manager
+Verwalten...
 sample_rate
 
 samples
@@ -4431,7 +4446,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-222
+223
 // Text
 about
 
@@ -4765,6 +4780,8 @@ repnum
 
 run_plugin
 
+sample_manager
+
 sample_rate
 
 samples
@@ -4878,7 +4895,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-6
+5
 // Text
 (stumm)
 (muted)
@@ -4888,8 +4905,6 @@ Das neue Gerät wird erst beim nächsten Start verwendet!
 The new device will only be used after the next program start.
 Fehler
 Error
-Keine Ebene ausgewählt
-No level selected
 keine Datei
 no file
 #

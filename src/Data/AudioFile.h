@@ -64,6 +64,8 @@ public:
 	void DeleteTag(int index);
 	Track *AddTrack(int type, int index = -1);
 	void DeleteTrack(int index);
+	Sample *AddSample(const string &name, BufferBox &buf);
+	void DeleteSample(int index);
 	void AddLevel();
 	void InsertSelectedSubs(int level_no);
 	void DeleteSelection(int level_no, bool all_levels);

@@ -19,6 +19,7 @@
 #include "../Stuff/Log.h"
 #include "../Audio/AudioRenderer.h"
 #include "../View/AudioView.h"
+#include "../Data/AudioFile.h"
 
 Storage::Storage()
 {
@@ -115,6 +116,19 @@ bool Storage::LoadTrack(Track *t, const string &filename, int offset, int level)
 	if (!found)
 		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
 
+	return ok;
+}
+
+bool Storage::LoadBufferBox(AudioFile *a, BufferBox *buf, const string &filename)
+{
+	msg_db_f("Storage.LoadBufferBox", 1);
+	AudioFile *aa = new AudioFile;
+	aa->NewWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
+	Track *t = aa->track[0];
+	bool ok = LoadTrack(t, filename, 0, 0);
+	buf->resize(t->level[0].buffer[0].num);
+	buf->set(t->level[0].buffer[0], 0, 1);
+	delete(aa);
 	return ok;
 }
 

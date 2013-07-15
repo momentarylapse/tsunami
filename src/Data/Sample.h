@@ -20,6 +20,8 @@ public:
 	Sample();
 	~Sample();
 
+	AudioFile *owner;
+
 	string name;
 	BufferBox buf;
 	float volume;

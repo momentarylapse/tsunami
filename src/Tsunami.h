@@ -66,6 +66,7 @@ public:
 	void OnTrackImport();
 	void OnAddLevel();
 	void OnDeleteLevel();
+	void OnSampleManager();
 	void OnSubImport();
 	void OnAudioProperties();
 	void OnTrackProperties();

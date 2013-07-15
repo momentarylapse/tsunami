@@ -22,7 +22,9 @@ public:
 	void FillList();
 
 	void OnListSelect();
-	void OnAdd();
+	void OnImportFromFile();
+	void OnInsert();
+	void OnCreateFromSelection();
 	void OnDelete();
 	void OnClose();
 

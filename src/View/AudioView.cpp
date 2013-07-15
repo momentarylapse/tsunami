@@ -1179,7 +1179,7 @@ void AudioView::SelectSample(SampleRef *s, bool diff)
 		s->is_selected = !s->is_selected;
 	}else{
 		if (!s->is_selected)
-			s->root->UnselectAllSubs();
+			s->owner->UnselectAllSubs();
 
 		// select this sub
 		s->is_selected = true;

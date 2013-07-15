@@ -35,8 +35,8 @@ void *ActionTrackAddSample::execute(Data *d)
 	Track *t = a->track[track_no];
 	SampleRef *s = new SampleRef(a->sample[index]);
 	s->pos = pos;
-	s->parent = track_no;
-	s->root = a;
+	s->track_no = track_no;
+	s->owner = a;
 	t->sample.add(s);
 	return s;
 }

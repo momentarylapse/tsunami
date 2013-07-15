@@ -40,12 +40,14 @@ SampleRef::SampleRef(Sample *sample) :
 {
 	origin = sample;
 	origin->ref();
-	parent = -1;
+	track_no = -1;
+	owner = NULL;
 	pos = 0;
 	volume = 1;
 	muted = false;
 	rep_num = 0;
 	rep_delay = 10000;
+	is_selected = false;
 }
 
 SampleRef::~SampleRef()
@@ -55,7 +57,7 @@ SampleRef::~SampleRef()
 
 Track *SampleRef::GetParent()
 {
-	return root->track[parent];
+	return owner->track[track_no];
 }
 
 Range SampleRef::GetRange()

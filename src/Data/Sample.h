@@ -46,7 +46,6 @@ public:
 	Range GetRange();
 
 	int pos;
-	int sample_index;
 	Sample *origin;
 	BufferBox &buf;
 	bool muted;
@@ -58,8 +57,8 @@ public:
 
 	// editing
 	rect area;
-	int parent;
-	AudioFile *root;
+	int track_no;
+	AudioFile *owner;
 
 	bool is_selected;
 };

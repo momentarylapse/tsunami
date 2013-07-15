@@ -20,12 +20,12 @@ SubDialog::SubDialog(HuiWindow *_parent, bool _allow_parent, SampleRef *s):
 	Check("mute", s->muted);
 	Enable("volume", !s->muted);
 	Enable("volume_slider", !s->muted);
-	foreach(Track *t, s->root->track)
+	foreach(Track *t, s->owner->track)
 		AddString("level_track", t->GetNiceName());
-	SetInt("level_track", s->parent);
+	SetInt("level_track", s->track_no);
 //	AddEffectList(LevelDialog, "fx_list", s->fx);
 	SetInt("repnum", s->rep_num + 1);
-	SetFloat("repdelay", (float)s->rep_delay / (float)s->root->sample_rate * 1000.0f);
+	SetFloat("repdelay", (float)s->rep_delay / (float)s->owner->sample_rate * 1000.0f);
 	Enable("repdelay", s->rep_num > 0);
 
 	EventM("mute", this, &SubDialog::OnMute);
@@ -71,7 +71,7 @@ void SubDialog::OnRepNum()
 
 void SubDialog::OnRepDelay()
 {
-	sample->rep_delay = (int)(GetFloat("repdelay") * (float)sample->root->sample_rate / 1000.0f);
+	sample->rep_delay = (int)(GetFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f);
 }
 
 void SubDialog::OnClose()

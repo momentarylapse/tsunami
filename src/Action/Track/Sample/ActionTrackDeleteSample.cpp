@@ -12,10 +12,14 @@ ActionTrackDeleteSample::ActionTrackDeleteSample(int _track_no, int _index)
 {
 	track_no = _track_no;
 	index = _index;
+	ref = NULL;
 }
 
 ActionTrackDeleteSample::~ActionTrackDeleteSample()
 {
+	if (ref)
+		if (!ref->owner)
+			delete(ref);
 }
 
 void* ActionTrackDeleteSample::execute(Data* d)
@@ -23,6 +27,8 @@ void* ActionTrackDeleteSample::execute(Data* d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
 	ref = a->track[track_no]->sample[index];
+	ref->origin->unref();
+	ref->owner = NULL;
 
 	a->track[track_no]->sample.erase(index);
 
@@ -34,6 +40,8 @@ void ActionTrackDeleteSample::undo(Data* d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
 	a->track[track_no]->sample.insert(ref, index);
+	ref->origin->ref();
+	ref->owner = a;
 }
 
 

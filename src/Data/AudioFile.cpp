@@ -13,6 +13,7 @@
 #include "../Action/AudioFile/Tag/ActionAudioEditTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioDeleteTag.h"
 #include "../Action/AudioFile/Sample/ActionAudioAddSample.h"
+#include "../Action/AudioFile/Sample/ActionAudioDeleteSample.h"
 #include "../Action/Track/ActionTrackAdd.h"
 #include "../Action/Track/ActionTrackDelete.h"
 #include "../Action/SubTrack/ActionSubTrackInsertSelected.h"
@@ -314,7 +315,10 @@ Sample *AudioFile::AddSample(const string &name, BufferBox &buf)
 
 void AudioFile::DeleteSample(int index)
 {
-	//Execute(new ActionAudioDeleteSample(this, index));
+	if (sample[index]->ref_count == 0)
+		Execute(new ActionAudioDeleteSample(index));
+	else
+		tsunami->log->Error(_("Kann nur Samples l&oschen, die nicht benutzt werden!"));
 }
 
 void AudioFile::DeleteSelection(int level_no, bool all_levels)

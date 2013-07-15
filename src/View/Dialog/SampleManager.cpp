@@ -46,6 +46,8 @@ void SampleManager::FillList()
 
 void SampleManager::OnListSelect()
 {
+	int n = GetInt("");
+	Enable("delete_sample", n >= 0);
 }
 
 void SampleManager::OnAdd()
@@ -59,6 +61,9 @@ void SampleManager::OnAdd()
 
 void SampleManager::OnDelete()
 {
+	int n = GetInt("sample_list");
+	if (n >= 0)
+		audio->DeleteSample(n);
 }
 
 void SampleManager::OnClose()

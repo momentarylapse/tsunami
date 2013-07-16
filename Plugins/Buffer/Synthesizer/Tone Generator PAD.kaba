@@ -1,0 +1,145 @@
+// Image = hui:add
+// Title[Deutsch] = Sinus Generator
+
+use "../../api.kaba"
+use "../../tone.kaba"
+
+
+class PluginData
+	int Pitch
+	float Frequency
+	float Volume
+
+PluginData data
+
+DummySynthesizer synth
+
+window dlg
+
+float gauss(float x)
+	return exp(- x*x)
+
+void ProcessTrack(BufferBox buf)
+	AudioFile *a = audio
+	
+	complex c[]
+	float amp[]
+	c.resize(buf.num / 2 - 1)
+	amp.resize(buf.num / 2 - 1)
+	
+	float w = i2f(buf.num) / a.sample_rate
+	for int i, 0, amp.num
+		float freq = i2f(i) / w
+		amp[i] = gauss((freq - data.Frequency) * 0.1)
+	for int i, 0, amp.num
+		freq = i2f(i) / w
+		amp[i] += gauss((freq - data.Frequency * 2) * 0.04) * 0.03
+	for int i, 0, amp.num
+		freq = i2f(i) / w
+		amp[i] += gauss((freq - data.Frequency * 3) * 0.02) * 0.01
+	for int i, 0, amp.num
+		freq = i2f(i) / w
+		amp[i] += gauss((freq - data.Frequency * 4) * 0.01) * 0.002
+		
+	for int i, 0, c.num
+		float phi = rand(2 * pi)
+		c[i] = complex(cos(phi), sin(phi)) * amp[i]
+	fft_c2r_inv(c, buf.r)
+	for int i, 0, c.num
+		float phi = rand(2 * pi)
+		c[i] = complex(cos(phi), sin(phi)) * amp[i]
+	fft_c2r_inv(c, buf.l)
+	
+	float m = 0
+	for int i, 0, buf.num
+		m = max(buf.r[i], m)
+	print m
+	buf.r /= (m * 1.2)
+	buf.l /= (m * 1.2)
+
+	/*float f = data.Frequency
+
+	float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
+
+	for int i, 0, buf.num
+		float tt = i * w_f
+		float d = sin(tt) * data.Volume
+		buf.r[i] = clamp(buf.r[i] + d, -1, 1)
+		buf.l[i] = clamp(buf.l[i] + d, -1, 1)*/
+
+void OnFrequency()
+	data.Pitch = -1
+	data.Frequency = dlg.GetFloat("")
+
+void ReadPitchFromDialog()
+	data.Pitch = pitch_from_octave_and_rel(dlg.GetInt("pitch_rel"),
+	                                       dlg.GetInt("octave"))
+
+void OnPitch()
+	ReadPitchFromDialog()
+	data.Frequency = pitch_to_freq(data.Pitch)
+	dlg.SetFloat("frequency", data.Frequency)
+
+void OnVolume()
+	data.Volume = SliderGet(dlg, "volume")
+
+void DataToDialog()
+	bool by_pitch = data.Pitch >= 0
+	if by_pitch
+		dlg.SetInt("pitch_rel", data.Pitch % 12)
+		dlg.SetInt("octave", pitch_get_octave(data.Pitch))
+		dlg.Check("type:pitch", true)
+	else
+		dlg.Check("type:freq", true)
+	dlg.SetFloat("frequency", data.Frequency)
+	SliderSet(dlg, "volume", data.Volume)
+	
+	dlg.Enable("frequency", !by_pitch)
+	dlg.Enable("octave", by_pitch)
+	dlg.Enable("pitch_rel", by_pitch)
+
+void OnTypeFreq()
+	data.Pitch = -1
+	DataToDialog()
+
+void OnTypePitch()
+	ReadPitchFromDialog()
+	data.Frequency = pitch_to_freq(data.Pitch)
+	DataToDialog()
+
+void ResetData()
+	data.Pitch = 81
+	data.Volume = 0.3
+	data.Frequency = pitch_to_freq(data.Pitch)
+
+void Configure()
+	// dialog
+	dlg = new FixedDialog("Ton Generator",420,135,MainWin,false)
+	dlg.AddRadioButton("Ton",5,5,100,25,"type:pitch")
+	dlg.AddComboBox("", 110, 5, 120, 25, "pitch_rel")
+	dlg.AddSpinButton("\\0\\8",235,5,150,25,"octave")
+	dlg.AddRadioButton("Frequenz",5,35,100,25,"type:freq")
+	dlg.AddSpinButton("\\0\\100000\\0.1",110,35,275,25,"frequency")
+	dlg.AddText("Hz",390,35,20,25,"")
+	dlg.AddText("Lautstärke:",5,65,100,25,"")
+	dlg.AddSlider("",110,65,150,25,"volume_slider")
+	dlg.AddSpinButton("\\0\\100\\0.1",265,65,120,25,"volume")
+	dlg.AddText("%",390,65,20,25,"")
+	PutCommandBarFixed(dlg, 5, 100, 420)
+	
+	dlg.Reset("pitch_rel")
+	for int i, 0, 12
+		dlg.SetString("pitch_rel", rel_pitch_name(i))
+	
+	AddSlider(dlg, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
+	dlg.Event("pitch_rel", &OnPitch)
+	dlg.Event("octave", &OnPitch)
+	dlg.Event("frequency", &OnFrequency)
+	dlg.Event("type:freq", &OnTypeFreq)
+	dlg.Event("type:pitch", &OnTypePitch)
+
+	dlg.SetDecimals(1)
+	DataToDialog()
+	
+	dlg.Run()
+

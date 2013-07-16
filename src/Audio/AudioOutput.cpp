@@ -27,9 +27,9 @@
 	#include <AL/alc.h>
 #endif
 
-//#define AL_BUFFER_SIZE		131072
-#define AL_BUFFER_SIZE		32768
-//#define AL_BUFFER_SIZE		16384
+//#define DEFAULT_BUFFER_SIZE		131072
+#define DEFAULT_BUFFER_SIZE		32768
+//#define DEFAULT_BUFFER_SIZE		16384
 
 #define UPDATE_TIME		0.050f
 
@@ -249,11 +249,11 @@ bool AudioOutput::stream(int buf)
 	BufferBox *b = (buf == buffer[0]) ? &box[0] : &box[1];
 	int size = 0;
 	if (audio){
-		size = min(AL_BUFFER_SIZE, range.end() - stream_offset_next);
+		size = min(buffer_size, range.end() - stream_offset_next);
 		*b = tsunami->renderer->RenderAudioFilePart(audio, Range(stream_offset_next, size));
 		//msg_write(size);
 	}else if (generate_func){
-		b->resize(AL_BUFFER_SIZE);
+		b->resize(buffer_size);
 		b->offset = stream_offset_next;
 		(*generate_func)(*b);
 		size = b->num;
@@ -283,6 +283,7 @@ void AudioOutput::start_play(int pos)
 		tsunami->renderer->Prepare(audio);
 
 	stream_offset_next = pos;
+	buffer_size = DEFAULT_BUFFER_SIZE;
 
 	int num_buffers = 0;
 	if (stream(buffer[0]))
@@ -494,7 +495,10 @@ void AudioOutput::Update()
 		}else{
 		}
 
-		HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
+		if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
+			HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
+		else
+			HuiRunLaterM(0, this, &AudioOutput::Update);
 	}
 }
 

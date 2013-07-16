@@ -53,6 +53,8 @@ public:
 	bool GetLoop(){	return loop;	}
 	void SetLoop(bool _loop){	loop = _loop;	}
 
+	void SetBufferSize(int _size){	buffer_size = _size;	}
+
 private:
 	bool TestError(const string &msg);
 	bool stream(int buf);
@@ -66,6 +68,7 @@ private:
 	bool allow_loop;
 	bool loop;
 	int sample_rate;
+	int buffer_size;
 
 	AudioFile *audio;
 	Range range;

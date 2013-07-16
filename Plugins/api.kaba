@@ -169,6 +169,7 @@ class AudioOutput
 	extern float GetSampleRate()
 	extern float GetVolume()
 	extern void SetVolume(float volume)
+	extern void SetBufferSize(int size)
 
 class AudioInput //: Observable
 	BufferBox cur_buf, buf

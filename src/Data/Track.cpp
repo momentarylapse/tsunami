@@ -7,6 +7,7 @@
 
 #include "Track.h"
 #include "../Plugins/Effect.h"
+#include "../Audio/Synth/Synthesizer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
 #include "../lib/hui/hui.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
@@ -50,30 +51,19 @@ void Track::Reset()
 	bar.clear();
 	fx.clear();
 	sample.clear();
-	synth = NULL;
+	if (synth)
+		delete(synth);
+	synth = CreateSynthesizer("Dummy");
 	msg_db_l(1);
 }
 
 Track::~Track()
 {
 	Reset();
+	if (synth)
+		delete(synth);
 }
 
-
-void SelectSub(Track *s, bool diff)
-{
-	if (!s)
-		return;
-	if (diff){
-		s->is_selected = !s->is_selected;
-	}else{
-		if (!s->is_selected)
-			s->root->UnselectAllSubs();
-
-		// select this sub
-		s->is_selected = true;
-	}
-}
 
 void SelectTrack(Track *t, bool diff)
 {

@@ -90,26 +90,27 @@ void PluginManager::LinkAppScriptData()
 
 	// api definition
 	GlobalMainWin = dynamic_cast<HuiWindow*>(tsunami);
-	Script::LinkExternal("MainWin",		&GlobalMainWin);
-	Script::LinkExternal("audio",			&tsunami->audio);
-	Script::LinkExternal("input",			&tsunami->input);
-	Script::LinkExternal("output",			&tsunami->output);
-	Script::LinkExternal("logging",			&tsunami->log);
-	Script::LinkExternal("fft_c2c",		(void*)&FastFourierTransform::fft_c2c);
-	Script::LinkExternal("fft_r2c",		(void*)&FastFourierTransform::fft_r2c);
-	Script::LinkExternal("fft_c2r_inv",	(void*)&FastFourierTransform::fft_c2r_inv);
-	/*Script::LinkExternal("ProgressStart",	(void*)&ProgressStart);
-	Script::LinkExternal("ProgressEnd",	(void*)&ProgressEnd);
-	Script::LinkExternal("Progress",		(void*)&ProgressStatus);*/
-	Script::LinkExternal("PutFavoriteBarFixed",	(void*)&GlobalPutFavoriteBarFixed);
-	Script::LinkExternal("PutFavoriteBarSizable",	(void*)&GlobalPutFavoriteBarSizable);
-	Script::LinkExternal("PutCommandBarFixed",	(void*)&GlobalPutCommandBarFixed);
-	Script::LinkExternal("PutCommandBarSizable",	(void*)&GlobalPutCommandBarSizable);
-	Script::LinkExternal("AddSlider",		(void*)&GlobalAddSlider);
-	Script::LinkExternal("SliderSet",		(void*)&GlobalSliderSet);
-	Script::LinkExternal("SliderGet",		(void*)&GlobalSliderGet);
-	Script::LinkExternal("RemoveSliders",	(void*)&GlobalRemoveSliders);
-	Script::LinkExternal("AudioFileRender",		(void*)&AudioFileRender);
+	Script::LinkExternal("MainWin", &GlobalMainWin);
+	Script::LinkExternal("audio", &tsunami->audio);
+	Script::LinkExternal("input", &tsunami->input);
+	Script::LinkExternal("output", &tsunami->output);
+	Script::LinkExternal("logging", &tsunami->log);
+	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
+	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
+	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
+	/*Script::LinkExternal("ProgressStart", (void*)&ProgressStart);
+	Script::LinkExternal("ProgressEnd", (void*)&ProgressEnd);
+	Script::LinkExternal("Progress", (void*)&ProgressStatus);*/
+	Script::LinkExternal("PutFavoriteBarFixed", (void*)&GlobalPutFavoriteBarFixed);
+	Script::LinkExternal("PutFavoriteBarSizable", (void*)&GlobalPutFavoriteBarSizable);
+	Script::LinkExternal("PutCommandBarFixed", (void*)&GlobalPutCommandBarFixed);
+	Script::LinkExternal("PutCommandBarSizable", (void*)&GlobalPutCommandBarSizable);
+	Script::LinkExternal("AddSlider", (void*)&GlobalAddSlider);
+	Script::LinkExternal("SliderSet", (void*)&GlobalSliderSet);
+	Script::LinkExternal("SliderGet", (void*)&GlobalSliderGet);
+	Script::LinkExternal("RemoveSliders", (void*)&GlobalRemoveSliders);
+	Script::LinkExternal("AudioFileRender",	 (void*)&AudioFileRender);
+	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 
 	Script::DeclareClassSize("Range", sizeof(Range));
 	Script::DeclareClassOffset("Range", "offset", offsetof(Range, offset));
@@ -211,7 +212,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "volume", offsetof(AudioFile, volume));
 	Script::DeclareClassOffset("AudioFile", "fx", offsetof(AudioFile, fx));
 	Script::DeclareClassOffset("AudioFile", "track", offsetof(AudioFile, track));
-	Script::DeclareClassOffset("AudioFile", "synth", offsetof(AudioFile, synth));
 	Script::DeclareClassOffset("AudioFile", "area", offsetof(AudioFile, area));
 	Script::DeclareClassOffset("AudioFile", "selection", offsetof(AudioFile, selection));
 	Script::DeclareClassOffset("AudioFile", "sel_raw", offsetof(AudioFile, sel_raw));

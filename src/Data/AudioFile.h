@@ -86,7 +86,6 @@ public:
 	Array<Effect> fx;
 	Array<Track*> track;
 	Array<Sample*> sample;
-	Array<Synthesizer*> synth;
 
 // editing
 	// needed for rendering

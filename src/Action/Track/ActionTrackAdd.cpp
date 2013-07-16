@@ -24,7 +24,6 @@ ActionTrackAdd::~ActionTrackAdd()
 void ActionTrackAdd::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	a->track[index]->synth->unref();
 	delete(a->track[index]);
 	a->track.erase(index);
 }
@@ -41,8 +40,6 @@ void *ActionTrackAdd::execute(Data *d)
 
 	t->name = format(_("Spur %d"), a->track.num + 1);
 	t->root = a;
-	t->synth = a->synth[0];
-	t->synth->ref();
 	t->is_selected = true;
 	t->type = type;
 	t->level.resize(a->level_name.num);

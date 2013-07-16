@@ -6,7 +6,11 @@
  */
 
 #include "Synthesizer.h"
+#include "DummySynthesizer.h"
+#include "SampleSynthesizer.h"
 #include "../../Data/AudioFile.h"
+#include "../../Tsunami.h"
+#include "../../Stuff/Log.h"
 #include <math.h>
 
 float pitch_to_freq(int pitch)
@@ -17,7 +21,6 @@ float pitch_to_freq(int pitch)
 Synthesizer::Synthesizer()
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
-	ref_count = 0;
 }
 
 Synthesizer::~Synthesizer()
@@ -31,16 +34,6 @@ void Synthesizer::__init__()
 
 void Synthesizer::__delete__()
 {
-}
-
-void Synthesizer::ref()
-{
-	ref_count ++;
-}
-
-void Synthesizer::unref()
-{
-	ref_count --;
 }
 
 void Synthesizer::AddTone(BufferBox& buf, const Range& range, int pitch, float volume)
@@ -64,4 +57,16 @@ void Synthesizer::AddMetronomeClick(BufferBox &buf, int pos, int level, float vo
 		AddClick(buf, pos, 81, volume);
 	else
 		AddClick(buf, pos, 74, volume * 0.5f);
+}
+
+
+// factory
+Synthesizer *CreateSynthesizer(const string &name)
+{
+	if ((name == "Dummy") || (name == ""))
+		return new DummySynthesizer;
+	if (name == "Symple")
+		return new SampleSynthesizer;
+	tsunami->log->Error(_("unbekannter Synthesizer: ") + name);
+	return new DummySynthesizer;
 }

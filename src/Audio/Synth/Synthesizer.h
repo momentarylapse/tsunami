@@ -30,11 +30,10 @@ public:
 
 	string name;
 	int sample_rate;
-	int ref_count;
-	void ref();
-	void unref();
 };
 
 float pitch_to_freq(int pitch);
+
+Synthesizer *CreateSynthesizer(const string &name);
 
 #endif /* SYNTHESIZER_H_ */

@@ -142,11 +142,6 @@ void AudioFile::Reset()
 	level_name.clear();
 	level_name.add("level 1");
 
-	foreach(Synthesizer *s, synth)
-		delete(s);
-	synth.clear();
-	synth.add(new DummySynthesizer);
-
 	action_manager->Reset();
 
 	Notify("Change");

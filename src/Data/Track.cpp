@@ -64,30 +64,6 @@ Track::~Track()
 		delete(synth);
 }
 
-
-void SelectTrack(Track *t, bool diff)
-{
-	if (!t)
-		return;
-	if (diff){
-		bool is_only_selected = true;
-		foreach(Track *tt, t->root->track)
-			if ((tt->is_selected) && (tt != t))
-				is_only_selected = false;
-		t->is_selected = !t->is_selected || is_only_selected;
-	}else{
-		if (!t->is_selected){
-			// unselect all tracks
-			foreach(Track *tt, t->root->track)
-				tt->is_selected = false;
-		}
-
-		// select this track
-		t->is_selected = true;
-	}
-	t->root->UpdateSelection();
-}
-
 Range Track::GetRangeUnsafe()
 {
 	int min =  1073741824;

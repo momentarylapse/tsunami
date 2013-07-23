@@ -179,7 +179,7 @@ void HuiErrorBox(HuiWindow *win,const string &title,const string &text)
 void HuiAboutBox(HuiWindow *win)
 {
 	msg_todo("HuiAboutBox (Win)");
-	HuiInfoBox(win,_("Beschreibung"), HuiPropName + " " + HuiPropVersion + " " + HuiPropCopyright);
+	HuiInfoBox(win,_("Beschreibung"), HuiGetProperty("name") + " " + HuiGetProperty("version") + " " + HuiGetProperty("copyright"));
 }
 
 #endif

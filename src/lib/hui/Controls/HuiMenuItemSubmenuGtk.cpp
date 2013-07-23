@@ -1,5 +1,5 @@
 /*
- * HuiMenuItemSubmenu.cpp
+ * HuiMenuItemSubmenuGtk.cpp
  *
  *  Created on: 26.06.2013
  *      Author: michi
@@ -7,6 +7,8 @@
 
 #include "HuiMenuItemSubmenu.h"
 #include "../HuiMenu.h"
+
+#ifdef HUI_API_GTK
 
 HuiMenuItemSubmenu::HuiMenuItemSubmenu(const string &title, HuiMenu *menu, const string &id) :
 	HuiControl(HuiKindMenuItemSubmenu, id)
@@ -21,4 +23,6 @@ HuiMenuItemSubmenu::~HuiMenuItemSubmenu()
 {
 	delete(sub_menu);
 }
+
+#endif
 

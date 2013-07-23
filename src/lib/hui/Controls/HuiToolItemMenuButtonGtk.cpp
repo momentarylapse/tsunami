@@ -1,5 +1,5 @@
 /*
- * HuiToolItemMenuButton.cpp
+ * HuiToolItemMenuButtonGtk.cpp
  *
  *  Created on: 26.06.2013
  *      Author: michi
@@ -7,6 +7,8 @@
 
 #include "HuiToolItemMenuButton.h"
 #include "../HuiMenu.h"
+
+#ifdef HUI_API_GTK
 
 void *get_gtk_image(const string &image, bool large);
 
@@ -26,4 +28,6 @@ HuiToolItemMenuButton::HuiToolItemMenuButton(const string &title, HuiMenu *menu,
 HuiToolItemMenuButton::~HuiToolItemMenuButton()
 {
 }
+
+#endif
 

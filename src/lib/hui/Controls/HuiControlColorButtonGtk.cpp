@@ -7,6 +7,8 @@
 
 #include "HuiControlColorButton.h"
 
+#ifdef HUI_API_GTK
+
 void OnGtkButtonPress(GtkWidget *widget, gpointer data);
 
 HuiControlColorButton::HuiControlColorButton(const string &title, const string &id) :
@@ -52,3 +54,5 @@ color HuiControlColorButton::GetColor()
 		col.a = col_i16_to_f(gtk_color_button_get_alpha(GTK_COLOR_BUTTON(widget)));
 	return col;
 }
+
+#endif

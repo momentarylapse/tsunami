@@ -9,7 +9,7 @@
 #ifndef _HUI_WINDOW_EXISTS_
 #define _HUI_WINDOW_EXISTS_
 
-//#include "hui_common.h"
+#include "hui_input.h"
 
 class HuiMenu;
 class HuiEvent;
@@ -55,19 +55,6 @@ public:
 	{	this->x1=x1;	this->x2=x2;	this->y1=y1;	this->y2=y2;	}
 };
 
-class HuiEventHandler
-{
-public:
-};
-
-struct HuiWinEvent
-{
-	string id, message;
-	hui_callback *function;
-	void (HuiEventHandler::*member_function)();
-	HuiEventHandler *object;
-};
-
 class HuiToolbar;
 class HuiControl;
 class HuiControlTabControl;
@@ -91,9 +78,9 @@ public:
 	HuiWindow(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
 	HuiWindow(const string &title, int x, int y, int width, int height);
 	HuiWindow(const string &id, HuiWindow *parent, bool allow_parent);
+	void _cdecl __init_ext__(const string &title, int x, int y, int width, int height);
 	virtual ~HuiWindow();
-	void __init_ext__(const string &title, int x, int y, int width, int height);
-	virtual void __delete__();
+	virtual void _cdecl __delete__();
 
 	void _Init_(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
 	void _InitGeneric_(HuiWindow *parent, bool allow_parent, int mode);
@@ -116,14 +103,14 @@ public:
 	irect _cdecl GetOuterior();
 	void _cdecl SetOuteriorDesired(irect rect);
 	irect _cdecl GetOuteriorDesired();
-	irect GetInterior();
+	irect _cdecl GetInterior();
 	void _cdecl Activate(const string &control_id = "");
 	bool _cdecl IsActive(bool include_sub_windows=false);
 	void _cdecl SetMenu(HuiMenu *menu);
-	HuiMenu *GetMenu();
+	HuiMenu* _cdecl GetMenu();
 	void _cdecl SetBorderWidth(int width);
-	HuiWindow *GetParent();
-	void FromResource(const string &id);
+	HuiWindow* _cdecl GetParent();
+	void _cdecl FromResource(const string &id);
 
 
 	void _cdecl SetCursorPos(int x,int y);
@@ -138,32 +125,32 @@ public:
 	void _cdecl AllowEvents(const string &msg);
 	void _cdecl Event(const string &id, hui_callback *function);
 	void _cdecl EventX(const string &id, const string &msg, hui_callback *function);
-	void _EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)());
-	void _EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)());
+	void _cdecl _EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)());
+	void _cdecl _EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)());
 	template<typename T>
-	void EventM(const string &id, HuiEventHandler* handler, T fun)
+	void _cdecl EventM(const string &id, HuiEventHandler* handler, T fun)
 	{	_EventM(id, handler, (void(HuiEventHandler::*)())fun);	}
 	template<typename T>
-	void EventMX(const string &id, const string &msg, HuiEventHandler* handler, T fun)
+	void _cdecl EventMX(const string &id, const string &msg, HuiEventHandler* handler, T fun)
 	{	_EventMX(id, msg, handler, (void(HuiEventHandler::*)())fun);	}
 	bool _SendEvent_(HuiEvent *e);
 
 	// events by overwriting
-	virtual void OnMouseMove(){}
-	virtual void OnLeftButtonDown(){}
-	virtual void OnMiddleButtonDown(){}
-	virtual void OnRightButtonDown(){}
-	virtual void OnLeftButtonUp(){}
-	virtual void OnMiddleButtonUp(){}
-	virtual void OnRightButtonUp(){}
-	virtual void OnDoubleClick(){}
-	virtual void OnMouseWheel(){}
-	virtual bool CanClose(){ return true; }
-	virtual void OnKeyDown(){}
-	virtual void OnKeyUp(){}
-	virtual void OnResize(){}
-	virtual void OnMove(){}
-	virtual void OnRedraw(){}
+	virtual void _cdecl OnMouseMove(){}
+	virtual void _cdecl OnLeftButtonDown(){}
+	virtual void _cdecl OnMiddleButtonDown(){}
+	virtual void _cdecl OnRightButtonDown(){}
+	virtual void _cdecl OnLeftButtonUp(){}
+	virtual void _cdecl OnMiddleButtonUp(){}
+	virtual void _cdecl OnRightButtonUp(){}
+	virtual void _cdecl OnDoubleClick(){}
+	virtual void _cdecl OnMouseWheel(){}
+	virtual void _cdecl OnCloseRequest();
+	virtual void _cdecl OnKeyDown(){}
+	virtual void _cdecl OnKeyUp(){}
+	virtual void _cdecl OnResize(){}
+	virtual void _cdecl OnMove(){}
+	virtual void _cdecl OnRedraw(){}
 
 	// creating controls
 	void _cdecl AddButton(const string &title,int x,int y,int width,int height,const string &id);
@@ -229,8 +216,8 @@ public:
 	void _cdecl RemoveControl(const string &id);
 
 	// edit completion
-	void CompletionAdd(const string &id, const string &text);
-	void CompletionClear(const string &id);
+	void _cdecl CompletionAdd(const string &id, const string &text);
+	void _cdecl CompletionClear(const string &id);
 
 	// drawing
 	void _cdecl Redraw(const string &id);
@@ -238,8 +225,8 @@ public:
 	HuiPainter* _cdecl BeginDraw(const string &id);
 
 	// input
-	bool GetKey(int key);
-	bool GetMouse(int &x, int &y, int button);
+	bool _cdecl GetKey(int key);
+	bool _cdecl GetMouse(int &x, int &y, int button);
 
 
 	// hui internal
@@ -293,7 +280,7 @@ private:
 	int border_width;
 	Array<HuiControl*> control;
 	HuiControl *cur_control;
-	Array<HuiWinEvent> event;
+	Array<HuiEventListener> event;
 	HuiMenu *menu, *popup;
 	bool statusbar_enabled;
 	bool allowed, allow_keys;
@@ -313,21 +300,21 @@ class HuiNixWindow : public HuiWindow
 {
 public:
 	HuiNixWindow(const string &title, int x, int y, int width, int height);
-	void __init_ext__(const string &title, int x, int y, int width, int height);
+	void _cdecl __init_ext__(const string &title, int x, int y, int width, int height);
 };
 
 class HuiDialog : public HuiWindow
 {
 public:
 	HuiDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
-	void __init_ext__(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+	void _cdecl __init_ext__(const string &title, int width, int height, HuiWindow *root, bool allow_root);
 };
 
 class HuiFixedDialog : public HuiWindow
 {
 public:
 	HuiFixedDialog(const string &title, int width, int height, HuiWindow *root, bool allow_root);
-	void __init_ext__(const string &title, int width, int height, HuiWindow *root, bool allow_root);
+	void _cdecl __init_ext__(const string &title, int width, int height, HuiWindow *root, bool allow_root);
 };
 
 extern HuiWindow *HuiCurWindow;

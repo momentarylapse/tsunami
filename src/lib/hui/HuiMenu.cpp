@@ -84,7 +84,7 @@ HuiMenu *HuiMenu::GetSubMenuByID(const string &id)
 
 void HuiMenu::UpdateLanguage()
 {
-	msg_db_r("UpdateMenuLanguage", 1);
+	msg_db_f("UpdateMenuLanguage", 1);
 #if 0
 	foreach(HuiMenuItem &it, item){
 		if (it.sub_menu)
@@ -108,7 +108,6 @@ void HuiMenu::UpdateLanguage()
 		EnableItem(it.id, enabled);
 	}
 #endif
-	msg_db_l(1);
 }
 
 Array<HuiControl*> HuiMenu::get_all_controls()

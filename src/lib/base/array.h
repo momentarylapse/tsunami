@@ -12,33 +12,33 @@
 class DynamicArray
 {
 	public:
-	void init(int _element_size_);
-	void reserve(int size);
-	void resize(int size);
-	void ensure_size(int size);
-	void insert_blank(int pos);
-	void append(const DynamicArray *a);
-	void assign(const DynamicArray *a);
-	void exchange(DynamicArray &a);
-	void append_p_single(void *p);
-	void append_4_single(int x);
-	void append_f_single(float x);
-	void append_1_single(char x);
-	void append_single(const void *d);
-	void insert_p_single(void *p, int index);
-	void insert_4_single(int x, int index);
-	void insert_f_single(float x, int index);
-	void insert_1_single(char x, int index);
-	void insert_single(const void *d, int index);
-	void delete_single(int index);
-	void delete_single_by_pointer(const void *p);
-	void swap(int i1, int i2);
-	void reverse();
-	DynamicArray ref_subarray(int start, int num_elements);
-	bool iterate(void *&p);
-	bool iterate_back(void *&p);
-	int index(const void *p);
-	void clear();
+	void _cdecl init(int _element_size_);
+	void _cdecl reserve(int size);
+	void _cdecl resize(int size);
+	void _cdecl ensure_size(int size);
+	void _cdecl insert_blank(int pos);
+	void _cdecl append(const DynamicArray *a);
+	void _cdecl assign(const DynamicArray *a);
+	void _cdecl exchange(DynamicArray &a);
+	void _cdecl append_p_single(void *p);
+	void _cdecl append_4_single(int x);
+	void _cdecl append_f_single(float x);
+	void _cdecl append_1_single(char x);
+	void _cdecl append_single(const void *d);
+	void _cdecl insert_p_single(void *p, int index);
+	void _cdecl insert_4_single(int x, int index);
+	void _cdecl insert_f_single(float x, int index);
+	void _cdecl insert_1_single(char x, int index);
+	void _cdecl insert_single(const void *d, int index);
+	void _cdecl delete_single(int index);
+	void _cdecl delete_single_by_pointer(const void *p);
+	void _cdecl swap(int i1, int i2);
+	void _cdecl reverse();
+	DynamicArray _cdecl ref_subarray(int start, int num_elements);
+	bool _cdecl iterate(void *&p);
+	bool _cdecl iterate_back(void *&p);
+	int _cdecl index(const void *p);
+	void _cdecl clear();
 	void *data;
 	int num, allocated, element_size;
 };
@@ -61,13 +61,13 @@ class Array : public DynamicArray
 			init(sizeof(T));
 			add(item);
 		}
-		void __init__()
+		void _cdecl __init__()
 		{
 			init(sizeof(T));
 		}
 		~Array()
 		{	clear();	}
-		void clear()
+		void _cdecl clear()
 		{
 			if (allocated > 0){
 				for (int i=0;i<num;i++)
@@ -75,12 +75,12 @@ class Array : public DynamicArray
 			}
 			((DynamicArray*)this)->clear();
 		}
-		void add(const T item)
+		void _cdecl add(const T item)
 		{
 			resize(num + 1);
 			(*this)[num - 1] = item;
 		}
-		T pop()
+		T _cdecl pop()
 		{
 			T r;
 			if (num > 0){
@@ -89,25 +89,25 @@ class Array : public DynamicArray
 			}
 			return r;
 		}
-		void append(const Array<T> &a)
+		void _cdecl append(const Array<T> &a)
 		{
 			int num0 = num;
 			resize(num + a.num);
 			for (int i=0;i<a.num;i++)
 				(*this)[num0 + i] = a[i];
 		}
-		void erase(int index)
+		void _cdecl erase(int index)
 		{
 			(*this)[index].~T();
 			delete_single(index);
 		}
-		void insert(const T item, int index)
+		void _cdecl insert(const T item, int index)
 		{
 			insert_blank(index);
 			new(&(*this)[index]) T;
 			(*this)[index] = item;
 		}
-		void resize(int size)
+		void _cdecl resize(int size)
 		{
 			if (size < num){
 				// shrink -> destruct
@@ -123,7 +123,7 @@ class Array : public DynamicArray
 			}
 			num = size;
 		}
-		Array<T> sub(int start, int num_elements) const
+		Array<T> _cdecl sub(int start, int num_elements) const
 		{
 			Array<T> s;
 			if ((num_elements < 0) || (num_elements > num - start))
@@ -147,7 +147,7 @@ class Array : public DynamicArray
 			clear();
 			add(item);
 		}
-		void set_ref(const Array<T> &a)
+		void _cdecl set_ref(const Array<T> &a)
 		{
 			if (this != &a){
 				clear();
@@ -157,13 +157,13 @@ class Array : public DynamicArray
 				allocated = 0;
 			}
 		}
-		void forget()
+		void _cdecl forget()
 		{
 			data = NULL;
 			allocated = 0;
 			num = 0;
 		}
-		void make_own()
+		void _cdecl make_own()
 		{
 			if ((num == 0) || (allocated > 0))
 				return;
@@ -196,7 +196,7 @@ class Array : public DynamicArray
 		{	return ((T*)data)[index];	}
 		T &back()
 		{	return ((T*)data)[num - 1];	}
-		const T &back() const
+		const T &_cdecl back() const
 		{	return ((T*)data)[num - 1];	}
 
 		// iterators

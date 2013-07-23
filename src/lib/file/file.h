@@ -46,11 +46,11 @@ struct Date
 	int time;
 	int year, month, day, hour, minute, second, milli_second;
 	int day_of_week, day_of_year;
-	string format(const string &f) const;
-	string str() const;
+	string _cdecl format(const string &f) const;
+	string _cdecl str() const;
 };
 
-Date get_current_date();
+Date _cdecl get_current_date();
 
 
 
@@ -73,69 +73,69 @@ public:
 	~CFile();
 
 	// opening
-	bool Open(const string &filename);
-	bool Create(const string &filename);
-	bool Append(const string &filename);
+	bool _cdecl Open(const string &filename);
+	bool _cdecl Create(const string &filename);
+	bool _cdecl Append(const string &filename);
 	bool _cdecl Close();
 
 	// meta
-	void SetBinaryMode(bool bm);
-	void SetPos(int pos,bool absolute);
-	int GetSize();
-	int GetPos();
+	void _cdecl SetBinaryMode(bool bm);
+	void _cdecl SetPos(int pos,bool absolute);
+	int _cdecl GetSize();
+	int _cdecl GetPos();
 	Date _cdecl GetDateCreation();
 	Date _cdecl GetDateModification();
 	Date _cdecl GetDateAccess();
 
 	// file format version
-	int ReadFileFormatVersion();
-	void WriteFileFormatVersion(bool binary, int fvv);
+	int _cdecl ReadFileFormatVersion();
+	void _cdecl WriteFileFormatVersion(bool binary, int fvv);
 
 	// really low level
-	int ReadBuffer(void *buffer, int size);
-	int WriteBuffer(const void *buffer, int size);
-	string ReadComplete();
+	int _cdecl ReadBuffer(void *buffer, int size);
+	int _cdecl WriteBuffer(const void *buffer, int size);
+	string _cdecl ReadComplete();
 
 	// medium level
-	void ReadComment();
-	char ReadChar();
-	unsigned char ReadByte();
-	unsigned char ReadByteC();
-	unsigned short ReadWord();
-	unsigned short ReadWordC();
-	unsigned short ReadReversedWord(); // for antique versions!!
+	void _cdecl ReadComment();
+	char _cdecl ReadChar();
+	unsigned char _cdecl ReadByte();
+	unsigned char _cdecl ReadByteC();
+	unsigned short _cdecl ReadWord();
+	unsigned short _cdecl ReadWordC();
+	unsigned short _cdecl ReadReversedWord(); // for antique versions!!
 	int _cdecl ReadInt();
 	int _cdecl ReadIntC();
-	float ReadFloat();
-	float ReadFloatC();
+	float _cdecl ReadFloat();
+	float _cdecl ReadFloatC();
 	bool _cdecl ReadBool();
 	bool _cdecl ReadBoolC();
 	string _cdecl ReadStr();
-	string ReadStrNT();
+	string _cdecl ReadStrNT();
 	string _cdecl ReadStrC();
-	string ReadStrRW(); // for antique versions!!
-	void ReadVector(void *v);
+	string _cdecl ReadStrRW(); // for antique versions!!
+	void _cdecl ReadVector(void *v);
 
-	void WriteChar(char c);
-	void WriteByte(unsigned char c);
-	void WriteWord(unsigned short);
+	void _cdecl WriteChar(char c);
+	void _cdecl WriteByte(unsigned char c);
+	void _cdecl WriteWord(unsigned short);
 	void _cdecl WriteInt(int in);
-	void WriteFloat(float f);
+	void _cdecl WriteFloat(float f);
 	void _cdecl WriteBool(bool b);
-	void WriteStr(const string &str);
-	void WriteComment(const string &str);
-	void WriteVector(const void *v);
+	void _cdecl WriteStr(const string &str);
+	void _cdecl WriteComment(const string &str);
+	void _cdecl WriteVector(const void *v);
 
 	// high level
-	void Int(int &i);
-	void Float(float &f);
-	void Bool(bool &b);
-	void String(string &str);
-	void Vector(float *v);
-	void Struct(const char *format, void *data);
-	void StructN(const char *format, int &num, void *data, int shift);
+	void _cdecl Int(int &i);
+	void _cdecl Float(float &f);
+	void _cdecl Bool(bool &b);
+	void _cdecl String(string &str);
+	void _cdecl Vector(float *v);
+	void _cdecl Struct(const char *format, void *data);
+	void _cdecl StructN(const char *format, int &num, void *data, int shift);
 
-	void ShiftRight(int s);
+	void _cdecl ShiftRight(int s);
 
 	bool Eof, Binary, SilentFileAccess, Reading;
 	int FloatDecimals;
@@ -145,14 +145,14 @@ public:
 	bool Error,ErrorReported,DontReportErrors;
 };
 
-extern CFile *OpenFile(const string &filename);
-extern CFile *OpenFileSilent(const string &filename);
-extern CFile *CreateFile(const string &filename);
-extern CFile *CreateFileSilent(const string &filename);
-extern CFile *AppendFile(const string &filename);
-extern void FileClose(CFile *f);
-extern string FileRead(const string &filename);
-extern void FileWrite(const string &filename, const string &str);
+extern CFile *_cdecl FileOpen(const string &filename);
+extern CFile *_cdecl FileOpenSilent(const string &filename);
+extern CFile *_cdecl FileCreate(const string &filename);
+extern CFile *_cdecl FileCreateSilent(const string &filename);
+extern CFile *_cdecl FileAppend(const string &filename);
+extern void _cdecl FileClose(CFile *f);
+extern string _cdecl FileRead(const string &filename);
+extern void _cdecl FileWrite(const string &filename, const string &str);
 
 
 

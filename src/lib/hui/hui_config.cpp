@@ -13,7 +13,7 @@ typedef MapEntry<string, string> HuiConfigEntry;
 
 static void LoadConfigFile()
 {
-	CFile *f = OpenFileSilent(HuiAppDirectory + "Data/config.txt");
+	CFile *f = FileOpenSilent(HuiAppDirectory + "Data/config.txt");
 	HuiConfig.clear();
 	if (f){
 		int num = f->ReadIntC();
@@ -31,7 +31,7 @@ static void LoadConfigFile()
 void HuiSaveConfigFile()
 {
 	dir_create(HuiAppDirectory + "Data");
-	CFile *f = CreateFileSilent(HuiAppDirectory + "Data/config.txt");
+	CFile *f = FileCreateSilent(HuiAppDirectory + "Data/config.txt");
 	f->WriteStr("// NumConfigs");
 	f->WriteInt(HuiConfig.num);
 	foreach(HuiConfigEntry &e, HuiConfig){

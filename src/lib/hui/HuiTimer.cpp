@@ -21,10 +21,21 @@
 
 
 #ifdef OS_WINDOWS
-	extern LONGLONG perf_cnt;
-	extern bool perf_flag;
-	extern float time_scale;
+	static bool HuiTimerPerfFlag = false;
+	static float HuitTimerScal = 0;
 #endif
+
+void HuiInitTimers()
+{
+#ifdef OS_WINDOWS
+	LONGLONG perf_cnt;
+	HuiTimerPerfFlag = QueryPerformanceFrequency((LARGE_INTEGER*)&perf_cnt);
+	if (HuiTimerPerfFlag)
+		HuitTimerScal = 1.0f / perf_cnt;
+	else
+		HuitTimerScal = 0.001f;
+#endif
+}
 
 HuiTimer::HuiTimer()
 {
@@ -40,15 +51,15 @@ float HuiTimer::peek()
 {
 	float elapsed = 0;
 	#ifdef OS_WINDOWS
-		if (perf_flag)
-			QueryPerformanceCounter((LARGE_INTEGER *)&CurTime);
+		if (HuiTimerPerfFlag)
+			QueryPerformanceCounter((LARGE_INTEGER *)&cur_time);
 		else
-			CurTime = timeGetTime();
-		elapsed = (CurTime - LastTime) * time_scale;
+			cur_time = timeGetTime();
+		elapsed = (float)(cur_time - last_time) * HuitTimerScal;
 	#endif
 	#ifdef OS_LINUX
-		gettimeofday(&CurTime,NULL);
-		elapsed = float(CurTime.tv_sec - LastTime.tv_sec) + float(CurTime.tv_usec - LastTime.tv_usec) * 0.000001f;
+		gettimeofday(&cur_time, NULL);
+		elapsed = float(cur_time.tv_sec - last_time.tv_sec) + float(cur_time.tv_usec - last_time.tv_usec) * 0.000001f;
 	#endif
 	return elapsed;
 }
@@ -56,12 +67,7 @@ float HuiTimer::peek()
 float HuiTimer::get()
 {
 	float elapsed = peek();
-#ifdef OS_WINDOWS
-	LastTime = CurTime;
-#endif
-#ifdef OS_LINUX
-	LastTime = CurTime;
-#endif
+	last_time = cur_time;
 	return elapsed;
 }
 

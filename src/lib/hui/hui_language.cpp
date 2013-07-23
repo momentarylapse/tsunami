@@ -19,7 +19,7 @@
 			MultiByteToWideChar(CP_UTF8,0,(LPCSTR)str.c_str(),-1,w,TCHAR_STRING_LENGTH);
 			return w;
 		#else
-			return str_m2ascii(str);
+			return str.c_str();
 		#endif
 	}
 
@@ -37,7 +37,7 @@
 			s.resize(r);
 			return s;
 		#else
-			return str_ascii2m(str);
+			return str;
 		#endif
 	}
 

@@ -65,7 +65,6 @@ HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height)
 
 void HuiWindow::__init_ext__(const string& title, int x, int y, int width, int height)
 {
-	msg_write("init ext");
 	new(this) HuiWindow(title, x, y, width, height);
 }
 
@@ -116,7 +115,7 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent, bool allow_parent)
 
 void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 {
-	msg_db_r("Window::_InitGeneric_", 2);
+	msg_db_f("Window::_InitGeneric_", 2);
 	_HuiMakeUsable_();
 	HuiWindows.add(this);
 
@@ -151,13 +150,11 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 	main_level = HuiMainLevel;
 
 	SetTarget("", 0);
-
-	msg_db_l(2);
 }
 
 void HuiWindow::_CleanUp_()
 {
-	msg_db_r("Window::_CleanUp_", 2);
+	msg_db_f("Window::_CleanUp_", 2);
 	HuiClosedWindow c;
 	c.unique_id = unique_id;
 	c.win = this;
@@ -169,6 +166,11 @@ void HuiWindow::_CleanUp_()
 
 	for (int i=0;i<control.num;i++)
 		delete(control[i]);
+	control.clear();
+	id.clear();
+	cur_id.clear();
+	event.clear();
+	input.reset();
 	
 	// unregister window
 	for (int i=0;i<HuiWindows.num;i++)
@@ -176,7 +178,20 @@ void HuiWindow::_CleanUp_()
 			HuiWindows.erase(i);
 			break;
 		}
-	msg_db_l(2);
+}
+
+// default handler when trying to close the windows
+void HuiWindow::OnCloseRequest()
+{
+	int level = _GetMainLevel_();
+	delete(this);
+	
+	// no message function (and last window in this main level): end program
+	// ...or at least end nested main level
+	foreach(HuiWindow *w, HuiWindows)
+		if (w->_GetMainLevel_() >= level)
+			return;
+	HuiEnd();
 }
 
 
@@ -270,46 +285,38 @@ bool HuiWindow::GetMouse(int &x, int &y, int button)
 
 void HuiWindow::Event(const string &id, hui_callback *function)
 {
-	HuiWinEvent e;
+	HuiEventListener e;
 	e.id = id;
 	e.message = "*";
 	e.function = function;
-	e.object = NULL;
-	e.member_function = NULL;
 	event.add(e);
 	
 }
 
 void HuiWindow::EventX(const string &id, const string &msg, hui_callback *function)
 {
-	HuiWinEvent e;
+	HuiEventListener e;
 	e.id = id;
 	e.message = msg;
 	e.function = function;
-	e.object = NULL;
-	e.member_function = NULL;
 	event.add(e);
 }
 
 void HuiWindow::_EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
-	HuiWinEvent e;
+	HuiEventListener e;
 	e.id = id;
 	e.message = ":def:";
-	e.function = NULL;
-	e.object = handler;
-	e.member_function = function;
+	e.function = HuiCallback(handler, function);
 	event.add(e);
 }
 
 void HuiWindow::_EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
-	HuiWinEvent e;
+	HuiEventListener e;
 	e.id = id;
 	e.message = msg;
-	e.function = NULL;
-	e.object = handler;
-	e.member_function = function;
+	e.function = HuiCallback(handler, function);
 	event.add(e);
 }
 
@@ -317,7 +324,7 @@ bool HuiWindow::_SendEvent_(HuiEvent *e)
 {
 	if (!allow_input)
 		return false;
-	msg_db_r("SendEvent", 2);
+	msg_db_f("SendEvent", 2);
 	//msg_write(e->id);
 	//msg_write(e->message);
 	HuiCurWindow = this;
@@ -347,26 +354,20 @@ bool HuiWindow::_SendEvent_(HuiEvent *e)
 		_SetCurID_(e->message);
 
 	bool sent = false;
-	foreach(HuiWinEvent &ee, event){
+	foreach(HuiEventListener &ee, event){
 		if (!_HuiEventMatch_(e, ee.id, ee.message))
 			continue;
 		
 		// send the event
-		if (ee.function){
-			ee.function();
-			sent = true;
-		}else if ((ee.object) && (ee.member_function)){
-			// send the event (member)
-			(ee.object->*ee.member_function)();
+		if (ee.function.is_set()){
+			ee.function.call();
 			sent = true;
 		}
 
 		// window closed by callback?
 		foreach(HuiClosedWindow &cw, _HuiClosedWindow_)
-			if (cw.win == this){
-				msg_db_l(2);
+			if (cw.win == this)
 				return sent;
-			}
 	}
 
 	// reset
@@ -374,7 +375,6 @@ bool HuiWindow::_SendEvent_(HuiEvent *e)
 	input.dy = 0;
 	input.dz = 0;
 
-	msg_db_l(2);
 	return sent;
 }
 
@@ -432,10 +432,10 @@ void HuiWindowAddControl(HuiWindow *win, const string &type, const string &title
 
 void HuiWindow::FromResource(const string &id)
 {
-	msg_db_r("Window.FromResource",1);
+	msg_db_f("Window.FromResource",1);
 	HuiResource *res = HuiGetResource(id);
 	if (!res)
-		msg_db_l(1);
+		return;
 
 	// title
 	SetTitle(HuiGetLanguage(res->id));
@@ -481,7 +481,6 @@ void HuiWindow::FromResource(const string &id)
 			SetImage(cmd.id, cmd.image);
 	}
 	msg_db_m("  \\(^_^)/",1);
-	msg_db_l(1);
 }
 
 //----------------------------------------------------------------------------------
@@ -714,18 +713,12 @@ bool HuiWindow::IsExpanded(const string &_id, int row)
 
 HuiWindow *HuiCreateDialog(const string &title,int width,int height,HuiWindow *root,bool allow_root)
 {
-	return new HuiWindow(	title,
-							-1, -1, width, height,
-							root, allow_root,
-							HuiWinModeControls);
+	return new HuiFixedDialog(title, width, height, root, allow_root);
 }
 
 HuiWindow *HuiCreateSizableDialog(const string &title,int width,int height,HuiWindow *root,bool allow_root)
 {
-	return new HuiWindow(	title,
-							-1, -1, width, height,
-							root, allow_root,
-							HuiWinModeControls | HuiWinModeResizable);
+	return new HuiDialog(title, width, height, root, allow_root);
 }
 
 void HuiFuncIgnore()

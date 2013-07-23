@@ -18,13 +18,13 @@
 	#include "../../../meta.h"
 	#include "../../../networking.h"
 	#define x_p(p)		(void*)p
-	void ExitProgram();
-	void ScreenShot();
-	void LoadWorldSoon(const string &filename);
-	void LoadGameFromHostSoon(const HostData &host);
-	void SaveGameState(const string &filename);
-	void LoadGameStateSoon(const string &filename);
-	void DrawSplashScreen(const string &str, float per);
+	void _cdecl ExitProgram();
+	void _cdecl ScreenShot();
+	void _cdecl LoadWorldSoon(const string &filename);
+	void _cdecl LoadGameFromHostSoon(const HostData &host);
+	void _cdecl SaveGameState(const string &filename);
+	void _cdecl LoadGameStateSoon(const string &filename);
+	void _cdecl DrawSplashScreen(const string &str, float per);
 	using namespace Gui;
 	using namespace Fx;
 #else
@@ -126,9 +126,9 @@ extern Type *TypeSocketList;
 	class HostDataList : public Array<HostData>
 	{
 		public:
-			void __init__(){Array<HostData>::__init__();}
-			void __delete__(){clear();}
-			void __assign__(HostDataList &other){*this = other;}
+			void _cdecl __init__(){Array<HostData>::__init__();}
+			void _cdecl __delete__(){clear();}
+			void _cdecl __assign__(HostDataList &other){*this = other;}
 	};
 	static Camera *_camera;
 	#define	GetDACamera(x)		long(&_camera->x)-long(_camera)
@@ -242,8 +242,6 @@ void SIAddPackageX()
 	// bone, subskin, material...
 
 	add_class(TypePicture);
-		class_set_vtable_x(Picture);
-		TypePicture->vtable = new VirtualTable[20];
 		class_add_element("enabled",		TypeBool,		GetDAPicture(enabled));
 		class_add_element("tc_inverted",	TypeBool,		GetDAPicture(tc_inverted));
 		class_add_element("pos",			TypeVector,		GetDAPicture(pos));
@@ -253,74 +251,68 @@ void SIAddPackageX()
 		class_add_element("texture",		TypeInt,		GetDAPicture(texture));
 		class_add_element("source",			TypeRect,		GetDAPicture(source));
 		class_add_element("shader",			TypeInt,		GetDAPicture(shader));
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Picture::__init_ext__)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Picture::__init_ext__)));
 			func_add_param("pos",		TypeVector);
 			func_add_param("width",		TypeFloat);
 			func_add_param("height",	TypeFloat);
 			func_add_param("texture",	TypeInt);
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Picture::__init__)));
-		class_add_func("__delete__", TypeVoid, x_p(mf((tmf)&Picture::__delete__)));
-		class_add_func("__Draw", TypeVoid, x_p(mf((tmf)&Picture::Draw)));
-		class_add_func("__Update", TypeVoid, x_p(mf((tmf)&Picture::Update)));
-		class_add_func("OnIterate", TypeVoid, x_p(mf((tmf)&Picture::OnIterate)));
-		class_add_func("OnHover", TypeVoid, x_p(mf((tmf)&Picture::OnHover)));
-		class_add_func("OnClick", TypeVoid, x_p(mf((tmf)&Picture::OnClick)));
-		class_add_func("OnMouseEnter", TypeVoid, x_p(mf((tmf)&Picture::OnMouseEnter)));
-		class_add_func("OnMouseLeave", TypeVoid, x_p(mf((tmf)&Picture::OnMouseLeave)));
-		class_add_func("IsMouseOver", TypeBool, x_p(mf((tmf)&Picture::IsMouseOver)));
-		TypePicture->LinkVirtualTable();
+		class_add_func("__init__", TypeVoid, x_p(mf(&Picture::__init__)));
+		class_add_func_virtual("__delete__", TypeVoid, x_p(mf(&Picture::__delete__)));
+		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Picture::Draw)));
+		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Picture::Update)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Picture::OnIterate)));
+		class_add_func_virtual("OnHover", TypeVoid, x_p(mf(&Picture::OnHover)));
+		class_add_func_virtual("OnClick", TypeVoid, x_p(mf(&Picture::OnClick)));
+		class_add_func_virtual("OnMouseEnter", TypeVoid, x_p(mf(&Picture::OnMouseEnter)));
+		class_add_func_virtual("OnMouseLeave", TypeVoid, x_p(mf(&Picture::OnMouseLeave)));
+		class_add_func_virtual("IsMouseOver", TypeBool, x_p(mf(&Picture::IsMouseOver)));
+		class_set_vtable_x(Picture);
 	
 	add_class(TypePicture3D);
-		class_set_vtable_x(Picture3d);
-		TypePicture3D->vtable = new VirtualTable[20];
 		class_add_element("enabled",		TypeBool,		GetDAPicture3D(enabled));
 		class_add_element("lighting",		TypeBool,		GetDAPicture3D(lighting));
 		class_add_element("world_3d",		TypeBool,		GetDAPicture3D(world_3d));
 		class_add_element("z",				TypeFloat,		GetDAPicture3D(pos.z));
 		class_add_element("matrix",			TypeMatrix,		GetDAPicture3D(_matrix));
 		class_add_element("model",			TypeModelP,		GetDAPicture3D(model));
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Picture3d::__init_ext__)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Picture3d::__init_ext__)));
 			func_add_param("m",			TypeModelP);
 			func_add_param("mat",		TypeMatrix);
 			func_add_param("z",			TypeFloat);
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Picture3d::__init__)));
-		class_add_func("__delete__", TypeVoid, x_p(mf((tmf)&Picture3d::__delete__)));
-		class_add_func("__Draw", TypeVoid, x_p(mf((tmf)&Picture3d::Draw)));
-		class_add_func("__Update", TypeVoid, x_p(mf((tmf)&Picture3d::Update)));
-		class_add_func("OnIterate", TypeVoid, x_p(mf((tmf)&Picture3d::OnIterate)));
-		class_add_func("OnHover", TypeVoid, x_p(mf((tmf)&Picture3d::OnHover)));
-		class_add_func("OnClick", TypeVoid, x_p(mf((tmf)&Picture3d::OnClick)));
-		class_add_func("OnMouseEnter", TypeVoid, x_p(mf((tmf)&Picture3d::OnMouseEnter)));
-		class_add_func("OnMouseLeave", TypeVoid, x_p(mf((tmf)&Picture3d::OnMouseLeave)));
-		class_add_func("IsMouseOver", TypeBool, x_p(mf((tmf)&Picture3d::IsMouseOver)));
-		TypePicture3D->LinkVirtualTable();
+		class_add_func("__init__", TypeVoid, x_p(mf(&Picture3d::__init__)));
+		class_add_func_virtual("__delete__", TypeVoid, x_p(mf(&Picture3d::__delete__)));
+		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Picture3d::Draw)));
+		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Picture3d::Update)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Picture3d::OnIterate)));
+		class_add_func_virtual("OnHover", TypeVoid, x_p(mf(&Picture3d::OnHover)));
+		class_add_func_virtual("OnClick", TypeVoid, x_p(mf(&Picture3d::OnClick)));
+		class_add_func_virtual("OnMouseEnter", TypeVoid, x_p(mf(&Picture3d::OnMouseEnter)));
+		class_add_func_virtual("OnMouseLeave", TypeVoid, x_p(mf(&Picture3d::OnMouseLeave)));
+		class_add_func_virtual("IsMouseOver", TypeBool, x_p(mf(&Picture3d::IsMouseOver)));
+		class_set_vtable_x(Picture3d);
 	
 	add_class(TypeLayer);
-		class_set_vtable_x(Layer);
-		TypeLayer->vtable = new VirtualTable[20];
 		class_add_element("enabled",		TypeBool,		GetDALayer(enabled));
 		class_add_element("pos",			TypeVector,		GetDALayer(pos));
 		class_add_element("color",			TypeColor,		GetDALayer(_color));
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Layer::__init_ext__)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Layer::__init_ext__)));
 			func_add_param("pos",		TypeVector);
 			func_add_param("set_cur",	TypeBool);
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Layer::__init__)));
-		class_add_func("__delete__", TypeVoid, x_p(mf((tmf)&Layer::__delete__)));
-		class_add_func("__Draw", TypeVoid, x_p(mf((tmf)&Layer::Draw)));
-		class_add_func("__Update", TypeVoid, x_p(mf((tmf)&Layer::Update)));
-		class_add_func("OnIterate", TypeVoid, x_p(mf((tmf)&Layer::OnIterate)));
-		class_add_func("OnHover", TypeVoid, x_p(mf((tmf)&Layer::OnHover)));
-		class_add_func("OnClick", TypeVoid, x_p(mf((tmf)&Layer::OnClick)));
-		class_add_func("OnMouseEnter", TypeVoid, x_p(mf((tmf)&Layer::OnMouseEnter)));
-		class_add_func("OnMouseLeave", TypeVoid, x_p(mf((tmf)&Layer::OnMouseLeave)));
-		class_add_func("IsMouseOver", TypeBool, x_p(mf((tmf)&Layer::IsMouseOver)));
-		class_add_func("add", TypeVoid, x_p(mf((tmf)&Layer::add)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Layer::__init__)));
+		class_add_func_virtual("__delete__", TypeVoid, x_p(mf(&Layer::__delete__)));
+		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Layer::Draw)));
+		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Layer::Update)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Layer::OnIterate)));
+		class_add_func_virtual("OnHover", TypeVoid, x_p(mf(&Layer::OnHover)));
+		class_add_func_virtual("OnClick", TypeVoid, x_p(mf(&Layer::OnClick)));
+		class_add_func_virtual("OnMouseEnter", TypeVoid, x_p(mf(&Layer::OnMouseEnter)));
+		class_add_func_virtual("OnMouseLeave", TypeVoid, x_p(mf(&Layer::OnMouseLeave)));
+		class_add_func_virtual("IsMouseOver", TypeBool, x_p(mf(&Layer::IsMouseOver)));
+		class_add_func("add", TypeVoid, x_p(mf(&Layer::add)));
 			func_add_param("p", TypeLayerP);
-		TypeLayer->LinkVirtualTable();
+		class_set_vtable_x(Layer);
 	
 	add_class(TypeText);
-		class_set_vtable_x(Text);
-		TypeText->vtable = new VirtualTable[20];
 		class_add_element("enabled",		TypeBool,		GetDAText(enabled));
 		class_add_element("centric",		TypeBool,		GetDAText(centric));
 		class_add_element("vertical",		TypeBool,		GetDAText(vertical));
@@ -329,26 +321,24 @@ void SIAddPackageX()
 		class_add_element("size",			TypeFloat,		GetDAText(size));
 		class_add_element("color",			TypeColor,		GetDAText(_color));
 		class_add_element("text",			TypeString,		GetDAText(text));
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Text::__init_ext__)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Text::__init_ext__)));
 			func_add_param("pos",		TypeVector);
 			func_add_param("size",		TypeFloat);
 			func_add_param("c",			TypeColor);
 			func_add_param("str",		TypeString);
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Text::__init__)));
-		class_add_func("__delete__", TypeVoid, x_p(mf((tmf)&Text::__delete__)));
-		class_add_func("__Draw", TypeVoid, x_p(mf((tmf)&Text::Draw)));
-		class_add_func("__Update", TypeVoid, x_p(mf((tmf)&Text::Update)));
-		class_add_func("OnIterate", TypeVoid, x_p(mf((tmf)&Text::OnIterate)));
-		class_add_func("OnHover", TypeVoid, x_p(mf((tmf)&Text::OnHover)));
-		class_add_func("OnClick", TypeVoid, x_p(mf((tmf)&Text::OnClick)));
-		class_add_func("OnMouseEnter", TypeVoid, x_p(mf((tmf)&Text::OnMouseEnter)));
-		class_add_func("OnMouseLeave", TypeVoid, x_p(mf((tmf)&Text::OnMouseLeave)));
-		class_add_func("IsMouseOver", TypeBool, x_p(mf((tmf)&Text::IsMouseOver)));
-		TypeText->LinkVirtualTable();
+		class_add_func("__init__", TypeVoid, x_p(mf(&Text::__init__)));
+		class_add_func_virtual("__delete__", TypeVoid, x_p(mf(&Text::__delete__)));
+		class_add_func_virtual("__Draw", TypeVoid, x_p(mf(&Text::Draw)));
+		class_add_func_virtual("__Update", TypeVoid, x_p(mf(&Text::Update)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Text::OnIterate)));
+		class_add_func_virtual("OnHover", TypeVoid, x_p(mf(&Text::OnHover)));
+		class_add_func_virtual("OnClick", TypeVoid, x_p(mf(&Text::OnClick)));
+		class_add_func_virtual("OnMouseEnter", TypeVoid, x_p(mf(&Text::OnMouseEnter)));
+		class_add_func_virtual("OnMouseLeave", TypeVoid, x_p(mf(&Text::OnMouseLeave)));
+		class_add_func_virtual("IsMouseOver", TypeBool, x_p(mf(&Text::IsMouseOver)));
+		class_set_vtable_x(Text);
 	
 	add_class(TypeParticle);
-		class_set_vtable_x(Particle);
-		TypeParticle->vtable = new VirtualTable[10];
 		class_add_element("enabled",		TypeBool,		GetDAParticle(enabled));
 		class_add_element("suicidal",		TypeBool,		GetDAParticle(suicidal));
 		class_add_element("pos",			TypeVector,		GetDAParticle(pos));
@@ -361,25 +351,23 @@ void SIAddPackageX()
 		class_add_element("source",			TypeRect,		GetDAParticle(source));
 		class_add_element("func_delta_t",	TypeFloat,		GetDAParticle(func_delta_t));
 		class_add_element("elapsed",		TypeFloat,		GetDAParticle(elapsed));
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Particle::__init_ext__)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Particle::__init_ext__)));
 			func_add_param("pos", TypeVector);
 			func_add_param("texture", TypeInt);
 			func_add_param("ttl", TypeFloat);
 			func_add_param("radius", TypeFloat);
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Particle::__init__)));
-		class_add_func("setr", TypeVoid, x_p(mf((tmf)&Particle::setr)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Particle::__init__)));
+		class_add_func("setr", TypeVoid, x_p(mf(&Particle::setr)));
 			func_add_param("pos", TypeVector);
 			func_add_param("ang", TypeVector);
 			func_add_param("texture", TypeInt);
 			func_add_param("ttl", TypeFloat);
 			func_add_param("radius", TypeFloat);
-		class_add_func("__delete__", TypeVoid, x_p(mf((tmf)&Particle::__delete__)));
-		class_add_func("OnIterate", TypeVoid, x_p(mf((tmf)&Particle::OnIterate)));
-		TypeParticle->LinkVirtualTable();
+		class_add_func_virtual("__delete__", TypeVoid, x_p(mf(&Particle::__delete__)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Particle::OnIterate)));
+		class_set_vtable_x(Particle);
 
 	add_class(TypeBeam);
-		class_set_vtable_x(Beam);
-		TypeBeam->vtable = new VirtualTable[10];
 		class_add_element("enabled",		TypeBool,		GetDAParticle(enabled));
 		class_add_element("suicidal",		TypeBool,		GetDAParticle(suicidal));
 		class_add_element("pos",			TypeVector,		GetDAParticle(pos));
@@ -392,20 +380,18 @@ void SIAddPackageX()
 		class_add_element("source",			TypeRect,		GetDAParticle(source));
 		class_add_element("func_delta_t",	TypeFloat,		GetDAParticle(func_delta_t));
 		class_add_element("elapsed",		TypeFloat,		GetDAParticle(elapsed));
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Beam::__init_ext__)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Beam::__init_ext__)));
 			func_add_param("pos", TypeVector);
 			func_add_param("length", TypeVector);
 			func_add_param("texture", TypeInt);
 			func_add_param("ttl", TypeFloat);
 			func_add_param("radius", TypeFloat);
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Beam::__init__)));
-		class_add_func("__delete__", TypeVoid, x_p(mf((tmf)&Beam::__delete__)));
-		class_add_func("OnIterate", TypeVoid, x_p(mf((tmf)&Beam::OnIterate)));
-		TypeBeam->LinkVirtualTable();
+		class_add_func("__init__", TypeVoid, x_p(mf(&Beam::__init__)));
+		class_add_func_virtual("__delete__", TypeVoid, x_p(mf(&Beam::__delete__)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Beam::OnIterate)));
+		class_set_vtable_x(Beam);
 	
 	add_class(TypeEffect);
-		class_set_vtable_x(Effect);
-		TypeEffect->vtable = new VirtualTable[10];
 		class_add_element("enabled",		TypeBool,		GetDAEffect(enabled));
 		class_add_element("suicidal",		TypeBool,		GetDAEffect(suicidal));
 		class_add_element("pos",			TypeVector,		GetDAEffect(pos));
@@ -415,12 +401,12 @@ void SIAddPackageX()
 		class_add_element("elapsed",		TypeFloat,		GetDAEffect(elapsed));
 		class_add_element("model",			TypeModelP,		GetDAEffect(model));
 		class_add_element("vertex",			TypeInt,		GetDAEffect(vertex));
-		class_add_func("__init__", TypeVoid, x_p(mf((tmf)&Effect::__init__)));
-		class_add_func("__delete__", TypeVoid, x_p(mf((tmf)&Effect::__delete__)));
-		class_add_func("OnIterate", TypeVoid, x_p(mf((tmf)&Effect::OnIterate)));
-		class_add_func("OnEnable", TypeVoid, x_p(mf((tmf)&Effect::OnEnable)));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Effect::__init__)));
+		class_add_func_virtual("__delete__", TypeVoid, x_p(mf(&Effect::__delete__)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Effect::OnIterate)));
+		class_add_func_virtual("OnEnable", TypeVoid, x_p(mf(&Effect::OnEnable)));
 			func_add_param("enabled", TypeBool);
-		TypeEffect->LinkVirtualTable();
+		class_set_vtable_x(Effect);
 
 	add_class(TypeSkin);
 		class_add_element("vertex",			TypeVectorList,	GetDASkin(vertex));
@@ -505,23 +491,23 @@ void SIAddPackageX()
 		class_add_element("max",			TypeVector,		GetDAModel(max));
 		class_add_element("test_collisions",	TypeBool,		GetDAModel(test_collisions));
 		class_add_element("allow_shadow",	TypeBool,		GetDAModel(allow_shadow));
-		class_add_func("AddForce",		TypeVoid,	x_p(mf((tmf)&Object::AddForce)));
+		class_add_func("AddForce",		TypeVoid,	x_p(mf(&Object::AddForce)));
 			func_add_param("force",		TypeVector);
 			func_add_param("rho",		TypeVector);
-		class_add_func("AddTorque",		TypeVoid,	x_p(mf((tmf)&Object::AddTorque)));
+		class_add_func("AddTorque",		TypeVoid,	x_p(mf(&Object::AddTorque)));
 			func_add_param("torque",		TypeVector);
-		class_add_func("MakeVisible",		TypeVoid,		x_p(mf((tmf)&Object::MakeVisible)));
+		class_add_func("MakeVisible",		TypeVoid,		x_p(mf(&Object::MakeVisible)));
 			func_add_param("visible",		TypeBool);
-		class_add_func("UpdateData",		TypeVoid,		x_p(mf((tmf)&Object::UpdateData)));
-/*	add_func("CalcMove",					TypeVoid,		x_p(mf((tmf)&Model::CalcMove)));
-	add_func("Draw",						TypeVoid,		x_p(mf((tmf)&Model::Draw)));
+		class_add_func("UpdateData",		TypeVoid,		x_p(mf(&Object::UpdateData)));
+/*	add_func("CalcMove",					TypeVoid,		x_p(mf(&Model::CalcMove)));
+	add_func("Draw",						TypeVoid,		x_p(mf(&Model::Draw)));
 		func_add_param("skin",				TypeInt);
 		func_add_param("fx",				TypeBool);*/
-		class_add_func("GetVertex",		TypeVector,		amd64_wrap(mf((tmf)&Model::GetVertex), &amd64_model_get_vertex));
+		class_add_func("GetVertex",		TypeVector,		amd64_wrap(mf(&Model::GetVertex), &amd64_model_get_vertex));
 			func_add_param("index",			TypeInt);
 			func_add_param("skin",			TypeInt);
-		class_add_func("ResetAnimation",		TypeVoid,		x_p(mf((tmf)&Model::ResetAnimation)));
-		class_add_func("Animate",				TypeBool,		x_p(mf((tmf)&Model::Animate)));
+		class_add_func("ResetAnimation",		TypeVoid,		x_p(mf(&Model::ResetAnimation)));
+		class_add_func("Animate",				TypeBool,		x_p(mf(&Model::Animate)));
 			func_add_param("operation",		TypeInt);
 			func_add_param("param1",		TypeFloat);
 			func_add_param("param2",		TypeFloat);
@@ -530,19 +516,19 @@ void SIAddPackageX()
 			func_add_param("dt",			TypeFloat);
 			func_add_param("v",				TypeFloat);
 			func_add_param("loop",			TypeBool);
-		class_add_func("GetFrames",		TypeInt,		x_p(mf((tmf)&Model::GetFrames)));
+		class_add_func("GetFrames",		TypeInt,		x_p(mf(&Model::GetFrames)));
 			func_add_param("move",			TypeInt);
-		class_add_func("BeginEditAnimation",	TypeVoid,		x_p(mf((tmf)&Model::BeginEditAnimation)));
-		class_add_func("MakeEditable",		TypeVoid,		x_p(mf((tmf)&Model::MakeEditable)));
-		class_add_func("BeginEdit",		TypeVoid,		x_p(mf((tmf)&Model::BeginEdit)));
+		class_add_func("BeginEditAnimation",	TypeVoid,		x_p(mf(&Model::BeginEditAnimation)));
+		class_add_func("MakeEditable",		TypeVoid,		x_p(mf(&Model::MakeEditable)));
+		class_add_func("BeginEdit",		TypeVoid,		x_p(mf(&Model::BeginEdit)));
 			func_add_param("skin",			TypeInt);
-		class_add_func("EndEdit",			TypeVoid,		x_p(mf((tmf)&Model::EndEdit)));
+		class_add_func("EndEdit",			TypeVoid,		x_p(mf(&Model::EndEdit)));
 			func_add_param("skin",			TypeInt);
-		class_add_func("SetBoneModel",		TypeVoid,		x_p(mf((tmf)&Model::SetBoneModel)));
+		class_add_func("SetBoneModel",		TypeVoid,		x_p(mf(&Model::SetBoneModel)));
 			func_add_param("index",			TypeInt);
 			func_add_param("bone",			TypeModelP);
-		class_add_func("GetFilename",		TypeString,		x_p(mf((tmf)&Model::GetFilename)));
-		class_add_func("GetRoot",			TypeModelP,		x_p(mf((tmf)&Model::GetRoot)));
+		class_add_func("GetFilename",		TypeString,		x_p(mf(&Model::GetFilename)));
+		class_add_func("GetRoot",			TypeModelP,		x_p(mf(&Model::GetRoot)));
 
 	add_class(TypeTerrain);
 		class_add_element("pos",			TypeVector,		GetDATerrain(pos));
@@ -552,18 +538,16 @@ void SIAddPackageX()
 		class_add_element("pattern",		TypeVector,		GetDATerrain(pattern));
 		class_add_element("material",		TypeMaterialP,	GetDATerrain(material));
 		class_add_element("texture_scale",	TypeVectorArray,GetDATerrain(texture_scale));
-		class_add_func("Update",			TypeVoid,		x_p(mf((tmf)&Terrain::Update)));
+		class_add_func("Update",			TypeVoid,		x_p(mf(&Terrain::Update)));
 			func_add_param("x1",		TypeInt);
 			func_add_param("x2",		TypeInt);
 			func_add_param("z1",		TypeInt);
 			func_add_param("z2",		TypeInt);
 			func_add_param("mode",		TypeInt);
-		class_add_func("GetHeight",			TypeFloat,		x_p(mf((tmf)&Terrain::gimme_height)));
+		class_add_func("GetHeight",			TypeFloat,		x_p(mf(&Terrain::gimme_height)));
 			func_add_param("p",			TypeVector);
 
 	add_class(TypeCamera);
-		class_set_vtable_x(Camera);
-		TypeCamera->vtable = new VirtualTable[10];
 		class_add_element("enabled",		TypeBool,		GetDACamera(enabled));
 		class_add_element("show",			TypeBool,		GetDACamera(show));
 		class_add_element("texture_out",	TypeInt,		GetDACamera(output_texture));
@@ -582,22 +566,22 @@ void SIAddPackageX()
 		class_add_element("max_depth",		TypeFloat,		GetDACamera(max_depth));
 		class_add_element("clipping_plane",	TypePlaneList,	GetDACamera(clipping_plane));
 		class_add_element("ignore",			TypeModelPList,	GetDACamera(ignore));
-		class_add_func("__init__",		TypeVoid,	x_p(mf((tmf)&Camera::__init_ext__)));
+		class_add_func("__init__",		TypeVoid,	x_p(mf(&Camera::__init_ext__)));
 			func_add_param("pos",		TypeVector);
 			func_add_param("ang",		TypeVector);
 			func_add_param("dest",		TypeRect);
-		class_add_func("__init__",		TypeVoid,	x_p(mf((tmf)&Camera::__init__)));
-		class_add_func("__delete__",		TypeVoid,	x_p(mf((tmf)&Camera::__delete__)));
-		class_add_func("StartScript",		TypeVoid,	x_p(mf((tmf)&Camera::StartScript)));
+		class_add_func("__init__",		TypeVoid,	x_p(mf(&Camera::__init__)));
+		class_add_func_virtual("__delete__",		TypeVoid,	x_p(mf(&Camera::__delete__)));
+		class_add_func("StartScript",		TypeVoid,	x_p(mf(&Camera::StartScript)));
 			func_add_param("filename",		TypeString);
 			func_add_param("dpos",			TypeVector);
-		class_add_func("StopScript",		TypeVoid,	x_p(mf((tmf)&Camera::StopScript)));
-		class_add_func("OnIterate",		TypeVoid,	x_p(mf((tmf)&Camera::OnIterate)));
-		class_add_func("Project",		TypeVector,	amd64_wrap(mf((tmf)&Camera::Project), &amd64_camera_project));
+		class_add_func("StopScript",		TypeVoid,	x_p(mf(&Camera::StopScript)));
+		class_add_func_virtual("OnIterate",		TypeVoid,	x_p(mf(&Camera::OnIterate)));
+		class_add_func("Project",		TypeVector,	amd64_wrap(mf(&Camera::Project), &amd64_camera_project));
 			func_add_param("v",			TypeVector);
-		class_add_func("Unproject",		TypeVector,	amd64_wrap(mf((tmf)&Camera::Unproject), &amd64_camera_unproject));
+		class_add_func("Unproject",		TypeVector,	amd64_wrap(mf(&Camera::Unproject), &amd64_camera_unproject));
 			func_add_param("v",			TypeVector);
-		TypeCamera->LinkVirtualTable();
+		class_set_vtable_x(Camera);
 	
 	add_class(TypeWorldData);
 		class_add_element("filename",		TypeString,		GetDAWorld(filename));
@@ -655,9 +639,9 @@ void SIAddPackageX()
 		class_add_element("session",		TypeString,		GetDAHostData(session));
 	
 	add_class(TypeHostDataList);
-		class_add_func("__init__",		TypeVoid,	x_p(mf((tmf)&HostDataList::__init__)));
-		class_add_func("__delete__",		TypeVoid,	x_p(mf((tmf)&HostDataList::__delete__)));
-		class_add_func("__assign__",		TypeVoid,	x_p(mf((tmf)&HostDataList::__assign__)));
+		class_add_func("__init__",		TypeVoid,	x_p(mf(&HostDataList::__init__)));
+		class_add_func("__delete__",		TypeVoid,	x_p(mf(&HostDataList::__delete__)));
+		class_add_func("__assign__",		TypeVoid,	x_p(mf(&HostDataList::__assign__)));
 			func_add_param("other",			TypeHostDataList);
 	
 	add_func("XFDrawStr",			TypeFloat,	x_p(&XFDrawStr));

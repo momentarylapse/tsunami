@@ -7,6 +7,8 @@
 
 #include "HuiControlToggleButton.h"
 
+#ifdef HUI_API_GTK
+
 void *get_gtk_image(const string &image, bool large); // -> hui_menu_gtk.cpp
 
 void OnGtkToggleButtonToggle(GtkWidget *widget, gpointer data)
@@ -29,6 +31,7 @@ HuiControlToggleButton::~HuiControlToggleButton()
 
 string HuiControlToggleButton::GetString()
 {
+	return "";
 }
 
 void HuiControlToggleButton::__SetString(const string &str)
@@ -51,3 +54,5 @@ bool HuiControlToggleButton::IsChecked()
 {
 	return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }
+
+#endif

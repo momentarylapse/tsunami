@@ -7,59 +7,59 @@
 class matrix;
 class matrix3;
 
-struct vector
+class vector
 {
 public:
 	float x, y, z;
 	vector(){};
 	vector(float x, float y, float z);
 	// assignment operators
-	vector& operator += (const vector& v);
-	vector& operator -= (const vector& v);
-	vector& operator *= (float f);
-	vector& operator /= (float f);
+	vector& _cdecl operator += (const vector& v);
+	vector& _cdecl operator -= (const vector& v);
+	vector& _cdecl operator *= (float f);
+	vector& _cdecl operator /= (float f);
 	// unitary operator(s)
-	vector operator - () const;
+	vector _cdecl operator - () const;
 	// binary operators
-	vector operator + (const vector &v) const;
-	vector operator - (const vector &v) const;
-	vector operator * (float f) const;
-	vector operator / (float f) const;
-	friend vector operator * (float f,const vector &v)
+	vector _cdecl operator + (const vector &v) const;
+	vector _cdecl operator - (const vector &v) const;
+	vector _cdecl operator * (float f) const;
+	vector _cdecl operator / (float f) const;
+	friend vector _cdecl operator * (float f,const vector &v)
 	{	return v*f;	}
-	bool operator == (const vector &v) const;
-	bool operator != (const vector &v) const;
-	float operator * (const vector &v) const;
+	bool _cdecl operator == (const vector &v) const;
+	bool _cdecl operator != (const vector &v) const;
+	float _cdecl operator * (const vector &v) const;
 	vector operator ^ (const vector &v) const;
-	string str() const;
+	string _cdecl str() const;
 
-	float length() const;
-	float length_sqr() const;
-	float length_fuzzy() const;
-	void normalize();
-	vector ang2dir() const;
-	vector dir2ang() const;
-	vector dir2ang2(const vector &up) const;
-	vector ortho() const;
-	int important_plane() const;
-	vector rotate(const vector &ang) const;
-	vector transform(const matrix &m) const;
-	vector transform_normal(const matrix &m) const;
-	vector untransform(const matrix &m) const;
-	vector transform3(const matrix3 &m) const;
-	void _min(const vector &test_partner);
-	void _max(const vector &test_partner);
-	bool between(const vector &a, const vector &b) const;
-	float factor_between(const vector &a, const vector &b) const;
-	bool bounding_cube(const vector &a, float r) const;
+	float _cdecl length() const;
+	float _cdecl length_sqr() const;
+	float _cdecl length_fuzzy() const;
+	void _cdecl normalize();
+	vector _cdecl ang2dir() const;
+	vector _cdecl dir2ang() const;
+	vector _cdecl dir2ang2(const vector &up) const;
+	vector _cdecl ortho() const;
+	int _cdecl important_plane() const;
+	vector _cdecl rotate(const vector &ang) const;
+	vector _cdecl transform(const matrix &m) const;
+	vector _cdecl transform_normal(const matrix &m) const;
+	vector _cdecl untransform(const matrix &m) const;
+	vector _cdecl transform3(const matrix3 &m) const;
+	void _cdecl _min(const vector &test_partner);
+	void _cdecl _max(const vector &test_partner);
+	bool _cdecl between(const vector &a, const vector &b) const;
+	float _cdecl factor_between(const vector &a, const vector &b) const;
+	bool _cdecl bounding_cube(const vector &a, float r) const;
 };
 // vectors
 float _cdecl VecDotProduct(const vector &v1, const vector &v2);
 vector _cdecl VecCrossProduct(const vector &v1, const vector &v2);
 vector _cdecl VecAngAdd(const vector &ang1, const vector &ang2);
 vector _cdecl VecAngInterpolate(const vector &ang1, const vector &ang2, float t);
-float VecLineDistance(const vector &p, const vector &l1, const vector &l2);
-vector VecLineNearestPoint(const vector &p, const vector &l1, const vector &l2);
+float _cdecl VecLineDistance(const vector &p, const vector &l1, const vector &l2);
+vector _cdecl VecLineNearestPoint(const vector &p, const vector &l1, const vector &l2);
 
 const vector v_0 = vector(0, 0, 0);
 const vector e_x = vector(1, 0, 0);

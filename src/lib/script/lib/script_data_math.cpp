@@ -81,16 +81,16 @@ float _cdecl f_sqr(float f){	return f*f;	}
 class IntList : public Array<int>
 {
 public:
-	int sum()
+	int _cdecl sum()
 	{
 		int r = 0;
 		for (int i=0;i<num;i++)
 			r += (*this)[i];
 		return r;
 	}
-	void sort()
+	void _cdecl sort()
 	{	std::sort((int*)data, (int*)data + num);	}
-	void unique()
+	void _cdecl unique()
 	{
 		int ndiff = 0;
 		int i0 = 1;
@@ -106,52 +106,52 @@ public:
 	}
 	
 	// a += b
-	void iadd(IntList &b)	IMPLEMENT_IOP(+=, int)
-	void isub(IntList &b)	IMPLEMENT_IOP(-=, int)
-	void imul(IntList &b)	IMPLEMENT_IOP(*=, int)
-	void idiv(IntList &b)	IMPLEMENT_IOP(/=, int)
+	void _cdecl iadd(IntList &b)	IMPLEMENT_IOP(+=, int)
+	void _cdecl isub(IntList &b)	IMPLEMENT_IOP(-=, int)
+	void _cdecl imul(IntList &b)	IMPLEMENT_IOP(*=, int)
+	void _cdecl idiv(IntList &b)	IMPLEMENT_IOP(/=, int)
 
 	// a = b + c
-	IntList add(IntList &b)	IMPLEMENT_OP(+, int, IntList)
-	IntList sub(IntList &b)	IMPLEMENT_OP(-, int, IntList)
-	IntList mul(IntList &b)	IMPLEMENT_OP(*, int, IntList)
-	IntList div(IntList &b)	IMPLEMENT_OP(/, int, IntList)
+	IntList _cdecl add(IntList &b)	IMPLEMENT_OP(+, int, IntList)
+	IntList _cdecl sub(IntList &b)	IMPLEMENT_OP(-, int, IntList)
+	IntList _cdecl mul(IntList &b)	IMPLEMENT_OP(*, int, IntList)
+	IntList _cdecl div(IntList &b)	IMPLEMENT_OP(/, int, IntList)
 
 	// a += x
-	void add2(int x)	IMPLEMENT_IOP2(+=, int)
-	void sub2(int x)	IMPLEMENT_IOP2(-=, int)
-	void mul2(int x)	IMPLEMENT_IOP2(*=, int)
-	void div2(int x)	IMPLEMENT_IOP2(/=, int)
-	void assign_int(int x)	IMPLEMENT_IOP2(=, int)
+	void _cdecl add2(int x)	IMPLEMENT_IOP2(+=, int)
+	void _cdecl sub2(int x)	IMPLEMENT_IOP2(-=, int)
+	void _cdecl mul2(int x)	IMPLEMENT_IOP2(*=, int)
+	void _cdecl div2(int x)	IMPLEMENT_IOP2(/=, int)
+	void _cdecl assign_int(int x)	IMPLEMENT_IOP2(=, int)
 };
 
 
 
 
-void super_array_add_s_com(DynamicArray *a, DynamicArray *b)
+void _cdecl super_array_add_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) += *(pb ++);	}
-void super_array_sub_s_com(DynamicArray *a, DynamicArray *b)
+void _cdecl super_array_sub_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) -= *(pb ++);	}
-void super_array_mul_s_com(DynamicArray *a, DynamicArray *b)
+void _cdecl super_array_mul_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) *= *(pb ++);	}
-void super_array_div_s_com(DynamicArray *a, DynamicArray *b)
+void _cdecl super_array_div_s_com(DynamicArray *a, DynamicArray *b)
 {	int n = min(a->num, b->num);	complex *pa = (complex*)a->data;	complex *pb = (complex*)b->data;	for (int i=0;i<n;i++)	*(pa ++) /= *(pb ++);	}
 
-void super_array_add_s_com_com(DynamicArray *a, complex x)
+void _cdecl super_array_add_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) += x;	}
-void super_array_sub_s_com_com(DynamicArray *a, complex x)
+void _cdecl super_array_sub_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) -= x;	}
-void super_array_mul_s_com_com(DynamicArray *a, complex x)
+void _cdecl super_array_mul_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
-void super_array_div_s_com_com(DynamicArray *a, complex x)
+void _cdecl super_array_div_s_com_com(DynamicArray *a, complex x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) /= x;	}
-void super_array_mul_s_com_float(DynamicArray *a, float x)
+void _cdecl super_array_mul_s_com_float(DynamicArray *a, float x)
 {	complex *pa = (complex*)a->data;	for (int i=0;i<a->num;i++)	*(pa ++) *= x;	}
 
 class FloatList : public Array<float>
 {
 public:
-	float _max()
+	float _cdecl _max()
 	{
 		float max = 0;
 		if (num > 0)
@@ -161,7 +161,7 @@ public:
 				max = (*this)[i];
 		return max;
 	}
-	float _min()
+	float _cdecl _min()
 	{
 		float min = 0;
 		if (num > 0)
@@ -171,14 +171,14 @@ public:
 				min = (*this)[i];
 		return min;
 	}
-	float sum()
+	float _cdecl sum()
 	{
 		float r = 0;
 		for (int i=0;i<num;i++)
 			r += (*this)[i];
 		return r;
 	}
-	float sum2()
+	float _cdecl sum2()
 	{
 		float r = 0;
 		for (int i=0;i<num;i++)
@@ -186,40 +186,40 @@ public:
 		return r;
 	}
 
-	void sort()
+	void _cdecl sort()
 	{	std::sort((float*)data, (float*)data + num);	}
 	
 	// a += b
-	void iadd(FloatList &b)	IMPLEMENT_IOP(+=, float)
-	void isub(FloatList &b)	IMPLEMENT_IOP(-=, float)
-	void imul(FloatList &b)	IMPLEMENT_IOP(*=, float)
-	void idiv(FloatList &b)	IMPLEMENT_IOP(/=, float)
+	void _cdecl iadd(FloatList &b)	IMPLEMENT_IOP(+=, float)
+	void _cdecl isub(FloatList &b)	IMPLEMENT_IOP(-=, float)
+	void _cdecl imul(FloatList &b)	IMPLEMENT_IOP(*=, float)
+	void _cdecl idiv(FloatList &b)	IMPLEMENT_IOP(/=, float)
 
 	// a = b + c
-	FloatList add(FloatList &b)	IMPLEMENT_OP(+, float, FloatList)
-	FloatList sub(FloatList &b)	IMPLEMENT_OP(-, float, FloatList)
-	FloatList mul(FloatList &b)	IMPLEMENT_OP(*, float, FloatList)
-	FloatList div(FloatList &b)	IMPLEMENT_OP(/, float, FloatList)
+	FloatList _cdecl add(FloatList &b)	IMPLEMENT_OP(+, float, FloatList)
+	FloatList _cdecl sub(FloatList &b)	IMPLEMENT_OP(-, float, FloatList)
+	FloatList _cdecl mul(FloatList &b)	IMPLEMENT_OP(*, float, FloatList)
+	FloatList _cdecl div(FloatList &b)	IMPLEMENT_OP(/, float, FloatList)
 
 	// a += x
-	void iadd2(float x)	IMPLEMENT_IOP2(+=, float)
-	void isub2(float x)	IMPLEMENT_IOP2(-=, float)
-	void imul2(float x)	IMPLEMENT_IOP2(*=, float)
-	void idiv2(float x)	IMPLEMENT_IOP2(/=, float)
-	void assign_float(float x)	IMPLEMENT_IOP2(=, float)
+	void _cdecl iadd2(float x)	IMPLEMENT_IOP2(+=, float)
+	void _cdecl isub2(float x)	IMPLEMENT_IOP2(-=, float)
+	void _cdecl imul2(float x)	IMPLEMENT_IOP2(*=, float)
+	void _cdecl idiv2(float x)	IMPLEMENT_IOP2(/=, float)
+	void _cdecl assign_float(float x)	IMPLEMENT_IOP2(=, float)
 };
 
 class ComplexList : public Array<complex>
 {
 public:
-	complex sum()
+	complex _cdecl sum()
 	{
 		complex r = complex(0, 0);
 		for (int i=0;i<num;i++)
 			r += (*this)[i];
 		return r;
 	}
-	float sum2()
+	float _cdecl sum2()
 	{
 		float r = 0;
 		for (int i=0;i<num;i++)
@@ -228,28 +228,28 @@ public:
 	}
 	
 	// a += b
-	void iadd(ComplexList &b)	IMPLEMENT_IOP(+=, complex)
-	void isub(ComplexList &b)	IMPLEMENT_IOP(-=, complex)
-	void imul(ComplexList &b)	IMPLEMENT_IOP(*=, complex)
-	void idiv(ComplexList &b)	IMPLEMENT_IOP(/=, complex)
+	void _cdecl iadd(ComplexList &b)	IMPLEMENT_IOP(+=, complex)
+	void _cdecl isub(ComplexList &b)	IMPLEMENT_IOP(-=, complex)
+	void _cdecl imul(ComplexList &b)	IMPLEMENT_IOP(*=, complex)
+	void _cdecl idiv(ComplexList &b)	IMPLEMENT_IOP(/=, complex)
 
 	// a = b + c
-	ComplexList add(ComplexList &b)	IMPLEMENT_OP(+, complex, ComplexList)
-	ComplexList sub(ComplexList &b)	IMPLEMENT_OP(-, complex, ComplexList)
-	ComplexList mul(ComplexList &b)	IMPLEMENT_OP(*, complex, ComplexList)
-	ComplexList div(ComplexList &b)	IMPLEMENT_OP(/, complex, ComplexList)
+	ComplexList _cdecl add(ComplexList &b)	IMPLEMENT_OP(+, complex, ComplexList)
+	ComplexList _cdecl sub(ComplexList &b)	IMPLEMENT_OP(-, complex, ComplexList)
+	ComplexList _cdecl mul(ComplexList &b)	IMPLEMENT_OP(*, complex, ComplexList)
+	ComplexList _cdecl div(ComplexList &b)	IMPLEMENT_OP(/, complex, ComplexList)
 
 	// a += x
-	void iadd2(complex x)	IMPLEMENT_IOP2(+=, complex)
-	void isub2(complex x)	IMPLEMENT_IOP2(-=, complex)
-	void imul2(complex x)	IMPLEMENT_IOP2(*=, complex)
-	void idiv2(complex x)	IMPLEMENT_IOP2(/=, complex)
-	void imul2f(float x)	IMPLEMENT_IOP2(*=, complex)
-	void idiv2f(float x)	IMPLEMENT_IOP2(/=, complex)
-	void assign_complex(complex x)	IMPLEMENT_IOP2(=, complex)
+	void _cdecl iadd2(complex x)	IMPLEMENT_IOP2(+=, complex)
+	void _cdecl isub2(complex x)	IMPLEMENT_IOP2(-=, complex)
+	void _cdecl imul2(complex x)	IMPLEMENT_IOP2(*=, complex)
+	void _cdecl idiv2(complex x)	IMPLEMENT_IOP2(/=, complex)
+	void _cdecl imul2f(float x)	IMPLEMENT_IOP2(*=, complex)
+	void _cdecl idiv2f(float x)	IMPLEMENT_IOP2(/=, complex)
+	void _cdecl assign_complex(complex x)	IMPLEMENT_IOP2(=, complex)
 };
 
-Array<int> int_range(int start, int end)
+Array<int> _cdecl int_range(int start, int end)
 {
 	Array<int> a;
 	//a.__init__(); // done by kaba-constructors for temp variables
@@ -258,7 +258,7 @@ Array<int> int_range(int start, int end)
 	return a;
 }
 
-Array<float> float_range(float start, float end, float step)
+Array<float> _cdecl float_range(float start, float end, float step)
 {
 	Array<float> a;
 	//a.__init__(); // done by kaba-constructors for temp variables
@@ -268,10 +268,10 @@ Array<float> float_range(float start, float end, float step)
 	return a;
 }
 
-float maxf(float a, float b)
+float _cdecl maxf(float a, float b)
 {	return (a > b) ? a : b;	}
 
-float minf(float a, float b)
+float _cdecl minf(float a, float b)
 {	return (a < b) ? a : b;	}
 
 string _cdecl ff2s(complex &x){	return x.str();	}
@@ -406,167 +406,167 @@ void SIAddPackageMath()
 	
 	
 	add_class(TypeIntList);
-		class_add_func("sort", TypeVoid, mf((tmf)&IntList::sort));
-		class_add_func("unique", TypeVoid, mf((tmf)&IntList::unique));
-		class_add_func("sum", TypeInt, mf((tmf)&IntList::sum));
-		class_add_func("__iadd__", TypeVoid, mf((tmf)&IntList::iadd));
+		class_add_func("sort", TypeVoid, mf(&IntList::sort));
+		class_add_func("unique", TypeVoid, mf(&IntList::unique));
+		class_add_func("sum", TypeInt, mf(&IntList::sum));
+		class_add_func("__iadd__", TypeVoid, mf(&IntList::iadd));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__isub__", TypeVoid, mf((tmf)&IntList::isub));
+		class_add_func("__isub__", TypeVoid, mf(&IntList::isub));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__imul__", TypeVoid, mf((tmf)&IntList::imul));
+		class_add_func("__imul__", TypeVoid, mf(&IntList::imul));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__idiv__", TypeVoid, mf((tmf)&IntList::idiv));
+		class_add_func("__idiv__", TypeVoid, mf(&IntList::idiv));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__add__", TypeIntList, mf((tmf)&IntList::add));
+		class_add_func("__add__", TypeIntList, mf(&IntList::add));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__sub__", TypeIntList, mf((tmf)&IntList::sub));
+		class_add_func("__sub__", TypeIntList, mf(&IntList::sub));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__mul__", TypeIntList, mf((tmf)&IntList::mul));
+		class_add_func("__mul__", TypeIntList, mf(&IntList::mul));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__div__", TypeIntList, mf((tmf)&IntList::div));
+		class_add_func("__div__", TypeIntList, mf(&IntList::div));
 			func_add_param("other",	TypeIntList);
-		class_add_func("__assign__", TypeVoid, mf((tmf)&IntList::assign_int));
+		class_add_func("__assign__", TypeVoid, mf(&IntList::assign_int));
 			func_add_param("other",	TypeInt);
 
 	add_class(TypeFloatList);
-		class_add_func("sort", TypeVoid, mf((tmf)&FloatList::sort));
-		class_add_func("sum", TypeFloat, mf((tmf)&FloatList::sum));
-		class_add_func("sum2", TypeFloat, mf((tmf)&FloatList::sum2));
-		class_add_func("max", TypeFloat, mf((tmf)&FloatList::_max));
-		class_add_func("min", TypeFloat, mf((tmf)&FloatList::_min));
-		class_add_func("__iadd__", TypeVoid, mf((tmf)&FloatList::iadd));
+		class_add_func("sort", TypeVoid, mf(&FloatList::sort));
+		class_add_func("sum", TypeFloat, mf(&FloatList::sum));
+		class_add_func("sum2", TypeFloat, mf(&FloatList::sum2));
+		class_add_func("max", TypeFloat, mf(&FloatList::_max));
+		class_add_func("min", TypeFloat, mf(&FloatList::_min));
+		class_add_func("__iadd__", TypeVoid, mf(&FloatList::iadd));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__isub__", TypeVoid, mf((tmf)&FloatList::isub));
+		class_add_func("__isub__", TypeVoid, mf(&FloatList::isub));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__imul__", TypeVoid, mf((tmf)&FloatList::imul));
+		class_add_func("__imul__", TypeVoid, mf(&FloatList::imul));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__idiv__", TypeVoid, mf((tmf)&FloatList::idiv));
+		class_add_func("__idiv__", TypeVoid, mf(&FloatList::idiv));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__add__", TypeFloatList, mf((tmf)&FloatList::add));
+		class_add_func("__add__", TypeFloatList, mf(&FloatList::add));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__sub__", TypeFloatList, mf((tmf)&FloatList::sub));
+		class_add_func("__sub__", TypeFloatList, mf(&FloatList::sub));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__mul__", TypeFloatList, mf((tmf)&FloatList::mul));
+		class_add_func("__mul__", TypeFloatList, mf(&FloatList::mul));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__div__", TypeFloatList, mf((tmf)&FloatList::div));
+		class_add_func("__div__", TypeFloatList, mf(&FloatList::div));
 			func_add_param("other",	TypeFloatList);
-		class_add_func("__iadd__", TypeVoid, mf((tmf)&FloatList::iadd2));
+		class_add_func("__iadd__", TypeVoid, mf(&FloatList::iadd2));
 			func_add_param("other",	TypeFloat);
-		class_add_func("__isub__", TypeVoid, mf((tmf)&FloatList::isub2));
+		class_add_func("__isub__", TypeVoid, mf(&FloatList::isub2));
 			func_add_param("other",	TypeFloat);
-		class_add_func("__imul__", TypeVoid, mf((tmf)&FloatList::imul2));
+		class_add_func("__imul__", TypeVoid, mf(&FloatList::imul2));
 			func_add_param("other",	TypeFloat);
-		class_add_func("__idiv__", TypeVoid, mf((tmf)&FloatList::idiv2));
+		class_add_func("__idiv__", TypeVoid, mf(&FloatList::idiv2));
 			func_add_param("other",	TypeFloat);
-		class_add_func("__assign__", TypeVoid, mf((tmf)&FloatList::assign_float));
+		class_add_func("__assign__", TypeVoid, mf(&FloatList::assign_float));
 			func_add_param("other",	TypeFloat);
 
 	add_class(TypeComplexList);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&ComplexList::__init__));
-		class_add_func("sum",	TypeComplex, amd64_wrap(mf((tmf)&ComplexList::sum), &amd64_comlist_sum));
-		class_add_func("sum2",	TypeFloat, mf((tmf)&ComplexList::sum2));
-		class_add_func("__iadd__", TypeVoid, mf((tmf)&ComplexList::iadd));
+		class_add_func("__init__",	TypeVoid, mf(&ComplexList::__init__));
+		class_add_func("sum",	TypeComplex, amd64_wrap(mf(&ComplexList::sum), &amd64_comlist_sum));
+		class_add_func("sum2",	TypeFloat, mf(&ComplexList::sum2));
+		class_add_func("__iadd__", TypeVoid, mf(&ComplexList::iadd));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__isub__", TypeVoid, mf((tmf)&ComplexList::isub));
+		class_add_func("__isub__", TypeVoid, mf(&ComplexList::isub));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__imul__", TypeVoid, mf((tmf)&ComplexList::imul));
+		class_add_func("__imul__", TypeVoid, mf(&ComplexList::imul));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__idiv__", TypeVoid, mf((tmf)&ComplexList::idiv));
+		class_add_func("__idiv__", TypeVoid, mf(&ComplexList::idiv));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__add__", TypeComplexList, mf((tmf)&ComplexList::add));
+		class_add_func("__add__", TypeComplexList, mf(&ComplexList::add));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__sub__", TypeComplexList, mf((tmf)&ComplexList::sub));
+		class_add_func("__sub__", TypeComplexList, mf(&ComplexList::sub));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__mul__", TypeComplexList, mf((tmf)&ComplexList::mul));
+		class_add_func("__mul__", TypeComplexList, mf(&ComplexList::mul));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__div__", TypeComplexList, mf((tmf)&ComplexList::div));
+		class_add_func("__div__", TypeComplexList, mf(&ComplexList::div));
 			func_add_param("other",	TypeComplexList);
-		class_add_func("__iadd__", TypeVoid, mf((tmf)&ComplexList::iadd2));
+		class_add_func("__iadd__", TypeVoid, mf(&ComplexList::iadd2));
 			func_add_param("other",	TypeComplex);
-		class_add_func("__isub__", TypeVoid, mf((tmf)&ComplexList::isub2));
+		class_add_func("__isub__", TypeVoid, mf(&ComplexList::isub2));
 			func_add_param("other",	TypeComplex);
-		class_add_func("__imul__", TypeVoid, mf((tmf)&ComplexList::imul2));
+		class_add_func("__imul__", TypeVoid, mf(&ComplexList::imul2));
 			func_add_param("other",	TypeComplex);
-		class_add_func("__idiv__", TypeVoid, mf((tmf)&ComplexList::idiv2));
+		class_add_func("__idiv__", TypeVoid, mf(&ComplexList::idiv2));
 			func_add_param("other",	TypeComplex);
-		class_add_func("__imul__", TypeVoid, mf((tmf)&ComplexList::imul2f));
+		class_add_func("__imul__", TypeVoid, mf(&ComplexList::imul2f));
 			func_add_param("other",	TypeFloat);
-		class_add_func("__idiv__", TypeVoid, mf((tmf)&ComplexList::idiv2f));
+		class_add_func("__idiv__", TypeVoid, mf(&ComplexList::idiv2f));
 			func_add_param("other",	TypeFloat);
-		class_add_func("__assign__", TypeVoid, mf((tmf)&ComplexList::assign_complex));
+		class_add_func("__assign__", TypeVoid, mf(&ComplexList::assign_complex));
 			func_add_param("other",	TypeComplex);
 	
 	add_class(TypeVectorList);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<vector>::__init__));
+		class_add_func("__init__",	TypeVoid, mf(&Array<vector>::__init__));
 	add_class(TypePlaneList);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&Array<plane>::__init__));
+		class_add_func("__init__",	TypeVoid, mf(&Array<plane>::__init__));
 
 	
 	add_class(TypeComplex);
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
-		class_add_func("abs",		TypeFloat,			mf((tmf)&complex::abs));
-		class_add_func("abs_sqr",	TypeFloat,			mf((tmf)&complex::abs_sqr));
-		class_add_func("str",		TypeString,			mf((tmf)&complex::str));
+		class_add_func("abs",		TypeFloat,			mf(&complex::abs));
+		class_add_func("abs_sqr",	TypeFloat,			mf(&complex::abs_sqr));
+		class_add_func("str",		TypeString,			mf(&complex::str));
 	
 	add_class(TypeVector);
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_element("z",		TypeFloat,	8);
-		class_add_func("length",			TypeFloat,	type_p(mf((tmf)&vector::length)));
-		class_add_func("length_sqr",		TypeFloat,	type_p(mf((tmf)&vector::length_sqr)));
-		class_add_func("length_fuzzy",		TypeFloat,	type_p(mf((tmf)&vector::length_fuzzy)));
-		class_add_func("normalize",		TypeVoid,	type_p(mf((tmf)&vector::normalize)));
-		class_add_func("dir2ang",			TypeVector,	amd64_wrap(mf((tmf)&vector::dir2ang), &amd64_vec_dir2ang));
-		class_add_func("dir2ang2",			TypeVector,	amd64_wrap(mf((tmf)&vector::dir2ang2), &amd64_vec_dir2ang2));
+		class_add_func("length",			TypeFloat,	type_p(mf(&vector::length)));
+		class_add_func("length_sqr",		TypeFloat,	type_p(mf(&vector::length_sqr)));
+		class_add_func("length_fuzzy",		TypeFloat,	type_p(mf(&vector::length_fuzzy)));
+		class_add_func("normalize",		TypeVoid,	type_p(mf(&vector::normalize)));
+		class_add_func("dir2ang",			TypeVector,	amd64_wrap(mf(&vector::dir2ang), &amd64_vec_dir2ang));
+		class_add_func("dir2ang2",			TypeVector,	amd64_wrap(mf(&vector::dir2ang2), &amd64_vec_dir2ang2));
 			func_add_param("up",		TypeVector);
-		class_add_func("ang2dir",			TypeVector,	amd64_wrap(mf((tmf)&vector::ang2dir), &amd64_vec_ang2dir));
-		class_add_func("rotate",			TypeVector,	amd64_wrap(mf((tmf)&vector::rotate), &amd64_vec_rotate));
+		class_add_func("ang2dir",			TypeVector,	amd64_wrap(mf(&vector::ang2dir), &amd64_vec_ang2dir));
+		class_add_func("rotate",			TypeVector,	amd64_wrap(mf(&vector::rotate), &amd64_vec_rotate));
 			func_add_param("ang",		TypeVector);
-		class_add_func("transform",		TypeVector,	amd64_wrap(mf((tmf)&vector::transform), &amd64_vec_transform));
+		class_add_func("transform",		TypeVector,	amd64_wrap(mf(&vector::transform), &amd64_vec_transform));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("transform_normal",	TypeVector,	amd64_wrap(mf((tmf)&vector::transform_normal), &amd64_vec_transform_normal));
+		class_add_func("transform_normal",	TypeVector,	amd64_wrap(mf(&vector::transform_normal), &amd64_vec_transform_normal));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("untransform",		TypeVector,	amd64_wrap(mf((tmf)&vector::untransform), &amd64_vec_untransform));
+		class_add_func("untransform",		TypeVector,	amd64_wrap(mf(&vector::untransform), &amd64_vec_untransform));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("__div__",		TypeVector,	amd64_wrap(mf((tmf)&vector::untransform), &amd64_vec_untransform));
+		class_add_func("__div__",		TypeVector,	amd64_wrap(mf(&vector::untransform), &amd64_vec_untransform));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("ortho",			TypeVector,	amd64_wrap(mf((tmf)&vector::ortho), &amd64_vec_ortho));
-		class_add_func("str",		TypeString,			mf((tmf)&vector::str));
+		class_add_func("ortho",			TypeVector,	amd64_wrap(mf(&vector::ortho), &amd64_vec_ortho));
+		class_add_func("str",		TypeString,			mf(&vector::str));
 	
 	add_class(TypeQuaternion);
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_element("z",		TypeFloat,	8);
 		class_add_element("w",		TypeFloat,	12);
-		class_add_func("__mul__", TypeQuaternion, amd64_wrap(mf((tmf)&quaternion::mul), &amd64_quat_mul));
+		class_add_func("__mul__", TypeQuaternion, amd64_wrap(mf(&quaternion::mul), &amd64_quat_mul));
 			func_add_param("other",	TypeQuaternion);
-		class_add_func("__imul__", TypeVoid, mf((tmf)&quaternion::imul));
+		class_add_func("__imul__", TypeVoid, mf(&quaternion::imul));
 			func_add_param("other",	TypeQuaternion);
-		class_add_func("inverse",	TypeVoid,	mf((tmf)&quaternion::inverse));
-		class_add_func("normalize",	TypeVoid,	mf((tmf)&quaternion::normalize));
-		class_add_func("get_angles",	TypeVector,	amd64_wrap(mf((tmf)&quaternion::get_angles), &amd64_quat_get_angles));
-		class_add_func("str",		TypeString,			mf((tmf)&quaternion::str));
+		class_add_func("inverse",	TypeVoid,	mf(&quaternion::inverse));
+		class_add_func("normalize",	TypeVoid,	mf(&quaternion::normalize));
+		class_add_func("get_angles",	TypeVector,	amd64_wrap(mf(&quaternion::get_angles), &amd64_quat_get_angles));
+		class_add_func("str",		TypeString,			mf(&quaternion::str));
 	
 	add_class(TypeRect);
 		class_add_element("x1",	TypeFloat,	0);
 		class_add_element("x2",	TypeFloat,	4);
 		class_add_element("y1",	TypeFloat,	8);
 		class_add_element("y2",	TypeFloat,	12);
-		class_add_func("width",		TypeFloat,			mf((tmf)&rect::width));
-		class_add_func("height",	TypeFloat,			mf((tmf)&rect::height));
-		class_add_func("area",		TypeFloat,			mf((tmf)&rect::area));
-		class_add_func("inside",	TypeBool,			mf((tmf)&rect::inside));
+		class_add_func("width",		TypeFloat,			mf(&rect::width));
+		class_add_func("height",	TypeFloat,			mf(&rect::height));
+		class_add_func("area",		TypeFloat,			mf(&rect::area));
+		class_add_func("inside",	TypeBool,			mf(&rect::inside));
 			func_add_param("x",	TypeFloat);
 			func_add_param("y",	TypeFloat);
-		class_add_func("str",		TypeString,			mf((tmf)&rect::str));
+		class_add_func("str",		TypeString,			mf(&rect::str));
 	
 	add_class(TypeColor);
 		class_add_element("a",		TypeFloat,	12);
 		class_add_element("r",		TypeFloat,	0);
 		class_add_element("g",		TypeFloat,	4);
 		class_add_element("b",		TypeFloat,	8);
-		class_add_func("str",		TypeString,			mf((tmf)&color::str));
+		class_add_func("str",		TypeString,			mf(&color::str));
 	
 	add_class(TypePlane);
 		class_add_element("a",		TypeFloat,	0);
@@ -574,14 +574,14 @@ void SIAddPackageMath()
 		class_add_element("c",		TypeFloat,	8);
 		class_add_element("d",		TypeFloat,	12);
 		class_add_element("n",		TypeVector,	0);
-		class_add_func("intersect_line",	TypeBool,	mf((tmf)&plane::intersect_line));
+		class_add_func("intersect_line",	TypeBool,	mf(&plane::intersect_line));
 			func_add_param("l1",		TypeVector);
 			func_add_param("l2",		TypeVector);
 			func_add_param("inter",		TypeVector);
-		class_add_func("inverse",	TypeVoid,	mf((tmf)&plane::inverse));
-		class_add_func("distance",	TypeFloat,	mf((tmf)&plane::distance));
+		class_add_func("inverse",	TypeVoid,	mf(&plane::inverse));
+		class_add_func("distance",	TypeFloat,	mf(&plane::distance));
 			func_add_param("p",		TypeVector);
-		class_add_func("str",		TypeString,			mf((tmf)&plane::str));
+		class_add_func("str",		TypeString,			mf(&plane::str));
 	
 	add_class(TypeMatrix);
 		class_add_element("_00",	TypeFloat,	0);
@@ -602,13 +602,13 @@ void SIAddPackageMath()
 		class_add_element("_33",	TypeFloat,	60);
 		class_add_element("e",		TypeFloatArray4x4,	0);
 		class_add_element("_e",		TypeFloatArray16,	0);
-		class_add_func("__imul__",	TypeVoid,	mf((tmf)&matrix::imul));
+		class_add_func("__imul__",	TypeVoid,	mf(&matrix::imul));
 			func_add_param("other",	TypeMatrix);
-		class_add_func("__mul__",	TypeMatrix,	mf((tmf)&matrix::mul));
+		class_add_func("__mul__",	TypeMatrix,	mf(&matrix::mul));
 			func_add_param("other",	TypeMatrix);
-		class_add_func("__mul__",	TypeVector,	amd64_wrap(mf((tmf)&matrix::mul_v), &amd64_mat_vec_mul));
+		class_add_func("__mul__",	TypeVector,	amd64_wrap(mf(&matrix::mul_v), &amd64_mat_vec_mul));
 			func_add_param("other",	TypeVector);
-		class_add_func("str",		TypeString,			mf((tmf)&matrix::str));
+		class_add_func("str",		TypeString,			mf(&matrix::str));
 	
 	add_class(TypeMatrix3);
 		class_add_element("_11",	TypeFloat,	0);
@@ -622,122 +622,122 @@ void SIAddPackageMath()
 		class_add_element("_33",	TypeFloat,	32);
 		class_add_element("e",		TypeFloatArray3x3,	0);
 		class_add_element("_e",		TypeFloatArray9,	0);
-		class_add_func("str",		TypeString,			mf((tmf)&matrix3::str));
+		class_add_func("str",		TypeString,			mf(&matrix3::str));
 	
 	add_class(TypeVli);
 		class_add_element("sign",	TypeBool,	0);
 		class_add_element("data",	TypeIntList,	4);
-		class_add_func("__init__",	TypeVoid, algebra_p(mf((tmf)&vli::__init__)));
-		class_add_func("__delete__",	TypeVoid, algebra_p(mf((tmf)&vli::__delete__)));
-		class_add_func("__assign__",			TypeVoid,			algebra_p(mf((tmf)&vli::set_vli)));
+		class_add_func("__init__",	TypeVoid, algebra_p(mf(&vli::__init__)));
+		class_add_func("__delete__",	TypeVoid, algebra_p(mf(&vli::__delete__)));
+		class_add_func("__assign__",			TypeVoid,			algebra_p(mf(&vli::set_vli)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__assign__",			TypeVoid,			algebra_p(mf((tmf)&vli::set_str)));
+		class_add_func("__assign__",			TypeVoid,			algebra_p(mf(&vli::set_str)));
 			func_add_param("s",			TypeString);
-		class_add_func("__assign__",			TypeVoid,			algebra_p(mf((tmf)&vli::set_int)));
+		class_add_func("__assign__",			TypeVoid,			algebra_p(mf(&vli::set_int)));
 			func_add_param("i",			TypeInt);
-		class_add_func("str",		TypeString,			algebra_p(mf((tmf)&vli::to_string)));
-		class_add_func("compare",			TypeInt,			algebra_p(mf((tmf)&vli::compare)));
+		class_add_func("str",		TypeString,			algebra_p(mf(&vli::to_string)));
+		class_add_func("compare",			TypeInt,			algebra_p(mf(&vli::compare)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__eq__",			TypeBool,			algebra_p(mf((tmf)&vli::operator==)));
+		class_add_func("__eq__",			TypeBool,			algebra_p(mf(&vli::operator==)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__ne__",			TypeBool,			algebra_p(mf((tmf)&vli::operator!=)));
+		class_add_func("__ne__",			TypeBool,			algebra_p(mf(&vli::operator!=)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__lt__",			TypeBool,			algebra_p(mf((tmf)&vli::operator<)));
+		class_add_func("__lt__",			TypeBool,			algebra_p(mf(&vli::operator<)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__gt__",			TypeBool,			algebra_p(mf((tmf)&vli::operator>)));
+		class_add_func("__gt__",			TypeBool,			algebra_p(mf(&vli::operator>)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__le__",			TypeBool,			algebra_p(mf((tmf)&vli::operator<=)));
+		class_add_func("__le__",			TypeBool,			algebra_p(mf(&vli::operator<=)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__ge__",			TypeBool,			algebra_p(mf((tmf)&vli::operator>=)));
+		class_add_func("__ge__",			TypeBool,			algebra_p(mf(&vli::operator>=)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__iadd__",			TypeVoid,			algebra_p(mf((tmf)&vli::operator+=)));
+		class_add_func("__iadd__",			TypeVoid,			algebra_p(mf(&vli::operator+=)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__isub__",			TypeVoid,			algebra_p(mf((tmf)&vli::operator-=)));
+		class_add_func("__isub__",			TypeVoid,			algebra_p(mf(&vli::operator-=)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__imul__",			TypeVoid,			algebra_p(mf((tmf)&vli::operator*=)));
+		class_add_func("__imul__",			TypeVoid,			algebra_p(mf(&vli::operator*=)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__add__",			TypeVli,			algebra_p(mf((tmf)&vli::operator+)));
+		class_add_func("__add__",			TypeVli,			algebra_p(mf(&vli::operator+)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__sub__",			TypeVli,			algebra_p(mf((tmf)&vli::operator-)));
+		class_add_func("__sub__",			TypeVli,			algebra_p(mf(&vli::operator-)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__mul__",			TypeVli,			algebra_p(mf((tmf)&vli::operator*)));
+		class_add_func("__mul__",			TypeVli,			algebra_p(mf(&vli::operator*)));
 			func_add_param("v",			TypeVli);
-		class_add_func("idiv",			TypeVoid,			algebra_p(mf((tmf)&vli::idiv)));
+		class_add_func("idiv",			TypeVoid,			algebra_p(mf(&vli::idiv)));
 			func_add_param("div",			TypeVli);
 			func_add_param("rem",			TypeVli);
-		class_add_func("div",			TypeVli,			algebra_p(mf((tmf)&vli::_div)));
+		class_add_func("div",			TypeVli,			algebra_p(mf(&vli::_div)));
 			func_add_param("div",			TypeVli);
 			func_add_param("rem",			TypeVli);
-		class_add_func("pow",			TypeVli,			algebra_p(mf((tmf)&vli::pow)));
+		class_add_func("pow",			TypeVli,			algebra_p(mf(&vli::pow)));
 			func_add_param("exp",			TypeVli);
-		class_add_func("pow_mod",		TypeVli,			algebra_p(mf((tmf)&vli::pow_mod)));
+		class_add_func("pow_mod",		TypeVli,			algebra_p(mf(&vli::pow_mod)));
 			func_add_param("exp",			TypeVli);
 			func_add_param("mod",		TypeVli);
-		class_add_func("gcd",			TypeVli,			algebra_p(mf((tmf)&vli::gcd)));
+		class_add_func("gcd",			TypeVli,			algebra_p(mf(&vli::gcd)));
 			func_add_param("v",			TypeVli);
 	
 	add_class(TypeAny);
 		class_add_element("type",	TypeInt, 0);
 		class_add_element("data",	TypePointer, 4);
-		class_add_func("__init__",	TypeVoid, any_p(mf((tmf)&Any::__init__)));
-		class_add_func("__delete__",	TypeVoid, any_p(mf((tmf)&Any::clear)));
-		class_add_func("__assign__",			TypeVoid,			any_p(mf((tmf)&Any::set)));
+		class_add_func("__init__",	TypeVoid, any_p(mf(&Any::__init__)));
+		class_add_func("__delete__",	TypeVoid, any_p(mf(&Any::clear)));
+		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set)));
 			func_add_param("a",			TypeAny);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf((tmf)&Any::set_str)));
+		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_str)));
 			func_add_param("s",			TypeString);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf((tmf)&Any::set_int)));
+		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_int)));
 			func_add_param("i",			TypeInt);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf((tmf)&Any::set_float)));
+		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_float)));
 			func_add_param("f",			TypeFloat);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf((tmf)&Any::set_bool)));
+		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_bool)));
 			func_add_param("b",			TypeBool);
-		class_add_func("__iadd__",			TypeVoid,			any_p(mf((tmf)&Any::_add)));
+		class_add_func("__iadd__",			TypeVoid,			any_p(mf(&Any::_add)));
 			func_add_param("a",			TypeAny);
-		class_add_func("__isub__",			TypeVoid,			any_p(mf((tmf)&Any::_sub)));
+		class_add_func("__isub__",			TypeVoid,			any_p(mf(&Any::_sub)));
 			func_add_param("a",			TypeAny);
-		class_add_func("clear",	TypeVoid, any_p(mf((tmf)&Any::clear)));
-		class_add_func("get",			TypeAny,			any_p(mf((tmf)&Any::get)));
+		class_add_func("clear",	TypeVoid, any_p(mf(&Any::clear)));
+		class_add_func("get",			TypeAny,			any_p(mf(&Any::get)));
 			func_add_param("key",			TypeString);
-		class_add_func("hset",			TypeVoid,			any_p(mf((tmf)&Any::hset)));
+		class_add_func("hset",			TypeVoid,			any_p(mf(&Any::hset)));
 			func_add_param("key",			TypeString);
 			func_add_param("value",			TypeAny);
-		class_add_func("at",			TypeAny,			any_p(mf((tmf)&Any::at)));
+		class_add_func("at",			TypeAny,			any_p(mf(&Any::at)));
 			func_add_param("index",			TypeInt);
-		class_add_func("aset",			TypeVoid,			any_p(mf((tmf)&Any::aset)));
+		class_add_func("aset",			TypeVoid,			any_p(mf(&Any::aset)));
 			func_add_param("index",			TypeString);
 			func_add_param("value",			TypeAny);
-		class_add_func("bool",		TypeBool,			any_p(mf((tmf)&Any::_bool)));
-		class_add_func("int",		TypeInt,			any_p(mf((tmf)&Any::_int)));
-		class_add_func("float",		TypeFloat,			any_p(mf((tmf)&Any::_float)));
-		class_add_func("str",		TypeString,			any_p(mf((tmf)&Any::str)));
+		class_add_func("bool",		TypeBool,			any_p(mf(&Any::_bool)));
+		class_add_func("int",		TypeInt,			any_p(mf(&Any::_int)));
+		class_add_func("float",		TypeFloat,			any_p(mf(&Any::_float)));
+		class_add_func("str",		TypeString,			any_p(mf(&Any::str)));
 
 
 	add_class(TypeCrypto);
 		class_add_element("n",	TypeVli, 0);
 		class_add_element("k",	TypeVli, sizeof(vli));
-		class_add_func("__init__",	TypeVoid, algebra_p(mf((tmf)&Crypto::__init__)));
-		class_add_func("str",		TypeString, algebra_p(mf((tmf)&Crypto::str)));
-		class_add_func("from_str",	TypeVoid, algebra_p(mf((tmf)&Crypto::from_str)));
+		class_add_func("__init__",	TypeVoid, algebra_p(mf(&Crypto::__init__)));
+		class_add_func("str",		TypeString, algebra_p(mf(&Crypto::str)));
+		class_add_func("from_str",	TypeVoid, algebra_p(mf(&Crypto::from_str)));
 			func_add_param("str",		TypeString);
-		class_add_func("Encrypt",	TypeString, algebra_p(mf((tmf)&Crypto::Encrypt)));
+		class_add_func("Encrypt",	TypeString, algebra_p(mf(&Crypto::Encrypt)));
 			func_add_param("str",		TypeString);
-		class_add_func("Decrypt",	TypeString, algebra_p(mf((tmf)&Crypto::Decrypt)));
+		class_add_func("Decrypt",	TypeString, algebra_p(mf(&Crypto::Decrypt)));
 			func_add_param("str",		TypeString);
 			func_add_param("cut",		TypeBool);
 
 	add_class(TypeRandom);
 		class_add_element("n",	TypeRandom, 0);
-		class_add_func("seed",		TypeVoid, mf((tmf)&Random::seed));
+		class_add_func("seed",		TypeVoid, mf(&Random::seed));
 			func_add_param("str",		TypeString);
-		class_add_func("geti",		TypeInt, mf((tmf)&Random::geti));
+		class_add_func("geti",		TypeInt, mf(&Random::geti));
 			func_add_param("max",		TypeInt);
-		class_add_func("getu",		TypeFloat, mf((tmf)&Random::getu));
-		class_add_func("geti",		TypeFloat, mf((tmf)&Random::getf));
+		class_add_func("getu",		TypeFloat, mf(&Random::getu));
+		class_add_func("geti",		TypeFloat, mf(&Random::getf));
 			func_add_param("min",		TypeFloat);
 			func_add_param("max",		TypeFloat);
-		class_add_func("in_ball",		TypeVector, amd64_wrap(mf((tmf)&Random::in_ball), &amd64_vec_rand_in_ball));
+		class_add_func("in_ball",		TypeVector, amd64_wrap(mf(&Random::in_ball), &amd64_vec_rand_in_ball));
 			func_add_param("r",		TypeFloat);
-		class_add_func("dir",		TypeVector, amd64_wrap(mf((tmf)&Random::dir), &amd64_vec_rand_dir));
+		class_add_func("dir",		TypeVector, amd64_wrap(mf(&Random::dir), &amd64_vec_rand_dir));
 	
 	add_compiler_func("complex",		TypeComplex,	CommandComplexSet);
 		func_add_param("x",		TypeFloat);
@@ -751,59 +751,59 @@ void SIAddPackageMath()
 	
 	add_class(TypeFloatInterpolator);
 		class_add_element("type",	TypeInt, 0);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&Interpolator<float>::__init__));
-		class_add_func("clear",	TypeVoid, mf((tmf)&Interpolator<float>::clear));
-		class_add_func("set_type",	TypeVoid, mf((tmf)&Interpolator<float>::set_type));
+		class_add_func("__init__",	TypeVoid, mf(&Interpolator<float>::__init__));
+		class_add_func("clear",	TypeVoid, mf(&Interpolator<float>::clear));
+		class_add_func("set_type",	TypeVoid, mf(&Interpolator<float>::set_type));
 			func_add_param("type",	TypeString);
-		class_add_func("add",	TypeVoid, mf((tmf)&Interpolator<float>::add));
+		class_add_func("add",	TypeVoid, mf(&Interpolator<float>::add));
 			func_add_param("p",	TypeFloatPs);
 			func_add_param("dt",	TypeFloat);
-		class_add_func("add2",	TypeVoid, mf((tmf)&Interpolator<float>::add2));
+		class_add_func("add2",	TypeVoid, mf(&Interpolator<float>::add2));
 			func_add_param("p",	TypeFloatPs);
 			func_add_param("v",	TypeFloatPs);
 			func_add_param("dt",	TypeFloat);
-		class_add_func("add3",	TypeVoid, mf((tmf)&Interpolator<float>::add3));
+		class_add_func("add3",	TypeVoid, mf(&Interpolator<float>::add3));
 			func_add_param("p",	TypeFloatPs);
 			func_add_param("v",	TypeFloatPs);
 			func_add_param("w",	TypeFloat);
 			func_add_param("dt",	TypeFloat);
-		class_add_func("jump",	TypeVoid, mf((tmf)&Interpolator<float>::jump));
+		class_add_func("jump",	TypeVoid, mf(&Interpolator<float>::jump));
 			func_add_param("p",	TypeFloatPs);
 			func_add_param("v",	TypeFloatPs);
-		class_add_func("get",	TypeFloat, mf((tmf)&Interpolator<float>::get));
+		class_add_func("get",	TypeFloat, mf(&Interpolator<float>::get));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_tang",	TypeFloat, mf((tmf)&Interpolator<float>::get_tang));
+		class_add_func("get_tang",	TypeFloat, mf(&Interpolator<float>::get_tang));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_list",	TypeFloatList, mf((tmf)&Interpolator<float>::get_list));
+		class_add_func("get_list",	TypeFloatList, mf(&Interpolator<float>::get_list));
 			func_add_param("t",	TypeFloatList);
 
 	
 	add_class(TypeVectorInterpolator);
 		class_add_element("type",	TypeInt, 0);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&Interpolator<vector>::__init__));
-		class_add_func("clear",	TypeVoid, mf((tmf)&Interpolator<vector>::clear));
-		class_add_func("set_type",	TypeVoid, mf((tmf)&Interpolator<vector>::set_type));
+		class_add_func("__init__",	TypeVoid, mf(&Interpolator<vector>::__init__));
+		class_add_func("clear",	TypeVoid, mf(&Interpolator<vector>::clear));
+		class_add_func("set_type",	TypeVoid, mf(&Interpolator<vector>::set_type));
 			func_add_param("type",	TypeString);
-		class_add_func("add",	TypeVoid, mf((tmf)&Interpolator<vector>::add));
+		class_add_func("add",	TypeVoid, mf(&Interpolator<vector>::add));
 			func_add_param("p",	TypeVector);
 			func_add_param("dt",	TypeFloat);
-		class_add_func("add2",	TypeVoid, mf((tmf)&Interpolator<vector>::add2));
+		class_add_func("add2",	TypeVoid, mf(&Interpolator<vector>::add2));
 			func_add_param("p",	TypeVector);
 			func_add_param("v",	TypeVector);
 			func_add_param("dt",	TypeFloat);
-		class_add_func("add3",	TypeVoid, mf((tmf)&Interpolator<vector>::add3));
+		class_add_func("add3",	TypeVoid, mf(&Interpolator<vector>::add3));
 			func_add_param("p",	TypeVector);
 			func_add_param("v",	TypeVector);
 			func_add_param("w",	TypeFloat);
 			func_add_param("dt",	TypeFloat);
-		class_add_func("jump",	TypeVoid, mf((tmf)&Interpolator<vector>::jump));
+		class_add_func("jump",	TypeVoid, mf(&Interpolator<vector>::jump));
 			func_add_param("p",	TypeVector);
 			func_add_param("v",	TypeVector);
-		class_add_func("get",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get), &amd64_vec_inter_get));
+		class_add_func("get",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::get), &amd64_vec_inter_get));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_tang",	TypeVector, amd64_wrap(mf((tmf)&Interpolator<vector>::get_tang), &amd64_vec_inter_get_tang));
+		class_add_func("get_tang",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::get_tang), &amd64_vec_inter_get_tang));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_list",	TypeVectorList, mf((tmf)&Interpolator<vector>::get_list));
+		class_add_func("get_list",	TypeVectorList, mf(&Interpolator<vector>::get_list));
 			func_add_param("t",	TypeFloatList);
 
 	// mathematical

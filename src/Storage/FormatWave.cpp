@@ -33,7 +33,7 @@ void FormatWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
 	char *data = (char*)buf16.data;
 
-	CFile *f = CreateFile(filename);
+	CFile *f = FileCreate(filename);
 	f->SetBinaryMode(true);
 
 	f->WriteBuffer("RIFF", 4);
@@ -76,7 +76,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 	tsunami->progress->Set(_("lade wave"), 0);
 
 	char *data = new char[WAVE_BUFFER_SIZE];
-	CFile *f = OpenFile(filename);
+	CFile *f = FileOpen(filename);
 
 	try{
 

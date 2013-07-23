@@ -39,16 +39,6 @@ void HuiWindow::AddProgressBar(const string &title, int x, int y, int width, int
 
 void HuiWindow::SetTarget(const string &id, int page){}
 
-void HuiWindow::SetString(const string &id, const string &str){}
-void HuiWindow::AddString(const string &id, const string &str){}
-void HuiWindow::SetInt(const string &id, int i){}
-void HuiWindow::SetFloat(const string &id, float f){}
-void HuiWindow::SetColor(const string &id, const color &c){}
-void HuiWindow::SetImage(const string &id, const string &image){}
-
-void HuiWindow::Enable(const string &id, bool b){}
-void HuiWindow::Check(const string &id, bool b){}
-
 HuiWindow::~HuiWindow(){}
 
 void HuiWindow::_Init_(const string &title,int x, int y, int w, int h, HuiWindow *parent, bool allow_parent, int mode){}

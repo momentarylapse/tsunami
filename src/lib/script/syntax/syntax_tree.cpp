@@ -693,7 +693,7 @@ void SyntaxTree::LoadToBuffer(const string &filename,bool just_analyse)
 	msg_db_f("LoadToBuffer",4);
 
 // read file
-	CFile *f = OpenFile(filename);
+	CFile *f = FileOpen(filename);
 	if (!f){
 		Exp.cur_line = NULL;
 		DoError("script file not loadable");
@@ -1028,6 +1028,30 @@ void SyntaxTree::BreakDownComplicatedCommands()
 	}
 }
 
+void MapLVSX86Return(Function *f)
+{
+	if (f->return_type->UsesReturnByMemory()){
+		foreachi(Variable &v, f->var, i)
+			if (v.name == "-return-"){
+				v._offset = f->_param_size;
+				f->_param_size += 4;
+			}
+	}
+}
+
+void MapLVSX86Self(Function *f)
+{
+	if (f->_class){
+		foreachi(Variable &v, f->var, i)
+			if (v.name == "self"){
+				v._offset = f->_param_size;
+				f->_param_size += 4;
+			}else if (v.name == "super"){
+				v._offset = f->var[f->get_var("self")]._offset;
+			}
+	}
+}
+
 void SyntaxTree::MapLocalVariablesToStack()
 {
 	msg_db_f("MapLocalVariablesToStack", 1);
@@ -1036,28 +1060,22 @@ void SyntaxTree::MapLocalVariablesToStack()
 		if (config.instruction_set == Asm::InstructionSetX86){
 			f->_var_size = 0;
 
-			// map "-return-" to the VERY first parameter
-			if (f->return_type->UsesReturnByMemory()){
-				foreachi(Variable &v, f->var, i)
-					if (v.name == "-return-"){
-						v._offset = f->_param_size;
-						f->_param_size += 4;
-					}
-			}
+			if (config.abi == AbiWindows32){
+				// map "self" to the VERY first parameter
+				MapLVSX86Self(f);
 
-			// map "self" to the first parameter
-			if (f->_class){
-				foreachi(Variable &v, f->var, i)
-					if (v.name == "self"){
-						v._offset = f->_param_size;
-						f->_param_size += 4;
-					}else if (v.name == "super"){
-						v._offset = f->var[f->get_var("self")]._offset;
-					}
+				// map "-return-" to the first parameter
+				MapLVSX86Return(f);
+			}else{
+				// map "-return-" to the VERY first parameter
+				MapLVSX86Return(f);
+
+				// map "self" to the first parameter
+				MapLVSX86Self(f);
 			}
 
 			foreachi(Variable &v, f->var, i){
-				if ((f->_class) && (v.name == "self") && (v.name == "super"))
+				if ((f->_class) && ((v.name == "self") || (v.name == "super")))
 					continue;
 				if (v.name == "-return-")
 					continue;

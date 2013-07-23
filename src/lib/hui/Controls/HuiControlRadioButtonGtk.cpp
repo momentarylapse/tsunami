@@ -8,6 +8,9 @@
 #include "HuiControlRadioButton.h"
 #include "../hui.h"
 
+
+#ifdef HUI_API_GTK
+
 void OnGtkRadioButtonToggle(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->Notify("hui:change");	}
 
@@ -51,3 +54,4 @@ bool HuiControlRadioButton::IsChecked()
 	return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }
 
+#endif

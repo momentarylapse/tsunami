@@ -59,11 +59,17 @@ void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
 #endif
 }
 
+
+void HuiMenu::add(HuiControl *c)
+{
+}
+
 // stupid function for HuiBui....
 /*void HuiMenu::SetID(const string &id)
 {
 }*/
 
+#if 0
 void HuiMenu::AddItem(const string &name, const string & id)
 {
 #if 0
@@ -80,6 +86,7 @@ void HuiMenu::AddItem(const string &name, const string & id)
 	Item.push_back(i);
 #endif
 }
+#endif
 
 int get_image_id(const string &image)
 {
@@ -103,6 +110,7 @@ int get_image_id(const string &image)
 	return STD_FILENEW;
 }
 
+#if 0
 void HuiMenu::AddItemImage(const string &name, const string &image, const string &id)
 {
 #if 0
@@ -130,11 +138,13 @@ void HuiMenu::AddItemCheckable(const string &name, const string &id)
 
 void HuiMenu::AddSeparator()
 {
+#if 0
 	HuiMenuItem i;
 	AppendMenu(hMenu,MF_SEPARATOR,0,_T(""));
 	
 	i.is_separator = true;
 	item.add(i);
+#endif
 }
 
 void HuiMenu::AddSubMenu(const string &name, const string &id, HuiMenu *menu)
@@ -149,11 +159,10 @@ void HuiMenu::AddSubMenu(const string &name, const string &id, HuiMenu *menu)
 	item.add(i);
 #endif
 }
+#endif
 
-// only allow menu callback, if we are in layer 0 (if we don't edit it ourself)
-int allow_signal_level=0;
 
-void HuiMenu::CheckItem(const string &id, bool checked)
+/*void HuiMenu::CheckItem(const string &id, bool checked)
 {
 #if 0
 	CheckMenuItem(hMenu,id,checked?MF_CHECKED:MF_UNCHECKED);
@@ -198,7 +207,7 @@ void HuiMenu::SetText(const string &id, const string &text)
 		}
 	}
 #endif
-}
+}*/
 
 
 

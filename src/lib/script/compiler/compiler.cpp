@@ -99,9 +99,14 @@ void Script::AllocateMemory()
 		}
 		MemorySize += mem_align(s, 4);
 	}
-	if (MemorySize > 0)
+	if (MemorySize > 0){
+#ifdef OS_WINDOWS
+		Memory = (char*)VirtualAlloc(NULL, MemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+#else
 		Memory = (char*)mmap(0, MemorySize, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, 0, 0);
+#endif
 		//Memory = new char[MemorySize];
+	}
 }
 
 void Script::AllocateStack()

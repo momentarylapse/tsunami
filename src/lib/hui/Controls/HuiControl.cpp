@@ -15,7 +15,7 @@ HuiControl::HuiControl(int _type, const string &_id)
 	win = NULL;
 	enabled = true;
 #ifdef HUI_API_WIN
-	hWND = NULL;
+	hWnd = NULL;
 #endif
 #ifdef HUI_API_GTK
 	widget = NULL;
@@ -35,6 +35,26 @@ HuiControl::~HuiControl()
 		gtk_widget_destroy(widget);
 #endif
 }
+
+#ifdef HUI_API_WIN
+
+void HuiControl::Enable(bool _enabled)
+{
+}
+
+void HuiControl::Hide(bool hidden)
+{
+}
+
+void HuiControl::SetTooltip(const string& str)
+{
+}
+
+void HuiControl::Focus()
+{
+}
+
+#endif
 
 #ifdef HUI_API_GTK
 

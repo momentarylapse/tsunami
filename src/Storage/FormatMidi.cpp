@@ -89,7 +89,7 @@ void FormatMidi::LoadAudio(AudioFile *a, const string &filename)
 {
 	CFile *f = NULL;
 	try{
-		f = OpenFile(filename);
+		f = FileOpen(filename);
 		if (!f)
 			throw string("can't open file");
 		f->SetBinaryMode(true);

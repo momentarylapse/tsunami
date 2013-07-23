@@ -8,6 +8,8 @@
 
 #include "HuiControlLabel.h"
 
+#ifdef HUI_API_GTK
+
 HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
 	HuiControl(HuiKindText, id)
 {
@@ -44,3 +46,4 @@ void HuiControlLabel::__SetString(const string &str)
 	gtk_label_set_markup(GTK_LABEL(widget), s.c_str());
 }
 
+#endif

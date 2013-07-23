@@ -18,57 +18,57 @@ class string : public DynamicArray
 	string(const string &s);
 	string(const char *str);
 	string(const char *str, int l);
-	void __init__();
+	void _cdecl __init__();
 	~string();
 
 	// functions
-	void add(char c)
+	void _cdecl add(char c)
 	{	append_1_single(c);	}
-	void insert(int pos, char c)
+	void _cdecl insert(int pos, char c)
 	{	resize(num + 1);	for (int i=num-2;i>=pos;i--) (*this)[i+1] = (*this)[i];	(*this)[pos] = c;	}
-	void erase(int index)
+	void _cdecl erase(int index)
 	{	delete_single(index);	}
-	int find(const string &s, int start = 0) const;
-	int rfind(const string &s, int start = -1) const;
-	string substr(int start, int length) const;
-	string head(int size) const;
-	string tail(int size) const;
-	int compare(const string &s) const;
-	int icompare(const string &s) const;
-	void replace0(int start, int length, const string &s);
-	string replace(const string &sub, const string &by) const;
-	string reverse() const;
-	string trim() const;
-	Array<string> explode(const string &s) const;
-	string lower() const;
-	string upper() const;
-	string hex(bool inverted = false) const;
-	string unhex() const;
-	bool match(const string &glob) const;
-	int hash() const;
-	int _int() const;
-	float _float() const;
+	int _cdecl find(const string &s, int start = 0) const;
+	int _cdecl rfind(const string &s, int start = -1) const;
+	string _cdecl substr(int start, int length) const;
+	string _cdecl head(int size) const;
+	string _cdecl tail(int size) const;
+	int _cdecl compare(const string &s) const;
+	int _cdecl icompare(const string &s) const;
+	void _cdecl replace0(int start, int length, const string &s);
+	string _cdecl replace(const string &sub, const string &by) const;
+	string _cdecl reverse() const;
+	string _cdecl trim() const;
+	Array<string> _cdecl explode(const string &s) const;
+	string _cdecl lower() const;
+	string _cdecl upper() const;
+	string _cdecl hex(bool inverted = false) const;
+	string _cdecl unhex() const;
+	bool _cdecl match(const string &glob) const;
+	int _cdecl hash() const;
+	int _cdecl _int() const;
+	float _cdecl _float() const;
 	const char *c_str() const;
 
 	// for paths
-	string sys_filename() const;
-	string dirname() const;
-	string basename() const;
-	void dir_ensure_ending();
-	string no_recursion() const;
-	string extension() const;
+	string _cdecl sys_filename() const;
+	string _cdecl dirname() const;
+	string _cdecl basename() const;
+	void _cdecl dir_ensure_ending();
+	string _cdecl no_recursion() const;
+	string _cdecl extension() const;
 
 	// operators
-	void operator = (const string &s)
+	void _cdecl operator = (const string &s)
 	//{	printf("= assign %p = %p", data, s.data);	assign(&s);	printf(" /=  '%s\n", c_str());}
 	{	assign(&s);	}
-	void operator += (const string &s)
+	void _cdecl operator += (const string &s)
 	{	append(&s);	}
-	string operator + (const string &s) const
+	string _cdecl operator + (const string &s) const
 	{	string r = *this;	r += s;	return r;	}
-	friend string operator + (const char *s1, const string &s2)
+	friend string _cdecl operator + (const char *s1, const string &s2)
 	{	return string(s1) + s2;	}
-	bool operator == (const string &s) const
+	bool _cdecl operator == (const string &s) const
 	{
 		if (num != s.num)
 			return false;
@@ -82,23 +82,23 @@ class string : public DynamicArray
 		}
 		return true;
 	}
-	bool operator != (const string &s) const
+	bool _cdecl operator != (const string &s) const
 	{	return !(*this == s);	}
-	bool operator < (const string &s) const
+	bool _cdecl operator < (const string &s) const
 	{	return compare(s) < 0;	}
-	bool operator > (const string &s) const
+	bool _cdecl operator > (const string &s) const
 	{	return compare(s) > 0;	}
-	bool operator <= (const string &s) const
+	bool _cdecl operator <= (const string &s) const
 	{	return compare(s) <= 0;	}
-	bool operator >= (const string &s) const
+	bool _cdecl operator >= (const string &s) const
 	{	return compare(s) >= 0;	}
 	char operator[] (int index) const
 	{	return ((char*)data)[index];	}
 	char &operator[] (int index)
 	{	return ((char*)data)[index];	}
-	char &back()
+	char &_cdecl back()
 	{	return (*this)[num - 1];	}
-	char back() const
+	char _cdecl back() const
 	{	return (*this)[num - 1];	}
 };
 
@@ -107,24 +107,24 @@ class string : public DynamicArray
 // string operations
 
 
-string format(const string s, ...);
-string i2s(int i);
-string i2s2(int i, int l);
-string f2s(float f, int dez);
-string f2sf(float f);
-string b2s(bool b);
-string p2s(void *p);
-string ia2s(const Array<int> &a);
-string fa2s(const Array<float> &a);
-string ba2s(const Array<bool> &a);
-string sa2s(const Array<string> &a);
-int s2i(const string &s);
-float s2f(const string &s);
+string _cdecl format(const string s, ...);
+string _cdecl i2s(int i);
+string _cdecl i2s2(int i, int l);
+string _cdecl f2s(float f, int dez);
+string _cdecl f2sf(float f);
+string _cdecl b2s(bool b);
+string _cdecl p2s(void *p);
+string _cdecl ia2s(const Array<int> &a);
+string _cdecl fa2s(const Array<float> &a);
+string _cdecl ba2s(const Array<bool> &a);
+string _cdecl sa2s(const Array<string> &a);
+int _cdecl s2i(const string &s);
+float _cdecl s2f(const string &s);
 
-string d2h(const void *data, int bytes, bool inverted = true);
-string h2d(const string &hex_str, int bytes);
+string _cdecl d2h(const void *data, int bytes, bool inverted = true);
+string _cdecl h2d(const string &hex_str, int bytes);
 
-string implode(const Array<string> &a, const string &glue);
+string _cdecl implode(const Array<string> &a, const string &glue);
 
 //--------------------------------------------------------------
 // regular expressions

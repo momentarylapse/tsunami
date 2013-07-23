@@ -219,7 +219,7 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 //	int length = a->GetLength();
 //	int min = a->GetMin();
-	CFile *f = CreateFile(filename);
+	CFile *f = FileCreate(filename);
 	f->SetBinaryMode(true);
 
 	BeginChunk(f, "nami");
@@ -803,7 +803,7 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 	// TODO?
 	a->tag.clear();
 
-	CFile *f = OpenFile(a->filename);
+	CFile *f = FileOpen(a->filename);
 	f->SetBinaryMode(true);
 	bool is_old = (f->ReadChar() == 'b');
 	f->SetPos(0, true);

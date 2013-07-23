@@ -30,23 +30,23 @@ class Image
 		ModeBGRA, // 0xbb 0xgg 0xrr 0xaa = 0xaarrggbb
 	};
 
-	void __init__();
-	void __delete__();
+	void _cdecl __init__();
+	void _cdecl __delete__();
 
-	bool Empty(){	return (data.num == 0);	}
+	bool _cdecl Empty(){	return (data.num == 0);	}
 
-	void Load(const string &filename);
-	void LoadFlipped(const string &filename);
-	void Create(int width, int height, const color &c);
-	void Save(const string &filename) const;
-	void Delete();
+	void _cdecl Load(const string &filename);
+	void _cdecl LoadFlipped(const string &filename);
+	void _cdecl Create(int width, int height, const color &c);
+	void _cdecl Save(const string &filename) const;
+	void _cdecl Delete();
 
-	void Scale(int width, int height);
-	void FlipV();
-	void SetMode(int mode) const;
-	void SetPixel(int x, int y, const color &c);
-	color GetPixel(int x, int y) const;
-	color GetPixelInterpolated(float x, float y) const;
+	void _cdecl Scale(int width, int height);
+	void _cdecl FlipV();
+	void _cdecl SetMode(int mode) const;
+	void _cdecl SetPixel(int x, int y, const color &c);
+	color _cdecl GetPixel(int x, int y) const;
+	color _cdecl GetPixelInterpolated(float x, float y) const;
 };
 
 #include "image_bmp.h"

@@ -412,7 +412,7 @@ void jpg_decode(unsigned char *b,s_jpg_color_info ci)
 
 void image_load_jpg(const string &filename, Image &image)
 {
-	CFile *f = OpenFileSilent(filename);
+	CFile *f = FileOpenSilent(filename);
 	if (!f)
 		return;
 	f->SetBinaryMode(true);

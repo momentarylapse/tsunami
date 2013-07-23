@@ -1,11 +1,13 @@
 /*
- * HuiToolItemToggleButton.cpp
+ * HuiToolItemToggleButtonGtk.cpp
  *
  *  Created on: 26.06.2013
  *      Author: michi
  */
 
 #include "HuiToolItemToggleButton.h"
+
+#ifdef HUI_API_GTK
 
 void *get_gtk_image(const string &image, bool large);
 
@@ -36,3 +38,5 @@ bool HuiToolItemToggleButton::IsChecked()
 {
 	return gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
 }
+
+#endif

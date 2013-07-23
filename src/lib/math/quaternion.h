@@ -5,33 +5,33 @@
 class vector;
 class matrix;
 
-struct quaternion
+class quaternion
 {
 public:
 	float x, y, z, w;
 	quaternion(){};
 	quaternion(const float w,const vector &v);
-	bool operator == (const quaternion& q) const;
-	bool operator != (const quaternion& q) const;
-	quaternion& operator += (const quaternion& q);
-	quaternion& operator -= (const quaternion& q);
-	quaternion operator + (const quaternion &q) const;
-	quaternion operator - (const quaternion &q) const;
-	quaternion operator * (float f) const;
-	quaternion operator * (const quaternion &q) const;
-	friend quaternion operator * (float f,const quaternion &q)
+	bool _cdecl operator == (const quaternion& q) const;
+	bool _cdecl operator != (const quaternion& q) const;
+	quaternion& _cdecl operator += (const quaternion& q);
+	quaternion& _cdecl operator -= (const quaternion& q);
+	quaternion _cdecl operator + (const quaternion &q) const;
+	quaternion _cdecl operator - (const quaternion &q) const;
+	quaternion _cdecl operator * (float f) const;
+	quaternion _cdecl operator * (const quaternion &q) const;
+	friend quaternion _cdecl operator * (float f,const quaternion &q)
 	{	return q*f;	}
-	string str() const;
+	string _cdecl str() const;
 
-	void normalize();
-	void inverse();
-	vector get_axis() const;
-	float get_angle() const;
+	void _cdecl normalize();
+	void _cdecl inverse();
+	vector _cdecl get_axis() const;
+	float _cdecl get_angle() const;
 	vector get_angles() const;
 
 	// kaba
-	void imul(const quaternion &q);
-	quaternion mul(const quaternion &q) const;
+	void _cdecl imul(const quaternion &q);
+	quaternion _cdecl mul(const quaternion &q) const;
 };
 // qaternions
 void _cdecl QuaternionRotationA(quaternion &q, const vector &axis, float w);

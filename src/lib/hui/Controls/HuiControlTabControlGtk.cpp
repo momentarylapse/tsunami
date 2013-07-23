@@ -8,6 +8,8 @@
 #include "HuiControlTabControl.h"
 #include "../hui.h"
 
+#ifdef HUI_API_GTK
+
 void OnGtkTabControlSwitch(GtkWidget *widget, GtkWidget *page, guint page_num, gpointer data)
 {
 	HuiControlTabControl *c = (HuiControlTabControl*)data;
@@ -25,7 +27,11 @@ HuiControlTabControl::HuiControlTabControl(const string &title, const string &id
 	for (int i=0;i<PartString.num;i++){
 		GtkWidget *inside;
 		if (win->is_resizable){
+#if GTK_MAJOR_VERSION >= 3
 			inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+#else
+			inside = gtk_hbox_new(true, 0);
+#endif
 			gtk_box_set_homogeneous(GTK_BOX(inside), true);
 		}else
 			inside = gtk_fixed_new();
@@ -46,6 +52,7 @@ HuiControlTabControl::~HuiControlTabControl() {
 
 string HuiControlTabControl::GetString()
 {
+	return "";
 }
 
 void HuiControlTabControl::__SetString(const string& str)
@@ -62,3 +69,5 @@ int HuiControlTabControl::GetInt()
 {
 	return cur_page;
 }
+
+#endif

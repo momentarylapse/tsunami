@@ -5,29 +5,30 @@
 class vector;
 class matrix;
 
-struct plane
+class plane
 {
+public:
 	vector n;
 	float d;
 
 	plane(){}
 	plane(const vector &p, const vector &n);
 	plane(const vector &a, const vector &b, const vector &c);
-	string str() const;
+	string _cdecl str() const;
 
-	bool intersect_line(const vector &l1, const vector &l2, vector &i) const;
-	float distance(const vector &p) const;
-	void inverse();
+	bool _cdecl intersect_line(const vector &l1, const vector &l2, vector &i) const;
+	float _cdecl distance(const vector &p) const;
+	void _cdecl inverse();
 };
 
 // planes
-void PlaneFromPoints(plane &pl,const vector &a,const vector &b,const vector &c);
-void PlaneFromPointNormal(plane &pl,const vector &p,const vector &n);
-void PlaneTransform(plane &plo,const matrix &m,const plane &pli);
-void GetBaryCentric(const vector &P,const vector &A,const vector &B,const vector &C,float &f,float &g);
+void _cdecl PlaneFromPoints(plane &pl,const vector &a,const vector &b,const vector &c);
+void _cdecl PlaneFromPointNormal(plane &pl,const vector &p,const vector &n);
+void _cdecl PlaneTransform(plane &plo,const matrix &m,const plane &pli);
+void _cdecl GetBaryCentric(const vector &P,const vector &A,const vector &B,const vector &C,float &f,float &g);
 extern float LineIntersectsTriangleF,LineIntersectsTriangleG;
-bool LineIntersectsTriangle(const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col,bool vm);
-bool LineIntersectsTriangle2(const plane &pl, const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col,bool vm);
+bool _cdecl LineIntersectsTriangle(const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col,bool vm);
+bool _cdecl LineIntersectsTriangle2(const plane &pl, const vector &t1,const vector &t2,const vector &t3,const vector &l1,const vector &l2,vector &col,bool vm);
 
 
 inline void _plane_from_point_normal_(plane &pl,const vector &p,const vector &n)

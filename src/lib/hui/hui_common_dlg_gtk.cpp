@@ -114,6 +114,7 @@ bool HuiSelectColor(HuiWindow *win,int r,int g,int b)
 
 bool HuiSelectFont(HuiWindow *win, const string &title)
 {
+#if GTK_MAJOR_VERSION >= 3
 	msg_db_r("HuiSelectFont",1);
 	GtkWindow *w = get_window_save(win);
 	msg_db_m("dialog_new",1);
@@ -131,6 +132,8 @@ bool HuiSelectFont(HuiWindow *win, const string &title)
 	gtk_widget_destroy(dlg);
 	msg_db_l(1);
 	return (r == GTK_RESPONSE_OK);
+#endif
+	return false;
 }
 
 string HuiQuestionBox(HuiWindow *win,const string &title,const string &text,bool allow_cancel)

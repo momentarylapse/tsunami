@@ -8,6 +8,8 @@
 #include "HuiControlDrawingArea.h"
 #include "../hui.h"
 
+#ifdef HUI_API_GTK
+
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	((HuiControl*)user_data)->Notify("hui:redraw");
@@ -155,3 +157,4 @@ HuiControlDrawingArea::~HuiControlDrawingArea() {
 	// TODO Auto-generated destructor stub
 }
 
+#endif

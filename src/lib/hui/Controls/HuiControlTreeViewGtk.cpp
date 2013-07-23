@@ -8,6 +8,8 @@
 #include "HuiControlTreeView.h"
 #include "../hui.h"
 
+#ifdef HUI_API_GTK
+
 void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpointer data);
 void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, const gchar *new_text, gpointer data);
 extern GType HuiTypeList[64];
@@ -62,6 +64,7 @@ HuiControlTreeView::~HuiControlTreeView()
 
 string HuiControlTreeView::GetString()
 {
+	return "";
 }
 
 void HuiControlTreeView::__SetString(const string &str)
@@ -216,4 +219,7 @@ bool HuiControlTreeView::IsExpanded(int row)
 		else
 			gtk_tree_view_collapse_row(GTK_TREE_VIEW(c->widget));
 	}*/
+	return false;
 }
+
+#endif

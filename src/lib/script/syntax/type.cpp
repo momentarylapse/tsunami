@@ -128,13 +128,11 @@ void Type::LinkVirtualTable()
 	if (!vtable)
 		return;
 
-	// evil hack: try to overwrite "real" c++ destructor
-	foreach(ClassFunction &cf, function)
-		if (cf.virtual_index >= 0){
-			if ((cf.nr >= 0) && (cf.name == "__delete__"))
-				for (int i=0;i<cf.virtual_index;i++)
-					vtable[i] = (void*)cf.script->func[cf.nr];
-		}
+	// derive from parent
+	if (parent)
+		for (int i=0;i<parent->num_virtual;i++)
+			vtable[i] = parent->vtable[i];
+	vtable[0] = mf(&VirtualBase::__delete_external__);
 
 	// link virtual functions into vtable
 	foreach(ClassFunction &cf, function)
@@ -143,6 +141,25 @@ void Type::LinkVirtualTable()
 				vtable[cf.virtual_index] = (void*)cf.script->func[cf.nr];
 			num_virtual = max(cf.virtual_index + 1, num_virtual);
 		}
+}
+
+void Type::LinkExternalVirtualTable(void *p)
+{
+	// link script functions according to external vtable
+	VirtualTable *t = (VirtualTable*)p;
+	num_virtual = 0;
+	foreach(ClassFunction &cf, function)
+		if (cf.virtual_index >= 0){
+			if (cf.nr >= 0)
+				cf.script->func[cf.nr] = (t_func*)t[cf.virtual_index];
+			num_virtual = max(cf.virtual_index + 1, num_virtual);
+		}
+
+	vtable = new VirtualTable[num_virtual];
+	for (int i=0;i<num_virtual;i++)
+		vtable[i] = t[i];
+	// this should also link the "real" c++ destructor
+	vtable[0] = mf(&VirtualBase::__delete_external__);
 }
 
 bool Type::DeriveFrom(Type* root)

@@ -5,7 +5,7 @@
 
 #include "../base/base.h"
 
-struct color
+class color
 {
 public:
 	float r,g,b,a;
@@ -14,30 +14,30 @@ public:
 	{	this->a=a;	this->r=r;	this->g=g;	this->b=b;	}
 	/*color& operator = (const color& c)
 	{	a=c.a;	r=c.r;	g=c.g;	b=c.b;	return *this;	}*/
-	color& operator += (const color& c)
+	color& _cdecl operator += (const color& c)
 	{	a += c.a;	r += c.r;	g += c.g;	b += c.b;	return *this;	}
-	color& operator -= (const color& c)
+	color& _cdecl operator -= (const color& c)
 	{	a -= c.a;	r -= c.r;	g -= c.g;	b -= c.b;	return *this;	}
-	color operator + (const color& c) const
+	color _cdecl operator + (const color& c) const
 	{	return color(a + c.a, r + c.r, g + c.g, b + c.b);	}
-	color operator - (const color& c) const
+	color _cdecl operator - (const color& c) const
 	{	return color(a - c.a, r - c.r, g - c.g, b - c.b);	}
-	color operator * (float f) const
+	color _cdecl operator * (float f) const
 	{	return color(a*f , r*f , g*f , b*f);	}
-	friend color operator * (float f, const color &c)
+	friend color _cdecl operator * (float f, const color &c)
 	{	return c * f;	}
-	void operator *= (float f)
+	void _cdecl operator *= (float f)
 	{	a *= f;	r *= f;	g *= f;	b *= f;	}
-	color operator * (const color &c) const
+	color _cdecl operator * (const color &c) const
 	{	return color(a*c.a , r*c.r , g*c.g , b*c.b);	}
-	void operator *= (const color &c)
+	void _cdecl operator *= (const color &c)
 	{	a*=c.a;	r*=c.r;	g*=c.g;	b*=c.b;	}
-	void clamp();
-	string str() const
+	void _cdecl clamp();
+	string _cdecl str() const
 	{	return format("(%f, %f, %f, %f)", r, g, b, a);	}
 
-	void get_int_rgb(int *i) const;
-	void get_int_argb(int *i) const;
+	void _cdecl get_int_rgb(int *i) const;
+	void _cdecl get_int_argb(int *i) const;
 };
 // colors
 color _cdecl SetColorSave(float a, float r, float g, float b);

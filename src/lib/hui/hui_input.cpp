@@ -11,6 +11,43 @@ Array<HuiCommand> _HuiCommand_;
 	int HuiKeyID[256], HuiKeyID2[256];
 #endif
 
+HuiCallback::HuiCallback()
+{
+	func = NULL;
+	object = NULL;
+	member_function = NULL;
+}
+
+HuiCallback::HuiCallback(hui_callback *_func)
+{
+	func = _func;
+	object = NULL;
+	member_function = NULL;
+}
+
+HuiCallback::HuiCallback(HuiEventHandler *_object, void (HuiEventHandler::*_member_function)())
+{
+	func = NULL;
+	object = _object;
+	member_function = _member_function;
+}
+
+void HuiCallback::call()
+{
+	if (func)
+		func();
+	else if (object)
+		(object->*member_function)();
+}
+
+bool HuiCallback::is_set()
+{
+	if (func)
+		return true;
+	else if (object)
+		return true;
+	return false;
+}
 
 HuiEvent _HuiEvent_;
 HuiEvent *HuiGetEvent()
@@ -246,9 +283,6 @@ void HuiAddKeyCode(const string &id, int key_code)
 	c.id = id;
 	c.enabled = true;
 	c.type = 0;
-	c.func = NULL;
-	c.object = NULL;
-	c.member_function = NULL;
 	_HuiCommand_.add(c);
 }
 
@@ -491,12 +525,8 @@ bool _HuiEventMatch_(HuiEvent *e, const string &id, const string &message)
 void _HuiSendGlobalCommand_(HuiEvent *e)
 {
 	foreach(HuiCommand &c, _HuiCommand_)
-		if (_HuiEventMatch_(e, c.id, ":def:")){
-			if (c.func)
-				c.func();
-			else if (c.member_function)
-				(c.object->*c.member_function)();
-		}
+		if (_HuiEventMatch_(e, c.id, ":def:"))
+			c.func.call();
 }
 
 void HuiAddCommand(const string &id, const string &image, int default_key_code, hui_callback *func)
@@ -507,8 +537,6 @@ void HuiAddCommand(const string &id, const string &image, int default_key_code, 
 	c.image = image;
 	c.key_code = default_key_code;
 	c.func = func;
-	c.object = NULL;
-	c.member_function = NULL;
 	_HuiCommand_.add(c);
 }
 
@@ -520,8 +548,6 @@ void HuiAddCommandToggle(const string &id, const string &image, int default_key_
 	c.image = image;
 	c.key_code = default_key_code;
 	c.func = func;
-	c.object = NULL;
-	c.member_function = NULL;
 	_HuiCommand_.add(c);
 }
 
@@ -532,9 +558,7 @@ void _HuiAddCommandM(const string &id, const string &image, int default_key_code
 	c.id = id;
 	c.image = image;
 	c.key_code = default_key_code;
-	c.func = NULL;
-	c.object = handler;
-	c.member_function = function;
+	c.func = HuiCallback(handler, function);
 	_HuiCommand_.add(c);
 }
 
@@ -545,9 +569,7 @@ void _HuiAddCommandMToggle(const string &id, const string &image, int default_ke
 	c.id = id;
 	c.image = image;
 	c.key_code = default_key_code;
-	c.func = NULL;
-	c.object = handler;
-	c.member_function = function;
+	c.func = HuiCallback(handler, function);
 	_HuiCommand_.add(c);
 }
 

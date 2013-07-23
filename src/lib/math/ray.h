@@ -9,13 +9,14 @@
 #define RAY_H_
 
 
-struct Ray
+class Ray
 {
+public:
 	Ray();
 	Ray(const vector &a, const vector &b);
 	vector u, v;
-	float dot(const Ray &r) const;
-	bool intersect_plane(const plane &pl, vector &c) const;
+	float _cdecl dot(const Ray &r) const;
+	bool _cdecl intersect_plane(const plane &pl, vector &c) const;
 };
 
 

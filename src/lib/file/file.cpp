@@ -131,6 +131,7 @@ string Date::str() const
 
 t_file_try_again_func *FileTryAgainFunc;
 
+#if 0
 static int a_num_dirs=-1,a_num_files=-1;
 struct s_a_dir{
 	string name;
@@ -146,7 +147,6 @@ static CFile *a_f=NULL;
 static int a_num_created_dirs=0;
 static string a_created_dir[256];
 
-#if 0
 
 // set and open the current archive
 //   calls to CFile::Open will try to find a file inside this archive
@@ -360,7 +360,7 @@ CFile::~CFile()
 		Close();
 }
 
-CFile *OpenFile(const string &filename)
+CFile *FileOpen(const string &filename)
 {
 	CFile *f = new CFile();
 	if (f->Open(filename))
@@ -369,7 +369,7 @@ CFile *OpenFile(const string &filename)
 	return NULL;
 }
 
-CFile *OpenFileSilent(const string &filename)
+CFile *FileOpenSilent(const string &filename)
 {
 	CFile *f = new CFile();
 	f->SilentFileAccess = true;
@@ -379,7 +379,7 @@ CFile *OpenFileSilent(const string &filename)
 	return NULL;
 }
 
-CFile *CreateFile(const string &filename)
+CFile *FileCreate(const string &filename)
 {
 	CFile *f = new CFile();
 	if (f->Create(filename))
@@ -388,7 +388,7 @@ CFile *CreateFile(const string &filename)
 	return NULL;
 }
 
-CFile *CreateFileSilent(const string &filename)
+CFile *FileCreateSilent(const string &filename)
 {
 	CFile *f = new CFile();
 	f->SilentFileAccess = true;
@@ -398,7 +398,7 @@ CFile *CreateFileSilent(const string &filename)
 	return NULL;
 }
 
-CFile *AppendFile(const string &filename)
+CFile *FileAppend(const string &filename)
 {
 	CFile *f = new CFile();
 	if (f->Append(filename))
@@ -415,7 +415,7 @@ void FileClose(CFile *f)
 
 string FileRead(const string &filename)
 {
-	CFile *f = OpenFile(filename);
+	CFile *f = FileOpen(filename);
 	if (!f)
 		return "";
 	string r = f->ReadComplete();
@@ -425,7 +425,7 @@ string FileRead(const string &filename)
 
 void FileWrite(const string &filename, const string &str)
 {
-	CFile *f = CreateFile(filename);
+	CFile *f = FileCreate(filename);
 	if (!f)
 		return;
 	f->WriteBuffer(str.data, str.num);

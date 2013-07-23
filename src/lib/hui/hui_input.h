@@ -11,14 +11,27 @@
 
 class HuiEventHandler;
 
+class HuiCallback
+{
+public:
+	HuiCallback();
+	HuiCallback(hui_callback *func);
+	HuiCallback(HuiEventHandler *object, void (HuiEventHandler::*member_function)());
+	void call();
+	bool is_set();
+
+private:
+	hui_callback *func;
+	HuiEventHandler *object;
+	void (HuiEventHandler::*member_function)();
+};
+
 struct HuiCommand
 {
 	string id, image;
 	int type, key_code;
 	bool enabled;
-	hui_callback *func;
-	HuiEventHandler *object;
-	void (HuiEventHandler::*member_function)();
+	HuiCallback func;
 };
 
 extern Array<HuiCommand> _HuiCommand_;
@@ -43,6 +56,19 @@ class HuiEvent
 
 extern HuiEvent _HuiEvent_;
 HuiEvent *HuiGetEvent();
+
+
+
+class HuiEventHandler : public VirtualBase
+{
+public:
+};
+
+struct HuiEventListener
+{
+	string id, message;
+	HuiCallback function;
+};
 
 
 // internal

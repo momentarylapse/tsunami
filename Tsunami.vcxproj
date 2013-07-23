@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\lib\glib-2.0\include;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\pango-1.0;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\gtk-3.0;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\glib-2.0;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\gio-win32-2.0;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\gdk-pixbuf-2.0;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\cairo;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\atk-1.0;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\action\Action.cpp" />
+    <ClCompile Include="src\action\ActionGroup.cpp" />
+    <ClCompile Include="src\action\ActionManager.cpp" />
+    <ClCompile Include="src\action\audiofile\ActionAudioDeleteSelection.cpp" />
+    <ClCompile Include="src\action\audiofile\level\ActionAudioAddLevel.cpp" />
+    <ClCompile Include="src\action\audiofile\sample\ActionAudioAddSample.cpp" />
+    <ClCompile Include="src\action\audiofile\sample\ActionAudioDeleteSample.cpp" />
+    <ClCompile Include="src\action\audiofile\tag\ActionAudioAddTag.cpp" />
+    <ClCompile Include="src\action\audiofile\tag\ActionAudioDeleteTag.cpp" />
+    <ClCompile Include="src\action\audiofile\tag\ActionAudioEditTag.cpp" />
+    <ClCompile Include="src\action\track\ActionTrackAdd.cpp" />
+    <ClCompile Include="src\action\track\ActionTrackDelete.cpp" />
+    <ClCompile Include="src\action\track\ActionTrack__DeleteEmpty.cpp" />
+    <ClCompile Include="src\action\track\bar\ActionTrackAddBar.cpp" />
+    <ClCompile Include="src\action\track\bar\ActionTrackDeleteBar.cpp" />
+    <ClCompile Include="src\action\track\bar\ActionTrackEditBar.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrackCreateBuffers.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrackEditBuffer.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrack__AbsorbBufferBox.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrack__AddBufferBox.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrack__CutBufferBox.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrack__DeleteBufferBox.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrack__GrowBufferBox.cpp" />
+    <ClCompile Include="src\action\track\buffer\ActionTrack__ShrinkBufferBox.cpp" />
+    <ClCompile Include="src\action\track\data\ActionTrackEditMuted.cpp" />
+    <ClCompile Include="src\action\track\data\ActionTrackEditName.cpp" />
+    <ClCompile Include="src\action\track\data\ActionTrackEditPanning.cpp" />
+    <ClCompile Include="src\action\track\data\ActionTrackEditVolume.cpp" />
+    <ClCompile Include="src\action\track\effect\ActionTrackAddEffect.cpp" />
+    <ClCompile Include="src\action\track\effect\ActionTrackDeleteEffect.cpp" />
+    <ClCompile Include="src\action\track\effect\ActionTrackEditEffect.cpp" />
+    <ClCompile Include="src\action\track\midi\ActionTrackInsertMidi.cpp" />
+    <ClCompile Include="src\action\track\sample\ActionTrackAddSample.cpp" />
+    <ClCompile Include="src\action\track\sample\ActionTrackDeleteSample.cpp" />
+    <ClCompile Include="src\action\track\sample\ActionTrackInsertSample.cpp" />
+    <ClCompile Include="src\action\track\sample\ActionTrackInsertSelectedSamples.cpp" />
+    <ClCompile Include="src\action\track\sample\ActionTrackMoveSample.cpp" />
+    <ClCompile Include="src\action\track\sample\ActionTrackPasteAsSample.cpp" />
+    <ClCompile Include="src\action\track\sample\ActionTrackSampleFromSelection.cpp" />
+    <ClCompile Include="src\audio\AudioInput.cpp" />
+    <ClCompile Include="src\audio\AudioInputAudio.cpp" />
+    <ClCompile Include="src\audio\AudioInputBase.cpp" />
+    <ClCompile Include="src\audio\AudioInputMidi.cpp" />
+    <ClCompile Include="src\audio\AudioOutput.cpp" />
+    <ClCompile Include="src\audio\AudioRenderer.cpp" />
+    <ClCompile Include="src\audio\synth\DummySynthesizer.cpp" />
+    <ClCompile Include="src\audio\synth\SampleSynthesizer.cpp" />
+    <ClCompile Include="src\audio\synth\Synthesizer.cpp" />
+    <ClCompile Include="src\data\AudioFile.cpp" />
+    <ClCompile Include="src\data\BufferBox.cpp" />
+    <ClCompile Include="src\data\Data.cpp" />
+    <ClCompile Include="src\data\MidiData.cpp" />
+    <ClCompile Include="src\data\Range.cpp" />
+    <ClCompile Include="src\data\Rhythm.cpp" />
+    <ClCompile Include="src\data\Sample.cpp" />
+    <ClCompile Include="src\data\Track.cpp" />
+    <ClCompile Include="src\lib\base\array.cpp" />
+    <ClCompile Include="src\lib\base\strings.cpp" />
+    <ClCompile Include="src\lib\file\file.cpp" />
+    <ClCompile Include="src\lib\file\file_op.cpp" />
+    <ClCompile Include="src\lib\file\msg.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControl.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlCheckBoxGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlColorButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlComboBoxGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlDrawingAreaGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlEditGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlGridGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlGroupGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlLabelGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlListViewGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlMultilineEditGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlProgressBarGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlRadioButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlSliderGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlSpinButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlTabControlGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlToggleButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiControlTreeViewGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiMenuItemGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiMenuItemSeparatorGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiMenuItemSubmenuGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiMenuItemToggleGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiToolItemButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiToolItemMenuButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiToolItemSeparatorGtk.cpp" />
+    <ClCompile Include="src\lib\hui\controls\HuiToolItemToggleButtonGtk.cpp" />
+    <ClCompile Include="src\lib\hui\hui.cpp" />
+    <ClCompile Include="src\lib\hui\HuiMenu.cpp" />
+    <ClCompile Include="src\lib\hui\HuiMenuGtk.cpp" />
+    <ClCompile Include="src\lib\hui\HuiMenuWin.cpp" />
+    <ClCompile Include="src\lib\hui\HuiPainterGtk.cpp" />
+    <ClCompile Include="src\lib\hui\HuiTimer.cpp" />
+    <ClCompile Include="src\lib\hui\HuiToolbar.cpp" />
+    <ClCompile Include="src\lib\hui\HuiToolbarGtk.cpp" />
+    <ClCompile Include="src\lib\hui\HuiToolbarWin.cpp" />
+    <ClCompile Include="src\lib\hui\HuiWindow.cpp" />
+    <ClCompile Include="src\lib\hui\HuiWindowGtk.cpp" />
+    <ClCompile Include="src\lib\hui\HuiWindowWin.cpp" />
+    <ClCompile Include="src\lib\hui\hui_clipboard.cpp" />
+    <ClCompile Include="src\lib\hui\hui_common_dlg.cpp" />
+    <ClCompile Include="src\lib\hui\hui_common_dlg_gtk.cpp" />
+    <ClCompile Include="src\lib\hui\hui_common_dlg_win.cpp" />
+    <ClCompile Include="src\lib\hui\hui_config.cpp" />
+    <ClCompile Include="src\lib\hui\hui_error.cpp" />
+    <ClCompile Include="src\lib\hui\hui_input.cpp" />
+    <ClCompile Include="src\lib\hui\hui_language.cpp" />
+    <ClCompile Include="src\lib\hui\hui_main_gtk.cpp" />
+    <ClCompile Include="src\lib\hui\hui_main_win.cpp" />
+    <ClCompile Include="src\lib\hui\hui_resource.cpp" />
+    <ClCompile Include="src\lib\hui\hui_utility.cpp" />
+    <ClCompile Include="src\lib\hui\hui_window_control.cpp" />
+    <ClCompile Include="src\lib\hui\hui_window_control_gtk.cpp" />
+    <ClCompile Include="src\lib\hui\hui_window_control_win.cpp" />
+    <ClCompile Include="src\lib\image\color.cpp" />
+    <ClCompile Include="src\lib\image\image.cpp" />
+    <ClCompile Include="src\lib\image\image_bmp.cpp" />
+    <ClCompile Include="src\lib\image\image_jpg.cpp" />
+    <ClCompile Include="src\lib\image\image_tga.cpp" />
+    <ClCompile Include="src\lib\math\complex.cpp" />
+    <ClCompile Include="src\lib\math\interpolation.cpp" />
+    <ClCompile Include="src\lib\math\math.cpp" />
+    <ClCompile Include="src\lib\math\matrix.cpp" />
+    <ClCompile Include="src\lib\math\matrix3.cpp" />
+    <ClCompile Include="src\lib\math\plane.cpp" />
+    <ClCompile Include="src\lib\math\quaternion.cpp" />
+    <ClCompile Include="src\lib\math\random.cpp" />
+    <ClCompile Include="src\lib\math\ray.cpp" />
+    <ClCompile Include="src\lib\math\rect.cpp" />
+    <ClCompile Include="src\lib\math\vector.cpp" />
+    <ClCompile Include="src\lib\net\net.cpp" />
+    <ClCompile Include="src\lib\script\asm\asm.cpp" />
+    <ClCompile Include="src\lib\script\compiler\compiler.cpp" />
+    <ClCompile Include="src\lib\script\compiler\serializer.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_file.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_hui.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_image.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_math.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_net.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_nix.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_sound.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_threads.cpp" />
+    <ClCompile Include="src\lib\script\lib\script_data_x.cpp" />
+    <ClCompile Include="src\lib\script\script.cpp" />
+    <ClCompile Include="src\lib\script\syntax\implicit.cpp" />
+    <ClCompile Include="src\lib\script\syntax\lexical.cpp" />
+    <ClCompile Include="src\lib\script\syntax\parser.cpp" />
+    <ClCompile Include="src\lib\script\syntax\precompiler.cpp" />
+    <ClCompile Include="src\lib\script\syntax\preprocessor.cpp" />
+    <ClCompile Include="src\lib\script\syntax\syntax_tree.cpp" />
+    <ClCompile Include="src\lib\script\syntax\type.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\plugins\Effect.cpp" />
+    <ClCompile Include="src\plugins\EffectManager.cpp" />
+    <ClCompile Include="src\plugins\ExtendedBufferBox.cpp" />
+    <ClCompile Include="src\plugins\FastFourierTransform.cpp" />
+    <ClCompile Include="src\plugins\Plugin.cpp" />
+    <ClCompile Include="src\plugins\PluginManager.cpp" />
+    <ClCompile Include="src\storage\dialog\RawConfigDialog.cpp" />
+    <ClCompile Include="src\storage\Format.cpp" />
+    <ClCompile Include="src\storage\FormatFlac.cpp" />
+    <ClCompile Include="src\storage\FormatMidi.cpp" />
+    <ClCompile Include="src\storage\FormatNami.cpp" />
+    <ClCompile Include="src\storage\FormatOgg.cpp" />
+    <ClCompile Include="src\storage\FormatRaw.cpp" />
+    <ClCompile Include="src\storage\FormatWave.cpp" />
+    <ClCompile Include="src\storage\Storage.cpp" />
+    <ClCompile Include="src\stuff\Clipboard.cpp" />
+    <ClCompile Include="src\stuff\Log.cpp" />
+    <ClCompile Include="src\stuff\Observable.cpp" />
+    <ClCompile Include="src\stuff\Observer.cpp" />
+    <ClCompile Include="src\Tsunami.cpp" />
+    <ClCompile Include="src\view\AudioView.cpp" />
+    <ClCompile Include="src\view\dialog\AudioFileDialog.cpp" />
+    <ClCompile Include="src\view\dialog\CaptureDialog.cpp" />
+    <ClCompile Include="src\view\dialog\LogDialog.cpp" />
+    <ClCompile Include="src\view\dialog\NewDialog.cpp" />
+    <ClCompile Include="src\view\dialog\RecordDialog.cpp" />
+    <ClCompile Include="src\view\dialog\SampleManager.cpp" />
+    <ClCompile Include="src\view\dialog\SettingsDialog.cpp" />
+    <ClCompile Include="src\view\dialog\SubDialog.cpp" />
+    <ClCompile Include="src\view\dialog\TrackDialog.cpp" />
+    <ClCompile Include="src\view\helper\BarList.cpp" />
+    <ClCompile Include="src\view\helper\EmbeddedDialog.cpp" />
+    <ClCompile Include="src\view\helper\FxList.cpp" />
+    <ClCompile Include="src\view\helper\PeakMeter.cpp" />
+    <ClCompile Include="src\view\helper\Progress.cpp" />
+    <ClCompile Include="src\view\helper\Slider.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\action\Action.h" />
+    <ClInclude Include="src\action\ActionGroup.h" />
+    <ClInclude Include="src\action\ActionManager.h" />
+    <ClInclude Include="src\action\audiofile\ActionAudioDeleteSelection.h" />
+    <ClInclude Include="src\action\audiofile\level\ActionAudioAddLevel.h" />
+    <ClInclude Include="src\action\audiofile\sample\ActionAudioAddSample.h" />
+    <ClInclude Include="src\action\audiofile\sample\ActionAudioDeleteSample.h" />
+    <ClInclude Include="src\action\audiofile\tag\ActionAudioAddTag.h" />
+    <ClInclude Include="src\action\audiofile\tag\ActionAudioDeleteTag.h" />
+    <ClInclude Include="src\action\audiofile\tag\ActionAudioEditTag.h" />
+    <ClInclude Include="src\action\track\ActionTrackAdd.h" />
+    <ClInclude Include="src\action\track\ActionTrackDelete.h" />
+    <ClInclude Include="src\action\track\ActionTrack__DeleteEmpty.h" />
+    <ClInclude Include="src\action\track\bar\ActionTrackAddBar.h" />
+    <ClInclude Include="src\action\track\bar\ActionTrackDeleteBar.h" />
+    <ClInclude Include="src\action\track\bar\ActionTrackEditBar.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrackCreateBuffers.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrackEditBuffer.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrack__AbsorbBufferBox.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrack__AddBufferBox.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrack__CutBufferBox.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrack__DeleteBufferBox.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrack__GrowBufferBox.h" />
+    <ClInclude Include="src\action\track\buffer\ActionTrack__ShrinkBufferBox.h" />
+    <ClInclude Include="src\action\track\data\ActionTrackEditMuted.h" />
+    <ClInclude Include="src\action\track\data\ActionTrackEditName.h" />
+    <ClInclude Include="src\action\track\data\ActionTrackEditPanning.h" />
+    <ClInclude Include="src\action\track\data\ActionTrackEditVolume.h" />
+    <ClInclude Include="src\action\track\effect\ActionTrackAddEffect.h" />
+    <ClInclude Include="src\action\track\effect\ActionTrackDeleteEffect.h" />
+    <ClInclude Include="src\action\track\effect\ActionTrackEditEffect.h" />
+    <ClInclude Include="src\action\track\midi\ActionTrackInsertMidi.h" />
+    <ClInclude Include="src\action\track\sample\ActionTrackAddSample.h" />
+    <ClInclude Include="src\action\track\sample\ActionTrackDeleteSample.h" />
+    <ClInclude Include="src\action\track\sample\ActionTrackInsertSample.h" />
+    <ClInclude Include="src\action\track\sample\ActionTrackInsertSelectedSamples.h" />
+    <ClInclude Include="src\action\track\sample\ActionTrackMoveSample.h" />
+    <ClInclude Include="src\action\track\sample\ActionTrackPasteAsSample.h" />
+    <ClInclude Include="src\action\track\sample\ActionTrackSampleFromSelection.h" />
+    <ClInclude Include="src\audio\AudioInput.h" />
+    <ClInclude Include="src\audio\AudioInputAudio.h" />
+    <ClInclude Include="src\audio\AudioInputBase.h" />
+    <ClInclude Include="src\audio\AudioInputMidi.h" />
+    <ClInclude Include="src\audio\AudioOutput.h" />
+    <ClInclude Include="src\audio\AudioRenderer.h" />
+    <ClInclude Include="src\audio\synth\DummySynthesizer.h" />
+    <ClInclude Include="src\audio\synth\SampleSynthesizer.h" />
+    <ClInclude Include="src\audio\synth\Synthesizer.h" />
+    <ClInclude Include="src\data\AudioFile.h" />
+    <ClInclude Include="src\data\BufferBox.h" />
+    <ClInclude Include="src\data\Data.h" />
+    <ClInclude Include="src\data\MidiData.h" />
+    <ClInclude Include="src\data\Range.h" />
+    <ClInclude Include="src\data\Rhythm.h" />
+    <ClInclude Include="src\data\Sample.h" />
+    <ClInclude Include="src\data\Track.h" />
+    <ClInclude Include="src\lib\base\array.h" />
+    <ClInclude Include="src\lib\base\base.h" />
+    <ClInclude Include="src\lib\base\map.h" />
+    <ClInclude Include="src\lib\base\set.h" />
+    <ClInclude Include="src\lib\base\strings.h" />
+    <ClInclude Include="src\lib\config.h" />
+    <ClInclude Include="src\lib\file\file.h" />
+    <ClInclude Include="src\lib\file\file_op.h" />
+    <ClInclude Include="src\lib\file\msg.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControl.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlButton.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlCheckBox.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlColorButton.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlComboBox.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlDrawingArea.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlEdit.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlGrid.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlGroup.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlLabel.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlListView.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlMultilineEdit.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlProgressBar.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlRadioButton.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlSlider.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlSpinButton.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlTabControl.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlToggleButton.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiControlTreeView.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiMenuItem.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiMenuItemSeparator.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiMenuItemSubmenu.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiMenuItemToggle.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiToolItemButton.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiToolItemMenuButton.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiToolItemSeparator.h" />
+    <ClInclude Include="src\lib\hui\controls\HuiToolItemToggleButton.h" />
+    <ClInclude Include="src\lib\hui\hui.h" />
+    <ClInclude Include="src\lib\hui\HuiMenu.h" />
+    <ClInclude Include="src\lib\hui\HuiPainter.h" />
+    <ClInclude Include="src\lib\hui\HuiTimer.h" />
+    <ClInclude Include="src\lib\hui\HuiToolbar.h" />
+    <ClInclude Include="src\lib\hui\HuiWindow.h" />
+    <ClInclude Include="src\lib\hui\hui_clipboard.h" />
+    <ClInclude Include="src\lib\hui\hui_common.h" />
+    <ClInclude Include="src\lib\hui\hui_common_dlg.h" />
+    <ClInclude Include="src\lib\hui\hui_config.h" />
+    <ClInclude Include="src\lib\hui\hui_error.h" />
+    <ClInclude Include="src\lib\hui\hui_input.h" />
+    <ClInclude Include="src\lib\hui\hui_internal.h" />
+    <ClInclude Include="src\lib\hui\hui_language.h" />
+    <ClInclude Include="src\lib\hui\hui_main.h" />
+    <ClInclude Include="src\lib\hui\hui_resource.h" />
+    <ClInclude Include="src\lib\hui\hui_utility.h" />
+    <ClInclude Include="src\lib\image\color.h" />
+    <ClInclude Include="src\lib\image\image.h" />
+    <ClInclude Include="src\lib\image\image_bmp.h" />
+    <ClInclude Include="src\lib\image\image_jpg.h" />
+    <ClInclude Include="src\lib\image\image_tga.h" />
+    <ClInclude Include="src\lib\math\complex.h" />
+    <ClInclude Include="src\lib\math\interpolation.h" />
+    <ClInclude Include="src\lib\math\math.h" />
+    <ClInclude Include="src\lib\math\matrix.h" />
+    <ClInclude Include="src\lib\math\matrix3.h" />
+    <ClInclude Include="src\lib\math\plane.h" />
+    <ClInclude Include="src\lib\math\quaternion.h" />
+    <ClInclude Include="src\lib\math\random.h" />
+    <ClInclude Include="src\lib\math\ray.h" />
+    <ClInclude Include="src\lib\math\rect.h" />
+    <ClInclude Include="src\lib\math\vector.h" />
+    <ClInclude Include="src\lib\net\net.h" />
+    <ClInclude Include="src\lib\script\asm\asm.h" />
+    <ClInclude Include="src\lib\script\compiler\serializer.h" />
+    <ClInclude Include="src\lib\script\lib\script_data.h" />
+    <ClInclude Include="src\lib\script\lib\script_data_common.h" />
+    <ClInclude Include="src\lib\script\script.h" />
+    <ClInclude Include="src\lib\script\syntax\lexical.h" />
+    <ClInclude Include="src\lib\script\syntax\syntax_tree.h" />
+    <ClInclude Include="src\lib\script\syntax\type.h" />
+    <ClInclude Include="src\plugins\Effect.h" />
+    <ClInclude Include="src\plugins\EffectManager.h" />
+    <ClInclude Include="src\plugins\ExtendedBufferBox.h" />
+    <ClInclude Include="src\plugins\FastFourierTransform.h" />
+    <ClInclude Include="src\plugins\Plugin.h" />
+    <ClInclude Include="src\plugins\PluginManager.h" />
+    <ClInclude Include="src\storage\dialog\RawConfigDialog.h" />
+    <ClInclude Include="src\storage\Format.h" />
+    <ClInclude Include="src\storage\FormatFlac.h" />
+    <ClInclude Include="src\storage\FormatMidi.h" />
+    <ClInclude Include="src\storage\FormatNami.h" />
+    <ClInclude Include="src\storage\FormatOgg.h" />
+    <ClInclude Include="src\storage\FormatRaw.h" />
+    <ClInclude Include="src\storage\FormatWave.h" />
+    <ClInclude Include="src\storage\Storage.h" />
+    <ClInclude Include="src\stuff\Clipboard.h" />
+    <ClInclude Include="src\stuff\Log.h" />
+    <ClInclude Include="src\stuff\Observable.h" />
+    <ClInclude Include="src\stuff\Observer.h" />
+    <ClInclude Include="src\Tsunami.h" />
+    <ClInclude Include="src\view\AudioView.h" />
+    <ClInclude Include="src\view\dialog\AudioFileDialog.h" />
+    <ClInclude Include="src\view\dialog\CaptureDialog.h" />
+    <ClInclude Include="src\view\dialog\LogDialog.h" />
+    <ClInclude Include="src\view\dialog\NewDialog.h" />
+    <ClInclude Include="src\view\dialog\RecordDialog.h" />
+    <ClInclude Include="src\view\dialog\SampleManager.h" />
+    <ClInclude Include="src\view\dialog\SettingsDialog.h" />
+    <ClInclude Include="src\view\dialog\SubDialog.h" />
+    <ClInclude Include="src\view\dialog\TrackDialog.h" />
+    <ClInclude Include="src\view\helper\BarList.h" />
+    <ClInclude Include="src\view\helper\EmbeddedDialog.h" />
+    <ClInclude Include="src\view\helper\FxList.h" />
+    <ClInclude Include="src\view\helper\PeakMeter.h" />
+    <ClInclude Include="src\view\helper\Progress.h" />
+    <ClInclude Include="src\view\helper\Slider.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

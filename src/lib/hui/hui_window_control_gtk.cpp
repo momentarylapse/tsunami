@@ -310,11 +310,7 @@ void HuiWindow::AddDefButton(const string &title,int x,int y,int width,int heigh
 {
 	AddButton(title, x, y, width, height, id);
 	GtkWidget *b = control.back()->widget;
-#ifdef OS_WINDOWS
-	GTK_WIDGET_SET_FLAGS(b, GTK_CAN_DEFAULT);
-#else
 	gtk_widget_set_can_default(b, true);
-#endif
 	gtk_widget_grab_default(b);
 }
 

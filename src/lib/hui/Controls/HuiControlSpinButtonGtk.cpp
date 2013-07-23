@@ -7,6 +7,8 @@
 
 #include "HuiControlSpinButton.h"
 
+#ifdef HUI_API_GTK
+
 void OnGtkEditChange(GtkWidget *widget, gpointer data);
 
 HuiControlSpinButton::HuiControlSpinButton(const string &title, const string &id) :
@@ -62,3 +64,5 @@ void HuiControlSpinButton::__SetFloat(float f)
 {
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), f);
 }
+
+#endif

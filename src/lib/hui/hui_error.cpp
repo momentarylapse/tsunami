@@ -13,22 +13,30 @@
 	#include "../net/net.h"
 #endif
 
+#include <signal.h>
 
-extern hui_callback *HuiIdleFunction, *HuiErrorFunction;
+extern HuiCallback HuiIdleFunction, HuiErrorFunction;
 extern Array<HuiWindow*> HuiWindows;
+
+void _HuiSignalHandler(int)
+{
+	HuiErrorFunction.call();
+}
 
 // apply a function to be executed when a critical error occures
 void HuiSetErrorFunction(hui_callback *error_function)
 {
-	HuiErrorFunction=error_function;
-	signal(SIGSEGV,(void(*)(int))HuiErrorFunction);
-	/*signal(SIGINT,(void (*)(int))HuiErrorFunction);
-	signal(SIGILL,(void (*)(int))HuiErrorFunction);
-	signal(SIGTERM,(void (*)(int))HuiErrorFunction);
-	signal(SIGABRT,(void (*)(int))HuiErrorFunction);*/
-	/*signal(SIGFPE,(void (*)(int))HuiErrorFunction);
-	signal(SIGBREAK,(void (*)(int))HuiErrorFunction);
-	signal(SIGABRT_COMPAT,(void (*)(int))HuiErrorFunction);*/
+	HuiErrorFunction = error_function;
+	if (error_function){
+		signal(SIGSEGV, &_HuiSignalHandler);
+		/*signal(SIGINT, &_HuiSignalHandler);
+		signal(SIGILL, &_HuiSignalHandler);
+		signal(SIGTERM, &_HuiSignalHandler);
+		signal(SIGABRT, &_HuiSignalHandler);*/
+		/*signal(SIGFPE, &_HuiSignalHandler);
+		signal(SIGBREAK, &_HuiSignalHandler);
+		signal(SIGABRT_COMPAT, &_HuiSignalHandler);*/
+	}
 }
 
 static HuiWindow *ErrorDialog,*ReportDialog;

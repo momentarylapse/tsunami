@@ -5,7 +5,11 @@
 #endif
 //#include <stdio.h>
 
-#define ALIGNMENT		16
+#ifdef OS_WINDOWS
+	#define ALIGNMENT		0
+#else
+	#define ALIGNMENT		16
+#endif
 
 
 void DynamicArray::init(int _element_size_)

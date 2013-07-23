@@ -28,7 +28,8 @@ struct ClassFunction{
 
 typedef void *VirtualTable;
 
-struct Type{
+class Type{
+public:
 	Type();
 	//Type(const string &name, int size, SyntaxTree *owner);
 	~Type();
@@ -56,6 +57,7 @@ struct Type{
 	ClassFunction *GetDestructor();
 	ClassFunction *GetVirtualFunction(int virtual_index);
 	void LinkVirtualTable();
+	void LinkExternalVirtualTable(void *p);
 	string var2str(void *p);
 };
 extern Type *TypeUnknown;

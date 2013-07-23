@@ -9,6 +9,8 @@
 #include "../hui.h"
 
 
+#ifdef HUI_API_GTK
+
 void *get_gtk_image_pixbuf(const string &image); // -> hui_menu_gtk.cpp
 string tree_get_cell(GtkTreeModel *store, GtkTreeIter &iter, int column);
 
@@ -254,3 +256,5 @@ void HuiControlListView::__Reset()
 	gtk_list_store_clear(store);
 	_item_.clear();
 }
+
+#endif

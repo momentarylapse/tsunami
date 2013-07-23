@@ -3,3 +3,7 @@ Data/config.txt
 Debug
 Release
 tsunami
+ipch
+Tsunami.suo
+Tsunami.sdf
+Tsunami.opensdf

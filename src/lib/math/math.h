@@ -14,14 +14,14 @@
 
 #include <math.h>
 
-struct color;
-struct vector;
-struct plane;
-struct complex;
-struct matrix;
-struct matrix3;
-struct quaternion;
-struct Ray;
+class color;
+class vector;
+class plane;
+class complex;
+class matrix;
+class matrix3;
+class quaternion;
+class Ray;
 
 
 #include "../base/base.h"
@@ -46,7 +46,7 @@ int _cdecl loopi(int i, int min, int max);
 int _cdecl randi(int m);
 
 // floats
-float sqr(float f);
+float _cdecl sqr(float f);
 float _cdecl clampf(float f, float min, float max);
 float _cdecl loopf(float f, float min, float max);
 float _cdecl randf(float m);

@@ -19,21 +19,21 @@ public:
 		TYPE_ANGULAR_LERP,
 	};
 	Interpolator(Type type);
-	void __init__();
-	void set_type(const string &_type);
+	void _cdecl __init__();
+	void _cdecl set_type(const string &_type);
 
 	// data input
-	void clear();
-	void add(const T &p, float dt = 1.0f);
-	void add2(const T &p, const T &v, float dt = 1.0f);
-	void add3(const T &p, const T &v, float weight, float dt = 1.0f);
-	void jump(const T &p, const T &v);
-	void close(float dt = 1.0f);
+	void _cdecl clear();
+	void _cdecl add(const T &p, float dt = 1.0f);
+	void _cdecl add2(const T &p, const T &v, float dt = 1.0f);
+	void _cdecl add3(const T &p, const T &v, float weight, float dt = 1.0f);
+	void _cdecl jump(const T &p, const T &v);
+	void _cdecl close(float dt = 1.0f);
 
 	// interpolated output
-	T get(float t);
-	T get_tang(float t);
-	Array<T> get_list(Array<float> &t);
+	T _cdecl get(float t);
+	T _cdecl get_tang(float t);
+	Array<T> _cdecl get_list(Array<float> &t);
 
 	struct Part
 	{

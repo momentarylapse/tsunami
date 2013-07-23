@@ -6,7 +6,8 @@
  */
 
 #include "BufferBox.h"
-#include <math.h>
+#include "../lib/math/math.h"
+//#include <math.h>
 #include <assert.h>
 
 SampleFormat format_for_bits(int bits)
@@ -172,8 +173,8 @@ void BufferBox::scale(float volume, float panning)
 		return;
 	make_own();
 
-	float f_r = volume * sin((panning + 1) / 4 * M_PI) * sqrt(2);
-	float f_l = volume * cos((panning + 1) / 4 * M_PI) * sqrt(2);
+	float f_r = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
+	float f_l = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
 
 	// scale
 	for (int i=0;i<r.num;i++){
@@ -195,8 +196,8 @@ void BufferBox::add(const BufferBox &b, int offset, float volume, float panning)
 			l[i + offset] += b.l[i];
 		}
 	}else{
-		float f_r = volume * sin((panning + 1) / 4 * M_PI) * sqrt(2);
-		float f_l = volume * cos((panning + 1) / 4 * M_PI) * sqrt(2);
+		float f_r = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
+		float f_l = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
 		for (int i=i0;i<i1;i++){
 			r[i + offset] += b.r[i] * f_r;
 			l[i + offset] += b.l[i] * f_l;

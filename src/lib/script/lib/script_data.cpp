@@ -52,12 +52,6 @@ struct ClassSizeData
 Array<ClassSizeData> ClassSizes;
 
 
-void *mf(tmf vmf)
-{
-	tcpa *cpa=(tcpa*)&vmf;
-	return (*cpa)[0];
-}
-
 //------------------------------------------------------------------------------------------------//
 //                                             types                                              //
 //------------------------------------------------------------------------------------------------//
@@ -243,13 +237,11 @@ static PreCommand *cur_cmd = NULL;
 static Function *cur_func = NULL;
 static Type *cur_class;
 static ClassFunction *cur_class_func = NULL;
-void **cur_vtable = NULL;
 
 void add_class(Type *root_type)//, PreScript *ps = NULL)
 {
 	msg_db_f("add_class", 4);
 	cur_class = root_type;
-	cur_vtable = NULL;
 }
 
 void class_add_element(const string &name, Type *type, int offset)
@@ -264,6 +256,17 @@ void class_add_element(const string &name, Type *type, int offset)
 
 int add_func(const string &name, Type *return_type, void *func, bool is_class);
 
+void _class_add_func_virtual(const string &tname, const string &name, Type *return_type, int index)
+{
+	//msg_write("virtual: " + tname + "." + name);
+	//msg_write(index);
+	int cmd = add_func(tname + "." + name + "[virtual]", return_type, NULL, true);
+	cur_func->_class = cur_class;
+	cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
+	cur_class_func = &cur_class->function.back();
+	cur_class_func->virtual_index = index;
+}
+
 void class_add_func(const string &name, Type *return_type, void *func)
 {
 	msg_db_f("add_class_func", 4);
@@ -273,27 +276,57 @@ void class_add_func(const string &name, Type *return_type, void *func)
 			if ((t->is_pointer) && (t->parent == cur_class))
 				tname = t->name;
 	}
-	long p = (long)func;
-	if ((cur_class->vtable) && ((p & 1) > 0)){
-		// virtual function
-		int index = p / sizeof(void*);
-		int cmd = -1;
-		cur_func = NULL;
-		func = NULL;
-		if (cur_vtable)
-			func = cur_vtable[index];
-		cmd = add_func(tname + "." + name + "[virtual]", return_type, func, true);
-		cur_func->_class = cur_class;
-		cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
-		cur_class_func = &cur_class->function.back();
-		cur_class_func->virtual_index = index;
-	}else{
-		// normal function
-		int cmd = add_func(tname + "." + name, return_type, func, true);
-		cur_func->_class = cur_class;
-		cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
-		cur_class_func = &cur_class->function.back();
+	int cmd = add_func(tname + "." + name, return_type, func, true);
+	cur_func->_class = cur_class;
+	cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
+	cur_class_func = &cur_class->function.back();
+}
+
+void class_add_func_virtual(const string &name, Type *return_type, void *func)
+{
+	msg_db_f("add_class_func_virtual", 4);
+	string tname = cur_class->name;
+	if (tname[0] == '-'){
+		foreach(Type *t, cur_package_script->syntax->Types)
+			if ((t->is_pointer) && (t->parent == cur_class))
+				tname = t->name;
 	}
+	if (config.abi == AbiWindows32){
+		if (!func){
+			_class_add_func_virtual(tname, name, return_type, 0);
+			return;
+		}
+		unsigned char *pp = (unsigned char*)func;
+		//if ((cur_class->vtable) && (pp[0] == 0x8b) && (pp[1] == 0x01) && (pp[2] == 0xff) && (pp[3] == 0x60)){
+		if ((pp[0] == 0x8b) && (pp[1] == 0x44) && (pp[2] == 0x24) && (pp[4] == 0x8b) && (pp[5] == 0x00) && (pp[6] == 0xff) && (pp[7] == 0x60)){
+			// 8b.44.24.**    8b.00     ff.60.10
+			// virtual function
+			int index = (int)pp[8] / 4;
+			_class_add_func_virtual(tname, name, return_type, index);
+		}else{
+			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+			msg_write(string((char*)pp, 4).hex());
+			msg_write(Asm::Disassemble(func, 16));
+		}
+	}else{
+	
+		long p = (long)func;
+		if ((p & 1) > 0){
+			// virtual function
+			int index = p / sizeof(void*);
+			_class_add_func_virtual(tname, name, return_type, index);
+		}else if (!func){
+			_class_add_func_virtual(tname, name, return_type, 0);
+		}else{
+			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+		}
+
+	}
+}
+
+void class_link_vtable(void *p)
+{
+	cur_class->LinkExternalVirtualTable(p);
 }
 
 
@@ -403,79 +436,79 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 		class_add_element("num", TypeInt, config.PointerSize);
 
 		// always usable operations
-		class_add_func("swap", TypeVoid, mf((tmf)&DynamicArray::swap));
+		class_add_func("swap", TypeVoid, mf(&DynamicArray::swap));
 			func_add_param("i1",		TypeInt);
 			func_add_param("i2",		TypeInt);
-		class_add_func("iterate", TypeBool, mf((tmf)&DynamicArray::iterate));
+		class_add_func("iterate", TypeBool, mf(&DynamicArray::iterate));
 			func_add_param("pointer",		TypePointerPs);
-		class_add_func("iterate_back", TypeBool, mf((tmf)&DynamicArray::iterate_back));
+		class_add_func("iterate_back", TypeBool, mf(&DynamicArray::iterate_back));
 			func_add_param("pointer",		TypePointerPs);
-		class_add_func("index", TypeInt, mf((tmf)&DynamicArray::index));
+		class_add_func("index", TypeInt, mf(&DynamicArray::index));
 			func_add_param("pointer",		TypePointer);
-		class_add_func("subarray", t, mf((tmf)&DynamicArray::ref_subarray));
+		class_add_func("subarray", t, mf(&DynamicArray::ref_subarray));
 			func_add_param("start",		TypeInt);
 			func_add_param("num",		TypeInt);
 
 		if (t->parent->is_simple_class()){
 			if (!t->parent->UsesCallByReference()){
 				if (t->parent->is_pointer){
-					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<void*>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_p_single));
+					class_add_func("__init__",	TypeVoid, mf(&Array<void*>::__init__));
+					class_add_func("add", TypeVoid, mf(&DynamicArray::append_p_single));
 						func_add_param("x",		t->parent);
-					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_p_single));
+					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_p_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent == TypeFloat){
-					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<float>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_f_single));
+					class_add_func("__init__",	TypeVoid, mf(&Array<float>::__init__));
+					class_add_func("add", TypeVoid, mf(&DynamicArray::append_f_single));
 						func_add_param("x",		t->parent);
-					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_f_single));
+					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_f_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 4){
-					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<int>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_4_single));
+					class_add_func("__init__",	TypeVoid, mf(&Array<int>::__init__));
+					class_add_func("add", TypeVoid, mf(&DynamicArray::append_4_single));
 						func_add_param("x",		t->parent);
-					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_4_single));
+					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_4_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 1){
-					class_add_func("__init__",	TypeVoid, mf((tmf)&Array<char>::__init__));
-					class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_1_single));
+					class_add_func("__init__",	TypeVoid, mf(&Array<char>::__init__));
+					class_add_func("add", TypeVoid, mf(&DynamicArray::append_1_single));
 						func_add_param("x",		t->parent);
-					class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_1_single));
+					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_1_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else
 					msg_error("evil class type..." + t->name);
 			}else{
-				class_add_func("add", TypeVoid, mf((tmf)&DynamicArray::append_single));
+				class_add_func("add", TypeVoid, mf(&DynamicArray::append_single));
 					func_add_param("x",		t->parent);
-				class_add_func("insert", TypeVoid, mf((tmf)&DynamicArray::insert_single));
+				class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_single));
 					func_add_param("x",		t->parent);
 					func_add_param("index",		TypeInt);
 			}
-			class_add_func("__delete__",	TypeVoid, mf((tmf)&DynamicArray::clear));
-			class_add_func("clear", TypeVoid, mf((tmf)&DynamicArray::clear));
-			class_add_func("__assign__", TypeVoid, mf((tmf)&DynamicArray::assign));
+			class_add_func("__delete__",	TypeVoid, mf(&DynamicArray::clear));
+			class_add_func("clear", TypeVoid, mf(&DynamicArray::clear));
+			class_add_func("__assign__", TypeVoid, mf(&DynamicArray::assign));
 				func_add_param("other",		t);
-			class_add_func("remove", TypeVoid, mf((tmf)&DynamicArray::delete_single));
+			class_add_func("remove", TypeVoid, mf(&DynamicArray::delete_single));
 				func_add_param("index",		TypeInt);
-			class_add_func("removep", TypeVoid, mf((tmf)&DynamicArray::delete_single_by_pointer));
+			class_add_func("removep", TypeVoid, mf(&DynamicArray::delete_single_by_pointer));
 				func_add_param("pointer",		TypePointer);
-			class_add_func("resize", TypeVoid, mf((tmf)&DynamicArray::resize));
+			class_add_func("resize", TypeVoid, mf(&DynamicArray::resize));
 				func_add_param("num",		TypeInt);
-			class_add_func("ensure_size", TypeVoid, mf((tmf)&DynamicArray::ensure_size));
+			class_add_func("ensure_size", TypeVoid, mf(&DynamicArray::ensure_size));
 				func_add_param("num",		TypeInt);
 		}
 
 		// low level operations
-		class_add_func("__mem_init__", TypeVoid, mf((tmf)&DynamicArray::init));
+		class_add_func("__mem_init__", TypeVoid, mf(&DynamicArray::init));
 			func_add_param("element_size",		TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, mf((tmf)&DynamicArray::clear));
-		class_add_func("__mem_resize__", TypeVoid, mf((tmf)&DynamicArray::resize));
+		class_add_func("__mem_clear__", TypeVoid, mf(&DynamicArray::clear));
+		class_add_func("__mem_resize__", TypeVoid, mf(&DynamicArray::resize));
 			func_add_param("size",		TypeInt);
-		class_add_func("__mem_remove__", TypeVoid, mf((tmf)&DynamicArray::delete_single));
+		class_add_func("__mem_remove__", TypeVoid, mf(&DynamicArray::delete_single));
 			func_add_param("index",		TypeInt);
 }
 
@@ -599,8 +632,8 @@ void add_type_cast(int penalty, Type *source, Type *dest, const string &cmd, voi
 class StringList : public Array<string>
 {
 public:
-	void assign(StringList &s){	*this = s;	}
-	string join(const string &glue)
+	void _cdecl assign(StringList &s){	*this = s;	}
+	string _cdecl join(const string &glue)
 	{	return implode((Array<string>)*this, glue);	}
 };
 
@@ -608,50 +641,50 @@ class IntClass
 {
 	int i;
 public:
-	string str(){	return i2s(i);	}
+	string _cdecl str(){	return i2s(i);	}
 };
 
 class FloatClass
 {
 	float f;
 public:
-	string str(){	return f2s(f, 6);	}
-	string str2(int decimals){	return f2s(f, decimals);	}
+	string _cdecl str(){	return f2s(f, 6);	}
+	string _cdecl str2(int decimals){	return f2s(f, decimals);	}
 };
 
 class BoolClass
 {
 	bool b;
 public:
-	string str(){	return b2s(b);	}
+	string _cdecl str(){	return b2s(b);	}
 };
 
 class CharClass
 {
 	char c;
 public:
-	string str(){	string r;	r.add(c);	return r;	}
+	string _cdecl str(){	string r;	r.add(c);	return r;	}
 };
 
 class PointerClass
 {
 	void *p;
 public:
-	string str(){	return p2s(p);	}
+	string _cdecl str(){	return p2s(p);	}
 };
 
-class VirtualTest
+class VirtualTest : public VirtualBase
 {
 public:
 	int i;
 	static bool enable_logging;
-	VirtualTest(){	if (enable_logging)	msg_write("VirtualTest.init()");	i = 13;	}
-	virtual ~VirtualTest(){	__delete__();	}
-	void __init__(){	new(this) VirtualTest;	}
-	virtual void __delete__(){	if (enable_logging) msg_write("VirtualTest.delete()");	}
-	virtual void f_virtual(){		msg_write(i);msg_write("VirtualTest.f_virtual()");	}
-	void f_normal(){		msg_write(i);msg_write("VirtualTest.f_normal()");	}
-	void test(){	msg_write("VirtualTest.test()"); f_virtual();	}
+	VirtualTest(){ if (enable_logging) msg_write("VirtualTest.init()"); i = 13; }
+	virtual ~VirtualTest(){ if (enable_logging) msg_write("VirtualTest.~"); }
+	void _cdecl __init__(){ new(this) VirtualTest; }
+	virtual void _cdecl __delete__(){ if (enable_logging) msg_write("VirtualTest.delete()"); }
+	virtual void _cdecl f_virtual(){ msg_write(i); msg_write("VirtualTest.f_virtual()"); }
+	void _cdecl f_normal(){ msg_write(i); msg_write("VirtualTest.f_normal()"); }
+	void _cdecl test(){ msg_write("VirtualTest.test()"); f_virtual(); }
 };
 bool VirtualTest::enable_logging;
 
@@ -693,101 +726,98 @@ void SIAddPackageBase()
 	TypeCString			= add_type_a("cstring",		TypeChar, 256);	// cstring := char[256]
 	TypeString			= add_type_a("string",		TypeChar, -1);	// string := char[]
 	TypeStringList		= add_type_a("string[]",	TypeString, -1);
+
 	
 	Type *TypeVirtualTest=add_type  ("VirtualTest",	sizeof(VirtualTest));
 
 	add_class(TypeInt);
-		class_add_func("str", TypeString, mf((tmf)&IntClass::str));
+		class_add_func("str", TypeString, mf(&IntClass::str));
 	add_class(TypeFloat);
-		class_add_func("str", TypeString, mf((tmf)&FloatClass::str));
-		class_add_func("str2", TypeString, mf((tmf)&FloatClass::str2));
+		class_add_func("str", TypeString, mf(&FloatClass::str));
+		class_add_func("str2", TypeString, mf(&FloatClass::str2));
 			func_add_param("decimals",		TypeInt);
 	add_class(TypeBool);
-		class_add_func("str", TypeString, mf((tmf)&BoolClass::str));
+		class_add_func("str", TypeString, mf(&BoolClass::str));
 	add_class(TypeChar);
-		class_add_func("str", TypeString, mf((tmf)&CharClass::str));
+		class_add_func("str", TypeString, mf(&CharClass::str));
 	add_class(TypePointer);
-		class_add_func("str", TypeString, mf((tmf)&PointerClass::str));
+		class_add_func("str", TypeString, mf(&PointerClass::str));
 	
 	add_class(TypeString);
-		class_add_func("__iadd__", TypeVoid, mf((tmf)&string::operator+=));
+		class_add_func("__iadd__", TypeVoid, mf(&string::operator+=));
 			func_add_param("x",		TypeString);
-		class_add_func("__add__", TypeString, mf((tmf)&string::operator+));
+		class_add_func("__add__", TypeString, mf(&string::operator+));
 			func_add_param("x",		TypeString);
-		class_add_func("__eq__", TypeBool, mf((tmf)&string::operator==));
+		class_add_func("__eq__", TypeBool, mf(&string::operator==));
 			func_add_param("x",		TypeString);
-		class_add_func("__ne__", TypeBool, mf((tmf)&string::operator!=));
+		class_add_func("__ne__", TypeBool, mf(&string::operator!=));
 			func_add_param("x",		TypeString);
-		class_add_func("__lt__", TypeBool, mf((tmf)&string::operator<));
+		class_add_func("__lt__", TypeBool, mf(&string::operator<));
 			func_add_param("x",		TypeString);
-		class_add_func("__gt__", TypeBool, mf((tmf)&string::operator>));
+		class_add_func("__gt__", TypeBool, mf(&string::operator>));
 			func_add_param("x",		TypeString);
-		class_add_func("__le__", TypeBool, mf((tmf)&string::operator<=));
+		class_add_func("__le__", TypeBool, mf(&string::operator<=));
 			func_add_param("x",		TypeString);
-		class_add_func("__ge__", TypeBool, mf((tmf)&string::operator>=));
+		class_add_func("__ge__", TypeBool, mf(&string::operator>=));
 			func_add_param("x",		TypeString);
-		class_add_func("substr", TypeString, mf((tmf)&string::substr));
+		class_add_func("substr", TypeString, mf(&string::substr));
 			func_add_param("start",		TypeInt);
 			func_add_param("length",	TypeInt);
-		class_add_func("head", TypeString, mf((tmf)&string::head));
+		class_add_func("head", TypeString, mf(&string::head));
 			func_add_param("size",		TypeInt);
-		class_add_func("tail", TypeString, mf((tmf)&string::tail));
+		class_add_func("tail", TypeString, mf(&string::tail));
 			func_add_param("size",		TypeInt);
-		class_add_func("find", TypeInt, mf((tmf)&string::find));
+		class_add_func("find", TypeInt, mf(&string::find));
 			func_add_param("str",		TypeString);
 			func_add_param("start",		TypeInt);
-		class_add_func("compare", TypeInt, mf((tmf)&string::compare));
+		class_add_func("compare", TypeInt, mf(&string::compare));
 			func_add_param("str",		TypeString);
-		class_add_func("icompare", TypeInt, mf((tmf)&string::icompare));
+		class_add_func("icompare", TypeInt, mf(&string::icompare));
 			func_add_param("str",		TypeString);
-		class_add_func("replace", TypeString, mf((tmf)&string::replace));
+		class_add_func("replace", TypeString, mf(&string::replace));
 			func_add_param("sub",		TypeString);
 			func_add_param("by",		TypeString);
-		class_add_func("explode", TypeStringList, mf((tmf)&string::explode));
+		class_add_func("explode", TypeStringList, mf(&string::explode));
 			func_add_param("str",		TypeString);
-		class_add_func("lower", TypeString, mf((tmf)&string::lower));
-		class_add_func("upper", TypeString, mf((tmf)&string::upper));
-		class_add_func("reverse", TypeString, mf((tmf)&string::reverse));
-		class_add_func("hash", TypeInt, mf((tmf)&string::hash));
-		class_add_func("hex", TypeString, mf((tmf)&string::hex));
+		class_add_func("lower", TypeString, mf(&string::lower));
+		class_add_func("upper", TypeString, mf(&string::upper));
+		class_add_func("reverse", TypeString, mf(&string::reverse));
+		class_add_func("hash", TypeInt, mf(&string::hash));
+		class_add_func("hex", TypeString, mf(&string::hex));
 			func_add_param("inverted",		TypeBool);
-		class_add_func("unhex", TypeString, mf((tmf)&string::unhex));
-		class_add_func("match", TypeBool, mf((tmf)&string::match));
+		class_add_func("unhex", TypeString, mf(&string::unhex));
+		class_add_func("match", TypeBool, mf(&string::match));
 			func_add_param("glob",		TypeString);
-		class_add_func("int", TypeInt, mf((tmf)&string::_int));
-		class_add_func("float", TypeFloat, mf((tmf)&string::_float));
-		class_add_func("trim", TypeString, mf((tmf)&string::trim));
-		class_add_func("dirname", TypeString, mf((tmf)&string::dirname));
-		class_add_func("basename", TypeString, mf((tmf)&string::basename));
-		class_add_func("extension", TypeString, mf((tmf)&string::extension));
-
+		class_add_func("int", TypeInt, mf(&string::_int));
+		class_add_func("float", TypeFloat, mf(&string::_float));
+		class_add_func("trim", TypeString, mf(&string::trim));
+		class_add_func("dirname", TypeString, mf(&string::dirname));
+		class_add_func("basename", TypeString, mf(&string::basename));
+		class_add_func("extension", TypeString, mf(&string::extension));
 	add_class(TypeStringList);
-		class_add_func("__init__",	TypeVoid, mf((tmf)&StringList::__init__));
-		class_add_func("__delete__",	TypeVoid, mf((tmf)&StringList::clear));
-		class_add_func("add", TypeVoid, mf((tmf)&StringList::add));
+		class_add_func("__init__",	TypeVoid, mf(&StringList::__init__));
+		class_add_func("__delete__",	TypeVoid, mf(&StringList::clear));
+		class_add_func("add", TypeVoid, mf(&StringList::add));
 			func_add_param("x",		TypeString);
-		class_add_func("clear", TypeVoid, mf((tmf)&StringList::clear));
-		class_add_func("remove", TypeVoid, mf((tmf)&StringList::erase));
+		class_add_func("clear", TypeVoid, mf(&StringList::clear));
+		class_add_func("remove", TypeVoid, mf(&StringList::erase));
 			func_add_param("index",		TypeInt);
-		class_add_func("resize", TypeVoid, mf((tmf)&StringList::resize));
+		class_add_func("resize", TypeVoid, mf(&StringList::resize));
 			func_add_param("num",		TypeInt);
-		class_add_func("__assign__",	TypeVoid, mf((tmf)&StringList::assign));
+		class_add_func("__assign__",	TypeVoid, mf(&StringList::assign));
 			func_add_param("other",		TypeStringList);
-		class_add_func("join", TypeString, mf((tmf)&StringList::join));
+		class_add_func("join", TypeString, mf(&StringList::join));
 			func_add_param("glue",		TypeString);
-
 
 	VirtualTest::enable_logging = false;
 	add_class(TypeVirtualTest);
-		class_set_vtable(VirtualTest);
-		cur_class->vtable = new VirtualTable[10];
 		class_add_element("i", TypeInt, offsetof(VirtualTest, i));
-		class_add_func("__init__", TypeVoid, mf((tmf)&VirtualTest::__init__));
-		class_add_func("__delete__", TypeVoid, mf((tmf)&VirtualTest::__delete__));
-		class_add_func("f_virtual", TypeVoid, mf((tmf)&VirtualTest::f_virtual));
-		class_add_func("f_normal", TypeVoid, mf((tmf)&VirtualTest::f_normal));
-		class_add_func("test", TypeVoid, mf((tmf)&VirtualTest::test));
-		cur_class->LinkVirtualTable();
+		class_add_func("__init__", TypeVoid, mf(&VirtualTest::__init__));
+		class_add_func_virtual("__delete__", TypeVoid, mf(&VirtualTest::__delete__));
+		class_add_func_virtual("f_virtual", TypeVoid, mf(&VirtualTest::f_virtual));
+		class_add_func("f_normal", TypeVoid, mf(&VirtualTest::f_normal));
+		class_add_func("test", TypeVoid, mf(&VirtualTest::test));
+		class_set_vtable(VirtualTest);
 	VirtualTest::enable_logging = true;
 
 
@@ -1155,11 +1185,6 @@ void LinkExternal(const string &name, void *pointer)
 	l.name = name;
 	l.pointer = pointer;
 	ExternalLinks.add(l);
-}
-
-void _LinkExternalClassFunc(const string &name, void (DummyClass::*function)())
-{
-	LinkExternal(name, (void*)function);
 }
 
 void *GetExternalLink(const string &name)

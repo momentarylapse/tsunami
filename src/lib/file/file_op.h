@@ -6,16 +6,16 @@
 //--------------------------------------------------------------
 // file/directory operations
 
-bool dir_create(const string &dir);
-bool dir_delete(const string &dir);
-string get_current_dir();
-bool file_rename(const string &source,const string &target);
-bool file_copy(const string &source,const string &target);
-bool file_delete(const string &filename);
-bool file_test_existence(const string &filename);
+bool _cdecl dir_create(const string &dir);
+bool _cdecl dir_delete(const string &dir);
+string _cdecl get_current_dir();
+bool _cdecl file_rename(const string &source,const string &target);
+bool _cdecl file_copy(const string &source,const string &target);
+bool _cdecl file_delete(const string &filename);
+bool _cdecl file_test_existence(const string &filename);
 
 
-string shell_execute(const string &cmd);
+string _cdecl shell_execute(const string &cmd);
 
 //--------------------------------------------------------------
 // searching directories
@@ -25,12 +25,14 @@ struct DirEntry
 	string name;
 	int size;
 	bool is_dir;
-
-	void __init__()
-	{	name.__init__();	}
-	void __assign__(const DirEntry &o)
+	
+	void _cdecl __init__()
+	{	new(this) DirEntry;	}
+	void _cdecl __delete__()
+	{	this->~DirEntry();	}
+	void _cdecl __assign__(const DirEntry &o)
 	{	*this = o;	}
-	string str()
+	string _cdecl str()
 	{	return "(\"" + name + "\", " + i2s(size) + "\", " + b2s(is_dir) + ")";	}
 };
 

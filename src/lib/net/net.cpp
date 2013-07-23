@@ -286,7 +286,7 @@ bool Socket::Connect(const string &addr,int port)
 			so(0,WSAGetLastError());
 		#endif
 		Close();
-		return -1;
+		return false;
 	}
 
 	/*if (connect(s, (struct sockaddr *)&host_addr, sizeof(host_addr))==-1){

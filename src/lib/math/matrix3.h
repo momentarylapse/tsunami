@@ -4,7 +4,7 @@
 
 class vector;
 
-struct matrix3
+class matrix3
 {
 public:
 	union{
@@ -20,19 +20,19 @@ public:
 	};
 
 	matrix3(){};
-	matrix3 operator + (const matrix3 &m) const;
-	matrix3 operator - (const matrix3 &m) const;
-	matrix3 operator * (float f) const;
-	matrix3 operator *= (float f);
-	friend matrix3 operator * (float f, const matrix3 &m)
+	matrix3 _cdecl operator + (const matrix3 &m) const;
+	matrix3 _cdecl operator - (const matrix3 &m) const;
+	matrix3 _cdecl operator * (float f) const;
+	matrix3 _cdecl operator *= (float f);
+	friend matrix3 _cdecl operator * (float f, const matrix3 &m)
 	{	return m * f;	}
-	matrix3 operator / (float f) const;
-	matrix3 operator /= (float f);
-	matrix3 operator * (const matrix3 &m) const;
-	vector operator * (const vector &v) const;
+	matrix3 _cdecl operator / (float f) const;
+	matrix3 _cdecl operator /= (float f);
+	matrix3 _cdecl operator * (const matrix3 &m) const;
+	vector _cdecl operator * (const vector &v) const;
 	/*friend vector operator * (const vector &v, const matrix3 &m)
 	{	return m*v;	}*/
-	string str() const;
+	string _cdecl str() const;
 };
 
 // matrix3s

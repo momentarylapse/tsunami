@@ -59,9 +59,9 @@ void PeakMeter::OnDraw()
 		c->DrawRect(2, 2, w-4, h/2 - 2);
 		c->DrawRect(2, h/2 + 2, w-4, h - 2);
 		c->SetColor(peak_color(peak_r));
-		c->DrawRect(2, 2,       (float)(w - 4) * min(pow(peak_r, 0.8), 1), h/2 - 2);
+		c->DrawRect(2, 2,       (float)(w - 4) * min(pow(peak_r, 0.8f), 1), h/2 - 2);
 		c->SetColor(peak_color(peak_l));
-		c->DrawRect(2, h/2 + 2, (float)(w - 4) * min(pow(peak_l, 0.8), 1), h - 2);
+		c->DrawRect(2, h/2 + 2, (float)(w - 4) * min(pow(peak_l, 0.8f), 1), h - 2);
 	}else{
 		c->SetColor(White);
 		c->DrawRect(2, 2, w - 4, h - 4);

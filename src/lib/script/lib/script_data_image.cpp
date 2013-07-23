@@ -51,28 +51,28 @@ void SIAddPackageImage()
 		class_add_element("data",			TypeIntList,	GetDAImage(data));
 		class_add_element("error",			TypeBool,		GetDAImage(error));
 		class_add_element("alpha_used",		TypeBool,		GetDAImage(alpha_used));
-		class_add_func("__init__",			TypeVoid,	image_p(mf((tmf)&Image::__init__)));
-		class_add_func("__delete__",		TypeVoid,	image_p(mf((tmf)&Image::__delete__)));
-		class_add_func("Create",			TypeVoid,	image_p(mf((tmf)&Image::Create)));
+		class_add_func("__init__",			TypeVoid,	image_p(mf(&Image::__init__)));
+		class_add_func("__delete__",		TypeVoid,	image_p(mf(&Image::__delete__)));
+		class_add_func("Create",			TypeVoid,	image_p(mf(&Image::Create)));
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
 			func_add_param("c",			TypeColor);
-		class_add_func("Load",			TypeVoid,	image_p(mf((tmf)&Image::Load)));
+		class_add_func("Load",			TypeVoid,	image_p(mf(&Image::Load)));
 			func_add_param("filename",	TypeString);
-		class_add_func("Save",			TypeVoid,	image_p(mf((tmf)&Image::Save)));
+		class_add_func("Save",			TypeVoid,	image_p(mf(&Image::Save)));
 			func_add_param("filename",	TypeString);
-		class_add_func("Scale",			TypeVoid,	image_p(mf((tmf)&Image::Scale)));
+		class_add_func("Scale",			TypeVoid,	image_p(mf(&Image::Scale)));
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
-		class_add_func("SetPixel",		TypeVoid,	image_p(mf((tmf)&Image::SetPixel)));
+		class_add_func("SetPixel",		TypeVoid,	image_p(mf(&Image::SetPixel)));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 			func_add_param("c",			TypeColor);
-		class_add_func("GetPixel",		TypeColor,	amd64_wrap(mf((tmf)&Image::GetPixel), &amd64_image_get_pixel));
+		class_add_func("GetPixel",		TypeColor,	amd64_wrap(mf(&Image::GetPixel), &amd64_image_get_pixel));
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
-		class_add_func("Delete",			TypeVoid,	image_p(mf((tmf)&Image::Delete)));
-		class_add_func("__assign__",			TypeVoid,	image_p(mf((tmf)&Image::operator=)));
+		class_add_func("Delete",			TypeVoid,	image_p(mf(&Image::Delete)));
+		class_add_func("__assign__",			TypeVoid,	image_p(mf(&Image::operator=)));
 			func_add_param("other",		TypeImage);
 }
 

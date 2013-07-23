@@ -217,6 +217,7 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Function *f)
 		}
 
 	DoError("unknown element of " + type->name);
+	return NULL;
 }
 
 Command *SyntaxTree::GetOperandExtensionArray(Command *Operand, Function *f)
@@ -332,7 +333,7 @@ bool SyntaxTree::GetSpecialFunctionCall(const string &f_name, Command *Operand, 
 			(*(int*)(Constants[nc].data)) = Types[nt]->size;
 		else if ((GetExistence(Exp.cur, f)) && ((GetExistenceLink.kind == KindVarGlobal) || (GetExistenceLink.kind == KindVarLocal)))
 			(*(int*)(Constants[nc].data)) = GetExistenceLink.type->size;
-		else if (type == GetConstantType())
+		else if (type = GetConstantType())
 			(*(int*)(Constants[nc].data)) = type->size;
 		else
 			DoError("type-name or variable name expected in sizeof(...)");

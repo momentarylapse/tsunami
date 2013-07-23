@@ -7,6 +7,9 @@
 
 #include "HuiControlProgressBar.h"
 
+
+#ifdef HUI_API_GTK
+
 HuiControlProgressBar::HuiControlProgressBar(const string &title, const string &id) :
 	HuiControl(HuiKindProgressBar, id)
 {
@@ -22,19 +25,25 @@ HuiControlProgressBar::~HuiControlProgressBar() {
 
 string HuiControlProgressBar::GetString()
 {
+	return "";
 }
 
 void HuiControlProgressBar::__SetString(const string &str)
 {
+#if GTK_MAJOR_VERSION >= 3
 	gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(widget), true);
+#endif
 	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget), sys_str(str));
 }
 
 float HuiControlProgressBar::GetFloat()
 {
+	return 0;
 }
 
 void HuiControlProgressBar::__SetFloat(float f)
 {
 	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(widget), min(max(f, 0), 1));
 }
+
+#endif

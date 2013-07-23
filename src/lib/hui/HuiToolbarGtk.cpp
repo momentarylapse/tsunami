@@ -8,6 +8,8 @@
 #include "HuiToolbar.h"
 #include "Controls/HuiControl.h"
 
+#ifdef HUI_API_GTK
+
 HuiToolbar::HuiToolbar(HuiWindow *_win, bool vertical)
 {
 	win = _win;
@@ -54,5 +56,5 @@ void HuiToolbar::add(HuiControl *c)
 	gtk_toolbar_insert(GTK_TOOLBAR(widget), GTK_TOOL_ITEM(c->widget), -1);
 }
 
-
+#endif
 

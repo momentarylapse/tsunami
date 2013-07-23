@@ -76,7 +76,7 @@ void HuiLoadResource(const string &filename)
 	_HuiResource_.clear();
 	_HuiLanguage_.clear();
 
-	CFile *f = OpenFile(filename);
+	CFile *f = FileOpen(filename);
 	if (f){
 		int ffv = f->ReadFileFormatVersion();
 		int nres = f->ReadIntC();

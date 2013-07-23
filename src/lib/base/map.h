@@ -24,17 +24,17 @@ public:
 	typedef MapEntry<T1, T2> Entry;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	int add(const T1 &key, const T2 &value)
+	int _cdecl add(const T1 &key, const T2 &value)
 	{
 		MapEntry<T1, T2> e = {key, value};
 		return Set<MapEntry<T1, T2> >::add(e);
 	}
-	int find(const T1 &key) const
+	int _cdecl find(const T1 &key) const
 	{
 		Entry e = {key, dummy};
 		return Set<Entry>::find(e);
 	}
-	bool contains(const T1 &key) const
+	bool _cdecl contains(const T1 &key) const
 	{
 		return find(key) >= 0;
 	}
@@ -77,7 +77,7 @@ public:
 	typedef HashMapEntry<T1, T2> Entry;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	int add(const T1 &key, const T2 &value)
+	int _cdecl add(const T1 &key, const T2 &value)
 	{
 		HashMapEntry<T1, T2> e = {key, key.hash(), value};
 		return Set<HashMapEntry<T1, T2> >::add(e);

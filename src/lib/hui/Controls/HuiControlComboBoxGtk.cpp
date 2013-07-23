@@ -7,6 +7,8 @@
 
 #include "HuiControlComboBox.h"
 
+#ifdef HUI_API_GTK
+
 void OnGtkComboboxChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->Notify("hui:change");	}
 
@@ -38,7 +40,11 @@ void HuiControlComboBox::__SetString(const string &str)
 
 void HuiControlComboBox::__AddString(const string& str)
 {
+#if GTK_MAJOR_VERSION >= 3
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(widget), NULL, sys_str(str));
+#else
+	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget), sys_str(str));
+#endif
 }
 
 void HuiControlComboBox::__SetInt(int i)
@@ -53,5 +59,14 @@ int HuiControlComboBox::GetInt()
 
 void HuiControlComboBox::__Reset()
 {
+#if GTK_MAJOR_VERSION >= 3
 	gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(widget));
+#else
+	/*GtkTreeModel *m = gtk_combo_box_get_model(GTK_COMBO_BOX(widget));
+	gtk_tree_model_cl
+	gtk_combo_box_remove_all(GTK_COMBO_BOX_TEXT(widget));*/
+	msg_todo("ComboBox.Reset for gtk 2.24");
+#endif
 }
+
+#endif

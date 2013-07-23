@@ -7,6 +7,8 @@
 
 #include "HuiControlEdit.h"
 
+#ifdef HUI_API_GTK
+
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str);
 
 void OnGtkEditChange(GtkWidget *widget, gpointer data)
@@ -60,3 +62,5 @@ void HuiControlEdit::CompletionClear()
 {
 	gtk_entry_set_completion(GTK_ENTRY(widget), NULL);
 }
+
+#endif

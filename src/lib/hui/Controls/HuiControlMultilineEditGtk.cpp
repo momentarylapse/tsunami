@@ -7,6 +7,8 @@
 
 #include "HuiControlMultilineEdit.h"
 
+#ifdef HUI_API_GTK
+
 void OnGtkMultilineEditChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->Notify("hui:change");	}
 
@@ -54,3 +56,5 @@ string HuiControlMultilineEdit::GetString()
 void HuiControlMultilineEdit::__AddString(const string& str)
 {
 }
+
+#endif

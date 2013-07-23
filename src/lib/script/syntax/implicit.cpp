@@ -99,7 +99,8 @@ void SyntaxTree::CreateImplicitComplexConstructor(Type *t)
 	// parent constructor
 	Command *c = add_command_classfunc(t, *pcc, cp_command(self));
 	for (int i=0;i<pcf->num_params;i++)
-		c->param[i] = add_command_local_var(0, pcf->var[i].type);
+		c->param[i] = add_command_local_var(i, pcf->var[i].type);
+	c->num_params = pcf->num_params;
 	f->block->command.add(c);
 
 	// add vtable reference

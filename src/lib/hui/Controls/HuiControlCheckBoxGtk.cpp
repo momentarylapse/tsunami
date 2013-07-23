@@ -7,6 +7,8 @@
 
 #include "HuiControlCheckBox.h"
 
+#ifdef HUI_API_GTK
+
 void OnGtkCheckboxChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->Notify("hui:change");	}
 
@@ -41,3 +43,5 @@ bool HuiControlCheckBox::IsChecked()
 {
 	return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }
+
+#endif

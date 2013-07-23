@@ -1,11 +1,13 @@
 /*
- * HuiMenuItemToggle.cpp
+ * HuiMenuItemToggleGtk.cpp
  *
  *  Created on: 26.06.2013
  *      Author: michi
  */
 
 #include "HuiMenuItemToggle.h"
+
+#ifdef HUI_API_GTK
 
 void try_add_accel(GtkWidget *item, const string &id);
 gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data);
@@ -32,3 +34,4 @@ bool HuiMenuItemToggle::IsChecked()
 	return gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
 }
 
+#endif

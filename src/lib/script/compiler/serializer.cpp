@@ -384,23 +384,23 @@ int Serializer::fc_x86_begin()
 		}
 	}
 
-#ifdef NIX_IDE_VCS
-	// more than 4 byte have to be returned -> give return address as very last parameter!
-	if (type->UsesReturnByMemory())
-		add_cmd(Asm::inst_push, ret_ref; // nachtraegliche eSP-Korrektur macht die Funktion
-#endif
+	if (config.abi == AbiWindows32){
+		// more than 4 byte have to be returned -> give return address as very last parameter!
+		if (type->UsesReturnByMemory())
+			add_cmd(Asm::inst_push, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
+	}
 
 	// _cdecl: push class instance as first parameter
 	if (CompilerFunctionInstance.type){
 		add_cmd(Asm::inst_push, CompilerFunctionInstance);
 		push_size += config.PointerSize;
 	}
-
-#ifndef NIX_IDE_VCS
-	// more than 4 byte have to be returned -> give return address as very first parameter!
-	if (type->UsesReturnByMemory())
-		add_cmd(Asm::inst_push, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
-#endif
+	
+	if (config.abi == AbiGnu32){
+		// more than 4 byte have to be returned -> give return address as very first parameter!
+		if (type->UsesReturnByMemory())
+			add_cmd(Asm::inst_push, ret_ref); // nachtraegliche eSP-Korrektur macht die Funktion
+	}
 	return push_size;
 }
 

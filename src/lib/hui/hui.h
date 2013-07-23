@@ -47,7 +47,6 @@ string HuiSetImage(const Image &image);
 
 // HUI configuration
 extern string HuiComboBoxSeparator;
-extern bool HuiCreateHiddenWindows;
 
 // data from hui (...don't change...)
 extern string HuiAppFilename, HuiAppDirectory, HuiAppDirectoryStatic;

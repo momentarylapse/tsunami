@@ -10,7 +10,7 @@ class quaternion;
 matrix MatrixMultiply2(const matrix &m2, const matrix &m1);
 
 
-struct matrix
+class matrix
 {
 public:
 	union{
@@ -29,25 +29,25 @@ public:
 	matrix(){};
 	matrix(const float f[16]);
 	matrix(const vector &a, const vector &b, const vector &c);
-	matrix operator + (const matrix &m) const;
-	matrix operator - (const matrix &m) const;
-	matrix operator * (const matrix &m) const;
-	matrix operator * (float f) const;
-	friend matrix operator * (float f, const matrix &m)
+	matrix _cdecl operator + (const matrix &m) const;
+	matrix _cdecl operator - (const matrix &m) const;
+	matrix _cdecl operator * (const matrix &m) const;
+	matrix _cdecl operator * (float f) const;
+	friend matrix _cdecl operator * (float f, const matrix &m)
 	{	return m*f;	}
-	matrix operator *= (const matrix &m);
-	vector operator * (const vector &v) const;
-	float determinant() const;
-	vector transform_normal(const vector &v) const;
-	vector untransform(const vector &v) const;
-	vector project(const vector &v) const;
-	vector unproject(const vector &v) const;
-	string str() const;
+	matrix _cdecl operator *= (const matrix &m);
+	vector _cdecl operator * (const vector &v) const;
+	float _cdecl determinant() const;
+	vector _cdecl transform_normal(const vector &v) const;
+	vector _cdecl untransform(const vector &v) const;
+	vector _cdecl project(const vector &v) const;
+	vector _cdecl unproject(const vector &v) const;
+	string _cdecl str() const;
 
 	// kaba
-	void imul(const matrix &m);
-	matrix mul(const matrix &m) const;
-	vector mul_v(const vector &v) const;
+	void _cdecl imul(const matrix &m);
+	matrix _cdecl mul(const matrix &m) const;
+	vector _cdecl mul_v(const vector &v) const;
 };
 // matrices
 void _cdecl MatrixMultiply(matrix &m,const matrix &m2,const matrix &m1);

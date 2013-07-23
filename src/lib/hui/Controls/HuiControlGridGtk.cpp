@@ -5,8 +5,10 @@
  *      Author: michi
  */
 
-#include "HuiControlGrid.h"15
+#include "HuiControlGrid.h"
 #include "../hui.h"
+
+#ifdef HUI_API_GTK
 
 HuiControlGrid::HuiControlGrid(const string &title, const string &id, int num_x, int num_y, HuiWindow *win) :
 	HuiControl(HuiKindControlTable, id)
@@ -21,3 +23,4 @@ HuiControlGrid::~HuiControlGrid() {
 	// TODO Auto-generated destructor stub
 }
 
+#endif

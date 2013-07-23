@@ -16,9 +16,9 @@ static DirEntry *_dir_entry;
 class DirEntryList : public Array<DirEntry>
 {
 public:
-	void __assign__(const DirEntryList &o)
+	void _cdecl __assign__(const DirEntryList &o)
 	{	*this = o;	}
-	string str()
+	string _cdecl str()
 	{
 		string s = "[";
 		for (int i=0;i<num;i++){
@@ -60,60 +60,60 @@ void SIAddPackageFile()
 		class_add_element("milli_second",	TypeInt,		GetDADate(milli_second));
 		class_add_element("day_of_week",	TypeInt,		GetDADate(day_of_week));
 		class_add_element("day_of_year",	TypeInt,		GetDADate(day_of_year));
-		class_add_func("format",			TypeString,		mf((tmf)&Date::format));
+		class_add_func("format",			TypeString,		mf(&Date::format));
 			func_add_param("f",	TypeString);
-		class_add_func("str",				TypeString,		mf((tmf)&Date::str));
+		class_add_func("str",				TypeString,		mf(&Date::str));
 	
 	add_class(TypeFile);
-		class_add_func("GetDateCreation",		TypeDate,		mf((tmf)&CFile::GetDateCreation));
-		class_add_func("GetDateModification",		TypeDate,		mf((tmf)&CFile::GetDateModification));
-		class_add_func("GetDateAccess",		TypeDate,		mf((tmf)&CFile::GetDateAccess));
-		class_add_func("GetSize",		TypeInt,		mf((tmf)&CFile::GetSize));
-		class_add_func("GetPos",		TypeInt,		mf((tmf)&CFile::GetPos));
-		class_add_func("SetPos",		TypeVoid,		mf((tmf)&CFile::SetPos));
+		class_add_func("GetDateCreation",		TypeDate,		mf(&CFile::GetDateCreation));
+		class_add_func("GetDateModification",		TypeDate,		mf(&CFile::GetDateModification));
+		class_add_func("GetDateAccess",		TypeDate,		mf(&CFile::GetDateAccess));
+		class_add_func("GetSize",		TypeInt,		mf(&CFile::GetSize));
+		class_add_func("GetPos",		TypeInt,		mf(&CFile::GetPos));
+		class_add_func("SetPos",		TypeVoid,		mf(&CFile::SetPos));
 			func_add_param("pos",		TypeInt);
 			func_add_param("absolute",	TypeBool);
-		class_add_func("SetBinaryMode",	TypeVoid,		mf((tmf)&CFile::SetBinaryMode));
+		class_add_func("SetBinaryMode",	TypeVoid,		mf(&CFile::SetBinaryMode));
 			func_add_param("binary",	TypeBool);
-		class_add_func("WriteBool",		TypeVoid,			mf((tmf)&CFile::WriteBool));
+		class_add_func("WriteBool",		TypeVoid,			mf(&CFile::WriteBool));
 			func_add_param("b",			TypeBool);
-		class_add_func("WriteInt",		TypeVoid,			mf((tmf)&CFile::WriteInt));
+		class_add_func("WriteInt",		TypeVoid,			mf(&CFile::WriteInt));
 			func_add_param("i",			TypeInt);
-		class_add_func("WriteFloat",	TypeVoid,			mf((tmf)&CFile::WriteFloat));
+		class_add_func("WriteFloat",	TypeVoid,			mf(&CFile::WriteFloat));
 			func_add_param("x",			TypeFloat);
-		class_add_func("WriteStr",		TypeVoid,			mf((tmf)&CFile::WriteStr));
+		class_add_func("WriteStr",		TypeVoid,			mf(&CFile::WriteStr));
 			func_add_param("s",			TypeString);
-		class_add_func("ReadBool",		TypeBool,			mf((tmf)&CFile::ReadBool));
-		class_add_func("ReadInt",		TypeInt,				mf((tmf)&CFile::ReadInt));
-		class_add_func("ReadFloat",		TypeFloat,			mf((tmf)&CFile::ReadFloat));
-		class_add_func("ReadStr",		TypeString,			mf((tmf)&CFile::ReadStr));
-		class_add_func("ReadBoolC",		TypeBool,			mf((tmf)&CFile::ReadBoolC));
-		class_add_func("ReadIntC",		TypeInt,			mf((tmf)&CFile::ReadIntC));
-		class_add_func("ReadFloatC",	TypeFloat,			mf((tmf)&CFile::ReadFloatC));
-		class_add_func("ReadStrC",		TypeString,			mf((tmf)&CFile::ReadStrC));
-		class_add_func("ReadComplete",	TypeString,			mf((tmf)&CFile::ReadComplete));
+		class_add_func("ReadBool",		TypeBool,			mf(&CFile::ReadBool));
+		class_add_func("ReadInt",		TypeInt,				mf(&CFile::ReadInt));
+		class_add_func("ReadFloat",		TypeFloat,			mf(&CFile::ReadFloat));
+		class_add_func("ReadStr",		TypeString,			mf(&CFile::ReadStr));
+		class_add_func("ReadBoolC",		TypeBool,			mf(&CFile::ReadBoolC));
+		class_add_func("ReadIntC",		TypeInt,			mf(&CFile::ReadIntC));
+		class_add_func("ReadFloatC",	TypeFloat,			mf(&CFile::ReadFloatC));
+		class_add_func("ReadStrC",		TypeString,			mf(&CFile::ReadStrC));
+		class_add_func("ReadComplete",	TypeString,			mf(&CFile::ReadComplete));
 
 	
 	add_class(TypeDirEntry);
 		class_add_element("name",			TypeString,		GetDADirEntry(name));
 		class_add_element("size",			TypeInt,		GetDADirEntry(size));
 		class_add_element("is_dir",			TypeBool,		GetDADirEntry(is_dir));
-		class_add_func("__init__",		TypeVoid,			mf((tmf)&DirEntry::__init__));
-		class_add_func("__assign__",		TypeVoid,			mf((tmf)&DirEntry::__assign__));
+		class_add_func("__init__",		TypeVoid,			mf(&DirEntry::__init__));
+		class_add_func("__assign__",		TypeVoid,			mf(&DirEntry::__assign__));
 			func_add_param("other",		TypeDirEntry);
-		class_add_func("str",		TypeString,			mf((tmf)&DirEntry::str));
+		class_add_func("str",		TypeString,			mf(&DirEntry::str));
 	
 	add_class(TypeDirEntryList);
-		class_add_func("__init__",		TypeVoid,			mf((tmf)&DirEntryList::__init__));
-		class_add_func("__assign__",		TypeVoid,			mf((tmf)&DirEntryList::__assign__));
+		class_add_func("__init__",		TypeVoid,			mf(&DirEntryList::__init__));
+		class_add_func("__assign__",		TypeVoid,			mf(&DirEntryList::__assign__));
 			func_add_param("other",		TypeDirEntryList);
-		class_add_func("str",		TypeString,			mf((tmf)&DirEntryList::str));
+		class_add_func("str",		TypeString,			mf(&DirEntryList::str));
 
 
 	// file access
-	add_func("FileOpen",			TypeFileP,				(void*)&OpenFile);
+	add_func("FileOpen",			TypeFileP,				(void*)&FileOpen);
 		func_add_param("filename",		TypeString);
-	add_func("FileCreate",			TypeFileP,				(void*)&CreateFile);
+	add_func("FileCreate",			TypeFileP,				(void*)&FileCreate);
 		func_add_param("filename",		TypeString);
 	add_func("FileRead",			TypeString,				(void*)&FileRead);
 		func_add_param("filename",		TypeString);

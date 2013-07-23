@@ -10,6 +10,8 @@
 
 #include "hui.h"
 
+void HuiInitTimers();
+
 class HuiTimer
 {
 public:
@@ -20,12 +22,12 @@ public:
 
 private:
 #ifdef OS_WINDOWS
-	LONGLONG CurTime;
-	LONGLONG LastTime;
-	float time_scale;
+	LONGLONG cur_time;
+	LONGLONG last_time;
 #endif
 #ifdef OS_LINUX
-	struct timeval CurTime, LastTime;
+	struct timeval cur_time;
+	struct timeval last_time;
 #endif
 };
 

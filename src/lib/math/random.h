@@ -5,14 +5,14 @@
 class Random
 {
 public:
-	void seed(const string &s);
-	int _get();
-	int geti(int max);
-	float getu();
-	float getf(float min, float max);
+	void _cdecl seed(const string &s);
+	int _cdecl _get();
+	int _cdecl geti(int max);
+	float _cdecl getu();
+	float _cdecl getf(float min, float max);
 
-	vector in_ball(float r);
-	vector dir();
+	vector _cdecl in_ball(float r);
+	vector _cdecl dir();
 
 private:
 	int Q[4096];

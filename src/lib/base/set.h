@@ -13,7 +13,7 @@ class Set : public Array<T>
 		Set() : Array<T>(){}
 		Set(const T &item) : Array<T>(item){}
 
-		int add(const T &item)
+		int _cdecl add(const T &item)
 		{
 			int i0 = 0;
 			int i1 = num;
@@ -33,12 +33,12 @@ class Set : public Array<T>
 				((Array<T>*)this)->add(item);
 			return i0;
 		}
-		void join(const Set &a)
+		void _cdecl join(const Set &a)
 		{
 			for (int i=0;i<a.num;i++)
 				add(a[i]);
 		}
-		int find(const T &item) const
+		int _cdecl find(const T &item) const
 		{
 			int i0 = 0;
 			int i1 = num;
@@ -54,13 +54,13 @@ class Set : public Array<T>
 			}
 			return -1;
 		}
-		void erase(const T &item)
+		void _cdecl erase(const T &item)
 		{
 			int index = find(item);
 			if (index >= 0)
 				((Array<T>*)this)->erase(index);
 		}
-		bool contains(const T &item) const
+		bool _cdecl contains(const T &item) const
 		{
 			return (find(item) >= 0);
 		}

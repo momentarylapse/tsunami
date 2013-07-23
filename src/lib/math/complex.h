@@ -2,8 +2,9 @@
 #ifndef _MATH_COMPLEX_INCLUDED_
 #define _MATH_COMPLEX__INCLUDED_
 
-struct complex
+class complex
 {
+public:
 	float x, y;
 	complex(){};
 	complex(float x, float y);
@@ -27,9 +28,9 @@ struct complex
 	{	return v*f;	}
 	bool operator == (const complex &v) const;
 	bool operator != (const complex &v) const;
-	float abs() const;
-	float abs_sqr() const;
-	string str() const;
+	float _cdecl abs() const;
+	float _cdecl abs_sqr() const;
+	string _cdecl str() const;
 };
 
 // complex

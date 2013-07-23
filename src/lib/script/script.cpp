@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.12.3.0";
+string Version = "0.12.4.0";
 
 //#define ScriptDebug
 
@@ -246,20 +246,24 @@ Script::~Script()
 	msg_db_f("~CScript", 4);
 	if ((Memory) && (!JustAnalyse)){
 		//delete[](Memory);
-		int r=munmap(Memory,MemorySize);
+		#ifdef OS_WINDOWS
+			VirtualFree(Memory, 0, MemorySize);
+		#else
+			int r = munmap(Memory, MemorySize);
+		#endif
 	}
 	if (Opcode){
 		#ifdef OS_WINDOWS
-			VirtualFree(Opcode,0,MEM_RELEASE);
+			VirtualFree(Opcode, 0, MEM_RELEASE);
 		#else
-			int r=munmap(Opcode,SCRIPT_MAX_OPCODE);
+			int r = munmap(Opcode, SCRIPT_MAX_OPCODE);
 		#endif
 	}
 	if (ThreadOpcode){
 		#ifdef OS_WINDOWS
-			VirtualFree(ThreadOpcode,0,MEM_RELEASE);
+			VirtualFree(ThreadOpcode, 0, MEM_RELEASE);
 		#else
-			int r=munmap(ThreadOpcode,SCRIPT_MAX_THREAD_OPCODE);
+			int r = munmap(ThreadOpcode, SCRIPT_MAX_THREAD_OPCODE);
 		#endif
 	}
 	if (Stack)

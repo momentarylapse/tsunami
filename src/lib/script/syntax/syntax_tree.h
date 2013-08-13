@@ -157,7 +157,7 @@ public:
 	void ParseEnum();
 	void ParseClass();
 	void ParseFunction(Type *class_type, bool as_extern);
-	void ParseClassFunction(Type *t, bool as_extern, int virtual_index);
+	void ParseClassFunction(Type *t, bool as_extern, int virtual_index, bool overwrite);
 	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
 	Type *ParseVariableDefSingle(Type *type, Function *f, bool as_param = false);
 	void ParseVariableDef(bool single, Function *f);
@@ -270,7 +270,9 @@ public:
 	bool FlagNoExecution;
 	bool FlagImmortal;
 	bool FlagCompileOS;
-	bool FlagCompileInitialRealMode;
+	bool FlagStringConstAsCString;
+	bool FlagNoFunctionFrame;
+	bool FlagAddEntryPoint;
 	bool FlagOverwriteVariablesOffset;
 	int VariablesOffset;
 

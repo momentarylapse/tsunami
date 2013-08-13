@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.12.4.0";
+string Version = "0.12.5.1";
 
 //#define ScriptDebug
 
@@ -225,6 +225,7 @@ Script::Script()
 	ReferenceCounter = 0;
 
 	cur_func = NULL;
+	first_execution = NULL;
 	WaitingMode = WaitingModeFirst;
 	TimeToWait = 0;
 	ShowCompilerStats = !config.CompileSilently;

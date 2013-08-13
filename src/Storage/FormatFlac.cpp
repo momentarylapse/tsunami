@@ -93,7 +93,7 @@ void FormatFlac::LoadTrack(Track *t, const string & filename, int offset, int le
 	bool ok = true;
 
 	flac_file_size = 1000000000;
-	CFile *f = OpenFile(filename);
+	CFile *f = FileOpen(filename);
 	if (f){
 		flac_file_size = f->GetSize();
 		FileClose(f);

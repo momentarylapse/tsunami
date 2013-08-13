@@ -133,13 +133,16 @@ SyntaxTree::SyntaxTree(Script *_script) :
 	FlagShowPrae = false;
 	FlagDisassemble = false;
 	FlagCompileOS = false;
-	FlagCompileInitialRealMode = false;
+	FlagStringConstAsCString = false;
+	FlagNoFunctionFrame = false;
+	FlagAddEntryPoint = false;
 	FlagOverwriteVariablesOffset = false;
 	FlagImmortal = false;
 	FlagNoExecution = false;
 	AsmMetaInfo = NULL;
 	cur_func = NULL;
 	script = _script;
+	AsmMetaInfo = new Asm::MetaInfo;
 
 	// "include" default stuff
 	foreach(Package &p, Packages)
@@ -304,13 +307,6 @@ void SyntaxTree::DoError(const string &str, int overwrite_line)
 void SyntaxTree::CreateAsmMetaInfo()
 {
 	msg_db_f("CreateAsmMetaInfo",5);
-	//msg_error("zu coden: CreateAsmMetaInfo");
-	if (!AsmMetaInfo){
-		AsmMetaInfo = new Asm::MetaInfo;
-		AsmMetaInfo->Mode16 = FlagCompileInitialRealMode;
-		AsmMetaInfo->CodeOrigin = 0; // FIXME:  &Opcode[0] ????
-	}
-	AsmMetaInfo->Opcode = script->Opcode;
 	AsmMetaInfo->global_var.clear();
 	for (int i=0;i<RootOfAllEvil.var.num;i++){
 		Asm::GlobalVar v;
@@ -475,8 +471,13 @@ void exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 void exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
 	Command *self = ps->add_command_local_var(f->get_var("self"), ps->GetPointerType(f->_class));
-	ps->GetExistenceLink.kind = KindFunction;
-	ps->GetExistenceLink.link_no = cf.nr;
+	if (cf.virtual_index >= 0){
+		ps->GetExistenceLink.kind = KindVirtualFunction;
+		ps->GetExistenceLink.link_no = cf.virtual_index;
+	}else{
+		ps->GetExistenceLink.kind = KindFunction;
+		ps->GetExistenceLink.link_no = cf.nr;
+	}
 	ps->GetExistenceLink.script = cf.script;
 	ps->GetExistenceLink.type = cf.return_type;
 	ps->GetExistenceLink.num_params = cf.param_type.num;

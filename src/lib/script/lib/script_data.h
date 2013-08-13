@@ -286,6 +286,7 @@ struct CompilerConfiguration
 {
 	int instruction_set;
 	int abi;
+	bool allow_std_lib;
 
 	int StackSize;
 	int PointerSize;
@@ -307,7 +308,7 @@ struct CompilerConfiguration
 
 extern CompilerConfiguration config;
 
-void Init(int instruction_set = -1, int abi = -1);
+void Init(int instruction_set = -1, int abi = -1, bool allow_std_lib = true);
 void End();
 
 

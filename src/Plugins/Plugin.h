@@ -8,7 +8,7 @@
 #ifndef PLUGIN_H_
 #define PLUGIN_H_
 
-#include "../lib/base/strings.h"
+#include "../lib/base/base.h"
 #include "../Data/AudioFile.h"
 
 namespace Script{

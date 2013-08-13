@@ -125,10 +125,8 @@ extern Type *TypeSocketList;
 	#define	GetDAHostData(x)			long(&_host_data->x)-long(_host_data)
 	class HostDataList : public Array<HostData>
 	{
-		public:
-			void _cdecl __init__(){Array<HostData>::__init__();}
-			void _cdecl __delete__(){clear();}
-			void _cdecl __assign__(HostDataList &other){*this = other;}
+	public:
+		void _cdecl __assign__(HostDataList &other){*this = other;}
 	};
 	static Camera *_camera;
 	#define	GetDACamera(x)		long(&_camera->x)-long(_camera)
@@ -169,6 +167,7 @@ extern Type *TypeSocketList;
 	#define	GetDATraceData(x)	0
 	typedef int TraceData;
 	typedef int Bone;
+	typedef int Model;
 	#define class_set_vtable_x(x)
 #endif
 
@@ -196,7 +195,7 @@ void SIAddPackageX()
 #endif
 
 	
-	TypeModel			= add_type  ("Model",		0);
+	TypeModel			= add_type  ("Model",		sizeof(Model));
 	TypeModelP			= add_type_p("model",		TypeModel);
 	TypeModelPPs		= add_type_p("model&",		TypeModelP);
 	TypeModelPList		= add_type_a("model[]",		TypeModelP, -1);
@@ -453,6 +452,9 @@ void SIAddPackageX()
 		class_add_element("cur_ang",		TypeQuaternion,	GetDABone(cur_ang));
 		class_add_element("cur_pos",		TypeVector,		GetDABone(cur_pos));
 
+	add_class(TypeBoneList);
+		class_add_func("__init__", TypeVoid, x_p(mf(&Array<Bone>::__init__)));
+
 	add_class(TypeModel);
 		class_add_element("pos",			TypeVector,		GetDAModel(pos));
 		class_add_element("vel",			TypeVector,		GetDAModel(vel));
@@ -478,8 +480,6 @@ void SIAddPackageX()
 		class_add_element("detail_dist",	TypeFloatArray,	GetDAModel(detail_dist));
 		class_add_element("var",			TypeFloatList,	GetDAModel(script_var));
 		class_add_element("var_i",			TypeIntList,	GetDAModel(script_var));
-		//class_add_element("var_p",			TypePointerList,GetDAModel(script_var));
-		class_add_element("data",			TypePointer,	GetDAModel(script_data));
 		class_add_element("item",			TypeModelPList,	GetDAModel(inventary));
 		class_add_element("skin",			TypeSkinPArray,	GetDAModel(skin));
 		class_add_element("skin0",			TypeSkinP,		GetDAModel(skin[0]));
@@ -491,6 +491,8 @@ void SIAddPackageX()
 		class_add_element("max",			TypeVector,		GetDAModel(max));
 		class_add_element("test_collisions",	TypeBool,		GetDAModel(test_collisions));
 		class_add_element("allow_shadow",	TypeBool,		GetDAModel(allow_shadow));
+		class_add_func("__init__",				TypeVoid,		x_p(mf(&Model::__init__)));
+		class_add_func_virtual("__delete__",				TypeVoid,		x_p(mf(&Model::__delete__)));
 		class_add_func("AddForce",		TypeVoid,	x_p(mf(&Object::AddForce)));
 			func_add_param("force",		TypeVector);
 			func_add_param("rho",		TypeVector);
@@ -529,6 +531,17 @@ void SIAddPackageX()
 			func_add_param("bone",			TypeModelP);
 		class_add_func("GetFilename",		TypeString,		x_p(mf(&Model::GetFilename)));
 		class_add_func("GetRoot",			TypeModelP,		x_p(mf(&Model::GetRoot)));
+		class_add_func_virtual("OnInit", TypeVoid, x_p(mf(&Model::OnInit)));
+		class_add_func_virtual("OnDelete", TypeVoid, x_p(mf(&Model::OnDelete)));
+		class_add_func_virtual("OnIterate", TypeVoid, x_p(mf(&Model::OnIterate)));
+		class_add_func_virtual("OnCollide", TypeVoid, x_p(mf(&Model::OnCollideM)));
+			func_add_param("m", TypeModelP);
+		class_add_func_virtual("OnCollide", TypeVoid, x_p(mf(&Model::OnCollideT)));
+			func_add_param("t", TypeTerrainP);
+		class_set_vtable_x(Model);
+
+	add_class(TypeModelPList);
+		class_add_func("__init__", TypeVoid, x_p(mf(&Array<Model*>::__init__)));
 
 	add_class(TypeTerrain);
 		class_add_element("pos",			TypeVector,		GetDATerrain(pos));
@@ -635,14 +648,15 @@ void SIAddPackageX()
 		class_add_element("cur_sock",		TypeSocketP,		GetDANetwork(CurrentSocket));
 
 	add_class(TypeHostData);
-		class_add_element("host",		TypeString,		GetDAHostData(host));
-		class_add_element("session",		TypeString,		GetDAHostData(session));
+		class_add_element("host", TypeString, GetDAHostData(host));
+		class_add_element("session", TypeString, GetDAHostData(session));
 	
 	add_class(TypeHostDataList);
-		class_add_func("__init__",		TypeVoid,	x_p(mf(&HostDataList::__init__)));
-		class_add_func("__delete__",		TypeVoid,	x_p(mf(&HostDataList::__delete__)));
-		class_add_func("__assign__",		TypeVoid,	x_p(mf(&HostDataList::__assign__)));
-			func_add_param("other",			TypeHostDataList);
+		class_add_func("__init__", TypeVoid, x_p(mf(&HostDataList::__init__)));
+		class_add_func("__delete__", TypeVoid, x_p(mf(&HostDataList::clear)));
+		class_add_func("clear", TypeVoid, x_p(mf(&HostDataList::clear)));
+		class_add_func("__assign__", TypeVoid, x_p(mf(&HostDataList::__assign__)));
+			func_add_param("other", TypeHostDataList);
 	
 	add_func("XFDrawStr",			TypeFloat,	x_p(&XFDrawStr));
 		func_add_param("x",			TypeFloat);
@@ -694,8 +708,6 @@ void SIAddPackageX()
 	add_func("ExitProgram",									TypeVoid,	x_p(ExitProgram));
 	add_func("ScreenShot",									TypeVoid,	x_p(ScreenShot));
 	add_func("FindHosts",									TypeHostDataList,	x_p(FindHosts));
-	add_func("XDelete",											TypeVoid,	x_p(&MetaDelete));
-		func_add_param("p",		TypePointer);
 	add_func("XDeleteLater",						TypeVoid,	x_p(&MetaDeleteLater));
 		func_add_param("p",		TypePointer);
 	add_func("XDeleteSelection",						TypeVoid,	x_p(&MetaDeleteSelection));

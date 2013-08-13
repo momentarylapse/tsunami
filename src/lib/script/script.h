@@ -58,6 +58,7 @@ public:
 	void AllocateMemory();
 	void AllocateStack();
 	void AllocateOpcode();
+	void AlignOpcode();
 	void CompileFunction(Function *f, char *Opcode, int &OpcodeSize);
 	void CompileOsEntryPoint();
 	void LinkOsEntryPoint();

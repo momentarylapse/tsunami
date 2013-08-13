@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.12.0.1";
+string DataVersion = "0.12.5.0";
 
 CompilerConfiguration config;
 
@@ -265,6 +265,7 @@ void _class_add_func_virtual(const string &tname, const string &name, Type *retu
 	cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
 	cur_class_func = &cur_class->function.back();
 	cur_class_func->virtual_index = index;
+	cur_class->num_virtual = max(cur_class->num_virtual, index + 1);
 }
 
 void class_add_func(const string &name, Type *return_type, void *func)
@@ -340,7 +341,8 @@ void add_const(const string &name, Type *type, void *value)
 	Constant c;
 	c.name = name;
 	c.type = type;
-	c.data = new char[max(type->size, config.PointerSize)];
+	c.data = new char[max(type->size, 8)];//config.PointerSize)];
+	// config.PointerSize might be smaller than needed for the following assignment
 	if ((type == TypeInt) || (type == TypeFloat) || (type == TypeChar)  || (type == TypeBool) || (type->is_pointer))
 		*(void**)c.data = value;
 	else
@@ -356,7 +358,7 @@ void add_const(const string &name, Type *type, void *value)
 void add_ext_var(const string &name, Type *type, void *var)
 {
 	cur_package_script->syntax->AddVar(name, type, &cur_package_script->syntax->RootOfAllEvil);
-	cur_package_script->g_var.add((char*)var);
+	cur_package_script->g_var.add(config.allow_std_lib ? (char*)var : NULL);
 };
 
 //------------------------------------------------------------------------------------------------//
@@ -385,7 +387,7 @@ int add_func(const string &name, Type *return_type, void *func, bool is_class)
 	f->num_params = 0;
 	f->_class = NULL;
 	cur_package_script->syntax->Functions.add(f);
-	cur_package_script->func.add((void (*)())func);
+	cur_package_script->func.add(config.allow_std_lib ? (void (*)())func : NULL);
 	cur_cmd = NULL;
 	cur_func = f;
 	cur_class_func = NULL;
@@ -449,6 +451,7 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 			func_add_param("start",		TypeInt);
 			func_add_param("num",		TypeInt);
 
+		// FIXME  wrong for complicated classes
 		if (t->parent->is_simple_class()){
 			if (!t->parent->UsesCallByReference()){
 				if (t->parent->is_pointer){
@@ -1027,28 +1030,28 @@ void SIAddCommands()
 	msg_db_f("SIAddCommands", 3);
 	
 	// type casting
-	add_func("-s2i-",				TypeInt,		(void*)&s2i);
+	add_func("@s2i",				TypeInt,		(void*)&s2i);
 		func_add_param("s",		TypeString);
-	add_func("-s2f-",				TypeFloat,		(void*)&s2f);
+	add_func("@s2f",				TypeFloat,		(void*)&s2f);
 		func_add_param("s",		TypeString);
-	add_func("-i2s-",				TypeString,	(void*)&i2s);
+	add_func("@i2s",				TypeString,	(void*)&i2s);
 		func_add_param("i",		TypeInt);
-	add_func("-f2s-",				TypeString,		(void*)&f2s);
+	add_func("@f2s",				TypeString,		(void*)&f2s);
 		func_add_param("f",			TypeFloat);
 		func_add_param("decimals",	TypeInt);
-	add_func("-f2sf-",			TypeString,		(void*)&f2sf);
+	add_func("@f2sf",			TypeString,		(void*)&f2sf);
 		func_add_param("f",			TypeFloat);
-	add_func("-b2s-",				TypeString,	(void*)&b2s);
+	add_func("@b2s",				TypeString,	(void*)&b2s);
 		func_add_param("b",		TypeBool);
 	add_func("p2s",				TypeString,	(void*)&p2s);
 		func_add_param("p",		TypePointer);
-	add_func("-ia2s-",			TypeString,	(void*)&ia2s);
+	add_func("@ia2s",			TypeString,	(void*)&ia2s);
 		func_add_param("a",		TypeIntList);
-	add_func("-fa2s-",			TypeString,	(void*)&fa2s);
+	add_func("@fa2s",			TypeString,	(void*)&fa2s);
 		func_add_param("a",		TypeFloatList);
-	add_func("-ba2s-",			TypeString,	(void*)&ba2s);
+	add_func("@ba2s",			TypeString,	(void*)&ba2s);
 		func_add_param("a",		TypeBoolList);
-	add_func("-sa2s-",			TypeString,	(void*)&sa2s);
+	add_func("@sa2s",			TypeString,	(void*)&sa2s);
 		func_add_param("a",		TypeStringList);
 	// debug output
 	/*add_func("cprint",			TypeVoid,		(void*)&_cstringout);
@@ -1056,9 +1059,9 @@ void SIAddCommands()
 	add_func("print",			TypeVoid,		(void*)&_stringout);
 		func_add_param("str",	TypeString);
 	// memory
-	add_func("-malloc-",			TypePointer,		(void*)&malloc);
+	add_func("@malloc",			TypePointer,		(void*)&malloc);
 		func_add_param("size",	TypeInt);
-	add_func("-free-",			TypeVoid,		(void*)&free);
+	add_func("@free",			TypeVoid,		(void*)&free);
 		func_add_param("p",	TypePointer);
 	// system
 	add_func("_exec_",			TypeString,		(void*)&shell_execute);
@@ -1079,7 +1082,7 @@ void SIAddPackageImage();
 void SIAddPackageSound();
 void SIAddPackageX();
 
-void Init(int instruction_set, int abi)
+void Init(int instruction_set, int abi, bool allow_std_lib)
 {
 	msg_db_f("ScriptInit", 1);
 
@@ -1099,9 +1102,12 @@ void Init(int instruction_set, int abi)
 #endif
 		}
 	}
+	config.allow_std_lib = allow_std_lib;
 	config.PointerSize = Asm::InstructionSet.pointer_size;
-	//config.SuperArraySize = config.PointerSize + 3 * sizeof(int);
-	config.SuperArraySize = sizeof(DynamicArray);
+	if ((abi >= 0) || (instruction_set >= 0))
+		config.SuperArraySize = config.PointerSize + 3 * sizeof(int);
+	else
+		config.SuperArraySize = sizeof(DynamicArray);
 	config.StackSize = SCRIPT_DEFAULT_STACK_SIZE;
 
 	config.allow_simplification = true;
@@ -1143,15 +1149,15 @@ void Init(int instruction_set, int abi)
 	add_type_cast(10,	TypeInt,		TypeChar,	"i2c",	(void*)&CastInt2Char);
 	add_type_cast(20,	TypeChar,		TypeInt,	"c2i",	(void*)&CastChar2Int);
 	add_type_cast(50,	TypePointer,	TypeBool,	"p2b",	(void*)&CastPointer2Bool);
-	add_type_cast(50,	TypeInt,		TypeString,	"-i2s-",	(void*)&CastInt2StringP);
-	add_type_cast(50,	TypeFloat,		TypeString,	"-f2sf-",	(void*)&CastFloat2StringP);
-	add_type_cast(50,	TypeBool,		TypeString,	"-b2s-",	(void*)&CastBool2StringP);
+	add_type_cast(50,	TypeInt,		TypeString,	"@i2s",	(void*)&CastInt2StringP);
+	add_type_cast(50,	TypeFloat,		TypeString,	"@f2sf",	(void*)&CastFloat2StringP);
+	add_type_cast(50,	TypeBool,		TypeString,	"@b2s",	(void*)&CastBool2StringP);
 	add_type_cast(50,	TypePointer,	TypeString,	"p2s",	(void*)&CastPointer2StringP);
-	//add_type_cast(50,	TypeClass,		TypeString,	"-f2s-",	(void*)&CastFloat2StringP);
-	add_type_cast(50,	TypeIntList,	TypeString,	"-ia2s-",	NULL);
-	add_type_cast(50,	TypeFloatList,	TypeString,	"-fa2s-",	NULL);
-	add_type_cast(50,	TypeBoolList,	TypeString,	"-ba2s-",	NULL);
-	add_type_cast(50,	TypeStringList,	TypeString,	"-sa2s-",	NULL);
+	//add_type_cast(50,	TypeClass,		TypeString,	"@f2s",	(void*)&CastFloat2StringP);
+	add_type_cast(50,	TypeIntList,	TypeString,	"@ia2s",	NULL);
+	add_type_cast(50,	TypeFloatList,	TypeString,	"@fa2s",	NULL);
+	add_type_cast(50,	TypeBoolList,	TypeString,	"@ba2s",	NULL);
+	add_type_cast(50,	TypeStringList,	TypeString,	"@sa2s",	NULL);
 
 	/*msg_write("------------------test");
 	foreach(PreType, t){
@@ -1185,6 +1191,13 @@ void LinkExternal(const string &name, void *pointer)
 	l.name = name;
 	l.pointer = pointer;
 	ExternalLinks.add(l);
+	if (name.head(5) == "lib__"){
+		string sname = name.substr(5, -1).replace("@list", "[]").replace("@@", ".");
+		foreach(Package &p, Packages)
+			foreachi(Function *f, p.script->syntax->Functions, i)
+				if (f->name == sname)
+					p.script->func[i] = (void(*)())pointer;
+	}
 }
 
 void *GetExternalLink(const string &name)

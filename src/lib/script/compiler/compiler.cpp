@@ -135,6 +135,8 @@ void Script::AllocateOpcode()
 #endif
 	if (((long)Opcode==-1)||((long)ThreadOpcode==-1))
 		DoErrorInternal("CScript:  could not allocate executable memory");
+	if (syntax->AsmMetaInfo->CodeOrigin == 0)
+		syntax->AsmMetaInfo->CodeOrigin = (long)Opcode;
 	OpcodeSize=0;
 	ThreadOpcodeSize=0;
 }
@@ -184,6 +186,14 @@ void Script::MapGlobalVariablesToMemory()
 	memset(Memory, 0, MemorySize); // reset all global variables to 0
 }
 
+void Script::AlignOpcode()
+{
+	int ocs_new = mem_align(OpcodeSize, config.FunctionAlign);
+	for (int i=OpcodeSize;i<ocs_new;i++)
+		Opcode[i] = 0x90;
+	OpcodeSize = ocs_new;
+}
+
 static int OCORA;
 void Script::CompileOsEntryPoint()
 {
@@ -199,36 +209,41 @@ void Script::CompileOsEntryPoint()
 
 	// put strings into Opcode!
 	foreachi(Constant &c, syntax->Constants, i){
-		if ((syntax->FlagCompileOS) || (c.type == TypeString)){
-			int offset = 0;
-			if (syntax->AsmMetaInfo)
-				offset = syntax->AsmMetaInfo->CodeOrigin;
-			cnst[i] = (char*)(long)(OpcodeSize + offset);
+		if (syntax->FlagCompileOS){// && (c.type == TypeCString)){
+			cnst[i] = (char*)(OpcodeSize + syntax->AsmMetaInfo->CodeOrigin);
 			int s = c.type->size;
-			if (c.type == TypeString)
+			if (c.type == TypeString){
+				// const string -> variable length
+				s = strlen(syntax->Constants[i].data) + 1;
+
+				*(void**)&Opcode[OpcodeSize] = (char*)(OpcodeSize + syntax->AsmMetaInfo->CodeOrigin + config.SuperArraySize); // .data
+				*(int*)&Opcode[OpcodeSize + config.PointerSize    ] = s - 1; // .num
+				*(int*)&Opcode[OpcodeSize + config.PointerSize + 4] = 0; // .reserved
+				*(int*)&Opcode[OpcodeSize + config.PointerSize + 8] = 1; // .item_size
+				OpcodeSize += config.SuperArraySize;
+			}else if (c.type == TypeCString){
 				s = strlen(c.data) + 1;
+			}
 			memcpy(&Opcode[OpcodeSize], (void*)c.data, s);
 			OpcodeSize += s;
 		}
 	}
+
+	AlignOpcode();
 }
 
 void Script::LinkOsEntryPoint()
 {
-	int nf=-1;
+	int nf = -1;
 	foreachi(Function *ff, syntax->Functions, index)
 		if (ff->name == "main")
 			nf = index;
-	if (nf>=0){
-		int lll=((long)func[nf]-(long)&Opcode[TaskReturnOffset]);
-		if (syntax->FlagCompileInitialRealMode)
-			lll+=5;
-		else
-			lll+=3;
+	if (nf >= 0){
+		int lll = (long)func[nf] - syntax->AsmMetaInfo->CodeOrigin - TaskReturnOffset;
 		//printf("insert   %d  an %d\n", lll, OCORA);
 		//msg_write(lll);
 		//msg_write(d2h(&lll,4,false));
-		*(int*)&Opcode[OCORA]=lll;
+		*(int*)&Opcode[OCORA] = lll;
 	}
 }
 
@@ -304,6 +319,7 @@ void Script::CompileTaskEntryPoint()
 void Script::Compiler()
 {
 	msg_db_f("Compiler",2);
+	Asm::CurrentMetaInfo = syntax->AsmMetaInfo;
 
 	syntax->MapLocalVariablesToStack();
 
@@ -328,14 +344,15 @@ void Script::Compiler()
 	AllocateOpcode();
 
 
-	syntax->PreProcessorAddresses(this);
-
-
 
 // compiling an operating system?
 //   -> create an entry point for execution... so we can just call Opcode like a function
-	if ((syntax->FlagCompileOS)||(syntax->FlagCompileInitialRealMode))
+	if (syntax->FlagAddEntryPoint)
 		CompileOsEntryPoint();
+
+
+
+	syntax->PreProcessorAddresses(this);
 
 
 // compile functions into Opcode
@@ -346,8 +363,9 @@ void Script::Compiler()
 			func[i] = (t_func*)GetExternalLink(f->name);
 			if (!func[i])
 				DoErrorLink("external function " + f->name + " not linkable");
+			//func[i] = (t_func*)((long)func[i] + (long)Opcode - syntax->AsmMetaInfo->CodeOrigin);
 		}else{
-			func[i] = (t_func*)&Opcode[OpcodeSize];
+			func[i] = (t_func*)(syntax->AsmMetaInfo->CodeOrigin + OpcodeSize);
 			CompileFunction(f, Opcode, OpcodeSize);
 		}
 	}
@@ -364,12 +382,13 @@ void Script::Compiler()
 
 
 
-	if (syntax->FlagCompileOS)
+	if (syntax->FlagAddEntryPoint)
 		LinkOsEntryPoint();
 
 
 	// initialize global objects
-	init_all_global_objects(syntax, g_var);
+	if (!syntax->FlagCompileOS)
+		init_all_global_objects(syntax, g_var);
 
 	//msg_db_out(1,GetAsm(Opcode,OpcodeSize));
 

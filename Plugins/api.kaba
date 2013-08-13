@@ -55,8 +55,8 @@ class Synthesizer
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()
-	extern virtual void AddToneFreq(BufferBox buf, Range range, float freq, float volume)
-	extern virtual void AddClick(BufferBox buf, int pos, int pitch, float volume)
+	extern overwrite void AddToneFreq(BufferBox buf, Range range, float freq, float volume)
+	extern overwrite void AddClick(BufferBox buf, int pos, int pitch, float volume)
 
 class TrackRenderBuffer
 	int dummy

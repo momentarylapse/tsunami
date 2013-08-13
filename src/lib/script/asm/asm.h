@@ -55,6 +55,12 @@ enum{
 
 
 enum{
+	inst_db, // data instructions
+	inst_dw,
+	inst_dd,
+	inst_ds,
+	inst_dz,
+
 	inst_add,
 	inst_adc,	   // add with carry
 	inst_sub,
@@ -183,6 +189,7 @@ enum{
 	inst_call,
 	inst_call_far,
 	inst_jmp,
+	inst_jmp_far,
 	inst_lock,
 	inst_rep,
 	inst_repne,
@@ -230,22 +237,22 @@ struct WantedLabel
 
 struct AsmData
 {
-	int Size; // number of bytes
-	int Pos; // relative to CodeOrigin (Opcode[0])
+	int size; // number of bytes
+	int cmd_pos;
+	int offset; // relative to CodeOrigin (Opcode[0])
+	//void *data;
 };
 
 struct BitChange
 {
-	int Pos; // relative to CodeOrigin (Opcode[0])
-	int Bits;
+	int cmd_pos;
+	int offset; // relative to CodeOrigin (Opcode[0])
+	int bits;
 };
 
 struct MetaInfo
 {
-	long CurrentOpcodePos; // current position in the opcode buffer (including script)
-	int PreInsertionLength; // size of script opcode preceding the asm block
 	long CodeOrigin; // how to interpret opcode buffer[0]
-	char *Opcode; // entire opcode of the script
 	bool Mode16;
 	int LineOffset; // number of script lines preceding asm block (to give correct error messages)
 
@@ -255,6 +262,8 @@ struct MetaInfo
 	Array<AsmData> data;
 	Array<BitChange> bit_change;
 	Array<GlobalVar> global_var;
+
+	MetaInfo();
 };
 
 

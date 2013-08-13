@@ -12,9 +12,7 @@ void main()
 	m.add(dt * 6, dt, 76, 0.7)
 	
 	bool ok = false
-	//forall t in audio.track
-	for int i, 0, audio.track.num
-		Track *t = audio.track[i].p
+	forall t in audio.track
 		if t.type != TRACK_TYPE_MIDI
 			continue
 		

@@ -31,7 +31,7 @@ Track::Track()
 	volume = 1;
 	muted = false;
 
-	synth = NULL;
+	synth = CreateSynthesizer("Dummy");
 
 	area = rect(0, 0, 0, 0);
 }
@@ -41,7 +41,7 @@ Track::Track()
 // destructor...
 void Track::Reset()
 {
-	msg_db_r("Track.Reset",1);
+	msg_db_f("Track.Reset",1);
 	level.clear();
 	name.clear();
 	area = rect(0, 0, 0, 0);
@@ -54,7 +54,6 @@ void Track::Reset()
 	if (synth)
 		delete(synth);
 	synth = CreateSynthesizer("Dummy");
-	msg_db_l(1);
 }
 
 Track::~Track()
@@ -109,7 +108,7 @@ string Track::GetNiceName()
 BufferBox Track::ReadBuffers(int level_no, const Range &r)
 {
 	BufferBox buf;
-	msg_db_r("Track.ReadBuffers", 1);
+	msg_db_f("Track.ReadBuffers", 1);
 
 	// is <r> inside a buffer?
 	foreach(BufferBox &b, level[level_no].buffer){
@@ -118,7 +117,6 @@ BufferBox Track::ReadBuffers(int level_no, const Range &r)
 		if ((p0 >= 0) && (p1 <= b.num)){
 			// set as reference to subarrays
 			buf.set_as_ref(b, p0, p1 - p0);
-			msg_db_l(1);
 			return buf;
 		}
 	}
@@ -130,14 +128,13 @@ BufferBox Track::ReadBuffers(int level_no, const Range &r)
 	foreach(BufferBox &b, level[level_no].buffer)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
-	msg_db_l(1);
 	return buf;
 }
 
 BufferBox Track::ReadBuffersCol(const Range &r)
 {
 	BufferBox buf;
-	msg_db_r("Track.ReadBuffersCol", 1);
+	msg_db_f("Track.ReadBuffersCol", 1);
 
 	// is <r> inside a single buffer?
 	int num_inside = 0;
@@ -158,7 +155,6 @@ BufferBox Track::ReadBuffersCol(const Range &r)
 	if ((num_inside == 1) && (!intersected)){
 		// set as reference to subarrays
 		buf.set_as_ref(level[inside_level].buffer[inside_no], inside_p0, inside_p1 - inside_p0);
-		msg_db_l(1);
 		return buf;
 	}
 
@@ -170,7 +166,6 @@ BufferBox Track::ReadBuffersCol(const Range &r)
 		foreach(BufferBox &b, l.buffer)
 			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
 
-	msg_db_l(1);
 	return buf;
 }
 

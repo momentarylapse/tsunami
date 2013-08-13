@@ -16,7 +16,7 @@ class ActionTrackMoveSample;
 class TrackDialog;
 class AudioFileDialog;
 
-class AudioView : public HuiEventHandler, public Observer, public Observable
+class AudioView : public Observer, public Observable
 {
 public:
 	AudioView(HuiWindow *parent, AudioFile *audio);

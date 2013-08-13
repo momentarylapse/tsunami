@@ -17,7 +17,7 @@ class AudioInputBase;
 class AudioInputAudio;
 class AudioInputMidi;
 
-class AudioInput : public HuiEventHandler, public PeakMeterSource
+class AudioInput : public PeakMeterSource
 {
 public:
 	AudioInput();

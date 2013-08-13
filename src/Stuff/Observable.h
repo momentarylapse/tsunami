@@ -10,10 +10,11 @@
 
 #include "Observer.h"
 #include "../lib/base/base.h"
+#include "../lib/hui/hui.h"
 
 class Observer;
 
-class Observable
+class Observable : public HuiEventHandler
 {
 public:
 	Observable(const string &name);

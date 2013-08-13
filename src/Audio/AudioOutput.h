@@ -16,7 +16,7 @@
 struct ALCdevice_struct;
 struct ALCcontext_struct;
 
-class AudioOutput : public HuiEventHandler, public PeakMeterSource
+class AudioOutput : public PeakMeterSource
 {
 public:
 	AudioOutput();

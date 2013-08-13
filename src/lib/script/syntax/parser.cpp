@@ -1520,6 +1520,7 @@ void SyntaxTree::ParseClass()
 	// virtual functions?     (derived -> _class->num_virtual)
 	int cur_virtual_index = _class->num_virtual;
 	_class->num_virtual += class_count_virtual_functions(this);
+	_class->num_virtual = ProcessClassNumVirtuals(_class->name, _class->num_virtual);
 	if (_class->num_virtual > 0){
 		if (_class->parent){
 			if (_class->parent->num_virtual == 0)

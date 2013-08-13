@@ -41,6 +41,7 @@ struct ClassOffsetData
 {
 	string class_name, element;
 	int offset;
+	bool is_virtual;
 };
 Array<ClassOffsetData> ClassOffsets;
 
@@ -1222,6 +1223,7 @@ void DeclareClassOffset(const string &class_name, const string &element, int off
 	d.class_name = class_name;
 	d.element = element;
 	d.offset = offset;
+	d.is_virtual = false;
 	ClassOffsets.add(d);
 }
 
@@ -1231,6 +1233,7 @@ void DeclareClassVirtualIndex(const string &class_name, const string &func, void
 	d.class_name = class_name;
 	d.element = func;
 	d.offset = (int)(long)p / sizeof(void*);
+	d.is_virtual = true;
 	ClassOffsets.add(d);
 }
 
@@ -1247,6 +1250,14 @@ int ProcessClassSize(const string &class_name, int size)
 		if (d.class_name == class_name)
 			return d.size;
 	return size;
+}
+
+int ProcessClassNumVirtuals(const string &class_name, int num_virtual)
+{
+	foreach(ClassOffsetData &d, ClassOffsets)
+		if ((d.class_name == class_name) && (d.is_virtual))
+			num_virtual = max(num_virtual, d.offset + 1);
+	return num_virtual;
 }
 
 void End()

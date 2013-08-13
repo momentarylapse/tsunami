@@ -31,7 +31,7 @@ void fill(BufferBox buf)
 			synth.AddMetronomeClick(buf, pos0, 0, volume)
 		else
 			synth.AddMetronomeClick(buf, pos0, 1, volume)
-		if chords.num > 0
+		if (chords.num > 0) and (n > 0)
 			AddChord(synth, buf, pos0, pos0 + sm_m, chords[n % chords.num], volume * 0.5)
 
 void Reset()

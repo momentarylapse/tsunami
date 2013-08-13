@@ -327,6 +327,7 @@ void DeclareClassVirtualIndex(const string &class_name, const string &func, void
 void *GetExternalLink(const string &name);
 int ProcessClassOffset(const string &class_name, const string &element, int offset);
 int ProcessClassSize(const string &class_name, int size);
+int ProcessClassNumVirtuals(const string &class_name, int num_virtual);
 
 
 

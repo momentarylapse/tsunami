@@ -10,13 +10,14 @@
 #include "../../Storage/Storage.h"
 #include "../../View/AudioView.h"
 #include "../../Tsunami.h"
+#include <math.h>
 
 SampleManager::SampleManager(AudioFile *a, HuiWindow* _parent, bool _allow_parent) :
 	HuiDialog(_("Sample Manager"), 600, 400, _parent, _allow_parent)
 {
 	AddControlTable("", 0, 0, 1, 2, "table1");
 	SetTarget("table1", 0);
-	AddListView(_("!format=TttC\\Name\\Dauer\\Benutzung\\L&oschen"), 0, 0, 0, 0, "sample_list");
+	AddListView(_("!format=iTttC\\Vorschau\\Name\\Dauer\\Benutzung\\L&oschen"), 0, 0, 0, 0, "sample_list");
 	AddControlTable("!noexpandy", 0, 1, 4, 1, "table2");
 	SetTarget("table2", 0);
 	AddButton(_("Laden..."), 0, 0, 0, 0, "import_from_file");
@@ -44,11 +45,32 @@ SampleManager::~SampleManager()
 	Unsubscribe(audio);
 }
 
+string render_bufbox(BufferBox &b, int w, int h)
+{
+	Image im;
+	im.Create(w, h, color(0, 0, 0, 0));
+	for (int x=0; x<w; x++){
+		float m = 0;
+		int i0 = (b.num * x) / w;
+		int i1 = (b.num * (x + 1)) / w;
+		for (int i=i0; i<i1; i++)
+			m = max(m, fabs(b.r[i]));
+		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
+			im.SetPixel(x, y, Black);
+	}
+	return HuiSetImage(im);
+}
+
 void SampleManager::FillList()
 {
 	Reset("sample_list");
-	foreach(Sample *s, audio->sample)
-		SetString("sample_list", s->name + "\\" + audio->get_time_str(s->buf.num) + "\\" + i2s(s->ref_count) + "\\" + b2s(s->auto_delete));
+	foreach(string &name, icon_names)
+		HuiDeleteImage(name);
+	icon_names.clear();
+	foreachi(Sample *s, audio->sample, i){
+		icon_names.add(render_bufbox(s->buf, 80, 32));
+		SetString("sample_list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str(s->buf.num) + "\\" + i2s(s->ref_count) + "\\" + b2s(s->auto_delete));
+	}
 	Enable("delete_sample", false);
 	Enable("insert_sample", false);
 }
@@ -65,7 +87,7 @@ void SampleManager::OnImportFromFile()
 	if (tsunami->storage->AskOpenImport(this)){
 		BufferBox buf;
 		tsunami->storage->LoadBufferBox(audio, &buf, HuiFilename);
-		audio->AddSample(HuiFilename, buf);
+		audio->AddSample(HuiFilename.basename(), buf);
 	}
 }
 

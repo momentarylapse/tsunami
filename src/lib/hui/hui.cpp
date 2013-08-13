@@ -519,14 +519,23 @@ void HuiEnd()
 }
 
 
+static int _HuiCurrentImageNo_ = 0;
+
 string HuiSetImage(const Image &image)
 {
 	sHuiImage img;
 	img.type = 1;
 	img.image = image;
-	img.filename = format("image:%d", HuiImage.num);
+	img.filename = format("image:%d", _HuiCurrentImageNo_ ++);
 	HuiImage.add(img);
 	return img.filename;
+}
+
+void HuiDeleteImage(const string &name)
+{
+	for (int i=0;i<HuiImage.num;i++)
+		if (HuiImage[i].filename == name)
+			HuiImage.erase(i);
 }
 
 

@@ -44,6 +44,7 @@ extern bool HuiEndKeepMsgAlive;
 // images
 //int HuiLoadImage(const string &filename);
 string HuiSetImage(const Image &image);
+void HuiDeleteImage(const string &name);
 
 // HUI configuration
 extern string HuiComboBoxSeparator;

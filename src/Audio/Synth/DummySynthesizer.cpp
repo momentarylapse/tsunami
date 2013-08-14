@@ -27,15 +27,20 @@ void DummySynthesizer::AddTone(BufferBox& buf, const Range& range, float pitch, 
 {
 	float freq = pitch_to_freq(pitch);
 	float f_w = 1.0f / sample_rate * freq * 2.0f * pi;
+	int sm_d = 0.02f * sample_rate;
+
 	int i0 = max(range.offset, 0);
-	int i1 = min(range.end(), buf.num);
+	int i1 = min(range.end() + sm_d * 8, buf.num);
+
 	for (int i=i0; i<i1; i++){
 		float tt = (i - range.offset) * f_w;
 		float d = sin(tt) * volume;
-		if (i < range.offset + 1000)
+		if (i > range.end()){
+			float fi = (float)(i - range.end()) / (float)sm_d;
+			d *= exp(-fi);//1 - fi;
+		}else if (i < range.offset + 1000){
 			d *= (i - range.offset) * 0.001;
-		if (i > range.end() - 1000)
-			d *= (range.end() - i) * 0.001;
+		}
 		buf.r[i] += d;
 		buf.l[i] += d;
 	}

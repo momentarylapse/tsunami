@@ -147,8 +147,10 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::LinkExternal("Synthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
 	Script::LinkExternal("Synthesizer.AddTone", Script::mf(&Synthesizer::AddTone));
+	Script::LinkExternal("Synthesizer.configure", Script::mf(&Synthesizer::configure));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "AddTone", Script::mf(&Synthesizer::AddTone));
+	Script::DeclareClassVirtualIndex("Synthesizer", "configure", Script::mf(&Synthesizer::configure));
 	Script::LinkExternal("Synthesizer.AddMetronomeClick", Script::mf(&Synthesizer::AddMetronomeClick));
 
 	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));

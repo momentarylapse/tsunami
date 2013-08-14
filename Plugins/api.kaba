@@ -49,6 +49,7 @@ class Synthesizer
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void AddTone(BufferBox buf, Range range, float pitch, float volume)
+	extern virtual void configure()
 	extern void AddMetronomeClick(BufferBox buf, int pos, int level, float volume)
 
 class DummySynthesizer : Synthesizer

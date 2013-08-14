@@ -3,13 +3,14 @@ use "../api.kaba"
 void main()
 	MidiData m
 	int dt = 20000
-	m.add(0     , dt, 69, 1)
-	m.add(dt    , dt, 71, 0.4)
-	m.add(dt * 2, dt, 72, 0.6)
-	m.add(dt * 3, dt, 74, 0.8)
-	m.add(dt * 4, dt, 76, 1)
-	m.add(dt * 5, dt, 81, 1)
-	m.add(dt * 6, dt, 76, 0.7)
+	int l = 19000
+	m.add(0     , l, 69, 1)
+	m.add(dt    , l, 71, 0.4)
+	m.add(dt * 2, l, 72, 0.6)
+	m.add(dt * 3, l, 74, 0.8)
+	m.add(dt * 4, l, 76, 1)
+	m.add(dt * 5, l, 81, 1)
+	m.add(dt * 6, l, 76, 0.7)
 	
 	bool ok = false
 	forall t in audio.track

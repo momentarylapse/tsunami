@@ -35,6 +35,8 @@ public:
 	virtual void read(BufferBox &buf){}
 	void iterate(int samples);
 
+	virtual void configure(){}
+
 	string name;
 	int sample_rate;
 

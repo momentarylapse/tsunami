@@ -7,6 +7,8 @@
 
 #include "MidiPatternManager.h"
 #include "../../Data/AudioFile.h"
+#include "../../Audio/AudioOutput.h"
+#include "../../Audio/Synth/DummySynthesizer.h"
 #include "../../Tsunami.h"
 #include "../AudioView.h"
 #include <math.h>
@@ -25,6 +27,7 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	//AddButton(_("Einf&ugen"), 2, 0, 0, 0, "insert_sample");
 	//AddButton(_("Aus Auswahl"), 3, 0, 0, 0, "create_from_selection");
 	AddButton(_("Abspielen"), 2, 0, 0, 0, "play_pattern");
+	AddButton(_("Stopp"), 3, 0, 0, 0, "stop_pattern");
 
 	//SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 
@@ -39,10 +42,13 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	EventMX("area", "hui:mouse-move", this, &MidiPatternManager::OnAreaMouseMove);
 	EventMX("area", "hui:left-button-down", this, &MidiPatternManager::OnAreaLeftButtonDown);
 	EventMX("area", "hui:left-button-up", this, &MidiPatternManager::OnAreaLeftButtonUp);
+	EventM("play_pattern", this, &MidiPatternManager::OnPlay);
+	EventM("stop_pattern", this, &MidiPatternManager::OnStop);
 
 
 	pitch_min = 60;
 	pitch_max = 90;
+	beats_per_minute = 90;
 	audio = a;
 	creating_new_note = false;
 	new_note = new MidiNote;
@@ -51,10 +57,12 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	FillList();
 
 	Subscribe(audio);
+	Subscribe(tsunami->output);
 }
 
 MidiPatternManager::~MidiPatternManager()
 {
+	Unsubscribe(tsunami->output);
 	Unsubscribe(audio);
 }
 
@@ -219,6 +227,16 @@ void MidiPatternManager::OnAreaDraw()
 		c->SetColor(col);
 		c->DrawRect(rect(time2x(cur_time), time2x(cur_time + 1), pitch2y(cur_pitch + 1), pitch2y(cur_pitch)));
 	}
+
+	if (tsunami->output->IsPlaying()){
+		int pos = tsunami->output->GetPos();
+		int samples_per_beat = DEFAULT_SAMPLE_RATE * 60 / beats_per_minute;
+		int length = samples_per_beat * cur_pattern->num_beats;
+		int offset = pos % length;
+		float x = w * offset / length;
+		c->SetColor(Green);
+		c->DrawLine(x, 0, x, h);
+	}
 }
 
 void MidiPatternManager::OnAdd()
@@ -241,6 +259,38 @@ void MidiPatternManager::SetCurPattern(MidiPattern *p)
 	Redraw("area");
 }
 
+void stream_func(BufferBox &b)
+{
+	for (int i=0;i<b.num;i++){
+		b.r[i] = 0;
+		b.l[i] = 0;
+	}
+	DummySynthesizer synth;
+	MidiPatternManager *m = tsunami->midi_pattern_manager;
+	MidiPattern *p = m->cur_pattern;
+	int samples_per_beat = DEFAULT_SAMPLE_RATE * 60 / m->beats_per_minute;
+	int samples_per_time = samples_per_beat / p->beat_partition;
+	int length = samples_per_beat * p->num_beats;
+	int offset = b.offset % length;
+	foreach(MidiNote &n, p->notes){
+		Range r = Range(n.range.offset * samples_per_time - offset, n.range.num * samples_per_time);
+		if (r.end() < 0)
+			r.offset += length;
+		synth.AddTone(b, r, n.pitch, n.volume);
+	}
+}
+
+void MidiPatternManager::OnPlay()
+{
+	if (cur_pattern)
+		tsunami->output->PlayGenerated((void*)&stream_func, DEFAULT_SAMPLE_RATE);
+}
+
+void MidiPatternManager::OnStop()
+{
+	tsunami->output->Stop();
+}
+
 void MidiPatternManager::OnClose()
 {
 	Hide();
@@ -248,5 +298,8 @@ void MidiPatternManager::OnClose()
 
 void MidiPatternManager::OnUpdate(Observable* o)
 {
-	FillList();
+	if (o == audio)
+		FillList();
+	else if (o == tsunami->output)
+		Redraw("area");
 }

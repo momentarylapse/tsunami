@@ -32,6 +32,8 @@ public:
 	//void OnImportFromFile();
 	//void OnInsert();
 	//void OnCreateFromSelection();
+	void OnPlay();
+	void OnStop();
 	void OnDelete();
 	void OnClose();
 
@@ -44,6 +46,8 @@ public:
 	AudioFile *audio;
 	MidiPattern *cur_pattern;
 	Array<string> icon_names;
+
+	float beats_per_minute;
 
 	int pitch_min, pitch_max;
 

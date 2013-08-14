@@ -16,30 +16,37 @@ DummySynthesizer synth
 
 window dlg
 
-float gauss(float x)
-	return exp(- x*x)
+float gauss(float f, float bw)
+	float x = f / bw
+	return exp(- x*x) / bw
 
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio
+	
+	float A[]
+	A.add(0) // dummy
+	A.add(1)
+	A.add(0.4)
+	A.add(0.2)
+	A.add(0.1)
+	A.add(0.05)
+	float bw = 0.5
+	float bwscale = 0.7
 	
 	complex c[]
 	float amp[]
 	c.resize(buf.num / 2 - 1)
 	amp.resize(buf.num / 2 - 1)
 	
-	float w = i2f(buf.num) / a.sample_rate
-	for int i, 0, amp.num
-		float freq = i2f(i) / w
-		amp[i] = gauss((freq - data.Frequency) * 0.1)
-	for int i, 0, amp.num
-		freq = i2f(i) / w
-		amp[i] += gauss((freq - data.Frequency * 2) * 0.04) * 0.03
-	for int i, 0, amp.num
-		freq = i2f(i) / w
-		amp[i] += gauss((freq - data.Frequency * 3) * 0.02) * 0.01
-	for int i, 0, amp.num
-		freq = i2f(i) / w
-		amp[i] += gauss((freq - data.Frequency * 4) * 0.01) * 0.002
+	for int n, 1, A.num
+		float nn = n + 0.03 * n * n
+		float bwHz = (pow(2, bw / 12.0) - 1.0) * data.Frequency * pow(nn, bwscale)
+		float bwi = bwHz / (2.0 * a.sample_rate)
+		float fi = data.Frequency * nn / a.sample_rate
+		print fi
+		print A[n]
+		for int i, 0, amp.num
+			amp[i] += gauss((i2f(i) / buf.num) - fi, bwi) * A[n]
 		
 	for int i, 0, c.num
 		float phi = rand(2 * pi)

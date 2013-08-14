@@ -10,7 +10,6 @@
 
 #include "../../Action.h"
 
-class BufferBox;
 class Sample;
 
 class ActionAudioDeleteSample : public Action

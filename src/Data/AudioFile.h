@@ -11,6 +11,7 @@
 #include "Data.h"
 #include "Track.h"
 #include "Sample.h"
+#include "MidiPattern.h"
 #include "../lib/base/base.h"
 #include "../lib/math/rect.h"
 
@@ -67,6 +68,9 @@ public:
 	void DeleteTrack(int index);
 	Sample *AddSample(const string &name, BufferBox &buf);
 	void DeleteSample(int index);
+	MidiPattern *AddMidiPattern(const string &name, int num_beats, int beat_partition);
+	void DeleteMidiPattern(int index);
+	//void EditMidiPattern();
 	void AddLevel();
 	void InsertSelectedSubs(int level_no);
 	void DeleteSelection(int level_no, bool all_levels);
@@ -86,6 +90,7 @@ public:
 	Array<Effect> fx;
 	Array<Track*> track;
 	Array<Sample*> sample;
+	Array<MidiPattern*> midi_pattern;
 
 // editing
 	// needed for rendering

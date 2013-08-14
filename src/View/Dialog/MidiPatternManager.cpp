@@ -282,8 +282,10 @@ void stream_func(BufferBox &b)
 
 void MidiPatternManager::OnPlay()
 {
-	if (cur_pattern)
+	if (cur_pattern){
 		tsunami->output->PlayGenerated((void*)&stream_func, DEFAULT_SAMPLE_RATE);
+		//tsunami->output->SetBufferSize(4096);
+	}
 }
 
 void MidiPatternManager::OnStop()

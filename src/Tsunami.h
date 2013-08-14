@@ -26,6 +26,7 @@ class Progress;
 class PeakMeter;
 class Clipboard;
 class SampleManager;
+class MidiPatternManager;
 
 class Tsunami : public Observer, public HuiWindow
 {
@@ -68,6 +69,7 @@ public:
 	void OnAddLevel();
 	void OnDeleteLevel();
 	void OnSampleManager();
+	void OnMidiPatternManager();
 	void OnSubImport();
 	void OnAudioProperties();
 	void OnTrackProperties();
@@ -124,6 +126,7 @@ public:
 	Clipboard *clipboard;
 
 	SampleManager *sample_manager;
+	MidiPatternManager *midi_pattern_manager;
 };
 
 extern Tsunami *tsunami;

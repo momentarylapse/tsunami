@@ -12,7 +12,6 @@
 #include "../../Stuff/Observer.h"
 
 class AudioFile;
-class Image;
 
 class SampleManager : public HuiDialog, public Observer
 {

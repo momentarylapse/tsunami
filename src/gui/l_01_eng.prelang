@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-178
+179
 // Data (ID,Text)
 about
 
@@ -189,6 +189,8 @@ menu_view_grid
 
 menu_view_peaks
 
+midi_pattern_manager
+
 ms
 ms
 mute
@@ -360,7 +362,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-97
+102
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -374,7 +376,9 @@ zoom_out
 
 !bold$Name:
 
-!format=TttC\\Name\\Dauer\\Benutzung\\Löschen
+!format=iTttC\\Vorschau\\Name\\Dauer\\Benutzung\\Löschen
+
+!format=iTttC\\Vorschau\\Name\\Schläge\\Unterteilungen\\Benutzung
 
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
@@ -460,6 +464,8 @@ Ist halt irgendwie passiert...
 
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 
+Kann nur Midi-Pattern löschen, die nicht benutzt werden!
+
 Kann nur Samples löschen, die nicht benutzt werden!
 
 Kanäle
@@ -478,7 +484,11 @@ MIDI Quellen
 
 Meldungen
 
+Midi-Pattern Manager
+
 Nachrichten
+
+Neu
 
 OK
 
@@ -555,5 +565,7 @@ speichere
 speichere nami
 
 unbekannte Dateiendung: 
+
+unbekannter Synthesizer: 
 
 #

@@ -926,7 +926,7 @@ menu
 0
 
 
-87
+88
 ItemPopup
 menu_file
 
@@ -1438,7 +1438,7 @@ ItemPopup
 menu_sub
 
 1
-7
+8
 0
 0
 0
@@ -1449,6 +1449,19 @@ menu_sub
 
 ItemImage
 sample_manager
+hui:properties
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+midi_pattern_manager
 hui:properties
 1
 0
@@ -3992,7 +4005,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-222
+223
 // Text
 about
 Info
@@ -4242,6 +4255,8 @@ menu_view_grid
 Raster
 menu_view_peaks
 Peaks
+midi_pattern_manager
+Midi-Pattern Verwalten...
 ms
 ms
 mute
@@ -4444,7 +4459,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-222
+223
 // Text
 about
 
@@ -4693,6 +4708,8 @@ menu_view_channels
 menu_view_grid
 
 menu_view_peaks
+
+midi_pattern_manager
 
 ms
 ms

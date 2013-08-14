@@ -12,6 +12,7 @@
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/SampleManager.h"
+#include "View/Dialog/MidiPatternManager.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -73,6 +74,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("level_up", "hui:up", -1, this, &Tsunami::OnCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &Tsunami::OnCurLevelDown);
 	HuiAddCommandM("sample_manager", "", -1, this, &Tsunami::OnSampleManager);
+	HuiAddCommandM("midi_pattern_manager", "", -1, this, &Tsunami::OnMidiPatternManager);
 	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, &Tsunami::OnRemoveAdded);
@@ -157,6 +159,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 
 	sample_manager = new SampleManager(audio, this, true);
+	midi_pattern_manager = new MidiPatternManager(audio, this, true);
 
 	Subscribe(view);
 	Subscribe(audio);
@@ -331,6 +334,11 @@ void Tsunami::OnDelete()
 void Tsunami::OnSampleManager()
 {
 	sample_manager->Show();
+}
+
+void Tsunami::OnMidiPatternManager()
+{
+	midi_pattern_manager->Show();
 }
 
 void Tsunami::OnSubImport()

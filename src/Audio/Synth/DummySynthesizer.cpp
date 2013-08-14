@@ -23,8 +23,9 @@ void DummySynthesizer::__init__()
 	new(this) DummySynthesizer;
 }
 
-void DummySynthesizer::AddToneFreq(BufferBox& buf, const Range& range, float freq, float volume)
+void DummySynthesizer::AddTone(BufferBox& buf, const Range& range, float pitch, float volume)
 {
+	float freq = pitch_to_freq(pitch);
 	float f_w = 1.0f / sample_rate * freq * 2.0f * pi;
 	int i0 = max(range.offset, 0);
 	int i1 = min(range.end(), buf.num);
@@ -40,7 +41,7 @@ void DummySynthesizer::AddToneFreq(BufferBox& buf, const Range& range, float fre
 	}
 }
 
-void DummySynthesizer::AddClick(BufferBox &buf, int pos, int pitch, float volume)
+/*void DummySynthesizer::AddClick(BufferBox &buf, int pos, float pitch, float volume)
 {
 	float freq = pitch_to_freq(pitch);
 	int sm_d = 0.06f * sample_rate;
@@ -57,4 +58,4 @@ void DummySynthesizer::AddClick(BufferBox &buf, int pos, int pitch, float volume
 			buf.l[j] += d;
 		}
 	}
-}
+}*/

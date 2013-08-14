@@ -22,7 +22,7 @@ void ProcessTrack(BufferBox buf)
 	Range r
 	r.offset = 0
 	r.length = buf.num
-	synth.AddToneFreq(buf, r, data.Frequency, data.Volume)
+	synth.AddTone(buf, r, freq_to_pitch(data.Frequency), data.Volume)
 
 	/*float f = data.Frequency
 

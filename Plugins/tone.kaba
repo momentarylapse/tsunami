@@ -2,8 +2,11 @@ use "api.kaba"
 
 // pitch is in MIDI notation (69 = A4 = 440Hz)
 
-float pitch_to_freq(int pitch)
+float pitch_to_freq(float pitch)
 	return 440 * pow(2, (pitch - 69.0) / 12.0)
+
+float freq_to_pitch(float freq)
+	return log(freq / 440.0) / log(2) * 12.0 + 69.0
 
 // "scientific" notation
 //   naive MIDI octave is off by 1
@@ -113,24 +116,24 @@ void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, 
 /*class RichtSynthesizer : DummySynthesizer
 	virtual void AddToneFreq(BufferBox buf, Range r, float freq, float volume)*/
 
-void AddRichTone(Synthesizer s, BufferBox buf, int pos0, int pos1, float f, float vol)
+void AddRichTone(Synthesizer s, BufferBox buf, int pos0, int pos1, int pitch, float vol)
 	Range r
 	r.offset = pos0
 	r.length = pos1 - pos0
-	s.AddToneFreq(buf, r, f,     vol * 0.6)
-	s.AddToneFreq(buf, r, f * 2, vol * 0.5)
-	s.AddToneFreq(buf, r, f * 4, vol * 0.3)
-	s.AddToneFreq(buf, r, f * 8, vol * 0.1)
+	s.AddTone(buf, r, pitch,      vol * 0.6)
+	s.AddTone(buf, r, pitch + 12, vol * 0.5)
+	s.AddTone(buf, r, pitch + 24, vol * 0.3)
+	s.AddTone(buf, r, pitch + 48, vol * 0.1)
 
 void AddChord(Synthesizer s, BufferBox buf, int pos0, int pos1, Chord c, float volume)
-	float f[]
-	f.add(pitch_to_freq(c.base_tone))
+	float pitch[]
+	pitch.add(c.base_tone)
 	if c.type == ChordMinor
-		f.add(pitch_to_freq(c.base_tone + 3))
+		pitch.add(c.base_tone + 3)
 	else
-		f.add(pitch_to_freq(c.base_tone + 4))
-	f.add(pitch_to_freq(c.base_tone + 7))
-	f.add(pitch_to_freq(c.base_tone + 12))
+		pitch.add(c.base_tone + 4)
+	pitch.add(c.base_tone + 7)
+	pitch.add(c.base_tone + 12)
 	
-	for int i, 0, f.num
-		AddRichTone(s, buf, pos0, pos1, f[i], volume)
+	for int i, 0, pitch.num
+		AddRichTone(s, buf, pos0, pos1, pitch[i], volume)

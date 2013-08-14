@@ -147,18 +147,14 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::LinkExternal("Synthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
 	Script::LinkExternal("Synthesizer.AddTone", Script::mf(&Synthesizer::AddTone));
-	Script::LinkExternal("Synthesizer.AddToneFreq", Script::mf(&Synthesizer::AddToneFreq));
-	Script::LinkExternal("Synthesizer.AddClick", Script::mf(&Synthesizer::AddClick));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "AddTone", Script::mf(&Synthesizer::AddTone));
-	Script::DeclareClassVirtualIndex("Synthesizer", "AddToneFreq", Script::mf(&Synthesizer::AddToneFreq));
-	Script::DeclareClassVirtualIndex("Synthesizer", "AddClick", Script::mf(&Synthesizer::AddClick));
 	Script::LinkExternal("Synthesizer.AddMetronomeClick", Script::mf(&Synthesizer::AddMetronomeClick));
 
 	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
 	Script::LinkExternal("DummySynthesizer.__init__", Script::mf(&DummySynthesizer::__init__));
-	Script::LinkExternal("DummySynthesizer.AddToneFreq", Script::mf(&DummySynthesizer::AddToneFreq));
-	Script::LinkExternal("DummySynthesizer.AddClick", Script::mf(&DummySynthesizer::AddClick));
+	Script::LinkExternal("DummySynthesizer.AddTone", Script::mf(&DummySynthesizer::AddTone));
+	Script::LinkExternal("DummySynthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
 
 	Script::DeclareClassSize("Bar", sizeof(Bar));
 	Script::DeclareClassOffset("Bar", "num_beats", offsetof(Bar, num_beats));

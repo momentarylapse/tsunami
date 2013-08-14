@@ -3,10 +3,7 @@ use "../api.kaba"
 DummySynthesizer synth
 
 class MySynth : Synthesizer
-	overwrite void AddClick(BufferBox buf, int pos, int pitch, float volume)
-		print "add click"
-		synth.AddClick(buf, pos, 150 - pitch, volume)
-	overwrite void AddTone(BufferBox buf, Range r, int pitch, float volume)
+	overwrite void AddTone(BufferBox buf, Range r, float pitch, float volume)
 		print "add tone"
 		synth.AddTone(buf, r, 150 - pitch, volume)
 

@@ -181,6 +181,14 @@ void HuiWindow::_InsertControl_(HuiControl *c, int x, int y, int width, int heig
 				gtk_widget_set_size_request(frame, width, 28);
 				op_x = GtkAttachOptions(0);
 			}
+			if (OptionString.find("height") >= 0){
+				string ww = OptionString.substr(OptionString.find("height") + 7, -1);
+				if (ww.find(","))
+					ww = ww.substr(0, ww.find(","));
+				int height = s2i(ww);
+				gtk_widget_set_size_request(frame, -1, height);
+				op_y = GtkAttachOptions(0);
+			}
 
 			// TODO
 			unsigned int nx, ny;

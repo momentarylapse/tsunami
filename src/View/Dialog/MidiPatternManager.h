@@ -24,6 +24,7 @@ public:
 	void FillList();
 
 	void OnListSelect();
+	void OnListEdit();
 	void OnAreaMouseMove();
 	void OnAreaLeftButtonDown();
 	void OnAreaLeftButtonUp();
@@ -34,6 +35,7 @@ public:
 	//void OnCreateFromSelection();
 	void OnPlay();
 	void OnStop();
+	void OnBeatsPerMinute();
 	void OnDelete();
 	void OnClose();
 

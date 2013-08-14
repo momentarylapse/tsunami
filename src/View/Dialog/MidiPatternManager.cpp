@@ -14,20 +14,25 @@
 #include <math.h>
 
 MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _allow_parent) :
-	HuiDialog(_("Midi-Pattern Manager"), 600, 400, _parent, _allow_parent)
+	HuiDialog(_("Midi-Pattern Manager"), 600, 600, _parent, _allow_parent)
 {
 	AddControlTable("", 0, 0, 1, 3, "table1");
 	SetTarget("table1", 0);
-	AddListView(_("!format=iTttt\\Vorschau\\Name\\Schl&age\\Unterteilungen\\Benutzung"), 0, 0, 0, 0, "pattern_list");
-	AddControlTable("!noexpandy", 0, 1, 4, 1, "table2");
+	AddListView(_("!format=iTTTt,height=150\\Vorschau\\Name\\Schl&age\\Unterteilungen\\Benutzung"), 0, 0, 0, 0, "pattern_list");
+	AddControlTable("!noexpandy", 0, 1, 5, 1, "table2");
 	AddDrawingArea("", 0, 2, 0, 0, "area");
 	SetTarget("table2", 0);
 	AddButton(_("Neu"), 0, 0, 0, 0, "add_pattern");
 	AddButton(_("L&oschen"), 1, 0, 0, 0, "delete_pattern");
 	//AddButton(_("Einf&ugen"), 2, 0, 0, 0, "insert_sample");
 	//AddButton(_("Aus Auswahl"), 3, 0, 0, 0, "create_from_selection");
-	AddButton(_("Abspielen"), 2, 0, 0, 0, "play_pattern");
-	AddButton(_("Stopp"), 3, 0, 0, 0, "stop_pattern");
+	AddButton("", 2, 0, 0, 0, "play_pattern");
+	SetImage("play_pattern", "hui:media-play");
+	AddButton("", 3, 0, 0, 0, "stop_pattern");
+	SetImage("stop_pattern", "hui:media-stop");
+	AddSpinButton("90\\0\\1000\\0.1", 4, 0, 0, 0, "beats_per_minute");
+	//AddSpinButton("4\\1\\100", 5, 0, 0, 0, "num_beats");
+	//AddSpinButton("4\\1\\200", 6, 0, 0, 0, "partition");
 
 	//SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 
@@ -38,12 +43,13 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	EventM("add_pattern", this, &MidiPatternManager::OnAdd);
 	EventM("delete_pattern", this, &MidiPatternManager::OnDelete);
 	EventMX("pattern_list", "hui:select", this, &MidiPatternManager::OnListSelect);
+	EventMX("pattern_list", "hui:change", this, &MidiPatternManager::OnListEdit);
 	EventMX("area", "hui:redraw", this, &MidiPatternManager::OnAreaDraw);
 	EventMX("area", "hui:mouse-move", this, &MidiPatternManager::OnAreaMouseMove);
 	EventMX("area", "hui:left-button-down", this, &MidiPatternManager::OnAreaLeftButtonDown);
 	EventMX("area", "hui:left-button-up", this, &MidiPatternManager::OnAreaLeftButtonUp);
 	EventM("play_pattern", this, &MidiPatternManager::OnPlay);
-	EventM("stop_pattern", this, &MidiPatternManager::OnStop);
+	EventM("beats_per_minute", this, &MidiPatternManager::OnBeatsPerMinute);
 
 
 	pitch_min = 60;
@@ -66,15 +72,35 @@ MidiPatternManager::~MidiPatternManager()
 	Unsubscribe(audio);
 }
 
+void MidiPatternManager::OnListEdit()
+{
+	int n = HuiGetEvent()->row;
+	int col = HuiGetEvent()->column;
+	if (n < 0)
+		return;
+	MidiPattern *p = audio->midi_pattern[n];
+	if (col == 1)
+		p->name = GetCell("pattern_list", n, col);
+	else if (col == 2)
+		p->num_beats = GetCell("pattern_list", n, col)._int();
+	else if (col == 3)
+		p->beat_partition = GetCell("pattern_list", n, col)._int();
+	Redraw("area");
+}
+
 void MidiPatternManager::FillList()
 {
 	Reset("pattern_list");
 	foreach(string &name, icon_names)
 		HuiDeleteImage(name);
 	icon_names.clear();
+	if ((audio->midi_pattern.num > 0) && (!cur_pattern))
+		SetCurPattern(audio->midi_pattern[0]);
 	foreachi(MidiPattern *p, audio->midi_pattern, i){
 		icon_names.add("");//render_bufbox(p->buf, 80, 32));
 		SetString("pattern_list", icon_names[i] + "\\" + p->name + "\\" + format("%d\\%d\\%d", p->num_beats, p->beat_partition, p->ref_count));
+		if (p == cur_pattern)
+			SetInt("pattern_list", i);
 	}
 	Enable("delete_pattern", false);
 	//Enable("insert_pattern", false);
@@ -138,11 +164,11 @@ void MidiPatternManager::OnAreaLeftButtonDown()
 {
 	if (!cur_pattern)
 		return;
+	OnAreaMouseMove();
 
 	// clicked on a note?
 	if (hover_note >= 0){
 		cur_pattern->notes.erase(hover_note);
-		OnAreaMouseMove();
 		return;
 	}
 	creating_new_note = true;
@@ -256,6 +282,8 @@ void MidiPatternManager::OnDelete()
 void MidiPatternManager::SetCurPattern(MidiPattern *p)
 {
 	cur_pattern = p;
+	if (!p)
+		tsunami->output->Stop();
 	Redraw("area");
 }
 
@@ -293,8 +321,14 @@ void MidiPatternManager::OnStop()
 	tsunami->output->Stop();
 }
 
+void MidiPatternManager::OnBeatsPerMinute()
+{
+	beats_per_minute = GetFloat("");
+}
+
 void MidiPatternManager::OnClose()
 {
+	tsunami->output->Stop();
 	Hide();
 }
 

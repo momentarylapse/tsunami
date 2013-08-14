@@ -748,12 +748,16 @@ void DrawStrBg(HuiPainter *c, float x, float y, const string &str, const color &
 	c->DrawStr(x, y, str);
 }
 
+color AudioView::GetPitchColor(int pitch)
+{
+	return SetColorHSB(1, (float)(pitch % 12) / 12.0f, 0.6f, 1);
+}
 
 void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col)
 {
 	c->SetLineWidth(3.0f);
 	foreach(MidiNote &n, midi){
-		c->SetColor(SetColorHSB(1, (float)(n.pitch % 12) / 12.0f, 0.6f, 1));
+		c->SetColor(GetPitchColor(n.pitch));
 		float x1 = sample2screen(n.range.offset);
 		float x2 = sample2screen(n.range.end());
 		float h = r.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * r.height();

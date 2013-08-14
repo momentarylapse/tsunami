@@ -8,6 +8,7 @@
 #include "MidiPatternManager.h"
 #include "../../Data/AudioFile.h"
 #include "../../Tsunami.h"
+#include "../AudioView.h"
 #include <math.h>
 
 MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _allow_parent) :
@@ -36,12 +37,16 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	EventMX("pattern_list", "hui:select", this, &MidiPatternManager::OnListSelect);
 	EventMX("area", "hui:redraw", this, &MidiPatternManager::OnAreaDraw);
 	EventMX("area", "hui:mouse-move", this, &MidiPatternManager::OnAreaMouseMove);
-	EventMX("area", "hui:left-button-down", this, &MidiPatternManager::OnAreaClick);
+	EventMX("area", "hui:left-button-down", this, &MidiPatternManager::OnAreaLeftButtonDown);
+	EventMX("area", "hui:left-button-up", this, &MidiPatternManager::OnAreaLeftButtonUp);
 
 
 	pitch_min = 60;
 	pitch_max = 90;
 	audio = a;
+	creating_new_note = false;
+	new_note = new MidiNote;
+	new_time_start = -1;
 	cur_pattern = NULL;
 	FillList();
 
@@ -76,24 +81,24 @@ void MidiPatternManager::OnListSelect()
 }
 
 
-int MidiPatternManager::x2beat(int x)
+int MidiPatternManager::x2time(int x)
 {
 	return (x * cur_pattern->num_beats * cur_pattern->beat_partition / area_width);
 }
 
 int MidiPatternManager::y2pitch(int y)
 {
-	return pitch_min + (y * (pitch_max - pitch_min) / area_height);
+	return pitch_min + ((area_height - y) * (pitch_max - pitch_min) / area_height);
 }
 
-float MidiPatternManager::beat2x(int b)
+float MidiPatternManager::time2x(int b)
 {
 	return area_width * (float)b / (cur_pattern->beat_partition * cur_pattern->num_beats);
 }
 
 float MidiPatternManager::pitch2y(int p)
 {
-	return area_height * ((float)p - pitch_min) / (pitch_max - pitch_min);
+	return area_height - area_height * ((float)p - pitch_min) / (pitch_max - pitch_min);
 }
 
 void MidiPatternManager::OnAreaMouseMove()
@@ -101,14 +106,50 @@ void MidiPatternManager::OnAreaMouseMove()
 	int x = HuiGetEvent()->mx;
 	int y = HuiGetEvent()->my;
 	if (cur_pattern){
-		cur_time = x2beat(x);
+		cur_time = x2time(x);
 		cur_pitch = y2pitch(y);
+
+		hover_note = -1;
+
+		if (creating_new_note){
+			if (cur_time >= new_time_start)
+				new_note->range = Range(new_time_start, cur_time - new_time_start + 1);
+			else
+				new_note->range = Range(cur_time, new_time_start - cur_time + 1);
+		}else{
+			// hovering over a note?
+			foreachi(MidiNote &n, cur_pattern->notes, i)
+				if ((n.pitch == cur_pitch) && (n.range.is_inside(cur_time)))
+					hover_note = i;
+		}
 	}
 	Redraw("area");
 }
 
-void MidiPatternManager::OnAreaClick()
+void MidiPatternManager::OnAreaLeftButtonDown()
 {
+	if (!cur_pattern)
+		return;
+
+	// clicked on a note?
+	if (hover_note >= 0){
+		cur_pattern->notes.erase(hover_note);
+		OnAreaMouseMove();
+		return;
+	}
+	creating_new_note = true;
+	new_note->range = Range(cur_time, 1);
+	new_note->volume = 1;
+	new_note->pitch = cur_pitch;
+	new_time_start = cur_time;
+}
+
+void MidiPatternManager::OnAreaLeftButtonUp()
+{
+	if ((cur_pattern) && (creating_new_note)){
+		cur_pattern->notes.add(*new_note);
+	}
+	creating_new_note = false;
 }
 
 bool is_sharp(int pitch)
@@ -116,6 +157,15 @@ bool is_sharp(int pitch)
 	int r = pitch % 12;
 	// 69 = 9 = a
 	return ((r == 10) || (r == 1) || (r == 3) || (r == 6) || (r == 8));
+}
+
+void MidiPatternManager::DrawNote(HuiPainter *c, MidiNote &n, bool hover)
+{
+	color col = tsunami->view->GetPitchColor(n.pitch);
+	if (hover)
+		col = ColorInterpolate(col, White, 0.5f);
+	c->SetColor(col);
+	c->DrawRect(rect(time2x(n.range.start()), time2x(n.range.end()), pitch2y(n.pitch + 1), pitch2y(n.pitch)));
 }
 
 void MidiPatternManager::OnAreaDraw()
@@ -139,8 +189,8 @@ void MidiPatternManager::OnAreaDraw()
 	// pitch grid
 	c->SetColor(Gray);
 	for (int i=pitch_min; i<pitch_max; i++){
-		float y0 = pitch2y(i);
-		float y1 = pitch2y(i + 1);
+		float y0 = pitch2y(i + 1);
+		float y1 = pitch2y(i);
 		if (is_sharp(i)){
 			c->SetColor(color(0.2f, 0, 0, 0));
 			c->DrawRect(0, y0, w, y1 - y0);
@@ -154,17 +204,26 @@ void MidiPatternManager::OnAreaDraw()
 			c->SetColor(Black);
 		else
 			c->SetColor(Gray);
-		float x = beat2x(i);
+		float x = time2x(i);
 		c->DrawLine(x, 0, x, h);
 	}
 
-	c->SetColor(color(0.5f, 0, 0, 1));
-	c->DrawRect(rect(beat2x(cur_time), beat2x(cur_time + 1), pitch2y(cur_pitch), pitch2y(cur_pitch + 1)));
+	foreachi(MidiNote &n, cur_pattern->notes, i)
+		DrawNote(c, n, i == hover_note);
+
+	if (creating_new_note){
+		DrawNote(c, *new_note, true);
+	}else if (hover_note < 0){
+		color col = tsunami->view->GetPitchColor(cur_pitch);
+		col.a = 0.5f;
+		c->SetColor(col);
+		c->DrawRect(rect(time2x(cur_time), time2x(cur_time + 1), pitch2y(cur_pitch + 1), pitch2y(cur_pitch)));
+	}
 }
 
 void MidiPatternManager::OnAdd()
 {
-	SetCurPattern(audio->AddMidiPattern("pattern", 4, 4));
+	SetCurPattern(audio->AddMidiPattern(format(_("Pattern %d"), audio->midi_pattern.num + 1), 4, 4));
 	SetInt("pattern_list", audio->midi_pattern.num - 1);
 }
 

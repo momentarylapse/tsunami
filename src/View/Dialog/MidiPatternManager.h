@@ -13,6 +13,7 @@
 
 class AudioFile;
 class MidiPattern;
+class MidiNote;
 
 class MidiPatternManager : public HuiDialog, public Observer
 {
@@ -24,7 +25,8 @@ public:
 
 	void OnListSelect();
 	void OnAreaMouseMove();
-	void OnAreaClick();
+	void OnAreaLeftButtonDown();
+	void OnAreaLeftButtonUp();
 	void OnAreaDraw();
 	void OnAdd();
 	//void OnImportFromFile();
@@ -35,6 +37,8 @@ public:
 
 	void SetCurPattern(MidiPattern *p);
 
+	void DrawNote(HuiPainter *c, MidiNote &n, bool hover);
+
 	virtual void OnUpdate(Observable *o);
 
 	AudioFile *audio;
@@ -44,11 +48,16 @@ public:
 	int pitch_min, pitch_max;
 
 	int cur_pitch, cur_time;
+	int hover_note;
 	int area_width, area_height;
 
-	int x2beat(int x);
+	bool creating_new_note;
+	int new_time_start;
+	MidiNote *new_note;
+
+	int x2time(int x);
 	int y2pitch(int y);
-	float beat2x(int b);
+	float time2x(int t);
 	float pitch2y(int p);
 };
 

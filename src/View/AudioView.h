@@ -48,6 +48,8 @@ public:
 	void ZoomOut();
 	void MakeSampleVisible(int sample);
 
+	color GetPitchColor(int pitch);
+
 	void DrawTrackBuffers(HuiPainter *c, const rect &r, Track *t, double pos, const color &col);
 	void DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
 	void DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);

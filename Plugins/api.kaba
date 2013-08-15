@@ -158,7 +158,7 @@ class AudioFile
 
 class AudioOutput
 	extern void Stop()
-	extern void Play(AudioFile a, bool loop)
+	//extern void Play(AudioRenderer r)
 	extern void PlayGenerated(void *func, int sample_rate)
 	extern bool IsPlaying()
 	extern int GetPos()

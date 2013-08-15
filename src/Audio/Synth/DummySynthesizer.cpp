@@ -28,6 +28,7 @@ void DummySynthesizer::AddTone(BufferBox& buf, const Range& range, float pitch, 
 	float freq = pitch_to_freq(pitch);
 	float f_w = 1.0f / sample_rate * freq * 2.0f * pi;
 	int sm_d = 0.02f * sample_rate;
+	keep_notes = sm_d * 8;
 
 	int i0 = max(range.offset, 0);
 	int i1 = min(range.end() + sm_d * 8, buf.num);

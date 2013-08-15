@@ -384,7 +384,7 @@ void Tsunami::OnPlayLoop()
 
 void Tsunami::OnPlay()
 {
-	renderer->Prepare(audio, audio->selection, false);
+	renderer->Prepare(audio, audio->GetPlaybackSelection(), false);
 	output->Play(renderer);
 }
 

@@ -67,7 +67,7 @@ private:
 	int stream_offset_next;
 	BufferBox box[2];
 
-	typedef void generate_func_t(BufferBox &);
+	typedef int generate_func_t(BufferBox &);
 	generate_func_t *generate_func;
 
 	Array<short> data;

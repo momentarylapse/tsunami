@@ -232,7 +232,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioInput.RemoveObserver", Script::mf(&AudioInput::RemoveWrappedObserver));
 	//Script::LinkExternal("Observable.AddObserver", Script::mf(&Observable::AddWrappedObserver);
 
-	/*Script::LinkExternal("AudioOutput.Play", Script::mf(&AudioOutput::Play));
+	Script::LinkExternal("AudioOutput.Play", Script::mf(&AudioOutput::Play));
 	Script::LinkExternal("AudioOutput.PlayGenerated", Script::mf(&AudioOutput::PlayGenerated));
 	Script::LinkExternal("AudioOutput.Stop", Script::mf(&AudioOutput::Stop));
 	Script::LinkExternal("AudioOutput.IsPlaying", Script::mf(&AudioOutput::IsPlaying));
@@ -251,7 +251,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("PluginContext", "track_no", offsetof(PluginManager::PluginContext, track_no));
 	Script::DeclareClassOffset("PluginContext", "range", offsetof(PluginManager::PluginContext, range));
 	Script::DeclareClassOffset("PluginContext", "level", offsetof(PluginManager::PluginContext, level));
-	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugins->context);*/
+	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugins->context);
 }
 
 void PluginManager::OnMenuExecutePlugin()

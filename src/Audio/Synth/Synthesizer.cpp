@@ -23,6 +23,7 @@ float pitch_to_freq(float pitch)
 Synthesizer::Synthesizer()
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
+	keep_notes = 0;
 	reset();
 }
 

@@ -11,7 +11,7 @@ float phi
 
 float factor2, volume2, phi2
 
-void fill(BufferBox buf)
+int fill(BufferBox buf)
 	float freq2 = freq * factor2
 	float w_f2 = freq2 * 2.0 * pi / SAMPLE_RATE
 	
@@ -23,6 +23,7 @@ void fill(BufferBox buf)
 		buf.l[i] = sin(phi) * volume
 	phi = loop(phi, 0, 2 * pi)
 	phi2 = loop(phi2, 0, 2 * pi)
+	return buf.num
 
 void OnFrequency()
 	freq = dlg.GetFloat("")

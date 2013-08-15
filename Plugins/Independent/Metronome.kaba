@@ -12,7 +12,7 @@ float volume
 
 DummySynthesizer synth
 
-void fill(BufferBox buf)
+int fill(BufferBox buf)
 	float dt_m = 60.0 / bpm
 	int sm_m = dt_m * SAMPLE_RATE
 	
@@ -27,6 +27,7 @@ void fill(BufferBox buf)
 			synth.AddMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 0, volume)
 		else
 			synth.AddMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 1, volume)
+	return buf.num
 
 void OnBpm()
 	bpm = dlg.GetFloat("")

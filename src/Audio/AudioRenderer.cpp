@@ -73,7 +73,8 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	// silence... TODO...
 	buf.resize(range_cur.length());
 
-	Array<Beat> beats = t->bar.GetBeats(range_cur);
+	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
+	Array<Beat> beats = t->bar.GetBeats(r);
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(Beat &b, beats)
@@ -199,7 +200,7 @@ int AudioRenderer::read(BufferBox &buf)
 		bb_apply_fx(buf, NULL, audio->fx);
 
 	pos += size;
-	if (pos >= range.end())
+	if ((pos >= range.end()) && (loop))
 		pos = range.offset;
 	return size;
 }

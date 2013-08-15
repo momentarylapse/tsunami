@@ -539,8 +539,11 @@ void HuiWindow::RemoveControl(const string &id)
 void HuiWindow::Redraw(const string &_id)
 {
 	HuiControl *c = _GetControl_(_id);
-	if (c)
-		gdk_window_invalidate_rect(gtk_widget_get_window(c->widget), NULL, false);
+	if (c){
+		GdkWindow *w = gtk_widget_get_window(c->widget);
+		if (w)
+			gdk_window_invalidate_rect(w, NULL, false);
+	}
 }
 
 void HuiWindow::RedrawRect(const string &_id, int x, int y, int w, int h)

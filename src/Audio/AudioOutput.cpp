@@ -250,8 +250,7 @@ bool AudioOutput::stream(int buf)
 		size = renderer->read(*b);
 		//msg_write(size);
 	}else if (generate_func){
-		(*generate_func)(*b);
-		size = b->num;
+		size = (*generate_func)(*b);
 	}
 	if (size == 0)
 		return false;

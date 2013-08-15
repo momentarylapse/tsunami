@@ -232,7 +232,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioInput.RemoveObserver", Script::mf(&AudioInput::RemoveWrappedObserver));
 	//Script::LinkExternal("Observable.AddObserver", Script::mf(&Observable::AddWrappedObserver);
 
-	Script::LinkExternal("AudioOutput.Play", Script::mf(&AudioOutput::Play));
+	/*Script::LinkExternal("AudioOutput.Play", Script::mf(&AudioOutput::Play));
 	Script::LinkExternal("AudioOutput.PlayGenerated", Script::mf(&AudioOutput::PlayGenerated));
 	Script::LinkExternal("AudioOutput.Stop", Script::mf(&AudioOutput::Stop));
 	Script::LinkExternal("AudioOutput.IsPlaying", Script::mf(&AudioOutput::IsPlaying));
@@ -251,7 +251,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("PluginContext", "track_no", offsetof(PluginManager::PluginContext, track_no));
 	Script::DeclareClassOffset("PluginContext", "range", offsetof(PluginManager::PluginContext, range));
 	Script::DeclareClassOffset("PluginContext", "level", offsetof(PluginManager::PluginContext, level));
-	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugins->context);
+	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugins->context);*/
 }
 
 void PluginManager::OnMenuExecutePlugin()
@@ -518,10 +518,10 @@ void PluginManager::OnUpdate(Observable *o)
 	if (o == tsunami->progress){
 		if (o->GetMessage() == "Cancel")
 			tsunami->output->Stop();
-	}else if (o == tsunami->output){
+	}/*else if (o == tsunami->output){
 		int pos = tsunami->output->GetPos();
 		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->output->GetRange().start()) / tsunami->output->GetRange().length());
-	}
+	}*/ // TODO
 }
 
 // always push the script... even if an error occurred
@@ -630,7 +630,8 @@ void PluginManager::Preview(Effect &fx)
 	tsunami->progress->StartCancelable(_("Vorschau"), 0);
 	Subscribe(tsunami->progress);
 	Subscribe(tsunami->output);
-	tsunami->output->Play(tsunami->audio, false);
+	tsunami->renderer->Prepare(tsunami->audio, tsunami->audio->selection, false);
+	tsunami->output->Play(tsunami->renderer);
 
 	while(tsunami->output->IsPlaying()){
 		HuiSleep(10);

@@ -32,15 +32,15 @@ void AudioInputAudio::SyncData::Reset()
 	num_points = 0;
 	delay_sum = 0;
 	samples_in = 0;
-	if (tsunami->output->IsPlaying())
-		offset_out = tsunami->output->GetRange().offset;
+	/*if (tsunami->output->IsPlaying())
+		offset_out = tsunami->output->GetRange().offset;*/ // TODO
 }
 
 void AudioInputAudio::SyncData::Add(int samples)
 {
 	if (tsunami->output->IsPlaying()){
 		samples_in += samples;
-		delay_sum += (tsunami->output->GetPos() - offset_out - samples_in);
+		/*delay_sum += (tsunami->output->GetPos() - offset_out - samples_in);*/ // TODO
 		num_points ++;
 	}
 }

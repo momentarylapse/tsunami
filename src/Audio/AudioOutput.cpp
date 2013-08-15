@@ -42,13 +42,10 @@ AudioOutput::AudioOutput() :
 	al_initialized = false;
 	al_last_error = AL_NO_ERROR;
 
-	audio = NULL;
-	range = Range(0, 0);
+	renderer = NULL;
 	generate_func = NULL;
 
 	playing = false;
-	loop = false;
-	allow_loop = true;
 	volume = 1;
 
 	al_context = NULL;
@@ -208,8 +205,8 @@ void AudioOutput::stop_play()
 		TestError(format("alSourceUnqueueBuffers(%d) (stop)", queued));
 	}
 
-	if (audio)
-		tsunami->renderer->CleanUp(audio);
+	if (renderer)
+		renderer->CleanUp();
 }
 
 void AudioOutput::Stop()
@@ -224,8 +221,7 @@ void AudioOutput::Stop()
 	TestError("alDeleteBuffers (stop)");
 	buffer[0] = -1;
 	playing = false;
-	allow_loop = false;
-	audio = NULL;
+	renderer = NULL;
 
 	Notify("StateChange");
 }
@@ -248,13 +244,12 @@ bool AudioOutput::stream(int buf)
 	msg_db_f("stream", 1);
 	BufferBox *b = (buf == buffer[0]) ? &box[0] : &box[1];
 	int size = 0;
-	if (audio){
-		size = min(buffer_size, range.end() - stream_offset_next);
-		*b = tsunami->renderer->RenderAudioFilePart(audio, Range(stream_offset_next, size));
+	b->resize(buffer_size);
+	b->offset = stream_offset_next;
+	if (renderer){
+		size = renderer->read(*b);
 		//msg_write(size);
 	}else if (generate_func){
-		b->resize(buffer_size);
-		b->offset = stream_offset_next;
 		(*generate_func)(*b);
 		size = b->num;
 	}
@@ -266,21 +261,11 @@ bool AudioOutput::stream(int buf)
 	TestError("alBufferData (stream)");
 
 	stream_offset_next += size;
-	if ((stream_offset_next >= range.end()) && (loop) && (allow_loop)){
-		stream_offset_next = range.start();
-		if (audio){
-			tsunami->renderer->CleanUp(audio);
-			tsunami->renderer->Prepare(audio);
-		}
-	}
-
 	return true;
 }
 
 void AudioOutput::start_play(int pos)
 {
-	if (audio)
-		tsunami->renderer->Prepare(audio);
 
 	stream_offset_next = pos;
 	buffer_size = DEFAULT_BUFFER_SIZE;
@@ -308,14 +293,12 @@ void AudioOutput::start_play(int pos)
 		return;
 }
 
-void AudioOutput::Play(AudioFile *a, bool _allow_loop)
+void AudioOutput::Play(AudioRenderer *r)
 {
 	msg_db_f("PreviewPlay", 1);
 
 	if (!al_initialized)
 		Init();
-
-	range = a->GetPlaybackSelection();
 
 	if (playing)
 		Stop();
@@ -323,14 +306,13 @@ void AudioOutput::Play(AudioFile *a, bool _allow_loop)
 	alGenBuffers(2, (ALuint*)buffer);
 	TestError("alGenBuffers (play)");
 
-	audio = a;
+	renderer = r;
 	generate_func = NULL;
-	sample_rate = audio->sample_rate;
+	sample_rate = tsunami->audio->sample_rate; //r->sample_rate; // FIXME
 
-	start_play(range.start());
+	start_play(0);
 
 	playing = true;
-	allow_loop = _allow_loop;
 
 	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
 
@@ -350,45 +332,17 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 	alGenBuffers(2, (ALuint*)buffer);
 	TestError("alGenBuffers (play)");
 
-	audio = NULL;
+	renderer = NULL;
 	generate_func = (generate_func_t*)func;
 	sample_rate = _sample_rate;
-	range = Range(0, 0);
 
 	start_play(0);
 
 	playing = true;
-	allow_loop = false;
 
 	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
 
 	Notify("StateChange");
-}
-
-void AudioOutput::SetRangeStart(int pos)
-{
-	if (pos < range.end()){
-		range.num = range.end() - pos;
-		range.offset = pos;
-	}
-}
-
-void AudioOutput::SetRangeEnd(int pos)
-{
-	if (pos > range.start()){
-		range.num = pos - range.start();
-	}
-}
-
-void AudioOutput::Seek(int pos)
-{
-	if (!playing)
-		return;
-	msg_db_f("Output.Seek", 1);
-
-	stop_play();
-
-	start_play(pos);
 }
 
 bool AudioOutput::IsPlaying()
@@ -408,7 +362,7 @@ int AudioOutput::GetPos()
 			return box[cur_buffer_no].offset + param;
 		}
 	}
-	return -1;
+	return 0;
 }
 
 float AudioOutput::GetVolume()
@@ -488,9 +442,6 @@ void AudioOutput::Update()
 		TestError("alGetSourcei(state) (idle)");
 		if ((param != AL_PLAYING) && (param != AL_PAUSED)){
 			//msg_write("hat gestoppt...");
-			if ((loop) && (allow_loop))
-				Seek(range.start());
-			else
 				Stop();
 		}else{
 		}

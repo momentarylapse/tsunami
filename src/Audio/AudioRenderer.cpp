@@ -13,6 +13,9 @@
 AudioRenderer::AudioRenderer()
 {
 	effect = NULL;
+	loop = false;
+	pos = 0;
+	audio = NULL;
 }
 
 AudioRenderer::~AudioRenderer()
@@ -39,7 +42,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 	msg_db_f("bb_render_audio_track_no_fx", 1);
 
 	// track buffer
-	BufferBox buf0 = t->ReadBuffersCol(range);
+	BufferBox buf0 = t->ReadBuffersCol(range_cur);
 	buf.swap_ref(buf0);
 
 	// subs
@@ -49,7 +52,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 
 		// can be repetitious!
 		for (int i=0;i<s->rep_num+1;i++){
-			Range rep_range = range;
+			Range rep_range = range_cur;
 			rep_range.move(-s->rep_delay * i);
 			Range intersect_range;
 			int bpos;
@@ -57,7 +60,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 				continue;
 
 			buf.make_own();
-			bpos = s->pos + s->rep_delay * i - range.start();
+			bpos = s->pos + s->rep_delay * i - range_cur.start();
 			buf.add(s->buf, bpos, s->volume * s->origin->volume, 0);
 		}
 	}
@@ -68,13 +71,13 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	msg_db_f("bb_render_time_track_no_fx", 1);
 
 	// silence... TODO...
-	buf.resize(range.length());
+	buf.resize(range_cur.length());
 
-	Array<Beat> beats = t->bar.GetBeats(range);
+	Array<Beat> beats = t->bar.GetBeats(range_cur);
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(Beat &b, beats)
-		t->synth->AddMetronomeClick(buf, b.pos - range.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
+		t->synth->AddMetronomeClick(buf, b.pos - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
 }
 
 void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
@@ -82,13 +85,13 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 	msg_db_f("bb_render_midi_track_no_fx", 1);
 
 	// silence... TODO...
-	buf.resize(range.length());
+	buf.resize(range_cur.length());
 
-	Array<MidiNote> notes = t->midi.GetNotes(range);
+	Array<MidiNote> notes = t->midi.GetNotes(range_cur);
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(MidiNote &n, notes){
-		Range r = Range(n.range.offset - range.offset, n.range.num);
+		Range r = Range(n.range.offset - range_cur.offset, n.range.num);
 		t->synth->AddTone(buf, r, n.pitch, n.volume);
 	}
 }
@@ -111,7 +114,7 @@ void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
 	t->root = audio;
 	t->level.resize(1);
 	t->level[0].buffer.resize(1);
-	t->level[0].buffer[0].set_as_ref(buf, 0, range.length());
+	t->level[0].buffer[0].set_as_ref(buf, 0, range_cur.length());
 }
 
 void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list)
@@ -161,7 +164,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 	int i0 = get_first_usable_track(audio);
 	if (i0 < 0){
 		// no -> return silence
-		buf.resize(range.length());
+		buf.resize(range_cur.length());
 	}else{
 
 		// first (un-muted) track
@@ -182,35 +185,43 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 	}
 }
 
-BufferBox AudioRenderer::RenderAudioFilePart(AudioFile *a, const Range &_range)
+int AudioRenderer::read(BufferBox &buf)
 {
 	msg_db_f("RenderAudioFilePart", 1);
-	audio = a;
-	range = _range;
+	int size = min(buf.num, range.end() - pos);
+	range_cur = Range(pos, size);
 
 	// render without fx
-	BufferBox buf;
 	bb_render_audio_no_fx(buf);
 
 	// apply fx
-	if (a->fx.num > 0)
+	if (audio->fx.num > 0)
 		bb_apply_fx(buf, NULL, audio->fx);
 
-	return buf;
+	pos += size;
+	if (pos >= range.end())
+		pos = range.offset;
+	return size;
 }
 
 BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
 {
 	BufferBox buf;
-	Prepare(a);
-	buf = RenderAudioFilePart(a, range);
-	CleanUp(a);
+	Prepare(a, range, false);
+	buf.resize(range.num);
+	read(buf);
+	//buf = RenderAudioFilePart(a, range);
+	CleanUp();
 	return buf;
 }
 
-void AudioRenderer::Prepare(AudioFile *a)
+void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool _loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
+	audio = a;
+	range = _range;
+	loop = _loop;
+	pos = range.offset;
 	foreach(Effect &fx, a->fx)
 		fx.Prepare();
 	foreach(Track *t, a->track)
@@ -220,14 +231,19 @@ void AudioRenderer::Prepare(AudioFile *a)
 		effect->Prepare();
 }
 
-void AudioRenderer::CleanUp(AudioFile *a)
+void AudioRenderer::CleanUp()
 {
 	msg_db_f("Renderer.CleanUp", 2);
-	foreach(Effect &fx, a->fx)
+	foreach(Effect &fx, audio->fx)
 		fx.CleanUp();
-	foreach(Track *t, a->track)
+	foreach(Track *t, audio->track)
 		foreach(Effect &fx, t->fx)
 			fx.CleanUp();
 	if (effect)
 		effect->CleanUp();
+}
+
+int AudioRenderer::TranslateOutputPos(int pos)
+{
+	return range.offset + (pos % range.num);
 }

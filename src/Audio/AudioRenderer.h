@@ -17,9 +17,14 @@ public:
 	virtual ~AudioRenderer();
 
 	BufferBox RenderAudioFile(AudioFile *a, const Range &range);
-	BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
-	void Prepare(AudioFile *a);
-	void CleanUp(AudioFile *a);
+	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
+	int read(BufferBox &buf);
+	void Prepare(AudioFile *a, const Range &range, bool loop);
+	void CleanUp();
+
+	//void Seek(int pos);
+
+	int TranslateOutputPos(int pos);
 
 private:
 	void bb_render_audio_track_no_fx(BufferBox &buf, Track *t);
@@ -32,10 +37,13 @@ private:
 	void bb_render_audio_no_fx(BufferBox &buf);
 
 	AudioFile *audio;
-	Range range;
+	Range range_cur;
+	int pos;
 
 public:
 	Effect *effect;
+	Range range;
+	bool loop;
 };
 
 #endif /* AUDIORENDERER_H_ */

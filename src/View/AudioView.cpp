@@ -13,6 +13,7 @@
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
+#include "../Audio/AudioRenderer.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
 
@@ -201,7 +202,7 @@ AudioView::SelectionType AudioView::GetMouseOver()
 			return s;
 		}
 	}
-	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio)){
+	/*if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer)){
 		if (mouse_over_time(this, tsunami->output->GetRange().start())){
 			s.type = SEL_TYPE_PLAYBACK_START;
 			return s;
@@ -214,7 +215,7 @@ AudioView::SelectionType AudioView::GetMouseOver()
 			s.type = SEL_TYPE_PLAYBACK;
 			return s;
 		}
-	}
+	}*/ // TODO
 
 	// mute button?
 	if (s.track){
@@ -358,7 +359,7 @@ void AudioView::OnMouseMove()
 			w = - HuiGetEvent()->dx - 2*r;
 		}
 		tsunami->RedrawRect("area", x, audio->area.y1, w, audio->area.height());
-	}else if (Selection.type == SEL_TYPE_PLAYBACK_START){
+	/*}else if (Selection.type == SEL_TYPE_PLAYBACK_START){
 		tsunami->output->SetRangeStart(Selection.pos);
 		_force_redraw_ = true;
 	}else if (Selection.type == SEL_TYPE_PLAYBACK_END){
@@ -366,7 +367,7 @@ void AudioView::OnMouseMove()
 		_force_redraw_ = true;
 	}else if (Selection.type == SEL_TYPE_PLAYBACK){
 		tsunami->output->Seek(Selection.pos);
-		_force_redraw_ = true;
+		_force_redraw_ = true;*/ // TODO
 	}else if (Selection.type == SEL_TYPE_SAMPLE){
 		ApplyBarriers(Selection.pos);
 		int dpos = (float)Selection.pos - Selection.sample_offset - Selection.sample->pos;
@@ -537,8 +538,9 @@ void AudioView::OnKeyDown()
 	if (k == KEY_SPACE){
 		if (tsunami->output->IsPlaying()){
 			tsunami->output->Pause();
-		}else
-			tsunami->output->Play(audio, true);
+		}else{
+			tsunami->OnPlay();
+		}
 	}
 	UpdateMenu();
 }
@@ -824,12 +826,12 @@ void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 		c->DrawLine(xx, r.y1, xx, r.y2);
 	}
 	if (show_time){
-		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio)){
+		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer)){
 			color cc = ColorPreviewMarker;
 			cc.a = 0.25f;
 			c->SetColor(cc);
-			float x0 = sample2screen(tsunami->output->GetRange().start());
-			float x1 = sample2screen(tsunami->output->GetRange().end());
+			float x0 = sample2screen(tsunami->renderer->range.start());
+			float x1 = sample2screen(tsunami->renderer->range.end());
 			c->DrawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
 		c->SetColor(ColorGrid);
@@ -902,8 +904,8 @@ void AudioView::OnUpdate(Observable *o)
 			UpdateMenu();
 		}
 	}else if (o->GetName() == "AudioOutput"){
-		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio))
-			MakeSampleVisible(tsunami->output->GetPos());
+		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer))
+			MakeSampleVisible(tsunami->renderer->TranslateOutputPos(tsunami->output->GetPos()));
 		ForceRedraw();
 	}else if (o->GetName() == "AudioInput"){
 		if (tsunami->input->IsCapturing())
@@ -1048,11 +1050,11 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 	DrawSelection(c, r);
 
 	// playing position
-	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetAudio() == audio)){
-		DrawTimeLine(c, tsunami->output->GetRange().start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
-		DrawTimeLine(c, tsunami->output->GetRange().end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
+	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer)){
+		DrawTimeLine(c, tsunami->renderer->range.start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
+		DrawTimeLine(c, tsunami->renderer->range.end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
 		if (!tsunami->input->IsCapturing())
-			DrawTimeLine(c, tsunami->output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
+			DrawTimeLine(c, tsunami->renderer->TranslateOutputPos(tsunami->output->GetPos()), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
 	}
 
 	// capturing position

@@ -9,7 +9,7 @@
 #include <math.h>
 
 
-MidiNote::MidiNote(const Range &_range, int _pitch, float _volume)
+MidiNote::MidiNote(const Range &_range, float _pitch, float _volume)
 {
 	range = _range;
 	pitch = _pitch;

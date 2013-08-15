@@ -15,7 +15,7 @@ class MidiNote
 {
 public:
 	MidiNote(){}
-	MidiNote(const Range &range, int pitch, float volume);
+	MidiNote(const Range &range, float pitch, float volume);
 	float GetFrequency();
 	Range range;
 	float pitch;

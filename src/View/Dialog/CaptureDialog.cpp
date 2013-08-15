@@ -10,6 +10,7 @@
 #include "../../Audio/AudioInput.h"
 #include "../../Audio/AudioInputMidi.h"
 #include "../../Audio/AudioOutput.h"
+#include "../../Audio/AudioRenderer.h"
 #include "../AudioView.h"
 #include "../../Stuff/Log.h"
 
@@ -128,8 +129,10 @@ void CaptureDialog::OnTypeMidi()
 
 void CaptureDialog::OnStart()
 {
-	if (IsChecked("capture_playback"))
-		tsunami->output->Play(audio, false);
+	if (IsChecked("capture_playback")){
+		tsunami->renderer->Prepare(audio, audio->selection, false);
+		tsunami->output->Play(tsunami->renderer);
+	}
 	tsunami->input->ResetSync();
 	tsunami->input->Accumulate(true);
 	Enable("capture_start", false);

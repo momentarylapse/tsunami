@@ -15,6 +15,7 @@
 
 struct ALCdevice_struct;
 struct ALCcontext_struct;
+class AudioRenderer;
 
 class AudioOutput : public PeakMeterSource
 {
@@ -30,28 +31,22 @@ public:
 	void Kill();
 
 	void Stop();
-	void Play(AudioFile *a, bool allow_loop);
+	void Play(AudioRenderer *r);
 	void PlayGenerated(void *func, int sample_rate);
 	void Pause();
 	void Update();
 
 	bool IsPlaying();
 	bool IsPaused();
-	AudioFile *GetAudio(){	return audio;	}
-	Range GetRange(){	return range;	}
+	AudioRenderer *GetSource(){	return renderer;	}
 	int GetPos();
-	void SetRangeStart(int pos);
-	void SetRangeEnd(int pos);
-	void Seek(int pos);
+	void FlushBuffers();
 
 	float GetSampleRate();
 	BufferBox GetSomeSamples(int num_samples);
 
 	float GetVolume();
 	void SetVolume(float _volume);
-
-	bool GetLoop(){	return loop;	}
-	void SetLoop(bool _loop){	loop = _loop;	}
 
 	void SetBufferSize(int _size){	buffer_size = _size;	}
 
@@ -65,13 +60,10 @@ private:
 
 	float volume;
 	bool playing;
-	bool allow_loop;
-	bool loop;
 	int sample_rate;
 	int buffer_size;
 
-	AudioFile *audio;
-	Range range;
+	AudioRenderer *renderer;
 	int stream_offset_next;
 	BufferBox box[2];
 

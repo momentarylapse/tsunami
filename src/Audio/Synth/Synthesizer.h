@@ -13,11 +13,7 @@
 class Range;
 class BufferBox;
 class MidiNote;
-
-class SynthesizerState
-{
-	Array<MidiNote> notes;
-};
+class MidiSource;
 
 class Synthesizer
 {
@@ -32,7 +28,7 @@ public:
 
 	void reset();
 	void set(float pitch, float volume, int offset);
-	virtual void read(BufferBox &buf){}
+	void read(BufferBox &buf);
 	void iterate(int samples);
 
 	virtual void configure(){}
@@ -40,7 +36,10 @@ public:
 	string name;
 	int sample_rate;
 
-	SynthesizerState state;
+	MidiSource *source;
+
+	int keep_notes;
+	Array<MidiNote> notes;
 };
 
 float pitch_to_freq(float pitch);

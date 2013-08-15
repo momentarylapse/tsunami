@@ -255,7 +255,7 @@ void MidiPatternManager::OnAreaDraw()
 	}
 
 	if (tsunami->output->IsPlaying()){
-		int pos = tsunami->output->GetPos();
+		int pos = tsunami->output->GetPos(); // FIXME!!!!!!!!!!
 		int samples_per_beat = DEFAULT_SAMPLE_RATE * 60 / beats_per_minute;
 		int length = samples_per_beat * cur_pattern->num_beats;
 		int offset = pos % length;

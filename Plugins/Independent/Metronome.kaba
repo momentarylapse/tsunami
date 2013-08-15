@@ -24,9 +24,9 @@ int fill(BufferBox buf)
 	for int i, -1, num_clicks
 		int n = buf.offset / sm_m + i
 		if (n % 4) == 0
-			synth.AddMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 0, volume)
+			synth.RenderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 0, volume)
 		else
-			synth.AddMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 1, volume)
+			synth.RenderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 1, volume)
 	return buf.num
 
 void OnBpm()

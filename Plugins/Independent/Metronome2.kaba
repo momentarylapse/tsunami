@@ -28,9 +28,9 @@ int fill(BufferBox buf)
 		int n = buf.offset / sm_m + i
 		int pos0 = i * sm_m - (buf.offset % sm_m)
 		if (n % beats) == 0
-			synth.AddMetronomeClick(buf, pos0, 0, volume)
+			synth.RenderMetronomeClick(buf, pos0, 0, volume)
 		else
-			synth.AddMetronomeClick(buf, pos0, 1, volume)
+			synth.RenderMetronomeClick(buf, pos0, 1, volume)
 		if (chords.num > 0) and (n > 0)
 			AddChord(synth, buf, pos0, pos0 + sm_m, chords[n % chords.num], volume * 0.5)
 	return buf.num

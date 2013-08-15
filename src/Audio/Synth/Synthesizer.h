@@ -9,13 +9,14 @@
 #define SYNTHESIZER_H_
 
 #include "../../lib/base/base.h"
+#include "../AudioRenderer.h"
 
 class Range;
 class BufferBox;
 class MidiNote;
 class MidiSource;
 
-class Synthesizer
+class Synthesizer : public AudioRendererInterface
 {
 public:
 	Synthesizer();
@@ -23,15 +24,15 @@ public:
 	void __init__();
 	virtual void __delete__();
 
-	virtual void AddTone(BufferBox &buf, const Range &range, float pitch, float volume){}
-	void AddMetronomeClick(BufferBox &buf, int pos, int level, float volume);
+	virtual void RenderNote(BufferBox &buf, const Range &range, float pitch, float volume){}
+	void RenderMetronomeClick(BufferBox &buf, int pos, int level, float volume);
 
 	void reset();
 	void set(float pitch, float volume, int offset);
-	void read(BufferBox &buf);
+	virtual int read(BufferBox &buf);
 	void iterate(int samples);
 
-	virtual void configure(){}
+	virtual void OnConfigure(){}
 
 	string name;
 	int sample_rate;

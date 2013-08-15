@@ -3,9 +3,9 @@ use "../api.kaba"
 DummySynthesizer synth
 
 class MySynth : Synthesizer
-	overwrite void AddTone(BufferBox buf, Range r, float pitch, float volume)
+	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
 		print "add tone"
-		synth.AddTone(buf, r, 150 - pitch, volume)
+		synth.RenderNote(buf, r, 150 - pitch, volume)
 
 void main()
 	forall t in audio.track

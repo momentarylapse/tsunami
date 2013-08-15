@@ -48,13 +48,15 @@ class Synthesizer
 	int sample_rate
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void AddTone(BufferBox buf, Range range, float pitch, float volume)
-	extern virtual void configure()
-	extern void AddMetronomeClick(BufferBox buf, int pos, int level, float volume)
+	extern virtual void RenderNote(BufferBox buf, Range range, float pitch, float volume)
+	extern virtual void OnConfigure()
+	extern virtual int read(BufferBox buf)
+	extern void set(float pitch, float volume, int offset)
+	extern void RenderMetronomeClick(BufferBox buf, int pos, int level, float volume)
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()
-	extern overwrite void AddTone(BufferBox buf, Range range, float pitch, float volume)
+	extern overwrite void RenderNote(BufferBox buf, Range range, float pitch, float volume)
 
 class TrackRenderBuffer
 	int dummy

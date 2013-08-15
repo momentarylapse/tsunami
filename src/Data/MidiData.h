@@ -22,6 +22,16 @@ public:
 	float volume;
 };
 
+class MidiEvent
+{
+public:
+	MidiEvent(){}
+	MidiEvent(int pos, float pitch, float volume);
+	int pos;
+	float pitch;
+	float volume;
+};
+
 class MidiData : public Array<MidiNote>
 {
 public:

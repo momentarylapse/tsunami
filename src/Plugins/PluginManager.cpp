@@ -146,16 +146,19 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Synthesizer", "sample_rate", offsetof(Synthesizer, sample_rate));
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::LinkExternal("Synthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
-	Script::LinkExternal("Synthesizer.AddTone", Script::mf(&Synthesizer::AddTone));
-	Script::LinkExternal("Synthesizer.configure", Script::mf(&Synthesizer::configure));
+	Script::LinkExternal("Synthesizer.RenderNote", Script::mf(&Synthesizer::RenderNote));
+	Script::LinkExternal("Synthesizer.read", Script::mf(&Synthesizer::read));
+	Script::LinkExternal("Synthesizer.OnConfigure", Script::mf(&Synthesizer::OnConfigure));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__));
-	Script::DeclareClassVirtualIndex("Synthesizer", "AddTone", Script::mf(&Synthesizer::AddTone));
-	Script::DeclareClassVirtualIndex("Synthesizer", "configure", Script::mf(&Synthesizer::configure));
-	Script::LinkExternal("Synthesizer.AddMetronomeClick", Script::mf(&Synthesizer::AddMetronomeClick));
+	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote));
+	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read));
+	Script::DeclareClassVirtualIndex("Synthesizer", "OnConfigure", Script::mf(&Synthesizer::OnConfigure));
+	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
+	Script::LinkExternal("Synthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
 
 	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
 	Script::LinkExternal("DummySynthesizer.__init__", Script::mf(&DummySynthesizer::__init__));
-	Script::LinkExternal("DummySynthesizer.AddTone", Script::mf(&DummySynthesizer::AddTone));
+	Script::LinkExternal("DummySynthesizer.RenderNote", Script::mf(&DummySynthesizer::RenderNote));
 	Script::LinkExternal("DummySynthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
 
 	Script::DeclareClassSize("Bar", sizeof(Bar));

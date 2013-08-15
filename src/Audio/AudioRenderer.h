@@ -10,7 +10,15 @@
 
 #include "../Data/AudioFile.h"
 
-class AudioRenderer
+class AudioRendererInterface
+{
+public:
+	AudioRendererInterface(){}
+	virtual ~AudioRendererInterface(){}
+	virtual int read(BufferBox &buf){ return 0; }
+};
+
+class AudioRenderer : public AudioRendererInterface
 {
 public:
 	AudioRenderer();
@@ -18,7 +26,7 @@ public:
 
 	BufferBox RenderAudioFile(AudioFile *a, const Range &range);
 	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
-	int read(BufferBox &buf);
+	virtual int read(BufferBox &buf);
 	void Prepare(AudioFile *a, const Range &range, bool loop);
 	void CleanUp();
 

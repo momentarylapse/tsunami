@@ -19,7 +19,7 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	AddControlTable("", 0, 0, 1, 3, "table1");
 	SetTarget("table1", 0);
 	AddListView(_("!format=iTTTt,height=150\\Vorschau\\Name\\Schl&age\\Unterteilungen\\Benutzung"), 0, 0, 0, 0, "pattern_list");
-	AddControlTable("!noexpandy", 0, 1, 5, 1, "table2");
+	AddControlTable("!noexpandy", 0, 1, 6, 1, "table2");
 	AddDrawingArea("", 0, 2, 0, 0, "area");
 	SetTarget("table2", 0);
 	AddButton(_("Neu"), 0, 0, 0, 0, "add_pattern");
@@ -49,6 +49,7 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	EventMX("area", "hui:left-button-down", this, &MidiPatternManager::OnAreaLeftButtonDown);
 	EventMX("area", "hui:left-button-up", this, &MidiPatternManager::OnAreaLeftButtonUp);
 	EventM("play_pattern", this, &MidiPatternManager::OnPlay);
+	EventM("stop_pattern", this, &MidiPatternManager::OnStop);
 	EventM("beats_per_minute", this, &MidiPatternManager::OnBeatsPerMinute);
 
 
@@ -60,6 +61,7 @@ MidiPatternManager::MidiPatternManager(AudioFile *a, HuiWindow* _parent, bool _a
 	new_note = new MidiNote;
 	new_time_start = -1;
 	cur_pattern = NULL;
+	hover_note = -1;
 	FillList();
 
 	Subscribe(audio);
@@ -287,7 +289,7 @@ void MidiPatternManager::SetCurPattern(MidiPattern *p)
 	Redraw("area");
 }
 
-void stream_func(BufferBox &b)
+int stream_func(BufferBox &b)
 {
 	for (int i=0;i<b.num;i++){
 		b.r[i] = 0;
@@ -304,15 +306,16 @@ void stream_func(BufferBox &b)
 		Range r = Range(n.range.offset * samples_per_time - offset, n.range.num * samples_per_time);
 		if (r.end() < 0)
 			r.offset += length;
-		synth.AddTone(b, r, n.pitch, n.volume);
+		synth.RenderNote(b, r, n.pitch, n.volume);
 	}
+	return b.num;
 }
 
 void MidiPatternManager::OnPlay()
 {
 	if (cur_pattern){
 		tsunami->output->PlayGenerated((void*)&stream_func, DEFAULT_SAMPLE_RATE);
-		//tsunami->output->SetBufferSize(4096);
+		tsunami->output->SetBufferSize(16384);
 	}
 }
 

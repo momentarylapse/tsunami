@@ -23,7 +23,7 @@ void DummySynthesizer::__init__()
 	new(this) DummySynthesizer;
 }
 
-void DummySynthesizer::AddTone(BufferBox& buf, const Range& range, float pitch, float volume)
+void DummySynthesizer::RenderNote(BufferBox& buf, const Range& range, float pitch, float volume)
 {
 	float freq = pitch_to_freq(pitch);
 	float f_w = 1.0f / sample_rate * freq * 2.0f * pi;
@@ -46,22 +46,3 @@ void DummySynthesizer::AddTone(BufferBox& buf, const Range& range, float pitch, 
 		buf.l[i] += d;
 	}
 }
-
-/*void DummySynthesizer::AddClick(BufferBox &buf, int pos, float pitch, float volume)
-{
-	float freq = pitch_to_freq(pitch);
-	int sm_d = 0.06f * sample_rate;
-	float w_f = 1.0 / sample_rate * freq * 2.0 * 3.14159265358979f;
-
-	for (int i=0; i<sm_d; i++){
-		float fi = (float)i / (float)sm_d;
-		float envelope = exp(-fi*3);//1 - fi;
-		float tt = i * w_f;
-		int j = i + pos;// - offset;
-		if ((j >= 0) && (j < buf.num)){
-			float d = sin(tt) * volume * envelope;
-			buf.r[j] += d;
-			buf.l[j] += d;
-		}
-	}
-}*/

@@ -17,7 +17,7 @@ public:
 	virtual ~DummySynthesizer();
 	void __init__();
 
-	virtual void AddTone(BufferBox &buf, const Range &range, float pitch, float volume);
+	virtual void RenderNote(BufferBox &buf, const Range &range, float pitch, float volume);
 };
 
 #endif /* DUMMYSYNTHESIZER_H_ */

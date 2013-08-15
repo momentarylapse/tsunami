@@ -8,6 +8,7 @@
 #include "Synthesizer.h"
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
+#include "ClickSynthesizer.h"
 #include "../../Data/AudioFile.h"
 #include "../../Tsunami.h"
 #include "../../Stuff/Log.h"
@@ -71,22 +72,23 @@ void Synthesizer::iterate(int samples)
 	}
 }
 
-void Synthesizer::read(BufferBox &buf)
+int Synthesizer::read(BufferBox &buf)
 {
 	// get from source...
 
 	foreach(MidiNote &n, notes)
-		AddTone(buf, n.range, n.pitch, n.volume);
+		RenderNote(buf, n.range, n.pitch, n.volume);
 
 	iterate(buf.num);
+	return buf.num;
 }
 
-void Synthesizer::AddMetronomeClick(BufferBox &buf, int pos, int level, float volume)
+void Synthesizer::RenderMetronomeClick(BufferBox &buf, int pos, int level, float volume)
 {
 	if (level == 0)
-		AddTone(buf, Range(pos, 0), 81, volume);
+		RenderNote(buf, Range(pos, 0), 81, volume);
 	else
-		AddTone(buf, Range(pos, 0), 74, volume * 0.5f);
+		RenderNote(buf, Range(pos, 0), 74, volume * 0.5f);
 }
 
 
@@ -95,6 +97,8 @@ Synthesizer *CreateSynthesizer(const string &name)
 {
 	if ((name == "Dummy") || (name == ""))
 		return new DummySynthesizer;
+	if (name == "Click")
+		return new ClickSynthesizer;
 	if (name == "Sample")
 		return new SampleSynthesizer;
 	tsunami->log->Error(_("unbekannter Synthesizer: ") + name);

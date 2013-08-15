@@ -1,0 +1,11 @@
+use "../api.kaba"
+
+
+class HeavySynthesizer : Synthesizer
+	DummySynthesizer sub
+	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
+		sub.sample_rate = sample_rate
+		sub.RenderNote(buf, r, pitch,      volume * 0.5)
+		sub.RenderNote(buf, r, pitch + 12, volume * 0.2)
+		sub.RenderNote(buf, r, pitch + 24, volume * 0.05)
+		sub.RenderNote(buf, r, pitch + 36, volume * 0.01)

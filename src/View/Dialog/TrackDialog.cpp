@@ -10,6 +10,8 @@
 #include "../Helper/Slider.h"
 #include "../Helper/FxList.h"
 #include "../Helper/BarList.h"
+#include "../../Audio/Synth/Synthesizer.h"
+#include "SynthesizerDialog.h"
 #include "../../Tsunami.h"
 
 TrackDialog::TrackDialog(HuiWindow *win):
@@ -28,9 +30,11 @@ TrackDialog::TrackDialog(HuiWindow *win):
 	LoadData();
 	Subscribe(tsunami->audio);
 
-	win->EventM("name", this, (void(HuiEventHandler::*)())&TrackDialog::OnName);
-	win->EventM("mute", this, (void(HuiEventHandler::*)())&TrackDialog::OnMute);
-	win->EventM("close", this, (void(HuiEventHandler::*)())&TrackDialog::OnClose);
+	win->EventM("name", this, &TrackDialog::OnName);
+	win->EventM("mute", this, &TrackDialog::OnMute);
+	win->EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
+	win->EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
+	win->EventM("close", this, &TrackDialog::OnClose);
 }
 
 TrackDialog::~TrackDialog()
@@ -55,8 +59,13 @@ void TrackDialog::LoadData()
 		volume_slider->Set(track->volume);
 		volume_slider->Enable(!track->muted);
 		panning_slider->Set(track->panning);
+		SetString("synthesizer", track->synth->name);
+		Enable("synthesizer", track->type != track->TYPE_AUDIO);
+		Enable("config_synth", track->type != track->TYPE_AUDIO);
 	}else{
 		volume_slider->Enable(false);
+		Enable("synthesizer", track);
+		Enable("config_synth", track);
 	}
 }
 
@@ -84,6 +93,17 @@ void TrackDialog::OnMute()
 void TrackDialog::OnPanning()
 {
 	track->SetPanning(panning_slider->Get());
+}
+
+void TrackDialog::OnSynthesizer()
+{
+	SynthesizerDialog *dlg = new SynthesizerDialog(tsunami, false, track);
+	dlg->Run();
+	LoadData();
+}
+
+void TrackDialog::OnConfigSynthesizer()
+{
 }
 
 void TrackDialog::OnClose()

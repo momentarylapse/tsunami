@@ -1,14 +1,6 @@
 use "../api.kaba"
 
-DummySynthesizer synth
-
-class MySynth : Synthesizer
-	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
-		print "add tone"
-		synth.RenderNote(buf, r, 150 - pitch, volume)
-
 void main()
 	forall t in audio.track
 		delete(t.synth)
-		t.synth = new MySynth
-	synth.sample_rate = audio.sample_rate
+		t.synth = CreateSynthesizer("Inverse")

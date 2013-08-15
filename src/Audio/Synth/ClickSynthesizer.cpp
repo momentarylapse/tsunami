@@ -11,7 +11,7 @@
 
 ClickSynthesizer::ClickSynthesizer()
 {
-	name = "ClickSynthesizer";
+	name = "Click";
 }
 
 ClickSynthesizer::~ClickSynthesizer()

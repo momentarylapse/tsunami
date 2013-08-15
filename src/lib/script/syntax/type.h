@@ -58,6 +58,7 @@ public:
 	ClassFunction *GetVirtualFunction(int virtual_index);
 	void LinkVirtualTable();
 	void LinkExternalVirtualTable(void *p);
+	void *CreateInstance();
 	string var2str(void *p);
 };
 extern Type *TypeUnknown;

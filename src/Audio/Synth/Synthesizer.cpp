@@ -12,6 +12,7 @@
 #include "../../Data/AudioFile.h"
 #include "../../Tsunami.h"
 #include "../../Stuff/Log.h"
+#include "../../Plugins/PluginManager.h"
 #include <math.h>
 
 const int MANY_SAMPLES = 0x7fffffff;
@@ -101,6 +102,20 @@ Synthesizer *CreateSynthesizer(const string &name)
 		return new ClickSynthesizer;
 	if (name == "Sample")
 		return new SampleSynthesizer;
+	Synthesizer *s = tsunami->plugins->LoadSynthesizer(name);
+	if (s){
+		s->name = name;
+		return s;
+	}
 	tsunami->log->Error(_("unbekannter Synthesizer: ") + name);
 	return new DummySynthesizer;
+}
+
+Array<string> FindSynthesizers()
+{
+	Array<string> names = tsunami->plugins->FindSynthesizers();
+	names.add("Dummy");
+	names.add("Click");
+	names.add("Sample");
+	return names;
 }

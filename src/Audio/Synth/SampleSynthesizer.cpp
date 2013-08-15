@@ -9,7 +9,7 @@
 
 SampleSynthesizer::SampleSynthesizer()
 {
-	name = "SampleSynthesizer";
+	name = "Sample";
 }
 
 SampleSynthesizer::~SampleSynthesizer()

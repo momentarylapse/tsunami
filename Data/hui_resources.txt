@@ -3217,7 +3217,7 @@ track_time_dialog
 0
 
 
-33
+37
 ControlTable
 td_table_1
 
@@ -3225,7 +3225,7 @@ td_table_1
 0
 0
 1
-11
+13
 -1
 0
 0
@@ -3289,6 +3289,19 @@ ld_t_bars
 1
 0
 8
+0
+0
+0
+0
+0
+td_table_1
+
+Text
+ld_t_synth
+
+1
+0
+10
 0
 0
 0
@@ -3366,8 +3379,21 @@ td_table_7
 
 1
 0
-10
+12
 2
+1
+0
+0
+0
+td_table_1
+
+ControlTable
+td_table_synth
+
+1
+0
+11
+4
 1
 0
 0
@@ -3646,6 +3672,32 @@ percent
 0
 0
 td_table_pan
+
+Button
+synthesizer
+
+1
+2
+0
+0
+0
+0
+0
+0
+td_table_synth
+
+Button
+config_synth
+hui:edit
+1
+3
+0
+0
+0
+0
+0
+0
+td_table_synth
 
 // Resource
 SizableDialog
@@ -4005,7 +4057,7 @@ ad_table_7
 // Language
 Deutsch
 // NumIDs
-223
+227
 // Text
 about
 Info
@@ -4115,6 +4167,8 @@ close
 Schließen
 close_file
 Schließen
+config_synth
+
 configure_effect
 
 copy
@@ -4189,6 +4243,8 @@ ld_t_repnum
 Anzahl:
 ld_t_samples
 !bold\\Samples
+ld_t_synth
+!bold\\Synthesizer
 ld_t_track
 Spur:
 ld_t_volume
@@ -4365,6 +4421,8 @@ sub_from_selection
 Aus Auswahl herauslösen
 sub_properties
 Eigenschaften
+synthesizer
+
 t_dummy
 
 tab_control
@@ -4395,6 +4453,8 @@ td_table_sam_con
 !noexpandy
 td_table_samples
 
+td_table_synth
+!noexpandy
 td_table_vol
 !noexpandy
 time
@@ -4459,7 +4519,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-223
+227
 // Text
 about
 
@@ -4569,6 +4629,8 @@ close
 Close
 close_file
 
+config_synth
+
 configure_effect
 
 copy
@@ -4642,6 +4704,8 @@ ld_t_repetition
 ld_t_repnum
 
 ld_t_samples
+
+ld_t_synth
 
 ld_t_track
 Track
@@ -4819,6 +4883,8 @@ sub_from_selection
 
 sub_properties
 
+synthesizer
+
 t_dummy
 
 tab_control
@@ -4848,6 +4914,8 @@ td_table_pan
 td_table_sam_con
 
 td_table_samples
+
+td_table_synth
 
 td_table_vol
 

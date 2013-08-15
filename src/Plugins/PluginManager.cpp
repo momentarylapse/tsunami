@@ -648,3 +648,37 @@ void PluginManager::Preview(Effect &fx)
 	tsunami->renderer->effect = NULL;
 	fx.ImportData();
 }
+
+
+Array<string> PluginManager::FindSynthesizers()
+{
+	Array<string> names;
+	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/Synthesizer/", "*.kaba", false);
+	foreach(DirEntry &e, list)
+		names.add(e.name.replace(".kaba", ""));
+	return names;
+}
+
+Synthesizer *PluginManager::LoadSynthesizer(const string &name)
+{
+	string filename = HuiAppDirectoryStatic + "Plugins/Synthesizer/" + name + ".kaba";
+	if (!file_test_existence(filename))
+		return NULL;
+	Script::Script *s;
+	try{
+		s = Script::Load(filename);
+	}catch(Script::Exception &e){
+		tsunami->log->Error(e.message);
+		return NULL;
+	}
+	foreach(Script::Type *t, s->syntax->Types){
+		Script::Type *r = t;
+		while (r->parent)
+			r = r->parent;
+		if (r->name != "Synthesizer")
+			continue;
+		return (Synthesizer*)t->CreateInstance();
+	}
+	return NULL;
+}
+

@@ -46,5 +46,6 @@ public:
 float pitch_to_freq(float pitch);
 
 Synthesizer *CreateSynthesizer(const string &name);
+Array<string> FindSynthesizers();
 
 #endif /* SYNTHESIZER_H_ */

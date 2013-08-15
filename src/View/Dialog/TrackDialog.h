@@ -31,6 +31,8 @@ public:
 	void OnVolume();
 	void OnMute();
 	void OnPanning();
+	void OnSynthesizer();
+	void OnConfigSynthesizer();
 
 	void SetTrack(Track *t);
 

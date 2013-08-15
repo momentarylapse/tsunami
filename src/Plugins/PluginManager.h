@@ -14,6 +14,7 @@
 #include "../Stuff/Observer.h"
 
 class Plugin;
+class Synthesizer;
 
 class PluginManager : public HuiEventHandler, public Observer
 {
@@ -54,6 +55,9 @@ public:
 	void OnPluginClose();
 
 	virtual void OnUpdate(Observable *o);
+
+	Array<string> FindSynthesizers();
+	Synthesizer *LoadSynthesizer(const string &name);
 
 	// not compiled yet
 	struct PluginFile

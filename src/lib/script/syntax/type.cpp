@@ -193,6 +193,19 @@ bool Type::DeriveFrom(Type* root)
 	return found;
 }
 
+void *Type::CreateInstance()
+{
+	void *p = malloc(size);
+	ClassFunction *c = GetDefaultConstructor();
+	if (c){
+		typedef void con_func(void *);
+		con_func * f = (con_func*)c->script->func[c->nr];
+		if (f)
+			f(p);
+	}
+	return p;
+}
+
 string Type::var2str(void *p)
 {
 	if (this == TypeInt)

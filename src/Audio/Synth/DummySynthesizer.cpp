@@ -11,7 +11,7 @@
 
 DummySynthesizer::DummySynthesizer()
 {
-	name = "DummySynthesizer";
+	name = "Dummy";
 }
 
 DummySynthesizer::~DummySynthesizer()

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-179
+181
 // Data (ID,Text)
 about
 
@@ -128,6 +128,8 @@ ld_t_repetition
 ld_t_repnum
 
 ld_t_samples
+
+ld_t_synth
 
 ld_t_track
 Track
@@ -309,6 +311,8 @@ td_table_pan
 
 td_table_sam_con
 
+td_table_synth
+
 td_table_vol
 
 track_dialog
@@ -362,7 +366,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-102
+104
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -376,9 +380,9 @@ zoom_out
 
 !bold$Name:
 
-!format=iTttC\\Vorschau\\Name\\Dauer\\Benutzung\\Löschen
+!format=iTTTt,height=150\\Vorschau\\Name\\Schläge\\Unterteilungen\\Benutzung
 
-!format=iTttC\\Vorschau\\Name\\Schläge\\Unterteilungen\\Benutzung
+!format=iTttC\\Vorschau\\Name\\Dauer\\Benutzung\\Löschen
 
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
@@ -496,6 +500,8 @@ Offset
 
 Ok
 
+Pattern %d
+
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 
 Plugin-Script wählen
@@ -533,6 +539,8 @@ exportiere wave
 fügt am Cursor der aktuellen Spur ein
 
 i'm now going to clean up...
+
+kein Muster ausgewählt
 
 keine Datei
 no file

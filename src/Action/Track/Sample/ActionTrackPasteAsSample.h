@@ -10,13 +10,14 @@
 
 #include "../../ActionGroup.h"
 
+class Track;
 class AudioFile;
 class BufferBox;
 
 class ActionTrackPasteAsSample : public ActionGroup
 {
 public:
-	ActionTrackPasteAsSample(AudioFile *a, int track_no, int pos, BufferBox *buf);
+	ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf);
 	virtual ~ActionTrackPasteAsSample();
 };
 

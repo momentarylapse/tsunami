@@ -62,6 +62,8 @@ public:
 	void InsertMidiData(int offset, MidiData &midi);
 	SampleRef *AddSample(int pos, int index);
 	void DeleteSample(int index);
+	void AddMidiNote(const MidiNote &n);
+	void DeleteMidiNote(int index);
 
 
 	enum

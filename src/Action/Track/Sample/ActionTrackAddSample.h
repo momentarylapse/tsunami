@@ -12,11 +12,12 @@
 
 class Sample;
 class SampleRef;
+class Track;
 
 class ActionTrackAddSample: public Action
 {
 public:
-	ActionTrackAddSample(int track_no, int pos, int index);
+	ActionTrackAddSample(Track *t, int pos, int index);
 	virtual ~ActionTrackAddSample();
 
 	virtual void *execute(Data *d);

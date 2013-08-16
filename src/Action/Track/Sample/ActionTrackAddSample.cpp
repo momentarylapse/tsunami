@@ -8,9 +8,9 @@
 #include "ActionTrackAddSample.h"
 #include "../../../Data/AudioFile.h"
 
-ActionTrackAddSample::ActionTrackAddSample(int _track_no, int _pos, int _index)
+ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, int _index)
 {
-	track_no = _track_no;
+	track_no = get_track_index(t);
 	pos = _pos;
 	index = _index;
 }

@@ -10,11 +10,11 @@
 #include "../../AudioFile/Sample/ActionAudioAddSample.h"
 #include "../../../Data/AudioFile.h"
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(AudioFile *a, int track_no, int pos, BufferBox *buf) :
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf) :
 	ActionGroup()
 {
-	AddSubAction(new ActionAudioAddSample("-paste-", *buf), a);
-	AddSubAction(new ActionTrackAddSample(track_no, pos, a->sample.num - 1), a);
+	AddSubAction(new ActionAudioAddSample("-paste-", *buf), t->root);
+	AddSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
 }
 
 ActionTrackPasteAsSample::~ActionTrackPasteAsSample()

@@ -14,6 +14,8 @@
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
+#include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
+#include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Sample/ActionTrackAddSample.h"
 #include "../Action/Track/Sample/ActionTrackDeleteSample.h"
@@ -191,12 +193,22 @@ void Track::InvalidateAllPeaks()
 
 SampleRef *Track::AddSample(int pos, int index)
 {
-	return (SampleRef*)root->Execute(new ActionTrackAddSample(get_track_index(this), pos, index));
+	return (SampleRef*)root->Execute(new ActionTrackAddSample(this, pos, index));
 }
 
 void Track::DeleteSample(int index)
 {
-	root->Execute(new ActionTrackDeleteSample(get_track_index(this), index));
+	root->Execute(new ActionTrackDeleteSample(this, index));
+}
+
+void Track::AddMidiNote(const MidiNote &n)
+{
+	root->Execute(new ActionTrackAddMidiNote(this, n));
+}
+
+void Track::DeleteMidiNote(int index)
+{
+	root->Execute(new ActionTrackDeleteMidiNote(this, index));
 }
 
 void Track::SetName(const string& name)

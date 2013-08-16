@@ -19,7 +19,7 @@ public:
 	virtual ~ActionTrackSampleFromSelection();
 
 private:
-	void CreateSubsFromTrack(AudioFile *a, Track *t, int track_no, int level_no);
+	void CreateSubsFromTrack(Track *t, int level_no);
 };
 
 #endif /* ACTIONTRACKSAMPLEFROMSELECTION_H_ */

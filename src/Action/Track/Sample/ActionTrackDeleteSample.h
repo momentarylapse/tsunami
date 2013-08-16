@@ -10,11 +10,12 @@
 
 #include "../../Action.h"
 class SampleRef;
+class Track;
 
 class ActionTrackDeleteSample : public Action
 {
 public:
-	ActionTrackDeleteSample(int _track_no, int _index);
+	ActionTrackDeleteSample(Track *t, int _index);
 	virtual ~ActionTrackDeleteSample();
 
 	virtual void *execute(Data *d);

@@ -55,7 +55,7 @@ void Clipboard::Paste(AudioFile *a)
 	if (!HasData())
 		return;
 	if (a->used){
-		a->Execute(new ActionTrackPasteAsSample(a, get_track_index(tsunami->view->cur_track), a->selection.start(), buf));
+		a->Execute(new ActionTrackPasteAsSample(tsunami->view->cur_track, a->selection.start(), buf));
 	}else{
 		a->NewWithOneTrack(sample_rate, Track::TYPE_AUDIO);
 		a->action_manager->Enable(false);

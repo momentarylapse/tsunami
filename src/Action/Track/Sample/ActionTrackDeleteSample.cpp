@@ -8,9 +8,9 @@
 #include "ActionTrackDeleteSample.h"
 #include "../../../Data/AudioFile.h"
 
-ActionTrackDeleteSample::ActionTrackDeleteSample(int _track_no, int _index)
+ActionTrackDeleteSample::ActionTrackDeleteSample(Track *t, int _index)
 {
-	track_no = _track_no;
+	track_no = get_track_index(t);
 	index = _index;
 	ref = NULL;
 }

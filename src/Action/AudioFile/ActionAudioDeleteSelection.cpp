@@ -26,7 +26,7 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_n
 			// subs
 			foreachib(SampleRef *s, t->sample, n)
 				if (s->is_selected){
-					AddSubAction(new ActionTrackDeleteSample(track_no, n), a);
+					AddSubAction(new ActionTrackDeleteSample(t, n), a);
 					_foreach_it_.update(); // TODO...
 				}
 		}

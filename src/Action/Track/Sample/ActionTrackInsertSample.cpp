@@ -26,7 +26,7 @@ ActionTrackInsertSample::ActionTrackInsertSample(AudioFile *a, int track_no, int
 	AddSubAction(action, a);
 
 	// delete sub
-	AddSubAction(new ActionTrackDeleteSample(track_no, index), a);
+	AddSubAction(new ActionTrackDeleteSample(a->track[track_no], index), a);
 }
 
 ActionTrackInsertSample::~ActionTrackInsertSample()

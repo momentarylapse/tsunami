@@ -378,13 +378,13 @@ void Tsunami::OnRemoveAdded()
 
 void Tsunami::OnPlayLoop()
 {
-	renderer->loop = !renderer->loop;
+	renderer->loop_if_allowed = !renderer->loop_if_allowed;
 	UpdateMenu();
 }
 
 void Tsunami::OnPlay()
 {
-	renderer->Prepare(audio, audio->GetPlaybackSelection(), false);
+	renderer->Prepare(audio, audio->GetPlaybackSelection(), true);
 	output->Play(renderer);
 }
 
@@ -553,7 +553,7 @@ void Tsunami::UpdateMenu()
 	Enable("play", audio->used);
 	Enable("stop", output->IsPlaying());
 	Enable("pause", output->IsPlaying());
-	Check("play_loop", renderer->loop);
+	Check("play_loop", renderer->loop_if_allowed);
 
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){

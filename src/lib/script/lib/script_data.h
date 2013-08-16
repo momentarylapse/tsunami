@@ -322,7 +322,7 @@ void LinkExternalClassFunc(const string &name, T pointer)
 }
 void DeclareClassSize(const string &class_name, int offset);
 void DeclareClassOffset(const string &class_name, const string &element, int offset);
-void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p);
+void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p, void *instance);
 
 void *GetExternalLink(const string &name);
 int ProcessClassOffset(const string &class_name, const string &element, int offset);

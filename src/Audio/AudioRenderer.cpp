@@ -14,6 +14,7 @@ AudioRenderer::AudioRenderer()
 {
 	effect = NULL;
 	loop = false;
+	loop_if_allowed = false;
 	pos = 0;
 	audio = NULL;
 }
@@ -216,12 +217,12 @@ BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
 	return buf;
 }
 
-void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool _loop)
+void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
 	audio = a;
 	range = _range;
-	loop = _loop;
+	loop = loop_if_allowed && allow_loop;
 	pos = range.offset;
 	foreach(Effect &fx, a->fx)
 		fx.Prepare();

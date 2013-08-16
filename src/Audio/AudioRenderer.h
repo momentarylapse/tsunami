@@ -10,7 +10,7 @@
 
 #include "../Data/AudioFile.h"
 
-class AudioRendererInterface
+class AudioRendererInterface : public VirtualBase
 {
 public:
 	AudioRendererInterface(){}
@@ -27,7 +27,7 @@ public:
 	BufferBox RenderAudioFile(AudioFile *a, const Range &range);
 	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
 	virtual int read(BufferBox &buf);
-	void Prepare(AudioFile *a, const Range &range, bool loop);
+	void Prepare(AudioFile *a, const Range &range, bool alllow_loop);
 	void CleanUp();
 
 	//void Seek(int pos);
@@ -52,6 +52,7 @@ public:
 	Effect *effect;
 	Range range;
 	bool loop;
+	bool loop_if_allowed;
 };
 
 #endif /* AUDIORENDERER_H_ */

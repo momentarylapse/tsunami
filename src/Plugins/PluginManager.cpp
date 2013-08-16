@@ -141,25 +141,28 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("BufferBox.range", Script::mf(&BufferBox::range));
 	Script::LinkExternal("BufferBox.get_spectrum", Script::mf(&ExtendedBufferBox::get_spectrum));
 
+	Synthesizer synth;
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
 	Script::DeclareClassOffset("Synthesizer", "name", offsetof(Synthesizer, name));
 	Script::DeclareClassOffset("Synthesizer", "sample_rate", offsetof(Synthesizer, sample_rate));
-	/*Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
-	Script::LinkExternal("Synthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
-	Script::LinkExternal("Synthesizer.RenderNote", Script::mf(&Synthesizer::RenderNote));
-	Script::LinkExternal("Synthesizer.read", Script::mf(&Synthesizer::read));
-	Script::LinkExternal("Synthesizer.OnConfigure", Script::mf(&Synthesizer::OnConfigure));*/
-	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__));
-	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote));
-	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read));
-	Script::DeclareClassVirtualIndex("Synthesizer", "OnConfigure", Script::mf(&Synthesizer::OnConfigure));
+	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
+	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "OnConfigure", Script::mf(&Synthesizer::OnConfigure), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
 	Script::LinkExternal("Synthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
 
+
+	DummySynthesizer dsynth;
 	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
 	Script::LinkExternal("DummySynthesizer.__init__", Script::mf(&DummySynthesizer::__init__));
-	Script::LinkExternal("DummySynthesizer.RenderNote", Script::mf(&DummySynthesizer::RenderNote));
-	Script::LinkExternal("DummySynthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
+	Script::DeclareClassVirtualIndex("DummySynthesizer", "__delete__", Script::mf(&DummySynthesizer::__delete__), &dsynth);
+	Script::DeclareClassVirtualIndex("DummySynthesizer", "RenderNote", Script::mf(&DummySynthesizer::RenderNote), &dsynth);
+	//Script::DeclareClassVirtualIndex("DummySynthesizer", "read", Script::mf(&DummySynthesizer::read), &dsynth);
+	//Script::DeclareClassVirtualIndex("DummySynthesizer", "OnConfigure", Script::mf(&DummySynthesizer::OnConfigure), &dsynth);
+	//Script::LinkExternal("DummySynthesizer.set", Script::mf(&Synthesizer::set));
+	//Script::LinkExternal("DummySynthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
 
 	Script::DeclareClassSize("BarPattern", sizeof(BarPattern));
 	Script::DeclareClassOffset("BarPattern", "num_beats", offsetof(BarPattern, num_beats));

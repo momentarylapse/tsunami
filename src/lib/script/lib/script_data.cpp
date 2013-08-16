@@ -1227,7 +1227,7 @@ void DeclareClassOffset(const string &class_name, const string &element, int off
 	ClassOffsets.add(d);
 }
 
-void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p)
+void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p, void *instance)
 {
 	ClassOffsetData d;
 	d.class_name = class_name;
@@ -1235,6 +1235,9 @@ void DeclareClassVirtualIndex(const string &class_name, const string &func, void
 	d.offset = (int)(long)p / sizeof(void*);
 	d.is_virtual = true;
 	ClassOffsets.add(d);
+
+	VirtualTable *v = *(VirtualTable**)instance;
+	LinkExternal(class_name + "." + func, v[d.offset]);
 }
 
 int ProcessClassOffset(const string &class_name, const string &element, int offset)

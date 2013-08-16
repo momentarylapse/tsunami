@@ -16,6 +16,7 @@ class MidiPattern;
 class MidiNote;
 class Track;
 class Bar;
+class Range;
 
 class MidiEditor : public HuiDialog, public Observer
 {
@@ -27,10 +28,13 @@ public:
 	void OnAreaLeftButtonDown();
 	void OnAreaLeftButtonUp();
 	void OnAreaDraw();
+	void OnBeatPartition();
 	void OnPlay();
 	void OnStop();
 	void OnDelete();
 	void OnClose();
+
+	void CreateParts();
 
 	void DrawNote(HuiPainter *c, MidiNote &n, bool hover);
 
@@ -39,16 +43,17 @@ public:
 	AudioFile *audio;
 	Track *track;
 	Array<Bar> bars;
+	Array<Range> parts;
 
 	int pitch_min, pitch_max;
 	int beat_partition;
 
-	int cur_pitch, cur_sample;
+	int cur_pitch, cur_sample, cur_part;
 	int hover_note;
 	int area_width, area_height;
 
 	bool creating_new_note;
-	int new_time_start;
+	int new_part_start;
 	MidiNote *new_note;
 
 	int x2sample(int x);

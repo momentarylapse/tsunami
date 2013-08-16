@@ -28,6 +28,7 @@ MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Tra
 	SetImage("play_pattern", "hui:media-play");
 	AddButton("", 3, 0, 0, 0, "stop_pattern");
 	SetImage("stop_pattern", "hui:media-stop");
+	AddSpinButton("4\\1", 4, 0, 0, 0, "beat_partition");
 
 	//SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 
@@ -41,21 +42,21 @@ MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Tra
 	EventMX("area", "hui:left-button-up", this, &MidiEditor::OnAreaLeftButtonUp);
 	EventM("play_pattern", this, &MidiEditor::OnPlay);
 	EventM("stop_pattern", this, &MidiEditor::OnStop);
+	EventM("beat_partition", this, &MidiEditor::OnBeatPartition);
 
 	if (a->selection.num == 0)
 		a->selection.num = a->sample_rate * 4;
 
-
-	if (audio->GetTimeTrack())
-		bars = audio->GetTimeTrack()->bar.GetBars(a->selection);
-
 	beat_partition = 4;
+	CreateParts();
 
 	pitch_min = 60;
 	pitch_max = 90;
+	cur_part = -1;
+	cur_sample = -1;
 	creating_new_note = false;
 	new_note = new MidiNote;
-	new_time_start = -1;
+	new_part_start = -1;
 	hover_note = -1;
 
 	Subscribe(audio);
@@ -66,6 +67,26 @@ MidiEditor::~MidiEditor()
 {
 	Unsubscribe(tsunami->output);
 	Unsubscribe(audio);
+}
+
+void MidiEditor::CreateParts()
+{
+	bars.clear();
+	parts.clear();
+	if (!audio->GetTimeTrack())
+		return;
+	bars = audio->GetTimeTrack()->bar.GetBars(audio->selection);
+
+	foreach(Bar &b, bars)
+		for (int i=0; i<b.num_beats; i++){
+			for (int j=0; j<beat_partition; j++){
+				int s0 = b.range.offset + (i * beat_partition + j) * b.range.num / beat_partition / b.num_beats;
+				int s1 = b.range.offset + (i * beat_partition + j + 1) * b.range.num / beat_partition / b.num_beats;
+				parts.add(Range(s0, s1 - s0));
+			}
+		}
+
+	Redraw("area");
 }
 
 
@@ -97,14 +118,20 @@ void MidiEditor::OnAreaMouseMove()
 	int y = HuiGetEvent()->my;
 	cur_sample = x2sample(x);
 	cur_pitch = y2pitch(y);
+	cur_part = -1;
+	foreachi(Range &r, parts, i)
+		if (r.is_inside(cur_sample))
+			cur_part = i;
 
 	hover_note = -1;
 
 	if (creating_new_note){
-		if (cur_sample >= new_time_start)
-			new_note->range = Range(new_time_start, cur_sample - new_time_start + 1000);
+		Range a = parts[new_part_start];
+		Range b = parts[cur_part];
+		if (cur_part >= new_part_start)
+			new_note->range = Range(a.start(), b.end() - a.start());
 		else
-			new_note->range = Range(cur_sample, new_time_start - cur_sample + 1000);
+			new_note->range = Range(b.start(), a.end() - b.start());
 	}else{
 		// hovering over a note?
 		foreachi(MidiNote &n, track->midi, i)
@@ -125,10 +152,10 @@ void MidiEditor::OnAreaLeftButtonDown()
 		return;
 	}
 	creating_new_note = true;
-	new_note->range = Range(cur_sample, 1000);
+	new_note->range = parts[cur_part];
 	new_note->volume = 1;
 	new_note->pitch = cur_pitch;
-	new_time_start = cur_sample;
+	new_part_start = cur_part;
 }
 
 void MidiEditor::OnAreaLeftButtonUp()
@@ -193,7 +220,7 @@ void MidiEditor::OnAreaDraw()
 					c->SetColor(Black);
 				else
 					c->SetColor(Gray);
-				float x = sample2x(b.range.offset + (i * b.num_beats + j) * b.range.num / beat_partition / b.num_beats);
+				float x = sample2x(b.range.offset + (i * beat_partition + j) * b.range.num / beat_partition / b.num_beats);
 				c->DrawLine(x, 0, x, h);
 			}
 		}
@@ -204,22 +231,21 @@ void MidiEditor::OnAreaDraw()
 
 	if (creating_new_note){
 		DrawNote(c, *new_note, true);
-	}else if (hover_note < 0){
+	}else if ((hover_note < 0) && (cur_part >= 0)){
 		color col = tsunami->view->GetPitchColor(cur_pitch);
 		col.a = 0.5f;
 		c->SetColor(col);
-		c->DrawRect(rect(sample2x(cur_sample), sample2x(cur_sample + 1), pitch2y(cur_pitch + 1), pitch2y(cur_pitch)));
+		Range r = parts[cur_part];
+		c->DrawRect(rect(sample2x(r.start()), sample2x(r.end()), pitch2y(cur_pitch + 1), pitch2y(cur_pitch)));
 	}
 
-	/*if (tsunami->output->IsPlaying()){
-		int pos = tsunami->output->GetPos(); // FIXME!!!!!!!!!!
-		int samples_per_beat = DEFAULT_SAMPLE_RATE * 60 / beats_per_minute;
-		int length = samples_per_beat * cur_pattern->num_beats;
-		int offset = pos % length;
-		float x = w * offset / length;
+	if (tsunami->output->IsPlaying()){
+		int pos = tsunami->output->GetPos();
+		int s = tsunami->renderer->TranslateOutputPos(pos);
+		float x = sample2x(s);
 		c->SetColor(Green);
 		c->DrawLine(x, 0, x, h);
-	}*/
+	}
 }
 
 /*int stream_func(BufferBox &b)
@@ -256,6 +282,12 @@ void MidiEditor::OnPlay()
 void MidiEditor::OnStop()
 {
 	tsunami->output->Stop();
+}
+
+void MidiEditor::OnBeatPartition()
+{
+	beat_partition = GetInt("");
+	CreateParts();
 }
 
 void MidiEditor::OnClose()

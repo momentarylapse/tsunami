@@ -102,7 +102,7 @@ Synthesizer *CreateSynthesizer(const string &name)
 		return new ClickSynthesizer;
 	if (name == "Sample")
 		return new SampleSynthesizer;
-	Synthesizer *s = tsunami->plugins->LoadSynthesizer(name);
+	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name);
 	if (s){
 		s->name = name;
 		return s;
@@ -113,7 +113,7 @@ Synthesizer *CreateSynthesizer(const string &name)
 
 Array<string> FindSynthesizers()
 {
-	Array<string> names = tsunami->plugins->FindSynthesizers();
+	Array<string> names = tsunami->plugin_manager->FindSynthesizers();
 	names.add("Dummy");
 	names.add("Click");
 	names.add("Sample");

@@ -102,7 +102,7 @@ void Effect::CleanUp()
 void Effect::make_usable()
 {
 	if (!plugin){
-		plugin = tsunami->plugins->GetPlugin(name);
+		plugin = tsunami->plugin_manager->GetPlugin(name);
 		if (plugin)
 			usable = plugin->usable;
 	}
@@ -125,7 +125,7 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 		plugin->ResetData();
 		ImportData();
 		ImportState();
-		tsunami->plugins->context.set(t, 0, buf.range());
+		tsunami->plugin_manager->context.set(t, 0, buf.range());
 		if (plugin->type == Plugin::TYPE_EFFECT)
 			plugin->f_process_track(&buf);
 		ExportState();

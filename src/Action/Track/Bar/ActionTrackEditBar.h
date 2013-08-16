@@ -14,14 +14,14 @@
 class ActionTrackEditBar: public Action
 {
 public:
-	ActionTrackEditBar(Track *t, int index, Bar &bar);
+	ActionTrackEditBar(Track *t, int index, BarPattern &bar);
 	virtual ~ActionTrackEditBar();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
-	Bar bar;
+	BarPattern bar;
 	int track_no;
 	int index;
 };

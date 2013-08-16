@@ -12,7 +12,7 @@
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/SampleManager.h"
-#include "View/Dialog/MidiPatternManager.h"
+#include "View/Dialog/MidiEditor.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -69,12 +69,12 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, &Tsunami::OnAddTimeTrack);
 	HuiAddCommandM("add_midi_track", "hui:add", -1, this, &Tsunami::OnAddMidiTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, &Tsunami::OnDeleteTrack);
+	HuiAddCommandM("edit_midi_track", "hui:edit", -1, this, &Tsunami::OnEditMidiTrack);
 	HuiAddCommandM("level_add", "hui:add", -1, this, &Tsunami::OnAddLevel);
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &Tsunami::OnDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &Tsunami::OnCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &Tsunami::OnCurLevelDown);
 	HuiAddCommandM("sample_manager", "", -1, this, &Tsunami::OnSampleManager);
-	HuiAddCommandM("midi_pattern_manager", "", -1, this, &Tsunami::OnMidiPatternManager);
 	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, &Tsunami::OnRemoveAdded);
@@ -153,13 +153,12 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	view = new AudioView(this, audio);
 
-	plugins = new PluginManager;
-	plugins->AddPluginsToMenu();
-	plugins->LinkAppScriptData();
+	plugin_manager = new PluginManager;
+	plugin_manager->AddPluginsToMenu();
+	plugin_manager->LinkAppScriptData();
 
 
 	sample_manager = new SampleManager(audio, this, true);
-	midi_pattern_manager = new MidiPatternManager(audio, this, true);
 
 	Subscribe(view);
 	Subscribe(audio);
@@ -193,7 +192,7 @@ Tsunami::~Tsunami()
 	HuiConfigWriteBool("Window.Maximized", IsMaximized());
 
 	delete(sample_manager);
-	delete(plugins);
+	delete(plugin_manager);
 	delete(storage);
 	delete(view);
 	delete(output);
@@ -242,6 +241,12 @@ void Tsunami::OnDeleteTrack()
 		}
 		audio->DeleteTrack(get_track_index(view->cur_track));
 	}
+}
+
+void Tsunami::OnEditMidiTrack()
+{
+	MidiEditor *e = new MidiEditor(tsunami, false, audio, view->cur_track);
+	e->Run();
 }
 
 void Tsunami::OnCloseFile()
@@ -322,7 +327,7 @@ void Tsunami::OnPaste()
 
 void Tsunami::OnFindAndExecutePlugin()
 {
-	plugins->FindAndExecutePlugin();
+	plugin_manager->FindAndExecutePlugin();
 }
 
 void Tsunami::OnDelete()
@@ -334,11 +339,6 @@ void Tsunami::OnDelete()
 void Tsunami::OnSampleManager()
 {
 	sample_manager->Show();
-}
-
-void Tsunami::OnMidiPatternManager()
-{
-	midi_pattern_manager->Show();
 }
 
 void Tsunami::OnSubImport()
@@ -535,6 +535,7 @@ void Tsunami::UpdateMenu()
 	Enable("track_import", audio->used);
 	Enable("add_track", audio->used);
 	Enable("add_time_track", audio->used);
+	Enable("edit_midi_track", view->cur_track && (view->cur_track->type == Track::TYPE_MIDI));
 	Enable("delete_track", view->cur_track);
 	Enable("track_properties", view->cur_track);
 	// level

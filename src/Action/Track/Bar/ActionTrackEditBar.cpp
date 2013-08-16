@@ -9,7 +9,7 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackEditBar::ActionTrackEditBar(Track *t, int _index, Bar &_bar)
+ActionTrackEditBar::ActionTrackEditBar(Track *t, int _index, BarPattern &_bar)
 {
 	track_no = get_track_index(t);
 	index = _index;
@@ -28,7 +28,7 @@ void *ActionTrackEditBar::execute(Data *d)
 	assert(index >= 0);
 	assert(index < t->bar.num);
 
-	Bar temp = bar;
+	BarPattern temp = bar;
 	bar = t->bar[index];
 	t->bar[index] = temp;
 

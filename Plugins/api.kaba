@@ -61,7 +61,7 @@ class DummySynthesizer : Synthesizer
 class TrackRenderBuffer
 	int dummy
 	
-class Bar
+class BarPattern
 	int num_beats
 	int length
 	int type
@@ -115,7 +115,7 @@ class Track
 	SampleRef *sample[]
 	
 	// time track
-	Bar bar[]
+	BarPattern bar[]
 	
 	// midi track
 	MidiData midi

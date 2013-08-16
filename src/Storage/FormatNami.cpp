@@ -119,7 +119,7 @@ void WriteSampleRef(CFile *f, SampleRef *s)
 	EndChunk(f);
 }
 
-void WriteBar(CFile *f, Bar &b)
+void WriteBar(CFile *f, BarPattern &b)
 {
 	BeginChunk(f, "bar");
 
@@ -200,7 +200,7 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0); // reserved
 	f->WriteInt(0);
 
-	foreach(Bar &b, t->bar)
+	foreach(BarPattern &b, t->bar)
 		WriteBar(f, b);
 
 	foreachi(TrackLevel &l, t->level, i)
@@ -685,9 +685,9 @@ void ReadSub(CFile *f, Track *t)
 	tsunami->log->Error("\"sub\" chunk is deprecated!");
 }
 
-void ReadChunkBar(CFile *f, Array<Bar> *bar)
+void ReadChunkBar(CFile *f, Array<BarPattern> *bar)
 {
-	Bar b;
+	BarPattern b;
 	b.type = f->ReadInt();
 	b.length = f->ReadInt();
 	b.num_beats = f->ReadInt();

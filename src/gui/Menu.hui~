@@ -90,6 +90,7 @@ enum{
 		sub_menu_161->AddEntryImage("Leere Spur hinzuf&ugen",HuiImageAdd,HMM_ADD_TRACK);
 		sub_menu_161->AddEntryImage("Rhythmus Spur hinzuf&ugen...",HuiImageAdd,HMM_ADD_TIME_TRACK);
 		sub_menu_161->AddEntryImage("Midi Spur hinzuf&ugen",HuiImageAdd,HMM_ADD_MIDI_TRACK);
+		sub_menu_161->AddEntryImage("Midi editieren",HuiImageEdit,HMM_EDIT_MIDI_TRACK);
 		sub_menu_161->AddEntryImage("L&oschen",HuiImageDelete,HMM_DELETE_TRACK);
 		sub_menu_161->AddSeparator();
 		sub_menu_161->AddEntryImage("Eigenschaften",HuiImageProperties,HMM_TRACK_PROPERTIES);
@@ -105,6 +106,7 @@ enum{
 	m->AddSubMenu("Ebene",HMM_MENU_LEVEL,sub_menu_level);
 		CHuiMenu *sub_menu_6679=new CHuiMenu();
 		sub_menu_6679->AddEntryImage("Verwalten...",HuiImageProperties,HMM_SAMPLE_MANAGER);
+		sub_menu_6679->AddEntryImage("Midi-Pattern Verwalten...",HuiImageProperties,HMM_MIDI_PATTERN_MANAGER);
 		sub_menu_6679->AddSeparator();
 		sub_menu_6679->AddEntryImage("Aus Auswahl herausl&osen",HuiImageCut,HMM_SUB_FROM_SELECTION);
 		sub_menu_6679->AddEntryImage("Fest einf&ugen",HuiImageAdd,HMM_INSERT_ADDED);

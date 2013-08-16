@@ -41,7 +41,7 @@ void BarList::FillList()
 	if (track){
 		int sample_rate = track->root->sample_rate;
 		int n = 1;
-		foreach(Bar &b, track->bar){
+		foreach(BarPattern &b, track->bar){
 			if (b.type == b.TYPE_BAR){
 				if (b.count == 1)
 					dlg->AddString(id, format("%d\\%d\\%.1f\\%d", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
@@ -82,7 +82,7 @@ void BarList::OnListEdit()
 		return;
 	int sample_rate = track->root->sample_rate;
 	int index = HuiGetEvent()->row;
-	Bar b = track->bar[index];
+	BarPattern b = track->bar[index];
 	string text = dlg->GetCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
 	if (b.type == b.TYPE_BAR){
 		if (HuiGetEvent()->column == 1){
@@ -116,7 +116,7 @@ void BarList::OnAddPause()
 		return;
 	int s = dlg->GetInt(id);
 
-	Bar b;
+	BarPattern b;
 	b.num_beats = 1;
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)track->root->sample_rate * 2.0f);
@@ -152,7 +152,7 @@ void BarList::AddNewBar()
 
 	int s = dlg->GetInt(id);
 
-	Bar b;
+	BarPattern b;
 	b.num_beats = 4;
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)track->root->sample_rate * 60.0f / 90.0f);

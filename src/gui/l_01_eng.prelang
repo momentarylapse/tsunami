@@ -91,6 +91,8 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
+edit_midi_track
+
 exit
 
 export_selection
@@ -190,8 +192,6 @@ menu_view_channels
 menu_view_grid
 
 menu_view_peaks
-
-midi_pattern_manager
 
 ms
 ms
@@ -366,7 +366,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-104
+101
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -379,8 +379,6 @@ zoom_out
 !bold$Kommentar/Geschehnisse:
 
 !bold$Name:
-
-!format=iTTTt,height=150\\Vorschau\\Name\\Schläge\\Unterteilungen\\Benutzung
 
 !format=iTttC\\Vorschau\\Name\\Dauer\\Benutzung\\Löschen
 
@@ -492,15 +490,11 @@ Midi-Pattern Manager
 
 Nachrichten
 
-Neu
-
 OK
 
 Offset
 
 Ok
-
-Pattern %d
 
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 

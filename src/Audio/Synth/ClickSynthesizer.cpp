@@ -36,7 +36,7 @@ void ClickSynthesizer::RenderNote(BufferBox& buf, const Range& range, float pitc
 	for (int i=i0; i<i1; i++){
 		float tt = (i - range.offset) * f_w;
 		float d = sin(tt) * volume;
-		float fi = (float)(i - range.end()) / (float)sm_d;
+		float fi = (float)(i - range.offset) / (float)sm_d;
 		d *= exp(-fi);
 		buf.r[i] += d;
 		buf.l[i] += d;

@@ -9,7 +9,7 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackAddBar::ActionTrackAddBar(Track *t, int _index, Bar &_bar)
+ActionTrackAddBar::ActionTrackAddBar(Track *t, int _index, BarPattern &_bar)
 {
 	track_no = get_track_index(t);
 	index = _index;

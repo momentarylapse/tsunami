@@ -21,7 +21,7 @@ public:
 	virtual void undo(Data *d);
 
 private:
-	Bar bar;
+	BarPattern bar;
 	int track_no;
 	int index;
 };

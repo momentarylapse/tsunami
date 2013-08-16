@@ -1,6 +1,17 @@
 use "../api.kaba"
 
+class MySyn : Synthesizer
+	void __init__()
+		print "init"
+	overwrite void __delete__()
+		print "dellll"
+
 void main()
-	forall t in audio.track
+	print "a"
+	delete(new Synthesizer)
+	print "b"
+	delete(new MySyn)
+	print "c"
+	/*forall t in audio.track
 		delete(t.synth)
-		t.synth = CreateSynthesizer("Inverse")
+		t.synth = CreateSynthesizer("Inverse")*/

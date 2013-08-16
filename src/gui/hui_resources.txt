@@ -1243,7 +1243,7 @@ ItemPopup
 menu_track
 
 1
-7
+8
 0
 0
 0
@@ -1294,6 +1294,19 @@ hui:add
 ItemImage
 add_midi_track
 hui:add
+1
+0
+0
+0
+0
+0
+0
+0
+
+
+ItemImage
+edit_midi_track
+hui:edit
 1
 0
 0
@@ -1438,7 +1451,7 @@ ItemPopup
 menu_sub
 
 1
-8
+7
 0
 0
 0
@@ -1449,19 +1462,6 @@ menu_sub
 
 ItemImage
 sample_manager
-hui:properties
-1
-0
-0
-0
-0
-0
-0
-0
-
-
-ItemImage
-midi_pattern_manager
 hui:properties
 1
 0
@@ -4189,6 +4189,8 @@ delete_track
 Löschen
 dummy_favorite_dialog
 Effekt
+edit_midi_track
+Midi editieren
 edit_sample
 
 exit
@@ -4311,8 +4313,6 @@ menu_view_grid
 Raster
 menu_view_peaks
 Peaks
-midi_pattern_manager
-Midi-Pattern Verwalten...
 ms
 ms
 mute
@@ -4651,6 +4651,8 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
+edit_midi_track
+
 edit_sample
 
 exit
@@ -4772,8 +4774,6 @@ menu_view_channels
 menu_view_grid
 
 menu_view_peaks
-
-midi_pattern_manager
 
 ms
 ms

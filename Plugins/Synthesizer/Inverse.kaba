@@ -2,7 +2,10 @@ use "../api.kaba"
 
 
 class InverseSynthesizer : Synthesizer
-	DummySynthesizer sub
+	overwrite void __delete__()
+		print "del"
+	//DummySynthesizer sub
 	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
-		sub.sample_rate = sample_rate
-		sub.RenderNote(buf, r, 150 - pitch, volume)
+		print "add"
+		//sub.sample_rate = sample_rate
+		//sub.RenderNote(buf, r, 150 - pitch, volume)

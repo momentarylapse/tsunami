@@ -104,6 +104,7 @@ void TrackDialog::OnSynthesizer()
 
 void TrackDialog::OnConfigSynthesizer()
 {
+	track->synth->OnConfigure();
 }
 
 void TrackDialog::OnClose()

@@ -11,7 +11,7 @@
 #include "../lib/base/base.h"
 #include "Range.h"
 
-class Bar
+class BarPattern
 {
 public:
 	int num_beats;
@@ -29,6 +29,15 @@ public:
 	int x, width;
 };
 
+class Bar
+{
+public:
+	Bar(){}
+	Bar(const Range &r, int num_beats);
+	Range range;
+	int num_beats;
+};
+
 class Beat
 {
 public:
@@ -39,10 +48,11 @@ public:
 	int beat_no;
 };
 
-class BarCollection : public Array<Bar>
+class BarCollection : public Array<BarPattern>
 {
 public:
 	Array<Beat> GetBeats(const Range &r);
+	Array<Bar> GetBars(const Range &r);
 	int GetNextBeat(int pos);
 	Range GetRange();
 };

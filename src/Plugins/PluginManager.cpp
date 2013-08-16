@@ -43,16 +43,16 @@ BufferBox AudioFileRender(AudioFile *a, const Range &r)
 {	return tsunami->renderer->RenderAudioFile(a, r);	}
 
 void GlobalPutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
-{	tsunami->plugins->PutFavoriteBarFixed(win, x, y, w);	}
+{	tsunami->plugin_manager->PutFavoriteBarFixed(win, x, y, w);	}
 
 void GlobalPutFavoriteBarSizable(HuiWindow *win, const string &root_id, int x, int y)
-{	tsunami->plugins->PutFavoriteBarSizable(win, root_id, x, y);	}
+{	tsunami->plugin_manager->PutFavoriteBarSizable(win, root_id, x, y);	}
 
 void GlobalPutCommandBarFixed(HuiWindow *win, int x, int y, int w)
-{	tsunami->plugins->PutCommandBarFixed(win, x, y, w);	}
+{	tsunami->plugin_manager->PutCommandBarFixed(win, x, y, w);	}
 
 void GlobalPutCommandBarSizable(HuiWindow *win, const string &root_id, int x, int y)
-{	tsunami->plugins->PutCommandBarSizable(win, root_id, x, y);	}
+{	tsunami->plugin_manager->PutCommandBarSizable(win, root_id, x, y);	}
 
 Array<Slider*> global_slider;
 
@@ -144,11 +144,11 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
 	Script::DeclareClassOffset("Synthesizer", "name", offsetof(Synthesizer, name));
 	Script::DeclareClassOffset("Synthesizer", "sample_rate", offsetof(Synthesizer, sample_rate));
-	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
+	/*Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::LinkExternal("Synthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
 	Script::LinkExternal("Synthesizer.RenderNote", Script::mf(&Synthesizer::RenderNote));
 	Script::LinkExternal("Synthesizer.read", Script::mf(&Synthesizer::read));
-	Script::LinkExternal("Synthesizer.OnConfigure", Script::mf(&Synthesizer::OnConfigure));
+	Script::LinkExternal("Synthesizer.OnConfigure", Script::mf(&Synthesizer::OnConfigure));*/
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote));
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read));
@@ -161,12 +161,12 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("DummySynthesizer.RenderNote", Script::mf(&DummySynthesizer::RenderNote));
 	Script::LinkExternal("DummySynthesizer.__delete__", Script::mf(&Synthesizer::__delete__));
 
-	Script::DeclareClassSize("Bar", sizeof(Bar));
-	Script::DeclareClassOffset("Bar", "num_beats", offsetof(Bar, num_beats));
-	Script::DeclareClassOffset("Bar", "length", offsetof(Bar, length));
-	Script::DeclareClassOffset("Bar", "type", offsetof(Bar, type));
-	Script::DeclareClassOffset("Bar", "count", offsetof(Bar, count));
-	Script::DeclareClassOffset("Bar", "is_selected", offsetof(Bar, is_selected));
+	Script::DeclareClassSize("BarPattern", sizeof(BarPattern));
+	Script::DeclareClassOffset("BarPattern", "num_beats", offsetof(BarPattern, num_beats));
+	Script::DeclareClassOffset("BarPattern", "length", offsetof(BarPattern, length));
+	Script::DeclareClassOffset("BarPattern", "type", offsetof(BarPattern, type));
+	Script::DeclareClassOffset("BarPattern", "count", offsetof(BarPattern, count));
+	Script::DeclareClassOffset("BarPattern", "is_selected", offsetof(BarPattern, is_selected));
 
 	Script::DeclareClassSize("MidiNote", sizeof(MidiNote));
 	Script::DeclareClassOffset("MidiNote", "range", offsetof(MidiNote, range));
@@ -254,7 +254,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("PluginContext", "track_no", offsetof(PluginManager::PluginContext, track_no));
 	Script::DeclareClassOffset("PluginContext", "range", offsetof(PluginManager::PluginContext, range));
 	Script::DeclareClassOffset("PluginContext", "level", offsetof(PluginManager::PluginContext, level));
-	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugins->context);
+	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugin_manager->context);
 }
 
 void PluginManager::OnMenuExecutePlugin()

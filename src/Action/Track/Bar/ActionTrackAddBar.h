@@ -14,7 +14,7 @@
 class ActionTrackAddBar: public Action
 {
 public:
-	ActionTrackAddBar(Track *t, int index, Bar &Bar);
+	ActionTrackAddBar(Track *t, int index, BarPattern &Bar);
 	virtual ~ActionTrackAddBar();
 
 	virtual void *execute(Data *d);
@@ -22,7 +22,7 @@ public:
 
 private:
 	int index;
-	Bar bar;
+	BarPattern bar;
 	int track_no;
 };
 

@@ -291,7 +291,8 @@ void AudioView::SetBarriers(SelectionType *s)
 
 		// time bar...
 		int x0 = 0;
-		foreach(Bar &b, t->bar){
+		foreach(BarPattern &b, t->bar){
+			// FIXME
 			for (int i=0;i<b.num_beats;i++)
 				s->barrier.add(x0 + (int)((float)b.length * i / (float)b.num_beats) + dpos);
 			x0 += b.length;

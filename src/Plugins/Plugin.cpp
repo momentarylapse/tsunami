@@ -207,12 +207,12 @@ bool Plugin::Configure(bool previewable)
 {
 	msg_db_r("Plugin.Configure", 1);
 	if (f_configure){
-		tsunami->plugins->cur_plugin = this;
-		tsunami->plugins->PluginAddPreview = previewable;
+		tsunami->plugin_manager->cur_plugin = this;
+		tsunami->plugin_manager->PluginAddPreview = previewable;
 		f_configure();
 		GlobalRemoveSliders(NULL);
 		msg_db_l(1);
-		return !tsunami->plugins->PluginCancelled;
+		return !tsunami->plugin_manager->PluginCancelled;
 	}else{
 		tsunami->log->Info(_("Dieser Effekt ist nicht konfigurierbar."));
 	}
@@ -232,7 +232,7 @@ void Plugin::ProcessTrack(Track *t, int level_no, const Range &r)
 		return;
 	msg_db_r("PluginProcessTrack", 1);
 
-	tsunami->plugins->context.set(t, level_no, r);
+	tsunami->plugin_manager->context.set(t, level_no, r);
 
 	BufferBox buf = t->GetBuffers(level_no, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);

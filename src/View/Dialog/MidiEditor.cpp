@@ -21,7 +21,7 @@ MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Tra
 
 	AddControlTable("", 0, 0, 1, 2, "table1");
 	SetTarget("table1", 0);
-	AddControlTable("!noexpandy", 0, 0, 6, 1, "table2");
+	AddControlTable("!noexpandy", 0, 0, 7, 1, "table2");
 	AddDrawingArea("", 0, 1, 0, 0, "area");
 	SetTarget("table2", 0);
 	AddButton("", 2, 0, 0, 0, "play_pattern");
@@ -29,6 +29,10 @@ MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Tra
 	AddButton("", 3, 0, 0, 0, "stop_pattern");
 	SetImage("stop_pattern", "hui:media-stop");
 	AddSpinButton("4\\1", 4, 0, 0, 0, "beat_partition");
+	AddButton("", 5, 0, 0, 0, "midi_undo");
+	SetImage("midi_undo", "hui:undo");
+	AddButton("", 6, 0, 0, 0, "midi_redo");
+	SetImage("midi_redo", "hui:redo");
 
 	//SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 
@@ -43,6 +47,11 @@ MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Tra
 	EventM("play_pattern", this, &MidiEditor::OnPlay);
 	EventM("stop_pattern", this, &MidiEditor::OnStop);
 	EventM("beat_partition", this, &MidiEditor::OnBeatPartition);
+	EventM("midi_undo", tsunami, &Tsunami::OnUndo);
+	EventM("midi_redo", tsunami, &Tsunami::OnRedo);
+
+	Enable("midi_undo", audio->action_manager->Undoable());
+	Enable("midi_redo", audio->action_manager->Redoable());
 
 	if (a->selection.num == 0)
 		a->selection.num = a->sample_rate * 4;
@@ -147,7 +156,7 @@ void MidiEditor::OnAreaLeftButtonDown()
 
 	// clicked on a note?
 	if (hover_note >= 0){
-		track->midi.erase(hover_note);
+		track->DeleteMidiNote(hover_note);
 		hover_note = -1;
 		return;
 	}
@@ -160,9 +169,8 @@ void MidiEditor::OnAreaLeftButtonDown()
 
 void MidiEditor::OnAreaLeftButtonUp()
 {
-	if (creating_new_note){
-		track->midi.add(*new_note);
-	}
+	if (creating_new_note)
+		track->AddMidiNote(*new_note);
 	creating_new_note = false;
 }
 
@@ -298,7 +306,10 @@ void MidiEditor::OnClose()
 void MidiEditor::OnUpdate(Observable* o)
 {
 	if (o == audio){
+		Redraw("area");
 	}else if (o == tsunami->output){
 		Redraw("area");
 	}
+	Enable("midi_undo", audio->action_manager->Undoable());
+	Enable("midi_redo", audio->action_manager->Redoable());
 }

@@ -22,7 +22,9 @@ void* ActionTrackDeleteMidiNote::execute(Data* d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
 
+	note = t->midi[index];
 	t->midi.erase(index);
+	return NULL;
 }
 
 void ActionTrackDeleteMidiNote::undo(Data* d)

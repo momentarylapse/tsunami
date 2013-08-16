@@ -14,8 +14,6 @@
 #include "../Action/AudioFile/Tag/ActionAudioDeleteTag.h"
 #include "../Action/AudioFile/Sample/ActionAudioAddSample.h"
 #include "../Action/AudioFile/Sample/ActionAudioDeleteSample.h"
-#include "../Action/AudioFile/MidiPattern/ActionAudioAddMidiPattern.h"
-#include "../Action/AudioFile/MidiPattern/ActionAudioDeleteMidiPattern.h"
 #include "../Action/Track/ActionTrackAdd.h"
 #include "../Action/Track/ActionTrackDelete.h"
 #include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
@@ -140,10 +138,6 @@ void AudioFile::Reset()
 	foreach(Sample *s, sample)
 		delete(s);
 	sample.clear();
-
-	foreach(MidiPattern *p, midi_pattern)
-		delete(p);
-	midi_pattern.clear();
 
 	level_name.clear();
 	level_name.add("level 1");
@@ -328,19 +322,6 @@ void AudioFile::DeleteSample(int index)
 		Execute(new ActionAudioDeleteSample(index));
 	else
 		tsunami->log->Error(_("Kann nur Samples l&oschen, die nicht benutzt werden!"));
-}
-
-MidiPattern *AudioFile::AddMidiPattern(const string &name, int num_beats, int beat_partition)
-{
-	return (MidiPattern*)Execute(new ActionAudioAddMidiPattern(name, num_beats, beat_partition));
-}
-
-void AudioFile::DeleteMidiPattern(int index)
-{
-	if (midi_pattern[index]->ref_count == 0)
-		Execute(new ActionAudioDeleteMidiPattern(index));
-	else
-		tsunami->log->Error(_("Kann nur Midi-Pattern l&oschen, die nicht benutzt werden!"));
 }
 
 void AudioFile::DeleteSelection(int level_no, bool all_levels)

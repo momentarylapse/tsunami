@@ -160,23 +160,6 @@ void WriteMidi(CFile *f, MidiData &m)
 	EndChunk(f);
 }
 
-void WriteMidiPattern(CFile *f, MidiPattern *p)
-{
-	BeginChunk(f, "midipat");
-	f->WriteStr(p->name);
-	f->WriteInt(p->num_beats);
-	f->WriteInt(p->beat_partition);
-	f->WriteFloat(p->volume_randomness);
-	f->WriteFloat(p->time_randomness);
-	f->WriteInt(0); // reserved
-	f->WriteInt(0);
-
-	foreach(MidiNote &n, p->notes)
-		WriteMidiNote(f, n);
-
-	EndChunk(f);
-}
-
 void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
 {
 	BeginChunk(f, "level");
@@ -250,9 +233,6 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 	foreach(Sample *sample, a->sample)
 		WriteSample(f, sample);
-
-	foreach(MidiPattern *pattern, a->midi_pattern)
-		WriteMidiPattern(f, pattern);
 
 	foreachi(Track *track, a->track, i){
 		WriteTrack(f, track);
@@ -723,22 +703,6 @@ void ReadChunkTrackLevel(CFile *f, Track *t)
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[l]);
 }
 
-void ReadChunkMidiPattern(CFile *f, AudioFile *a)
-{
-	MidiPattern *p = new MidiPattern;
-	a->midi_pattern.add(p);
-	p->owner = a;
-	p->name = f->ReadStr();
-	p->num_beats = f->ReadInt();
-	p->beat_partition = f->ReadInt();
-	p->volume_randomness = f->ReadFloat();
-	p->time_randomness = f->ReadFloat();
-	f->ReadInt(); // reserved
-	f->ReadInt();
-
-	AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, &p->notes);
-}
-
 void ReadChunkTrack(CFile *f, AudioFile *a)
 {
 	Track *t = a->AddTrack(Track::TYPE_AUDIO);
@@ -768,7 +732,6 @@ void ReadChunkNami(CFile *f, AudioFile *a)
 	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &a->fx);
 	AddChunkHandler("lvlname", (chunk_reader*)&ReadChunkLevelName, a);
 	AddChunkHandler("sample", (chunk_reader*)&ReadChunkSample, a);
-	AddChunkHandler("midipat", (chunk_reader*)&ReadChunkMidiPattern, a);
 	AddChunkHandler("track", (chunk_reader*)&ReadChunkTrack, a);
 }
 

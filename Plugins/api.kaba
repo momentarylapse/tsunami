@@ -46,6 +46,7 @@ class BufferBox
 class Synthesizer
 	string name
 	int sample_rate
+	int keep_notes
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void RenderNote(BufferBox buf, Range range, float pitch, float volume)

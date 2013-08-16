@@ -145,6 +145,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
 	Script::DeclareClassOffset("Synthesizer", "name", offsetof(Synthesizer, name));
 	Script::DeclareClassOffset("Synthesizer", "sample_rate", offsetof(Synthesizer, sample_rate));
+	Script::DeclareClassOffset("Synthesizer", "keep_notes", offsetof(Synthesizer, keep_notes));
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote), &synth);

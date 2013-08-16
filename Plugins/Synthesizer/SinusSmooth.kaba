@@ -1,0 +1,27 @@
+use "../api.kaba"
+use "../tone.kaba"
+
+
+class SinusSmoothSynthesizer : Synthesizer
+	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
+		float freq = pitch_to_freq(pitch)
+		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
+		float sm_d = 0.02 * sample_rate
+		keep_notes = sm_d * 8
+
+
+		int r_end = r.offset + r.length
+		
+		int i0 = max(r.offset, 0)
+		int i1 = min(r_end + sm_d * 8, buf.num)
+
+		for int i, i0, i1
+			float tt = (i - r.offset) * f_w
+			float d = sin(tt) * volume
+			if i > r_end
+				float fi = (i - r_end) / sm_d
+				d *= exp(-fi)
+			else if i < r.offset + 1000
+				d *= (i - r.offset) * 0.001
+			buf.r[i] += d
+			buf.l[i] += d

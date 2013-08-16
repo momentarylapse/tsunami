@@ -1,0 +1,17 @@
+use "../api.kaba"
+use "../tone.kaba"
+
+
+class SinusSynthesizer : Synthesizer
+	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
+		float freq = pitch_to_freq(pitch)
+		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
+
+		int i0 = max(r.offset, 0)
+		int i1 = min(r.offset + r.length, buf.num)
+
+		for int i, i0, i1
+			float tt = (i - r.offset) * f_w
+			float d = sin(tt) * volume
+			buf.r[i] += d
+			buf.l[i] += d

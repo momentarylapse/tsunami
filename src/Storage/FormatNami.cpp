@@ -10,6 +10,7 @@
 #include "../Plugins/Effect.h"
 #include "../Stuff/Log.h"
 #include "../View/Helper/Progress.h"
+#include "../Audio/Synth/Synthesizer.h"
 
 
 const int CHUNK_SIZE = 1 << 16;
@@ -235,6 +236,7 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 		WriteSample(f, sample);
 
 	foreachi(Track *track, a->track, i){
+		track->midi.synthesizer = track->synth->name;
 		WriteTrack(f, track);
 		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
@@ -816,6 +818,12 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 	FileClose(f);
 
 	check_empty_subs(a);
+
+	foreach(Track *t, a->track)
+		if (t->midi.synthesizer.num > 0){
+			delete(t->synth);
+			t->synth = CreateSynthesizer(t->midi.synthesizer);
+		}
 
 	a->UpdateSelection();
 }

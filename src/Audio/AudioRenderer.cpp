@@ -89,12 +89,13 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 	// silence... TODO...
 	buf.resize(range_cur.length());
 
-	Array<MidiNote> notes = t->midi.GetNotes(range_cur);
+	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
+	Array<MidiNote> notes = t->midi.GetNotes(r);
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(MidiNote &n, notes){
-		Range r = Range(n.range.offset - range_cur.offset, n.range.num);
-		t->synth->RenderNote(buf, r, n.pitch, n.volume);
+		Range rr = Range(n.range.offset - range_cur.offset, n.range.num);
+		t->synth->RenderNote(buf, rr, n.pitch, n.volume);
 	}
 }
 

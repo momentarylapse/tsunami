@@ -2701,7 +2701,7 @@ void InstructionWithParamsList::LinkWantedLabels(void *oc)
 {
 	foreachib(WantedLabel &w, wanted_label, i){
 		Label &l = label[w.LabelNo];
-		if (l.Value < 0)
+		if (l.Value == -1)
 			continue;
 		so("linking label");
 

@@ -2931,7 +2931,7 @@ void Serializer::Assemble(char *Opcode, int &OpcodeSize)
 	for (int i=0;i<cmd.num;i++){
 
 		if (cmd[i].inst == inst_marker){
-			//msg_write("marker _kaba_" + i2s(cmd[i].p1.kind));
+			//msg_write("marker _kaba_" + i2s((long)cmd[i].p1.p));
 			list->add_label("_kaba_" + i2s((long)cmd[i].p1.p), true);
 		}else if (cmd[i].inst == inst_asm){
 			AddAsmBlock(list, script);

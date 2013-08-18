@@ -284,6 +284,9 @@ InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{inst_fsub,		"fsub",		1},
 	{inst_fdiv,		"fdiv",		1},
 	{inst_fld,		"fld",		1},
+	{inst_fld1,		"fld1",		0},
+	{inst_fldz,		"fldz",		0},
+	{inst_fldpi,	"fldpi",	0},
 	{inst_fst,		"fst",		2},
 	{inst_fstp,		"fstp",		2},
 	{inst_fild,		"fild",		1},
@@ -296,8 +299,12 @@ InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{inst_fnstsw,	"fnstsw",	2},
 	{inst_fistp,	"fistp",	2},
 	{inst_fxch,		"fxch",		3, 3},
+	{inst_fsqrt,	"fsqrt",	3},
 	{inst_fsin,		"fsin",		3},
 	{inst_fcos,		"fcos",		3},
+	{inst_fptan,	"fptan",	3},
+	{inst_fpatan,	"fpatan",	3},
+	{inst_fyl2x,	"fyl2x",	3},
 	{inst_fchs,		"fchs",		3},
 	{inst_fabs,		"fabs",		3},
 	{inst_fucompp,	"fucompp",	1, 1},
@@ -380,7 +387,7 @@ struct InstructionParam{
 	long long value; // disp or immediate
 	bool is_label;
 	bool immediate_is_relative;	// for jump
-	string str();
+	string str(bool hide_size = false);
 };
 
 struct InstructionWithParams{
@@ -1424,26 +1431,28 @@ void Init(int set)
 	add_inst(inst_fsub,	0xd8,	1,	4,	Ed,	-1);
 	add_inst(inst_fdiv,	0xd8,	1,	6,	Ed,	-1);
 	add_inst(inst_fld,	0xd9,	1,	0,	Md,	-1);
+	add_inst(inst_fld1,	0xe8d9,	2,	-1,	-1,	-1);
+	add_inst(inst_fldz,	0xeed9,	2,	-1,	-1,	-1);
+	add_inst(inst_fldpi,	0xebd9,	2,	-1,	-1,	-1);
 	add_inst(inst_fst,	0xd9,	1,	2,	Md,	-1);
 	add_inst(inst_fstp,	0xd9,	1,	3,	Md,	-1);
 	add_inst(inst_fldcw,	0xd9,	1,	5,	Mw,	-1);
 	add_inst(inst_fnstcw,	0xd9,	1,	7,	Mw,	-1);
 	add_inst(inst_fxch		,0xc9d9	,2	,-1	,RegSt0	,RegSt1);
 	add_inst(inst_fucompp	,0xe9da	,2	,-1	,RegSt0	,RegSt1);
-	add_inst(inst_fistp		,0xdb	,1	,3	,Md	,-1);
+
+	add_inst(inst_fsqrt,	0xfad9,	2,	-1,	-1, -1);
+	add_inst(inst_fsin,	0xfed9,	2,	-1,	-1, -1);
+	add_inst(inst_fcos,	0xffd9,	2,	-1,	-1, -1);
+	add_inst(inst_fptan,	0xf2d9,	2,	-1,	-1, -1);
+	add_inst(inst_fpatan,	0xf3d9,	2,	-1,	-1, -1);
+	add_inst(inst_fyl2x,	0xf1d9,	2,	-1,	-1, -1);
+	add_inst(inst_fistp,	0xdb	,1	,3	,Md	,-1);
 	add_inst(inst_fild,	0xdb,	1,	0,	Ed,	-1);
-	add_inst(inst_faddp,	0xde,	1,	0,	Ew,	-1, OptSmallParam);
-	add_inst(inst_faddp,	0xde,	1,	0,	Ed,	-1, OptMediumParam);
-	add_inst(inst_faddp,	0xde,	1,	0,	Eq,	-1, OptBigParam);
-	add_inst(inst_fmulp,	0xde,	1,	1,	Ew,	-1, OptSmallParam);
-	add_inst(inst_fmulp,	0xde,	1,	1,	Ed,	-1, OptMediumParam);
-	add_inst(inst_fmulp,	0xde,	1,	1,	Eq,	-1, OptBigParam);
-	add_inst(inst_fsubp,	0xde,	1,	5,	Ew,	-1, OptSmallParam);
-	add_inst(inst_fsubp,	0xde,	1,	5,	Ed,	-1, OptMediumParam);
-	add_inst(inst_fsubp,	0xde,	1,	5,	Eq,	-1, OptBigParam);
-	add_inst(inst_fdivp,	0xde,	1,	7,	Ew,	-1, OptSmallParam);
-	add_inst(inst_fdivp,	0xde,	1,	7,	Ed,	-1, OptMediumParam);
-	add_inst(inst_fdivp,	0xde,	1,	7,	Eq,	-1, OptBigParam); // de.f9 ohne Parameter...?
+	add_inst(inst_faddp,	0xde,	1,	0,	Ed,	-1);
+	add_inst(inst_fmulp,	0xde,	1,	1,	Ed,	-1);
+	add_inst(inst_fsubp,	0xde,	1,	5,	Ed,	-1);
+	add_inst(inst_fdivp,	0xde,	1,	7,	Ed,	-1); // de.f9 ohne Parameter...?
 	add_inst(inst_fnstsw	,0xe0df	,2	,-1	,RegAx	,-1);
 	add_inst(inst_loopne	,0xe0	,1	,-1	,Jb	,-1);
 	add_inst(inst_loope		,0xe1	,1	,-1	,Jb	,-1);
@@ -1537,7 +1546,7 @@ void Init(int set)
 }
 
 // convert an asm parameter into a human readable expression
-string InstructionParam::str()
+string InstructionParam::str(bool hide_size)
 {
 	msg_db_f("AddParam", 1+ASM_DB_LEVEL);
 	//msg_write("----");
@@ -1551,29 +1560,31 @@ string InstructionParam::str()
 			//msg_write((long)disp);
 		if (deref){
 			//msg_write("deref");
-			string ss = get_size_name(size);
+			string ss;
+			if (!hide_size)
+				ss = get_size_name(size) + " ";
 			if (disp == DispModeNone)
-				return ss + " [" + reg->name + "]";
+				return ss + "[" + reg->name + "]";
 			else if (disp == DispMode8)
-				return ss + format(" [%s + 0x%02x]", reg->name.c_str(), value);
+				return ss + format("[%s + 0x%02x]", reg->name.c_str(), value);
 			else if (disp == DispMode16)
-				return ss + format(" [%s + 0x%04x]", reg->name.c_str(), value);
+				return ss + format("[%s + 0x%04x]", reg->name.c_str(), value);
 			else if (disp == DispMode32)
-				return ss + format(" [%s + 0x%08x]", reg->name.c_str(), value);
+				return ss + format("[%s + 0x%08x]", reg->name.c_str(), value);
 			else if (disp == DispModeSIB)
 				return "SIB[...][...]";
 			else if (disp == DispMode8SIB)
-				return ss + format(" [SIB... + 0x%02x]", value);
+				return ss + format("[SIB... + 0x%02x]", value);
 			else if (disp == DispMode8Reg2)
-				return ss + format(" [%s + %s + 0x%02x]", reg->name.c_str(), reg2->name.c_str(), value);
+				return ss + format("[%s + %s + 0x%02x]", reg->name.c_str(), reg2->name.c_str(), value);
 			else if (disp == DispModeReg2)
-				return ss + " [" + reg->name + " + " + reg2->name + "]";
+				return ss + "[" + reg->name + " + " + reg2->name + "]";
 		}else
 			return reg->name;
 	}else if (type == ParamTImmediate){
 		//msg_write("im");
 		if (deref)
-			return format(" [%s]", d2h(&value, state.AddrSize).c_str());
+			return format("[%s]", d2h(&value, state.AddrSize).c_str());
 		return d2h(&value, size);
 	/*}else if (type == ParamTImmediateExt){
 		//msg_write("im");
@@ -2009,6 +2020,20 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 			// cap correct?
 			if (ci.cap >= 0)
 				ok &= ((unsigned char)ci.cap == (((unsigned)cur[ci.code_size] >> 3) & 0x07));
+			if ((ok) && (ci.has_modrm)){
+				InstructionParam p1, p2;
+				UnfuzzyParam(p1, ci.param1);
+				UnfuzzyParam(p2, ci.param2);
+
+				// modr/m byte
+				char modrm = cur[ci.code_size];
+				GetFromModRM(p1, ci.param1, modrm);
+				GetFromModRM(p2, ci.param2, modrm);
+				if ((p1.type == ParamTRegister) && (!p1.deref) && (!ci.param1.allow_register))
+					continue;
+				if ((p2.type == ParamTRegister) && (!p2.deref) && (!ci.param2.allow_register))
+					continue;
+			}
 			if (ok){
 				inst = &ci;
 				cur += inst->code_size;
@@ -2060,10 +2085,11 @@ string Disassemble(void *_code_,int length,bool allow_comments)
 				else if (state.ParamSize == Size64)
 					str += " qword";
 			}
+			bool hide_size = p2.type != ParamTNone;
 			if (p1.type != ParamTNone)
-				str += " " + p1.str();
+				str += " " + p1.str(hide_size);
 			if (p2.type != ParamTNone)
-				str += ", " + p2.str();
+				str += ", " + p2.str(hide_size);
 			
 			
 			if (allow_comments){
@@ -3172,7 +3198,7 @@ void InstructionWithParamsList::ShrinkJumps(void *oc, int ocs)
 
 	// try shrinking
 	foreachi(InstructionWithParams &iwp, *this, i){
-		if ((iwp.inst == inst_jmp) || (iwp.inst == inst_jz) || (iwp.inst == inst_jnz)){
+		if ((iwp.inst == inst_jmp) || (iwp.inst == inst_jz) || (iwp.inst == inst_jnz) || (iwp.inst == inst_jl) || (iwp.inst == inst_jnl) || (iwp.inst == inst_jle) || (iwp.inst == inst_jnle)){
 			if (iwp.p1.is_label){
 				int target = label[iwp.p1.value].InstNo;
 

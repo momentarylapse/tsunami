@@ -29,6 +29,9 @@ public:
 	void OnAreaLeftButtonUp();
 	void OnAreaDraw();
 	void OnBeatPartition();
+	void OnPitchOffset();
+	void OnJumpRight();
+	void OnJumpLeft();
 	void OnPlay();
 	void OnStop();
 	void OnDelete();

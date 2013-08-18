@@ -67,12 +67,22 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 	}
 }
 
+void make_silence(BufferBox &buf, int size)
+{
+	if (buf.num == 0)
+		buf.resize(size);
+	else{
+		buf.resize(size);
+		memset(buf.r.data, 0, size * sizeof(buf.r[0]));
+		memset(buf.l.data, 0, size * sizeof(buf.l[0]));
+	}
+}
+
 void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_f("bb_render_time_track_no_fx", 1);
 
-	// silence... TODO...
-	buf.resize(range_cur.length());
+	make_silence(buf, range_cur.length());
 
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
 	Array<Beat> beats = t->bar.GetBeats(r);
@@ -86,8 +96,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_f("bb_render_midi_track_no_fx", 1);
 
-	// silence... TODO...
-	buf.resize(range_cur.length());
+	make_silence(buf, range_cur.length());
 
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
 	Array<MidiNote> notes = t->midi.GetNotes(r);

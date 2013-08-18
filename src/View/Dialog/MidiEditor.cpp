@@ -21,17 +21,22 @@ MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Tra
 
 	AddControlTable("", 0, 0, 1, 2, "table1");
 	SetTarget("table1", 0);
-	AddControlTable("!noexpandy", 0, 0, 7, 1, "table2");
+	AddControlTable("!noexpandy", 0, 0, 9, 1, "table2");
 	AddDrawingArea("", 0, 1, 0, 0, "area");
 	SetTarget("table2", 0);
 	AddButton("", 2, 0, 0, 0, "play_pattern");
 	SetImage("play_pattern", "hui:media-play");
 	AddButton("", 3, 0, 0, 0, "stop_pattern");
 	SetImage("stop_pattern", "hui:media-stop");
-	AddSpinButton("4\\1", 4, 0, 0, 0, "beat_partition");
-	AddButton("", 5, 0, 0, 0, "midi_undo");
+	AddSpinButton("60\\0\\90", 4, 0, 0, 0, "pitch_offset");
+	AddButton("", 5, 0, 0, 0, "jump_left");
+	SetImage("jump_left", "hui:back");
+	AddButton("", 6, 0, 0, 0, "jump_right");
+	SetImage("jump_right", "hui:forward");
+	AddSpinButton("4\\1", 7, 0, 0, 0, "beat_partition");
+	AddButton("", 8, 0, 0, 0, "midi_undo");
 	SetImage("midi_undo", "hui:undo");
-	AddButton("", 6, 0, 0, 0, "midi_redo");
+	AddButton("", 9, 0, 0, 0, "midi_redo");
 	SetImage("midi_redo", "hui:redo");
 
 	//SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
@@ -47,14 +52,19 @@ MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Tra
 	EventM("play_pattern", this, &MidiEditor::OnPlay);
 	EventM("stop_pattern", this, &MidiEditor::OnStop);
 	EventM("beat_partition", this, &MidiEditor::OnBeatPartition);
+	EventM("pitch_offset", this, &MidiEditor::OnPitchOffset);
+	EventM("jump_left", this, &MidiEditor::OnJumpLeft);
+	EventM("jump_right", this, &MidiEditor::OnJumpRight);
 	EventM("midi_undo", tsunami, &Tsunami::OnUndo);
 	EventM("midi_redo", tsunami, &Tsunami::OnRedo);
 
 	Enable("midi_undo", audio->action_manager->Undoable());
 	Enable("midi_redo", audio->action_manager->Redoable());
 
-	if (a->selection.num == 0)
-		a->selection.num = a->sample_rate * 4;
+	if (a->selection.num == 0){
+		audio->sel_raw.num = a->sample_rate * 4;
+		audio->UpdateSelection();
+	}
 
 	beat_partition = 4;
 	CreateParts();
@@ -295,6 +305,27 @@ void MidiEditor::OnStop()
 void MidiEditor::OnBeatPartition()
 {
 	beat_partition = GetInt("");
+	CreateParts();
+}
+
+void MidiEditor::OnPitchOffset()
+{
+	pitch_min = GetInt("");
+	pitch_max = pitch_min + 30;
+	Redraw("area");
+}
+
+void MidiEditor::OnJumpLeft()
+{
+	audio->sel_raw.offset -= audio->selection.num * 0.2f;
+	audio->UpdateSelection();
+	CreateParts();
+}
+
+void MidiEditor::OnJumpRight()
+{
+	audio->sel_raw.offset += audio->selection.num * 0.2f;
+	audio->UpdateSelection();
 	CreateParts();
 }
 

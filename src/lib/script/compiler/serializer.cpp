@@ -2646,6 +2646,12 @@ void Serializer::SerializeFunction(Function *f)
 
 	// function
 	SerializeBlock(f->block, 0);
+	ScanTempVarUsage();
+
+	SimplifyIfStatements();
+	TryMergeTempVars();
+	SimplifyFloatStore();
+
 	if (script->syntax->FlagShow)
 		cmd_list_out();
 	
@@ -2679,6 +2685,71 @@ void Serializer::SerializeFunction(Function *f)
 	}
 
 	//cmd_list_out();
+}
+
+
+void Serializer::SimplifyIfStatements()
+{
+	for (int i=0;i<cmd.num - 4;i++){
+		if ((cmd[i].inst == Asm::inst_cmp) && (cmd[i+2].inst == Asm::inst_cmp) && (cmd[i+3].inst == Asm::inst_jz)){
+			if (cmd[i+1].inst == Asm::inst_setl)
+				cmd[i+3].inst = Asm::inst_jnl;
+			else if (cmd[i+1].inst == Asm::inst_setle)
+				cmd[i+3].inst = Asm::inst_jnle;
+			else if (cmd[i+1].inst == Asm::inst_setnl)
+				cmd[i+3].inst = Asm::inst_jl;
+			else if (cmd[i+1].inst == Asm::inst_setnle)
+				cmd[i+3].inst = Asm::inst_jle;
+			else if (cmd[i+1].inst == Asm::inst_setz)
+				cmd[i+3].inst = Asm::inst_jnz;
+			else if (cmd[i+1].inst == Asm::inst_setnz)
+				cmd[i+3].inst = Asm::inst_jz;
+			else
+				continue;
+
+			remove_cmd(i + 2);
+			remove_cmd(i + 1);
+		}
+	}
+}
+
+void Serializer::TryMergeTempVars()
+{
+	return;
+	for (int i=0;i<cmd.num;i++)
+		if (cmd[i].inst == Asm::inst_mov)
+			if ((cmd[i].p1.kind == KindVarTemp) && (cmd[i].p2.kind == KindVarTemp)){
+				int v1 = (long)cmd[i].p1.p;
+				int v2 = (long)cmd[i].p2.p;
+				if ((temp_var[v1].first == i) && (temp_var[v2].last == i)){
+					// swap v1 -> v2
+					for (int j=i+1;j<=temp_var[v1].last;j++){
+						if (((cmd[j].p1.kind == KindVarTemp) || (cmd[j].p1.kind == KindDerefVarTemp)) && ((long)cmd[j].p1.p == v1))
+							cmd[j].p1.p = (char*)(long)v2;
+						if (((cmd[j].p2.kind == KindVarTemp) || (cmd[j].p2.kind == KindDerefVarTemp)) && ((long)cmd[j].p2.p == v1))
+							cmd[j].p2.p = (char*)(long)v2;
+					}
+					temp_var[v2].last = temp_var[v1].last;
+				}
+				remove_cmd(i);
+				remove_temp_var(v1);
+			}
+}
+
+void Serializer::SimplifyFloatStore()
+{
+	for (int i=0;i<cmd.num - 1;i++){
+		if ((cmd[i].inst == Asm::inst_fstp) && (cmd[i+1].inst == Asm::inst_mov)){
+			if (cmd[i].p1.kind == KindVarTemp){
+				int v = (long)cmd[i].p1.p;
+				if ((temp_var[v].first == i) && (temp_var[v].last == i+1)){
+					cmd[i].p1 = cmd[i+1].p1;
+					remove_cmd(i + 1);
+					remove_temp_var(v);
+				}
+			}
+		}
+	}
 }
 
 

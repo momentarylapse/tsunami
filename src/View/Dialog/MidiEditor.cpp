@@ -264,6 +264,7 @@ void MidiEditor::OnAreaDraw()
 		c->SetColor(Green);
 		c->DrawLine(x, 0, x, h);
 	}
+	c->End();
 }
 
 /*int stream_func(BufferBox &b)

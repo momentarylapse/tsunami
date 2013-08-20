@@ -257,5 +257,7 @@ void AudioRenderer::CleanUp()
 
 int AudioRenderer::TranslateOutputPos(int pos)
 {
-	return range.offset + (pos % range.num);
+	if (loop && (range.num > 0))
+		return range.offset + (pos % range.num);
+	return range.offset + pos;
 }

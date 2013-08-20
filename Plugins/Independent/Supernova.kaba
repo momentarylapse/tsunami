@@ -7,15 +7,15 @@ const int freq = 44100
 const int f_min = 50
 const int f_max = 5000
 
-const float threshold = 0.1
+const float threshold = 5.0
 
 
-const int buf_size = 8192
+const int buf_size = 4096
 float buf[]
 
 window win
 
-float played[]
+int played[]
 
 float get_freq(float i)
 	return i / (buf_size / 2) * freq / 2
@@ -52,6 +52,8 @@ void Draw()
 	DrawVolume(c)
 	
 	c.SetColor(Black)
+	c.DrawStr(20, 20, Frequency.str2(1) + "Hz")
+	c.DrawStr(20, 40, Volume.str())
 	for int i, 0, played.num
 		if played[i] < 0
 			continue
@@ -60,7 +62,9 @@ void Draw()
 		c.DrawLine(x, y, x + 2, y)
 	
 	c.SetColor(Black)
-	if !LoudEnough
+	if LoudEnough
+		c.DrawStr(120, 20, rel_pitch_name(played[played.num - 1] % 12))
+	else
 		c.DrawStr(w / 2 - 30, h / 2 - 20, "zu leise")
 	c.End()
 
@@ -95,21 +99,22 @@ void UpdateInput()
 	for int i, 0, bufc.num
 		float f = get_freq(i)
 		if f > f_min and f < f_max
-			float amp = abs(bufc[i].x)
+			float amp = (bufc[i].x*bufc[i].x + bufc[i].y*bufc[i].y) / f
 			//floatout f
-			if (amp > max * 2.5) or (amp > max and f < fmax2)
+			/*if (amp > max * 2.5) or (amp > max and f < fmax2)
 				max = amp
 				fmax = f
-				fmax2 = f * 1.5
+				fmax2 = f * 1.5*/
+			if (amp > max)
+				max = amp
+				fmax = f
+	max *= fmax
 	max /= sqrt(buf.num) * 2 * pi
 	Volume = clamp(max / threshold / 2, 0, 1)
 	if max > threshold
 		LoudEnough = true
-		if abs(log(fmax / Frequency)) < 0.1
-			Frequency *= 1 + log(fmax / Frequency) * 0.1
-		else
-			Frequency = fmax
-		played.add(freq_to_pitch(Frequency))
+		Frequency = fmax
+		played.add(f2i(freq_to_pitch(Frequency) + 0.5))
 		//Frequency = fmax
 		Error = error
 	else

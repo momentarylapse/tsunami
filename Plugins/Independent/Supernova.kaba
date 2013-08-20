@@ -1,0 +1,144 @@
+// Image = hui:find
+// Title[Deutsch] = Tonerkennung
+use "../api.kaba"
+use "../tone.kaba"
+
+const int freq = 44100
+const int f_min = 50
+const int f_max = 5000
+
+const float threshold = 0.1
+
+
+const int buf_size = 8192
+float buf[]
+
+window win
+
+float played[]
+
+float get_freq(float i)
+	return i / (buf_size / 2) * freq / 2
+
+float Frequency, Volume, Error
+bool LoudEnough
+
+float error
+string get_note(float f)
+	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
+	int rel = f2i(pitch + 0.5) % 12
+	error = loop(pitch, -0.5, 0.5)
+	return rel_pitch_name(rel)
+	//loopf(fl, 0, 1)
+	//note = i2s(n)
+
+void DrawVolume(painter c)
+	c.SetColor(color(1, 0.8, 0.8, 0.8))
+	float y0 = 30
+	float y1 = c.height - 5
+	float h = y1 - y0
+	c.DrawRect(5, y0 + h * (1 - Volume), 5, h)
+	c.SetColor(color(1, 0.6, 0.6, 0.6))
+	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+
+void Draw()
+	painter c = win.BeginDraw("drawing")
+	c.SetColor(White)
+	c.SetFontSize(12)
+	int w = c.width
+	int h = c.height
+	c.DrawRect(0, 0, w, h)
+	
+	DrawVolume(c)
+	
+	c.SetColor(Black)
+	for int i, 0, played.num
+		if played[i] < 0
+			continue
+		float x = i
+		float y = h - h * (played[i] - 40.0) / 60.0
+		c.DrawLine(x, y, x + 2, y)
+	
+	c.SetColor(Black)
+	if !LoudEnough
+		c.DrawStr(w / 2 - 30, h / 2 - 20, "zu leise")
+	c.End()
+
+void OnClose()
+	delete win
+	win = nil
+
+void UpdateInput()
+	int stack_corrector[1] // needed for stack alignment (T_T)
+	
+	int num = clampi(input.cur_buf.num, 0, buf_size)
+	buf.resize(buf_size)
+	
+	// alten Pufferinhalt verschieben
+	for int i, 0, buf_size - num
+		buf[i] = buf[i + num]
+	
+	// neuen Inhalt anfügen
+	for int i, 0, num
+		buf[buf_size - num + i] = (input.cur_buf.r[i] + input.cur_buf.l[i]) / 2
+	
+	/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
+	for int i, 0, buf_size
+		float tt = i * w_f
+		buf[i] = f2i(val_max * sin(tt) * 0.1)*/
+	
+	complex bufc[]
+	bufc.resize(buf.num / 2 + 1)
+	fft_r2c(buf, bufc)
+	float max = 0
+	float fmax = 0, fmax2 = 0
+	for int i, 0, bufc.num
+		float f = get_freq(i)
+		if f > f_min and f < f_max
+			float amp = abs(bufc[i].x)
+			//floatout f
+			if (amp > max * 2.5) or (amp > max and f < fmax2)
+				max = amp
+				fmax = f
+				fmax2 = f * 1.5
+	max /= sqrt(buf.num) * 2 * pi
+	Volume = clamp(max / threshold / 2, 0, 1)
+	if max > threshold
+		LoudEnough = true
+		if abs(log(fmax / Frequency)) < 0.1
+			Frequency *= 1 + log(fmax / Frequency) * 0.1
+		else
+			Frequency = fmax
+		played.add(freq_to_pitch(Frequency))
+		//Frequency = fmax
+		Error = error
+	else
+		LoudEnough = false
+		played.add(-1)
+	if played.num > 500
+		played.remove(0)
+	win.Redraw("drawing")
+
+
+complex bufc[]
+
+void main()
+	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)
+	win.AddDrawingArea("", 0, 0, 0, 0, "drawing")
+	
+	win.EventX("drawing", "hui:redraw", &Draw)
+	win.Event("hui:close", &OnClose)
+	
+
+
+	buf.resize(1000)
+	bufc.resize(1000)
+	fft_r2c(buf, bufc)
+	
+	input.Start(TRACK_TYPE_AUDIO, freq)
+	input.AddObserver(nil, &UpdateInput)
+	
+	win.Run()
+	
+	input.RemoveObserver(nil)
+	input.Stop()

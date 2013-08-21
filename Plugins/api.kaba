@@ -156,12 +156,21 @@ class AudioFile
 	
 	string level_name[]
 	
+	extern Range GetRange()
 	extern int GetNextBeat(int pos)
+
+
+class AudioRenderer
+	BufferBox RenderAudioFile(AudioFile *a, Range r)
+	void Prepare(AudioFile *a, Range r, bool allow_loop)
+	//virtual int read(BufferBox b)
+	void CleanUp()
+	int TranslateOutputPos(int pos)
 
 
 class AudioOutput
 	extern void Stop()
-	//extern void Play(AudioRenderer r)
+	extern void Play(AudioRenderer *r)
 	extern void PlayGenerated(void *func, int sample_rate)
 	extern bool IsPlaying()
 	extern int GetPos()
@@ -200,6 +209,7 @@ extern window MainWin
 extern AudioFile *audio
 extern AudioOutput *output
 extern AudioInput *input
+extern AudioRenderer *renderer
 extern Log *logging
 extern PluginContext plugin_context
 
@@ -212,8 +222,6 @@ extern void fft_c2r_inv(complex in[], float out[])
 /*extern void ProgressStart(string s, float progress)
 extern void ProgressEnd()
 extern void Progress(string s, float progress)*/
-
-extern BufferBox AudioFileRender(AudioFile *a, Range r)
 
 extern void PutFavoriteBarFixed(window win, int x, int y, int w)
 extern void PutFavoriteBarSizable(window win, string root_id, int x, int y)

@@ -44,6 +44,11 @@ public:
 };
 
 float pitch_to_freq(float pitch);
+int pitch_get_octave(int pitch);
+int pitch_from_octave_and_rel(int rel, int octave);
+int pitch_to_rel(int pitch);
+string rel_pitch_name(int pitch_rel);
+string pitch_name(int pitch);
 
 Synthesizer *CreateSynthesizer(const string &name);
 Array<string> FindSynthesizers();

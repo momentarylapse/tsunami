@@ -21,6 +21,58 @@ float pitch_to_freq(float pitch)
 	return 440.0f * pow(2, (pitch - 69.0f) / 12.0f);
 }
 
+
+// "scientific" notation
+//   naive MIDI octave is off by 1
+int pitch_get_octave(int pitch)
+{
+	return (pitch / 12) - 1;
+}
+
+int pitch_from_octave_and_rel(int rel, int octave)
+{
+	return rel + octave * 12 + 12;
+}
+
+int pitch_to_rel(int pitch)
+{
+	return pitch % 12;
+}
+
+string rel_pitch_name(int pitch_rel)
+{
+	if (pitch_rel == 0)
+		return "C";
+	if (pitch_rel == 1)
+		return "C#";
+	if (pitch_rel == 2)
+		return "D";
+	if (pitch_rel == 3)
+		return "D#";
+	if (pitch_rel == 4)
+		return "E";
+	if (pitch_rel == 5)
+		return "F";
+	if (pitch_rel == 6)
+		return "F#";
+	if (pitch_rel == 7)
+		return "G";
+	if (pitch_rel == 8)
+		return "G#";
+	if (pitch_rel == 9)
+		return "A";
+	if (pitch_rel == 10)
+		return "A#";
+	if (pitch_rel == 11)
+		return "H";
+	return "???";
+}
+
+string pitch_name(int pitch)
+{
+	return rel_pitch_name(pitch_to_rel(pitch)) + " " + i2s(pitch_get_octave(pitch));
+}
+
 Synthesizer::Synthesizer()
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;

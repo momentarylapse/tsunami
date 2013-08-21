@@ -153,12 +153,13 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	view = new AudioView(this, audio);
 
+
+	sample_manager = new SampleManager(audio, this, true);
+
+	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
 	plugin_manager->AddPluginsToMenu();
 	plugin_manager->LinkAppScriptData();
-
-
-	sample_manager = new SampleManager(audio, this, true);
 
 	Subscribe(view);
 	Subscribe(audio);

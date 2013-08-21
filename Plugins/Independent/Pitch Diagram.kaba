@@ -1,5 +1,5 @@
 // Image = hui:find
-// Title[Deutsch] = Supernova
+// Title[Deutsch] = Tonerkennung
 use "../api.kaba"
 use "../tone.kaba"
 
@@ -128,7 +128,7 @@ void UpdateInput()
 complex bufc[]
 
 void main()
-	win = new Dialog("Supernova", 600, 400, MainWin, false)
+	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)
 	win.AddDrawingArea("", 0, 0, 0, 0, "drawing")
 	
 	win.EventX("drawing", "hui:redraw", &Draw)
@@ -143,15 +143,7 @@ void main()
 	input.Start(TRACK_TYPE_AUDIO, freq)
 	input.AddObserver(nil, &UpdateInput)
 	
-	Range rr = audio.GetRange()
-	print rr.offset
-	print rr.length
-	renderer.Prepare(audio, rr, false)
-	output.Play(renderer)
-	
 	win.Run()
 	
-	output.Stop()
-	renderer.CleanUp()
 	input.RemoveObserver(nil)
 	input.Stop()

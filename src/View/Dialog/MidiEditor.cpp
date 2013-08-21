@@ -14,7 +14,7 @@
 #include <math.h>
 
 MidiEditor::MidiEditor(HuiWindow* _parent, bool _allow_parent, AudioFile *a, Track *t) :
-	HuiDialog(_("Midi-Pattern Manager"), 600, 600, _parent, _allow_parent)
+	HuiDialog(_("Midi-Editor"), 600, 600, _parent, _allow_parent)
 {
 	audio = a;
 	track = t;
@@ -255,6 +255,8 @@ void MidiEditor::OnAreaDraw()
 		c->SetColor(col);
 		Range r = parts[cur_part];
 		c->DrawRect(rect(sample2x(r.start()), sample2x(r.end()), pitch2y(cur_pitch + 1), pitch2y(cur_pitch)));
+		c->SetColor(Black);
+		c->DrawStr(20, 20, pitch_name(cur_pitch));
 	}
 
 	if (tsunami->output->IsPlaying()){

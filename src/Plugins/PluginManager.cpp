@@ -94,6 +94,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("audio", &tsunami->audio);
 	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
+	Script::LinkExternal("renderer", &tsunami->renderer);
 	Script::LinkExternal("logging", &tsunami->log);
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
@@ -205,9 +206,9 @@ void PluginManager::LinkAppScriptData()
 //	Script::DeclareClassOffset("Track", "parent", offsetof(Track, parent));
 	Script::DeclareClassOffset("Track", "root", offsetof(Track, root));
 	Script::DeclareClassOffset("Track", "is_selected", offsetof(Track, is_selected));
-	Script::LinkExternal("Track.GetBuffers",	Script::mf(&Track::GetBuffers));
-	Script::LinkExternal("Track.ReadBuffers",	Script::mf(&Track::ReadBuffers));
-	Script::LinkExternal("Track.InsertMidiData",	Script::mf(&Track::InsertMidiData));
+	Script::LinkExternal("Track.GetBuffers", Script::mf(&Track::GetBuffers));
+	Script::LinkExternal("Track.ReadBuffers", Script::mf(&Track::ReadBuffers));
+	Script::LinkExternal("Track.InsertMidiData", Script::mf(&Track::InsertMidiData));
 
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
 	Script::DeclareClassOffset("AudioFile", "used", offsetof(AudioFile, used));
@@ -221,7 +222,14 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "selection", offsetof(AudioFile, selection));
 	Script::DeclareClassOffset("AudioFile", "sel_raw", offsetof(AudioFile, sel_raw));
 	Script::DeclareClassOffset("AudioFile", "level_name", offsetof(AudioFile, level_name));
-	Script::LinkExternal("AudioFile.GetNextBeat",	Script::mf(&AudioFile::GetNextBeat));
+	Script::LinkExternal("AudioFile.GetRange", Script::mf(&AudioFile::GetRange));
+	Script::LinkExternal("AudioFile.GetNextBeat", Script::mf(&AudioFile::GetNextBeat));
+
+	Script::LinkExternal("AudioRenderer.Prepare", Script::mf(&AudioRenderer::Prepare));
+	Script::LinkExternal("AudioRenderer.CleanUp", Script::mf(&AudioRenderer::CleanUp));
+	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
+	Script::LinkExternal("AudioRenderer.RenderAudioFile", Script::mf(&AudioRenderer::RenderAudioFile));
+	Script::LinkExternal("AudioRenderer.TranslateOutputPos", Script::mf(&AudioRenderer::TranslateOutputPos));
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
 	Script::DeclareClassOffset("AudioInput", "cur_buf", offsetof(AudioInput, current_buffer));

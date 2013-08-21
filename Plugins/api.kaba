@@ -162,10 +162,10 @@ class AudioFile
 
 class AudioRenderer
 	BufferBox RenderAudioFile(AudioFile *a, Range r)
-	void Prepare(AudioFile *a, Range r, bool allow_loop)
-	//virtual int read(BufferBox b)
-	void CleanUp()
-	int TranslateOutputPos(int pos)
+	extern void Prepare(AudioFile *a, Range r, bool allow_loop)
+	//extern virtual int read(BufferBox b)
+	extern void CleanUp()
+	extern int TranslateOutputPos(int pos)
 
 
 class AudioOutput
@@ -193,6 +193,9 @@ class AudioInput //: Observable
 	extern void AddObserver(void *handler, void *func)
 	extern void RemoveObserver(void *handler)
 
+class Storage
+	extern bool Load(AudioFile *a, string filename)
+	extern bool Save(AudioFile *a, string filename)
 
 class Log
 	extern void Error(string message)

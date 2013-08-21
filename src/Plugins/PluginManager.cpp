@@ -16,6 +16,7 @@
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../View/Helper/Progress.h"
+#include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include "Plugin.h"
@@ -95,6 +96,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
 	Script::LinkExternal("renderer", &tsunami->renderer);
+	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
@@ -260,6 +262,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Log.Error", Script::mf(&Log::Error));
 	Script::LinkExternal("Log.Warning", Script::mf(&Log::Warning));
 	Script::LinkExternal("Log.Info", Script::mf(&Log::Info));
+
+	Script::LinkExternal("Storage.Load", Script::mf(&Storage::Load));
+	Script::LinkExternal("Storage.Save", Script::mf(&Storage::Save));
 
 	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
 	Script::DeclareClassOffset("PluginContext", "track", offsetof(PluginManager::PluginContext, track));

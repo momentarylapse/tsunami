@@ -63,6 +63,8 @@ AudioOutput::AudioOutput() :
 
 AudioOutput::~AudioOutput()
 {
+	Stop();
+	Kill();
 	HuiConfigWriteStr("Output.ChosenDevice", ChosenDevice);
 	HuiConfigWriteFloat("Output.Volume", volume);
 }

@@ -18,7 +18,7 @@ class PeakMeterSource : public Observable
 public:
 	PeakMeterSource(const string &name) : Observable(name){}
 	virtual float GetSampleRate() = 0;
-	virtual BufferBox GetSomeSamples(int num_samples) = 0;
+	virtual void GetSomeSamples(BufferBox &buf, int num_samples) = 0;
 };
 
 class PeakMeter : public HuiEventHandler, public Observer

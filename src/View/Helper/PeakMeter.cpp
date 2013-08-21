@@ -136,7 +136,7 @@ void PeakMeter::FindSpectrum()
 void PeakMeter::OnUpdate(Observable *o)
 {
 	sample_rate = source->GetSampleRate();
-	buf = source->GetSomeSamples(NUM_SAMPLES);
+	source->GetSomeSamples(buf, NUM_SAMPLES);
 
 	if (mode == ModePeaks)
 		FindPeaks();

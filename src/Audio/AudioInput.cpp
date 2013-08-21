@@ -97,9 +97,9 @@ int AudioInput::GetSampleCount()
 	return in_cur->GetSampleCount();
 }
 
-BufferBox AudioInput::GetSomeSamples(int num_samples)
+void AudioInput::GetSomeSamples(BufferBox &buf, int num_samples)
 {
-	return in_cur->GetSomeSamples(num_samples);
+	in_cur->GetSomeSamples(buf, num_samples);
 }
 
 void AudioInput::ResetSync()

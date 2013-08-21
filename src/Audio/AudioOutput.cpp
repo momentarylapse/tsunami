@@ -379,19 +379,16 @@ float AudioOutput::GetSampleRate()
 	return sample_rate;
 }
 
-BufferBox AudioOutput::GetSomeSamples(int num_samples)
+void AudioOutput::GetSomeSamples(BufferBox &buf, int num_samples)
 {
-	BufferBox buf;
+	if (!playing)
+		return;
 
-	if (playing){
+	// (sample) position within current stream/buffer
+	int dpos = 0;
+	alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
 
-		// (sample) position within current stream/buffer
-		int dpos = 0;
-		alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
-
-		buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
-	}
-	return buf;
+	buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
 }
 
 bool AudioOutput::TestError(const string &msg)

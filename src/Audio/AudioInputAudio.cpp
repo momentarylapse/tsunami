@@ -178,12 +178,10 @@ void AudioInputAudio::ResetSync()
 	sync.Reset();
 }
 
-BufferBox AudioInputAudio::GetSomeSamples(int num_samples)
+void AudioInputAudio::GetSomeSamples(BufferBox &buf, int num_samples)
 {
-	BufferBox buf;
 	num_samples = min(num_samples, CurrentBuffer.num);
 	buf.set_as_ref(CurrentBuffer, CurrentBuffer.num - num_samples, num_samples);
-	return buf;
 }
 
 float AudioInputAudio::GetSampleRate()

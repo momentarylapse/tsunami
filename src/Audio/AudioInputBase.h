@@ -25,7 +25,7 @@ public:
 	virtual int GetSampleCount() = 0;
 
 	virtual float GetSampleRate() = 0;
-	virtual BufferBox GetSomeSamples(int num_samples) = 0;
+	virtual void GetSomeSamples(BufferBox &buf, int num_samples) = 0;
 
 	virtual int DoCapturing() = 0;
 };

@@ -43,7 +43,7 @@ public:
 	void FlushBuffers();
 
 	float GetSampleRate();
-	BufferBox GetSomeSamples(int num_samples);
+	void GetSomeSamples(BufferBox &buf, int num_samples);
 
 	float GetVolume();
 	void SetVolume(float _volume);

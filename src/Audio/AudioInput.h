@@ -36,7 +36,7 @@ public:
 	int GetSampleCount();
 
 	virtual float GetSampleRate();
-	virtual BufferBox GetSomeSamples(int num_samples);
+	virtual void GetSomeSamples(BufferBox &buf, int num_samples);
 
 	BufferBox current_buffer, buffer;
 	MidiData midi;

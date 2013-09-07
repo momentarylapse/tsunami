@@ -73,7 +73,7 @@ void try_init_global_var(Type *type, char* g_var)
 		return;
 	typedef void init_func(void *);
 	//msg_write("global init: " + v.type->name);
-	init_func *ff = (init_func*)type->owner->script->func[cf->nr];
+	init_func *ff = (init_func*)cf->script->func[cf->nr];
 	if (ff)
 		ff(g_var);
 }

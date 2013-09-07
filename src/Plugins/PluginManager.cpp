@@ -154,8 +154,10 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "OnConfigure", Script::mf(&Synthesizer::OnConfigure), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "Reset", Script::mf(&Synthesizer::Reset), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
 	Script::LinkExternal("Synthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
+	Script::LinkExternal("Synthesizer.reset", Script::mf(&Synthesizer::reset));
 
 
 	DummySynthesizer dsynth;

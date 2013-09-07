@@ -299,13 +299,28 @@ void class_add_func_virtual(const string &name, Type *return_type, void *func)
 			return;
 		}
 		unsigned char *pp = (unsigned char*)func;
-		//if ((cur_class->vtable) && (pp[0] == 0x8b) && (pp[1] == 0x01) && (pp[2] == 0xff) && (pp[3] == 0x60)){
-		if ((pp[0] == 0x8b) && (pp[1] == 0x44) && (pp[2] == 0x24) && (pp[4] == 0x8b) && (pp[5] == 0x00) && (pp[6] == 0xff) && (pp[7] == 0x60)){
-			// 8b.44.24.**    8b.00     ff.60.10
-			// virtual function
-			int index = (int)pp[8] / 4;
-			_class_add_func_virtual(tname, name, return_type, index);
-		}else{
+		try{
+			//if ((cur_class->vtable) && (pp[0] == 0x8b) && (pp[1] == 0x01) && (pp[2] == 0xff) && (pp[3] == 0x60)){
+			if ((pp[0] == 0x8b) && (pp[1] == 0x44) && (pp[2] == 0x24) && (pp[4] == 0x8b) && (pp[5] == 0x00) && (pp[6] == 0xff) && (pp[7] == 0x60)){
+				// 8b.44.24.**    8b.00     ff.60.10
+				// virtual function
+				int index = (int)pp[8] / 4;
+				_class_add_func_virtual(tname, name, return_type, index);
+			}else if (pp[0] == 0xe9){
+				// jmp
+				//msg_write(Asm::Disassemble(func, 16));
+				pp = &pp[5] + *(int*)&pp[1];
+				//msg_write(Asm::Disassemble(pp, 16));
+				if ((pp[0] == 0x8b) && (pp[1] == 0x44) && (pp[2] == 0x24) && (pp[4] == 0x8b) && (pp[5] == 0x00) && (pp[6] == 0xff) && (pp[7] == 0x60)){
+					// 8b.44.24.**    8b.00     ff.60.10
+					// virtual function
+					int index = (int)pp[8] / 4;
+					_class_add_func_virtual(tname, name, return_type, index);
+				}else
+					throw(1);
+			}else
+				throw(1);
+		}catch(...){
 			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 			msg_write(string((char*)pp, 4).hex());
 			msg_write(Asm::Disassemble(func, 16));

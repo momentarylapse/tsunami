@@ -99,6 +99,11 @@ void Synthesizer::reset()
 	keep_notes = 0;
 }
 
+void Synthesizer::Reset()
+{
+	reset();
+}
+
 void Synthesizer::set(float pitch, float volume, int offset)
 {
 	// end active notes

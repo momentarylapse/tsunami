@@ -33,6 +33,7 @@ public:
 	void iterate(int samples);
 
 	virtual void OnConfigure(){}
+	virtual void Reset();
 
 	string name;
 	int sample_rate;

@@ -51,6 +51,12 @@ void Draw()
 	
 	DrawVolume(c)
 	
+	
+	c.SetColor(Black)
+	for int i, 0, 6
+		float ly = h - (7 - i) * h / 8 * 0.33
+		c.DrawLine(0, ly, w, ly)
+	
 	c.SetColor(Black)
 	c.DrawStr(20, 20, Frequency.str2(1) + "Hz")
 	c.DrawStr(20, 40, Volume.str())

@@ -236,9 +236,11 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 	pos = range.offset;
 	foreach(Effect &fx, a->fx)
 		fx.Prepare();
-	foreach(Track *t, a->track)
+	foreach(Track *t, a->track){
+		t->synth->Reset();
 		foreach(Effect &fx, t->fx)
 			fx.Prepare();
+	}
 	if (effect)
 		effect->Prepare();
 }

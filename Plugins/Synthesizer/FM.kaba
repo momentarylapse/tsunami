@@ -17,11 +17,15 @@ class FMConfig
 	OscillatorLink link[]
 	void __init__()
 		osc[0].factor = 1
-		osc[0].amplitude = 1
-		osc[1].factor = 1.99
+		osc[0].amplitude = 0.5
+		osc[1].factor = 1.9881
 		osc[1].amplitude = 0.7
-		osc[2].factor = 3.99 // 1.72
+		osc[2].factor = 3.9821 // 1.72
 		osc[2].amplitude = 0.3
+		osc[3].factor = 1.00621
+		osc[3].amplitude = 0.5
+		osc[4].factor = 1.9934
+		osc[4].amplitude = 0.7
 		for int j, 0, NUM_OSCILLATORS
 			osc[j].attack = 0.01
 			osc[j].decay = 0.4
@@ -39,6 +43,12 @@ class FMConfig
 		l.source = 2
 		l.dest = 1
 		link.add(l)
+		l.source = 3
+		l.dest = -1
+		link.add(l)
+		l.source = 4
+		l.dest = 3
+		link.add(l)
 	void __assign__(FMConfig o)
 
 class OscillatorState
@@ -50,17 +60,22 @@ class NoteState
 
 class FMState
 	NoteState note[128]
-	void __init__()
+	void reset()
 		for int i, 0, 128
 			for int j, 0, NUM_OSCILLATORS
 				note[i].osc[j].inp = 0
 				note[i].osc[j].phi = 0
+	void __init__()
+		reset()
 	void __assign__(FMState o)
 	
 
 class FMSynthesizer : Synthesizer
 	FMConfig config
 	FMState state
+	overwrite void Reset()
+		reset()
+		state.reset()
 	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
 		int n = pitch + 0.4
 		float freq = pitch_to_freq(pitch)

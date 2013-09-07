@@ -88,7 +88,7 @@ void show_spec()
 	
 	dlg.SetInt("type", TypeLogarithm)
 	
-	BufferBox buf = AudioFileRender(audio, audio.selection)
+	BufferBox buf = renderer.RenderAudioFile(audio, audio.selection)
 	
 	complex fr[], fl[]
 	

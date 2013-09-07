@@ -168,6 +168,11 @@ extern Type *TypeSocketList;
 	typedef int TraceData;
 	typedef int Bone;
 	typedef int Model;
+	typedef int Terrain;
+	typedef int Skin;
+	typedef int SubSkin;
+	typedef int HostData;
+	typedef int Material;
 	#define class_set_vtable_x(x)
 #endif
 
@@ -218,23 +223,23 @@ void SIAddPackageX()
 	TypeEffectP			= add_type_p("effect",		TypeEffect);
 	TypeCamera			= add_type  ("Camera",		sizeof(Camera));
 	TypeCameraP			= add_type_p("camera",		TypeCamera);
-	TypeSkin			= add_type  ("Skin",		0);
+	TypeSkin			= add_type  ("Skin",		sizeof(Skin));
 	TypeSkinP			= add_type_p("skin",		TypeSkin);
 	TypeSkinPArray		= add_type_a("skin[?]",		TypeSkinP, 1);
-	TypeSubSkin			= add_type  ("SubSkin",		0);
+	TypeSubSkin			= add_type  ("SubSkin",		sizeof(SubSkin));
 	TypeSubSkinList		= add_type_a("SubSkin[]",	TypeSubSkin, -1);
-	TypeMaterial		= add_type  ("Material",	0);
+	TypeMaterial		= add_type  ("Material",	sizeof(Material));
 	TypeMaterialP		= add_type_p("Material*",	TypeMaterial);
 	TypeMaterialList	= add_type_a("Material[]",	TypeMaterial, -1);
 	TypeFog				= add_type  ("Fog",			sizeof(Fog));
 	TypeTraceData		= add_type  ("TraceData",	sizeof(TraceData));
-	TypeTerrain			= add_type  ("Terrain",		0);
+	TypeTerrain			= add_type  ("Terrain",		sizeof(Terrain));
 	TypeTerrainP		= add_type_p("terrain",		TypeTerrain);
 	TypeTerrainPList	= add_type_a("terrain[]",	TypeTerrainP, -1);
 	TypeWorldData		= add_type  ("WorldData",	0);
 	TypeEngineData		= add_type  ("EngineData",	0);
 	TypeNetworkData		= add_type  ("NetworkData",	0);
-	TypeHostData		= add_type  ("HostData",    0);
+	TypeHostData		= add_type  ("HostData",    sizeof(HostData));
 	TypeHostDataList	= add_type_a("HostData[]",	TypeHostData, -1);
 	
 
@@ -650,6 +655,10 @@ void SIAddPackageX()
 	add_class(TypeHostData);
 		class_add_element("host", TypeString, GetDAHostData(host));
 		class_add_element("session", TypeString, GetDAHostData(session));
+		class_add_func("__init__", TypeVoid, x_p(mf(&HostData::__init__)));
+		class_add_func("__delete__", TypeVoid, x_p(mf(&HostData::__delete__)));
+		class_add_func("__assign__", TypeVoid, x_p(mf(&HostData::operator=)));
+			func_add_param("other", TypeHostData);
 	
 	add_class(TypeHostDataList);
 		class_add_func("__init__", TypeVoid, x_p(mf(&HostDataList::__init__)));

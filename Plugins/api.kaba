@@ -51,9 +51,11 @@ class Synthesizer
 	extern virtual void __delete__()
 	extern virtual void RenderNote(BufferBox buf, Range range, float pitch, float volume)
 	extern virtual void OnConfigure()
+	extern virtual void Reset()
 	extern virtual int read(BufferBox buf)
 	extern void set(float pitch, float volume, int offset)
 	extern void RenderMetronomeClick(BufferBox buf, int pos, int level, float volume)
+	extern void reset()
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()

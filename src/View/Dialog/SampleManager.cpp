@@ -13,18 +13,8 @@
 #include <math.h>
 
 SampleManager::SampleManager(AudioFile *a, HuiWindow* _parent, bool _allow_parent) :
-	HuiDialog(_("Sample Manager"), 600, 400, _parent, _allow_parent)
+	HuiWindow("sample_manager_dialog", _parent, true)
 {
-	AddControlTable("", 0, 0, 1, 2, "table1");
-	SetTarget("table1", 0);
-	AddListView(_("!format=iTttC\\Vorschau\\Name\\Dauer\\Benutzung\\L&oschen"), 0, 0, 0, 0, "sample_list");
-	AddControlTable("!noexpandy", 0, 1, 4, 1, "table2");
-	SetTarget("table2", 0);
-	AddButton(_("Laden..."), 0, 0, 0, 0, "import_from_file");
-	AddButton(_("L&oschen"), 1, 0, 0, 0, "delete_sample");
-	AddButton(_("Einf&ugen"), 2, 0, 0, 0, "insert_sample");
-	AddButton(_("Aus Auswahl"), 3, 0, 0, 0, "create_from_selection");
-
 	SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 
 	EventM("hui:close", this, &SampleManager::OnClose);
@@ -35,6 +25,7 @@ SampleManager::SampleManager(AudioFile *a, HuiWindow* _parent, bool _allow_paren
 	EventMX("sample_list", "hui:select", this, &SampleManager::OnListSelect);
 
 	audio = a;
+	selected = 0;
 	FillList();
 
 	Subscribe(audio);
@@ -69,17 +60,19 @@ void SampleManager::FillList()
 	icon_names.clear();
 	foreachi(Sample *s, audio->sample, i){
 		icon_names.add(render_bufbox(s->buf, 80, 32));
-		SetString("sample_list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str(s->buf.num) + "\\" + i2s(s->ref_count) + "\\" + b2s(s->auto_delete));
+		SetString("sample_list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str(s->buf.num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
-	Enable("delete_sample", false);
-	Enable("insert_sample", false);
+	if (audio->sample.num > 0){
+		selected = min(selected, audio->sample.num - 1);
+		SetInt("sample_list", selected);
+	}
+	Enable("delete_sample", audio->sample.num > 0);
+	Enable("insert_sample", audio->sample.num > 0);
 }
 
 void SampleManager::OnListSelect()
 {
-	int n = GetInt("");
-	Enable("delete_sample", n >= 0);
-	Enable("insert_sample", n >= 0);
+	selected = GetInt("");
 }
 
 void SampleManager::OnImportFromFile()
@@ -87,6 +80,7 @@ void SampleManager::OnImportFromFile()
 	if (tsunami->storage->AskOpenImport(this)){
 		BufferBox buf;
 		tsunami->storage->LoadBufferBox(audio, &buf, HuiFilename);
+		selected = audio->sample.num;
 		audio->AddSample(HuiFilename.basename(), buf);
 	}
 }
@@ -100,6 +94,7 @@ void SampleManager::OnInsert()
 
 void SampleManager::OnCreateFromSelection()
 {
+	selected = audio->sample.num;
 	audio->CreateSubsFromSelection(tsunami->view->cur_level);
 }
 

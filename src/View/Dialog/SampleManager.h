@@ -13,7 +13,7 @@
 
 class AudioFile;
 
-class SampleManager : public HuiDialog, public Observer
+class SampleManager : public HuiWindow, public Observer
 {
 public:
 	SampleManager(AudioFile *a, HuiWindow *_parent, bool _allow_parent);
@@ -32,6 +32,7 @@ public:
 
 	AudioFile *audio;
 	Array<string> icon_names;
+	int selected;
 };
 
 #endif /* SAMPLEMANAGER_H_ */

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-163
+169
 // Data (ID,Text)
 about
 
@@ -63,12 +63,16 @@ close_file
 
 copy
 Copy
+create_from_selection
+
 data_list
 
 delete
 Delete
 delete_effect
 Delete
+delete_sample
+
 delete_track
 
 dummy_favorite_dialog
@@ -91,7 +95,11 @@ fxdt_params
 !bold\\Parameters
 help
 
+import_from_file
+
 insert_added
+
+insert_sample
 
 kbitpersec
 kbit/s
@@ -261,7 +269,11 @@ repnum
 
 run_plugin
 
+sample_list
+
 sample_manager
+
+sample_manager_dialog
 
 sample_rate
 
@@ -330,7 +342,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-100
+95
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -344,9 +356,9 @@ zoom_out
 
 !bold$Name:
 
-!format=iTttC\\Vorschau\\Name\\Dauer\\Benutzung\\Löschen
-
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
+
+%d mal
 
 '%s'\nDatei speichern?
 
@@ -372,8 +384,6 @@ Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
 
-Aus Auswahl
-
 Beim Anwenden eines Effekts: 
 
 Beschreibung
@@ -397,8 +407,6 @@ Dieser Effekt ist nicht konfigurierbar.
 Editor für Audio Dateien
 
 Effekt nicht ladbar: \"%s\"
-
-Einfügen
 
 Ende\\\") + audio->get_time_str(audio->GetRange().end()));
 
@@ -438,10 +446,6 @@ Kein Sample ausgewählt
 
 Konnte Aufnahmegerät nicht öffnen
 
-Laden...
-
-Löschen
-
 MIDI Quelle auswählen
 
 MIDI Quellen
@@ -463,8 +467,6 @@ Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 Plugin-Script wählen
 
 Raw Daten
-
-Sample Manager
 
 Samplerate
 

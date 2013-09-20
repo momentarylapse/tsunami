@@ -374,6 +374,7 @@ float AudioOutput::GetVolume()
 void AudioOutput::SetVolume(float _volume)
 {
 	volume = _volume;
+	Notify("StateChange");
 }
 
 float AudioOutput::GetSampleRate()

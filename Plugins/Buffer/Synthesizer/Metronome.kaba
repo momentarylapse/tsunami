@@ -31,9 +31,9 @@ void ProcessTrack(BufferBox buf)
 
 	while true
 		if state.beat == 0
-			synth.AddMetronomeClick(buf, state.dpos, 0, data.Volume)
+			synth.RenderMetronomeClick(buf, state.dpos, 0, data.Volume)
 		else
-			synth.AddMetronomeClick(buf, state.dpos, 1, data.Volume)
+			synth.RenderMetronomeClick(buf, state.dpos, 1, data.Volume)
 		
 		state.beat ++
 		if state.beat >= data.BeatsPerMeasure

@@ -11,9 +11,10 @@
 #include "../../Audio/AudioInput.h"
 #include "../../Audio/AudioInputAudio.h"
 #include "../../Stuff/Log.h"
+#include "../Helper/Slider.h"
 
 SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
-	HuiWindow("properties_dialog", _parent, _allow_parent)
+	HuiWindow("settings_dialog", _parent, _allow_parent)
 {
 	EventM("language", this, &SettingsDialog::OnLanguage);
 	EventM("ogg_bitrate", this, &SettingsDialog::OnOggBitrate);
@@ -34,6 +35,8 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	ogg_quality.add(OggQuality(0.8f, 256));
 	ogg_quality.add(OggQuality(0.9f, 320));
 	ogg_quality.add(OggQuality(1.0f, 500));
+
+	volume_slider = new Slider(this, "volume_slider", "preview_volume", 0, 1, 100, (void(HuiEventHandler::*)())&SettingsDialog::OnVolume, tsunami->output->GetVolume());
 
 	LoadData();
 
@@ -95,6 +98,11 @@ void SettingsDialog::OnLanguage()
 void SettingsDialog::OnOggBitrate()
 {
 	HuiConfigWriteFloat("OggQuality", ogg_quality[GetInt("")].quality);
+}
+
+void SettingsDialog::OnVolume()
+{
+	tsunami->output->SetVolume(volume_slider->Get());
 }
 
 void SettingsDialog::OnCaptureDevice()

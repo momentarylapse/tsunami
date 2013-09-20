@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-169
+174
 // Data (ID,Text)
 about
 
@@ -41,8 +41,12 @@ bar_list
 
 cancel
 Cancel
+capture_delay
+
 capture_delete
 Delete
+capture_device
+
 capture_pause
 Pause
 capture_playback
@@ -101,8 +105,8 @@ insert_added
 
 insert_sample
 
-kbitpersec
-kbit/s
+language
+
 ld_t_bars
 
 ld_t_effects
@@ -239,6 +243,10 @@ plugin_on_file
 
 preview
 Preview
+preview_device
+
+preview_volume
+
 progress_bar
 
 progress_cancelable_dialog
@@ -247,8 +255,8 @@ progress_cancelable_grid
 
 progress_dialog
 in progress
-properties_dialog
-Settings
+properties_dialog_buttonbar
+
 rdt_source
 !bold\\Source
 rdt_target
@@ -286,6 +294,8 @@ select_all
 select_nothing
 
 settings
+
+settings_dialog
 
 show_log
 

@@ -556,6 +556,8 @@ void Tsunami::UpdateMenu()
 	Enable("pause", output->IsPlaying());
 	Check("play_loop", renderer->loop_if_allowed);
 
+	volume_slider->Set(output->GetVolume());
+
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){
 		m->Clear();

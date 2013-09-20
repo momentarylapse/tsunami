@@ -424,10 +424,10 @@ void PluginManager::PutFavoriteBarSizable(HuiWindow *win, const string &root_id,
 {
 	msg_db_f("PutFavoriteBarSizable", 1);
 	win->SetTarget(root_id, 0);
-	win->AddControlTable("!noexpandy", x, y, 4, 1, "favorite_table");
+	win->AddControlTable("", x, y, 4, 1, "favorite_table");
 	win->SetTarget("favorite_table", 0);
 	win->AddComboBox("", 0, 0, 0, 0, "favorite_list");
-	win->AddEdit("", 1, 0, 0, 0, "favorite_name");
+	win->AddEdit("!expandx", 1, 0, 0, 0, "favorite_name");
 	win->AddButton("", 2, 0, 0, 0, "favorite_save");
 	win->SetImage("favorite_save", "hui:save");
 	win->AddButton("", 3, 0, 0, 0, "favorite_delete");
@@ -510,13 +510,13 @@ void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, 
 {
 	msg_db_f("PutCommandBarSizable", 1);
 	win->SetTarget(root_id, 0);
-	win->AddControlTable("!noexpandy", x, y, 4, 1, "command_table");
+	win->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
 	win->SetTarget("command_table", 0);
 	win->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
 	win->SetImage("ok", "hui:ok");
 	win->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
 	win->SetImage("cancel", "hui:cancel");
-	win->AddText("", 1, 0, 0, 0, "");
+	win->AddText("!expandx", 1, 0, 0, 0, "");
 	if (PluginAddPreview){
 		if (cur_plugin->type == Plugin::TYPE_EFFECT){
 			win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");

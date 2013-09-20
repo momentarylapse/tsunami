@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-178
+179
 // Data (ID,Text)
 about
 
@@ -24,6 +24,8 @@ add_midi_track
 add_time_track
 
 add_track
+
+afd_grid_1
 
 audio_add_bar
 
@@ -315,8 +317,6 @@ synthesizer
 
 t_dummy
 
-t_dummy_vertical
-
 tags
 !format=tT\\Tag\\Value
 track_dialog
@@ -331,6 +331,8 @@ track_time_dialog
 
 trackdest_dialog
 Destination track
+ttd_grid_1
+
 undo
 Undo
 view_grid_bars

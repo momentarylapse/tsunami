@@ -9,14 +9,13 @@ Dialog record_dialog "Aufnahme" 300 200
 					Text capture_time "0:00" width=120
 					DrawingArea capture_level ""
 				Grid ? "" 3 1
-					Button capture_start "Start" image=hui:media-record
-					Button capture_pause "Anhalten" image=hui:media-pause
+					Button capture_start "" image=hui:media-record
+					Button capture_pause "" image=hui:media-pause
 					Button capture_delete "Verwerfen" image=hui:delete
 		Group rdt_target "Ziel"
 			Grid ? "" 1 2
 				ComboBox capture_target "" expandx
 				CheckBox capture_playback "wärendher abspielen"
-		Grid record_dialog_buttonbar "" 3 1 buttonbar
-			Text t_dummy "" expandx
+		Grid record_dialog_buttonbar "" 2 1 buttonbar
 			Button cancel "Abbrechen" image=hui:cancel
 			DefButton ok "OK" image=hui:ok

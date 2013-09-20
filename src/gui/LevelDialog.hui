@@ -19,6 +19,5 @@ Dialog level_dialog "Ebene" 375 230
 				Text ld_t_repdelay "Abstand:"
 				SpinButton repdelay "0\\0\\\\0.1"
 				Text ms "ms"
-		Grid level_dialog_buttonbar "" 2 1 buttonbar
-			Text t_dummy "" expandx
+		Grid level_dialog_buttonbar "" 1 1 buttonbar
 			DefButton close "Schließen" image=hui:close

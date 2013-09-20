@@ -512,17 +512,17 @@ void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, 
 	win->SetTarget(root_id, 0);
 	win->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
 	win->SetTarget("command_table", 0);
-	win->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
-	win->SetImage("ok", "hui:ok");
-	win->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
-	win->SetImage("cancel", "hui:cancel");
-	win->AddText("!expandx", 1, 0, 0, 0, "");
 	if (PluginAddPreview){
 		if (cur_plugin->type == Plugin::TYPE_EFFECT){
 			win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 			win->SetImage("preview", "hui:media-play");
 		}
 	}
+	win->AddText("!width=30", 1, 0, 0, 0, "");
+	win->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
+	win->SetImage("cancel", "hui:cancel");
+	win->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
+	win->SetImage("ok", "hui:ok");
 	win->EventM("ok", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginOk);
 	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginPreview);
 	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);

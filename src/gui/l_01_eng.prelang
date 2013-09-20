@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-179
+176
 // Data (ID,Text)
 about
 
@@ -53,12 +53,8 @@ capture_delete
 Delete
 capture_device
 
-capture_pause
-Pause
 capture_playback
 Playback
-capture_start
-Start
 capture_target
 
 capture_time
@@ -314,8 +310,6 @@ sub_from_selection
 sub_properties
 
 synthesizer
-
-t_dummy
 
 tags
 !format=tT\\Tag\\Value

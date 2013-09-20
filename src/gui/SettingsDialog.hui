@@ -25,6 +25,5 @@ Dialog settings_dialog "Einstellungen" 300 300
 				Text pdt_capturedelay "Latenz"
 				SpinButton capture_delay "\\\\\\0.1"
 				Text ms "ms"
-		Grid properties_dialog_buttonbar "" 2 1 buttonbar
-			Text t_dummy "" expandx
+		Grid properties_dialog_buttonbar "" 1 1 buttonbar
 			DefButton close "Schließen" image=hui:close

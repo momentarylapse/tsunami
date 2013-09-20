@@ -17,6 +17,8 @@ public:
 	HuiControlGrid(const string &text, const string &id, int num_x, int num_y, HuiWindow *win);
 	virtual ~HuiControlGrid();
 	virtual void add(HuiControl *child, int x, int y);
+
+	bool button_bar;
 };
 
 #endif /* HUICONTROLGRIDGTK_H_ */

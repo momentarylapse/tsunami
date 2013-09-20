@@ -6,13 +6,17 @@
 #include "Controls/HuiControlComboBox.h"
 #include "Controls/HuiControlDrawingArea.h"
 #include "Controls/HuiControlEdit.h"
+#include "Controls/HuiControlExpander.h"
 #include "Controls/HuiControlGrid.h"
 #include "Controls/HuiControlGroup.h"
 #include "Controls/HuiControlLabel.h"
 #include "Controls/HuiControlListView.h"
 #include "Controls/HuiControlMultilineEdit.h"
+#include "Controls/HuiControlPaned.h"
 #include "Controls/HuiControlProgressBar.h"
 #include "Controls/HuiControlRadioButton.h"
+#include "Controls/HuiControlScroller.h"
+#include "Controls/HuiControlSeparator.h"
 #include "Controls/HuiControlSlider.h"
 #include "Controls/HuiControlSpinButton.h"
 #include "Controls/HuiControlTabControl.h"
@@ -39,7 +43,7 @@ extern string OptionString, HuiFormatString;
 
 
 enum{
-	HuiGtkInsertContainer,
+	HuiGtkInsertWindow,
 	HuiGtkInsertTable,
 	HuiGtkInsertTabControl,
 };
@@ -91,120 +95,23 @@ void HuiWindow::_InsertControl_(HuiControl *c, int x, int y, int width, int heig
 	c->win = this;
 	c->is_button_bar = false;
 	if (is_resizable){
-		HuiControl *root_ctrl = cur_control;
-		GtkWidget *target_widget = plugable;
-		int root_type = HuiGtkInsertContainer;
-		if (root_ctrl){
-			if (root_ctrl->type == HuiKindControlTable){
-				root_type = HuiGtkInsertTable;
-				target_widget = root_ctrl->widget;
-				unsigned int n_cols, n_rows;
-				gtk_table_get_size(GTK_TABLE(target_widget), &n_rows, &n_cols);
-
-				// top table?
-				if (cur_control == control[0])
-					if ((n_cols == 1) && (y == (n_rows - 1)))
-						c->is_button_bar = true;
-			}else if (root_ctrl->type == HuiKindTabControl){
-				root_type = HuiGtkInsertTabControl;
-				target_widget = root_ctrl->widget;
-				target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(target_widget), tab_creation_page); // selected by SetTabCreationPage()...
-			}else
-				root_type = -1;
-		}
-		bool root_is_button_bar = false;
-		if (root_ctrl)
-			if (root_ctrl->is_button_bar)
-				root_is_button_bar = true;
-		// insert
-		if (root_type == HuiGtkInsertContainer){
+		if (cur_control){
+			if (cur_control->type == HuiKindControlTable){
+				cur_control->add(c, x, y);
+			}else if (cur_control->type == HuiKindTabControl){
+				cur_control->add(c, tab_creation_page, 0);
+			}else if (cur_control->type == HuiKindGroup){
+				cur_control->add(c, 0, 0);
+			}else if (cur_control->type == HuiKindExpander){
+				cur_control->add(c, 0, 0);
+			}else if (cur_control->type == HuiKindScroller){
+				cur_control->add(c, 0, 0);
+			}
+		}else{
 			// directly into the window...
-			//gtk_container_add(GTK_CONTAINER(target_widget), frame);
-			gtk_box_pack_start(GTK_BOX(target_widget), frame, true, true, 0);
-	//		_cur_widget_ = frame;
-			/*if ((kind == HuiKindListView) || (kind == HuiKindDrawingArea) || (kind == HuiKindMultilineEdit))
-				gtk_container_set_border_width(GTK_CONTAINER(target_widget), 0);
-			else*/
-				gtk_container_set_border_width(GTK_CONTAINER(target_widget), border_width);
-		}else if (root_type == HuiGtkInsertTable){
-			GtkAttachOptions op_x = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
-			GtkAttachOptions op_y = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
-			if (c->type == HuiKindButton){
-				//gtk_widget_set_size_request(frame, 100, 30);
-				const char *_label = gtk_button_get_label(GTK_BUTTON(c->widget));
-				if ((_label) && (strlen(_label) > 0)){ // != NULL ... cause set even if ""
-					if (root_is_button_bar){
-						op_x = GtkAttachOptions(GTK_FILL);
-						//gtk_widget_set_size_request(frame, 120, 30);
-						gtk_widget_set_size_request(frame, -1, 30);
-					}else{
-						op_x = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
-						gtk_widget_set_size_request(frame, -1, 30);
-					}
-				}else{
-					op_x = GtkAttachOptions(GTK_FILL);
-					gtk_widget_set_size_request(frame, 30, 30);
-				}
-				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
-			/*}else if ((type == HuiKindEdit) || (kind == HuiKindComboBox)  || (type == HuiKindCheckBox) || (type == HuiKindControlTable)){
-				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);*/
-			}else if (c->type == HuiKindColorButton){
-				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
-				gtk_widget_set_size_request(frame, 100, 28);
-			}else if (c->type == HuiKindComboBox){
-				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
-				gtk_widget_set_size_request(frame, -1, 28);
-			}else if ((c->type == HuiKindEdit) || (c->type == HuiKindSpinButton) || (c->type == HuiKindCheckBox) || (c->type == HuiKindRadioButton) || (c->type == HuiKindSlider) || (c->type == HuiKindProgressBar)){
-				op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
-				gtk_widget_set_size_request(frame, -1, 25);
-			}else if (c->type == HuiKindControlTable){
-				//op_y = GtkAttachOptions(GTK_FILL);// | GTK_SHRINK);
-			}else if (c->type == HuiKindText){
-				//op_x = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
-				if (!root_is_button_bar)
-					op_x = GtkAttachOptions(GTK_FILL);
-				op_y = GtkAttachOptions(GTK_FILL);
-			}
-			if (OptionString.find("noexpandy") >= 0)
-				op_y = GtkAttachOptions(GTK_FILL);
-			else if (OptionString.find("expandy") >= 0)
-				op_y = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
-			if (OptionString.find("noexpandx") >= 0)
-				op_x = GtkAttachOptions(GTK_FILL);
-			else if (OptionString.find("expandx") >= 0)
-				op_x = GtkAttachOptions(GTK_FILL | GTK_EXPAND);
-			if (OptionString.find("width") >= 0){
-				string ww = OptionString.substr(OptionString.find("width") + 6, -1);
-				if (ww.find(","))
-					ww = ww.substr(0, ww.find(","));
-				int width = s2i(ww);
-				gtk_widget_set_size_request(frame, width, 28);
-				op_x = GtkAttachOptions(0);
-			}
-			if (OptionString.find("height") >= 0){
-				string ww = OptionString.substr(OptionString.find("height") + 7, -1);
-				if (ww.find(","))
-					ww = ww.substr(0, ww.find(","));
-				int height = s2i(ww);
-				gtk_widget_set_size_request(frame, -1, height);
-				op_y = GtkAttachOptions(0);
-			}
-
-			// TODO
-			unsigned int nx, ny;
-			gtk_table_get_size(GTK_TABLE(target_widget), &ny, &nx);
-			if (x >= nx){
-				y += (x / nx);
-				x = (x % nx);
-			}
-
-			
-			gtk_table_attach(GTK_TABLE(target_widget), frame, x, x+1, y, y+1, op_x, op_y, 0, 0);
-			if (root_is_button_bar)
-				gtk_container_child_set(GTK_CONTAINER(target_widget), frame, "y-padding", 7, NULL);
-		}else if (root_type == HuiGtkInsertTabControl){
-			gtk_container_add(GTK_CONTAINER(target_widget), frame);
-			gtk_container_set_border_width(GTK_CONTAINER(target_widget), border_width);
+			//gtk_container_add(GTK_CONTAINER(plugable), frame);
+			gtk_box_pack_start(GTK_BOX(plugable), frame, true, true, 0);
+			gtk_container_set_border_width(GTK_CONTAINER(plugable), border_width);
 		}
 	}else{
 		if ((c->type == HuiKindButton) || (c->type == HuiKindColorButton) || (c->type == HuiKindComboBox)){
@@ -473,6 +380,26 @@ void HuiWindow::AddDrawingArea(const string &title,int x,int y,int width,int hei
 void HuiWindow::AddControlTable(const string &title, int x, int y, int width, int height, const string &id)
 {
 	_InsertControl_(new HuiControlGrid(title, id, width, height, this), x, y, width, height);
+}
+
+void HuiWindow::AddExpander(const string &title,int x,int y,int width,int height,const string &id)
+{
+	_InsertControl_(new HuiControlExpander(title, id), x, y, width, height);
+}
+
+void HuiWindow::AddPaned(const string &title,int x,int y,int width,int height,const string &id)
+{
+	_InsertControl_(new HuiControlPaned(title, id), x, y, width, height);
+}
+
+void HuiWindow::AddScroller(const string &title,int x,int y,int width,int height,const string &id)
+{
+	_InsertControl_(new HuiControlScroller(title, id), x, y, width, height);
+}
+
+void HuiWindow::AddSeparator(const string &title,int x,int y,int width,int height,const string &id)
+{
+	_InsertControl_(new HuiControlSeparator(title, id), x, y, width, height);
 }
 
 void HuiWindow::EmbedDialog(const string &id, int x, int y)

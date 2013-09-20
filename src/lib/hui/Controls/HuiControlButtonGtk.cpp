@@ -22,6 +22,7 @@ HuiControlButton::HuiControlButton(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 
 //	SetImageById(this, id);
+	SetOptions(OptionString);
 }
 
 HuiControlButton::~HuiControlButton()

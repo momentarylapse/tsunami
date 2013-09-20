@@ -1,16 +1,2 @@
-// IDs
-enum{
-	HMM_PROGRESS_DIALOG,
-	HMM_PROGRESS_BAR
-};
-
-
-
-	// dialog
-	ProgressDialog=HuiCreateDialog("in Arbeit",210,35,MainWin,false,NULL);
-	ProgressDialog->SetID(HMM_PROGRESS_DIALOG);
-	ProgressDialog->AddProgressBar("",5,5,200,25,HMM_PROGRESS_BAR);
-	ProgressDialog->Update();
-
-
-
+Dialog progress_dialog "in Arbeit" 210 30
+	ProgressBar progress_bar ""

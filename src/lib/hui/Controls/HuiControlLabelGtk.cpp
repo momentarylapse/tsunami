@@ -24,6 +24,7 @@ HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
 	else
 		gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
 	HuiControlLabel::__SetString(title);
+	SetOptions(OptionString);
 }
 
 string HuiControlLabel::GetString()

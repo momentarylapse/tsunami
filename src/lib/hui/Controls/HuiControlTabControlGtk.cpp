@@ -44,6 +44,7 @@ HuiControlTabControl::HuiControlTabControl(const string &title, const string &id
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), true);
 	if (OptionString.find("nobar") >= 0)
 		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
+	SetOptions(OptionString);
 }
 
 HuiControlTabControl::~HuiControlTabControl() {
@@ -68,6 +69,19 @@ void HuiControlTabControl::__SetInt(int i)
 int HuiControlTabControl::GetInt()
 {
 	return cur_page;
+}
+
+void HuiControlTabControl::add(HuiControl *child, int x, int y)
+{
+	GtkWidget *child_widget = child->widget;
+	if (child->frame)
+		child_widget = child->frame;
+	GtkWidget *target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), x);
+	gtk_container_add(GTK_CONTAINER(target_widget), child_widget);
+	if (win)
+		gtk_container_set_border_width(GTK_CONTAINER(target_widget), win->border_width);
+	children.add(child);
+	child->parent = this;
 }
 
 #endif

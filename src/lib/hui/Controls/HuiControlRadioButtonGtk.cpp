@@ -28,6 +28,7 @@ HuiControlRadioButton::HuiControlRadioButton(const string &title, const string &
 
 	widget = gtk_radio_button_new_with_label(group, sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&OnGtkRadioButtonToggle), this);
+	SetOptions(OptionString);
 }
 
 HuiControlRadioButton::~HuiControlRadioButton() {

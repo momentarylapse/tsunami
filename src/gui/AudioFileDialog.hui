@@ -1,57 +1,27 @@
-	// dialog
-	AudioFileDialog = HuiCreateSizableDialog("Sound-Datei", 430, 375, MainWin, false);
-	AudioFileDialog->SetID("audio_file_dialog");
-	AudioFileDialog->AddControlTable("", 0, 0, 1, 11, "ad_table_1");
-	AudioFileDialog->SetTarget("ad_table_1", 0);
-	
-	AudioFileDialog->AddText("!bold\\Daten", 0, 0, 0, 0, "ad_t_data");
-	AudioFileDialog->AddText("!bold\\Lautst&arke", 0, 2, 0, 0, "ad_t_volume");
-	AudioFileDialog->AddText("!bold\\Tags", 0, 4, 0, 0, "ad_t_tags");
-	AudioFileDialog->AddText("!bold\\Effekte", 0, 6, 0, 0, "ad_t_effects");
-	AudioFileDialog->AddText("!bold\\Takte", 0, 8, 0, 0, "ad_t_bars");
-	AudioFileDialog->AddButton("Schlie&sen", 0, 10, 0, 0, "audio_close");
-	AudioFileDialog->SetImage("audio_close", "hui:close");
-	
-	AudioFileDialog->AddControlTable("", 0, 1, 3, 1, "ad_table_data");
-	AudioFileDialog->AddControlTable("!noexpandy", 0, 3, 3, 1, "ad_table_vol");
-	AudioFileDialog->AddControlTable("", 0, 5, 3, 2, "ad_table_tags");
-	AudioFileDialog->AddControlTable("", 0, 7, 3, 2, "ad_table_fx");
-	AudioFileDialog->AddControlTable("", 0, 9, 3, 2, "ad_table_bars");
-	
-	AudioFileDialog->SetTarget("ad_table_data", 0);
-	AudioFileDialog->AddListView("!nobar\\key\\value", 2, 0, 0, 0, "data_list");
-	
-	AudioFileDialog->SetTarget("ad_table_tags", 0);
-	AudioFileDialog->AddListView("!format=TT\\Tag\\Wert", 2, 0, 0, 0, "tags");
-	AudioFileDialog->AddControlTable("!noexpandy", 2, 1, 2, 1, "ad_table_tag_con");
-	AudioFileDialog->SetTarget("ad_table_tag_con", 0);
-	AudioFileDialog->AddButton("", 0, 0, 0, 0, "add_tag");
-	AudioFileDialog->SetImage("add_tag", "hui:add");
-	AudioFileDialog->AddButton("", 1, 0, 0, 0, "delete_tag");
-	AudioFileDialog->SetImage("delete_tag", "hui:delete");
-	
-	AudioFileDialog->SetTarget("ad_table_fx", 0);
-	AudioFileDialog->AddListView("!nobar\\Effekte", 2, 0, 0, 0, "audio_fx_list");
-	AudioFileDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "ad_table_fx_con");
-	AudioFileDialog->SetTarget("ad_table_fx_con", 0);
-	AudioFileDialog->AddButton("", 0, 0, 0, 0, "audio_add_effect");
-	AudioFileDialog->SetImage("audio_add_effect", "hui:add");
-	AudioFileDialog->AddButton("", 1, 0, 0, 0, "audio_configure_effect");
-	AudioFileDialog->SetImage("audio_configure_effect", "hui:edit");
-	AudioFileDialog->AddButton("", 2, 0, 0, 0, "audio_delete_effect");
-	AudioFileDialog->SetImage("audio_delete_effect", "hui:delete");
-	
-	AudioFileDialog->SetTarget("ad_table_bars", 0);
-	AudioFileDialog->AddListView("!format=tTTT\\#\\Schl&age\\Bpm\\Anzahl", 2, 0, 0, 0, "audio_bar_list");
-	AudioFileDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "ad_table_bars_con");
-	AudioFileDialog->SetTarget("ad_table_bars_con", 0);
-	AudioFileDialog->AddButton("Takt", 0, 0, 0, 0, "audio_add_bar");
-	AudioFileDialog->SetImage("audio_add_bar", "hui:add");
-	AudioFileDialog->AddButton("Pause", 1, 0, 0, 0, "audio_add_bar_pause");
-	AudioFileDialog->SetImage("audio_add_bar_pause", "hui:add");
-	AudioFileDialog->AddButton("", 2, 0, 0, 0, "audio_delete_bar");
-	AudioFileDialog->SetImage("audio_delete_bar", "hui:delete");
-	
-	AudioFileDialog->Update();
-
-
+Dialog audio_file_dialog "Sound-Datei" 430 375
+	Grid ad_table_1 "" 1 6
+		Group ad_t_data "Daten"
+			ListView data_list "key\\value" nobar height=160 noexpandy
+		Group ad_t_volume "Lautstärke"
+			.
+		Expander ad_t_tags "Tags"
+			Grid ad_table_tags "" 1 2
+				ListView tags "Tag\\Wert" format=TT
+				Grid ? "" 2 1
+					Button add_tag "" image=hui:add
+					Button delete_tag "" image=hui:delete
+		Expander ad_t_effects "Effekte"
+			Grid ? "" 1 2
+				ListView audio_fx_list "Effekte" nobar
+				Grid ? "" 3 1
+					Button audio_add_effect "" image=hui:add
+					Button audio_configure_effect "" image=hui:edit
+					Button audio_delete_effect "" image=hui:delete
+		Expander ad_t_bars "Takte"
+			Grid ? "" 1 2
+				ListView audio_bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT
+				Grid ? "" 3 1
+					Button audio_add_bar "Takt" image=hui:add
+					Button audio_add_bar_pause "Pause" image=hui:add
+					Button audio_delete_bar "" image=hui:delete
+		Button audio_close "Schließen" image=hui:close

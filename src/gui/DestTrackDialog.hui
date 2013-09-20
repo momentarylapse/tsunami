@@ -1,16 +1,2 @@
-// IDs
-enum{
-	HMM_TRACKDEST_DIALOG,
-	HMM_TRACK_LIST
-};
-
-
-
-	// dialog
-	CHuiWindow *dlg=HuiCreateDialog("Ziel-Spur f&ur die Ebenen",400,300,MainWin,false,&MessageFunc);
-	dlg->SetID(HMM_TRACKDEST_DIALOG);
-	dlg->AddListView("Spur",0,0,400,300,HMM_TRACK_LIST);
-	dlg->Update();
-
-
-
+Dialog trackdest_dialog "Ziel-Spur für die Ebenen" 400 300
+	ListView track_list "Spur"

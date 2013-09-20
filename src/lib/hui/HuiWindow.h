@@ -133,6 +133,7 @@ public:
 	template<typename T>
 	void _cdecl EventMX(const string &id, const string &msg, HuiEventHandler* handler, T fun)
 	{	_EventMX(id, msg, handler, (void(HuiEventHandler::*)())fun);	}
+	void RemoveEventHandlers(HuiEventHandler *handler);
 	bool _SendEvent_(HuiEvent *e);
 
 	// events by overwriting
@@ -176,6 +177,10 @@ public:
 	void _cdecl AddDrawingArea(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl AddControlTable(const string &title, int x, int y, int width, int height, const string &id);
 	void _cdecl AddSpinButton(const string &title, int x, int y, int width, int height, const string &id);
+	void _cdecl AddScroller(const string &title,int x,int y,int width,int height,const string &id);
+	void _cdecl AddExpander(const string &title,int x,int y,int width,int height,const string &id);
+	void _cdecl AddSeparator(const string &title,int x,int y,int width,int height,const string &id);
+	void _cdecl AddPaned(const string &title,int x,int y,int width,int height,const string &id);
 
 	void _cdecl EmbedDialog(const string &id, int x, int y);
 
@@ -206,6 +211,7 @@ public:
 	void _cdecl Enable(const string &id, bool enabled);
 	bool _cdecl IsEnabled(const string &id);
 	void _cdecl HideControl(const string &id, bool hide);
+	void _cdecl DeleteControl(const string &id);
 	void _cdecl Check(const string &id, bool checked);
 	bool _cdecl IsChecked(const string &id);
 	void _cdecl SetImage(const string &id, const string &image);
@@ -214,6 +220,7 @@ public:
 	void _cdecl SetMultiSelection(const string &id, Array<int> &sel);
 	void _cdecl Reset(const string &id);
 	void _cdecl RemoveControl(const string &id);
+	void _cdecl SetOptions(const string &id, const string &options);
 
 	// edit completion
 	void _cdecl CompletionAdd(const string &id, const string &text);
@@ -280,6 +287,7 @@ private:
 	int border_width;
 	Array<HuiControl*> control;
 	HuiControl *cur_control;
+	HuiControl *root_control;
 	Array<HuiEventListener> event;
 	HuiMenu *menu, *popup;
 	bool statusbar_enabled;

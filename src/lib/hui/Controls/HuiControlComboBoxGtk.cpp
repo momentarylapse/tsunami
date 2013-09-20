@@ -22,6 +22,7 @@ HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
 		for (int i=0;i<PartString.num;i++)
 			__SetString(PartString[i]);
 	SetInt(0);
+	SetOptions(OptionString);
 }
 
 HuiControlComboBox::~HuiControlComboBox()

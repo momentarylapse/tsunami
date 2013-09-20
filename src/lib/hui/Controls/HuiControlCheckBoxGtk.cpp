@@ -18,6 +18,7 @@ HuiControlCheckBox::HuiControlCheckBox(const string &title, const string &id) :
 	GetPartStrings(id, title);
 	widget = gtk_check_button_new_with_label(sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkCheckboxChange), this);
+	SetOptions(OptionString);
 }
 
 HuiControlCheckBox::~HuiControlCheckBox()

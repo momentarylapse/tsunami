@@ -1,24 +1,10 @@
-// IDs
-enum{
-	HMM_NEW_DIALOG,
-	HMM_ND_T_FREQUENCY,
-	HMM_SAMPLE_RATE,
-	HMM_PER_SECOND,
-	HMM_OK,
-	HMM_CANCEL
-};
-
-
-	// dialog
-	NewDialog=HuiCreateDialog("Neue Datei",250,85,MainWin,false,&NewMessageFunc);
-	NewDialog->SetID(HMM_NEW_DIALOG);
-	NewDialog->AddText("Frequenz:",5,5,80,25,HMM_ND_T_FREQUENCY);
-	NewDialog->AddEdit("",90,5,130,25,HMM_SAMPLE_RATE);
-	NewDialog->AddText("/s",225,5,20,25,HMM_PER_SECOND);
-	NewDialog->AddDefButton("OK",130,45,100,25,HMM_OK);
-	NewDialog->SetImage(HMM_OK,HuiImageOk);
-	NewDialog->AddButton("Abbrechen",15,45,100,25,HMM_CANCEL);
-	NewDialog->SetImage(HMM_CANCEL,HuiImageCancel);
-	NewDialog->Update();
-
-
+Dialog new_dialog "Neue Datei" 250 80
+	Grid ? "" 1 2
+		Grid ? "" 3 1
+			Text nd_t_frequency "Frequenz:"
+			Edit sample_rate "" expandx
+			Text per_second "/s"
+		Grid new_dialog_buttonbar "" 3 1 buttonbar
+			Text t_dummy "" expandx
+			Button cancel "Abbrechen" image=hui:cancel
+			DefButton ok "OK" image=hui:ok

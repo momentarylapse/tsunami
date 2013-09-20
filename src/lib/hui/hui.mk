@@ -20,6 +20,8 @@ HUI_OBJ  = $(HUI_DIR)/hui.o \
  $(HUI_DIR)/Controls/HuiControlRadioButtonGtk.o $(HUI_DIR)/Controls/HuiControlToggleButtonGtk.o \
  $(HUI_DIR)/Controls/HuiControlSpinButtonGtk.o $(HUI_DIR)/Controls/HuiControlSliderGtk.o \
  $(HUI_DIR)/Controls/HuiControlTabControlGtk.o $(HUI_DIR)/Controls/HuiControlTreeViewGtk.o \
+ $(HUI_DIR)/Controls/HuiControlExpanderGtk.o $(HUI_DIR)/Controls/HuiControlScrollerGtk.o \
+ $(HUI_DIR)/Controls/HuiControlPanedGtk.o $(HUI_DIR)/Controls/HuiControlSeparatorGtk.o \
  $(HUI_DIR)/Controls/HuiToolItemButtonGtk.o $(HUI_DIR)/Controls/HuiToolItemMenuButtonGtk.o \
  $(HUI_DIR)/Controls/HuiToolItemSeparatorGtk.o $(HUI_DIR)/Controls/HuiToolItemToggleButtonGtk.o \
  $(HUI_DIR)/Controls/HuiMenuItemGtk.o $(HUI_DIR)/Controls/HuiMenuItemSubmenuGtk.o \
@@ -162,6 +164,18 @@ $(HUI_DIR)/Controls/HuiControlToggleButtonGtk.o : $(HUI_DIR)/Controls/HuiControl
 
 $(HUI_DIR)/Controls/HuiControlTreeViewGtk.o : $(HUI_DIR)/Controls/HuiControlTreeViewGtk.cpp
 	$(CPP) -c $(HUI_DIR)/Controls/HuiControlTreeViewGtk.cpp -o $@ $(HUI_CXXFLAGS)
+
+$(HUI_DIR)/Controls/HuiControlExpanderGtk.o : $(HUI_DIR)/Controls/HuiControlExpanderGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/HuiControlExpanderGtk.cpp -o $@ $(HUI_CXXFLAGS)
+
+$(HUI_DIR)/Controls/HuiControlScrollerGtk.o : $(HUI_DIR)/Controls/HuiControlScrollerGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/HuiControlScrollerGtk.cpp -o $@ $(HUI_CXXFLAGS)
+
+$(HUI_DIR)/Controls/HuiControlPanedGtk.o : $(HUI_DIR)/Controls/HuiControlPanedGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/HuiControlPanedGtk.cpp -o $@ $(HUI_CXXFLAGS)
+
+$(HUI_DIR)/Controls/HuiControlSeparatorGtk.o : $(HUI_DIR)/Controls/HuiControlSeparatorGtk.cpp
+	$(CPP) -c $(HUI_DIR)/Controls/HuiControlSeparatorGtk.cpp -o $@ $(HUI_CXXFLAGS)
 
 $(HUI_DIR)/Controls/HuiControlToolItemButtonGtk.o : $(HUI_DIR)/Controls/HuiControlToolItemButtonGtk.cpp
 	$(CPP) -c $(HUI_DIR)/Controls/HuiControlToolItemButtonGtk.cpp -o $@ $(HUI_CXXFLAGS)

@@ -151,6 +151,9 @@ HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &
 		gtk_widget_grab_focus(da);
 	}
 	widget = da;
+	gtk_widget_set_hexpand(widget, true);
+	gtk_widget_set_vexpand(widget, true);
+	SetOptions(OptionString);
 }
 
 HuiControlDrawingArea::~HuiControlDrawingArea() {

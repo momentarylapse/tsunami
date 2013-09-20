@@ -55,6 +55,9 @@ HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, Hu
 	widget = view;
 
 	configure_tree_view_columns(this, view);
+	gtk_widget_set_hexpand(widget, true);
+	gtk_widget_set_vexpand(widget, true);
+	SetOptions(OptionString);
 }
 
 HuiControlTreeView::~HuiControlTreeView()

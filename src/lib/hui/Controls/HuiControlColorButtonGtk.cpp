@@ -11,14 +11,20 @@
 
 void OnGtkButtonPress(GtkWidget *widget, gpointer data);
 
+
+void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
+{	((HuiControl*)data)->Notify("hui:change");	}
+
 HuiControlColorButton::HuiControlColorButton(const string &title, const string &id) :
 	HuiControl(HuiKindColorButton, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_color_button_new();
 	if (OptionString.find("alpha") >= 0)
-		gtk_color_button_set_use_alpha(GTK_COLOR_BUTTON(widget), true);
-	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
+		gtk_color_chooser_set_use_alpha(GTK_COLOR_CHOOSER(widget), true);
+	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
+	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
+	SetOptions(OptionString);
 }
 
 HuiControlColorButton::~HuiControlColorButton() {
@@ -33,25 +39,23 @@ float col_i16_to_f(int i)
 
 void HuiControlColorButton::__SetColor(const color& c)
 {
-	GdkColor gcol;
-	gcol.red = col_f_to_i16(c.r);
-	gcol.green = col_f_to_i16(c.g);
-	gcol.blue = col_f_to_i16(c.b);
-	gtk_color_button_set_color(GTK_COLOR_BUTTON(widget), &gcol);
-	if (gtk_color_button_get_use_alpha(GTK_COLOR_BUTTON(widget)))
-		gtk_color_button_set_alpha(GTK_COLOR_BUTTON(widget), col_f_to_i16(c.a));
+	GdkRGBA gcol;
+	gcol.red = c.r;
+	gcol.green = c.g;
+	gcol.blue = c.b;
+	gcol.alpha = c.a;
+	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
 }
 
 color HuiControlColorButton::GetColor()
 {
 	color col;
-	GdkColor gcol;
-	gtk_color_button_get_color(GTK_COLOR_BUTTON(widget), &gcol);
-	col.r = col_i16_to_f(gcol.red);
-	col.g = col_i16_to_f(gcol.green);
-	col.b = col_i16_to_f(gcol.blue);
-	if (gtk_color_button_get_use_alpha(GTK_COLOR_BUTTON(widget)))
-		col.a = col_i16_to_f(gtk_color_button_get_alpha(GTK_COLOR_BUTTON(widget)));
+	GdkRGBA gcol;
+	gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
+	col.r = gcol.red;
+	col.g = gcol.green;
+	col.b = gcol.blue;
+	col.a = gcol.alpha;
 	return col;
 }
 

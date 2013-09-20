@@ -49,6 +49,11 @@ bool HuiCallback::is_set()
 	return false;
 }
 
+bool HuiCallback::has_handler(HuiEventHandler *_object)
+{
+	return (object == _object);
+}
+
 HuiEvent _HuiEvent_;
 HuiEvent *HuiGetEvent()
 {

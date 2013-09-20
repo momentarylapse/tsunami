@@ -53,12 +53,11 @@ void HuiToolbar::Reset()
 // create and apply a toolbar bar resource id
 void HuiToolbar::SetByID(const string &id)
 {
-	msg_db_r("Toolbar.SetByID",1);
+	msg_db_f("Toolbar.SetByID",1);
 	msg_db_m(id.c_str(),1);
 	HuiResource *res = HuiGetResource(id);
 	if (!res){
 		msg_error("Toolbar.SetByID  :~~(");
-		msg_db_l(1);
 		return;
 	}
 	Reset();
@@ -80,8 +79,6 @@ void HuiToolbar::SetByID(const string &id)
 	}
 	Enable(true);
 	msg_db_m(":)",1);
-	msg_db_l(1);
-	return;
 }
 
 

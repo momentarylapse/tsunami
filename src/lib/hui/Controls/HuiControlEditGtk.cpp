@@ -23,6 +23,7 @@ HuiControlEdit::HuiControlEdit(const string &title, const string &id) :
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(PartString[0]));
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkEditChange), this);
+	SetOptions(OptionString);
 }
 
 HuiControlEdit::~HuiControlEdit() {

@@ -32,6 +32,7 @@ HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool h
 	}
 	gtk_scale_set_draw_value(GTK_SCALE(widget), false);
 	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkSliderChange), this);
+	SetOptions(OptionString);
 }
 
 HuiControlSlider::~HuiControlSlider() {

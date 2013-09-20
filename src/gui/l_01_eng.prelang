@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-181
+163
 // Data (ID,Text)
 about
 
@@ -15,29 +15,11 @@ ad_t_tags
 
 ad_t_volume
 
-ad_table_1
-
-ad_table_2
-
-ad_table_5
-
-ad_table_7
-
-ad_table_bars_con
-
-ad_table_fx_con
-
-ad_table_tag_con
-
-ad_table_vol
-
 add_bar
 
 add_bar_pause
 
 add_midi_track
-
-add_tag
 
 add_time_track
 
@@ -67,6 +49,8 @@ capture_playback
 Playback
 capture_start
 Start
+capture_target
+
 capture_time
 0:00
 capture_type:audio
@@ -85,8 +69,6 @@ delete
 Delete
 delete_effect
 Delete
-delete_tag
-
 delete_track
 
 dummy_favorite_dialog
@@ -103,8 +85,6 @@ fx_dialog
 Effect
 fx_list
 !nobar\\Effects
-fx_samples
-
 fxdt_filename
 !bold\\Filename
 fxdt_params
@@ -129,8 +109,6 @@ ld_t_repetition
 
 ld_t_repnum
 
-ld_t_samples
-
 ld_t_synth
 
 ld_t_track
@@ -143,6 +121,8 @@ level_delete
 
 level_dialog
 Level
+level_dialog_buttonbar
+
 level_down
 
 level_up
@@ -197,12 +177,16 @@ ms
 ms
 mute
 Muted
+name
+
 nd_t_frequency
 Frequency:
 new
 New...
 new_dialog
 New file
+new_dialog_buttonbar
+
 ogg_bitrate
 64\\96\\128\\160\\196\\256
 ok
@@ -210,6 +194,8 @@ OK
 open
 Open...
 panning
+
+panning_slider
 
 paste
 Paste
@@ -245,8 +231,12 @@ plugin_on_file
 
 preview
 Preview
+progress_bar
+
 progress_cancelable_dialog
 in progress
+progress_cancelable_grid
+
 progress_dialog
 in progress
 properties_dialog
@@ -259,6 +249,8 @@ record
 Record
 record_dialog
 Record
+record_dialog_buttonbar
+
 redo
 Redo
 remove_added
@@ -270,6 +262,8 @@ repnum
 run_plugin
 
 sample_manager
+
+sample_rate
 
 save
 Save
@@ -289,32 +283,12 @@ sub_from_selection
 
 sub_properties
 
-tab_control
-Data\\Tags\\Tracks\\Effects
+synthesizer
+
+t_dummy
+
 tags
 !format=tT\\Tag\\Value
-td_table_1
-
-td_table_10
-
-td_table_5
-
-td_table_6
-
-td_table_7
-
-td_table_fx_con
-
-td_table_name
-
-td_table_pan
-
-td_table_sam_con
-
-td_table_synth
-
-td_table_vol
-
 track_dialog
 Track
 track_import
@@ -347,26 +321,16 @@ view_stereo
 
 volume
 \\0\\1000\\0.1
-wave_dialog
-Sound file
-wave_list
-!tree\\#\\Name\\Volume
+volume_slider
+
 wave_properties
 
-wd_t_format
-Format:
-wd_t_freq
-Frequency:
-wd_t_samples
-Samples:
-wd_t_time
-Duration:
 zoom_in
 
 zoom_out
 
 // Num Language Strings
-101
+100
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -466,8 +430,6 @@ Ist halt irgendwie passiert...
 
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 
-Kann nur Midi-Pattern löschen, die nicht benutzt werden!
-
 Kann nur Samples löschen, die nicht benutzt werden!
 
 Kanäle
@@ -486,7 +448,7 @@ MIDI Quellen
 
 Meldungen
 
-Midi-Pattern Manager
+Midi-Editor
 
 Nachrichten
 

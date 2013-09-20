@@ -65,10 +65,14 @@ Type *TypeMaterial;
 Type *TypeMaterialP;
 Type *TypeMaterialList;
 Type *TypeFog;
+Type *TypeLight;
+Type *TypeLightP;
 Type *TypeTraceData;
 Type *TypeTerrain;
 Type *TypeTerrainP;
 Type *TypeTerrainPList;
+Type *TypeLink;
+Type *TypeLinkP;
 Type *TypeEngineData;
 Type *TypeWorldData;
 Type *TypeNetworkData;
@@ -114,14 +118,16 @@ extern Type *TypeSocketList;
 	static Material *_material;
 	#define	GetDAMaterial(x)	long(&_material->x)-long(_material)
 	static Fog *_fog;
-	static WorldData *_world_data;
-	static EngineData *_engine_data;
-	static NetworkData *_network_data;
-	static HostData *_host_data;
 	#define	GetDAFog(x)			long(&_fog->x)-long(_fog)
+	static Light::Light *_light;
+	#define	GetDALight(x)			long(&_light->x)-long(_light)
+	static WorldData *_world_data;
 	#define	GetDAWorld(x)			long(&_world_data->x)-long(_world_data)
+	static EngineData *_engine_data;
 	#define	GetDAEngine(x)			long(&_engine_data->x)-long(_engine_data)
+	static NetworkData *_network_data;
 	#define	GetDANetwork(x)			long(&_network_data->x)-long(_network_data)
+	static HostData *_host_data;
 	#define	GetDAHostData(x)			long(&_host_data->x)-long(_host_data)
 	class HostDataList : public Array<HostData>
 	{
@@ -135,6 +141,8 @@ extern Type *TypeSocketList;
 	static TraceData *_tracedata;
 	#define	GetDATraceData(x)		long(&_tracedata->x)-long(_tracedata)
 	#define class_set_vtable_x(x)	class_set_vtable(x)
+	static Link *_link;
+	#define	GetDALink(x)			long(&_link->x)-long(_link)
 #else
 	typedef int Picture;
 	typedef int Picture3d;
@@ -144,6 +152,9 @@ extern Type *TypeSocketList;
 	typedef int Effect;
 	typedef int Camera;
 	typedef int Fog;
+	namespace Light{
+	typedef int Light;
+	};
 	#define	GetDAText(x)		0
 	#define	GetDAPicture(x)		0
 	#define	GetDAPicture3D(x)	0
@@ -158,6 +169,7 @@ extern Type *TypeSocketList;
 	#define	GetDASubSkin(x)		0
 	#define	GetDAMaterial(x)	0
 	#define	GetDAFog(x)			0
+	#define	GetDALight(x)		0
 	#define	GetDAWorld(x)		0
 	#define	GetDAEngine(x)		0
 	#define	GetDANetwork(x)		0
@@ -165,6 +177,7 @@ extern Type *TypeSocketList;
 	#define	GetDACamera(x)		0
 	#define	GetDATerrain(x)		0
 	#define	GetDATraceData(x)	0
+	#define	GetDALink(x)			0
 	typedef int TraceData;
 	typedef int Bone;
 	typedef int Model;
@@ -173,6 +186,7 @@ extern Type *TypeSocketList;
 	typedef int SubSkin;
 	typedef int HostData;
 	typedef int Material;
+	typedef int Link;
 	#define class_set_vtable_x(x)
 #endif
 
@@ -232,10 +246,14 @@ void SIAddPackageX()
 	TypeMaterialP		= add_type_p("Material*",	TypeMaterial);
 	TypeMaterialList	= add_type_a("Material[]",	TypeMaterial, -1);
 	TypeFog				= add_type  ("Fog",			sizeof(Fog));
+	TypeLight			= add_type  ("Light",		sizeof(Light::Light));
+	TypeLightP			= add_type_p("Light*",		TypeLight);
 	TypeTraceData		= add_type  ("TraceData",	sizeof(TraceData));
 	TypeTerrain			= add_type  ("Terrain",		sizeof(Terrain));
 	TypeTerrainP		= add_type_p("terrain",		TypeTerrain);
 	TypeTerrainPList	= add_type_a("terrain[]",	TypeTerrainP, -1);
+	TypeLink			= add_type  ("Link",		sizeof(Link));
+	TypeLinkP			= add_type_p("Link*",		TypeLink);
 	TypeWorldData		= add_type  ("WorldData",	0);
 	TypeEngineData		= add_type  ("EngineData",	0);
 	TypeNetworkData		= add_type  ("NetworkData",	0);
@@ -411,6 +429,24 @@ void SIAddPackageX()
 		class_add_func_virtual("OnEnable", TypeVoid, x_p(mf(&Effect::OnEnable)));
 			func_add_param("enabled", TypeBool);
 		class_set_vtable_x(Effect);
+
+
+	add_class(TypeLight);
+		class_add_element("enabled",		TypeBool,		GetDALight(enabled));
+		class_add_element("directional",	TypeBool,		GetDALight(directional));
+		class_add_element("pos",			TypeVector,		GetDALight(pos));
+		class_add_element("dir",			TypeVector,		GetDALight(dir));
+		class_add_func("__init__", TypeVoid, x_p(mf(&Light::Light::__init__)));
+		class_add_func("__delete__", TypeVoid, x_p(mf(&Light::Light::__delete__)));
+		class_add_func("SetDirectional", TypeVoid, x_p(mf(&Light::Light::SetDirectional)));
+			func_add_param("dir", TypeVector);
+		class_add_func("SetRadial", TypeVoid, x_p(mf(&Light::Light::SetRadial)));
+			func_add_param("pos", TypeVector);
+			func_add_param("radius", TypeFloat);
+		class_add_func("SetColors", TypeVoid, x_p(mf(&Light::Light::SetColors)));
+			func_add_param("am", TypeColor);
+			func_add_param("di", TypeColor);
+			func_add_param("sp", TypeColor);
 
 	add_class(TypeSkin);
 		class_add_element("vertex",			TypeVectorList,	GetDASkin(vertex));
@@ -600,6 +636,29 @@ void SIAddPackageX()
 		class_add_func("Unproject",		TypeVector,	amd64_wrap(mf(&Camera::Unproject), &amd64_camera_unproject));
 			func_add_param("v",			TypeVector);
 		class_set_vtable_x(Camera);
+
+
+	add_class(TypeLink);
+		class_add_func("SetTorque", TypeVoid, x_p(mf(&Link::SetTorque)));
+			func_add_param("torque", TypeFloat);
+		class_add_func("SetTorqueAxis", TypeVoid, x_p(mf(&Link::SetTorqueAxis)));
+			func_add_param("axis", TypeInt);
+			func_add_param("torque", TypeFloat);
+		class_add_func("SetRange", TypeVoid, x_p(mf(&Link::SetRange)));
+			func_add_param("min", TypeFloat);
+			func_add_param("max", TypeFloat);
+		class_add_func("SetRangeAxis", TypeVoid, x_p(mf(&Link::SetRangeAxis)));
+			func_add_param("axis", TypeInt);
+			func_add_param("min", TypeFloat);
+			func_add_param("max", TypeFloat);
+		class_add_func("SetFriction", TypeVoid, x_p(mf(&Link::SetFriction)));
+			func_add_param("friction", TypeFloat);
+		/*class_add_func("SetFrictionAxis", TypeVoid, x_p(mf(&Link::SetFrictionAxis)));
+			func_add_param("axis", TypeInt);
+			func_add_param("friction", TypeFloat);*/
+		class_add_func("GetPosition", TypeFloat, x_p(mf(&Link::GetPosition)));
+		class_add_func("GetPositionAxis", TypeFloat, x_p(mf(&Link::GetPositionAxis)));
+			func_add_param("axis", TypeInt);
 	
 	add_class(TypeWorldData);
 		class_add_element("filename",		TypeString,		GetDAWorld(filename));
@@ -609,7 +668,7 @@ void SIAddPackageX()
 		class_add_element("fog",		TypeFog,		GetDAWorld(fog));
 		class_add_element("var",		TypeFloatList,		GetDAWorld(var));
 		class_add_element("ambient",		TypeColor,		GetDAWorld(ambient));
-		class_add_element("sun",		TypeInt,		GetDAWorld(sun));
+		class_add_element("sun",		TypeLightP,		GetDAWorld(sun));
 		class_add_element("speed_of_sound",		TypeFloat,		GetDAWorld(speed_of_sound));
 
 	add_class(TypeEngineData);
@@ -630,7 +689,7 @@ void SIAddPackageX()
 		class_add_element("console_enabled",		TypeBool,		GetDAEngine(ConsoleEnabled));
 		class_add_element("record",		TypeBool,		GetDAEngine(Record));
 		class_add_element("resetting_game",		TypeBool,		GetDAEngine(ResettingGame));
-		class_add_element("shadow_light",		TypeInt,		GetDAEngine(ShadowLight));
+		class_add_element("shadow_light",		TypeLightP,		GetDAEngine(ShadowLight));
 		class_add_element("shadow_color",		TypeColor,		GetDAEngine(ShadowColor));
 		class_add_element("shadow_lower_detail",		TypeBool,		GetDAEngine(ShadowLowerDetail));
 		class_add_element("shadow_level",		TypeInt,		GetDAEngine(ShadowLevel));
@@ -694,25 +753,6 @@ void SIAddPackageX()
 		func_add_param("filename",		TypeString);*/
 	
 	// engine
-	// effects
-	add_func("LightCreate",							TypeInt,	x_p(&Light::Create));
-	add_func("LightSetColors",			TypeVoid,	x_p(&Light::SetColors));
-		func_add_param("index",		TypeInt);
-		func_add_param("ambient",		TypeColor);
-		func_add_param("diffuse",		TypeColor);
-		func_add_param("specular",		TypeColor);
-	add_func("LightSetDirectional",			TypeVoid,	x_p(&Light::SetDirectional));
-		func_add_param("index",		TypeInt);
-		func_add_param("dir",		TypeVector);
-	add_func("LightSetRadial",					TypeVoid,	x_p(&Light::SetRadial));
-		func_add_param("index",		TypeInt);
-		func_add_param("pos",		TypeVector);
-		func_add_param("radius",		TypeFloat);
-	add_func("LightEnable",							TypeVoid,	x_p(&Light::Enable));
-		func_add_param("index",		TypeInt);
-		func_add_param("enabled",		TypeBool);
-	add_func("LightDelete",							TypeVoid,	x_p(&Light::Delete));
-		func_add_param("index",		TypeInt);
 	// game
 	add_func("ExitProgram",									TypeVoid,	x_p(ExitProgram));
 	add_func("ScreenShot",									TypeVoid,	x_p(ScreenShot));
@@ -752,66 +792,38 @@ void SIAddPackageX()
 		func_add_param("d",			TypeTraceData);
 		func_add_param("simple_test",	TypeBool);
 		func_add_param("o_ignore",		TypeInt);
-	add_func("LinkAddSpring",							TypeInt,	x_p(&AddLinkSpring));
+	add_func("LinkAddSpring",							TypeLinkP,	x_p(&AddLinkSpring));
 		func_add_param("o1",		TypeModelP);
 		func_add_param("o2",		TypeModelP);
 		func_add_param("p1",		TypeVector);
 		func_add_param("p2",		TypeVector);
 		func_add_param("dx0",		TypeFloat);
 		func_add_param("k",			TypeFloat);
-	add_func("LinkAddBall",									TypeInt,	x_p(&AddLinkBall));
+	add_func("LinkAddBall",									TypeLinkP,	x_p(&AddLinkBall));
 		func_add_param("o1",		TypeModelP);
 		func_add_param("o2",		TypeModelP);
 		func_add_param("p",			TypeVector);
-	add_func("LinkAddHinge",							TypeInt,	x_p(&AddLinkHinge));
+	add_func("LinkAddHinge",							TypeLinkP,	x_p(&AddLinkHinge));
 		func_add_param("o1",		TypeModelP);
 		func_add_param("o2",		TypeModelP);
 		func_add_param("p"	,		TypeVector);
 		func_add_param("ax",		TypeVector);
-	add_func("LinkAddHinge2",							TypeInt,	x_p(&AddLinkHinge2));
+	add_func("LinkAddHinge2",							TypeLinkP,	x_p(&AddLinkHinge2));
 		func_add_param("o1",		TypeModelP);
 		func_add_param("o2",		TypeModelP);
 		func_add_param("p"	,		TypeVector);
 		func_add_param("ax1",		TypeVector);
 		func_add_param("ax2",		TypeVector);
-	add_func("LinkAddSlider",									TypeInt,	x_p(&AddLinkSlider));
+	add_func("LinkAddSlider",									TypeLinkP,	x_p(&AddLinkSlider));
 		func_add_param("o1",		TypeModelP);
 		func_add_param("o2",		TypeModelP);
 		func_add_param("ax",		TypeVector);
-	add_func("LinkAddUniversal",									TypeInt,	x_p(&AddLinkUniversal));
+	add_func("LinkAddUniversal",									TypeLinkP,	x_p(&AddLinkUniversal));
 		func_add_param("o1",		TypeModelP);
 		func_add_param("o2",		TypeModelP);
 		func_add_param("p",			TypeVector);
 		func_add_param("ax1",		TypeVector);
 		func_add_param("ax2",		TypeVector);
-	add_func("LinkSetTorque",					TypeVoid,	x_p(&LinkSetTorque));
-		func_add_param("link",		TypeInt);
-		func_add_param("torque",	TypeFloat);
-	add_func("LinkSetTorqueAxis",					TypeVoid,	x_p(&LinkSetTorqueAxis));
-		func_add_param("link",		TypeInt);
-		func_add_param("axis",		TypeInt);
-		func_add_param("torque",	TypeFloat);
-	add_func("LinkSetRange",					TypeVoid,	x_p(&LinkSetRange));
-		func_add_param("link",		TypeInt);
-		func_add_param("min",		TypeFloat);
-		func_add_param("max",		TypeFloat);
-	add_func("LinkSetRangeAxis",					TypeVoid,	x_p(&LinkSetRangeAxis));
-		func_add_param("link",		TypeInt);
-		func_add_param("axis",		TypeInt);
-		func_add_param("min",		TypeFloat);
-		func_add_param("max",		TypeFloat);
-	add_func("LinkSetFriction",		TypeVoid,	x_p(&LinkSetFriction));
-		func_add_param("link",		TypeInt);
-		func_add_param("friction",	TypeFloat);
-	/*add_func("LinkSetFrictionAxis",		TypeVoid,	x_p(&LinkSetFrictionAxis));
-		func_add_param("link",		TypeInt);
-		func_add_param("axis",		TypeInt);
-		func_add_param("friction",	TypeFloat);*/
-	add_func("LinkGetPosition",					TypeFloat,	x_p(&LinkGetPosition));
-		func_add_param("link",		TypeInt);
-	add_func("LinkGetPositionAxis",					TypeFloat,	x_p(&LinkGetPositionAxis));
-		func_add_param("link",		TypeInt);
-		func_add_param("axis",		TypeInt);
 
 	
 

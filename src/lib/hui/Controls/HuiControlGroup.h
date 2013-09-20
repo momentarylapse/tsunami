@@ -18,6 +18,8 @@ public:
 	virtual ~HuiControlGroup();
 	//virtual string GetString();
 	//virtual void SetString(const string &str);
+
+	virtual void add(HuiControl *child, int x, int y);
 };
 
 #endif /* HUICONTROLGROUP_H_ */

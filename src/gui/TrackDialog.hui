@@ -1,47 +1,28 @@
-	// dialog
-	TrackDialog = HuiCreateSizableDialog("Spur", 380, 430, MainWin, false);
-	TrackDialog->SetID("track_dialog");
-	TrackDialog->AddControlTable("ControlTable 1", 0, 0, 1, 9, "td_table_1");
-	TrackDialog->SetTarget("td_table_1", 0);
-	TrackDialog->AddText("!bold\\Name", 0, 0, 0, 0, "ld_t_name");
-	TrackDialog->AddText("!bold\\Lautst&arke", 0, 2, 0, 0, "ld_t_volume");
-	TrackDialog->AddText("!bold\\Effekte", 0, 4, 0, 0, "ld_t_effects");
-	TrackDialog->AddText("!bold\\Samples", 0, 6, 0, 0, "ld_t_samples");
-	TrackDialog->AddControlTable("!noexpandy", 0, 1, 3, 1, "td_table_name");
-	TrackDialog->AddControlTable("!noexpandy", 0, 3, 3, 2, "td_table_vol");
-	TrackDialog->AddControlTable("", 0, 5, 3, 2, "td_table_fx");
-	TrackDialog->AddControlTable("", 0, 7, 3, 2, "td_table_samples");
-	TrackDialog->AddButton("Schlie&sen", 0, 8, 0, 0, "close");
-	TrackDialog->SetImage("close", "hui:close");
-	TrackDialog->SetTarget("td_table_name", 0);
-	TrackDialog->AddEdit("", 2, 0, 0, 0, "name");
-	TrackDialog->SetTarget("td_table_vol", 0);
-	TrackDialog->AddSlider("", 2, 0, 0, 0, "volume_slider");
-	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_6");
-	TrackDialog->SetTarget("td_table_6", 0);
-	TrackDialog->AddCheckBox("Stumm", 2, 0, 0, 0, "mute");
-	TrackDialog->AddSpinButton("\\0\\1000\\0.1", 0, 0, 0, 0, "volume");
-	TrackDialog->AddText("%", 1, 0, 0, 0, "percent");
-	TrackDialog->SetTarget("td_table_fx", 0);
-	TrackDialog->AddListView("!nobar\\Effekte", 2, 0, 0, 0, "fx_list");
-	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_fx_con");
-	TrackDialog->SetTarget("td_table_fx_con", 0);
-	TrackDialog->AddButton("", 0, 0, 0, 0, "add_effect");
-	TrackDialog->SetImage("add_effect", "hui:add");
-	TrackDialog->AddButton("", 1, 0, 0, 0, "configure_effect");
-	TrackDialog->SetImage("configure_effect", "hui:edit");
-	TrackDialog->AddButton("", 2, 0, 0, 0, "delete_effect");
-	TrackDialog->SetImage("delete_effect", "hui:delete");
-	TrackDialog->SetTarget("td_table_samples", 0);
-	TrackDialog->AddListView("!nobar\\Samples", 2, 0, 0, 0, "fx_samples");
-	TrackDialog->AddControlTable("!noexpandy", 2, 1, 3, 1, "td_table_sam_con");
-	TrackDialog->SetTarget("td_table_sam_con", 0);
-	TrackDialog->AddButton("", 0, 0, 0, 0, "add_sample");
-	TrackDialog->SetImage("add_sample", "hui:add");
-	TrackDialog->AddButton("", 1, 0, 0, 0, "edit_sample");
-	TrackDialog->SetImage("edit_effect", "hui:edit");
-	TrackDialog->AddButton("", 2, 0, 0, 0, "delete_sample");
-	TrackDialog->SetImage("delete_sample", "hui:delete");
-	TrackDialog->Update();
-
-
+Dialog track_dialog "Spur" 380 430
+	Grid ? "" 1 6
+		Group ld_t_name "Name"
+			Edit name "" expandx
+		Group ld_t_volume "Lautstärke"
+			Grid ? "" 1 2
+				Slider volume_slider "" expandx
+				Grid ? "" 3 1
+					SpinButton volume "\\0\\1000\\0.1"
+					Text percent "%"
+					CheckBox mute "Stumm"
+		Group ld_t_panning "Balance"
+			Grid ? "" 3 1
+				Slider panning_slider "" expandx
+				SpinButton panning "0\\-100\\100\\0.1"
+				Text percent "%"
+		Expander ld_t_effects "Effekte"
+			Grid ? "" 1 2
+				ListView fx_list "Effekte" nobar
+				Grid ? "" 3 1
+					Button add_effect "" image=hui:add
+					Button configure_effect "" image=hui:edit
+					Button delete_effect "" image=hui:delete
+		Expander ld_t_synth "Synthesizer"
+			Grid ? "" 2 1
+				Button synthesizer "" expandx
+				Button config_synth "" image=hui:edit
+		Button close "Schließen" image=hui:close

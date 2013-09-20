@@ -21,7 +21,7 @@ HuiControlToggleButton::HuiControlToggleButton(const string &title, const string
 	widget = gtk_toggle_button_new_with_label(sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&OnGtkToggleButtonToggle), this);
 	//SetInt(id, 0);
-
+	SetOptions(OptionString);
 }
 
 HuiControlToggleButton::~HuiControlToggleButton()

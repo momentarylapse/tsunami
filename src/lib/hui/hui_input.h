@@ -19,6 +19,7 @@ public:
 	HuiCallback(HuiEventHandler *object, void (HuiEventHandler::*member_function)());
 	void call();
 	bool is_set();
+	bool has_handler(HuiEventHandler *object);
 
 private:
 	hui_callback *func;

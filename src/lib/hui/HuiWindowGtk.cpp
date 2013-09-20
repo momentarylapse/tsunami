@@ -525,6 +525,7 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 		gtk_widget_set_double_buffered(gl_widget, false);
 		g_signal_connect(G_OBJECT(gl_widget), "draw", G_CALLBACK(&expose_event_gl), this);
 		gtk_box_pack_start(GTK_BOX(hbox), gl_widget, TRUE, TRUE, 0);
+		gtk_widget_show(gl_widget);
 
 		// show/realize to be done by the nix library!
 		/*gtk_widget_show(gl_widget);
@@ -542,6 +543,9 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 		gtk_widget_set_can_focus(gl_widget, true);
 #endif
 		gtk_widget_grab_focus(gl_widget);
+		GtkWidget *ww = gtk_button_new_with_label("test");
+		gtk_widget_show(ww);
+		gtk_box_pack_start(GTK_BOX(hbox), ww, TRUE, TRUE, 0);
 	}else if (ControlMode){
 		if (is_resizable){
 			// free to use...
@@ -737,12 +741,13 @@ void HuiWindow::SetMenu(HuiMenu *_menu)
 		}
 		gtk_menu.clear();
 		gtk_num_menus = 0;
-		menu->set_win(NULL);
+		/*menu->set_win(NULL);
 		foreach(HuiControl *c, list){
 			for (int i=0;i<control.num;i++)
 				if (control[i] == c)
 					control.erase(i);
-		}
+		}*/
+		delete(menu);
 	}
 
 	

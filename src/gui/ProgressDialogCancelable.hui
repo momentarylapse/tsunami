@@ -1,19 +1,4 @@
-// IDs
-enum{
-	HMM_PROGRESS_CANCELABLE_DIALOG,
-	HMM_PROGRESS_BAR,
-	HMM_CANCEL
-};
-
-
-
-	// dialog
-	ProgressDialog=HuiCreateDialog("in Arbeit",210,65,MainWin,false,NULL);
-	ProgressDialog->SetID(HMM_PROGRESS_CANCELABLE_DIALOG);
-	ProgressDialog->AddProgressBar("",5,5,200,25,HMM_PROGRESS_BAR);
-	ProgressDialog->AddButton("Abbrechen",5,35,200,25,HMM_CANCEL);
-	ProgressDialog->SetImage(HMM_CANCEL,HuiImageCancel);
-	ProgressDialog->Update();
-
-
-
+Dialog progress_cancelable_dialog "in Arbeit" 210 30
+	Grid progress_cancelable_grid "" 1 2 expandx
+		ProgressBar progress_bar "" expandx
+		Button cancel "Abbrechen" image=hui:cancel

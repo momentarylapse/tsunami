@@ -21,6 +21,8 @@ public:
 	virtual void __SetInt(int i);
 	virtual int GetInt();
 
+	virtual void add(HuiControl *child, int x, int y);
+
 	int cur_page;
 };
 

@@ -40,7 +40,7 @@ void try_add_accel(GtkWidget *item, const string &id)
 
 HuiMenu::HuiMenu()
 {
-	msg_db_r("CHuiMenu()", 1);
+	msg_db_r("HuiMenu()", 1);
 	_HuiMakeUsable_();
 	win = NULL;
 	

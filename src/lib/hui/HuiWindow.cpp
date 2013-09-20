@@ -142,6 +142,7 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 	toolbar[HuiToolbarBottom] = new HuiToolbar(this);
 	input.reset();
 	tab_creation_page = -1;
+	root_control = NULL;
 
 	id = "";
 	num_float_decimals = 3;
@@ -164,9 +165,11 @@ void HuiWindow::_CleanUp_()
 	for (int i=0;i<4;i++)
 		delete(toolbar[i]);
 
-	for (int i=0;i<control.num;i++)
-		delete(control[i]);
-	control.clear();
+	while (control.num > 0){
+		HuiControl *c = control[0];
+		control.erase(0);
+		delete(c);
+	}
 	id.clear();
 	cur_id.clear();
 	event.clear();
@@ -320,6 +323,13 @@ void HuiWindow::_EventMX(const string &id, const string &msg, HuiEventHandler *h
 	event.add(e);
 }
 
+void HuiWindow::RemoveEventHandlers(HuiEventHandler *handler)
+{
+	for (int i=event.num-1;i>=0;i--)
+		if (event[i].function.has_handler(handler))
+			event.erase(i);
+}
+
 bool HuiWindow::_SendEvent_(HuiEvent *e)
 {
 	if (!allow_input)
@@ -368,6 +378,7 @@ bool HuiWindow::_SendEvent_(HuiEvent *e)
 		foreach(HuiClosedWindow &cw, _HuiClosedWindow_)
 			if (cw.win == this)
 				return sent;
+		_foreach_it_.update();
 	}
 
 	// reset
@@ -428,6 +439,14 @@ void HuiWindowAddControl(HuiWindow *win, const string &type, const string &title
 		win->AddRadioButton(title, x, y, width, height, id);
 	else if (type == "ToggleButton")
 		win->AddToggleButton(title, x, y, width, height, id);
+	else if (type == "Expander")
+		win->AddExpander(title, x, y, width, height, id);
+	else if (type == "Scroller")
+		win->AddScroller(title, x, y, width, height, id);
+	else if (type == "Paned")
+		win->AddPaned(title, x, y, width, height, id);
+	else if (type == "Separator")
+		win->AddSeparator(title, x, y, width, height, id);
 }
 
 void HuiWindow::FromResource(const string &id)
@@ -706,6 +725,19 @@ bool HuiWindow::IsExpanded(const string &_id, int row)
 	test_controls(_id, c)
 		return false;
 	return false;
+}
+
+void HuiWindow::DeleteControl(const string &_id)
+{
+	for(int i=control.num-1;i>=0;i--)
+		if (control[i]->id == _id)
+			delete(control[i]);
+}
+
+void HuiWindow::SetOptions(const string &_id, const string &options)
+{
+	test_controls(_id, c)
+		c->SetOptions(options);
 }
 
 

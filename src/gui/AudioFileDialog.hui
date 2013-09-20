@@ -1,9 +1,12 @@
 Dialog audio_file_dialog "Sound-Datei" 430 375
-	Grid ad_table_1 "" 1 6
+	Grid ad_table_1 "" 1 8
 		Group ad_t_data "Daten"
 			ListView data_list "key\\value" nobar height=160 noexpandy
 		Group ad_t_volume "Lautstärke"
-			.
+			Grid ? "" 3 1
+				Slider audio_volume_slider "" expandx
+				SpinButton audio_volume "\\0\\100\\0.1"
+				Text percent "%"
 		Expander ad_t_tags "Tags"
 			Grid ad_table_tags "" 1 2
 				ListView tags "Tag\\Wert" format=TT
@@ -24,4 +27,6 @@ Dialog audio_file_dialog "Sound-Datei" 430 375
 					Button audio_add_bar "Takt" image=hui:add
 					Button audio_add_bar_pause "Pause" image=hui:add
 					Button audio_delete_bar "" image=hui:delete
+		Text t_dummy_vertical "" expandy
+		Separator sep_vertical "" vertical
 		Button audio_close "Schließen" image=hui:close

@@ -1,5 +1,5 @@
 Dialog track_time_dialog "Rhythmus Spur" 380 516
-	Grid ? "" 1 7
+	Grid ? "" 1 10
 		Group ld_t_name "Name"
 			Edit name "" expandx
 		Group ld_t_volume "Lautstärke"
@@ -32,6 +32,7 @@ Dialog track_time_dialog "Rhythmus Spur" 380 516
 			Grid ? "" 2 1
 				Button synthesizer "" expandx
 				Button config_synth "" image=hui:edit
+		Button edit_midi_track "Midi editieren"
+		Text t_dummy_vertical "" expandy
+		Separator sep_vertical "" vertical
 		Button close "Schließen" image=hui:close
-
-

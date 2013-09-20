@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-174
+178
 // Data (ID,Text)
 about
 
@@ -36,6 +36,10 @@ audio_close
 audio_file_dialog
 
 audio_fx_list
+
+audio_volume
+
+audio_volume_slider
 
 bar_list
 
@@ -293,6 +297,8 @@ select_all
 
 select_nothing
 
+sep_vertical
+
 settings
 
 settings_dialog
@@ -308,6 +314,8 @@ sub_properties
 synthesizer
 
 t_dummy
+
+t_dummy_vertical
 
 tags
 !format=tT\\Tag\\Value

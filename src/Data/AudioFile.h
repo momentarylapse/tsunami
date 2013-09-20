@@ -63,6 +63,7 @@ public:
 	void AddTag(const string &key, const string &value);
 	void EditTag(int index, const string &key, const string &value);
 	void DeleteTag(int index);
+	void SetVolume(float volume);
 	Track *AddTrack(int type, int index = -1);
 	void DeleteTrack(int index);
 	Sample *AddSample(const string &name, BufferBox &buf);

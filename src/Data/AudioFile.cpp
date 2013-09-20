@@ -9,6 +9,7 @@
 #include "../Plugins/Effect.h"
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "../Action/AudioFile/Level/ActionAudioAddLevel.h"
+#include "../Action/AudioFile/Data/ActionAudioSetVolume.h"
 #include "../Action/AudioFile/Tag/ActionAudioAddTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioEditTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioDeleteTag.h"
@@ -84,6 +85,11 @@ void AudioFile::EditTag(int index, const string &key, const string &value)
 void AudioFile::DeleteTag(int index)
 {
 	Execute(new ActionAudioDeleteTag(index));
+}
+
+void AudioFile::SetVolume(float volume)
+{
+	Execute(new ActionAudioSetVolume(volume));
 }
 
 void AudioFile::NewEmpty(int _sample_rate)

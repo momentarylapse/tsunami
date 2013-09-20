@@ -26,6 +26,7 @@ public:
 
 	void OnOk();
 	void OnClose();
+	void OnVolume();
 	void OnTrackList();
 	void OnTagsSelect();
 	void OnTagsEdit();

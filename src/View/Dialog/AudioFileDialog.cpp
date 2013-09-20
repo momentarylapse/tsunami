@@ -23,7 +23,7 @@ AudioFileDialog::AudioFileDialog(HuiWindow *win, AudioFile *a):
 	win->SetBorderWidth(5);
 	win->EmbedDialog("audio_file_dialog", 0, 0);
 	win->SetDecimals(1);
-	//volume_slider = new Slider(win, "audio_volume_slider", "audio_volume", 0, 2, 100, &TrackDialog::OnVolume, 0, this);
+	volume_slider = new Slider(win, "audio_volume_slider", "audio_volume", 0, 1, 100, (void(HuiEventHandler::*)())&AudioFileDialog::OnVolume, audio->volume, this);
 	fx_list = new FxList(win, "audio_fx_list", "audio_add_effect", "audio_configure_effect", "audio_delete_effect");
 	bar_list = new BarList(win, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
 	fx_list->SetAudio(audio);
@@ -44,10 +44,12 @@ AudioFileDialog::~AudioFileDialog()
 	Unsubscribe(audio);
 	delete(fx_list);
 	delete(bar_list);
+	delete(volume_slider);
 }
 
 void AudioFileDialog::LoadData()
 {
+	volume_slider->Set(audio->volume);
 	Reset("tags");
 	foreach(Tag &t, audio->tag)
 		AddString("tags", t.key + "\\" + t.value);
@@ -130,6 +132,11 @@ void AudioFileDialog::OnDeleteTag()
 	int s = GetInt("tags");
 	if (s >= 0)
 		audio->DeleteTag(s);
+}
+
+void AudioFileDialog::OnVolume()
+{
+	audio->SetVolume(volume_slider->Get());
 }
 
 void AudioFileDialog::OnUpdate(Observable *o)

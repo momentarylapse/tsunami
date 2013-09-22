@@ -121,17 +121,14 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 
 	_HuiClosedWindow_.clear();
 
-	used_by_nix = false;
 	is_resizable = ((_mode & HuiWinModeResizable) > 0);
 	border_width = 5;
 	allowed = true;
 	allow_keys = true;
 	parent = _root;
-	terror_child = NULL;
+	main_input_control = NULL;
 	if (parent){
 		parent->allowed = _allow_root;
-		if (!parent->allowed)
-			parent->terror_child = this;
 		parent->sub_window.add(this);
 	}
 	menu = popup = NULL;
@@ -209,6 +206,7 @@ void HuiWindow::SetID(const string &_id)
 // align window relative to another window (like..."top right corner")
 void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 {
+#if 0
 	irect rp=win->GetOuterior();
 	irect ro=GetOuterior();
 	int x=ro.x1,y=ro.y1;
@@ -221,6 +219,7 @@ void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 	if ((mode & HuiBottom)>0)
 		y=rp.y2 - (ro.y2-ro.y1) -2;
 	SetPosition(x,y);
+#endif
 }
 
 void HuiWindow::SetBorderWidth(int width)
@@ -339,13 +338,8 @@ bool HuiWindow::_SendEvent_(HuiEvent *e)
 	//msg_write(e->message);
 	HuiCurWindow = this;
 	e->win = this;
-	if (e->id.num > 0){
-		e->mx = input.area_x;
-		e->my = input.area_y;
-	}else{
-		e->mx = input.x;
-		e->my = input.y;
-	}
+	e->mx = input.x;
+	e->my = input.y;
 	e->dx = input.dx;
 	e->dy = input.dy;
 	e->dz = input.dz;
@@ -763,8 +757,9 @@ void HuiFuncClose()
 }
 
 HuiNixWindow::HuiNixWindow(const string& title, int x, int y, int width, int height) :
-	HuiWindow(title, x, y, width, height, NULL, true, HuiWinModeResizable | HuiWinModeNix)
+	HuiWindow(title, x, y, width, height, NULL, true, HuiWinModeResizable)
 {
+	AddDrawingArea("", 0, 0, 0, 0, "nix-area");
 }
 
 void HuiNixWindow::__init_ext__(const string& title, int x, int y, int width, int height)

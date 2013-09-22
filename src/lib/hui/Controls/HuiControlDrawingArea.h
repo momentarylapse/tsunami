@@ -16,6 +16,8 @@ class HuiControlDrawingArea : public HuiControl
 public:
 	HuiControlDrawingArea(const string &text, const string &id);
 	virtual ~HuiControlDrawingArea();
+
+	bool grab_focus;
 };
 
 #endif /* HUICONTROLDRAWINGAREA_H_ */

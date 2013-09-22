@@ -89,78 +89,6 @@ void WinTrySendByKeyCode(HuiWindow *win, int key_code)
 		}
 }
 
-void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code)
-{
-	// convert hardware keycode into GDK keyvalue
-	GdkKeymapKey kmk;
-	kmk.keycode = event->hardware_keycode;
-	kmk.group = event->group;
-	kmk.level = 0;
-	int keyvalue = gdk_keymap_lookup_key(gdk_keymap_get_default(), &kmk);
-	// TODO GTK3
-	//int keyvalue = event->keyval;
-	//msg_write(keyvalue);
-
-	// convert GDK keyvalue into HUI key id
-	key = -1;
-	for (int i=0;i<HUI_NUM_KEYS;i++)
-		//if ((HuiKeyID[i] == keyvalue)||(HuiKeyID2[i] == keyvalue))
-		if (HuiKeyID[i] == keyvalue)
-			key = i;
-	key_code = key;
-	if (key < 0)
-		return;
-
-
-	// key code?
-	if ((event->state & GDK_CONTROL_MASK) > 0)
-		key_code += KEY_CONTROL;
-	if ((event->state & GDK_SHIFT_MASK) > 0)
-		key_code += KEY_SHIFT;
-	if (((event->state & GDK_MOD1_MASK) > 0) /*|| ((event->state & GDK_MOD2_MASK) > 0) || ((event->state & GDK_MOD5_MASK) > 0)*/)
-		key_code += KEY_ALT;
-}
-
-bool process_key(GdkEventKey *event, GtkWidget *KeyReciever, HuiWindow *win, bool down)
-{
-	//printf("%d   %d\n", nk++, event->time);
-	int key, key_code;
-	_get_hui_key_id_(event, key, key_code);
-	if (key < 0){
-		//msg_write(format("unknown key: %d", event->hardware_keycode));
-		return false;
-	}
-
-/*#ifdef OS_LINUX
-	char key_map_stat[32];
-	XQueryKeymap(hui_x_display, key_map_stat);
-	bool actual_state = ((key_map_stat[event->hardware_keycode >> 3] >> (event->hardware_keycode & 7)) & 1);
-#else
-	bool actual_state = down;
-#endif*/
-
-	if (win->allow_input)
-		win->input.key[key] = down;//actual_state;
-
-	//printf("%d\n", event->state & GDK_CONTROL_MASK);
-
-	win->input.key_code = key;
-
-	msg_db_m(format("%s:  %s", down ? "down" : "up", HuiGetKeyName(key).c_str()).c_str(), 1);
-	//if ((down) && (win->input.key[key])){
-	if (down){
-		add_key_to_buffer(&win->input, key);
-
-		win->input.key_code = key_code;
-		WinTrySendByKeyCode(win, key_code);
-	}
-
-	HuiEvent e = HuiEvent("", down ? "hui:key-down" : "hui:key-up");
-	win->_SendEvent_(&e);
-	
-	return true;
-}
-
 gboolean OnGtkWindowClose(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
 	HuiWindow *win = (HuiWindow *)user_data;
@@ -177,123 +105,6 @@ void OnGtkWindowResize(GtkWidget *widget, GtkRequisition *requisition, gpointer 
 	HuiEvent e = HuiEvent("", "hui:resize");
 	win->OnResize();
 	win->_SendEvent_(&e);
-}
-
-gboolean OnGtkWindowMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow*)user_data;
-
-	//msg_write(format("  %d  %d", (int)event->x, (int)event->y));
-
-	int mx, my, mod = 0;
-	if (win->gl_widget){
-		//msg_write("gl");
-#if GTK_MAJOR_VERSION >= 3
-		gdk_window_get_device_position(gtk_widget_get_window(win->gl_widget), event->device, &mx, &my, (GdkModifierType*)&mod);
-#else
-		gdk_window_get_pointer(win->gl_widget->window, &mx, &my, (GdkModifierType*)&mod);
-#endif
-		//mx = event->x;
-		//my = event->y;
-		/*win->mouse_offset_x = mx - event->x;
-		win->mouse_offset_y = my - event->y;*/
-		mod = event->state;
-		/*mx = event->x;
-		my = event->y;*/
-	}else{
-		// TODO GTK3
-		//gdk_window_get_pointer(win->window->window, &mx, &my, (GdkModifierType*)&mod);
-		irect ri = win->GetInterior();
-		mx -= ri.x1;
-		my -= ri.y1;
-	}
-	//msg_write(format("gtk  %.0f %.0f  ->  %d %d   (%d)", win->input.x, win->input.y, mx, my, gdk_event_get_time((GdkEvent*)event)));
-	
-	/*if (ignore_time != 0)
-		if (gdk_event_get_time((GdkEvent*)event) <= ignore_time){
-			//msg_error("ignore");
-			gdk_event_request_motions(event); // to prevent too many signals for slow message processing
-			return false;
-		}*/
-	win->input.dx = mx - win->input.x;
-	win->input.dy = my - win->input.y;
-	win->input.x = mx;
-	win->input.y = my;
-	win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
-	win->input.mb = ((mod & GDK_BUTTON2_MASK) > 0);
-	win->input.rb = ((mod & GDK_BUTTON3_MASK) > 0);
-	HuiEvent e = HuiEvent("", "hui:mouse-move");
-	win->_SendEvent_(&e);
-	win->OnMouseMove();
-
-	/*if (win){
-		// don't listen to "event", it lacks behind
-		int mod = 0, mx, my, x_max, y_max;
-		if (win->input_widget){
-			msg_write("iw");
-			gdk_window_get_pointer(win->input_widget->window, &mx, &my, (GdkModifierType*)&mod);
-			win->input.x = mx;
-			win->input.y = my;
-		}else{
-			msg_write("!iw");
-			// TODO
-			if ((win->Resizable) && (win->_cur_control_))
-				gdk_window_get_pointer(win->_cur_control_->widget->window, &mx, &my, (GdkModifierType*)&mod);
-			else
-				gdk_window_get_pointer(win->window->window, &mx, &my, (GdkModifierType*)&mod);
-			irect ri = win->GetInterior();
-			x_max = ri.x2 - ri.x1;
-			y_max = ri.y2 - ri.y1;
-			win->input.x = mx - ri.x1;
-			win->input.y = my - ri.y1;
-			//msg_write(string2("%d  %d  %f - %d %d %f", ri.x1, mx, win->input.x, ri.y1, my, win->input.y));
-		}
-
-		// only allow setting when cursor is in the interior
-		if ((win->input.x < 0) || (win->input.x >= x_max) || (win->input.y < 0) || (win->input.y >= y_max)){
-			// outside -> only reset allowed
-			win->input.lb &= ((mod & GDK_BUTTON1_MASK) > 0);
-			win->input.mb &= ((mod & GDK_BUTTON2_MASK) > 0);
-			win->input.rb &= ((mod & GDK_BUTTON3_MASK) > 0);
-		}else{
-			win->input.lb = ((mod & GDK_BUTTON1_MASK) > 0);
-			win->input.mb = ((mod & GDK_BUTTON2_MASK) > 0);
-			win->input.rb = ((mod & GDK_BUTTON3_MASK) > 0);
-		}
-		HuiEvent e = HuiCreateEvent("", "hui:mouse-move");
-		win->_SendEvent_(&e);
-	}*/
-	gdk_event_request_motions(event); // too prevent too many signals for slow message processing
-	return false;
-}
-
-gboolean OnGtkWindowMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow*)user_data;
-	if (event->direction == GDK_SCROLL_UP)
-		win->input.dz = 1;
-	else if (event->direction == GDK_SCROLL_DOWN)
-		win->input.dz = -1;
-	HuiEvent e = HuiEvent("", "hui:mouse-wheel");
-	win->_SendEvent_(&e);
-	win->OnMouseWheel();
-	return false;
-}
-
-gboolean OnGtkWindowKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow*)user_data;
-	process_key(event, widget, win, true);
-	win->OnKeyDown();
-	return false;
-}
-
-gboolean OnGtkWindowKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow*)user_data;
-	process_key(event, widget, win, false);
-	win->OnKeyUp();
-	return false;
 }
 
 gboolean OnGtkWindowExpose(GtkWidget *widget, cairo_t *cr, gpointer user_data)
@@ -319,81 +130,6 @@ gboolean OnGtkWindowVisibilityNotify(GtkWidget *widget, GdkEventVisibility *even
 	HuiWindow *win = (HuiWindow*)user_data;
 	HuiEvent e = HuiEvent("", "hui:redraw");
 	win->_SendEvent_(&e);
-	return false;
-}
-
-bool set_button_state(GtkWidget *widget, GdkEventButton *event)
-{
-	HuiWindow *win = win_from_widget(widget);
-	if (win){
-		if (event->type == GDK_BUTTON_PRESS){
-			irect r = win->GetInterior();
-			if ((win->input.x < 0) || (win->input.x >= r.x2 - r.x1) || (win->input.y < 0) || (win->input.y >= r.y2 - r.y1))
-				return false;
-		}
-		// don't listen to "event", it lacks behind
-		if (event->button == 1)
-			win->input.lb = (event->type == GDK_BUTTON_PRESS);
-		else if (event->button == 2)
-			win->input.mb = (event->type == GDK_BUTTON_PRESS);
-		else if (event->button == 3)
-			win->input.rb = (event->type == GDK_BUTTON_PRESS);
-	}
-	return true;
-}
-
-gboolean OnGtkWindowButtonDown(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
-{
-#ifdef OS_WINDOWS
-	// without this... nothing happens.... code optimization???
-	//msg_write("");
-#endif
-	HuiWindow *win = (HuiWindow*)user_data;
-	if (set_button_state(widget, event)){
-		HuiEvent e;
-		if (event->type == GDK_2BUTTON_PRESS){
-			if (event->button == 1){
-				e = HuiEvent("", "hui:left-double-click");
-				win->OnDoubleClick();
-			}else if (event->button == 2){
-				e = HuiEvent("", "hui:middle-double-click");
-			}else if (event->button == 3){
-				e = HuiEvent("", "hui:right-double-click");
-			}
-		}else{
-			if (event->button == 1){
-				e = HuiEvent("", "hui:left-button-down");
-				win->OnLeftButtonDown();
-			}else if (event->button == 2){
-				e = HuiEvent("", "hui:middle-button-down");
-				win->OnMiddleButtonDown();
-			}else if (event->button == 3){
-				e = HuiEvent("", "hui:right-button-down");
-				win->OnRightButtonDown();
-			}
-		}
-		win->_SendEvent_(&e);
-	}
-	return false;
-}
-
-gboolean OnGtkWindowButtonUp(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow*)user_data;
-	if (set_button_state(widget, event)){
-		HuiEvent e;
-		if (event->button == 1){
-			e = HuiEvent("", "hui:left-button-up");
-			win->OnLeftButtonUp();
-		}else if (event->button == 2){
-			e = HuiEvent("", "hui:middle-button-up");
-			win->OnMiddleButtonUp();
-		}else if (event->button == 3){
-			e = HuiEvent("", "hui:right-button-up");
-			win->OnRightButtonUp();
-		}
-		win->_SendEvent_(&e);
-	}
 	return false;
 }
 
@@ -432,7 +168,6 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 	_InitGeneric_(root, allow_root, mode);
 	
 	bool ControlMode = ((mode & HuiWinModeControls) > 0);
-	bool NixMode = ((mode & HuiWinModeNix) > 0);
 
 	// creation
 	if (parent){
@@ -484,8 +219,6 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 
 	// catch signals
 	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(&OnGtkWindowClose), this);
-	if (NixMode)
-		AllowEvents("key,mouse,scroll,draw");
 
 	// fill in some stuff
 	gtk_container_set_border_width(GTK_CONTAINER(window), 0);
@@ -517,36 +250,8 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HuiToolbarLeft]->widget, FALSE, FALSE, 0);
 
 	plugable = NULL;
-	gl_widget = NULL;
 	cur_control = NULL;
-	if (NixMode){
-		// "drawable" (for opengl)
-		gl_widget = gtk_drawing_area_new();
-		gtk_widget_set_double_buffered(gl_widget, false);
-		g_signal_connect(G_OBJECT(gl_widget), "draw", G_CALLBACK(&expose_event_gl), this);
-		gtk_box_pack_start(GTK_BOX(hbox), gl_widget, TRUE, TRUE, 0);
-		gtk_widget_show(gl_widget);
-
-		// show/realize to be done by the nix library!
-		/*gtk_widget_show(gl_widget);
-		gtk_widget_realize(gl_widget);
-		GdkRectangle r;
-		r.x = 0;
-		r.y = 0;
-		r.width = width;
-		r.height = height;
-		gdk_window_invalidate_region(gl_widget->window, gdk_region_rectangle(&r), false);
-		gdk_window_process_all_updates();*/
-
-		// prevent the toolbar from using keys...
-#ifndef OS_WINDOWS
-		gtk_widget_set_can_focus(gl_widget, true);
-#endif
-		gtk_widget_grab_focus(gl_widget);
-		GtkWidget *ww = gtk_button_new_with_label("test");
-		gtk_widget_show(ww);
-		gtk_box_pack_start(GTK_BOX(hbox), ww, TRUE, TRUE, 0);
-	}else if (ControlMode){
+	if (ControlMode){
 		if (is_resizable){
 			// free to use...
 			//cur_control = hbox;
@@ -569,19 +274,6 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 	// status bar
 	statusbar = gtk_statusbar_new();
 	gtk_box_pack_start(GTK_BOX(vbox), statusbar, FALSE, FALSE, 0);
-
-	input_widget = NULL;
-	gtk_num_menus = 0;
-	//###########################################################################################
-	// never dare to ask, why there has to be a hidden edit box!
-	/*if (bg_mode==HuiBGModeBlack){
-		GtkWidget *edit=gtk_entry_new();
-		gtk_widget_set_size_request(edit,1,1);
-		gtk_fixed_put(GTK_FIXED(fixed),edit,0,0);
-		gtk_widget_show(edit);
-	}*/
-	//###########################################################################################
-
 	
 #ifdef OS_WINDOWS
 	hWnd = NULL;
@@ -705,24 +397,8 @@ void HuiWindow::AllowEvents(const string &msg)
 		g_signal_connect(G_OBJECT(window), "visibility-notify-event", G_CALLBACK(&OnGtkWindowVisibilityNotify), this);
 		mask |= GDK_VISIBILITY_NOTIFY_MASK;
 	}
-	if (msg.find("scroll") >= 0){
-		g_signal_connect(G_OBJECT(window), "scroll-event", G_CALLBACK(&OnGtkWindowMouseWheel), this);
-		mask |= GDK_SCROLL_MASK;
-	}
-	if (msg.find("key") >= 0){
-		g_signal_connect(G_OBJECT(window), "key-press-event", G_CALLBACK(&OnGtkWindowKeyDown), this);
-		g_signal_connect(G_OBJECT(window), "key-release-event", G_CALLBACK(&OnGtkWindowKeyUp), this);
-		g_signal_connect(G_OBJECT(window), "focus-in-event", G_CALLBACK(&focus_in_event), this);
-		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
-	}
 	if (msg.find("size") >= 0){
 		g_signal_connect(G_OBJECT(window), "size-request", G_CALLBACK(&OnGtkWindowResize), this);
-	}
-	if (msg.find("mouse") >= 0){
-		g_signal_connect(G_OBJECT(window), "motion-notify-event", G_CALLBACK(&OnGtkWindowMouseMove), this);
-		g_signal_connect(G_OBJECT(window), "button-press-event", G_CALLBACK(&OnGtkWindowButtonDown), this);
-		g_signal_connect(G_OBJECT(window), "button-release-event", G_CALLBACK(&OnGtkWindowButtonUp), this);
-		mask |= GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK; // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
 	}
 
 	g_object_set(G_OBJECT(window), "events", mask, NULL);
@@ -735,12 +411,11 @@ void HuiWindow::SetMenu(HuiMenu *_menu)
 	if (menu){
 		Array<HuiControl*> list = menu->get_all_controls();
 		// move items from <menu_bar> back to <Menu>
-		for (int i=0;i<gtk_num_menus;i++){
+		for (int i=0;i<gtk_menu.num;i++){
 			gtk_container_remove(GTK_CONTAINER(menubar), GTK_WIDGET(gtk_menu[i]));
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu->widget), GTK_WIDGET(gtk_menu[i]));
 		}
 		gtk_menu.clear();
-		gtk_num_menus = 0;
 		/*menu->set_win(NULL);
 		foreach(HuiControl *c, list){
 			for (int i=0;i<control.num;i++)
@@ -797,58 +472,37 @@ void HuiWindow::SetSize(int width, int height)
 		gtk_window_resize(GTK_WINDOW(window), width, height);
 }
 
-// set the current window position and size (including the frame and menu/toolbars...)
-//    if maximized this will un-maximize the window!
-void HuiWindow::SetOuterior(irect rect)
-{
-	gtk_window_unmaximize(GTK_WINDOW(window));
-	gtk_window_move(GTK_WINDOW(window),rect.x1,rect.y1);
-	gtk_window_resize(GTK_WINDOW(window),rect.x2-rect.x1,rect.y2-rect.y1);
-}
-
 // get the current window position and size (including the frame and menu/toolbars...)
-irect HuiWindow::GetOuterior()
+void HuiWindow::GetSize(int &width, int &height)
 {
-	irect r;
-	gtk_window_get_position(GTK_WINDOW(window),&r.x1,&r.y1);
-	gtk_window_get_size(GTK_WINDOW(window),&r.x2,&r.y2);
-	r.x2+=r.x1;
-	r.y2+=r.y1;
-	return r;
+	gtk_window_get_size(GTK_WINDOW(window), &width, &height);
 }
 
 // set the window position and size it had wouldn't it be maximized (including the frame and menu/toolbars...)
 //    if not maximized this behaves like <SetOuterior>
-void HuiWindow::SetOuteriorDesired(irect rect)
+void HuiWindow::SetSizeDesired(int width, int height)
 {
 	// bad hack
 	bool maximized = (gdk_window_get_state(gtk_widget_get_window(window)) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
 	if (maximized)
 		gtk_window_unmaximize(GTK_WINDOW(window));
-	gtk_window_move(GTK_WINDOW(window),rect.x1,rect.y1);
-	gtk_window_resize(GTK_WINDOW(window),rect.x2-rect.x1,rect.y2-rect.y1);
+	gtk_window_resize(GTK_WINDOW(window), width, height);
 	if (maximized)
 		gtk_window_maximize(GTK_WINDOW(window));
 }
 
 // get the window position and size it had wouldn't it be maximized (including the frame and menu/toolbars...)
 //    if not maximized this behaves like <GetOuterior>
-irect HuiWindow::GetOuteriorDesired()
+void HuiWindow::GetSizeDesired(int &width, int &height)
 {
-	irect r;
 	// bad hack
 	bool maximized = (gdk_window_get_state(gtk_widget_get_window(window)) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
 	if (maximized){
 		// very nasty hack   m(-_-)m
-		r .x1 = 50;
-		r .y1 = 50;
-		r .x2 = r.x1 + 800;
-		r .y2 = r.y1 + 600;
+		width = 800;
+		height = 600;
 	}else{
-		gtk_window_get_position(GTK_WINDOW(window),&r.x1,&r.y1);
-		gtk_window_get_size(GTK_WINDOW(window),&r.x2,&r.y2);
-		r.x2+=r.x1;
-		r.y2+=r.y1;
+		gtk_window_get_size(GTK_WINDOW(window), &width, &height);
 	}
 	/*if (maximized){
 		gtk_window_unmaximize(GTK_WINDOW(window));
@@ -864,57 +518,6 @@ irect HuiWindow::GetOuteriorDesired()
 		for (int i=0;i<20;i++)
 			HuiDoSingleMainLoop();
 	}*/
-	return r;
-}
-
-// get the "usable" part of the window: controllers/graphics area
-//   relative to the outer part!!
-irect HuiWindow::GetInterior()
-{
-	irect r;
-	r.x1 = 0;
-	r.y1 = 0;
-	/*int ww, hh;
-	GdkWindow *www = gtk_widget_get_window(toolbar[HuiToolbarTop].widget);
-	//gtk_widget_get_size_request(toolbar[HuiToolbarTop].widget, &ww, &hh);
-	gdk_window_get_size(www, &ww, &hh);
-	msg_write(ww);
-	msg_write(hh);*/
-	gtk_window_get_size(GTK_WINDOW(window), &r.x2, &r.y2);
-	//msg_write(string2("getinter %d %d   %p %p", r.x2, r.y2, gl_widget, fixed));
-	GtkWidget *interior = (plugable == NULL) ? gl_widget : plugable;
-	if (interior){
-		int w, h, x = 0, y = 0;
-		gdk_window_get_position(gtk_widget_get_window(window), &x, &y);
-		if (gl_widget){
-			// TODO GTK3
-			//gdk_drawable_get_size(gtk_widget_get_window(window), &w, &h);
-			w = gdk_window_get_width(gtk_widget_get_window(gl_widget));
-			h = gdk_window_get_height(gtk_widget_get_window(gl_widget));
-			//msg_write(format("gl %d %d (getint)", w, h));
-		}else{
-			// TODO GTK3
-			//gdk_window_get_size(gtk_widget_get_window(interior), &w, &h);
-			w = gdk_window_get_width(gtk_widget_get_window(window));
-			h = gdk_window_get_height(gtk_widget_get_window(window));
-		}
-		//msg_write(string2("getinter2 %d %d %d %d", x, y, w, h));
-		if ((w <= 0) || (h <= 0) || (w > r.x2) || (h > r.y2))
-			return r;
-		r.x1 = x;
-		r.y1 = y;
-		if (plugable){
-			gtk_window_get_position(GTK_WINDOW(window), &x, &y);
-			r.x1 -= x;
-			r.y1 -= y;
-			// FIXME
-			r.x1 = 0;
-			r.y1 = 0;
-		}
-		r.x2 = r.x1 + w;
-		r.y2 = r.y1 + h;
-	}
-	return r;
 }
 
 void HuiWindow::ShowCursor(bool show)
@@ -980,15 +583,21 @@ void put_events()
 		gdk_event_put(e);
 }
 
+extern int GtkAreaMouseSet;
+extern int GtkAreaMouseSetX, GtkAreaMouseSetY;
+
 // relative to Interior
 void HuiWindow::SetCursorPos(int x, int y)
 {
-	if (gl_widget){
+	if (main_input_control){
+		GtkAreaMouseSet = 0;
+		GtkAreaMouseSetX = x;
+		GtkAreaMouseSetY = y;
 		input.x = x;
 		input.y = y;
 		// TODO GTK3
 #ifdef OS_LINUX
-		XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(gl_widget)), 0, 0, 0, 0, x, y);
+		XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(main_input_control->widget)), 0, 0, 0, 0, x, y);
 #endif
 	}
 #if 0
@@ -1099,19 +708,15 @@ void HuiWindow::Activate(const string &control_id)
 				control[i]->Focus();
 }
 
-bool HuiWindow::IsActive(bool include_sub_windows)
+bool HuiWindow::IsActive(const string &control_id)
 {
-	bool ia=false;
-	/*ghjghjghj
-	// TODO!!!
-	gtk_widget_grab_focus(window);
-	gtk_window_present(GTK_WINDOW(window));*/
-	if ((!ia)&&(include_sub_windows)){
-		for (int i=0;i<sub_window.num;i++)
-			if (sub_window[i]->IsActive(true))
-				return true;
+	if (control_id.num > 0){
+		for (int i=0;i<control.num;i++)
+			if (control_id == control[i]->id)
+				return control[i]->HasFocus();
+		return false;
 	}
-	return ia;
+	return gtk_widget_has_focus(window);
 }
 
 

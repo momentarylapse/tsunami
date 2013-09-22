@@ -33,7 +33,6 @@ struct HuiInputData
 {
 	// mouse
 	float x, y, dx, dy, dz;	// position, change
-	float area_x, area_y;
 	float mw;					// drection
 	bool lb,mb,rb;				// buttons
 	int row, column;
@@ -44,15 +43,6 @@ struct HuiInputData
 	int KeyBuffer[HUI_MAX_KEYBUFFER_DEPTH];
 	void reset()
 	{	memset(this, 0, sizeof(HuiInputData));	}
-};
-
-struct irect
-{
-public:
-	int x1,y1,x2,y2;
-	irect(){};
-	irect(int x1,int x2,int y1,int y2)
-	{	this->x1=x1;	this->x2=x2;	this->y1=y1;	this->y2=y2;	}
 };
 
 class HuiToolbar;
@@ -99,13 +89,11 @@ public:
 	void _cdecl SetPosition(int x, int y);
 	void _cdecl SetPositionSpecial(HuiWindow *win, int mode);
 	void _cdecl SetSize(int width, int height);
-	void _cdecl SetOuterior(irect rect);
-	irect _cdecl GetOuterior();
-	void _cdecl SetOuteriorDesired(irect rect);
-	irect _cdecl GetOuteriorDesired();
-	irect _cdecl GetInterior();
-	void _cdecl Activate(const string &control_id = "");
-	bool _cdecl IsActive(bool include_sub_windows=false);
+	void _cdecl GetSize(int &width, int &height);
+	void _cdecl SetSizeDesired(int width, int height);
+	void _cdecl GetSizeDesired(int &width, int &height);
+	void _cdecl Activate(const string &control_id);
+	bool _cdecl IsActive(const string &control_id);
 	void _cdecl SetMenu(HuiMenu *menu);
 	HuiMenu* _cdecl GetMenu();
 	void _cdecl SetBorderWidth(int width);
@@ -272,35 +260,32 @@ private:
 #ifdef HUI_API_GTK
 public:
 	GtkWidget *window;
-	GtkWidget *gl_widget;
 	GtkWidget *plugable;
 private:
-	GtkWidget *vbox, *hbox, *menubar, *statusbar, *__ttt__, *input_widget;
+	GtkWidget *vbox, *hbox, *menubar, *statusbar, *__ttt__;
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
 	void _InsertControl_(HuiControl *c, int x, int y, int width, int height);
 #endif
 	
 	int num_float_decimals;
-	bool used_by_nix;
 	bool is_resizable;
 	int border_width;
 	Array<HuiControl*> control;
 	HuiControl *cur_control;
 	HuiControl *root_control;
+	HuiControl *main_input_control;
 	Array<HuiEventListener> event;
 	HuiMenu *menu, *popup;
 	bool statusbar_enabled;
 	bool allowed, allow_keys;
-	HuiWindow *parent, *terror_child;
+	HuiWindow *parent;
 	Array<HuiWindow*> sub_window;
 
 	int unique_id;
 	string id;
 	int main_level;
 	string cur_id;
-
-	//HuiCompleteWindowMessage CompleteWindowMessage;
 };
 
 
@@ -339,7 +324,6 @@ enum{
 	HuiWinModeNoTitle = 4,
 	HuiWinModeControls = 8,
 	HuiWinModeDummy = 16,
-	HuiWinModeNix = 32,
 };
 
 #define HuiLeft		1

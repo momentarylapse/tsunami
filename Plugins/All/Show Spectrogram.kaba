@@ -60,7 +60,8 @@ void show_spec()
 	dlg.Event("hui:close", &OnClose)
 	dlg.Event("close", &OnClose)
 	
-	BufferBox buf = renderer.RenderAudioFile(audio, audio.selection)
+	BufferBox buf
+	renderer.RenderAudioFile(audio, audio.selection, buf)
 	
 	complex f[]
 	float sub[]

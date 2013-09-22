@@ -373,7 +373,8 @@ void HuiWindow::AddImage(const string &title,int x,int y,int width,int height,co
 void HuiWindow::AddDrawingArea(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_InsertControl_(new HuiControlDrawingArea(title, id), x, y, width, height);
-	input_widget = control.back()->widget;
+	if (!main_input_control)
+		main_input_control = control.back();
 }
 
 

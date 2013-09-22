@@ -86,11 +86,13 @@ public:
 	virtual bool IsChecked(){ return false; }
 	virtual void SetTooltip(const string &str);
 	virtual void Focus();
+	virtual bool HasFocus();
 	virtual void CompletionAdd(const string &text){}
 	virtual void CompletionClear(){}
 
 	virtual void add(HuiControl *child, int x, int y){}
 	void SetOptions(const string &options);
+	void GetSize(int &w, int &h);
 
 	void Notify(const string &message = "", bool is_default = true);
 };

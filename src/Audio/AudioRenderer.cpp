@@ -216,15 +216,13 @@ int AudioRenderer::read(BufferBox &buf)
 	return size;
 }
 
-BufferBox AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range)
+void AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range, BufferBox &buf)
 {
-	BufferBox buf;
 	Prepare(a, range, false);
 	buf.resize(range.num);
 	read(buf);
 	//buf = RenderAudioFilePart(a, range);
 	CleanUp();
-	return buf;
 }
 
 void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)

@@ -88,10 +88,6 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	MousePossiblySelecting = -1;
 	cur_action = NULL;
 
-	tsunami->SetBorderWidth(0);
-	parent->SetTarget("main_table", 0);
-	parent->AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
-
 	cur_track = NULL;
 	cur_sample = NULL;
 	cur_level = 0;
@@ -117,6 +113,8 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	parent->EventMX("area", "hui:key-down", this, &AudioView::OnKeyDown);
 	parent->EventMX("area", "hui:key-up", this, &AudioView::OnKeyUp);
 	parent->EventMX("area", "hui:mouse-wheel", this, &AudioView::OnMouseWheel);
+
+	parent->Activate("area");
 
 	//ForceRedraw();
 	UpdateMenu();

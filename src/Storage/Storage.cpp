@@ -184,7 +184,8 @@ bool Storage::Export(AudioFile *a, const string &filename)
 			Range r = a->GetRange();
 			if (!a->selection.empty())
 				r = a->selection;
-			BufferBox buf = tsunami->renderer->RenderAudioFile(a, r);
+			BufferBox buf;
+			tsunami->renderer->RenderAudioFile(a, r, buf);
 
 			// save
 			f->SaveBuffer(a, &buf, filename);

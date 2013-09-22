@@ -24,7 +24,7 @@ public:
 	AudioRenderer();
 	virtual ~AudioRenderer();
 
-	BufferBox RenderAudioFile(AudioFile *a, const Range &range);
+	void RenderAudioFile(AudioFile *a, const Range &range, BufferBox &buf);
 	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
 	virtual int read(BufferBox &buf);
 	void Prepare(AudioFile *a, const Range &range, bool alllow_loop);

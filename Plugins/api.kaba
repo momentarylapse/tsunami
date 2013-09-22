@@ -163,7 +163,7 @@ class AudioFile
 
 
 class AudioRenderer
-	BufferBox RenderAudioFile(AudioFile *a, Range r)
+	extern void RenderAudioFile(AudioFile *a, Range r, BufferBox buf)
 	extern void Prepare(AudioFile *a, Range r, bool allow_loop)
 	//extern virtual int read(BufferBox b)
 	extern void CleanUp()

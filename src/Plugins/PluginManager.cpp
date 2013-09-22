@@ -40,9 +40,6 @@ PluginManager::~PluginManager()
 }
 
 
-BufferBox AudioFileRender(AudioFile *a, const Range &r)
-{	return tsunami->renderer->RenderAudioFile(a, r);	}
-
 void GlobalPutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
 {	tsunami->plugin_manager->PutFavoriteBarFixed(win, x, y, w);	}
 
@@ -112,7 +109,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("SliderSet", (void*)&GlobalSliderSet);
 	Script::LinkExternal("SliderGet", (void*)&GlobalSliderGet);
 	Script::LinkExternal("RemoveSliders", (void*)&GlobalRemoveSliders);
-	Script::LinkExternal("AudioFileRender",	 (void*)&AudioFileRender);
 	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 
 	Script::DeclareClassSize("Range", sizeof(Range));

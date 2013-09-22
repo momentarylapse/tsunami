@@ -118,6 +118,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddControlTable("!noexpandy", 0, 1, 7, 1, "output_table");
 	SetBorderWidth(0);
 	SetTarget("main_table", 0);
+	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
 	AddControlTable("!noexpandx", 1, 0, 1, 1, "track_dialog_table");
 	HideControl("track_dialog_table", true);
 	AddControlTable("!noexpandx,width=220", 2, 0, 1, 1, "audio_dialog_table");
@@ -185,11 +186,10 @@ Tsunami::~Tsunami()
 	Unsubscribe(output);
 	Unsubscribe(clipboard);
 
-	irect r = GetOuteriorDesired();
-	HuiConfigWriteInt("Window.Width", r.x2 - r.x1);
-	HuiConfigWriteInt("Window.Height", r.y2 - r.y1);
-	HuiConfigWriteInt("Window.X", r.x1);
-	HuiConfigWriteInt("Window.Y", r.y1);
+	int w, h;
+	GetSizeDesired(w, h);
+	HuiConfigWriteInt("Window.Width", w);
+	HuiConfigWriteInt("Window.Height", h);
 	HuiConfigWriteBool("Window.Maximized", IsMaximized());
 
 	delete(sample_manager);

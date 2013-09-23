@@ -33,6 +33,7 @@ public:
 	void OnPanning();
 	void OnSynthesizer();
 	void OnConfigSynthesizer();
+	void OnEditMidiTrack();
 
 	void SetTrack(Track *t);
 

@@ -13,6 +13,7 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "SynthesizerDialog.h"
 #include "../../Tsunami.h"
+#include "../AudioView.h"
 
 TrackDialog::TrackDialog(HuiWindow *win):
 	EmbeddedDialog(win)
@@ -34,6 +35,7 @@ TrackDialog::TrackDialog(HuiWindow *win):
 	win->EventM("mute", this, &TrackDialog::OnMute);
 	win->EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
 	win->EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
+	win->EventM("edit_midi_track", this, &TrackDialog::OnEditMidiTrack);
 	win->EventM("close", this, &TrackDialog::OnClose);
 }
 
@@ -105,6 +107,11 @@ void TrackDialog::OnSynthesizer()
 void TrackDialog::OnConfigSynthesizer()
 {
 	track->synth->OnConfigure();
+}
+
+void TrackDialog::OnEditMidiTrack()
+{
+	tsunami->view->SetEditModeMidi(track);
 }
 
 void TrackDialog::OnClose()

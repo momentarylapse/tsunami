@@ -41,6 +41,10 @@ public:
 
 	void OnUpdate(Observable *o);
 
+	void OnCloseEditMidiMode();
+	void OnMidiPitch();
+	void OnMidiBeatPartition();
+
 	void SetShowMono(bool mono);
 	void SetGridMode(int mode);
 	void SetPeaksMode(int mode);
@@ -98,7 +102,8 @@ public:
 		SEL_TYPE_TRACK,
 		SEL_TYPE_MUTE,
 		SEL_TYPE_SOLO,
-		SEL_TYPE_SAMPLE
+		SEL_TYPE_SAMPLE,
+		SEL_TYPE_MIDI
 	};
 
 	struct SelectionType
@@ -110,14 +115,15 @@ public:
 		int sample_offset;
 		Array<int> barrier;
 		Track *show_track_controls;
+		int pitch;
 
 		SelectionType();
 	};
 
-	SelectionType Hover, Selection;
+	SelectionType hover, selection;
 	ActionTrackMoveSample *cur_action;
 
-	int MousePossiblySelecting, MousePossiblySelectingStart;
+	int mouse_possibly_selecting, mouse_possibly_selecting_start;
 	const int BarrierDist;
 	float ScrollSpeed;
 	float ScrollSpeedFast;
@@ -164,14 +170,24 @@ public:
 		GRID_MODE_TIME,
 		GRID_MODE_BARS
 	};
-	int DetailSteps;
-	int MouseMinMoveToSelect;
-	int PreviewSleepTime;
-	bool Antialiasing;
+	int detail_steps;
+	int mouse_min_move_to_select;
+	int preview_sleep_time;
+	bool antialiasing;
 
-	int PeakMode;
+	int peak_mode;
 
-	int DrawingWidth;
+	int drawing_width;
+
+	int edit_mode;
+	enum{
+		EDIT_MODE_DEFAULT,
+		EDIT_MODE_MIDI
+	};
+	int min_pitch;
+	Track *midi_edit_track;
+	void SetEditModeDefault();
+	void SetEditModeMidi(Track *t);
 
 	AudioFile *audio;
 

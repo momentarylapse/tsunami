@@ -67,7 +67,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 			a->action_manager->Enable(true);
 			tsunami->progress->Set("peaks", 1);
-			a->UpdatePeaks(tsunami->view->PeakMode);
+			a->UpdatePeaks(tsunami->view->peak_mode);
 
 			tsunami->progress->End();
 			if (a->track.num > 0)

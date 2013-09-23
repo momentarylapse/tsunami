@@ -288,7 +288,7 @@ void AudioFile::UpdatePeaks(int mode)
 
 void AudioFile::PostActionUpdate()
 {
-	UpdatePeaks(tsunami->view->PeakMode);
+	UpdatePeaks(tsunami->view->peak_mode);
 }
 
 int AudioFile::GetNumSelectedSubs()

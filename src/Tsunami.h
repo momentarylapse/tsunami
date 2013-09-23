@@ -61,7 +61,6 @@ public:
 	void OnAddTimeTrack();
 	void OnAddMidiTrack();
 	void OnDeleteTrack();
-	void OnEditMidiTrack();
 	void OnSubFromSelection();
 	void OnInsertAdded();
 	void OnRemoveAdded();

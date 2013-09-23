@@ -65,18 +65,18 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	ColorSubMO = color(1, 0.6f, 0, 0);
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
-	DrawingWidth = 800;
+	drawing_width = 800;
 
 	show_mono = HuiConfigReadBool("View.Mono", false);
 	grid_mode = HuiConfigReadInt("View.GridMode", GRID_MODE_TIME);
-	DetailSteps = HuiConfigReadInt("View.DetailSteps", 1);
-	MouseMinMoveToSelect = HuiConfigReadInt("View.MouseMinMoveToSelect", 5);
-	PreviewSleepTime = HuiConfigReadInt("PreviewSleepTime", 10);
+	detail_steps = HuiConfigReadInt("View.DetailSteps", 1);
+	mouse_min_move_to_select = HuiConfigReadInt("View.MouseMinMoveToSelect", 5);
+	preview_sleep_time = HuiConfigReadInt("PreviewSleepTime", 10);
 	ScrollSpeed = HuiConfigReadInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = HuiConfigReadInt("View.ScrollSpeedFast", 3000);
 	ZoomSpeed = HuiConfigReadFloat("View.ZoomSpeed", 0.1f);
-	PeakMode = HuiConfigReadInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
-	Antialiasing = HuiConfigReadBool("View.Antialiasing", false);
+	peak_mode = HuiConfigReadInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
+	antialiasing = HuiConfigReadBool("View.Antialiasing", false);
 
 	image_unmuted.Load(HuiAppDirectoryStatic + "Data/volume.tga");
 	image_muted.Load(HuiAppDirectoryStatic + "Data/mute.tga");
@@ -85,7 +85,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	image_track_time.Load(HuiAppDirectoryStatic + "Data/track-time.tga");
 	image_track_midi.Load(HuiAppDirectoryStatic + "Data/track-midi.tga");
 
-	MousePossiblySelecting = -1;
+	mouse_possibly_selecting = -1;
 	cur_action = NULL;
 
 	cur_track = NULL;
@@ -93,6 +93,10 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	cur_level = 0;
 
 	audio = _audio;
+
+	edit_mode = EDIT_MODE_DEFAULT;
+	midi_edit_track = NULL;
+	min_pitch = 60;
 
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
@@ -113,6 +117,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	parent->EventMX("area", "hui:key-down", this, &AudioView::OnKeyDown);
 	parent->EventMX("area", "hui:key-up", this, &AudioView::OnKeyUp);
 	parent->EventMX("area", "hui:mouse-wheel", this, &AudioView::OnMouseWheel);
+	parent->EventM("close_edit_midi_mode", this, &AudioView::OnCloseEditMidiMode);
 
 	parent->Activate("area");
 
@@ -131,12 +136,12 @@ AudioView::~AudioView()
 
 	HuiConfigWriteBool("View.Mono", show_mono);
 	HuiConfigWriteInt("View.GridMode", grid_mode);
-	HuiConfigWriteInt("View.DetailSteps", DetailSteps);
-	HuiConfigWriteInt("View.MouseMinMoveToSelect", MouseMinMoveToSelect);
+	HuiConfigWriteInt("View.DetailSteps", detail_steps);
+	HuiConfigWriteInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
 	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
 	HuiConfigWriteInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	HuiConfigWriteFloat("View.ZoomSpeed", ZoomSpeed);
-	HuiConfigWriteBool("View.Antialiasing", Antialiasing);
+	HuiConfigWriteBool("View.Antialiasing", antialiasing);
 }
 
 
@@ -247,23 +252,23 @@ AudioView::SelectionType AudioView::GetMouseOver()
 void AudioView::SelectUnderMouse()
 {
 	msg_db_f("SelectUnderMouse", 2);
-	Hover = GetMouseOver();
-	Selection = Hover;
-	Track *t = Selection.track;
-	SampleRef *s = Selection.sample;
+	hover = GetMouseOver();
+	selection = hover;
+	Track *t = selection.track;
+	SampleRef *s = selection.sample;
 	bool control = tsunami->GetKey(KEY_CONTROL);
 
 	// track
-	if (Selection.track)
-		SetCurTrack(Selection.track);
-	if (Selection.type == SEL_TYPE_TRACK){
+	if (selection.track)
+		SetCurTrack(selection.track);
+	if (selection.type == SEL_TYPE_TRACK){
 		SelectTrack(t, control);
 		if (!control)
 			audio->UnselectAllSubs();
 	}
 
 	// sub
-	if (Selection.type == SEL_TYPE_SAMPLE){
+	if (selection.type == SEL_TYPE_SAMPLE){
 		SelectSample(s, control);
 		if (s->is_selected)
 			SetCurSample(s);
@@ -300,7 +305,7 @@ void AudioView::SetBarriers(SelectionType *s)
 	// selection marker
 	if (!audio->selection.empty()){
 		s->barrier.add(audio->sel_raw.start());
-		if (MousePossiblySelecting < 0)
+		if (mouse_possibly_selecting < 0)
 			s->barrier.add(audio->sel_raw.end());
 	}
 }
@@ -308,7 +313,7 @@ void AudioView::SetBarriers(SelectionType *s)
 void AudioView::ApplyBarriers(int &pos)
 {
 	msg_db_f("ApplyBarriers", 2);
-	foreach(int b, Selection.barrier){
+	foreach(int b, selection.barrier){
 		int dpos = sample2screen(b) - sample2screen(pos);
 		if (abs(dpos) <= BarrierDist){
 			//msg_write(format("barrier:  %d  ->  %d", pos, b));
@@ -329,22 +334,22 @@ void AudioView::OnMouseMove()
 	bool _force_redraw_ = false;
 
 	if (HuiGetEvent()->lbut){
-		SelectionUpdatePos(Selection);
+		SelectionUpdatePos(selection);
 	}else{
-		SelectionType hover_old = Hover;
-		Hover = GetMouseOver();
-		_force_redraw_ |= hover_changed(Hover, hover_old);
+		SelectionType hover_old = hover;
+		hover = GetMouseOver();
+		_force_redraw_ |= hover_changed(hover, hover_old);
 	}
 
 
 	// drag & drop
-	if (Selection.type == SEL_TYPE_SELECTION_END){
+	if (selection.type == SEL_TYPE_SELECTION_END){
 		SelectionType mo = GetMouseOver();
 		if (mo.track)
 			mo.track->is_selected = true;
 
-		ApplyBarriers(Selection.pos);
-		audio->sel_raw.set_end(Selection.pos);
+		ApplyBarriers(selection.pos);
+		audio->sel_raw.set_end(selection.pos);
 		audio->UpdateSelection();
 		//_force_redraw_ = true;
 		_force_redraw_ = false;
@@ -367,9 +372,9 @@ void AudioView::OnMouseMove()
 	}else if (Selection.type == SEL_TYPE_PLAYBACK){
 		tsunami->output->Seek(Selection.pos);
 		_force_redraw_ = true;*/ // TODO
-	}else if (Selection.type == SEL_TYPE_SAMPLE){
-		ApplyBarriers(Selection.pos);
-		int dpos = (float)Selection.pos - Selection.sample_offset - Selection.sample->pos;
+	}else if (selection.type == SEL_TYPE_SAMPLE){
+		ApplyBarriers(selection.pos);
+		int dpos = (float)selection.pos - selection.sample_offset - selection.sample->pos;
 		if (cur_action)
 			cur_action->set_param_and_notify(audio, dpos);
 		_force_redraw_ = true;
@@ -377,19 +382,19 @@ void AudioView::OnMouseMove()
 
 	// selection:
 	if (!HuiGetEvent()->lbut){
-		MousePossiblySelecting = -1;
+		mouse_possibly_selecting = -1;
 	}
-	if (MousePossiblySelecting >= 0)
-		MousePossiblySelecting += abs(HuiGetEvent()->dx);
-	if (MousePossiblySelecting > MouseMinMoveToSelect){
-		audio->sel_raw.offset = MousePossiblySelectingStart;
-		audio->sel_raw.num = Selection.pos - MousePossiblySelectingStart;
-		SetBarriers(&Selection);
+	if (mouse_possibly_selecting >= 0)
+		mouse_possibly_selecting += abs(HuiGetEvent()->dx);
+	if (mouse_possibly_selecting > mouse_min_move_to_select){
+		audio->sel_raw.offset = mouse_possibly_selecting_start;
+		audio->sel_raw.num = selection.pos - mouse_possibly_selecting_start;
+		SetBarriers(&selection);
 		audio->UpdateSelection();
-		Selection.type = SEL_TYPE_SELECTION_END;
-		Hover.type = SEL_TYPE_SELECTION_END;
+		selection.type = SEL_TYPE_SELECTION_END;
+		hover.type = SEL_TYPE_SELECTION_END;
 		_force_redraw_ = true;
-		MousePossiblySelecting = -1;
+		mouse_possibly_selecting = -1;
 	}
 
 	if (_force_redraw_)
@@ -410,29 +415,29 @@ void AudioView::OnLeftButtonDown()
 
 	// selection:
 	//   start after lb down and moving
-	if ((Selection.type == SEL_TYPE_TRACK) || (Selection.type == SEL_TYPE_TIME)){
-		MousePossiblySelecting = 0;
+	if ((selection.type == SEL_TYPE_TRACK) || (selection.type == SEL_TYPE_TIME)){
+		mouse_possibly_selecting = 0;
 		int pos = screen2sample(mx);
 		audio->sel_raw = Range(pos, 0);
 		audio->UpdateSelection();
-		MousePossiblySelectingStart = pos;
-	}else if (Selection.type == SEL_TYPE_SELECTION_START){
+		mouse_possibly_selecting_start = pos;
+	}else if (selection.type == SEL_TYPE_SELECTION_START){
 		// switch end / start
-		Selection.type = SEL_TYPE_SELECTION_END;
-		Hover.type = SEL_TYPE_SELECTION_END;
+		selection.type = SEL_TYPE_SELECTION_END;
+		hover.type = SEL_TYPE_SELECTION_END;
 		audio->sel_raw.invert();
-	}else if (Selection.type == SEL_TYPE_MUTE){
-		Selection.track->SetMuted(!Selection.track->muted);
-	}else if (Selection.type == SEL_TYPE_SOLO){
+	}else if (selection.type == SEL_TYPE_MUTE){
+		selection.track->SetMuted(!selection.track->muted);
+	}else if (selection.type == SEL_TYPE_SOLO){
 		foreach(Track *t, audio->track)
-			t->is_selected = (t == Selection.track);
-		if (Selection.track->muted)
-			Selection.track->SetMuted(false);
-	}else if (Selection.type == SEL_TYPE_SAMPLE){
+			t->is_selected = (t == selection.track);
+		if (selection.track->muted)
+			selection.track->SetMuted(false);
+	}else if (selection.type == SEL_TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(audio);
 	}
 
-	SetBarriers(&Selection);
+	SetBarriers(&selection);
 
 	ForceRedraw();
 	UpdateMenu();
@@ -443,13 +448,13 @@ void AudioView::OnLeftButtonDown()
 void AudioView::OnLeftButtonUp()
 {
 	msg_db_f("OnLBU", 2);
-	if (Selection.type == SEL_TYPE_SAMPLE)
+	if (selection.type == SEL_TYPE_SAMPLE)
 		if (cur_action)
 			audio->Execute(cur_action);
 	cur_action = NULL;
 
 	// TODO !!!!!!!!
-	Selection.type = SEL_TYPE_NONE;
+	selection.type = SEL_TYPE_NONE;
 	ForceRedraw();
 	UpdateMenu();
 }
@@ -492,15 +497,15 @@ void AudioView::OnLeftDoubleClick()
 {
 	SelectUnderMouse();
 
-	if (MousePossiblySelecting < MouseMinMoveToSelect)
+	if (mouse_possibly_selecting < mouse_min_move_to_select)
 		if (audio->used){
-			if (Selection.type == SEL_TYPE_SAMPLE)
+			if (selection.type == SEL_TYPE_SAMPLE)
 				ExecuteSubDialog(tsunami);
-			else if (Selection.type == SEL_TYPE_TRACK)
+			else if (selection.type == SEL_TYPE_TRACK)
 				ExecuteTrackDialog(tsunami);
-			else if (!Selection.track)
+			else if (!selection.track)
 				ExecuteAudioDialog(tsunami);
-			Selection.type = SEL_TYPE_NONE;
+			selection.type = SEL_TYPE_NONE;
 		}
 	UpdateMenu();
 }
@@ -619,6 +624,43 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 	//c->DrawLines(tx, ty2, nl -1);
 }
 
+void AudioView::SetCurSample(AudioFile* a, SampleRef* s)
+{
+}
+
+void AudioView::SetCurTrack(AudioFile* a, Track* t)
+{
+}
+
+void AudioView::SetEditModeDefault()
+{
+	edit_mode = EDIT_MODE_DEFAULT;
+	midi_edit_track = NULL;
+	tsunami->HideControl("edit_midi_table", true);
+	ForceRedraw();
+}
+
+void AudioView::SetEditModeMidi(Track* t)
+{
+	edit_mode = EDIT_MODE_MIDI;
+	midi_edit_track = t;
+	tsunami->HideControl("edit_midi_table", false);
+	ForceRedraw();
+}
+
+void AudioView::OnCloseEditMidiMode()
+{
+	SetEditModeDefault();
+}
+
+void AudioView::OnMidiPitch()
+{
+}
+
+void AudioView::OnMidiBeatPartition()
+{
+}
+
 void AudioView::UpdateBufferZoom()
 {
 	prefered_buffer_level = 0;
@@ -651,7 +693,7 @@ void AudioView::DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double vi
 	}
 
 
-	int di = DetailSteps;
+	int di = detail_steps;
 	c->SetColor(col);
 	int l = min(prefered_buffer_level - 1, b.peak.num / 2);
 	if (l >= 1){//f < MIN_MAX_FACTOR){
@@ -669,22 +711,9 @@ void AudioView::DrawTrackBuffers(HuiPainter *c, const rect &r, Track *t, double 
 {
 	msg_db_f("DrawTrackBuffers", 1);
 
-	// zero heights of both channels
-	float y0r = r.y1 + r.height() / 4;
-	float y0l = r.y1 + r.height() * 3 / 4;
-
-	float hf = r.height() / 4;
-
-	if (show_mono){
-		y0r = r.y1 + r.height() / 2;
-		hf *= 2;
-	}
-
-
-	int di = DetailSteps;
 	foreachi(TrackLevel &lev, t->level, level_no){
 		color cc = ColorWave;
-		if ((level_no == cur_level))// || (!t->parent))
+		if (level_no == cur_level)
 			cc = col;
 		foreach(BufferBox &b, lev.buffer)
 			DrawBuffer(c, r, b, view_pos_rel, cc);
@@ -720,7 +749,7 @@ void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
 	//bool is_cur = ((s == cur_sub) && (t->IsSelected));
 	if (!s->is_selected)
 		col = ColorSubNotCur;
-	if (Hover.sample == s)
+	if (hover.sample == s)
 		col = ColorSubMO;
 	//col.a = 0.2f;
 
@@ -792,9 +821,9 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 	else
 		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_audio);
 
-	if ((t->muted) || (Hover.show_track_controls == t))
+	if ((t->muted) || (hover.show_track_controls == t))
 		c->DrawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
-	if ((audio->track.num > 1) && (Hover.show_track_controls == t))
+	if ((audio->track.num > 1) && (hover.show_track_controls == t))
 		c->DrawImage(r.x1 + 22, r.y1 + 22, image_solo);
 }
 
@@ -913,12 +942,23 @@ void AudioView::OnUpdate(Observable *o)
 	}
 }
 
-void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
+void plan_track_sizes(const rect &r, AudioFile *a, AudioView *v)
 {
-	int n_ch = tsunami->view->show_mono ? 1 : 2;
+	if (v->edit_mode == v->EDIT_MODE_MIDI){
+		float y0 = v->TIME_SCALE_HEIGHT;
+		foreachi(Track *t, a->track, i){
+			float h = v->TIME_SCALE_HEIGHT;
+			if (t == v->midi_edit_track)
+				h = r.height() - a->track.num * v->TIME_SCALE_HEIGHT;
+			t->area = rect(r.x1, r.x2, y0, y0 + h);
+			y0 += h;
+		}
+		return;
+	}
+	int n_ch = v->show_mono ? 1 : 2;
 
-	int h_wish = TIME_SCALE_HEIGHT;
-	int h_fix = TIME_SCALE_HEIGHT;
+	int h_wish = v->TIME_SCALE_HEIGHT;
+	int h_fix = v->TIME_SCALE_HEIGHT;
 	int n_var = 0;
 	foreach(Track *t, a->track){
 		if (t->type == t->TYPE_AUDIO){
@@ -928,17 +968,17 @@ void plan_track_sizes(const rect &r, AudioFile *a, int TIME_SCALE_HEIGHT)
 			h_wish += MAX_TRACK_CHANNEL_HEIGHT;
 			n_var ++;
 		}else{
-			h_wish += TIME_SCALE_HEIGHT * 2;
-			h_fix += TIME_SCALE_HEIGHT * 2;
+			h_wish += v->TIME_SCALE_HEIGHT * 2;
+			h_fix += v->TIME_SCALE_HEIGHT * 2;
 		}
 	}
 
-	int y0 = r.y1 + TIME_SCALE_HEIGHT;
+	int y0 = r.y1 + v->TIME_SCALE_HEIGHT;
 	int opt_channel_height = MAX_TRACK_CHANNEL_HEIGHT;
 	if (h_wish > r.height())
 		opt_channel_height = (r.height() - h_fix) / n_var;
 	foreachi(Track *t, a->track, i){
-		float h = TIME_SCALE_HEIGHT*2;
+		float h = v->TIME_SCALE_HEIGHT*2;
 		if (t->type == t->TYPE_AUDIO)
 			h = opt_channel_height * n_ch;
 		else if (t->type == t->TYPE_MIDI)
@@ -952,7 +992,7 @@ void AudioView::DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool 
 {
 	int p = sample2screen(pos);
 	if ((p >= audio->area.x1) && (p <= audio->area.x2)){
-		c->SetColor((type == Hover.type) ? ColorSelectionBoundaryMO : col);
+		c->SetColor((type == hover.type) ? ColorSelectionBoundaryMO : col);
 		c->DrawLine(p, audio->area.y1, p, audio->area.y2);
 		if (show_time)
 			c->DrawStr(p, (audio->area.y1 + audio->area.y2) / 2, audio->get_time_str(pos));
@@ -1031,7 +1071,7 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 		return;
 	}
 
-	plan_track_sizes(r, audio, TIME_SCALE_HEIGHT);
+	plan_track_sizes(r, audio, this);
 	UpdateBufferZoom();
 
 	// background
@@ -1069,10 +1109,10 @@ void AudioView::OnDraw()
 	force_redraw = false;
 
 	HuiPainter *c = tsunami->BeginDraw("area");
-	DrawingWidth = c->width;
+	drawing_width = c->width;
 	c->SetFontSize(FONT_SIZE);
 	c->SetLineWidth(LINE_WIDTH);
-	c->SetAntialiasing(Antialiasing);
+	c->SetAntialiasing(antialiasing);
 	//c->SetColor(ColorWaveCur);
 
 	DrawAudioFile(c, rect(0, c->width, 0, c->height));
@@ -1086,7 +1126,7 @@ void AudioView::OptimizeView()
 {
 	msg_db_f("OptimizeView", 1);
 	if (audio->area.x2 <= 0)
-		audio->area.x2 = DrawingWidth;
+		audio->area.x2 = drawing_width;
 
 	Range r = audio->GetRange();
 
@@ -1107,8 +1147,8 @@ void AudioView::UpdateMenu()
 	tsunami->Check("view_stereo", !show_mono);
 	tsunami->Check("view_grid_time", grid_mode == GRID_MODE_TIME);
 	tsunami->Check("view_grid_bars", grid_mode == GRID_MODE_BARS);
-	tsunami->Check("view_peaks_max", PeakMode == BufferBox::PEAK_MODE_MAXIMUM);
-	tsunami->Check("view_peaks_mean", PeakMode == BufferBox::PEAK_MODE_SQUAREMEAN);
+	tsunami->Check("view_peaks_max", peak_mode == BufferBox::PEAK_MODE_MAXIMUM);
+	tsunami->Check("view_peaks_mean", peak_mode == BufferBox::PEAK_MODE_SQUAREMEAN);
 	tsunami->Enable("zoom_in", audio->used);
 	tsunami->Enable("zoom_out", audio->used);
 	tsunami->Enable("view_optimal", audio->used);
@@ -1117,10 +1157,10 @@ void AudioView::UpdateMenu()
 
 void AudioView::SetPeaksMode(int mode)
 {
-	PeakMode = mode;
+	peak_mode = mode;
 	if (audio->used){
 		audio->InvalidateAllPeaks();
-		audio->UpdatePeaks(PeakMode);
+		audio->UpdatePeaks(peak_mode);
 	}
 	ForceRedraw();
 	UpdateMenu();

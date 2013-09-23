@@ -69,7 +69,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, &Tsunami::OnAddTimeTrack);
 	HuiAddCommandM("add_midi_track", "hui:add", -1, this, &Tsunami::OnAddMidiTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, &Tsunami::OnDeleteTrack);
-	HuiAddCommandM("edit_midi_track", "hui:edit", -1, this, &Tsunami::OnEditMidiTrack);
 	HuiAddCommandM("level_add", "hui:add", -1, this, &Tsunami::OnAddLevel);
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &Tsunami::OnDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &Tsunami::OnCurLevelUp);
@@ -108,14 +107,20 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("zoom_out", "", -1, this, &Tsunami::OnZoomOut);
 
 
-	// create the window
+	// table structure
 	SetSize(width, height);
 	SetBorderWidth(0);
 	AddControlTable("", 0, 0, 1, 2, "root_table");
 	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 3, 1, "main_table");
 	SetBorderWidth(5);
-	AddControlTable("!noexpandy", 0, 1, 7, 1, "output_table");
+	AddControlTable("!noexpandy", 0, 1, 3, 1, "bottom_table");
+	SetTarget("bottom_table", 0);
+	AddControlTable("!noexpandy", 0, 0, 7, 1, "output_table");
+	AddControlTable("!noexpandy", 1, 0, 7, 1, "edit_midi_table");
+	HideControl("edit_midi_table", true);
+
+	// main table
 	SetBorderWidth(0);
 	SetTarget("main_table", 0);
 	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
@@ -123,6 +128,8 @@ Tsunami::Tsunami(Array<string> arg) :
 	HideControl("track_dialog_table", true);
 	AddControlTable("!noexpandx,width=220", 2, 0, 1, 1, "audio_dialog_table");
 	HideControl("audio_dialog_table", true);
+
+	// output table
 	SetBorderWidth(5);
 	SetTarget("output_table", 0);
 	AddButton("", 0, 0, 0, 0, "play");
@@ -134,7 +141,17 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddSpinButton("!width=50\\0\\0\\100", 5, 0, 0, 0, "output_volume");
 	AddText("%", 6, 0, 0, 0, "output_label_percent");
 	volume_slider = new Slider(this, "output_volume_slider", "output_volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
-	AllowEvents("key");
+
+	// edit midi table
+	SetTarget("edit_midi_table", 0);
+	AddSeparator("", 0, 0, 0, 0, "");
+	AddText("Pitch", 1, 0, 0, 0, "");
+	AddSpinButton("60\\0\\90", 2, 0, 0, 0, "pitch_offset");
+	AddText("Unterteilung", 3, 0, 0, 0, "");
+	AddSpinButton("4\\1", 4, 0, 0, 0, "beat_partition");
+	AddButton("Beenden", 5, 0, 0, 0, "close_edit_midi_mode");
+
+
 	toolbar[0]->SetByID("toolbar");
 	//ToolbarConfigure(false, true);
 
@@ -242,12 +259,6 @@ void Tsunami::OnDeleteTrack()
 		}
 		audio->DeleteTrack(get_track_index(view->cur_track));
 	}
-}
-
-void Tsunami::OnEditMidiTrack()
-{
-	MidiEditor *e = new MidiEditor(tsunami, false, audio, view->cur_track);
-	e->Run();
 }
 
 void Tsunami::OnCloseFile()

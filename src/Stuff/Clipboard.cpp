@@ -62,7 +62,7 @@ void Clipboard::Paste(AudioFile *a)
 		BufferBox dest = a->track[0]->GetBuffers(0, Range(0, buf->num));
 		dest.set(*buf, 0, 1.0f);
 		a->InvalidateAllPeaks();
-		a->UpdatePeaks(tsunami->view->PeakMode);
+		a->UpdatePeaks(tsunami->view->peak_mode);
 		a->action_manager->Enable(true);
 	}
 }

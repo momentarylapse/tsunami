@@ -424,6 +424,9 @@ void AudioView::OnMouseMove()
 		mouse_possibly_selecting = -1;
 	}
 
+	if ((HuiGetEvent()->lbut) && (selection.type == SEL_TYPE_MIDI_PITCH))
+		_force_redraw_ = true;
+
 	if (_force_redraw_)
 		ForceRedraw();
 }
@@ -440,14 +443,14 @@ void AudioView::OnLeftButtonDown()
 	if (!audio->used)
 		return;
 
+	mouse_possibly_selecting_start = selection.pos;
+
 	// selection:
 	//   start after lb down and moving
 	if ((selection.type == SEL_TYPE_TRACK) || (selection.type == SEL_TYPE_TIME)){
 		mouse_possibly_selecting = 0;
-		int pos = screen2sample(mx);
-		audio->sel_raw = Range(pos, 0);
+		audio->sel_raw = Range(selection.pos, 0);
 		audio->UpdateSelection();
-		mouse_possibly_selecting_start = pos;
 	}else if (selection.type == SEL_TYPE_SELECTION_START){
 		// switch end / start
 		selection.type = SEL_TYPE_SELECTION_END;
@@ -464,6 +467,8 @@ void AudioView::OnLeftButtonDown()
 		cur_action = new ActionTrackMoveSample(audio);
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
 		midi_edit_track->DeleteMidiNote(selection.note);
+	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
+
 	}
 
 	SetBarriers(&selection);
@@ -477,9 +482,13 @@ void AudioView::OnLeftButtonDown()
 void AudioView::OnLeftButtonUp()
 {
 	msg_db_f("OnLBU", 2);
-	if (selection.type == SEL_TYPE_SAMPLE)
+	if (selection.type == SEL_TYPE_SAMPLE){
 		if (cur_action)
 			audio->Execute(cur_action);
+	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
+		Range r = Range(min(mouse_possibly_selecting_start, selection.pos), abs(mouse_possibly_selecting_start - selection.pos));
+		midi_edit_track->AddMidiNote(MidiNote(r, selection.pitch, 1));
+	}
 	cur_action = NULL;
 
 	// TODO !!!!!!!!
@@ -839,6 +848,15 @@ void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col
 	c->SetLineWidth(LINE_WIDTH);
 }
 
+void draw_note(HuiPainter *c, const MidiNote &n, AudioView *v)
+{
+	float x1 = v->sample2screen(n.range.offset);
+	float x2 = v->sample2screen(n.range.end());
+	float y1 = v->pitch2y(n.pitch + 1);
+	float y2 = v->pitch2y(n.pitch);
+	c->DrawRect(rect(x1, x2, y1, y2));
+}
+
 void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col)
 {
 	foreachi(MidiNote &n, midi, i){
@@ -848,11 +866,13 @@ void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, c
 		if ((hover.type == SEL_TYPE_MIDI_NOTE) && (hover.note == i))
 			col.a = 0.5f;
 		c->SetColor(col);
-		float x1 = sample2screen(n.range.offset);
-		float x2 = sample2screen(n.range.end());
-		float y1 = pitch2y(n.pitch + 1);
-		float y2 = pitch2y(n.pitch);
-		c->DrawRect(rect(x1, x2, y1, y2));
+		draw_note(c, n, this);
+	}
+	if ((HuiGetEvent()->lbut) && (selection.type == SEL_TYPE_MIDI_PITCH)){
+		color col = GetPitchColor(selection.pitch);
+		col.a = 0.5f;
+		c->SetColor(col);
+		draw_note(c, MidiNote(Range(mouse_possibly_selecting_start, selection.pos - mouse_possibly_selecting_start), selection.pitch, 1), this);
 	}
 }
 

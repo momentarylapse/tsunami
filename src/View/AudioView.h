@@ -59,6 +59,7 @@ public:
 	void DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
 	void DrawSample(HuiPainter *c, const rect &r, SampleRef *s);
 	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col);
+	void DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col);
 	void DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no);
 	void DrawGrid(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
@@ -103,7 +104,8 @@ public:
 		SEL_TYPE_MUTE,
 		SEL_TYPE_SOLO,
 		SEL_TYPE_SAMPLE,
-		SEL_TYPE_MIDI
+		SEL_TYPE_MIDI_NOTE,
+		SEL_TYPE_MIDI_PITCH,
 	};
 
 	struct SelectionType
@@ -115,7 +117,7 @@ public:
 		int sample_offset;
 		Array<int> barrier;
 		Track *show_track_controls;
-		int pitch;
+		int pitch, note;
 
 		SelectionType();
 	};
@@ -152,6 +154,8 @@ public:
 
 	double screen2sample(double x);
 	double sample2screen(double s);
+	int y2pitch(int y);
+	float pitch2y(int p);
 
 	void Zoom(float f);
 	void Move(float dpos);
@@ -184,7 +188,7 @@ public:
 		EDIT_MODE_DEFAULT,
 		EDIT_MODE_MIDI
 	};
-	int min_pitch;
+	int pitch_min, pitch_max;
 	Track *midi_edit_track;
 	void SetEditModeDefault();
 	void SetEditModeMidi(Track *t);

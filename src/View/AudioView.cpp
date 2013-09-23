@@ -42,6 +42,8 @@ AudioView::SelectionType::SelectionType()
 	pos = 0;
 	sample_offset = 0;
 	show_track_controls = NULL;
+	note = -1;
+	pitch = -1;
 }
 
 AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
@@ -96,7 +98,8 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 
 	edit_mode = EDIT_MODE_DEFAULT;
 	midi_edit_track = NULL;
-	min_pitch = 60;
+	pitch_min = 60;
+	pitch_max = 90;
 
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
@@ -118,6 +121,8 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	parent->EventMX("area", "hui:key-up", this, &AudioView::OnKeyUp);
 	parent->EventMX("area", "hui:mouse-wheel", this, &AudioView::OnMouseWheel);
 	parent->EventM("close_edit_midi_mode", this, &AudioView::OnCloseEditMidiMode);
+	parent->EventM("pitch_offset", this, &AudioView::OnMidiPitch);
+	parent->EventM("beat_partition", this, &AudioView::OnMidiBeatPartition);
 
 	parent->Activate("area");
 
@@ -245,6 +250,16 @@ AudioView::SelectionType AudioView::GetMouseOver()
 		}
 	}
 
+	if ((s.track) && (s.track == midi_edit_track)){
+		s.pitch = y2pitch(my);
+		s.type = SEL_TYPE_MIDI_PITCH;
+		foreachi(MidiNote &n, s.track->midi, i)
+			if ((n.pitch == s.pitch) && (n.range.is_inside(s.pos))){
+				s.note = i;
+				s.type = SEL_TYPE_MIDI_NOTE;
+			}
+	}
+
 	return s;
 }
 
@@ -324,7 +339,11 @@ void AudioView::ApplyBarriers(int &pos)
 
 bool hover_changed(AudioView::SelectionType &hover, AudioView::SelectionType &hover_old)
 {
-	return (hover.type != hover_old.type) || (hover.sample != hover_old.sample) || (hover.show_track_controls != hover_old.show_track_controls);
+	return (hover.type != hover_old.type)
+			|| (hover.sample != hover_old.sample)
+			|| (hover.show_track_controls != hover_old.show_track_controls)
+			|| (hover.note != hover_old.note)
+			|| (hover.pitch != hover_old.pitch);
 }
 
 void AudioView::OnMouseMove()
@@ -435,6 +454,8 @@ void AudioView::OnLeftButtonDown()
 			selection.track->SetMuted(false);
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(audio);
+	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
+		midi_edit_track->DeleteMidiNote(selection.note);
 	}
 
 	SetBarriers(&selection);
@@ -655,6 +676,9 @@ void AudioView::OnCloseEditMidiMode()
 
 void AudioView::OnMidiPitch()
 {
+	pitch_min = tsunami->GetInt("");
+	pitch_max = tsunami->GetInt("") + 30;
+	ForceRedraw();
 }
 
 void AudioView::OnMidiBeatPartition()
@@ -783,6 +807,16 @@ color AudioView::GetPitchColor(int pitch)
 	return SetColorHSB(1, (float)(pitch % 12) / 12.0f, 0.6f, 1);
 }
 
+int AudioView::y2pitch(int y)
+{
+	return pitch_min + ((midi_edit_track->area.y2 - y) * (pitch_max - pitch_min) / midi_edit_track->area.height());
+}
+
+float AudioView::pitch2y(int p)
+{
+	return midi_edit_track->area.y2 - midi_edit_track->area.height() * ((float)p - pitch_min) / (pitch_max - pitch_min);
+}
+
 void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col)
 {
 	c->SetLineWidth(3.0f);
@@ -797,11 +831,31 @@ void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col
 	c->SetLineWidth(LINE_WIDTH);
 }
 
+void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col)
+{
+	foreachi(MidiNote &n, midi, i){
+		if ((n.pitch < pitch_min) || (n.pitch >= pitch_max))
+			continue;
+		color col = GetPitchColor(n.pitch);
+		if ((hover.type == SEL_TYPE_MIDI_NOTE) && (hover.note == i))
+			col.a = 0.5f;
+		c->SetColor(col);
+		float x1 = sample2screen(n.range.offset);
+		float x2 = sample2screen(n.range.end());
+		float y1 = pitch2y(n.pitch + 1);
+		float y2 = pitch2y(n.pitch);
+		c->DrawRect(rect(x1, x2, y1, y2));
+	}
+}
+
 void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no)
 {
 	msg_db_f("DrawTrack", 1);
 
-	DrawMidi(c, r, t->midi, col);
+	if (midi_edit_track == t)
+		DrawMidiEditable(c, r, t->midi, col);
+	else
+		DrawMidi(c, r, t->midi, col);
 
 	DrawTrackBuffers(c, r, t, view_pos, col);
 

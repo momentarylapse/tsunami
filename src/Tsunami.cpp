@@ -547,7 +547,6 @@ void Tsunami::UpdateMenu()
 	Enable("track_import", audio->used);
 	Enable("add_track", audio->used);
 	Enable("add_time_track", audio->used);
-	Enable("edit_midi_track", view->cur_track && (view->cur_track->type == Track::TYPE_MIDI));
 	Enable("delete_track", view->cur_track);
 	Enable("track_properties", view->cur_track);
 	// level

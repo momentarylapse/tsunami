@@ -64,10 +64,12 @@ void TrackDialog::LoadData()
 		SetString("synthesizer", track->synth->name);
 		Enable("synthesizer", track->type != track->TYPE_AUDIO);
 		Enable("config_synth", track->type != track->TYPE_AUDIO);
+		Enable("edit_midi_track", track->type == Track::TYPE_MIDI);
 	}else{
 		volume_slider->Enable(false);
 		Enable("synthesizer", track);
 		Enable("config_synth", track);
+		Enable("edit_midi_track", false);
 	}
 }
 

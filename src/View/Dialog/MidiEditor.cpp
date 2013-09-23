@@ -184,7 +184,7 @@ void MidiEditor::OnAreaLeftButtonUp()
 	creating_new_note = false;
 }
 
-bool is_sharp(int pitch)
+static bool is_sharp(int pitch)
 {
 	int r = pitch % 12;
 	// 69 = 9 = a

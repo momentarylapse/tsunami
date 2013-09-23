@@ -34,6 +34,14 @@ int get_track_index_save(Track *t)
 	return -1;
 }
 
+
+static bool is_sharp(int pitch)
+{
+	int r = pitch % 12;
+	// 69 = 9 = a
+	return ((r == 10) || (r == 1) || (r == 3) || (r == 6) || (r == 8));
+}
+
 AudioView::SelectionType::SelectionType()
 {
 	type = SEL_TYPE_NONE;
@@ -1077,10 +1085,24 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 		color cc = (t->is_selected) ? ColorBackgroundCurTrack : ColorBackgroundCurWave;
 		c->SetColor(cc);
 		c->DrawRect(t->area);
+
 		if (t->type == t->TYPE_TIME)
 			DrawGridBars(c, t->area, cc, grid_mode == GRID_MODE_TIME);
 		else
 			DrawGrid(c, t->area, cc);
+
+		if (t == midi_edit_track){
+			// pitch grid
+			c->SetColor(color(0.25f, 0, 0, 0));
+			for (int i=pitch_min; i<pitch_max; i++){
+				float y0 = pitch2y(i + 1);
+				float y1 = pitch2y(i);
+				if (is_sharp(i)){
+					c->SetColor(color(0.2f, 0, 0, 0));
+					c->DrawRect(r.x1, y0, r.width(), y1 - y0);
+				}
+			}
+		}
 	}
 
 	// free space below tracks

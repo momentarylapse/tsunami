@@ -14,6 +14,7 @@
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
 #include "../Audio/AudioRenderer.h"
+#include "../Audio/Synth/Synthesizer.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
 
@@ -899,6 +900,10 @@ void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, c
 		col.a = 0.5f;
 		c->SetColor(col);
 		draw_note(c, GetSelectedNote(), this);
+	}
+	if ((hover.type == SEL_TYPE_MIDI_PITCH) || (hover.type == SEL_TYPE_MIDI_NOTE)){
+		c->SetColor(ColorWaveCur);
+		c->DrawStr(20, r.y1 + r.height() * (pitch_max - hover.pitch - 1) / (pitch_max - pitch_min), pitch_name(hover.pitch));
 	}
 }
 

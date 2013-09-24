@@ -108,6 +108,8 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	midi_edit_track = NULL;
 	pitch_min = 60;
 	pitch_max = 90;
+	beat_partition = 4;
+	parent->SetInt("beat_partition", beat_partition);
 
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
@@ -478,6 +480,29 @@ void AudioView::OnLeftButtonDown()
 }
 
 
+MidiNote AudioView::GetSelectedNote()
+{
+	int start = min(mouse_possibly_selecting_start, selection.pos);
+	int end = max(mouse_possibly_selecting_start, selection.pos);
+	Track *t = audio->GetTimeTrack();
+	if (t){
+		Array<Beat> beats = t->bar.GetBeats(audio->GetRange());
+		foreach(Beat &b, beats){
+			if (b.range.is_inside(start)){
+				int dl = b.range.num / beat_partition;
+				start = b.range.offset + dl * ((start - b.range.offset) / dl);
+			}
+			if (b.range.is_inside(end)){
+				int dl = b.range.num / beat_partition;
+				end = b.range.offset + dl * ((end - b.range.offset) / dl + 1);
+				break;
+			}
+		}
+	}
+	Range r = Range(start, end - start);
+	return MidiNote(r, selection.pitch, 1);
+}
+
 
 void AudioView::OnLeftButtonUp()
 {
@@ -486,8 +511,7 @@ void AudioView::OnLeftButtonUp()
 		if (cur_action)
 			audio->Execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		Range r = Range(min(mouse_possibly_selecting_start, selection.pos), abs(mouse_possibly_selecting_start - selection.pos));
-		midi_edit_track->AddMidiNote(MidiNote(r, selection.pitch, 1));
+		midi_edit_track->AddMidiNote(GetSelectedNote());
 	}
 	cur_action = NULL;
 
@@ -700,6 +724,8 @@ void AudioView::OnMidiPitch()
 
 void AudioView::OnMidiBeatPartition()
 {
+	beat_partition = tsunami->GetInt("");
+	ForceRedraw();
 }
 
 void AudioView::UpdateBufferZoom()
@@ -872,7 +898,7 @@ void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, c
 		color col = GetPitchColor(selection.pitch);
 		col.a = 0.5f;
 		c->SetColor(col);
-		draw_note(c, MidiNote(Range(mouse_possibly_selecting_start, selection.pos - mouse_possibly_selecting_start), selection.pitch, 1), this);
+		draw_note(c, GetSelectedNote(), this);
 	}
 }
 
@@ -959,27 +985,32 @@ void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 
 void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
-	Track *t = NULL;
-	foreach(Track *tt, audio->track)
-		if (tt->type == tt->TYPE_TIME)
-			t = tt;
+	Track *t = audio->GetTimeTrack();
 	if (!t)
 		return;
 	int s0 = screen2sample(r.x1 - 1);
 	int s1 = screen2sample(r.x2);
 	Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
 	color c1 = ColorInterpolate(bg, ColorGrid, 0.5f);
+	color c2 = ColorInterpolate(bg, ColorGrid, 0.3f);
 	foreach(Beat &b, beats){
 		c->SetColor((b.beat_no == 0) ? ColorGrid : c1);
-		int xx = sample2screen(b.pos);
+		int xx = sample2screen(b.range.offset);
 		c->DrawLine(xx, r.y1, xx, r.y2);
+		if (edit_mode == EDIT_MODE_MIDI){
+			c->SetColor(c2);
+			for (int i=1;i<beat_partition;i++){
+				xx = sample2screen(b.range.offset + b.range.num / beat_partition * i);
+				c->DrawLine(xx, r.y1, xx, r.y2);
+			}
+		}
 	}
 	if (!show_time)
 		return;
 	c->SetColor(ColorGrid);
 	foreach(Beat &b, beats){
 		if (b.beat_no == 0){
-			int xx = sample2screen(b.pos);
+			int xx = sample2screen(b.range.offset);
 			c->DrawStr(xx + 2, r.y1, i2s(b.bar_no + 1));
 		}
 	}
@@ -1008,6 +1039,7 @@ void AudioView::OnUpdate(Observable *o)
 
 	if (o->GetName() == "AudioFile"){
 		if (o->GetMessage() == "New"){
+			SetEditModeDefault();
 			OptimizeView();
 		}else{
 			ForceRedraw();

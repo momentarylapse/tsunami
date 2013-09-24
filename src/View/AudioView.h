@@ -157,6 +157,8 @@ public:
 	int y2pitch(int y);
 	float pitch2y(int p);
 
+	MidiNote GetSelectedNote();
+
 	void Zoom(float f);
 	void Move(float dpos);
 
@@ -189,6 +191,7 @@ public:
 		EDIT_MODE_MIDI
 	};
 	int pitch_min, pitch_max;
+	int beat_partition;
 	Track *midi_edit_track;
 	void SetEditModeDefault();
 	void SetEditModeMidi(Track *t);

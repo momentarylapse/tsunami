@@ -42,8 +42,8 @@ class Beat
 {
 public:
 	Beat(){}
-	Beat(int p, int bar, int beat);
-	int pos;
+	Beat(const Range &r, int bar, int beat);
+	Range range;
 	int bar_no;
 	int beat_no;
 };

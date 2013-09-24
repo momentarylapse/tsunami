@@ -7,9 +7,9 @@
 
 #include "Rhythm.h"
 
-Beat::Beat(int p, int bar, int beat)
+Beat::Beat(const Range &r, int bar, int beat)
 {
-	pos = p;
+	range = r;
 	bar_no = bar;
 	beat_no = beat;
 };
@@ -29,10 +29,11 @@ Array<Beat> BarCollection::GetBeats(const Range &r)
 	foreach(BarPattern &b, *this)
 		if (b.type == b.TYPE_BAR){
 			for (int j=0;j<b.count;j++){
+				int beat_length = b.length / b.num_beats;
 				for (int i=0;i<b.num_beats;i++){
-					int pos = pos0 + i * b.length / b.num_beats;
+					int pos = pos0 + i * beat_length;
 					if (r.is_inside(pos))
-						beats.add(Beat(pos, bar_no, i));
+						beats.add(Beat(Range(pos, beat_length), bar_no, i));
 				}
 				pos0 += b.length;
 				bar_no ++;

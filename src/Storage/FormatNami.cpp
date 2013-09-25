@@ -196,8 +196,13 @@ void WriteTrack(CFile *f, Track *t)
 	foreach(Effect &effect, t->fx)
 		WriteEffect(f, &effect);
 
-	if ((t->midi.num > 0) || (t->type == t->TYPE_MIDI))
+	if ((t->midi.num > 0) || (t->type == t->TYPE_MIDI)){
+		if (t->synth){
+			t->synth->options_to_string();
+			t->midi.options = t->synth->options;
+		}
 		WriteMidi(f, t->midi);
+	}
 
 	EndChunk(f);
 }
@@ -823,6 +828,8 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 		if (t->midi.synthesizer.num > 0){
 			delete(t->synth);
 			t->synth = CreateSynthesizer(t->midi.synthesizer);
+			t->synth->options = t->midi.options;
+			t->synth->options_from_string();
 		}
 
 	a->UpdateSelection();

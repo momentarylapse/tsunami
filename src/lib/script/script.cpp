@@ -165,6 +165,24 @@ void DeleteAllScripts(bool even_immortal, bool force)
 	*/
 }
 
+
+extern Array<Script*> PublicScript;
+
+Type *GetDynamicType(void *p)
+{
+	VirtualTable *pp = *(VirtualTable**)p;
+	foreach(Script *s, PublicScript){
+		foreach(Type *t, s->syntax->Types){
+			if (t->num_virtual > 0){
+				if (t->vtable == pp){
+					return t;
+				}
+			}
+		}
+	}
+	return NULL;
+}
+
 void Script::Load(const string &filename, bool just_analyse)
 {
 	msg_db_f("loading script", 1);

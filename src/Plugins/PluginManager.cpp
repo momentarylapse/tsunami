@@ -33,6 +33,8 @@ void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
 
 PluginManager::PluginManager()
 {
+	cur_plugin = NULL;
+	cur_synth = NULL;
 }
 
 PluginManager::~PluginManager()
@@ -149,7 +151,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "OnConfigure", Script::mf(&Synthesizer::OnConfigure), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "Configure", Script::mf(&Synthesizer::Configure), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "DataToDialog", Script::mf(&Synthesizer::DataToDialog), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "DataFromDialog", Script::mf(&Synthesizer::DataFromDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "Reset", Script::mf(&Synthesizer::Reset), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
 	Script::LinkExternal("Synthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
@@ -327,7 +331,7 @@ void PluginManager::AddPluginsToMenu()
 
 	// Events
 	for (int i=0;i<plugin_file.num;i++)
-		tsunami->EventM(format("execute_plugin_%d", i), this, (void(HuiEventHandler::*)())&PluginManager::OnMenuExecutePlugin);
+		tsunami->EventM(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
 }
 
 void PluginManager::InitPluginData()
@@ -350,6 +354,8 @@ void PluginManager::OnFavoriteName()
 
 void PluginManager::OnFavoriteList()
 {
+	if (!cur_plugin)
+		return;
 	int n = HuiCurWindow->GetInt("");
 	cur_plugin->ResetData();
 	if (n == 0){
@@ -366,6 +372,8 @@ void PluginManager::OnFavoriteList()
 
 void PluginManager::OnFavoriteSave()
 {
+	if (!cur_plugin)
+		return;
 	string name = HuiCurWindow->GetString("favorite_name");
 	cur_plugin->WriteDataToFile(name);
 	PluginFavoriteName.add(name);
@@ -385,7 +393,9 @@ void PluginManager::InitFavorites(HuiWindow *win)
 	win->Enable("favorite_save", false);
 	win->Enable("favorite_delete", false);
 
-	string init = cur_plugin->s->Filename.basename() + "___";
+	string init;
+	if (cur_plugin)
+		cur_plugin->s->Filename.basename() + "___";
 
 	dir_create(HuiAppDirectory + "Plugins/Favorites");
 	Array<DirEntry> list = dir_search(HuiAppDirectory + "Plugins/Favorites", "*", false);
@@ -396,10 +406,10 @@ void PluginManager::InitFavorites(HuiWindow *win)
 		win->AddString("favorite_list", PluginFavoriteName.back());
 	}
 
-	win->EventM("favorite_name", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteName);
-	win->EventM("favorite_save", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteSave);
-	win->EventM("favorite_delete", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteDelete);
-	win->EventM("favorite_list", this, (void(HuiEventHandler::*)())&PluginManager::OnFavoriteList);
+	win->EventM("favorite_name", this, &PluginManager::OnFavoriteName);
+	win->EventM("favorite_save", this, &PluginManager::OnFavoriteSave);
+	win->EventM("favorite_delete", this, &PluginManager::OnFavoriteDelete);
+	win->EventM("favorite_list", this, &PluginManager::OnFavoriteList);
 }
 
 void PluginManager::PutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
@@ -441,6 +451,8 @@ void PluginManager::OnPluginFavoriteName()
 
 void PluginManager::OnPluginFavoriteList()
 {
+	if (!cur_plugin)
+		return;
 	HuiWindow *win = HuiGetEvent()->win;
 	int n = win->GetInt("");
 	cur_plugin->ResetData();
@@ -458,6 +470,8 @@ void PluginManager::OnPluginFavoriteList()
 
 void PluginManager::OnPluginFavoriteSave()
 {
+	if (!cur_plugin)
+		return;
 	HuiWindow *win = HuiGetEvent()->win;
 	cur_plugin->WriteDataToFile(win->GetString("favorite_name"));
 	PluginFavoriteName.add(win->GetString("favorite_name"));
@@ -467,13 +481,19 @@ void PluginManager::OnPluginFavoriteSave()
 
 void PluginManager::OnPluginOk()
 {
+	if (cur_synth)
+		cur_synth->DataFromDialog();
 	PluginCancelled = false;
+	cur_plugin = NULL;
+	cur_synth = NULL;
 	delete(HuiCurWindow);
 }
 
 void PluginManager::OnPluginClose()
 {
 	PluginCancelled = true;
+	cur_plugin = NULL;
+	cur_synth = NULL;
 	delete(HuiCurWindow);
 }
 
@@ -491,15 +511,15 @@ void PluginManager::PutCommandBarFixed(HuiWindow *win, int x, int y, int w)
 	//win->SetImage("cancel", "hui:cancel");
 
 	if (PluginAddPreview){
-		if (cur_plugin->type == Plugin::TYPE_EFFECT){
+		if (cur_plugin && (cur_plugin->type == Plugin::TYPE_EFFECT)){
 			win->AddButton(_("Vorschau"),w - ww * 3 - 20,y,ww,25,"preview");
 			win->SetImage("preview", "hui:media-play");
 		}
 	}
-	win->EventM("ok", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginOk);
-	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginPreview);
-	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
-	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
+	win->EventM("ok", this, &PluginManager::OnPluginOk);
+	win->EventM("preview", this, &PluginManager::OnPluginPreview);
+	win->EventM("cancel", this, &PluginManager::OnPluginClose);
+	win->EventM("hui:close", this, &PluginManager::OnPluginClose);
 }
 
 void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, int x, int y)
@@ -509,26 +529,41 @@ void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, 
 	win->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
 	win->SetTarget("command_table", 0);
 	if (PluginAddPreview){
-		if (cur_plugin->type == Plugin::TYPE_EFFECT){
+		if (cur_plugin && (cur_plugin->type == Plugin::TYPE_EFFECT)){
 			win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 			win->SetImage("preview", "hui:media-play");
 		}
+	}else if (cur_synth){
+		win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
+		win->SetImage("preview", "hui:media-play");
 	}
 	win->AddText("!width=30", 1, 0, 0, 0, "");
 	win->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
 	win->SetImage("cancel", "hui:cancel");
 	win->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
 	win->SetImage("ok", "hui:ok");
-	win->EventM("ok", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginOk);
-	win->EventM("preview", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginPreview);
-	win->EventM("cancel", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
-	win->EventM("hui:close", this, (void(HuiEventHandler::*)())&PluginManager::OnPluginClose);
+	win->EventM("ok", this, &PluginManager::OnPluginOk);
+	win->EventM("preview", this, &PluginManager::OnPluginPreview);
+	win->EventM("cancel", this, &PluginManager::OnPluginClose);
+	win->EventM("hui:close", this, &PluginManager::OnPluginClose);
 }
 
 void PluginManager::OnPluginPreview()
 {
-	Effect fx(cur_plugin);
-	Preview(fx);
+	if (cur_plugin){
+		Effect fx(cur_plugin);
+		Preview(&fx);
+	}else{
+		Preview(NULL);
+	}
+}
+
+void PluginManager::ConfigureSynthesizer(Synthesizer *s)
+{
+	cur_synth = s;
+	s->options_to_string();
+	//s->options_from_string();
+	s->Configure();
 }
 
 void PluginManager::OnUpdate(Observable *o)
@@ -639,10 +674,11 @@ Plugin *PluginManager::GetPlugin(const string &name)
 }
 
 
-void PluginManager::Preview(Effect &fx)
+void PluginManager::Preview(Effect *fx)
 {
-	fx.ExportData();
-	tsunami->renderer->effect = &fx;
+	if (fx)
+		fx->ExportData();
+	tsunami->renderer->effect = fx;
 
 
 	tsunami->progress->StartCancelable(_("Vorschau"), 0);
@@ -661,7 +697,8 @@ void PluginManager::Preview(Effect &fx)
 
 
 	tsunami->renderer->effect = NULL;
-	fx.ImportData();
+	if (fx)
+		fx->ImportData();
 }
 
 

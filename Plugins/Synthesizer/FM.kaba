@@ -68,14 +68,73 @@ class FMState
 	void __init__()
 		reset()
 	void __assign__(FMState o)
-	
+
+Dialog *cur_dlg
+
+class ConfigDialog : Dialog
+	void __init__(FMConfig *c, window parent)
+		super.__init__("config", 640, 260, parent, false)
+		cur_dlg = self
+		AddControlTable("", 0, 0, 1, 3, "root_table")
+		SetTarget("root_table", 0)
+		AddControlTable("", 0, 1, 8, NUM_OSCILLATORS + 1, "main_table")
+		SetTarget("main_table", 0)
+		AddText("Frequency", 0, 0, 0, 0, "")
+		AddText("Amplitude", 1, 0, 0, 0, "")
+		AddText("Initial", 2, 0, 0, 0, "")
+		AddText("Peak", 3, 0, 0, 0, "")
+		AddText("Sustain", 4, 0, 0, 0, "")
+		AddText("Attack (ms)", 5, 0, 0, 0, "")
+		AddText("Decay (ms)", 6, 0, 0, 0, "")
+		AddText("Release (ms)", 7, 0, 0, 0, "")
+		for int j, 0, NUM_OSCILLATORS
+			AddSpinButton("0\\0\\32\\0.001", 0, j + 1, 0, 0, "factor_" + j)
+			AddSpinButton("0\\0\\32\\0.001", 1, j + 1, 0, 0, "amplitude_" + j)
+			AddSpinButton("0\\0\\1\\0.001", 2, j + 1, 0, 0, "initial_" + j)
+			AddSpinButton("0\\0\\1\\0.001", 3, j + 1, 0, 0, "peak_" + j)
+			AddSpinButton("0\\0\\1\\0.001", 4, j + 1, 0, 0, "sustain_" + j)
+			AddSpinButton("0\\0\\1000\\0.1", 5, j + 1, 0, 0, "attack_" + j)
+			AddSpinButton("0\\0\\1000\\0.1", 6, j + 1, 0, 0, "decay_" + j)
+			AddSpinButton("0\\0\\1000\\0.1", 7, j + 1, 0, 0, "release_" + j)
+		PutFavoriteBarSizable(self, "root_table", 0, 0)
+		PutCommandBarSizable(self, "root_table", 0, 2)
 
 class FMSynthesizer : Synthesizer
 	FMConfig config
 	FMState state
+
 	overwrite void Reset()
 		reset()
 		state.reset()
+	
+	overwrite void DataToDialog()
+		for int j, 0, NUM_OSCILLATORS
+			cur_dlg.SetFloat("factor_" + j, config.osc[j].factor)
+			cur_dlg.SetFloat("amplitude_" + j, config.osc[j].amplitude)
+			cur_dlg.SetFloat("initial_" + j, config.osc[j].initial)
+			cur_dlg.SetFloat("peak_" + j, config.osc[j].peak)
+			cur_dlg.SetFloat("sustain_" + j, config.osc[j].sustain)
+			cur_dlg.SetFloat("attack_" + j, config.osc[j].attack * 1000)
+			cur_dlg.SetFloat("decay_" + j, config.osc[j].decay * 1000)
+			cur_dlg.SetFloat("release_" + j, config.osc[j].release * 1000)
+	
+	
+	overwrite void DataFromDialog()
+		for int j, 0, NUM_OSCILLATORS
+			config.osc[j].factor = cur_dlg.GetFloat("factor_" + j)
+			config.osc[j].amplitude = cur_dlg.GetFloat("amplitude_" + j)
+			config.osc[j].initial = cur_dlg.GetFloat("initial_" + j)
+			config.osc[j].peak = cur_dlg.GetFloat("peak_" + j)
+			config.osc[j].sustain = cur_dlg.GetFloat("sustain_" + j)
+			config.osc[j].attack = cur_dlg.GetFloat("attack_" + j) / 1000
+			config.osc[j].decay = cur_dlg.GetFloat("decay_" + j) / 1000
+			config.osc[j].release = cur_dlg.GetFloat("release_" + j) / 1000
+
+	overwrite void Configure()
+		ConfigDialog *d = new ConfigDialog(&config, MainWin)
+		DataToDialog()
+		d.Run()
+
 	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
 		int n = pitch + 0.4
 		float freq = pitch_to_freq(pitch)

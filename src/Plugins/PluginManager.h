@@ -41,7 +41,7 @@ public:
 	void FinishPluginData();
 	void InitFavorites(HuiWindow *win);
 
-	void Preview(Effect &fx);
+	void Preview(Effect *fx);
 
 	void OnFavoriteName();
 	void OnFavoriteList();
@@ -58,6 +58,8 @@ public:
 
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name);
+
+	void ConfigureSynthesizer(Synthesizer *s);
 
 	// not compiled yet
 	struct PluginFile
@@ -78,6 +80,7 @@ public:
 
 	Array<Plugin*> plugin;
 	Plugin *cur_plugin;
+	Synthesizer *cur_synth;
 
 	struct PluginContext
 	{

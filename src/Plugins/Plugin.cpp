@@ -83,6 +83,46 @@ void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)
 		var_temp += "-------";
 }
 
+string var_to_string(Script::Type *type, char *v)
+{
+	string r;
+	if (type == Script::TypeInt){
+		r += i2s(*(int*)v);
+	}else if (type == Script::TypeChar){
+		r += i2s(*(char*)v);
+	}else if (type == Script::TypeFloat){
+		r += f2s(*(float*)v, 6);
+	}else if (type == Script::TypeBool){
+		r += (*(bool*)v) ? "true" : "false";
+	}else if (type->is_array){
+		r += "[";
+		for (int i=0;i<type->array_length;i++){
+			if (i > 0)
+				r += " ";
+			r += var_to_string(type->parent, &v[i * type->parent->size]);
+		}
+		r += "]";
+	}else if (type->is_super_array){
+		DynamicArray *a = (DynamicArray*)v;
+		r += "[";
+		for (int i=0;i<a->num;i++){
+			if (i > 0)
+				r += " ";
+			r += var_to_string(type->parent, &(((char*)a->data)[i * type->parent->size]));
+		}
+		r += "]";
+	}else{
+		r += "(";
+		for(int i=0;i<type->element.num;i++){
+			if (i > 0)
+				r += " ";
+			r += var_to_string(type->element[i].type, &v[type->element[i].offset]);
+		}
+		r += ")";
+	}
+	return r;
+}
+
 void try_write_element(EffectParam *p, Script::ClassElement *e, char *v)
 {
 	p->name = e->name;
@@ -128,6 +168,64 @@ string get_next(const string &var_temp, int &pos)
 	return var_temp.substr(start, -1);
 }
 
+string get_next2(const string &var_temp, int &pos)
+{
+	int start = pos;
+	for (int i=start;i<var_temp.num;i++){
+		if ((var_temp[i] == ' ') || (var_temp[i] == ']') || (var_temp[i] == ')') || (var_temp[i] == '[') || (var_temp[i] == '(')){
+			pos = i;
+			return var_temp.substr(start, i - start);
+			break;
+		}
+	}
+	return var_temp.substr(start, -1);
+}
+
+void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
+{
+	if (pos >= s.num)
+		return;
+	if (type == Script::TypeInt){
+		*(int*)v = get_next2(s, pos)._int();
+	}else if (type == Script::TypeChar){
+		get_next2(s, pos);
+		*(char*)v = 'x';
+	}else if (type == Script::TypeFloat){
+		*(float*)v = get_next2(s, pos)._float();
+	}else if (type == Script::TypeBool){
+		*(bool*)v = (get_next2(s, pos) == "true");
+	}else if (type->is_array){
+		pos ++; // '['
+		for (int i=0;i<type->array_length;i++){
+			if (i > 0)
+				pos ++; // ' '
+			var_from_string(type->parent, &v[i * type->parent->size], s, pos);
+		}
+		pos ++; // ']'
+	}else if (type->is_super_array){
+		pos ++; // '['
+		DynamicArray *a = (DynamicArray*)v;
+		a->clear(); // todo...
+		while (true){
+			if ((s[pos] == ']') || (pos >= s.num))
+				break;
+			if (a->num > 0)
+				pos ++; // ' '
+			a->resize(a->num + 1);
+			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos);
+		}
+		pos ++; // ']'
+	}else{
+		pos ++; // '('
+		for(int i=0;i<type->element.num;i++){
+			if (i > 0)
+				pos ++; // ' '
+			var_from_string(type->element[i].type, &v[type->element[i].offset], s, pos);
+		}
+		pos ++; // ')'
+	}
+}
+
 void try_read_primitive_element(const string &var_temp, int &pos, Script::Type *t, char *v)
 {
 	if (t == Script::TypeInt)
@@ -165,26 +263,24 @@ void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
 
 void Plugin::ExportData(Array<EffectParam> &param)
 {
-	msg_db_r("Plugin.ExportData", 1);
+	msg_db_f("Plugin.ExportData", 1);
 	param.clear();
 	if (data){
 		param.resize(data_type->element.num);
 		foreachi(Script::ClassElement &e, data_type->element, j)
 			try_write_element(&param[j], &e, (char*)data);
 	}
-	msg_db_l(1);
 }
 
 void Plugin::ImportData(Array<EffectParam> &param)
 {
-	msg_db_r("Plugin.ImportData", 1);
+	msg_db_f("Plugin.ImportData", 1);
 	if (data){
 		foreach(Script::ClassElement &e, data_type->element)
 			foreach(EffectParam &p, param)
 				if ((e.name == p.name) && (e.type->name == p.type))
 					try_read_element(p, &e, (char*)data);
 	}
-	msg_db_l(1);
 }
 
 void Plugin::ResetData()
@@ -197,26 +293,23 @@ void Plugin::ResetData()
 
 void Plugin::ResetState()
 {
-	msg_db_r("Plugin.ResetState", 1);
+	msg_db_f("Plugin.ResetState", 1);
 	if (f_reset_state)
 		f_reset_state();
-	msg_db_l(1);
 }
 
 bool Plugin::Configure(bool previewable)
 {
-	msg_db_r("Plugin.Configure", 1);
+	msg_db_f("Plugin.Configure", 1);
 	if (f_configure){
 		tsunami->plugin_manager->cur_plugin = this;
 		tsunami->plugin_manager->PluginAddPreview = previewable;
 		f_configure();
 		GlobalRemoveSliders(NULL);
-		msg_db_l(1);
 		return !tsunami->plugin_manager->PluginCancelled;
 	}else{
 		tsunami->log->Info(_("Dieser Effekt ist nicht konfigurierbar."));
 	}
-	msg_db_l(1);
 	return true;
 }
 
@@ -230,7 +323,7 @@ void Plugin::ProcessTrack(Track *t, int level_no, const Range &r)
 {
 	if (!f_process_track)
 		return;
-	msg_db_r("PluginProcessTrack", 1);
+	msg_db_f("PluginProcessTrack", 1);
 
 	tsunami->plugin_manager->context.set(t, level_no, r);
 
@@ -238,14 +331,13 @@ void Plugin::ProcessTrack(Track *t, int level_no, const Range &r)
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
 	f_process_track(&buf);
 	t->root->Execute(a);
-	msg_db_l(1);
 }
 
 void Plugin::WriteDataToFile(const string &name)
 {
 	if (!usable)
 		return;
-	msg_db_r("Plugin.WriteDataToFile", 1);
+	msg_db_f("Plugin.WriteDataToFile", 1);
 	Array<EffectParam> param;
 	ExportData(param);
 	dir_create(HuiAppDirectory + "Plugins/");
@@ -262,19 +354,16 @@ void Plugin::WriteDataToFile(const string &name)
 	}
 	f->WriteStr("#");
 	FileClose(f);
-	msg_db_l(1);
 }
 
 void Plugin::LoadDataFromFile(const string &name)
 {
 	if (!usable)
 		return;
-	msg_db_r("Plugin.LoadDataFromFile", 1);
+	msg_db_f("Plugin.LoadDataFromFile", 1);
 	CFile *f = FileOpen(HuiAppDirectory + "Plugins/Favorites/" + s->Filename.basename() + "___" + name);
-	if (!f){
-		msg_db_l(1);
+	if (!f)
 		return;
-	}
 
 	Array<EffectParam> param;
 
@@ -291,5 +380,4 @@ void Plugin::LoadDataFromFile(const string &name)
 	ImportData(param);
 
 	FileClose(f);
-	msg_db_l(1);
 }

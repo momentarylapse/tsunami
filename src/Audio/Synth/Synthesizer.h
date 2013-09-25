@@ -32,10 +32,16 @@ public:
 	virtual int read(BufferBox &buf);
 	void iterate(int samples);
 
-	virtual void OnConfigure(){}
+	virtual void Configure(){}
+	virtual void DataToDialog(){}
+	virtual void DataFromDialog(){}
 	virtual void Reset();
 
+	void options_to_string();
+	void options_from_string();
+
 	string name;
+	string options;
 	int sample_rate;
 
 	MidiSource *source;

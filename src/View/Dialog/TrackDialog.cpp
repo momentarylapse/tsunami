@@ -13,6 +13,7 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "SynthesizerDialog.h"
 #include "../../Tsunami.h"
+#include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"
 
 TrackDialog::TrackDialog(HuiWindow *win):
@@ -108,7 +109,7 @@ void TrackDialog::OnSynthesizer()
 
 void TrackDialog::OnConfigSynthesizer()
 {
-	track->synth->OnConfigure();
+	tsunami->plugin_manager->ConfigureSynthesizer(track->synth);
 }
 
 void TrackDialog::OnEditMidiTrack()

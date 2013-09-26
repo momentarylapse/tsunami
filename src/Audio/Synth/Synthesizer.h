@@ -36,6 +36,7 @@ public:
 	virtual void DataToDialog(){}
 	virtual void DataFromDialog(){}
 	virtual void Reset();
+	virtual void ResetConfig(){}
 
 	void options_to_string();
 	void options_from_string();

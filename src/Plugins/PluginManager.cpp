@@ -155,6 +155,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "DataToDialog", Script::mf(&Synthesizer::DataToDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "DataFromDialog", Script::mf(&Synthesizer::DataFromDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "Reset", Script::mf(&Synthesizer::Reset), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "ResetConfig", Script::mf(&Synthesizer::ResetConfig), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
 	Script::LinkExternal("Synthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
 	Script::LinkExternal("Synthesizer.reset", Script::mf(&Synthesizer::reset));
@@ -352,30 +353,65 @@ void PluginManager::OnFavoriteName()
 	HuiCurWindow->Enable("favorite_delete", enabled);
 }
 
+void SynthWriteDataToFile(Synthesizer *s, const string &name)
+{
+	msg_db_f("Synth.WriteDataToFile", 1);
+	dir_create(HuiAppDirectory + "Favorites/");
+	dir_create(HuiAppDirectory + "Favorites/Synthesizer/");
+	s->options_to_string();
+	CFile *f = FileCreate(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
+	f->WriteStr(s->options);
+	FileClose(f);
+}
+
+void SynthLoadDataFromFile(Synthesizer *s, const string &name)
+{
+	msg_db_f("Synth.LoadDataFromFile", 1);
+	/*Script::Type *t = Script::GetDynamicType(s);
+	if (!t)
+		return;*/
+	CFile *f = FileOpen(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
+	if (!f)
+		return;
+	s->options = f->ReadStr();
+	FileClose(f);
+	s->options_from_string();
+}
+
+
 void PluginManager::OnFavoriteList()
 {
-	if (!cur_plugin)
-		return;
 	int n = HuiCurWindow->GetInt("");
-	cur_plugin->ResetData();
+	if (cur_plugin)
+		cur_plugin->ResetData();
+	else if (cur_synth)
+		cur_synth->ResetConfig();
 	if (n == 0){
 		HuiCurWindow->SetString("favorite_name", "");
 		HuiCurWindow->Enable("favorite_save", false);
 		HuiCurWindow->Enable("favorite_delete", false);
 	}else{
-		cur_plugin->LoadDataFromFile(PluginFavoriteName[n - 1]);
+		if (cur_plugin)
+			cur_plugin->LoadDataFromFile(PluginFavoriteName[n - 1]);
+		else if (cur_synth)
+			SynthLoadDataFromFile(cur_synth, PluginFavoriteName[n - 1]);
 		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		HuiCurWindow->Enable("favorite_delete", true);
 	}
-	cur_plugin->DataToDialog();
+	if (cur_plugin)
+		cur_plugin->DataToDialog();
+	else if (cur_synth)
+		cur_synth->DataToDialog();
 }
 
 void PluginManager::OnFavoriteSave()
 {
-	if (!cur_plugin)
-		return;
 	string name = HuiCurWindow->GetString("favorite_name");
-	cur_plugin->WriteDataToFile(name);
+	if (cur_plugin){
+		cur_plugin->WriteDataToFile(name);
+	}else if (cur_synth){
+		SynthWriteDataToFile(cur_synth, name);
+	}
 	PluginFavoriteName.add(name);
 	HuiCurWindow->AddString("favorite_list", name);
 	HuiCurWindow->SetInt("favorite_list", PluginFavoriteName.num);
@@ -393,12 +429,19 @@ void PluginManager::InitFavorites(HuiWindow *win)
 	win->Enable("favorite_save", false);
 	win->Enable("favorite_delete", false);
 
-	string init;
+	string init = "-------";
 	if (cur_plugin)
-		cur_plugin->s->Filename.basename() + "___";
+		init = cur_plugin->s->Filename.basename() + "___";
+	else if (cur_synth)
+		init = cur_synth->name + "___";
 
-	dir_create(HuiAppDirectory + "Plugins/Favorites");
-	Array<DirEntry> list = dir_search(HuiAppDirectory + "Plugins/Favorites", "*", false);
+	dir_create(HuiAppDirectory + "Favorites");
+	dir_create(HuiAppDirectory + "Favorites/Effects");
+	dir_create(HuiAppDirectory + "Favorites/Synthesizer");
+	string dir = HuiAppDirectory + "Favorites/Effects";
+	if (cur_synth)
+		dir = HuiAppDirectory + "Favorites/Synthesizer";
+	Array<DirEntry> list = dir_search(dir, "*", false);
 	foreach(DirEntry &e, list){
 		if (e.name.find(init) < 0)
 			continue;
@@ -481,8 +524,10 @@ void PluginManager::OnPluginFavoriteSave()
 
 void PluginManager::OnPluginOk()
 {
-	if (cur_synth)
+	if (cur_synth){
 		cur_synth->DataFromDialog();
+		cur_synth->options_to_string();
+	}
 	PluginCancelled = false;
 	cur_plugin = NULL;
 	cur_synth = NULL;
@@ -491,6 +536,9 @@ void PluginManager::OnPluginOk()
 
 void PluginManager::OnPluginClose()
 {
+	if (cur_synth){
+		cur_synth->options_from_string();
+	}
 	PluginCancelled = true;
 	cur_plugin = NULL;
 	cur_synth = NULL;
@@ -553,13 +601,16 @@ void PluginManager::OnPluginPreview()
 	if (cur_plugin){
 		Effect fx(cur_plugin);
 		Preview(&fx);
-	}else{
+	}else if (cur_synth){
+		cur_synth->DataFromDialog();
 		Preview(NULL);
 	}
 }
 
 void PluginManager::ConfigureSynthesizer(Synthesizer *s)
 {
+	PluginAddPreview = false;
+	cur_plugin = NULL;
 	cur_synth = s;
 	s->options_to_string();
 	//s->options_from_string();

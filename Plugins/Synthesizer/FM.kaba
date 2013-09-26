@@ -15,29 +15,32 @@ class OscillatorLink
 class FMConfig
 	OscillatorConfig osc[NUM_OSCILLATORS]
 	OscillatorLink link[]
-	void __init__()
-		osc[0].factor = 1
-		osc[0].amplitude = 0.5
-		osc[1].factor = 1.9881
-		osc[1].amplitude = 0.7
-		osc[2].factor = 3.9821 // 1.72
-		osc[2].amplitude = 0.3
-		osc[3].factor = 1.00621
-		osc[3].amplitude = 0.5
-		osc[4].factor = 1.9934
-		osc[4].amplitude = 0.7
+	void reset()
+		link.clear()
 		for int j, 0, NUM_OSCILLATORS
+			osc[j].factor = 1
+			osc[j].amplitude = 0
 			osc[j].attack = 0.01
 			osc[j].decay = 0.4
 			osc[j].release = 0.4
 			osc[j].initial = 0.01
 			osc[j].peak = 1
 			osc[j].sustain = 0.6
+		osc[0].factor = 1
+		osc[0].amplitude = 0.5
+		/*osc[1].factor = 1.9881
+		osc[1].amplitude = 0.7
+		osc[2].factor = 3.9821 // 1.72
+		osc[2].amplitude = 0.3
+		osc[3].factor = 1.00621
+		osc[3].amplitude = 0.5
+		osc[4].factor = 1.9934
+		osc[4].amplitude = 0.7*/
 		OscillatorLink l
 		l.source = 0
 		l.dest = -1
 		link.add(l)
-		l.source = 1
+		/*l.source = 1
 		l.dest = 0
 		link.add(l)
 		l.source = 2
@@ -48,7 +51,9 @@ class FMConfig
 		link.add(l)
 		l.source = 4
 		l.dest = 3
-		link.add(l)
+		link.add(l)*/
+	void __init__()
+		reset()
 	void __assign__(FMConfig o)
 
 class OscillatorState
@@ -102,6 +107,9 @@ class ConfigDialog : Dialog
 class FMSynthesizer : Synthesizer
 	FMConfig config
 	FMState state
+	
+	overwrite void ResetConfig()
+		config.reset()
 
 	overwrite void Reset()
 		reset()

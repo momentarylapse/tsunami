@@ -54,6 +54,7 @@ class Synthesizer
 	extern virtual void DataToDialog()
 	extern virtual void DataFromDialog()
 	extern virtual void Reset()
+	extern virtual void ResetConfig()
 	extern virtual int read(BufferBox buf)
 	extern void set(float pitch, float volume, int offset)
 	extern void RenderMetronomeClick(BufferBox buf, int pos, int level, float volume)

@@ -340,8 +340,7 @@ void Plugin::WriteDataToFile(const string &name)
 	msg_db_f("Plugin.WriteDataToFile", 1);
 	Array<EffectParam> param;
 	ExportData(param);
-	dir_create(HuiAppDirectory + "Plugins/");
-	dir_create(HuiAppDirectory + "Plugins/Favorites/");
+	dir_create(HuiAppDirectory + "Favorites/");
 	CFile *f = FileCreate(HuiAppDirectory + "Plugins/Favorites/" + s->Filename.basename() + "___" + name);
 	f->WriteInt(0);
 	f->WriteInt(0);
@@ -361,7 +360,7 @@ void Plugin::LoadDataFromFile(const string &name)
 	if (!usable)
 		return;
 	msg_db_f("Plugin.LoadDataFromFile", 1);
-	CFile *f = FileOpen(HuiAppDirectory + "Plugins/Favorites/" + s->Filename.basename() + "___" + name);
+	CFile *f = FileOpen(HuiAppDirectory + "Favorites/" + s->Filename.basename() + "___" + name);
 	if (!f)
 		return;
 

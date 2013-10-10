@@ -49,8 +49,4 @@ class Image
 	color _cdecl GetPixelInterpolated(float x, float y) const;
 };
 
-#include "image_bmp.h"
-#include "image_tga.h"
-#include "image_jpg.h"
-
 #endif

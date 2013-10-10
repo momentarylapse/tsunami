@@ -57,11 +57,13 @@ void SIAddPackageNix()
 		// drawing
 	add_func("NixInit",				TypeVoid,					nix_p(&NixInit));
 		func_add_param("api",		TypeString);
+		func_add_param("w",			TypeHuiWindowP);
+		func_add_param("id",		TypeString);
+	add_func("NixSetVideoMove",				TypeVoid,					nix_p(&NixSetVideoMode));
+		func_add_param("api",		TypeString);
 		func_add_param("xres",		TypeInt);
 		func_add_param("yres",		TypeInt);
-		func_add_param("depth",		TypeInt);
 		func_add_param("fullscreen",TypeBool);
-		func_add_param("w",			TypeHuiWindowP);
 	add_func("NixStart",									TypeVoid,	nix_p(&NixStart));
 		func_add_param("texture",		TypeInt);
 	add_func("NixEnd",											TypeVoid,	nix_p(&NixEnd));

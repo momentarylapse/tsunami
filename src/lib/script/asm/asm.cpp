@@ -3195,6 +3195,7 @@ void InstructionWithParamsList::ShrinkJumps(void *oc, int ocs)
 	// first pass compilation (we need real jump distances)
 	int _ocs = ocs;
 	Compile(oc, _ocs);
+	wanted_label.clear();
 
 	// try shrinking
 	foreachi(InstructionWithParams &iwp, *this, i){
@@ -3264,10 +3265,12 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 
 	LinkWantedLabels(oc);
 
-	if (wanted_label.num > 0){
-		state.LineNo = (*this)[wanted_label[0].InstNo].line;
-		state.ColumnNo = (*this)[wanted_label[0].InstNo].col;
-		SetError("undeclared label used: " + wanted_label[0].Name);
+	foreach(WantedLabel &l, wanted_label){
+		if (l.Name.head(10) == "kaba-func:")
+			continue;
+		state.LineNo = (*this)[l.InstNo].line;
+		state.ColumnNo = (*this)[l.InstNo].col;
+		SetError("undeclared label used: " + l.Name);
 	}
 }
 

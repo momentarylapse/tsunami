@@ -11,7 +11,7 @@ const float MAX_FREQ = 10000.0
 const float MIN_VOL = 0.0 - 60.0
 const float MAX_VOL = 0.0
 
-window dlg
+Window *dlg
 
 float sg[NT][NF]
 Image im0
@@ -20,7 +20,7 @@ GridData grid
 
 
 void OnDraw()
-	painter c = dlg.BeginDraw("drawing_area")
+	Painter *c = dlg.BeginDraw("drawing_area")
 	float w = c.width
 	float h = c.height
 	

@@ -141,7 +141,9 @@ string param_out(SerialCommandParam &p)
 		string n = p2s(p.p);
 		if ((p.kind == KindRegister) || (p.kind == KindDerefRegister))
 			n = Asm::GetRegName((long)p.p);
-		str = "  " + Kind2Str(p.kind) + " " + n + " (" + p.type->name + ")";
+		else if ((p.kind == KindVarLocal) || (p.kind == KindVarGlobal) || (p.kind == KindVarTemp) || (p.kind == KindDerefVarTemp) || (p.kind == KindMarker))
+			n = i2s((long)p.p);
+		str = "  (" + p.type->name + ") " + Kind2Str(p.kind) + " " + n;
 		if (p.shift > 0)
 			str += format(" + shift %d", p.shift);
 	}
@@ -155,6 +157,8 @@ string cmd2str(SerialCommand &c)
 		return format("-- Marker %d --", (long)c.p1.p);
 	if (c.inst == inst_asm)
 		return "-- Asm --";
+	if (c.inst == inst_call_label)
+		return "call  (by label) " + ((Function*)c.p1.p)->name;
 	string t = Asm::GetInstructionName(c.inst);
 	t += param_out(c.p1);
 	t += param_out(c.p2);
@@ -197,7 +201,7 @@ void Serializer::add_cmd(int inst, SerialCommandParam p1, SerialCommandParam p2)
 	cmd.add(c);
 
 	// call violates all used registers...
-	if (inst == Asm::inst_call)
+	if ((inst == Asm::inst_call) || (inst == inst_call_label))
 		for (int i=0;i<MapRegRoot.num;i++){
 			add_reg_channel(get_reg(i, 4), cmd.num - 1, cmd.num - 1);
 		}
@@ -434,10 +438,13 @@ void Serializer::add_function_call_x86(Script *script, int func_no)
 	int push_size = fc_x86_begin();
 
 	void *func = (void*)script->func[func_no];
-	if (!func)
-		DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);
-	add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
-	// function pointer will be shifted later...
+	if (!func){
+		//DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);*/
+		add_cmd(inst_call_label, param_const(TypePointer, script->syntax->Functions[func_no])); // the actual call
+	}else{
+		add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
+		// function pointer will be shifted later...
+	}
 
 	fc_x86_end(push_size);
 }
@@ -562,10 +569,13 @@ void Serializer::add_function_call_amd64(Script *script, int func_no)
 	int push_size = fc_amd64_begin();
 
 	void *func = (void*)script->func[func_no];
-	if (!func)
-		DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);
-	//add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
-	add_cmd(Asm::inst_call, param_const(TypeReg32, func)); // the actual call
+	if (!func){
+		//DoErrorLink("could not link function " + script->syntax->Functions[func_no]->name);*/
+		add_cmd(inst_call_label, param_const(TypePointer, script->syntax->Functions[func_no])); // the actual call
+	}else{
+		//add_cmd(Asm::inst_call, param_const(TypePointer, func)); // the actual call
+		add_cmd(Asm::inst_call, param_const(TypeReg32, func)); // the actual call
+	}
 	// function pointer will be shifted later...
 
 	fc_amd64_end(push_size);
@@ -712,6 +722,15 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 		so(" -var-func");
 		p.p = (char*)link->script->func[link->link_no];
 		p.kind = KindVarGlobal;
+		if (!p.p){
+			if (link->script == script){
+				p.p = (char*)(long)(link->link_no + 0xefef0000);
+				script->function_vars_to_link.add(link->link_no);
+			}else
+				DoErrorLink("could not link function as variable: " + link->script->syntax->Functions[link->link_no]->name);
+			//p.kind = Asm::PKLabel;
+			//p.p = (char*)(long)list->add_label("kaba-func:" + link->script->syntax->Functions[link->link_no]->name, false);
+		}
 	}else if (link->kind == KindMemory){
 		so(" -mem");
 		p.p = (char*)(long)link->link_no;
@@ -2013,7 +2032,7 @@ bool Serializer::ParamUntouchedInInterval(SerialCommandParam &p, int first, int 
 		for (int i=first;i<=last;i++){
 			
 			// call violates all!
-			if (cmd[i].inst == Asm::inst_call)
+			if ((cmd[i].inst == Asm::inst_call) || (cmd[i].inst == inst_call_label))
 				return false;
 
 			// div violates eax and edx
@@ -2834,7 +2853,7 @@ inline void get_param(int inst, SerialCommandParam &p, int &param_type, int &par
 	}else if (p.kind == KindMarker){
 		param_type = Asm::PKLabel;
 		param_size = 4;
-		param = (void*)(long)list->add_label("_kaba_" + i2s((int)(long)p.p), false);
+		param = (void*)(long)list->add_label("kaba:" + i2s((int)(long)p.p), false);
 	}else if (p.kind == KindRegister){
 		param_type = Asm::PKRegister;
 		param = p.p;
@@ -2895,6 +2914,12 @@ inline void get_param(int inst, SerialCommandParam &p, int &param_type, int &par
 
 void assemble_cmd(Asm::InstructionWithParamsList *list, SerialCommand &c, Script *s)
 {
+	if (c.inst == inst_call_label){
+		//msg_write("marker kaba:" + i2s((long)cmd[i].p1.p));
+		Function *f = (Function*)c.p1.p;
+		list->add_easy(Asm::inst_call, Asm::PKLabel, 4, (void*)(long)list->add_label("kaba-func:" + f->name, false));
+		return;
+	}
 	// translate parameters
 	int param1_type, param2_type;
 	int param1_size, param2_size;
@@ -2931,8 +2956,8 @@ void Serializer::Assemble(char *Opcode, int &OpcodeSize)
 	for (int i=0;i<cmd.num;i++){
 
 		if (cmd[i].inst == inst_marker){
-			//msg_write("marker _kaba_" + i2s((long)cmd[i].p1.p));
-			list->add_label("_kaba_" + i2s((long)cmd[i].p1.p), true);
+			//msg_write("marker kaba:" + i2s((long)cmd[i].p1.p));
+			list->add_label("kaba:" + i2s((long)cmd[i].p1.p), true);
 		}else if (cmd[i].inst == inst_asm){
 			AddAsmBlock(list, script);
 		}else{
@@ -3058,6 +3083,7 @@ void Script::CompileFunction(Function *f, char *Opcode, int &OpcodeSize)
 	}catch(Asm::Exception &e){
 		throw Exception(e, this);
 	}
+	functions_to_link.append(d.list->wanted_label);
 	AlignOpcode();
 }
 

@@ -3,7 +3,7 @@
 
 use "../../api.kaba"
 
-window PitchDialog
+ConfigDialog *dlg
 
 complex buf1[]
 complex buf2[]
@@ -17,10 +17,7 @@ void ResetData()
 	data.Pitch = 1
 
 void DataToDialog()
-	SliderSet(PitchDialog, "pitch", data.Pitch)
-
-void OnPitch()
-	data.Pitch = SliderGet(PitchDialog, "pitch")
+	dlg.fill()
 
 void shift_buf(float b[])
 	int i, j
@@ -38,20 +35,30 @@ void shift_buf(float b[])
 			buf2[i] = complex(0, 0)
 	fft_c2r_inv(buf2, b)
 
+class ConfigDialog : Dialog
+	void __init__()
+		super.__init__("Pitch Shift", 305, 75, MainWin, false)
+		AddControlTable("", 0, 0, 1, 2, "table1")
+		SetTarget("table1", 0)
+		AddControlTable("", 0, 0, 3, 1, "table2")
+		SetTarget("table2", 0)
+		AddSlider("!expandx", 0, 0, 0, 0, "pitch_slider")
+		AddSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "pitch")
+		AddText("%", 2, 0, 0, 0, "")
+		PutCommandBar(self, "table1", 0, 1)
+		CreateSliderM(self, "pitch_slider", "pitch", 0, 2, 100, &OnPitch, data.Pitch)
+		
+		fill()
+	
+	void fill()
+		SliderSet(self, "pitch", data.Pitch)
+
+	void OnPitch()
+		data.Pitch = SliderGet(self, "pitch")
 
 void Configure()
-	// dialog
-	PitchDialog = new FixedDialog("Pitch Shift",305,75,MainWin,false)
-	PitchDialog.AddSlider("",5,5,205,25,"pitch_slider")
-	PitchDialog.AddSpinButton("\\0\\1000\\0.1",215,5,50,25,"pitch")
-	PitchDialog.AddText("%",270,5,30,25,"")
-	PutCommandBarFixed(PitchDialog, 5, 40, 305)
-	AddSlider(PitchDialog, "pitch_slider", "pitch", 0, 2, 100, &OnPitch, data.Pitch)
-		
-	PitchDialog.SetDecimals(1)
-	DataToDialog()
-	
-	PitchDialog.Run()
+	dlg = new ConfigDialog
+	dlg.Run()
 
 void ProcessTrack(BufferBox buf)
 	shift_buf(buf.r)

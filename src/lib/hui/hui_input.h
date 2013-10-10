@@ -11,12 +11,15 @@
 
 class HuiEventHandler;
 
+typedef void hui_kaba_callback(HuiEventHandler *h);
+
 class HuiCallback
 {
 public:
 	HuiCallback();
 	HuiCallback(hui_callback *func);
 	HuiCallback(HuiEventHandler *object, void (HuiEventHandler::*member_function)());
+	HuiCallback(HuiEventHandler *object, hui_kaba_callback *function);
 	void call();
 	bool is_set();
 	bool has_handler(HuiEventHandler *object);
@@ -24,6 +27,7 @@ public:
 private:
 	hui_callback *func;
 	HuiEventHandler *object;
+	hui_kaba_callback *kaba_func;
 	void (HuiEventHandler::*member_function)();
 };
 
@@ -69,6 +73,8 @@ struct HuiEventListener
 {
 	string id, message;
 	HuiCallback function;
+	HuiEventListener(){}
+	HuiEventListener(const string &id, const string &message, HuiCallback function);
 };
 
 

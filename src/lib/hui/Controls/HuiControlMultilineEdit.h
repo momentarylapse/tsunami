@@ -19,6 +19,8 @@ public:
 	virtual string GetString();
 	virtual void __SetString(const string &str);
 	virtual void __AddString(const string &str);
+
+	bool handle_keys;
 };
 
 #endif /* HUICONTROLMULTILINEEDIT_H_ */

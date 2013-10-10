@@ -247,19 +247,13 @@ void HuiWindow::AddText(const string &title,int x,int y,int width,int height,con
 void HuiWindow::AddEdit(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_InsertControl_(new HuiControlEdit(title, id), x, y, width, height);
-
-	// dumb but usefull test
-/*	if (height > 30){
-		GtkStyle* style = gtk_widget_get_style(text);
-		PangoFontDescription *font_desc = pango_font_description_copy(style->font_desc);
-		pango_font_description_set_absolute_size(font_desc, height * PANGO_SCALE * 0.95);
-		gtk_widget_modify_font(text, font_desc);
-	}*/
 }
 
 void HuiWindow::AddMultilineEdit(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_InsertControl_(new HuiControlMultilineEdit(title, id), x, y, width, height);
+	if ((!main_input_control) && ((HuiControlMultilineEdit*)control.back())->handle_keys)
+		main_input_control = control.back();
 }
 
 void HuiWindow::AddSpinButton(const string &title,int x,int y,int width,int height,const string &id)

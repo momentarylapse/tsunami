@@ -2,7 +2,7 @@
 // Title[Deutsch] = Metronom
 use "../api.kaba"
 
-window dlg
+Window *dlg
 
 const int SAMPLE_RATE = 44100
 float length

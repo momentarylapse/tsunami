@@ -45,18 +45,21 @@ PluginManager::~PluginManager()
 void GlobalPutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
 {	tsunami->plugin_manager->PutFavoriteBarFixed(win, x, y, w);	}
 
-void GlobalPutFavoriteBarSizable(HuiWindow *win, const string &root_id, int x, int y)
+void GlobalPutFavoriteBar(HuiWindow *win, const string &root_id, int x, int y)
 {	tsunami->plugin_manager->PutFavoriteBarSizable(win, root_id, x, y);	}
 
 void GlobalPutCommandBarFixed(HuiWindow *win, int x, int y, int w)
 {	tsunami->plugin_manager->PutCommandBarFixed(win, x, y, w);	}
 
-void GlobalPutCommandBarSizable(HuiWindow *win, const string &root_id, int x, int y)
+void GlobalPutCommandBar(HuiWindow *win, const string &root_id, int x, int y)
 {	tsunami->plugin_manager->PutCommandBarSizable(win, root_id, x, y);	}
 
 Array<Slider*> global_slider;
 
-void GlobalAddSlider(HuiWindow *win, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
+void GlobalCreateSlider(HuiWindow *win, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
+{	global_slider.add(new Slider(win, id_slider, id_edit, v_min, v_max, factor, func, value));	}
+
+void GlobalCreateSliderM(HuiWindow *win, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_kaba_callback *func, float value)
 {	global_slider.add(new Slider(win, id_slider, id_edit, v_min, v_max, factor, func, value));	}
 
 void GlobalSliderSet(HuiWindow *win, const string &id, float value)
@@ -104,10 +107,11 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("ProgressEnd", (void*)&ProgressEnd);
 	Script::LinkExternal("Progress", (void*)&ProgressStatus);*/
 	Script::LinkExternal("PutFavoriteBarFixed", (void*)&GlobalPutFavoriteBarFixed);
-	Script::LinkExternal("PutFavoriteBarSizable", (void*)&GlobalPutFavoriteBarSizable);
+	Script::LinkExternal("PutFavoriteBar", (void*)&GlobalPutFavoriteBar);
 	Script::LinkExternal("PutCommandBarFixed", (void*)&GlobalPutCommandBarFixed);
-	Script::LinkExternal("PutCommandBarSizable", (void*)&GlobalPutCommandBarSizable);
-	Script::LinkExternal("AddSlider", (void*)&GlobalAddSlider);
+	Script::LinkExternal("PutCommandBar", (void*)&GlobalPutCommandBar);
+	Script::LinkExternal("CreateSlider", (void*)&GlobalCreateSlider);
+	Script::LinkExternal("CreateSliderM", (void*)&GlobalCreateSliderM);
 	Script::LinkExternal("SliderSet", (void*)&GlobalSliderSet);
 	Script::LinkExternal("SliderGet", (void*)&GlobalSliderGet);
 	Script::LinkExternal("RemoveSliders", (void*)&GlobalRemoveSliders);

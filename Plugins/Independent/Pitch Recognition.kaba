@@ -13,7 +13,7 @@ const float threshold = 0.1
 const int buf_size = 32768
 float buf[]
 
-window win
+Window *win
 
 float get_freq(float i)
 	return i / (buf_size / 2) * freq / 2
@@ -30,7 +30,7 @@ string get_note(float f)
 	//loopf(fl, 0, 1)
 	//note = i2s(n)
 
-void DrawVolume(painter c)
+void DrawVolume(Painter *c)
 	c.SetColor(color(1, 0.8, 0.8, 0.8))
 	float y0 = 30
 	float y1 = c.height - 5
@@ -40,7 +40,7 @@ void DrawVolume(painter c)
 	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 void Draw()
-	painter c = win.BeginDraw("drawing")
+	Painter *c = win.BeginDraw("drawing")
 	c.SetColor(White)
 	c.SetFontSize(12)
 	c.DrawRect(0, 0, c.width, c.height)

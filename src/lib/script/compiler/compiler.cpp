@@ -315,6 +315,24 @@ void Script::CompileTaskEntryPoint()
 	delete(list);
 }
 
+bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, char *insert)
+{
+	for (int i=0;i<opcode_size - size;i++){
+		bool match = true;
+		for (int j=0;j<size;j++)
+			if (pattern[j] != opcode[i + j]){
+				match = false;
+				break;
+			}
+		if (match){
+			for (int j=0;j<size;j++)
+				opcode[i + j] = insert[j];
+			return true;
+		}
+	}
+	return false;
+}
+
 // generate opcode
 void Script::Compiler()
 {
@@ -368,6 +386,26 @@ void Script::Compiler()
 			func[i] = (t_func*)(syntax->AsmMetaInfo->CodeOrigin + OpcodeSize);
 			CompileFunction(f, Opcode, OpcodeSize);
 		}
+	}
+
+// link functions
+	foreach(Asm::WantedLabel &l, functions_to_link){
+		string name = l.Name.substr(10, -1);
+		bool found = false;
+		foreachi(Function *f, syntax->Functions, i)
+			if (f->name == name){
+				*(int*)&Opcode[l.Pos] = (char*)func[i] - (char*)&Opcode[l.Pos + 4];
+				found = true;
+				break;
+			}
+		if (!found)
+			DoErrorLink("could not link function: " + name);
+	}
+	foreach(int n, function_vars_to_link){
+		void *p = (void*)(long)(n + 0xefef0000);
+		void *q = (void*)func[n];
+		if (!find_and_replace(Opcode, OpcodeSize, (char*)&p, config.PointerSize, (char*)&q))
+			DoErrorLink("could not link function as variable: " + syntax->Functions[n]->name);
 	}
 
 // link virtual functions into vtables

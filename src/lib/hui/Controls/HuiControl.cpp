@@ -38,6 +38,7 @@ HuiControl::HuiControl(int _type, const string &_id)
 	widget = NULL;
 	frame = NULL;
 #endif
+	grab_focus = false;
 }
 
 HuiControl::~HuiControl()
@@ -293,6 +294,8 @@ void HuiControl::Notify(const string &message, bool is_default)
 			WinTrySendByKeyCode(win, HuiGetEvent()->key_code);
 		}else if (message == "hui:key-up")
 			win->OnKeyUp();
+		else if (message == "hui:redraw")
+			win->OnRedraw();
 	}
 }
 

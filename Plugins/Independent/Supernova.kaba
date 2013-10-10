@@ -13,7 +13,7 @@ const float threshold = 5.0
 const int buf_size = 4096
 float buf[]
 
-window win
+Window *win
 
 int played[]
 
@@ -32,7 +32,7 @@ string get_note(float f)
 	//loopf(fl, 0, 1)
 	//note = i2s(n)
 
-void DrawVolume(painter c)
+void DrawVolume(Painter *c)
 	c.SetColor(color(1, 0.8, 0.8, 0.8))
 	float y0 = 30
 	float y1 = c.height - 5
@@ -42,7 +42,7 @@ void DrawVolume(painter c)
 	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 void Draw()
-	painter c = win.BeginDraw("drawing")
+	Painter *c = win.BeginDraw("drawing")
 	c.SetColor(White)
 	c.SetFontSize(12)
 	int w = c.width

@@ -6,7 +6,7 @@ use "../../api.kaba"
 bool not_first_time
 
 
-window FlangerDialog
+ConfigDialog *dlg
 
 class PluginData
 	float Delay
@@ -31,15 +31,6 @@ void ResetState()
 	state.temp_r.clear()
 	state.temp_l.clear()
 	state.offset = 0
-
-void OnSpeed()
-	data.Speed = SliderGet(FlangerDialog, "speed")
-
-void OnDepth()
-	data.Depth = SliderGet(FlangerDialog, "depth")
-
-void OnDelay()
-	data.Delay = SliderGet(FlangerDialog, "delay")
 
 void DoFlanger(float b[], float temp[], int sample_rate)
 	int p = state.offset % temp.num
@@ -68,36 +59,54 @@ void DoFlanger(float b[], float temp[], int sample_rate)
 			p = 0
 
 void DataToDialog()
-	SliderSet(FlangerDialog, "speed", data.Speed)
-	SliderSet(FlangerDialog, "depth", data.Depth)
-	SliderSet(FlangerDialog, "delay", data.Delay)
+	dlg.fill()
+	
+class ConfigDialog : Dialog
+	void __init__()
+		super.__init__("Flanger", 485, 175, MainWin, false)
+		AddControlTable("", 0, 0, 1, 3, "table1")
+		SetTarget("table1", 0)
+		AddControlTable("", 0, 1, 4, 3, "table2")
+		SetTarget("table2", 0)
+		AddText("Geschwindigkeit", 0, 0, 0, 0, "")
+		AddSlider("!expandx", 1, 0, 0, 0, "speed_slider")
+		AddSpinButton("\\0\\10000\\0.1", 2, 0, 0, 0, "speed")
+		AddText("Hz", 3, 0, 0, 0, "")
+		AddText("Verzögerung", 0, 1, 0, 0, "")
+		AddSlider("", 1, 1, 0, 0, "delay_slider")
+		AddSpinButton("\\0\\10000\\0.1", 2, 1, 0, 0, "delay")
+		AddText("ms", 3, 1, 0, 0, "")
+		AddText("Tiefe", 0, 2, 0, 0, "")
+		AddSlider("", 1, 2, 0, 0, "depth_slider")
+		AddSpinButton("\\0\\100\\0.1", 2, 2, 0, 0, "depth")
+		AddText("%", 3, 2, 0, 0, "")
+		
+		PutFavoriteBar(self, "table1", 0, 0)
+		PutCommandBar(self, "table1", 0, 2)
+	
+		CreateSliderM(self, "speed_slider", "speed", 0, 2,    1,    &OnSpeed, data.Speed)
+		CreateSliderM(self, "depth_slider", "depth", 0, 1,    100,  &OnDepth, data.Depth)
+		CreateSliderM(self, "delay_slider", "delay", 0, 0.02, 1000, &OnDelay, data.Delay)
+	
+		fill()
+		
+	void fill()
+		SliderSet(self, "speed", data.Speed)
+		SliderSet(self, "depth", data.Depth)
+		SliderSet(self, "delay", data.Delay)
+		
+	void OnSpeed()
+		data.Speed = SliderGet(self, "speed")
+
+	void OnDepth()
+		data.Depth = SliderGet(self, "depth")
+
+	void OnDelay()
+		data.Delay = SliderGet(self, "delay")
 
 void Configure()
-	// dialog
-	FlangerDialog = new FixedDialog("Flanger",485,175,MainWin,false)
-	FlangerDialog.AddSlider("",115,35,205,25,"speed_slider")
-	FlangerDialog.AddSpinButton("\\0\\10000\\0.1",325,35,130,25,"speed")
-	FlangerDialog.AddText("Hz",460,35,30,25,"")
-	FlangerDialog.AddSlider("",115,65,205,25,"delay_slider")
-	FlangerDialog.AddSpinButton("\\0\\10000\\0.1",325,65,130,25,"delay")
-	FlangerDialog.AddText("ms",460,65,30,25,"")
-	FlangerDialog.AddSlider("",115,95,205,25,"depth_slider")
-	FlangerDialog.AddSpinButton("\\0\\100\\0.1",325,95,130,25,"depth")
-	FlangerDialog.AddText("%",460,95,30,25,"")
-	FlangerDialog.AddText("Geschwindigkeit",5,35,110,25,"")
-	FlangerDialog.AddText("Verzögerung",5,65,100,25,"")
-	FlangerDialog.AddText("Tiefe",5,95,100,25,"")
-	PutCommandBarFixed(FlangerDialog, 5, 135, 485)
-	
-	AddSlider(FlangerDialog, "speed_slider", "speed", 0, 2,    1,    &OnSpeed, data.Speed)
-	AddSlider(FlangerDialog, "depth_slider", "depth", 0, 1,    100,  &OnDepth, data.Depth)
-	AddSlider(FlangerDialog, "delay_slider", "delay", 0, 0.02, 1000, &OnDelay, data.Delay)
-	
-	PutFavoriteBarFixed(FlangerDialog, 5, 5, 485)
-	
-	DataToDialog()
-	
-	FlangerDialog.Run()
+	dlg = new ConfigDialog
+	dlg.Run()
 	
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio

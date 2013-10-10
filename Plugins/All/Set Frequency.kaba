@@ -1,6 +1,6 @@
 use "../api.kaba"
 
-window dlg
+Window *dlg
 
 void OnOk()
 	audio.sample_rate = dlg.GetInt("freq")

@@ -19,7 +19,7 @@ PluginState state
 
 DummySynthesizer synth
 
-window dlg
+ConfigDialog *dlg
 
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio
@@ -53,41 +53,48 @@ void ResetData()
 	data.BeatsPerMeasure = 4
 
 void DataToDialog()
-	dlg.SetFloat("beats_per_minute", data.BeatsPerMinute)
-	dlg.SetInt("beats_per_measure", data.BeatsPerMeasure)
-	dlg.SetFloat("volume", data.Volume * 100)
-	//SliderSet(dlg, "volume", data.Volume)
+	dlg.fill()
+	
+class ConfigDialog : Dialog
+	void __init__()
+		super.__init__("Metronom", 305, 135, MainWin, false)
+		AddControlTable("", 0, 0, 1, 2, "table1")
+		SetTarget("table1", 0)
+		AddControlTable("", 0, 0, 2, 3, "table2")
+		SetTarget("table2", 0)
+		AddText("Geschwindigkeit:", 0, 0, 0, 0, "")
+		AddSpinButton("!expandx\\\\0\\1000\\0.1", 1, 0, 0, 0, "beats_per_minute")
+		AddText("/min", 2, 0, 0, 0, "")
+		AddText("Schläge pro Takt:", 0, 1, 0, 0, "")
+		AddSpinButton("\\1\\32\\1", 1, 1, 0, 0, "beats_per_measure")
+		AddText("Lautstärke:", 0, 2, 0, 0, "")
+		AddSpinButton("\\0\\100\\0.1", 1, 2, 0, 0, "volume")
+		AddText("%", 2, 2, 0, 0, "")
+		PutCommandBar(self, "table1", 0, 1)
+	
+		EventM("beats_per_minute", self, &OnMetroBeats)
+		EventM("beats_per_measure", self, &OnMetroMeasure)
+		EventM("volume", self, &OnMetroVolume)
+	
+		fill()
 
-void OnMetroBeats()
-	data.BeatsPerMinute = dlg.GetFloat("")
+	void fill()
+		SetFloat("beats_per_minute", data.BeatsPerMinute)
+		SetInt("beats_per_measure", data.BeatsPerMeasure)
+		SetFloat("volume", data.Volume * 100)
+		//SliderSet(self, "volume", data.Volume)
 
-void OnMetroMeasure()
-	data.BeatsPerMeasure = dlg.GetInt("")
+	void OnMetroBeats()
+		data.BeatsPerMinute = GetFloat("")
 
-void OnMetroVolume()
-	data.Volume = dlg.GetFloat("") / 100
-	//data.Volume = SliderGet(dlg, "volume")
+	void OnMetroMeasure()
+		data.BeatsPerMeasure = GetInt("")
+
+	void OnMetroVolume()
+		data.Volume = GetFloat("") / 100
+		//data.Volume = SliderGet(self, "volume")
 
 void Configure()
-	// dialog
-	dlg = new FixedDialog("Metronom",305,135,MainWin,false)
-	dlg.AddText("Geschwindigkeit:",5,5,120,25,"")
-	dlg.AddSpinButton("\\0\\1000\\0.1",130,5,140,25,"beats_per_minute")
-	dlg.AddText("/min",275,5,30,25,"")
-	dlg.AddText("Schläge pro Takt:",5,35,130,25,"")
-	dlg.AddSpinButton("\\1\\32\\1",130,35,140,25,"beats_per_measure")
-	dlg.AddText("Lautstärke:",5,65,120,25,"")
-	dlg.AddSpinButton("\\0\\100\\0.1",130,65,140,25,"volume")
-	dlg.AddText("%",275,65,30,25,"")
-	PutCommandBarFixed(dlg, 5, 100, 305)
-
-	dlg.SetDecimals(1)
-	
-	dlg.Event("beats_per_minute", &OnMetroBeats)
-	dlg.Event("beats_per_measure", &OnMetroMeasure)
-	dlg.Event("volume", &OnMetroVolume)
-	
-	DataToDialog()
-
+	dlg = new ConfigDialog
 	dlg.Run()
 

@@ -42,6 +42,7 @@ public:
 #endif
 	bool enabled;
 	bool is_button_bar;
+	bool grab_focus;
 	HuiWindow *win;
 	HuiControl *parent;
 	Array<HuiControl*> children;

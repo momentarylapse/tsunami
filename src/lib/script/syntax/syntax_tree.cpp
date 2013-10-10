@@ -11,6 +11,8 @@ namespace Script{
 /*#define PRESCRIPT_DB_LEVEL	2
 #define db_f(msg,level)		msg_db_f(msg,level+PRESCRIPT_DB_LEVEL)*/
 
+extern Type *TypeDynamicArray;
+
 
 bool next_extern = false;
 bool next_const = false;
@@ -38,7 +40,7 @@ void command_make_ref(SyntaxTree *ps, Command *c, Command *param)
 	c->kind = KindReference;
 	c->num_params = 1;
 	c->param[0] = param;
-	c->type = ps->GetPointerType(param->type);
+	c->type = param->type->GetPointer();
 }
 
 void ref_command_old(SyntaxTree *ps, Command *c)
@@ -49,7 +51,7 @@ void ref_command_old(SyntaxTree *ps, Command *c)
 
 Command *SyntaxTree::ref_command(Command *sub)
 {
-	Command *c = AddCommand(KindReference, 0, GetPointerType(sub->type));
+	Command *c = AddCommand(KindReference, 0, sub->type->GetPointer());
 	c->num_params = 1;
 	c->param[0] = sub;
 	return c;
@@ -92,11 +94,11 @@ Command *SyntaxTree::add_command_compilerfunc(int cf)
 }
 
 // link as NON-VIRTUAL function!
-Command *SyntaxTree::add_command_classfunc(Type *class_type, ClassFunction &f, Command *inst)
+Command *SyntaxTree::add_command_classfunc(Type *class_type, ClassFunction *f, Command *inst)
 {
-	Command *c = AddCommand(KindFunction, f.nr, f.return_type);
+	Command *c = AddCommand(KindFunction, f->nr, f->return_type);
 	c->instance = inst;
-	c->script = f.script;
+	c->script = f->script;
 	return c;
 }
 
@@ -318,14 +320,14 @@ void SyntaxTree::CreateAsmMetaInfo()
 }
 
 
-int SyntaxTree::AddVar(const string &name, Type *type, Function *f)
+int Function::AddVar(const string &name, Type *type)
 {
 	Variable v;
 	v.name = name;
 	v.type = type;
 	v.is_extern = next_extern;
-	f->var.add(v);
-	return f->var.num - 1;
+	var.add(v);
+	return var.num - 1;
 }
 
 // constants
@@ -364,8 +366,10 @@ Function::Function(const string &_name, Type *_return_type)
 	literal_return_type = _return_type;
 	_class = NULL;
 	is_extern = false;
+	auto_implement = false;
 	_param_size = 0;
 	_var_size = 0;
+	_logical_line_no = -1;
 }
 
 int Function::get_var(const string &name)
@@ -458,7 +462,7 @@ void exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no)
 
 void exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 {
-	Command *self = ps->add_command_local_var(f->get_var("self"), ps->GetPointerType(f->_class));
+	Command *self = ps->add_command_local_var(f->get_var("self"), f->_class->GetPointer());
 	ps->GetExistenceLink.type = e.type;
 	ps->GetExistenceLink.link_no = e.offset;
 	ps->GetExistenceLink.kind = KindDerefAddressShift;
@@ -470,7 +474,7 @@ void exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 
 void exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
-	Command *self = ps->add_command_local_var(f->get_var("self"), ps->GetPointerType(f->_class));
+	Command *self = ps->add_command_local_var(f->get_var("self"), f->_class->GetPointer());
 	if (cf.virtual_index >= 0){
 		ps->GetExistenceLink.kind = KindVirtualFunction;
 		ps->GetExistenceLink.link_no = cf.virtual_index;
@@ -662,8 +666,17 @@ void SyntaxTree::AddType(Type **type)
 	(*type) = t;
 	Types.add(t);
 
-	if (t->is_super_array)
-		script_make_super_array(t, this);
+
+	if (t->is_super_array){
+		Type *parent = t->parent;
+		int size = t->size;
+		t->DeriveFrom(TypeDynamicArray);
+		t->parent = parent;
+		t->size = size;
+		AddFunctionHeadersForClass(t);
+	}else if (t->is_array){
+		AddFunctionHeadersForClass(t);
+	}
 }
 
 Type *SyntaxTree::CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Type *sub)
@@ -679,11 +692,6 @@ Type *SyntaxTree::CreateNewType(const string &name, int size, bool is_pointer, b
 	nt.parent = sub;
 	AddType(&pt);
 	return pt;
-}
-
-Type *SyntaxTree::GetPointerType(Type *sub)
-{
-	return CreateNewType(sub->name + "*", config.PointerSize, true, false, false, 0, sub);
 }
 
 
@@ -727,7 +735,7 @@ void conv_cbr(SyntaxTree *ps, Command *&c, int var)
 	if ((c->kind == KindVarLocal) && (c->link_no == var)){
 		so("conv");
 		c = ps->cp_command(c);
-		c->type = ps->GetPointerType(c->type);
+		c->type = c->type->GetPointer();
 		deref_command_old(ps, c);
 	}
 }
@@ -833,7 +841,7 @@ void SyntaxTree::ConvertCallByReference()
 		// parameter: array/class as reference
 		for (int j=0;j<f->num_params;j++)
 			if (f->var[j].type->UsesCallByReference()){
-				f->var[j].type = GetPointerType(f->var[j].type);
+				f->var[j].type = f->var[j].type->GetPointer();
 
 				// internal usage...
 				foreach(Command *c, f->block->command)
@@ -888,7 +896,7 @@ void SyntaxTree::ConvertCallByReference()
 			if ((c->type->is_array) /*|| (c->Type->IsSuperArray)*/){
 				so("conv ret");
 				so(c->type->name);
-				c->type = GetPointerType(c->type);
+				c->type = c->type->GetPointer();
 				deref_command_old(this, c);
 			}	
 		}
@@ -949,7 +957,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 			c_offset->type = TypeInt;//TypePointer;
 			// address = &array + offset
 			Command *c_address = add_command_operator(c_ref_array, c_offset, OperatorIntAdd);
-			c_address->type = GetPointerType(el_type);//TypePointer;
+			c_address->type = el_type->GetPointer();//TypePointer;
 			// c = * address
 			command_make_deref(this, c, c_address);
 			c->type = el_type;
@@ -976,7 +984,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 			c_offset->type = TypeInt;
 			// address = &array + offset
 			Command *c_address = add_command_operator(c_ref_array, c_offset, OperatorIntAdd);
-			c_address->type = GetPointerType(el_type);//TypePointer;
+			c_address->type = el_type->GetPointer();//TypePointer;
 			// c = * address
 			command_make_deref(this, c, c_address);
 			c->type = el_type;
@@ -999,7 +1007,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 			Command *c_shift = add_command_const(nc);
 			// address = &struct + shift
 			Command *c_address = add_command_operator(c_ref_struct, c_shift, OperatorIntAdd);
-			c_address->type = GetPointerType(el_type);//TypePointer;
+			c_address->type = el_type->GetPointer();//TypePointer;
 			// c = * address
 			command_make_deref(this, c, c_address);
 			c->type = el_type;
@@ -1021,7 +1029,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 			Command *c_shift = add_command_const(nc);
 			// address = &struct + shift
 			Command *c_address = add_command_operator(c_ref_struct, c_shift, OperatorIntAdd);
-			c_address->type = GetPointerType(el_type);//TypePointer;
+			c_address->type = el_type->GetPointer();//TypePointer;
 			// c = * address
 			command_make_deref(this, c, c_address);
 			c->type = el_type;

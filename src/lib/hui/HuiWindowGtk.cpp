@@ -539,50 +539,6 @@ void HuiWindow::ShowCursor(bool show)
 #endif
 }
 
-static Array<GdkEvent*> scp_event;
-
-void ev_out(GdkEvent *e)
-{
-	if (e->type == 3){
-		msg_write(format("event: move %.0f %.0f  (%d)", ((GdkEventMotion*)e)->x, ((GdkEventMotion*)e)->y, gdk_event_get_time(e)));
-	}else
-		msg_write("event: other");
-}
-
-void read_events(const string &msg, bool rem = false)
-{
-	foreach(GdkEvent *e, scp_event)
-		gdk_event_free(e);
-	scp_event.clear();
-	
-	int n = 0;
-	while (gdk_events_pending()){
-		GdkEvent *e = gdk_event_get();
-		if (e){
-			n ++;
-			if (e->type == 3)
-				gdk_event_request_motions((GdkEventMotion*)e);
-			//ev_out(e);
-			scp_event.add(e);
-			//gdk_event_free(e);
-		}else
-			break;
-	}
-	if (n > 0){
-		//msg_write(msg + ": del " + i2s(n));
-		if (rem){
-			gdk_event_free(scp_event.back());
-			scp_event.resize(scp_event.num - 1);
-		}
-	}
-}
-
-void put_events()
-{
-	foreach(GdkEvent *e, scp_event)
-		gdk_event_put(e);
-}
-
 extern int GtkAreaMouseSet;
 extern int GtkAreaMouseSetX, GtkAreaMouseSetY;
 
@@ -590,7 +546,7 @@ extern int GtkAreaMouseSetX, GtkAreaMouseSetY;
 void HuiWindow::SetCursorPos(int x, int y)
 {
 	if (main_input_control){
-		GtkAreaMouseSet = 0;
+		GtkAreaMouseSet = 2;
 		GtkAreaMouseSetX = x;
 		GtkAreaMouseSetY = y;
 		input.x = x;
@@ -599,59 +555,12 @@ void HuiWindow::SetCursorPos(int x, int y)
 #ifdef OS_LINUX
 		XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(main_input_control->widget)), 0, 0, 0, 0, x, y);
 #endif
-	}
-#if 0
-	irect ri = GetInterior();
-	irect ro = GetOuterior();
-	int dx = 0;
-	int dy = 0;
-	#ifdef OS_LINUX
-		//kill_events();
-		XFlush(hui_x_display);
-		read_events("prae");
-		float xnew = input.x, ynew = input.y;
-		foreach(GdkEvent *e, scp_event){
-			if (e->type == 3){
-				xnew = ((GdkEventMotion*)e)->x;
-				ynew = ((GdkEventMotion*)e)->y;
-				ignore_time = gdk_event_get_time(e) + 20;
-			}
-		}
-		dx = xnew - input.x;
-		dy = ynew - input.y;
-		//msg_write(format(" d= %d %d  (%d)", dx, dy, ignore_time));
-		put_events();
-		if (gl_widget){
-			// TODO GTK3
-			XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(gl_widget)), 0, 0, 0, 0, x, y);
-			//XWarpPointer(hui_x_display, None, GDK_WINDOW_XWINDOW(gtk_widget_get_window(gl_widget)), 0, 0, 0, 0, x, y);
-		}else
-			XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(window)), 0, 0, 0, 0, x + ri.x1, y + ri.y1);
-		XFlush(hui_x_display);
-		XFlush(hui_x_display);
-		/*HuiSleep(2);
-		XFlush(hui_x_display);*/
-
-		read_events("post");
-		foreachb(GdkEvent *e, scp_event)
-			if (e->type == 3){
-				((GdkEventMotion*)e)->x = x - dx;
-				((GdkEventMotion*)e)->y = y - dy;
-				((GdkEventMotion*)e)->time += 100;
-			}
-		put_events();
-	#endif
-	#ifdef OS_WINDOWS
-		// TODO GetInterior gives the wrong position
-		//::SetCursorPos(x + ri.x1, y + ri.y1);
-		::SetCursorPos(x + ri.x1, y + 20);
-	#endif
-	
-	input.x = (float)x - dx;
-	input.y = (float)y - dy;
-	input.dx = 0;
-	input.dy = 0;
+#ifdef OS_WINDOWS
+		RECT r;
+		GetWindowRect((HWND)GDK_WINDOW_HWND(gtk_widget_get_window(main_input_control->widget)), &r);
+		::SetCursorPos(x + r.left, y + r.top);
 #endif
+	}
 }
 
 void HuiWindow::SetMaximized(bool maximized)

@@ -38,15 +38,15 @@ void SIAddPackageFile()
 	add_package("file", false);
 
 	Type*
-	TypeFile			= add_type  ("File",		0);
+	TypeFile			= add_type  ("File", 0);
 	Type*
-	TypeFileP			= add_type_p("file",		TypeFile);
+	TypeFileP			= add_type_p("File*", TypeFile);
 	Type*
-	TypeDate			= add_type  ("Date",		sizeof(Date));
+	TypeDate			= add_type  ("Date", sizeof(Date));
 	Type*
-	TypeDirEntry		= add_type  ("DirEntry",	sizeof(DirEntry));
+	TypeDirEntry		= add_type  ("DirEntry", sizeof(DirEntry));
 	Type*
-	TypeDirEntryList	= add_type_a("DirEntry[]",	TypeDirEntry, -1);
+	TypeDirEntryList	= add_type_a("DirEntry[]", TypeDirEntry, -1);
 
 
 	add_class(TypeDate);

@@ -2,8 +2,13 @@
 #include "../file/file.h"
 #include "../math/math.h"
 
+#include "image_bmp.h"
+#include "image_tga.h"
+#include "image_jpg.h"
+#include "image_png.h"
 
-string ImageVersion = "0.2.3.0";
+
+string ImageVersion = "0.2.4.1";
 
 void Image::__init__()
 {
@@ -19,7 +24,7 @@ void Image::__delete__()
 //    = r + g<<8 + b<<16 + a<<24
 void Image::LoadFlipped(const string &filename)
 {
-	msg_db_r("Image.LoadFlipped", 1);
+	msg_db_f("Image.LoadFlipped", 1);
 
 	// reset image
 	width = 0;
@@ -32,7 +37,6 @@ void Image::LoadFlipped(const string &filename)
 	// file ok?
 	if (!file_test_existence(filename)){
 		msg_error("Image.Load: file does not exist: " + filename);
-		msg_db_l(1);
 		return;
 	}
 	
@@ -44,10 +48,10 @@ void Image::LoadFlipped(const string &filename)
 		image_load_tga(filename, *this);
 	else if (ext == "jpg")
 		image_load_jpg(filename, *this);
+	else if (ext == "png")
+		image_load_png(filename, *this);
 	else
 		msg_error("ImageLoad: unhandled file extension: " + ext);
-	
-	msg_db_l(1);
 }
 
 void Image::Load(const string &filename)
@@ -84,9 +88,7 @@ inline color image_uncolor_bgra(unsigned int i)
 
 void Image::Create(int _width, int _height, const color &c)
 {
-	msg_db_r("Image.Create", 1);
-	if (data.element_size != 4)
-		data.init(4); // script...
+	msg_db_f("Image.Create", 1);
 
 	// create
 	width = _width;
@@ -100,13 +102,11 @@ void Image::Create(int _width, int _height, const color &c)
 	unsigned int ic = image_color_rgba(c);
 	for (int i=0;i<data.num;i++)
 		data[i] = ic;
-	
-	msg_db_l(1);
 }
 
 void Image::Save(const string &filename) const
 {
-	msg_db_r("Image.Save", 1);
+	msg_db_f("Image.Save", 1);
 	
 	string ext = filename.extension();
 	if (ext == "tga")
@@ -115,20 +115,17 @@ void Image::Save(const string &filename) const
 		image_save_bmp(filename, *this);
 	else
 		msg_error("ImageSave: unhandled file extension: " + ext);
-	
-	msg_db_l(1);
 }
 
 void Image::Delete()
 {
-	msg_db_r("Image.Delete", 1);
+	msg_db_f("Image.Delete", 1);
 	data.clear();
-	msg_db_l(1);
 }
 
 void Image::Scale(int _width, int _height)
 {
-	msg_db_r("Image.Scale", 1);
+	msg_db_f("Image.Scale", 1);
 	Array<unsigned int> _data;
 	_data.resize(_width * _height);
 
@@ -142,13 +139,11 @@ void Image::Scale(int _width, int _height)
 	data.exchange(_data);
 	width = _width;
 	height = _height;
-	
-	msg_db_l(1);
 }
 
 void Image::FlipV()
 {
-	msg_db_r("Image.FlipV", 1);
+	msg_db_f("Image.FlipV", 1);
 	
 	unsigned int t;
 	unsigned int *d = &data[0];
@@ -158,8 +153,6 @@ void Image::FlipV()
 			d[x + y * width] = d[x + (height - y - 1) * width];
 			d[x + (height - y - 1) * width] = t;
 		}
-	
-	msg_db_l(1);
 }
 
 inline void col_conv_rgba_to_bgra(unsigned int &c)
@@ -190,7 +183,7 @@ void Image::SetMode(int _mode) const
 {
 	if (_mode == mode)
 		return;
-	msg_db_r("Image.SetMode", 1);
+	msg_db_f("Image.SetMode", 1);
 
 	unsigned int *c = (unsigned int*)data.data;
 	if (mode == ModeRGBA){
@@ -205,8 +198,6 @@ void Image::SetMode(int _mode) const
 		}
 	}
 	mode = _mode;
-
-	msg_db_l(1);
 }
 
 

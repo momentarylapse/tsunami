@@ -14,6 +14,8 @@ namespace Script{
 #ifdef _X_USE_SOUND_
 	#define sound_p(p)		(void*)p
 #else
+	typedef int Sound;
+	typedef int Music;
 	#define sound_p(p)		NULL
 #endif
 
@@ -22,9 +24,38 @@ extern Type *TypeFloatList;
 void SIAddPackageSound()
 {
 	add_package("sound", false);
+
+	Type *TypeSound = add_type("Sound",		sizeof(Sound));
+	Type *TypeSoundP = add_type_p("Sound*", TypeSound);
+	Type *TypeMusic = add_type("Music",		sizeof(Music));
+	Type *TypeMusicP = add_type_p("Music*", TypeMusic);
+
+	add_class(TypeSound);
+		class_add_func("SetData",							TypeVoid,	sound_p(mf(&Sound::SetData)));
+			func_add_param("pos",		TypeVector);
+			func_add_param("vel",		TypeVector);
+			func_add_param("r_min",		TypeFloat);
+			func_add_param("r_max",		TypeFloat);
+			func_add_param("speed",		TypeFloat);
+			func_add_param("volume",	TypeFloat);
+		class_add_func("Play",							TypeVoid,	sound_p(mf(&Sound::Play)));
+			func_add_param("loop",		TypeBool);
+		class_add_func("Stop",							TypeVoid,	sound_p(mf(&Sound::Stop)));
+		class_add_func("Pause",							TypeVoid,	sound_p(mf(&Sound::Pause)));
+			func_add_param("pause",		TypeBool);
+		class_add_func("__delete__",									TypeVoid,	sound_p(mf(&Sound::__delete__)));
+
+	add_class(TypeMusic);
+		class_add_func("Play",									TypeVoid,	sound_p(mf(&Music::Play)));
+			func_add_param("loop",		TypeBool);
+		class_add_func("Stop",									TypeVoid,	sound_p(mf(&Music::Stop)));
+		class_add_func("Pause",									TypeVoid,	sound_p(mf(&Music::Pause)));
+			func_add_param("pause",		TypeBool);
+		class_add_func("SetRate",							TypeVoid,	sound_p(mf(&Music::SetRate)));
+			func_add_param("rate",		TypeFloat);
 	
 	// sound
-	add_func("SoundEmit",									TypeInt,	sound_p(&SoundEmit));
+	add_func("SoundEmit",									TypeSoundP,	sound_p(&SoundEmit));
 		func_add_param("filename",	TypeString);
 		func_add_param("pos",		TypeVector);
 		func_add_param("r_min",		TypeFloat);
@@ -32,40 +63,11 @@ void SIAddPackageSound()
 		func_add_param("speed",		TypeFloat);
 		func_add_param("volume",	TypeFloat);
 		func_add_param("loop",		TypeBool);
-	add_func("SoundLoad",									TypeInt,	sound_p(&SoundLoad));
+	add_func("SoundLoad",									TypeSoundP,	sound_p(&SoundLoad));
 		func_add_param("filename",	TypeString);
-	add_func("SoundSetData",							TypeVoid,	sound_p(&SoundSetData));
-		func_add_param("index",		TypeInt);
-		func_add_param("pos",		TypeVector);
-		func_add_param("vel",		TypeVector);
-		func_add_param("r_min",		TypeFloat);
-		func_add_param("r_max",		TypeFloat);
-		func_add_param("speed",		TypeFloat);
-		func_add_param("volume",	TypeFloat);
-	add_func("SoundPlay",							TypeVoid,	sound_p(&SoundPlay));
-		func_add_param("index",		TypeInt);
-		func_add_param("loop",		TypeBool);
-	add_func("SoundStop",							TypeVoid,	sound_p(&SoundStop));
-		func_add_param("index",		TypeInt);
-	add_func("SoundPause",							TypeVoid,	sound_p(&SoundPause));
-		func_add_param("index",		TypeInt);
-		func_add_param("pause",		TypeBool);
-	add_func("SoundDelete",									TypeVoid,	sound_p(&SoundDelete));
-		func_add_param("index",		TypeInt);
 	// music
-	add_func("MusicLoad",									TypeInt,	sound_p(&MusicLoad));
+	add_func("MusicLoad",									TypeMusicP,	sound_p(&MusicLoad));
 		func_add_param("filename",		TypeString);
-	add_func("MusicPlay",									TypeVoid,	sound_p(&MusicPlay));
-		func_add_param("index",		TypeInt);
-		func_add_param("loop",		TypeBool);
-	add_func("MusicStop",									TypeVoid,	sound_p(&MusicStop));
-		func_add_param("index",		TypeInt);
-	add_func("MusicPause",									TypeVoid,	sound_p(&MusicPause));
-		func_add_param("index",		TypeInt);
-		func_add_param("pause",		TypeBool);
-	add_func("MusicSetRate",							TypeVoid,	sound_p(&MusicSetRate));
-		func_add_param("index",		TypeInt);
-		func_add_param("rate",		TypeFloat);
 	// sound creation
 	add_func("SoundSave",		TypeVoid, 		sound_p(&SoundSaveFile));
 		func_add_param("filename",		TypeString);

@@ -44,9 +44,10 @@ gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer u
 	if (GtkAreaMouseSet >= 0){
 		if ((event->x != GtkAreaMouseSetX) || (event->y != GtkAreaMouseSetY)){
 			GtkAreaMouseSet --;
-			//msg_write(format("ignore %.0f\t%0.f", event->x, event->y));
+			//msg_write(format("ignore fail %.0f\t%0.f", event->x, event->y));
 			return false;
 		}
+		//msg_write(format("ignore %.0f\t%0.f", event->x, event->y));
 		GtkAreaMouseSet = -1;
 	}
 
@@ -152,14 +153,15 @@ void _get_hui_key_id_(GdkEventKey *event, int &key, int &key_code)
 		key_code += KEY_ALT;
 }
 
-bool area_process_key(GdkEventKey *event, HuiControlDrawingArea *c, bool down)
+bool area_process_key(GdkEventKey *event, HuiControl *c, bool down)
 {
 	int key, key_code;
 	_get_hui_key_id_(event, key, key_code);
 	if (key < 0)
 		return false;
 
-	c->win->input.key_code = key;
+	//c->win->input.key_code = key;
+	c->win->input.key[key] = down;
 
 	if (down){
 		c->win->input.key_code = key_code;
@@ -175,12 +177,12 @@ bool area_process_key(GdkEventKey *event, HuiControlDrawingArea *c, bool down)
 
 gboolean OnGtkAreaKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-	return area_process_key(event, (HuiControlDrawingArea*)user_data, true);
+	return area_process_key(event, (HuiControl*)user_data, true);
 }
 
 gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-	return area_process_key(event, (HuiControlDrawingArea*)user_data, false);
+	return area_process_key(event, (HuiControl*)user_data, false);
 }
 
 HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &id) :

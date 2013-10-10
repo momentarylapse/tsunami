@@ -17,7 +17,7 @@ class PluginData
 PluginData data
 
 
-window dlg
+ConfigDialog *dlg
 int MouseOver, Selected
 
 GridData grid
@@ -67,104 +67,98 @@ void ResetData()
 void DataToDialog()
 	dlg.Redraw("drawing")
 
-void Draw()
-	painter c = dlg.BeginDraw("drawing")
-	float w = c.width
-	float h = c.height
+class ConfigDialog : Dialog
+	void __init__()
+		super.__init__("Equalizer", 600, 400, MainWin, false)
+		AddControlTable("", 0, 0, 1, 3, "table")
+		SetTarget("table", 0)
+		AddDrawingArea("", 0, 1, 0, 0, "drawing")
+
+		PutFavoriteBar(self, "table", 0, 0)
+		PutCommandBar(self, "table", 0, 2)
 	
-	grid.Draw(c, 0, 0, w, h)
+		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
+		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 	
-	// curve + area below
-	FloatInterpolator fi
-	fill_inter(fi)
-	grid.DrawCurve(c, fi, true)
+		Redraw("drawing")
 	
-	// points
-	for int i, 0, data.curve.num
-		grid.DrawPoint3(c, data.curve[i], i == Selected, i == MouseOver)
-	c.End()
-
-// left button down -> select
-void OnLeftButtonDown()
-	Selected = MouseOver
-	dlg.Redraw("drawing")
-
-// left button up -> if moved to a neighbour -> remove point
-void OnLeftButtonUp()
-	nil
-	/*if Selected >= 0
-		bool del = false//(data.curve[Selected] == data.curve[Selected - 1])
-		if Selected < data.curve.num - 1
-			del = del or (data.curve[Selected] == data.curve[Selected + 1])
-		if del
-			data.curve.remove(Selected)
-			Selected = -1
-			dlg.Redraw("drawing")*/
-
-void OnScroll()
-	if MouseOver >= 0
-		if HuiGetEvent().wheel > 0
-			data.curve[MouseOver].z += 0.2
-		else
-			data.curve[MouseOver].z -= 0.2
-		dlg.Redraw("drawing")
-
-// right button down -> new point
-void OnRightButtonDown()
-	vector m = grid.GetMouse3(0)
-	for int i, 1, data.curve.num
-		if (m.x > data.curve[i - 1].x) and (m.x < data.curve[i].x)
-			data.curve.insert(m, i)
-			Selected = i
-			MouseOver = i
-			dlg.Redraw("drawing")
-			break
-
-void OnMouseMove()
-	// move
-	if HuiGetEvent().button_l and (Selected >= 0)
-		data.curve[Selected] = grid.GetMouse3(data.curve[Selected].z)
-		float xmin = MIN_FREQ
-		float xmax = MAX_FREQ
-		if Selected > 0
-			xmin = data.curve[Selected - 1].x
-		if Selected < data.curve.num - 1
-			xmax = data.curve[Selected + 1].x
-		data.curve[Selected].x = clamp(data.curve[Selected].x, xmin, xmax)
-		data.curve[Selected].y = clamp(data.curve[Selected].y, MIN_VOL, MAX_VOL)
-		if Selected == data.curve.num - 1
-			data.curve[Selected].x = MAX_FREQ
-		if Selected == 0
-			data.curve[Selected].x = MIN_FREQ
-	else
-	// mouse over?
-		MouseOver = -1
+	overwrite void OnRedraw()
+		Painter *c = BeginDraw("drawing")
+		float w = c.width
+		float h = c.height
+	
+		grid.Draw(c, 0, 0, w, h)
+	
+		// curve + area below
+		FloatInterpolator fi
+		fill_inter(fi)
+		grid.DrawCurve(c, fi, true)
+	
+		// points
 		for int i, 0, data.curve.num
-			if grid.MouseOverPoint3(data.curve[i])
+			grid.DrawPoint3(c, data.curve[i], i == Selected, i == MouseOver)
+		c.End()
+
+	// left button down -> select
+	overwrite void OnLeftButtonDown()
+		Selected = MouseOver
+		Redraw("drawing")
+
+	// left button up -> if moved to a neighbour -> remove point
+	overwrite void OnLeftButtonUp()
+		/*if Selected >= 0
+			bool del = false//(data.curve[Selected] == data.curve[Selected - 1])
+			if Selected < data.curve.num - 1
+				del = del or (data.curve[Selected] == data.curve[Selected + 1])
+			if del
+				data.curve.remove(Selected)
+				Selected = -1
+				Redraw("drawing")*/
+
+	overwrite void OnMouseWheel()
+		if MouseOver >= 0
+			if HuiGetEvent().wheel > 0
+				data.curve[MouseOver].z += 0.2
+			else
+				data.curve[MouseOver].z -= 0.2
+			Redraw("drawing")
+
+	// right button down -> new point
+	overwrite void OnRightButtonDown()
+		vector m = grid.GetMouse3(0)
+		for int i, 1, data.curve.num
+			if (m.x > data.curve[i - 1].x) and (m.x < data.curve[i].x)
+				data.curve.insert(m, i)
+				Selected = i
 				MouseOver = i
-	dlg.Redraw("drawing")
+				Redraw("drawing")
+				break
+
+	overwrite void OnMouseMove()
+		// move
+		if HuiGetEvent().button_l and (Selected >= 0)
+			data.curve[Selected] = grid.GetMouse3(data.curve[Selected].z)
+			float xmin = MIN_FREQ
+			float xmax = MAX_FREQ
+			if Selected > 0
+				xmin = data.curve[Selected - 1].x
+			if Selected < data.curve.num - 1
+				xmax = data.curve[Selected + 1].x
+			data.curve[Selected].x = clamp(data.curve[Selected].x, xmin, xmax)
+			data.curve[Selected].y = clamp(data.curve[Selected].y, MIN_VOL, MAX_VOL)
+			if Selected == data.curve.num - 1
+				data.curve[Selected].x = MAX_FREQ
+			if Selected == 0
+				data.curve[Selected].x = MIN_FREQ
+		else
+		// mouse over?
+			MouseOver = -1
+			for int i, 0, data.curve.num
+				if grid.MouseOverPoint3(data.curve[i])
+					MouseOver = i
+		Redraw("drawing")
 
 void Configure()
-	// dialog
-	dlg = new Dialog("Equalizer",600,400,MainWin,false)
-	dlg.AddControlTable("", 0, 0, 1, 3, "table")
-	dlg.SetTarget("table", 0)
-	dlg.AddDrawingArea("", 0, 1, 0, 0, "drawing")
-	
-	dlg.EventX("drawing", "hui:redraw", &Draw)
-	dlg.EventX("drawing", "hui:left-button-down", &OnLeftButtonDown)
-	dlg.EventX("drawing", "hui:left-button-up", &OnLeftButtonUp)
-	dlg.EventX("drawing", "hui:right-button-down", &OnRightButtonDown)
-	dlg.EventX("drawing", "hui:mouse-move", &OnMouseMove)
-	dlg.EventX("drawing", "hui:mouse-wheel", &OnScroll)
-
-	PutFavoriteBarSizable(dlg, "table", 0, 0)
-	PutCommandBarSizable(dlg, "table", 0, 2)
-	
-	grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
-	grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
-	
-	DataToDialog()
-
+	dlg = new ConfigDialog
 	dlg.Run()
 

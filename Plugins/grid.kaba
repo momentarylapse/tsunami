@@ -92,7 +92,7 @@ class GridData
 		return vector(x_axis.unproject(z.x), y_axis.unproject(z.y), z.z)
 	
 	
-	void DrawLinY(painter c, GridPartition part)
+	void DrawLinY(Painter *c, GridPartition part)
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
 		float yy = part.min
@@ -111,7 +111,7 @@ class GridData
 				c.DrawLine(x, vy, x + w, vy)
 			yy += part.step
 	
-	void DrawLinX(painter c, GridPartition part)
+	void DrawLinX(Painter *c, GridPartition part)
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
 		float xx = part.min
@@ -133,7 +133,7 @@ class GridData
 	rect GetPlotRegion(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
 
-	void Draw(painter c, float _x0, float _y0, float _w, float _h)
+	void Draw(Painter *c, float _x0, float _y0, float _w, float _h)
 	
 		x0 = _x0
 		y0 = _y0 + 3
@@ -175,7 +175,7 @@ class GridData
 		part = y_axis.get_lin_partition()
 		DrawLinY(c, part)
 	
-	void DrawCurve(painter c, FloatInterpolator fi, bool fill_below)
+	void DrawCurve(Painter *c, FloatInterpolator fi, bool fill_below)
 		float tt[], xx[], yy[]
 		tt = rangef(0, 1, 0.003)
 		yy = fi.get_list(tt)
@@ -196,7 +196,7 @@ class GridData
 		c.SetColor(Black)
 		c.DrawLines(xx, yy)
 	
-	void DrawCurveB(painter c, float _x[], float _y[], bool fill_below, color col)
+	void DrawCurveB(Painter *c, float _x[], float _y[], bool fill_below, color col)
 		float xx[], yy[]
 		for int i, 0, _x.num
 			complex zz = project2(complex(_x[i], _y[i]))
@@ -217,7 +217,7 @@ class GridData
 		c.SetColor(col)
 		c.DrawLines(xx, yy)
 	
-	void DrawPoint2(painter c, complex p, bool selected, bool hover)
+	void DrawPoint2(Painter *c, complex p, bool selected, bool hover)
 		complex pp = project2(p)
 		c.SetColor(Black)
 		float radius = 3
@@ -228,7 +228,7 @@ class GridData
 			c.SetColor(color(1, 0.7, 0, 0))
 		c.DrawCircle(pp.x, pp.y, radius)
 	
-	void DrawPoint3(painter c, vector p, bool selected, bool hover)
+	void DrawPoint3(Painter *c, vector p, bool selected, bool hover)
 		vector pp = project3(p)
 		c.SetColor(Black)
 		float radius = 3

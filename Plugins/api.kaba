@@ -213,7 +213,7 @@ class PluginContext
 	int level
 	Range range
 
-extern window MainWin
+extern Window *MainWin
 extern AudioFile *audio
 extern AudioOutput *output
 extern AudioInput *input
@@ -231,12 +231,13 @@ extern void fft_c2r_inv(complex in[], float out[])
 extern void ProgressEnd()
 extern void Progress(string s, float progress)*/
 
-extern void PutFavoriteBarFixed(window win, int x, int y, int w)
-extern void PutFavoriteBarSizable(window win, string root_id, int x, int y)
-extern void PutCommandBarFixed(window win, int x, int y, int w)
-extern void PutCommandBarSizable(window win, string root_id, int x, int y)
-extern void AddSlider(window win, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
-extern void SliderSet(window win, string id, float value)
-extern float SliderGet(window win, string id)
-extern void RemoveSliders(window win)
+extern void PutFavoriteBarFixed(Window *win, int x, int y, int w)
+extern void PutFavoriteBar(Window *win, string root_id, int x, int y)
+extern void PutCommandBarFixed(Window *win, int x, int y, int w)
+extern void PutCommandBar(Window *win, string root_id, int x, int y)
+extern void CreateSlider(Window *win, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
+extern void CreateSliderM(Window *win, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
+extern void SliderSet(Window *win, string id, float value)
+extern float SliderGet(Window *win, string id)
+extern void RemoveSliders(Window *win)
 extern Synthesizer *CreateSynthesizer(string name)

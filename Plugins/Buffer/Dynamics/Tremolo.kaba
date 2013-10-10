@@ -4,20 +4,13 @@ use "../../api.kaba"
 
 bool not_first_time
 
-
-window dlg
+TremoloDialog *dlg
 
 class PluginData
 	float Speed
 	float Depth
 
 PluginData data
-
-void OnSpeed()
-	data.Speed = SliderGet(dlg, "speed")
-
-void OnDepth()
-	data.Depth = SliderGet(dlg, "depth")
 
 void DoTremolo(float b[])
 	
@@ -29,34 +22,49 @@ void DoTremolo(float b[])
 		// old value
 		b[i] *= f
 
+class TremoloDialog : Dialog
+	void __init__()
+		super.__init__("Tremolo", 460, 145, MainWin, false)
+		AddControlTable("", 0, 0, 1, 3, "table1")
+		SetTarget("table1", 0)
+		AddControlTable("", 0, 1, 4, 2, "table2")
+		SetTarget("table2", 0)
+		AddSlider("!expandx", 1, 0, 0, 0, "speed_slider")
+		AddSpinButton("\\0\\100\\0.1", 2, 0, 0, 0, "speed")
+		AddText("Hz", 3, 0, 0, 0, "")
+		AddSlider("", 1, 1, 0, 0, "depth_slider")
+		AddSpinButton("\\0\\100\\0.1", 2, 1, 0, 0, "depth")
+		AddText("%", 3, 1, 0, 0, "")
+		AddText("Geschwindigkeit", 0, 0, 0, 0, "")
+		AddText("Tiefe", 0, 1, 0, 0, "")
+		
+		PutFavoriteBar(self, "table1", 0, 0)
+		PutCommandBar(self, "table1", 0, 2)
+	
+		CreateSliderM(self, "speed_slider", "speed", 0, 20,   1,  &OnSpeed, data.Speed)
+		CreateSliderM(self, "depth_slider", "depth", 0, 1,  100,  &OnDepth, data.Depth)
+	
+		fill()
+
+	void OnSpeed()
+		data.Speed = SliderGet(self, "speed")
+
+	void OnDepth()
+		data.Depth = SliderGet(self, "depth")
+
+	void fill()
+		SliderSet(self, "speed", data.Speed)
+		SliderSet(self, "depth", data.Depth)
+
 void DataToDialog()
-	SliderSet(dlg, "speed", data.Speed)
-	SliderSet(dlg, "depth", data.Depth)
+	dlg.fill()
 
 void ResetData()
 	data.Depth = 0.5
 	data.Speed = 6
 
 void Configure()
-	// dialog
-	dlg = new FixedDialog("Tremolo",460,145,MainWin,false)
-	dlg.AddSlider("",115,35,185,25,"speed_slider")
-	dlg.AddSpinButton("\\0\\100\\0.1",305,35,120,25,"speed")
-	dlg.AddText("Hz",430,35,25,25,"")
-	dlg.AddSlider("",115,65,185,25,"depth_slider")
-	dlg.AddSpinButton("\\0\\100\\0.1",305,65,120,25,"depth")
-	dlg.AddText("%",430,65,25,25,"")
-	dlg.AddText("Geschwindigkeit",5,35,110,25,"")
-	dlg.AddText("Tiefe",5,65,100,25,"")
-	PutCommandBarFixed(dlg, 5, 105, 460)
-	
-	AddSlider(dlg, "speed_slider", "speed", 0, 20,    1,    &OnSpeed, data.Speed)
-	AddSlider(dlg, "depth_slider", "depth", 0, 1,    100,  &OnDepth, data.Depth)
-	
-	PutFavoriteBarFixed(dlg, 5, 5, 460)
-	
-	DataToDialog()
-	
+	dlg = new TremoloDialog
 	dlg.Run()
 	
 void ProcessTrack(BufferBox buf)

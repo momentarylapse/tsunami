@@ -9,6 +9,9 @@
 
 #ifdef HUI_API_GTK
 
+gboolean OnGtkAreaKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+
 void OnGtkMultilineEditChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->Notify("hui:change");	}
 
@@ -32,12 +35,20 @@ HuiControlMultilineEdit::HuiControlMultilineEdit(const string &title, const stri
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	g_signal_connect(G_OBJECT(tb), "changed", G_CALLBACK(&OnGtkMultilineEditChange), this);
+	handle_keys = (OptionString.find("handlekeys") >= 0);
+	if (handle_keys){
+		int mask;
+		g_object_get(G_OBJECT(widget), "events", &mask, NULL);
+		mask |= GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
+		g_object_set(G_OBJECT(widget), "events", mask, NULL);
+		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
+		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
+	}
 	SetOptions(OptionString);
 }
 
 HuiControlMultilineEdit::~HuiControlMultilineEdit()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void HuiControlMultilineEdit::__SetString(const string &str)

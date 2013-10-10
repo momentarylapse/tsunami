@@ -16,6 +16,7 @@ HuiCallback::HuiCallback()
 	func = NULL;
 	object = NULL;
 	member_function = NULL;
+	kaba_func = NULL;
 }
 
 HuiCallback::HuiCallback(hui_callback *_func)
@@ -23,6 +24,7 @@ HuiCallback::HuiCallback(hui_callback *_func)
 	func = _func;
 	object = NULL;
 	member_function = NULL;
+	kaba_func = NULL;
 }
 
 HuiCallback::HuiCallback(HuiEventHandler *_object, void (HuiEventHandler::*_member_function)())
@@ -30,14 +32,27 @@ HuiCallback::HuiCallback(HuiEventHandler *_object, void (HuiEventHandler::*_memb
 	func = NULL;
 	object = _object;
 	member_function = _member_function;
+	kaba_func = NULL;
+}
+
+HuiCallback::HuiCallback(HuiEventHandler *_object, hui_kaba_callback *_func)
+{
+	func = NULL;
+	object = _object;
+	member_function = NULL;
+	kaba_func = _func;
 }
 
 void HuiCallback::call()
 {
-	if (func)
+	if (func){
 		func();
-	else if (object)
-		(object->*member_function)();
+	}else if (object){
+		if (member_function)
+			(object->*member_function)();
+		else if (kaba_func)
+			kaba_func(object);
+	}
 }
 
 bool HuiCallback::is_set()
@@ -52,6 +67,14 @@ bool HuiCallback::is_set()
 bool HuiCallback::has_handler(HuiEventHandler *_object)
 {
 	return (object == _object);
+}
+
+
+HuiEventListener::HuiEventListener(const string &_id, const string &_message, HuiCallback _function)
+{
+	id = _id;
+	message = _message;
+	function = _function;
 }
 
 HuiEvent _HuiEvent_;

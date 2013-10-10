@@ -30,6 +30,14 @@ string ExpressionBuffer::get_name(int n)
 	return cur_line->exp[n].name;
 }
 
+int ExpressionBuffer::get_line_no()
+{
+	foreachi(Line &l, line, i)
+		if (cur_line == &l)
+			return i;
+	return -1;
+}
+
 void ExpressionBuffer::next()
 {
 	cur_exp ++;

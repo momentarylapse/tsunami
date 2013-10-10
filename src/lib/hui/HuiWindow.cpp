@@ -287,39 +287,33 @@ bool HuiWindow::GetMouse(int &x, int &y, int button)
 
 void HuiWindow::Event(const string &id, hui_callback *function)
 {
-	HuiEventListener e;
-	e.id = id;
-	e.message = "*";
-	e.function = function;
-	event.add(e);
+	event.add(HuiEventListener(id, "*", function));
 	
 }
 
 void HuiWindow::EventX(const string &id, const string &msg, hui_callback *function)
 {
-	HuiEventListener e;
-	e.id = id;
-	e.message = msg;
-	e.function = function;
-	event.add(e);
+	event.add(HuiEventListener(id, msg, function));
 }
 
 void HuiWindow::_EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
-	HuiEventListener e;
-	e.id = id;
-	e.message = ":def:";
-	e.function = HuiCallback(handler, function);
-	event.add(e);
+	event.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
 }
 
 void HuiWindow::_EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
-	HuiEventListener e;
-	e.id = id;
-	e.message = msg;
-	e.function = HuiCallback(handler, function);
-	event.add(e);
+	event.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
+}
+
+void HuiWindow::_EventKM(const string &id, HuiEventHandler *handler, hui_kaba_callback *function)
+{
+	event.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
+}
+
+void HuiWindow::_EventKMX(const string &id, const string &msg, HuiEventHandler *handler, hui_kaba_callback *function)
+{
+	event.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
 }
 
 void HuiWindow::RemoveEventHandlers(HuiEventHandler *handler)

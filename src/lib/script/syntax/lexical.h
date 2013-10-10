@@ -32,6 +32,7 @@ struct ExpressionBuffer
 	SyntaxTree *syntax;
 
 	string get_name(int n);
+	int get_line_no();
 	void next();
 	void rewind();
 	bool end_of_line();

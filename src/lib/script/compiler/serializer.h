@@ -20,6 +20,7 @@ enum{
 	inst_asm,
 	inst_func_intro,
 	inst_func_outro,
+	inst_call_label,
 };
 
 struct LoopData

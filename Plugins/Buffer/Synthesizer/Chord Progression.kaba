@@ -17,7 +17,7 @@ PluginData data
 DummySynthesizer synth
 
 
-window dlg
+ConfigDialog *dlg
 
 void ProcessTrack(BufferBox buf)
 	Chord chord[]
@@ -37,36 +37,71 @@ void ProcessTrack(BufferBox buf)
 			pos1 = p0 - buf.offset
 		AddChord(synth, buf, pos0, pos1, chord[i], data.Volume)
 
-void OnChords()
-	data.Chords = dlg.GetString("")
+class ConfigDialog : Dialog
+	void __init__()
+		super.__init__("Akkord Generator", 415, 185, MainWin, false)
+		AddControlTable("", 0, 0, 1, 3, "table1")
+		SetTarget("table1", 0)
+		AddControlTable("", 0, 1, 4, 4, "table2")
+		SetTarget("table2", 0)
+		AddText("Akkorde:", 0, 0, 0, 0, "")
+		AddEdit("", 1, 0, 0, 0, "chords")
+		AddText("Lautstärke:", 0, 1, 0, 0, "")
+		AddSlider("", 1, 1, 0, 0, "volume_slider")
+		AddSpinButton("\\0\\100\\0.1", 2, 1, 0, 0, "volume")
+		AddText("%", 3, 1, 0, 0, "")
+		AddText("Dauer:", 0, 2, 0, 0, "")
+		AddRadioButton("Sekunden", 1, 2, 0, 0, "duration_type:time")
+		AddSpinButton("\\0\\100\\0.01", 2, 2, 0, 0, "duration")
+		AddRadioButton("Schläge", 1, 3, 0, 0, "duration_type:beats")
+		AddSpinButton("\\1\\100\\1", 2, 3, 0, 0, "beats")
+		
+		PutCommandBar(self, "table1", 0, 2)
+		PutFavoriteBar(self, "table1", 0, 0)
+	
+	
+		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
+		EventM("chords", self, &OnChords)
+		EventM("duration_type:beats", self, &OnDurationTypeBeats)
+		EventM("duration_type:time", self, &OnDurationTypeTime)
+		EventM("duration", self, &OnDuration)
+		EventM("beats", self, &OnBeats)
 
-void OnVolume()
-	data.Volume = SliderGet(dlg, "volume")
+		fill()
+	
+	void fill()
+		SetString("chords", data.Chords)
+		SliderSet(self, "volume", data.Volume)
+		Check("duration_by_beats", data.DurationByBeats)
+		SetFloat("duration", data.Duration)
+		SetInt("beats", data.Beats)
+		Enable("duration", !data.DurationByBeats)
+		Enable("beats", data.DurationByBeats)
 
-void OnDurationTypeBeats()
-	data.DurationByBeats = true
-	dlg.Enable("duration", false)
-	dlg.Enable("beats", true)
+	void OnChords()
+		data.Chords = GetString("")
 
-void OnDurationTypeTime()
-	data.DurationByBeats = false
-	dlg.Enable("duration", true)
-	dlg.Enable("beats", false)
+	void OnVolume()
+		data.Volume = SliderGet(self, "volume")
 
-void OnDuration()
-	data.Duration = dlg.GetFloat("")
+	void OnDurationTypeBeats()
+		data.DurationByBeats = true
+		Enable("duration", false)
+		Enable("beats", true)
 
-void OnBeats()
-	data.Beats = dlg.GetInt("")
+	void OnDurationTypeTime()
+		data.DurationByBeats = false
+		Enable("duration", true)
+		Enable("beats", false)
+
+	void OnDuration()
+		data.Duration = GetFloat("")
+
+	void OnBeats()
+		data.Beats = GetInt("")
 
 void DataToDialog()
-	dlg.SetString("chords", data.Chords)
-	SliderSet(dlg, "volume", data.Volume)
-	dlg.Check("duration_by_beats", data.DurationByBeats)
-	dlg.SetFloat("duration", data.Duration)
-	dlg.SetInt("beats", data.Beats)
-	dlg.Enable("duration", !data.DurationByBeats)
-	dlg.Enable("beats", data.DurationByBeats)
+	dlg.fill()
 
 void ResetData()
 	data.Volume = 0.2
@@ -76,32 +111,6 @@ void ResetData()
 	data.Beats = 1
 
 void Configure()
-	// dialog
-	dlg = new FixedDialog("Akkord Generator",415,185,MainWin,false)
-	dlg.AddText("Akkorde:",5,35,100,25,"")
-	dlg.AddEdit("",110,35,300,25,"chords")
-	dlg.AddText("Lautstärke:",5,65,100,25,"")
-	dlg.AddSlider("",110,65,145,25,"volume_slider")
-	dlg.AddSpinButton("\\0\\100\\0.1",260,65,150,25,"volume")
-	dlg.AddText("%",415,65,20,25,"")
-	dlg.AddText("Dauer:",5,95,100,25,"")
-	dlg.AddRadioButton("Sekunden",110,95,150,25,"duration_type:time")
-	dlg.AddSpinButton("\\0\\100\\0.01",260,95,150,25,"duration")
-	dlg.AddRadioButton("Schläge",110,125,150,25,"duration_type:beats")
-	dlg.AddSpinButton("\\1\\100\\1",260,125,150,25,"beats")
-	PutCommandBarFixed(dlg, 5, 155, 415)
-	PutFavoriteBarFixed(dlg, 5, 5, 415)
-	
-	
-	AddSlider(dlg, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
-	dlg.Event("chords", &OnChords)
-	dlg.Event("duration_type:beats", &OnDurationTypeBeats)
-	dlg.Event("duration_type:time", &OnDurationTypeTime)
-	dlg.Event("duration", &OnDuration)
-	dlg.Event("beats", &OnBeats)
-
-	dlg.SetDecimals(1)
-	DataToDialog()
-
+	dlg = new ConfigDialog
 	dlg.Run()
 

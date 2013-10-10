@@ -251,7 +251,7 @@ Command *SyntaxTree::GetOperandExtensionArray(Command *Operand, Function *f)
 		array = Operand->param[0];*/
 	}else if (Operand->type->is_super_array){
 		array = AddCommand(KindPointerAsArray, 0, Operand->type->parent);
-		array->param[0] = shift_command(Operand, false, 0, GetPointerType(array->type));
+		array->param[0] = shift_command(Operand, false, 0, array->type->GetPointer());
 	}else if (Operand->type->is_pointer){
 		array = AddCommand(KindPointerAsArray, 0, Operand->type->parent->parent);
 		array->param[0] = Operand;
@@ -542,7 +542,7 @@ Command *SyntaxTree::GetOperand(Function *f)
 		Exp.next();
 		Type *t = GetType(Exp.cur, true);
 		Operand = add_command_compilerfunc(CommandNew);
-		Operand->type = GetPointerType(t);
+		Operand->type = t->GetPointer();
 		if (Exp.cur == "("){
 			ClassFunction *cf = t->GetComplexConstructor();
 			if (!cf)
@@ -581,7 +581,7 @@ Command *SyntaxTree::GetOperand(Function *f)
 				// exact match?
 				bool ok=false;
 				for (int i=0;i<PreOperators.num;i++)
-					if ((unsigned)po == PreOperators[i].primitive_id)
+					if (po == PreOperators[i].primitive_id)
 						if ((PreOperators[i].param_type_1 == TypeVoid) && (type_match(p2, false, PreOperators[i].param_type_2))){
 							o = i;
 							r = PreOperators[i].return_type;
@@ -767,7 +767,7 @@ Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 			if (type_match(p2, equal_classes, f.param_type[0])){
 				Command *inst = param1;
 				ref_command_old(this, inst);
-				op = add_command_classfunc(p1, f, inst);
+				op = add_command_classfunc(p1, &f, inst);
 				op->num_params = 1;
 				op->param[0] = param2;
 				return op;
@@ -788,7 +788,7 @@ Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 				if (direct_type_match(p2, f.param_type[0]->parent)){
 					Command *inst = param1;
 					ref_command_old(this, inst);
-					op = add_command_classfunc(p1, f, inst);
+					op = add_command_classfunc(p1, &f, inst);
 					op->num_params = 1;
 					op->param[0] = param2;
 					ref_command_old(this, op->param[0]);
@@ -804,7 +804,7 @@ Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 	int op_found = -1;
 	bool op_is_class_func = false;
 	for (int i=0;i<PreOperators.num;i++)
-		if ((unsigned)op_no == PreOperators[i].primitive_id)
+		if (op_no == PreOperators[i].primitive_id)
 			if (type_match_with_cast(p1, equal_classes, left_modifiable, PreOperators[i].param_type_1, pen1, c1) && type_match_with_cast(p2, equal_classes, false, PreOperators[i].param_type_2, pen2, c2))
 				if (pen1 + pen2 < pen_min){
 					op_found = i;
@@ -829,7 +829,7 @@ Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 		if (op_is_class_func){
 			Command *inst = param1;
 			ref_command_old(this, inst);
-			op = add_command_classfunc(p1, p1->function[op_found], inst);
+			op = add_command_classfunc(p1, &p1->function[op_found], inst);
 			op->num_params = 1;
 			op->param[0] = param2;
 		}else{
@@ -915,7 +915,7 @@ void SyntaxTree::ParseSpecialCommandFor(Block *block, Function *f)
 		Type *t = (Exp.cur == "int") ? TypeInt : TypeFloat;
 		internally = true;
 		Exp.next();
-		int var_no = AddVar(Exp.cur, t, f);
+		int var_no = f->AddVar(Exp.cur, t);
 		exlink_make_var_local(this, t, var_no);
 			for_var = cp_command(&GetExistenceLink);
 	}else{
@@ -993,7 +993,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 {
 	msg_db_f("ParseSpecialCommandForall", 4);
 	// for index
-	int var_no_index = AddVar("-for_index-", TypeInt, f);
+	int var_no_index = f->AddVar("-for_index-", TypeInt);
 	exlink_make_var_local(this, TypeInt, var_no_index);
 		Command *for_index = cp_command(&GetExistenceLink);
 
@@ -1013,7 +1013,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 
 	// variable...
 	Type *var_type = for_array->type->parent;
-	int var_no = AddVar(var_name, var_type, f);
+	int var_no = f->AddVar(var_name, var_type);
 	exlink_make_var_local(this, var_type, var_no);
 		Command *for_var = cp_command(&GetExistenceLink);
 
@@ -1057,7 +1057,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 	// &array.data[for_index]
 	Command *array_el = AddCommand(KindPointerAsArray, 0, var_type);
 	array_el->num_params = 2;
-	array_el->param[0] = shift_command(for_array, false, 0, GetPointerType(var_type));
+	array_el->param[0] = shift_command(for_array, false, 0, var_type->GetPointer());
 	array_el->param[1] = for_index;
 	Command *array_el_ref = AddCommand(KindUnknown, 0, TypeVoid); // TODO
 	command_make_ref(this, array_el_ref, array_el);
@@ -1067,7 +1067,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 	loop_block->command.insert(cmd_var_assign, 0);
 
 	// ref...
-	f->var[var_no].type = GetPointerType(var_type);
+	f->var[var_no].type = var_type->GetPointer();
 	foreach(Command *c, loop_block->command)
 		conv_cbr(this, c, var_no);
 
@@ -1286,7 +1286,7 @@ void SyntaxTree::TestArrayDefinition(Type **type, bool is_pointer)
 {
 	msg_db_f("TestArrayDef", 4);
 	if (is_pointer){
-		(*type) = GetPointerType((*type));
+		(*type) = (*type)->GetPointer();
 	}
 	if (Exp.cur == "["){
 		int array_size;
@@ -1320,7 +1320,6 @@ void SyntaxTree::TestArrayDefinition(Type **type, bool is_pointer)
 		if (array_size < 0){
 			(*type) = CreateNewType(or_name + "[]" +  (*type)->name.substr(or_name_length, -1),
 			                        config.SuperArraySize, false, false, true, array_size, (*type));
-			CreateImplicitFunctions((*type), cur_func);
 		}else{
 			(*type) = CreateNewType(or_name + format("[%d]", array_size) + (*type)->name.substr(or_name_length, -1),
 			                        (*type)->size * array_size, false, false, true, array_size, (*type));
@@ -1409,59 +1408,15 @@ void SyntaxTree::ParseEnum()
 	Exp.cur_line --;
 }
 
-bool class_func_match(ClassFunction &a, ClassFunction &b)
+void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, int virtual_index, bool overwrite)
 {
-	if (a.name != b.name)
-		return false;
-	if (a.return_type != b.return_type)
-		return false;
-	if (a.param_type.num != b.param_type.num)
-		return false;
-	for (int i=0;i<a.param_type.num;i++)
-		if (a.param_type[i] != b.param_type[i])
-			return false;
-	return true;
-}
+	Function *f = ParseFunctionHeader(t, as_extern);
+	int n = -1;
+	foreachi(Function *g, Functions, i)
+		if (f == g)
+			n = i;
 
-string func_signature(Function *f)
-{
-	string r = f->literal_return_type->name + " " + f->name + "(";
-	for (int i=0;i<f->num_params;i++){
-		if (i > 0)
-			r += ", ";
-		r += f->literal_param_type[i]->name;
-	}
-	return r + ")";
-}
-
-void SyntaxTree::ParseClassFunction(Type *t, bool as_extern, int virtual_index, bool overwrite)
-{
-	ParseFunction(t, as_extern);
-
-	Function *f = Functions.back();
-	ClassFunction cf;
-	cf.name = f->name.substr(t->name.num + 1, -1);
-	cf.nr = Functions.num - 1;
-	cf.script = script;
-	cf.return_type = f->return_type;
-	for (int i=0;i<f->num_params;i++)
-		cf.param_type.add(f->var[i].type);
-	cf.virtual_index = ProcessClassOffset(t->name, cf.name, virtual_index);
-
-	// overwrite?
-	ClassFunction *orig = NULL;
-	foreach(ClassFunction &_cf, t->function)
-		if (class_func_match(_cf, cf))
-			orig = &_cf;
-	if (overwrite and !orig)
-		DoError(format("can not overwrite function '%s', no previous definition", func_signature(f).c_str()));
-	if (!overwrite and orig)
-		DoError(format("function '%s' is already defined, use 'overwrite' to overwrite", func_signature(f).c_str()));
-	if (overwrite){
-		orig->script = cf.script;
-		orig->nr = cf.nr;
-	}else
-		t->function.add(cf);
+	t->AddFunction(this, n, virtual_index, overwrite);
 }
 
 inline bool type_needs_alignment(Type *t)
@@ -1499,12 +1454,7 @@ void SyntaxTree::ParseClass()
 	Exp.next();
 
 	// create class and type
-	int nt0 = Types.num;
 	Type *_class = CreateNewType(name, 0, false, false, false, 0, NULL);
-	if (nt0 == Types.num){
-		Exp.rewind();
-		DoError("class already exists");
-	}
 
 	// parent class
 	if (Exp.cur == ":"){
@@ -1519,26 +1469,9 @@ void SyntaxTree::ParseClass()
 
 	// virtual functions?     (derived -> _class->num_virtual)
 	int cur_virtual_index = _class->num_virtual;
-	_class->num_virtual += class_count_virtual_functions(this);
-	_class->num_virtual = ProcessClassNumVirtuals(_class->name, _class->num_virtual);
-	if (_class->num_virtual > 0){
-		if (_class->parent){
-			if (_class->parent->num_virtual == 0)
-				DoError("no virtual functions allowed when inheriting from class without virtual functions");
-			// element "-vtable-" being derived
-		}else{
-			ClassElement el;
-			el.name = "-vtable-";
-			el.type = TypePointer;
-			el.offset = 0;
-			_class->element.add(el);
-			_offset = config.PointerSize;
-		}
-		_class->vtable = new VirtualTable[_class->num_virtual];
-	}
 
 	// elements
-	for (int num=0;true;num++){
+	for (int num=0;!Exp.end_of_file();num++){
 		Exp.next_line();
 		if (Exp.cur_line->indent <= indent0) //(unindented)
 			break;
@@ -1587,7 +1520,7 @@ void SyntaxTree::ParseClass()
 			if (is_function){
 				Exp.cur_exp = ie;
 				Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
-				ParseClassFunction(_class, next_extern, next_virtual ? (cur_virtual_index ++) : -1, overwrite);
+				ParseClassFunctionHeader(_class, next_extern, next_virtual ? (cur_virtual_index ++) : -1, overwrite);
 
 				break;
 			}
@@ -1625,14 +1558,38 @@ void SyntaxTree::ParseClass()
 			Exp.next();
 		}
 	}
+
+
+
+	// virtual functions?     (derived -> _class->num_virtual)
+	_class->num_virtual = cur_virtual_index;
+	//foreach(ClassFunction &cf, _class->function)
+	//	_class->num_virtual = max(_class->num_virtual, cf.virtual_index);
+	if (_class->num_virtual > 0){
+		if (_class->parent){
+			if (_class->parent->num_virtual == 0)
+				DoError("no virtual functions allowed when inheriting from class without virtual functions");
+			// element "-vtable-" being derived
+		}else{
+			foreach(ClassElement &e, _class->element)
+				e.offset += config.PointerSize;
+
+			ClassElement el;
+			el.name = "-vtable-";
+			el.type = TypePointer;
+			el.offset = 0;
+			_class->element.insert(el, 0);
+			_offset += config.PointerSize;
+		}
+		_class->vtable = new VirtualTable[_class->num_virtual + 2];
+	}
+
 	foreach(ClassElement &e, _class->element)
 		if (type_needs_alignment(e.type))
 			_offset = mem_align(_offset, 4);
 	_class->size = ProcessClassSize(_class->name, _offset);
 
-
-
-	CreateImplicitFunctions(_class, false);
+	AddFunctionHeadersForClass(_class);
 
 	Exp.cur_line --;
 }
@@ -1699,7 +1656,7 @@ Type *SyntaxTree::ParseVariableDefSingle(Type *type, Function *f, bool as_param)
 	if (next_const){
 		ParseGlobalConst(name, type);
 	}else
-		AddVar(name, type, f);
+		f->AddVar(name, type);
 	return type;
 }
 
@@ -1752,9 +1709,31 @@ bool SyntaxTree::ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_
 	return true;
 }
 
-void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
+void Function::Update(Type *class_type)
 {
-	msg_db_f("ParseFunction", 4);
+	// save "original" param types (Var[].Type gets altered for call by reference)
+	for (int i=0;i<num_params;i++)
+		literal_param_type[i] = var[i].type;
+
+	// return by memory
+	if (return_type->UsesReturnByMemory())
+		AddVar("-return-", return_type->GetPointer());
+
+	// class function
+	_class = class_type;
+	if (class_type){
+		AddVar("self", class_type->GetPointer());
+		if (class_type->parent)
+			AddVar("super", class_type->parent->GetPointer());
+
+		// convert name to Class.Function
+		name = class_type->name + "." +  name;
+	}
+}
+
+Function *SyntaxTree::ParseFunctionHeader(Type *class_type, bool as_extern)
+{
+	msg_db_f("ParseFunctionHeader", 4);
 
 // return type
 	Type *return_type = GetType(Exp.cur, true);
@@ -1762,7 +1741,7 @@ void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
 	// pointer?
 	if (Exp.cur == "*"){
 		Exp.next();
-		return_type = GetPointerType(return_type);
+		return_type = return_type->GetPointer();
 	}
 
 	so(Exp.cur);
@@ -1795,34 +1774,28 @@ void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
 		}
 	Exp.next(); // ')'
 
-	// save "original" param types (Var[].Type gets altered for call by reference)
-	for (int i=0;i<f->num_params;i++)
-		f->literal_param_type[i] = f->var[i].type;
-
 	if (!Exp.end_of_line())
 		DoError("newline expected after parameter list");
 
+	f->Update(class_type);
 
-	// return by memory
-	if (return_type->UsesReturnByMemory())
-		AddVar("-return-", GetPointerType(return_type), f);
+	f->is_extern = as_extern;
+	f->_logical_line_no = Exp.get_line_no();
+	cur_func = NULL;
 
-	// class function
-	f->_class = class_type;
-	if (class_type){
-		AddVar("self", GetPointerType(class_type), f);
-		if (class_type->parent)
-			AddVar("super", GetPointerType(class_type->parent), f);
-
-		// convert name to Class.Function
-		f->name = class_type->name + "." +  f->name;
+	// skip function body
+	int indent0 = Exp.cur_line->indent;
+	while (!Exp.end_of_file()){
+		if (Exp.cur_line[1].indent <= indent0)
+			break;
+		Exp.next_line();
 	}
+	return f;
+}
 
-	if (as_extern){
-		f->is_extern = true;
-		cur_func = NULL;
-		return;
-	}
+void SyntaxTree::ParseFunctionBody(Function *f)
+{
+	Exp.cur_line = &Exp.line[f->_logical_line_no];
 
 	ExpressionBuffer::Line *this_line = Exp.cur_line;
 	bool more_to_parse = true;
@@ -1832,9 +1805,9 @@ void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
 		if (peak_commands_super(Exp)){
 			more_to_parse = ParseFunctionCommand(f, this_line);
 
-			ImplementImplicitConstructor(f, class_type, false);
+			AutoImplementDefaultConstructor(f, f->_class, false);
 		}else
-			ImplementImplicitConstructor(f, class_type);
+			AutoImplementDefaultConstructor(f, f->_class, true);
 	}
 
 
@@ -1845,10 +1818,38 @@ void SyntaxTree::ParseFunction(Type *class_type, bool as_extern)
 
 	// auto implement destructor?
 	if (f->name.tail(11) == ".__delete__")
-		ImplementImplicitDestructor(f, class_type);
+		AutoImplementDestructor(f, f->_class);
 	cur_func = NULL;
 
 	Exp.cur_line --;
+}
+
+void SyntaxTree::ParseAllClassNames()
+{
+	msg_db_f("ParseAllClassNames", 4);
+
+	Exp.reset_parser();
+	while (!Exp.end_of_file()){
+		if ((Exp.cur_line->indent == 0) && (Exp.cur_line->exp.num >= 2)){
+			if (Exp.cur == "class"){
+				Exp.next();
+				int nt0 = Types.num;
+				CreateNewType(Exp.cur, 0, false, false, false, 0, NULL);
+				if (nt0 == Types.num)
+					DoError("class already exists");
+			}
+		}
+		Exp.next_line();
+	}
+}
+
+void SyntaxTree::ParseAllFunctionBodies()
+{
+	for (int i=0;i<Functions.num;i++){
+		Function *f = Functions[i];
+		if ((!f->is_extern) && (f->_logical_line_no >= 0))
+			ParseFunctionBody(f);
+	}
 }
 
 // convert text into script data
@@ -1860,6 +1861,8 @@ void SyntaxTree::Parser()
 	cur_func = NULL;
 
 	// syntax analysis
+
+	ParseAllClassNames();
 
 	Exp.reset_parser();
 
@@ -1902,17 +1905,23 @@ void SyntaxTree::Parser()
 				if (Exp.cur_line->exp[j].name == "(")
 				    is_function = true;
 
-			// own function?
+			// function?
 			if (is_function){
-				ParseFunction(NULL, next_extern);
+				ParseFunctionHeader(NULL, next_extern);
 
 			// global variables
 			}else{
 				ParseVariableDef(false, &RootOfAllEvil);
 			}
 		}
-		Exp.next_line();
+		if (!Exp.end_of_file())
+			Exp.next_line();
 	}
+
+	ParseAllFunctionBodies();
+
+	for (int i=0;i<Types.num;i++)
+		AutoImplementFunctions(Types[i]);
 }
 
 }

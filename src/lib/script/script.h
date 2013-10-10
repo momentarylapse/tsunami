@@ -95,6 +95,8 @@ public:
 
 	Array<t_func*> func;
 	t_func *first_execution, *continue_execution;
+	Array<Asm::WantedLabel> functions_to_link;
+	Array<int> function_vars_to_link;
 
 	bool JustAnalyse, ShowCompilerStats;
 	Function *cur_func;

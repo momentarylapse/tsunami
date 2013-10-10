@@ -15,6 +15,11 @@ ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s,
 	virtual_index = -1;
 }
 
+Function* ClassFunction::GetFunc()
+{
+	return script->syntax->Functions[nr];
+}
+
 Type::Type()//const string &_name, int _size, SyntaxTree *_owner)
 {
 	//name = _name;
@@ -64,7 +69,7 @@ bool Type::is_simple_class()
 		return false;
 	if (GetDestructor())
 		return false;
-	if (GetFunc("__assign__") >= 0)
+	if (GetAssign())
 		return false;
 	foreach(ClassElement &e, element)
 		if (!e.type->is_simple_class())
@@ -83,20 +88,17 @@ bool Type::IsDerivedFrom(Type *root) const
 	return parent->IsDerivedFrom(root);
 }
 
-int Type::GetFunc(const string &name)
+ClassFunction *Type::GetFunc(const string &name, Type *return_type, int num_params)
 {
 	foreachi(ClassFunction &f, function, i)
-		if (f.name == name)
-			return i;
-	return -1;
+		if ((f.name == name) && (f.return_type == return_type) && (f.param_type.num == num_params))
+			return &f;
+	return NULL;
 }
 
 ClassFunction *Type::GetDefaultConstructor()
 {
-	foreach(ClassFunction &f, function)
-		if ((f.name == "__init__") && (f.return_type == TypeVoid) && (f.param_type.num == 0))
-			return &f;
-	return NULL;
+	return GetFunc("__init__", TypeVoid, 0);
 }
 
 ClassFunction *Type::GetComplexConstructor()
@@ -109,10 +111,12 @@ ClassFunction *Type::GetComplexConstructor()
 
 ClassFunction *Type::GetDestructor()
 {
-	foreach(ClassFunction &f, function)
-		if ((f.name == "__delete__") && (f.return_type == TypeVoid) && (f.param_type.num == 0))
-			return &f;
-	return NULL;
+	return GetFunc("__delete__", TypeVoid, 0);
+}
+
+ClassFunction *Type::GetAssign()
+{
+	return GetFunc("__assign__", TypeVoid, 1);
 }
 
 ClassFunction *Type::GetVirtualFunction(int virtual_index)
@@ -171,6 +175,68 @@ void Type::LinkExternalVirtualTable(void *p)
 		vtable[1] = mf(&VirtualBase::__delete_external__);
 }
 
+
+bool class_func_match(ClassFunction &a, ClassFunction &b)
+{
+	if (a.name != b.name)
+		return false;
+	if (a.return_type != b.return_type)
+		return false;
+	if (a.param_type.num != b.param_type.num)
+		return false;
+	for (int i=0;i<a.param_type.num;i++)
+		if (a.param_type[i] != b.param_type[i])
+			return false;
+	return true;
+}
+
+string func_signature(Function *f)
+{
+	string r = f->literal_return_type->name + " " + f->name + "(";
+	for (int i=0;i<f->num_params;i++){
+		if (i > 0)
+			r += ", ";
+		r += f->literal_param_type[i]->name;
+	}
+	return r + ")";
+}
+
+
+Type *Type::GetPointer()
+{
+	return owner->CreateNewType(name + "*", config.PointerSize, true, false, false, 0, this);
+}
+
+void Type::AddFunction(SyntaxTree *s, int func_no, int virtual_index, bool overwrite)
+{
+	Function *f = s->Functions[func_no];
+	ClassFunction cf;
+	cf.name = f->name.substr(name.num + 1, -1);
+	cf.nr = func_no;
+	cf.script = s->script;
+	cf.return_type = f->return_type;
+	for (int i=0;i<f->num_params;i++)
+		cf.param_type.add(f->var[i].type);
+	cf.virtual_index = ProcessClassOffset(name, cf.name, virtual_index);
+
+	// overwrite?
+	ClassFunction *orig = NULL;
+	foreach(ClassFunction &_cf, function)
+		if (class_func_match(_cf, cf))
+			orig = &_cf;
+	if (overwrite and !orig)
+		s->DoError(format("can not overwrite function '%s', no previous definition", func_signature(f).c_str()));
+	if (!overwrite and orig){
+		msg_write(orig->param_type.num);
+		s->DoError(format("function '%s' is already defined, use 'overwrite' to overwrite", func_signature(f).c_str()));
+	}
+	if (overwrite){
+		orig->script = cf.script;
+		orig->nr = cf.nr;
+	}else
+		function.add(cf);
+}
+
 bool Type::DeriveFrom(Type* root)
 {
 	parent = root;
@@ -183,7 +249,7 @@ bool Type::DeriveFrom(Type* root)
 	if (parent->function.num > 0){
 		// inheritance of functions
 		foreach(ClassFunction &f, parent->function){
-			if ((f.name != "__init__") && (f.name != "__assign__"))
+			if ((f.name != "__init__") && (f.name != "__init_comp__") && (f.name != "__delete__") && (f.name != "__assign__"))
 				function.add(f);
 		}
 		found = true;

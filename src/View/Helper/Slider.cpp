@@ -17,9 +17,7 @@ Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_ed
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = _func;
-	member_func = NULL;
-	handler = NULL;
+	func = HuiCallback(_func);
 
 	win->EventM(id_slider, this, &Slider::OnSlide);
 	win->EventM(id_edit, this, &Slider::OnEdit);
@@ -37,9 +35,23 @@ Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_ed
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = NULL;
-	member_func = _func;
-	handler = _handler ? _handler : win;
+	func = HuiCallback(_handler ? _handler : win, _func);
+
+	win->EventM(id_slider, this, &Slider::OnSlide);
+	win->EventM(id_edit, this, &Slider::OnEdit);
+
+	Set(_value);
+}
+
+Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_kaba_callback *_func, float _value, HuiEventHandler *_handler)
+{
+	win = _win;
+	id_slider = _id_slider;
+	id_edit = _id_edit;
+	value_min = _v_min;
+	value_max = _v_max;
+	factor = _factor;
+	func = HuiCallback(_handler ? _handler : win, _func);
 
 	win->EventM(id_slider, this, &Slider::OnSlide);
 	win->EventM(id_edit, this, &Slider::OnEdit);
@@ -83,19 +95,13 @@ void Slider::OnSlide()
 {
 	float value = value_min + win->GetFloat("") * (value_max - value_min);
 	win->SetFloat(id_edit, value * factor);
-	if (func)
-		func();
-	if (member_func)
-		(handler->*member_func)();
+	func.call();
 }
 
 void Slider::OnEdit()
 {
 	float value = win->GetFloat("") / factor;
 	win->SetFloat(id_slider, (value - value_min) / (value_max - value_min));
-	if (func)
-		func();
-	if (member_func)
-		(handler->*member_func)();
+	func.call();
 }
 

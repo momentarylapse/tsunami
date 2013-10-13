@@ -118,7 +118,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	Subscribe(tsunami->input);
 
 	// events
-	parent->EventMX("area", "hui:redraw", this, &AudioView::OnDraw);
+	parent->EventMX("area", "hui:draw", this, &AudioView::OnDraw);
 	parent->EventMX("area", "hui:mouse-move", this, &AudioView::OnMouseMove);
 	parent->EventMX("area", "hui:left-button-down", this, &AudioView::OnLeftButtonDown);
 	parent->EventMX("area", "hui:left-double-click", this, &AudioView::OnLeftDoubleClick);

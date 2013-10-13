@@ -9,7 +9,7 @@ const float MAX_FREQ = 20000.0
 const float MIN_VOL = 0.0 - 60.0
 const float MAX_VOL = 0.0
 
-Window *dlg
+SpectrumDialog *dlg
 
 enum
 	TypeLinear
@@ -50,43 +50,46 @@ void CreateLines(int type, float x[], float yr[], float yl[])
 			yr.add(clamp(todb(ffr[i]), vol_min, vol_max))
 			yl.add(clamp(todb(ffl[i]), vol_min, vol_max))
 
-void OnDraw()
-	Painter *c = dlg.BeginDraw("drawing_area")
-	w = c.width
-	h = c.height
+class SpectrumDialog : Dialog
+	void __init__()
+		super.__init__("Spectrum", 600, 460, MainWin, true)
+		AddControlTable("", 0, 0, 1, 2, "table1")
+		SetTarget("table1", 0)
+		AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
+		AddControlTable("!noexpandy", 0, 1, 2, 1, "table2")
+		SetTarget("table2", 0)
+		AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
+		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
+		SetImage("close", "hui:close")
 	
-	float x[], yr[], yl[]
-	CreateLines(dlg.GetInt("type"), x, yr, yl)
+		EventM("type", self, &OnType)
+		EventM("hui:close", self, &OnClose)
+		EventM("close", self, &OnClose)
 	
-	grid.Draw(c, 0, 0, w, h)
-	grid.DrawCurveB(c, x, yr, true, Red)
-	grid.DrawCurveB(c, x, yl, true, Blue)
-	
-	c.End()
+		SetInt("type", TypeLogarithm)
 
-void OnType()
-	dlg.Redraw("drawing_area")
+	overwrite void OnDraw()
+		Painter *c = BeginDraw("drawing_area")
+		w = c.width
+		h = c.height
+	
+		float x[], yr[], yl[]
+		CreateLines(GetInt("type"), x, yr, yl)
+	
+		grid.Draw(c, 0, 0, w, h)
+		grid.DrawCurveB(c, x, yr, true, Red)
+		grid.DrawCurveB(c, x, yl, true, Blue)
+	
+		c.End()
 
-void OnClose()
-	delete dlg
+	void OnType()
+		Redraw("drawing_area")
+
+	void OnClose()
+		delete self
 
 void show_spec()
-	dlg = new Dialog("Spectrum", 600, 460, MainWin, true)
-	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
-	dlg.SetTarget("table1", 0)
-	dlg.AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
-	dlg.AddControlTable("!noexpandy", 0, 1, 2, 1, "table2")
-	dlg.SetTarget("table2", 0)
-	dlg.AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
-	dlg.AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
-	dlg.SetImage("close", "hui:close")
-	
-	dlg.EventX("drawing_area", "hui:redraw", &OnDraw)
-	dlg.Event("type", &OnType)
-	dlg.Event("hui:close", &OnClose)
-	dlg.Event("close", &OnClose)
-	
-	dlg.SetInt("type", TypeLogarithm)
+	dlg = new SpectrumDialog
 	
 	BufferBox buf
 	renderer.RenderAudioFile(audio, audio.selection, buf)

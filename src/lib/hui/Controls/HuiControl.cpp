@@ -294,8 +294,8 @@ void HuiControl::Notify(const string &message, bool is_default)
 			WinTrySendByKeyCode(win, HuiGetEvent()->key_code);
 		}else if (message == "hui:key-up")
 			win->OnKeyUp();
-		else if (message == "hui:redraw")
-			win->OnRedraw();
+		else if (message == "hui:draw")
+			win->OnDraw();
 	}
 }
 

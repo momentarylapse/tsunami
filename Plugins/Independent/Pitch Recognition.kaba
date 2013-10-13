@@ -129,7 +129,7 @@ void main()
 	win.AddButton("Schließen", 5, 145, 290, 25, "close")
 	win.SetImage("close", "hui:close")
 	
-	win.EventX("drawing", "hui:redraw", &Draw)
+	win.EventX("drawing", "hui:draw", &Draw)
 	win.Event("hui:close", &OnClose)
 	win.Event("close", &OnClose)
 	

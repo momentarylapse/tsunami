@@ -13,7 +13,7 @@ const float threshold = 5.0
 const int buf_size = 4096
 float buf[]
 
-Window *win
+SuperNovaWindow *win
 
 int played[]
 
@@ -32,51 +32,52 @@ string get_note(float f)
 	//loopf(fl, 0, 1)
 	//note = i2s(n)
 
-void DrawVolume(Painter *c)
-	c.SetColor(color(1, 0.8, 0.8, 0.8))
-	float y0 = 30
-	float y1 = c.height - 5
-	float h = y1 - y0
-	c.DrawRect(5, y0 + h * (1 - Volume), 5, h)
-	c.SetColor(color(1, 0.6, 0.6, 0.6))
-	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+class SuperNovaWindow : Dialog
+	void __init__()
+		super.__init__("Supernova", 600, 400, MainWin, false)
+		AddDrawingArea("", 0, 0, 0, 0, "drawing")
 
-void Draw()
-	Painter *c = win.BeginDraw("drawing")
-	c.SetColor(White)
-	c.SetFontSize(12)
-	int w = c.width
-	int h = c.height
-	c.DrawRect(0, 0, w, h)
-	
-	DrawVolume(c)
-	
-	
-	c.SetColor(Black)
-	for int i, 0, 6
-		float ly = h - (7 - i) * h / 8 * 0.33
-		c.DrawLine(0, ly, w, ly)
-	
-	c.SetColor(Black)
-	c.DrawStr(20, 20, Frequency.str2(1) + "Hz")
-	c.DrawStr(20, 40, Volume.str())
-	for int i, 0, played.num
-		if played[i] < 0
-			continue
-		float x = i
-		float y = h - h * (played[i] - 40.0) / 60.0
-		c.DrawLine(x, y, x + 2, y)
-	
-	c.SetColor(Black)
-	if LoudEnough
-		c.DrawStr(120, 20, rel_pitch_name(played[played.num - 1] % 12))
-	else
-		c.DrawStr(w / 2 - 30, h / 2 - 20, "zu leise")
-	c.End()
+	void DrawVolume(Painter *c)
+		c.SetColor(color(1, 0.8, 0.8, 0.8))
+		float y0 = 30
+		float y1 = c.height - 5
+		float h = y1 - y0
+		c.DrawRect(5, y0 + h * (1 - Volume), 5, h)
+		c.SetColor(color(1, 0.6, 0.6, 0.6))
+		c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-void OnClose()
-	delete win
-	win = nil
+	overwrite void OnDraw()
+		Painter *c = BeginDraw("drawing")
+		c.SetColor(White)
+		c.SetFontSize(12)
+		int w = c.width
+		int h = c.height
+		c.DrawRect(0, 0, w, h)
+	
+		DrawVolume(c)
+	
+	
+		c.SetColor(Black)
+		for int i, 0, 6
+			float ly = h - (7 - i) * h / 8 * 0.33
+			c.DrawLine(0, ly, w, ly)
+	
+		c.SetColor(Black)
+		c.DrawStr(20, 20, Frequency.str2(1) + "Hz")
+		c.DrawStr(20, 40, Volume.str())
+		for int i, 0, played.num
+			if played[i] < 0
+				continue
+			float x = i
+			float y = h - h * (played[i] - 40.0) / 60.0
+			c.DrawLine(x, y, x + 2, y)
+	
+		c.SetColor(Black)
+		if LoudEnough
+			c.DrawStr(120, 20, rel_pitch_name(played[played.num - 1] % 12))
+		else
+			c.DrawStr(w / 2 - 30, h / 2 - 20, "zu leise")
+		c.End()
 
 void UpdateInput()
 	int stack_corrector[1] // needed for stack alignment (T_T)
@@ -134,12 +135,7 @@ void UpdateInput()
 complex bufc[]
 
 void main()
-	win = new Dialog("Supernova", 600, 400, MainWin, false)
-	win.AddDrawingArea("", 0, 0, 0, 0, "drawing")
-	
-	win.EventX("drawing", "hui:redraw", &Draw)
-	win.Event("hui:close", &OnClose)
-	
+	win = new SuperNovaWindow
 
 
 	buf.resize(1000)

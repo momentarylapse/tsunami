@@ -88,10 +88,10 @@ bool Type::IsDerivedFrom(Type *root) const
 	return parent->IsDerivedFrom(root);
 }
 
-ClassFunction *Type::GetFunc(const string &name, Type *return_type, int num_params)
+ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_params)
 {
 	foreachi(ClassFunction &f, function, i)
-		if ((f.name == name) && (f.return_type == return_type) && (f.param_type.num == num_params))
+		if ((f.name == _name) && (f.return_type == return_type) && (f.param_type.num == num_params))
 			return &f;
 	return NULL;
 }

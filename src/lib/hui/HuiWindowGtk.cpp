@@ -99,40 +99,6 @@ gboolean OnGtkWindowClose(GtkWidget *widget, GdkEvent *event, gpointer user_data
 	return true;
 }
 
-void OnGtkWindowResize(GtkWidget *widget, GtkRequisition *requisition, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow *)user_data;
-	HuiEvent e = HuiEvent("", "hui:resize");
-	win->OnResize();
-	win->_SendEvent_(&e);
-}
-
-gboolean OnGtkWindowExpose(GtkWidget *widget, cairo_t *cr, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow*)user_data;
-	HuiEvent e = HuiEvent("", "hui:redraw");
-	win->_SendEvent_(&e);
-	win->OnRedraw();
-	return false;
-}
-
-gboolean expose_event_gl(GtkWidget *widget, cairo_t *cr, gpointer user_data)
-{
-	//msg_write(string2("expose gl %d", xpi++));
-	HuiWindow *win = (HuiWindow*)user_data;
-	HuiEvent e = HuiEvent("", "hui:redraw");
-	win->_SendEvent_(&e);
-	return true; // stop handler...
-}
-
-gboolean OnGtkWindowVisibilityNotify(GtkWidget *widget, GdkEventVisibility *event, gpointer user_data)
-{
-	HuiWindow *win = (HuiWindow*)user_data;
-	HuiEvent e = HuiEvent("", "hui:redraw");
-	win->_SendEvent_(&e);
-	return false;
-}
-
 gboolean focus_in_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_data)
 {
 	// make sure the contro/alt/shift keys are unset
@@ -384,24 +350,6 @@ string HuiWindow::Run()
 			_HuiClosedWindow_.erase(i);
 		}
 	return last_id;
-}
-
-void HuiWindow::AllowEvents(const string &msg)
-{
-	int mask;
-	g_object_get(G_OBJECT(window), "events", &mask, NULL);
-	
-	// catch signals
-	if (msg.find("draw") >= 0){
-		//g_signal_connect(G_OBJECT(window), "draw", G_CALLBACK(&OnGtkWindowExpose), this);
-		g_signal_connect(G_OBJECT(window), "visibility-notify-event", G_CALLBACK(&OnGtkWindowVisibilityNotify), this);
-		mask |= GDK_VISIBILITY_NOTIFY_MASK;
-	}
-	if (msg.find("size") >= 0){
-		g_signal_connect(G_OBJECT(window), "size-request", G_CALLBACK(&OnGtkWindowResize), this);
-	}
-
-	g_object_set(G_OBJECT(window), "events", mask, NULL);
 }
 
 void HuiWindow::SetMenu(HuiMenu *_menu)

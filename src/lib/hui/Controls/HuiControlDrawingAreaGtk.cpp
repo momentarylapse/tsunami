@@ -16,7 +16,7 @@ int GtkAreaMouseSetX, GtkAreaMouseSetY;
 
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
-	((HuiControl*)user_data)->Notify("hui:redraw");
+	((HuiControl*)user_data)->Notify("hui:draw");
 	return false;
 }
 

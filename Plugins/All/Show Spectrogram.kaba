@@ -3,6 +3,9 @@
 use "../api.kaba"
 use "../grid.kaba"
 
+//#show
+//#disasm
+
 const int N = 4096
 const int NT = 512
 const int NF = 512
@@ -11,31 +14,44 @@ const float MAX_FREQ = 10000.0
 const float MIN_VOL = 0.0 - 60.0
 const float MAX_VOL = 0.0
 
-Window *dlg
+SpectrumDialog *dlg
 
 float sg[NT][NF]
 Image im0
 
 GridData grid
 
+class SpectrumDialog : Dialog
+	void __init__()
+		super.__init__("Spectrum", 600, 460, MainWin, true)
+		AddControlTable("", 0, 0, 1, 2, "table1")
+		SetTarget("table1", 0)
+		AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
+		AddControlTable("!noexpandy", 0, 1, 2, 1, "table2")
+		SetTarget("table2", 0)
+		AddText("", 0, 0, 0, 0, "")
+		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
+		SetImage("close", "hui:close")
+	
+		EventM("close", self, &OnClose)
 
-void OnDraw()
-	Painter *c = dlg.BeginDraw("drawing_area")
-	float w = c.width
-	float h = c.height
+	overwrite void OnDraw()
+		Painter *c = BeginDraw("drawing_area")
+		float w = c.width
+		float h = c.height
 	
-	grid.Draw(c, 0, 0, w, h)
+		grid.Draw(c, 0, 0, w, h)
 	
-	rect r = grid.GetPlotRegion(0, 0, w, h)
+		rect r = grid.GetPlotRegion(0, 0, w, h)
 	
-	Image im = im0
-	im.Scale(r.width(), r.height())
-	c.DrawImage(r.x1, r.y1, im)
+		Image im = im0
+		im.Scale(r.width(), r.height())
+		c.DrawImage(r.x1, r.y1, im)
 	
-	c.End()
+		c.End()
 
-void OnClose()
-	delete dlg
+	void OnClose()
+		delete self
 
 color f2col(float f)
 	f = sqrt(f)
@@ -46,19 +62,7 @@ color f2col(float f)
 	return color(1, 1, f * 3 - 2, 0)
 
 void show_spec()
-	dlg = new Dialog("Spectrum", 600, 460, MainWin, true)
-	dlg.AddControlTable("", 0, 0, 1, 2, "table1")
-	dlg.SetTarget("table1", 0)
-	dlg.AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
-	dlg.AddControlTable("!noexpandy", 0, 1, 2, 1, "table2")
-	dlg.SetTarget("table2", 0)
-	dlg.AddText("", 0, 0, 0, 0, "")
-	dlg.AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
-	dlg.SetImage("close", "hui:close")
-	
-	dlg.EventX("drawing_area", "hui:redraw", &OnDraw)
-	dlg.Event("hui:close", &OnClose)
-	dlg.Event("close", &OnClose)
+	dlg = new SpectrumDialog
 	
 	BufferBox buf
 	renderer.RenderAudioFile(audio, audio.selection, buf)

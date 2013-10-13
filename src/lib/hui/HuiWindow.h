@@ -110,7 +110,6 @@ public:
 	void _cdecl SetStatusText(const string &str);
 
 	// events
-	void _cdecl AllowEvents(const string &msg);
 	void _cdecl Event(const string &id, hui_callback *function);
 	void _cdecl EventX(const string &id, const string &msg, hui_callback *function);
 	void _cdecl _EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)());
@@ -139,9 +138,7 @@ public:
 	virtual void _cdecl OnCloseRequest();
 	virtual void _cdecl OnKeyDown(){}
 	virtual void _cdecl OnKeyUp(){}
-	virtual void _cdecl OnResize(){}
-	virtual void _cdecl OnMove(){}
-	virtual void _cdecl OnRedraw(){}
+	virtual void _cdecl OnDraw(){}
 
 	// creating controls
 	void _cdecl AddButton(const string &title,int x,int y,int width,int height,const string &id);

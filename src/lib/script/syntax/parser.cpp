@@ -1531,7 +1531,7 @@ void SyntaxTree::ParseClass()
 				if (e.name == el.name) //&& e.type->is_pointer && el.type->is_pointer)
 						orig = &e;
 			if (overwrite and ! orig)
-				DoError(format("can not overwrite element '%s', not previous definition", el.name.c_str()));
+				DoError(format("can not overwrite element '%s', no previous definition", el.name.c_str()));
 			if (!overwrite and orig)
 				DoError(format("element '%s' is already defined, use 'overwrite' to overwrite", el.name.c_str()));
 			if (overwrite){
@@ -1572,7 +1572,7 @@ void SyntaxTree::ParseClass()
 			// element "-vtable-" being derived
 		}else{
 			foreach(ClassElement &e, _class->element)
-				e.offset += config.PointerSize;
+				e.offset = ProcessClassOffset(_class->name, e.name, e.offset + config.PointerSize);
 
 			ClassElement el;
 			el.name = "-vtable-";

@@ -80,9 +80,9 @@ class ConfigDialog : Dialog
 	void __init__(FMConfig *c, Window *parent)
 		super.__init__("config", 640, 260, parent, false)
 		cur_dlg = self
-		AddControlTable("", 0, 0, 1, 3, "root_table")
+		AddGrid("", 0, 0, 1, 3, "root_table")
 		SetTarget("root_table", 0)
-		AddControlTable("", 0, 1, 8, NUM_OSCILLATORS + 1, "main_table")
+		AddGrid("", 0, 1, 8, NUM_OSCILLATORS + 1, "main_table")
 		SetTarget("main_table", 0)
 		AddText("Frequency", 0, 0, 0, 0, "")
 		AddText("Amplitude", 1, 0, 0, 0, "")
@@ -101,8 +101,8 @@ class ConfigDialog : Dialog
 			AddSpinButton("0\\0\\1000\\0.1", 5, j + 1, 0, 0, "attack_" + j)
 			AddSpinButton("0\\0\\1000\\0.1", 6, j + 1, 0, 0, "decay_" + j)
 			AddSpinButton("0\\0\\1000\\0.1", 7, j + 1, 0, 0, "release_" + j)
-		PutFavoriteBarSizable(self, "root_table", 0, 0)
-		PutCommandBarSizable(self, "root_table", 0, 2)
+		PutFavoriteBar(self, "root_table", 0, 0)
+		PutCommandBar(self, "root_table", 0, 2)
 
 class FMSynthesizer : Synthesizer
 	FMConfig config

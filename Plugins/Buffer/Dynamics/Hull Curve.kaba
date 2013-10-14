@@ -55,15 +55,15 @@ void DataToDialog()
 class ConfigDialog : Dialog
 	void __init__()
 		super.__init__("Hull Curve", 600, 420, MainWin, false)
-		AddControlTable("", 0, 0, 1, 4, "table")
+		AddGrid("", 0, 0, 1, 4, "table")
 		SetTarget("table", 0)
 		AddDrawingArea("", 0, 1, 0, 0, "drawing")
-		AddControlTable("!noexpandy", 0, 2, 2, 1, "table2")
+		AddGrid("!noexpandy", 0, 2, 2, 1, "table2")
 		SetTarget("table2", 0)
 		AddComboBox("linear\\log", 0, 0, 0, 0, "type")
 		AddCheckBox("show buffer", 1, 0, 0, 0, "preview")
 	
-		//EventMX("drawing", "hui:redraw", self, &OnDraw)
+		//EventMX("drawing", "hui:draw", self, &OnDraw)
 
 		PutFavoriteBar(self, "table", 0, 0)
 		PutCommandBar(self, "table", 0, 3)
@@ -73,7 +73,7 @@ class ConfigDialog : Dialog
 	
 		Redraw("drawing")
 
-	overwrite void OnRedraw()
+	overwrite void OnDraw()
 		Painter *c = BeginDraw("drawing")
 		float w = c.width
 		float h = c.height

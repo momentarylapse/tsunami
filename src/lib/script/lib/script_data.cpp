@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.13.0.0";
+string DataVersion = "0.13.1.0";
 
 CompilerConfiguration config;
 
@@ -258,19 +258,32 @@ void class_add_element(const string &name, Type *type, int offset)
 
 int add_func(const string &name, Type *return_type, void *func, bool is_class);
 
-void _class_add_func_virtual(const string &tname, const string &name, Type *return_type, int index)
+ClassFunction *_class_add_func(Type *c, const ClassFunction &f, bool overwrite)
+{
+	if (overwrite){
+		foreachi(ClassFunction &ff, c->function, i)
+			if (ff.name == f.name){
+				ff = f;
+				return &ff;
+			}
+		msg_error("could not overwrite " + c->name + "." + f.name);
+	}
+	c->function.add(f);
+	return &c->function.back();
+}
+
+void _class_add_func_virtual(const string &tname, const string &name, Type *return_type, int index, bool overwrite)
 {
 	//msg_write("virtual: " + tname + "." + name);
 	//msg_write(index);
 	int cmd = add_func(tname + "." + name + "[virtual]", return_type, NULL, true);
 	cur_func->_class = cur_class;
-	cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
-	cur_class_func = &cur_class->function.back();
+	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cmd), overwrite);
 	cur_class_func->virtual_index = index;
 	cur_class->num_virtual = max(cur_class->num_virtual, index + 1);
 }
 
-void class_add_func(const string &name, Type *return_type, void *func)
+void class_add_func(const string &name, Type *return_type, void *func, bool overwrite)
 {
 	msg_db_f("add_class_func", 4);
 	string tname = cur_class->name;
@@ -281,11 +294,10 @@ void class_add_func(const string &name, Type *return_type, void *func)
 	}
 	int cmd = add_func(tname + "." + name, return_type, func, true);
 	cur_func->_class = cur_class;
-	cur_class->function.add(ClassFunction(name, return_type, cur_package_script, cmd));
-	cur_class_func = &cur_class->function.back();
+	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cmd), overwrite);
 }
 
-void class_add_func_virtual(const string &name, Type *return_type, void *func)
+void class_add_func_virtual(const string &name, Type *return_type, void *func, bool overwrite)
 {
 	msg_db_f("add_class_func_virtual", 4);
 	string tname = cur_class->name;
@@ -296,7 +308,7 @@ void class_add_func_virtual(const string &name, Type *return_type, void *func)
 	}
 	if (config.abi == AbiWindows32){
 		if (!func){
-			_class_add_func_virtual(tname, name, return_type, 0);
+			_class_add_func_virtual(tname, name, return_type, 0, overwrite);
 			return;
 		}
 		unsigned char *pp = (unsigned char*)func;
@@ -306,7 +318,7 @@ void class_add_func_virtual(const string &name, Type *return_type, void *func)
 				// 8b.44.24.**    8b.00     ff.60.10
 				// virtual function
 				int index = (int)pp[8] / 4;
-				_class_add_func_virtual(tname, name, return_type, index);
+				_class_add_func_virtual(tname, name, return_type, index, overwrite);
 			}else if (pp[0] == 0xe9){
 				// jmp
 				//msg_write(Asm::Disassemble(func, 16));
@@ -316,7 +328,7 @@ void class_add_func_virtual(const string &name, Type *return_type, void *func)
 					// 8b.44.24.**    8b.00     ff.60.10
 					// virtual function
 					int index = (int)pp[8] / 4;
-					_class_add_func_virtual(tname, name, return_type, index);
+					_class_add_func_virtual(tname, name, return_type, index, overwrite);
 				}else
 					throw(1);
 			}else
@@ -332,9 +344,9 @@ void class_add_func_virtual(const string &name, Type *return_type, void *func)
 		if ((p & 1) > 0){
 			// virtual function
 			int index = p / sizeof(void*);
-			_class_add_func_virtual(tname, name, return_type, index);
+			_class_add_func_virtual(tname, name, return_type, index, overwrite);
 		}else if (!func){
-			_class_add_func_virtual(tname, name, return_type, 0);
+			_class_add_func_virtual(tname, name, return_type, 0, overwrite);
 		}else{
 			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		}
@@ -501,10 +513,8 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 	msg_db_f("make_super_array", 4);
 
 	Type *parent = t->parent;
-	int size = t->size;
-	t->DeriveFrom(TypeDynamicArray);
+	t->DeriveFrom(TypeDynamicArray, false);
 	t->parent = parent;
-	t->size = size;
 	add_class(t);
 
 	ClassFunction *sub = t->GetFunc("subarray", TypeDynamicArray, 2);
@@ -766,12 +776,12 @@ void SIAddPackageBase()
 		class_add_func("swap", TypeVoid, mf(&DynamicArray::swap));
 			func_add_param("i1", TypeInt);
 			func_add_param("i2", TypeInt);
-		class_add_func("iterate", TypeBool, mf(&DynamicArray::iterate));
+		/*class_add_func("iterate", TypeBool, mf(&DynamicArray::iterate));
 			func_add_param("pointer", TypePointerPs);
 		class_add_func("iterate_back", TypeBool, mf(&DynamicArray::iterate_back));
 			func_add_param("pointer", TypePointerPs);
 		class_add_func("index", TypeInt, mf(&DynamicArray::index));
-			func_add_param("pointer", TypePointer);
+			func_add_param("pointer", TypePointer);*/
 		class_add_func("subarray", TypeDynamicArray, mf(&DynamicArray::ref_subarray));
 			func_add_param("start", TypeInt);
 			func_add_param("num", TypeInt);
@@ -818,16 +828,6 @@ void SIAddPackageBase()
 	add_class(TypePointer);
 		class_add_func("str", TypeString, mf(&PointerClass::str));
 
-
-
-	add_class(TypePointerList);
-		class_add_func("__init__",	TypeVoid, mf(&Array<void*>::__init__));
-		class_add_func("add", TypeVoid, mf(&Array<void*>::add));
-			func_add_param("x", TypePointer);
-		class_add_func("insert", TypeVoid, mf(&Array<void*>::insert));
-			func_add_param("x", TypePointer);
-			func_add_param("index", TypeInt);
-	
 	add_class(TypeString);
 		class_add_func("__iadd__", TypeVoid, mf(&string::operator+=));
 			func_add_param("x",		TypeString);

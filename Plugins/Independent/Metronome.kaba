@@ -38,7 +38,7 @@ void OnClose()
 
 void main()
 	dlg = new Dialog("Metronome", 200, 80, MainWin, false)
-	dlg.AddControlTable("", 0, 0, 1, 2, "table")
+	dlg.AddGrid("", 0, 0, 1, 2, "table")
 	dlg.SetTarget("table", 0)
 	dlg.AddSpinButton("", 0, 0, 0, 0, "bpm")
 	dlg.AddButton("Close", 0, 1, 0, 0, "close")

@@ -1461,7 +1461,7 @@ void SyntaxTree::ParseClass()
 		so("vererbung der struktur");
 		Exp.next();
 		Type *parent = GetType(Exp.cur, true);
-		if (!_class->DeriveFrom(parent))
+		if (!_class->DeriveFrom(parent, true))
 			DoError(format("parental type in class definition after \":\" has to be a class, but (%s) is not", parent->name.c_str()));
 		_offset = parent->size;
 	}

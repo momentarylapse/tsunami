@@ -59,7 +59,7 @@ void SIAddPackageNix()
 		func_add_param("api",		TypeString);
 		func_add_param("w",			TypeHuiWindowP);
 		func_add_param("id",		TypeString);
-	add_func("NixSetVideoMove",				TypeVoid,					nix_p(&NixSetVideoMode));
+	add_func("NixSetVideoMode",				TypeVoid,					nix_p(&NixSetVideoMode));
 		func_add_param("api",		TypeString);
 		func_add_param("xres",		TypeInt);
 		func_add_param("yres",		TypeInt);
@@ -181,12 +181,6 @@ void SIAddPackageNix()
 		func_add_param("emission",		TypeColor);
 	add_func("NixSetColor",		TypeVoid,	nix_p(&NixSetColor));
 		func_add_param("c",			TypeColor);
-	add_func("NixSetVideoMode",		TypeVoid,	nix_p(&NixSetVideoMode));
-		func_add_param("api",		TypeInt);
-		func_add_param("width",		TypeInt);
-		func_add_param("height",	TypeInt);
-		func_add_param("depth",		TypeInt);
-		func_add_param("fullscreen",TypeBool);
 	add_func("NixCreateDynamicTexture",	TypeInt,	nix_p(&NixCreateDynamicTexture));
 		func_add_param("width",		TypeInt);
 		func_add_param("height",	TypeInt);

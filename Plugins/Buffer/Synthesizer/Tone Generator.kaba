@@ -14,7 +14,7 @@ PluginData data
 
 DummySynthesizer synth
 
-Window *dlg
+ConfigDialog *dlg
 
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio
@@ -34,45 +34,86 @@ void ProcessTrack(BufferBox buf)
 		buf.r[i] = clamp(buf.r[i] + d, -1, 1)
 		buf.l[i] = clamp(buf.l[i] + d, -1, 1)*/
 
-void OnFrequency()
-	data.Pitch = -1
-	data.Frequency = dlg.GetFloat("")
-
-void ReadPitchFromDialog()
-	data.Pitch = pitch_from_octave_and_rel(dlg.GetInt("pitch_rel"),
-	                                       dlg.GetInt("octave"))
-
-void OnPitch()
-	ReadPitchFromDialog()
-	data.Frequency = pitch_to_freq(data.Pitch)
-	dlg.SetFloat("frequency", data.Frequency)
-
-void OnVolume()
-	data.Volume = SliderGet(dlg, "volume")
-
-void DataToDialog()
-	bool by_pitch = data.Pitch >= 0
-	if by_pitch
-		dlg.SetInt("pitch_rel", data.Pitch % 12)
-		dlg.SetInt("octave", pitch_get_octave(data.Pitch))
-		dlg.Check("type:pitch", true)
-	else
-		dlg.Check("type:freq", true)
-	dlg.SetFloat("frequency", data.Frequency)
-	SliderSet(dlg, "volume", data.Volume)
+class ConfigDialog : Dialog
+	void __init__()
+		super.__init__("Ton Generator", 420, 135, MainWin, false)
+		AddGrid("", 0, 0, 1, 2, "table1")
+		SetTarget("table1", 0)
+		AddGrid("", 0, 0, 3, 3, "table2")
+		SetTarget("table2", 0)
+		AddRadioButton("Ton", 0, 0, 0, 0, "type:pitch")
+		AddRadioButton("Frequenz", 0, 1, 0, 0, "type:freq")
+		AddSpinButton("\\0\\100000\\0.1", 1, 1, 0, 0, "frequency")
+		AddText("Hz", 2, 1, 0, 0, "")
+		AddText("Lautstärke:", 0, 2, 0, 0, "")
+		AddText("%", 2, 2, 0, 0, "")
+		AddGrid("", 1, 0, 2, 1, "table3")
+		AddGrid("", 1, 2, 2, 1, "table4")
+		SetTarget("table3", 0)
+		AddComboBox("", 0, 0, 0, 0, "pitch_rel")
+		AddSpinButton("\\0\\8", 1, 0, 0, 0, "octave")
+		SetTarget("table4", 0)
+		AddSlider("", 0, 0, 0, 0, "volume_slider")
+		AddSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "volume")
+		
+		PutCommandBar(self, "table1", 0, 1)
 	
-	dlg.Enable("frequency", !by_pitch)
-	dlg.Enable("octave", by_pitch)
-	dlg.Enable("pitch_rel", by_pitch)
+		Reset("pitch_rel")
+		for int i, 0, 12
+			SetString("pitch_rel", rel_pitch_name(i))
+	
+		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
+		EventM("pitch_rel", self, &OnPitch)
+		EventM("octave", self, &OnPitch)
+		EventM("frequency", self, &OnFrequency)
+		EventM("type:freq", self, &OnTypeFreq)
+		EventM("type:pitch", self, &OnTypePitch)
 
-void OnTypeFreq()
-	data.Pitch = -1
-	DataToDialog()
+		fill()
 
-void OnTypePitch()
-	ReadPitchFromDialog()
-	data.Frequency = pitch_to_freq(data.Pitch)
-	DataToDialog()
+	void OnFrequency()
+		data.Pitch = -1
+		data.Frequency = GetFloat("")
+
+	void ReadPitchFromDialog()
+		data.Pitch = pitch_from_octave_and_rel(GetInt("pitch_rel"),
+		                                       GetInt("octave"))
+
+	void OnPitch()
+		ReadPitchFromDialog()
+		data.Frequency = pitch_to_freq(data.Pitch)
+		SetFloat("frequency", data.Frequency)
+
+	void OnVolume()
+		data.Volume = SliderGet(self, "volume")
+
+	void fill()
+		bool by_pitch = data.Pitch >= 0
+		if by_pitch
+			SetInt("pitch_rel", data.Pitch % 12)
+			SetInt("octave", pitch_get_octave(data.Pitch))
+			Check("type:pitch", true)
+		else
+			Check("type:freq", true)
+		SetFloat("frequency", data.Frequency)
+		SliderSet(self, "volume", data.Volume)
+
+		Enable("frequency", !by_pitch)
+		Enable("octave", by_pitch)
+		Enable("pitch_rel", by_pitch)
+
+	void OnTypeFreq()
+		data.Pitch = -1
+		fill()
+
+	void OnTypePitch()
+		ReadPitchFromDialog()
+		data.Frequency = pitch_to_freq(data.Pitch)
+		fill()
+	
+	
+void DataToDialog()
+	dlg.fill()
 
 void ResetData()
 	data.Pitch = 81
@@ -80,33 +121,6 @@ void ResetData()
 	data.Frequency = pitch_to_freq(data.Pitch)
 
 void Configure()
-	// dialog
-	dlg = new FixedDialog("Ton Generator",420,135,MainWin,false)
-	dlg.AddRadioButton("Ton",5,5,100,25,"type:pitch")
-	dlg.AddComboBox("", 110, 5, 120, 25, "pitch_rel")
-	dlg.AddSpinButton("\\0\\8",235,5,150,25,"octave")
-	dlg.AddRadioButton("Frequenz",5,35,100,25,"type:freq")
-	dlg.AddSpinButton("\\0\\100000\\0.1",110,35,275,25,"frequency")
-	dlg.AddText("Hz",390,35,20,25,"")
-	dlg.AddText("Lautstärke:",5,65,100,25,"")
-	dlg.AddSlider("",110,65,150,25,"volume_slider")
-	dlg.AddSpinButton("\\0\\100\\0.1",265,65,120,25,"volume")
-	dlg.AddText("%",390,65,20,25,"")
-	PutCommandBarFixed(dlg, 5, 100, 420)
-	
-	dlg.Reset("pitch_rel")
-	for int i, 0, 12
-		dlg.SetString("pitch_rel", rel_pitch_name(i))
-	
-	CreateSlider(dlg, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
-	dlg.Event("pitch_rel", &OnPitch)
-	dlg.Event("octave", &OnPitch)
-	dlg.Event("frequency", &OnFrequency)
-	dlg.Event("type:freq", &OnTypeFreq)
-	dlg.Event("type:pitch", &OnTypePitch)
-
-	dlg.SetDecimals(1)
-	DataToDialog()
-	
+	dlg = new ConfigDialog
 	dlg.Run()
 

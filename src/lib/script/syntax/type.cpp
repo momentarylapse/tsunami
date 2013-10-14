@@ -237,7 +237,7 @@ void Type::AddFunction(SyntaxTree *s, int func_no, int virtual_index, bool overw
 		function.add(cf);
 }
 
-bool Type::DeriveFrom(Type* root)
+bool Type::DeriveFrom(Type* root, bool increase_size)
 {
 	parent = root;
 	bool found = false;
@@ -249,12 +249,13 @@ bool Type::DeriveFrom(Type* root)
 	if (parent->function.num > 0){
 		// inheritance of functions
 		foreach(ClassFunction &f, parent->function){
-			if ((f.name != "__init__") && (f.name != "__init_comp__") && (f.name != "__delete__") && (f.name != "__assign__"))
+			if ((f.name != "__init__") && (f.name != "__delete__") && (f.name != "__assign__"))
 				function.add(f);
 		}
 		found = true;
 	}
-	size += parent->size;
+	if (increase_size)
+		size += parent->size;
 	num_virtual += parent->num_virtual;
 	return found;
 }

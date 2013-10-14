@@ -664,25 +664,26 @@ void PluginManager::ExecutePlugin(const string &filename)
 	msg_db_f("ExecutePlugin", 1);
 
 	if (LoadAndCompilePlugin(filename)){
-		Script::Script *s = cur_plugin->s;
+		Plugin *p = cur_plugin;
+		Script::Script *s = p->s;
 
 		AudioFile *a = tsunami->audio;
 
 		// run
-		cur_plugin->ResetData();
-		if (cur_plugin->Configure(true)){
+		p->ResetData();
+		if (p->Configure(true)){
 			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
-			if (cur_plugin->type == Plugin::TYPE_EFFECT){
+			if (p->type == Plugin::TYPE_EFFECT){
 				if (a->used){
-					cur_plugin->ResetState();
+					p->ResetState();
 					Range range = a->selection;
 					if (range.empty())
 						range = a->GetRange();
 					a->action_manager->BeginActionGroup();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
-							cur_plugin->ProcessTrack(t, tsunami->view->cur_level, range);
+							p->ProcessTrack(t, tsunami->view->cur_level, range);
 						}
 					a->action_manager->EndActionGroup();
 				}else{

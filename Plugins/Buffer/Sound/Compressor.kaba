@@ -50,10 +50,10 @@ void DataToDialog()
 class ConfigDialog : Dialog
 	void __init__()
 		super.__init__("Compressor", 500, 600, MainWin, false)
-		AddControlTable("", 0, 0, 1, 4, "table1")
+		AddGrid("", 0, 0, 1, 4, "table1")
 		SetTarget("table1", 0)
 		AddDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing_area")
-		AddControlTable("!noexpandy", 0, 2, 3, 1, "table2")
+		AddGrid("!noexpandy", 0, 2, 3, 1, "table2")
 		SetTarget("table2", 0)
 		AddText("Delay", 0, 0, 0, 0, "")
 		AddSpinButton("\\0\\10000\\0.1", 1, 0, 0, 0, "edit")
@@ -73,7 +73,7 @@ class ConfigDialog : Dialog
 		Redraw("drawing_area")
 		SetFloat("edit", data.Delay * 1000)
 
-	overwrite void OnRedraw()
+	overwrite void OnDraw()
 		Painter *c = BeginDraw("drawing_area")
 		float w = c.width
 		float h = c.height

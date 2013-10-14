@@ -135,7 +135,7 @@ void SIAddPackageHui()
 		class_add_func("Activate",										TypeVoid,		mf(&HuiWindow::Activate));
 			func_add_param("id",		TypeInt);
 		class_add_func("IsActive",										TypeVoid,		mf(&HuiWindow::IsActive));
-			func_add_param("recursive",	TypeBool);
+			func_add_param("id",	TypeString);
 		class_add_func("AddButton",										TypeVoid,		mf(&HuiWindow::AddButton));
 			func_add_param("title",		TypeString);
 			func_add_param("x",			TypeInt);
@@ -251,7 +251,7 @@ void SIAddPackageHui()
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
 			func_add_param("id",		TypeString);
-		class_add_func("AddControlTable",										TypeVoid,		mf(&HuiWindow::AddControlTable));
+		class_add_func("AddGrid",										TypeVoid,		mf(&HuiWindow::AddControlTable));
 			func_add_param("title",		TypeString);
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
@@ -361,7 +361,7 @@ void SIAddPackageHui()
 		class_set_vtable(HuiWindow);
 
 	add_class(TypeHuiNixWindow);
-		TypeHuiNixWindow->DeriveFrom(TypeHuiWindow);
+		TypeHuiNixWindow->DeriveFrom(TypeHuiWindow, false);
 		TypeHuiNixWindow->vtable = TypeHuiWindow->vtable;
 		class_add_func("__init__",		TypeVoid,		mf(&HuiNixWindow::__init_ext__));
 			func_add_param("title",		TypeString);
@@ -373,7 +373,7 @@ void SIAddPackageHui()
 		class_set_vtable(HuiWindow);
 
 	add_class(TypeHuiDialog);
-		TypeHuiDialog->DeriveFrom(TypeHuiWindow);
+		TypeHuiDialog->DeriveFrom(TypeHuiWindow, false);
 		TypeHuiDialog->vtable = TypeHuiWindow->vtable;
 		class_add_func("__init__",		TypeVoid,		mf(&HuiDialog::__init_ext__));
 			func_add_param("title",		TypeString);
@@ -385,7 +385,7 @@ void SIAddPackageHui()
 		class_set_vtable(HuiWindow);
 
 	add_class(TypeHuiFixedDialog);
-		TypeHuiFixedDialog->DeriveFrom(TypeHuiWindow);
+		TypeHuiFixedDialog->DeriveFrom(TypeHuiWindow, false);
 		TypeHuiFixedDialog->vtable = TypeHuiWindow->vtable;
 		class_add_func("__init__",		TypeVoid,		mf(&HuiFixedDialog::__init_ext__));
 			func_add_param("title",		TypeString);

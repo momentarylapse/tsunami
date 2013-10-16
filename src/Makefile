@@ -18,6 +18,7 @@ install : all
 	cp -rf ../Plugins/All              /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Independent      /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Synthesizer      /usr/share/tsunami/Plugins
+	cp -rf ../Lessons/                 /usr/share/tsunami/
 	xdg-desktop-menu install ../Data/michisoft-tsunami.desktop
 	xdg-mime install ../Data/michisoft-nami.xml
 	xdg-icon-resource install --context mimetypes --size  32 ../Data/Icons/32.png  application-michisoft-nami --noupdate

@@ -650,6 +650,7 @@ void SIAddPackageHui()
 
 	add_ext_var("AppFilename",		TypeString,		hui_p(&HuiAppFilename));
 	add_ext_var("AppDirectory",		TypeString,		hui_p(&HuiAppDirectory));
+	add_ext_var("AppDirectoryStatic",TypeString,		hui_p(&HuiAppDirectoryStatic));
 	add_ext_var("HuiFilename",		TypeString,		hui_p(&HuiFilename));
 	add_ext_var("HuiRunning",		TypeBool,		hui_p(&HuiRunning));
 }

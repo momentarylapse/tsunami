@@ -993,7 +993,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 {
 	msg_db_f("ParseSpecialCommandForall", 4);
 	// for index
-	int var_no_index = f->AddVar("-for_index-", TypeInt);
+	int var_no_index = f->AddVar(format("-for_index_%d-", ForIndexCount ++), TypeInt);
 	exlink_make_var_local(this, TypeInt, var_no_index);
 		Command *for_index = cp_command(&GetExistenceLink);
 
@@ -1073,7 +1073,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 
 	// force for_var out of scope...
 	f->var[for_var->link_no].name = "-out-of-scope-";
-	f->var[for_index->link_no].name = "-out-of-scope-";
+	//f->var[for_index->link_no].name = "-out-of-scope-";
 }
 
 void SyntaxTree::ParseSpecialCommandWhile(Block *block, Function *f)

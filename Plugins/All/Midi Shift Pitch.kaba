@@ -1,0 +1,27 @@
+use "../api.kaba"
+
+ConfigDialog *dlg
+
+class ConfigDialog : Dialog
+	void __init__()
+		super.__init__("Shift", 210, 65, MainWin, false)
+		AddGrid("", 0, 0, 1, 2, "table1")
+		SetTarget("table1", 0)
+		AddSpinButton("", 0, 0, 0, 0, "shift")
+		AddDefButton("OK", 0, 1, 0, 0, "ok")
+	
+		EventM("ok", self, &OnOk)
+
+	void OnOk()
+		int shift = GetInt("shift")
+		forall t in audio.track
+			ShiftTrack(t, shift)
+		delete self
+		
+void ShiftTrack(Track *t, int shift)
+	forall n in t.midi.note
+		n.pitch += shift
+
+void main()
+	dlg = new ConfigDialog
+	dlg.Run()

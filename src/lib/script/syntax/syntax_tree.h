@@ -294,6 +294,7 @@ public:
 
 	Script *script;
 	Function *cur_func;
+	int ForIndexCount;
 };
 
 string Kind2Str(int kind);

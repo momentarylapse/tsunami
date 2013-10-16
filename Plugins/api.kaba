@@ -220,6 +220,7 @@ extern AudioInput *input
 extern AudioRenderer *renderer
 extern Log *logging
 extern PluginContext plugin_context
+extern Storage *storage
 
 
 extern void fft_c2c(complex in[], complex out[], bool inverse)

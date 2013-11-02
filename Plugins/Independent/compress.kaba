@@ -4,14 +4,14 @@ const int SAMPLES = 1024
 const int NUM_FREQS = 512
 const float QUANT_FACTOR = 80.0
 
-window win
+Window *win
 
 float r[], r2[], d[]
 float dmax
 complex c[]
 
 void OnDraw()
-	context c = win.BeginDraw("area")
+	Painter *c = win.BeginDraw("area")
 	c.SetColor(White)
 	c.DrawRect(0, 0, c.width, c.height)
 	c.SetColor(Black)
@@ -26,7 +26,7 @@ void OnDraw()
 	c.DrawStr(10, 10, f2s(dmax, 6))
 	c.End()
 
-file fout
+File *fout
 
 complex quant(complex z)
 	int a = f2i(z.x * QUANT_FACTOR)

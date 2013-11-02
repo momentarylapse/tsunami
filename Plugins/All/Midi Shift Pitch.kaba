@@ -10,16 +10,16 @@ class ConfigDialog : Dialog
 		AddSpinButton("", 0, 0, 0, 0, "shift")
 		AddDefButton("OK", 0, 1, 0, 0, "ok")
 	
-		EventM("ok", self, &OnOk)
+		EventM("ok", &OnOk)
 
 	void OnOk()
 		int shift = GetInt("shift")
-		forall t in audio.track
+		for t in audio.track
 			ShiftTrack(t, shift)
 		delete self
 		
 void ShiftTrack(Track *t, int shift)
-	forall n in t.midi.note
+	for n in t.midi.note
 		n.pitch += shift
 
 void main()

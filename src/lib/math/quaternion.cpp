@@ -14,6 +14,11 @@ quaternion::quaternion(const float w, const vector &v)
 	this->z = v.z;
 }
 
+quaternion::quaternion(const vector &v)
+{
+	QuaternionRotationV(*this, v);
+}
+
 bool quaternion::operator == (const quaternion& q) const
 {
 	return ((x==q.x)&&(y==q.y)&&(z==q.z)&&(w==q.w));
@@ -79,6 +84,15 @@ quaternion quaternion::operator * (const quaternion &q) const
 	r.x = w*q.x + x*q.w + y*q.z - z*q.y;
 	r.y = w*q.y + y*q.w + z*q.x - x*q.z;
 	r.z = w*q.z + z*q.w + x*q.y - y*q.x;
+	return r;
+}
+
+vector quaternion::operator * (const vector &v) const
+{
+	vector r = v * (w*w - x*x - y*y - z*z);
+	vector *vv = (vector*)&x;
+	r += 2 * w * (*vv) ^ v;
+	r += 2 * ((*vv) * v) * (*vv);
 	return r;
 }
 

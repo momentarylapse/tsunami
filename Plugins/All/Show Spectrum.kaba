@@ -62,9 +62,9 @@ class SpectrumDialog : Dialog
 		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 		SetImage("close", "hui:close")
 	
-		EventM("type", self, &OnType)
-		EventM("hui:close", self, &OnClose)
-		EventM("close", self, &OnClose)
+		EventM("type", &OnType)
+		EventM("hui:close", &OnClose)
+		EventM("close", &OnClose)
 	
 		SetInt("type", TypeLogarithm)
 

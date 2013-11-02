@@ -20,11 +20,11 @@ class Socket
 public:
 	Socket();
 	~Socket();
-	Socket operator=(const Socket &other);
 
-	bool Create(int port);
-	bool Accept(Socket &con);
-	bool Connect(const string &addr, int port);
+	bool _Create(int port, bool block);
+	bool _Connect(const string &addr,int port);
+
+	Socket *Accept();
 	void Close();
 	void SetBlocking(bool blocking);
 	bool IsConnected();
@@ -70,7 +70,6 @@ public:
 	// kaba interface
 	void __init__();
 	void __delete__();
-	void __assign__(const Socket &other);
 private:
 	int uid;
 	int s;
@@ -81,32 +80,8 @@ private:
 
 void NetInit();
 
-
-// buffered data
-/*void _cdecl NetResetBuffer();
-bool _cdecl NetReadBuffer(int s);
-bool _cdecl NetWriteBuffer(int s);
-// read from buffer
-int _cdecl NetReadInt();
-bool _cdecl NetReadBool();
-float _cdecl NetReadFloat();
-vector _cdecl NetReadVector();
-string _cdecl NetReadStr();
-char _cdecl NetReadChar();
-int _cdecl NetReadBlockStart();
-void _cdecl NetReadBlockEnd();
-// write to buffer
-void _cdecl NetWriteInt(int i);
-void _cdecl NetWriteBool(bool b);
-void _cdecl NetWriteFloat(float f);
-void _cdecl NetWriteVector(const vector &v);
-void _cdecl NetWriteChar(char c);
-void _cdecl NetWriteStr(const string &str);
-void _cdecl NetWriteBlockStart(int id);
-void _cdecl NetWriteBlockEnd();
-
-int NetGetBufferPos();
-void NetSetBufferPos(int pos);*/
+Socket *NetListen(int port, bool block);
+Socket *NetConnect(const string &host, int port);
 
 // ...
 bool NetSendBugReport(const string &sender, const string &program, const string &version, const string &comment, string &return_msg);

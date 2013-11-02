@@ -15,8 +15,7 @@ void DataToDialog()
 	dlg.fill()
 
 void DoOctaver(float b[])
-	int i
-	for i, 0, b.num
+	for int i, 0, b.num
 		b[i] = (b[i] * b[i]) * data.Level + b[i] * (1 - data.Level)
 
 void ProcessTrack(BufferBox buf)

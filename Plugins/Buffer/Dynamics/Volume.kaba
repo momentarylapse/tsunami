@@ -31,7 +31,7 @@ class VolumeDialog : Dialog
 		PutCommandBar(self, "table1", 0, 2)
 		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &OnVolume, data.Volume)
 	
-		EventM("max", self, &OnMax)
+		EventM("max", &OnMax)
 		
 		fill()
 

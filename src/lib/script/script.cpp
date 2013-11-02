@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.13.1.0";
+string Version = "0.13.3.0";
 
 //#define ScriptDebug
 

@@ -120,8 +120,8 @@ public:
 	template<typename T>
 	void _cdecl EventMX(const string &id, const string &msg, HuiEventHandler* handler, T fun)
 	{	_EventMX(id, msg, handler, (void(HuiEventHandler::*)())fun);	}
-	void _cdecl _EventKM(const string &id, HuiEventHandler *handler, hui_kaba_callback *function);
-	void _cdecl _EventKMX(const string &id, const string &msg, HuiEventHandler *handler, hui_kaba_callback *function);
+	void _cdecl _EventKM(const string &id, hui_kaba_callback *function);
+	void _cdecl _EventKMX(const string &id, const string &msg, hui_kaba_callback *function);
 	void RemoveEventHandlers(HuiEventHandler *handler);
 	bool _SendEvent_(HuiEvent *e);
 

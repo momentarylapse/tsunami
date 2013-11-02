@@ -36,11 +36,11 @@ void SIAddPackageThread()
 	add_class(TypeThread);
 		class_add_func("__init__",		TypeVoid,	thread_p(mf(&Thread::__init__)));
 		class_add_func_virtual("__delete__",		TypeVoid,	thread_p(mf(&Thread::__delete__)));
-		class_add_func("Run",		TypeVoid,	thread_p(mf(&Thread::Run)));
-		class_add_func_virtual("OnRun",		TypeVoid,	thread_p(mf(&Thread::OnRun)));
-		class_add_func("IsDone",		TypeBool,	thread_p(mf(&Thread::IsDone)));
-		class_add_func("Kill",		TypeVoid,	thread_p(mf(&Thread::Kill)));
-		class_add_func("Join",		TypeVoid,	thread_p(mf(&Thread::Join)));
+		class_add_func("run",		TypeVoid,	thread_p(mf(&Thread::Run)));
+		class_add_func_virtual("onRun",		TypeVoid,	thread_p(mf(&Thread::OnRun)));
+		class_add_func("isDone",		TypeBool,	thread_p(mf(&Thread::IsDone)));
+		class_add_func("kill",		TypeVoid,	thread_p(mf(&Thread::Kill)));
+		class_add_func("join",		TypeVoid,	thread_p(mf(&Thread::Join)));
 #ifdef _X_USE_THREADS_
 		class_set_vtable(Thread);
 #endif
@@ -48,21 +48,21 @@ void SIAddPackageThread()
 	add_class(TypeMutex);
 		class_add_func("__init__",		TypeVoid,	thread_p(mf(&Mutex::__init__)));
 		class_add_func("__delete__",		TypeVoid,	thread_p(mf(&Mutex::__delete__)));
-		class_add_func("Lock",		TypeVoid,	thread_p(mf(&Mutex::Lock)));
-		class_add_func("Unlock",	TypeVoid,	thread_p(mf(&Mutex::Unlock)));
+		class_add_func("lock",		TypeVoid,	thread_p(mf(&Mutex::Lock)));
+		class_add_func("unlock",	TypeVoid,	thread_p(mf(&Mutex::Unlock)));
 
 	add_class(TypeThreadedWork);
 		class_add_func("__init__",		TypeVoid,	thread_p(mf(&ThreadedWork::__init__)));
 		class_add_func_virtual("__delete__",		TypeVoid,	thread_p(mf(&ThreadedWork::__delete__)));
-		class_add_func("Run",		TypeBool,	thread_p(mf(&ThreadedWork::Run)));
+		class_add_func("run",		TypeBool,	thread_p(mf(&ThreadedWork::Run)));
 			func_add_param("total_size", TypeInt);
 			func_add_param("partition_size", TypeInt);
-		class_add_func_virtual("DoStep",		TypeVoid,	thread_p(mf(&ThreadedWork::DoStep)));
+		class_add_func_virtual("onStep",		TypeVoid,	thread_p(mf(&ThreadedWork::DoStep)));
 			func_add_param("index", TypeInt);
 			func_add_param("worker_id", TypeInt);
-		class_add_func_virtual("OnStatus",		TypeBool,	thread_p(mf(&ThreadedWork::OnStatus)));
-		class_add_func("GetTotal",		TypeInt,	thread_p(mf(&ThreadedWork::GetTotal)));
-		class_add_func("GetDone",		TypeInt,	thread_p(mf(&ThreadedWork::GetDone)));
+		class_add_func_virtual("onStatus",		TypeBool,	thread_p(mf(&ThreadedWork::OnStatus)));
+		class_add_func("getTotal",		TypeInt,	thread_p(mf(&ThreadedWork::GetTotal)));
+		class_add_func("getDone",		TypeInt,	thread_p(mf(&ThreadedWork::GetDone)));
 #ifdef _X_USE_THREADS_
 		class_set_vtable(ThreadedWork);
 #endif

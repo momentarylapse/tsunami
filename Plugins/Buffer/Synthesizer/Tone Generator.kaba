@@ -63,11 +63,11 @@ class ConfigDialog : Dialog
 			SetString("pitch_rel", rel_pitch_name(i))
 	
 		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
-		EventM("pitch_rel", self, &OnPitch)
-		EventM("octave", self, &OnPitch)
-		EventM("frequency", self, &OnFrequency)
-		EventM("type:freq", self, &OnTypeFreq)
-		EventM("type:pitch", self, &OnTypePitch)
+		EventM("pitch_rel", &OnPitch)
+		EventM("octave", &OnPitch)
+		EventM("frequency",  &OnFrequency)
+		EventM("type:freq",  &OnTypeFreq)
+		EventM("type:pitch", &OnTypePitch)
 
 		fill()
 

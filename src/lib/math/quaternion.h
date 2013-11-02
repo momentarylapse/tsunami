@@ -10,7 +10,8 @@ class quaternion
 public:
 	float x, y, z, w;
 	quaternion(){};
-	quaternion(const float w,const vector &v);
+	quaternion(const float w, const vector &v);
+	quaternion(const vector &v);
 	bool _cdecl operator == (const quaternion& q) const;
 	bool _cdecl operator != (const quaternion& q) const;
 	quaternion& _cdecl operator += (const quaternion& q);
@@ -19,6 +20,7 @@ public:
 	quaternion _cdecl operator - (const quaternion &q) const;
 	quaternion _cdecl operator * (float f) const;
 	quaternion _cdecl operator * (const quaternion &q) const;
+	vector _cdecl operator * (const vector &v) const;
 	friend quaternion _cdecl operator * (float f,const quaternion &q)
 	{	return q*f;	}
 	string _cdecl str() const;

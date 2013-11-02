@@ -62,7 +62,7 @@ class ConfigDialog : Dialog
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 3)
 		
-		EventM("edit", self, &OnEdit)
+		EventM("edit", &OnEdit)
 	
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(0, 1, false, "")

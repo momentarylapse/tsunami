@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.13.1.0";
+string DataVersion = "0.13.4.0";
 
 CompilerConfiguration config;
 
@@ -1209,8 +1209,8 @@ void Init(int instruction_set, int abi, bool allow_std_lib)
 
 
 
-	SIAddPackageFile();
 	SIAddPackageMath();
+	SIAddPackageFile();
 	SIAddPackageImage();
 	SIAddPackageHui();
 	SIAddPackageNix();

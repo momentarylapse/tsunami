@@ -352,6 +352,8 @@ void amd64_vec_rand_in_ball(vector &v, Random &r, float rad)
 // amd64 quaternion return wrappers
 void amd64_quat_mul(quaternion &r, quaternion &a, quaternion&b)
 {	r = a * b;	}
+void amd64_quat_vec_mul(vector &r, quaternion &a, vector &b)
+{	r = a * b;	}
 
 // amd64 color return wrappers
 void amd64_col_hsb(color &r, float a, float h, float s, float b)
@@ -541,6 +543,8 @@ void SIAddPackageMath()
 		class_add_element("w",		TypeFloat,	12);
 		class_add_func("__mul__", TypeQuaternion, amd64_wrap(mf(&quaternion::mul), &amd64_quat_mul));
 			func_add_param("other",	TypeQuaternion);
+		class_add_func("__mul__", TypeVector, (void*)&amd64_quat_vec_mul);
+			func_add_param("other",	TypeVector);
 		class_add_func("__imul__", TypeVoid, mf(&quaternion::imul));
 			func_add_param("other",	TypeQuaternion);
 		class_add_func("inverse",	TypeVoid,	mf(&quaternion::inverse));
@@ -928,9 +932,11 @@ void SIAddPackageMath()
 		func_add_param("q_out",		TypeQuaternion);
 		func_add_param("axis",		TypeVector);
 		func_add_param("angle",		TypeFloat);
-	add_func("QuaternionScale",		TypeVoid,	(void*)&QuaternionScale);
-		func_add_param("q",		TypeQuaternion);
-		func_add_param("f",		TypeFloat);
+	add_func("QuaternionInterpolate",		TypeVoid,	(void*)(void(*)(quaternion&, const quaternion&, const quaternion&, float))&QuaternionInterpolate);
+		func_add_param("q_out",		TypeQuaternion);
+		func_add_param("q_0",		TypeQuaternion);
+		func_add_param("q_1",		TypeQuaternion);
+		func_add_param("t",		TypeFloat);
 	// plane
 	add_func("PlaneFromPoints",	TypeVoid,	(void*)&PlaneFromPoints);
 		func_add_param("pl",		TypePlane);

@@ -184,7 +184,7 @@ void HuiPainter::DrawImage(float x, float y, const Image &image)
 #ifdef _X_USE_IMAGE_
 	if (!cr)
 		return;
-	image.SetMode(Image::ModeBGRA);
+	image.setMode(Image::ModeBGRA);
 	cairo_pattern_t *p = cairo_get_source(cr);
 	cairo_pattern_reference(p);
 	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image.data.data,

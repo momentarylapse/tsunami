@@ -33,7 +33,7 @@ class SpectrumDialog : Dialog
 		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 		SetImage("close", "hui:close")
 	
-		EventM("close", self, &OnClose)
+		EventM("close", &OnClose)
 
 	overwrite void OnDraw()
 		Painter *c = BeginDraw("drawing_area")
@@ -45,7 +45,7 @@ class SpectrumDialog : Dialog
 		rect r = grid.GetPlotRegion(0, 0, w, h)
 	
 		Image im = im0
-		im.Scale(r.width(), r.height())
+		im.scale(r.width(), r.height())
 		c.DrawImage(r.x1, r.y1, im)
 	
 		c.End()
@@ -95,11 +95,11 @@ void show_spec()
 			_max = max(_max, bmaxr)
 			sg[t][i] = bmaxr
 	
-	im0.Create(NT, NF, Black)
+	im0.create(NT, NF, Black)
 	for int t, 0, NT
 		for int i, 0, NF
 			float ff = sg[t][i] / _max
-			im0.SetPixel(t, NF - i - 1, f2col(ff))
+			im0.setPixel(t, NF - i - 1, f2col(ff))
 	
 
 	dlg.Redraw("drawing_area")

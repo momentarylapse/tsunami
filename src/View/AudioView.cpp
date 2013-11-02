@@ -89,12 +89,12 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	peak_mode = HuiConfigReadInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
 	antialiasing = HuiConfigReadBool("View.Antialiasing", false);
 
-	image_unmuted.Load(HuiAppDirectoryStatic + "Data/volume.tga");
-	image_muted.Load(HuiAppDirectoryStatic + "Data/mute.tga");
-	image_solo.Load(HuiAppDirectoryStatic + "Data/solo.tga");
-	image_track_audio.Load(HuiAppDirectoryStatic + "Data/track-audio.tga");
-	image_track_time.Load(HuiAppDirectoryStatic + "Data/track-time.tga");
-	image_track_midi.Load(HuiAppDirectoryStatic + "Data/track-midi.tga");
+	image_unmuted.load(HuiAppDirectoryStatic + "Data/volume.tga");
+	image_muted.load(HuiAppDirectoryStatic + "Data/mute.tga");
+	image_solo.load(HuiAppDirectoryStatic + "Data/solo.tga");
+	image_track_audio.load(HuiAppDirectoryStatic + "Data/track-audio.tga");
+	image_track_time.load(HuiAppDirectoryStatic + "Data/track-time.tga");
+	image_track_midi.load(HuiAppDirectoryStatic + "Data/track-midi.tga");
 
 	mouse_possibly_selecting = -1;
 	cur_action = NULL;

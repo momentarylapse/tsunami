@@ -164,7 +164,7 @@ void image_save_bmp(const string &filename, const Image &image)
 	if (!f)
 		return;
 	f->SetBinaryMode(true);
-	image.SetMode(image.ModeRGBA);
+	image.setMode(image.ModeRGBA);
 
 	int row_size = 4 * (int)((image.width * 3 + 3) / 4);
 	int data_size = row_size * image.height;

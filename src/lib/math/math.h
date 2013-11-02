@@ -69,8 +69,11 @@ inline bool inf_f(float f)
 #endif
 }
 
-inline bool inf_v(vector v)
+inline bool inf_v(const vector &v)
 {   return (inf_f(v.x) || inf_f(v.y) || inf_f(v.z));  }
+
+inline bool inf_q(const quaternion &q)
+{   return (inf_f(q.x) || inf_f(q.y) || inf_f(q.z) || inf_f(q.z));  }
 
 inline bool inf_pl(plane p)
 {   return (inf_v(p.n) || inf_f(p.d));  }

@@ -5,6 +5,11 @@
 
 namespace Script{
 
+class vector;
+
+extern Type *TypeIntPs;
+extern Type *TypeFloatPs;
+extern Type *TypeBoolPs;
 extern Type *TypeStringList;
 extern Type *TypeBoolList;
 
@@ -29,6 +34,35 @@ public:
 		s += "]";
 		return s;
 	}
+};
+
+class KabaFile : public CFile
+{
+public:
+	void _cdecl __delete__()
+	{ this->~KabaFile(); }
+	int _cdecl _WriteBuffer(const string &s)
+	{ return WriteBuffer(s.data, s.num); }
+	string _cdecl _ReadBuffer(int size)
+	{
+		string s;
+		s.resize(size);
+		int r = ReadBuffer(s.data, size);
+		s.resize(r);
+		return s;
+	}
+	void _cdecl _ReadInt(int &i)
+	{ i = ReadInt(); }
+	void _cdecl _ReadFloat(float &f)
+	{ f = ReadFloat(); }
+	void _cdecl _ReadBool(bool &b)
+	{ b = ReadBool(); }
+	void _cdecl _ReadVector(vector &v)
+	{ ReadVector(&v); }
+	void _cdecl _ReadStr(string &s)
+	{ s = ReadStr(); }
+	void _cdecl _WriteVector(const vector &v)
+	{ WriteVector(&v); }
 };
 
 void SIAddPackageFile()
@@ -65,33 +99,42 @@ void SIAddPackageFile()
 		class_add_func("str",				TypeString,		mf(&Date::str));
 	
 	add_class(TypeFile);
-		class_add_func("GetDateCreation",		TypeDate,		mf(&CFile::GetDateCreation));
-		class_add_func("GetDateModification",		TypeDate,		mf(&CFile::GetDateModification));
-		class_add_func("GetDateAccess",		TypeDate,		mf(&CFile::GetDateAccess));
-		class_add_func("GetSize",		TypeInt,		mf(&CFile::GetSize));
-		class_add_func("GetPos",		TypeInt,		mf(&CFile::GetPos));
-		class_add_func("SetPos",		TypeVoid,		mf(&CFile::SetPos));
+		class_add_func("__delete__",		TypeVoid,		mf(&KabaFile::__delete__));
+		class_add_func("getCDate",		TypeDate,		mf(&CFile::GetDateCreation));
+		class_add_func("getMDate",		TypeDate,		mf(&CFile::GetDateModification));
+		class_add_func("getADate",		TypeDate,		mf(&CFile::GetDateAccess));
+		class_add_func("getSize",		TypeInt,		mf(&CFile::GetSize));
+		class_add_func("getPos",		TypeInt,		mf(&CFile::GetPos));
+		class_add_func("seek",		TypeVoid,		mf(&CFile::SetPos));
 			func_add_param("pos",		TypeInt);
 			func_add_param("absolute",	TypeBool);
-		class_add_func("SetBinaryMode",	TypeVoid,		mf(&CFile::SetBinaryMode));
+		class_add_func("setBinaryMode",	TypeVoid,		mf(&CFile::SetBinaryMode));
 			func_add_param("binary",	TypeBool);
-		class_add_func("WriteBool",		TypeVoid,			mf(&CFile::WriteBool));
-			func_add_param("b",			TypeBool);
-		class_add_func("WriteInt",		TypeVoid,			mf(&CFile::WriteInt));
-			func_add_param("i",			TypeInt);
-		class_add_func("WriteFloat",	TypeVoid,			mf(&CFile::WriteFloat));
-			func_add_param("x",			TypeFloat);
-		class_add_func("WriteStr",		TypeVoid,			mf(&CFile::WriteStr));
+		class_add_func("read",		TypeString,			mf(&KabaFile::_ReadBuffer));
+			func_add_param("size",			TypeInt);
+		class_add_func("write",		TypeInt,			mf(&KabaFile::_WriteBuffer));
 			func_add_param("s",			TypeString);
-		class_add_func("ReadBool",		TypeBool,			mf(&CFile::ReadBool));
-		class_add_func("ReadInt",		TypeInt,				mf(&CFile::ReadInt));
-		class_add_func("ReadFloat",		TypeFloat,			mf(&CFile::ReadFloat));
-		class_add_func("ReadStr",		TypeString,			mf(&CFile::ReadStr));
-		class_add_func("ReadBoolC",		TypeBool,			mf(&CFile::ReadBoolC));
-		class_add_func("ReadIntC",		TypeInt,			mf(&CFile::ReadIntC));
-		class_add_func("ReadFloatC",	TypeFloat,			mf(&CFile::ReadFloatC));
-		class_add_func("ReadStrC",		TypeString,			mf(&CFile::ReadStrC));
-		class_add_func("ReadComplete",	TypeString,			mf(&CFile::ReadComplete));
+		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteBool));
+			func_add_param("b",			TypeBool);
+		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteInt));
+			func_add_param("i",			TypeInt);
+		class_add_func("__lshift__",	TypeVoid,			mf(&CFile::WriteFloat));
+			func_add_param("x",			TypeFloat);
+		class_add_func("__lshift__",	TypeVoid,			mf(&CFile::WriteVector));
+			func_add_param("v",			TypeVector);
+		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteStr));
+			func_add_param("s",			TypeString);
+		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadBool));
+			func_add_param("b",			TypeBoolPs);
+		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadInt));
+			func_add_param("i",			TypeIntPs);
+		class_add_func("__rshift__",	TypeVoid,			mf(&KabaFile::_ReadFloat));
+			func_add_param("x",			TypeFloatPs);
+		class_add_func("__rshift__",	TypeVoid,			mf(&KabaFile::_ReadVector));
+			func_add_param("v",			TypeVector);
+		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadStr));
+			func_add_param("s",			TypeString);
+		class_add_func("readComplete",	TypeString,			mf(&CFile::ReadComplete));
 
 	
 	add_class(TypeDirEntry);
@@ -117,8 +160,6 @@ void SIAddPackageFile()
 		func_add_param("filename",		TypeString);
 	add_func("FileRead",			TypeString,				(void*)&FileRead);
 		func_add_param("filename",		TypeString);
-	add_func("FileClose",			TypeVoid,				(void*)&FileClose);
-		func_add_param("f",		TypeFileP);
 	add_func("FileExists",			TypeBool,		(void*)&file_test_existence);
 		func_add_param("filename",		TypeString);
 	add_func("FileRename",			TypeBool,			(void*)&file_rename);

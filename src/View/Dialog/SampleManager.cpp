@@ -39,7 +39,7 @@ SampleManager::~SampleManager()
 string render_bufbox(BufferBox &b, int w, int h)
 {
 	Image im;
-	im.Create(w, h, color(0, 0, 0, 0));
+	im.create(w, h, color(0, 0, 0, 0));
 	for (int x=0; x<w; x++){
 		float m = 0;
 		int i0 = (b.num * x) / w;
@@ -47,7 +47,7 @@ string render_bufbox(BufferBox &b, int w, int h)
 		for (int i=i0; i<i1; i++)
 			m = max(m, fabs(b.r[i]));
 		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
-			im.SetPixel(x, y, Black);
+			im.setPixel(x, y, Black);
 	}
 	return HuiSetImage(im);
 }

@@ -760,41 +760,43 @@ Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 			if (p1->element.num > 0)
 				equal_classes = true;
 
+	Type *pp1 = p1;
+	if (pp1->is_pointer)
+		pp1 = p1->parent;
 
 	// exact match as class function?
-	foreach(ClassFunction &f, p1->function)
+	foreach(ClassFunction &f, pp1->function)
 		if (f.name == op_func_name){
-			if (type_match(p2, equal_classes, f.param_type[0])){
-				Command *inst = param1;
-				ref_command_old(this, inst);
-				op = add_command_classfunc(p1, &f, inst);
+			// exact match as class function but missing a "&"?
+			if (f.param_type[0]->is_pointer && f.param_type[0]->is_silent){
+				if (direct_type_match(p2, f.param_type[0]->parent)){
+					Command *inst = ref_command(param1);
+					if (p1 == pp1)
+						op = add_command_classfunc(p1, &f, inst);
+					else
+						op = add_command_classfunc(pp1, &f, deref_command(inst));
+					op->num_params = 1;
+					op->param[0] = ref_command(param2);
+					return op;
+				}
+			}else if (type_match(p2, equal_classes, f.param_type[0])){
+				Command *inst = ref_command(param1);
+				if (p1 == pp1)
+					op = add_command_classfunc(p1, &f, inst);
+				else
+					op = add_command_classfunc(pp1, &f, deref_command(inst));
 				op->num_params = 1;
 				op->param[0] = param2;
 				return op;
 			}
 		}
 
-	// exact match?
+	// exact (operator) match?
 	for (int i=0;i<PreOperators.num;i++)
 		if (op_no == PreOperators[i].primitive_id)
 			if (type_match(p1, equal_classes, PreOperators[i].param_type_1) && type_match(p2, equal_classes, PreOperators[i].param_type_2)){
 				return add_command_operator(param1, param2, i);
 			}
-
-	// exact match as class function but missing a "&"?
-	foreach(ClassFunction &f, p1->function)
-		if (f.name == op_func_name){
-			if (f.param_type[0]->is_pointer && f.param_type[0]->is_silent)
-				if (direct_type_match(p2, f.param_type[0]->parent)){
-					Command *inst = param1;
-					ref_command_old(this, inst);
-					op = add_command_classfunc(p1, &f, inst);
-					op->num_params = 1;
-					op->param[0] = param2;
-					ref_command_old(this, op->param[0]);
-					return op;
-				}
-		}
 
 
 	// needs type casting?
@@ -1004,11 +1006,11 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 
 	// super array
 	if (Exp.cur != "in")
-		DoError("\"in\" expected after variable in forall");
+		DoError("\"in\" expected after variable in \"for . in .\"");
 	Exp.next();
 	Command *for_array = GetOperand(f);
 	if (!for_array->type->is_super_array)
-		DoError("list expected as second parameter in \"forall\"");
+		DoError("list expected as second parameter in \"for . in .\"");
 	//Exp.next();
 
 	// variable...
@@ -1057,7 +1059,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 	// &array.data[for_index]
 	Command *array_el = AddCommand(KindPointerAsArray, 0, var_type);
 	array_el->num_params = 2;
-	array_el->param[0] = shift_command(for_array, false, 0, var_type->GetPointer());
+	array_el->param[0] = shift_command(cp_command(for_array), false, 0, var_type->GetPointer());
 	array_el->param[1] = for_index;
 	Command *array_el_ref = AddCommand(KindUnknown, 0, TypeVoid); // TODO
 	command_make_ref(this, array_el_ref, array_el);
@@ -1176,10 +1178,10 @@ void SyntaxTree::ParseSpecialCommandIf(Block *block, Function *f)
 void SyntaxTree::ParseSpecialCommand(Block *block, Function *f)
 {
 	// special commands...
-	if (Exp.cur == "for"){
-		ParseSpecialCommandFor(block, f);
-	}else if (Exp.cur == "forall"){
+	if ((Exp.cur == "for") && (Exp.cur_line->exp.num >= 3) && (Exp.cur_line->exp[2].name == "in")){
 		ParseSpecialCommandForall(block, f);
+	}else if (Exp.cur == "for"){
+		ParseSpecialCommandFor(block, f);
 	}else if (Exp.cur == "while"){
 		ParseSpecialCommandWhile(block, f);
  	}else if (Exp.cur == "break"){
@@ -1265,7 +1267,7 @@ void SyntaxTree::ParseCompleteCommand(Block *block, Function *f)
 
 
 	// commands (the actual code!)
-		if ((Exp.cur == "for") || (Exp.cur == "forall") || (Exp.cur == "while") || (Exp.cur == "break") || (Exp.cur == "continue") || (Exp.cur == "return") || (Exp.cur == "if")){
+		if ((Exp.cur == "for") || (Exp.cur == "while") || (Exp.cur == "break") || (Exp.cur == "continue") || (Exp.cur == "return") || (Exp.cur == "if")){
 			ParseSpecialCommand(block, f);
 
 		}else{

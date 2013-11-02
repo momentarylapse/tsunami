@@ -10,9 +10,24 @@
 
 string ImageVersion = "0.2.4.1";
 
+Image::Image()
+{
+	width = height = 0;
+}
+
+Image::Image(int _width, int _height, const color &c)
+{
+	create(_width, _height, c);
+}
+
 void Image::__init__()
 {
 	new(this) Image;
+}
+
+void Image::__init_ext__(int _width, int _height, const color &c)
+{
+	new(this) Image(_width, _height, c);
 }
 
 void Image::__delete__()
@@ -22,7 +37,7 @@ void Image::__delete__()
 
 // mode: rgba
 //    = r + g<<8 + b<<16 + a<<24
-void Image::LoadFlipped(const string &filename)
+void Image::loadFlipped(const string &filename)
 {
 	msg_db_f("Image.LoadFlipped", 1);
 
@@ -54,10 +69,10 @@ void Image::LoadFlipped(const string &filename)
 		msg_error("ImageLoad: unhandled file extension: " + ext);
 }
 
-void Image::Load(const string &filename)
+void Image::load(const string &filename)
 {
-	LoadFlipped(filename);
-	FlipV();
+	loadFlipped(filename);
+	flipV();
 }
 
 inline unsigned int image_color_rgba(const color &c)
@@ -86,7 +101,7 @@ inline color image_uncolor_bgra(unsigned int i)
 	              (float)(i & 255) / 255.0f);
 }
 
-void Image::Create(int _width, int _height, const color &c)
+void Image::create(int _width, int _height, const color &c)
 {
 	msg_db_f("Image.Create", 1);
 
@@ -104,7 +119,7 @@ void Image::Create(int _width, int _height, const color &c)
 		data[i] = ic;
 }
 
-void Image::Save(const string &filename) const
+void Image::save(const string &filename) const
 {
 	msg_db_f("Image.Save", 1);
 	
@@ -117,31 +132,28 @@ void Image::Save(const string &filename) const
 		msg_error("ImageSave: unhandled file extension: " + ext);
 }
 
-void Image::Delete()
+void Image::clear()
 {
 	msg_db_f("Image.Delete", 1);
 	data.clear();
 }
 
-void Image::Scale(int _width, int _height)
+Image* Image::scale(int _width, int _height) const
 {
 	msg_db_f("Image.Scale", 1);
-	Array<unsigned int> _data;
-	_data.resize(_width * _height);
+	Image *r = new Image(_width, _height, Black);
 
 	for (int x=0;x<_width;x++)
 		for (int y=0;y<_height;y++){
 			int x0 = (int)( (float)x * (float)width / (float)_width );
 			int y0 = (int)( (float)y * (float)height / (float)_height );
-			_data[y * _width + x] = data[y0 * width + x0];
+			r->data[y * _width + x] = data[y0 * width + x0];
 		}
 
-	data.exchange(_data);
-	width = _width;
-	height = _height;
+	return r;
 }
 
-void Image::FlipV()
+void Image::flipV()
 {
 	msg_db_f("Image.FlipV", 1);
 	
@@ -179,7 +191,7 @@ inline void col_conv_bgra_to_rgba(unsigned int &c)
 	c = (c & 0xff00ff00) + r + (b << 16);
 }
 
-void Image::SetMode(int _mode) const
+void Image::setMode(int _mode) const
 {
 	if (_mode == mode)
 		return;
@@ -201,7 +213,7 @@ void Image::SetMode(int _mode) const
 }
 
 
-void Image::SetPixel(int x, int y, const color &c)
+void Image::setPixel(int x, int y, const color &c)
 {
 	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
 		if (mode == ModeBGRA)
@@ -211,7 +223,7 @@ void Image::SetPixel(int x, int y, const color &c)
 	}
 }
 
-color Image::GetPixel(int x, int y) const
+color Image::getPixel(int x, int y) const
 {
 	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
 		if (mode == ModeBGRA)
@@ -226,7 +238,7 @@ color Image::GetPixel(int x, int y) const
 //  x repeats in [0..width)
 //  y repeats in [0..height)
 //  each pixel has its maximum at offset (0.5, 0.5)
-color Image::GetPixelInterpolated(float x, float y) const
+color Image::getPixelInterpolated(float x, float y) const
 {
 	x = loopf(x, 0, width);
 	y = loopf(y, 0, height);
@@ -234,12 +246,22 @@ color Image::GetPixelInterpolated(float x, float y) const
 	int x1 = (x0 < width - 1) ? (x0 + 1) : 0;
 	int y0 = (y >= 0.5f) ? (y - 0.5f) : (height - 1);
 	int y1 = (y0 < height- 1) ? (y0 + 1) : 0;
-	color c00 = GetPixel(x0, y0);
-	color c01 = GetPixel(x0, y1);
-	color c10 = GetPixel(x1, y0);
-	color c11 = GetPixel(x1, y1);
+	color c00 = getPixel(x0, y0);
+	color c01 = getPixel(x0, y1);
+	color c10 = getPixel(x1, y0);
+	color c11 = getPixel(x1, y1);
 	float sx = loopf(x + 0.5f, 0, 1);
 	float sy = loopf(y + 0.5f, 0, 1);
 	// bilinear interpolation
 	return (c00 * (1 - sy) + c01 * sy) * (1 - sx) + (c10 * (1 - sy) + c11 * sy) * sx;
+}
+
+Image *LoadImage(const string &filename)
+{
+	Image *im = new Image;
+	im->load(filename);
+	if (!im->error)
+		return im;
+	delete(im);
+	return NULL;
 }

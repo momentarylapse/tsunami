@@ -202,7 +202,7 @@ void image_save_tga(const string &filename, const Image &image)
 		msg_error("couldn't save tga file: " + filename);
 		return;
 	}
-	image.SetMode(Image::ModeRGBA);
+	image.setMode(Image::ModeRGBA);
 	int bits = image.alpha_used ? 32 : 24;
 	int alpha_bits = image.alpha_used ? 8 : 0;
 	memset(Header,0,18);

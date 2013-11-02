@@ -74,8 +74,8 @@ class SuperNovaWindow : Window
 		SetInt("speed", 1)
 		Enable("cancel", false)
 		
-		EventM("close", self, &OnClose)
-		EventM("cancel", self, &OnCancel)
+		EventM("close", &OnClose)
+		EventM("cancel", &OnCancel)
 		SetFullscreen(true)
 	
 	void OnClose()
@@ -104,7 +104,7 @@ class SuperNovaWindow : Window
 			c.DrawLine(0, ly, w, ly)
 		c.SetColor(Black)
 		c.SetFontSize(18)
-		forall n in MidiTrack.midi.note
+		for n in MidiTrack.midi.note
 			int s, f
 			for int i, 0, 6
 				if n.pitch >= StringPitch[i] + HandPosition
@@ -131,7 +131,7 @@ class SuperNovaWindow : Window
 		c.SetColor(Gray)
 		c.DrawStr(20, 20, Frequency.str2(1) + "Hz")
 		c.DrawStr(20, 40, Volume.str())
-		forall p in played
+		for p in played
 			if p.correct
 				c.SetColor(Blue)
 			else
@@ -242,7 +242,7 @@ void UpdateInput()
 		//Frequency = fmax
 		Error = error
 	
-		forall n in MidiTrack.midi.note
+		for n in MidiTrack.midi.note
 			if n.range.offset <= Offset and n.range.offset + n.range.length > Offset
 				if n.pitch == p.note
 					Score += p.length * ScoreFactor
@@ -265,15 +265,15 @@ void StartLesson(string name)
 	played.clear()
 
 	storage.Load(audio, AppDirectoryStatic + "Lessons/" + name + ".nami")
-	forall t in audio.track
+	for t in audio.track
 		if t.type == TRACK_TYPE_MIDI
 			MidiTrack = t
 			
 	float num_samples = 0
-	forall n in MidiTrack.midi.note
+	for n in MidiTrack.midi.note
 		num_samples += n.range.length
 	ScoreFactor = 100 / num_samples
-	forall t in audio.tag
+	for t in audio.tag
 		if t.key == "position"
 			HandPosition = t.value.int()
 		if t.key == "score"
@@ -331,7 +331,7 @@ void main()
 	
 	LessonName.clear()
 	DirEntry list[] = DirSearch(AppDirectoryStatic + "Lessons/", "*.nami", false)
-	forall e in list
+	for e in list
 		if e.name[0] != '0'
 			LessonName.add(e.name.substr(0, -6))
 		

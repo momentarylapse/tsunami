@@ -7,7 +7,7 @@ class Plugin
 	virtual void ProcessTrack(BufferBox buf)
 	virtual void Configure()
 class PluginData
-	window dlg
+	Window *dlg
 	virtual void Reset()
 	virtual void Configure()
 	virtual void UpdateDialog()

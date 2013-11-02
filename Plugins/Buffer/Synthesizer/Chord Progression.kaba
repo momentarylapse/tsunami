@@ -61,11 +61,11 @@ class ConfigDialog : Dialog
 	
 	
 		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
-		EventM("chords", self, &OnChords)
-		EventM("duration_type:beats", self, &OnDurationTypeBeats)
-		EventM("duration_type:time", self, &OnDurationTypeTime)
-		EventM("duration", self, &OnDuration)
-		EventM("beats", self, &OnBeats)
+		EventM("chords", &OnChords)
+		EventM("duration_type:beats", &OnDurationTypeBeats)
+		EventM("duration_type:time", &OnDurationTypeTime)
+		EventM("duration", &OnDuration)
+		EventM("beats", &OnBeats)
 
 		fill()
 	

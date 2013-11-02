@@ -120,7 +120,7 @@ class FMSynthesizer : Synthesizer
 				oup[j] *= h
 			
 			// transport
-			forall l in config.link
+			for l in config.link
 				if l.dest >= 0
 					ns.osc[l.dest].inp += oup[l.source]
 				else

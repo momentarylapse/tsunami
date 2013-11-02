@@ -88,7 +88,7 @@ void image_load_png(const string &filename, Image &image)
 		if (name == "IHDR"){
 			int w = read_int_big_endian(f);
 			int h = read_int_big_endian(f);
-			image.Create(w, h, Black);
+			image.create(w, h, Black);
 			int bits_per_channel = f->ReadByte();
 			int type = f->ReadByte();
 			// 0 = gray, 2 = rgb, 6 = rgba
@@ -142,7 +142,7 @@ void image_load_png(const string &filename, Image &image)
 			float a = 1;
 			if (bytes_per_pixel > 3)
 				a = l_cur[i ++] / 255.0f;
-			image.SetPixel(x, image.height - y - 1, color(a, r, g, b));
+			image.setPixel(x, image.height - y - 1, color(a, r, g, b));
 		}
 	}
 

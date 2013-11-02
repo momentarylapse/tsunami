@@ -96,17 +96,6 @@ void Socket::__delete__()
 	this->~Socket();
 }
 
-Socket Socket::operator=(const Socket &other)
-{
-	s = other.s;
-	return *this;
-}
-
-void Socket::__assign__(const Socket &other)
-{
-	*this = other;
-}
-
 
 void Socket::Close()
 {
@@ -146,7 +135,7 @@ int _NetCreateSocket_()
 }
 
 // host
-bool Socket::Create(int port)
+bool Socket::_Create(int port, bool block)
 {
 	so(1,"socket...");
 	s = socket(AF_INET, SOCK_STREAM, 0);
@@ -156,7 +145,7 @@ bool Socket::Create(int port)
 	}else
 		so(1,"  -ok");
 
-	SetBlocking(true);
+	SetBlocking(block);
 
 	struct sockaddr_in my_addr;
 	my_addr.sin_family = AF_INET;
@@ -181,9 +170,19 @@ bool Socket::Create(int port)
 	return true;
 }
 
-// host
-bool Socket::Accept(Socket &con)
+Socket *NetListen(int port, bool block)
 {
+	Socket *s = new Socket;
+	if (s->_Create(port, block))
+		return s;
+	delete(s);
+	return NULL;
+}
+
+// host
+Socket *Socket::Accept()
+{
+	Socket *con = new Socket;
 //	so(1,"accept...");
 	struct sockaddr_in remote_addr;
 	int size = sizeof(remote_addr);
@@ -192,12 +191,13 @@ bool Socket::Accept(Socket &con)
 #endif
 #ifdef OS_LINUX
 	socklen_t len = (socklen_t)size;
-	con.s = accept(s, (struct sockaddr *)&remote_addr, &len);
+	con->s = accept(s, (struct sockaddr *)&remote_addr, &len);
 #endif
 
-	if (con.s < 0){
+	if (con->s < 0){
 		//so("  -FEHLER");
-		return false;
+		delete(con);
+		return NULL;
 	}else{
 		so(1,"accept...");
 		so(1,"  -ok");
@@ -207,13 +207,13 @@ bool Socket::Accept(Socket &con)
 	#ifdef OS_WINDOWS
 		so(1, inet_ntoa(remote_addr.sin_addr));//.s_addr));
 	#endif
-	con.SetBlocking(true);
+	con->SetBlocking(true);
 
-	return true;
+	return con;
 }
 
 // client
-bool Socket::Connect(const string &addr,int port)
+bool Socket::_Connect(const string &addr,int port)
 {
 	struct sockaddr_in host_addr;
 	struct hostent *host;
@@ -301,6 +301,15 @@ bool Socket::Connect(const string &addr,int port)
 	SetBlocking(true);
 
 	return true;
+}
+
+Socket *NetConnect(const string &addr, int port)
+{
+	Socket *s = new Socket;
+	if (s->_Connect(addr, port))
+		return s;
+	delete(s);
+	return NULL;
 }
 
 bool Socket::IsConnected()
@@ -519,8 +528,8 @@ bool _cdecl NetSendBugReport(const string &sender, const string &program, const 
 {
 	NetInit();
 
-	Socket s;
-	if (s.Connect("michisoft.michi.is-a-geek.org", 80)){
+	Socket *s = NetConnect("michisoft.michi.is-a-geek.org", 80);
+	if (s){
 		string temp, report;
 
 		// actual data to send
@@ -542,15 +551,15 @@ bool _cdecl NetSendBugReport(const string &sender, const string &program, const 
 		temp += report;
 
 		// try and send
-		if (!s.Write(temp)){
+		if (!s->Write(temp)){
 			return_msg = "Server accepted a connection but could not send any data";
-			s.Close();
+			delete(s);
 			return false;
 		}
 
 		// get response
-		temp = s.Read();
-		s.Close();
+		temp = s->Read();
+		delete(s);
 		if (temp.num == 0){
 			return_msg = "Server does not respond";
 			return false;

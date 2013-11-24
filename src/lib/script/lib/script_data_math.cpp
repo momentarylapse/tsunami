@@ -723,9 +723,9 @@ void SIAddPackageMath()
 		class_add_func("str",		TypeString, algebra_p(mf(&Crypto::str)));
 		class_add_func("from_str",	TypeVoid, algebra_p(mf(&Crypto::from_str)));
 			func_add_param("str",		TypeString);
-		class_add_func("Encrypt",	TypeString, algebra_p(mf(&Crypto::Encrypt)));
+		class_add_func("encrypt",	TypeString, algebra_p(mf(&Crypto::Encrypt)));
 			func_add_param("str",		TypeString);
-		class_add_func("Decrypt",	TypeString, algebra_p(mf(&Crypto::Decrypt)));
+		class_add_func("decrypt",	TypeString, algebra_p(mf(&Crypto::Decrypt)));
 			func_add_param("str",		TypeString);
 			func_add_param("cut",		TypeBool);
 
@@ -736,7 +736,7 @@ void SIAddPackageMath()
 		class_add_func("geti",		TypeInt, mf(&Random::geti));
 			func_add_param("max",		TypeInt);
 		class_add_func("getu",		TypeFloat, mf(&Random::getu));
-		class_add_func("geti",		TypeFloat, mf(&Random::getf));
+		class_add_func("getf",		TypeFloat, mf(&Random::getf));
 			func_add_param("min",		TypeFloat);
 			func_add_param("max",		TypeFloat);
 		class_add_func("in_ball",		TypeVector, amd64_wrap(mf(&Random::in_ball), &amd64_vec_rand_in_ball));

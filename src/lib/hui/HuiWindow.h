@@ -88,6 +88,7 @@ public:
 	void _cdecl SetTitle(const string &title);
 	void _cdecl SetPosition(int x, int y);
 	void _cdecl SetPositionSpecial(HuiWindow *win, int mode);
+	void _cdecl GetPosition(int &x, int &y);
 	void _cdecl SetSize(int width, int height);
 	void _cdecl GetSize(int &width, int &height);
 	void _cdecl SetSizeDesired(int width, int height);

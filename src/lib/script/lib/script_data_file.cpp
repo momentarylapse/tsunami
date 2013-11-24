@@ -179,6 +179,7 @@ void SIAddPackageFile()
 	add_func("DirDelete",			TypeBool,			(void*)&dir_delete);
 		func_add_param("dir",		TypeString);
 	add_func("GetCurDir",			TypeString,			(void*)&get_current_dir);
+	add_func("GetCurDate",			TypeDate,			(void*)&get_current_date);
 }
 
 };

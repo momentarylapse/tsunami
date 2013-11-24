@@ -11,8 +11,17 @@
 #define _NET_INCLUDED_
 
 
+#include "../base/base.h"
+
 class vector;
-class string;
+
+class SocketException
+{
+};
+
+class SocketConnectionLostException : public SocketException
+{
+};
 
 
 class Socket
@@ -21,27 +30,21 @@ public:
 	Socket();
 	~Socket();
 
-	bool _Create(int port, bool block);
-	bool _Connect(const string &addr,int port);
+	bool _create(int port, bool block);
+	bool _connect(const string &addr,int port);
 
-	Socket *Accept();
-	void Close();
-	void SetBlocking(bool blocking);
-	bool IsConnected();
+	Socket *accept();
+	void close();
+	void setBlocking(bool blocking);
+	bool isConnected();
 
 	// send / receive directly
-	string Read();
-	bool Write(const string &buf);
-	bool CanWrite();
-	bool CanRead();
+	string read();
+	bool write(const string &buf);
+	bool canWrite();
+	bool canRead();
 
 	// buffered read
-	int ReadInt();
-	float ReadFloat();
-	bool ReadBool();
-	char ReadChar();
-	string ReadString();
-	vector ReadVector();
 	void operator>>(int &i);
 	void operator>>(float &f);
 	void operator>>(bool &b);
@@ -49,31 +52,26 @@ public:
 	void operator>>(string &s);
 	void operator>>(vector &v);
 	void _read_buffered_(void *p, int size);
-	void SetBufferPos(int pos);
-	int GetBufferPos();
+	void setBufferPos(int pos);
+	int getBufferPos();
+	void clearBuffer();
 
 	// buffered write
-	void WriteInt(int i);
-	void WriteFloat(float f);
-	void WriteBool(bool b);
-	void WriteChar(char c);
-	void WriteString(const string &s);
-	void WriteVector(const vector &v);
-	void operator<<(int i){	WriteInt(i);	}
-	void operator<<(float f){	WriteFloat(f);	}
-	void operator<<(bool b){	WriteBool(b);	}
-	void operator<<(char c){	WriteChar(c);	}
-	void operator<<(const string &s){		WriteString(s);	}
-	void operator<<(const vector &v){		WriteVector(v);	}
-	bool WriteBuffer();
+	void operator<<(int i);
+	void operator<<(float f);
+	void operator<<(bool b);
+	void operator<<(char c);
+	void operator<<(const string &s);
+	void operator<<(const vector &v);
+	bool writeBuffer();
 
 	// kaba interface
 	void __init__();
 	void __delete__();
-private:
+
 	int uid;
 	int s;
-	string *buffer;
+	string buffer;
 	int buffer_pos;
 	bool last_op_reading;
 };

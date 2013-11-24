@@ -70,7 +70,12 @@ Type *TypeTerrain;
 Type *TypeTerrainP;
 Type *TypeTerrainPList;
 Type *TypeLink;
-Type *TypeLinkP;
+Type *TypeLinkSpring;
+Type *TypeLinkBall;
+Type *TypeLinkSlider;
+Type *TypeLinkHinge;
+Type *TypeLinkHinge2;
+Type *TypeLinkUniversal;
 Type *TypeEngineData;
 Type *TypeWorldData;
 Type *TypeNetworkData;
@@ -144,8 +149,6 @@ extern Type *TypeShaderP;
 	static TraceData *_tracedata;
 	#define	GetDATraceData(x)		long(&_tracedata->x)-long(_tracedata)
 	#define class_set_vtable_x(x)	class_set_vtable(x)
-	static Link *_link;
-	#define	GetDALink(x)			long(&_link->x)-long(_link)
 #else
 	typedef int Picture;
 	typedef int Picture3d;
@@ -183,7 +186,6 @@ extern Type *TypeShaderP;
 	#define	GetDAController(x)	0
 	#define	GetDATerrain(x)		0
 	#define	GetDATraceData(x)	0
-	#define	GetDALink(x)			0
 	typedef int TraceData;
 	typedef int Bone;
 	typedef int Model;
@@ -256,7 +258,12 @@ void SIAddPackageX()
 	TypeTerrainP		= add_type_p("Terrain*",	TypeTerrain);
 	TypeTerrainPList	= add_type_a("Terrain*[]",	TypeTerrainP, -1);
 	TypeLink			= add_type  ("Link",		sizeof(Link));
-	TypeLinkP			= add_type_p("Link*",		TypeLink);
+	TypeLinkSpring		= add_type  ("LinkSpring",	sizeof(Link));
+	TypeLinkBall		= add_type  ("LinkBall",	sizeof(Link));
+	TypeLinkSlider		= add_type  ("LinkSlider",	sizeof(Link));
+	TypeLinkHinge		= add_type  ("LinkHinge",	sizeof(Link));
+	TypeLinkHinge2		= add_type  ("LinkHinge2",	sizeof(Link));
+	TypeLinkUniversal	= add_type  ("LinkUniversal",	sizeof(Link));
 	TypeWorldData		= add_type  ("WorldData",	0);
 	TypeEngineData		= add_type  ("EngineData",	0);
 	TypeNetworkData		= add_type  ("NetworkData",	0);
@@ -693,6 +700,57 @@ void SIAddPackageX()
 		class_add_func("getPosition", TypeFloat, x_p(mf(&Link::GetPosition)));
 		class_add_func("getPositionAxis", TypeFloat, x_p(mf(&Link::GetPositionAxis)));
 			func_add_param("axis", TypeInt);
+
+	add_class(TypeLinkSpring);
+		TypeLinkSpring->DeriveFrom(TypeLink, false);
+		class_add_func("__init__",							TypeVoid,	x_p(mf(&Link::__init_spring__)));
+			func_add_param("o1",		TypeModelP);
+			func_add_param("o2",		TypeModelP);
+			func_add_param("p1",		TypeVector);
+			func_add_param("p2",		TypeVector);
+			func_add_param("dx0",		TypeFloat);
+			func_add_param("k",			TypeFloat);
+
+	add_class(TypeLinkBall);
+		TypeLinkBall->DeriveFrom(TypeLink, false);
+		class_add_func("__init__",							TypeVoid,	x_p(mf(&Link::__init_ball__)));
+			func_add_param("o1",		TypeModelP);
+			func_add_param("o2",		TypeModelP);
+			func_add_param("p",			TypeVector);
+
+	add_class(TypeLinkHinge);
+		TypeLinkHinge->DeriveFrom(TypeLink, false);
+		class_add_func("__init__",							TypeVoid,	x_p(mf(&Link::__init_hinge__)));
+			func_add_param("o1",		TypeModelP);
+			func_add_param("o2",		TypeModelP);
+			func_add_param("p"	,		TypeVector);
+			func_add_param("ax",		TypeVector);
+
+	add_class(TypeLinkHinge2);
+		TypeLinkHinge2->DeriveFrom(TypeLink, false);
+		class_add_func("__init__",							TypeVoid,	x_p(mf(&Link::__init_hinge2__)));
+			func_add_param("o1",		TypeModelP);
+			func_add_param("o2",		TypeModelP);
+			func_add_param("p"	,		TypeVector);
+			func_add_param("ax1",		TypeVector);
+			func_add_param("ax2",		TypeVector);
+
+	add_class(TypeLinkSlider);
+		TypeLinkSlider->DeriveFrom(TypeLink, false);
+		class_add_func("__init__",							TypeVoid,	x_p(mf(&Link::__init_slider__)));
+			func_add_param("o1",		TypeModelP);
+			func_add_param("o2",		TypeModelP);
+			func_add_param("ax",		TypeVector);
+
+
+	add_class(TypeLinkUniversal);
+		TypeLinkUniversal->DeriveFrom(TypeLink, false);
+		class_add_func("__init__",							TypeVoid,	x_p(mf(&Link::__init_universal__)));
+			func_add_param("o1",		TypeModelP);
+			func_add_param("o2",		TypeModelP);
+			func_add_param("p",			TypeVector);
+			func_add_param("ax1",		TypeVector);
+			func_add_param("ax2",		TypeVector);
 	
 	add_class(TypeWorldData);
 		class_add_element("filename",		TypeString,		GetDAWorld(filename));
@@ -826,39 +884,6 @@ void SIAddPackageX()
 		func_add_param("d",			TypeTraceData);
 		func_add_param("simple_test",	TypeBool);
 		func_add_param("o_ignore",		TypeInt);
-	add_func("LinkAddSpring",							TypeLinkP,	x_p(&AddLinkSpring));
-		func_add_param("o1",		TypeModelP);
-		func_add_param("o2",		TypeModelP);
-		func_add_param("p1",		TypeVector);
-		func_add_param("p2",		TypeVector);
-		func_add_param("dx0",		TypeFloat);
-		func_add_param("k",			TypeFloat);
-	add_func("LinkAddBall",									TypeLinkP,	x_p(&AddLinkBall));
-		func_add_param("o1",		TypeModelP);
-		func_add_param("o2",		TypeModelP);
-		func_add_param("p",			TypeVector);
-	add_func("LinkAddHinge",							TypeLinkP,	x_p(&AddLinkHinge));
-		func_add_param("o1",		TypeModelP);
-		func_add_param("o2",		TypeModelP);
-		func_add_param("p"	,		TypeVector);
-		func_add_param("ax",		TypeVector);
-	add_func("LinkAddHinge2",							TypeLinkP,	x_p(&AddLinkHinge2));
-		func_add_param("o1",		TypeModelP);
-		func_add_param("o2",		TypeModelP);
-		func_add_param("p"	,		TypeVector);
-		func_add_param("ax1",		TypeVector);
-		func_add_param("ax2",		TypeVector);
-	add_func("LinkAddSlider",									TypeLinkP,	x_p(&AddLinkSlider));
-		func_add_param("o1",		TypeModelP);
-		func_add_param("o2",		TypeModelP);
-		func_add_param("ax",		TypeVector);
-	add_func("LinkAddUniversal",									TypeLinkP,	x_p(&AddLinkUniversal));
-		func_add_param("o1",		TypeModelP);
-		func_add_param("o2",		TypeModelP);
-		func_add_param("p",			TypeVector);
-		func_add_param("ax1",		TypeVector);
-		func_add_param("ax2",		TypeVector);
-
 	
 
 	// game variables

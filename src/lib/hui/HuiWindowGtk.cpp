@@ -412,6 +412,11 @@ void HuiWindow::SetPosition(int x, int y)
 	gtk_window_move(GTK_WINDOW(window),x,y);
 }
 
+void HuiWindow::GetPosition(int &x, int &y)
+{
+	gtk_window_get_position(GTK_WINDOW(window), &x, &y);
+}
+
 void HuiWindow::SetSize(int width, int height)
 {
 	if (parent)

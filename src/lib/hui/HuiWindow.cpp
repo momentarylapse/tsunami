@@ -206,20 +206,20 @@ void HuiWindow::SetID(const string &_id)
 // align window relative to another window (like..."top right corner")
 void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 {
-#if 0
-	irect rp=win->GetOuterior();
-	irect ro=GetOuterior();
-	int x=ro.x1,y=ro.y1;
+	int pw, ph, cw, ch, px, py, cx, cy;
+	win->GetSize(pw, ph);
+	win->GetPosition(px, py);
+	GetSize(cw, ch);
+	GetPosition(cx, cy);
 	if ((mode & HuiLeft)>0)
-		x=rp.x1 + 2;
+		cx = px + 2;
 	if ((mode & HuiRight)>0)
-		x=rp.x2 - (ro.x2-ro.x1) -2;
+		cx = px + pw - cw - 2;
 	if ((mode & HuiTop)>0)
-		y=rp.y1 + 20;
+		cy = py + 20;
 	if ((mode & HuiBottom)>0)
-		y=rp.y2 - (ro.y2-ro.y1) -2;
-	SetPosition(x,y);
-#endif
+		cy = py + ph - ch - 2;
+	SetPosition(cx, cy);
 }
 
 void HuiWindow::SetBorderWidth(int width)

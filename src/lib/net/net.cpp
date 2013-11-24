@@ -73,7 +73,6 @@ void NetInit()
 Socket::Socket()
 {
 	s = -1;
-	buffer = new string;
 	buffer_pos = 0;
 	last_op_reading = false;
 	uid = NetCurrentSocketID ++;
@@ -82,8 +81,7 @@ Socket::Socket()
 Socket::~Socket()
 {
 	if (s >= 0)
-		Close();
-	delete(buffer);
+		close();
 }
 
 void Socket::__init__()
@@ -97,7 +95,7 @@ void Socket::__delete__()
 }
 
 
-void Socket::Close()
+void Socket::close()
 {
 	if (s < 0)
 		return;
@@ -106,12 +104,12 @@ void Socket::Close()
 	closesocket(s);
 #endif
 #ifdef OS_LINUX
-	close(s);
+	::close(s);
 #endif
 	s = -1;
 }
 
-void Socket::SetBlocking(bool blocking)
+void Socket::setBlocking(bool blocking)
 {
 #ifdef OS_WINDOWS
 	unsigned long l = blocking ? 0 : 1;
@@ -135,7 +133,7 @@ int _NetCreateSocket_()
 }
 
 // host
-bool Socket::_Create(int port, bool block)
+bool Socket::_create(int port, bool block)
 {
 	so(1,"socket...");
 	s = socket(AF_INET, SOCK_STREAM, 0);
@@ -145,7 +143,7 @@ bool Socket::_Create(int port, bool block)
 	}else
 		so(1,"  -ok");
 
-	SetBlocking(block);
+	setBlocking(block);
 
 	struct sockaddr_in my_addr;
 	my_addr.sin_family = AF_INET;
@@ -155,7 +153,7 @@ bool Socket::_Create(int port, bool block)
 	so(1,"bind...");
 	if (bind(s, (struct sockaddr *)&my_addr, sizeof(my_addr))==-1){
 		so(0,"  -ERROR (bind)");
-		Close();
+		close();
 		return false;
 	}else
 		so(1,"  -ok");
@@ -173,25 +171,26 @@ bool Socket::_Create(int port, bool block)
 Socket *NetListen(int port, bool block)
 {
 	Socket *s = new Socket;
-	if (s->_Create(port, block))
+	if (s->_create(port, block))
 		return s;
 	delete(s);
 	return NULL;
 }
 
 // host
-Socket *Socket::Accept()
+Socket *Socket::accept()
 {
+	msg_db_f("sock.accept", 1);
 	Socket *con = new Socket;
 //	so(1,"accept...");
 	struct sockaddr_in remote_addr;
 	int size = sizeof(remote_addr);
 #ifdef OS_WINDOWS
-	con.s = accept(s, (struct sockaddr *)&remote_addr, &size);
+	con.s = ::accept(s, (struct sockaddr *)&remote_addr, &size);
 #endif
 #ifdef OS_LINUX
 	socklen_t len = (socklen_t)size;
-	con->s = accept(s, (struct sockaddr *)&remote_addr, &len);
+	con->s = ::accept(s, (struct sockaddr *)&remote_addr, &len);
 #endif
 
 	if (con->s < 0){
@@ -207,13 +206,13 @@ Socket *Socket::Accept()
 	#ifdef OS_WINDOWS
 		so(1, inet_ntoa(remote_addr.sin_addr));//.s_addr));
 	#endif
-	con->SetBlocking(true);
+	con->setBlocking(true);
 
 	return con;
 }
 
 // client
-bool Socket::_Connect(const string &addr,int port)
+bool Socket::_connect(const string &addr,int port)
 {
 	struct sockaddr_in host_addr;
 	struct hostent *host;
@@ -236,7 +235,7 @@ bool Socket::_Connect(const string &addr,int port)
 	host_addr.sin_port = htons(port);
 
 
-	SetBlocking(false);
+	setBlocking(false);
 
 	so(1,"connect...");
 	int status=connect(s, (struct sockaddr *)&host_addr, sizeof(host_addr));
@@ -285,7 +284,7 @@ bool Socket::_Connect(const string &addr,int port)
 		#ifdef OS_WINDOWS
 			so(0,WSAGetLastError());
 		#endif
-		Close();
+		close();
 		return false;
 	}
 
@@ -298,7 +297,7 @@ bool Socket::_Connect(const string &addr,int port)
 		return -1;
 	}else
 		so(1,"  -ok");*/
-	SetBlocking(true);
+	setBlocking(true);
 
 	return true;
 }
@@ -306,45 +305,48 @@ bool Socket::_Connect(const string &addr,int port)
 Socket *NetConnect(const string &addr, int port)
 {
 	Socket *s = new Socket;
-	if (s->_Connect(addr, port))
+	if (s->_connect(addr, port))
 		return s;
 	delete(s);
 	return NULL;
 }
 
-bool Socket::IsConnected()
+bool Socket::isConnected()
 {
 	return (s >= 0);
 }
 
 char _net_temp_buf_[65536];
 
-string Socket::Read()
+string Socket::read()
 {
 	if (s < 0)
 		return "";
+	msg_db_f("sock.read", 2);
 	int r = recv(s, _net_temp_buf_, sizeof(_net_temp_buf_), 0);
-	if (r > 0){
-		//msg_write("Read: " + string(_net_temp_buf_, r).hex(false));
-		return string(_net_temp_buf_, r);
+	if (r <= 0){
+		//msg_error("recv");
+		close();
+		throw SocketConnectionLostException();
 	}
-	msg_error("recv");
-	Close();
-	return "";
+	//msg_write("Read: " + string(_net_temp_buf_, r).hex(false));
+	return string(_net_temp_buf_, r);
 }
 
-bool Socket::Write(const string &buf)
+bool Socket::write(const string &buf)
 {
 	if (s < 0)
 		return false;
+	msg_db_f("sock.write", 2);
 	int sent = 0;
 	char *b = (char*)buf.data;
 	//msg_write("Write: " + buf.hex(false));
 	while (sent < buf.num){
 		int r = send(s, b, buf.num - sent, 0);
 		if (r <= 0){
-			msg_error("send");
-			Close();
+			//msg_error("send");
+			close();
+			throw SocketConnectionLostException();
 			return false;
 		}
 		b += r;
@@ -355,30 +357,30 @@ bool Socket::Write(const string &buf)
 
 
 
-bool Socket::CanWrite()
+bool Socket::canWrite()
 {
 	if (s < 0)
 		return false;
 	fd_set w;
 	FD_ZERO(&w);
-	FD_SET(((unsigned)s),&w);
+	FD_SET((unsigned)s, &w);
 	struct timeval t;
-	t.tv_sec=0;
-	t.tv_usec=10;
+	t.tv_sec = 0;
+	t.tv_usec = 10;
 	select(s+1, NULL, &w, NULL, &t);
 	return (FD_ISSET(s, &w) > 0);
 }
 
-bool Socket::CanRead()
+bool Socket::canRead()
 {
 	if (s < 0)
 		return false;
 	fd_set r;
 	FD_ZERO(&r);
-	FD_SET(((unsigned)s),&r);
+	FD_SET((unsigned)s, &r);
 	struct timeval t;
-	t.tv_sec=0;
-	t.tv_usec=10;
+	t.tv_sec = 0;
+	t.tv_usec = 10;
 	select(s+1, &r, NULL, NULL, &t);
 	return (FD_ISSET(s, &r) > 0);
 }
@@ -389,86 +391,58 @@ void Socket::_read_buffered_(void *p, int size)
 	if (s < 0)
 		return;
 	last_op_reading = true;
-	//msg_write(format("r s=%d  p=%d  b=%d", size, buffer_pos, buffer->num));
-	while (size > (buffer->num - buffer_pos))
-		*buffer += Read();
-	memcpy(p, (char*)buffer->data + buffer_pos, size);
+	//msg_write(format("r s=%d  p=%d  b=%d", size, buffer_pos, buffer.num));
+	while (size > (buffer.num - buffer_pos)){
+		buffer += read();
+	}
+	memcpy(p, (char*)buffer.data + buffer_pos, size);
 	buffer_pos += size;
 }
 
-int Socket::ReadInt()
-{
-	int i;
-	_read_buffered_(&i, sizeof(i));
-	return i;
-}
-
-float Socket::ReadFloat()
-{
-	float f;
-	_read_buffered_(&f, sizeof(f));
-	return f;
-}
-
-bool Socket::ReadBool()
-{
-	bool b;
-	_read_buffered_(&b, sizeof(b));
-	return b;
-}
-
-char Socket::ReadChar()
-{
-	char c;
-	_read_buffered_(&c, sizeof(c));
-	return c;
-}
-
-vector Socket::ReadVector()
-{
-	vector v;
-	_read_buffered_(&v, sizeof(v));
-	return v;
-}
-
-string Socket::ReadString()
-{
-	string s;
-	int n = ReadInt();
-	s.resize(n);
-	_read_buffered_(s.data, n);
-	return s;
-}
-
 void Socket::operator>>(int &i)
-{	i = ReadInt();	}
+{
+	_read_buffered_(&i, sizeof(i));
+}
 
 void Socket::operator>>(float &f)
-{	f = ReadFloat();	}
+{
+	_read_buffered_(&f, sizeof(f));
+}
 
 void Socket::operator>>(bool &b)
-{	b = ReadBool();	}
+{
+	_read_buffered_(&b, sizeof(b));
+}
 
 void Socket::operator>>(char &c)
-{	c = ReadChar();	}
+{
+	_read_buffered_(&c, sizeof(c));
+}
 
 void Socket::operator>>(string &s)
-{	s = ReadString();	}
+{
+	int n;
+	_read_buffered_(&n, sizeof(n));
+	s.resize(n);
+	_read_buffered_(s.data, n);
+}
 
 void Socket::operator>>(vector &v)
-{	v = ReadVector();	}
+{
+	_read_buffered_(&v, sizeof(v));
+}
 
-int Socket::GetBufferPos()
+int Socket::getBufferPos()
 {
 	return buffer_pos;
 }
 
-void Socket::SetBufferPos(int pos)
+void Socket::setBufferPos(int pos)
 {
 	if (s < 0)
 		return;
-	while (pos > buffer->num)
-		*buffer += Read();
+	while (pos > buffer.num)
+		buffer += read();
 	buffer_pos = pos;
 }
 
@@ -476,49 +450,54 @@ void Socket::SetBufferPos(int pos)
 #define _test_first_write_() \
 	if (last_op_reading){ \
 		last_op_reading = false; \
-		buffer->clear(); \
+		buffer.clear(); \
 		buffer_pos = 0; \
 	}
 
-void Socket::WriteInt(int i)
+void Socket::operator<<(int i)
 {
 	_test_first_write_();
-	*buffer += string((char*)&i, sizeof(i));
+	buffer += string((char*)&i, sizeof(i));
 }
-void Socket::WriteFloat(float f)
+void Socket::operator<<(float f)
 {
 	_test_first_write_();
-	*buffer += string((char*)&f, sizeof(f));
+	buffer += string((char*)&f, sizeof(f));
 }
-void Socket::WriteBool(bool b)
+void Socket::operator<<(bool b)
 {
 	_test_first_write_();
-	*buffer += string((char*)&b, sizeof(b));
+	buffer += string((char*)&b, sizeof(b));
 }
-void Socket::WriteChar(char c)
+void Socket::operator<<(char c)
 {
 	_test_first_write_();
-	*buffer += string((char*)&c, sizeof(c));
+	buffer += string((char*)&c, sizeof(c));
 }
-void Socket::WriteString(const string &s)
+void Socket::operator<<(const string &s)
 {
 	_test_first_write_();
-	WriteInt(s.num);
-	*buffer += s;
-}
-
-void Socket::WriteVector(const vector &v)
-{
-	_test_first_write_();
-	*buffer += string((char*)&v, sizeof(v));
+	buffer += string((char*)&s.num, sizeof(int));
+	buffer += s;
 }
 
-bool Socket::WriteBuffer()
+void Socket::operator<<(const vector &v)
 {
-	bool r = Write(*buffer);
-	buffer->clear();
-	buffer_pos = 0;
+	_test_first_write_();
+	buffer += string((char*)&v, sizeof(v));
+}
+
+bool Socket::writeBuffer()
+{
+	bool r = write(buffer);
+	clearBuffer();
 	return r;
+}
+
+void Socket::clearBuffer()
+{
+	buffer.clear();
+	buffer_pos = 0;
 }
 
 
@@ -551,19 +530,23 @@ bool _cdecl NetSendBugReport(const string &sender, const string &program, const 
 		temp += report;
 
 		// try and send
-		if (!s->Write(temp)){
+		try{
+			s->write(temp);
+		}catch (SocketException &e){
 			return_msg = "Server accepted a connection but could not send any data";
 			delete(s);
 			return false;
 		}
 
 		// get response
-		temp = s->Read();
-		delete(s);
-		if (temp.num == 0){
+		try{
+			temp = s->read();
+		}catch(SocketException &e){
 			return_msg = "Server does not respond";
+			delete(s);
 			return false;
 		}
+		delete(s);
 		if (temp.find(" 200 OK") >= 0){
 			if (temp.find("report: ok") >= 0){
 				return_msg = "report successfully sent";

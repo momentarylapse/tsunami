@@ -44,9 +44,9 @@ class SpectrumDialog : Dialog
 	
 		rect r = grid.GetPlotRegion(0, 0, w, h)
 	
-		Image im = im0
-		im.scale(r.width(), r.height())
-		c.DrawImage(r.x1, r.y1, im)
+		Image *im = im0.scale(r.width(), r.height())
+		c.DrawImage(r.x1, r.y1, *im)
+		delete(im)
 	
 		c.End()
 

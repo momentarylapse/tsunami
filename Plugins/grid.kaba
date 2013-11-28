@@ -176,46 +176,38 @@ class GridData
 		DrawLinY(c, part)
 	
 	void DrawCurve(Painter *c, FloatInterpolator fi, bool fill_below)
-		float tt[], xx[], yy[]
+		float tt[], yy[]
+		complex pp[]
 		tt = rangef(0, 1, 0.003)
 		yy = fi.get_list(tt)
 		for int i, 0, tt.num
 			complex zz = project2(complex(x_axis.rel2val(tt[i]), yy[i]))
-			yy[i] = zz.y
-			xx.add(zz.x)
+			pp.add(zz)
 		if fill_below
-			xx.add(x + w)
-			yy.add(y + h)
-			xx.add(x)
-			yy.add(y + h)
+			pp.add(complex(x + w, y + h))
+			pp.add(complex(x, y + h))
 			c.SetColor(color(0.3, 0.3, 0.3, 1))
-			c.DrawPolygon(xx, yy)
-			xx.resize(xx.num - 2)
-			yy.resize(yy.num - 2)
+			c.DrawPolygon(pp)
+			pp.resize(pp.num - 2)
 		c.SetLineWidth(2)
 		c.SetColor(Black)
-		c.DrawLines(xx, yy)
+		c.DrawLines(pp)
 	
-	void DrawCurveB(Painter *c, float _x[], float _y[], bool fill_below, color col)
-		float xx[], yy[]
-		for int i, 0, _x.num
-			complex zz = project2(complex(_x[i], _y[i]))
-			yy.add(zz.y)
-			xx.add(zz.x)
+	void DrawCurveB(Painter *c, complex _p[], bool fill_below, color col)
+		complex pp[]
+		for int i, 0, _p.num
+			pp.add(project2(_p[i]))
 		if fill_below
-			xx.add(x + w)
-			yy.add(y + h)
-			xx.add(x)
-			yy.add(y + h)
+			pp.add(complex(x + w, y + h))
+			pp.add(complex(x, y + h))
 			color col2 = col
 			col2.a = 0.3
 			c.SetColor(col2)
-			c.DrawPolygon(xx, yy)
-			xx.resize(xx.num - 2)
-			yy.resize(yy.num - 2)
+			c.DrawPolygon(pp)
+			pp.resize(pp.num - 2)
 		c.SetLineWidth(0.9)
 		c.SetColor(col)
-		c.DrawLines(xx, yy)
+		c.DrawLines(pp)
 	
 	void DrawPoint2(Painter *c, complex p, bool selected, bool hover)
 		complex pp = project2(p)

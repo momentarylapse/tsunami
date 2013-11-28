@@ -28,27 +28,28 @@ float todb(float v)
 
 float peak_max
 
-void CreateLines(int type, float x[], float yr[], float yl[])
+void CreateLines(int type, complex pr[], complex pl[])
 
-	x.clear()
-	yr.clear()
-	yl.clear()
+	pr.resize(N)
+	pl.resize(N)
 	for int i, 0, N
-		x.add(log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ))
+		float x = log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ)
+		pr[i].x = x
+		pl[i].x = x
 		if type == TypeLinear
 			grid.y_axis.set(0, peak_max, false, "")
-			yr.add(ffr[i])
-			yl.add(ffl[i])
+			pr[i].y = ffr[i]
+			pl[i].y = ffl[i]
 		else if type == TypeRoot2
 			grid.y_axis.set(0, sqrt(peak_max), false, "")
-			yr.add(pow(ffr[i], 0.5))
-			yl.add(pow(ffl[i], 0.5))
+			pr[i].y = pow(ffr[i], 0.5)
+			pl[i].y = pow(ffl[i], 0.5)
 		else //if type == TypeLogarithm
 			float vol_max = todb(peak_max)
 			float vol_min = vol_max - 60
 			grid.y_axis.set(vol_min, vol_max, false, "db")
-			yr.add(clamp(todb(ffr[i]), vol_min, vol_max))
-			yl.add(clamp(todb(ffl[i]), vol_min, vol_max))
+			pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
+			pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
 
 class SpectrumDialog : Dialog
 	void __init__()
@@ -73,12 +74,12 @@ class SpectrumDialog : Dialog
 		w = c.width
 		h = c.height
 	
-		float x[], yr[], yl[]
-		CreateLines(GetInt("type"), x, yr, yl)
+		complex pr[], pl[]
+		CreateLines(GetInt("type"), pr, pl)
 	
 		grid.Draw(c, 0, 0, w, h)
-		grid.DrawCurveB(c, x, yr, true, Red)
-		grid.DrawCurveB(c, x, yl, true, Blue)
+		grid.DrawCurveB(c, pr, true, Red)
+		grid.DrawCurveB(c, pl, true, Blue)
 	
 		c.End()
 

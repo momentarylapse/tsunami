@@ -72,37 +72,31 @@ void HuiPainter::DrawLine(float x1, float y1, float x2, float y2)
 	cairo_stroke(cr);
 }
 
-void HuiPainter::DrawLines(float *x, float *y, int num_lines)
+void HuiPainter::DrawLines(Array<complex> &p)
 {
 	if (!cr)
+		return;
+	if (p.num == 0)
 		return;
 	//cairo_set_line_join(cr, CAIRO_LINE_JOIN_ROUND);
 	//cairo_set_line_cap(cr, CAIRO_LINE_CAP_ROUND);
-	cairo_move_to(cr, x[0], y[0]);
-	for (int i=1;i<=num_lines;i++)  // <=  !!!
-		cairo_line_to(cr, x[i], y[i]);
+	cairo_move_to(cr, p[0].x, p[0].y);
+	for (int i=1; i<p.num; i++)
+		cairo_line_to(cr, p[i].x, p[i].y);
 	cairo_stroke(cr);
 }
 
-void HuiPainter::DrawLinesMA(Array<float> &x, Array<float> &y)
-{
-	DrawLines(&x[0], &y[0], x.num - 1);
-}
-
-void HuiPainter::DrawPolygon(float *x, float *y, int num_points)
+void HuiPainter::DrawPolygon(Array<complex> &p)
 {
 	if (!cr)
 		return;
-	cairo_move_to(cr, x[0], y[0]);
-	for (int i=1;i<num_points;i++)
-		cairo_line_to(cr, x[i], y[i]);
+	if (p.num == 0)
+		return;
+	cairo_move_to(cr, p[0].x, p[0].y);
+	for (int i=1; i<p.num; i++)
+		cairo_line_to(cr, p[i].x, p[i].y);
 	cairo_close_path(cr);
 	cairo_fill(cr);
-}
-
-void HuiPainter::DrawPolygonMA(Array<float> &x, Array<float> &y)
-{
-	DrawPolygon(&x[0], &y[0], x.num);
 }
 
 void HuiPainter::DrawStr(float x, float y, const string &str)

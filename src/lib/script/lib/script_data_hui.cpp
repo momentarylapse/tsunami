@@ -33,7 +33,7 @@ namespace Script{
 
 extern Type *TypeIntList;
 extern Type *TypeIntPs;
-extern Type *TypeFloatList;
+extern Type *TypeComplexList;
 extern Type *TypeImage;
 Type *TypeHuiWindowP;
 
@@ -414,12 +414,10 @@ void SIAddPackageHui()
 			func_add_param("y1",		TypeFloat);
 			func_add_param("x2",		TypeFloat);
 			func_add_param("y2",		TypeFloat);
-		class_add_func("DrawLines",								TypeVoid,		mf(&HuiPainter::DrawLinesMA));
-			func_add_param("x",			TypeFloatList);
-			func_add_param("y",			TypeFloatList);
-		class_add_func("DrawPolygon",								TypeVoid,		mf(&HuiPainter::DrawPolygonMA));
-			func_add_param("x",			TypeFloatList);
-			func_add_param("y",			TypeFloatList);
+		class_add_func("DrawLines",								TypeVoid,		mf(&HuiPainter::DrawLines));
+			func_add_param("p",			TypeComplexList);
+		class_add_func("DrawPolygon",								TypeVoid,		mf(&HuiPainter::DrawPolygon));
+			func_add_param("p",			TypeComplexList);
 		class_add_func("DrawRect",								TypeVoid,		mf((void (HuiPainter::*) (float,float,float,float))&HuiPainter::DrawRect));
 			func_add_param("x",			TypeFloat);
 			func_add_param("y",			TypeFloat);

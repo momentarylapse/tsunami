@@ -635,7 +635,7 @@ void AudioView::ForceRedraw()
 
 #define MIN_GRID_DIST	10.0f
 
-float tx[4096], ty[4096], ty2[4096];
+static Array<complex> tt;
 
 inline void draw_line_buffer(HuiPainter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
 {
@@ -643,19 +643,18 @@ inline void draw_line_buffer(HuiPainter *c, int width, double view_pos, double z
 	int i0 = max((double) x          / zoom + view_pos - offset    , 0);
 	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, buf.num);
 
-	if (i1 - i0 > 4000)
-		return;
+	tt.resize(i1 - i0);
 
-	for (int i=i0;i<i1;i++){
+	for (int i=i0; i<i1; i++){
 
 		double p = x + ((double)(i + offset) + 0.5 - view_pos) * zoom;
-		tx[nl] = (float)p;
-		ty[nl] = y0 + buf[i] * hf;
+		tt[nl].x = (float)p;
+		tt[nl].y = y0 + buf[i] * hf;
 		if (zoom > 5)
-			c->DrawCircle(p, ty[nl], 2);
+			c->DrawCircle(p, tt[nl].y, 2);
 		nl ++;
 	}
-	c->DrawLines(tx, ty, nl -1);
+	c->DrawLines(tt);
 }
 
 inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
@@ -665,26 +664,25 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 	// pixel position
 	// -> buffer position
 	double p0 = view_pos_rel;
-	for (int i=0;i<width+di;i+=di){
+	tt.resize(width/di + 1);
+	for (int i=0; i<width+di; i+=di){
 
 		double p = p0 + dpos * (double)i + 0.5;
 		int ip = (int)(p - offset)/f;
 		if ((ip >= 0) && (ip < buf.num))
 		if (((int)(p) < offset + buf.num*f) && (p >= offset)){
-			tx[nl] = (float)x+i;
+			tt[nl].x = (float)x+i;
 			float dy = ((float)((unsigned char)buf[ip])/255.0f) * hf;
-			ty[nl]  = y0 + dy;
-			//ty2[nl] = y0 - dy;
+			tt[nl].y  = y0 + dy;
 			nl ++;
 		}
 	}
-	for (int i=0;i<nl;i++){
-		tx[nl + i] = tx[nl - i - 1];
-		ty[nl + i] = y0 *2 - ty[nl - i - 1] - 1;
+	tt.resize(nl * 2);
+	for (int i=0; i<nl; i++){
+		tt[nl + i].x = tt[nl - i - 1].x;
+		tt[nl + i].y = y0 *2 - tt[nl - i - 1].y - 1;
 	}
-	c->DrawPolygon(tx, ty, nl*2);
-//	c->DrawLines(tx, ty, nl*2 -1);
-	//c->DrawLines(tx, ty2, nl -1);
+	c->DrawPolygon(tt);
 }
 
 void AudioView::SetCurSample(AudioFile* a, SampleRef* s)

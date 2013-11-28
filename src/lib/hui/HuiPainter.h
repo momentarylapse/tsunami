@@ -9,6 +9,7 @@
 #define HUIPAINTER_H_
 
 class HuiWindow;
+class complex;
 
 class HuiPainter
 {
@@ -30,10 +31,8 @@ class HuiPainter
 	void _cdecl SetLineWidth(float w);
 	void _cdecl DrawPoint(float x, float y);
 	void _cdecl DrawLine(float x1, float y1, float x2, float y2);
-	void _cdecl DrawLines(float *x, float *y, int num_lines);
-	void _cdecl DrawLinesMA(Array<float> &x, Array<float> &y);
-	void _cdecl DrawPolygon(float *x, float *y, int num_points);
-	void _cdecl DrawPolygonMA(Array<float> &x, Array<float> &y);
+	void _cdecl DrawLines(Array<complex> &p);
+	void _cdecl DrawPolygon(Array<complex> &p);
 	void _cdecl DrawRect(float x1, float y1, float w, float h);
 	void _cdecl DrawRect(const rect &r);
 	void _cdecl DrawCircle(float x, float y, float radius);

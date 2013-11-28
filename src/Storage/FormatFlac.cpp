@@ -202,7 +202,7 @@ void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 	// initialize encoder
 	if (ok){
-		init_status = FLAC__stream_encoder_init_file(encoder, filename.c_str(), flac_progress_callback, /*client_data=*/(void*)b->num);
+		init_status = FLAC__stream_encoder_init_file(encoder, filename.c_str(), flac_progress_callback, /*client_data=*/(void*)(long)b->num);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
 			fprintf(stderr, "ERROR: initializing encoder: %s\n", FLAC__StreamEncoderInitStatusString[init_status]);
 			ok = false;

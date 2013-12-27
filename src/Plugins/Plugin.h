@@ -13,7 +13,6 @@
 
 namespace Script{
 class Script;
-class Type;
 };
 
 class EffectParam;
@@ -28,17 +27,13 @@ public:
 	Plugin(const string &_filename);
 
 	string filename;
+	int index;
 	Script::Script *s;
 	void_func *f_reset;
 	void_func *f_data2dialog;
 	void_func *f_configure;
 	void_func *f_reset_state;
 	process_track_func *f_process_track;
-	int index;
-	Script::Type *state_type;
-	void *state;
-	Script::Type *data_type;
-	void *data;
 
 	bool usable;
 	int type;
@@ -48,16 +43,11 @@ public:
 	};
 	string error_message;
 
-	void ExportData(Array<EffectParam> &param);
-	void ImportData(Array<EffectParam> &param);
 	void ResetData();
 	void ResetState();
 	bool Configure(bool previewable);
 	void DataToDialog();
 	void ProcessTrack(Track *t, int level_no, const Range &r);
-
-	void WriteDataToFile(const string &name);
-	void LoadDataFromFile(const string &name);
 
 	string GetError();
 };

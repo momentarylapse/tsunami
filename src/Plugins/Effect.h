@@ -15,6 +15,11 @@ class Plugin;
 class Track;
 class BufferBox;
 
+namespace Script{
+class Script;
+class Type;
+};
+
 class EffectParam
 {
 public:
@@ -33,8 +38,12 @@ public:
 	bool only_on_selection;
 	Range range;
 	Plugin *plugin;
-	void *state;
 	bool usable;
+
+	Script::Type *state_type;
+	void *state;
+	Script::Type *data_type;
+	void *data;
 
 	void ExportData();
 	void ImportData();
@@ -43,6 +52,9 @@ public:
 	void Prepare();
 	void CleanUp();
 	void Apply(BufferBox &buf, Track *t, bool log_error);
+
+	void WriteDataToFile(const string &name);
+	void LoadDataFromFile(const string &name);
 
 	void make_usable();
 	string GetError();

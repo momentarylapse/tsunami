@@ -34,6 +34,7 @@ void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
 PluginManager::PluginManager()
 {
 	cur_plugin = NULL;
+	cur_effect = NULL;
 	cur_synth = NULL;
 }
 
@@ -395,8 +396,8 @@ void PluginManager::OnFavoriteList()
 		HuiCurWindow->Enable("favorite_save", false);
 		HuiCurWindow->Enable("favorite_delete", false);
 	}else{
-		if (cur_plugin)
-			cur_plugin->LoadDataFromFile(PluginFavoriteName[n - 1]);
+		if (cur_effect)
+			cur_effect->LoadDataFromFile(PluginFavoriteName[n - 1]);
 		else if (cur_synth)
 			SynthLoadDataFromFile(cur_synth, PluginFavoriteName[n - 1]);
 		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
@@ -411,8 +412,8 @@ void PluginManager::OnFavoriteList()
 void PluginManager::OnFavoriteSave()
 {
 	string name = HuiCurWindow->GetString("favorite_name");
-	if (cur_plugin){
-		cur_plugin->WriteDataToFile(name);
+	if (cur_effect){
+		cur_effect->WriteDataToFile(name);
 	}else if (cur_synth){
 		SynthWriteDataToFile(cur_synth, name);
 	}
@@ -508,7 +509,7 @@ void PluginManager::OnPluginFavoriteList()
 		win->Enable("favorite_save", false);
 		win->Enable("favorite_delete", false);
 	}else{
-		cur_plugin->LoadDataFromFile(PluginFavoriteName[n - 1]);
+		cur_effect->LoadDataFromFile(PluginFavoriteName[n - 1]);
 		win->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		win->Enable("favorite_delete", true);
 	}
@@ -520,7 +521,7 @@ void PluginManager::OnPluginFavoriteSave()
 	if (!cur_plugin)
 		return;
 	HuiWindow *win = HuiGetEvent()->win;
-	cur_plugin->WriteDataToFile(win->GetString("favorite_name"));
+	cur_effect->WriteDataToFile(win->GetString("favorite_name"));
 	PluginFavoriteName.add(win->GetString("favorite_name"));
 	win->AddString("favorite_list", win->GetString("favorite_name"));
 	win->SetInt("favorite_list", PluginFavoriteName.num);

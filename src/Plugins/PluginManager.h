@@ -14,6 +14,7 @@
 #include "../Stuff/Observer.h"
 
 class Plugin;
+class Effect;
 class Synthesizer;
 
 class PluginManager : public HuiEventHandler, public Observer
@@ -80,6 +81,7 @@ public:
 
 	Array<Plugin*> plugin;
 	Plugin *cur_plugin;
+	Effect *cur_effect;
 	Synthesizer *cur_synth;
 
 	struct PluginContext

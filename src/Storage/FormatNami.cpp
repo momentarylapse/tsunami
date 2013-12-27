@@ -567,16 +567,16 @@ void ReadChunkEffectParam(CFile *f, Effect *e)
 	e->param.add(p);
 }
 
-void ReadChunkEffect(CFile *f, Array<Effect> *fx)
+void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 {
-	Effect e;
-	e.name = f->ReadStr();
-	e.only_on_selection = f->ReadBool();
-	e.range.offset = f->ReadInt();
-	e.range.num = f->ReadInt();
+	Effect *e = new Effect;
+	e->name = f->ReadStr();
+	e->only_on_selection = f->ReadBool();
+	e->range.offset = f->ReadInt();
+	e->range.num = f->ReadInt();
 	fx->add(e);
 
-	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParam, &fx->back());
+	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParam, e);
 }
 
 void ReadChunkBufferBox(CFile *f, TrackLevel *l)

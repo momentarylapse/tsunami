@@ -30,6 +30,7 @@ public:
 	bool operator != (const complex &v) const;
 	float _cdecl abs() const;
 	float _cdecl abs_sqr() const;
+	complex _cdecl bar() const;
 	string _cdecl str() const;
 };
 

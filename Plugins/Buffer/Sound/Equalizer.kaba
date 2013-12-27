@@ -23,7 +23,7 @@ int MouseOver, Selected
 GridData grid
 
 void fill_inter(FloatInterpolator fi)
-	fi.set_type("cubic-spline-notang")
+	fi.setType("cubic-spline-notang")
 	fi.add3(data.curve[0].y, 0.0, exp(data.curve[0].z), 0.0)
 	for int i, 1, data.curve.num
 		fi.add3(data.curve[i].y, 0.0, exp(data.curve[i].z), log(data.curve[i].x / data.curve[i - 1].x))

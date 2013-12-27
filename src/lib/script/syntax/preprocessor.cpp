@@ -10,16 +10,6 @@ typedef void op_func(void *r, void *a, void *b);
 
 
 
-extern void script_db_out(const string &str);
-extern void script_db_out(int i);
-extern void script_db_right();
-extern void script_db_left();
-
-#define so		script_db_out
-#define right	script_db_right
-#define left	script_db_left
-
-
 void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 {
 	msg_db_f("PreProcessCommand", 4);
@@ -60,8 +50,8 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 			if (all_const){
 				op_func *f = (op_func*)o->func;
 				if (is_address){
-					/*so("pre process address");
-					void *d1 = (void*)&c->Param[0]->LinkNr;
+					// pre process address
+					/*void *d1 = (void*)&c->Param[0]->LinkNr;
 					void *d2 = (void*)&c->Param[1]->LinkNr;
 					if (c->Param[0]->Kind == KindConstant)
 					    d1 = Constant[c->Param[0]->LinkNr].data;
@@ -72,7 +62,7 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 					c->Kind = is_local ? KindLocalAddress : KindAddress;
 					c->NumParams = 0;*/
 				}else{
-					so("pre process operator");
+					// pre process operator
 					int nc = AddConstant(o->return_type);
 					void *d1 = Constants[c->param[0]->link_no].data;
 					void *d2 = NULL;
@@ -88,7 +78,7 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 	}/*else if (c->Kind == KindReference){
 		if (s){
 			if ((c->Param[0]->Kind == KindVarGlobal) || (c->Param[0]->Kind == KindVarLocal) || (c->Param[0]->Kind == KindVarExternal) || (c->Param[0]->Kind == KindConstant)){
-				so("pre process ref var");
+				// pre process ref var
 				c->Kind = KindAddress;
 				c->NumParams = 0;
 				if (c->Param[0]->Kind == KindVarGlobal){
@@ -107,12 +97,12 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 		}
 	}else if (c->Kind == KindDereference){
 		if (c->Param[0]->Kind == KindAddress){
-			so("pre process deref address");
+			// pre process deref address
 			c->Kind = KindMemory;
 			c->LinkNr = c->Param[0]->LinkNr;
 			c->NumParams = 0;
 		}else if (c->Param[0]->Kind == KindLocalAddress){
-			so("pre process deref local address");
+			// pre process deref local address
 			c->Kind = KindLocalMemory;
 			c->LinkNr = c->Param[0]->LinkNr;
 			c->NumParams = 0;
@@ -160,7 +150,7 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 			if (all_const){
 				op_func *f = (op_func*)o->func;
 				if (is_address){
-					so("pre process address");
+					// pre process address
 					void *d1 = (void*)&c->param[0]->link_no;
 					void *d2 = (void*)&c->param[1]->link_no;
 					if (c->param[0]->kind == KindConstant)
@@ -177,7 +167,7 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 	}else if (c->kind == KindReference){
 		if (s){
 			if ((c->param[0]->kind == KindVarGlobal) || (c->param[0]->kind == KindVarLocal) || (c->param[0]->kind == KindConstant)){
-				so("pre process ref var");
+				// pre process ref var
 				c->kind = KindAddress;
 				c->num_params = 0;
 				if (c->param[0]->kind == KindVarGlobal){
@@ -191,12 +181,12 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 		}
 	}else if (c->kind == KindDereference){
 		if (c->param[0]->kind == KindAddress){
-			so("pre process deref address");
+			// pre process deref address
 			c->kind = KindMemory;
 			c->link_no = c->param[0]->link_no;
 			c->num_params = 0;
 		}else if (c->param[0]->kind == KindLocalAddress){
-			so("pre process deref local address");
+			// pre process deref local address
 			c->kind = KindLocalMemory;
 			c->link_no = c->param[0]->link_no;
 			c->num_params = 0;

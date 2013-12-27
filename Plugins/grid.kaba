@@ -179,7 +179,7 @@ class GridData
 		float tt[], yy[]
 		complex pp[]
 		tt = rangef(0, 1, 0.003)
-		yy = fi.get_list(tt)
+		yy = fi.getList(tt)
 		for int i, 0, tt.num
 			complex zz = project2(complex(x_axis.rel2val(tt[i]), yy[i]))
 			pp.add(zz)

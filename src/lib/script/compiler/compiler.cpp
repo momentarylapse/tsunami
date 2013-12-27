@@ -14,17 +14,6 @@
 namespace Script{
 
 
-#define so		script_db_out
-#define right	script_db_right
-#define left	script_db_left
-
-
-void script_db_out(const string &str); // -> script.cpp
-void script_db_out(int i);
-void script_db_right();
-void script_db_left();
-
-
 int LocalOffset,LocalOffsetMax;
 
 /*int get_func_temp_size(Function *f)
@@ -144,7 +133,6 @@ void Script::AllocateOpcode()
 void Script::MapConstantsToMemory()
 {
 	// constants -> Memory
-	so("Konstanten");
 	cnst.resize(syntax->Constants.num);
 	foreachi(Constant &c, syntax->Constants, i){
 		cnst[i] = &Memory[MemorySize];
@@ -167,7 +155,6 @@ void Script::MapConstantsToMemory()
 void Script::MapGlobalVariablesToMemory()
 {
 	// global variables -> into Memory
-	so("glob.Var.");
 	g_var.resize(syntax->RootOfAllEvil.var.num);
 	foreachi(Variable &v, syntax->RootOfAllEvil.var, i){
 		if (v.is_extern){
@@ -179,7 +166,6 @@ void Script::MapGlobalVariablesToMemory()
 				g_var[i] = (char*)(long)(MemorySize + syntax->VariablesOffset);
 			else
 				g_var[i] = &Memory[MemorySize];
-			so(format("%d: %s", MemorySize, v.name.c_str()));
 			MemorySize += mem_align(v.type->size, 4);
 		}
 	}
@@ -374,7 +360,6 @@ void Script::Compiler()
 
 
 // compile functions into Opcode
-	so("Funktionen");
 	func.resize(syntax->Functions.num);
 	foreachi(Function *f, syntax->Functions, i){
 		if (f->is_extern){

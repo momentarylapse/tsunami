@@ -183,45 +183,6 @@ void SyntaxTree::LoadAndParseFile(const string &filename, bool just_analyse)
 	Exp.clear();
 }
 
-static void so(const char *str)
-{
-#ifdef ScriptDebug
-	/*if (strlen(str)>256)
-		str[256]=0;*/
-	msg_write(str);
-#endif
-}
-
-static void so(const string &str)
-{
-#ifdef ScriptDebug
-	/*if (strlen(str)>256)
-		str[256]=0;*/
-	msg_write(str);
-#endif
-}
-
-static void so(int i)
-{
-#ifdef ScriptDebug
-	msg_write(i);
-#endif
-}
-
-static void right()
-{
-#ifdef ScriptDebug
-	msg_right();
-#endif
-}
-
-static void left()
-{
-#ifdef ScriptDebug
-	msg_left();
-#endif
-}
-
 string Kind2Str(int kind)
 {
 	if (kind == KindVarLocal)			return "local variable";
@@ -663,7 +624,6 @@ void SyntaxTree::AddType(Type **type)
 	(*t) = (**type);
 	t->owner = this;
 	t->name = (*type)->name;
-	so("AddType: " + t->name);
 	(*type) = t;
 	Types.add(t);
 
@@ -716,10 +676,8 @@ void SyntaxTree::LoadToBuffer(const string &filename,bool just_analyse)
 void conv_cbr(SyntaxTree *ps, Command *&c, int var)
 {
 	msg_db_f("conv_cbr", 4);
-	//so(Kind2Str(c->Kind));
 	
 	// recursion...
-	so(c->num_params);
 	for (int i=0;i<c->num_params;i++)
 		conv_cbr(ps, c->param[i], var);
 	if (c->kind == KindBlock){
@@ -728,11 +686,9 @@ void conv_cbr(SyntaxTree *ps, Command *&c, int var)
 	}
 	if (c->instance)
 		conv_cbr(ps, c->instance, var);
-	so("a");
 
 	// convert
 	if ((c->kind == KindVarLocal) && (c->link_no == var)){
-		so("conv");
 		c = ps->cp_command(c);
 		c->type = c->type->GetPointer();
 		deref_command_old(ps, c);
@@ -776,14 +732,12 @@ void easyfy(SyntaxTree *ps, Command *c, int l)
 	// convert
 	if (c->kind == KindReference){
 		if (c->param[0]->kind == KindDereference){
-			so("rem 2");
 			// remove 2 knots...
 			Command *t = c->param[0]->param[0];
 			*c = *t;
 		}
 	}else if ((c->kind == KindAddressShift) || (c->kind == KindArray)){
 		if (c->param[0]->kind == KindDereference){
-			so("rem 1 (unify)");
 			// unify 2 knots (remove 1)
 			Command *t = c->param[0]->param[0];
 			c->kind = (c->kind == KindAddressShift) ? KindDerefAddressShift : KindPointerAsArray;
@@ -804,7 +758,6 @@ void convert_return_by_memory(SyntaxTree *ps, Block *b, Function *f)
 			convert_return_by_memory(ps, ps->Blocks[c->link_no], f);
 		if ((c->kind != KindCompilerFunction) || (c->link_no != CommandReturn))
 			continue;
-		so("convert return by mem");
 
 		// convert into   *-return- = param
 		Command *p_ret = NULL;
@@ -874,8 +827,6 @@ void SyntaxTree::ConvertCallByReference()
 		if (c->kind == KindCompilerFunction)
 			if (c->link_no == CommandReturn){
 				if ((c->param[0]->type->is_array) /*|| (c->Param[j]->Type->IsSuperArray)*/){
-					so("conv param (return)");
-					so(c->param[0]->type->name);
 					ref_command_old(this, c->param[0]);
 				}
 				_foreach_it_.update(); // TODO badness10000!!!!!!!!
@@ -886,15 +837,11 @@ void SyntaxTree::ConvertCallByReference()
 			// parameters: array/class as reference
 			for (int j=0;j<c->num_params;j++)
 				if (c->param[j]->type->UsesCallByReference()){
-					so("conv param");
-					so(c->param[j]->type->name);
 					ref_command_old(this, c->param[j]);
 				}
 
 			// return: array reference (-> dereference)
 			if ((c->type->is_array) /*|| (c->Type->IsSuperArray)*/){
-				so("conv ret");
-				so(c->type->name);
 				c->type = c->type->GetPointer();
 				deref_command_old(this, c);
 			}	
@@ -905,8 +852,6 @@ void SyntaxTree::ConvertCallByReference()
 			// parameters: super array as reference
 			for (int j=0;j<c->num_params;j++)
 				if ((c->param[j]->type->is_array) || (c->param[j]->type->is_super_array)){
-					so("conv param (op)");
-					so(c->param[j]->type->name);
 					ref_command_old(this, c->param[j]);
 				}
 		}
@@ -933,7 +878,6 @@ void SyntaxTree::BreakDownComplicatedCommands()
 	for (int i=0;i<Commands.num;i++){
 		Command *c = Commands[i];
 		if (c->kind == KindArray){
-			so("array");
 
 			Type *el_type = c->type;
 
@@ -961,7 +905,6 @@ void SyntaxTree::BreakDownComplicatedCommands()
 			command_make_deref(this, c, c_address);
 			c->type = el_type;
 		}else if (c->kind == KindPointerAsArray){
-			so("array");
 
 			Type *el_type = c->type;
 
@@ -988,7 +931,6 @@ void SyntaxTree::BreakDownComplicatedCommands()
 			command_make_deref(this, c, c_address);
 			c->type = el_type;
 		}else if (c->kind == KindAddressShift){
-			so("address shift");
 
 			Type *el_type = c->type;
 
@@ -1011,7 +953,6 @@ void SyntaxTree::BreakDownComplicatedCommands()
 			command_make_deref(this, c, c_address);
 			c->type = el_type;
 		}else if (c->kind == KindDerefAddressShift){
-			so("deref address shift");
 
 			Type *el_type = c->type;
 

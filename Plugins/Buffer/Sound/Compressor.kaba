@@ -17,7 +17,7 @@ GridData grid
 float level_scale
 
 void fill_inter(FloatInterpolator fi)
-	fi.set_type("lerp")
+	fi.setType("lerp")
 	fi.add(data.curve[0].y, 0)
 	for int i, 1, data.curve.num
 		fi.add(data.curve[i].y, data.curve[i].x - data.curve[i - 1].x)

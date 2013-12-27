@@ -105,6 +105,11 @@ float complex::abs_sqr() const
 	return x*x + y*y;
 }
 
+complex complex::bar() const
+{
+	return complex(x, -y);
+}
+
 string complex::str() const
 {
 	return format("(%f, %f)", x, y);

@@ -310,6 +310,8 @@ char *CastComplex2StringP(complex *z)
 // amd64 complex return wrappers
 void amd64_comlist_sum(complex &r, ComplexList &l)
 {	r = l.sum();	}
+void amd64_com_bar(complex &r, complex &c)
+{	r = c.bar();	}
 
 // amd64 vector return wrappers
 void amd64_vec_dir2ang(vector &r, vector &v)
@@ -354,6 +356,8 @@ void amd64_quat_mul(quaternion &r, quaternion &a, quaternion&b)
 {	r = a * b;	}
 void amd64_quat_vec_mul(vector &r, quaternion &a, vector &b)
 {	r = a * b;	}
+void amd64_quat_bar(quaternion &r, quaternion &a)
+{	r = a.bar();	}
 
 // amd64 color return wrappers
 void amd64_col_hsb(color &r, float a, float h, float s, float b)
@@ -508,16 +512,18 @@ void SIAddPackageMath()
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_func("abs",		TypeFloat,			mf(&complex::abs));
-		class_add_func("abs_sqr",	TypeFloat,			mf(&complex::abs_sqr));
+		class_add_func("absSqr",	TypeFloat,			mf(&complex::abs_sqr));
+		class_add_func("bar",		TypeComplex, 		amd64_wrap(mf(&complex::bar), &amd64_com_bar));
 		class_add_func("str",		TypeString,			mf(&complex::str));
 	
 	add_class(TypeVector);
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_element("z",		TypeFloat,	8);
+		class_add_element("e",		TypeFloatArray3,	0);
 		class_add_func("length",			TypeFloat,	type_p(mf(&vector::length)));
-		class_add_func("length_sqr",		TypeFloat,	type_p(mf(&vector::length_sqr)));
-		class_add_func("length_fuzzy",		TypeFloat,	type_p(mf(&vector::length_fuzzy)));
+		class_add_func("lengthSqr",		TypeFloat,	type_p(mf(&vector::length_sqr)));
+		class_add_func("lengthFuzzy",		TypeFloat,	type_p(mf(&vector::length_fuzzy)));
 		class_add_func("normalize",		TypeVoid,	type_p(mf(&vector::normalize)));
 		class_add_func("dir2ang",			TypeVector,	amd64_wrap(mf(&vector::dir2ang), &amd64_vec_dir2ang));
 		class_add_func("dir2ang2",			TypeVector,	amd64_wrap(mf(&vector::dir2ang2), &amd64_vec_dir2ang2));
@@ -527,7 +533,7 @@ void SIAddPackageMath()
 			func_add_param("ang",		TypeVector);
 		class_add_func("transform",		TypeVector,	amd64_wrap(mf(&vector::transform), &amd64_vec_transform));
 			func_add_param("m",			TypeMatrix);
-		class_add_func("transform_normal",	TypeVector,	amd64_wrap(mf(&vector::transform_normal), &amd64_vec_transform_normal));
+		class_add_func("transformNormal",	TypeVector,	amd64_wrap(mf(&vector::transform_normal), &amd64_vec_transform_normal));
 			func_add_param("m",			TypeMatrix);
 		class_add_func("untransform",		TypeVector,	amd64_wrap(mf(&vector::untransform), &amd64_vec_untransform));
 			func_add_param("m",			TypeMatrix);
@@ -547,9 +553,10 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeVector);
 		class_add_func("__imul__", TypeVoid, mf(&quaternion::imul));
 			func_add_param("other",	TypeQuaternion);
-		class_add_func("inverse",	TypeVoid,	mf(&quaternion::inverse));
+		class_add_func("invert",	TypeVoid,	mf(&quaternion::invert));
+		class_add_func("bar",		TypeQuaternion,	amd64_wrap(mf(&quaternion::bar), &amd64_quat_bar));
 		class_add_func("normalize",	TypeVoid,	mf(&quaternion::normalize));
-		class_add_func("get_angles",	TypeVector,	amd64_wrap(mf(&quaternion::get_angles), &amd64_quat_get_angles));
+		class_add_func("getAngles",	TypeVector,	amd64_wrap(mf(&quaternion::get_angles), &amd64_quat_get_angles));
 		class_add_func("str",		TypeString,			mf(&quaternion::str));
 	
 	add_class(TypeRect);
@@ -578,7 +585,7 @@ void SIAddPackageMath()
 		class_add_element("c",		TypeFloat,	8);
 		class_add_element("d",		TypeFloat,	12);
 		class_add_element("n",		TypeVector,	0);
-		class_add_func("intersect_line",	TypeBool,	mf(&plane::intersect_line));
+		class_add_func("intersectLine",	TypeBool,	mf(&plane::intersect_line));
 			func_add_param("l1",		TypeVector);
 			func_add_param("l2",		TypeVector);
 			func_add_param("inter",		TypeVector);
@@ -674,7 +681,7 @@ void SIAddPackageMath()
 			func_add_param("rem",			TypeVli);
 		class_add_func("pow",			TypeVli,			algebra_p(mf(&vli::pow)));
 			func_add_param("exp",			TypeVli);
-		class_add_func("pow_mod",		TypeVli,			algebra_p(mf(&vli::pow_mod)));
+		class_add_func("powMod",		TypeVli,			algebra_p(mf(&vli::pow_mod)));
 			func_add_param("exp",			TypeVli);
 			func_add_param("mod",		TypeVli);
 		class_add_func("gcd",			TypeVli,			algebra_p(mf(&vli::gcd)));
@@ -721,7 +728,7 @@ void SIAddPackageMath()
 		class_add_element("k",	TypeVli, sizeof(vli));
 		class_add_func("__init__",	TypeVoid, algebra_p(mf(&Crypto::__init__)));
 		class_add_func("str",		TypeString, algebra_p(mf(&Crypto::str)));
-		class_add_func("from_str",	TypeVoid, algebra_p(mf(&Crypto::from_str)));
+		class_add_func("fromStr",	TypeVoid, algebra_p(mf(&Crypto::from_str)));
 			func_add_param("str",		TypeString);
 		class_add_func("encrypt",	TypeString, algebra_p(mf(&Crypto::Encrypt)));
 			func_add_param("str",		TypeString);
@@ -739,7 +746,7 @@ void SIAddPackageMath()
 		class_add_func("getf",		TypeFloat, mf(&Random::getf));
 			func_add_param("min",		TypeFloat);
 			func_add_param("max",		TypeFloat);
-		class_add_func("in_ball",		TypeVector, amd64_wrap(mf(&Random::in_ball), &amd64_vec_rand_in_ball));
+		class_add_func("inBall",		TypeVector, amd64_wrap(mf(&Random::in_ball), &amd64_vec_rand_in_ball));
 			func_add_param("r",		TypeFloat);
 		class_add_func("dir",		TypeVector, amd64_wrap(mf(&Random::dir), &amd64_vec_rand_dir));
 	
@@ -757,7 +764,7 @@ void SIAddPackageMath()
 		class_add_element("type",	TypeInt, 0);
 		class_add_func("__init__",	TypeVoid, mf(&Interpolator<float>::__init__));
 		class_add_func("clear",	TypeVoid, mf(&Interpolator<float>::clear));
-		class_add_func("set_type",	TypeVoid, mf(&Interpolator<float>::set_type));
+		class_add_func("setType",	TypeVoid, mf(&Interpolator<float>::set_type));
 			func_add_param("type",	TypeString);
 		class_add_func("add",	TypeVoid, mf(&Interpolator<float>::add));
 			func_add_param("p",	TypeFloatPs);
@@ -776,9 +783,9 @@ void SIAddPackageMath()
 			func_add_param("v",	TypeFloatPs);
 		class_add_func("get",	TypeFloat, mf(&Interpolator<float>::get));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_tang",	TypeFloat, mf(&Interpolator<float>::get_tang));
+		class_add_func("getTang",	TypeFloat, mf(&Interpolator<float>::get_tang));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_list",	TypeFloatList, mf(&Interpolator<float>::get_list));
+		class_add_func("getList",	TypeFloatList, mf(&Interpolator<float>::get_list));
 			func_add_param("t",	TypeFloatList);
 
 	
@@ -786,7 +793,7 @@ void SIAddPackageMath()
 		class_add_element("type",	TypeInt, 0);
 		class_add_func("__init__",	TypeVoid, mf(&Interpolator<vector>::__init__));
 		class_add_func("clear",	TypeVoid, mf(&Interpolator<vector>::clear));
-		class_add_func("set_type",	TypeVoid, mf(&Interpolator<vector>::set_type));
+		class_add_func("setType",	TypeVoid, mf(&Interpolator<vector>::set_type));
 			func_add_param("type",	TypeString);
 		class_add_func("add",	TypeVoid, mf(&Interpolator<vector>::add));
 			func_add_param("p",	TypeVector);
@@ -805,9 +812,9 @@ void SIAddPackageMath()
 			func_add_param("v",	TypeVector);
 		class_add_func("get",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::get), &amd64_vec_inter_get));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_tang",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::get_tang), &amd64_vec_inter_get_tang));
+		class_add_func("getTang",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::get_tang), &amd64_vec_inter_get_tang));
 			func_add_param("t",	TypeFloat);
-		class_add_func("get_list",	TypeVectorList, mf(&Interpolator<vector>::get_list));
+		class_add_func("getList",	TypeVectorList, mf(&Interpolator<vector>::get_list));
 			func_add_param("t",	TypeFloatList);
 
 	// mathematical
@@ -937,6 +944,11 @@ void SIAddPackageMath()
 		func_add_param("q_0",		TypeQuaternion);
 		func_add_param("q_1",		TypeQuaternion);
 		func_add_param("t",		TypeFloat);
+	add_func("QuaternionDrag",	TypeVoid,	(void*)&QuaternionDrag);
+		func_add_param("q",		TypeQuaternion);
+		func_add_param("up",		TypeVector);
+		func_add_param("dang",		TypeVector);
+		func_add_param("reset_z",		TypeBool);
 	// plane
 	add_func("PlaneFromPoints",	TypeVoid,	(void*)&PlaneFromPoints);
 		func_add_param("pl",		TypePlane);

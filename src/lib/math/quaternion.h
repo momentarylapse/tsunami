@@ -26,7 +26,8 @@ public:
 	string _cdecl str() const;
 
 	void _cdecl normalize();
-	void _cdecl inverse();
+	void _cdecl invert();
+	quaternion _cdecl bar() const;
 	vector _cdecl get_axis() const;
 	float _cdecl get_angle() const;
 	vector get_angles() const;
@@ -43,6 +44,7 @@ void _cdecl QuaternionRotationM(quaternion &q, const matrix &m);
 void _cdecl QuaternionInterpolate(quaternion &q, const quaternion &q1, const quaternion &q2, float t);
 void _cdecl QuaternionInterpolate(quaternion &q, const quaternion &q1, const quaternion &q2, const quaternion &q3, const quaternion &q4, float t);
 void _cdecl QuaternionScale(quaternion &q, float f);
+void _cdecl QuaternionDrag(quaternion &q, const vector &up, const vector &dang, bool reset_z);
 
 const quaternion q_id = quaternion(1, v_0);
 

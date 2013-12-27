@@ -84,7 +84,7 @@ public:
 
 	float volume;
 
-	Array<Effect> fx;
+	Array<Effect*> fx;
 	Array<Track*> track;
 	Array<Sample*> sample;
 

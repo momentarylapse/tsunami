@@ -14,7 +14,6 @@
 #include "Rhythm.h"
 #include "Sample.h"
 #include "AudioFile.h"
-#include "../Plugins/Effect.h"
 #include "../lib/math/rect.h"
 
 
@@ -27,6 +26,7 @@
 class BufferBox;
 class AudioFile;
 class Synthesizer;
+class Effect;
 
 
 class TrackLevel
@@ -82,7 +82,7 @@ public:
 	float volume, panning;
 	bool muted;
 
-	Array<Effect> fx;
+	Array<Effect*> fx;
 	Array<SampleRef*> sample;
 
 	// time track

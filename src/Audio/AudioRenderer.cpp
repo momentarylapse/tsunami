@@ -129,7 +129,7 @@ void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
 	t->level[0].buffer[0].set_as_ref(buf, 0, range_cur.length());
 }
 
-void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list)
+void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)
 {
 	msg_db_f("bb_apply_fx", 1);
 
@@ -146,8 +146,8 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect> &fx_list
 		}
 
 	// apply fx
-	foreach(Effect &fx, fx_list)
-		fx.Apply(buf, &fake_track, false);
+	foreach(Effect *fx, fx_list)
+		fx->Apply(buf, &fake_track, false);
 }
 
 void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t)
@@ -232,12 +232,12 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 	range = _range;
 	loop = loop_if_allowed && allow_loop;
 	pos = range.offset;
-	foreach(Effect &fx, a->fx)
-		fx.Prepare();
+	foreach(Effect *fx, a->fx)
+		fx->Prepare();
 	foreach(Track *t, a->track){
 		t->synth->Reset();
-		foreach(Effect &fx, t->fx)
-			fx.Prepare();
+		foreach(Effect *fx, t->fx)
+			fx->Prepare();
 	}
 	if (effect)
 		effect->Prepare();
@@ -246,11 +246,11 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 void AudioRenderer::CleanUp()
 {
 	msg_db_f("Renderer.CleanUp", 2);
-	foreach(Effect &fx, audio->fx)
-		fx.CleanUp();
+	foreach(Effect *fx, audio->fx)
+		fx->CleanUp();
 	foreach(Track *t, audio->track)
-		foreach(Effect &fx, t->fx)
-			fx.CleanUp();
+		foreach(Effect *fx, t->fx)
+			fx->CleanUp();
 	if (effect)
 		effect->CleanUp();
 }

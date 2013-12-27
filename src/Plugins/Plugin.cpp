@@ -10,6 +10,7 @@
 #include "../lib/script/script.h"
 #include "../lib/math/math.h"
 #include "PluginManager.h"
+#include "Effect.h"
 #include "../Stuff/Log.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 

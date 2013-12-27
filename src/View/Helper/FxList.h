@@ -26,7 +26,7 @@ public:
 	void OnEdit();
 	void OnDelete();
 
-	bool UpdateEffectParams(Effect &f);
+	bool UpdateEffectParams(Effect *f);
 	void AddNewEffect(string &filename);
 	void ExecuteFXDialog(int index);
 
@@ -40,7 +40,7 @@ public:
 
 	AudioFile *audio;
 	Track *track;
-	Array<Effect> *fx;
+	Array<Effect*> *fx;
 };
 
 #endif /* FXLIST_H_ */

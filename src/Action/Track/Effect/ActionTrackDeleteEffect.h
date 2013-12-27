@@ -22,7 +22,7 @@ public:
 	virtual void undo(Data *d);
 
 private:
-	Effect effect;
+	Effect *effect;
 	int track_no;
 	int index;
 };

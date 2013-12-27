@@ -16,6 +16,8 @@ class Script;
 class Type;
 };
 
+class EffectParam;
+
 // represents a compiled script
 class Plugin
 {

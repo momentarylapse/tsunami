@@ -193,8 +193,8 @@ void WriteTrack(CFile *f, Track *t)
 	foreach(SampleRef *s, t->sample)
 		WriteSampleRef(f, s);
 
-	foreach(Effect &effect, t->fx)
-		WriteEffect(f, &effect);
+	foreach(Effect *effect, t->fx)
+		WriteEffect(f, effect);
 
 	if ((t->midi.num > 0) || (t->type == t->TYPE_MIDI)){
 		if (t->synth){
@@ -246,8 +246,8 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
 
-	foreach(Effect &effect, a->fx)
-		WriteEffect(f, &effect);
+	foreach(Effect *effect, a->fx)
+		WriteEffect(f, effect);
 
 	EndChunk(f);
 
@@ -280,7 +280,7 @@ void ReadCompressed(CFile *f, char *data, int size)
 	}
 }
 
-void ReadFXListOld(CFile *f, Array<Effect> &fx)
+void ReadFXListOld(CFile *f, Array<Effect*> &fx)
 {
 	// reset old params....???
 	fx.clear();
@@ -289,11 +289,11 @@ void ReadFXListOld(CFile *f, Array<Effect> &fx)
 		return;
 	}
 	for (int i=0;i<n;i++){
-		Effect e;
-		e.name = f->ReadStr();
-		e.only_on_selection = false;
-		e.range.offset = 0;
-		e.range.num = -1;
+		Effect *e = new Effect;
+		e->name = f->ReadStr();
+		e->only_on_selection = false;
+		e->range.offset = 0;
+		e->range.num = -1;
 		int num_params = f->ReadInt();
 		for (int j=0;j<num_params;j++){
 			EffectParam p;
@@ -302,13 +302,13 @@ void ReadFXListOld(CFile *f, Array<Effect> &fx)
 			p.type = "float";
 			float val = f->ReadFloat();
 			p.value = f2s(val, 6);
-			e.param.add(p);
+			e->param.add(p);
 		}
 		fx.add(e);
 	}
 }
 
-void ReadFXList(CFile *f, Array<Effect> &fx)
+void ReadFXList(CFile *f, Array<Effect*> &fx)
 {
 	// reset old params....???
 	fx.clear();
@@ -317,18 +317,18 @@ void ReadFXList(CFile *f, Array<Effect> &fx)
 		return;
 	}
 	for (int i=0;i<n;i++){
-		Effect e;
-		e.name = f->ReadStr();
-		e.only_on_selection = f->ReadBool();
-		e.range.offset = f->ReadInt();
-		e.range.num = f->ReadInt();
+		Effect *e = new Effect;
+		e->name = f->ReadStr();
+		e->only_on_selection = f->ReadBool();
+		e->range.offset = f->ReadInt();
+		e->range.num = f->ReadInt();
 		int num_params = f->ReadInt();
 		for (int j=0;j<num_params;j++){
 			EffectParam p;
 			p.name = f->ReadStr();
 			p.type = f->ReadStr();
 			p.value = f->ReadStr();
-			e.param.add(p);
+			e->param.add(p);
 		}
 		fx.add(e);
 	}
@@ -480,7 +480,7 @@ void load_nami_file_old(CFile *f, AudioFile *a)
 				}
 				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
 				if (ffv == 3){
-					Array<Effect> _fx;
+					Array<Effect*> _fx;
 					ReadFXListOld(f, _fx);
 				}
 			}

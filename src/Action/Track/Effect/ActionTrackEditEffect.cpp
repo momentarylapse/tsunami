@@ -9,11 +9,11 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, Effect &_effect)
+ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, Array<EffectParam> &_params)
 {
 	track_no = get_track_index(t);
 	index = _index;
-	effect = _effect;
+	params = _params;
 }
 
 ActionTrackEditEffect::~ActionTrackEditEffect()
@@ -30,15 +30,15 @@ void *ActionTrackEditEffect::execute(Data *d)
 		assert(t);
 		assert(index < t->fx.num);
 
-		Effect temp = effect;
-		effect = t->fx[index];
-		t->fx[index] = temp;
+		Array<EffectParam> temp = params;
+		params = t->fx[index]->param;
+		t->fx[index]->param = temp;
 	}else{
 		assert(index < a->fx.num);
 
-		Effect temp = effect;
-		effect = a->fx[index];
-		a->fx[index] = temp;
+		Array<EffectParam> temp = params;
+		params = a->fx[index]->param;
+		a->fx[index]->param = temp;
 	}
 
 	return NULL;

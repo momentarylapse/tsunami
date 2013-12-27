@@ -8,7 +8,7 @@
 #include "ActionTrackAddEffect.h"
 #include "../../../Data/Track.h"
 
-ActionTrackAddEffect::ActionTrackAddEffect(Track *t, Effect &_effect)
+ActionTrackAddEffect::ActionTrackAddEffect(Track *t, Effect *_effect)
 {
 	track_no = get_track_index(t);
 	effect = _effect;

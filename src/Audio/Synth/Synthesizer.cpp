@@ -165,7 +165,9 @@ Synthesizer *CreateSynthesizer(const string &name)
 		return s;
 	}
 	tsunami->log->Error(_("unbekannter Synthesizer: ") + name);
-	return new DummySynthesizer;
+	s = new DummySynthesizer;
+	s->name = name;
+	return s;
 }
 
 Array<string> FindSynthesizers()

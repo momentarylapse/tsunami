@@ -2,28 +2,34 @@
 // Title[Deutsch] = Oktavieren
 use "../../api.kaba"
 
-ConfigDialog *dlg
-
 class PluginData
 	float Level
-PluginData data
 
-void ResetData()
-	data.Level = 0.5
+class Octaver : AudioEffect	
+	ConfigDialog *dlg
+	PluginData config
 
-void DataToDialog()
-	dlg.fill()
+	overwrite void ResetConfig()
+		config.Level = 0.5
 
-void DoOctaver(float b[])
-	for int i, 0, b.num
-		b[i] = (b[i] * b[i]) * data.Level + b[i] * (1 - data.Level)
+	overwrite void UpdateDialog()
+		dlg.fill()
 
-void ProcessTrack(BufferBox buf)
-	DoOctaver(buf.r)
-	DoOctaver(buf.l)
+	void DoOctaver(float b[])
+		for int i, 0, b.num
+			b[i] = (b[i] * b[i]) * config.Level + b[i] * (1 - config.Level)
+
+	overwrite void ProcessTrack(BufferBox buf)
+		DoOctaver(buf.r)
+		DoOctaver(buf.l)
+
+	overwrite void Configure()
+		dlg = new ConfigDialog(self)
+		dlg.Run()
 	
 class ConfigDialog : Dialog
-	void __init__()
+	Octaver *o
+	void __init__(Octaver *_o)
 		super.__init__("Octaver", 305, 60, MainWin, false)
 		AddGrid("", 0, 0, 1, 2, "table1")
 		SetTarget("table1", 0)
@@ -33,15 +39,12 @@ class ConfigDialog : Dialog
 		AddSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "level")
 		AddText("%", 2, 0, 0, 0, "")
 		PutCommandBar(self, "table1", 0, 1)
-		CreateSliderM(self, "level_slider", "level", 0, 1, 100, &OnLevel, data.Level)
+		o = _o
+		CreateSliderM(self, "level_slider", "level", 0, 1, 100, &OnLevel, o.config.Level)
 	
 		fill()
 	void fill()
-		SliderSet(self, "level", data.Level)
+		SliderSet(self, "level", o.config.Level)
 
 	void OnLevel()
-		data.Level = SliderGet(self, "level")
-
-void Configure()
-	dlg = new ConfigDialog
-	dlg.Run()
+		o.config.Level = SliderGet(self, "level")

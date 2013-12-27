@@ -127,14 +127,20 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("EffectParam", "type", offsetof(EffectParam, type));
 	Script::DeclareClassOffset("EffectParam", "value", offsetof(EffectParam, value));
 
+	Effect effect;
 	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
 	Script::DeclareClassOffset("AudioEffect", "name", offsetof(Effect, name));
 	Script::DeclareClassOffset("AudioEffect", "param", offsetof(Effect, param));
 	Script::DeclareClassOffset("AudioEffect", "only_on_selection", offsetof(Effect, only_on_selection));
 	Script::DeclareClassOffset("AudioEffect", "range", offsetof(Effect, range));
-	Script::DeclareClassOffset("AudioEffect", "plugin", offsetof(Effect, plugin));
-	Script::DeclareClassOffset("AudioEffect", "state", offsetof(Effect, state));
 	Script::DeclareClassOffset("AudioEffect", "usable", offsetof(Effect, usable));
+	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
+	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "ProcessTrack", Script::mf(&Effect::ProcessTrack), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "Configure", Script::mf(&Effect::Configure), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "ResetConfig", Script::mf(&Effect::ResetConfig), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "ResetState", Script::mf(&Effect::ResetState), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "UpdateDialog", Script::mf(&Effect::UpdateDialog), &effect);
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
 	Script::DeclareClassOffset("BufferBox", "offset", offsetof(BufferBox, offset));
@@ -387,8 +393,8 @@ void SynthLoadDataFromFile(Synthesizer *s, const string &name)
 void PluginManager::OnFavoriteList()
 {
 	int n = HuiCurWindow->GetInt("");
-	if (cur_plugin)
-		cur_plugin->ResetData();
+	if (cur_effect)
+		cur_effect->ResetConfig();
 	else if (cur_synth)
 		cur_synth->ResetConfig();
 	if (n == 0){
@@ -397,14 +403,14 @@ void PluginManager::OnFavoriteList()
 		HuiCurWindow->Enable("favorite_delete", false);
 	}else{
 		if (cur_effect)
-			cur_effect->LoadDataFromFile(PluginFavoriteName[n - 1]);
+			cur_effect->LoadConfigFromFile(PluginFavoriteName[n - 1]);
 		else if (cur_synth)
 			SynthLoadDataFromFile(cur_synth, PluginFavoriteName[n - 1]);
 		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		HuiCurWindow->Enable("favorite_delete", true);
 	}
-	if (cur_plugin)
-		cur_plugin->DataToDialog();
+	if (cur_effect)
+		cur_effect->UpdateDialog();
 	else if (cur_synth)
 		cur_synth->DataToDialog();
 }
@@ -413,7 +419,7 @@ void PluginManager::OnFavoriteSave()
 {
 	string name = HuiCurWindow->GetString("favorite_name");
 	if (cur_effect){
-		cur_effect->WriteDataToFile(name);
+		cur_effect->WriteConfigToFile(name);
 	}else if (cur_synth){
 		SynthWriteDataToFile(cur_synth, name);
 	}
@@ -503,25 +509,25 @@ void PluginManager::OnPluginFavoriteList()
 		return;
 	HuiWindow *win = HuiGetEvent()->win;
 	int n = win->GetInt("");
-	cur_plugin->ResetData();
+	cur_effect->ResetConfig();
 	if (n == 0){
 		win->SetString("favorite_name", "");
 		win->Enable("favorite_save", false);
 		win->Enable("favorite_delete", false);
 	}else{
-		cur_effect->LoadDataFromFile(PluginFavoriteName[n - 1]);
+		cur_effect->LoadConfigFromFile(PluginFavoriteName[n - 1]);
 		win->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		win->Enable("favorite_delete", true);
 	}
-	cur_plugin->DataToDialog();
+	cur_effect->UpdateDialog();
 }
 
 void PluginManager::OnPluginFavoriteSave()
 {
-	if (!cur_plugin)
+	if (!cur_effect)
 		return;
 	HuiWindow *win = HuiGetEvent()->win;
-	cur_effect->WriteDataToFile(win->GetString("favorite_name"));
+	cur_effect->WriteConfigToFile(win->GetString("favorite_name"));
 	PluginFavoriteName.add(win->GetString("favorite_name"));
 	win->AddString("favorite_list", win->GetString("favorite_name"));
 	win->SetInt("favorite_list", PluginFavoriteName.num);
@@ -534,6 +540,7 @@ void PluginManager::OnPluginOk()
 		cur_synth->options_to_string();
 	}
 	PluginCancelled = false;
+	cur_effect = NULL;
 	cur_plugin = NULL;
 	cur_synth = NULL;
 	delete(HuiCurWindow);
@@ -545,6 +552,7 @@ void PluginManager::OnPluginClose()
 		cur_synth->options_from_string();
 	}
 	PluginCancelled = true;
+	cur_effect = NULL;
 	cur_plugin = NULL;
 	cur_synth = NULL;
 	delete(HuiCurWindow);
@@ -670,36 +678,47 @@ void PluginManager::ExecutePlugin(const string &filename)
 
 		AudioFile *a = tsunami->audio;
 
+		Effect *fx = NULL;
+		foreach(Script::Type *t, s->syntax->Types){
+			Script::Type *r = t;
+			while (r->parent)
+				r = r->parent;
+			if (r->name != "AudioEffect")
+				continue;
+			fx = (Effect*)t->CreateInstance();
+			break;
+		}
+
 		// run
-		p->ResetData();
-		if (p->Configure(true)){
-			main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
-			main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
-			if (p->type == Plugin::TYPE_EFFECT){
+		if (fx){
+			fx->ResetConfig();
+			if (fx->DoConfigure(true)){
+				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
+				main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				if (a->used){
-					p->ResetState();
+					fx->ResetState();
 					Range range = a->selection;
 					if (range.empty())
 						range = a->GetRange();
 					a->action_manager->BeginActionGroup();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
-							p->ProcessTrack(t, tsunami->view->cur_level, range);
+							fx->DoProcessTrack(t, tsunami->view->cur_level, range);
 						}
 					a->action_manager->EndActionGroup();
 				}else{
 					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 				}
-			}else if (f_audio){
-				if (a->used)
-					f_audio(a);
-				else
-					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
-			}else if (f_void){
-
-				f_void();
 			}
-		}
+			delete(fx);
+		}/*else if (f_audio){
+			if (a->used)
+				f_audio(a);
+			else
+				tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
+		}else if (f_void){
+			f_void();
+		}*/
 
 		// data changed?
 		FinishPluginData();
@@ -734,7 +753,7 @@ Plugin *PluginManager::GetPlugin(const string &name)
 void PluginManager::Preview(Effect *fx)
 {
 	if (fx)
-		fx->ExportData();
+		fx->ExportConfig();
 	tsunami->renderer->effect = fx;
 
 
@@ -755,7 +774,28 @@ void PluginManager::Preview(Effect *fx)
 
 	tsunami->renderer->effect = NULL;
 	if (fx)
-		fx->ImportData();
+		fx->ImportConfig();
+}
+
+Effect *PluginManager::LoadEffect(const string &name)
+{
+	foreach(PluginFile &pf, plugin_file){
+		if (pf.name == name){
+			if (!LoadAndCompilePlugin(pf.filename))
+				return NULL;
+		}
+	}
+
+	Script::Script *s = cur_plugin->s;
+	foreach(Script::Type *t, s->syntax->Types){
+		Script::Type *r = t;
+		while (r->parent)
+			r = r->parent;
+		if (r->name != "AudioEffect")
+			continue;
+		return (Effect*)t->CreateInstance();
+	}
+	return NULL;
 }
 
 

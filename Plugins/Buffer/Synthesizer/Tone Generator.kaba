@@ -10,32 +10,45 @@ class PluginData
 	float Frequency
 	float Volume
 
-PluginData data
+class ToneGenerator : AudioEffect
+	PluginData config
+	ConfigDialog *dlg
+	DummySynthesizer synth
 
-DummySynthesizer synth
+	overwrite void ProcessTrack(BufferBox buf)
+		AudioFile *a = audio
+		synth.sample_rate = a.sample_rate
+		Range r
+		r.offset = 0
+		r.length = buf.num
+		synth.RenderNote(buf, r, freq_to_pitch(config.Frequency), config.Volume)
 
-ConfigDialog *dlg
+		/*float f = config.Frequency
 
-void ProcessTrack(BufferBox buf)
-	AudioFile *a = audio
-	synth.sample_rate = a.sample_rate
-	Range r
-	r.offset = 0
-	r.length = buf.num
-	synth.RenderNote(buf, r, freq_to_pitch(data.Frequency), data.Volume)
+		float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
 
-	/*float f = data.Frequency
+		for int i, 0, buf.num
+			float tt = i * w_f
+			float d = sin(tt) * config.Volume
+			buf.r[i] = clamp(buf.r[i] + d, -1, 1)
+			buf.l[i] = clamp(buf.l[i] + d, -1, 1)*/
+	
+	
+	overwrite void UpdateDialog()
+		dlg.fill()
 
-	float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
+	overwrite void ResetConfig()
+		config.Pitch = 81
+		config.Volume = 0.3
+		config.Frequency = pitch_to_freq(config.Pitch)
 
-	for int i, 0, buf.num
-		float tt = i * w_f
-		float d = sin(tt) * data.Volume
-		buf.r[i] = clamp(buf.r[i] + d, -1, 1)
-		buf.l[i] = clamp(buf.l[i] + d, -1, 1)*/
+	overwrite void Configure()
+		dlg = new ConfigDialog(self)
+		dlg.Run()
 
 class ConfigDialog : Dialog
-	void __init__()
+	ToneGenerator *t
+	void __init__(ToneGenerator *_t)
 		super.__init__("Ton Generator", 420, 135, MainWin, false)
 		AddGrid("", 0, 0, 1, 2, "table1")
 		SetTarget("table1", 0)
@@ -57,12 +70,14 @@ class ConfigDialog : Dialog
 		AddSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "volume")
 		
 		PutCommandBar(self, "table1", 0, 1)
+		
+		t = _t
 	
 		Reset("pitch_rel")
 		for int i, 0, 12
 			SetString("pitch_rel", rel_pitch_name(i))
 	
-		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
+		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, t.config.Volume)
 		EventM("pitch_rel", &OnPitch)
 		EventM("octave", &OnPitch)
 		EventM("frequency",  &OnFrequency)
@@ -72,55 +87,42 @@ class ConfigDialog : Dialog
 		fill()
 
 	void OnFrequency()
-		data.Pitch = -1
-		data.Frequency = GetFloat("")
+		t.config.Pitch = -1
+		t.config.Frequency = GetFloat("")
 
 	void ReadPitchFromDialog()
-		data.Pitch = pitch_from_octave_and_rel(GetInt("pitch_rel"),
-		                                       GetInt("octave"))
+		t.config.Pitch = pitch_from_octave_and_rel(GetInt("pitch_rel"),
+		                                           GetInt("octave"))
 
 	void OnPitch()
 		ReadPitchFromDialog()
-		data.Frequency = pitch_to_freq(data.Pitch)
-		SetFloat("frequency", data.Frequency)
+		t.config.Frequency = pitch_to_freq(t.config.Pitch)
+		SetFloat("frequency", t.config.Frequency)
 
 	void OnVolume()
-		data.Volume = SliderGet(self, "volume")
+		t.config.Volume = SliderGet(self, "volume")
 
 	void fill()
-		bool by_pitch = data.Pitch >= 0
+		bool by_pitch = t.config.Pitch >= 0
 		if by_pitch
-			SetInt("pitch_rel", data.Pitch % 12)
-			SetInt("octave", pitch_get_octave(data.Pitch))
+			SetInt("pitch_rel", t.config.Pitch % 12)
+			SetInt("octave", pitch_get_octave(t.config.Pitch))
 			Check("type:pitch", true)
 		else
 			Check("type:freq", true)
-		SetFloat("frequency", data.Frequency)
-		SliderSet(self, "volume", data.Volume)
+		SetFloat("frequency", t.config.Frequency)
+		SliderSet(self, "volume", t.config.Volume)
 
 		Enable("frequency", !by_pitch)
 		Enable("octave", by_pitch)
 		Enable("pitch_rel", by_pitch)
 
 	void OnTypeFreq()
-		data.Pitch = -1
+		t.config.Pitch = -1
 		fill()
 
 	void OnTypePitch()
 		ReadPitchFromDialog()
-		data.Frequency = pitch_to_freq(data.Pitch)
+		t.config.Frequency = pitch_to_freq(t.config.Pitch)
 		fill()
-	
-	
-void DataToDialog()
-	dlg.fill()
-
-void ResetData()
-	data.Pitch = 81
-	data.Volume = 0.3
-	data.Frequency = pitch_to_freq(data.Pitch)
-
-void Configure()
-	dlg = new ConfigDialog
-	dlg.Run()
 

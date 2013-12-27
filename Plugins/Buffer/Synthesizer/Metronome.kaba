@@ -9,54 +9,62 @@ class PluginData
 	float Volume
 	int BeatsPerMeasure
 
-PluginData data
 
 class PluginState
 	int beat
 	int dpos
 
-PluginState state
 
 DummySynthesizer synth
 
-ConfigDialog *dlg
 
-void ProcessTrack(BufferBox buf)
-	AudioFile *a = audio
+class Metronome : AudioEffect
+	PluginState state
+	PluginData config
+	ConfigDialog *dlg
 
-	float dt_m = 60.0 / data.BeatsPerMinute
-	int sm_m = dt_m * a.sample_rate
+	overwrite void ProcessTrack(BufferBox buf)
+		AudioFile *a = audio
+
+		float dt_m = 60.0 / config.BeatsPerMinute
+		int sm_m = dt_m * a.sample_rate
 	
-	synth.sample_rate = a.sample_rate
+		synth.sample_rate = a.sample_rate
 
-	while true
-		if state.beat == 0
-			synth.RenderMetronomeClick(buf, state.dpos, 0, data.Volume)
-		else
-			synth.RenderMetronomeClick(buf, state.dpos, 1, data.Volume)
+		while true
+			if state.beat == 0
+				synth.RenderMetronomeClick(buf, state.dpos, 0, config.Volume)
+			else
+				synth.RenderMetronomeClick(buf, state.dpos, 1, config.Volume)
 		
-		state.beat ++
-		if state.beat >= data.BeatsPerMeasure
-			state.beat = 0
-		state.dpos += sm_m
-		if state.dpos >= buf.num
-			state.dpos -= buf.num
-			break
+			state.beat ++
+			if state.beat >= config.BeatsPerMeasure
+				state.beat = 0
+			state.dpos += sm_m
+			if state.dpos >= buf.num
+				state.dpos -= buf.num
+				break
 
-void ResetState()
-	state.beat = 0
-	state.dpos = 0
+	overwrite void ResetState()
+		state.beat = 0
+		state.dpos = 0
 
-void ResetData()
-	data.Volume = 0.3
-	data.BeatsPerMinute = 90
-	data.BeatsPerMeasure = 4
+	overwrite void ResetConfig()
+		config.Volume = 0.3
+		config.BeatsPerMinute = 90
+		config.BeatsPerMeasure = 4
 
-void DataToDialog()
-	dlg.fill()
+	overwrite void UpdateDialog()
+		dlg.fill()
+		
+	overwrite void Configure()
+		dlg = new ConfigDialog(self)
+		dlg.Run()
+
 	
 class ConfigDialog : Dialog
-	void __init__()
+	Metronome *m
+	void __init__(Metronome *_m)
 		super.__init__("Metronom", 305, 135, MainWin, false)
 		AddGrid("", 0, 0, 1, 2, "table1")
 		SetTarget("table1", 0)
@@ -75,26 +83,24 @@ class ConfigDialog : Dialog
 		EventM("beats_per_minute", &OnMetroBeats)
 		EventM("beats_per_measure", &OnMetroMeasure)
 		EventM("volume", &OnMetroVolume)
+		
+		m = _m
 	
 		fill()
 
 	void fill()
-		SetFloat("beats_per_minute", data.BeatsPerMinute)
-		SetInt("beats_per_measure", data.BeatsPerMeasure)
-		SetFloat("volume", data.Volume * 100)
-		//SliderSet(self, "volume", data.Volume)
+		SetFloat("beats_per_minute", m.config.BeatsPerMinute)
+		SetInt("beats_per_measure", m.config.BeatsPerMeasure)
+		SetFloat("volume", m.config.Volume * 100)
+		//SliderSet(self, "volume", m.config.Volume)
 
 	void OnMetroBeats()
-		data.BeatsPerMinute = GetFloat("")
+		m.config.BeatsPerMinute = GetFloat("")
 
 	void OnMetroMeasure()
-		data.BeatsPerMeasure = GetInt("")
+		m.config.BeatsPerMeasure = GetInt("")
 
 	void OnMetroVolume()
-		data.Volume = GetFloat("") / 100
-		//data.Volume = SliderGet(self, "volume")
-
-void Configure()
-	dlg = new ConfigDialog
-	dlg.Run()
+		m.config.Volume = GetFloat("") / 100
+		//m.config.Volume = SliderGet(self, "volume")
 

@@ -3,40 +3,54 @@
 
 use "../../api.kaba"
 
-ConfigDialog *dlg
-
-complex buf1[]
-complex buf2[]
-
 class PluginData
 	float Pitch
 
-PluginData data
 
-void ResetData()
-	data.Pitch = 1
+class PitchShift : AudioEffect
+	PluginData config
 
-void DataToDialog()
-	dlg.fill()
+	ConfigDialog *dlg
 
-void shift_buf(float b[])
-	int i, j
-	fft_r2c(b, buf1)
-	float f = 1.0 / b.num
-	int ll = b.num / 2
-	buf2.resize(ll)
-	for i, 0, ll
-		float i_s = i2f(i) / data.Pitch
-		int ii_s = f2i(i_s)
-		float di_s = i_s - i2f(ii_s)
-		if i < ll and ii_s < ll
-			buf2[i] = f*(buf1[ii_s])// * (1 - di_s) + buf[ii_s + 1] * di_s)
-		else
-			buf2[i] = complex(0, 0)
-	fft_c2r_inv(buf2, b)
+	complex buf1[]
+	complex buf2[]
+
+	overwrite void ResetConfig()
+		config.Pitch = 1
+
+	overwrite void UpdateDialog()
+		dlg.fill()
+
+	void shift_buf(float b[])
+		int i, j
+		fft_r2c(b, buf1)
+		float f = 1.0 / b.num
+		int ll = b.num / 2
+		buf2.resize(ll)
+		for i, 0, ll
+			float i_s = i2f(i) / config.Pitch
+			int ii_s = f2i(i_s)
+			float di_s = i_s - i2f(ii_s)
+			if i < ll and ii_s < ll
+				buf2[i] = f*(buf1[ii_s])// * (1 - di_s) + buf[ii_s + 1] * di_s)
+			else
+				buf2[i] = complex(0, 0)
+		fft_c2r_inv(buf2, b)
+
+	overwrite void Configure()
+		dlg = new ConfigDialog(self)
+		dlg.Run()
+
+	overwrite void ProcessTrack(BufferBox buf)
+		shift_buf(buf.r)
+		shift_buf(buf.l)
+		buf1.clear()
+		buf2.clear()
+
 
 class ConfigDialog : Dialog
-	void __init__()
+	PitchShift *p
+	void __init__(PitchShift *_p)
 		super.__init__("Pitch Shift", 305, 75, MainWin, false)
 		AddGrid("", 0, 0, 1, 2, "table1")
 		SetTarget("table1", 0)
@@ -46,23 +60,14 @@ class ConfigDialog : Dialog
 		AddSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "pitch")
 		AddText("%", 2, 0, 0, 0, "")
 		PutCommandBar(self, "table1", 0, 1)
-		CreateSliderM(self, "pitch_slider", "pitch", 0, 2, 100, &OnPitch, data.Pitch)
+		p = _p
+		CreateSliderM(self, "pitch_slider", "pitch", 0, 2, 100, &OnPitch, p.config.Pitch)
 		
 		fill()
 	
 	void fill()
-		SliderSet(self, "pitch", data.Pitch)
+		SliderSet(self, "pitch", p.config.Pitch)
 
 	void OnPitch()
-		data.Pitch = SliderGet(self, "pitch")
-
-void Configure()
-	dlg = new ConfigDialog
-	dlg.Run()
-
-void ProcessTrack(BufferBox buf)
-	shift_buf(buf.r)
-	shift_buf(buf.l)
-	buf1.clear()
-	buf2.clear()
+		p.config.Pitch = SliderGet(self, "pitch")
 

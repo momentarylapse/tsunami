@@ -2,6 +2,7 @@
 // Title[Deutsch] = Kanäle L -> R
 use "../../api.kaba"
 
-void ProcessTrack(BufferBox buf)
-	buf.r = buf.l
+class LToR : AudioEffect
+	overwrite void ProcessTrack(BufferBox buf)
+		buf.r = buf.l
 

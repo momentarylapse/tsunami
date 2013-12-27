@@ -4,21 +4,41 @@
 use "../../api.kaba"
 
 
-VolumeDialog *dlg
-
 class PluginData
 	float Volume
 	bool Maximize
-PluginData data
 
-void ResetData()
-	data.Volume = 1
+class Volume : AudioEffect
+	VolumeDialog *dlg
+	PluginData config
 
-void DataToDialog()
-	dlg.fill()
+	overwrite void ResetConfig()
+		config.Volume = 1
+
+	overwrite void UpdateDialog()
+		dlg.fill()
+
+	overwrite void Configure()
+		dlg = new VolumeDialog(self)
+		dlg.Run()
+
+	overwrite void ProcessTrack(BufferBox buf)
+		float factor = config.Volume
+		if config.Maximize
+			float max = 0
+			for int i, 0, buf.num
+				if abs(buf.r[i]) > max
+					max = abs(buf.r[i])
+				if abs(buf.l[i]) > max
+					max = abs(buf.l[i])
+			factor = 1 / max
+		for int i, 0, buf.num
+			buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
+			buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
 	
 class VolumeDialog : Dialog
-	void __init__()
+	Volume *v
+	void __init__(Volume *_v)
 		super.__init__("Lautstärke", 305, 105, MainWin, false)
 		AddGrid("", 0, 0, 1, 3, "table1")
 		SetTarget("table1", 0)
@@ -29,41 +49,26 @@ class VolumeDialog : Dialog
 		AddSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
 		AddText("%", 2, 0, 0, 0, "")
 		PutCommandBar(self, "table1", 0, 2)
-		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &OnVolume, data.Volume)
+		
+		v = _v
+		
+		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &OnVolume, v.config.Volume)
 	
 		EventM("max", &OnMax)
 		
 		fill()
 
 	void fill()
-		SliderSet(self, "volume", data.Volume)
-		Check("max", data.Maximize)
-		Enable("volume", !data.Maximize)
-		Enable("volume_slider", !data.Maximize)
+		SliderSet(self, "volume", v.config.Volume)
+		Check("max", v.config.Maximize)
+		Enable("volume", !v.config.Maximize)
+		Enable("volume_slider", !v.config.Maximize)
 
 	void OnMax()
-		data.Maximize = IsChecked("max")
-		Enable("volume", !data.Maximize)
-		Enable("volume_slider", !data.Maximize)
+		v.config.Maximize = IsChecked("max")
+		Enable("volume", !v.config.Maximize)
+		Enable("volume_slider", !v.config.Maximize)
 
 	void OnVolume()
-		data.Volume = SliderGet(self, "volume")
-
-void Configure()
-	dlg = new VolumeDialog
-	dlg.Run()
-
-void ProcessTrack(BufferBox buf)
-	float factor = data.Volume
-	if data.Maximize
-		float max = 0
-		for int i, 0, buf.num
-			if abs(buf.r[i]) > max
-				max = abs(buf.r[i])
-			if abs(buf.l[i]) > max
-				max = abs(buf.l[i])
-		factor = 1 / max
-	for int i, 0, buf.num
-		buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
-		buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
+		v.config.Volume = SliderGet(self, "volume")
 

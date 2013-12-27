@@ -30,9 +30,14 @@ class AudioEffect
 	EffectParam param[]
 	bool only_on_selection
 	Range range
-	void *plugin
-	void *state
 	bool usable
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual void ProcessTrack(BufferBox buf)
+	extern virtual void ResetConfig()
+	extern virtual void ResetState()
+	extern virtual void Configure()
+	extern virtual void UpdateDialog()
 
 class BufferBox
 	int offset, num

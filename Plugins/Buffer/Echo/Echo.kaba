@@ -5,47 +5,78 @@ use "../../api.kaba"
 
 bool not_first_time
 
-DelayDialog *dlg
 
 class PluginData
 	float Delay
 	float Volume
 	float Feedback
 
-PluginData data
 
 class PluginState
 	float buf_r[], buf_l[]
 	int offset
 
-PluginState state
+class Echo : AudioEffect
+	PluginData config
+	PluginState state
+	DelayDialog *dlg
 
-void ResetState()
-	state.buf_r.clear()
-	state.buf_l.clear()
-	state.offset = 0
+	overwrite void ResetState()
+		state.buf_r.clear()
+		state.buf_l.clear()
+		state.offset = 0
 
 
-void DoDelay(float b[], float d[])
-	int p = state.offset % d.num
-	for int i, 0, b.num
+	void DoDelay(float b[], float d[])
+		int p = state.offset % d.num
+		for int i, 0, b.num
 	
-		// old value
-		float b0 = b[i]
+			// old value
+			float b0 = b[i]
 		
-		// add echo
-		b[i] = b[i] + d[p] * data.Volume
-		//clampf(b[i], -1, 1)
+			// add echo
+			b[i] = b[i] + d[p] * config.Volume
+			//clampf(b[i], -1, 1)
 		
-		// add to echo
-		d[p] = b0 + d[p] * data.Feedback
+			// add to echo
+			d[p] = b0 + d[p] * config.Feedback
 		
-		p ++
-		if p >= d.num
-			p = 0
+			p ++
+			if p >= d.num
+				p = 0
+
+
+
+	overwrite void UpdateDialog()
+		dlg.fill()
+
+	overwrite void Configure()
+		// dialog
+		dlg = new DelayDialog(self)
+		dlg.Run()
+
+	overwrite void ResetConfig()
+		config.Volume = 0.2
+		config.Feedback = 0.5
+		config.Delay = 0.15
+
+	overwrite void ProcessTrack(BufferBox buf)
+
+		AudioFile *a = audio
+		int delay_samples = a.sample_rate * config.Delay
+		state.buf_r.resize(delay_samples)
+		state.buf_l.resize(delay_samples)
+	
+		DoDelay(buf.r, state.buf_r)
+		DoDelay(buf.l, state.buf_l)
+	
+		state.offset += buf.num
+					
+
 	
 class DelayDialog : Dialog
-	void __init__()
+	Echo *e
+	void __init__(Echo *_e)
 		super.__init__("Echo", 395, 175, MainWin, false)
 		AddGrid("", 0, 0, 1, 3, "table1")
 		SetTarget("table1", 0)
@@ -65,50 +96,26 @@ class DelayDialog : Dialog
 		AddText("Feedback", 0, 2, 0, 0, "")
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 2)
+		
+		e = _e
 	
-		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &OnVolume, data.Volume)
-		CreateSliderM(self, "feedback_slider", "feedback", 0, 1, 100, &OnFeedback, data.Feedback)
-		CreateSliderM(self, "delay_slider", "delay", 0, 1, 1000, &OnDelay, data.Delay)
+		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &OnVolume, e.config.Volume)
+		CreateSliderM(self, "feedback_slider", "feedback", 0, 1, 100, &OnFeedback, e.config.Feedback)
+		CreateSliderM(self, "delay_slider", "delay", 0, 1, 1000, &OnDelay, e.config.Delay)
 	
 		fill()
 		
 	void fill()
-		SliderSet(self, "volume", data.Volume)
-		SliderSet(self, "feedback", data.Feedback)
-		SliderSet(self, "delay", data.Delay)
+		SliderSet(self, "volume", e.config.Volume)
+		SliderSet(self, "feedback", e.config.Feedback)
+		SliderSet(self, "delay", e.config.Delay)
 		
 	void OnVolume()
-		data.Volume = SliderGet(self, "volume")
+		e.config.Volume = SliderGet(self, "volume")
 
 	void OnFeedback()
-		data.Feedback = SliderGet(self, "feedback")
+		e.config.Feedback = SliderGet(self, "feedback")
 
 	void OnDelay()
-		data.Delay = SliderGet(self, "delay")
-
-void DataToDialog()
-	dlg.fill()
-
-void Configure()
-	// dialog
-	dlg = new DelayDialog
-	dlg.Run()
-
-void ResetData()
-	data.Volume = 0.2
-	data.Feedback = 0.5
-	data.Delay = 0.15
-
-void ProcessTrack(BufferBox buf)
-
-	AudioFile *a = audio
-	int delay_samples = a.sample_rate * data.Delay
-	state.buf_r.resize(delay_samples)
-	state.buf_l.resize(delay_samples)
-	
-	DoDelay(buf.r, state.buf_r)
-	DoDelay(buf.l, state.buf_l)
-	
-	state.offset += buf.num
-	
+		e.config.Delay = SliderGet(self, "delay")
 

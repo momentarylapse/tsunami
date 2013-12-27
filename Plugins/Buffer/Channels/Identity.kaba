@@ -2,5 +2,6 @@
 
 use "../../api.kaba"
 
-void ProcessTrack(BufferBox buf)
-	nil
+class Identity : AudioEffect
+	overwrite void ProcessTrack(BufferBox buf)
+		nil

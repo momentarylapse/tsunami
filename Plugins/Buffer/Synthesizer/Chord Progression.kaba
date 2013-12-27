@@ -5,40 +5,54 @@ use "../../api.kaba"
 use "../../tone.kaba"
 
 
-class PluginData
+class PluginConfig
 	string Chords
 	float Volume
 	bool DurationByBeats
 	float Duration
 	int Beats
 
-PluginData data
 
-DummySynthesizer synth
+class ChordProgression : AudioEffect
+	PluginConfig config
+	DummySynthesizer synth
+	ConfigDialog *dlg
 
-
-ConfigDialog *dlg
-
-void ProcessTrack(BufferBox buf)
-	Chord chord[]
-	AudioFile *a = audio
-	ParseChords(data.Chords, chord)
+	overwrite void ProcessTrack(BufferBox buf)
+		Chord chord[]
+		AudioFile *a = audio
+		ParseChords(config.Chords, chord)
 	
-	int p0 = a.GetNextBeat(buf.offset)
-	synth.sample_rate = a.sample_rate
+		int p0 = a.GetNextBeat(buf.offset)
+		synth.sample_rate = a.sample_rate
 	
-	for int i, 0, chord.num
-		int pos0 = f2i(a.sample_rate * data.Duration * i2f(i))
-		int pos1 = f2i(a.sample_rate * data.Duration * i2f(i + 1))
-		if data.DurationByBeats
-			pos0 = p0 - buf.offset
-			for int j, 0, data.Beats
-				p0 = a.GetNextBeat(p0)
-			pos1 = p0 - buf.offset
-		AddChord(synth, buf, pos0, pos1, chord[i], data.Volume)
+		for int i, 0, chord.num
+			int pos0 = f2i(a.sample_rate * config.Duration * i2f(i))
+			int pos1 = f2i(a.sample_rate * config.Duration * i2f(i + 1))
+			if config.DurationByBeats
+				pos0 = p0 - buf.offset
+				for int j, 0, config.Beats
+					p0 = a.GetNextBeat(p0)
+				pos1 = p0 - buf.offset
+			AddChord(synth, buf, pos0, pos1, chord[i], config.Volume)
+
+	overwrite void UpdateDialog()
+		dlg.fill()
+
+	overwrite void ResetConfig()
+		config.Volume = 0.2
+		config.Chords = "aeFa"
+		config.DurationByBeats = false
+		config.Duration = 2.0
+		config.Beats = 1
+
+	overwrite void Configure()
+		dlg = new ConfigDialog(self)
+		dlg.Run()
 
 class ConfigDialog : Dialog
-	void __init__()
+	ChordProgression *c
+	void __init__(ChordProgression *_c)
 		super.__init__("Akkord Generator", 415, 185, MainWin, false)
 		AddGrid("", 0, 0, 1, 3, "table1")
 		SetTarget("table1", 0)
@@ -59,8 +73,9 @@ class ConfigDialog : Dialog
 		PutCommandBar(self, "table1", 0, 2)
 		PutFavoriteBar(self, "table1", 0, 0)
 	
+		c = _c
 	
-		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, data.Volume)
+		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, c.config.Volume)
 		EventM("chords", &OnChords)
 		EventM("duration_type:beats", &OnDurationTypeBeats)
 		EventM("duration_type:time", &OnDurationTypeTime)
@@ -70,47 +85,33 @@ class ConfigDialog : Dialog
 		fill()
 	
 	void fill()
-		SetString("chords", data.Chords)
-		SliderSet(self, "volume", data.Volume)
-		Check("duration_by_beats", data.DurationByBeats)
-		SetFloat("duration", data.Duration)
-		SetInt("beats", data.Beats)
-		Enable("duration", !data.DurationByBeats)
-		Enable("beats", data.DurationByBeats)
+		SetString("chords", c.config.Chords)
+		SliderSet(self, "volume", c.config.Volume)
+		Check("duration_by_beats", c.config.DurationByBeats)
+		SetFloat("duration", c.config.Duration)
+		SetInt("beats", c.config.Beats)
+		Enable("duration", !c.config.DurationByBeats)
+		Enable("beats", c.config.DurationByBeats)
 
 	void OnChords()
-		data.Chords = GetString("")
+		c.config.Chords = GetString("")
 
 	void OnVolume()
-		data.Volume = SliderGet(self, "volume")
+		c.config.Volume = SliderGet(self, "volume")
 
 	void OnDurationTypeBeats()
-		data.DurationByBeats = true
+		c.config.DurationByBeats = true
 		Enable("duration", false)
 		Enable("beats", true)
 
 	void OnDurationTypeTime()
-		data.DurationByBeats = false
+		c.config.DurationByBeats = false
 		Enable("duration", true)
 		Enable("beats", false)
 
 	void OnDuration()
-		data.Duration = GetFloat("")
+		c.config.Duration = GetFloat("")
 
 	void OnBeats()
-		data.Beats = GetInt("")
-
-void DataToDialog()
-	dlg.fill()
-
-void ResetData()
-	data.Volume = 0.2
-	data.Chords = "aeFa"
-	data.DurationByBeats = false
-	data.Duration = 2.0
-	data.Beats = 1
-
-void Configure()
-	dlg = new ConfigDialog
-	dlg.Run()
+		c.config.Beats = GetInt("")
 

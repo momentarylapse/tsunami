@@ -2,28 +2,45 @@
 
 use "../../api.kaba"
 
-bool not_first_time
-
-TremoloDialog *dlg
 
 class PluginData
 	float Speed
 	float Depth
 
-PluginData data
+class Tremolo : AudioEffect
 
-void DoTremolo(float b[])
+	PluginData config
+	TremoloDialog *dlg
+
+	void DoTremolo(float b[])
 	
-	float f_c = 1.0 / audio.sample_rate * 2 * pi * data.Speed
+		float f_c = 1.0 / audio.sample_rate * 2 * pi * config.Speed
 	
-	for int i, 0, b.num
-		float f = 1 - (1 + cos(i * f_c)) * data.Depth * 0.5
+		for int i, 0, b.num
+			float f = 1 - (1 + cos(i * f_c)) * config.Depth * 0.5
 	
-		// old value
-		b[i] *= f
+			// old value
+			b[i] *= f
+
+	overwrite void UpdateDialog()
+		dlg.fill()
+
+	overwrite void ResetConfig()
+		config.Depth = 0.5
+		config.Speed = 6
+
+	overwrite void Configure()
+		dlg = new TremoloDialog(self)
+		dlg.Run()
+	
+	overwrite void ProcessTrack(BufferBox buf)
+		
+		DoTremolo(buf.r)
+		DoTremolo(buf.l)
 
 class TremoloDialog : Dialog
-	void __init__()
+	Tremolo *t
+	void __init__(Tremolo *_t)
 		super.__init__("Tremolo", 460, 145, MainWin, false)
 		AddGrid("", 0, 0, 1, 3, "table1")
 		SetTarget("table1", 0)
@@ -40,36 +57,22 @@ class TremoloDialog : Dialog
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 2)
+		
+		t = _t
 	
-		CreateSliderM(self, "speed_slider", "speed", 0, 20,   1,  &OnSpeed, data.Speed)
-		CreateSliderM(self, "depth_slider", "depth", 0, 1,  100,  &OnDepth, data.Depth)
+		CreateSliderM(self, "speed_slider", "speed", 0, 20,   1,  &OnSpeed, t.config.Speed)
+		CreateSliderM(self, "depth_slider", "depth", 0, 1,  100,  &OnDepth, t.config.Depth)
 	
 		fill()
 
 	void OnSpeed()
-		data.Speed = SliderGet(self, "speed")
+		t.config.Speed = SliderGet(self, "speed")
 
 	void OnDepth()
-		data.Depth = SliderGet(self, "depth")
+		t.config.Depth = SliderGet(self, "depth")
 
 	void fill()
-		SliderSet(self, "speed", data.Speed)
-		SliderSet(self, "depth", data.Depth)
-
-void DataToDialog()
-	dlg.fill()
-
-void ResetData()
-	data.Depth = 0.5
-	data.Speed = 6
-
-void Configure()
-	dlg = new TremoloDialog
-	dlg.Run()
-	
-void ProcessTrack(BufferBox buf)
-		
-	DoTremolo(buf.r)
-	DoTremolo(buf.l)
+		SliderSet(self, "speed", t.config.Speed)
+		SliderSet(self, "depth", t.config.Depth)
 	
 

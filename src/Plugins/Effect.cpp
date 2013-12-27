@@ -13,85 +13,94 @@
 #include "../lib/math/math.h"
 #include "../Stuff/Log.h"
 #include "PluginManager.h"
+#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
+// -> PluginManager.cpp
+void GlobalRemoveSliders(HuiWindow *win);
+
+string var_to_string(Script::Type *type, char *v);
+void var_from_string(Script::Type *type, char *v, const string &s, int &pos);
 void try_read_element(EffectParam &p, Script::ClassElement *e, char *v);
 void try_write_element(EffectParam *p, Script::ClassElement *e, char *v);
 
 Effect::Effect()
 {
-	usable = false;
+	usable = true;
 	plugin = NULL;
 	only_on_selection = false;
-	data = NULL;
-	data_type = NULL;
-	state = NULL;
-	state_type = NULL;
 }
 
 Effect::Effect(Plugin *p)
 {
-	usable = false;
-	if (p)
-		usable = p->usable;
+	usable = true;
 	plugin = p;
 	only_on_selection = false;
-	data = NULL;
-	data_type = NULL;
-	state = NULL;
-	state_type = NULL;
 }
 
-void Effect::ExportData()
+Effect::~Effect()
 {
-	msg_db_f("Effect.ExportData", 1);
-	if (!usable)
-		return;
+}
+
+void Effect::__init__()
+{
+	new(this) Effect;
+}
+
+void Effect::__delete__()
+{
+}
+
+/*void make_fx(Effect *fx)
+{
+	foreachi(Script::Variable &v, fx->plugin->s->syntax->RootOfAllEvil.var, i)
+		if (v.type->name == "PluginData"){
+			fx->data = fx->plugin->s->g_var[i];
+			fx->data_type = v.type;
+		}
+}*/
+
+void Effect::ExportConfig()
+{
+	msg_db_f("Effect.ExportConfig", 1);
 
 	param.clear();
-	if (!data)
-		return;
-	param.resize(data_type->element.num);
-	foreachi(Script::ClassElement &e, data_type->element, j)
-		try_write_element(&param[j], &e, (char*)data);
+	Script::Type *type = Script::GetDynamicType(this);
+	if (type){
+		foreach(Script::ClassElement &e, type->element)
+			if (e.name == "config"){
+				param.resize(e.type->element.num);
+				foreachi(Script::ClassElement &ee, e.type->element, j){
+					char *p = (char*)this;
+					param[j].value = var_to_string(ee.type, &p[e.offset + ee.offset]);
+				}
+			}
+	}
 }
 
-void Effect::ImportData()
+void Effect::ImportConfig()
 {
-	msg_db_f("Plugin.ImportData", 1);
-	if (!usable)
-		return;
+	msg_db_f("Effect.ImportConfig", 1);
 
-	if (!data)
-		return;
-	foreach(Script::ClassElement &e, data_type->element)
-		foreach(EffectParam &p, param)
-			if ((e.name == p.name) && (e.type->name == p.type))
-				try_read_element(p, &e, (char*)data);
-}
+	Script::Type *type = Script::GetDynamicType(this);
+	if (type){
+		foreach(Script::ClassElement &e, type->element)
+			if (e.name == "config"){
+				param.resize(e.type->element.num);
+				foreachi(Script::ClassElement &ee, e.type->element, j){
 
-void Effect::ExportState()
-{
-	msg_db_f("Effect.ExportState", 1);
-	// TODO delete me
-}
-
-void Effect::ImportState()
-{
-	msg_db_f("Effect.ImportState", 1);
-	// TODO delete me
+					char *p = (char*)this;
+					int pos = 0;
+					var_from_string(e.type, &p[e.offset + ee.offset], param[j].value, pos);
+				}
+			}
+	}
 }
 
 void Effect::Prepare()
 {
 	msg_db_f("Effect.Prepare", 1);
 	if (usable){
-		if (state){
-			ImportData();
-			state = new char[state_type->size];
-			// TODO (init)
-			plugin->ResetState();
-			ExportState();
-		}
+		ImportConfig();
 	}else{
 		tsunami->log->Error(GetError());
 	}
@@ -99,36 +108,6 @@ void Effect::Prepare()
 
 void Effect::CleanUp()
 {
-	msg_db_f("Effect.CleanUp", 1);
-	if (usable){
-		if (state){
-			ImportState();
-			plugin->ResetState();
-			// TODO (clear)
-			ExportState();
-			delete[]((char*)state);
-		}
-	}
-}
-
-Effect *CreateEffect(const string &name)
-{
-	Effect *f = new Effect;
-	f->name = name;
-	f->plugin = tsunami->plugin_manager->GetPlugin(name);
-	if (f->plugin){
-		f->usable = f->plugin->usable;
-
-		foreachi(Script::Variable &v, f->plugin->s->syntax->RootOfAllEvil.var, i)
-			if (v.type->name == "PluginData"){
-				f->data = f->plugin->s->g_var[i];
-				f->data_type = v.type;
-			}else if (v.type->name == "PluginState"){
-				f->state = f->plugin->s->g_var[i];
-				f->state_type = v.type;
-			}
-	}
-	return f;
 }
 
 string Effect::GetError()
@@ -144,13 +123,10 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 
 	if (usable){
 		// run
-		plugin->ResetData();
-		ImportData();
-		ImportState();
+		ResetConfig();
+		ImportConfig();
 		tsunami->plugin_manager->context.set(t, 0, buf.range());
-		if (plugin->type == Plugin::TYPE_EFFECT)
-			plugin->f_process_track(&buf);
-		ExportState();
+		ProcessTrack(&buf);
 		t->root->UpdateSelection();
 	}else{
 		if (log_error)
@@ -354,12 +330,12 @@ void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
 		try_read_primitive_element(p.value, pos, e->type, &v[e->offset]);
 }
 
-void Effect::WriteDataToFile(const string &name)
+void Effect::WriteConfigToFile(const string &name)
 {
 	if (!usable)
 		return;
-	msg_db_f("Plugin.WriteDataToFile", 1);
-	ExportData();
+	msg_db_f("Effect.ConfigDataToFile", 1);
+	ExportConfig();
 	dir_create(HuiAppDirectory + "Favorites/");
 	CFile *f = FileCreate(HuiAppDirectory + "Plugins/Favorites/" + plugin->s->Filename.basename() + "___" + name);
 	f->WriteInt(0);
@@ -375,11 +351,11 @@ void Effect::WriteDataToFile(const string &name)
 	FileClose(f);
 }
 
-void Effect::LoadDataFromFile(const string &name)
+void Effect::LoadConfigFromFile(const string &name)
 {
 	if (!usable)
 		return;
-	msg_db_f("Plugin.LoadDataFromFile", 1);
+	msg_db_f("Effect.LoadConfigFromFile", 1);
 	CFile *f = FileOpen(HuiAppDirectory + "Favorites/" + plugin->s->Filename.basename() + "___" + name);
 	if (!f)
 		return;
@@ -394,7 +370,50 @@ void Effect::LoadDataFromFile(const string &name)
 		p.type = f->ReadStr();
 		p.value = f->ReadStr();
 	}
-	ImportData();
+	ImportConfig();
 
 	FileClose(f);
+}
+
+
+bool Effect::DoConfigure(bool previewable)
+{
+	msg_db_f("Effect.DoConfigure", 1);
+	tsunami->plugin_manager->cur_effect = this;
+	tsunami->plugin_manager->PluginAddPreview = previewable;
+	tsunami->plugin_manager->PluginCancelled = false;
+	Configure();
+	GlobalRemoveSliders(NULL);
+	return !tsunami->plugin_manager->PluginCancelled;
+	//tsunami->log->Info(_("Dieser Effekt ist nicht konfigurierbar."));
+	//return true;
+}
+
+
+
+void Effect::DoProcessTrack(Track *t, int level_no, const Range &r)
+{
+	msg_db_f("Effect.DoProcessTrack", 1);
+
+	tsunami->plugin_manager->context.set(t, level_no, r);
+
+	BufferBox buf = t->GetBuffers(level_no, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
+	ProcessTrack(&buf);
+	t->root->Execute(a);
+}
+
+
+Effect *CreateEffect(const string &name)
+{
+	Effect *f = tsunami->plugin_manager->LoadEffect(name);
+	if (f)
+		return f;
+	f = new Effect;
+	f->name = name;
+	f->plugin = tsunami->plugin_manager->GetPlugin(name);
+	if (f->plugin){
+		f->usable = f->plugin->usable;
+	}
+	return f;
 }

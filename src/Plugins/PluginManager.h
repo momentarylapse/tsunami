@@ -57,6 +57,8 @@ public:
 
 	virtual void OnUpdate(Observable *o);
 
+	Effect *LoadEffect(const string &name);
+
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name);
 

@@ -27,11 +27,15 @@ public:
 	string value;
 };
 
-class Effect
+class Effect : public VirtualBase
 {
 public:
 	Effect();
 	Effect(Plugin *p);
+	virtual ~Effect();
+
+	void __init__();
+	virtual void __delete__();
 
 	string name;
 	Array<EffectParam> param;
@@ -40,21 +44,24 @@ public:
 	Plugin *plugin;
 	bool usable;
 
-	Script::Type *state_type;
-	void *state;
-	Script::Type *data_type;
-	void *data;
+	virtual void ProcessTrack(BufferBox *buf){};
+	virtual void ResetConfig(){};
+	virtual void ResetState(){};
+	virtual void Configure(){};
+	virtual void UpdateDialog(){};
 
-	void ExportData();
-	void ImportData();
-	void ExportState();
-	void ImportState();
+
+	void DoProcessTrack(Track *t, int level_no, const Range &r);
+	bool DoConfigure(bool previewable);
+
+	void ExportConfig();
+	void ImportConfig();
 	void Prepare();
 	void CleanUp();
 	void Apply(BufferBox &buf, Track *t, bool log_error);
 
-	void WriteDataToFile(const string &name);
-	void LoadDataFromFile(const string &name);
+	void WriteConfigToFile(const string &name);
+	void LoadConfigFromFile(const string &name);
 
 	string GetError();
 };

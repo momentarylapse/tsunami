@@ -136,12 +136,12 @@ bool FxList::UpdateEffectParams(Effect *f)
 
 	if (f->usable){
 
-		f->plugin->ResetData();
+		f->ResetConfig();
 
-		f->ImportData();
+		f->ImportConfig();
 
-		if (f->plugin->Configure(false)){
-			f->ExportData();
+		if (f->DoConfigure(false)){
+			f->ExportConfig();
 			ok = true;
 		}
 	}else{

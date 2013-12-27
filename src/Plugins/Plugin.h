@@ -29,11 +29,6 @@ public:
 	string filename;
 	int index;
 	Script::Script *s;
-	void_func *f_reset;
-	void_func *f_data2dialog;
-	void_func *f_configure;
-	void_func *f_reset_state;
-	process_track_func *f_process_track;
 
 	bool usable;
 	int type;
@@ -43,10 +38,6 @@ public:
 	};
 	string error_message;
 
-	void ResetData();
-	void ResetState();
-	bool Configure(bool previewable);
-	void DataToDialog();
 	void ProcessTrack(Track *t, int level_no, const Range &r);
 
 	string GetError();

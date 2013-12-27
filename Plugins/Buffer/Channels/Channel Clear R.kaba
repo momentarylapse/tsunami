@@ -3,5 +3,6 @@
 use "../../api.kaba"
 
 
-void ProcessTrack(BufferBox buf)
-	buf.r = 0
+class ClearR : AudioEffect
+	overwrite void ProcessTrack(BufferBox buf)
+		buf.r = 0

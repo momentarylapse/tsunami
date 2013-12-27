@@ -56,8 +56,9 @@ public:
 	void WriteDataToFile(const string &name);
 	void LoadDataFromFile(const string &name);
 
-	void make_usable();
 	string GetError();
 };
+
+Effect *CreateEffect(const string &name);
 
 #endif /* EFFECT_H_ */

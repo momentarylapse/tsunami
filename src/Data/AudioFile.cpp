@@ -136,6 +136,8 @@ void AudioFile::Reset()
 	selection.clear();
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
+	foreach(Effect *f, fx)
+		delete(f);
 	fx.clear();
 	foreach(Track *t, track)
 		delete(t);

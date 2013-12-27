@@ -48,7 +48,7 @@ void ActionTrackDeleteEffect::undo(Data *d)
 	if (track_no >= 0){
 		Track *t = a->get_track(track_no);
 		assert(t);
-		assert(index < t->fx.num);
+		assert(index <= t->fx.num);
 
 		t->fx.insert(effect, index);
 	}else{

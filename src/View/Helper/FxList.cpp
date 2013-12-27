@@ -61,7 +61,7 @@ void FxList::SetTrack(Track *t)
 
 void FxList::FillList()
 {
-	msg_db_r("FillEffectList", 1);
+	msg_db_f("FillEffectList", 1);
 	dlg->Reset(id);
 	if (fx){
 		foreach(Effect *f, *fx)
@@ -71,7 +71,6 @@ void FxList::FillList()
 	dlg->Enable(id_add, fx);
 	dlg->Enable(id_edit, false);
 	dlg->Enable(id_delete, false);
-	msg_db_l(1);
 }
 
 
@@ -132,10 +131,8 @@ FxList::~FxList()
 
 bool FxList::UpdateEffectParams(Effect *f)
 {
-	msg_db_r("UpdateEffectParams", 1);
+	msg_db_f("UpdateEffectParams", 1);
 	bool ok = false;
-
-	f->make_usable();
 
 	if (f->usable){
 
@@ -151,7 +148,6 @@ bool FxList::UpdateEffectParams(Effect *f)
 		tsunami->log->Error(f->GetError());
 	}
 
-	msg_db_l(1);
 	return ok;
 }
 
@@ -159,29 +155,25 @@ void FxList::AddNewEffect(string &filename)
 {
 	if (!fx)
 		return;
-	msg_db_r("AddNewEffect", 1);
+	msg_db_f("AddNewEffect", 1);
 
-	Effect *effect = new Effect;
-	effect->name = filename.basename(); // remove directory
-	effect->name = effect->name.substr(0, effect->name.num - 5); //      and remove ".kaba"
+	string name = filename.basename(); // remove directory
+	name = name.substr(0, name.num - 5); //      and remove ".kaba"
+	Effect *effect = CreateEffect(name);
 	if (UpdateEffectParams(effect)){
 		audio->Execute(new ActionTrackAddEffect(track, effect));
 		FillList();
 	}
-
-	msg_db_l(1);
 }
 
 void FxList::ExecuteFXDialog(int index)
 {
 	if (!fx)
 		return;
-	msg_db_r("ExecuteFXDialog", 1);
+	msg_db_f("ExecuteFXDialog", 1);
 
 	Effect *f = (*fx)[index];
 	Array<EffectParam> param = f->param;
 	UpdateEffectParams(f);
 	audio->Execute(new ActionTrackEditEffect(track, index, param));
-
-	msg_db_l(1);
 }

@@ -44,7 +44,6 @@ Effect::Effect(Plugin *p)
 void Effect::ExportData()
 {
 	msg_db_f("Effect.ExportData", 1);
-	make_usable();
 	if (!usable)
 		return;
 
@@ -59,7 +58,6 @@ void Effect::ExportData()
 void Effect::ImportData()
 {
 	msg_db_f("Plugin.ImportData", 1);
-	make_usable();
 	if (!usable)
 		return;
 
@@ -73,24 +71,19 @@ void Effect::ImportData()
 
 void Effect::ExportState()
 {
-	msg_db_r("Effect.ExportState", 1);
-	make_usable();
+	msg_db_f("Effect.ExportState", 1);
 	// TODO delete me
-	msg_db_l(1);
 }
 
 void Effect::ImportState()
 {
-	msg_db_r("Effect.ImportState", 1);
-	make_usable();
+	msg_db_f("Effect.ImportState", 1);
 	// TODO delete me
-	msg_db_l(1);
 }
 
 void Effect::Prepare()
 {
-	msg_db_r("Effect.Prepare", 1);
-	make_usable();
+	msg_db_f("Effect.Prepare", 1);
 	if (usable){
 		if (state){
 			ImportData();
@@ -102,13 +95,11 @@ void Effect::Prepare()
 	}else{
 		tsunami->log->Error(GetError());
 	}
-	msg_db_l(1);
 }
 
 void Effect::CleanUp()
 {
-	msg_db_r("Effect.CleanUp", 1);
-	make_usable();
+	msg_db_f("Effect.CleanUp", 1);
 	if (usable){
 		if (state){
 			ImportState();
@@ -118,28 +109,26 @@ void Effect::CleanUp()
 			delete[]((char*)state);
 		}
 	}
-	msg_db_l(1);
 }
 
-
-
-void Effect::make_usable()
+Effect *CreateEffect(const string &name)
 {
-	if (!plugin){
-		plugin = tsunami->plugin_manager->GetPlugin(name);
-		if (plugin){
-			usable = plugin->usable;
+	Effect *f = new Effect;
+	f->name = name;
+	f->plugin = tsunami->plugin_manager->GetPlugin(name);
+	if (f->plugin){
+		f->usable = f->plugin->usable;
 
-			foreachi(Script::Variable &v, plugin->s->syntax->RootOfAllEvil.var, i)
-				if (v.type->name == "PluginData"){
-					data = plugin->s->g_var[i];
-					data_type = v.type;
-				}else if (v.type->name == "PluginState"){
-					state = plugin->s->g_var[i];
-					state_type = v.type;
-				}
-		}
+		foreachi(Script::Variable &v, f->plugin->s->syntax->RootOfAllEvil.var, i)
+			if (v.type->name == "PluginData"){
+				f->data = f->plugin->s->g_var[i];
+				f->data_type = v.type;
+			}else if (v.type->name == "PluginState"){
+				f->state = f->plugin->s->g_var[i];
+				f->state_type = v.type;
+			}
 	}
+	return f;
 }
 
 string Effect::GetError()
@@ -151,9 +140,8 @@ string Effect::GetError()
 
 void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 {
-	msg_db_r("Effect.Apply", 1);
+	msg_db_f("Effect.Apply", 1);
 
-	make_usable();
 	if (usable){
 		// run
 		plugin->ResetData();
@@ -168,8 +156,6 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 		if (log_error)
 			tsunami->log->Error(_("Beim Anwenden eines Effekts: ") + GetError());
 	}
-
-	msg_db_l(1);
 }
 
 void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)

@@ -289,8 +289,7 @@ void ReadFXListOld(CFile *f, Array<Effect*> &fx)
 		return;
 	}
 	for (int i=0;i<n;i++){
-		Effect *e = new Effect;
-		e->name = f->ReadStr();
+		Effect *e = CreateEffect(f->ReadStr());
 		e->only_on_selection = false;
 		e->range.offset = 0;
 		e->range.num = -1;
@@ -317,8 +316,7 @@ void ReadFXList(CFile *f, Array<Effect*> &fx)
 		return;
 	}
 	for (int i=0;i<n;i++){
-		Effect *e = new Effect;
-		e->name = f->ReadStr();
+		Effect *e = CreateEffect(f->ReadStr());
 		e->only_on_selection = f->ReadBool();
 		e->range.offset = f->ReadInt();
 		e->range.num = f->ReadInt();
@@ -569,8 +567,7 @@ void ReadChunkEffectParam(CFile *f, Effect *e)
 
 void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 {
-	Effect *e = new Effect;
-	e->name = f->ReadStr();
+	Effect *e = CreateEffect(f->ReadStr());
 	e->only_on_selection = f->ReadBool();
 	e->range.offset = f->ReadInt();
 	e->range.num = f->ReadInt();

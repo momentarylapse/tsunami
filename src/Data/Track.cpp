@@ -51,6 +51,8 @@ void Track::Reset()
 	muted = false;
 	panning = 0;
 	bar.clear();
+	foreach(Effect *f, fx)
+		delete(f);
 	fx.clear();
 	sample.clear();
 	if (synth)

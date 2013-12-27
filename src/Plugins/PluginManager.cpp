@@ -780,7 +780,7 @@ void PluginManager::Preview(Effect *fx)
 Effect *PluginManager::LoadEffect(const string &name)
 {
 	foreach(PluginFile &pf, plugin_file){
-		if (pf.name == name){
+		if ((pf.name == name) && (pf.filename.find("/Buffer/") >= 0)){
 			if (!LoadAndCompilePlugin(pf.filename))
 				return NULL;
 		}

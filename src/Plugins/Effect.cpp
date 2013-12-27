@@ -87,10 +87,9 @@ void Effect::ImportConfig()
 			if (e.name == "config"){
 				param.resize(e.type->element.num);
 				foreachi(Script::ClassElement &ee, e.type->element, j){
-
 					char *p = (char*)this;
 					int pos = 0;
-					var_from_string(e.type, &p[e.offset + ee.offset], param[j].value, pos);
+					var_from_string(ee.type, &p[e.offset + ee.offset], param[j].value, pos);
 				}
 			}
 	}
@@ -99,11 +98,10 @@ void Effect::ImportConfig()
 void Effect::Prepare()
 {
 	msg_db_f("Effect.Prepare", 1);
-	if (usable){
-		ImportConfig();
-	}else{
+	ImportConfig();
+	ResetState();
+	if (!usable)
 		tsunami->log->Error(GetError());
-	}
 }
 
 void Effect::CleanUp()
@@ -121,14 +119,15 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 {
 	msg_db_f("Effect.Apply", 1);
 
-	if (usable){
-		// run
-		ResetConfig();
-		ImportConfig();
-		tsunami->plugin_manager->context.set(t, 0, buf.range());
-		ProcessTrack(&buf);
-		t->root->UpdateSelection();
-	}else{
+	// run
+	ResetConfig();
+	ImportConfig();
+	tsunami->plugin_manager->context.set(t, 0, buf.range());
+	ProcessTrack(&buf);
+	t->root->UpdateSelection();
+
+	if (!usable){
+		msg_error("not usable... apply");
 		if (log_error)
 			tsunami->log->Error(_("Beim Anwenden eines Effekts: ") + GetError());
 	}
@@ -332,8 +331,6 @@ void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
 
 void Effect::WriteConfigToFile(const string &name)
 {
-	if (!usable)
-		return;
 	msg_db_f("Effect.ConfigDataToFile", 1);
 	ExportConfig();
 	dir_create(HuiAppDirectory + "Favorites/");
@@ -348,13 +345,11 @@ void Effect::WriteConfigToFile(const string &name)
 		f->WriteStr(p.value);
 	}
 	f->WriteStr("#");
-	FileClose(f);
+	delete(f);
 }
 
 void Effect::LoadConfigFromFile(const string &name)
 {
-	if (!usable)
-		return;
 	msg_db_f("Effect.LoadConfigFromFile", 1);
 	CFile *f = FileOpen(HuiAppDirectory + "Favorites/" + plugin->s->Filename.basename() + "___" + name);
 	if (!f)
@@ -372,7 +367,7 @@ void Effect::LoadConfigFromFile(const string &name)
 	}
 	ImportConfig();
 
-	FileClose(f);
+	delete(f);
 }
 
 
@@ -407,8 +402,10 @@ void Effect::DoProcessTrack(Track *t, int level_no, const Range &r)
 Effect *CreateEffect(const string &name)
 {
 	Effect *f = tsunami->plugin_manager->LoadEffect(name);
-	if (f)
+	if (f){
+		f->name = name;
 		return f;
+	}
 	f = new Effect;
 	f->name = name;
 	f->plugin = tsunami->plugin_manager->GetPlugin(name);

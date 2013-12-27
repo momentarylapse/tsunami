@@ -4,51 +4,77 @@
 use "../../api.kaba"
 use "../../grid.kaba"
 
-ConfigDialog *win
-int MouseOver, Selected
-
 class PluginData
 	complex curve[]
 	float Delay
-PluginData data
 
-GridData grid
+	void fill_inter(FloatInterpolator fi)
+		fi.setType("lerp")
+		fi.add(curve[0].y, 0)
+		for int i, 1, curve.num
+			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 
-float level_scale
 
-void fill_inter(FloatInterpolator fi)
-	fi.setType("lerp")
-	fi.add(data.curve[0].y, 0)
-	for int i, 1, data.curve.num
-		fi.add(data.curve[i].y, data.curve[i].x - data.curve[i - 1].x)
+class Compressor : AudioEffect
+	PluginData config
 
-void compress(float b[])
-	float in_level = 0
-	for int i, 0, b.num
-		// in level
-		float in_level_cur = abs(b[i])
-		in_level *= level_scale
-		if in_level_cur > in_level
-			in_level = in_level_cur
+	ConfigDialog *win
+
+	float level_scale
+
+	void compress(float b[])
+		float in_level = 0
+		for int i, 0, b.num
+			// in level
+			float in_level_cur = abs(b[i])
+			in_level *= level_scale
+			if in_level_cur > in_level
+				in_level = in_level_cur
 		
-		// out level
-		float out_level = in_level
-		for int j, 1, data.curve.num
-			if (in_level >= data.curve[j - 1].x) and (in_level <= data.curve[j].x)
-				out_level = data.curve[j - 1].y + (data.curve[j].y - data.curve[j - 1].y) * (in_level - data.curve[j - 1].x) / (data.curve[j].x - data.curve[j - 1].x)
-				break
+			// out level
+			float out_level = in_level
+			for int j, 1, config.curve.num
+				if (in_level >= config.curve[j - 1].x) and (in_level <= config.curve[j].x)
+					out_level = config.curve[j - 1].y + (config.curve[j].y - config.curve[j - 1].y) * (in_level - config.curve[j - 1].x) / (config.curve[j].x - config.curve[j - 1].x)
+					break
 		
-		// scale
-		float factor = 1
-		if in_level > 0
-			factor = out_level / in_level
-		b[i] = b[i] * factor
+			// scale
+			float factor = 1
+			if in_level > 0
+				factor = out_level / in_level
+			b[i] = b[i] * factor
 
-void DataToDialog()
-	win.fill()
+	overwrite void UpdateDialog()
+		win.fill()
+
+	overwrite void ResetConfig()
+		config.curve.clear()
+		config.curve.add(complex(0, 0))
+		config.curve.add(complex(1, 1))
+		config.Delay = 0.1
+		//MouseOver = -1
+		//Selected = -1
+
+	overwrite void Configure()
+		win = new ConfigDialog(self)
+		win.Run()
+
+	overwrite void ProcessTrack(BufferBox buf)
+		AudioFile *a = audio
+	
+		float n_steps = config.Delay * a.sample_rate
+		if n_steps > 0
+			level_scale = exp(- 1 / n_steps)
+		else
+			level_scale = 0
+		compress(buf.r)
+		compress(buf.l)
 
 class ConfigDialog : Dialog
-	void __init__()
+	int MouseOver, Selected
+	GridData grid
+	Compressor *fx
+	void __init__(Compressor *_fx)
 		super.__init__("Compressor", 500, 600, MainWin, false)
 		AddGrid("", 0, 0, 1, 4, "table1")
 		SetTarget("table1", 0)
@@ -61,6 +87,7 @@ class ConfigDialog : Dialog
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 3)
+		fx = _fx
 		
 		EventM("edit", &OnEdit)
 	
@@ -71,7 +98,7 @@ class ConfigDialog : Dialog
 	
 	void fill()
 		Redraw("drawing_area")
-		SetFloat("edit", data.Delay * 1000)
+		SetFloat("edit", fx.config.Delay * 1000)
 
 	overwrite void OnDraw()
 		Painter *c = BeginDraw("drawing_area")
@@ -81,18 +108,12 @@ class ConfigDialog : Dialog
 		grid.Draw(c, 0, 0, w, h)
 	
 		FloatInterpolator fi
-		fill_inter(fi)
+		fx.config.fill_inter(fi)
 	
 		// curve
 		grid.DrawCurve(c, fi, true)
-		/*c.SetLineWidth(2)
-		c.SetColor(Black)
-		for int i, 1, data.curve.num
-			complex p = grid.project2(data.curve[i])
-			complex q = grid.project2(data.curve[i - 1])
-			c.DrawLine(q.x, q.y, p.x, p.y)*/
-		for int i, 1, data.curve.num
-			grid.DrawPoint2(c, data.curve[i], i == Selected, i == MouseOver)
+		for int i, 1, fx.config.curve.num
+			grid.DrawPoint2(c, fx.config.curve[i], i == Selected, i == MouseOver)
 		c.End()
 
 	// left button down -> select
@@ -103,22 +124,22 @@ class ConfigDialog : Dialog
 	// left button up -> if moved to a neighbour -> remove point
 	overwrite void OnLeftButtonUp()
 		if Selected >= 0
-			bool del = (data.curve[Selected] == data.curve[Selected - 1])
-			if Selected < data.curve.num - 1
-				del = del or (data.curve[Selected] == data.curve[Selected + 1])
+			bool del = (fx.config.curve[Selected] == fx.config.curve[Selected - 1])
+			if Selected < fx.config.curve.num - 1
+				del = del or (fx.config.curve[Selected] == fx.config.curve[Selected + 1])
 			if del
-				data.curve.remove(Selected)
+				fx.config.curve.remove(Selected)
 				Selected = -1
 				Redraw("drawing_area")
 
 	// right button down -> new point
 	overwrite void OnRightButtonDown()
 		complex m = grid.GetMouse2()
-		for int i, 1, data.curve.num
-			complex q = data.curve[i - 1]
-			complex p = data.curve[i]
+		for int i, 1, fx.config.curve.num
+			complex q = fx.config.curve[i - 1]
+			complex p = fx.config.curve[i]
 			if (m.x > q.x) and (m.x < p.x) and (m.y > q.y) and (m.y < p.y)
-				data.curve.insert(m, i)
+				fx.config.curve.insert(m, i)
 				Selected = i
 				Redraw("drawing_area")
 				break
@@ -127,23 +148,23 @@ class ConfigDialog : Dialog
 	
 		// move
 		if HuiGetEvent().button_l and (Selected > 0)
-			data.curve[Selected] = grid.GetMouse2()
-			float xmin = data.curve[Selected - 1].x
+			fx.config.curve[Selected] = grid.GetMouse2()
+			float xmin = fx.config.curve[Selected - 1].x
 			float xmax = 1
-			float ymin = data.curve[Selected - 1].y
+			float ymin = fx.config.curve[Selected - 1].y
 			float ymax = 1
-			if Selected < data.curve.num - 1
-				xmax = data.curve[Selected + 1].x
-				ymax = data.curve[Selected + 1].y
-			data.curve[Selected].x = clamp(data.curve[Selected].x, xmin, xmax)
-			data.curve[Selected].y = clamp(data.curve[Selected].y, ymin, ymax)
-			if Selected == data.curve.num - 1
-				data.curve[Selected].x = 1
+			if Selected < fx.config.curve.num - 1
+				xmax = fx.config.curve[Selected + 1].x
+				ymax = fx.config.curve[Selected + 1].y
+			fx.config.curve[Selected].x = clamp(fx.config.curve[Selected].x, xmin, xmax)
+			fx.config.curve[Selected].y = clamp(fx.config.curve[Selected].y, ymin, ymax)
+			if Selected == fx.config.curve.num - 1
+				fx.config.curve[Selected].x = 1
 		else
 		// mouse over?
 			MouseOver = -1
-			for int i, 1, data.curve.num
-				if grid.MouseOverPoint2(data.curve[i])
+			for int i, 1, fx.config.curve.num
+				if grid.MouseOverPoint2(fx.config.curve[i])
 					MouseOver = i
 		Redraw("drawing_area")
 
@@ -151,34 +172,11 @@ class ConfigDialog : Dialog
 		int k = HuiGetEvent().key
 
 		// [Delete] -> remove point
-		if (k == KeyDelete) and (Selected > 0) and (Selected < data.curve.num - 1)
-			data.curve.remove(Selected)
+		if (k == KeyDelete) and (Selected > 0) and (Selected < fx.config.curve.num - 1)
+			fx.config.curve.remove(Selected)
 			Selected = -1
 			Redraw("drawing_area")
 
 	void OnEdit()
-		data.Delay = GetFloat("") / 1000.0
-
-void ResetData()
-	data.curve.clear()
-	data.curve.add(complex(0, 0))
-	data.curve.add(complex(1, 1))
-	data.Delay = 0.1
-	MouseOver = -1
-	Selected = -1
-
-void Configure()
-	win = new ConfigDialog
-	win.Run()
-
-void ProcessTrack(BufferBox buf)
-	AudioFile *a = audio
-	
-	float n_steps = data.Delay * a.sample_rate
-	if n_steps > 0
-		level_scale = exp(- 1 / n_steps)
-	else
-		level_scale = 0
-	compress(buf.r)
-	compress(buf.l)
+		fx.config.Delay = GetFloat("") / 1000.0
 		

@@ -14,6 +14,7 @@ ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, Array<EffectP
 	track_no = get_track_index(t);
 	index = _index;
 	params = _params;
+	first_execution = true;
 }
 
 ActionTrackEditEffect::~ActionTrackEditEffect()
@@ -25,21 +26,31 @@ void *ActionTrackEditEffect::execute(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(index >= 0);
 
+	// old_params... so don't execute on first run
+	if (first_execution){
+		first_execution = false;
+		return NULL;
+	}
+
+	Effect *fx;
+
 	if (track_no >= 0){
 		Track *t = a->get_track(track_no);
 		assert(t);
 		assert(index < t->fx.num);
 
-		Array<EffectParam> temp = params;
-		params = t->fx[index]->param;
-		t->fx[index]->param = temp;
+		fx = t->fx[index];
 	}else{
 		assert(index < a->fx.num);
 
-		Array<EffectParam> temp = params;
-		params = a->fx[index]->param;
-		a->fx[index]->param = temp;
+		fx = a->fx[index];
 	}
+
+	fx->ConfigToString();
+	Array<EffectParam> temp = params;
+	params = fx->param;
+	fx->param = temp;
+	fx->ConfigFromString();
 
 	return NULL;
 }

@@ -136,13 +136,15 @@ bool FxList::UpdateEffectParams(Effect *f)
 
 	if (f->usable){
 
-		f->ResetConfig();
-
-		f->ConfigFromString();
+		f->ConfigToString();
+		Array<EffectParam> param_old = f->param;
 
 		if (f->DoConfigure(false)){
 			f->ConfigToString();
 			ok = true;
+		}else{
+			f->param = param_old;
+			f->ConfigFromString();
 		}
 	}else{
 		tsunami->log->Error(f->GetError());
@@ -160,6 +162,7 @@ void FxList::AddNewEffect(string &filename)
 	string name = filename.basename(); // remove directory
 	name = name.substr(0, name.num - 5); //      and remove ".kaba"
 	Effect *effect = CreateEffect(name);
+	effect->ResetConfig();
 	if (UpdateEffectParams(effect)){
 		audio->Execute(new ActionTrackAddEffect(track, effect));
 		FillList();

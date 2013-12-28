@@ -26,6 +26,7 @@ private:
 	Array<EffectParam> params;
 	int track_no;
 	int index;
+	bool first_execution;
 };
 
 #endif /* ACTIONTRACKEDITEFFECT_H_ */

@@ -59,7 +59,7 @@ void Effect::__delete__()
 		}
 }*/
 
-void Effect::ExportConfig()
+void Effect::ConfigToString()
 {
 	msg_db_f("Effect.ExportConfig", 1);
 
@@ -77,7 +77,7 @@ void Effect::ExportConfig()
 	}
 }
 
-void Effect::ImportConfig()
+void Effect::ConfigFromString()
 {
 	msg_db_f("Effect.ImportConfig", 1);
 
@@ -98,7 +98,7 @@ void Effect::ImportConfig()
 void Effect::Prepare()
 {
 	msg_db_f("Effect.Prepare", 1);
-	ImportConfig();
+	ConfigFromString();
 	ResetState();
 	if (!usable)
 		tsunami->log->Error(GetError());
@@ -121,7 +121,7 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 
 	// run
 	ResetConfig();
-	ImportConfig();
+	ConfigFromString();
 	tsunami->plugin_manager->context.set(t, 0, buf.range());
 	ProcessTrack(&buf);
 	t->root->UpdateSelection();
@@ -332,7 +332,7 @@ void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
 void Effect::WriteConfigToFile(const string &name)
 {
 	msg_db_f("Effect.ConfigDataToFile", 1);
-	ExportConfig();
+	ConfigToString();
 	dir_create(HuiAppDirectory + "Favorites/");
 	CFile *f = FileCreate(HuiAppDirectory + "Plugins/Favorites/" + plugin->s->Filename.basename() + "___" + name);
 	f->WriteInt(0);
@@ -365,7 +365,7 @@ void Effect::LoadConfigFromFile(const string &name)
 		p.type = f->ReadStr();
 		p.value = f->ReadStr();
 	}
-	ImportConfig();
+	ConfigFromString();
 
 	delete(f);
 }

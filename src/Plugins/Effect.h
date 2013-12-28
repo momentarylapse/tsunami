@@ -54,8 +54,8 @@ public:
 	void DoProcessTrack(Track *t, int level_no, const Range &r);
 	bool DoConfigure(bool previewable);
 
-	void ExportConfig();
-	void ImportConfig();
+	void ConfigToString();
+	void ConfigFromString();
 	void Prepare();
 	void CleanUp();
 	void Apply(BufferBox &buf, Track *t, bool log_error);

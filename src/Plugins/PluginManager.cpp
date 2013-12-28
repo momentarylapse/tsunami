@@ -755,7 +755,7 @@ Plugin *PluginManager::GetPlugin(const string &name)
 void PluginManager::PreviewStart(Effect *fx)
 {
 	if (fx)
-		fx->ExportConfig();
+		fx->ConfigToString();
 	tsunami->renderer->effect = fx;
 
 
@@ -776,7 +776,7 @@ void PluginManager::PreviewEnd()
 
 	tsunami->renderer->effect = NULL;
 	if (cur_effect)
-		cur_effect->ImportConfig();
+		cur_effect->ConfigFromString();
 }
 
 Effect *PluginManager::LoadEffect(const string &name)

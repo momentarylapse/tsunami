@@ -819,6 +819,7 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 
 	FileClose(f);
 
+	// some post processing
 	check_empty_subs(a);
 
 	foreach(Track *t, a->track)
@@ -828,6 +829,12 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 			t->synth->options = t->midi.options;
 			t->synth->options_from_string();
 		}
+
+	foreach(Effect *fx, a->fx)
+		fx->ConfigFromString();
+	foreach(Track *t, a->track)
+		foreach(Effect *fx, t->fx)
+			fx->ConfigFromString();
 
 	a->UpdateSelection();
 }

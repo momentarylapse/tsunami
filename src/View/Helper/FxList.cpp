@@ -138,10 +138,10 @@ bool FxList::UpdateEffectParams(Effect *f)
 
 		f->ResetConfig();
 
-		f->ImportConfig();
+		f->ConfigFromString();
 
 		if (f->DoConfigure(false)){
-			f->ExportConfig();
+			f->ConfigToString();
 			ok = true;
 		}
 	}else{
@@ -173,7 +173,7 @@ void FxList::ExecuteFXDialog(int index)
 	msg_db_f("ExecuteFXDialog", 1);
 
 	Effect *f = (*fx)[index];
-	f->ExportConfig();
+	f->ConfigToString();
 	Array<EffectParam> param = f->param;
 	if (UpdateEffectParams(f))
 		audio->Execute(new ActionTrackEditEffect(track, index, param));

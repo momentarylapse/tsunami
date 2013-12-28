@@ -42,7 +42,8 @@ public:
 	void FinishPluginData();
 	void InitFavorites(HuiWindow *win);
 
-	void Preview(Effect *fx);
+	void PreviewStart(Effect *fx);
+	void PreviewEnd();
 
 	void OnFavoriteName();
 	void OnFavoriteList();

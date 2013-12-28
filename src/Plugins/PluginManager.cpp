@@ -590,7 +590,7 @@ void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, 
 	win->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
 	win->SetTarget("command_table", 0);
 	if (PluginAddPreview){
-		if (cur_plugin && (cur_plugin->type == Plugin::TYPE_EFFECT)){
+		if (cur_effect){
 			win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 			win->SetImage("preview", "hui:media-play");
 		}
@@ -611,13 +611,9 @@ void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, 
 
 void PluginManager::OnPluginPreview()
 {
-	if (cur_plugin){
-		Effect fx(cur_plugin);
-		Preview(&fx);
-	}else if (cur_synth){
+	if (cur_synth)
 		cur_synth->DataFromDialog();
-		Preview(NULL);
-	}
+	PreviewStart(cur_effect);
 }
 
 void PluginManager::ConfigureSynthesizer(Synthesizer *s)
@@ -634,11 +630,14 @@ void PluginManager::OnUpdate(Observable *o)
 {
 	if (o == tsunami->progress){
 		if (o->GetMessage() == "Cancel")
-			tsunami->output->Stop();
-	}/*else if (o == tsunami->output){
+			PreviewEnd();
+	}else if (o == tsunami->output){
 		int pos = tsunami->output->GetPos();
-		tsunami->progress->Set(_("Vorschau"), (float)(pos - tsunami->output->GetRange().start()) / tsunami->output->GetRange().length());
-	}*/ // TODO
+		Range r = tsunami->audio->selection;
+		tsunami->progress->Set(_("Vorschau"), (float)pos / r.length());
+		if (!tsunami->output->IsPlaying())
+			PreviewEnd();
+	}
 }
 
 // always push the script... even if an error occurred
@@ -750,7 +749,7 @@ Plugin *PluginManager::GetPlugin(const string &name)
 }
 
 
-void PluginManager::Preview(Effect *fx)
+void PluginManager::PreviewStart(Effect *fx)
 {
 	if (fx)
 		fx->ExportConfig();
@@ -762,19 +761,19 @@ void PluginManager::Preview(Effect *fx)
 	Subscribe(tsunami->output);
 	tsunami->renderer->Prepare(tsunami->audio, tsunami->audio->selection, false);
 	tsunami->output->Play(tsunami->renderer);
+}
 
-	while(tsunami->output->IsPlaying()){
-		HuiSleep(10);
-		HuiDoSingleMainLoop();
-	}
+void PluginManager::PreviewEnd()
+{
+	tsunami->output->Stop();
 	Unsubscribe(tsunami->output);
 	Unsubscribe(tsunami->progress);
 	tsunami->progress->End();
 
 
 	tsunami->renderer->effect = NULL;
-	if (fx)
-		fx->ImportConfig();
+	if (cur_effect)
+		cur_effect->ImportConfig();
 }
 
 Effect *PluginManager::LoadEffect(const string &name)

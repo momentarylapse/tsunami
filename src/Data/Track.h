@@ -27,6 +27,7 @@ class BufferBox;
 class AudioFile;
 class Synthesizer;
 class Effect;
+class EffectParam;
 
 
 class TrackLevel
@@ -60,6 +61,9 @@ public:
 	void SetPanning(float panning);
 	BufferBox GetBuffers(int level_no, const Range &r);
 	void InsertMidiData(int offset, MidiData &midi);
+	void AddEffect(Effect *effect);
+	void DeleteEffect(int index);
+	void EditEffect(int index, Array<EffectParam> &param_old);
 	SampleRef *AddSample(int pos, int index);
 	void DeleteSample(int index);
 	void AddMidiNote(const MidiNote &n);

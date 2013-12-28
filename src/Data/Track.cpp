@@ -20,6 +20,9 @@
 #include "../Action/Track/Sample/ActionTrackAddSample.h"
 #include "../Action/Track/Sample/ActionTrackDeleteSample.h"
 #include "../Action/Track/Synthesizer/ActionTrackSetSynthesizer.h"
+#include "../Action/Track/Effect/ActionTrackAddEffect.h"
+#include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
+#include "../Action/Track/Effect/ActionTrackEditEffect.h"
 
 
 Track::Track()
@@ -237,6 +240,22 @@ void Track::SetPanning(float panning)
 void Track::InsertMidiData(int offset, MidiData& midi)
 {
 	root->Execute(new ActionTrackInsertMidi(this, offset, midi));
+}
+
+void Track::AddEffect(Effect *effect)
+{
+	root->Execute(new ActionTrackAddEffect(this, effect));
+}
+
+// execute after editing...
+void Track::EditEffect(int index, Array<EffectParam> &param_old)
+{
+	root->Execute(new ActionTrackEditEffect(this, index, param_old));
+}
+
+void Track::DeleteEffect(int index)
+{
+	root->Execute(new ActionTrackDeleteEffect(this, index));
 }
 
 void Track::SetSynthesizer(Synthesizer *_synth)

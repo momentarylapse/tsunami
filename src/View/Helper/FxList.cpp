@@ -11,9 +11,6 @@
 #include "../../Plugins/Effect.h"
 #include "../../Tsunami.h"
 #include "../../Stuff/Log.h"
-#include "../../Action/Track/Effect/ActionTrackAddEffect.h"
-#include "../../Action/Track/Effect/ActionTrackDeleteEffect.h"
-#include "../../Action/Track/Effect/ActionTrackEditEffect.h"
 
 
 FxList::FxList(HuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete)
@@ -120,7 +117,7 @@ void FxList::OnDelete()
 		return;
 	int s = dlg->GetInt(id);
 	if (s >= 0){
-		audio->Execute(new ActionTrackDeleteEffect(track, s));
+		track->DeleteEffect(s);
 		FillList();
 	}
 }
@@ -164,7 +161,7 @@ void FxList::AddNewEffect(string &filename)
 	Effect *effect = CreateEffect(name);
 	effect->ResetConfig();
 	if (UpdateEffectParams(effect)){
-		audio->Execute(new ActionTrackAddEffect(track, effect));
+		track->AddEffect(effect);
 		FillList();
 	}
 }
@@ -177,7 +174,7 @@ void FxList::ExecuteFXDialog(int index)
 
 	Effect *f = (*fx)[index];
 	f->ConfigToString();
-	Array<EffectParam> param = f->param;
+	Array<EffectParam> param_old = f->param;
 	if (UpdateEffectParams(f))
-		audio->Execute(new ActionTrackEditEffect(track, index, param));
+		track->EditEffect(index, param_old);
 }

@@ -173,7 +173,8 @@ void FxList::ExecuteFXDialog(int index)
 	msg_db_f("ExecuteFXDialog", 1);
 
 	Effect *f = (*fx)[index];
+	f->ExportConfig();
 	Array<EffectParam> param = f->param;
-	UpdateEffectParams(f);
-	audio->Execute(new ActionTrackEditEffect(track, index, param));
+	if (UpdateEffectParams(f))
+		audio->Execute(new ActionTrackEditEffect(track, index, param));
 }

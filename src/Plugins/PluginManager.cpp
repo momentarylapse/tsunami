@@ -687,6 +687,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			fx = (Effect*)t->CreateInstance();
 			break;
 		}
+		main_void_func *f_main = (main_void_func*)s->MatchFunction("main", "void", 0);
 
 		// run
 		if (fx){
@@ -715,9 +716,11 @@ void PluginManager::ExecutePlugin(const string &filename)
 				f_audio(a);
 			else
 				tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
-		}else if (f_void){
-			f_void();
-		}*/
+		}*/else if (f_main){
+			f_main();
+		}else{
+			tsunami->log->Error(_("Plugin ist kein Effekt und enth&alt keine Funktion 'void main()'"));
+		}
 
 		// data changed?
 		FinishPluginData();

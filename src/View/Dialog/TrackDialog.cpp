@@ -103,10 +103,8 @@ void TrackDialog::OnPanning()
 void TrackDialog::OnSynthesizer()
 {
 	Synthesizer *s = ChooseSynthesizer(tsunami, track->synth->name);
-	if (s){
-		track->synth = s;
-		LoadData();
-	}
+	if (s)
+		track->SetSynthesizer(s);
 }
 
 void TrackDialog::OnConfigSynthesizer()

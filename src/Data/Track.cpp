@@ -19,6 +19,7 @@
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Sample/ActionTrackAddSample.h"
 #include "../Action/Track/Sample/ActionTrackDeleteSample.h"
+#include "../Action/Track/Synthesizer/ActionTrackSetSynthesizer.h"
 
 
 Track::Track()
@@ -236,6 +237,11 @@ void Track::SetPanning(float panning)
 void Track::InsertMidiData(int offset, MidiData& midi)
 {
 	root->Execute(new ActionTrackInsertMidi(this, offset, midi));
+}
+
+void Track::SetSynthesizer(Synthesizer *_synth)
+{
+	root->Execute(new ActionTrackSetSynthesizer(this, _synth));
 }
 
 

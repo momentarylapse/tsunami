@@ -64,6 +64,7 @@ public:
 	void DeleteSample(int index);
 	void AddMidiNote(const MidiNote &n);
 	void DeleteMidiNote(int index);
+	void SetSynthesizer(Synthesizer *synth);
 
 
 	enum

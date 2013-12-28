@@ -3,66 +3,80 @@
 
 use "../../api.kaba"
 
-bool not_first_time
 
-
-ConfigDialog *dlg
 
 class PluginData
 	float Delay
 	float Speed
 	float Depth
 
-PluginData data
-
-void ResetData()
-	data.Depth = 0.5
-	data.Speed = 0.3
-	data.Delay = 0.01
-
 class PluginState
 	float temp_r[]
 	float temp_l[]
 	int offset
 
-PluginState state
+class Flanger : AudioEffect
+	ConfigDialog *dlg
+	PluginData config
+	PluginState state
 
-void ResetState()
-	state.temp_r.clear()
-	state.temp_l.clear()
-	state.offset = 0
+	overwrite void ResetConfig()
+		config.Depth = 0.5
+		config.Speed = 0.3
+		config.Delay = 0.01
 
-void DoFlanger(float b[], float temp[], int sample_rate)
-	int p = state.offset % temp.num
-	
-	float f_a = (1 - 0.5 * data.Depth) * data.Delay
-	float f_b = 0.5 * data.Depth * data.Delay
-	float f_c = 1.0 / sample_rate * 2 * pi * data.Speed
-	
-	for int i, 0, b.num
-	
-		// old value
-		temp[p] = b[i]
-		
-		// shift
-		float dt = f_a - cos((i + state.offset) * f_c) * f_b
-		int dp = dt * sample_rate
-		int p2 = p - dp
-		if p2 < 0
-			p2 += temp.num
-		
-		// add echo
-		b[i] += temp[p2]
-		
-		p ++
-		if p >= temp.num
-			p = 0
+	overwrite void ResetState()
+		state.temp_r.clear()
+		state.temp_l.clear()
+		state.offset = 0
 
-void DataToDialog()
-	dlg.fill()
+	void DoFlanger(float b[], float temp[], int sample_rate)
+		int p = state.offset % temp.num
+	
+		float f_a = (1 - 0.5 * config.Depth) * config.Delay
+		float f_b = 0.5 * config.Depth * config.Delay
+		float f_c = 1.0 / sample_rate * 2 * pi * config.Speed
+	
+		for int i, 0, b.num
+	
+			// old value
+			temp[p] = b[i]
+		
+			// shift
+			float dt = f_a - cos((i + state.offset) * f_c) * f_b
+			int dp = dt * sample_rate
+			int p2 = p - dp
+			if p2 < 0
+				p2 += temp.num
+		
+			// add echo
+			b[i] += temp[p2]
+		
+			p ++
+			if p >= temp.num
+				p = 0
+
+	overwrite void UpdateDialog()
+		dlg.fill()
+
+	overwrite void Configure()
+		dlg = new ConfigDialog(self)
+		dlg.Run()
+	
+	overwrite void ProcessTrack(BufferBox buf)
+		AudioFile *a = audio
+		int delay_samples = a.sample_rate * config.Delay + 1
+		state.temp_r.resize(delay_samples)
+		state.temp_l.resize(delay_samples)
+	
+		DoFlanger(buf.r, state.temp_r, a.sample_rate)
+		DoFlanger(buf.l, state.temp_l, a.sample_rate)
+	
+		state.offset += buf.num
 	
 class ConfigDialog : Dialog
-	void __init__()
+	Flanger *f
+	void __init__(Flanger *_f)
 		super.__init__("Flanger", 485, 175, MainWin, false)
 		AddGrid("", 0, 0, 1, 3, "table1")
 		SetTarget("table1", 0)
@@ -83,39 +97,25 @@ class ConfigDialog : Dialog
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 2)
+		f = _f
 	
-		CreateSliderM(self, "speed_slider", "speed", 0, 2,    1,    &OnSpeed, data.Speed)
-		CreateSliderM(self, "depth_slider", "depth", 0, 1,    100,  &OnDepth, data.Depth)
-		CreateSliderM(self, "delay_slider", "delay", 0, 0.02, 1000, &OnDelay, data.Delay)
+		CreateSliderM(self, "speed_slider", "speed", 0, 2,    1,    &OnSpeed, f.config.Speed)
+		CreateSliderM(self, "depth_slider", "depth", 0, 1,    100,  &OnDepth, f.config.Depth)
+		CreateSliderM(self, "delay_slider", "delay", 0, 0.02, 1000, &OnDelay, f.config.Delay)
 	
 		fill()
 		
 	void fill()
-		SliderSet(self, "speed", data.Speed)
-		SliderSet(self, "depth", data.Depth)
-		SliderSet(self, "delay", data.Delay)
+		SliderSet(self, "speed", f.config.Speed)
+		SliderSet(self, "depth", f.config.Depth)
+		SliderSet(self, "delay", f.config.Delay)
 		
 	void OnSpeed()
-		data.Speed = SliderGet(self, "speed")
+		f.config.Speed = SliderGet(self, "speed")
 
 	void OnDepth()
-		data.Depth = SliderGet(self, "depth")
+		f.config.Depth = SliderGet(self, "depth")
 
 	void OnDelay()
-		data.Delay = SliderGet(self, "delay")
-
-void Configure()
-	dlg = new ConfigDialog
-	dlg.Run()
-	
-void ProcessTrack(BufferBox buf)
-	AudioFile *a = audio
-	int delay_samples = a.sample_rate * data.Delay + 1
-	state.temp_r.resize(delay_samples)
-	state.temp_l.resize(delay_samples)
-	
-	DoFlanger(buf.r, state.temp_r, a.sample_rate)
-	DoFlanger(buf.l, state.temp_l, a.sample_rate)
-	
-	state.offset += buf.num
+		f.config.Delay = SliderGet(self, "delay")
 

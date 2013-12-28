@@ -1,5 +1,5 @@
 // Image = hui:properties
-// Title[Deutsch] = Equalizer
+// Title[Deutsch] = Equalizer 15
 
 use "../../api.kaba"
 
@@ -13,81 +13,90 @@ const float MAX_FREQ = 20000.0
 class PluginData
 	float Factor[NUM_BANDS]
 
-PluginData data
+class Equalizer15 : AudioEffect
 
+	PluginData config
 
+	ConfigDialog *dlg
+	float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
 
-Window *EqualizerDialog
-float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
+	complex f[]
 
-complex f[]
-
-void equalize(float b[])
-	int _STACK_ALIGNMENT_
+	void equalize(float b[])
+		int _STACK_ALIGNMENT_
 	
-	// transform
-	int len2 = b.num / 2 + 1
-	f.resize(len2)
-	fft_r2c(b, f)
+		// transform
+		int len2 = b.num / 2 + 1
+		f.resize(len2)
+		fft_r2c(b, f)
 
-	// equalize
-	float w = i2f(b.num) / audio.sample_rate
-	for int i, 0, NUM_BANDS
-		int j0 = clamp(FreqMin[i] * w, 0, len2)
-		int j1 = clamp(FreqMax[i] * w, 0, len2)
-		float ff = data.Factor[i] / b.num
-		for int j, j0, j1
-			f[j] = f[j] * ff
+		// equalize
+		float w = i2f(b.num) / audio.sample_rate
+		for int i, 0, NUM_BANDS
+			int j0 = clamp(FreqMin[i] * w, 0, len2)
+			int j1 = clamp(FreqMax[i] * w, 0, len2)
+			float ff = config.Factor[i] / b.num
+			for int j, j0, j1
+				f[j] = f[j] * ff
 		
-	// transform back
-	fft_c2r_inv(f, b)
+		// transform back
+		fft_c2r_inv(f, b)
 
-void ProcessTrack(BufferBox buf)
-	equalize(buf.r)
-	equalize(buf.l)
-	f.clear()
+	overwrite void ProcessTrack(BufferBox buf)
+		equalize(buf.r)
+		equalize(buf.l)
+		f.clear()
 
-void ResetData()
-	for int i, 0, NUM_BANDS
-		data.Factor[i] = 1
+	overwrite void ResetConfig()
+		for int i, 0, NUM_BANDS
+			config.Factor[i] = 1
 
-	for int i, 0, NUM_BANDS
-		FreqMin[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i - 0.5))
-		FreqMax[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i + 0.5))
-	FreqMin[0] = 0
-	FreqMax[NUM_BANDS - 1] = 1000000
+		for int i, 0, NUM_BANDS
+			FreqMin[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i - 0.5))
+			FreqMax[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i + 0.5))
+		FreqMin[0] = 0
+		FreqMax[NUM_BANDS - 1] = 1000000
 
-void DataToDialog()
-	for int i, 0, NUM_BANDS
-		EqualizerDialog.SetFloat("slider_" + i, data.Factor[i] / 2)
-
-void OnEvent()
-	Event *e = HuiGetEvent()
-	for int i, 0, NUM_BANDS
-		if e.id == ("slider_" + i)
-			data.Factor[i] = EqualizerDialog.GetFloat("") * 2
-
-
-void Configure()
-	// dialog
-	EqualizerDialog =new FixedDialog("Equalizer",455,325,MainWin,false)
-	for int i, 0, NUM_BANDS
-		EqualizerDialog.AddSlider("",5 + i*30,35,25,210,"slider_" + i)
-	EqualizerDialog.AddText("20",5,250,25,25,"")
-	EqualizerDialog.AddText("54",65,250,25,25,"")
-	EqualizerDialog.AddText("140",125,250,25,25,"")
-	EqualizerDialog.AddText("390",185,250,25,25,"")
-	EqualizerDialog.AddText("1k",245,250,25,25,"")
-	EqualizerDialog.AddText("2k8",305,250,25,25,"")
-	EqualizerDialog.AddText("7k5",365,250,25,25,"")
-	EqualizerDialog.AddText("20k",425,250,25,25,"")
-	PutCommandBarFixed(EqualizerDialog, 5, 285, 455)
-	PutFavoriteBarFixed(EqualizerDialog, 5, 5, 455)
+	overwrite void UpdateDialog()
+		for int i, 0, NUM_BANDS
+			dlg.SetFloat("slider_" + i, config.Factor[i] / 2)
 	
-	EqualizerDialog.Event("*", &OnEvent)
-	
-	
-	DataToDialog()
+	overwrite void Configure()
+		dlg = new ConfigDialog(self)
+		dlg.Run()
 
-	EqualizerDialog.Run()
+class ConfigDialog : FixedDialog
+	Equalizer15 *eq
+
+
+	void __init__(Equalizer15 *_eq)
+		super.__init__("Equalizer",455,325,MainWin,false)
+		for int i, 0, NUM_BANDS
+			AddSlider("",5 + i*30,35,25,210,"slider_" + i)
+		AddText("20",5,250,25,25,"")
+		AddText("54",65,250,25,25,"")
+		AddText("140",125,250,25,25,"")
+		AddText("390",185,250,25,25,"")
+		AddText("1k",245,250,25,25,"")
+		AddText("2k8",305,250,25,25,"")
+		AddText("7k5",365,250,25,25,"")
+		AddText("20k",425,250,25,25,"")
+		PutCommandBarFixed(self, 5, 285, 455)
+		PutFavoriteBarFixed(self, 5, 5, 455)
+	
+		eq = _eq
+		EventM("*", &OnEvent)
+	
+	
+		fill()
+
+	void OnEvent()
+		Event *e = HuiGetEvent()
+		for int i, 0, NUM_BANDS
+			if e.id == ("slider_" + i)
+				eq.config.Factor[i] = GetFloat("") * 2
+		
+	void fill()
+		for int i, 0, NUM_BANDS
+			SetFloat("slider_" + i, eq.config.Factor[i] / 2)
 	

@@ -102,9 +102,11 @@ void TrackDialog::OnPanning()
 
 void TrackDialog::OnSynthesizer()
 {
-	SynthesizerDialog *dlg = new SynthesizerDialog(tsunami, false, track);
-	dlg->Run();
-	LoadData();
+	Synthesizer *s = ChooseSynthesizer(tsunami, track->synth->name);
+	if (s){
+		track->synth = s;
+		LoadData();
+	}
 }
 
 void TrackDialog::OnConfigSynthesizer()

@@ -10,19 +10,20 @@
 
 #include "../../lib/hui/hui.h"
 
-class Track;
+class Synthesizer;
 
 class SynthesizerDialog: public HuiDialog
 {
 public:
-	SynthesizerDialog(HuiWindow *_parent, bool _allow_parent, Track *t);
+	SynthesizerDialog(HuiWindow *_parent, const string &old_name = "");
 	virtual ~SynthesizerDialog();
 
 	void OnSelect();
 	void OnClose();
 
 	Array<string> names;
-	Track *track;
 };
+
+Synthesizer *ChooseSynthesizer(HuiWindow *parent, const string &old_name = "");
 
 #endif /* SYNTHESIZERDIALOG_H_ */

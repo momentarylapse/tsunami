@@ -11,17 +11,35 @@
 void WinTrySendByKeyCode(HuiWindow *win, int key_code);
 
 // safety feature... in case we delete the control while it notifies us
-static HuiControl *_current_notification_control_ = NULL;
-static bool _current_notification_control_deleted_ = false;
-inline void notify_set_cur(HuiControl *c)
+struct _HuiNotifyStackElement
 {
-	_current_notification_control_ = c;
-	_current_notification_control_deleted_ = false;
+	HuiControl *c;
+	bool deleted;
+};
+static Array<_HuiNotifyStackElement> _notify_stack_;
+inline void notify_push(HuiControl *c)
+{
+	_HuiNotifyStackElement e;
+	e.c = c;
+	e.deleted = false;
+	_notify_stack_.add(e);
+}
+inline void notify_pop()
+{
+	_notify_stack_.pop();
 }
 inline void notify_set_del(HuiControl *c)
 {
-	if (_current_notification_control_ == c)
-		_current_notification_control_deleted_ = true;
+	foreach(_HuiNotifyStackElement &e, _notify_stack_)
+		if (e.c == c)
+			e.deleted = true;
+}
+inline bool notify_is_deleted(HuiControl *c)
+{
+	foreach(_HuiNotifyStackElement &e, _notify_stack_)
+		if (e.c == c)
+			return e.deleted;
+	return false;
 }
 
 HuiControl::HuiControl(int _type, const string &_id)
@@ -263,14 +281,16 @@ void HuiControl::Notify(const string &message, bool is_default)
 	win->_SetCurID_(id);
 	if (id.num == 0)
 		return;
-	notify_set_cur(this);
+	notify_push(this);
 	HuiEvent e = HuiEvent(id, message);
 	_HuiSendGlobalCommand_(&e);
 	e.is_default = is_default;
 	win->_SendEvent_(&e);
 
-	if (_current_notification_control_deleted_)
+	if (notify_is_deleted(this)){
+		notify_pop();
 		return;
+	}
 
 	if (this == win->main_input_control){
 		if (message == "hui:mouse-move")
@@ -297,5 +317,6 @@ void HuiControl::Notify(const string &message, bool is_default)
 		else if (message == "hui:draw")
 			win->OnDraw();
 	}
+	notify_pop();
 }
 

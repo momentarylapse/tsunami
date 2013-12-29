@@ -609,14 +609,19 @@ void PluginManager::OnPluginPreview()
 	PreviewStart(cur_effect);
 }
 
-void PluginManager::ConfigureSynthesizer(Synthesizer *s)
+bool PluginManager::ConfigureSynthesizer(Synthesizer *s)
 {
+	string params_old = s->options_to_string();
+
 	PluginAddPreview = false;
 	cur_plugin = NULL;
 	cur_synth = s;
 	s->options_to_string();
 	//s->options_from_string();
 	s->Configure();
+	if (PluginCancelled)
+		s->options_from_string(params_old);
+	return !PluginCancelled;
 }
 
 void PluginManager::OnUpdate(Observable *o)

@@ -63,7 +63,7 @@ public:
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name);
 
-	void ConfigureSynthesizer(Synthesizer *s);
+	bool ConfigureSynthesizer(Synthesizer *s);
 
 	// not compiled yet
 	struct PluginFile

@@ -15,6 +15,7 @@
 #include "../../Tsunami.h"
 #include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"
+#include "../../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
 
 TrackDialog::TrackDialog(HuiWindow *win):
 	EmbeddedDialog(win)
@@ -109,7 +110,9 @@ void TrackDialog::OnSynthesizer()
 
 void TrackDialog::OnConfigSynthesizer()
 {
-	tsunami->plugin_manager->ConfigureSynthesizer(track->synth);
+	string params_old = track->synth->options_to_string();
+	if (tsunami->plugin_manager->ConfigureSynthesizer(track->synth))
+		track->root->Execute(new ActionTrackEditSynthesizer(track, params_old));
 }
 
 void TrackDialog::OnEditMidiTrack()

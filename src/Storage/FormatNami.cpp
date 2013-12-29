@@ -150,13 +150,25 @@ void WriteMidi(CFile *f, MidiData &m)
 {
 	BeginChunk(f, "midi");
 
-	f->WriteStr(m.instrument);
-	f->WriteStr(m.synthesizer);
-	f->WriteStr(m.options);
+	f->WriteStr("");
+	f->WriteStr("");
+	f->WriteStr("");
 	f->WriteInt(0); // reserved
 
 	foreach(MidiNote &n, m)
 		WriteMidiNote(f, n);
+
+	EndChunk(f);
+}
+
+void WriteSynth(CFile *f, Synthesizer *s)
+{
+	BeginChunk(f, "synth");
+
+	f->WriteStr(s->name);
+	f->WriteStr(s->options_to_string());
+	f->WriteStr("");
+	f->WriteInt(0); // reserved
 
 	EndChunk(f);
 }
@@ -196,13 +208,11 @@ void WriteTrack(CFile *f, Track *t)
 	foreach(Effect *effect, t->fx)
 		WriteEffect(f, effect);
 
-	if ((t->midi.num > 0) || (t->type == t->TYPE_MIDI)){
-		if (t->synth){
-			t->synth->options_to_string();
-			t->midi.options = t->synth->options;
-		}
+	if ((t->type == t->TYPE_TIME) || (t->type == t->TYPE_MIDI))
+		WriteSynth(f, t->synth);
+
+	if (t->midi.num > 0)
 		WriteMidi(f, t->midi);
-	}
 
 	EndChunk(f);
 }
@@ -241,7 +251,6 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 		WriteSample(f, sample);
 
 	foreachi(Track *track, a->track, i){
-		track->midi.synthesizer = track->synth->name;
 		WriteTrack(f, track);
 		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
@@ -693,12 +702,21 @@ void ReadChunkMidiNote(CFile *f, Array<MidiNote> *notes)
 
 void ReadChunkMidiData(CFile *f, MidiData *midi)
 {
-	midi->instrument = f->ReadStr();
-	midi->synthesizer = f->ReadStr();
-	midi->options = f->ReadStr();
+	f->ReadStr();
+	f->ReadStr();
+	f->ReadStr();
 	f->ReadInt(); // reserved
 
 	AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
+}
+
+void ReadChunkSynth(CFile *f, Track *t)
+{
+	delete(t->synth);
+	t->synth = CreateSynthesizer(f->ReadStr());
+	t->synth->options_from_string(f->ReadStr());
+	f->ReadStr();
+	f->ReadInt();
 }
 
 void ReadChunkTrackLevel(CFile *f, Track *t)
@@ -726,6 +744,7 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &t->fx);
 	AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
 	AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
+	AddChunkHandler("synth", (chunk_reader*)&ReadChunkSynth, t);
 }
 
 void ReadChunkNami(CFile *f, AudioFile *a)
@@ -821,14 +840,6 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 
 	// some post processing
 	check_empty_subs(a);
-
-	foreach(Track *t, a->track)
-		if (t->midi.synthesizer.num > 0){
-			delete(t->synth);
-			t->synth = CreateSynthesizer(t->midi.synthesizer);
-			t->synth->options = t->midi.options;
-			t->synth->options_from_string();
-		}
 
 	foreach(Effect *fx, a->fx)
 		fx->ConfigFromString();

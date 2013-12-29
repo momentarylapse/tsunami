@@ -88,9 +88,6 @@ class MidiNote
 
 class MidiData
 	MidiNote note[]
-	string synthesizer
-	string instrument
-	string options
 	void add(int offset, int length, float pitch, float volume)
 		MidiNote n
 		n.range.offset = offset

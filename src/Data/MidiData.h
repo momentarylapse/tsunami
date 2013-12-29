@@ -40,10 +40,6 @@ public:
 	Range GetRange();
 
 	void sort();
-
-	string synthesizer;
-	string instrument;
-	string options;
 };
 
 

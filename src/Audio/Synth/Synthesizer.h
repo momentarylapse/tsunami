@@ -38,11 +38,10 @@ public:
 	virtual void Reset();
 	virtual void ResetConfig(){}
 
-	void options_to_string();
-	void options_from_string();
+	string options_to_string();
+	void options_from_string(const string &options);
 
 	string name;
-	string options;
 	int sample_rate;
 
 	MidiSource *source;

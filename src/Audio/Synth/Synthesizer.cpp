@@ -178,9 +178,9 @@ Array<string> FindSynthesizers()
 	return names;
 }
 
-void Synthesizer::options_to_string()
+string Synthesizer::options_to_string()
 {
-	options = "";
+	string options;
 	Script::Type *type = Script::GetDynamicType(this);
 	if (type){
 		foreach(Script::ClassElement &e, type->element)
@@ -189,9 +189,10 @@ void Synthesizer::options_to_string()
 				options = var_to_string(e.type, &p[e.offset]);
 			}
 	}
+	return options;
 }
 
-void Synthesizer::options_from_string()
+void Synthesizer::options_from_string(const string &options)
 {
 	Script::Type *type = Script::GetDynamicType(this);
 	if (type){

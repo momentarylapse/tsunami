@@ -196,9 +196,6 @@ void PluginManager::LinkAppScriptData()
 
 	Script::DeclareClassSize("MidiData", sizeof(MidiData));
 	Script::DeclareClassOffset("MidiData", "note", 0); //offsetof(MidiData, note));
-	Script::DeclareClassOffset("MidiData", "synthesizer", offsetof(MidiData, synthesizer));
-	Script::DeclareClassOffset("MidiData", "instrument", offsetof(MidiData, instrument));
-	Script::DeclareClassOffset("MidiData", "options", offsetof(MidiData, options));
 
 	Script::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
 	Script::DeclareClassOffset("TrackLevel", "buffer", offsetof(TrackLevel, buffer));
@@ -371,7 +368,7 @@ void SynthWriteDataToFile(Synthesizer *s, const string &name)
 	dir_create(HuiAppDirectory + "Favorites/Synthesizer/");
 	s->options_to_string();
 	CFile *f = FileCreate(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
-	f->WriteStr(s->options);
+	f->WriteStr(s->options_to_string());
 	FileClose(f);
 }
 
@@ -384,9 +381,8 @@ void SynthLoadDataFromFile(Synthesizer *s, const string &name)
 	CFile *f = FileOpen(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
 	if (!f)
 		return;
-	s->options = f->ReadStr();
+	s->options_from_string(f->ReadStr());
 	FileClose(f);
-	s->options_from_string();
 }
 
 
@@ -548,9 +544,6 @@ void PluginManager::OnPluginOk()
 
 void PluginManager::OnPluginClose()
 {
-	if (cur_synth){
-		cur_synth->options_from_string();
-	}
 	PluginCancelled = true;
 	cur_effect = NULL;
 	cur_plugin = NULL;

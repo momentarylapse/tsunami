@@ -157,7 +157,6 @@ void FxList::AddNewEffect(string &filename)
 	string name = filename.basename(); // remove directory
 	name = name.substr(0, name.num - 5); //      and remove ".kaba"
 	Effect *effect = CreateEffect(name);
-	effect->ResetConfig();
 	if (UpdateEffectParams(effect)){
 		track->AddEffect(effect);
 		FillList();

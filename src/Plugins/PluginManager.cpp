@@ -431,15 +431,15 @@ void PluginManager::InitFavorites(HuiWindow *win)
 	win->Enable("favorite_delete", false);
 
 	string init = "-------";
-	if (cur_plugin)
-		init = cur_plugin->s->Filename.basename() + "___";
+	if (cur_effect)
+		init = cur_effect->name + "___";
 	else if (cur_synth)
 		init = cur_synth->name + "___";
 
 	dir_create(HuiAppDirectory + "Favorites");
-	dir_create(HuiAppDirectory + "Favorites/Effects");
+	dir_create(HuiAppDirectory + "Favorites/Effect");
 	dir_create(HuiAppDirectory + "Favorites/Synthesizer");
-	string dir = HuiAppDirectory + "Favorites/Effects";
+	string dir = HuiAppDirectory + "Favorites/Effect";
 	if (cur_synth)
 		dir = HuiAppDirectory + "Favorites/Synthesizer";
 	Array<DirEntry> list = dir_search(dir, "*", false);
@@ -677,6 +677,8 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (r->name != "AudioEffect")
 				continue;
 			fx = (Effect*)t->CreateInstance();
+			fx->name = p->filename.basename();
+			fx->name = fx->name.head(fx->name.num - 5);
 			break;
 		}
 		main_void_func *f_main = (main_void_func*)s->MatchFunction("main", "void", 0);

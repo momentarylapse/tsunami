@@ -123,23 +123,17 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 	}
 }
 
-/*void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)
+Array<Script::ClassElement> get_unique_elements(Script::Type *t)
 {
-	if (t == Script::TypeInt)
-		var_temp += i2s(*(int*)v);
-	else if (t == Script::TypeChar)
-		var_temp += i2s(*(char*)v);
-	else if (t == Script::TypeFloat)
-		var_temp += f2s(*(float*)v, 6);
-	else if (t == Script::TypeBool)
-		var_temp += (*(bool*)v) ? "true" : "false";
-	else if (t == Script::TypeVector)
-		var_temp += format("(%f %f %f)", *(float*)v, ((float*)v)[1], ((float*)v)[2]);
-	else if (t == Script::TypeComplex)
-		var_temp += format("(%f %f)", *(float*)v, ((float*)v)[1]);
-	else
-		var_temp += "-------";
-}*/
+	Array<Script::ClassElement> r;
+	int pos = -1;
+	foreach(Script::ClassElement &e, t->element)
+		if (e.offset > pos){
+			r.add(e);
+			pos = e.offset;
+		}
+	return r;
+}
 
 string var_to_string(Script::Type *type, char *v)
 {
@@ -170,43 +164,17 @@ string var_to_string(Script::Type *type, char *v)
 		}
 		r += "]";
 	}else{
+		Array<Script::ClassElement> e = get_unique_elements(type);
 		r += "(";
-		for(int i=0;i<type->element.num;i++){
+		for(int i=0;i<e.num;i++){
 			if (i > 0)
 				r += " ";
-			r += var_to_string(type->element[i].type, &v[type->element[i].offset]);
+			r += var_to_string(e[i].type, &v[e[i].offset]);
 		}
 		r += ")";
 	}
 	return r;
 }
-
-/*
-void try_write_element(EffectParam *p, Script::ClassElement *e, char *v)
-{
-	p->name = e->name;
-	p->type = e->type->name;
-	p->value = "";
-	if (e->type->is_array){
-		p->value += "[";
-		for (int i=0;i<e->type->array_length;i++){
-			if (i > 0)
-				p->value += " ";
-			try_write_primitive_element(p->value, e->type->parent, &v[e->offset + i * e->type->parent->size]);
-		}
-		p->value += "]";
-	}else if (e->type->is_super_array){
-		DynamicArray *a = (DynamicArray*)&v[e->offset];
-		p->value += format("[%d ", a->num);
-		for (int i=0;i<a->num;i++){
-			if (i > 0)
-				p->value += " ";
-			try_write_primitive_element(p->value, e->type->parent, &(((char*)a->data)[i * e->type->parent->size]));
-		}
-		p->value += "]";
-	}else
-		try_write_primitive_element(p->value, e->type, &v[e->offset]);
-}*/
 
 string get_next(const string &var_temp, int &pos)
 {
@@ -275,11 +243,12 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		}
 		pos ++; // ']'
 	}else{
+		Array<Script::ClassElement> e = get_unique_elements(type);
 		pos ++; // '('
-		for(int i=0;i<type->element.num;i++){
+		for(int i=0;i<e.num;i++){
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(type->element[i].type, &v[type->element[i].offset], s, pos);
+			var_from_string(e[i].type, &v[e[i].offset], s, pos);
 		}
 		pos ++; // ')'
 	}
@@ -320,32 +289,23 @@ void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
 		try_read_primitive_element(p.value, pos, e->type, &v[e->offset]);
 }*/
 
-void Effect::WriteConfigToFile(const string &name)
+void Effect::WriteConfigToFile(const string &fav_name)
 {
 	msg_db_f("Effect.ConfigDataToFile", 1);
 	ConfigToString();
 	dir_create(HuiAppDirectory + "Favorites/");
-	CFile *f = FileCreate(HuiAppDirectory + "Plugins/Favorites/" + plugin->s->Filename.basename() + "___" + name);
-	f->WriteInt(0);
-	f->WriteInt(0);
-	f->WriteComment("// Data");
+	CFile *f = FileCreate(HuiAppDirectory + "Favorites/Effect/" + name + "___" + fav_name);
 	f->WriteStr(ConfigToString());
-	f->WriteStr("#");
 	delete(f);
 }
 
-void Effect::LoadConfigFromFile(const string &name)
+void Effect::LoadConfigFromFile(const string &fav_name)
 {
 	msg_db_f("Effect.LoadConfigFromFile", 1);
-	CFile *f = FileOpen(HuiAppDirectory + "Favorites/" + plugin->s->Filename.basename() + "___" + name);
+	CFile *f = FileOpen(HuiAppDirectory + "Favorites/Effect/" + name + "___" + fav_name);
 	if (!f)
 		return;
-
-	f->ReadInt();
-	f->ReadInt();
-	f->ReadComment();
 	ConfigFromString(f->ReadStr());
-
 	delete(f);
 }
 

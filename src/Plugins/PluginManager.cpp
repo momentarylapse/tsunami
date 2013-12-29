@@ -122,15 +122,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Range", "offset", offsetof(Range, offset));
 	Script::DeclareClassOffset("Range", "length", offsetof(Range, num));
 
-	Script::DeclareClassSize("EffectParam", sizeof(EffectParam));
-	Script::DeclareClassOffset("EffectParam", "name", offsetof(EffectParam, name));
-	Script::DeclareClassOffset("EffectParam", "type", offsetof(EffectParam, type));
-	Script::DeclareClassOffset("EffectParam", "value", offsetof(EffectParam, value));
-
 	Effect effect;
 	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
 	Script::DeclareClassOffset("AudioEffect", "name", offsetof(Effect, name));
-	Script::DeclareClassOffset("AudioEffect", "param", offsetof(Effect, param));
 	Script::DeclareClassOffset("AudioEffect", "only_on_selection", offsetof(Effect, only_on_selection));
 	Script::DeclareClassOffset("AudioEffect", "range", offsetof(Effect, range));
 	Script::DeclareClassOffset("AudioEffect", "usable", offsetof(Effect, usable));
@@ -773,8 +767,6 @@ void PluginManager::PreviewEnd()
 
 
 	tsunami->renderer->effect = NULL;
-	if (cur_effect)
-		cur_effect->ConfigFromString();
 }
 
 Effect *PluginManager::LoadEffect(const string &name)

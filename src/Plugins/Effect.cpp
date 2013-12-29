@@ -20,8 +20,6 @@ void GlobalRemoveSliders(HuiWindow *win);
 
 string var_to_string(Script::Type *type, char *v);
 void var_from_string(Script::Type *type, char *v, const string &s, int &pos);
-void try_read_element(EffectParam &p, Script::ClassElement *e, char *v);
-void try_write_element(EffectParam *p, Script::ClassElement *e, char *v);
 
 Effect::Effect()
 {
@@ -59,25 +57,23 @@ void Effect::__delete__()
 		}
 }*/
 
-void Effect::ConfigToString()
+string Effect::ConfigToString()
 {
 	msg_db_f("Effect.ExportConfig", 1);
 
-	param.clear();
+	string param;
 	Script::Type *type = Script::GetDynamicType(this);
 	if (type){
 		foreach(Script::ClassElement &e, type->element)
 			if (e.name == "config"){
-				param.resize(e.type->element.num);
-				foreachi(Script::ClassElement &ee, e.type->element, j){
-					char *p = (char*)this;
-					param[j].value = var_to_string(ee.type, &p[e.offset + ee.offset]);
-				}
+				char *p = (char*)this;
+				param = var_to_string(e.type, &p[e.offset]);
 			}
 	}
+	return param;
 }
 
-void Effect::ConfigFromString()
+void Effect::ConfigFromString(const string &param)
 {
 	msg_db_f("Effect.ImportConfig", 1);
 
@@ -85,12 +81,9 @@ void Effect::ConfigFromString()
 	if (type){
 		foreach(Script::ClassElement &e, type->element)
 			if (e.name == "config"){
-				param.resize(e.type->element.num);
-				foreachi(Script::ClassElement &ee, e.type->element, j){
-					char *p = (char*)this;
-					int pos = 0;
-					var_from_string(ee.type, &p[e.offset + ee.offset], param[j].value, pos);
-				}
+				char *p = (char*)this;
+				int pos = 0;
+				var_from_string(e.type, &p[e.offset], param, pos);
 			}
 	}
 }
@@ -98,7 +91,6 @@ void Effect::ConfigFromString()
 void Effect::Prepare()
 {
 	msg_db_f("Effect.Prepare", 1);
-	ConfigFromString();
 	ResetState();
 	if (!usable)
 		tsunami->log->Error(GetError());
@@ -120,8 +112,6 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 	msg_db_f("Effect.Apply", 1);
 
 	// run
-	ResetConfig();
-	ConfigFromString();
 	tsunami->plugin_manager->context.set(t, 0, buf.range());
 	ProcessTrack(&buf);
 	t->root->UpdateSelection();
@@ -133,7 +123,7 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 	}
 }
 
-void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)
+/*void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)
 {
 	if (t == Script::TypeInt)
 		var_temp += i2s(*(int*)v);
@@ -149,7 +139,7 @@ void try_write_primitive_element(string &var_temp, Script::Type *t, char *v)
 		var_temp += format("(%f %f)", *(float*)v, ((float*)v)[1]);
 	else
 		var_temp += "-------";
-}
+}*/
 
 string var_to_string(Script::Type *type, char *v)
 {
@@ -191,6 +181,7 @@ string var_to_string(Script::Type *type, char *v)
 	return r;
 }
 
+/*
 void try_write_element(EffectParam *p, Script::ClassElement *e, char *v)
 {
 	p->name = e->name;
@@ -215,7 +206,7 @@ void try_write_element(EffectParam *p, Script::ClassElement *e, char *v)
 		p->value += "]";
 	}else
 		try_write_primitive_element(p->value, e->type, &v[e->offset]);
-}
+}*/
 
 string get_next(const string &var_temp, int &pos)
 {
@@ -294,7 +285,7 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 	}
 }
 
-void try_read_primitive_element(const string &var_temp, int &pos, Script::Type *t, char *v)
+/*void try_read_primitive_element(const string &var_temp, int &pos, Script::Type *t, char *v)
 {
 	if (t == Script::TypeInt)
 		*(int*)v = s2i(get_next(var_temp, pos));
@@ -327,7 +318,7 @@ void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
 			try_read_primitive_element(p.value, pos, e->type->parent, &(((char*)a->data)[i * e->type->parent->size]));
 	}else
 		try_read_primitive_element(p.value, pos, e->type, &v[e->offset]);
-}
+}*/
 
 void Effect::WriteConfigToFile(const string &name)
 {
@@ -338,12 +329,7 @@ void Effect::WriteConfigToFile(const string &name)
 	f->WriteInt(0);
 	f->WriteInt(0);
 	f->WriteComment("// Data");
-	f->WriteInt(param.num);
-	foreach(EffectParam &p, param){
-		f->WriteStr(p.name);
-		f->WriteStr(p.type);
-		f->WriteStr(p.value);
-	}
+	f->WriteStr(ConfigToString());
 	f->WriteStr("#");
 	delete(f);
 }
@@ -358,14 +344,7 @@ void Effect::LoadConfigFromFile(const string &name)
 	f->ReadInt();
 	f->ReadInt();
 	f->ReadComment();
-	int num = f->ReadInt();
-	param.resize(num);
-	foreach(EffectParam &p, param){
-		p.name = f->ReadStr();
-		p.type = f->ReadStr();
-		p.value = f->ReadStr();
-	}
-	ConfigFromString();
+	ConfigFromString(f->ReadStr());
 
 	delete(f);
 }
@@ -404,6 +383,7 @@ Effect *CreateEffect(const string &name)
 	Effect *f = tsunami->plugin_manager->LoadEffect(name);
 	if (f){
 		f->name = name;
+		f->ResetConfig();
 		return f;
 	}
 	f = new Effect;

@@ -20,10 +20,8 @@ class Script;
 class Type;
 };
 
-class EffectParam
+struct EffectParam
 {
-public:
-	string name, type;
 	string value;
 };
 
@@ -38,11 +36,12 @@ public:
 	virtual void __delete__();
 
 	string name;
-	Array<EffectParam> param;
 	bool only_on_selection;
 	Range range;
 	Plugin *plugin;
 	bool usable;
+
+	Array<EffectParam> legacy_params;
 
 	virtual void ProcessTrack(BufferBox *buf){};
 	virtual void ResetConfig(){};
@@ -54,8 +53,8 @@ public:
 	void DoProcessTrack(Track *t, int level_no, const Range &r);
 	bool DoConfigure(bool previewable);
 
-	void ConfigToString();
-	void ConfigFromString();
+	string ConfigToString();
+	void ConfigFromString(const string &options);
 	void Prepare();
 	void CleanUp();
 	void Apply(BufferBox &buf, Track *t, bool log_error);

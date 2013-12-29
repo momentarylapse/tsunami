@@ -248,7 +248,7 @@ void Track::AddEffect(Effect *effect)
 }
 
 // execute after editing...
-void Track::EditEffect(int index, Array<EffectParam> &param_old)
+void Track::EditEffect(int index, const string &param_old)
 {
 	root->Execute(new ActionTrackEditEffect(this, index, param_old));
 }

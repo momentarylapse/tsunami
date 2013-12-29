@@ -11,19 +11,18 @@
 #include "../../Action.h"
 #include "../../../Plugins/Effect.h"
 class Track;
-class EffectParam;
 
 class ActionTrackEditEffect: public Action
 {
 public:
-	ActionTrackEditEffect(Track *t, int index, Array<EffectParam> &params);
+	ActionTrackEditEffect(Track *t, int index, const string &params);
 	virtual ~ActionTrackEditEffect();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
-	Array<EffectParam> params;
+	string params;
 	int track_no;
 	int index;
 	bool first_execution;

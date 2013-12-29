@@ -55,24 +55,15 @@ void WriteTag(CFile *f, Tag *t)
 	EndChunk(f);
 }
 
-void WriteEffectParam(CFile *f, EffectParam *p)
-{
-	BeginChunk(f, "fxparam");
-	f->WriteStr(p->name);
-	f->WriteStr(p->type);
-	f->WriteStr(p->value);
-	EndChunk(f);
-}
-
 void WriteEffect(CFile *f, Effect *e)
 {
-	BeginChunk(f, "fx");
+	BeginChunk(f, "effect");
 	f->WriteStr(e->name);
 	f->WriteBool(e->only_on_selection);
 	f->WriteInt(e->range.offset);
 	f->WriteInt(e->range.num);
-	foreach(EffectParam &p, e->param)
-		WriteEffectParam(f, &p);
+	f->WriteStr(e->ConfigToString());
+	f->WriteStr("");
 	EndChunk(f);
 }
 
@@ -271,7 +262,7 @@ void FormatNami::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 }
 
 
-
+#if 0
 void ReadCompressed(CFile *f, char *data, int size)
 {
 	memset(data, 0, size);
@@ -288,58 +279,7 @@ void ReadCompressed(CFile *f, char *data, int size)
 		//printf("%d  %d  %d\n", nonzero, zero, done);
 	}
 }
-
-void ReadFXListOld(CFile *f, Array<Effect*> &fx)
-{
-	// reset old params....???
-	fx.clear();
-	int n = f->ReadInt();
-	if (f->Eof){
-		return;
-	}
-	for (int i=0;i<n;i++){
-		Effect *e = CreateEffect(f->ReadStr());
-		e->only_on_selection = false;
-		e->range.offset = 0;
-		e->range.num = -1;
-		int num_params = f->ReadInt();
-		for (int j=0;j<num_params;j++){
-			EffectParam p;
-			p.name = f->ReadStr();
-			f->ReadChar(); // 'f'
-			p.type = "float";
-			float val = f->ReadFloat();
-			p.value = f2s(val, 6);
-			e->param.add(p);
-		}
-		fx.add(e);
-	}
-}
-
-void ReadFXList(CFile *f, Array<Effect*> &fx)
-{
-	// reset old params....???
-	fx.clear();
-	int n = f->ReadInt();
-	if (f->Eof){
-		return;
-	}
-	for (int i=0;i<n;i++){
-		Effect *e = CreateEffect(f->ReadStr());
-		e->only_on_selection = f->ReadBool();
-		e->range.offset = f->ReadInt();
-		e->range.num = f->ReadInt();
-		int num_params = f->ReadInt();
-		for (int j=0;j<num_params;j++){
-			EffectParam p;
-			p.name = f->ReadStr();
-			p.type = f->ReadStr();
-			p.value = f->ReadStr();
-			e->param.add(p);
-		}
-		fx.add(e);
-	}
-}
+#endif
 
 SampleRef *__AddEmptySubTrack(Track *t, const Range &r, const string &name)
 {
@@ -347,177 +287,6 @@ SampleRef *__AddEmptySubTrack(Track *t, const Range &r, const string &name)
 	buf.resize(r.length());
 	t->root->AddSample(name, buf);
 	return t->AddSample(r.start(), t->root->sample.num - 1);
-}
-
-void load_nami_file_old(CFile *f, AudioFile *a)
-{
-	int file_size = f->GetSize();
-	int ffv = f->ReadFileFormatVersion();
-	msg_write("old format: " + i2s(ffv));
-	Array<short> tdata;
-
-	if (ffv == 1){
-		int length = f->ReadInt();
-		//msg_write(length);
-		f->ReadInt(); // channels
-		a->sample_rate = f->ReadInt();
-		//msg_write(a->SampleRate);
-		f->ReadInt(); // bits per sample
-		tdata.resize(length * 2);
-		f->ReadBuffer((char*)&tdata[0], length * 4);
-		Track *t = a->AddTrack(Track::TYPE_AUDIO, 0);
-		BufferBox buf = t->GetBuffers(0, Range(0, length));
-		for (int i=0;i<length;i++){
-			buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-			buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
-		}
-		tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-		msg_db_m("b",1);
-		int NumSubs = f->ReadInt();
-		for (int n=0;n<NumSubs;n++){
-			string name = f->ReadStr();
-			int pos = (float)f->ReadInt();
-			int slength = f->ReadInt();
-			SampleRef *s = __AddEmptySubTrack(t, Range(pos, slength), name);
-			//msg_write(s->Length);
-			s->volume = f->ReadFloat();
-			f->ReadBool(); // s->echo_enabled
-			f->ReadFloat(); // s->echo_vol
-			f->ReadFloat(); // s->echo_delay
-			f->ReadFloat(); // s->echo_damp
-			tdata.resize(length * 2);
-			f->ReadBuffer((char*)&tdata[0], length * 4);
-			for (int i=0;i<slength;i++){
-				s->buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-				s->buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
-			}
-			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-		}
-	}else if (ffv == 2){
-		int length = f->ReadInt();
-		f->ReadInt(); // channels
-		a->sample_rate = f->ReadInt();
-		f->ReadInt(); // bits per sample
-		int num_tracks = f->ReadInt();
-		for (int k=0;k<num_tracks;k++){
-			Track *t = a->AddTrack(Track::TYPE_AUDIO, k);
-			t->name = f->ReadStr();
-			t->volume = f->ReadFloat();
-			tdata.resize(length * 2);
-			ReadCompressed(f, (char*)&tdata[0], length * 4);
-			//f->ReadBuffer((char*)&tdata[0], length * 4);
-			BufferBox buf = t->GetBuffers(0, Range(0, length));
-			for (int i=0;i<length;i++){
-				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
-			}
-			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-			msg_db_m("b",1);
-			int NumSubs = f->ReadInt();
-			for (int n=0;n<NumSubs;n++){
-				string name = f->ReadStr();
-				int pos = (float)f->ReadInt();
-				int slength = f->ReadInt();
-				SampleRef *s = __AddEmptySubTrack(t, Range(pos, slength), name);
-				//msg_write(s->Length);
-				s->volume = f->ReadFloat();
-				f->ReadBool(); // s->echo_enabled
-				f->ReadFloat(); // s->echo_vol
-				f->ReadFloat(); // s->echo_delay
-				f->ReadFloat(); // s->echo_damp
-				tdata.resize(slength * 2);
-				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				for (int i=0;i<slength;i++){
-					s->buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-					s->buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
-				}
-				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-			}
-		}
-	}else if ((ffv == 3) || (ffv == 5)){
-		int length = f->ReadInt();
-		f->ReadInt(); // channels
-		a->sample_rate = f->ReadInt();
-		f->ReadInt(); // bits per sample
-		int num_meta = f->ReadInt();
-		for (int i=0;i<num_meta;i++){
-			Tag t;
-			t.key = f->ReadStr();
-			t.value = f->ReadStr();
-			a->tag.add(t);
-		}
-		int num_tracks = f->ReadInt();
-		for (int k=0;k<num_tracks;k++){
-			Track *t = a->AddTrack(Track::TYPE_AUDIO, k);
-			if (ffv == 5)
-				f->ReadInt();
-			t->name = f->ReadStr();
-			t->volume = f->ReadFloat();
-			t->muted = f->ReadBool();
-			tdata.resize(length * 2);
-			ReadCompressed(f, (char*)&tdata[0], length * 4);
-			//f->ReadBuffer((char*)&tdata[0], length * 4);
-			BufferBox buf = t->GetBuffers(0, Range(0, length));
-			for (int i=0;i<length;i++){
-				buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-				buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
-			}
-			tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-			if (ffv == 3)
-				ReadFXListOld(f, t->fx);
-			else
-				ReadFXList(f, t->fx);
-			msg_db_m("b",1);
-			int NumSubs = f->ReadInt();
-			for (int n=0;n<NumSubs;n++){
-				if (ffv == 5)
-					f->ReadInt();
-				string name = f->ReadStr();
-				int pos = (float)f->ReadInt();
-				int slength = f->ReadInt();
-				SampleRef *s = __AddEmptySubTrack(t, Range(pos, slength), name);
-				//msg_write(s->Length);
-				s->volume = f->ReadFloat();
-				s->muted = f->ReadBool();
-				tdata.resize(slength * 2);
-				f->ReadBuffer((char*)&tdata[0], slength * 4);
-				for (int i=0;i<slength;i++){
-					s->buf.r[i] = (float)tdata[i*2  ] / 32768.0f;
-					s->buf.l[i] = (float)tdata[i*2+1] / 32768.0f;
-				}
-				tsunami->progress->Set((float)f->GetPos() / (float)file_size);
-				if (ffv == 3){
-					Array<Effect*> _fx;
-					ReadFXListOld(f, _fx);
-				}
-			}
-		}
-		if (ffv == 3)
-			ReadFXListOld(f, a->fx);
-		else
-			ReadFXList(f, a->fx);
-	}else
-		tsunami->log->Error(format(_("Falsche Version des Dateiformats: %d  (%d erwartet)"), ffv, 5));
-	tdata.clear();
-
-
-
-
-	// compress...
-	foreach(Track *t, a->track)
-		foreach(TrackLevel &l, t->level){
-			if (l.buffer.num != 1)
-				continue;
-			bool empty = true;
-			for (int i=0;i<l.buffer[0].num;i++)
-				if ((l.buffer[0].r[i] != 0) || (l.buffer[0].l[i] != 0)){
-					empty = false;
-					break;
-				}
-
-			if (empty)
-				l.buffer.clear();
-		}
 }
 
 typedef void chunk_reader(CFile*, void*);
@@ -565,13 +334,24 @@ void ReadChunkLevelName(CFile *f, AudioFile *a)
 		a->level_name.add(f->ReadStr());
 }
 
-void ReadChunkEffectParam(CFile *f, Effect *e)
+void ReadChunkEffectParamLegacy(CFile *f, Effect *e)
 {
 	EffectParam p;
-	p.name = f->ReadStr();
-	p.type = f->ReadStr();
+	f->ReadStr();
+	f->ReadStr();
 	p.value = f->ReadStr();
-	e->param.add(p);
+	e->legacy_params.add(p);
+}
+
+void ReadChunkEffectLegacy(CFile *f, Array<Effect*> *fx)
+{
+	Effect *e = CreateEffect(f->ReadStr());
+	e->only_on_selection = f->ReadBool();
+	e->range.offset = f->ReadInt();
+	e->range.num = f->ReadInt();
+	fx->add(e);
+
+	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParamLegacy, e);
 }
 
 void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
@@ -580,9 +360,14 @@ void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 	e->only_on_selection = f->ReadBool();
 	e->range.offset = f->ReadInt();
 	e->range.num = f->ReadInt();
+	string params = f->ReadStr();
+	msg_write("new");
+	msg_write(params);
+	e->ConfigFromString(params);
+	f->ReadStr();
 	fx->add(e);
 
-	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParam, e);
+	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParamLegacy, e);
 }
 
 void ReadChunkBufferBox(CFile *f, TrackLevel *l)
@@ -741,7 +526,8 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
 	AddChunkHandler("samref", (chunk_reader*)&ReadSampleRef, t);
 	AddChunkHandler("sub", (chunk_reader*)&ReadSub, t);
-	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &t->fx);
+	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffectLegacy, &t->fx);
+	AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &t->fx);
 	AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
 	AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
 	AddChunkHandler("synth", (chunk_reader*)&ReadChunkSynth, t);
@@ -818,6 +604,21 @@ void check_empty_subs(AudioFile *a)
 			}*/
 }
 
+void update_legacy_fx(Effect *fx)
+{
+	if (fx->legacy_params.num == 0)
+		return;
+	string params = "(";
+	for (int i=0;i<fx->legacy_params.num;i++){
+		if (i > 0)
+			params += " ";
+		params += fx->legacy_params[i].value;
+	}
+	params += ")";
+	msg_write(params);
+	fx->ConfigFromString(params);
+}
+
 void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_f("load_nami_file", 1);
@@ -828,13 +629,8 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 
 	CFile *f = FileOpen(a->filename);
 	f->SetBinaryMode(true);
-	bool is_old = (f->ReadChar() == 'b');
-	f->SetPos(0, true);
 
-	if (is_old)
-		load_nami_file_old(f, a);
-	else
-		load_nami_file_new(f, a);
+	load_nami_file_new(f, a);
 
 	FileClose(f);
 
@@ -842,10 +638,10 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 	check_empty_subs(a);
 
 	foreach(Effect *fx, a->fx)
-		fx->ConfigFromString();
+		update_legacy_fx(fx);
 	foreach(Track *t, a->track)
 		foreach(Effect *fx, t->fx)
-			fx->ConfigFromString();
+			update_legacy_fx(fx);
 
 	a->UpdateSelection();
 }

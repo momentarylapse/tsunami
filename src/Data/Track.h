@@ -27,7 +27,6 @@ class BufferBox;
 class AudioFile;
 class Synthesizer;
 class Effect;
-class EffectParam;
 
 
 class TrackLevel
@@ -63,7 +62,7 @@ public:
 	void InsertMidiData(int offset, MidiData &midi);
 	void AddEffect(Effect *effect);
 	void DeleteEffect(int index);
-	void EditEffect(int index, Array<EffectParam> &param_old);
+	void EditEffect(int index, const string &param_old);
 	SampleRef *AddSample(int pos, int index);
 	void DeleteSample(int index);
 	void AddMidiNote(const MidiNote &n);

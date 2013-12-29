@@ -134,14 +134,12 @@ bool FxList::UpdateEffectParams(Effect *f)
 	if (f->usable){
 
 		f->ConfigToString();
-		Array<EffectParam> param_old = f->param;
+		string param_old = f->ConfigToString();
 
 		if (f->DoConfigure(false)){
-			f->ConfigToString();
 			ok = true;
 		}else{
-			f->param = param_old;
-			f->ConfigFromString();
+			f->ConfigFromString(param_old);
 		}
 	}else{
 		tsunami->log->Error(f->GetError());
@@ -174,7 +172,7 @@ void FxList::ExecuteFXDialog(int index)
 
 	Effect *f = (*fx)[index];
 	f->ConfigToString();
-	Array<EffectParam> param_old = f->param;
+	string param_old = f->ConfigToString();
 	if (UpdateEffectParams(f))
 		track->EditEffect(index, param_old);
 }

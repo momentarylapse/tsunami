@@ -9,7 +9,7 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, Array<EffectParam> &_params)
+ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, const string &_params)
 {
 	track_no = get_track_index(t);
 	index = _index;
@@ -47,10 +47,9 @@ void *ActionTrackEditEffect::execute(Data *d)
 	}
 
 	fx->ConfigToString();
-	Array<EffectParam> temp = params;
-	params = fx->param;
-	fx->param = temp;
-	fx->ConfigFromString();
+	string temp = params;
+	params = fx->ConfigToString();
+	fx->ConfigFromString(temp);
 
 	return NULL;
 }

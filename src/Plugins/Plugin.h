@@ -15,8 +15,6 @@ namespace Script{
 class Script;
 };
 
-class EffectParam;
-
 // represents a compiled script
 class Plugin
 {

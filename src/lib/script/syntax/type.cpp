@@ -207,6 +207,14 @@ Type *Type::GetPointer()
 	return owner->CreateNewType(name + "*", config.PointerSize, true, false, false, 0, this);
 }
 
+Type *Type::GetRoot()
+{
+	Type *r = this;
+	while (r->parent)
+		r = r->parent;
+	return r;
+}
+
 void Type::AddFunction(SyntaxTree *s, int func_no, int virtual_index, bool overwrite)
 {
 	Function *f = s->Functions[func_no];

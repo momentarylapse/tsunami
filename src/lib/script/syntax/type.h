@@ -54,6 +54,7 @@ public:
 	bool IsDerivedFrom(Type *root) const;
 	bool DeriveFrom(Type *root, bool increase_size);
 	Type *GetPointer();
+	Type *GetRoot();
 	void AddFunction(SyntaxTree *s, int func_no, int virtual_index = -1, bool overwrite = false);
 	ClassFunction *GetFunc(const string &name, Type *return_type, int num_params);
 	ClassFunction *GetDefaultConstructor();

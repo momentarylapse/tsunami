@@ -773,19 +773,22 @@ void PluginManager::PreviewEnd()
 
 Effect *PluginManager::LoadEffect(const string &name)
 {
+	bool found = false;
 	foreach(PluginFile &pf, plugin_file){
 		if ((pf.name == name) && (pf.filename.find("/Buffer/") >= 0)){
+			found = true;
 			if (!LoadAndCompilePlugin(pf.filename))
 				return NULL;
 		}
 	}
+	if (!found){
+		tsunami->log->Error(format(_("Kann Effekt nicht laden: %s"), name.c_str()));
+		return NULL;
+	}
 
 	Script::Script *s = cur_plugin->s;
 	foreach(Script::Type *t, s->syntax->Types){
-		Script::Type *r = t;
-		while (r->parent)
-			r = r->parent;
-		if (r->name != "AudioEffect")
+		if (t->GetRoot()->name != "AudioEffect")
 			continue;
 		return (Effect*)t->CreateInstance();
 	}
@@ -815,10 +818,7 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name)
 		return NULL;
 	}
 	foreach(Script::Type *t, s->syntax->Types){
-		Script::Type *r = t;
-		while (r->parent)
-			r = r->parent;
-		if (r->name != "Synthesizer")
+		if (t->GetRoot()->name != "Synthesizer")
 			continue;
 		return (Synthesizer*)t->CreateInstance();
 	}

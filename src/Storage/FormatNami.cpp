@@ -361,8 +361,6 @@ void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 	e->range.offset = f->ReadInt();
 	e->range.num = f->ReadInt();
 	string params = f->ReadStr();
-	msg_write("new");
-	msg_write(params);
 	e->ConfigFromString(params);
 	f->ReadStr();
 	fx->add(e);
@@ -538,7 +536,8 @@ void ReadChunkNami(CFile *f, AudioFile *a)
 	a->sample_rate = f->ReadInt();
 
 	AddChunkHandler("tag", (chunk_reader*)&ReadChunkTag, &a->tag);
-	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffect, &a->fx);
+	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffectLegacy, &a->fx);
+	AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &a->fx);
 	AddChunkHandler("lvlname", (chunk_reader*)&ReadChunkLevelName, a);
 	AddChunkHandler("sample", (chunk_reader*)&ReadChunkSample, a);
 	AddChunkHandler("track", (chunk_reader*)&ReadChunkTrack, a);
@@ -578,7 +577,6 @@ void ReadChunk(CFile *f)
 		tsunami->log->Error("unknown nami chunk: " + cname + " (within " + chunk_data[chunk_data.num - 2].tag + ")");
 
 
-	msg_left();
 	f->SetPos(chunk_data.back().pos, true);
 	chunk_data.pop();
 }
@@ -615,7 +613,7 @@ void update_legacy_fx(Effect *fx)
 		params += fx->legacy_params[i].value;
 	}
 	params += ")";
-	msg_write(params);
+	msg_write("legacy params: " + params);
 	fx->ConfigFromString(params);
 }
 

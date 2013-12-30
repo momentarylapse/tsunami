@@ -640,6 +640,8 @@ inline void draw_line_buffer(HuiPainter *c, int width, double view_pos, double z
 	int nl = 0;
 	int i0 = max((double) x          / zoom + view_pos - offset    , 0);
 	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, buf.num);
+	if (i1 < i0)
+		return;
 
 	tt.resize(i1 - i0);
 
@@ -662,7 +664,7 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 	// pixel position
 	// -> buffer position
 	double p0 = view_pos_rel;
-	tt.resize(width/di + 1);
+	tt.resize(width/di + 10);
 	for (int i=0; i<width+di; i+=di){
 
 		double p = p0 + dpos * (double)i + 0.5;
@@ -671,14 +673,16 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 		if (((int)(p) < offset + buf.num*f) && (p >= offset)){
 			tt[nl].x = (float)x+i;
 			float dy = ((float)((unsigned char)buf[ip])/255.0f) * hf;
-			tt[nl].y  = y0 + dy;
+			tt[nl].y  = y0 - dy;
 			nl ++;
 		}
 	}
+	if (nl == 0)
+		return;
 	tt.resize(nl * 2);
 	for (int i=0; i<nl; i++){
 		tt[nl + i].x = tt[nl - i - 1].x;
-		tt[nl + i].y = y0 *2 - tt[nl - i - 1].y - 1;
+		tt[nl + i].y = y0 *2 - tt[nl - i - 1].y + 1;
 	}
 	c->DrawPolygon(tt);
 }

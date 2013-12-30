@@ -146,6 +146,8 @@ string var_to_string(Script::Type *type, char *v)
 		r += f2s(*(float*)v, 6);
 	}else if (type == Script::TypeBool){
 		r += (*(bool*)v) ? "true" : "false";
+	}else if (type == Script::TypeString){
+		r += "\"" + str_escape(*(string*)v) + "\"";
 	}else if (type->is_array){
 		r += "[";
 		for (int i=0;i<type->array_length;i++){
@@ -179,30 +181,20 @@ string var_to_string(Script::Type *type, char *v)
 string get_next(const string &var_temp, int &pos)
 {
 	int start = pos;
-	for (int i=pos;i<var_temp.num;i++){
-		if ((var_temp[i] != ' ') && (var_temp[i] != ']') && (var_temp[i] != ')') && (var_temp[i] != '[') && (var_temp[i] != '(')){
-			start = i;
-			break;
-		}
-	}
+	bool in_string = false;
 	for (int i=start;i<var_temp.num;i++){
-		if ((var_temp[i] == ' ') || (var_temp[i] == ']') || (var_temp[i] == ')') || (var_temp[i] == '[') || (var_temp[i] == '(')){
-			pos = i + 1;
-			return var_temp.substr(start, i - start);
-			break;
-		}
-	}
-	return var_temp.substr(start, -1);
-}
-
-string get_next2(const string &var_temp, int &pos)
-{
-	int start = pos;
-	for (int i=start;i<var_temp.num;i++){
-		if ((var_temp[i] == ' ') || (var_temp[i] == ']') || (var_temp[i] == ')') || (var_temp[i] == '[') || (var_temp[i] == '(')){
+		if ((i == start) && (var_temp[i] == '"')){
+			in_string = true;
+		}else if (in_string){
+			if (var_temp[i] == '\\'){
+				i ++;
+			}else if (var_temp[i] == '"'){
+				pos = i + 1;
+				return str_unescape(var_temp.substr(start + 1, i - start - 1));
+			}
+		}else if ((var_temp[i] == ' ') || (var_temp[i] == ']') || (var_temp[i] == ')') || (var_temp[i] == '[') || (var_temp[i] == '(')){
 			pos = i;
 			return var_temp.substr(start, i - start);
-			break;
 		}
 	}
 	return var_temp.substr(start, -1);
@@ -213,14 +205,15 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 	if (pos >= s.num)
 		return;
 	if (type == Script::TypeInt){
-		*(int*)v = get_next2(s, pos)._int();
+		*(int*)v = get_next(s, pos)._int();
 	}else if (type == Script::TypeChar){
-		get_next2(s, pos);
-		*(char*)v = 'x';
+		*(char*)v = get_next(s, pos)._int();
 	}else if (type == Script::TypeFloat){
-		*(float*)v = get_next2(s, pos)._float();
+		*(float*)v = get_next(s, pos)._float();
 	}else if (type == Script::TypeBool){
-		*(bool*)v = (get_next2(s, pos) == "true");
+		*(bool*)v = (get_next(s, pos) == "true");
+	}else if (type == Script::TypeString){
+		*(string*)v = get_next(s, pos);
 	}else if (type->is_array){
 		pos ++; // '['
 		for (int i=0;i<type->array_length;i++){
@@ -253,41 +246,6 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		pos ++; // ')'
 	}
 }
-
-/*void try_read_primitive_element(const string &var_temp, int &pos, Script::Type *t, char *v)
-{
-	if (t == Script::TypeInt)
-		*(int*)v = s2i(get_next(var_temp, pos));
-	else if (t == Script::TypeChar)
-		*(char*)v = s2i(get_next(var_temp, pos));
-	else if (t == Script::TypeFloat)
-		*(float*)v = s2f(get_next(var_temp, pos));
-	else if (t == Script::TypeComplex){
-		((complex*)v)->x = s2f(get_next(var_temp, pos));
-		((complex*)v)->y = s2f(get_next(var_temp, pos));
-	}else if (t == Script::TypeVector){
-		((vector*)v)->x = s2f(get_next(var_temp, pos));
-		((vector*)v)->y = s2f(get_next(var_temp, pos));
-		((vector*)v)->z = s2f(get_next(var_temp, pos));
-	}else if (t == Script::TypeBool)
-		*(bool*)v = (get_next(var_temp, pos) == "true");
-}
-
-void try_read_element(EffectParam &p, Script::ClassElement *e, char *v)
-{
-	int pos = 0;
-	if (e->type->is_array){
-		for (int i=0;i<e->type->array_length;i++)
-			try_read_primitive_element(p.value, pos, e->type->parent, &v[e->offset + i * e->type->parent->size]);
-	}else if (e->type->is_super_array){
-		DynamicArray *a = (DynamicArray*)&v[e->offset];
-		int num = s2i(get_next(p.value, pos));
-		a->resize(num);
-		for (int i=0;i<num;i++)
-			try_read_primitive_element(p.value, pos, e->type->parent, &(((char*)a->data)[i * e->type->parent->size]));
-	}else
-		try_read_primitive_element(p.value, pos, e->type, &v[e->offset]);
-}*/
 
 void Effect::WriteConfigToFile(const string &fav_name)
 {

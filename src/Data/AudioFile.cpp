@@ -284,7 +284,7 @@ void AudioFile::UpdatePeaks(int mode)
 		t->UpdatePeaks(mode);
 	foreach(Sample *s, sample)
 		s->buf.update_peaks(mode);
-	msg_write(format("up %f", debug_timer.get()));
+	//msg_write(format("up %f", debug_timer.get()));
 }
 
 

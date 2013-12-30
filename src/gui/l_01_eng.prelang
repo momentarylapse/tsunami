@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-176
+173
 // Data (ID,Text)
 about
 
@@ -183,8 +183,6 @@ menu_view
 
 menu_view_channels
 
-menu_view_grid
-
 menu_view_peaks
 
 ms
@@ -329,10 +327,6 @@ ttd_grid_1
 
 undo
 Undo
-view_grid_bars
-
-view_grid_time
-
 view_mono
 
 view_optimal
@@ -356,7 +350,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-95
+94
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -430,8 +424,6 @@ Es muss mindestens eine Spur existieren
 
 Failed writing header to output stream\n
 
-Falsche Version des Dateiformats: %d  (%d erwartet)
-
 Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)
 
 Fehler
@@ -450,6 +442,8 @@ Frage
 
 Ist halt irgendwie passiert...
 
+Kann Effekt nicht laden: %s
+
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 
 Kann nur Samples löschen, die nicht benutzt werden!
@@ -466,8 +460,6 @@ MIDI Quellen
 
 Meldungen
 
-Midi-Editor
-
 Nachrichten
 
 OK
@@ -475,6 +467,8 @@ OK
 Offset
 
 Ok
+
+Plugin ist kein Effekt und enthält keine Funktion 'void main()'
 
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 
@@ -511,8 +505,6 @@ exportiere wave
 fügt am Cursor der aktuellen Spur ein
 
 i'm now going to clean up...
-
-kein Muster ausgewählt
 
 keine Datei
 no file

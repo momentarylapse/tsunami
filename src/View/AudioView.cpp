@@ -79,7 +79,6 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	drawing_width = 800;
 
 	show_mono = HuiConfigReadBool("View.Mono", false);
-	grid_mode = HuiConfigReadInt("View.GridMode", GRID_MODE_TIME);
 	detail_steps = HuiConfigReadInt("View.DetailSteps", 1);
 	mouse_min_move_to_select = HuiConfigReadInt("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = HuiConfigReadInt("PreviewSleepTime", 10);
@@ -151,7 +150,6 @@ AudioView::~AudioView()
 	Unsubscribe(tsunami->input);
 
 	HuiConfigWriteBool("View.Mono", show_mono);
-	HuiConfigWriteInt("View.GridMode", grid_mode);
 	HuiConfigWriteInt("View.DetailSteps", detail_steps);
 	HuiConfigWriteInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
 	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
@@ -938,12 +936,6 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 		c->DrawImage(r.x1 + 22, r.y1 + 22, image_solo);
 }
 
-void AudioView::DrawGrid(HuiPainter *c, const rect &r, const color &bg, bool show_time)
-{
-	DrawGridTime(c, r, bg, show_time);
-	DrawGridBars(c, r, bg, show_time);
-}
-
 void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
 	double dl = MIN_GRID_DIST / view_zoom; // >= 10 pixel
@@ -1160,10 +1152,12 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 		c->SetColor(cc);
 		c->DrawRect(t->area);
 
-		if (t->type == t->TYPE_TIME)
+		if (t->type == t->TYPE_TIME){
 			DrawGridBars(c, t->area, cc, true);
-		else
-			DrawGrid(c, t->area, cc);
+		}else{
+			DrawGridTime(c, t->area, cc, false);
+			DrawGridBars(c, t->area, cc, false);
+		}
 
 		if (t == midi_edit_track){
 			// pitch grid
@@ -1295,8 +1289,6 @@ void AudioView::UpdateMenu()
 	// view
 	tsunami->Check("view_mono", show_mono);
 	tsunami->Check("view_stereo", !show_mono);
-	tsunami->Check("view_grid_time", grid_mode == GRID_MODE_TIME);
-	tsunami->Check("view_grid_bars", grid_mode == GRID_MODE_BARS);
 	tsunami->Check("view_peaks_max", peak_mode == BufferBox::PEAK_MODE_MAXIMUM);
 	tsunami->Check("view_peaks_mean", peak_mode == BufferBox::PEAK_MODE_SQUAREMEAN);
 	tsunami->Enable("zoom_in", audio->used);
@@ -1355,13 +1347,6 @@ void AudioView::SelectNone()
 	audio->UpdateSelection();
 	audio->UnselectAllSubs();
 	SetCurSample(NULL);
-}
-
-void AudioView::SetGridMode(int mode)
-{
-	grid_mode = mode;
-	ForceRedraw();
-	UpdateMenu();
 }
 
 

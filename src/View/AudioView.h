@@ -46,7 +46,6 @@ public:
 	void OnMidiBeatPartition();
 
 	void SetShowMono(bool mono);
-	void SetGridMode(int mode);
 	void SetPeaksMode(int mode);
 	void ZoomIn();
 	void ZoomOut();
@@ -61,7 +60,6 @@ public:
 	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col);
 	void DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col);
 	void DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no);
-	void DrawGrid(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time = false);
@@ -171,12 +169,6 @@ public:
 	bool force_redraw;
 
 	bool show_mono;
-	int grid_mode;
-	enum{
-		GRID_MODE_NONE,
-		GRID_MODE_TIME,
-		GRID_MODE_BARS
-	};
 	int detail_steps;
 	int mouse_min_move_to_select;
 	int preview_sleep_time;

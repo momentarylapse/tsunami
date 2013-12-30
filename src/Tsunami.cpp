@@ -97,8 +97,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("select_nothing", "", -1, this, &Tsunami::OnSelectNone);
 	HuiAddCommandM("view_mono", "", -1, this, &Tsunami::OnViewMono);
 	HuiAddCommandM("view_stereo", "", -1, this, &Tsunami::OnViewStereo);
-	HuiAddCommandM("view_grid_time", "", -1, this, &Tsunami::OnViewGridTime);
-	HuiAddCommandM("view_grid_bars", "", -1, this, &Tsunami::OnViewGridBars);
 	HuiAddCommandM("view_peaks_max", "", -1, this, &Tsunami::OnViewPeaksMax);
 	HuiAddCommandM("view_peaks_mean", "", -1, this, &Tsunami::OnViewPeaksMean);
 	HuiAddCommandM("view_optimal", "", -1, this, &Tsunami::OnViewOptimal);
@@ -500,16 +498,6 @@ void Tsunami::OnViewMono()
 void Tsunami::OnViewStereo()
 {
 	view->SetShowMono(false);
-}
-
-void Tsunami::OnViewGridBars()
-{
-	view->SetGridMode(view->GRID_MODE_BARS);
-}
-
-void Tsunami::OnViewGridTime()
-{
-	view->SetGridMode(view->GRID_MODE_TIME);
 }
 
 void Tsunami::OnZoomIn()

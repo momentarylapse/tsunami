@@ -87,8 +87,6 @@ public:
 	void OnViewPeaksMean();
 	void OnZoomIn();
 	void OnZoomOut();
-	void OnViewGridTime();
-	void OnViewGridBars();
 	void OnViewMono();
 	void OnViewStereo();
 	void OnViewOptimal();

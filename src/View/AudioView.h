@@ -154,6 +154,7 @@ public:
 
 	double screen2sample(double x);
 	double sample2screen(double s);
+	double dsample2screen(double ds);
 	int y2pitch(int y);
 	float pitch2y(int p);
 

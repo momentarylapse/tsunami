@@ -940,10 +940,8 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 
 void AudioView::DrawGrid(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
-	if (grid_mode == GRID_MODE_TIME)
-		DrawGridTime(c, r, bg, show_time);
-	else if (grid_mode == GRID_MODE_BARS)
-		DrawGridBars(c, r, bg, show_time);
+	DrawGridTime(c, r, bg, show_time);
+	DrawGridBars(c, r, bg, show_time);
 }
 
 void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time)
@@ -993,14 +991,27 @@ void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 		return;
 	int s0 = screen2sample(r.x1 - 1);
 	int s1 = screen2sample(r.x2);
+	//c->SetLineWidth(2.0f);
+	Array<float> dash, no_dash;
+	dash.add(6);
+	dash.add(4);
 	Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	color c1 = ColorInterpolate(bg, ColorGrid, 0.5f);
-	color c2 = ColorInterpolate(bg, ColorGrid, 0.3f);
+	color c1 = ColorInterpolate(bg, ColorWave, 0.5f);
+	color c2 = ColorInterpolate(bg, ColorWave, 0.5f);
 	foreach(Beat &b, beats){
-		c->SetColor((b.beat_no == 0) ? ColorGrid : c1);
+		float dx = dsample2screen(b.range.num);
+		c1 = ColorInterpolate(bg, ColorWave, min(0.8f, dx / 13.0f));
+		if (b.beat_no == 0){
+			c->SetColor(ColorWave);
+			c->SetLineDash(no_dash, r.y1);
+		}else{
+			c->SetColor(c1);
+			c->SetLineDash(dash, r.y1);
+		}
 		int xx = sample2screen(b.range.offset);
 		c->DrawLine(xx, r.y1, xx, r.y2);
 		if (edit_mode == EDIT_MODE_MIDI){
+			c2 = ColorInterpolate(bg, c1, 0.5f);
 			c->SetColor(c2);
 			for (int i=1;i<beat_partition;i++){
 				xx = sample2screen(b.range.offset + b.range.num / beat_partition * i);
@@ -1008,9 +1019,11 @@ void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 			}
 		}
 	}
+	c->SetLineDash(no_dash, 0);
+	c->SetLineWidth(LINE_WIDTH);
 	if (!show_time)
 		return;
-	c->SetColor(ColorGrid);
+	c->SetColor(ColorWave);
 	foreach(Beat &b, beats){
 		if (b.beat_no == 0){
 			int xx = sample2screen(b.range.offset);
@@ -1133,7 +1146,7 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 	// time scale
 	c->SetColor(ColorBackgroundCurWave);
 	c->DrawRect(r.x1, r.y1, r.width(), TIME_SCALE_HEIGHT);
-	DrawGrid(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), ColorBackgroundCurWave, true);
+	DrawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), ColorBackgroundCurWave, true);
 
 	// tracks
 	foreach(Track *t, audio->track){
@@ -1142,7 +1155,7 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 		c->DrawRect(t->area);
 
 		if (t->type == t->TYPE_TIME)
-			DrawGridBars(c, t->area, cc, grid_mode == GRID_MODE_TIME);
+			DrawGridBars(c, t->area, cc, true);
 		else
 			DrawGrid(c, t->area, cc);
 
@@ -1165,7 +1178,7 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 		c->SetColor(ColorBackground);
 		rect rr = rect(r.x1, r.x2, yy, r.y2);
 		c->DrawRect(rr);
-		DrawGrid(c, rr, ColorBackground, false);
+		DrawGridTime(c, rr, ColorBackground, false);
 	}
 
 	// lines between tracks
@@ -1407,6 +1420,11 @@ double AudioView::screen2sample(double _x)
 double AudioView::sample2screen(double s)
 {
 	return audio->area.x1 + (s - view_pos) * view_zoom;
+}
+
+double AudioView::dsample2screen(double ds)
+{
+	return ds * view_zoom;
 }
 
 void AudioView::Zoom(float f)

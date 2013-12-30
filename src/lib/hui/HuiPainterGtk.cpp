@@ -33,6 +33,16 @@ void HuiPainter::SetLineWidth(float w)
 	cairo_set_line_width(cr, w);
 }
 
+void HuiPainter::SetLineDash(Array<float> &dash, float offset)
+{
+	if (!cr)
+		return;
+	Array<double> d;
+	foreach(float f, dash)
+		d.add(f);
+	cairo_set_dash(cr, (double*)d.data, d.num, offset);
+}
+
 color HuiPainter::GetThemeColor(int i)
 {
 	GtkStyle *style = gtk_widget_get_style(win->window);

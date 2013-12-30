@@ -29,6 +29,7 @@ class HuiPainter
 	void _cdecl SetFontSize(float size);
 	void _cdecl SetAntialiasing(bool enabled);
 	void _cdecl SetLineWidth(float w);
+	void _cdecl SetLineDash(Array<float> &dash, float offset);
 	void _cdecl DrawPoint(float x, float y);
 	void _cdecl DrawLine(float x1, float y1, float x2, float y2);
 	void _cdecl DrawLines(Array<complex> &p);

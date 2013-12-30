@@ -987,47 +987,52 @@ void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 	Array<float> dash, no_dash;
 	dash.add(6);
 	dash.add(4);
-	Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	color c1 = ColorInterpolate(bg, ColorWave, 0.5f);
-	color c2 = ColorInterpolate(bg, ColorWave, 0.5f);
-	foreach(Beat &b, beats){
-		float dx = dsample2screen(b.range.num);
-		float f = min(1.0f, dx / 15.0f);
-		c1 = ColorInterpolate(bg, ColorWave, f * 0.8f);
-		if (b.beat_no == 0){
-			c->SetColor(ColorWave);
-			c->SetLineDash(no_dash, r.y1);
-		}else{
-			if (f < 0.1f)
-				continue;
-			c->SetColor(c1);
-			c->SetLineDash(dash, r.y1);
-		}
+	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
+	Array<Bar> bars = t->bar.GetBars(Range(s0, s1 - s0));
+	foreach(Bar &b, bars){
 		int xx = sample2screen(b.range.offset);
+
+		float dx_bar = dsample2screen(b.range.num);
+		float dx_beat = dx_bar / b.num_beats;
+		float f0 = min(1.0f, dx_bar / 50.0f);
+		float f1 = min(1.0f, dx_bar / 15.0f);
+		if ((b.index % 5) == 0)
+			f0 = f1 = 1;
+		float f2 = min(1.0f, dx_beat / 15.0f);
+
+		c->SetColor(ColorInterpolate(bg, ColorWave, f1));
+		c->SetLineDash(no_dash, r.y1);
 		c->DrawLine(xx, r.y1, xx, r.y2);
-		if (edit_mode == EDIT_MODE_MIDI){
-			c2 = ColorInterpolate(bg, c1, 0.5f);
-			c->SetColor(c2);
-			for (int i=1;i<beat_partition;i++){
-				xx = sample2screen(b.range.offset + b.range.num / beat_partition * i);
-				c->DrawLine(xx, r.y1, xx, r.y2);
+
+		if (f2 >= 0.1f){
+			color c1 = ColorInterpolate(bg, ColorWave, f2);
+			float beat_length = (float)b.range.num / (float)b.num_beats;
+			c->SetLineDash(dash, r.y1);
+			for (int i=0; i<b.num_beats; i++){
+				float beat_offset = b.range.offset + (float)i * beat_length;
+				if (edit_mode == EDIT_MODE_MIDI){
+					color c2 = ColorInterpolate(bg, c1, 0.6f);
+					c->SetColor(c2);
+					for (int j=1; j<beat_partition; j++){
+						int x = sample2screen(beat_offset + beat_length * j / beat_partition);
+						c->DrawLine(x, r.y1, x, r.y2);
+					}
+				}
+				if (i == 0)
+					continue;
+				c->SetColor(c1);
+				int x = sample2screen(beat_offset);
+				c->DrawLine(x, r.y1, x, r.y2);
 			}
+		}
+
+		if ((show_time) && (f0 > 0.8f)){
+			c->SetColor(ColorWave);
+			c->DrawStr(xx + 2, r.y1, i2s(b.index + 1));
 		}
 	}
 	c->SetLineDash(no_dash, 0);
 	c->SetLineWidth(LINE_WIDTH);
-	if (!show_time)
-		return;
-	c->SetColor(ColorWave);
-	int xx_last = -100;
-	foreach(Beat &b, beats){
-		if (b.beat_no == 0){
-			int xx = sample2screen(b.range.offset);
-			if (((b.bar_no % 5) == 0) || (xx - xx_last > 20))
-				c->DrawStr(xx + 2, r.y1, i2s(b.bar_no + 1));
-			xx_last = xx;
-		}
-	}
 }
 
 void AudioView::CheckConsistency()

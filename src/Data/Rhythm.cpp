@@ -14,10 +14,11 @@ Beat::Beat(const Range &r, int bar, int beat)
 	beat_no = beat;
 };
 
-Bar::Bar(const Range &r, int _num_beats)
+Bar::Bar(const Range &r, int _num_beats, int _index)
 {
 	range = r;
 	num_beats = _num_beats;
+	index = _index;
 }
 
 Array<Beat> BarCollection::GetBeats(const Range &r)
@@ -55,7 +56,7 @@ Array<Bar> BarCollection::GetBars(const Range &r)
 			for (int j=0;j<b.count;j++){
 				Range rr = Range(pos0, b.length);
 				if (rr.overlaps(r))
-					bars.add(Bar(rr, b.num_beats));
+					bars.add(Bar(rr, b.num_beats, bar_no));
 				pos0 += b.length;
 				bar_no ++;
 			}

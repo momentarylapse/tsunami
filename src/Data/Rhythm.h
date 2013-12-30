@@ -33,9 +33,10 @@ class Bar
 {
 public:
 	Bar(){}
-	Bar(const Range &r, int num_beats);
+	Bar(const Range &r, int num_beats, int index);
 	Range range;
 	int num_beats;
+	int index;
 };
 
 class Beat

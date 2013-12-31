@@ -998,15 +998,16 @@ void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 
 		float dx_bar = dsample2screen(b.range.num);
 		float dx_beat = dx_bar / b.num_beats;
-		float f0 = min(1.0f, dx_bar / 50.0f);
-		float f1 = min(1.0f, dx_bar / 15.0f);
+		float f1 = min(1.0f, dx_bar / 40.0f);
 		if ((b.index % 5) == 0)
-			f0 = f1 = 1;
-		float f2 = min(1.0f, dx_beat / 15.0f);
+			f1 = 1;
+		float f2 = min(1.0f, dx_beat / 25.0f);
 
-		c->SetColor(ColorInterpolate(bg, ColorWave, f1));
-		c->SetLineDash(no_dash, r.y1);
-		c->DrawLine(xx, r.y1, xx, r.y2);
+		if (f1 >= 0.1f){
+			c->SetColor(ColorInterpolate(bg, ColorWave, f1));
+			c->SetLineDash(no_dash, r.y1);
+			c->DrawLine(xx, r.y1, xx, r.y2);
+		}
 
 		if (f2 >= 0.1f){
 			color c1 = ColorInterpolate(bg, ColorWave, f2);
@@ -1030,7 +1031,7 @@ void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 			}
 		}
 
-		if ((show_time) && (f0 > 0.8f)){
+		if ((show_time) && (f1 > 0.9f)){
 			c->SetColor(ColorWave);
 			c->DrawStr(xx + 2, r.y1, i2s(b.index + 1));
 		}

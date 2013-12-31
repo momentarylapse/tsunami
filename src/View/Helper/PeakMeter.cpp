@@ -21,6 +21,11 @@ PeakMeter::PeakMeter(HuiWindow *_win, const string &_id, PeakMeterSource *_sourc
 	mode = ModePeaks;
 	peak_r = 0;
 	peak_l = 0;
+
+	super_peak_r = 0;
+	super_peak_l = 0;
+	super_peak_r_t = 0;
+	super_peak_l_t = 0;
 	spec_r.resize(SPECTRUM_SIZE);
 	spec_l.resize(SPECTRUM_SIZE);
 
@@ -34,10 +39,10 @@ PeakMeter::~PeakMeter()
 	Unsubscribe(source);
 }
 
-color peak_color(float peak)
+color peak_color(float peak, float a = 1)
 {
 	if (peak <= 1.001f)
-		return SetColorHSB(1, (1 - pow(peak, 3) * 0.7f) * 0.33f, 0.8f, 0.8f);
+		return SetColorHSB(a, (1 - pow(peak, 3) * 0.7f) * 0.33f, 0.8f, 0.8f);
 	/*if (peak < 0.5f)
 		return color(1, 0, 0.8f, 0);
 	if (peak < 0.9f)
@@ -47,21 +52,45 @@ color peak_color(float peak)
 	return Red;
 }
 
+inline float super_peak(float sp, float sp_t)
+{
+	return sp * (1 - pow(sp_t, 3)*0.2f);
+}
+
+inline float nice_peak(float p)
+{
+	return min(pow(p, 0.8f), 1);
+}
+
 void PeakMeter::OnDraw()
 {
-	msg_db_r("PeakMeter.OnDraw", 1);
+	msg_db_f("PeakMeter.OnDraw", 1);
 	HuiPainter *c = win->BeginDraw(id);
 	int w = c->width;
 	int h = c->height;
 	if (mode == ModePeaks){
+		float sp_r = super_peak(super_peak_r, super_peak_r_t);
+		float sp_l = super_peak(super_peak_l, super_peak_l_t);
+
 		c->SetColor(White);
+		if ((sp_r > 1) || (sp_l > 1))
+			c->SetColor(Red);
 		//c->DrawRect(0, 0, w, h);
 		c->DrawRect(2, 2, w-4, h/2 - 2);
-		c->DrawRect(2, h/2 + 2, w-4, h - 2);
+		c->DrawRect(2, h/2 + 2, w-4, h/2 - 2);
+
+		c->SetColor(peak_color(sp_r, 0.5f));
+		c->DrawRect(2, 2,       (float)(w - 4) * nice_peak(sp_r), h/2 - 2);
+		c->SetColor(peak_color(sp_l, 0.5f));
+		c->DrawRect(2, h/2 + 2, (float)(w - 4) * nice_peak(sp_l), h/2 - 2);
+
 		c->SetColor(peak_color(peak_r));
-		c->DrawRect(2, 2,       (float)(w - 4) * min(pow(peak_r, 0.8f), 1), h/2 - 2);
+		c->DrawRect(2, 2,       (float)(w - 4) * nice_peak(peak_r), h/2 - 2);
 		c->SetColor(peak_color(peak_l));
-		c->DrawRect(2, h/2 + 2, (float)(w - 4) * min(pow(peak_l, 0.8f), 1), h - 2);
+		c->DrawRect(2, h/2 + 2, (float)(w - 4) * nice_peak(peak_l), h/2 - 2);
+		c->SetColor(Black);
+		c->DrawRect(2 + (w - 4)*nice_peak(sp_r), 2, 2, h/2-2);
+		c->DrawRect(2 + (w - 4)*nice_peak(sp_l), h/2+2, 2, h/2-2);
 	}else{
 		c->SetColor(White);
 		c->DrawRect(2, 2, w - 4, h - 4);
@@ -75,7 +104,16 @@ void PeakMeter::OnDraw()
 	}
 
 	c->End();
-	msg_db_l(1);
+}
+
+inline void update_super_peak(float &sp, float &sp_t, float peak, float dt)
+{
+	if (peak > super_peak(sp, sp_t)){
+		sp = peak;
+		sp_t = 0;
+	}else{
+		sp_t += dt;
+	}
 }
 
 void PeakMeter::FindPeaks()
@@ -87,6 +125,8 @@ void PeakMeter::FindPeaks()
 		if (fabs(buf.l[i]) > peak_l)
 			peak_l = fabs(buf.l[i]);
 	}
+	update_super_peak(super_peak_r, super_peak_r_t, peak_r, (float)buf.r.num / sample_rate);
+	update_super_peak(super_peak_l, super_peak_l_t, peak_l, (float)buf.l.num / sample_rate);
 }
 
 inline float i_to_freq(int i)
@@ -109,7 +149,7 @@ void PeakMeter::SetMode(int _mode)
 
 void PeakMeter::FindSpectrum()
 {
-	msg_db_r("PeakMeter.FindSp", 1);
+	msg_db_f("PeakMeter.FindSp", 1);
 	Array<complex> cr, cl;
 	cr.resize(buf.num / 2 + 1);
 	cl.resize(buf.num / 2 + 1);
@@ -130,7 +170,6 @@ void PeakMeter::FindSpectrum()
 			}
 		spec_r[i] = spec_l[i] = sqrt(sqrt(s) / (float)SPECTRUM_SIZE / pi / 2);
 	}
-	msg_db_l(1);
 }
 
 void PeakMeter::OnUpdate(Observable *o)

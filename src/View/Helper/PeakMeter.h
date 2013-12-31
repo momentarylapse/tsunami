@@ -51,6 +51,8 @@ private:
 	BufferBox buf;
 	float peak_r, peak_l;
 	Array<float> spec_r, spec_l;
+	float super_peak_r, super_peak_l;
+	float super_peak_r_t, super_peak_l_t;
 };
 
 #endif /* PEAKMETER_H_ */

@@ -89,8 +89,10 @@ void PeakMeter::OnDraw()
 		c->SetColor(peak_color(peak_l));
 		c->DrawRect(2, h/2 + 2, (float)(w - 4) * nice_peak(peak_l), h/2 - 2);
 		c->SetColor(Black);
-		c->DrawRect(2 + (w - 4)*nice_peak(sp_r), 2, 2, h/2-2);
-		c->DrawRect(2 + (w - 4)*nice_peak(sp_l), h/2+2, 2, h/2-2);
+		if (sp_r > 0)
+			c->DrawRect(2 + (w - 4)*nice_peak(sp_r), 2, 2, h/2-2);
+		if (sp_l > 0)
+			c->DrawRect(2 + (w - 4)*nice_peak(sp_l), h/2+2, 2, h/2-2);
 	}else{
 		c->SetColor(White);
 		c->DrawRect(2, 2, w - 4, h - 4);
@@ -127,6 +129,16 @@ void PeakMeter::FindPeaks()
 	}
 	update_super_peak(super_peak_r, super_peak_r_t, peak_r, (float)buf.r.num / sample_rate);
 	update_super_peak(super_peak_l, super_peak_l_t, peak_l, (float)buf.l.num / sample_rate);
+}
+
+void PeakMeter::ClearData()
+{
+	peak_r = peak_l = 0;
+	super_peak_l = super_peak_r = 0;
+	for (int i=0; i<spec_r.num; i++)
+		spec_r[i] = 0;
+	for (int i=0; i<spec_l.num; i++)
+		spec_l[i] = 0;
 }
 
 inline float i_to_freq(int i)
@@ -174,12 +186,17 @@ void PeakMeter::FindSpectrum()
 
 void PeakMeter::OnUpdate(Observable *o)
 {
-	sample_rate = source->GetSampleRate();
-	source->GetSomeSamples(buf, NUM_SAMPLES);
+	int state = source->GetState();
 
-	if (mode == ModePeaks)
-		FindPeaks();
-	else if (mode == ModeSpectrum)
-		FindSpectrum();
+	if (state == source->STATE_PLAYING){
+		sample_rate = source->GetSampleRate();
+		source->GetSomeSamples(buf, NUM_SAMPLES);
+		if (mode == ModePeaks)
+			FindPeaks();
+		else if (mode == ModeSpectrum)
+			FindSpectrum();
+	}else if (state == source->STATE_STOPPED){
+		ClearData();
+	}
 	win->Redraw(id);
 }

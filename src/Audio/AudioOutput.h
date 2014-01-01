@@ -38,6 +38,7 @@ public:
 
 	bool IsPlaying();
 	bool IsPaused();
+	int GetState();
 	AudioRenderer *GetSource(){	return renderer;	}
 	int GetPos();
 	void FlushBuffers();

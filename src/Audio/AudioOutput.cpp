@@ -351,6 +351,19 @@ bool AudioOutput::IsPlaying()
 	return playing;
 }
 
+int AudioOutput::GetState()
+{
+	/*if (IsPlaying())
+		return STATE_PLAYING;*/
+	int param;
+	alGetSourcei(source, AL_SOURCE_STATE, &param);
+	if (param == AL_PLAYING)
+		return STATE_PLAYING;
+	if (param == AL_PAUSED)
+		return STATE_PAUSED;
+	return STATE_STOPPED;
+}
+
 int AudioOutput::GetPos()
 {
 	if (playing){

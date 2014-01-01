@@ -19,6 +19,12 @@ public:
 	PeakMeterSource(const string &name) : Observable(name){}
 	virtual float GetSampleRate() = 0;
 	virtual void GetSomeSamples(BufferBox &buf, int num_samples) = 0;
+	virtual int GetState() = 0;
+	enum{
+		STATE_PLAYING,
+		STATE_PAUSED,
+		STATE_STOPPED
+	};
 };
 
 class PeakMeter : public HuiEventHandler, public Observer
@@ -34,6 +40,7 @@ public:
 	void OnUpdate(Observable *o);
 
 private:
+	void ClearData();
 	void FindPeaks();
 	void FindSpectrum();
 

@@ -102,6 +102,13 @@ void AudioInput::GetSomeSamples(BufferBox &buf, int num_samples)
 	in_cur->GetSomeSamples(buf, num_samples);
 }
 
+int AudioInput::GetState()
+{
+	if (IsCapturing())
+		return STATE_PLAYING;
+	return STATE_STOPPED;
+}
+
 void AudioInput::ResetSync()
 {
 	in_cur->ResetSync();

@@ -54,12 +54,25 @@ private:
 		ModeSpectrum
 	};
 
+	struct Data{
+		float peak;
+		float super_peak, super_peak_t;
+		Array<float> spec;
+
+		void reset();
+		void update(Array<float> &buf, float sample_rate);
+		float get_sp();
+	};
+	Data r, l;
+
+	void DrawPeak(HuiPainter *c, const rect &r, Data &d);
+
 	float sample_rate;
 	BufferBox buf;
-	float peak_r, peak_l;
+	/*float peak_r, peak_l;
 	Array<float> spec_r, spec_l;
 	float super_peak_r, super_peak_l;
-	float super_peak_r_t, super_peak_l_t;
+	float super_peak_r_t, super_peak_l_t;*/
 };
 
 #endif /* PEAKMETER_H_ */

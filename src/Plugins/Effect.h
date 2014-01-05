@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
-#include "Plugin.h"
+#include "Configurable.h"
 
 class Plugin;
 class Track;

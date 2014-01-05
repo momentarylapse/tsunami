@@ -10,7 +10,7 @@
 
 #include "../../lib/base/base.h"
 #include "../AudioRenderer.h"
-#include "../../Plugins/Plugin.h"
+#include "../../Plugins/Configurable.h"
 
 class Range;
 class BufferBox;

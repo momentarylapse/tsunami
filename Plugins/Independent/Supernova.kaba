@@ -304,7 +304,6 @@ void StartLesson(string name)
 
 void StopLesson()	
 	output.Stop()
-	renderer.CleanUp()
 	input.RemoveObserver(nil)
 	input.Stop()
 	TotalScore += Score

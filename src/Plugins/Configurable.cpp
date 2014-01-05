@@ -11,6 +11,7 @@
 #include "../lib/script/script.h"
 #include "PluginManager.h"
 #include "../Stuff/Log.h"
+#include "../View/Helper/Slider.h"
 
 
 void PluginData::__init__()
@@ -230,6 +231,97 @@ void Configurable::ResetState()
 	if (!state)
 		return;
 	state->reset();
+}
+
+struct AutoConfigData
+{
+	string name, unit;
+	float min, max, step, factor;
+	float *value;
+	AutoConfigData()
+	{
+		min = -100000000;
+		max = 100000000;
+		step = 1;
+		factor = 1;
+	}
+};
+
+Array<AutoConfigData> get_auto_conf(PluginData *config)
+{
+	Script::SyntaxTree *ps = config->type->owner;
+	Array<AutoConfigData> r;
+	foreach(Script::ClassElement &e, config->type->element)
+		if (e.type == Script::TypeFloat){
+			AutoConfigData a;
+			a.name = e.name;
+			a.value = (float*)((char*)config + e.offset);
+			foreach(Script::Constant &c, ps->Constants){
+				if (c.name == "AutoConfig" + e.name){
+					string s = string(c.data);
+					Array<string> p = s.explode(":");
+					if (p.num == 5){
+						a.min = p[0]._float();
+						a.max = p[1]._float();
+						a.step = p[2]._float();
+						a.factor = p[3]._float();
+						a.unit = p[4];
+					}
+				}
+			}
+			r.add(a);
+		}
+	return r;
+}
+
+class AutoConfigDialog : public HuiDialog
+{
+public:
+	Array<Slider*> slider;
+	Array<AutoConfigData> aa;
+	AutoConfigDialog(Array<AutoConfigData> &_aa) :
+		HuiDialog("...", 300, 100, tsunami, false)
+	{
+		aa = _aa;
+		AddControlTable("", 0, 0, 1, 3, "root-table");
+		SetTarget("root-table", 0);
+		AddControlTable("", 0, 1, 4, aa.num, "main-table");
+		SetTarget("main-table", 0);
+		foreachi(AutoConfigData &a, aa, i){
+			AddText(a.name, 0, i, 0, 0, "");
+			AddSlider("!width=150", 1, i, 0, 0, "slider-" + i);
+			AddSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
+			AddText(a.unit, 3, i, 0, 0, "");
+			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigDialog::OnChange, *a.value, this));
+		}
+		tsunami->plugin_manager->PutCommandBarSizable(this, "root-table", 0, 2);
+		tsunami->plugin_manager->PutFavoriteBarSizable(this, "root-table", 0, 0);
+	}
+	~AutoConfigDialog()
+	{
+		foreach(Slider *s, slider)
+			delete(s);
+	}
+	void OnChange()
+	{
+		foreachi(AutoConfigData &a, aa, i){
+			*a.value = slider[i]->Get();
+		}
+	}
+};
+
+void Configurable::Configure()
+{
+	PluginData *config = get_config();
+	if (!config){
+		tsunami->log->Warning(_("nichts zu konfigurieren"));
+		return;
+	}
+
+	// automatic configuration
+	Array<AutoConfigData> aa = get_auto_conf(config);
+	HuiDialog *dlg = new AutoConfigDialog(aa);
+	dlg->Run();
 }
 
 

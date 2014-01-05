@@ -33,7 +33,6 @@ public:
 	virtual int read(BufferBox &buf);
 	void iterate(int samples);
 
-	virtual void Configure(){}
 	virtual void Reset();
 
 	string name;

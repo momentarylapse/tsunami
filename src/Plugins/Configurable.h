@@ -36,7 +36,7 @@ public:
 
 	virtual void ResetConfig();
 	virtual void ResetState();
-	virtual void Configure(){};
+	virtual void Configure();
 	virtual void UpdateDialog(){};
 
 	PluginData *get_config();

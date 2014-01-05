@@ -1,6 +1,7 @@
 use "../api.kaba"
 use "../tone.kaba"
 
+const string AutoConfigrelease = "0:0.4:1:1000:ms"
 
 class Config : PluginData
 	float release

@@ -1,13 +1,12 @@
 use "../api.kaba"
 use "../tone.kaba"
 
-
 const int NUM_HARMONICS = 10
 
-class HarmonicConfig
+class HarmonicConfig : PluginData
 	float intensity[NUM_HARMONICS]
 	float release
-	void reset()
+	overwrite void reset()
 		intensity[0] = 1
 		for int i, 1, NUM_HARMONICS
 			intensity[i] = 0
@@ -38,9 +37,6 @@ class ConfigDialog : Dialog
 class HarmonicSynthesizer : Synthesizer
 	HarmonicConfig config
 	Dialog *dlg
-	
-	overwrite void ResetConfig()
-		config.reset()
 	
 	overwrite void UpdateDialog()
 		for int j, 0, NUM_HARMONICS

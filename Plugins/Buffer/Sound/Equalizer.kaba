@@ -11,7 +11,7 @@ const float MAX_FREQ = 20000.0
 const int MIN_VOL = 0-45
 const int MAX_VOL = 45
 
-class PluginData
+class Config : PluginData
 	vector curve[]
 
 	void fill_inter(FloatInterpolator fi)
@@ -20,9 +20,16 @@ class PluginData
 		for int i, 1, curve.num
 			fi.add3(curve[i].y, 0.0, exp(curve[i].z), log(curve[i].x / curve[i - 1].x))
 
+	overwrite void reset()
+		curve.clear()
+		curve.add(vector(MIN_FREQ, 0, 0))
+		curve.add(vector(MAX_FREQ, 0, 0))
+		//MouseOver = -1
+		//Selected = -1
+
 class Equalizer : AudioEffect
 
-	PluginData config
+	Config config
 	ConfigDialog *dlg
 
 
@@ -53,13 +60,6 @@ class Equalizer : AudioEffect
 	overwrite void ProcessTrack(BufferBox buf)
 		equalize(buf.r)
 		equalize(buf.l)
-
-	overwrite void ResetConfig()
-		config.curve.clear()
-		config.curve.add(vector(MIN_FREQ, 0, 0))
-		config.curve.add(vector(MAX_FREQ, 0, 0))
-		//MouseOver = -1
-		//Selected = -1
 
 	overwrite void UpdateDialog()
 		dlg.Redraw("drawing")

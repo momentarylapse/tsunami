@@ -5,7 +5,7 @@ use "../../api.kaba"
 use "../../tone.kaba"
 
 
-class PluginData
+class Config : PluginData
 	int Pitch
 	float Frequency
 	float Volume

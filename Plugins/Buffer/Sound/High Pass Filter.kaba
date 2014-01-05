@@ -2,16 +2,13 @@
 // Title[Deutsch] = High Pass Filter
 use "../../api.kaba"
 
-class Config
+class Config : PluginData
 	float Frequency
-	void reset()
+	overwrite void reset()
 		Frequency = 1000
 
 class LowPassFilter : AudioEffect
 	Config config
-	
-	overwrite void ResetConfig()
-		config.reset()
 
 	overwrite void ProcessTrack(BufferBox buf)
 		float RC = 1 / (2 * pi * config.Frequency)

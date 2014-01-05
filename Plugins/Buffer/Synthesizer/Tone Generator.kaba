@@ -5,13 +5,17 @@ use "../../api.kaba"
 use "../../tone.kaba"
 
 
-class PluginData
+class Config : PluginData
 	int Pitch
 	float Frequency
 	float Volume
+	overwrite void reset()
+		Pitch = 81
+		Volume = 0.3
+		Frequency = pitch_to_freq(Pitch)
 
 class ToneGenerator : AudioEffect
-	PluginData config
+	Config config
 	ConfigDialog *dlg
 	DummySynthesizer synth
 
@@ -36,11 +40,6 @@ class ToneGenerator : AudioEffect
 	
 	overwrite void UpdateDialog()
 		dlg.fill()
-
-	overwrite void ResetConfig()
-		config.Pitch = 81
-		config.Volume = 0.3
-		config.Frequency = pitch_to_freq(config.Pitch)
 
 	overwrite void Configure()
 		dlg = new ConfigDialog(self)

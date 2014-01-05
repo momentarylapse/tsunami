@@ -6,25 +6,30 @@ use "../../api.kaba"
 bool not_first_time
 
 
-class PluginData
+class Config : PluginData
 	float Delay
 	float Volume
 	float Feedback
 
+	overwrite void reset()
+		self.Volume = 0.2
+		Feedback = 0.5
+		Delay = 0.15
 
-class PluginState
+
+class PluginState : PluginData
 	float buf_r[], buf_l[]
 	int offset
 
+	overwrite void reset()
+		buf_r.clear()
+		buf_l.clear()
+		offset = 0
+
 class Echo : AudioEffect
-	PluginData config
+	Config config
 	PluginState state
 	DelayDialog *dlg
-
-	overwrite void ResetState()
-		state.buf_r.clear()
-		state.buf_l.clear()
-		state.offset = 0
 
 
 	void DoDelay(float b[], float d[])
@@ -54,11 +59,6 @@ class Echo : AudioEffect
 		// dialog
 		dlg = new DelayDialog(self)
 		dlg.Run()
-
-	overwrite void ResetConfig()
-		config.Volume = 0.2
-		config.Feedback = 0.5
-		config.Delay = 0.15
 
 	overwrite void ProcessTrack(BufferBox buf)
 

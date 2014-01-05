@@ -2,15 +2,15 @@
 // Title[Deutsch] = Oktavieren
 use "../../api.kaba"
 
-class PluginData
+class Config : PluginData
 	float Level
+
+	overwrite void reset()
+		Level = 0.5
 
 class Octaver : AudioEffect	
 	ConfigDialog *dlg
-	PluginData config
-
-	overwrite void ResetConfig()
-		config.Level = 0.5
+	Config config
 
 	overwrite void UpdateDialog()
 		dlg.fill()

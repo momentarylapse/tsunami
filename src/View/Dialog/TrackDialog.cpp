@@ -110,7 +110,7 @@ void TrackDialog::OnSynthesizer()
 
 void TrackDialog::OnConfigSynthesizer()
 {
-	string params_old = track->synth->options_to_string();
+	string params_old = track->synth->ConfigToString();
 	if (tsunami->plugin_manager->ConfigureSynthesizer(track->synth))
 		track->root->Execute(new ActionTrackEditSynthesizer(track, params_old));
 }

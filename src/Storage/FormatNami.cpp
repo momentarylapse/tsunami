@@ -157,7 +157,7 @@ void WriteSynth(CFile *f, Synthesizer *s)
 	BeginChunk(f, "synth");
 
 	f->WriteStr(s->name);
-	f->WriteStr(s->options_to_string());
+	f->WriteStr(s->ConfigToString());
 	f->WriteStr("");
 	f->WriteInt(0); // reserved
 
@@ -497,7 +497,7 @@ void ReadChunkSynth(CFile *f, Track *t)
 {
 	delete(t->synth);
 	t->synth = CreateSynthesizer(f->ReadStr());
-	t->synth->options_from_string(f->ReadStr());
+	t->synth->ConfigFromString(f->ReadStr());
 	f->ReadStr();
 	f->ReadInt();
 }

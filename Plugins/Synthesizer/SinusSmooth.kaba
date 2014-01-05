@@ -2,16 +2,13 @@ use "../api.kaba"
 use "../tone.kaba"
 
 
-class Config
+class Config : PluginData
 	float release
-	void reset()
+	overwrite void reset()
 		release = 0.02
 
 class SinusSmoothSynthesizer : Synthesizer
 	Config config
-
-	overwrite void ResetConfig()
-		config.reset()
 
 	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
 		float freq = pitch_to_freq(pitch)

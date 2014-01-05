@@ -4,16 +4,16 @@
 use "../../api.kaba"
 
 
-class PluginData
+class Config : PluginData
 	float Volume
 	bool Maximize
+	
+	overwrite void reset()
+		self.Volume = 1
 
 class Volume : AudioEffect
 	VolumeDialog *dlg
-	PluginData config
-
-	overwrite void ResetConfig()
-		config.Volume = 1
+	Config config
 
 	overwrite void UpdateDialog()
 		dlg.fill()

@@ -39,8 +39,8 @@ void *ActionTrackEditSynthesizer::execute(Data *d)
 	assert(t->synth);
 
 	string temp = params;
-	params = t->synth->options_to_string();
-	t->synth->options_from_string(temp);
+	params = t->synth->ConfigToString();
+	t->synth->ConfigFromString(temp);
 
 	return NULL;
 }

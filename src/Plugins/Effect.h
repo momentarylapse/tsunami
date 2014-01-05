@@ -10,6 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../Data/Range.h"
+#include "Plugin.h"
 
 class Plugin;
 class Track;
@@ -25,7 +26,7 @@ struct EffectParam
 	string value;
 };
 
-class Effect : public VirtualBase
+class Effect : public Configurable
 {
 public:
 	Effect();
@@ -44,19 +45,11 @@ public:
 	Array<EffectParam> legacy_params;
 
 	virtual void ProcessTrack(BufferBox *buf){};
-	virtual void ResetConfig(){};
-	virtual void ResetState(){};
-	virtual void Configure(){};
-	virtual void UpdateDialog(){};
-
 
 	void DoProcessTrack(Track *t, int level_no, const Range &r);
 	bool DoConfigure(bool previewable);
 
-	string ConfigToString();
-	void ConfigFromString(const string &options);
 	void Prepare();
-	void CleanUp();
 	void Apply(BufferBox &buf, Track *t, bool log_error);
 
 	void WriteConfigToFile(const string &name);

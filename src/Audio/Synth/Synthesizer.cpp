@@ -16,9 +16,6 @@
 
 const int MANY_SAMPLES = 0x7fffffff;
 
-string var_to_string(Script::Type *type, char *v);
-void var_from_string(Script::Type *type, char *v, const string &s, int &pos);
-
 float pitch_to_freq(float pitch)
 {
 	return 440.0f * pow(2, (pitch - 69.0f) / 12.0f);
@@ -177,31 +174,4 @@ Array<string> FindSynthesizers()
 	names.add("Dummy");
 	names.add("Sample");
 	return names;
-}
-
-string Synthesizer::options_to_string()
-{
-	string options;
-	Script::Type *type = Script::GetDynamicType(this);
-	if (type){
-		foreach(Script::ClassElement &e, type->element)
-			if (e.name == "config"){
-				char *p = (char*)this;
-				options = var_to_string(e.type, &p[e.offset]);
-			}
-	}
-	return options;
-}
-
-void Synthesizer::options_from_string(const string &options)
-{
-	Script::Type *type = Script::GetDynamicType(this);
-	if (type){
-		foreach(Script::ClassElement &e, type->element)
-			if (e.name == "config"){
-				char *p = (char*)this;
-				int pos = 0;
-				var_from_string(e.type, &p[e.offset], options, pos);
-			}
-	}
 }

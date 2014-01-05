@@ -222,7 +222,6 @@ void AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range, BufferBox 
 	buf.resize(range.num);
 	read(buf);
 	//buf = RenderAudioFilePart(a, range);
-	CleanUp();
 }
 
 void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
@@ -241,18 +240,6 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 	}
 	if (effect)
 		effect->Prepare();
-}
-
-void AudioRenderer::CleanUp()
-{
-	msg_db_f("Renderer.CleanUp", 2);
-	foreach(Effect *fx, audio->fx)
-		fx->CleanUp();
-	foreach(Track *t, audio->track)
-		foreach(Effect *fx, t->fx)
-			fx->CleanUp();
-	if (effect)
-		effect->CleanUp();
 }
 
 int AudioRenderer::TranslateOutputPos(int pos)

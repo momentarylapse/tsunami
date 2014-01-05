@@ -3,13 +3,17 @@
 use "../../api.kaba"
 
 
-class PluginData
+class Config : PluginData
 	float Speed
 	float Depth
 
+	overwrite void reset()
+		Depth = 0.5
+		Speed = 6
+
 class Tremolo : AudioEffect
 
-	PluginData config
+	Config config
 	TremoloDialog *dlg
 
 	void DoTremolo(float b[])
@@ -24,10 +28,6 @@ class Tremolo : AudioEffect
 
 	overwrite void UpdateDialog()
 		dlg.fill()
-
-	overwrite void ResetConfig()
-		config.Depth = 0.5
-		config.Speed = 6
 
 	overwrite void Configure()
 		dlg = new TremoloDialog(self)

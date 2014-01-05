@@ -4,15 +4,22 @@
 use "../../api.kaba"
 
 
-class PluginData
+class Config : PluginData
 	float BeatsPerMinute
 	float Volume
 	int BeatsPerMeasure
+	overwrite void reset()
+		Volume = 0.3
+		BeatsPerMinute = 90
+		BeatsPerMeasure = 4
 
 
-class PluginState
+class PluginState : PluginData
 	int beat
 	int dpos
+	overwrite void reset()
+		beat = 0
+		dpos = 0
 
 
 DummySynthesizer synth
@@ -20,7 +27,7 @@ DummySynthesizer synth
 
 class Metronome : AudioEffect
 	PluginState state
-	PluginData config
+	Config config
 	ConfigDialog *dlg
 
 	overwrite void ProcessTrack(BufferBox buf)
@@ -44,15 +51,6 @@ class Metronome : AudioEffect
 			if state.dpos >= buf.num
 				state.dpos -= buf.num
 				break
-
-	overwrite void ResetState()
-		state.beat = 0
-		state.dpos = 0
-
-	overwrite void ResetConfig()
-		config.Volume = 0.3
-		config.BeatsPerMinute = 90
-		config.BeatsPerMeasure = 4
 
 	overwrite void UpdateDialog()
 		dlg.fill()

@@ -206,9 +206,6 @@ void AudioOutput::stop_play()
 		alSourceUnqueueBuffers(source, 1, &buf);
 		TestError(format("alSourceUnqueueBuffers(%d) (stop)", queued));
 	}
-
-	if (renderer)
-		renderer->CleanUp();
 }
 
 void AudioOutput::Stop()

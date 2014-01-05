@@ -10,13 +10,14 @@
 
 #include "../../lib/base/base.h"
 #include "../AudioRenderer.h"
+#include "../../Plugins/Plugin.h"
 
 class Range;
 class BufferBox;
 class MidiNote;
 class MidiSource;
 
-class Synthesizer : public AudioRendererInterface
+class Synthesizer : /*public AudioRendererInterface,*/ public Configurable
 {
 public:
 	Synthesizer();
@@ -33,12 +34,7 @@ public:
 	void iterate(int samples);
 
 	virtual void Configure(){}
-	virtual void UpdateDialog(){}
 	virtual void Reset();
-	virtual void ResetConfig(){}
-
-	string options_to_string();
-	void options_from_string(const string &options);
 
 	string name;
 	int sample_rate;

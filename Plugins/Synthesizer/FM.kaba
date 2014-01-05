@@ -12,10 +12,10 @@ class OscillatorConfig
 class OscillatorLink
 	int source, dest
 
-class FMConfig
+class FMConfig : PluginData
 	OscillatorConfig osc[NUM_OSCILLATORS]
 	OscillatorLink link[]
-	void reset()
+	overwrite void reset()
 		link.clear()
 		for int j, 0, NUM_OSCILLATORS
 			osc[j].factor = 1
@@ -63,9 +63,9 @@ class OscillatorState
 class NoteState
 	OscillatorState osc[NUM_OSCILLATORS]
 
-class FMState
+class FMState : PluginData
 	NoteState note[128]
-	void reset()
+	overwrite void reset()
 		for int i, 0, 128
 			for int j, 0, NUM_OSCILLATORS
 				note[i].osc[j].inp = 0
@@ -118,9 +118,6 @@ class FMSynthesizer : Synthesizer
 	FMConfig config
 	FMState state
 	Dialog *dlg
-	
-	overwrite void ResetConfig()
-		config.reset()
 
 	overwrite void Reset()
 		reset()

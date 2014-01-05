@@ -4,7 +4,7 @@
 use "../../api.kaba"
 use "../../grid.kaba"
 
-class PluginData
+class Config : PluginData
 	complex curve[]
 	float Delay
 
@@ -14,9 +14,17 @@ class PluginData
 		for int i, 1, curve.num
 			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 
+	overwrite void reset()
+		curve.clear()
+		curve.add(complex(0, 0))
+		curve.add(complex(1, 1))
+		Delay = 0.1
+		//MouseOver = -1
+		//Selected = -1
+
 
 class Compressor : AudioEffect
-	PluginData config
+	Config config
 
 	ConfigDialog *win
 
@@ -46,14 +54,6 @@ class Compressor : AudioEffect
 
 	overwrite void UpdateDialog()
 		win.fill()
-
-	overwrite void ResetConfig()
-		config.curve.clear()
-		config.curve.add(complex(0, 0))
-		config.curve.add(complex(1, 1))
-		config.Delay = 0.1
-		//MouseOver = -1
-		//Selected = -1
 
 	overwrite void Configure()
 		win = new ConfigDialog(self)

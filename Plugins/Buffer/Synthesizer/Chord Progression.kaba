@@ -5,12 +5,19 @@ use "../../api.kaba"
 use "../../tone.kaba"
 
 
-class PluginConfig
+class PluginConfig : PluginData
 	string Chords
 	float Volume
 	bool DurationByBeats
 	float Duration
 	int Beats
+
+	overwrite void reset()
+		Volume = 0.2
+		Chords = "aeFa"
+		DurationByBeats = false
+		Duration = 2.0
+		Beats = 1
 
 
 class ChordProgression : AudioEffect
@@ -38,13 +45,6 @@ class ChordProgression : AudioEffect
 
 	overwrite void UpdateDialog()
 		dlg.fill()
-
-	overwrite void ResetConfig()
-		config.Volume = 0.2
-		config.Chords = "aeFa"
-		config.DurationByBeats = false
-		config.Duration = 2.0
-		config.Beats = 1
 
 	overwrite void Configure()
 		dlg = new ConfigDialog(self)

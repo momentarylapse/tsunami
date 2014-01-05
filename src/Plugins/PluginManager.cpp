@@ -122,6 +122,13 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Range", "offset", offsetof(Range, offset));
 	Script::DeclareClassOffset("Range", "length", offsetof(Range, num));
 
+
+	PluginData plugin_data;
+	Script::DeclareClassSize("PluginData", sizeof(PluginData));
+	Script::LinkExternal("PluginData.__init__", Script::mf(&PluginData::__init__));
+	Script::DeclareClassVirtualIndex("PluginData", "__delete__", Script::mf(&PluginData::__delete__), &plugin_data);
+	Script::DeclareClassVirtualIndex("PluginData", "reset", Script::mf(&PluginData::reset), &plugin_data);
+
 	Effect effect;
 	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
 	Script::DeclareClassOffset("AudioEffect", "name", offsetof(Effect, name));
@@ -232,7 +239,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioFile.GetNextBeat", Script::mf(&AudioFile::GetNextBeat));
 
 	Script::LinkExternal("AudioRenderer.Prepare", Script::mf(&AudioRenderer::Prepare));
-	Script::LinkExternal("AudioRenderer.CleanUp", Script::mf(&AudioRenderer::CleanUp));
 	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
 	Script::LinkExternal("AudioRenderer.RenderAudioFile", Script::mf(&AudioRenderer::RenderAudioFile));
 	Script::LinkExternal("AudioRenderer.TranslateOutputPos", Script::mf(&AudioRenderer::TranslateOutputPos));
@@ -359,9 +365,8 @@ void SynthWriteDataToFile(Synthesizer *s, const string &name)
 	msg_db_f("Synth.WriteDataToFile", 1);
 	dir_create(HuiAppDirectory + "Favorites/");
 	dir_create(HuiAppDirectory + "Favorites/Synthesizer/");
-	s->options_to_string();
 	CFile *f = FileCreate(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
-	f->WriteStr(s->options_to_string());
+	f->WriteStr(s->ConfigToString());
 	FileClose(f);
 }
 
@@ -374,7 +379,7 @@ void SynthLoadDataFromFile(Synthesizer *s, const string &name)
 	CFile *f = FileOpen(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
 	if (!f)
 		return;
-	s->options_from_string(f->ReadStr());
+	s->ConfigFromString(f->ReadStr());
 	FileClose(f);
 }
 
@@ -524,9 +529,6 @@ void PluginManager::OnPluginFavoriteSave()
 
 void PluginManager::OnPluginOk()
 {
-	if (cur_synth){
-		cur_synth->options_to_string();
-	}
 	PluginCancelled = false;
 	cur_effect = NULL;
 	cur_plugin = NULL;
@@ -601,16 +603,14 @@ void PluginManager::OnPluginPreview()
 
 bool PluginManager::ConfigureSynthesizer(Synthesizer *s)
 {
-	string params_old = s->options_to_string();
+	string params_old = s->ConfigToString();
 
 	PluginAddPreview = false;
 	cur_plugin = NULL;
 	cur_synth = s;
-	s->options_to_string();
-	//s->options_from_string();
 	s->Configure();
 	if (PluginCancelled)
-		s->options_from_string(params_old);
+		s->ConfigFromString(params_old);
 	return !PluginCancelled;
 }
 

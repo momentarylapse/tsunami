@@ -18,9 +18,6 @@
 // -> PluginManager.cpp
 void GlobalRemoveSliders(HuiWindow *win);
 
-string var_to_string(Script::Type *type, char *v);
-void var_from_string(Script::Type *type, char *v, const string &s, int &pos);
-
 Effect::Effect()
 {
 	usable = true;
@@ -57,47 +54,12 @@ void Effect::__delete__()
 		}
 }*/
 
-string Effect::ConfigToString()
-{
-	msg_db_f("Effect.ExportConfig", 1);
-
-	string param;
-	Script::Type *type = Script::GetDynamicType(this);
-	if (type){
-		foreach(Script::ClassElement &e, type->element)
-			if (e.name == "config"){
-				char *p = (char*)this;
-				param = var_to_string(e.type, &p[e.offset]);
-			}
-	}
-	return param;
-}
-
-void Effect::ConfigFromString(const string &param)
-{
-	msg_db_f("Effect.ImportConfig", 1);
-
-	Script::Type *type = Script::GetDynamicType(this);
-	if (type){
-		foreach(Script::ClassElement &e, type->element)
-			if (e.name == "config"){
-				char *p = (char*)this;
-				int pos = 0;
-				var_from_string(e.type, &p[e.offset], param, pos);
-			}
-	}
-}
-
 void Effect::Prepare()
 {
 	msg_db_f("Effect.Prepare", 1);
 	ResetState();
 	if (!usable)
 		tsunami->log->Error(GetError());
-}
-
-void Effect::CleanUp()
-{
 }
 
 string Effect::GetError()
@@ -120,130 +82,6 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 		msg_error("not usable... apply");
 		if (log_error)
 			tsunami->log->Error(_("Beim Anwenden eines Effekts: ") + GetError());
-	}
-}
-
-Array<Script::ClassElement> get_unique_elements(Script::Type *t)
-{
-	Array<Script::ClassElement> r;
-	int pos = -1;
-	foreach(Script::ClassElement &e, t->element)
-		if (e.offset > pos){
-			r.add(e);
-			pos = e.offset;
-		}
-	return r;
-}
-
-string var_to_string(Script::Type *type, char *v)
-{
-	string r;
-	if (type == Script::TypeInt){
-		r += i2s(*(int*)v);
-	}else if (type == Script::TypeChar){
-		r += i2s(*(char*)v);
-	}else if (type == Script::TypeFloat){
-		r += f2s(*(float*)v, 6);
-	}else if (type == Script::TypeBool){
-		r += (*(bool*)v) ? "true" : "false";
-	}else if (type == Script::TypeString){
-		r += "\"" + str_escape(*(string*)v) + "\"";
-	}else if (type->is_array){
-		r += "[";
-		for (int i=0;i<type->array_length;i++){
-			if (i > 0)
-				r += " ";
-			r += var_to_string(type->parent, &v[i * type->parent->size]);
-		}
-		r += "]";
-	}else if (type->is_super_array){
-		DynamicArray *a = (DynamicArray*)v;
-		r += "[";
-		for (int i=0;i<a->num;i++){
-			if (i > 0)
-				r += " ";
-			r += var_to_string(type->parent, &(((char*)a->data)[i * type->parent->size]));
-		}
-		r += "]";
-	}else{
-		Array<Script::ClassElement> e = get_unique_elements(type);
-		r += "(";
-		for(int i=0;i<e.num;i++){
-			if (i > 0)
-				r += " ";
-			r += var_to_string(e[i].type, &v[e[i].offset]);
-		}
-		r += ")";
-	}
-	return r;
-}
-
-string get_next(const string &var_temp, int &pos)
-{
-	int start = pos;
-	bool in_string = false;
-	for (int i=start;i<var_temp.num;i++){
-		if ((i == start) && (var_temp[i] == '"')){
-			in_string = true;
-		}else if (in_string){
-			if (var_temp[i] == '\\'){
-				i ++;
-			}else if (var_temp[i] == '"'){
-				pos = i + 1;
-				return str_unescape(var_temp.substr(start + 1, i - start - 1));
-			}
-		}else if ((var_temp[i] == ' ') || (var_temp[i] == ']') || (var_temp[i] == ')') || (var_temp[i] == '[') || (var_temp[i] == '(')){
-			pos = i;
-			return var_temp.substr(start, i - start);
-		}
-	}
-	return var_temp.substr(start, -1);
-}
-
-void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
-{
-	if (pos >= s.num)
-		return;
-	if (type == Script::TypeInt){
-		*(int*)v = get_next(s, pos)._int();
-	}else if (type == Script::TypeChar){
-		*(char*)v = get_next(s, pos)._int();
-	}else if (type == Script::TypeFloat){
-		*(float*)v = get_next(s, pos)._float();
-	}else if (type == Script::TypeBool){
-		*(bool*)v = (get_next(s, pos) == "true");
-	}else if (type == Script::TypeString){
-		*(string*)v = get_next(s, pos);
-	}else if (type->is_array){
-		pos ++; // '['
-		for (int i=0;i<type->array_length;i++){
-			if (i > 0)
-				pos ++; // ' '
-			var_from_string(type->parent, &v[i * type->parent->size], s, pos);
-		}
-		pos ++; // ']'
-	}else if (type->is_super_array){
-		pos ++; // '['
-		DynamicArray *a = (DynamicArray*)v;
-		a->clear(); // todo...
-		while (true){
-			if ((s[pos] == ']') || (pos >= s.num))
-				break;
-			if (a->num > 0)
-				pos ++; // ' '
-			a->resize(a->num + 1);
-			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos);
-		}
-		pos ++; // ']'
-	}else{
-		Array<Script::ClassElement> e = get_unique_elements(type);
-		pos ++; // '('
-		for(int i=0;i<e.num;i++){
-			if (i > 0)
-				pos ++; // ' '
-			var_from_string(e[i].type, &v[e[i].offset], s, pos);
-		}
-		pos ++; // ')'
 	}
 }
 

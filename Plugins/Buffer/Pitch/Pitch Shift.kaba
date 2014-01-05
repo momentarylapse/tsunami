@@ -3,20 +3,20 @@
 
 use "../../api.kaba"
 
-class PluginData
+class Config : PluginData
 	float Pitch
+
+	overwrite void reset()
+		Pitch = 1
 
 
 class PitchShift : AudioEffect
-	PluginData config
+	Config config
 
 	ConfigDialog *dlg
 
 	complex buf1[]
 	complex buf2[]
-
-	overwrite void ResetConfig()
-		config.Pitch = 1
 
 	overwrite void UpdateDialog()
 		dlg.fill()

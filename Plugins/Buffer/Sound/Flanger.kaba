@@ -5,30 +5,28 @@ use "../../api.kaba"
 
 
 
-class PluginData
+class PluginConfig : PluginData
 	float Delay
 	float Speed
 	float Depth
+	overwrite void reset()
+		Depth = 0.5
+		Speed = 0.3
+		Delay = 0.01
 
-class PluginState
+class PluginState : PluginData
 	float temp_r[]
 	float temp_l[]
 	int offset
+	overwrite void reset()
+		temp_r.clear()
+		temp_l.clear()
+		offset = 0
 
 class Flanger : AudioEffect
 	ConfigDialog *dlg
-	PluginData config
+	PluginConfig config
 	PluginState state
-
-	overwrite void ResetConfig()
-		config.Depth = 0.5
-		config.Speed = 0.3
-		config.Delay = 0.01
-
-	overwrite void ResetState()
-		state.temp_r.clear()
-		state.temp_l.clear()
-		state.offset = 0
 
 	void DoFlanger(float b[], float temp[], int sample_rate)
 		int p = state.offset % temp.num

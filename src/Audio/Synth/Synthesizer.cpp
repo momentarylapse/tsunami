@@ -161,6 +161,7 @@ Synthesizer *CreateSynthesizer(const string &name)
 		return new SampleSynthesizer;
 	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name);
 	if (s){
+		s->ResetConfig();
 		s->name = name;
 		return s;
 	}

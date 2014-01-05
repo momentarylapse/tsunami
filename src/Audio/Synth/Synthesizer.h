@@ -33,8 +33,7 @@ public:
 	void iterate(int samples);
 
 	virtual void Configure(){}
-	virtual void DataToDialog(){}
-	virtual void DataFromDialog(){}
+	virtual void UpdateDialog(){}
 	virtual void Reset();
 	virtual void ResetConfig(){}
 

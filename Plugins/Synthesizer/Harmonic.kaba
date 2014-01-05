@@ -1,0 +1,78 @@
+use "../api.kaba"
+use "../tone.kaba"
+
+
+const int NUM_HARMONICS = 10
+
+class HarmonicConfig
+	float intensity[NUM_HARMONICS]
+	float release
+	void reset()
+		intensity[0] = 1
+		for int i, 1, NUM_HARMONICS
+			intensity[i] = 0
+		release = 0.02
+
+class ConfigDialog : Dialog
+	HarmonicConfig *c
+	void __init__(HarmonicConfig *_c, Window *parent)
+		super.__init__("config", 640, 260, parent, false)
+		//cur_dlg = self
+		AddGrid("", 0, 0, 1, 3, "root_table")
+		SetTarget("root_table", 0)
+		AddGrid("", 0, 1, 2, NUM_HARMONICS, "main_table")
+		SetTarget("main_table", 0)
+		for int j, 0, NUM_HARMONICS
+			AddText("" + (j + 1), j, 0, 0, 0, "")
+			AddSpinButton("0\\0\\100\\0.1", j, 1, 0, 0, "intensity_" + j)
+			EventM("intensity_" + j, &OnIntensity)
+		PutFavoriteBar(self, "root_table", 0, 0)
+		PutCommandBar(self, "root_table", 0, 2)
+		c = _c
+		
+	void OnIntensity()
+		for int j, 0, NUM_HARMONICS
+			c.intensity[j] = GetFloat("intensity_" + j) / 100
+		
+
+class HarmonicSynthesizer : Synthesizer
+	HarmonicConfig config
+	Dialog *dlg
+	
+	overwrite void ResetConfig()
+		config.reset()
+	
+	overwrite void UpdateDialog()
+		for int j, 0, NUM_HARMONICS
+			dlg.SetFloat("intensity_" + j, config.intensity[j] * 100)
+
+	overwrite void Configure()
+		dlg = new ConfigDialog(&config, MainWin)
+		UpdateDialog()
+		dlg.Run()
+		
+	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
+		float freq = pitch_to_freq(pitch)
+		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
+		float sm_d = config.release * sample_rate
+		keep_notes = sm_d * 8
+
+
+		int r_end = r.offset + r.length
+		
+		int i0 = max(r.offset, 0)
+		int i1 = min(r_end + sm_d * 8, buf.num)
+
+		for int i, i0, i1
+			float tt = (i - r.offset) * f_w
+			float d = 0
+			for int j, 0, NUM_HARMONICS
+				d += sin(tt * (j+1)) * config.intensity[j]
+			d *= volume
+			if i > r_end
+				float fi = (i - r_end) / sm_d
+				d *= exp(-fi)
+			else if i < r.offset + 1000
+				d *= (i - r.offset) * 0.001
+			buf.r[i] += d
+			buf.l[i] += d

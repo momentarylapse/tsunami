@@ -157,8 +157,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "Configure", Script::mf(&Synthesizer::Configure), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "DataToDialog", Script::mf(&Synthesizer::DataToDialog), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "DataFromDialog", Script::mf(&Synthesizer::DataFromDialog), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "UpdateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "Reset", Script::mf(&Synthesizer::Reset), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "ResetConfig", Script::mf(&Synthesizer::ResetConfig), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
@@ -402,7 +401,7 @@ void PluginManager::OnFavoriteList()
 	if (cur_effect)
 		cur_effect->UpdateDialog();
 	else if (cur_synth)
-		cur_synth->DataToDialog();
+		cur_synth->UpdateDialog();
 }
 
 void PluginManager::OnFavoriteSave()
@@ -526,7 +525,6 @@ void PluginManager::OnPluginFavoriteSave()
 void PluginManager::OnPluginOk()
 {
 	if (cur_synth){
-		cur_synth->DataFromDialog();
 		cur_synth->options_to_string();
 	}
 	PluginCancelled = false;
@@ -598,8 +596,6 @@ void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, 
 
 void PluginManager::OnPluginPreview()
 {
-	if (cur_synth)
-		cur_synth->DataFromDialog();
 	PreviewStart(cur_effect);
 }
 

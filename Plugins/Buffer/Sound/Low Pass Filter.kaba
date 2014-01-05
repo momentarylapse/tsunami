@@ -1,0 +1,24 @@
+// Image = hui:properties
+// Title[Deutsch] = Low Pass Filter
+use "../../api.kaba"
+
+class Config
+	float Frequency
+	void reset()
+		Frequency = 1000
+
+class LowPassFilter : AudioEffect
+	Config config
+	
+	overwrite void ResetConfig()
+		config.reset()
+
+	overwrite void ProcessTrack(BufferBox buf)
+		float RC = 1 / (2 * pi * config.Frequency)
+		float dt = 1.0 / audio.sample_rate
+		float a = dt / (RC + dt)
+		float b = 1 - a
+	
+		for int i, 1, buf.num
+			buf.r[i] = a * buf.r[i] + b * buf.r[i-1]
+			buf.l[i] = a * buf.l[i] + b * buf.l[i-1]

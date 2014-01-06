@@ -7,14 +7,16 @@ float log2lin(float f, float f_min, float f_max)
 float lin2log(float f, float f_min, float f_max)
 	return log(f / f_min) / log(f_max / f_min)
 
+class GridTick
+	float value, weight
+	string label
+
 class GridPartition
-	float min, max
-	float step
-	float factor
-	int decimals
+	GridTick tick[]
 
 class AxisData
 	float offset, size
+	float min_label_dist
 	float val_min, val_max
 	bool as_log
 	string unit
@@ -45,16 +47,67 @@ class AxisData
 	GridPartition get_lin_partition()
 		float d = (val_max - val_min) / size * 100
 		GridPartition r
-		r.step = 1
+		float step = 1
 		float e = log(abs(abs(d))) / log(10)
 		float e_floor = i2f(f2i(e))
 		if e < 0
 			e_floor -= 1
-		r.step = pow(10, e_floor)
-		r.factor = d / r.step
-		r.decimals = f2i(max(-e_floor, 0))
-		r.min = i2f(f2i(val_min / r.step) * r.step)
-		r.max = val_max
+		step = pow(10, e_floor)
+		float factor = d / step
+		int decimals = f2i(max(-e_floor, 0))
+		float min = i2f(f2i(val_min / step) * step)
+		float max = val_max
+		
+		float vv = min
+		while vv <= max and step > 0
+			GridTick tt
+			tt.value = vv
+			tt.weight = 1
+			tt.label = vv.str2(decimals)
+			tt.label += " "
+			tt.label += unit
+			r.tick.add(tt)
+			if factor < 3
+				tt.value = vv + step / 2
+				tt.weight = 0.7
+				tt.label = ""
+				r.tick.add(tt)
+			vv += step
+		
+		return r
+		
+	GridPartition get_log_partition()
+		float pixel_per_decade = abs(size / log(val_max / val_min)) * log(10)
+		float size_param = pixel_per_decade / min_label_dist
+		GridPartition r
+		int e_min = log(abs(abs(val_min))) / log(10)
+		int e_max = log(abs(abs(val_max))) / log(10) + 1
+		for int e, e_min, e_max
+			float vv0 = pow(10, e)
+			for int i, 1, 10
+				float vv = vv0 * i
+				if (vv >= val_min) and (vv <= val_max)
+					GridTick tt
+					tt.value = vv
+					tt.weight = exp(-(i+1)*0.14)
+					tt.label = ""
+					bool show = false
+					if (i == 1)
+						show = true
+					if (i == 3) and (size_param > 2)
+						show = true
+					if ((i == 2) or (i == 5)) and (size_param > 4)
+						show = true
+					if show
+						tt.label = vv.str2(0) + " " + unit
+					r.tick.add(tt)
+				if (i == 1)
+					vv = vv0 * 1.5
+					GridTick tt
+					tt.value = vv
+					tt.weight = 0.5
+					tt.label = ""
+					r.tick.add(tt)
 		return r
 
 class GridData
@@ -67,15 +120,15 @@ class GridData
 	
 	color col_bg
 	color col_grid
-	color col_grid2
 	color col_text
 	
 	void __init__()
 		col_grid = color(1, 0.8, 0.8, 0.8)
-		col_grid2 = color(1, 0.9, 0.9, 0.9)
 		col_text = color(1, 0.4, 0.4, 0.4)
 		col_bg = White
 		allow_bg = true
+		x_axis.min_label_dist = 60
+		y_axis.min_label_dist = 30
 		x_axis.set(0, 1, false, "")
 		y_axis.set(0, 1, false, "")
 
@@ -92,43 +145,21 @@ class GridData
 		return vector(x_axis.unproject(z.x), y_axis.unproject(z.y), z.z)
 	
 	
-	void DrawLinY(Painter *c, GridPartition part)
-		c.SetLineWidth(0.9)
-		c.SetFontSize(7)
-		float yy = part.min
-		while yy <= part.max and part.step > 0
-			c.SetColor(col_grid)
-			float vy = y_axis.project(yy)
-			c.DrawLine(x, vy, x + w, vy)
+	void DrawAxisY(Painter *c, GridPartition part)
+		for t in part.tick
+			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
+			float yy = y_axis.project(t.value)
+			c.DrawLine(x, yy, x + w, yy)
 			c.SetColor(col_text)
-			string t = yy.str2(part.decimals)
-			t += " "
-			t += y_axis.unit
-			c.DrawStr(x0 + 2, vy - 6, t)
-			if part.factor < 3
-				c.SetColor(col_grid2)
-				vy = y_axis.project(yy + part.step / 2)
-				c.DrawLine(x, vy, x + w, vy)
-			yy += part.step
+			c.DrawStr(x0 + 2, yy - 6, t.label)
 	
-	void DrawLinX(Painter *c, GridPartition part)
-		c.SetLineWidth(0.9)
-		c.SetFontSize(7)
-		float xx = part.min
-		while xx <= part.max and part.step > 0
-			c.SetColor(col_grid)
-			float vx = x_axis.project(xx)
-			c.DrawLine(vx, y, vx, y + h)
+	void DrawAxisX(Painter *c, GridPartition part)
+		for t in part.tick
+			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
+			float xx = x_axis.project(t.value)
+			c.DrawLine(xx, y, xx, y + h)
 			c.SetColor(col_text)
-			string t = xx.str2(part.decimals)
-			t += " "
-			t += x_axis.unit
-			c.DrawStr(vx, y + h + 5, t)
-			if part.factor < 3
-				c.SetColor(col_grid2)
-				vx = x_axis.project(xx + part.step / 2)
-				c.DrawLine(vx, y, vx, y + h)
-			xx += part.step
+			c.DrawStr(xx, y + h + 5, t.label)
 	
 	rect GetPlotRegion(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
@@ -158,22 +189,15 @@ class GridData
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
 		if x_axis.as_log
-			float ff = x_axis.val_min
-			while ff <= x_axis.val_max
-				float fx = x_axis.project(ff)
-				c.SetColor(col_grid)
-				c.DrawLine(fx, y, fx, y + h)
-				c.SetColor(col_text)
-				c.DrawStr(fx, y + h + 5, ff.str2(0) + " " + x_axis.unit)
-				fx = x_axis.project(ff * sqrt(2))
-				c.SetColor(col_grid2)
-				c.DrawLine(fx, y, fx, y + h)
-				ff *= 2
+			GridPartition part = x_axis.get_log_partition()
 		else
-			GridPartition part = x_axis.get_lin_partition()
-			DrawLinX(c, part)
-		part = y_axis.get_lin_partition()
-		DrawLinY(c, part)
+			part = x_axis.get_lin_partition()
+		DrawAxisX(c, part)
+		if y_axis.as_log
+			part = y_axis.get_log_partition()
+		else
+			part = y_axis.get_lin_partition()
+		DrawAxisY(c, part)
 	
 	void DrawCurve(Painter *c, FloatInterpolator fi, bool fill_below)
 		float tt[], yy[]

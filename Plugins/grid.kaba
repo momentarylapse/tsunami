@@ -1,4 +1,5 @@
 
+use "tone.kaba"
 
 
 float log2lin(float f, float f_min, float f_max)
@@ -14,12 +15,18 @@ class GridTick
 class GridPartition
 	GridTick tick[]
 
-class AxisData
+class GridAxis
 	float offset, size
+	rect rect
 	float min_label_dist
 	float val_min, val_max
 	bool as_log
+	bool freq_as_pitch
 	string unit
+	
+	void __init__()
+		freq_as_pitch = false
+		set(0, 1, false, "")
 	
 	void set(float _val_min, float _val_max, bool _log, string _unit)
 		val_min = _val_min
@@ -109,6 +116,36 @@ class AxisData
 					tt.label = ""
 					r.tick.add(tt)
 		return r
+		
+	GridPartition get_pitch_partition()
+		GridPartition r
+		float pitch_min = freq_to_pitch(val_min)
+		float pitch_max = freq_to_pitch(val_max)
+		int oct_min = pitch_get_octave(pitch_min)
+		int oct_max = pitch_get_octave(pitch_max) + 1
+		for int o, oct_min, oct_max
+			int pitch = pitch_from_octave_and_rel(0, o)
+			GridTick tt
+			tt.value = pitch_to_freq(pitch)
+			if (tt.value >= val_min) and (tt.value <= val_max)
+				tt.weight = 1
+				tt.label = pitch_name(pitch)
+				r.tick.add(tt)
+			pitch = pitch_from_octave_and_rel(6, o)
+			GridTick tt
+			tt.value = pitch_to_freq(pitch)
+			if (tt.value >= val_min) and (tt.value <= val_max)
+				tt.weight = 0.7
+				tt.label = ""
+				r.tick.add(tt)
+		return r
+		
+	GridPartition get_partition()
+		if as_log
+			if freq_as_pitch
+				return get_pitch_partition()
+			return get_log_partition()
+		return get_lin_partition()
 
 class GridData
 	bool allow_bg
@@ -116,7 +153,7 @@ class GridData
 	rect plot_rect
 	float x, y, w, h
 	
-	AxisData x_axis, y_axis
+	GridAxis x_axis, y_axis
 	
 	color col_bg
 	color col_grid
@@ -129,8 +166,6 @@ class GridData
 		allow_bg = true
 		x_axis.min_label_dist = 60
 		y_axis.min_label_dist = 30
-		x_axis.set(0, 1, false, "")
-		y_axis.set(0, 1, false, "")
 
 	complex project2(complex z)
 		return complex(x_axis.project(z.x), y_axis.project(z.y))
@@ -150,16 +185,20 @@ class GridData
 			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float yy = y_axis.project(t.value)
 			c.DrawLine(x, yy, x + w, yy)
-			c.SetColor(col_text)
-			c.DrawStr(x0 + 2, yy - 6, t.label)
+			if t.label.num > 0
+				c.SetColor(col_text)
+				c.DrawLine(x, yy, x + 6, yy)
+				c.DrawStr(x0 + 2, yy - 6, t.label)
 	
 	void DrawAxisX(Painter *c, GridPartition part)
 		for t in part.tick
 			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float xx = x_axis.project(t.value)
 			c.DrawLine(xx, y, xx, y + h)
-			c.SetColor(col_text)
-			c.DrawStr(xx, y + h + 5, t.label)
+			if t.label.num > 0
+				c.SetColor(col_text)
+				c.DrawLine(xx, y + h - 6, xx, y + h)
+				c.DrawStr(xx - 8, y + h + 5, t.label)
 	
 	rect GetPlotRegion(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
@@ -178,8 +217,10 @@ class GridData
 		
 		x_axis.offset = x
 		x_axis.size = w
+		x_axis.rect = rect(x, x+w, y+h, _h)
 		y_axis.offset = y + h
 		y_axis.size = -h
+		y_axis.rect = rect(_x0, x, _y0, y+h)
 		
 		// background
 		if allow_bg
@@ -188,15 +229,9 @@ class GridData
 	
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
-		if x_axis.as_log
-			GridPartition part = x_axis.get_log_partition()
-		else
-			part = x_axis.get_lin_partition()
+		GridPartition part = x_axis.get_partition()
 		DrawAxisX(c, part)
-		if y_axis.as_log
-			part = y_axis.get_log_partition()
-		else
-			part = y_axis.get_lin_partition()
+		part = y_axis.get_partition()
 		DrawAxisY(c, part)
 	
 	void DrawCurve(Painter *c, FloatInterpolator fi, bool fill_below)

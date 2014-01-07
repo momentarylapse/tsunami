@@ -49,6 +49,11 @@ class SpectrumDialog : Dialog
 		delete(im)
 	
 		c.End()
+	
+	overwrite void OnLeftButtonDown()
+		if grid.y_axis.rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+			grid.y_axis.freq_as_pitch = !grid.y_axis.freq_as_pitch
+			Redraw("drawing_area")
 
 	void OnClose()
 		delete self

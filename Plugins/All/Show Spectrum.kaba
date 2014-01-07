@@ -82,6 +82,11 @@ class SpectrumDialog : Dialog
 		grid.DrawCurveB(c, pl, true, Blue)
 	
 		c.End()
+	
+	overwrite void OnLeftButtonDown()
+		if grid.x_axis.rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+			grid.x_axis.freq_as_pitch = !grid.x_axis.freq_as_pitch
+			Redraw("drawing_area")
 
 	void OnType()
 		Redraw("drawing_area")

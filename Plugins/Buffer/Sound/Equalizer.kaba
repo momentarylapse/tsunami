@@ -65,14 +65,14 @@ class Equalizer : AudioEffect
 		dlg.Redraw("drawing")
 
 	overwrite void Configure()
-		dlg = new ConfigDialog(self)
+		dlg = new ConfigDialog(&config)
 		dlg.Run()
 
 class ConfigDialog : Dialog
 	int MouseOver, Selected
 	GridData grid
-	Equalizer *e
-	void __init__(Equalizer *_e)
+	Config *e
+	void __init__(Config *_e)
 		super.__init__("Equalizer", 600, 400, MainWin, false)
 		AddGrid("", 0, 0, 1, 3, "table")
 		SetTarget("table", 0)
@@ -97,16 +97,18 @@ class ConfigDialog : Dialog
 	
 		// curve + area below
 		FloatInterpolator fi
-		e.config.fill_inter(fi)
+		e.fill_inter(fi)
 		grid.DrawCurve(c, fi, true)
 	
 		// points
-		for int i, 0, e.config.curve.num
-			grid.DrawPoint3(c, e.config.curve[i], i == Selected, i == MouseOver)
+		for int i, 0, e.curve.num
+			grid.DrawPoint3(c, e.curve[i], i == Selected, i == MouseOver)
 		c.End()
 
 	// left button down -> select
 	overwrite void OnLeftButtonDown()
+		if grid.x_axis.rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+			grid.x_axis.freq_as_pitch = !grid.x_axis.freq_as_pitch
 		Selected = MouseOver
 		Redraw("drawing")
 
@@ -124,17 +126,17 @@ class ConfigDialog : Dialog
 	overwrite void OnMouseWheel()
 		if MouseOver >= 0
 			if HuiGetEvent().wheel > 0
-				e.config.curve[MouseOver].z += 0.2
+				e.curve[MouseOver].z += 0.2
 			else
-				e.config.curve[MouseOver].z -= 0.2
+				e.curve[MouseOver].z -= 0.2
 			Redraw("drawing")
 
 	// right button down -> new point
 	overwrite void OnRightButtonDown()
 		vector m = grid.GetMouse3(0)
-		for int i, 1, e.config.curve.num
-			if (m.x > e.config.curve[i - 1].x) and (m.x < e.config.curve[i].x)
-				e.config.curve.insert(m, i)
+		for int i, 1, e.curve.num
+			if (m.x > e.curve[i - 1].x) and (m.x < e.curve[i].x)
+				e.curve.insert(m, i)
 				Selected = i
 				MouseOver = i
 				Redraw("drawing")
@@ -143,24 +145,24 @@ class ConfigDialog : Dialog
 	overwrite void OnMouseMove()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
-			e.config.curve[Selected] = grid.GetMouse3(e.config.curve[Selected].z)
+			e.curve[Selected] = grid.GetMouse3(e.curve[Selected].z)
 			float xmin = MIN_FREQ
 			float xmax = MAX_FREQ
 			if Selected > 0
-				xmin = e.config.curve[Selected - 1].x
-			if Selected < e.config.curve.num - 1
-				xmax = e.config.curve[Selected + 1].x
-			e.config.curve[Selected].x = clamp(e.config.curve[Selected].x, xmin, xmax)
-			e.config.curve[Selected].y = clamp(e.config.curve[Selected].y, MIN_VOL, MAX_VOL)
-			if Selected == e.config.curve.num - 1
-				e.config.curve[Selected].x = MAX_FREQ
+				xmin = e.curve[Selected - 1].x
+			if Selected < e.curve.num - 1
+				xmax = e.curve[Selected + 1].x
+			e.curve[Selected].x = clamp(e.curve[Selected].x, xmin, xmax)
+			e.curve[Selected].y = clamp(e.curve[Selected].y, MIN_VOL, MAX_VOL)
+			if Selected == e.curve.num - 1
+				e.curve[Selected].x = MAX_FREQ
 			if Selected == 0
-				e.config.curve[Selected].x = MIN_FREQ
+				e.curve[Selected].x = MIN_FREQ
 		else
 		// mouse over?
 			MouseOver = -1
-			for int i, 0, e.config.curve.num
-				if grid.MouseOverPoint3(e.config.curve[i])
+			for int i, 0, e.curve.num
+				if grid.MouseOverPoint3(e.curve[i])
 					MouseOver = i
 		Redraw("drawing")
 

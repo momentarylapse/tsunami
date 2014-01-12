@@ -181,7 +181,7 @@ class GridData
 		return vector(x_axis.unproject(z.x), y_axis.unproject(z.y), z.z)
 	
 	
-	void DrawAxisY(Painter *c, GridPartition part)
+	void drawAxisY(Painter *c, GridPartition part)
 		for t in part.tick
 			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float yy = y_axis.project(t.value)
@@ -191,7 +191,7 @@ class GridData
 				c.DrawLine(x, yy, x + 6, yy)
 				c.DrawStr(x0 + 2, yy - 6, t.label)
 	
-	void DrawAxisX(Painter *c, GridPartition part)
+	void drawAxisX(Painter *c, GridPartition part)
 		for t in part.tick
 			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float xx = x_axis.project(t.value)
@@ -201,15 +201,15 @@ class GridData
 				c.DrawLine(xx, y + h - 6, xx, y + h)
 				c.DrawStr(xx - 8, y + h + 5, t.label)
 	
-	rect GetPlotRegion(float _x0, float _y0, float _w, float _h)
+	rect getPlotRegion(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
 
-	void Draw(Painter *c, float _x0, float _y0, float _w, float _h)
+	void drawBackground(Painter *c, float _x0, float _y0, float _w, float _h)
 	
 		x0 = _x0
 		y0 = _y0 + 3
 	
-		plot_rect = GetPlotRegion(_x0, _y0, _w, _h)
+		plot_rect = getPlotRegion(_x0, _y0, _w, _h)
 		_y0 += 3
 		x = plot_rect.x1
 		y = plot_rect.y1
@@ -231,11 +231,11 @@ class GridData
 		c.SetLineWidth(0.9)
 		c.SetFontSize(7)
 		GridPartition part = x_axis.get_partition()
-		DrawAxisX(c, part)
+		drawAxisX(c, part)
 		part = y_axis.get_partition()
-		DrawAxisY(c, part)
+		drawAxisY(c, part)
 	
-	void DrawCurve(Painter *c, FloatInterpolator fi, bool fill_below)
+	void drawCurve(Painter *c, FloatInterpolator fi, bool fill_below)
 		float tt[], yy[]
 		complex pp[]
 		tt = rangef(0, 1, 0.003)
@@ -253,7 +253,7 @@ class GridData
 		c.SetColor(Black)
 		c.DrawLines(pp)
 	
-	void DrawCurveB(Painter *c, complex _p[], bool fill_below, color col)
+	void drawCurveB(Painter *c, complex _p[], bool fill_below, color col)
 		complex pp[]
 		for int i, 0, _p.num
 			pp.add(project2(_p[i]))
@@ -269,7 +269,7 @@ class GridData
 		c.SetColor(col)
 		c.DrawLines(pp)
 	
-	void DrawPoint2(Painter *c, complex p, bool selected, bool hover)
+	void drawPoint2(Painter *c, complex p, bool selected, bool hover)
 		complex pp = project2(p)
 		c.SetColor(Black)
 		float radius = 3
@@ -280,7 +280,7 @@ class GridData
 			c.SetColor(color(1, 0.7, 0, 0))
 		c.DrawCircle(pp.x, pp.y, radius)
 	
-	void DrawPoint3(Painter *c, vector p, bool selected, bool hover)
+	void drawPoint3(Painter *c, vector p, bool selected, bool hover)
 		vector pp = project3(p)
 		c.SetColor(Black)
 		float radius = 3
@@ -292,39 +292,40 @@ class GridData
 			c.SetColor(color(1, 0.7, 0, 0))
 		c.DrawCircle(pp.x, pp.y, radius)
 	
-	complex GetMouse2()
+	complex getMouse2()
 		float mx = HuiGetEvent().mouse_x
 		float my = HuiGetEvent().mouse_y
 		return unproject2(complex(mx, my))
 	
-	vector GetMouse3(float z)
+	vector getMouse3(float z)
 		float mx = HuiGetEvent().mouse_x
 		float my = HuiGetEvent().mouse_y
 		return unproject3(vector(mx, my, z))
 		
-	bool MouseOverPoint2(complex q)
+	bool mouseOverPoint2(complex q)
 		float mx = HuiGetEvent().mouse_x
 		float my = HuiGetEvent().mouse_y
 		complex p = project2(q)
 		return (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 		
-	bool MouseOverPoint3(vector q)
-		return MouseOverPoint2(complex(q.x, q.y))
+	bool mouseOverPoint3(vector q)
+		return mouseOverPoint2(complex(q.x, q.y))
 		
 	virtual void dummyVirtual()
 		nil
 		
 
-class SuperGrid : GridData
+class Grid : GridData
 	Window *win
 	string id
+	float mx, my
 	
 	void onDrawAll()
 		Painter *c = win.BeginDraw(id)
 		float w = c.width
 		float h = c.height
 	
-		Draw(c, 0, 0, w, h)
+		drawBackground(c, 0, 0, w, h)
 	
 		onDraw(c)
 		
@@ -334,8 +335,8 @@ class SuperGrid : GridData
 		win.Redraw(id)
 	
 	void onLeftButtonDownAll()
-		float mx = HuiGetEvent().mouse_x
-		float my = HuiGetEvent().mouse_y
+		mx = HuiGetEvent().mouse_x
+		my = HuiGetEvent().mouse_y
 		if plot_rect.inside(mx, my)
 			onLeftButtonDown()
 		if x_axis.rect.inside(mx, my)
@@ -345,17 +346,56 @@ class SuperGrid : GridData
 			y_axis.freq_as_pitch = !y_axis.freq_as_pitch
 			redraw()
 	
+	void onLeftButtonUpAll()
+		mx = HuiGetEvent().mouse_x
+		my = HuiGetEvent().mouse_y
+		if plot_rect.inside(mx, my)
+			onLeftButtonUp()
+	
+	void onRightButtonDownAll()
+		mx = HuiGetEvent().mouse_x
+		my = HuiGetEvent().mouse_y
+		if plot_rect.inside(mx, my)
+			onRightButtonDown()
+	
+	void onRightButtonUpAll()
+		mx = HuiGetEvent().mouse_x
+		my = HuiGetEvent().mouse_y
+		if plot_rect.inside(mx, my)
+			onRightButtonUp()
+	
 	void onMouseMoveAll()
-		if plot_rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
-			onMouseMove()
+		mx = HuiGetEvent().mouse_x
+		my = HuiGetEvent().mouse_y
+		//if plot_rect.inside(mx, my)
+		onMouseMove()
+	
+	void onMouseWheelAll()
+		mx = HuiGetEvent().mouse_x
+		my = HuiGetEvent().mouse_y
+		if plot_rect.inside(mx, my)
+			onMouseWheel()
+	
+	void onKeyDownAll()
+		onKeyDown()
 
-	void Init(Window *_win, string _id)
+	void init(Window *_win, string _id)
 		win = _win
 		id = _id
 		win.EventMX(id, "hui:draw", self, &onDrawAll)
 		win.EventMX(id, "hui:left-button-down", self, &onLeftButtonDownAll)
+		win.EventMX(id, "hui:left-button-up", self, &onLeftButtonUpAll)
+		win.EventMX(id, "hui:right-button-down", self, &onRightButtonDownAll)
+		win.EventMX(id, "hui:right-button-up", self, &onRightButtonUpAll)
 		win.EventMX(id, "hui:mouse-move", self, &onMouseMoveAll)
+		win.EventMX(id, "hui:mouse-wheel", self, &onMouseWheelAll)
+		win.EventMX(id, "hui:key-down", self, &onKeyDownAll)
 	
 	virtual void onDraw(Painter *c)
 	virtual void onLeftButtonDown()
+	virtual void onLeftButtonUp()
+	virtual void onRightButtonDown()
+	virtual void onRightButtonUp()
 	virtual void onMouseMove()
+	virtual void onMouseWheel()
+	virtual void onKeyDown()

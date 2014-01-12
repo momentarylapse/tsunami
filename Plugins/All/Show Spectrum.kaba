@@ -27,11 +27,11 @@ float todb(float v)
 
 float peak_max
 
-class SpecGrid : SuperGrid
+class SpecGrid : Grid
 	int type
+	complex pr[], pl[]
 
-	void CreateLines(complex pr[], complex pl[])
-
+	void createLines()
 		pr.resize(N)
 		pl.resize(N)
 		for int i, 0, N
@@ -54,12 +54,11 @@ class SpecGrid : SuperGrid
 			float vol_max = todb(peak_max)
 			float vol_min = vol_max - 60
 			y_axis.set(vol_min, vol_max, false, "db")
+		createLines()
+
 	overwrite void onDraw(Painter *c)
-		complex pr[], pl[]
-		CreateLines(pr, pl)
-	
-		DrawCurveB(c, pr, true, Red)
-		DrawCurveB(c, pl, true, Blue)
+		drawCurveB(c, pr, true, Red)
+		drawCurveB(c, pl, true, Blue)
 
 class SpectrumDialog : Dialog
 	SpecGrid grid
@@ -74,7 +73,7 @@ class SpectrumDialog : Dialog
 		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 		SetImage("close", "hui:close")
 		
-		grid.Init(self, "drawing_area")
+		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
 		EventM("type", self, &OnType)

@@ -54,102 +54,92 @@ class HullCurve : AudioEffect
 		dlg = new ConfigDialog(self)
 		dlg.Run()
 
-class ConfigDialog : Dialog
-	HullCurve *fx
+class HullGrid : Grid
+	Config *config
 	int MouseOver, Selected
-	GridData grid
+
+	overwrite void onDraw(Painter *c)
+	
+		// curve + area below
+		FloatInterpolator fi
+		config.fill_inter(fi)
+		drawCurve(c, fi, true)
+	
+		// points
+		for int i, 0, config.curve.num
+			drawPoint2(c, config.curve[i], i == Selected, i == MouseOver)
+
+	// left button down -> select
+	overwrite void onLeftButtonDown()
+		Selected = MouseOver
+		redraw()
+
+	// [Delete] -> remove point
+	overwrite void onKeyDown()
+		if HuiGetEvent().key_code == KeyDelete
+			if Selected > 0 and Selected < config.curve.num-1
+				config.curve.remove(Selected)
+				Selected = -1
+				redraw()
+
+	// right button down -> new point
+	overwrite void onRightButtonDown()
+		for int i, 1, config.curve.num
+			complex q = project2(config.curve[i - 1])
+			complex p = project2(config.curve[i])
+			if (mx > q.x) and (mx < p.x)
+				config.curve.insert(getMouse2(), i)
+				Selected = i
+				redraw()
+				i = config.curve.num
+				break
+
+	overwrite void onMouseMove()
+		// move
+		if HuiGetEvent().button_l and (Selected >= 0)
+			config.curve[Selected] = getMouse2()
+			float xmin = 0
+			float xmax = 1
+			if Selected > 0
+				xmin = config.curve[Selected - 1].x
+			if Selected < config.curve.num - 1
+				xmax = config.curve[Selected + 1].x
+			config.curve[Selected].x = clamp(config.curve[Selected].x, xmin, xmax)
+			config.curve[Selected].y = clamp(config.curve[Selected].y, MIN_VOL, MAX_VOL)
+			if Selected == config.curve.num - 1
+				config.curve[Selected].x = 1
+			if Selected == 0
+				config.curve[Selected].x = 0
+		else
+		// mouse over?
+			MouseOver = -1
+			for int i, 0, config.curve.num
+				complex p = project2(config.curve[i])
+				if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
+					MouseOver = i
+		redraw()
+
+class ConfigDialog : Dialog
+	HullGrid grid
 	void __init__(HullCurve *_h)
 		super.__init__("Hull Curve", 600, 420, MainWin, false)
 		AddGrid("", 0, 0, 1, 4, "table")
 		SetTarget("table", 0)
-		AddDrawingArea("", 0, 1, 0, 0, "drawing")
+		AddDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing")
 		AddGrid("!noexpandy", 0, 2, 2, 1, "table2")
 		SetTarget("table2", 0)
 		AddComboBox("linear\\log", 0, 0, 0, 0, "type")
 		AddCheckBox("show buffer", 1, 0, 0, 0, "preview")
 	
 		//EventMX("drawing", "hui:draw", self, &OnDraw)
-		fx = _h
 
 		PutFavoriteBar(self, "table", 0, 0)
 		PutCommandBar(self, "table", 0, 3)
 	
+		grid.config = &_h.config
+		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 	
-		Redraw("drawing")
-
-	overwrite void OnDraw()
-		Painter *c = BeginDraw("drawing")
-		float w = c.width
-		float h = c.height
-	
-		grid.Draw(c, 0, 0, w, h)
-	
-		// curve + area below
-		FloatInterpolator fi
-		fx.config.fill_inter(fi)
-		grid.DrawCurve(c, fi, true)
-	
-		// points
-		for int i, 0, fx.config.curve.num
-			grid.DrawPoint2(c, fx.config.curve[i], i == Selected, i == MouseOver)
-		c.End()
-
-	// left button down -> select
-	overwrite void OnLeftButtonDown()
-		Selected = MouseOver
-		Redraw("drawing")
-
-	// left button up -> if moved to a neighbour -> remove point
-	overwrite void OnLeftButtonUp()
-		if Selected >= 0
-			bool del = (fx.config.curve[Selected] == fx.config.curve[Selected - 1])
-			if Selected < fx.config.curve.num - 1
-				del = del or (fx.config.curve[Selected] == fx.config.curve[Selected + 1])
-			if del
-				fx.config.curve.remove(Selected)
-				Selected = -1
-				Redraw("drawing")
-
-	// right button down -> new point
-	overwrite void OnRightButtonDown()
-		int mx = HuiGetEvent().mouse_x
-		int my = HuiGetEvent().mouse_y
-		for int i, 1, fx.config.curve.num
-			complex q = grid.project2(fx.config.curve[i - 1])
-			complex p = grid.project2(fx.config.curve[i])
-			if (mx > q.x) and (mx < p.x)
-				fx.config.curve.insert(grid.unproject2(complex(mx, my)), i)
-				Selected = i
-				Redraw("drawing")
-				i = fx.config.curve.num
-				break
-
-	overwrite void OnMouseMove()
-		int mx = HuiGetEvent().mouse_x
-		int my = HuiGetEvent().mouse_y
-		// move
-		if HuiGetEvent().button_l and (Selected >= 0)
-			fx.config.curve[Selected] = grid.unproject2(complex(mx, my))
-			float xmin = 0
-			float xmax = 1
-			if Selected > 0
-				xmin = fx.config.curve[Selected - 1].x
-			if Selected < fx.config.curve.num - 1
-				xmax = fx.config.curve[Selected + 1].x
-			fx.config.curve[Selected].x = clamp(fx.config.curve[Selected].x, xmin, xmax)
-			fx.config.curve[Selected].y = clamp(fx.config.curve[Selected].y, MIN_VOL, MAX_VOL)
-			if Selected == fx.config.curve.num - 1
-				fx.config.curve[Selected].x = 1
-			if Selected == 0
-				fx.config.curve[Selected].x = 0
-		else
-		// mouse over?
-			MouseOver = -1
-			for int i, 0, fx.config.curve.num
-				complex p = grid.project2(fx.config.curve[i])
-				if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
-					MouseOver = i
-		Redraw("drawing")
+		grid.redraw()
 

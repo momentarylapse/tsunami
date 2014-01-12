@@ -19,9 +19,19 @@ SpectrumDialog *dlg
 float sg[NT][NF]
 Image im0
 
-GridData grid
+class SpecGrid : Grid
+	overwrite void onDraw(Painter *c)
+		float w = c.width
+		float h = c.height
+	
+		rect r = plot_rect
+	
+		Image *im = im0.scale(r.width(), r.height())
+		c.DrawImage(r.x1, r.y1, *im)
+		delete(im)
 
 class SpectrumDialog : Dialog
+	SpecGrid grid
 	void __init__()
 		super.__init__("Spectrum", 600, 460, MainWin, true)
 		AddGrid("", 0, 0, 1, 2, "table1")
@@ -32,28 +42,13 @@ class SpectrumDialog : Dialog
 		AddText("", 0, 0, 0, 0, "")
 		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 		SetImage("close", "hui:close")
+		
+		grid.init(self, "drawing_area")
+		grid.x_axis.set(0, 1, false, "")
+		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
+		//grid.allow_bg = false
 	
 		EventM("close", self, &OnClose)
-
-	overwrite void OnDraw()
-		Painter *c = BeginDraw("drawing_area")
-		float w = c.width
-		float h = c.height
-	
-		grid.Draw(c, 0, 0, w, h)
-	
-		rect r = grid.GetPlotRegion(0, 0, w, h)
-	
-		Image *im = im0.scale(r.width(), r.height())
-		c.DrawImage(r.x1, r.y1, *im)
-		delete(im)
-	
-		c.End()
-	
-	overwrite void OnLeftButtonDown()
-		if grid.y_axis.rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
-			grid.y_axis.freq_as_pitch = !grid.y_axis.freq_as_pitch
-			Redraw("drawing_area")
 
 	void OnClose()
 		delete self
@@ -114,9 +109,6 @@ void show_spec()
 	dlg.Run()
 
 void main()
-	grid.x_axis.set(0, 1, false, "")
-	grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
-	//grid.allow_bg = false
 	
 	if audio.selection.length > 0
 		show_spec()

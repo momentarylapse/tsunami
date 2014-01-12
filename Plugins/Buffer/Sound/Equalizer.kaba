@@ -62,90 +62,55 @@ class Equalizer : AudioEffect
 		equalize(buf.l)
 
 	overwrite void UpdateDialog()
-		dlg.Redraw("drawing")
+		dlg.grid.redraw()
 
 	overwrite void Configure()
 		dlg = new ConfigDialog(&config)
 		dlg.Run()
 
-class ConfigDialog : Dialog
-	int MouseOver, Selected
-	GridData grid
-	Config *e
-	void __init__(Config *_e)
-		super.__init__("Equalizer", 600, 400, MainWin, false)
-		AddGrid("", 0, 0, 1, 3, "table")
-		SetTarget("table", 0)
-		AddDrawingArea("", 0, 1, 0, 0, "drawing")
 
-		PutFavoriteBar(self, "table", 0, 0)
-		PutCommandBar(self, "table", 0, 2)
-		
-		e = _e
-	
-		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
-		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
-	
-		Redraw("drawing")
-	
-	overwrite void OnDraw()
-		Painter *c = BeginDraw("drawing")
-		float w = c.width
-		float h = c.height
-	
-		grid.Draw(c, 0, 0, w, h)
-	
+class EqualizerGrid : Grid
+	Config *e
+	int MouseOver, Selected
+	overwrite void onDraw(Painter *c)
 		// curve + area below
 		FloatInterpolator fi
 		e.fill_inter(fi)
-		grid.DrawCurve(c, fi, true)
+		drawCurve(c, fi, true)
 	
 		// points
 		for int i, 0, e.curve.num
-			grid.DrawPoint3(c, e.curve[i], i == Selected, i == MouseOver)
-		c.End()
+			drawPoint3(c, e.curve[i], i == Selected, i == MouseOver)
+			
 
 	// left button down -> select
-	overwrite void OnLeftButtonDown()
-		if grid.x_axis.rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
-			grid.x_axis.freq_as_pitch = !grid.x_axis.freq_as_pitch
+	overwrite void onLeftButtonDown()
 		Selected = MouseOver
-		Redraw("drawing")
+		redraw()
 
-	// left button up -> if moved to a neighbour -> remove point
-	overwrite void OnLeftButtonUp()
-		/*if Selected >= 0
-			bool del = false//(data.curve[Selected] == data.curve[Selected - 1])
-			if Selected < data.curve.num - 1
-				del = del or (data.curve[Selected] == data.curve[Selected + 1])
-			if del
-				data.curve.remove(Selected)
-				Selected = -1
-				Redraw("drawing")*/
-
-	overwrite void OnMouseWheel()
+	overwrite void onMouseWheel()
 		if MouseOver >= 0
 			if HuiGetEvent().wheel > 0
 				e.curve[MouseOver].z += 0.2
 			else
 				e.curve[MouseOver].z -= 0.2
-			Redraw("drawing")
+			redraw()
 
 	// right button down -> new point
-	overwrite void OnRightButtonDown()
-		vector m = grid.GetMouse3(0)
+	overwrite void onRightButtonDown()
+		vector m = getMouse3(0)
 		for int i, 1, e.curve.num
 			if (m.x > e.curve[i - 1].x) and (m.x < e.curve[i].x)
 				e.curve.insert(m, i)
 				Selected = i
 				MouseOver = i
-				Redraw("drawing")
+				redraw()
 				break
 
-	overwrite void OnMouseMove()
+	overwrite void onMouseMove()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
-			e.curve[Selected] = grid.GetMouse3(e.curve[Selected].z)
+			e.curve[Selected] = getMouse3(e.curve[Selected].z)
 			float xmin = MIN_FREQ
 			float xmax = MAX_FREQ
 			if Selected > 0
@@ -162,7 +127,33 @@ class ConfigDialog : Dialog
 		// mouse over?
 			MouseOver = -1
 			for int i, 0, e.curve.num
-				if grid.MouseOverPoint3(e.curve[i])
+				if mouseOverPoint3(e.curve[i])
 					MouseOver = i
-		Redraw("drawing")
+		redraw()
+
+	// [Delete] -> remove point
+	overwrite void onKeyDown()
+		if HuiGetEvent().key_code == KeyDelete
+			if Selected > 0 and Selected < e.curve.num-1
+				e.curve.remove(Selected)
+				Selected = -1
+				redraw()
+
+class ConfigDialog : Dialog
+	EqualizerGrid grid
+	void __init__(Config *_e)
+		super.__init__("Equalizer", 600, 400, MainWin, false)
+		AddGrid("", 0, 0, 1, 3, "table")
+		SetTarget("table", 0)
+		AddDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing")
+
+		PutFavoriteBar(self, "table", 0, 0)
+		PutCommandBar(self, "table", 0, 2)
+	
+		grid.init(self, "drawing")
+		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
+		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
+		grid.e = _e
+	
+		grid.redraw()
 

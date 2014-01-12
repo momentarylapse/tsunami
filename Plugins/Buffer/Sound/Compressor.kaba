@@ -4,9 +4,11 @@
 use "../../api.kaba"
 use "../../grid.kaba"
 
+const float MIN_DB = 0.0 - 60.0
+
 class Config : PluginData
 	complex curve[]
-	float Delay
+	float attack, release
 
 	void fill_inter(FloatInterpolator fi)
 		fi.setType("lerp")
@@ -16,9 +18,10 @@ class Config : PluginData
 
 	overwrite void reset()
 		curve.clear()
+		curve.add(complex(MIN_DB, MIN_DB))
 		curve.add(complex(0, 0))
-		curve.add(complex(1, 1))
-		Delay = 0.1
+		attack = 0.01
+		release = 0.1
 		//MouseOver = -1
 		//Selected = -1
 
@@ -28,16 +31,21 @@ class Compressor : AudioEffect
 
 	ConfigDialog *win
 
-	float level_scale
+	float dgain_attack, dgain_release
 
 	void compress(float b[])
-		float in_level = 0
+		float gain = 1
+		float bmin = pow(10, MIN_DB/20)
+		float squares[]
+		squares.resize(70)
 		for int i, 0, b.num
-			// in level
-			float in_level_cur = abs(b[i])
-			in_level *= level_scale
-			if in_level_cur > in_level
-				in_level = in_level_cur
+		
+			// in level (filtered)
+			squares[i%squares.num] = b[i]*b[i]
+			float rms = sqrt(squares.sum() / squares.num * 2)
+			float in_level = MIN_DB
+			if rms > bmin
+				in_level = log(rms) / log(10) * 20
 		
 			// out level
 			float out_level = in_level
@@ -45,12 +53,16 @@ class Compressor : AudioEffect
 				if (in_level >= config.curve[j - 1].x) and (in_level <= config.curve[j].x)
 					out_level = config.curve[j - 1].y + (config.curve[j].y - config.curve[j - 1].y) * (in_level - config.curve[j - 1].x) / (config.curve[j].x - config.curve[j - 1].x)
 					break
-		
-			// scale
-			float factor = 1
-			if in_level > 0
-				factor = out_level / in_level
-			b[i] = b[i] * factor
+			
+			// slow gain changes
+			float cur_gain = out_level - in_level
+			if cur_gain > gain
+				gain += dgain_release
+			else if cur_gain < gain
+				gain -= dgain_attack
+			
+			// apply gain
+			b[i] *= pow(10, gain / 20)
 
 	overwrite void UpdateDialog()
 		win.fill()
@@ -61,12 +73,10 @@ class Compressor : AudioEffect
 
 	overwrite void ProcessTrack(BufferBox buf)
 		AudioFile *a = audio
-	
-		float n_steps = config.Delay * a.sample_rate
-		if n_steps > 0
-			level_scale = exp(- 1 / n_steps)
-		else
-			level_scale = 0
+		
+		dgain_attack = 10 / (config.attack * a.sample_rate)
+		dgain_release = 10 / (config.release * a.sample_rate)
+		
 		compress(buf.r)
 		compress(buf.l)
 
@@ -94,7 +104,7 @@ class CompressorGrid : Grid
 		for int i, 1, config.curve.num
 			complex q = config.curve[i - 1]
 			complex p = config.curve[i]
-			if (m.x > q.x) and (m.x < p.x) and (m.y > q.y) and (m.y < p.y)
+			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(m, i)
 				Selected = i
 				redraw()
@@ -105,16 +115,12 @@ class CompressorGrid : Grid
 		if HuiGetEvent().button_l and (Selected > 0)
 			config.curve[Selected] = getMouse2()
 			float xmin = config.curve[Selected - 1].x
-			float xmax = 1
-			float ymin = config.curve[Selected - 1].y
-			float ymax = 1
+			float xmax = 0
 			if Selected < config.curve.num - 1
 				xmax = config.curve[Selected + 1].x
-				ymax = config.curve[Selected + 1].y
 			config.curve[Selected].x = clamp(config.curve[Selected].x, xmin, xmax)
-			config.curve[Selected].y = clamp(config.curve[Selected].y, ymin, ymax)
 			if Selected == config.curve.num - 1
-				config.curve[Selected].x = 1
+				config.curve[Selected].x = 0
 		else
 		// mouse over?
 			MouseOver = -1
@@ -139,28 +145,34 @@ class ConfigDialog : Dialog
 		AddGrid("", 0, 0, 1, 4, "table1")
 		SetTarget("table1", 0)
 		AddDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing_area")
-		AddGrid("!noexpandy", 0, 2, 3, 1, "table2")
+		AddGrid("!noexpandy", 0, 2, 6, 1, "table2")
 		SetTarget("table2", 0)
-		AddText("Delay", 0, 0, 0, 0, "")
-		AddSpinButton("\\0\\10000\\0.1", 1, 0, 0, 0, "edit")
+		AddText("Attack", 0, 0, 0, 0, "")
+		AddSpinButton("\\1\\100\\0.1", 1, 0, 0, 0, "attack")
 		AddText("ms", 2, 0, 0, 0, "")
+		AddText("Release", 3, 0, 0, 0, "")
+		AddSpinButton("\\1\\1000\\0.1", 4, 0, 0, 0, "release")
+		AddText("ms", 5, 0, 0, 0, "")
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 3)
 		grid.config = &_fx.config
 		
-		EventM("edit", self, &OnEdit)
+		EventM("attack", self, &OnEdit)
+		EventM("release", self, &OnEdit)
 	
 		grid.init(self, "drawing_area")
-		grid.x_axis.set(0, 1, false, "")
-		grid.y_axis.set(0, 1, false, "")
+		grid.x_axis.set(MIN_DB, 0, false, "dB")
+		grid.y_axis.set(MIN_DB, 0, false, "dB")
 	
 		fill()
 	
 	void fill()
 		grid.redraw()
-		SetFloat("edit", grid.config.Delay * 1000)
+		SetFloat("attack", grid.config.attack * 1000)
+		SetFloat("release", grid.config.release * 1000)
 
 	void OnEdit()
-		grid.config.Delay = GetFloat("") / 1000.0
+		grid.config.attack = GetFloat("attack") / 1000.0
+		grid.config.release = GetFloat("release") / 1000.0
 		

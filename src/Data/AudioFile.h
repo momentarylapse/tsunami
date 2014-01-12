@@ -63,6 +63,9 @@ public:
 	void AddTag(const string &key, const string &value);
 	void EditTag(int index, const string &key, const string &value);
 	void DeleteTag(int index);
+	void AddEffect(Effect *effect);
+	void DeleteEffect(int index);
+	void EditEffect(int index, const string &param_old);
 	void SetVolume(float volume);
 	Track *AddTrack(int type, int index = -1);
 	void DeleteTrack(int index);

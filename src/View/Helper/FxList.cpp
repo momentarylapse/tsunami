@@ -117,7 +117,10 @@ void FxList::OnDelete()
 		return;
 	int s = dlg->GetInt(id);
 	if (s >= 0){
-		track->DeleteEffect(s);
+		if (track)
+			track->DeleteEffect(s);
+		else
+			audio->DeleteEffect(s);
 		FillList();
 	}
 }
@@ -158,7 +161,10 @@ void FxList::AddNewEffect(string &filename)
 	name = name.substr(0, name.num - 5); //      and remove ".kaba"
 	Effect *effect = CreateEffect(name);
 	if (UpdateEffectParams(effect)){
-		track->AddEffect(effect);
+		if (track)
+			track->AddEffect(effect);
+		else
+			audio->AddEffect(effect);
 		FillList();
 	}
 }
@@ -172,6 +178,10 @@ void FxList::ExecuteFXDialog(int index)
 	Effect *f = (*fx)[index];
 	f->ConfigToString();
 	string param_old = f->ConfigToString();
-	if (UpdateEffectParams(f))
-		track->EditEffect(index, param_old);
+	if (UpdateEffectParams(f)){
+		if (track)
+			track->EditEffect(index, param_old);
+		else
+			audio->EditEffect(index, param_old);
+	}
 }

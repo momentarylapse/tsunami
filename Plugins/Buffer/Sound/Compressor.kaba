@@ -6,7 +6,7 @@ use "../../grid.kaba"
 
 const float MIN_DB = 0.0 - 60.0
 
-class Config : PluginData
+class CompressorConfig : PluginData
 	complex curve[]
 	float attack, release
 
@@ -25,24 +25,36 @@ class Config : PluginData
 		//MouseOver = -1
 		//Selected = -1
 
+class CompressorState : PluginData
+	float gain_r, gain_l
+	float squares_r[]
+	float squares_l[]
+	overwrite void reset()
+		gain_r = 1
+		gain_l = 1
+		squares_r.clear()
+		squares_r.resize(70)
+		squares_l.clear()
+		squares_l.resize(70)
+
 
 class Compressor : AudioEffect
-	Config config
+	CompressorConfig config
+	CompressorState state
 
 	ConfigDialog *win
 
 	float dgain_attack, dgain_release
 
-	void compress(float b[])
-		float gain = 1
+	void compress(float b[], float squares[], float *gain)
 		float bmin = pow(10, MIN_DB/20)
-		float squares[]
-		squares.resize(70)
 		for int i, 0, b.num
 		
 			// in level (filtered)
 			squares[i%squares.num] = b[i]*b[i]
 			float rms = sqrt(squares.sum() / squares.num * 2)
+			if config.attack < 0.00005 // = 0
+				rms = abs(b[i])
 			float in_level = MIN_DB
 			if rms > bmin
 				in_level = log(rms) / log(10) * 20
@@ -56,13 +68,19 @@ class Compressor : AudioEffect
 			
 			// slow gain changes
 			float cur_gain = out_level - in_level
-			if cur_gain > gain
-				gain += dgain_release
-			else if cur_gain < gain
-				gain -= dgain_attack
+			if cur_gain > *gain
+				if config.release < 0.00005
+					*gain = cur_gain
+				else
+					*gain += dgain_release
+			else if cur_gain < *gain
+				if config.attack < 0.00005
+					*gain = cur_gain
+				else
+					*gain -= dgain_attack
 			
 			// apply gain
-			b[i] *= pow(10, gain / 20)
+			b[i] *= pow(10, *gain / 20)
 
 	overwrite void UpdateDialog()
 		win.fill()
@@ -77,12 +95,12 @@ class Compressor : AudioEffect
 		dgain_attack = 10 / (config.attack * a.sample_rate)
 		dgain_release = 10 / (config.release * a.sample_rate)
 		
-		compress(buf.r)
-		compress(buf.l)
+		compress(buf.r, state.squares_r, &state.gain_r)
+		compress(buf.l, state.squares_l, &state.gain_l)
 
 class CompressorGrid : Grid
 	int MouseOver, Selected
-	Config *config
+	CompressorConfig *config
 
 	overwrite void onDraw(Painter *c)
 		FloatInterpolator fi
@@ -148,10 +166,10 @@ class ConfigDialog : Dialog
 		AddGrid("!noexpandy", 0, 2, 6, 1, "table2")
 		SetTarget("table2", 0)
 		AddText("Attack", 0, 0, 0, 0, "")
-		AddSpinButton("\\1\\100\\0.1", 1, 0, 0, 0, "attack")
+		AddSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "attack")
 		AddText("ms", 2, 0, 0, 0, "")
 		AddText("Release", 3, 0, 0, 0, "")
-		AddSpinButton("\\1\\1000\\0.1", 4, 0, 0, 0, "release")
+		AddSpinButton("\\0\\1000\\0.1", 4, 0, 0, 0, "release")
 		AddText("ms", 5, 0, 0, 0, "")
 		
 		PutFavoriteBar(self, "table1", 0, 0)

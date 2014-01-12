@@ -19,6 +19,9 @@
 #include "../Action/Track/ActionTrackDelete.h"
 #include "../Action/Track/Sample/ActionTrackInsertSelectedSamples.h"
 #include "../Action/Track/Sample/ActionTrackSampleFromSelection.h"
+#include "../Action/Track/Effect/ActionTrackAddEffect.h"
+#include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
+#include "../Action/Track/Effect/ActionTrackEditEffect.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Tsunami.h"
 #include "../Storage/Storage.h"
@@ -85,6 +88,22 @@ void AudioFile::EditTag(int index, const string &key, const string &value)
 void AudioFile::DeleteTag(int index)
 {
 	Execute(new ActionAudioDeleteTag(index));
+}
+
+void AudioFile::AddEffect(Effect *effect)
+{
+	Execute(new ActionTrackAddEffect(NULL, effect));
+}
+
+// execute after editing...
+void AudioFile::EditEffect(int index, const string &param_old)
+{
+	Execute(new ActionTrackEditEffect(NULL, index, param_old));
+}
+
+void AudioFile::DeleteEffect(int index)
+{
+	Execute(new ActionTrackDeleteEffect(NULL, index));
 }
 
 void AudioFile::SetVolume(float volume)

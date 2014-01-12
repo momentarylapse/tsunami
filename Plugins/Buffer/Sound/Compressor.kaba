@@ -70,10 +70,70 @@ class Compressor : AudioEffect
 		compress(buf.r)
 		compress(buf.l)
 
-class ConfigDialog : Dialog
+class CompressorGrid : Grid
 	int MouseOver, Selected
-	GridData grid
-	Compressor *fx
+	Config *config
+
+	overwrite void onDraw(Painter *c)
+		FloatInterpolator fi
+		config.fill_inter(fi)
+	
+		// curve
+		drawCurve(c, fi, true)
+		for int i, 1, config.curve.num
+			drawPoint2(c, config.curve[i], i == Selected, i == MouseOver)
+
+	// left button down -> select
+	overwrite void onLeftButtonDown()
+		Selected = MouseOver
+		redraw()
+
+	// right button down -> new point
+	overwrite void onRightButtonDown()
+		complex m = getMouse2()
+		for int i, 1, config.curve.num
+			complex q = config.curve[i - 1]
+			complex p = config.curve[i]
+			if (m.x > q.x) and (m.x < p.x) and (m.y > q.y) and (m.y < p.y)
+				config.curve.insert(m, i)
+				Selected = i
+				redraw()
+				break
+
+	overwrite void onMouseMove()
+		// move
+		if HuiGetEvent().button_l and (Selected > 0)
+			config.curve[Selected] = getMouse2()
+			float xmin = config.curve[Selected - 1].x
+			float xmax = 1
+			float ymin = config.curve[Selected - 1].y
+			float ymax = 1
+			if Selected < config.curve.num - 1
+				xmax = config.curve[Selected + 1].x
+				ymax = config.curve[Selected + 1].y
+			config.curve[Selected].x = clamp(config.curve[Selected].x, xmin, xmax)
+			config.curve[Selected].y = clamp(config.curve[Selected].y, ymin, ymax)
+			if Selected == config.curve.num - 1
+				config.curve[Selected].x = 1
+		else
+		// mouse over?
+			MouseOver = -1
+			for int i, 1, config.curve.num
+				if mouseOverPoint2(config.curve[i])
+					MouseOver = i
+		redraw()
+
+	overwrite void onKeyDown()
+		int k = HuiGetEvent().key
+
+		// [Delete] -> remove point
+		if (k == KeyDelete) and (Selected > 0) and (Selected < config.curve.num - 1)
+			config.curve.remove(Selected)
+			Selected = -1
+			redraw()
+
+class ConfigDialog : Dialog
+	CompressorGrid grid
 	void __init__(Compressor *_fx)
 		super.__init__("Compressor", 500, 600, MainWin, false)
 		AddGrid("", 0, 0, 1, 4, "table1")
@@ -87,96 +147,20 @@ class ConfigDialog : Dialog
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 3)
-		fx = _fx
+		grid.config = &_fx.config
 		
 		EventM("edit", self, &OnEdit)
 	
+		grid.init(self, "drawing_area")
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(0, 1, false, "")
 	
 		fill()
 	
 	void fill()
-		Redraw("drawing_area")
-		SetFloat("edit", fx.config.Delay * 1000)
-
-	overwrite void OnDraw()
-		Painter *c = BeginDraw("drawing_area")
-		float w = c.width
-		float h = c.height
-	
-		grid.Draw(c, 0, 0, w, h)
-	
-		FloatInterpolator fi
-		fx.config.fill_inter(fi)
-	
-		// curve
-		grid.DrawCurve(c, fi, true)
-		for int i, 1, fx.config.curve.num
-			grid.DrawPoint2(c, fx.config.curve[i], i == Selected, i == MouseOver)
-		c.End()
-
-	// left button down -> select
-	overwrite void OnLeftButtonDown()
-		Selected = MouseOver
-		Redraw("drawing_area")
-
-	// left button up -> if moved to a neighbour -> remove point
-	overwrite void OnLeftButtonUp()
-		if Selected >= 0
-			bool del = (fx.config.curve[Selected] == fx.config.curve[Selected - 1])
-			if Selected < fx.config.curve.num - 1
-				del = del or (fx.config.curve[Selected] == fx.config.curve[Selected + 1])
-			if del
-				fx.config.curve.remove(Selected)
-				Selected = -1
-				Redraw("drawing_area")
-
-	// right button down -> new point
-	overwrite void OnRightButtonDown()
-		complex m = grid.GetMouse2()
-		for int i, 1, fx.config.curve.num
-			complex q = fx.config.curve[i - 1]
-			complex p = fx.config.curve[i]
-			if (m.x > q.x) and (m.x < p.x) and (m.y > q.y) and (m.y < p.y)
-				fx.config.curve.insert(m, i)
-				Selected = i
-				Redraw("drawing_area")
-				break
-
-	overwrite void OnMouseMove()
-	
-		// move
-		if HuiGetEvent().button_l and (Selected > 0)
-			fx.config.curve[Selected] = grid.GetMouse2()
-			float xmin = fx.config.curve[Selected - 1].x
-			float xmax = 1
-			float ymin = fx.config.curve[Selected - 1].y
-			float ymax = 1
-			if Selected < fx.config.curve.num - 1
-				xmax = fx.config.curve[Selected + 1].x
-				ymax = fx.config.curve[Selected + 1].y
-			fx.config.curve[Selected].x = clamp(fx.config.curve[Selected].x, xmin, xmax)
-			fx.config.curve[Selected].y = clamp(fx.config.curve[Selected].y, ymin, ymax)
-			if Selected == fx.config.curve.num - 1
-				fx.config.curve[Selected].x = 1
-		else
-		// mouse over?
-			MouseOver = -1
-			for int i, 1, fx.config.curve.num
-				if grid.MouseOverPoint2(fx.config.curve[i])
-					MouseOver = i
-		Redraw("drawing_area")
-
-	overwrite void OnKeyDown()
-		int k = HuiGetEvent().key
-
-		// [Delete] -> remove point
-		if (k == KeyDelete) and (Selected > 0) and (Selected < fx.config.curve.num - 1)
-			fx.config.curve.remove(Selected)
-			Selected = -1
-			Redraw("drawing_area")
+		grid.redraw()
+		SetFloat("edit", grid.config.Delay * 1000)
 
 	void OnEdit()
-		fx.config.Delay = GetFloat("") / 1000.0
+		grid.config.Delay = GetFloat("") / 1000.0
 		

@@ -21,6 +21,7 @@ class GridAxis
 	rect rect
 	float min_label_dist
 	float val_min, val_max
+	float val_min_min, val_max_max
 	bool as_log
 	bool freq_as_pitch
 	string unit
@@ -32,25 +33,34 @@ class GridAxis
 	void set(float _val_min, float _val_max, bool _log, string _unit)
 		val_min = _val_min
 		val_max = _val_max
+		val_min_min = _val_min
+		val_max_max = _val_max
 		as_log = _log
 		unit = _unit
 	
 	float rel2val(float __v)
 		if as_log
-			return log2lin(__v, val_min, val_max)
-		return __v * (val_max - val_min) + val_min
+			return log2lin(__v, val_min_min, val_max_max)
+		return __v * (val_max_max - val_min_min) + val_min_min
 		
 	float project(float __v)
 		if as_log
 			return lin2log(__v, val_min, val_max) * size + offset
-		else
-			return ((__v - val_min) / (val_max - val_min)) * size + offset
+		return ((__v - val_min) / (val_max - val_min)) * size + offset
 
 	float unproject(float __v)
 		if as_log
 			return log2lin((__v - offset) / size, val_min, val_max)
-		else
-			return (__v - offset) / size * (val_max - val_min) + val_min
+		return (__v - offset) / size * (val_max - val_min) + val_min
+	
+	void zoom(float p, float dz)
+		float m = unproject(p)
+		if as_log
+			val_min = clamp(exp(log(m) + (log(val_min) - log(m)) * pow(0.8, dz)), val_min_min, val_max_max)
+			val_max = clamp(exp(log(m) + (log(val_max) - log(m)) * pow(0.8, dz)), val_min_min, val_max_max)
+		val_min = clamp(m + (val_min - m) * pow(0.8, dz), val_min_min, val_max_max)
+		val_max = clamp(m + (val_max - m) * pow(0.8, dz), val_min_min, val_max_max)
+		
 
 	GridPartition get_lin_partition()
 		float d = (val_max - val_min) / size * 100
@@ -375,6 +385,12 @@ class Grid : GridData
 		my = HuiGetEvent().mouse_y
 		if plot_rect.inside(mx, my)
 			onMouseWheel()
+		if x_axis.rect.inside(mx, my)
+			x_axis.zoom(mx, HuiGetEvent().wheel)
+			redraw()
+		if y_axis.rect.inside(mx, my)
+			y_axis.zoom(my, HuiGetEvent().wheel)
+			redraw()
 	
 	void onKeyDownAll()
 		onKeyDown()

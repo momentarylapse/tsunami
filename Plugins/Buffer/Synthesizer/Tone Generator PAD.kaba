@@ -10,7 +10,7 @@ class Config : PluginData
 	float Frequency
 	float Volume
 
-PluginData data
+Config data
 
 DummySynthesizer synth
 

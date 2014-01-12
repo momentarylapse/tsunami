@@ -23,7 +23,7 @@ struct ClassFunction{
 	Array<Type*> param_type;
 	Type *return_type;
 	int virtual_index;
-	ClassFunction(){}
+	ClassFunction();
 	ClassFunction(const string &name, Type *return_type, Script *s, int no);
 	Function *GetFunc();
 };
@@ -44,8 +44,7 @@ public:
 	Array<ClassFunction> function;
 	Type *parent;
 	SyntaxTree *owner; // to share and be able to delete...
-	VirtualTable *vtable;
-	int num_virtual;
+	Array<void*> vtable;
 
 	bool force_call_by_value;
 	bool UsesCallByReference();
@@ -55,7 +54,7 @@ public:
 	bool DeriveFrom(Type *root, bool increase_size);
 	Type *GetPointer();
 	Type *GetRoot();
-	void AddFunction(SyntaxTree *s, int func_no, int virtual_index = -1, bool overwrite = false);
+	void AddFunction(SyntaxTree *s, int func_no, bool as_virtual = false, bool overwrite = false);
 	ClassFunction *GetFunc(const string &name, Type *return_type, int num_params);
 	ClassFunction *GetDefaultConstructor();
 	ClassFunction *GetComplexConstructor();

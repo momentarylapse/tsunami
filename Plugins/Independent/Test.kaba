@@ -1,2 +1,14 @@
+#disasm
+
+class MyDialog : Dialog
+	void __init__()
+		super.__init__("", 300, 200, nil, false)
+		AddEdit("", 0, 0, 0, 0, "edit")
+		EventM("edit", self, &onChange)
+	void onChange()
+		print "ssss"
+
 void main()
-	HuiInfoBox(nil, "", "hallo")
+	//HuiInfoBox(nil, "", "hallo")
+	Dialog *d = new MyDialog
+	d.Run()

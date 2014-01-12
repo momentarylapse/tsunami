@@ -6,6 +6,12 @@
 namespace Script{
 
 
+ClassFunction::ClassFunction()
+{
+	nr = -1;
+	virtual_index = -1;
+}
+
 ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s, int no)
 {
 	name = _name;
@@ -32,14 +38,10 @@ Type::Type()//const string &_name, int _size, SyntaxTree *_owner)
 	is_silent = false;
 	parent = NULL;
 	force_call_by_value = false;
-	vtable = NULL;
-	num_virtual = 0;
 };
 
 Type::~Type()
 {
-	if (vtable)
-		delete[](vtable);
 }
 
 bool Type::UsesCallByReference()
@@ -58,7 +60,7 @@ bool Type::is_simple_class()
 		return false;*/
 	if (is_super_array)
 		return false;
-	if (vtable)
+	if (vtable.num > 0)
 		return false;
 	if (parent)
 		if (!parent->is_simple_class())
@@ -129,13 +131,13 @@ ClassFunction *Type::GetVirtualFunction(int virtual_index)
 
 void Type::LinkVirtualTable()
 {
-	if (!vtable)
+	if (vtable.num == 0)
 		return;
 
 	//msg_write("link vtable " + name);
 	// derive from parent
 	if (parent)
-		for (int i=0;i<parent->num_virtual;i++)
+		for (int i=0;i<parent->vtable.num;i++)
 			vtable[i] = parent->vtable[i];
 	if (config.abi == AbiWindows32)
 		vtable[0] = mf(&VirtualBase::__delete_external__);
@@ -147,9 +149,10 @@ void Type::LinkVirtualTable()
 		if (cf.virtual_index >= 0){
 			if (cf.nr >= 0){
 				//msg_write(i2s(cf.virtual_index) + ": " + cf.script->syntax->Functions[cf.nr]->name);
+				if (cf.virtual_index >= vtable.num)
+					vtable.resize(cf.virtual_index + 1);
 				vtable[cf.virtual_index] = (void*)cf.script->func[cf.nr];
 			}
-			num_virtual = max(cf.virtual_index + 1, num_virtual);
 		}
 }
 
@@ -157,16 +160,16 @@ void Type::LinkExternalVirtualTable(void *p)
 {
 	// link script functions according to external vtable
 	VirtualTable *t = (VirtualTable*)p;
-	num_virtual = 0;
+	vtable.clear();
 	foreach(ClassFunction &cf, function)
 		if (cf.virtual_index >= 0){
 			if (cf.nr >= 0)
 				cf.script->func[cf.nr] = (t_func*)t[cf.virtual_index];
-			num_virtual = max(cf.virtual_index + 1, num_virtual);
+			if (cf.virtual_index >= vtable.num)
+				vtable.resize(cf.virtual_index + 1);
 		}
 
-	vtable = new VirtualTable[num_virtual];
-	for (int i=0;i<num_virtual;i++)
+	for (int i=0;i<vtable.num;i++)
 		vtable[i] = t[i];
 	// this should also link the "real" c++ destructor
 	if (config.abi == AbiWindows32)
@@ -215,7 +218,7 @@ Type *Type::GetRoot()
 	return r;
 }
 
-void Type::AddFunction(SyntaxTree *s, int func_no, int virtual_index, bool overwrite)
+void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overwrite)
 {
 	Function *f = s->Functions[func_no];
 	ClassFunction cf;
@@ -225,7 +228,11 @@ void Type::AddFunction(SyntaxTree *s, int func_no, int virtual_index, bool overw
 	cf.return_type = f->return_type;
 	for (int i=0;i<f->num_params;i++)
 		cf.param_type.add(f->var[i].type);
-	cf.virtual_index = ProcessClassOffset(name, cf.name, virtual_index);
+	if (as_virtual){
+		cf.virtual_index = ProcessClassOffset(name, cf.name, max(vtable.num, 2));
+		if (vtable.num <= cf.virtual_index)
+			vtable.resize(cf.virtual_index + 1);
+	}
 
 	// overwrite?
 	ClassFunction *orig = NULL;
@@ -264,7 +271,7 @@ bool Type::DeriveFrom(Type* root, bool increase_size)
 	}
 	if (increase_size)
 		size += parent->size;
-	num_virtual += parent->num_virtual;
+	vtable = parent->vtable;
 	return found;
 }
 

@@ -139,25 +139,25 @@ void *SyntaxTree::GetConstantValue()
 }
 
 
-Command *DoClassFunction(SyntaxTree *ps, Command *ob, ClassFunction &cf, Function *f)
+Command *SyntaxTree::DoClassFunction(Command *ob, ClassFunction &cf, Function *f)
 {
-	msg_db_f("DoClassFunc", 1);
+	msg_db_f("DoClassFunc", 4);
 
 	// the function
 	Function *ff = cf.script->syntax->Functions[cf.nr];
 	if (cf.virtual_index >= 0){
-		Command *cmd = ps->AddCommand(KindVirtualFunction, cf.virtual_index, ff->literal_return_type);
+		Command *cmd = AddCommand(KindVirtualFunction, cf.virtual_index, ff->literal_return_type);
 		cmd->num_params = ff->num_params;
 		cmd->script = cf.script;
 		cmd->instance = ob;
-		ps->GetFunctionCall("?." + cf.name, cmd, f);
+		GetFunctionCall("(virtual)." + cf.name, cmd, f);
 		return cmd;
 	}
 
-	Command *cmd = ps->AddCommand(KindFunction, cf.nr, ff->literal_return_type);
+	Command *cmd = AddCommand(KindFunction, cf.nr, ff->literal_return_type);
 	cmd->num_params = ff->num_params;
 	cmd->script = cf.script;
-	ps->GetFunctionCall(ff->name, cmd, f);
+	GetFunctionCall(ff->name, cmd, f);
 	cmd->instance = ob;
 	return cmd;
 }
@@ -188,7 +188,7 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Function *f)
 			if (!deref)
 				ref_command_old(this, Operand);
 			Exp.next();
-			return DoClassFunction(this, Operand, cf, f);
+			return DoClassFunction(Operand, cf, f);
 		}
 
 	DoError("unknown element of " + type->name);
@@ -509,7 +509,7 @@ Command *SyntaxTree::GetOperand(Function *f)
 			ClassFunction *cf = t->GetComplexConstructor();
 			if (!cf)
 				DoError(format("class \"%s\" does not have a constructor with parameters", t->name.c_str()));
-			Operand->param[0] = DoClassFunction(this, NULL, *cf, f);
+			Operand->param[0] = DoClassFunction(NULL, *cf, f);
 			Operand->num_params = 1;
 		}
 	}else if (Exp.cur == "delete"){ // delete operator
@@ -1359,7 +1359,7 @@ void SyntaxTree::ParseEnum()
 	Exp.cur_line --;
 }
 
-void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, int virtual_index, bool overwrite)
+void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtual, bool overwrite)
 {
 	Function *f = ParseFunctionHeader(t, as_extern);
 	int n = -1;
@@ -1367,7 +1367,7 @@ void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, int virtual_i
 		if (f == g)
 			n = i;
 
-	t->AddFunction(this, n, virtual_index, overwrite);
+	t->AddFunction(this, n, as_virtual, overwrite);
 }
 
 inline bool type_needs_alignment(Type *t)
@@ -1416,9 +1416,6 @@ void SyntaxTree::ParseClass()
 		_offset = parent->size;
 	}
 	ExpectNewline();
-
-	// virtual functions?     (derived -> _class->num_virtual)
-	int cur_virtual_index = _class->num_virtual;
 
 	// elements
 	for (int num=0;!Exp.end_of_file();num++){
@@ -1470,7 +1467,7 @@ void SyntaxTree::ParseClass()
 			if (is_function){
 				Exp.cur_exp = ie;
 				Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
-				ParseClassFunctionHeader(_class, next_extern, next_virtual ? (cur_virtual_index ++) : -1, overwrite);
+				ParseClassFunctionHeader(_class, next_extern, next_virtual, overwrite);
 
 				break;
 			}
@@ -1511,12 +1508,12 @@ void SyntaxTree::ParseClass()
 
 
 	// virtual functions?     (derived -> _class->num_virtual)
-	_class->num_virtual = cur_virtual_index;
+//	_class->vtable = cur_virtual_index;
 	//foreach(ClassFunction &cf, _class->function)
 	//	_class->num_virtual = max(_class->num_virtual, cf.virtual_index);
-	if (_class->num_virtual > 0){
+	if (_class->vtable.num > 0){
 		if (_class->parent){
-			if (_class->parent->num_virtual == 0)
+			if (_class->parent->vtable.num == 0)
 				DoError("no virtual functions allowed when inheriting from class without virtual functions");
 			// element "-vtable-" being derived
 		}else{
@@ -1530,7 +1527,6 @@ void SyntaxTree::ParseClass()
 			_class->element.insert(el, 0);
 			_offset += config.PointerSize;
 		}
-		_class->vtable = new VirtualTable[_class->num_virtual + 2];
 	}
 
 	foreach(ClassElement &e, _class->element)
@@ -1867,8 +1863,8 @@ void SyntaxTree::Parser()
 
 	ParseAllFunctionBodies();
 
-	for (int i=0;i<Types.num;i++)
-		AutoImplementFunctions(Types[i]);
+	foreach(Type *t, Types)
+		AutoImplementFunctions(t);
 }
 
 }

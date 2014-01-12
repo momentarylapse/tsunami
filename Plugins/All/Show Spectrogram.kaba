@@ -33,7 +33,7 @@ class SpectrumDialog : Dialog
 		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 		SetImage("close", "hui:close")
 	
-		EventM("close", &OnClose)
+		EventM("close", self, &OnClose)
 
 	overwrite void OnDraw()
 		Painter *c = BeginDraw("drawing_area")

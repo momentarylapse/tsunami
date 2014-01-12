@@ -336,10 +336,12 @@ void SIAddPackageHui()
 			func_add_param("func",			TypePointer);
 		class_add_func("EventM",						TypeVoid,		mf(&HuiWindow::_EventKM));
 			func_add_param("id",			TypeString);
+			func_add_param("handler",		TypePointer);
 			func_add_param("func",			TypePointer);
 		class_add_func("EventMX",						TypeVoid,		mf(&HuiWindow::_EventKMX));
 			func_add_param("id",			TypeString);
 			func_add_param("msg",			TypeString);
+			func_add_param("handler",		TypePointer);
 			func_add_param("func",			TypePointer);
 		class_add_func_virtual("OnMouseMove", TypeVoid, mf(&HuiWindow::OnMouseMove));
 		class_add_func_virtual("OnMouseWheel", TypeVoid, mf(&HuiWindow::OnMouseWheel));

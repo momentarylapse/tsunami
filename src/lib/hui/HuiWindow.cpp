@@ -306,14 +306,14 @@ void HuiWindow::_EventMX(const string &id, const string &msg, HuiEventHandler *h
 	event.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
 }
 
-void HuiWindow::_EventKM(const string &id, hui_kaba_callback *function)
+void HuiWindow::_EventKM(const string &id, HuiEventHandler* handler, hui_kaba_callback *function)
 {
-	event.add(HuiEventListener(id, ":def:", HuiCallback(this, function)));
+	event.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
 }
 
-void HuiWindow::_EventKMX(const string &id, const string &msg, hui_kaba_callback *function)
+void HuiWindow::_EventKMX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_callback *function)
 {
-	event.add(HuiEventListener(id, msg, HuiCallback(this, function)));
+	event.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
 }
 
 void HuiWindow::RemoveEventHandlers(HuiEventHandler *handler)

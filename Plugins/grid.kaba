@@ -1,5 +1,6 @@
 
 use "tone.kaba"
+//#disasm
 
 
 float log2lin(float f, float f_min, float f_max)
@@ -108,8 +109,8 @@ class GridAxis
 					if show
 						tt.label = vv.str2(0) + " " + unit
 					r.tick.add(tt)
-				if (i == 1)
-					vv = vv0 * 1.5
+				vv = vv0 * 1.5
+				if (i == 1) and (vv >= val_min) and (vv <= val_max)
 					GridTick tt
 					tt.value = vv
 					tt.weight = 0.5
@@ -309,3 +310,52 @@ class GridData
 		
 	bool MouseOverPoint3(vector q)
 		return MouseOverPoint2(complex(q.x, q.y))
+		
+	virtual void dummyVirtual()
+		nil
+		
+
+class SuperGrid : GridData
+	Window *win
+	string id
+	
+	void onDrawAll()
+		Painter *c = win.BeginDraw(id)
+		float w = c.width
+		float h = c.height
+	
+		Draw(c, 0, 0, w, h)
+	
+		onDraw(c)
+		
+		c.End()
+	
+	void redraw()
+		win.Redraw(id)
+	
+	void onLeftButtonDownAll()
+		float mx = HuiGetEvent().mouse_x
+		float my = HuiGetEvent().mouse_y
+		if plot_rect.inside(mx, my)
+			onLeftButtonDown()
+		if x_axis.rect.inside(mx, my)
+			x_axis.freq_as_pitch = !x_axis.freq_as_pitch
+			redraw()
+		if y_axis.rect.inside(mx, my)
+			y_axis.freq_as_pitch = !y_axis.freq_as_pitch
+			redraw()
+	
+	void onMouseMoveAll()
+		if plot_rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+			onMouseMove()
+
+	void Init(Window *_win, string _id)
+		win = _win
+		id = _id
+		win.EventMX(id, "hui:draw", self, &onDrawAll)
+		win.EventMX(id, "hui:left-button-down", self, &onLeftButtonDownAll)
+		win.EventMX(id, "hui:mouse-move", self, &onMouseMoveAll)
+	
+	virtual void onDraw(Painter *c)
+	virtual void onLeftButtonDown()
+	virtual void onMouseMove()

@@ -13,45 +13,56 @@ SpectrumDialog *dlg
 
 enum
 	TypeLinear
-	TypeRoot2
 	TypeLogarithm
 
 //float x[], yr[], yl[]
 float ffr[], ffl[]
 
-GridData grid
+//GridData grid
 
-int w, h
+//int w, h
 
 float todb(float v)
 	return log(v) / log(10) * 10
 
 float peak_max
 
-void CreateLines(int type, complex pr[], complex pl[])
+class SpecGrid : SuperGrid
+	int type
 
-	pr.resize(N)
-	pl.resize(N)
-	for int i, 0, N
-		float x = log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ)
-		pr[i].x = x
-		pl[i].x = x
+	void CreateLines(complex pr[], complex pl[])
+
+		pr.resize(N)
+		pl.resize(N)
+		for int i, 0, N
+			float x = log2lin(i2f(i) / i2f(N), MIN_FREQ, MAX_FREQ)
+			pr[i].x = x
+			pl[i].x = x
+			if type == TypeLinear
+				pr[i].y = ffr[i]
+				pl[i].y = ffl[i]
+			else //if type == TypeLogarithm
+				float vol_max = todb(peak_max)
+				float vol_min = vol_max - 60
+				pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
+				pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
+	void setType(int t)
+		type = t
 		if type == TypeLinear
-			grid.y_axis.set(0, peak_max, false, "")
-			pr[i].y = ffr[i]
-			pl[i].y = ffl[i]
-		else if type == TypeRoot2
-			grid.y_axis.set(0, sqrt(peak_max), false, "")
-			pr[i].y = pow(ffr[i], 0.5)
-			pl[i].y = pow(ffl[i], 0.5)
+			y_axis.set(0, peak_max, false, "")
 		else //if type == TypeLogarithm
 			float vol_max = todb(peak_max)
 			float vol_min = vol_max - 60
-			grid.y_axis.set(vol_min, vol_max, false, "db")
-			pr[i].y = clamp(todb(ffr[i]), vol_min, vol_max)
-			pl[i].y = clamp(todb(ffl[i]), vol_min, vol_max)
+			y_axis.set(vol_min, vol_max, false, "db")
+	overwrite void onDraw(Painter *c)
+		complex pr[], pl[]
+		CreateLines(pr, pl)
+	
+		DrawCurveB(c, pr, true, Red)
+		DrawCurveB(c, pl, true, Blue)
 
 class SpectrumDialog : Dialog
+	SpecGrid grid
 	void __init__()
 		super.__init__("Spectrum", 600, 460, MainWin, true)
 		AddGrid("", 0, 0, 1, 2, "table1")
@@ -59,37 +70,22 @@ class SpectrumDialog : Dialog
 		AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
 		AddGrid("!noexpandy", 0, 1, 2, 1, "table2")
 		SetTarget("table2", 0)
-		AddComboBox("Linear\\Square Root\\Logarithm", 0, 0, 0, 0, "type")
+		AddComboBox("Linear\\Logarithm", 0, 0, 0, 0, "type")
 		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
 		SetImage("close", "hui:close")
+		
+		grid.Init(self, "drawing_area")
+		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
-		EventM("type", &OnType)
-		EventM("hui:close", &OnClose)
-		EventM("close", &OnClose)
+		EventM("type", self, &OnType)
+		EventM("hui:close", self, &OnClose)
+		EventM("close", self, &OnClose)
 	
 		SetInt("type", TypeLogarithm)
 
-	overwrite void OnDraw()
-		Painter *c = BeginDraw("drawing_area")
-		w = c.width
-		h = c.height
-	
-		complex pr[], pl[]
-		CreateLines(GetInt("type"), pr, pl)
-	
-		grid.Draw(c, 0, 0, w, h)
-		grid.DrawCurveB(c, pr, true, Red)
-		grid.DrawCurveB(c, pl, true, Blue)
-	
-		c.End()
-	
-	overwrite void OnLeftButtonDown()
-		if grid.x_axis.rect.inside(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
-			grid.x_axis.freq_as_pitch = !grid.x_axis.freq_as_pitch
-			Redraw("drawing_area")
-
 	void OnType()
-		Redraw("drawing_area")
+		grid.setType(GetInt("type"))
+		grid.redraw()
 
 	void OnClose()
 		delete self
@@ -137,7 +133,7 @@ void show_spec()
 		ffl /= mmax
 	peak_max /= mmax
 
-	dlg.Redraw("drawing_area")
+	dlg.OnType()
 
 	dlg.Run()
 	
@@ -145,9 +141,6 @@ void show_spec()
 	ffl.clear()
 
 void main()
-	//char dummy[3]
-	grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
-	
 	if audio.selection.length > 0
 		show_spec()
 	else

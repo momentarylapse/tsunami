@@ -78,9 +78,9 @@ class ConfigDialog : Dialog
 		AddText("%", 2, 2, 0, 0, "")
 		PutCommandBar(self, "table1", 0, 1)
 	
-		EventM("beats_per_minute", &OnMetroBeats)
-		EventM("beats_per_measure", &OnMetroMeasure)
-		EventM("volume", &OnMetroVolume)
+		EventM("beats_per_minute", self, &OnMetroBeats)
+		EventM("beats_per_measure", self, &OnMetroMeasure)
+		EventM("volume", self, &OnMetroVolume)
 		
 		m = _m
 	

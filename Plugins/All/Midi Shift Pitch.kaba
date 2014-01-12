@@ -10,7 +10,7 @@ class ConfigDialog : Dialog
 		AddSpinButton("", 0, 0, 0, 0, "shift")
 		AddDefButton("OK", 0, 1, 0, 0, "ok")
 	
-		EventM("ok", &OnOk)
+		EventM("ok", self, &OnOk)
 
 	void OnOk()
 		int shift = GetInt("shift")

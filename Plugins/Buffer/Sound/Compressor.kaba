@@ -89,7 +89,7 @@ class ConfigDialog : Dialog
 		PutCommandBar(self, "table1", 0, 3)
 		fx = _fx
 		
-		EventM("edit", &OnEdit)
+		EventM("edit", self, &OnEdit)
 	
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(0, 1, false, "")

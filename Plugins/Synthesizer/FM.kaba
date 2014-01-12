@@ -101,7 +101,7 @@ class ConfigDialog : Dialog
 			AddSpinButton("0\\0\\1000\\0.1", 7, j + 1, 0, 0, "release_" + j)
 		PutFavoriteBar(self, "root_table", 0, 0)
 		PutCommandBar(self, "root_table", 0, 2)
-		EventM("*", &OnChange)
+		EventM("*", self, &OnChange)
 	
 	void OnChange()
 		for int j, 0, NUM_OSCILLATORS

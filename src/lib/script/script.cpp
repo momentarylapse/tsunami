@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.13.3.0";
+string Version = "0.13.4.0";
 
 //#define ScriptDebug
 
@@ -135,11 +135,8 @@ Type *GetDynamicType(void *p)
 	VirtualTable *pp = *(VirtualTable**)p;
 	foreach(Script *s, PublicScript){
 		foreach(Type *t, s->syntax->Types){
-			if (t->num_virtual > 0){
-				if (t->vtable == pp){
-					return t;
-				}
-			}
+			if (t->vtable.data == pp)
+				return t;
 		}
 	}
 	return NULL;

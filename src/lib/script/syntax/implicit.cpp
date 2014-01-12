@@ -7,10 +7,10 @@ namespace Script{
 
 void SyntaxTree::AutoImplementAddVirtualTable(Command *self, Function *f, Type *t)
 {
-	if (t->vtable){
+	if (t->vtable.num > 0){
 		Command *p = shift_command(self, true, 0, TypePointer);
 		int nc = AddConstant(TypePointer);
-		(*(void**)Constants[nc].data) = t->vtable;
+		(*(void**)Constants[nc].data) = t->vtable.data;
 		Command *cmd_0 = add_command_const(nc);
 		Command *c = add_command_operator(p, cmd_0, OperatorAssign);
 		f->block->command.add(c);
@@ -60,7 +60,7 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Type *t, bool allo
 		}
 
 		// add vtable reference
-		if (t->vtable)
+		if (t->vtable.num > 0)
 			AutoImplementAddVirtualTable(self, f, t);
 
 		// call child constructors
@@ -86,7 +86,7 @@ void SyntaxTree::AutoImplementComplexConstructor(Function *f, Type *t)
 	f->block->command.add(c);
 
 	// add vtable reference
-	if (t->vtable)
+	if (t->vtable.num > 0)
 		AutoImplementAddVirtualTable(self, f, t);
 
 	// call child constructors
@@ -498,7 +498,7 @@ void add_func_header(SyntaxTree *s, Type *t, const string &name, Type *return_ty
 		f->num_params ++;
 	}
 	f->Update(t);
-	t->AddFunction(s, s->Functions.num - 1, -1, false);
+	t->AddFunction(s, s->Functions.num - 1, false, false);
 }
 
 void SyntaxTree::AddFunctionHeadersForClass(Type *t)
@@ -543,7 +543,7 @@ void SyntaxTree::AddFunctionHeadersForClass(Type *t)
 					f->num_params = b->num_params;
 					f->var = b->var;
 					f->Update(t);
-					t->AddFunction(this, Functions.num - 1, -1, false);
+					t->AddFunction(this, Functions.num - 1, false, false);
 
 				}
 	}

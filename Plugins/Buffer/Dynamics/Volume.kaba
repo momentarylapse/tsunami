@@ -54,7 +54,7 @@ class VolumeDialog : Dialog
 		
 		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &OnVolume, v.config.Volume)
 	
-		EventM("max", &OnMax)
+		EventM("max", self, &OnMax)
 		
 		fill()
 

@@ -87,7 +87,7 @@ class ConfigDialog : FixedDialog
 		PutFavoriteBarFixed(self, 5, 5, 455)
 	
 		eq = _eq
-		EventM("*", &OnEvent)
+		EventM("*", self, &OnEvent)
 	
 	
 		fill()

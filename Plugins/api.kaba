@@ -94,7 +94,7 @@ class MidiData
 		n.range.length = length
 		n.pitch = pitch
 		n.volume = volume
-		self.note.add(n)
+		note.add(n)
 
 enum
 	TRACK_TYPE_AUDIO

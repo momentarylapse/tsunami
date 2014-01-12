@@ -163,7 +163,7 @@ public:
 	void ParseClass();
 	Function *ParseFunctionHeader(Type *class_type, bool as_extern);
 	void ParseFunctionBody(Function *f);
-	void ParseClassFunctionHeader(Type *t, bool as_extern, int virtual_index, bool overwrite);
+	void ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtual, bool overwrite);
 	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
 	Type *ParseVariableDefSingle(Type *type, Function *f, bool as_param = false);
 	void ParseVariableDef(bool single, Function *f);
@@ -212,6 +212,7 @@ public:
 	void FindFunctionParameters(int &np, Type **WantedType, Function *f, Command *cmd);
 	void FindFunctionSingleParameter(int p, Type **WantedType, Function *f, Command *cmd);
 	void GetFunctionCall(const string &f_name, Command *Operand, Function *f);
+	Command *DoClassFunction(Command *ob, ClassFunction &cf, Function *f);
 	bool GetSpecialFunctionCall(const string &f_name, Command *Operand, Function *f);
 	void CheckParamLink(Command *link, Type *type, const string &f_name = "", int param_no = -1);
 	void ParseSpecialCommand(Block *block, Function *f);

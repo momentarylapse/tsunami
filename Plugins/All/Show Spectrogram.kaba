@@ -22,10 +22,26 @@ Image im0
 class SpecGrid : Grid
 	overwrite void onDraw(Painter *c)
 		rect r = plot_rect
+		int w = r.width()
+		int h = r.height()
+		
+		float fy = im0.height / r.height()
+		float ya = (log(y_axis.val_max) - log(y_axis.val_min)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * fy
+		float yb = (log(y_axis.val_max_max) - log(y_axis.val_max)) / (log(y_axis.val_max_max) - log(y_axis.val_min_min)) * im0.height
+		float fx = im0.width / r.width()
+		float xa = (x_axis.val_max - x_axis.val_min) / (x_axis.val_max_max - x_axis.val_min_min) * fx
+		float xb = (x_axis.val_min - x_axis.val_min_min) / (x_axis.val_max_max - x_axis.val_min_min) * im0.width
+		
+		Image im
+		im.create(w, h, Black)
+		for int x, 0, w
+			for int y, 0, h
+				im.setPixel(x, y, im0.getPixel(x * xa + xb, y * ya + yb))
+		c.DrawImage(r.x1, r.y1, im)
 	
-		Image *im = im0.scale(r.width(), r.height())
+		/*Image *im = im0.scale(r.width(), r.height())
 		c.DrawImage(r.x1, r.y1, *im)
-		delete(im)
+		delete(im)*/
 
 class SpectrumDialog : Dialog
 	SpecGrid grid
@@ -41,7 +57,7 @@ class SpectrumDialog : Dialog
 		SetImage("close", "hui:close")
 		
 		grid.init(self, "drawing_area")
-		grid.x_axis.set(0, 1, false, "")
+		grid.x_axis.set(audio.selection.offset / i2f(audio.sample_rate), audio.selection.end() / i2f(audio.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		//grid.allow_bg = false
 	

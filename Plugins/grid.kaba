@@ -1,6 +1,4 @@
-
 use "tone.kaba"
-//#disasm
 
 
 float log2lin(float f, float f_min, float f_max)
@@ -56,14 +54,15 @@ class GridAxis
 	void zoom(float p, float dz)
 		float m = unproject(p)
 		if as_log
-			val_min = clamp(exp(log(m) + (log(val_min) - log(m)) * pow(0.8, dz)), val_min_min, val_max_max)
-			val_max = clamp(exp(log(m) + (log(val_max) - log(m)) * pow(0.8, dz)), val_min_min, val_max_max)
-		val_min = clamp(m + (val_min - m) * pow(0.8, dz), val_min_min, val_max_max)
-		val_max = clamp(m + (val_max - m) * pow(0.8, dz), val_min_min, val_max_max)
+			val_min = clamp(exp(log(m) + (log(val_min) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
+			val_max = clamp(exp(log(m) + (log(val_max) - log(m)) * pow(0.9, dz)), val_min_min, val_max_max)
+		else
+			val_min = clamp(m + (val_min - m) * pow(0.9, dz), val_min_min, val_max_max)
+			val_max = clamp(m + (val_max - m) * pow(0.9, dz), val_min_min, val_max_max)
 		
 
 	GridPartition get_lin_partition()
-		float d = (val_max - val_min) / size * 100
+		float d = (val_max - val_min) / size * 150
 		GridPartition r
 		float step = 1
 		float e = log(abs(abs(d))) / log(10)
@@ -195,6 +194,8 @@ class GridData
 		for t in part.tick
 			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float yy = y_axis.project(t.value)
+			if yy < y_axis.rect.y1 or yy > y_axis.rect.y2
+				continue
 			c.DrawLine(x, yy, x + w, yy)
 			if t.label.num > 0
 				c.SetColor(col_text)
@@ -205,6 +206,8 @@ class GridData
 		for t in part.tick
 			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float xx = x_axis.project(t.value)
+			if xx < x_axis.rect.x1 or xx > x_axis.rect.x2
+				continue
 			c.DrawLine(xx, y, xx, y + h)
 			if t.label.num > 0
 				c.SetColor(col_text)

@@ -336,7 +336,7 @@ class Grid : GridData
 		float h = c.height
 	
 		drawBackground(c, 0, 0, w, h)
-	
+		c.Clip(plot_rect)
 		onDraw(c)
 		
 		c.End()

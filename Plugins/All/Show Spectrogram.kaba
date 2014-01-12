@@ -21,9 +21,6 @@ Image im0
 
 class SpecGrid : Grid
 	overwrite void onDraw(Painter *c)
-		float w = c.width
-		float h = c.height
-	
 		rect r = plot_rect
 	
 		Image *im = im0.scale(r.width(), r.height())

@@ -66,6 +66,13 @@ color HuiPainter::GetThemeColor(int i)
 	return color(1, (float)c.red / 65535.0f, (float)c.green / 65535.0f, (float)c.blue / 65535.0f);
 }
 
+void HuiPainter::Clip(const rect &r)
+{
+	cairo_reset_clip(cr);
+	cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
+	cairo_clip(cr);
+}
+
 
 void HuiPainter::DrawPoint(float x, float y)
 {

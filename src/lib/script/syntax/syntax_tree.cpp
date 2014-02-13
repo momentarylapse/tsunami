@@ -203,6 +203,7 @@ string Kind2Str(int kind)
 	if (kind == KindDereference)		return "dereferencing";
 	if (kind == KindDerefAddressShift)	return "deref address shift";
 	if (kind == KindType)				return "type";
+	if (kind == KindArrayBuilder)		return "array builder";
 	if (kind == KindVarTemp)			return "temp";
 	if (kind == KindDerefVarTemp)		return "deref temp";
 	if (kind == KindRegister)			return "register";
@@ -653,6 +654,20 @@ Type *SyntaxTree::CreateNewType(const string &name, int size, bool is_pointer, b
 	return pt;
 }
 
+Type *SyntaxTree::CreateArrayType(Type *element_type, int num_elements, const string &_name_pre, const string &suffix)
+{
+	string name_pre = _name_pre;
+	if (name_pre.num == 0)
+		name_pre = element_type->name;
+	if (num_elements < 0){
+		return CreateNewType(name_pre + "[]" +  suffix,
+			config.SuperArraySize, false, false, true, num_elements, element_type);
+	}else{
+		return CreateNewType(name_pre + format("[%d]", num_elements) + suffix,
+			element_type->size * num_elements, false, false, true, num_elements, element_type);
+	}
+}
+
 
 
 // read the file and do a lexical analysis
@@ -833,7 +848,7 @@ void SyntaxTree::ConvertCallByReference()
 				continue;
 			}
 		
-		if ((c->kind == KindFunction)|| (c->kind == KindVirtualFunction)|| (c->kind == KindCompilerFunction)){
+		if ((c->kind == KindFunction) || (c->kind == KindVirtualFunction) || (c->kind == KindCompilerFunction) || (c->kind == KindArrayBuilder)){
 			// parameters: array/class as reference
 			for (int j=0;j<c->num_params;j++)
 				if (c->param[j]->type->UsesCallByReference()){

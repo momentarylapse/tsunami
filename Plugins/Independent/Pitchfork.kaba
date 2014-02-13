@@ -16,28 +16,28 @@ int fill(BufferBox buf)
 	return buf.num
 
 void OnFrequency()
-	freq = dlg.GetFloat("")
+	freq = dlg.getFloat("")
 
 void OnClose()
-	output.Stop()
+	output.stop()
 	delete dlg
 
 void main()
 	dlg = new Dialog("Pitchfork", 200, 80, MainWin, false)
-	dlg.AddGrid("", 0, 0, 1, 2, "table")
-	dlg.SetTarget("table", 0)
-	dlg.AddSpinButton("", 0, 0, 0, 0, "frequency")
-	dlg.AddButton("Close", 0, 1, 0, 0, "close")
-	dlg.SetImage("close", "hui:close")
+	dlg.addGrid("", 0, 0, 1, 2, "table")
+	dlg.setTarget("table", 0)
+	dlg.addSpinButton("", 0, 0, 0, 0, "frequency")
+	dlg.addButton("Close", 0, 1, 0, 0, "close")
+	dlg.setImage("close", "hui:close")
 	
 	volume = 0.8
 	freq = 880.0
-	dlg.SetFloat("frequency", freq)
+	dlg.setFloat("frequency", freq)
 	
-	dlg.Event("hui:close", &OnClose)
-	dlg.Event("close", &OnClose)
-	dlg.Event("frequency", &OnFrequency)
+	dlg.event("hui:close", &OnClose)
+	dlg.event("close", &OnClose)
+	dlg.event("frequency", &OnFrequency)
 	
-	output.PlayGenerated(&fill, SAMPLE_RATE)
+	output.playGenerated(&fill, SAMPLE_RATE)
 	
-	dlg.Run()
+	dlg.run()

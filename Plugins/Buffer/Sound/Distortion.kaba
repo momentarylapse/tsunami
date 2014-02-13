@@ -20,7 +20,7 @@ class Distortion : AudioEffect
 				ff = x_out[i] + (x_out[i + 1] - x_out[i]) * (f - x_in[i]) / (x_in[i + 1] - x_in[i])
 		return sign * ff
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 	
 		num_x = 4
 		x_in[0] = 0

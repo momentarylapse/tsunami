@@ -18,7 +18,7 @@ class PitchShift : AudioEffect
 	complex buf1[]
 	complex buf2[]
 
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		dlg.fill()
 
 	void shift_buf(float b[])
@@ -37,11 +37,11 @@ class PitchShift : AudioEffect
 				buf2[i] = complex(0, 0)
 		fft_c2r_inv(buf2, b)
 
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new ConfigDialog(self)
-		dlg.Run()
+		dlg.run()
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		shift_buf(buf.r)
 		shift_buf(buf.l)
 		buf1.clear()
@@ -52,22 +52,22 @@ class ConfigDialog : Dialog
 	PitchShift *p
 	void __init__(PitchShift *_p)
 		super.__init__("Pitch Shift", 305, 75, MainWin, false)
-		AddGrid("", 0, 0, 1, 2, "table1")
-		SetTarget("table1", 0)
-		AddGrid("", 0, 0, 3, 1, "table2")
-		SetTarget("table2", 0)
-		AddSlider("!expandx", 0, 0, 0, 0, "pitch_slider")
-		AddSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "pitch")
-		AddText("%", 2, 0, 0, 0, "")
+		addGrid("", 0, 0, 1, 2, "table1")
+		setTarget("table1", 0)
+		addGrid("", 0, 0, 3, 1, "table2")
+		setTarget("table2", 0)
+		addSlider("!expandx", 0, 0, 0, 0, "pitch_slider")
+		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "pitch")
+		addText("%", 2, 0, 0, 0, "")
 		PutCommandBar(self, "table1", 0, 1)
 		p = _p
-		CreateSliderM(self, "pitch_slider", "pitch", 0, 2, 100, &OnPitch, p.config.Pitch)
+		CreateSliderM(self, "pitch_slider", "pitch", 0, 2, 100, &onPitch, p.config.Pitch)
 		
 		fill()
 	
 	void fill()
 		SliderSet(self, "pitch", p.config.Pitch)
 
-	void OnPitch()
+	void onPitch()
 		p.config.Pitch = SliderGet(self, "pitch")
 

@@ -19,13 +19,13 @@ class ToneGenerator : AudioEffect
 	ConfigDialog *dlg
 	DummySynthesizer synth
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		AudioFile *a = audio
 		synth.sample_rate = a.sample_rate
 		Range r
 		r.offset = 0
 		r.length = buf.num
-		synth.RenderNote(buf, r, freq_to_pitch(config.Frequency), config.Volume)
+		synth.renderNote(buf, r, freq_to_pitch(config.Frequency), config.Volume)
 
 		/*float f = config.Frequency
 
@@ -38,90 +38,90 @@ class ToneGenerator : AudioEffect
 			buf.l[i] = clamp(buf.l[i] + d, -1, 1)*/
 	
 	
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		dlg.fill()
 
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new ConfigDialog(self)
-		dlg.Run()
+		dlg.run()
 
 class ConfigDialog : Dialog
 	ToneGenerator *t
 	void __init__(ToneGenerator *_t)
 		super.__init__("Ton Generator", 420, 135, MainWin, false)
-		AddGrid("", 0, 0, 1, 2, "table1")
-		SetTarget("table1", 0)
-		AddGrid("", 0, 0, 3, 3, "table2")
-		SetTarget("table2", 0)
-		AddRadioButton("Ton", 0, 0, 0, 0, "type:pitch")
-		AddRadioButton("Frequenz", 0, 1, 0, 0, "type:freq")
-		AddSpinButton("\\0\\100000\\0.1", 1, 1, 0, 0, "frequency")
-		AddText("Hz", 2, 1, 0, 0, "")
-		AddText("Lautstärke:", 0, 2, 0, 0, "")
-		AddText("%", 2, 2, 0, 0, "")
-		AddGrid("", 1, 0, 2, 1, "table3")
-		AddGrid("", 1, 2, 2, 1, "table4")
-		SetTarget("table3", 0)
-		AddComboBox("", 0, 0, 0, 0, "pitch_rel")
-		AddSpinButton("\\0\\8", 1, 0, 0, 0, "octave")
-		SetTarget("table4", 0)
-		AddSlider("", 0, 0, 0, 0, "volume_slider")
-		AddSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "volume")
+		addGrid("", 0, 0, 1, 2, "table1")
+		setTarget("table1", 0)
+		addGrid("", 0, 0, 3, 3, "table2")
+		setTarget("table2", 0)
+		addRadioButton("Ton", 0, 0, 0, 0, "type:pitch")
+		addRadioButton("Frequenz", 0, 1, 0, 0, "type:freq")
+		addSpinButton("\\0\\100000\\0.1", 1, 1, 0, 0, "frequency")
+		addText("Hz", 2, 1, 0, 0, "")
+		addText("Lautstärke:", 0, 2, 0, 0, "")
+		addText("%", 2, 2, 0, 0, "")
+		addGrid("", 1, 0, 2, 1, "table3")
+		addGrid("", 1, 2, 2, 1, "table4")
+		setTarget("table3", 0)
+		addComboBox("", 0, 0, 0, 0, "pitch_rel")
+		addSpinButton("\\0\\8", 1, 0, 0, 0, "octave")
+		setTarget("table4", 0)
+		addSlider("", 0, 0, 0, 0, "volume_slider")
+		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "volume")
 		
 		PutCommandBar(self, "table1", 0, 1)
 		
 		t = _t
 	
-		Reset("pitch_rel")
+		reset("pitch_rel")
 		for int i, 0, 12
-			SetString("pitch_rel", rel_pitch_name(i))
+			setString("pitch_rel", rel_pitch_name(i))
 	
-		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &OnVolume, t.config.Volume)
-		EventM("pitch_rel", self, &OnPitch)
-		EventM("octave", self, &OnPitch)
-		EventM("frequency",  self, &OnFrequency)
-		EventM("type:freq",  self, &OnTypeFreq)
-		EventM("type:pitch", self, &OnTypePitch)
+		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &onVolume, t.config.Volume)
+		eventM("pitch_rel", self, &onPitch)
+		eventM("octave", self, &onPitch)
+		eventM("frequency",  self, &onFrequency)
+		eventM("type:freq",  self, &onTypeFreq)
+		eventM("type:pitch", self, &onTypePitch)
 
 		fill()
 
-	void OnFrequency()
+	void onFrequency()
 		t.config.Pitch = -1
-		t.config.Frequency = GetFloat("")
+		t.config.Frequency = getFloat("")
 
-	void ReadPitchFromDialog()
-		t.config.Pitch = pitch_from_octave_and_rel(GetInt("pitch_rel"),
-		                                           GetInt("octave"))
+	void readPitchFromDialog()
+		t.config.Pitch = pitch_from_octave_and_rel(getInt("pitch_rel"),
+		                                           getInt("octave"))
 
-	void OnPitch()
-		ReadPitchFromDialog()
+	void onPitch()
+		readPitchFromDialog()
 		t.config.Frequency = pitch_to_freq(t.config.Pitch)
-		SetFloat("frequency", t.config.Frequency)
+		setFloat("frequency", t.config.Frequency)
 
-	void OnVolume()
+	void onVolume()
 		t.config.Volume = SliderGet(self, "volume")
 
 	void fill()
 		bool by_pitch = t.config.Pitch >= 0
 		if by_pitch
-			SetInt("pitch_rel", t.config.Pitch % 12)
-			SetInt("octave", pitch_get_octave(t.config.Pitch))
-			Check("type:pitch", true)
+			setInt("pitch_rel", t.config.Pitch % 12)
+			setInt("octave", pitch_get_octave(t.config.Pitch))
+			check("type:pitch", true)
 		else
-			Check("type:freq", true)
-		SetFloat("frequency", t.config.Frequency)
+			check("type:freq", true)
+		setFloat("frequency", t.config.Frequency)
 		SliderSet(self, "volume", t.config.Volume)
 
-		Enable("frequency", !by_pitch)
-		Enable("octave", by_pitch)
-		Enable("pitch_rel", by_pitch)
+		enable("frequency", !by_pitch)
+		enable("octave", by_pitch)
+		enable("pitch_rel", by_pitch)
 
-	void OnTypeFreq()
+	void onTypeFreq()
 		t.config.Pitch = -1
 		fill()
 
-	void OnTypePitch()
-		ReadPitchFromDialog()
+	void onTypePitch()
+		readPitchFromDialog()
 		t.config.Frequency = pitch_to_freq(t.config.Pitch)
 		fill()
 

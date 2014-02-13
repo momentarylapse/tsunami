@@ -28,7 +28,7 @@ void win_set_input(HuiWindow *win, T *event)
 {
 	win->input.dx = event->x - win->input.x;
 	win->input.dy = event->y - win->input.y;
-	//msg_write(format("%.0f\t%0.f\t->\t%0.f\t%0.f\t(%.0f\t%0.f)", win->input.x, win->input.y, event->x, event->y, win->input.dx, win->input.dy));
+	//msg_write(format("%.1f\t%.1f\t->\t%.1f\t%.1f\t(%.1f\t%.1f)", win->input.x, win->input.y, event->x, event->y, win->input.dx, win->input.dy));
 	win->input.dz = 0;
 	win->input.x = event->x;
 	win->input.y = event->y;
@@ -56,14 +56,14 @@ gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer u
 
 	// gtk hinting system doesn't work?
 	// always use the real (current) cursor
-	int x, y, mod = 0;
+/*	int x, y, mod = 0;
 	#if GTK_MAJOR_VERSION >= 3
 		gdk_window_get_device_position(gtk_widget_get_window(c->widget), event->device, &x, &y, (GdkModifierType*)&mod);
 	#else
 		gdk_window_get_pointer(c->widget->window, &x, &y, (GdkModifierType*)&mod);
 	#endif
 	c->win->input.x = x;
-	c->win->input.y = y;
+	c->win->input.y = y;*/
 
 	c->Notify("hui:mouse-move", false);
 	gdk_event_request_motions(event); // to prevent too many signals for slow message processing
@@ -220,6 +220,44 @@ HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &
 }
 
 HuiControlDrawingArea::~HuiControlDrawingArea() {
+}
+
+void HuiControlDrawingArea::HardReset()
+{
+	msg_db_f("hard reset", 0);
+	GtkWidget *parent = gtk_widget_get_parent(widget);
+
+	gtk_container_remove(GTK_CONTAINER(parent), widget);
+
+
+	GtkWidget *da = gtk_drawing_area_new();
+	g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
+	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
+	g_signal_connect(G_OBJECT(da), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
+	//g_signal_connect(G_OBJECT(da), "size-request", G_CALLBACK(&OnGtkAreaResize), this);
+	g_signal_connect(G_OBJECT(da), "motion-notify-event", G_CALLBACK(&OnGtkAreaMouseMove), this);
+	g_signal_connect(G_OBJECT(da), "button-press-event", G_CALLBACK(&OnGtkAreaButtonDown), this);
+	g_signal_connect(G_OBJECT(da), "button-release-event", G_CALLBACK(&OnGtkAreaButtonUp), this);
+	g_signal_connect(G_OBJECT(da), "scroll-event", G_CALLBACK(&OnGtkAreaMouseWheel), this);
+	//g_signal_connect(G_OBJECT(w), "focus-in-event", G_CALLBACK(&focus_in_event), this);
+	int mask;
+	g_object_get(G_OBJECT(da), "events", &mask, NULL);
+	mask |= GDK_EXPOSURE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK;
+	mask |= GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK;
+	mask |= GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK; // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
+	mask |= GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK;
+	//mask = GDK_ALL_EVENTS_MASK;
+	g_object_set(G_OBJECT(da), "events", mask, NULL);
+
+	if (grab_focus){
+		gtk_widget_set_can_focus(da, true);
+		gtk_widget_grab_focus(da);
+	}
+	widget = da;
+	gtk_widget_set_hexpand(widget, true);
+	gtk_widget_set_vexpand(widget, true);
+
+	gtk_container_add(GTK_CONTAINER(parent), widget);
 }
 
 #endif

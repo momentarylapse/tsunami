@@ -3,5 +3,5 @@
 use "../../api.kaba"
 
 class RToL : AudioEffect
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		buf.l = buf.r

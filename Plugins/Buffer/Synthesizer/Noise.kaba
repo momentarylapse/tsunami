@@ -2,7 +2,7 @@
 use "../../api.kaba"
 
 class Noise : AudioEffect
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		for int i, 0, buf.r.num
 			buf.r[i] = rand(2.0) - 1.0
 			buf.l[i] = rand(2.0) - 1.0

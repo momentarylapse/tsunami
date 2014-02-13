@@ -137,11 +137,11 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioEffect", "usable", offsetof(Effect, usable));
 	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "ProcessTrack", Script::mf(&Effect::ProcessTrack), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "Configure", Script::mf(&Effect::Configure), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "ResetConfig", Script::mf(&Effect::ResetConfig), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "ResetState", Script::mf(&Effect::ResetState), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "UpdateDialog", Script::mf(&Effect::UpdateDialog), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "processTrack", Script::mf(&Effect::ProcessTrack), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "configure", Script::mf(&Effect::Configure), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::ResetConfig), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::ResetState), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
 	Script::DeclareClassOffset("BufferBox", "offset", offsetof(BufferBox, offset));
@@ -161,26 +161,26 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Synthesizer", "keep_notes", offsetof(Synthesizer, keep_notes));
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "RenderNote", Script::mf(&Synthesizer::RenderNote), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::RenderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "Configure", Script::mf(&Synthesizer::Configure), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "UpdateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "Reset", Script::mf(&Synthesizer::Reset), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "ResetConfig", Script::mf(&Synthesizer::ResetConfig), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "configure", Script::mf(&Synthesizer::Configure), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::Reset), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::ResetConfig), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
-	Script::LinkExternal("Synthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
-	Script::LinkExternal("Synthesizer.reset", Script::mf(&Synthesizer::reset));
+	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
+	Script::LinkExternal("Synthesizer._reset", Script::mf(&Synthesizer::reset));
 
 
 	DummySynthesizer dsynth;
 	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
 	Script::LinkExternal("DummySynthesizer.__init__", Script::mf(&DummySynthesizer::__init__));
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "__delete__", Script::mf(&DummySynthesizer::__delete__), &dsynth);
-	Script::DeclareClassVirtualIndex("DummySynthesizer", "RenderNote", Script::mf(&DummySynthesizer::RenderNote), &dsynth);
+	Script::DeclareClassVirtualIndex("DummySynthesizer", "renderNote", Script::mf(&DummySynthesizer::RenderNote), &dsynth);
 	//Script::DeclareClassVirtualIndex("DummySynthesizer", "read", Script::mf(&DummySynthesizer::read), &dsynth);
-	//Script::DeclareClassVirtualIndex("DummySynthesizer", "OnConfigure", Script::mf(&DummySynthesizer::OnConfigure), &dsynth);
+	//Script::DeclareClassVirtualIndex("DummySynthesizer", "onConfigure", Script::mf(&DummySynthesizer::OnConfigure), &dsynth);
 	//Script::LinkExternal("DummySynthesizer.set", Script::mf(&Synthesizer::set));
-	//Script::LinkExternal("DummySynthesizer.RenderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
+	//Script::LinkExternal("DummySynthesizer.renderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
 
 	Script::DeclareClassSize("BarPattern", sizeof(BarPattern));
 	Script::DeclareClassOffset("BarPattern", "num_beats", offsetof(BarPattern, num_beats));
@@ -219,9 +219,9 @@ void PluginManager::LinkAppScriptData()
 //	Script::DeclareClassOffset("Track", "parent", offsetof(Track, parent));
 	Script::DeclareClassOffset("Track", "root", offsetof(Track, root));
 	Script::DeclareClassOffset("Track", "is_selected", offsetof(Track, is_selected));
-	Script::LinkExternal("Track.GetBuffers", Script::mf(&Track::GetBuffers));
-	Script::LinkExternal("Track.ReadBuffers", Script::mf(&Track::ReadBuffers));
-	Script::LinkExternal("Track.InsertMidiData", Script::mf(&Track::InsertMidiData));
+	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::GetBuffers));
+	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::ReadBuffers));
+	Script::LinkExternal("Track.insertMidiData", Script::mf(&Track::InsertMidiData));
 
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
 	Script::DeclareClassOffset("AudioFile", "used", offsetof(AudioFile, used));
@@ -235,46 +235,46 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "selection", offsetof(AudioFile, selection));
 	Script::DeclareClassOffset("AudioFile", "sel_raw", offsetof(AudioFile, sel_raw));
 	Script::DeclareClassOffset("AudioFile", "level_name", offsetof(AudioFile, level_name));
-	Script::LinkExternal("AudioFile.GetRange", Script::mf(&AudioFile::GetRange));
-	Script::LinkExternal("AudioFile.GetNextBeat", Script::mf(&AudioFile::GetNextBeat));
+	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::GetRange));
+	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::GetNextBeat));
 
-	Script::LinkExternal("AudioRenderer.Prepare", Script::mf(&AudioRenderer::Prepare));
+	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::Prepare));
 	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
-	Script::LinkExternal("AudioRenderer.RenderAudioFile", Script::mf(&AudioRenderer::RenderAudioFile));
-	Script::LinkExternal("AudioRenderer.TranslateOutputPos", Script::mf(&AudioRenderer::TranslateOutputPos));
+	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::RenderAudioFile));
+	Script::LinkExternal("AudioRenderer.translateOutputPos", Script::mf(&AudioRenderer::TranslateOutputPos));
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
 	Script::DeclareClassOffset("AudioInput", "cur_buf", offsetof(AudioInput, current_buffer));
 	Script::DeclareClassOffset("AudioInput", "buf", offsetof(AudioInput, buffer));
 	Script::DeclareClassOffset("AudioInput", "midi", offsetof(AudioInput, midi));
-	Script::LinkExternal("AudioInput.Start", Script::mf(&AudioInput::Start));
-	Script::LinkExternal("AudioInput.ResetSync", Script::mf(&AudioInput::ResetSync));
-	Script::LinkExternal("AudioInput.Stop",	 Script::mf(&AudioInput::Stop));
-	Script::LinkExternal("AudioInput.IsCapturing", Script::mf(&AudioInput::IsCapturing));
-	Script::LinkExternal("AudioInput.GetSampleCount", Script::mf(&AudioInput::GetSampleCount));
-	Script::LinkExternal("AudioInput.Accumulate", Script::mf(&AudioInput::Accumulate));
-	Script::LinkExternal("AudioInput.ResetAccumulation", Script::mf(&AudioInput::ResetAccumulation));
-	Script::LinkExternal("AudioInput.GetDelay", Script::mf(&AudioInput::GetDelay));
-	Script::LinkExternal("AudioInput.AddObserver", Script::mf(&AudioInput::AddWrappedObserver));
-	Script::LinkExternal("AudioInput.RemoveObserver", Script::mf(&AudioInput::RemoveWrappedObserver));
-	//Script::LinkExternal("Observable.AddObserver", Script::mf(&Observable::AddWrappedObserver);
+	Script::LinkExternal("AudioInput.start", Script::mf(&AudioInput::Start));
+	Script::LinkExternal("AudioInput.resetSync", Script::mf(&AudioInput::ResetSync));
+	Script::LinkExternal("AudioInput.stop",	 Script::mf(&AudioInput::Stop));
+	Script::LinkExternal("AudioInput.isCapturing", Script::mf(&AudioInput::IsCapturing));
+	Script::LinkExternal("AudioInput.getSampleCount", Script::mf(&AudioInput::GetSampleCount));
+	Script::LinkExternal("AudioInput.accumulate", Script::mf(&AudioInput::Accumulate));
+	Script::LinkExternal("AudioInput.resetAccumulation", Script::mf(&AudioInput::ResetAccumulation));
+	Script::LinkExternal("AudioInput.getDelay", Script::mf(&AudioInput::GetDelay));
+	Script::LinkExternal("AudioInput.addObserver", Script::mf(&AudioInput::AddWrappedObserver));
+	Script::LinkExternal("AudioInput.removeObserver", Script::mf(&AudioInput::RemoveWrappedObserver));
+	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
 
-	Script::LinkExternal("AudioOutput.Play", Script::mf(&AudioOutput::Play));
-	Script::LinkExternal("AudioOutput.PlayGenerated", Script::mf(&AudioOutput::PlayGenerated));
-	Script::LinkExternal("AudioOutput.Stop", Script::mf(&AudioOutput::Stop));
-	Script::LinkExternal("AudioOutput.IsPlaying", Script::mf(&AudioOutput::IsPlaying));
-	Script::LinkExternal("AudioOutput.GetPos", Script::mf(&AudioOutput::GetPos));
-	Script::LinkExternal("AudioOutput.GetSampleRate", Script::mf(&AudioOutput::GetSampleRate));
-	Script::LinkExternal("AudioOutput.GetVolume", Script::mf(&AudioOutput::GetVolume));
-	Script::LinkExternal("AudioOutput.SetVolume", Script::mf(&AudioOutput::SetVolume));
-	Script::LinkExternal("AudioOutput.SetBufferSize", Script::mf(&AudioOutput::SetBufferSize));
+	Script::LinkExternal("AudioOutput.play", Script::mf(&AudioOutput::Play));
+	Script::LinkExternal("AudioOutput.playGenerated", Script::mf(&AudioOutput::PlayGenerated));
+	Script::LinkExternal("AudioOutput.stop", Script::mf(&AudioOutput::Stop));
+	Script::LinkExternal("AudioOutput.isPlaying", Script::mf(&AudioOutput::IsPlaying));
+	Script::LinkExternal("AudioOutput.getPos", Script::mf(&AudioOutput::GetPos));
+	Script::LinkExternal("AudioOutput.getSampleRate", Script::mf(&AudioOutput::GetSampleRate));
+	Script::LinkExternal("AudioOutput.getVolume", Script::mf(&AudioOutput::GetVolume));
+	Script::LinkExternal("AudioOutput.setVolume", Script::mf(&AudioOutput::SetVolume));
+	Script::LinkExternal("AudioOutput.setBufferSize", Script::mf(&AudioOutput::SetBufferSize));
 
-	Script::LinkExternal("Log.Error", Script::mf(&Log::Error));
-	Script::LinkExternal("Log.Warning", Script::mf(&Log::Warning));
-	Script::LinkExternal("Log.Info", Script::mf(&Log::Info));
+	Script::LinkExternal("Log.error", Script::mf(&Log::Error));
+	Script::LinkExternal("Log.warning", Script::mf(&Log::Warning));
+	Script::LinkExternal("Log.info", Script::mf(&Log::Info));
 
-	Script::LinkExternal("Storage.Load", Script::mf(&Storage::Load));
-	Script::LinkExternal("Storage.Save", Script::mf(&Storage::Save));
+	Script::LinkExternal("Storage.load", Script::mf(&Storage::Load));
+	Script::LinkExternal("Storage.save", Script::mf(&Storage::Save));
 
 	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
 	Script::DeclareClassOffset("PluginContext", "track", offsetof(PluginManager::PluginContext, track));

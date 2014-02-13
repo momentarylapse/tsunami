@@ -16,7 +16,7 @@ class Tremolo : AudioEffect
 	Config config
 	TremoloDialog *dlg
 
-	void DoTremolo(float b[])
+	void doTremolo(float b[])
 	
 		float f_c = 1.0 / audio.sample_rate * 2 * pi * config.Speed
 	
@@ -26,34 +26,34 @@ class Tremolo : AudioEffect
 			// old value
 			b[i] *= f
 
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		dlg.fill()
 
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new TremoloDialog(self)
-		dlg.Run()
+		dlg.run()
 	
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		
-		DoTremolo(buf.r)
-		DoTremolo(buf.l)
+		doTremolo(buf.r)
+		doTremolo(buf.l)
 
 class TremoloDialog : Dialog
 	Tremolo *t
 	void __init__(Tremolo *_t)
 		super.__init__("Tremolo", 460, 145, MainWin, false)
-		AddGrid("", 0, 0, 1, 3, "table1")
-		SetTarget("table1", 0)
-		AddGrid("", 0, 1, 4, 2, "table2")
-		SetTarget("table2", 0)
-		AddSlider("!expandx", 1, 0, 0, 0, "speed_slider")
-		AddSpinButton("\\0\\100\\0.1", 2, 0, 0, 0, "speed")
-		AddText("Hz", 3, 0, 0, 0, "")
-		AddSlider("", 1, 1, 0, 0, "depth_slider")
-		AddSpinButton("\\0\\100\\0.1", 2, 1, 0, 0, "depth")
-		AddText("%", 3, 1, 0, 0, "")
-		AddText("Geschwindigkeit", 0, 0, 0, 0, "")
-		AddText("Tiefe", 0, 1, 0, 0, "")
+		addGrid("", 0, 0, 1, 3, "table1")
+		setTarget("table1", 0)
+		addGrid("", 0, 1, 4, 2, "table2")
+		setTarget("table2", 0)
+		addSlider("!expandx", 1, 0, 0, 0, "speed_slider")
+		addSpinButton("\\0\\100\\0.1", 2, 0, 0, 0, "speed")
+		addText("Hz", 3, 0, 0, 0, "")
+		addSlider("", 1, 1, 0, 0, "depth_slider")
+		addSpinButton("\\0\\100\\0.1", 2, 1, 0, 0, "depth")
+		addText("%", 3, 1, 0, 0, "")
+		addText("Geschwindigkeit", 0, 0, 0, 0, "")
+		addText("Tiefe", 0, 1, 0, 0, "")
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 2)

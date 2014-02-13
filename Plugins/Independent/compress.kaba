@@ -11,20 +11,20 @@ float dmax
 complex c[]
 
 void OnDraw()
-	Painter *c = win.BeginDraw("area")
-	c.SetColor(White)
-	c.DrawRect(0, 0, c.width, c.height)
-	c.SetColor(Black)
+	Painter *c = win.beginDraw("area")
+	c.setColor(White)
+	c.drawRect(0, 0, c.width, c.height)
+	c.setColor(Black)
 	for int i, 1, 1024
-		c.DrawLine(i - 1, r[i - 1] * 100 + 100, i, r[i] * 100 + 100)
-	c.SetColor(Blue)
+		c.drawLine(i - 1, r[i - 1] * 100 + 100, i, r[i] * 100 + 100)
+	c.setColor(Blue)
 	for int i, 1, 1024
-		c.DrawLine(i - 1, r2[i - 1] * 100 + 100, i, r2[i] * 100 + 100)
-	c.SetColor(Red)
+		c.drawLine(i - 1, r2[i - 1] * 100 + 100, i, r2[i] * 100 + 100)
+	c.setColor(Red)
 	for int i, 1, 1024
-		c.DrawLine(i - 1, d[i - 1] * 100 + 100, i, d[i] * 100 + 100)
-	c.DrawStr(10, 10, f2s(dmax, 6))
-	c.End()
+		c.drawLine(i - 1, d[i - 1] * 100 + 100, i, d[i] * 100 + 100)
+	c.drawStr(10, 10, f2s(dmax, 6))
+	c.end()
 
 File *fout
 

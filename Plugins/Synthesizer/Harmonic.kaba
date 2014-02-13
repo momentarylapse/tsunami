@@ -16,45 +16,45 @@ class ConfigDialog : Dialog
 	HarmonicConfig *c
 	void __init__(HarmonicConfig *_c, Window *parent)
 		super.__init__("config", 200, 260, parent, false)
-		AddGrid("", 0, 0, 1, 3, "root_table")
-		SetTarget("root_table", 0)
-		AddGrid("", 0, 1, 5, NUM_HARMONICS, "main_table")
-		SetTarget("main_table", 0)
-		AddText("Fundamental", 0, 0, 0, 0, "")
+		addGrid("", 0, 0, 1, 3, "root_table")
+		setTarget("root_table", 0)
+		addGrid("", 0, 1, 5, NUM_HARMONICS, "main_table")
+		setTarget("main_table", 0)
+		addText("Fundamental", 0, 0, 0, 0, "")
 		for int j, 0, NUM_HARMONICS
 			if j > 0
-				AddText("x " + (j + 1), 0, j, 0, 0, "")
-			AddSpinButton("0\\0\\100\\0.1", 1, j, 0, 0, "intensity_" + j)
-			EventM("intensity_" + j, self, &OnChange)
-		AddText("Release", 2, 0, 0, 0, "")
-		AddSpinButton("0\\0\\100\\0.1", 3, 0, 0, 0, "release")
-		AddText("ms", 4, 0, 0, 0, "")
-		EventM("release", self, &OnChange)
+				addText("x " + (j + 1), 0, j, 0, 0, "")
+			addSpinButton("0\\0\\100\\0.1", 1, j, 0, 0, "intensity_" + j)
+			eventM("intensity_" + j, self, &onChange)
+		addText("Release", 2, 0, 0, 0, "")
+		addSpinButton("0\\0\\100\\0.1", 3, 0, 0, 0, "release")
+		addText("ms", 4, 0, 0, 0, "")
+		eventM("release", self, &onChange)
 		PutFavoriteBar(self, "root_table", 0, 0)
 		PutCommandBar(self, "root_table", 0, 2)
 		c = _c
 		
-	void OnChange()
+	void onChange()
 		for int j, 0, NUM_HARMONICS
-			c.intensity[j] = GetFloat("intensity_" + j) / 100
-		c.release = GetFloat("release") / 1000
+			c.intensity[j] = getFloat("intensity_" + j) / 100
+		c.release = getFloat("release") / 1000
 		
 
 class HarmonicSynthesizer : Synthesizer
 	HarmonicConfig config
 	Dialog *dlg
 	
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		for int j, 0, NUM_HARMONICS
-			dlg.SetFloat("intensity_" + j, config.intensity[j] * 100)
-		dlg.SetFloat("release", config.release * 1000)
+			dlg.setFloat("intensity_" + j, config.intensity[j] * 100)
+		dlg.setFloat("release", config.release * 1000)
 
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new ConfigDialog(&config, MainWin)
-		UpdateDialog()
-		dlg.Run()
+		updateDialog()
+		dlg.run()
 		
-	overwrite void RenderNote(BufferBox buf, Range r, float pitch, float volume)
+	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
 		float freq = pitch_to_freq(pitch)
 		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
 		float sm_d = config.release * sample_rate

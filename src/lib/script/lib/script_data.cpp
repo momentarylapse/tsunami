@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.13.6.0";
+string DataVersion = "0.13.8.0";
 
 CompilerConfiguration config;
 
@@ -280,7 +280,7 @@ void _class_add_func_virtual(const string &tname, const string &name, Type *retu
 	cur_func->_class = cur_class;
 	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cmd), overwrite);
 	cur_class_func->virtual_index = index;
-	if (index > cur_class->vtable.num)
+	if (index >= cur_class->vtable.num)
 		cur_class->vtable.resize(index + 1);
 }
 

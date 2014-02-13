@@ -33,40 +33,40 @@ string get_note(float f)
 	//note = i2s(n)
 
 void DrawVolume(Painter *c)
-	c.SetColor(color(1, 0.8, 0.8, 0.8))
+	c.setColor(color(1, 0.8, 0.8, 0.8))
 	float y0 = 30
 	float y1 = c.height - 5
 	float h = y1 - y0
-	c.DrawRect(5, y0 + h * (1 - Volume), 5, h)
-	c.SetColor(color(1, 0.6, 0.6, 0.6))
-	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+	c.drawRect(5, y0 + h * (1 - Volume), 5, h)
+	c.setColor(color(1, 0.6, 0.6, 0.6))
+	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 void Draw()
-	Painter *c = win.BeginDraw("drawing")
-	c.SetColor(White)
-	c.SetFontSize(12)
+	Painter *c = win.beginDraw("drawing")
+	c.setColor(White)
+	c.setFontSize(12)
 	int w = c.width
 	int h = c.height
-	c.DrawRect(0, 0, w, h)
+	c.drawRect(0, 0, w, h)
 	
 	DrawVolume(c)
 	
-	c.SetColor(Black)
-	c.DrawStr(20, 20, Frequency.str2(1) + "Hz")
-	c.DrawStr(20, 40, Volume.str())
+	c.setColor(Black)
+	c.drawStr(20, 20, Frequency.str2(1) + "Hz")
+	c.drawStr(20, 40, Volume.str())
 	for int i, 0, played.num
 		if played[i] < 0
 			continue
 		float x = i
 		float y = h - h * (played[i] - 40.0) / 60.0
-		c.DrawLine(x, y, x + 2, y)
+		c.drawLine(x, y, x + 2, y)
 	
-	c.SetColor(Black)
+	c.setColor(Black)
 	if LoudEnough
-		c.DrawStr(120, 20, rel_pitch_name(played[played.num - 1] % 12))
+		c.drawStr(120, 20, rel_pitch_name(played[played.num - 1] % 12))
 	else
-		c.DrawStr(w / 2 - 30, h / 2 - 20, "zu leise")
-	c.End()
+		c.drawStr(w / 2 - 30, h / 2 - 20, "zu leise")
+	c.end()
 
 void OnClose()
 	delete win
@@ -122,17 +122,17 @@ void UpdateInput()
 		played.add(-1)
 	if played.num > 500
 		played.remove(0)
-	win.Redraw("drawing")
+	win.redraw("drawing")
 
 
 complex bufc[]
 
 void main()
 	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)
-	win.AddDrawingArea("", 0, 0, 0, 0, "drawing")
+	win.addDrawingArea("", 0, 0, 0, 0, "drawing")
 	
-	win.EventX("drawing", "hui:redraw", &Draw)
-	win.Event("hui:close", &OnClose)
+	win.eventX("drawing", "hui:redraw", &Draw)
+	win.event("hui:close", &OnClose)
 	
 
 
@@ -140,10 +140,10 @@ void main()
 	bufc.resize(1000)
 	fft_r2c(buf, bufc)
 	
-	input.Start(TRACK_TYPE_AUDIO, freq)
-	input.AddObserver(nil, &UpdateInput)
+	input.start(TRACK_TYPE_AUDIO, freq)
+	input.addObserver(nil, &UpdateInput)
 	
-	win.Run()
+	win.run()
 	
-	input.RemoveObserver(nil)
-	input.Stop()
+	input.removeObserver(nil)
+	input.stop()

@@ -15,14 +15,14 @@ class Volume : AudioEffect
 	VolumeDialog *dlg
 	Config config
 
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		dlg.fill()
 
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new VolumeDialog(self)
-		dlg.Run()
+		dlg.run()
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		float factor = config.Volume
 		if config.Maximize
 			float max = 0
@@ -40,35 +40,35 @@ class VolumeDialog : Dialog
 	Volume *v
 	void __init__(Volume *_v)
 		super.__init__("Lautstärke", 305, 105, MainWin, false)
-		AddGrid("", 0, 0, 1, 3, "table1")
-		SetTarget("table1", 0)
-		AddCheckBox("Maximieren", 0, 1, 0, 0, "max")
-		AddGrid("", 0, 0, 3, 1, "table2")
-		SetTarget("table2", 0)
-		AddSlider("!expandx", 0, 0, 0, 0, "volume_slider")
-		AddSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
-		AddText("%", 2, 0, 0, 0, "")
+		addGrid("", 0, 0, 1, 3, "table1")
+		setTarget("table1", 0)
+		addCheckBox("Maximieren", 0, 1, 0, 0, "max")
+		addGrid("", 0, 0, 3, 1, "table2")
+		setTarget("table2", 0)
+		addSlider("!expandx", 0, 0, 0, 0, "volume_slider")
+		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
+		addText("%", 2, 0, 0, 0, "")
 		PutCommandBar(self, "table1", 0, 2)
 		
 		v = _v
 		
-		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &OnVolume, v.config.Volume)
+		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, v.config.Volume)
 	
-		EventM("max", self, &OnMax)
+		eventM("max", self, &onMax)
 		
 		fill()
 
 	void fill()
 		SliderSet(self, "volume", v.config.Volume)
-		Check("max", v.config.Maximize)
-		Enable("volume", !v.config.Maximize)
-		Enable("volume_slider", !v.config.Maximize)
+		check("max", v.config.Maximize)
+		enable("volume", !v.config.Maximize)
+		enable("volume_slider", !v.config.Maximize)
 
-	void OnMax()
-		v.config.Maximize = IsChecked("max")
-		Enable("volume", !v.config.Maximize)
-		Enable("volume_slider", !v.config.Maximize)
+	void onMax()
+		v.config.Maximize = isChecked("max")
+		enable("volume", !v.config.Maximize)
+		enable("volume_slider", !v.config.Maximize)
 
-	void OnVolume()
+	void onVolume()
 		v.config.Volume = SliderGet(self, "volume")
 

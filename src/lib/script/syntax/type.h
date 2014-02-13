@@ -50,6 +50,8 @@ public:
 	bool UsesCallByReference();
 	bool UsesReturnByMemory();
 	bool is_simple_class();
+	bool needs_constructor();
+	bool needs_destructor();
 	bool IsDerivedFrom(Type *root) const;
 	bool DeriveFrom(Type *root, bool increase_size);
 	Type *GetPointer();

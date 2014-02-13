@@ -36,11 +36,11 @@ class AudioEffect
 	bool usable
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void ProcessTrack(BufferBox buf)
-	extern virtual void ResetConfig()
-	extern virtual void ResetState()
-	extern virtual void Configure()
-	extern virtual void UpdateDialog()
+	extern virtual void processTrack(BufferBox buf)
+	extern virtual void resetConfig()
+	extern virtual void resetState()
+	extern virtual void configure()
+	extern virtual void updateDialog()
 
 class BufferBox
 	int offset, num
@@ -57,19 +57,19 @@ class Synthesizer
 	int keep_notes
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void RenderNote(BufferBox buf, Range range, float pitch, float volume)
-	extern virtual void Configure()
-	extern virtual void UpdateDialog()
-	extern virtual void Reset()
-	extern virtual void ResetConfig()
+	extern virtual void renderNote(BufferBox buf, Range range, float pitch, float volume)
+	extern virtual void configure()
+	extern virtual void updateDialog()
+	extern virtual void reset()
+	extern virtual void resetConfig()
 	extern virtual int read(BufferBox buf)
 	extern void set(float pitch, float volume, int offset)
-	extern void RenderMetronomeClick(BufferBox buf, int pos, int level, float volume)
-	extern void reset()
+	extern void renderMetronomeClick(BufferBox buf, int pos, int level, float volume)
+	extern void _reset()
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()
-	extern overwrite void RenderNote(BufferBox buf, Range range, float pitch, float volume)
+	extern overwrite void renderNote(BufferBox buf, Range range, float pitch, float volume)
 
 class TrackRenderBuffer
 	int dummy
@@ -140,9 +140,9 @@ class Track
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
-	extern BufferBox GetBuffers(int level_no, Range r)
-	extern BufferBox ReadBuffers(Range r)
-	extern void InsertMidiData(int offset, MidiData midi)
+	extern BufferBox getBuffers(int level_no, Range r)
+	extern BufferBox readBuffers(Range r)
+	extern void insertMidiData(int offset, MidiData midi)
 
 class Tag
 	string key, value
@@ -165,50 +165,50 @@ class AudioFile
 	
 	string level_name[]
 	
-	extern Range GetRange()
-	extern int GetNextBeat(int pos)
+	extern Range getRange()
+	extern int getNextBeat(int pos)
 
 
 class AudioRenderer
-	extern void RenderAudioFile(AudioFile *a, Range r, BufferBox buf)
-	extern void Prepare(AudioFile *a, Range r, bool allow_loop)
+	extern void renderAudioFile(AudioFile *a, Range r, BufferBox buf)
+	extern void prepare(AudioFile *a, Range r, bool allow_loop)
 	//extern virtual int read(BufferBox b)
-	extern int TranslateOutputPos(int pos)
+	extern int translateOutputPos(int pos)
 
 
 class AudioOutput
-	extern void Stop()
-	extern void Play(AudioRenderer *r)
-	extern void PlayGenerated(void *func, int sample_rate)
-	extern bool IsPlaying()
-	extern int GetPos()
-	extern float GetSampleRate()
-	extern float GetVolume()
-	extern void SetVolume(float volume)
-	extern void SetBufferSize(int size)
+	extern void stop()
+	extern void play(AudioRenderer *r)
+	extern void playGenerated(void *func, int sample_rate)
+	extern bool isPlaying()
+	extern int getPos()
+	extern float getSampleRate()
+	extern float getVolume()
+	extern void setVolume(float volume)
+	extern void setBufferSize(int size)
 
 class AudioInput //: Observable
 	BufferBox cur_buf, buf
 	MidiData midi
-	extern void Start(int type, int sample_rate)
-	extern void Stop()
-	extern bool IsCapturing()
-	extern void ResetSync()
-	extern int GetDelay()
-	extern int GetSampleCount()
-	extern void Accumulate(bool enable)
-	extern void ResetAccumulation()
-	extern void AddObserver(void *handler, void *func)
-	extern void RemoveObserver(void *handler)
+	extern void start(int type, int sample_rate)
+	extern void stop()
+	extern bool isCapturing()
+	extern void resetSync()
+	extern int getDelay()
+	extern int getSampleCount()
+	extern void accumulate(bool enable)
+	extern void resetAccumulation()
+	extern void addObserver(void *handler, void *func)
+	extern void removeObserver(void *handler)
 
 class Storage
-	extern bool Load(AudioFile *a, string filename)
-	extern bool Save(AudioFile *a, string filename)
+	extern bool load(AudioFile *a, string filename)
+	extern bool save(AudioFile *a, string filename)
 
 class Log
-	extern void Error(string message)
-	extern void Warning(string message)
-	extern void Info(string message)
+	extern void error(string message)
+	extern void warning(string message)
+	extern void info(string message)
 
 class PluginContext
 	Track *track

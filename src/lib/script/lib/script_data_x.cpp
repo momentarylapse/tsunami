@@ -47,6 +47,8 @@ Type *TypePicture;
 Type *TypePicture3D;
 Type *TypeLayer;
 Type *TypeLayerP;
+Type *TypeFont;
+Type *TypeFontP;
 Type *TypeParticle;
 Type *TypeParticleRot;
 Type *TypeBeam;
@@ -109,6 +111,8 @@ extern Type *TypeShaderP;
 	#define	GetDAPicture3D(x)	long(&_picture3d->x)-long(_picture3d)
 	static Layer *_layer;
 	#define	GetDALayer(x)	long(&_layer->x)-long(_layer)
+	static Font *_font;
+	#define	GetDAFont(x)		long(&_font->x)-long(_font)
 	static Particle *_particle;
 	#define	GetDAParticle(x)	long(&_particle->x)-long(_particle)
 	static Effect *_effect;
@@ -154,6 +158,7 @@ extern Type *TypeShaderP;
 	typedef int Picture3d;
 	typedef int Text;
 	typedef int Layer;
+	typedef int Font;
 	typedef int Particle;
 	typedef int ParticleRot;
 	typedef int Effect;
@@ -167,6 +172,7 @@ extern Type *TypeShaderP;
 	#define	GetDAPicture(x)		0
 	#define	GetDAPicture3D(x)	0
 	#define	GetDALayer(x)		0
+	#define	GetDAFont(x)		0
 	#define	GetDAParticle(x)	0
 	#define	GetDABeam(x)		0
 	#define	GetDAEffect(x)		0
@@ -229,6 +235,8 @@ void SIAddPackageX()
 	TypeModelPListPs	= add_type_p("Model*[]&",	TypeModelPList, FLAG_SILENT);
 	TypeBone			= add_type  ("Bone",		sizeof(Bone));
 	TypeBoneList		= add_type_a("Bone[]",		TypeBone, -1);
+	TypeFont			= add_type  ("Font",		sizeof(Font));
+	TypeFontP			= add_type_p("Font*",		TypeFont);
 	TypeLayer			= add_type  ("Layer",		sizeof(Layer));
 	TypeLayerP			= add_type_p("Layer*",		TypeLayer);
 	TypeText			= add_type  ("Text",		sizeof(Text));
@@ -272,6 +280,25 @@ void SIAddPackageX()
 	
 
 	// bone, subskin, material...
+
+
+	add_class(TypeFont);
+		class_add_func("drawStr",			TypeFloat,	x_p(mf(&Font::drawStr)));
+			func_add_param("x",			TypeFloat);
+			func_add_param("y",			TypeFloat);
+			func_add_param("z",			TypeFloat);
+			func_add_param("size",		TypeFloat);
+			func_add_param("str",		TypeString);
+			func_add_param("centric",	TypeBool);
+		class_add_func("drawStrVert",		TypeFloat,	x_p(mf(&Font::drawStrVert)));
+			func_add_param("x",			TypeFloat);
+			func_add_param("y",			TypeFloat);
+			func_add_param("z",			TypeFloat);
+			func_add_param("size",		TypeFloat);
+			func_add_param("str",		TypeString);
+		class_add_func("getWidth",			TypeFloat,	x_p(mf(&Font::getWidth)));
+			func_add_param("size",		TypeFloat);
+			func_add_param("s",		TypeString);
 
 	add_class(TypeLayer);
 		class_add_element("enabled",		TypeBool,		GetDALayer(enabled));
@@ -353,7 +380,7 @@ void SIAddPackageX()
 	//	class_add_element("color",			TypeColor,		GetDAText(_color));
 		class_add_element("centric",		TypeBool,		GetDAText(centric));
 		class_add_element("vertical",		TypeBool,		GetDAText(vertical));
-		class_add_element("font",			TypeInt,		GetDAText(font));
+		class_add_element("font",			TypeFontP,		GetDAText(font));
 		class_add_element("size",			TypeFloat,		GetDAText(size));
 		class_add_element("text",			TypeString,		GetDAText(text));
 		class_add_func("__init__", TypeVoid, x_p(mf(&Text::__init_ext__)));
@@ -371,6 +398,7 @@ void SIAddPackageX()
 		class_add_func_virtual("onMouseEnter", TypeVoid, x_p(mf(&Text::OnMouseEnter)), true);
 		class_add_func_virtual("onMouseLeave", TypeVoid, x_p(mf(&Text::OnMouseLeave)), true);
 		class_add_func_virtual("isMouseOver", TypeBool, x_p(mf(&Text::IsMouseOver)), true);
+		class_add_func("getWidth", TypeFloat, x_p(mf(&Text::GetWidth)));
 		class_set_vtable_x(Text);
 	
 	add_class(TypeParticle);
@@ -788,7 +816,7 @@ void SIAddPackageX()
 		class_add_element("multisampling",		TypeInt,		GetDAEngine(Multisampling));
 		class_add_element("detail_factor",		TypeFloat,		GetDAEngine(DetailLevel));
 		//class_add_element("detail_factor_inv",		TypeFloat,		GetDAEngine(DetailFactorInv));
-		class_add_element("default_font",		TypeInt,		GetDAEngine(DefaultFont));
+		class_add_element("default_font",		TypeFontP,		GetDAEngine(DefaultFont));
 		class_add_element("mirror_level_max",		TypeInt,		GetDAEngine(MirrorLevelMax));
 	
 	add_class(TypeNetworkData);
@@ -817,27 +845,8 @@ void SIAddPackageX()
 		class_add_func("clear", TypeVoid, x_p(mf(&HostDataList::clear)));
 		class_add_func("__assign__", TypeVoid, x_p(mf(&HostDataList::__assign__)));
 			func_add_param("other", TypeHostDataList);
-	
-	add_func("XFDrawStr",			TypeFloat,	x_p(&XFDrawStr));
-		func_add_param("x",			TypeFloat);
-		func_add_param("y",			TypeFloat);
-		func_add_param("z",			TypeFloat);
-		func_add_param("size",		TypeFloat);
-		func_add_param("str",		TypeString);
-		func_add_param("font",		TypeInt);
-		func_add_param("centric",	TypeBool);
-	add_func("XFDrawVertStr",		TypeFloat,	x_p(&XFDrawVertStr));
-		func_add_param("x",			TypeFloat);
-		func_add_param("y",			TypeFloat);
-		func_add_param("z",			TypeFloat);
-		func_add_param("size",		TypeFloat);
-		func_add_param("str",		TypeString);
-		func_add_param("font",		TypeInt);
-	add_func("XFGetWidth",			TypeFloat,	x_p(&XFGetWidth));
-		func_add_param("size",		TypeFloat);
-		func_add_param("s",		TypeString);
-		func_add_param("font",		TypeInt);
-	add_func("LoadFont",			TypeInt,	x_p(&LoadFont));
+
+	add_func("LoadFont",			TypeFontP,	x_p(&LoadFont));
 		func_add_param("filename",		TypeString);
 	add_func("LoadModel",												TypeModelP,	x_p(&LoadModel));
 		func_add_param("filename",		TypeString);
@@ -849,9 +858,6 @@ void SIAddPackageX()
 	add_func("ExitProgram",									TypeVoid,	x_p(ExitProgram));
 	add_func("ScreenShot",									TypeVoid,	x_p(ScreenShot));
 	add_func("FindHosts",									TypeHostDataList,	x_p(FindHosts));
-	add_func("XDeleteLater",						TypeVoid,	x_p(&MetaDeleteLater));
-		func_add_param("p",		TypePointer);
-	add_func("XDeleteSelection",						TypeVoid,	x_p(&MetaDeleteSelection));
 	add_func("LoadWorld",									TypeVoid,	x_p(LoadWorldSoon));
 		func_add_param("filename",		TypeString);
 	add_func("LoadGameFromHost",					TypeVoid,	x_p(LoadGameFromHostSoon));
@@ -883,7 +889,7 @@ void SIAddPackageX()
 		func_add_param("p2",		TypeVector);
 		func_add_param("d",			TypeTraceData);
 		func_add_param("simple_test",	TypeBool);
-		func_add_param("o_ignore",		TypeInt);
+		func_add_param("o_ignore",		TypeModelP);
 	
 
 	// game variables
@@ -896,11 +902,6 @@ void SIAddPackageX()
 	add_ext_var("Cam",				TypeCameraP,		x_p(&Cam));
 	add_ext_var("CurrentLayer",		TypeLayerP,	x_p(&CurrentGrouping));
 
-	
-	// model skins
-	add_const("SkinHigh",   TypeInt, x_p(SkinHigh));
-	add_const("SkinMedium", TypeInt, x_p(SkinMedium));
-	add_const("SkinLow",    TypeInt, x_p(SkinLow));
 	// trace
 	add_const("TraceTypeNone",    TypeInt, x_p(TraceTypeNone));
 	add_const("TraceTypeTerrain", TypeInt, x_p(TraceTypeTerrain));

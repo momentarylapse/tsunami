@@ -3,7 +3,7 @@
 use "../../api.kaba"
 
 class Reverse : AudioEffect
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		int n = buf.num / 2
 		for int i, 0, n
 			int j = buf.num - i - 1

@@ -54,18 +54,18 @@ class Equalizer15 : AudioEffect
 		// transform back
 		fft_c2r_inv(f, b)
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		equalize(buf.r)
 		equalize(buf.l)
 		f.clear()
 
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		for int i, 0, NUM_BANDS
-			dlg.SetFloat("slider_" + i, config.Factor[i] / 2)
+			dlg.setFloat("slider_" + i, config.Factor[i] / 2)
 	
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new ConfigDialog(self)
-		dlg.Run()
+		dlg.run()
 
 class ConfigDialog : FixedDialog
 	Equalizer15 *eq
@@ -74,31 +74,31 @@ class ConfigDialog : FixedDialog
 	void __init__(Equalizer15 *_eq)
 		super.__init__("Equalizer",455,325,MainWin,false)
 		for int i, 0, NUM_BANDS
-			AddSlider("",5 + i*30,35,25,210,"slider_" + i)
-		AddText("20",5,250,25,25,"")
-		AddText("54",65,250,25,25,"")
-		AddText("140",125,250,25,25,"")
-		AddText("390",185,250,25,25,"")
-		AddText("1k",245,250,25,25,"")
-		AddText("2k8",305,250,25,25,"")
-		AddText("7k5",365,250,25,25,"")
-		AddText("20k",425,250,25,25,"")
+			addSlider("",5 + i*30,35,25,210,"slider_" + i)
+		addText("20",5,250,25,25,"")
+		addText("54",65,250,25,25,"")
+		addText("140",125,250,25,25,"")
+		addText("390",185,250,25,25,"")
+		addText("1k",245,250,25,25,"")
+		addText("2k8",305,250,25,25,"")
+		addText("7k5",365,250,25,25,"")
+		addText("20k",425,250,25,25,"")
 		PutCommandBarFixed(self, 5, 285, 455)
 		PutFavoriteBarFixed(self, 5, 5, 455)
 	
 		eq = _eq
-		EventM("*", self, &OnEvent)
+		eventM("*", self, &onEvent)
 	
 	
 		fill()
 
-	void OnEvent()
+	void onEvent()
 		Event *e = HuiGetEvent()
 		for int i, 0, NUM_BANDS
 			if e.id == ("slider_" + i)
-				eq.config.Factor[i] = GetFloat("") * 2
+				eq.config.Factor[i] = getFloat("") * 2
 		
 	void fill()
 		for int i, 0, NUM_BANDS
-			SetFloat("slider_" + i, eq.config.Factor[i] / 2)
+			setFloat("slider_" + i, eq.config.Factor[i] / 2)
 	

@@ -3,7 +3,7 @@ use "../api.kaba"
 Window *dlg
 
 void OnOk()
-	audio.sample_rate = dlg.GetInt("freq")
+	audio.sample_rate = dlg.getInt("freq")
 	delete dlg
 
 void OnClose()
@@ -11,14 +11,14 @@ void OnClose()
 
 void main()
 	dlg = new FixedDialog("Frequenz", 210, 65, MainWin, false)
-	dlg.AddEdit("", 5, 5, 200, 25, "freq")
-	dlg.AddButton("Abbrechen", 5, 35, 100, 25, "cancel")
-	dlg.AddDefButton("Ok", 110, 35, 95, 25, "ok")
+	dlg.addEdit("", 5, 5, 200, 25, "freq")
+	dlg.addButton("Abbrechen", 5, 35, 100, 25, "cancel")
+	dlg.addDefButton("Ok", 110, 35, 95, 25, "ok")
 	
-	dlg.Event("ok", &OnOk)
-	dlg.Event("cancel", &OnClose)
-	dlg.Event("hui:close", &OnClose)
+	dlg.event("ok", &OnOk)
+	dlg.event("cancel", &OnClose)
+	dlg.event("hui:close", &OnClose)
 	
-	dlg.SetInt("freq", audio.sample_rate)
+	dlg.setInt("freq", audio.sample_rate)
 	
-	dlg.Run()
+	dlg.run()

@@ -15,6 +15,7 @@ class CompressorConfig : PluginData
 		fi.add(curve[0].y, 0)
 		for int i, 1, curve.num
 			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
+		fi.normalize()
 
 	overwrite void reset()
 		curve.clear()
@@ -82,14 +83,14 @@ class Compressor : AudioEffect
 			// apply gain
 			b[i] *= pow(10, *gain / 20)
 
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		win.fill()
 
-	overwrite void Configure()
+	overwrite void configure()
 		win = new ConfigDialog(self)
-		win.Run()
+		win.run()
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		AudioFile *a = audio
 		
 		dgain_attack = 10 / (config.attack * a.sample_rate)
@@ -160,24 +161,24 @@ class ConfigDialog : Dialog
 	CompressorGrid grid
 	void __init__(Compressor *_fx)
 		super.__init__("Compressor", 500, 600, MainWin, false)
-		AddGrid("", 0, 0, 1, 4, "table1")
-		SetTarget("table1", 0)
-		AddDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing_area")
-		AddGrid("!noexpandy", 0, 2, 6, 1, "table2")
-		SetTarget("table2", 0)
-		AddText("Attack", 0, 0, 0, 0, "")
-		AddSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "attack")
-		AddText("ms", 2, 0, 0, 0, "")
-		AddText("Release", 3, 0, 0, 0, "")
-		AddSpinButton("\\0\\1000\\0.1", 4, 0, 0, 0, "release")
-		AddText("ms", 5, 0, 0, 0, "")
+		addGrid("", 0, 0, 1, 4, "table1")
+		setTarget("table1", 0)
+		addDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing_area")
+		addGrid("!noexpandy", 0, 2, 6, 1, "table2")
+		setTarget("table2", 0)
+		addText("Attack", 0, 0, 0, 0, "")
+		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "attack")
+		addText("ms", 2, 0, 0, 0, "")
+		addText("Release", 3, 0, 0, 0, "")
+		addSpinButton("\\0\\1000\\0.1", 4, 0, 0, 0, "release")
+		addText("ms", 5, 0, 0, 0, "")
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 3)
 		grid.config = &_fx.config
 		
-		EventM("attack", self, &OnEdit)
-		EventM("release", self, &OnEdit)
+		eventM("attack", self, &onEdit)
+		eventM("release", self, &onEdit)
 	
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_DB, 0, false, "dB")
@@ -187,10 +188,10 @@ class ConfigDialog : Dialog
 	
 	void fill()
 		grid.redraw()
-		SetFloat("attack", grid.config.attack * 1000)
-		SetFloat("release", grid.config.release * 1000)
+		setFloat("attack", grid.config.attack * 1000)
+		setFloat("release", grid.config.release * 1000)
 
-	void OnEdit()
-		grid.config.attack = GetFloat("attack") / 1000.0
-		grid.config.release = GetFloat("release") / 1000.0
+	void onEdit()
+		grid.config.attack = getFloat("attack") / 1000.0
+		grid.config.release = getFloat("release") / 1000.0
 		

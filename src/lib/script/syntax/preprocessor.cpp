@@ -75,7 +75,24 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 				}
 			}
 		}
-	}/*else if (c->Kind == KindReference){
+	}else if (c->kind == KindArrayBuilder){
+		bool all_consts = true;
+		for (int i=0; i<c->num_params; i++)
+			if (c->param[i]->kind != KindConstant)
+				all_consts = false;
+		if (all_consts){
+			int nc = AddConstant(c->type);
+			int el_size = c->type->parent->size;
+			DynamicArray *da = (DynamicArray*)Constants[nc].data;
+			da->init(el_size);
+			da->resize(c->num_params);
+			for (int i=0; i<c->num_params; i++)
+				memcpy((char*)da->data + el_size * i, Constants[c->param[i]->link_no].data, el_size);
+			c->kind = KindConstant;
+			c->link_no = nc;
+			c->num_params = 0;
+		}
+	}/*else if (c->kind == KindReference){
 		if (s){
 			if ((c->Param[0]->Kind == KindVarGlobal) || (c->Param[0]->Kind == KindVarLocal) || (c->Param[0]->Kind == KindVarExternal) || (c->Param[0]->Kind == KindConstant)){
 				// pre process ref var
@@ -95,7 +112,7 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 					c->LinkNr = (long)s->cnst[c->Param[0]->LinkNr];
 			}
 		}
-	}else if (c->Kind == KindDereference){
+	}else if (c->kind == KindDereference){
 		if (c->Param[0]->Kind == KindAddress){
 			// pre process deref address
 			c->Kind = KindMemory;

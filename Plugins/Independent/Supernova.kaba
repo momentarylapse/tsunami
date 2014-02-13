@@ -61,49 +61,49 @@ class SuperNovaWindow : Window
 	Painter *c
 	void __init__()
 		super.__init__("Supernova", -1, -1, 1024, 600)
-		AddGrid("", 0, 0, 1, 2, "table1")
-		SetTarget("table1", 0)
-		AddDrawingArea("", 0, 0, 0, 0, "drawing")
-		AddGrid("", 0, 1, 4, 1, "table2")
-		SetTarget("table2", 0)
-		AddText("Geschwindigkeit", 0, 0, 0, 0, "")
-		AddComboBox("Langsam\\Normal\\Schnell", 1, 0, 0, 0, "speed")
-		AddButton("Lektion abbrechen", 2, 0, 0, 0, "cancel")
-		AddButton("Schließen", 3, 0, 0, 0, "close")
+		addGrid("", 0, 0, 1, 2, "table1")
+		setTarget("table1", 0)
+		addDrawingArea("", 0, 0, 0, 0, "drawing")
+		addGrid("", 0, 1, 4, 1, "table2")
+		setTarget("table2", 0)
+		addText("Geschwindigkeit", 0, 0, 0, 0, "")
+		addComboBox("Langsam\\Normal\\Schnell", 1, 0, 0, 0, "speed")
+		addButton("Lektion abbrechen", 2, 0, 0, 0, "cancel")
+		addButton("Schließen", 3, 0, 0, 0, "close")
 		hover = -1
-		SetInt("speed", 1)
-		Enable("cancel", false)
+		setInt("speed", 1)
+		enable("cancel", false)
 		
-		EventM("close", self, &OnClose)
-		EventM("cancel", self, &OnCancel)
-		SetFullscreen(true)
+		eventM("close", self, &onClose)
+		eventM("cancel", self, &onCancel)
+		setFullscreen(true)
 	
-	void OnClose()
+	void onClose()
 		delete self
 	
-	void OnCancel()
+	void onCancel()
 		StopLesson()
-		Redraw("drawing")
+		redraw("drawing")
 
-	void DrawVolume()
-		c.SetColor(color(1, 0.8, 0.8, 0.8))
+	void drawVolume()
+		c.setColor(color(1, 0.8, 0.8, 0.8))
 		float y0 = 30
 		float y1 = c.height - 5
 		float h = y1 - y0
-		c.DrawRect(5, y0 + h * (1 - Volume), 5, h)
-		c.SetColor(color(1, 0.6, 0.6, 0.6))
-		c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+		c.drawRect(5, y0 + h * (1 - Volume), 5, h)
+		c.setColor(color(1, 0.6, 0.6, 0.6))
+		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 	
 	float sample2x(float s)
 		return (s - Offset) / 700.0 + 500
 	
-	void DrawSheet(float y0)
-		c.SetColor(color(1, 0.6, 0.6, 0.6))
+	void drawSheet(float y0)
+		c.setColor(color(1, 0.6, 0.6, 0.6))
 		for int i, 0, 6
 			float ly = h - (i + 1) * 30
-			c.DrawLine(0, ly, w, ly)
-		c.SetColor(Black)
-		c.SetFontSize(18)
+			c.drawLine(0, ly, w, ly)
+		c.setColor(Black)
+		c.setFontSize(18)
 		for n in MidiTrack.midi.note
 			int s, f
 			for int i, 0, 6
@@ -111,73 +111,73 @@ class SuperNovaWindow : Window
 					s = i
 					f = n.pitch - StringPitch[i]
 			float ly = h - (s + 1) * 30
-			c.SetColor(ColorSetHSB(0.3, (n.pitch % 12) / 12.0, 1, 1))
-			c.DrawRect(sample2x(n.range.offset), ly - 12, n.range.length / 700.0, 24)
-			c.SetColor(Black)
-			c.DrawStr(sample2x(n.range.offset), ly-12, f)
+			c.setColor(ColorSetHSB(0.3, (n.pitch % 12) / 12.0, 1, 1))
+			c.drawRect(sample2x(n.range.offset), ly - 12, n.range.length / 700.0, 24)
+			c.setColor(Black)
+			c.drawStr(sample2x(n.range.offset), ly-12, f)
 			
-	void DrawScore()
-		c.SetColor(Black)
-		c.SetFontSize(24)
-		c.DrawStr(w - 220, 50, Score.str2(0) + " Punkte")
+	void drawScore()
+		c.setColor(Black)
+		c.setFontSize(24)
+		c.drawStr(w - 220, 50, Score.str2(0) + " Punkte")
 		
-	void DrawLesson()
+	void drawLesson()
 	
-		DrawVolume()
+		drawVolume()
 	
 		if MidiTrack
-			DrawSheet(0)
+			drawSheet(0)
 	
-		c.SetColor(Gray)
-		c.DrawStr(20, 20, Frequency.str2(1) + "Hz")
-		c.DrawStr(20, 40, Volume.str())
+		c.setColor(Gray)
+		c.drawStr(20, 20, Frequency.str2(1) + "Hz")
+		c.drawStr(20, 40, Volume.str())
 		for p in played
 			if p.correct
-				c.SetColor(Blue)
+				c.setColor(Blue)
 			else
-				c.SetColor(Red)
+				c.setColor(Red)
 			float x = sample2x(p.offset)
 			float y = h - h * (p.note - 40.0) / 60.0
-			c.DrawLine(x, y, x + 2, y)
+			c.drawLine(x, y, x + 2, y)
 		
-		c.SetColor(color(1, 1, 0.5, 0.5))
-		c.DrawLine(500, 0, 500, h)
+		c.setColor(color(1, 1, 0.5, 0.5))
+		c.drawLine(500, 0, 500, h)
 		
-		DrawScore()
+		drawScore()
 	
-		c.SetColor(Black)
+		c.setColor(Black)
 		if LoudEnough
-			c.DrawStr(120, 20, rel_pitch_name(played[played.num - 1].note % 12))
+			c.drawStr(120, 20, rel_pitch_name(played[played.num - 1].note % 12))
 		else
-			c.DrawStr(w / 2 - 30, h / 2 - 20, "zu leise")
+			c.drawStr(w / 2 - 30, h / 2 - 20, "zu leise")
 	
-	void DrawConfig()
-		c.SetFontSize(20)
+	void drawConfig()
+		c.setFontSize(20)
 		for int i, 0, LessonName.num
 			if i == hover
-				c.SetColor(color(1, 0.8, 0.8, 1))
-				c.DrawRect(100, 35 + i * 40, 300, 35)
-			c.SetColor(Black)
-			c.DrawStr(100, 38 + i * 40, LessonName[i])
-		c.SetColor(Black)
-		c.SetFontSize(24)
-		c.DrawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
+				c.setColor(color(1, 0.8, 0.8, 1))
+				c.drawRect(100, 35 + i * 40, 300, 35)
+			c.setColor(Black)
+			c.drawStr(100, 38 + i * 40, LessonName[i])
+		c.setColor(Black)
+		c.setFontSize(24)
+		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
 
-	overwrite void OnDraw()
-		c = BeginDraw("drawing")
-		c.SetColor(White)
-		c.SetFontSize(12)
+	overwrite void onDraw()
+		c = beginDraw("drawing")
+		c.setColor(White)
+		c.setFontSize(12)
 		w = c.width
 		h = c.height
-		c.DrawRect(0, 0, w, h)
+		c.drawRect(0, 0, w, h)
 		
 		if Mode == ModeConfig
-			DrawConfig()
+			drawConfig()
 		else if Mode == ModeLesson
-			DrawLesson()
-		c.End()
+			drawLesson()
+		c.end()
 		
-	overwrite void OnMouseMove()
+	overwrite void onMouseMove()
 		if Mode != ModeConfig
 			return
 		hover = -1
@@ -186,8 +186,8 @@ class SuperNovaWindow : Window
 		for int i, 0, LessonName.num
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
-		Redraw("drawing")
-	overwrite void OnLeftButtonDown()
+		redraw("drawing")
+	overwrite void onLeftButtonDown()
 		if Mode != ModeConfig
 			return
 		if hover >= 0
@@ -257,14 +257,14 @@ void UpdateInput()
 	if Offset > LessonLength
 		StopLesson()
 
-	win.Redraw("drawing")
+	win.redraw("drawing")
 
 void StartLesson(string name)
 	Offset = 0
 	Score = 0
 	played.clear()
 
-	storage.Load(audio, AppDirectoryStatic + "Lessons/" + name + ".nami")
+	storage.load(audio, AppDirectoryStatic + "Lessons/" + name + ".nami")
 	for t in audio.track
 		if t.type == TRACK_TYPE_MIDI
 			MidiTrack = t
@@ -279,7 +279,7 @@ void StartLesson(string name)
 		if t.key == "score"
 			ScoreFactor = t.value.float() / num_samples * 1.2
 	
-	int speed = win.GetInt("speed")
+	int speed = win.getInt("speed")
 	if speed == 0
 		audio.sample_rate = audio.sample_rate * 0.7
 		ScoreFactor *= 0.6
@@ -293,24 +293,24 @@ void StartLesson(string name)
 	bufc.resize(1000)
 	fft_r2c(buf, bufc)
 	
-	input.Start(TRACK_TYPE_AUDIO, audio.sample_rate)
-	input.AddObserver(nil, &UpdateInput)
+	input.start(TRACK_TYPE_AUDIO, audio.sample_rate)
+	input.addObserver(nil, &UpdateInput)
 	
-	renderer.Prepare(audio, audio.GetRange(), false)
-	output.Play(renderer)
-	win.Enable("speed", false)
-	win.Enable("cancel", true)
+	renderer.prepare(audio, audio.getRange(), false)
+	output.play(renderer)
+	win.enable("speed", false)
+	win.enable("cancel", true)
 	Mode = ModeLesson
 
 void StopLesson()	
-	output.Stop()
-	input.RemoveObserver(nil)
-	input.Stop()
+	output.stop()
+	input.removeObserver(nil)
+	input.stop()
 	TotalScore += Score
 	HuiConfigWriteFloat("Supernova.Score", TotalScore)
 	Mode = ModeConfig
-	win.Enable("speed", true)
-	win.Enable("cancel", false)
+	win.enable("speed", true)
+	win.enable("cancel", false)
 
 complex bufc[]
 
@@ -337,9 +337,9 @@ void main()
 		
 	TotalScore = HuiConfigReadFloat("Supernova.Score", 0)
 	
-	MainWin.Hide()
-	win.Run()
-	MainWin.Show()
+	MainWin.hide()
+	win.run()
+	MainWin.show()
 	
 	if Mode == ModeLesson
 		StopLesson()

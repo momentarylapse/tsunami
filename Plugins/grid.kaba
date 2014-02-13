@@ -192,27 +192,27 @@ class GridData
 	
 	void drawAxisY(Painter *c, GridPartition part)
 		for t in part.tick
-			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
+			c.setColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float yy = y_axis.project(t.value)
 			if yy < y_axis.rect.y1 or yy > y_axis.rect.y2
 				continue
-			c.DrawLine(x, yy, x + w, yy)
+			c.drawLine(x, yy, x + w, yy)
 			if t.label.num > 0
-				c.SetColor(col_text)
-				c.DrawLine(x, yy, x + 6, yy)
-				c.DrawStr(x0 + 2, yy - 6, t.label)
+				c.setColor(col_text)
+				c.drawLine(x, yy, x + 6, yy)
+				c.drawStr(x0 + 2, yy - 6, t.label)
 	
 	void drawAxisX(Painter *c, GridPartition part)
 		for t in part.tick
-			c.SetColor(ColorInterpolate(col_bg, col_grid, t.weight))
+			c.setColor(ColorInterpolate(col_bg, col_grid, t.weight))
 			float xx = x_axis.project(t.value)
 			if xx < x_axis.rect.x1 or xx > x_axis.rect.x2
 				continue
-			c.DrawLine(xx, y, xx, y + h)
+			c.drawLine(xx, y, xx, y + h)
 			if t.label.num > 0
-				c.SetColor(col_text)
-				c.DrawLine(xx, y + h - 6, xx, y + h)
-				c.DrawStr(xx - 8, y + h + 5, t.label)
+				c.setColor(col_text)
+				c.drawLine(xx, y + h - 6, xx, y + h)
+				c.drawStr(xx - 8, y + h + 5, t.label)
 	
 	rect getPlotRegion(float _x0, float _y0, float _w, float _h)
 		return rect(_x0 + 40, _x0 + _w - 3, _y0 + 3, _y0 + _h -20)
@@ -238,11 +238,11 @@ class GridData
 		
 		// background
 		if allow_bg
-			c.SetColor(col_bg)
-			c.DrawRect(x, y, w, h)
+			c.setColor(col_bg)
+			c.drawRect(x, y, w, h)
 	
-		c.SetLineWidth(0.9)
-		c.SetFontSize(7)
+		c.setLineWidth(0.9)
+		c.setFontSize(7)
 		GridPartition part = x_axis.get_partition()
 		drawAxisX(c, part)
 		part = y_axis.get_partition()
@@ -259,12 +259,12 @@ class GridData
 		if fill_below
 			pp.add(complex(x + w, y + h))
 			pp.add(complex(x, y + h))
-			c.SetColor(color(0.3, 0.3, 0.3, 1))
-			c.DrawPolygon(pp)
+			c.setColor(color(0.3, 0.3, 0.3, 1))
+			c.drawPolygon(pp)
 			pp.resize(pp.num - 2)
-		c.SetLineWidth(2)
-		c.SetColor(Black)
-		c.DrawLines(pp)
+		c.setLineWidth(2)
+		c.setColor(Black)
+		c.drawLines(pp)
 	
 	void drawCurveB(Painter *c, complex _p[], bool fill_below, color col)
 		complex pp[]
@@ -275,35 +275,35 @@ class GridData
 			pp.add(complex(x, y + h))
 			color col2 = col
 			col2.a = 0.3
-			c.SetColor(col2)
-			c.DrawPolygon(pp)
+			c.setColor(col2)
+			c.drawPolygon(pp)
 			pp.resize(pp.num - 2)
-		c.SetLineWidth(0.9)
-		c.SetColor(col)
-		c.DrawLines(pp)
+		c.setLineWidth(0.9)
+		c.setColor(col)
+		c.drawLines(pp)
 	
 	void drawPoint2(Painter *c, complex p, bool selected, bool hover)
 		complex pp = project2(p)
-		c.SetColor(Black)
+		c.setColor(Black)
 		float radius = 3
 		if hover
-			c.SetColor(Red)
+			c.setColor(Red)
 			radius = 4
 		else if selected
-			c.SetColor(color(1, 0.7, 0, 0))
-		c.DrawCircle(pp.x, pp.y, radius)
+			c.setColor(color(1, 0.7, 0, 0))
+		c.drawCircle(pp.x, pp.y, radius)
 	
 	void drawPoint3(Painter *c, vector p, bool selected, bool hover)
 		vector pp = project3(p)
-		c.SetColor(Black)
+		c.setColor(Black)
 		float radius = 3
 		if hover
-			c.SetColor(Red)
-			c.DrawStr(pp.x, pp.y - 20, pp.z.str2(1))
+			c.setColor(Red)
+			c.drawStr(pp.x, pp.y - 20, pp.z.str2(1))
 			radius = 4
 		else if selected
-			c.SetColor(color(1, 0.7, 0, 0))
-		c.DrawCircle(pp.x, pp.y, radius)
+			c.setColor(color(1, 0.7, 0, 0))
+		c.drawCircle(pp.x, pp.y, radius)
 	
 	complex getMouse2()
 		float mx = HuiGetEvent().mouse_x
@@ -334,18 +334,18 @@ class Grid : GridData
 	float mx, my
 	
 	void onDrawAll()
-		Painter *c = win.BeginDraw(id)
+		Painter *c = win.beginDraw(id)
 		float w = c.width
 		float h = c.height
 	
 		drawBackground(c, 0, 0, w, h)
-		c.Clip(plot_rect)
+		c.clip(plot_rect)
 		onDraw(c)
 		
-		c.End()
+		c.end()
 	
 	void redraw()
-		win.Redraw(id)
+		win.redraw(id)
 	
 	void onLeftButtonDownAll()
 		mx = HuiGetEvent().mouse_x
@@ -401,14 +401,14 @@ class Grid : GridData
 	void init(Window *_win, string _id)
 		win = _win
 		id = _id
-		win.EventMX(id, "hui:draw", self, &onDrawAll)
-		win.EventMX(id, "hui:left-button-down", self, &onLeftButtonDownAll)
-		win.EventMX(id, "hui:left-button-up", self, &onLeftButtonUpAll)
-		win.EventMX(id, "hui:right-button-down", self, &onRightButtonDownAll)
-		win.EventMX(id, "hui:right-button-up", self, &onRightButtonUpAll)
-		win.EventMX(id, "hui:mouse-move", self, &onMouseMoveAll)
-		win.EventMX(id, "hui:mouse-wheel", self, &onMouseWheelAll)
-		win.EventMX(id, "hui:key-down", self, &onKeyDownAll)
+		win.eventMX(id, "hui:draw", self, &onDrawAll)
+		win.eventMX(id, "hui:left-button-down", self, &onLeftButtonDownAll)
+		win.eventMX(id, "hui:left-button-up", self, &onLeftButtonUpAll)
+		win.eventMX(id, "hui:right-button-down", self, &onRightButtonDownAll)
+		win.eventMX(id, "hui:right-button-up", self, &onRightButtonUpAll)
+		win.eventMX(id, "hui:mouse-move", self, &onMouseMoveAll)
+		win.eventMX(id, "hui:mouse-wheel", self, &onMouseWheelAll)
+		win.eventMX(id, "hui:key-down", self, &onKeyDownAll)
 	
 	virtual void onDraw(Painter *c)
 	virtual void onLeftButtonDown()

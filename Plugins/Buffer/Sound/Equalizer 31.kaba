@@ -53,18 +53,18 @@ class Equalizer31 : AudioEffect
 		// transform back
 		fft_c2r_inv(f, b)
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		equalize(buf.r)
 		equalize(buf.l)
 		f.clear()
 
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		for int i, 0, NUM_BANDS
-			dlg.SetFloat("slider_" + i, config.Factor[i] / 2)
+			dlg.setFloat("slider_" + i, config.Factor[i] / 2)
 	
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new ConfigDialog(self)
-		dlg.Run()
+		dlg.run()
 
 const int dx = 30
 
@@ -76,34 +76,34 @@ class ConfigDialog : FixedDialog
 		super.__init__("Equalizer",10 + dx * NUM_BANDS,325,MainWin,false)
 		
 		for int i, 0, NUM_BANDS
-			AddSlider("",5 + i*dx,35,25,210,"slider_" + i)
-		AddText("20",5,250,25,25,"")
-		AddText("40",5+3*dx,250,25,25,"")
-		AddText("80",5+6*dx,250,25,25,"")
-		AddText("160",5+9*dx,250,25,25,"")
-		AddText("320",5+12*dx,250,25,25,"")
-		AddText("640",5+15*dx,250,25,25,"")
-		AddText("1280",5+18*dx,250,25,25,"")
-		AddText("2k5",5+21*dx,250,25,25,"")
-		AddText("5k",5+24*dx,250,25,25,"")
-		AddText("10k",5+27*dx,250,25,25,"")
-		AddText("20k",5+30*dx,250,25,25,"")
+			addSlider("",5 + i*dx,35,25,210,"slider_" + i)
+		addText("20",5,250,25,25,"")
+		addText("40",5+3*dx,250,25,25,"")
+		addText("80",5+6*dx,250,25,25,"")
+		addText("160",5+9*dx,250,25,25,"")
+		addText("320",5+12*dx,250,25,25,"")
+		addText("640",5+15*dx,250,25,25,"")
+		addText("1280",5+18*dx,250,25,25,"")
+		addText("2k5",5+21*dx,250,25,25,"")
+		addText("5k",5+24*dx,250,25,25,"")
+		addText("10k",5+27*dx,250,25,25,"")
+		addText("20k",5+30*dx,250,25,25,"")
 		PutCommandBarFixed(self, 5, 285, dx * NUM_BANDS)
 		PutFavoriteBarFixed(self, 5, 5, dx * NUM_BANDS)
 	
 		eq = _eq
-		EventM("*", self, &OnEvent)
+		eventM("*", self, &onEvent)
 	
 	
 		fill()
 
-	void OnEvent()
+	void onEvent()
 		Event *e = HuiGetEvent()
 		for int i, 0, NUM_BANDS
 			if e.id == ("slider_" + i)
-				eq.config.Factor[i] = GetFloat("") * 2
+				eq.config.Factor[i] = getFloat("") * 2
 		
 	void fill()
 		for int i, 0, NUM_BANDS
-			SetFloat("slider_" + i, eq.config.Factor[i] / 2)
+			setFloat("slider_" + i, eq.config.Factor[i] / 2)
 	

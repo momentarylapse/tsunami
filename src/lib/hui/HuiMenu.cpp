@@ -12,6 +12,15 @@
 #include "Controls/HuiMenuItemSubmenu.h"
 #include "Controls/HuiMenuItemSeparator.h"
 
+void HuiMenu::__init__()
+{
+	new(this) HuiMenu;
+}
+
+void HuiMenu::__delete__()
+{
+	this->~HuiMenu();
+}
 
 void HuiMenu::Clear()
 {
@@ -119,9 +128,4 @@ Array<HuiControl*> HuiMenu::get_all_controls()
 			list.append(s->sub_menu->get_all_controls());
 	}
 	return list;
-}
-
-HuiMenu *HuiCreateMenu()
-{
-	return new HuiMenu();
 }

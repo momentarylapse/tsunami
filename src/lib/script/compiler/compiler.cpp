@@ -379,7 +379,7 @@ void Script::Compiler()
 		bool found = false;
 		foreachi(Function *f, syntax->Functions, i)
 			if (f->name == name){
-				*(int*)&Opcode[l.Pos] = (char*)func[i] - (char*)&Opcode[l.Pos + 4];
+				*(int*)&Opcode[l.Pos] = (long)func[i] - (syntax->AsmMetaInfo->CodeOrigin + l.Pos + 4);
 				found = true;
 				break;
 			}

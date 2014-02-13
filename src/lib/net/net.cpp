@@ -186,7 +186,7 @@ Socket *Socket::accept()
 	struct sockaddr_in remote_addr;
 	int size = sizeof(remote_addr);
 #ifdef OS_WINDOWS
-	con.s = ::accept(s, (struct sockaddr *)&remote_addr, &size);
+	con->s = ::accept(s, (struct sockaddr *)&remote_addr, &size);
 #endif
 #ifdef OS_LINUX
 	socklen_t len = (socklen_t)size;

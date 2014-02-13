@@ -589,8 +589,10 @@ void SyntaxTree::AutoImplementFunctions(Type *t)
 	}else if (t->is_array){
 		AutoImplementAssign(class_get_func(t, "__assign__", TypeVoid, 1), t);
 	}else if (!t->is_simple_class()){//needs_init){
-		AutoImplementDefaultConstructor(class_get_func(t, "__init__", TypeVoid, 0), t, true);
-		AutoImplementDestructor(class_get_func(t, "__delete__", TypeVoid, 0), t);
+		if (t->needs_constructor())
+			AutoImplementDefaultConstructor(class_get_func(t, "__init__", TypeVoid, 0), t, true);
+		if (t->needs_destructor())
+			AutoImplementDestructor(class_get_func(t, "__delete__", TypeVoid, 0), t);
 		AutoImplementAssign(class_get_func(t, "__assign__", TypeVoid, 1), t);
 		ClassFunction *cf = t->GetComplexConstructor();
 		if (cf)

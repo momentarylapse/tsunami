@@ -26,27 +26,27 @@ int fill(BufferBox buf)
 	return buf.num
 
 void OnFrequency()
-	freq = dlg.GetFloat("")
+	freq = dlg.getFloat("")
 
 void OnFactor2()
-	factor2 = dlg.GetFloat("")
+	factor2 = dlg.getFloat("")
 
 void OnVolume2()
-	volume2 = dlg.GetFloat("") * 200
+	volume2 = dlg.getFloat("") * 200
 
 void OnClose()
-	output.Stop()
+	output.stop()
 	delete dlg
 
 void main()
 	dlg = new Dialog("FM Synth", 200, 80, MainWin, false)
-	dlg.AddGrid("", 0, 0, 1, 4, "table")
-	dlg.SetTarget("table", 0)
-	dlg.AddSpinButton("", 0, 0, 0, 0, "frequency")
-	dlg.AddSpinButton("0\\0\\100\\0.01", 0, 1, 0, 0, "factor2")
-	dlg.AddSlider("", 0, 2, 0, 0, "volume2")
-	dlg.AddButton("Close", 0, 3, 0, 0, "close")
-	dlg.SetImage("close", "hui:close")
+	dlg.addGrid("", 0, 0, 1, 4, "table")
+	dlg.setTarget("table", 0)
+	dlg.addSpinButton("", 0, 0, 0, 0, "frequency")
+	dlg.addSpinButton("0\\0\\100\\0.01", 0, 1, 0, 0, "factor2")
+	dlg.addSlider("", 0, 2, 0, 0, "volume2")
+	dlg.addButton("Close", 0, 3, 0, 0, "close")
+	dlg.setImage("close", "hui:close")
 	
 	volume = 0.8
 	freq = 880.0
@@ -54,15 +54,15 @@ void main()
 	volume2 = 0
 	factor2 = 0
 	phi2 = 0
-	dlg.SetFloat("frequency", freq)
+	dlg.setFloat("frequency", freq)
 	
-	dlg.Event("hui:close", &OnClose)
-	dlg.Event("close", &OnClose)
-	dlg.Event("frequency", &OnFrequency)
-	dlg.Event("factor2", &OnFactor2)
-	dlg.Event("volume2", &OnVolume2)
+	dlg.event("hui:close", &OnClose)
+	dlg.event("close", &OnClose)
+	dlg.event("frequency", &OnFrequency)
+	dlg.event("factor2", &OnFactor2)
+	dlg.event("volume2", &OnVolume2)
 	
-	output.PlayGenerated(&fill, SAMPLE_RATE)
-	output.SetBufferSize(4096)//8192)
+	output.playGenerated(&fill, SAMPLE_RATE)
+	output.setBufferSize(4096)//8192)
 	
-	dlg.Run()
+	dlg.run()

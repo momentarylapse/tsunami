@@ -20,7 +20,7 @@ public:
 	};
 	Interpolator(Type type);
 	void _cdecl __init__();
-	void _cdecl set_type(const string &_type);
+	void _cdecl setType(const string &type);
 
 	// data input
 	void _cdecl clear();
@@ -30,10 +30,13 @@ public:
 	void _cdecl jump(const T &p, const T &v);
 	void _cdecl close(float dt = 1.0f);
 
+	void normalize();
+	float getDuration();
+
 	// interpolated output
 	T _cdecl get(float t);
-	T _cdecl get_tang(float t);
-	Array<T> _cdecl get_list(Array<float> &t);
+	T _cdecl getTang(float t);
+	Array<T> _cdecl getList(Array<float> &t);
 
 	struct Part
 	{

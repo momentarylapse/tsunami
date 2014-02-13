@@ -335,7 +335,7 @@ void amd64_quat_get_angles(vector &r, quaternion &q)
 void amd64_vec_inter_get(vector &r, Interpolator<vector> &inter, float t)
 {	r = inter.get(t);	}
 void amd64_vec_inter_get_tang(vector &r, Interpolator<vector> &inter, float t)
-{	r = inter.get_tang(t);	}
+{	r = inter.getTang(t);	}
 void amd64_mat_vec_mul(vector &r, matrix &m, vector &v)
 {	r = m * v;	}
 void amd64_vec_ang_add(vector &r, vector &a, vector &b)
@@ -764,7 +764,7 @@ void SIAddPackageMath()
 		class_add_element("type",	TypeInt, 0);
 		class_add_func("__init__",	TypeVoid, mf(&Interpolator<float>::__init__));
 		class_add_func("clear",	TypeVoid, mf(&Interpolator<float>::clear));
-		class_add_func("setType",	TypeVoid, mf(&Interpolator<float>::set_type));
+		class_add_func("setType",	TypeVoid, mf(&Interpolator<float>::setType));
 			func_add_param("type",	TypeString);
 		class_add_func("add",	TypeVoid, mf(&Interpolator<float>::add));
 			func_add_param("p",	TypeFloatPs);
@@ -781,11 +781,12 @@ void SIAddPackageMath()
 		class_add_func("jump",	TypeVoid, mf(&Interpolator<float>::jump));
 			func_add_param("p",	TypeFloatPs);
 			func_add_param("v",	TypeFloatPs);
+		class_add_func("normalize",	TypeVoid, mf(&Interpolator<float>::normalize));
 		class_add_func("get",	TypeFloat, mf(&Interpolator<float>::get));
 			func_add_param("t",	TypeFloat);
-		class_add_func("getTang",	TypeFloat, mf(&Interpolator<float>::get_tang));
+		class_add_func("getTang",	TypeFloat, mf(&Interpolator<float>::getTang));
 			func_add_param("t",	TypeFloat);
-		class_add_func("getList",	TypeFloatList, mf(&Interpolator<float>::get_list));
+		class_add_func("getList",	TypeFloatList, mf(&Interpolator<float>::getList));
 			func_add_param("t",	TypeFloatList);
 
 	
@@ -793,7 +794,7 @@ void SIAddPackageMath()
 		class_add_element("type",	TypeInt, 0);
 		class_add_func("__init__",	TypeVoid, mf(&Interpolator<vector>::__init__));
 		class_add_func("clear",	TypeVoid, mf(&Interpolator<vector>::clear));
-		class_add_func("setType",	TypeVoid, mf(&Interpolator<vector>::set_type));
+		class_add_func("setType",	TypeVoid, mf(&Interpolator<vector>::setType));
 			func_add_param("type",	TypeString);
 		class_add_func("add",	TypeVoid, mf(&Interpolator<vector>::add));
 			func_add_param("p",	TypeVector);
@@ -810,11 +811,12 @@ void SIAddPackageMath()
 		class_add_func("jump",	TypeVoid, mf(&Interpolator<vector>::jump));
 			func_add_param("p",	TypeVector);
 			func_add_param("v",	TypeVector);
+		class_add_func("normalize",	TypeVoid, mf(&Interpolator<vector>::normalize));
 		class_add_func("get",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::get), &amd64_vec_inter_get));
 			func_add_param("t",	TypeFloat);
-		class_add_func("getTang",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::get_tang), &amd64_vec_inter_get_tang));
+		class_add_func("getTang",	TypeVector, amd64_wrap(mf(&Interpolator<vector>::getTang), &amd64_vec_inter_get_tang));
 			func_add_param("t",	TypeFloat);
-		class_add_func("getList",	TypeVectorList, mf(&Interpolator<vector>::get_list));
+		class_add_func("getList",	TypeVectorList, mf(&Interpolator<vector>::getList));
 			func_add_param("t",	TypeFloatList);
 
 	// mathematical

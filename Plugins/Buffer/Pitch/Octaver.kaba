@@ -12,39 +12,39 @@ class Octaver : AudioEffect
 	ConfigDialog *dlg
 	Config config
 
-	overwrite void UpdateDialog()
+	overwrite void updateDialog()
 		dlg.fill()
 
-	void DoOctaver(float b[])
+	void doOctaver(float b[])
 		for int i, 0, b.num
 			b[i] = (b[i] * b[i]) * config.Level + b[i] * (1 - config.Level)
 
-	overwrite void ProcessTrack(BufferBox buf)
-		DoOctaver(buf.r)
-		DoOctaver(buf.l)
+	overwrite void processTrack(BufferBox buf)
+		doOctaver(buf.r)
+		doOctaver(buf.l)
 
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new ConfigDialog(self)
-		dlg.Run()
+		dlg.run()
 	
 class ConfigDialog : Dialog
 	Octaver *o
 	void __init__(Octaver *_o)
 		super.__init__("Octaver", 305, 60, MainWin, false)
-		AddGrid("", 0, 0, 1, 2, "table1")
-		SetTarget("table1", 0)
-		AddGrid("", 0, 0, 3, 1, "table2")
-		SetTarget("table2", 0)
-		AddSlider("!expandx", 0, 0, 0, 0, "level_slider")
-		AddSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "level")
-		AddText("%", 2, 0, 0, 0, "")
+		addGrid("", 0, 0, 1, 2, "table1")
+		setTarget("table1", 0)
+		addGrid("", 0, 0, 3, 1, "table2")
+		setTarget("table2", 0)
+		addSlider("!expandx", 0, 0, 0, 0, "level_slider")
+		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "level")
+		addText("%", 2, 0, 0, 0, "")
 		PutCommandBar(self, "table1", 0, 1)
 		o = _o
-		CreateSliderM(self, "level_slider", "level", 0, 1, 100, &OnLevel, o.config.Level)
+		CreateSliderM(self, "level_slider", "level", 0, 1, 100, &onLevel, o.config.Level)
 	
 		fill()
 	void fill()
 		SliderSet(self, "level", o.config.Level)
 
-	void OnLevel()
+	void onLevel()
 		o.config.Level = SliderGet(self, "level")

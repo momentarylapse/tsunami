@@ -48,8 +48,8 @@ class HuiEvent
 	HuiWindow *win;
 	string message, id;
 	bool is_default;
-	int mx, my;
-	int dx, dy, dz;
+	float mx, my;
+	float dx, dy, dz;
 	int key, key_code;
 	string text;
 	int width, height;

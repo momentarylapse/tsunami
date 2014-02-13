@@ -476,6 +476,23 @@ void SyntaxTree::GetFunctionCall(const string &f_name, Command *Operand, Functio
 	}
 }
 
+Command *build_list(SyntaxTree *ps, Array<Command*> &el)
+{
+	if (el.num == 0)
+		ps->DoError("empty arrays not supported yet");
+	if (el.num > SCRIPT_MAX_PARAMS)
+		ps->DoError(format("only %d elements in auto arrays supported yet", SCRIPT_MAX_PARAMS));
+	Type *t = ps->CreateArrayType(el[0]->type, -1);
+	Command *c = ps->AddCommand(KindArrayBuilder, 0, t);
+	c->num_params = el.num;
+	for (int i=0; i<el.num; i++){
+		if (el[i]->type != el[0]->type)
+			ps->DoError(format("inhomogenous array types %s/%s", el[i]->type->name.c_str(), el[0]->type->name.c_str()));
+		c->param[i] = el[i];
+	}
+	return c;
+}
+
 Command *SyntaxTree::GetOperand(Function *f)
 {
 	msg_db_f("GetOperand", 4);
@@ -500,6 +517,19 @@ Command *SyntaxTree::GetOperand(Function *f)
 			DoError("only pointers can be dereferenced using \"*\"");
 		}
 		deref_command_old(this, Operand);
+	}else if (Exp.cur == "["){
+		Exp.next();
+		Array<Command*> el;
+		while(true){
+			el.add(GetCommand(f));
+			if ((Exp.cur != ",") && (Exp.cur != "]"))
+				DoError("\",\" or \"]\" expected");
+			if (Exp.cur == "]")
+				break;
+			Exp.next();
+		}
+		Operand = build_list(this, el);
+		Exp.next();
 	}else if (Exp.cur == "new"){ // new operator
 		Exp.next();
 		Type *t = GetType(Exp.cur, true);
@@ -1269,13 +1299,7 @@ void SyntaxTree::TestArrayDefinition(Type **type, bool is_pointer)
 		TestArrayDefinition(type, false); // is_pointer=false, since pointers have been handled
 
 		// create array       (complicated name necessary to get correct ordering   int a[2][4] = (int[4])[2])
-		if (array_size < 0){
-			(*type) = CreateNewType(or_name + "[]" +  (*type)->name.substr(or_name_length, -1),
-			                        config.SuperArraySize, false, false, true, array_size, (*type));
-		}else{
-			(*type) = CreateNewType(or_name + format("[%d]", array_size) + (*type)->name.substr(or_name_length, -1),
-			                        (*type)->size * array_size, false, false, true, array_size, (*type));
-		}
+		(*type) = CreateArrayType(*type, array_size, or_name, (*type)->name.substr(or_name_length, -1));
 		if (Exp.cur == "*"){
 			Exp.next();
 			TestArrayDefinition(type, true);

@@ -62,6 +62,7 @@ enum
 	KindLocalMemory,		// local (but LinkNr = address)
 	// special
 	KindType,
+	KindArrayBuilder,
 	// compilation
 	KindVarTemp,
 	KindDerefVarTemp,
@@ -197,6 +198,7 @@ public:
 	Type *GetType(const string &name, bool force);
 	void AddType(Type **type);
 	Type *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Type *sub);
+	Type *CreateArrayType(Type *element_type, int num_elements, const string &name_pre = "", const string &suffix = "");
 	void TestArrayDefinition(Type **type, bool is_pointer);
 	bool GetExistence(const string &name, Function *f);
 	bool GetExistenceShared(const string &name);

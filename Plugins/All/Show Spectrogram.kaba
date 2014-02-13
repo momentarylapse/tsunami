@@ -37,7 +37,7 @@ class SpecGrid : Grid
 		for int x, 0, w
 			for int y, 0, h
 				im.setPixel(x, y, im0.getPixel(x * xa + xb, y * ya + yb))
-		c.DrawImage(r.x1, r.y1, im)
+		c.drawImage(r.x1, r.y1, im)
 	
 		/*Image *im = im0.scale(r.width(), r.height())
 		c.DrawImage(r.x1, r.y1, *im)
@@ -47,23 +47,23 @@ class SpectrumDialog : Dialog
 	SpecGrid grid
 	void __init__()
 		super.__init__("Spectrum", 600, 460, MainWin, true)
-		AddGrid("", 0, 0, 1, 2, "table1")
-		SetTarget("table1", 0)
-		AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
-		AddGrid("!noexpandy", 0, 1, 2, 1, "table2")
-		SetTarget("table2", 0)
-		AddText("", 0, 0, 0, 0, "")
-		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
-		SetImage("close", "hui:close")
+		addGrid("", 0, 0, 1, 2, "table1")
+		setTarget("table1", 0)
+		addDrawingArea("", 0, 0, 0, 0, "drawing_area")
+		addGrid("!noexpandy", 0, 1, 2, 1, "table2")
+		setTarget("table2", 0)
+		addText("", 0, 0, 0, 0, "")
+		addButton("!width=120\\Close", 1, 0, 0, 0, "close")
+		setImage("close", "hui:close")
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(audio.selection.offset / i2f(audio.sample_rate), audio.selection.end() / i2f(audio.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		//grid.allow_bg = false
 	
-		EventM("close", self, &OnClose)
+		eventM("close", self, &onClose)
 
-	void OnClose()
+	void onClose()
 		delete self
 
 color f2col(float f)
@@ -78,7 +78,7 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	renderer.RenderAudioFile(audio, audio.selection, buf)
+	renderer.renderAudioFile(audio, audio.selection, buf)
 	
 	complex f[]
 	float sub[]
@@ -117,13 +117,13 @@ void show_spec()
 			im0.setPixel(t, NF - i - 1, f2col(ff))
 	
 
-	dlg.Redraw("drawing_area")
+	dlg.redraw("drawing_area")
 
-	dlg.Run()
+	dlg.run()
 
 void main()
 	
 	if audio.selection.length > 0
 		show_spec()
 	else
-		logging.Error("'Show Spectrogram.kaba': Needs some selection!")
+		logging.error("'Show Spectrogram.kaba': Needs some selection!")

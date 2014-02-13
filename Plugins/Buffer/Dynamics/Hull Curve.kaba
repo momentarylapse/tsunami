@@ -17,6 +17,7 @@ class Config : PluginData
 		fi.add(curve[0].y, 0)
 		for int i, 1, curve.num
 			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
+		fi.normalize()
 
 	overwrite void reset()
 		curve.clear()
@@ -43,16 +44,16 @@ class HullCurve : AudioEffect
 			float db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
 
-	overwrite void ProcessTrack(BufferBox buf)
+	overwrite void processTrack(BufferBox buf)
 		hull(buf.r)
 		hull(buf.l)
 
-	overwrite void UpdateDialog()
-		dlg.Redraw("drawing")
+	overwrite void updateDialog()
+		dlg.redraw("drawing")
 
-	overwrite void Configure()
+	overwrite void configure()
 		dlg = new ConfigDialog(self)
-		dlg.Run()
+		dlg.run()
 
 class HullGrid : Grid
 	Config *config
@@ -123,13 +124,13 @@ class ConfigDialog : Dialog
 	HullGrid grid
 	void __init__(HullCurve *_h)
 		super.__init__("Hull Curve", 600, 420, MainWin, false)
-		AddGrid("", 0, 0, 1, 4, "table")
-		SetTarget("table", 0)
-		AddDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing")
-		AddGrid("!noexpandy", 0, 2, 2, 1, "table2")
-		SetTarget("table2", 0)
-		AddComboBox("linear\\log", 0, 0, 0, 0, "type")
-		AddCheckBox("show buffer", 1, 0, 0, 0, "preview")
+		addGrid("", 0, 0, 1, 4, "table")
+		setTarget("table", 0)
+		addDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing")
+		addGrid("!noexpandy", 0, 2, 2, 1, "table2")
+		setTarget("table2", 0)
+		addComboBox("linear\\log", 0, 0, 0, 0, "type")
+		addCheckBox("show buffer", 1, 0, 0, 0, "preview")
 	
 		//EventMX("drawing", "hui:draw", self, &OnDraw)
 

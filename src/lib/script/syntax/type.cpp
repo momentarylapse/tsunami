@@ -79,6 +79,38 @@ bool Type::is_simple_class()
 	return true;
 }
 
+bool Type::needs_constructor()
+{
+	if (!UsesCallByReference())
+		return false;
+	if (is_super_array)
+		return true;
+	if (vtable.num > 0)
+		return true;
+	if (parent)
+		if (parent->needs_constructor())
+			return true;
+	foreach(ClassElement &e, element)
+		if (e.type->needs_constructor())
+			return true;
+	return false;
+}
+
+bool Type::needs_destructor()
+{
+	if (!UsesCallByReference())
+		return false;
+	if (is_super_array)
+		return true;
+	if (parent)
+		if (parent->needs_destructor())
+			return true;
+	foreach(ClassElement &e, element)
+		if (e.type->needs_destructor())
+			return true;
+	return false;
+}
+
 bool Type::IsDerivedFrom(Type *root) const
 {
 	if (this == root)

@@ -25,7 +25,7 @@ void Interpolator<T>::__init__()
 }
 
 template<class T>
-void Interpolator<T>::set_type(const string &_type)
+void Interpolator<T>::setType(const string &_type)
 {
 	if (_type == "lerp")
 		type = TYPE_LERP;
@@ -136,9 +136,21 @@ void Interpolator<T>::update()
 			T v = (part[i].pos1 - part[i - 1].pos0) / (part[i - 1].dt + part[i].dt);
 			part[i - 1].vel1 = v;
 			part[i    ].vel0 = v;
-		};
+		}
 	}
 	ready = true;
+}
+
+template<class T>
+void Interpolator<T>::normalize()
+{
+	foreach(Part &p, part){
+		p.t0 /= t_sum;
+		p.dt /= t_sum;
+		p.vel0 *= t_sum;
+		p.vel1 *= t_sum;
+	}
+	t_sum = 1;
 }
 
 
@@ -206,7 +218,7 @@ float clampf(float, float, float);
 template<class T>
 int Interpolator<T>::canonize(float &t)
 {
-	t = clampf(t, 0, 0.99999f) * t_sum;
+	t = clampf(t, 0, t_sum * 0.99999f);
 	foreachi(Part &p, part, i)
 		if ((t >= p.t0) && (t <= p.t0 + p.dt)){
 			t = (t - p.t0) / p.dt;
@@ -235,7 +247,7 @@ T Interpolator<T>::get(float t)
 
 
 template<class T>
-T Interpolator<T>::get_tang(float t)
+T Interpolator<T>::getTang(float t)
 {
 	if (!ready)
 		update();
@@ -263,7 +275,7 @@ template<>
 inline void Interpolator<vector>::print(){}
 
 template<class T>
-Array<T> Interpolator<T>::get_list(Array<float> &t)
+Array<T> Interpolator<T>::getList(Array<float> &t)
 {
 	//print();
 	Array<T> r;

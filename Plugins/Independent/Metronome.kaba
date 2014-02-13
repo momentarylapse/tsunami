@@ -24,38 +24,38 @@ int fill(BufferBox buf)
 	for int i, -1, num_clicks
 		int n = buf.offset / sm_m + i
 		if (n % 4) == 0
-			synth.RenderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 0, volume)
+			synth.renderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 0, volume)
 		else
-			synth.RenderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 1, volume)
+			synth.renderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 1, volume)
 	return buf.num
 
 void OnBpm()
-	bpm = dlg.GetFloat("")
+	bpm = dlg.getFloat("")
 
 void OnClose()
-	output.Stop()
+	output.stop()
 	delete dlg
 
 void main()
 	dlg = new Dialog("Metronome", 200, 80, MainWin, false)
-	dlg.AddGrid("", 0, 0, 1, 2, "table")
-	dlg.SetTarget("table", 0)
-	dlg.AddSpinButton("", 0, 0, 0, 0, "bpm")
-	dlg.AddButton("Close", 0, 1, 0, 0, "close")
-	dlg.SetImage("close", "hui:close")
+	dlg.addGrid("", 0, 0, 1, 2, "table")
+	dlg.setTarget("table", 0)
+	dlg.addSpinButton("", 0, 0, 0, 0, "bpm")
+	dlg.addButton("Close", 0, 1, 0, 0, "close")
+	dlg.setImage("close", "hui:close")
 	
 	freq = 880.0
 	length = 0.02
 	volume = 0.8
 	bpm = 90.0
-	dlg.SetFloat("bpm", bpm)
+	dlg.setFloat("bpm", bpm)
 	
-	dlg.Event("hui:close", &OnClose)
-	dlg.Event("close", &OnClose)
-	dlg.Event("bpm", &OnBpm)
+	dlg.event("hui:close", &OnClose)
+	dlg.event("close", &OnClose)
+	dlg.event("bpm", &OnBpm)
 	
 	synth.sample_rate = SAMPLE_RATE
 	
-	output.PlayGenerated(&fill, SAMPLE_RATE)
+	output.playGenerated(&fill, SAMPLE_RATE)
 	
-	dlg.Run()
+	dlg.run()

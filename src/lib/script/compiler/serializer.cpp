@@ -749,7 +749,7 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 		else
 			p.kind = KindRefToConst;
 		p.p = script->cnst[link->link_no];
-	}else if ((link->kind==KindOperator) || (link->kind==KindFunction) || (link->kind==KindVirtualFunction) || (link->kind==KindCompilerFunction)){
+	}else if ((link->kind==KindOperator) || (link->kind==KindFunction) || (link->kind==KindVirtualFunction) || (link->kind==KindCompilerFunction) || (link->kind==KindArrayBuilder)){
 		p = SerializeCommand(link, level, index);
 	}else if (link->kind == KindReference){
 		SerialCommandParam param;
@@ -1556,6 +1556,16 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 		AddClassFunctionCall(instance.type->parent->GetVirtualFunction(com->link_no));
 	}else if (com->kind == KindCompilerFunction){
 		SerializeCompilerFunction(com, param, ret, level, index, marker_before_params);
+	}else if (com->kind == KindArrayBuilder){
+		ClassFunction *cf = com->type->GetFunc("add", TypeVoid, 1);
+		if (!cf)
+			DoError(format("[..]: can not find %s.add() function???", com->type->name.c_str()));
+		AddReference(ret, com->type->GetPointer(), instance);
+		for (int i=0; i<com->num_params; i++){
+			AddFuncInstance(instance);
+			AddFuncParam(param[i]);
+			AddFunctionCall(cf->script, cf->nr);
+		}
 	}else if (com->kind == KindBlock){
 		SerializeBlock(syntax_tree->Blocks[com->link_no], level + 1);
 	}else{

@@ -22,6 +22,8 @@ class HuiMenu
 public:
 	HuiMenu();
 	~HuiMenu();
+	void _cdecl __init__();
+	void _cdecl __delete__();
 	void _cdecl Clear();
 	void _cdecl OpenPopup(HuiWindow *win, int x, int y);
 	void _cdecl AddItem(const string &name, const string &id);
@@ -50,7 +52,5 @@ public:
 	Array<HuiControl*> item;
 	HuiWindow *win;
 };
-
-HuiMenu *_cdecl HuiCreateMenu();
 
 #endif

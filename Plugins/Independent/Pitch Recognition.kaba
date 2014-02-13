@@ -31,19 +31,19 @@ string get_note(float f)
 	//note = i2s(n)
 
 void DrawVolume(Painter *c)
-	c.SetColor(color(1, 0.8, 0.8, 0.8))
+	c.setColor(color(1, 0.8, 0.8, 0.8))
 	float y0 = 30
 	float y1 = c.height - 5
 	float h = y1 - y0
-	c.DrawRect(5, y0 + h * (1 - Volume), 5, h)
-	c.SetColor(color(1, 0.6, 0.6, 0.6))
-	c.DrawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+	c.drawRect(5, y0 + h * (1 - Volume), 5, h)
+	c.setColor(color(1, 0.6, 0.6, 0.6))
+	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
 void Draw()
-	Painter *c = win.BeginDraw("drawing")
-	c.SetColor(White)
-	c.SetFontSize(12)
-	c.DrawRect(0, 0, c.width, c.height)
+	Painter *c = win.beginDraw("drawing")
+	c.setColor(White)
+	c.setFontSize(12)
+	c.drawRect(0, 0, c.width, c.height)
 	
 	DrawVolume(c)
 	
@@ -53,21 +53,21 @@ void Draw()
 	float x = c.width / 2
 	float y = c.height - 10
 	
-	c.SetColor(color(1, 0.4, 0.4, 0.4))
+	c.setColor(color(1, 0.4, 0.4, 0.4))
 	for int i, 0, 9
 		float w = i * 0.125 * pi - pi / 2
-		c.DrawLine(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
+		c.drawLine(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
 	
-	c.SetColor(Black)
+	c.setColor(Black)
 	if LoudEnough
-		c.DrawStr(x - 8, y - r2 - 22, get_note(Frequency))
-		c.DrawStr(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
-		c.DrawStr(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
-		c.DrawStr(5, 5, Frequency.str2(1) + " Hz")
-		c.DrawLine(x, y, x + r * sin(Error * pi), y - r * cos(Error * pi))
+		c.drawStr(x - 8, y - r2 - 22, get_note(Frequency))
+		c.drawStr(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
+		c.drawStr(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
+		c.drawStr(5, 5, Frequency.str2(1) + " Hz")
+		c.drawLine(x, y, x + r * sin(Error * pi), y - r * cos(Error * pi))
 	else
-		c.DrawStr(x - 30, y - 20, "zu leise")
-	c.End()
+		c.drawStr(x - 30, y - 20, "zu leise")
+	c.end()
 
 void OnClose()
 	delete win
@@ -118,20 +118,20 @@ void UpdateInput()
 		Error = error
 	else
 		LoudEnough = false
-	win.Redraw("drawing")
+	win.redraw("drawing")
 
 
 complex bufc[]
 
 void main()
 	win = new FixedDialog("Tonerkennung", 300, 175, MainWin, false)
-	win.AddDrawingArea("", 5, 5, 290, 135, "drawing")
-	win.AddButton("Schließen", 5, 145, 290, 25, "close")
-	win.SetImage("close", "hui:close")
+	win.addDrawingArea("", 5, 5, 290, 135, "drawing")
+	win.addButton("Schließen", 5, 145, 290, 25, "close")
+	win.setImage("close", "hui:close")
 	
-	win.EventX("drawing", "hui:draw", &Draw)
-	win.Event("hui:close", &OnClose)
-	win.Event("close", &OnClose)
+	win.eventX("drawing", "hui:draw", &Draw)
+	win.event("hui:close", &OnClose)
+	win.event("close", &OnClose)
 	
 
 
@@ -139,10 +139,10 @@ void main()
 	bufc.resize(1000)
 	fft_r2c(buf, bufc)
 	
-	input.Start(TRACK_TYPE_AUDIO, freq)
-	input.AddObserver(nil, &UpdateInput)
+	input.start(TRACK_TYPE_AUDIO, freq)
+	input.addObserver(nil, &UpdateInput)
 	
-	win.Run()
+	win.run()
 	
-	input.RemoveObserver(nil)
-	input.Stop()
+	input.removeObserver(nil)
+	input.stop()

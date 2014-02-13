@@ -64,36 +64,36 @@ class SpectrumDialog : Dialog
 	SpecGrid grid
 	void __init__()
 		super.__init__("Spectrum", 600, 460, MainWin, true)
-		AddGrid("", 0, 0, 1, 2, "table1")
-		SetTarget("table1", 0)
-		AddDrawingArea("", 0, 0, 0, 0, "drawing_area")
-		AddGrid("!noexpandy", 0, 1, 2, 1, "table2")
-		SetTarget("table2", 0)
-		AddComboBox("Linear\\Logarithm", 0, 0, 0, 0, "type")
-		AddButton("!width=120\\Close", 1, 0, 0, 0, "close")
-		SetImage("close", "hui:close")
+		addGrid("", 0, 0, 1, 2, "table1")
+		setTarget("table1", 0)
+		addDrawingArea("", 0, 0, 0, 0, "drawing_area")
+		addGrid("!noexpandy", 0, 1, 2, 1, "table2")
+		setTarget("table2", 0)
+		addComboBox("Linear\\Logarithm", 0, 0, 0, 0, "type")
+		addButton("!width=120\\Close", 1, 0, 0, 0, "close")
+		setImage("close", "hui:close")
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 	
-		EventM("type", self, &OnType)
-		EventM("hui:close", self, &OnClose)
-		EventM("close", self, &OnClose)
+		eventM("type", self, &onType)
+		eventM("hui:close", self, &onClose)
+		eventM("close", self, &onClose)
 	
-		SetInt("type", TypeLogarithm)
+		setInt("type", TypeLogarithm)
 
-	void OnType()
-		grid.setType(GetInt("type"))
+	void onType()
+		grid.setType(getInt("type"))
 		grid.redraw()
 
-	void OnClose()
+	void onClose()
 		delete self
 
 void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	renderer.RenderAudioFile(audio, audio.selection, buf)
+	renderer.renderAudioFile(audio, audio.selection, buf)
 	
 	complex fr[], fl[]
 	
@@ -132,9 +132,9 @@ void show_spec()
 		ffl /= mmax
 	peak_max /= mmax
 
-	dlg.OnType()
+	dlg.onType()
 
-	dlg.Run()
+	dlg.run()
 	
 	ffr.clear()
 	ffl.clear()
@@ -143,4 +143,4 @@ void main()
 	if audio.selection.length > 0
 		show_spec()
 	else
-		logging.Error("'Show Spectrum.kaba': Needs some selection!")
+		logging.error("'Show Spectrum.kaba': Needs some selection!")

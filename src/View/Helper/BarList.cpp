@@ -7,9 +7,7 @@
 
 #include "BarList.h"
 #include "../../Tsunami.h"
-#include "../../Action/Track/Bar/ActionTrackAddBar.h"
-#include "../../Action/Track/Bar/ActionTrackEditBar.h"
-#include "../../Action/Track/Bar/ActionTrackDeleteBar.h"
+#include "../../Data/AudioFile.h"
 
 
 
@@ -36,7 +34,7 @@ BarList::BarList(HuiWindow *_dlg, const string & _id, const string &_id_add, con
 
 void BarList::FillList()
 {
-	msg_db_r("FillBarList", 1);
+	msg_db_f("FillBarList", 1);
 	dlg->Reset(id);
 	if (track){
 		int sample_rate = track->root->sample_rate;
@@ -54,7 +52,6 @@ void BarList::FillList()
 		}
 	}
 	dlg->Enable(id_delete, false);
-	msg_db_l(1);
 }
 
 
@@ -99,7 +96,7 @@ void BarList::OnListEdit()
 			b.length = (int)(text._float() * (float)sample_rate);
 		}
 	}
-	track->root->Execute(new ActionTrackEditBar(track, index, b));
+	track->EditBar(index, b);
 	FillList();
 }
 
@@ -116,15 +113,7 @@ void BarList::OnAddPause()
 		return;
 	int s = dlg->GetInt(id);
 
-	BarPattern b;
-	b.num_beats = 1;
-	b.type = b.TYPE_PAUSE;
-	b.length = (int)((float)track->root->sample_rate * 2.0f);
-	b.count = 1;
-	if (s >= 0)
-		track->root->Execute(new ActionTrackAddBar(track, s + 1, b));
-	else
-		track->root->Execute(new ActionTrackAddBar(track, track->bar.num, b));
+	track->AddPause(s, 2.0f);
 	FillList();
 }
 
@@ -135,7 +124,7 @@ void BarList::OnDelete()
 		return;
 	int s = dlg->GetInt(id);
 	if (s >= 0){
-		track->root->Execute(new ActionTrackDeleteBar(track, s));
+		track->DeleteBar(s);
 		FillList();
 	}
 }
@@ -148,29 +137,17 @@ void BarList::AddNewBar()
 {
 	if (!track)
 		return;
-	msg_db_r("AddNewBar", 1);
+	msg_db_f("AddNewBar", 1);
 
 	int s = dlg->GetInt(id);
 
-	BarPattern b;
-	b.num_beats = 4;
-	b.type = b.TYPE_BAR;
-	b.length = (int)((float)b.num_beats * (float)track->root->sample_rate * 60.0f / 90.0f);
-	b.count = 1;
-	if (s >= 0)
-		track->root->Execute(new ActionTrackAddBar(track, s + 1, b));
-	else
-		track->root->Execute(new ActionTrackAddBar(track, track->bar.num, b));
+	track->AddBars(s, 90.0f, 4, 10);
 	FillList();
-
-	msg_db_l(1);
 }
 
 void BarList::ExecuteBarDialog(int index)
 {
-	msg_db_r("ExecuteBarDialog", 1);
-
-	msg_db_l(1);
+	msg_db_f("ExecuteBarDialog", 1);
 }
 
 void BarList::SetTrack(Track *t)

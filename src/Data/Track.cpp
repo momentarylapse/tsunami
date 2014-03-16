@@ -23,6 +23,9 @@
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
+#include "../Action/Track/Bar/ActionTrackAddBar.h"
+#include "../Action/Track/Bar/ActionTrackEditBar.h"
+#include "../Action/Track/Bar/ActionTrackDeleteBar.h"
 
 
 Track::Track()
@@ -261,6 +264,42 @@ void Track::DeleteEffect(int index)
 void Track::SetSynthesizer(Synthesizer *_synth)
 {
 	root->Execute(new ActionTrackSetSynthesizer(this, _synth));
+}
+
+void Track::AddBars(int index, float bpm, int beats, int bars)
+{
+	BarPattern b;
+	b.num_beats = beats;
+	b.type = b.TYPE_BAR;
+	b.length = (int)((float)b.num_beats * (float)root->sample_rate * 60.0f / bpm);
+	b.count = bars;
+	if (index >= 0)
+		root->Execute(new ActionTrackAddBar(this, index + 1, b));
+	else
+		root->Execute(new ActionTrackAddBar(this, bar.num, b));
+}
+
+void Track::AddPause(int index, float time)
+{
+	BarPattern b;
+	b.num_beats = 1;
+	b.type = b.TYPE_PAUSE;
+	b.length = (int)((float)root->sample_rate * time);
+	b.count = 1;
+	if (index >= 0)
+		root->Execute(new ActionTrackAddBar(this, index + 1, b));
+	else
+		root->Execute(new ActionTrackAddBar(this, bar.num, b));
+}
+
+void Track::EditBar(int index, BarPattern &p)
+{
+	root->Execute(new ActionTrackEditBar(this, index, p));
+}
+
+void Track::DeleteBar(int index)
+{
+	root->Execute(new ActionTrackDeleteBar(this, index));
 }
 
 

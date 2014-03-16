@@ -68,6 +68,10 @@ public:
 	void AddMidiNote(const MidiNote &n);
 	void DeleteMidiNote(int index);
 	void SetSynthesizer(Synthesizer *synth);
+	void AddBars(int index, float bpm, int beats, int bars);
+	void AddPause(int index, float time);
+	void EditBar(int index, BarPattern &p);
+	void DeleteBar(int index);
 
 
 	enum

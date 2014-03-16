@@ -241,7 +241,11 @@ void Tsunami::OnAddTrack()
 
 void Tsunami::OnAddTimeTrack()
 {
-	audio->AddTrack(Track::TYPE_TIME);
+	audio->action_manager->BeginActionGroup();
+	Track *t = audio->AddTrack(Track::TYPE_TIME);
+	if (t)
+		t->AddBars(-1, 90, 4, 10);
+	audio->action_manager->EndActionGroup();
 }
 
 void Tsunami::OnAddMidiTrack()

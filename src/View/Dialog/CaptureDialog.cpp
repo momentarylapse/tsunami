@@ -130,7 +130,7 @@ void CaptureDialog::OnTypeMidi()
 void CaptureDialog::OnStart()
 {
 	if (IsChecked("capture_playback")){
-		tsunami->renderer->Prepare(audio, audio->selection, false);
+		tsunami->renderer->Prepare(audio, audio->GetPlaybackSelection(), false);
 		tsunami->output->Play(tsunami->renderer);
 	}
 	tsunami->input->ResetSync();

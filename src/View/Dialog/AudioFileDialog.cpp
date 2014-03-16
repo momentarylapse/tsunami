@@ -27,6 +27,9 @@ AudioFileDialog::AudioFileDialog(HuiWindow *win, AudioFile *a):
 	fx_list = new FxList(win, "audio_fx_list", "audio_add_effect", "audio_configure_effect", "audio_delete_effect");
 	bar_list = new BarList(win, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
 	fx_list->SetAudio(audio);
+	win->HideControl("ad_t_bars", true);
+
+	win->Expand("ad_t_tags", 0, true);
 
 	LoadData();
 

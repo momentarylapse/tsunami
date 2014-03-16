@@ -80,7 +80,6 @@ public:
 	void OnPlayLoop();
 	void OnPause();
 	void OnStop();
-	void OnVolume();
 	void OnRecord();
 	void OnCurLevel();
 	void OnCurLevelUp();
@@ -107,9 +106,6 @@ public:
 	AudioFile *audio;
 
 	AudioView *view;
-
-	PeakMeter *peak_meter;
-	Slider *volume_slider;
 
 	Storage *storage;
 

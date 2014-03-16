@@ -14,11 +14,14 @@
 class Track;
 class Slider;
 class AudioFile;
+class MixingConsole;
+class PeakMeter;
+class AudioOutput;
 
 class TrackMixer: public EmbeddedDialog
 {
 public:
-	TrackMixer(int index, HuiWindow *win);
+	TrackMixer(MixingConsole *console, int index, HuiWindow *win);
 	~TrackMixer();
 	void OnVolume();
 	void OnMute();
@@ -36,6 +39,7 @@ public:
 
 	int index;
 	Track *track;
+	MixingConsole *console;
 	//Slider *volume_slider;
 	//Slider *panning_slider;
 	string id_grid;
@@ -45,20 +49,27 @@ public:
 	string mute_id;
 };
 
-class MixingConsole: public EmbeddedDialog, public Observer, public Observable
+class MixingConsole: public Observer, public Observable
 {
 public:
-	MixingConsole(AudioFile *audio, HuiWindow *win);
+	MixingConsole(AudioFile *audio, AudioOutput *output, HuiWindow *win, const string &id);
 	virtual ~MixingConsole();
 
 	void LoadData();
-
 	void Show(bool show);
+
+	void OnClose();
+	void OnOutputVolume();
 
 	virtual void OnUpdate(Observable *o);
 
+	HuiWindow *win;
 	AudioFile *audio;
+	AudioOutput *output;
+	PeakMeter *peak_meter;
 
+	string id_outer;
+	string id_inner;
 	Array<TrackMixer*> mixer;
 	bool enabled;
 };

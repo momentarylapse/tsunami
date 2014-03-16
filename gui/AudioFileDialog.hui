@@ -28,5 +28,5 @@ Dialog audio_file_dialog "Sound-Datei" 430 375
 						Button audio_add_bar "Takt" image=hui:add
 						Button audio_add_bar_pause "Pause" image=hui:add
 						Button audio_delete_bar "" image=hui:delete
-		Separator sep_vertical "" vertical
+		Separator sep_vertical ""
 		Button audio_close "Schließen" image=hui:close

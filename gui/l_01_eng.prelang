@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-171
+170
 // Data (ID,Text)
 about
 
@@ -287,8 +287,6 @@ select_all
 
 select_nothing
 
-sep_vertical
-
 settings
 
 settings_dialog
@@ -346,7 +344,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-96
+98
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -387,6 +385,8 @@ Amplitude zu groß, Signal übersteuert.
 Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
+
+Ausgabe
 
 Beim Anwenden eines Effekts: 
 
@@ -450,13 +450,15 @@ Kein Sample ausgewählt
 
 Konnte Aufnahmegerät nicht öffnen
 
-Lautstärke
+Lautstärke in dB
 
 MIDI Quelle auswählen
 
 MIDI Quellen
 
 Meldungen
+
+Mischpult
 
 Nachrichten
 

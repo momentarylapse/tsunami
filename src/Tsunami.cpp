@@ -113,16 +113,14 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 3, 1, "main_table");
 	SetBorderWidth(5);
+	AddControlTable("!noexpandy,height=250", 0, 1, 2, 1, "mixing_table");
 	AddControlTable("!noexpandy", 0, 2, 3, 1, "bottom_table");
-	AddControlTable("!noexpandy,height=250", 0, 1, 20, 1, "mixing_table");
 
 	// bottom
 	SetTarget("bottom_table", 0);
 	AddControlTable("!noexpandy", 0, 0, 7, 1, "output_table");
 	AddControlTable("!noexpandy", 1, 0, 7, 1, "edit_midi_table");
 	HideControl("edit_midi_table", true);
-
-	HideControl("mixing_table", true);
 
 	// main table
 	SetBorderWidth(0);
@@ -135,16 +133,6 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	// output table
 	SetBorderWidth(5);
-	SetTarget("output_table", 0);
-	/*AddButton("", 0, 0, 0, 0, "play");
-	AddButton("", 1, 0, 0, 0, "pause");
-	AddButton("", 2, 0, 0, 0, "stop");*/
-	AddDrawingArea("!width=100,noexpandx", 3, 0, 0, 0, "output_peaks");
-	peak_meter = new PeakMeter(this, "output_peaks", output);
-	AddSlider("!width=100", 4, 0, 0, 0, "output_volume_slider");
-	AddSpinButton("!width=50\\0\\0\\100", 5, 0, 0, 0, "output_volume");
-	AddText("%", 6, 0, 0, 0, "output_label_percent");
-	volume_slider = new Slider(this, "output_volume_slider", "output_volume", 0, 1, 100, (void(HuiEventHandler::*)())&Tsunami::OnVolume, output->GetVolume());
 
 	// edit midi table
 	SetTarget("edit_midi_table", 0);
@@ -178,7 +166,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	sample_manager = new SampleManager(audio, this, true);
 
-	mixing_console = new MixingConsole(audio, this);
+	mixing_console = new MixingConsole(audio, output, this, "mixing_table");
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
@@ -424,11 +412,6 @@ void Tsunami::OnStop()
 	output->Stop();
 }
 
-void Tsunami::OnVolume()
-{
-	output->SetVolume(volume_slider->Get());
-}
-
 void Tsunami::OnInsertAdded()
 {
 	if (audio->used)
@@ -571,8 +554,6 @@ void Tsunami::UpdateMenu()
 	Check("play_loop", renderer->loop_if_allowed);
 	// view
 	Check("show_mixing_console", mixing_console->enabled);
-
-	volume_slider->Set(output->GetVolume());
 
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){

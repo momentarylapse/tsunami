@@ -28,6 +28,11 @@ TrackDialog::TrackDialog(HuiWindow *win):
 	fx_list = new FxList(win, "fx_list", "add_effect", "configure_effect", "delete_effect");
 	bar_list = new BarList(win, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
+
+	win->Expand("ld_t_synth", 0, true);
+	win->Expand("ld_t_bars", 0, true);
+	win->Expand("ld_t_effects", 0, true);
+
 	LoadData();
 	Subscribe(tsunami->audio);
 
@@ -54,13 +59,17 @@ void TrackDialog::LoadData()
 	if (track){
 		SetString("name", track->name);
 		SetString("synthesizer", track->synth->name);
-		Enable("synthesizer", track->type != track->TYPE_AUDIO);
-		Enable("config_synth", track->type != track->TYPE_AUDIO);
-		Enable("edit_midi_track", track->type == Track::TYPE_MIDI);
+		win->HideControl("ld_t_synth", track->type == track->TYPE_AUDIO);
+		//Enable("config_synth", track->type != track->TYPE_AUDIO);
+		win->HideControl("edit_midi_track", track->type != Track::TYPE_MIDI);
+		win->HideControl("ld_t_bars", track->type != Track::TYPE_TIME);
 	}else{
-		Enable("synthesizer", track);
-		Enable("config_synth", track);
-		Enable("edit_midi_track", false);
+		win->HideControl("ld_t_synth", true);
+		win->HideControl("edit_midi_track", true);
+		win->HideControl("ld_t_bars", true);
+		//Enable("synthesizer", track);
+		//Enable("config_synth", track);
+		//Enable("edit_midi_track", false);
 	}
 }
 

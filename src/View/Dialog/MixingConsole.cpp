@@ -7,19 +7,22 @@
 
 #include "MixingConsole.h"
 #include "../../Data/AudioFile.h"
+#include "../../Audio/AudioOutput.h"
+#include "../Helper/PeakMeter.h"
 #include <math.h>
 
 const float TrackMixer::DB_MIN = -100;
 const float TrackMixer::DB_MAX = 10;
 const float TrackMixer::TAN_SCALE = 10.0f;
 
-TrackMixer::TrackMixer(int _index, HuiWindow *win) :
+TrackMixer::TrackMixer(MixingConsole *_console, int _index, HuiWindow *win) :
 	EmbeddedDialog(win)
 {
+	console = _console;
 	index = _index;
-	win->SetTarget("mixing_table", 0);
+	win->SetTarget(console->id_inner, 0);
 	id_grid = "mixing_track_table_" + i2s(index);
-	win->AddControlTable("", index, 0, 1, 4, id_grid);
+	win->AddControlTable("", index + 2, 0, 1, 4, id_grid);
 	win->SetTarget("mixing_track_table_" + i2s(index), 0);
 	id_name = "mc_track_name_" + i2s(index);
 	win->AddText("Track " + i2s(index+1), 0, 0, 0, 0, id_name);
@@ -101,19 +104,51 @@ void TrackMixer::Update()
 }
 
 
-MixingConsole::MixingConsole(AudioFile *_audio, HuiWindow* win) :
-	EmbeddedDialog(win),
+MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, HuiWindow* _win, const string &id) :
 	Observable("MixingConsole")
 {
-	enabled = false;
+	win = _win;
+	enabled = true;
 	audio = _audio;
+	output = _output;
+	id_outer = id;
+	id_inner = "mixing_inner_table";
+
+
+	win->SetTarget(id_outer, 0);
+	win->AddControlTable("", 0, 0, 1, 2, "mixing_console_button_grid");
+	win->AddGroup(_("Mischpult"), 1, 0, 0, 0, "mixing_console_group");
+	win->SetTarget("mixing_console_button_grid", 0);
+	win->AddButton("!noexpandy", 0, 0, 0, 0, "mixing_console_close");
+	win->SetImage("mixing_console_close", "hui:close");
+	win->SetTarget("mixing_console_group", 0);
+	win->AddControlTable("", 0, 0, 1, 20, id_inner);
+	win->SetTarget(id_inner, 0);
+	win->AddControlTable("", 0, 0, 1, 5, "mc_output");
+	win->AddSeparator("!vertical", 1, 0, 0, 0, "");
+
+
+	win->SetTarget("mc_output", 0);
+	win->AddText(_("Ausgabe"), 0, 0, 0, 0, "");
+	win->AddDrawingArea("!width=100,height=30,noexpandx,noexpandy", 0, 1, 0, 0, "mc_output_peaks");
+	win->AddSlider("!vertical,expandy", 0, 2, 0, 0, "mc_output_volume");
+
+	peak_meter = new PeakMeter(win, "mc_output_peaks", output);
+	win->SetFloat("mc_output_volume", output->GetVolume());
+
+	Show(false);
+
+	win->EventM("mixing_console_close", this, &MixingConsole::OnClose);
+	win->EventM("mc_output_volume", this, &MixingConsole::OnOutputVolume);
 
 	Subscribe(audio);
+	Subscribe(output);
 }
 
 MixingConsole::~MixingConsole()
 {
 	Unsubscribe(audio);
+	Unsubscribe(output);
 	foreach(TrackMixer *m, mixer)
 		delete(m);
 }
@@ -125,10 +160,20 @@ void MixingConsole::Show(bool show)
 	Notify("Show");
 }
 
+void MixingConsole::OnClose()
+{
+	Show(false);
+}
+
+void MixingConsole::OnOutputVolume()
+{
+	output->SetVolume(win->GetFloat(""));
+}
+
 void MixingConsole::LoadData()
 {
 	for (int i=mixer.num; i<audio->track.num; i++)
-		mixer.add(new TrackMixer(i, win));
+		mixer.add(new TrackMixer(this, i, win));
 	for (int i=audio->track.num; i<mixer.num; i++)
 		delete(mixer[i]);
 	mixer.resize(audio->track.num);
@@ -139,5 +184,8 @@ void MixingConsole::LoadData()
 
 void MixingConsole::OnUpdate(Observable* o)
 {
-	LoadData();
+	if (o == output)
+		win->SetFloat("mc_output_volume", output->GetVolume());
+	else
+		LoadData();
 }

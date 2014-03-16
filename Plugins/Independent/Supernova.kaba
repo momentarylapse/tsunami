@@ -307,7 +307,7 @@ void StopLesson()
 	input.removeObserver(nil)
 	input.stop()
 	TotalScore += Score
-	HuiConfigWriteFloat("Supernova.Score", TotalScore)
+	HuiConfig.setFloat("Supernova.Score", TotalScore)
 	Mode = ModeConfig
 	win.enable("speed", true)
 	win.enable("cancel", false)
@@ -335,7 +335,7 @@ void main()
 			LessonName.add(e.name.substr(0, -6))
 		
 		
-	TotalScore = HuiConfigReadFloat("Supernova.Score", 0)
+	TotalScore = HuiConfig.getFloat("Supernova.Score", 0)
 	
 	MainWin.hide()
 	win.run()

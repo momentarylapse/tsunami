@@ -189,6 +189,8 @@ Tsunami::Tsunami(Array<string> arg) :
 	HandleArguments(arg);
 
 	Show();
+
+	HuiRunLaterM(0.01f, this, &Tsunami::OnViewOptimal);
 }
 
 Tsunami::~Tsunami()

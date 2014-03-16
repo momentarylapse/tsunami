@@ -76,7 +76,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	ColorSubMO = color(1, 0.6f, 0, 0);
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
-	drawing_width = 800;
+	drawing_width = 1024;
 
 	show_mono = HuiConfig.getBool("View.Mono", false);
 	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);

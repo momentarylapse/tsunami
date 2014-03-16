@@ -686,13 +686,13 @@ void PluginManager::ExecutePlugin(const string &filename)
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 				main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				if (a->used){
-					fx->ResetState();
 					Range range = a->selection;
 					if (range.empty())
 						range = a->GetRange();
 					a->action_manager->BeginActionGroup();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
+							fx->ResetState();
 							fx->DoProcessTrack(t, tsunami->view->cur_level, range);
 						}
 					a->action_manager->EndActionGroup();

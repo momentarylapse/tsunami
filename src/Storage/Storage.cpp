@@ -30,12 +30,12 @@ Storage::Storage()
 	format.add(new FormatFlac());
 	format.add(new FormatMidi());
 
-	CurrentDirectory = HuiConfigReadStr("CurrentDirectory", "");
+	CurrentDirectory = HuiConfig.getStr("CurrentDirectory", "");
 }
 
 Storage::~Storage()
 {
-	HuiConfigWriteStr("CurrentDirectory", CurrentDirectory);
+	HuiConfig.setStr("CurrentDirectory", CurrentDirectory);
 
 	foreach(Format *f, format)
 		delete(f);

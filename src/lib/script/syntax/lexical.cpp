@@ -8,7 +8,7 @@ namespace Script{
 
 //#define ScriptDebug
 
-static char Temp[1024];
+static char Temp[SCRIPT_MAX_STRING_CONST_LENGTH];
 static int ExpKind;
 
 char str_eol[] = "-eol-";
@@ -335,10 +335,13 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 		for (int i=0;true;i++){
 			char c = Temp[TempLength ++] = source[pos ++];
 			// end of string?
-			if ((c == '\"') && (i > 0))
+			if ((c == '\"') && (i > 0)){
 				break;
-			else if ((c == '\n') || (c == 0)){
-				syntax->DoError("string exceeds line");
+			}else if (c == 0){
+				syntax->DoError("string exceeds file");
+			}else if (c == '\n'){
+				line_no ++;
+				//syntax->DoError("string exceeds line");
 			}else{
 				// escape sequence
 				if (c == '\\'){

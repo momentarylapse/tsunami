@@ -78,15 +78,15 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 
 	drawing_width = 800;
 
-	show_mono = HuiConfigReadBool("View.Mono", false);
-	detail_steps = HuiConfigReadInt("View.DetailSteps", 1);
-	mouse_min_move_to_select = HuiConfigReadInt("View.MouseMinMoveToSelect", 5);
-	preview_sleep_time = HuiConfigReadInt("PreviewSleepTime", 10);
-	ScrollSpeed = HuiConfigReadInt("View.ScrollSpeed", 300);
-	ScrollSpeedFast = HuiConfigReadInt("View.ScrollSpeedFast", 3000);
-	ZoomSpeed = HuiConfigReadFloat("View.ZoomSpeed", 0.1f);
-	peak_mode = HuiConfigReadInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
-	antialiasing = HuiConfigReadBool("View.Antialiasing", false);
+	show_mono = HuiConfig.getBool("View.Mono", false);
+	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);
+	mouse_min_move_to_select = HuiConfig.getInt("View.MouseMinMoveToSelect", 5);
+	preview_sleep_time = HuiConfig.getInt("PreviewSleepTime", 10);
+	ScrollSpeed = HuiConfig.getInt("View.ScrollSpeed", 300);
+	ScrollSpeedFast = HuiConfig.getInt("View.ScrollSpeedFast", 3000);
+	ZoomSpeed = HuiConfig.getFloat("View.ZoomSpeed", 0.1f);
+	peak_mode = HuiConfig.getInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
+	antialiasing = HuiConfig.getBool("View.Antialiasing", false);
 
 	image_unmuted.load(HuiAppDirectoryStatic + "Data/volume.tga");
 	image_muted.load(HuiAppDirectoryStatic + "Data/mute.tga");
@@ -149,13 +149,13 @@ AudioView::~AudioView()
 	Unsubscribe(tsunami->output);
 	Unsubscribe(tsunami->input);
 
-	HuiConfigWriteBool("View.Mono", show_mono);
-	HuiConfigWriteInt("View.DetailSteps", detail_steps);
-	HuiConfigWriteInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
-	HuiConfigWriteInt("View.ScrollSpeed", ScrollSpeed);
-	HuiConfigWriteInt("View.ScrollSpeedFast", ScrollSpeedFast);
-	HuiConfigWriteFloat("View.ZoomSpeed", ZoomSpeed);
-	HuiConfigWriteBool("View.Antialiasing", antialiasing);
+	HuiConfig.setBool("View.Mono", show_mono);
+	HuiConfig.setInt("View.DetailSteps", detail_steps);
+	HuiConfig.setInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
+	HuiConfig.setInt("View.ScrollSpeed", ScrollSpeed);
+	HuiConfig.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
+	HuiConfig.setFloat("View.ZoomSpeed", ZoomSpeed);
+	HuiConfig.setBool("View.Antialiasing", antialiasing);
 }
 
 
@@ -651,10 +651,10 @@ inline void draw_line_buffer(HuiPainter *c, int width, double view_pos, double z
 		tt[nl].x = (float)p;
 		tt[nl].y = y0 + buf[i] * hf;
 		if (zoom > 5)
-			c->DrawCircle(p, tt[nl].y, 2);
+			c->drawCircle(p, tt[nl].y, 2);
 		nl ++;
 	}
-	c->DrawLines(tt);
+	c->drawLines(tt);
 }
 
 inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
@@ -684,7 +684,7 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 		tt[nl + i].x = tt[nl - i - 1].x;
 		tt[nl + i].y = y0 *2 - tt[nl - i - 1].y + 1;
 	}
-	c->DrawPolygon(tt);
+	c->drawPolygon(tt);
 }
 
 void AudioView::SetCurSample(AudioFile* a, SampleRef* s)
@@ -762,7 +762,7 @@ void AudioView::DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double vi
 
 
 	int di = detail_steps;
-	c->SetColor(col);
+	c->setColor(col);
 	int l = min(prefered_buffer_level - 1, b.peak.num / 2);
 	if (l >= 1){//f < MIN_MAX_FACTOR){
 		draw_peak_buffer(c, r.width(), di, view_pos_rel, view_zoom, buffer_zoom_factor, hf, r.x1, y0r, b.peak[l*2-2], b.offset);
@@ -800,15 +800,15 @@ void AudioView::DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, cons
 
 	color col2 = col;
 	col2.a *= 0.2f;
-	c->SetColor(col2);
-	c->DrawRect(asx, r.y1,                    aex - asx, SUB_FRAME_HEIGHT);
-	c->DrawRect(asx, r.y2 - SUB_FRAME_HEIGHT, aex - asx, SUB_FRAME_HEIGHT);
+	c->setColor(col2);
+	c->drawRect(asx, r.y1,                    aex - asx, SUB_FRAME_HEIGHT);
+	c->drawRect(asx, r.y2 - SUB_FRAME_HEIGHT, aex - asx, SUB_FRAME_HEIGHT);
 
-	c->SetColor(col);
-	c->DrawLine(asx, r.y1, asx, r.y2);
-	c->DrawLine(aex, r.y1, aex, r.y2);
-	c->DrawLine(asx, r.y1, aex, r.y1);
-	c->DrawLine(asx, r.y2, aex, r.y2);
+	c->setColor(col);
+	c->drawLine(asx, r.y1, asx, r.y2);
+	c->drawLine(aex, r.y1, aex, r.y2);
+	c->drawLine(asx, r.y1, aex, r.y1);
+	c->drawLine(asx, r.y2, aex, r.y2);
 }
 
 void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
@@ -833,17 +833,17 @@ void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
-		c->DrawStr(asx, r.y2 - SUB_FRAME_HEIGHT, s->origin->name);
+		c->drawStr(asx, r.y2 - SUB_FRAME_HEIGHT, s->origin->name);
 }
 
 void DrawStrBg(HuiPainter *c, float x, float y, const string &str, const color &fg, const color &bg)
 {
 	color bg2 = bg;
 	bg2.a = 0.6f;
-	c->SetColor(bg2);
-	c->DrawRect(x, y, c->GetStrWidth(str), FONT_SIZE * 1.5f);
-	c->SetColor(fg);
-	c->DrawStr(x, y, str);
+	c->setColor(bg2);
+	c->drawRect(x, y, c->getStrWidth(str), FONT_SIZE * 1.5f);
+	c->setColor(fg);
+	c->drawStr(x, y, str);
 }
 
 color AudioView::GetPitchColor(int pitch)
@@ -863,16 +863,16 @@ float AudioView::pitch2y(int p)
 
 void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col)
 {
-	c->SetLineWidth(3.0f);
+	c->setLineWidth(3.0f);
 	foreach(MidiNote &n, midi){
-		c->SetColor(GetPitchColor(n.pitch));
+		c->setColor(GetPitchColor(n.pitch));
 		float x1 = sample2screen(n.range.offset);
 		float x2 = sample2screen(n.range.end());
 		float h = r.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * r.height();
-		//c->DrawRect(rect(x1, x2, r.y1, r.y2));
-		c->DrawLine(x1, h, x2, h);
+		//c->drawRect(rect(x1, x2, r.y1, r.y2));
+		c->drawLine(x1, h, x2, h);
 	}
-	c->SetLineWidth(LINE_WIDTH);
+	c->setLineWidth(LINE_WIDTH);
 }
 
 void draw_note(HuiPainter *c, const MidiNote &n, AudioView *v)
@@ -881,7 +881,7 @@ void draw_note(HuiPainter *c, const MidiNote &n, AudioView *v)
 	float x2 = v->sample2screen(n.range.end());
 	float y1 = v->pitch2y(n.pitch + 1);
 	float y2 = v->pitch2y(n.pitch);
-	c->DrawRect(rect(x1, x2, y1, y2));
+	c->drawRect(rect(x1, x2, y1, y2));
 }
 
 void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col)
@@ -892,18 +892,18 @@ void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, c
 		color col = GetPitchColor(n.pitch);
 		if ((hover.type == SEL_TYPE_MIDI_NOTE) && (hover.note == i))
 			col.a = 0.5f;
-		c->SetColor(col);
+		c->setColor(col);
 		draw_note(c, n, this);
 	}
 	if ((HuiGetEvent()->lbut) && (selection.type == SEL_TYPE_MIDI_PITCH)){
 		color col = GetPitchColor(selection.pitch);
 		col.a = 0.5f;
-		c->SetColor(col);
+		c->setColor(col);
 		draw_note(c, GetSelectedNote(), this);
 	}
 	if ((hover.type == SEL_TYPE_MIDI_PITCH) || (hover.type == SEL_TYPE_MIDI_NOTE)){
-		c->SetColor(ColorWaveCur);
-		c->DrawStr(20, r.y1 + r.height() * (pitch_max - hover.pitch - 1) / (pitch_max - pitch_min), pitch_name(hover.pitch));
+		c->setColor(ColorWaveCur);
+		c->drawStr(20, r.y1 + r.height() * (pitch_max - hover.pitch - 1) / (pitch_max - pitch_min), pitch_name(hover.pitch));
 	}
 }
 
@@ -921,23 +921,23 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 	foreach(SampleRef *s, t->sample)
 		DrawSample(c, r, s);
 
-	//c->SetColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
-//	c->SetColor(ColorWaveCur);
-	c->SetFont("", -1, (t == cur_track), false);
+	//c->setColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
+//	c->setColor(ColorWaveCur);
+	c->setFont("", -1, (t == cur_track), false);
 	DrawStrBg(c, r.x1 + 23, r.y1 + 3, t->GetNiceName(), ColorWaveCur, ColorBackgroundCurWave);
-	c->SetFont("", -1, false, false);
+	c->setFont("", -1, false, false);
 
 	if (t->type == t->TYPE_TIME)
-		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_time);
+		c->drawImage(r.x1 + 5, r.y1 + 5, image_track_time);
 	else if (t->type == t->TYPE_MIDI)
-		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_midi);
+		c->drawImage(r.x1 + 5, r.y1 + 5, image_track_midi);
 	else
-		c->DrawImage(r.x1 + 5, r.y1 + 5, image_track_audio);
+		c->drawImage(r.x1 + 5, r.y1 + 5, image_track_audio);
 
 	if ((t->muted) || (hover.show_track_controls == t))
-		c->DrawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
+		c->drawImage(r.x1 + 5, r.y1 + 22, t->muted ? image_muted : image_unmuted);
 	if ((audio->track.num > 1) && (hover.show_track_controls == t))
-		c->DrawImage(r.x1 + 22, r.y1 + 22, image_solo);
+		c->drawImage(r.x1 + 22, r.y1 + 22, image_solo);
 }
 
 void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time)
@@ -954,27 +954,27 @@ void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 	color c1 = ColorInterpolate(bg, ColorGrid, exp_s_mod);
 	color c2 = ColorGrid;
 	for (int n=nx0;n<nx1;n++){
-		c->SetColor(((n % 10) == 0) ? c2 : c1);
+		c->setColor(((n % 10) == 0) ? c2 : c1);
 		int xx = sample2screen(n * dl);
-		c->DrawLine(xx, r.y1, xx, r.y2);
+		c->drawLine(xx, r.y1, xx, r.y2);
 	}
 	if (show_time){
 		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer)){
 			color cc = ColorPreviewMarker;
 			cc.a = 0.25f;
-			c->SetColor(cc);
+			c->setColor(cc);
 			float x0 = sample2screen(tsunami->renderer->range.start());
 			float x1 = sample2screen(tsunami->renderer->range.end());
-			c->DrawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
+			c->drawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
-		c->SetColor(ColorGrid);
+		c->setColor(ColorGrid);
 		for (int n=nx0;n<nx1;n++){
 			if ((sample2screen(dl) - sample2screen(0)) > 30){
 				if ((((n % 10) % 3) == 0) && ((n % 10) != 9) && ((n % 10) != -9))
-					c->DrawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy(n * dl, dt * 3));
+					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy(n * dl, dt * 3));
 			}else{
 				if ((n % 10) == 0)
-					c->DrawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy(n * dl, dt * 10));
+					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy(n * dl, dt * 10));
 			}
 		}
 	}
@@ -1004,40 +1004,40 @@ void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 		float f2 = min(1.0f, dx_beat / 25.0f);
 
 		if (f1 >= 0.1f){
-			c->SetColor(ColorInterpolate(bg, ColorWave, f1));
-			c->SetLineDash(no_dash, r.y1);
-			c->DrawLine(xx, r.y1, xx, r.y2);
+			c->setColor(ColorInterpolate(bg, ColorWave, f1));
+			c->setLineDash(no_dash, r.y1);
+			c->drawLine(xx, r.y1, xx, r.y2);
 		}
 
 		if (f2 >= 0.1f){
 			color c1 = ColorInterpolate(bg, ColorWave, f2);
 			float beat_length = (float)b.range.num / (float)b.num_beats;
-			c->SetLineDash(dash, r.y1);
+			c->setLineDash(dash, r.y1);
 			for (int i=0; i<b.num_beats; i++){
 				float beat_offset = b.range.offset + (float)i * beat_length;
 				if (edit_mode == EDIT_MODE_MIDI){
 					color c2 = ColorInterpolate(bg, c1, 0.6f);
-					c->SetColor(c2);
+					c->setColor(c2);
 					for (int j=1; j<beat_partition; j++){
 						int x = sample2screen(beat_offset + beat_length * j / beat_partition);
-						c->DrawLine(x, r.y1, x, r.y2);
+						c->drawLine(x, r.y1, x, r.y2);
 					}
 				}
 				if (i == 0)
 					continue;
-				c->SetColor(c1);
+				c->setColor(c1);
 				int x = sample2screen(beat_offset);
-				c->DrawLine(x, r.y1, x, r.y2);
+				c->drawLine(x, r.y1, x, r.y2);
 			}
 		}
 
 		if ((show_time) && (f1 > 0.9f)){
-			c->SetColor(ColorWave);
-			c->DrawStr(xx + 2, r.y1, i2s(b.index + 1));
+			c->setColor(ColorWave);
+			c->drawStr(xx + 2, r.y1, i2s(b.index + 1));
 		}
 	}
-	c->SetLineDash(no_dash, 0);
-	c->SetLineWidth(LINE_WIDTH);
+	c->setLineDash(no_dash, 0);
+	c->setLineWidth(LINE_WIDTH);
 }
 
 void AudioView::CheckConsistency()
@@ -1130,21 +1130,21 @@ void AudioView::DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool 
 {
 	int p = sample2screen(pos);
 	if ((p >= audio->area.x1) && (p <= audio->area.x2)){
-		c->SetColor((type == hover.type) ? ColorSelectionBoundaryMO : col);
-		c->DrawLine(p, audio->area.y1, p, audio->area.y2);
+		c->setColor((type == hover.type) ? ColorSelectionBoundaryMO : col);
+		c->drawLine(p, audio->area.y1, p, audio->area.y2);
 		if (show_time)
-			c->DrawStr(p, (audio->area.y1 + audio->area.y2) / 2, audio->get_time_str(pos));
+			c->drawStr(p, (audio->area.y1 + audio->area.y2) / 2, audio->get_time_str(pos));
 	}
 }
 
 void AudioView::DrawEmptyAudioFile(HuiPainter *c, const rect &r)
 {
 	color col = ColorBackgroundCurWave;
-	c->SetColor(col);
-	c->DrawRect(r.x1, r.y2, r.width(), r.height());
-	c->SetColor(ColorWaveCur);
-	c->SetFontSize(FONT_SIZE_NO_FILE);
-	c->DrawStr(r.x1 + r.width() / 2 - 50, r.y1 + r.height() / 2 - 10, _("keine Datei"));
+	c->setColor(col);
+	c->drawRect(r.x1, r.y2, r.width(), r.height());
+	c->setColor(ColorWaveCur);
+	c->setFontSize(FONT_SIZE_NO_FILE);
+	c->drawStr(r.x1 + r.width() / 2 - 50, r.y1 + r.height() / 2 - 10, _("keine Datei"));
 }
 
 void AudioView::DrawBackground(HuiPainter *c, const rect &r)
@@ -1152,15 +1152,15 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 	int yy = audio->track.back()->area.y2;
 
 	// time scale
-	c->SetColor(ColorBackgroundCurWave);
-	c->DrawRect(r.x1, r.y1, r.width(), TIME_SCALE_HEIGHT);
+	c->setColor(ColorBackgroundCurWave);
+	c->drawRect(r.x1, r.y1, r.width(), TIME_SCALE_HEIGHT);
 	DrawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), ColorBackgroundCurWave, true);
 
 	// tracks
 	foreach(Track *t, audio->track){
 		color cc = (t->is_selected) ? ColorBackgroundCurTrack : ColorBackgroundCurWave;
-		c->SetColor(cc);
-		c->DrawRect(t->area);
+		c->setColor(cc);
+		c->drawRect(t->area);
 
 		if (t->type == t->TYPE_TIME){
 			DrawGridBars(c, t->area, cc, true);
@@ -1171,13 +1171,13 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 
 		if (t == midi_edit_track){
 			// pitch grid
-			c->SetColor(color(0.25f, 0, 0, 0));
+			c->setColor(color(0.25f, 0, 0, 0));
 			for (int i=pitch_min; i<pitch_max; i++){
 				float y0 = pitch2y(i + 1);
 				float y1 = pitch2y(i);
 				if (is_sharp(i)){
-					c->SetColor(color(0.2f, 0, 0, 0));
-					c->DrawRect(r.x1, y0, r.width(), y1 - y0);
+					c->setColor(color(0.2f, 0, 0, 0));
+					c->drawRect(r.x1, y0, r.width(), y1 - y0);
 				}
 			}
 		}
@@ -1185,18 +1185,18 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 
 	// free space below tracks
 	if (yy < r.y2){
-		c->SetColor(ColorBackground);
+		c->setColor(ColorBackground);
 		rect rr = rect(r.x1, r.x2, yy, r.y2);
-		c->DrawRect(rr);
+		c->drawRect(rr);
 		DrawGridTime(c, rr, ColorBackground, false);
 	}
 
 	// lines between tracks
-	c->SetColor(ColorGrid);
+	c->setColor(ColorGrid);
 	foreach(Track *t, audio->track)
-		c->DrawLine(0, t->area.y1, r.width(), t->area.y1);
+		c->drawLine(0, t->area.y1, r.width(), t->area.y1);
 	if (yy < r.y2)
-		c->DrawLine(0, yy, r.width(), yy);
+		c->drawLine(0, yy, r.width(), yy);
 
 	//DrawGrid(c, r, ColorBackgroundCurWave, true);
 }
@@ -1207,10 +1207,10 @@ void AudioView::DrawSelection(HuiPainter *c, const rect &r)
 	int sx2 = sample2screen(audio->selection.end());
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
-	c->SetColor(ColorSelectionInternal);
+	c->setColor(ColorSelectionInternal);
 	foreach(Track *t, audio->track)
 		if (t->is_selected)
-			c->DrawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
+			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 	DrawTimeLine(c, audio->sel_raw.start(), SEL_TYPE_SELECTION_START, ColorSelectionBoundary);
 	DrawTimeLine(c, audio->sel_raw.end(), SEL_TYPE_SELECTION_END, ColorSelectionBoundary);
 }
@@ -1232,7 +1232,7 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 	DrawBackground(c, r);
 
 
-	c->SetColor(ColorWaveCur);
+	c->setColor(ColorWaveCur);
 
 	// tracks
 	foreachi(Track *tt, audio->track, i)
@@ -1264,16 +1264,16 @@ void AudioView::OnDraw()
 
 	HuiPainter *c = tsunami->BeginDraw("area");
 	drawing_width = c->width;
-	c->SetFontSize(FONT_SIZE);
-	c->SetLineWidth(LINE_WIDTH);
-	c->SetAntialiasing(antialiasing);
-	//c->SetColor(ColorWaveCur);
+	c->setFontSize(FONT_SIZE);
+	c->setLineWidth(LINE_WIDTH);
+	c->setAntialiasing(antialiasing);
+	//c->setColor(ColorWaveCur);
 
 	DrawAudioFile(c, rect(0, c->width, 0, c->height));
 
 	//c->DrawStr(100, 100, i2s(frame++));
 
-	c->End();
+	c->end();
 }
 
 void AudioView::OptimizeView()

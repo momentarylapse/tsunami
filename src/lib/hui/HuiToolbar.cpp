@@ -62,7 +62,7 @@ void HuiToolbar::SetByID(const string &id)
 	}
 	Reset();
 	//Configure(res->b_param[0], res->b_param[1]);
-	foreach(HuiResourceCommand &cmd, res->cmd){
+	foreach(HuiResource &cmd, res->children){
 		if (cmd.type == "Item"){
 			AddItem(get_lang(cmd.id, "", false), cmd.image, cmd.id);
 			item.back()->SetTooltip(get_lang(cmd.id, "", false));

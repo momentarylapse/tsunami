@@ -26,6 +26,7 @@ class Progress;
 class PeakMeter;
 class Clipboard;
 class SampleManager;
+class MixingConsole;
 
 class Tsunami : public Observer, public HuiWindow
 {
@@ -68,6 +69,7 @@ public:
 	void OnAddLevel();
 	void OnDeleteLevel();
 	void OnSampleManager();
+	void OnMixingConsole();
 	void OnSubImport();
 	void OnAudioProperties();
 	void OnTrackProperties();
@@ -122,6 +124,7 @@ public:
 	Clipboard *clipboard;
 
 	SampleManager *sample_manager;
+	MixingConsole *mixing_console;
 };
 
 extern Tsunami *tsunami;

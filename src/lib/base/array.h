@@ -132,7 +132,7 @@ class Array : public DynamicArray
 			s.data = ((T*)this->data) + start;
 			return s;
 		}
-		void operator = (const Array &a)
+		void operator = (const Array<T> &a)
 		{
 			if (this != &a){
 				//clear();

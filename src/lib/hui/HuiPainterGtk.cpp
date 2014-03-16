@@ -11,7 +11,7 @@
 
 #ifdef HUI_API_GTK
 
-void HuiPainter::End()
+void HuiPainter::end()
 {
 	if (!cr)
 		return;
@@ -19,21 +19,21 @@ void HuiPainter::End()
 	cairo_destroy(cr);
 }
 
-void HuiPainter::SetColor(const color &c)
+void HuiPainter::setColor(const color &c)
 {
 	if (!cr)
 		return;
 	cairo_set_source_rgba(cr, c.r, c.g, c.b, c.a);
 }
 
-void HuiPainter::SetLineWidth(float w)
+void HuiPainter::setLineWidth(float w)
 {
 	if (!cr)
 		return;
 	cairo_set_line_width(cr, w);
 }
 
-void HuiPainter::SetLineDash(Array<float> &dash, float offset)
+void HuiPainter::setLineDash(Array<float> &dash, float offset)
 {
 	if (!cr)
 		return;
@@ -43,7 +43,7 @@ void HuiPainter::SetLineDash(Array<float> &dash, float offset)
 	cairo_set_dash(cr, (double*)d.data, d.num, offset);
 }
 
-color HuiPainter::GetThemeColor(int i)
+color HuiPainter::getThemeColor(int i)
 {
 	GtkStyle *style = gtk_widget_get_style(win->window);
 	int x = (i / 5);
@@ -66,7 +66,7 @@ color HuiPainter::GetThemeColor(int i)
 	return color(1, (float)c.red / 65535.0f, (float)c.green / 65535.0f, (float)c.blue / 65535.0f);
 }
 
-void HuiPainter::Clip(const rect &r)
+void HuiPainter::clip(const rect &r)
 {
 	cairo_reset_clip(cr);
 	cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
@@ -74,13 +74,13 @@ void HuiPainter::Clip(const rect &r)
 }
 
 
-void HuiPainter::DrawPoint(float x, float y)
+void HuiPainter::drawPoint(float x, float y)
 {
 	if (!cr)
 		return;
 }
 
-void HuiPainter::DrawLine(float x1, float y1, float x2, float y2)
+void HuiPainter::drawLine(float x1, float y1, float x2, float y2)
 {
 	if (!cr)
 		return;
@@ -89,7 +89,7 @@ void HuiPainter::DrawLine(float x1, float y1, float x2, float y2)
 	cairo_stroke(cr);
 }
 
-void HuiPainter::DrawLines(Array<complex> &p)
+void HuiPainter::drawLines(Array<complex> &p)
 {
 	if (!cr)
 		return;
@@ -103,7 +103,7 @@ void HuiPainter::DrawLines(Array<complex> &p)
 	cairo_stroke(cr);
 }
 
-void HuiPainter::DrawPolygon(Array<complex> &p)
+void HuiPainter::drawPolygon(Array<complex> &p)
 {
 	if (!cr)
 		return;
@@ -116,7 +116,7 @@ void HuiPainter::DrawPolygon(Array<complex> &p)
 	cairo_fill(cr);
 }
 
-void HuiPainter::DrawStr(float x, float y, const string &str)
+void HuiPainter::drawStr(float x, float y, const string &str)
 {
 	if (!cr)
 		return;
@@ -141,7 +141,7 @@ void HuiPainter::DrawStr(float x, float y, const string &str)
 	//cairo_show_text(cr, str);
 }
 
-float HuiPainter::GetStrWidth(const string &str)
+float HuiPainter::getStrWidth(const string &str)
 {
 	if (!cr)
 		return 0;
@@ -166,7 +166,7 @@ float HuiPainter::GetStrWidth(const string &str)
 	return (float)w / 1000.0f;
 }
 
-void HuiPainter::DrawRect(float x, float y, float w, float h)
+void HuiPainter::drawRect(float x, float y, float w, float h)
 {
 	if (!cr)
 		return;
@@ -174,7 +174,7 @@ void HuiPainter::DrawRect(float x, float y, float w, float h)
 	cairo_fill(cr);
 }
 
-void HuiPainter::DrawRect(const rect &r)
+void HuiPainter::drawRect(const rect &r)
 {
 	if (!cr)
 		return;
@@ -182,7 +182,7 @@ void HuiPainter::DrawRect(const rect &r)
 	cairo_fill(cr);
 }
 
-void HuiPainter::DrawCircle(float x, float y, float radius)
+void HuiPainter::drawCircle(float x, float y, float radius)
 {
 	if (!cr)
 		return;
@@ -190,7 +190,7 @@ void HuiPainter::DrawCircle(float x, float y, float radius)
 	cairo_fill(cr);
 }
 
-void HuiPainter::DrawImage(float x, float y, const Image &image)
+void HuiPainter::drawImage(float x, float y, const Image &image)
 {
 #ifdef _X_USE_IMAGE_
 	if (!cr)
@@ -212,7 +212,7 @@ void HuiPainter::DrawImage(float x, float y, const Image &image)
 #endif
 }
 
-void HuiPainter::SetFont(const string &font, float size, bool bold, bool italic)
+void HuiPainter::setFont(const string &font, float size, bool bold, bool italic)
 {
 	if (!cr)
 		return;
@@ -226,7 +226,7 @@ void HuiPainter::SetFont(const string &font, float size, bool bold, bool italic)
 	cur_font_italic = italic;
 }
 
-void HuiPainter::SetFontSize(float size)
+void HuiPainter::setFontSize(float size)
 {
 	if (!cr)
 		return;
@@ -234,7 +234,7 @@ void HuiPainter::SetFontSize(float size)
 	cur_font_size = size;
 }
 
-void HuiPainter::SetAntialiasing(bool enabled)
+void HuiPainter::setAntialiasing(bool enabled)
 {
 	if (!cr)
 		return;

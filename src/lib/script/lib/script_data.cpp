@@ -26,7 +26,7 @@
 
 namespace Script{
 
-string DataVersion = "0.13.8.0";
+string DataVersion = "0.13.9.0";
 
 CompilerConfiguration config;
 
@@ -371,12 +371,12 @@ void add_const(const string &name, Type *type, void *value)
 	Constant c;
 	c.name = name;
 	c.type = type;
-	c.data = new char[max(type->size, 8)];//config.PointerSize)];
+	c.value.resize(max(type->size, 8));//config.PointerSize));
 	// config.PointerSize might be smaller than needed for the following assignment
 	if ((type == TypeInt) || (type == TypeFloat) || (type == TypeChar)  || (type == TypeBool) || (type->is_pointer))
-		*(void**)c.data = value;
+		*(void**)c.value.data = value;
 	else
-		memcpy(c.data, value, type->size);
+		memcpy(c.value.data, value, type->size);
 	cur_package_script->syntax->Constants.add(c);
 }
 
@@ -575,81 +575,53 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 
 // automatic type casting
 
-#define MAX_TYPE_CAST_BUFFER	32768
-char type_cast_buffer[MAX_TYPE_CAST_BUFFER];
-int type_cast_buffer_size = 0;
-
-char *get_type_cast_buf(int size)
+string CastFloat2Int(string &s)
 {
-	char *str = &type_cast_buffer[type_cast_buffer_size];
-	type_cast_buffer_size += size;
-	if (type_cast_buffer_size >= MAX_TYPE_CAST_BUFFER){
-		msg_error("Script: type_cast_buffer overflow");
-		type_cast_buffer_size = 0;
-		str = type_cast_buffer;
-	}
-	return str;
+	string r;
+	r.resize(8);
+	*(int*)r.data = *(float*)s.data;
+	return r;
 }
-
-
-char CastTemp[256];
-char *CastFloat2Int(float *f)
+string CastInt2Float(string &s)
 {
-	*(int*)&CastTemp[0]=int(*f);
-	return &CastTemp[0];
+	string r;
+	r.resize(8);
+	*(float*)r.data = *(int*)s.data;
+	return r;
 }
-char *CastInt2Float(int *i)
+string CastInt2Char(string &s)
 {
-	*(float*)&CastTemp[0]=float(*i);
-	return &CastTemp[0];
+	return s;
 }
-char *CastInt2Char(int *i)
+string CastChar2Int(string &s)
 {
-	*(char*)&CastTemp[0]=char(*i);
-	return &CastTemp[0];
+	string r;
+	r.resize(8);
+	*(int*)r.data = *(char*)s.data;
+	return r;
 }
-char *CastChar2Int(char *c)
+string CastPointer2Bool(string &s)
 {
-	*(int*)&CastTemp[0]=int(*c);
-	return &CastTemp[0];
+	string r;
+	r.resize(8);
+	*(bool*)r.data = *(void**)s.data;
+	return r;
 }
-char *CastPointer2Bool(void **p)
+string CastInt2StringP(string &s)
 {
-	*(bool*)&CastTemp[0]=( (*p) != NULL );
-	return &CastTemp[0];
+	return i2s(*(int*)s.data);
 }
-char *CastInt2StringP(int *i)
+string CastFloat2StringP(string &s)
 {
-	string s = i2s(*i);
-	char *str = get_type_cast_buf(s.num + 1);
-	memcpy(str, s.data, s.num);
-	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
-	return &CastTemp[0];
+	return f2s(*(float*)s.data, 6);
 }
-char *CastFloat2StringP(float *f)
+string CastBool2StringP(string &s)
 {
-	string s = f2sf(*f);
-	char *str = get_type_cast_buf(s.num + 1);
-	memcpy(str, s.data, s.num);
-	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
-	return &CastTemp[0];
+	return b2s(*(bool*)s.data);
 }
-char *CastBool2StringP(bool *b)
+string CastPointer2StringP(string &s)
 {
-	string s = b2s(*b);
-	char *str = get_type_cast_buf(s.num + 1);
-	memcpy(str, s.data, s.num);
-	type_cast_buffer_size += strlen(str) + 1;
-	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
-	return &CastTemp[0];
-}
-char *CastPointer2StringP(void *p)
-{
-	string s = p2s(p);
-	char *str = get_type_cast_buf(s.num + 1);
-	memcpy(str, s.data, s.num);
-	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
-	return &CastTemp[0];
+	return p2s(*(void**)s.data);
 }
 
 Array<TypeCast> TypeCasts;
@@ -986,28 +958,28 @@ void SIAddBasicCommands()
 
 
 
-void op_int_add(int &r, int &a, int &b)
-{	r = a + b;	}
-void op_int_sub(int &r, int &a, int &b)
-{	r = a - b;	}
-void op_int_mul(int &r, int &a, int &b)
-{	r = a * b;	}
-void op_int_div(int &r, int &a, int &b)
-{	r = a / b;	}
-void op_int_mod(int &r, int &a, int &b)
-{	r = a % b;	}
-void op_int_shr(int &r, int &a, int &b)
-{	r = a >> b;	}
-void op_int_shl(int &r, int &a, int &b)
-{	r = a << b;	}
-void op_float_add(float &r, float &a, float &b)
-{	r = a + b;	}
-void op_float_sub(float &r, float &a, float &b)
-{	r = a - b;	}
-void op_float_mul(float &r, float &a, float &b)
-{	r = a * b;	}
-void op_float_div(float &r, float &a, float &b)
-{	r = a / b;	}
+void op_int_add(string &r, string &a, string &b)
+{	*(int*)r.data = *(int*)a.data + *(int*)b.data;	}
+void op_int_sub(string &r, string &a, string &b)
+{	*(int*)r.data = *(int*)a.data - *(int*)b.data;	}
+void op_int_mul(string &r, string &a, string &b)
+{	*(int*)r.data = *(int*)a.data * *(int*)b.data;	}
+void op_int_div(string &r, string &a, string &b)
+{	*(int*)r.data = *(int*)a.data / *(int*)b.data;	}
+void op_int_mod(string &r, string &a, string &b)
+{	*(int*)r.data = *(int*)a.data % *(int*)b.data;	}
+void op_int_shr(string &r, string &a, string &b)
+{	*(int*)r.data = *(int*)a.data >> *(int*)b.data;	}
+void op_int_shl(string &r, string &a, string &b)
+{	*(int*)r.data = *(int*)a.data << *(int*)b.data;	}
+void op_float_add(string &r, string &a, string &b)
+{	*(float*)r.data = *(float*)a.data + *(float*)b.data;	}
+void op_float_sub(string &r, string &a, string &b)
+{	*(float*)r.data = *(float*)a.data - *(float*)b.data;	}
+void op_float_mul(string &r, string &a, string &b)
+{	*(float*)r.data = *(float*)a.data * *(float*)b.data;	}
+void op_float_div(string &r, string &a, string &b)
+{	*(float*)r.data = *(float*)a.data / *(float*)b.data;	}
 
 void SIAddOperators()
 {

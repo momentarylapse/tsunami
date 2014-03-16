@@ -279,32 +279,18 @@ string _cdecl fff2s(vector &x){	return x.str();	}
 string _cdecl ffff2s(quaternion &x){	return x.str();	}
 
 
-char *get_type_cast_buf(int size);
-extern char CastTemp[];
 
-char *CastVector2StringP(vector *v)
+string CastVector2StringP(string &s)
 {
-	string s = v->str();
-	char *str = get_type_cast_buf(s.num + 1);
-	memcpy(str, s.data, s.num);
-	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
-	return &CastTemp[0];
+	return ((vector*)s.data)->str();
 }
-char *CastFFFF2StringP(quaternion *q)
+string CastFFFF2StringP(string &s)
 {
-	string s = q->str();
-	char *str = get_type_cast_buf(s.num + 1);
-	memcpy(str, s.data, s.num);
-	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
-	return &CastTemp[0];
+	return ((quaternion*)s.data)->str();
 }
-char *CastComplex2StringP(complex *z)
+string CastComplex2StringP(string &s)
 {
-	string s = z->str();
-	char *str = get_type_cast_buf(s.num + 1);
-	memcpy(str, s.data, s.num);
-	*(char**)&CastTemp[0] = str; // save the return address in CastTemp
-	return &CastTemp[0];
+	return ((complex*)s.data)->str();
 }
 
 // amd64 complex return wrappers

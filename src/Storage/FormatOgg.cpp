@@ -55,7 +55,7 @@ void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	tsunami->progress->Set(_("exportiere ogg"), 0);
 	int size = b->num * 4;
 
-	float OggQuality = HuiConfigReadFloat("OggQuality", 0.5f);
+	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
 
 	FILE *f = fopen(filename.c_str(), "wb");
 

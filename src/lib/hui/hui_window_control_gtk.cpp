@@ -425,7 +425,7 @@ void HuiWindow::EmbedDialog(const string &id, int x, int y)
 	if (res){
 		if (res->type != "SizableDialog")
 			return;
-		foreachi(HuiResourceCommand &cmd, res->cmd, i){
+		foreachi(HuiResource &cmd, res->children, i){
 			//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 			//if ((cmd->type & 1023)==HuiCmdDialogAddControl){
 
@@ -503,8 +503,8 @@ HuiPainter *HuiWindow::BeginDraw(const string &_id)
 		//gdk_drawable_get_size(gtk_widget_get_window(c->widget), &hui_drawing_context.width, &hui_drawing_context.height);
 		hui_drawing_context.width = gdk_window_get_width(gtk_widget_get_window(c->widget));
 		hui_drawing_context.height = gdk_window_get_height(gtk_widget_get_window(c->widget));
-		//hui_drawing_context.SetFontSize(16);
-		hui_drawing_context.SetFont("Sans", 16, false, false);
+		//hui_drawing_context.setFontSize(16);
+		hui_drawing_context.setFont("Sans", 16, false, false);
 	}
 	return &hui_drawing_context;
 }

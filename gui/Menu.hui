@@ -1,0 +1,88 @@
+Menu menu "" disabled
+	Menu menu_file "Datei"
+		Item new "Neu..." image=hui:new
+		Item open "Öffnen" image=hui:open
+		Separator "" ""
+		Item save "Speichern" image=hui:save
+		Item save_as "Speichern unter..." image=hui:save-as
+		Item export_selection "Auswahl Exportieren..." image=hui:save-as
+		Separator "" ""
+		Item wave_properties "Eigenschaften" image=hui:properties
+		Separator "" ""
+		Item close_file "Schließen" image=hui:close
+		Item exit "Beenden" image=hui:quit
+	Menu menu_edit "Bearbeiten"
+		Item undo "Rückgängig" image=hui:undo
+		Item redo "Wiederherstellen" image=hui:redo
+		Separator "" ""
+		Item select_all "Alles auswählen" image=hui:select-all
+		Item select_nothing "Nichts auswählen" image=hui:delete
+		Separator "" ""
+		Item copy "Kopieren" image=hui:copy
+		Item paste "Einfügen" image=hui:paste
+		Item delete "Löschen" image=hui:delete
+		Separator "" ""
+		Item settings "Einstellungen" image=hui:preferences
+	Menu menu_track "Spur"
+		Item track_import "Aus Datei importieren..." image=hui:open
+		Separator "" ""
+		Item add_track "Leere Spur hinzufügen" image=hui:add
+		Item add_time_track "Rhythmus Spur hinzufügen..." image=hui:add
+		Item add_midi_track "Midi Spur hinzufügen" image=hui:add
+		Item delete_track "Löschen" image=hui:delete
+		Separator "" ""
+		Item track_properties "Eigenschaften" image=hui:properties
+	Menu menu_level "Ebene"
+		Item level_add "Hinzufügen" image=hui:add
+		Item level_delete "Löschen" image=hui:delete
+		Separator "" ""
+		Menu menu_level_target "Gehe zu"
+		Item level_up "Hoch" image=hui:up
+		Item level_down "Runter" image=hui:down
+	Menu menu_sub "Samples"
+		Item sample_manager "Verwalten..." image=hui:properties
+		Separator "" ""
+		Item sub_from_selection "Aus Auswahl herauslösen" image=hui:cut
+		Item insert_added "Fest einfügen" image=hui:add
+		Item remove_added "Löschen" image=hui:delete
+		Separator "" ""
+		Item sub_properties "Eigenschaften" image=hui:properties
+	Menu menu_view "Ansicht"
+		Menu menu_view_channels "Kanäle"
+			Item view_mono "Mono" checkable
+			Item view_stereo "Stereo" checkable
+		Menu menu_view_peaks "Peaks"
+			Item view_peaks_max "Maximum" checkable
+			Item view_peaks_mean "Quadratisches Mittel" checkable
+		Item show_mixing_console "Mischpult" checkable
+		Separator "" ""
+		Item zoom_in "Vergrößern" image=hui:zoom-in
+		Item zoom_out "Verkleinern" image=hui:zoom-out
+		Item view_optimal "Optimal" image=hui:zoom-fit
+		Item view_samples "Sample-Ebene" image=hui:zoom-one
+	Menu menu_sound "Sound"
+		Item play "Abspielen" image=hui:media-play
+		Item pause "Pause" image=hui:media-pause
+		Item stop "Stopp" image=hui:media-stop
+		Item play_loop "Schleife" checkable
+		Separator "" ""
+		Item record "Aufnehmen" image=hui:media-record
+	Menu menu_plugins "Plugins"
+		Item run_plugin "Script ausführen..." image=hui:execute
+		Separator "" ""
+		Item plugin_on_file "Auf Audiopuffer" disabled
+		Menu menu_plugins_channels "Kanäle"
+		Menu menu_plugins_dynamics "Dynamik"
+		Menu menu_plugins_echo "Echo"
+		Menu menu_plugins_pitch "Tonhöhe"
+		Menu menu_plugins_sound "Klang"
+		Menu menu_plugins_synthesizer "Synthese"
+		Separator "" ""
+		Menu menu_plugins_on_audio "Auf Alles"
+		Menu menu_plugins_other "Eigenständig"
+	Menu menu_help "?"
+		Item help "Hilfe" image=hui:help
+		Item show_log "Meldungen" image=hui:info
+		Separator "" ""
+		Item about "Info" image=hui:about
+

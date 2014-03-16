@@ -1,0 +1,4 @@
+Menu "" "" disabled
+	Item play "Abspielen"
+	Item stop "Stopp"
+

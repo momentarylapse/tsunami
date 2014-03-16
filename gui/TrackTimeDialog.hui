@@ -3,18 +3,6 @@ Dialog track_time_dialog "Rhythmus Spur" 380 516
 		Grid ttd_grid_1 "" 1 7 expandy
 			Group ld_t_name "Name"
 				Edit name "" expandx
-			Group ld_t_volume "Lautstärke"
-				Grid ? "" 1 2
-					Slider volume_slider "" expandx
-					Grid ? "" 3 1
-						SpinButton volume "\\0\\1000\\0.1"
-						Text percent "%"
-						CheckBox mute "Stumm"
-			Group ld_t_panning "Balance"
-				Grid ? "" 3 1
-					Slider panning_slider "" expandx
-					SpinButton panning "0\\-100\\100\\0.1"
-					Text percent "%"
 			Expander ld_t_effects "Effekte"
 				Grid ? "" 1 2
 					ListView fx_list "Effekte" nobar

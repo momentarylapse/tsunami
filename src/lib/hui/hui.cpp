@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.2.1";
+string HuiVersion = "0.5.5.1";
 
 #include <stdio.h>
 #include <signal.h>
@@ -82,7 +82,6 @@ Array<HuiWindow*> HuiWindows;
 Array<HuiClosedWindow> _HuiClosedWindow_;
 
 
-extern bool HuiConfigChanged;
 bool _HuiScreenOpened_ = false;
 
 // HUI configuration
@@ -335,6 +334,8 @@ void HuiInit(const string &program, bool load_res, const string &def_lang)
 	HuiSetDefaultErrorHandler(NULL);
 	//msg_write("");
 
+	HuiConfig.filename = HuiAppDirectory + "Data/config.txt";
+
 	
 	//msg_write("HuiAppDirectory " + HuiAppDirectory);
 	//msg_write("HuiInitialWorkingDirectory " + HuiInitialWorkingDirectory);
@@ -343,7 +344,7 @@ void HuiInit(const string &program, bool load_res, const string &def_lang)
 		HuiLoadResource(HuiAppDirectoryStatic + "Data/hui_resources.txt");
 
 	if (def_lang.num > 0)
-		HuiSetLanguage(HuiConfigReadStr("Language", def_lang));
+		HuiSetLanguage(HuiConfig.getStr("Language", def_lang));
 
 	// at this point:
 	//   HuiAppDirectory -> dir to run binary in (binary dir or ~/.my_app/)
@@ -510,8 +511,8 @@ void HuiEnd()
 		g_object_unref(invisible_cursor);
 #endif
 #endif
-		if (HuiConfigChanged)
-			HuiSaveConfigFile();
+		if (HuiConfig.changed)
+			HuiConfig.save();
 	}
 	msg_db_l(1);
 	if ((msg_inited) && (!HuiEndKeepMsgAlive) && (HuiMainLevel == 0))

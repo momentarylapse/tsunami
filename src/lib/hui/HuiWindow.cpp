@@ -90,7 +90,7 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent, bool allow_parent)
 		toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
 
 	// controls
-	foreach(HuiResourceCommand &cmd, res->cmd){
+	foreach(HuiResource &cmd, res->children){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
 			SetTarget(cmd.s_param[0], cmd.i_param[4]);
@@ -123,6 +123,7 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 
 	is_resizable = ((_mode & HuiWinModeResizable) > 0);
 	border_width = 5;
+	expander_indent = 20;
 	allowed = true;
 	allow_keys = true;
 	parent = _root;
@@ -225,6 +226,11 @@ void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 void HuiWindow::SetBorderWidth(int width)
 {
 	border_width = width;
+}
+
+void HuiWindow::SetIndent(int indent)
+{
+	expander_indent = indent;
 }
 
 void HuiWindow::SetDecimals(int decimals)
@@ -419,7 +425,7 @@ void HuiWindowAddControl(HuiWindow *win, const string &type, const string &title
 		win->AddImage(title, x, y, width, height, id);
 	else if (type == "DrawingArea")
 		win->AddDrawingArea(title, x, y, width, height, id);
-	else if (type == "ControlTable")
+	else if ((type == "ControlTable") || (type == "Grid"))
 		win->AddControlTable(title, x, y, width, height, id);
 	else if (type == "SpinButton")
 		win->AddSpinButton(title, x, y, width, height, id);
@@ -467,7 +473,7 @@ void HuiWindow::FromResource(const string &id)
 		toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
 
 	// controls
-	foreach(HuiResourceCommand &cmd, res->cmd){
+	foreach(HuiResource &cmd, res->children){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
 			SetTarget(cmd.s_param[0], cmd.i_param[4]);
@@ -489,6 +495,48 @@ void HuiWindow::FromResource(const string &id)
 	}
 	msg_db_m("  \\(^_^)/",1);
 }
+
+void HuiWindow::FromSource(const string &buffer)
+{
+	msg_db_f("FromSource",1);
+	HuiResourceNew res;
+	res.load(buffer);
+	if (res.type == "Dialog"){
+		SetSize(res.w, res.h);
+
+		if (res.children.num > 0)
+			EmbedResource(res.children[0], "", 0, 0);
+	}else{
+		EmbedResource(res, "", 0, 0);
+	}
+
+}
+
+
+void HuiWindow::EmbedResource(HuiResourceNew &c, const string &parent_id, int x, int y)
+{
+	SetTarget(parent_id, x);
+	string title = c.title;
+	if (c.options.num > 0)
+		title = "!" + implode(c.options, ",") + "\\" + title;
+	HuiWindowAddControl(this, c.type, title, x, y, c.w, c.h, c.id);
+
+	Enable(c.id, c.enabled);
+	if (c.image.num > 0)
+		SetImage(c.id, c.image);
+
+	foreach(HuiResourceNew &child, c.children)
+		EmbedResource(child, c.id, child.x, child.y);
+}
+
+void HuiWindow::EmbedSource(const string &buffer, const string &parent_id, int x, int y)
+{
+	HuiResourceNew res;
+	res.load(buffer);
+	EmbedResource(res, parent_id, x, y);
+
+}
+
 
 //----------------------------------------------------------------------------------
 // data exchanging functions for control items
@@ -780,3 +828,13 @@ void HuiFixedDialog::__init_ext__(const string& title, int width, int height, Hu
 {
 	new(this) HuiFixedDialog(title, width, height, root, allow_root);
 }
+
+
+
+HuiSourceDialog::HuiSourceDialog(const string &buffer, HuiWindow *root) :
+	HuiWindow("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, HuiWinModeControls | HuiWinModeResizable)
+{
+	FromSource(buffer);
+}
+
+

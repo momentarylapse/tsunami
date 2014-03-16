@@ -55,8 +55,8 @@ AudioOutput::AudioOutput() :
 	source = -1;
 	data_samples = 0;
 
-	ChosenDevice = HuiConfigReadStr("Output.ChosenDevice", "");
-	volume = HuiConfigReadFloat("Output.Volume", 1.0f);
+	ChosenDevice = HuiConfig.getStr("Output.ChosenDevice", "");
+	volume = HuiConfig.getFloat("Output.Volume", 1.0f);
 
 	Init();
 }
@@ -65,15 +65,15 @@ AudioOutput::~AudioOutput()
 {
 	Stop();
 	Kill();
-	HuiConfigWriteStr("Output.ChosenDevice", ChosenDevice);
-	HuiConfigWriteFloat("Output.Volume", volume);
+	HuiConfig.setStr("Output.ChosenDevice", ChosenDevice);
+	HuiConfig.setFloat("Output.Volume", volume);
 }
 
 void AudioOutput::SetDevice(const string &device)
 {
 	ChosenDevice = device;
-	HuiConfigWriteStr("ChosenOutputDevice", ChosenDevice);
-	HuiSaveConfigFile();
+	HuiConfig.setStr("ChosenOutputDevice", ChosenDevice);
+	HuiConfig.save();
 	tsunami->log->Warning(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
 	//KillPreview();
 	//PreviewInit();

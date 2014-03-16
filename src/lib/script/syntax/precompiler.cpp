@@ -25,14 +25,30 @@ void SyntaxTree::AddIncludeData(Script *s)
 		if (i == s)
 			return;
 	msg_db_f("AddIncludeData",5);
-	Includes.add(s);
 	SyntaxTree *ps = s->syntax;
-	s->ReferenceCounter ++;
 	if (FlagImmortal)
 		SetImmortal(ps);
 
+	FlagCompileOS |= ps->FlagCompileOS;
+	FlagAddEntryPoint |= ps->FlagAddEntryPoint;
+	FlagNoFunctionFrame |= ps->FlagNoFunctionFrame;
+	FlagOverwriteVariablesOffset |= ps->FlagOverwriteVariablesOffset;
+	if (ps->FlagOverwriteVariablesOffset)
+		VariablesOffset = ps->VariablesOffset;
+	FlagStringConstAsCString |= ps->FlagStringConstAsCString;
+	if (ps->AsmMetaInfo->CodeOrigin != (long)ps->script->Opcode)
+		AsmMetaInfo->CodeOrigin = ps->AsmMetaInfo->CodeOrigin;
+
 	// defines
 	Defines.append(ps->Defines);
+
+
+	/*if (FlagCompileOS){
+		import_deep(this, ps);
+	}else{*/
+		Includes.add(s);
+		s->ReferenceCounter ++;
+	//}
 
 	/*ExpressionBuffer::Line *cur_line = Exp.cur_line;
 	PreCompiler(script->JustAnalyse);

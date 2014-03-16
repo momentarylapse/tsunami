@@ -76,22 +76,22 @@ class ConfigDialog : Dialog
 	Flanger *f
 	void __init__(Flanger *_f)
 		super.__init__("Flanger", 485, 175, MainWin, false)
-		addGrid("", 0, 0, 1, 3, "table1")
-		setTarget("table1", 0)
-		addGrid("", 0, 1, 4, 3, "table2")
-		setTarget("table2", 0)
-		addText("Geschwindigkeit", 0, 0, 0, 0, "")
-		addSlider("!expandx", 1, 0, 0, 0, "speed_slider")
-		addSpinButton("\\0\\10000\\0.1", 2, 0, 0, 0, "speed")
-		addText("Hz", 3, 0, 0, 0, "")
-		addText("Verzögerung", 0, 1, 0, 0, "")
-		addSlider("", 1, 1, 0, 0, "delay_slider")
-		addSpinButton("\\0\\10000\\0.1", 2, 1, 0, 0, "delay")
-		addText("ms", 3, 1, 0, 0, "")
-		addText("Tiefe", 0, 2, 0, 0, "")
-		addSlider("", 1, 2, 0, 0, "depth_slider")
-		addSpinButton("\\0\\100\\0.1", 2, 2, 0, 0, "depth")
-		addText("%", 3, 2, 0, 0, "")
+		fromSource("
+Grid table1 '' 1 3
+	.
+	Grid ? '' 4 3
+		Text ? 'Geschwindigkeit'
+		Slider speed_slider '' expandx
+		SpinButton speed '\\0\\10000\\0.1'
+		Text ? 'Hz'
+		Text ? 'Verzögerung'
+		Slider delay_slider ''
+		SpinButton delay '\\0\\10000\\0.1'
+		Text ? 'ms'
+		Text ? 'Tiefe'
+		Slider depth_slider ''
+		SpinButton depth '\\0\\100\\0.1'
+		Text ? '%'")
 		
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 2)

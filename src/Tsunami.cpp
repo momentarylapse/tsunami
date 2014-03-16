@@ -12,6 +12,7 @@
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/SampleManager.h"
+#include "View/Dialog/MixingConsole.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -47,9 +48,9 @@ Tsunami::Tsunami(Array<string> arg) :
 	renderer = new AudioRenderer;
 
 
-	int width = HuiConfigReadInt("Window.Width", 800);
-	int height = HuiConfigReadInt("Window.Height", 600);
-	bool maximized = HuiConfigReadBool("Window.Maximized", true);
+	int width = HuiConfig.getInt("Window.Width", 800);
+	int height = HuiConfig.getInt("Window.Height", 600);
+	bool maximized = HuiConfig.getBool("Window.Maximized", true);
 
 	//HuiAddKeyCode("insert_added", KEY_RETURN);
 	//HuiAddKeyCode("remove_added", KEY_BACKSPACE);
@@ -73,6 +74,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("level_up", "hui:up", -1, this, &Tsunami::OnCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &Tsunami::OnCurLevelDown);
 	HuiAddCommandM("sample_manager", "", -1, this, &Tsunami::OnSampleManager);
+	HuiAddCommandM("show_mixing_console", "", -1, this, &Tsunami::OnMixingConsole);
 	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, &Tsunami::OnRemoveAdded);
@@ -107,31 +109,36 @@ Tsunami::Tsunami(Array<string> arg) :
 	// table structure
 	SetSize(width, height);
 	SetBorderWidth(0);
-	AddControlTable("", 0, 0, 1, 2, "root_table");
+	AddControlTable("", 0, 0, 1, 3, "root_table");
 	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 3, 1, "main_table");
 	SetBorderWidth(5);
-	AddControlTable("!noexpandy", 0, 1, 3, 1, "bottom_table");
+	AddControlTable("!noexpandy", 0, 2, 3, 1, "bottom_table");
+	AddControlTable("!noexpandy,height=250", 0, 1, 20, 1, "mixing_table");
+
+	// bottom
 	SetTarget("bottom_table", 0);
 	AddControlTable("!noexpandy", 0, 0, 7, 1, "output_table");
 	AddControlTable("!noexpandy", 1, 0, 7, 1, "edit_midi_table");
 	HideControl("edit_midi_table", true);
 
+	HideControl("mixing_table", true);
+
 	// main table
 	SetBorderWidth(0);
 	SetTarget("main_table", 0);
 	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
-	AddControlTable("!noexpandx", 1, 0, 1, 1, "track_dialog_table");
+	AddControlTable("!noexpandx,width=250", 1, 0, 1, 1, "track_dialog_table");
 	HideControl("track_dialog_table", true);
-	AddControlTable("!noexpandx,width=220", 2, 0, 1, 1, "audio_dialog_table");
+	AddControlTable("!noexpandx,width=250", 2, 0, 1, 1, "audio_dialog_table");
 	HideControl("audio_dialog_table", true);
 
 	// output table
 	SetBorderWidth(5);
 	SetTarget("output_table", 0);
-	AddButton("", 0, 0, 0, 0, "play");
+	/*AddButton("", 0, 0, 0, 0, "play");
 	AddButton("", 1, 0, 0, 0, "pause");
-	AddButton("", 2, 0, 0, 0, "stop");
+	AddButton("", 2, 0, 0, 0, "stop");*/
 	AddDrawingArea("!width=100,noexpandx", 3, 0, 0, 0, "output_peaks");
 	peak_meter = new PeakMeter(this, "output_peaks", output);
 	AddSlider("!width=100", 4, 0, 0, 0, "output_volume_slider");
@@ -171,6 +178,8 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	sample_manager = new SampleManager(audio, this, true);
 
+	mixing_console = new MixingConsole(audio, this);
+
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
 	plugin_manager->AddPluginsToMenu();
@@ -180,6 +189,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	Subscribe(audio);
 	Subscribe(output, "StateChange");
 	Subscribe(clipboard);
+	Subscribe(mixing_console);
 
 	UpdateMenu();
 
@@ -199,13 +209,15 @@ Tsunami::~Tsunami()
 	Unsubscribe(audio);
 	Unsubscribe(output);
 	Unsubscribe(clipboard);
+	Unsubscribe(mixing_console);
 
 	int w, h;
 	GetSizeDesired(w, h);
-	HuiConfigWriteInt("Window.Width", w);
-	HuiConfigWriteInt("Window.Height", h);
-	HuiConfigWriteBool("Window.Maximized", IsMaximized());
+	HuiConfig.setInt("Window.Width", w);
+	HuiConfig.setInt("Window.Height", h);
+	HuiConfig.setBool("Window.Maximized", IsMaximized());
 
+	delete(mixing_console);
 	delete(sample_manager);
 	delete(plugin_manager);
 	delete(storage);
@@ -348,6 +360,11 @@ void Tsunami::OnDelete()
 void Tsunami::OnSampleManager()
 {
 	sample_manager->Show();
+}
+
+void Tsunami::OnMixingConsole()
+{
+	mixing_console->Show(!mixing_console->enabled);
 }
 
 void Tsunami::OnSubImport()
@@ -552,6 +569,8 @@ void Tsunami::UpdateMenu()
 	Enable("stop", output->IsPlaying());
 	Enable("pause", output->IsPlaying());
 	Check("play_loop", renderer->loop_if_allowed);
+	// view
+	Check("show_mixing_console", mixing_console->enabled);
 
 	volume_slider->Set(output->GetVolume());
 

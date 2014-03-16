@@ -2,18 +2,6 @@ Dialog track_dialog "Spur" 380 430
 	Grid ? "" 1 6
 		Group ld_t_name "Name"
 			Edit name "" expandx
-		Group ld_t_volume "Lautstärke"
-			Grid ? "" 1 2
-				Slider volume_slider "" expandx
-				Grid ? "" 3 1
-					SpinButton volume "\\0\\1000\\0.1"
-					Text percent "%"
-					CheckBox mute "Stumm"
-		Group ld_t_panning "Balance"
-			Grid ? "" 3 1
-				Slider panning_slider "" expandx
-				SpinButton panning "0\\-100\\100\\0.1"
-				Text percent "%"
 		Expander ld_t_effects "Effekte"
 			Grid ? "" 1 2
 				ListView fx_list "Effekte" nobar

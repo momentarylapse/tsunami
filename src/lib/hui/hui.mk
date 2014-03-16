@@ -3,7 +3,7 @@
 HUI_DIR = $(LIB_DIR)/hui
 HUI_BIN  = $(HUI_DIR)/hui.a
 HUI_OBJ  = $(HUI_DIR)/hui.o \
- $(HUI_DIR)/hui_language.o $(HUI_DIR)/hui_config.o $(HUI_DIR)/hui_resource.o $(HUI_DIR)/hui_utility.o \
+ $(HUI_DIR)/hui_language.o $(HUI_DIR)/HuiConfig.o $(HUI_DIR)/hui_resource.o $(HUI_DIR)/hui_utility.o \
  $(HUI_DIR)/hui_input.o $(HUI_DIR)/hui_error.o $(HUI_DIR)/hui_clipboard.o $(HUI_DIR)/HuiTimer.o \
  $(HUI_DIR)/hui_common_dlg.o $(HUI_DIR)/hui_common_dlg_gtk.o $(HUI_DIR)/hui_common_dlg_win.o \
  $(HUI_DIR)/HuiMenu.o $(HUI_DIR)/HuiMenuGtk.o $(HUI_DIR)/HuiMenuWin.o \
@@ -69,8 +69,8 @@ $(HUI_DIR)/hui_resource.o : $(HUI_DIR)/hui_resource.cpp
 $(HUI_DIR)/hui_utility.o : $(HUI_DIR)/hui_utility.cpp
 	$(CPP) -c $(HUI_DIR)/hui_utility.cpp -o $@ $(HUI_CXXFLAGS)
 
-$(HUI_DIR)/hui_config.o : $(HUI_DIR)/hui_config.cpp
-	$(CPP) -c $(HUI_DIR)/hui_config.cpp -o $@ $(HUI_CXXFLAGS)
+$(HUI_DIR)/HuiConfig.o : $(HUI_DIR)/HuiConfig.cpp
+	$(CPP) -c $(HUI_DIR)/HuiConfig.cpp -o $@ $(HUI_CXXFLAGS)
 
 $(HUI_DIR)/HuiMenu.o : $(HUI_DIR)/HuiMenu.cpp
 	$(CPP) -c $(HUI_DIR)/HuiMenu.cpp -o $@ $(HUI_CXXFLAGS)

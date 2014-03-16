@@ -230,7 +230,7 @@ enum{
 //--------------------------------------------------------------------------------------------------
 // type casting
 
-typedef void *t_cast_func(void*);
+typedef string t_cast_func(string);
 struct TypeCast{
 	int penalty;
 	Type *source, *dest;

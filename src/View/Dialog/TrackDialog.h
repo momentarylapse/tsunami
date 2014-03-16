@@ -28,9 +28,6 @@ public:
 	void OnOk();
 	void OnClose();
 	void OnName();
-	void OnVolume();
-	void OnMute();
-	void OnPanning();
 	void OnSynthesizer();
 	void OnConfigSynthesizer();
 	void OnEditMidiTrack();
@@ -40,8 +37,6 @@ public:
 	virtual void OnUpdate(Observable *o);
 
 	Track *track;
-	Slider *volume_slider;
-	Slider *panning_slider;
 	FxList *fx_list;
 	BarList *bar_list;
 };

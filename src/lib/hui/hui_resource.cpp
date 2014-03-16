@@ -1,6 +1,7 @@
 #include "hui.h"
 #include "hui_internal.h"
 #include "Controls/HuiControl.h"
+#include "../math/math.h"
 
 //----------------------------------------------------------------------------------
 // resource functions
@@ -52,7 +53,7 @@ string str_escape(const string &str)
 extern Array<HuiLanguage> _HuiLanguage_;
 Array<HuiResource> _HuiResource_;
 
-void LoadResourceCommand(CFile *f, HuiResourceCommand *c)
+void LoadResourceCommand(CFile *f, HuiResource *c)
 {
 	c->type = f->ReadStr();
 	c->id = f->ReadStr();
@@ -82,14 +83,14 @@ void HuiLoadResource(const string &filename)
 		int nres = f->ReadIntC();
 		for (int i=0;i<nres;i++){
 			HuiResource res;
-			res.cmd.clear();
+			res.children.clear();
 			f->ReadComment();
 			LoadResourceCommand(f, &res);
 			int n = f->ReadInt();
 			for (int j=0;j<n;j++){
-				HuiResourceCommand cmd;
-				LoadResourceCommand(f, &cmd);
-				res.cmd.add(cmd);
+				HuiResource child;
+				LoadResourceCommand(f, &child);
+				res.children.add(child);
 			}
 			_HuiResource_.add(res);
 		}
@@ -165,7 +166,7 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 		dlg->toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
 
 	// controls
-	foreach(HuiResourceCommand &cmd, res->cmd){
+	foreach(HuiResource &cmd, res->children){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
 			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
@@ -201,7 +202,7 @@ HuiMenu *_create_res_menu_(HuiResource *res, int &index, int num)
 	//msg_db_out(2,i2s(n));
 	for (int i=0;i<num;i++){
 		//msg_db_out(2,i2s(j));
-		HuiResourceCommand *cmd = &res->cmd[index];
+		HuiResource *cmd = &res->children[index];
 		if (cmd->type == "Item")
 			menu->AddItem(get_lang(cmd->id, "", true), cmd->id);
 		if (cmd->type == "ItemImage")
@@ -237,5 +238,224 @@ HuiMenu *HuiCreateResourceMenu(const string &id)
 	msg_db_m("  \\(^_^)/",1);
 	HuiMenu *m = _create_res_menu_(res, i, res->i_param[0]);
 	return m;
+}
+
+
+
+inline bool res_is_letter(char c)
+{
+	return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'z'));
+}
+
+inline bool res_is_number(char c)
+{
+	return (c >= '0') && (c <= '9');
+}
+
+inline bool res_is_alphanum(char c)
+{
+	return res_is_letter(c) || res_is_number(c);
+}
+
+Array<string> res_tokenize(const string &s)
+{
+	Array<string> a;
+	for (int i=0;i<s.num;i++){
+		// ignore whitespace
+		if ((s[i] == ' ') || (s[i] == '\t'))
+			continue;
+
+		// read token
+		string token;
+		if ((s[i] == '\"') || (s[i] == '\'')){
+			// string
+			i ++;
+			for (;i<s.num;i++){
+				if ((s[i] == '\"') || (s[i] == '\''))
+					break;
+				token.add(s[i]);
+			}
+		}else if (res_is_letter(s[i])){
+			// word
+			for (;i<s.num;i++){
+				token.add(s[i]);
+				if (i < s.num - 1)
+					if (!res_is_alphanum(s[i + 1]))
+						break;
+			}
+		}else if ((res_is_number(s[i])) || ((s[i] == '-') && (res_is_number(s[i + 1])))){
+			// number
+			for (;i<s.num;i++){
+				token.add(s[i]);
+				if (i < s.num - 1)
+					if ((!res_is_number(s[i + 1])) && (s[i + 1] != '.'))
+						break;
+			}
+		}else{
+			// operator etc
+			token.add(s[i]);
+			if ((s[i] == '-') && (s[i + 1] == '>'))
+				token.add(s[++ i]);
+		}
+		a.add(token);
+	}
+	return a;
+}
+
+bool res_sa_contains(Array<string> &a, const string &s)
+{
+	foreach(string &aa, a)
+		if (aa == s)
+			return true;
+	return false;
+}
+
+int res_get_indent(const string &line)
+{
+	int indent = 0;
+	for (int i=0;i<line.num;i++)
+		if (line[i] != '\t')
+			break;
+		else
+			indent ++;
+	return indent;
+}
+
+void res_parse_new(const string &line, Array<string> &tokens)
+{
+	int indent = res_get_indent(line);
+	string temp;
+	for (int i=indent;i<line.num;i++){
+		if (line[i] == ' '){
+			if (temp.num > 0)
+				tokens.add(temp);
+			temp = "";
+		}else if ((temp.num == 0) && ((line[i] == '\"') || (line[i] == '\''))){
+			// string
+			for (int j=i+1;j<line.num;j++){
+				if (line[j] == '\\'){
+					temp.add(line[j ++]);
+					temp.add(line[j]);
+				}else if ((line[j] == '\"') || (line[j] == '\'')){
+					i = j;
+					tokens.add(str_unescape(temp));
+					temp = "";
+					break;
+				}else
+					temp.add(line[j]);
+			}
+		}else
+			temp.add(line[i]);
+	}
+	if (temp.num > 0)
+		tokens.add(temp);
+}
+
+void res_add_option(HuiResourceNew &c, const string &option)
+{
+	if (option.head(6) == "image="){
+		c.image = option.substr(6, -1);
+		return;
+	}
+	if (option == "disabled"){
+		c.enabled = false;
+		return;
+	}
+	c.options.add(option);
+}
+
+bool res_load_line(string &l, HuiResourceNew &c)
+{
+	// parse line
+	Array<string> tokens;
+	res_parse_new(l, tokens);
+	if (tokens.num == 0)
+		return false;
+
+	// id
+	string id;
+	if (tokens.num > 1)
+		id = tokens[1];
+	if (id == "?")
+		id = "rand_id_" + i2s(randi(1000000));
+
+	// dummy
+	if (tokens[0] == ".")
+		return false;
+	if (tokens.num < 3)
+		return false;
+
+	// interpret tokens
+	c.x = 0;
+	c.y = 0;
+	c.w = 1;
+	c.h = 1;
+	c.enabled = true;
+	c.type = tokens[0];
+	/*if (cur_indent == 0)
+		c.type = "Dialog";*/
+	c.id = id;
+	c.title = tokens[2];
+	int n_used = 3;
+	if ((c.type == "Grid") || (c.type == "Dialog")){
+		c.w = tokens[3]._int();
+		c.h = tokens[4]._int();
+		n_used = 5;
+	}
+	for (int i=n_used; i<tokens.num; i++)
+		res_add_option(c, tokens[i]);
+	return true;
+}
+
+bool res_load_rec(Array<string> &lines, int &cur_line, HuiResourceNew &c)
+{
+	int cur_indent = res_get_indent(lines[cur_line]);
+	bool r = res_load_line(lines[cur_line], c);
+	cur_line ++;
+
+	for (int n=0; n<100; n++){
+		if (cur_line >= lines.num)
+			break;
+		int indent = res_get_indent(lines[cur_line]);
+		if (indent <= cur_indent)
+			break;
+		HuiResourceNew child;
+		if (res_load_rec(lines, cur_line, child)){
+			if (c.type == "Grid"){
+				if (c.w > 0){
+					child.x = n % c.w;
+					child.y = n / c.w;
+					//msg_write(format("%d %d", c.x, c.y));
+				}
+			}else if (c.type == "TabControl"){
+				child.x = n;
+			}
+			c.children.add(child);
+		}
+
+	}
+	return r;
+}
+
+void HuiResourceNew::show(int indent)
+{
+	string nn;
+	for (int i=0;i<indent;i++)
+		nn += "    ";
+	msg_write(nn + type + " - " + id + format(" - %d %d %d %d - ", x, y, w, h) + sa2s(options));
+	foreach(HuiResourceNew &child, children)
+		child.show(indent + 1);
+}
+
+void HuiResourceNew::load(const string &buffer)
+{
+	Array<string> lines = buffer.explode("\n");
+	for (int i=lines.num-1; i>=0; i--)
+		if (lines[i].num == 0)
+			lines.erase(i);
+	int cur_line = 0;
+
+	//HuiResourceNew c;
+	res_load_rec(lines, cur_line, *this);
 }
 

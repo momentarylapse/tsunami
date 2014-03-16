@@ -86,20 +86,20 @@ void PeakMeter::DrawPeak(HuiPainter *c, const rect &r, Data &d)
 	int h = r.height();
 	float sp = d.get_sp();
 
-	c->SetColor(White);
+	c->setColor(White);
 	if ((sp > 1) || (sp > 1))
-		c->SetColor(Red);
-	c->DrawRect(r);
+		c->setColor(Red);
+	c->drawRect(r);
 
-	c->SetColor(peak_color(sp, 0.4f));
-	c->DrawRect(r.x1, r.y1,       (float)w * nice_peak(sp), h);
+	c->setColor(peak_color(sp, 0.4f));
+	c->drawRect(r.x1, r.y1,       (float)w * nice_peak(sp), h);
 
-	c->SetColor(peak_color(d.peak));
-	c->DrawRect(r.x1, r.y1,       (float)w * nice_peak(d.peak), h);
+	c->setColor(peak_color(d.peak));
+	c->drawRect(r.x1, r.y1,       (float)w * nice_peak(d.peak), h);
 
-	c->SetColor(Black);
+	c->setColor(Black);
 	if (sp > 0)
-		c->DrawRect(w * nice_peak(sp), r.y1, 2, h);
+		c->drawRect(w * nice_peak(sp), r.y1, 2, h);
 }
 
 void PeakMeter::OnDraw()
@@ -113,18 +113,18 @@ void PeakMeter::OnDraw()
 		DrawPeak(c, rect(2, w-2, 2, h/2-1), r);
 		DrawPeak(c, rect(2, w-2, h/2 + 1, h-2), l);
 	}else{
-		c->SetColor(White);
-		c->DrawRect(2, 2, w - 4, h - 4);
-		c->SetColor(Black);
+		c->setColor(White);
+		c->drawRect(2, 2, w - 4, h - 4);
+		c->setColor(Black);
 		float dx = 1.0f / (float)SPECTRUM_SIZE * (w - 2);
 		for (int i=0;i<100;i++){
 			float x0 = 2 + (float)i / (float)SPECTRUM_SIZE * (w - 2);
 			float hh = (h - 4) * r.spec[i];
-			c->DrawRect(x0, h - 2 - hh, dx, hh);
+			c->drawRect(x0, h - 2 - hh, dx, hh);
 		}
 	}
 
-	c->End();
+	c->end();
 }
 
 void PeakMeter::FindPeaks()

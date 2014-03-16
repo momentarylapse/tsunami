@@ -7,6 +7,7 @@
 
 #include "HuiControl.h"
 #include "../hui.h"
+#include "HuiControlMultilineEdit.h"
 
 void WinTrySendByKeyCode(HuiWindow *win, int key_code);
 
@@ -316,6 +317,11 @@ void HuiControl::Notify(const string &message, bool is_default)
 			win->OnKeyUp();
 		else if (message == "hui:draw")
 			win->OnDraw();
+	}else if (type == HuiKindMultilineEdit){
+		if (message == "hui:key-down"){
+			if (((HuiControlMultilineEdit*)this)->handle_keys)
+				WinTrySendByKeyCode(win, HuiGetEvent()->key_code);
+		}
 	}
 	notify_pop();
 }

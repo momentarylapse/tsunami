@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-173
+171
 // Data (ID,Text)
 about
 
@@ -115,8 +115,6 @@ ld_t_effects
 !bold\\Effects
 ld_t_name
 !bold\\Name:
-ld_t_panning
-
 ld_t_repdelay
 
 ld_t_repetition
@@ -205,10 +203,6 @@ ok
 OK
 open
 Open...
-panning
-
-panning_slider
-
 paste
 Paste
 pause
@@ -301,6 +295,8 @@ settings_dialog
 
 show_log
 
+show_mixing_console
+
 stop
 Stop
 sub_from_selection
@@ -350,7 +346,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-94
+96
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -454,6 +450,8 @@ Kein Sample ausgewählt
 
 Konnte Aufnahmegerät nicht öffnen
 
+Lautstärke
+
 MIDI Quelle auswählen
 
 MIDI Quellen
@@ -527,6 +525,8 @@ namenlose Spur
 neue Audiodatei
 
 neue Spur anlegen
+
+nichts zu konfigurieren
 
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 

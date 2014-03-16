@@ -499,6 +499,7 @@ extern int GtkAreaMouseSetX, GtkAreaMouseSetY;
 void HuiWindow::SetCursorPos(int x, int y)
 {
 	if (main_input_control){
+		//msg_write(format("set cursor %d %d  ->  %d %d", (int)input.x, (int)input.y, x, y));
 		GtkAreaMouseSet = 2;
 		GtkAreaMouseSetX = x;
 		GtkAreaMouseSetY = y;
@@ -507,6 +508,7 @@ void HuiWindow::SetCursorPos(int x, int y)
 		// TODO GTK3
 #ifdef OS_LINUX
 		XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(main_input_control->widget)), 0, 0, 0, 0, x, y);
+		XFlush(hui_x_display);
 #endif
 #ifdef OS_WINDOWS
 		RECT r;

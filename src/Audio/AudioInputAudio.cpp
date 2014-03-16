@@ -60,8 +60,8 @@ AudioInputAudio::AudioInputAudio(BufferBox &buf, BufferBox &cur_buf) :
 	memset(capture_temp, 0, sizeof(capture_temp));
 	SampleRate = DEFAULT_SAMPLE_RATE;
 
-	ChosenDevice = HuiConfigReadStr("Input.ChosenDevice", "");
-	PlaybackDelayConst = HuiConfigReadFloat("Input.PlaybackDelay", 80.0f);
+	ChosenDevice = HuiConfig.getStr("Input.ChosenDevice", "");
+	PlaybackDelayConst = HuiConfig.getFloat("Input.PlaybackDelay", 80.0f);
 
 }
 
@@ -141,7 +141,7 @@ int AudioInputAudio::GetSampleCount()
 void AudioInputAudio::SetPlaybackDelayConst(float f)
 {
 	PlaybackDelayConst = f;
-	HuiConfigWriteFloat("Input.PlaybackDelay", PlaybackDelayConst);
+	HuiConfig.setFloat("Input.PlaybackDelay", PlaybackDelayConst);
 }
 
 int AudioInputAudio::DoCapturing()

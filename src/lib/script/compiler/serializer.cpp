@@ -148,7 +148,7 @@ string cmd2str(SerialCommand &c)
 	if (c.inst == inst_marker)
 		return format("-- Marker %d --", (long)c.p1.p);
 	if (c.inst == inst_asm)
-		return "-- Asm --";
+		return format("-- Asm %d --", (long)c.p1.p);
 	if (c.inst == inst_call_label)
 		return "call  (by label) " + ((Function*)c.p1.p)->name;
 	string t = Asm::GetInstructionName(c.inst);
@@ -748,7 +748,7 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 			p.kind = KindVarGlobal;
 		else
 			p.kind = KindRefToConst;
-		p.p = script->cnst[link->link_no];
+		p.p = link->script->cnst[link->link_no];
 	}else if ((link->kind==KindOperator) || (link->kind==KindFunction) || (link->kind==KindVirtualFunction) || (link->kind==KindCompilerFunction) || (link->kind==KindArrayBuilder)){
 		p = SerializeCommand(link, level, index);
 	}else if (link->kind == KindReference){
@@ -768,7 +768,7 @@ void Serializer::SerializeParameter(Command *link, int level, int index, SerialC
 		AddDereference(param, p);
 	}else if (link->kind == KindVarTemp){
 		// only used by <new> operator
-		p.p = (char*)link->link_no;
+		p.p = (char*)(long)link->link_no;
 	}else{
 		DoError("unexpected type of parameter: " + Kind2Str(link->kind));
 	}
@@ -1233,7 +1233,7 @@ void Serializer::SerializeCompilerFunction(Command *com, Array<SerialCommandPara
 				// NextCommand is a block!
 				if (NextCommand->kind != KindBlock)
 					DoError("command block in \"for\" loop missing");
-				marker_continue = add_marker_after_command(level + 1, syntax_tree->Blocks[NextCommand->link_no]->command.num - 2);
+				marker_continue = add_marker_after_command(level + 1, NextCommand->block()->command.num - 2);
 			}
 			LoopData l = {marker_continue, marker_after_while, level, index};
 			loop.add(l);
@@ -1519,9 +1519,11 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 
 	// class function -> compile instance
 	bool is_class_function = false;
-	if ((com->kind == KindFunction) || (com->kind == KindVirtualFunction)){
+	if (com->kind == KindFunction){
 		if (com->script->syntax->Functions[com->link_no]->_class)
 			is_class_function = true;
+	}else if (com->kind == KindVirtualFunction){
+		is_class_function = true;
 	}
 	SerialCommandParam instance = {-1, NULL, NULL};
 	if (is_class_function){
@@ -1567,7 +1569,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 			AddFunctionCall(cf->script, cf->nr);
 		}
 	}else if (com->kind == KindBlock){
-		SerializeBlock(syntax_tree->Blocks[com->link_no], level + 1);
+		SerializeBlock(com->block(), level + 1);
 	}else{
 		//DoError(string("type of command is unimplemented (call Michi!): ",Kind2Str(com->Kind)));
 	}
@@ -2906,6 +2908,8 @@ void AddAsmBlock(Asm::InstructionWithParamsList *list, Script *s)
 	msg_db_f("AddAsmBlock", 4);
 	//msg_write(".------------------------------- asm");
 	SyntaxTree *ps = s->syntax;
+	if (ps->AsmBlocks.num == 0)
+		s->DoError("asm block mismatch");
 	ps->AsmMetaInfo->LineOffset = ps->AsmBlocks[0].line;
 	list->AppendFromSource(ps->AsmBlocks[0].block);
 	ps->AsmBlocks.erase(0);

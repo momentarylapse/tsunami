@@ -28,10 +28,10 @@ HuiControlMultilineEdit::HuiControlMultilineEdit(const string &title, const stri
 
 	// frame
 	frame = scroll;
-//	if (border_width > 0){
+	if (OptionString.find("noframe") < 0){ //(border_width > 0){
 		frame = gtk_frame_new(NULL);
 		gtk_container_add(GTK_CONTAINER(frame), scroll);
-//	}
+	}
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	g_signal_connect(G_OBJECT(tb), "changed", G_CALLBACK(&OnGtkMultilineEditChange), this);

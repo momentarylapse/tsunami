@@ -54,7 +54,7 @@ void SettingsDialog::LoadData()
 		if (l == HuiGetCurLanguage())
 			SetInt("language", i);
 	}
-	float CurOggQuality = HuiConfigReadFloat("OggQuality", 0.5f);
+	float CurOggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
 	foreachi(OggQuality &q, ogg_quality, i)
 		if (CurOggQuality > q.quality - 0.05f)
 			SetInt("ogg_bitrate", i);
@@ -92,12 +92,12 @@ void SettingsDialog::OnLanguage()
 	Array<string> lang = HuiGetLanguages();
 	int l = GetInt("");
 	HuiSetLanguage(lang[l]);
-	HuiConfigWriteStr("Language", lang[l]);
+	HuiConfig.setStr("Language", lang[l]);
 }
 
 void SettingsDialog::OnOggBitrate()
 {
-	HuiConfigWriteFloat("OggQuality", ogg_quality[GetInt("")].quality);
+	HuiConfig.setFloat("OggQuality", ogg_quality[GetInt("")].quality);
 }
 
 void SettingsDialog::OnVolume()
@@ -111,7 +111,7 @@ void SettingsDialog::OnCaptureDevice()
 		tsunami->input->in_audio->ChosenDevice = tsunami->input->in_audio->Device[GetInt("") - 1];
 	else
 		tsunami->input->in_audio->ChosenDevice = "";
-	HuiConfigWriteStr("Input.ChosenDevice", tsunami->input->in_audio->ChosenDevice);
+	HuiConfig.setStr("Input.ChosenDevice", tsunami->input->in_audio->ChosenDevice);
 }
 
 void SettingsDialog::OnPreviewDevice()

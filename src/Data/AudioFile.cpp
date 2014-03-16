@@ -28,6 +28,17 @@
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include <assert.h>
+#include <math.h>
+
+float amplitude2db(float amp)
+{
+	return log10(amp) * 20.0f;
+}
+
+float db2amplitude(float db)
+{
+	return pow10(db * 0.05);
+}
 
 
 int get_track_index(Track *t)

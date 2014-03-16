@@ -12,11 +12,14 @@
 void OnGtkSliderChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->Notify("hui:change");	}
 
-HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool horizontal) :
+HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool _vertical) :
 	HuiControl(HuiKindSlider, id)
 {
+	vertical = _vertical;
 	GetPartStrings(id, title);
-	if (horizontal){
+	if (OptionString.find("vertical") >= 0)
+		vertical = true;
+	if (vertical){
 #if GTK_MAJOR_VERSION >= 3
 		widget = gtk_scale_new_with_range(GTK_ORIENTATION_VERTICAL, 0.0, 1.0, 0.0001);
 #else
@@ -30,6 +33,8 @@ HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool h
 		widget = gtk_vscale_new_with_range(0.0, 1.0, 0.0001);
 #endif
 	}
+	if (OptionString.find("noorigin") >= 0)
+		gtk_scale_set_has_origin(GTK_SCALE(widget), false);
 	gtk_scale_set_draw_value(GTK_SCALE(widget), false);
 	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkSliderChange), this);
 	SetOptions(OptionString);
@@ -47,6 +52,14 @@ float HuiControlSlider::GetFloat()
 void HuiControlSlider::__SetFloat(float f)
 {
 	gtk_range_set_value(GTK_RANGE(widget), f);
+}
+
+void HuiControlSlider::__AddString(const string &s)
+{
+	Array<string> p = s.explode("\\");//HuiComboBoxSeparator);
+	if (p.num != 2)
+		return;
+	gtk_scale_add_mark(GTK_SCALE(widget), p[0]._float(), vertical ? GTK_POS_LEFT : GTK_POS_TOP, ("<small>" + p[1] + "</small>").c_str());
 }
 
 #endif

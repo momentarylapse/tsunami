@@ -10,7 +10,7 @@ void SyntaxTree::AutoImplementAddVirtualTable(Command *self, Function *f, Type *
 	if (t->vtable.num > 0){
 		Command *p = shift_command(self, true, 0, TypePointer);
 		int nc = AddConstant(TypePointer);
-		(*(void**)Constants[nc].data) = t->vtable.data;
+		(*(void**)Constants[nc].value.data) = t->vtable.data;
 		Command *cmd_0 = add_command_const(nc);
 		Command *c = add_command_operator(p, cmd_0, OperatorAssign);
 		f->block->command.add(c);
@@ -42,7 +42,7 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Type *t, bool allo
 		foreach(ClassFunction &ff, t->function)
 			if (ff.name == "__mem_init__"){
 				int nc = AddConstant(TypeInt);
-				*(int*)Constants[nc].data = t->parent->size;
+				Constants[nc].setInt(t->parent->size);
 				Command *c = add_command_classfunc(t, &ff, self);
 				c->param[0] = add_command_const(nc);
 				c->num_params = 1;
@@ -165,7 +165,7 @@ void SyntaxTree::AutoImplementAssign(Function *f, Type *t)
 
 		// for_var = 0
 		int nc = AddConstant(TypeInt);
-		(*(int*)Constants[nc].data) = 0;
+		Constants[nc].setInt(0);
 		Command *cmd_0 = add_command_const(nc);
 		Command *cmd_assign0 = add_command_operator(for_var, cmd_0, OperatorIntAssign);
 		f->block->command.add(cmd_assign0);
@@ -206,7 +206,7 @@ void SyntaxTree::AutoImplementAssign(Function *f, Type *t)
 
 		f->AddVar("i", TypeInt);
 		int nc_num = AddConstant(TypeInt);
-		*(int*)Constants[nc_num].data = t->array_length;
+		Constants[nc_num].setInt(t->array_length);
 
 		Command *for_var = add_command_local_var(f->get_var("i"), TypeInt);
 		Command *c_num = add_command_const(nc_num);
@@ -214,7 +214,7 @@ void SyntaxTree::AutoImplementAssign(Function *f, Type *t)
 
 		// for_var = 0
 		int nc_0 = AddConstant(TypeInt);
-		(*(int*)Constants[nc_0].data) = 0;
+		Constants[nc_0].setInt(0);
 		Command *cmd_0 = add_command_const(nc_0);
 		Command *cmd_assign0 = add_command_operator(for_var, cmd_0, OperatorIntAssign);
 		f->block->command.add(cmd_assign0);
@@ -293,7 +293,7 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Type *t)
 	if (f_del){
 		// for_var = 0
 		int nc = AddConstant(TypeInt);
-		(*(int*)Constants[nc].data) = 0;
+		Constants[nc].setInt(0);
 		Command *cmd_0 = add_command_const(nc);
 		Command *cmd_assign = add_command_operator(for_var, cmd_0, OperatorIntAssign);
 		f->block->command.add(cmd_assign);
@@ -464,7 +464,7 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Type *t)
 
 	// resize(self.num + 1)
 	int nc = AddConstant(TypeInt);
-	(*(int*)Constants[nc].data) = 1;
+	Constants[nc].setInt(1);
 	Command *cmd_1 = add_command_const(nc);
 	Command *cmd_add = add_command_operator(self_num, cmd_1, OperatorIntAdd);
 	Command *cmd_resize = add_command_classfunc(t, t->GetFunc("resize", TypeVoid, 1), self);

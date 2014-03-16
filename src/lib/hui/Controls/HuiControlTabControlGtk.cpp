@@ -23,22 +23,11 @@ HuiControlTabControl::HuiControlTabControl(const string &title, const string &id
 {
 	GetPartStrings(id, title);
 	widget = gtk_notebook_new();
+	this->win = win; // for addPage()
 
-	for (int i=0;i<PartString.num;i++){
-		GtkWidget *inside;
-		if (win->is_resizable){
-#if GTK_MAJOR_VERSION >= 3
-			inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
-#else
-			inside = gtk_hbox_new(true, 0);
-#endif
-			gtk_box_set_homogeneous(GTK_BOX(inside), true);
-		}else
-			inside = gtk_fixed_new();
-		gtk_widget_show(inside);
-		GtkWidget *label = gtk_label_new(sys_str(PartString[i]));
-		gtk_notebook_append_page(GTK_NOTEBOOK(widget), inside, label);
-    }
+	for (int i=0;i<PartString.num;i++)
+		addPage(PartString[i]);
+
 	cur_page = 0;
 	g_signal_connect(G_OBJECT(widget), "switch-page", G_CALLBACK(&OnGtkTabControlSwitch), this);
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), true);
@@ -69,6 +58,28 @@ void HuiControlTabControl::__SetInt(int i)
 int HuiControlTabControl::GetInt()
 {
 	return cur_page;
+}
+
+void HuiControlTabControl::__AddString(const string &str)
+{
+	addPage(str);
+}
+
+void HuiControlTabControl::addPage(const string &str)
+{
+	GtkWidget *inside;
+	if (win->is_resizable){
+#if GTK_MAJOR_VERSION >= 3
+		inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
+#else
+		inside = gtk_hbox_new(true, 0);
+#endif
+		gtk_box_set_homogeneous(GTK_BOX(inside), true);
+	}else
+		inside = gtk_fixed_new();
+	gtk_widget_show(inside);
+	GtkWidget *label = gtk_label_new(sys_str(str));
+	gtk_notebook_append_page(GTK_NOTEBOOK(widget), inside, label);
 }
 
 void HuiControlTabControl::add(HuiControl *child, int x, int y)

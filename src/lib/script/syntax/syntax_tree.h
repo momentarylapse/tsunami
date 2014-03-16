@@ -15,6 +15,7 @@ class Script;
 class SyntaxTree;
 
 #define SCRIPT_MAX_PARAMS				16		// number of possible parameters per function/command
+#define SCRIPT_MAX_STRING_CONST_LENGTH	2048
 
 // macros
 struct Define
@@ -27,8 +28,10 @@ struct Define
 struct Constant
 {
 	string name;
-	char *data;
+	string value;
 	Type *type;
+	void setInt(int i);
+	int getInt();
 };
 
 enum
@@ -70,7 +73,6 @@ enum
 	KindRegister,
 	KindDerefRegister,
 	KindMarker,
-	KindAsmBlock,
 };
 
 struct Command;
@@ -78,9 +80,8 @@ struct Command;
 // {...}-block
 struct Block
 {
-	int root;
 	int index;
-	Array<Command*> command; // ID of command in global command array
+	Array<Command*> command;
 };
 
 struct Variable
@@ -128,6 +129,7 @@ struct Command
 	// return value
 	Type *type;
 	Command(int kind, int link_no, Script *script, Type *type);
+	Block *block() const;
 };
 
 struct AsmBlock
@@ -193,7 +195,7 @@ public:
 
 	// syntax analysis
 	Type *GetConstantType();
-	void *GetConstantValue();
+	string GetConstantValue();
 	Type *FindType(const string &name);
 	Type *GetType(const string &name, bool force);
 	void AddType(Type **type);
@@ -231,6 +233,7 @@ public:
 	// neccessary conversions
 	void ConvertCallByReference();
 	void BreakDownComplicatedCommands();
+	void BreakDownComplicatedCommand(Command *c);
 	void MapLocalVariablesToStack();
 
 	// data creation
@@ -248,15 +251,15 @@ public:
 	Command *add_command_parray(Command *p, Command *index, Type *type);
 	Command *cp_command(Command *c);
 	Command *cp_command_deep(Command *c);
-	Command *ref_command(Command *sub);
+	Command *ref_command(Command *sub, Type *overwrite_type = NULL);
 	Command *deref_command(Command *sub);
 	Command *shift_command(Command *sub, bool deref, int shift, Type *type);
 
 	// pre processor
-	void PreProcessCommand(Script *s, Command *c);
-	void PreProcessor(Script *s);
-	void PreProcessCommandAddresses(Script *s, Command *c);
-	void PreProcessorAddresses(Script *s);
+	void PreProcessCommand(Command *c);
+	void PreProcessor();
+	void PreProcessCommandAddresses(Command *c);
+	void PreProcessorAddresses();
 	void Simplify();
 
 	// debug displaying

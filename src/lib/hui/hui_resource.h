@@ -21,23 +21,7 @@ HuiMenu *_cdecl HuiCreateResourceMenu(const string &id);
 
 
 
-// resource commands (don't change the order!!!)
-enum{
-	HuiResMenu,
-	HuiResDialog,
-	HuiResToolBar,
-	HuiResSizableDialog,
-};
-enum{
-	HuiCmdMenuAddItem,
-	HuiCmdMenuAddItemImage,
-	HuiCmdMenuAddItemCheckable,
-	HuiCmdMenuAddItemSeparator,
-	HuiCmdMenuAddItemPopup,
-	HuiCmdDialogAddControl,
-};
-
-struct HuiResourceCommand
+struct HuiResource
 {
 	string type;
 	string id;
@@ -46,6 +30,7 @@ struct HuiResourceCommand
 	int i_param[6];
 	string s_param[2];
 	string image;
+	Array<HuiResource> children;
 	void reset()
 	{
 		type = "";
@@ -54,16 +39,26 @@ struct HuiResourceCommand
 		s_param[1] = "";
 		image = "";
 		enabled = true;
+		children.clear();
 		memset(i_param, 0, sizeof(i_param));
 		memset(b_param, 0, sizeof(b_param));
 	}
 };
 
-struct HuiResource : HuiResourceCommand
+
+
+struct HuiResourceNew
 {
-	Array<HuiResourceCommand> cmd;
-	void reset()
-	{	cmd.clear();	((HuiResourceCommand*)this)->reset();	}
+	string type;
+	string id;
+	string title;
+	bool enabled;
+	Array<string> options;
+	int x, y, w, h;
+	string image;
+	Array<HuiResourceNew> children;
+	void load(const string &buffer);
+	void show(int indent = 0);
 };
 
 // resources

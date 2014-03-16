@@ -47,14 +47,12 @@ class SpectrumDialog : Dialog
 	SpecGrid grid
 	void __init__()
 		super.__init__("Spectrum", 600, 460, MainWin, true)
-		addGrid("", 0, 0, 1, 2, "table1")
-		setTarget("table1", 0)
-		addDrawingArea("", 0, 0, 0, 0, "drawing_area")
-		addGrid("!noexpandy", 0, 1, 2, 1, "table2")
-		setTarget("table2", 0)
-		addText("", 0, 0, 0, 0, "")
-		addButton("!width=120\\Close", 1, 0, 0, 0, "close")
-		setImage("close", "hui:close")
+		fromSource("
+Grid ? '' 1 2
+	DrawingArea drawing_area ''
+	Grid ? '' 2 1 noexpandy
+		Text ? ''
+		Button close 'Close' width=120 image=hui:close")
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(audio.selection.offset / i2f(audio.sample_rate), audio.selection.end() / i2f(audio.sample_rate), false, "s")

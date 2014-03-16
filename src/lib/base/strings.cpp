@@ -715,7 +715,14 @@ int string::hash() const
 
 string string::trim() const
 {
-	return *this; // TODO
+	int i0 = 0, i1 = num-1;
+	for (i0=0;i0<num;i0++)
+		if (((*this)[i0] != ' ') && ((*this)[i0] != '\t') && ((*this)[i0] != '\n') && ((*this)[i0] != '\r'))
+			break;
+	for (i1=num-1;i1>=0;i1--)
+		if (((*this)[i1] != ' ') && ((*this)[i1] != '\t') && ((*this)[i1] != '\n') && ((*this)[i1] != '\r'))
+			break;
+	return substr(i0, i1 - i0 + 1);
 }
 
 string implode(const Array<string> &a, const string &glue)

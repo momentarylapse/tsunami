@@ -4,25 +4,25 @@
 
 namespace Script{
 
-typedef void op_func(void *r, void *a, void *b);
+typedef void op_func(string &r, string &a, string &b);
 
 //static Function *cur_func;
 
 
 
-void SyntaxTree::PreProcessCommand(Script *s, Command *c)
+void SyntaxTree::PreProcessCommand(Command *c)
 {
 	msg_db_f("PreProcessCommand", 4);
 
 	// recursion
 	if (c->kind == KindBlock){
-		for (int i=0;i<Blocks[c->link_no]->command.num;i++)
-			PreProcessCommand(s, Blocks[c->link_no]->command[i]);
+		for (int i=0;i<c->block()->command.num;i++)
+			PreProcessCommand(c->block()->command[i]);
 	}
 	for (int i=0;i<c->num_params;i++)
-		PreProcessCommand(s, c->param[i]);
+		PreProcessCommand(c->param[i]);
 	if (c->instance)
-		PreProcessCommand(s, c->instance);
+		PreProcessCommand(c->instance);
 	
 
 	// process...
@@ -64,11 +64,12 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 				}else{
 					// pre process operator
 					int nc = AddConstant(o->return_type);
-					void *d1 = Constants[c->param[0]->link_no].data;
-					void *d2 = NULL;
+					string d1 = Constants[c->param[0]->link_no].value;
+					string d2;
 					if (c->num_params > 1)
-						d2 = Constants[c->param[1]->link_no].data;
-					f(Constants[nc].data, d1, d2);
+						d2 = Constants[c->param[1]->link_no].value;
+					f(Constants[nc].value, d1, d2);
+					c->script = script;
 					c->kind = KindConstant;
 					c->link_no = nc;
 					c->num_params = 0;
@@ -83,12 +84,13 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 		if (all_consts){
 			int nc = AddConstant(c->type);
 			int el_size = c->type->parent->size;
-			DynamicArray *da = (DynamicArray*)Constants[nc].data;
+			DynamicArray *da = (DynamicArray*)Constants[nc].value.data;
 			da->init(el_size);
 			da->resize(c->num_params);
 			for (int i=0; i<c->num_params; i++)
-				memcpy((char*)da->data + el_size * i, Constants[c->param[i]->link_no].data, el_size);
+				memcpy((char*)da->data + el_size * i, Constants[c->param[i]->link_no].value.data, el_size);
 			c->kind = KindConstant;
+			c->script = script;
 			c->link_no = nc;
 			c->num_params = 0;
 		}
@@ -130,7 +132,7 @@ void SyntaxTree::PreProcessCommand(Script *s, Command *c)
 string LinkNr2Str(SyntaxTree *s,int kind,int nr);
 
 // may not use AddConstant()!!!
-void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
+void SyntaxTree::PreProcessCommandAddresses(Command *c)
 {
 	msg_db_f("PreProcessCommandAddr", 4);
 	/*msg_write(Kind2Str(c->Kind));
@@ -141,13 +143,13 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 
 	// recursion
 	if (c->kind == KindBlock){
-		for (int i=0;i<Blocks[c->link_no]->command.num;i++)
-			PreProcessCommandAddresses(s, Blocks[c->link_no]->command[i]);
+		for (int i=0;i<c->block()->command.num;i++)
+			PreProcessCommandAddresses(c->block()->command[i]);
 	}
 	for (int i=0;i<c->num_params;i++)
-		PreProcessCommandAddresses(s, c->param[i]);
+		PreProcessCommandAddresses(c->param[i]);
 	if (c->instance)
-		PreProcessCommandAddresses(s, c->instance);
+		PreProcessCommandAddresses(c->instance);
 	
 
 	// process...
@@ -168,21 +170,22 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 				op_func *f = (op_func*)o->func;
 				if (is_address){
 					// pre process address
-					void *d1 = (void*)&c->param[0]->link_no;
-					void *d2 = (void*)&c->param[1]->link_no;
+					string d1 = string((char*)&c->param[0]->link_no, 4);
+					string d2 = string((char*)&c->param[1]->link_no, 4);
 					if (c->param[0]->kind == KindConstant)
-					    d1 = Constants[c->param[0]->link_no].data;
+					    d1 = Constants[c->param[0]->link_no].value;
 					if (c->param[1]->kind == KindConstant)
-					    d2 = Constants[c->param[1]->link_no].data;
-					void *r = (void*)&c->link_no;
+					    d2 = Constants[c->param[1]->link_no].value;
+					string r = "--------";
 					f(r, d1, d2);
+					c->link_no = *(int*)r.data;
 					c->kind = is_local ? KindLocalAddress : KindAddress;
 					c->num_params = 0;
 				}
 			}
 		}
 	}else if (c->kind == KindReference){
-		if (s){
+		if (c->script){
 			if ((c->param[0]->kind == KindVarGlobal) || (c->param[0]->kind == KindVarLocal) || (c->param[0]->kind == KindConstant)){
 				// pre process ref var
 				c->kind = KindAddress;
@@ -192,8 +195,9 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 				}else if (c->param[0]->kind == KindVarLocal){
 					c->link_no = (long)cur_func->var[c->param[0]->link_no]._offset;
 					c->kind = KindLocalAddress;
-				}else if (c->param[0]->kind == KindConstant)
-					c->link_no = (long)s->cnst[c->param[0]->link_no];
+				}else if (c->param[0]->kind == KindConstant){
+					c->link_no = (long)c->param[0]->script->cnst[c->param[0]->link_no];
+				}
 			}
 		}
 	}else if (c->kind == KindDereference){
@@ -211,24 +215,24 @@ void SyntaxTree::PreProcessCommandAddresses(Script *s, Command *c)
 	}
 }
 
-void SyntaxTree::PreProcessor(Script *s)
+void SyntaxTree::PreProcessor()
 {
 	msg_db_f("PreProcessor", 4);
 	foreach(Function *f, Functions){
 		cur_func = f;
 		foreach(Command *c, f->block->command)
-			PreProcessCommand(s, c);
+			PreProcessCommand(c);
 	}
 	//Show();
 }
 
-void SyntaxTree::PreProcessorAddresses(Script *s)
+void SyntaxTree::PreProcessorAddresses()
 {
 	msg_db_f("PreProcessorAddr", 4);
 	foreach(Function *f, Functions){
 		cur_func = f;
 		foreach(Command *c, f->block->command)
-			PreProcessCommandAddresses(s, c);
+			PreProcessCommandAddresses(c);
 	}
 	//Show();
 }

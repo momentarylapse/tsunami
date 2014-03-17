@@ -47,6 +47,7 @@ public:
 	string vol_slider_id;
 	string pan_slider_id;
 	string mute_id;
+	string id_separator;
 };
 
 class MixingConsole: public Observer, public Observable

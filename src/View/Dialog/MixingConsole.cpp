@@ -22,7 +22,9 @@ TrackMixer::TrackMixer(MixingConsole *_console, int _index, HuiWindow *win) :
 	index = _index;
 	win->SetTarget(console->id_inner, 0);
 	id_grid = "mixing_track_table_" + i2s(index);
-	win->AddControlTable("", index + 2, 0, 1, 4, id_grid);
+	id_separator = "mixing_track_separator_" + i2s(index);
+	win->AddControlTable("", index*2 + 2, 0, 1, 4, id_grid);
+	win->AddSeparator("!vertical", index*2 + 3, 0, 1, 4, id_separator);
 	win->SetTarget("mixing_track_table_" + i2s(index), 0);
 	id_name = "mc_track_name_" + i2s(index);
 	win->AddText("Track " + i2s(index+1), 0, 0, 0, 0, id_name);
@@ -52,6 +54,7 @@ TrackMixer::TrackMixer(MixingConsole *_console, int _index, HuiWindow *win) :
 TrackMixer::~TrackMixer()
 {
 	win->RemoveControl(id_grid);
+	win->RemoveControl(id_separator);
 }
 
 float TrackMixer::slider2db(float val)

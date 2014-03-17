@@ -275,6 +275,7 @@ private:
 	Array<GtkWidget*> gtk_menu;
 	int gtk_num_menus;
 	void _InsertControl_(HuiControl *c, int x, int y, int width, int height);
+	int desired_width, desired_height;
 #endif
 	
 	int num_float_decimals;

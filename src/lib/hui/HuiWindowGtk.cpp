@@ -177,6 +177,8 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 		gtk_window_resize(GTK_WINDOW(window), width, height);
 	else
 		gtk_widget_set_size_request(window, width, height);
+	desired_width = width;
+	desired_height = height;
 
 	// icon
 	string logo = HuiGetProperty("logo");
@@ -419,6 +421,8 @@ void HuiWindow::GetPosition(int &x, int &y)
 
 void HuiWindow::SetSize(int width, int height)
 {
+	desired_width = width;
+	desired_height = height;
 	if (parent)
 		gtk_widget_set_size_request(window, width, height);
 	else
@@ -436,41 +440,26 @@ void HuiWindow::GetSize(int &width, int &height)
 void HuiWindow::SetSizeDesired(int width, int height)
 {
 	// bad hack
-	bool maximized = (gdk_window_get_state(gtk_widget_get_window(window)) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
+	bool maximized = IsMaximized();
 	if (maximized)
 		gtk_window_unmaximize(GTK_WINDOW(window));
 	gtk_window_resize(GTK_WINDOW(window), width, height);
 	if (maximized)
 		gtk_window_maximize(GTK_WINDOW(window));
+	desired_width = width;
+	desired_height = height;
 }
 
 // get the window position and size it had wouldn't it be maximized (including the frame and menu/toolbars...)
 //    if not maximized this behaves like <GetOuterior>
 void HuiWindow::GetSizeDesired(int &width, int &height)
 {
-	// bad hack
-	bool maximized = (gdk_window_get_state(gtk_widget_get_window(window)) & GDK_WINDOW_STATE_MAXIMIZED) > 0;
-	if (maximized){
-		// very nasty hack   m(-_-)m
-		width = 800;
-		height = 600;
+	if (IsMaximized()){
+		width = desired_width;
+		height = desired_height;
 	}else{
 		gtk_window_get_size(GTK_WINDOW(window), &width, &height);
 	}
-	/*if (maximized){
-		gtk_window_unmaximize(GTK_WINDOW(window));
-		for (int i=0;i<5;i++)
-			HuiDoSingleMainLoop();
-	}
-	gtk_window_get_position(GTK_WINDOW(window),&r.x1,&r.y1);
-	gtk_window_get_size(GTK_WINDOW(window),&r.x2,&r.y2);
-	r.x2+=r.x1;
-	r.y2+=r.y1;
-	if (maximized){
-		gtk_window_maximize(GTK_WINDOW(window));
-		for (int i=0;i<20;i++)
-			HuiDoSingleMainLoop();
-	}*/
 }
 
 void HuiWindow::ShowCursor(bool show)
@@ -520,22 +509,25 @@ void HuiWindow::SetCursorPos(int x, int y)
 
 void HuiWindow::SetMaximized(bool maximized)
 {
-	if (maximized)
+	if (maximized){
+		if (!IsMaximized())
+			gtk_window_get_size(GTK_WINDOW(window), &desired_width, &desired_height);
 		gtk_window_maximize(GTK_WINDOW(window));
-	else
+	}else{
 		gtk_window_unmaximize(GTK_WINDOW(window));
+	}
 }
 
 bool HuiWindow::IsMaximized()
 {
-	int state=gdk_window_get_state(gtk_widget_get_window(window));
-	return ((state & GDK_WINDOW_STATE_MAXIMIZED)>0);
+	int state = gdk_window_get_state(gtk_widget_get_window(window));
+	return ((state & GDK_WINDOW_STATE_MAXIMIZED) > 0);
 }
 
 bool HuiWindow::IsMinimized()
 {
-	int state=gdk_window_get_state(gtk_widget_get_window(window));
-	return ((state & GDK_WINDOW_STATE_ICONIFIED)>0);
+	int state = gdk_window_get_state(gtk_widget_get_window(window));
+	return ((state & GDK_WINDOW_STATE_ICONIFIED) > 0);
 }
 
 void HuiWindow::SetFullscreen(bool fullscreen)

@@ -8,10 +8,10 @@
 #ifndef ACTIONTRACKEDITVOLUME_H_
 #define ACTIONTRACKEDITVOLUME_H_
 
-#include "../../Action.h"
+#include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditVolume : public Action
+class ActionTrackEditVolume : public ActionMergable<float>
 {
 public:
 	ActionTrackEditVolume(Track *t, float volume);
@@ -20,8 +20,9 @@ public:
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
+	virtual bool mergable(Action *a);
+
 private:
-	float volume;
 	int track_no;
 };
 

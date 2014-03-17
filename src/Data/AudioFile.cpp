@@ -119,7 +119,7 @@ void AudioFile::DeleteEffect(int index)
 
 void AudioFile::SetVolume(float volume)
 {
-	Execute(new ActionAudioSetVolume(volume));
+	Execute(new ActionAudioSetVolume(this, volume));
 }
 
 void AudioFile::NewEmpty(int _sample_rate)

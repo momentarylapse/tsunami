@@ -446,9 +446,22 @@ void HuiWindow::EmbedDialog(const string &id, int x, int y)
 	}
 }
 
+void hui_rm_event(Array<HuiEventListener> &event, HuiControl *c)
+{
+	for (int i=0; i<event.num; i++)
+		if (event[i].id == c->id){
+			//msg_write("erase event");
+			event.erase(i);
+			i --;
+		}
+	foreach(HuiControl *cc, c->children)
+		hui_rm_event(event, cc);
+}
+
 void HuiWindow::RemoveControl(const string &id)
 {
 	HuiControl *c = _GetControl_(id);
+	hui_rm_event(event, c);
 	if (c)
 		delete(c);
 }

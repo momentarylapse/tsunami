@@ -11,7 +11,8 @@
 ActionTrackEditVolume::ActionTrackEditVolume(Track *t, float _volume)
 {
 	track_no = get_track_index(t);
-	volume = _volume;
+	old_value = t->volume;
+	new_value = _volume;
 }
 
 ActionTrackEditVolume::~ActionTrackEditVolume()
@@ -23,14 +24,24 @@ void *ActionTrackEditVolume::execute(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
 
-	float temp = volume;
-	volume = t->volume;
-	t->volume = temp;
+	t->volume = new_value;
 
 	return NULL;
 }
 
 void ActionTrackEditVolume::undo(Data *d)
 {
-	execute(d);
+	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Track *t = a->get_track(track_no);
+
+	t->volume = old_value;
+}
+
+
+bool ActionTrackEditVolume::mergable(Action *a)
+{
+	ActionTrackEditVolume *aa = dynamic_cast<ActionTrackEditVolume*>(a);
+	if (!aa)
+		return false;
+	return (aa->track_no == track_no);
 }

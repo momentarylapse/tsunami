@@ -8,19 +8,20 @@
 #ifndef ACTIONAUDIOSETVOLUME_H_
 #define ACTIONAUDIOSETVOLUME_H_
 
-#include "../../Action.h"
+#include "../../ActionMergable.h"
 
-class ActionAudioSetVolume : public Action
+class AudioFile;
+
+class ActionAudioSetVolume : public ActionMergable<float>
 {
 public:
-	ActionAudioSetVolume(float volume);
+	ActionAudioSetVolume(AudioFile *a, float volume);
 	virtual ~ActionAudioSetVolume();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
-private:
-	float volume;
+	virtual bool mergable(Action *a);
 };
 
 #endif /* ACTIONAUDIOSETVOLUME_H_ */

@@ -9,6 +9,7 @@
 #define ACTIONMANAGER_H_
 
 #include "../lib/base/base.h"
+#include "../lib/hui/HuiTimer.h"
 #include "Action.h"
 #include "../Data/Data.h"
 
@@ -37,6 +38,8 @@ public:
 	void MarkCurrentAsSave();
 
 private:
+	void truncate();
+	bool merge(Action *a);
 	void add(Action *a);
 	Data *data;
 	Array<Action*> action;
@@ -49,6 +52,8 @@ private:
 	// group
 	int cur_group_level;
 	ActionGroup *cur_group;
+
+	HuiTimer timer;
 };
 
 #endif /* ACTIONMANAGER_H_ */

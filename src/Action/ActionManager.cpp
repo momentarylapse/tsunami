@@ -7,9 +7,11 @@
 
 #include "ActionManager.h"
 #include "Action.h"
+#include "ActionMergable.h"
 #include "ActionGroup.h"
 #include "../Data/Data.h"
 #include <assert.h>
+//#include <typeinfo>
 
 ActionManager::ActionManager(Data *_data)
 {
@@ -39,18 +41,40 @@ void ActionManager::Reset()
 }
 
 
-
-void ActionManager::add(Action *a)
+void ActionManager::truncate()
 {
-	// truncate history
+	// truncate future history
 	for (int i=cur_pos;i<action.num;i++)
 		delete(action[i]);
 	action.resize(cur_pos);
+}
 
+void ActionManager::add(Action *a)
+{
+	truncate();
+
+	if (timer.get() < 2.0f)
+		if (merge(a))
+			return;
 	action.add(a);
 	cur_pos ++;
 }
 
+bool ActionManager::merge(Action *a)
+{
+	if (action.num < 1)
+		return false;
+	/*if (typeid(*a) != typeid(*action.back()))
+		return false;*/
+	ActionMergableBase *aa = dynamic_cast<ActionMergableBase*>(a);
+	ActionMergableBase *bb = dynamic_cast<ActionMergableBase*>(action.back());
+	if ((!aa) || (!bb))
+		return false;
+	if (!bb->absorb(aa))
+		return false;
+	delete(a);
+	return true;
+}
 
 
 void *ActionManager::Execute(Action *a)
@@ -59,7 +83,7 @@ void *ActionManager::Execute(Action *a)
 		if (cur_group)
 			return cur_group->AddSubAction(a, data);
 		add(a);
-		return a->execute_and_notify(data);
+		return action.back()->execute_and_notify(data);
 	}else
 		return a->execute(data);
 }

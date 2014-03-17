@@ -11,7 +11,8 @@
 ActionTrackEditPanning::ActionTrackEditPanning(Track *t, float _panning)
 {
 	track_no = get_track_index(t);
-	panning = _panning;
+	old_value = t->panning;
+	new_value = _panning;
 }
 
 ActionTrackEditPanning::~ActionTrackEditPanning()
@@ -23,15 +24,25 @@ void *ActionTrackEditPanning::execute(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
 
-	float temp = panning;
-	panning = t->panning;
-	t->panning = temp;
+	t->panning = new_value;
 
 	return NULL;
 }
 
 void ActionTrackEditPanning::undo(Data *d)
 {
-	execute(d);
+	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Track *t = a->get_track(track_no);
+
+	t->panning = old_value;
+}
+
+
+bool ActionTrackEditPanning::mergable(Action *a)
+{
+	ActionTrackEditPanning *aa = dynamic_cast<ActionTrackEditPanning*>(a);
+	if (!aa)
+		return false;
+	return (aa->track_no == track_no);
 }
 

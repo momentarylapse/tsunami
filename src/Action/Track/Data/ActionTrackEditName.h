@@ -8,10 +8,10 @@
 #ifndef ACTIONTRACKEDITNAME_H_
 #define ACTIONTRACKEDITNAME_H_
 
-#include "../../Action.h"
+#include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditName: public Action
+class ActionTrackEditName: public ActionMergable<string>
 {
 public:
 	ActionTrackEditName(Track *t, const string &name);
@@ -20,8 +20,9 @@ public:
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
+	virtual bool mergable(Action *a);
+
 private:
-	string name;
 	int track_no;
 };
 

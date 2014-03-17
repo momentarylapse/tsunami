@@ -8,10 +8,10 @@
 #ifndef ACTIONTRACKEDITPANNING_H_
 #define ACTIONTRACKEDITPANNING_H_
 
-#include "../../Action.h"
+#include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditPanning : public Action
+class ActionTrackEditPanning : public ActionMergable<float>
 {
 public:
 	ActionTrackEditPanning(Track *t, float panning);
@@ -20,8 +20,9 @@ public:
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
+	virtual bool mergable(Action *a);
+
 private:
-	float panning;
 	int track_no;
 };
 

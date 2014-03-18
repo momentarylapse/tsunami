@@ -43,42 +43,42 @@ PluginManager::~PluginManager()
 }
 
 
-void GlobalPutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
-{	tsunami->plugin_manager->PutFavoriteBarFixed(win, x, y, w);	}
+void GlobalPutFavoriteBarFixed(HuiPanel *panel, int x, int y, int w)
+{	tsunami->plugin_manager->PutFavoriteBarFixed(panel, x, y, w);	}
 
-void GlobalPutFavoriteBar(HuiWindow *win, const string &root_id, int x, int y)
-{	tsunami->plugin_manager->PutFavoriteBarSizable(win, root_id, x, y);	}
+void GlobalPutFavoriteBar(HuiPanel *panel, const string &root_id, int x, int y)
+{	tsunami->plugin_manager->PutFavoriteBarSizable(panel, root_id, x, y);	}
 
-void GlobalPutCommandBarFixed(HuiWindow *win, int x, int y, int w)
-{	tsunami->plugin_manager->PutCommandBarFixed(win, x, y, w);	}
+void GlobalPutCommandBarFixed(HuiPanel *panel, int x, int y, int w)
+{	tsunami->plugin_manager->PutCommandBarFixed(panel, x, y, w);	}
 
-void GlobalPutCommandBar(HuiWindow *win, const string &root_id, int x, int y)
-{	tsunami->plugin_manager->PutCommandBarSizable(win, root_id, x, y);	}
+void GlobalPutCommandBar(HuiPanel *panel, const string &root_id, int x, int y)
+{	tsunami->plugin_manager->PutCommandBarSizable(panel, root_id, x, y);	}
 
 Array<Slider*> global_slider;
 
-void GlobalCreateSlider(HuiWindow *win, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
-{	global_slider.add(new Slider(win, id_slider, id_edit, v_min, v_max, factor, func, value));	}
+void GlobalCreateSlider(HuiPanel *panel, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
+{	global_slider.add(new Slider(panel, id_slider, id_edit, v_min, v_max, factor, func, value));	}
 
-void GlobalCreateSliderM(HuiWindow *win, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_kaba_callback *func, float value)
-{	global_slider.add(new Slider(win, id_slider, id_edit, v_min, v_max, factor, func, value));	}
+void GlobalCreateSliderM(HuiPanel *panel, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_kaba_callback *func, float value)
+{	global_slider.add(new Slider(panel, id_slider, id_edit, v_min, v_max, factor, func, value));	}
 
-void GlobalSliderSet(HuiWindow *win, const string &id, float value)
+void GlobalSliderSet(HuiPanel *panel, const string &id, float value)
 {
 	foreach(Slider *s, global_slider)
 		if (s->Match(id))
-				s->Set(value);
+			s->Set(value);
 }
 
-float GlobalSliderGet(HuiWindow *win, const string &id)
+float GlobalSliderGet(HuiPanel *panel, const string &id)
 {
 	foreach(Slider *s, global_slider)
 		if (s->Match(id))
-				return s->Get();
+			return s->Get();
 	return 0;
 }
 
-void GlobalRemoveSliders(HuiWindow *win)
+void GlobalRemoveSliders(HuiPanel *panel)
 {
 	foreach(Slider *s, global_slider)
 		delete(s);
@@ -139,6 +139,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "processTrack", Script::mf(&Effect::ProcessTrack), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "configure", Script::mf(&Effect::Configure), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::CreatePanel), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::ResetConfig), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::ResetState), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
@@ -164,6 +165,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::RenderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "configure", Script::mf(&Synthesizer::Configure), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::CreatePanel), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::Reset), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::ResetConfig), &synth);
@@ -425,14 +427,14 @@ void PluginManager::OnFavoriteSave()
 void PluginManager::OnFavoriteDelete()
 {}
 
-void PluginManager::InitFavorites(HuiWindow *win)
+void PluginManager::InitFavorites(HuiPanel *panel)
 {
 	msg_db_f("InitFavorites", 1);
 	PluginFavoriteName.clear();
 
 
-	win->Enable("favorite_save", false);
-	win->Enable("favorite_delete", false);
+	panel->Enable("favorite_save", false);
+	panel->Enable("favorite_delete", false);
 
 	string init = "-------";
 	if (cur_effect)
@@ -451,43 +453,43 @@ void PluginManager::InitFavorites(HuiWindow *win)
 		if (e.name.find(init) < 0)
 			continue;
 		PluginFavoriteName.add(e.name.substr(init.num, -1));
-		win->AddString("favorite_list", PluginFavoriteName.back());
+		panel->AddString("favorite_list", PluginFavoriteName.back());
 	}
 
-	win->EventM("favorite_name", this, &PluginManager::OnFavoriteName);
-	win->EventM("favorite_save", this, &PluginManager::OnFavoriteSave);
-	win->EventM("favorite_delete", this, &PluginManager::OnFavoriteDelete);
-	win->EventM("favorite_list", this, &PluginManager::OnFavoriteList);
+	panel->EventM("favorite_name", this, &PluginManager::OnFavoriteName);
+	panel->EventM("favorite_save", this, &PluginManager::OnFavoriteSave);
+	panel->EventM("favorite_delete", this, &PluginManager::OnFavoriteDelete);
+	panel->EventM("favorite_list", this, &PluginManager::OnFavoriteList);
 }
 
-void PluginManager::PutFavoriteBarFixed(HuiWindow *win, int x, int y, int w)
+void PluginManager::PutFavoriteBarFixed(HuiPanel *panel, int x, int y, int w)
 {
 	msg_db_f("PutFavoriteBarFixed", 1);
 	w -= 10;
-	win->AddComboBox("", x, y, w / 2 - 35, 25, "favorite_list");
-	win->AddEdit("", x + w / 2 - 30, y, w / 2 - 30, 25, "favorite_name");
-	win->AddButton("", x + w - 55, y, 25, 25, "favorite_save");
-	win->SetImage("favorite_save", "hui:save");
-	win->AddButton("", x + w - 25, y, 25, 25, "favorite_delete");
-	win->SetImage("favorite_delete", "hui:delete");
+	panel->AddComboBox("", x, y, w / 2 - 35, 25, "favorite_list");
+	panel->AddEdit("", x + w / 2 - 30, y, w / 2 - 30, 25, "favorite_name");
+	panel->AddButton("", x + w - 55, y, 25, 25, "favorite_save");
+	panel->SetImage("favorite_save", "hui:save");
+	panel->AddButton("", x + w - 25, y, 25, 25, "favorite_delete");
+	panel->SetImage("favorite_delete", "hui:delete");
 
-	InitFavorites(win);
+	InitFavorites(panel);
 }
 
-void PluginManager::PutFavoriteBarSizable(HuiWindow *win, const string &root_id, int x, int y)
+void PluginManager::PutFavoriteBarSizable(HuiPanel *panel, const string &root_id, int x, int y)
 {
 	msg_db_f("PutFavoriteBarSizable", 1);
-	win->SetTarget(root_id, 0);
-	win->AddControlTable("", x, y, 4, 1, "favorite_table");
-	win->SetTarget("favorite_table", 0);
-	win->AddComboBox("", 0, 0, 0, 0, "favorite_list");
-	win->AddEdit("!expandx", 1, 0, 0, 0, "favorite_name");
-	win->AddButton("", 2, 0, 0, 0, "favorite_save");
-	win->SetImage("favorite_save", "hui:save");
-	win->AddButton("", 3, 0, 0, 0, "favorite_delete");
-	win->SetImage("favorite_delete", "hui:delete");
+	panel->SetTarget(root_id, 0);
+	panel->AddControlTable("", x, y, 4, 1, "favorite_table");
+	panel->SetTarget("favorite_table", 0);
+	panel->AddComboBox("", 0, 0, 0, 0, "favorite_list");
+	panel->AddEdit("!expandx", 1, 0, 0, 0, "favorite_name");
+	panel->AddButton("", 2, 0, 0, 0, "favorite_save");
+	panel->SetImage("favorite_save", "hui:save");
+	panel->AddButton("", 3, 0, 0, 0, "favorite_delete");
+	panel->SetImage("favorite_delete", "hui:delete");
 
-	InitFavorites(win);
+	InitFavorites(panel);
 }
 
 void PluginManager::OnPluginFavoriteName()
@@ -545,7 +547,7 @@ void PluginManager::OnPluginClose()
 	delete(HuiCurWindow);
 }
 
-void PluginManager::PutCommandBarFixed(HuiWindow *win, int x, int y, int w)
+void PluginManager::PutCommandBarFixed(HuiPanel *panel, int x, int y, int w)
 {
 	msg_db_f("PutCommandBarFixed", 1);
 	w -= 10;
@@ -553,47 +555,47 @@ void PluginManager::PutCommandBarFixed(HuiWindow *win, int x, int y, int w)
 	if (ww > 120)
 		ww = 120;
 
-	win->AddDefButton(_("OK"),w - ww,y,ww,25,"ok");
-	//win->SetImage("ok", "hui:ok");
-	win->AddButton(_("Abbrechen"),w - ww*2 - 10,y,ww,25,"cancel");
-	//win->SetImage("cancel", "hui:cancel");
+	panel->AddDefButton(_("OK"),w - ww,y,ww,25,"ok");
+	//panel->SetImage("ok", "hui:ok");
+	panel->AddButton(_("Abbrechen"),w - ww*2 - 10,y,ww,25,"cancel");
+	//panel->SetImage("cancel", "hui:cancel");
 
 	if (PluginAddPreview){
 		if (cur_plugin && (cur_plugin->type == Plugin::TYPE_EFFECT)){
-			win->AddButton(_("Vorschau"),w - ww * 3 - 20,y,ww,25,"preview");
-			win->SetImage("preview", "hui:media-play");
+			panel->AddButton(_("Vorschau"),w - ww * 3 - 20,y,ww,25,"preview");
+			panel->SetImage("preview", "hui:media-play");
 		}
 	}
-	win->EventM("ok", this, &PluginManager::OnPluginOk);
-	win->EventM("preview", this, &PluginManager::OnPluginPreview);
-	win->EventM("cancel", this, &PluginManager::OnPluginClose);
-	win->EventM("hui:close", this, &PluginManager::OnPluginClose);
+	panel->EventM("ok", this, &PluginManager::OnPluginOk);
+	panel->EventM("preview", this, &PluginManager::OnPluginPreview);
+	panel->EventM("cancel", this, &PluginManager::OnPluginClose);
+	panel->EventM("hui:close", this, &PluginManager::OnPluginClose);
 }
 
-void PluginManager::PutCommandBarSizable(HuiWindow *win, const string &root_id, int x, int y)
+void PluginManager::PutCommandBarSizable(HuiPanel *panel, const string &root_id, int x, int y)
 {
 	msg_db_f("PutCommandBarSizable", 1);
-	win->SetTarget(root_id, 0);
-	win->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
-	win->SetTarget("command_table", 0);
+	panel->SetTarget(root_id, 0);
+	panel->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
+	panel->SetTarget("command_table", 0);
 	if (PluginAddPreview){
 		if (cur_effect){
-			win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
-			win->SetImage("preview", "hui:media-play");
+			panel->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
+			panel->SetImage("preview", "hui:media-play");
 		}
 	}else if (cur_synth){
-		win->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
-		win->SetImage("preview", "hui:media-play");
+		panel->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
+		panel->SetImage("preview", "hui:media-play");
 	}
-	win->AddText("!width=30", 1, 0, 0, 0, "");
-	win->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
-	win->SetImage("cancel", "hui:cancel");
-	win->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
-	win->SetImage("ok", "hui:ok");
-	win->EventM("ok", this, &PluginManager::OnPluginOk);
-	win->EventM("preview", this, &PluginManager::OnPluginPreview);
-	win->EventM("cancel", this, &PluginManager::OnPluginClose);
-	win->EventM("hui:close", this, &PluginManager::OnPluginClose);
+	panel->AddText("!width=30", 1, 0, 0, 0, "");
+	panel->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
+	panel->SetImage("cancel", "hui:cancel");
+	panel->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
+	panel->SetImage("ok", "hui:ok");
+	panel->EventM("ok", this, &PluginManager::OnPluginOk);
+	panel->EventM("preview", this, &PluginManager::OnPluginPreview);
+	panel->EventM("cancel", this, &PluginManager::OnPluginClose);
+	panel->EventM("hui:close", this, &PluginManager::OnPluginClose);
 }
 
 void PluginManager::OnPluginPreview()

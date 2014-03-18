@@ -15,6 +15,7 @@ namespace Script{
 class Script;
 class Type;
 };
+class HuiPanel;
 
 
 class PluginData : public VirtualBase
@@ -37,6 +38,7 @@ public:
 	virtual void ResetConfig();
 	virtual void ResetState();
 	virtual void Configure();
+	virtual HuiPanel *CreatePanel();
 	virtual void UpdateDialog(){};
 
 	PluginData *get_config();
@@ -44,6 +46,8 @@ public:
 
 	string ConfigToString();
 	void ConfigFromString(const string &options);
+
+	string name;
 };
 
 

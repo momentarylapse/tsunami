@@ -9,9 +9,9 @@
 
 
 
-Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_callback *_func, float _value)
+Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_callback *_func, float _value)
 {
-	win = _win;
+	panel = _panel;
 	id_slider = _id_slider;
 	id_edit = _id_edit;
 	value_min = _v_min;
@@ -19,42 +19,42 @@ Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_ed
 	factor = _factor;
 	func = HuiCallback(_func);
 
-	win->EventM(id_slider, this, &Slider::OnSlide);
-	win->EventM(id_edit, this, &Slider::OnEdit);
+	panel->EventM(id_slider, this, &Slider::OnSlide);
+	panel->EventM(id_edit, this, &Slider::OnEdit);
 
 	Set(_value);
 }
 
 
 
-Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, void(HuiEventHandler::*_func)(), float _value, HuiEventHandler *_handler)
+Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, void(HuiEventHandler::*_func)(), float _value, HuiEventHandler *_handler)
 {
-	win = _win;
+	panel = _panel;
 	id_slider = _id_slider;
 	id_edit = _id_edit;
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = HuiCallback(_handler ? _handler : win, _func);
+	func = HuiCallback(_handler ? _handler : panel, _func);
 
-	win->EventM(id_slider, this, &Slider::OnSlide);
-	win->EventM(id_edit, this, &Slider::OnEdit);
+	panel->EventM(id_slider, this, &Slider::OnSlide);
+	panel->EventM(id_edit, this, &Slider::OnEdit);
 
 	Set(_value);
 }
 
-Slider::Slider(HuiWindow *_win, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_kaba_callback *_func, float _value, HuiEventHandler *_handler)
+Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_kaba_callback *_func, float _value, HuiEventHandler *_handler)
 {
-	win = _win;
+	panel = _panel;
 	id_slider = _id_slider;
 	id_edit = _id_edit;
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = HuiCallback(_handler ? _handler : win, _func);
+	func = HuiCallback(_handler ? _handler : panel, _func);
 
-	win->EventM(id_slider, this, &Slider::OnSlide);
-	win->EventM(id_edit, this, &Slider::OnEdit);
+	panel->EventM(id_slider, this, &Slider::OnSlide);
+	panel->EventM(id_edit, this, &Slider::OnEdit);
 
 	Set(_value);
 }
@@ -66,22 +66,22 @@ Slider::~Slider()
 
 void Slider::Set(float value)
 {
-	win->SetFloat(id_slider, (value - value_min) / (value_max - value_min));
-	win->SetFloat(id_edit, value * factor);
+	panel->SetFloat(id_slider, (value - value_min) / (value_max - value_min));
+	panel->SetFloat(id_edit, value * factor);
 }
 
 
 
 float Slider::Get()
 {
-	return win->GetFloat(id_edit) / factor;
+	return panel->GetFloat(id_edit) / factor;
 }
 
 
 void Slider::Enable(bool enabled)
 {
-	win->Enable(id_slider, enabled);
-	win->Enable(id_edit, enabled);
+	panel->Enable(id_slider, enabled);
+	panel->Enable(id_edit, enabled);
 }
 
 
@@ -93,15 +93,15 @@ bool Slider::Match(const string &id)
 
 void Slider::OnSlide()
 {
-	float value = value_min + win->GetFloat("") * (value_max - value_min);
-	win->SetFloat(id_edit, value * factor);
+	float value = value_min + panel->GetFloat("") * (value_max - value_min);
+	panel->SetFloat(id_edit, value * factor);
 	func.call();
 }
 
 void Slider::OnEdit()
 {
-	float value = win->GetFloat("") / factor;
-	win->SetFloat(id_slider, (value - value_min) / (value_max - value_min));
+	float value = panel->GetFloat("") / factor;
+	panel->SetFloat(id_slider, (value - value_min) / (value_max - value_min));
 	func.call();
 }
 

@@ -47,7 +47,7 @@ HuiControl::HuiControl(int _type, const string &_id)
 {
 	type = _type;
 	id = _id;
-	win = NULL;
+	panel = NULL;
 	parent = NULL;
 	enabled = true;
 #ifdef HUI_API_WIN
@@ -72,10 +72,10 @@ HuiControl::~HuiControl()
 		HuiControl *c = children.pop();
 		delete(c);
 	}
-	if (win){
-		for (int i=0;i<win->control.num;i++)
-			if (win->control[i] == this)
-				win->control.erase(i);
+	if (panel){
+		for (int i=0;i<panel->control.num;i++)
+			if (panel->control[i] == this)
+				panel->control.erase(i);
 	}
 #ifdef HUI_API_GTK
 	if (widget)
@@ -274,25 +274,26 @@ void HuiControl::Notify(const string &message, bool is_default)
 {
 	if (allow_signal_level > 0)
 		return;
-	if (!win){
-		msg_error("HuiControl.Notify without win: " + id);
+	if (!panel){
+		msg_error("HuiControl.Notify without panel: " + id);
 		return;
 	}
 	msg_db_m("Control.Notify", 2);
-	win->_SetCurID_(id);
+	panel->_SetCurID_(id);
 	if (id.num == 0)
 		return;
 	notify_push(this);
 	HuiEvent e = HuiEvent(id, message);
 	_HuiSendGlobalCommand_(&e);
 	e.is_default = is_default;
-	win->_SendEvent_(&e);
+	panel->_SendEvent_(&e);
 
 	if (notify_is_deleted(this)){
 		notify_pop();
 		return;
 	}
 
+	HuiWindow *win = panel->win;
 	if (this == win->main_input_control){
 		if (message == "hui:mouse-move")
 			win->OnMouseMove();

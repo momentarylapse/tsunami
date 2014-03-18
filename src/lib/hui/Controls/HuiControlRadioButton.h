@@ -14,7 +14,7 @@
 class HuiControlRadioButton : public HuiControl
 {
 public:
-	HuiControlRadioButton(const string &text, const string &id, HuiWindow *win);
+	HuiControlRadioButton(const string &text, const string &id, HuiPanel *panel);
 	virtual ~HuiControlRadioButton();
 	virtual string GetString();
 	virtual void __SetString(const string &str);

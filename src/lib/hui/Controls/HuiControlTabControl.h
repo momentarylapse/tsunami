@@ -14,7 +14,7 @@
 class HuiControlTabControl : public HuiControl
 {
 public:
-	HuiControlTabControl(const string &text, const string &id, HuiWindow *win);
+	HuiControlTabControl(const string &text, const string &id, HuiPanel *panel);
 	virtual ~HuiControlTabControl();
 	virtual string GetString();
 	virtual void __SetString(const string &str);

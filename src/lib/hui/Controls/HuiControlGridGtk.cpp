@@ -10,13 +10,13 @@
 
 #ifdef HUI_API_GTK
 
-HuiControlGrid::HuiControlGrid(const string &title, const string &id, int num_x, int num_y, HuiWindow *win) :
+HuiControlGrid::HuiControlGrid(const string &title, const string &id, int num_x, int num_y, HuiPanel *panel) :
 	HuiControl(HuiKindControlTable, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_grid_new();
-	gtk_grid_set_row_spacing(GTK_GRID(widget), win->border_width);
-	gtk_grid_set_column_spacing(GTK_GRID(widget), win->border_width);
+	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->border_width);
+	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->border_width);
 	SetOptions(OptionString);
 	button_bar = (OptionString.find("buttonbar") >= 0);
 	if (button_bar){

@@ -75,7 +75,7 @@ void HuiMenu::add(HuiControl *c)
 	item.add(c);
 	gtk_menu_shell_append(GTK_MENU_SHELL(widget), c->widget);
 	gtk_widget_show(c->widget);
-	c->win = win;
+	c->panel = win;
 	if (win)
 		win->control.add(c);
 }

@@ -14,7 +14,7 @@
 class HuiControlTreeView : public HuiControl
 {
 public:
-	HuiControlTreeView(const string &title, const string &id, HuiWindow *win);
+	HuiControlTreeView(const string &title, const string &id, HuiPanel *panel);
 	virtual ~HuiControlTreeView();
 	virtual string GetString();
 	virtual void __SetString(const string &str);

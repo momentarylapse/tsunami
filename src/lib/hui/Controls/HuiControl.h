@@ -13,6 +13,7 @@
 #include "../../image/image.h"
 
 class HuiWindow;
+class HuiPanel;
 
 extern int allow_signal_level; // -> hui_window_control.cpp
 
@@ -43,7 +44,7 @@ public:
 	bool enabled;
 	bool is_button_bar;
 	bool grab_focus;
-	HuiWindow *win;
+	HuiPanel *panel;
 	HuiControl *parent;
 	Array<HuiControl*> children;
 

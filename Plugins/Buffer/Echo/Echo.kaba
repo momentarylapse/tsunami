@@ -78,22 +78,22 @@ class DelayDialog : Dialog
 	Echo *e
 	void __init__(Echo *_e)
 		super.__init__("Echo", 395, 175, MainWin, false)
-		addGrid("", 0, 0, 1, 3, "table1")
-		setTarget("table1", 0)
-		addGrid("", 0, 1, 4, 3, "table2")
-		setTarget("table2", 0)
-		addSlider("!expandx", 1, 0, 0, 0, "volume_slider")
-		addSpinButton("\\0\\200\\0.1", 2, 0, 0, 0, "volume")
-		addText("%", 3, 0, 0, 0, "")
-		addSlider("", 1, 1, 0, 0, "delay_slider")
-		addSpinButton("\\0\\1000", 2, 1, 0, 0, "delay")
-		addText("ms", 3, 1, 0, 0, "")
-		addSlider("", 1, 2, 0, 0, "feedback_slider")
-		addSpinButton("\\0\\100\\0.1", 2, 2, 0, 0, "feedback")
-		addText("%", 3, 2, 0, 0, "")
-		addText("Lautstärke", 0, 0, 0, 0, "")
-		addText("Verzögerung", 0, 1, 0, 0, "")
-		addText("Feedback", 0, 2, 0, 0, "")
+		fromSource("
+Grid table1 '' 1 3
+	.
+	Grid ? '' 4 3
+		Text ? 'Lautstärke'
+		Slider volume_slider '' expandx
+		SpinButton volume '\\0\\200\\0.1'
+		Text ? '%'
+		Text ? 'Verzögerung'
+		Slider delay_slider ''
+		SpinButton delay '\\0\\1000'
+		Text ? 'ms'
+		Text ? 'Feedback'
+		Slider feedback_slider ''
+		SpinButton feedback '\\0\\100\\0.1
+		Text ? '%'")
 		PutFavoriteBar(self, "table1", 0, 0)
 		PutCommandBar(self, "table1", 0, 2)
 		

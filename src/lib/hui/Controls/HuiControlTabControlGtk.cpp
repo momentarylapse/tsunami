@@ -18,12 +18,12 @@ void OnGtkTabControlSwitch(GtkWidget *widget, GtkWidget *page, guint page_num, g
 }
 
 
-HuiControlTabControl::HuiControlTabControl(const string &title, const string &id, HuiWindow *win) :
+HuiControlTabControl::HuiControlTabControl(const string &title, const string &id, HuiPanel *panel) :
 	HuiControl(HuiKindTabControl, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_notebook_new();
-	this->win = win; // for addPage()
+	this->panel = panel; // for addPage()
 
 	for (int i=0;i<PartString.num;i++)
 		addPage(PartString[i]);
@@ -68,7 +68,7 @@ void HuiControlTabControl::__AddString(const string &str)
 void HuiControlTabControl::addPage(const string &str)
 {
 	GtkWidget *inside;
-	if (win->is_resizable){
+	if (panel->win->is_resizable){
 #if GTK_MAJOR_VERSION >= 3
 		inside = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
 #else
@@ -89,8 +89,8 @@ void HuiControlTabControl::add(HuiControl *child, int x, int y)
 		child_widget = child->frame;
 	GtkWidget *target_widget = gtk_notebook_get_nth_page(GTK_NOTEBOOK(widget), x);
 	gtk_container_add(GTK_CONTAINER(target_widget), child_widget);
-	if (win)
-		gtk_container_set_border_width(GTK_CONTAINER(target_widget), win->border_width);
+	if (panel)
+		gtk_container_set_border_width(GTK_CONTAINER(target_widget), panel->border_width);
 	children.add(child);
 	child->parent = this;
 }

@@ -170,17 +170,17 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
 			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			HuiWindowAddControl( dlg, cmd.type, HuiGetLanguage(cmd.id),
-								cmd.i_param[0], cmd.i_param[1],
-								cmd.i_param[2], cmd.i_param[3],
-								cmd.id);
+			dlg->AddControl(cmd.type, HuiGetLanguage(cmd.id),
+							cmd.i_param[0], cmd.i_param[1],
+							cmd.i_param[2], cmd.i_param[3],
+							cmd.id);
 		}else if (res->type == "SizableDialog"){
 			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
 			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			HuiWindowAddControl( dlg, cmd.type, HuiGetLanguage(cmd.id),
-								cmd.i_param[0], cmd.i_param[1],
-								cmd.i_param[2], cmd.i_param[3],
-								cmd.id);
+			dlg->AddControl(cmd.type, HuiGetLanguage(cmd.id),
+							cmd.i_param[0], cmd.i_param[1],
+							cmd.i_param[2], cmd.i_param[3],
+							cmd.id);
 		}
 		dlg->Enable(cmd.id, cmd.enabled);
 		if (cmd.image.num > 0)

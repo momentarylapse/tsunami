@@ -16,7 +16,7 @@
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 // -> PluginManager.cpp
-void GlobalRemoveSliders(HuiWindow *win);
+void GlobalRemoveSliders(HuiPanel *panel);
 
 Effect::Effect()
 {

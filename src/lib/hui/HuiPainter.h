@@ -10,6 +10,7 @@
 
 class HuiWindow;
 class complex;
+class rect;
 
 class HuiPainter
 {

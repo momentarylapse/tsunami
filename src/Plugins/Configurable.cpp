@@ -233,6 +233,11 @@ void Configurable::ResetState()
 	state->reset();
 }
 
+HuiPanel *Configurable::CreatePanel()
+{
+	return NULL;
+}
+
 struct AutoConfigData
 {
 	string name, unit;
@@ -273,13 +278,12 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 	return r;
 }
 
-class AutoConfigDialog : public HuiDialog
+class AutoConfigPanel : public HuiPanel
 {
 public:
 	Array<Slider*> slider;
 	Array<AutoConfigData> aa;
-	AutoConfigDialog(Array<AutoConfigData> &_aa) :
-		HuiDialog("...", 300, 100, tsunami, false)
+	AutoConfigPanel(Array<AutoConfigData> &_aa)
 	{
 		aa = _aa;
 		AddControlTable("", 0, 0, 1, 3, "root-table");
@@ -291,12 +295,12 @@ public:
 			AddSlider("!width=150", 1, i, 0, 0, "slider-" + i);
 			AddSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
 			AddText(a.unit, 3, i, 0, 0, "");
-			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigDialog::OnChange, *a.value, this));
+			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::OnChange, *a.value, this));
 		}
 		tsunami->plugin_manager->PutCommandBarSizable(this, "root-table", 0, 2);
 		tsunami->plugin_manager->PutFavoriteBarSizable(this, "root-table", 0, 0);
 	}
-	~AutoConfigDialog()
+	~AutoConfigPanel()
 	{
 		foreach(Slider *s, slider)
 			delete(s);
@@ -317,9 +321,17 @@ void Configurable::Configure()
 		return;
 	}
 
-	// automatic configuration
-	Array<AutoConfigData> aa = get_auto_conf(config);
-	HuiDialog *dlg = new AutoConfigDialog(aa);
+	HuiPanel *panel = CreatePanel();
+	if (!panel){
+		Array<AutoConfigData> aa = get_auto_conf(config);
+		panel = new AutoConfigPanel(aa);
+	}
+	HuiDialog *dlg = new HuiDialog(name, 300, 100, tsunami, false);
+	dlg->AddControlTable("", 0, 0, 1, 3, "root-table");
+	dlg->SetTarget("root-table", 0);
+	tsunami->plugin_manager->PutCommandBarSizable(dlg, "root-table", 0, 2);
+	tsunami->plugin_manager->PutFavoriteBarSizable(dlg, "root-table", 0, 0);
+	dlg->Embed(panel, "root-table", 0, 1);
 	dlg->Run();
 }
 

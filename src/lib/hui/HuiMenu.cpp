@@ -60,7 +60,7 @@ void HuiMenu::set_win(HuiWindow *_win)
 {
 	win = _win;
 	foreach(HuiControl *c, item){
-		c->win = win;
+		c->panel = win;
 		HuiMenuItemSubmenu *s = dynamic_cast<HuiMenuItemSubmenu*>(c);
 		if (s)
 			s->sub_menu->set_win(win);

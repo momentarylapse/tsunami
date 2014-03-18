@@ -57,12 +57,13 @@ extern bool HuiRunning;
 
 
 #include "hui_main.h"
+#include "hui_input.h"
 #include "HuiMenu.h"
+#include "HuiPanel.h"
 #include "HuiWindow.h"
 #include "hui_common_dlg.h"
 #include "hui_language.h"
 #include "HuiConfig.h"
-#include "hui_input.h"
 #include "hui_resource.h"
 #include "hui_utility.h"
 #include "HuiPainter.h"

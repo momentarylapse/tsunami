@@ -36,7 +36,6 @@ public:
 	void __init__();
 	virtual void __delete__();
 
-	string name;
 	bool only_on_selection;
 	Range range;
 	Plugin *plugin;

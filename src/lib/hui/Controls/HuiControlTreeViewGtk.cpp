@@ -20,7 +20,7 @@ void OnGtkListSelect(GtkTreeSelection *selection, gpointer data);
 
 void *get_gtk_image_pixbuf(const string &image); // -> hui_menu_gtk.cpp
 
-HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, HuiWindow *win) :
+HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, HuiPanel *panel) :
 	HuiControl(HuiKindTreeView, id)
 {
 	GetPartStrings(id, title);
@@ -45,7 +45,7 @@ HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, Hu
 
 	// frame
 	frame = sw;
-	if (win->border_width > 0){
+	if (panel->border_width > 0){
 		frame = gtk_frame_new(NULL);
 		gtk_container_add(GTK_CONTAINER(frame), sw);
 	}

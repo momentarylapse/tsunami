@@ -24,7 +24,7 @@ class PluginState : PluginData
 		offset = 0
 
 class Flanger : AudioEffect
-	ConfigDialog *dlg
+	ConfigPanel *dlg
 	PluginConfig config
 	PluginState state
 
@@ -57,9 +57,8 @@ class Flanger : AudioEffect
 	overwrite void updateDialog()
 		dlg.fill()
 
-	overwrite void configure()
-		dlg = new ConfigDialog(self)
-		dlg.run()
+	overwrite Panel *createPanel()
+		return new ConfigPanel(self)
 	
 	overwrite void processTrack(BufferBox buf)
 		AudioFile *a = audio
@@ -72,10 +71,9 @@ class Flanger : AudioEffect
 	
 		state.offset += buf.num
 	
-class ConfigDialog : Dialog
+class ConfigPanel : Panel
 	Flanger *f
 	void __init__(Flanger *_f)
-		super.__init__("Flanger", 485, 175, MainWin, false)
 		fromSource("
 Grid table1 '' 1 3
 	.
@@ -92,9 +90,6 @@ Grid table1 '' 1 3
 		Slider depth_slider ''
 		SpinButton depth '\\0\\100\\0.1'
 		Text ? '%'")
-		
-		PutFavoriteBar(self, "table1", 0, 0)
-		PutCommandBar(self, "table1", 0, 2)
 		f = _f
 	
 		CreateSliderM(self, "speed_slider", "speed", 0, 2,    1,    &onSpeed, f.config.Speed)

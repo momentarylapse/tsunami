@@ -30,8 +30,8 @@ void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpoin
 	else if (c->type == HuiKindTreeView)
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, column, state, -1);
 
-	c->win->input.column = column;
-	c->win->input.row = s2i(path_string);
+	c->panel->win->input.column = column;
+	c->panel->win->input.row = s2i(path_string);
 	c->Notify("hui:change", false);
 	gtk_tree_path_free(path);
 }
@@ -51,8 +51,8 @@ void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, c
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, column, new_text, -1);
 
 
-	c->win->input.column = column;
-	c->win->input.row = s2i(path_string);
+	c->panel->win->input.column = column;
+	c->panel->win->input.row = s2i(path_string);
 	c->Notify("hui:change", false);
 	gtk_tree_path_free(path);
 }
@@ -108,7 +108,7 @@ void OnGtkListSelect(GtkTreeSelection *selection, gpointer data)
 {	((HuiControl*)data)->Notify("hui:select", false);	}
 
 
-HuiControlListView::HuiControlListView(const string &title, const string &id, HuiWindow *win) :
+HuiControlListView::HuiControlListView(const string &title, const string &id, HuiPanel *panel) :
 	HuiControl(HuiKindListView, id)
 {
 	GetPartStrings(id, title);
@@ -137,7 +137,7 @@ HuiControlListView::HuiControlListView(const string &title, const string &id, Hu
 
 	// frame
 	frame = sw;
-	if (win->border_width > 0){
+	if (panel->border_width > 0){
 		frame = gtk_frame_new(NULL);
 		gtk_container_add(GTK_CONTAINER(frame), sw);
 	}

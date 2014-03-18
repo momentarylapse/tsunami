@@ -35,7 +35,6 @@ public:
 
 	virtual void Reset();
 
-	string name;
 	int sample_rate;
 
 	MidiSource *source;

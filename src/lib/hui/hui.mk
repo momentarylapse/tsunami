@@ -10,7 +10,7 @@ HUI_OBJ  = $(HUI_DIR)/hui.o \
  $(HUI_DIR)/HuiWindow.o $(HUI_DIR)/HuiWindowGtk.o $(HUI_DIR)/HuiWindowWin.o \
  $(HUI_DIR)/HuiToolbar.o $(HUI_DIR)/HuiToolbarGtk.o $(HUI_DIR)/HuiToolbarWin.o \
  $(HUI_DIR)/hui_window_control.o $(HUI_DIR)/hui_window_control_gtk.o $(HUI_DIR)/hui_window_control_win.o \
- $(HUI_DIR)/HuiPainterGtk.o $(HUI_DIR)/Controls/HuiControl.o \
+ $(HUI_DIR)/HuiPanel.o $(HUI_DIR)/HuiPainterGtk.o $(HUI_DIR)/Controls/HuiControl.o \
  $(HUI_DIR)/Controls/HuiControlCheckBoxGtk.o $(HUI_DIR)/Controls/HuiControlButtonGtk.o \
  $(HUI_DIR)/Controls/HuiControlColorButtonGtk.o $(HUI_DIR)/Controls/HuiControlEditGtk.o \
  $(HUI_DIR)/Controls/HuiControlComboBoxGtk.o $(HUI_DIR)/Controls/HuiControlGridGtk.o \
@@ -80,6 +80,9 @@ $(HUI_DIR)/HuiMenuGtk.o : $(HUI_DIR)/HuiMenuGtk.cpp
 
 $(HUI_DIR)/HuiMenuWin.o : $(HUI_DIR)/HuiMenuWin.cpp
 	$(CPP) -c $(HUI_DIR)/HuiMenuWin.cpp -o $@ $(HUI_CXXFLAGS)
+
+$(HUI_DIR)/HuiPanel.o : $(HUI_DIR)/HuiPanel.cpp
+	$(CPP) -c $(HUI_DIR)/HuiPanel.cpp -o $@ $(HUI_CXXFLAGS)
 
 $(HUI_DIR)/HuiWindow.o : $(HUI_DIR)/HuiWindow.cpp
 	$(CPP) -c $(HUI_DIR)/HuiWindow.cpp -o $@ $(HUI_CXXFLAGS)

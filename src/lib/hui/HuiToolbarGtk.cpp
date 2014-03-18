@@ -48,7 +48,7 @@ void HuiToolbar::Configure(bool _text_enabled, bool _large_icons)
 
 void HuiToolbar::add(HuiControl *c)
 {
-	c->win = win;
+	c->panel = win;
 	item.add(c);
 	win->control.add(c);
 	//gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(c->widget), true);

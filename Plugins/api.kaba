@@ -40,6 +40,7 @@ class AudioEffect
 	extern virtual void resetConfig()
 	extern virtual void resetState()
 	extern virtual void configure()
+	extern virtual Panel *createPanel()
 	extern virtual void updateDialog()
 
 class BufferBox

@@ -14,7 +14,7 @@
 class HuiControlGrid : public HuiControl
 {
 public:
-	HuiControlGrid(const string &text, const string &id, int num_x, int num_y, HuiWindow *win);
+	HuiControlGrid(const string &text, const string &id, int num_x, int num_y, HuiPanel *panel);
 	virtual ~HuiControlGrid();
 	virtual void add(HuiControl *child, int x, int y);
 

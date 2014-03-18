@@ -128,6 +128,7 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 	msg_db_f("HuiWindow()",1);
 
 	window = NULL;
+	win = this;
 	if ((mode & HuiWinModeDummy) > 0)
 		return;
 
@@ -554,17 +555,17 @@ void HuiWindow::SetStatusText(const string &str)
 
 
 // give our window the focus....and try to focus the specified control item
-void HuiWindow::Activate(const string &control_id)
+void HuiPanel::Activate(const string &control_id)
 {
-	gtk_widget_grab_focus(window);
-	gtk_window_present(GTK_WINDOW(window));
+	gtk_widget_grab_focus(win->window);
+	gtk_window_present(GTK_WINDOW(win->window));
 	if (control_id.num > 0)
 		for (int i=0;i<control.num;i++)
 			if (control_id == control[i]->id)
 				control[i]->Focus();
 }
 
-bool HuiWindow::IsActive(const string &control_id)
+bool HuiPanel::IsActive(const string &control_id)
 {
 	if (control_id.num > 0){
 		for (int i=0;i<control.num;i++)
@@ -572,7 +573,7 @@ bool HuiWindow::IsActive(const string &control_id)
 				return control[i]->HasFocus();
 		return false;
 	}
-	return gtk_widget_has_focus(window);
+	return gtk_widget_has_focus(win->window);
 }
 
 

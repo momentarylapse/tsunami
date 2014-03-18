@@ -55,7 +55,7 @@ void HuiControlExpander::add(HuiControl *child, int x, int y)
 	GtkWidget *child_widget = child->get_frame();
 	//gtk_widget_set_vexpand(child_widget, true);
 	//gtk_widget_set_hexpand(child_widget, true);
-	gtk_widget_set_margin_left(child_widget, win->expander_indent);
+	gtk_widget_set_margin_left(child_widget, panel->expander_indent);
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
 	children.add(child);
 	child->parent = this;

@@ -29,7 +29,7 @@ class PluginState : PluginData
 class Echo : AudioEffect
 	Config config
 	PluginState state
-	DelayDialog *dlg
+	DelayPanel *panel
 
 
 	void doDelay(float b[], float d[])
@@ -53,12 +53,11 @@ class Echo : AudioEffect
 
 
 	overwrite void updateDialog()
-		dlg.fill()
+		panel.fill()
 
-	overwrite void configure()
-		// dialog
-		dlg = new DelayDialog(self)
-		dlg.run()
+	overwrite Panel *createPanel()
+		panel = new DelayPanel(self)
+		return panel
 
 	overwrite void processTrack(BufferBox buf)
 
@@ -74,28 +73,23 @@ class Echo : AudioEffect
 					
 
 	
-class DelayDialog : Dialog
+class DelayPanel : Panel
 	Echo *e
 	void __init__(Echo *_e)
-		super.__init__("Echo", 395, 175, MainWin, false)
 		fromSource("
-Grid table1 '' 1 3
-	.
-	Grid ? '' 4 3
-		Text ? 'Lautstärke'
-		Slider volume_slider '' expandx
-		SpinButton volume '\\0\\200\\0.1'
-		Text ? '%'
-		Text ? 'Verzögerung'
-		Slider delay_slider ''
-		SpinButton delay '\\0\\1000'
-		Text ? 'ms'
-		Text ? 'Feedback'
-		Slider feedback_slider ''
-		SpinButton feedback '\\0\\100\\0.1
-		Text ? '%'")
-		PutFavoriteBar(self, "table1", 0, 0)
-		PutCommandBar(self, "table1", 0, 2)
+Grid ? '' 4 3 width=400
+	Text ? 'Lautstärke'
+	Slider volume_slider '' expandx
+	SpinButton volume '\\0\\200\\0.1'
+	Text ? '%'
+	Text ? 'Verzögerung'
+	Slider delay_slider ''
+	SpinButton delay '\\0\\1000'
+	Text ? 'ms'
+	Text ? 'Feedback'
+	Slider feedback_slider ''
+	SpinButton feedback '\\0\\100\\0.1
+	Text ? '%'")
 		
 		e = _e
 	
@@ -112,10 +106,13 @@ Grid table1 '' 1 3
 		
 	void onVolume()
 		e.config.Volume = SliderGet(self, "volume")
+		e.notify()
 
 	void onFeedback()
 		e.config.Feedback = SliderGet(self, "feedback")
+		e.notify()
 
 	void onDelay()
 		e.config.Delay = SliderGet(self, "delay")
+		e.notify()
 

@@ -12,13 +12,10 @@ class HarmonicConfig : PluginData
 			intensity[i] = 0
 		release = 0.02
 
-class ConfigDialog : Dialog
+class ConfigPanel : Panel
 	HarmonicConfig *c
-	void __init__(HarmonicConfig *_c, Window *parent)
-		super.__init__("config", 200, 260, parent, false)
-		addGrid("", 0, 0, 1, 3, "root_table")
-		setTarget("root_table", 0)
-		addGrid("", 0, 1, 5, NUM_HARMONICS, "main_table")
+	void __init__(HarmonicConfig *_c)
+		addGrid("", 0, 0, 5, NUM_HARMONICS, "main_table")
 		setTarget("main_table", 0)
 		addText("Fundamental", 0, 0, 0, 0, "")
 		for int j, 0, NUM_HARMONICS
@@ -30,8 +27,6 @@ class ConfigDialog : Dialog
 		addSpinButton("0\\0\\100\\0.1", 3, 0, 0, 0, "release")
 		addText("ms", 4, 0, 0, 0, "")
 		eventM("release", self, &onChange)
-		PutFavoriteBar(self, "root_table", 0, 0)
-		PutCommandBar(self, "root_table", 0, 2)
 		c = _c
 		
 	void onChange()
@@ -42,17 +37,17 @@ class ConfigDialog : Dialog
 
 class HarmonicSynthesizer : Synthesizer
 	HarmonicConfig config
-	Dialog *dlg
+	ConfigPanel *panel
 	
 	overwrite void updateDialog()
 		for int j, 0, NUM_HARMONICS
-			dlg.setFloat("intensity_" + j, config.intensity[j] * 100)
-		dlg.setFloat("release", config.release * 1000)
+			panel.setFloat("intensity_" + j, config.intensity[j] * 100)
+		panel.setFloat("release", config.release * 1000)
 
-	overwrite void configure()
-		dlg = new ConfigDialog(&config, MainWin)
+	overwrite Panel *createPanel()
+		panel = new ConfigPanel(&config)
 		updateDialog()
-		dlg.run()
+		return panel
 		
 	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
 		float freq = pitch_to_freq(pitch)

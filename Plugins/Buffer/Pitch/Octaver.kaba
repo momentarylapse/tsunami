@@ -9,11 +9,11 @@ class Config : PluginData
 		Level = 0.5
 
 class Octaver : AudioEffect	
-	ConfigDialog *dlg
+	ConfigPanel *panel
 	Config config
 
 	overwrite void updateDialog()
-		dlg.fill()
+		panel.fill()
 
 	void doOctaver(float b[])
 		for int i, 0, b.num
@@ -23,22 +23,18 @@ class Octaver : AudioEffect
 		doOctaver(buf.r)
 		doOctaver(buf.l)
 
-	overwrite void configure()
-		dlg = new ConfigDialog(self)
-		dlg.run()
+	overwrite Panel *createPanel()
+		panel = new ConfigPanel(self)
+		return panel
 	
-class ConfigDialog : Dialog
+class ConfigPanel : Panel
 	Octaver *o
 	void __init__(Octaver *_o)
-		super.__init__("Octaver", 305, 60, MainWin, false)
-		addGrid("", 0, 0, 1, 2, "table1")
-		setTarget("table1", 0)
 		addGrid("", 0, 0, 3, 1, "table2")
 		setTarget("table2", 0)
 		addSlider("!expandx", 0, 0, 0, 0, "level_slider")
 		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "level")
 		addText("%", 2, 0, 0, 0, "")
-		PutCommandBar(self, "table1", 0, 1)
 		o = _o
 		CreateSliderM(self, "level_slider", "level", 0, 1, 100, &onLevel, o.config.Level)
 	
@@ -48,3 +44,4 @@ class ConfigDialog : Dialog
 
 	void onLevel()
 		o.config.Level = SliderGet(self, "level")
+		o.notify()

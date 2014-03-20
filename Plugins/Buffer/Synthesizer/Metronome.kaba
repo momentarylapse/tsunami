@@ -28,7 +28,7 @@ DummySynthesizer synth
 class Metronome : AudioEffect
 	PluginState state
 	Config config
-	ConfigDialog *dlg
+	ConfigPanel *panel
 
 	overwrite void processTrack(BufferBox buf)
 		AudioFile *a = audio
@@ -53,20 +53,17 @@ class Metronome : AudioEffect
 				break
 
 	overwrite void updateDialog()
-		dlg.fill()
+		panel.fill()
 		
-	overwrite void configure()
-		dlg = new ConfigDialog(self)
-		dlg.run()
+	overwrite Panel *createPanel()
+		panel = new ConfigPanel(self)
+		return panel
 
 	
-class ConfigDialog : Dialog
+class ConfigPanel : Panel
 	Metronome *m
 	void __init__(Metronome *_m)
-		super.__init__("Metronom", 305, 135, MainWin, false)
-		addGrid("", 0, 0, 1, 2, "table1")
-		setTarget("table1", 0)
-		addGrid("", 0, 0, 2, 3, "table2")
+		addGrid("!width=300", 0, 0, 2, 3, "table2")
 		setTarget("table2", 0)
 		addText("Geschwindigkeit:", 0, 0, 0, 0, "")
 		addSpinButton("!expandx\\\\0\\1000\\0.1", 1, 0, 0, 0, "beats_per_minute")
@@ -76,7 +73,6 @@ class ConfigDialog : Dialog
 		addText("Lautstärke:", 0, 2, 0, 0, "")
 		addSpinButton("\\0\\100\\0.1", 1, 2, 0, 0, "volume")
 		addText("%", 2, 2, 0, 0, "")
-		PutCommandBar(self, "table1", 0, 1)
 	
 		eventM("beats_per_minute", self, &onMetroBeats)
 		eventM("beats_per_measure", self, &onMetroMeasure)
@@ -94,11 +90,14 @@ class ConfigDialog : Dialog
 
 	void onMetroBeats()
 		m.config.BeatsPerMinute = getFloat("")
+		m.notify()
 
 	void onMetroMeasure()
 		m.config.BeatsPerMeasure = getInt("")
+		m.notify()
 
 	void onMetroVolume()
 		m.config.Volume = getFloat("") / 100
 		//m.config.Volume = SliderGet(self, "volume")
+		m.notify()
 

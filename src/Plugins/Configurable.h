@@ -15,6 +15,7 @@ namespace Script{
 class Script;
 class Type;
 };
+
 class HuiPanel;
 
 
@@ -22,9 +23,9 @@ class PluginData : public VirtualBase
 {
 public:
 	virtual ~PluginData(){}
-	void __init__();
-	virtual void __delete__();
-	virtual void reset(){}
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
+	virtual void _cdecl reset(){}
 	Script::Type *type;
 };
 
@@ -35,11 +36,12 @@ public:
 	void __init__();
 	virtual void __delete__();
 
-	virtual void ResetConfig();
-	virtual void ResetState();
-	virtual void Configure();
-	virtual HuiPanel *CreatePanel();
-	virtual void UpdateDialog(){};
+	virtual void _cdecl ResetConfig();
+	virtual void _cdecl ResetState();
+	virtual void _cdecl Configure();
+	virtual HuiPanel *_cdecl CreatePanel();
+	virtual void _cdecl UpdateDialog(){};
+	void _cdecl notify();
 
 	PluginData *get_config();
 	PluginData *get_state();

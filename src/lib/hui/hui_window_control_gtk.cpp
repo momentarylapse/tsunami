@@ -370,7 +370,7 @@ void HuiPanel::AddImage(const string &title,int x,int y,int width,int height,con
 void HuiPanel::AddDrawingArea(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_InsertControl_(new HuiControlDrawingArea(title, id), x, y, width, height);
-	if (!win->main_input_control)
+	if ((win) && (!win->main_input_control))
 		win->main_input_control = control.back();
 }
 

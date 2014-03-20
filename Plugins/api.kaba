@@ -42,6 +42,7 @@ class AudioEffect
 	extern virtual void configure()
 	extern virtual Panel *createPanel()
 	extern virtual void updateDialog()
+	extern void notify()
 
 class BufferBox
 	int offset, num
@@ -60,6 +61,7 @@ class Synthesizer
 	extern virtual void __delete__()
 	extern virtual void renderNote(BufferBox buf, Range range, float pitch, float volume)
 	extern virtual void configure()
+	extern virtual Panel *createPanel()
 	extern virtual void updateDialog()
 	extern virtual void reset()
 	extern virtual void resetConfig()
@@ -67,6 +69,7 @@ class Synthesizer
 	extern void set(float pitch, float volume, int offset)
 	extern void renderMetronomeClick(BufferBox buf, int pos, int level, float volume)
 	extern void _reset()
+	extern void notify()
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()

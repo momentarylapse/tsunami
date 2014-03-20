@@ -16,7 +16,7 @@ class Config : PluginData
 
 class ToneGenerator : AudioEffect
 	Config config
-	ConfigDialog *dlg
+	ConfigPanel *panel
 	DummySynthesizer synth
 
 	overwrite void processTrack(BufferBox buf)
@@ -39,19 +39,16 @@ class ToneGenerator : AudioEffect
 	
 	
 	overwrite void updateDialog()
-		dlg.fill()
+		panel.fill()
 
-	overwrite void configure()
-		dlg = new ConfigDialog(self)
-		dlg.run()
+	overwrite Panel *createPanel()
+		panel = new ConfigPanel(self)
+		return panel
 
-class ConfigDialog : Dialog
+class ConfigPanel : Panel
 	ToneGenerator *t
 	void __init__(ToneGenerator *_t)
-		super.__init__("Ton Generator", 420, 135, MainWin, false)
-		addGrid("", 0, 0, 1, 2, "table1")
-		setTarget("table1", 0)
-		addGrid("", 0, 0, 3, 3, "table2")
+		addGrid("!width=350", 0, 0, 3, 3, "table2")
 		setTarget("table2", 0)
 		addRadioButton("Ton", 0, 0, 0, 0, "type:pitch")
 		addRadioButton("Frequenz", 0, 1, 0, 0, "type:freq")
@@ -67,8 +64,6 @@ class ConfigDialog : Dialog
 		setTarget("table4", 0)
 		addSlider("", 0, 0, 0, 0, "volume_slider")
 		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "volume")
-		
-		PutCommandBar(self, "table1", 0, 1)
 		
 		t = _t
 	
@@ -88,6 +83,7 @@ class ConfigDialog : Dialog
 	void onFrequency()
 		t.config.Pitch = -1
 		t.config.Frequency = getFloat("")
+		t.notify()
 
 	void readPitchFromDialog()
 		t.config.Pitch = pitch_from_octave_and_rel(getInt("pitch_rel"),
@@ -97,9 +93,11 @@ class ConfigDialog : Dialog
 		readPitchFromDialog()
 		t.config.Frequency = pitch_to_freq(t.config.Pitch)
 		setFloat("frequency", t.config.Frequency)
+		t.notify()
 
 	void onVolume()
 		t.config.Volume = SliderGet(self, "volume")
+		t.notify()
 
 	void fill()
 		bool by_pitch = t.config.Pitch >= 0
@@ -119,9 +117,11 @@ class ConfigDialog : Dialog
 	void onTypeFreq()
 		t.config.Pitch = -1
 		fill()
+		t.notify()
 
 	void onTypePitch()
 		readPitchFromDialog()
 		t.config.Frequency = pitch_to_freq(t.config.Pitch)
 		fill()
+		t.notify()
 

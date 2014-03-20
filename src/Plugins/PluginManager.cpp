@@ -129,6 +129,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("PluginData", "__delete__", Script::mf(&PluginData::__delete__), &plugin_data);
 	Script::DeclareClassVirtualIndex("PluginData", "reset", Script::mf(&PluginData::reset), &plugin_data);
 
+
 	Effect effect;
 	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
 	Script::DeclareClassOffset("AudioEffect", "name", offsetof(Effect, name));
@@ -143,6 +144,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::ResetConfig), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::ResetState), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
+	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
 	Script::DeclareClassOffset("BufferBox", "offset", offsetof(BufferBox, offset));
@@ -172,6 +174,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
 	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
 	Script::LinkExternal("Synthesizer._reset", Script::mf(&Synthesizer::reset));
+	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
 
 
 	DummySynthesizer dsynth;

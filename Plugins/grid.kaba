@@ -329,12 +329,12 @@ class GridData
 		
 
 class Grid : GridData
-	Window *win
+	Panel *panel
 	string id
 	float mx, my
 	
 	void onDrawAll()
-		Painter *c = win.beginDraw(id)
+		Painter *c = panel.beginDraw(id)
 		float w = c.width
 		float h = c.height
 	
@@ -345,7 +345,7 @@ class Grid : GridData
 		c.end()
 	
 	void redraw()
-		win.redraw(id)
+		panel.redraw(id)
 	
 	void onLeftButtonDownAll()
 		mx = HuiGetEvent().mouse_x
@@ -398,17 +398,17 @@ class Grid : GridData
 	void onKeyDownAll()
 		onKeyDown()
 
-	void init(Window *_win, string _id)
-		win = _win
+	void init(Panel *_panel, string _id)
+		panel = _panel
 		id = _id
-		win.eventMX(id, "hui:draw", self, &onDrawAll)
-		win.eventMX(id, "hui:left-button-down", self, &onLeftButtonDownAll)
-		win.eventMX(id, "hui:left-button-up", self, &onLeftButtonUpAll)
-		win.eventMX(id, "hui:right-button-down", self, &onRightButtonDownAll)
-		win.eventMX(id, "hui:right-button-up", self, &onRightButtonUpAll)
-		win.eventMX(id, "hui:mouse-move", self, &onMouseMoveAll)
-		win.eventMX(id, "hui:mouse-wheel", self, &onMouseWheelAll)
-		win.eventMX(id, "hui:key-down", self, &onKeyDownAll)
+		panel.eventMX(id, "hui:draw", self, &onDrawAll)
+		panel.eventMX(id, "hui:left-button-down", self, &onLeftButtonDownAll)
+		panel.eventMX(id, "hui:left-button-up", self, &onLeftButtonUpAll)
+		panel.eventMX(id, "hui:right-button-down", self, &onRightButtonDownAll)
+		panel.eventMX(id, "hui:right-button-up", self, &onRightButtonUpAll)
+		panel.eventMX(id, "hui:mouse-move", self, &onMouseMoveAll)
+		panel.eventMX(id, "hui:mouse-wheel", self, &onMouseWheelAll)
+		panel.eventMX(id, "hui:key-down", self, &onKeyDownAll)
 	
 	virtual void onDraw(Painter *c)
 	virtual void onLeftButtonDown()

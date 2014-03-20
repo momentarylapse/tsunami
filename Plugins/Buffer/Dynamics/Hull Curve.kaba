@@ -30,7 +30,7 @@ class Config : PluginData
 class HullCurve : AudioEffect
 
 	Config config
-	ConfigDialog *dlg
+	ConfigPanel *panel
 
 
 	void hull(float b[])
@@ -49,11 +49,11 @@ class HullCurve : AudioEffect
 		hull(buf.l)
 
 	overwrite void updateDialog()
-		dlg.redraw("drawing")
+		panel.redraw("drawing")
 
-	overwrite void configure()
-		dlg = new ConfigDialog(self)
-		dlg.run()
+	overwrite Panel *createPanel()
+		panel = new ConfigPanel(self)
+		return panel
 
 class HullGrid : Grid
 	Config *config
@@ -120,22 +120,17 @@ class HullGrid : Grid
 					MouseOver = i
 		redraw()
 
-class ConfigDialog : Dialog
+class ConfigPanel : Panel
 	HullGrid grid
 	void __init__(HullCurve *_h)
-		super.__init__("Hull Curve", 600, 420, MainWin, false)
-		addGrid("", 0, 0, 1, 4, "table")
-		setTarget("table", 0)
-		addDrawingArea("!grabfocus", 0, 1, 0, 0, "drawing")
-		addGrid("!noexpandy", 0, 2, 2, 1, "table2")
-		setTarget("table2", 0)
-		addComboBox("linear\\log", 0, 0, 0, 0, "type")
-		addCheckBox("show buffer", 1, 0, 0, 0, "preview")
+		fromSource("
+Grid ? '' 1 2 width=500 height=300
+	DrawingArea drawing '' grabfocus
+	Grid ? '' 2 1 noexpandy
+		ComboBox type 'linear\\log'
+		CheckBox preview 'show buffer'")
 	
 		//EventMX("drawing", "hui:draw", self, &OnDraw)
-
-		PutFavoriteBar(self, "table", 0, 0)
-		PutCommandBar(self, "table", 0, 3)
 	
 		grid.config = &_h.config
 		grid.init(self, "drawing")

@@ -313,6 +313,7 @@ public:
 	}
 };
 
+// default handler...
 void Configurable::Configure()
 {
 	PluginData *config = get_config();
@@ -333,6 +334,10 @@ void Configurable::Configure()
 	tsunami->plugin_manager->PutFavoriteBarSizable(dlg, "root-table", 0, 0);
 	dlg->Embed(panel, "root-table", 0, 1);
 	dlg->Run();
+}
+
+void Configurable::notify()
+{
 }
 
 

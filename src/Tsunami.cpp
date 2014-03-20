@@ -113,7 +113,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 3, 1, "main_table");
 	SetBorderWidth(5);
-	AddControlTable("!noexpandy,height=250", 0, 1, 2, 1, "mixing_table");
 	AddControlTable("!noexpandy", 0, 2, 3, 1, "bottom_table");
 
 	// bottom
@@ -162,7 +161,9 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	sample_manager = new SampleManager(audio, this, true);
 
-	mixing_console = new MixingConsole(audio, output, this, "mixing_table");
+	mixing_console = new MixingConsole(audio, output);
+	Embed(mixing_console, "main_table", 0, 1);
+	mixing_console->Hide();
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;

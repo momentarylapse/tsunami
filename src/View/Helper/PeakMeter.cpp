@@ -41,9 +41,9 @@ void PeakMeter::Data::update(Array<float> &buf, float sample_rate)
 	}
 }
 
-PeakMeter::PeakMeter(HuiWindow *_win, const string &_id, PeakMeterSource *_source)
+PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_source)
 {
-	win = _win;
+	panel = _panel;
 	id = _id;
 	source = _source;
 	mode = ModePeaks;
@@ -51,8 +51,8 @@ PeakMeter::PeakMeter(HuiWindow *_win, const string &_id, PeakMeterSource *_sourc
 	r.reset();
 	l.reset();
 
-	win->EventMX(id, "hui:draw", this, &PeakMeter::OnDraw);
-	win->EventMX(id, "hui:left-button-down", this, &PeakMeter::OnLeftButtonDown);
+	panel->EventMX(id, "hui:draw", this, &PeakMeter::OnDraw);
+	panel->EventMX(id, "hui:left-button-down", this, &PeakMeter::OnLeftButtonDown);
 	Subscribe(source);
 }
 
@@ -105,7 +105,7 @@ void PeakMeter::DrawPeak(HuiPainter *c, const rect &r, Data &d)
 void PeakMeter::OnDraw()
 {
 	msg_db_f("PeakMeter.OnDraw", 1);
-	HuiPainter *c = win->BeginDraw(id);
+	HuiPainter *c = panel->BeginDraw(id);
 	int w = c->width;
 	int h = c->height;
 	if (mode == ModePeaks){
@@ -154,7 +154,7 @@ void PeakMeter::OnRightButtonDown()
 void PeakMeter::SetMode(int _mode)
 {
 	mode = _mode;
-	win->Redraw(id);
+	panel->Redraw(id);
 }
 
 void PeakMeter::FindSpectrum()
@@ -196,5 +196,5 @@ void PeakMeter::OnUpdate(Observable *o)
 	}else if (state == source->STATE_STOPPED){
 		ClearData();
 	}
-	win->Redraw(id);
+	panel->Redraw(id);
 }

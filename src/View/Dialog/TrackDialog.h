@@ -9,17 +9,17 @@
 #define TRACKDIALOG_H_
 
 
-#include "../Helper/EmbeddedDialog.h"
+#include "../../lib/hui/hui.h"
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
 class FxList;
 class BarList;
 
-class TrackDialog: public EmbeddedDialog, public Observer
+class TrackDialog: public HuiPanel, public Observer
 {
 public:
-	TrackDialog(HuiWindow *win);
+	TrackDialog();
 	virtual ~TrackDialog();
 
 	void LoadData();

@@ -33,6 +33,8 @@ public:
 	void _cdecl FromResource(const string &id);
 	void _cdecl FromSource(const string &source);
 
+	void _cdecl Show();
+	void _cdecl Hide();
 
 	// events
 	void _cdecl Event(const string &id, hui_callback *function);

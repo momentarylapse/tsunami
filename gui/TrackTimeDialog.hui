@@ -1,5 +1,5 @@
 Dialog track_time_dialog "Rhythmus Spur" 380 516
-	Grid ? "" 1 3
+	Grid td_main_grid "" 1 3 width=250 noexpandx
 		Grid ttd_grid_1 "" 1 5 expandy
 			Group ld_t_name "Name"
 				Edit name "" expandx

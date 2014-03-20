@@ -184,6 +184,22 @@ bool HuiPanel::_SendEvent_(HuiEvent *e)
 	return sent;
 }
 
+void HuiPanel::Show()
+{
+	if (this == win)
+		win->Show();
+	else if (root_control)
+		root_control->Hide(false);
+}
+
+void HuiPanel::Hide()
+{
+	if (this == win)
+		win->Hide();
+	else if (root_control)
+		root_control->Hide(true);
+}
+
 //----------------------------------------------------------------------------------
 // easy window creation functions
 
@@ -251,10 +267,12 @@ void HuiPanel::FromResource(const string &id)
 		return;
 
 	// title
-	win->SetTitle(HuiGetLanguage(res->id));
+	if (win)
+		win->SetTitle(HuiGetLanguage(res->id));
 
 	// size
-	win->SetSize(res->i_param[0], res->i_param[1]);
+	if (win)
+		win->SetSize(res->i_param[0], res->i_param[1]);
 
 
 	// dialog
@@ -265,11 +283,11 @@ void HuiPanel::FromResource(const string &id)
 		dlg = HuiCreateDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);*/
 
 	// menu?
-	if (res->s_param[0].num > 0)
+	if ((win) && (res->s_param[0].num > 0))
 		win->SetMenu(HuiCreateResourceMenu(res->s_param[0]));
 
 	// toolbar?
-	if (res->s_param[1].num > 0)
+	if ((win) && (res->s_param[1].num > 0))
 		win->toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
 
 	// controls

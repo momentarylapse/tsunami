@@ -8,17 +8,17 @@
 #ifndef AUDIOFILEDIALOG_H_
 #define AUDIOFILEDIALOG_H_
 
-#include "../Helper/EmbeddedDialog.h"
+#include "../../lib/hui/hui.h"
 #include "../../Stuff/Observer.h"
 class AudioFile;
 class Slider;
 class BarList;
 class FxList;
 
-class AudioFileDialog: public EmbeddedDialog, public Observer
+class AudioFileDialog: public HuiPanel, public Observer
 {
 public:
-	AudioFileDialog(HuiWindow *win, AudioFile *a);
+	AudioFileDialog(AudioFile *a);
 	virtual ~AudioFileDialog();
 
 	void LoadData();

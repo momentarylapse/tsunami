@@ -126,10 +126,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetBorderWidth(0);
 	SetTarget("main_table", 0);
 	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
-	AddControlTable("!noexpandx,width=250", 1, 0, 1, 1, "track_dialog_table");
-	HideControl("track_dialog_table", true);
-	AddControlTable("!noexpandx,width=250", 2, 0, 1, 1, "audio_dialog_table");
-	HideControl("audio_dialog_table", true);
 
 	// output table
 	SetBorderWidth(5);

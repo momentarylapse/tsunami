@@ -13,9 +13,9 @@
 #include "../../Stuff/Log.h"
 
 
-FxList::FxList(HuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete)
+FxList::FxList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_edit, const string &_id_delete)
 {
-	dlg = _dlg;
+	panel = _panel;
 	id = _id;
 	id_add = _id_add;
 	id_edit = _id_edit;
@@ -26,11 +26,11 @@ FxList::FxList(HuiWindow *_dlg, const string & _id, const string &_id_add, const
 	fx = NULL;
 
 	FillList();
-	dlg->EventM(id, this, &FxList::OnList);
-	dlg->EventMX(id, "hui:select", this, &FxList::OnListSelect);
-	dlg->EventM(id_add, this, &FxList::OnAdd);
-	dlg->EventM(id_edit, this, &FxList::OnEdit);
-	dlg->EventM(id_delete, this, &FxList::OnDelete);
+	panel->EventM(id, this, &FxList::OnList);
+	panel->EventMX(id, "hui:select", this, &FxList::OnListSelect);
+	panel->EventM(id_add, this, &FxList::OnAdd);
+	panel->EventM(id_edit, this, &FxList::OnEdit);
+	panel->EventM(id_delete, this, &FxList::OnDelete);
 }
 
 
@@ -59,22 +59,22 @@ void FxList::SetTrack(Track *t)
 void FxList::FillList()
 {
 	msg_db_f("FillEffectList", 1);
-	dlg->Reset(id);
+	panel->Reset(id);
 	if (fx){
 		foreach(Effect *f, *fx)
-			dlg->AddString(id, f->name);
+			panel->AddString(id, f->name);
 	}
-	dlg->Enable(id, fx);
-	dlg->Enable(id_add, fx);
-	dlg->Enable(id_edit, false);
-	dlg->Enable(id_delete, false);
+	panel->Enable(id, fx);
+	panel->Enable(id_add, fx);
+	panel->Enable(id_edit, false);
+	panel->Enable(id_delete, false);
 }
 
 
 
 void FxList::OnList()
 {
-	int s = dlg->GetInt(id);
+	int s = panel->GetInt(id);
 	if (s >= 0){
 		ExecuteFXDialog(s);
 		FillList();
@@ -84,9 +84,9 @@ void FxList::OnList()
 
 void FxList::OnListSelect()
 {
-	int s = dlg->GetInt(id);
-	dlg->Enable(id_edit, s >= 0);
-	dlg->Enable(id_delete, s >= 0);
+	int s = panel->GetInt(id);
+	panel->Enable(id_edit, s >= 0);
+	panel->Enable(id_delete, s >= 0);
 }
 
 
@@ -94,7 +94,7 @@ void FxList::OnAdd()
 {
 	if (!fx)
 		return;
-	if (HuiFileDialogOpen(dlg, _("einen Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins/Buffer/", "*.kaba", "*.kaba"))
+	if (HuiFileDialogOpen(panel->win, _("einen Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins/Buffer/", "*.kaba", "*.kaba"))
 		AddNewEffect(HuiFilename);
 }
 
@@ -103,7 +103,7 @@ void FxList::OnEdit()
 {
 	if (!fx)
 		return;
-	int s = dlg->GetInt(id);
+	int s = panel->GetInt(id);
 	if (s >= 0){
 		ExecuteFXDialog(s);
 		FillList();
@@ -115,7 +115,7 @@ void FxList::OnDelete()
 {
 	if (!fx)
 		return;
-	int s = dlg->GetInt(id);
+	int s = panel->GetInt(id);
 	if (s >= 0){
 		if (track)
 			track->DeleteEffect(s);

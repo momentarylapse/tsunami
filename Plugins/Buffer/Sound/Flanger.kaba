@@ -75,7 +75,7 @@ class ConfigPanel : Panel
 	Flanger *f
 	void __init__(Flanger *_f)
 		fromSource("
-Grid table1 '' 1 3
+Grid table1 '' 1 3 width=400
 	.
 	Grid ? '' 4 3
 		Text ? 'Geschwindigkeit'

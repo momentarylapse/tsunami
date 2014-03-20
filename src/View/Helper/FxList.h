@@ -16,7 +16,7 @@ class Effect;
 class FxList : public HuiEventHandler
 {
 public:
-	FxList(HuiWindow *_dlg, const string &_id, const string &_id_add, const string &_id_edit, const string &_id_delete);
+	FxList(HuiPanel *_panel, const string &_id, const string &_id_add, const string &_id_edit, const string &_id_delete);
 	virtual ~FxList();
 
 	void FillList();
@@ -34,7 +34,7 @@ public:
 	void SetTrack(Track *t);
 
 public:
-	HuiWindow *dlg;
+	HuiPanel *panel;
 	string id;
 	string id_add, id_edit, id_delete;
 

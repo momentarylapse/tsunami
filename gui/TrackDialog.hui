@@ -1,5 +1,5 @@
 Dialog track_dialog "Spur" 380 430
-	Grid ? "" 1 6
+	Grid ? "" 1 6 width=250
 		Group ld_t_name "Name"
 			Edit name "" expandx
 		Expander ld_t_effects "Effekte"

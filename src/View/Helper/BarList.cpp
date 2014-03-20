@@ -11,9 +11,9 @@
 
 
 
-BarList::BarList(HuiWindow *_dlg, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete)
+BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete)
 {
-	dlg = _dlg;
+	panel = _panel;
 	id = _id;
 	id_add = _id_add;
 	id_add_pause = _id_add_pause;
@@ -22,12 +22,12 @@ BarList::BarList(HuiWindow *_dlg, const string & _id, const string &_id_add, con
 	track = NULL;
 
 	FillList();
-	dlg->EventM(id, this, &BarList::OnList);
-	dlg->EventMX(id, "hui:select", this, &BarList::OnListSelect);
-	dlg->EventMX(id, "hui:change", this, &BarList::OnListEdit);
-	dlg->EventM(id_add, this, &BarList::OnAdd);
-	dlg->EventM(id_add_pause, this, &BarList::OnAddPause);
-	dlg->EventM(id_delete, this, &BarList::OnDelete);
+	panel->EventM(id, this, &BarList::OnList);
+	panel->EventMX(id, "hui:select", this, &BarList::OnListSelect);
+	panel->EventMX(id, "hui:change", this, &BarList::OnListEdit);
+	panel->EventM(id_add, this, &BarList::OnAdd);
+	panel->EventM(id_add_pause, this, &BarList::OnAddPause);
+	panel->EventM(id_delete, this, &BarList::OnDelete);
 }
 
 
@@ -35,30 +35,30 @@ BarList::BarList(HuiWindow *_dlg, const string & _id, const string &_id_add, con
 void BarList::FillList()
 {
 	msg_db_f("FillBarList", 1);
-	dlg->Reset(id);
+	panel->Reset(id);
 	if (track){
 		int sample_rate = track->root->sample_rate;
 		int n = 1;
 		foreach(BarPattern &b, track->bar){
 			if (b.type == b.TYPE_BAR){
 				if (b.count == 1)
-					dlg->AddString(id, format("%d\\%d\\%.1f\\%d", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
+					panel->AddString(id, format("%d\\%d\\%.1f\\%d", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
 				else
-					dlg->AddString(id, format("%d-%d\\%d\\%.1f\\%d", n, n + b.count - 1, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
+					panel->AddString(id, format("%d-%d\\%d\\%.1f\\%d", n, n + b.count - 1, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
 				n += b.count;
 			}else if (b.type == b.TYPE_PAUSE){
-				dlg->AddString(id, format(_("(Pause)\\-\\-\\%.3f"), (float)b.length / (float)sample_rate));
+				panel->AddString(id, format(_("(Pause)\\-\\-\\%.3f"), (float)b.length / (float)sample_rate));
 			}
 		}
 	}
-	dlg->Enable(id_delete, false);
+	panel->Enable(id_delete, false);
 }
 
 
 
 void BarList::OnList()
 {
-	int s = dlg->GetInt(id);
+	int s = panel->GetInt(id);
 	if (s >= 0){
 		ExecuteBarDialog(s);
 		FillList();
@@ -68,8 +68,8 @@ void BarList::OnList()
 
 void BarList::OnListSelect()
 {
-	int s = dlg->GetInt(id);
-	dlg->Enable(id_delete, s >= 0);
+	int s = panel->GetInt(id);
+	panel->Enable(id_delete, s >= 0);
 }
 
 
@@ -80,7 +80,7 @@ void BarList::OnListEdit()
 	int sample_rate = track->root->sample_rate;
 	int index = HuiGetEvent()->row;
 	BarPattern b = track->bar[index];
-	string text = dlg->GetCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
+	string text = panel->GetCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
 	if (b.type == b.TYPE_BAR){
 		if (HuiGetEvent()->column == 1){
 			float l = (float)b.length / (float)b.num_beats;
@@ -111,7 +111,7 @@ void BarList::OnAddPause()
 {
 	if (!track)
 		return;
-	int s = dlg->GetInt(id);
+	int s = panel->GetInt(id);
 
 	track->AddPause(s, 2.0f);
 	FillList();
@@ -122,7 +122,7 @@ void BarList::OnDelete()
 {
 	if (!track)
 		return;
-	int s = dlg->GetInt(id);
+	int s = panel->GetInt(id);
 	if (s >= 0){
 		track->DeleteBar(s);
 		FillList();
@@ -139,7 +139,7 @@ void BarList::AddNewBar()
 		return;
 	msg_db_f("AddNewBar", 1);
 
-	int s = dlg->GetInt(id);
+	int s = panel->GetInt(id);
 
 	track->AddBars(s, 90.0f, 4, 10);
 	FillList();
@@ -158,8 +158,8 @@ void BarList::SetTrack(Track *t)
 			track = t;
 	FillList();
 
-	dlg->Enable(id, track);
-	dlg->Enable(id_add, track);
-	dlg->Enable(id_add_pause, track);
+	panel->Enable(id, track);
+	panel->Enable(id_add, track);
+	panel->Enable(id_add_pause, track);
 }
 

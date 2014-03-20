@@ -139,8 +139,12 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	//ForceRedraw();
 	UpdateMenu();
 
-	track_dialog = new TrackDialog(tsunami);
-	audio_file_dialog = new AudioFileDialog(tsunami, audio);
+	track_dialog = new TrackDialog();
+	parent->Embed(track_dialog, "main_table", 1, 0);
+	audio_file_dialog = new AudioFileDialog(audio);
+	parent->Embed(audio_file_dialog, "main_table", 2, 0);
+	track_dialog->Hide();
+	audio_file_dialog->Hide();
 }
 
 AudioView::~AudioView()
@@ -156,6 +160,9 @@ AudioView::~AudioView()
 	HuiConfig.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	HuiConfig.setFloat("View.ZoomSpeed", ZoomSpeed);
 	HuiConfig.setBool("View.Antialiasing", antialiasing);
+
+	delete(track_dialog);
+	delete(audio_file_dialog);
 }
 
 
@@ -1446,8 +1453,8 @@ void AudioView::Move(float dpos)
 
 void AudioView::ExecuteTrackDialog(HuiWindow *win)
 {
-	win->HideControl("track_dialog_table", false);
-	win->HideControl("audio_dialog_table", true);
+	track_dialog->Show();
+	audio_file_dialog->Hide();
 }
 
 
@@ -1466,8 +1473,8 @@ void AudioView::ExecuteSubDialog(HuiWindow *win)
 
 void AudioView::ExecuteAudioDialog(HuiWindow *win)
 {
-	win->HideControl("track_dialog_table", true);
-	win->HideControl("audio_dialog_table", false);
+	track_dialog->Hide();
+	audio_file_dialog->Show();
 }
 
 

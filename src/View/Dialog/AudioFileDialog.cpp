@@ -13,31 +13,30 @@
 #include "../Helper/FxList.h"
 #include "../Helper/BarList.h"
 
-AudioFileDialog::AudioFileDialog(HuiWindow *win, AudioFile *a):
-	EmbeddedDialog(win)
+AudioFileDialog::AudioFileDialog(AudioFile *a)
 {
 	audio = a;
 
 	// dialog
-	win->SetTarget("audio_dialog_table", 0);
-	win->SetBorderWidth(5);
-	win->EmbedDialog("audio_file_dialog", 0, 0);
-	win->SetDecimals(1);
-	volume_slider = new Slider(win, "audio_volume_slider", "audio_volume", 0, 1, 100, (void(HuiEventHandler::*)())&AudioFileDialog::OnVolume, audio->volume, this);
-	fx_list = new FxList(win, "audio_fx_list", "audio_add_effect", "audio_configure_effect", "audio_delete_effect");
-	bar_list = new BarList(win, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
+//	SetTarget("audio_dialog_table", 0);
+	SetBorderWidth(5);
+	EmbedDialog("audio_file_dialog", 0, 0);
+	SetDecimals(1);
+	volume_slider = new Slider(this, "audio_volume_slider", "audio_volume", 0, 1, 100, (void(HuiEventHandler::*)())&AudioFileDialog::OnVolume, audio->volume, this);
+	fx_list = new FxList(this, "audio_fx_list", "audio_add_effect", "audio_configure_effect", "audio_delete_effect");
+	bar_list = new BarList(this, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
 	fx_list->SetAudio(audio);
-	win->HideControl("ad_t_bars", true);
+	HideControl("ad_t_bars", true);
 
-	win->Expand("ad_t_tags", 0, true);
+	Expand("ad_t_tags", 0, true);
 
 	LoadData();
 
-	win->EventMX("tags", "hui:select", this, &AudioFileDialog::OnTagsSelect);
-	win->EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
-	win->EventM("add_tag", this, &AudioFileDialog::OnAddTag);
-	win->EventM("delete_tag", this, &AudioFileDialog::OnDeleteTag);
-	win->EventM("audio_close", this, &AudioFileDialog::OnClose);
+	EventMX("tags", "hui:select", this, &AudioFileDialog::OnTagsSelect);
+	EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
+	EventM("add_tag", this, &AudioFileDialog::OnAddTag);
+	EventM("delete_tag", this, &AudioFileDialog::OnDeleteTag);
+	EventM("audio_close", this, &AudioFileDialog::OnClose);
 
 	Subscribe(audio);
 }
@@ -149,5 +148,6 @@ void AudioFileDialog::OnUpdate(Observable *o)
 
 void AudioFileDialog::OnClose()
 {
-	win->HideControl("audio_dialog_table", true);
+	//HideControl("audio_dialog_table", true);
+	Hide();
 }

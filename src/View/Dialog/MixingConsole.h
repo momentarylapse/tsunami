@@ -9,7 +9,7 @@
 #define MIXINGCONSOLE_H_
 
 
-#include "../Helper/EmbeddedDialog.h"
+#include "../../lib/hui/hui.h"
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
@@ -18,10 +18,10 @@ class MixingConsole;
 class PeakMeter;
 class AudioOutput;
 
-class TrackMixer: public EmbeddedDialog
+class TrackMixer: public HuiPanel
 {
 public:
-	TrackMixer(MixingConsole *console, int index, HuiWindow *win);
+	TrackMixer();
 	~TrackMixer();
 	void OnVolume();
 	void OnMute();
@@ -37,12 +37,9 @@ public:
 	static float vol2slider(float vol);
 	static float slider2vol(float val);
 
-	int index;
 	Track *track;
-	MixingConsole *console;
 	//Slider *volume_slider;
 	//Slider *panning_slider;
-	string id_grid;
 	string id_name;
 	string vol_slider_id;
 	string pan_slider_id;

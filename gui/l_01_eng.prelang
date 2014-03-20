@@ -1,9 +1,11 @@
 // Language
 English
 // Num IDs
-170
+173
 // Data (ID,Text)
 about
+
+ad_main_grid
 
 ad_t_bars
 
@@ -251,6 +253,8 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
+rand_id_545948
+
 rdt_source
 !bold\\Source
 rdt_target
@@ -305,6 +309,8 @@ synthesizer
 
 tags
 !format=tT\\Tag\\Value
+td_main_grid
+
 track_dialog
 Track
 track_import

@@ -15,46 +15,39 @@ const float TrackMixer::DB_MIN = -100;
 const float TrackMixer::DB_MAX = 10;
 const float TrackMixer::TAN_SCALE = 10.0f;
 
-TrackMixer::TrackMixer(MixingConsole *_console, int _index, HuiWindow *win) :
-	EmbeddedDialog(win)
+TrackMixer::TrackMixer()
 {
-	console = _console;
-	index = _index;
-	win->SetTarget(console->id_inner, 0);
-	id_grid = "mixing_track_table_" + i2s(index);
-	id_separator = "mixing_track_separator_" + i2s(index);
-	win->AddControlTable("", index*2 + 2, 0, 1, 4, id_grid);
-	win->AddSeparator("!vertical", index*2 + 3, 0, 1, 4, id_separator);
-	win->SetTarget("mixing_track_table_" + i2s(index), 0);
-	id_name = "mc_track_name_" + i2s(index);
-	win->AddText("Track " + i2s(index+1), 0, 0, 0, 0, id_name);
-	vol_slider_id = "mc_volume_" + i2s(index);
-	pan_slider_id = "mc_panning_" + i2s(index);
-	mute_id = "mc_mute_" + i2s(index);
-	win->AddSlider("!width=80,noorigin", 0, 1, 0, 0, pan_slider_id);
-	win->AddString(pan_slider_id, "0\\L");
-	win->AddString(pan_slider_id, "0.5\\");
-	win->AddString(pan_slider_id, "1\\R");
-	win->SetTooltip(pan_slider_id, "Balance");
-	win->AddSlider("!vertical,expandy", 0, 2, 0, 0, vol_slider_id);
-	win->AddString(vol_slider_id, format("%f\\%d", db2slider(DB_MAX), (int)DB_MAX));
-	win->AddString(vol_slider_id, format("%f\\%d", db2slider(5), (int)5));
-	win->AddString(vol_slider_id, format("%f\\%d", db2slider(0), 0));
-	win->AddString(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
-	win->AddString(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
-	win->AddString(vol_slider_id, format("%f\\%d", db2slider(DB_MIN), (int)DB_MIN));
-	win->SetTooltip(vol_slider_id, _("Lautst&arke in dB"));
-	win->AddCheckBox("Stumm", 0, 3, 0, 0, mute_id);
+	string id_grid = "mixing_track_table";
+	id_separator = "mixing_track_separator";
+	AddControlTable("", 0, 0, 1, 4, id_grid);
+	SetTarget(id_grid, 0);
+	id_name = "track_name";
+	AddText("...", 0, 0, 0, 0, id_name);
+	vol_slider_id = "volume";
+	pan_slider_id = "panning";
+	mute_id = "mute";
+	AddSlider("!width=80,noorigin", 0, 1, 0, 0, pan_slider_id);
+	AddString(pan_slider_id, "0\\L");
+	AddString(pan_slider_id, "0.5\\");
+	AddString(pan_slider_id, "1\\R");
+	SetTooltip(pan_slider_id, "Balance");
+	AddSlider("!vertical,expandy", 0, 2, 0, 0, vol_slider_id);
+	AddString(vol_slider_id, format("%f\\%d", db2slider(DB_MAX), (int)DB_MAX));
+	AddString(vol_slider_id, format("%f\\%d", db2slider(5), (int)5));
+	AddString(vol_slider_id, format("%f\\%d", db2slider(0), 0));
+	AddString(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
+	AddString(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
+	AddString(vol_slider_id, format("%f\\%d", db2slider(DB_MIN), (int)DB_MIN));
+	SetTooltip(vol_slider_id, _("Lautst&arke in dB"));
+	AddCheckBox("Stumm", 0, 3, 0, 0, mute_id);
 
-	win->EventM(vol_slider_id, this, &TrackMixer::OnVolume);
-	win->EventM(pan_slider_id, this, &TrackMixer::OnPanning);
-	win->EventM(mute_id, this, &TrackMixer::OnMute);
+	EventM(vol_slider_id, this, &TrackMixer::OnVolume);
+	EventM(pan_slider_id, this, &TrackMixer::OnPanning);
+	EventM(mute_id, this, &TrackMixer::OnMute);
 }
 
 TrackMixer::~TrackMixer()
 {
-	win->RemoveControl(id_grid);
-	win->RemoveControl(id_separator);
 }
 
 float TrackMixer::slider2db(float val)
@@ -79,7 +72,7 @@ float TrackMixer::vol2slider(float vol)
 
 void TrackMixer::OnVolume()
 {
-	track->SetVolume(slider2vol(win->GetFloat("")));
+	track->SetVolume(slider2vol(GetFloat("")));
 }
 
 void TrackMixer::OnMute()
@@ -89,7 +82,7 @@ void TrackMixer::OnMute()
 
 void TrackMixer::OnPanning()
 {
-	track->SetPanning(win->GetFloat("")*2 - 1);
+	track->SetPanning(GetFloat("")*2 - 1);
 }
 
 void TrackMixer::SetTrack(Track* t)
@@ -100,10 +93,10 @@ void TrackMixer::SetTrack(Track* t)
 
 void TrackMixer::Update()
 {
-	win->SetFloat(vol_slider_id, vol2slider(track->volume));
-	win->SetFloat(pan_slider_id, track->panning * 0.5f + 0.5f);
-	win->Check(mute_id, track->muted);
-	win->SetString(id_name, track->name);
+	SetFloat(vol_slider_id, vol2slider(track->volume));
+	SetFloat(pan_slider_id, track->panning * 0.5f + 0.5f);
+	Check(mute_id, track->muted);
+	SetString(id_name, track->name);
 }
 
 
@@ -175,10 +168,16 @@ void MixingConsole::OnOutputVolume()
 
 void MixingConsole::LoadData()
 {
-	for (int i=mixer.num; i<audio->track.num; i++)
-		mixer.add(new TrackMixer(this, i, win));
-	for (int i=audio->track.num; i<mixer.num; i++)
+	for (int i=mixer.num; i<audio->track.num; i++){
+		TrackMixer *m = new TrackMixer();
+		mixer.add(m);
+		win->Embed(m, id_inner, i*2 + 2, 0);
+		win->AddSeparator("!vertical", i*2 + 3, 0, 1, 4, "separator_" + i2s(i));
+	}
+	for (int i=audio->track.num; i<mixer.num; i++){
 		delete(mixer[i]);
+		win->RemoveControl("separator_" + i2s(i));
+	}
 	mixer.resize(audio->track.num);
 
 	foreachi(Track *t, audio->track, i)

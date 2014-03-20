@@ -363,13 +363,20 @@ void HuiPanel::Embed(HuiPanel *panel, const string &parent_id, int x, int y)
 		return;
 	}
 	panel->parent = this;
-	panel->win = win;
+	panel->set_win(win);
 	children.add(panel);
 
 	SetTarget(parent_id, x);
 	_InsertControl_(panel->root_control, x, y, 0, 0);
 	control.pop(); // dont' really add to us
 	panel->root_control->panel = panel;
+}
+
+void HuiPanel::set_win(HuiWindow *_win)
+{
+	win = _win;
+	foreach(HuiPanel *p, children)
+		p->set_win(win);
 }
 
 

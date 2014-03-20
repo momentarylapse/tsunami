@@ -111,9 +111,9 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetBorderWidth(0);
 	AddControlTable("", 0, 0, 1, 3, "root_table");
 	SetTarget("root_table", 0);
-	AddControlTable("", 0, 0, 3, 1, "main_table");
+	AddControlTable("", 0, 0, 4, 1, "main_table");
 	SetBorderWidth(5);
-	AddControlTable("!noexpandy", 0, 2, 3, 1, "bottom_table");
+	AddControlTable("!noexpandy", 0, 3, 3, 1, "bottom_table");
 
 	// bottom
 	SetTarget("bottom_table", 0);

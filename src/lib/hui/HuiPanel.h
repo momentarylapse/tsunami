@@ -36,6 +36,8 @@ public:
 	void _cdecl Show();
 	void _cdecl Hide();
 
+	void set_win(HuiWindow *win);
+
 	// events
 	void _cdecl Event(const string &id, hui_callback *function);
 	void _cdecl EventX(const string &id, const string &msg, hui_callback *function);

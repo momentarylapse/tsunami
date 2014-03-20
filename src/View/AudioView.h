@@ -15,6 +15,7 @@
 class ActionTrackMoveSample;
 class TrackDialog;
 class AudioFileDialog;
+class FxPanel;
 
 class AudioView : public Observer, public Observable
 {
@@ -206,6 +207,7 @@ public:
 
 	TrackDialog *track_dialog;
 	AudioFileDialog *audio_file_dialog;
+	FxPanel *fx_panel;
 
 	Image image_muted, image_unmuted, image_solo;
 	Image image_track_audio, image_track_time, image_track_midi;

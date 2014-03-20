@@ -10,11 +10,24 @@
 
 #include "../../lib/hui/hui.h"
 
+class Track;
+
 class FxPanel : public HuiPanel
 {
 public:
 	FxPanel();
 	virtual ~FxPanel();
+
+	void Clear();
+	void SetTrack(Track *t);
+
+	void OnAdd();
+	void OnClose();
+
+	string id_inner;
+
+	Track *track;
+	Array<HuiPanel*> panels;
 };
 
 #endif /* FXPANEL_H_ */

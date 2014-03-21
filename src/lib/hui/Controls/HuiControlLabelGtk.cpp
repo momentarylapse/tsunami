@@ -23,6 +23,10 @@ HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
 		gtk_misc_set_alignment(GTK_MISC(widget), 1, 0.5f);
 	else
 		gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
+	if (OptionString.find("angle=90") >= 0)
+		gtk_label_set_angle(GTK_LABEL(widget), 90);
+	else if (OptionString.find("angle=270") >= 0)
+		gtk_label_set_angle(GTK_LABEL(widget), 270);
 	HuiControlLabel::__SetString(title);
 	SetOptions(OptionString);
 }
@@ -44,6 +48,8 @@ void HuiControlLabel::__SetString(const string &str)
 		s = "<b>" + s + "</b>";
 	else if (OptionString.find("italic") >= 0)
 		s = "<i>" + s + "</i>";
+	if (OptionString.find("big") >= 0)
+		s = "<big>" + s + "</big>";
 	gtk_label_set_markup(GTK_LABEL(widget), s.c_str());
 }
 

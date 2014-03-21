@@ -353,7 +353,6 @@ void HuiPanel::EmbedSource(const string &buffer, const string &parent_id, int x,
 	HuiResourceNew res;
 	res.load(buffer);
 	EmbedResource(res, parent_id, x, y);
-
 }
 
 void HuiPanel::Embed(HuiPanel *panel, const string &parent_id, int x, int y)

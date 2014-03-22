@@ -8,6 +8,8 @@
 #include "FxPanel.h"
 #include "../../Data/Track.h"
 #include "../../Plugins/Effect.h"
+#include "../../Plugins/PluginManager.h"
+#include "../../Tsunami.h"
 
 class SingleFxPanel : public HuiPanel, public Observer
 {
@@ -19,19 +21,16 @@ public:
 		index = _index;
 		AddControlTable("!noexpandx", 0, 0, 1, 2, "grid");
 		SetTarget("grid", 0);
-		AddControlTable("", 0, 0, 5, 1, "header");
+		AddControlTable("", 0, 0, 4, 1, "header");
 		SetTarget("header", 0);
 		AddText("!bold,center,expandx\\" + fx->name, 0, 0, 0, 0, "");
-		AddButton("!flat", 1, 0, 0, 0, "clear");
-		SetImage("clear", "hui:clear");
-		SetTooltip("clear", _("auf Standard Parameter zur&ucksetzen"));
-		AddButton("!flat", 2, 0, 0, 0, "load");
-		SetImage("load", "hui:open");
-		SetTooltip("load", _("Parameter aus Favoriten laden"));
-		AddButton("!flat", 3, 0, 0, 0, "save");
-		SetImage("save", "hui:save");
-		SetTooltip("save", _("Parameter in Favoriten speichern"));
-		AddButton("!flat", 4, 0, 0, 0, "delete");
+		AddButton("!flat", 1, 0, 0, 0, "load_favorite");
+		SetImage("load_favorite", "hui:open");
+		SetTooltip("load_favorite", _("Parameter laden"));
+		AddButton("!flat", 2, 0, 0, 0, "save_favorite");
+		SetImage("save_favorite", "hui:save");
+		SetTooltip("save_favorite", _("Parameter speichern"));
+		AddButton("!flat", 3, 0, 0, 0, "delete");
 		SetImage("delete", "hui:delete");
 		SetTooltip("delete", _("Effekt l&oschen"));
 		HuiPanel *p = fx->CreatePanel();
@@ -40,13 +39,13 @@ public:
 		}else{
 			SetTarget("grid", 0);
 			AddText(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
-			HideControl("clear", true);
-			HideControl("load", true);
-			HideControl("save", true);
+			HideControl("load_favorite", true);
+			HideControl("save_favorite", true);
 		}
 
 		EventM("delete", this, &SingleFxPanel::onDelete);
-		EventM("clear", this, &SingleFxPanel::onClear);
+		EventM("load_favorite", this, &SingleFxPanel::onLoad);
+		EventM("save_favorite", this, &SingleFxPanel::onSave);
 
 		old_param = fx->ConfigToString();
 		Subscribe(fx);
@@ -55,11 +54,21 @@ public:
 	{
 		Unsubscribe(fx);
 	}
-	void onClear()
+	void onLoad()
 	{
-		fx->ResetConfig();
+		string name = tsunami->plugin_manager->SelectFavoriteName(win, (Configurable*)fx, false);
+		if (name.num == 0)
+			return;
+		tsunami->plugin_manager->ApplyFavorite(fx, name);
 		track->EditEffect(index, old_param);
 		old_param = fx->ConfigToString();
+	}
+	void onSave()
+	{
+		string name = tsunami->plugin_manager->SelectFavoriteName(win, fx, true);
+		if (name.num == 0)
+			return;
+		tsunami->plugin_manager->SaveFavorite(fx, name);
 	}
 	void onDelete()
 	{

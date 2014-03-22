@@ -148,14 +148,15 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 	}
 }
 
-Configurable::Configurable(const string &observable_name) :
+Configurable::Configurable(const string &observable_name, int type) :
 	Observable(observable_name)
 {
+	configurable_type = type;
 }
 
 void Configurable::__init__()
 {
-	new(this) Configurable("");
+	new(this) Configurable("", -1);
 }
 
 void Configurable::__delete__()

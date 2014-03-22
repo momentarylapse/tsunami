@@ -21,6 +21,7 @@
 #include "../View/AudioView.h"
 #include "Plugin.h"
 #include "Effect.h"
+#include <typeinfo>
 
 
 void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
@@ -347,63 +348,27 @@ void PluginManager::OnFavoriteName()
 	HuiCurWindow->Enable("favorite_delete", enabled);
 }
 
-void SynthWriteDataToFile(Synthesizer *s, const string &name)
-{
-	msg_db_f("Synth.WriteDataToFile", 1);
-	dir_create(HuiAppDirectory + "Favorites/");
-	dir_create(HuiAppDirectory + "Favorites/Synthesizer/");
-	CFile *f = FileCreate(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
-	f->WriteStr(s->ConfigToString());
-	FileClose(f);
-}
-
-void SynthLoadDataFromFile(Synthesizer *s, const string &name)
-{
-	msg_db_f("Synth.LoadDataFromFile", 1);
-	/*Script::Type *t = Script::GetDynamicType(s);
-	if (!t)
-		return;*/
-	CFile *f = FileOpen(HuiAppDirectory + "Favorites/Synthesizer/" + s->name + "___" + name);
-	if (!f)
-		return;
-	s->ConfigFromString(f->ReadStr());
-	FileClose(f);
-}
-
 
 void PluginManager::OnFavoriteList()
 {
 	int n = HuiCurWindow->GetInt("");
-	if (cur_effect)
-		cur_effect->ResetConfig();
-	else if (cur_synth)
-		cur_synth->ResetConfig();
 	if (n == 0){
+		get_configurable()->ResetConfig();
 		HuiCurWindow->SetString("favorite_name", "");
 		HuiCurWindow->Enable("favorite_save", false);
 		HuiCurWindow->Enable("favorite_delete", false);
 	}else{
-		if (cur_effect)
-			cur_effect->LoadConfigFromFile(PluginFavoriteName[n - 1]);
-		else if (cur_synth)
-			SynthLoadDataFromFile(cur_synth, PluginFavoriteName[n - 1]);
+		ApplyFavorite(get_configurable(), PluginFavoriteName[n - 1]);
 		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		HuiCurWindow->Enable("favorite_delete", true);
 	}
-	if (cur_effect)
-		cur_effect->UpdateDialog();
-	else if (cur_synth)
-		cur_synth->UpdateDialog();
+	get_configurable()->UpdateDialog();
 }
 
 void PluginManager::OnFavoriteSave()
 {
 	string name = HuiCurWindow->GetString("favorite_name");
-	if (cur_effect){
-		cur_effect->WriteConfigToFile(name);
-	}else if (cur_synth){
-		SynthWriteDataToFile(cur_synth, name);
-	}
+	SaveFavorite(get_configurable(), name);
 	PluginFavoriteName.add(name);
 	HuiCurWindow->AddString("favorite_list", name);
 	HuiCurWindow->SetInt("favorite_list", PluginFavoriteName.num);
@@ -415,31 +380,13 @@ void PluginManager::OnFavoriteDelete()
 void PluginManager::InitFavorites(HuiPanel *panel)
 {
 	msg_db_f("InitFavorites", 1);
-	PluginFavoriteName.clear();
+	PluginFavoriteName = GetFavoriteList(get_configurable());
 
 
 	panel->Enable("favorite_save", false);
 	panel->Enable("favorite_delete", false);
-
-	string init = "-------";
-	if (cur_effect)
-		init = cur_effect->name + "___";
-	else if (cur_synth)
-		init = cur_synth->name + "___";
-
-	dir_create(HuiAppDirectory + "Favorites");
-	dir_create(HuiAppDirectory + "Favorites/Effect");
-	dir_create(HuiAppDirectory + "Favorites/Synthesizer");
-	string dir = HuiAppDirectory + "Favorites/Effect";
-	if (cur_synth)
-		dir = HuiAppDirectory + "Favorites/Synthesizer";
-	Array<DirEntry> list = dir_search(dir, "*", false);
-	foreach(DirEntry &e, list){
-		if (e.name.find(init) < 0)
-			continue;
-		PluginFavoriteName.add(e.name.substr(init.num, -1));
-		panel->AddString("favorite_list", PluginFavoriteName.back());
-	}
+	foreach(string &n, PluginFavoriteName)
+		panel->AddString("favorite_list", n);
 
 	panel->EventM("favorite_name", this, &PluginManager::OnFavoriteName);
 	panel->EventM("favorite_save", this, &PluginManager::OnFavoriteSave);
@@ -447,18 +394,121 @@ void PluginManager::InitFavorites(HuiPanel *panel)
 	panel->EventM("favorite_list", this, &PluginManager::OnFavoriteList);
 }
 
-void PluginManager::PutFavoriteBarFixed(HuiPanel *panel, int x, int y, int w)
+Configurable *PluginManager::get_configurable()
 {
-	msg_db_f("PutFavoriteBarFixed", 1);
-	w -= 10;
-	panel->AddComboBox("", x, y, w / 2 - 35, 25, "favorite_list");
-	panel->AddEdit("", x + w / 2 - 30, y, w / 2 - 30, 25, "favorite_name");
-	panel->AddButton("", x + w - 55, y, 25, 25, "favorite_save");
-	panel->SetImage("favorite_save", "hui:save");
-	panel->AddButton("", x + w - 25, y, 25, 25, "favorite_delete");
-	panel->SetImage("favorite_delete", "hui:delete");
+	return cur_synth ? (Configurable*)cur_synth : (Configurable*)cur_effect;
+}
 
-	InitFavorites(panel);
+string get_fav_dir(Configurable *c)
+{
+	dir_create(HuiAppDirectory + "Favorites");
+	if (c->configurable_type == CONFIGURABLE_SYNTHESIZER){
+		dir_create(HuiAppDirectory + "Favorites/Synthesizer");
+		return HuiAppDirectory + "Favorites/Synthesizer";
+	}
+	dir_create(HuiAppDirectory + "Favorites/Effect");
+	return HuiAppDirectory + "Favorites/Effect";
+}
+
+Array<string> PluginManager::GetFavoriteList(Configurable *c)
+{
+	Array<string> names;
+
+	string init = c->name + "___";
+
+	string dir = get_fav_dir(c);
+	Array<DirEntry> list = dir_search(dir, "*", false);
+	foreach(DirEntry &e, list){
+		if (e.name.find(init) < 0)
+			continue;
+		names.add(e.name.substr(init.num, -1));
+	}
+	return names;
+}
+
+void PluginManager::ApplyFavorite(Configurable *c, const string &name)
+{
+	c->ResetConfig();
+	if (name == ":def:")
+		return;
+	msg_db_f("ApplyFavorite", 1);
+	string dir = get_fav_dir(c);
+	CFile *f = FileOpen(dir + "/" + c->name + "___" + name);
+	if (!f)
+		return;
+	c->ConfigFromString(f->ReadStr());
+	delete(f);
+}
+
+void PluginManager::SaveFavorite(Configurable *c, const string &name)
+{
+	msg_db_f("SaveFavorite", 1);
+	string dir = get_fav_dir(c);
+	CFile *f = FileCreate(dir + "/" + c->name + "___" + name);
+	f->WriteStr(c->ConfigToString());
+	delete(f);
+}
+
+static string FavoriteSelectionDialogReturn;
+
+class FavoriteSelectionDialog : public HuiDialog
+{
+public:
+	FavoriteSelectionDialog(HuiWindow *win, const Array<string> &_names, bool _save) :
+		HuiDialog(_(""), 300, 200, win, false)
+	{
+		save = _save;
+		FavoriteSelectionDialogReturn = "";
+		names = _names;
+		AddControlTable("", 0, 0, 1, 2, "grid");
+		SetTarget("grid", 0);
+		AddListView("Name", 0, 0, 0, 0, "list");
+		AddControlTable("", 0, 1, 2, 1, "grid2");
+		SetTarget("grid2", 0);
+		AddEdit("", 0, 0, 0, 0, "name");
+		AddDefButton("Ok", 1, 0, 0, 0, "ok");
+		if (!save)
+			AddString("list", _("-Standard Parameter-"));
+		foreach(string &n, names)
+			AddString("list", n);
+		if (!save)
+			names.insert(":def:", 0);
+		HideControl("grid2", !save);
+		EventM("list", this, &FavoriteSelectionDialog::OnList);
+		EventMX("list", "hui:select", this, &FavoriteSelectionDialog::OnListSelect);
+		EventM("ok", this, &FavoriteSelectionDialog::OnOk);
+	}
+	void OnList()
+	{
+		int n = GetInt("list");
+		FavoriteSelectionDialogReturn = "";
+		if (n >= 0){
+			FavoriteSelectionDialogReturn = names[n];
+			SetString("name", names[n]);
+		}
+		delete(this);
+	}
+	void OnListSelect()
+	{
+		int n = GetInt("list");
+		if (n >= 0)
+			SetString("name", names[n]);
+	}
+	void OnOk()
+	{
+		FavoriteSelectionDialogReturn = GetString("name");
+		delete(this);
+	}
+
+	bool save;
+	Array<string> names;
+};
+
+string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool save)
+{
+	FavoriteSelectionDialog *dlg = new FavoriteSelectionDialog(win, GetFavoriteList(c), save);
+	dlg->Run();
+	return FavoriteSelectionDialogReturn;
 }
 
 void PluginManager::PutFavoriteBarSizable(HuiPanel *panel, const string &root_id, int x, int y)
@@ -486,29 +536,25 @@ void PluginManager::OnPluginFavoriteName()
 
 void PluginManager::OnPluginFavoriteList()
 {
-	if (!cur_plugin)
-		return;
 	HuiWindow *win = HuiGetEvent()->win;
 	int n = win->GetInt("");
-	cur_effect->ResetConfig();
 	if (n == 0){
+		get_configurable()->ResetConfig();
 		win->SetString("favorite_name", "");
 		win->Enable("favorite_save", false);
 		win->Enable("favorite_delete", false);
 	}else{
-		cur_effect->LoadConfigFromFile(PluginFavoriteName[n - 1]);
+		ApplyFavorite(get_configurable(), PluginFavoriteName[n - 1]);
 		win->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		win->Enable("favorite_delete", true);
 	}
-	cur_effect->UpdateDialog();
+	get_configurable()->UpdateDialog();
 }
 
 void PluginManager::OnPluginFavoriteSave()
 {
-	if (!cur_effect)
-		return;
 	HuiWindow *win = HuiGetEvent()->win;
-	cur_effect->WriteConfigToFile(win->GetString("favorite_name"));
+	SaveFavorite(get_configurable(), win->GetString("favorite_name"));
 	PluginFavoriteName.add(win->GetString("favorite_name"));
 	win->AddString("favorite_list", win->GetString("favorite_name"));
 	win->SetInt("favorite_list", PluginFavoriteName.num);
@@ -530,31 +576,6 @@ void PluginManager::OnPluginClose()
 	cur_plugin = NULL;
 	cur_synth = NULL;
 	delete(HuiCurWindow);
-}
-
-void PluginManager::PutCommandBarFixed(HuiPanel *panel, int x, int y, int w)
-{
-	msg_db_f("PutCommandBarFixed", 1);
-	w -= 10;
-	int ww = (w - 30) / 3;
-	if (ww > 120)
-		ww = 120;
-
-	panel->AddDefButton(_("OK"),w - ww,y,ww,25,"ok");
-	//panel->SetImage("ok", "hui:ok");
-	panel->AddButton(_("Abbrechen"),w - ww*2 - 10,y,ww,25,"cancel");
-	//panel->SetImage("cancel", "hui:cancel");
-
-	if (PluginAddPreview){
-		if (cur_plugin && (cur_plugin->type == Plugin::TYPE_EFFECT)){
-			panel->AddButton(_("Vorschau"),w - ww * 3 - 20,y,ww,25,"preview");
-			panel->SetImage("preview", "hui:media-play");
-		}
-	}
-	panel->EventM("ok", this, &PluginManager::OnPluginOk);
-	panel->EventM("preview", this, &PluginManager::OnPluginPreview);
-	panel->EventM("cancel", this, &PluginManager::OnPluginClose);
-	panel->EventM("hui:close", this, &PluginManager::OnPluginClose);
 }
 
 void PluginManager::PutCommandBarSizable(HuiPanel *panel, const string &root_id, int x, int y)

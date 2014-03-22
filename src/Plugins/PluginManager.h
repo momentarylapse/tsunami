@@ -16,6 +16,7 @@
 class Plugin;
 class Effect;
 class Synthesizer;
+class Configurable;
 
 class PluginManager : public HuiEventHandler, public Observer
 {
@@ -27,9 +28,7 @@ public:
 	void AddPluginsToMenu();
 	void FindAndExecutePlugin();
 
-	void PutFavoriteBarFixed(HuiPanel *panel, int x, int y, int w);
 	void PutFavoriteBarSizable(HuiPanel *panel, const string &root_id, int x, int y);
-	void PutCommandBarFixed(HuiPanel *panel, int x, int y, int w);
 	void PutCommandBarSizable(HuiPanel *panel, const string &root_id, int x, int y);
 
 	void OnMenuExecutePlugin();
@@ -44,6 +43,11 @@ public:
 
 	void PreviewStart(Effect *fx);
 	void PreviewEnd();
+
+	Array<string> GetFavoriteList(Configurable *c);
+	void ApplyFavorite(Configurable *c, const string &name);
+	void SaveFavorite(Configurable *c, const string &name);
+	string SelectFavoriteName(HuiWindow *win, Configurable *c, bool save);
 
 	void OnFavoriteName();
 	void OnFavoriteList();
@@ -86,6 +90,7 @@ public:
 	Plugin *cur_plugin;
 	Effect *cur_effect;
 	Synthesizer *cur_synth;
+	Configurable *get_configurable();
 
 	struct PluginContext
 	{

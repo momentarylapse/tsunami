@@ -19,7 +19,7 @@
 void GlobalRemoveSliders(HuiPanel *panel);
 
 Effect::Effect() :
-	Configurable("Effect")
+	Configurable("Effect", CONFIGURABLE_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
@@ -27,7 +27,7 @@ Effect::Effect() :
 }
 
 Effect::Effect(Plugin *p) :
-	Configurable("Effect")
+	Configurable("Effect", CONFIGURABLE_EFFECT)
 {
 	usable = true;
 	plugin = p;

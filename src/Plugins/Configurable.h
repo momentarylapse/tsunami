@@ -30,10 +30,16 @@ public:
 	Script::Type *type;
 };
 
+enum
+{
+	CONFIGURABLE_EFFECT,
+	CONFIGURABLE_SYNTHESIZER,
+};
+
 class Configurable : public Observable
 {
 public:
-	Configurable(const string &observable_name);
+	Configurable(const string &observable_name, int type);
 	virtual ~Configurable(){}
 	void __init__();
 	virtual void __delete__();
@@ -52,6 +58,7 @@ public:
 	void ConfigFromString(const string &options);
 
 	string name;
+	int configurable_type;
 };
 
 

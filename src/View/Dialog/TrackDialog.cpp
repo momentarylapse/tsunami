@@ -23,7 +23,6 @@ TrackDialog::TrackDialog()
 	SetBorderWidth(5);
 	FromResource("track_time_dialog");
 	SetDecimals(1);
-	fx_list = new FxList(this, "fx_list", "add_effect", "configure_effect", "delete_effect");
 	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
 
@@ -44,7 +43,6 @@ TrackDialog::TrackDialog()
 TrackDialog::~TrackDialog()
 {
 	Unsubscribe(tsunami->audio);
-	delete(fx_list);
 	if (bar_list)
 		delete(bar_list);
 }
@@ -52,7 +50,6 @@ TrackDialog::~TrackDialog()
 void TrackDialog::LoadData()
 {
 	Enable("name", track);
-	fx_list->SetTrack(track);
 	bar_list->SetTrack(track);
 	if (track){
 		SetString("name", track->name);

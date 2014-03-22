@@ -2,15 +2,8 @@ Dialog track_dialog "Spur" 380 430
 	Grid ? "" 1 6 width=250
 		Group ld_t_name "Name"
 			Edit name "" expandx
-		Expander ld_t_effects "Effekte"
-			Grid ? "" 1 2
-				ListView fx_list "Effekte" nobar
-				Grid ? "" 3 1
-					Button add_effect "" image=hui:add
-					Button configure_effect "" image=hui:edit
-					Button delete_effect "" image=hui:delete
 		Expander ld_t_synth "Synthesizer"
 			Grid ? "" 2 1
-				Button synthesizer "" expandx
+				Button synthesizer "" expandx flat
 				Button config_synth "" image=hui:edit
 		Button close "Schließen" image=hui:close

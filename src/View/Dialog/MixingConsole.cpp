@@ -114,7 +114,7 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
 	AddControlTable("", 0, 0, 1, 2, "button_grid");
 	AddControlTable("", 1, 0, 1, 20, id_inner);
 	SetTarget("button_grid", 0);
-	AddButton("!noexpandy", 0, 0, 0, 0, "close");
+	AddButton("!noexpandy,flat", 0, 0, 0, 0, "close");
 	SetImage("close", "hui:close");
 	AddText(_("!big,bold,angle=90\\Mischpult"), 0, 1, 0, 0, "");
 	SetTarget(id_inner, 0);
@@ -173,7 +173,7 @@ void MixingConsole::LoadData()
 		TrackMixer *m = new TrackMixer();
 		mixer.add(m);
 		Embed(m, id_inner, i*2 + 2, 0);
-		AddSeparator("!vertical", i*2 + 3, 0, 1, 4, "separator_" + i2s(i));
+		AddSeparator("!vertical", i*2 + 3, 0, 0, 0, "separator_" + i2s(i));
 	}
 	for (int i=audio->track.num; i<mixer.num; i++){
 		delete(mixer[i]);

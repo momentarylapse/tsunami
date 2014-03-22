@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-173
+179
 // Data (ID,Text)
 about
 
@@ -23,6 +23,8 @@ add_bar_pause
 
 add_midi_track
 
+add_tag
+
 add_time_track
 
 add_track
@@ -33,9 +35,17 @@ audio_add_bar
 
 audio_add_bar_pause
 
+audio_add_effect
+
 audio_bar_list
 
 audio_close
+
+audio_configure_effect
+
+audio_delete_bar
+
+audio_delete_effect
 
 audio_file_dialog
 
@@ -77,9 +87,13 @@ data_list
 
 delete
 Delete
+delete_bar
+
 delete_effect
 Delete
 delete_sample
+
+delete_tag
 
 delete_track
 
@@ -95,8 +109,6 @@ favorite_list
 - Default -
 fx_dialog
 Effect
-fx_list
-!nobar\\Effects
 fxdt_filename
 !bold\\Filename
 fxdt_params
@@ -113,8 +125,6 @@ language
 
 ld_t_bars
 
-ld_t_effects
-!bold\\Effects
 ld_t_name
 !bold\\Name:
 ld_t_repdelay
@@ -253,7 +263,7 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_545948
+rand_id_925432
 
 rdt_source
 !bold\\Source
@@ -294,6 +304,8 @@ select_nothing
 settings
 
 settings_dialog
+
+show_fx_console
 
 show_log
 
@@ -350,7 +362,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-98
+103
 // Data (ID,Text)
                   Close dialog box to exit program.
 
@@ -360,9 +372,13 @@ zoom_out
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
 
+!big,bold,angle=90\\Mischpult
+
 !bold$Kommentar/Geschehnisse:
 
 !bold$Name:
+
+!bold,center\\Ausgabe
 
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
@@ -392,8 +408,6 @@ Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
 
-Ausgabe
-
 Beim Anwenden eines Effekts: 
 
 Beschreibung
@@ -415,6 +429,8 @@ Dauer\\\") + audio->get_time_str(samples));
 Dieser Effekt ist nicht konfigurierbar.
 
 Editor für Audio Dateien
+
+Effekt löschen
 
 Effekt nicht ladbar: \"%s\"
 
@@ -464,8 +480,6 @@ MIDI Quellen
 
 Meldungen
 
-Mischpult
-
 Nachrichten
 
 OK
@@ -473,6 +487,10 @@ OK
 Offset
 
 Ok
+
+Parameter aus Favoriten laden
+
+Parameter in Favoriten speichern
 
 Plugin ist kein Effekt und enthält keine Funktion 'void main()'
 
@@ -493,6 +511,8 @@ Spur %d
 Unbenannt
 
 Vorschau
+
+auf Standard Parameter zurücksetzen
 
 benutze OpenAl Device: 
 
@@ -533,6 +553,8 @@ namenlose Spur
 neue Audiodatei
 
 neue Spur anlegen
+
+nicht konfigurierbar
 
 nichts zu konfigurieren
 

@@ -9,13 +9,15 @@
 #define FXPANEL_H_
 
 #include "../../lib/hui/hui.h"
+#include "../../Stuff/Observer.h"
 
 class Track;
+class AudioFile;
 
-class FxPanel : public HuiPanel
+class FxPanel : public HuiPanel, public Observer
 {
 public:
-	FxPanel();
+	FxPanel(AudioFile *audio);
 	virtual ~FxPanel();
 
 	void Clear();
@@ -24,9 +26,12 @@ public:
 	void OnAdd();
 	void OnClose();
 
+	virtual void OnUpdate(Observable *o);
+
 	string id_inner;
 
 	Track *track;
+	AudioFile *audio;
 	Array<HuiPanel*> panels;
 };
 

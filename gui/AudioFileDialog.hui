@@ -12,21 +12,21 @@ Dialog audio_file_dialog "Sound-Datei" 430 375
 				Grid ad_table_tags "" 1 2
 					ListView tags "Tag\\Wert" format=TT
 					Grid ? "" 2 1
-						Button add_tag "" image=hui:add
-						Button delete_tag "" image=hui:delete
+						Button add_tag "" image=hui:add flat
+						Button delete_tag "" image=hui:delete flat
 			Expander ad_t_effects "Effekte"
 				Grid ? "" 1 2
 					ListView audio_fx_list "Effekte" nobar
 					Grid ? "" 3 1
-						Button audio_add_effect "" image=hui:add
-						Button audio_configure_effect "" image=hui:edit
-						Button audio_delete_effect "" image=hui:delete
+						Button audio_add_effect "" image=hui:add flat
+						Button audio_configure_effect "" image=hui:edit flat
+						Button audio_delete_effect "" image=hui:delete flat
 			Expander ad_t_bars "Takte"
 				Grid ? "" 1 2
 					ListView audio_bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT
 					Grid ? "" 3 1
-						Button audio_add_bar "Takt" image=hui:add
-						Button audio_add_bar_pause "Pause" image=hui:add
-						Button audio_delete_bar "" image=hui:delete
+						Button audio_add_bar "Takt" image=hui:add flat
+						Button audio_add_bar_pause "Pause" image=hui:add flat
+						Button audio_delete_bar "" image=hui:delete flat
 		Separator sep_vertical ""
 		Button audio_close "Schließen" image=hui:close

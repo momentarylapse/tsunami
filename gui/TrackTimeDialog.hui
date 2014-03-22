@@ -5,22 +5,15 @@ Dialog track_time_dialog "Rhythmus Spur" 380 516
 				Edit name "" expandx
 			Group ld_t_synth "Synthesizer"
 				Grid ? "" 2 1
-					Button synthesizer "" expandx
+					Button synthesizer "" expandx flat
 					Button config_synth "" image=hui:edit
-			Expander ld_t_effects "Effekte"
-				Grid ? "" 1 2
-					ListView fx_list "Effekte" nobar
-					Grid ? "" 3 1
-						Button add_effect "" image=hui:add
-						Button configure_effect "" image=hui:edit
-						Button delete_effect "" image=hui:delete
 			Expander ld_t_bars "Takte"
 				Grid ? "" 1 2
 					ListView bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT
 					Grid ? "" 3 1
-						Button add_bar "Takt" image=hui:add
-						Button add_bar_pause "Pause" image=hui:add
-						Button delete_bar "" image=hui:delete
+						Button add_bar "Takt" image=hui:add flat
+						Button add_bar_pause "Pause" image=hui:add flat
+						Button delete_bar "" image=hui:delete flat
 			Button edit_midi_track "Midi editieren"
 		Separator sep_vertical ""
 		Button close "Schließen" image=hui:close

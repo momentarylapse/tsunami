@@ -13,7 +13,6 @@
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
-class FxList;
 class BarList;
 
 class TrackDialog: public HuiPanel, public Observer
@@ -37,7 +36,6 @@ public:
 	virtual void OnUpdate(Observable *o);
 
 	Track *track;
-	FxList *fx_list;
 	BarList *bar_list;
 };
 

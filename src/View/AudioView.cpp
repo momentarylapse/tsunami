@@ -147,7 +147,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	track_dialog->Hide();
 	audio_file_dialog->Hide();
 
-	fx_panel = new FxPanel();
+	fx_panel = new FxPanel(audio);
 	parent->Embed(fx_panel, "main_table", 0, 2);
 	//fx_panel->Hide();
 }

@@ -55,6 +55,7 @@ Menu menu "" disabled
 			Item view_peaks_max "Maximum" checkable
 			Item view_peaks_mean "Quadratisches Mittel" checkable
 		Item show_mixing_console "Mischpult" checkable
+		Item show_fx_console "Effekte" checkable
 		Separator "" ""
 		Item zoom_in "Vergrößern" image=hui:zoom-in
 		Item zoom_out "Verkleinern" image=hui:zoom-out

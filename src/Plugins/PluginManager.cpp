@@ -55,14 +55,14 @@ void GlobalCreateSliderM(HuiPanel *panel, const string &id_slider, const string 
 void GlobalSliderSet(HuiPanel *panel, const string &id, float value)
 {
 	foreach(Slider *s, global_slider)
-		if (s->Match(id))
+		if (s->Match(panel, id))
 			s->Set(value);
 }
 
 float GlobalSliderGet(HuiPanel *panel, const string &id)
 {
 	foreach(Slider *s, global_slider)
-		if (s->Match(id))
+		if (s->Match(panel, id))
 			return s->Get();
 	return 0;
 }

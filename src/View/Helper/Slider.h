@@ -21,7 +21,7 @@ public:
 	void Set(float value);
 	float Get();
 	void Enable(bool enabled);
-	bool Match(const string &id);
+	bool Match(HuiPanel *panel, const string &id);
 
 	void OnSlide();
 	void OnEdit();

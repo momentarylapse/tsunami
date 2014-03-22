@@ -29,6 +29,11 @@ class PluginData
 	extern virtual void __delete__()
 	extern virtual void reset()
 
+/*class ConfigPanel : Panel
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual void update()*/
+
 class AudioEffect
 	string name
 	bool only_on_selection

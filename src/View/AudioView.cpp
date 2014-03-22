@@ -1162,7 +1162,9 @@ void AudioView::DrawEmptyAudioFile(HuiPainter *c, const rect &r)
 
 void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 {
-	int yy = audio->track.back()->area.y2;
+	int yy = 0;
+	if (audio->track.num > 0)
+		yy = audio->track.back()->area.y2;
 
 	// time scale
 	c->setColor(ColorBackgroundCurWave);

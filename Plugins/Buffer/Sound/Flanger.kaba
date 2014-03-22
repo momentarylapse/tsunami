@@ -24,7 +24,7 @@ class PluginState : PluginData
 		offset = 0
 
 class Flanger : AudioEffect
-	ConfigPanel *dlg
+	FlangerPanel *panel
 	PluginConfig config
 	PluginState state
 
@@ -55,10 +55,11 @@ class Flanger : AudioEffect
 				p = 0
 
 	overwrite void updateDialog()
-		dlg.fill()
+		panel.fill()
 
 	overwrite Panel *createPanel()
-		return new ConfigPanel(self)
+		panel = new FlangerPanel(self)
+		return panel
 	
 	overwrite void processTrack(BufferBox buf)
 		AudioFile *a = audio
@@ -71,7 +72,7 @@ class Flanger : AudioEffect
 	
 		state.offset += buf.num
 	
-class ConfigPanel : Panel
+class FlangerPanel : Panel
 	Flanger *f
 	void __init__(Flanger *_f)
 		fromSource("
@@ -103,10 +104,13 @@ Grid ? '' 4 3 width=400
 		
 	void onSpeed()
 		f.config.Speed = SliderGet(self, "speed")
+		f.notify()
 
 	void onDepth()
 		f.config.Depth = SliderGet(self, "depth")
+		f.notify()
 
 	void onDelay()
 		f.config.Delay = SliderGet(self, "delay")
+		f.notify()
 

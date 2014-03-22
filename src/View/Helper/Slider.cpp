@@ -85,9 +85,9 @@ void Slider::Enable(bool enabled)
 }
 
 
-bool Slider::Match(const string &id)
+bool Slider::Match(HuiPanel *_panel, const string &id)
 {
-	return ((id == id_slider) or (id == id_edit));
+	return ((panel == _panel) and ((id == id_slider) or (id == id_edit)));
 }
 
 

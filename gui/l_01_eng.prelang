@@ -65,8 +65,8 @@ capture_delete
 Delete
 capture_device
 
-capture_playback
-Playback
+capture_level
+
 capture_target
 
 capture_time
@@ -263,7 +263,7 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_925432
+rand_id_559158
 
 rdt_source
 !bold\\Source
@@ -362,8 +362,10 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-103
+104
 // Data (ID,Text)
+
+
                   Close dialog box to exit program.
 
         - nicht verbinden -
@@ -396,6 +398,8 @@ zoom_out
 
 - Standard -
 - Default -
+-Standard Parameter-
+
 ...done
 
 Abbrechen
@@ -488,9 +492,9 @@ Offset
 
 Ok
 
-Parameter aus Favoriten laden
+Parameter laden
 
-Parameter in Favoriten speichern
+Parameter speichern
 
 Plugin ist kein Effekt und enthält keine Funktion 'void main()'
 
@@ -511,8 +515,6 @@ Spur %d
 Unbenannt
 
 Vorschau
-
-auf Standard Parameter zurücksetzen
 
 benutze OpenAl Device: 
 

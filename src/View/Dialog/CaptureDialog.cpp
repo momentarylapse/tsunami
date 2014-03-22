@@ -52,10 +52,6 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	Enable("capture_pause", false);
 	Enable("ok", false);
 
-
-	Enable("capture_playback", a->used);
-	Check("capture_playback", a->used);
-
 	foreach(Track *t, a->track)
 		AddString("capture_target", t->GetNiceName() + "     (" + track_type(t->type) + ")");
 	AddString("capture_target", _("neue Spur anlegen"));
@@ -129,17 +125,17 @@ void CaptureDialog::OnTypeMidi()
 
 void CaptureDialog::OnStart()
 {
-	if (IsChecked("capture_playback")){
+	if (audio->used){
 		tsunami->renderer->Prepare(audio, audio->GetPlaybackSelection(), false);
 		tsunami->output->Play(tsunami->renderer);
 	}
+
 	tsunami->input->ResetSync();
 	tsunami->input->Accumulate(true);
 	Enable("capture_start", false);
 	Enable("capture_pause", true);
 	Enable("capture_delete", true);
 	Enable("ok", true);
-	Enable("capture_playback", false);
 	Enable("capture_type:audio", false);
 	Enable("capture_type:midi", false);
 }

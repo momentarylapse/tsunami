@@ -7,15 +7,13 @@ Dialog record_dialog "Aufnahme" 300 200
 					RadioButton capture_type:midi "Midi"
 				Grid ? "" 2 1
 					Text capture_time "0:00" width=120
-					DrawingArea capture_level ""
+					DrawingArea capture_level "" height=25
 				Grid ? "" 3 1
 					Button capture_start "" image=hui:media-record
 					Button capture_pause "" image=hui:media-pause
 					Button capture_delete "Verwerfen" image=hui:delete
 		Group rdt_target "Ziel"
-			Grid ? "" 1 2
-				ComboBox capture_target "" expandx
-				CheckBox capture_playback "wärendher abspielen"
+			ComboBox capture_target "" expandx
 		Grid record_dialog_buttonbar "" 2 1 buttonbar
 			Button cancel "Abbrechen" image=hui:cancel
 			DefButton ok "OK" image=hui:ok

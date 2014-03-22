@@ -324,7 +324,7 @@ void Configurable::Configure()
 {
 	PluginData *config = get_config();
 	if (!config){
-		tsunami->log->Warning(_("nichts zu konfigurieren"));
+		//tsunami->log->Warning(_("nichts zu konfigurieren"));
 		return;
 	}
 

@@ -21,7 +21,7 @@ class Equalizer15 : AudioEffect
 
 	Config config
 
-	ConfigDialog *dlg
+	ConfigPanel *panel
 	float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
 
 	complex f[]
@@ -61,34 +61,32 @@ class Equalizer15 : AudioEffect
 
 	overwrite void updateDialog()
 		for int i, 0, NUM_BANDS
-			dlg.setFloat("slider_" + i, config.Factor[i] / 2)
+			panel.setFloat("slider_" + i, config.Factor[i] / 2)
 	
-	overwrite void configure()
-		dlg = new ConfigDialog(self)
-		dlg.run()
+	overwrite Panel *createPanel()
+		panel = new ConfigPanel(self)
+		return panel
 
-class ConfigDialog : FixedDialog
+class ConfigPanel : Panel
 	Equalizer15 *eq
 
-
 	void __init__(Equalizer15 *_eq)
-		super.__init__("Equalizer",455,325,MainWin,false)
+		addGrid("!height=280", 0, 1, NUM_BANDS, 2, "grid")
+		setTarget("grid", 0)
 		for int i, 0, NUM_BANDS
-			addSlider("",5 + i*30,35,25,210,"slider_" + i)
-		addText("20",5,250,25,25,"")
-		addText("54",65,250,25,25,"")
-		addText("140",125,250,25,25,"")
-		addText("390",185,250,25,25,"")
-		addText("1k",245,250,25,25,"")
-		addText("2k8",305,250,25,25,"")
-		addText("7k5",365,250,25,25,"")
-		addText("20k",425,250,25,25,"")
-		PutCommandBarFixed(self, 5, 285, 455)
-		PutFavoriteBarFixed(self, 5, 5, 455)
+			addSlider("!expandy,vertical", i, 0, 0, 0, "slider_" + i)
+			//addString("slider_" + i, "0.5:0")
+		addText("20", 0, 1, 0, 0, "")
+		addText("54", 2, 1, 0, 0, "")
+		addText("140", 4, 1, 0, 0, "")
+		addText("390", 6, 1, 0, 0, "")
+		addText("1k", 8, 1, 0, 0, "")
+		addText("2k8", 10, 1, 0, 0, "")
+		addText("7k5", 12, 1, 0, 0, "")
+		addText("20k", 14, 1, 0, 0, "")
 	
 		eq = _eq
 		eventM("*", self, &onEvent)
-	
 	
 		fill()
 
@@ -97,6 +95,7 @@ class ConfigDialog : FixedDialog
 		for int i, 0, NUM_BANDS
 			if e.id == ("slider_" + i)
 				eq.config.Factor[i] = getFloat("") * 2
+				eq.notify()
 		
 	void fill()
 		for int i, 0, NUM_BANDS

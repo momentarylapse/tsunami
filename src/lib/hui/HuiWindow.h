@@ -133,7 +133,6 @@ public:
 
 	// hui internal
 	int _GetMainLevel_();
-	int _GetUniqueID_();
 	bool allow_input;
 	HuiInputData input;
 	int mouse_offset_x, mouse_offset_y;
@@ -172,7 +171,6 @@ private:
 	bool allowed, allow_keys;
 	HuiWindow *parent;
 
-	int unique_id;
 	int main_level;
 };
 

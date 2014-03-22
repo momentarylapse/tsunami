@@ -79,7 +79,7 @@ int HuiMainLevel = -1;
 Array<bool> HuiMainLevelRunning;
 
 Array<HuiWindow*> HuiWindows;
-Array<HuiClosedWindow> _HuiClosedWindow_;
+Array<HuiClosedPanel> HuiClosedPanels;
 
 
 bool _HuiScreenOpened_ = false;

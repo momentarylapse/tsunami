@@ -14,7 +14,7 @@
 class Track;
 class AudioFile;
 
-class FxPanel : public HuiPanel, public Observer
+class FxPanel : public HuiPanel, public Observer, public Observable
 {
 public:
 	FxPanel(AudioFile *audio);
@@ -22,6 +22,7 @@ public:
 
 	void Clear();
 	void SetTrack(Track *t);
+	void Show(bool show);
 
 	void OnAdd();
 	void OnClose();
@@ -33,6 +34,7 @@ public:
 	Track *track;
 	AudioFile *audio;
 	Array<HuiPanel*> panels;
+	bool enabled;
 };
 
 #endif /* FXPANEL_H_ */

@@ -33,13 +33,13 @@ extern Array<sHuiImage> HuiImage;
 
 // window lists...
 extern Array<HuiWindow*> HuiWindows;
-struct HuiClosedWindow
+struct HuiClosedPanel
 {
-	HuiWindow *win;
+	HuiPanel *panel;
 	int unique_id;
 	string last_id;
 };
-extern Array<HuiClosedWindow> _HuiClosedWindow_;
+extern Array<HuiClosedPanel> HuiClosedPanels;
 
 
 

@@ -70,6 +70,7 @@ public:
 	void OnDeleteLevel();
 	void OnSampleManager();
 	void OnMixingConsole();
+	void OnFxConsole();
 	void OnSubImport();
 	void OnAudioProperties();
 	void OnTrackProperties();

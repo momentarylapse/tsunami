@@ -9,6 +9,9 @@
 #include "hui_internal.h"
 #include "Controls/HuiControl.h"
 
+// for unique window identifiers
+static int current_uid = 0;
+
 HuiPanel::HuiPanel()
 {
 	win = NULL;
@@ -21,6 +24,8 @@ HuiPanel::HuiPanel()
 	root_control = NULL;
 	is_resizable = true;
 	plugable = NULL;
+
+	unique_id = current_uid ++;
 
 	SetTarget("", 0);
 }
@@ -42,6 +47,12 @@ void HuiPanel::__delete__()
 
 void HuiPanel::_ClearPanel_()
 {
+	HuiClosedPanel c;
+	c.unique_id = unique_id;
+	c.panel = this;
+	c.last_id = cur_id;
+	HuiClosedPanels.add(c);
+
 	if (parent){
 		// disconnect
 		for (int i=0; i<parent->children.num; i++)
@@ -170,8 +181,8 @@ bool HuiPanel::_SendEvent_(HuiEvent *e)
 		}
 
 		// window closed by callback?
-		foreach(HuiClosedWindow &cw, _HuiClosedWindow_)
-			if (cw.win == win)
+		foreach(HuiClosedPanel &cp, HuiClosedPanels)
+			if (cp.panel == this)
 				return sent;
 		_foreach_it_.update();
 	}
@@ -182,6 +193,11 @@ bool HuiPanel::_SendEvent_(HuiEvent *e)
 	win->input.dz = 0;
 
 	return sent;
+}
+
+int HuiPanel::_GetUniqueID_()
+{
+	return unique_id;
 }
 
 void HuiPanel::Show()

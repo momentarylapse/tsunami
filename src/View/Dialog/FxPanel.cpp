@@ -45,6 +45,7 @@ public:
 			HideControl("save", true);
 		}
 
+		EventM("delete", this, &SingleFxPanel::onDelete);
 		EventM("clear", this, &SingleFxPanel::onClear);
 	}
 	void onClear()
@@ -53,12 +54,17 @@ public:
 		fx->ResetConfig();
 		track->EditEffect(index, old_param);
 	}
+	void onDelete()
+	{
+		track->DeleteEffect(index);
+	}
 	Track *track;
 	Effect *fx;
 	int index;
 };
 
-FxPanel::FxPanel(AudioFile *_audio)
+FxPanel::FxPanel(AudioFile *_audio) :
+	Observable("FxConsole")
 {
 	audio = _audio;
 	id_inner = "mixing_inner_table";
@@ -81,6 +87,8 @@ FxPanel::FxPanel(AudioFile *_audio)
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&FxPanel::OnClose);
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxPanel::OnAdd);
 
+	enabled = true;
+
 	Subscribe(audio);
 }
 
@@ -92,7 +100,7 @@ FxPanel::~FxPanel()
 
 void FxPanel::OnClose()
 {
-	Hide();
+	Show(false);
 }
 
 void FxPanel::OnAdd()
@@ -107,6 +115,16 @@ void FxPanel::OnAdd()
 		track->AddEffect(effect);
 	/*else
 		audio->AddEffect(effect);*/
+}
+
+void FxPanel::Show(bool show)
+{
+	enabled = show;
+	if (show)
+		HuiPanel::Show();
+	else
+		HuiPanel::Hide();
+	Notify("Show");
 }
 
 void FxPanel::Clear()

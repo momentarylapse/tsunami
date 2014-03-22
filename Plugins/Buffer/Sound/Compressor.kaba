@@ -102,15 +102,16 @@ class Compressor : AudioEffect
 class CompressorGrid : Grid
 	int MouseOver, Selected
 	CompressorConfig *config
+	Compressor *c
 
-	overwrite void onDraw(Painter *c)
+	overwrite void onDraw(Painter *p)
 		FloatInterpolator fi
 		config.fill_inter(fi)
 	
 		// curve
-		drawCurve(c, fi, true)
+		drawCurve(p, fi, true)
 		for int i, 1, config.curve.num
-			drawPoint2(c, config.curve[i], i == Selected, i == MouseOver)
+			drawPoint2(p, config.curve[i], i == Selected, i == MouseOver)
 
 	// left button down -> select
 	overwrite void onLeftButtonDown()
@@ -125,6 +126,7 @@ class CompressorGrid : Grid
 			complex p = config.curve[i]
 			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(m, i)
+				c.notify()
 				Selected = i
 				redraw()
 				break
@@ -140,6 +142,7 @@ class CompressorGrid : Grid
 			config.curve[Selected].x = clamp(config.curve[Selected].x, xmin, xmax)
 			if Selected == config.curve.num - 1
 				config.curve[Selected].x = 0
+			c.notify()
 		else
 		// mouse over?
 			MouseOver = -1
@@ -154,13 +157,14 @@ class CompressorGrid : Grid
 		// [Delete] -> remove point
 		if (k == KeyDelete) and (Selected > 0) and (Selected < config.curve.num - 1)
 			config.curve.remove(Selected)
+			c.notify()
 			Selected = -1
 			redraw()
 
 class ConfigPanel : Panel
 	CompressorGrid grid
 	void __init__(Compressor *_fx)
-		addGrid("!width=400,height=420", 0, 0, 1, 2, "table1")
+		addGrid("!width=300,height=320", 0, 0, 1, 2, "table1")
 		setTarget("table1", 0)
 		addDrawingArea("!grabfocus", 0, 0, 0, 0, "drawing_area")
 		addGrid("!noexpandy", 0, 1, 6, 1, "table2")
@@ -173,6 +177,7 @@ class ConfigPanel : Panel
 		addText("ms", 5, 0, 0, 0, "")
 		
 		grid.config = &_fx.config
+		grid.c = _fx
 		
 		eventM("attack", self, &onEdit)
 		eventM("release", self, &onEdit)
@@ -191,4 +196,5 @@ class ConfigPanel : Panel
 	void onEdit()
 		grid.config.attack = getFloat("attack") / 1000.0
 		grid.config.release = getFloat("release") / 1000.0
+		grid.c.notify()
 		

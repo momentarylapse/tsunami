@@ -13,6 +13,7 @@
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/SampleManager.h"
 #include "View/Dialog/MixingConsole.h"
+#include "View/Dialog/FxPanel.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -75,6 +76,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("level_down", "hui:down", -1, this, &Tsunami::OnCurLevelDown);
 	HuiAddCommandM("sample_manager", "", -1, this, &Tsunami::OnSampleManager);
 	HuiAddCommandM("show_mixing_console", "", -1, this, &Tsunami::OnMixingConsole);
+	HuiAddCommandM("show_fx_console", "", -1, this, &Tsunami::OnFxConsole);
 	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
 	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
 	HuiAddCommandM("remove_added", "", -1, this, &Tsunami::OnRemoveAdded);
@@ -175,6 +177,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	Subscribe(output, "StateChange");
 	Subscribe(clipboard);
 	Subscribe(mixing_console);
+	Subscribe(view->fx_panel);
 
 	UpdateMenu();
 
@@ -197,6 +200,7 @@ Tsunami::~Tsunami()
 	Unsubscribe(output);
 	Unsubscribe(clipboard);
 	Unsubscribe(mixing_console);
+	Unsubscribe(view->fx_panel);
 
 	int w, h;
 	GetSizeDesired(w, h);
@@ -355,7 +359,14 @@ void Tsunami::OnSampleManager()
 
 void Tsunami::OnMixingConsole()
 {
+	view->fx_panel->Show(false);
 	mixing_console->Show(!mixing_console->enabled);
+}
+
+void Tsunami::OnFxConsole()
+{
+	mixing_console->Show(false);
+	view->fx_panel->Show(!view->fx_panel->enabled);
 }
 
 void Tsunami::OnSubImport()
@@ -557,6 +568,7 @@ void Tsunami::UpdateMenu()
 	Check("play_loop", renderer->loop_if_allowed);
 	// view
 	Check("show_mixing_console", mixing_console->enabled);
+	Check("show_fx_console", view->fx_panel->enabled);
 
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){

@@ -168,8 +168,10 @@ protected:
 	Array<HuiEventListener> event;
 
 	string id;
+	int unique_id;
 	string cur_id;
 public:
+	int _GetUniqueID_();
 	int num_float_decimals;
 	int border_width;
 	int expander_indent;

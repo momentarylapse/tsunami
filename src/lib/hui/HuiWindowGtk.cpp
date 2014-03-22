@@ -338,8 +338,8 @@ string HuiWindow::Run()
 		bool killed = false;
 		while(!killed){
 			HuiDoSingleMainLoop();
-			foreach(HuiClosedWindow &cw, _HuiClosedWindow_)
-				if (cw.unique_id == uid)
+			foreach(HuiClosedPanel &cp, HuiClosedPanels)
+				if (cp.unique_id == uid)
 					killed = true;
 		}
 	}
@@ -347,10 +347,10 @@ string HuiWindow::Run()
 	//msg_write("cleanup");
 
 	// clean up
-	foreachi(HuiClosedWindow &cw, _HuiClosedWindow_, i)
-		if (cw.unique_id == uid){
-			last_id = cw.last_id;
-			_HuiClosedWindow_.erase(i);
+	foreachi(HuiClosedPanel &cp, HuiClosedPanels, i)
+		if (cp.unique_id == uid){
+			last_id = cp.last_id;
+			HuiClosedPanels.erase(i);
 		}
 	return last_id;
 }

@@ -66,22 +66,23 @@ class Equalizer : AudioEffect
 		panel.grid.redraw()
 
 	overwrite Panel *createPanel()
-		panel = new ConfigPanel(&config)
+		panel = new ConfigPanel(self)
 		return panel
 
 
 class EqualizerGrid : Grid
-	Config *e
+	Config *c
+	Equalizer *e
 	int MouseOver, Selected
-	overwrite void onDraw(Painter *c)
+	overwrite void onDraw(Painter *p)
 		// curve + area below
 		FloatInterpolator fi
-		e.fill_inter(fi)
-		drawCurve(c, fi, true)
+		c.fill_inter(fi)
+		drawCurve(p, fi, true)
 	
 		// points
-		for int i, 0, e.curve.num
-			drawPoint3(c, e.curve[i], i == Selected, i == MouseOver)
+		for int i, 0, c.curve.num
+			drawPoint3(p, c.curve[i], i == Selected, i == MouseOver)
 			
 
 	// left button down -> select
@@ -92,17 +93,19 @@ class EqualizerGrid : Grid
 	overwrite void onMouseWheel()
 		if MouseOver >= 0
 			if HuiGetEvent().wheel > 0
-				e.curve[MouseOver].z += 0.2
+				c.curve[MouseOver].z += 0.2
 			else
-				e.curve[MouseOver].z -= 0.2
+				c.curve[MouseOver].z -= 0.2
+			e.notify()
 			redraw()
 
 	// right button down -> new point
 	overwrite void onRightButtonDown()
 		vector m = getMouse3(0)
-		for int i, 1, e.curve.num
-			if (m.x > e.curve[i - 1].x) and (m.x < e.curve[i].x)
-				e.curve.insert(m, i)
+		for int i, 1, c.curve.num
+			if (m.x > c.curve[i - 1].x) and (m.x < c.curve[i].x)
+				c.curve.insert(m, i)
+				e.notify()
 				Selected = i
 				MouseOver = i
 				redraw()
@@ -111,44 +114,48 @@ class EqualizerGrid : Grid
 	overwrite void onMouseMove()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
-			e.curve[Selected] = getMouse3(e.curve[Selected].z)
+			c.curve[Selected] = getMouse3(c.curve[Selected].z)
 			float xmin = MIN_FREQ
 			float xmax = MAX_FREQ
 			if Selected > 0
-				xmin = e.curve[Selected - 1].x
-			if Selected < e.curve.num - 1
-				xmax = e.curve[Selected + 1].x
-			e.curve[Selected].x = clamp(e.curve[Selected].x, xmin, xmax)
-			e.curve[Selected].y = clamp(e.curve[Selected].y, MIN_VOL, MAX_VOL)
-			if Selected == e.curve.num - 1
-				e.curve[Selected].x = MAX_FREQ
+				xmin = c.curve[Selected - 1].x
+			if Selected < c.curve.num - 1
+				xmax = c.curve[Selected + 1].x
+			c.curve[Selected].x = clamp(c.curve[Selected].x, xmin, xmax)
+			c.curve[Selected].y = clamp(c.curve[Selected].y, MIN_VOL, MAX_VOL)
+			if Selected == c.curve.num - 1
+				c.curve[Selected].x = MAX_FREQ
 			if Selected == 0
-				e.curve[Selected].x = MIN_FREQ
+				c.curve[Selected].x = MIN_FREQ
+			e.notify()
 		else
 		// mouse over?
 			MouseOver = -1
-			for int i, 0, e.curve.num
-				if mouseOverPoint3(e.curve[i])
+			for int i, 0, c.curve.num
+				if mouseOverPoint3(c.curve[i])
 					MouseOver = i
 		redraw()
 
 	// [Delete] -> remove point
 	overwrite void onKeyDown()
 		if HuiGetEvent().key_code == KeyDelete
-			if Selected > 0 and Selected < e.curve.num-1
-				e.curve.remove(Selected)
+			if Selected > 0 and Selected < c.curve.num-1
+				c.curve.remove(Selected)
+				e.notify()
 				Selected = -1
 				redraw()
 
 class ConfigPanel : Panel
 	EqualizerGrid grid
-	void __init__(Config *_e)
+	void __init__(Equalizer *e)
 		addDrawingArea("!grabfocus,width=500,height=300", 0, 0, 0, 0, "drawing")
 	
 		grid.init(self, "drawing")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
-		grid.e = _e
+		
+		grid.e = e
+		grid.c = &e.config
 	
 		grid.redraw()
 

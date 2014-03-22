@@ -149,7 +149,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 
 	fx_panel = new FxPanel(audio);
 	parent->Embed(fx_panel, "main_table", 0, 2);
-	//fx_panel->Hide();
+	fx_panel->Show(false);
 }
 
 AudioView::~AudioView()

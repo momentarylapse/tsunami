@@ -12,9 +12,6 @@
 #include "HuiToolbar.h"
 
 
-// for unique window identifiers
-static int current_uid = 0;
-
 extern int HuiMainLevel;
 
 HuiWindow *HuiCurWindow = NULL;
@@ -119,8 +116,6 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 	_HuiMakeUsable_();
 	HuiWindows.add(this);
 
-	_HuiClosedWindow_.clear();
-
 	is_resizable = ((_mode & HuiWinModeResizable) > 0);
 	allowed = true;
 	allow_keys = true;
@@ -137,7 +132,6 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 	toolbar[HuiToolbarBottom] = new HuiToolbar(this);
 	input.reset();
 
-	unique_id = current_uid ++;
 	allow_input = false; // allow only if ->Show() was called
 	main_level = HuiMainLevel;
 }
@@ -145,11 +139,6 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 void HuiWindow::_CleanUp_()
 {
 	msg_db_f("Window::_CleanUp_", 2);
-	HuiClosedWindow c;
-	c.unique_id = unique_id;
-	c.win = this;
-	c.last_id = cur_id;
-	_HuiClosedWindow_.add(c);
 
 	for (int i=0;i<4;i++)
 		delete(toolbar[i]);
@@ -210,11 +199,6 @@ void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 int HuiWindow::_GetMainLevel_()
 {
 	return main_level;
-}
-
-int HuiWindow::_GetUniqueID_()
-{
-	return unique_id;
 }
 
 HuiMenu *HuiWindow::GetMenu()

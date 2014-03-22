@@ -43,18 +43,6 @@ PluginManager::~PluginManager()
 }
 
 
-void GlobalPutFavoriteBarFixed(HuiPanel *panel, int x, int y, int w)
-{	tsunami->plugin_manager->PutFavoriteBarFixed(panel, x, y, w);	}
-
-void GlobalPutFavoriteBar(HuiPanel *panel, const string &root_id, int x, int y)
-{	tsunami->plugin_manager->PutFavoriteBarSizable(panel, root_id, x, y);	}
-
-void GlobalPutCommandBarFixed(HuiPanel *panel, int x, int y, int w)
-{	tsunami->plugin_manager->PutCommandBarFixed(panel, x, y, w);	}
-
-void GlobalPutCommandBar(HuiPanel *panel, const string &root_id, int x, int y)
-{	tsunami->plugin_manager->PutCommandBarSizable(panel, root_id, x, y);	}
-
 Array<Slider*> global_slider;
 
 void GlobalCreateSlider(HuiPanel *panel, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
@@ -107,10 +95,6 @@ void PluginManager::LinkAppScriptData()
 	/*Script::LinkExternal("ProgressStart", (void*)&ProgressStart);
 	Script::LinkExternal("ProgressEnd", (void*)&ProgressEnd);
 	Script::LinkExternal("Progress", (void*)&ProgressStatus);*/
-	Script::LinkExternal("PutFavoriteBarFixed", (void*)&GlobalPutFavoriteBarFixed);
-	Script::LinkExternal("PutFavoriteBar", (void*)&GlobalPutFavoriteBar);
-	Script::LinkExternal("PutCommandBarFixed", (void*)&GlobalPutCommandBarFixed);
-	Script::LinkExternal("PutCommandBar", (void*)&GlobalPutCommandBar);
 	Script::LinkExternal("CreateSlider", (void*)&GlobalCreateSlider);
 	Script::LinkExternal("CreateSliderM", (void*)&GlobalCreateSliderM);
 	Script::LinkExternal("SliderSet", (void*)&GlobalSliderSet);
@@ -139,7 +123,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "processTrack", Script::mf(&Effect::ProcessTrack), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "configure", Script::mf(&Effect::Configure), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::CreatePanel), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::ResetConfig), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::ResetState), &effect);
@@ -166,7 +149,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::RenderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "configure", Script::mf(&Synthesizer::Configure), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::CreatePanel), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::Reset), &synth);

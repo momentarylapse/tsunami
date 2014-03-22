@@ -8,6 +8,12 @@
 #include "Observable.h"
 #include "Observer.h"
 
+ObserverRequest::ObserverRequest(Observer *o, const string &_message)
+{
+	observer = o;
+	message = _message;
+}
+
 Observable::Observable(const string &name)
 {
 	notify_level = 0;
@@ -16,13 +22,12 @@ Observable::Observable(const string &name)
 
 Observable::~Observable()
 {
-	observer.clear();
+	requests.clear();
 }
 
 void Observable::AddObserver(Observer *o, const string &message)
 {
-	observer.add(o);
-	observer_message.add(message);
+	requests.add(ObserverRequest(o, message));
 }
 
 void Observable::AddObserver(Observer *o)
@@ -32,10 +37,9 @@ void Observable::AddObserver(Observer *o)
 
 void Observable::RemoveObserver(Observer *o)
 {
-	for (int i=observer.num-1; i>=0; i--)
-		if (observer[i] == o){
-			observer.erase(i);
-			observer_message.erase(i);
+	for (int i=requests.num-1; i>=0; i--)
+		if (requests[i].observer == o){
+			requests.erase(i);
 		}
 }
 
@@ -47,11 +51,10 @@ void Observable::AddWrappedObserver(void* handler, void* func)
 
 void Observable::RemoveWrappedObserver(void* handler)
 {
-	foreachi(Observer *obs, observer, i)
-		if (dynamic_cast<ObserverWrapper*>(obs)){
-			if (dynamic_cast<ObserverWrapper*>(obs)->handler == handler){
-				observer.erase(i);
-				observer_message.erase(i);
+	foreachi(ObserverRequest &r, requests, i)
+		if (dynamic_cast<ObserverWrapper*>(r.observer)){
+			if (dynamic_cast<ObserverWrapper*>(r.observer)->handler == handler){
+				requests.erase(i);
 				break;
 			}
 		}
@@ -64,23 +67,19 @@ string Observable::GetName()
 
 
 
-string Observable::GetMessage()
-{	return cur_message;	}
-
-
 void Observable::NotifySend()
 {
-	// send
-	foreach(string &m, message_queue){
-		cur_message = m;
-		//msg_write("send " + observable_name + ": " + m);
-		foreachi(Observer *o, observer, i)
-			if ((observer_message[i] == m) or (observer_message[i].num == 0))
-				o->OnUpdate(this);
-	}
-
-	// clear queue
+	Array<string> queue = message_queue;
 	message_queue.clear();
+
+	// send
+	for (int i=0;i<queue.num;i++)
+		for (int j=0;j<requests.num;j++){
+			//msg_write("send " + observable_name + ": " + queue[i]);
+			if ((requests[j].message == queue[i]) or (requests[j].message.num == 0)){
+				requests[j].observer->OnUpdate(this, queue[i]);
+			}
+	}
 }
 
 

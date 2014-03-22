@@ -31,7 +31,7 @@ public:
 
 	void FillTrackList();
 
-	void OnUpdate(Observable *o);
+	void OnUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
 	PeakMeter *peak_meter;

@@ -103,7 +103,7 @@ void TrackDialog::OnClose()
 	Hide();
 }
 
-void TrackDialog::OnUpdate(Observable *o)
+void TrackDialog::OnUpdate(Observable *o, const string &message)
 {
 	if (!track)
 		return;

@@ -40,7 +40,7 @@ public:
 	void OnKeyUp();
 	void OnCommand(const string &id);
 
-	void OnUpdate(Observable *o);
+	void OnUpdate(Observable *o, const string &message);
 
 	void OnCloseEditMidiMode();
 	void OnMidiPitch();

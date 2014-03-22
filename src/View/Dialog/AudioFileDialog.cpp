@@ -141,7 +141,7 @@ void AudioFileDialog::OnVolume()
 	audio->SetVolume(volume_slider->Get());
 }
 
-void AudioFileDialog::OnUpdate(Observable *o)
+void AudioFileDialog::OnUpdate(Observable *o, const string &message)
 {
 	LoadData();
 }

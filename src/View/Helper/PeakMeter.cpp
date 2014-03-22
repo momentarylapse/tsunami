@@ -182,7 +182,7 @@ void PeakMeter::FindSpectrum()
 	}
 }
 
-void PeakMeter::OnUpdate(Observable *o)
+void PeakMeter::OnUpdate(Observable *o, const string &message)
 {
 	int state = source->GetState();
 

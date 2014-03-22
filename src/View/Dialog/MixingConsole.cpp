@@ -185,7 +185,7 @@ void MixingConsole::LoadData()
 		mixer[i]->SetTrack(t);
 }
 
-void MixingConsole::OnUpdate(Observable* o)
+void MixingConsole::OnUpdate(Observable* o, const string &message)
 {
 	if (o == output)
 		SetFloat("mc_output_volume", output->GetVolume());

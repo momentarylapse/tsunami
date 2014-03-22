@@ -33,7 +33,7 @@ public:
 	void OnAddTag();
 	void OnDeleteTag();
 
-	virtual void OnUpdate(Observable *o);
+	virtual void OnUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
 	Slider *volume_slider;

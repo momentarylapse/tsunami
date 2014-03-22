@@ -255,7 +255,7 @@ void Track::AddEffect(Effect *effect)
 // execute after editing...
 void Track::EditEffect(int index, const string &param_old)
 {
-	root->Execute(new ActionTrackEditEffect(this, index, param_old));
+	root->Execute(new ActionTrackEditEffect(this, index, param_old, fx[index]));
 }
 
 void Track::DeleteEffect(int index)

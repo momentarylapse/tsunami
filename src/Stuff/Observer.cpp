@@ -44,7 +44,7 @@ ObserverWrapper::ObserverWrapper(void *_handler, void *_func)
 ObserverWrapper::~ObserverWrapper()
 {}
 
-void ObserverWrapper::OnUpdate(Observable *o)
+void ObserverWrapper::OnUpdate(Observable *o, const string &message)
 {
 	if (handler){
 		typedef void mfunct(void *);

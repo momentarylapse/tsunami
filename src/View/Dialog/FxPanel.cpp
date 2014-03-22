@@ -65,10 +65,10 @@ public:
 	{
 		track->DeleteEffect(index);
 	}
-	virtual void OnUpdate(Observable *o)
+	virtual void OnUpdate(Observable *o, const string &message)
 	{
-		msg_write("SingleFxPanel: " + o->GetMessage());
-		if (o->GetMessage() == "Change")
+		//msg_write("SingleFxPanel: " + message);
+		if (message == "Change")
 			track->EditEffect(index, old_param);
 		fx->UpdateDialog();
 		old_param = fx->ConfigToString();
@@ -171,10 +171,10 @@ void FxPanel::SetTrack(Track *t)
 	Enable("add", track);
 }
 
-void FxPanel::OnUpdate(Observable* o)
+void FxPanel::OnUpdate(Observable* o, const string &message)
 {
-	msg_write("FxPanel: " + o->GetMessage());
-	if ((o == track) && (o->GetMessage() == "Delete"))
+	//msg_write("FxPanel: " + message);
+	if ((o == track) && (message == "Delete"))
 		SetTrack(NULL);
 	else
 		SetTrack(track);

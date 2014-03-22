@@ -33,7 +33,7 @@ public:
 
 	void SetTrack(Track *t);
 
-	virtual void OnUpdate(Observable *o);
+	virtual void OnUpdate(Observable *o, const string &message);
 
 	Track *track;
 	BarList *bar_list;

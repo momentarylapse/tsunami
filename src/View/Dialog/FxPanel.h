@@ -27,7 +27,7 @@ public:
 	void OnAdd();
 	void OnClose();
 
-	virtual void OnUpdate(Observable *o);
+	virtual void OnUpdate(Observable *o, const string &message);
 
 	string id_inner;
 

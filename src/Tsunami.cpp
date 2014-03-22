@@ -588,7 +588,7 @@ void Tsunami::UpdateMenu()
 }
 
 
-void Tsunami::OnUpdate(Observable *o)
+void Tsunami::OnUpdate(Observable *o, const string &message)
 {
 	if (o->GetName() == "AudioOutput"){
 		view->ForceRedraw();

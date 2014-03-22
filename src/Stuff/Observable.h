@@ -14,6 +14,14 @@
 
 class Observer;
 
+struct ObserverRequest
+{
+	ObserverRequest(){}
+	ObserverRequest(Observer *o, const string &message);
+	Observer* observer;
+	string message;
+};
+
 class Observable : public HuiEventHandler
 {
 public:
@@ -26,7 +34,6 @@ public:
 	void RemoveObserver(Observer *o);
 	void RemoveWrappedObserver(void *handler);
 	string GetName();
-	string GetMessage();
 
 	void NotifyBegin();
 	void Notify(const string &message);
@@ -39,12 +46,10 @@ private:
 	string observable_name;
 
 	// observers
-	Array<Observer*> observer;
-	Array<string> observer_message;
+	Array<ObserverRequest> requests;
 
 	// current notifies
 	Array<string> message_queue;
-	string cur_message;
 	int notify_level;
 };
 

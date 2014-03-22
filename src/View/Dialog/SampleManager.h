@@ -28,7 +28,7 @@ public:
 	void OnDelete();
 	void OnClose();
 
-	virtual void OnUpdate(Observable *o);
+	virtual void OnUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
 	Array<string> icon_names;

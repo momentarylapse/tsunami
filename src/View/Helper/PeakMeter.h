@@ -37,7 +37,7 @@ public:
 	void OnLeftButtonDown();
 	void OnRightButtonDown();
 	void SetMode(int _mode);
-	void OnUpdate(Observable *o);
+	void OnUpdate(Observable *o, const string &message);
 
 private:
 	void ClearData();

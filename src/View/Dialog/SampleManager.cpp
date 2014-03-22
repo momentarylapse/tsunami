@@ -110,7 +110,7 @@ void SampleManager::OnClose()
 	Hide();
 }
 
-void SampleManager::OnUpdate(Observable *o)
+void SampleManager::OnUpdate(Observable *o, const string &message)
 {
 	FillList();
 }

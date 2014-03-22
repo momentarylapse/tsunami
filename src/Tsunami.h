@@ -41,7 +41,7 @@ public:
 	void OnAbout();
 	void OnSendBugReport();
 
-	void OnUpdate(Observable *o);
+	void OnUpdate(Observable *o, const string &message);
 	void OnCommand(const string &id);
 
 	void OnEvent();

@@ -1068,14 +1068,14 @@ void AudioView::CheckConsistency()
 	}
 }
 
-void AudioView::OnUpdate(Observable *o)
+void AudioView::OnUpdate(Observable *o, const string &message)
 {
-	//msg_write("view: " + o->GetName() + " - " + o->GetMessage());
+	//msg_write("view: " + o->GetName() + " - " + message);
 
 	CheckConsistency();
 
 	if (o->GetName() == "AudioFile"){
-		if (o->GetMessage() == "New"){
+		if (message == "New"){
 			SetEditModeDefault();
 			OptimizeView();
 		}else{

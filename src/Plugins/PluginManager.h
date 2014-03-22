@@ -56,7 +56,7 @@ public:
 	void OnPluginOk();
 	void OnPluginClose();
 
-	virtual void OnUpdate(Observable *o);
+	virtual void OnUpdate(Observable *o, const string &message);
 
 	Effect *LoadEffect(const string &name);
 

@@ -154,7 +154,7 @@ void CaptureDialog::OnDelete()
 	Enable("capture_pause", false);
 	Enable("capture_delete", false);
 	Enable("ok", false);
-	OnUpdate(NULL);
+	OnUpdate(NULL, "");
 }
 
 void CaptureDialog::OnPause()
@@ -179,7 +179,7 @@ void CaptureDialog::OnClose()
 	delete(this);
 }
 
-void CaptureDialog::OnUpdate(Observable *o)
+void CaptureDialog::OnUpdate(Observable *o, const string &message)
 {
 	SetString("capture_time", audio->get_time_str(tsunami->input->GetSampleCount()));
 }

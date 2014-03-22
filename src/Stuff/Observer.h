@@ -23,7 +23,7 @@ public:
 	void Subscribe(Observable *o, const string &message);
 	void Unsubscribe(Observable *o);
 
-	virtual void OnUpdate(Observable *o) = 0;
+	virtual void OnUpdate(Observable *o, const string &message) = 0;
 };
 
 class ObserverWrapper : public Observer
@@ -32,7 +32,7 @@ public:
 	ObserverWrapper(void *handler, void *func);
 	virtual ~ObserverWrapper();
 
-	virtual void OnUpdate(Observable *o);
+	virtual void OnUpdate(Observable *o, const string &message);
 
 	void *handler, *func;
 };

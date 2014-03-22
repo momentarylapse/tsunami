@@ -59,7 +59,7 @@ public:
 	void OnClose();
 	void OnOutputVolume();
 
-	virtual void OnUpdate(Observable *o);
+	virtual void OnUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
 	AudioOutput *output;

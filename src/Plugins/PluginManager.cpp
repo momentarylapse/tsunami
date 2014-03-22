@@ -601,10 +601,10 @@ bool PluginManager::ConfigureSynthesizer(Synthesizer *s)
 	return !PluginCancelled;
 }
 
-void PluginManager::OnUpdate(Observable *o)
+void PluginManager::OnUpdate(Observable *o, const string &message)
 {
 	if (o == tsunami->progress){
-		if (o->GetMessage() == "Cancel")
+		if (message == "Cancel")
 			PreviewEnd();
 	}else if (o == tsunami->output){
 		int pos = tsunami->output->GetPos();

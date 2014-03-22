@@ -109,7 +109,7 @@ void AudioFile::AddEffect(Effect *effect)
 // execute after editing...
 void AudioFile::EditEffect(int index, const string &param_old)
 {
-	Execute(new ActionTrackEditEffect(NULL, index, param_old));
+	Execute(new ActionTrackEditEffect(NULL, index, param_old, fx[index]));
 }
 
 void AudioFile::DeleteEffect(int index)

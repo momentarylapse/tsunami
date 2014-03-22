@@ -148,7 +148,7 @@ class EqualizerGrid : Grid
 class ConfigPanel : Panel
 	EqualizerGrid grid
 	void __init__(Equalizer *e)
-		addDrawingArea("!grabfocus,width=500,height=300", 0, 0, 0, 0, "drawing")
+		addDrawingArea("!grabfocus,width=450", 0, 0, 0, 0, "drawing")
 	
 		grid.init(self, "drawing")
 		grid.x_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")

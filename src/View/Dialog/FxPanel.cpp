@@ -85,7 +85,7 @@ FxPanel::FxPanel(AudioFile *_audio) :
 	audio = _audio;
 	id_inner = "mixing_inner_table";
 
-	AddControlTable("!height=250,noexpandy", 0, 0, 2, 1, "root_grid");
+	AddControlTable("!height=320,noexpandy", 0, 0, 2, 1, "root_grid");
 	SetTarget("root_grid", 0);
 	AddControlTable("", 0, 0, 1, 3, "button_grid");
 	AddControlTable("", 1, 0, 1, 20, id_inner);

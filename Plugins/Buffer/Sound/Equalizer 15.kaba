@@ -71,7 +71,7 @@ class ConfigPanel : Panel
 	Equalizer15 *eq
 
 	void __init__(Equalizer15 *_eq)
-		addGrid("!height=280", 0, 1, NUM_BANDS, 2, "grid")
+		addGrid("", 0, 1, NUM_BANDS, 2, "grid")
 		setTarget("grid", 0)
 		for int i, 0, NUM_BANDS
 			addSlider("!expandy,vertical", i, 0, 0, 0, "slider_" + i)

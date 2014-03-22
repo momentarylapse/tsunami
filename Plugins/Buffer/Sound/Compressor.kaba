@@ -164,7 +164,7 @@ class CompressorGrid : Grid
 class ConfigPanel : Panel
 	CompressorGrid grid
 	void __init__(Compressor *_fx)
-		addGrid("!width=300,height=320", 0, 0, 1, 2, "table1")
+		addGrid("!width=240", 0, 0, 1, 2, "table1")
 		setTarget("table1", 0)
 		addDrawingArea("!grabfocus", 0, 0, 0, 0, "drawing_area")
 		addGrid("!noexpandy", 0, 1, 6, 1, "table2")

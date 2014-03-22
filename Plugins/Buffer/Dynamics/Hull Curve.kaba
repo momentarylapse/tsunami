@@ -124,7 +124,7 @@ class ConfigPanel : Panel
 	HullGrid grid
 	void __init__(HullCurve *_h)
 		fromSource("
-Grid ? '' 1 2 width=500 height=300
+Grid ? '' 1 2 width=450
 	DrawingArea drawing '' grabfocus
 	Grid ? '' 2 1 noexpandy
 		ComboBox type 'linear\\log'

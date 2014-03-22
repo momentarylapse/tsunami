@@ -28,7 +28,8 @@
 #include "../Action/Track/Bar/ActionTrackDeleteBar.h"
 
 
-Track::Track()
+Track::Track() :
+	Observable("Track")
 {
 	type = TYPE_AUDIO;
 	muted = false;
@@ -69,6 +70,7 @@ void Track::Reset()
 
 Track::~Track()
 {
+	Notify("Delete");
 	Reset();
 	if (synth)
 		delete(synth);

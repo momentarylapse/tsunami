@@ -15,6 +15,7 @@
 #include "Sample.h"
 #include "AudioFile.h"
 #include "../lib/math/rect.h"
+#include "../Stuff/Observable.h"
 
 
 #define NUM_PEAK_LEVELS		24
@@ -36,7 +37,7 @@ public:
 };
 
 
-class Track
+class Track : public Observable
 {
 public:
 	Track();

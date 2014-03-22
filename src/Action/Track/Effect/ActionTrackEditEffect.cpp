@@ -50,6 +50,7 @@ void *ActionTrackEditEffect::execute(Data *d)
 	string temp = params;
 	params = fx->ConfigToString();
 	fx->ConfigFromString(temp);
+	fx->Notify("ChangeByAction");
 
 	return NULL;
 }

@@ -18,14 +18,16 @@
 // -> PluginManager.cpp
 void GlobalRemoveSliders(HuiPanel *panel);
 
-Effect::Effect()
+Effect::Effect() :
+	Configurable("Effect")
 {
 	usable = true;
 	plugin = NULL;
 	only_on_selection = false;
 }
 
-Effect::Effect(Plugin *p)
+Effect::Effect(Plugin *p) :
+	Configurable("Effect")
 {
 	usable = true;
 	plugin = p;
@@ -34,6 +36,7 @@ Effect::Effect(Plugin *p)
 
 Effect::~Effect()
 {
+	Notify("Delete");
 }
 
 void Effect::__init__()
@@ -43,6 +46,7 @@ void Effect::__init__()
 
 void Effect::__delete__()
 {
+	Notify("Delete");
 }
 
 /*void make_fx(Effect *fx)

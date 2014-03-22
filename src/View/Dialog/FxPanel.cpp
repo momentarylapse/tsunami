@@ -9,7 +9,7 @@
 #include "../../Data/Track.h"
 #include "../../Plugins/Effect.h"
 
-class SingleFxPanel : public HuiPanel
+class SingleFxPanel : public HuiPanel, public Observer
 {
 public:
 	SingleFxPanel(Track *t, Effect *_fx, int _index)
@@ -47,19 +47,35 @@ public:
 
 		EventM("delete", this, &SingleFxPanel::onDelete);
 		EventM("clear", this, &SingleFxPanel::onClear);
+
+		old_param = fx->ConfigToString();
+		Subscribe(fx);
+	}
+	virtual ~SingleFxPanel()
+	{
+		Unsubscribe(fx);
 	}
 	void onClear()
 	{
-		string old_param = fx->ConfigToString();
 		fx->ResetConfig();
 		track->EditEffect(index, old_param);
+		old_param = fx->ConfigToString();
 	}
 	void onDelete()
 	{
 		track->DeleteEffect(index);
 	}
+	virtual void OnUpdate(Observable *o)
+	{
+		msg_write("SingleFxPanel: " + o->GetMessage());
+		if (o->GetMessage() == "Change")
+			track->EditEffect(index, old_param);
+		fx->UpdateDialog();
+		old_param = fx->ConfigToString();
+	}
 	Track *track;
 	Effect *fx;
+	string old_param;
 	int index;
 };
 
@@ -88,13 +104,10 @@ FxPanel::FxPanel(AudioFile *_audio) :
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxPanel::OnAdd);
 
 	enabled = true;
-
-	Subscribe(audio);
 }
 
 FxPanel::~FxPanel()
 {
-	Unsubscribe(audio);
 	Clear();
 }
 
@@ -129,6 +142,8 @@ void FxPanel::Show(bool show)
 
 void FxPanel::Clear()
 {
+	if (track)
+		Unsubscribe(track);
 	foreachi(HuiPanel *p, panels, i){
 		delete(p);
 		RemoveControl("separator_" + i2s(i));
@@ -142,22 +157,26 @@ void FxPanel::SetTrack(Track *t)
 {
 	Clear();
 	track = t;
-	Enable("add", t);
+	if (track){
+		Subscribe(track, "Delete");
+		Subscribe(track, "AddEffect");
+		Subscribe(track, "DeleteEffect");
 
-	foreachi(Effect *fx, track->fx, i){
-		panels.add(new SingleFxPanel(track, fx, i));
-		Embed(panels.back(), id_inner, i*2, 0);
-		AddSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
+		foreachi(Effect *fx, track->fx, i){
+			panels.add(new SingleFxPanel(track, fx, i));
+			Embed(panels.back(), id_inner, i*2, 0);
+			AddSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
+		}
 	}
+	Enable("add", track);
 }
 
 void FxPanel::OnUpdate(Observable* o)
 {
-	foreach(Track *t, audio->track)
-		if (t == track){
-			SetTrack(t);
-			return;
-		}
-	SetTrack(NULL);
+	msg_write("FxPanel: " + o->GetMessage());
+	if ((o == track) && (o->GetMessage() == "Delete"))
+		SetTrack(NULL);
+	else
+		SetTrack(track);
 }
 

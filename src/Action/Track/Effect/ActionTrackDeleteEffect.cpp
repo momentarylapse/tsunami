@@ -29,11 +29,14 @@ void *ActionTrackDeleteEffect::execute(Data *d)
 		assert(index < t->fx.num);
 
 		effect = t->fx[index];
+		effect->Notify("Delete");
 		t->fx.erase(index);
+		t->Notify("DeleteEffect");
 	}else{
 		assert(index < a->fx.num);
 
 		effect = a->fx[index];
+		effect->Notify("Delete");
 		a->fx.erase(index);
 	}
 
@@ -51,6 +54,7 @@ void ActionTrackDeleteEffect::undo(Data *d)
 		assert(index <= t->fx.num);
 
 		t->fx.insert(effect, index);
+		t->Notify("AddEffect");
 	}else{
 		assert(index < a->fx.num);
 

@@ -10,6 +10,7 @@
 
 
 #include "../lib/base/base.h"
+#include "../Stuff/Observable.h"
 
 namespace Script{
 class Script;
@@ -29,9 +30,10 @@ public:
 	Script::Type *type;
 };
 
-class Configurable : public VirtualBase
+class Configurable : public Observable
 {
 public:
+	Configurable(const string &observable_name);
 	virtual ~Configurable(){}
 	void __init__();
 	virtual void __delete__();

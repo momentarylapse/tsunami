@@ -73,7 +73,8 @@ string pitch_name(int pitch)
 	return rel_pitch_name(pitch_to_rel(pitch)) + " " + i2s(pitch_get_octave(pitch));
 }
 
-Synthesizer::Synthesizer()
+Synthesizer::Synthesizer() :
+	Configurable("Synthesizer")
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;

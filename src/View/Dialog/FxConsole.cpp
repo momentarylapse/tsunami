@@ -1,11 +1,11 @@
 /*
- * FxPanel.cpp
+ * FxConsole.cpp
  *
  *  Created on: 20.03.2014
  *      Author: michi
  */
 
-#include "FxPanel.h"
+#include "FxConsole.h"
 #include "../../Data/Track.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/PluginManager.h"
@@ -88,7 +88,7 @@ public:
 	int index;
 };
 
-FxPanel::FxPanel(AudioFile *_audio) :
+FxConsole::FxConsole(AudioFile *_audio) :
 	Observable("FxConsole")
 {
 	audio = _audio;
@@ -109,23 +109,23 @@ FxPanel::FxPanel(AudioFile *_audio) :
 	track = NULL;
 	Enable("add", false);
 
-	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&FxPanel::OnClose);
-	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxPanel::OnAdd);
+	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnClose);
+	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
 
 	enabled = true;
 }
 
-FxPanel::~FxPanel()
+FxConsole::~FxConsole()
 {
 	Clear();
 }
 
-void FxPanel::OnClose()
+void FxConsole::OnClose()
 {
 	Show(false);
 }
 
-void FxPanel::OnAdd()
+void FxConsole::OnAdd()
 {
 	if (!HuiFileDialogOpen(win, _("einen Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins/Buffer/", "*.kaba", "*.kaba"))
 		return;
@@ -139,7 +139,7 @@ void FxPanel::OnAdd()
 		audio->AddEffect(effect);*/
 }
 
-void FxPanel::Show(bool show)
+void FxConsole::Show(bool show)
 {
 	enabled = show;
 	if (show)
@@ -149,7 +149,7 @@ void FxPanel::Show(bool show)
 	Notify("Show");
 }
 
-void FxPanel::Clear()
+void FxConsole::Clear()
 {
 	if (track)
 		Unsubscribe(track);
@@ -162,7 +162,7 @@ void FxPanel::Clear()
 	Enable("add", false);
 }
 
-void FxPanel::SetTrack(Track *t)
+void FxConsole::SetTrack(Track *t)
 {
 	Clear();
 	track = t;
@@ -180,7 +180,7 @@ void FxPanel::SetTrack(Track *t)
 	Enable("add", track);
 }
 
-void FxPanel::OnUpdate(Observable* o, const string &message)
+void FxConsole::OnUpdate(Observable* o, const string &message)
 {
 	//msg_write("FxPanel: " + message);
 	if ((o == track) && (message == "Delete"))

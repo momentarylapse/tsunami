@@ -13,7 +13,7 @@
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/SampleManager.h"
 #include "View/Dialog/MixingConsole.h"
-#include "View/Dialog/FxPanel.h"
+#include "View/Dialog/FxConsole.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -177,7 +177,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	Subscribe(output, "StateChange");
 	Subscribe(clipboard);
 	Subscribe(mixing_console);
-	Subscribe(view->fx_panel);
+	Subscribe(view->fx_console);
 
 	UpdateMenu();
 
@@ -200,7 +200,7 @@ Tsunami::~Tsunami()
 	Unsubscribe(output);
 	Unsubscribe(clipboard);
 	Unsubscribe(mixing_console);
-	Unsubscribe(view->fx_panel);
+	Unsubscribe(view->fx_console);
 
 	int w, h;
 	GetSizeDesired(w, h);
@@ -359,14 +359,14 @@ void Tsunami::OnSampleManager()
 
 void Tsunami::OnMixingConsole()
 {
-	view->fx_panel->Show(false);
+	view->fx_console->Show(false);
 	mixing_console->Show(!mixing_console->enabled);
 }
 
 void Tsunami::OnFxConsole()
 {
 	mixing_console->Show(false);
-	view->fx_panel->Show(!view->fx_panel->enabled);
+	view->fx_console->Show(!view->fx_console->enabled);
 }
 
 void Tsunami::OnSubImport()
@@ -568,7 +568,7 @@ void Tsunami::UpdateMenu()
 	Check("play_loop", renderer->loop_if_allowed);
 	// view
 	Check("show_mixing_console", mixing_console->enabled);
-	Check("show_fx_console", view->fx_panel->enabled);
+	Check("show_fx_console", view->fx_console->enabled);
 
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){

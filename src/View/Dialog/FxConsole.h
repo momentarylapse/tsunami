@@ -1,12 +1,12 @@
 /*
- * FxPanel.h
+ * FxConsole.h
  *
  *  Created on: 20.03.2014
  *      Author: michi
  */
 
-#ifndef FXPANEL_H_
-#define FXPANEL_H_
+#ifndef FXCONSOLE_H_
+#define FXCONSOLE_H_
 
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observer.h"
@@ -14,11 +14,11 @@
 class Track;
 class AudioFile;
 
-class FxPanel : public HuiPanel, public Observer, public Observable
+class FxConsole : public HuiPanel, public Observer, public Observable
 {
 public:
-	FxPanel(AudioFile *audio);
-	virtual ~FxPanel();
+	FxConsole(AudioFile *audio);
+	virtual ~FxConsole();
 
 	void Clear();
 	void SetTrack(Track *t);
@@ -37,4 +37,4 @@ public:
 	bool enabled;
 };
 
-#endif /* FXPANEL_H_ */
+#endif /* FXCONSOLE_H_ */

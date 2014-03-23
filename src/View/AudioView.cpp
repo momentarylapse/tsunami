@@ -10,7 +10,7 @@
 #include "../View/Dialog/AudioFileDialog.h"
 #include "../View/Dialog/TrackDialog.h"
 #include "../View/Dialog/SubDialog.h"
-#include "../View/Dialog/FxPanel.h"
+#include "../View/Dialog/FxConsole.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
@@ -147,9 +147,9 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	track_dialog->Hide();
 	audio_file_dialog->Hide();
 
-	fx_panel = new FxPanel(audio);
-	parent->Embed(fx_panel, "main_table", 0, 2);
-	fx_panel->Show(false);
+	fx_console = new FxConsole(audio);
+	parent->Embed(fx_console, "main_table", 0, 2);
+	fx_console->Show(false);
 }
 
 AudioView::~AudioView()
@@ -166,7 +166,7 @@ AudioView::~AudioView()
 	HuiConfig.setFloat("View.ZoomSpeed", ZoomSpeed);
 	HuiConfig.setBool("View.Antialiasing", antialiasing);
 
-	delete(fx_panel);
+	delete(fx_console);
 	delete(track_dialog);
 	delete(audio_file_dialog);
 }
@@ -1424,7 +1424,7 @@ void AudioView::SetCurTrack(Track *t)
 {
 	cur_track = t;
 	track_dialog->SetTrack(cur_track);
-	fx_panel->SetTrack(cur_track);
+	fx_console->SetTrack(cur_track);
 }
 
 

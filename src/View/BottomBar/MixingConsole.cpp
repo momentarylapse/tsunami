@@ -179,3 +179,13 @@ void MixingConsole::OnUpdate(Observable* o, const string &message)
 	else
 		LoadData();
 }
+
+void MixingConsole::OnShow()
+{
+	peak_meter->Enable(true);
+}
+
+void MixingConsole::OnHide()
+{
+	peak_meter->Enable(false);
+}

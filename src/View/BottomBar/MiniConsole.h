@@ -16,8 +16,11 @@ class AudioOutput;
 class MiniConsole : public HuiPanel
 {
 public:
-	MiniConsole();
+	MiniConsole(AudioOutput *output);
 	virtual ~MiniConsole();
+
+	virtual void OnShow();
+	virtual void OnHide();
 
 	AudioOutput *output;
 	PeakMeter *peak_meter;

@@ -38,6 +38,7 @@ public:
 	void OnRightButtonDown();
 	void SetMode(int _mode);
 	void OnUpdate(Observable *o, const string &message);
+	void Enable(bool enabled);
 
 private:
 	void ClearData();
@@ -69,10 +70,8 @@ private:
 
 	float sample_rate;
 	BufferBox buf;
-	/*float peak_r, peak_l;
-	Array<float> spec_r, spec_l;
-	float super_peak_r, super_peak_l;
-	float super_peak_r_t, super_peak_l_t;*/
+
+	bool enabled;
 };
 
 #endif /* PEAKMETER_H_ */

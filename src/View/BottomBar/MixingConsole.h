@@ -60,6 +60,9 @@ public:
 
 	virtual void OnUpdate(Observable *o, const string &message);
 
+	virtual void OnShow();
+	virtual void OnHide();
+
 	AudioFile *audio;
 	AudioOutput *output;
 	PeakMeter *peak_meter;

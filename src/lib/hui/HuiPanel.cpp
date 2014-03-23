@@ -206,6 +206,7 @@ void HuiPanel::Show()
 		win->Show();
 	else if (root_control)
 		root_control->Hide(false);
+	OnShow();
 }
 
 void HuiPanel::Hide()
@@ -214,6 +215,7 @@ void HuiPanel::Hide()
 		win->Hide();
 	else if (root_control)
 		root_control->Hide(true);
+	OnHide();
 }
 
 //----------------------------------------------------------------------------------

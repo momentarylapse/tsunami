@@ -14,7 +14,7 @@ BottomBar::BottomBar(AudioFile *audio, AudioOutput *output) :
 	Observable("BottomBar")
 {
 	AddControlTable("!noexpandy", 0, 0, 1, 3, "grid");
-	mini_console = new MiniConsole;
+	mini_console = new MiniConsole(output);
 	fx_console = new FxConsole(audio);
 	mixing_console = new MixingConsole(audio, output);
 	Embed(mini_console, "grid", 0, 0);

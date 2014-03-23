@@ -48,17 +48,30 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 	source = _source;
 	mode = ModePeaks;
 	sample_rate = 44100;
+	enabled = false;
 	r.reset();
 	l.reset();
 
 	panel->EventMX(id, "hui:draw", this, &PeakMeter::OnDraw);
 	panel->EventMX(id, "hui:left-button-down", this, &PeakMeter::OnLeftButtonDown);
-	Subscribe(source);
+
+	Enable(true);
 }
 
 PeakMeter::~PeakMeter()
 {
-	Unsubscribe(source);
+	if (enabled)
+		Unsubscribe(source);
+}
+
+void PeakMeter::Enable(bool _enabled)
+{
+	if ((!enabled) && (_enabled))
+		Subscribe(source);
+	if ((enabled) && (!_enabled))
+		Unsubscribe(source);
+
+	enabled = _enabled;
 }
 
 color peak_color(float peak, float a = 1)

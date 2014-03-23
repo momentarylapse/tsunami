@@ -36,6 +36,9 @@ public:
 	void _cdecl Show();
 	void _cdecl Hide();
 
+	virtual _cdecl void OnShow(){}
+	virtual _cdecl void OnHide(){}
+
 	void set_win(HuiWindow *win);
 
 	// events

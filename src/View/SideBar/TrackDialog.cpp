@@ -11,7 +11,7 @@
 #include "../Helper/FxList.h"
 #include "../Helper/BarList.h"
 #include "../../Audio/Synth/Synthesizer.h"
-#include "SynthesizerDialog.h"
+#include "../Dialog/SynthesizerDialog.h"
 #include "../../Tsunami.h"
 #include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"

@@ -6,6 +6,7 @@
  */
 
 #include "FxConsole.h"
+#include "BottomBar.h"
 #include "../../Data/Track.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/PluginManager.h"
@@ -88,8 +89,7 @@ public:
 	int index;
 };
 
-FxConsole::FxConsole(AudioFile *_audio) :
-	Observable("FxConsole")
+FxConsole::FxConsole(AudioFile *_audio)
 {
 	audio = _audio;
 	id_inner = "mixing_inner_table";
@@ -111,8 +111,6 @@ FxConsole::FxConsole(AudioFile *_audio) :
 
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnClose);
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
-
-	enabled = true;
 }
 
 FxConsole::~FxConsole()
@@ -122,7 +120,7 @@ FxConsole::~FxConsole()
 
 void FxConsole::OnClose()
 {
-	Show(false);
+	((BottomBar*)parent)->Choose(BottomBar::MINI_CONSOLE);
 }
 
 void FxConsole::OnAdd()
@@ -137,16 +135,6 @@ void FxConsole::OnAdd()
 		track->AddEffect(effect);
 	/*else
 		audio->AddEffect(effect);*/
-}
-
-void FxConsole::Show(bool show)
-{
-	enabled = show;
-	if (show)
-		HuiPanel::Show();
-	else
-		HuiPanel::Hide();
-	Notify("Show");
 }
 
 void FxConsole::Clear()

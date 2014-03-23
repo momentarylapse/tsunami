@@ -7,10 +7,10 @@
 
 #include "AudioView.h"
 #include "../Tsunami.h"
-#include "../View/Dialog/AudioFileDialog.h"
-#include "../View/Dialog/TrackDialog.h"
-#include "../View/Dialog/SubDialog.h"
-#include "../View/Dialog/FxConsole.h"
+#include "SideBar/AudioFileDialog.h"
+#include "SideBar/TrackDialog.h"
+#include "BottomBar/BottomBar.h"
+#include "Dialog/SubDialog.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
@@ -146,10 +146,6 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	parent->Embed(audio_file_dialog, "main_table", 2, 0);
 	track_dialog->Hide();
 	audio_file_dialog->Hide();
-
-	fx_console = new FxConsole(audio);
-	parent->Embed(fx_console, "main_table", 0, 2);
-	fx_console->Show(false);
 }
 
 AudioView::~AudioView()
@@ -166,7 +162,6 @@ AudioView::~AudioView()
 	HuiConfig.setFloat("View.ZoomSpeed", ZoomSpeed);
 	HuiConfig.setBool("View.Antialiasing", antialiasing);
 
-	delete(fx_console);
 	delete(track_dialog);
 	delete(audio_file_dialog);
 }
@@ -1424,7 +1419,7 @@ void AudioView::SetCurTrack(Track *t)
 {
 	cur_track = t;
 	track_dialog->SetTrack(cur_track);
-	fx_console->SetTrack(cur_track);
+	tsunami->bottom_bar->SetTrack(cur_track);
 }
 
 

@@ -47,14 +47,13 @@ public:
 	string id_separator;
 };
 
-class MixingConsole: public HuiPanel, public Observer, public Observable
+class MixingConsole: public HuiPanel, public Observer
 {
 public:
 	MixingConsole(AudioFile *audio, AudioOutput *output);
 	virtual ~MixingConsole();
 
 	void LoadData();
-	void Show(bool show);
 
 	void OnClose();
 	void OnOutputVolume();
@@ -67,7 +66,6 @@ public:
 
 	string id_inner;
 	Array<TrackMixer*> mixer;
-	bool enabled;
 };
 
 #endif /* MIXINGCONSOLE_H_ */

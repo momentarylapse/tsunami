@@ -6,6 +6,7 @@
  */
 
 #include "MixingConsole.h"
+#include "BottomBar.h"
 #include "../../Data/AudioFile.h"
 #include "../../Audio/AudioOutput.h"
 #include "../Helper/PeakMeter.h"
@@ -100,10 +101,8 @@ void TrackMixer::Update()
 }
 
 
-MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
-	Observable("MixingConsole")
+MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output)
 {
-	enabled = true;
 	audio = _audio;
 	output = _output;
 	id_inner = "inner_table";
@@ -130,8 +129,6 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
 	peak_meter = new PeakMeter(this, "mc_output_peaks", output);
 	SetFloat("mc_output_volume", output->GetVolume());
 
-	Show(false);
-
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::OnClose);
 	EventM("mc_output_volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::OnOutputVolume);
 
@@ -147,19 +144,9 @@ MixingConsole::~MixingConsole()
 		delete(m);
 }
 
-void MixingConsole::Show(bool show)
-{
-	enabled = show;
-	if (show)
-		HuiPanel::Show();
-	else
-		HuiPanel::Hide();
-	Notify("Show");
-}
-
 void MixingConsole::OnClose()
 {
-	Show(false);
+	((BottomBar*)parent)->Choose(BottomBar::MINI_CONSOLE);
 }
 
 void MixingConsole::OnOutputVolume()

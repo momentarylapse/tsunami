@@ -12,8 +12,10 @@
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/SampleManager.h"
-#include "View/Dialog/MixingConsole.h"
-#include "View/Dialog/FxConsole.h"
+#include "View/BottomBar/BottomBar.h"
+#include "View/BottomBar/MixingConsole.h"
+#include "View/BottomBar/FxConsole.h"
+#include "View/BottomBar/FxConsole.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -111,17 +113,16 @@ Tsunami::Tsunami(Array<string> arg) :
 	// table structure
 	SetSize(width, height);
 	SetBorderWidth(0);
-	AddControlTable("", 0, 0, 1, 3, "root_table");
+	AddControlTable("", 0, 0, 1, 2, "root_table");
 	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 4, 1, "main_table");
 	SetBorderWidth(5);
-	AddControlTable("!noexpandy", 0, 3, 3, 1, "bottom_table");
 
 	// bottom
-	SetTarget("bottom_table", 0);
+	/*SetTarget("bottom_table", 0);
 	AddControlTable("!noexpandy", 0, 0, 7, 1, "output_table");
 	AddControlTable("!noexpandy", 1, 0, 7, 1, "edit_midi_table");
-	HideControl("edit_midi_table", true);
+	HideControl("edit_midi_table", true);*/
 
 	// main table
 	SetBorderWidth(0);
@@ -132,13 +133,13 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetBorderWidth(5);
 
 	// edit midi table
-	SetTarget("edit_midi_table", 0);
+	/*SetTarget("edit_midi_table", 0);
 	AddSeparator("", 0, 0, 0, 0, "");
 	AddText("Pitch", 1, 0, 0, 0, "");
 	AddSpinButton("60\\0\\90", 2, 0, 0, 0, "pitch_offset");
 	AddText("Unterteilung", 3, 0, 0, 0, "");
 	AddSpinButton("4\\1", 4, 0, 0, 0, "beat_partition");
-	AddButton("Beenden", 5, 0, 0, 0, "close_edit_midi_mode");
+	AddButton("Beenden", 5, 0, 0, 0, "close_edit_midi_mode");*/
 
 
 	toolbar[0]->SetByID("toolbar");
@@ -163,9 +164,11 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	sample_manager = new SampleManager(audio, this, true);
 
-	mixing_console = new MixingConsole(audio, output);
+	/*mixing_console = new MixingConsole(audio, output);
 	Embed(mixing_console, "main_table", 0, 1);
-	mixing_console->Hide();
+	mixing_console->Hide();*/
+	bottom_bar = new BottomBar(audio, output);
+	Embed(bottom_bar, "root_table", 0, 1);
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
@@ -176,8 +179,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	Subscribe(audio);
 	Subscribe(output, "StateChange");
 	Subscribe(clipboard);
-	Subscribe(mixing_console);
-	Subscribe(view->fx_console);
+	Subscribe(bottom_bar);
 
 	UpdateMenu();
 
@@ -199,8 +201,7 @@ Tsunami::~Tsunami()
 	Unsubscribe(audio);
 	Unsubscribe(output);
 	Unsubscribe(clipboard);
-	Unsubscribe(mixing_console);
-	Unsubscribe(view->fx_console);
+	Unsubscribe(bottom_bar);
 
 	int w, h;
 	GetSizeDesired(w, h);
@@ -208,7 +209,6 @@ Tsunami::~Tsunami()
 	HuiConfig.setInt("Window.Height", h);
 	HuiConfig.setBool("Window.Maximized", IsMaximized());
 
-	delete(mixing_console);
 	delete(sample_manager);
 	delete(plugin_manager);
 	delete(storage);
@@ -359,14 +359,12 @@ void Tsunami::OnSampleManager()
 
 void Tsunami::OnMixingConsole()
 {
-	view->fx_console->Show(false);
-	mixing_console->Show(!mixing_console->enabled);
+	bottom_bar->Choose(BottomBar::MIXING_CONSOLE);
 }
 
 void Tsunami::OnFxConsole()
 {
-	mixing_console->Show(false);
-	view->fx_console->Show(!view->fx_console->enabled);
+	bottom_bar->Choose(BottomBar::FX_CONSOLE);
 }
 
 void Tsunami::OnSubImport()
@@ -567,8 +565,8 @@ void Tsunami::UpdateMenu()
 	Enable("pause", output->IsPlaying());
 	Check("play_loop", renderer->loop_if_allowed);
 	// view
-	Check("show_mixing_console", mixing_console->enabled);
-	Check("show_fx_console", view->fx_console->enabled);
+	Check("show_mixing_console", bottom_bar->active_console == BottomBar::MIXING_CONSOLE);
+	Check("show_fx_console", bottom_bar->active_console == BottomBar::FX_CONSOLE);
 
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){

@@ -94,9 +94,11 @@ FxConsole::FxConsole(AudioFile *_audio)
 	audio = _audio;
 	id_inner = "mixing_inner_table";
 
-	AddControlTable("!expandy", 1, 0, 1, 20, id_inner);
-	//AddButton("!noexpandy,flat", 0, 1, 0, 0, "add");
-	//SetImage("add", "hui:add");
+	AddControlTable("!expandy", 0, 0, 1, 30, id_inner);
+	SetTarget(id_inner, 0);
+	AddButton("!expandy,flat", 29, 0, 0, 0, "add");
+	SetImage("add", "hui:add");
+	SetTooltip("add", _("neuen Effekt hinzuf&ugen"));
 
 	track = NULL;
 	Enable("add", false);

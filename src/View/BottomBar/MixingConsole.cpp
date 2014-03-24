@@ -108,7 +108,7 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output)
 	id_inner = "inner_table";
 
 
-	AddControlTable("", 1, 0, 1, 20, id_inner);
+	AddControlTable("", 0, 0, 1, 20, id_inner);
 	SetTarget(id_inner, 0);
 	AddControlTable("", 0, 0, 1, 5, "mc_output");
 	AddSeparator("!vertical", 1, 0, 0, 0, "");

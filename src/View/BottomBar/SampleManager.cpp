@@ -12,12 +12,12 @@
 #include "../../Tsunami.h"
 #include <math.h>
 
-SampleManager::SampleManager(AudioFile *a, HuiWindow* _parent, bool _allow_parent) :
-	HuiWindow("sample_manager_dialog", _parent, true)
+SampleManager::SampleManager(AudioFile *a)
 {
+	title = _("Sample Manager");
+	FromResource("sample_manager_dialog");
 	SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 
-	EventM("hui:close", this, &SampleManager::OnClose);
 	EventM("import_from_file", this, &SampleManager::OnImportFromFile);
 	EventM("insert_sample", this, &SampleManager::OnInsert);
 	EventM("create_from_selection", this, &SampleManager::OnCreateFromSelection);
@@ -77,7 +77,7 @@ void SampleManager::OnListSelect()
 
 void SampleManager::OnImportFromFile()
 {
-	if (tsunami->storage->AskOpenImport(this)){
+	if (tsunami->storage->AskOpenImport(win)){
 		BufferBox buf;
 		tsunami->storage->LoadBufferBox(audio, &buf, HuiFilename);
 		selected = audio->sample.num;
@@ -103,11 +103,6 @@ void SampleManager::OnDelete()
 	int n = GetInt("sample_list");
 	if (n >= 0)
 		audio->DeleteSample(n);
-}
-
-void SampleManager::OnClose()
-{
-	Hide();
 }
 
 void SampleManager::OnUpdate(Observable *o, const string &message)

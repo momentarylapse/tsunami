@@ -10,6 +10,7 @@
 #include "MixingConsole.h"
 #include "FxConsole.h"
 #include "LogDialog.h"
+#include "SampleManager.h"
 
 BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
@@ -27,10 +28,12 @@ BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
 	AddText("!big,bold,angle=90,expandy\\...", 0, 2, 0, 0, "title");
 	fx_console = new FxConsole(audio);
 	mixing_console = new MixingConsole(audio, output);
+	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
 	Embed(mixing_console, "console_grid", 0, 0);
 	Embed(fx_console, "console_grid", 0, 1);
-	Embed(log_dialog, "console_grid", 0, 2);
+	Embed(sample_manager, "console_grid", 0, 2);
+	Embed(log_dialog, "console_grid", 0, 3);
 
 	EventM("next", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnNext);
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);

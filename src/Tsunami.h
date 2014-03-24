@@ -24,7 +24,6 @@ class AudioRenderer;
 class Storage;
 class Progress;
 class Clipboard;
-class SampleManager;
 class BottomBar;
 
 class Tsunami : public Observer, public HuiWindow
@@ -119,7 +118,6 @@ public:
 	PluginManager *plugin_manager;
 	Clipboard *clipboard;
 
-	SampleManager *sample_manager;
 	BottomBar *bottom_bar;
 };
 

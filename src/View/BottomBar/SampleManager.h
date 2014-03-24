@@ -8,15 +8,14 @@
 #ifndef SAMPLEMANAGER_H_
 #define SAMPLEMANAGER_H_
 
-#include "../../lib/hui/hui.h"
-#include "../../Stuff/Observer.h"
+#include "BottomBar.h"
 
 class AudioFile;
 
-class SampleManager : public HuiWindow, public Observer
+class SampleManager : public BottomBarConsole, public Observer
 {
 public:
-	SampleManager(AudioFile *a, HuiWindow *_parent, bool _allow_parent);
+	SampleManager(AudioFile *a);
 	virtual ~SampleManager();
 
 	void FillList();
@@ -26,7 +25,6 @@ public:
 	void OnInsert();
 	void OnCreateFromSelection();
 	void OnDelete();
-	void OnClose();
 
 	virtual void OnUpdate(Observable *o, const string &message);
 

@@ -11,7 +11,6 @@
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
-#include "View/Dialog/SampleManager.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MixingConsole.h"
 #include "View/BottomBar/FxConsole.h"
@@ -150,9 +149,6 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	view = new AudioView(this, audio);
 
-
-	sample_manager = new SampleManager(audio, this, true);
-
 	bottom_bar = new BottomBar(audio, output, log);
 	Embed(bottom_bar, "root_table", 0, 1);
 
@@ -195,7 +191,6 @@ Tsunami::~Tsunami()
 	HuiConfig.setInt("Window.Height", h);
 	HuiConfig.setBool("Window.Maximized", IsMaximized());
 
-	delete(sample_manager);
 	delete(plugin_manager);
 	delete(storage);
 	delete(view);
@@ -340,7 +335,7 @@ void Tsunami::OnDelete()
 
 void Tsunami::OnSampleManager()
 {
-	sample_manager->Show();
+	bottom_bar->Choose(BottomBar::SAMPLE_CONSOLE);
 }
 
 void Tsunami::OnMixingConsole()
@@ -553,6 +548,7 @@ void Tsunami::UpdateMenu()
 	// view
 	Check("show_mixing_console", bottom_bar->IsActive(BottomBar::MIXING_CONSOLE));
 	Check("show_fx_console", bottom_bar->IsActive(BottomBar::FX_CONSOLE));
+	Check("sample_manager", bottom_bar->IsActive(BottomBar::SAMPLE_CONSOLE));
 
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){

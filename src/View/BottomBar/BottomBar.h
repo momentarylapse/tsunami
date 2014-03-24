@@ -17,6 +17,7 @@ class Track;
 class FxConsole;
 class MixingConsole;
 class LogDialog;
+class SampleManager;
 class Log;
 
 class BottomBarConsole : public HuiPanel
@@ -40,6 +41,7 @@ public:
 	{
 		MIXING_CONSOLE,
 		FX_CONSOLE,
+		SAMPLE_CONSOLE,
 		LOG_CONSOLE,
 		NUM_CONSOLES
 	};
@@ -53,6 +55,7 @@ public:
 	FxConsole *fx_console;
 	MixingConsole *mixing_console;
 	LogDialog *log_dialog;
+	SampleManager *sample_manager;
 };
 
 #endif /* BOTTOMBAR_H_ */

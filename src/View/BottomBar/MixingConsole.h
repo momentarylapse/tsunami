@@ -9,7 +9,7 @@
 #define MIXINGCONSOLE_H_
 
 
-#include "../../lib/hui/hui.h"
+#include "BottomBar.h"
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
@@ -47,7 +47,7 @@ public:
 	string id_separator;
 };
 
-class MixingConsole: public HuiPanel, public Observer
+class MixingConsole: public BottomBarConsole, public Observer
 {
 public:
 	MixingConsole(AudioFile *audio, AudioOutput *output);
@@ -55,7 +55,6 @@ public:
 
 	void LoadData();
 
-	void OnClose();
 	void OnOutputVolume();
 
 	virtual void OnUpdate(Observable *o, const string &message);

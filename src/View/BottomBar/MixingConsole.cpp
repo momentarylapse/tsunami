@@ -6,7 +6,6 @@
  */
 
 #include "MixingConsole.h"
-#include "BottomBar.h"
 #include "../../Data/AudioFile.h"
 #include "../../Audio/AudioOutput.h"
 #include "../Helper/PeakMeter.h"
@@ -103,19 +102,13 @@ void TrackMixer::Update()
 
 MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output)
 {
+	title = _("Mischpult");
 	audio = _audio;
 	output = _output;
 	id_inner = "inner_table";
 
 
-	AddControlTable("!height=250,noexpandy", 0, 0, 2, 1, "root_grid");
-	SetTarget("root_grid", 0);
-	AddControlTable("", 0, 0, 1, 2, "button_grid");
 	AddControlTable("", 1, 0, 1, 20, id_inner);
-	SetTarget("button_grid", 0);
-	AddButton("!noexpandy,flat", 0, 0, 0, 0, "close");
-	SetImage("close", "hui:close");
-	AddText(_("!big,bold,angle=90\\Mischpult"), 0, 1, 0, 0, "");
 	SetTarget(id_inner, 0);
 	AddControlTable("", 0, 0, 1, 5, "mc_output");
 	AddSeparator("!vertical", 1, 0, 0, 0, "");
@@ -129,7 +122,6 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output)
 	peak_meter = new PeakMeter(this, "mc_output_peaks", output);
 	SetFloat("mc_output_volume", output->GetVolume());
 
-	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::OnClose);
 	EventM("mc_output_volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::OnOutputVolume);
 
 	Subscribe(audio);
@@ -142,11 +134,6 @@ MixingConsole::~MixingConsole()
 	Unsubscribe(output);
 	foreach(TrackMixer *m, mixer)
 		delete(m);
-}
-
-void MixingConsole::OnClose()
-{
-	((BottomBar*)parent)->Choose(BottomBar::MINI_CONSOLE);
 }
 
 void MixingConsole::OnOutputVolume()

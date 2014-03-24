@@ -116,21 +116,10 @@ Tsunami::Tsunami(Array<string> arg) :
 	AddControlTable("", 0, 0, 1, 2, "root_table");
 	SetTarget("root_table", 0);
 	AddControlTable("", 0, 0, 4, 1, "main_table");
-	SetBorderWidth(5);
-
-	// bottom
-	/*SetTarget("bottom_table", 0);
-	AddControlTable("!noexpandy", 0, 0, 7, 1, "output_table");
-	AddControlTable("!noexpandy", 1, 0, 7, 1, "edit_midi_table");
-	HideControl("edit_midi_table", true);*/
 
 	// main table
-	SetBorderWidth(0);
 	SetTarget("main_table", 0);
 	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
-
-	// output table
-	SetBorderWidth(5);
 
 	// edit midi table
 	/*SetTarget("edit_midi_table", 0);
@@ -164,9 +153,6 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	sample_manager = new SampleManager(audio, this, true);
 
-	/*mixing_console = new MixingConsole(audio, output);
-	Embed(mixing_console, "main_table", 0, 1);
-	mixing_console->Hide();*/
 	bottom_bar = new BottomBar(audio, output);
 	Embed(bottom_bar, "root_table", 0, 1);
 
@@ -565,8 +551,8 @@ void Tsunami::UpdateMenu()
 	Enable("pause", output->IsPlaying());
 	Check("play_loop", renderer->loop_if_allowed);
 	// view
-	Check("show_mixing_console", bottom_bar->active_console == BottomBar::MIXING_CONSOLE);
-	Check("show_fx_console", bottom_bar->active_console == BottomBar::FX_CONSOLE);
+	Check("show_mixing_console", bottom_bar->IsActive(BottomBar::MIXING_CONSOLE));
+	Check("show_fx_console", bottom_bar->IsActive(BottomBar::FX_CONSOLE));
 
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){

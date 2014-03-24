@@ -6,7 +6,6 @@
  */
 
 #include "FxConsole.h"
-#include "BottomBar.h"
 #include "../../Data/Track.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/PluginManager.h"
@@ -20,7 +19,7 @@ public:
 		track = t;
 		fx = _fx;
 		index = _index;
-		AddControlTable("!noexpandx", 0, 0, 1, 2, "grid");
+		AddControlTable("!noexpandx,expandy", 0, 0, 1, 2, "grid");
 		SetTarget("grid", 0);
 		AddControlTable("", 0, 0, 4, 1, "header");
 		SetTarget("header", 0);
@@ -91,36 +90,23 @@ public:
 
 FxConsole::FxConsole(AudioFile *_audio)
 {
+	title = _("Effekte");
 	audio = _audio;
 	id_inner = "mixing_inner_table";
 
-	AddControlTable("!height=320,noexpandy", 0, 0, 2, 1, "root_grid");
-	SetTarget("root_grid", 0);
-	AddControlTable("", 0, 0, 1, 3, "button_grid");
-	AddControlTable("", 1, 0, 1, 20, id_inner);
-	SetTarget("button_grid", 0);
-	AddButton("!noexpandy,flat", 0, 0, 0, 0, "close");
-	SetImage("close", "hui:close");
-	AddButton("!noexpandy,flat", 0, 1, 0, 0, "add");
-	SetImage("add", "hui:add");
-	AddText("!big,bold,angle=90\\Effekte", 0, 2, 0, 0, "");
-	SetTarget("group", 0);
+	AddControlTable("!expandy", 1, 0, 1, 20, id_inner);
+	//AddButton("!noexpandy,flat", 0, 1, 0, 0, "add");
+	//SetImage("add", "hui:add");
 
 	track = NULL;
 	Enable("add", false);
 
-	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnClose);
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
 }
 
 FxConsole::~FxConsole()
 {
 	Clear();
-}
-
-void FxConsole::OnClose()
-{
-	((BottomBar*)parent)->Choose(BottomBar::MINI_CONSOLE);
 }
 
 void FxConsole::OnAdd()

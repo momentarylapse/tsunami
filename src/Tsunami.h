@@ -23,12 +23,8 @@ class AudioOutput;
 class AudioRenderer;
 class Storage;
 class Progress;
-class PeakMeter;
 class Clipboard;
 class SampleManager;
-class FxConsole;
-class MixingConsole;
-class MiniConsole;
 class BottomBar;
 
 class Tsunami : public Observer, public HuiWindow
@@ -124,9 +120,6 @@ public:
 	Clipboard *clipboard;
 
 	SampleManager *sample_manager;
-	MixingConsole *mixing_console;
-	FxConsole *fx_console;
-	MiniConsole *mini_console;
 	BottomBar *bottom_bar;
 };
 

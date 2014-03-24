@@ -8,13 +8,13 @@
 #ifndef FXCONSOLE_H_
 #define FXCONSOLE_H_
 
-#include "../../lib/hui/hui.h"
+#include "BottomBar.h"
 #include "../../Stuff/Observer.h"
 
 class Track;
 class AudioFile;
 
-class FxConsole : public HuiPanel, public Observer
+class FxConsole : public BottomBarConsole, public Observer
 {
 public:
 	FxConsole(AudioFile *audio);
@@ -24,7 +24,6 @@ public:
 	void SetTrack(Track *t);
 
 	void OnAdd();
-	void OnClose();
 
 	virtual void OnUpdate(Observable *o, const string &message);
 

@@ -22,6 +22,9 @@ public:
 	virtual void OnShow();
 	virtual void OnHide();
 
+	void OnShowFxConsole();
+	void OnShowMixingConsole();
+
 	AudioOutput *output;
 	PeakMeter *peak_meter;
 };

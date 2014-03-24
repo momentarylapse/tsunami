@@ -9,21 +9,22 @@
 #define LOG_H_
 
 #include "../lib/base/base.h"
-#include "../lib/hui/hui.h"
+#include "Observable.h"
 
-class Log : public HuiEventHandler
+class LogDialog;
+
+class Log : public Observable
 {
+	friend class LogDialog;
 public:
-	Log(HuiWindow *parent);
+	Log();
 	virtual ~Log();
 
 	void Error(const string &message);
 	void Warning(const string &message);
 	void Info(const string &message);
 
-	void Show();
 	void Clear();
-	void Close();
 
 	enum{
 		TYPE_ERROR,
@@ -38,8 +39,7 @@ public:
 	};
 private:
 	void AddMessage(int type, const string &message);
-	Array<Message> message;
-	HuiWindow *dlg;
+	Array<Message> messages;
 };
 
 #endif /* LOG_H_ */

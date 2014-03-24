@@ -16,6 +16,8 @@ class AudioOutput;
 class Track;
 class FxConsole;
 class MixingConsole;
+class LogDialog;
+class Log;
 
 class BottomBarConsole : public HuiPanel
 {
@@ -26,7 +28,7 @@ public:
 class BottomBar : public HuiPanel, public Observable
 {
 public:
-	BottomBar(AudioFile *audio, AudioOutput *output);
+	BottomBar(AudioFile *audio, AudioOutput *output, Log *log);
 	virtual ~BottomBar();
 
 	void OnClose();
@@ -38,6 +40,8 @@ public:
 	{
 		MIXING_CONSOLE,
 		FX_CONSOLE,
+		LOG_CONSOLE,
+		NUM_CONSOLES
 	};
 
 	void SetTrack(Track *t);
@@ -48,6 +52,7 @@ public:
 
 	FxConsole *fx_console;
 	MixingConsole *mixing_console;
+	LogDialog *log_dialog;
 };
 
 #endif /* BOTTOMBAR_H_ */

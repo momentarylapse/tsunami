@@ -9,8 +9,9 @@
 #include "MiniConsole.h"
 #include "MixingConsole.h"
 #include "FxConsole.h"
+#include "LogDialog.h"
 
-BottomBar::BottomBar(AudioFile *audio, AudioOutput *output) :
+BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
 {
 	AddControlTable("!noexpandy,height=300", 0, 0, 3, 1, "root_grid");
@@ -26,8 +27,10 @@ BottomBar::BottomBar(AudioFile *audio, AudioOutput *output) :
 	AddText("!big,bold,angle=90,expandy\\...", 0, 2, 0, 0, "title");
 	fx_console = new FxConsole(audio);
 	mixing_console = new MixingConsole(audio, output);
+	log_dialog = new LogDialog(log);
 	Embed(mixing_console, "console_grid", 0, 0);
 	Embed(fx_console, "console_grid", 0, 1);
+	Embed(log_dialog, "console_grid", 0, 2);
 
 	EventM("next", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnNext);
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);
@@ -47,7 +50,7 @@ void BottomBar::OnClose()
 
 void BottomBar::OnNext()
 {
-	Choose((active_console + 1) % 2);
+	Choose((active_console + 1) % NUM_CONSOLES);
 }
 
 void BottomBar::OnShow()

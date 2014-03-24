@@ -42,7 +42,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	tsunami = this;
 
 	progress = new Progress;
-	log = new Log(this);
+	log = new Log;
 
 	clipboard = new Clipboard;
 
@@ -153,7 +153,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	sample_manager = new SampleManager(audio, this, true);
 
-	bottom_bar = new BottomBar(audio, output);
+	bottom_bar = new BottomBar(audio, output, log);
 	Embed(bottom_bar, "root_table", 0, 1);
 
 	// create (link) PluginManager after all other components are ready
@@ -170,7 +170,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	UpdateMenu();
 
 	log->Info(AppName + " " + AppVersion);
-	log->Info(_("  viel Erfolg!"));
+	log->Info(_("  ...keine Sorge, das wird schon!"));
 
 	audio->NewWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
 
@@ -277,7 +277,7 @@ void Tsunami::OnSubProperties()
 
 void Tsunami::OnShowLog()
 {
-	log->Show();
+	bottom_bar->Choose(BottomBar::LOG_CONSOLE);
 }
 
 void Tsunami::OnUndo()

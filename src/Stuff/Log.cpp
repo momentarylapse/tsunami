@@ -9,20 +9,13 @@
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 
-Log::Log(HuiWindow *parent)
+Log::Log() :
+	Observable("Log")
 {
-	dlg = new HuiDialog(_("Meldungen"), 500, 300, parent, true);
-	dlg->toolbar[0]->SetByID("log_toolbar");
-	dlg->AddListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
-
-	dlg->EventM("hui:close", this, (void(HuiEventHandler::*)())&Log::Close);
-	dlg->EventM("log_close", this, (void(HuiEventHandler::*)())&Log::Close);
-	dlg->EventM("log_clear", this, (void(HuiEventHandler::*)())&Log::Clear);
 }
 
 Log::~Log()
 {
-	delete(dlg);
 }
 
 
@@ -46,20 +39,8 @@ void Log::Info(const string &message)
 
 void Log::Clear()
 {
-	message.clear();
-	dlg->Reset("log_list");
-}
-
-
-void Log::Close()
-{
-	dlg->Hide();
-}
-
-
-void Log::Show()
-{
-	dlg->Show();
+	messages.clear();
+	Notify("Clear");
 }
 
 
@@ -68,20 +49,14 @@ void Log::AddMessage(int type, const string &_message)
 	Message m;
 	m.type = type;
 	m.text = _message;
-	message.add(m);
+	messages.add(m);
 
 	if (type == TYPE_ERROR){
 		msg_error(_message);
-		dlg->AddString("log_list", "hui:error\\" + _message);
 	}else if (type == TYPE_WARNING){
 		msg_write(_message);
-		dlg->AddString("log_list", "hui:warning\\" + _message);
 	}else{
 		msg_write(_message);
-		dlg->AddString("log_list", "hui:info\\" + _message);
 	}
-
-	if ((type == TYPE_ERROR) || (type == TYPE_WARNING))
-		Show();
-		//HuiErrorBox(HuiCurWindow, _("Fehler"), _message);
+	Notify("Add");
 }

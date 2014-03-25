@@ -104,8 +104,6 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 
 	audio = _audio;
 
-	edit_mode = EDIT_MODE_DEFAULT;
-	midi_edit_track = NULL;
 	pitch_min = 60;
 	pitch_max = 90;
 	beat_partition = 4;
@@ -130,9 +128,6 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	parent->EventMX("area", "hui:key-down", this, &AudioView::OnKeyDown);
 	parent->EventMX("area", "hui:key-up", this, &AudioView::OnKeyUp);
 	parent->EventMX("area", "hui:mouse-wheel", this, &AudioView::OnMouseWheel);
-	parent->EventM("close_edit_midi_mode", this, &AudioView::OnCloseEditMidiMode);
-	parent->EventM("pitch_offset", this, &AudioView::OnMidiPitch);
-	parent->EventM("beat_partition", this, &AudioView::OnMidiBeatPartition);
 
 	parent->Activate("area");
 
@@ -256,7 +251,7 @@ AudioView::SelectionType AudioView::GetMouseOver()
 		}
 	}
 
-	if ((s.track) && (s.track == midi_edit_track)){
+	if ((s.track) && (s.track == cur_track) && (EditingMidi())){
 		s.pitch = y2pitch(my);
 		s.type = SEL_TYPE_MIDI_PITCH;
 		foreachi(MidiNote &n, s.track->midi, i)
@@ -464,7 +459,7 @@ void AudioView::OnLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(audio);
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
-		midi_edit_track->DeleteMidiNote(selection.note);
+		cur_track->DeleteMidiNote(selection.note);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 
 	}
@@ -507,7 +502,7 @@ void AudioView::OnLeftButtonUp()
 		if (cur_action)
 			audio->Execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		midi_edit_track->AddMidiNote(GetSelectedNote());
+		cur_track->AddMidiNote(GetSelectedNote());
 	}
 	cur_action = NULL;
 
@@ -684,48 +679,6 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 	c->drawPolygon(tt);
 }
 
-void AudioView::SetCurSample(AudioFile* a, SampleRef* s)
-{
-}
-
-void AudioView::SetCurTrack(AudioFile* a, Track* t)
-{
-}
-
-void AudioView::SetEditModeDefault()
-{
-	edit_mode = EDIT_MODE_DEFAULT;
-	midi_edit_track = NULL;
-	tsunami->HideControl("edit_midi_table", true);
-	ForceRedraw();
-}
-
-void AudioView::SetEditModeMidi(Track* t)
-{
-	edit_mode = EDIT_MODE_MIDI;
-	midi_edit_track = t;
-	tsunami->HideControl("edit_midi_table", false);
-	ForceRedraw();
-}
-
-void AudioView::OnCloseEditMidiMode()
-{
-	SetEditModeDefault();
-}
-
-void AudioView::OnMidiPitch()
-{
-	pitch_min = tsunami->GetInt("");
-	pitch_max = tsunami->GetInt("") + 30;
-	ForceRedraw();
-}
-
-void AudioView::OnMidiBeatPartition()
-{
-	beat_partition = tsunami->GetInt("");
-	ForceRedraw();
-}
-
 void AudioView::UpdateBufferZoom()
 {
 	prefered_buffer_level = 0;
@@ -850,12 +803,12 @@ color AudioView::GetPitchColor(int pitch)
 
 int AudioView::y2pitch(int y)
 {
-	return pitch_min + ((midi_edit_track->area.y2 - y) * (pitch_max - pitch_min) / midi_edit_track->area.height());
+	return pitch_min + ((cur_track->area.y2 - y) * (pitch_max - pitch_min) / cur_track->area.height());
 }
 
 float AudioView::pitch2y(int p)
 {
-	return midi_edit_track->area.y2 - midi_edit_track->area.height() * ((float)p - pitch_min) / (pitch_max - pitch_min);
+	return cur_track->area.y2 - cur_track->area.height() * ((float)p - pitch_min) / (pitch_max - pitch_min);
 }
 
 void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col)
@@ -908,7 +861,7 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 {
 	msg_db_f("DrawTrack", 1);
 
-	if (midi_edit_track == t)
+	if ((cur_track == t) && (EditingMidi()))
 		DrawMidiEditable(c, r, t->midi, col);
 	else
 		DrawMidi(c, r, t->midi, col);
@@ -977,11 +930,19 @@ void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 	}
 }
 
+bool AudioView::EditingMidi()
+{
+	if (cur_track->type != Track::TYPE_MIDI)
+		return false;
+	return tsunami->side_bar->IsActive(SideBar::TRACK_DIALOG);
+}
+
 void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
 	Track *t = audio->GetTimeTrack();
 	if (!t)
 		return;
+	bool editing_midi = EditingMidi();
 	int s0 = screen2sample(r.x1 - 1);
 	int s1 = screen2sample(r.x2);
 	//c->SetLineWidth(2.0f);
@@ -1012,7 +973,7 @@ void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 			c->setLineDash(dash, r.y1);
 			for (int i=0; i<b.num_beats; i++){
 				float beat_offset = b.range.offset + (float)i * beat_length;
-				if (edit_mode == EDIT_MODE_MIDI){
+				if (editing_midi){
 					color c2 = ColorInterpolate(bg, c1, 0.6f);
 					c->setColor(c2);
 					for (int j=1; j<beat_partition; j++){
@@ -1060,7 +1021,6 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 
 	if (o->GetName() == "AudioFile"){
 		if (message == "New"){
-			SetEditModeDefault();
 			OptimizeView();
 		}else{
 			ForceRedraw();
@@ -1079,11 +1039,11 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 
 void plan_track_sizes(const rect &r, AudioFile *a, AudioView *v)
 {
-	if (v->edit_mode == v->EDIT_MODE_MIDI){
+	if (v->EditingMidi()){
 		float y0 = v->TIME_SCALE_HEIGHT;
 		foreachi(Track *t, a->track, i){
 			float h = v->TIME_SCALE_HEIGHT;
-			if (t == v->midi_edit_track)
+			if (t == v->cur_track)
 				h = r.height() - a->track.num * v->TIME_SCALE_HEIGHT;
 			t->area = rect(r.x1, r.x2, y0, y0 + h);
 			y0 += h;
@@ -1168,7 +1128,7 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 			DrawGridBars(c, t->area, cc, false);
 		}
 
-		if (t == midi_edit_track){
+		if ((t == cur_track) && (EditingMidi())){
 			// pitch grid
 			c->setColor(color(0.25f, 0, 0, 0));
 			for (int i=pitch_min; i<pitch_max; i++){

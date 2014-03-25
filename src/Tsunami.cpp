@@ -118,15 +118,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetTarget("main_table", 0);
 	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
 
-	// edit midi table
-	/*SetTarget("edit_midi_table", 0);
-	AddSeparator("", 0, 0, 0, 0, "");
-	AddText("Pitch", 1, 0, 0, 0, "");
-	AddSpinButton("60\\0\\90", 2, 0, 0, 0, "pitch_offset");
-	AddText("Unterteilung", 3, 0, 0, 0, "");
-	AddSpinButton("4\\1", 4, 0, 0, 0, "beat_partition");
-	AddButton("Beenden", 5, 0, 0, 0, "close_edit_midi_mode");*/
-
 
 	toolbar[0]->SetByID("toolbar");
 	//ToolbarConfigure(false, true);
@@ -148,7 +139,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	view = new AudioView(this, audio);
 
 	// side bar
-	side_bar = new SideBar(audio);
+	side_bar = new SideBar(view, audio);
 	Embed(side_bar, "main_table", 1, 0);
 	side_bar->Hide();
 

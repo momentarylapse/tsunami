@@ -17,9 +17,10 @@
 #include "../AudioView.h"
 #include "../../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
 
-TrackDialog::TrackDialog() :
+TrackDialog::TrackDialog(AudioView *_view) :
 	SideBarConsole(_("Spur-Eigenschaften"))
 {
+	view = _view;
 	track = NULL;
 	SetBorderWidth(5);
 	FromResource("track_dialog");
@@ -37,7 +38,8 @@ TrackDialog::TrackDialog() :
 	EventM("name", this, &TrackDialog::OnName);
 	EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
 	EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
-	EventM("edit_midi_track", this, &TrackDialog::OnEditMidiTrack);
+	EventM("pitch_offset", this, &TrackDialog::OnPitch);
+	EventM("beat_partition", this, &TrackDialog::OnBeatPartition);
 }
 
 TrackDialog::~TrackDialog()
@@ -93,9 +95,17 @@ void TrackDialog::OnConfigSynthesizer()
 		track->root->Execute(new ActionTrackEditSynthesizer(track, params_old));
 }
 
-void TrackDialog::OnEditMidiTrack()
+void TrackDialog::OnPitch()
 {
-	tsunami->view->SetEditModeMidi(track);
+	view->pitch_min = GetInt("");
+	view->pitch_max = GetInt("") + 30;
+	view->ForceRedraw();
+}
+
+void TrackDialog::OnBeatPartition()
+{
+	view->beat_partition = GetInt("");
+	view->ForceRedraw();
 }
 
 void TrackDialog::OnUpdate(Observable *o, const string &message)

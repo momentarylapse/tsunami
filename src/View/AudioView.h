@@ -39,10 +39,6 @@ public:
 
 	void OnUpdate(Observable *o, const string &message);
 
-	void OnCloseEditMidiMode();
-	void OnMidiPitch();
-	void OnMidiBeatPartition();
-
 	void SetShowMono(bool mono);
 	void SetPeaksMode(int mode);
 	void ZoomIn();
@@ -145,9 +141,6 @@ public:
 	void SelectSample(SampleRef *s, bool diff);
 	void SelectTrack(Track *t, bool diff);
 
-	void SetCurSample(AudioFile *a, SampleRef *s);
-	void SetCurTrack(AudioFile *a, Track *t);
-
 	double screen2sample(double x);
 	double sample2screen(double s);
 	double dsample2screen(double ds);
@@ -174,16 +167,9 @@ public:
 
 	int drawing_width;
 
-	int edit_mode;
-	enum{
-		EDIT_MODE_DEFAULT,
-		EDIT_MODE_MIDI
-	};
+	bool EditingMidi();
 	int pitch_min, pitch_max;
 	int beat_partition;
-	Track *midi_edit_track;
-	void SetEditModeDefault();
-	void SetEditModeMidi(Track *t);
 
 	AudioFile *audio;
 

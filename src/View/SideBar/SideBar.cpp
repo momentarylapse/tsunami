@@ -9,7 +9,7 @@
 #include "AudioFileDialog.h"
 #include "TrackDialog.h"
 
-SideBar::SideBar(AudioFile *audio) :
+SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	Observable("SideBar")
 {
 	AddControlTable("!noexpandx,width=270", 0, 0, 1, 3, "root_grid");
@@ -22,7 +22,7 @@ SideBar::SideBar(AudioFile *audio) :
 	SetImage("close", "hui:close");
 	AddText("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 	audio_file_dialog = new AudioFileDialog(audio);
-	track_dialog = new TrackDialog;
+	track_dialog = new TrackDialog(view);
 	Embed(audio_file_dialog, "console_grid", 0, 0);
 	Embed(track_dialog, "console_grid", 0, 1);
 

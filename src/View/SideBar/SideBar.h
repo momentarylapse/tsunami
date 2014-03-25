@@ -15,6 +15,7 @@ class AudioFile;
 class Track;
 class TrackDialog;
 class AudioFileDialog;
+class AudioView;
 
 class SideBarConsole : public HuiPanel
 {
@@ -27,7 +28,7 @@ public:
 class SideBar : public HuiPanel, public Observable
 {
 public:
-	SideBar(AudioFile *audio);
+	SideBar(AudioView *view, AudioFile *audio);
 	virtual ~SideBar();
 
 	void OnClose();

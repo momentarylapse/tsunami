@@ -14,11 +14,12 @@
 class Track;
 class Slider;
 class BarList;
+class AudioView;
 
 class TrackDialog: public SideBarConsole, public Observer
 {
 public:
-	TrackDialog();
+	TrackDialog(AudioView *view);
 	virtual ~TrackDialog();
 
 	void LoadData();
@@ -27,12 +28,14 @@ public:
 	void OnName();
 	void OnSynthesizer();
 	void OnConfigSynthesizer();
-	void OnEditMidiTrack();
+	void OnPitch();
+	void OnBeatPartition();
 
 	void SetTrack(Track *t);
 
 	virtual void OnUpdate(Observable *o, const string &message);
 
+	AudioView *view;
 	Track *track;
 	BarList *bar_list;
 };

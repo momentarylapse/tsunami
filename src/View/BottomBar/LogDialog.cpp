@@ -9,9 +9,9 @@
 #include "BottomBar.h"
 #include "../../Stuff/Log.h"
 
-LogDialog::LogDialog(Log *_log)
+LogDialog::LogDialog(Log *_log) :
+	BottomBarConsole(_("Nachrichten"))
 {
-	title = _("Nachrichten");
 	log = _log;
 
 	AddControlTable("", 0, 0, 2, 1, "grid");

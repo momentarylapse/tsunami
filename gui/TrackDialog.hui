@@ -1,9 +1,22 @@
-Dialog track_dialog "Spur" 380 430
-	Grid ? "" 1 6 width=250
+Dialog track_dialog "Spur" 380 516
+	Grid ttd_grid_1 "" 1 4 expandy
 		Group ld_t_name "Name"
 			Edit name "" expandx
-		Expander ld_t_synth "Synthesizer"
+		Group ld_t_synth "Synthesizer"
 			Grid ? "" 2 1
-				Button synthesizer "" expandx flat
-				Button config_synth "" image=hui:edit
-		Button close "Schließen" image=hui:close
+				Button synthesizer "" expandx
+				Button config_synth "" image=hui:edit flat
+		Group ld_t_bars "Takte"
+			Grid ? "" 1 2
+				ListView bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT
+				Grid ? "" 3 1
+					Button add_bar "Takt" image=hui:add flat
+					Button add_bar_pause "Pause" image=hui:add flat
+					Button delete_bar "" image=hui:delete flat
+		Group ld_t_midi "Midi-Bearbeitung"
+			Grid ? "" 2 2
+				Text ld_t_pitch "Pitch"
+				SpinButton pitch_offset "60\\0\\90" expandx
+				Text ld_t_partition "Unterteilung"
+				SpinButton beat_partition "4\\1\\256"
+

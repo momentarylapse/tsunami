@@ -22,7 +22,7 @@ TrackDialog::TrackDialog() :
 {
 	track = NULL;
 	SetBorderWidth(5);
-	FromResource("track_time_dialog");
+	FromResource("track_dialog");
 	SetDecimals(1);
 	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
@@ -56,11 +56,11 @@ void TrackDialog::LoadData()
 		SetString("synthesizer", track->synth->name);
 		HideControl("ld_t_synth", track->type == track->TYPE_AUDIO);
 		//Enable("config_synth", track->type != track->TYPE_AUDIO);
-		HideControl("edit_midi_track", track->type != Track::TYPE_MIDI);
+		HideControl("ld_t_midi", track->type != Track::TYPE_MIDI);
 		HideControl("ld_t_bars", track->type != Track::TYPE_TIME);
 	}else{
 		HideControl("ld_t_synth", true);
-		HideControl("edit_midi_track", true);
+		HideControl("ld_t_midi", true);
 		HideControl("ld_t_bars", true);
 		//Enable("synthesizer", track);
 		//Enable("config_synth", track);

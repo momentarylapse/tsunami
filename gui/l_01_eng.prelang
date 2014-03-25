@@ -1,21 +1,15 @@
 // Language
 English
 // Num IDs
-179
+171
 // Data (ID,Text)
 about
-
-ad_main_grid
 
 ad_t_bars
 
 ad_t_data
 
-ad_t_effects
-
 ad_t_tags
-
-ad_t_volume
 
 add_bar
 
@@ -35,27 +29,15 @@ audio_add_bar
 
 audio_add_bar_pause
 
-audio_add_effect
-
 audio_bar_list
-
-audio_close
-
-audio_configure_effect
 
 audio_delete_bar
 
-audio_delete_effect
-
 audio_file_dialog
 
-audio_fx_list
-
-audio_volume
-
-audio_volume_slider
-
 bar_list
+
+beat_partition
 
 cancel
 Cancel
@@ -79,6 +61,8 @@ close
 Close
 close_file
 
+config_synth
+
 copy
 Copy
 create_from_selection
@@ -99,8 +83,6 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
-edit_midi_track
-
 exit
 
 export_selection
@@ -125,8 +107,14 @@ language
 
 ld_t_bars
 
+ld_t_midi
+
 ld_t_name
 !bold\\Name:
+ld_t_partition
+
+ld_t_pitch
+
 ld_t_repdelay
 
 ld_t_repetition
@@ -241,6 +229,8 @@ per_second
 /s
 percent
 %
+pitch_offset
+
 play
 Play
 play_loop
@@ -262,8 +252,6 @@ progress_cancelable_grid
 progress_dialog
 in progress
 properties_dialog_buttonbar
-
-rand_id_559158
 
 rdt_source
 !bold\\Source
@@ -321,8 +309,6 @@ synthesizer
 
 tags
 !format=tT\\Tag\\Value
-td_main_grid
-
 track_dialog
 Track
 track_import
@@ -330,8 +316,6 @@ track_import
 track_list
 Track
 track_properties
-
-track_time_dialog
 
 trackdest_dialog
 Destination track
@@ -362,7 +346,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-104
+109
 // Data (ID,Text)
 
 
@@ -370,11 +354,9 @@ zoom_out
 
         - nicht verbinden -
 
-  viel Erfolg!
+  ...keine Sorge, das wird schon!
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
-
-!big,bold,angle=90\\Mischpult
 
 !bold$Kommentar/Geschehnisse:
 
@@ -426,6 +408,8 @@ Datei speichern
 
 Datei öffnen
 
+Datei-Eigenschaften
+
 Datenverlust!
 
 Dauer\\\") + audio->get_time_str(samples));
@@ -437,6 +421,8 @@ Editor für Audio Dateien
 Effekt löschen
 
 Effekt nicht ladbar: \"%s\"
+
+Effekte
 
 Ende\\\") + audio->get_time_str(audio->GetRange().end()));
 
@@ -482,7 +468,7 @@ MIDI Quelle auswählen
 
 MIDI Quellen
 
-Meldungen
+Mischpult
 
 Nachrichten
 
@@ -504,6 +490,8 @@ Plugin-Script wählen
 
 Raw Daten
 
+Sample Manager
+
 Samplerate
 
 Samples\\\") + i2s(samples));
@@ -512,9 +500,13 @@ Script (*.kaba)
 
 Spur %d
 
+Spur-Eigenschaften
+
 Unbenannt
 
 Vorschau
+
+alle Nachrichten löschen
 
 benutze OpenAl Device: 
 
@@ -555,6 +547,8 @@ namenlose Spur
 neue Audiodatei
 
 neue Spur anlegen
+
+neuen Effekt hinzufügen
 
 nicht konfigurierbar
 

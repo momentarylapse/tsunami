@@ -17,7 +17,7 @@ BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
 {
 	AddControlTable("!noexpandy,height=300", 0, 0, 3, 1, "root_grid");
 	SetTarget("root_grid", 0);
-	AddControlTable("", 0, 0, 1, 3, "button_grid");
+	AddControlTable("", 0, 0, 1, 4, "button_grid");
 	AddSeparator("!vertical", 1, 0, 0, 0, "");
 	AddControlTable("", 2, 0, 1, 20, "console_grid");
 	SetTarget("button_grid", 0);
@@ -25,7 +25,9 @@ BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
 	SetImage("close", "hui:close");
 	AddButton("!noexpandy,flat", 0, 1, 0, 0, "next");
 	SetImage("next", "hui:forward");
-	AddText("!big,bold,angle=90,expandy\\...", 0, 2, 0, 0, "title");
+	AddText("!big,angle=90,expandy\\...", 0, 2, 0, 0, "title");
+	AddButton("!noexpandy,flat", 0, 3, 0, 0, "previous");
+	SetImage("previous", "hui:back");
 	fx_console = new FxConsole(audio);
 	mixing_console = new MixingConsole(audio, output);
 	sample_manager = new SampleManager(audio);
@@ -36,6 +38,7 @@ BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
 	Embed(log_dialog, "console_grid", 0, 3);
 
 	EventM("next", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnNext);
+	EventM("previous", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnPrevious);
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);
 
 	Choose(MIXING_CONSOLE);
@@ -56,6 +59,11 @@ void BottomBar::OnNext()
 	Choose((active_console + 1) % NUM_CONSOLES);
 }
 
+void BottomBar::OnPrevious()
+{
+	Choose((active_console - 1 + NUM_CONSOLES) % NUM_CONSOLES);
+}
+
 void BottomBar::OnShow()
 {
 	visible = true;
@@ -72,7 +80,7 @@ void BottomBar::Choose(int console)
 {
 	foreachi(HuiPanel *p, children, i){
 		if (i == console){
-			SetString("title", "!big,bold\\" + ((BottomBarConsole*)p)->title);
+			SetString("title", "!big\\" + ((BottomBarConsole*)p)->title);
 			p->Show();
 		}else
 			p->Hide();

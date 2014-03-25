@@ -12,7 +12,7 @@
 SideBar::SideBar(AudioFile *audio) :
 	Observable("SideBar")
 {
-	AddControlTable("!noexpandx,width=260", 0, 0, 1, 3, "root_grid");
+	AddControlTable("!noexpandx,width=270", 0, 0, 1, 3, "root_grid");
 	SetTarget("root_grid", 0);
 	AddControlTable("", 0, 0, 2, 1, "button_grid");
 	AddSeparator("", 0, 1, 0, 0, "");
@@ -20,7 +20,7 @@ SideBar::SideBar(AudioFile *audio) :
 	SetTarget("button_grid", 0);
 	AddButton("!noexpandx,flat", 0, 0, 0, 0, "close");
 	SetImage("close", "hui:close");
-	AddText("!big,bold,expandx,center\\...", 1, 0, 0, 0, "title");
+	AddText("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 	audio_file_dialog = new AudioFileDialog(audio);
 	track_dialog = new TrackDialog;
 	Embed(audio_file_dialog, "console_grid", 0, 0);
@@ -57,7 +57,7 @@ void SideBar::Choose(int console)
 {
 	foreachi(HuiPanel *p, children, i){
 		if (i == console){
-			SetString("title", "!big,bold\\" + ((SideBarConsole*)p)->title);
+			SetString("title", "!big\\" + ((SideBarConsole*)p)->title);
 			p->Show();
 		}else
 			p->Hide();

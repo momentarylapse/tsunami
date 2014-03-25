@@ -12,9 +12,9 @@
 #include "../../Tsunami.h"
 #include <math.h>
 
-SampleManager::SampleManager(AudioFile *a)
+SampleManager::SampleManager(AudioFile *a) :
+	BottomBarConsole(_("Sample Manager"))
 {
-	title = _("Sample Manager");
 	FromResource("sample_manager_dialog");
 	SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 

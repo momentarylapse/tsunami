@@ -88,9 +88,9 @@ public:
 	int index;
 };
 
-FxConsole::FxConsole(AudioFile *_audio)
+FxConsole::FxConsole(AudioFile *_audio) :
+	BottomBarConsole(_("Effekte"))
 {
-	title = _("Effekte");
 	audio = _audio;
 	id_inner = "mixing_inner_table";
 

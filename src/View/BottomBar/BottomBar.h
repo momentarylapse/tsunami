@@ -23,6 +23,8 @@ class Log;
 class BottomBarConsole : public HuiPanel
 {
 public:
+	BottomBarConsole(const string &_title)
+	{ title = _title; }
 	string title;
 };
 
@@ -34,6 +36,7 @@ public:
 
 	void OnClose();
 	void OnNext();
+	void OnPrevious();
 	virtual void OnShow();
 	virtual void OnHide();
 

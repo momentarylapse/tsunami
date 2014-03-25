@@ -100,9 +100,9 @@ void TrackMixer::Update()
 }
 
 
-MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output)
+MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
+	BottomBarConsole(_("Mischpult"))
 {
-	title = _("Mischpult");
 	audio = _audio;
 	output = _output;
 	id_inner = "inner_table";

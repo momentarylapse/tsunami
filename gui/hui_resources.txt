@@ -1,6 +1,6 @@
 t3
 // Number Of Resources
-17
+16
 // Resource
 Menu
 
@@ -175,9 +175,9 @@ audio_file_dialog
 0
 
 
-31
+16
 ControlTable
-ad_main_grid
+afd_grid_1
 
 1
 0
@@ -188,19 +188,6 @@ ad_main_grid
 0
 0
 
-
-ControlTable
-afd_grid_1
-
-1
-0
-0
-1
-5
--1
-0
-0
-ad_main_grid
 
 Group
 ad_t_data
@@ -229,76 +216,11 @@ data_list
 ad_t_data
 
 Group
-ad_t_volume
-
-1
-0
-1
-1
-1
--1
-0
-0
-afd_grid_1
-
-ControlTable
-rand_id_205051
-
-1
-0
-0
-3
-1
--1
-0
-0
-ad_t_volume
-
-Slider
-audio_volume_slider
-
-1
-0
-0
-1
-1
--1
-0
-0
-rand_id_205051
-
-SpinButton
-audio_volume
-
-1
-1
-0
-1
-1
--1
-0
-0
-rand_id_205051
-
-Text
-percent
-
-1
-2
-0
-1
-1
--1
-0
-0
-rand_id_205051
-
-Expander
 ad_t_tags
 
 1
 0
-2
+1
 1
 1
 -1
@@ -333,7 +255,7 @@ tags
 ad_table_tags
 
 ControlTable
-rand_id_110490
+rand_id_445953
 
 1
 0
@@ -356,7 +278,7 @@ hui:add
 -1
 0
 0
-rand_id_110490
+rand_id_445953
 
 Button
 delete_tag
@@ -369,105 +291,14 @@ hui:delete
 -1
 0
 0
-rand_id_110490
-
-Expander
-ad_t_effects
-
-1
-0
-3
-1
-1
--1
-0
-0
-afd_grid_1
-
-ControlTable
-rand_id_444914
-
-1
-0
-0
-1
-2
--1
-0
-0
-ad_t_effects
-
-ListView
-audio_fx_list
-
-1
-0
-0
-1
-1
--1
-0
-0
-rand_id_444914
-
-ControlTable
-rand_id_145271
-
-1
-0
-1
-3
-1
--1
-0
-0
-rand_id_444914
-
-Button
-audio_add_effect
-hui:add
-1
-0
-0
-1
-1
--1
-0
-0
-rand_id_145271
-
-Button
-audio_configure_effect
-hui:edit
-1
-1
-0
-1
-1
--1
-0
-0
-rand_id_145271
-
-Button
-audio_delete_effect
-hui:delete
-1
-2
-0
-1
-1
--1
-0
-0
-rand_id_145271
+rand_id_445953
 
 Expander
 ad_t_bars
 
 1
 0
-4
+2
 1
 1
 -1
@@ -476,7 +307,7 @@ ad_t_bars
 afd_grid_1
 
 ControlTable
-rand_id_499269
+rand_id_639664
 
 1
 0
@@ -499,10 +330,10 @@ audio_bar_list
 -1
 0
 0
-rand_id_499269
+rand_id_639664
 
 ControlTable
-rand_id_622173
+rand_id_382174
 
 1
 0
@@ -512,7 +343,7 @@ rand_id_622173
 -1
 0
 0
-rand_id_499269
+rand_id_639664
 
 Button
 audio_add_bar
@@ -525,7 +356,7 @@ hui:add
 -1
 0
 0
-rand_id_622173
+rand_id_382174
 
 Button
 audio_add_bar_pause
@@ -538,7 +369,7 @@ hui:add
 -1
 0
 0
-rand_id_622173
+rand_id_382174
 
 Button
 audio_delete_bar
@@ -551,33 +382,7 @@ hui:delete
 -1
 0
 0
-rand_id_622173
-
-Separator
-sep_vertical
-
-1
-0
-1
-1
-1
--1
-0
-0
-ad_main_grid
-
-Button
-audio_close
-hui:close
-1
-0
-2
-1
-1
--1
-0
-0
-ad_main_grid
+rand_id_382174
 
 // Resource
 SizableDialog
@@ -716,7 +521,7 @@ level_dialog
 
 21
 ControlTable
-rand_id_860626
+rand_id_816580
 
 1
 0
@@ -739,7 +544,7 @@ ld_t_name
 -1
 0
 0
-rand_id_860626
+rand_id_816580
 
 Edit
 name
@@ -755,7 +560,7 @@ name
 ld_t_name
 
 ControlTable
-rand_id_211191
+rand_id_220439
 
 1
 0
@@ -778,7 +583,7 @@ ld_t_track
 -1
 0
 0
-rand_id_211191
+rand_id_220439
 
 ComboBox
 level_track
@@ -791,7 +596,7 @@ level_track
 -1
 0
 0
-rand_id_211191
+rand_id_220439
 
 Group
 ld_t_volume
@@ -804,10 +609,10 @@ ld_t_volume
 -1
 0
 0
-rand_id_860626
+rand_id_816580
 
 ControlTable
-rand_id_991887
+rand_id_826865
 
 1
 0
@@ -830,7 +635,7 @@ volume_slider
 -1
 0
 0
-rand_id_991887
+rand_id_826865
 
 SpinButton
 volume
@@ -843,7 +648,7 @@ volume
 -1
 0
 0
-rand_id_991887
+rand_id_826865
 
 Text
 percent
@@ -856,7 +661,7 @@ percent
 -1
 0
 0
-rand_id_991887
+rand_id_826865
 
 CheckBox
 mute
@@ -869,7 +674,7 @@ mute
 -1
 0
 0
-rand_id_991887
+rand_id_826865
 
 Group
 ld_t_repetition
@@ -882,10 +687,10 @@ ld_t_repetition
 -1
 0
 0
-rand_id_860626
+rand_id_816580
 
 ControlTable
-rand_id_617880
+rand_id_925573
 
 1
 0
@@ -908,7 +713,7 @@ ld_t_repnum
 -1
 0
 0
-rand_id_617880
+rand_id_925573
 
 SpinButton
 repnum
@@ -921,7 +726,7 @@ repnum
 -1
 0
 0
-rand_id_617880
+rand_id_925573
 
 Text
 ld_t_repdelay
@@ -934,7 +739,7 @@ ld_t_repdelay
 -1
 0
 0
-rand_id_617880
+rand_id_925573
 
 SpinButton
 repdelay
@@ -947,7 +752,7 @@ repdelay
 -1
 0
 0
-rand_id_617880
+rand_id_925573
 
 Text
 ms
@@ -960,7 +765,7 @@ ms
 -1
 0
 0
-rand_id_617880
+rand_id_925573
 
 ControlTable
 level_dialog_buttonbar
@@ -973,7 +778,7 @@ level_dialog_buttonbar
 -1
 0
 0
-rand_id_860626
+rand_id_816580
 
 DefButton
 close
@@ -2191,7 +1996,7 @@ new_dialog
 
 8
 ControlTable
-rand_id_456774
+rand_id_217524
 
 1
 0
@@ -2204,7 +2009,7 @@ rand_id_456774
 
 
 ControlTable
-rand_id_388994
+rand_id_823418
 
 1
 0
@@ -2214,7 +2019,7 @@ rand_id_388994
 -1
 0
 0
-rand_id_456774
+rand_id_217524
 
 Text
 nd_t_frequency
@@ -2227,7 +2032,7 @@ nd_t_frequency
 -1
 0
 0
-rand_id_388994
+rand_id_823418
 
 Edit
 sample_rate
@@ -2240,7 +2045,7 @@ sample_rate
 -1
 0
 0
-rand_id_388994
+rand_id_823418
 
 Text
 per_second
@@ -2253,7 +2058,7 @@ per_second
 -1
 0
 0
-rand_id_388994
+rand_id_823418
 
 ControlTable
 new_dialog_buttonbar
@@ -2266,7 +2071,7 @@ new_dialog_buttonbar
 -1
 0
 0
-rand_id_456774
+rand_id_217524
 
 Button
 cancel
@@ -2392,7 +2197,7 @@ record_dialog
 
 18
 ControlTable
-rand_id_94871
+rand_id_933899
 
 1
 0
@@ -2415,10 +2220,10 @@ rdt_source
 -1
 0
 0
-rand_id_94871
+rand_id_933899
 
 ControlTable
-rand_id_659620
+rand_id_696536
 
 1
 0
@@ -2431,7 +2236,7 @@ rand_id_659620
 rdt_source
 
 ControlTable
-rand_id_673957
+rand_id_618563
 
 1
 0
@@ -2441,7 +2246,7 @@ rand_id_673957
 -1
 0
 0
-rand_id_659620
+rand_id_696536
 
 RadioButton
 capture_type:audio
@@ -2454,7 +2259,7 @@ capture_type:audio
 -1
 0
 0
-rand_id_673957
+rand_id_618563
 
 RadioButton
 capture_type:midi
@@ -2467,10 +2272,10 @@ capture_type:midi
 -1
 0
 0
-rand_id_673957
+rand_id_618563
 
 ControlTable
-rand_id_465857
+rand_id_529846
 
 1
 0
@@ -2480,7 +2285,7 @@ rand_id_465857
 -1
 0
 0
-rand_id_659620
+rand_id_696536
 
 Text
 capture_time
@@ -2493,7 +2298,7 @@ capture_time
 -1
 0
 0
-rand_id_465857
+rand_id_529846
 
 DrawingArea
 capture_level
@@ -2506,10 +2311,10 @@ capture_level
 -1
 0
 0
-rand_id_465857
+rand_id_529846
 
 ControlTable
-rand_id_503628
+rand_id_274650
 
 1
 0
@@ -2519,7 +2324,7 @@ rand_id_503628
 -1
 0
 0
-rand_id_659620
+rand_id_696536
 
 Button
 capture_start
@@ -2532,7 +2337,7 @@ hui:media-record
 -1
 0
 0
-rand_id_503628
+rand_id_274650
 
 Button
 capture_pause
@@ -2545,7 +2350,7 @@ hui:media-pause
 -1
 0
 0
-rand_id_503628
+rand_id_274650
 
 Button
 capture_delete
@@ -2558,7 +2363,7 @@ hui:delete
 -1
 0
 0
-rand_id_503628
+rand_id_274650
 
 Group
 rdt_target
@@ -2571,7 +2376,7 @@ rdt_target
 -1
 0
 0
-rand_id_94871
+rand_id_933899
 
 ComboBox
 capture_target
@@ -2597,7 +2402,7 @@ record_dialog_buttonbar
 -1
 0
 0
-rand_id_94871
+rand_id_933899
 
 Button
 cancel
@@ -2641,7 +2446,7 @@ sample_manager_dialog
 
 7
 ControlTable
-rand_id_137715
+rand_id_10168
 
 1
 0
@@ -2664,10 +2469,10 @@ sample_list
 -1
 0
 0
-rand_id_137715
+rand_id_10168
 
 ControlTable
-rand_id_87504
+rand_id_196825
 
 1
 0
@@ -2677,7 +2482,7 @@ rand_id_87504
 -1
 0
 0
-rand_id_137715
+rand_id_10168
 
 Button
 import_from_file
@@ -2690,7 +2495,7 @@ import_from_file
 -1
 0
 0
-rand_id_87504
+rand_id_196825
 
 Button
 delete_sample
@@ -2703,7 +2508,7 @@ delete_sample
 -1
 0
 0
-rand_id_87504
+rand_id_196825
 
 Button
 insert_sample
@@ -2716,7 +2521,7 @@ insert_sample
 -1
 0
 0
-rand_id_87504
+rand_id_196825
 
 Button
 create_from_selection
@@ -2729,7 +2534,7 @@ create_from_selection
 -1
 0
 0
-rand_id_87504
+rand_id_196825
 
 // Resource
 SizableDialog
@@ -2747,7 +2552,7 @@ settings_dialog
 
 25
 ControlTable
-rand_id_152445
+rand_id_24932
 
 1
 0
@@ -2770,10 +2575,10 @@ pdp_general
 -1
 0
 0
-rand_id_152445
+rand_id_24932
 
 ControlTable
-rand_id_676401
+rand_id_879459
 
 1
 0
@@ -2796,7 +2601,7 @@ pdp_language
 -1
 0
 0
-rand_id_676401
+rand_id_879459
 
 ComboBox
 language
@@ -2809,7 +2614,7 @@ language
 -1
 0
 0
-rand_id_676401
+rand_id_879459
 
 Text
 pdt_oggrate
@@ -2822,7 +2627,7 @@ pdt_oggrate
 -1
 0
 0
-rand_id_676401
+rand_id_879459
 
 ComboBox
 ogg_bitrate
@@ -2835,7 +2640,7 @@ ogg_bitrate
 -1
 0
 0
-rand_id_676401
+rand_id_879459
 
 Group
 pdp_preview
@@ -2848,10 +2653,10 @@ pdp_preview
 -1
 0
 0
-rand_id_152445
+rand_id_24932
 
 ControlTable
-rand_id_87672
+rand_id_884572
 
 1
 0
@@ -2874,7 +2679,7 @@ pdp_previewdevice
 -1
 0
 0
-rand_id_87672
+rand_id_884572
 
 ComboBox
 preview_device
@@ -2887,7 +2692,7 @@ preview_device
 -1
 0
 0
-rand_id_87672
+rand_id_884572
 
 Text
 pdt_volume
@@ -2900,10 +2705,10 @@ pdt_volume
 -1
 0
 0
-rand_id_87672
+rand_id_884572
 
 ControlTable
-rand_id_206295
+rand_id_75281
 
 1
 1
@@ -2913,7 +2718,7 @@ rand_id_206295
 -1
 0
 0
-rand_id_87672
+rand_id_884572
 
 Slider
 volume_slider
@@ -2926,7 +2731,7 @@ volume_slider
 -1
 0
 0
-rand_id_206295
+rand_id_75281
 
 SpinButton
 preview_volume
@@ -2939,7 +2744,7 @@ preview_volume
 -1
 0
 0
-rand_id_206295
+rand_id_75281
 
 Text
 percent
@@ -2952,7 +2757,7 @@ percent
 -1
 0
 0
-rand_id_87672
+rand_id_884572
 
 Group
 pdp_capture
@@ -2965,10 +2770,10 @@ pdp_capture
 -1
 0
 0
-rand_id_152445
+rand_id_24932
 
 ControlTable
-rand_id_987785
+rand_id_440025
 
 1
 0
@@ -2991,7 +2796,7 @@ pdp_capturedevice
 -1
 0
 0
-rand_id_987785
+rand_id_440025
 
 ComboBox
 capture_device
@@ -3004,7 +2809,7 @@ capture_device
 -1
 0
 0
-rand_id_987785
+rand_id_440025
 
 Text
 pdt_capturedelay
@@ -3017,7 +2822,7 @@ pdt_capturedelay
 -1
 0
 0
-rand_id_987785
+rand_id_440025
 
 SpinButton
 capture_delay
@@ -3030,7 +2835,7 @@ capture_delay
 -1
 0
 0
-rand_id_987785
+rand_id_440025
 
 Text
 ms
@@ -3043,7 +2848,7 @@ ms
 -1
 0
 0
-rand_id_987785
+rand_id_440025
 
 ControlTable
 properties_dialog_buttonbar
@@ -3056,7 +2861,7 @@ properties_dialog_buttonbar
 -1
 0
 0
-rand_id_152445
+rand_id_24932
 
 DefButton
 close
@@ -3287,125 +3092,6 @@ track_dialog
 
 1
 380
-430
-0
-0
-0
-0
-0
-
-
-8
-ControlTable
-rand_id_21969
-
-1
-0
-0
-1
-6
--1
-0
-0
-
-
-Group
-ld_t_name
-
-1
-0
-0
-1
-1
--1
-0
-0
-rand_id_21969
-
-Edit
-name
-
-1
-0
-0
-1
-1
--1
-0
-0
-ld_t_name
-
-Expander
-ld_t_synth
-
-1
-0
-1
-1
-1
--1
-0
-0
-rand_id_21969
-
-ControlTable
-rand_id_301080
-
-1
-0
-0
-2
-1
--1
-0
-0
-ld_t_synth
-
-Button
-synthesizer
-
-1
-0
-0
-1
-1
--1
-0
-0
-rand_id_301080
-
-Button
-config_synth
-hui:edit
-1
-1
-0
-1
-1
--1
-0
-0
-rand_id_301080
-
-Button
-close
-hui:close
-1
-0
-2
-1
-1
--1
-0
-0
-rand_id_21969
-
-// Resource
-SizableDialog
-track_time_dialog
-
-1
-380
 516
 0
 0
@@ -3414,20 +3100,7 @@ track_time_dialog
 0
 
 
-18
-ControlTable
-td_main_grid
-
-1
-0
-0
-1
-3
--1
-0
-0
-
-
+20
 ControlTable
 ttd_grid_1
 
@@ -3435,11 +3108,11 @@ ttd_grid_1
 0
 0
 1
-5
+4
 -1
 0
 0
-td_main_grid
+
 
 Group
 ld_t_name
@@ -3481,7 +3154,7 @@ ld_t_synth
 ttd_grid_1
 
 ControlTable
-rand_id_279467
+rand_id_62645
 
 1
 0
@@ -3504,7 +3177,7 @@ synthesizer
 -1
 0
 0
-rand_id_279467
+rand_id_62645
 
 Button
 config_synth
@@ -3517,9 +3190,9 @@ hui:edit
 -1
 0
 0
-rand_id_279467
+rand_id_62645
 
-Expander
+Group
 ld_t_bars
 
 1
@@ -3533,7 +3206,7 @@ ld_t_bars
 ttd_grid_1
 
 ControlTable
-rand_id_364056
+rand_id_762169
 
 1
 0
@@ -3556,10 +3229,10 @@ bar_list
 -1
 0
 0
-rand_id_364056
+rand_id_762169
 
 ControlTable
-rand_id_955022
+rand_id_929081
 
 1
 0
@@ -3569,7 +3242,7 @@ rand_id_955022
 -1
 0
 0
-rand_id_364056
+rand_id_762169
 
 Button
 add_bar
@@ -3582,7 +3255,7 @@ hui:add
 -1
 0
 0
-rand_id_955022
+rand_id_929081
 
 Button
 add_bar_pause
@@ -3595,7 +3268,7 @@ hui:add
 -1
 0
 0
-rand_id_955022
+rand_id_929081
 
 Button
 delete_bar
@@ -3608,10 +3281,10 @@ hui:delete
 -1
 0
 0
-rand_id_955022
+rand_id_929081
 
-Button
-edit_midi_track
+Group
+ld_t_midi
 
 1
 0
@@ -3623,53 +3296,86 @@ edit_midi_track
 0
 ttd_grid_1
 
-Separator
-sep_vertical
+ControlTable
+rand_id_137137
 
 1
 0
-1
-1
-1
--1
-0
-0
-td_main_grid
-
-Button
-close
-hui:close
-1
 0
 2
+2
+-1
+0
+0
+ld_t_midi
+
+Text
+ld_t_pitch
+
+1
+0
+0
 1
 1
 -1
 0
 0
-td_main_grid
+rand_id_137137
+
+SpinButton
+pitch_offset
+
+1
+1
+0
+1
+1
+-1
+0
+0
+rand_id_137137
+
+Text
+ld_t_partition
+
+1
+0
+1
+1
+1
+-1
+0
+0
+rand_id_137137
+
+SpinButton
+beat_partition
+
+1
+1
+1
+1
+1
+-1
+0
+0
+rand_id_137137
 
 // Number Of Languages
 2
 // Language
 Deutsch
 // NumIDs
-220
+207
 // Text
 about
 Info
-ad_main_grid
-!width=250,noexpandx\\
 ad_t_bars
 Takte
 ad_t_data
 Daten
-ad_t_effects
-Effekte
 ad_t_tags
 Tags
-ad_t_volume
-Lautstärke
 ad_table_tags
 
 add_bar
@@ -3690,28 +3396,16 @@ audio_add_bar
 !flat\\Takt
 audio_add_bar_pause
 !flat\\Pause
-audio_add_effect
-!flat\\
 audio_bar_list
 !format=tTTT\\#\\Schläge\\Bpm\\Anzahl
-audio_close
-Schließen
-audio_configure_effect
-!flat\\
 audio_delete_bar
-!flat\\
-audio_delete_effect
 !flat\\
 audio_file_dialog
 Sound-Datei
-audio_fx_list
-!nobar\\Effekte
-audio_volume
-\\0\\100\\0.1
-audio_volume_slider
-!expandx\\
 bar_list
 !format=tTTT\\#\\Schläge\\Bpm\\Anzahl
+beat_partition
+4\\1\\256
 cancel
 Abbrechen
 capture_delay
@@ -3739,7 +3433,7 @@ Schließen
 close_file
 Schließen
 config_synth
-
+!flat\\
 copy
 Kopieren
 create_from_selection
@@ -3760,8 +3454,6 @@ delete_track
 Löschen
 dummy_favorite_dialog
 Effekt
-edit_midi_track
-Midi editieren
 exit
 Beenden
 export_selection
@@ -3794,8 +3486,14 @@ language
 !expandx\\
 ld_t_bars
 Takte
+ld_t_midi
+Midi-Bearbeitung
 ld_t_name
 Name
+ld_t_partition
+Unterteilung
+ld_t_pitch
+Pitch
 ld_t_repdelay
 Abstand:
 ld_t_repetition
@@ -3916,6 +3614,8 @@ per_second
 /s
 percent
 %
+pitch_offset
+!expandx\\60\\0\\90
 play
 Abspielen
 play_loop
@@ -3938,63 +3638,55 @@ progress_dialog
 in Arbeit
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_168
+rand_id_108992
 
-rand_id_177259
+rand_id_151279
 
-rand_id_202846
+rand_id_178072
 
-rand_id_213996
+rand_id_286409
 
-rand_id_230917
+rand_id_342869
 
-rand_id_245583
+rand_id_391604
 
-rand_id_284962
+rand_id_479011
 
-rand_id_291681
+rand_id_489055
 
-rand_id_311384
+rand_id_50348
 
-rand_id_342087
+rand_id_560566
 
-rand_id_369714
+rand_id_578113
 
-rand_id_370985
+rand_id_595947
 
-rand_id_388778
+rand_id_666978
 
-rand_id_397107
+rand_id_677982
 
-rand_id_463757
+rand_id_686887
 
-rand_id_476990
+rand_id_687747
 
-rand_id_53850
+rand_id_726520
 
-rand_id_538686
+rand_id_74492
 
-rand_id_607939
+rand_id_750282
 
-rand_id_621647
+rand_id_795145
 
-rand_id_648816
+rand_id_8325
 
-rand_id_653942
+rand_id_869290
 
-rand_id_711922
+rand_id_958191
 
-rand_id_715354
+rand_id_996552
 
-rand_id_757253
-
-rand_id_844008
-
-rand_id_934296
-
-rand_id_940220
-
-rand_id_94784
+rand_id_997085
 
 rdt_source
 Quelle
@@ -4032,8 +3724,6 @@ select_all
 Alles auswählen
 select_nothing
 Nichts auswählen
-sep_vertical
-
 settings
 Einstellungen
 settings_dialog
@@ -4051,11 +3741,9 @@ Aus Auswahl herauslösen
 sub_properties
 Eigenschaften
 synthesizer
-!expandx,flat\\
+!expandx\\
 tags
 !format=TT\\Tag\\Wert
-td_main_grid
-!width=250,noexpandx\\
 toolbar
 
 track_dialog
@@ -4066,8 +3754,6 @@ track_list
 Spur
 track_properties
 Eigenschaften
-track_time_dialog
-Rhythmus Spur
 trackdest_dialog
 Ziel-Spur für die Ebenen
 ttd_grid_1
@@ -4102,21 +3788,15 @@ Verkleinern
 // Language
 English
 // NumIDs
-220
+207
 // Text
 about
-
-ad_main_grid
 
 ad_t_bars
 
 ad_t_data
 
-ad_t_effects
-
 ad_t_tags
-
-ad_t_volume
 
 ad_table_tags
 
@@ -4138,27 +3818,15 @@ audio_add_bar
 
 audio_add_bar_pause
 
-audio_add_effect
-
 audio_bar_list
-
-audio_close
-
-audio_configure_effect
 
 audio_delete_bar
 
-audio_delete_effect
-
 audio_file_dialog
 
-audio_fx_list
-
-audio_volume
-
-audio_volume_slider
-
 bar_list
+
+beat_partition
 
 cancel
 Cancel
@@ -4208,8 +3876,6 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
-edit_midi_track
-
 exit
 
 export_selection
@@ -4242,8 +3908,14 @@ language
 
 ld_t_bars
 
+ld_t_midi
+
 ld_t_name
 !bold\\Name:
+ld_t_partition
+
+ld_t_pitch
+
 ld_t_repdelay
 
 ld_t_repetition
@@ -4364,6 +4036,8 @@ per_second
 /s
 percent
 %
+pitch_offset
+
 play
 Play
 play_loop
@@ -4386,63 +4060,55 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_168
+rand_id_108992
 
-rand_id_177259
+rand_id_151279
 
-rand_id_202846
+rand_id_178072
 
-rand_id_213996
+rand_id_286409
 
-rand_id_230917
+rand_id_342869
 
-rand_id_245583
+rand_id_391604
 
-rand_id_284962
+rand_id_479011
 
-rand_id_291681
+rand_id_489055
 
-rand_id_311384
+rand_id_50348
 
-rand_id_342087
+rand_id_560566
 
-rand_id_369714
+rand_id_578113
 
-rand_id_370985
+rand_id_595947
 
-rand_id_388778
+rand_id_666978
 
-rand_id_397107
+rand_id_677982
 
-rand_id_463757
+rand_id_686887
 
-rand_id_476990
+rand_id_687747
 
-rand_id_53850
+rand_id_726520
 
-rand_id_538686
+rand_id_74492
 
-rand_id_607939
+rand_id_750282
 
-rand_id_621647
+rand_id_795145
 
-rand_id_648816
+rand_id_8325
 
-rand_id_653942
+rand_id_869290
 
-rand_id_711922
+rand_id_958191
 
-rand_id_715354
+rand_id_996552
 
-rand_id_757253
-
-rand_id_844008
-
-rand_id_934296
-
-rand_id_940220
-
-rand_id_94784
+rand_id_997085
 
 rdt_source
 !bold\\Source
@@ -4480,8 +4146,6 @@ select_all
 
 select_nothing
 
-sep_vertical
-
 settings
 
 settings_dialog
@@ -4502,8 +4166,6 @@ synthesizer
 
 tags
 !format=tT\\Tag\\Value
-td_main_grid
-
 toolbar
 
 track_dialog
@@ -4513,8 +4175,6 @@ track_import
 track_list
 Track
 track_properties
-
-track_time_dialog
 
 trackdest_dialog
 Destination track

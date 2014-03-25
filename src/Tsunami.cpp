@@ -12,9 +12,7 @@
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/BottomBar/BottomBar.h"
-#include "View/BottomBar/MixingConsole.h"
-#include "View/BottomBar/FxConsole.h"
-#include "View/BottomBar/FxConsole.h"
+#include "View/SideBar/SideBar.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -114,7 +112,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	SetBorderWidth(0);
 	AddControlTable("", 0, 0, 1, 2, "root_table");
 	SetTarget("root_table", 0);
-	AddControlTable("", 0, 0, 4, 1, "main_table");
+	AddControlTable("", 0, 0, 2, 1, "main_table");
 
 	// main table
 	SetTarget("main_table", 0);
@@ -149,6 +147,12 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	view = new AudioView(this, audio);
 
+	// side bar
+	side_bar = new SideBar(audio);
+	Embed(side_bar, "main_table", 1, 0);
+	side_bar->Hide();
+
+	// bottom bar
 	bottom_bar = new BottomBar(audio, output, log);
 	Embed(bottom_bar, "root_table", 0, 1);
 
@@ -191,6 +195,8 @@ Tsunami::~Tsunami()
 	HuiConfig.setInt("Window.Height", h);
 	HuiConfig.setBool("Window.Maximized", IsMaximized());
 
+	delete(side_bar);
+	delete(bottom_bar);
 	delete(plugin_manager);
 	delete(storage);
 	delete(view);
@@ -257,12 +263,12 @@ void Tsunami::LoadKeyCodes()
 
 void Tsunami::OnAudioProperties()
 {
-	view->ExecuteAudioDialog(this);
+	side_bar->Choose(SideBar::AUDIO_FILE_DIALOG);
 }
 
 void Tsunami::OnTrackProperties()
 {
-	view->ExecuteTrackDialog(this);
+	side_bar->Choose(SideBar::TRACK_DIALOG);
 }
 
 void Tsunami::OnSubProperties()

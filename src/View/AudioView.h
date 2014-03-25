@@ -13,8 +13,6 @@
 #include "../Stuff/Observer.h"
 
 class ActionTrackMoveSample;
-class TrackDialog;
-class AudioFileDialog;
 
 class AudioView : public Observer, public Observable
 {
@@ -162,8 +160,6 @@ public:
 	void Move(float dpos);
 
 	void ExecuteSubDialog(HuiWindow *win);
-	void ExecuteTrackDialog(HuiWindow *win);
-	void ExecuteAudioDialog(HuiWindow *win);
 
 
 	bool force_redraw;
@@ -203,9 +199,6 @@ public:
 	int prefered_buffer_level;
 	double buffer_zoom_factor;
 	void UpdateBufferZoom();
-
-	TrackDialog *track_dialog;
-	AudioFileDialog *audio_file_dialog;
 
 	Image image_muted, image_unmuted, image_solo;
 	Image image_track_audio, image_track_time, image_track_midi;

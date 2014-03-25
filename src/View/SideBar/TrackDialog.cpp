@@ -17,7 +17,8 @@
 #include "../AudioView.h"
 #include "../../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
 
-TrackDialog::TrackDialog()
+TrackDialog::TrackDialog() :
+	SideBarConsole(_("Spur-Eigenschaften"))
 {
 	track = NULL;
 	SetBorderWidth(5);
@@ -37,7 +38,6 @@ TrackDialog::TrackDialog()
 	EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
 	EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
 	EventM("edit_midi_track", this, &TrackDialog::OnEditMidiTrack);
-	EventM("close", this, &TrackDialog::OnClose);
 }
 
 TrackDialog::~TrackDialog()
@@ -96,11 +96,6 @@ void TrackDialog::OnConfigSynthesizer()
 void TrackDialog::OnEditMidiTrack()
 {
 	tsunami->view->SetEditModeMidi(track);
-}
-
-void TrackDialog::OnClose()
-{
-	Hide();
 }
 
 void TrackDialog::OnUpdate(Observable *o, const string &message)

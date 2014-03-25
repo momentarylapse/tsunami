@@ -8,14 +8,14 @@
 #ifndef AUDIOFILEDIALOG_H_
 #define AUDIOFILEDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 class AudioFile;
 class Slider;
 class BarList;
 class FxList;
 
-class AudioFileDialog: public HuiPanel, public Observer
+class AudioFileDialog: public SideBarConsole, public Observer
 {
 public:
 	AudioFileDialog(AudioFile *a);
@@ -24,8 +24,6 @@ public:
 	void LoadData();
 	void ApplyData();
 
-	void OnOk();
-	void OnClose();
 	void OnVolume();
 	void OnTrackList();
 	void OnTagsSelect();

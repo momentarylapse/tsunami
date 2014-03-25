@@ -7,8 +7,7 @@
 
 #include "AudioView.h"
 #include "../Tsunami.h"
-#include "SideBar/AudioFileDialog.h"
-#include "SideBar/TrackDialog.h"
+#include "SideBar/SideBar.h"
 #include "BottomBar/BottomBar.h"
 #include "Dialog/SubDialog.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
@@ -139,13 +138,6 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 
 	//ForceRedraw();
 	UpdateMenu();
-
-	track_dialog = new TrackDialog();
-	parent->Embed(track_dialog, "main_table", 1, 0);
-	audio_file_dialog = new AudioFileDialog(audio);
-	parent->Embed(audio_file_dialog, "main_table", 2, 0);
-	track_dialog->Hide();
-	audio_file_dialog->Hide();
 }
 
 AudioView::~AudioView()
@@ -161,9 +153,6 @@ AudioView::~AudioView()
 	HuiConfig.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	HuiConfig.setFloat("View.ZoomSpeed", ZoomSpeed);
 	HuiConfig.setBool("View.Antialiasing", antialiasing);
-
-	delete(track_dialog);
-	delete(audio_file_dialog);
 }
 
 
@@ -571,9 +560,9 @@ void AudioView::OnLeftDoubleClick()
 			if (selection.type == SEL_TYPE_SAMPLE)
 				ExecuteSubDialog(tsunami);
 			else if (selection.type == SEL_TYPE_TRACK)
-				ExecuteTrackDialog(tsunami);
+				tsunami->side_bar->Choose(SideBar::TRACK_DIALOG);
 			else if (!selection.track)
-				ExecuteAudioDialog(tsunami);
+				tsunami->side_bar->Choose(SideBar::AUDIO_FILE_DIALOG);
 			selection.type = SEL_TYPE_NONE;
 		}
 	UpdateMenu();
@@ -1418,7 +1407,7 @@ void AudioView::SetCurSample(SampleRef *s)
 void AudioView::SetCurTrack(Track *t)
 {
 	cur_track = t;
-	track_dialog->SetTrack(cur_track);
+	tsunami->side_bar->SetTrack(cur_track);
 	tsunami->bottom_bar->SetTrack(cur_track);
 }
 
@@ -1455,12 +1444,6 @@ void AudioView::Move(float dpos)
 	ForceRedraw();
 }
 
-void AudioView::ExecuteTrackDialog(HuiWindow *win)
-{
-	track_dialog->Show();
-	audio_file_dialog->Hide();
-}
-
 
 
 void AudioView::ExecuteSubDialog(HuiWindow *win)
@@ -1474,11 +1457,5 @@ void AudioView::ExecuteSubDialog(HuiWindow *win)
 }
 
 
-
-void AudioView::ExecuteAudioDialog(HuiWindow *win)
-{
-	track_dialog->Hide();
-	audio_file_dialog->Show();
-}
 
 

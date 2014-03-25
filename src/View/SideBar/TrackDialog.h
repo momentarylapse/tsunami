@@ -9,13 +9,13 @@
 #define TRACKDIALOG_H_
 
 
-#include "../../lib/hui/hui.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
 class BarList;
 
-class TrackDialog: public HuiPanel, public Observer
+class TrackDialog: public SideBarConsole, public Observer
 {
 public:
 	TrackDialog();
@@ -24,8 +24,6 @@ public:
 	void LoadData();
 	void ApplyData();
 
-	void OnOk();
-	void OnClose();
 	void OnName();
 	void OnSynthesizer();
 	void OnConfigSynthesizer();

@@ -13,7 +13,8 @@
 #include "../Helper/FxList.h"
 #include "../Helper/BarList.h"
 
-AudioFileDialog::AudioFileDialog(AudioFile *a)
+AudioFileDialog::AudioFileDialog(AudioFile *a) :
+	SideBarConsole(_("Datei-Eigenschaften"))
 {
 	audio = a;
 
@@ -36,7 +37,6 @@ AudioFileDialog::AudioFileDialog(AudioFile *a)
 	EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
 	EventM("add_tag", this, &AudioFileDialog::OnAddTag);
 	EventM("delete_tag", this, &AudioFileDialog::OnDeleteTag);
-	EventM("audio_close", this, &AudioFileDialog::OnClose);
 
 	Subscribe(audio);
 }
@@ -72,38 +72,6 @@ string get_vol(float volume, bool muted)
 {
 	return muted ? _("(stumm)") : format("%.1f%%", volume * 100.0f);
 }
-
-#if 0
-void WaveDialogFunction(int message)
-{
-	msg_db_r("WaveDialogFunction", 1);
-	CHuiWindow *dlg = WaveDialog;
-	int sel;
-	DoEffectList(dlg_audio->FX, dlg, HMM_FX_LIST, message);
-	switch(message){
-		case HMM_WAVE_LIST:
-			sel = dlg->GetInt(HMM_WAVE_LIST);
-			if ((sel >= 0) && (sel < dlg_audio->Track.num)){
-				dlg_audio->CurTrack = sel;
-				ExecuteTrackDialog(dlg, dlg_audio);
-				RefillAudioList();
-			}else if (sel >= dlg_audio->Track.num){
-				//ExecuteLevelDialog(dlg, audio_list[sel - dlg_audio->Track.num]);
-				RefillAudioList();
-			}
-			break;
-		case HMM_OK:
-			/*dlg_audio->Title = WaveDialog->GetCell(HMM_TAGS, 0, 1);
-			dlg_audio->Album = WaveDialog->GetCell(HMM_TAGS, 1, 1);
-			dlg_audio->Artist = WaveDialog->GetCell(HMM_TAGS, 2, 1);*/
-		case HUI_WIN_CLOSE:
-		case HMM_CANCEL:
-			delete(dlg);
-			break;
-	}
-	msg_db_l(1);
-}
-#endif
 
 void AudioFileDialog::OnTagsSelect()
 {
@@ -144,10 +112,4 @@ void AudioFileDialog::OnVolume()
 void AudioFileDialog::OnUpdate(Observable *o, const string &message)
 {
 	LoadData();
-}
-
-void AudioFileDialog::OnClose()
-{
-	//HideControl("audio_dialog_table", true);
-	Hide();
 }

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-171
+173
 // Data (ID,Text)
 about
 
@@ -48,6 +48,10 @@ Delete
 capture_device
 
 capture_level
+
+capture_pause
+
+capture_start
 
 capture_target
 

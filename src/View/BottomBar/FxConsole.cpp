@@ -14,8 +14,9 @@
 class SingleFxPanel : public HuiPanel, public Observer
 {
 public:
-	SingleFxPanel(Track *t, Effect *_fx, int _index)
+	SingleFxPanel(AudioFile *a, Track *t, Effect *_fx, int _index)
 	{
+		audio = a;
 		track = t;
 		fx = _fx;
 		index = _index;
@@ -60,7 +61,10 @@ public:
 		if (name.num == 0)
 			return;
 		tsunami->plugin_manager->ApplyFavorite(fx, name);
-		track->EditEffect(index, old_param);
+		if (track)
+			track->EditEffect(index, old_param);
+		else
+			audio->EditEffect(index, old_param);
 		old_param = fx->ConfigToString();
 	}
 	void onSave()
@@ -72,16 +76,24 @@ public:
 	}
 	void onDelete()
 	{
-		track->DeleteEffect(index);
+		if (track)
+			track->DeleteEffect(index);
+		else
+			audio->DeleteEffect(index);
 	}
 	virtual void OnUpdate(Observable *o, const string &message)
 	{
 		//msg_write("SingleFxPanel: " + message);
-		if (message == "Change")
-			track->EditEffect(index, old_param);
+		if (message == "Change"){
+			if (track)
+				track->EditEffect(index, old_param);
+			else
+				audio->EditEffect(index, old_param);
+		}
 		fx->UpdateDialog();
 		old_param = fx->ConfigToString();
 	}
+	AudioFile *audio;
 	Track *track;
 	Effect *fx;
 	string old_param;
@@ -101,14 +113,18 @@ FxConsole::FxConsole(AudioFile *_audio) :
 	SetTooltip("add", _("neuen Effekt hinzuf&ugen"));
 
 	track = NULL;
-	Enable("add", false);
+	//Enable("add", false);
 
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
+
+	Subscribe(audio, "AddEffect");
+	Subscribe(audio, "DeleteEffect");
 }
 
 FxConsole::~FxConsole()
 {
 	Clear();
+	Unsubscribe(audio);
 }
 
 void FxConsole::OnAdd()
@@ -121,8 +137,8 @@ void FxConsole::OnAdd()
 	Effect *effect = CreateEffect(name);
 	if (track)
 		track->AddEffect(effect);
-	/*else
-		audio->AddEffect(effect);*/
+	else
+		audio->AddEffect(effect);
 }
 
 void FxConsole::Clear()
@@ -135,7 +151,7 @@ void FxConsole::Clear()
 	}
 	panels.clear();
 	track = NULL;
-	Enable("add", false);
+	//Enable("add", false);
 }
 
 void FxConsole::SetTrack(Track *t)
@@ -146,14 +162,20 @@ void FxConsole::SetTrack(Track *t)
 		Subscribe(track, "Delete");
 		Subscribe(track, "AddEffect");
 		Subscribe(track, "DeleteEffect");
-
-		foreachi(Effect *fx, track->fx, i){
-			panels.add(new SingleFxPanel(track, fx, i));
-			Embed(panels.back(), id_inner, i*2, 0);
-			AddSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
-		}
 	}
-	Enable("add", track);
+
+
+	Array<Effect*> fx;
+	if (track)
+		fx = track->fx;
+	else
+		fx = audio->fx;
+	foreachi(Effect *e, fx, i){
+		panels.add(new SingleFxPanel(audio, track, e, i));
+		Embed(panels.back(), id_inner, i*2, 0);
+		AddSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
+	}
+	//Enable("add", track);
 }
 
 void FxConsole::OnUpdate(Observable* o, const string &message)

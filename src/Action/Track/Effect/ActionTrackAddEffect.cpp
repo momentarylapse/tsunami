@@ -28,6 +28,7 @@ void *ActionTrackAddEffect::execute(Data *d)
 		t->Notify("AddEffect");
 	}else{
 		a->fx.add(effect);
+		a->Notify("AddEffect");
 	}
 
 	return NULL;
@@ -43,6 +44,7 @@ void ActionTrackAddEffect::undo(Data *d)
 		t->Notify("DeleteEffect");
 	}else{
 		a->fx.pop();
+		a->Notify("DeleteEffect");
 	}
 }
 

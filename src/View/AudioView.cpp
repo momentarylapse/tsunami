@@ -552,12 +552,15 @@ void AudioView::OnLeftDoubleClick()
 
 	if (mouse_possibly_selecting < mouse_min_move_to_select)
 		if (audio->used){
-			if (selection.type == SEL_TYPE_SAMPLE)
+			if (selection.type == SEL_TYPE_SAMPLE){
 				ExecuteSubDialog(tsunami);
-			else if (selection.type == SEL_TYPE_TRACK)
-				tsunami->side_bar->Choose(SideBar::TRACK_DIALOG);
-			else if (!selection.track)
-				tsunami->side_bar->Choose(SideBar::AUDIO_FILE_DIALOG);
+			}else if (selection.type == SEL_TYPE_TRACK){
+				tsunami->side_bar->Open(SideBar::TRACK_DIALOG);
+			}else if (!selection.track){
+				cur_track = NULL;
+				tsunami->bottom_bar->SetTrack(NULL);
+				tsunami->side_bar->Open(SideBar::AUDIO_FILE_DIALOG);
+			}
 			selection.type = SEL_TYPE_NONE;
 		}
 	UpdateMenu();
@@ -932,6 +935,8 @@ void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 
 bool AudioView::EditingMidi()
 {
+	if (!cur_track)
+		return false;
 	if (cur_track->type != Track::TYPE_MIDI)
 		return false;
 	return tsunami->side_bar->IsActive(SideBar::TRACK_DIALOG);
@@ -1368,6 +1373,7 @@ void AudioView::SetCurTrack(Track *t)
 {
 	cur_track = t;
 	tsunami->side_bar->SetTrack(cur_track);
+	tsunami->side_bar->Choose(t ? SideBar::TRACK_DIALOG : SideBar::AUDIO_FILE_DIALOG);
 	tsunami->bottom_bar->SetTrack(cur_track);
 }
 

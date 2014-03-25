@@ -38,6 +38,7 @@ void *ActionTrackDeleteEffect::execute(Data *d)
 		effect = a->fx[index];
 		effect->Notify("Delete");
 		a->fx.erase(index);
+		a->Notify("DeleteEffect");
 	}
 
 	return NULL;
@@ -59,6 +60,7 @@ void ActionTrackDeleteEffect::undo(Data *d)
 		assert(index < a->fx.num);
 
 		a->fx.insert(effect, index);
+		a->Notify("AddEffect");
 	}
 }
 

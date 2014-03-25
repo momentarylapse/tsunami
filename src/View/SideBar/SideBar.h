@@ -44,6 +44,7 @@ public:
 
 	void SetTrack(Track *t);
 	void Choose(int console);
+	void Open(int console);
 	bool IsActive(int console);
 	int active_console;
 	bool visible;

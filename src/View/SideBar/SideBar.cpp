@@ -63,10 +63,17 @@ void SideBar::Choose(int console)
 			p->Hide();
 	}
 	active_console = console;
-	if (visible)
-		Notify("Change");
-	else
+	Notify("Change");
+}
+
+void SideBar::Open(int console)
+{
+	NotifyBegin();
+	Choose(console);
+	active_console = console;
+	if (!visible)
 		Show();
+	NotifyEnd();
 }
 
 bool SideBar::IsActive(int console)

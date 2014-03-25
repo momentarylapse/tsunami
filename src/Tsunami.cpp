@@ -239,7 +239,11 @@ void Tsunami::OnDeleteTrack()
 			log->Error(_("Es muss mindestens eine Spur existieren"));
 			return;
 		}
-		audio->DeleteTrack(get_track_index(view->cur_track));
+
+		if (view->cur_track)
+			audio->DeleteTrack(get_track_index(view->cur_track));
+		else
+			log->Error(_("Keine Spur ausgew&ahlt"));
 	}
 }
 
@@ -259,7 +263,10 @@ void Tsunami::OnAudioProperties()
 
 void Tsunami::OnTrackProperties()
 {
-	side_bar->Choose(SideBar::TRACK_DIALOG);
+	if (view->cur_action)
+		side_bar->Choose(SideBar::TRACK_DIALOG);
+	else
+		log->Error(_("Keine Spur ausgew&ahlt"));
 }
 
 void Tsunami::OnSubProperties()

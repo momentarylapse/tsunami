@@ -11,6 +11,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observable.h"
 
+class AudioView;
 class AudioFile;
 class AudioOutput;
 class Track;
@@ -31,7 +32,7 @@ public:
 class BottomBar : public HuiPanel, public Observable
 {
 public:
-	BottomBar(AudioFile *audio, AudioOutput *output, Log *log);
+	BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log);
 	virtual ~BottomBar();
 
 	void OnClose();
@@ -49,7 +50,6 @@ public:
 		NUM_CONSOLES
 	};
 
-	void SetTrack(Track *t);
 	void Choose(int console);
 	bool IsActive(int console);
 	int active_console;

@@ -6,6 +6,7 @@
  */
 
 #include "FxConsole.h"
+#include "../AudioView.h"
 #include "../../Data/Track.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/PluginManager.h"
@@ -100,9 +101,10 @@ public:
 	int index;
 };
 
-FxConsole::FxConsole(AudioFile *_audio) :
+FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 	BottomBarConsole(_("Effekte"))
 {
+	view = _view;
 	audio = _audio;
 	id_inner = "mixing_inner_table";
 
@@ -117,6 +119,7 @@ FxConsole::FxConsole(AudioFile *_audio) :
 
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
 
+	Subscribe(view, "CurTrackChange");
 	Subscribe(audio, "AddEffect");
 	Subscribe(audio, "DeleteEffect");
 }
@@ -124,6 +127,7 @@ FxConsole::FxConsole(AudioFile *_audio) :
 FxConsole::~FxConsole()
 {
 	Clear();
+	Unsubscribe(view);
 	Unsubscribe(audio);
 }
 
@@ -183,6 +187,8 @@ void FxConsole::OnUpdate(Observable* o, const string &message)
 	//msg_write("FxPanel: " + message);
 	if ((o == track) && (message == "Delete"))
 		SetTrack(NULL);
+	else if ((o == view) && (message == "CurTrackChange"))
+		SetTrack(view->cur_track);
 	else
 		SetTrack(track);
 }

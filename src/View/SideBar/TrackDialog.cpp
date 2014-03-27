@@ -114,7 +114,6 @@ void TrackDialog::OnBeatPartition()
 
 void TrackDialog::OnUpdate(Observable *o, const string &message)
 {
-	msg_write(o->GetName() + " - " + message);
 	if (o == view){
 		SetTrack(view->cur_track);
 	}else if ((o == track) && (message == "Delete")){

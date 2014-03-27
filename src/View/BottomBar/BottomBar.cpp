@@ -12,7 +12,7 @@
 #include "LogDialog.h"
 #include "SampleManager.h"
 
-BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
+BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
 {
 	AddControlTable("!noexpandy,height=300", 0, 0, 3, 1, "root_grid");
@@ -28,7 +28,7 @@ BottomBar::BottomBar(AudioFile *audio, AudioOutput *output, Log *log) :
 	AddText("!big,angle=90,expandy\\...", 0, 2, 0, 0, "title");
 	AddButton("!noexpandy,flat", 0, 3, 0, 0, "previous");
 	SetImage("previous", "hui:back");
-	fx_console = new FxConsole(audio);
+	fx_console = new FxConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output);
 	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
@@ -95,10 +95,5 @@ void BottomBar::Choose(int console)
 bool BottomBar::IsActive(int console)
 {
 	return (active_console == console) && visible;
-}
-
-void BottomBar::SetTrack(Track *t)
-{
-	fx_console->SetTrack(t);
 }
 

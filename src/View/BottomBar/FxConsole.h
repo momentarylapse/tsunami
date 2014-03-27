@@ -13,11 +13,12 @@
 
 class Track;
 class AudioFile;
+class AudioView;
 
 class FxConsole : public BottomBarConsole, public Observer
 {
 public:
-	FxConsole(AudioFile *audio);
+	FxConsole(AudioView *view, AudioFile *audio);
 	virtual ~FxConsole();
 
 	void Clear();
@@ -29,6 +30,7 @@ public:
 
 	string id_inner;
 
+	AudioView *view;
 	Track *track;
 	AudioFile *audio;
 	Array<HuiPanel*> panels;

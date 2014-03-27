@@ -40,7 +40,7 @@ void *ActionTrackAdd::execute(Data *d)
 
 	Track *t = new Track;
 
-	t->name = format(_("Spur %d"), a->track.num + 1);
+	//t->name = format(_("Spur %d"), a->track.num + 1);
 	t->root = a;
 	t->is_selected = true;
 	t->type = type;

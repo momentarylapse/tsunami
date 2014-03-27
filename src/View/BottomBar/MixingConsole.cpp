@@ -96,7 +96,7 @@ void TrackMixer::Update()
 	SetFloat(vol_slider_id, vol2slider(track->volume));
 	SetFloat(pan_slider_id, track->panning * 0.5f + 0.5f);
 	Check(mute_id, track->muted);
-	SetString(id_name, "!bold\\" + track->name);
+	SetString(id_name, "!bold\\" + track->GetNiceName());
 }
 
 

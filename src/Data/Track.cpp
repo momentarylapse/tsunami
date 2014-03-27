@@ -115,7 +115,10 @@ string Track::GetNiceName()
 {
 	if (name.num > 0)
 		return name;
-	return _("namenlose Spur");
+	if (type == TYPE_TIME)
+		return _("Metronom");
+	int n = get_track_index(this);
+	return format(_("Spur %d"), n+1);
 }
 
 BufferBox Track::ReadBuffers(int level_no, const Range &r)

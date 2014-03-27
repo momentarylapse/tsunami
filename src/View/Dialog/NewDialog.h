@@ -23,6 +23,7 @@ public:
 
 	void OnOk();
 	void OnClose();
+	void OnMetronome();
 
 	AudioFile *audio;
 };

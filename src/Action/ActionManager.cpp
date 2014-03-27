@@ -156,7 +156,8 @@ void ActionManager::EndActionGroup()
 	if (cur_group_level == 0){
 		ActionGroup *g = cur_group;
 		cur_group = NULL;
-		Execute(g);
+		if (g->action.num > 0)
+			Execute(g);
 	}
 }
 

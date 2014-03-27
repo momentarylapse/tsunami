@@ -81,8 +81,3 @@ bool SideBar::IsActive(int console)
 	return (active_console == console) && visible;
 }
 
-void SideBar::SetTrack(Track *t)
-{
-	track_dialog->SetTrack(t);
-}
-

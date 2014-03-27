@@ -557,8 +557,7 @@ void AudioView::OnLeftDoubleClick()
 			}else if (selection.type == SEL_TYPE_TRACK){
 				tsunami->side_bar->Open(SideBar::TRACK_DIALOG);
 			}else if (!selection.track){
-				cur_track = NULL;
-				tsunami->bottom_bar->SetTrack(NULL);
+				SetCurTrack(NULL);
 				tsunami->side_bar->Open(SideBar::AUDIO_FILE_DIALOG);
 			}
 			selection.type = SEL_TYPE_NONE;
@@ -1365,14 +1364,19 @@ void AudioView::SelectTrack(Track *t, bool diff)
 
 void AudioView::SetCurSample(SampleRef *s)
 {
+	if (cur_sample == s)
+		return;
 	cur_sample = s;
+	Notify("CurSampleChange");
 }
 
 
 void AudioView::SetCurTrack(Track *t)
 {
+	if (cur_track == t)
+		return;
 	cur_track = t;
-	tsunami->side_bar->SetTrack(cur_track);
+	Notify("CurTrackChange");
 	tsunami->side_bar->Choose(t ? SideBar::TRACK_DIALOG : SideBar::AUDIO_FILE_DIALOG);
 	tsunami->bottom_bar->SetTrack(cur_track);
 }

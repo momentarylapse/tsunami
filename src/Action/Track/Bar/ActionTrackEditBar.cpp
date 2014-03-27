@@ -31,6 +31,7 @@ void *ActionTrackEditBar::execute(Data *d)
 	BarPattern temp = bar;
 	bar = t->bar[index];
 	t->bar[index] = temp;
+	t->Notify("Change");
 
 	return NULL;
 }

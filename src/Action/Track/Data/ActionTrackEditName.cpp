@@ -25,6 +25,7 @@ void *ActionTrackEditName::execute(Data *d)
 	Track *t = a->get_track(track_no);
 
 	t->name = new_value;
+	t->Notify("Change");
 
 	return NULL;
 }
@@ -35,6 +36,7 @@ void ActionTrackEditName::undo(Data *d)
 	Track *t = a->get_track(track_no);
 
 	t->name = old_value;
+	t->Notify("Change");
 }
 
 

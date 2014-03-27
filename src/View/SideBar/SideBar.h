@@ -12,7 +12,6 @@
 #include "../../Stuff/Observable.h"
 
 class AudioFile;
-class Track;
 class TrackDialog;
 class AudioFileDialog;
 class AudioView;
@@ -42,7 +41,6 @@ public:
 		NUM_CONSOLES
 	};
 
-	void SetTrack(Track *t);
 	void Choose(int console);
 	void Open(int console);
 	bool IsActive(int console);

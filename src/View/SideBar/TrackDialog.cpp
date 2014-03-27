@@ -33,7 +33,7 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	Expand("ld_t_effects", 0, true);
 
 	LoadData();
-	Subscribe(tsunami->audio);
+	Subscribe(view, "CurTrackChange");
 
 	EventM("name", this, &TrackDialog::OnName);
 	EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
@@ -44,9 +44,10 @@ TrackDialog::TrackDialog(AudioView *_view) :
 
 TrackDialog::~TrackDialog()
 {
-	Unsubscribe(tsunami->audio);
-	if (bar_list)
-		delete(bar_list);
+	Unsubscribe(view);
+	if (track)
+		Unsubscribe(track);
+	delete(bar_list);
 }
 
 void TrackDialog::LoadData()
@@ -66,14 +67,17 @@ void TrackDialog::LoadData()
 		HideControl("ld_t_bars", true);
 		//Enable("synthesizer", track);
 		//Enable("config_synth", track);
-		//Enable("edit_midi_track", false);
 	}
 }
 
 void TrackDialog::SetTrack(Track *t)
 {
+	if (track)
+		Unsubscribe(track);
 	track = t;
 	LoadData();
+	if (track)
+		Subscribe(track);
 }
 
 void TrackDialog::OnName()
@@ -110,14 +114,12 @@ void TrackDialog::OnBeatPartition()
 
 void TrackDialog::OnUpdate(Observable *o, const string &message)
 {
-	if (!track)
-		return;
-	bool ok = false;
-	foreach(Track *t, tsunami->audio->track)
-		if (track == t)
-			ok = true;
-	if (ok)
-		LoadData();
-	else
+	msg_write(o->GetName() + " - " + message);
+	if (o == view){
+		SetTrack(view->cur_track);
+	}else if ((o == track) && (message == "Delete")){
 		SetTrack(NULL);
+	}else{
+		LoadData();
+	}
 }

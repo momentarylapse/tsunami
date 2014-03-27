@@ -36,6 +36,7 @@ void *ActionTrackSetSynthesizer::execute(Data *d)
 	Synthesizer *temp = synth;
 	synth = t->synth;
 	t->synth = temp;
+	t->Notify("Change");
 
 	return t;
 }

@@ -34,9 +34,9 @@ void ActionTrackEditVolume::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
-	t->Notify("Change");
 
 	t->volume = old_value;
+	t->Notify("Change");
 }
 
 

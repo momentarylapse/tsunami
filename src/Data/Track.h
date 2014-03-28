@@ -66,6 +66,7 @@ public:
 	void EditEffect(int index, const string &param_old);
 	SampleRef *AddSample(int pos, int index);
 	void DeleteSample(int index);
+	void EditSample(int index, float volume, bool mute, int rep_num, int rep_delay);
 	void AddMidiNote(const MidiNote &n);
 	void DeleteMidiNote(int index);
 	void SetSynthesizer(Synthesizer *synth);

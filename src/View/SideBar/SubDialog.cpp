@@ -26,12 +26,12 @@ SubDialog::SubDialog(AudioView *v, AudioFile *a):
 	EventM("repdelay", this, &SubDialog::OnRepDelay);
 
 	Subscribe(view, "CurSampleChange");
-	Subscribe(audio);
 }
 
 SubDialog::~SubDialog()
 {
-	Unsubscribe(audio);
+	if (sample)
+		Unsubscribe(sample);
 	Unsubscribe(view);
 	delete(volume_slider);
 }
@@ -44,8 +44,14 @@ void SubDialog::OnName()
 
 void SubDialog::OnMute()
 {
-	sample->muted = IsChecked("");
+	if (!sample)
+		return;
+	Unsubscribe(sample);
+	int index = get_sample_ref_index(sample);
+	track->EditSample(index, sample->volume, IsChecked(""), sample->rep_num, sample->rep_delay);
+
 	volume_slider->Enable(!sample->muted);
+	Subscribe(sample);
 }
 
 void SubDialog::OnLevelTrack()
@@ -55,18 +61,33 @@ void SubDialog::OnLevelTrack()
 
 void SubDialog::OnVolume()
 {
-	sample->volume = volume_slider->Get();
+	if (!sample)
+		return;
+	Unsubscribe(sample);
+	int index = get_sample_ref_index(sample);
+	track->EditSample(index, volume_slider->Get(), sample->muted, sample->rep_num, sample->rep_delay);
+	Subscribe(sample);
 }
 
 void SubDialog::OnRepNum()
 {
-	sample->rep_num = GetInt("repnum") - 1;
+	if (!sample)
+		return;
+	Unsubscribe(sample);
+	int index = get_sample_ref_index(sample);
+	track->EditSample(index, sample->volume, sample->muted, GetInt("repnum") - 1, sample->rep_delay);
 	Enable("repdelay", sample->rep_num > 0);
+	Subscribe(sample);
 }
 
 void SubDialog::OnRepDelay()
 {
-	sample->rep_delay = (int)(GetFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f);
+	if (!sample)
+		return;
+	Unsubscribe(sample);
+	int index = get_sample_ref_index(sample);
+	track->EditSample(index, sample->volume, sample->muted, sample->rep_num, (int)(GetFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
+	Subscribe(sample);
 }
 
 void SubDialog::LoadData()
@@ -94,9 +115,15 @@ void SubDialog::LoadData()
 
 void SubDialog::OnUpdate(Observable *o, const string &message)
 {
-	//msg_write(o->GetName() + " - " + message);
 	if (o == view){
+		if (sample)
+			Unsubscribe(sample);
+		track = view->cur_track;
 		sample = view->cur_sample;
+		if (sample)
+			Subscribe(sample);
+		LoadData();
+	}else{
 		LoadData();
 	}
 }

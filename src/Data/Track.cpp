@@ -19,6 +19,7 @@
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Sample/ActionTrackAddSample.h"
 #include "../Action/Track/Sample/ActionTrackDeleteSample.h"
+#include "../Action/Track/Sample/ActionTrackEditSample.h"
 #include "../Action/Track/Synthesizer/ActionTrackSetSynthesizer.h"
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
@@ -213,6 +214,11 @@ SampleRef *Track::AddSample(int pos, int index)
 void Track::DeleteSample(int index)
 {
 	root->Execute(new ActionTrackDeleteSample(this, index));
+}
+
+void Track::EditSample(int index, float volume, bool mute, int rep_num, int rep_delay)
+{
+	root->Execute(new ActionTrackEditSample(this, index, volume, mute, rep_num, rep_delay));
 }
 
 void Track::AddMidiNote(const MidiNote &n)

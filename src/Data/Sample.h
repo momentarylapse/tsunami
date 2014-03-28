@@ -10,6 +10,7 @@
 
 #include "BufferBox.h"
 #include "../lib/math/rect.h"
+#include "../Stuff/Observable.h"
 
 class AudioFile;
 class Track;
@@ -36,7 +37,7 @@ public:
 
 
 
-class SampleRef
+class SampleRef : public Observable
 {
 public:
 	SampleRef(Sample *sample);

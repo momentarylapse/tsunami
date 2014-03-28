@@ -36,6 +36,7 @@ void Sample::unref()
 
 
 SampleRef::SampleRef(Sample *sample) :
+	Observable("SampleRef"),
 	buf(sample->buf)
 {
 	origin = sample;
@@ -46,13 +47,14 @@ SampleRef::SampleRef(Sample *sample) :
 	volume = 1;
 	muted = false;
 	rep_num = 0;
-	rep_delay = 10000;
+	rep_delay = sample->owner->sample_rate;
 	is_selected = false;
 }
 
 SampleRef::~SampleRef()
 {
 	origin->unref();
+	Notify("Delete");
 }
 
 Track *SampleRef::GetParent()

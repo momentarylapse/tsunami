@@ -8,8 +8,6 @@
 #include "AudioView.h"
 #include "../Tsunami.h"
 #include "SideBar/SideBar.h"
-#include "BottomBar/BottomBar.h"
-#include "Dialog/SubDialog.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
@@ -284,10 +282,9 @@ void AudioView::SelectUnderMouse()
 	}
 
 	// sub
+	SetCurSample(s);
 	if (selection.type == SEL_TYPE_SAMPLE){
 		SelectSample(s, control);
-		if (s->is_selected)
-			SetCurSample(s);
 	}
 }
 
@@ -553,7 +550,7 @@ void AudioView::OnLeftDoubleClick()
 	if (mouse_possibly_selecting < mouse_min_move_to_select)
 		if (audio->used){
 			if (selection.type == SEL_TYPE_SAMPLE){
-				ExecuteSubDialog(tsunami);
+				tsunami->side_bar->Open(SideBar::SUB_DIALOG);
 			}else if (selection.type == SEL_TYPE_TRACK){
 				tsunami->side_bar->Open(SideBar::TRACK_DIALOG);
 			}else if (!selection.track){
@@ -1411,18 +1408,6 @@ void AudioView::Move(float dpos)
 {
 	view_pos += dpos;
 	ForceRedraw();
-}
-
-
-
-void AudioView::ExecuteSubDialog(HuiWindow *win)
-{
-	if (!cur_sample){
-		tsunami->log->Error(_("Kein Sample ausgew&ahlt"));
-		return;
-	}
-	SubDialog *dlg = new SubDialog(win, false, cur_sample);
-	dlg->Run();
 }
 
 

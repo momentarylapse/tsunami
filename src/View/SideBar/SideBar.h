@@ -13,6 +13,7 @@
 
 class AudioFile;
 class TrackDialog;
+class SubDialog;
 class AudioFileDialog;
 class AudioView;
 
@@ -38,6 +39,7 @@ public:
 	{
 		AUDIO_FILE_DIALOG,
 		TRACK_DIALOG,
+		SUB_DIALOG,
 		NUM_CONSOLES
 	};
 
@@ -49,6 +51,7 @@ public:
 
 	AudioFileDialog *audio_file_dialog;
 	TrackDialog *track_dialog;
+	SubDialog *sub_dialog;
 };
 
 #endif /* BOTTOMBAR_H_ */

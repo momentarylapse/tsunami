@@ -152,8 +152,6 @@ public:
 	void Zoom(float f);
 	void Move(float dpos);
 
-	void ExecuteSubDialog(HuiWindow *win);
-
 
 	bool force_redraw;
 

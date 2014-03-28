@@ -263,15 +263,18 @@ void Tsunami::OnAudioProperties()
 
 void Tsunami::OnTrackProperties()
 {
-	if (view->cur_action)
-		side_bar->Choose(SideBar::TRACK_DIALOG);
+	if (view->cur_track)
+		side_bar->Open(SideBar::TRACK_DIALOG);
 	else
 		log->Error(_("Keine Spur ausgew&ahlt"));
 }
 
 void Tsunami::OnSubProperties()
 {
-	view->ExecuteSubDialog(this);
+	if (view->cur_sample)
+		side_bar->Open(SideBar::SUB_DIALOG);
+	else
+		log->Error(_("Kein Sample ausgew&ahlt"));
 }
 
 void Tsunami::OnShowLog()

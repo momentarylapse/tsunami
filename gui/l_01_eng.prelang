@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-182
+181
 // Data (ID,Text)
 about
 
@@ -138,10 +138,6 @@ ld_t_volume
 level_add
 
 level_delete
-
-level_dialog
-Level
-level_dialog_buttonbar
 
 level_down
 
@@ -327,6 +323,8 @@ sub_from_selection
 
 sub_properties
 
+sub_track_dialog
+
 synthesizer
 
 tags
@@ -492,6 +490,8 @@ MIDI Quelle auswählen
 
 MIDI Quellen
 
+Metronom
+
 Mischpult
 
 Nachrichten
@@ -565,8 +565,6 @@ lade raw
 lade wave
 
 message.txt öffnen
-
-namenlose Spur
 
 neue Audiodatei
 

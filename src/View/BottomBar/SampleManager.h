@@ -21,6 +21,7 @@ public:
 	void FillList();
 
 	void OnListSelect();
+	void OnListEdit();
 	void OnImportFromFile();
 	void OnInsert();
 	void OnCreateFromSelection();

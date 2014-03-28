@@ -71,6 +71,7 @@ public:
 	void DeleteTrack(int index);
 	Sample *AddSample(const string &name, BufferBox &buf);
 	void DeleteSample(int index);
+	void EditSampleName(int index, const string &name);
 	void AddLevel();
 	void InsertSelectedSubs(int level_no);
 	void DeleteSelection(int level_no, bool all_levels);

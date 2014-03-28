@@ -22,6 +22,7 @@ SampleManager::SampleManager(AudioFile *a) :
 	EventM("insert_sample", this, &SampleManager::OnInsert);
 	EventM("create_from_selection", this, &SampleManager::OnCreateFromSelection);
 	EventM("delete_sample", this, &SampleManager::OnDelete);
+	EventMX("sample_list", "hui:change", this, &SampleManager::OnListEdit);
 	EventMX("sample_list", "hui:select", this, &SampleManager::OnListSelect);
 
 	audio = a;
@@ -73,6 +74,12 @@ void SampleManager::FillList()
 void SampleManager::OnListSelect()
 {
 	selected = GetInt("");
+}
+
+void SampleManager::OnListEdit()
+{
+	selected = GetInt("");
+	audio->EditSampleName(selected, GetCell("sample_list", selected, 1));
 }
 
 void SampleManager::OnImportFromFile()

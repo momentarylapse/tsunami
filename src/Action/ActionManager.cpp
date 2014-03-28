@@ -80,6 +80,8 @@ bool ActionManager::merge(Action *a)
 void *ActionManager::Execute(Action *a)
 {
 	if (enabled){
+		if (a->is_trivial())
+			return NULL;
 		if (cur_group)
 			return cur_group->AddSubAction(a, data);
 		add(a);
@@ -156,8 +158,7 @@ void ActionManager::EndActionGroup()
 	if (cur_group_level == 0){
 		ActionGroup *g = cur_group;
 		cur_group = NULL;
-		if (g->action.num > 0)
-			Execute(g);
+		Execute(g);
 	}
 }
 

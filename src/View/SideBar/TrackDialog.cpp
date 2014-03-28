@@ -8,7 +8,6 @@
 #include "TrackDialog.h"
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
-#include "../Helper/FxList.h"
 #include "../Helper/BarList.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../Dialog/SynthesizerDialog.h"

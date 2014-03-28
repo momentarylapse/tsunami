@@ -25,6 +25,8 @@ public:
 	virtual void abort_and_notify(Data *d);
 	virtual void set_param_and_notify(Data *d, int _param);
 
+	virtual bool is_trivial();
+
 private:
 	struct SubSaveData{
 		int track_no, sub_no;

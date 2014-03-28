@@ -39,7 +39,7 @@ SubDialog::~SubDialog()
 
 void SubDialog::OnName()
 {
-	sample->origin->name = GetString("");
+	//sample->origin->name = GetString("");
 }
 
 void SubDialog::OnMute()
@@ -71,7 +71,7 @@ void SubDialog::OnRepDelay()
 
 void SubDialog::LoadData()
 {
-	Enable("name", sample);
+	Enable("name", false);
 	Enable("mute", sample);
 	volume_slider->Enable(sample);
 	Enable("repnum", sample);
@@ -82,11 +82,11 @@ void SubDialog::LoadData()
 	SetString("name", sample->origin->name);
 	SetDecimals(1);
 	Check("mute", sample->muted);
+	volume_slider->Set(sample->volume);
 	volume_slider->Enable(!sample->muted);
 	foreach(Track *t, audio->track)
 		AddString("level_track", t->GetNiceName());
 	SetInt("level_track", sample->track_no);
-//	AddEffectList(LevelDialog, "fx_list", s->fx);
 	SetInt("repnum", sample->rep_num + 1);
 	SetFloat("repdelay", (float)sample->rep_delay / (float)sample->owner->sample_rate * 1000.0f);
 	Enable("repdelay", sample->rep_num > 0);
@@ -94,7 +94,7 @@ void SubDialog::LoadData()
 
 void SubDialog::OnUpdate(Observable *o, const string &message)
 {
-	msg_write(o->GetName() + " - " + message);
+	//msg_write(o->GetName() + " - " + message);
 	if (o == view){
 		sample = view->cur_sample;
 		LoadData();

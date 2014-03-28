@@ -13,7 +13,6 @@
 class AudioFile;
 class Slider;
 class BarList;
-class FxList;
 
 class AudioFileDialog: public SideBarConsole, public Observer
 {
@@ -35,7 +34,6 @@ public:
 
 	AudioFile *audio;
 	Slider *volume_slider;
-	FxList *fx_list;
 	BarList *bar_list;
 };
 

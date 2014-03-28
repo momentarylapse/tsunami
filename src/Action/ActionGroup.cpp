@@ -52,4 +52,11 @@ void ActionGroup::redo(Data *d)
 		a->redo(d);
 }
 
+bool ActionGroup::is_trivial()
+{
+	foreach(Action *a, action)
+		if (!a->is_trivial())
+			return false;
+	return true;
+}
 

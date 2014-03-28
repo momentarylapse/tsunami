@@ -27,6 +27,8 @@ public:
 	virtual void undo(Data *d);
 	virtual void redo(Data *d);
 
+	virtual bool is_trivial();
+
 protected:
 	void *AddSubAction(Action *a, Data *d);
 	virtual void *execute_return(Data *d);

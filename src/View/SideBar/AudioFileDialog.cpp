@@ -10,7 +10,6 @@
 #include "../../Stuff/Observer.h"
 #include "../../Data/AudioFile.h"
 #include "../Helper/Slider.h"
-#include "../Helper/FxList.h"
 #include "../Helper/BarList.h"
 
 AudioFileDialog::AudioFileDialog(AudioFile *a) :
@@ -24,9 +23,7 @@ AudioFileDialog::AudioFileDialog(AudioFile *a) :
 	EmbedDialog("audio_file_dialog", 0, 0);
 	SetDecimals(1);
 	volume_slider = new Slider(this, "audio_volume_slider", "audio_volume", 0, 1, 100, (void(HuiEventHandler::*)())&AudioFileDialog::OnVolume, audio->volume, this);
-	fx_list = new FxList(this, "audio_fx_list", "audio_add_effect", "audio_configure_effect", "audio_delete_effect");
 	bar_list = new BarList(this, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
-	fx_list->SetAudio(audio);
 	HideControl("ad_t_bars", true);
 
 	Expand("ad_t_tags", 0, true);
@@ -44,7 +41,6 @@ AudioFileDialog::AudioFileDialog(AudioFile *a) :
 AudioFileDialog::~AudioFileDialog()
 {
 	Unsubscribe(audio);
-	delete(fx_list);
 	delete(bar_list);
 	delete(volume_slider);
 }
@@ -64,7 +60,6 @@ void AudioFileDialog::LoadData()
 	AddString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
 	AddString("data_list", _("Format\\16 bit stereo (nami)"));
 	Enable("delete_tag", false);
-	fx_list->FillList();
 }
 
 

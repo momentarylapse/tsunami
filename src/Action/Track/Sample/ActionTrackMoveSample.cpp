@@ -69,4 +69,8 @@ void ActionTrackMoveSample::abort_and_notify(Data *d)
 	d->Notify("Change");
 }
 
+bool ActionTrackMoveSample::is_trivial()
+{
+	return (param == 0);
+}
 

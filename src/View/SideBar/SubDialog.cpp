@@ -47,7 +47,7 @@ void SubDialog::OnMute()
 	if (!sample)
 		return;
 	Unsubscribe(sample);
-	int index = get_sample_ref_index(sample);
+	int index = sample->get_index();
 	track->EditSample(index, sample->volume, IsChecked(""), sample->rep_num, sample->rep_delay);
 
 	volume_slider->Enable(!sample->muted);
@@ -64,7 +64,7 @@ void SubDialog::OnVolume()
 	if (!sample)
 		return;
 	Unsubscribe(sample);
-	int index = get_sample_ref_index(sample);
+	int index = sample->get_index();
 	track->EditSample(index, volume_slider->Get(), sample->muted, sample->rep_num, sample->rep_delay);
 	Subscribe(sample);
 }
@@ -74,7 +74,7 @@ void SubDialog::OnRepNum()
 	if (!sample)
 		return;
 	Unsubscribe(sample);
-	int index = get_sample_ref_index(sample);
+	int index = sample->get_index();
 	track->EditSample(index, sample->volume, sample->muted, GetInt("repnum") - 1, sample->rep_delay);
 	Enable("repdelay", sample->rep_num > 0);
 	Subscribe(sample);
@@ -85,7 +85,7 @@ void SubDialog::OnRepDelay()
 	if (!sample)
 		return;
 	Unsubscribe(sample);
-	int index = get_sample_ref_index(sample);
+	int index = sample->get_index();
 	track->EditSample(index, sample->volume, sample->muted, sample->rep_num, (int)(GetFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
 	Subscribe(sample);
 }

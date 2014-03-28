@@ -21,6 +21,8 @@ public:
 	Sample();
 	~Sample();
 
+	int get_index();
+
 	AudioFile *owner;
 
 	string name;
@@ -45,6 +47,8 @@ public:
 
 	Track *GetParent();
 	Range GetRange();
+
+	int get_index();
 
 	int pos;
 	Sample *origin;

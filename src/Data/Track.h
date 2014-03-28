@@ -53,6 +53,7 @@ public:
 	BufferBox ReadBuffersCol(const Range &r);
 
 	string GetNiceName();
+	int get_index();
 
 	// actions
 	void SetName(const string &name);

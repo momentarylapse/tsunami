@@ -44,35 +44,15 @@ float db2amplitude(float db)
 
 int get_track_index(Track *t)
 {
-	if (t){
-		AudioFile *a = t->root;
-		if (a){
-			foreachi(Track *tt, a->track, i)
-				if (t == tt)
-					return i;
-		}
-	}
+	if (t)
+		return t->get_index();
 	return -1;
 }
 
 int get_sample_ref_index(SampleRef *s)
 {
-	if (s){
-		Track *t = s->GetParent();
-		if (t){
-			foreachi(SampleRef *ss, t->sample, i)
-				if (s == ss)
-					return i;
-		}
-	}
-	return -1;
-}
-
-int get_sample_index(Sample *s)
-{
-	foreachi(Sample *ss, s->owner->sample, i)
-		if (s == ss)
-			return i;
+	if (s)
+		return s->get_index();
 	return -1;
 }
 

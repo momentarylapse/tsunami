@@ -23,6 +23,15 @@ Sample::~Sample()
 {
 }
 
+
+int Sample::get_index()
+{
+	foreachi(Sample *s, owner->sample, i)
+		if (this == s)
+			return i;
+	return -1;
+}
+
 void Sample::ref()
 {
 	ref_count ++;
@@ -55,6 +64,17 @@ SampleRef::~SampleRef()
 {
 	origin->unref();
 	Notify("Delete");
+}
+
+int SampleRef::get_index()
+{
+	Track *t = GetParent();
+	if (t){
+		foreachi(SampleRef *s, t->sample, i)
+			if (this == s)
+				return i;
+	}
+	return -1;
 }
 
 Track *SampleRef::GetParent()

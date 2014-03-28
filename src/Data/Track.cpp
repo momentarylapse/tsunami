@@ -122,6 +122,16 @@ string Track::GetNiceName()
 	return format(_("Spur %d"), n+1);
 }
 
+int Track::get_index()
+{
+	if (root){
+		foreachi(Track *t, root->track, i)
+			if (this == t)
+				return i;
+	}
+	return -1;
+}
+
 BufferBox Track::ReadBuffers(int level_no, const Range &r)
 {
 	BufferBox buf;

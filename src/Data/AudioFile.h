@@ -105,9 +105,7 @@ public:
 };
 
 
-
 int get_track_index(Track *t);
-int get_sample_ref_index(SampleRef *s);
 int get_sample_index(Sample *s);
 
 float amplitude2db(float amp);

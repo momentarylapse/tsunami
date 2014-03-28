@@ -100,7 +100,7 @@ void WriteSampleRef(CFile *f, SampleRef *s)
 
 	f->WriteStr(s->origin->name);
 	f->WriteInt(s->pos);
-	f->WriteInt(get_sample_index(s->origin));
+	f->WriteInt(s->origin->get_index());
 	f->WriteFloat(s->volume);
 	f->WriteBool(s->muted);
 	f->WriteInt(s->rep_num);

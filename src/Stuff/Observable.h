@@ -13,14 +13,7 @@
 #include "../lib/hui/hui.h"
 
 class Observer;
-
-struct ObserverRequest
-{
-	ObserverRequest(){}
-	ObserverRequest(Observer *o, const string &message);
-	Observer* observer;
-	string message;
-};
+struct ObserverRequest;
 
 class Observable : public HuiEventHandler
 {

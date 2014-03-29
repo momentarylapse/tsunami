@@ -108,9 +108,11 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 	audio = _audio;
 	id_inner = "mixing_inner_table";
 
-	AddControlTable("!expandy", 0, 0, 1, 30, id_inner);
+	AddControlTable("!expandy", 0, 0, 1, 32, id_inner);
 	SetTarget(id_inner, 0);
-	AddButton("!expandy,flat", 29, 0, 0, 0, "add");
+	AddText("!angle=90\\...", 29, 0, 0, 0, "track_name");
+	AddText("- noch keine Effekte -", 30, 0, 0, 0, "comment_no_fx");
+	AddButton("!expandy,flat", 31, 0, 0, 0, "add");
 	SetImage("add", "hui:add");
 	SetTooltip("add", _("neuen Effekt hinzuf&ugen"));
 
@@ -166,7 +168,9 @@ void FxConsole::SetTrack(Track *t)
 		Subscribe(track, "Delete");
 		Subscribe(track, "AddEffect");
 		Subscribe(track, "DeleteEffect");
-	}
+		SetString("track_name", "!angle=90\\wirken auf die Spur '" + track->GetNiceName() + "'");
+	}else
+		SetString("track_name", "!angle=90\\wirken auf die komplette Datei");
 
 
 	Array<Effect*> fx;
@@ -179,15 +183,16 @@ void FxConsole::SetTrack(Track *t)
 		Embed(panels.back(), id_inner, i*2, 0);
 		AddSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
 	}
+	HideControl("comment_no_fx", fx.num > 0);
 	//Enable("add", track);
 }
 
 void FxConsole::OnUpdate(Observable* o, const string &message)
 {
-	//msg_write("FxPanel: " + message);
-	if ((o == track) && (message == "Delete"))
+	//msg_write("FxPanel: " + o->GetName() + "/" + message);
+	if ((o == track) && (message == "Delete")){
 		SetTrack(NULL);
-	else if ((o == view) && (message == "CurTrackChange"))
+	}else if ((o == view) && (message == "CurTrackChange"))
 		SetTrack(view->cur_track);
 	else
 		SetTrack(track);

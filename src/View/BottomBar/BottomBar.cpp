@@ -41,8 +41,8 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	EventM("previous", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnPrevious);
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);
 
-	Choose(MIXING_CONSOLE);
 	visible = true;
+	Choose(MIXING_CONSOLE);
 }
 
 BottomBar::~BottomBar()

@@ -8,11 +8,22 @@
 #include "Observable.h"
 #include "Observer.h"
 
-ObserverRequest::ObserverRequest(Observer *o, const string &_message)
+
+
+struct ObserverRequest
 {
-	observer = o;
-	message = _message;
-}
+	ObserverRequest(){}
+	ObserverRequest(Observer *o, const string &_message)
+	{
+		observer = o;
+		message = _message;
+	}
+	Observer* observer;
+	string message;
+};
+
+typedef ObserverRequest Notification;
+
 
 Observable::Observable(const string &name)
 {
@@ -65,21 +76,24 @@ void Observable::RemoveWrappedObserver(void* handler)
 string Observable::GetName()
 {	return observable_name;	}
 
-
-
 void Observable::NotifySend()
 {
-	Array<string> queue = message_queue;
+	Array<Notification> notifications;
+
+	// decide whom to send what
+	foreach(string &m, message_queue){
+		//msg_write("send " + observable_name + ": " + queue[i]);
+		foreach(ObserverRequest &r, requests){
+			if ((r.message == m) or (r.message.num == 0))
+				notifications.add(Notification(r.observer, m));
+		}
+	}
+
 	message_queue.clear();
 
 	// send
-	for (int i=0;i<queue.num;i++)
-		for (int j=0;j<requests.num;j++){
-			//msg_write("send " + observable_name + ": " + queue[i]);
-			if ((requests[j].message == queue[i]) or (requests[j].message.num == 0)){
-				requests[j].observer->OnUpdate(this, queue[i]);
-			}
-	}
+	foreach(Notification &n, notifications)
+		n.observer->OnUpdate(this, n.message);
 }
 
 

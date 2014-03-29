@@ -110,14 +110,16 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 
 	AddControlTable("!expandy", 0, 0, 1, 32, id_inner);
 	SetTarget(id_inner, 0);
-	AddText("!angle=90\\...", 29, 0, 0, 0, "track_name");
-	AddText("- noch keine Effekte -", 30, 0, 0, 0, "comment_no_fx");
+	AddText("!angle=90\\...", 0, 0, 0, 0, "track_name");
+	AddSeparator("!vertical", 1, 0, 0, 0, "");
+	AddText(_("- hier sind (noch) keine Effekte aktiv -"), 30, 0, 0, 0, "comment_no_fx");
 	AddButton("!expandy,flat", 31, 0, 0, 0, "add");
 	SetImage("add", "hui:add");
 	SetTooltip("add", _("neuen Effekt hinzuf&ugen"));
 
 	track = NULL;
 	//Enable("add", false);
+	Enable("track_name", false);
 
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
 
@@ -168,9 +170,9 @@ void FxConsole::SetTrack(Track *t)
 		Subscribe(track, "Delete");
 		Subscribe(track, "AddEffect");
 		Subscribe(track, "DeleteEffect");
-		SetString("track_name", "!angle=90\\wirken auf die Spur '" + track->GetNiceName() + "'");
+		SetString("track_name", format(_("!angle=90\\wirken auf die Spur '%s'"), track->GetNiceName().c_str()));
 	}else
-		SetString("track_name", "!angle=90\\wirken auf die komplette Datei");
+		SetString("track_name", _("!angle=90\\wirken auf die komplette Datei"));
 
 
 	Array<Effect*> fx;
@@ -180,8 +182,8 @@ void FxConsole::SetTrack(Track *t)
 		fx = audio->fx;
 	foreachi(Effect *e, fx, i){
 		panels.add(new SingleFxPanel(audio, track, e, i));
-		Embed(panels.back(), id_inner, i*2, 0);
-		AddSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
+		Embed(panels.back(), id_inner, i*2 + 2, 0);
+		AddSeparator("!vertical", i*2 + 3, 0, 0, 0, "separator_" + i2s(i));
 	}
 	HideControl("comment_no_fx", fx.num > 0);
 	//Enable("add", track);

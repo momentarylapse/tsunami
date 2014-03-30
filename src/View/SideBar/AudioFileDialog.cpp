@@ -124,6 +124,7 @@ void AudioFileDialog::OnLevelsEdit()
 	int r = HuiGetEvent()->row;
 	if (r < 0)
 		return;
+	audio->RenameLevel(r, GetCell("levels", r, 1));
 }
 
 void AudioFileDialog::OnAddLevel()
@@ -133,10 +134,9 @@ void AudioFileDialog::OnAddLevel()
 
 void AudioFileDialog::OnDeleteLevel()
 {
-	/*int s = GetInt("levels");
+	int s = GetInt("levels");
 	if (s >= 0)
-		audio->DeleteLevel(s);*/
-	tsunami->log->Error(_("Ebene l&oschen: noch nicht implementiert..."));
+		audio->DeleteLevel(s, false);
 }
 
 void AudioFileDialog::OnUpdate(Observable *o, const string &message)

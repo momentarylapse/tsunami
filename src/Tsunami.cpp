@@ -435,7 +435,7 @@ void Tsunami::OnAddLevel()
 
 void Tsunami::OnDeleteLevel()
 {
-	log->Error(_("Ebene l&oschen: noch nicht implementiert..."));
+	audio->DeleteLevel(view->cur_level, true);
 }
 
 void Tsunami::OnCurLevel()
@@ -553,8 +553,8 @@ void Tsunami::UpdateMenu()
 	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
 	if (m){
 		m->Clear();
-		foreachib(string &l, audio->level_name, i)
-			m->AddItemCheckable(l, format("jump_to_level_%d", i));
+		for (int i=0; i<audio->level_name.num; i++)
+			m->AddItemCheckable(audio->GetNiceLevelName(i), format("jump_to_level_%d", i));
 		Check(format("jump_to_level_%d", view->cur_level), true);
 	}
 

@@ -9,6 +9,7 @@
 #include "../Plugins/Effect.h"
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "../Action/AudioFile/Level/ActionAudioAddLevel.h"
+#include "../Action/AudioFile/Level/ActionAudioRenameLevel.h"
 #include "../Action/AudioFile/Data/ActionAudioSetVolume.h"
 #include "../Action/AudioFile/Tag/ActionAudioAddTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioEditTag.h"
@@ -166,7 +167,7 @@ void AudioFile::Reset()
 	sample.clear();
 
 	level_name.clear();
-	level_name.add("level 1");
+	level_name.add("");
 
 	action_manager->Reset();
 
@@ -357,6 +358,16 @@ void AudioFile::AddLevel()
 	Execute(new ActionAudioAddLevel());
 }
 
+void AudioFile::DeleteLevel(int index, bool merge)
+{
+	tsunami->log->Error(_("Ebene l&oschen: noch nicht implementiert..."));
+}
+
+void AudioFile::RenameLevel(int index, const string &name)
+{
+	Execute(new ActionAudioRenameLevel(index, name));
+}
+
 void AudioFile::DeleteTrack(int index)
 {
 	Execute(new ActionTrackDelete(this, index));
@@ -446,5 +457,12 @@ int AudioFile::GetNextBeat(int pos)
 	if (!t)
 		return pos;
 	return t->bar.GetNextBeat(pos);
+}
+
+string AudioFile::GetNiceLevelName(int index)
+{
+	if (level_name[index].num > 0)
+		return level_name[index];
+	return format(_("Ebene %d"), index + 1);
 }
 

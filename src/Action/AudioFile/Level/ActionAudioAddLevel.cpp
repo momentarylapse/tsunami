@@ -19,7 +19,7 @@ ActionAudioAddLevel::~ActionAudioAddLevel()
 void* ActionAudioAddLevel::execute(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	a->level_name.add(format("level %d", a->level_name.num + 1));
+	a->level_name.add("");
 
 	TrackLevel new_level;
 	foreach(Track *t, a->track)

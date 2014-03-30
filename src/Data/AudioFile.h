@@ -59,6 +59,7 @@ public:
 
 	Track *GetTimeTrack();
 	int GetNextBeat(int pos);
+	string GetNiceLevelName(int index);
 
 	// action
 	void AddTag(const string &key, const string &value);
@@ -75,6 +76,8 @@ public:
 	void DeleteSample(int index);
 	void EditSampleName(int index, const string &name);
 	void AddLevel();
+	void DeleteLevel(int index, bool merge);
+	void RenameLevel(int index, const string &name);
 	void InsertSelectedSamples(int level_no);
 	void DeleteSelectedSamples();
 	void DeleteSelection(int level_no, bool all_levels);

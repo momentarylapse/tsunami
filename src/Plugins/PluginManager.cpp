@@ -229,7 +229,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::Prepare));
 	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
 	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::RenderAudioFile));
-	Script::LinkExternal("AudioRenderer.translateOutputPos", Script::mf(&AudioRenderer::TranslateOutputPos));
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
 	Script::DeclareClassOffset("AudioInput", "cur_buf", offsetof(AudioInput, current_buffer));

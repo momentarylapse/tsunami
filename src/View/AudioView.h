@@ -13,11 +13,14 @@
 #include "../Stuff/Observer.h"
 
 class ActionTrackMoveSample;
+class AudioOutput;
+class AudioInput;
+class AudioRenderer;
 
 class AudioView : public Observer, public Observable
 {
 public:
-	AudioView(HuiWindow *parent, AudioFile *audio);
+	AudioView(HuiWindow *parent, AudioFile *audio, AudioOutput *output, AudioInput *input, AudioRenderer *renderer);
 	virtual ~AudioView();
 
 	void CheckConsistency();
@@ -170,6 +173,10 @@ public:
 	int beat_partition;
 
 	AudioFile *audio;
+
+	AudioOutput *output;
+	AudioInput *input;
+	AudioRenderer *renderer;
 
 	void SetCurSample(SampleRef *s);
 	void SetCurTrack(Track *t);

@@ -8,11 +8,14 @@ const int SAMPLE_RATE = 44100
 float freq
 float volume
 
+int offset
+
 int fill(BufferBox buf)
 	float w_f = 1.0 / i2f(SAMPLE_RATE) * freq * 2.0 * pi
 	for int i, 0, buf.num
-		buf.r[i] = sin((i + buf.offset) * w_f) * volume
-		buf.l[i] = sin((i + buf.offset) * w_f) * volume
+		buf.r[i] = sin((i + offset) * w_f) * volume
+		buf.l[i] = sin((i + offset) * w_f) * volume
+	offset += buf.num
 	return buf.num
 
 void OnFrequency()
@@ -38,6 +41,7 @@ void main()
 	dlg.event("close", &OnClose)
 	dlg.event("frequency", &OnFrequency)
 	
+	offset = 0
 	output.playGenerated(&fill, SAMPLE_RATE)
 	
 	dlg.run()

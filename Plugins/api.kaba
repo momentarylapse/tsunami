@@ -180,7 +180,6 @@ class AudioRenderer
 	extern void renderAudioFile(AudioFile *a, Range r, BufferBox buf)
 	extern void prepare(AudioFile *a, Range r, bool allow_loop)
 	//extern virtual int read(BufferBox b)
-	extern int translateOutputPos(int pos)
 
 
 class AudioOutput

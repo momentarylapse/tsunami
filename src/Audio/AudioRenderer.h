@@ -29,9 +29,7 @@ public:
 	virtual int read(BufferBox &buf);
 	void Prepare(AudioFile *a, const Range &range, bool alllow_loop);
 
-	//void Seek(int pos);
-
-	int TranslateOutputPos(int pos);
+	void Seek(int pos);
 
 private:
 	void bb_render_audio_track_no_fx(BufferBox &buf, Track *t);

@@ -210,6 +210,7 @@ int AudioRenderer::read(BufferBox &buf)
 	if (audio->fx.num > 0)
 		bb_apply_fx(buf, NULL, audio->fx);
 
+	buf.offset = pos;
 	pos += size;
 	if ((pos >= range.end()) && (loop))
 		pos = range.offset;
@@ -242,9 +243,7 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 		effect->Prepare();
 }
 
-int AudioRenderer::TranslateOutputPos(int pos)
+void AudioRenderer::Seek(int _pos)
 {
-	if (loop && (range.num > 0))
-		return range.offset + (pos % range.num);
-	return range.offset + pos;
+	pos = _pos;
 }

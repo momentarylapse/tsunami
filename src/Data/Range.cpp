@@ -56,6 +56,12 @@ void Range::set_end(int end)
 	num = end - offset;
 }
 
+void Range::set_start(int start)
+{
+	num = offset + num - start;
+	offset = start;
+}
+
 void Range::invert()
 {
 	offset += num;

@@ -65,7 +65,6 @@ private:
 	int buffer_size;
 
 	AudioRenderer *renderer;
-	int stream_offset_next;
 	BufferBox box[2];
 
 	typedef int generate_func_t(BufferBox &);

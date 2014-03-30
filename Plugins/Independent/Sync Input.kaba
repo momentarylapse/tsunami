@@ -5,12 +5,13 @@ Window *dlg
 const int SAMPLE_RATE = 44100
 const int offset_out = 20000
 int offset_in
+int offset
 
 void fill(BufferBox buf)
 	buf.r = 0
 	buf.l = 0
 	
-	if buf.offset == 0
+	if offset == 0
 		buf.add_click(offset_out, 1, 880, SAMPLE_RATE)
 
 void sync()
@@ -28,15 +29,16 @@ void sync()
 
 void main()
 	dlg = new Dialog("Sync", 200, 80, MainWin, false)
-	dlg.AddText("Sync...", 0, 0, 0, 0, "")
+	dlg.addText("Sync...", 0, 0, 0, 0, "")
 	offset_in = 0
 	
-	input.AddObserver(nil, &sync)
-	output.PlayGenerated(&fill, SAMPLE_RATE)
-	input.Start(TRACK_TYPE_AUDIO, SAMPLE_RATE)
+	input.addObserver(nil, &sync)
+	output.playGenerated(&fill, SAMPLE_RATE)
+	input.start(TRACK_TYPE_AUDIO, SAMPLE_RATE)
 	
-	dlg.Run()
-	
+	dlg.run()
+
+	offset = 0	
 	input.RemoveObserver(nil)
 	output.Stop()
 	input.Stop()

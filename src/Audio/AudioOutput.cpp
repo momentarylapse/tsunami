@@ -244,7 +244,7 @@ bool AudioOutput::stream(int buf)
 	BufferBox *b = (buf == buffer[0]) ? &box[0] : &box[1];
 	int size = 0;
 	b->resize(buffer_size);
-	b->offset = stream_offset_next;
+	//b->offset = stream_offset_next;
 	if (renderer){
 		size = renderer->read(*b);
 		//msg_write(size);
@@ -253,19 +253,16 @@ bool AudioOutput::stream(int buf)
 	}
 	if (size == 0)
 		return false;
-	b->offset = stream_offset_next;
+	//b->offset = stream_offset_next;
 	b->get_16bit_buffer(data);
 	alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
 	TestError("alBufferData (stream)");
 
-	stream_offset_next += size;
 	return true;
 }
 
 void AudioOutput::start_play(int pos)
 {
-
-	stream_offset_next = pos;
 	buffer_size = DEFAULT_BUFFER_SIZE;
 
 	int num_buffers = 0;

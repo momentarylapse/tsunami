@@ -24,6 +24,7 @@ public:
 
 	void resize(int new_length);
 	void move(int dpos);
+	void set_start(int start);
 	void set_end(int end);
 
 	void invert();

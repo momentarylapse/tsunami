@@ -11,6 +11,7 @@ float bpm
 float volume
 
 DummySynthesizer synth
+int offset
 
 int fill(BufferBox buf)
 	float dt_m = 60.0 / bpm
@@ -22,11 +23,12 @@ int fill(BufferBox buf)
 	int num_clicks = buf.num / sm_m + 2
 	
 	for int i, -1, num_clicks
-		int n = buf.offset / sm_m + i
+		int n = offset / sm_m + i
 		if (n % 4) == 0
-			synth.renderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 0, volume)
+			synth.renderMetronomeClick(buf, i * sm_m - (offset % sm_m), 0, volume)
 		else
-			synth.renderMetronomeClick(buf, i * sm_m - (buf.offset % sm_m), 1, volume)
+			synth.renderMetronomeClick(buf, i * sm_m - (offset % sm_m), 1, volume)
+	offset += buf.num
 	return buf.num
 
 void OnBpm()
@@ -55,7 +57,8 @@ void main()
 	dlg.event("bpm", &OnBpm)
 	
 	synth.sample_rate = SAMPLE_RATE
-	
+
+	offset = 0	
 	output.playGenerated(&fill, SAMPLE_RATE)
 	
 	dlg.run()

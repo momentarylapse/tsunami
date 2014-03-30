@@ -136,7 +136,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	storage = new Storage;
 
-	view = new AudioView(this, audio);
+	view = new AudioView(this, audio, output, input, renderer);
 
 	// side bar
 	side_bar = new SideBar(view, audio);

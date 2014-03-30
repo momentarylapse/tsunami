@@ -53,7 +53,7 @@ AudioView::SelectionType::SelectionType()
 	pitch = -1;
 }
 
-AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
+AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input, AudioRenderer *_renderer) :
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
 	TIME_SCALE_HEIGHT(20),
@@ -101,6 +101,9 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 	cur_level = 0;
 
 	audio = _audio;
+	output = _output;
+	input = _input;
+	renderer = _renderer;
 
 	pitch_min = 60;
 	pitch_max = 90;
@@ -109,8 +112,8 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
-	Subscribe(tsunami->output);
-	Subscribe(tsunami->input);
+	Subscribe(output);
+	Subscribe(input);
 
 	// events
 	parent->EventMX("area", "hui:draw", this, &AudioView::OnDraw);
@@ -136,8 +139,8 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio) :
 AudioView::~AudioView()
 {
 	Unsubscribe(audio);
-	Unsubscribe(tsunami->output);
-	Unsubscribe(tsunami->input);
+	Unsubscribe(output);
+	Unsubscribe(input);
 
 	HuiConfig.setBool("View.Mono", show_mono);
 	HuiConfig.setInt("View.DetailSteps", detail_steps);
@@ -209,20 +212,20 @@ AudioView::SelectionType AudioView::GetMouseOver()
 			return s;
 		}
 	}
-	/*if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer)){
-		if (mouse_over_time(this, tsunami->output->GetRange().start())){
+	if ((output->IsPlaying()) && (output->GetSource() == renderer)){
+		if (mouse_over_time(this, renderer->range.start())){
 			s.type = SEL_TYPE_PLAYBACK_START;
 			return s;
 		}
-		if (mouse_over_time(this, tsunami->output->GetRange().end())){
+		if (mouse_over_time(this, renderer->range.end())){
 			s.type = SEL_TYPE_PLAYBACK_END;
 			return s;
 		}
-		if (mouse_over_time(this, tsunami->output->GetPos())){
+		if (mouse_over_time(this, output->GetPos())){
 			s.type = SEL_TYPE_PLAYBACK;
 			return s;
 		}
-	}*/ // TODO
+	}
 
 	// mute button?
 	if (s.track){
@@ -380,15 +383,16 @@ void AudioView::OnMouseMove()
 			w = - HuiGetEvent()->dx - 2*r;
 		}
 		tsunami->RedrawRect("area", x, audio->area.y1, w, audio->area.height());
-	/*}else if (Selection.type == SEL_TYPE_PLAYBACK_START){
-		tsunami->output->SetRangeStart(Selection.pos);
+	}else if (selection.type == SEL_TYPE_PLAYBACK_START){
+		renderer->range.set_start(selection.pos);
 		_force_redraw_ = true;
-	}else if (Selection.type == SEL_TYPE_PLAYBACK_END){
-		tsunami->output->SetRangeEnd(Selection.pos);
+	}else if (selection.type == SEL_TYPE_PLAYBACK_END){
+		renderer->range.set_end(selection.pos);
 		_force_redraw_ = true;
-	}else if (Selection.type == SEL_TYPE_PLAYBACK){
-		tsunami->output->Seek(Selection.pos);
-		_force_redraw_ = true;*/ // TODO
+	}else if (selection.type == SEL_TYPE_PLAYBACK){
+		renderer->Seek(selection.pos);
+		output->Play(renderer);
+		_force_redraw_ = true;
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		ApplyBarriers(selection.pos);
 		int dpos = (float)selection.pos - selection.sample_offset - selection.sample->pos;
@@ -592,8 +596,8 @@ void AudioView::OnKeyDown()
 		Zoom(exp(- ZoomSpeed));
 
 	if (k == KEY_SPACE){
-		if (tsunami->output->IsPlaying()){
-			tsunami->output->Pause();
+		if (output->IsPlaying()){
+			output->Pause();
 		}else{
 			tsunami->OnPlay();
 		}
@@ -908,12 +912,12 @@ void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 		c->drawLine(xx, r.y1, xx, r.y2);
 	}
 	if (show_time){
-		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer)){
+		if ((output->IsPlaying()) && (output->GetSource() == renderer)){
 			color cc = ColorPreviewMarker;
 			cc.a = 0.25f;
 			c->setColor(cc);
-			float x0 = sample2screen(tsunami->renderer->range.start());
-			float x1 = sample2screen(tsunami->renderer->range.end());
+			float x0 = sample2screen(renderer->range.start());
+			float x1 = sample2screen(renderer->range.end());
 			c->drawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
 		c->setColor(ColorGrid);
@@ -1028,12 +1032,12 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 			UpdateMenu();
 		}
 	}else if (o->GetName() == "AudioOutput"){
-		if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer))
-			MakeSampleVisible(tsunami->renderer->TranslateOutputPos(tsunami->output->GetPos()));
+		if ((output->IsPlaying()) && (output->GetSource() == renderer))
+			MakeSampleVisible(output->GetPos());
 		ForceRedraw();
 	}else if (o->GetName() == "AudioInput"){
-		if (tsunami->input->IsCapturing())
-			MakeSampleVisible(audio->selection.start() + tsunami->input->GetSampleCount());
+		if (input->IsCapturing())
+			MakeSampleVisible(audio->selection.start() + input->GetSampleCount());
 		ForceRedraw();
 	}
 }
@@ -1203,16 +1207,16 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 	DrawSelection(c, r);
 
 	// playing position
-	if ((tsunami->output->IsPlaying()) && (tsunami->output->GetSource() == tsunami->renderer)){
-		DrawTimeLine(c, tsunami->renderer->range.start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
-		DrawTimeLine(c, tsunami->renderer->range.end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
-		if (!tsunami->input->IsCapturing())
-			DrawTimeLine(c, tsunami->renderer->TranslateOutputPos(tsunami->output->GetPos()), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
+	if ((output->IsPlaying()) && (output->GetSource() == renderer)){
+		DrawTimeLine(c, renderer->range.start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
+		DrawTimeLine(c, renderer->range.end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
+		if (!input->IsCapturing())
+			DrawTimeLine(c, output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
 	}
 
 	// capturing position
-	if (tsunami->input->IsCapturing())
-		DrawTimeLine(c, audio->selection.start() + tsunami->input->GetSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
+	if (input->IsCapturing())
+		DrawTimeLine(c, audio->selection.start() + input->GetSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
 }
 
 int frame=0;

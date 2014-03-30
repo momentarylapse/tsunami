@@ -1378,7 +1378,6 @@ void AudioView::SetCurTrack(Track *t)
 		return;
 	cur_track = t;
 	Notify("CurTrackChange");
-	tsunami->side_bar->Choose(t ? SideBar::TRACK_DIALOG : SideBar::AUDIO_FILE_DIALOG);
 }
 
 

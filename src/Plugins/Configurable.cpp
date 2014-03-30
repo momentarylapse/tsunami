@@ -239,11 +239,6 @@ void Configurable::ResetState()
 	state->reset();
 }
 
-HuiPanel *Configurable::CreatePanel()
-{
-	return NULL;
-}
-
 struct AutoConfigData
 {
 	string name, unit;
@@ -317,20 +312,27 @@ public:
 	}
 };
 
+HuiPanel *Configurable::CreatePanel()
+{
+	PluginData *config = get_config();
+	if (!config)
+		return NULL;
+	Array<AutoConfigData> aa = get_auto_conf(config);
+	if (aa.num == 0)
+		return NULL;
+	return new AutoConfigPanel(aa);
+}
+
 // default handler...
 void Configurable::Configure()
 {
 	PluginData *config = get_config();
-	if (!config){
-		//tsunami->log->Warning(_("nichts zu konfigurieren"));
+	if (!config)
 		return;
-	}
 
 	HuiPanel *panel = CreatePanel();
-	if (!panel){
-		Array<AutoConfigData> aa = get_auto_conf(config);
-		panel = new AutoConfigPanel(aa);
-	}
+	if (!panel)
+		return;
 	HuiDialog *dlg = new HuiDialog(name, 300, 100, tsunami, false);
 	dlg->AddControlTable("", 0, 0, 1, 3, "root-table");
 	dlg->SetTarget("root-table", 0);

@@ -63,7 +63,7 @@ void WriteEffect(CFile *f, Effect *e)
 	f->WriteInt(e->range.offset);
 	f->WriteInt(e->range.num);
 	f->WriteStr(e->ConfigToString());
-	f->WriteStr("");
+	f->WriteStr(e->enabled ? "" : "disabled");
 	EndChunk(f);
 }
 
@@ -362,7 +362,9 @@ void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 	e->range.num = f->ReadInt();
 	string params = f->ReadStr();
 	e->ConfigFromString(params);
-	f->ReadStr();
+	string temp = f->ReadStr();
+	if (temp.find("disabled") >= 0)
+		e->enabled = false;
 	fx->add(e);
 
 	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParamLegacy, e);

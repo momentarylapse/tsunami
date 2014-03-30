@@ -629,7 +629,7 @@ void PluginManager::OnUpdate(Observable *o, const string &message)
 	}else if (o == tsunami->output){
 		int pos = tsunami->output->GetPos();
 		Range r = tsunami->audio->selection;
-		tsunami->progress->Set(_("Vorschau"), (float)pos / r.length());
+		tsunami->progress->Set(_("Vorschau"), (float)(pos - r.offset) / r.length());
 		if (!tsunami->output->IsPlaying())
 			PreviewEnd();
 	}

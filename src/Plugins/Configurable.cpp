@@ -303,8 +303,6 @@ public:
 			AddText(a.unit, 3, i, 0, 0, "");
 			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::OnChange, *a.value, this));
 		}
-		tsunami->plugin_manager->PutCommandBarSizable(this, "root-table", 0, 2);
-		tsunami->plugin_manager->PutFavoriteBarSizable(this, "root-table", 0, 0);
 	}
 	~AutoConfigPanel()
 	{

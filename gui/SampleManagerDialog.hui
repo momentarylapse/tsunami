@@ -4,5 +4,5 @@ Dialog sample_manager_dialog "Sample Manager" 400 400 allow-root
 		Grid ? "" 4 1
 			Button import_from_file "Laden..."
 			Button delete_sample "Löschen"
-			Button insert_sample "Einfügen"
+			Button paste_sample "Einfügen"
 			Button create_from_selection "Aus Auswahl erzeugen"

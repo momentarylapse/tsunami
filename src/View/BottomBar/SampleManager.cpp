@@ -20,7 +20,7 @@ SampleManager::SampleManager(AudioFile *a) :
 	SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 
 	EventM("import_from_file", this, &SampleManager::OnImportFromFile);
-	EventM("insert_sample", this, &SampleManager::OnInsert);
+	EventM("paste_sample", this, &SampleManager::OnInsert);
 	EventM("create_from_selection", this, &SampleManager::OnCreateFromSelection);
 	EventM("delete_sample", this, &SampleManager::OnDelete);
 	EventMX("sample_list", "hui:change", this, &SampleManager::OnListEdit);
@@ -103,7 +103,7 @@ void SampleManager::OnInsert()
 void SampleManager::OnCreateFromSelection()
 {
 	selected = audio->sample.num;
-	audio->CreateSubsFromSelection(tsunami->view->cur_level);
+	audio->CreateSamplesFromSelection(tsunami->view->cur_level);
 }
 
 void SampleManager::OnDelete()

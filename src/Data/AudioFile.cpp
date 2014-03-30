@@ -206,7 +206,7 @@ Range AudioFile::GetPlaybackSelection()
 }
 
 
-void AudioFile::UnselectAllSubs()
+void AudioFile::UnselectAllSamples()
 {
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
@@ -325,7 +325,7 @@ void AudioFile::PostActionUpdate()
 	UpdatePeaks(tsunami->view->peak_mode);
 }
 
-int AudioFile::GetNumSelectedSubs()
+int AudioFile::GetNumSelectedSamples()
 {
 	int n = 0;
 	foreach(Track *t, track)
@@ -335,10 +335,21 @@ int AudioFile::GetNumSelectedSubs()
 	return n;
 }
 
-void AudioFile::InsertSelectedSubs(int level_no)
+void AudioFile::InsertSelectedSamples(int level_no)
 {
-	if (GetNumSelectedSubs() > 0)
+	if (GetNumSelectedSamples() > 0)
 		Execute(new ActionTrackInsertSelectedSamples(this, level_no));
+}
+
+void AudioFile::DeleteSelectedSamples()
+{
+	action_manager->BeginActionGroup();
+	foreachi(Track *t, track, i){
+		for (int j=t->sample.num-1;j>=0;j--)
+			if (t->sample[j]->is_selected)
+				t->DeleteSample(j);
+	}
+	action_manager->EndActionGroup();
 }
 
 void AudioFile::AddLevel()
@@ -375,7 +386,7 @@ void AudioFile::DeleteSelection(int level_no, bool all_levels)
 		Execute(new ActionAudioDeleteSelection(this, level_no, all_levels));
 }
 
-void AudioFile::CreateSubsFromSelection(int level_no)
+void AudioFile::CreateSamplesFromSelection(int level_no)
 {
 	if (!selection.empty())
 		Execute(new ActionTrackSampleFromSelection(this, level_no));
@@ -395,14 +406,14 @@ Track *AudioFile::get_track(int track_no)
 	return track[track_no];
 }
 
-SampleRef *AudioFile::get_sub(int track_no, int sub_no)
+SampleRef *AudioFile::get_sample(int track_no, int index)
 {
-	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_sub");
+	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_sample");
 	Track *t = track[track_no];
 
-	assert((sub_no >= 0) && "AudioFile.get_sub");
-	assert((sub_no < t->sample.num) && "AudioFile.get_sub");
-	return t->sample[sub_no];
+	assert((index >= 0) && "AudioFile.get_sample");
+	assert((index < t->sample.num) && "AudioFile.get_sample");
+	return t->sample[index];
 }
 
 Effect *AudioFile::get_fx(int track_no, int index)

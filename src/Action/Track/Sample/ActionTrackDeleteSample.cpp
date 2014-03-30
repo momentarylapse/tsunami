@@ -42,6 +42,7 @@ void ActionTrackDeleteSample::undo(Data* d)
 	a->track[track_no]->sample.insert(ref, index);
 	ref->origin->ref();
 	ref->owner = a;
+	ref = NULL;
 }
 
 

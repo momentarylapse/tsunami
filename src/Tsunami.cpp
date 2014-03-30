@@ -77,14 +77,14 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("sample_manager", "", -1, this, &Tsunami::OnSampleManager);
 	HuiAddCommandM("show_mixing_console", "", -1, this, &Tsunami::OnMixingConsole);
 	HuiAddCommandM("show_fx_console", "", -1, this, &Tsunami::OnFxConsole);
-	HuiAddCommandM("sub_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
-	HuiAddCommandM("insert_added", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
-	HuiAddCommandM("remove_added", "", -1, this, &Tsunami::OnRemoveAdded);
+	HuiAddCommandM("sample_from_selection", "hui:cut", -1, this, &Tsunami::OnSubFromSelection);
+	HuiAddCommandM("insert_sample", "", KEY_I + KEY_CONTROL, this, &Tsunami::OnInsertAdded);
+	HuiAddCommandM("remove_sample", "", -1, this, &Tsunami::OnRemoveAdded);
 	HuiAddCommandM("track_import", "", -1, this, &Tsunami::OnTrackImport);
 	HuiAddCommandM("sub_import", "", -1, this, &Tsunami::OnSubImport);
-	HuiAddCommandM("wave_properties", "", KEY_F4, this, &Tsunami::OnAudioProperties);
+	HuiAddCommandM("audio_file_properties", "", KEY_F4, this, &Tsunami::OnAudioProperties);
 	HuiAddCommandM("track_properties", "", -1, this, &Tsunami::OnTrackProperties);
-	HuiAddCommandM("sub_properties", "", -1, this, &Tsunami::OnSubProperties);
+	HuiAddCommandM("sample_properties", "", -1, this, &Tsunami::OnSubProperties);
 	HuiAddCommandM("settings", "", -1, this, &Tsunami::OnSettings);
 	HuiAddCommandM("close_file", "hui:close", KEY_W + KEY_CONTROL, this, &Tsunami::OnCloseFile);
 	HuiAddCommandM("play", "hui:media-play", -1, this, &Tsunami::OnPlay);
@@ -390,6 +390,7 @@ bool Tsunami::HandleArguments(Array<string> arg)
 
 void Tsunami::OnRemoveAdded()
 {
+	audio->DeleteSelectedSamples();
 }
 
 void Tsunami::OnPlayLoop()
@@ -417,7 +418,7 @@ void Tsunami::OnStop()
 void Tsunami::OnInsertAdded()
 {
 	if (audio->used)
-		audio->InsertSelectedSubs(view->cur_level);
+		audio->InsertSelectedSamples(view->cur_level);
 }
 
 void Tsunami::OnRecord()
@@ -464,7 +465,7 @@ void Tsunami::OnCurLevelDown()
 void Tsunami::OnSubFromSelection()
 {
 	if (audio->used)
-		audio->CreateSubsFromSelection(view->cur_level);
+		audio->CreateSamplesFromSelection(view->cur_level);
 }
 
 void Tsunami::OnViewOptimal()
@@ -522,9 +523,9 @@ void Tsunami::UpdateMenu()
 	Enable("select_nothing", audio->used);
 	Enable("undo", audio->action_manager->Undoable());
 	Enable("redo", audio->action_manager->Redoable());
-	Enable("copy", selected || (audio->GetNumSelectedSubs() > 0));
+	Enable("copy", selected || (audio->GetNumSelectedSamples() > 0));
 	Enable("paste", clipboard->HasData());
-	Enable("delete", selected || (audio->GetNumSelectedSubs() > 0));
+	Enable("delete", selected || (audio->GetNumSelectedSamples() > 0));
 	// file
 	Enable("save", audio->used);
 	Enable("save", audio->used);
@@ -544,11 +545,10 @@ void Tsunami::UpdateMenu()
 	Enable("level_up", audio->used && (view->cur_level < audio->level_name.num -1));
 	Enable("level_down", audio->used && (view->cur_level > 0));
 	// sub
-	Enable("sub_import", view->cur_track);
-	Enable("sub_from_selection", selected);
-	Enable("insert_added", audio->GetNumSelectedSubs() > 0);
-	Enable("remove_added", audio->GetNumSelectedSubs() > 0);
-	Enable("sub_properties", view->cur_sample);
+	Enable("sample_from_selection", selected);
+	Enable("insert_sample", audio->GetNumSelectedSamples() > 0);
+	Enable("remove_sample", audio->GetNumSelectedSamples() > 0);
+	Enable("sample_properties", view->cur_sample);
 	// sound
 	Enable("play", audio->used);
 	Enable("stop", output->IsPlaying());

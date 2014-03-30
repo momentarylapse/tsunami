@@ -7,7 +7,7 @@ Menu menu "" disabled
 		Item save_as "Speichern unter..." image=hui:save-as
 		Item export_selection "Auswahl Exportieren..." image=hui:save-as
 		Separator "" ""
-		Item wave_properties "Eigenschaften" image=hui:properties
+		Item audio_file_properties "Eigenschaften" image=hui:properties
 		Separator "" ""
 		Item close_file "Schließen" image=hui:close
 		Item exit "Beenden" image=hui:quit
@@ -42,11 +42,11 @@ Menu menu "" disabled
 	Menu menu_sub "Samples"
 		Item sample_manager "Verwalten..." image=hui:properties
 		Separator "" ""
-		Item sub_from_selection "Aus Auswahl herauslösen" image=hui:cut
-		Item insert_added "Fest einfügen" image=hui:add
-		Item remove_added "Löschen" image=hui:delete
+		Item sample_from_selection "Aus Auswahl herauslösen" image=hui:cut
+		Item insert_sample "Fest einfügen" image=hui:add
+		Item remove_sample "Löschen" image=hui:delete
 		Separator "" ""
-		Item sub_properties "Eigenschaften" image=hui:properties
+		Item sample_properties "Eigenschaften" image=hui:properties
 	Menu menu_view "Ansicht"
 		Menu menu_view_channels "Kanäle"
 			Item view_mono "Mono" checkable

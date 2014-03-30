@@ -1,0 +1,4 @@
+Menu popup_audio_file_menu ""
+	Item audio_file_menu_header "Audio Datei" disabled
+	Separator "" ""
+	Item audio_file_properties "Eigenschaften"

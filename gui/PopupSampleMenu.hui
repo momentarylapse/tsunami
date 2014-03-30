@@ -1,0 +1,7 @@
+Menu popup_sample_menu ""
+	Item sample_menu_header "Sample" disabled
+	Separator "" ""
+	Item insert_sample "Fest einfügen"
+	Item remove_sample "Löschen"
+	Item sample_properties "Eigenschaften"
+

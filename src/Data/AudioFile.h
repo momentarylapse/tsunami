@@ -49,13 +49,13 @@ public:
 	bool Save(const string &filename);
 	void UpdateSelection();
 	Range GetPlaybackSelection();
-	void UnselectAllSubs();
+	void UnselectAllSamples();
 
 	virtual void PostActionUpdate();
 	void UpdatePeaks(int mode);
 	void InvalidateAllPeaks();
 
-	int GetNumSelectedSubs();
+	int GetNumSelectedSamples();
 
 	Track *GetTimeTrack();
 	int GetNextBeat(int pos);
@@ -75,12 +75,13 @@ public:
 	void DeleteSample(int index);
 	void EditSampleName(int index, const string &name);
 	void AddLevel();
-	void InsertSelectedSubs(int level_no);
+	void InsertSelectedSamples(int level_no);
+	void DeleteSelectedSamples();
 	void DeleteSelection(int level_no, bool all_levels);
-	void CreateSubsFromSelection(int level_no);
+	void CreateSamplesFromSelection(int level_no);
 
 	Track *get_track(int track_no);
-	SampleRef *get_sub(int track_no, int sub_no);
+	SampleRef *get_sample(int track_no, int index);
 	Effect *get_fx(int track_no, int index);
 
 // data

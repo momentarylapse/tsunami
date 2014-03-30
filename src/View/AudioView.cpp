@@ -134,9 +134,9 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output,
 	parent->Activate("area");
 
 
-	menu_audio = HuiCreateResourceMenu("popup_audio_menu");
+	menu_audio = HuiCreateResourceMenu("popup_audio_file_menu");
 	menu_track = HuiCreateResourceMenu("popup_track_menu");
-	menu_sub= HuiCreateResourceMenu("popup_sub_menu");
+	menu_sub= HuiCreateResourceMenu("popup_sample_menu");
 
 	//ForceRedraw();
 	UpdateMenu();
@@ -287,7 +287,7 @@ void AudioView::SelectUnderMouse()
 	if (selection.type == SEL_TYPE_TRACK){
 		SelectTrack(t, control);
 		if (!control)
-			audio->UnselectAllSubs();
+			audio->UnselectAllSamples();
 	}
 
 	// sub
@@ -548,7 +548,7 @@ void AudioView::OnRightButtonDown()
 		menu_sub->OpenPopup(tsunami, 0, 0);
 	else if (selection.type == SEL_TYPE_TRACK)
 		menu_track->OpenPopup(tsunami, 0, 0);
-	else if (selection.type == SEL_TYPE_NONE)
+	else if (!selection.track)
 		menu_audio->OpenPopup(tsunami, 0, 0);
 }
 
@@ -1331,7 +1331,7 @@ void AudioView::SelectNone()
 	// select all/none
 	audio->sel_raw.clear();
 	audio->UpdateSelection();
-	audio->UnselectAllSubs();
+	audio->UnselectAllSamples();
 	SetCurSample(NULL);
 }
 
@@ -1345,7 +1345,7 @@ void AudioView::SelectSample(SampleRef *s, bool diff)
 		s->is_selected = !s->is_selected;
 	}else{
 		if (!s->is_selected)
-			s->owner->UnselectAllSubs();
+			s->owner->UnselectAllSamples();
 
 		// select this sub
 		s->is_selected = true;

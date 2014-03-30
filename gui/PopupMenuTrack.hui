@@ -1,6 +1,6 @@
 Menu popup_track_menu ""
 	Item track_menu_header "Spur" disabled
 	Separator "" ""
-	Item track_properties "Eigenschaften"
 	Item delete_track "Löschen"
+	Item track_properties "Eigenschaften"
 

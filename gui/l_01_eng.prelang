@@ -35,6 +35,10 @@ audio_delete_bar
 
 audio_file_dialog
 
+audio_file_menu_header
+
+audio_file_properties
+
 bar_list
 
 beat_partition
@@ -106,8 +110,6 @@ fxdt_params
 help
 
 import_from_file
-
-insert_added
 
 insert_sample
 
@@ -221,6 +223,8 @@ open
 Open...
 paste
 Paste
+paste_sample
+
 pause
 
 pdp_capture
@@ -283,7 +287,7 @@ record_dialog_buttonbar
 
 redo
 Redo
-remove_added
+remove_sample
 
 repdelay
 
@@ -291,11 +295,17 @@ repnum
 
 run_plugin
 
+sample_from_selection
+
 sample_list
 
 sample_manager
 
 sample_manager_dialog
+
+sample_menu_header
+
+sample_properties
 
 sample_rate
 
@@ -319,12 +329,6 @@ show_mixing_console
 
 stop
 Stop
-sub_from_selection
-
-sub_menu_header
-
-sub_properties
-
 sub_track_dialog
 
 synthesizer
@@ -362,10 +366,6 @@ view_stereo
 volume
 \\0\\1000\\0.1
 volume_slider
-
-wave_menu_header
-
-wave_properties
 
 zoom_in
 

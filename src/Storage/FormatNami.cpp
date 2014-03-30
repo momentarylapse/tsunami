@@ -334,26 +334,6 @@ void ReadChunkLevelName(CFile *f, AudioFile *a)
 		a->level_name.add(f->ReadStr());
 }
 
-void ReadChunkEffectParamLegacy(CFile *f, Effect *e)
-{
-	EffectParam p;
-	f->ReadStr();
-	f->ReadStr();
-	p.value = f->ReadStr();
-	e->legacy_params.add(p);
-}
-
-void ReadChunkEffectLegacy(CFile *f, Array<Effect*> *fx)
-{
-	Effect *e = CreateEffect(f->ReadStr());
-	e->only_on_selection = f->ReadBool();
-	e->range.offset = f->ReadInt();
-	e->range.num = f->ReadInt();
-	fx->add(e);
-
-	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParamLegacy, e);
-}
-
 void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 {
 	Effect *e = CreateEffect(f->ReadStr());
@@ -366,8 +346,6 @@ void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 	if (temp.find("disabled") >= 0)
 		e->enabled = false;
 	fx->add(e);
-
-	AddChunkHandler("fxparam", (chunk_reader*)&ReadChunkEffectParamLegacy, e);
 }
 
 void ReadChunkBufferBox(CFile *f, TrackLevel *l)
@@ -526,7 +504,6 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
 	AddChunkHandler("samref", (chunk_reader*)&ReadSampleRef, t);
 	AddChunkHandler("sub", (chunk_reader*)&ReadSub, t);
-	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffectLegacy, &t->fx);
 	AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &t->fx);
 	AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
 	AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
@@ -538,7 +515,6 @@ void ReadChunkNami(CFile *f, AudioFile *a)
 	a->sample_rate = f->ReadInt();
 
 	AddChunkHandler("tag", (chunk_reader*)&ReadChunkTag, &a->tag);
-	AddChunkHandler("fx", (chunk_reader*)&ReadChunkEffectLegacy, &a->fx);
 	AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &a->fx);
 	AddChunkHandler("lvlname", (chunk_reader*)&ReadChunkLevelName, a);
 	AddChunkHandler("sample", (chunk_reader*)&ReadChunkSample, a);
@@ -604,21 +580,6 @@ void check_empty_subs(AudioFile *a)
 			}*/
 }
 
-void update_legacy_fx(Effect *fx)
-{
-	if (fx->legacy_params.num == 0)
-		return;
-	string params = "(";
-	for (int i=0;i<fx->legacy_params.num;i++){
-		if (i > 0)
-			params += " ";
-		params += fx->legacy_params[i].value;
-	}
-	params += ")";
-	msg_write("legacy params: " + params);
-	fx->ConfigFromString(params);
-}
-
 void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_f("load_nami_file", 1);
@@ -636,12 +597,6 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 
 	// some post processing
 	check_empty_subs(a);
-
-	foreach(Effect *fx, a->fx)
-		update_legacy_fx(fx);
-	foreach(Track *t, a->track)
-		foreach(Effect *fx, t->fx)
-			update_legacy_fx(fx);
 
 	a->UpdateSelection();
 }

@@ -147,6 +147,7 @@ Tsunami::Tsunami(Array<string> arg) :
 	// bottom bar
 	bottom_bar = new BottomBar(view, audio, output, log);
 	Embed(bottom_bar, "root_table", 0, 1);
+	bottom_bar->Hide();
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;

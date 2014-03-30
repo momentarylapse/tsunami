@@ -42,8 +42,6 @@ public:
 	bool usable;
 	bool enabled;
 
-	Array<EffectParam> legacy_params;
-
 	virtual void ProcessTrack(BufferBox *buf){};
 
 	void DoProcessTrack(Track *t, int level_no, const Range &r);

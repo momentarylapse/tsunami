@@ -47,7 +47,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	// dialog
 	Check("capture_type:audio", true);
 	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
-	SetString("capture_time", a->get_time_str(0));
+	SetString("capture_time", a->get_time_str_long(0));
 	Enable("capture_delete", false);
 	Enable("capture_pause", false);
 	Enable("ok", false);
@@ -177,7 +177,7 @@ void CaptureDialog::OnClose()
 
 void CaptureDialog::OnUpdate(Observable *o, const string &message)
 {
-	SetString("capture_time", audio->get_time_str(tsunami->input->GetSampleCount()));
+	SetString("capture_time", audio->get_time_str_long(tsunami->input->GetSampleCount()));
 }
 
 bool CaptureDialog::Insert()

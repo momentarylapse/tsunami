@@ -40,6 +40,7 @@ public:
 
 	string get_time_str(int t);
 	string get_time_str_fuzzy(int t, float dt);
+	string get_time_str_long(int t);
 
 	void Reset();
 	void NewEmpty(int _sample_rate);

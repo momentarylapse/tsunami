@@ -1095,7 +1095,7 @@ void AudioView::DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool 
 		c->setColor((type == hover.type) ? ColorSelectionBoundaryMO : col);
 		c->drawLine(p, audio->area.y1, p, audio->area.y2);
 		if (show_time)
-			c->drawStr(p, (audio->area.y1 + audio->area.y2) / 2, audio->get_time_str(pos));
+			c->drawStr(p, (audio->area.y1 + audio->area.y2) / 2, audio->get_time_str_long(pos));
 	}
 }
 

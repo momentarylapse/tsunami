@@ -231,16 +231,22 @@ Range AudioFile::GetRange()
 	return r;
 }
 
+void disect_time(int t, int sample_rate, bool &sign, int &min, int &sec, int &msec)
+{
+	sign = (t < 0);
+	if (sign)
+		t = -t;
+	min=(t / 60 / sample_rate);
+	sec=((t / sample_rate) % 60);
+	msec=(((t - sample_rate * (t / sample_rate)) * 1000 / sample_rate) % 1000);
+}
 
 string AudioFile::get_time_str(int t)
 {
 	int _sample_rate = used ? sample_rate : DEFAULT_SAMPLE_RATE;
-	bool sign = (t < 0);
-	if (sign)
-		t = -t;
-	int _min=(t/60/_sample_rate);
-	int _sec=((t/_sample_rate) %60);
-	int _msec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
+	bool sign;
+	int _min, _sec, _msec;
+	disect_time(t, _sample_rate, sign, _min, _sec, _msec);
 	if (_min > 0)
 		return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);
 	else
@@ -250,12 +256,9 @@ string AudioFile::get_time_str(int t)
 string AudioFile::get_time_str_fuzzy(int t, float dt)
 {
 	int _sample_rate = used ? sample_rate : DEFAULT_SAMPLE_RATE;
-	bool sign = (t < 0);
-	if (sign)
-		t = -t;
-	int _min=(t/60/_sample_rate);
-	int _sec=((t/_sample_rate) %60);
-	int _msec=(( (t-_sample_rate*(t/_sample_rate))*1000/_sample_rate) %1000);
+	bool sign;
+	int _min, _sec, _msec;
+	disect_time(t, _sample_rate, sign, _min, _sec, _msec);
 	if (dt < 1.0){
 		if (_min > 0)
 			return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);
@@ -267,6 +270,17 @@ string AudioFile::get_time_str_fuzzy(int t, float dt)
 		else
 			return format("%s%.2d",sign?"-":"",_sec);
 	}
+}
+
+string AudioFile::get_time_str_long(int t)
+{
+	bool sign;
+	int _min, _sec, _msec;
+	disect_time(t, sample_rate, sign, _min, _sec, _msec);
+	if (_min > 0)
+		return format("%s%dm %.2ds %.3dms",sign?"-":"",_min,_sec,_msec);
+	else
+		return format("%s%ds %.3dms",sign?"-":"",_sec,_msec);
 }
 
 

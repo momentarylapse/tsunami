@@ -1392,6 +1392,17 @@ void AudioView::SetCurTrack(Track *t)
 	Notify("CurTrackChange");
 }
 
+void AudioView::SetCurLevel(int l)
+{
+	if (cur_level == l)
+		return;
+	if ((l < 0) || (l >= audio->level_name.num))
+		return;
+	cur_level = l;
+	ForceRedraw();
+	Notify("CurLevelChange");
+}
+
 
 
 double AudioView::screen2sample(double _x)

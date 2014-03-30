@@ -9,21 +9,22 @@
 #include "../../Tsunami.h"
 #include "../../Stuff/Observer.h"
 #include "../../Data/AudioFile.h"
-#include "../Helper/Slider.h"
 #include "../Helper/BarList.h"
+#include "../AudioView.h"
+#include "../../Stuff/Log.h"
 
-AudioFileDialog::AudioFileDialog(AudioFile *a) :
+AudioFileDialog::AudioFileDialog(AudioView *v, AudioFile *a) :
 	SideBarConsole(_("Datei-Eigenschaften")),
 	Observer("AudioFileDialog")
 {
 	audio = a;
+	view = v;
 
 	// dialog
 //	SetTarget("audio_dialog_table", 0);
 	SetBorderWidth(5);
 	EmbedDialog("audio_file_dialog", 0, 0);
 	SetDecimals(1);
-	volume_slider = new Slider(this, "audio_volume_slider", "audio_volume", 0, 1, 100, (void(HuiEventHandler::*)())&AudioFileDialog::OnVolume, audio->volume, this);
 	bar_list = new BarList(this, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
 	HideControl("ad_t_bars", true);
 
@@ -35,23 +36,31 @@ AudioFileDialog::AudioFileDialog(AudioFile *a) :
 	EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
 	EventM("add_tag", this, &AudioFileDialog::OnAddTag);
 	EventM("delete_tag", this, &AudioFileDialog::OnDeleteTag);
+	EventMX("levels", "hui:select", this, &AudioFileDialog::OnLevelsSelect);
+	EventMX("levels", "hui:change", this, &AudioFileDialog::OnLevelsEdit);
+	EventM("add_level", this, &AudioFileDialog::OnAddLevel);
+	EventM("delete_level", this, &AudioFileDialog::OnDeleteLevel);
 
 	Subscribe(audio);
+	Subscribe(view, "CurLevelChange");
 }
 
 AudioFileDialog::~AudioFileDialog()
 {
 	Unsubscribe(audio);
+	Unsubscribe(view);
 	delete(bar_list);
-	delete(volume_slider);
 }
 
 void AudioFileDialog::LoadData()
 {
-	volume_slider->Set(audio->volume);
+	// tags
 	Reset("tags");
 	foreach(Tag &t, audio->tag)
 		AddString("tags", t.key + "\\" + t.value);
+	Enable("delete_tag", false);
+
+	// data
 	Reset("data_list");
 	int samples = audio->GetRange().length();
 	AddString("data_list", _("Anfang\\") + audio->get_time_str_long(audio->GetRange().start()));
@@ -60,7 +69,11 @@ void AudioFileDialog::LoadData()
 	AddString("data_list", _("Samples\\") + i2s(samples));
 	AddString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
 	AddString("data_list", _("Format\\16 bit stereo (nami)"));
-	Enable("delete_tag", false);
+
+	Reset("levels");
+	foreachi(string &n, audio->level_name, i)
+		AddString("levels", i2s(i + 1) + "\\" + n);
+	SetInt("levels", view->cur_level);
 }
 
 
@@ -100,9 +113,30 @@ void AudioFileDialog::OnDeleteTag()
 		audio->DeleteTag(s);
 }
 
-void AudioFileDialog::OnVolume()
+void AudioFileDialog::OnLevelsSelect()
 {
-	audio->SetVolume(volume_slider->Get());
+	int s = GetInt("levels");
+	view->SetCurLevel(s);
+}
+
+void AudioFileDialog::OnLevelsEdit()
+{
+	int r = HuiGetEvent()->row;
+	if (r < 0)
+		return;
+}
+
+void AudioFileDialog::OnAddLevel()
+{
+	audio->AddLevel();
+}
+
+void AudioFileDialog::OnDeleteLevel()
+{
+	/*int s = GetInt("levels");
+	if (s >= 0)
+		audio->DeleteLevel(s);*/
+	tsunami->log->Error(_("Ebene l&oschen: noch nicht implementiert..."));
 }
 
 void AudioFileDialog::OnUpdate(Observable *o, const string &message)

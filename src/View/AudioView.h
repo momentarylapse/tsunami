@@ -180,6 +180,7 @@ public:
 
 	void SetCurSample(SampleRef *s);
 	void SetCurTrack(Track *t);
+	void SetCurLevel(int l);
 	Track *cur_track;
 	SampleRef *cur_sample;
 	int cur_level;

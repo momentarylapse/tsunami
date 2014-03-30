@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-184
+188
 // Data (ID,Text)
 about
 
@@ -9,11 +9,15 @@ ad_t_bars
 
 ad_t_data
 
+ad_t_levels
+
 ad_t_tags
 
 add_bar
 
 add_bar_pause
+
+add_level
 
 add_midi_track
 
@@ -87,6 +91,8 @@ delete_bar
 
 delete_effect
 Delete
+delete_level
+
 delete_sample
 
 delete_tag
@@ -144,6 +150,8 @@ level_delete
 level_down
 
 level_up
+
+levels
 
 log_clear
 Clear

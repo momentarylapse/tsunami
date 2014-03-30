@@ -435,31 +435,22 @@ void Tsunami::OnAddLevel()
 
 void Tsunami::OnDeleteLevel()
 {
+	log->Error(_("Ebene l&oschen: noch nicht implementiert..."));
 }
 
 void Tsunami::OnCurLevel()
 {
-	view->cur_level = HuiGetEvent()->id.substr(14, -1)._int();
-	UpdateMenu();
-	view->ForceRedraw();
+	view->SetCurLevel(HuiGetEvent()->id.substr(14, -1)._int());
 }
 
 void Tsunami::OnCurLevelUp()
 {
-	if (view->cur_level < audio->level_name.num - 1){
-		view->cur_level ++;
-		UpdateMenu();
-		view->ForceRedraw();
-	}
+	view->SetCurLevel(view->cur_level + 1);
 }
 
 void Tsunami::OnCurLevelDown()
 {
-	if (view->cur_level > 0){
-		view->cur_level --;
-		UpdateMenu();
-		view->ForceRedraw();
-	}
+	view->SetCurLevel(view->cur_level - 1);
 }
 
 void Tsunami::OnSubFromSelection()

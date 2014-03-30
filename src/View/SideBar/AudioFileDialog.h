@@ -11,29 +11,32 @@
 #include "SideBar.h"
 #include "../../Stuff/Observer.h"
 class AudioFile;
-class Slider;
 class BarList;
+class AudioView;
 
 class AudioFileDialog: public SideBarConsole, public Observer
 {
 public:
-	AudioFileDialog(AudioFile *a);
+	AudioFileDialog(AudioView *v, AudioFile *a);
 	virtual ~AudioFileDialog();
 
 	void LoadData();
 	void ApplyData();
 
-	void OnVolume();
 	void OnTrackList();
 	void OnTagsSelect();
 	void OnTagsEdit();
 	void OnAddTag();
 	void OnDeleteTag();
+	void OnLevelsSelect();
+	void OnLevelsEdit();
+	void OnAddLevel();
+	void OnDeleteLevel();
 
 	virtual void OnUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
-	Slider *volume_slider;
+	AudioView *view;
 	BarList *bar_list;
 };
 

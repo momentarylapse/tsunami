@@ -17,7 +17,8 @@
 #include "../../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
 
 TrackDialog::TrackDialog(AudioView *_view) :
-	SideBarConsole(_("Spur-Eigenschaften"))
+	SideBarConsole(_("Spur-Eigenschaften")),
+	Observer("TrackDialog")
 {
 	view = _view;
 	track = NULL;

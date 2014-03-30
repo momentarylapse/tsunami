@@ -10,7 +10,8 @@
 #include "../../Stuff/Log.h"
 
 LogDialog::LogDialog(Log *_log) :
-	BottomBarConsole(_("Nachrichten"))
+	BottomBarConsole(_("Nachrichten")),
+	Observer("LogDialog")
 {
 	log = _log;
 

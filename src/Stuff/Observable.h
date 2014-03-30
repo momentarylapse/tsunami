@@ -21,8 +21,7 @@ public:
 	Observable(const string &name);
 	virtual ~Observable();
 
-	void AddObserver(Observer *o);
-	void AddObserver(Observer *o, const string &message);
+	void AddObserver(Observer *o, const string &message = "");
 	void AddWrappedObserver(void *handler, void *func);
 	void RemoveObserver(Observer *o);
 	void RemoveWrappedObserver(void *handler);

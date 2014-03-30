@@ -13,7 +13,8 @@
 #include <math.h>
 
 SampleManager::SampleManager(AudioFile *a) :
-	BottomBarConsole(_("Sample Manager"))
+	BottomBarConsole(_("Sample Manager")),
+	Observer("SampleManager")
 {
 	FromResource("sample_manager_dialog");
 	SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));

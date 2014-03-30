@@ -11,7 +11,8 @@
 #include "../Helper/Slider.h"
 
 SubDialog::SubDialog(AudioView *v, AudioFile *a):
-	SideBarConsole("Sample-Eigenschaften")
+	SideBarConsole("Sample-Eigenschaften"),
+	Observer("SubDialog")
 {
 	FromResource("sub_track_dialog");
 	view = v;

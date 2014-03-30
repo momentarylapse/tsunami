@@ -32,7 +32,8 @@ void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
 	track_no = get_track_index(t);
 }
 
-PluginManager::PluginManager()
+PluginManager::PluginManager() :
+	Observer("PluginManager")
 {
 	cur_plugin = NULL;
 	cur_effect = NULL;

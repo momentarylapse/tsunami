@@ -101,7 +101,8 @@ void TrackMixer::Update()
 
 
 MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
-	BottomBarConsole(_("Mischpult"))
+	BottomBarConsole(_("Mischpult")),
+	Observer("MixingConsole")
 {
 	audio = _audio;
 	output = _output;

@@ -54,6 +54,7 @@ AudioView::SelectionType::SelectionType()
 }
 
 AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input, AudioRenderer *_renderer) :
+	Observer("AudioView"),
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
 	TIME_SCALE_HEIGHT(20),
@@ -1007,7 +1008,7 @@ void AudioView::CheckConsistency()
 {
 	// check cur_track consistency
 	int n = get_track_index_save(cur_track);
-	if (n < 0)
+	if ((cur_track) && (n < 0))
 		if (audio->track.num > 0)
 			SetCurTrack(audio->track[0]);
 
@@ -1020,12 +1021,11 @@ void AudioView::CheckConsistency()
 
 void AudioView::OnUpdate(Observable *o, const string &message)
 {
-	//msg_write("view: " + o->GetName() + " - " + message);
-
 	CheckConsistency();
 
 	if (o->GetName() == "AudioFile"){
 		if (message == "New"){
+			SetCurTrack((audio->track.num > 0) ? audio->track[0] : NULL);
 			OptimizeView();
 		}else{
 			ForceRedraw();

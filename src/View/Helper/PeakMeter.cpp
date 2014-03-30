@@ -41,7 +41,8 @@ void PeakMeter::Data::update(Array<float> &buf, float sample_rate)
 	}
 }
 
-PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_source)
+PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_source) :
+	Observer("PeakMeter")
 {
 	panel = _panel;
 	id = _id;

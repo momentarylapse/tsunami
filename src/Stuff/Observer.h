@@ -16,14 +16,18 @@ class Observable;
 class Observer
 {
 public:
-	Observer();
+	Observer(const string &name);
 	virtual ~Observer();
 
-	void Subscribe(Observable *o);
-	void Subscribe(Observable *o, const string &message);
+	void Subscribe(Observable *o, const string &message = "");
 	void Unsubscribe(Observable *o);
 
+	string GetName();
+
 	virtual void OnUpdate(Observable *o, const string &message) = 0;
+
+private:
+	string observer_name;
 };
 
 class ObserverWrapper : public Observer

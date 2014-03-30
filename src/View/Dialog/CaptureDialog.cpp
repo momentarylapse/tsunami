@@ -28,7 +28,8 @@ string track_type(int type)
 }
 
 CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
-	HuiWindow("record_dialog", _parent, _allow_parent)
+	HuiWindow("record_dialog", _parent, _allow_parent),
+	Observer("CaptureDialog")
 {
 	audio = a;
 	type = Track::TYPE_AUDIO;

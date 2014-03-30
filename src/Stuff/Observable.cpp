@@ -41,11 +41,6 @@ void Observable::AddObserver(Observer *o, const string &message)
 	requests.add(ObserverRequest(o, message));
 }
 
-void Observable::AddObserver(Observer *o)
-{	AddObserver(o, "");	}
-
-
-
 void Observable::RemoveObserver(Observer *o)
 {
 	for (int i=requests.num-1; i>=0; i--)
@@ -57,7 +52,7 @@ void Observable::RemoveObserver(Observer *o)
 void Observable::AddWrappedObserver(void* handler, void* func)
 {
 	Observer *o = new ObserverWrapper(handler, func);
-	AddObserver(o);
+	AddObserver(o, "");
 }
 
 void Observable::RemoveWrappedObserver(void* handler)
@@ -65,6 +60,7 @@ void Observable::RemoveWrappedObserver(void* handler)
 	foreachi(ObserverRequest &r, requests, i)
 		if (dynamic_cast<ObserverWrapper*>(r.observer)){
 			if (dynamic_cast<ObserverWrapper*>(r.observer)->handler == handler){
+				delete(r.observer);
 				requests.erase(i);
 				break;
 			}
@@ -92,8 +88,10 @@ void Observable::NotifySend()
 	message_queue.clear();
 
 	// send
-	foreach(Notification &n, notifications)
+	foreach(Notification &n, notifications){
+		//msg_write("send " + GetName() + "/" + n.message + "  >>  " + n.observer->GetName());
 		n.observer->OnUpdate(this, n.message);
+	}
 }
 
 

@@ -13,7 +13,8 @@
 #include "../Helper/BarList.h"
 
 AudioFileDialog::AudioFileDialog(AudioFile *a) :
-	SideBarConsole(_("Datei-Eigenschaften"))
+	SideBarConsole(_("Datei-Eigenschaften")),
+	Observer("AudioFileDialog")
 {
 	audio = a;
 

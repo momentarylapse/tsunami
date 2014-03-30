@@ -34,6 +34,7 @@ extern string AppVersion;
 HuiTimer debug_timer;
 
 Tsunami::Tsunami(Array<string> arg) :
+	Observer("Tsunami"),
 	HuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls)
 {
 	tsunami = this;

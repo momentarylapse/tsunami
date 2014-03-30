@@ -745,13 +745,17 @@ void AudioView::DrawTrackBuffers(HuiPainter *c, const rect &r, Track *t, double 
 {
 	msg_db_f("DrawTrackBuffers", 1);
 
+	// non-current levels
 	foreachi(TrackLevel &lev, t->level, level_no){
-		color cc = ColorWave;
 		if (level_no == cur_level)
-			cc = col;
+			continue;
 		foreach(BufferBox &b, lev.buffer)
-			DrawBuffer(c, r, b, view_pos_rel, cc);
+			DrawBuffer(c, r, b, view_pos_rel, ColorWave);
 	}
+
+	// current
+	foreach(BufferBox &b, t->level[cur_level].buffer)
+		DrawBuffer(c, r, b, view_pos_rel, col);
 }
 
 void AudioView::DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay)

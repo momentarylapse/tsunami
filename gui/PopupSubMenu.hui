@@ -1,0 +1,7 @@
+Menu popup_sub_menu ""
+	Item sub_menu_header "Sample" disabled
+	Separator "" ""
+	Item sub_properties "Eigenschaften"
+	Item insert_added "Fest einfügen"
+	Item remove_added "Löschen"
+

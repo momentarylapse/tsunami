@@ -128,7 +128,7 @@ class Track
 	int rep_num
 	int rep_delay
 	
-	AudioEffect fx[]
+	AudioEffect *fx[]
 	SampleRef *sample[]
 	
 	// time track

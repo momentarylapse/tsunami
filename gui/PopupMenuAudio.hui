@@ -1,0 +1,4 @@
+Menu popup_audio_menu ""
+	Item wave_menu_header "Audio Datei" disabled
+	Separator "" ""
+	Item wave_properties "Eigenschaften"

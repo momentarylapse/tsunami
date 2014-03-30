@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-181
+184
 // Data (ID,Text)
 about
 
@@ -321,6 +321,8 @@ stop
 Stop
 sub_from_selection
 
+sub_menu_header
+
 sub_properties
 
 sub_track_dialog
@@ -335,6 +337,8 @@ track_import
 
 track_list
 Track
+track_menu_header
+
 track_properties
 
 trackdest_dialog
@@ -359,6 +363,8 @@ volume
 \\0\\1000\\0.1
 volume_slider
 
+wave_menu_header
+
 wave_properties
 
 zoom_in
@@ -366,7 +372,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-110
+113
 // Data (ID,Text)
 
 
@@ -377,6 +383,10 @@ zoom_out
   ...keine Sorge, das wird schon!
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
+
+!angle=90\\wirken auf die Spur '%s'
+
+!angle=90\\wirken auf die komplette Datei
 
 !bold$Kommentar/Geschehnisse:
 
@@ -400,6 +410,8 @@ zoom_out
 
 - Standard -
 - Default -
+- hier sind (noch) keine Effekte aktiv -
+
 -Standard Parameter-
 
 ...done
@@ -410,7 +422,7 @@ Abtastrate\\\") + i2s(audio->sample_rate) +
 
 Amplitude zu groß, Signal übersteuert.
 
-Anfang\\\") + audio->get_time_str(audio->GetRange().start()));
+Anfang\\\") + audio->get_time_str_long(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
 
@@ -432,7 +444,7 @@ Datei-Eigenschaften
 
 Datenverlust!
 
-Dauer\\\") + audio->get_time_str(samples));
+Dauer\\\") + audio->get_time_str_long(samples));
 
 Dieser Effekt ist nicht konfigurierbar.
 
@@ -444,7 +456,7 @@ Effekt nicht ladbar: \"%s\"
 
 Effekte
 
-Ende\\\") + audio->get_time_str(audio->GetRange().end()));
+Ende\\\") + audio->get_time_str_long(audio->GetRange().end()));
 
 Es existiert schon eine Rhythmus-Spur.
 
@@ -530,6 +542,8 @@ Unbenannt
 
 Vorschau
 
+aktiv?
+
 alle Nachrichten löschen
 
 benutze OpenAl Device: 
@@ -573,8 +587,6 @@ neue Spur anlegen
 neuen Effekt hinzufügen
 
 nicht konfigurierbar
-
-nichts zu konfigurieren
 
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 

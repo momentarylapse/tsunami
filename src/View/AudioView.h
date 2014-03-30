@@ -193,6 +193,10 @@ public:
 
 	Image image_muted, image_unmuted, image_solo;
 	Image image_track_audio, image_track_time, image_track_midi;
+
+	HuiMenu *menu_track;
+	HuiMenu *menu_sub;
+	HuiMenu *menu_audio;
 };
 
 #endif /* AUDIOVIEW_H_ */

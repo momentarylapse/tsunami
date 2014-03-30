@@ -66,6 +66,7 @@ void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
 	msg_db_r("CHuiMenu::OpenPopup", 1);
 	gtk_widget_show(widget);
 	gtk_menu_popup(GTK_MENU(widget), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
+	set_win(win);
 //	win->popup = this;
 	msg_db_l(1);
 }

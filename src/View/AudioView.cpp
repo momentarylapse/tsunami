@@ -133,6 +133,11 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output,
 
 	parent->Activate("area");
 
+
+	menu_audio = HuiCreateResourceMenu("popup_audio_menu");
+	menu_track = HuiCreateResourceMenu("popup_track_menu");
+	menu_sub= HuiCreateResourceMenu("popup_sub_menu");
+
 	//ForceRedraw();
 	UpdateMenu();
 }
@@ -538,6 +543,13 @@ void AudioView::OnRightButtonDown()
 
 	// pop up menu...
 	UpdateMenu();
+
+	if (selection.type == SEL_TYPE_SAMPLE)
+		menu_sub->OpenPopup(tsunami, 0, 0);
+	else if (selection.type == SEL_TYPE_TRACK)
+		menu_track->OpenPopup(tsunami, 0, 0);
+	else if (selection.type == SEL_TYPE_NONE)
+		menu_audio->OpenPopup(tsunami, 0, 0);
 }
 
 

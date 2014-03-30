@@ -7,6 +7,7 @@
 
 #include "ActionTrackAddEffect.h"
 #include "../../../Data/Track.h"
+#include "../../../Plugins/Effect.h"
 
 ActionTrackAddEffect::ActionTrackAddEffect(Track *t, Effect *_effect)
 {

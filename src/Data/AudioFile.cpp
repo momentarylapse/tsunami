@@ -23,6 +23,7 @@
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
+#include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Tsunami.h"
 #include "../Storage/Storage.h"
@@ -91,6 +92,12 @@ void AudioFile::AddEffect(Effect *effect)
 void AudioFile::EditEffect(int index, const string &param_old)
 {
 	Execute(new ActionTrackEditEffect(NULL, index, param_old, fx[index]));
+}
+
+void AudioFile::EnableEffect(int index, bool enabled)
+{
+	if (fx[index]->enabled != enabled)
+		Execute(new ActionTrackToggleEffectEnabled(NULL, index));
 }
 
 void AudioFile::DeleteEffect(int index)
@@ -396,6 +403,22 @@ SampleRef *AudioFile::get_sub(int track_no, int sub_no)
 	assert((sub_no >= 0) && "AudioFile.get_sub");
 	assert((sub_no < t->sample.num) && "AudioFile.get_sub");
 	return t->sample[sub_no];
+}
+
+Effect *AudioFile::get_fx(int track_no, int index)
+{
+	assert(index >= 0);
+	if (track_no >= 0){
+		Track *t = get_track(track_no);
+		assert(t);
+		assert(index < t->fx.num);
+
+		return t->fx[index];
+	}else{
+		assert(index < fx.num);
+
+		return fx[index];
+	}
 }
 
 Track *AudioFile::GetTimeTrack()

@@ -24,6 +24,7 @@
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
+#include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Action/Track/Bar/ActionTrackAddBar.h"
 #include "../Action/Track/Bar/ActionTrackEditBar.h"
 #include "../Action/Track/Bar/ActionTrackDeleteBar.h"
@@ -275,6 +276,12 @@ void Track::AddEffect(Effect *effect)
 void Track::EditEffect(int index, const string &param_old)
 {
 	root->Execute(new ActionTrackEditEffect(this, index, param_old, fx[index]));
+}
+
+void Track::EnableEffect(int index, bool enabled)
+{
+	if (fx[index]->enabled != enabled)
+		root->Execute(new ActionTrackToggleEffectEnabled(this, index));
 }
 
 void Track::DeleteEffect(int index)

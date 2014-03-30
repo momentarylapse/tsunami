@@ -40,6 +40,7 @@ public:
 	Range range;
 	Plugin *plugin;
 	bool usable;
+	bool enabled;
 
 	Array<EffectParam> legacy_params;
 

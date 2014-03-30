@@ -65,6 +65,7 @@ public:
 	void AddEffect(Effect *effect);
 	void DeleteEffect(int index);
 	void EditEffect(int index, const string &param_old);
+	void EnableEffect(int index, bool enabled);
 	SampleRef *AddSample(int pos, int index);
 	void DeleteSample(int index);
 	void EditSample(int index, float volume, bool mute, int rep_num, int rep_delay);

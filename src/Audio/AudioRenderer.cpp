@@ -139,15 +139,13 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_lis
 	make_fake_track(&fake_track, buf);
 
 	// apply preview plugin?
-	if (t)
-		if (effect){
-			effect->Apply(buf, &fake_track, false);
-			//msg_write("preview  .....");
-		}
+	if ((t) && (effect))
+		effect->Apply(buf, &fake_track, false);
 
 	// apply fx
 	foreach(Effect *fx, fx_list)
-		fx->Apply(buf, &fake_track, false);
+		if (fx->enabled)
+			fx->Apply(buf, &fake_track, false);
 }
 
 void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t)
@@ -222,7 +220,6 @@ void AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range, BufferBox 
 	Prepare(a, range, false);
 	buf.resize(range.num);
 	read(buf);
-	//buf = RenderAudioFilePart(a, range);
 }
 
 void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)

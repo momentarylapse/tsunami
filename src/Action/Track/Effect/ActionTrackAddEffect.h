@@ -9,7 +9,6 @@
 #define ACTIONTRACKADDEFFECT_H_
 
 #include "../../Action.h"
-#include "../../../Plugins/Effect.h"
 class Track;
 class Effect;
 

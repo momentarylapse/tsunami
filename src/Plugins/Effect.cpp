@@ -24,6 +24,7 @@ Effect::Effect() :
 	usable = true;
 	plugin = NULL;
 	only_on_selection = false;
+	enabled = true;
 }
 
 Effect::Effect(Plugin *p) :
@@ -32,6 +33,7 @@ Effect::Effect(Plugin *p) :
 	usable = true;
 	plugin = p;
 	only_on_selection = false;
+	enabled = true;
 }
 
 Effect::~Effect()

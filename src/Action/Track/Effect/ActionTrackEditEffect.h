@@ -25,7 +25,6 @@ public:
 	virtual bool mergable(Action *a);
 
 private:
-	Effect *get_fx(AudioFile *a);
 	int track_no;
 	int index;
 };

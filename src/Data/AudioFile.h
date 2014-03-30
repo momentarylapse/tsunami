@@ -67,6 +67,7 @@ public:
 	void AddEffect(Effect *effect);
 	void DeleteEffect(int index);
 	void EditEffect(int index, const string &param_old);
+	void EnableEffect(int index, bool enabled);
 	void SetVolume(float volume);
 	Track *AddTrack(int type, int index = -1);
 	void DeleteTrack(int index);
@@ -80,6 +81,7 @@ public:
 
 	Track *get_track(int track_no);
 	SampleRef *get_sub(int track_no, int sub_no);
+	Effect *get_fx(int track_no, int index);
 
 // data
 	bool used;

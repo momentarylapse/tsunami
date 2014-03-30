@@ -24,16 +24,18 @@ public:
 		index = _index;
 		AddControlTable("!noexpandx,expandy", 0, 0, 1, 2, "grid");
 		SetTarget("grid", 0);
-		AddControlTable("", 0, 0, 4, 1, "header");
+		AddControlTable("", 0, 0, 5, 1, "header");
 		SetTarget("header", 0);
-		AddText("!bold,center,expandx\\" + fx->name, 0, 0, 0, 0, "");
-		AddButton("!flat", 1, 0, 0, 0, "load_favorite");
+		AddButton("!flat", 0, 0, 0, 0, "load_favorite");
 		SetImage("load_favorite", "hui:open");
 		SetTooltip("load_favorite", _("Parameter laden"));
-		AddButton("!flat", 2, 0, 0, 0, "save_favorite");
+		AddButton("!flat", 1, 0, 0, 0, "save_favorite");
 		SetImage("save_favorite", "hui:save");
 		SetTooltip("save_favorite", _("Parameter speichern"));
-		AddButton("!flat", 3, 0, 0, 0, "delete");
+		AddText("!bold,center,expandx\\" + fx->name, 2, 0, 0, 0, "");
+		AddCheckBox("", 3, 0, 0, 0, "enabled");
+		SetTooltip("enabled", _("aktiv?"));
+		AddButton("!flat", 4, 0, 0, 0, "delete");
 		SetImage("delete", "hui:delete");
 		SetTooltip("delete", _("Effekt l&oschen"));
 		HuiPanel *p = fx->CreatePanel();
@@ -46,9 +48,12 @@ public:
 			HideControl("save_favorite", true);
 		}
 
+		EventM("enabled", this, &SingleFxPanel::onEnabled);
 		EventM("delete", this, &SingleFxPanel::onDelete);
 		EventM("load_favorite", this, &SingleFxPanel::onLoad);
 		EventM("save_favorite", this, &SingleFxPanel::onSave);
+
+		Check("enabled", fx->enabled);
 
 		old_param = fx->ConfigToString();
 		Subscribe(fx);
@@ -76,6 +81,13 @@ public:
 			return;
 		tsunami->plugin_manager->SaveFavorite(fx, name);
 	}
+	void onEnabled()
+	{
+		if (track)
+			track->EnableEffect(index, IsChecked(""));
+		else
+			audio->EnableEffect(index, IsChecked(""));
+	}
 	void onDelete()
 	{
 		if (track)
@@ -85,13 +97,13 @@ public:
 	}
 	virtual void OnUpdate(Observable *o, const string &message)
 	{
-		//msg_write("SingleFxPanel: " + message);
 		if (message == "Change"){
 			if (track)
 				track->EditEffect(index, old_param);
 			else
 				audio->EditEffect(index, old_param);
 		}
+		Check("enabled", fx->enabled);
 		fx->UpdateDialog();
 		old_param = fx->ConfigToString();
 	}

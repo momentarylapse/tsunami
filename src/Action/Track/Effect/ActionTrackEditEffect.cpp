@@ -22,26 +22,11 @@ ActionTrackEditEffect::~ActionTrackEditEffect()
 {
 }
 
-Effect *ActionTrackEditEffect::get_fx(AudioFile *a)
-{
-	if (track_no >= 0){
-		Track *t = a->get_track(track_no);
-		assert(t);
-		assert(index < t->fx.num);
-
-		return t->fx[index];
-	}else{
-		assert(index < a->fx.num);
-
-		return a->fx[index];
-	}
-}
-
 void *ActionTrackEditEffect::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	Effect *fx = get_fx(a);
+	Effect *fx = a->get_fx(track_no, index);
 
 	fx->ConfigFromString(new_value);
 	fx->Notify("ChangeByAction");
@@ -53,7 +38,7 @@ void ActionTrackEditEffect::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	Effect *fx = get_fx(a);
+	Effect *fx = a->get_fx(track_no, index);
 
 	fx->ConfigFromString(old_value);
 	fx->Notify("ChangeByAction");

@@ -22,6 +22,7 @@ public:
 	void Paste(AudioFile *a);
 	void Clear();
 	bool HasData();
+	bool CanCopy(AudioFile *a);
 
 private:
 	BufferBox *buf;

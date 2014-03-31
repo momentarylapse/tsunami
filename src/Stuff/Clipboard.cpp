@@ -35,19 +35,19 @@ void Clipboard::Clear()
 
 void Clipboard::Copy(AudioFile *a)
 {
+	if ((a->selection.empty()) || (!tsunami->view->cur_track))
+		return;
 	Clear();
 
-	if (!a->selection.empty()){
-		assert(a == tsunami->view->cur_track->root);
+	assert(a == tsunami->view->cur_track->root);
 
-		sample_rate = a->sample_rate;
+	sample_rate = a->sample_rate;
 
-		buf = new BufferBox;
-		*buf = tsunami->view->cur_track->ReadBuffers(tsunami->view->cur_level, a->selection);
-		buf->make_own();
+	buf = new BufferBox;
+	*buf = tsunami->view->cur_track->ReadBuffers(tsunami->view->cur_level, a->selection);
+	buf->make_own();
 
-		Notify("Change");
-	}
+	Notify("Change");
 }
 
 void Clipboard::Paste(AudioFile *a)
@@ -70,5 +70,10 @@ void Clipboard::Paste(AudioFile *a)
 bool Clipboard::HasData()
 {
 	return buf;
+}
+
+bool Clipboard::CanCopy(AudioFile *a)
+{
+	return !a->selection.empty();// || (a->GetNumSelectedSamples() > 0);
 }
 

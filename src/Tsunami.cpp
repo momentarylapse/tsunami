@@ -514,7 +514,7 @@ void Tsunami::UpdateMenu()
 	Enable("select_nothing", audio->used);
 	Enable("undo", audio->action_manager->Undoable());
 	Enable("redo", audio->action_manager->Redoable());
-	Enable("copy", selected || (audio->GetNumSelectedSamples() > 0));
+	Enable("copy", clipboard->CanCopy(audio));
 	Enable("paste", clipboard->HasData());
 	Enable("delete", selected || (audio->GetNumSelectedSamples() > 0));
 	// file

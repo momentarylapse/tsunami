@@ -99,6 +99,8 @@ void SubDialog::LoadData()
 	Enable("repnum", sample);
 	Enable("repdelay", sample);
 
+	SetString("name", _("keine Sample gew&ahlt"));
+
 	if (!sample)
 		return;
 	SetString("name", sample->origin->name);
@@ -123,6 +125,10 @@ void SubDialog::OnUpdate(Observable *o, const string &message)
 		sample = view->cur_sample;
 		if (sample)
 			Subscribe(sample);
+		LoadData();
+	}else if ((o == sample) && (message == "Delete")){
+		Unsubscribe(sample);
+		sample = NULL;
 		LoadData();
 	}else{
 		LoadData();

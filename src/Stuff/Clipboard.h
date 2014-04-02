@@ -26,6 +26,7 @@ public:
 
 private:
 	BufferBox *buf;
+	int ref_uid;
 	int sample_rate;
 };
 

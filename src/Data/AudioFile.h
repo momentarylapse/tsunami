@@ -84,7 +84,8 @@ public:
 	void CreateSamplesFromSelection(int level_no);
 
 	Track *get_track(int track_no);
-	SampleRef *get_sample(int track_no, int index);
+	SampleRef *get_sample_ref(int track_no, int index);
+	int get_sample_by_uid(int uid);
 	Effect *get_fx(int track_no, int index);
 
 // data

@@ -16,6 +16,7 @@ Clipboard::Clipboard() :
 	Observable("Clipboard")
 {
 	buf = NULL;
+	ref_uid = -1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
@@ -31,11 +32,12 @@ void Clipboard::Clear()
 		buf = NULL;
 		Notify("Change");
 	}
+	ref_uid = -1;
 }
 
 void Clipboard::Copy(AudioFile *a)
 {
-	if ((a->selection.empty()) || (!tsunami->view->cur_track))
+	if (!CanCopy(a))
 		return;
 	Clear();
 
@@ -55,7 +57,13 @@ void Clipboard::Paste(AudioFile *a)
 	if (!HasData())
 		return;
 	if (a->used){
-		a->Execute(new ActionTrackPasteAsSample(tsunami->view->cur_track, a->selection.start(), buf));
+		int index = a->get_sample_by_uid(ref_uid);
+		if (index >= 0){
+			tsunami->view->cur_track->AddSample(a->selection.start(), index);
+		}else{
+			a->Execute(new ActionTrackPasteAsSample(tsunami->view->cur_track, a->selection.start(), buf));
+			ref_uid = a->sample.back()->uid;
+		}
 	}else{
 		a->NewWithOneTrack(sample_rate, Track::TYPE_AUDIO);
 		a->action_manager->Enable(false);

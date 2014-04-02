@@ -417,7 +417,7 @@ Track *AudioFile::get_track(int track_no)
 	return track[track_no];
 }
 
-SampleRef *AudioFile::get_sample(int track_no, int index)
+SampleRef *AudioFile::get_sample_ref(int track_no, int index)
 {
 	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_sample");
 	Track *t = track[track_no];
@@ -425,6 +425,14 @@ SampleRef *AudioFile::get_sample(int track_no, int index)
 	assert((index >= 0) && "AudioFile.get_sample");
 	assert((index < t->sample.num) && "AudioFile.get_sample");
 	return t->sample[index];
+}
+
+int AudioFile::get_sample_by_uid(int uid)
+{
+	foreachi(Sample *s, sample, i)
+		if (s->uid == uid)
+			return i;
+	return -1;
 }
 
 Effect *AudioFile::get_fx(int track_no, int index)

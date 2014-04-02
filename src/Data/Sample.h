@@ -30,6 +30,7 @@ public:
 	float volume;
 	int offset;
 
+	int uid;
 	int ref_count;
 	bool auto_delete;
 

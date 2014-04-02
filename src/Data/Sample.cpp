@@ -7,6 +7,7 @@
 
 #include "Sample.h"
 #include "AudioFile.h"
+#include "../lib/math/math.h"
 
 Sample::Sample()
 {
@@ -17,6 +18,8 @@ Sample::Sample()
 
 	ref_count = 0;
 	auto_delete = false;
+
+	uid = randi(0x7fffffff);
 }
 
 Sample::~Sample()

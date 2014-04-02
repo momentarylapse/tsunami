@@ -34,7 +34,7 @@ void *ActionTrackMoveSample::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	foreach(SubSaveData &d, sub)
-		a->get_sample(d.track_no, d.sub_no)->pos = d.pos_old + param;
+		a->get_sample_ref(d.track_no, d.sub_no)->pos = d.pos_old + param;
 	return NULL;
 }
 
@@ -51,7 +51,7 @@ void ActionTrackMoveSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	foreach(SubSaveData &d, sub)
-		a->get_sample(d.track_no, d.sub_no)->pos = d.pos_old;
+		a->get_sample_ref(d.track_no, d.sub_no)->pos = d.pos_old;
 }
 
 

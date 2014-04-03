@@ -166,14 +166,15 @@ class AudioFile
 	Track *track[]
 
 	rect area
-
-	Range selection
-	Range sel_raw
 	
 	string level_name[]
 	
 	extern Range getRange()
 	extern int getNextBeat(int pos)
+
+class AudioView
+	Range sel_range
+	Range sel_raw
 
 
 class AudioRenderer
@@ -227,6 +228,7 @@ extern AudioFile *audio
 extern AudioOutput *output
 extern AudioInput *input
 extern AudioRenderer *renderer
+extern AudioView *view
 extern Log *logging
 extern PluginContext plugin_context
 extern Storage *storage

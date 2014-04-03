@@ -12,6 +12,8 @@
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 
+class Range;
+
 class Storage
 {
 public:
@@ -22,7 +24,7 @@ public:
 	bool LoadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
 	bool LoadBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
 	bool Save(AudioFile *a, const string &filename);
-	bool Export(AudioFile *a, const string &filename);
+	bool Export(AudioFile *a, const Range &r, const string &filename);
 
 	bool AskByFlags(HuiWindow *win, const string &title, bool save, int flags);
 

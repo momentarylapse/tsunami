@@ -47,8 +47,7 @@ public:
 	void NewWithOneTrack(int track_type, int _sample_rate);
 	bool Load(const string &filename, bool deep);
 	bool Save(const string &filename);
-	void UpdateSelection();
-	Range GetPlaybackSelection();
+	void UpdateSelection(const Range &range);
 	void UnselectAllSamples();
 
 	virtual void PostActionUpdate();
@@ -80,8 +79,8 @@ public:
 	void RenameLevel(int index, const string &name);
 	void InsertSelectedSamples(int level_no);
 	void DeleteSelectedSamples();
-	void DeleteSelection(int level_no, bool all_levels);
-	void CreateSamplesFromSelection(int level_no);
+	void DeleteSelection(int level_no, const Range &range, bool all_levels);
+	void CreateSamplesFromSelection(int level_no, const Range &range);
 
 	Track *get_track(int track_no);
 	SampleRef *get_sample_ref(int track_no, int index);
@@ -103,11 +102,6 @@ public:
 // editing
 	// needed for rendering
 	rect area;
-
-	// selection within the buffer?
-	Range selection;
-
-	Range sel_raw;
 
 	Array<string> level_name;
 };

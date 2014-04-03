@@ -91,7 +91,7 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	renderer.renderAudioFile(audio, audio.selection, buf)
+	renderer.renderAudioFile(audio, view.sel_range, buf)
 	
 	complex fr[], fl[]
 	
@@ -138,7 +138,7 @@ void show_spec()
 	ffl.clear()
 
 void main()
-	if audio.selection.length > 0
+	if view.sel_range.length > 0
 		show_spec()
 	else
 		logging.error("'Show Spectrum.kaba': Needs some selection!")

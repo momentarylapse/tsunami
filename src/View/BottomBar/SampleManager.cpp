@@ -97,13 +97,13 @@ void SampleManager::OnInsert()
 {
 	int n = GetInt("sample_list");
 	if (n >= 0)
-		tsunami->view->cur_track->AddSample(audio->selection.start(), n);
+		tsunami->view->cur_track->AddSample(tsunami->view->sel_range.start(), n);
 }
 
 void SampleManager::OnCreateFromSelection()
 {
 	selected = audio->sample.num;
-	audio->CreateSamplesFromSelection(tsunami->view->cur_level);
+	audio->CreateSamplesFromSelection(tsunami->view->cur_level, tsunami->view->sel_range);
 }
 
 void SampleManager::OnDelete()

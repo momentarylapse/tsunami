@@ -82,7 +82,6 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 	// run
 	tsunami->plugin_manager->context.set(t, 0, buf.range());
 	ProcessTrack(&buf);
-	t->root->UpdateSelection();
 
 	if (!usable){
 		msg_error("not usable... apply");

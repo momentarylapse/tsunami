@@ -166,7 +166,7 @@ bool Storage::Save(AudioFile *a, const string &filename)
 	return ok;
 }
 
-bool Storage::Export(AudioFile *a, const string &filename)
+bool Storage::Export(AudioFile *a, const Range &r, const string &filename)
 {
 	msg_db_f("Storage.Export", 1);
 	bool ok = false;
@@ -181,9 +181,6 @@ bool Storage::Export(AudioFile *a, const string &filename)
 
 			// render audio...
 			tsunami->progress->Set(_("rendere Audio"), 0);
-			Range r = a->GetRange();
-			if (!a->selection.empty())
-				r = a->selection;
 			BufferBox buf;
 			tsunami->renderer->RenderAudioFile(a, r, buf);
 

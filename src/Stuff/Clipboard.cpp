@@ -46,7 +46,7 @@ void Clipboard::Copy(AudioFile *a)
 	sample_rate = a->sample_rate;
 
 	buf = new BufferBox;
-	*buf = tsunami->view->cur_track->ReadBuffers(tsunami->view->cur_level, a->selection);
+	*buf = tsunami->view->cur_track->ReadBuffers(tsunami->view->cur_level, tsunami->view->sel_range);
 	buf->make_own();
 
 	Notify("Change");
@@ -59,9 +59,9 @@ void Clipboard::Paste(AudioFile *a)
 	if (a->used){
 		int index = a->get_sample_by_uid(ref_uid);
 		if (index >= 0){
-			tsunami->view->cur_track->AddSample(a->selection.start(), index);
+			tsunami->view->cur_track->AddSample(tsunami->view->sel_range.start(), index);
 		}else{
-			a->Execute(new ActionTrackPasteAsSample(tsunami->view->cur_track, a->selection.start(), buf));
+			a->Execute(new ActionTrackPasteAsSample(tsunami->view->cur_track, tsunami->view->sel_range.start(), buf));
 			ref_uid = a->sample.back()->uid;
 		}
 	}else{
@@ -82,6 +82,6 @@ bool Clipboard::HasData()
 
 bool Clipboard::CanCopy(AudioFile *a)
 {
-	return !a->selection.empty();// || (a->GetNumSelectedSamples() > 0);
+	return !tsunami->view->sel_range.empty();// || (a->GetNumSelectedSamples() > 0);
 }
 

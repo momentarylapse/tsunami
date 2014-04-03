@@ -127,7 +127,7 @@ void CaptureDialog::OnTypeMidi()
 void CaptureDialog::OnStart()
 {
 	if (audio->used){
-		tsunami->renderer->Prepare(audio, audio->GetPlaybackSelection(), false);
+		tsunami->renderer->Prepare(audio, tsunami->view->GetPlaybackSelection(), false);
 		tsunami->output->Play(tsunami->renderer);
 	}
 
@@ -188,7 +188,7 @@ bool CaptureDialog::Insert()
 	int target = GetInt("capture_target");
 	int i0;
 	if (audio->used){
-		int s_start = audio->selection.start();
+		int s_start = tsunami->view->sel_range.start();
 
 		// insert recorded data with some delay
 		int dpos = tsunami->input->GetDelay();

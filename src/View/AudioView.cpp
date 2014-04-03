@@ -186,6 +186,17 @@ void AudioView::SelectionUpdatePos(SelectionType &s)
 	s.pos = screen2sample(mx);
 }
 
+void AudioView::UpdateSelection()
+{
+	msg_db_f("UpdateSelection", 1);
+	sel_range = sel_raw;
+	if (sel_range.num < 0)
+		sel_range.invert();
+
+	audio->UpdateSelection(sel_range);
+	Notify("SelectionChange");
+}
+
 bool mouse_over_time(AudioView *v, int pos)
 {
 	int ssx = v->sample2screen(pos);
@@ -208,12 +219,12 @@ AudioView::SelectionType AudioView::GetMouseOver()
 
 	// selection boundaries?
 	SelectionUpdatePos(s);
-	if (!audio->selection.empty()){
-		if (mouse_over_time(this, audio->sel_raw.start())){
+	if (!sel_raw.empty()){
+		if (mouse_over_time(this, sel_raw.start())){
 			s.type = SEL_TYPE_SELECTION_START;
 			return s;
 		}
-		if (mouse_over_time(this, audio->sel_raw.end())){
+		if (mouse_over_time(this, sel_raw.end())){
 			s.type = SEL_TYPE_SELECTION_END;
 			return s;
 		}
@@ -272,6 +283,17 @@ AudioView::SelectionType AudioView::GetMouseOver()
 }
 
 
+Range AudioView::GetPlaybackSelection()
+{
+	if (sel_range.empty()){
+		int num = audio->GetRange().end() - sel_range.start();
+		if (num <= 0)
+			num = audio->sample_rate; // 1 second
+		return Range(sel_range.start(), num);
+	}
+	return sel_range;
+}
+
 void AudioView::SelectUnderMouse()
 {
 	msg_db_f("SelectUnderMouse", 2);
@@ -325,10 +347,10 @@ void AudioView::SetBarriers(SelectionType *s)
 	}
 
 	// selection marker
-	if (!audio->selection.empty()){
-		s->barrier.add(audio->sel_raw.start());
+	if (!sel_range.empty()){
+		s->barrier.add(sel_raw.start());
 		if (mouse_possibly_selecting < 0)
-			s->barrier.add(audio->sel_raw.end());
+			s->barrier.add(sel_raw.end());
 	}
 }
 
@@ -375,8 +397,8 @@ void AudioView::OnMouseMove()
 			mo.track->is_selected = true;
 
 		ApplyBarriers(selection.pos);
-		audio->sel_raw.set_end(selection.pos);
-		audio->UpdateSelection();
+		sel_raw.set_end(selection.pos);
+		UpdateSelection();
 		//_force_redraw_ = true;
 		_force_redraw_ = false;
 		int x, w;
@@ -414,10 +436,10 @@ void AudioView::OnMouseMove()
 	if (mouse_possibly_selecting >= 0)
 		mouse_possibly_selecting += abs(HuiGetEvent()->dx);
 	if (mouse_possibly_selecting > mouse_min_move_to_select){
-		audio->sel_raw.offset = mouse_possibly_selecting_start;
-		audio->sel_raw.num = selection.pos - mouse_possibly_selecting_start;
+		sel_raw.offset = mouse_possibly_selecting_start;
+		sel_raw.num = selection.pos - mouse_possibly_selecting_start;
 		SetBarriers(&selection);
-		audio->UpdateSelection();
+		UpdateSelection();
 		selection.type = SEL_TYPE_SELECTION_END;
 		hover.type = SEL_TYPE_SELECTION_END;
 		_force_redraw_ = true;
@@ -449,13 +471,13 @@ void AudioView::OnLeftButtonDown()
 	//   start after lb down and moving
 	if ((selection.type == SEL_TYPE_TRACK) || (selection.type == SEL_TYPE_TIME)){
 		mouse_possibly_selecting = 0;
-		audio->sel_raw = Range(selection.pos, 0);
-		audio->UpdateSelection();
+		sel_raw = Range(selection.pos, 0);
+		UpdateSelection();
 	}else if (selection.type == SEL_TYPE_SELECTION_START){
 		// switch end / start
 		selection.type = SEL_TYPE_SELECTION_END;
 		hover.type = SEL_TYPE_SELECTION_END;
-		audio->sel_raw.invert();
+		sel_raw.invert();
 	}else if (selection.type == SEL_TYPE_MUTE){
 		selection.track->SetMuted(!selection.track->muted);
 	}else if (selection.type == SEL_TYPE_SOLO){
@@ -1041,6 +1063,7 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 
 	if (o->GetName() == "AudioFile"){
 		if (message == "New"){
+			sel_range = sel_raw = Range(0, 0);
 			SetCurTrack((audio->track.num > 0) ? audio->track[0] : NULL);
 			OptimizeView();
 		}else{
@@ -1053,7 +1076,7 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 		ForceRedraw();
 	}else if (o->GetName() == "AudioInput"){
 		if (input->IsCapturing())
-			MakeSampleVisible(audio->selection.start() + input->GetSampleCount());
+			MakeSampleVisible(sel_range.start() + input->GetSampleCount());
 		ForceRedraw();
 	}
 }
@@ -1183,16 +1206,16 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 
 void AudioView::DrawSelection(HuiPainter *c, const rect &r)
 {
-	int sx1 = sample2screen(audio->selection.start());
-	int sx2 = sample2screen(audio->selection.end());
+	int sx1 = sample2screen(sel_range.start());
+	int sx2 = sample2screen(sel_range.end());
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(ColorSelectionInternal);
 	foreach(Track *t, audio->track)
 		if (t->is_selected)
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
-	DrawTimeLine(c, audio->sel_raw.start(), SEL_TYPE_SELECTION_START, ColorSelectionBoundary);
-	DrawTimeLine(c, audio->sel_raw.end(), SEL_TYPE_SELECTION_END, ColorSelectionBoundary);
+	DrawTimeLine(c, sel_raw.start(), SEL_TYPE_SELECTION_START, ColorSelectionBoundary);
+	DrawTimeLine(c, sel_raw.end(), SEL_TYPE_SELECTION_END, ColorSelectionBoundary);
 }
 
 void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
@@ -1232,7 +1255,7 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 
 	// capturing position
 	if (input->IsCapturing())
-		DrawTimeLine(c, audio->selection.start() + input->GetSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
+		DrawTimeLine(c, sel_range.start() + input->GetSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
 }
 
 int frame=0;
@@ -1326,15 +1349,15 @@ void AudioView::MakeSampleVisible(int sample)
 
 void AudioView::SelectAll()
 {
-	audio->sel_raw = audio->GetRange();
-	audio->UpdateSelection();
+	sel_raw = audio->GetRange();
+	UpdateSelection();
 }
 
 void AudioView::SelectNone()
 {
 	// select all/none
-	audio->sel_raw.clear();
-	audio->UpdateSelection();
+	sel_raw.clear();
+	UpdateSelection();
 	audio->UnselectAllSamples();
 	SetCurSample(NULL);
 }
@@ -1376,7 +1399,7 @@ void AudioView::SelectTrack(Track *t, bool diff)
 		// select this track
 		t->is_selected = true;
 	}
-	t->root->UpdateSelection();
+	UpdateSelection();
 }
 
 void AudioView::SetCurSample(SampleRef *s)

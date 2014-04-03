@@ -598,7 +598,7 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 	// some post processing
 	check_empty_subs(a);
 
-	a->UpdateSelection();
+	a->UpdateSelection(Range(0, 0));
 }
 
 

@@ -118,6 +118,9 @@ public:
 	};
 
 	SelectionType hover, selection;
+	Range sel_range;
+	Range sel_raw;
+
 	ActionTrackMoveSample *cur_action;
 
 	int mouse_possibly_selecting, mouse_possibly_selecting_start;
@@ -131,6 +134,8 @@ public:
 
 	void SelectNone();
 	void SelectAll();
+	void UpdateSelection();
+	Range GetPlaybackSelection();
 
 	void SetMouse();
 	bool MouseOverTrack(Track *t);

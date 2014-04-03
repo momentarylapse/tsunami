@@ -339,7 +339,7 @@ void Tsunami::OnFindAndExecutePlugin()
 void Tsunami::OnDelete()
 {
 	if (audio->used)
-		audio->DeleteSelection(view->cur_level, false);
+		audio->DeleteSelection(view->cur_level, view->sel_range, false);
 }
 
 void Tsunami::OnSampleManager()
@@ -377,7 +377,7 @@ void Tsunami::OnTrackImport()
 		return;
 	if (storage->AskOpenImport(this)){
 		Track *t = audio->AddTrack(Track::TYPE_AUDIO);
-		storage->LoadTrack(t, HuiFilename, audio->selection.start(), view->cur_level);
+		storage->LoadTrack(t, HuiFilename, view->sel_range.start(), view->cur_level);
 	}
 }
 
@@ -401,7 +401,7 @@ void Tsunami::OnPlayLoop()
 
 void Tsunami::OnPlay()
 {
-	renderer->Prepare(audio, audio->GetPlaybackSelection(), true);
+	renderer->Prepare(audio, view->GetPlaybackSelection(), true);
 	output->Play(renderer);
 }
 
@@ -456,7 +456,7 @@ void Tsunami::OnCurLevelDown()
 void Tsunami::OnSubFromSelection()
 {
 	if (audio->used)
-		audio->CreateSamplesFromSelection(view->cur_level);
+		audio->CreateSamplesFromSelection(view->cur_level, view->sel_range);
 }
 
 void Tsunami::OnViewOptimal()
@@ -507,7 +507,7 @@ void Tsunami::OnZoomOut()
 void Tsunami::UpdateMenu()
 {
 	msg_db_f("UpdateMenu", 1);
-	bool selected = !audio->selection.empty();
+	bool selected = !view->sel_range.empty();
 // menu / toolbar
 	// edit
 	Enable("select_all", audio->used);
@@ -623,5 +623,5 @@ void Tsunami::OnExport()
 	if (!audio->used)
 		return;
 	if (storage->AskSaveExport(this))
-		storage->Export(audio, HuiFilename);
+		storage->Export(audio, view->GetPlaybackSelection(), HuiFilename);
 }

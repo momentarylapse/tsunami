@@ -91,6 +91,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("renderer", &tsunami->renderer);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
+	Script::LinkExternal("view", &tsunami->view);
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
@@ -221,8 +222,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "fx", offsetof(AudioFile, fx));
 	Script::DeclareClassOffset("AudioFile", "track", offsetof(AudioFile, track));
 	Script::DeclareClassOffset("AudioFile", "area", offsetof(AudioFile, area));
-	Script::DeclareClassOffset("AudioFile", "selection", offsetof(AudioFile, selection));
-	Script::DeclareClassOffset("AudioFile", "sel_raw", offsetof(AudioFile, sel_raw));
 	Script::DeclareClassOffset("AudioFile", "level_name", offsetof(AudioFile, level_name));
 	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::GetRange));
 	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::GetNextBeat));
@@ -256,6 +255,10 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioOutput.getVolume", Script::mf(&AudioOutput::GetVolume));
 	Script::LinkExternal("AudioOutput.setVolume", Script::mf(&AudioOutput::SetVolume));
 	Script::LinkExternal("AudioOutput.setBufferSize", Script::mf(&AudioOutput::SetBufferSize));
+
+	Script::DeclareClassSize("AudioView", sizeof(AudioView));
+	Script::DeclareClassOffset("AudioView", "sel_range", offsetof(AudioView, sel_range));
+	Script::DeclareClassOffset("AudioView", "sel_raw", offsetof(AudioView, sel_raw));
 
 	Script::LinkExternal("Log.error", Script::mf(&Log::Error));
 	Script::LinkExternal("Log.warning", Script::mf(&Log::Warning));
@@ -629,7 +632,7 @@ void PluginManager::OnUpdate(Observable *o, const string &message)
 			PreviewEnd();
 	}else if (o == tsunami->output){
 		int pos = tsunami->output->GetPos();
-		Range r = tsunami->audio->selection;
+		Range r = tsunami->view->sel_range;
 		tsunami->progress->Set(_("Vorschau"), (float)(pos - r.offset) / r.length());
 		if (!tsunami->output->IsPlaying())
 			PreviewEnd();
@@ -694,9 +697,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 				main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				if (a->used){
-					Range range = a->selection;
-					if (range.empty())
-						range = a->GetRange();
+					Range range = tsunami->view->GetPlaybackSelection();
 					a->action_manager->BeginActionGroup();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
@@ -760,7 +761,7 @@ void PluginManager::PreviewStart(Effect *fx)
 	tsunami->progress->StartCancelable(_("Vorschau"), 0);
 	Subscribe(tsunami->progress);
 	Subscribe(tsunami->output);
-	tsunami->renderer->Prepare(tsunami->audio, tsunami->audio->selection, false);
+	tsunami->renderer->Prepare(tsunami->audio, tsunami->view->sel_range, false);
 	tsunami->output->Play(tsunami->renderer);
 }
 

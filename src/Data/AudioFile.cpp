@@ -64,7 +64,6 @@ AudioFile::AudioFile() :
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	used = false;
 	volume = 1;
-	selection.clear();
 }
 
 
@@ -151,8 +150,6 @@ void AudioFile::Reset()
 	filename = "";
 	tag.clear();
 	area = rect(0, 0, 0, 0);
-	sel_raw.clear();
-	selection.clear();
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	foreach(Effect *f, fx)
@@ -181,29 +178,15 @@ AudioFile::~AudioFile()
 }
 
 
-void AudioFile::UpdateSelection()
+void AudioFile::UpdateSelection(const Range &range)
 {
 	msg_db_f("UpdateSelection", 1);
-	selection = sel_raw;
-	if (selection.num < 0)
-		selection.invert();
 
 	// subs
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
-			s->is_selected = (t->is_selected) && selection.overlaps(s->GetRange());
+			s->is_selected = (t->is_selected) && range.overlaps(s->GetRange());
 	Notify("SelectionChange");
-}
-
-Range AudioFile::GetPlaybackSelection()
-{
-	if (selection.empty()){
-		int num = GetRange().end() - selection.start();
-		if (num <= 0)
-			num = sample_rate; // 1 second
-		return Range(selection.start(), num);
-	}
-	return selection;
 }
 
 
@@ -391,16 +374,16 @@ void AudioFile::EditSampleName(int index, const string &name)
 	Execute(new ActionAudioSampleEditName(this, index, name));
 }
 
-void AudioFile::DeleteSelection(int level_no, bool all_levels)
+void AudioFile::DeleteSelection(int level_no, const Range &range, bool all_levels)
 {
-	if (!selection.empty())
-		Execute(new ActionAudioDeleteSelection(this, level_no, all_levels));
+	if (!range.empty())
+		Execute(new ActionAudioDeleteSelection(this, level_no, range, all_levels));
 }
 
-void AudioFile::CreateSamplesFromSelection(int level_no)
+void AudioFile::CreateSamplesFromSelection(int level_no, const Range &range)
 {
-	if (!selection.empty())
-		Execute(new ActionTrackSampleFromSelection(this, level_no));
+	if (!range.empty())
+		Execute(new ActionTrackSampleFromSelection(this, range, level_no));
 }
 
 void AudioFile::InvalidateAllPeaks()

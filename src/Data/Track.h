@@ -70,6 +70,7 @@ public:
 	void DeleteSample(int index);
 	void EditSample(int index, float volume, bool mute, int rep_num, int rep_delay);
 	void AddMidiNote(const MidiNote &n);
+	void AddMidiNotes(Array<MidiNote> notes);
 	void DeleteMidiNote(int index);
 	void SetSynthesizer(Synthesizer *synth);
 	void AddBars(int index, float bpm, int beats, int bars);

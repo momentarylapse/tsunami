@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-188
+190
 // Data (ID,Text)
 about
 
@@ -117,11 +117,15 @@ help
 
 import_from_file
 
+insert_chord
+
 insert_sample
 
 language
 
 ld_t_bars
+
+ld_t_chord
 
 ld_t_midi
 
@@ -380,7 +384,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-113
+116
 // Data (ID,Text)
 
 
@@ -455,6 +459,10 @@ Datenverlust!
 Dauer\\\") + audio->get_time_str_long(samples));
 
 Dieser Effekt ist nicht konfigurierbar.
+
+Ebene %d
+
+Ebene löschen: noch nicht implementiert...
 
 Editor für Audio Dateien
 
@@ -574,6 +582,8 @@ i'm now going to clean up...
 
 keine Datei
 no file
+keine Sample gewählt
+
 lade
 
 lade flac

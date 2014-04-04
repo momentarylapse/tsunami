@@ -154,7 +154,7 @@ public:
 	int y2pitch(int y);
 	float pitch2y(int p);
 
-	MidiNote GetSelectedNote();
+	Array<MidiNote> GetSelectedNotes();
 
 	void Zoom(float f);
 	void Move(float dpos);
@@ -175,6 +175,7 @@ public:
 	bool EditingMidi();
 	int pitch_min, pitch_max;
 	int beat_partition;
+	int chord_mode;
 
 	AudioFile *audio;
 

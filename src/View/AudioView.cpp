@@ -110,6 +110,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output,
 	pitch_max = 90;
 	beat_partition = 4;
 	parent->SetInt("beat_partition", beat_partition);
+	chord_mode = CHORD_TYPE_NONE;
 
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
@@ -509,7 +510,7 @@ void AudioView::OnLeftButtonDown()
 }
 
 
-MidiNote AudioView::GetSelectedNote()
+Array<MidiNote> AudioView::GetSelectedNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection.pos);
 	int end = max(mouse_possibly_selecting_start, selection.pos);
@@ -529,7 +530,11 @@ MidiNote AudioView::GetSelectedNote()
 		}
 	}
 	Range r = Range(start, end - start);
-	return MidiNote(r, selection.pitch, 1);
+	Array<MidiNote> notes;
+	Array<int> pitch = GetChordNotes(chord_mode, selection.pitch);
+	foreach(int p, pitch)
+		notes.add(MidiNote(r, p, 1));
+	return notes;
 }
 
 
@@ -540,7 +545,7 @@ void AudioView::OnLeftButtonUp()
 		if (cur_action)
 			audio->Execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		cur_track->AddMidiNote(GetSelectedNote());
+		cur_track->AddMidiNotes(GetSelectedNotes());
 	}
 	cur_action = NULL;
 
@@ -897,10 +902,13 @@ void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, c
 		draw_note(c, n, this);
 	}
 	if ((HuiGetEvent()->lbut) && (selection.type == SEL_TYPE_MIDI_PITCH)){
-		color col = GetPitchColor(selection.pitch);
-		col.a = 0.5f;
-		c->setColor(col);
-		draw_note(c, GetSelectedNote(), this);
+		Array<MidiNote> notes = GetSelectedNotes();
+		foreach(MidiNote &n, notes){
+			color col = GetPitchColor(n.pitch);
+			col.a = 0.5f;
+			c->setColor(col);
+			draw_note(c, n, this);
+		}
 	}
 	if ((hover.type == SEL_TYPE_MIDI_PITCH) || (hover.type == SEL_TYPE_MIDI_NOTE)){
 		c->setColor(ColorWaveCur);

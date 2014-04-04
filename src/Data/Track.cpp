@@ -237,6 +237,14 @@ void Track::AddMidiNote(const MidiNote &n)
 	root->Execute(new ActionTrackAddMidiNote(this, n));
 }
 
+void Track::AddMidiNotes(Array<MidiNote> notes)
+{
+	root->action_manager->BeginActionGroup();
+	foreach(MidiNote &n, notes)
+		AddMidiNote(n);
+	root->action_manager->EndActionGroup();
+}
+
 void Track::DeleteMidiNote(int index)
 {
 	root->Execute(new ActionTrackDeleteMidiNote(this, index));

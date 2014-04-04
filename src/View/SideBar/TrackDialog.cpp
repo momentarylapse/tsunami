@@ -32,6 +32,12 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	Expand("ld_t_bars", 0, true);
 	Expand("ld_t_effects", 0, true);
 
+	Array<string> chord_types = GetChordTypeNames();
+	foreach(string &ct, chord_types)
+		AddString("chord_type", ct);
+	SetInt("chord_type", 0);
+	Enable("chord_type", false);
+
 	LoadData();
 	Subscribe(view, "CurTrackChange");
 
@@ -40,6 +46,8 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
 	EventM("pitch_offset", this, &TrackDialog::OnPitch);
 	EventM("beat_partition", this, &TrackDialog::OnBeatPartition);
+	EventM("insert_chord", this, &TrackDialog::OnInsertChord);
+	EventM("chord_type", this, &TrackDialog::OnChordType);
 }
 
 TrackDialog::~TrackDialog()
@@ -110,6 +118,20 @@ void TrackDialog::OnBeatPartition()
 {
 	view->beat_partition = GetInt("");
 	view->ForceRedraw();
+}
+
+void TrackDialog::OnInsertChord()
+{
+	if (IsChecked(""))
+		view->chord_mode = GetInt("chord_type");
+	else
+		view->chord_mode = CHORD_TYPE_NONE;
+	Enable("chord_type", IsChecked(""));
+}
+
+void TrackDialog::OnChordType()
+{
+	view->chord_mode = GetInt("");
 }
 
 void TrackDialog::OnUpdate(Observable *o, const string &message)

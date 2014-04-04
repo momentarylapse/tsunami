@@ -7,6 +7,7 @@
 
 #include "MidiData.h"
 #include <math.h>
+#include "../lib/hui/hui.h"
 
 
 MidiNote::MidiNote(const Range &_range, float _pitch, float _volume)
@@ -50,5 +51,57 @@ void MidiData::sort()
 		for (int j=i+1;j<num;j++)
 			if ((*this)[i].range.offset > (*this)[j].range.offset)
 				swap(i, j);
+}
+
+
+
+enum
+{
+	CHORD_TYPE_MINOR,
+	CHORD_TYPE_MAJOR,
+	CHORD_TYPE_DIMINISHED,
+	CHORD_TYPE_AUGMENTED,
+	NUM_CHORD_TYPES
+};
+
+string GetChordTypeName(int type)
+{
+	if (type == CHORD_TYPE_MINOR)
+		return _("Moll");
+	if (type == CHORD_TYPE_MAJOR)
+		return _("Dur");
+	if (type == CHORD_TYPE_DIMINISHED)
+		return _("Vermindert");
+	if (type == CHORD_TYPE_AUGMENTED)
+		return _("&Uberm&a&sig");
+	return "???";
+}
+
+Array<string> GetChordTypeNames()
+{
+	Array<string> r;
+	for (int i=0; i<NUM_CHORD_TYPES; i++)
+		r.add(GetChordTypeName(i));
+	return r;
+}
+
+Array<int> GetChordNotes(int type, int pitch)
+{
+	Array<int> r;
+	r.add(pitch);
+	if (type == CHORD_TYPE_MINOR){
+		r.add(pitch + 3);
+		r.add(pitch + 7);
+	}else if (type == CHORD_TYPE_MAJOR){
+		r.add(pitch + 4);
+		r.add(pitch + 7);
+	}else if (type == CHORD_TYPE_DIMINISHED){
+		r.add(pitch + 3);
+		r.add(pitch + 6);
+	}else if (type == CHORD_TYPE_AUGMENTED){
+		r.add(pitch + 4);
+		r.add(pitch + 8);
+	}
+	return r;
 }
 

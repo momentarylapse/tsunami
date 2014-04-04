@@ -30,6 +30,8 @@ public:
 	void OnConfigSynthesizer();
 	void OnPitch();
 	void OnBeatPartition();
+	void OnInsertChord();
+	void OnChordType();
 
 	void SetTrack(Track *t);
 

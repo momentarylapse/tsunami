@@ -198,7 +198,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 int AudioRenderer::read(BufferBox &buf)
 {
 	msg_db_f("RenderAudioFilePart", 1);
-	int size = min(buf.num, range.end() - pos);
+	int size = max(min(buf.num, range.end() - pos), 0);
 	range_cur = Range(pos, size);
 
 	// render without fx

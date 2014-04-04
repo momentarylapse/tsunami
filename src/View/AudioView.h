@@ -143,6 +143,7 @@ public:
 	void SelectUnderMouse();
 	void SetBarriers(SelectionType *s);
 	void ApplyBarriers(int &pos);
+	void SetCursorPos(int pos);
 
 	void SelectSample(SampleRef *s, bool diff);
 	void SelectTrack(Track *t, bool diff);

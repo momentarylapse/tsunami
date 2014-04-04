@@ -194,7 +194,13 @@ void AudioView::UpdateSelection()
 		sel_range.invert();
 
 
-	renderer->range = sel_range;
+	renderer->range = GetPlaybackSelection();
+	if (output->IsPlaying()){
+		if (renderer->range.is_inside(output->GetPos()))
+			renderer->range = GetPlaybackSelection();
+		else
+			output->Stop();
+	}
 
 	audio->UpdateSelection(sel_range);
 	Notify("SelectionChange");
@@ -443,6 +449,22 @@ void AudioView::OnMouseMove()
 }
 
 
+void AudioView::SetCursorPos(int pos)
+{
+	if (output->IsPlaying()){
+		if (renderer->range.is_inside(pos)){
+			renderer->Seek(pos);
+			output->Play(renderer);
+			selection.type = SEL_TYPE_PLAYBACK;
+			ForceRedraw();
+			return;
+		}else
+			output->Stop();
+	}
+	mouse_possibly_selecting = 0;
+	sel_raw = Range(pos, 0);
+	UpdateSelection();
+}
 
 void AudioView::OnLeftButtonDown()
 {
@@ -459,9 +481,7 @@ void AudioView::OnLeftButtonDown()
 	// selection:
 	//   start after lb down and moving
 	if ((selection.type == SEL_TYPE_TRACK) || (selection.type == SEL_TYPE_TIME)){
-		mouse_possibly_selecting = 0;
-		sel_raw = Range(selection.pos, 0);
-		UpdateSelection();
+		SetCursorPos(selection.pos);
 	}else if (selection.type == SEL_TYPE_SELECTION_START){
 		// switch end / start
 		selection.type = SEL_TYPE_SELECTION_END;

@@ -128,13 +128,6 @@ HuiControlListView::HuiControlListView(const string &title, const string &id, Hu
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&OnGtkListSelect), this);
 
-	if ((OptionString.find("multiline") >= 0) || (OptionString.find("select-multi") >= 0))
-		gtk_tree_selection_set_mode(sel, GTK_SELECTION_MULTIPLE);
-	else if (OptionString.find("select-single") >= 0)
-		gtk_tree_selection_set_mode(sel, GTK_SELECTION_BROWSE);
-	if (OptionString.find("nobar") >= 0)
-		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), false);
-
 	// frame
 	frame = sw;
 	if (panel->border_width > 0){
@@ -260,6 +253,21 @@ void HuiControlListView::__Reset()
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_list_store_clear(store);
 	_item_.clear();
+}
+
+void HuiControlListView::__SetOption(const string &op, const string &value)
+{
+	if ((op == "multiline") || (op == "select-multi")){
+		GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
+		gtk_tree_selection_set_mode(sel, GTK_SELECTION_MULTIPLE);
+	}else if (op == "select-single"){
+		GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
+		gtk_tree_selection_set_mode(sel, GTK_SELECTION_BROWSE);
+	}else if (op == "nobar"){
+		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), false);
+	}else if (op == "bar"){
+		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), value._bool());
+	}
 }
 
 #endif

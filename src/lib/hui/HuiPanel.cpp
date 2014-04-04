@@ -585,18 +585,6 @@ void HuiPanel::Reset(const string &_id)
 		c->Reset();
 }
 
-void HuiPanel::CompletionAdd(const string &_id, const string &text)
-{
-	test_controls(_id, c)
-		c->CompletionAdd(text);
-}
-
-void HuiPanel::CompletionClear(const string &_id)
-{
-	test_controls(_id, c)
-		c->CompletionClear();
-}
-
 // expand a single row
 //    for TreeView
 void HuiPanel::Expand(const string &_id, int row, bool expand)

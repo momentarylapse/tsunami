@@ -131,10 +131,6 @@ public:
 	void _cdecl RemoveControl(const string &id);
 	void _cdecl SetOptions(const string &id, const string &options);
 
-	// edit completion
-	void _cdecl CompletionAdd(const string &id, const string &text);
-	void _cdecl CompletionClear(const string &id);
-
 	// drawing
 	void _cdecl Redraw(const string &id);
 	void _cdecl RedrawRect(const string &_id, int x, int y, int w, int h);

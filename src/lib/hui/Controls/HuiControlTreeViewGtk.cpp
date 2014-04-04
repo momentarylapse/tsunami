@@ -40,9 +40,6 @@ HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, Hu
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&OnGtkListSelect), this);
 
-	if (OptionString.find("nobar") >= 0)
-		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), false);
-
 	// frame
 	frame = sw;
 	if (panel->border_width > 0){
@@ -223,6 +220,14 @@ bool HuiControlTreeView::IsExpanded(int row)
 			gtk_tree_view_collapse_row(GTK_TREE_VIEW(c->widget));
 	}*/
 	return false;
+}
+
+void HuiControlTreeView::__SetOption(const string &op, const string &value)
+{
+	if (op == "nobar")
+		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), false);
+	else if (op == "bar")
+		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), value._bool());
 }
 
 #endif

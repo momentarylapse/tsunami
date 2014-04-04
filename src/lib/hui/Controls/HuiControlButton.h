@@ -19,6 +19,7 @@ public:
 	virtual string GetString();
 	virtual void __SetString(const string &str);
 	virtual void SetImage(const string &str);
+	virtual void __SetOption(const string &op, const string &value);
 };
 
 #endif /* HUICONTROLBUTTON_H_ */

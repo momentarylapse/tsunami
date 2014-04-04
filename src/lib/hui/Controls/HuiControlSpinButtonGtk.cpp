@@ -70,4 +70,33 @@ void HuiControlSpinButton::__SetFloat(float f)
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), f);
 }
 
+void HuiControlSpinButton::__SetOption(const string &op, const string &value)
+{
+	if (op == "range"){
+		float vmin = -100000000000.0f;
+		float vmax = 100000000000.0f;
+		float step = 1;
+		Array<string> v = value.explode("\\");
+		if (v.num >= 1){
+			if (v[0].num > 0)
+				vmin = v[0]._float();
+		}
+		if (v.num >= 2){
+			if (v[1].num > 0)
+				vmax = v[1]._float();
+		}
+		if (v.num >= 3){
+			if (v[2].num > 0){
+				step = v[2]._float();
+				gtk_spin_button_set_increments(GTK_SPIN_BUTTON(widget), step, step * 10);
+			}
+		}
+		gtk_spin_button_set_range(GTK_SPIN_BUTTON(widget), vmin, vmax);
+	}else if (op == "wrap"){
+		gtk_spin_button_set_wrap(GTK_SPIN_BUTTON(widget), true);
+	}else if (op == "nowrap"){
+		gtk_spin_button_set_wrap(GTK_SPIN_BUTTON(widget), false);
+	}
+}
+
 #endif

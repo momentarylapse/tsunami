@@ -48,6 +48,7 @@ class string : public DynamicArray
 	int _cdecl hash() const;
 	int _cdecl _int() const;
 	float _cdecl _float() const;
+	bool _cdecl _bool() const;
 	const char *c_str() const;
 
 	// for paths
@@ -119,6 +120,7 @@ string _cdecl fa2s(const Array<float> &a);
 string _cdecl ba2s(const Array<bool> &a);
 string _cdecl sa2s(const Array<string> &a);
 int _cdecl s2i(const string &s);
+bool _cdecl s2b(const string &s);
 float _cdecl s2f(const string &s);
 
 string _cdecl d2h(const void *data, int bytes, bool inverted = true);

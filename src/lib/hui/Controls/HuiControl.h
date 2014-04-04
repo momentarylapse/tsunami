@@ -94,6 +94,7 @@ public:
 
 	virtual void add(HuiControl *child, int x, int y){}
 	void SetOptions(const string &options);
+	virtual void __SetOption(const string &op, const string &value){}
 	void GetSize(int &w, int &h);
 
 	void Notify(const string &message = "", bool is_default = true);

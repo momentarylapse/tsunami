@@ -692,6 +692,14 @@ float string::_float() const
 float s2f(const string &s)
 {	return s._float();	}
 
+bool string::_bool() const
+{
+	return (*this == "true") || (*this == "yes");
+}
+
+bool s2b(const string &s)
+{	return s._bool();	}
+
 int string::hash() const
 {
 	int id = 0;

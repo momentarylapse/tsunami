@@ -19,6 +19,7 @@ public:
 	virtual float GetFloat();
 	virtual void __SetFloat(float f);
 	virtual void __AddString(const string &s);
+	virtual void __SetOption(const string &op, const string &value);
 	bool vertical;
 };
 

@@ -15,18 +15,7 @@ HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
 {
 	GetPartStrings(id, title);
 	widget = gtk_label_new("");
-	if (OptionString.find("wrap") >= 0)
-		gtk_label_set_line_wrap(GTK_LABEL(widget),true);
-	if (OptionString.find("center") >= 0)
-		gtk_misc_set_alignment(GTK_MISC(widget), 0.5f, 0.5f);
-	else if (OptionString.find("right") >= 0)
-		gtk_misc_set_alignment(GTK_MISC(widget), 1, 0.5f);
-	else
-		gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
-	if (OptionString.find("angle=90") >= 0)
-		gtk_label_set_angle(GTK_LABEL(widget), 90);
-	else if (OptionString.find("angle=270") >= 0)
-		gtk_label_set_angle(GTK_LABEL(widget), 270);
+	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
 	HuiControlLabel::__SetString(title);
 	SetOptions(OptionString);
 }
@@ -51,6 +40,18 @@ void HuiControlLabel::__SetString(const string &str)
 	if (OptionString.find("big") >= 0)
 		s = "<big>" + s + "</big>";
 	gtk_label_set_markup(GTK_LABEL(widget), s.c_str());
+}
+
+void HuiControlLabel::__SetOption(const string &op, const string &value)
+{
+	if (op == "wrap")
+		gtk_label_set_line_wrap(GTK_LABEL(widget),true);
+	else if (op == "center")
+		gtk_misc_set_alignment(GTK_MISC(widget), 0.5f, 0.5f);
+	else if (op == "right")
+		gtk_misc_set_alignment(GTK_MISC(widget), 1, 0.5f);
+	else if (op == "angle")
+		gtk_label_set_angle(GTK_LABEL(widget), value._float());
 }
 
 #endif

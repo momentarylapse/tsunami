@@ -278,11 +278,9 @@ void SIAddPackageHui()
 				func_add_param("row",		TypeInt);
 				func_add_param("column",	TypeInt);
 				func_add_param("s",			TypeString);
-			class_add_func("completionAdd",			TypeVoid,		mf(&HuiPanel::CompletionAdd));
+			class_add_func("setOptions",			TypeVoid,		mf(&HuiPanel::SetOptions));
 				func_add_param("id",		TypeString);
-				func_add_param("text",		TypeString);
-			class_add_func("completionClear",			TypeVoid,		mf(&HuiPanel::CompletionClear));
-				func_add_param("id",		TypeString);
+				func_add_param("options",	TypeString);
 			class_add_func("reset",								TypeVoid,		mf(&HuiPanel::Reset));
 				func_add_param("id",		TypeString);
 			class_add_func("redraw",								TypeVoid,		mf(&HuiPanel::Redraw));

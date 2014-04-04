@@ -95,4 +95,12 @@ void HuiControlTabControl::add(HuiControl *child, int x, int y)
 	child->parent = this;
 }
 
+void HuiControlTabControl::__SetOption(const string &op, const string &value)
+{
+	if (op == "nobar")
+		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
+	else if (op == "bar")
+		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), value._bool());
+}
+
 #endif

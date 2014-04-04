@@ -174,7 +174,10 @@ void HuiControl::SetOptions(const string &options)
 				gtk_widget_set_margin_top(get_frame(), a1._int());
 			else if (a0 == "margin-bottom")
 				gtk_widget_set_margin_bottom(get_frame(), a1._int());
-		}
+			else
+				__SetOption(a0, a1);
+		}else
+			__SetOption(aa, "");
 	}
 	if ((width >= 0) || (height >= 0))
 		gtk_widget_set_size_request(get_frame(), width, height);

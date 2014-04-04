@@ -26,8 +26,8 @@ HuiControlEdit::HuiControlEdit(const string &title, const string &id) :
 	SetOptions(OptionString);
 }
 
-HuiControlEdit::~HuiControlEdit() {
-	// TODO Auto-generated destructor stub
+HuiControlEdit::~HuiControlEdit()
+{
 }
 
 void HuiControlEdit::__SetString(const string &str)
@@ -62,6 +62,18 @@ void HuiControlEdit::CompletionAdd(const string &text)
 void HuiControlEdit::CompletionClear()
 {
 	gtk_entry_set_completion(GTK_ENTRY(widget), NULL);
+}
+
+void HuiControlEdit::__SetOption(const string &op, const string &value)
+{
+	if (op == "clear-placeholder")
+		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), "");
+	else if (op == "clear-completion")
+		gtk_entry_set_completion(GTK_ENTRY(widget), NULL);
+	else if (op == "placeholder")
+		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), value.c_str());
+	else if (op == "completion")
+		CompletionAdd(value);
 }
 
 #endif

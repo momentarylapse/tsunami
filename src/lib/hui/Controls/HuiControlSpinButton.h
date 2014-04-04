@@ -22,6 +22,7 @@ public:
 	virtual int GetInt();
 	virtual float GetFloat();
 	virtual void __SetFloat(float f);
+	virtual void __SetOption(const string &op, const string &value);
 };
 
 #endif /* HUICONTROLSPINBUTTON_H_ */

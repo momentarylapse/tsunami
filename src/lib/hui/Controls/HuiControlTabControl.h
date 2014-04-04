@@ -21,6 +21,7 @@ public:
 	virtual void __SetInt(int i);
 	virtual int GetInt();
 	virtual void __AddString(const string &str);
+	virtual void __SetOption(const string &op, const string &value);
 
 	virtual void add(HuiControl *child, int x, int y);
 	void addPage(const string &str);

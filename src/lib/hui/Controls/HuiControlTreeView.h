@@ -31,6 +31,7 @@ public:
 	virtual void Expand(int row, bool expand);
 	virtual void ExpandAll(bool expand);
 	virtual bool IsExpanded(int row);
+	virtual void __SetOption(const string &op, const string &value);
 
 #ifdef HUI_API_GTK
 	Array<GtkTreeIter> _item_;

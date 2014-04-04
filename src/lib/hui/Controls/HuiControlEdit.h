@@ -20,6 +20,7 @@ public:
 	virtual void __SetString(const string &str);
 	virtual void CompletionAdd(const string &text);
 	virtual void CompletionClear();
+	virtual void __SetOption(const string &op, const string &value);
 };
 
 #endif /* HUICONTROLEDIT_H_ */

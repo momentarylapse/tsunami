@@ -26,7 +26,7 @@ TrackMixer::TrackMixer()
 	vol_slider_id = "volume";
 	pan_slider_id = "panning";
 	mute_id = "mute";
-	AddSlider("!width=80,noorigin", 0, 1, 0, 0, pan_slider_id);
+	AddSlider("!width=80,origin=no", 0, 1, 0, 0, pan_slider_id);
 	AddString(pan_slider_id, "0\\L");
 	AddString(pan_slider_id, "0.5\\");
 	AddString(pan_slider_id, "1\\R");

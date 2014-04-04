@@ -18,6 +18,7 @@ public:
 	virtual ~HuiControlLabel();
 	virtual string GetString();
 	virtual void __SetString(const string &str);
+	virtual void __SetOption(const string &op, const string &value);
 };
 
 

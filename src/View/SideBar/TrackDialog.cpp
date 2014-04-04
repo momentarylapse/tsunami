@@ -66,6 +66,7 @@ void TrackDialog::LoadData()
 	bar_list->SetTrack(track);
 	if (track){
 		SetString("name", track->name);
+		SetOptions("name", "placeholder=" + track->GetNiceName());
 		SetFloat("volume", amplitude2db(track->volume));
 		SetFloat("panning", track->panning * 100.0f);
 		SetString("synthesizer", track->synth->name);

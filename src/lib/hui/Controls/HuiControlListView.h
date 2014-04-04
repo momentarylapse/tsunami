@@ -27,6 +27,7 @@ public:
 	virtual Array<int> GetMultiSelection();
 	virtual void __SetMultiSelection(Array<int> &sel);
 	virtual void __Reset();
+	virtual void __SetOption(const string &op, const string &value);
 
 #ifdef HUI_API_GTK
 	Array<GtkTreeIter> _item_;

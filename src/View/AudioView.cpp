@@ -193,6 +193,9 @@ void AudioView::UpdateSelection()
 	if (sel_range.num < 0)
 		sel_range.invert();
 
+
+	renderer->range = sel_range;
+
 	audio->UpdateSelection(sel_range);
 	Notify("SelectionChange");
 }
@@ -230,14 +233,6 @@ AudioView::SelectionType AudioView::GetMouseOver()
 		}
 	}
 	if ((output->IsPlaying()) && (output->GetSource() == renderer)){
-		if (mouse_over_time(this, renderer->range.start())){
-			s.type = SEL_TYPE_PLAYBACK_START;
-			return s;
-		}
-		if (mouse_over_time(this, renderer->range.end())){
-			s.type = SEL_TYPE_PLAYBACK_END;
-			return s;
-		}
 		if (mouse_over_time(this, output->GetPos())){
 			s.type = SEL_TYPE_PLAYBACK;
 			return s;
@@ -411,12 +406,6 @@ void AudioView::OnMouseMove()
 			w = - HuiGetEvent()->dx - 2*r;
 		}
 		tsunami->RedrawRect("area", x, audio->area.y1, w, audio->area.height());
-	}else if (selection.type == SEL_TYPE_PLAYBACK_START){
-		renderer->range.set_start(selection.pos);
-		_force_redraw_ = true;
-	}else if (selection.type == SEL_TYPE_PLAYBACK_END){
-		renderer->range.set_end(selection.pos);
-		_force_redraw_ = true;
 	}else if (selection.type == SEL_TYPE_PLAYBACK){
 		renderer->Seek(selection.pos);
 		output->Play(renderer);
@@ -1247,8 +1236,6 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 
 	// playing position
 	if ((output->IsPlaying()) && (output->GetSource() == renderer)){
-		DrawTimeLine(c, renderer->range.start(), SEL_TYPE_PLAYBACK_START, ColorPreviewMarker);
-		DrawTimeLine(c, renderer->range.end(), SEL_TYPE_PLAYBACK_END, ColorPreviewMarker);
 		if (!input->IsCapturing())
 			DrawTimeLine(c, output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
 	}

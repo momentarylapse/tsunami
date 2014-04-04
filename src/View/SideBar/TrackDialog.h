@@ -26,6 +26,8 @@ public:
 	void ApplyData();
 
 	void OnName();
+	void OnVolume();
+	void OnPanning();
 	void OnSynthesizer();
 	void OnConfigSynthesizer();
 	void OnPitch();

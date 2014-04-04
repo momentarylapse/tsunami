@@ -9,7 +9,6 @@
 #define SUBDIALOG_H_
 
 #include "SideBar.h"
-class Slider;
 class AudioFile;
 class Track;
 class SampleRef;
@@ -37,7 +36,6 @@ public:
 	AudioFile *audio;
 	Track *track;
 	SampleRef *sample;
-	Slider *volume_slider;
 };
 
 #endif /* SUBDIALOG_H_ */

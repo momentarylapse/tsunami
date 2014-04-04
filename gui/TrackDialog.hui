@@ -1,7 +1,15 @@
 Dialog track_dialog "Spur" 380 516
-	Grid ttd_grid_1 "" 1 4 expandy
+	Grid ttd_grid_1 "" 1 5 expandy
 		Group ld_t_name "Name"
 			Edit name "" expandx
+		Group ld_t_volume "Lautstärke"
+			Grid ? "" 3 2
+				Text ld_tt_volume "Lautstärke"
+				SpinButton volume "0\\-100\\10\\0.1" expandx
+				Text db "dB"
+				Text ld_tt_panning "Balance"
+				SpinButton panning "0\\-100\\100\\1"
+				Text percent "%"
 		Group ld_t_synth "Synthesizer"
 			Grid ? "" 2 1
 				Button synthesizer "" expandx

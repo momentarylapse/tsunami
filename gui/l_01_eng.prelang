@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-190
+194
 // Data (ID,Text)
 about
 
@@ -85,6 +85,8 @@ create_from_selection
 
 data_list
 
+db
+
 delete
 Delete
 delete_bar
@@ -147,6 +149,10 @@ ld_t_track
 Track
 ld_t_volume
 !bold\\Volume:
+ld_tt_panning
+
+ld_tt_volume
+
 level_add
 
 level_delete
@@ -233,6 +239,8 @@ ok
 OK
 open
 Open...
+panning
+
 paste
 Paste
 paste_sample
@@ -384,7 +392,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-116
+120
 // Data (ID,Text)
 
 
@@ -460,6 +468,8 @@ Dauer\\\") + audio->get_time_str_long(samples));
 
 Dieser Effekt ist nicht konfigurierbar.
 
+Dur
+
 Ebene %d
 
 Ebene löschen: noch nicht implementiert...
@@ -522,6 +532,8 @@ Metronom
 
 Mischpult
 
+Moll
+
 Nachrichten
 
 OK
@@ -555,6 +567,8 @@ Spur %d
 Spur-Eigenschaften
 
 Unbenannt
+
+Vermindert
 
 Vorschau
 
@@ -617,5 +631,7 @@ speichere nami
 unbekannte Dateiendung: 
 
 unbekannter Synthesizer: 
+
+Übermäßig
 
 #

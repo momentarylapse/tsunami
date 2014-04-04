@@ -1,16 +1,13 @@
 Dialog sub_track_dialog "Sub Track" 375 230
-	Grid ? "" 1 3
+	Grid ? "" 1 4
 		Group ld_t_name "Name"
 			Edit name "" expandx
-			Grid ? "" 2 1
-				Text ld_t_track "Spur:"
-				ComboBox level_track ""
+		Group ld_t_track "Spur"
+			ComboBox level_track ""
 		Group ld_t_volume "Lautstärke"
-			Grid ? "" 1 2
-				Grid ? "" 3 1
-					Slider volume_slider "" expandx
-					SpinButton volume "\\0\\1000\\0.1"
-					Text percent "%"
+			Grid ? "" 3 1
+				SpinButton volume "0\\-100\\10\\0.1" expandx
+				Text db "dB"
 				CheckBox mute "Stumm"
 		Group ld_t_repetition "Wiederholungen"
 			Grid ? "" 3 2

@@ -73,7 +73,8 @@ void AudioFileDialog::LoadData()
 	Reset("levels");
 	foreachi(string &n, audio->level_name, i)
 		AddString("levels", i2s(i + 1) + "\\" + n);
-	SetInt("levels", view->cur_level);
+	if (audio->level_name.num > 0)
+		SetInt("levels", view->cur_level);
 }
 
 

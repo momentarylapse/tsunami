@@ -20,7 +20,7 @@ SubDialog::SubDialog(AudioView *v, AudioFile *a):
 	track = NULL;
 	sample = NULL;
 
-	volume_slider = new Slider((HuiPanel*)this, "volume_slider", "volume", 0.0f, 2.0f, 100.0f, (void(HuiEventHandler::*)())&SubDialog::OnVolume, 1.0f);
+	EventM("volume", this, &SubDialog::OnVolume);
 	EventM("mute", this, &SubDialog::OnMute);
 	EventM("level_track", this, &SubDialog::OnLevelTrack);
 	EventM("repnum", this, &SubDialog::OnRepNum);
@@ -34,7 +34,6 @@ SubDialog::~SubDialog()
 	if (sample)
 		Unsubscribe(sample);
 	Unsubscribe(view);
-	delete(volume_slider);
 }
 
 
@@ -51,7 +50,7 @@ void SubDialog::OnMute()
 	int index = sample->get_index();
 	track->EditSample(index, sample->volume, IsChecked(""), sample->rep_num, sample->rep_delay);
 
-	volume_slider->Enable(!sample->muted);
+	Enable("volume", !sample->muted);
 	Subscribe(sample);
 }
 
@@ -66,7 +65,7 @@ void SubDialog::OnVolume()
 		return;
 	Unsubscribe(sample);
 	int index = sample->get_index();
-	track->EditSample(index, volume_slider->Get(), sample->muted, sample->rep_num, sample->rep_delay);
+	track->EditSample(index, db2amplitude(GetFloat("")), sample->muted, sample->rep_num, sample->rep_delay);
 	Subscribe(sample);
 }
 
@@ -95,7 +94,7 @@ void SubDialog::LoadData()
 {
 	Enable("name", false);
 	Enable("mute", sample);
-	volume_slider->Enable(sample);
+	Enable("volume", sample);
 	Enable("repnum", sample);
 	Enable("repdelay", sample);
 
@@ -106,8 +105,8 @@ void SubDialog::LoadData()
 	SetString("name", sample->origin->name);
 	SetDecimals(1);
 	Check("mute", sample->muted);
-	volume_slider->Set(sample->volume);
-	volume_slider->Enable(!sample->muted);
+	SetFloat("volume", amplitude2db(sample->volume));
+	Enable("volume", !sample->muted);
 	foreach(Track *t, audio->track)
 		AddString("level_track", t->GetNiceName());
 	SetInt("level_track", sample->track_no);

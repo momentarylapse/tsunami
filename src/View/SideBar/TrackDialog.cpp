@@ -42,6 +42,8 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	Subscribe(view, "CurTrackChange");
 
 	EventM("name", this, &TrackDialog::OnName);
+	EventM("volume", this, &TrackDialog::OnVolume);
+	EventM("panning", this, &TrackDialog::OnPanning);
 	EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
 	EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
 	EventM("pitch_offset", this, &TrackDialog::OnPitch);
@@ -64,6 +66,8 @@ void TrackDialog::LoadData()
 	bar_list->SetTrack(track);
 	if (track){
 		SetString("name", track->name);
+		SetFloat("volume", amplitude2db(track->volume));
+		SetFloat("panning", track->panning * 100.0f);
 		SetString("synthesizer", track->synth->name);
 		HideControl("ld_t_synth", track->type == track->TYPE_AUDIO);
 		//Enable("config_synth", track->type != track->TYPE_AUDIO);
@@ -91,6 +95,16 @@ void TrackDialog::SetTrack(Track *t)
 void TrackDialog::OnName()
 {
 	track->SetName(GetString(""));
+}
+
+void TrackDialog::OnVolume()
+{
+	track->SetVolume(db2amplitude(GetFloat("volume")));
+}
+
+void TrackDialog::OnPanning()
+{
+	track->SetPanning(GetFloat("panning") / 100.0f);
 }
 
 void TrackDialog::OnSynthesizer()

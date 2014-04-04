@@ -107,7 +107,6 @@ Tsunami::Tsunami(Array<string> arg) :
 	HuiAddCommandM("zoom_in", "", -1, this, &Tsunami::OnZoomIn);
 	HuiAddCommandM("zoom_out", "", -1, this, &Tsunami::OnZoomOut);
 
-
 	// table structure
 	SetSize(width, height);
 	SetBorderWidth(0);

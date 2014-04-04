@@ -468,7 +468,7 @@ public:
 		AddListView("Name", 0, 0, 0, 0, "list");
 		AddControlTable("", 0, 1, 2, 1, "grid2");
 		SetTarget("grid2", 0);
-		AddEdit("", 0, 0, 0, 0, "name");
+		AddEdit("!expandx,placeholder=" + _("neuen Namen eingeben"), 0, 0, 0, 0, "name");
 		AddDefButton("Ok", 1, 0, 0, 0, "ok");
 		if (!save)
 			AddString("list", _("-Standard Parameter-"));
@@ -479,7 +479,9 @@ public:
 		HideControl("grid2", !save);
 		EventM("list", this, &FavoriteSelectionDialog::OnList);
 		EventMX("list", "hui:select", this, &FavoriteSelectionDialog::OnListSelect);
+		EventM("name", this, &FavoriteSelectionDialog::OnName);
 		EventM("ok", this, &FavoriteSelectionDialog::OnOk);
+		SetInt("list", -1);
 	}
 	void OnList()
 	{
@@ -496,6 +498,10 @@ public:
 		int n = GetInt("list");
 		if (n >= 0)
 			SetString("name", names[n]);
+	}
+	void OnName()
+	{
+		SetInt("list", -1);
 	}
 	void OnOk()
 	{

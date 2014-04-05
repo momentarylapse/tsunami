@@ -12,7 +12,11 @@ NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
 {
 	audio = a;
 
-	SetInt("sample_rate", DEFAULT_SAMPLE_RATE);
+	SetString("sample_rate", "22050");
+	SetString("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
+	SetString("sample_rate", "48000");
+	SetString("sample_rate", "96000");
+	SetInt("sample_rate", 1);
 	HideControl("nd_g_metronome_params", true);
 
 	EventM("cancel", this, &NewDialog::OnClose);
@@ -32,7 +36,7 @@ void NewDialog::OnClose()
 
 void NewDialog::OnOk()
 {
-	int sample_rate = GetInt("sample_rate");
+	int sample_rate = GetString("sample_rate")._int();
 	audio->NewWithOneTrack(Track::TYPE_AUDIO, sample_rate);
 	audio->action_manager->Enable(false);
 	if (IsChecked("metronome")){

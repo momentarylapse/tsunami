@@ -16,7 +16,12 @@ HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
 	HuiControl(HuiKindComboBox, id)
 {
 	GetPartStrings(id, title);
-	widget = gtk_combo_box_text_new();
+	if (OptionString.find("editable") >= 0){
+		widget = gtk_combo_box_text_new_with_entry();
+		gtk_entry_set_activates_default(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(widget))), true);
+	}else{
+		widget = gtk_combo_box_text_new();
+	}
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkComboboxChange), this);
 	if ((PartString.num > 1) || (PartString[0] != ""))
 		for (int i=0;i<PartString.num;i++)
@@ -31,7 +36,10 @@ HuiControlComboBox::~HuiControlComboBox()
 
 string HuiControlComboBox::GetString()
 {
-	return "TODO";
+	char *c = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
+	string s = c;
+	g_free(c);
+	return s;
 }
 
 void HuiControlComboBox::__SetString(const string &str)

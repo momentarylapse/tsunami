@@ -97,7 +97,7 @@ public:
 	}
 	virtual void OnUpdate(Observable *o, const string &message)
 	{
-		if (message == "Change"){
+		if (message == o->MESSAGE_CHANGE){
 			if (track)
 				track->EditEffect(index, old_param);
 			else
@@ -137,9 +137,9 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 
 	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
 
-	Subscribe(view, "CurTrackChange");
-	Subscribe(audio, "AddEffect");
-	Subscribe(audio, "DeleteEffect");
+	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	Subscribe(audio, audio->MESSAGE_ADD_EFFECT);
+	Subscribe(audio, audio->MESSAGE_DELETE_EFFECT);
 }
 
 FxConsole::~FxConsole()
@@ -181,9 +181,9 @@ void FxConsole::SetTrack(Track *t)
 	Clear();
 	track = t;
 	if (track){
-		Subscribe(track, "Delete");
-		Subscribe(track, "AddEffect");
-		Subscribe(track, "DeleteEffect");
+		Subscribe(track, track->MESSAGE_DELETE);
+		Subscribe(track, track->MESSAGE_ADD_EFFECT);
+		Subscribe(track, track->MESSAGE_DELETE_EFFECT);
 		SetString("track_name", format(_("!angle=90\\wirken auf die Spur '%s'"), track->GetNiceName().c_str()));
 	}else
 		SetString("track_name", _("!angle=90\\wirken auf die komplette Datei"));
@@ -205,10 +205,9 @@ void FxConsole::SetTrack(Track *t)
 
 void FxConsole::OnUpdate(Observable* o, const string &message)
 {
-	//msg_write("FxPanel: " + o->GetName() + "/" + message);
-	if ((o == track) && (message == "Delete")){
+	if ((o == track) && (message == track->MESSAGE_DELETE)){
 		SetTrack(NULL);
-	}else if ((o == view) && (message == "CurTrackChange"))
+	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE))
 		SetTrack(view->cur_track);
 	else
 		SetTrack(track);

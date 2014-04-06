@@ -42,7 +42,7 @@ AudioFileDialog::AudioFileDialog(AudioView *v, AudioFile *a) :
 	EventM("delete_level", this, &AudioFileDialog::OnDeleteLevel);
 
 	Subscribe(audio);
-	Subscribe(view, "CurLevelChange");
+	Subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 AudioFileDialog::~AudioFileDialog()

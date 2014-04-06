@@ -155,7 +155,7 @@ Tsunami::Tsunami(Array<string> arg) :
 
 	Subscribe(view);
 	Subscribe(audio);
-	Subscribe(output, "StateChange");
+	Subscribe(output, output->MESSAGE_STATE_CHANGE);
 	Subscribe(clipboard);
 	Subscribe(bottom_bar);
 
@@ -569,7 +569,7 @@ void Tsunami::UpdateMenu()
 
 void Tsunami::OnUpdate(Observable *o, const string &message)
 {
-	if (o->GetName() == "AudioOutput"){
+	if (o == output){
 		view->ForceRedraw();
 		UpdateMenu();
 	}else // "Clipboard", "AudioFile" or "AudioView"

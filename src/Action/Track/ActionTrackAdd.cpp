@@ -24,8 +24,7 @@ ActionTrackAdd::~ActionTrackAdd()
 void ActionTrackAdd::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	a->track[index]->Notify("Delete");
-	a->Notify("DeleteTrack");
+	a->Notify(a->MESSAGE_DELETE_TRACK);
 	delete(a->track[index]);
 	a->track.erase(index);
 }
@@ -48,7 +47,7 @@ void *ActionTrackAdd::execute(Data *d)
 
 	a->track.insert(t, index);
 
-	a->Notify("AddTrack");
+	a->Notify(a->MESSAGE_ADD_TRACK);
 
 	return t;
 }

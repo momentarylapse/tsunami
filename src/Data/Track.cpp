@@ -30,6 +30,10 @@
 #include "../Action/Track/Bar/ActionTrackDeleteBar.h"
 
 
+
+const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
+const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
+
 Track::Track() :
 	Observable("Track")
 {
@@ -72,7 +76,7 @@ void Track::Reset()
 
 Track::~Track()
 {
-	Notify("Delete");
+	Notify(MESSAGE_DELETE);
 	Reset();
 	if (synth)
 		delete(synth);

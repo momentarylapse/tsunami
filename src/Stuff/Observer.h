@@ -11,7 +11,7 @@
 #include "Observable.h"
 #include "../lib/base/base.h"
 
-class Observable;
+//class Observable;
 
 class Observer
 {
@@ -19,7 +19,7 @@ public:
 	Observer(const string &name);
 	virtual ~Observer();
 
-	void Subscribe(Observable *o, const string &message = "");
+	void Subscribe(Observable *o, const string &message = Observable::MESSAGE_ALL);
 	void Unsubscribe(Observable *o);
 
 	string GetName();

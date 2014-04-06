@@ -8,6 +8,9 @@
 #include "Observable.h"
 #include "Observer.h"
 
+const string Observable::MESSAGE_ALL = "";
+const string Observable::MESSAGE_CHANGE = "Change";
+const string Observable::MESSAGE_DELETE = "Delete";
 
 
 struct ObserverRequest
@@ -16,10 +19,10 @@ struct ObserverRequest
 	ObserverRequest(Observer *o, const string &_message)
 	{
 		observer = o;
-		message = _message;
+		message = &_message;
 	}
 	Observer* observer;
-	string message;
+	const string *message;
 };
 
 typedef ObserverRequest Notification;
@@ -52,7 +55,7 @@ void Observable::RemoveObserver(Observer *o)
 void Observable::AddWrappedObserver(void* handler, void* func)
 {
 	Observer *o = new ObserverWrapper(handler, func);
-	AddObserver(o, "");
+	AddObserver(o, MESSAGE_ALL);
 }
 
 void Observable::RemoveWrappedObserver(void* handler)
@@ -77,11 +80,11 @@ void Observable::NotifySend()
 	Array<Notification> notifications;
 
 	// decide whom to send what
-	foreach(string &m, message_queue){
+	foreach(const string *m, message_queue){
 		//msg_write("send " + observable_name + ": " + queue[i]);
 		foreach(ObserverRequest &r, requests){
-			if ((r.message == m) or (r.message.num == 0))
-				notifications.add(Notification(r.observer, m));
+			if ((r.message == m) or (r.message == &MESSAGE_ALL))
+				notifications.add(Notification(r.observer, *m));
 		}
 	}
 
@@ -90,7 +93,7 @@ void Observable::NotifySend()
 	// send
 	foreach(Notification &n, notifications){
 		//msg_write("send " + GetName() + "/" + n.message + "  >>  " + n.observer->GetName());
-		n.observer->OnUpdate(this, n.message);
+		n.observer->OnUpdate(this, *n.message);
 	}
 }
 
@@ -98,12 +101,12 @@ void Observable::NotifySend()
 void Observable::NotifyEnqueue(const string &message)
 {
 	// already enqueued?
-	foreach(string &m, message_queue)
-		if (message == m)
+	foreach(const string *m, message_queue)
+		if (&message == m)
 			return;
 
 	// add
-	message_queue.add(message);
+	message_queue.add(&message);
 }
 
 void Observable::NotifyBegin()

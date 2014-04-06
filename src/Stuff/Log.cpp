@@ -9,6 +9,9 @@
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 
+const string Log::MESSAGE_ADD = "Add";
+const string Log::MESSAGE_CLEAR = "Clear";
+
 Log::Log() :
 	Observable("Log")
 {
@@ -40,7 +43,7 @@ void Log::Info(const string &message)
 void Log::Clear()
 {
 	messages.clear();
-	Notify("Clear");
+	Notify(MESSAGE_CLEAR);
 }
 
 
@@ -58,5 +61,5 @@ void Log::AddMessage(int type, const string &_message)
 	}else{
 		msg_write(_message);
 	}
-	Notify("Add");
+	Notify(MESSAGE_ADD);
 }

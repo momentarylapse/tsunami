@@ -38,6 +38,13 @@ public:
 	virtual ~AudioFile();
 	Range GetRange();
 
+	static const string MESSAGE_NEW;
+	static const string MESSAGE_SELECTION_CHANGE;
+	static const string MESSAGE_ADD_TRACK;
+	static const string MESSAGE_DELETE_TRACK;
+	static const string MESSAGE_ADD_EFFECT;
+	static const string MESSAGE_DELETE_EFFECT;
+
 	string get_time_str(int t);
 	string get_time_str_fuzzy(int t, float dt);
 	string get_time_str_long(int t);

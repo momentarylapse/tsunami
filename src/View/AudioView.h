@@ -41,6 +41,11 @@ public:
 	void OnCommand(const string &id);
 
 	void OnUpdate(Observable *o, const string &message);
+	static const string MESSAGE_CUR_TRACK_CHANGE;
+	static const string MESSAGE_CUR_SAMPLE_CHANGE;
+	static const string MESSAGE_CUR_LEVEL_CHANGE;
+	static const string MESSAGE_SELECTION_CHANGE;
+	static const string MESSAGE_SETTINGS_CHANGE;
 
 	void SetShowMono(bool mono);
 	void SetPeaksMode(int mode);

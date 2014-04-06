@@ -8,7 +8,6 @@
 #ifndef OBSERVABLE_H_
 #define OBSERVABLE_H_
 
-#include "Observer.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 
@@ -21,14 +20,18 @@ public:
 	Observable(const string &name);
 	virtual ~Observable();
 
-	void AddObserver(Observer *o, const string &message = "");
+	static const string MESSAGE_CHANGE;
+	static const string MESSAGE_DELETE;
+	static const string MESSAGE_ALL;
+
+	void AddObserver(Observer *o, const string &message = MESSAGE_ALL);
 	void AddWrappedObserver(void *handler, void *func);
 	void RemoveObserver(Observer *o);
 	void RemoveWrappedObserver(void *handler);
 	string GetName();
 
 	void NotifyBegin();
-	void Notify(const string &message);
+	void Notify(const string &message = MESSAGE_CHANGE);
 	void NotifyEnd();
 private:
 	void NotifyEnqueue(const string &message);
@@ -41,7 +44,7 @@ private:
 	Array<ObserverRequest> requests;
 
 	// current notifies
-	Array<string> message_queue;
+	Array<const string*> message_queue;
 	int notify_level;
 };
 

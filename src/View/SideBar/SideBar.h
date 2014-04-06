@@ -9,7 +9,7 @@
 #define SIDEBAR_H_
 
 #include "../../lib/hui/hui.h"
-#include "../../Stuff/Observable.h"
+#include "../../Stuff/Observer.h"
 
 class AudioFile;
 class TrackDialog;

@@ -32,8 +32,8 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 	track = t;
 
 	// delete
-	track->Notify("Delete");
-	a->Notify("DeleteTrack");
+	track->Notify(track->MESSAGE_DELETE);
+	a->Notify(a->MESSAGE_DELETE_TRACK);
 	a->track.erase(index);
 	return NULL;
 }
@@ -44,7 +44,7 @@ void ActionTrack__DeleteEmpty::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	a->track.insert(track, index);
-	a->Notify("AddTrack");
+	a->Notify(a->MESSAGE_ADD_TRACK);
 }
 
 

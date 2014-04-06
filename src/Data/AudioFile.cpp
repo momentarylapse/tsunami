@@ -67,6 +67,13 @@ AudioFile::AudioFile() :
 }
 
 
+const string AudioFile::MESSAGE_NEW = "New";
+const string AudioFile::MESSAGE_SELECTION_CHANGE = "SelectionChange";
+const string AudioFile::MESSAGE_ADD_TRACK = "AddTrack";
+const string AudioFile::MESSAGE_DELETE_TRACK = "DeleteTrack";
+const string AudioFile::MESSAGE_ADD_EFFECT = "AddEffect";
+const string AudioFile::MESSAGE_DELETE_EFFECT = "DeleteEffect";
+
 
 void AudioFile::AddTag(const string &key, const string &value)
 {
@@ -125,7 +132,7 @@ void AudioFile::NewEmpty(int _sample_rate)
 	AddTag("artist", "tsunami");//AppTitle);
 
 	action_manager->Enable(true);
-	Notify("Change");
+	Notify();
 }
 
 void AudioFile::NewWithOneTrack(int track_type, int _sample_rate)
@@ -168,8 +175,8 @@ void AudioFile::Reset()
 
 	action_manager->Reset();
 
-	Notify("Change");
-	Notify("New");
+	Notify();
+	Notify(MESSAGE_NEW);
 }
 
 AudioFile::~AudioFile()
@@ -186,7 +193,7 @@ void AudioFile::UpdateSelection(const Range &range)
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
 			s->is_selected = (t->is_selected) && range.overlaps(s->GetRange());
-	Notify("SelectionChange");
+	Notify(MESSAGE_SELECTION_CHANGE);
 }
 
 
@@ -195,7 +202,7 @@ void AudioFile::UnselectAllSamples()
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
 			s->is_selected = false;
-	Notify("SelectionChange");
+	Notify(MESSAGE_SELECTION_CHANGE);
 }
 
 

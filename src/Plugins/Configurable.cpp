@@ -13,6 +13,8 @@
 #include "../Stuff/Log.h"
 #include "../View/Helper/Slider.h"
 
+const string Configurable::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
+
 
 void PluginData::__init__()
 {
@@ -344,7 +346,7 @@ void Configurable::Configure()
 
 void Configurable::notify()
 {
-	Notify("Change");
+	Notify();
 }
 
 

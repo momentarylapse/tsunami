@@ -23,6 +23,9 @@ public:
 	AudioOutput();
 	virtual ~AudioOutput();
 
+	static const string MESSAGE_STATE_CHANGE;
+	static const string MESSAGE_UPDATE;
+
 	Array<string> Device;
 	string ChosenDevice;
 	void SetDevice(const string &device);

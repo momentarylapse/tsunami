@@ -30,7 +30,7 @@ void Clipboard::Clear()
 	if (buf){
 		delete(buf);
 		buf = NULL;
-		Notify("Change");
+		Notify();
 	}
 	ref_uid = -1;
 }
@@ -49,7 +49,7 @@ void Clipboard::Copy(AudioFile *a)
 	*buf = tsunami->view->cur_track->ReadBuffers(tsunami->view->cur_level, tsunami->view->sel_range);
 	buf->make_own();
 
-	Notify("Change");
+	Notify();
 }
 
 void Clipboard::Paste(AudioFile *a)

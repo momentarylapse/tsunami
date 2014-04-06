@@ -23,6 +23,8 @@ public:
 	AudioInput();
 	virtual ~AudioInput();
 
+	static const string MESSAGE_CAPTURE;
+
 	bool Start(int type, int sample_rate);
 	void Stop();
 	void Update();

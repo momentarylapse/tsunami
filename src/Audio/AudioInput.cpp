@@ -14,6 +14,8 @@
 
 #define UPDATE_TIME		0.005f
 
+const string AudioInput::MESSAGE_CAPTURE = "Capture";
+
 AudioInput::AudioInput() :
 	PeakMeterSource("AudioInput")
 {
@@ -63,7 +65,7 @@ void AudioInput::Stop()
 void AudioInput::Update()
 {
 	if (in_cur->DoCapturing() > 0)
-		Notify("Capture");
+		Notify(MESSAGE_CAPTURE);
 
 	running = in_cur->IsCapturing();
 	if (running)

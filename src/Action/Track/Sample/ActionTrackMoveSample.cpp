@@ -60,13 +60,13 @@ void ActionTrackMoveSample::set_param_and_notify(Data *d, int _param)
 {
 	param += _param;
 	execute(d);
-	d->Notify("Change");
+	d->Notify();
 }
 
 void ActionTrackMoveSample::abort_and_notify(Data *d)
 {
 	abort(d);
-	d->Notify("Change");
+	d->Notify();
 }
 
 bool ActionTrackMoveSample::is_trivial()

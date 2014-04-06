@@ -41,7 +41,7 @@ void *ActionTrackEditSynthesizer::execute(Data *d)
 	string temp = params;
 	params = t->synth->ConfigToString();
 	t->synth->ConfigFromString(temp);
-	t->Notify("Change");
+	t->Notify();
 
 	return NULL;
 }

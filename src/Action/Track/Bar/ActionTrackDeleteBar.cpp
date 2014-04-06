@@ -28,7 +28,7 @@ void *ActionTrackDeleteBar::execute(Data *d)
 
 	bar = t->bar[index];
 	t->bar.erase(index);
-	t->Notify("Change");
+	t->Notify();
 
 	return NULL;
 }
@@ -42,6 +42,6 @@ void ActionTrackDeleteBar::undo(Data *d)
 	assert(index <= t->bar.num);
 
 	t->bar.insert(bar, index);
-	t->Notify("Change");
+	t->Notify();
 }
 

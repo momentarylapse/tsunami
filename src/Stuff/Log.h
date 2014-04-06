@@ -20,6 +20,9 @@ public:
 	Log();
 	virtual ~Log();
 
+	static const string MESSAGE_ADD;
+	static const string MESSAGE_CLEAR;
+
 	void Error(const string &message);
 	void Warning(const string &message);
 	void Info(const string &message);

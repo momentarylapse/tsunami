@@ -26,7 +26,7 @@ SubDialog::SubDialog(AudioView *v, AudioFile *a):
 	EventM("repnum", this, &SubDialog::OnRepNum);
 	EventM("repdelay", this, &SubDialog::OnRepDelay);
 
-	Subscribe(view, "CurSampleChange");
+	Subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 SubDialog::~SubDialog()
@@ -125,7 +125,7 @@ void SubDialog::OnUpdate(Observable *o, const string &message)
 		if (sample)
 			Subscribe(sample);
 		LoadData();
-	}else if ((o == sample) && (message == "Delete")){
+	}else if ((o == sample) && (message == o->MESSAGE_DELETE)){
 		Unsubscribe(sample);
 		sample = NULL;
 		LoadData();

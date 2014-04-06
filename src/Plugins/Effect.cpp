@@ -38,7 +38,7 @@ Effect::Effect(Plugin *p) :
 
 Effect::~Effect()
 {
-	Notify("Delete");
+	Notify(MESSAGE_DELETE);
 }
 
 void Effect::__init__()
@@ -48,7 +48,7 @@ void Effect::__init__()
 
 void Effect::__delete__()
 {
-	Notify("Delete");
+	Notify(MESSAGE_DELETE);
 }
 
 /*void make_fx(Effect *fx)

@@ -46,6 +46,8 @@ public:
 	SampleRef(Sample *sample);
 	~SampleRef();
 
+	static const string MESSAGE_CHANGE_BY_ACTION;
+
 	Track *GetParent();
 	Range GetRange();
 

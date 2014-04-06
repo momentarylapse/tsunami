@@ -9,6 +9,8 @@
 #include "AudioFile.h"
 #include "../lib/math/math.h"
 
+const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
+
 Sample::Sample()
 {
 	owner = NULL;
@@ -66,7 +68,7 @@ SampleRef::SampleRef(Sample *sample) :
 SampleRef::~SampleRef()
 {
 	origin->unref();
-	Notify("Delete");
+	Notify(MESSAGE_DELETE);
 }
 
 int SampleRef::get_index()

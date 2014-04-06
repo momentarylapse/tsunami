@@ -23,7 +23,7 @@ void Action::undo_and_notify(Data *d)
 	d->NotifyBegin();
 	undo(d);
 	d->PostActionUpdate();
-	d->Notify("Change");
+	d->Notify(d->MESSAGE_CHANGE);
 	d->NotifyEnd();
 }
 
@@ -34,7 +34,7 @@ void *Action::execute_and_notify(Data *d)
 	d->NotifyBegin();
 	void *r = execute(d);
 	d->PostActionUpdate();
-	d->Notify("Change");
+	d->Notify(d->MESSAGE_CHANGE);
 	d->NotifyEnd();
 	return r;
 }
@@ -46,7 +46,7 @@ void Action::redo_and_notify(Data *d)
 	d->NotifyBegin();
 	redo(d);
 	d->PostActionUpdate();
-	d->Notify("Change");
+	d->Notify(d->MESSAGE_CHANGE);
 	d->NotifyEnd();
 }
 

@@ -47,13 +47,13 @@ void SideBar::OnClose()
 void SideBar::OnShow()
 {
 	visible = true;
-	Notify("Change");
+	Notify();
 }
 
 void SideBar::OnHide()
 {
 	visible = false;
-	Notify("Change");
+	Notify();
 }
 
 void SideBar::Choose(int console)
@@ -66,7 +66,7 @@ void SideBar::Choose(int console)
 			p->Hide();
 	}
 	active_console = console;
-	Notify("Change");
+	Notify();
 }
 
 void SideBar::Open(int console)

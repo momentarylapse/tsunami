@@ -22,6 +22,8 @@ public:
 	void StartCancelable(const string &str, float progress);
 	void End();
 
+	static const string MESSAGE_CANCEL;
+
 	void Cancel();
 	bool IsCancelled();
 

@@ -41,6 +41,12 @@ static bool is_sharp(int pitch)
 	return ((r == 10) || (r == 1) || (r == 3) || (r == 6) || (r == 8));
 }
 
+const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "CurTrackChange";
+const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "CurSampleChange";
+const string AudioView::MESSAGE_CUR_LEVEL_CHANGE = "CurLevelChange";
+const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
+const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
+
 AudioView::SelectionType::SelectionType()
 {
 	type = SEL_TYPE_NONE;
@@ -204,7 +210,7 @@ void AudioView::UpdateSelection()
 	}
 
 	audio->UpdateSelection(sel_range);
-	Notify("SelectionChange");
+	Notify(MESSAGE_SELECTION_CHANGE);
 }
 
 bool mouse_over_time(AudioView *v, int pos)
@@ -1078,8 +1084,8 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 {
 	CheckConsistency();
 
-	if (o->GetName() == "AudioFile"){
-		if (message == "New"){
+	if (o == audio){
+		if (message == audio->MESSAGE_NEW){
 			sel_range = sel_raw = Range(0, 0);
 			SetCurTrack((audio->track.num > 0) ? audio->track[0] : NULL);
 			OptimizeView();
@@ -1087,11 +1093,11 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 			ForceRedraw();
 			UpdateMenu();
 		}
-	}else if (o->GetName() == "AudioOutput"){
+	}else if (o == output){
 		if ((output->IsPlaying()) && (output->GetSource() == renderer))
 			MakeSampleVisible(output->GetPos());
 		ForceRedraw();
-	}else if (o->GetName() == "AudioInput"){
+	}else if (o == input){
 		if (input->IsCapturing())
 			MakeSampleVisible(sel_range.start() + input->GetSampleCount());
 		ForceRedraw();
@@ -1340,7 +1346,7 @@ void AudioView::SetShowMono(bool mono)
 {
 	show_mono = mono;
 	ForceRedraw();
-	//Notify("Settings");
+	Notify(MESSAGE_SETTINGS_CHANGE);
 	UpdateMenu();
 }
 
@@ -1422,7 +1428,7 @@ void AudioView::SetCurSample(SampleRef *s)
 	if (cur_sample == s)
 		return;
 	cur_sample = s;
-	Notify("CurSampleChange");
+	Notify(MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 
@@ -1431,7 +1437,7 @@ void AudioView::SetCurTrack(Track *t)
 	if (cur_track == t)
 		return;
 	cur_track = t;
-	Notify("CurTrackChange");
+	Notify(MESSAGE_CUR_TRACK_CHANGE);
 }
 
 void AudioView::SetCurLevel(int l)
@@ -1442,7 +1448,7 @@ void AudioView::SetCurLevel(int l)
 		return;
 	cur_level = l;
 	ForceRedraw();
-	Notify("CurLevelChange");
+	Notify(MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 

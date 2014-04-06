@@ -26,7 +26,7 @@ void *ActionTrackEditMuted::execute(Data *d)
 	bool temp = muted;
 	muted = t->muted;
 	t->muted = temp;
-	t->Notify("Change");
+	t->Notify();
 
 	return NULL;
 }

@@ -33,8 +33,9 @@
 
 #define UPDATE_TIME		0.050f
 
-// sends notifications:
-//   "StateChange", "Update"
+
+const string AudioOutput::MESSAGE_STATE_CHANGE = "StateChange";
+const string AudioOutput::MESSAGE_UPDATE = "Update";
 
 AudioOutput::AudioOutput() :
 	PeakMeterSource("AudioOutput")
@@ -222,7 +223,7 @@ void AudioOutput::Stop()
 	playing = false;
 	renderer = NULL;
 
-	Notify("StateChange");
+	Notify(MESSAGE_STATE_CHANGE);
 }
 
 void AudioOutput::Pause()
@@ -235,7 +236,7 @@ void AudioOutput::Pause()
 		alSourcePause(source);
 	else if (param == AL_PAUSED)
 		alSourcePlay(source);
-	Notify("StateChange");
+	Notify(MESSAGE_STATE_CHANGE);
 }
 
 bool AudioOutput::stream(int buf)
@@ -311,7 +312,7 @@ void AudioOutput::Play(AudioRenderer *r)
 
 	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
 
-	Notify("StateChange");
+	Notify(MESSAGE_STATE_CHANGE);
 }
 
 void AudioOutput::PlayGenerated(void *func, int _sample_rate)
@@ -337,7 +338,7 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 
 	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
 
-	Notify("StateChange");
+	Notify(MESSAGE_STATE_CHANGE);
 }
 
 bool AudioOutput::IsPlaying()
@@ -381,7 +382,7 @@ float AudioOutput::GetVolume()
 void AudioOutput::SetVolume(float _volume)
 {
 	volume = _volume;
-	Notify("StateChange");
+	Notify(MESSAGE_STATE_CHANGE);
 }
 
 float AudioOutput::GetSampleRate()
@@ -440,7 +441,7 @@ void AudioOutput::Update()
 				TestError("alSourceQueueBuffers (idle)");
 			}
 		}
-		Notify("Update");
+		Notify(MESSAGE_UPDATE);
 
 
 		int param=0;

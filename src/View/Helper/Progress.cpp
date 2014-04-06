@@ -7,6 +7,8 @@
 
 #include "Progress.h"
 
+const string Progress::MESSAGE_CANCEL = "Cancel";
+
 Progress::Progress() :
 	Observable("Progress"), dlg(NULL)
 {
@@ -56,7 +58,7 @@ void Progress::Start(const string &str, float progress)
 
 void Progress::Cancel()
 {
-	Notify("Cancel");
+	Notify(MESSAGE_CANCEL);
 	Cancelled = true;
 }
 

@@ -67,13 +67,13 @@ void BottomBar::OnPrevious()
 void BottomBar::OnShow()
 {
 	visible = true;
-	Notify("Change");
+	Notify();
 }
 
 void BottomBar::OnHide()
 {
 	visible = false;
-	Notify("Change");
+	Notify();
 }
 
 void BottomBar::Choose(int console)
@@ -87,7 +87,7 @@ void BottomBar::Choose(int console)
 	}
 	active_console = console;
 	if (visible)
-		Notify("Change");
+		Notify();
 	else
 		Show();
 }

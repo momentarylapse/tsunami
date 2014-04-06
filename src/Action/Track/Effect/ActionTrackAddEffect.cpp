@@ -26,10 +26,10 @@ void *ActionTrackAddEffect::execute(Data *d)
 	if (track_no >= 0){
 		Track *t = a->get_track(track_no);
 		t->fx.add(effect);
-		t->Notify("AddEffect");
+		t->Notify(t->MESSAGE_ADD_EFFECT);
 	}else{
 		a->fx.add(effect);
-		a->Notify("AddEffect");
+		a->Notify(a->MESSAGE_ADD_EFFECT);
 	}
 
 	return NULL;
@@ -38,14 +38,14 @@ void *ActionTrackAddEffect::execute(Data *d)
 void ActionTrackAddEffect::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	effect->Notify("Delete");
+	effect->Notify(effect->MESSAGE_DELETE);
 	if (track_no >= 0){
 		Track *t = a->get_track(track_no);
 		t->fx.pop();
-		t->Notify("DeleteEffect");
+		t->Notify(t->MESSAGE_DELETE_EFFECT);
 	}else{
 		a->fx.pop();
-		a->Notify("DeleteEffect");
+		a->Notify(a->MESSAGE_DELETE_EFFECT);
 	}
 }
 

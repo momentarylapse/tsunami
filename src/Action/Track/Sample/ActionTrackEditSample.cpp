@@ -37,7 +37,7 @@ void *ActionTrackEditSample::execute(Data *d)
 	s->muted = new_value.mute;
 	s->rep_num = new_value.rep_num;
 	s->rep_delay = new_value.rep_delay;
-	s->Notify("ChangeByAction");
+	s->Notify(s->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }
@@ -52,7 +52,7 @@ void ActionTrackEditSample::undo(Data *d)
 	s->muted = old_value.mute;
 	s->rep_num = old_value.rep_num;
 	s->rep_delay = old_value.rep_delay;
-	s->Notify("ChangeByAction");
+	s->Notify(s->MESSAGE_CHANGE_BY_ACTION);
 }
 
 

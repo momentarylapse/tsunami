@@ -46,6 +46,9 @@ public:
 	Range GetRange();
 	Range GetRangeUnsafe();
 
+	static const string MESSAGE_ADD_EFFECT;
+	static const string MESSAGE_DELETE_EFFECT;
+
 	void Reset();
 	void UpdatePeaks(int mode);
 	void InvalidateAllPeaks();

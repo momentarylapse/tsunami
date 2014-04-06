@@ -39,7 +39,7 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	Enable("chord_type", false);
 
 	LoadData();
-	Subscribe(view, "CurTrackChange");
+	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
 	EventM("name", this, &TrackDialog::OnName);
 	EventM("volume", this, &TrackDialog::OnVolume);
@@ -153,7 +153,7 @@ void TrackDialog::OnUpdate(Observable *o, const string &message)
 {
 	if (o == view){
 		SetTrack(view->cur_track);
-	}else if ((o == track) && (message == "Delete")){
+	}else if ((o == track) && (message == track->MESSAGE_DELETE)){
 		SetTrack(NULL);
 	}else{
 		LoadData();

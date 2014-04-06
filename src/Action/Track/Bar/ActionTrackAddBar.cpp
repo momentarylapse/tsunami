@@ -28,7 +28,7 @@ void *ActionTrackAddBar::execute(Data *d)
 	assert(index <= t->bar.num);
 
 	t->bar.insert(bar, index);
-	t->Notify("Change");
+	t->Notify();
 
 	return NULL;
 }
@@ -39,6 +39,6 @@ void ActionTrackAddBar::undo(Data *d)
 
 	Track *t = a->get_track(track_no);
 	t->bar.erase(index);
-	t->Notify("Change");
+	t->Notify();
 }
 

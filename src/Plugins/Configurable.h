@@ -44,6 +44,8 @@ public:
 	void __init__();
 	virtual void __delete__();
 
+	static const string MESSAGE_CHANGE_BY_ACTION;
+
 	virtual void _cdecl ResetConfig();
 	virtual void _cdecl ResetState();
 	void Configure();

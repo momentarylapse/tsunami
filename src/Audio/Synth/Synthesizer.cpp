@@ -92,6 +92,7 @@ void Synthesizer::__init__()
 
 void Synthesizer::__delete__()
 {
+	this->Configurable::~Configurable();
 }
 
 void Synthesizer::reset()

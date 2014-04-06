@@ -1087,7 +1087,9 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 	if (o == audio){
 		if (message == audio->MESSAGE_NEW){
 			sel_range = sel_raw = Range(0, 0);
-			SetCurTrack((audio->track.num > 0) ? audio->track[0] : NULL);
+			SetCurTrack(NULL);
+			if (audio->track.num > 0)
+				SetCurTrack(audio->track[0]);
 			OptimizeView();
 		}else{
 			ForceRedraw();

@@ -23,6 +23,7 @@ AudioInput::AudioInput() :
 	in_midi = new AudioInputMidi(midi);
 	in_cur = in_audio;
 	running = false;
+	type = -1;
 }
 
 AudioInput::~AudioInput()

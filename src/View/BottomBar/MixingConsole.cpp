@@ -135,6 +135,7 @@ MixingConsole::~MixingConsole()
 	Unsubscribe(output);
 	foreach(TrackMixer *m, mixer)
 		delete(m);
+	delete(peak_meter);
 }
 
 void MixingConsole::OnOutputVolume()

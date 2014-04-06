@@ -57,6 +57,7 @@ AudioInputAudio::AudioInputAudio(BufferBox &buf, BufferBox &cur_buf) :
 {
 	Capturing = false;
 	capture = NULL;
+	accumulate = false;
 	memset(capture_temp, 0, sizeof(capture_temp));
 	SampleRate = DEFAULT_SAMPLE_RATE;
 

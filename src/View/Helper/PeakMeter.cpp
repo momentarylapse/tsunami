@@ -61,8 +61,7 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 
 PeakMeter::~PeakMeter()
 {
-	if (enabled)
-		Unsubscribe(source);
+	Unsubscribe(source);
 }
 
 void PeakMeter::Enable(bool _enabled)

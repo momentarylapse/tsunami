@@ -38,7 +38,6 @@ Effect::Effect(Plugin *p) :
 
 Effect::~Effect()
 {
-	Notify(MESSAGE_DELETE);
 }
 
 void Effect::__init__()
@@ -48,17 +47,8 @@ void Effect::__init__()
 
 void Effect::__delete__()
 {
-	Notify(MESSAGE_DELETE);
+	this->Configurable::~Configurable();
 }
-
-/*void make_fx(Effect *fx)
-{
-	foreachi(Script::Variable &v, fx->plugin->s->syntax->RootOfAllEvil.var, i)
-		if (v.type->name == "PluginData"){
-			fx->data = fx->plugin->s->g_var[i];
-			fx->data_type = v.type;
-		}
-}*/
 
 void Effect::Prepare()
 {

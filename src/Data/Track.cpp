@@ -76,7 +76,6 @@ void Track::Reset()
 
 Track::~Track()
 {
-	Notify(MESSAGE_DELETE);
 	Reset();
 	if (synth)
 		delete(synth);

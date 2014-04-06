@@ -189,13 +189,13 @@ Tsunami::~Tsunami()
 
 	delete(side_bar);
 	delete(bottom_bar);
-	delete(plugin_manager);
 	delete(storage);
 	delete(view);
 	delete(output);
 	delete(input);
 	delete(audio);
 	delete(renderer);
+	delete(plugin_manager);
 	HuiEnd();
 }
 

@@ -13,6 +13,8 @@
 class AudioInputBase
 {
 public:
+	virtual ~AudioInputBase(){}
+
 	virtual bool Start(int sample_rate) = 0;
 	virtual void Stop() = 0;
 

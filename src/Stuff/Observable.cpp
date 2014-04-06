@@ -36,7 +36,7 @@ Observable::Observable(const string &name)
 
 Observable::~Observable()
 {
-	requests.clear();
+	Notify(MESSAGE_DELETE);
 }
 
 void Observable::AddObserver(Observer *o, const string &message)
@@ -92,7 +92,7 @@ void Observable::NotifySend()
 
 	// send
 	foreach(Notification &n, notifications){
-		//msg_write("send " + GetName() + "/" + n.message + "  >>  " + n.observer->GetName());
+		//msg_write("send " + GetName() + "/" + *n.message + "  >>  " + n.observer->GetName());
 		n.observer->OnUpdate(this, *n.message);
 	}
 }

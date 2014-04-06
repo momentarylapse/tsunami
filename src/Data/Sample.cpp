@@ -68,7 +68,6 @@ SampleRef::SampleRef(Sample *sample) :
 SampleRef::~SampleRef()
 {
 	origin->unref();
-	Notify(MESSAGE_DELETE);
 }
 
 int SampleRef::get_index()

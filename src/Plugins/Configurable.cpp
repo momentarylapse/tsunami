@@ -163,6 +163,7 @@ void Configurable::__init__()
 
 void Configurable::__delete__()
 {
+	this->Observable::~Observable();
 }
 
 PluginData *Configurable::get_config()
@@ -252,6 +253,7 @@ struct AutoConfigData
 		max = 100000000;
 		step = 1;
 		factor = 1;
+		value = NULL;
 	}
 };
 

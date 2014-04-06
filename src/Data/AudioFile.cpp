@@ -343,9 +343,9 @@ void AudioFile::DeleteSelectedSamples()
 	action_manager->EndActionGroup();
 }
 
-void AudioFile::AddLevel()
+void AudioFile::AddLevel(const string &name)
 {
-	Execute(new ActionAudioAddLevel());
+	Execute(new ActionAudioAddLevel(name));
 }
 
 void AudioFile::DeleteLevel(int index, bool merge)

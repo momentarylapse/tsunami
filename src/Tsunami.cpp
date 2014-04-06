@@ -307,16 +307,19 @@ string title_filename(const string &filename)
 
 bool Tsunami::AllowTermination()
 {
-	if (!audio->action_manager->IsSave()){
-		string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio->filename).c_str()), true);
-		if (answer == "hui:yes"){
-			/*if (!OnSave())
-				return false;*/
-			OnSave();
-		}else if (answer == "hui:cancel")
-			return false;
-	}
-	return true;
+	if (audio->action_manager->IsSave())
+		return true;
+	string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio->filename).c_str()), true);
+	if (answer == "hui:yes"){
+		/*if (!OnSave())
+			return false;*/
+		OnSave();
+		return true;
+	}else if (answer == "hui:no")
+		return true;
+
+	// cancel
+	return false;
 }
 
 void Tsunami::OnCopy()
@@ -429,7 +432,7 @@ void Tsunami::OnRecord()
 void Tsunami::OnAddLevel()
 {
 	if (audio->used)
-		audio->AddLevel();
+		audio->AddLevel("");
 }
 
 void Tsunami::OnDeleteLevel()
@@ -586,6 +589,8 @@ void Tsunami::OnExit()
 
 void Tsunami::OnNew()
 {
+	if (!AllowTermination())
+		return;
 	NewDialog *d = new NewDialog(tsunami, false, audio);
 	d->Run();
 }
@@ -593,6 +598,8 @@ void Tsunami::OnNew()
 
 void Tsunami::OnOpen()
 {
+	if (!AllowTermination())
+		return;
 	if (storage->AskOpen(this))
 		storage->Load(audio, HuiFilename);
 }

@@ -75,6 +75,11 @@ void GlobalRemoveSliders(HuiPanel *panel)
 	global_slider.clear();
 }
 
+bool GlobalAllowTermination()
+{
+	return tsunami->AllowTermination();
+}
+
 HuiWindow *GlobalMainWin = NULL;
 
 void PluginManager::LinkAppScriptData()
@@ -104,6 +109,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("SliderGet", (void*)&GlobalSliderGet);
 	Script::LinkExternal("RemoveSliders", (void*)&GlobalRemoveSliders);
 	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
+	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 
 	Script::DeclareClassSize("Range", sizeof(Range));
 	Script::DeclareClassOffset("Range", "offset", offsetof(Range, offset));
@@ -211,7 +217,26 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Track", "is_selected", offsetof(Track, is_selected));
 	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::GetBuffers));
 	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::ReadBuffers));
+	Script::LinkExternal("Track.setName", Script::mf(&Track::SetName));
+	Script::LinkExternal("Track.setMuted", Script::mf(&Track::SetMuted));
+	Script::LinkExternal("Track.setVolume", Script::mf(&Track::SetVolume));
+	Script::LinkExternal("Track.setPanning", Script::mf(&Track::SetPanning));
 	Script::LinkExternal("Track.insertMidiData", Script::mf(&Track::InsertMidiData));
+	Script::LinkExternal("Track.addEffect", Script::mf(&Track::AddEffect));
+	Script::LinkExternal("Track.deleteEffect", Script::mf(&Track::DeleteEffect));
+	Script::LinkExternal("Track.editEffect", Script::mf(&Track::EditEffect));
+	Script::LinkExternal("Track.enableEffect", Script::mf(&Track::EnableEffect));
+	Script::LinkExternal("Track.addSample", Script::mf(&Track::AddSample));
+	Script::LinkExternal("Track.deleteSample", Script::mf(&Track::DeleteSample));
+	Script::LinkExternal("Track.editSample", Script::mf(&Track::EditSample));
+	Script::LinkExternal("Track.addMidiNote", Script::mf(&Track::AddMidiNote));
+	Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::AddMidiNotes));
+	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::DeleteMidiNote));
+	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::SetSynthesizer));
+	Script::LinkExternal("Track.addBars", Script::mf(&Track::AddBars));
+	Script::LinkExternal("Track.addPause", Script::mf(&Track::AddPause));
+	Script::LinkExternal("Track.editBar", Script::mf(&Track::EditBar));
+	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::DeleteBar));
 
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
 	Script::DeclareClassOffset("AudioFile", "used", offsetof(AudioFile, used));
@@ -223,6 +248,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "track", offsetof(AudioFile, track));
 	Script::DeclareClassOffset("AudioFile", "area", offsetof(AudioFile, area));
 	Script::DeclareClassOffset("AudioFile", "level_name", offsetof(AudioFile, level_name));
+	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::NewEmpty));
+	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::AddTrack));
+	Script::LinkExternal("AudioFile.deleteTrack", Script::mf(&AudioFile::DeleteTrack));
 	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::GetRange));
 	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::GetNextBeat));
 

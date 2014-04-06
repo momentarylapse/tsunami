@@ -156,6 +156,10 @@ Configurable::Configurable(const string &observable_name, int type) :
 	configurable_type = type;
 }
 
+Configurable::~Configurable()
+{
+}
+
 void Configurable::__init__()
 {
 	new(this) Configurable("", -1);

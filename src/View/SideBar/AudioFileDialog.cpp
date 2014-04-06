@@ -130,7 +130,7 @@ void AudioFileDialog::OnLevelsEdit()
 
 void AudioFileDialog::OnAddLevel()
 {
-	audio->AddLevel();
+	audio->AddLevel("");
 }
 
 void AudioFileDialog::OnDeleteLevel()

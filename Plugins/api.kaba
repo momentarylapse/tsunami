@@ -116,6 +116,12 @@ class TrackLevel
 class SampleRef // TODO
 	int dummy
 
+
+enum
+	TYPE_AUDIO
+	TYPE_TIME
+	TYPE_MIDI
+
 class Track
 	int type
 	string name
@@ -149,7 +155,27 @@ class Track
 	
 	extern BufferBox getBuffers(int level_no, Range r)
 	extern BufferBox readBuffers(Range r)
+	
+	extern void setName(string name)
+	extern void setMuted(bool muted)
+	extern void setVolume(float volume)
+	extern void setPanning(float panning)
 	extern void insertMidiData(int offset, MidiData midi)
+	extern void addEffect(AudioEffect *effect)
+	extern void deleteEffect(int index)
+	extern void editEffect(int index, string param_old)
+	extern void enableEffect(int index, bool enabled)
+	extern SampleRef *addSample(int pos, int index)
+	extern void deleteSample(int index)
+	extern void editSample(int index, float volume, bool mute, int rep_num, int rep_delay)
+	extern void addMidiNote(MidiNote n)
+	extern void addMidiNotes(MidiNote notes[])
+	extern void deleteMidiNote(int index)
+	extern void setSynthesizer(Synthesizer *synth)
+	extern void addBars(int index, float bpm, int beats, int bars)
+	extern void addPause(int index, float time)
+	extern void editBar(int index, BarPattern p)
+	extern void deleteBar(int index)
 
 class Tag
 	string key, value
@@ -171,6 +197,10 @@ class AudioFile
 	
 	extern Range getRange()
 	extern int getNextBeat(int pos)
+	
+	extern void newEmpty(int sample_rate)
+	extern Track *addTrack(int type, int index)
+	extern void deleteTrack(int index)
 
 class AudioView
 	Range sel_range
@@ -243,6 +273,7 @@ extern void fft_c2r_inv(complex in[], float out[])
 extern void ProgressEnd()
 extern void Progress(string s, float progress)*/
 
+extern bool AllowTermination()
 extern void CreateSlider(Panel *panel, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
 extern void CreateSliderM(Panel *panel, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
 extern void SliderSet(Panel *panel, string id, float value)

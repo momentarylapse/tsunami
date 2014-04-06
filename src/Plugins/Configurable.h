@@ -40,7 +40,7 @@ class Configurable : public Observable
 {
 public:
 	Configurable(const string &observable_name, int type);
-	virtual ~Configurable(){}
+	virtual ~Configurable();
 	void __init__();
 	virtual void __delete__();
 

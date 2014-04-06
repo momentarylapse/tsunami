@@ -13,11 +13,13 @@
 class ActionAudioAddLevel : public Action
 {
 public:
-	ActionAudioAddLevel();
+	ActionAudioAddLevel(const string &name);
 	virtual ~ActionAudioAddLevel();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
+private:
+	string name;
 };
 
 #endif /* ACTIONAUDIOADDLEVEL_H_ */

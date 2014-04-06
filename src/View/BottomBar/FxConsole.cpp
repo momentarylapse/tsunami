@@ -56,7 +56,8 @@ public:
 		Check("enabled", fx->enabled);
 
 		old_param = fx->ConfigToString();
-		Subscribe(fx);
+		Subscribe(fx, fx->MESSAGE_CHANGE);
+		Subscribe(fx, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleFxPanel()
 	{

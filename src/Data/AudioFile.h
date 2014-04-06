@@ -36,7 +36,7 @@ class AudioFile : public Data
 public:
 	AudioFile();
 	virtual ~AudioFile();
-	Range GetRange();
+	Range _cdecl GetRange();
 
 	static const string MESSAGE_NEW;
 	static const string MESSAGE_SELECTION_CHANGE;
@@ -50,11 +50,11 @@ public:
 	string get_time_str_long(int t);
 
 	void Reset();
-	void NewEmpty(int _sample_rate);
-	void NewWithOneTrack(int track_type, int _sample_rate);
-	bool Load(const string &filename, bool deep);
-	bool Save(const string &filename);
-	void UpdateSelection(const Range &range);
+	void _cdecl NewEmpty(int _sample_rate);
+	void _cdecl NewWithOneTrack(int track_type, int _sample_rate);
+	bool _cdecl Load(const string &filename, bool deep);
+	bool _cdecl Save(const string &filename);
+	void _cdecl UpdateSelection(const Range &range);
 	void UnselectAllSamples();
 
 	virtual void PostActionUpdate();
@@ -63,31 +63,31 @@ public:
 
 	int GetNumSelectedSamples();
 
-	Track *GetTimeTrack();
-	int GetNextBeat(int pos);
-	string GetNiceLevelName(int index);
+	Track *_cdecl GetTimeTrack();
+	int _cdecl GetNextBeat(int pos);
+	string _cdecl GetNiceLevelName(int index);
 
 	// action
-	void AddTag(const string &key, const string &value);
-	void EditTag(int index, const string &key, const string &value);
-	void DeleteTag(int index);
-	void AddEffect(Effect *effect);
-	void DeleteEffect(int index);
-	void EditEffect(int index, const string &param_old);
-	void EnableEffect(int index, bool enabled);
-	void SetVolume(float volume);
-	Track *AddTrack(int type, int index = -1);
-	void DeleteTrack(int index);
-	Sample *AddSample(const string &name, BufferBox &buf);
-	void DeleteSample(int index);
-	void EditSampleName(int index, const string &name);
-	void AddLevel();
-	void DeleteLevel(int index, bool merge);
-	void RenameLevel(int index, const string &name);
-	void InsertSelectedSamples(int level_no);
-	void DeleteSelectedSamples();
-	void DeleteSelection(int level_no, const Range &range, bool all_levels);
-	void CreateSamplesFromSelection(int level_no, const Range &range);
+	void _cdecl AddTag(const string &key, const string &value);
+	void _cdecl EditTag(int index, const string &key, const string &value);
+	void _cdecl DeleteTag(int index);
+	void _cdecl AddEffect(Effect *effect);
+	void _cdecl DeleteEffect(int index);
+	void _cdecl EditEffect(int index, const string &param_old);
+	void _cdecl EnableEffect(int index, bool enabled);
+	void _cdecl SetVolume(float volume);
+	Track *_cdecl AddTrack(int type, int index = -1);
+	void _cdecl DeleteTrack(int index);
+	Sample *_cdecl AddSample(const string &name, BufferBox &buf);
+	void _cdecl DeleteSample(int index);
+	void _cdecl EditSampleName(int index, const string &name);
+	void _cdecl AddLevel(const string &name);
+	void _cdecl DeleteLevel(int index, bool merge);
+	void _cdecl RenameLevel(int index, const string &name);
+	void _cdecl InsertSelectedSamples(int level_no);
+	void _cdecl DeleteSelectedSamples();
+	void _cdecl DeleteSelection(int level_no, const Range &range, bool all_levels);
+	void _cdecl CreateSamplesFromSelection(int level_no, const Range &range);
 
 	Track *get_track(int track_no);
 	SampleRef *get_sample_ref(int track_no, int index);

@@ -42,8 +42,7 @@ class Track : public Observable
 public:
 	Track();
 	virtual ~Track();
-	Track *GetParent();
-	Range GetRange();
+	Range _cdecl GetRange();
 	Range GetRangeUnsafe();
 
 	static const string MESSAGE_ADD_EFFECT;
@@ -52,34 +51,34 @@ public:
 	void Reset();
 	void UpdatePeaks(int mode);
 	void InvalidateAllPeaks();
-	BufferBox ReadBuffers(int level_no, const Range &r);
-	BufferBox ReadBuffersCol(const Range &r);
+	BufferBox _cdecl ReadBuffers(int level_no, const Range &r);
+	BufferBox _cdecl ReadBuffersCol(const Range &r);
 
-	string GetNiceName();
+	string _cdecl GetNiceName();
 	int get_index();
 
 	// actions
-	void SetName(const string &name);
-	void SetMuted(bool muted);
-	void SetVolume(float volume);
-	void SetPanning(float panning);
-	BufferBox GetBuffers(int level_no, const Range &r);
-	void InsertMidiData(int offset, MidiData &midi);
-	void AddEffect(Effect *effect);
-	void DeleteEffect(int index);
-	void EditEffect(int index, const string &param_old);
-	void EnableEffect(int index, bool enabled);
-	SampleRef *AddSample(int pos, int index);
-	void DeleteSample(int index);
-	void EditSample(int index, float volume, bool mute, int rep_num, int rep_delay);
-	void AddMidiNote(const MidiNote &n);
-	void AddMidiNotes(Array<MidiNote> notes);
-	void DeleteMidiNote(int index);
-	void SetSynthesizer(Synthesizer *synth);
-	void AddBars(int index, float bpm, int beats, int bars);
-	void AddPause(int index, float time);
-	void EditBar(int index, BarPattern &p);
-	void DeleteBar(int index);
+	void _cdecl SetName(const string &name);
+	void _cdecl SetMuted(bool muted);
+	void _cdecl SetVolume(float volume);
+	void _cdecl SetPanning(float panning);
+	BufferBox _cdecl GetBuffers(int level_no, const Range &r);
+	void _cdecl InsertMidiData(int offset, MidiData &midi);
+	void _cdecl AddEffect(Effect *effect);
+	void _cdecl DeleteEffect(int index);
+	void _cdecl EditEffect(int index, const string &param_old);
+	void _cdecl EnableEffect(int index, bool enabled);
+	SampleRef *_cdecl AddSample(int pos, int index);
+	void _cdecl DeleteSample(int index);
+	void _cdecl EditSample(int index, float volume, bool mute, int rep_num, int rep_delay);
+	void _cdecl AddMidiNote(const MidiNote &n);
+	void _cdecl AddMidiNotes(Array<MidiNote> notes);
+	void _cdecl DeleteMidiNote(int index);
+	void _cdecl SetSynthesizer(Synthesizer *synth);
+	void _cdecl AddBars(int index, float bpm, int beats, int bars);
+	void _cdecl AddPause(int index, float time);
+	void _cdecl EditBar(int index, BarPattern &p);
+	void _cdecl DeleteBar(int index);
 
 
 	enum

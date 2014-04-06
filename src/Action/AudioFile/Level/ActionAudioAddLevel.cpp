@@ -8,8 +8,9 @@
 #include "ActionAudioAddLevel.h"
 #include "../../../Data/AudioFile.h"
 
-ActionAudioAddLevel::ActionAudioAddLevel()
+ActionAudioAddLevel::ActionAudioAddLevel(const string &_name)
 {
+	name = _name;
 }
 
 ActionAudioAddLevel::~ActionAudioAddLevel()
@@ -19,7 +20,7 @@ ActionAudioAddLevel::~ActionAudioAddLevel()
 void* ActionAudioAddLevel::execute(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	a->level_name.add("");
+	a->level_name.add(name);
 
 	TrackLevel new_level;
 	foreach(Track *t, a->track)

@@ -1,0 +1,83 @@
+// Image = hui:media-play
+// Title[Deutsch] = Metronom
+use "../api.kaba"
+use "../tone.kaba"
+
+Window *dlg
+
+const int SAMPLE_RATE = 44100
+
+void insert_chord(Track *t, Chord c, Range r)
+	float pitch[]
+	pitch.add(c.base_tone)
+	if c.type == ChordMinor
+		pitch.add(c.base_tone + 3)
+	else
+		pitch.add(c.base_tone + 4)
+	pitch.add(c.base_tone + 7)
+	pitch.add(c.base_tone + 12)
+	
+	for p in pitch
+		MidiNote n
+		n.range = r
+		n.pitch = p
+		n.volume = 0.3
+		t.addMidiNote(n)
+
+void OnOk()
+	string str = dlg.getString("chords")
+	Chord chords[]
+	ParseChords(str, chords)
+	int sample_rate = dlg.getString("sample_rate").int()
+	int beats = dlg.getInt("beats")
+	float bpm = dlg.getFloat("bpm")
+	audio.newEmpty(sample_rate)
+	Track *t = audio.addTrack(TYPE_TIME, 0)
+	t.addBars(-1, bpm, beats, chords.num)
+	int dt = t.bar[0].length
+	t = audio.addTrack(TYPE_MIDI, 1)
+	Range r
+	r.offset = 0
+	r.length = dt
+	for c in chords
+		insert_chord(t, c, r)
+		r.offset += dt
+		
+	delete dlg
+
+void OnClose()
+	delete dlg
+
+void main()
+	if !AllowTermination()
+		return
+		
+	dlg = new Dialog("Create Chord Progression", 200, 80, MainWin, true)
+	dlg.fromSource("
+Grid ? '' 1 4
+	Group ? 'Samplerate'
+		Grid ? '' 2 1
+			ComboBox sample_rate '44100' expandx editable
+			Text per_second '/s'
+	Group ? 'Chords'
+		Edit chords ''
+	Group ? 'Metronom'
+		Grid ? '' 3 3
+			Text ? 'Speed'
+			SpinButton bpm '90\\0\\999\\0.1'
+			Text ? '/min'
+			Text ? 'Beats per measure'
+			SpinButton beats '4\\1\\99'
+			.
+	Grid ? '' 2 1 buttonbar
+		Button cancel 'Cancel' image=hui:cancel
+		DefButton ok 'Ok' image=hui:ok")
+	
+	dlg.setFloat("bpm", 90.0)
+	dlg.setInt("beats", 4)
+	
+	dlg.event("hui:close", &OnClose)
+	dlg.event("cancel", &OnClose)
+	dlg.event("ok", &OnOk)
+	
+	dlg.run()

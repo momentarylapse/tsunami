@@ -85,7 +85,7 @@ Array<string> GetChordTypeNames()
 	return r;
 }
 
-Array<int> GetChordNotes(int type, int pitch)
+Array<int> GetChordNotes(int type, int inversion, int pitch)
 {
 	Array<int> r;
 	r.add(pitch);
@@ -101,6 +101,12 @@ Array<int> GetChordNotes(int type, int pitch)
 	}else if (type == CHORD_TYPE_AUGMENTED){
 		r.add(pitch + 4);
 		r.add(pitch + 8);
+	}
+	if (inversion == 2)
+		r.insert(r.pop() - 12, 0);
+	if (inversion == 1){
+		r.insert(r.pop() - 12, 0);
+		r.insert(r.pop() - 12, 0);
 	}
 	return r;
 }

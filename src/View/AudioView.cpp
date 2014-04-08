@@ -117,6 +117,7 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output,
 	beat_partition = 4;
 	parent->SetInt("beat_partition", beat_partition);
 	chord_mode = CHORD_TYPE_NONE;
+	chord_inversion = 0;
 
 	audio->area = rect(0, 0, 0, 0);
 	Subscribe(audio);
@@ -537,7 +538,7 @@ Array<MidiNote> AudioView::GetSelectedNotes()
 	}
 	Range r = Range(start, end - start);
 	Array<MidiNote> notes;
-	Array<int> pitch = GetChordNotes(chord_mode, selection.pitch);
+	Array<int> pitch = GetChordNotes(chord_mode, chord_inversion, selection.pitch);
 	foreach(int p, pitch)
 		notes.add(MidiNote(r, p, 1));
 	return notes;
@@ -1090,7 +1091,7 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 			SetCurTrack(NULL);
 			if (audio->track.num > 0)
 				SetCurTrack(audio->track[0]);
-			OptimizeView();
+			HuiRunLaterM(0.01f, this, &AudioView::OptimizeView);
 		}else{
 			ForceRedraw();
 			UpdateMenu();

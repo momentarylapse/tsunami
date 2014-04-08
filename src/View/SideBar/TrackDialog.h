@@ -34,6 +34,7 @@ public:
 	void OnBeatPartition();
 	void OnInsertChord();
 	void OnChordType();
+	void OnChordInversion();
 
 	void SetTrack(Track *t);
 

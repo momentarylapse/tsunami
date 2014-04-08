@@ -49,7 +49,7 @@ enum
 
 string GetChordTypeName(int type);
 Array<string> GetChordTypeNames();
-Array<int> GetChordNotes(int type, int pitch);
+Array<int> GetChordNotes(int type, int inversion, int pitch);
 
 
 #endif /* MIDIDATA_H_ */

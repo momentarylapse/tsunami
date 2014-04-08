@@ -37,6 +37,11 @@ TrackDialog::TrackDialog(AudioView *_view) :
 		AddString("chord_type", ct);
 	SetInt("chord_type", 0);
 	Enable("chord_type", false);
+	AddString("chord_inversion", _("Grundform"));
+	AddString("chord_inversion", _("1. Umkehrung"));
+	AddString("chord_inversion", _("2. Umkehrung"));
+	SetInt("chord_inversion", 0);
+	Enable("chord_inversion", false);
 
 	LoadData();
 	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
@@ -50,6 +55,7 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	EventM("beat_partition", this, &TrackDialog::OnBeatPartition);
 	EventM("insert_chord", this, &TrackDialog::OnInsertChord);
 	EventM("chord_type", this, &TrackDialog::OnChordType);
+	EventM("chord_inversion", this, &TrackDialog::OnChordInversion);
 }
 
 TrackDialog::~TrackDialog()
@@ -142,11 +148,17 @@ void TrackDialog::OnInsertChord()
 	else
 		view->chord_mode = CHORD_TYPE_NONE;
 	Enable("chord_type", IsChecked(""));
+	Enable("chord_inversion", IsChecked(""));
 }
 
 void TrackDialog::OnChordType()
 {
 	view->chord_mode = GetInt("");
+}
+
+void TrackDialog::OnChordInversion()
+{
+	view->chord_inversion = GetInt("");
 }
 
 void TrackDialog::OnUpdate(Observable *o, const string &message)

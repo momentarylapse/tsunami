@@ -181,6 +181,7 @@ public:
 	int pitch_min, pitch_max;
 	int beat_partition;
 	int chord_mode;
+	int chord_inversion;
 
 	AudioFile *audio;
 

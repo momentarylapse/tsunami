@@ -22,7 +22,7 @@ Dialog track_dialog "Spur" 380 516
 					Button add_bar_pause "Pause" image=hui:add flat
 					Button delete_bar "" image=hui:delete flat
 		Group ld_t_midi "Midi-Bearbeitung"
-			Grid ? "" 2 4
+			Grid ? "" 2 5
 				Text ld_t_pitch "Pitch"
 				SpinButton pitch_offset "60\\0\\90" expandx
 				Text ld_t_partition "Unterteilung"
@@ -31,4 +31,6 @@ Dialog track_dialog "Spur" 380 516
 				.
 				Text ld_t_chord "Typ"
 				ComboBox chord_type ""
+				Text ld_t_inversion "Umkehrung"
+				ComboBox chord_inversion ""
 

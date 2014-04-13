@@ -9,6 +9,7 @@
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
 #include "../Helper/BarList.h"
+#include "../BottomBar/BottomBar.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../Dialog/SynthesizerDialog.h"
 #include "../../Tsunami.h"
@@ -123,9 +124,7 @@ void TrackDialog::OnSynthesizer()
 
 void TrackDialog::OnConfigSynthesizer()
 {
-	string params_old = track->synth->ConfigToString();
-	if (tsunami->plugin_manager->ConfigureSynthesizer(track->synth))
-		track->root->Execute(new ActionTrackEditSynthesizer(track, params_old));
+	tsunami->bottom_bar->Choose(BottomBar::SYNTH_CONSOLE);
 }
 
 void TrackDialog::OnPitch()

@@ -13,8 +13,8 @@
 ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t, const string &params_old)
 {
 	track_no = get_track_index(t);
-	params = params_old;
-	first_execution = true;
+	old_value = params_old;
+	new_value = t->synth->ConfigToString();
 }
 
 ActionTrackEditSynthesizer::~ActionTrackEditSynthesizer()
@@ -25,29 +25,33 @@ void *ActionTrackEditSynthesizer::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	// old_params... so don't execute on first run
-	if (first_execution){
-		first_execution = false;
-		return NULL;
-	}
-
-	assert(track_no >= 0);
-	assert(track_no < a->track.num);
-
 	Track *t = a->get_track(track_no);
 	assert(t);
 	assert(t->synth);
 
-	string temp = params;
-	params = t->synth->ConfigToString();
-	t->synth->ConfigFromString(temp);
-	t->Notify();
+	t->synth->ConfigFromString(new_value);
+	t->synth->Notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }
 
 void ActionTrackEditSynthesizer::undo(Data *d)
 {
-	execute(d);
+	AudioFile *a = dynamic_cast<AudioFile*>(d);
+
+	Track *t = a->get_track(track_no);
+	assert(t);
+	assert(t->synth);
+
+	t->synth->ConfigFromString(old_value);
+	t->synth->Notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
+}
+
+bool ActionTrackEditSynthesizer::mergable(Action *a)
+{
+	ActionTrackEditSynthesizer *aa = dynamic_cast<ActionTrackEditSynthesizer*>(a);
+	if (!aa)
+		return false;
+	return (aa->track_no == track_no);
 }
 

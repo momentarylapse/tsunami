@@ -9,6 +9,7 @@
 #include "MiniConsole.h"
 #include "MixingConsole.h"
 #include "FxConsole.h"
+#include "SynthConsole.h"
 #include "LogDialog.h"
 #include "SampleManager.h"
 
@@ -29,13 +30,15 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	AddButton("!noexpandy,flat", 0, 3, 0, 0, "previous");
 	SetImage("previous", "hui:back");
 	fx_console = new FxConsole(view, audio);
+	synth_console = new SynthConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output);
 	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
 	Embed(mixing_console, "console_grid", 0, 0);
 	Embed(fx_console, "console_grid", 0, 1);
-	Embed(sample_manager, "console_grid", 0, 2);
-	Embed(log_dialog, "console_grid", 0, 3);
+	Embed(synth_console, "console_grid", 0, 2);
+	Embed(sample_manager, "console_grid", 0, 3);
+	Embed(log_dialog, "console_grid", 0, 4);
 
 	EventM("next", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnNext);
 	EventM("previous", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnPrevious);

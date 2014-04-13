@@ -8,10 +8,10 @@
 #ifndef ACTIONTRACKEDITSYNTHESIZER_H_
 #define ACTIONTRACKEDITSYNTHESIZER_H_
 
-#include "../../Action.h"
+#include "../../ActionMergable.h"
 class Track;
 
-class ActionTrackEditSynthesizer: public Action
+class ActionTrackEditSynthesizer: public ActionMergable<string>
 {
 public:
 	ActionTrackEditSynthesizer(Track *t, const string &params_old);
@@ -20,10 +20,10 @@ public:
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
+	virtual bool mergable(Action *a);
+
 private:
-	string params;
 	int track_no;
-	bool first_execution;
 };
 
 #endif /* ACTIONTRACKEDITSYNTHESIZER_H_ */

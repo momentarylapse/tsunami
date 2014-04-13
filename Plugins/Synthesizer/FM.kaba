@@ -75,8 +75,10 @@ class FMState : PluginData
 
 class ConfigPanel : Panel
 	FMConfig *c
-	void __init__(FMConfig *_c)
-		c = _c
+	FMSynthesizer *s
+	void __init__(FMSynthesizer *_s)
+		s = _s
+		c = &s.config
 		addGrid("", 0, 0, 8, NUM_OSCILLATORS + 1, "main_table")
 		setTarget("main_table", 0)
 		addText("Frequency", 0, 0, 0, 0, "")
@@ -108,6 +110,8 @@ class ConfigPanel : Panel
 			c.osc[j].attack = getFloat("attack_" + j) / 1000
 			c.osc[j].decay = getFloat("decay_" + j) / 1000
 			c.osc[j].release = getFloat("release_" + j) / 1000
+		s.notify()
+		
 
 class FMSynthesizer : Synthesizer
 	FMConfig config
@@ -130,7 +134,7 @@ class FMSynthesizer : Synthesizer
 			panel.setFloat("release_" + j, config.osc[j].release * 1000)
 
 	overwrite Panel *createPanel()
-		panel = new ConfigPanel(&config)
+		panel = new ConfigPanel(self)
 		updateDialog()
 		return panel
 

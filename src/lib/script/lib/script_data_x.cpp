@@ -783,6 +783,9 @@ void SIAddPackageX()
 	add_class(TypeWorldData);
 		class_add_element("filename",		TypeString,		GetDAWorld(filename));
 		class_add_element("gravity",		TypeVector,		GetDAWorld(gravity));
+		class_add_element("objects",		TypeModelPList,		GetDAWorld(objects));
+		class_add_element("terrains",		TypeTerrainPList,		GetDAWorld(terrains));
+		//class_add_element("ego",			TypeModelP,		GetDAWorld(ego));
 		class_add_element("skybox",		TypeModelPList,		GetDAWorld(skybox));
 		class_add_element("background",		TypeColor,		GetDAWorld(background));
 		class_add_element("fog",		TypeFog,		GetDAWorld(fog));
@@ -894,11 +897,9 @@ void SIAddPackageX()
 
 	// game variables
 	add_ext_var("World", 			TypeWorldData,	x_p(&World));
+	add_ext_var("Ego", 				TypeModelP,		x_p(&World.ego));
 	add_ext_var("Engine", 			TypeEngineData,	x_p(&Engine));
 	add_ext_var("Net", 				TypeNetworkData,x_p(&Net));
-	add_ext_var("Object",			TypeModelPList,	x_p(&Objects));
-	add_ext_var("Ego",				TypeModelP,		x_p(&Ego));
-	add_ext_var("Terrain",			TypeTerrainPList,x_p(&Terrains));
 	add_ext_var("Cam",				TypeCameraP,		x_p(&Cam));
 	add_ext_var("CurrentLayer",		TypeLayerP,	x_p(&CurrentGrouping));
 

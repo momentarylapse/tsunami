@@ -16,6 +16,7 @@ class AudioFile;
 class AudioOutput;
 class Track;
 class FxConsole;
+class SynthConsole;
 class MixingConsole;
 class LogDialog;
 class SampleManager;
@@ -45,6 +46,7 @@ public:
 	{
 		MIXING_CONSOLE,
 		FX_CONSOLE,
+		SYNTH_CONSOLE,
 		SAMPLE_CONSOLE,
 		LOG_CONSOLE,
 		NUM_CONSOLES
@@ -56,6 +58,7 @@ public:
 	bool visible;
 
 	FxConsole *fx_console;
+	SynthConsole *synth_console;
 	MixingConsole *mixing_console;
 	LogDialog *log_dialog;
 	SampleManager *sample_manager;

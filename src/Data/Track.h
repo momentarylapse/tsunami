@@ -75,6 +75,7 @@ public:
 	void _cdecl AddMidiNotes(Array<MidiNote> notes);
 	void _cdecl DeleteMidiNote(int index);
 	void _cdecl SetSynthesizer(Synthesizer *synth);
+	void _cdecl EditSynthesizer(const string &param_old);
 	void _cdecl AddBars(int index, float bpm, int beats, int bars);
 	void _cdecl AddPause(int index, float time);
 	void _cdecl EditBar(int index, BarPattern &p);

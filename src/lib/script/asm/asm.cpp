@@ -1323,11 +1323,11 @@ void Init(int set)
 	add_inst(inst_xchg		,0x97	,1	,-1	,RegRax	,RegRdi, OptBigParam);
 	add_inst(inst_cbw_cwde	,0x98	,1	,-1	,-1 ,-1);
 	add_inst(inst_cgq_cwd	,0x99	,1	,-1	,-1 ,-1);
-	add_inst(inst_mov		,0xa0	,1	,-1	,RegAl	,Ob, true);
+	add_inst(inst_mov		,0xa0	,1	,-1	,RegAl	,Ob, 0, true);
 	add_inst(inst_mov		,0xa1	,1	,-1	,RegAx	,Ow, OptSmallParam, true);
 	add_inst(inst_mov		,0xa1	,1	,-1	,RegEax	,Od, OptMediumParam, true);
 	add_inst(inst_mov		,0xa1	,1	,-1	,RegRax	,Oq, OptBigParam, true);
-	add_inst(inst_mov		,0xa2	,1	,-1	,Ob	,RegAl, true);
+	add_inst(inst_mov		,0xa2	,1	,-1	,Ob	,RegAl, 0, true);
 	add_inst(inst_mov,	0xa3,	1,	-1,	Ow,	RegAx, OptSmallParam, true);
 	add_inst(inst_mov,	0xa3,	1,	-1,	Od,	RegEax, OptMediumParam, true);
 	add_inst(inst_mov,	0xa3,	1,	-1,	Oq,	RegRax, OptBigParam, true);

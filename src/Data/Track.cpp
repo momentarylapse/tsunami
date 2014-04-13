@@ -21,6 +21,7 @@
 #include "../Action/Track/Sample/ActionTrackDeleteSample.h"
 #include "../Action/Track/Sample/ActionTrackEditSample.h"
 #include "../Action/Track/Synthesizer/ActionTrackSetSynthesizer.h"
+#include "../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
@@ -303,6 +304,12 @@ void Track::DeleteEffect(int index)
 void Track::SetSynthesizer(Synthesizer *_synth)
 {
 	root->Execute(new ActionTrackSetSynthesizer(this, _synth));
+}
+
+// execute after editing...
+void Track::EditSynthesizer(const string &param_old)
+{
+	root->Execute(new ActionTrackEditSynthesizer(this, param_old));
 }
 
 void Track::AddBars(int index, float bpm, int beats, int bars)

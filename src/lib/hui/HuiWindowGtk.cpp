@@ -99,18 +99,16 @@ gboolean OnGtkWindowClose(GtkWidget *widget, GdkEvent *event, gpointer user_data
 	return true;
 }
 
-gboolean focus_in_event(GtkWidget *widget, GdkEventFocus *event, gpointer user_data)
+gboolean OnGtkWindowFocus(GtkWidget *widget, GdkEventFocus *event, gpointer user_data)
 {
+	HuiWindow *win = (HuiWindow *)user_data;
 	// make sure the contro/alt/shift keys are unset
-	HuiWindow *win = win_from_widget(widget);
-	if (win){
 
-		// reset all keys
-		memset(&win->input.key, 0, sizeof(win->input.key));
-		/*win->input.key[KEY_RSHIFT] = win->input.key[KEY_LSHIFT] = false;
-		win->input.key[KEY_RCONTROL] = win->input.key[KEY_LCONTROL] = false;
-		win->input.key[KEY_RALT] = win->input.key[KEY_LALT] = false;*/
-	}
+	// reset all keys
+	memset(&win->input.key, 0, sizeof(win->input.key));
+	/*win->input.key[KEY_RSHIFT] = win->input.key[KEY_LSHIFT] = false;
+	win->input.key[KEY_RCONTROL] = win->input.key[KEY_LCONTROL] = false;
+	win->input.key[KEY_RALT] = win->input.key[KEY_LALT] = false;*/
 	return false;
 }
 
@@ -188,6 +186,7 @@ void HuiWindow::_Init_(const string &title, int x, int y, int width, int height,
 
 	// catch signals
 	g_signal_connect(G_OBJECT(window), "delete-event", G_CALLBACK(&OnGtkWindowClose), this);
+	g_signal_connect(G_OBJECT(window), "focus-in-event", G_CALLBACK(&OnGtkWindowFocus), this);
 
 	// fill in some stuff
 	gtk_container_set_border_width(GTK_CONTAINER(window), 0);

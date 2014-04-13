@@ -358,8 +358,6 @@ void HuiInit(const string &program, bool load_res, const string &def_lang)
 		HuiSetProperty("logo", HuiAppDirectoryStatic + "Data/icon.svg");
 	else if (file_test_existence(HuiAppDirectoryStatic + "Data/icon.ico"))
 		HuiSetProperty("logo", HuiAppDirectoryStatic + "Data/icon.ico");
-	if (file_test_existence(HuiAppDirectoryStatic + "Data/license_small.txt"))
-		HuiSetProperty("license", FileRead(HuiAppDirectoryStatic + "Data/license_small.txt"));
 }
 
 

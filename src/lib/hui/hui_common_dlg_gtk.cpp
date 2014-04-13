@@ -181,6 +181,12 @@ void HuiErrorBox(HuiWindow *win,const string &title,const string &text)
 
 void HuiAboutBox(HuiWindow *win)
 {
+	// load license
+	if (HuiGetProperty("license") == "")
+		if (file_test_existence(HuiAppDirectoryStatic + "Data/license_small.txt"))
+			HuiSetProperty("license", FileRead(HuiAppDirectoryStatic + "Data/license_small.txt"));
+
+	// author list
 	Array<char*> _a_;
 	foreach(string &author, HuiPropAuthors){
 		char *p = new char[author.num + 1];
@@ -188,6 +194,7 @@ void HuiAboutBox(HuiWindow *win)
 		_a_.add(p);
 	}
 	_a_.add(NULL);
+
 	GError *error = NULL;
 	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(HuiGetProperty("logo").c_str(), &error);
 	gtk_show_about_dialog(NULL,

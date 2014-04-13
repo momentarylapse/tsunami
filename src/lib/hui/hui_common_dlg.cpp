@@ -21,7 +21,7 @@ void HuiSetProperty(const string &name, const string &value)
 	if (name == "author")
 		HuiPropAuthors.add(value);
 	else
-		HuiProperties.add(name, value);
+		HuiProperties[name] = value;
 }
 
 string HuiGetProperty(const string &name)

@@ -12,6 +12,7 @@
 #include "SynthConsole.h"
 #include "LogDialog.h"
 #include "SampleManager.h"
+#include "../../lib/hui/Controls/HuiControl.h"
 
 BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
@@ -24,11 +25,9 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	SetTarget("button_grid", 0);
 	AddButton("!noexpandy,flat", 0, 0, 0, 0, "close");
 	SetImage("close", "hui:close");
-	AddButton("!noexpandy,flat", 0, 1, 0, 0, "next");
-	SetImage("next", "hui:forward");
+	AddButton("!noexpandy,flat", 0, 1, 0, 0, "choose");
+	SetImage("choose", "hui:forward");
 	AddText("!big,angle=90,expandy\\...", 0, 2, 0, 0, "title");
-	AddButton("!noexpandy,flat", 0, 3, 0, 0, "previous");
-	SetImage("previous", "hui:back");
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output);
@@ -40,8 +39,14 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	Embed(sample_manager, "console_grid", 0, 3);
 	Embed(log_dialog, "console_grid", 0, 4);
 
-	EventM("next", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnNext);
-	EventM("previous", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnPrevious);
+	menu = new HuiMenu;
+	foreachi(HuiPanel *p, children, i){
+		string id = "bottom_bar_choose_" + i2s(i);
+		menu->AddItemCheckable(((BottomBarConsole*)p)->title, id);
+		EventM(id, (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChooseByMenu);
+	}
+
+	EventM("choose", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnOpenChooseMenu);
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);
 
 	visible = true;
@@ -57,14 +62,16 @@ void BottomBar::OnClose()
 	Hide();
 }
 
-void BottomBar::OnNext()
+void BottomBar::OnOpenChooseMenu()
 {
-	Choose((active_console + 1) % NUM_CONSOLES);
+	foreachi(HuiControl *c, menu->item, i)
+		c->Check(i == active_console);
+	menu->OpenPopup(this, 0, 0);
 }
 
-void BottomBar::OnPrevious()
+void BottomBar::OnChooseByMenu()
 {
-	Choose((active_console - 1 + NUM_CONSOLES) % NUM_CONSOLES);
+	Choose(HuiGetEvent()->id.tail(1)._int());
 }
 
 void BottomBar::OnShow()

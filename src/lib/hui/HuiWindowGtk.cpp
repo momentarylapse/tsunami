@@ -380,7 +380,7 @@ void HuiWindow::SetMenu(HuiMenu *_menu)
 	// insert new menu
 	menu = _menu;
 	if (menu){
-		menu->set_win(this);
+		menu->set_panel(this);
 		gtk_widget_show(menubar);
 		gtk_num_menus = menu->item.num;
 		for (int i=0;i<menu->item.num;i++){

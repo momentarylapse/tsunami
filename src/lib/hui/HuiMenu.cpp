@@ -56,14 +56,14 @@ void HuiMenu::AddSubMenu(const string &name, const string &id, HuiMenu *menu)
 		add(new HuiMenuItemSubmenu(name, menu, id));
 }
 
-void HuiMenu::set_win(HuiWindow *_win)
+void HuiMenu::set_panel(HuiPanel *_panel)
 {
-	win = _win;
+	panel = _panel;
 	foreach(HuiControl *c, item){
-		c->panel = win;
+		c->panel = panel;
 		HuiMenuItemSubmenu *s = dynamic_cast<HuiMenuItemSubmenu*>(c);
 		if (s)
-			s->sub_menu->set_win(win);
+			s->sub_menu->set_panel(panel);
 	}
 }
 

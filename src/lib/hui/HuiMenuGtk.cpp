@@ -42,7 +42,7 @@ HuiMenu::HuiMenu()
 {
 	msg_db_r("HuiMenu()", 1);
 	_HuiMakeUsable_();
-	win = NULL;
+	panel = NULL;
 	
 	widget = gtk_menu_new();
 	if (accel_group == NULL)
@@ -61,14 +61,12 @@ void HuiMenu::gtk_realize()
 }
 
 // window coordinate system!
-void HuiMenu::OpenPopup(HuiWindow *win, int x, int y)
+void HuiMenu::OpenPopup(HuiPanel *panel, int x, int y)
 {
-	msg_db_r("CHuiMenu::OpenPopup", 1);
+	msg_db_f("CHuiMenu::OpenPopup", 1);
 	gtk_widget_show(widget);
 	gtk_menu_popup(GTK_MENU(widget), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time());
-	set_win(win);
-//	win->popup = this;
-	msg_db_l(1);
+	set_panel(panel);
 }
 
 void HuiMenu::add(HuiControl *c)
@@ -76,9 +74,9 @@ void HuiMenu::add(HuiControl *c)
 	item.add(c);
 	gtk_menu_shell_append(GTK_MENU_SHELL(widget), c->widget);
 	gtk_widget_show(c->widget);
-	c->panel = win;
-	if (win)
-		win->control.add(c);
+	c->panel = panel;
+	if (panel)
+		panel->control.add(c);
 }
 
 

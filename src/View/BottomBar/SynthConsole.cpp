@@ -133,7 +133,7 @@ void SynthConsole::SetTrack(Track *t)
 	if (track){
 		Subscribe(track, track->MESSAGE_DELETE);
 		Subscribe(track, track->MESSAGE_CHANGE);
-		SetString("track_name", format(_("!angle=90\\wirken auf die Spur '%s'"), track->GetNiceName().c_str()));
+		SetString("track_name", format(_("!angle=90\\f&ur die Spur '%s'"), track->GetNiceName().c_str()));
 
 		if (track->synth){
 			Subscribe(track->synth, track->synth->MESSAGE_DELETE);

@@ -12,7 +12,7 @@
 #include "hui_common.h"
 
 
-class HuiWindow;
+class HuiPanel;
 class HuiMenu;
 class HuiControl;
 
@@ -25,7 +25,7 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__();
 	void _cdecl Clear();
-	void _cdecl OpenPopup(HuiWindow *win, int x, int y);
+	void _cdecl OpenPopup(HuiPanel *panel, int x, int y);
 	void _cdecl AddItem(const string &name, const string &id);
 	void _cdecl AddItemImage(const string &name, const string &image, const string &id);
 	void _cdecl AddItemCheckable(const string &name, const string &id);
@@ -38,7 +38,7 @@ public:
 	Array<HuiControl*> get_all_controls();
 
 	void UpdateLanguage();
-	void set_win(HuiWindow *win);
+	void set_panel(HuiPanel *panel);
 	
 #ifdef HUI_API_GTK
 	void gtk_realize();
@@ -50,7 +50,7 @@ public:
 	HMENU hMenu;
 #endif
 	Array<HuiControl*> item;
-	HuiWindow *win;
+	HuiPanel *panel;
 };
 
 #endif

@@ -10,6 +10,7 @@
 
 #include "hui.h"
 
+class HuiMenu;
 class HuiResourceNew;
 class HuiPainter;
 class HuiEvent;
@@ -21,6 +22,7 @@ class HuiPanel : public HuiEventHandler
 {
 	friend class HuiControl;
 	friend class HuiControlRadioButton;
+	friend class HuiMenu;
 public:
 	HuiPanel();
 	virtual ~HuiPanel();

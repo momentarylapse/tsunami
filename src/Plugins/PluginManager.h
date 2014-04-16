@@ -17,6 +17,7 @@ class Plugin;
 class Effect;
 class Synthesizer;
 class Configurable;
+class FavoriteManager;
 
 class PluginManager : public HuiEventHandler, public Observer
 {
@@ -101,6 +102,8 @@ public:
 		void set(Track *t, int l, const Range &r);
 	};
 	PluginContext context;
+
+	FavoriteManager *favorites;
 };
 
 #endif /* PLUGINMANAGER_H_ */

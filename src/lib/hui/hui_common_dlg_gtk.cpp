@@ -197,7 +197,7 @@ void HuiAboutBox(HuiWindow *win)
 
 	GError *error = NULL;
 	GdkPixbuf *_logo = gdk_pixbuf_new_from_file(HuiGetProperty("logo").c_str(), &error);
-	gtk_show_about_dialog(NULL,
+	gtk_show_about_dialog(get_window_save(win),
 		"program-name", HuiGetProperty("name").c_str(),
 		"website", HuiGetProperty("website").c_str(),
 		"version", HuiGetProperty("version").c_str(),

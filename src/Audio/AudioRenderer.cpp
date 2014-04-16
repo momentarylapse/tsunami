@@ -211,7 +211,7 @@ int AudioRenderer::read(BufferBox &buf)
 	buf.offset = pos;
 	pos += size;
 	if ((pos >= range.end()) && (loop))
-		pos = range.offset;
+		Seek(range.offset);
 	return size;
 }
 
@@ -243,4 +243,6 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 void AudioRenderer::Seek(int _pos)
 {
 	pos = _pos;
+	foreach(Track *t, audio->track)
+		t->synth->Reset();
 }

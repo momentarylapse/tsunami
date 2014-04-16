@@ -68,8 +68,6 @@ public:
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name);
 
-	bool ConfigureSynthesizer(Synthesizer *s);
-
 	// not compiled yet
 	struct PluginFile
 	{
@@ -85,13 +83,10 @@ public:
 	Array<string> PluginFavoriteName;
 
 	bool PluginCancelled;
-	bool PluginAddPreview;
 
 	Array<Plugin*> plugin;
 	Plugin *cur_plugin;
 	Effect *cur_effect;
-	Synthesizer *cur_synth;
-	Configurable *get_configurable();
 
 	struct PluginContext
 	{

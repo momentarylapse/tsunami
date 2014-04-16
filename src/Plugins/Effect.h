@@ -45,13 +45,9 @@ public:
 	virtual void ProcessTrack(BufferBox *buf){};
 
 	void DoProcessTrack(Track *t, int level_no, const Range &r);
-	bool DoConfigure(bool previewable);
 
 	void Prepare();
 	void Apply(BufferBox &buf, Track *t, bool log_error);
-
-	void WriteConfigToFile(const string &name);
-	void LoadConfigFromFile(const string &name);
 
 	string GetError();
 };

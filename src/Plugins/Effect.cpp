@@ -80,40 +80,6 @@ void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
 	}
 }
 
-void Effect::WriteConfigToFile(const string &fav_name)
-{
-	msg_db_f("Effect.ConfigDataToFile", 1);
-	ConfigToString();
-	dir_create(HuiAppDirectory + "Favorites/");
-	CFile *f = FileCreate(HuiAppDirectory + "Favorites/Effect/" + name + "___" + fav_name);
-	f->WriteStr(ConfigToString());
-	delete(f);
-}
-
-void Effect::LoadConfigFromFile(const string &fav_name)
-{
-	msg_db_f("Effect.LoadConfigFromFile", 1);
-	CFile *f = FileOpen(HuiAppDirectory + "Favorites/Effect/" + name + "___" + fav_name);
-	if (!f)
-		return;
-	ConfigFromString(f->ReadStr());
-	delete(f);
-}
-
-
-bool Effect::DoConfigure(bool previewable)
-{
-	msg_db_f("Effect.DoConfigure", 1);
-	tsunami->plugin_manager->cur_effect = this;
-	tsunami->plugin_manager->PluginAddPreview = previewable;
-	tsunami->plugin_manager->PluginCancelled = false;
-	Configure();
-	GlobalRemoveSliders(NULL);
-	return !tsunami->plugin_manager->PluginCancelled;
-	//tsunami->log->Info(_("Dieser Effekt ist nicht konfigurierbar."));
-	//return true;
-}
-
 
 
 void Effect::DoProcessTrack(Track *t, int level_no, const Range &r)

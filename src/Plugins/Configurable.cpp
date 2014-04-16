@@ -13,6 +13,8 @@
 #include "../Stuff/Log.h"
 #include "../View/Helper/Slider.h"
 
+void GlobalRemoveSliders(HuiPanel*);
+
 const string Configurable::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 
@@ -332,15 +334,17 @@ HuiPanel *Configurable::CreatePanel()
 }
 
 // default handler...
-void Configurable::Configure()
+bool Configurable::Configure()
 {
+	tsunami->plugin_manager->PluginCancelled = false;
+
 	PluginData *config = get_config();
 	if (!config)
-		return;
+		return true;
 
 	HuiPanel *panel = CreatePanel();
 	if (!panel)
-		return;
+		return false;
 	HuiDialog *dlg = new HuiDialog(name, 300, 100, tsunami, false);
 	dlg->AddControlTable("", 0, 0, 1, 3, "root-table");
 	dlg->SetTarget("root-table", 0);
@@ -348,6 +352,8 @@ void Configurable::Configure()
 	tsunami->plugin_manager->PutFavoriteBarSizable(dlg, "root-table", 0, 0);
 	dlg->Embed(panel, "root-table", 0, 1);
 	dlg->Run();
+	GlobalRemoveSliders(NULL);
+	return !tsunami->plugin_manager->PluginCancelled;
 }
 
 void Configurable::notify()

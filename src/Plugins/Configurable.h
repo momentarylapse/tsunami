@@ -48,7 +48,7 @@ public:
 
 	virtual void _cdecl ResetConfig();
 	virtual void _cdecl ResetState();
-	void Configure();
+	bool Configure();
 	virtual HuiPanel *_cdecl CreatePanel();
 	virtual void _cdecl UpdateDialog(){};
 	void _cdecl notify();

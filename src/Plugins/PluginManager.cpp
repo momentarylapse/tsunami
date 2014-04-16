@@ -38,12 +38,10 @@ PluginManager::PluginManager() :
 {
 	cur_plugin = NULL;
 	cur_effect = NULL;
-	cur_synth = NULL;
 
 	favorites = new FavoriteManager;
 
 	ErrorApplyingEffect = false;
-	PluginAddPreview = false;
 	PluginCancelled = false;
 }
 
@@ -392,22 +390,22 @@ void PluginManager::OnFavoriteList()
 {
 	int n = HuiCurWindow->GetInt("");
 	if (n == 0){
-		get_configurable()->ResetConfig();
+		cur_effect->ResetConfig();
 		HuiCurWindow->SetString("favorite_name", "");
 		HuiCurWindow->Enable("favorite_save", false);
 		HuiCurWindow->Enable("favorite_delete", false);
 	}else{
-		ApplyFavorite(get_configurable(), PluginFavoriteName[n - 1]);
+		ApplyFavorite(cur_effect, PluginFavoriteName[n - 1]);
 		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		HuiCurWindow->Enable("favorite_delete", true);
 	}
-	get_configurable()->UpdateDialog();
+	cur_effect->UpdateDialog();
 }
 
 void PluginManager::OnFavoriteSave()
 {
 	string name = HuiCurWindow->GetString("favorite_name");
-	SaveFavorite(get_configurable(), name);
+	SaveFavorite(cur_effect, name);
 	PluginFavoriteName.add(name);
 	HuiCurWindow->AddString("favorite_list", name);
 	HuiCurWindow->SetInt("favorite_list", PluginFavoriteName.num);
@@ -419,7 +417,7 @@ void PluginManager::OnFavoriteDelete()
 void PluginManager::InitFavorites(HuiPanel *panel)
 {
 	msg_db_f("InitFavorites", 1);
-	PluginFavoriteName = GetFavoriteList(get_configurable());
+	PluginFavoriteName = GetFavoriteList(cur_effect);
 
 
 	panel->Enable("favorite_save", false);
@@ -431,11 +429,6 @@ void PluginManager::InitFavorites(HuiPanel *panel)
 	panel->EventM("favorite_save", this, &PluginManager::OnFavoriteSave);
 	panel->EventM("favorite_delete", this, &PluginManager::OnFavoriteDelete);
 	panel->EventM("favorite_list", this, &PluginManager::OnFavoriteList);
-}
-
-Configurable *PluginManager::get_configurable()
-{
-	return cur_synth ? (Configurable*)cur_synth : (Configurable*)cur_effect;
 }
 
 Array<string> PluginManager::GetFavoriteList(Configurable *c)
@@ -487,22 +480,22 @@ void PluginManager::OnPluginFavoriteList()
 	HuiWindow *win = HuiGetEvent()->win;
 	int n = win->GetInt("");
 	if (n == 0){
-		get_configurable()->ResetConfig();
+		cur_effect->ResetConfig();
 		win->SetString("favorite_name", "");
 		win->Enable("favorite_save", false);
 		win->Enable("favorite_delete", false);
 	}else{
-		ApplyFavorite(get_configurable(), PluginFavoriteName[n - 1]);
+		ApplyFavorite(cur_effect, PluginFavoriteName[n - 1]);
 		win->SetString("favorite_name", PluginFavoriteName[n - 1]);
 		win->Enable("favorite_delete", true);
 	}
-	get_configurable()->UpdateDialog();
+	cur_effect->UpdateDialog();
 }
 
 void PluginManager::OnPluginFavoriteSave()
 {
 	HuiWindow *win = HuiGetEvent()->win;
-	SaveFavorite(get_configurable(), win->GetString("favorite_name"));
+	SaveFavorite(cur_effect, win->GetString("favorite_name"));
 	PluginFavoriteName.add(win->GetString("favorite_name"));
 	win->AddString("favorite_list", win->GetString("favorite_name"));
 	win->SetInt("favorite_list", PluginFavoriteName.num);
@@ -513,7 +506,6 @@ void PluginManager::OnPluginOk()
 	PluginCancelled = false;
 	cur_effect = NULL;
 	cur_plugin = NULL;
-	cur_synth = NULL;
 	delete(HuiCurWindow);
 }
 
@@ -522,7 +514,6 @@ void PluginManager::OnPluginClose()
 	PluginCancelled = true;
 	cur_effect = NULL;
 	cur_plugin = NULL;
-	cur_synth = NULL;
 	delete(HuiCurWindow);
 }
 
@@ -532,12 +523,7 @@ void PluginManager::PutCommandBarSizable(HuiPanel *panel, const string &root_id,
 	panel->SetTarget(root_id, 0);
 	panel->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
 	panel->SetTarget("command_table", 0);
-	if (PluginAddPreview){
-		if (cur_effect){
-			panel->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
-			panel->SetImage("preview", "hui:media-play");
-		}
-	}else if (cur_synth){
+	if (cur_effect){
 		panel->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 		panel->SetImage("preview", "hui:media-play");
 	}
@@ -555,19 +541,6 @@ void PluginManager::PutCommandBarSizable(HuiPanel *panel, const string &root_id,
 void PluginManager::OnPluginPreview()
 {
 	PreviewStart(cur_effect);
-}
-
-bool PluginManager::ConfigureSynthesizer(Synthesizer *s)
-{
-	string params_old = s->ConfigToString();
-
-	PluginAddPreview = false;
-	cur_plugin = NULL;
-	cur_synth = s;
-	s->Configure();
-	if (PluginCancelled)
-		s->ConfigFromString(params_old);
-	return !PluginCancelled;
 }
 
 void PluginManager::OnUpdate(Observable *o, const string &message)
@@ -637,8 +610,9 @@ void PluginManager::ExecutePlugin(const string &filename)
 
 		// run
 		if (fx){
+			tsunami->plugin_manager->cur_effect = fx;
 			fx->ResetConfig();
-			if (fx->DoConfigure(true)){
+			if (fx->Configure()){
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 				main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				if (a->used){

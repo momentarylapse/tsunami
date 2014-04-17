@@ -42,7 +42,6 @@ PluginManager::PluginManager() :
 	favorites = new FavoriteManager;
 
 	ErrorApplyingEffect = false;
-	PluginCancelled = false;
 }
 
 PluginManager::~PluginManager()
@@ -414,23 +413,6 @@ void PluginManager::OnFavoriteSave()
 void PluginManager::OnFavoriteDelete()
 {}
 
-void PluginManager::InitFavorites(HuiPanel *panel)
-{
-	msg_db_f("InitFavorites", 1);
-	PluginFavoriteName = GetFavoriteList(cur_effect);
-
-
-	panel->Enable("favorite_save", false);
-	panel->Enable("favorite_delete", false);
-	foreach(string &n, PluginFavoriteName)
-		panel->AddString("favorite_list", n);
-
-	panel->EventM("favorite_name", this, &PluginManager::OnFavoriteName);
-	panel->EventM("favorite_save", this, &PluginManager::OnFavoriteSave);
-	panel->EventM("favorite_delete", this, &PluginManager::OnFavoriteDelete);
-	panel->EventM("favorite_list", this, &PluginManager::OnFavoriteList);
-}
-
 Array<string> PluginManager::GetFavoriteList(Configurable *c)
 {
 	return favorites->GetList(c);
@@ -450,97 +432,6 @@ void PluginManager::SaveFavorite(Configurable *c, const string &name)
 string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool save)
 {
 	return favorites->SelectName(win, c, save);
-}
-
-void PluginManager::PutFavoriteBarSizable(HuiPanel *panel, const string &root_id, int x, int y)
-{
-	msg_db_f("PutFavoriteBarSizable", 1);
-	panel->SetTarget(root_id, 0);
-	panel->AddControlTable("", x, y, 4, 1, "favorite_table");
-	panel->SetTarget("favorite_table", 0);
-	panel->AddComboBox("", 0, 0, 0, 0, "favorite_list");
-	panel->AddEdit("!expandx", 1, 0, 0, 0, "favorite_name");
-	panel->AddButton("", 2, 0, 0, 0, "favorite_save");
-	panel->SetImage("favorite_save", "hui:save");
-	panel->AddButton("", 3, 0, 0, 0, "favorite_delete");
-	panel->SetImage("favorite_delete", "hui:delete");
-
-	InitFavorites(panel);
-}
-
-void PluginManager::OnPluginFavoriteName()
-{
-	HuiWindow *win = HuiGetEvent()->win;
-	win->Enable("favorite_save", win->GetString("favorite_name").num > 0);
-	win->Enable("favorite_delete", win->GetString("favorite_name").num > 0);
-}
-
-void PluginManager::OnPluginFavoriteList()
-{
-	HuiWindow *win = HuiGetEvent()->win;
-	int n = win->GetInt("");
-	if (n == 0){
-		cur_effect->ResetConfig();
-		win->SetString("favorite_name", "");
-		win->Enable("favorite_save", false);
-		win->Enable("favorite_delete", false);
-	}else{
-		ApplyFavorite(cur_effect, PluginFavoriteName[n - 1]);
-		win->SetString("favorite_name", PluginFavoriteName[n - 1]);
-		win->Enable("favorite_delete", true);
-	}
-	cur_effect->UpdateDialog();
-}
-
-void PluginManager::OnPluginFavoriteSave()
-{
-	HuiWindow *win = HuiGetEvent()->win;
-	SaveFavorite(cur_effect, win->GetString("favorite_name"));
-	PluginFavoriteName.add(win->GetString("favorite_name"));
-	win->AddString("favorite_list", win->GetString("favorite_name"));
-	win->SetInt("favorite_list", PluginFavoriteName.num);
-}
-
-void PluginManager::OnPluginOk()
-{
-	PluginCancelled = false;
-	cur_effect = NULL;
-	cur_plugin = NULL;
-	delete(HuiCurWindow);
-}
-
-void PluginManager::OnPluginClose()
-{
-	PluginCancelled = true;
-	cur_effect = NULL;
-	cur_plugin = NULL;
-	delete(HuiCurWindow);
-}
-
-void PluginManager::PutCommandBarSizable(HuiPanel *panel, const string &root_id, int x, int y)
-{
-	msg_db_f("PutCommandBarSizable", 1);
-	panel->SetTarget(root_id, 0);
-	panel->AddControlTable("!buttonbar", x, y, 4, 1, "command_table");
-	panel->SetTarget("command_table", 0);
-	if (cur_effect){
-		panel->AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
-		panel->SetImage("preview", "hui:media-play");
-	}
-	panel->AddText("!width=30", 1, 0, 0, 0, "");
-	panel->AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
-	panel->SetImage("cancel", "hui:cancel");
-	panel->AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
-	panel->SetImage("ok", "hui:ok");
-	panel->EventM("ok", this, &PluginManager::OnPluginOk);
-	panel->EventM("preview", this, &PluginManager::OnPluginPreview);
-	panel->EventM("cancel", this, &PluginManager::OnPluginClose);
-	panel->EventM("hui:close", this, &PluginManager::OnPluginClose);
-}
-
-void PluginManager::OnPluginPreview()
-{
-	PreviewStart(cur_effect);
 }
 
 void PluginManager::OnUpdate(Observable *o, const string &message)

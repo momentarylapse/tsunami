@@ -29,9 +29,6 @@ public:
 	void AddPluginsToMenu();
 	void FindAndExecutePlugin();
 
-	void PutFavoriteBarSizable(HuiPanel *panel, const string &root_id, int x, int y);
-	void PutCommandBarSizable(HuiPanel *panel, const string &root_id, int x, int y);
-
 	void OnMenuExecutePlugin();
 	void ExecutePlugin(const string &filename);
 
@@ -40,7 +37,6 @@ public:
 	bool LoadAndCompilePlugin(const string&);
 	void InitPluginData();
 	void FinishPluginData();
-	void InitFavorites(HuiPanel *panel);
 
 	void PreviewStart(Effect *fx);
 	void PreviewEnd();
@@ -54,12 +50,6 @@ public:
 	void OnFavoriteList();
 	void OnFavoriteSave();
 	void OnFavoriteDelete();
-	void OnPluginFavoriteName();
-	void OnPluginFavoriteList();
-	void OnPluginFavoriteSave();
-	void OnPluginPreview();
-	void OnPluginOk();
-	void OnPluginClose();
 
 	virtual void OnUpdate(Observable *o, const string &message);
 
@@ -81,8 +71,6 @@ public:
 	bool ErrorApplyingEffect;
 
 	Array<string> PluginFavoriteName;
-
-	bool PluginCancelled;
 
 	Array<Plugin*> plugin;
 	Plugin *cur_plugin;

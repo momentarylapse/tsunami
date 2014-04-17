@@ -348,7 +348,8 @@ string HuiWindow::Run()
 	// clean up
 	foreachi(HuiClosedPanel &cp, HuiClosedPanels, i)
 		if (cp.unique_id == uid){
-			last_id = cp.last_id;
+			if (cp.last_id.num > 0)
+				last_id = cp.last_id;
 			HuiClosedPanels.erase(i);
 		}
 	return last_id;

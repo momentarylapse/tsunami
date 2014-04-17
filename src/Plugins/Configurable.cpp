@@ -333,11 +333,86 @@ HuiPanel *Configurable::CreatePanel()
 	return new AutoConfigPanel(aa);
 }
 
+class ConfigurationDialog : public HuiDialog
+{
+public:
+	ConfigurationDialog(Configurable *c, PluginData *pd, HuiPanel *panel) :
+		HuiDialog(c->name, 300, 100, tsunami, false)
+	{
+		config = c;
+		AddControlTable("", 0, 0, 1, 3, "root-table");
+		SetTarget("root-table", 0);
+		Embed(panel, "root-table", 0, 1);
+
+		// favorite grid
+		SetTarget("root-table", 0);
+		AddControlTable("!noexpandx,expandy", 0, 0, 5, 1, "favorite_grid");
+		SetTarget("favorite_grid", 0);
+		AddButton("!flat", 0, 0, 0, 0, "load_favorite");
+		SetImage("load_favorite", "hui:open");
+		SetTooltip("load_favorite", _("Parameter laden"));
+		AddButton("!flat", 1, 0, 0, 0, "save_favorite");
+		SetImage("save_favorite", "hui:save");
+		SetTooltip("save_favorite", _("Parameter speichern"));
+		EventM("load_favorite", this, &ConfigurationDialog::onLoad);
+		EventM("save_favorite", this, &ConfigurationDialog::onSave);
+
+		// command grid
+		SetTarget("root-table", 0);
+		AddControlTable("!buttonbar", 0, 2, 4, 1, "command_grid");
+		SetTarget("command_grid", 0);
+		if (c->configurable_type == CONFIGURABLE_EFFECT){
+			AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
+			SetImage("preview", "hui:media-play");
+		}
+		AddText("!width=30", 1, 0, 0, 0, "");
+		AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
+		SetImage("cancel", "hui:cancel");
+		AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
+		SetImage("ok", "hui:ok");
+		EventM("ok", this, &ConfigurationDialog::onOk);
+		EventM("preview", this, &ConfigurationDialog::onPreview);
+		EventM("cancel", this, &ConfigurationDialog::onClose);
+		EventM("hui:close", this, &ConfigurationDialog::onClose);
+	}
+	~ConfigurationDialog()
+	{
+		GlobalRemoveSliders(this);
+	}
+	void onOk()
+	{
+		delete(this);
+	}
+	void onClose()
+	{
+		delete(this);
+	}
+	void onPreview()
+	{
+		tsunami->plugin_manager->PreviewStart((Effect*)config);
+	}
+	void onLoad()
+	{
+		string name = tsunami->plugin_manager->SelectFavoriteName(this, config, false);
+		if (name.num == 0)
+			return;
+		tsunami->plugin_manager->ApplyFavorite(config, name);
+		config->UpdateDialog();
+	}
+	void onSave()
+	{
+		string name = tsunami->plugin_manager->SelectFavoriteName(this, config, true);
+		if (name.num == 0)
+			return;
+		tsunami->plugin_manager->SaveFavorite(config, name);
+	}
+
+	Configurable *config;
+};
+
 // default handler...
 bool Configurable::Configure()
 {
-	tsunami->plugin_manager->PluginCancelled = false;
-
 	PluginData *config = get_config();
 	if (!config)
 		return true;
@@ -345,15 +420,8 @@ bool Configurable::Configure()
 	HuiPanel *panel = CreatePanel();
 	if (!panel)
 		return false;
-	HuiDialog *dlg = new HuiDialog(name, 300, 100, tsunami, false);
-	dlg->AddControlTable("", 0, 0, 1, 3, "root-table");
-	dlg->SetTarget("root-table", 0);
-	tsunami->plugin_manager->PutCommandBarSizable(dlg, "root-table", 0, 2);
-	tsunami->plugin_manager->PutFavoriteBarSizable(dlg, "root-table", 0, 0);
-	dlg->Embed(panel, "root-table", 0, 1);
-	dlg->Run();
-	GlobalRemoveSliders(NULL);
-	return !tsunami->plugin_manager->PluginCancelled;
+	HuiDialog *dlg = new ConfigurationDialog(this, config, panel);
+	return (dlg->Run() == "ok");
 }
 
 void Configurable::notify()

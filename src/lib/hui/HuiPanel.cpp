@@ -45,6 +45,7 @@ void HuiPanel::__delete__()
 	_ClearPanel_();
 }
 
+// might be executed repeatedly
 void HuiPanel::_ClearPanel_()
 {
 	HuiClosedPanel c;
@@ -98,6 +99,8 @@ string HuiPanel::_GetCurID_()
 
 void HuiPanel::_SetCurID_(const string &id)
 {
+	if (win)
+		win->cur_id = id;
 	cur_id = id;
 }
 

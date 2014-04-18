@@ -35,21 +35,13 @@ public:
 	Plugin *GetPlugin(const string &name);
 
 	bool LoadAndCompilePlugin(const string&);
-	void InitPluginData();
-	void FinishPluginData();
 
 	void PreviewStart(Effect *fx);
 	void PreviewEnd();
 
-	Array<string> GetFavoriteList(Configurable *c);
 	void ApplyFavorite(Configurable *c, const string &name);
 	void SaveFavorite(Configurable *c, const string &name);
 	string SelectFavoriteName(HuiWindow *win, Configurable *c, bool save);
-
-	void OnFavoriteName();
-	void OnFavoriteList();
-	void OnFavoriteSave();
-	void OnFavoriteDelete();
 
 	virtual void OnUpdate(Observable *o, const string &message);
 

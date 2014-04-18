@@ -366,58 +366,6 @@ void PluginManager::AddPluginsToMenu()
 		tsunami->EventM(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
 }
 
-void PluginManager::InitPluginData()
-{
-	msg_db_f("InitPluginData", 2);
-}
-
-void PluginManager::FinishPluginData()
-{
-	msg_db_f("FinishPluginData", 2);
-	//tsunami->view->ForceRedraw();
-}
-
-void PluginManager::OnFavoriteName()
-{
-	bool enabled = HuiCurWindow->GetString("").num > 0;
-	HuiCurWindow->Enable("favorite_save", enabled);
-	HuiCurWindow->Enable("favorite_delete", enabled);
-}
-
-
-void PluginManager::OnFavoriteList()
-{
-	int n = HuiCurWindow->GetInt("");
-	if (n == 0){
-		cur_effect->ResetConfig();
-		HuiCurWindow->SetString("favorite_name", "");
-		HuiCurWindow->Enable("favorite_save", false);
-		HuiCurWindow->Enable("favorite_delete", false);
-	}else{
-		ApplyFavorite(cur_effect, PluginFavoriteName[n - 1]);
-		HuiCurWindow->SetString("favorite_name", PluginFavoriteName[n - 1]);
-		HuiCurWindow->Enable("favorite_delete", true);
-	}
-	cur_effect->UpdateDialog();
-}
-
-void PluginManager::OnFavoriteSave()
-{
-	string name = HuiCurWindow->GetString("favorite_name");
-	SaveFavorite(cur_effect, name);
-	PluginFavoriteName.add(name);
-	HuiCurWindow->AddString("favorite_list", name);
-	HuiCurWindow->SetInt("favorite_list", PluginFavoriteName.num);
-}
-
-void PluginManager::OnFavoriteDelete()
-{}
-
-Array<string> PluginManager::GetFavoriteList(Configurable *c)
-{
-	return favorites->GetList(c);
-}
-
 void PluginManager::ApplyFavorite(Configurable *c, const string &name)
 {
 	favorites->Apply(c, name);
@@ -530,9 +478,6 @@ void PluginManager::ExecutePlugin(const string &filename)
 		}else{
 			tsunami->log->Error(_("Plugin ist kein Effekt und enth&alt keine Funktion 'void main()'"));
 		}
-
-		// data changed?
-		FinishPluginData();
 	}else{
 		tsunami->log->Error(cur_plugin->GetError());
 	}

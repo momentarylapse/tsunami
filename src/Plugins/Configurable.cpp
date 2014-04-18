@@ -346,7 +346,7 @@ public:
 
 		// favorite grid
 		SetTarget("root-table", 0);
-		AddControlTable("!noexpandx,expandy", 0, 0, 5, 1, "favorite_grid");
+		AddControlTable("!noexpandy", 0, 0, 5, 1, "favorite_grid");
 		SetTarget("favorite_grid", 0);
 		AddButton("!flat", 0, 0, 0, 0, "load_favorite");
 		SetImage("load_favorite", "hui:open");

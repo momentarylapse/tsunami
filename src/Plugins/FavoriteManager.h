@@ -19,6 +19,24 @@ public:
 	FavoriteManager();
 	virtual ~FavoriteManager();
 
+	struct Favorite
+	{
+		string name;
+		string config_name;
+		string options;
+		int type;
+		bool read_only;
+	};
+
+	bool loaded;
+	Array<Favorite> favorites;
+
+	void Load();
+	void LoadFromFile(const string &filename, bool read_only);
+	void Save();
+
+	void set(const Favorite &f);
+
 	Array<string> GetList(Configurable *c);
 	void Apply(Configurable *c, const string &name);
 	void Save(Configurable *c, const string &name);

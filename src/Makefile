@@ -12,6 +12,7 @@ install : all
 	cp -f ../Data/*.tga                /usr/share/tsunami/Data
 	cp -f ../Data/license.txt          /usr/share/tsunami/Data
 	cp -f ../Data/license_small.txt    /usr/share/tsunami/Data
+	cp -f ../Data/favorites_demo.txt   /usr/share/tsunami/Data
 	mkdir -p /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/*.kaba           /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Buffer           /usr/share/tsunami/Plugins

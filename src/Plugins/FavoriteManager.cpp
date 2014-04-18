@@ -12,38 +12,66 @@
 
 FavoriteManager::FavoriteManager()
 {
+	loaded = false;
 }
 
 FavoriteManager::~FavoriteManager()
 {
 }
 
-
-string get_fav_dir(Configurable *c)
+void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 {
-	dir_create(HuiAppDirectory + "Favorites");
-	if (c->configurable_type == CONFIGURABLE_SYNTHESIZER){
-		dir_create(HuiAppDirectory + "Favorites/Synthesizer");
-		return HuiAppDirectory + "Favorites/Synthesizer";
+	if (!file_test_existence(filename))
+		return;
+	CFile *f = FileOpen(filename);
+	if (!f)
+		return;
+	int n = f->ReadInt();
+	for (int i=0; i<n; i++){
+		Favorite ff;
+		string type = f->ReadStr();
+		ff.type = (type == "Effect") ? CONFIGURABLE_EFFECT : CONFIGURABLE_SYNTHESIZER;
+		ff.config_name = f->ReadStr();
+		ff.name = f->ReadStr();
+		ff.options = f->ReadStr();
+		ff.read_only = read_only;
+		set(ff);
 	}
-	dir_create(HuiAppDirectory + "Favorites/Effect");
-	return HuiAppDirectory + "Favorites/Effect";
+	delete(f);
+}
+
+void FavoriteManager::Load()
+{
+	LoadFromFile(HuiAppDirectoryStatic + "Data/favorites_demo.txt", true);
+	LoadFromFile(HuiAppDirectory + "Data/favorites.txt", false);
+	loaded = true;
+}
+
+void FavoriteManager::Save()
+{
+	CFile *f = FileCreate(HuiAppDirectory + "Data/favorites.txt");
+	if (!f)
+		return;
+	f->WriteInt(favorites.num);
+	foreach(Favorite &ff, favorites){
+		f->WriteStr((ff.type == CONFIGURABLE_EFFECT) ? "Effect" : "Synth");
+		f->WriteStr(ff.config_name);
+		f->WriteStr(ff.name);
+		f->WriteStr(ff.options);
+	}
+	delete(f);
 }
 
 Array<string> FavoriteManager::GetList(Configurable *c)
 {
-	Array<string> names;
-
-	string init = c->name + "___";
-
-	string dir = get_fav_dir(c);
-	Array<DirEntry> list = dir_search(dir, "*", false);
-	foreach(DirEntry &e, list){
-		if (e.name.find(init) < 0)
-			continue;
-		names.add(e.name.substr(init.num, -1));
+	if (!loaded)
+		Load();
+	Array<string> r;
+	foreach(Favorite &f, favorites){
+		if ((f.type == c->configurable_type) && (f.config_name == c->name))
+			r.add(f.name);
 	}
-	return names;
+	return r;
 }
 
 void FavoriteManager::Apply(Configurable *c, const string &name)
@@ -52,21 +80,39 @@ void FavoriteManager::Apply(Configurable *c, const string &name)
 	if (name == ":def:")
 		return;
 	msg_db_f("ApplyFavorite", 1);
-	string dir = get_fav_dir(c);
-	CFile *f = FileOpen(dir + "/" + c->name + "___" + name);
-	if (!f)
-		return;
-	c->ConfigFromString(f->ReadStr());
-	delete(f);
+	if (!loaded)
+		Load();
+	foreach(Favorite &f, favorites){
+		if ((f.type == c->configurable_type) && (f.config_name == c->name) && (f.name == name))
+			c->ConfigFromString(f.options);
+	}
 }
 
 void FavoriteManager::Save(Configurable *c, const string &name)
 {
 	msg_db_f("SaveFavorite", 1);
-	string dir = get_fav_dir(c);
-	CFile *f = FileCreate(dir + "/" + c->name + "___" + name);
-	f->WriteStr(c->ConfigToString());
-	delete(f);
+	if (!loaded)
+		Load();
+	Favorite f;
+	f.type = c->configurable_type;
+	f.config_name = c->name;
+	f.name = name;
+	f.read_only = false;
+	f.options = c->ConfigToString();
+	set(f);
+	Save();
+}
+
+void FavoriteManager::set(const Favorite &ff)
+{
+	foreach(Favorite &f, favorites){
+		if ((f.type == ff.type) && (f.config_name == ff.config_name) && (f.name == ff.name)){
+			f.options = ff.options;
+			return;
+		}
+	}
+
+	favorites.add(ff);
 }
 
 
@@ -95,13 +141,13 @@ public:
 		if (!save)
 			names.insert(":def:", 0);
 		HideControl("grid2", !save);
-		EventM("list", this, &FavoriteSelectionDialog::OnList);
-		EventMX("list", "hui:select", this, &FavoriteSelectionDialog::OnListSelect);
-		EventM("name", this, &FavoriteSelectionDialog::OnName);
-		EventM("ok", this, &FavoriteSelectionDialog::OnOk);
+		EventM("list", this, &FavoriteSelectionDialog::onList);
+		EventMX("list", "hui:select", this, &FavoriteSelectionDialog::onListSelect);
+		EventM("name", this, &FavoriteSelectionDialog::onName);
+		EventM("ok", this, &FavoriteSelectionDialog::onOk);
 		SetInt("list", -1);
 	}
-	void OnList()
+	void onList()
 	{
 		int n = GetInt("list");
 		FavoriteSelectionDialogReturn = "";
@@ -111,17 +157,17 @@ public:
 		}
 		delete(this);
 	}
-	void OnListSelect()
+	void onListSelect()
 	{
 		int n = GetInt("list");
 		if (n >= 0)
 			SetString("name", names[n]);
 	}
-	void OnName()
+	void onName()
 	{
 		SetInt("list", -1);
 	}
-	void OnOk()
+	void onOk()
 	{
 		FavoriteSelectionDialogReturn = GetString("name");
 		delete(this);

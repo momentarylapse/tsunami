@@ -1,5 +1,6 @@
 message.txt
 Data/config.txt
+Data/favorites.txt
 *~
 Debug
 Release

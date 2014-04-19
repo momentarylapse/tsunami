@@ -236,15 +236,13 @@ AudioView::SelectionType AudioView::GetMouseOver()
 
 	// selection boundaries?
 	SelectionUpdatePos(s);
-	if (!sel_raw.empty()){
-		if (mouse_over_time(this, sel_raw.start())){
-			s.type = SEL_TYPE_SELECTION_START;
-			return s;
-		}
-		if (mouse_over_time(this, sel_raw.end())){
-			s.type = SEL_TYPE_SELECTION_END;
-			return s;
-		}
+	if (mouse_over_time(this, sel_raw.end())){
+		s.type = SEL_TYPE_SELECTION_END;
+		return s;
+	}
+	if (mouse_over_time(this, sel_raw.start())){
+		s.type = SEL_TYPE_SELECTION_START;
+		return s;
 	}
 	if ((output->IsPlaying()) && (output->GetSource() == renderer)){
 		if (mouse_over_time(this, output->GetPos())){
@@ -611,7 +609,7 @@ void AudioView::OnLeftDoubleClick()
 		if (audio->used){
 			if (selection.type == SEL_TYPE_SAMPLE){
 				tsunami->side_bar->Open(SideBar::SUB_DIALOG);
-			}else if (selection.type == SEL_TYPE_TRACK){
+			}else if ((selection.type == SEL_TYPE_TRACK) || ((selection.track) && ((selection.type == SEL_TYPE_SELECTION_START) || (selection.type == SEL_TYPE_SELECTION_END)))){
 				tsunami->side_bar->Open(SideBar::TRACK_DIALOG);
 			}else if (!selection.track){
 				SetCurTrack(NULL);

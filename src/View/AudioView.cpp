@@ -8,6 +8,7 @@
 #include "AudioView.h"
 #include "../Tsunami.h"
 #include "SideBar/SideBar.h"
+#include "BottomBar/BottomBar.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
@@ -81,7 +82,8 @@ AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output,
 	ColorSubMO = color(1, 0.6f, 0, 0);
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
-	drawing_width = 1024;
+	drawing_rect = rect(0, 1024, 0, 768);
+	bottom_button_rect = rect(0, 0, 0, 0);
 
 	show_mono = HuiConfig.getBool("View.Mono", false);
 	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);
@@ -233,6 +235,12 @@ AudioView::SelectionType AudioView::GetMouseOver()
 				s.show_track_controls = t;
 		}
 	}
+
+	if (!tsunami->bottom_bar->visible)
+		if (bottom_button_rect.inside(mx, my)){
+			s.type = SEL_TYPE_BOTTOM_BUTTON;
+			return s;
+		}
 
 	// selection boundaries?
 	SelectionUpdatePos(s);
@@ -506,6 +514,8 @@ void AudioView::OnLeftButtonDown()
 		cur_track->DeleteMidiNote(selection.note);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 
+	}else if (selection.type == SEL_TYPE_BOTTOM_BUTTON){
+		tsunami->bottom_bar->Show();
 	}
 
 	SetBarriers(&selection);
@@ -1288,7 +1298,7 @@ void AudioView::OnDraw()
 	force_redraw = false;
 
 	HuiPainter *c = tsunami->BeginDraw("area");
-	drawing_width = c->width;
+	drawing_rect = rect(0, c->width, 0, c->height);
 	c->setFontSize(FONT_SIZE);
 	c->setLineWidth(LINE_WIDTH);
 	c->setAntialiasing(antialiasing);
@@ -1298,6 +1308,13 @@ void AudioView::OnDraw()
 
 	//c->DrawStr(100, 100, i2s(frame++));
 
+	if (!tsunami->bottom_bar->visible){
+		c->setColor((hover.type == SEL_TYPE_BOTTOM_BUTTON) ? Black : ColorWave);
+		bottom_button_rect = rect(5, 5 + c->getStrWidth(_("Leiste anzeigen")), c->height - 18, c->height);
+		c->drawStr(5, c->height - 18, _("Leiste anzeigen"));
+	}else
+		bottom_button_rect = rect(0, 0, 0, 0);
+
 	c->end();
 }
 
@@ -1305,7 +1322,7 @@ void AudioView::OptimizeView()
 {
 	msg_db_f("OptimizeView", 1);
 	if (audio->area.x2 <= 0)
-		audio->area.x2 = drawing_width;
+		audio->area.x2 = drawing_rect.x2;
 
 	Range r = audio->GetRange();
 

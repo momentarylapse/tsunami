@@ -104,6 +104,7 @@ public:
 		SEL_TYPE_SAMPLE,
 		SEL_TYPE_MIDI_NOTE,
 		SEL_TYPE_MIDI_PITCH,
+		SEL_TYPE_BOTTOM_BUTTON,
 	};
 
 	struct SelectionType
@@ -175,7 +176,8 @@ public:
 
 	int peak_mode;
 
-	int drawing_width;
+	rect drawing_rect;
+	rect bottom_button_rect;
 
 	bool EditingMidi();
 	int pitch_min, pitch_max;

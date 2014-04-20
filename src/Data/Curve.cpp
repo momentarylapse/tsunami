@@ -6,6 +6,75 @@
  */
 
 #include "Curve.h"
+#include "AudioFile.h"
+#include "../Plugins/Effect.h"
+#include "../lib/script/script.h"
+
+string Curve::Target::str(AudioFile *a)
+{
+	if (!p)
+		return "";
+	foreachi(Track *t, a->track, i){
+		if (p == &t->volume)
+			return format("t:%d:volume", i);
+		if (p == &t->panning)
+			return format("t:%d:panning", i);
+		foreachi(Effect *fx, t->fx, j){
+			PluginData *pd = fx->get_config();
+			if (pd){
+				foreach(Script::ClassElement &e, pd->type->element)
+					if (p == (float*)((char*)pd + e.offset))
+						return format("t:%d:fx:%d:", i, j) + e.name;
+			}
+		}
+	}
+	return "";
+}
+
+Curve::Target::Target()
+{
+	p = NULL;
+}
+
+Curve::Target::Target(float *_p)
+{
+	p = _p;
+}
+
+Array<Curve::Target> Curve::Target::enumerate(AudioFile *a)
+{
+	Array<Target> r;
+	foreach(Track *t, a->track)
+		r.append(enumerateTrack(a, t));
+	return r;
+}
+Array<Curve::Target> Curve::Target::enumerateTrack(AudioFile *a, Track *t)
+{
+	Array<Target> r;
+	r.add(Target(&t->volume));
+	r.add(Target(&t->panning));
+	foreach(Effect *fx, t->fx)
+		r.append(enumerateEffect(a, t, fx));
+	r.append(enumerateSynth(a, t, t->synth));
+	return r;
+}
+Array<Curve::Target> Curve::Target::enumerateEffect(AudioFile *a, Track *t, Effect *fx)
+{
+	Array<Target> r;
+	PluginData *pd = fx->get_config();
+	if (!pd)
+		return r;
+	foreach(Script::ClassElement &e, pd->type->element)
+		if (e.type->name == "float")
+			r.add(Target((float*)((char*)pd + e.offset)));
+	return r;
+}
+Array<Curve::Target> Curve::Target::enumerateSynth(AudioFile *a, Track *t, Synthesizer *s)
+{
+	Array<Target> r;
+	return r;
+}
+
 
 Curve::Curve() :
 	Observable("Curve")

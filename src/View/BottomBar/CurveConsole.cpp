@@ -66,7 +66,7 @@ void CurveConsole::updateList()
 {
 	Reset("list");
 	foreach(Curve *c, audio->curve){
-		AddString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->target);
+		AddString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->target.str(audio));
 	}
 }
 
@@ -74,8 +74,12 @@ void CurveConsole::onAdd()
 {
 	Curve *c = new Curve;
 	c->name = "new";
+	c->target = Curve::Target(&audio->track[0]->volume);
 	audio->curve.add(c);
 	audio->Notify(audio->MESSAGE_ADD_CURVE);
+	Array<Curve::Target> target = Curve::Target::enumerate(audio);
+	foreach(Curve::Target &t, target)
+		msg_write(t.str(audio));
 }
 
 void CurveConsole::onTarget()

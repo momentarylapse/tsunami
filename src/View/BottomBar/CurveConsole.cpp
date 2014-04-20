@@ -19,7 +19,7 @@ CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
 
 	AddControlTable("", 0, 0, 2, 1, "root");
 	SetTarget("root", 0);
-	AddDrawingArea("", 0, 0, 0, 0, "area");
+	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
 	AddControlTable("", 1, 0, 1, 2, "controller");
 	SetTarget("controller", 0);
 	AddListView("!noexpandx,width=250\\name\\min\\max\\target", 0, 0, 0, 0, "list");
@@ -31,6 +31,7 @@ CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
 	EventM("add", this, &CurveConsole::onAdd);
 	EventM("target", this, &CurveConsole::onTarget);
 	EventMX("list", "hui:select", this, &CurveConsole::onListSelect);
+	EventMX("area", "hui:key-down", this, &CurveConsole::onKeyDown);
 	EventMX("area", "hui:left-button-down", this, &CurveConsole::onLeftButtonDown);
 	EventMX("area", "hui:left-button-up", this, &CurveConsole::onLeftButtonUp);
 	EventMX("area", "hui:mouse-move", this, &CurveConsole::onMouseMove);
@@ -73,17 +74,6 @@ void CurveConsole::onAdd()
 {
 	Curve *c = new Curve;
 	c->name = "new";
-	c->target = "";
-	c->min = 0;
-	c->max = 1;
-	c->type = c->TYPE_LINEAR;
-	Curve::Point p;
-	p.pos = 0;
-	p.value = 0.2f;
-	c->points.add(p);
-	p.pos = 120000;
-	p.value = 0.7f;
-	c->points.add(p);
 	audio->curve.add(c);
 	audio->Notify(audio->MESSAGE_ADD_CURVE);
 }
@@ -101,18 +91,48 @@ void CurveConsole::onListSelect()
 	Redraw("area");
 }
 
+void CurveConsole::onKeyDown()
+{
+	if ((curve) && (selected >= 0))
+		if (HuiGetEvent()->key_code == KEY_DELETE){
+			curve->points.erase(selected);
+			selected = hover = -1;
+			Redraw("area");
+		}
+}
+
 void CurveConsole::onLeftButtonDown()
 {
+	hover = getHover();
 	selected = hover;
+
+	if ((curve) && (selected < 0)){
+		curve->add(screen2sample(HuiGetEvent()->mx), screen2value(HuiGetEvent()->my));
+		Redraw("area");
+	}
 }
 
 void CurveConsole::onLeftButtonUp()
 {
 }
 
+int CurveConsole::getHover()
+{
+	if (!curve)
+		return -1;
+	float mx = HuiGetEvent()->mx;
+	float my = HuiGetEvent()->my;
+	foreachi(Curve::Point &p, curve->points, i){
+		float x = sample2screen(p.pos);
+		float y = value2screen(p.value);
+		if ((fabs(mx - x) < 10) && (fabs(my - y) < 10))
+			return i;
+	}
+	return -1;
+}
+
 void CurveConsole::onMouseMove()
 {
-	hover = -1;
 	float mx = HuiGetEvent()->mx;
 	float my = HuiGetEvent()->my;
 	if (HuiGetEvent()->lbut){
@@ -122,14 +142,7 @@ void CurveConsole::onMouseMove()
 		}
 
 	}else{
-		if (curve){
-			foreachi(Curve::Point &p, curve->points, i){
-				float x = sample2screen(p.pos);
-				float y = value2screen(p.value);
-				if ((fabs(mx - x) < 5) && (fabs(my - y) < 5))
-					hover = i;
-			}
-		}
+		hover = getHover();
 	}
 	Redraw("area");
 }
@@ -152,7 +165,12 @@ void CurveConsole::onDraw()
 			pp.add(complex(x, value2screen(curve->get(screen2sample(x)))));
 		c->drawLines(pp);
 		foreachi(Curve::Point &p, curve->points, i){
-			c->setColor((i == hover) ? Red : Black);
+			if (i == hover)
+				c->setColor(Red);
+			else if (i == selected)
+				c->setColor(Blue);
+			else
+				c->setColor(Black);
 			c->drawCircle(sample2screen(p.pos), value2screen(p.value), 3);
 		}
 	}
@@ -173,13 +191,13 @@ float CurveConsole::value2screen(float value)
 {
 	if (!curve)
 		return 0;
-	return curve_rect.y1 + curve_rect.height() * (value - curve->min) / (curve->max - curve->min);
+	return curve_rect.y2 - curve_rect.height() * (value - curve->min) / (curve->max - curve->min);
 }
 
 float CurveConsole::screen2value(float y)
 {
 	if (!curve)
 		return 0;
-	return curve->min + (y - curve_rect.y1) / curve_rect.height() * (curve->max - curve->min);
+	return curve->min + (curve_rect.y2 - y) / curve_rect.height() * (curve->max - curve->min);
 }
 

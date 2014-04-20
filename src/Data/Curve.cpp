@@ -10,10 +10,26 @@
 Curve::Curve() :
 	Observable("Curve")
 {
+	min = 0;
+	max = 1;
+	type = TYPE_LINEAR;
 }
 
 Curve::~Curve()
 {
+}
+
+void Curve::add(int pos, float value)
+{
+	Point p;
+	p.pos = pos;
+	p.value = value;
+	for (int i=0; i<points.num; i++)
+		if (pos < points[i].pos){
+			points.insert(p, i);
+			return;
+		}
+	points.add(p);
 }
 
 float Curve::get(int pos)

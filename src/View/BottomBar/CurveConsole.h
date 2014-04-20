@@ -29,6 +29,7 @@ public:
 	void onTarget();
 	void onListSelect();
 	void onDraw();
+	void onKeyDown();
 	void onLeftButtonDown();
 	void onLeftButtonUp();
 	void onMouseMove();
@@ -45,6 +46,7 @@ public:
 	float screen2sample(float x);
 	float value2screen(float value);
 	float screen2value(float y);
+	int getHover();
 };
 
 #endif /* CURVECONSOLE_H_ */

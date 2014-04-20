@@ -8,6 +8,7 @@
 #include "BottomBar.h"
 #include "MiniConsole.h"
 #include "MixingConsole.h"
+#include "CurveConsole.h"
 #include "FxConsole.h"
 #include "SynthConsole.h"
 #include "LogDialog.h"
@@ -31,13 +32,15 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output);
+	curve_console = new CurveConsole(view, audio);
 	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
 	Embed(mixing_console, "console_grid", 0, 0);
 	Embed(fx_console, "console_grid", 0, 1);
 	Embed(synth_console, "console_grid", 0, 2);
-	Embed(sample_manager, "console_grid", 0, 3);
-	Embed(log_dialog, "console_grid", 0, 4);
+	Embed(curve_console, "console_grid", 0, 3);
+	Embed(sample_manager, "console_grid", 0, 4);
+	Embed(log_dialog, "console_grid", 0, 5);
 
 	menu = new HuiMenu;
 	foreachi(HuiPanel *p, children, i){

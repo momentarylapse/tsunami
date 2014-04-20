@@ -19,6 +19,7 @@ class Effect;
 class Track;
 class Sample;
 class Synthesizer;
+class Curve;
 
 struct Tag
 {
@@ -105,6 +106,7 @@ public:
 	Array<Effect*> fx;
 	Array<Track*> track;
 	Array<Sample*> sample;
+	Array<Curve*> curve;
 
 // editing
 	// needed for rendering

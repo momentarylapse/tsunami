@@ -73,6 +73,8 @@ const string AudioFile::MESSAGE_ADD_TRACK = "AddTrack";
 const string AudioFile::MESSAGE_DELETE_TRACK = "DeleteTrack";
 const string AudioFile::MESSAGE_ADD_EFFECT = "AddEffect";
 const string AudioFile::MESSAGE_DELETE_EFFECT = "DeleteEffect";
+const string AudioFile::MESSAGE_ADD_CURVE = "AddCurve";
+const string AudioFile::MESSAGE_DELETE_CURVE = "DeleteCurve";
 
 
 void AudioFile::AddTag(const string &key, const string &value)

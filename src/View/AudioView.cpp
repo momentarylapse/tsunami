@@ -47,6 +47,7 @@ const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "CurSampleChange";
 const string AudioView::MESSAGE_CUR_LEVEL_CHANGE = "CurLevelChange";
 const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
+const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 
 AudioView::SelectionType::SelectionType()
 {
@@ -1333,6 +1334,7 @@ void AudioView::OptimizeView()
 	r.num += border * 2;
 	view_zoom = audio->area.width() / (double)r.length();
 	view_pos = (double)r.start();
+	Notify(MESSAGE_VIEW_CHANGE);
 	ForceRedraw();
 }
 
@@ -1382,6 +1384,7 @@ void AudioView::MakeSampleVisible(int sample)
 	double x = sample2screen(sample);
 	if ((x > audio->area.x2) || (x < audio->area.x1)){
 		view_pos = sample - audio->area.width() / view_zoom * BORDER_FACTOR;
+		Notify(MESSAGE_VIEW_CHANGE);
 		ForceRedraw();
 	}
 }
@@ -1493,12 +1496,14 @@ void AudioView::Zoom(float f)
 
 	view_pos += (mx - audio->area.x1) * (1.0/view_zoom - 1.0/zoom_new);
 	view_zoom = zoom_new;
+	Notify(MESSAGE_VIEW_CHANGE);
 	ForceRedraw();
 }
 
 void AudioView::Move(float dpos)
 {
 	view_pos += dpos;
+	Notify(MESSAGE_VIEW_CHANGE);
 	ForceRedraw();
 }
 

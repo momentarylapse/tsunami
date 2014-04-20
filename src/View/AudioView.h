@@ -46,6 +46,7 @@ public:
 	static const string MESSAGE_CUR_LEVEL_CHANGE;
 	static const string MESSAGE_SELECTION_CHANGE;
 	static const string MESSAGE_SETTINGS_CHANGE;
+	static const string MESSAGE_VIEW_CHANGE;
 
 	void SetShowMono(bool mono);
 	void SetPeaksMode(int mode);

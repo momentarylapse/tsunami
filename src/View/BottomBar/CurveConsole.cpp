@@ -10,6 +10,36 @@
 #include "../../Data/AudioFile.h"
 #include "../../Data/Curve.h"
 
+class CurveTargetDialog : public HuiDialog
+{
+public:
+	CurveTargetDialog(HuiPanel *parent, AudioFile *a) :
+		HuiDialog(_("target"), 300, 400, parent->win, false)
+	{
+		AddListView("!nobar\\name", 0, 0, 0, 0, "list");
+		ret = Curve::Target();
+		target.add(Curve::Target());
+		target.append(Curve::Target::enumerate(a));
+
+		foreach(Curve::Target &t, target)
+			AddString("list", t.str(a));
+
+		EventM("list", this, &CurveTargetDialog::onList);
+	}
+
+	Array<Curve::Target> target;
+	static Curve::Target ret;
+
+	void onList()
+	{
+		int n = GetInt("list");
+		ret = target[n];
+		delete(this);
+	}
+};
+
+Curve::Target CurveTargetDialog::ret;
+
 CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
 	BottomBarConsole(_("Kurven")),
 	Observer("CurveConsole")
@@ -74,16 +104,18 @@ void CurveConsole::onAdd()
 {
 	Curve *c = new Curve;
 	c->name = "new";
-	c->target = Curve::Target(&audio->track[0]->volume);
 	audio->curve.add(c);
 	audio->Notify(audio->MESSAGE_ADD_CURVE);
-	Array<Curve::Target> target = Curve::Target::enumerate(audio);
-	foreach(Curve::Target &t, target)
-		msg_write(t.str(audio));
 }
 
 void CurveConsole::onTarget()
 {
+	if (!curve)
+		return;
+	CurveTargetDialog *dlg = new CurveTargetDialog(this, audio);
+	dlg->Run();
+	curve->target = CurveTargetDialog::ret;
+	updateList();
 }
 
 void CurveConsole::onListSelect()

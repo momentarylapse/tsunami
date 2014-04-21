@@ -14,6 +14,8 @@ struct ClassElement{
 	string name;
 	Type *type;
 	int offset;
+	bool hidden;
+	ClassElement();
 };
 struct ClassFunction{
 	string name;

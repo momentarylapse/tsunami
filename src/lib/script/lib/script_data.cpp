@@ -246,13 +246,14 @@ void add_class(Type *root_type)//, PreScript *ps = NULL)
 	cur_class = root_type;
 }
 
-void class_add_element(const string &name, Type *type, int offset)
+void class_add_element(const string &name, Type *type, int offset, bool hidden)
 {
 	msg_db_f("add_class_el", 4);
 	ClassElement e;
 	e.name = name;
 	e.type = type;
 	e.offset = offset;
+	e.hidden = hidden;
 	cur_class->element.add(e);
 }
 

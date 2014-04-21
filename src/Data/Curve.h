@@ -13,7 +13,11 @@
 class AudioFile;
 class Track;
 class Effect;
-class Synthesizer;
+class Configurable;
+namespace Script
+{
+	class Type;
+};
 
 class Curve : public Observable
 {
@@ -30,16 +34,19 @@ public:
 	struct Target
 	{
 		float *p;
+		string temp_name;
+		string temp_name_nice;
 		Target();
 		Target(float *p);
+		Target(float *p, const string &name, const string &name_nice);
 		void fromString(const string &str, AudioFile *a);
 		string str(AudioFile *a);
 		string niceStr(AudioFile *a);
 
 		static Array<Target> enumerate(AudioFile *a);
-		static Array<Target> enumerateTrack(AudioFile *a, Track *t);
-		static Array<Target> enumerateEffect(AudioFile *a, Track *t, Effect *fx);
-		static Array<Target> enumerateSynth(AudioFile *a, Track *t, Synthesizer *s);
+		static void enumerateTrack(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
+		static void enumerateConfigurable(Configurable *c, Array<Target> &list, const string &prefix, const string &prefix_nice);
+		static void enumerateType(char *p, Script::Type *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
 	};
 
 	string name;

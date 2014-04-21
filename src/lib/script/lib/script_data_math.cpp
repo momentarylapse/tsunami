@@ -506,7 +506,7 @@ void SIAddPackageMath()
 		class_add_element("x",		TypeFloat,	0);
 		class_add_element("y",		TypeFloat,	4);
 		class_add_element("z",		TypeFloat,	8);
-		class_add_element("e",		TypeFloatArray3,	0);
+		class_add_element("e",		TypeFloatArray3,	0, true);
 		class_add_func("length",			TypeFloat,	type_p(mf(&vector::length)));
 		class_add_func("lengthSqr",		TypeFloat,	type_p(mf(&vector::length_sqr)));
 		class_add_func("lengthFuzzy",		TypeFloat,	type_p(mf(&vector::length_fuzzy)));
@@ -597,8 +597,8 @@ void SIAddPackageMath()
 		class_add_element("_13",	TypeFloat,	52);
 		class_add_element("_23",	TypeFloat,	56);
 		class_add_element("_33",	TypeFloat,	60);
-		class_add_element("e",		TypeFloatArray4x4,	0);
-		class_add_element("_e",		TypeFloatArray16,	0);
+		class_add_element("e",		TypeFloatArray4x4,	0, true);
+		class_add_element("_e",		TypeFloatArray16,	0, true);
 		class_add_func("__imul__",	TypeVoid,	mf(&matrix::imul));
 			func_add_param("other",	TypeMatrix);
 		class_add_func("__mul__",	TypeMatrix,	mf(&matrix::mul));
@@ -617,8 +617,8 @@ void SIAddPackageMath()
 		class_add_element("_13",	TypeFloat,	24);
 		class_add_element("_23",	TypeFloat,	28);
 		class_add_element("_33",	TypeFloat,	32);
-		class_add_element("e",		TypeFloatArray3x3,	0);
-		class_add_element("_e",		TypeFloatArray9,	0);
+		class_add_element("e",		TypeFloatArray3x3,	0, true);
+		class_add_element("_e",		TypeFloatArray9,	0, true);
 		class_add_func("str",		TypeString,			mf(&matrix3::str));
 	
 	add_class(TypeVli);

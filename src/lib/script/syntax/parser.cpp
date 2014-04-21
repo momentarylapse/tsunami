@@ -1550,6 +1550,7 @@ void SyntaxTree::ParseClass()
 			el.name = "-vtable-";
 			el.type = TypePointer;
 			el.offset = 0;
+			el.hidden = true;
 			_class->element.insert(el, 0);
 			_offset += config.PointerSize;
 		}

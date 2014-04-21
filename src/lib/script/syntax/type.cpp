@@ -5,6 +5,11 @@
 
 namespace Script{
 
+ClassElement::ClassElement()
+{
+	hidden = false;
+}
+
 
 ClassFunction::ClassFunction()
 {

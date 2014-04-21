@@ -15,7 +15,7 @@ int add_func(const string &name, Type *return_type, void *func, bool is_class = 
 int add_compiler_func(const string &name, Type *return_type, int index);
 void func_add_param(const string &name, Type *type);
 void add_class(Type *root_type);
-void class_add_element(const string &name, Type *type, int offset);
+void class_add_element(const string &name, Type *type, int offset, bool hidden = false);
 void class_add_func(const string &name, Type *return_type, void *func, bool overwrite = false);
 void class_add_func_virtual(const string &name, Type *return_type, void *func, bool overwrite = false);
 void class_link_vtable(void *p);

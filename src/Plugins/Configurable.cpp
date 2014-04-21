@@ -31,11 +31,9 @@ void PluginData::__delete__()
 Array<Script::ClassElement> get_unique_elements(Script::Type *t)
 {
 	Array<Script::ClassElement> r;
-	int pos = -1;
 	foreach(Script::ClassElement &e, t->element)
-		if ((e.offset > pos) && (e.name[0] != '-')){
+		if (!e.hidden){
 			r.add(e);
-			pos = e.offset;
 		}
 	return r;
 }

@@ -8,6 +8,7 @@
 #include "Curve.h"
 #include "AudioFile.h"
 #include "../Plugins/Effect.h"
+#include "../Audio/Synth/Synthesizer.h"
 #include "../lib/script/script.h"
 
 Curve::Target::Target()
@@ -20,80 +21,71 @@ Curve::Target::Target(float *_p)
 	p = _p;
 }
 
+Curve::Target::Target(float *_p, const string &name, const string &name_nice)
+{
+	p = _p;
+	temp_name = name;
+	temp_name_nice = name_nice;
+}
+
 string Curve::Target::str(AudioFile *a)
 {
-	if (!p)
-		return "";
-	foreachi(Track *t, a->track, i){
-		if (p == &t->volume)
-			return format("t:%d:volume", i);
-		if (p == &t->panning)
-			return format("t:%d:panning", i);
-		foreachi(Effect *fx, t->fx, j){
-			PluginData *pd = fx->get_config();
-			if (pd){
-				foreach(Script::ClassElement &e, pd->type->element)
-					if (p == (float*)((char*)pd + e.offset))
-						return format("t:%d:fx:%d:", i, j) + e.name;
-			}
-		}
-	}
+	Array<Target> list = enumerate(a);
+	foreach(Target &t, list)
+		if (t.p == p)
+			return t.temp_name;
 	return "";
 }
 
 string Curve::Target::niceStr(AudioFile *a)
 {
-	if (!p)
-		return "none";
-	foreachi(Track *t, a->track, i){
-		if (p == &t->volume)
-			return format("Track[%d].volume", i);
-		if (p == &t->panning)
-			return format("Track[%d].panning", i);
-		foreachi(Effect *fx, t->fx, j){
-			PluginData *pd = fx->get_config();
-			if (pd){
-				foreach(Script::ClassElement &e, pd->type->element)
-					if (p == (float*)((char*)pd + e.offset))
-						return format("Track[%d].fx[%d].", i, j) + e.name;
-			}
-		}
-	}
-	return "???";
+	Array<Target> list = enumerate(a);
+	foreach(Target &t, list)
+		if (t.p == p)
+			return t.temp_name_nice;
+	return "";
 }
 
 Array<Curve::Target> Curve::Target::enumerate(AudioFile *a)
 {
-	Array<Target> r;
-	foreach(Track *t, a->track)
-		r.append(enumerateTrack(a, t));
-	return r;
+	Array<Target> list;
+	foreachi(Track *t, a->track, i)
+		enumerateTrack(t, list, format("t:%d", i), format("track[%d]", i));
+	return list;
 }
-Array<Curve::Target> Curve::Target::enumerateTrack(AudioFile *a, Track *t)
+void Curve::Target::enumerateTrack(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
-	Array<Target> r;
-	r.add(Target(&t->volume));
-	r.add(Target(&t->panning));
-	foreach(Effect *fx, t->fx)
-		r.append(enumerateEffect(a, t, fx));
-	r.append(enumerateSynth(a, t, t->synth));
-	return r;
+	list.add(Target(&t->volume, prefix + ":volume", prefix_nice + ".volume"));
+	list.add(Target(&t->panning, prefix + ":panning", prefix_nice + ".panning"));
+	foreachi(Effect *fx, t->fx, i)
+		enumerateConfigurable(fx, list, prefix + format(":fx:%d", i), prefix_nice + format(".fx[%d]", i));
+	enumerateConfigurable(t->synth, list, prefix + ":s", prefix_nice + ".synth");
 }
-Array<Curve::Target> Curve::Target::enumerateEffect(AudioFile *a, Track *t, Effect *fx)
+void Curve::Target::enumerateConfigurable(Configurable *c, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
-	Array<Target> r;
-	PluginData *pd = fx->get_config();
-	if (!pd)
-		return r;
-	foreach(Script::ClassElement &e, pd->type->element)
-		if (e.type->name == "float")
-			r.add(Target((float*)((char*)pd + e.offset)));
-	return r;
+	PluginData *pd = c->get_config();
+	if (pd)
+		enumerateType((char*)pd, pd->type, list, prefix, prefix_nice);
 }
-Array<Curve::Target> Curve::Target::enumerateSynth(AudioFile *a, Track *t, Synthesizer *s)
+
+void Curve::Target::enumerateType(char *pp, Script::Type *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
-	Array<Target> r;
-	return r;
+	if (t->name == "float"){
+		list.add(Target((float*)pp, prefix, prefix_nice));
+	}else if (t->is_array){
+		for (int i=0; i<t->array_length; i++){
+			enumerateType(pp + t->parent->size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
+		}
+	}else if (t->is_super_array){
+		DynamicArray *da = (DynamicArray*)pp;
+		for (int i=0; i<da->num; i++){
+			enumerateType(pp + da->element_size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
+		}
+	}else{
+		foreach(Script::ClassElement &e, t->element)
+			if (!e.hidden)
+				enumerateType(pp + e.offset, e.type, list, prefix + ":" + e.name, prefix_nice + "." + e.name);
+	}
 }
 
 

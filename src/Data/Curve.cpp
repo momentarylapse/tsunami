@@ -10,6 +10,16 @@
 #include "../Plugins/Effect.h"
 #include "../lib/script/script.h"
 
+Curve::Target::Target()
+{
+	p = NULL;
+}
+
+Curve::Target::Target(float *_p)
+{
+	p = _p;
+}
+
 string Curve::Target::str(AudioFile *a)
 {
 	if (!p)
@@ -31,14 +41,25 @@ string Curve::Target::str(AudioFile *a)
 	return "";
 }
 
-Curve::Target::Target()
+string Curve::Target::niceStr(AudioFile *a)
 {
-	p = NULL;
-}
-
-Curve::Target::Target(float *_p)
-{
-	p = _p;
+	if (!p)
+		return "none";
+	foreachi(Track *t, a->track, i){
+		if (p == &t->volume)
+			return format("Track[%d].volume", i);
+		if (p == &t->panning)
+			return format("Track[%d].panning", i);
+		foreachi(Effect *fx, t->fx, j){
+			PluginData *pd = fx->get_config();
+			if (pd){
+				foreach(Script::ClassElement &e, pd->type->element)
+					if (p == (float*)((char*)pd + e.offset))
+						return format("Track[%d].fx[%d].", i, j) + e.name;
+			}
+		}
+	}
+	return "???";
 }
 
 Array<Curve::Target> Curve::Target::enumerate(AudioFile *a)
@@ -114,5 +135,34 @@ float Curve::get(int pos)
 			return points[i-1].value + dv * (pos - points[i-1].pos) / dp;
 		}
 	return points.back().value;
+}
+
+
+
+void Curve::apply(int pos)
+{
+	temp_value.resize(target.num);
+	for (int i=0; i<target.num; i++){
+		temp_value[i] = *target[i].p;
+		*target[i].p = get(pos);
+	}
+}
+
+void Curve::unapply()
+{
+	for (int i=0; i<target.num; i++){
+		*target[i].p = temp_value[i];
+	}
+}
+
+string Curve::getTargets(AudioFile *a)
+{
+	string tt;
+	foreachi(Target &t, target, i){
+		if (i > 0)
+			tt += ", ";
+		tt += t.niceStr(a);
+	}
+	return tt;
 }
 

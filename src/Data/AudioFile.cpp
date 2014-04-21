@@ -172,6 +172,10 @@ void AudioFile::Reset()
 		delete(s);
 	sample.clear();
 
+	foreach(Curve *c, curve)
+		delete(c);
+	curve.clear();
+
 	level_name.clear();
 	level_name.add("");
 

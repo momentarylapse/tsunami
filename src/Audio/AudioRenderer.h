@@ -32,6 +32,7 @@ public:
 	void Seek(int pos);
 
 private:
+	void read_basic(BufferBox &buf, int pos, int size);
 	void bb_render_audio_track_no_fx(BufferBox &buf, Track *t);
 	void bb_render_time_track_no_fx(BufferBox &buf, Track *t);
 	void bb_render_midi_track_no_fx(BufferBox &buf, Track *t);

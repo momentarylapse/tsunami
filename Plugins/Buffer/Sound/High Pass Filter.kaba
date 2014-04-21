@@ -9,20 +9,42 @@ class Config : PluginData
 	overwrite void reset()
 		Frequency = 1000
 
+class State : PluginData
+	float in_r, in_l, out_r, out_l
+	bool used
+	overwrite void reset()
+		used = false
+
 class LowPassFilter : AudioEffect
 	Config config
+	State state
 
+	// y[i] := α * (y[i-1] + x[i] - x[i-1])
 	overwrite void processTrack(BufferBox buf)
 		float RC = 1 / (2 * pi * config.Frequency)
 		float dt = 1.0 / audio.sample_rate
 		float a = RC / (RC + dt)
-		float last_r = 0
-		float last_l = 0
+		float prev_in_r = 0
+		float prev_in_l = 0
+		if state.used
+			float tr = buf.r[0]
+			float tl = buf.l[0]
+			buf.r[0] = a * (buf.r[0] + state.out_r - state.in_r)
+			buf.l[0] = a * (buf.l[0] + state.out_l - state.in_l)
+			prev_in_r = tr
+			prev_in_l = tl
+
 	
 		for int i, 1, buf.num
-			float tr = buf.r[i]
-			float tl = buf.l[i]
-			buf.r[i] = a * (buf.r[i] + buf.r[i-1] - last_r)
-			buf.l[i] = a * (buf.l[i] + buf.l[i-1] - last_l)
-			last_r = tr
-			last_l = tl
+			tr = buf.r[i]
+			tl = buf.l[i]
+			buf.r[i] = a * (buf.r[i] + buf.r[i-1] - prev_in_r)
+			buf.l[i] = a * (buf.l[i] + buf.l[i-1] - prev_in_l)
+			prev_in_r = tr
+			prev_in_l = tl
+		
+		state.used = true
+		state.in_r = prev_in_r
+		state.in_l = prev_in_l
+		state.out_r = buf.r[buf.num - 1]
+		state.out_l = buf.l[buf.num - 1]

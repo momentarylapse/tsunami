@@ -34,6 +34,7 @@ public:
 		Target(float *p);
 		void fromString(const string &str, AudioFile *a);
 		string str(AudioFile *a);
+		string niceStr(AudioFile *a);
 
 		static Array<Target> enumerate(AudioFile *a);
 		static Array<Target> enumerateTrack(AudioFile *a, Track *t);
@@ -42,7 +43,8 @@ public:
 	};
 
 	string name;
-	Target target;
+	Array<Target> target;
+	Array<float> temp_value;
 	int type;
 
 	float min, max;
@@ -57,6 +59,11 @@ public:
 
 	void add(int pos, float value);
 	float get(int pos);
+
+	void apply(int pos);
+	void unapply();
+
+	string getTargets(AudioFile *a);
 };
 
 #endif /* CURVE_H_ */

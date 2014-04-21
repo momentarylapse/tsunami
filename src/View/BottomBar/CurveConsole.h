@@ -26,7 +26,9 @@ public:
 
 	void updateList();
 	void onAdd();
+	void onDelete();
 	void onTarget();
+	void onListEdit();
 	void onListSelect();
 	void onDraw();
 	void onKeyDown();

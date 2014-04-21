@@ -9,15 +9,31 @@ class Config : PluginData
 	overwrite void reset()
 		Frequency = 1000
 
+class State : PluginData
+	float l, r
+	bool used
+	overwrite void reset()
+		used = false
+
 class LowPassFilter : AudioEffect
 	Config config
+	State state
 
+	// y[i] := α * x[i] + (1-α) * y[i-1]
 	overwrite void processTrack(BufferBox buf)
 		float RC = 1 / (2 * pi * config.Frequency)
 		float dt = 1.0 / audio.sample_rate
 		float a = dt / (RC + dt)
 		float b = 1 - a
+		
+		if state.used
+			buf.r[0] = a * buf.r[0] + b * state.r
+			buf.l[0] = a * buf.l[0] + b * state.l
 	
 		for int i, 1, buf.num
 			buf.r[i] = a * buf.r[i] + b * buf.r[i-1]
 			buf.l[i] = a * buf.l[i] + b * buf.l[i-1]
+		
+		state.used = true
+		state.r = buf.r[buf.num-1]
+		state.l = buf.l[buf.num-1]

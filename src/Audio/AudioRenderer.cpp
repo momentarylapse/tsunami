@@ -8,7 +8,10 @@
 #include "AudioRenderer.h"
 #include "Synth/Synthesizer.h"
 #include "../Plugins/Effect.h"
+#include "../Data/Curve.h"
 #include "../Tsunami.h"
+
+#include "../lib/math/math.h"
 
 AudioRenderer::AudioRenderer()
 {
@@ -195,18 +198,49 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 	}
 }
 
-int AudioRenderer::read(BufferBox &buf)
+void apply_curves(AudioFile *audio, int pos)
 {
-	msg_db_f("RenderAudioFilePart", 1);
-	int size = max(min(buf.num, range.end() - pos), 0);
+	foreach(Curve *c, audio->curve)
+		c->apply(pos);
+}
+
+void unapply_curves(AudioFile *audio)
+{
+	foreach(Curve *c, audio->curve)
+		c->unapply();
+}
+
+void AudioRenderer::read_basic(BufferBox &buf, int pos, int size)
+{
 	range_cur = Range(pos, size);
+
+	apply_curves(audio, pos);
 
 	// render without fx
 	bb_render_audio_no_fx(buf);
 
-	// apply fx
+	// apply global fx
 	if (audio->fx.num > 0)
 		bb_apply_fx(buf, NULL, audio->fx);
+
+	unapply_curves(audio);
+}
+
+int AudioRenderer::read(BufferBox &buf)
+{
+	msg_db_f("AudioRenderer.read", 1);
+	int size = max(min(buf.num, range.end() - pos), 0);
+
+	if (audio->curve.num >= 0){
+		buf.resize(size);
+		int chunk = 128;
+		for (int d=0; d<size; d+=chunk){
+			BufferBox tbuf;
+			read_basic(tbuf, pos + d, min(size - d, chunk));
+			buf.set(tbuf, d, 1.0f);
+		}
+	}else
+		read_basic(buf, pos, size);
 
 	buf.offset = pos;
 	pos += size;

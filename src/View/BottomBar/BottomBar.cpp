@@ -38,8 +38,8 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	Embed(mixing_console, "console_grid", 0, 0);
 	Embed(fx_console, "console_grid", 0, 1);
 	Embed(synth_console, "console_grid", 0, 2);
-	Embed(curve_console, "console_grid", 0, 3);
-	Embed(sample_manager, "console_grid", 0, 4);
+	Embed(sample_manager, "console_grid", 0, 3);
+	Embed(curve_console, "console_grid", 0, 4);
 	Embed(log_dialog, "console_grid", 0, 5);
 
 	menu = new HuiMenu;

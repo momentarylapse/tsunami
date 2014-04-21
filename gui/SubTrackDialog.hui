@@ -6,7 +6,7 @@ Dialog sub_track_dialog "Sub Track" 375 230
 			ComboBox level_track ""
 		Group ld_t_volume "Lautstärke"
 			Grid ? "" 3 1
-				SpinButton volume "0\\-100\\10\\0.1" expandx
+				SpinButton volume "0\\-10000\\10\\0.1" expandx
 				Text db "dB"
 				CheckBox mute "Stumm"
 		Group ld_t_repetition "Wiederholungen"

@@ -11,7 +11,7 @@
 #include "../Helper/PeakMeter.h"
 #include <math.h>
 
-const float TrackMixer::DB_MIN = -100;
+const float TrackMixer::DB_MIN = -1000000;
 const float TrackMixer::DB_MAX = 10;
 const float TrackMixer::TAN_SCALE = 10.0f;
 
@@ -32,12 +32,13 @@ TrackMixer::TrackMixer()
 	AddString(pan_slider_id, "1\\R");
 	SetTooltip(pan_slider_id, "Balance");
 	AddSlider("!vertical,expandy", 0, 2, 0, 0, vol_slider_id);
-	AddString(vol_slider_id, format("%f\\%d", db2slider(DB_MAX), (int)DB_MAX));
-	AddString(vol_slider_id, format("%f\\%d", db2slider(5), (int)5));
+	AddString(vol_slider_id, format("%f\\%+d", db2slider(DB_MAX), (int)DB_MAX));
+	AddString(vol_slider_id, format("%f\\%+d", db2slider(5), (int)5));
 	AddString(vol_slider_id, format("%f\\%d", db2slider(0), 0));
 	AddString(vol_slider_id, format("%f\\%d", db2slider(-5), (int)-5));
 	AddString(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
-	AddString(vol_slider_id, format("%f\\%d", db2slider(DB_MIN), (int)DB_MIN));
+	AddString(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
+	AddString(vol_slider_id, format("%f\\-inf", db2slider(DB_MIN))); // \u221e
 	SetTooltip(vol_slider_id, _("Lautst&arke in dB"));
 	AddCheckBox("Stumm", 0, 3, 0, 0, mute_id);
 

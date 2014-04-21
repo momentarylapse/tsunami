@@ -5,7 +5,7 @@ Dialog track_dialog "Spur" 380 516
 		Group ld_t_volume "Lautstärke"
 			Grid ? "" 3 2
 				Text ld_tt_volume "Lautstärke"
-				SpinButton volume "0\\-100\\10\\0.1" expandx
+				SpinButton volume "0\\-10000\\10\\0.1" expandx
 				Text db "dB"
 				Text ld_tt_panning "Balance"
 				SpinButton panning "0\\-100\\100\\1"

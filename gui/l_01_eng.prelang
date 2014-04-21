@@ -394,7 +394,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-124
+129
 // Data (ID,Text)
 
 
@@ -405,6 +405,10 @@ zoom_out
   ...keine Sorge, das wird schon!
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
+
+!angle=90\\für die Spur '%s'
+
+!angle=90\\keine Spur gewählt
 
 !angle=90\\wirken auf die Spur '%s'
 
@@ -472,8 +476,6 @@ Datenverlust!
 
 Dauer\\\") + audio->get_time_str_long(samples));
 
-Dieser Effekt ist nicht konfigurierbar.
-
 Dur
 
 Ebene %d
@@ -530,7 +532,11 @@ Keine Spur ausgewählt
 
 Konnte Aufnahmegerät nicht öffnen
 
+Kurven
+
 Lautstärke in dB
+
+Leiste anzeigen
 
 MIDI Quelle auswählen
 
@@ -573,6 +579,8 @@ Script (*.kaba)
 Spur %d
 
 Spur-Eigenschaften
+
+Synthesizer
 
 Unbenannt
 
@@ -637,6 +645,8 @@ rendere Audio
 speichere
 
 speichere nami
+
+target
 
 unbekannte Dateiendung: 
 

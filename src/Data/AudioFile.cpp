@@ -6,6 +6,7 @@
  */
 
 #include "AudioFile.h"
+#include "Curve.h"
 #include "../Plugins/Effect.h"
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "../Action/AudioFile/Level/ActionAudioAddLevel.h"

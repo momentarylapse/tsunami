@@ -22,7 +22,8 @@
 #include "Plugin.h"
 #include "Effect.h"
 #include "FavoriteManager.h"
-#include <typeinfo>
+
+#define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 
 void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
@@ -117,8 +118,8 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 
 	Script::DeclareClassSize("Range", sizeof(Range));
-	Script::DeclareClassOffset("Range", "offset", offsetof(Range, offset));
-	Script::DeclareClassOffset("Range", "length", offsetof(Range, num));
+	Script::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
+	Script::DeclareClassOffset("Range", "length", _offsetof(Range, num));
 
 
 	PluginData plugin_data;
@@ -130,10 +131,10 @@ void PluginManager::LinkAppScriptData()
 
 	Effect effect;
 	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
-	Script::DeclareClassOffset("AudioEffect", "name", offsetof(Effect, name));
-	Script::DeclareClassOffset("AudioEffect", "only_on_selection", offsetof(Effect, only_on_selection));
-	Script::DeclareClassOffset("AudioEffect", "range", offsetof(Effect, range));
-	Script::DeclareClassOffset("AudioEffect", "usable", offsetof(Effect, usable));
+	Script::DeclareClassOffset("AudioEffect", "name", _offsetof(Effect, name));
+	Script::DeclareClassOffset("AudioEffect", "only_on_selection", _offsetof(Effect, only_on_selection));
+	Script::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
+	Script::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
 	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "processTrack", Script::mf(&Effect::ProcessTrack), &effect);
@@ -144,11 +145,11 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
-	Script::DeclareClassOffset("BufferBox", "offset", offsetof(BufferBox, offset));
-	Script::DeclareClassOffset("BufferBox", "num", offsetof(BufferBox, num));
-	Script::DeclareClassOffset("BufferBox", "r", offsetof(BufferBox, r));
-	Script::DeclareClassOffset("BufferBox", "l", offsetof(BufferBox, l));
-	Script::DeclareClassOffset("BufferBox", "peak", offsetof(BufferBox, peak));
+	Script::DeclareClassOffset("BufferBox", "offset", _offsetof(BufferBox, offset));
+	Script::DeclareClassOffset("BufferBox", "num", _offsetof(BufferBox, num));
+	Script::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, r));
+	Script::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, l));
+	Script::DeclareClassOffset("BufferBox", "peak", _offsetof(BufferBox, peak));
 	Script::LinkExternal("BufferBox.clear", Script::mf(&BufferBox::clear));
 	Script::LinkExternal("BufferBox.__assign__", Script::mf(&BufferBox::__assign__));
 	Script::LinkExternal("BufferBox.range", Script::mf(&BufferBox::range));
@@ -156,9 +157,9 @@ void PluginManager::LinkAppScriptData()
 
 	Synthesizer synth;
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
-	Script::DeclareClassOffset("Synthesizer", "name", offsetof(Synthesizer, name));
-	Script::DeclareClassOffset("Synthesizer", "sample_rate", offsetof(Synthesizer, sample_rate));
-	Script::DeclareClassOffset("Synthesizer", "keep_notes", offsetof(Synthesizer, keep_notes));
+	Script::DeclareClassOffset("Synthesizer", "name", _offsetof(Synthesizer, name));
+	Script::DeclareClassOffset("Synthesizer", "sample_rate", _offsetof(Synthesizer, sample_rate));
+	Script::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::RenderNote), &synth);
@@ -184,42 +185,42 @@ void PluginManager::LinkAppScriptData()
 	//Script::LinkExternal("DummySynthesizer.renderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
 
 	Script::DeclareClassSize("BarPattern", sizeof(BarPattern));
-	Script::DeclareClassOffset("BarPattern", "num_beats", offsetof(BarPattern, num_beats));
-	Script::DeclareClassOffset("BarPattern", "length", offsetof(BarPattern, length));
-	Script::DeclareClassOffset("BarPattern", "type", offsetof(BarPattern, type));
-	Script::DeclareClassOffset("BarPattern", "count", offsetof(BarPattern, count));
-	Script::DeclareClassOffset("BarPattern", "is_selected", offsetof(BarPattern, is_selected));
+	Script::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));
+	Script::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));
+	Script::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
+	Script::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));
+	Script::DeclareClassOffset("BarPattern", "is_selected", _offsetof(BarPattern, is_selected));
 
 	Script::DeclareClassSize("MidiNote", sizeof(MidiNote));
-	Script::DeclareClassOffset("MidiNote", "range", offsetof(MidiNote, range));
-	Script::DeclareClassOffset("MidiNote", "pitch", offsetof(MidiNote, pitch));
-	Script::DeclareClassOffset("MidiNote", "volume", offsetof(MidiNote, volume));
+	Script::DeclareClassOffset("MidiNote", "range", _offsetof(MidiNote, range));
+	Script::DeclareClassOffset("MidiNote", "pitch", _offsetof(MidiNote, pitch));
+	Script::DeclareClassOffset("MidiNote", "volume", _offsetof(MidiNote, volume));
 
 	Script::DeclareClassSize("MidiData", sizeof(MidiData));
-	Script::DeclareClassOffset("MidiData", "note", 0); //offsetof(MidiData, note));
+	Script::DeclareClassOffset("MidiData", "note", 0); //_offsetof(MidiData, note));
 
 	Script::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
-	Script::DeclareClassOffset("TrackLevel", "buffer", offsetof(TrackLevel, buffer));
+	Script::DeclareClassOffset("TrackLevel", "buffer", _offsetof(TrackLevel, buffer));
 
 	Script::DeclareClassSize("Track", sizeof(Track));
-	Script::DeclareClassOffset("Track", "type", offsetof(Track, type));
-	Script::DeclareClassOffset("Track", "name", offsetof(Track, name));
-	Script::DeclareClassOffset("Track", "level", offsetof(Track, level));
-//	Script::DeclareClassOffset("Track", "length", offsetof(Track, length));
-//	Script::DeclareClassOffset("Track", "pos", offsetof(Track, pos));
-	Script::DeclareClassOffset("Track", "volume", offsetof(Track, volume));
-	Script::DeclareClassOffset("Track", "panning", offsetof(Track, panning));
-	Script::DeclareClassOffset("Track", "muted", offsetof(Track, muted));
-//	Script::DeclareClassOffset("Track", "rep_num", offsetof(Track, rep_num));
-//	Script::DeclareClassOffset("Track", "rep_delay", offsetof(Track, rep_delay));
-	Script::DeclareClassOffset("Track", "fx", offsetof(Track, fx));
-//	Script::DeclareClassOffset("Track", "sub", offsetof(Track, sub));
-	Script::DeclareClassOffset("Track", "midi", offsetof(Track, midi));
-	Script::DeclareClassOffset("Track", "synth", offsetof(Track, synth));
-	Script::DeclareClassOffset("Track", "area", offsetof(Track, area));
-//	Script::DeclareClassOffset("Track", "parent", offsetof(Track, parent));
-	Script::DeclareClassOffset("Track", "root", offsetof(Track, root));
-	Script::DeclareClassOffset("Track", "is_selected", offsetof(Track, is_selected));
+	Script::DeclareClassOffset("Track", "type", _offsetof(Track, type));
+	Script::DeclareClassOffset("Track", "name", _offsetof(Track, name));
+	Script::DeclareClassOffset("Track", "level", _offsetof(Track, level));
+//	Script::DeclareClassOffset("Track", "length", _offsetof(Track, length));
+//	Script::DeclareClassOffset("Track", "pos", _offsetof(Track, pos));
+	Script::DeclareClassOffset("Track", "volume", _offsetof(Track, volume));
+	Script::DeclareClassOffset("Track", "panning", _offsetof(Track, panning));
+	Script::DeclareClassOffset("Track", "muted", _offsetof(Track, muted));
+//	Script::DeclareClassOffset("Track", "rep_num", _offsetof(Track, rep_num));
+//	Script::DeclareClassOffset("Track", "rep_delay", _offsetof(Track, rep_delay));
+	Script::DeclareClassOffset("Track", "fx", _offsetof(Track, fx));
+//	Script::DeclareClassOffset("Track", "sub", _offsetof(Track, sub));
+	Script::DeclareClassOffset("Track", "midi", _offsetof(Track, midi));
+	Script::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
+	Script::DeclareClassOffset("Track", "area", _offsetof(Track, area));
+//	Script::DeclareClassOffset("Track", "parent", _offsetof(Track, parent));
+	Script::DeclareClassOffset("Track", "root", _offsetof(Track, root));
+	Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
 	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::GetBuffers));
 	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::ReadBuffers));
 	Script::LinkExternal("Track.setName", Script::mf(&Track::SetName));
@@ -244,15 +245,15 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::DeleteBar));
 
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
-	Script::DeclareClassOffset("AudioFile", "used", offsetof(AudioFile, used));
-	Script::DeclareClassOffset("AudioFile", "filename", offsetof(AudioFile, filename));
-	Script::DeclareClassOffset("AudioFile", "tag", offsetof(AudioFile, tag));
-	Script::DeclareClassOffset("AudioFile", "sample_rate", offsetof(AudioFile, sample_rate));
-	Script::DeclareClassOffset("AudioFile", "volume", offsetof(AudioFile, volume));
-	Script::DeclareClassOffset("AudioFile", "fx", offsetof(AudioFile, fx));
-	Script::DeclareClassOffset("AudioFile", "track", offsetof(AudioFile, track));
-	Script::DeclareClassOffset("AudioFile", "area", offsetof(AudioFile, area));
-	Script::DeclareClassOffset("AudioFile", "level_name", offsetof(AudioFile, level_name));
+	Script::DeclareClassOffset("AudioFile", "used", _offsetof(AudioFile, used));
+	Script::DeclareClassOffset("AudioFile", "filename", _offsetof(AudioFile, filename));
+	Script::DeclareClassOffset("AudioFile", "tag", _offsetof(AudioFile, tag));
+	Script::DeclareClassOffset("AudioFile", "sample_rate", _offsetof(AudioFile, sample_rate));
+	Script::DeclareClassOffset("AudioFile", "volume", _offsetof(AudioFile, volume));
+	Script::DeclareClassOffset("AudioFile", "fx", _offsetof(AudioFile, fx));
+	Script::DeclareClassOffset("AudioFile", "track", _offsetof(AudioFile, track));
+	Script::DeclareClassOffset("AudioFile", "area", _offsetof(AudioFile, area));
+	Script::DeclareClassOffset("AudioFile", "level_name", _offsetof(AudioFile, level_name));
 	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::NewEmpty));
 	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::AddTrack));
 	Script::LinkExternal("AudioFile.deleteTrack", Script::mf(&AudioFile::DeleteTrack));
@@ -264,9 +265,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::RenderAudioFile));
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
-	Script::DeclareClassOffset("AudioInput", "cur_buf", offsetof(AudioInput, current_buffer));
-	Script::DeclareClassOffset("AudioInput", "buf", offsetof(AudioInput, buffer));
-	Script::DeclareClassOffset("AudioInput", "midi", offsetof(AudioInput, midi));
+	Script::DeclareClassOffset("AudioInput", "cur_buf", _offsetof(AudioInput, current_buffer));
+	Script::DeclareClassOffset("AudioInput", "buf", _offsetof(AudioInput, buffer));
+	Script::DeclareClassOffset("AudioInput", "midi", _offsetof(AudioInput, midi));
 	Script::LinkExternal("AudioInput.start", Script::mf(&AudioInput::Start));
 	Script::LinkExternal("AudioInput.resetSync", Script::mf(&AudioInput::ResetSync));
 	Script::LinkExternal("AudioInput.stop",	 Script::mf(&AudioInput::Stop));
@@ -290,8 +291,8 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioOutput.setBufferSize", Script::mf(&AudioOutput::SetBufferSize));
 
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
-	Script::DeclareClassOffset("AudioView", "sel_range", offsetof(AudioView, sel_range));
-	Script::DeclareClassOffset("AudioView", "sel_raw", offsetof(AudioView, sel_raw));
+	Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));
+	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 
 	Script::LinkExternal("Log.error", Script::mf(&Log::Error));
 	Script::LinkExternal("Log.warning", Script::mf(&Log::Warning));
@@ -301,10 +302,10 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Storage.save", Script::mf(&Storage::Save));
 
 	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
-	Script::DeclareClassOffset("PluginContext", "track", offsetof(PluginManager::PluginContext, track));
-	Script::DeclareClassOffset("PluginContext", "track_no", offsetof(PluginManager::PluginContext, track_no));
-	Script::DeclareClassOffset("PluginContext", "range", offsetof(PluginManager::PluginContext, range));
-	Script::DeclareClassOffset("PluginContext", "level", offsetof(PluginManager::PluginContext, level));
+	Script::DeclareClassOffset("PluginContext", "track", _offsetof(PluginManager::PluginContext, track));
+	Script::DeclareClassOffset("PluginContext", "track_no", _offsetof(PluginManager::PluginContext, track_no));
+	Script::DeclareClassOffset("PluginContext", "range", _offsetof(PluginManager::PluginContext, range));
+	Script::DeclareClassOffset("PluginContext", "level", _offsetof(PluginManager::PluginContext, level));
 	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugin_manager->context);
 }
 
@@ -453,7 +454,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			fx->ResetConfig();
 			if (fx->Configure()){
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
-				main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
+			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				if (a->used){
 					Range range = tsunami->view->GetPlaybackSelection();
 					a->action_manager->BeginActionGroup();

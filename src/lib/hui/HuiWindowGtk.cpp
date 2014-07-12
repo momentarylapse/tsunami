@@ -363,8 +363,10 @@ void HuiWindow::SetMenu(HuiMenu *_menu)
 		Array<HuiControl*> list = menu->get_all_controls();
 		// move items from <menu_bar> back to <Menu>
 		for (int i=0;i<gtk_menu.num;i++){
+			g_object_ref(gtk_menu[i]);
 			gtk_container_remove(GTK_CONTAINER(menubar), GTK_WIDGET(gtk_menu[i]));
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu->widget), GTK_WIDGET(gtk_menu[i]));
+			g_object_unref(gtk_menu[i]);
 		}
 		gtk_menu.clear();
 		/*menu->set_win(NULL);
@@ -388,8 +390,10 @@ void HuiWindow::SetMenu(HuiMenu *_menu)
 			HuiControl *it = menu->item[i];
 			gtk_menu.add(it->widget);
 			gtk_widget_show(gtk_menu[i]);
+			g_object_ref(it->widget);
 			gtk_container_remove(GTK_CONTAINER(menu->widget), gtk_menu[i]);
 			gtk_menu_shell_append(GTK_MENU_SHELL(menubar), gtk_menu[i]);
+			g_object_unref(it->widget);
 		}
 		Array<HuiControl*> list = menu->get_all_controls();
 		control.append(list);

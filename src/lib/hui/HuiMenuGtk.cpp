@@ -80,92 +80,92 @@ void HuiMenu::add(HuiControl *c)
 }
 
 
-const char *get_stock_id(const string image)
+const char *get_gtk_icon_name(const string image)
 {
-	if (image=="hui:open")	return GTK_STOCK_OPEN;
-	if (image=="hui:new")		return GTK_STOCK_NEW;
-	if (image=="hui:save")	return GTK_STOCK_SAVE;
-	if (image=="hui:save-as")	return GTK_STOCK_SAVE_AS;
-	if (image=="hui:quit")	return GTK_STOCK_QUIT;
+	if (image=="hui:open")	return "document-open";
+	if (image=="hui:new")		return "document-new";
+	if (image=="hui:save")	return "document-save";
+	if (image=="hui:save-as")	return "document-save-as";
+	if (image=="hui:quit")	return "application-exit";
 
-	if (image=="hui:copy")	return GTK_STOCK_COPY;
-	if (image=="hui:paste")	return GTK_STOCK_PASTE;
-	if (image=="hui:cut")		return GTK_STOCK_CUT;
-	if (image=="hui:delete")	return GTK_STOCK_DELETE;
-	if (image=="hui:close")	return GTK_STOCK_CLOSE;
-	if (image=="hui:edit")	return GTK_STOCK_EDIT;
-	if (image=="hui:find")	return GTK_STOCK_FIND;
-	if (image=="hui:find-and-replace")	return GTK_STOCK_FIND_AND_REPLACE;
+	if (image=="hui:copy")	return "edit-copy";
+	if (image=="hui:paste")	return "edit-paste";
+	if (image=="hui:cut")		return "edit-cut";
+	if (image=="hui:delete")	return "edit-delete";
+	if (image=="hui:close")	return "window-close";
+	if (image=="hui:edit")	return "document-edit"; // ???
+	if (image=="hui:find")	return "edit-find";
+	if (image=="hui:find-and-replace")	return "edit-find-replace";
 
 
-	if (image=="hui:no")		return GTK_STOCK_NO;
-	if (image=="hui:yes")		return GTK_STOCK_YES;
-	if (image=="hui:ok")		return GTK_STOCK_OK;
-	if (image=="hui:cancel")	return GTK_STOCK_CANCEL;
-	if (image=="hui:apply")	return GTK_STOCK_APPLY;
+	if (image=="hui:no")		return "dialog-no";//GTK_STOCK_NO;
+	if (image=="hui:yes")		return "dialog-yes";//GTK_STOCK_YES;
+	if (image=="hui:ok")		return "dialog-ok";//GTK_STOCK_OK;
+	if (image=="hui:cancel")	return "dialog-cancel";//GTK_STOCK_CANCEL;
+	if (image=="hui:apply")	return "dialog-apply";//GTK_STOCK_APPLY;
 
-	if (image=="hui:redo")	return GTK_STOCK_REDO;
-	if (image=="hui:undo")	return GTK_STOCK_UNDO;
-	if (image=="hui:refresh")	return GTK_STOCK_REFRESH;
-	if (image=="hui:preferences")	return GTK_STOCK_PREFERENCES;
-	if (image=="hui:properties")return GTK_STOCK_PROPERTIES;
+	if (image=="hui:redo")	return "edit-redo";
+	if (image=="hui:undo")	return "edit-undo";
+	if (image=="hui:refresh")	return "view-refresh";
+	if (image=="hui:preferences")	return "preferences-system";
+	if (image=="hui:properties")return "document-properties";
 
-	if (image=="hui:clear")	return GTK_STOCK_CLEAR;
-	if (image=="hui:add")		return GTK_STOCK_ADD;
-	if (image=="hui:remove")	return GTK_STOCK_REMOVE;
-	if (image=="hui:execute")	return GTK_STOCK_EXECUTE;
-	if (image=="hui:stop")	return GTK_STOCK_STOP;
+	if (image=="hui:clear")	return "edit-clear";
+	if (image=="hui:add")		return "list-add";
+	if (image=="hui:remove")	return "list-remove";
+	if (image=="hui:execute")	return "system-run";
+	if (image=="hui:stop")	return "process-stop";
 
-	if (image=="hui:up")		return GTK_STOCK_GO_UP;
-	if (image=="hui:down")	return GTK_STOCK_GO_DOWN;
-	if (image=="hui:back")	return GTK_STOCK_GO_BACK;
-	if (image=="hui:forward")	return GTK_STOCK_GO_FORWARD;
-	if (image=="hui:bottom")		return GTK_STOCK_GOTO_BOTTOM;
-	if (image=="hui:first")	return GTK_STOCK_GOTO_FIRST;
-	if (image=="hui:last")	return GTK_STOCK_GOTO_LAST;
-	if (image=="hui:top")	return GTK_STOCK_GOTO_TOP;
+	if (image=="hui:up")		return "go-up";
+	if (image=="hui:down")	return "go-down";
+	if (image=="hui:back")	return "go-previous";
+	if (image=="hui:forward")	return "go-next";
+	if (image=="hui:bottom")		return "go-bottom";
+	if (image=="hui:first")	return "go-first";
+	if (image=="hui:last")	return "go-last";
+	if (image=="hui:top")	return "go-top";
 
-	if (image=="hui:help")	return GTK_STOCK_HELP;
-	if (image=="hui:info")	return GTK_STOCK_INFO;
-	if (image=="hui:about")	return GTK_STOCK_ABOUT;
-	if (image=="hui:print")	return GTK_STOCK_PRINT;
-	if (image=="hui:font")	return GTK_STOCK_SELECT_FONT;
-	if (image=="hui:select-all")	return "gtk-select-all";//GTK_STOCK_SELECT_ALL;
+	if (image=="hui:help")	return "help-browser";
+	if (image=="hui:info")	return "dialog-information";
+	if (image=="hui:about")	return "help-about";
+	if (image=="hui:print")	return "document-print";
+	if (image=="hui:font")	return "font";//GTK_STOCK_SELECT_FONT;
+	if (image=="hui:select-all")	return "edit-select-all";
 
-	if (image=="hui:zoom-in")	return GTK_STOCK_ZOOM_IN;
-	if (image=="hui:zoom-out")	return GTK_STOCK_ZOOM_OUT;
-	if (image=="hui:fullscreen")	return GTK_STOCK_FULLSCREEN;
-	if (image=="hui:zoom-one")	return GTK_STOCK_ZOOM_100;
-	if (image=="hui:zoom-fit")	return GTK_STOCK_ZOOM_FIT;
+	if (image=="hui:zoom-in")	return "zoom-in";
+	if (image=="hui:zoom-out")	return "zoom-out";
+	if (image=="hui:fullscreen")	return "view-fullscreen";
+	if (image=="hui:zoom-one")	return "zoom-original";
+	if (image=="hui:zoom-fit")	return "zoom-fit-best";
 
-	
-	if (image=="hui:media-play")return GTK_STOCK_MEDIA_PLAY;
-	if (image=="hui:media-stop")return GTK_STOCK_MEDIA_STOP;
-	if (image=="hui:media-pause")return GTK_STOCK_MEDIA_PAUSE;
-	if (image=="hui:media-record")return GTK_STOCK_MEDIA_RECORD;
-	if (image=="hui:media-forward")return GTK_STOCK_MEDIA_FORWARD;
-	if (image=="hui:media-rewind")return GTK_STOCK_MEDIA_REWIND;
-	if (image=="hui:media-next")return GTK_STOCK_MEDIA_NEXT;
-	if (image=="hui:media-previous")return GTK_STOCK_MEDIA_PREVIOUS;
 
-	if (image=="hui:connect")	return GTK_STOCK_CONNECT;
-	if (image=="hui:disconnect")	return GTK_STOCK_DISCONNECT;
-	if (image=="hui:network")	return GTK_STOCK_NETWORK;
+	if (image=="hui:media-play")return "media-playback-start";
+	if (image=="hui:media-stop")return "media-playback-stop";
+	if (image=="hui:media-pause")return "media-playback-pause";
+	if (image=="hui:media-record")return "media-record";
+	if (image=="hui:media-forward")return "media-seek-forward";
+	if (image=="hui:media-rewind")return "media-seek-backward";
+	if (image=="hui:media-next")return "media-skip-forward";
+	if (image=="hui:media-previous")return "media-skip-backward";
 
-	if (image=="hui:error")	return GTK_STOCK_DIALOG_ERROR;
-	//if (image=="hui:info")	return GTK_STOCK_DIALOG_INFO;
-	if (image=="hui:question")	return GTK_STOCK_DIALOG_QUESTION;
-	if (image=="hui:warning")	return GTK_STOCK_DIALOG_WARNING;
-	if (image=="hui:authentication")	return GTK_STOCK_DIALOG_AUTHENTICATION;
+	if (image=="hui:connect")	return "network-connect";//GTK_STOCK_CONNECT;
+	if (image=="hui:disconnect")	return "network-disconnect";//GTK_STOCK_DISCONNECT;
+	if (image=="hui:network")	return "network";//GTK_STOCK_NETWORK;
 
-	if (image=="hui:home")	return GTK_STOCK_HOME;
-	if (image=="hui:select-color")	return GTK_STOCK_SELECT_COLOR;
-	if (image=="hui:select-font")	return GTK_STOCK_SELECT_FONT;
-	if (image=="hui:sort-ascending")	return GTK_STOCK_SORT_ASCENDING;
-	if (image=="hui:sort-descending")	return GTK_STOCK_SORT_DESCENDING;
-	if (image=="hui:spell-check")	return GTK_STOCK_SPELL_CHECK;
-	if (image=="hui:convert")	return GTK_STOCK_CONVERT;
-	
+	if (image=="hui:error")	return "dialog-error";
+	//if (image=="hui:info")	return "dialog-information";
+	if (image=="hui:question")	return "dialog-question";
+	if (image=="hui:warning")	return "dialog-warning";
+	if (image=="hui:authentication")	return "dialog-password";
+
+	if (image=="hui:home")	return "go-home";
+	if (image=="hui:select-color")	return "color-picker";//GTK_STOCK_SELECT_COLOR;
+	if (image=="hui:select-font")	return "font";//GTK_STOCK_SELECT_FONT;
+	if (image=="hui:sort-ascending")	return "view-sort-ascending";
+	if (image=="hui:sort-descending")	return "view-sort-descending";
+	if (image=="hui:spell-check")	return "tools-check-spelling";
+	if (image=="hui:convert")	return "gtk-convert";//GTK_STOCK_CONVERT;
+
 	return "";
 }
 
@@ -185,7 +185,7 @@ void *get_gtk_image(const string &image, bool large)
 		return NULL;
 	if (image.find("hui:") == 0){
 		// internal
-		return gtk_image_new_from_stock(get_stock_id(image), large ? GTK_ICON_SIZE_LARGE_TOOLBAR : GTK_ICON_SIZE_MENU);
+		return gtk_image_new_from_icon_name(get_gtk_icon_name(image), large ? GTK_ICON_SIZE_LARGE_TOOLBAR : GTK_ICON_SIZE_MENU);
 	}else{
 		// file
 		sHuiImage *img = get_image(image);
@@ -203,7 +203,7 @@ void *get_gtk_image_pixbuf(const string &image)
 {
 	if (image.find("hui:") == 0){
 		// internal
-		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_stock_id(image), 24, (GtkIconLookupFlags)0, NULL);
+		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_gtk_icon_name(image), 24, (GtkIconLookupFlags)0, NULL);
 		if (pb){
 			GdkPixbuf *r = gdk_pixbuf_copy(pb);
 			g_object_unref(pb);

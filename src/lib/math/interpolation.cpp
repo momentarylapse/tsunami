@@ -108,9 +108,32 @@ void Interpolator<T>::add3(const T &p, const T &v, float weight, float dt)
 	empty = false;
 }
 
+template<class T>
+void Interpolator<T>::addv(const T p, float dt)
+{	add3(p, _inter_zero_<T>(), 1, dt);	}
+
+
+template<class T>
+void Interpolator<T>::add2v(const T p, const T v, float dt)
+{	add3(p, v, 1, dt);	}
+
+
+template<class T>
+void Interpolator<T>::add3v(const T p, const T v, float weight, float dt)
+{	add3(p, v, weight, dt);	}
+
 
 template<class T>
 void Interpolator<T>::jump(const T &p, const T &v)
+{
+	temp.pos0 = p;
+	temp.vel0 = v;
+	temp.weight0 = 1;
+	empty = false;
+}
+
+template<class T>
+void Interpolator<T>::jumpv(const T p, const T v)
 {
 	temp.pos0 = p;
 	temp.vel0 = v;

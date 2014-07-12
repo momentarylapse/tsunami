@@ -47,7 +47,9 @@ class string : public DynamicArray
 	bool _cdecl match(const string &glob) const;
 	int _cdecl hash() const;
 	int _cdecl _int() const;
+	long long _cdecl _int64() const;
 	float _cdecl _float() const;
+	double _cdecl _float64() const;
 	bool _cdecl _bool() const;
 	const char *c_str() const;
 
@@ -110,9 +112,12 @@ class string : public DynamicArray
 
 string _cdecl format(const string s, ...);
 string _cdecl i2s(int i);
+string _cdecl i642s(long long i);
 string _cdecl i2s2(int i, int l);
 string _cdecl f2s(float f, int dez);
+string _cdecl f642s(double f, int dez);
 string _cdecl f2sf(float f);
+string _cdecl f642sf(double f);
 string _cdecl b2s(bool b);
 string _cdecl p2s(void *p);
 string _cdecl ia2s(const Array<int> &a);
@@ -122,6 +127,7 @@ string _cdecl sa2s(const Array<string> &a);
 int _cdecl s2i(const string &s);
 bool _cdecl s2b(const string &s);
 float _cdecl s2f(const string &s);
+double _cdecl s2f64(const string &s);
 
 string _cdecl d2h(const void *data, int bytes, bool inverted = true);
 string _cdecl h2d(const string &hex_str, int bytes);

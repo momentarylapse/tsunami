@@ -1429,15 +1429,22 @@ void Init(int set)
 	add_inst(inst_sar,	0xd3,	1,	7,	Ed,	RegCl, OptMediumParam);
 	add_inst(inst_sar,	0xd3,	1,	7,	Eq,	RegCl, OptBigParam);
 	add_inst(inst_fadd,	0xd8,	1,	0,	Ed,	-1);
+	add_inst(inst_fadd,	0xdc,	1,	0,	Eq,	-1);
 	add_inst(inst_fmul,	0xd8,	1,	1,	Ed,	-1);
+	add_inst(inst_fmul,	0xdc,	1,	1,	Eq,	-1);
 	add_inst(inst_fsub,	0xd8,	1,	4,	Ed,	-1);
+	add_inst(inst_fsub,	0xdc,	1,	4,	Eq,	-1);
 	add_inst(inst_fdiv,	0xd8,	1,	6,	Ed,	-1);
+	add_inst(inst_fdiv,	0xdc,	1,	6,	Eq,	-1);
 	add_inst(inst_fld,	0xd9,	1,	0,	Md,	-1);
+	add_inst(inst_fld,	0xdd,	1,	0,	Mq,	-1);
 	add_inst(inst_fld1,	0xe8d9,	2,	-1,	-1,	-1);
 	add_inst(inst_fldz,	0xeed9,	2,	-1,	-1,	-1);
 	add_inst(inst_fldpi,	0xebd9,	2,	-1,	-1,	-1);
 	add_inst(inst_fst,	0xd9,	1,	2,	Md,	-1);
+	add_inst(inst_fst,	0xdd,	1,	2,	Mq,	-1);
 	add_inst(inst_fstp,	0xd9,	1,	3,	Md,	-1);
+	add_inst(inst_fstp,	0xdd,	1,	3,	Mq,	-1);
 	add_inst(inst_fldcw,	0xd9,	1,	5,	Mw,	-1);
 	add_inst(inst_fnstcw,	0xd9,	1,	7,	Mw,	-1);
 	add_inst(inst_fxch		,0xc9d9	,2	,-1	,RegSt0	,RegSt1);
@@ -1586,7 +1593,7 @@ string InstructionParam::str(bool hide_size)
 	}else if (type == ParamTImmediate){
 		//msg_write("im");
 		if (deref)
-			return format("[%s]", d2h(&value, state.AddrSize).c_str());
+			return get_size_name(size) + " " + format("[%s]", d2h(&value, state.AddrSize).c_str());
 		return d2h(&value, size);
 	/*}else if (type == ParamTImmediateExt){
 		//msg_write("im");

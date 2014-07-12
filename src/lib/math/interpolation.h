@@ -27,7 +27,11 @@ public:
 	void _cdecl add(const T &p, float dt = 1.0f);
 	void _cdecl add2(const T &p, const T &v, float dt = 1.0f);
 	void _cdecl add3(const T &p, const T &v, float weight, float dt = 1.0f);
+	void _cdecl addv(const T p, float dt = 1.0f);
+	void _cdecl add2v(const T p, const T v, float dt = 1.0f);
+	void _cdecl add3v(const T p, const T v, float weight, float dt = 1.0f);
 	void _cdecl jump(const T &p, const T &v);
+	void _cdecl jumpv(const T p, const T v);
 	void _cdecl close(float dt = 1.0f);
 
 	void normalize();

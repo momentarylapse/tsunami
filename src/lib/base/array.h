@@ -23,11 +23,13 @@ class DynamicArray
 	void _cdecl append_p_single(void *p);
 	void _cdecl append_4_single(int x);
 	void _cdecl append_f_single(float x);
+	void _cdecl append_d_single(double x);
 	void _cdecl append_1_single(char x);
 	void _cdecl append_single(const void *d);
 	void _cdecl insert_p_single(void *p, int index);
 	void _cdecl insert_4_single(int x, int index);
 	void _cdecl insert_f_single(float x, int index);
+	void _cdecl insert_d_single(double x, int index);
 	void _cdecl insert_1_single(char x, int index);
 	void _cdecl insert_single(const void *d, int index);
 	void _cdecl delete_single(int index);

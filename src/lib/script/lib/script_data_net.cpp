@@ -71,7 +71,7 @@ void SIAddPackageNet()
 		class_add_func("__lshift__",		TypeVoid,	net_p(mf((void(Socket::*)(int))&Socket::operator<<)));
 			func_add_param("i",		TypeInt);
 		class_add_func("__lshift__",		TypeVoid,	net_p(mf((void(Socket::*)(float))&Socket::operator<<)));
-			func_add_param("f",		TypeFloat);
+			func_add_param("f",		TypeFloat32);
 		class_add_func("__lshift__",		TypeVoid,	net_p(mf((void(Socket::*)(bool))&Socket::operator<<)));
 			func_add_param("b",		TypeBool);
 		class_add_func("__lshift__",		TypeVoid,	net_p(mf((void(Socket::*)(char))&Socket::operator<<)));

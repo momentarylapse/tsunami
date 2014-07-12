@@ -34,10 +34,10 @@ void SIAddPackageSound()
 		class_add_func("set",							TypeVoid,	sound_p(mf(&Sound::SetData)));
 			func_add_param("pos",		TypeVector);
 			func_add_param("vel",		TypeVector);
-			func_add_param("r_min",		TypeFloat);
-			func_add_param("r_max",		TypeFloat);
-			func_add_param("speed",		TypeFloat);
-			func_add_param("volume",	TypeFloat);
+			func_add_param("r_min",		TypeFloat32);
+			func_add_param("r_max",		TypeFloat32);
+			func_add_param("speed",		TypeFloat32);
+			func_add_param("volume",	TypeFloat32);
 		class_add_func("play",							TypeVoid,	sound_p(mf(&Sound::Play)));
 			func_add_param("loop",		TypeBool);
 		class_add_func("stop",							TypeVoid,	sound_p(mf(&Sound::Stop)));
@@ -52,16 +52,16 @@ void SIAddPackageSound()
 		class_add_func("pause",									TypeVoid,	sound_p(mf(&Music::Pause)));
 			func_add_param("pause",		TypeBool);
 		class_add_func("setRate",							TypeVoid,	sound_p(mf(&Music::SetRate)));
-			func_add_param("rate",		TypeFloat);
+			func_add_param("rate",		TypeFloat32);
 	
 	// sound
 	add_func("EmitSound",									TypeSoundP,	sound_p(&SoundEmit));
 		func_add_param("filename",	TypeString);
 		func_add_param("pos",		TypeVector);
-		func_add_param("r_min",		TypeFloat);
-		func_add_param("r_max",		TypeFloat);
-		func_add_param("speed",		TypeFloat);
-		func_add_param("volume",	TypeFloat);
+		func_add_param("r_min",		TypeFloat32);
+		func_add_param("r_max",		TypeFloat32);
+		func_add_param("speed",		TypeFloat32);
+		func_add_param("volume",	TypeFloat32);
 		func_add_param("loop",		TypeBool);
 	add_func("LoadSound",									TypeSoundP,	sound_p(&SoundLoad));
 		func_add_param("filename",	TypeString);
@@ -77,8 +77,8 @@ void SIAddPackageSound()
 		func_add_param("channels",		TypeInt);
 		func_add_param("bits",			TypeInt);
 	
-	add_ext_var("VolumeMusic",		TypeFloat,		sound_p(&VolumeMusic));
-	add_ext_var("VolumeSounds",		TypeFloat,		sound_p(&VolumeSound));
+	add_ext_var("VolumeMusic",		TypeFloat32,		sound_p(&VolumeMusic));
+	add_ext_var("VolumeSounds",		TypeFloat32,		sound_p(&VolumeSound));
 }
 
 };

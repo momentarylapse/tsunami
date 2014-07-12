@@ -110,6 +110,12 @@ void DynamicArray::append_f_single(float x)
 	((float*)data)[num ++] = x;
 }
 
+void DynamicArray::append_d_single(double x)
+{
+	reserve(num + 1);
+	((double*)data)[num ++] = x;
+}
+
 void DynamicArray::append_1_single(char x)
 {
 	reserve(num + 1);
@@ -139,6 +145,12 @@ void DynamicArray::insert_f_single(float x, int index)
 {
 	insert_blank(index);
 	((float*)data)[index] = x;
+}
+
+void DynamicArray::insert_d_single(double x, int index)
+{
+	insert_blank(index);
+	((double*)data)[index] = x;
 }
 
 void DynamicArray::insert_1_single(char x, int index)

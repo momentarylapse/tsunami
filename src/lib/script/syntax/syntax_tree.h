@@ -107,6 +107,8 @@ struct Function
 	Type *return_type;
 	Type *literal_return_type;
 	bool is_extern, auto_implement;
+	bool is_pure;
+	int inline_no;
 	// for compilation...
 	int _var_size, _param_size;
 	int _logical_line_no;

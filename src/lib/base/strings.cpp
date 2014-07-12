@@ -473,6 +473,33 @@ string i2s(int i)
 	return r;
 }
 
+string i642s(long long i)
+{
+	string r;
+	int l=0;
+	bool m=false;
+	if (i<0){
+		i=-i;
+		m=true;
+	}
+	char a[128];
+	while (1){
+		a[l]=(i%10)+48;
+		l++;
+		i=(long long)(i/10);
+		if (i==0)
+			break;
+	}
+	if (m){
+		a[l]='-';
+		l++;
+	}
+	r.resize(l);
+	for (int j=0;j<l;j++)
+		r[l-j-1]=a[j];
+	return r;
+}
+
 // convert a float to a string
 string f2s(float f,int dez)
 {
@@ -503,7 +530,48 @@ string f2s(float f,int dez)
 }
 
 // convert a float to a string
+string f642s(double f,int dez)
+{
+	/*strcpy(str,"");
+	if (f<0){
+		strcat(str,"-");
+		f=-f;
+	}
+	strcat(str,i2s(int(f)));
+	if (dez>0){
+		strcat(str,",");
+		int e=1;
+		for (int i=0;i<dez;i++)
+			e*=10;
+		strcat(str,i2sl(int(f*(float)e)%e,dez));
+	}*/
+	if (dez > 9)
+		dez = 9;
+	char tmp[128], fmt[8];
+	strcpy(fmt, "%.0f");
+	fmt[2] += dez;
+	sprintf(tmp, fmt, f);
+	string t = string(tmp);
+	for (int i=0;i<t.num;i++)
+		if (t[i] == ',')
+			t[i] = '.';
+	return t;
+}
+
+// convert a float to a string
 string f2sf(float f)
+{
+	char tmp[128];
+	sprintf(tmp, "%f", f);
+	string t = string(tmp);
+	for (int i=0;i<t.num;i++)
+		if (t[i] == ',')
+			t[i] = '.';
+	return t;
+}
+
+// convert a float to a string
+string f642sf(double f)
 {
 	char tmp[128];
 	sprintf(tmp, "%f", f);
@@ -656,6 +724,20 @@ int string::_int() const
 	return res;
 }
 
+long long string::_int64() const
+{
+	bool minus=false;
+	long long res=0;
+	for (int i=0;i<num;i++){
+		if ((*this)[i]=='-')
+			minus=true;
+		else res=res*10+((*this)[i]-48);
+	}
+	if (minus)
+		res=-res;
+	return res;
+}
+
 int s2i(const string &s)
 {	return s._int();	}
 
@@ -688,9 +770,41 @@ float string::_float() const
 	return res;
 }
 
+// convert a string to a float
+double string::_float64() const
+{
+	bool minus=false;
+	int e=-1;
+	double res=0;
+	for (int i=0;i<num;i++){
+		if (e>0)
+			e*=10;
+		if ((*this)[i]=='-'){
+			minus=true;
+		}else{
+			if (((*this)[i]==',')||((*this)[i]=='.')){
+				e=1;
+			}else{
+				if((*this)[i]!='\n'){
+					if (e<0)
+						res=res*10+((*this)[i]-48);
+					else
+						res+=double((*this)[i]-48)/(double)e;
+				}
+			}
+		}
+	}
+	if (minus)
+		res=-res;
+	return res;
+}
+
 
 float s2f(const string &s)
 {	return s._float();	}
+
+double s2f64(const string &s)
+{	return s._float64();	}
 
 bool string::_bool() const
 {

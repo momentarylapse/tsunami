@@ -119,7 +119,7 @@ void SIAddPackageFile()
 		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteInt));
 			func_add_param("i",			TypeInt);
 		class_add_func("__lshift__",	TypeVoid,			mf(&CFile::WriteFloat));
-			func_add_param("x",			TypeFloat);
+			func_add_param("x",			TypeFloat32);
 		class_add_func("__lshift__",	TypeVoid,			mf(&CFile::WriteVector));
 			func_add_param("v",			TypeVector);
 		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteStr));

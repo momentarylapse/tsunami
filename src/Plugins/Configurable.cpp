@@ -45,7 +45,7 @@ string var_to_string(Script::Type *type, char *v)
 		r += i2s(*(int*)v);
 	}else if (type == Script::TypeChar){
 		r += i2s(*(char*)v);
-	}else if (type == Script::TypeFloat){
+	}else if (type == Script::TypeFloat32){
 		r += f2s(*(float*)v, 6);
 	}else if (type == Script::TypeBool){
 		r += (*(bool*)v) ? "true" : "false";
@@ -111,7 +111,7 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		*(int*)v = get_next(s, pos)._int();
 	}else if (type == Script::TypeChar){
 		*(char*)v = get_next(s, pos)._int();
-	}else if (type == Script::TypeFloat){
+	}else if (type == Script::TypeFloat32){
 		*(float*)v = get_next(s, pos)._float();
 	}else if (type == Script::TypeBool){
 		*(bool*)v = (get_next(s, pos) == "true");
@@ -266,7 +266,7 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 	Script::SyntaxTree *ps = config->type->owner;
 	Array<AutoConfigData> r;
 	foreach(Script::ClassElement &e, config->type->element)
-		if (e.type == Script::TypeFloat){
+		if (e.type == Script::TypeFloat32){
 			AutoConfigData a;
 			a.name = e.name;
 			a.value = (float*)((char*)config + e.offset);

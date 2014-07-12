@@ -43,27 +43,25 @@ void HuiPainter::setLineDash(Array<float> &dash, float offset)
 	cairo_set_dash(cr, (double*)d.data, d.num, offset);
 }
 
+color gdk2color(GdkColor c)
+{
+	return color(1, (float)c.red / 65535.0f, (float)c.green / 65535.0f, (float)c.blue / 65535.0f);
+}
+
 color HuiPainter::getThemeColor(int i)
 {
-	GtkStyle *style = gtk_widget_get_style(win->window);
-	int x = (i / 5);
-	int y = (i % 5);
-	GdkColor c;
+	GtkStyleContext *sc = gtk_widget_get_style_context(win->window);
+	int x = (i / 10);
+	int y = (i % 10);
+	GtkStateFlags state = (y == 1) ? GTK_STATE_FLAG_INSENSITIVE : GTK_STATE_FLAG_NORMAL;
+	GdkRGBA c;
 	if (x == 0)
-		c = style->fg[y];
+		gtk_style_context_get_color(sc, state, &c);
 	else if (x == 1)
-		c = style->bg[y];
+		gtk_style_context_get_background_color(sc, state, &c);
 	else if (x == 2)
-		c = style->light[y];
-	else if (x == 3)
-		c = style->mid[y];
-	else if (x == 4)
-		c = style->dark[y];
-	else if (x == 5)
-		c = style->base[y];
-	else if (x == 6)
-		c = style->text[y];
-	return color(1, (float)c.red / 65535.0f, (float)c.green / 65535.0f, (float)c.blue / 65535.0f);
+		gtk_style_context_get_border_color(sc, state, &c);
+	return color(c.alpha, c.red, c.green, c.blue);
 }
 
 void HuiPainter::clip(const rect &r)

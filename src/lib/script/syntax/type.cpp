@@ -329,7 +329,7 @@ string Type::var2str(void *p)
 {
 	if (this == TypeInt)
 		return i2s(*(int*)p);
-	else if (this == TypeFloat)
+	else if (this == TypeFloat32)
 		return f2s(*(float*)p, 3);
 	else if (this == TypeBool)
 		return b2s(*(bool*)p);

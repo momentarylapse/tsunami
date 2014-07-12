@@ -334,9 +334,11 @@ Function::Function(const string &_name, Type *_return_type)
 	_class = NULL;
 	is_extern = false;
 	auto_implement = false;
+	is_pure = false;
 	_param_size = 0;
 	_var_size = 0;
 	_logical_line_no = -1;
+	inline_no = -1;
 }
 
 int Function::get_var(const string &name)

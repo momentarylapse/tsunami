@@ -14,7 +14,6 @@
 #else
 	extern int HuiKeyID[256];
 	extern void *invisible_cursor;
-	extern const char *get_stock_id(int image);
 	extern void *get_gtk_image(const string &image, bool large);
 	extern void *get_gtk_image_pixbuf(const string &image);
 #endif

@@ -24,7 +24,7 @@ gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data)
 HuiMenuItem::HuiMenuItem(const string &title, const string &id) :
 	HuiControl(HuiKindMenuItem, id)
 {
-	widget = gtk_image_menu_item_new_with_label(get_lang_sys(id, get_lang_sys(id, title), false));
+	widget = gtk_menu_item_new_with_label(get_lang_sys(id, get_lang_sys(id, title), false));
 	/*GtkWidget *im = (GtkWidget*)get_gtk_image(image, false);
 	if (im)
 		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(i->widget), im);*/
@@ -39,9 +39,9 @@ HuiMenuItem::~HuiMenuItem()
 
 void HuiMenuItem::SetImage(const string &image)
 {
-	GtkWidget *im = (GtkWidget*)get_gtk_image(image, false);
+	/*GtkWidget *im = (GtkWidget*)get_gtk_image(image, false);
 	if (im)
-		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(widget), im);
+		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(widget), im);*/
 }
 
 #endif

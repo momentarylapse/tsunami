@@ -56,6 +56,7 @@ extern bool HuiRunning;
 
 
 
+#include "HuiApplication.h"
 #include "hui_main.h"
 #include "hui_input.h"
 #include "HuiMenu.h"

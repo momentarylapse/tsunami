@@ -25,7 +25,8 @@ HUI_OBJ  = $(HUI_DIR)/hui.o \
  $(HUI_DIR)/Controls/HuiToolItemButtonGtk.o $(HUI_DIR)/Controls/HuiToolItemMenuButtonGtk.o \
  $(HUI_DIR)/Controls/HuiToolItemSeparatorGtk.o $(HUI_DIR)/Controls/HuiToolItemToggleButtonGtk.o \
  $(HUI_DIR)/Controls/HuiMenuItemGtk.o $(HUI_DIR)/Controls/HuiMenuItemSubmenuGtk.o \
- $(HUI_DIR)/Controls/HuiMenuItemSeparatorGtk.o $(HUI_DIR)/Controls/HuiMenuItemToggleGtk.o
+ $(HUI_DIR)/Controls/HuiMenuItemSeparatorGtk.o $(HUI_DIR)/Controls/HuiMenuItemToggleGtk.o \
+ $(HUI_DIR)/HuiApplication.o
 HUI_CXXFLAGS =  `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
 
 
@@ -41,6 +42,9 @@ $(HUI_DIR)/hui_main_gtk.o : $(HUI_DIR)/hui_main_gtk.cpp
 
 $(HUI_DIR)/hui_main_win.o : $(HUI_DIR)/hui_main_win.cpp
 	$(CPP) -c $(HUI_DIR)/hui_main_win.cpp -o $@ $(HUI_CXXFLAGS)
+
+$(HUI_DIR)/HuiApplication.o : $(HUI_DIR)/HuiApplication.cpp
+	$(CPP) -c $(HUI_DIR)/HuiApplication.cpp -o $@ $(HUI_CXXFLAGS)
 
 $(HUI_DIR)/hui_common_dlg.o : $(HUI_DIR)/hui_common_dlg.cpp
 	$(CPP) -c $(HUI_DIR)/hui_common_dlg.cpp -o $@ $(HUI_CXXFLAGS)

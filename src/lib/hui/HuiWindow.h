@@ -35,6 +35,7 @@ struct HuiInputData
 {
 	// mouse
 	float x, y, dx, dy, dz;	// position, change
+	bool inside, inside_smart;
 	bool lb,mb,rb;				// buttons
 	int row, column;
 	// keyboard
@@ -113,6 +114,8 @@ public:
 
 	// events by overwriting
 	virtual void _cdecl OnMouseMove(){}
+	virtual void _cdecl OnMouseEnter(){}
+	virtual void _cdecl OnMouseLeave(){}
 	virtual void _cdecl OnLeftButtonDown(){}
 	virtual void _cdecl OnMiddleButtonDown(){}
 	virtual void _cdecl OnRightButtonDown(){}

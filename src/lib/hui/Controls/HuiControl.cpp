@@ -302,6 +302,10 @@ void HuiControl::Notify(const string &message, bool is_default)
 			win->OnMouseMove();
 		else if (message == "hui:mouse-wheel")
 			win->OnMouseWheel();
+		else if (message == "hui:mouse-enter")
+			win->OnMouseEnter();
+		else if (message == "hui:mouse-leave")
+			win->OnMouseLeave();
 		else if (message == "hui:left-button-down")
 			win->OnLeftButtonDown();
 		else if (message == "hui:left-button-up")

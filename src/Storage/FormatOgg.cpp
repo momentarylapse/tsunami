@@ -218,7 +218,7 @@ void FormatOgg::LoadTrack(Track *t, const string & filename, int offset, int lev
 		string s = *ptr;
 		if (s.find("=") > 0){
 			Tag tag;
-			tag.key = s.substr(0, s.find("="));
+			tag.key = s.substr(0, s.find("=")).lower();
 			tag.value = s.substr(s.find("=") + 1, -1);
 			t->root->tag.add(tag);
 		}

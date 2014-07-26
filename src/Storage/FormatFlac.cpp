@@ -8,6 +8,7 @@
 #include "FormatFlac.h"
 #include "../Tsunami.h"
 #include "../View/Helper/Progress.h"
+#include "../Stuff/Log.h"
 #include <math.h>
 
 #include <FLAC/all.h>
@@ -52,9 +53,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
 {
-	msg_write("--  metadata  --");
 	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO){
-		msg_write("stream info");
 		flac_freq = metadata->data.stream_info.sample_rate;
 		flac_bits = metadata->data.stream_info.bits_per_sample;
 		flac_format = format_for_bits(flac_bits);
@@ -63,10 +62,14 @@ void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stre
 		flac_channels = metadata->data.stream_info.channels;
 		//printf("%d %d %d %d\n", flac_channels, flac_bits, (int)flac_samples, flac_freq);
 	}else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT){
-		msg_write("comment");
 		for (int i=0;i<(int)metadata->data.vorbis_comment.num_comments;i++){
-			msg_write((char*)metadata->data.vorbis_comment.comments[i].entry);
+			string s = (char*)metadata->data.vorbis_comment.comments[i].entry;
+			int pos = s.find("=");
+			if (pos >= 0)
+				flac_track->root->AddTag(s.head(pos).lower(), s.tail(s.num - pos - 1));
 		}
+	}else{
+		tsunami->log->Warning("flac_metadata_callback: unhandled type: " + i2s(metadata->type));
 	}
 }
 
@@ -107,8 +110,10 @@ void FormatFlac::LoadTrack(Track *t, const string & filename, int offset, int le
 
 	FLAC__StreamDecoder *decoder = FLAC__stream_decoder_new();
 	if (!decoder){
-		msg_error("flac: decoder_new()");
+		tsunami->log->Error("flac: decoder_new()");
 	}
+
+	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO | FLAC__METADATA_TYPE_VORBIS_COMMENT));
 
 	FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_file(
 							decoder,
@@ -117,14 +122,16 @@ void FormatFlac::LoadTrack(Track *t, const string & filename, int offset, int le
 							flac_metadata_callback,
 							flac_error_callback, NULL);
 	if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
-		fprintf(stderr, "ERROR: initializing decoder: %s\n", FLAC__StreamDecoderInitStatusString[init_status]);
+		tsunami->log->Error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
 		ok = false;
 	}
 
 	if (ok){
 		ok = FLAC__stream_decoder_process_until_end_of_stream(decoder);
-		fprintf(stderr, "decoding: %s\n", ok? "succeeded" : "FAILED");
-		fprintf(stderr, "   state: %s\n", FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+		if (!ok){
+			tsunami->log->Error("flac: decoding FAILED");
+			tsunami->log->Error(string("   state: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+		}
 	}
 	FLAC__stream_decoder_delete(decoder);
 
@@ -161,7 +168,7 @@ void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 	bool ok = true;
 	FLAC__StreamEncoderInitStatus init_status;
-	FLAC__StreamMetadata *metadata[2];
+	FLAC__StreamMetadata *metadata[1];
 	FLAC__StreamMetadata_VorbisComment_Entry entry;
 
 	int channels = 2;
@@ -169,7 +176,7 @@ void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	// allocate the encoder
 	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
 	if (!encoder){
-		fprintf(stderr, "ERROR: allocating encoder\n");
+		tsunami->log->Error("flac: allocating encoder");
 		return;
 	}
 
@@ -180,31 +187,27 @@ void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	ok &= FLAC__stream_encoder_set_sample_rate(encoder, a->sample_rate);
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b->num);
 
-	// now add some metadata; we'll add some tags and a padding block
+	// metadata
 	if (ok){
-		if (
-			(metadata[0] = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT)) == NULL ||
-			(metadata[1] = FLAC__metadata_object_new(FLAC__METADATA_TYPE_PADDING)) == NULL ||
-			/* there are many tag (vorbiscomment) functions but these are convenient for this particular use: */
-			!FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, "ARTIST", "test") ||
-			!FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, /*copy=*/false) || /* copy=false: let metadata object take control of entry's allocated string */
-			!FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, "YEAR", "1984") ||
-			!FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, /*copy=*/false)
-		) {
-			fprintf(stderr, "ERROR: out of memory or tag error\n");
+		metadata[0] = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
+		if (metadata[0]){
+			foreach(Tag &t, a->tag){
+				FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, t.key.upper().c_str(), t.value.c_str());
+				FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, true);
+			}
+		}else{
+			tsunami->log->Error("flac: could not add metadata");
 			ok = false;
 		}
 
-		metadata[1]->length = 1234; /* set the padding length */
-
-		ok = FLAC__stream_encoder_set_metadata(encoder, metadata, 2);
+		ok = FLAC__stream_encoder_set_metadata(encoder, metadata, 1);
 	}
 
 	// initialize encoder
 	if (ok){
 		init_status = FLAC__stream_encoder_init_file(encoder, filename.c_str(), flac_progress_callback, /*client_data=*/(void*)(long)b->num);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
-			fprintf(stderr, "ERROR: initializing encoder: %s\n", FLAC__StreamEncoderInitStatusString[init_status]);
+			tsunami->log->Error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
 			ok = false;
 		}
 	}
@@ -231,12 +234,13 @@ void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 	ok &= FLAC__stream_encoder_finish(encoder);
 
-	fprintf(stderr, "encoding: %s\n", ok? "succeeded" : "FAILED");
-	fprintf(stderr, "   state: %s\n", FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
+	if (!ok){
+		tsunami->log->Error("flac: encoding: FAILED");
+		tsunami->log->Error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
+	}
 
-	/* now that encoding is finished, the metadata can be freed */
-//	FLAC__metadata_object_delete(metadata[0]);
-//	FLAC__metadata_object_delete(metadata[1]);
+	// now that encoding is finished, the metadata can be freed
+	FLAC__metadata_object_delete(metadata[0]);
 
 	FLAC__stream_encoder_delete(encoder);
 }

@@ -32,6 +32,8 @@ AudioFileDialog::AudioFileDialog(AudioView *v, AudioFile *a) :
 
 	LoadData();
 
+	SetTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
+
 	EventMX("tags", "hui:select", this, &AudioFileDialog::OnTagsSelect);
 	EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
 	EventM("add_tag", this, &AudioFileDialog::OnAddTag);

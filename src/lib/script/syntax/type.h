@@ -65,6 +65,7 @@ public:
 	ClassFunction *GetDestructor();
 	ClassFunction *GetAssign();
 	ClassFunction *GetVirtualFunction(int virtual_index);
+	ClassFunction *GetGet(Type *index);
 	void LinkVirtualTable();
 	void LinkExternalVirtualTable(void *p);
 	void *CreateInstance();

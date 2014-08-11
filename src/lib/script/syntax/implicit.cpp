@@ -27,7 +27,7 @@ void SyntaxTree::AutoImplementAddChildConstructors(Command *self, Function *f, T
 		if (!ff)
 			continue;
 		Command *p = shift_command(self, true, e.offset, e.type);
-		Command *c = add_command_classfunc(t, ff, ref_command(p));
+		Command *c = add_command_classfunc(ff, ref_command(p));
 		f->block->command.add(c);
 	}
 }
@@ -39,22 +39,18 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Type *t, bool allo
 	Command *self = add_command_local_var(f->get_var("self"), t->GetPointer());
 
 	if (t->is_super_array){
-		foreach(ClassFunction &ff, t->function)
-			if (ff.name == "__mem_init__"){
-				int nc = AddConstant(TypeInt);
-				Constants[nc].setInt(t->parent->size);
-				Command *c = add_command_classfunc(t, &ff, self);
-				c->param[0] = add_command_const(nc);
-				c->num_params = 1;
-				f->block->command.add(c);
-			}
+		int nc = AddConstant(TypeInt);
+		Constants[nc].setInt(t->parent->size);
+		Command *c = add_command_classfunc(t->GetFunc("__mem_init__", TypeVoid, 1), self);
+		c->set_param(0, add_command_const(nc));
+		f->block->command.add(c);
 	}else{
 
 		// parent constructor
 		if ((t->parent) && (allow_parent_constructor)){
 			ClassFunction *ff = t->parent->GetDefaultConstructor();
 			if (ff){
-				Command *c = add_command_classfunc(t, ff, cp_command(self));
+				Command *c = add_command_classfunc(ff, cp_command(self));
 				f->block->command.add(c);
 			}
 		}
@@ -79,10 +75,9 @@ void SyntaxTree::AutoImplementComplexConstructor(Function *f, Type *t)
 	Command *self = add_command_local_var(f->get_var("self"), t->GetPointer());
 
 	// parent constructor
-	Command *c = add_command_classfunc(t, pcc, cp_command(self));
+	Command *c = add_command_classfunc(pcc, cp_command(self));
 	for (int i=0;i<pcc->param_type.num;i++)
-		c->param[i] = add_command_local_var(i, pcc->param_type[i]);
-	c->num_params = pcc->param_type.num;
+		c->set_param(i, add_command_local_var(i, pcc->param_type[i]));
 	f->block->command.add(c);
 
 	// add vtable reference
@@ -103,7 +98,7 @@ void SyntaxTree::AutoImplementDestructor(Function *f, Type *t)
 	if (t->is_super_array){
 		ClassFunction *f_clear = t->GetFunc("clear", TypeVoid, 0);
 		if (f_clear){
-			Command *c = add_command_classfunc(t, f_clear, self);
+			Command *c = add_command_classfunc(f_clear, self);
 			f->block->command.add(c);
 		}
 	}else{
@@ -117,7 +112,7 @@ void SyntaxTree::AutoImplementDestructor(Function *f, Type *t)
 			if (!ff)
 				continue;
 			Command *p = shift_command(self, true, e.offset, e.type);
-			Command *c = add_command_classfunc(t, ff, ref_command(p));
+			Command *c = add_command_classfunc(ff, ref_command(p));
 			f->block->command.add(c);
 		}
 
@@ -125,7 +120,7 @@ void SyntaxTree::AutoImplementDestructor(Function *f, Type *t)
 		if (t->parent){
 			ClassFunction *ff = t->parent->GetDestructor();
 			if (ff){
-				Command *c = add_command_classfunc(t, ff, cp_command(self));
+				Command *c = add_command_classfunc(ff, cp_command(self), true);
 				f->block->command.add(c);
 			}
 		}
@@ -142,17 +137,15 @@ void SyntaxTree::AutoImplementAssign(Function *f, Type *t)
 	if (t->is_super_array){
 
 		ClassFunction *f_resize = t->GetFunc("resize", TypeVoid, 1);
-		if (!f_resize){
+		if (!f_resize)
 			DoError(format("%s.__assign__(): no %s.resize() found", t->name.c_str(), t->name.c_str()));
-			return;
-		}
 
 		// self.resize(other.num)
 		Command *other_num = shift_command(other, false, config.PointerSize, TypeInt);
 
-		Command *cmd_resize = add_command_classfunc(t, f_resize, cp_command(self));
-		cmd_resize->num_params = 1;
-		cmd_resize->param[0] = other_num;
+		Command *cmd_resize = add_command_classfunc(f_resize, cp_command(self));
+		cmd_resize->set_num_params(1);
+		cmd_resize->set_param(0, other_num);
 		f->block->command.add(cmd_resize);
 
 		// for int i, 0, other.num
@@ -171,14 +164,14 @@ void SyntaxTree::AutoImplementAssign(Function *f, Type *t)
 		f->block->command.add(cmd_assign0);
 
 		// while(for_var < self.num)
-		Command *cmd_cmp = add_command_operator(for_var, cp_command_deep(other_num), OperatorIntSmaller);
+		Command *cmd_cmp = add_command_operator(for_var, cp_command(other_num), OperatorIntSmaller);
 
 		Command *cmd_while = add_command_compilerfunc(CommandFor);
-		cmd_while->param[0] = cmd_cmp;
+		cmd_while->set_param(0, cmd_cmp);
 		f->block->command.add(cmd_while);
 
 		Block *b = AddBlock();
-		Command *cb = AddCommand(KindBlock, b->index, TypeVoid);
+		Command *cb = add_command_block(b);
 
 		// el := self.data[for_var]
 		Command *deref_self = deref_command(cp_command(self));
@@ -223,11 +216,11 @@ void SyntaxTree::AutoImplementAssign(Function *f, Type *t)
 		Command *cmd_cmp = add_command_operator(for_var, c_num, OperatorIntSmaller);
 
 		Command *cmd_while = add_command_compilerfunc(CommandFor);
-		cmd_while->param[0] = cmd_cmp;
+		cmd_while->set_param(0, cmd_cmp);
 		f->block->command.add(cmd_while);
 
 		Block *b = AddBlock();
-		Command *cb = AddCommand(KindBlock, b->index, TypeVoid);
+		Command *cb = add_command_block(b);
 
 		// el := self.data[for_var]
 		Command *cmd_el = add_command_parray(self, for_var, t->parent);
@@ -302,11 +295,11 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Type *t)
 		Command *cmd_cmp = add_command_operator(for_var, self_num, OperatorIntSmaller);
 
 		Command *cmd_while = add_command_compilerfunc(CommandFor);
-		cmd_while->param[0] = cmd_cmp;
+		cmd_while->set_param(0, cmd_cmp);
 		f->block->command.add(cmd_while);
 
 		Block *b = AddBlock();
-		Command *cb = AddCommand(KindBlock, b->index, TypeVoid);
+		Command *cb = add_command_block(b);
 
 		// el := self.data[for_var]
 		Command *deref_self = deref_command(cp_command(self));
@@ -314,7 +307,7 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Type *t)
 		Command *cmd_el = add_command_parray(self_data, for_var, t->parent);
 
 		// __delete__
-		Command *cmd_delete = add_command_classfunc(t, f_del, ref_command(cmd_el));
+		Command *cmd_delete = add_command_classfunc(f_del, ref_command(cmd_el));
 		b->command.add(cmd_delete);
 
 		// for_var ++
@@ -324,7 +317,7 @@ void SyntaxTree::AutoImplementArrayClear(Function *f, Type *t)
 	}
 
 	// clear
-	Command *cmd_clear = add_command_classfunc(t, t->GetFunc("__mem_clear__", TypeVoid, 0), self);
+	Command *cmd_clear = add_command_classfunc(t->GetFunc("__mem_clear__", TypeVoid, 0), self);
 	f->block->command.add(cmd_clear);
 }
 
@@ -361,11 +354,11 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Type *t)
 		Command *cmd_cmp = add_command_operator(for_var, self_num, OperatorIntSmaller);
 
 		Command *cmd_while = add_command_compilerfunc(CommandFor);
-		cmd_while->param[0] = cmd_cmp;
+		cmd_while->set_param(0, cmd_cmp);
 		f->block->command.add(cmd_while);
 
 		Block *b = AddBlock();
-		Command *cb = AddCommand(KindBlock, b->index, TypeVoid);
+		Command *cb = add_command_block(b);
 
 		// el := self.data[for_var]
 		Command *deref_self = deref_command(cp_command(self));
@@ -373,7 +366,7 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Type *t)
 		Command *cmd_el = add_command_parray(self_data, for_var, t->parent);
 
 		// __delete__
-		Command *cmd_delete = add_command_classfunc(t, f_del, ref_command(cmd_el));
+		Command *cmd_delete = add_command_classfunc(f_del, ref_command(cmd_el));
 		b->command.add(cmd_delete);
 
 		// ...for_var += 1
@@ -383,9 +376,8 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Type *t)
 	}
 
 	// resize
-	Command *c_resize = add_command_classfunc(t, t->GetFunc("__mem_resize__", TypeVoid, 1), self);
-	c_resize->num_params = 1;
-	c_resize->param[0] = num;
+	Command *c_resize = add_command_classfunc(t->GetFunc("__mem_resize__", TypeVoid, 1), self);
+	c_resize->set_param(0, num);
 	f->block->command.add(c_resize);
 
 	// new...
@@ -399,11 +391,11 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Type *t)
 		Command *cmd_cmp = add_command_operator(for_var, self_num, OperatorIntSmaller);
 
 		Command *cmd_while = add_command_compilerfunc(CommandFor);
-		cmd_while->param[0] = cmd_cmp;
+		cmd_while->set_param(0, cmd_cmp);
 		f->block->command.add(cmd_while);
 
 		Block *b = AddBlock();
-		Command *cb = AddCommand(KindBlock, b->index, TypeVoid);
+		Command *cb = add_command_block(b);
 
 		// el := self.data[for_var]
 		Command *deref_self = deref_command(cp_command(self));
@@ -411,7 +403,7 @@ void SyntaxTree::AutoImplementArrayResize(Function *f, Type *t)
 		Command *cmd_el = add_command_parray(self_data, for_var, t->parent);
 
 		// __init__
-		Command *cmd_init = add_command_classfunc(t, f_init, ref_command(cmd_el));
+		Command *cmd_init = add_command_classfunc(f_init, ref_command(cmd_el));
 		b->command.add(cmd_init);
 
 		// ...for_var += 1
@@ -440,14 +432,13 @@ void SyntaxTree::AutoImplementArrayRemove(Function *f, Type *t)
 		Command *cmd_el = add_command_parray(self_data, index, t->parent);
 
 		// __delete__
-		Command *cmd_delete = add_command_classfunc(t, f_del, ref_command(cmd_el));
+		Command *cmd_delete = add_command_classfunc(f_del, ref_command(cmd_el));
 		f->block->command.add(cmd_delete);
 	}
 
 	// resize
-	Command *c_remove = add_command_classfunc(t, t->GetFunc("__mem_remove__", TypeVoid, 1), self);
-	c_remove->num_params = 1;
-	c_remove->param[0] = index;
+	Command *c_remove = add_command_classfunc(t->GetFunc("__mem_remove__", TypeVoid, 1), self);
+	c_remove->set_param(0, index);
 	f->block->command.add(c_remove);
 }
 
@@ -467,9 +458,8 @@ void SyntaxTree::AutoImplementArrayAdd(Function *f, Type *t)
 	Constants[nc].setInt(1);
 	Command *cmd_1 = add_command_const(nc);
 	Command *cmd_add = add_command_operator(self_num, cmd_1, OperatorIntAdd);
-	Command *cmd_resize = add_command_classfunc(t, t->GetFunc("resize", TypeVoid, 1), self);
-	cmd_resize->num_params = 1;
-	cmd_resize->param[0] = cmd_add;
+	Command *cmd_resize = add_command_classfunc(t->GetFunc("resize", TypeVoid, 1), self);
+	cmd_resize->set_param(0, cmd_add);
 	f->block->command.add(cmd_resize);
 
 

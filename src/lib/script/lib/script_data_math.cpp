@@ -723,12 +723,12 @@ void SIAddPackageMath()
 		class_add_func("__isub__",			TypeVoid,			any_p(mf(&Any::_sub)));
 			func_add_param("a",			TypeAny);
 		class_add_func("clear",	TypeVoid, any_p(mf(&Any::clear)));
-		class_add_func("get",			TypeAny,			any_p(mf(&Any::get)));
+		class_add_func("__get__",			TypeAny,			any_p(mf(&Any::get)));
 			func_add_param("key",			TypeString);
 		class_add_func("hset",			TypeVoid,			any_p(mf(&Any::hset)));
 			func_add_param("key",			TypeString);
 			func_add_param("value",			TypeAny);
-		class_add_func("at",			TypeAny,			any_p(mf(&Any::at)));
+		class_add_func("__get__",			TypeAny,			any_p(mf(&Any::at)));
 			func_add_param("index",			TypeInt);
 		class_add_func("aset",			TypeVoid,			any_p(mf(&Any::aset)));
 			func_add_param("index",			TypeString);

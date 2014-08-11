@@ -66,11 +66,10 @@ Exception::Exception(const string &_message, const string &_expression, int _lin
 	if (_expression.num > 0)
 		message += "\"" + _expression + "\": ";
 	message += _message;
-	if (line >= 0)
-		message += "\nline " + i2s(_line);
-
 	line = _line;
 	column = _column;
+	if (line >= 0)
+		message += "\nline " + i2s(line);
 }
 
 Exception::~Exception(){}

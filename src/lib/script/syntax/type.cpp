@@ -158,6 +158,20 @@ ClassFunction *Type::GetAssign()
 	return GetFunc("__assign__", TypeVoid, 1);
 }
 
+ClassFunction *Type::GetGet(Type *index)
+{
+	foreach(ClassFunction &cf, function){
+		if (cf.name != "__get__")
+			continue;
+		if (cf.param_type.num != 1)
+			continue;
+		if (cf.param_type[0] != index)
+			continue;
+		return &cf;
+	}
+	return NULL;
+}
+
 ClassFunction *Type::GetVirtualFunction(int virtual_index)
 {
 	foreach(ClassFunction &f, function)

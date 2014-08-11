@@ -1609,11 +1609,9 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 
 	// special new-operator work-around
 	if ((com->kind == KindCompilerFunction) && (com->link_no == CommandNew)){
-		if (com->num_params > 0){
-			if (!com->param[0]->instance)
-				com->num_params = 0;
-		}else
+		if (com->num_params == 0)
 			com->param[0] = NULL;
+		com->num_params = 0;
 	}
 
 	// compile parameters

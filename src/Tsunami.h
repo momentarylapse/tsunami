@@ -1,20 +1,17 @@
 /*
  * Tsunami.h
  *
- *  Created on: 21.03.2012
+ *  Created on: 13.08.2014
  *      Author: michi
  */
 
 #ifndef TSUNAMI_H_
 #define TSUNAMI_H_
 
-#include "Stuff/Observer.h"
 #include "lib/hui/hui.h"
 
-class Observer;
-class HuiWindow;
+
 class AudioFile;
-class AudioView;
 class PluginManager;
 class Slider;
 class Log;
@@ -24,88 +21,25 @@ class AudioRenderer;
 class Storage;
 class Progress;
 class Clipboard;
-class SideBar;
-class BottomBar;
+class TsunamiWindow;
 
-class Tsunami : public Observer, public HuiWindow
+class Tsunami : public HuiApplication
 {
 public:
 	Tsunami(Array<string> arg);
 	virtual ~Tsunami();
 
+	virtual void onStartup(Array<string> arg);
+
 	bool HandleArguments(Array<string> arg);
 	void LoadKeyCodes();
-	int Run();
 
-	void OnAbout();
-	void OnSendBugReport();
+	void CreateWindow();
 
-	void OnUpdate(Observable *o, const string &message);
-	void OnCommand(const string &id);
+	TsunamiWindow *win;
 
-	void OnEvent();
-
-	void OnNew();
-	void OnOpen();
-	void OnSave();
-	void OnSaveAs();
-
-
-	void OnCopy();
-	void OnPaste();
-	void OnDelete();
-	void OnExport();
-	void OnUndo();
-	void OnRedo();
-	void OnAddTrack();
-	void OnAddTimeTrack();
-	void OnAddMidiTrack();
-	void OnDeleteTrack();
-	void OnSubFromSelection();
-	void OnInsertAdded();
-	void OnRemoveAdded();
-	void OnTrackImport();
-	void OnAddLevel();
-	void OnDeleteLevel();
-	void OnSampleManager();
-	void OnMixingConsole();
-	void OnFxConsole();
-	void OnSubImport();
-	void OnAudioProperties();
-	void OnTrackProperties();
-	void OnSubProperties();
-	void OnSettings();
-	void OnCloseFile();
-	void OnPlay();
-	void OnPlayLoop();
-	void OnPause();
-	void OnStop();
-	void OnRecord();
-	void OnCurLevel();
-	void OnCurLevelUp();
-	void OnCurLevelDown();
-	void OnViewPeaksMax();
-	void OnViewPeaksMean();
-	void OnZoomIn();
-	void OnZoomOut();
-	void OnViewMono();
-	void OnViewStereo();
-	void OnViewOptimal();
-	void OnSelectNone();
-	void OnSelectAll();
-	void OnShowLog();
-	void OnFindAndExecutePlugin();
-	void OnExit();
-
-	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
-	bool AllowTermination();
-	bool Save();
-
-	void UpdateMenu();
 
 	AudioFile *audio;
-
-	AudioView *view;
 
 	Storage *storage;
 
@@ -118,10 +52,8 @@ public:
 
 	PluginManager *plugin_manager;
 	Clipboard *clipboard;
-
-	SideBar *side_bar;
-	BottomBar *bottom_bar;
 };
+
 
 extern Tsunami *tsunami;
 

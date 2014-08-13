@@ -13,6 +13,7 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../Dialog/SynthesizerDialog.h"
 #include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
 #include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"
 #include "../../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
@@ -117,14 +118,14 @@ void TrackDialog::OnPanning()
 
 void TrackDialog::OnSynthesizer()
 {
-	Synthesizer *s = ChooseSynthesizer(tsunami, track->synth->name);
+	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
 	if (s)
 		track->SetSynthesizer(s);
 }
 
 void TrackDialog::OnConfigSynthesizer()
 {
-	tsunami->bottom_bar->Choose(BottomBar::SYNTH_CONSOLE);
+	tsunami->win->bottom_bar->Choose(BottomBar::SYNTH_CONSOLE);
 }
 
 void TrackDialog::OnPitch()

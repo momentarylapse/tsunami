@@ -16,11 +16,12 @@ class ActionTrackMoveSample;
 class AudioOutput;
 class AudioInput;
 class AudioRenderer;
+class TsunamiWindow;
 
 class AudioView : public Observer, public Observable
 {
 public:
-	AudioView(HuiWindow *parent, AudioFile *audio, AudioOutput *output, AudioInput *input, AudioRenderer *renderer);
+	AudioView(TsunamiWindow *parent, AudioFile *audio, AudioOutput *output, AudioInput *input, AudioRenderer *renderer);
 	virtual ~AudioView();
 
 	void CheckConsistency();
@@ -185,6 +186,8 @@ public:
 	int beat_partition;
 	int chord_mode;
 	int chord_inversion;
+
+	TsunamiWindow *win;
 
 	AudioFile *audio;
 

@@ -28,6 +28,7 @@
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
@@ -320,7 +321,7 @@ void AudioFile::UpdatePeaks(int mode)
 
 void AudioFile::PostActionUpdate()
 {
-	UpdatePeaks(tsunami->view->peak_mode);
+	UpdatePeaks(tsunami->win->view->peak_mode);
 }
 
 int AudioFile::GetNumSelectedSamples()

@@ -8,6 +8,7 @@
 #include "Clipboard.h"
 #include "../Data/AudioFile.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "../View/AudioView.h"
 #include "../Action/Track/Sample/ActionTrackPasteAsSample.h"
 #include <assert.h>
@@ -41,12 +42,12 @@ void Clipboard::Copy(AudioFile *a)
 		return;
 	Clear();
 
-	assert(a == tsunami->view->cur_track->root);
+	assert(a == tsunami->win->view->cur_track->root);
 
 	sample_rate = a->sample_rate;
 
 	buf = new BufferBox;
-	*buf = tsunami->view->cur_track->ReadBuffers(tsunami->view->cur_level, tsunami->view->sel_range);
+	*buf = tsunami->win->view->cur_track->ReadBuffers(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
 	buf->make_own();
 
 	Notify();
@@ -59,9 +60,9 @@ void Clipboard::Paste(AudioFile *a)
 	if (a->used){
 		int index = a->get_sample_by_uid(ref_uid);
 		if (index >= 0){
-			tsunami->view->cur_track->AddSample(tsunami->view->sel_range.start(), index);
+			tsunami->win->view->cur_track->AddSample(tsunami->win->view->sel_range.start(), index);
 		}else{
-			a->Execute(new ActionTrackPasteAsSample(tsunami->view->cur_track, tsunami->view->sel_range.start(), buf));
+			a->Execute(new ActionTrackPasteAsSample(tsunami->win->view->cur_track, tsunami->win->view->sel_range.start(), buf));
 			ref_uid = a->sample.back()->uid;
 		}
 	}else{
@@ -70,7 +71,7 @@ void Clipboard::Paste(AudioFile *a)
 		BufferBox dest = a->track[0]->GetBuffers(0, Range(0, buf->num));
 		dest.set(*buf, 0, 1.0f);
 		a->InvalidateAllPeaks();
-		a->UpdatePeaks(tsunami->view->peak_mode);
+		a->UpdatePeaks(tsunami->win->view->peak_mode);
 		a->action_manager->Enable(true);
 	}
 }
@@ -82,6 +83,6 @@ bool Clipboard::HasData()
 
 bool Clipboard::CanCopy(AudioFile *a)
 {
-	return !tsunami->view->sel_range.empty();// || (a->GetNumSelectedSamples() > 0);
+	return !tsunami->win->view->sel_range.empty();// || (a->GetNumSelectedSamples() > 0);
 }
 

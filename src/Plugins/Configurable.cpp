@@ -8,6 +8,7 @@
 
 #include "Configurable.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "../lib/script/script.h"
 #include "PluginManager.h"
 #include "../Stuff/Log.h"
@@ -335,7 +336,7 @@ class ConfigurationDialog : public HuiDialog
 {
 public:
 	ConfigurationDialog(Configurable *c, PluginData *pd, HuiPanel *panel) :
-		HuiDialog(c->name, 300, 100, tsunami, false)
+		HuiDialog(c->name, 300, 100, tsunami->win, false)
 	{
 		config = c;
 		AddControlTable("", 0, 0, 1, 3, "root-table");

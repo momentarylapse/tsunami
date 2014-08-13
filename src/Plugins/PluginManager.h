@@ -26,7 +26,7 @@ public:
 	virtual ~PluginManager();
 
 	void LinkAppScriptData();
-	void AddPluginsToMenu();
+	void AddPluginsToMenu(HuiWindow *win);
 	void FindAndExecutePlugin();
 
 	void OnMenuExecutePlugin();

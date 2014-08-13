@@ -7,6 +7,7 @@
 
 #include "FormatRaw.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
@@ -27,7 +28,7 @@ FormatRaw::~FormatRaw()
 RawConfigData GetRawConfigData()
 {
 	RawConfigData data;
-	RawConfigDialog *dlg = new RawConfigDialog(&data, tsunami);
+	RawConfigDialog *dlg = new RawConfigDialog(&data, tsunami->win);
 	dlg->Run();
 	return data;
 }

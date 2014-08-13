@@ -7,6 +7,7 @@
 
 #include "PluginManager.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "FastFourierTransform.h"
 #include "ExtendedBufferBox.h"
 #include "../View/Helper/Slider.h"
@@ -83,10 +84,8 @@ void GlobalRemoveSliders(HuiPanel *panel)
 
 bool GlobalAllowTermination()
 {
-	return tsunami->AllowTermination();
+	return tsunami->win->AllowTermination();
 }
-
-HuiWindow *GlobalMainWin = NULL;
 
 void PluginManager::LinkAppScriptData()
 {
@@ -94,15 +93,13 @@ void PluginManager::LinkAppScriptData()
 	Script::config.Directory = "";
 
 	// api definition
-	GlobalMainWin = dynamic_cast<HuiWindow*>(tsunami);
-	Script::LinkExternal("MainWin", &GlobalMainWin);
 	Script::LinkExternal("audio", &tsunami->audio);
 	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
 	Script::LinkExternal("renderer", &tsunami->renderer);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
-	Script::LinkExternal("view", &tsunami->view);
+	Script::LinkExternal("view", &tsunami->win->view);
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
@@ -341,12 +338,12 @@ void find_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
 	}
 }
 
-void PluginManager::AddPluginsToMenu()
+void PluginManager::AddPluginsToMenu(HuiWindow *win)
 {
 	msg_db_f("AddPluginsToMenu", 2);
 	Script::Init();
 
-	HuiMenu *m = tsunami->GetMenu();
+	HuiMenu *m = win->GetMenu();
 
 	// "Buffer"
 	find_plugins_in_dir("Buffer/Channels/", this, m->GetSubMenuByID("menu_plugins_channels"));
@@ -364,7 +361,7 @@ void PluginManager::AddPluginsToMenu()
 
 	// Events
 	for (int i=0;i<plugin_file.num;i++)
-		tsunami->EventM(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
+		win->EventM(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
 }
 
 void PluginManager::ApplyFavorite(Configurable *c, const string &name)
@@ -390,7 +387,7 @@ void PluginManager::OnUpdate(Observable *o, const string &message)
 			PreviewEnd();
 	}else if (o == tsunami->output){
 		int pos = tsunami->output->GetPos();
-		Range r = tsunami->view->sel_range;
+		Range r = tsunami->win->view->sel_range;
 		tsunami->progress->Set(_("Vorschau"), (float)(pos - r.offset) / r.length());
 		if (!tsunami->output->IsPlaying())
 			PreviewEnd();
@@ -456,12 +453,12 @@ void PluginManager::ExecutePlugin(const string &filename)
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				if (a->used){
-					Range range = tsunami->view->GetPlaybackSelection();
+					Range range = tsunami->win->view->GetPlaybackSelection();
 					a->action_manager->BeginActionGroup();
 					foreach(Track *t, a->track)
 						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
 							fx->ResetState();
-							fx->DoProcessTrack(t, tsunami->view->cur_level, range);
+							fx->DoProcessTrack(t, tsunami->win->view->cur_level, range);
 						}
 					a->action_manager->EndActionGroup();
 				}else{
@@ -490,7 +487,7 @@ void PluginManager::FindAndExecutePlugin()
 	msg_db_f("ExecutePlugin", 1);
 
 
-	if (HuiFileDialogOpen(tsunami, _("Plugin-Script w&ahlen"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
+	if (HuiFileDialogOpen(tsunami->win, _("Plugin-Script w&ahlen"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
 		ExecutePlugin(HuiFilename);
 	}
 }
@@ -517,7 +514,7 @@ void PluginManager::PreviewStart(Effect *fx)
 	tsunami->progress->StartCancelable(_("Vorschau"), 0);
 	Subscribe(tsunami->progress);
 	Subscribe(tsunami->output);
-	tsunami->renderer->Prepare(tsunami->audio, tsunami->view->sel_range, false);
+	tsunami->renderer->Prepare(tsunami->audio, tsunami->win->view->sel_range, false);
 	tsunami->output->Play(tsunami->renderer);
 }
 

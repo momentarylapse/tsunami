@@ -14,6 +14,7 @@
 #include "FormatMidi.h"
 #include "FormatNami.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "../lib/hui/hui.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
@@ -67,7 +68,7 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 			a->action_manager->Enable(true);
 			tsunami->progress->Set("peaks", 1);
-			a->UpdatePeaks(tsunami->view->peak_mode);
+			a->UpdatePeaks(tsunami->win->view->peak_mode);
 
 			tsunami->progress->End();
 			if (a->track.num > 0)
@@ -154,7 +155,7 @@ bool Storage::Save(AudioFile *a, const string &filename)
 
 			a->action_manager->MarkCurrentAsSave();
 			tsunami->progress->End();
-			tsunami->UpdateMenu();
+			tsunami->win->UpdateMenu();
 			ok = true;
 			found = true;
 			break;

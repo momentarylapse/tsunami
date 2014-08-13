@@ -7,6 +7,7 @@
 
 #include "CaptureDialog.h"
 #include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
 #include "../../Audio/AudioInput.h"
 #include "../../Audio/AudioInputMidi.h"
 #include "../../Audio/AudioOutput.h"
@@ -56,8 +57,8 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	foreach(Track *t, a->track)
 		AddString("capture_target", t->GetNiceName() + "     (" + track_type(t->type) + ")");
 	AddString("capture_target", _("neue Spur anlegen"));
-	if (tsunami->view->cur_track)
-		SetInt("capture_target", get_track_index(tsunami->view->cur_track));
+	if (tsunami->win->view->cur_track)
+		SetInt("capture_target", get_track_index(tsunami->win->view->cur_track));
 	else
 		SetInt("capture_target", a->track.num);
 
@@ -127,7 +128,7 @@ void CaptureDialog::OnTypeMidi()
 void CaptureDialog::OnStart()
 {
 	if (audio->used){
-		tsunami->renderer->Prepare(audio, tsunami->view->GetPlaybackSelection(), false);
+		tsunami->renderer->Prepare(audio, tsunami->win->view->GetPlaybackSelection(), false);
 		tsunami->output->Play(tsunami->renderer);
 	}
 
@@ -188,7 +189,7 @@ bool CaptureDialog::Insert()
 	int target = GetInt("capture_target");
 	int i0;
 	if (audio->used){
-		int s_start = tsunami->view->sel_range.start();
+		int s_start = tsunami->win->view->sel_range.start();
 
 		// insert recorded data with some delay
 		int dpos = tsunami->input->GetDelay();
@@ -216,8 +217,8 @@ bool CaptureDialog::Insert()
 	if (type == t->TYPE_AUDIO){
 		Range r = Range(i0, tsunami->input->GetSampleCount());
 		audio->action_manager->BeginActionGroup();
-		BufferBox tbuf = t->GetBuffers(tsunami->view->cur_level, r);
-		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->view->cur_level, r);
+		BufferBox tbuf = t->GetBuffers(tsunami->win->view->cur_level, r);
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->win->view->cur_level, r);
 		tbuf.set(tsunami->input->buffer, 0, 1.0f);
 		audio->Execute(a);
 		audio->action_manager->EndActionGroup();

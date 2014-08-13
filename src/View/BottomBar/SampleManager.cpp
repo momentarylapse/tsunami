@@ -10,6 +10,7 @@
 #include "../../Storage/Storage.h"
 #include "../../View/AudioView.h"
 #include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
 #include <math.h>
 
 SampleManager::SampleManager(AudioFile *a) :
@@ -97,13 +98,13 @@ void SampleManager::OnInsert()
 {
 	int n = GetInt("sample_list");
 	if (n >= 0)
-		tsunami->view->cur_track->AddSample(tsunami->view->sel_range.start(), n);
+		tsunami->win->view->cur_track->AddSample(tsunami->win->view->sel_range.start(), n);
 }
 
 void SampleManager::OnCreateFromSelection()
 {
 	selected = audio->sample.num;
-	audio->CreateSamplesFromSelection(tsunami->view->cur_level, tsunami->view->sel_range);
+	audio->CreateSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
 }
 
 void SampleManager::OnDelete()

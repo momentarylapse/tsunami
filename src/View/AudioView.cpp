@@ -7,6 +7,7 @@
 
 #include "AudioView.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "SideBar/SideBar.h"
 #include "BottomBar/BottomBar.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
@@ -61,13 +62,15 @@ AudioView::SelectionType::SelectionType()
 	pitch = -1;
 }
 
-AudioView::AudioView(HuiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input, AudioRenderer *_renderer) :
+AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input, AudioRenderer *_renderer) :
 	Observer("AudioView"),
 	Observable("AudioView"),
 	SUB_FRAME_HEIGHT(20),
 	TIME_SCALE_HEIGHT(20),
 	BarrierDist(5)
 {
+	win = parent;
+
 	ColorBackground = White;
 	ColorBackgroundCurWave = color(1, 0.93f, 0.93f, 1);
 	ColorBackgroundCurTrack = color(1, 0.88f, 0.88f, 1);
@@ -237,7 +240,7 @@ AudioView::SelectionType AudioView::GetMouseOver()
 		}
 	}
 
-	if (!tsunami->bottom_bar->visible)
+	if (!win->bottom_bar->visible)
 		if (bottom_button_rect.inside(mx, my)){
 			s.type = SEL_TYPE_BOTTOM_BUTTON;
 			return s;
@@ -317,7 +320,7 @@ void AudioView::SelectUnderMouse()
 	selection = hover;
 	Track *t = selection.track;
 	SampleRef *s = selection.sample;
-	bool control = tsunami->GetKey(KEY_CONTROL);
+	bool control = win->GetKey(KEY_CONTROL);
 
 	// track
 	if (selection.track)
@@ -426,7 +429,7 @@ void AudioView::OnMouseMove()
 			x = mx + r;
 			w = - HuiGetEvent()->dx - 2*r;
 		}
-		tsunami->RedrawRect("area", x, audio->area.y1, w, audio->area.height());
+		win->RedrawRect("area", x, audio->area.y1, w, audio->area.height());
 	}else if (selection.type == SEL_TYPE_PLAYBACK){
 		renderer->Seek(selection.pos);
 		output->Play(renderer);
@@ -516,7 +519,7 @@ void AudioView::OnLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 
 	}else if (selection.type == SEL_TYPE_BOTTOM_BUTTON){
-		tsunami->bottom_bar->Show();
+		win->bottom_bar->Show();
 	}
 
 	SetBarriers(&selection);
@@ -597,11 +600,11 @@ void AudioView::OnRightButtonDown()
 	UpdateMenu();
 
 	if (selection.type == SEL_TYPE_SAMPLE)
-		menu_sub->OpenPopup(tsunami, 0, 0);
+		menu_sub->OpenPopup(win, 0, 0);
 	else if (selection.type == SEL_TYPE_TRACK)
-		menu_track->OpenPopup(tsunami, 0, 0);
+		menu_track->OpenPopup(win, 0, 0);
 	else if (!selection.track)
-		menu_audio->OpenPopup(tsunami, 0, 0);
+		menu_audio->OpenPopup(win, 0, 0);
 }
 
 
@@ -619,12 +622,12 @@ void AudioView::OnLeftDoubleClick()
 	if (mouse_possibly_selecting < mouse_min_move_to_select)
 		if (audio->used){
 			if (selection.type == SEL_TYPE_SAMPLE){
-				tsunami->side_bar->Open(SideBar::SUB_DIALOG);
+				win->side_bar->Open(SideBar::SUB_DIALOG);
 			}else if ((selection.type == SEL_TYPE_TRACK) || ((selection.track) && ((selection.type == SEL_TYPE_SELECTION_START) || (selection.type == SEL_TYPE_SELECTION_END)))){
-				tsunami->side_bar->Open(SideBar::TRACK_DIALOG);
+				win->side_bar->Open(SideBar::TRACK_DIALOG);
 			}else if (!selection.track){
 				SetCurTrack(NULL);
-				tsunami->side_bar->Open(SideBar::AUDIO_FILE_DIALOG);
+				win->side_bar->Open(SideBar::AUDIO_FILE_DIALOG);
 			}
 			selection.type = SEL_TYPE_NONE;
 		}
@@ -664,7 +667,7 @@ void AudioView::OnKeyDown()
 		if (output->IsPlaying()){
 			output->Pause();
 		}else{
-			tsunami->OnPlay();
+			win->OnPlay();
 		}
 	}
 	UpdateMenu();
@@ -687,7 +690,7 @@ void AudioView::OnMouseWheel()
 void AudioView::ForceRedraw()
 {
 	force_redraw = true;
-	tsunami->Redraw("area");
+	win->Redraw("area");
 }
 
 
@@ -1011,7 +1014,7 @@ bool AudioView::EditingMidi()
 		return false;
 	if (cur_track->type != Track::TYPE_MIDI)
 		return false;
-	return tsunami->side_bar->IsActive(SideBar::TRACK_DIALOG);
+	return win->side_bar->IsActive(SideBar::TRACK_DIALOG);
 }
 
 void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
@@ -1298,7 +1301,7 @@ void AudioView::OnDraw()
 	msg_db_f("OnDraw", 1);
 	force_redraw = false;
 
-	HuiPainter *c = tsunami->BeginDraw("area");
+	HuiPainter *c = win->BeginDraw("area");
 	drawing_rect = rect(0, c->width, 0, c->height);
 	c->setFontSize(FONT_SIZE);
 	c->setLineWidth(LINE_WIDTH);
@@ -1309,7 +1312,7 @@ void AudioView::OnDraw()
 
 	//c->DrawStr(100, 100, i2s(frame++));
 
-	if (!tsunami->bottom_bar->visible){
+	if (!win->bottom_bar->visible){
 		c->setColor((hover.type == SEL_TYPE_BOTTOM_BUTTON) ? Black : ColorWave);
 		bottom_button_rect = rect(5, 5 + c->getStrWidth(_("Leiste anzeigen")), c->height - 18, c->height);
 		c->drawStr(5, c->height - 18, _("Leiste anzeigen"));
@@ -1341,14 +1344,14 @@ void AudioView::OptimizeView()
 void AudioView::UpdateMenu()
 {
 	// view
-	tsunami->Check("view_mono", show_mono);
-	tsunami->Check("view_stereo", !show_mono);
-	tsunami->Check("view_peaks_max", peak_mode == BufferBox::PEAK_MODE_MAXIMUM);
-	tsunami->Check("view_peaks_mean", peak_mode == BufferBox::PEAK_MODE_SQUAREMEAN);
-	tsunami->Enable("zoom_in", audio->used);
-	tsunami->Enable("zoom_out", audio->used);
-	tsunami->Enable("view_optimal", audio->used);
-	tsunami->Enable("view_samples", false);//tsunami->cur_audio->used);
+	win->Check("view_mono", show_mono);
+	win->Check("view_stereo", !show_mono);
+	win->Check("view_peaks_max", peak_mode == BufferBox::PEAK_MODE_MAXIMUM);
+	win->Check("view_peaks_mean", peak_mode == BufferBox::PEAK_MODE_SQUAREMEAN);
+	win->Enable("zoom_in", audio->used);
+	win->Enable("zoom_out", audio->used);
+	win->Enable("view_optimal", audio->used);
+	win->Enable("view_samples", false);//win->cur_audio->used);
 }
 
 void AudioView::SetPeaksMode(int mode)

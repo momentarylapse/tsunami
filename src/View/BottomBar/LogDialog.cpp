@@ -24,6 +24,8 @@ LogDialog::LogDialog(Log *_log) :
 
 	EventM("clear", this, (void(HuiEventHandler::*)())&LogDialog::OnClear);
 
+	Reload();
+
 	Subscribe(log);
 }
 
@@ -37,7 +39,7 @@ void LogDialog::OnClear()
 	log->Clear();
 }
 
-void LogDialog::OnUpdate(Observable *o, const string &message)
+void LogDialog::Reload()
 {
 	Reset("log_list");
 	foreach(Log::Message &m, log->messages){
@@ -50,4 +52,9 @@ void LogDialog::OnUpdate(Observable *o, const string &message)
 			AddString("log_list", "hui:info\\" + m.text);
 		}
 	}
+}
+
+void LogDialog::OnUpdate(Observable *o, const string &message)
+{
+	Reload();
 }

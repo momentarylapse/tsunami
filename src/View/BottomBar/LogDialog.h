@@ -19,6 +19,7 @@ public:
 	virtual ~LogDialog();
 
 	void OnClear();
+	void Reload();
 	virtual void OnUpdate(Observable *o, const string &message);
 
 	Log *log;

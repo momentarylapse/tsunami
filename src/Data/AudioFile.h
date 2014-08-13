@@ -60,7 +60,6 @@ public:
 	void _cdecl UpdateSelection(const Range &range);
 	void UnselectAllSamples();
 
-	virtual void PostActionUpdate();
 	void UpdatePeaks(int mode);
 	void InvalidateAllPeaks();
 

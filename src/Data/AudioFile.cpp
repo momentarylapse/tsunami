@@ -318,13 +318,6 @@ void AudioFile::UpdatePeaks(int mode)
 	//msg_write(format("up %f", debug_timer.get()));
 }
 
-
-void AudioFile::PostActionUpdate()
-{
-	if (tsunami->win)
-		UpdatePeaks(tsunami->win->view->peak_mode);
-}
-
 int AudioFile::GetNumSelectedSamples()
 {
 	int n = 0;

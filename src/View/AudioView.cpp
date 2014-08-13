@@ -1108,6 +1108,9 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 			ForceRedraw();
 			UpdateMenu();
 		}
+
+		if (message == audio->MESSAGE_CHANGE)
+			audio->UpdatePeaks(peak_mode);
 	}else if (o == output){
 		if ((output->IsPlaying()) && (output->GetSource() == renderer))
 			MakeSampleVisible(output->GetPos());

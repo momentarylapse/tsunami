@@ -44,6 +44,9 @@ PluginManager::PluginManager() :
 	favorites = new FavoriteManager;
 
 	ErrorApplyingEffect = false;
+
+	FindPlugins();
+	LinkAppScriptData();
 }
 
 PluginManager::~PluginManager()
@@ -84,7 +87,7 @@ void GlobalRemoveSliders(HuiPanel *panel)
 
 bool GlobalAllowTermination()
 {
-	return tsunami->win->AllowTermination();
+	return tsunami->AllowTermination();
 }
 
 void PluginManager::LinkAppScriptData()
@@ -93,13 +96,14 @@ void PluginManager::LinkAppScriptData()
 	Script::config.Directory = "";
 
 	// api definition
+	Script::LinkExternal("MainWin", &tsunami->_win);
 	Script::LinkExternal("audio", &tsunami->audio);
 	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
 	Script::LinkExternal("renderer", &tsunami->renderer);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
-	Script::LinkExternal("view", &tsunami->win->view);
+	Script::LinkExternal("view", &tsunami->_view);
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
@@ -325,7 +329,7 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 	SilentFiles = false;
 }
 
-void find_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
+void find_plugins_in_dir(const string &dir, PluginManager *pm)
 {
 	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
 	foreach(DirEntry &e, list){
@@ -333,31 +337,58 @@ void find_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
 		pf.name = e.name.replace(".kaba", "");
 		pf.filename = HuiAppDirectoryStatic + "Plugins/" + dir + e.name;
 		get_plugin_file_data(pf);
-		m->AddItemImage(pf.name, pf.image, format("execute_plugin_%d", pm->plugin_file.num));
 		pm->plugin_file.add(pf);
 	}
+}
+
+void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
+{
+	foreachi(PluginManager::PluginFile &f, pm->plugin_file, i){
+		if (f.filename.find(dir) >= 0){
+            m->AddItemImage(f.name, f.image, format("execute_plugin_%d", i));
+		}
+	}
+}
+
+void PluginManager::FindPlugins()
+{
+	msg_db_f("FindPlugins", 2);
+	Script::Init();
+
+	// "Buffer"
+	find_plugins_in_dir("Buffer/Channels/", this);
+	find_plugins_in_dir("Buffer/Dynamics/", this);
+	find_plugins_in_dir("Buffer/Echo/", this);
+	find_plugins_in_dir("Buffer/Pitch/", this);
+	find_plugins_in_dir("Buffer/Sound/", this);
+	find_plugins_in_dir("Buffer/Synthesizer/", this);
+
+	// "All"
+	find_plugins_in_dir("All/", this);
+
+	// rest
+	find_plugins_in_dir("Independent/", this);
 }
 
 void PluginManager::AddPluginsToMenu(HuiWindow *win)
 {
 	msg_db_f("AddPluginsToMenu", 2);
-	Script::Init();
 
 	HuiMenu *m = win->GetMenu();
 
 	// "Buffer"
-	find_plugins_in_dir("Buffer/Channels/", this, m->GetSubMenuByID("menu_plugins_channels"));
-	find_plugins_in_dir("Buffer/Dynamics/", this, m->GetSubMenuByID("menu_plugins_dynamics"));
-	find_plugins_in_dir("Buffer/Echo/", this, m->GetSubMenuByID("menu_plugins_echo"));
-	find_plugins_in_dir("Buffer/Pitch/", this, m->GetSubMenuByID("menu_plugins_pitch"));
-	find_plugins_in_dir("Buffer/Sound/", this, m->GetSubMenuByID("menu_plugins_sound"));
-	find_plugins_in_dir("Buffer/Synthesizer/", this, m->GetSubMenuByID("menu_plugins_synthesizer"));
+	add_plugins_in_dir("Buffer/Channels/", this, m->GetSubMenuByID("menu_plugins_channels"));
+	add_plugins_in_dir("Buffer/Dynamics/", this, m->GetSubMenuByID("menu_plugins_dynamics"));
+	add_plugins_in_dir("Buffer/Echo/", this, m->GetSubMenuByID("menu_plugins_echo"));
+	add_plugins_in_dir("Buffer/Pitch/", this, m->GetSubMenuByID("menu_plugins_pitch"));
+	add_plugins_in_dir("Buffer/Sound/", this, m->GetSubMenuByID("menu_plugins_sound"));
+	add_plugins_in_dir("Buffer/Synthesizer/", this, m->GetSubMenuByID("menu_plugins_synthesizer"));
 
 	// "All"
-	find_plugins_in_dir("All/", this, m->GetSubMenuByID("menu_plugins_on_audio"));
+	add_plugins_in_dir("All/", this, m->GetSubMenuByID("menu_plugins_on_audio"));
 
 	// rest
-	find_plugins_in_dir("Independent/", this, m->GetSubMenuByID("menu_plugins_other"));
+	add_plugins_in_dir("Independent/", this, m->GetSubMenuByID("menu_plugins_other"));
 
 	// Events
 	for (int i=0;i<plugin_file.num;i++)

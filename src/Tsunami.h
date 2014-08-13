@@ -18,6 +18,7 @@ class Log;
 class AudioInput;
 class AudioOutput;
 class AudioRenderer;
+class AudioView;
 class Storage;
 class Progress;
 class Clipboard;
@@ -35,8 +36,11 @@ public:
 	void LoadKeyCodes();
 
 	void CreateWindow();
+	bool AllowTermination();
 
 	TsunamiWindow *win;
+	HuiWindow *_win;
+	AudioView *_view;
 
 
 	AudioFile *audio;

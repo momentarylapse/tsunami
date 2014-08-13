@@ -321,7 +321,8 @@ void AudioFile::UpdatePeaks(int mode)
 
 void AudioFile::PostActionUpdate()
 {
-	UpdatePeaks(tsunami->win->view->peak_mode);
+	if (tsunami->win)
+		UpdatePeaks(tsunami->win->view->peak_mode);
 }
 
 int AudioFile::GetNumSelectedSamples()

@@ -68,7 +68,8 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 			a->action_manager->Enable(true);
 			tsunami->progress->Set("peaks", 1);
-			a->UpdatePeaks(tsunami->win->view->peak_mode);
+			if (tsunami->win)
+				a->UpdatePeaks(tsunami->win->view->peak_mode);
 
 			tsunami->progress->End();
 			if (a->track.num > 0)
@@ -155,7 +156,8 @@ bool Storage::Save(AudioFile *a, const string &filename)
 
 			a->action_manager->MarkCurrentAsSave();
 			tsunami->progress->End();
-			tsunami->win->UpdateMenu();
+			if (tsunami->win)
+				tsunami->win->UpdateMenu();
 			ok = true;
 			found = true;
 			break;

@@ -18,7 +18,7 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.3.0";
+string AppVersion = "0.6.4.-1";
 
 Tsunami *tsunami = NULL;
 
@@ -46,6 +46,7 @@ Tsunami::~Tsunami()
 void Tsunami::onStartup(Array<string> arg)
 {
 	tsunami = this;
+	win = NULL;
 
 	progress = new Progress;
 	log = new Log;
@@ -63,26 +64,36 @@ void Tsunami::onStartup(Array<string> arg)
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
-	plugin_manager->LinkAppScriptData();
-
-	log->Info(AppName + " " + AppVersion);
-	log->Info(_("  ...keine Sorge, das wird schon!"));
 
 	HandleArguments(arg);
 }
 
 bool Tsunami::HandleArguments(Array<string> arg)
 {
-	if (arg.num <= 1){
+	if (arg.num < 2){
 		CreateWindow();
 		return false;
 	}
 	if (arg[1] == "--info"){
+		if (arg.num < 3){
+			log->Error(_("Aufruf: tsunami --info <Datei.nami>"));
+			exit(0);
+		}
 		if (storage->Load(audio, arg[2])){
 			msg_write(format("sample-rate: %d", audio->sample_rate));
 			msg_write(format("samples: %d", audio->GetRange().num));
+			msg_write("length: " + audio->get_time_str(audio->GetRange().num));
 			foreach(Tag &t, audio->tag)
 				msg_write("tag: " + t.key + " = " + t.value);
+		}
+		exit(0);
+	}else if (arg[1] == "--export"){
+		if (arg.num < 4){
+			log->Error(_("Aufruf: tsunami --export <Datei.nami> <Exportdatei>"));
+			exit(0);
+		}
+		if (storage->Load(audio, arg[2])){
+			storage->Export(audio, audio->GetRange(), arg[3]);
 		}
 		exit(0);
 	}
@@ -95,10 +106,13 @@ HuiWindow *GlobalMainWin = NULL;
 
 void Tsunami::CreateWindow()
 {
+	log->Info(AppName + " " + AppVersion);
+	log->Info(_("  ...keine Sorge, das wird schon!"));
+
 	win = new TsunamiWindow;
+	_win = dynamic_cast<HuiWindow*>(win);
+	_view = win->view;
 	plugin_manager->AddPluginsToMenu(win);
-	GlobalMainWin = dynamic_cast<HuiWindow*>(tsunami->win);
-	Script::LinkExternal("MainWin", &GlobalMainWin);
 
 	win->Show();
 	HuiRunLaterM(0.01f, win, &TsunamiWindow::OnViewOptimal);
@@ -106,6 +120,13 @@ void Tsunami::CreateWindow()
 
 void Tsunami::LoadKeyCodes()
 {
+}
+
+bool Tsunami::AllowTermination()
+{
+	if (win)
+		return win->AllowTermination();
+	return true;
 }
 
 HuiExecute(Tsunami);

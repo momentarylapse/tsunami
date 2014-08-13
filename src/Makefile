@@ -121,6 +121,7 @@ OBJ = \
  lib/hui/hui_window_control.o\
  lib/hui/hui_window_control_gtk.o\
  lib/hui/hui_window_control_win.o\
+ lib/hui/HuiApplication.o\
  lib/hui/HuiConfig.o\
  lib/hui/HuiMenu.o\
  lib/hui/HuiMenuGtk.o\
@@ -216,7 +217,7 @@ OBJ = \
  View/SideBar/SubDialog.o\
  View/SideBar/TrackDialog.o\
  View/AudioView.o\
- main.o\
+ TsunamiWindow.o\
  Tsunami.o
 CPP = g++
 #GLOBALFLAGS = -O2 -g

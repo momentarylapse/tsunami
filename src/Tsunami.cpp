@@ -22,8 +22,8 @@ string AppVersion = "0.6.4.-1";
 
 Tsunami *tsunami = NULL;
 
-Tsunami::Tsunami(Array<string> arg) :
-	HuiApplication(arg, "tsunami", "Deutsch", HUI_FLAG_LOAD_RESOURCE)
+Tsunami::Tsunami() :
+	HuiApplication("tsunami", "Deutsch", HUI_FLAG_LOAD_RESOURCE)
 {
 	HuiSetProperty("name", AppName);
 	HuiSetProperty("version", AppVersion);
@@ -43,10 +43,12 @@ Tsunami::~Tsunami()
 	delete(plugin_manager);
 }
 
-bool Tsunami::onStartup(Array<string> arg)
+bool Tsunami::onStartup(const Array<string> &arg)
 {
 	tsunami = this;
 	win = NULL;
+	_win = NULL;
+	_view = NULL;
 
 	progress = new Progress;
 	log = new Log;
@@ -80,7 +82,7 @@ void Tsunami::_HandleArguments()
 		storage->Load(audio, _arg[1]);
 }
 
-bool Tsunami::HandleArguments(Array<string> arg)
+bool Tsunami::HandleArguments(const Array<string> &arg)
 {
 	if (arg.num < 2)
 		return true;

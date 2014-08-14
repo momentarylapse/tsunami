@@ -27,15 +27,15 @@ class TsunamiWindow;
 class Tsunami : public HuiApplication
 {
 public:
-	Tsunami(Array<string> arg);
+	Tsunami();
 	virtual ~Tsunami();
 
-	virtual bool onStartup(Array<string> arg);
+	virtual bool onStartup(const Array<string> &arg);
 
 	Array<string> _arg;
 	void _HandleArguments();
 
-	bool HandleArguments(Array<string> arg);
+	bool HandleArguments(const Array<string> &arg);
 	void LoadKeyCodes();
 
 	void CreateWindow();

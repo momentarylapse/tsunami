@@ -21,22 +21,20 @@ enum
 class HuiApplication : public HuiEventHandler
 {
 public:
-	HuiApplication(Array<string> arg, const string &app_name, const string &def_lang, int flags);
+	HuiApplication(const string &app_name, const string &def_lang, int flags);
 	virtual ~HuiApplication();
 
-	virtual bool onStartup(Array<string> arg) = 0;
+	virtual bool onStartup(const Array<string> &arg) = 0;
+
+	static int _Execute_(HuiApplication *app, const Array<string> &arg);
 
 	int run();
 };
 
 #define HuiExecute(APP_CLASS) \
-int hui_main(Array<string> arg) \
+int hui_main(const Array<string> &arg) \
 { \
-	HuiApplication *app = new APP_CLASS(arg); \
-	if (app->onStartup(arg)); \
-		return app->run(); \
-	delete(app); \
-	return 0; \
+	HuiApplication::_Execute_(new APP_CLASS, arg); \
 }
 
 #endif /* HUIAPPLICATION_H_ */

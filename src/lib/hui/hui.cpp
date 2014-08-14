@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.8.0";
+string HuiVersion = "0.5.9.0";
 
 #include <stdio.h>
 #include <signal.h>
@@ -120,7 +120,7 @@ Array<sHuiImage> HuiImage;
 extern Array<string> HuiMakeArgs(int num_args, char *args[]);
 
 
-int hui_main(Array<string>);
+int hui_main(const Array<string> &);
 
 // for a system independent usage of this library
 
@@ -165,7 +165,7 @@ int main(int NumArgs, char *Args[])
 
 // usage:
 //
-// int hui_main(Array<string> arg)
+// int hui_main(const Array<string> &arg)
 // {
 //     HuiInit();
 //     ....

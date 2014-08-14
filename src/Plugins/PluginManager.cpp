@@ -307,7 +307,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("PluginContext", "track_no", _offsetof(PluginManager::PluginContext, track_no));
 	Script::DeclareClassOffset("PluginContext", "range", _offsetof(PluginManager::PluginContext, range));
 	Script::DeclareClassOffset("PluginContext", "level", _offsetof(PluginManager::PluginContext, level));
-	Script::LinkExternal("plugin_context",	(void*)&tsunami->plugin_manager->context);
+	Script::LinkExternal("plugin_context",	(void*)&context);
 }
 
 void PluginManager::OnMenuExecutePlugin()

@@ -78,8 +78,6 @@ void Tsunami::_HandleArguments()
 {
 	if (_arg.num >= 2)
 		storage->Load(audio, _arg[1]);
-	msg_write("x");
-	HuiRunLaterM(0.01f, win, &TsunamiWindow::OnViewOptimal);
 }
 
 bool Tsunami::HandleArguments(Array<string> arg)

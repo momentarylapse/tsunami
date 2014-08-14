@@ -89,7 +89,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	drawing_rect = rect(0, 1024, 0, 768);
 	bottom_button_rect = rect(0, 0, 0, 0);
 
-	show_mono = HuiConfig.getBool("View.Mono", false);
+	show_mono = HuiConfig.getBool("View.Mono", true);
 	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);
 	mouse_min_move_to_select = HuiConfig.getInt("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = HuiConfig.getInt("PreviewSleepTime", 10);
@@ -105,6 +105,9 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	image_track_audio.load(HuiAppDirectoryStatic + "Data/track-audio.tga");
 	image_track_time.load(HuiAppDirectoryStatic + "Data/track-time.tga");
 	image_track_midi.load(HuiAppDirectoryStatic + "Data/track-midi.tga");
+
+	view_zoom = 0.001;
+	view_pos = 0;
 
 	mouse_possibly_selecting = -1;
 	cur_action = NULL;
@@ -1103,7 +1106,7 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 			SetCurTrack(NULL);
 			if (audio->track.num > 0)
 				SetCurTrack(audio->track[0]);
-			HuiRunLaterM(0.01f, this, &AudioView::OptimizeView);
+			OptimizeView();
 		}else{
 			ForceRedraw();
 			UpdateMenu();

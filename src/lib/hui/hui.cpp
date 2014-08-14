@@ -189,7 +189,9 @@ int main(int NumArgs, char *Args[])
 	gboolean GtkRunLaterFunction(gpointer data)
 	{
 		HuiCallback *c = (HuiCallback*)data;
+		msg_write("<<");
 		c->call();
+		msg_write(">>");
 		delete(c);
 		return false;
 	}

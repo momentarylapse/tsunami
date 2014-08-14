@@ -56,6 +56,12 @@
 
 #include "../file/file.h"
 
+
+class HuiEventHandler : public VirtualBase
+{
+public:
+};
+
 typedef void hui_callback();
 
 

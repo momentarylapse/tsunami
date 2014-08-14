@@ -63,12 +63,6 @@ extern HuiEvent _HuiEvent_;
 HuiEvent *HuiGetEvent();
 
 
-
-class HuiEventHandler : public VirtualBase
-{
-public:
-};
-
 struct HuiEventListener
 {
 	string id, message;

@@ -43,7 +43,7 @@ Tsunami::~Tsunami()
 	delete(plugin_manager);
 }
 
-void Tsunami::onStartup(Array<string> arg)
+bool Tsunami::onStartup(Array<string> arg)
 {
 	tsunami = this;
 	win = NULL;
@@ -65,44 +65,48 @@ void Tsunami::onStartup(Array<string> arg)
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
 
-	HandleArguments(arg);
+	if (!HandleArguments(arg))
+		return false;
+
+	CreateWindow();
+	_arg = arg;
+	HuiRunLaterM(0.01f, this, &Tsunami::_HandleArguments);
+	return true;
+}
+
+void Tsunami::_HandleArguments()
+{
+	if (_arg.num >= 2)
+		storage->Load(audio, _arg[1]);
+	msg_write("x");
+	HuiRunLaterM(0.01f, win, &TsunamiWindow::OnViewOptimal);
 }
 
 bool Tsunami::HandleArguments(Array<string> arg)
 {
-	if (arg.num < 2){
-		CreateWindow();
-		return false;
-	}
+	if (arg.num < 2)
+		return true;
 	if (arg[1] == "--info"){
 		if (arg.num < 3){
 			log->Error(_("Aufruf: tsunami --info <Datei.nami>"));
-			exit(0);
-		}
-		if (storage->Load(audio, arg[2])){
+		}else if (storage->Load(audio, arg[2])){
 			msg_write(format("sample-rate: %d", audio->sample_rate));
 			msg_write(format("samples: %d", audio->GetRange().num));
 			msg_write("length: " + audio->get_time_str(audio->GetRange().num));
 			foreach(Tag &t, audio->tag)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
-		exit(0);
+		return false;
 	}else if (arg[1] == "--export"){
 		if (arg.num < 4){
 			log->Error(_("Aufruf: tsunami --export <Datei.nami> <Exportdatei>"));
-			exit(0);
-		}
-		if (storage->Load(audio, arg[2])){
+		}else if (storage->Load(audio, arg[2])){
 			storage->Export(audio, audio->GetRange(), arg[3]);
 		}
-		exit(0);
+		return false;
 	}
-	CreateWindow();
-	return storage->Load(audio, arg[1]);
+	return true;
 }
-
-
-HuiWindow *GlobalMainWin = NULL;
 
 void Tsunami::CreateWindow()
 {
@@ -115,7 +119,7 @@ void Tsunami::CreateWindow()
 	plugin_manager->AddPluginsToMenu(win);
 
 	win->Show();
-	HuiRunLaterM(0.01f, win, &TsunamiWindow::OnViewOptimal);
+	//HuiRunLaterM(0.01f, win, &TsunamiWindow::OnViewOptimal);
 }
 
 void Tsunami::LoadKeyCodes()

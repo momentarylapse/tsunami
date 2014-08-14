@@ -9,6 +9,7 @@
 #define HUIAPPLICATION_H_
 
 #include "../base/base.h"
+#include "hui_common.h"
 
 enum
 {
@@ -17,13 +18,13 @@ enum
 	HUI_FLAG_UNIQUE = 16,
 };
 
-class HuiApplication
+class HuiApplication : public HuiEventHandler
 {
 public:
 	HuiApplication(Array<string> arg, const string &app_name, const string &def_lang, int flags);
 	virtual ~HuiApplication();
 
-	virtual void onStartup(Array<string> arg) = 0;
+	virtual bool onStartup(Array<string> arg) = 0;
 
 	int run();
 };
@@ -32,8 +33,10 @@ public:
 int hui_main(Array<string> arg) \
 { \
 	HuiApplication *app = new APP_CLASS(arg); \
-	app->onStartup(arg); \
-	return app->run(); \
+	if (app->onStartup(arg)); \
+		return app->run(); \
+	delete(app); \
+	return 0; \
 }
 
 #endif /* HUIAPPLICATION_H_ */

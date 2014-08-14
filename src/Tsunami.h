@@ -30,7 +30,10 @@ public:
 	Tsunami(Array<string> arg);
 	virtual ~Tsunami();
 
-	virtual void onStartup(Array<string> arg);
+	virtual bool onStartup(Array<string> arg);
+
+	Array<string> _arg;
+	void _HandleArguments();
 
 	bool HandleArguments(Array<string> arg);
 	void LoadKeyCodes();

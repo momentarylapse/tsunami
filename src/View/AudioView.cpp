@@ -604,9 +604,10 @@ void AudioView::OnRightButtonDown()
 
 	if (selection.type == SEL_TYPE_SAMPLE)
 		menu_sub->OpenPopup(win, 0, 0);
-	else if (selection.type == SEL_TYPE_TRACK)
+	else if (selection.type == SEL_TYPE_TRACK){
+		menu_track->Enable("track_edit_midi", cur_track->type == Track::TYPE_MIDI);
 		menu_track->OpenPopup(win, 0, 0);
-	else if (!selection.track)
+	}else if (!selection.track)
 		menu_audio->OpenPopup(win, 0, 0);
 }
 
@@ -1017,7 +1018,7 @@ bool AudioView::EditingMidi()
 		return false;
 	if (cur_track->type != Track::TYPE_MIDI)
 		return false;
-	return win->side_bar->IsActive(SideBar::TRACK_DIALOG);
+	return win->bottom_bar->IsActive(BottomBar::MIDI_EDITOR);
 }
 
 void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)

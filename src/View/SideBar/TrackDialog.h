@@ -30,11 +30,7 @@ public:
 	void OnPanning();
 	void OnSynthesizer();
 	void OnConfigSynthesizer();
-	void OnPitch();
-	void OnBeatPartition();
-	void OnInsertChord();
-	void OnChordType();
-	void OnChordInversion();
+	void OnEditMidi();
 
 	void SetTrack(Track *t);
 

@@ -60,6 +60,8 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("add_time_track", "hui:add", -1, this, &TsunamiWindow::OnAddTimeTrack);
 	HuiAddCommandM("add_midi_track", "hui:add", -1, this, &TsunamiWindow::OnAddMidiTrack);
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, &TsunamiWindow::OnDeleteTrack);
+	HuiAddCommandM("track_edit_midi", "hui:edit", -1, this, &TsunamiWindow::OnTrackEditMidi);
+	HuiAddCommandM("track_edit_fx", "hui:edit", -1, this, &TsunamiWindow::OnTrackEditFX);
 	HuiAddCommandM("level_add", "hui:add", -1, this, &TsunamiWindow::OnAddLevel);
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &TsunamiWindow::OnDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &TsunamiWindow::OnCurLevelUp);
@@ -205,6 +207,22 @@ void TsunamiWindow::OnDeleteTrack()
 		else
 			tsunami->log->Error(_("Keine Spur ausgew&ahlt"));
 	}
+}
+
+void TsunamiWindow::OnTrackEditMidi()
+{
+	if (view->cur_track)
+		bottom_bar->Choose(BottomBar::MIDI_EDITOR);
+	else
+		tsunami->log->Error(_("Keine Spur ausgew&ahlt"));
+}
+
+void TsunamiWindow::OnTrackEditFX()
+{
+	if (view->cur_track)
+		bottom_bar->Choose(BottomBar::FX_CONSOLE);
+	else
+		tsunami->log->Error(_("Keine Spur ausgew&ahlt"));
 }
 
 void TsunamiWindow::OnCloseFile()

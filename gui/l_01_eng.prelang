@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-195
+202
 // Data (ID,Text)
 about
 
@@ -103,6 +103,8 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
+edit_midi
+
 exit
 
 export_selection
@@ -135,6 +137,8 @@ ld_t_midi
 
 ld_t_name
 !bold\\Name:
+ld_t_no_midi
+
 ld_t_partition
 
 ld_t_pitch
@@ -169,6 +173,8 @@ log_clear
 Clear
 log_close
 Close
+me_grid_yes
+
 menu_edit
 
 menu_file
@@ -210,6 +216,8 @@ menu_view_channels
 menu_view_peaks
 
 metronome
+
+midi_editor
 
 ms
 ms
@@ -297,6 +305,8 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
+rand_id_230642
+
 rdt_source
 !bold\\Source
 rdt_target
@@ -359,6 +369,10 @@ tags
 !format=tT\\Tag\\Value
 track_dialog
 Track
+track_edit_fx
+
+track_edit_midi
+
 track_import
 
 track_list
@@ -394,7 +408,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-129
+133
 // Data (ID,Text)
 
 
@@ -455,6 +469,10 @@ Amplitude zu groß, Signal übersteuert.
 Anfang\\\") + audio->get_time_str_long(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
+
+Aufruf: tsunami --export <Datei.nami> <Exportdatei>
+
+Aufruf: tsunami --info <Datei.nami>
 
 Beim Anwenden eines Effekts: 
 
@@ -544,6 +562,8 @@ MIDI Quellen
 
 Metronom
 
+Midi Editor
+
 Mischpult
 
 Moll
@@ -587,6 +607,8 @@ Unbenannt
 Vermindert
 
 Vorschau
+
+Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
 
 aktiv?
 

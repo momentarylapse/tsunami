@@ -2,5 +2,7 @@ Menu popup_track_menu ""
 	Item track_menu_header "Spur" disabled
 	Separator "" ""
 	Item delete_track "Löschen"
+	Item track_edit_fx "Effekte bearbeiten"
+	Item track_edit_midi "Midi bearbeiten"
 	Item track_properties "Eigenschaften"
 

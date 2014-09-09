@@ -128,6 +128,7 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
 
 	Subscribe(audio);
 	Subscribe(output);
+	LoadData();
 }
 
 MixingConsole::~MixingConsole()

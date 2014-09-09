@@ -34,17 +34,6 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	Expand("ld_t_bars", 0, true);
 	Expand("ld_t_effects", 0, true);
 
-	Array<string> chord_types = GetChordTypeNames();
-	foreach(string &ct, chord_types)
-		AddString("chord_type", ct);
-	SetInt("chord_type", 0);
-	Enable("chord_type", false);
-	AddString("chord_inversion", _("Grundform"));
-	AddString("chord_inversion", _("1. Umkehrung"));
-	AddString("chord_inversion", _("2. Umkehrung"));
-	SetInt("chord_inversion", 0);
-	Enable("chord_inversion", false);
-
 	LoadData();
 	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
@@ -53,11 +42,7 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	EventM("panning", this, &TrackDialog::OnPanning);
 	EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
 	EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
-	EventM("pitch_offset", this, &TrackDialog::OnPitch);
-	EventM("beat_partition", this, &TrackDialog::OnBeatPartition);
-	EventM("insert_chord", this, &TrackDialog::OnInsertChord);
-	EventM("chord_type", this, &TrackDialog::OnChordType);
-	EventM("chord_inversion", this, &TrackDialog::OnChordInversion);
+	EventM("edit_midi", this, &TrackDialog::OnEditMidi);
 }
 
 TrackDialog::~TrackDialog()
@@ -80,12 +65,12 @@ void TrackDialog::LoadData()
 		SetString("synthesizer", track->synth->name);
 		HideControl("ld_t_synth", track->type == track->TYPE_AUDIO);
 		//Enable("config_synth", track->type != track->TYPE_AUDIO);
-		HideControl("ld_t_midi", track->type != Track::TYPE_MIDI);
 		HideControl("ld_t_bars", track->type != Track::TYPE_TIME);
+		HideControl("ld_t_midi", track->type != Track::TYPE_MIDI);
 	}else{
 		HideControl("ld_t_synth", true);
-		HideControl("ld_t_midi", true);
 		HideControl("ld_t_bars", true);
+		HideControl("ld_t_midi", true);
 		//Enable("synthesizer", track);
 		//Enable("config_synth", track);
 	}
@@ -128,37 +113,9 @@ void TrackDialog::OnConfigSynthesizer()
 	tsunami->win->bottom_bar->Choose(BottomBar::SYNTH_CONSOLE);
 }
 
-void TrackDialog::OnPitch()
+void TrackDialog::OnEditMidi()
 {
-	view->pitch_min = GetInt("");
-	view->pitch_max = GetInt("") + 30;
-	view->ForceRedraw();
-}
-
-void TrackDialog::OnBeatPartition()
-{
-	view->beat_partition = GetInt("");
-	view->ForceRedraw();
-}
-
-void TrackDialog::OnInsertChord()
-{
-	if (IsChecked(""))
-		view->chord_mode = GetInt("chord_type");
-	else
-		view->chord_mode = CHORD_TYPE_NONE;
-	Enable("chord_type", IsChecked(""));
-	Enable("chord_inversion", IsChecked(""));
-}
-
-void TrackDialog::OnChordType()
-{
-	view->chord_mode = GetInt("");
-}
-
-void TrackDialog::OnChordInversion()
-{
-	view->chord_inversion = GetInt("");
+	tsunami->win->bottom_bar->Choose(BottomBar::MIDI_EDITOR);
 }
 
 void TrackDialog::OnUpdate(Observable *o, const string &message)

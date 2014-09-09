@@ -31,6 +31,7 @@ public:
 	void _cdecl AddItemCheckable(const string &name, const string &id);
 	void _cdecl AddSeparator();
 	void _cdecl AddSubMenu(const string &name, const string &id, HuiMenu *menu);
+	void _cdecl Enable(const string &id, bool enabled);
 	void _cdecl SetID(const string &id);
 	HuiMenu *GetSubMenuByID(const string &id);
 

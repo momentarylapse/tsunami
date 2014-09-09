@@ -21,6 +21,7 @@ class MixingConsole;
 class CurveConsole;
 class LogDialog;
 class SampleManager;
+class MidiEditor;
 class Log;
 
 class BottomBarConsole : public HuiPanel
@@ -48,6 +49,7 @@ public:
 		MIXING_CONSOLE,
 		FX_CONSOLE,
 		SYNTH_CONSOLE,
+		MIDI_EDITOR,
 		SAMPLE_CONSOLE,
 		CURVE_CONSOLE,
 		LOG_CONSOLE,
@@ -66,6 +68,7 @@ public:
 	CurveConsole *curve_console;
 	LogDialog *log_dialog;
 	SampleManager *sample_manager;
+	MidiEditor *midi_editor;
 };
 
 #endif /* BOTTOMBAR_H_ */

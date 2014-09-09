@@ -48,6 +48,8 @@ public:
 	void OnAddTimeTrack();
 	void OnAddMidiTrack();
 	void OnDeleteTrack();
+	void OnTrackEditMidi();
+	void OnTrackEditFX();
 	void OnSubFromSelection();
 	void OnInsertAdded();
 	void OnRemoveAdded();

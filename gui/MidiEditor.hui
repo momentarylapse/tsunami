@@ -1,0 +1,18 @@
+Dialog midi_editor "Midi" 380 516
+	Grid ? "" 2 1 noexpandx
+		Grid me_grid_no "" 1 1
+			Text ld_t_no_midi "keine Midi-Spur ausgewählt" expandy
+		Grid me_grid_yes "" 4 3 noexpandx
+			Text ld_t_pitch "Pitch"
+			SpinButton pitch_offset "60\\0\\90" expandx
+			CheckBox insert_chord "Akkord"
+			.
+			Text ld_t_partition "Unterteilung"
+			SpinButton beat_partition "4\\1\\256"
+			Text ld_t_chord "Typ"
+			ComboBox chord_type ""
+			.
+			.
+			Text ld_t_inversion "Umkehrung"
+			ComboBox chord_inversion ""
+

@@ -129,3 +129,14 @@ Array<HuiControl*> HuiMenu::get_all_controls()
 	}
 	return list;
 }
+
+
+void HuiMenu::Enable(const string &id, bool enabled)
+{
+	foreach(HuiControl *c, item){
+		if (c->id == id)
+			c->Enable(enabled);
+		if (c->type == HuiKindMenuItemSubmenu)
+			dynamic_cast<HuiMenuItemSubmenu*>(c)->sub_menu->Enable(id, enabled);
+	}
+}

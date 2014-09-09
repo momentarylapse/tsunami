@@ -13,6 +13,7 @@
 #include "SynthConsole.h"
 #include "LogDialog.h"
 #include "SampleManager.h"
+#include "MidiEditor.h"
 #include "../../lib/hui/Controls/HuiControl.h"
 
 BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
@@ -35,12 +36,14 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	curve_console = new CurveConsole(view, audio);
 	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
+	midi_editor = new MidiEditor(view, audio);
 	Embed(mixing_console, "console_grid", 0, 0);
 	Embed(fx_console, "console_grid", 0, 1);
 	Embed(synth_console, "console_grid", 0, 2);
-	Embed(sample_manager, "console_grid", 0, 3);
-	Embed(curve_console, "console_grid", 0, 4);
-	Embed(log_dialog, "console_grid", 0, 5);
+	Embed(midi_editor, "console_grid", 0, 3);
+	Embed(sample_manager, "console_grid", 0, 4);
+	Embed(curve_console, "console_grid", 0, 5);
+	Embed(log_dialog, "console_grid", 0, 6);
 
 	menu = new HuiMenu;
 	foreachi(HuiPanel *p, children, i){

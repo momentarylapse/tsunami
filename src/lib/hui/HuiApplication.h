@@ -34,7 +34,7 @@ public:
 #define HuiExecute(APP_CLASS) \
 int hui_main(const Array<string> &arg) \
 { \
-	HuiApplication::_Execute_(new APP_CLASS, arg); \
+	return HuiApplication::_Execute_(new APP_CLASS, arg); \
 }
 
 #endif /* HUIAPPLICATION_H_ */

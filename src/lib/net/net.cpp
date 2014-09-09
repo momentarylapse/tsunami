@@ -29,9 +29,14 @@
 	#include <unistd.h>
 
 	#include <netdb.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+
 
 #endif
 
+const int Socket::TYPE_TCP = 1;
+const int Socket::TYPE_UDP = 2;
 
 #define NET_DEBUG			0
 
@@ -69,10 +74,21 @@ void NetInit()
 }
 
 
+void NetAddress::__init__()
+{
+	new(this) NetAddress();
+}
 
-Socket::Socket()
+void NetAddress::__delete__()
+{
+	this->~NetAddress();
+}
+
+
+Socket::Socket(int _type)
 {
 	s = -1;
+	type = _type;
 	buffer_pos = 0;
 	last_op_reading = false;
 	uid = NetCurrentSocketID ++;
@@ -86,7 +102,7 @@ Socket::~Socket()
 
 void Socket::__init__()
 {
-	new(this) Socket;
+	new(this) Socket(TYPE_TCP);
 }
 
 void Socket::__delete__()
@@ -136,7 +152,10 @@ int _NetCreateSocket_()
 bool Socket::_create(int port, bool block)
 {
 	so(1,"socket...");
-	s = socket(AF_INET, SOCK_STREAM, 0);
+	if (type == TYPE_UDP)
+		s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	else
+		s = socket(AF_INET, SOCK_STREAM, 0);
 	if (s < 0){
 		so(0,"  -ERROR (socket creation)");
 		return false;
@@ -144,6 +163,9 @@ bool Socket::_create(int port, bool block)
 		so(1,"  -ok");
 
 	setBlocking(block);
+
+	if ((type == TYPE_UDP) && (port < 0))
+		return true;
 
 	struct sockaddr_in my_addr;
 	my_addr.sin_family = AF_INET;
@@ -158,6 +180,9 @@ bool Socket::_create(int port, bool block)
 	}else
 		so(1,"  -ok");
 
+	if (type == TYPE_UDP)
+		return true;
+
 	so(1,"listen...");
 	if (listen(s, 1) == -1){
 		so(0,"  -ERROR (listen)");
@@ -170,7 +195,7 @@ bool Socket::_create(int port, bool block)
 
 Socket *NetListen(int port, bool block)
 {
-	Socket *s = new Socket;
+	Socket *s = new Socket(Socket::TYPE_TCP);
 	if (s->_create(port, block))
 		return s;
 	delete(s);
@@ -181,7 +206,7 @@ Socket *NetListen(int port, bool block)
 Socket *Socket::accept()
 {
 	msg_db_f("sock.accept", 1);
-	Socket *con = new Socket;
+	Socket *con = new Socket(type);
 //	so(1,"accept...");
 	struct sockaddr_in remote_addr;
 	int size = sizeof(remote_addr);
@@ -304,8 +329,17 @@ bool Socket::_connect(const string &addr,int port)
 
 Socket *NetConnect(const string &addr, int port)
 {
-	Socket *s = new Socket;
+	Socket *s = new Socket(Socket::TYPE_TCP);
 	if (s->_connect(addr, port))
+		return s;
+	delete(s);
+	return NULL;
+}
+
+Socket *NetCreateUDP(int port)
+{
+	Socket *s = new Socket(Socket::TYPE_UDP);
+	if (s->_create(port, true))
 		return s;
 	delete(s);
 	return NULL;
@@ -323,11 +357,22 @@ string Socket::read()
 	if (s < 0)
 		return "";
 	msg_db_f("sock.read", 2);
-	int r = recv(s, _net_temp_buf_, sizeof(_net_temp_buf_), 0);
+	int r;
+	sockaddr_in addr;
+	socklen_t addr_len = sizeof(addr);
+	if (type == TYPE_UDP)
+		r = recvfrom(s, _net_temp_buf_, sizeof(_net_temp_buf_), 0, (sockaddr*)&addr, &addr_len);
+	else
+		r = recv(s, _net_temp_buf_, sizeof(_net_temp_buf_), 0);
+
 	if (r <= 0){
 		//msg_error("recv");
 		close();
 		throw SocketConnectionLostException();
+	}
+	if (type == TYPE_UDP){
+		sender.host = inet_ntoa(addr.sin_addr);
+		sender.port = ntohs(addr.sin_port);
 	}
 	//msg_write("Read: " + string(_net_temp_buf_, r).hex(false));
 	return string(_net_temp_buf_, r);
@@ -338,11 +383,25 @@ bool Socket::write(const string &buf)
 	if (s < 0)
 		return false;
 	msg_db_f("sock.write", 2);
+	sockaddr_in addr;
 	int sent = 0;
 	char *b = (char*)buf.data;
 	//msg_write("Write: " + buf.hex(false));
+
+	if (type == TYPE_UDP){
+		memset((char *)&addr, 0, sizeof(addr));
+		addr.sin_family = AF_INET;
+		addr.sin_port = htons(target.port);
+		if (inet_aton(target.host.c_str(), &addr.sin_addr)==0)
+			msg_error("inet_aton() failed\n");
+	}
+
 	while (sent < buf.num){
-		int r = send(s, b, buf.num - sent, 0);
+		int r;
+		if (type == TYPE_UDP)
+			r = sendto(s, b, buf.num - sent, 0, (sockaddr*)&addr, sizeof(addr));
+		else
+			r = send(s, b, buf.num - sent, 0);
 		if (r <= 0){
 			//msg_error("send");
 			close();
@@ -353,6 +412,16 @@ bool Socket::write(const string &buf)
 		sent += r;
 	}
 	return true;
+}
+
+void Socket::setTarget(NetAddress &_target)
+{
+	target = _target;
+}
+
+NetAddress Socket::getSender()
+{
+	return sender;
 }
 
 

@@ -24,10 +24,20 @@ class SocketConnectionLostException : public SocketException
 };
 
 
+class NetAddress
+{
+public:
+	string host;
+	int port;
+
+	void __init__();
+	void __delete__();
+};
+
 class Socket
 {
 public:
-	Socket();
+	Socket(int type);
 	~Socket();
 
 	bool _create(int port, bool block);
@@ -71,15 +81,26 @@ public:
 
 	int uid;
 	int s;
+	int type;
 	string buffer;
 	int buffer_pos;
 	bool last_op_reading;
+
+	// udp
+	void setTarget(NetAddress &target);
+	NetAddress getSender();
+	NetAddress target;
+	NetAddress sender;
+
+	static const int TYPE_TCP;
+	static const int TYPE_UDP;
 };
 
 void NetInit();
 
 Socket *NetListen(int port, bool block);
 Socket *NetConnect(const string &host, int port);
+Socket *NetCreateUDP(int port);
 
 // ...
 bool NetSendBugReport(const string &sender, const string &program, const string &version, const string &comment, string &return_msg);

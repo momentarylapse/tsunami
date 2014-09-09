@@ -12,8 +12,11 @@ namespace Script{
 
 #ifdef _X_USE_NET_
 	#define net_p(p)		(void*)p
+	static NetAddress *_addr;
+	#define GetDAAddress(x)			long(&_addr->x)-long(_addr)
 #else
 	typedef int Socket;
+	typedef int NetAddress;
 	#define net_p(p)		NULL
 #endif
 #ifdef _X_ALLOW_X_
@@ -27,6 +30,7 @@ extern Type *TypeFloatPs;
 extern Type *TypeBoolPs;
 extern Type *TypeCharPs;
 
+Type *TypeNetAddress;
 Type *TypeSocket;
 Type *TypeSocketP;
 Type *TypeSocketPList;
@@ -37,9 +41,17 @@ void SIAddPackageNet()
 
 	add_package("net", false);
 
+	TypeNetAddress = add_type  ("NetAddress",	sizeof(NetAddress));
 	TypeSocket     = add_type  ("Socket",		sizeof(Socket));
 	TypeSocketP    = add_type_p("Socket*",	TypeSocket);
 	TypeSocketPList = add_type_a("Socket*[]",	TypeSocketP, -1);
+
+
+	add_class(TypeNetAddress);
+		class_add_element("host", TypeString, GetDAAddress(host));
+		class_add_element("port", TypeInt, GetDAAddress(port));
+		class_add_func("__init__", TypeVoid, net_p(mf(&NetAddress::__init__)));
+		class_add_func("__delete__", TypeVoid, net_p(mf(&NetAddress::__delete__)));
 
 	add_class(TypeSocket);
 		class_add_element("uid", TypeInt,0);
@@ -49,6 +61,9 @@ void SIAddPackageNet()
 		class_add_func("close",		TypeVoid,	net_p(mf(&Socket::close)));
 		class_add_func("setBlocking",		TypeVoid,	net_p(mf(&Socket::setBlocking)));
 			func_add_param("block",		TypeBool);
+		class_add_func("setTarget",		TypeVoid,	net_p(mf(&Socket::setTarget)));
+			func_add_param("target",		TypeNetAddress);
+		class_add_func("getSender",		TypeNetAddress,	net_p(mf(&Socket::getSender)));
 		class_add_func("read",		TypeString,	net_p(mf(&Socket::read)));
 		class_add_func("write",		TypeBool,	net_p(mf(&Socket::write)));
 			func_add_param("buf",		TypeString);
@@ -86,6 +101,8 @@ void SIAddPackageNet()
 		func_add_param("block",		TypeBool);
 	add_func("SocketConnect",		TypeSocketP,	net_p(&NetConnect));
 		func_add_param("addr",		TypeString);
+		func_add_param("port",		TypeInt);
+	add_func("CreateUDP",		TypeSocketP,	net_p(&NetCreateUDP));
 		func_add_param("port",		TypeInt);
 }
 

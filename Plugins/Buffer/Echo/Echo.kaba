@@ -3,7 +3,9 @@
 
 use "../../api.kaba"
 
-bool not_first_time
+const string AutoConfigDelay = "0:1:1:1000:ms"
+const string AutoConfigVolume = "0:2:0.1:100:%"
+const string AutoConfigFeedback = "0:1:0.1:100:%"
 
 
 class Config : PluginData
@@ -29,7 +31,6 @@ class PluginState : PluginData
 class Echo : AudioEffect
 	Config config
 	PluginState state
-	DelayPanel *panel
 
 
 	void doDelay(float b[], float d[])
@@ -51,14 +52,6 @@ class Echo : AudioEffect
 				p = 0
 
 
-
-	overwrite void updateDialog()
-		panel.fill()
-
-	overwrite Panel *createPanel()
-		panel = new DelayPanel(self)
-		return panel
-
 	overwrite void process(BufferBox buf)
 
 		AudioFile *a = audio
@@ -70,49 +63,3 @@ class Echo : AudioEffect
 		doDelay(buf.l, state.buf_l)
 	
 		state.offset += buf.num
-					
-
-	
-class DelayPanel : Panel
-	Echo *e
-	void __init__(Echo *_e)
-		fromSource("
-Grid ? '' 4 3 width=400
-	Text ? 'Lautstärke'
-	Slider volume_slider '' expandx
-	SpinButton volume '\\0\\200\\0.1'
-	Text ? '%'
-	Text ? 'Verzögerung'
-	Slider delay_slider ''
-	SpinButton delay '\\0\\1000'
-	Text ? 'ms'
-	Text ? 'Feedback'
-	Slider feedback_slider ''
-	SpinButton feedback '\\0\\100\\0.1
-	Text ? '%'")
-		
-		e = _e
-	
-		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, e.config.Volume)
-		CreateSliderM(self, "feedback_slider", "feedback", 0, 1, 100, &onFeedback, e.config.Feedback)
-		CreateSliderM(self, "delay_slider", "delay", 0, 1, 1000, &onDelay, e.config.Delay)
-	
-		fill()
-		
-	void fill()
-		SliderSet(self, "volume", e.config.Volume)
-		SliderSet(self, "feedback", e.config.Feedback)
-		SliderSet(self, "delay", e.config.Delay)
-		
-	void onVolume()
-		e.config.Volume = SliderGet(self, "volume")
-		e.notify()
-
-	void onFeedback()
-		e.config.Feedback = SliderGet(self, "feedback")
-		e.notify()
-
-	void onDelay()
-		e.config.Delay = SliderGet(self, "delay")
-		e.notify()
-

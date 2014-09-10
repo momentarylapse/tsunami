@@ -3,6 +3,8 @@
 
 use "../../api.kaba"
 
+const string AutoConfigPitch = "0:2:0.1:100:%"
+
 class Config : PluginData
 	float Pitch
 
@@ -13,13 +15,8 @@ class Config : PluginData
 class PitchShift : AudioEffect
 	Config config
 
-	ConfigPanel *panel
-
 	complex buf1[]
 	complex buf2[]
-
-	overwrite void updateDialog()
-		panel.fill()
 
 	void shift_buf(float b[])
 		int i, j
@@ -37,34 +34,9 @@ class PitchShift : AudioEffect
 				buf2[i] = complex(0, 0)
 		fft_c2r_inv(buf2, b)
 
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		return panel
-
 	overwrite void process(BufferBox buf)
 		shift_buf(buf.r)
 		shift_buf(buf.l)
 		buf1.clear()
 		buf2.clear()
-
-
-class ConfigPanel : Panel
-	PitchShift *p
-	void __init__(PitchShift *_p)
-		addGrid("", 0, 0, 3, 1, "table2")
-		setTarget("table2", 0)
-		addSlider("!expandx", 0, 0, 0, 0, "pitch_slider")
-		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "pitch")
-		addText("%", 2, 0, 0, 0, "")
-		p = _p
-		CreateSliderM(self, "pitch_slider", "pitch", 0, 2, 100, &onPitch, p.config.Pitch)
-		
-		fill()
-	
-	void fill()
-		SliderSet(self, "pitch", p.config.Pitch)
-
-	void onPitch()
-		p.config.Pitch = SliderGet(self, "pitch")
-		p.notify()
 

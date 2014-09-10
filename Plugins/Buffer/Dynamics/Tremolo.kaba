@@ -2,6 +2,8 @@
 
 use "../../api.kaba"
 
+const string AutoConfigSpeed = "0:20:0.1:1:Hz"
+const string AutoConfigDepth = "0:1:0.1:100:%"
 
 class Config : PluginData
 	float Speed
@@ -14,7 +16,6 @@ class Config : PluginData
 class Tremolo : AudioEffect
 
 	Config config
-	TremoloPanel *panel
 
 	void doTremolo(float b[])
 	
@@ -25,50 +26,7 @@ class Tremolo : AudioEffect
 	
 			// old value
 			b[i] *= f
-
-	overwrite void updateDialog()
-		panel.fill()
-
-	overwrite Panel *createPanel()
-		panel = new TremoloPanel(self)
-		return panel
 	
 	overwrite void process(BufferBox buf)
-		
 		doTremolo(buf.r)
 		doTremolo(buf.l)
-
-class TremoloPanel : Panel
-	Tremolo *t
-	void __init__(Tremolo *_t)
-		addGrid("", 0, 0, 4, 2, "table2")
-		setTarget("table2", 0)
-		addSlider("!expandx", 1, 0, 0, 0, "speed_slider")
-		addSpinButton("\\0\\100\\0.1", 2, 0, 0, 0, "speed")
-		addText("Hz", 3, 0, 0, 0, "")
-		addSlider("", 1, 1, 0, 0, "depth_slider")
-		addSpinButton("\\0\\100\\0.1", 2, 1, 0, 0, "depth")
-		addText("%", 3, 1, 0, 0, "")
-		addText("Geschwindigkeit", 0, 0, 0, 0, "")
-		addText("Tiefe", 0, 1, 0, 0, "")
-		
-		t = _t
-	
-		CreateSliderM(self, "speed_slider", "speed", 0, 20,   1,  &OnSpeed, t.config.Speed)
-		CreateSliderM(self, "depth_slider", "depth", 0, 1,  100,  &OnDepth, t.config.Depth)
-	
-		fill()
-
-	void OnSpeed()
-		t.config.Speed = SliderGet(self, "speed")
-		t.notify()
-
-	void OnDepth()
-		t.config.Depth = SliderGet(self, "depth")
-		t.notify()
-
-	void fill()
-		SliderSet(self, "speed", t.config.Speed)
-		SliderSet(self, "depth", t.config.Depth)
-	
-

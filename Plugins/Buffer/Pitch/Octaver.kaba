@@ -2,18 +2,16 @@
 // Title[Deutsch] = Oktavieren
 use "../../api.kaba"
 
+const string AutoConfigLevel = "0:1:0.1:100:%"
+
 class Config : PluginData
 	float Level
 
 	overwrite void reset()
 		Level = 0.5
 
-class Octaver : AudioEffect	
-	ConfigPanel *panel
+class Octaver : AudioEffect
 	Config config
-
-	overwrite void updateDialog()
-		panel.fill()
 
 	void doOctaver(float b[])
 		for int i, 0, b.num
@@ -22,26 +20,3 @@ class Octaver : AudioEffect
 	overwrite void process(BufferBox buf)
 		doOctaver(buf.r)
 		doOctaver(buf.l)
-
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		return panel
-	
-class ConfigPanel : Panel
-	Octaver *o
-	void __init__(Octaver *_o)
-		addGrid("", 0, 0, 3, 1, "table2")
-		setTarget("table2", 0)
-		addSlider("!expandx", 0, 0, 0, 0, "level_slider")
-		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "level")
-		addText("%", 2, 0, 0, 0, "")
-		o = _o
-		CreateSliderM(self, "level_slider", "level", 0, 1, 100, &onLevel, o.config.Level)
-	
-		fill()
-	void fill()
-		SliderSet(self, "level", o.config.Level)
-
-	void onLevel()
-		o.config.Level = SliderGet(self, "level")
-		o.notify()

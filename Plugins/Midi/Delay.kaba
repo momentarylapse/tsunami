@@ -1,0 +1,48 @@
+use "../api.kaba"
+
+class Config : PluginData
+	float delay
+	
+	overwrite void reset()
+		delay = 0
+
+class Delay : MidiEffect
+	Config config
+	DelayPanel *panel
+	
+	overwrite void process(MidiData midi)
+		AudioFile *a = plugin_context.track.root
+		int dt = a.sample_rate * config.delay
+		for n in midi.note
+			n.range.offset += dt
+
+	overwrite void updateDialog()
+		panel.fill()
+
+	overwrite Panel *createPanel()
+		panel = new DelayPanel(self)
+		return panel
+
+class DelayPanel : Panel
+	Delay *v
+	void __init__(Delay *_v)
+		addGrid("!width=400", 0, 0, 4, 1, "table1")
+		setTarget("table1", 0)
+		addText("Verzögerung", 0, 0, 0, 0, "")
+		addSlider("!expandx", 1, 0, 0, 0, "delay_slider")
+		addSpinButton("\\0\\2000\\0.1", 2, 0, 0, 0, "delay")
+		addText("ms", 3, 0, 0, 0, "")
+		
+		v = _v
+		
+		CreateSliderM(self, "delay_slider", "delay", 0, 2, 1000, &onDelay, v.config.delay)
+		
+		fill()
+
+	void fill()
+		SliderSet(self, "delay", v.config.delay)
+
+	void onDelay()
+		v.config.delay = SliderGet(self, "delay")
+		v.notify()
+

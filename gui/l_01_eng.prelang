@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-202
+203
 // Data (ID,Text)
 about
 
@@ -195,6 +195,8 @@ menu_plugins_echo
 
 menu_plugins_on_audio
 
+menu_plugins_on_midi
+
 menu_plugins_other
 
 menu_plugins_pitch
@@ -305,7 +307,7 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_230642
+rand_id_227982
 
 rdt_source
 !bold\\Source
@@ -408,7 +410,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-133
+136
 // Data (ID,Text)
 
 
@@ -476,6 +478,8 @@ Aufruf: tsunami --info <Datei.nami>
 
 Beim Anwenden eines Effekts: 
 
+Beim Anwenden eines MidiEffekts: 
+
 Beschreibung
 
 Das neue Gerät wird erst beim nächsten Start verwendet!
@@ -538,6 +542,8 @@ Ist halt irgendwie passiert...
 
 Kann Effekt nicht laden: %s
 
+Kann MidiEffekt nicht laden: %s
+
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 
 Kann nur Samples löschen, die nicht benutzt werden!
@@ -563,6 +569,8 @@ MIDI Quellen
 Metronom
 
 Midi Editor
+
+MidiEffekt nicht ladbar: \"%s\"
 
 Mischpult
 

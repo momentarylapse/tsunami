@@ -19,7 +19,7 @@ class ToneGenerator : AudioEffect
 	ConfigPanel *panel
 	DummySynthesizer synth
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
 		synth.sample_rate = a.sample_rate
 		Range r

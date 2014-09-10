@@ -33,7 +33,7 @@ class Tremolo : AudioEffect
 		panel = new TremoloPanel(self)
 		return panel
 	
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		
 		doTremolo(buf.r)
 		doTremolo(buf.l)

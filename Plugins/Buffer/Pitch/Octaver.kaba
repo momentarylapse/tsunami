@@ -19,7 +19,7 @@ class Octaver : AudioEffect
 		for int i, 0, b.num
 			b[i] = (b[i] * b[i]) * config.Level + b[i] * (1 - config.Level)
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		doOctaver(buf.r)
 		doOctaver(buf.l)
 

@@ -59,7 +59,7 @@ class Echo : AudioEffect
 		panel = new DelayPanel(self)
 		return panel
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 
 		AudioFile *a = audio
 		int delay_samples = a.sample_rate * config.Delay

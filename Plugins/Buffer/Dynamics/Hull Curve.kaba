@@ -44,7 +44,7 @@ class HullCurve : AudioEffect
 			float db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		hull(buf.r)
 		hull(buf.l)
 

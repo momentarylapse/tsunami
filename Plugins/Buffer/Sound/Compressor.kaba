@@ -90,7 +90,7 @@ class Compressor : AudioEffect
 		panel = new ConfigPanel(self)
 		return panel
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
 		
 		dgain_attack = 10 / (config.attack * a.sample_rate)

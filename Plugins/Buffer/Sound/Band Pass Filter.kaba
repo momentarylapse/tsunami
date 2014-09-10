@@ -1,5 +1,5 @@
 // Image = hui:properties
-// Title[Deutsch] = High Pass Filter
+// Title[Deutsch] = Band Pass Filter
 use "../../api.kaba"
 
 const string AutoConfigFrequency = "0:5000:0.1:1:Hz"
@@ -19,29 +19,35 @@ class LowPassFilter : AudioEffect
 	Config config
 	State state
 
-	// y[i] := α * (y[i-1] + x[i] - x[i-1])
 	overwrite void process(BufferBox buf)
 		float RC = 1 / (2 * pi * config.Frequency)
 		float dt = 1.0 / audio.sample_rate
-		float a = RC / (RC + dt)
+		float aa = dt / (RC + dt)
+		float bb = 1 - aa
 		float prev_in_r = 0
 		float prev_in_l = 0
 		if state.used
 			float tr = buf.r[0]
 			float tl = buf.l[0]
-			buf.r[0] = a * (buf.r[0] + state.out_r - state.in_r)
-			buf.l[0] = a * (buf.l[0] + state.out_l - state.in_l)
+			buf.r[0] = bb * (buf.r[0] + state.out_r - state.in_r)
+			buf.l[0] = bb * (buf.l[0] + state.out_l - state.in_l)
 			prev_in_r = tr
 			prev_in_l = tl
-
+			//buf.r[0] = aa * buf.r[0] + bb * state.out_r
+			//buf.l[0] = aa * buf.l[0] + bb * state.out_l
+		
+		// y[i] := b * (y[i-1] + x[i] - x[i-1])
+		// z[i] := α * y[i] + b * z[i-1]
 	
 		for int i, 1, buf.num
 			tr = buf.r[i]
 			tl = buf.l[i]
-			buf.r[i] = a * (buf.r[i] + buf.r[i-1] - prev_in_r)
-			buf.l[i] = a * (buf.l[i] + buf.l[i-1] - prev_in_l)
+			buf.r[i] = bb * (buf.r[i] + buf.r[i-1] - prev_in_r)
+			buf.l[i] = bb * (buf.l[i] + buf.l[i-1] - prev_in_l)
 			prev_in_r = tr
 			prev_in_l = tl
+			//buf.r[i] = aa * buf.r[i] + bb * buf.r[i-1]
+			//buf.l[i] = aa * buf.l[i] + bb * buf.l[i-1]
 		
 		state.used = true
 		state.in_r = prev_in_r

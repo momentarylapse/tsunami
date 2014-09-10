@@ -34,6 +34,7 @@ enum
 {
 	CONFIGURABLE_EFFECT,
 	CONFIGURABLE_SYNTHESIZER,
+	CONFIGURABLE_MIDI_EFFECT,
 };
 
 class Configurable : public Observable
@@ -41,8 +42,8 @@ class Configurable : public Observable
 public:
 	Configurable(const string &observable_name, int type);
 	virtual ~Configurable();
-	void __init__();
-	virtual void __delete__();
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 

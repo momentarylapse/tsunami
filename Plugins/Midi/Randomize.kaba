@@ -1,0 +1,61 @@
+use "../api.kaba"
+
+class Config : PluginData
+	float time
+	float volume
+	
+	overwrite void reset()
+		time = 0
+		volume = 0
+
+class Randomize : MidiEffect
+	Config config
+	RandomizePanel *panel
+	overwrite void process(MidiData midi)
+		AudioFile *a = plugin_context.track.root
+		float dt_max = a.sample_rate * config.time
+		for n in midi.note
+			int dt = randi(dt_max * 2) - dt_max
+			n.range.offset += dt
+			n.volume *= rand(config.volume) + 1 - config.volume
+
+	overwrite void updateDialog()
+		panel.fill()
+
+	overwrite Panel *createPanel()
+		panel = new RandomizePanel(self)
+		return panel
+
+class RandomizePanel : Panel
+	Randomize *v
+	void __init__(Randomize *_v)
+		addGrid("!width=400", 0, 0, 4, 2, "table1")
+		setTarget("table1", 0)
+		addText("Zeit", 0, 0, 0, 0, "")
+		addSlider("!expandx", 1, 0, 0, 0, "time_slider")
+		addSpinButton("\\0\\1000\\0.1", 2, 0, 0, 0, "time")
+		addText("ms", 3, 0, 0, 0, "")
+		addText("Lautstärke", 0, 1, 0, 0, "")
+		addSlider("!expandx", 1, 1, 0, 0, "volume_slider")
+		addSpinButton("\\0\\1000\\0.1", 2, 1, 0, 0, "volume")
+		addText("%", 3, 1, 0, 0, "")
+		
+		v = _v
+		
+		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, v.config.volume)
+		CreateSliderM(self, "time_slider", "time", 0, 1, 1000, &onTime, v.config.time)
+		
+		fill()
+
+	void fill()
+		SliderSet(self, "volume", v.config.volume)
+		SliderSet(self, "time", v.config.time)
+
+	void onVolume()
+		v.config.volume = SliderGet(self, "volume")
+		v.notify()
+
+	void onTime()
+		v.config.time = SliderGet(self, "time")
+		v.notify()
+

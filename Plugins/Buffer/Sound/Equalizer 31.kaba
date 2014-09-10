@@ -53,7 +53,7 @@ class Equalizer31 : AudioEffect
 		// transform back
 		fft_c2r_inv(f, b)
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		equalize(buf.r)
 		equalize(buf.l)
 		f.clear()

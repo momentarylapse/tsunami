@@ -22,7 +22,7 @@ class Volume : AudioEffect
 		panel = new VolumePanel(self)
 		return panel
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		float factor = config.Volume
 		if config.Maximize
 			float max = 0

@@ -15,6 +15,7 @@
 
 class Plugin;
 class Effect;
+class MidiEffect;
 class Synthesizer;
 class Configurable;
 class FavoriteManager;
@@ -26,8 +27,8 @@ public:
 	virtual ~PluginManager();
 
 	void LinkAppScriptData();
-        void FindPlugins();
-        void AddPluginsToMenu(HuiWindow *win);
+	void FindPlugins();
+	void AddPluginsToMenu(HuiWindow *win);
 	void FindAndExecutePlugin();
 
 	void OnMenuExecutePlugin();
@@ -47,6 +48,7 @@ public:
 	virtual void OnUpdate(Observable *o, const string &message);
 
 	Effect *LoadEffect(const string &name);
+	MidiEffect *LoadMidiEffect(const string &name);
 
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name);

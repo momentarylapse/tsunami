@@ -22,6 +22,7 @@
 #include "../View/AudioView.h"
 #include "Plugin.h"
 #include "Effect.h"
+#include "MidiEffect.h"
 #include "FavoriteManager.h"
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
@@ -138,12 +139,27 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
 	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "processTrack", Script::mf(&Effect::ProcessTrack), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "process", Script::mf(&Effect::ProcessTrack), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::CreatePanel), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::ResetConfig), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::ResetState), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
 	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
+
+	MidiEffect midieffect;
+	Script::DeclareClassSize("MidiEffect", sizeof(MidiEffect));
+	Script::DeclareClassOffset("MidiEffect", "name", _offsetof(MidiEffect, name));
+	Script::DeclareClassOffset("MidiEffect", "only_on_selection", _offsetof(MidiEffect, only_on_selection));
+	Script::DeclareClassOffset("MidiEffect", "range", _offsetof(MidiEffect, range));
+	Script::DeclareClassOffset("MidiEffect", "usable", _offsetof(MidiEffect, usable));
+	Script::LinkExternal("MidiEffect.__init__", Script::mf(&MidiEffect::__init__));
+	Script::DeclareClassVirtualIndex("MidiEffect", "__delete__", Script::mf(&MidiEffect::__delete__), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "process", Script::mf(&MidiEffect::process), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "createPanel", Script::mf(&MidiEffect::CreatePanel), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "resetConfig", Script::mf(&MidiEffect::ResetConfig), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "resetState", Script::mf(&MidiEffect::ResetState), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Script::mf(&MidiEffect::UpdateDialog), &midieffect);
+	Script::LinkExternal("MidiEffect.notify", Script::mf(&MidiEffect::notify));
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
 	Script::DeclareClassOffset("BufferBox", "offset", _offsetof(BufferBox, offset));
@@ -363,6 +379,9 @@ void PluginManager::FindPlugins()
 	find_plugins_in_dir("Buffer/Sound/", this);
 	find_plugins_in_dir("Buffer/Synthesizer/", this);
 
+	// "Midi"
+	find_plugins_in_dir("Midi/", this);
+
 	// "All"
 	find_plugins_in_dir("All/", this);
 
@@ -383,6 +402,9 @@ void PluginManager::AddPluginsToMenu(HuiWindow *win)
 	add_plugins_in_dir("Buffer/Pitch/", this, m->GetSubMenuByID("menu_plugins_pitch"));
 	add_plugins_in_dir("Buffer/Sound/", this, m->GetSubMenuByID("menu_plugins_sound"));
 	add_plugins_in_dir("Buffer/Synthesizer/", this, m->GetSubMenuByID("menu_plugins_synthesizer"));
+
+	// "Midi"
+	add_plugins_in_dir("Midi/", this, m->GetSubMenuByID("menu_plugins_on_midi"));
 
 	// "All"
 	add_plugins_in_dir("All/", this, m->GetSubMenuByID("menu_plugins_on_audio"));
@@ -463,15 +485,21 @@ void PluginManager::ExecutePlugin(const string &filename)
 		AudioFile *a = tsunami->audio;
 
 		Effect *fx = NULL;
+		MidiEffect *mfx = NULL;
 		foreach(Script::Type *t, s->syntax->Types){
 			Script::Type *r = t;
 			while (r->parent)
 				r = r->parent;
-			if (r->name != "AudioEffect")
+			if (r->name == "AudioEffect"){
+				fx = (Effect*)t->CreateInstance();
+				fx->name = p->filename.basename();
+				fx->name = fx->name.head(fx->name.num - 5);
+			}else if (r->name == "MidiEffect"){
+				mfx = (MidiEffect*)t->CreateInstance();
+				mfx->name = p->filename.basename();
+				mfx->name = mfx->name.head(mfx->name.num - 5);
+			}else
 				continue;
-			fx = (Effect*)t->CreateInstance();
-			fx->name = p->filename.basename();
-			fx->name = fx->name.head(fx->name.num - 5);
 			break;
 		}
 		main_void_func *f_main = (main_void_func*)s->MatchFunction("main", "void", 0);
@@ -497,6 +525,24 @@ void PluginManager::ExecutePlugin(const string &filename)
 				}
 			}
 			delete(fx);
+		}else if (mfx){
+			tsunami->plugin_manager->cur_effect = NULL;//fx;
+			mfx->ResetConfig();
+			if (mfx->Configure()){
+				if (a->used){
+					Range range = tsunami->win->view->GetPlaybackSelection();
+					a->action_manager->BeginActionGroup();
+					foreach(Track *t, a->track)
+						if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
+							mfx->ResetState();
+							mfx->DoProcessTrack(t, range);
+						}
+					a->action_manager->EndActionGroup();
+				}else{
+					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
+				}
+			}
+			delete(mfx);
 		}/*else if (f_audio){
 			if (a->used)
 				f_audio(a);
@@ -505,7 +551,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 		}*/else if (f_main){
 			f_main();
 		}else{
-			tsunami->log->Error(_("Plugin ist kein Effekt und enth&alt keine Funktion 'void main()'"));
+			tsunami->log->Error(_("Plugin ist kein Effekt/MidiEffekt und enth&alt keine Funktion 'void main()'"));
 		}
 	}else{
 		tsunami->log->Error(cur_plugin->GetError());
@@ -580,6 +626,30 @@ Effect *PluginManager::LoadEffect(const string &name)
 		if (t->GetRoot()->name != "AudioEffect")
 			continue;
 		return (Effect*)t->CreateInstance();
+	}
+	return NULL;
+}
+
+MidiEffect *PluginManager::LoadMidiEffect(const string &name)
+{
+	bool found = false;
+	foreach(PluginFile &pf, plugin_file){
+		if ((pf.name == name) && (pf.filename.find("/Midi/") >= 0)){
+			found = true;
+			if (!LoadAndCompilePlugin(pf.filename))
+				return NULL;
+		}
+	}
+	if (!found){
+		tsunami->log->Error(format(_("Kann MidiEffekt nicht laden: %s"), name.c_str()));
+		return NULL;
+	}
+
+	Script::Script *s = cur_plugin->s;
+	foreach(Script::Type *t, s->syntax->Types){
+		if (t->GetRoot()->name != "MidiEffect")
+			continue;
+		return (MidiEffect*)t->CreateInstance();
 	}
 	return NULL;
 }

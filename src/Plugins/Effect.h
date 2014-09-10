@@ -21,11 +21,6 @@ class Script;
 class Type;
 };
 
-struct EffectParam
-{
-	string value;
-};
-
 class Effect : public Configurable
 {
 public:
@@ -33,8 +28,8 @@ public:
 	Effect(Plugin *p);
 	virtual ~Effect();
 
-	void __init__();
-	virtual void __delete__();
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
 
 	bool only_on_selection;
 	Range range;
@@ -42,7 +37,7 @@ public:
 	bool usable;
 	bool enabled;
 
-	virtual void ProcessTrack(BufferBox *buf){};
+	virtual void _cdecl ProcessTrack(BufferBox *buf){};
 
 	void DoProcessTrack(Track *t, int level_no, const Range &r);
 
@@ -52,6 +47,6 @@ public:
 	string GetError();
 };
 
-Effect *CreateEffect(const string &name);
+Effect *_cdecl CreateEffect(const string &name);
 
 #endif /* EFFECT_H_ */

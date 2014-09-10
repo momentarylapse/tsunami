@@ -11,6 +11,8 @@
 #include "../lib/base/base.h"
 #include "Range.h"
 
+class MidiEffect;
+
 class MidiNote
 {
 public:
@@ -40,6 +42,8 @@ public:
 	Range GetRange();
 
 	void sort();
+
+	Array<MidiEffect*> fx;
 };
 
 enum

@@ -41,7 +41,7 @@ class PitchShift : AudioEffect
 		panel = new ConfigPanel(self)
 		return panel
 
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		shift_buf(buf.r)
 		shift_buf(buf.l)
 		buf1.clear()

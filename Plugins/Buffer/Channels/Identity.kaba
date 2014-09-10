@@ -3,5 +3,5 @@
 use "../../api.kaba"
 
 class Identity : AudioEffect
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		nil

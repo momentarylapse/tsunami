@@ -3,5 +3,5 @@
 use "../../api.kaba"
 
 class ClearL : AudioEffect
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		buf.l = 0

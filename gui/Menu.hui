@@ -79,6 +79,8 @@ Menu menu "" disabled
 		Menu menu_plugins_sound "Klang"
 		Menu menu_plugins_synthesizer "Synthese"
 		Separator "" ""
+		Menu menu_plugins_on_midi "Auf Midi"
+		Separator "" ""
 		Menu menu_plugins_on_audio "Auf Alles"
 		Menu menu_plugins_other "Eigenständig"
 	Menu menu_help "?"

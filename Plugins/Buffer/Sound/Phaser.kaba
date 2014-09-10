@@ -56,7 +56,7 @@ class Phaser : AudioEffect
 		panel = new PhaserPanel(self)
 		return panel
 	
-	overwrite void processTrack(BufferBox buf)
+	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
 	
 		doPhaser(buf.r, state.r, a.sample_rate)

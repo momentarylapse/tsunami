@@ -41,7 +41,21 @@ class AudioEffect
 	bool usable
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void processTrack(BufferBox buf)
+	extern virtual void process(BufferBox buf)
+	extern virtual void resetConfig()
+	extern virtual void resetState()
+	extern virtual Panel *createPanel()
+	extern virtual void updateDialog()
+	extern void notify()
+
+class MidiEffect
+	string name
+	bool only_on_selection
+	Range range
+	bool usable
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual void process(MidiData midi)
 	extern virtual void resetConfig()
 	extern virtual void resetState()
 	extern virtual Panel *createPanel()
@@ -147,7 +161,7 @@ class Track
 	// editing
 	rect area
 	int parent
-	void *root
+	AudioFile *root
 
 	bool is_selected
 

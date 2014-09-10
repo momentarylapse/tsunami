@@ -42,6 +42,9 @@ public:
 	void Save(Configurable *c, const string &name);
 
 	string SelectName(HuiWindow *win, Configurable *c, bool save);
+
+	string type2str(int type);
+	int str2type(const string &str);
 };
 
 #endif /* FAVORITEMANAGER_H_ */

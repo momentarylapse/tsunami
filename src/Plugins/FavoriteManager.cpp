@@ -19,6 +19,28 @@ FavoriteManager::~FavoriteManager()
 {
 }
 
+string FavoriteManager::type2str(int type)
+{
+	if (type == CONFIGURABLE_EFFECT)
+		return "Effect";
+	if (type == CONFIGURABLE_SYNTHESIZER)
+		return "Synth";
+	if (type == CONFIGURABLE_MIDI_EFFECT)
+		return "MidiEffect";
+	return "???";
+}
+
+int FavoriteManager::str2type(const string &str)
+{
+	if (str == "Effect")
+		return CONFIGURABLE_EFFECT;
+	if (str == "Synth")
+		return CONFIGURABLE_SYNTHESIZER;
+	if (str == "MidiEffect")
+		return CONFIGURABLE_MIDI_EFFECT;
+	return -1;
+}
+
 void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 {
 	if (!file_test_existence(filename))
@@ -30,7 +52,7 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 	for (int i=0; i<n; i++){
 		Favorite ff;
 		string type = f->ReadStr();
-		ff.type = (type == "Effect") ? CONFIGURABLE_EFFECT : CONFIGURABLE_SYNTHESIZER;
+		ff.type = str2type(type);
 		ff.config_name = f->ReadStr();
 		ff.name = f->ReadStr();
 		ff.options = f->ReadStr();
@@ -54,7 +76,7 @@ void FavoriteManager::Save()
 		return;
 	f->WriteInt(favorites.num);
 	foreach(Favorite &ff, favorites){
-		f->WriteStr((ff.type == CONFIGURABLE_EFFECT) ? "Effect" : "Synth");
+		f->WriteStr(type2str(ff.type));
 		f->WriteStr(ff.config_name);
 		f->WriteStr(ff.name);
 		f->WriteStr(ff.options);

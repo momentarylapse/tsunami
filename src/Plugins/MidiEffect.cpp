@@ -85,11 +85,19 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 
 	tsunami->plugin_manager->context.set(t, 0, r);
 
-	MidiData midi = t->midi;
-	//ActionTrackEditBuffer *a = new ActionTrack(t, level_no, r);
+	MidiData midi;
+	midi.append(t->midi.GetNotes(r));
+
+	t->root->action_manager->BeginActionGroup();
+
+	foreachib(MidiNote &n, t->midi, i)
+		if (r.is_inside(n.range.offset)){
+			t->DeleteMidiNote(i);
+			_foreach_it_.update(); // TODO...
+		}
 	process(&midi);
-	//t->root->Execute(a);
-	t->midi = midi;
+	t->InsertMidiData(0, midi);
+	t->root->action_manager->EndActionGroup();
 }
 
 

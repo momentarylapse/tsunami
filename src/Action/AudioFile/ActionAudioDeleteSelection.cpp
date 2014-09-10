@@ -10,6 +10,7 @@
 #include "../Track/Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../Track/Buffer/ActionTrack__ShrinkBufferBox.h"
 #include "../Track/Sample/ActionTrackDeleteSample.h"
+#include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_no, const Range &range, bool all_levels)
 {
@@ -24,9 +25,16 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_n
 			}
 
 			// subs
-			foreachib(SampleRef *s, t->sample, n)
+			foreachib(SampleRef *s, t->sample, i)
 				if (s->is_selected){
-					AddSubAction(new ActionTrackDeleteSample(t, n), a);
+					AddSubAction(new ActionTrackDeleteSample(t, i), a);
+					_foreach_it_.update(); // TODO...
+				}
+
+			// midi
+			foreachib(MidiNote &n, t->midi, i)
+				if (range.is_inside(n.range.offset)){
+					AddSubAction(new ActionTrackDeleteMidiNote(t, i), a);
 					_foreach_it_.update(); // TODO...
 				}
 		}

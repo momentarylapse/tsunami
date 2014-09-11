@@ -180,6 +180,7 @@ OBJ = \
  Plugins/ExtendedBufferBox.o\
  Plugins/FastFourierTransform.o\
  Plugins/FavoriteManager.o\
+ Plugins/MidiEffect.o\
  Plugins/Plugin.o\
  Plugins/PluginManager.o\
  Storage/Dialog/RawConfigDialog.o\
@@ -199,6 +200,7 @@ OBJ = \
  View/BottomBar/CurveConsole.o\
  View/BottomBar/FxConsole.o\
  View/BottomBar/LogDialog.o\
+ View/BottomBar/MidiEditor.o\
  View/BottomBar/MiniConsole.o\
  View/BottomBar/MixingConsole.o\
  View/BottomBar/SampleManager.o\
@@ -757,6 +759,9 @@ Plugins/FastFourierTransform.o : Plugins/FastFourierTransform.cpp
 Plugins/FavoriteManager.o : Plugins/FavoriteManager.cpp
 	$(CPP) -c Plugins/FavoriteManager.cpp -o $@ $(CXXFLAGS)
 
+Plugins/MidiEffect.o : Plugins/MidiEffect.cpp
+	$(CPP) -c Plugins/MidiEffect.cpp -o $@ $(CXXFLAGS)
+
 Plugins/Plugin.o : Plugins/Plugin.cpp
 	$(CPP) -c Plugins/Plugin.cpp -o $@ $(CXXFLAGS)
 
@@ -813,6 +818,9 @@ View/BottomBar/FxConsole.o : View/BottomBar/FxConsole.cpp
 
 View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 	$(CPP) -c View/BottomBar/LogDialog.cpp -o $@ $(CXXFLAGS)
+
+View/BottomBar/MidiEditor.o : View/BottomBar/MidiEditor.cpp
+	$(CPP) -c View/BottomBar/MidiEditor.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/MiniConsole.o : View/BottomBar/MiniConsole.cpp
 	$(CPP) -c View/BottomBar/MiniConsole.cpp -o $@ $(CXXFLAGS)
@@ -892,6 +900,7 @@ install : all
 	cp -rf ../Plugins/*.kaba           /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Buffer           /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/All              /usr/share/tsunami/Plugins
+	cp -rf ../Plugins/Midi             /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Independent      /usr/share/tsunami/Plugins
 	cp -rf ../Plugins/Synthesizer      /usr/share/tsunami/Plugins
 	cp -rf ../Lessons/                 /usr/share/tsunami/

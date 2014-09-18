@@ -14,7 +14,7 @@
 class Format
 {
 public:
-	Format(const string &_extension, int _flags);
+	Format(const string &_extensions, int _flags);
 	virtual ~Format();
 	bool CanHandle(const string &_extension);
 	bool TestFormatCompatibility(AudioFile *a);
@@ -28,7 +28,7 @@ public:
 	virtual void LoadAudio(AudioFile *a, const string &filename) = 0;
 	virtual void SaveAudio(AudioFile *a, const string &filename) = 0;
 
-	string extension;
+	Array<string> extensions;
 	int flags;
 
 	enum{

@@ -206,12 +206,14 @@ bool Storage::AskByFlags(HuiWindow *win, const string &title, bool save, int fla
 	string filter, filter_show;
 	foreach(Format *f, format)
 		if ((f->flags & flags) == flags){
-			if (filter != "")
-				filter += ";";
-			filter += "*." + f->extension;
-			if (filter_show != "")
-				filter_show += ",";
-			filter_show += "*." + f->extension;
+			foreach(string &e, f->extensions){
+				if (filter != "")
+					filter += ";";
+				filter += "*." + e;
+				if (filter_show != "")
+					filter_show += ",";
+				filter_show += "*." + e;
+			}
 		}
 	if (save)
 		return HuiFileDialogSave(win, title, CurrentDirectory, filter_show, filter);

@@ -10,9 +10,9 @@
 #include "../Audio/AudioRenderer.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-Format::Format(const string &_extension, int _flags)
+Format::Format(const string &_extensions, int _flags)
 {
-	extension = _extension;
+	extensions = _extensions.explode(",");
 	flags = _flags;
 }
 
@@ -34,7 +34,10 @@ void Format::ImportData(Track *t, void *data, int channels, SampleFormat format,
 
 bool Format::CanHandle(const string & _extension)
 {
-	return (extension == _extension);
+	foreach(string e, extensions)
+		if (e == _extension)
+			return true;
+	return false;
 }
 
 void Format::ExportAudioAsTrack(AudioFile* a, const string& filename)

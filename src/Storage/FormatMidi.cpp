@@ -10,7 +10,7 @@
 #include "../Stuff/Log.h"
 
 FormatMidi::FormatMidi() :
-	Format("mid", FLAG_MIDI | FLAG_MULTITRACK)
+	Format("mid,midi", FLAG_MIDI | FLAG_MULTITRACK)
 {
 }
 

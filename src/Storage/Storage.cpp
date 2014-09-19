@@ -12,6 +12,7 @@
 #include "FormatOgg.h"
 #include "FormatFlac.h"
 #include "FormatMidi.h"
+#include "FormatMp3.h"
 #include "FormatNami.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -29,6 +30,7 @@ Storage::Storage()
 	format.add(new FormatRaw());
 	format.add(new FormatOgg());
 	format.add(new FormatFlac());
+	format.add(new FormatMp3());
 	format.add(new FormatMidi());
 
 	CurrentDirectory = HuiConfig.getStr("CurrentDirectory", "");

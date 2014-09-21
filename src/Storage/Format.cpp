@@ -10,8 +10,9 @@
 #include "../Audio/AudioRenderer.h"
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-Format::Format(const string &_extensions, int _flags)
+Format::Format(const string &_description, const string &_extensions, int _flags)
 {
+	description = _description;
 	extensions = _extensions.explode(",");
 	flags = _flags;
 }

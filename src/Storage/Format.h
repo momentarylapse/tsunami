@@ -14,9 +14,9 @@
 class Format
 {
 public:
-	Format(const string &_extensions, int _flags);
+	Format(const string &description, const string &extensions, int _flags);
 	virtual ~Format();
-	bool CanHandle(const string &_extension);
+	bool CanHandle(const string &extension);
 	bool TestFormatCompatibility(AudioFile *a);
 
 	void ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
@@ -29,16 +29,19 @@ public:
 	virtual void SaveAudio(AudioFile *a, const string &filename) = 0;
 
 	Array<string> extensions;
+	string description;
 	int flags;
 
 	enum{
-		FLAG_SINGLE_TRACK = 1,
-		FLAG_TAGS = 2,
-		FLAG_FX = 4,
-		FLAG_MULTITRACK = 8,
-		FLAG_SUBS = 16,
-		FLAG_AUDIO = 32,
-		FLAG_MIDI = 64,
+		FLAG_SINGLE_TRACK = 1<<0,
+		FLAG_TAGS = 1<<1,
+		FLAG_FX = 1<<2,
+		FLAG_MULTITRACK = 1<<3,
+		FLAG_SUBS = 1<<4,
+		FLAG_AUDIO = 1<<5,
+		FLAG_MIDI = 1<<6,
+		FLAG_READ = 1<<7,
+		FLAG_WRITE = 1<<8,
 	};
 };
 

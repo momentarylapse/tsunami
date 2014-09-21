@@ -30,12 +30,16 @@ bool HuiFileDialogDir(HuiWindow *win, const string &title, const string &dir/*, 
 
 void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter)
 {
-	GtkFileFilter *gtk_filter = gtk_file_filter_new();
-	gtk_file_filter_set_name(gtk_filter, sys_str(show_filter));
-	Array<string> filters = filter.explode(";");
-	foreach(string &f, filters)
-		gtk_file_filter_add_pattern(gtk_filter, sys_str(f));
-	gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dlg), gtk_filter);
+	Array<string> show_filter_list = show_filter.explode("|");
+	Array<string> filter_list = filter.explode("|");
+	for (int i=0; i<min(show_filter_list.num, filter_list.num); i++){
+		GtkFileFilter *gtk_filter = gtk_file_filter_new();
+		gtk_file_filter_set_name(gtk_filter, sys_str(show_filter_list[i]));
+		Array<string> filters = filter_list[i].explode(";");
+		foreach(string &f, filters)
+			gtk_file_filter_add_pattern(gtk_filter, sys_str(f));
+		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dlg), gtk_filter);
+	}
 }
 
 // file selection for opening (filter should look like "*.txt")

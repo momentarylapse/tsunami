@@ -187,6 +187,7 @@ OBJ = \
  Storage/Format.o\
  Storage/FormatFlac.o\
  Storage/FormatMidi.o\
+ Storage/FormatM4a.o\
  Storage/FormatMp3.o\
  Storage/FormatNami.o\
  Storage/FormatOgg.o\
@@ -780,6 +781,9 @@ Storage/FormatFlac.o : Storage/FormatFlac.cpp
 
 Storage/FormatMidi.o : Storage/FormatMidi.cpp
 	$(CPP) -c Storage/FormatMidi.cpp -o $@ $(CXXFLAGS)
+
+Storage/FormatM4a.o : Storage/FormatM4a.cpp
+	$(CPP) -c Storage/FormatM4a.cpp -o $@ $(CXXFLAGS)
 
 Storage/FormatMp3.o : Storage/FormatMp3.cpp
 	$(CPP) -c Storage/FormatMp3.cpp -o $@ $(CXXFLAGS)

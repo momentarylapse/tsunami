@@ -11,6 +11,7 @@
 #include "FormatRaw.h"
 #include "FormatOgg.h"
 #include "FormatFlac.h"
+#include "FormatM4a.h"
 #include "FormatMidi.h"
 #include "FormatMp3.h"
 #include "FormatNami.h"
@@ -31,6 +32,7 @@ Storage::Storage()
 	format.add(new FormatOgg());
 	format.add(new FormatFlac());
 	format.add(new FormatMp3());
+	format.add(new FormatM4a());
 	format.add(new FormatMidi());
 
 	CurrentDirectory = HuiConfig.getStr("CurrentDirectory", "");
@@ -206,16 +208,35 @@ bool Storage::Export(AudioFile *a, const Range &r, const string &filename)
 bool Storage::AskByFlags(HuiWindow *win, const string &title, bool save, int flags)
 {
 	string filter, filter_show;
+	filter_show = _("alles m&ogliche (");
+	bool first = true;
 	foreach(Format *f, format)
 		if ((f->flags & flags) == flags){
 			foreach(string &e, f->extensions){
-				if (filter != "")
+				if (!first)
 					filter += ";";
 				filter += "*." + e;
-				if (filter_show != "")
-					filter_show += ",";
+				if (!first)
+					filter_show += ", ";
+				filter_show += "*." + e;
+				first = false;
+			}
+		}
+	filter_show += ")|" + _("alle Dateien");
+	filter += "|*.*";
+	foreach(Format *f, format)
+		if ((f->flags & flags) == flags){
+			filter += "|";
+			filter_show += "|" + f->description + " (";
+			foreachi(string &e, f->extensions, i){
+				if (i > 0){
+					filter += ";";
+					filter_show += ", ";
+				}
+				filter += "*." + e;
 				filter_show += "*." + e;
 			}
+			filter_show += ")";
 		}
 	if (save)
 		return HuiFileDialogSave(win, title, CurrentDirectory, filter_show, filter);
@@ -225,20 +246,20 @@ bool Storage::AskByFlags(HuiWindow *win, const string &title, bool save, int fla
 
 bool Storage::AskOpen(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei &offnen"), false, 0);
+	return AskByFlags(win, _("Datei &offnen"), false, Format::FLAG_READ);
 }
 
 bool Storage::AskSave(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei speichern"), true, 0);
+	return AskByFlags(win, _("Datei speichern"), true, Format::FLAG_WRITE);
 }
 
 bool Storage::AskOpenImport(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei importieren"), false, Format::FLAG_SINGLE_TRACK);
+	return AskByFlags(win, _("Datei importieren"), false, Format::FLAG_SINGLE_TRACK | Format::FLAG_READ);
 }
 
 bool Storage::AskSaveExport(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei exportieren"), true, Format::FLAG_SINGLE_TRACK);
+	return AskByFlags(win, _("Datei exportieren"), true, Format::FLAG_SINGLE_TRACK | Format::FLAG_WRITE);
 }

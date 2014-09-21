@@ -23,7 +23,7 @@ OggVorbis_File vf;
 char ogg_buffer[4096];
 
 FormatOgg::FormatOgg() :
-	Format("ogg", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS)
+	Format("Ogg vorbis", "ogg", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ | FLAG_WRITE)
 {
 }
 

@@ -320,7 +320,7 @@ void Track::EditMidiEffect(int index, const string &param_old)
 
 void Track::EnableMidiEffect(int index, bool enabled)
 {
-	if (fx[index]->enabled != enabled)
+	if (midi.fx[index]->enabled != enabled)
 		root->Execute(new ActionTrackToggleMidiEffectEnabled(this, index));
 }
 

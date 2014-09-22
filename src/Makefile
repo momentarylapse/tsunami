@@ -32,6 +32,10 @@ OBJ = \
  Action/Track/Effect/ActionTrackDeleteEffect.o\
  Action/Track/Effect/ActionTrackEditEffect.o\
  Action/Track/Effect/ActionTrackToggleEffectEnabled.o\
+ Action/Track/Midi/ActionTrackAddMidiEffect.o\
+ Action/Track/Midi/ActionTrackDeleteMidiEffect.o\
+ Action/Track/Midi/ActionTrackEditMidiEffect.o\
+ Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.o\
  Action/Track/Midi/ActionTrackAddMidiNote.o\
  Action/Track/Midi/ActionTrackDeleteMidiNote.o\
  Action/Track/Midi/ActionTrackInsertMidi.o\
@@ -319,6 +323,18 @@ Action/Track/Effect/ActionTrackEditEffect.o : Action/Track/Effect/ActionTrackEdi
 
 Action/Track/Effect/ActionTrackToggleEffectEnabled.o : Action/Track/Effect/ActionTrackToggleEffectEnabled.cpp
 	$(CPP) -c Action/Track/Effect/ActionTrackToggleEffectEnabled.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Midi/ActionTrackAddMidiEffect.o : Action/Track/Midi/ActionTrackAddMidiEffect.cpp
+	$(CPP) -c Action/Track/Midi/ActionTrackAddMidiEffect.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Midi/ActionTrackDeleteMidiEffect.o : Action/Track/Midi/ActionTrackDeleteMidiEffect.cpp
+	$(CPP) -c Action/Track/Midi/ActionTrackDeleteMidiEffect.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Midi/ActionTrackEditMidiEffect.o : Action/Track/Midi/ActionTrackEditMidiEffect.cpp
+	$(CPP) -c Action/Track/Midi/ActionTrackEditMidiEffect.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.o : Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.cpp
+	$(CPP) -c Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Midi/ActionTrackAddMidiNote.o : Action/Track/Midi/ActionTrackAddMidiNote.cpp
 	$(CPP) -c Action/Track/Midi/ActionTrackAddMidiNote.cpp -o $@ $(CXXFLAGS)

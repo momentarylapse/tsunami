@@ -293,7 +293,8 @@ class AutoConfigPanel : public HuiPanel
 public:
 	Array<Slider*> slider;
 	Array<AutoConfigData> aa;
-	AutoConfigPanel(Array<AutoConfigData> &_aa)
+	Configurable *c;
+	AutoConfigPanel(Array<AutoConfigData> &_aa, Configurable *_c)
 	{
 		aa = _aa;
 		AddControlTable("", 0, 0, 1, 3, "root-table");
@@ -305,22 +306,32 @@ public:
 			AddSlider("!width=150", 1, i, 0, 0, "slider-" + i);
 			AddSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
 			AddText(a.unit, 3, i, 0, 0, "");
-			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::OnChange, *a.value, this));
+			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::onChange, *a.value, this));
 		}
+		c = _c;
 	}
 	~AutoConfigPanel()
 	{
 		foreach(Slider *s, slider)
 			delete(s);
 	}
-	void OnChange()
+	void onChange()
 	{
 		foreachi(AutoConfigData &a, aa, i){
 			*a.value = slider[i]->Get();
 		}
+		c->notify();
+
+	}
+	void update()
+	{
+		foreachi(AutoConfigData &a, aa, i){
+			slider[i]->Set(*a.value);
+		}
 	}
 };
 
+// default handler...
 HuiPanel *Configurable::CreatePanel()
 {
 	PluginData *config = get_config();
@@ -329,7 +340,15 @@ HuiPanel *Configurable::CreatePanel()
 	Array<AutoConfigData> aa = get_auto_conf(config);
 	if (aa.num == 0)
 		return NULL;
-	return new AutoConfigPanel(aa);
+	_auto_panel_ = new AutoConfigPanel(aa, this);
+	return _auto_panel_;
+}
+
+void Configurable::UpdateDialog()
+{
+	if (_auto_panel_){
+		_auto_panel_->update();
+	}
 }
 
 class ConfigurationDialog : public HuiDialog
@@ -409,13 +428,13 @@ public:
 	Configurable *config;
 };
 
-// default handler...
 bool Configurable::Configure()
 {
 	PluginData *config = get_config();
 	if (!config)
 		return true;
 
+	_auto_panel_ = NULL;
 	HuiPanel *panel = CreatePanel();
 	if (!panel)
 		return false;

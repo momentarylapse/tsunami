@@ -250,8 +250,8 @@ void MidiEditor::SetTrack(Track *t)
 	if (track){
 		foreachi(MidiEffect *e, track->midi.fx, i){
 			panels.add(new SingleMidiFxPanel(audio, track, e, i));
-			Embed(panels.back(), id_inner, i*2 + 2, 0);
-			AddSeparator("!vertical", i*2 + 3, 0, 0, 0, "separator_" + i2s(i));
+			Embed(panels.back(), id_inner, i*2 + 3, 0);
+			AddSeparator("!vertical", i*2 + 4, 0, 0, 0, "separator_" + i2s(i));
 		}
 		HideControl("comment_no_fx", track->midi.fx.num > 0);
 	}else{

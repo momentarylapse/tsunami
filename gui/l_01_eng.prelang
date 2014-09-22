@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-203
+207
 // Data (ID,Text)
 about
 
@@ -12,6 +12,8 @@ ad_t_data
 ad_t_levels
 
 ad_t_tags
+
+add
 
 add_bar
 
@@ -76,6 +78,8 @@ capture_type:midi
 close
 Close
 close_file
+
+comment_no_fx
 
 config_synth
 
@@ -221,6 +225,8 @@ metronome
 
 midi_editor
 
+midi_label_fx
+
 ms
 ms
 mute
@@ -307,7 +313,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_227982
+rand_id_310073
+
+rand_id_715306
 
 rdt_source
 !bold\\Source
@@ -410,7 +418,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-136
+141
 // Data (ID,Text)
 
 
@@ -421,6 +429,8 @@ zoom_out
   ...keine Sorge, das wird schon!
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
+
+!angle=90\\-keine Spur ausgewählt-
 
 !angle=90\\für die Spur '%s'
 
@@ -588,7 +598,7 @@ Parameter laden
 
 Parameter speichern
 
-Plugin ist kein Effekt und enthält keine Funktion 'void main()'
+Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'
 
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 
@@ -620,7 +630,11 @@ Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
 
 aktiv?
 
+alle Dateien
+
 alle Nachrichten löschen
+
+alles mögliche (
 
 benutze OpenAl Device: 
 
@@ -647,6 +661,10 @@ keine Sample gewählt
 lade
 
 lade flac
+
+lade m4a
+
+lade mp3
 
 lade nami
 

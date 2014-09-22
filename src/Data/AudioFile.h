@@ -95,6 +95,7 @@ public:
 	SampleRef *get_sample_ref(int track_no, int index);
 	int get_sample_by_uid(int uid);
 	Effect *get_fx(int track_no, int index);
+	MidiEffect *get_midi_fx(int track_no, int index);
 
 // data
 	bool used;

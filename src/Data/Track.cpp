@@ -17,6 +17,10 @@
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
+#include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
+#include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
+#include "../Action/Track/Midi/ActionTrackEditMidiEffect.h"
+#include "../Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.h"
 #include "../Action/Track/Sample/ActionTrackAddSample.h"
 #include "../Action/Track/Sample/ActionTrackDeleteSample.h"
 #include "../Action/Track/Sample/ActionTrackEditSample.h"
@@ -34,6 +38,8 @@
 
 const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
+const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
+const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
 
 Track::Track() :
 	Observable("Track")
@@ -299,6 +305,28 @@ void Track::EnableEffect(int index, bool enabled)
 void Track::DeleteEffect(int index)
 {
 	root->Execute(new ActionTrackDeleteEffect(this, index));
+}
+
+void Track::AddMidiEffect(MidiEffect *effect)
+{
+	root->Execute(new ActionTrackAddMidiEffect(this, effect));
+}
+
+// execute after editing...
+void Track::EditMidiEffect(int index, const string &param_old)
+{
+	root->Execute(new ActionTrackEditMidiEffect(this, index, param_old, midi.fx[index]));
+}
+
+void Track::EnableMidiEffect(int index, bool enabled)
+{
+	if (fx[index]->enabled != enabled)
+		root->Execute(new ActionTrackToggleMidiEffectEnabled(this, index));
+}
+
+void Track::DeleteMidiEffect(int index)
+{
+	root->Execute(new ActionTrackDeleteMidiEffect(this, index));
 }
 
 void Track::SetSynthesizer(Synthesizer *_synth)

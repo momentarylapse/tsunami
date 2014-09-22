@@ -30,8 +30,18 @@ public:
 	void OnChordType();
 	void OnChordInversion();
 
-	AudioFile *audio;
+	void Clear();
+	void SetTrack(Track *t);
+
+	void OnAdd();
+
+
+	string id_inner;
+
 	AudioView *view;
+	Track *track;
+	AudioFile *audio;
+	Array<HuiPanel*> panels;
 };
 
 #endif /* MIDIEDITOR_H_ */

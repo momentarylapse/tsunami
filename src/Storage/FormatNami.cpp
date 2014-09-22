@@ -8,6 +8,7 @@
 #include "FormatNami.h"
 #include "../Tsunami.h"
 #include "../Plugins/Effect.h"
+#include "../Plugins/MidiEffect.h"
 #include "../Stuff/Log.h"
 #include "../View/Helper/Progress.h"
 #include "../Audio/Synth/Synthesizer.h"
@@ -126,7 +127,7 @@ void WriteBar(CFile *f, BarPattern &b)
 
 void WriteMidiNote(CFile *f, MidiNote &n)
 {
-	BeginChunk(f, "midinote");
+	BeginChunk(f, "note");
 
 	f->WriteInt(n.range.offset);
 	f->WriteInt(n.range.num);
@@ -134,6 +135,18 @@ void WriteMidiNote(CFile *f, MidiNote &n)
 	f->WriteFloat(n.volume);
 	f->WriteInt(0); // reserved
 
+	EndChunk(f);
+}
+
+void WriteMidiEffect(CFile *f, MidiEffect *e)
+{
+	BeginChunk(f, "effect");
+	f->WriteStr(e->name);
+	f->WriteBool(e->only_on_selection);
+	f->WriteInt(e->range.offset);
+	f->WriteInt(e->range.num);
+	f->WriteStr(e->ConfigToString());
+	f->WriteStr(e->enabled ? "" : "disabled");
 	EndChunk(f);
 }
 
@@ -148,6 +161,9 @@ void WriteMidi(CFile *f, MidiData &m)
 
 	foreach(MidiNote &n, m)
 		WriteMidiNote(f, n);
+
+	foreach(MidiEffect *e, m.fx)
+		WriteMidiEffect(f, e);
 
 	EndChunk(f);
 }
@@ -463,6 +479,20 @@ void ReadChunkMidiNote(CFile *f, Array<MidiNote> *notes)
 	notes->add(n);
 }
 
+void ReadChunkMidiEffect(CFile *f, MidiData *m)
+{
+	MidiEffect *e = CreateMidiEffect(f->ReadStr());
+	e->only_on_selection = f->ReadBool();
+	e->range.offset = f->ReadInt();
+	e->range.num = f->ReadInt();
+	string params = f->ReadStr();
+	e->ConfigFromString(params);
+	string temp = f->ReadStr();
+	if (temp.find("disabled") >= 0)
+		e->enabled = false;
+	m->fx.add(e);
+}
+
 void ReadChunkMidiData(CFile *f, MidiData *midi)
 {
 	f->ReadStr();
@@ -471,6 +501,8 @@ void ReadChunkMidiData(CFile *f, MidiData *midi)
 	f->ReadInt(); // reserved
 
 	AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
+	AddChunkHandler("note", (chunk_reader*)&ReadChunkMidiNote, midi);
+	AddChunkHandler("effect", (chunk_reader*)&ReadChunkMidiEffect, midi);
 }
 
 void ReadChunkSynth(CFile *f, Track *t)

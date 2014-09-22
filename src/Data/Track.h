@@ -47,6 +47,8 @@ public:
 
 	static const string MESSAGE_ADD_EFFECT;
 	static const string MESSAGE_DELETE_EFFECT;
+	static const string MESSAGE_ADD_MIDI_EFFECT;
+	static const string MESSAGE_DELETE_MIDI_EFFECT;
 
 	void Reset();
 	void UpdatePeaks(int mode);
@@ -68,6 +70,10 @@ public:
 	void _cdecl DeleteEffect(int index);
 	void _cdecl EditEffect(int index, const string &param_old);
 	void _cdecl EnableEffect(int index, bool enabled);
+	void _cdecl AddMidiEffect(MidiEffect *effect);
+	void _cdecl DeleteMidiEffect(int index);
+	void _cdecl EditMidiEffect(int index, const string &param_old);
+	void _cdecl EnableMidiEffect(int index, bool enabled);
 	SampleRef *_cdecl AddSample(int pos, int index);
 	void _cdecl DeleteSample(int index);
 	void _cdecl EditSample(int index, float volume, bool mute, int rep_num, int rep_delay);

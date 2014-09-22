@@ -121,7 +121,7 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 {
 	view = _view;
 	audio = _audio;
-	id_inner = "mixing_inner_table";
+	id_inner = "fx_inner_table";
 
 	AddControlTable("!expandy", 0, 0, 1, 32, id_inner);
 	SetTarget(id_inner, 0);
@@ -136,7 +136,7 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 	//Enable("add", false);
 	Enable("track_name", false);
 
-	EventM("add", (HuiPanel*)this, (void(HuiPanel::*)())&FxConsole::OnAdd);
+	EventM("add", this, &FxConsole::OnAdd);
 
 	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	Subscribe(audio, audio->MESSAGE_ADD_EFFECT);

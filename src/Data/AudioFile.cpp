@@ -443,6 +443,16 @@ Effect *AudioFile::get_fx(int track_no, int index)
 	}
 }
 
+MidiEffect *AudioFile::get_midi_fx(int track_no, int index)
+{
+	assert(index >= 0);
+	Track *t = get_track(track_no);
+	assert(t);
+	assert(index < t->midi.fx.num);
+
+	return t->midi.fx[index];
+}
+
 Track *AudioFile::GetTimeTrack()
 {
 	foreach(Track *t, track)

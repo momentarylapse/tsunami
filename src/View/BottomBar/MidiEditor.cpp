@@ -215,12 +215,9 @@ void MidiEditor::OnChordInversion()
 
 void MidiEditor::OnAdd()
 {
-	if (!HuiFileDialogOpen(win, _("einen Midi-Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins/Midi/", "*.kaba", "*.kaba"))
+	MidiEffect *effect = tsunami->plugin_manager->ChooseMidiEffect(this);
+	if (!effect)
 		return;
-
-	string name = HuiFilename.basename(); // remove directory
-	name = name.substr(0, name.num - 5); //      and remove ".kaba"
-	MidiEffect *effect = CreateMidiEffect(name);
 	if (track)
 		track->AddMidiEffect(effect);
 }

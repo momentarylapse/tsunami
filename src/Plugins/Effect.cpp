@@ -16,7 +16,7 @@
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 Effect::Effect() :
-	Configurable("Effect", CONFIGURABLE_EFFECT)
+	Configurable("Effect", TYPE_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
@@ -25,7 +25,7 @@ Effect::Effect() :
 }
 
 Effect::Effect(Plugin *p) :
-	Configurable("Effect", CONFIGURABLE_EFFECT)
+	Configurable("Effect", TYPE_EFFECT)
 {
 	usable = true;
 	plugin = p;

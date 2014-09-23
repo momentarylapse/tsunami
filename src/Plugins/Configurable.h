@@ -30,13 +30,6 @@ public:
 	Script::Type *type;
 };
 
-enum
-{
-	CONFIGURABLE_EFFECT,
-	CONFIGURABLE_SYNTHESIZER,
-	CONFIGURABLE_MIDI_EFFECT,
-};
-
 //class AutoConfigPanel;
 class ConfigPanel;
 
@@ -66,6 +59,14 @@ public:
 	string name;
 	int configurable_type;
 	//AutoConfigPanel *_auto_panel_;
+
+
+	enum
+	{
+		TYPE_EFFECT,
+		TYPE_SYNTHESIZER,
+		TYPE_MIDI_EFFECT,
+	};
 };
 
 

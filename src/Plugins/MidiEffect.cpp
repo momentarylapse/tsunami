@@ -16,7 +16,7 @@
 #include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 MidiEffect::MidiEffect() :
-	Configurable("Effect", CONFIGURABLE_MIDI_EFFECT)
+	Configurable("Effect", TYPE_MIDI_EFFECT)
 {
 	usable = true;
 	plugin = NULL;
@@ -25,7 +25,7 @@ MidiEffect::MidiEffect() :
 }
 
 MidiEffect::MidiEffect(Plugin *p) :
-	Configurable("Effect", CONFIGURABLE_MIDI_EFFECT)
+	Configurable("Effect", TYPE_MIDI_EFFECT)
 {
 	usable = true;
 	plugin = p;

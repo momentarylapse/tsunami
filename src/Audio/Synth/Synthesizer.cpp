@@ -74,7 +74,7 @@ string pitch_name(int pitch)
 }
 
 Synthesizer::Synthesizer() :
-	Configurable("Synthesizer", CONFIGURABLE_SYNTHESIZER)
+	Configurable("Synthesizer", TYPE_SYNTHESIZER)
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;

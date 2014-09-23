@@ -154,12 +154,9 @@ FxConsole::~FxConsole()
 
 void FxConsole::OnAdd()
 {
-	if (!HuiFileDialogOpen(win, _("einen Effekt w&ahlen"), HuiAppDirectoryStatic + "Plugins/Buffer/", "*.kaba", "*.kaba"))
+	Effect *effect = tsunami->plugin_manager->ChooseEffect(this);
+	if (!effect)
 		return;
-
-	string name = HuiFilename.basename(); // remove directory
-	name = name.substr(0, name.num - 5); //      and remove ".kaba"
-	Effect *effect = CreateEffect(name);
 	if (track)
 		track->AddEffect(effect);
 	else

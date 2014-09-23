@@ -53,6 +53,11 @@ public:
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name);
 
+	Effect *ChooseEffect(HuiPanel *parent);
+	MidiEffect *ChooseMidiEffect(HuiPanel *parent);
+	//Synthesizer *ChooseSynthesizer(HuiPanel *parent);
+
+
 	// not compiled yet
 	struct PluginFile
 	{

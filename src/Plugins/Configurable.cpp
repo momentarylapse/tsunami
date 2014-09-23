@@ -379,7 +379,7 @@ public:
 		SetTarget("root-table", 0);
 		AddControlTable("!buttonbar", 0, 2, 4, 1, "command_grid");
 		SetTarget("command_grid", 0);
-		if (c->configurable_type == CONFIGURABLE_EFFECT){
+		if (c->configurable_type == c->TYPE_EFFECT){
 			AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 			SetImage("preview", "hui:media-play");
 		}

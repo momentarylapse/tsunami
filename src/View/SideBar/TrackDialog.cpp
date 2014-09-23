@@ -11,7 +11,7 @@
 #include "../Helper/BarList.h"
 #include "../BottomBar/BottomBar.h"
 #include "../../Audio/Synth/Synthesizer.h"
-#include "../Dialog/SynthesizerDialog.h"
+#include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../../Plugins/PluginManager.h"

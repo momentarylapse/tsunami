@@ -20,6 +20,7 @@
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
+#include "../View/Dialog/ConfigurableSelectorDialog.h"
 #include "Plugin.h"
 #include "Effect.h"
 #include "ConfigPanel.h"
@@ -693,4 +694,27 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name)
 	}
 	return NULL;
 }
+
+Effect* PluginManager::ChooseEffect(HuiPanel *parent)
+{
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT);
+	dlg->Run();
+	return (Effect*)ConfigurableSelectorDialog::_return;
+}
+
+MidiEffect* PluginManager::ChooseMidiEffect(HuiPanel *parent)
+{
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT);
+	dlg->Run();
+	return (MidiEffect*)ConfigurableSelectorDialog::_return;
+}
+
+/*Synthesizer* PluginManager::ChooseSynthesizer(HuiPanel *parent)
+{
+	string name = ChooseConfigurable(parent, Configurable::TYPE_SYNTHESIZER);
+	if (name == "")
+		return NULL;
+	return CreateSynthesizer(name);
+}*/
+
 

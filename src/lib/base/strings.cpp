@@ -29,21 +29,21 @@
 
 string::string()
 {
-	init(sizeof(char));
+	init(sizeof(unsigned char));
 }
 
 string::string(const char *str)
 {
-	init(sizeof(char));
+	init(sizeof(unsigned char));
 	int l = strlen(str);
 	resize(l);
 	if (l > 0)
 		memcpy(data, str, l);
 }
 
-string::string(const char *str, int l)
+string::string(const void *str, int l)
 {
-	init(sizeof(char));
+	init(sizeof(unsigned char));
 	resize(l);
 	if (l > 0)
 		memcpy(data, str, l);
@@ -51,7 +51,7 @@ string::string(const char *str, int l)
 
 string::string(const string &s)
 {
-	init(sizeof(char));
+	init(sizeof(unsigned char));
 	assign(&s);
 }
 
@@ -83,7 +83,7 @@ string string::substr(int start, int length) const
 		length = num - start;
 	if (length > 0){
 		r.resize(length);
-		memcpy(r.data, &((char*)data)[start], length);
+		memcpy(r.data, &((unsigned char*)data)[start], length);
 	}
 	return r;
 }
@@ -96,8 +96,8 @@ string string::tail(int size) const
 
 int string::find(const string &s, int start) const
 {
-	char *b = (char*)data;
-	char *aa = (char*)s.data;
+	unsigned char *b = (unsigned char*)data;
+	unsigned char *aa = (unsigned char*)s.data;
 	for (int i=start;i<num - s.num + 1;i++){
 		bool ok = true;
 		for (int j=0;j<s.num;j++)
@@ -113,8 +113,8 @@ int string::find(const string &s, int start) const
 
 int string::rfind(const string &s, int start) const
 {
-	char *b = (char*)data;
-	char *aa = (char*)s.data;
+	unsigned char *b = (unsigned char*)data;
+	unsigned char *aa = (unsigned char*)s.data;
 	if (start < 0)
 		start = num - 1;
 	for (int i=start;i>=0;i--){
@@ -132,27 +132,27 @@ int string::rfind(const string &s, int start) const
 
 int string::compare(const string &s) const
 {
-	char *a = (char*)data;
+	unsigned char *a = (unsigned char*)data;
 	int n = num;
 	if (num > s.num)
 		n = s.num;
 	for (int i=0;i<n;i++){
 		if (s[i] != a[i])
-			return (int)(unsigned char)a[i] - (int)(unsigned char)s[i];
+			return (int)a[i] - (int)s[i];
 	}
 	return num - s.num;
 }
 
-inline int ichar(char a)
+inline int ichar(unsigned char a)
 {
 	if ((a >= 'A') && (a <= 'Z'))
-		return (int)(unsigned char)a - (int)(unsigned char)'A' + (int)(unsigned char)'a';
-	return (int)(unsigned char)a;
+		return (int)a - (int)'A' + (int)'a';
+	return (int)a;
 }
 
 int string::icompare(const string &s) const
 {
-	char *a = (char*)data;
+	unsigned char *a = (unsigned char*)data;
 	int n = num;
 	if (num > s.num)
 		n = s.num;
@@ -167,8 +167,8 @@ string string::reverse() const
 {
 	string r;
 	r.resize(num);
-	char *a = (char*)data;
-	char *b = (char*)r.data;
+	unsigned char *a = (unsigned char*)data;
+	unsigned char *b = (unsigned char*)r.data;
 	for (int i=0;i<num;i++)
 		b[num - i - 1] = a[i];
 	return r;
@@ -198,11 +198,11 @@ void string::replace0(int start, int length, const string &str)
 {
 	if (start + length > num)
 		return;
-	char *s = (char*)data;
+	unsigned char *s = (unsigned char*)data;
 	int d = str.num - length;
 	if (d > 0){
 		resize(num + d);
-		s = (char*)data;
+		s = (unsigned char*)data;
 		for (int i=num-1;i>=start+length;i--)
 			s[i] = s[i - d];
 	}

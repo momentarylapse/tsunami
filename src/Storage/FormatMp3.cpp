@@ -82,16 +82,16 @@ static string utf16_to_utf8(const string &s)
 	bool big_endian = false;
 	unsigned int last = 0;
 	for (int i=0; i<s.num-1; i+=2){
-		if (((unsigned char)s[i] == 0xff) && ((unsigned char)s[i+1] == 0xfe)){
+		if ((s[i] == 0xff) && (s[i+1] == 0xfe)){
 			big_endian = false;
 			continue;
-		}else if (((unsigned char)s[i] == 0xfe) && ((unsigned char)s[i+1] == 0xff)){
+		}else if ((s[i] == 0xfe) && (s[i+1] == 0xff)){
 			big_endian = true;
 			continue;
 		}
-		unsigned int code = (unsigned char)s[i] | ((unsigned char)s[i+1] << 8);
+		unsigned int code = s[i] | (s[i+1] << 8);
 		if (big_endian)
-			code = (unsigned char)s[i+1] | ((unsigned char)s[i] << 8);
+			code = s[i+1] | (s[i] << 8);
 		//msg_write(string((char*)&code, 2).hex());
 
 		if ((code < 0xd800) || (code > 0xdbff))
@@ -118,7 +118,7 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 	msg_db_f("load_mp3_file", 1);
 	tsunami->progress->Set(_("lade mp3"), 0);
 
-	char *data = new char[4096];
+	unsigned char *data = new unsigned char[4096];
 	CFile *f = FileOpen(filename);
 
 	try{
@@ -131,7 +131,7 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 		while(true){
 			int pos0 = f->GetPos();
 			f->ReadBuffer(data, 4);
-			if (((unsigned char)data[0] == 0xff) && ((unsigned char)(data[1] & 0xfe) == 0xfa)){
+			if ((data[0] == 0xff) && ((data[1] & 0xfe) == 0xfa)){
 				msg_write("== mp3-header ==");
 				int BIT_RATES[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
 				int FREQS[] = {44100, 48000, 32000, 0};
@@ -165,15 +165,21 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 				int size = read_mp3_28bit(f);
 				//msg_write(size);
 				int r = 0;
-				while (r < size){
+				while (r < size - 3){
 					if (version == 2){
 						f->ReadBuffer(data, 3);
-						msg_write(string(data, 3));
+						string key = string(data, 3);
+						//if (key[0] != 0)
+						//	msg_write(key);
 						f->ReadBuffer(data, 3);
-						int _size = data[3] + (data[4] << 8) + (data[5] << 16);
-						msg_write(_size);
+						unsigned int _size = data[2] + (data[1] << 8) + (data[0] << 16);
+						//msg_write(_size);
 						r += 6 + _size;
-						f->ReadBuffer(data, _size);
+						if (_size < 1024){
+							f->ReadBuffer(data, _size);
+						}else{
+							f->SetPos(_size, false);
+						}
 
 					}else if ((version == 3) || (version == 4)){
 						f->ReadBuffer(data, 4);
@@ -213,8 +219,7 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 							else if (key == "COMM")
 								t->root->AddTag("comment", val);
 						}else{
-							for (int i=0; i<_size; i++)
-								f->ReadByte();
+							f->SetPos(_size, false);
 						}
 
 					}else{

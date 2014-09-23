@@ -73,12 +73,12 @@ class FMState : PluginData
 	void __init__()
 		reset()
 
-class ConfigPanel : Panel
-	FMConfig *c
-	FMSynthesizer *s
+class FMPanel : ConfigPanel
+	FMConfig *fc
+	overwrite FMSynthesizer *c
 	void __init__(FMSynthesizer *_s)
-		s = _s
-		c = &s.config
+		super.__init__(_s)
+		fc = &c.config
 		addGrid("", 0, 0, 8, NUM_OSCILLATORS + 1, "main_table")
 		setTarget("main_table", 0)
 		addText("Frequency", 0, 0, 0, 0, "")
@@ -98,45 +98,43 @@ class ConfigPanel : Panel
 			addSpinButton("0\\0\\1000\\0.1", 5, j + 1, 0, 0, "attack_" + j)
 			addSpinButton("0\\0\\1000\\0.1", 6, j + 1, 0, 0, "decay_" + j)
 			addSpinButton("0\\0\\1000\\0.1", 7, j + 1, 0, 0, "release_" + j)
+		update()
 		eventM("*", self, &onChange)
 	
 	void onChange()
 		for int j, 0, NUM_OSCILLATORS
-			c.osc[j].factor = getFloat("factor_" + j)
-			c.osc[j].amplitude = getFloat("amplitude_" + j)
-			c.osc[j].initial = getFloat("initial_" + j)
-			c.osc[j].peak = getFloat("peak_" + j)
-			c.osc[j].sustain = getFloat("sustain_" + j)
-			c.osc[j].attack = getFloat("attack_" + j) / 1000
-			c.osc[j].decay = getFloat("decay_" + j) / 1000
-			c.osc[j].release = getFloat("release_" + j) / 1000
-		s.notify()
+			fc.osc[j].factor = getFloat("factor_" + j)
+			fc.osc[j].amplitude = getFloat("amplitude_" + j)
+			fc.osc[j].initial = getFloat("initial_" + j)
+			fc.osc[j].peak = getFloat("peak_" + j)
+			fc.osc[j].sustain = getFloat("sustain_" + j)
+			fc.osc[j].attack = getFloat("attack_" + j) / 1000
+			fc.osc[j].decay = getFloat("decay_" + j) / 1000
+			fc.osc[j].release = getFloat("release_" + j) / 1000
+		notify()
+	
+	overwrite void update()
+		for int j, 0, NUM_OSCILLATORS
+			setFloat("factor_" + j, fc.osc[j].factor)
+			setFloat("amplitude_" + j, fc.osc[j].amplitude)
+			setFloat("initial_" + j, fc.osc[j].initial)
+			setFloat("peak_" + j, fc.osc[j].peak)
+			setFloat("sustain_" + j, fc.osc[j].sustain)
+			setFloat("attack_" + j, fc.osc[j].attack * 1000)
+			setFloat("decay_" + j, fc.osc[j].decay * 1000)
+			setFloat("release_" + j, fc.osc[j].release * 1000)
 		
 
 class FMSynthesizer : Synthesizer
 	FMConfig config
 	FMState state
-	ConfigPanel *panel
 
 	overwrite void reset()
 		_reset()
 		state.reset()
-	
-	overwrite void updateDialog()
-		for int j, 0, NUM_OSCILLATORS
-			panel.setFloat("factor_" + j, config.osc[j].factor)
-			panel.setFloat("amplitude_" + j, config.osc[j].amplitude)
-			panel.setFloat("initial_" + j, config.osc[j].initial)
-			panel.setFloat("peak_" + j, config.osc[j].peak)
-			panel.setFloat("sustain_" + j, config.osc[j].sustain)
-			panel.setFloat("attack_" + j, config.osc[j].attack * 1000)
-			panel.setFloat("decay_" + j, config.osc[j].decay * 1000)
-			panel.setFloat("release_" + j, config.osc[j].release * 1000)
 
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		updateDialog()
-		return panel
+	overwrite ConfigPanel *createPanel()
+		return new FMPanel(self)
 
 	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
 		int n = pitch + 0.4

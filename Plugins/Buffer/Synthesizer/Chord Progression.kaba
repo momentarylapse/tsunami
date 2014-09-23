@@ -23,7 +23,6 @@ class PluginConfig : PluginData
 class ChordProgression : AudioEffect
 	PluginConfig config
 	DummySynthesizer synth
-	ConfigPanel *panel
 
 	overwrite void process(BufferBox buf)
 		Chord chord[]
@@ -43,16 +42,13 @@ class ChordProgression : AudioEffect
 				pos1 = p0 - buf.offset
 			AddChord(synth, buf, pos0, pos1, chord[i], config.Volume)
 
-	overwrite void updateDialog()
-		panel.fill()
+	overwrite ConfigPanel *createPanel()
+		return new ChordProgPanel(self)
 
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		return panel
-
-class ConfigPanel : Panel
-	ChordProgression *c
+class ChordProgPanel : ConfigPanel
+	overwrite ChordProgression *c
 	void __init__(ChordProgression *_c)
+		super.__init__(_c)
 		addGrid("", 0, 0, 4, 4, "table2")
 		setTarget("table2", 0)
 		addText("Akkorde:", 0, 0, 0, 0, "")
@@ -67,8 +63,6 @@ class ConfigPanel : Panel
 		addRadioButton("Schläge", 1, 3, 0, 0, "duration_type:beats")
 		addSpinButton("\\1\\100\\1", 2, 3, 0, 0, "beats")
 	
-		c = _c
-	
 		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)
 		eventM("chords", self, &onChords)
 		eventM("duration_type:beats", self, &onDurationTypeBeats)
@@ -76,9 +70,9 @@ class ConfigPanel : Panel
 		eventM("duration", self, &onDuration)
 		eventM("beats", self, &onBeats)
 
-		fill()
+		update()
 	
-	void fill()
+	overwrite void update()
 		setString("chords", c.config.Chords)
 		SliderSet(self, "volume", c.config.Volume)
 		check("duration_by_beats", c.config.DurationByBeats)
@@ -89,29 +83,29 @@ class ConfigPanel : Panel
 
 	void onChords()
 		c.config.Chords = getString("")
-		c.notify()
+		notify()
 
 	void onVolume()
 		c.config.Volume = SliderGet(self, "volume")
-		c.notify()
+		notify()
 
 	void onDurationTypeBeats()
 		c.config.DurationByBeats = true
 		enable("duration", false)
 		enable("beats", true)
-		c.notify()
+		notify()
 
 	void onDurationTypeTime()
 		c.config.DurationByBeats = false
 		enable("duration", true)
 		enable("beats", false)
-		c.notify()
+		notify()
 
 	void onDuration()
 		c.config.Duration = getFloat("")
-		c.notify()
+		notify()
 
 	void onBeats()
 		c.config.Beats = getInt("")
-		c.notify()
+		notify()
 

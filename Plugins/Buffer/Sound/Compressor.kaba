@@ -43,8 +43,6 @@ class Compressor : AudioEffect
 	CompressorConfig config
 	CompressorState state
 
-	ConfigPanel *panel
-
 	float dgain_attack, dgain_release
 
 	void compress(float b[], float squares[], float *gain)
@@ -83,12 +81,8 @@ class Compressor : AudioEffect
 			// apply gain
 			b[i] *= pow(10, *gain / 20)
 
-	overwrite void updateDialog()
-		panel.fill()
-
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		return panel
+	overwrite ConfigPanel *createPanel()
+		return new CompressorPanel(self)
 
 	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
@@ -102,7 +96,7 @@ class Compressor : AudioEffect
 class CompressorGrid : Grid
 	int MouseOver, Selected
 	CompressorConfig *config
-	Compressor *c
+	ConfigPanel *cp
 
 	overwrite void onDraw(Painter *p)
 		FloatInterpolator fi
@@ -126,7 +120,7 @@ class CompressorGrid : Grid
 			complex p = config.curve[i]
 			if (m.x > q.x) and (m.x < p.x)
 				config.curve.insert(m, i)
-				c.notify()
+				cp.notify()
 				Selected = i
 				redraw()
 				break
@@ -142,7 +136,7 @@ class CompressorGrid : Grid
 			config.curve[Selected].x = clamp(config.curve[Selected].x, xmin, xmax)
 			if Selected == config.curve.num - 1
 				config.curve[Selected].x = 0
-			c.notify()
+			cp.notify()
 		else
 		// mouse over?
 			MouseOver = -1
@@ -157,13 +151,14 @@ class CompressorGrid : Grid
 		// [Delete] -> remove point
 		if (k == KeyDelete) and (Selected > 0) and (Selected < config.curve.num - 1)
 			config.curve.remove(Selected)
-			c.notify()
+			cp.notify()
 			Selected = -1
 			redraw()
 
-class ConfigPanel : Panel
+class CompressorPanel : ConfigPanel
 	CompressorGrid grid
 	void __init__(Compressor *_fx)
+		super.__init__(_fx)
 		addGrid("!width=240", 0, 0, 1, 2, "table1")
 		setTarget("table1", 0)
 		addDrawingArea("!grabfocus", 0, 0, 0, 0, "drawing_area")
@@ -177,7 +172,7 @@ class ConfigPanel : Panel
 		addText("ms", 5, 0, 0, 0, "")
 		
 		grid.config = &_fx.config
-		grid.c = _fx
+		grid.cp = self
 		
 		eventM("attack", self, &onEdit)
 		eventM("release", self, &onEdit)
@@ -186,9 +181,9 @@ class ConfigPanel : Panel
 		grid.x_axis.set(MIN_DB, 0, false, "dB")
 		grid.y_axis.set(MIN_DB, 0, false, "dB")
 	
-		fill()
+		update()
 	
-	void fill()
+	overwrite void update()
 		grid.redraw()
 		setFloat("attack", grid.config.attack * 1000)
 		setFloat("release", grid.config.release * 1000)
@@ -196,5 +191,5 @@ class ConfigPanel : Panel
 	void onEdit()
 		grid.config.attack = getFloat("attack") / 1000.0
 		grid.config.release = getFloat("release") / 1000.0
-		grid.c.notify()
+		notify()
 		

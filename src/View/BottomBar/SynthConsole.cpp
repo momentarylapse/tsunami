@@ -9,6 +9,7 @@
 #include "../AudioView.h"
 #include "../../Data/Track.h"
 #include "../../Audio/Synth/Synthesizer.h"
+#include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Tsunami.h"
 
@@ -33,7 +34,7 @@ public:
 		SetImage("save_favorite", "hui:save");
 		SetTooltip("save_favorite", _("Parameter speichern"));
 		AddText("!bold,center,expandx\\" + synth->name, 2, 0, 0, 0, "");
-		HuiPanel *p = synth->CreatePanel();
+		p = synth->CreatePanel();
 		if (p){
 			Embed(p, "grid", 0, 1);
 		}else{
@@ -75,11 +76,12 @@ public:
 		if (message == o->MESSAGE_CHANGE){
 			track->EditSynthesizer(old_param);
 		}
-		synth->UpdateDialog();
+		p->update();
 		old_param = synth->ConfigToString();
 	}
 	Track *track;
 	Synthesizer *synth;
+	ConfigPanel *p;
 	string old_param;
 };
 

@@ -7,6 +7,7 @@
 
 
 #include "Configurable.h"
+#include "ConfigPanel.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../lib/script/script.h"
@@ -288,13 +289,13 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 	return r;
 }
 
-class AutoConfigPanel : public HuiPanel
+class AutoConfigPanel : public ConfigPanel
 {
 public:
 	Array<Slider*> slider;
 	Array<AutoConfigData> aa;
-	Configurable *c;
-	AutoConfigPanel(Array<AutoConfigData> &_aa, Configurable *_c)
+	AutoConfigPanel(Array<AutoConfigData> &_aa, Configurable *_c) :
+		ConfigPanel(_c)
 	{
 		aa = _aa;
 		AddControlTable("", 0, 0, 1, 3, "root-table");
@@ -308,7 +309,6 @@ public:
 			AddText(a.unit, 3, i, 0, 0, "");
 			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::onChange, *a.value, this));
 		}
-		c = _c;
 	}
 	~AutoConfigPanel()
 	{
@@ -320,10 +320,10 @@ public:
 		foreachi(AutoConfigData &a, aa, i){
 			*a.value = slider[i]->Get();
 		}
-		c->notify();
+		notify();
 
 	}
-	void update()
+	virtual void update()
 	{
 		foreachi(AutoConfigData &a, aa, i){
 			slider[i]->Set(*a.value);
@@ -332,7 +332,7 @@ public:
 };
 
 // default handler...
-HuiPanel *Configurable::CreatePanel()
+ConfigPanel *Configurable::CreatePanel()
 {
 	PluginData *config = get_config();
 	if (!config)
@@ -340,24 +340,24 @@ HuiPanel *Configurable::CreatePanel()
 	Array<AutoConfigData> aa = get_auto_conf(config);
 	if (aa.num == 0)
 		return NULL;
-	_auto_panel_ = new AutoConfigPanel(aa, this);
-	return _auto_panel_;
+	return new AutoConfigPanel(aa, this);
 }
 
-void Configurable::UpdateDialog()
+/*void Configurable::UpdateDialog()
 {
 	if (_auto_panel_){
 		_auto_panel_->update();
 	}
-}
+}*/
 
 class ConfigurationDialog : public HuiDialog
 {
 public:
-	ConfigurationDialog(Configurable *c, PluginData *pd, HuiPanel *panel) :
+	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p) :
 		HuiDialog(c->name, 300, 100, tsunami->win, false)
 	{
 		config = c;
+		panel = p;
 		AddControlTable("", 0, 0, 1, 3, "root-table");
 		SetTarget("root-table", 0);
 		Embed(panel, "root-table", 0, 1);
@@ -415,7 +415,7 @@ public:
 		if (name.num == 0)
 			return;
 		tsunami->plugin_manager->ApplyFavorite(config, name);
-		config->UpdateDialog();
+		panel->update();
 	}
 	void onSave()
 	{
@@ -426,6 +426,7 @@ public:
 	}
 
 	Configurable *config;
+	ConfigPanel *panel;
 };
 
 bool Configurable::Configure()
@@ -434,8 +435,8 @@ bool Configurable::Configure()
 	if (!config)
 		return true;
 
-	_auto_panel_ = NULL;
-	HuiPanel *panel = CreatePanel();
+	//_auto_panel_ = NULL;
+	ConfigPanel *panel = CreatePanel();
 	if (!panel)
 		return false;
 	HuiDialog *dlg = new ConfigurationDialog(this, config, panel);

@@ -28,7 +28,6 @@ DummySynthesizer synth
 class Metronome : AudioEffect
 	PluginState state
 	Config config
-	ConfigPanel *panel
 
 	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
@@ -51,18 +50,15 @@ class Metronome : AudioEffect
 			if state.dpos >= buf.num
 				state.dpos -= buf.num
 				break
-
-	overwrite void updateDialog()
-		panel.fill()
 		
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		return panel
+	overwrite ConfigPanel *createPanel()
+		return new MetronomePanel(self)
 
 	
-class ConfigPanel : Panel
-	Metronome *m
+class MetronomePanel : ConfigPanel
+	overwrite Metronome *c
 	void __init__(Metronome *_m)
+		super.__init__(_m)
 		addGrid("!width=300", 0, 0, 2, 3, "table2")
 		setTarget("table2", 0)
 		addText("Geschwindigkeit:", 0, 0, 0, 0, "")
@@ -77,27 +73,25 @@ class ConfigPanel : Panel
 		eventM("beats_per_minute", self, &onMetroBeats)
 		eventM("beats_per_measure", self, &onMetroMeasure)
 		eventM("volume", self, &onMetroVolume)
-		
-		m = _m
 	
-		fill()
+		update()
 
-	void fill()
-		setFloat("beats_per_minute", m.config.BeatsPerMinute)
-		setInt("beats_per_measure", m.config.BeatsPerMeasure)
-		setFloat("volume", m.config.Volume * 100)
-		//SliderSet(self, "volume", m.config.Volume)
+	overwrite void update()
+		setFloat("beats_per_minute", c.config.BeatsPerMinute)
+		setInt("beats_per_measure", c.config.BeatsPerMeasure)
+		setFloat("volume", c.config.Volume * 100)
+		//SliderSet(self, "volume", c.config.Volume)
 
 	void onMetroBeats()
-		m.config.BeatsPerMinute = getFloat("")
-		m.notify()
+		c.config.BeatsPerMinute = getFloat("")
+		notify()
 
 	void onMetroMeasure()
-		m.config.BeatsPerMeasure = getInt("")
-		m.notify()
+		c.config.BeatsPerMeasure = getInt("")
+		notify()
 
 	void onMetroVolume()
-		m.config.Volume = getFloat("") / 100
+		c.config.Volume = getFloat("") / 100
 		//m.config.Volume = SliderGet(self, "volume")
-		m.notify()
+		notify()
 

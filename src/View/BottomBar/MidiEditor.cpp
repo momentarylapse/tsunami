@@ -8,6 +8,7 @@
 #include "MidiEditor.h"
 #include "../../Data/Track.h"
 #include "../AudioView.h"
+#include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Tsunami.h"
@@ -39,7 +40,7 @@ public:
 		AddButton("!flat", 4, 0, 0, 0, "delete");
 		SetImage("delete", "hui:delete");
 		SetTooltip("delete", _("Effekt l&oschen"));
-		HuiPanel *p = fx->CreatePanel();
+		p = fx->CreatePanel();
 		if (p){
 			Embed(p, "grid", 0, 1);
 		}else{
@@ -98,12 +99,13 @@ public:
 				track->EditMidiEffect(index, old_param);
 		}
 		Check("enabled", fx->enabled);
-		fx->UpdateDialog();
+		p->update();
 		old_param = fx->ConfigToString();
 	}
 	AudioFile *audio;
 	Track *track;
 	MidiEffect *fx;
+	ConfigPanel *p;
 	string old_param;
 	int index;
 };

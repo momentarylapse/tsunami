@@ -22,6 +22,7 @@
 #include "../View/AudioView.h"
 #include "Plugin.h"
 #include "Effect.h"
+#include "ConfigPanel.h"
 #include "MidiEffect.h"
 #include "FavoriteManager.h"
 
@@ -131,6 +132,15 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("PluginData", "reset", Script::mf(&PluginData::reset), &plugin_data);
 
 
+	ConfigPanel config_panel;
+	Script::DeclareClassSize("ConfigPanel", sizeof(ConfigPanel));
+	Script::LinkExternal("ConfigPanel.__init__", Script::mf(&ConfigPanel::__init__));
+	Script::DeclareClassVirtualIndex("ConfigPanel", "__delete__", Script::mf(&ConfigPanel::__delete__), &config_panel);
+	Script::DeclareClassVirtualIndex("ConfigPanel", "update", Script::mf(&ConfigPanel::update), &config_panel);
+	Script::LinkExternal("ConfigPanel.notify", Script::mf(&ConfigPanel::notify));
+	Script::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
+
+
 	Effect effect;
 	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
 	Script::DeclareClassOffset("AudioEffect", "name", _offsetof(Effect, name));
@@ -143,7 +153,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::CreatePanel), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::ResetConfig), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::ResetState), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
+	//Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
 	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
 
 	MidiEffect midieffect;
@@ -158,7 +168,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("MidiEffect", "createPanel", Script::mf(&MidiEffect::CreatePanel), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "resetConfig", Script::mf(&MidiEffect::ResetConfig), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "resetState", Script::mf(&MidiEffect::ResetState), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Script::mf(&MidiEffect::UpdateDialog), &midieffect);
+	//Script::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Script::mf(&MidiEffect::UpdateDialog), &midieffect);
 	Script::LinkExternal("MidiEffect.notify", Script::mf(&MidiEffect::notify));
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
@@ -182,7 +192,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::RenderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::CreatePanel), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
+	//Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::Reset), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::ResetConfig), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));

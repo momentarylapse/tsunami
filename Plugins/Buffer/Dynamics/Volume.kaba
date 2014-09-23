@@ -12,15 +12,10 @@ class Config : PluginData
 		self.Volume = 1
 
 class Volume : AudioEffect
-	VolumePanel *panel
 	Config config
 
-	overwrite void updateDialog()
-		panel.fill()
-
-	overwrite Panel *createPanel()
-		panel = new VolumePanel(self)
-		return panel
+	overwrite ConfigPanel *createPanel()
+		return new VolumePanel(self)
 
 	overwrite void process(BufferBox buf)
 		float factor = config.Volume
@@ -36,9 +31,10 @@ class Volume : AudioEffect
 			buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
 			buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
 	
-class VolumePanel : Panel
-	Volume *v
+class VolumePanel : ConfigPanel
+	overwrite Volume *c
 	void __init__(Volume *_v)
+		super.__init__(_v)
 		addGrid("!width=400", 0, 0, 1, 2, "table1")
 		setTarget("table1", 0)
 		addCheckBox("Maximieren", 0, 1, 0, 0, "max")
@@ -48,27 +44,23 @@ class VolumePanel : Panel
 		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
 		addText("%", 2, 0, 0, 0, "")
 		
-		v = _v
-		
-		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, v.config.Volume)
+		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.Volume)
 	
 		eventM("max", self, &onMax)
-		
-		fill()
 
-	void fill()
-		SliderSet(self, "volume", v.config.Volume)
-		check("max", v.config.Maximize)
-		enable("volume", !v.config.Maximize)
-		enable("volume_slider", !v.config.Maximize)
+	overwrite void update()
+		SliderSet(self, "volume", c.config.Volume)
+		check("max", c.config.Maximize)
+		enable("volume", !c.config.Maximize)
+		enable("volume_slider", !c.config.Maximize)
 
 	void onMax()
-		v.config.Maximize = isChecked("max")
-		enable("volume", !v.config.Maximize)
-		enable("volume_slider", !v.config.Maximize)
-		v.notify()
+		c.config.Maximize = isChecked("max")
+		enable("volume", !c.config.Maximize)
+		enable("volume_slider", !c.config.Maximize)
+		notify()
 
 	void onVolume()
-		v.config.Volume = SliderGet(self, "volume")
-		v.notify()
+		c.config.Volume = SliderGet(self, "volume")
+		notify()
 

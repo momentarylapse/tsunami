@@ -30,8 +30,6 @@ class Config : PluginData
 class HullCurve : AudioEffect
 
 	Config config
-	ConfigPanel *panel
-
 
 	void hull(float b[])
 	
@@ -48,15 +46,12 @@ class HullCurve : AudioEffect
 		hull(buf.r)
 		hull(buf.l)
 
-	overwrite void updateDialog()
-		panel.redraw("drawing")
-
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		return panel
+	overwrite ConfigPanel *createPanel()
+		return new HullCurvePanel(self)
 
 class HullGrid : Grid
 	Config *config
+	ConfigPanel *cp
 	int MouseOver, Selected
 
 	overwrite void onDraw(Painter *c)
@@ -80,6 +75,7 @@ class HullGrid : Grid
 		if HuiGetEvent().key_code == KeyDelete
 			if Selected > 0 and Selected < config.curve.num-1
 				config.curve.remove(Selected)
+				cp.notify()
 				Selected = -1
 				redraw()
 
@@ -90,6 +86,7 @@ class HullGrid : Grid
 			complex p = project2(config.curve[i])
 			if (mx > q.x) and (mx < p.x)
 				config.curve.insert(getMouse2(), i)
+				cp.notify()
 				Selected = i
 				redraw()
 				i = config.curve.num
@@ -111,6 +108,7 @@ class HullGrid : Grid
 				config.curve[Selected].x = 1
 			if Selected == 0
 				config.curve[Selected].x = 0
+			cp.notify()
 		else
 		// mouse over?
 			MouseOver = -1
@@ -120,9 +118,10 @@ class HullGrid : Grid
 					MouseOver = i
 		redraw()
 
-class ConfigPanel : Panel
+class HullCurvePanel : ConfigPanel
 	HullGrid grid
 	void __init__(HullCurve *_h)
+		super.__init__(_h)
 		fromSource("
 Grid ? '' 1 2 width=450
 	DrawingArea drawing '' grabfocus
@@ -133,9 +132,13 @@ Grid ? '' 1 2 width=450
 		//EventMX("drawing", "hui:draw", self, &OnDraw)
 	
 		grid.config = &_h.config
+		grid.cp = self
 		grid.init(self, "drawing")
 		grid.x_axis.set(0, 1, false, "")
 		grid.y_axis.set(MIN_VOL, MAX_VOL, false, "db")
 	
 		grid.redraw()
+	
+	overwrite void update()
+		redraw("drawing")
 

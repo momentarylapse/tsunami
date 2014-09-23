@@ -37,7 +37,8 @@ enum
 	CONFIGURABLE_MIDI_EFFECT,
 };
 
-class AutoConfigPanel;
+//class AutoConfigPanel;
+class ConfigPanel;
 
 class Configurable : public Observable
 {
@@ -52,8 +53,8 @@ public:
 	virtual void _cdecl ResetConfig();
 	virtual void _cdecl ResetState();
 	bool Configure();
-	virtual HuiPanel *_cdecl CreatePanel();
-	virtual void _cdecl UpdateDialog();
+	virtual ConfigPanel *_cdecl CreatePanel();
+	//virtual void _cdecl UpdateDialog();
 	void _cdecl notify();
 
 	PluginData *get_config();
@@ -64,7 +65,7 @@ public:
 
 	string name;
 	int configurable_type;
-	AutoConfigPanel *_auto_panel_;
+	//AutoConfigPanel *_auto_panel_;
 };
 
 

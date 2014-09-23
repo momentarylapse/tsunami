@@ -178,6 +178,7 @@ OBJ = \
  lib/script/syntax/syntax_tree.o\
  lib/script/syntax/type.o\
  lib/script/script.o\
+ Plugins/ConfigPanel.o\
  Plugins/Configurable.o\
  Plugins/Effect.o\
  Plugins/EffectManager.o\
@@ -761,6 +762,9 @@ lib/script/script.o : lib/script/script.cpp
 
 Plugins/Configurable.o : Plugins/Configurable.cpp
 	$(CPP) -c Plugins/Configurable.cpp -o $@ $(CXXFLAGS)
+
+Plugins/ConfigPanel.o : Plugins/ConfigPanel.cpp
+	$(CPP) -c Plugins/ConfigPanel.cpp -o $@ $(CXXFLAGS)
 
 Plugins/Effect.o : Plugins/Effect.cpp
 	$(CPP) -c Plugins/Effect.cpp -o $@ $(CXXFLAGS)

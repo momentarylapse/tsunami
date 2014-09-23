@@ -29,10 +29,12 @@ class PluginData
 	extern virtual void __delete__()
 	extern virtual void reset()
 
-/*class ConfigPanel : Panel
-	extern void __init__()
+class ConfigPanel : Panel
+	extern void __init__(void *c)
 	extern virtual void __delete__()
-	extern virtual void update()*/
+	extern virtual void update()
+	extern void notify()
+	void *c
 
 class AudioEffect
 	string name
@@ -44,9 +46,9 @@ class AudioEffect
 	extern virtual void process(BufferBox buf)
 	extern virtual void resetConfig()
 	extern virtual void resetState()
-	extern virtual Panel *createPanel()
-	extern virtual void updateDialog()
-	extern void notify()
+	extern virtual ConfigPanel *createPanel()
+	//extern virtual void updateDialog()
+	//extern void notify()
 
 class MidiEffect
 	string name
@@ -58,9 +60,9 @@ class MidiEffect
 	extern virtual void process(MidiData midi)
 	extern virtual void resetConfig()
 	extern virtual void resetState()
-	extern virtual Panel *createPanel()
-	extern virtual void updateDialog()
-	extern void notify()
+	extern virtual ConfigPanel *createPanel()
+	//extern virtual void updateDialog()
+	//extern void notify()
 
 class BufferBox
 	int offset, num
@@ -78,15 +80,15 @@ class Synthesizer
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void renderNote(BufferBox buf, Range range, float pitch, float volume)
-	extern virtual Panel *createPanel()
-	extern virtual void updateDialog()
+	extern virtual ConfigPanel *createPanel()
+	//extern virtual void updateDialog()
 	extern virtual void reset()
 	extern virtual void resetConfig()
 	extern virtual int read(BufferBox buf)
 	extern void set(float pitch, float volume, int offset)
 	extern void renderMetronomeClick(BufferBox buf, int pos, int level, float volume)
 	extern void _reset()
-	extern void notify()
+	//extern void notify()
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()

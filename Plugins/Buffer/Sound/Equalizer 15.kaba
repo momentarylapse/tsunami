@@ -21,7 +21,6 @@ class Equalizer15 : AudioEffect
 
 	Config config
 
-	ConfigPanel *panel
 	float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
 
 	complex f[]
@@ -58,19 +57,15 @@ class Equalizer15 : AudioEffect
 		equalize(buf.r)
 		equalize(buf.l)
 		f.clear()
-
-	overwrite void updateDialog()
-		for int i, 0, NUM_BANDS
-			panel.setFloat("slider_" + i, config.Factor[i] / 2)
 	
-	overwrite Panel *createPanel()
-		panel = new ConfigPanel(self)
-		return panel
+	overwrite ConfigPanel *createPanel()
+		return new ConfigPanel(self)
 
-class ConfigPanel : Panel
-	Equalizer15 *eq
+class Equalizer15Panel : ConfigPanel
+	overwrite Equalizer15 *c
 
 	void __init__(Equalizer15 *_eq)
+		super.__init__(_eq)
 		addGrid("", 0, 1, NUM_BANDS, 2, "grid")
 		setTarget("grid", 0)
 		for int i, 0, NUM_BANDS
@@ -85,19 +80,18 @@ class ConfigPanel : Panel
 		addText("7k5", 12, 1, 0, 0, "")
 		addText("20k", 14, 1, 0, 0, "")
 	
-		eq = _eq
 		eventM("*", self, &onEvent)
 	
-		fill()
+		update()
 
 	void onEvent()
 		Event *e = HuiGetEvent()
 		for int i, 0, NUM_BANDS
 			if e.id == ("slider_" + i)
-				eq.config.Factor[i] = getFloat("") * 2
-				eq.notify()
+				c.config.Factor[i] = getFloat("") * 2
+				notify()
 		
-	void fill()
+	overwrite void update()
 		for int i, 0, NUM_BANDS
-			setFloat("slider_" + i, eq.config.Factor[i] / 2)
+			setFloat("slider_" + i, c.config.Factor[i] / 2)
 	

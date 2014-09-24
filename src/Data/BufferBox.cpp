@@ -384,11 +384,11 @@ void BufferBox::invalidate_peaks(const Range &_range)
 		if (peak[k].num < n){
 			int n0 = peak[k].num;
 			peak[k].resize(n);
-			peak[k][n0] = -1;
+			peak[k][n0] = 255;
 		}
 	for (int i=i0;i<i1;i++){
-		peak[0][i] = -1;
-		peak[1][i] = -1;
+		peak[0][i] = 255;
+		peak[1][i] = 255;
 	}
 }
 
@@ -401,7 +401,7 @@ inline void find_update_peak_range(string &p0, string &p1, int &i0, int &i1, int
 	//msg_write("t");
 	bool found = false;
 	for (int i=0;i<n;i++)
-		if (p0[i] == -1){
+		if (p0[i] == 255){
 			//msg_write(format("i0: %d (%d)", i, p0[i]));
 			i0 = i;
 			found = true;
@@ -410,7 +410,7 @@ inline void find_update_peak_range(string &p0, string &p1, int &i0, int &i1, int
 	if (!found)
 		i0 = n;
 	for (int i=n-1;i>i0;i--)
-		if (p0[i] == -1){
+		if (p0[i] == 255){
 			//msg_write(format("i1: %d (%d)", i, p0[i]));
 			i1 = i + 1;
 			break;
@@ -456,13 +456,13 @@ void BufferBox::update_peaks(int mode)
 		peak[level + 1].resize(n);
 		if (mode == PEAK_MODE_MAXIMUM){
 			for (int i=i0;i<i1;i++){
-				peak[level    ][i] = shrink_max((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
-				peak[level + 1][i] = shrink_max((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
+				peak[level    ][i] = shrink_max(peak[level - 2][i * 2], peak[level - 2][i * 2 + 1]);
+				peak[level + 1][i] = shrink_max(peak[level - 1][i * 2], peak[level - 1][i * 2 + 1]);
 			}
 		}else if (mode == PEAK_MODE_SQUAREMEAN){
 			for (int i=i0;i<i1;i++){
-				peak[level    ][i] = shrink_mean((unsigned char)peak[level - 2][i * 2], (unsigned char)peak[level - 2][i * 2 + 1]);
-				peak[level + 1][i] = shrink_mean((unsigned char)peak[level - 1][i * 2], (unsigned char)peak[level - 1][i * 2 + 1]);
+				peak[level    ][i] = shrink_mean(peak[level - 2][i * 2], peak[level - 2][i * 2 + 1]);
+				peak[level + 1][i] = shrink_mean(peak[level - 1][i * 2], peak[level - 1][i * 2 + 1]);
 			}
 		}
 

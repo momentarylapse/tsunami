@@ -739,7 +739,7 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 		if ((ip >= 0) && (ip < buf.num))
 		if (((int)(p) < offset + buf.num*f) && (p >= offset)){
 			tt[nl].x = (float)x+i;
-			float dy = ((float)((unsigned char)buf[ip])/255.0f) * hf;
+			float dy = ((float)(buf[ip])/255.0f) * hf;
 			tt[nl].y  = y0 - dy;
 			nl ++;
 		}

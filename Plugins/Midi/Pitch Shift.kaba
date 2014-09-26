@@ -1,6 +1,6 @@
 use "../api.kaba"
 
-const string AutoConfigPitch = "-50:50:0"
+const string AutoConfigPitch = "-50:50:1:1:"
 
 class Config : PluginData
 	float Pitch

@@ -8,6 +8,8 @@
 #include "AudioRenderer.h"
 #include "Synth/Synthesizer.h"
 #include "../Plugins/Effect.h"
+#include "../Plugins/MidiEffect.h"
+#include "../Plugins/PluginManager.h"
 #include "../Data/Curve.h"
 #include "../Tsunami.h"
 
@@ -101,8 +103,12 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 
 	make_silence(buf, range_cur.length());
 
+	MidiData *m = &midi[t];
+	if (!m)
+		m = &t->midi;
+
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
-	Array<MidiNote> notes = t->midi.GetNotes(r);
+	Array<MidiNote> notes = m->GetNotes(r);
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(MidiNote &n, notes){
@@ -263,12 +269,20 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 	range = _range;
 	loop = loop_if_allowed && allow_loop;
 	pos = range.offset;
+	midi.clear();
 	foreach(Effect *fx, a->fx)
 		fx->Prepare();
-	foreach(Track *t, a->track){
+	foreachi(Track *t, a->track, i){
+		//midi.add(t, t->midi);
+		midi[t] = t->midi;
 		t->synth->Reset();
 		foreach(Effect *fx, t->fx)
 			fx->Prepare();
+		foreach(MidiEffect *fx, t->midi.fx){
+			fx->Prepare();
+			tsunami->plugin_manager->context.set(t, 0, _range);
+			fx->process(&midi[t]);
+		}
 	}
 	if (effect)
 		effect->Prepare();

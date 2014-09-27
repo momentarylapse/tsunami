@@ -45,6 +45,7 @@ private:
 	AudioFile *audio;
 	Range range_cur;
 	int pos;
+	Map<Track*, MidiData> midi;
 
 public:
 	Effect *effect;

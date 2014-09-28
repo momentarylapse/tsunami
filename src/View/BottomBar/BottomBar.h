@@ -39,8 +39,9 @@ public:
 	virtual ~BottomBar();
 
 	void OnClose();
-	void OnOpenChooseMenu();
-	void OnChooseByMenu();
+	void OnChoose();
+	//void OnOpenChooseMenu();
+	//void OnChooseByMenu();
 	virtual void OnShow();
 	virtual void OnHide();
 
@@ -61,7 +62,7 @@ public:
 	int active_console;
 	bool visible;
 
-	HuiMenu *menu;
+	//HuiMenu *menu;
 	FxConsole *fx_console;
 	SynthConsole *synth_console;
 	MixingConsole *mixing_console;

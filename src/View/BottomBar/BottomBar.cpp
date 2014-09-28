@@ -21,15 +21,13 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 {
 	AddControlTable("!noexpandy,height=300", 0, 0, 3, 1, "root_grid");
 	SetTarget("root_grid", 0);
-	AddControlTable("", 0, 0, 1, 4, "button_grid");
+	AddControlTable("!noexpandx,width=130", 0, 0, 1, 2, "button_grid");
 	AddSeparator("!vertical", 1, 0, 0, 0, "");
 	AddControlTable("", 2, 0, 1, 20, "console_grid");
 	SetTarget("button_grid", 0);
 	AddButton("!noexpandy,flat", 0, 0, 0, 0, "close");
 	SetImage("close", "hui:close");
-	AddButton("!noexpandy,flat", 0, 1, 0, 0, "choose");
-	SetImage("choose", "hui:forward");
-	AddText("!big,angle=90,expandy\\...", 0, 2, 0, 0, "title");
+	AddListView("!nobar\\name", 0, 1, 0, 0, "choose");
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output);
@@ -45,14 +43,15 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	Embed(curve_console, "console_grid", 0, 5);
 	Embed(log_dialog, "console_grid", 0, 6);
 
-	menu = new HuiMenu;
+	//menu = new HuiMenu;
 	foreachi(HuiPanel *p, children, i){
-		string id = "bottom_bar_choose_" + i2s(i);
-		menu->AddItemCheckable(((BottomBarConsole*)p)->title, id);
-		EventM(id, (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChooseByMenu);
+		AddString("choose", ((BottomBarConsole*)p)->title);
+		//string id = "bottom_bar_choose_" + i2s(i);
+		//menu->AddItemCheckable(((BottomBarConsole*)p)->title, id);
+		//EventM(id, (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChooseByMenu);
 	}
 
-	EventM("choose", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnOpenChooseMenu);
+	EventMX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChoose);
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);
 
 	visible = true;
@@ -68,7 +67,7 @@ void BottomBar::OnClose()
 	Hide();
 }
 
-void BottomBar::OnOpenChooseMenu()
+/*void BottomBar::OnOpenChooseMenu()
 {
 	foreachi(HuiControl *c, menu->item, i)
 		c->Check(i == active_console);
@@ -78,6 +77,13 @@ void BottomBar::OnOpenChooseMenu()
 void BottomBar::OnChooseByMenu()
 {
 	Choose(HuiGetEvent()->id.tail(1)._int());
+}*/
+
+void BottomBar::OnChoose()
+{
+	int n = GetInt("");
+	if (n >= 0)
+		Choose(n);
 }
 
 void BottomBar::OnShow()
@@ -101,6 +107,7 @@ void BottomBar::Choose(int console)
 		}else
 			p->Hide();
 	}
+	SetInt("choose", console);
 	active_console = console;
 	if (visible)
 		Notify();

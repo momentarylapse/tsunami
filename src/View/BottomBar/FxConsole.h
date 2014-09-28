@@ -25,6 +25,7 @@ public:
 	void SetTrack(Track *t);
 
 	void OnAdd();
+	void OnTarget();
 
 	virtual void OnUpdate(Observable *o, const string &message);
 

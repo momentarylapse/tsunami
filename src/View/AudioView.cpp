@@ -1459,6 +1459,7 @@ void AudioView::SetCurSample(SampleRef *s)
 	if (cur_sample == s)
 		return;
 	cur_sample = s;
+	ForceRedraw();
 	Notify(MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
@@ -1468,6 +1469,7 @@ void AudioView::SetCurTrack(Track *t)
 	if (cur_track == t)
 		return;
 	cur_track = t;
+	ForceRedraw();
 	Notify(MESSAGE_CUR_TRACK_CHANGE);
 }
 

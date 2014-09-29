@@ -38,79 +38,6 @@ static int read_32bit_be(CFile *f)
 	return d[3] | (d[2] << 8) | (d[1] << 16) | (d[0] << 24);
 }
 
-string utf8_char(unsigned int code)
-{
-	char r[6] = "";
-	if ((code & 0xffffff80) == 0){ // 7bit
-		return string((char*)&code, 1);
-	}else if ((code & 0xfffff800) == 0){ // 11bit
-		r[1] = (code & 0x003f) | 0x80;        // 00-05
-		r[0] = ((code & 0x07c0) >> 6) | 0xc0; // 06-10
-		return string(r, 2);
-	}else if ((code & 0xffff0000) == 0){ // 16bit
-		r[2] = (code & 0x003f) | 0x80;         // 00-05
-		r[1] = ((code & 0x0fc0) >> 6) | 0x80;  // 06-11
-		r[0] = ((code & 0xf000) >> 12) | 0xe0; // 12-15
-		return string(r, 3);
-	}else if ((code & 0xffe00000) == 0){ // 21bit
-		r[3] = (code & 0x0000003f) | 0x80;         // 00-05
-		r[2] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
-		r[1] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
-		r[0] = ((code & 0x001c0000) >> 18) | 0xf0; // 18-20
-		return string(r, 4);
-	}else if ((code & 0xffe00000) == 0){ // 26bit
-		r[4] = (code & 0x0000003f) | 0x80;         // 00-05
-		r[3] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
-		r[2] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
-		r[1] = ((code & 0x00fc0000) >> 18) | 0x80; // 18-23
-		r[1] = ((code & 0x03000000) >> 24) | 0xf4; // 24-25
-		return string(r, 5);
-	}else{ // 31bit
-		r[5] = (code & 0x0000003f) | 0x80;         // 00-05
-		r[4] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
-		r[3] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
-		r[2] = ((code & 0x00fc0000) >> 18) | 0x80; // 18-23
-		r[1] = ((code & 0x3f000000) >> 24) | 0x80; // 24-29
-		r[0] = ((code & 0x40000000) >> 30) | 0xfc; // 30
-		return string(r, 6);
-	}
-}
-
-static string utf16_to_utf8(const string &s)
-{
-	string r;
-	bool big_endian = false;
-	unsigned int last = 0;
-	for (int i=0; i<s.num-1; i+=2){
-		if ((s[i] == 0xff) && (s[i+1] == 0xfe)){
-			big_endian = false;
-			continue;
-		}else if ((s[i] == 0xfe) && (s[i+1] == 0xff)){
-			big_endian = true;
-			continue;
-		}
-		unsigned int code = s[i] | (s[i+1] << 8);
-		if (big_endian)
-			code = s[i+1] | (s[i] << 8);
-		//msg_write(string((char*)&code, 2).hex());
-
-		if ((code < 0xd800) || (code > 0xdbff))
-			r += utf8_char(code);
-		else if ((last >= 0xdc00) && (last <= 0xdfff))
-			r += utf8_char(0x010000 | ((code - 0xd800) << 12) | (last - 0xdc00));
-		last = code;
-	}
-	return r;
-}
-
-static string latin_to_utf8(const string &s)
-{
-	string r;
-	for (int i=0; i<s.num; i++)
-		r += utf8_char(s[i]);
-	return r;
-}
-
 void FormatMp3::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
 
 void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int level)
@@ -201,9 +128,9 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 							if (key == "COMM")
 								val = val.substr(3, -1);
 							if ((type == 1) || (type == 2))
-								val = utf16_to_utf8(val);
+								val = val.utf16_to_utf8();
 							else if (type == 0)
-								val = latin_to_utf8(val);
+								val = val.latin_to_utf8();
 							val = val.replace(string("\0", 1), "");
 							//msg_write(val);
 							if (key == "TALB")

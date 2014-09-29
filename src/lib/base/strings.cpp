@@ -882,6 +882,102 @@ bool string::match(const string &glob) const
 	return true;
 }
 
+int string::utf8len() const
+{
+	int l = 0;
+	for (int i=0; i<num; i++)
+		if (((*this)[i] & 0x80) == 0)
+			l ++;
+	return l;
+}
+
+
+string utf8_char(unsigned int code)
+{
+	char r[6] = "";
+	if ((code & 0xffffff80) == 0){ // 7bit
+		return string((char*)&code, 1);
+	}else if ((code & 0xfffff800) == 0){ // 11bit
+		r[1] = (code & 0x003f) | 0x80;        // 00-05
+		r[0] = ((code & 0x07c0) >> 6) | 0xc0; // 06-10
+		return string(r, 2);
+	}else if ((code & 0xffff0000) == 0){ // 16bit
+		r[2] = (code & 0x003f) | 0x80;         // 00-05
+		r[1] = ((code & 0x0fc0) >> 6) | 0x80;  // 06-11
+		r[0] = ((code & 0xf000) >> 12) | 0xe0; // 12-15
+		return string(r, 3);
+	}else if ((code & 0xffe00000) == 0){ // 21bit
+		r[3] = (code & 0x0000003f) | 0x80;         // 00-05
+		r[2] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
+		r[1] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
+		r[0] = ((code & 0x001c0000) >> 18) | 0xf0; // 18-20
+		return string(r, 4);
+	}else if ((code & 0xffe00000) == 0){ // 26bit
+		r[4] = (code & 0x0000003f) | 0x80;         // 00-05
+		r[3] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
+		r[2] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
+		r[1] = ((code & 0x00fc0000) >> 18) | 0x80; // 18-23
+		r[1] = ((code & 0x03000000) >> 24) | 0xf4; // 24-25
+		return string(r, 5);
+	}else{ // 31bit
+		r[5] = (code & 0x0000003f) | 0x80;         // 00-05
+		r[4] = ((code & 0x00000fc0) >> 6) | 0x80;  // 06-11
+		r[3] = ((code & 0x0003f000) >> 12) | 0x80; // 12-17
+		r[2] = ((code & 0x00fc0000) >> 18) | 0x80; // 18-23
+		r[1] = ((code & 0x3f000000) >> 24) | 0x80; // 24-29
+		r[0] = ((code & 0x40000000) >> 30) | 0xfc; // 30
+		return string(r, 6);
+	}
+}
+
+Array<int> string::utf16_to_utf32() const
+{
+	Array<int> r;
+	bool big_endian = false;
+	unsigned int last = 0;
+	for (int i=0; i<num-1; i+=2){
+		if (((*this)[i] == 0xff) && ((*this)[i+1] == 0xfe)){
+			big_endian = false;
+			continue;
+		}else if (((*this)[i] == 0xfe) && ((*this)[i+1] == 0xff)){
+			big_endian = true;
+			continue;
+		}
+		unsigned int code = (*this)[i] | ((*this)[i+1] << 8);
+		if (big_endian)
+			code = (*this)[i+1] | ((*this)[i] << 8);
+		//msg_write(string((char*)&code, 2).hex());
+
+		if ((code < 0xd800) || (code > 0xdbff))
+			r.add(code);
+		else if ((last >= 0xdc00) && (last <= 0xdfff))
+			r.add(0x010000 | ((code - 0xd800) << 12) | (last - 0xdc00));
+		last = code;
+	}
+	return r;
+}
+
+string string::utf16_to_utf8() const
+{
+	return utf32_to_utf8(utf16_to_utf32());
+}
+
+string string::latin_to_utf8() const
+{
+	string r;
+	for (int i=0; i<num; i++)
+		r += utf8_char((*this)[i]);
+	return r;
+}
+
+string utf32_to_utf8(const Array<int> &s)
+{
+	string r;
+	for (int i=0; i<s.num; i++)
+		r += utf8_char(s[i]);
+	return r;
+}
+
 /*
 char *regex_out_match[REGEX_MAX_MATCHES];
 int regex_out_pos[REGEX_MAX_MATCHES],regex_out_length[REGEX_MAX_MATCHES];

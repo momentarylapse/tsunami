@@ -45,6 +45,11 @@ class string : public DynamicArray
 	string _cdecl hex(bool inverted = false) const;
 	string _cdecl unhex() const;
 	bool _cdecl match(const string &glob) const;
+	int _cdecl utf8len() const;
+	string utf16_to_utf8() const;
+	string latin_to_utf8() const;
+	Array<int> utf8_to_utf32() const;
+	Array<int> utf16_to_utf32() const;
 	int _cdecl hash() const;
 	int _cdecl _int() const;
 	long long _cdecl _int64() const;
@@ -133,6 +138,7 @@ string _cdecl d2h(const void *data, int bytes, bool inverted = true);
 string _cdecl h2d(const string &hex_str, int bytes);
 
 string _cdecl implode(const Array<string> &a, const string &glue);
+string _cdecl utf32_to_utf8(const Array<int> &s);
 
 //--------------------------------------------------------------
 // regular expressions

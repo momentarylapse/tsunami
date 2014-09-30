@@ -37,6 +37,7 @@ public:
 		p = synth->CreatePanel();
 		if (p){
 			Embed(p, "grid", 0, 1);
+			p->update();
 		}else{
 			SetTarget("grid", 0);
 			AddText(_("nicht konfigurierbar"), 0, 1, 0, 0, "");

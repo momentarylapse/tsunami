@@ -15,6 +15,7 @@
 #include "SampleManager.h"
 #include "MidiEditor.h"
 #include "../../lib/hui/Controls/HuiControl.h"
+#include "../AudioView.h"
 
 BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
@@ -42,6 +43,8 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	Embed(sample_manager, "console_grid", 0, 4);
 	Embed(curve_console, "console_grid", 0, 5);
 	Embed(log_dialog, "console_grid", 0, 6);
+
+	view->Subscribe(this);
 
 	//menu = new HuiMenu;
 	foreachi(HuiPanel *p, children, i){
@@ -109,10 +112,9 @@ void BottomBar::Choose(int console)
 	}
 	SetInt("choose", console);
 	active_console = console;
-	if (visible)
-		Notify();
-	else
+	if (!visible)
 		Show();
+	Notify();
 }
 
 bool BottomBar::IsActive(int console)

@@ -30,7 +30,6 @@ class HarmonicPanel : ConfigPanel
 		addText("ms", 4, 0, 0, 0, "")
 		eventM("release", self, &onChange)
 		hc = &c.config
-		update()
 		
 	void onChange()
 		for int j, 0, NUM_HARMONICS

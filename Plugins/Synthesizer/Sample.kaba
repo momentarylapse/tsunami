@@ -2,9 +2,14 @@ use "../api.kaba"
 
 
 class SampleConfig : PluginData
-	int sam[]
+	SampleRef *samples[]
+	virtual void __delete__()
+		reset()
 	overwrite void reset()
-		sam.clear()
+		for s in samples
+			if s
+				delete s
+		samples.clear()
 
 class SampleSynthesizer : Synthesizer
 	SampleConfig config
@@ -13,14 +18,13 @@ class SampleSynthesizer : Synthesizer
 		//plugin_context.track
 		//buf.add(audio.sample[0].buf, r.offset, volume, 0)
 		int n = pitch + 0.4
-		if n < 0 or n >= config.sam.num
+		if n < 0 or n >= config.samples.num
 			return
-		int nn = config.sam[n]
-		if nn < 0 or nn >= audio.sample.num
+		SampleRef *s = config.samples[n]
+		if !s
 			return
-		Sample *s = audio.sample[nn]
 		
-		buf.add(s.buf, r.offset, volume, 0)
+		buf.add(*s.buf, r.offset, volume, 0)
 	
 	overwrite ConfigPanel *createPanel()
 		return new SamplePanel(self)
@@ -31,26 +35,36 @@ class SamplePanel : ConfigPanel
 	void __init__(SampleSynthesizer *_s)
 		super.__init__(_s)
 		sc = &c.config
-		addGrid("", 0, 0, 4, 8, "main_table")
+		addGrid("", 0, 0, 6, 6, "main_table")
 		setTarget("main_table", 0)
-		for int i, 0, 16
-			addText(i, (i/8)*2, i%8, 0, 0, "")
-			addComboBox("- leer -", 1+(i/8)*2, i%8, 0, 0, "sample"+i)
-			int j = 1
+		for int i, 0, 18
+			addText(i, (i/6)*2, i%6, 0, 0, "")
+			addComboBox("- leer -", 1+(i/6)*2, i%6, 0, 0, "sample"+i)
 			for s in audio.sample
 				setString("sample"+i, s.name)
-				if i < sc.sam.num
-					if sc.sam[i] == j-1
-						setInt("sample"+i, j)
-				j ++
 			eventM("sample"+i, self, &onChange)
+			
+	overwrite void update()
+		for int i, 0, 18
+			setInt("sample"+i, 0)
+			int j = 1
+			for s in audio.sample
+				if i < sc.samples.num
+					if sc.samples[i]
+						if sc.samples[i].origin == s
+							setInt("sample"+i, j)
+				j ++
 		
 	void onChange()
 		int n = HuiGetEvent().id.substr(6, -1).int()
 		if n < 0
 			return
-		if n >= sc.sam.num
-			sc.sam.resize(n + 1)
+		if n >= sc.samples.num
+			sc.samples.resize(n + 1)
 		int m = getInt("")
-		sc.sam[n] = m-1
+		if sc.samples[n]
+			delete sc.samples[n]
+			sc.samples[n] = nil
+		if m > 0
+			sc.samples[n] = audio.sample[m-1].createRef()
 		notify()

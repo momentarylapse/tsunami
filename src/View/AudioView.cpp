@@ -1123,6 +1123,8 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 		if (input->IsCapturing())
 			MakeSampleVisible(sel_range.start() + input->GetSampleCount());
 		ForceRedraw();
+	}else{
+		ForceRedraw();
 	}
 }
 
@@ -1218,10 +1220,10 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 		}
 
 		if ((t == cur_track) && (EditingMidi())){
-			Array<int> *p = NULL;
+			Array<SampleRef*> *p = NULL;
 			if ((t->synth) && (t->synth->name == "Sample")){
 				PluginData *c = t->synth->get_config();
-				p = (Array<int> *)&c[1];
+				p = (Array<SampleRef*> *)&c[1];
 			}
 			// pitch grid
 			c->setColor(color(0.25f, 0, 0, 0));
@@ -1234,10 +1236,10 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 				}
 				if (p){
 					if ((i >= 0) && (i < p->num)){
-						int n = (*p)[i];
-						if ((n >= 0) && (n < audio->sample.num)){
+						SampleRef *s = (*p)[i];
+						if (s){
 							c->setColor(Black);
-							c->drawStr(r.x1, y0, audio->sample[n]->name);
+							c->drawStr(r.x1, y0, s->origin->name);
 						}
 					}
 				}

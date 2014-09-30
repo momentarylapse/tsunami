@@ -71,11 +71,9 @@ string var_to_string(Script::Type *type, char *v)
 		}
 		r += "]";
 	}else if (type->name == "SampleRef*"){
-		msg_write("sample ref!!!!");
 		SampleRef *sr = *(SampleRef**)v;
-		msg_write(p2s(sr));
 		if (sr)
-			r += i2s(sr->origin->uid);
+			r += i2s(sr->origin->get_index());
 		else
 			r += "nil";
 	}else{
@@ -149,11 +147,11 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		}
 		pos ++; // ']'
 	}else if (type->name == "SampleRef*"){
-		string s = get_next(s, pos);
+		string ss = get_next(s, pos);
 		*(SampleRef**)v = NULL;
-		if (s != "nil"){
-			int n = tsunami->audio->get_sample_by_uid(s._int());
-			if (n >= 0)
+		if (ss != "nil"){
+			int n = ss._int();
+			if ((n >= 0) && (n < tsunami->audio->sample.num))
 				*(SampleRef**)v = new SampleRef(tsunami->audio->sample[n]);
 		}
 	}else{
@@ -224,7 +222,8 @@ string Configurable::ConfigToString()
 	if (!config)
 		return "";
 
-	return var_to_string(config->type, (char*)config);
+	string s = var_to_string(config->type, (char*)config);
+	return s;
 }
 
 void Configurable::ConfigFromString(const string &param)
@@ -235,6 +234,7 @@ void Configurable::ConfigFromString(const string &param)
 	if (!config)
 		return;
 
+	config->reset();
 	int pos = 0;
 	var_from_string(config->type, (char*)config, param, pos);
 }

@@ -197,6 +197,7 @@ void PluginManager::LinkAppScriptData()
 	SampleRef sampleref(&sample);
 	Script::DeclareClassSize("SampleRef", sizeof(SampleRef));
 	Script::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
+	Script::DeclareClassOffset("SampleRef", "origin", _offsetof(SampleRef, origin));
 	Script::LinkExternal("SampleRef.__init__", Script::mf(&SampleRef::__init__));
 	Script::DeclareClassVirtualIndex("SampleRef", "__delete__", Script::mf(&SampleRef::__delete__), &sampleref);
 

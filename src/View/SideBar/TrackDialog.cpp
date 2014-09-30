@@ -56,6 +56,8 @@ TrackDialog::~TrackDialog()
 void TrackDialog::LoadData()
 {
 	Enable("name", track);
+	Enable("volume", track);
+	Enable("panning", track);
 	bar_list->SetTrack(track);
 	if (track){
 		SetString("name", track->name);

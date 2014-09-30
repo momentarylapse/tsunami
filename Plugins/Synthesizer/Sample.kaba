@@ -31,10 +31,11 @@ class SamplePanel : ConfigPanel
 	void __init__(SampleSynthesizer *_s)
 		super.__init__(_s)
 		sc = &c.config
-		addGrid("", 0, 0, 1, 8, "main_table")
+		addGrid("", 0, 0, 4, 8, "main_table")
 		setTarget("main_table", 0)
-		for int i, 0, 8
-			addComboBox("- leer -", 0, i, 0, 0, "sample"+i)
+		for int i, 0, 16
+			addText(i, (i/8)*2, i%8, 0, 0, "")
+			addComboBox("- leer -", 1+(i/8)*2, i%8, 0, 0, "sample"+i)
 			int j = 1
 			for s in audio.sample
 				setString("sample"+i, s.name)

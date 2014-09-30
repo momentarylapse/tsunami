@@ -1218,6 +1218,11 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 		}
 
 		if ((t == cur_track) && (EditingMidi())){
+			Array<int> *p = NULL;
+			if ((t->synth) && (t->synth->name == "Sample")){
+				PluginData *c = t->synth->get_config();
+				p = (Array<int> *)&c[1];
+			}
 			// pitch grid
 			c->setColor(color(0.25f, 0, 0, 0));
 			for (int i=pitch_min; i<pitch_max; i++){
@@ -1226,6 +1231,15 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 				if (is_sharp(i)){
 					c->setColor(color(0.2f, 0, 0, 0));
 					c->drawRect(r.x1, y0, r.width(), y1 - y0);
+				}
+				if (p){
+					if ((i >= 0) && (i < p->num)){
+						int n = (*p)[i];
+						if ((n >= 0) && (n < audio->sample.num)){
+							c->setColor(Black);
+							c->drawStr(r.x1, y0, audio->sample[n]->name);
+						}
+					}
 				}
 			}
 		}

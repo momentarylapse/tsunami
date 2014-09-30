@@ -14,6 +14,7 @@
 
 class AudioFile;
 class Track;
+class SampleRef;
 
 class Sample
 {
@@ -36,6 +37,8 @@ public:
 
 	void ref();
 	void unref();
+
+	SampleRef *create_ref();
 };
 
 

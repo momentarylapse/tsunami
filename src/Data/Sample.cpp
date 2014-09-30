@@ -49,6 +49,11 @@ void Sample::unref()
 	ref_count --;
 }
 
+SampleRef *Sample::create_ref()
+{
+	return new SampleRef(this);
+}
+
 
 
 SampleRef::SampleRef(Sample *sample) :

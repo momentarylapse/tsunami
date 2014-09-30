@@ -190,6 +190,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Sample", "buf", _offsetof(Sample, buf));
 	Script::DeclareClassOffset("Sample", "volume", _offsetof(Sample, volume));
 	Script::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
+	Script::LinkExternal("Sample.createRef", Script::mf(&Sample::create_ref));
 
 	Sample sample;
 	sample.owner = tsunami->audio;

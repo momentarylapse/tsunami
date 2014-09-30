@@ -70,6 +70,14 @@ string var_to_string(Script::Type *type, char *v)
 			r += var_to_string(type->parent, &(((char*)a->data)[i * type->parent->size]));
 		}
 		r += "]";
+	}else if (type->name == "SampleRef*"){
+		msg_write("sample ref!!!!");
+		SampleRef *sr = *(SampleRef**)v;
+		msg_write(p2s(sr));
+		if (sr)
+			r += i2s(sr->origin->uid);
+		else
+			r += "nil";
 	}else{
 		Array<Script::ClassElement> e = get_unique_elements(type);
 		r += "(";
@@ -140,6 +148,14 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos);
 		}
 		pos ++; // ']'
+	}else if (type->name == "SampleRef*"){
+		string s = get_next(s, pos);
+		*(SampleRef**)v = NULL;
+		if (s != "nil"){
+			int n = tsunami->audio->get_sample_by_uid(s._int());
+			if (n >= 0)
+				*(SampleRef**)v = new SampleRef(tsunami->audio->sample[n]);
+		}
 	}else{
 		Array<Script::ClassElement> e = get_unique_elements(type);
 		pos ++; // '('

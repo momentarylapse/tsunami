@@ -1,0 +1,20 @@
+use "../api.kaba"
+
+
+class SampleConfig : PluginData
+	SampleRef *sam[]
+	overwrite void reset()
+
+class SampleSynthesizer : Synthesizer
+	SampleConfig config
+	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
+		keep_notes = sample_rate * 2
+		//plugin_context.track
+		buf.add(audio.sample[0].buf, r.offset, volume, 0)
+		/*int n = pitch + 0.4
+		if n < 0 or n >= config.sam.num
+			return
+		SampleRef *s = config.sam[n]
+		
+		buf.add(*s.buf, r.offset, volume, 0)*/
+		

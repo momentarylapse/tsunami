@@ -32,7 +32,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 {
 	// intersected intervall (track-coordinates)
 	int i0 = max(s->pos, r.start());
-	int i1 = min(s->pos + s->buf.num, r.end());
+	int i1 = min(s->pos + s->buf->num, r.end());
 
 	// beginning of the intervall (relative to sub)
 	ir.offset = i0 - s->pos;
@@ -67,7 +67,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 
 			buf.make_own();
 			bpos = s->pos + s->rep_delay * i - range_cur.start();
-			buf.add(s->buf, bpos, s->volume * s->origin->volume, 0);
+			buf.add(*s->buf, bpos, s->volume * s->origin->volume, 0);
 		}
 	}
 }

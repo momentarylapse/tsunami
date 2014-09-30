@@ -156,8 +156,8 @@ Synthesizer *CreateSynthesizer(const string &name)
 {
 	if ((name == "Dummy") || (name == ""))
 		return new DummySynthesizer;
-	if (name == "Sample")
-		return new SampleSynthesizer;
+	/*if (name == "Sample")
+		return new SampleSynthesizer;*/
 	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name);
 	if (s){
 		s->ResetConfig();
@@ -174,6 +174,6 @@ Array<string> FindSynthesizers()
 {
 	Array<string> names = tsunami->plugin_manager->FindSynthesizers();
 	names.add("Dummy");
-	names.add("Sample");
+	//names.add("Sample");
 	return names;
 }

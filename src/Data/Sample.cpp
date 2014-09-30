@@ -31,6 +31,8 @@ Sample::~Sample()
 
 int Sample::get_index()
 {
+	if (!owner)
+		return -1;
 	foreachi(Sample *s, owner->sample, i)
 		if (this == s)
 			return i;
@@ -50,9 +52,9 @@ void Sample::unref()
 
 
 SampleRef::SampleRef(Sample *sample) :
-	Observable("SampleRef"),
-	buf(sample->buf)
+	Observable("SampleRef")
 {
+	buf = &sample->buf;
 	origin = sample;
 	origin->ref();
 	track_no = -1;
@@ -61,13 +63,25 @@ SampleRef::SampleRef(Sample *sample) :
 	volume = 1;
 	muted = false;
 	rep_num = 0;
-	rep_delay = sample->owner->sample_rate;
+	rep_delay = 0;
+	if (sample->owner)
+		rep_delay = sample->owner->sample_rate;
 	is_selected = false;
 }
 
 SampleRef::~SampleRef()
 {
 	origin->unref();
+}
+
+void SampleRef::__init__(Sample *sam)
+{
+	new(this) SampleRef(sam);
+}
+
+void SampleRef::__delete__()
+{
+	this->~SampleRef();
 }
 
 int SampleRef::get_index()
@@ -83,10 +97,12 @@ int SampleRef::get_index()
 
 Track *SampleRef::GetParent()
 {
-	return owner->track[track_no];
+	if (owner)
+		return owner->track[track_no];
+	return NULL;
 }
 
 Range SampleRef::GetRange()
 {
-	return Range(pos, buf.num);
+	return Range(pos, buf->num);
 }

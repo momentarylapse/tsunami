@@ -39,5 +39,5 @@ void SampleSynthesizer::RenderNote(BufferBox& buf, const Range& range, float pit
 	SampleRef *s = samples[pitch];
 	if (!s)
 		return;
-	buf.add(s->buf, range.start(), volume, 0);
+	buf.add(*s->buf, range.start(), volume, 0);
 }

@@ -44,7 +44,9 @@ class SampleRef : public Observable
 {
 public:
 	SampleRef(Sample *sample);
-	~SampleRef();
+	virtual ~SampleRef();
+	void _cdecl __init__(Sample *sample);
+	virtual void _cdecl __delete__();
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
@@ -55,7 +57,7 @@ public:
 
 	int pos;
 	Sample *origin;
-	BufferBox &buf;
+	BufferBox *buf;
 	bool muted;
 	float volume;
 

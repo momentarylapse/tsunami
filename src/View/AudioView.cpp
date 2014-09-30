@@ -821,7 +821,7 @@ void AudioView::DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, cons
 {
 	// frame
 	int asx = clampi(sample2screen(s->pos + delay), r.x1, r.x2);
-	int aex = clampi(sample2screen(s->pos + s->buf.num + delay), r.x1, r.x2);
+	int aex = clampi(sample2screen(s->pos + s->buf->num + delay), r.x1, r.x2);
 
 	if (delay == 0)
 		s->area = rect(asx, aex, r.y1, r.y2);
@@ -858,7 +858,7 @@ void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
 		DrawSampleFrame(c, r, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	DrawBuffer(c, r, s->buf, view_pos - (double)s->pos, col);
+	DrawBuffer(c, r, *s->buf, view_pos - (double)s->pos, col);
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))

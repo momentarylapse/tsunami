@@ -181,7 +181,23 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("BufferBox.clear", Script::mf(&BufferBox::clear));
 	Script::LinkExternal("BufferBox.__assign__", Script::mf(&BufferBox::__assign__));
 	Script::LinkExternal("BufferBox.range", Script::mf(&BufferBox::range));
+	Script::LinkExternal("BufferBox.add", Script::mf(&BufferBox::add));
+	Script::LinkExternal("BufferBox.set", Script::mf(&BufferBox::set));
 	Script::LinkExternal("BufferBox.get_spectrum", Script::mf(&ExtendedBufferBox::get_spectrum));
+
+	Script::DeclareClassSize("Sample", sizeof(Sample));
+	Script::DeclareClassOffset("Sample", "name", _offsetof(Sample, name));
+	Script::DeclareClassOffset("Sample", "buf", _offsetof(Sample, buf));
+	Script::DeclareClassOffset("Sample", "volume", _offsetof(Sample, volume));
+	Script::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
+
+	Sample sample;
+	sample.owner = tsunami->audio;
+	SampleRef sampleref(&sample);
+	Script::DeclareClassSize("SampleRef", sizeof(SampleRef));
+	Script::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
+	Script::LinkExternal("SampleRef.__init__", Script::mf(&SampleRef::__init__));
+	Script::DeclareClassVirtualIndex("SampleRef", "__delete__", Script::mf(&SampleRef::__delete__), &sampleref);
 
 	Synthesizer synth;
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
@@ -280,6 +296,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "volume", _offsetof(AudioFile, volume));
 	Script::DeclareClassOffset("AudioFile", "fx", _offsetof(AudioFile, fx));
 	Script::DeclareClassOffset("AudioFile", "track", _offsetof(AudioFile, track));
+	Script::DeclareClassOffset("AudioFile", "sample", _offsetof(AudioFile, sample));
 	Script::DeclareClassOffset("AudioFile", "area", _offsetof(AudioFile, area));
 	Script::DeclareClassOffset("AudioFile", "level_name", _offsetof(AudioFile, level_name));
 	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::NewEmpty));

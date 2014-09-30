@@ -100,7 +100,7 @@ Range Track::GetRangeUnsafe()
 	foreach(SampleRef *s, sample){
 		if (s->pos < min)
 			min = s->pos;
-		int smax = s->pos + s->buf.num + s->rep_num * s->rep_delay;
+		int smax = s->pos + s->buf->num + s->rep_num * s->rep_delay;
 		if (smax > max)
 			max = smax;
 	}

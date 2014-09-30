@@ -22,7 +22,7 @@ ActionTrackInsertSample::ActionTrackInsertSample(AudioFile *a, int track_no, int
 
 	// insert sub (ignore muted)
 	ActionTrackEditBuffer *action = new ActionTrackEditBuffer(a->track[track_no], level_no, r);
-	buf.set(sub->buf, 0, sub->volume);
+	buf.set(*sub->buf, 0, sub->volume);
 	AddSubAction(action, a);
 
 	// delete sub

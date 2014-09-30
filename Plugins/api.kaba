@@ -71,6 +71,8 @@ class BufferBox
 	extern void __assign__(BufferBox other)
 	extern void clear()
 	extern Range range()
+	extern void set(BufferBox b, int offset, float volume)
+	extern void add(BufferBox b, int offset, float volume, float panning)
 	extern void get_spectrum(complex spec_r[], complex spec_l[], int samples)
 
 class Synthesizer
@@ -129,8 +131,17 @@ enum
 class TrackLevel
 	BufferBox buffer[]
 
+class Sample // TODO
+	string name
+	BufferBox buf
+	float volume
+	int uid
+
 class SampleRef // TODO
-	int dummy
+	Sample *origin
+	BufferBox *buf
+	extern void __init__(Sample *sam)
+	extern virtual void __delete__()
 
 
 enum
@@ -206,6 +217,7 @@ class AudioFile
 	
 	AudioEffect fx[]
 	Track *track[]
+	Sample *sample[]
 
 	rect area
 	

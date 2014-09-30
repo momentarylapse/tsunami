@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-207
+206
 // Data (ID,Text)
 about
 
@@ -80,8 +80,6 @@ Close
 close_file
 
 comment_no_fx
-
-config_synth
 
 copy
 Copy
@@ -313,9 +311,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_310073
+rand_id_21168
 
-rand_id_715306
+rand_id_481674
 
 rdt_source
 !bold\\Source
@@ -418,7 +416,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-141
+139
 // Data (ID,Text)
 
 
@@ -430,21 +428,17 @@ zoom_out
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
 
-!angle=90\\-keine Spur ausgewählt-
-
 !angle=90\\für die Spur '%s'
 
 !angle=90\\keine Spur gewählt
-
-!angle=90\\wirken auf die Spur '%s'
-
-!angle=90\\wirken auf die komplette Datei
 
 !bold$Kommentar/Geschehnisse:
 
 !bold$Name:
 
 !bold,center\\Ausgabe
+
+!noexpandx,width=150\\Ziel
 
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
@@ -463,6 +457,8 @@ zoom_out
 - Standard -
 - Default -
 - hier sind (noch) keine Effekte aktiv -
+
+- komplette Datei -
 
 -Standard Parameter-
 
@@ -637,8 +633,6 @@ alle Nachrichten löschen
 alles mögliche (
 
 benutze OpenAl Device: 
-
-einen Effekt wählen
 
 exportiere
 

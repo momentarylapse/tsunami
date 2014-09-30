@@ -913,7 +913,7 @@ void draw_note(HuiPainter *c, const MidiNote &n, AudioView *v)
 	c->drawRect(rect(x1, x2, y1, y2));
 }
 
-void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col)
+void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, Track *t, color col)
 {
 	foreachi(MidiNote &n, midi, i){
 		if ((n.pitch < pitch_min) || (n.pitch >= pitch_max))
@@ -933,9 +933,25 @@ void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, c
 			draw_note(c, n, this);
 		}
 	}
-	if ((hover.type == SEL_TYPE_MIDI_PITCH) || (hover.type == SEL_TYPE_MIDI_NOTE)){
-		c->setColor(ColorWaveCur);
-		c->drawStr(20, r.y1 + r.height() * (pitch_max - hover.pitch - 1) / (pitch_max - pitch_min), pitch_name(hover.pitch));
+
+	color cc = ColorWaveCur;
+	cc.a = 0.4f;
+	Array<SampleRef*> *p = NULL;
+	if ((t->synth) && (t->synth->name == "Sample")){
+		PluginData *c = t->synth->get_config();
+		p = (Array<SampleRef*> *)&c[1];
+	}
+	for (int i=pitch_min; i<pitch_max; i++){
+		c->setColor(cc);
+		if (((hover.type == SEL_TYPE_MIDI_PITCH) || (hover.type == SEL_TYPE_MIDI_NOTE)) && (i == hover.pitch))
+			c->setColor(ColorWaveCur);
+
+		string name = pitch_name(i);
+		if (p)
+			if (i < p->num)
+				if ((*p)[i])
+					name = (*p)[i]->origin->name;
+		c->drawStr(20, r.y1 + r.height() * (pitch_max - i - 1) / (pitch_max - pitch_min), name);
 	}
 }
 
@@ -944,7 +960,7 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 	msg_db_f("DrawTrack", 1);
 
 	if ((cur_track == t) && (EditingMidi()))
-		DrawMidiEditable(c, r, t->midi, col);
+		DrawMidiEditable(c, r, t->midi, t, col);
 	else
 		DrawMidi(c, r, t->midi, col);
 
@@ -1220,11 +1236,6 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 		}
 
 		if ((t == cur_track) && (EditingMidi())){
-			Array<SampleRef*> *p = NULL;
-			if ((t->synth) && (t->synth->name == "Sample")){
-				PluginData *c = t->synth->get_config();
-				p = (Array<SampleRef*> *)&c[1];
-			}
 			// pitch grid
 			c->setColor(color(0.25f, 0, 0, 0));
 			for (int i=pitch_min; i<pitch_max; i++){
@@ -1233,15 +1244,6 @@ void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 				if (is_sharp(i)){
 					c->setColor(color(0.2f, 0, 0, 0));
 					c->drawRect(r.x1, y0, r.width(), y1 - y0);
-				}
-				if (p){
-					if ((i >= 0) && (i < p->num)){
-						SampleRef *s = (*p)[i];
-						if (s){
-							c->setColor(Black);
-							c->drawStr(r.x1, y0, s->origin->name);
-						}
-					}
 				}
 			}
 		}

@@ -12,8 +12,8 @@ Dialog track_dialog "Spur" 380 516
 				Text percent "%"
 		Group ld_t_synth "Synthesizer"
 			Grid ? "" 2 1
-				Button synthesizer "" expandx
-				Button config_synth "" image=hui:edit flat
+				Button synthesizer "" expandx flat
+				Button config_synth "" image=hui:edit
 		Group ld_t_bars "Takte"
 			Grid ? "" 1 2
 				ListView bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT
@@ -22,5 +22,5 @@ Dialog track_dialog "Spur" 380 516
 					Button add_bar_pause "Pause" image=hui:add flat
 					Button delete_bar "" image=hui:delete flat
 		Group ld_t_midi "Midi"
-			Button edit_midi "bearbeiten" image=hui:edit flat
+			Button edit_midi "bearbeiten" image=hui:edit
 

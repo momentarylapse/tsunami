@@ -11,6 +11,7 @@
 #include "FormatRaw.h"
 #include "FormatOgg.h"
 #include "FormatFlac.h"
+#include "FormatGp4.h"
 #include "FormatM4a.h"
 #include "FormatMidi.h"
 #include "FormatMp3.h"
@@ -31,6 +32,7 @@ Storage::Storage()
 	format.add(new FormatRaw());
 	format.add(new FormatOgg());
 	format.add(new FormatFlac());
+	format.add(new FormatGp4());
 	format.add(new FormatMp3());
 	format.add(new FormatM4a());
 	format.add(new FormatMidi());

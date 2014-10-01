@@ -21,6 +21,7 @@
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
+#include "../View/BottomBar/SampleManager.h"
 #include "Plugin.h"
 #include "Effect.h"
 #include "ConfigPanel.h"
@@ -120,6 +121,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("RemoveSliders", (void*)&GlobalRemoveSliders);
 	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
+	Script::LinkExternal("SelectSample", (void*)&SampleManager::Select);
 
 	Script::DeclareClassSize("Range", sizeof(Range));
 	Script::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));

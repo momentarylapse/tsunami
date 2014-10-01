@@ -1,4 +1,5 @@
 use "../api.kaba"
+use "../tone.kaba"
 
 
 class SampleConfig : PluginData
@@ -35,36 +36,32 @@ class SamplePanel : ConfigPanel
 	void __init__(SampleSynthesizer *_s)
 		super.__init__(_s)
 		sc = &c.config
-		addGrid("", 0, 0, 6, 6, "main_table")
-		setTarget("main_table", 0)
-		for int i, 0, 18
-			addText(i, (i/6)*2, i%6, 0, 0, "")
-			addComboBox("- leer -", 1+(i/6)*2, i%6, 0, 0, "sample"+i)
-			for s in audio.sample
-				setString("sample"+i, s.name)
-			eventM("sample"+i, self, &onChange)
-			
+		addListView("!width=300\\Note\\Sample", 0, 0, 0, 0, "list")
+		eventM("list", self, &onSelect)
+
 	overwrite void update()
-		for int i, 0, 18
-			setInt("sample"+i, 0)
-			int j = 1
-			for s in audio.sample
-				if i < sc.samples.num
-					if sc.samples[i]
-						if sc.samples[i].origin == s
-							setInt("sample"+i, j)
-				j ++
+		reset("list")
+		for int i, 0, 128
+			string name = ""
+			if i < sc.samples.num
+				if sc.samples[i]
+					name = sc.samples[i].origin.name
+			setString("list", pitch_name(i) + "\\" + name)
 		
-	void onChange()
-		int n = HuiGetEvent().id.substr(6, -1).int()
+	void onSelect()
+		int n = getInt("")
 		if n < 0
 			return
 		if n >= sc.samples.num
 			sc.samples.resize(n + 1)
-		int m = getInt("")
+		Sample *old = nil
 		if sc.samples[n]
-			delete sc.samples[n]
-			sc.samples[n] = nil
-		if m > 0
-			sc.samples[n] = audio.sample[m-1].createRef()
-		notify()
+			old = sc.samples[n].origin
+		Sample *s = SelectSample(self, audio, old)
+		if s != old
+			if sc.samples[n]
+				delete sc.samples[n]
+				sc.samples[n] = nil
+			if s
+				sc.samples[n] = s.createRef()
+			notify()

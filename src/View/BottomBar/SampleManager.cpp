@@ -118,3 +118,88 @@ void SampleManager::OnUpdate(Observable *o, const string &message)
 {
 	FillList();
 }
+
+
+class SampleSelector : public HuiDialog
+{
+public:
+	SampleSelector(HuiPanel *root, AudioFile *a, Sample *old) :
+		HuiDialog(_("Sample w&ahlen"), 300, 400, root->win, false)
+	{
+		audio = a;
+		ret = NULL;;
+		_old = old;
+
+		FromSource("Grid ? '' 1 2\n"\
+					"	ListView list 'Vorschau\\Name\\Dauer' format=itt\n"\
+					"	Grid ? '' 2 1 buttonbar\n"\
+					"		Button cancel 'Abbrechen'\n"\
+					"		Button ok 'Ok'");
+
+		SetString("list", _("\\- keines -\\"));
+		SetInt("list", 0);
+		foreachi(Sample *s, audio->sample, i){
+			icon_names.add(render_bufbox(s->buf, 80, 32));
+			SetString("list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
+			if (s == old)
+				SetInt("list", i + 1);
+		}
+
+		EventM("ok", this, &SampleSelector::onOk);
+		EventM("cancel", this, &SampleSelector::onCancel);
+		EventM("hui:close", this, &SampleSelector::onCancel);
+		EventMX("list", "hui:select", this, &SampleSelector::onSelect);
+		EventM("list", this, &SampleSelector::onList);
+	}
+	virtual ~SampleSelector()
+	{
+		foreach(string &name, icon_names)
+			HuiDeleteImage(name);
+	}
+
+	void onSelect()
+	{
+		int n = GetInt("");
+		ret = NULL;
+		if (n >= 1)
+			ret = audio->sample[n - 1];
+		Enable("ok", n >= 0);
+	}
+
+	void onList()
+	{
+		int n = GetInt("");
+		if (n == 0){
+			ret = NULL;
+			delete(this);
+		}else if (n >= 1){
+			ret = audio->sample[n - 1];
+			delete(this);
+		}
+	}
+
+	void onOk()
+	{
+		delete(this);
+	}
+
+	void onCancel()
+	{
+		ret = _old;
+		delete(this);
+	}
+
+	static Sample *ret;
+	Sample *_old;
+	Array<string> icon_names;
+	AudioFile *audio;
+};
+
+Sample *SampleSelector::ret;
+
+Sample *SampleManager::Select(HuiPanel *root, AudioFile *a, Sample *old)
+{
+	SampleSelector *s = new SampleSelector(root, a, old);
+	s->Run();
+	return SampleSelector::ret;
+}

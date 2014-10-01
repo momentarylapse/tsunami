@@ -11,6 +11,7 @@
 #include "BottomBar.h"
 
 class AudioFile;
+class Sample;
 
 class SampleManager : public BottomBarConsole, public Observer
 {
@@ -32,6 +33,8 @@ public:
 	AudioFile *audio;
 	Array<string> icon_names;
 	int selected;
+
+	static Sample *_cdecl Select(HuiPanel *root, AudioFile *a, Sample *old);
 };
 
 #endif /* SAMPLEMANAGER_H_ */

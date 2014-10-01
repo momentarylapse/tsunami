@@ -904,13 +904,18 @@ void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col
 	c->setLineWidth(LINE_WIDTH);
 }
 
-void draw_note(HuiPainter *c, const MidiNote &n, AudioView *v)
+void draw_note(HuiPainter *c, const MidiNote &n, color &col, AudioView *v)
 {
 	float x1 = v->sample2screen(n.range.offset);
 	float x2 = v->sample2screen(n.range.end());
+	float xm = x1 * 0.8f + x2 * 0.2f;
 	float y1 = v->pitch2y(n.pitch + 1);
 	float y2 = v->pitch2y(n.pitch);
-	c->drawRect(rect(x1, x2, y1, y2));
+	c->setColor(col);
+	c->drawRect(rect(x1, xm, y1, y2));
+	color col2 = ColorInterpolate(col, Black, 0.1f);
+	c->setColor(col2);
+	c->drawRect(rect(xm, x2, y1, y2));
 }
 
 void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, Track *t, color col)
@@ -921,16 +926,14 @@ void AudioView::DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, T
 		color col = GetPitchColor(n.pitch);
 		if ((hover.type == SEL_TYPE_MIDI_NOTE) && (hover.note == i))
 			col.a = 0.5f;
-		c->setColor(col);
-		draw_note(c, n, this);
+		draw_note(c, n, col, this);
 	}
 	if ((HuiGetEvent()->lbut) && (selection.type == SEL_TYPE_MIDI_PITCH)){
 		Array<MidiNote> notes = GetSelectedNotes();
 		foreach(MidiNote &n, notes){
 			color col = GetPitchColor(n.pitch);
 			col.a = 0.5f;
-			c->setColor(col);
-			draw_note(c, n, this);
+			draw_note(c, n, col, this);
 		}
 	}
 

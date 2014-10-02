@@ -147,6 +147,7 @@ TsunamiWindow::TsunamiWindow() :
 
 	if (audio->track.num > 0)
 		view->SetCurTrack(audio->track[0]);
+	view->OptimizeView();
 
 	UpdateMenu();
 }

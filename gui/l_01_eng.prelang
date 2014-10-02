@@ -311,9 +311,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_21168
+rand_id_286233
 
-rand_id_481674
+rand_id_645178
 
 rdt_source
 !bold\\Source
@@ -416,7 +416,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-139
+141
 // Data (ID,Text)
 
 
@@ -432,13 +432,15 @@ zoom_out
 
 !angle=90\\keine Spur gewählt
 
+!angle=90\\wirken auf die Spur '%s'
+
+!angle=90\\wirken auf die komplette Datei
+
 !bold$Kommentar/Geschehnisse:
 
 !bold$Name:
 
 !bold,center\\Ausgabe
-
-!noexpandx,width=150\\Ziel
 
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 
@@ -458,8 +460,6 @@ zoom_out
 - Default -
 - hier sind (noch) keine Effekte aktiv -
 
-- komplette Datei -
-
 -Standard Parameter-
 
 ...done
@@ -478,9 +478,9 @@ Anfang\\\") + audio->get_time_str_long(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
 
-Aufruf: tsunami --export <Datei.nami> <Exportdatei>
+Aufruf: tsunami --export <Datei> <Exportdatei>
 
-Aufruf: tsunami --info <Datei.nami>
+Aufruf: tsunami --info <Datei>
 
 Beim Anwenden eines Effekts: 
 
@@ -604,6 +604,8 @@ Raw Daten
 
 Sample Manager
 
+Sample wählen
+
 Samplerate
 
 Samples\\\") + i2s(samples));
@@ -623,6 +625,8 @@ Vermindert
 Vorschau
 
 Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
+
+\\- keines -\\\"));
 
 aktiv?
 

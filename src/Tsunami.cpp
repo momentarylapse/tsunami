@@ -80,6 +80,7 @@ void Tsunami::_HandleArguments()
 {
 	if (_arg.num >= 2)
 		storage->Load(audio, _arg[1]);
+	audio->Notify(audio->MESSAGE_NEW);
 }
 
 bool Tsunami::HandleArguments(const Array<string> &arg)
@@ -88,7 +89,7 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		return true;
 	if (arg[1] == "--info"){
 		if (arg.num < 3){
-			log->Error(_("Aufruf: tsunami --info <Datei.nami>"));
+			log->Error(_("Aufruf: tsunami --info <Datei>"));
 		}else if (storage->Load(audio, arg[2])){
 			msg_write(format("sample-rate: %d", audio->sample_rate));
 			msg_write(format("samples: %d", audio->GetRange().num));
@@ -99,7 +100,7 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		return false;
 	}else if (arg[1] == "--export"){
 		if (arg.num < 4){
-			log->Error(_("Aufruf: tsunami --export <Datei.nami> <Exportdatei>"));
+			log->Error(_("Aufruf: tsunami --export <Datei> <Exportdatei>"));
 		}else if (storage->Load(audio, arg[2])){
 			storage->Export(audio, audio->GetRange(), arg[3]);
 		}

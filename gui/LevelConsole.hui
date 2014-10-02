@@ -1,0 +1,6 @@
+Dialog level_console "LevelConsole" 430 375
+	Grid ? "" 1 2
+		ListView levels "#\\Name" format=tT select-single width=400 noexpandx
+		Grid ? "" 2 1
+			Button add_level "" image=hui:add flat
+			Button delete_level "" image=hui:delete flat

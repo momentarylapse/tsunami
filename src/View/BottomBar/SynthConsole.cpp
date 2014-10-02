@@ -124,6 +124,7 @@ void SynthConsole::Clear()
 			Unsubscribe(track->synth);
 			delete(panel);
 			panel = NULL;
+			RemoveControl("separator_0");
 		}
 	}
 	track = NULL;
@@ -142,6 +143,7 @@ void SynthConsole::SetTrack(Track *t)
 			Subscribe(track->synth, track->synth->MESSAGE_DELETE);
 			panel = new SynthPanel(track);
 			Embed(panel, id_inner, 2, 0);
+			AddSeparator("!vertical", 3, 0, 0, 0, "separator_0");
 		}
 	}else
 		SetString("track_name", _("!angle=90\\keine Spur gew&ahlt"));

@@ -25,7 +25,7 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	AddButton("!noexpandx,flat", 0, 0, 0, 0, "close");
 	SetImage("close", "hui:close");
 	AddText("!big,expandx,center\\...", 1, 0, 0, 0, "title");
-	audio_file_dialog = new AudioFileDialog(view, audio);
+	audio_file_dialog = new AudioFileDialog(audio);
 	track_dialog = new TrackDialog(view);
 	sub_dialog = new SubDialog(view, audio);
 	Embed(audio_file_dialog, "console_grid", 0, 0);

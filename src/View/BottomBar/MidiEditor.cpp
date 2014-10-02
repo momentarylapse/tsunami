@@ -112,7 +112,7 @@ public:
 };
 
 MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
-	BottomBarConsole(_("Midi Editor")),
+	BottomBarConsole(_("Midi")),
 	Observer("MidiEditor")
 {
 	view = _view;

@@ -18,6 +18,7 @@ class Track;
 class FxConsole;
 class SynthConsole;
 class MixingConsole;
+class LevelConsole;
 class CurveConsole;
 class LogDialog;
 class SampleManager;
@@ -51,6 +52,7 @@ public:
 		FX_CONSOLE,
 		SYNTH_CONSOLE,
 		MIDI_EDITOR,
+		LEVEL_CONSOLE,
 		SAMPLE_CONSOLE,
 		CURVE_CONSOLE,
 		LOG_CONSOLE,
@@ -66,6 +68,7 @@ public:
 	FxConsole *fx_console;
 	SynthConsole *synth_console;
 	MixingConsole *mixing_console;
+	LevelConsole *level_console;
 	CurveConsole *curve_console;
 	LogDialog *log_dialog;
 	SampleManager *sample_manager;

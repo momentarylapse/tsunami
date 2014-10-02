@@ -14,7 +14,7 @@
 #include <math.h>
 
 SampleManager::SampleManager(AudioFile *a) :
-	BottomBarConsole(_("Sample Manager")),
+	BottomBarConsole(_("Samples")),
 	Observer("SampleManager")
 {
 	FromResource("sample_manager_dialog");

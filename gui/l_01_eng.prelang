@@ -9,8 +9,6 @@ ad_t_bars
 
 ad_t_data
 
-ad_t_levels
-
 ad_t_tags
 
 add
@@ -163,6 +161,8 @@ ld_tt_volume
 
 level_add
 
+level_console
+
 level_delete
 
 level_down
@@ -311,9 +311,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_286233
+rand_id_391180
 
-rand_id_645178
+rand_id_455601
 
 rdt_source
 !bold\\Source
@@ -416,7 +416,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-141
+142
 // Data (ID,Text)
 
 
@@ -509,6 +509,8 @@ Dur
 Ebene %d
 
 Ebene löschen: noch nicht implementiert...
+
+Ebenen
 
 Editor für Audio Dateien
 

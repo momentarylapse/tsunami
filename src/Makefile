@@ -191,6 +191,7 @@ OBJ = \
  Storage/Dialog/RawConfigDialog.o\
  Storage/Format.o\
  Storage/FormatFlac.o\
+ Storage/FormatGp4.o\
  Storage/FormatMidi.o\
  Storage/FormatM4a.o\
  Storage/FormatMp3.o\
@@ -206,6 +207,7 @@ OBJ = \
  View/BottomBar/BottomBar.o\
  View/BottomBar/CurveConsole.o\
  View/BottomBar/FxConsole.o\
+ View/BottomBar/LevelConsole.o\
  View/BottomBar/LogDialog.o\
  View/BottomBar/MidiEditor.o\
  View/BottomBar/MiniConsole.o\
@@ -799,6 +801,9 @@ Storage/Format.o : Storage/Format.cpp
 Storage/FormatFlac.o : Storage/FormatFlac.cpp
 	$(CPP) -c Storage/FormatFlac.cpp -o $@ $(CXXFLAGS)
 
+Storage/FormatGp4.o : Storage/FormatGp4.cpp
+	$(CPP) -c Storage/FormatGp4.cpp -o $@ $(CXXFLAGS)
+
 Storage/FormatMidi.o : Storage/FormatMidi.cpp
 	$(CPP) -c Storage/FormatMidi.cpp -o $@ $(CXXFLAGS)
 
@@ -843,6 +848,9 @@ View/BottomBar/CurveConsole.o : View/BottomBar/CurveConsole.cpp
 
 View/BottomBar/FxConsole.o : View/BottomBar/FxConsole.cpp
 	$(CPP) -c View/BottomBar/FxConsole.cpp -o $@ $(CXXFLAGS)
+
+View/BottomBar/LevelConsole.o : View/BottomBar/LevelConsole.cpp
+	$(CPP) -c View/BottomBar/LevelConsole.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 	$(CPP) -c View/BottomBar/LogDialog.cpp -o $@ $(CXXFLAGS)

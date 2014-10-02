@@ -10,15 +10,13 @@
 #include "../../Stuff/Observer.h"
 #include "../../Data/AudioFile.h"
 #include "../Helper/BarList.h"
-#include "../AudioView.h"
 #include "../../Stuff/Log.h"
 
-AudioFileDialog::AudioFileDialog(AudioView *v, AudioFile *a) :
+AudioFileDialog::AudioFileDialog(AudioFile *a) :
 	SideBarConsole(_("Datei-Eigenschaften")),
 	Observer("AudioFileDialog")
 {
 	audio = a;
-	view = v;
 
 	// dialog
 //	SetTarget("audio_dialog_table", 0);
@@ -38,19 +36,13 @@ AudioFileDialog::AudioFileDialog(AudioView *v, AudioFile *a) :
 	EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
 	EventM("add_tag", this, &AudioFileDialog::OnAddTag);
 	EventM("delete_tag", this, &AudioFileDialog::OnDeleteTag);
-	EventMX("levels", "hui:select", this, &AudioFileDialog::OnLevelsSelect);
-	EventMX("levels", "hui:change", this, &AudioFileDialog::OnLevelsEdit);
-	EventM("add_level", this, &AudioFileDialog::OnAddLevel);
-	EventM("delete_level", this, &AudioFileDialog::OnDeleteLevel);
 
 	Subscribe(audio);
-	Subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 AudioFileDialog::~AudioFileDialog()
 {
 	Unsubscribe(audio);
-	Unsubscribe(view);
 	delete(bar_list);
 }
 
@@ -71,12 +63,6 @@ void AudioFileDialog::LoadData()
 	AddString("data_list", _("Samples\\") + i2s(samples));
 	AddString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
 	AddString("data_list", _("Format\\16 bit stereo (nami)"));
-
-	Reset("levels");
-	foreachi(string &n, audio->level_name, i)
-		AddString("levels", i2s(i + 1) + "\\" + n);
-	if (audio->level_name.num > 0)
-		SetInt("levels", view->cur_level);
 }
 
 
@@ -114,32 +100,6 @@ void AudioFileDialog::OnDeleteTag()
 	int s = GetInt("tags");
 	if (s >= 0)
 		audio->DeleteTag(s);
-}
-
-void AudioFileDialog::OnLevelsSelect()
-{
-	int s = GetInt("levels");
-	view->SetCurLevel(s);
-}
-
-void AudioFileDialog::OnLevelsEdit()
-{
-	int r = HuiGetEvent()->row;
-	if (r < 0)
-		return;
-	audio->RenameLevel(r, GetCell("levels", r, 1));
-}
-
-void AudioFileDialog::OnAddLevel()
-{
-	audio->AddLevel("");
-}
-
-void AudioFileDialog::OnDeleteLevel()
-{
-	int s = GetInt("levels");
-	if (s >= 0)
-		audio->DeleteLevel(s, false);
 }
 
 void AudioFileDialog::OnUpdate(Observable *o, const string &message)

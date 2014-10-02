@@ -12,12 +12,11 @@
 #include "../../Stuff/Observer.h"
 class AudioFile;
 class BarList;
-class AudioView;
 
 class AudioFileDialog: public SideBarConsole, public Observer
 {
 public:
-	AudioFileDialog(AudioView *v, AudioFile *a);
+	AudioFileDialog(AudioFile *a);
 	virtual ~AudioFileDialog();
 
 	void LoadData();
@@ -28,15 +27,10 @@ public:
 	void OnTagsEdit();
 	void OnAddTag();
 	void OnDeleteTag();
-	void OnLevelsSelect();
-	void OnLevelsEdit();
-	void OnAddLevel();
-	void OnDeleteLevel();
 
 	virtual void OnUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
-	AudioView *view;
 	BarList *bar_list;
 };
 

@@ -11,6 +11,7 @@
 #include "CurveConsole.h"
 #include "FxConsole.h"
 #include "SynthConsole.h"
+#include "LevelConsole.h"
 #include "LogDialog.h"
 #include "SampleManager.h"
 #include "MidiEditor.h"
@@ -35,6 +36,7 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output);
+	level_console = new LevelConsole(view, audio);
 	curve_console = new CurveConsole(view, audio);
 	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
@@ -43,9 +45,10 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	Embed(fx_console, "console_grid", 0, 1);
 	Embed(synth_console, "console_grid", 0, 2);
 	Embed(midi_editor, "console_grid", 0, 3);
-	Embed(sample_manager, "console_grid", 0, 4);
-	Embed(curve_console, "console_grid", 0, 5);
-	Embed(log_dialog, "console_grid", 0, 6);
+	Embed(level_console, "console_grid", 0, 4);
+	Embed(sample_manager, "console_grid", 0, 5);
+	Embed(curve_console, "console_grid", 0, 6);
+	Embed(log_dialog, "console_grid", 0, 7);
 
 	view->Subscribe(this);
 

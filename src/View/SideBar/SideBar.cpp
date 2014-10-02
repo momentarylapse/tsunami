@@ -13,7 +13,10 @@
 SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	Observable("SideBar")
 {
-	AddControlTable("!noexpandx,width=270", 0, 0, 1, 3, "root_grid");
+	AddControlTable("!noexpandx,width=270,expandy", 0, 0, 2, 1, "root_grid0");
+	SetTarget("root_grid0", 0);
+	AddSeparator("!vertical,expandy", 0, 0, 0, 0, "");
+	AddControlTable("!noexpandx,width=270,expandy", 1, 0, 1, 3, "root_grid");
 	SetTarget("root_grid", 0);
 	AddControlTable("", 0, 0, 2, 1, "button_grid");
 	AddSeparator("", 0, 1, 0, 0, "");

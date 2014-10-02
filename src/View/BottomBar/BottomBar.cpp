@@ -20,7 +20,10 @@
 BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
 {
-	AddControlTable("!noexpandy,height=300", 0, 0, 3, 1, "root_grid");
+	AddControlTable("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
+	SetTarget("root_grid0", 0);
+	AddSeparator("!horizontal,expandx", 0, 0, 0, 0, "");
+	AddControlTable("!expandx", 0, 1, 3, 1, "root_grid");
 	SetTarget("root_grid", 0);
 	AddControlTable("!noexpandx,width=130", 0, 0, 1, 2, "button_grid");
 	AddSeparator("!vertical", 1, 0, 0, 0, "");

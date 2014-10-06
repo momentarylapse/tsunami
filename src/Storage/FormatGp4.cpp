@@ -104,23 +104,23 @@ void FormatGp4::LoadAudio(AudioFile *a, const string &filename)
 
 		read_channels(a, f);
 
-		int measures = f->ReadInt();
-		int tracks = f->ReadInt();
+		int num_measures = f->ReadInt();
+		int num_tracks = f->ReadInt();
 		//msg_write(format("measures: %d   tracks: %d", measures, tracks));
-		for (int i=0; i<measures; i++)
+		for (int i=0; i<num_measures; i++)
 			read_measure_header(a, f);
-		for (int i=0; i<tracks; i++)
+		for (int i=0; i<num_tracks; i++)
 			read_track(a, f);
 
-		for (int i = 0; i < measures; i++)
-			for (int j = 0; j < tracks; j++)
-				read_measure(a, f, i, j);
+		for (int i = 0; i < num_measures; i++)
+			for (int j = 0; j < num_tracks; j++)
+				read_measure(a, f, measures[i], tracks[j]);
 
 	}catch(const string &s){
 		tsunami->log->Error(s);
 	}
 
-	delete(data);
+	delete[](data);
 	if (f)
 		FileClose(f);
 }
@@ -179,6 +179,12 @@ void FormatGp4::read_channels(AudioFile *a, CFile *f)
 void FormatGp4::read_measure_header(AudioFile *a, CFile *f)
 {
 	GpMeasure m;
+	if (measures.num > 0){
+		m = measures.back();
+	}else{
+		m.numerator = 1;
+		m.denominator = 1;
+	}
 	int flags = f->ReadByte();
 	if ((flags & 0x01) != 0)
 		m.numerator = f->ReadByte();
@@ -199,11 +205,11 @@ void FormatGp4::read_measure_header(AudioFile *a, CFile *f)
 
 void FormatGp4::read_track(AudioFile *a, CFile *f)
 {
-	msg_db_f("track", 0);
-	Track *t = a->AddTrack(Track::TYPE_MIDI);
+	msg_db_f("track", 1);
 	f->ReadByte();
-	t->SetName(read_str1c(f, 40));
 	GpTrack tt;
+	tt.t = a->AddTrack(Track::TYPE_MIDI);
+	tt.t->SetName(read_str1c(f, 40));
 	tt.stringCount = f->ReadInt();
 	for (int i=0; i<7; i++){
 		int tuning = f->ReadInt(); // tuning
@@ -223,67 +229,75 @@ void FormatGp4::read_channel(AudioFile *a, CFile *f)
 	f->ReadInt();
 }
 
-void FormatGp4::read_measure(AudioFile *a, CFile *f, int i, int j)
+void FormatGp4::read_measure(AudioFile *a, CFile *f, GpMeasure &m, GpTrack &t)
 {
-	msg_db_f("measure", 0);
+	msg_db_f("measure", 1);
 	int beats = f->ReadInt();
-	msg_write(beats);
-	for (int i=0; i<beats; i++) {
-		read_beat(a, a->track[i], f);
+	int offset = 0;
+	foreachi(GpMeasure &mm, measures, ii)
+		if (&mm == &m)
+			offset = ii * a->sample_rate * 2;
+	//msg_write(beats);
+	if (beats > 1000)
+		throw string("too many beats...");
+	for (int i=0; i<beats; i++){
+		int length = read_beat(a, f, t, offset);
+		offset += length;
 	}
 }
 
-void FormatGp4::read_beat(AudioFile *a, Track *t, CFile *f)
+int FormatGp4::read_beat(AudioFile *a, CFile *f, GpTrack &t, int start)
 {
-	msg_db_f("beat", 0);
+	msg_db_f("beat", 1);
 	int flags = f->ReadByte();
 	if((flags & 0x40) != 0)
 		f->ReadByte();
 
-	read_duration(a, f, flags);
+	int duration = read_duration(a, f, flags);
 
 	if ((flags & 0x02) != 0)
 		read_chord(a, f);
-	if ((flags & 0x04) != 0)
+	if ((flags & 0x04) != 0){
 		//read_text(beat);
-		read_str41(f);
+		msg_write("text: " + read_str41(f));
+	}
 	if ((flags & 0x08) != 0)
 		read_beat_fx(a, f);
 	if ((flags & 0x10) != 0)
 		read_mix_change(a, f);
 	int stringFlags = f->ReadByte();
-	msg_write(".");
 	for (int i = 6; i >= 0; i--) {
-		if ((stringFlags & (1 << i)) != 0 && (6 - i) < tracks[t->get_index()].stringCount) {
+		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.stringCount) {
 			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
-			read_note(a, f, (6 - i) + 1);
+			read_note(a, f, t, (6 - i) + 1, start, duration);
 			//TGNote note = readNote(string, track,effect.clone(getFactory()));
 			//voice.addNote(note);
 		}
 	}
+	return duration;
 }
 
 void FormatGp4::read_chord(AudioFile *a, CFile *f)
 {
-	msg_db_f("chord", 0);
-	if ((f->ReadByte() & 0x01) == 0) {
+	msg_db_f("chord", 1);
+	int type = f->ReadByte();
+	if ((type & 0x01) == 0){
 		string name = read_str41(f);
 		int first_fret = f->ReadInt();
 		if (first_fret != 0){
-			for (int i = 0; i < 6; i++) {
+			for (int i=0; i<6; i++) {
 				int fret = f->ReadInt();
 				/*if(i < chord.countStrings()){
 					chord.addFretValue(i,fret);
 				}*/
 			}
 		}
-	}
-	else{
+	}else{
 		f->SetPos(16, false);
 		string name = read_str1c(f, 21);
 		f->SetPos(4, false);
 		int first_fret = f->ReadInt();
-		for (int i = 0; i < 7; i++) {
+		for (int i=0; i<7; i++){
 			int fret = f->ReadInt();
 			/*if(i < chord.countStrings()){
 				chord.addFretValue(i,fret);
@@ -293,10 +307,11 @@ void FormatGp4::read_chord(AudioFile *a, CFile *f)
 	}
 }
 
-void FormatGp4::read_note(AudioFile *a, CFile *f, int string_no)
+void FormatGp4::read_note(AudioFile *a, CFile *f, GpTrack &t, int string_no, int start, int length)
 {
-	msg_db_f("note", 0);
+	msg_db_f("note", 1);
 	MidiNote n;
+	n.range = Range(start, length);
 	n.volume = 1;
 	int flags = f->ReadByte();
 	if ((flags & 0x20) != 0) {
@@ -316,11 +331,12 @@ void FormatGp4::read_note(AudioFile *a, CFile *f, int string_no)
 	if ((flags & 0x08) != 0) {
 		read_note_fx(a, f);
 	}
+	t.t->AddMidiNote(n);
 }
 
 void FormatGp4::read_note_fx(AudioFile *a, CFile *f)
 {
-	msg_db_f("note fx", 0);
+	msg_db_f("note fx", 1);
 	int flags1 = f->ReadByte();
 	int flags2 = f->ReadByte();
 	if ((flags1 & 0x01) != 0) {
@@ -336,12 +352,14 @@ void FormatGp4::read_note_fx(AudioFile *a, CFile *f)
 	if ((flags1 & 0x10) != 0) {
 		// grace
 		int fret = f->ReadByte();
+		int volume = f->ReadByte();
 		int transition = f->ReadByte();
 		int duration = f->ReadByte();
 	}
-	if ((flags2 & 0x04) != 0)
+	if ((flags2 & 0x04) != 0){
 		// tremolo picking
 		f->ReadByte();
+	}
 	if ((flags2 & 0x08) != 0)
 		f->ReadByte();
 	if ((flags2 & 0x10) != 0)
@@ -352,11 +370,14 @@ void FormatGp4::read_note_fx(AudioFile *a, CFile *f)
 	}
 }
 
-void FormatGp4::read_duration(AudioFile *a, CFile *f, int flags)
+int FormatGp4::read_duration(AudioFile *a, CFile *f, int flags)
 {
-	msg_db_f("duration", 0);
-	int value = (1 << f->ReadByte());
+	msg_db_f("duration", 1);
+	int v = (signed char)f->ReadByte();
+	float value = (int)(1 << (v + 4)) / 4.0f;
 	bool dotted = ((flags & 0x01) != 0);
+	if (dotted)
+		value *= 1.5f;
 	if ((flags & 0x20) != 0) {
 		int divisionType = f->ReadInt();
 		switch (divisionType) {
@@ -394,19 +415,21 @@ void FormatGp4::read_duration(AudioFile *a, CFile *f, int flags)
 			break;
 		}
 	}
+	return a->sample_rate * value * 60 / tempo;
 }
 
 void FormatGp4::read_mix_change(AudioFile *a, CFile *f)
 {
-	msg_db_f("mix", 0);
+	msg_db_f("mix", 1);
 	f->ReadByte();
-	int volume = f->ReadByte();
-	int pan = f->ReadByte();
-	int chorus = f->ReadByte();
-	int reverb = f->ReadByte();
-	int phaser = f->ReadByte();
-	int tremolo = f->ReadByte();
-	int tempoValue = f->ReadByte();
+	int volume = (signed char)f->ReadByte();
+	int pan = (signed char)f->ReadByte();
+	int chorus = (signed char)f->ReadByte();
+	int reverb = (signed char)f->ReadByte();
+	int phaser = (signed char)f->ReadByte();
+	int tremolo = (signed char)f->ReadByte();
+	int tempoValue = f->ReadInt();
+	//msg_write(format("%d %d %d %d %d %d %d", volume, pan, chorus, reverb, phaser, tremolo, tempoValue));
 	if(volume >= 0)
 		f->ReadByte();
 	if(pan >= 0)
@@ -419,27 +442,26 @@ void FormatGp4::read_mix_change(AudioFile *a, CFile *f)
 		f->ReadByte();
 	if(tremolo >= 0)
 		f->ReadByte();
-	if(tempoValue >= 0)
-		tempo = f->ReadByte();
+	if(tempoValue >= 0){
+		tempo = tempoValue;
+		f->ReadByte();
+	}
 	f->ReadByte();
 }
 
 void FormatGp4::read_beat_fx(AudioFile *a, CFile *f)
 {
-	msg_db_f("beat fx", 0);
+	msg_db_f("beat fx", 1);
 	int flags1 = f->ReadByte();
 	int flags2 = f->ReadByte();
 	if ((flags1 & 0x20) != 0) {
-		msg_write("fx");
 		int effect = f->ReadByte();
 	}
 	if ((flags2 & 0x04) != 0) {
-
-		msg_write("tremolo");
 		// tremolo
 		f->SetPos(5, false);
 		int points = f->ReadInt();
-		msg_write(points);
+		//msg_write(points);
 		for (int i=0; i<points; i++){
 			int position = f->ReadInt();
 			int value = f->ReadInt();

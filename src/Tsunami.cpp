@@ -94,6 +94,7 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 			msg_write(format("sample-rate: %d", audio->sample_rate));
 			msg_write(format("samples: %d", audio->GetRange().num));
 			msg_write("length: " + audio->get_time_str(audio->GetRange().num));
+			msg_write(format("tracks: %d", audio->track.num));
 			foreach(Tag &t, audio->tag)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}

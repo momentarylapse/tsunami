@@ -45,12 +45,12 @@ public:
 	void read_measure_header(AudioFile *a, CFile *f);
 	void read_track(AudioFile *a, CFile *f);
 	void read_channel(AudioFile *a, CFile *f);
-	void read_measure(AudioFile *a, CFile *f, GpMeasure &m, GpTrack &t);
-	int read_beat(AudioFile *a, CFile *f, GpTrack &t, int start);
+	void read_measure(AudioFile *a, CFile *f, GpMeasure &m, GpTrack &t, int offset);
+	int read_beat(AudioFile *a, CFile *f, GpTrack &t, GpMeasure &m, int start);
 	void read_beat_fx(AudioFile *a, CFile *f);
 	void read_note(AudioFile *a, CFile *f, GpTrack &t, int string_base, int start, int length);
 	void read_note_fx(AudioFile *a, CFile *f);
-	int read_duration(AudioFile *a, CFile *f, int flags);
+	int read_duration(AudioFile *a, CFile *f, int flags, GpMeasure &m);
 	void read_chord(AudioFile *a, CFile *f);
 	void read_mix_change(AudioFile *a, CFile *f);
 };

@@ -109,12 +109,17 @@ void FormatGp4::LoadAudio(AudioFile *a, const string &filename)
 		//msg_write(format("measures: %d   tracks: %d", measures, tracks));
 		for (int i=0; i<num_measures; i++)
 			read_measure_header(a, f);
+		a->AddTrack(Track::TYPE_TIME);
 		for (int i=0; i<num_tracks; i++)
 			read_track(a, f);
 
-		for (int i = 0; i < num_measures; i++)
+		int offset = 0;
+		for (int i = 0; i < num_measures; i++){
 			for (int j = 0; j < num_tracks; j++)
-				read_measure(a, f, measures[i], tracks[j]);
+				read_measure(a, f, measures[i], tracks[j], offset);
+			offset += a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator;
+			a->track[0]->AddBars(-1, tempo, measures[i].numerator, 1);
+		}
 
 	}catch(const string &s){
 		tsunami->log->Error(s);
@@ -229,31 +234,28 @@ void FormatGp4::read_channel(AudioFile *a, CFile *f)
 	f->ReadInt();
 }
 
-void FormatGp4::read_measure(AudioFile *a, CFile *f, GpMeasure &m, GpTrack &t)
+void FormatGp4::read_measure(AudioFile *a, CFile *f, GpMeasure &m, GpTrack &t, int offset)
 {
 	msg_db_f("measure", 1);
 	int beats = f->ReadInt();
-	int offset = 0;
-	foreachi(GpMeasure &mm, measures, ii)
-		if (&mm == &m)
-			offset = ii * a->sample_rate * 2;
 	//msg_write(beats);
 	if (beats > 1000)
 		throw string("too many beats...");
 	for (int i=0; i<beats; i++){
-		int length = read_beat(a, f, t, offset);
+		int length = read_beat(a, f, t, m, offset);
 		offset += length;
 	}
 }
 
-int FormatGp4::read_beat(AudioFile *a, CFile *f, GpTrack &t, int start)
+int FormatGp4::read_beat(AudioFile *a, CFile *f, GpTrack &t, GpMeasure &m, int start)
 {
 	msg_db_f("beat", 1);
 	int flags = f->ReadByte();
 	if((flags & 0x40) != 0)
 		f->ReadByte();
 
-	int duration = read_duration(a, f, flags);
+	int duration = read_duration(a, f, flags, m);
+	//msg_write(duration);
 
 	if ((flags & 0x02) != 0)
 		read_chord(a, f);
@@ -269,7 +271,7 @@ int FormatGp4::read_beat(AudioFile *a, CFile *f, GpTrack &t, int start)
 	for (int i = 6; i >= 0; i--) {
 		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.stringCount) {
 			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
-			read_note(a, f, t, (6 - i) + 1, start, duration);
+			read_note(a, f, t, (6 - i), start, duration);
 			//TGNote note = readNote(string, track,effect.clone(getFactory()));
 			//voice.addNote(note);
 		}
@@ -313,6 +315,7 @@ void FormatGp4::read_note(AudioFile *a, CFile *f, GpTrack &t, int string_no, int
 	MidiNote n;
 	n.range = Range(start, length);
 	n.volume = 1;
+	n.pitch = -1;
 	int flags = f->ReadByte();
 	if ((flags & 0x20) != 0) {
 		int noteType = f->ReadByte();
@@ -320,10 +323,12 @@ void FormatGp4::read_note(AudioFile *a, CFile *f, GpTrack &t, int string_no, int
 	if ((flags & 0x01) != 0)
 		f->SetPos(2, false);
 	if ((flags & 0x10) != 0)
-		n.volume = f->ReadByte() / 255.0f;
+		n.volume = 0.1f + 0.9f * (float)f->ReadByte() / 10.0f;
 	if ((flags & 0x20) != 0) {
 		int fret = f->ReadByte();
-		int value = fret + string_no * 5;//( note.isTiedNote() ? getTiedNoteValue(string.getNumber(), track) : fret );
+		int value = fret;
+		if ((string_no >= 0) && (string_no < t.tuning.num))
+			value = fret + t.tuning[string_no];
 		n.pitch = value;
 	}
 	if ((flags & 0x80) != 0)
@@ -331,7 +336,10 @@ void FormatGp4::read_note(AudioFile *a, CFile *f, GpTrack &t, int string_no, int
 	if ((flags & 0x08) != 0) {
 		read_note_fx(a, f);
 	}
-	t.t->AddMidiNote(n);
+	if (n.volume > 1)
+		n.volume = 1;
+	if (n.pitch >= 0)
+		t.t->AddMidiNote(n);
 }
 
 void FormatGp4::read_note_fx(AudioFile *a, CFile *f)
@@ -370,11 +378,11 @@ void FormatGp4::read_note_fx(AudioFile *a, CFile *f)
 	}
 }
 
-int FormatGp4::read_duration(AudioFile *a, CFile *f, int flags)
+int FormatGp4::read_duration(AudioFile *a, CFile *f, int flags, GpMeasure &m)
 {
 	msg_db_f("duration", 1);
 	int v = (signed char)f->ReadByte();
-	float value = (int)(1 << (v + 4)) / 4.0f;
+	float value = 16.0f / (float)(int)(1 << (v + 4));
 	bool dotted = ((flags & 0x01) != 0);
 	if (dotted)
 		value *= 1.5f;
@@ -415,7 +423,7 @@ int FormatGp4::read_duration(AudioFile *a, CFile *f, int flags)
 			break;
 		}
 	}
-	return a->sample_rate * value * 60 / tempo;
+	return a->sample_rate * value * 60.0f / (float)tempo;
 }
 
 void FormatGp4::read_mix_change(AudioFile *a, CFile *f)

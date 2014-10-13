@@ -84,7 +84,7 @@ void SettingsDialog::LoadData()
 
 	SetFloat("capture_delay", tsunami->input->in_audio->GetPlaybackDelayConst());
 
-	SetString("capture_filename", tsunami->input->in_audio->GetTempFilename());
+	SetString("capture_filename", tsunami->input->in_audio->TempFilename);
 }
 
 void SettingsDialog::ApplyData()

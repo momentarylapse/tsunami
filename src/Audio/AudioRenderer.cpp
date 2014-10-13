@@ -97,15 +97,15 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 		t->synth->RenderMetronomeClick(buf, b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
 }
 
-void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
+void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 {
 	msg_db_f("bb_render_midi_track_no_fx", 1);
 
 	make_silence(buf, range_cur.length());
 
-	MidiData *m = &midi[t];
-	if (!m)
-		m = &t->midi;
+	MidiData *m = &t->midi;
+	if ((ti >= 0) && (ti < midi.num))
+		m = &midi[ti];
 
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
 	Array<MidiNote> notes = m->GetNotes(r);
@@ -117,7 +117,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t)
 	}
 }
 
-void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t)
+void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
 {
 	msg_db_f("bb_render_track_no_fx", 1);
 
@@ -126,7 +126,7 @@ void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t)
 	else if (t->type == Track::TYPE_TIME)
 		bb_render_time_track_no_fx(buf, t);
 	else if (t->type == Track::TYPE_MIDI)
-		bb_render_midi_track_no_fx(buf, t);
+		bb_render_midi_track_no_fx(buf, t, ti);
 }
 
 void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
@@ -157,11 +157,11 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_lis
 			fx->Apply(buf, &fake_track, false);
 }
 
-void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t)
+void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 {
 	msg_db_f("bb_render_track_fx", 1);
 
-	bb_render_track_no_fx(buf, t);
+	bb_render_track_no_fx(buf, t, ti);
 
 	if ((t->fx.num > 0) || (effect))
 		bb_apply_fx(buf, t, t->fx);
@@ -187,7 +187,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 	}else{
 
 		// first (un-muted) track
-		bb_render_track_fx(buf, audio->track[i0]);
+		bb_render_track_fx(buf, audio->track[i0], i0);
 		buf.scale(audio->track[i0]->volume, audio->track[i0]->panning);
 
 		// other tracks
@@ -195,7 +195,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 			if ((audio->track[i]->muted) || (!audio->track[i]->is_selected))
 				continue;
 			BufferBox tbuf;
-			bb_render_track_fx(tbuf, audio->track[i]);
+			bb_render_track_fx(tbuf, audio->track[i], i);
 			buf.make_own();
 			buf.add(tbuf, 0, audio->track[i]->volume, audio->track[i]->panning);
 		}
@@ -274,14 +274,14 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 		fx->Prepare();
 	foreachi(Track *t, a->track, i){
 		//midi.add(t, t->midi);
-		midi[t] = t->midi;
+		midi.add(t->midi);
 		t->synth->Reset();
 		foreach(Effect *fx, t->fx)
 			fx->Prepare();
 		foreach(MidiEffect *fx, t->midi.fx){
 			fx->Prepare();
 			tsunami->plugin_manager->context.set(t, 0, _range);
-			fx->process(&midi[t]);
+			fx->process(&midi[i]);
 		}
 	}
 	if (effect)

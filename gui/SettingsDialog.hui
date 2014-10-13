@@ -8,22 +8,19 @@ Dialog settings_dialog "Einstellungen" 300 300
 				Text pdt_oggrate "OGG-Bitrate"
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
 		Group pdp_preview "Ausgabe"
-			Grid ? "" 3 2
+			Grid ? "" 2 1
 				Text pdp_previewdevice "Gerät"
 				ComboBox preview_device "" expandx
-				.
-				Text pdt_volume "Lautstärke"
-				Grid ? "" 2 1
-					Slider volume_slider "" expandx
-					SpinButton preview_volume "\\0\\100\\1"
-				Text percent "%"
 		Group pdp_capture "Aufnahme"
-			Grid ? "" 3 2
+			Grid ? "" 3 3
 				Text pdp_capturedevice "Gerät"
 				ComboBox capture_device "" expandx
 				.
 				Text pdt_capturedelay "Latenz"
 				SpinButton capture_delay "\\\\\\0.1"
 				Text ms "ms"
+				Text pdt_capturetempfile "Sicherungsdatei"
+				Edit capture_filename ""
+				Button capture_find "" image=hui:open
 		Grid properties_dialog_buttonbar "" 1 1 buttonbar
 			DefButton close "Schließen" image=hui:close

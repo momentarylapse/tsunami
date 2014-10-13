@@ -64,6 +64,9 @@ public:
 	int active_console;
 	bool visible;
 
+	bool ready;
+	int console_when_ready;
+
 	//HuiMenu *menu;
 	FxConsole *fx_console;
 	SynthConsole *synth_console;

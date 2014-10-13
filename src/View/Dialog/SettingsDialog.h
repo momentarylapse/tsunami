@@ -10,8 +10,6 @@
 
 #include "../../lib/hui/hui.h"
 
-class Slider;
-
 class SettingsDialog: public HuiWindow
 {
 public:
@@ -23,10 +21,11 @@ public:
 
 	void OnLanguage();
 	void OnOggBitrate();
-	void OnVolume();
 	void OnPreviewDevice();
 	void OnCaptureDevice();
 	void OnCaptureDelay();
+	void OnCaptureFilename();
+	void OnCaptureFind();
 	void OnClose();
 
 
@@ -40,8 +39,6 @@ private:
 	};
 
 	Array<OggQuality> ogg_quality;
-
-	Slider *volume_slider;
 };
 
 #endif /* SETTINGSDIALOG_H_ */

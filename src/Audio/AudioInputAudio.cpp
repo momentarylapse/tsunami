@@ -9,6 +9,7 @@
 #include "AudioOutput.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
+#include "../Stuff/Log.h"
 
 
 #ifdef NIX_OS_WINDOWS
@@ -63,7 +64,11 @@ AudioInputAudio::AudioInputAudio(BufferBox &buf, BufferBox &cur_buf) :
 
 	ChosenDevice = HuiConfig.getStr("Input.ChosenDevice", "");
 	PlaybackDelayConst = HuiConfig.getFloat("Input.PlaybackDelay", 80.0f);
+	TempFilename = HuiConfig.getStr("Input.TempFilename", "");
+	temp_file = NULL;
 
+	if (file_test_existence(GetTempFilename()))
+		tsunami->log->Warning(_("alte Aufnahmedaten gefunden: ") + GetTempFilename());
 }
 
 AudioInputAudio::~AudioInputAudio()
@@ -73,7 +78,7 @@ AudioInputAudio::~AudioInputAudio()
 
 void AudioInputAudio::Init()
 {
-	msg_db_r("CaptureInit", 1);
+	msg_db_f("CaptureInit", 1);
 	Device.clear();
 	const ALCchar *s = alcGetString(NULL, ALC_CAPTURE_DEVICE_SPECIFIER);
 	while(*s != 0){
@@ -84,24 +89,25 @@ void AudioInputAudio::Init()
 	}
 	if (dev_name == "")
 		ChosenDevice = "";
-	msg_db_l(1);
 }
 
 void AudioInputAudio::Stop()
 {
-	msg_db_r("CaptureStop", 1);
+	msg_db_f("CaptureStop", 1);
 	if (Capturing){
 		alcCaptureStop(capture);
 		alcCaptureCloseDevice(capture);
 		Capturing = false;
 		CurrentBuffer.clear();
+		delete(temp_file);
+		temp_file = NULL;
+		file_delete(cur_temp_filename);
 	}
-	msg_db_l(1);
 }
 
 bool AudioInputAudio::Start(int sample_rate)
 {
-	msg_db_r("CaptureStart", 1);
+	msg_db_f("CaptureStart", 1);
 	if (Capturing)
 		Stop();
 
@@ -113,9 +119,12 @@ bool AudioInputAudio::Start(int sample_rate)
 	if (capture){
 		alcCaptureStart(capture);
 		Capturing = true;
+
+		cur_temp_filename = GetTempFilename();
+		temp_file = FileCreate(GetTempFilename());
+		temp_file->SetBinaryMode(true);
 	}
 	ResetSync();
-	msg_db_l(1);
 	return Capturing;
 }
 
@@ -147,7 +156,7 @@ void AudioInputAudio::SetPlaybackDelayConst(float f)
 
 int AudioInputAudio::DoCapturing()
 {
-	msg_db_r("DoCapturing", 1);
+	msg_db_f("DoCapturing", 1);
 	int a = -42;
 	alcGetIntegerv(capture, ALC_CAPTURE_SAMPLES, 1, &a);
 
@@ -166,11 +175,12 @@ int AudioInputAudio::DoCapturing()
 		if (!too_much_data)
 			sync.Add(a);
 
-		if (accumulate)
+		if (accumulate){
 			AccumulationBuffer.append(CurrentBuffer);
+			temp_file->WriteBuffer(&capture_temp, a * 4);
+		}
 	}else
 		a = 0;
-	msg_db_l(1);
 	return a;
 }
 
@@ -198,4 +208,26 @@ bool AudioInputAudio::IsCapturing()
 int AudioInputAudio::GetDelay()
 {
 	return sync.GetDelay() - PlaybackDelayConst * (float)SampleRate / 1000.0f;
+}
+
+string AudioInputAudio::GetDefaultTempFilename()
+{
+#ifdef OS_WINDOWS
+	return "c:\\tsunami-input.raw";
+#else
+	return "/tmp/tsunami-input.raw";
+#endif
+}
+
+string AudioInputAudio::GetTempFilename()
+{
+	if (TempFilename.num > 0)
+		return TempFilename;
+	return GetDefaultTempFilename();
+}
+
+void AudioInputAudio::SetTempFilename(const string &filename)
+{
+	TempFilename = filename;
+	HuiConfig.setStr("Input.TempFilename", TempFilename);
 }

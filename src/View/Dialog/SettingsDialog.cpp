@@ -21,8 +21,12 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	EventM("preview_device", this, &SettingsDialog::OnPreviewDevice);
 	EventM("capture_device", this, &SettingsDialog::OnCaptureDevice);
 	EventM("capture_delay", this, &SettingsDialog::OnCaptureDelay);
+	EventM("capture_filename", this, &SettingsDialog::OnCaptureFilename);
+	EventM("capture_find", this, &SettingsDialog::OnCaptureFind);
 	EventM("hui:close", this, &SettingsDialog::OnClose);
 	EventM("close", this, &SettingsDialog::OnClose);
+
+	SetOptions("capture_filename", "placeholder=" + tsunami->input->in_audio->GetDefaultTempFilename());
 
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
@@ -35,8 +39,6 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	ogg_quality.add(OggQuality(0.8f, 256));
 	ogg_quality.add(OggQuality(0.9f, 320));
 	ogg_quality.add(OggQuality(1.0f, 500));
-
-	volume_slider = new Slider(this, "volume_slider", "preview_volume", 0, 1, 100, (void(HuiEventHandler::*)())&SettingsDialog::OnVolume, tsunami->output->GetVolume());
 
 	LoadData();
 
@@ -81,6 +83,8 @@ void SettingsDialog::LoadData()
 	}
 
 	SetFloat("capture_delay", tsunami->input->in_audio->GetPlaybackDelayConst());
+
+	SetString("capture_filename", tsunami->input->in_audio->GetTempFilename());
 }
 
 void SettingsDialog::ApplyData()
@@ -98,11 +102,6 @@ void SettingsDialog::OnLanguage()
 void SettingsDialog::OnOggBitrate()
 {
 	HuiConfig.setFloat("OggQuality", ogg_quality[GetInt("")].quality);
-}
-
-void SettingsDialog::OnVolume()
-{
-	tsunami->output->SetVolume(volume_slider->Get());
 }
 
 void SettingsDialog::OnCaptureDevice()
@@ -126,6 +125,18 @@ void SettingsDialog::OnPreviewDevice()
 void SettingsDialog::OnCaptureDelay()
 {
 	tsunami->input->in_audio->SetPlaybackDelayConst(GetFloat(""));
+}
+
+void SettingsDialog::OnCaptureFilename()
+{
+	tsunami->input->in_audio->SetTempFilename(GetString(""));
+}
+
+void SettingsDialog::OnCaptureFind()
+{
+	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), tsunami->input->in_audio->TempFilename.basename(), "*.raw", "*.raw"))
+		SetString("capture_filename", HuiFilename);
+		tsunami->input->in_audio->SetTempFilename(HuiFilename);
 }
 
 void SettingsDialog::OnClose()

@@ -24,7 +24,7 @@ LogDialog::LogDialog(Log *_log) :
 
 	EventM("clear", this, (void(HuiEventHandler::*)())&LogDialog::OnClear);
 
-	Reload();
+	HuiRunLaterM(0.5f, this, &LogDialog::Reload);
 
 	Subscribe(log);
 }
@@ -48,6 +48,7 @@ void LogDialog::Reload()
 			((BottomBar*)parent)->Choose(BottomBar::LOG_CONSOLE);
 		}else if (m.type == Log::TYPE_WARNING){
 			AddString("log_list", "hui:warning\\" + m.text);
+			((BottomBar*)parent)->Choose(BottomBar::LOG_CONSOLE);
 		}else{
 			AddString("log_list", "hui:info\\" + m.text);
 		}

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-206
+204
 // Data (ID,Text)
 about
 
@@ -277,10 +277,10 @@ pdp_previewdevice
 Device
 pdt_capturedelay
 Playback delay
+pdt_capturetempfile
+
 pdt_oggrate
 OGG bitrate
-pdt_volume
-Volume
 per_minute
 
 per_second
@@ -299,8 +299,6 @@ preview
 Preview
 preview_device
 
-preview_volume
-
 progress_bar
 
 progress_cancelable_dialog
@@ -311,9 +309,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_391180
+rand_id_527552
 
-rand_id_455601
+rand_id_951070
 
 rdt_source
 !bold\\Source
@@ -409,8 +407,6 @@ view_stereo
 
 volume
 \\0\\1000\\0.1
-volume_slider
-
 zoom_in
 
 zoom_out
@@ -576,7 +572,7 @@ MIDI Quellen
 
 Metronom
 
-Midi Editor
+Midi
 
 MidiEffekt nicht ladbar: \"%s\"
 
@@ -604,11 +600,11 @@ Plugin-Script wählen
 
 Raw Daten
 
-Sample Manager
-
 Sample wählen
 
 Samplerate
+
+Samples
 
 Samples\\\") + i2s(samples));
 

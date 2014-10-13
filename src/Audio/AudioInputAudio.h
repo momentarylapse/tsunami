@@ -26,6 +26,7 @@ public:
 
 	Array<string> Device;
 	string ChosenDevice;
+	string TempFilename;
 
 	void Init();
 
@@ -48,12 +49,19 @@ public:
 	float GetPlaybackDelayConst();
 	void SetPlaybackDelayConst(float f);
 
+	string GetDefaultTempFilename();
+	string GetTempFilename();
+	void SetTempFilename(const string &filename);
+
 private:
 	BufferBox &AccumulationBuffer, &CurrentBuffer;
 	bool accumulate;
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];
 	ALCdevice_struct *capture;
+
+	CFile *temp_file;
+	string cur_temp_filename;
 
 	string dev_name;
 

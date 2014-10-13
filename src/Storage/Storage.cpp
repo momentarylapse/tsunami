@@ -225,7 +225,7 @@ bool Storage::AskByFlags(HuiWindow *win, const string &title, bool save, int fla
 			}
 		}
 	filter_show += ")|" + _("alle Dateien");
-	filter += "|*.*";
+	filter += "|*";
 	foreach(Format *f, format)
 		if ((f->flags & flags) == flags){
 			filter += "|";

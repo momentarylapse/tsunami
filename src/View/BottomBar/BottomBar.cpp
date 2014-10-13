@@ -21,6 +21,9 @@
 BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
 {
+	ready = false;
+	console_when_ready = MIXING_CONSOLE;
+
 	AddControlTable("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
 	SetTarget("root_grid0", 0);
 	AddSeparator("!horizontal,expandx", 0, 0, 0, 0, "");
@@ -64,7 +67,8 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);
 
 	visible = true;
-	Choose(MIXING_CONSOLE);
+	ready = true;
+	Choose(console_when_ready);
 }
 
 BottomBar::~BottomBar()
@@ -109,6 +113,11 @@ void BottomBar::OnHide()
 
 void BottomBar::Choose(int console)
 {
+	if (!ready){
+		console_when_ready = console;
+		return;
+	}
+
 	foreachi(HuiPanel *p, children, i){
 		if (i == console){
 			SetString("title", "!big\\" + ((BottomBarConsole*)p)->title);

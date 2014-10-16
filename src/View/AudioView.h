@@ -184,8 +184,15 @@ public:
 	bool EditingMidi();
 	int pitch_min, pitch_max;
 	int beat_partition;
-	int chord_mode;
+	int midi_mode;
+	int chord_type;
 	int chord_inversion;
+
+	enum{
+		MIDI_MODE_SELECT,
+		MIDI_MODE_NOTE,
+		MIDI_MODE_CHORD
+	};
 
 	TsunamiWindow *win;
 

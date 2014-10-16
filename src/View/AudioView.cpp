@@ -125,7 +125,8 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	pitch_max = 90;
 	beat_partition = 4;
 	parent->SetInt("beat_partition", beat_partition);
-	chord_mode = CHORD_TYPE_NONE;
+	midi_mode = MIDI_MODE_SELECT;
+	chord_type = 0;
 	chord_inversion = 0;
 
 	audio->area = rect(0, 0, 0, 0);
@@ -291,7 +292,7 @@ AudioView::SelectionType AudioView::GetMouseOver()
 		}
 	}
 
-	if ((s.track) && (s.track == cur_track) && (EditingMidi())){
+	if ((s.track) && (s.track == cur_track) && (EditingMidi()) && (midi_mode != MIDI_MODE_SELECT)){
 		s.pitch = y2pitch(my);
 		s.type = SEL_TYPE_MIDI_PITCH;
 		foreachi(MidiNote &n, s.track->midi, i)
@@ -553,7 +554,7 @@ Array<MidiNote> AudioView::GetSelectedNotes()
 	}
 	Range r = Range(start, end - start);
 	Array<MidiNote> notes;
-	Array<int> pitch = GetChordNotes(chord_mode, chord_inversion, selection.pitch);
+	Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
 	foreach(int p, pitch)
 		notes.add(MidiNote(r, p, 1));
 	return notes;

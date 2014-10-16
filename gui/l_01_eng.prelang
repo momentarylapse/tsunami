@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-204
+208
 // Data (ID,Text)
 about
 
@@ -73,6 +73,8 @@ capture_type:audio
 
 capture_type:midi
 
+chord_type
+
 close
 Close
 close_file
@@ -121,8 +123,6 @@ help
 
 import_from_file
 
-insert_chord
-
 insert_sample
 
 language
@@ -148,6 +148,8 @@ ld_t_repdelay
 ld_t_repetition
 
 ld_t_repnum
+
+ld_t_space
 
 ld_t_synth
 
@@ -224,6 +226,12 @@ metronome
 midi_editor
 
 midi_label_fx
+
+midi_mode:chord
+
+midi_mode:note
+
+midi_mode:select
 
 ms
 ms
@@ -309,9 +317,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_527552
+rand_id_535279
 
-rand_id_951070
+rand_id_866465
 
 rdt_source
 !bold\\Source
@@ -412,7 +420,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-142
+144
 // Data (ID,Text)
 
 
@@ -610,6 +618,8 @@ Samples\\\") + i2s(samples));
 
 Script (*.kaba)
 
+Sicherungsdatei für Aufnahmen wählen
+
 Spur %d
 
 Spur-Eigenschaften
@@ -633,6 +643,8 @@ alle Dateien
 alle Nachrichten löschen
 
 alles mögliche (
+
+alte Aufnahmedaten gefunden: 
 
 benutze OpenAl Device: 
 

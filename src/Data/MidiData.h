@@ -46,11 +46,6 @@ public:
 	Array<MidiEffect*> fx;
 };
 
-enum
-{
-	CHORD_TYPE_NONE = -1
-};
-
 string GetChordTypeName(int type);
 Array<string> GetChordTypeNames();
 Array<int> GetChordNotes(int type, int inversion, int pitch);

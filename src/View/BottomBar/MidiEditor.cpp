@@ -141,7 +141,9 @@ MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
 
 	EventM("pitch_offset", this, &MidiEditor::OnPitch);
 	EventM("beat_partition", this, &MidiEditor::OnBeatPartition);
-	EventM("insert_chord", this, &MidiEditor::OnInsertChord);
+	EventM("midi_mode:select", this, &MidiEditor::OnMidiModeSelect);
+	EventM("midi_mode:note", this, &MidiEditor::OnMidiModeNote);
+	EventM("midi_mode:chord", this, &MidiEditor::OnMidiModeChord);
 	EventM("chord_type", this, &MidiEditor::OnChordType);
 	EventM("chord_inversion", this, &MidiEditor::OnChordInversion);
 
@@ -193,19 +195,30 @@ void MidiEditor::OnBeatPartition()
 	view->ForceRedraw();
 }
 
-void MidiEditor::OnInsertChord()
+void MidiEditor::OnMidiModeSelect()
 {
-	if (IsChecked(""))
-		view->chord_mode = GetInt("chord_type");
-	else
-		view->chord_mode = CHORD_TYPE_NONE;
-	Enable("chord_type", IsChecked(""));
-	Enable("chord_inversion", IsChecked(""));
+	view->midi_mode = view->MIDI_MODE_SELECT;
+	Enable("chord_type", false);
+	Enable("chord_inversion", false);
+}
+
+void MidiEditor::OnMidiModeNote()
+{
+	view->midi_mode = view->MIDI_MODE_NOTE;
+	Enable("chord_type", false);
+	Enable("chord_inversion", false);
+}
+
+void MidiEditor::OnMidiModeChord()
+{
+	view->midi_mode = view->MIDI_MODE_CHORD;
+	Enable("chord_type", true);
+	Enable("chord_inversion", true);
 }
 
 void MidiEditor::OnChordType()
 {
-	view->chord_mode = GetInt("");
+	view->chord_type = GetInt("");
 }
 
 void MidiEditor::OnChordInversion()

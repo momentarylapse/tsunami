@@ -26,7 +26,9 @@ public:
 
 	void OnPitch();
 	void OnBeatPartition();
-	void OnInsertChord();
+	void OnMidiModeSelect();
+	void OnMidiModeNote();
+	void OnMidiModeChord();
 	void OnChordType();
 	void OnChordInversion();
 

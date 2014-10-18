@@ -98,7 +98,6 @@ public:
 	MidiEffect *get_midi_fx(int track_no, int index);
 
 // data
-	bool used;
 	string filename;
 	Array<Tag> tag;
 	int sample_rate;

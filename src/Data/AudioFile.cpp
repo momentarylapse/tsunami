@@ -64,7 +64,6 @@ AudioFile::AudioFile() :
 	Data("AudioFile")
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
-	used = false;
 	volume = 1;
 }
 
@@ -127,7 +126,6 @@ void AudioFile::NewEmpty(int _sample_rate)
 
 	Reset();
 	action_manager->Enable(false);
-	used = true;
 	sample_rate = _sample_rate;
 
 	// default tags
@@ -157,7 +155,6 @@ void AudioFile::Reset()
 	msg_db_f("AudioFile.Reset",1);
 	action_manager->Reset();
 
-	used = false;
 	filename = "";
 	tag.clear();
 	area = rect(0, 0, 0, 0);
@@ -249,10 +246,9 @@ void disect_time(int t, int sample_rate, bool &sign, int &min, int &sec, int &ms
 
 string AudioFile::get_time_str(int t)
 {
-	int _sample_rate = used ? sample_rate : DEFAULT_SAMPLE_RATE;
 	bool sign;
 	int _min, _sec, _msec;
-	disect_time(t, _sample_rate, sign, _min, _sec, _msec);
+	disect_time(t, sample_rate, sign, _min, _sec, _msec);
 	if (_min > 0)
 		return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);
 	else
@@ -261,10 +257,9 @@ string AudioFile::get_time_str(int t)
 
 string AudioFile::get_time_str_fuzzy(int t, float dt)
 {
-	int _sample_rate = used ? sample_rate : DEFAULT_SAMPLE_RATE;
 	bool sign;
 	int _min, _sec, _msec;
-	disect_time(t, _sample_rate, sign, _min, _sec, _msec);
+	disect_time(t, sample_rate, sign, _min, _sec, _msec);
 	if (dt < 1.0){
 		if (_min > 0)
 			return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);

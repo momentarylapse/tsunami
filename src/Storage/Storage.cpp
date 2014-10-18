@@ -66,7 +66,6 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 			a->Reset();
 			a->action_manager->Enable(false);
-			a->used = true;
 			a->filename = filename;
 
 			f->LoadAudio(a, filename);
@@ -78,12 +77,10 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			tsunami->progress->End();
 			if (a->track.num > 0)
 			{}//	a->SetCurTrack(a->track[0]);
-			else
-				a->used = false;
 			a->action_manager->Reset();
 			a->Notify(a->MESSAGE_CHANGE);
 			a->NotifyEnd();
-			ok = a->used;
+			ok = (a->track.num > 0);
 			found = true;
 			break;
 		}

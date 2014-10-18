@@ -293,7 +293,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::DeleteBar));
 
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
-	Script::DeclareClassOffset("AudioFile", "used", _offsetof(AudioFile, used));
 	Script::DeclareClassOffset("AudioFile", "filename", _offsetof(AudioFile, filename));
 	Script::DeclareClassOffset("AudioFile", "tag", _offsetof(AudioFile, tag));
 	Script::DeclareClassOffset("AudioFile", "sample_rate", _offsetof(AudioFile, sample_rate));
@@ -543,36 +542,28 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (fx->Configure()){
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
-				if (a->used){
-					Range range = tsunami->win->view->GetPlaybackSelection();
-					a->action_manager->BeginActionGroup();
-					foreach(Track *t, a->track)
-						if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
-							fx->ResetState();
-							fx->DoProcessTrack(t, tsunami->win->view->cur_level, range);
-						}
-					a->action_manager->EndActionGroup();
-				}else{
-					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
-				}
+				Range range = tsunami->win->view->GetPlaybackSelection();
+				a->action_manager->BeginActionGroup();
+				foreach(Track *t, a->track)
+					if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
+						fx->ResetState();
+						fx->DoProcessTrack(t, tsunami->win->view->cur_level, range);
+					}
+				a->action_manager->EndActionGroup();
 			}
 			delete(fx);
 		}else if (mfx){
 			tsunami->plugin_manager->cur_effect = NULL;//fx;
 			mfx->ResetConfig();
 			if (mfx->Configure()){
-				if (a->used){
-					Range range = tsunami->win->view->GetPlaybackSelection();
-					a->action_manager->BeginActionGroup();
-					foreach(Track *t, a->track)
-						if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
-							mfx->ResetState();
-							mfx->DoProcessTrack(t, range);
-						}
-					a->action_manager->EndActionGroup();
-				}else{
-					tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
-				}
+				Range range = tsunami->win->view->GetPlaybackSelection();
+				a->action_manager->BeginActionGroup();
+				foreach(Track *t, a->track)
+					if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
+						mfx->ResetState();
+						mfx->DoProcessTrack(t, range);
+					}
+				a->action_manager->EndActionGroup();
 			}
 			delete(mfx);
 		}/*else if (f_audio){

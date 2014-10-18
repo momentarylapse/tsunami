@@ -495,9 +495,6 @@ void AudioView::OnLeftButtonDown()
 	SelectUnderMouse();
 	UpdateMenu();
 
-	if (!audio->used)
-		return;
-
 	mouse_possibly_selecting_start = selection.pos;
 
 	// selection:
@@ -624,18 +621,17 @@ void AudioView::OnLeftDoubleClick()
 {
 	SelectUnderMouse();
 
-	if (mouse_possibly_selecting < mouse_min_move_to_select)
-		if (audio->used){
-			if (selection.type == SEL_TYPE_SAMPLE){
-				win->side_bar->Open(SideBar::SUB_DIALOG);
-			}else if ((selection.type == SEL_TYPE_TRACK) || ((selection.track) && ((selection.type == SEL_TYPE_SELECTION_START) || (selection.type == SEL_TYPE_SELECTION_END)))){
-				win->side_bar->Open(SideBar::TRACK_DIALOG);
-			}else if (!selection.track){
-				SetCurTrack(NULL);
-				win->side_bar->Open(SideBar::AUDIO_FILE_DIALOG);
-			}
-			selection.type = SEL_TYPE_NONE;
+	if (mouse_possibly_selecting < mouse_min_move_to_select){
+		if (selection.type == SEL_TYPE_SAMPLE){
+			win->side_bar->Open(SideBar::SUB_DIALOG);
+		}else if ((selection.type == SEL_TYPE_TRACK) || ((selection.track) && ((selection.type == SEL_TYPE_SELECTION_START) || (selection.type == SEL_TYPE_SELECTION_END)))){
+			win->side_bar->Open(SideBar::TRACK_DIALOG);
+		}else if (!selection.track){
+			SetCurTrack(NULL);
+			win->side_bar->Open(SideBar::AUDIO_FILE_DIALOG);
 		}
+		selection.type = SEL_TYPE_NONE;
+	}
 	UpdateMenu();
 }
 
@@ -1205,16 +1201,6 @@ void AudioView::DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool 
 	}
 }
 
-void AudioView::DrawEmptyAudioFile(HuiPainter *c, const rect &r)
-{
-	color col = ColorBackgroundCurWave;
-	c->setColor(col);
-	c->drawRect(r.x1, r.y2, r.width(), r.height());
-	c->setColor(ColorWaveCur);
-	c->setFontSize(FONT_SIZE_NO_FILE);
-	c->drawStr(r.x1 + r.width() / 2 - 50, r.y1 + r.height() / 2 - 10, _("keine Datei"));
-}
-
 void AudioView::DrawBackground(HuiPainter *c, const rect &r)
 {
 	int yy = 0;
@@ -1288,12 +1274,6 @@ void AudioView::DrawSelection(HuiPainter *c, const rect &r)
 void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 {
 	audio->area = r;
-
-	// empty file
-	if (!audio->used){
-		DrawEmptyAudioFile(c, r);
-		return;
-	}
 
 	plan_track_sizes(r, audio, this);
 	UpdateBufferZoom();
@@ -1377,19 +1357,14 @@ void AudioView::UpdateMenu()
 	win->Check("view_stereo", !show_mono);
 	win->Check("view_peaks_max", peak_mode == BufferBox::PEAK_MODE_MAXIMUM);
 	win->Check("view_peaks_mean", peak_mode == BufferBox::PEAK_MODE_SQUAREMEAN);
-	win->Enable("zoom_in", audio->used);
-	win->Enable("zoom_out", audio->used);
-	win->Enable("view_optimal", audio->used);
-	win->Enable("view_samples", false);//win->cur_audio->used);
+	win->Enable("view_samples", false);
 }
 
 void AudioView::SetPeaksMode(int mode)
 {
 	peak_mode = mode;
-	if (audio->used){
-		audio->InvalidateAllPeaks();
-		audio->UpdatePeaks(peak_mode);
-	}
+	audio->InvalidateAllPeaks();
+	audio->UpdatePeaks(peak_mode);
 	ForceRedraw();
 	UpdateMenu();
 }

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-208
+207
 // Data (ID,Text)
 about
 
@@ -77,8 +77,6 @@ chord_type
 
 close
 Close
-close_file
-
 comment_no_fx
 
 copy
@@ -317,9 +315,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_535279
+rand_id_808075
 
-rand_id_866465
+rand_id_812737
 
 rdt_source
 !bold\\Source

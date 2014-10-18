@@ -16,7 +16,6 @@ void fold(float b[], float k[])
 
 class Folding : AudioEffect
 	overwrite void process(BufferBox buf)
-		if audio.used
-			fold(buf.r, audio.track[0].level[0].buffer[0].r)
-			fold(buf.l, audio.track[0].level[0].buffer[0].l)
+		fold(buf.r, audio.track[0].level[0].buffer[0].r)
+		fold(buf.l, audio.track[0].level[0].buffer[0].l)
 	

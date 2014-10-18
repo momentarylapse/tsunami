@@ -9,7 +9,6 @@ Menu menu "" disabled
 		Separator "" ""
 		Item audio_file_properties "Eigenschaften" image=hui:properties
 		Separator "" ""
-		Item close_file "Schließen" image=hui:close
 		Item exit "Beenden" image=hui:quit
 	Menu menu_edit "Bearbeiten"
 		Item undo "Rückgängig" image=hui:undo

@@ -209,7 +209,6 @@ class Tag
 	string key, value
 
 class AudioFile
-	bool used
 	string filename
 	Tag tag[]
 	int sample_rate

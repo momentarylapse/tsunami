@@ -58,22 +58,12 @@ void Clipboard::Paste(AudioView *view)
 	if (!HasData())
 		return;
 	AudioFile *a = view->audio;
-	if (a->used){
-		int index = a->get_sample_by_uid(ref_uid);
-		if (index >= 0){
-			view->cur_track->AddSample(view->sel_range.start(), index);
-		}else{
-			a->Execute(new ActionTrackPasteAsSample(view->cur_track, view->sel_range.start(), buf));
-			ref_uid = a->sample.back()->uid;
-		}
+	int index = a->get_sample_by_uid(ref_uid);
+	if (index >= 0){
+		view->cur_track->AddSample(view->sel_range.start(), index);
 	}else{
-		a->NewWithOneTrack(sample_rate, Track::TYPE_AUDIO);
-		a->action_manager->Enable(false);
-		BufferBox dest = a->track[0]->GetBuffers(0, Range(0, buf->num));
-		dest.set(*buf, 0, 1.0f);
-		a->InvalidateAllPeaks();
-		a->UpdatePeaks(view->peak_mode);
-		a->action_manager->Enable(true);
+		a->Execute(new ActionTrackPasteAsSample(view->cur_track, view->sel_range.start(), buf));
+		ref_uid = a->sample.back()->uid;
 	}
 }
 

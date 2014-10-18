@@ -69,7 +69,6 @@ public:
 	void DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time = false);
 	void DrawSelection(HuiPainter *c, const rect &r);
 	void DrawBackground(HuiPainter *c, const rect &r);
-	void DrawEmptyAudioFile(HuiPainter *c, const rect &r);
 	void DrawAudioFile(HuiPainter *c, const rect &r);
 
 	void OptimizeView();

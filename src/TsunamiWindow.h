@@ -64,7 +64,6 @@ public:
 	void OnTrackProperties();
 	void OnSubProperties();
 	void OnSettings();
-	void OnCloseFile();
 	void OnPlay();
 	void OnPlayLoop();
 	void OnPause();

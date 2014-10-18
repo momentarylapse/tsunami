@@ -36,7 +36,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	type = Track::TYPE_AUDIO;
 
 
-	int sample_rate = (a->used) ? a->sample_rate : DEFAULT_SAMPLE_RATE;
+	int sample_rate = a->sample_rate;
 	//CapturingByDialog = true;
 
 	if (!tsunami->input->Start(type, sample_rate)){
@@ -127,10 +127,8 @@ void CaptureDialog::OnTypeMidi()
 
 void CaptureDialog::OnStart()
 {
-	if (audio->used){
-		tsunami->renderer->Prepare(audio, tsunami->win->view->GetPlaybackSelection(), false);
-		tsunami->output->Play(tsunami->renderer);
-	}
+	tsunami->renderer->Prepare(audio, tsunami->win->view->GetPlaybackSelection(), false);
+	tsunami->output->Play(tsunami->renderer);
 
 	tsunami->input->ResetSync();
 	tsunami->input->Accumulate(true);
@@ -188,26 +186,20 @@ bool CaptureDialog::Insert()
 	Track *t;
 	int target = GetInt("capture_target");
 	int i0;
-	if (audio->used){
-		int s_start = tsunami->win->view->sel_range.start();
+	int s_start = tsunami->win->view->sel_range.start();
 
-		// insert recorded data with some delay
-		int dpos = tsunami->input->GetDelay();
+	// insert recorded data with some delay
+	int dpos = tsunami->input->GetDelay();
 
-		if (target >= audio->track.num){
-			// new track
-			t = audio->AddTrack(type, audio->track.num);
-		}else{
-			// overwrite
-			t = audio->track[target];
-		}
-		i0 = s_start + dpos;
+	if (target >= audio->track.num){
+		// new track
+		t = audio->AddTrack(type, audio->track.num);
 	}else{
-		// new file
-		audio->NewWithOneTrack(type, DEFAULT_SAMPLE_RATE);
-		t = audio->track[0];
-		i0 = 0;
+		// overwrite
+		t = audio->track[target];
 	}
+	i0 = s_start + dpos;
+
 	if (t->type != type){
 		tsunami->log->Error(format(_("Kann aufgenommene Daten (%s) nicht in Ziel (%s) einf&ugen."), track_type(type).c_str(), track_type(t->type).c_str()));
 		return false;

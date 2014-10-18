@@ -304,12 +304,12 @@ bool TsunamiWindow::AllowTermination()
 void TsunamiWindow::OnCopy()
 {
 	if (audio->used)
-		tsunami->clipboard->Copy(audio);
+		tsunami->clipboard->Copy(view);
 }
 
 void TsunamiWindow::OnPaste()
 {
-	tsunami->clipboard->Paste(audio);
+	tsunami->clipboard->Paste(view);
 }
 
 void TsunamiWindow::OnFindAndExecutePlugin()
@@ -488,7 +488,7 @@ void TsunamiWindow::UpdateMenu()
 	Enable("select_nothing", audio->used);
 	Enable("undo", audio->action_manager->Undoable());
 	Enable("redo", audio->action_manager->Redoable());
-	Enable("copy", tsunami->clipboard->CanCopy(audio));
+	Enable("copy", tsunami->clipboard->CanCopy(view));
 	Enable("paste", tsunami->clipboard->HasData());
 	Enable("delete", selected || (audio->GetNumSelectedSamples() > 0));
 	// file

@@ -11,6 +11,8 @@
 #include "Observable.h"
 class AudioFile;
 class BufferBox;
+class AudioView;
+class MidiData;
 
 class Clipboard : public Observable
 {
@@ -18,14 +20,15 @@ public:
 	Clipboard();
 	virtual ~Clipboard();
 
-	void Copy(AudioFile *a);
-	void Paste(AudioFile *a);
+	void Copy(AudioView *view);
+	void Paste(AudioView *view);
 	void Clear();
 	bool HasData();
-	bool CanCopy(AudioFile *a);
+	bool CanCopy(AudioView *view);
 
 private:
 	BufferBox *buf;
+	MidiData *midi;
 	int ref_uid;
 	int sample_rate;
 };

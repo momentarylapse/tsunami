@@ -27,6 +27,7 @@ public:
 	bool CanCopy(AudioView *view);
 
 private:
+	int type;
 	BufferBox *buf;
 	MidiData *midi;
 	int ref_uid;

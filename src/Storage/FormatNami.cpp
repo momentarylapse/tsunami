@@ -26,6 +26,8 @@ FormatNami::~FormatNami()
 {
 }
 
+void WriteMidi(CFile *f, MidiData &m);
+void ReadChunkMidiData(CFile *f, MidiData *midi);
 
 Array<int> ChunkPos;
 
@@ -89,9 +91,12 @@ void WriteSample(CFile *f, Sample *s)
 	f->WriteStr(s->name);
 	f->WriteFloat(s->volume);
 	f->WriteInt(s->offset);
-	f->WriteInt(0); // reserved
+	f->WriteInt(s->type); // reserved
 	f->WriteInt(0);
-	WriteBufferBox(f, &s->buf);
+	if (s->type == Track::TYPE_AUDIO)
+		WriteBufferBox(f, &s->buf);
+	else if (s->type == Track::TYPE_MIDI)
+		WriteMidi(f, s->midi);
 	EndChunk(f);
 }
 
@@ -414,16 +419,17 @@ void ReadChunkSampleBufferBox(CFile *f, BufferBox *b)
 
 void ReadChunkSample(CFile *f, AudioFile *a)
 {
-	Sample *s = new Sample;
+	Sample *s = new Sample(Track::TYPE_AUDIO);
 	a->sample.add(s);
 	s->owner = a;
 	s->name = f->ReadStr();
 	s->volume = f->ReadFloat();
 	s->offset = f->ReadInt();
+	s->type = f->ReadInt();
 	f->ReadInt(); // reserved
-	f->ReadInt();
 
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &s->buf);
+	AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &s->midi);
 }
 
 void ReadSampleRef(CFile *f, Track *t)

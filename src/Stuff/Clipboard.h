@@ -27,11 +27,8 @@ public:
 	bool CanCopy(AudioView *view);
 
 private:
-	int type;
-	BufferBox *buf;
-	MidiData *midi;
-	int ref_uid;
-	int sample_rate;
+	AudioFile *temp;
+	Array<int> ref_uid;
 };
 
 #endif /* CLIPBOARD_H_ */

@@ -133,7 +133,9 @@ class TrackLevel
 
 class Sample // TODO
 	string name
+	int type
 	BufferBox buf
+	MidiData midi
 	float volume
 	int uid
 	extern SampleRef *createRef()

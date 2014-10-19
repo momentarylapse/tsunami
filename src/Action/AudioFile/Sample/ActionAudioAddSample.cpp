@@ -11,7 +11,7 @@
 
 ActionAudioAddSample::ActionAudioAddSample(const string &name, BufferBox &buf)
 {
-	sample = new Sample;
+	sample = new Sample(Track::TYPE_AUDIO);
 	sample->buf = buf;
 	sample->buf.offset = 0;
 	sample->name = name;

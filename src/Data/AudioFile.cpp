@@ -65,6 +65,7 @@ AudioFile::AudioFile() :
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	volume = 1;
+	level_name.add("");
 }
 
 

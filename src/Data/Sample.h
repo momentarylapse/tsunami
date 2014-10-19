@@ -9,6 +9,7 @@
 #define SAMPLE_H_
 
 #include "BufferBox.h"
+#include "MidiData.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
 
@@ -19,7 +20,7 @@ class SampleRef;
 class Sample
 {
 public:
-	Sample();
+	Sample(int type);
 	~Sample();
 
 	int get_index();
@@ -27,7 +28,9 @@ public:
 	AudioFile *owner;
 
 	string name;
+	int type;
 	BufferBox buf;
+	MidiData midi;
 	float volume;
 	int offset;
 
@@ -61,6 +64,7 @@ public:
 	int pos;
 	Sample *origin;
 	BufferBox *buf;
+	MidiData *midi;
 	bool muted;
 	float volume;
 

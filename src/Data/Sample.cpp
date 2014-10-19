@@ -11,9 +11,10 @@
 
 const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
-Sample::Sample()
+Sample::Sample(int _type)
 {
 	owner = NULL;
+	type = _type;
 
 	volume = 1;
 	offset = 0;
@@ -60,6 +61,7 @@ SampleRef::SampleRef(Sample *sample) :
 	Observable("SampleRef")
 {
 	buf = &sample->buf;
+	midi = &sample->midi;
 	origin = sample;
 	origin->ref();
 	track_no = -1;

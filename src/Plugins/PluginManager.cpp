@@ -189,16 +189,19 @@ void PluginManager::LinkAppScriptData()
 
 	Script::DeclareClassSize("Sample", sizeof(Sample));
 	Script::DeclareClassOffset("Sample", "name", _offsetof(Sample, name));
+	Script::DeclareClassOffset("Sample", "type", _offsetof(Sample, type));
 	Script::DeclareClassOffset("Sample", "buf", _offsetof(Sample, buf));
+	Script::DeclareClassOffset("Sample", "midi", _offsetof(Sample, midi));
 	Script::DeclareClassOffset("Sample", "volume", _offsetof(Sample, volume));
 	Script::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
 	Script::LinkExternal("Sample.createRef", Script::mf(&Sample::create_ref));
 
-	Sample sample;
+	Sample sample(0);
 	sample.owner = tsunami->audio;
 	SampleRef sampleref(&sample);
 	Script::DeclareClassSize("SampleRef", sizeof(SampleRef));
 	Script::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
+	Script::DeclareClassOffset("SampleRef", "midi", _offsetof(SampleRef, midi));
 	Script::DeclareClassOffset("SampleRef", "origin", _offsetof(SampleRef, origin));
 	Script::LinkExternal("SampleRef.__init__", Script::mf(&SampleRef::__init__));
 	Script::DeclareClassVirtualIndex("SampleRef", "__delete__", Script::mf(&SampleRef::__delete__), &sampleref);

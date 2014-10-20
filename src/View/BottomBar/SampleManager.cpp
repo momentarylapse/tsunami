@@ -109,8 +109,12 @@ void SampleManager::OnListSelect()
 
 void SampleManager::OnListEdit()
 {
-	int sel = GetInt("");
-	audio->EditSampleName(sel, GetCell("sample_list", sel, 2));
+	int sel = HuiGetEvent()->row;
+	int col = HuiGetEvent()->column;
+	if (col == 2)
+		audio->EditSampleName(sel, GetCell("sample_list", sel, 2));
+	else if (col == 5)
+		audio->sample[sel]->auto_delete = GetCell("sample_list", sel, 5)._bool();
 }
 
 void SampleManager::OnImportFromFile()

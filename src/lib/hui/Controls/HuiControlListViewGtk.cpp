@@ -20,10 +20,9 @@ void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpoin
 	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(c->widget));
 	GtkTreePath *path = gtk_tree_path_new_from_string(path_string);
 	GtkTreeIter iter;
-	gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT (cell), "column"));
+	gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
 	gtk_tree_model_get_iter(model, &iter, path);
-	bool state;
-	gtk_tree_model_get(model, &iter, column, &state, -1);
+	bool state = gtk_cell_renderer_toggle_get_active(cell);
 	state = !state;
 	if (c->type == HuiKindListView)
 		gtk_list_store_set(GTK_LIST_STORE(model), &iter, column, state, -1);
@@ -43,7 +42,7 @@ void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, c
 	GtkTreeModel *model = gtk_tree_view_get_model(GTK_TREE_VIEW(c->widget));
 	GtkTreePath *path = gtk_tree_path_new_from_string(path_string);
 	GtkTreeIter iter;
-	gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT (cell), "column"));
+	gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
 	gtk_tree_model_get_iter(model, &iter, path);
 	if (c->type == HuiKindListView)
 		gtk_list_store_set(GTK_LIST_STORE(model), &iter, column, new_text, -1);
@@ -207,6 +206,8 @@ int HuiControlListView::GetInt()
 
 void HuiControlListView::__ChangeString(int row, const string& str)
 {
+	if ((row < 0) or (row >= _item_.num))
+		return;
 	GetPartStrings("", str);
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	if (gtk_list_store_iter_is_valid(store, &_item_[row]))
@@ -216,12 +217,16 @@ void HuiControlListView::__ChangeString(int row, const string& str)
 
 string HuiControlListView::GetCell(int row, int column)
 {
+	if ((row < 0) or (row >= _item_.num))
+		return "";
 	GtkTreeModel *store = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
 	return tree_get_cell(store, _item_[row], column);
 }
 
 void HuiControlListView::__SetCell(int row, int column, const string& str)
 {
+	if ((row < 0) or (row >= _item_.num))
+		return;
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	if (gtk_list_store_iter_is_valid(store, &_item_[row]))
 		set_list_cell(store, _item_[row], column, str);

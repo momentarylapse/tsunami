@@ -72,8 +72,9 @@ void HuiControlTreeView::__SetString(const string &str)
 	__AddString(str);
 }
 
-void set_tree_cell(GtkTreeStore *store, GtkTreeIter &iter, int column, const string &str)
+void set_tree_cell(GtkTreeStore *store, GtkTreeIter &_iter, int column, const string &str)
 {
+	GtkTreeIter iter = _iter;
 	GType type = gtk_tree_model_get_column_type(GTK_TREE_MODEL(store), column);
 	if (type == G_TYPE_STRING)
 		gtk_tree_store_set(store, &iter, column, sys_str(str), -1);
@@ -86,8 +87,9 @@ void set_tree_cell(GtkTreeStore *store, GtkTreeIter &iter, int column, const str
 	}
 }
 
-string tree_get_cell(GtkTreeModel *store, GtkTreeIter &iter, int column)
+string tree_get_cell(GtkTreeModel *store, GtkTreeIter &_iter, int column)
 {
+	GtkTreeIter iter = _iter;
 	string r;
 	GType type = gtk_tree_model_get_column_type(store, column);
 	if (type == G_TYPE_STRING){
@@ -159,12 +161,16 @@ void HuiControlTreeView::__ChangeString(int row, const string& str)
 
 string HuiControlTreeView::GetCell(int row, int column)
 {
+	if ((row < 0) or (row >= _item_.num))
+		return "";
 	GtkTreeModel *store = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
 	return tree_get_cell(store, _item_[row], column);
 }
 
 void HuiControlTreeView::__SetCell(int row, int column, const string& str)
 {
+	if ((row < 0) or (row >= _item_.num))
+		return;
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	if (gtk_tree_store_iter_is_valid(store, &_item_[row]))
 		set_tree_cell(store, _item_[row], column, str);

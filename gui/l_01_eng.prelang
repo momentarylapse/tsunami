@@ -315,9 +315,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_527624
+rand_id_187370
 
-rand_id_733095
+rand_id_790038
 
 rdt_source
 !bold\\Source
@@ -418,7 +418,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-145
+146
 // Data (ID,Text)
 
 
@@ -481,6 +481,8 @@ Amplitude zu groß, Signal übersteuert.
 Anfang\\\") + audio->get_time_str_long(audio->GetRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
+
+Audio
 
 Aufruf: tsunami --export <Datei> <Exportdatei>
 

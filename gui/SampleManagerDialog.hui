@@ -1,8 +1,8 @@
 Dialog sample_manager_dialog "Sample Manager" 400 400 allow-root
 	Grid ? "" 1 2
-		ListView sample_list "Vorschau\\Typ\\Name\\Dauer\\Benutzung\\Temporär" format=itTttC select-single width=600 noexpandx
+		ListView sample_list "Vorschau\\Typ\\Name\\Dauer\\Benutzung\\Temporär" format=itTttC
 		Grid ? "" 4 1
-			Button import_from_file "Laden..."
-			Button delete_sample "Löschen"
-			Button paste_sample "Einfügen"
-			Button create_from_selection "Aus Auswahl erzeugen"
+			Button import_from_file "" image=hui:open flat
+			Button delete_sample "" image=hui:delete flat
+			Button paste_sample "" image=hui:paste flat
+			Button create_from_selection "" image=hui:copy flat

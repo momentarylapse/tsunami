@@ -19,7 +19,10 @@ SampleManager::SampleManager(AudioFile *a) :
 	Observer("SampleManager")
 {
 	FromResource("sample_manager_dialog");
-	SetTooltip("insert_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
+	SetTooltip("import_from_file", _("aus Datei importieren"));
+	SetTooltip("delete_sample", _("l&oschen"));
+	SetTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
+	SetTooltip("create_from_selection", _("aus Auswahl erzeugen"));
 
 	EventM("import_from_file", this, &SampleManager::OnImportFromFile);
 	EventM("paste_sample", this, &SampleManager::OnInsert);
@@ -29,10 +32,10 @@ SampleManager::SampleManager(AudioFile *a) :
 	EventMX("sample_list", "hui:select", this, &SampleManager::OnListSelect);
 
 	audio = a;
-	selected = 0;
+	selected_uid = -1;
 	FillList();
 
-	Subscribe(audio);
+	Subscribe(audio, audio->MESSAGE_CHANGE);
 }
 
 SampleManager::~SampleManager()
@@ -73,7 +76,7 @@ void render_midi(Image &im, MidiData &m)
 string render_sample(Sample *s)
 {
 	Image im;
-	im.create(80, 32, color(0, 0, 0, 0));
+	im.create(150, 32, color(0, 0, 0, 0));
 	if (s->type == Track::TYPE_AUDIO)
 		render_bufbox(im, s->buf);
 	else if (s->type == Track::TYPE_MIDI)
@@ -91,23 +94,23 @@ void SampleManager::FillList()
 		icon_names.add(render_sample(s));
 		SetString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->GetRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
-	if (audio->sample.num > 0){
-		selected = min(selected, audio->sample.num - 1);
-		SetInt("sample_list", selected);
-	}
+	SetInt("sample_list", audio->get_sample_by_uid(selected_uid));
 	Enable("delete_sample", audio->sample.num > 0);
 	Enable("insert_sample", audio->sample.num > 0);
 }
 
 void SampleManager::OnListSelect()
 {
-	selected = GetInt("");
+	int sel = GetInt("");
+	selected_uid = -1;
+	if (sel >= 0)
+		selected_uid = audio->sample[sel]->uid;
 }
 
 void SampleManager::OnListEdit()
 {
-	selected = GetInt("");
-	audio->EditSampleName(selected, GetCell("sample_list", selected, 2));
+	int sel = GetInt("");
+	audio->EditSampleName(sel, GetCell("sample_list", sel, 2));
 }
 
 void SampleManager::OnImportFromFile()
@@ -115,8 +118,9 @@ void SampleManager::OnImportFromFile()
 	if (tsunami->storage->AskOpenImport(win)){
 		BufferBox buf;
 		tsunami->storage->LoadBufferBox(audio, &buf, HuiFilename);
-		selected = audio->sample.num;
-		audio->AddSample(HuiFilename.basename(), buf);
+		Sample *s = audio->AddSample(HuiFilename.basename(), buf);
+		selected_uid = s->uid;
+		SetInt("sample_list", audio->sample.num - 1);
 	}
 }
 
@@ -129,8 +133,9 @@ void SampleManager::OnInsert()
 
 void SampleManager::OnCreateFromSelection()
 {
-	selected = audio->sample.num;
 	audio->CreateSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
+	if (audio->sample.num > 0)
+		selected_uid = audio->sample.back()->uid;
 }
 
 void SampleManager::OnDelete()

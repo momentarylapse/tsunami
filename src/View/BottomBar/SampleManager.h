@@ -32,7 +32,7 @@ public:
 
 	AudioFile *audio;
 	Array<string> icon_names;
-	int selected;
+	int selected_uid;
 
 	static Sample *_cdecl Select(HuiPanel *root, AudioFile *a, Sample *old);
 };

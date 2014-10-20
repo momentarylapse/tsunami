@@ -12,6 +12,7 @@
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include <math.h>
+#include "../../lib/math/math.h"
 
 SampleManager::SampleManager(AudioFile *a) :
 	BottomBarConsole(_("Samples")),
@@ -39,10 +40,10 @@ SampleManager::~SampleManager()
 	Unsubscribe(audio);
 }
 
-string render_bufbox(BufferBox &b, int w, int h)
+void render_bufbox(Image &im, BufferBox &b)
 {
-	Image im;
-	im.create(w, h, color(0, 0, 0, 0));
+	int w = im.width;
+	int h = im.height;
 	for (int x=0; x<w; x++){
 		float m = 0;
 		int i0 = (b.num * x) / w;
@@ -52,6 +53,31 @@ string render_bufbox(BufferBox &b, int w, int h)
 		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
 			im.setPixel(x, y, Black);
 	}
+}
+
+void render_midi(Image &im, MidiData &m)
+{
+	int w = im.width;
+	int h = im.height;
+	Range r = m.GetRange();
+	foreach(MidiNote &n, m){
+		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
+		float x0 = w * clampf((float)n.range.offset / (float)r.num, 0, 1);
+		float x1 = w * clampf((float)n.range.end() / (float)r.num, 0, 1);
+		color c = tsunami->win->view->GetPitchColor(n.pitch);
+		for (int x=x0; x<=x1; x++)
+			im.setPixel(x, y, c);
+	}
+}
+
+string render_sample(Sample *s)
+{
+	Image im;
+	im.create(80, 32, color(0, 0, 0, 0));
+	if (s->type == Track::TYPE_AUDIO)
+		render_bufbox(im, s->buf);
+	else if (s->type == Track::TYPE_MIDI)
+		render_midi(im, s->midi);
 	return HuiSetImage(im);
 }
 
@@ -62,7 +88,7 @@ void SampleManager::FillList()
 		HuiDeleteImage(name);
 	icon_names.clear();
 	foreachi(Sample *s, audio->sample, i){
-		icon_names.add(render_bufbox(s->buf, 80, 32));
+		icon_names.add(render_sample(s));
 		SetString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->GetRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
 	if (audio->sample.num > 0){
@@ -139,7 +165,7 @@ public:
 		SetString("list", _("\\- keines -\\"));
 		SetInt("list", 0);
 		foreachi(Sample *s, audio->sample, i){
-			icon_names.add(render_bufbox(s->buf, 80, 32));
+			icon_names.add(render_sample(s));
 			SetString("list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
 			if (s == old)
 				SetInt("list", i + 1);

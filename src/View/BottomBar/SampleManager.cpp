@@ -94,9 +94,10 @@ void SampleManager::FillList()
 		icon_names.add(render_sample(s));
 		SetString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->GetRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
-	SetInt("sample_list", audio->get_sample_by_uid(selected_uid));
-	Enable("delete_sample", audio->sample.num > 0);
-	Enable("insert_sample", audio->sample.num > 0);
+	int sel = audio->get_sample_by_uid(selected_uid);
+	SetInt("sample_list", sel);
+	Enable("delete_sample", sel >= 0);
+	Enable("paste_sample", sel >= 0);
 }
 
 void SampleManager::OnListSelect()
@@ -105,6 +106,8 @@ void SampleManager::OnListSelect()
 	selected_uid = -1;
 	if (sel >= 0)
 		selected_uid = audio->sample[sel]->uid;
+	Enable("delete_sample", sel >= 0);
+	Enable("paste_sample", sel >= 0);
 }
 
 void SampleManager::OnListEdit()
@@ -125,6 +128,8 @@ void SampleManager::OnImportFromFile()
 		Sample *s = audio->AddSample(HuiFilename.basename(), buf);
 		selected_uid = s->uid;
 		SetInt("sample_list", audio->sample.num - 1);
+		Enable("delete_sample", true);
+		Enable("paste_sample", true);
 	}
 }
 
@@ -138,8 +143,11 @@ void SampleManager::OnInsert()
 void SampleManager::OnCreateFromSelection()
 {
 	audio->CreateSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
-	if (audio->sample.num > 0)
+	if (audio->sample.num > 0){
 		selected_uid = audio->sample.back()->uid;
+		Enable("delete_sample", true);
+		Enable("paste_sample", true);
+	}
 }
 
 void SampleManager::OnDelete()

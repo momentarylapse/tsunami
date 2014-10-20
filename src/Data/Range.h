@@ -42,6 +42,7 @@ public:
 
 	Range operator||(const Range &r) const;
 	Range operator&&(const Range &r) const;
+	Range operator+ (int shift) const;
 };
 
 #endif /* RANGE_H_ */

@@ -17,17 +17,6 @@
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-string track_type(int type)
-{
-	if (type == Track::TYPE_AUDIO)
-		return "audio";
-	if (type == Track::TYPE_MIDI)
-		return "midi";
-	if (type == Track::TYPE_TIME)
-		return "time";
-	return "???";
-}
-
 CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
 	HuiWindow("record_dialog", _parent, _allow_parent),
 	Observer("CaptureDialog")

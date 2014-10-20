@@ -65,17 +65,6 @@ void Clipboard::Copy(AudioView *view)
 	Notify();
 }
 
-string type2str(int type)
-{
-	if (type == Track::TYPE_AUDIO)
-		return "Audio";
-	if (type == Track::TYPE_MIDI)
-		return "Midi";
-	if (type == Track::TYPE_TIME)
-		return "Metronom";
-	return "?";
-}
-
 void Clipboard::Paste(AudioView *view)
 {
 	if (!HasData())
@@ -88,10 +77,10 @@ void Clipboard::Paste(AudioView *view)
 			continue;
 		if (t->type == Track::TYPE_TIME)
 			continue;
-		dest_type.add(type2str(t->type));
+		dest_type.add(track_type(t->type));
 	}
 	foreach(Track *t, temp->track)
-		temp_type.add(type2str(t->type));
+		temp_type.add(track_type(t->type));
 	if (dest_type.num != temp->track.num){
 		tsunami->log->Error(format(_("%d Spuren zum Einf&ugen markiert (ohne Metronom gez&ahlt), aber %d Spuren in der Zwischenablage"), dest_type.num, temp->track.num));
 		return;
@@ -113,19 +102,16 @@ void Clipboard::Paste(AudioView *view)
 			continue;
 
 		Track *tt = temp->track[ti];
-		if (t->type == Track::TYPE_AUDIO){
-			int index = a->get_sample_by_uid(ref_uid[ti]);
-			if (index >= 0){
-				t->AddSample(view->sel_range.start(), index);
-			}else{
+		int ref_index = a->get_sample_by_uid(ref_uid[ti]);
+		if (ref_index >= 0){
+			t->AddSample(view->sel_range.start(), ref_index);
+		}else{
+			if (t->type == Track::TYPE_AUDIO){
 				a->Execute(new ActionTrackPasteAsSample(t, view->sel_range.start(), &tt->level[0].buffer[0]));
 				ref_uid[ti] = a->sample.back()->uid;
-			}
-		}else if (t->type == Track::TYPE_MIDI){
-			foreach(MidiNote &n, tt->midi){
-				MidiNote nn = n;
-				nn.range.offset += view->sel_range.start();
-				t->AddMidiNote(nn);
+			}else if (t->type == Track::TYPE_MIDI){
+				a->Execute(new ActionTrackPasteAsSample(t, view->sel_range.start(), &tt->midi));
+				ref_uid[ti] = a->sample.back()->uid;
 			}
 		}
 

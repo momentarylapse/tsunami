@@ -817,8 +817,9 @@ void AudioView::DrawTrackBuffers(HuiPainter *c, const rect &r, Track *t, double 
 void AudioView::DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay)
 {
 	// frame
-	int asx = clampi(sample2screen(s->pos + delay), r.x1, r.x2);
-	int aex = clampi(sample2screen(s->pos + s->buf->num + delay), r.x1, r.x2);
+	Range rr = s->GetRange() + delay;
+	int asx = clampi(sample2screen(rr.start()), r.x1, r.x2);
+	int aex = clampi(sample2screen(rr.end()), r.x1, r.x2);
 
 	if (delay == 0)
 		s->area = rect(asx, aex, r.y1, r.y2);
@@ -856,6 +857,7 @@ void AudioView::DrawSample(HuiPainter *c, const rect &r, SampleRef *s)
 
 	// buffer
 	DrawBuffer(c, r, *s->buf, view_pos - (double)s->pos, col);
+	DrawMidi(c, r, *s->midi, s->pos);
 
 	int asx = clampi(sample2screen(s->pos), r.x1, r.x2);
 	if (s->is_selected)//((is_cur) || (a->sub_mouse_over == s))
@@ -887,13 +889,13 @@ float AudioView::pitch2y(int p)
 	return cur_track->area.y2 - cur_track->area.height() * ((float)p - pitch_min) / (pitch_max - pitch_min);
 }
 
-void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col)
+void AudioView::DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift)
 {
 	c->setLineWidth(3.0f);
 	foreach(MidiNote &n, midi){
 		c->setColor(GetPitchColor(n.pitch));
-		float x1 = sample2screen(n.range.offset);
-		float x2 = sample2screen(n.range.end());
+		float x1 = sample2screen(n.range.offset + shift);
+		float x2 = sample2screen(n.range.end() + shift);
 		float h = r.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * r.height();
 		//c->drawRect(rect(x1, x2, r.y1, r.y2));
 		c->drawLine(x1, h, x2, h);
@@ -962,7 +964,7 @@ void AudioView::DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int
 	if ((cur_track == t) && (EditingMidi()))
 		DrawMidiEditable(c, r, t->midi, t, col);
 	else
-		DrawMidi(c, r, t->midi, col);
+		DrawMidi(c, r, t->midi, 0);
 
 	DrawTrackBuffers(c, r, t, view_pos, col);
 

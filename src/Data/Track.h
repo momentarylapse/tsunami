@@ -36,6 +36,7 @@ public:
 	Array<BufferBox> buffer;
 };
 
+string track_type(int type);
 
 class Track : public Observable
 {

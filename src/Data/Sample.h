@@ -24,6 +24,7 @@ public:
 	~Sample();
 
 	int get_index();
+	Range GetRange();
 
 	AudioFile *owner;
 

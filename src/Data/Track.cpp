@@ -35,6 +35,16 @@
 #include "../Action/Track/Bar/ActionTrackDeleteBar.h"
 
 
+string track_type(int type)
+{
+	if (type == Track::TYPE_AUDIO)
+		return _("Audio");
+	if (type == Track::TYPE_MIDI)
+		return _("Midi");
+	if (type == Track::TYPE_TIME)
+		return _("Metronom");
+	return "???";
+}
 
 const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";

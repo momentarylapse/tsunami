@@ -40,6 +40,13 @@ int Sample::get_index()
 	return -1;
 }
 
+Range Sample::GetRange()
+{
+	if (type == Track::TYPE_MIDI)
+		return Range(0, midi.GetRange().num);
+	return Range(0, buf.num);
+}
+
 void Sample::ref()
 {
 	ref_count ++;
@@ -111,5 +118,5 @@ Track *SampleRef::GetParent()
 
 Range SampleRef::GetRange()
 {
-	return Range(pos, buf->num);
+	return origin->GetRange() + pos;
 }

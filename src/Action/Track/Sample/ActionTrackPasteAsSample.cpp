@@ -17,6 +17,13 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, BufferBox 
 	AddSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
 }
 
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, MidiData *midi) :
+	ActionGroup()
+{
+	AddSubAction(new ActionAudioAddSample("-paste-", *midi), t->root);
+	AddSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
+}
+
 ActionTrackPasteAsSample::~ActionTrackPasteAsSample()
 {
 }

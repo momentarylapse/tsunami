@@ -132,6 +132,11 @@ Range Range::operator&&(const Range &r) const
 	return intersect(r);
 }
 
+Range Range::operator+ (int shift) const
+{
+	return Range(offset + shift, num);
+}
+
 
 
 

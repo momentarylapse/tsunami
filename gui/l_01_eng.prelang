@@ -315,9 +315,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_808075
+rand_id_527624
 
-rand_id_812737
+rand_id_733095
 
 rdt_source
 !bold\\Source
@@ -418,7 +418,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-144
+145
 // Data (ID,Text)
 
 
@@ -445,6 +445,8 @@ zoom_out
 !bold,center\\Ausgabe
 
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
+
+%d Spuren zum Einfügen markiert (ohne Metronom gezählt), aber %d Spuren in der Zwischenablage
 
 %d mal
 
@@ -622,6 +624,8 @@ Spur %d
 
 Spur-Eigenschaften
 
+Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingefügt werden soll (%s)
+
 Synthesizer
 
 Unbenannt
@@ -660,8 +664,6 @@ fügt am Cursor der aktuellen Spur ein
 
 i'm now going to clean up...
 
-keine Datei
-no file
 keine Sample gewählt
 
 lade

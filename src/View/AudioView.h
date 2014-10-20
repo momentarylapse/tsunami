@@ -61,7 +61,7 @@ public:
 	void DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
 	void DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
 	void DrawSample(HuiPainter *c, const rect &r, SampleRef *s);
-	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, color col);
+	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift);
 	void DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, Track *t, color col);
 	void DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no);
 	void DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);

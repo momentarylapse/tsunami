@@ -63,7 +63,7 @@ void SampleManager::FillList()
 	icon_names.clear();
 	foreachi(Sample *s, audio->sample, i){
 		icon_names.add(render_bufbox(s->buf, 80, 32));
-		SetString("sample_list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
+		SetString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->GetRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
 	if (audio->sample.num > 0){
 		selected = min(selected, audio->sample.num - 1);
@@ -81,7 +81,7 @@ void SampleManager::OnListSelect()
 void SampleManager::OnListEdit()
 {
 	selected = GetInt("");
-	audio->EditSampleName(selected, GetCell("sample_list", selected, 1));
+	audio->EditSampleName(selected, GetCell("sample_list", selected, 2));
 }
 
 void SampleManager::OnImportFromFile()

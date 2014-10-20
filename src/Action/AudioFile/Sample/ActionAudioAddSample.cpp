@@ -17,6 +17,13 @@ ActionAudioAddSample::ActionAudioAddSample(const string &name, BufferBox &buf)
 	sample->name = name;
 }
 
+ActionAudioAddSample::ActionAudioAddSample(const string &name, MidiData &midi)
+{
+	sample = new Sample(Track::TYPE_MIDI);
+	sample->midi = midi;
+	sample->name = name;
+}
+
 ActionAudioAddSample::~ActionAudioAddSample()
 {
 	if (!sample->owner)

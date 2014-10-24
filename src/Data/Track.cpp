@@ -65,8 +65,6 @@ Track::Track() :
 	muted = false;
 
 	synth = CreateSynthesizer("Dummy");
-
-	area = rect(0, 0, 0, 0);
 }
 
 
@@ -77,7 +75,6 @@ void Track::Reset()
 	msg_db_f("Track.Reset",1);
 	level.clear();
 	name.clear();
-	area = rect(0, 0, 0, 0);
 	volume = 1;
 	muted = false;
 	panning = 0;

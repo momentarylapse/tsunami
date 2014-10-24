@@ -115,8 +115,6 @@ public:
 	MidiData midi;
 	Synthesizer *synth;
 
-// editing
-	rect area;
 	AudioFile *root;
 
 	bool is_selected;

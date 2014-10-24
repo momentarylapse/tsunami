@@ -268,7 +268,6 @@ void PluginManager::LinkAppScriptData()
 //	Script::DeclareClassOffset("Track", "sub", _offsetof(Track, sub));
 	Script::DeclareClassOffset("Track", "midi", _offsetof(Track, midi));
 	Script::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
-	Script::DeclareClassOffset("Track", "area", _offsetof(Track, area));
 //	Script::DeclareClassOffset("Track", "parent", _offsetof(Track, parent));
 	Script::DeclareClassOffset("Track", "root", _offsetof(Track, root));
 	Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));

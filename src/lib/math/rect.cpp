@@ -30,5 +30,15 @@ float rect::area() const
 
 bool rect::inside(float x, float y) const
 {
-	return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2);
+	return (x >= x1) and (x <= x2) and (y >= y1) and (y <= y2);
+}
+
+bool rect::operator ==(const rect &r) const
+{
+	return (x1 == r.x1) and (y1 == r.y1) and (x2 == r.x2) and (y2 == r.y2);
+}
+
+bool rect::operator !=(const rect &r) const
+{
+	return !(*this == r);
 }

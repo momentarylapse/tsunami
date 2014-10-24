@@ -187,7 +187,8 @@ public:
 	int chord_type;
 	int chord_inversion;
 
-	enum{
+	enum
+	{
 		MIDI_MODE_SELECT,
 		MIDI_MODE_NOTE,
 		MIDI_MODE_CHORD
@@ -210,6 +211,24 @@ public:
 
 	double view_pos;
 	double view_zoom;
+
+	struct TrackHeightManager
+	{
+		Array<rect> last;
+		Array<rect> target;
+		Array<rect> area;
+		Array<Track*> track;
+		float t;
+		bool dirty;
+		bool animating;
+		rect render_area;
+		HuiTimer timer;
+
+		bool check(AudioFile *a);
+		void update(AudioView *v, AudioFile *a, const rect &r);
+		void plan(AudioView *v, AudioFile *a, const rect &r);
+	};
+	TrackHeightManager thm;
 
 	int prefered_buffer_level;
 	double buffer_zoom_factor;

@@ -175,7 +175,6 @@ class Track
 	Synthesizer *synth
 
 	// editing
-	rect area
 	int parent
 	AudioFile *root
 

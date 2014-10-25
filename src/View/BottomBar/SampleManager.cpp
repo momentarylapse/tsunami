@@ -9,6 +9,7 @@
 #include "../../Data/AudioFile.h"
 #include "../../Storage/Storage.h"
 #include "../../View/AudioView.h"
+#include "../../View/AudioViewTrack.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include <math.h>
@@ -67,7 +68,7 @@ void render_midi(Image &im, MidiData &m)
 		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n.range.offset / (float)r.num, 0, 1);
 		float x1 = w * clampf((float)n.range.end() / (float)r.num, 0, 1);
-		color c = tsunami->win->view->GetPitchColor(n.pitch);
+		color c = AudioViewTrack::GetPitchColor(n.pitch);
 		for (int x=x0; x<=x1; x++)
 			im.setPixel(x, y, c);
 	}

@@ -17,6 +17,7 @@ class AudioOutput;
 class AudioInput;
 class AudioRenderer;
 class TsunamiWindow;
+class AudioViewTrack;
 
 class AudioView : public Observer, public Observable
 {
@@ -55,15 +56,6 @@ public:
 	void ZoomOut();
 	void MakeSampleVisible(int sample);
 
-	color GetPitchColor(int pitch);
-
-	void DrawTrackBuffers(HuiPainter *c, const rect &r, Track *t, double pos, const color &col);
-	void DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
-	void DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
-	void DrawSample(HuiPainter *c, const rect &r, SampleRef *s);
-	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift);
-	void DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, Track *t, color col);
-	void DrawTrack(HuiPainter *c, const rect &r, Track *t, color col, int track_no);
 	void DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
 	void DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time = false);
@@ -89,8 +81,11 @@ public:
 	color ColorSub;
 	color ColorSubMO;
 	color ColorSubNotCur;
-	const int SUB_FRAME_HEIGHT;
-	const int TIME_SCALE_HEIGHT;
+	static const int SUB_FRAME_HEIGHT;
+	static const int TIME_SCALE_HEIGHT;
+	static const float LINE_WIDTH;
+	static const int FONT_SIZE;
+	static const int MAX_TRACK_CHANNEL_HEIGHT;
 
 	enum
 	{
@@ -111,6 +106,7 @@ public:
 	struct SelectionType
 	{
 		int type;
+		AudioViewTrack *vtrack;
 		Track *track;
 		SampleRef *sample;
 		int pos;
@@ -143,7 +139,7 @@ public:
 	Range GetPlaybackSelection();
 
 	void SetMouse();
-	bool MouseOverTrack(Track *t);
+	bool MouseOverTrack(AudioViewTrack *t);
 	int MouseOverSample(SampleRef *s);
 	void SelectionUpdatePos(SelectionType &s);
 	SelectionType GetMouseOver();
@@ -214,10 +210,6 @@ public:
 
 	struct TrackHeightManager
 	{
-		Array<rect> last;
-		Array<rect> target;
-		Array<rect> area;
-		Array<Track*> track;
 		float t;
 		bool dirty;
 		bool animating;
@@ -229,6 +221,9 @@ public:
 		void plan(AudioView *v, AudioFile *a, const rect &r);
 	};
 	TrackHeightManager thm;
+
+	Array<AudioViewTrack*> vtrack;
+	void UpdateTracks();
 
 	int prefered_buffer_level;
 	double buffer_zoom_factor;

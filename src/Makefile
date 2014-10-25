@@ -228,6 +228,7 @@ OBJ = \
  View/SideBar/SubDialog.o\
  View/SideBar/TrackDialog.o\
  View/AudioView.o\
+ View/AudioViewTrack.o\
  TsunamiWindow.o\
  Tsunami.o
 CPP = g++
@@ -911,6 +912,9 @@ View/SideBar/TrackDialog.o : View/SideBar/TrackDialog.cpp
 
 View/AudioView.o : View/AudioView.cpp
 	$(CPP) -c View/AudioView.cpp -o $@ $(CXXFLAGS)
+
+View/AudioViewTrack.o : View/AudioViewTrack.cpp
+	$(CPP) -c View/AudioViewTrack.cpp -o $@ $(CXXFLAGS)
 
 main.o : main.cpp
 	$(CPP) -c main.cpp -o $@ $(CXXFLAGS)

@@ -215,6 +215,7 @@ public:
 		bool animating;
 		rect render_area;
 		HuiTimer timer;
+		Track *midi_track;
 
 		bool check(AudioFile *a);
 		void update(AudioView *v, AudioFile *a, const rect &r);

@@ -74,6 +74,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	thm.t = 0;
 	thm.render_area = rect(0, 0, 0, 0);
 	thm.animating = false;
+	thm.midi_track = NULL;
 
 	ColorBackground = White;
 	ColorBackgroundCurWave = color(1, 0.93f, 0.93f, 1);
@@ -903,40 +904,90 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 
 void AudioView::UpdateTracks()
 {
-	msg_write("update tracks");
-	foreach(AudioViewTrack *t, vtrack)
-		delete(t);
-	vtrack.clear();
-	foreach(Track *t, audio->track)
-		vtrack.add(new AudioViewTrack(this, t));
+	Array<AudioViewTrack*> vtrack2;
+	vtrack2.resize(audio->track.num);
+	foreachi(Track *t, audio->track, ti){
+		bool found = false;
+		foreachi(AudioViewTrack *v, vtrack, vi)
+			if (v){
+				if (v->track == t){
+					vtrack2[ti] = v;
+					vtrack[vi] = NULL;
+					found = true;
+					break;
+				}
+			}
+		if (!found)
+			vtrack2[ti] = new AudioViewTrack(this, t);
+	}
+	foreach(AudioViewTrack *v, vtrack)
+		if (v)
+			delete(v);
+	vtrack = vtrack2;
+	thm.dirty = true;
+	foreachi(AudioViewTrack *v, vtrack, i){
+		if (i > 0){
+			if (v->area.y1 < vtrack[i-1]->area.y2){
+				v->area.y1 = vtrack[i-1]->area.y2;
+				v->area.y2 = vtrack[i-1]->area.y2;
+			}
+		}
+	}
 }
 
 bool AudioView::TrackHeightManager::check(AudioFile *a)
 {
-	dirty = false;
-	/*if (track.num != a->track.num)
-		return true;
-	foreachi(Track *t, a->track, i)
-		if (track[i] != t){
-			dirty = true;
-		}
-	if (!dirty)
-		return false;*/
 	return true;
+}
+
+rect rect_inter(const rect &a, const rect &b, float t)
+{
+	return rect((1-t) * a.x1 + t * b.x1,
+			(1-t) * a.x2 + t * b.x2,
+			(1-t) * a.y1 + t * b.y1,
+			(1-t) * a.y2 + t * b.y2);
 }
 
 void AudioView::TrackHeightManager::update(AudioView *v, AudioFile *a, const rect &r)
 {
-	if (check(a)){
+	Track *new_midi_track = (v->EditingMidi() ? v->cur_track : NULL);
+	if ((dirty) or (render_area != r) or (midi_track != new_midi_track)){
 		plan(v, a, r);
+		t = 0;
+		animating = true;
+		dirty = false;
+
+		foreach(AudioViewTrack *v, v->vtrack)
+			v->area_last = v->area;
+	}
+	midi_track = new_midi_track;
+	foreach(AudioViewTrack *v, v->vtrack){
+		v->area.x1 = v->area_target.x1 = v->area_last.x1 = r.x1;
+		v->area.x2 = v->area_target.x2 = v->area_last.x2 = r.x2;
 	}
 
-	/*if (render_area != r){
+
+	if (render_area != r){
 		render_area = r;
-		area = target;
+		foreach(AudioViewTrack *v, v->vtrack)
+			v->area = v->area_target;
 		animating = false;
 		t = 0;
-	}*/
+	}
+
+	if (!animating)
+		return;
+
+	t += 0.07f;
+	if (t >= 1){
+		t = 1;
+		animating = false;
+	}
+	foreach(AudioViewTrack *v, v->vtrack)
+		v->area = rect_inter(v->area_last, v->area_target, (t < 0.5f) ? 2*t*t : -2*t*t+4*t-1);
+
+	if (animating)
+		HuiRunLaterM(0.03f, v, &AudioView::ForceRedraw);
 }
 
 void AudioView::TrackHeightManager::plan(AudioView *v, AudioFile *a, const rect &r)
@@ -947,7 +998,7 @@ void AudioView::TrackHeightManager::plan(AudioView *v, AudioFile *a, const rect 
 			float h = v->TIME_SCALE_HEIGHT;
 			if (t->track == v->cur_track)
 				h = r.height() - a->track.num * v->TIME_SCALE_HEIGHT;
-			t->area = rect(r.x1, r.x2, y0, y0 + h);
+			t->area_target = rect(r.x1, r.x2, y0, y0 + h);
 			y0 += h;
 		}
 		return;
@@ -980,7 +1031,7 @@ void AudioView::TrackHeightManager::plan(AudioView *v, AudioFile *a, const rect 
 			h = opt_channel_height * n_ch;
 		else if (t->track->type == Track::TYPE_MIDI)
 			h = opt_channel_height;
-		t->area = rect(r.x1, r.x2, y0, y0 + h);
+		t->area_target = rect(r.x1, r.x2, y0, y0 + h);
 		y0 += h;
 	}
 }
@@ -1070,7 +1121,7 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 {
 	audio->area = r;
 
-	thm.plan(this, audio, r);
+	thm.update(this, audio, r);
 	UpdateBufferZoom();
 
 	// background

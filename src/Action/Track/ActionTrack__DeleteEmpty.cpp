@@ -33,8 +33,8 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 
 	// delete
 	track->Notify(track->MESSAGE_DELETE);
-	a->Notify(a->MESSAGE_DELETE_TRACK);
 	a->track.erase(index);
+	a->Notify(a->MESSAGE_DELETE_TRACK);
 	return NULL;
 }
 

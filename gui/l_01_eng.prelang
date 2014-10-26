@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-207
+208
 // Data (ID,Text)
 about
 
@@ -146,6 +146,8 @@ ld_t_repdelay
 ld_t_repetition
 
 ld_t_repnum
+
+ld_t_scale
 
 ld_t_space
 
@@ -315,9 +317,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_187370
+rand_id_307753
 
-rand_id_790038
+rand_id_943448
 
 rdt_source
 !bold\\Source
@@ -418,7 +420,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-146
+149
 // Data (ID,Text)
 
 
@@ -650,6 +652,10 @@ alles mögliche (
 
 alte Aufnahmedaten gefunden: 
 
+aus Auswahl erzeugen
+
+aus Datei importieren
+
 benutze OpenAl Device: 
 
 exportiere
@@ -683,6 +689,8 @@ lade ogg
 lade raw
 
 lade wave
+
+löschen
 
 message.txt öffnen
 

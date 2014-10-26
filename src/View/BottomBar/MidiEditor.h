@@ -25,6 +25,7 @@ public:
 	void update();
 
 	void OnPitch();
+	void OnScale();
 	void OnBeatPartition();
 	void OnMidiModeSelect();
 	void OnMidiModeNote();

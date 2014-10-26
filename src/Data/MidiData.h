@@ -51,4 +51,14 @@ Array<string> GetChordTypeNames();
 Array<int> GetChordNotes(int type, int inversion, int pitch);
 
 
+enum
+{
+	CHORD_TYPE_MINOR,
+	CHORD_TYPE_MAJOR,
+	CHORD_TYPE_DIMINISHED,
+	CHORD_TYPE_AUGMENTED,
+	NUM_CHORD_TYPES
+};
+
+
 #endif /* MIDIDATA_H_ */

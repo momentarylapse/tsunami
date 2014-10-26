@@ -158,7 +158,6 @@ void AudioFile::Reset()
 
 	filename = "";
 	tag.clear();
-	area = rect(0, 0, 0, 0);
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	foreach(Effect *f, fx)

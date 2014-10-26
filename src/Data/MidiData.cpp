@@ -55,15 +55,6 @@ void MidiData::sort()
 
 
 
-enum
-{
-	CHORD_TYPE_MINOR,
-	CHORD_TYPE_MAJOR,
-	CHORD_TYPE_DIMINISHED,
-	CHORD_TYPE_AUGMENTED,
-	NUM_CHORD_TYPES
-};
-
 string GetChordTypeName(int type)
 {
 	if (type == CHORD_TYPE_MINOR)

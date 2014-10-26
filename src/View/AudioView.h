@@ -180,8 +180,10 @@ public:
 	int pitch_min, pitch_max;
 	int beat_partition;
 	int midi_mode;
+	int midi_scale;
 	int chord_type;
 	int chord_inversion;
+	bool is_sharp(int pitch);
 
 	enum
 	{
@@ -208,6 +210,7 @@ public:
 	double view_pos;
 	double view_zoom;
 
+	rect area;
 	struct TrackHeightManager
 	{
 		float t;

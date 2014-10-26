@@ -473,7 +473,7 @@ void TsunamiWindow::UpdateMenu()
 	Enable("redo", audio->action_manager->Redoable());
 	Enable("copy", tsunami->clipboard->CanCopy(view));
 	Enable("paste", tsunami->clipboard->HasData());
-	Enable("delete", selected || (audio->GetNumSelectedSamples() > 0));
+	Enable("delete", selected or (audio->GetNumSelectedSamples() > 0));
 	// file
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);

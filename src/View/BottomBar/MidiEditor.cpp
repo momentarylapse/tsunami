@@ -7,6 +7,8 @@
 
 #include "MidiEditor.h"
 #include "../../Data/Track.h"
+#include "../../Data/MidiData.h"
+#include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/MidiEffect.h"
@@ -135,12 +137,17 @@ MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
 
 	SetTooltip("add", _("neuen Effekt hinzuf&ugen"));
 
+	for (int i=0; i<12; i++)
+		AddString("scale", rel_pitch_name(i) + " " + GetChordTypeName(CHORD_TYPE_MAJOR) + " / " + rel_pitch_name(pitch_to_rel(i + 9)) + " " + GetChordTypeName(CHORD_TYPE_MINOR));
+	SetInt("scale", view->midi_scale);
+
 	track = NULL;
 	//Enable("add", false);
 	Enable("track_name", false);
 
 	EventM("pitch_offset", this, &MidiEditor::OnPitch);
 	EventM("beat_partition", this, &MidiEditor::OnBeatPartition);
+	EventM("scale", this, &MidiEditor::OnScale);
 	EventM("midi_mode:select", this, &MidiEditor::OnMidiModeSelect);
 	EventM("midi_mode:note", this, &MidiEditor::OnMidiModeNote);
 	EventM("midi_mode:chord", this, &MidiEditor::OnMidiModeChord);
@@ -186,6 +193,12 @@ void MidiEditor::OnPitch()
 {
 	view->pitch_min = GetInt("");
 	view->pitch_max = GetInt("") + 30;
+	view->ForceRedraw();
+}
+
+void MidiEditor::OnScale()
+{
+	view->midi_scale = GetInt("");
 	view->ForceRedraw();
 }
 

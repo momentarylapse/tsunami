@@ -219,8 +219,6 @@ class AudioFile
 	AudioEffect fx[]
 	Track *track[]
 	Sample *sample[]
-
-	rect area
 	
 	string level_name[]
 	

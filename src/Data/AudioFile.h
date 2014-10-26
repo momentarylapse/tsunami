@@ -109,10 +109,6 @@ public:
 	Array<Sample*> sample;
 	Array<Curve*> curve;
 
-// editing
-	// needed for rendering
-	rect area;
-
 	Array<string> level_name;
 };
 

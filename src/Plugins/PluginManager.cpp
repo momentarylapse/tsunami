@@ -302,7 +302,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "fx", _offsetof(AudioFile, fx));
 	Script::DeclareClassOffset("AudioFile", "track", _offsetof(AudioFile, track));
 	Script::DeclareClassOffset("AudioFile", "sample", _offsetof(AudioFile, sample));
-	Script::DeclareClassOffset("AudioFile", "area", _offsetof(AudioFile, area));
 	Script::DeclareClassOffset("AudioFile", "level_name", _offsetof(AudioFile, level_name));
 	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::NewEmpty));
 	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::AddTrack));

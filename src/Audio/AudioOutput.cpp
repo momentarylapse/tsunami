@@ -343,7 +343,12 @@ void AudioOutput::PlayGenerated(void *func, int _sample_rate)
 
 bool AudioOutput::IsPlaying()
 {
-	return playing;
+	if (!playing)
+		return false;
+	int param = 0;
+	alGetSourcei(source, AL_SOURCE_STATE, &param);
+	TestError("alGetSourcei1 (getpos)");
+	return ((param == AL_PLAYING) or (param == AL_PAUSED));
 }
 
 int AudioOutput::GetState()
@@ -361,17 +366,26 @@ int AudioOutput::GetState()
 
 int AudioOutput::GetPos()
 {
+	int pos;
+	if (GetPosSafe(pos))
+		return pos;
+	return 0;
+}
+
+bool AudioOutput::GetPosSafe(int &pos)
+{
 	if (playing){
 		int param = 0;
 		alGetSourcei(source, AL_SOURCE_STATE, &param);
 		TestError("alGetSourcei1 (getpos)");
-		if ((param == AL_PLAYING) || (param == AL_PAUSED)){
+		if ((param == AL_PLAYING) or (param == AL_PAUSED)){
 			alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
 			TestError("alGetSourcei2 (getpos)");
-			return box[cur_buffer_no].offset + param;
+			pos = box[cur_buffer_no].offset + param;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 float AudioOutput::GetVolume()
@@ -447,7 +461,7 @@ void AudioOutput::Update()
 		int param=0;
 		alGetSourcei(source,AL_SOURCE_STATE, &param);
 		TestError("alGetSourcei(state) (idle)");
-		if ((param != AL_PLAYING) && (param != AL_PAUSED)){
+		if ((param != AL_PLAYING) and (param != AL_PAUSED)){
 			//msg_write("hat gestoppt...");
 				Stop();
 		}else{

@@ -44,6 +44,7 @@ public:
 	int GetState();
 	AudioRenderer *GetSource(){	return renderer;	}
 	int GetPos();
+	bool GetPosSafe(int &pos);
 	void FlushBuffers();
 
 	float GetSampleRate();

@@ -21,6 +21,7 @@ ActionAudioAddSample::ActionAudioAddSample(const string &name, MidiData &midi)
 {
 	sample = new Sample(Track::TYPE_MIDI);
 	sample->midi = midi;
+	sample->midi.sort();
 	sample->name = name;
 }
 

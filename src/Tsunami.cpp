@@ -120,7 +120,7 @@ void Tsunami::CreateWindow()
 	_view = win->view;
 	plugin_manager->AddPluginsToMenu(win);
 
-	win->Show();
+	win->show();
 	//HuiRunLaterM(0.01f, win, &TsunamiWindow::OnViewOptimal);
 }
 

@@ -52,7 +52,7 @@ HuiMenu::HuiMenu()
 
 HuiMenu::~HuiMenu()
 {
-	Clear();
+	clear();
 }
 
 void HuiMenu::gtk_realize()
@@ -61,7 +61,7 @@ void HuiMenu::gtk_realize()
 }
 
 // window coordinate system!
-void HuiMenu::OpenPopup(HuiPanel *panel, int x, int y)
+void HuiMenu::openPopup(HuiPanel *panel, int x, int y)
 {
 	msg_db_f("CHuiMenu::OpenPopup", 1);
 	gtk_widget_show(widget);

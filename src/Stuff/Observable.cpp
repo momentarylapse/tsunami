@@ -92,7 +92,7 @@ void Observable::notifySend()
 
 	// send
 	foreach(Notification &n, notifications){
-		msg_write("send " + getName() + "/" + *n.message + "  >>  " + n.observer->getName());
+		//msg_write("send " + getName() + "/" + *n.message + "  >>  " + n.observer->getName());
 		n.observer->onUpdate(this, *n.message);
 	}
 }

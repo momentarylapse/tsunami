@@ -17,19 +17,19 @@ public:
 		HuiDialog(_("target"), 300, 400, parent->win, false),
 		targets(t)
 	{
-		AddControlTable("", 0, 0, 1, 2, "grid");
-		SetTarget("grid", 0);
-		AddListView("!multiselection,nobar\\name", 0, 0, 0, 0, "list");
-		AddControlTable("!buttonbar", 0, 1, 2, 1, "buttonbar");
-		SetTarget("buttonbar", 0);
-		AddButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
-		AddButton(_("Ok"), 1, 0, 0, 0, "ok");
+		addControlTable("", 0, 0, 1, 2, "grid");
+		setTarget("grid", 0);
+		addListView("!multiselection,nobar\\name", 0, 0, 0, 0, "list");
+		addControlTable("!buttonbar", 0, 1, 2, 1, "buttonbar");
+		setTarget("buttonbar", 0);
+		addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
+		addButton(_("Ok"), 1, 0, 0, 0, "ok");
 		all_targets = Curve::Target::enumerate(a);
 
 		Array<int> sel;
 
 		foreachi(Curve::Target &t, all_targets, i){
-			AddString("list", t.niceStr(a));
+			addString("list", t.niceStr(a));
 
 			foreach(Curve::Target &tt, targets)
 				if (t.p == tt.p){
@@ -37,11 +37,11 @@ public:
 					break;
 				}
 		}
-		SetMultiSelection("list", sel);
+		setMultiSelection("list", sel);
 
-		EventM("hui:close", this, &CurveTargetDialog::onClose);
-		EventM("cancel", this, &CurveTargetDialog::onClose);
-		EventM("ok", this, &CurveTargetDialog::onOk);
+		event("hui:close", this, &CurveTargetDialog::onClose);
+		event("cancel", this, &CurveTargetDialog::onClose);
+		event("ok", this, &CurveTargetDialog::onOk);
 	}
 
 	Array<Curve::Target> all_targets;
@@ -49,7 +49,7 @@ public:
 
 	void onOk()
 	{
-		Array<int> sel = GetMultiSelection("list");
+		Array<int> sel = getMultiSelection("list");
 		targets.clear();
 		foreach(int i, sel)
 			targets.add(all_targets[i]);
@@ -69,28 +69,28 @@ CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
 	view = _view;
 	audio = _audio;
 
-	AddControlTable("", 0, 0, 2, 1, "root");
-	SetTarget("root", 0);
-	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
-	AddControlTable("", 1, 0, 1, 2, "controller");
-	SetTarget("controller", 0);
-	AddListView("!noexpandx,format=TTTt,width=300\\name\\min\\max\\target", 0, 0, 0, 0, "list");
-	AddControlTable("", 0, 1, 4, 1, "controller_buttons");
-	SetTarget("controller_buttons", 0);
-	AddButton("add", 0, 0, 0, 0, "add");
-	AddButton("delete", 1, 0, 0, 0, "delete");
-	AddButton("target", 2, 0, 0, 0, "target");
+	addControlTable("", 0, 0, 2, 1, "root");
+	setTarget("root", 0);
+	addDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
+	addControlTable("", 1, 0, 1, 2, "controller");
+	setTarget("controller", 0);
+	addListView("!noexpandx,format=TTTt,width=300\\name\\min\\max\\target", 0, 0, 0, 0, "list");
+	addControlTable("", 0, 1, 4, 1, "controller_buttons");
+	setTarget("controller_buttons", 0);
+	addButton("add", 0, 0, 0, 0, "add");
+	addButton("delete", 1, 0, 0, 0, "delete");
+	addButton("target", 2, 0, 0, 0, "target");
 
-	EventM("add", this, &CurveConsole::onAdd);
-	EventM("delete", this, &CurveConsole::onDelete);
-	EventM("target", this, &CurveConsole::onTarget);
-	EventMX("list", "hui:select", this, &CurveConsole::onListSelect);
-	EventMX("list", "hui:change", this, &CurveConsole::onListEdit);
-	EventMX("area", "hui:key-down", this, &CurveConsole::onKeyDown);
-	EventMX("area", "hui:left-button-down", this, &CurveConsole::onLeftButtonDown);
-	EventMX("area", "hui:left-button-up", this, &CurveConsole::onLeftButtonUp);
-	EventMX("area", "hui:mouse-move", this, &CurveConsole::onMouseMove);
-	EventMX("area", "hui:draw", this, &CurveConsole::onDraw);
+	event("add", this, &CurveConsole::onAdd);
+	event("delete", this, &CurveConsole::onDelete);
+	event("target", this, &CurveConsole::onTarget);
+	eventX("list", "hui:select", this, &CurveConsole::onListSelect);
+	eventX("list", "hui:change", this, &CurveConsole::onListEdit);
+	eventX("area", "hui:key-down", this, &CurveConsole::onKeyDown);
+	eventX("area", "hui:left-button-down", this, &CurveConsole::onLeftButtonDown);
+	eventX("area", "hui:left-button-up", this, &CurveConsole::onLeftButtonUp);
+	eventX("area", "hui:mouse-move", this, &CurveConsole::onMouseMove);
+	eventX("area", "hui:draw", this, &CurveConsole::onDraw);
 
 	curve = NULL;
 	curve_rect = rect(0, 0, 0, 0);
@@ -113,17 +113,17 @@ void CurveConsole::onUpdate(Observable* o, const string &message)
 	if (o == audio){
 		updateList();
 	}else if (o == view){
-		Redraw("area");
+		redraw("area");
 	}
 }
 
 void CurveConsole::updateList()
 {
-	Reset("list");
+	reset("list");
 	foreachi(Curve *c, audio->curve, i){
-		AddString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(audio));
+		addString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(audio));
 		if (c == curve)
-			SetInt("list", i);
+			setInt("list", i);
 	}
 }
 
@@ -137,7 +137,7 @@ void CurveConsole::onAdd()
 
 void CurveConsole::onDelete()
 {
-	int n = GetInt("list");
+	int n = getInt("list");
 	if (n >= 0){
 		delete(audio->curve[n]);
 		audio->curve.erase(n);
@@ -151,17 +151,17 @@ void CurveConsole::onTarget()
 	if (!curve)
 		return;
 	CurveTargetDialog *dlg = new CurveTargetDialog(this, audio, curve->target);
-	dlg->Run();
+	dlg->run();
 	updateList();
 }
 
 void CurveConsole::onListSelect()
 {
 	curve = NULL;
-	int n = GetInt("list");
+	int n = getInt("list");
 	if (n >= 0)
 		curve = audio->curve[n];
-	Redraw("area");
+	redraw("area");
 }
 
 void CurveConsole::onListEdit()
@@ -170,13 +170,13 @@ void CurveConsole::onListEdit()
 	int col = HuiGetEvent()->column;
 	if (n >= 0){
 		if (col == 0)
-			audio->curve[n]->name = GetCell("list", n, col);
+			audio->curve[n]->name = getCell("list", n, col);
 		else if (col == 1)
-			audio->curve[n]->min = GetCell("list", n, col)._float();
+			audio->curve[n]->min = getCell("list", n, col)._float();
 		else if (col == 2)
-			audio->curve[n]->max = GetCell("list", n, col)._float();
+			audio->curve[n]->max = getCell("list", n, col)._float();
 	}
-	Redraw("area");
+	redraw("area");
 }
 
 void CurveConsole::onKeyDown()
@@ -185,7 +185,7 @@ void CurveConsole::onKeyDown()
 		if (HuiGetEvent()->key_code == KEY_DELETE){
 			curve->points.erase(selected);
 			selected = hover = -1;
-			Redraw("area");
+			redraw("area");
 		}
 }
 
@@ -196,7 +196,7 @@ void CurveConsole::onLeftButtonDown()
 
 	if ((curve) && (selected < 0)){
 		curve->add(screen2sample(HuiGetEvent()->mx), screen2value(HuiGetEvent()->my));
-		Redraw("area");
+		redraw("area");
 	}
 }
 
@@ -232,12 +232,12 @@ void CurveConsole::onMouseMove()
 	}else{
 		hover = getHover();
 	}
-	Redraw("area");
+	redraw("area");
 }
 
 void CurveConsole::onDraw()
 {
-	HuiPainter *c = BeginDraw("area");
+	HuiPainter *c = beginDraw("area");
 	float w = c->width;
 	float h = c->height;
 	float y0 = 10;

@@ -17,46 +17,46 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, HuiWindow *parent) :
 	data->sample_rate = DEFAULT_SAMPLE_RATE;
 	data->offset = 0;
 
-	AddControlTable("", 0, 0, 1, 2, "table1");
-	SetTarget("table1", 0);
-	AddControlTable("", 0, 0, 2, 4, "table2");
-	AddControlTable("", 0, 1, 2, 1, "table3");
-	SetTarget("table2", 0);
-	AddText(_("Format"), 0, 0, 0, 0, "");
-	AddComboBox("", 1, 0, 0, 0, "format");
-	AddText(_("Kan&ale"), 0, 1, 0, 0, "");
-	AddComboBox("Mono\\Stereo", 1, 1, 0, 0, "channels");
-	AddText(_("Samplerate"), 0, 2, 0, 0, "");
-	AddSpinButton("44100\\1", 1, 2, 0, 0, "sample_rate");
-	AddText(_("Offset"), 0, 3, 0, 0, "");
-	AddSpinButton("0\\0", 1, 3, 0, 0, "offset");
-	SetTarget("table3", 0);
-	AddButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
-	AddButton(_("Ok"), 1, 0, 0, 0, "ok");
+	addControlTable("", 0, 0, 1, 2, "table1");
+	setTarget("table1", 0);
+	addControlTable("", 0, 0, 2, 4, "table2");
+	addControlTable("", 0, 1, 2, 1, "table3");
+	setTarget("table2", 0);
+	addText(_("Format"), 0, 0, 0, 0, "");
+	addComboBox("", 1, 0, 0, 0, "format");
+	addText(_("Kan&ale"), 0, 1, 0, 0, "");
+	addComboBox("Mono\\Stereo", 1, 1, 0, 0, "channels");
+	addText(_("Samplerate"), 0, 2, 0, 0, "");
+	addSpinButton("44100\\1", 1, 2, 0, 0, "sample_rate");
+	addText(_("Offset"), 0, 3, 0, 0, "");
+	addSpinButton("0\\0", 1, 3, 0, 0, "offset");
+	setTarget("table3", 0);
+	addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
+	addButton(_("Ok"), 1, 0, 0, 0, "ok");
 
 	for (int i=1;i<NUM_SAMPLE_FORMATS;i++)
-		AddString("format", format_name((SampleFormat)i));
-	SetInt("format", 0);
+		addString("format", format_name((SampleFormat)i));
+	setInt("format", 0);
 
-	EventM("hui:close", this, &RawConfigDialog::OnClose);
-	EventM("close", this, &RawConfigDialog::OnClose);
-	EventM("ok", this, &RawConfigDialog::OnOk);
+	event("hui:close", this, &RawConfigDialog::onClose);
+	event("close", this, &RawConfigDialog::onClose);
+	event("ok", this, &RawConfigDialog::onOk);
 }
 
 RawConfigDialog::~RawConfigDialog()
 {
 }
 
-void RawConfigDialog::OnClose()
+void RawConfigDialog::onClose()
 {
 	delete(this);
 }
 
-void RawConfigDialog::OnOk()
+void RawConfigDialog::onOk()
 {
-	data->format = (SampleFormat)(GetInt("format") + 1);
-	data->channels = GetInt("channels") + 1;
-	data->sample_rate = GetInt("sample_rate");
-	data->offset = GetInt("offset");
+	data->format = (SampleFormat)(getInt("format") + 1);
+	data->channels = getInt("channels") + 1;
+	data->sample_rate = getInt("sample_rate");
+	data->offset = getInt("offset");
 	delete(this);
 }

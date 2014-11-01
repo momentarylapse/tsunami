@@ -20,22 +20,22 @@ AudioFileDialog::AudioFileDialog(AudioFile *a) :
 
 	// dialog
 //	SetTarget("audio_dialog_table", 0);
-	SetBorderWidth(5);
-	EmbedDialog("audio_file_dialog", 0, 0);
-	SetDecimals(1);
+	setBorderWidth(5);
+	embedDialog("audio_file_dialog", 0, 0);
+	setDecimals(1);
 	bar_list = new BarList(this, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
-	HideControl("ad_t_bars", true);
+	hideControl("ad_t_bars", true);
 
-	Expand("ad_t_tags", 0, true);
+	expand("ad_t_tags", 0, true);
 
 	loadData();
 
-	SetTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
+	setTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
 
-	EventMX("tags", "hui:select", this, &AudioFileDialog::onTagsSelect);
-	EventMX("tags", "hui:change", this, &AudioFileDialog::onTagsEdit);
-	EventM("add_tag", this, &AudioFileDialog::onAddTag);
-	EventM("delete_tag", this, &AudioFileDialog::onDeleteTag);
+	eventX("tags", "hui:select", this, &AudioFileDialog::onTagsSelect);
+	eventX("tags", "hui:change", this, &AudioFileDialog::onTagsEdit);
+	event("add_tag", this, &AudioFileDialog::onAddTag);
+	event("delete_tag", this, &AudioFileDialog::onDeleteTag);
 
 	subscribe(audio);
 }
@@ -49,20 +49,20 @@ AudioFileDialog::~AudioFileDialog()
 void AudioFileDialog::loadData()
 {
 	// tags
-	Reset("tags");
+	reset("tags");
 	foreach(Tag &t, audio->tag)
-		AddString("tags", t.key + "\\" + t.value);
-	Enable("delete_tag", false);
+		addString("tags", t.key + "\\" + t.value);
+	enable("delete_tag", false);
 
 	// data
-	Reset("data_list");
+	reset("data_list");
 	int samples = audio->GetRange().length();
-	AddString("data_list", _("Anfang\\") + audio->get_time_str_long(audio->GetRange().start()));
-	AddString("data_list", _("Ende\\") + audio->get_time_str_long(audio->GetRange().end()));
-	AddString("data_list", _("Dauer\\") + audio->get_time_str_long(samples));
-	AddString("data_list", _("Samples\\") + i2s(samples));
-	AddString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
-	AddString("data_list", _("Format\\16 bit stereo (nami)"));
+	addString("data_list", _("Anfang\\") + audio->get_time_str_long(audio->GetRange().start()));
+	addString("data_list", _("Ende\\") + audio->get_time_str_long(audio->GetRange().end()));
+	addString("data_list", _("Dauer\\") + audio->get_time_str_long(samples));
+	addString("data_list", _("Samples\\") + i2s(samples));
+	addString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
+	addString("data_list", _("Format\\16 bit stereo (nami)"));
 }
 
 
@@ -73,8 +73,8 @@ string get_vol(float volume, bool muted)
 
 void AudioFileDialog::onTagsSelect()
 {
-	int s = GetInt("tags");
-	Enable("delete_tag", s >= 0);
+	int s = getInt("tags");
+	enable("delete_tag", s >= 0);
 }
 
 void AudioFileDialog::onTagsEdit()
@@ -84,9 +84,9 @@ void AudioFileDialog::onTagsEdit()
 		return;
 	Tag t = audio->tag[r];
 	if (HuiGetEvent()->column == 0)
-		t.key = GetCell("tags", r, 0);
+		t.key = getCell("tags", r, 0);
 	else
-		t.value = GetCell("tags", r, 1);
+		t.value = getCell("tags", r, 1);
 	audio->EditTag(r, t.key, t.value);
 }
 
@@ -97,7 +97,7 @@ void AudioFileDialog::onAddTag()
 
 void AudioFileDialog::onDeleteTag()
 {
-	int s = GetInt("tags");
+	int s = getInt("tags");
 	if (s >= 0)
 		audio->DeleteTag(s);
 }

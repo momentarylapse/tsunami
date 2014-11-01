@@ -24,21 +24,21 @@ public:
 	~HuiMenu();
 	void _cdecl __init__();
 	void _cdecl __delete__();
-	void _cdecl Clear();
-	void _cdecl OpenPopup(HuiPanel *panel, int x, int y);
-	void _cdecl AddItem(const string &name, const string &id);
-	void _cdecl AddItemImage(const string &name, const string &image, const string &id);
-	void _cdecl AddItemCheckable(const string &name, const string &id);
-	void _cdecl AddSeparator();
-	void _cdecl AddSubMenu(const string &name, const string &id, HuiMenu *menu);
-	void _cdecl Enable(const string &id, bool enabled);
-	void _cdecl SetID(const string &id);
-	HuiMenu *GetSubMenuByID(const string &id);
+	void _cdecl clear();
+	void _cdecl openPopup(HuiPanel *panel, int x, int y);
+	void _cdecl addItem(const string &name, const string &id);
+	void _cdecl addItemImage(const string &name, const string &image, const string &id);
+	void _cdecl addItemCheckable(const string &name, const string &id);
+	void _cdecl addSeparator();
+	void _cdecl addSubMenu(const string &name, const string &id, HuiMenu *menu);
+	void _cdecl enable(const string &id, bool enabled);
+	void _cdecl setID(const string &id);
+	HuiMenu *getSubMenuByID(const string &id);
 
 	void add(HuiControl *c);
 	Array<HuiControl*> get_all_controls();
 
-	void UpdateLanguage();
+	void updateLanguage();
 	void set_panel(HuiPanel *panel);
 	
 #ifdef HUI_API_GTK

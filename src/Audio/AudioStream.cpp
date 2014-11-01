@@ -102,12 +102,11 @@ void AudioStream::stop()
 {
 	if (!playing)
 		return;
-	msg_db_f("Output.Stop", 1);
+	msg_db_f("Stream.stop", 1);
 
 	stop_play();
 
 	playing = false;
-	renderer = NULL;
 
 	notify(MESSAGE_STATE_CHANGE);
 }

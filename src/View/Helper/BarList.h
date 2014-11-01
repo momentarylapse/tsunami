@@ -17,18 +17,18 @@ public:
 	BarList(HuiPanel *_panel, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete);
 	virtual ~BarList();
 
-	void FillList();
-	void OnList();
-	void OnListSelect();
-	void OnListEdit();
-	void OnAdd();
-	void OnAddPause();
-	void OnDelete();
+	void fillList();
+	void onList();
+	void onListSelect();
+	void onListEdit();
+	void onAdd();
+	void onAddPause();
+	void onDelete();
 
-	void AddNewBar();
-	void ExecuteBarDialog(int index);
+	void addNewBar();
+	void executeBarDialog(int index);
 
-	void SetTrack(Track *t);
+	void setTrack(Track *t);
 
 public:
 	HuiPanel *panel;

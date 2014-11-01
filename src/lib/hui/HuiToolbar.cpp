@@ -13,37 +13,37 @@
 
 
 // add a default button
-void HuiToolbar::AddItem(const string &title, const string &image, const string &id)
+void HuiToolbar::addItem(const string &title, const string &image, const string &id)
 {
 	add(new HuiToolItemButton(title, image, id));
 }
 
 // add a checkable button
-void HuiToolbar::AddItemCheckable(const string &title, const string &image, const string &id)
+void HuiToolbar::addItemCheckable(const string &title, const string &image, const string &id)
 {
 	add(new HuiToolItemToggleButton(title, image, id));
 }
 
-void HuiToolbar::AddItemMenu(const string &title, const string &image, HuiMenu *menu, const string &id)
+void HuiToolbar::addItemMenu(const string &title, const string &image, HuiMenu *menu, const string &id)
 {
 	if (!menu)
 		return;
 	add(new HuiToolItemMenuButton(title, menu, image, id));
 }
 
-void HuiToolbar::AddItemMenuByID(const string &title, const string &image, const string &menu_id, const string &id)
+void HuiToolbar::addItemMenuByID(const string &title, const string &image, const string &menu_id, const string &id)
 {
 	HuiMenu *menu = HuiCreateResourceMenu(menu_id);
-	AddItemMenu(title, image, menu, id);
+	addItemMenu(title, image, menu, id);
 }
 
-void HuiToolbar::AddSeparator()
+void HuiToolbar::addSeparator()
 {
 	add(new HuiToolItemSeparator());
 }
 
 // remove all items from the toolbar
-void HuiToolbar::Reset()
+void HuiToolbar::reset()
 {
 	for (int i=0;i<item.num;i++)
 		delete(item[i]);
@@ -51,7 +51,7 @@ void HuiToolbar::Reset()
 }
 
 // create and apply a toolbar bar resource id
-void HuiToolbar::SetByID(const string &id)
+void HuiToolbar::setByID(const string &id)
 {
 	msg_db_f("Toolbar.SetByID",1);
 	msg_db_m(id.c_str(),1);
@@ -60,24 +60,24 @@ void HuiToolbar::SetByID(const string &id)
 		msg_error("Toolbar.SetByID  :~~(");
 		return;
 	}
-	Reset();
+	reset();
 	//Configure(res->b_param[0], res->b_param[1]);
 	foreach(HuiResource &cmd, res->children){
 		if (cmd.type == "Item"){
-			AddItem(get_lang(cmd.id, "", false), cmd.image, cmd.id);
+			addItem(get_lang(cmd.id, "", false), cmd.image, cmd.id);
 			item.back()->SetTooltip(get_lang(cmd.id, "", false));
 		}else if (cmd.type == "ItemCheckable"){
-			AddItemCheckable(get_lang(cmd.id, "", false), cmd.image, cmd.id);
+			addItemCheckable(get_lang(cmd.id, "", false), cmd.image, cmd.id);
 			item.back()->SetTooltip(get_lang(cmd.id, "", false));
 		}else if (cmd.type == "ItemSeparator"){
-			AddSeparator();
+			addSeparator();
 		}else if (cmd.type == "ItemPopup"){
 			string title = get_lang(cmd.id, "", false);
-			AddItemMenuByID(title, cmd.image, cmd.s_param[0], cmd.id);
+			addItemMenuByID(title, cmd.image, cmd.s_param[0], cmd.id);
 			item.back()->SetTooltip(title);
 		}
 	}
-	Enable(true);
+	enable(true);
 	msg_db_m(":)",1);
 }
 

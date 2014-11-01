@@ -23,15 +23,15 @@ public:
 	AudioViewTrack(AudioView *view, Track *track);
 	virtual ~AudioViewTrack();
 
-	static color GetPitchColor(int pitch);
+	static color getPitchColor(int pitch);
 
-	void DrawTrackBuffers(HuiPainter *c, const rect &r, double pos, const color &col);
-	void DrawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
-	void DrawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
-	void DrawSample(HuiPainter *c, const rect &r, SampleRef *s);
-	void DrawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift);
-	void DrawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col);
-	void DrawTrack(HuiPainter *c, const rect &r, color col, int track_no);
+	void drawTrackBuffers(HuiPainter *c, const rect &r, double pos, const color &col);
+	void drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
+	void drawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
+	void drawSample(HuiPainter *c, const rect &r, SampleRef *s);
+	void drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift);
+	void drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col);
+	void drawTrack(HuiPainter *c, const rect &r, color col, int track_no);
 
 	Track *track;
 	rect area;

@@ -20,11 +20,11 @@ public:
 	Clipboard();
 	virtual ~Clipboard();
 
-	void Copy(AudioView *view);
-	void Paste(AudioView *view);
-	void Clear();
-	bool HasData();
-	bool CanCopy(AudioView *view);
+	void copy(AudioView *view);
+	void paste(AudioView *view);
+	void clear();
+	bool hasData();
+	bool canCopy(AudioView *view);
 
 private:
 	AudioFile *temp;

@@ -15,14 +15,14 @@ LogDialog::LogDialog(Log *_log) :
 {
 	log = _log;
 
-	AddControlTable("", 0, 0, 2, 1, "grid");
-	SetTarget("grid", 0);
-	AddListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
-	AddButton("", 1, 0, 0, 0, "clear");
-	SetImage("clear", "hui:clear");
-	SetTooltip("clear", _("alle Nachrichten l&oschen"));
+	addControlTable("", 0, 0, 2, 1, "grid");
+	setTarget("grid", 0);
+	addListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
+	addButton("", 1, 0, 0, 0, "clear");
+	setImage("clear", "hui:clear");
+	setTooltip("clear", _("alle Nachrichten l&oschen"));
 
-	EventM("clear", this, &LogDialog::onClear);
+	event("clear", this, &LogDialog::onClear);
 
 	HuiRunLaterM(0.5f, this, &LogDialog::reload);
 
@@ -41,16 +41,16 @@ void LogDialog::onClear()
 
 void LogDialog::reload()
 {
-	Reset("log_list");
+	reset("log_list");
 	foreach(Log::Message &m, log->messages){
 		if (m.type == Log::TYPE_ERROR){
-			AddString("log_list", "hui:error\\" + m.text);
+			addString("log_list", "hui:error\\" + m.text);
 			((BottomBar*)parent)->choose(BottomBar::LOG_CONSOLE);
 		}else if (m.type == Log::TYPE_WARNING){
-			AddString("log_list", "hui:warning\\" + m.text);
+			addString("log_list", "hui:warning\\" + m.text);
 			((BottomBar*)parent)->choose(BottomBar::LOG_CONSOLE);
 		}else{
-			AddString("log_list", "hui:info\\" + m.text);
+			addString("log_list", "hui:info\\" + m.text);
 		}
 	}
 }

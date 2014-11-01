@@ -25,7 +25,7 @@ Clipboard::~Clipboard()
 	delete(temp);
 }
 
-void Clipboard::Clear()
+void Clipboard::clear()
 {
 	if (temp->track.num > 0){
 		temp->Reset();
@@ -34,11 +34,11 @@ void Clipboard::Clear()
 	ref_uid.clear();
 }
 
-void Clipboard::Copy(AudioView *view)
+void Clipboard::copy(AudioView *view)
 {
-	if (!CanCopy(view))
+	if (!canCopy(view))
 		return;
-	Clear();
+	clear();
 
 	AudioFile *a = view->audio;
 
@@ -65,9 +65,9 @@ void Clipboard::Copy(AudioView *view)
 	notify();
 }
 
-void Clipboard::Paste(AudioView *view)
+void Clipboard::paste(AudioView *view)
 {
-	if (!HasData())
+	if (!hasData())
 		return;
 	AudioFile *a = view->audio;
 
@@ -120,12 +120,12 @@ void Clipboard::Paste(AudioView *view)
 	a->action_manager->EndActionGroup();
 }
 
-bool Clipboard::HasData()
+bool Clipboard::hasData()
 {
 	return (temp->track.num > 0);
 }
 
-bool Clipboard::CanCopy(AudioView *view)
+bool Clipboard::canCopy(AudioView *view)
 {
 	return !view->sel_range.empty();// or (view->audio->GetNumSelectedSamples() > 0);
 }

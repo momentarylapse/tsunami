@@ -21,66 +21,66 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 
 	track = NULL;
 
-	FillList();
-	panel->EventM(id, this, &BarList::OnList);
-	panel->EventMX(id, "hui:select", this, &BarList::OnListSelect);
-	panel->EventMX(id, "hui:change", this, &BarList::OnListEdit);
-	panel->EventM(id_add, this, &BarList::OnAdd);
-	panel->EventM(id_add_pause, this, &BarList::OnAddPause);
-	panel->EventM(id_delete, this, &BarList::OnDelete);
+	fillList();
+	panel->event(id, this, &BarList::onList);
+	panel->eventX(id, "hui:select", this, &BarList::onListSelect);
+	panel->eventX(id, "hui:change", this, &BarList::onListEdit);
+	panel->event(id_add, this, &BarList::onAdd);
+	panel->event(id_add_pause, this, &BarList::onAddPause);
+	panel->event(id_delete, this, &BarList::onDelete);
 }
 
 
 
-void BarList::FillList()
+void BarList::fillList()
 {
 	msg_db_f("FillBarList", 1);
-	panel->Reset(id);
+	panel->reset(id);
 	if (track){
 		int sample_rate = track->root->sample_rate;
 		int n = 1;
 		foreach(BarPattern &b, track->bar){
 			if (b.type == b.TYPE_BAR){
 				if (b.count == 1)
-					panel->AddString(id, format("%d\\%d\\%.1f\\%d", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
+					panel->addString(id, format("%d\\%d\\%.1f\\%d", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
 				else
-					panel->AddString(id, format("%d-%d\\%d\\%.1f\\%d", n, n + b.count - 1, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
+					panel->addString(id, format("%d-%d\\%d\\%.1f\\%d", n, n + b.count - 1, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
 				n += b.count;
 			}else if (b.type == b.TYPE_PAUSE){
-				panel->AddString(id, format(_("(Pause)\\-\\-\\%.3f"), (float)b.length / (float)sample_rate));
+				panel->addString(id, format(_("(Pause)\\-\\-\\%.3f"), (float)b.length / (float)sample_rate));
 			}
 		}
 	}
-	panel->Enable(id_delete, false);
+	panel->enable(id_delete, false);
 }
 
 
 
-void BarList::OnList()
+void BarList::onList()
 {
-	int s = panel->GetInt(id);
+	int s = panel->getInt(id);
 	if (s >= 0){
-		ExecuteBarDialog(s);
-		FillList();
+		executeBarDialog(s);
+		fillList();
 	}
 }
 
 
-void BarList::OnListSelect()
+void BarList::onListSelect()
 {
-	int s = panel->GetInt(id);
-	panel->Enable(id_delete, s >= 0);
+	int s = panel->getInt(id);
+	panel->enable(id_delete, s >= 0);
 }
 
 
-void BarList::OnListEdit()
+void BarList::onListEdit()
 {
 	if (!track)
 		return;
 	int sample_rate = track->root->sample_rate;
 	int index = HuiGetEvent()->row;
 	BarPattern b = track->bar[index];
-	string text = panel->GetCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
+	string text = panel->getCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
 	if (b.type == b.TYPE_BAR){
 		if (HuiGetEvent()->column == 1){
 			float l = (float)b.length / (float)b.num_beats;
@@ -97,35 +97,35 @@ void BarList::OnListEdit()
 		}
 	}
 	track->EditBar(index, b);
-	FillList();
+	fillList();
 }
 
 
-void BarList::OnAdd()
+void BarList::onAdd()
 {
-	AddNewBar();
+	addNewBar();
 }
 
 
-void BarList::OnAddPause()
+void BarList::onAddPause()
 {
 	if (!track)
 		return;
-	int s = panel->GetInt(id);
+	int s = panel->getInt(id);
 
 	track->AddPause(s, 2.0f);
-	FillList();
+	fillList();
 }
 
 
-void BarList::OnDelete()
+void BarList::onDelete()
 {
 	if (!track)
 		return;
-	int s = panel->GetInt(id);
+	int s = panel->getInt(id);
 	if (s >= 0){
 		track->DeleteBar(s);
-		FillList();
+		fillList();
 	}
 }
 
@@ -133,33 +133,33 @@ BarList::~BarList()
 {
 }
 
-void BarList::AddNewBar()
+void BarList::addNewBar()
 {
 	if (!track)
 		return;
 	msg_db_f("AddNewBar", 1);
 
-	int s = panel->GetInt(id);
+	int s = panel->getInt(id);
 
 	track->AddBars(s, 90.0f, 4, 10);
-	FillList();
+	fillList();
 }
 
-void BarList::ExecuteBarDialog(int index)
+void BarList::executeBarDialog(int index)
 {
-	msg_db_f("ExecuteBarDialog", 1);
+	msg_db_f("executeBarDialog", 1);
 }
 
-void BarList::SetTrack(Track *t)
+void BarList::setTrack(Track *t)
 {
 	track = NULL;
 	if (t)
 		if (t->type == t->TYPE_TIME)
 			track = t;
-	FillList();
+	fillList();
 
-	panel->Enable(id, track);
-	panel->Enable(id_add, track);
-	panel->Enable(id_add_pause, track);
+	panel->enable(id, track);
+	panel->enable(id_add, track);
+	panel->enable(id_add_pause, track);
 }
 

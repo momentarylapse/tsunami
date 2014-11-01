@@ -71,15 +71,15 @@ void GlobalCreateSliderM(HuiPanel *panel, const string &id_slider, const string 
 void GlobalSliderSet(HuiPanel *panel, const string &id, float value)
 {
 	foreach(Slider *s, global_slider)
-		if (s->Match(panel, id))
-			s->Set(value);
+		if (s->match(panel, id))
+			s->set(value);
 }
 
 float GlobalSliderGet(HuiPanel *panel, const string &id)
 {
 	foreach(Slider *s, global_slider)
-		if (s->Match(panel, id))
-			return s->Get();
+		if (s->match(panel, id))
+			return s->get();
 	return 0;
 }
 
@@ -105,6 +105,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("audio", &tsunami->audio);
 	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
+	Script::LinkExternal("stream", &tsunami->_view->stream);
 	Script::LinkExternal("renderer", &tsunami->renderer);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
@@ -395,7 +396,7 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
 {
 	foreachi(PluginManager::PluginFile &f, pm->plugin_file, i){
 		if (f.filename.find(dir) >= 0){
-            m->AddItemImage(f.name, f.image, format("execute_plugin_%d", i));
+            m->addItemImage(f.name, f.image, format("execute_plugin_%d", i));
 		}
 	}
 }
@@ -427,28 +428,28 @@ void PluginManager::AddPluginsToMenu(HuiWindow *win)
 {
 	msg_db_f("AddPluginsToMenu", 2);
 
-	HuiMenu *m = win->GetMenu();
+	HuiMenu *m = win->getMenu();
 
 	// "Buffer"
-	add_plugins_in_dir("Buffer/Channels/", this, m->GetSubMenuByID("menu_plugins_channels"));
-	add_plugins_in_dir("Buffer/Dynamics/", this, m->GetSubMenuByID("menu_plugins_dynamics"));
-	add_plugins_in_dir("Buffer/Echo/", this, m->GetSubMenuByID("menu_plugins_echo"));
-	add_plugins_in_dir("Buffer/Pitch/", this, m->GetSubMenuByID("menu_plugins_pitch"));
-	add_plugins_in_dir("Buffer/Sound/", this, m->GetSubMenuByID("menu_plugins_sound"));
-	add_plugins_in_dir("Buffer/Synthesizer/", this, m->GetSubMenuByID("menu_plugins_synthesizer"));
+	add_plugins_in_dir("Buffer/Channels/", this, m->getSubMenuByID("menu_plugins_channels"));
+	add_plugins_in_dir("Buffer/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"));
+	add_plugins_in_dir("Buffer/Echo/", this, m->getSubMenuByID("menu_plugins_echo"));
+	add_plugins_in_dir("Buffer/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"));
+	add_plugins_in_dir("Buffer/Sound/", this, m->getSubMenuByID("menu_plugins_sound"));
+	add_plugins_in_dir("Buffer/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"));
 
 	// "Midi"
-	add_plugins_in_dir("Midi/", this, m->GetSubMenuByID("menu_plugins_on_midi"));
+	add_plugins_in_dir("Midi/", this, m->getSubMenuByID("menu_plugins_on_midi"));
 
 	// "All"
-	add_plugins_in_dir("All/", this, m->GetSubMenuByID("menu_plugins_on_audio"));
+	add_plugins_in_dir("All/", this, m->getSubMenuByID("menu_plugins_on_audio"));
 
 	// rest
-	add_plugins_in_dir("Independent/", this, m->GetSubMenuByID("menu_plugins_other"));
+	add_plugins_in_dir("Independent/", this, m->getSubMenuByID("menu_plugins_other"));
 
 	// Events
 	for (int i=0;i<plugin_file.num;i++)
-		win->EventM(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
+		win->event(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
 }
 
 void PluginManager::ApplyFavorite(Configurable *c, const string &name)
@@ -545,7 +546,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (fx->configure()){
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
-				Range range = tsunami->win->view->GetPlaybackSelection();
+				Range range = tsunami->win->view->getPlaybackSelection();
 				a->action_manager->BeginActionGroup();
 				foreach(Track *t, a->track)
 					if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
@@ -559,7 +560,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			tsunami->plugin_manager->cur_effect = NULL;//fx;
 			mfx->resetConfig();
 			if (mfx->configure()){
-				Range range = tsunami->win->view->GetPlaybackSelection();
+				Range range = tsunami->win->view->getPlaybackSelection();
 				a->action_manager->BeginActionGroup();
 				foreach(Track *t, a->track)
 					if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
@@ -713,14 +714,14 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name)
 Effect* PluginManager::ChooseEffect(HuiPanel *parent)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT);
-	dlg->Run();
+	dlg->run();
 	return (Effect*)ConfigurableSelectorDialog::_return;
 }
 
 MidiEffect* PluginManager::ChooseMidiEffect(HuiPanel *parent)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT);
-	dlg->Run();
+	dlg->run();
 	return (MidiEffect*)ConfigurableSelectorDialog::_return;
 }
 

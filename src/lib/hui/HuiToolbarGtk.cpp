@@ -25,11 +25,11 @@ HuiToolbar::HuiToolbar(HuiWindow *_win, bool vertical)
 
 HuiToolbar::~HuiToolbar()
 {
-	Reset();
+	reset();
 }
 
 
-void HuiToolbar::Enable(bool _enabled)
+void HuiToolbar::enable(bool _enabled)
 {
 	if (_enabled)
 		gtk_widget_show(widget);
@@ -38,7 +38,7 @@ void HuiToolbar::Enable(bool _enabled)
 	enabled = _enabled;
 }
 
-void HuiToolbar::Configure(bool _text_enabled, bool _large_icons)
+void HuiToolbar::configure(bool _text_enabled, bool _large_icons)
 {
 	gtk_toolbar_set_style(GTK_TOOLBAR(widget), _text_enabled ? GTK_TOOLBAR_BOTH : GTK_TOOLBAR_ICONS);
 	gtk_toolbar_set_icon_size(GTK_TOOLBAR(widget), _large_icons ? GTK_ICON_SIZE_LARGE_TOOLBAR : GTK_ICON_SIZE_SMALL_TOOLBAR);

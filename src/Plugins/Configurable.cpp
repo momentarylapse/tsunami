@@ -314,15 +314,15 @@ public:
 		ConfigPanel(_c)
 	{
 		aa = _aa;
-		AddControlTable("", 0, 0, 1, 3, "root-table");
-		SetTarget("root-table", 0);
-		AddControlTable("", 0, 1, 4, aa.num, "main-table");
-		SetTarget("main-table", 0);
+		addControlTable("", 0, 0, 1, 3, "root-table");
+		setTarget("root-table", 0);
+		addControlTable("", 0, 1, 4, aa.num, "main-table");
+		setTarget("main-table", 0);
 		foreachi(AutoConfigData &a, aa, i){
-			AddText(a.name, 0, i, 0, 0, "");
-			AddSlider("!width=150", 1, i, 0, 0, "slider-" + i);
-			AddSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
-			AddText(a.unit, 3, i, 0, 0, "");
+			addText(a.name, 0, i, 0, 0, "");
+			addSlider("!width=150", 1, i, 0, 0, "slider-" + i);
+			addSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
+			addText(a.unit, 3, i, 0, 0, "");
 			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::onChange, *a.value, this));
 		}
 	}
@@ -334,7 +334,7 @@ public:
 	void onChange()
 	{
 		foreachi(AutoConfigData &a, aa, i){
-			*a.value = slider[i]->Get();
+			*a.value = slider[i]->get();
 		}
 		notify();
 
@@ -342,7 +342,7 @@ public:
 	virtual void update()
 	{
 		foreachi(AutoConfigData &a, aa, i){
-			slider[i]->Set(*a.value);
+			slider[i]->set(*a.value);
 		}
 	}
 };
@@ -374,40 +374,40 @@ public:
 	{
 		config = c;
 		panel = p;
-		AddControlTable("", 0, 0, 1, 3, "root-table");
-		SetTarget("root-table", 0);
-		Embed(panel, "root-table", 0, 1);
+		addControlTable("", 0, 0, 1, 3, "root-table");
+		setTarget("root-table", 0);
+		embed(panel, "root-table", 0, 1);
 
 		// favorite grid
-		SetTarget("root-table", 0);
-		AddControlTable("!noexpandy", 0, 0, 5, 1, "favorite_grid");
-		SetTarget("favorite_grid", 0);
-		AddButton("!flat", 0, 0, 0, 0, "load_favorite");
-		SetImage("load_favorite", "hui:open");
-		SetTooltip("load_favorite", _("Parameter laden"));
-		AddButton("!flat", 1, 0, 0, 0, "save_favorite");
-		SetImage("save_favorite", "hui:save");
-		SetTooltip("save_favorite", _("Parameter speichern"));
-		EventM("load_favorite", this, &ConfigurationDialog::onLoad);
-		EventM("save_favorite", this, &ConfigurationDialog::onSave);
+		setTarget("root-table", 0);
+		addControlTable("!noexpandy", 0, 0, 5, 1, "favorite_grid");
+		setTarget("favorite_grid", 0);
+		addButton("!flat", 0, 0, 0, 0, "load_favorite");
+		setImage("load_favorite", "hui:open");
+		setTooltip("load_favorite", _("Parameter laden"));
+		addButton("!flat", 1, 0, 0, 0, "save_favorite");
+		setImage("save_favorite", "hui:save");
+		setTooltip("save_favorite", _("Parameter speichern"));
+		event("load_favorite", this, &ConfigurationDialog::onLoad);
+		event("save_favorite", this, &ConfigurationDialog::onSave);
 
 		// command grid
-		SetTarget("root-table", 0);
-		AddControlTable("!buttonbar", 0, 2, 4, 1, "command_grid");
-		SetTarget("command_grid", 0);
+		setTarget("root-table", 0);
+		addControlTable("!buttonbar", 0, 2, 4, 1, "command_grid");
+		setTarget("command_grid", 0);
 		if (c->configurable_type == c->TYPE_EFFECT){
-			AddButton(_("Vorschau"), 0, 0, 0, 0, "preview");
-			SetImage("preview", "hui:media-play");
+			addButton(_("Vorschau"), 0, 0, 0, 0, "preview");
+			setImage("preview", "hui:media-play");
 		}
-		AddText("!width=30", 1, 0, 0, 0, "");
-		AddButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
-		SetImage("cancel", "hui:cancel");
-		AddDefButton(_("OK"), 3, 0, 0, 0, "ok");
-		SetImage("ok", "hui:ok");
-		EventM("ok", this, &ConfigurationDialog::onOk);
-		EventM("preview", this, &ConfigurationDialog::onPreview);
-		EventM("cancel", this, &ConfigurationDialog::onClose);
-		EventM("hui:close", this, &ConfigurationDialog::onClose);
+		addText("!width=30", 1, 0, 0, 0, "");
+		addButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
+		setImage("cancel", "hui:cancel");
+		addDefButton(_("OK"), 3, 0, 0, 0, "ok");
+		setImage("ok", "hui:ok");
+		event("ok", this, &ConfigurationDialog::onOk);
+		event("preview", this, &ConfigurationDialog::onPreview);
+		event("cancel", this, &ConfigurationDialog::onClose);
+		event("hui:close", this, &ConfigurationDialog::onClose);
 	}
 	~ConfigurationDialog()
 	{
@@ -456,7 +456,7 @@ bool Configurable::configure()
 	if (!panel)
 		return false;
 	HuiDialog *dlg = new ConfigurationDialog(this, config, panel);
-	return (dlg->Run() == "ok");
+	return (dlg->run() == "ok");
 }
 
 void Configurable::notify()

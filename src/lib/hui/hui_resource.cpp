@@ -159,32 +159,32 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 
 	// menu?
 	if (res->s_param[0].num > 0)
-		dlg->SetMenu(HuiCreateResourceMenu(res->s_param[0]));
+		dlg->setMenu(HuiCreateResourceMenu(res->s_param[0]));
 
 	// toolbar?
 	if (res->s_param[1].num > 0)
-		dlg->toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
+		dlg->toolbar[HuiToolbarTop]->setByID(res->s_param[1]);
 
 	// controls
 	foreach(HuiResource &cmd, res->children){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
-			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			dlg->AddControl(cmd.type, HuiGetLanguage(cmd.id),
+			dlg->setTarget(cmd.s_param[0], cmd.i_param[4]);
+			dlg->addControl(cmd.type, HuiGetLanguage(cmd.id),
 							cmd.i_param[0], cmd.i_param[1],
 							cmd.i_param[2], cmd.i_param[3],
 							cmd.id);
 		}else if (res->type == "SizableDialog"){
 			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			dlg->SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			dlg->AddControl(cmd.type, HuiGetLanguage(cmd.id),
+			dlg->setTarget(cmd.s_param[0], cmd.i_param[4]);
+			dlg->addControl(cmd.type, HuiGetLanguage(cmd.id),
 							cmd.i_param[0], cmd.i_param[1],
 							cmd.i_param[2], cmd.i_param[3],
 							cmd.id);
 		}
-		dlg->Enable(cmd.id, cmd.enabled);
+		dlg->enable(cmd.id, cmd.enabled);
 		if (cmd.image.num > 0)
-			dlg->SetImage(cmd.id, cmd.image);
+			dlg->setImage(cmd.id, cmd.image);
 	}
 	msg_db_m("  \\(^_^)/",1);
 	return dlg;
@@ -204,17 +204,17 @@ HuiMenu *_create_res_menu_(HuiResource *res, int &index, int num)
 		//msg_db_out(2,i2s(j));
 		HuiResource *cmd = &res->children[index];
 		if (cmd->type == "Item")
-			menu->AddItem(get_lang(cmd->id, "", true), cmd->id);
+			menu->addItem(get_lang(cmd->id, "", true), cmd->id);
 		if (cmd->type == "ItemImage")
-			menu->AddItemImage(get_lang(cmd->id, "", true), cmd->image, cmd->id);
+			menu->addItemImage(get_lang(cmd->id, "", true), cmd->image, cmd->id);
 		if (cmd->type == "ItemCheckable")
-			menu->AddItemCheckable(get_lang(cmd->id, "", true), cmd->id);
+			menu->addItemCheckable(get_lang(cmd->id, "", true), cmd->id);
 		if (cmd->type == "ItemSeparator")
-			menu->AddSeparator();
+			menu->addSeparator();
 		if (cmd->type == "ItemPopup"){
 			index ++;
 			HuiMenu *sub = _create_res_menu_(res, index, cmd->i_param[0]);
-			menu->AddSubMenu(get_lang(cmd->id, "", true), cmd->id, sub);
+			menu->addSubMenu(get_lang(cmd->id, "", true), cmd->id, sub);
 			index --;
 		}
 		menu->item.back()->Enable(cmd->enabled);

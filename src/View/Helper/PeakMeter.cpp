@@ -53,8 +53,8 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 	r.reset();
 	l.reset();
 
-	panel->EventMX(id, "hui:draw", this, &PeakMeter::onDraw);
-	panel->EventMX(id, "hui:left-button-down", this, &PeakMeter::onLeftButtonDown);
+	panel->eventX(id, "hui:draw", this, &PeakMeter::onDraw);
+	panel->eventX(id, "hui:left-button-down", this, &PeakMeter::onLeftButtonDown);
 
 	enable(true);
 }
@@ -118,7 +118,7 @@ void PeakMeter::drawPeak(HuiPainter *c, const rect &r, Data &d)
 void PeakMeter::onDraw()
 {
 	msg_db_f("PeakMeter.onDraw", 1);
-	HuiPainter *c = panel->BeginDraw(id);
+	HuiPainter *c = panel->beginDraw(id);
 	int w = c->width;
 	int h = c->height;
 	if (mode == ModePeaks){
@@ -167,7 +167,7 @@ void PeakMeter::onRightButtonDown()
 void PeakMeter::setMode(int _mode)
 {
 	mode = _mode;
-	panel->Redraw(id);
+	panel->redraw(id);
 }
 
 void PeakMeter::findSpectrum()
@@ -209,5 +209,5 @@ void PeakMeter::onUpdate(Observable *o, const string &message)
 	}else if (state == source->STATE_STOPPED){
 		clearData();
 	}
-	panel->Redraw(id);
+	panel->redraw(id);
 }

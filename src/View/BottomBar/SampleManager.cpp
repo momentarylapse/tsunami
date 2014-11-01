@@ -19,18 +19,18 @@ SampleManager::SampleManager(AudioFile *a) :
 	BottomBarConsole(_("Samples")),
 	Observer("SampleManager")
 {
-	FromResource("sample_manager_dialog");
-	SetTooltip("import_from_file", _("aus Datei importieren"));
-	SetTooltip("delete_sample", _("l&oschen"));
-	SetTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
-	SetTooltip("create_from_selection", _("aus Auswahl erzeugen"));
+	fromResource("sample_manager_dialog");
+	setTooltip("import_from_file", _("aus Datei importieren"));
+	setTooltip("delete_sample", _("l&oschen"));
+	setTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
+	setTooltip("create_from_selection", _("aus Auswahl erzeugen"));
 
-	EventM("import_from_file", this, &SampleManager::onImportFromFile);
-	EventM("paste_sample", this, &SampleManager::onInsert);
-	EventM("create_from_selection", this, &SampleManager::onCreateFromSelection);
-	EventM("delete_sample", this, &SampleManager::onDelete);
-	EventMX("sample_list", "hui:change", this, &SampleManager::onListEdit);
-	EventMX("sample_list", "hui:select", this, &SampleManager::onListSelect);
+	event("import_from_file", this, &SampleManager::onImportFromFile);
+	event("paste_sample", this, &SampleManager::onInsert);
+	event("create_from_selection", this, &SampleManager::onCreateFromSelection);
+	event("delete_sample", this, &SampleManager::onDelete);
+	eventX("sample_list", "hui:change", this, &SampleManager::onListEdit);
+	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
 
 	audio = a;
 	selected_uid = -1;
@@ -68,7 +68,7 @@ void render_midi(Image &im, MidiData &m)
 		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n.range.offset / (float)r.num, 0, 1);
 		float x1 = w * clampf((float)n.range.end() / (float)r.num, 0, 1);
-		color c = AudioViewTrack::GetPitchColor(n.pitch);
+		color c = AudioViewTrack::getPitchColor(n.pitch);
 		for (int x=x0; x<=x1; x++)
 			im.setPixel(x, y, c);
 	}
@@ -87,28 +87,28 @@ string render_sample(Sample *s)
 
 void SampleManager::fillList()
 {
-	Reset("sample_list");
+	reset("sample_list");
 	foreach(string &name, icon_names)
 		HuiDeleteImage(name);
 	icon_names.clear();
 	foreachi(Sample *s, audio->sample, i){
 		icon_names.add(render_sample(s));
-		SetString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->GetRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
+		setString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->GetRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
 	int sel = audio->get_sample_by_uid(selected_uid);
-	SetInt("sample_list", sel);
-	Enable("delete_sample", sel >= 0);
-	Enable("paste_sample", sel >= 0);
+	setInt("sample_list", sel);
+	enable("delete_sample", sel >= 0);
+	enable("paste_sample", sel >= 0);
 }
 
 void SampleManager::onListSelect()
 {
-	int sel = GetInt("");
+	int sel = getInt("");
 	selected_uid = -1;
 	if (sel >= 0)
 		selected_uid = audio->sample[sel]->uid;
-	Enable("delete_sample", sel >= 0);
-	Enable("paste_sample", sel >= 0);
+	enable("delete_sample", sel >= 0);
+	enable("paste_sample", sel >= 0);
 }
 
 void SampleManager::onListEdit()
@@ -116,9 +116,9 @@ void SampleManager::onListEdit()
 	int sel = HuiGetEvent()->row;
 	int col = HuiGetEvent()->column;
 	if (col == 2)
-		audio->EditSampleName(sel, GetCell("sample_list", sel, 2));
+		audio->EditSampleName(sel, getCell("sample_list", sel, 2));
 	else if (col == 5)
-		audio->sample[sel]->auto_delete = GetCell("sample_list", sel, 5)._bool();
+		audio->sample[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
 }
 
 void SampleManager::onImportFromFile()
@@ -128,15 +128,15 @@ void SampleManager::onImportFromFile()
 		tsunami->storage->loadBufferBox(audio, &buf, HuiFilename);
 		Sample *s = audio->AddSample(HuiFilename.basename(), buf);
 		selected_uid = s->uid;
-		SetInt("sample_list", audio->sample.num - 1);
-		Enable("delete_sample", true);
-		Enable("paste_sample", true);
+		setInt("sample_list", audio->sample.num - 1);
+		enable("delete_sample", true);
+		enable("paste_sample", true);
 	}
 }
 
 void SampleManager::onInsert()
 {
-	int n = GetInt("sample_list");
+	int n = getInt("sample_list");
 	if (n >= 0)
 		tsunami->win->view->cur_track->AddSample(tsunami->win->view->sel_range.start(), n);
 }
@@ -146,14 +146,14 @@ void SampleManager::onCreateFromSelection()
 	audio->CreateSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
 	if (audio->sample.num > 0){
 		selected_uid = audio->sample.back()->uid;
-		Enable("delete_sample", true);
-		Enable("paste_sample", true);
+		enable("delete_sample", true);
+		enable("paste_sample", true);
 	}
 }
 
 void SampleManager::onDelete()
 {
-	int n = GetInt("sample_list");
+	int n = getInt("sample_list");
 	if (n >= 0)
 		audio->DeleteSample(n);
 }
@@ -174,26 +174,26 @@ public:
 		ret = NULL;;
 		_old = old;
 
-		FromSource("Grid ? '' 1 2\n"\
+		fromSource("Grid ? '' 1 2\n"\
 					"	ListView list 'Vorschau\\Name\\Dauer' format=itt\n"\
 					"	Grid ? '' 2 1 buttonbar\n"\
 					"		Button cancel 'Abbrechen'\n"\
 					"		Button ok 'Ok'");
 
-		SetString("list", _("\\- keines -\\"));
-		SetInt("list", 0);
+		setString("list", _("\\- keines -\\"));
+		setInt("list", 0);
 		foreachi(Sample *s, audio->sample, i){
 			icon_names.add(render_sample(s));
-			SetString("list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
+			setString("list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
 			if (s == old)
-				SetInt("list", i + 1);
+				setInt("list", i + 1);
 		}
 
-		EventM("ok", this, &SampleSelector::onOk);
-		EventM("cancel", this, &SampleSelector::onCancel);
-		EventM("hui:close", this, &SampleSelector::onCancel);
-		EventMX("list", "hui:select", this, &SampleSelector::onSelect);
-		EventM("list", this, &SampleSelector::onList);
+		event("ok", this, &SampleSelector::onOk);
+		event("cancel", this, &SampleSelector::onCancel);
+		event("hui:close", this, &SampleSelector::onCancel);
+		eventX("list", "hui:select", this, &SampleSelector::onSelect);
+		event("list", this, &SampleSelector::onList);
 	}
 	virtual ~SampleSelector()
 	{
@@ -203,16 +203,16 @@ public:
 
 	void onSelect()
 	{
-		int n = GetInt("");
+		int n = getInt("");
 		ret = NULL;
 		if (n >= 1)
 			ret = audio->sample[n - 1];
-		Enable("ok", n >= 0);
+		enable("ok", n >= 0);
 	}
 
 	void onList()
 	{
-		int n = GetInt("");
+		int n = getInt("");
 		if (n == 0){
 			ret = NULL;
 			delete(this);
@@ -244,6 +244,6 @@ Sample *SampleSelector::ret;
 Sample *SampleManager::select(HuiPanel *root, AudioFile *a, Sample *old)
 {
 	SampleSelector *s = new SampleSelector(root, a, old);
-	s->Run();
+	s->run();
 	return SampleSelector::ret;
 }

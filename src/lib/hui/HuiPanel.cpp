@@ -27,7 +27,7 @@ HuiPanel::HuiPanel()
 
 	unique_id = current_uid ++;
 
-	SetTarget("", 0);
+	setTarget("", 0);
 }
 
 HuiPanel::~HuiPanel()
@@ -74,75 +74,85 @@ void HuiPanel::_ClearPanel_()
 	}
 	id.clear();
 	cur_id.clear();
-	event.clear();
+	events.clear();
 }
 
-void HuiPanel::SetBorderWidth(int width)
+void HuiPanel::setBorderWidth(int width)
 {
 	border_width = width;
 }
 
-void HuiPanel::SetIndent(int indent)
+void HuiPanel::setIndent(int indent)
 {
 	expander_indent = indent;
 }
 
-void HuiPanel::SetDecimals(int decimals)
+void HuiPanel::setDecimals(int decimals)
 {
 	num_float_decimals = decimals;
 }
 
-string HuiPanel::_GetCurID_()
+string HuiPanel::_get_cur_id_()
 {
 	return cur_id;
 }
 
-void HuiPanel::_SetCurID_(const string &id)
+void HuiPanel::_set_cur_id_(const string &id)
 {
 	if (win)
 		win->cur_id = id;
 	cur_id = id;
 }
 
-void HuiPanel::Event(const string &id, hui_callback *function)
+void HuiPanel::eventS(const string &id, hui_callback *function)
 {
-	event.add(HuiEventListener(id, "*", function));
+	events.add(HuiEventListener(id, "*", function));
 
 }
 
-void HuiPanel::EventX(const string &id, const string &msg, hui_callback *function)
+void HuiPanel::eventSX(const string &id, const string &msg, hui_callback *function)
 {
-	event.add(HuiEventListener(id, msg, function));
+	events.add(HuiEventListener(id, msg, function));
 }
 
-void HuiPanel::_EventM(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+void HuiPanel::_event(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
-	event.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
+	events.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
 }
 
-void HuiPanel::_EventMX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
+void HuiPanel::_eventX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)())
 {
-	event.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
+	events.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
 }
 
-void HuiPanel::_EventKM(const string &id, HuiEventHandler* handler, hui_kaba_callback *function)
+void HuiPanel::_eventK(const string &id, hui_kaba_callback *function)
 {
-	event.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
+	events.add(HuiEventListener(id, ":def:", HuiCallback(this, function)));
 }
 
-void HuiPanel::_EventKMX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_callback *function)
+void HuiPanel::_eventKO(const string &id, HuiEventHandler* handler, hui_kaba_callback *function)
 {
-	event.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
+	events.add(HuiEventListener(id, ":def:", HuiCallback(handler, function)));
 }
 
-void HuiPanel::RemoveEventHandlers(HuiEventHandler *handler)
+void HuiPanel::_eventKX(const string &id, const string &msg, hui_kaba_callback *function)
 {
-	for (int i=event.num-1;i>=0;i--)
-		if (event[i].function.has_handler(handler))
-			event.erase(i);
+	events.add(HuiEventListener(id, msg, HuiCallback(this, function)));
 }
 
-bool HuiPanel::_SendEvent_(HuiEvent *e)
+void HuiPanel::_eventKOX(const string &id, const string &msg, HuiEventHandler* handler, hui_kaba_callback *function)
+{
+	events.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
+}
+
+void HuiPanel::removeEventHandlers(HuiEventHandler *handler)
+{
+	for (int i=events.num-1;i>=0;i--)
+		if (events[i].function.has_handler(handler))
+			events.erase(i);
+}
+
+bool HuiPanel::_send_event_(HuiEvent *e)
 {
 	if (!win)
 		return false;
@@ -168,12 +178,12 @@ bool HuiPanel::_SendEvent_(HuiEvent *e)
 	e->column = win->input.column;
 	_HuiEvent_ = *e;
 	if (e->id.num > 0)
-		_SetCurID_(e->id);
+		_set_cur_id_(e->id);
 	else
-		_SetCurID_(e->message);
+		_set_cur_id_(e->message);
 
 	bool sent = false;
-	foreach(HuiEventListener &ee, event){
+	foreach(HuiEventListener &ee, events){
 		if (!_HuiEventMatch_(e, ee.id, ee.message))
 			continue;
 
@@ -198,89 +208,89 @@ bool HuiPanel::_SendEvent_(HuiEvent *e)
 	return sent;
 }
 
-int HuiPanel::_GetUniqueID_()
+int HuiPanel::_get_unique_id_()
 {
 	return unique_id;
 }
 
-void HuiPanel::Show()
+void HuiPanel::show()
 {
 	if (this == win)
-		win->Show();
+		win->show();
 	else if (root_control)
 		root_control->Hide(false);
-	OnShow();
+	onShow();
 }
 
-void HuiPanel::Hide()
+void HuiPanel::hide()
 {
 	if (this == win)
-		win->Hide();
+		win->hide();
 	else if (root_control)
 		root_control->Hide(true);
-	OnHide();
+	onHide();
 }
 
 //----------------------------------------------------------------------------------
 // easy window creation functions
 
 
-void HuiPanel::AddControl(const string &type, const string &title, int x, int y, int width, int height, const string &id)
+void HuiPanel::addControl(const string &type, const string &title, int x, int y, int width, int height, const string &id)
 {
 	//msg_db_m(format("HuiPanelAddControl %s  %s  %d  %d  %d  %d  %d", type.c_str(), title.c_str(), x, y, width, height, id.c_str()).c_str(),2);
 	if (type == "Button")
-		AddButton(title, x, y, width, height, id);
+		addButton(title, x, y, width, height, id);
 	else if (type == "ColorButton")
-		AddColorButton(title, x, y, width, height, id);
+		addColorButton(title, x, y, width, height, id);
 	else if (type == "DefButton")
-		AddDefButton(title, x, y, width, height, id);
+		addDefButton(title, x, y, width, height, id);
 	else if (type == "Text")
-		AddText(title, x, y, width, height, id);
+		addText(title, x, y, width, height, id);
 	else if (type == "Edit")
-		AddEdit(title, x, y, width, height, id);
+		addEdit(title, x, y, width, height, id);
 	else if (type == "MultilineEdit")
-		AddMultilineEdit(title, x, y, width, height, id);
+		addMultilineEdit(title, x, y, width, height, id);
 	else if (type == "Group")
-		AddGroup(title, x, y, width, height, id);
+		addGroup(title, x, y, width, height, id);
 	else if (type == "CheckBox")
-		AddCheckBox(title, x, y, width, height, id);
+		addCheckBox(title, x, y, width, height, id);
 	else if (type == "ComboBox")
-		AddComboBox(title, x, y, width, height, id);
+		addComboBox(title, x, y, width, height, id);
 	else if (type == "TabControl")
-		AddTabControl(title, x, y, width, height, id);
+		addTabControl(title, x, y, width, height, id);
 	else if (type == "ListView")
-		AddListView(title, x, y, width, height, id);
+		addListView(title, x, y, width, height, id);
 	else if (type == "TreeView")
-		AddTreeView(title, x, y, width, height, id);
+		addTreeView(title, x, y, width, height, id);
 	else if (type == "IconView")
-		AddIconView(title, x, y, width, height, id);
+		addIconView(title, x, y, width, height, id);
 	else if (type == "ProgressBar")
-		AddProgressBar(title, x, y, width, height, id);
+		addProgressBar(title, x, y, width, height, id);
 	else if (type == "Slider")
-		AddSlider(title, x, y, width, height, id);
+		addSlider(title, x, y, width, height, id);
 	else if (type == "Image")
-		AddImage(title, x, y, width, height, id);
+		addImage(title, x, y, width, height, id);
 	else if (type == "DrawingArea")
-		AddDrawingArea(title, x, y, width, height, id);
+		addDrawingArea(title, x, y, width, height, id);
 	else if ((type == "ControlTable") || (type == "Grid"))
-		AddControlTable(title, x, y, width, height, id);
+		addControlTable(title, x, y, width, height, id);
 	else if (type == "SpinButton")
-		AddSpinButton(title, x, y, width, height, id);
+		addSpinButton(title, x, y, width, height, id);
 	else if (type == "RadioButton")
-		AddRadioButton(title, x, y, width, height, id);
+		addRadioButton(title, x, y, width, height, id);
 	else if (type == "ToggleButton")
-		AddToggleButton(title, x, y, width, height, id);
+		addToggleButton(title, x, y, width, height, id);
 	else if (type == "Expander")
-		AddExpander(title, x, y, width, height, id);
+		addExpander(title, x, y, width, height, id);
 	else if (type == "Scroller")
-		AddScroller(title, x, y, width, height, id);
+		addScroller(title, x, y, width, height, id);
 	else if (type == "Paned")
-		AddPaned(title, x, y, width, height, id);
+		addPaned(title, x, y, width, height, id);
 	else if (type == "Separator")
-		AddSeparator(title, x, y, width, height, id);
+		addSeparator(title, x, y, width, height, id);
 }
 
-void HuiPanel::FromResource(const string &id)
+void HuiPanel::fromResource(const string &id)
 {
 	msg_db_f("Window.FromResource",1);
 	HuiResource *res = HuiGetResource(id);
@@ -289,11 +299,11 @@ void HuiPanel::FromResource(const string &id)
 
 	// title
 	if (win)
-		win->SetTitle(HuiGetLanguage(res->id));
+		win->setTitle(HuiGetLanguage(res->id));
 
 	// size
 	if (win)
-		win->SetSize(res->i_param[0], res->i_param[1]);
+		win->setSize(res->i_param[0], res->i_param[1]);
 
 
 	// dialog
@@ -305,78 +315,78 @@ void HuiPanel::FromResource(const string &id)
 
 	// menu?
 	if ((win) && (res->s_param[0].num > 0))
-		win->SetMenu(HuiCreateResourceMenu(res->s_param[0]));
+		win->setMenu(HuiCreateResourceMenu(res->s_param[0]));
 
 	// toolbar?
 	if ((win) && (res->s_param[1].num > 0))
-		win->toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
+		win->toolbar[HuiToolbarTop]->setByID(res->s_param[1]);
 
 	// controls
 	foreach(HuiResource &cmd, res->children){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
-			SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			AddControl( cmd.type, HuiGetLanguage(cmd.id),
+			setTarget(cmd.s_param[0], cmd.i_param[4]);
+			addControl( cmd.type, HuiGetLanguage(cmd.id),
 						cmd.i_param[0], cmd.i_param[1],
 						cmd.i_param[2], cmd.i_param[3],
 						cmd.id);
 		}else if (res->type == "SizableDialog"){
 			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			AddControl( cmd.type, HuiGetLanguage(cmd.id),
+			setTarget(cmd.s_param[0], cmd.i_param[4]);
+			addControl( cmd.type, HuiGetLanguage(cmd.id),
 						cmd.i_param[0], cmd.i_param[1],
 						cmd.i_param[2], cmd.i_param[3],
 						cmd.id);
 		}
-		Enable(cmd.id, cmd.enabled);
+		enable(cmd.id, cmd.enabled);
 		if (cmd.image.num > 0)
-			SetImage(cmd.id, cmd.image);
+			setImage(cmd.id, cmd.image);
 	}
 	msg_db_m("  \\(^_^)/",1);
 }
 
-void HuiPanel::FromSource(const string &buffer)
+void HuiPanel::fromSource(const string &buffer)
 {
 	msg_db_f("FromSource",1);
 	HuiResourceNew res;
 	res.load(buffer);
 	if (res.type == "Dialog"){
 		if (win)
-			win->SetSize(res.w, res.h);
+			win->setSize(res.w, res.h);
 
 		if (res.children.num > 0)
-			EmbedResource(res.children[0], "", 0, 0);
+			embedResource(res.children[0], "", 0, 0);
 	}else{
-		EmbedResource(res, "", 0, 0);
+		embedResource(res, "", 0, 0);
 	}
 
 }
 
 
-void HuiPanel::EmbedResource(HuiResourceNew &c, const string &parent_id, int x, int y)
+void HuiPanel::embedResource(HuiResourceNew &c, const string &parent_id, int x, int y)
 {
-	SetTarget(parent_id, x);
+	setTarget(parent_id, x);
 	string title = c.title;
 	if (c.options.num > 0)
 		title = "!" + implode(c.options, ",") + "\\" + title;
-	AddControl(c.type, title, x, y, c.w, c.h, c.id);
+	addControl(c.type, title, x, y, c.w, c.h, c.id);
 
-	Enable(c.id, c.enabled);
+	enable(c.id, c.enabled);
 	if (c.image.num > 0)
-		SetImage(c.id, c.image);
+		setImage(c.id, c.image);
 
 	foreach(HuiResourceNew &child, c.children)
-		EmbedResource(child, c.id, child.x, child.y);
+		embedResource(child, c.id, child.x, child.y);
 }
 
-void HuiPanel::EmbedSource(const string &buffer, const string &parent_id, int x, int y)
+void HuiPanel::embedSource(const string &buffer, const string &parent_id, int x, int y)
 {
 	HuiResourceNew res;
 	res.load(buffer);
-	EmbedResource(res, parent_id, x, y);
+	embedResource(res, parent_id, x, y);
 }
 
-void HuiPanel::Embed(HuiPanel *panel, const string &parent_id, int x, int y)
+void HuiPanel::embed(HuiPanel *panel, const string &parent_id, int x, int y)
 {
 	if (!panel->root_control){
 		msg_error("trying to embed an empty panel");
@@ -386,8 +396,8 @@ void HuiPanel::Embed(HuiPanel *panel, const string &parent_id, int x, int y)
 	panel->set_win(win);
 	children.add(panel);
 
-	SetTarget(parent_id, x);
-	_InsertControl_(panel->root_control, x, y, 0, 0);
+	setTarget(parent_id, x);
+	_insert_control_(panel->root_control, x, y, 0, 0);
 	control.pop(); // dont' really add to us
 	panel->root_control->panel = panel;
 }
@@ -411,10 +421,10 @@ void HuiPanel::set_win(HuiWindow *_win)
 
 // replace all the text
 //    for all
-void HuiPanel::SetString(const string &_id, const string &str)
+void HuiPanel::setString(const string &_id, const string &str)
 {
 	if (win && (id == _id))
-		win->SetTitle(str);
+		win->setTitle(str);
 	test_controls(_id, c)
 		c->SetString(str);
 }
@@ -423,7 +433,7 @@ void HuiPanel::SetString(const string &_id, const string &str)
 //    for all
 // select an item
 //    for ComboBox, TabControl, ListView?
-void HuiPanel::SetInt(const string &_id, int n)
+void HuiPanel::setInt(const string &_id, int n)
 {
 	test_controls(_id, c)
 		c->SetInt(n);
@@ -431,19 +441,19 @@ void HuiPanel::SetInt(const string &_id, int n)
 
 // replace all the text with a float
 //    for all
-void HuiPanel::SetFloat(const string &_id, float f)
+void HuiPanel::setFloat(const string &_id, float f)
 {
 	test_controls(_id, c)
 		c->SetFloat(f);
 }
 
-void HuiPanel::SetImage(const string &_id, const string &image)
+void HuiPanel::setImage(const string &_id, const string &image)
 {
 	test_controls(_id, c)
 		c->SetImage(image);
 }
 
-void HuiPanel::SetTooltip(const string &_id, const string &tip)
+void HuiPanel::setTooltip(const string &_id, const string &tip)
 {
 	test_controls(_id, c)
 		c->SetTooltip(tip);
@@ -452,7 +462,7 @@ void HuiPanel::SetTooltip(const string &_id, const string &tip)
 
 // add a single line/string
 //    for ComboBox, ListView, ListViewTree, ListViewIcons
-void HuiPanel::AddString(const string &_id, const string &str)
+void HuiPanel::addString(const string &_id, const string &str)
 {
 	test_controls(_id, c)
 		c->AddString(str);
@@ -460,7 +470,7 @@ void HuiPanel::AddString(const string &_id, const string &str)
 
 // add a single line as a child in the tree of a ListViewTree
 //    for ListViewTree
-void HuiPanel::AddChildString(const string &_id, int parent_row, const string &str)
+void HuiPanel::addChildString(const string &_id, int parent_row, const string &str)
 {
 	test_controls(_id, c)
 		c->AddChildString(parent_row, str);
@@ -468,14 +478,14 @@ void HuiPanel::AddChildString(const string &_id, int parent_row, const string &s
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
-void HuiPanel::ChangeString(const string &_id,int row,const string &str)
+void HuiPanel::changeString(const string &_id,int row,const string &str)
 {
 	test_controls(_id, c)
 		c->ChangeString(row, str);
 }
 
 // listview / treeview
-string HuiPanel::GetCell(const string &_id, int row, int column)
+string HuiPanel::getCell(const string &_id, int row, int column)
 {
 	test_controls(_id, c)
 		return c->GetCell(row, column);
@@ -483,13 +493,13 @@ string HuiPanel::GetCell(const string &_id, int row, int column)
 }
 
 // listview / treeview
-void HuiPanel::SetCell(const string &_id, int row, int column, const string &str)
+void HuiPanel::setCell(const string &_id, int row, int column, const string &str)
 {
 	test_controls(_id, c)
 		c->SetCell(row, column, str);
 }
 
-void HuiPanel::SetColor(const string &_id, const color &col)
+void HuiPanel::setColor(const string &_id, const color &col)
 {
 	test_controls(_id, c)
 		c->SetColor(col);
@@ -497,7 +507,7 @@ void HuiPanel::SetColor(const string &_id, const color &col)
 
 // retrieve the text
 //    for edit
-string HuiPanel::GetString(const string &_id)
+string HuiPanel::getString(const string &_id)
 {
 	test_controls(_id, c)
 		return c->GetString();
@@ -508,7 +518,7 @@ string HuiPanel::GetString(const string &_id)
 //    for edit
 // which item/line is selected?
 //    for ComboBox, TabControl, ListView
-int HuiPanel::GetInt(const string &_id)
+int HuiPanel::getInt(const string &_id)
 {
 	test_controls(_id, c)
 		return c->GetInt();
@@ -517,14 +527,14 @@ int HuiPanel::GetInt(const string &_id)
 
 // retrieve the text as a numerical value (float)
 //    for edit
-float HuiPanel::GetFloat(const string &_id)
+float HuiPanel::getFloat(const string &_id)
 {
 	test_controls(_id, c)
 		return c->GetFloat();
 	return 0;
 }
 
-color HuiPanel::GetColor(const string &_id)
+color HuiPanel::getColor(const string &_id)
 {
 	test_controls(_id, c)
 		return c->GetColor();
@@ -533,7 +543,7 @@ color HuiPanel::GetColor(const string &_id)
 
 // switch control to usable/unusable
 //    for all
-void HuiPanel::Enable(const string &_id,bool enabled)
+void HuiPanel::enable(const string &_id,bool enabled)
 {
 	test_controls(_id, c)
 		c->Enable(enabled);
@@ -541,7 +551,7 @@ void HuiPanel::Enable(const string &_id,bool enabled)
 
 // show/hide control
 //    for all
-void HuiPanel::HideControl(const string &_id,bool hide)
+void HuiPanel::hideControl(const string &_id,bool hide)
 {
 	test_controls(_id, c)
 		c->Hide(hide);
@@ -549,7 +559,7 @@ void HuiPanel::HideControl(const string &_id,bool hide)
 
 // mark as "checked"
 //    for CheckBox, ToolBarItemCheckable
-void HuiPanel::Check(const string &_id,bool checked)
+void HuiPanel::check(const string &_id,bool checked)
 {
 	test_controls(_id, c)
 		c->Check(checked);
@@ -557,7 +567,7 @@ void HuiPanel::Check(const string &_id,bool checked)
 
 // is marked as "checked"?
 //    for CheckBox
-bool HuiPanel::IsChecked(const string &_id)
+bool HuiPanel::isChecked(const string &_id)
 {
 	test_controls(_id, c)
 		return c->IsChecked();
@@ -566,7 +576,7 @@ bool HuiPanel::IsChecked(const string &_id)
 
 // which lines are selected?
 //    for ListView
-Array<int> HuiPanel::GetMultiSelection(const string &_id)
+Array<int> HuiPanel::getMultiSelection(const string &_id)
 {
 	test_controls(_id, c)
 		return c->GetMultiSelection();
@@ -574,7 +584,7 @@ Array<int> HuiPanel::GetMultiSelection(const string &_id)
 	return sel;
 }
 
-void HuiPanel::SetMultiSelection(const string &_id, Array<int> &sel)
+void HuiPanel::setMultiSelection(const string &_id, Array<int> &sel)
 {
 	test_controls(_id, c)
 		c->SetMultiSelection(sel);
@@ -582,7 +592,7 @@ void HuiPanel::SetMultiSelection(const string &_id, Array<int> &sel)
 
 // delete all the content
 //    for ComboBox, ListView
-void HuiPanel::Reset(const string &_id)
+void HuiPanel::reset(const string &_id)
 {
 	test_controls(_id, c)
 		c->Reset();
@@ -590,7 +600,7 @@ void HuiPanel::Reset(const string &_id)
 
 // expand a single row
 //    for TreeView
-void HuiPanel::Expand(const string &_id, int row, bool expand)
+void HuiPanel::expand(const string &_id, int row, bool expand)
 {
 	test_controls(_id, c)
 		c->Expand(row, expand);
@@ -598,7 +608,7 @@ void HuiPanel::Expand(const string &_id, int row, bool expand)
 
 // expand all rows
 //    for TreeView
-void HuiPanel::ExpandAll(const string &_id, bool expand)
+void HuiPanel::expandAll(const string &_id, bool expand)
 {
 	test_controls(_id, c)
 		c->ExpandAll(expand);
@@ -606,21 +616,21 @@ void HuiPanel::ExpandAll(const string &_id, bool expand)
 
 // is column in tree expanded?
 //    for TreeView
-bool HuiPanel::IsExpanded(const string &_id, int row)
+bool HuiPanel::isExpanded(const string &_id, int row)
 {
 	test_controls(_id, c)
 		return false;
 	return false;
 }
 
-void HuiPanel::DeleteControl(const string &_id)
+void HuiPanel::deleteControl(const string &_id)
 {
 	for(int i=control.num-1;i>=0;i--)
 		if (control[i]->id == _id)
 			delete(control[i]);
 }
 
-void HuiPanel::SetOptions(const string &_id, const string &options)
+void HuiPanel::setOptions(const string &_id, const string &options)
 {
 	test_controls(_id, c)
 		c->SetOptions(options);

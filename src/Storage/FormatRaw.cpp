@@ -29,7 +29,7 @@ RawConfigData GetRawConfigData()
 {
 	RawConfigData data;
 	RawConfigDialog *dlg = new RawConfigDialog(&data, tsunami->win);
-	dlg->Run();
+	dlg->run();
 	return data;
 }
 

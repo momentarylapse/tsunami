@@ -78,64 +78,64 @@ public:
 	virtual ~HuiWindow();
 	virtual void _cdecl __delete__();
 
-	void _Init_(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
-	void _InitGeneric_(HuiWindow *parent, bool allow_parent, int mode);
-	void _CleanUp_();
+	void _init_(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
+	void _init_generic_(HuiWindow *parent, bool allow_parent, int mode);
+	void _clean_up_();
 
 	// the window
-	string _cdecl Run();
-	void _cdecl Show();
-	void _cdecl Hide();
-	void _cdecl SetMaximized(bool maximized);
-	bool _cdecl IsMaximized();
-	bool _cdecl IsMinimized();
-	void _cdecl SetID(const string &id);
-	void _cdecl SetFullscreen(bool fullscreen);
-	void _cdecl SetTitle(const string &title);
-	void _cdecl SetPosition(int x, int y);
-	void _cdecl SetPositionSpecial(HuiWindow *win, int mode);
-	void _cdecl GetPosition(int &x, int &y);
-	void _cdecl SetSize(int width, int height);
-	void _cdecl GetSize(int &width, int &height);
-	void _cdecl SetSizeDesired(int width, int height);
-	void _cdecl GetSizeDesired(int &width, int &height);
-	void _cdecl SetMenu(HuiMenu *menu);
-	HuiMenu* _cdecl GetMenu();
-	HuiWindow* _cdecl GetParent();
+	string _cdecl run();
+	void _cdecl show();
+	void _cdecl hide();
+	void _cdecl setMaximized(bool maximized);
+	bool _cdecl isMaximized();
+	bool _cdecl isMinimized();
+	void _cdecl setID(const string &id);
+	void _cdecl setFullscreen(bool fullscreen);
+	void _cdecl setTitle(const string &title);
+	void _cdecl setPosition(int x, int y);
+	void _cdecl setPositionSpecial(HuiWindow *win, int mode);
+	void _cdecl getPosition(int &x, int &y);
+	void _cdecl setSize(int width, int height);
+	void _cdecl getSize(int &width, int &height);
+	void _cdecl setSizeDesired(int width, int height);
+	void _cdecl getSizeDesired(int &width, int &height);
+	void _cdecl setMenu(HuiMenu *menu);
+	HuiMenu* _cdecl getMenu();
+	HuiWindow* _cdecl getParent();
 
 
-	void _cdecl SetCursorPos(int x,int y);
-	void _cdecl ShowCursor(bool show);
+	void _cdecl setCursorPos(int x,int y);
+	void _cdecl showCursor(bool show);
 
 	// status bar
-	void _cdecl EnableStatusbar(bool enabled);
-	//bool _cdecl IsStatusbarEnabled();
-	void _cdecl SetStatusText(const string &str);
+	void _cdecl enableStatusbar(bool enabled);
+	//bool _cdecl isStatusbarEnabled();
+	void _cdecl setStatusText(const string &str);
 
 	// events by overwriting
-	virtual void _cdecl OnMouseMove(){}
-	virtual void _cdecl OnMouseEnter(){}
-	virtual void _cdecl OnMouseLeave(){}
-	virtual void _cdecl OnLeftButtonDown(){}
-	virtual void _cdecl OnMiddleButtonDown(){}
-	virtual void _cdecl OnRightButtonDown(){}
-	virtual void _cdecl OnLeftButtonUp(){}
-	virtual void _cdecl OnMiddleButtonUp(){}
-	virtual void _cdecl OnRightButtonUp(){}
-	virtual void _cdecl OnDoubleClick(){}
-	virtual void _cdecl OnMouseWheel(){}
-	virtual void _cdecl OnCloseRequest();
-	virtual void _cdecl OnKeyDown(){}
-	virtual void _cdecl OnKeyUp(){}
-	virtual void _cdecl OnDraw(){}
+	virtual void _cdecl onMouseMove(){}
+	virtual void _cdecl onMouseEnter(){}
+	virtual void _cdecl onMouseLeave(){}
+	virtual void _cdecl onLeftButtonDown(){}
+	virtual void _cdecl onMiddleButtonDown(){}
+	virtual void _cdecl onRightButtonDown(){}
+	virtual void _cdecl onLeftButtonUp(){}
+	virtual void _cdecl onMiddleButtonUp(){}
+	virtual void _cdecl onRightButtonUp(){}
+	virtual void _cdecl onDoubleClick(){}
+	virtual void _cdecl onMouseWheel(){}
+	virtual void _cdecl onCloseRequest();
+	virtual void _cdecl onKeyDown(){}
+	virtual void _cdecl onKeyUp(){}
+	virtual void _cdecl onDraw(){}
 
 	// input
-	bool _cdecl GetKey(int key);
-	bool _cdecl GetMouse(int &x, int &y, int button);
+	bool _cdecl getKey(int key);
+	bool _cdecl getMouse(int &x, int &y, int button);
 
 
 	// hui internal
-	int _GetMainLevel_();
+	int _get_main_level_();
 	bool allow_input;
 	HuiInputData input;
 	int mouse_offset_x, mouse_offset_y;

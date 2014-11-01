@@ -12,43 +12,43 @@ NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
 {
 	audio = a;
 
-	SetString("sample_rate", "22050");
-	SetString("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
-	SetString("sample_rate", "48000");
-	SetString("sample_rate", "96000");
-	SetInt("sample_rate", 1);
-	HideControl("nd_g_metronome_params", true);
+	setString("sample_rate", "22050");
+	setString("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
+	setString("sample_rate", "48000");
+	setString("sample_rate", "96000");
+	setInt("sample_rate", 1);
+	hideControl("nd_g_metronome_params", true);
 
-	EventM("cancel", this, &NewDialog::OnClose);
-	EventM("hui:close", this, &NewDialog::OnClose);
-	EventM("ok", this, &NewDialog::OnOk);
-	EventM("metronome", this, &NewDialog::OnMetronome);
+	event("cancel", this, &NewDialog::onClose);
+	event("hui:close", this, &NewDialog::onClose);
+	event("ok", this, &NewDialog::onOk);
+	event("metronome", this, &NewDialog::onMetronome);
 }
 
 NewDialog::~NewDialog()
 {
 }
 
-void NewDialog::OnClose()
+void NewDialog::onClose()
 {
 	delete(this);
 }
 
-void NewDialog::OnOk()
+void NewDialog::onOk()
 {
-	int sample_rate = GetString("sample_rate")._int();
+	int sample_rate = getString("sample_rate")._int();
 	audio->NewWithOneTrack(Track::TYPE_AUDIO, sample_rate);
 	audio->action_manager->Enable(false);
-	if (IsChecked("metronome")){
+	if (isChecked("metronome")){
 		Track *t = audio->AddTrack(Track::TYPE_TIME, 0);
-		t->AddBars(-1, GetFloat("beats_per_minute"), GetInt("beats_per_bar"), GetInt("num_bars"));
+		t->AddBars(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("num_bars"));
 	}
 	audio->action_manager->Enable(true);
-	OnClose();
+	onClose();
 }
 
-void NewDialog::OnMetronome()
+void NewDialog::onMetronome()
 {
-	HideControl("nd_g_metronome_params", !IsChecked(""));
+	hideControl("nd_g_metronome_params", !isChecked(""));
 }
 

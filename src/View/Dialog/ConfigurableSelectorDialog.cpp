@@ -17,7 +17,7 @@ Configurable *ConfigurableSelectorDialog::_return;
 ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _type, const string &old_name) :
 	HuiDialog("Selector", 400, 500, _parent, false)
 {
-	AddTreeView("Name", 0, 0, 0, 0, "list");
+	addTreeView("Name", 0, 0, 0, 0, "list");
 
 	type = _type;
 	if (type == Configurable::TYPE_EFFECT){
@@ -40,21 +40,21 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _
 	}
 
 	foreach(string &g, ugroups)
-		SetString("list", g);
+		setString("list", g);
 
 	foreachi(string &name, names, i){
 		int n = i;
 		if (groups.num > 0){
 			int r = ugroups.find(groups[i]);
-			AddChildString("list", r, name);
+			addChildString("list", r, name);
 		}else
-			SetString("list", name);
+			setString("list", name);
 		if (name == old_name)
-			SetInt("list", n);
+			setInt("list", n);
 	}
 
-	EventM("hui:close", this, &ConfigurableSelectorDialog::onClose);
-	EventM("list", this, &ConfigurableSelectorDialog::onSelect);
+	event("hui:close", this, &ConfigurableSelectorDialog::onClose);
+	event("list", this, &ConfigurableSelectorDialog::onSelect);
 
 	_return = NULL;
 }
@@ -65,7 +65,7 @@ ConfigurableSelectorDialog::~ConfigurableSelectorDialog()
 
 void ConfigurableSelectorDialog::onSelect()
 {
-	int n = GetInt("list") - ugroups.num;
+	int n = getInt("list") - ugroups.num;
 	if (n < 0)
 		return;
 	if (type == Configurable::TYPE_EFFECT)
@@ -85,6 +85,6 @@ void ConfigurableSelectorDialog::onClose()
 Synthesizer *ChooseSynthesizer(HuiWindow *parent, const string &old_name)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, old_name);
-	dlg->Run();
+	dlg->run();
 	return (Synthesizer*)ConfigurableSelectorDialog::_return;
 }

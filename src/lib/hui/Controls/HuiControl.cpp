@@ -282,14 +282,14 @@ void HuiControl::Notify(const string &message, bool is_default)
 		return;
 	}
 	msg_db_m("Control.Notify", 2);
-	panel->_SetCurID_(id);
+	panel->_set_cur_id_(id);
 	if (id.num == 0)
 		return;
 	notify_push(this);
 	HuiEvent e = HuiEvent(id, message);
 	_HuiSendGlobalCommand_(&e);
 	e.is_default = is_default;
-	panel->_SendEvent_(&e);
+	panel->_send_event_(&e);
 
 	if (notify_is_deleted(this)){
 		notify_pop();
@@ -299,32 +299,32 @@ void HuiControl::Notify(const string &message, bool is_default)
 	HuiWindow *win = panel->win;
 	if (this == win->main_input_control){
 		if (message == "hui:mouse-move")
-			win->OnMouseMove();
+			win->onMouseMove();
 		else if (message == "hui:mouse-wheel")
-			win->OnMouseWheel();
+			win->onMouseWheel();
 		else if (message == "hui:mouse-enter")
-			win->OnMouseEnter();
+			win->onMouseEnter();
 		else if (message == "hui:mouse-leave")
-			win->OnMouseLeave();
+			win->onMouseLeave();
 		else if (message == "hui:left-button-down")
-			win->OnLeftButtonDown();
+			win->onLeftButtonDown();
 		else if (message == "hui:left-button-up")
-			win->OnLeftButtonUp();
+			win->onLeftButtonUp();
 		else if (message == "hui:middle-button-down")
-			win->OnMiddleButtonDown();
+			win->onMiddleButtonDown();
 		else if (message == "hui:middle-button-up")
-			win->OnMiddleButtonUp();
+			win->onMiddleButtonUp();
 		else if (message == "hui:right-button-down")
-			win->OnRightButtonDown();
+			win->onRightButtonDown();
 		else if (message == "hui:right-button-up")
-			win->OnRightButtonUp();
+			win->onRightButtonUp();
 		else if (message == "hui:key-down"){
-			win->OnKeyDown();
+			win->onKeyDown();
 			WinTrySendByKeyCode(win, HuiGetEvent()->key_code);
 		}else if (message == "hui:key-up")
-			win->OnKeyUp();
+			win->onKeyUp();
 		else if (message == "hui:draw")
-			win->OnDraw();
+			win->onDraw();
 	}else if (type == HuiKindMultilineEdit){
 		if (message == "hui:key-down"){
 			if (((HuiControlMultilineEdit*)this)->handle_keys)

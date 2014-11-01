@@ -29,15 +29,15 @@ public:
 	GtkWidget *widget;
 #endif
 
-	void _cdecl Enable(bool enabled);
-	void _cdecl Configure(bool text_enabled, bool large_icons);
-	void _cdecl AddItem(const string &title, const string &image, const string &id);
-	void _cdecl AddItemCheckable(const string &title, const string &image, const string &id);
-	void _cdecl AddItemMenu(const string &title, const string &image, HuiMenu *menu, const string &id);
-	void _cdecl AddItemMenuByID(const string &title, const string &image, const string &menu_id, const string &id);
-	void _cdecl AddSeparator();
-	void _cdecl Reset();
-	void _cdecl SetByID(const string &id);
+	void _cdecl enable(bool enabled);
+	void _cdecl configure(bool text_enabled, bool large_icons);
+	void _cdecl addItem(const string &title, const string &image, const string &id);
+	void _cdecl addItemCheckable(const string &title, const string &image, const string &id);
+	void _cdecl addItemMenu(const string &title, const string &image, HuiMenu *menu, const string &id);
+	void _cdecl addItemMenuByID(const string &title, const string &image, const string &menu_id, const string &id);
+	void _cdecl addSeparator();
+	void _cdecl reset();
+	void _cdecl setByID(const string &id);
 
 	void add(HuiControl *c);
 };

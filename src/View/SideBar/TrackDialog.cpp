@@ -24,25 +24,25 @@ TrackDialog::TrackDialog(AudioView *_view) :
 {
 	view = _view;
 	track = NULL;
-	SetBorderWidth(5);
-	FromResource("track_dialog");
-	SetDecimals(1);
+	setBorderWidth(5);
+	fromResource("track_dialog");
+	setDecimals(1);
 	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
 
-	Expand("ld_t_synth", 0, true);
-	Expand("ld_t_bars", 0, true);
-	Expand("ld_t_effects", 0, true);
+	expand("ld_t_synth", 0, true);
+	expand("ld_t_bars", 0, true);
+	expand("ld_t_effects", 0, true);
 
 	loadData();
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
-	EventM("name", this, &TrackDialog::onName);
-	EventM("volume", this, &TrackDialog::onVolume);
-	EventM("panning", this, &TrackDialog::onPanning);
-	EventM("synthesizer", this, &TrackDialog::onSynthesizer);
-	EventM("config_synth", this, &TrackDialog::onConfigSynthesizer);
-	EventM("edit_midi", this, &TrackDialog::onEditMidi);
+	event("name", this, &TrackDialog::onName);
+	event("volume", this, &TrackDialog::onVolume);
+	event("panning", this, &TrackDialog::onPanning);
+	event("synthesizer", this, &TrackDialog::onSynthesizer);
+	event("config_synth", this, &TrackDialog::onConfigSynthesizer);
+	event("edit_midi", this, &TrackDialog::onEditMidi);
 }
 
 TrackDialog::~TrackDialog()
@@ -55,24 +55,24 @@ TrackDialog::~TrackDialog()
 
 void TrackDialog::loadData()
 {
-	Enable("name", track);
-	Enable("volume", track);
-	Enable("panning", track);
-	bar_list->SetTrack(track);
+	enable("name", track);
+	enable("volume", track);
+	enable("panning", track);
+	bar_list->setTrack(track);
 	if (track){
-		SetString("name", track->name);
-		SetOptions("name", "placeholder=" + track->GetNiceName());
-		SetFloat("volume", amplitude2db(track->volume));
-		SetFloat("panning", track->panning * 100.0f);
-		SetString("synthesizer", track->synth->name);
-		HideControl("ld_t_synth", track->type == track->TYPE_AUDIO);
+		setString("name", track->name);
+		setOptions("name", "placeholder=" + track->GetNiceName());
+		setFloat("volume", amplitude2db(track->volume));
+		setFloat("panning", track->panning * 100.0f);
+		setString("synthesizer", track->synth->name);
+		hideControl("ld_t_synth", track->type == track->TYPE_AUDIO);
 		//Enable("config_synth", track->type != track->TYPE_AUDIO);
-		HideControl("ld_t_bars", track->type != Track::TYPE_TIME);
-		HideControl("ld_t_midi", track->type != Track::TYPE_MIDI);
+		hideControl("ld_t_bars", track->type != Track::TYPE_TIME);
+		hideControl("ld_t_midi", track->type != Track::TYPE_MIDI);
 	}else{
-		HideControl("ld_t_synth", true);
-		HideControl("ld_t_bars", true);
-		HideControl("ld_t_midi", true);
+		hideControl("ld_t_synth", true);
+		hideControl("ld_t_bars", true);
+		hideControl("ld_t_midi", true);
 		//Enable("synthesizer", track);
 		//Enable("config_synth", track);
 	}
@@ -90,17 +90,17 @@ void TrackDialog::setTrack(Track *t)
 
 void TrackDialog::onName()
 {
-	track->SetName(GetString(""));
+	track->SetName(getString(""));
 }
 
 void TrackDialog::onVolume()
 {
-	track->SetVolume(db2amplitude(GetFloat("volume")));
+	track->SetVolume(db2amplitude(getFloat("volume")));
 }
 
 void TrackDialog::onPanning()
 {
-	track->SetPanning(GetFloat("panning") / 100.0f);
+	track->SetPanning(getFloat("panning") / 100.0f);
 }
 
 void TrackDialog::onSynthesizer()

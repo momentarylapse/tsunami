@@ -47,17 +47,17 @@ void add_key_to_buffer(HuiInputData *d, int key)
 
 HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height, HuiWindow *root, bool allow_root, int mode)
 {
-	_Init_(title, x, y, width, height, root, allow_root, mode);
+	_init_(title, x, y, width, height, root, allow_root, mode);
 }
 
 HuiWindow::HuiWindow()
 {
-	_Init_("", -1, -1, 0, 0, NULL, true, HuiWinModeDummy);
+	_init_("", -1, -1, 0, 0, NULL, true, HuiWinModeDummy);
 }
 
 HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height)
 {
-	_Init_(title, x, y, width, height, NULL, true, HuiWinModeResizable | HuiWinModeControls);
+	_init_(title, x, y, width, height, NULL, true, HuiWinModeResizable | HuiWinModeControls);
 }
 
 void HuiWindow::__init_ext__(const string& title, int x, int y, int width, int height)
@@ -76,41 +76,41 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent, bool allow_parent)
 	int mode = HuiWinModeControls;
 	if (res->type == "SizableDialog")
 		mode = HuiWinModeControls | HuiWinModeResizable;
-	_Init_(HuiGetLanguage(id), -1, -1, res->i_param[0], res->i_param[1], parent, allow_parent, mode);
+	_init_(HuiGetLanguage(id), -1, -1, res->i_param[0], res->i_param[1], parent, allow_parent, mode);
 
 	// menu?
 	if (res->s_param[0].num > 0)
-		SetMenu(HuiCreateResourceMenu(res->s_param[0]));
+		setMenu(HuiCreateResourceMenu(res->s_param[0]));
 
 	// toolbar?
 	if (res->s_param[1].num > 0)
-		toolbar[HuiToolbarTop]->SetByID(res->s_param[1]);
+		toolbar[HuiToolbarTop]->setByID(res->s_param[1]);
 
 	// controls
 	foreach(HuiResource &cmd, res->children){
 		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 		if (res->type == "Dialog"){
-			SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			AddControl(	cmd.type, HuiGetLanguage(cmd.id),
+			setTarget(cmd.s_param[0], cmd.i_param[4]);
+			addControl(	cmd.type, HuiGetLanguage(cmd.id),
 						cmd.i_param[0], cmd.i_param[1],
 						cmd.i_param[2], cmd.i_param[3],
 						cmd.id);
 		}else if (res->type == "SizableDialog"){
 			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			SetTarget(cmd.s_param[0], cmd.i_param[4]);
-			AddControl( cmd.type, HuiGetLanguage(cmd.id),
+			setTarget(cmd.s_param[0], cmd.i_param[4]);
+			addControl( cmd.type, HuiGetLanguage(cmd.id),
 						cmd.i_param[0], cmd.i_param[1],
 						cmd.i_param[2], cmd.i_param[3],
 						cmd.id);
 		}
-		Enable(cmd.id, cmd.enabled);
+		enable(cmd.id, cmd.enabled);
 		if (cmd.image.num > 0)
-			SetImage(cmd.id, cmd.image);
+			setImage(cmd.id, cmd.image);
 	}
 	msg_db_m("  \\(^_^)/",1);
 }
 
-void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
+void HuiWindow::_init_generic_(HuiWindow *_root, bool _allow_root, int _mode)
 {
 	msg_db_f("Window::_InitGeneric_", 2);
 	_HuiMakeUsable_();
@@ -136,7 +136,7 @@ void HuiWindow::_InitGeneric_(HuiWindow *_root, bool _allow_root, int _mode)
 	main_level = HuiMainLevel;
 }
 
-void HuiWindow::_CleanUp_()
+void HuiWindow::_clean_up_()
 {
 	msg_db_f("Window::_CleanUp_", 2);
 
@@ -155,36 +155,36 @@ void HuiWindow::_CleanUp_()
 }
 
 // default handler when trying to close the windows
-void HuiWindow::OnCloseRequest()
+void HuiWindow::onCloseRequest()
 {
-	int level = _GetMainLevel_();
+	int level = _get_main_level_();
 	delete(this);
 	
 	// no message function (and last window in this main level): end program
 	// ...or at least end nested main level
 	foreach(HuiWindow *w, HuiWindows)
-		if (w->_GetMainLevel_() >= level)
+		if (w->_get_main_level_() >= level)
 			return;
 	HuiEnd();
 }
 
 
 // identify window (for automatic title assignment with language strings)
-void HuiWindow::SetID(const string &_id)
+void HuiWindow::setID(const string &_id)
 {
 	id = _id;
 	if ((HuiLanguaged) && (id.num > 0))
-		SetTitle(HuiGetLanguage(id));
+		setTitle(HuiGetLanguage(id));
 }
 
 // align window relative to another window (like..."top right corner")
-void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
+void HuiWindow::setPositionSpecial(HuiWindow *win,int mode)
 {
 	int pw, ph, cw, ch, px, py, cx, cy;
-	win->GetSize(pw, ph);
-	win->GetPosition(px, py);
-	GetSize(cw, ch);
-	GetPosition(cx, cy);
+	win->getSize(pw, ph);
+	win->getPosition(px, py);
+	getSize(cw, ch);
+	getPosition(cx, cy);
 	if ((mode & HuiLeft)>0)
 		cx = px + 2;
 	if ((mode & HuiRight)>0)
@@ -193,25 +193,25 @@ void HuiWindow::SetPositionSpecial(HuiWindow *win,int mode)
 		cy = py + 20;
 	if ((mode & HuiBottom)>0)
 		cy = py + ph - ch - 2;
-	SetPosition(cx, cy);
+	setPosition(cx, cy);
 }
 
-int HuiWindow::_GetMainLevel_()
+int HuiWindow::_get_main_level_()
 {
 	return main_level;
 }
 
-HuiMenu *HuiWindow::GetMenu()
+HuiMenu *HuiWindow::getMenu()
 {
 	return menu;
 }
 
-HuiWindow *HuiWindow::GetParent()
+HuiWindow *HuiWindow::getParent()
 {
 	return parent;
 }
 
-bool HuiWindow::GetKey(int k)
+bool HuiWindow::getKey(int k)
 {
 	if (k == KEY_CONTROL)
 		return (input.key[KEY_RCONTROL] || input.key[KEY_LCONTROL]);
@@ -221,7 +221,7 @@ bool HuiWindow::GetKey(int k)
 		return input.key[k];
 }
 
-bool HuiWindow::GetMouse(int &x, int &y, int button)
+bool HuiWindow::getMouse(int &x, int &y, int button)
 {
 	x = input.x;
 	y = input.y;
@@ -260,7 +260,7 @@ void HuiFuncClose()
 HuiNixWindow::HuiNixWindow(const string& title, int x, int y, int width, int height) :
 	HuiWindow(title, x, y, width, height, NULL, true, HuiWinModeResizable)
 {
-	AddDrawingArea("", 0, 0, 0, 0, "nix-area");
+	addDrawingArea("", 0, 0, 0, 0, "nix-area");
 }
 
 void HuiNixWindow::__init_ext__(const string& title, int x, int y, int width, int height)
@@ -293,7 +293,7 @@ void HuiFixedDialog::__init_ext__(const string& title, int width, int height, Hu
 HuiSourceDialog::HuiSourceDialog(const string &buffer, HuiWindow *root) :
 	HuiWindow("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, HuiWinModeControls | HuiWinModeResizable)
 {
-	FromSource(buffer);
+	fromSource(buffer);
 }
 
 

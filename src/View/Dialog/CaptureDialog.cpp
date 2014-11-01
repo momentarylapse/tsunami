@@ -38,29 +38,29 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	}
 
 	// dialog
-	Check("capture_type:audio", true);
+	check("capture_type:audio", true);
 	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
-	SetString("capture_time", a->get_time_str_long(0));
-	Enable("capture_delete", false);
-	Enable("capture_pause", false);
-	Enable("ok", false);
+	setString("capture_time", a->get_time_str_long(0));
+	enable("capture_delete", false);
+	enable("capture_pause", false);
+	enable("ok", false);
 
 	foreach(Track *t, a->track)
-		AddString("capture_target", t->GetNiceName() + "     (" + track_type(t->type) + ")");
-	AddString("capture_target", _("neue Spur anlegen"));
+		addString("capture_target", t->GetNiceName() + "     (" + track_type(t->type) + ")");
+	addString("capture_target", _("neue Spur anlegen"));
 	if (view->cur_track)
-		SetInt("capture_target", get_track_index(view->cur_track));
+		setInt("capture_target", get_track_index(view->cur_track));
 	else
-		SetInt("capture_target", a->track.num);
+		setInt("capture_target", a->track.num);
 
-	EventM("cancel", this, &CaptureDialog::onClose);
-	EventM("hui:close", this, &CaptureDialog::onClose);
-	EventM("ok", this, &CaptureDialog::onOk);
-	EventM("capture_type:audio", this, &CaptureDialog::onTypeAudio);
-	EventM("capture_type:midi", this, &CaptureDialog::onTypeMidi);
-	EventM("capture_start", this, &CaptureDialog::onStart);
-	EventM("capture_delete", this, &CaptureDialog::onDelete);
-	EventM("capture_pause", this, &CaptureDialog::onPause);
+	event("cancel", this, &CaptureDialog::onClose);
+	event("hui:close", this, &CaptureDialog::onClose);
+	event("ok", this, &CaptureDialog::onOk);
+	event("capture_type:audio", this, &CaptureDialog::onTypeAudio);
+	event("capture_type:midi", this, &CaptureDialog::onTypeMidi);
+	event("capture_start", this, &CaptureDialog::onStart);
+	event("capture_delete", this, &CaptureDialog::onDelete);
+	event("capture_pause", this, &CaptureDialog::onPause);
 	subscribe(tsunami->input);
 }
 
@@ -87,7 +87,7 @@ static Array<AudioInputMidi::MidiPort> ports;
 
 void OnSelectPort()
 {
-	int n = HuiCurWindow->GetInt("");
+	int n = HuiCurWindow->getInt("");
 	if (n < ports.num)
 		tsunami->input->in_midi->connectTo(ports[n]);
 	delete HuiCurWindow;
@@ -97,14 +97,14 @@ void SelectMidiPort(HuiWindow *parent)
 {
 	ports = tsunami->input->in_midi->findPorts();
 	HuiDialog *dlg = new HuiDialog(_("MIDI Quelle ausw&ahlen"), 400, 300, parent, false);
-	dlg->AddListView(_("MIDI Quellen"), 0, 0, 0, 0, "port_list");
+	dlg->addListView(_("MIDI Quellen"), 0, 0, 0, 0, "port_list");
 	foreach(AudioInputMidi::MidiPort &p, ports)
-		dlg->SetString("port_list", p.client_name + " : " + p.port_name);
-	dlg->SetString("port_list", _("        - nicht verbinden -"));
-	dlg->SetTooltip("port_list", _("* entweder eine Quelle w&ahlen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen &uberlassen, eine Verbindung herzustellen"));
-	dlg->SetInt("port_list", 0);
-	dlg->Event("port_list", &OnSelectPort);
-	dlg->Run();
+		dlg->setString("port_list", p.client_name + " : " + p.port_name);
+	dlg->setString("port_list", _("        - nicht verbinden -"));
+	dlg->setTooltip("port_list", _("* entweder eine Quelle w&ahlen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen &uberlassen, eine Verbindung herzustellen"));
+	dlg->setInt("port_list", 0);
+	dlg->eventS("port_list", &OnSelectPort);
+	dlg->run();
 }
 
 void CaptureDialog::onTypeMidi()
@@ -118,17 +118,17 @@ void CaptureDialog::onTypeMidi()
 
 void CaptureDialog::onStart()
 {
-	tsunami->renderer->Prepare(audio, tsunami->win->view->GetPlaybackSelection(), false);
+	tsunami->renderer->Prepare(audio, tsunami->win->view->getPlaybackSelection(), false);
 	view->stream->play();
 
 	tsunami->input->resetSync();
 	tsunami->input->accumulate(true);
-	Enable("capture_start", false);
-	Enable("capture_pause", true);
-	Enable("capture_delete", true);
-	Enable("ok", true);
-	Enable("capture_type:audio", false);
-	Enable("capture_type:midi", false);
+	enable("capture_start", false);
+	enable("capture_pause", true);
+	enable("capture_delete", true);
+	enable("ok", true);
+	enable("capture_type:audio", false);
+	enable("capture_type:midi", false);
 }
 
 void CaptureDialog::onDelete()
@@ -137,10 +137,10 @@ void CaptureDialog::onDelete()
 		view->stream->stop();
 	tsunami->input->resetAccumulation();
 	tsunami->input->accumulate(false);
-	Enable("capture_start", true);
-	Enable("capture_pause", false);
-	Enable("capture_delete", false);
-	Enable("ok", false);
+	enable("capture_start", true);
+	enable("capture_pause", false);
+	enable("capture_delete", false);
+	enable("ok", false);
 	onUpdate(NULL, "");
 }
 
@@ -150,8 +150,8 @@ void CaptureDialog::onPause()
 	if (view->stream->isPlaying())
 		view->stream->stop();
 	tsunami->input->accumulate(false);
-	Enable("capture_start", true);
-	Enable("capture_pause", false);
+	enable("capture_start", true);
+	enable("capture_pause", false);
 }
 
 
@@ -168,14 +168,14 @@ void CaptureDialog::onClose()
 
 void CaptureDialog::onUpdate(Observable *o, const string &message)
 {
-	SetString("capture_time", audio->get_time_str_long(tsunami->input->getSampleCount()));
+	setString("capture_time", audio->get_time_str_long(tsunami->input->getSampleCount()));
 }
 
 bool CaptureDialog::insert()
 {
 	msg_db_f("CaptureInsert", 1);
 	Track *t;
-	int target = GetInt("capture_target");
+	int target = getInt("capture_target");
 	int i0;
 	int s_start = tsunami->win->view->sel_range.start();
 

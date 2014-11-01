@@ -18,12 +18,12 @@ public:
 	NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a);
 	virtual ~NewDialog();
 
-	void LoadData();
-	void ApplyData();
+	void loadData();
+	void applyData();
 
-	void OnOk();
-	void OnClose();
-	void OnMetronome();
+	void onOk();
+	void onClose();
+	void onMetronome();
 
 	AudioFile *audio;
 };

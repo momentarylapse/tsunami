@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.9.0";
+string HuiVersion = "0.5.10.0";
 
 #include <stdio.h>
 #include <signal.h>
@@ -460,7 +460,7 @@ void HuiCleanUpMainLevel()
 {
 	msg_db_f("HuiCleanUpMainLevel",2);
 	foreachb(HuiWindow *w, HuiWindows)
-		if (w->_GetMainLevel_() >= HuiMainLevel){
+		if (w->_get_main_level_() >= HuiMainLevel){
 			delete(w);
 		}
 	HuiSetIdleFunction(NULL);

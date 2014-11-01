@@ -26,22 +26,22 @@ public:
 	AudioView(TsunamiWindow *parent, AudioFile *audio, AudioOutput *output, AudioInput *input, AudioRenderer *renderer);
 	virtual ~AudioView();
 
-	void CheckConsistency();
-	void ForceRedraw();
+	void checkConsistency();
+	void forceRedraw();
 
-	void OnDraw();
-	void OnMouseMove();
-	void OnLeftButtonDown();
-	void OnLeftButtonUp();
-	void OnMiddleButtonDown();
-	void OnMiddleButtonUp();
-	void OnRightButtonDown();
-	void OnRightButtonUp();
-	void OnLeftDoubleClick();
-	void OnMouseWheel();
-	void OnKeyDown();
-	void OnKeyUp();
-	void OnCommand(const string &id);
+	void onDraw();
+	void onMouseMove();
+	void onLeftButtonDown();
+	void onLeftButtonUp();
+	void onMiddleButtonDown();
+	void onMiddleButtonUp();
+	void onRightButtonDown();
+	void onRightButtonUp();
+	void onLeftDoubleClick();
+	void onMouseWheel();
+	void onKeyDown();
+	void onKeyUp();
+	void onCommand(const string &id);
 
 	void onUpdate(Observable *o, const string &message);
 	static const string MESSAGE_CUR_TRACK_CHANGE;
@@ -51,21 +51,21 @@ public:
 	static const string MESSAGE_SETTINGS_CHANGE;
 	static const string MESSAGE_VIEW_CHANGE;
 
-	void SetShowMono(bool mono);
-	void SetPeaksMode(int mode);
-	void ZoomIn();
-	void ZoomOut();
-	void MakeSampleVisible(int sample);
+	void setShowMono(bool mono);
+	void setPeaksMode(int mode);
+	void zoomIn();
+	void zoomOut();
+	void makeSampleVisible(int sample);
 
-	void DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
-	void DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
-	void DrawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time = false);
-	void DrawSelection(HuiPainter *c, const rect &r);
-	void DrawBackground(HuiPainter *c, const rect &r);
-	void DrawAudioFile(HuiPainter *c, const rect &r);
+	void drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
+	void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
+	void drawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time = false);
+	void drawSelection(HuiPainter *c, const rect &r);
+	void drawBackground(HuiPainter *c, const rect &r);
+	void drawAudioFile(HuiPainter *c, const rect &r);
 
-	void OptimizeView();
-	void UpdateMenu();
+	void optimizeView();
+	void updateMenu();
 
 
 	color ColorBackground;
@@ -134,23 +134,23 @@ public:
 	int mx,my;
 	int mx0,my0;
 
-	void SelectNone();
-	void SelectAll();
-	void UpdateSelection();
-	Range GetPlaybackSelection();
+	void selectNone();
+	void selectAll();
+	void updateSelection();
+	Range getPlaybackSelection();
 
-	void SetMouse();
-	bool MouseOverTrack(AudioViewTrack *t);
-	int MouseOverSample(SampleRef *s);
-	void SelectionUpdatePos(SelectionType &s);
-	SelectionType GetMouseOver();
-	void SelectUnderMouse();
-	void SetBarriers(SelectionType *s);
-	void ApplyBarriers(int &pos);
-	void SetCursorPos(int pos);
+	void setMouse();
+	bool mouseOverTrack(AudioViewTrack *t);
+	int mouseOverSample(SampleRef *s);
+	void selectionUpdatePos(SelectionType &s);
+	SelectionType getMouseOver();
+	void selectUnderMouse();
+	void setBarriers(SelectionType *s);
+	void applyBarriers(int &pos);
+	void setCursorPos(int pos);
 
-	void SelectSample(SampleRef *s, bool diff);
-	void SelectTrack(Track *t, bool diff);
+	void selectSample(SampleRef *s, bool diff);
+	void selectTrack(Track *t, bool diff);
 
 	double screen2sample(double x);
 	double sample2screen(double s);
@@ -158,10 +158,10 @@ public:
 	int y2pitch(int y);
 	float pitch2y(int p);
 
-	Array<MidiNote> GetSelectedNotes();
+	Array<MidiNote> getSelectedNotes();
 
-	void Zoom(float f);
-	void Move(float dpos);
+	void zoom(float f);
+	void move(float dpos);
 
 
 	bool force_redraw;
@@ -177,7 +177,7 @@ public:
 	rect drawing_rect;
 	rect bottom_button_rect;
 
-	bool EditingMidi();
+	bool editingMidi();
 	int pitch_min, pitch_max;
 	int beat_partition;
 	int midi_mode;
@@ -201,9 +201,9 @@ public:
 	AudioInput *input;
 	AudioRenderer *renderer;
 
-	void SetCurSample(SampleRef *s);
-	void SetCurTrack(Track *t);
-	void SetCurLevel(int l);
+	void setCurSample(SampleRef *s);
+	void setCurTrack(Track *t);
+	void setCurLevel(int l);
 	Track *cur_track;
 	SampleRef *cur_sample;
 	int cur_level;
@@ -228,11 +228,11 @@ public:
 	TrackHeightManager thm;
 
 	Array<AudioViewTrack*> vtrack;
-	void UpdateTracks();
+	void updateTracks();
 
 	int prefered_buffer_level;
 	double buffer_zoom_factor;
-	void UpdateBufferZoom();
+	void updateBufferZoom();
 
 	Image image_muted, image_unmuted, image_solo;
 	Image image_track_audio, image_track_time, image_track_midi;

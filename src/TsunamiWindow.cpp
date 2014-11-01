@@ -100,28 +100,28 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("zoom_out", "", -1, this, &TsunamiWindow::onZoomOut);
 
 	// table structure
-	SetSize(width, height);
-	SetBorderWidth(0);
-	AddControlTable("", 0, 0, 1, 2, "root_table");
-	SetTarget("root_table", 0);
-	AddControlTable("", 0, 0, 2, 1, "main_table");
+	setSize(width, height);
+	setBorderWidth(0);
+	addControlTable("", 0, 0, 1, 2, "root_table");
+	setTarget("root_table", 0);
+	addControlTable("", 0, 0, 2, 1, "main_table");
 
 	// main table
-	SetTarget("main_table", 0);
-	AddDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
+	setTarget("main_table", 0);
+	addDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
 
 
-	toolbar[0]->SetByID("toolbar");
+	toolbar[0]->setByID("toolbar");
 	//ToolbarConfigure(false, true);
 
-	SetMenu(HuiCreateResourceMenu("menu"));
+	setMenu(HuiCreateResourceMenu("menu"));
 	//ToolBarConfigure(true, true);
-	SetMaximized(maximized);
+	setMaximized(maximized);
 
 	// events
-	EventM("hui:close", this, &TsunamiWindow::onExit);
+	event("hui:close", this, &TsunamiWindow::onExit);
 	for (int i=0;i<256;i++)
-		EventM(format("jump_to_level_%d", i), this, &TsunamiWindow::onCurLevel);
+		event(format("jump_to_level_%d", i), this, &TsunamiWindow::onCurLevel);
 
 	audio = tsunami->audio;
 
@@ -130,13 +130,13 @@ TsunamiWindow::TsunamiWindow() :
 
 	// side bar
 	side_bar = new SideBar(view, audio);
-	Embed(side_bar, "main_table", 1, 0);
-	side_bar->Hide();
+	embed(side_bar, "main_table", 1, 0);
+	side_bar->hide();
 
 	// bottom bar
 	bottom_bar = new BottomBar(view, audio, tsunami->output, tsunami->log);
-	Embed(bottom_bar, "root_table", 0, 1);
-	bottom_bar->Hide();
+	embed(bottom_bar, "root_table", 0, 1);
+	bottom_bar->hide();
 
 	subscribe(view);
 	subscribe(audio);
@@ -146,9 +146,9 @@ TsunamiWindow::TsunamiWindow() :
 
 
 	if (audio->track.num > 0)
-		view->SetCurTrack(audio->track[0]);
-	view->OptimizeView();
-	HuiRunLaterM(0.5f, view, &AudioView::OptimizeView);
+		view->setCurTrack(audio->track[0]);
+	view->optimizeView();
+	HuiRunLaterM(0.5f, view, &AudioView::optimizeView);
 
 	updateMenu();
 }
@@ -162,10 +162,10 @@ TsunamiWindow::~TsunamiWindow()
 	unsubscribe(bottom_bar);
 
 	int w, h;
-	GetSizeDesired(w, h);
+	getSizeDesired(w, h);
 	HuiConfig.setInt("Window.Width", w);
 	HuiConfig.setInt("Window.Height", h);
-	HuiConfig.setBool("Window.Maximized", IsMaximized());
+	HuiConfig.setBool("Window.Maximized", isMaximized());
 
 	delete(side_bar);
 	delete(bottom_bar);
@@ -296,12 +296,12 @@ bool TsunamiWindow::allowTermination()
 
 void TsunamiWindow::onCopy()
 {
-	tsunami->clipboard->Copy(view);
+	tsunami->clipboard->copy(view);
 }
 
 void TsunamiWindow::onPaste()
 {
-	tsunami->clipboard->Paste(view);
+	tsunami->clipboard->paste(view);
 }
 
 void TsunamiWindow::onFindAndExecutePlugin()
@@ -340,7 +340,7 @@ void TsunamiWindow::onCommand(const string & id)
 void TsunamiWindow::onSettings()
 {
 	SettingsDialog *dlg = new SettingsDialog(this, false);
-	dlg->Run();
+	dlg->run();
 }
 
 void TsunamiWindow::onTrackImport()
@@ -364,7 +364,7 @@ void TsunamiWindow::onPlayLoop()
 
 void TsunamiWindow::onPlay()
 {
-	tsunami->renderer->Prepare(audio, view->GetPlaybackSelection(), true);
+	tsunami->renderer->Prepare(audio, view->getPlaybackSelection(), true);
 	view->stream->play();
 }
 
@@ -386,7 +386,7 @@ void TsunamiWindow::onInsertAdded()
 void TsunamiWindow::onRecord()
 {
 	CaptureDialog *dlg = new CaptureDialog(this, false, audio);
-	dlg->Run();
+	dlg->run();
 }
 
 void TsunamiWindow::onAddLevel()
@@ -401,17 +401,17 @@ void TsunamiWindow::onDeleteLevel()
 
 void TsunamiWindow::onCurLevel()
 {
-	view->SetCurLevel(HuiGetEvent()->id.substr(14, -1)._int());
+	view->setCurLevel(HuiGetEvent()->id.substr(14, -1)._int());
 }
 
 void TsunamiWindow::onCurLevelUp()
 {
-	view->SetCurLevel(view->cur_level + 1);
+	view->setCurLevel(view->cur_level + 1);
 }
 
 void TsunamiWindow::onCurLevelDown()
 {
-	view->SetCurLevel(view->cur_level - 1);
+	view->setCurLevel(view->cur_level - 1);
 }
 
 void TsunamiWindow::onSubFromSelection()
@@ -421,47 +421,47 @@ void TsunamiWindow::onSubFromSelection()
 
 void TsunamiWindow::onViewOptimal()
 {
-	view->OptimizeView();
+	view->optimizeView();
 }
 
 void TsunamiWindow::onSelectNone()
 {
-	view->SelectNone();
+	view->selectNone();
 }
 
 void TsunamiWindow::onSelectAll()
 {
-	view->SelectAll();
+	view->selectAll();
 }
 
 void TsunamiWindow::onViewPeaksMax()
 {
-	view->SetPeaksMode(BufferBox::PEAK_MODE_MAXIMUM);
+	view->setPeaksMode(BufferBox::PEAK_MODE_MAXIMUM);
 }
 
 void TsunamiWindow::onViewPeaksMean()
 {
-	view->SetPeaksMode(BufferBox::PEAK_MODE_SQUAREMEAN);
+	view->setPeaksMode(BufferBox::PEAK_MODE_SQUAREMEAN);
 }
 
 void TsunamiWindow::onViewMono()
 {
-	view->SetShowMono(true);
+	view->setShowMono(true);
 }
 
 void TsunamiWindow::onViewStereo()
 {
-	view->SetShowMono(false);
+	view->setShowMono(false);
 }
 
 void TsunamiWindow::onZoomIn()
 {
-	view->ZoomIn();
+	view->zoomIn();
 }
 
 void TsunamiWindow::onZoomOut()
 {
-	view->ZoomOut();
+	view->zoomOut();
 }
 
 void TsunamiWindow::updateMenu()
@@ -470,54 +470,54 @@ void TsunamiWindow::updateMenu()
 	bool selected = !view->sel_range.empty();
 // menu / toolbar
 	// edit
-	Enable("undo", audio->action_manager->Undoable());
-	Enable("redo", audio->action_manager->Redoable());
-	Enable("copy", tsunami->clipboard->CanCopy(view));
-	Enable("paste", tsunami->clipboard->HasData());
-	Enable("delete", selected or (audio->GetNumSelectedSamples() > 0));
+	enable("undo", audio->action_manager->Undoable());
+	enable("redo", audio->action_manager->Redoable());
+	enable("copy", tsunami->clipboard->canCopy(view));
+	enable("paste", tsunami->clipboard->hasData());
+	enable("delete", selected or (audio->GetNumSelectedSamples() > 0));
 	// file
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);
 	// track
-	Enable("delete_track", view->cur_track);
-	Enable("track_properties", view->cur_track);
+	enable("delete_track", view->cur_track);
+	enable("track_properties", view->cur_track);
 	// level
-	Enable("level_delete", audio->level_name.num > 1);
-	Enable("level_up", view->cur_level < audio->level_name.num -1);
-	Enable("level_down", view->cur_level > 0);
+	enable("level_delete", audio->level_name.num > 1);
+	enable("level_up", view->cur_level < audio->level_name.num -1);
+	enable("level_down", view->cur_level > 0);
 	// sub
-	Enable("sample_from_selection", selected);
-	Enable("insert_sample", audio->GetNumSelectedSamples() > 0);
-	Enable("remove_sample", audio->GetNumSelectedSamples() > 0);
-	Enable("sample_properties", view->cur_sample);
+	enable("sample_from_selection", selected);
+	enable("insert_sample", audio->GetNumSelectedSamples() > 0);
+	enable("remove_sample", audio->GetNumSelectedSamples() > 0);
+	enable("sample_properties", view->cur_sample);
 	// sound
-	Enable("stop", view->stream->isPlaying());
-	Enable("pause", view->stream->isPlaying());
-	Check("play_loop", tsunami->renderer->loop_if_allowed);
+	enable("stop", view->stream->isPlaying());
+	enable("pause", view->stream->isPlaying());
+	check("play_loop", tsunami->renderer->loop_if_allowed);
 	// view
-	Check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
-	Check("show_fx_console", bottom_bar->isActive(BottomBar::FX_CONSOLE));
-	Check("sample_manager", bottom_bar->isActive(BottomBar::SAMPLE_CONSOLE));
+	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
+	check("show_fx_console", bottom_bar->isActive(BottomBar::FX_CONSOLE));
+	check("sample_manager", bottom_bar->isActive(BottomBar::SAMPLE_CONSOLE));
 
-	HuiMenu *m = GetMenu()->GetSubMenuByID("menu_level_target");
+	HuiMenu *m = getMenu()->getSubMenuByID("menu_level_target");
 	if (m){
-		m->Clear();
+		m->clear();
 		for (int i=0; i<audio->level_name.num; i++)
-			m->AddItemCheckable(audio->GetNiceLevelName(i), format("jump_to_level_%d", i));
-		Check(format("jump_to_level_%d", view->cur_level), true);
+			m->addItemCheckable(audio->GetNiceLevelName(i), format("jump_to_level_%d", i));
+		check(format("jump_to_level_%d", view->cur_level), true);
 	}
 
 	string title = title_filename(audio->filename) + " - " + AppName;
 	if (!audio->action_manager->IsSave())
 		title = "*" + title;
-	SetTitle(title);
+	setTitle(title);
 }
 
 
 void TsunamiWindow::onUpdate(Observable *o, const string &message)
 {
 	if (o == tsunami->output){
-		view->ForceRedraw();
+		view->forceRedraw();
 		updateMenu();
 	}else // "Clipboard", "AudioFile" or "AudioView"
 		updateMenu();
@@ -536,7 +536,7 @@ void TsunamiWindow::onNew()
 	if (!allowTermination())
 		return;
 	NewDialog *d = new NewDialog(this, false, audio);
-	d->Run();
+	d->run();
 }
 
 
@@ -567,5 +567,5 @@ void TsunamiWindow::onSaveAs()
 void TsunamiWindow::onExport()
 {
 	if (tsunami->storage->askSaveExport(this))
-		tsunami->storage->_export(audio, view->GetPlaybackSelection(), HuiFilename);
+		tsunami->storage->_export(audio, view->getPlaybackSelection(), HuiFilename);
 }

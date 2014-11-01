@@ -149,49 +149,49 @@ public:
 		save = _save;
 		FavoriteSelectionDialogReturn = "";
 		names = _names;
-		AddControlTable("", 0, 0, 1, 2, "grid");
-		SetTarget("grid", 0);
-		AddListView("Name", 0, 0, 0, 0, "list");
-		AddControlTable("", 0, 1, 2, 1, "grid2");
-		SetTarget("grid2", 0);
-		AddEdit("!expandx,placeholder=" + _("neuen Namen eingeben"), 0, 0, 0, 0, "name");
-		AddDefButton("Ok", 1, 0, 0, 0, "ok");
+		addControlTable("", 0, 0, 1, 2, "grid");
+		setTarget("grid", 0);
+		addListView("Name", 0, 0, 0, 0, "list");
+		addControlTable("", 0, 1, 2, 1, "grid2");
+		setTarget("grid2", 0);
+		addEdit("!expandx,placeholder=" + _("neuen Namen eingeben"), 0, 0, 0, 0, "name");
+		addDefButton("Ok", 1, 0, 0, 0, "ok");
 		if (!save)
-			AddString("list", _("-Standard Parameter-"));
+			addString("list", _("-Standard Parameter-"));
 		foreach(string &n, names)
-			AddString("list", n);
+			addString("list", n);
 		if (!save)
 			names.insert(":def:", 0);
-		HideControl("grid2", !save);
-		EventM("list", this, &FavoriteSelectionDialog::onList);
-		EventMX("list", "hui:select", this, &FavoriteSelectionDialog::onListSelect);
-		EventM("name", this, &FavoriteSelectionDialog::onName);
-		EventM("ok", this, &FavoriteSelectionDialog::onOk);
-		SetInt("list", -1);
+		hideControl("grid2", !save);
+		event("list", this, &FavoriteSelectionDialog::onList);
+		eventX("list", "hui:select", this, &FavoriteSelectionDialog::onListSelect);
+		event("name", this, &FavoriteSelectionDialog::onName);
+		event("ok", this, &FavoriteSelectionDialog::onOk);
+		setInt("list", -1);
 	}
 	void onList()
 	{
-		int n = GetInt("list");
+		int n = getInt("list");
 		FavoriteSelectionDialogReturn = "";
 		if (n >= 0){
 			FavoriteSelectionDialogReturn = names[n];
-			SetString("name", names[n]);
+			setString("name", names[n]);
 		}
 		delete(this);
 	}
 	void onListSelect()
 	{
-		int n = GetInt("list");
+		int n = getInt("list");
 		if (n >= 0)
-			SetString("name", names[n]);
+			setString("name", names[n]);
 	}
 	void onName()
 	{
-		SetInt("list", -1);
+		setInt("list", -1);
 	}
 	void onOk()
 	{
-		FavoriteSelectionDialogReturn = GetString("name");
+		FavoriteSelectionDialogReturn = getString("name");
 		delete(this);
 	}
 
@@ -202,6 +202,6 @@ public:
 string FavoriteManager::SelectName(HuiWindow *win, Configurable *c, bool save)
 {
 	FavoriteSelectionDialog *dlg = new FavoriteSelectionDialog(win, GetList(c), save);
-	dlg->Run();
+	dlg->run();
 	return FavoriteSelectionDialogReturn;
 }

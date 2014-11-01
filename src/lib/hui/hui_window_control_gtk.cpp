@@ -87,7 +87,7 @@ enum{
 	}
 #endif
 
-void HuiPanel::_InsertControl_(HuiControl *c, int x, int y, int width, int height)
+void HuiPanel::_insert_control_(HuiControl *c, int x, int y, int width, int height)
 {
 	GtkWidget *frame = c->get_frame();
 	c->panel = this;
@@ -147,10 +147,10 @@ void HuiPanel::_InsertControl_(HuiControl *c, int x, int y, int width, int heigh
 	control.add(c);
 }
 
-HuiControl *HuiPanel ::_GetControl_(const string &id)
+HuiControl *HuiPanel ::_get_control_(const string &id)
 {
 	if ((id.num == 0) && (cur_id.num > 0))
-		return _GetControl_(cur_id);
+		return _get_control_(cur_id);
 
 	// search backwards -> multiple AddText()s with identical ids
 	//   will always set their own text
@@ -165,7 +165,7 @@ HuiControl *HuiPanel ::_GetControl_(const string &id)
 	return NULL;
 }
 
-HuiControl *HuiPanel::_GetControlByWidget_(GtkWidget *widget)
+HuiControl *HuiPanel::_get_control_by_widget_(GtkWidget *widget)
 {
 	for (int j=0;j<control.num;j++)
 		if (control[j]->widget == widget)
@@ -173,7 +173,7 @@ HuiControl *HuiPanel::_GetControlByWidget_(GtkWidget *widget)
 	return NULL;
 }
 
-string HuiPanel::_GetIDByWidget_(GtkWidget *widget)
+string HuiPanel::_get_id_by_widget_(GtkWidget *widget)
 {
 	for (int j=0;j<control.num;j++)
 		if (control[j]->widget == widget)
@@ -188,44 +188,44 @@ void NotifyWindowByWidget(HuiPanel *panel, GtkWidget *widget, const string &mess
 	if (allow_signal_level > 0)
 		return;
 	msg_db_m("NotifyWindowByWidget", 2);
-	string id = panel->_GetIDByWidget_(widget);
-	panel->_SetCurID_(id);
+	string id = panel->_get_id_by_widget_(widget);
+	panel->_set_cur_id_(id);
 	if (id.num > 0){
 		HuiEvent e = HuiEvent(id, message);
 		_HuiSendGlobalCommand_(&e);
 		e.is_default = is_default;
-		panel->_SendEvent_(&e);
+		panel->_send_event_(&e);
 	}
 }
 
 void SetImageById(HuiPanel *panel, const string &id)
 {
 	if ((id == "ok") || (id == "cancel") || (id == "apply"))
-		panel->SetImage(id, "hui:" + id);
+		panel->setImage(id, "hui:" + id);
 	else if (id != ""){
 		foreach(HuiCommand &c, _HuiCommand_)
 			if ((c.id == id) && (c.image != ""))
-				panel->SetImage(id, c.image);
+				panel->setImage(id, c.image);
 	}
 }
 
 
 
-void HuiPanel::AddButton(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addButton(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlButton(title, id), x, y, width, height);
+	_insert_control_(new HuiControlButton(title, id), x, y, width, height);
 
 	SetImageById(this, id);
 }
 
-void HuiPanel::AddColorButton(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addColorButton(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlColorButton(title, id), x, y, width, height);
+	_insert_control_(new HuiControlColorButton(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddDefButton(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addDefButton(const string &title,int x,int y,int width,int height,const string &id)
 {
-	AddButton(title, x, y, width, height, id);
+	addButton(title, x, y, width, height, id);
 	GtkWidget *b = control.back()->widget;
 	gtk_widget_set_can_default(b, true);
 	gtk_widget_grab_default(b);
@@ -234,62 +234,62 @@ void HuiPanel::AddDefButton(const string &title,int x,int y,int width,int height
 
 
 
-void HuiPanel::AddCheckBox(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addCheckBox(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlCheckBox(title, id), x, y, width, height);
+	_insert_control_(new HuiControlCheckBox(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddText(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addText(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlLabel(title, id), x, y, width, height);
+	_insert_control_(new HuiControlLabel(title, id), x, y, width, height);
 }
 
 
 
-void HuiPanel::AddEdit(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addEdit(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlEdit(title, id), x, y, width, height);
+	_insert_control_(new HuiControlEdit(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddMultilineEdit(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addMultilineEdit(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlMultilineEdit(title, id), x, y, width, height);
+	_insert_control_(new HuiControlMultilineEdit(title, id), x, y, width, height);
 	if (win)
 		if ((!win->main_input_control) && ((HuiControlMultilineEdit*)control.back())->handle_keys)
 			win->main_input_control = control.back();
 }
 
-void HuiPanel::AddSpinButton(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addSpinButton(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlSpinButton(title, id), x, y, width, height);
+	_insert_control_(new HuiControlSpinButton(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddGroup(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addGroup(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlGroup(title, id), x, y, width, height);
+	_insert_control_(new HuiControlGroup(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddComboBox(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addComboBox(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlComboBox(title, id), x, y, width, height);
+	_insert_control_(new HuiControlComboBox(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddToggleButton(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addToggleButton(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlToggleButton(title, id), x, y, width, height);
+	_insert_control_(new HuiControlToggleButton(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddRadioButton(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addRadioButton(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlRadioButton(title, id, this), x, y, width, height);
+	_insert_control_(new HuiControlRadioButton(title, id, this), x, y, width, height);
 }
 
-void HuiPanel::AddTabControl(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addTabControl(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlTabControl(title, id, this), x, y, width, height);
+	_insert_control_(new HuiControlTabControl(title, id, this), x, y, width, height);
 }
 
-void HuiPanel::SetTarget(const string &id,int page)
+void HuiPanel::setTarget(const string &id,int page)
 {
 	tab_creation_page = page;
 	cur_control = NULL;
@@ -299,17 +299,17 @@ void HuiPanel::SetTarget(const string &id,int page)
 				cur_control = control[i];
 }
 
-void HuiPanel::AddListView(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addListView(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlListView(title, id, this), x, y, width, height);
+	_insert_control_(new HuiControlListView(title, id, this), x, y, width, height);
 }
 
-void HuiPanel::AddTreeView(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addTreeView(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlTreeView(title, id, this), x, y, width, height);
+	_insert_control_(new HuiControlTreeView(title, id, this), x, y, width, height);
 }
 
-void HuiPanel::AddIconView(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addIconView(const string &title,int x,int y,int width,int height,const string &id)
 {
 	msg_todo("AddIconView: deprecated");
 	/*
@@ -341,17 +341,17 @@ void HuiPanel::AddIconView(const string &title,int x,int y,int width,int height,
 	_InsertControl_(view, x, y, width, height, id, HuiKindIconView, frame);*/
 }
 
-void HuiPanel::AddProgressBar(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addProgressBar(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlProgressBar(title, id), x, y, width, height);
+	_insert_control_(new HuiControlProgressBar(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddSlider(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addSlider(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlSlider(title, id, height > width), x, y, width, height);
+	_insert_control_(new HuiControlSlider(title, id, height > width), x, y, width, height);
 }
 
-void HuiPanel::AddImage(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addImage(const string &title,int x,int y,int width,int height,const string &id)
 {
 	msg_todo("AddImage: deprecated");
 	/*GetPartStrings(id, title);
@@ -367,40 +367,40 @@ void HuiPanel::AddImage(const string &title,int x,int y,int width,int height,con
 }
 
 
-void HuiPanel::AddDrawingArea(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addDrawingArea(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlDrawingArea(title, id), x, y, width, height);
+	_insert_control_(new HuiControlDrawingArea(title, id), x, y, width, height);
 	if ((win) && (!win->main_input_control))
 		win->main_input_control = control.back();
 }
 
 
-void HuiPanel::AddControlTable(const string &title, int x, int y, int width, int height, const string &id)
+void HuiPanel::addControlTable(const string &title, int x, int y, int width, int height, const string &id)
 {
-	_InsertControl_(new HuiControlGrid(title, id, width, height, this), x, y, width, height);
+	_insert_control_(new HuiControlGrid(title, id, width, height, this), x, y, width, height);
 }
 
-void HuiPanel::AddExpander(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addExpander(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlExpander(title, id), x, y, width, height);
+	_insert_control_(new HuiControlExpander(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddPaned(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addPaned(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlPaned(title, id), x, y, width, height);
+	_insert_control_(new HuiControlPaned(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddScroller(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addScroller(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlScroller(title, id), x, y, width, height);
+	_insert_control_(new HuiControlScroller(title, id), x, y, width, height);
 }
 
-void HuiPanel::AddSeparator(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addSeparator(const string &title,int x,int y,int width,int height,const string &id)
 {
-	_InsertControl_(new HuiControlSeparator(title, id), x, y, width, height);
+	_insert_control_(new HuiControlSeparator(title, id), x, y, width, height);
 }
 
-void HuiPanel::EmbedDialog(const string &id, int x, int y)
+void HuiPanel::embedDialog(const string &id, int x, int y)
 {
 #if 0
 	HuiPanel *dlg = HuiCreateResourceDialog(id, NULL, NULL);
@@ -414,7 +414,7 @@ void HuiPanel::EmbedDialog(const string &id, int x, int y)
 	//GtkWidget *b = gtk_button_new_with_label("test");
 
 	
-	_InsertControl_(this, dlg->control[0]->widget, root, page, 10, 10, 86237, dlg->control[0]->type);
+	_insert_control_(this, dlg->control[0]->widget, root, page, 10, 10, 86237, dlg->control[0]->type);
 	//_InsertControl_(this, b, root, page, 10, 10, 86237, dlg->control[0]->type);
 
 	/*GtkWidget *p = gtk_widget_get_parent(b);
@@ -435,16 +435,16 @@ void HuiPanel::EmbedDialog(const string &id, int x, int y)
 			string target_id = cmd.s_param[0];
 			int target_page = cmd.i_param[4];
 			if (i > 0)
-				SetTarget(target_id, target_page);
+				setTarget(target_id, target_page);
 			int _x = (i == 0) ? x : cmd.i_param[0];
 			int _y = (i == 0) ? y : cmd.i_param[1];
-			AddControl( cmd.type, HuiGetLanguage(cmd.id),
+			addControl( cmd.type, HuiGetLanguage(cmd.id),
 						_x, _y,
 						cmd.i_param[2], cmd.i_param[3],
 						cmd.id);
-			Enable(cmd.id, cmd.enabled);
+			enable(cmd.id, cmd.enabled);
 			if (cmd.image.num > 0)
-				SetImage(cmd.id, cmd.image);
+				setImage(cmd.id, cmd.image);
 		}
 	}
 }
@@ -461,10 +461,10 @@ void hui_rm_event(Array<HuiEventListener> &event, HuiControl *c)
 		hui_rm_event(event, cc);
 }
 
-void HuiPanel::RemoveControl(const string &id)
+void HuiPanel::removeControl(const string &id)
 {
-	HuiControl *c = _GetControl_(id);
-	hui_rm_event(event, c);
+	HuiControl *c = _get_control_(id);
+	hui_rm_event(events, c);
 	if (c)
 		delete(c);
 }
@@ -474,9 +474,9 @@ void HuiPanel::RemoveControl(const string &id)
 //----------------------------------------------------------------------------------
 // drawing
 
-void HuiPanel::Redraw(const string &_id)
+void HuiPanel::redraw(const string &_id)
 {
-	HuiControl *c = _GetControl_(_id);
+	HuiControl *c = _get_control_(_id);
 	if (c){
 		GdkWindow *w = gtk_widget_get_window(c->widget);
 		if (w)
@@ -484,9 +484,9 @@ void HuiPanel::Redraw(const string &_id)
 	}
 }
 
-void HuiPanel::RedrawRect(const string &_id, int x, int y, int w, int h)
+void HuiPanel::redrawRect(const string &_id, int x, int y, int w, int h)
 {
-	HuiControl *c = _GetControl_(_id);
+	HuiControl *c = _get_control_(_id);
 	if (c){
 		if (w < 0){
 			x += w;
@@ -508,9 +508,9 @@ void HuiPanel::RedrawRect(const string &_id, int x, int y, int w, int h)
 
 static HuiPainter hui_drawing_context;
 
-HuiPainter *HuiPanel::BeginDraw(const string &_id)
+HuiPainter *HuiPanel::beginDraw(const string &_id)
 {
-	HuiControl *c = _GetControl_(_id);
+	HuiControl *c = _get_control_(_id);
 	hui_drawing_context.win = win;
 	hui_drawing_context.id = _id;
 	hui_drawing_context.cr = NULL;

@@ -13,26 +13,26 @@
 SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	Observable("SideBar")
 {
-	AddControlTable("!noexpandx,width=270,expandy", 0, 0, 2, 1, "root_grid0");
-	SetTarget("root_grid0", 0);
-	AddSeparator("!vertical,expandy", 0, 0, 0, 0, "");
-	AddControlTable("!noexpandx,width=270,expandy", 1, 0, 1, 3, "root_grid");
-	SetTarget("root_grid", 0);
-	AddControlTable("", 0, 0, 2, 1, "button_grid");
-	AddSeparator("", 0, 1, 0, 0, "");
-	AddControlTable("", 0, 2, 1, 20, "console_grid");
-	SetTarget("button_grid", 0);
-	AddButton("!noexpandx,flat", 0, 0, 0, 0, "close");
-	SetImage("close", "hui:close");
-	AddText("!big,expandx,center\\...", 1, 0, 0, 0, "title");
+	addControlTable("!noexpandx,width=270,expandy", 0, 0, 2, 1, "root_grid0");
+	setTarget("root_grid0", 0);
+	addSeparator("!vertical,expandy", 0, 0, 0, 0, "");
+	addControlTable("!noexpandx,width=270,expandy", 1, 0, 1, 3, "root_grid");
+	setTarget("root_grid", 0);
+	addControlTable("", 0, 0, 2, 1, "button_grid");
+	addSeparator("", 0, 1, 0, 0, "");
+	addControlTable("", 0, 2, 1, 20, "console_grid");
+	setTarget("button_grid", 0);
+	addButton("!noexpandx,flat", 0, 0, 0, 0, "close");
+	setImage("close", "hui:close");
+	addText("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 	audio_file_dialog = new AudioFileDialog(audio);
 	track_dialog = new TrackDialog(view);
 	sub_dialog = new SubDialog(view, audio);
-	Embed(audio_file_dialog, "console_grid", 0, 0);
-	Embed(track_dialog, "console_grid", 0, 1);
-	Embed(sub_dialog, "console_grid", 0, 2);
+	embed(audio_file_dialog, "console_grid", 0, 0);
+	embed(track_dialog, "console_grid", 0, 1);
+	embed(sub_dialog, "console_grid", 0, 2);
 
-	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
+	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
 
 	choose(AUDIO_FILE_DIALOG);
 	visible = true;
@@ -44,7 +44,7 @@ SideBar::~SideBar()
 
 void SideBar::onClose()
 {
-	Hide();
+	hide();
 }
 
 void SideBar::onShow()
@@ -63,10 +63,10 @@ void SideBar::choose(int console)
 {
 	foreachi(HuiPanel *p, children, i){
 		if (i == console){
-			SetString("title", "!big\\" + ((SideBarConsole*)p)->title);
-			p->Show();
+			setString("title", "!big\\" + ((SideBarConsole*)p)->title);
+			p->show();
 		}else
-			p->Hide();
+			p->hide();
 	}
 	active_console = console;
 	notify();
@@ -78,7 +78,7 @@ void SideBar::open(int console)
 	choose(console);
 	active_console = console;
 	if (!visible)
-		Show();
+		show();
 	notifyEnd();
 }
 

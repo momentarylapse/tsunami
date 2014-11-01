@@ -24,18 +24,18 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	ready = false;
 	console_when_ready = MIXING_CONSOLE;
 
-	AddControlTable("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
-	SetTarget("root_grid0", 0);
-	AddSeparator("!horizontal,expandx", 0, 0, 0, 0, "");
-	AddControlTable("!expandx", 0, 1, 3, 1, "root_grid");
-	SetTarget("root_grid", 0);
-	AddControlTable("!noexpandx,width=130", 0, 0, 1, 2, "button_grid");
-	AddSeparator("!vertical", 1, 0, 0, 0, "");
-	AddControlTable("", 2, 0, 1, 20, "console_grid");
-	SetTarget("button_grid", 0);
-	AddButton("!noexpandy,flat", 0, 0, 0, 0, "close");
-	SetImage("close", "hui:close");
-	AddListView("!nobar\\name", 0, 1, 0, 0, "choose");
+	addControlTable("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
+	setTarget("root_grid0", 0);
+	addSeparator("!horizontal,expandx", 0, 0, 0, 0, "");
+	addControlTable("!expandx", 0, 1, 3, 1, "root_grid");
+	setTarget("root_grid", 0);
+	addControlTable("!noexpandx,width=130", 0, 0, 1, 2, "button_grid");
+	addSeparator("!vertical", 1, 0, 0, 0, "");
+	addControlTable("", 2, 0, 1, 20, "console_grid");
+	setTarget("button_grid", 0);
+	addButton("!noexpandy,flat", 0, 0, 0, 0, "close");
+	setImage("close", "hui:close");
+	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output, view->stream);
@@ -44,27 +44,27 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
 	midi_editor = new MidiEditor(view, audio);
-	Embed(mixing_console, "console_grid", 0, 0);
-	Embed(fx_console, "console_grid", 0, 1);
-	Embed(synth_console, "console_grid", 0, 2);
-	Embed(midi_editor, "console_grid", 0, 3);
-	Embed(level_console, "console_grid", 0, 4);
-	Embed(sample_manager, "console_grid", 0, 5);
-	Embed(curve_console, "console_grid", 0, 6);
-	Embed(log_dialog, "console_grid", 0, 7);
+	embed(mixing_console, "console_grid", 0, 0);
+	embed(fx_console, "console_grid", 0, 1);
+	embed(synth_console, "console_grid", 0, 2);
+	embed(midi_editor, "console_grid", 0, 3);
+	embed(level_console, "console_grid", 0, 4);
+	embed(sample_manager, "console_grid", 0, 5);
+	embed(curve_console, "console_grid", 0, 6);
+	embed(log_dialog, "console_grid", 0, 7);
 
 	view->subscribe(this);
 
 	//menu = new HuiMenu;
 	foreachi(HuiPanel *p, children, i){
-		AddString("choose", ((BottomBarConsole*)p)->title);
+		addString("choose", ((BottomBarConsole*)p)->title);
 		//string id = "bottom_bar_choose_" + i2s(i);
 		//menu->AddItemCheckable(((BottomBarConsole*)p)->title, id);
 		//EventM(id, (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChooseByMenu);
 	}
 
-	EventMX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);
-	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onClose);
+	eventX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);
+	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onClose);
 
 	visible = true;
 	ready = true;
@@ -77,7 +77,7 @@ BottomBar::~BottomBar()
 
 void BottomBar::onClose()
 {
-	Hide();
+	hide();
 }
 
 /*void BottomBar::OnOpenChooseMenu()
@@ -94,7 +94,7 @@ void BottomBar::OnChooseByMenu()
 
 void BottomBar::onChoose()
 {
-	int n = GetInt("");
+	int n = getInt("");
 	if (n >= 0)
 		choose(n);
 }
@@ -120,15 +120,15 @@ void BottomBar::choose(int console)
 
 	foreachi(HuiPanel *p, children, i){
 		if (i == console){
-			SetString("title", "!big\\" + ((BottomBarConsole*)p)->title);
-			p->Show();
+			setString("title", "!big\\" + ((BottomBarConsole*)p)->title);
+			p->show();
 		}else
-			p->Hide();
+			p->hide();
 	}
-	SetInt("choose", console);
+	setInt("choose", console);
 	active_console = console;
 	if (!visible)
-		Show();
+		show();
 	notify();
 }
 

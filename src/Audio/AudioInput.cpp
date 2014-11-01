@@ -32,9 +32,9 @@ AudioInput::~AudioInput()
 	delete(in_midi);
 }
 
-bool AudioInput::Start(int type, int sample_rate)
+bool AudioInput::start(int type, int sample_rate)
 {
-	in_cur->Stop();
+	in_cur->stop();
 
 	if (type == Track::TYPE_AUDIO){
 		in_cur = in_audio;
@@ -42,82 +42,82 @@ bool AudioInput::Start(int type, int sample_rate)
 		in_cur = in_midi;
 	}else{
 		in_cur = in_audio;
-		tsunami->log->Error(_("Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)"));
+		tsunami->log->error(_("Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)"));
 		return false;
 	}
 
-	if (in_cur->Start(sample_rate)){
+	if (in_cur->start(sample_rate)){
 
 		if (!running)
-			HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
+			HuiRunLaterM(UPDATE_TIME, this, &AudioInput::update);
 		running = true;
 		return true;
 	}
-	tsunami->log->Error(_("Konnte Aufnahmeger&at nicht &offnen"));
+	tsunami->log->error(_("Konnte Aufnahmeger&at nicht &offnen"));
 	return false;
 }
 
-void AudioInput::Stop()
+void AudioInput::stop()
 {
-	in_cur->Stop();
+	in_cur->stop();
 }
 
 
-void AudioInput::Update()
+void AudioInput::update()
 {
-	if (in_cur->DoCapturing() > 0)
-		Notify(MESSAGE_CAPTURE);
+	if (in_cur->doCapturing() > 0)
+		notify(MESSAGE_CAPTURE);
 
-	running = in_cur->IsCapturing();
+	running = in_cur->isCapturing();
 	if (running)
-		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::Update);
+		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::update);
 }
 
-bool AudioInput::IsCapturing()
+bool AudioInput::isCapturing()
 {
-	return in_cur->IsCapturing();
+	return in_cur->isCapturing();
 }
 
 
 
-float AudioInput::GetSampleRate()
+float AudioInput::getSampleRate()
 {
-	return in_cur->GetSampleRate();
+	return in_cur->getSampleRate();
 }
 
-void AudioInput::Accumulate(bool enable)
+void AudioInput::accumulate(bool enable)
 {
-	in_cur->Accumulate(enable);
+	in_cur->accumulate(enable);
 }
 
-void AudioInput::ResetAccumulation()
+void AudioInput::resetAccumulation()
 {
-	in_cur->ResetAccumulation();
+	in_cur->resetAccumulation();
 }
 
-int AudioInput::GetSampleCount()
+int AudioInput::getSampleCount()
 {
-	return in_cur->GetSampleCount();
+	return in_cur->getSampleCount();
 }
 
-void AudioInput::GetSomeSamples(BufferBox &buf, int num_samples)
+void AudioInput::getSomeSamples(BufferBox &buf, int num_samples)
 {
-	in_cur->GetSomeSamples(buf, num_samples);
+	in_cur->getSomeSamples(buf, num_samples);
 }
 
-int AudioInput::GetState()
+int AudioInput::getState()
 {
-	if (IsCapturing())
+	if (isCapturing())
 		return STATE_PLAYING;
 	return STATE_STOPPED;
 }
 
-void AudioInput::ResetSync()
+void AudioInput::resetSync()
 {
-	in_cur->ResetSync();
+	in_cur->resetSync();
 }
 
-int AudioInput::GetDelay()
+int AudioInput::getDelay()
 {
-	return in_cur->GetDelay();
+	return in_cur->getDelay();
 }

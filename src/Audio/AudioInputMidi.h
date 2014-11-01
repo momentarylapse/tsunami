@@ -22,36 +22,36 @@ public:
 	AudioInputMidi(MidiData &data);
 	virtual ~AudioInputMidi();
 
-	void Init();
+	void init();
 
-	virtual bool Start(int sample_rate);
-	virtual void Stop();
-	virtual int DoCapturing();
+	virtual bool start(int sample_rate);
+	virtual void stop();
+	virtual int doCapturing();
 
-	virtual bool IsCapturing();
+	virtual bool isCapturing();
 
-	virtual int GetDelay();
-	virtual void ResetSync();
+	virtual int getDelay();
+	virtual void resetSync();
 
-	virtual void Accumulate(bool enable);
-	virtual void ResetAccumulation();
-	virtual int GetSampleCount();
+	virtual void accumulate(bool enable);
+	virtual void resetAccumulation();
+	virtual int getSampleCount();
 
-	virtual float GetSampleRate();
-	virtual void GetSomeSamples(BufferBox &buf, int num_samples);
+	virtual float getSampleRate();
+	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 
 	struct MidiPort
 	{
 		int client, port;
 		string client_name, port_name;
 	};
-	Array<MidiPort> FindPorts();
-	bool ConnectTo(MidiPort p);
-	bool Unconnect();
+	Array<MidiPort> findPorts();
+	bool connectTo(MidiPort p);
+	bool unconnect();
 
 private:
 
-	void ClearInputQueue();
+	void clearInputQueue();
 
 	MidiData &data;
 

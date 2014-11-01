@@ -22,7 +22,7 @@ public:
 	CurveConsole(AudioView *view, AudioFile *audio);
 	virtual ~CurveConsole();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	void updateList();
 	void onAdd();

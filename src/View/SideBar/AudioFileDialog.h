@@ -19,16 +19,16 @@ public:
 	AudioFileDialog(AudioFile *a);
 	virtual ~AudioFileDialog();
 
-	void LoadData();
-	void ApplyData();
+	void loadData();
+	void applyData();
 
-	void OnTrackList();
-	void OnTagsSelect();
-	void OnTagsEdit();
-	void OnAddTag();
-	void OnDeleteTag();
+	void onTrackList();
+	void onTagsSelect();
+	void onTagsEdit();
+	void onAddTag();
+	void onDeleteTag();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
 	BarList *bar_list;

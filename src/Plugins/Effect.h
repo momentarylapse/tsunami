@@ -37,14 +37,14 @@ public:
 	bool usable;
 	bool enabled;
 
-	virtual void _cdecl ProcessTrack(BufferBox *buf){};
+	virtual void _cdecl processTrack(BufferBox *buf){};
 
-	void DoProcessTrack(Track *t, int level_no, const Range &r);
+	void doProcessTrack(Track *t, int level_no, const Range &r);
 
-	void Prepare();
-	void Apply(BufferBox &buf, Track *t, bool log_error);
+	void prepare();
+	void apply(BufferBox &buf, Track *t, bool log_error);
 
-	string GetError();
+	string getError();
 };
 
 Effect *_cdecl CreateEffect(const string &name);

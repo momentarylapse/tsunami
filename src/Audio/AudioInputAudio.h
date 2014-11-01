@@ -28,34 +28,34 @@ public:
 	string ChosenDevice;
 	string TempFilename;
 
-	void Init();
+	void init();
 
-	virtual bool Start(int sample_rate);
-	virtual void Stop();
+	virtual bool start(int sample_rate);
+	virtual void stop();
 
-	virtual bool IsCapturing();
-	virtual int GetDelay();
-	virtual void ResetSync();
+	virtual bool isCapturing();
+	virtual int getDelay();
+	virtual void resetSync();
 
-	virtual int DoCapturing();
+	virtual int doCapturing();
 
-	virtual void Accumulate(bool enable);
-	virtual void ResetAccumulation();
-	virtual int GetSampleCount();
+	virtual void accumulate(bool enable);
+	virtual void resetAccumulation();
+	virtual int getSampleCount();
 
-	virtual float GetSampleRate();
-	virtual void GetSomeSamples(BufferBox &buf, int num_samples);
+	virtual float getSampleRate();
+	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 
-	float GetPlaybackDelayConst();
-	void SetPlaybackDelayConst(float f);
+	float getPlaybackDelayConst();
+	void setPlaybackDelayConst(float f);
 
-	string GetDefaultTempFilename();
-	string GetTempFilename();
-	void SetTempFilename(const string &filename);
+	string getDefaultTempFilename();
+	string getTempFilename();
+	void setTempFilename(const string &filename);
 
 private:
 	BufferBox &AccumulationBuffer, &CurrentBuffer;
-	bool accumulate;
+	bool accumulating;
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];
 	ALCdevice_struct *capture;
@@ -71,9 +71,9 @@ private:
 		long long int delay_sum;
 		int samples_in, offset_out;
 
-		void Reset();
-		void Add(int samples);
-		int GetDelay();
+		void reset();
+		void add(int samples);
+		int getDelay();
 	};
 	SyncData sync;
 

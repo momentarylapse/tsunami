@@ -42,7 +42,7 @@ public:
 		AddButton("!flat", 4, 0, 0, 0, "delete");
 		SetImage("delete", "hui:delete");
 		SetTooltip("delete", _("Effekt l&oschen"));
-		p = fx->CreatePanel();
+		p = fx->createPanel();
 		if (p){
 			Embed(p, "grid", 0, 1);
 			p->update();
@@ -60,13 +60,13 @@ public:
 
 		Check("enabled", fx->enabled);
 
-		old_param = fx->ConfigToString();
-		Subscribe(fx, fx->MESSAGE_CHANGE);
-		Subscribe(fx, fx->MESSAGE_CHANGE_BY_ACTION);
+		old_param = fx->configToString();
+		subscribe(fx, fx->MESSAGE_CHANGE);
+		subscribe(fx, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleMidiFxPanel()
 	{
-		Unsubscribe(fx);
+		unsubscribe(fx);
 	}
 	void onLoad()
 	{
@@ -76,7 +76,7 @@ public:
 		tsunami->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
 			track->EditMidiEffect(index, old_param);
-		old_param = fx->ConfigToString();
+		old_param = fx->configToString();
 	}
 	void onSave()
 	{
@@ -95,7 +95,7 @@ public:
 		if (track)
 			track->DeleteMidiEffect(index);
 	}
-	virtual void OnUpdate(Observable *o, const string &message)
+	virtual void onUpdate(Observable *o, const string &message)
 	{
 		if (message == o->MESSAGE_CHANGE){
 			if (track)
@@ -103,7 +103,7 @@ public:
 		}
 		Check("enabled", fx->enabled);
 		p->update();
-		old_param = fx->ConfigToString();
+		old_param = fx->configToString();
 	}
 	AudioFile *audio;
 	Track *track;
@@ -145,26 +145,26 @@ MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
 	//Enable("add", false);
 	Enable("track_name", false);
 
-	EventM("pitch_offset", this, &MidiEditor::OnPitch);
-	EventM("beat_partition", this, &MidiEditor::OnBeatPartition);
-	EventM("scale", this, &MidiEditor::OnScale);
-	EventM("midi_mode:select", this, &MidiEditor::OnMidiModeSelect);
-	EventM("midi_mode:note", this, &MidiEditor::OnMidiModeNote);
-	EventM("midi_mode:chord", this, &MidiEditor::OnMidiModeChord);
-	EventM("chord_type", this, &MidiEditor::OnChordType);
-	EventM("chord_inversion", this, &MidiEditor::OnChordInversion);
+	EventM("pitch_offset", this, &MidiEditor::onPitch);
+	EventM("beat_partition", this, &MidiEditor::onBeatPartition);
+	EventM("scale", this, &MidiEditor::onScale);
+	EventM("midi_mode:select", this, &MidiEditor::onMidiModeSelect);
+	EventM("midi_mode:note", this, &MidiEditor::onMidiModeNote);
+	EventM("midi_mode:chord", this, &MidiEditor::onMidiModeChord);
+	EventM("chord_type", this, &MidiEditor::onChordType);
+	EventM("chord_inversion", this, &MidiEditor::onChordInversion);
 
-	EventM("add", (HuiPanel*)this, &MidiEditor::OnAdd);
+	EventM("add", (HuiPanel*)this, &MidiEditor::onAdd);
 
-	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
 }
 
 MidiEditor::~MidiEditor()
 {
-	Clear();
-	Unsubscribe(view);
-	Unsubscribe(audio);
+	clear();
+	unsubscribe(view);
+	unsubscribe(audio);
 }
 
 void MidiEditor::update()
@@ -177,70 +177,70 @@ void MidiEditor::update()
 	HideControl(id_inner, !allow);
 }
 
-void MidiEditor::OnUpdate(Observable* o, const string &message)
+void MidiEditor::onUpdate(Observable* o, const string &message)
 {
 	update();
 	if ((o == track) && (message == track->MESSAGE_DELETE)){
-		SetTrack(NULL);
+		setTrack(NULL);
 	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE))
-		SetTrack(view->cur_track);
+		setTrack(view->cur_track);
 	else
-		SetTrack(track);
+		setTrack(track);
 }
 
 
-void MidiEditor::OnPitch()
+void MidiEditor::onPitch()
 {
 	view->pitch_min = GetInt("");
 	view->pitch_max = GetInt("") + 30;
 	view->ForceRedraw();
 }
 
-void MidiEditor::OnScale()
+void MidiEditor::onScale()
 {
 	view->midi_scale = GetInt("");
 	view->ForceRedraw();
 }
 
-void MidiEditor::OnBeatPartition()
+void MidiEditor::onBeatPartition()
 {
 	view->beat_partition = GetInt("");
 	view->ForceRedraw();
 }
 
-void MidiEditor::OnMidiModeSelect()
+void MidiEditor::onMidiModeSelect()
 {
 	view->midi_mode = view->MIDI_MODE_SELECT;
 	Enable("chord_type", false);
 	Enable("chord_inversion", false);
 }
 
-void MidiEditor::OnMidiModeNote()
+void MidiEditor::onMidiModeNote()
 {
 	view->midi_mode = view->MIDI_MODE_NOTE;
 	Enable("chord_type", false);
 	Enable("chord_inversion", false);
 }
 
-void MidiEditor::OnMidiModeChord()
+void MidiEditor::onMidiModeChord()
 {
 	view->midi_mode = view->MIDI_MODE_CHORD;
 	Enable("chord_type", true);
 	Enable("chord_inversion", true);
 }
 
-void MidiEditor::OnChordType()
+void MidiEditor::onChordType()
 {
 	view->chord_type = GetInt("");
 }
 
-void MidiEditor::OnChordInversion()
+void MidiEditor::onChordInversion()
 {
 	view->chord_inversion = GetInt("");
 }
 
 
-void MidiEditor::OnAdd()
+void MidiEditor::onAdd()
 {
 	MidiEffect *effect = tsunami->plugin_manager->ChooseMidiEffect(this);
 	if (!effect)
@@ -249,10 +249,10 @@ void MidiEditor::OnAdd()
 		track->AddMidiEffect(effect);
 }
 
-void MidiEditor::Clear()
+void MidiEditor::clear()
 {
 	if (track)
-		Unsubscribe(track);
+		unsubscribe(track);
 	foreachi(HuiPanel *p, panels, i){
 		delete(p);
 		RemoveControl("separator_" + i2s(i));
@@ -262,14 +262,14 @@ void MidiEditor::Clear()
 	//Enable("add", false);
 }
 
-void MidiEditor::SetTrack(Track *t)
+void MidiEditor::setTrack(Track *t)
 {
-	Clear();
+	clear();
 	track = t;
 	if (track){
-		Subscribe(track, track->MESSAGE_DELETE);
-		Subscribe(track, track->MESSAGE_ADD_MIDI_EFFECT);
-		Subscribe(track, track->MESSAGE_DELETE_MIDI_EFFECT);
+		subscribe(track, track->MESSAGE_DELETE);
+		subscribe(track, track->MESSAGE_ADD_MIDI_EFFECT);
+		subscribe(track, track->MESSAGE_DELETE_MIDI_EFFECT);
 	}
 
 

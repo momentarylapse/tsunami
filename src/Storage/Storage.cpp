@@ -49,7 +49,7 @@ Storage::~Storage()
 	format.clear();
 }
 
-bool Storage::Load(AudioFile *a, const string &filename)
+bool Storage::load(AudioFile *a, const string &filename)
 {
 	msg_db_f("Storage.Load", 1);
 	bool ok = false;
@@ -60,9 +60,9 @@ bool Storage::Load(AudioFile *a, const string &filename)
 
 	foreach(Format *f, format)
 		if (f->CanHandle(ext)){
-			tsunami->progress->Start(_("lade"), 0);
+			tsunami->progress->start(_("lade"), 0);
 
-			a->NotifyBegin();
+			a->notifyBegin();
 
 			a->Reset();
 			a->action_manager->Enable(false);
@@ -74,24 +74,24 @@ bool Storage::Load(AudioFile *a, const string &filename)
 			a->action_manager->Enable(true);
 			//tsunami->progress->Set("peaks", 1);
 
-			tsunami->progress->End();
+			tsunami->progress->end();
 			if (a->track.num > 0)
 			{}//	a->SetCurTrack(a->track[0]);
 			a->action_manager->Reset();
-			a->Notify(a->MESSAGE_CHANGE);
-			a->NotifyEnd();
+			a->notify(a->MESSAGE_CHANGE);
+			a->notifyEnd();
 			ok = (a->track.num > 0);
 			found = true;
 			break;
 		}
 
 	if (!found)
-		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
+		tsunami->log->error(_("unbekannte Dateiendung: ") + ext);
 
 	return ok;
 }
 
-bool Storage::LoadTrack(Track *t, const string &filename, int offset, int level)
+bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 {
 	msg_db_f("Storage.LoadTrack", 1);
 	bool ok = false;
@@ -102,41 +102,41 @@ bool Storage::LoadTrack(Track *t, const string &filename, int offset, int level)
 
 	foreach(Format *f, format)
 		if (f->CanHandle(ext)){
-			tsunami->progress->Start(_("lade"), 0);
+			tsunami->progress->start(_("lade"), 0);
 
 			AudioFile *a = t->root;
-			a->NotifyBegin();
+			a->notifyBegin();
 			a->action_manager->BeginActionGroup();
 
 			f->LoadTrack(t, filename, offset, level);
 
-			tsunami->progress->End();
+			tsunami->progress->end();
 			a->action_manager->EndActionGroup();
-			a->NotifyEnd();
+			a->notifyEnd();
 			found = true;
 			break;
 		}
 
 	if (!found)
-		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
+		tsunami->log->error(_("unbekannte Dateiendung: ") + ext);
 
 	return ok;
 }
 
-bool Storage::LoadBufferBox(AudioFile *a, BufferBox *buf, const string &filename)
+bool Storage::loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename)
 {
 	msg_db_f("Storage.LoadBufferBox", 1);
 	AudioFile *aa = new AudioFile;
 	aa->NewWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->track[0];
-	bool ok = LoadTrack(t, filename, 0, 0);
+	bool ok = loadTrack(t, filename, 0, 0);
 	buf->resize(t->level[0].buffer[0].num);
 	buf->set(t->level[0].buffer[0], 0, 1);
 	delete(aa);
 	return ok;
 }
 
-bool Storage::Save(AudioFile *a, const string &filename)
+bool Storage::save(AudioFile *a, const string &filename)
 {
 	msg_db_f("Storage.Save", 1);
 	bool ok = false;
@@ -148,30 +148,30 @@ bool Storage::Save(AudioFile *a, const string &filename)
 	foreach(Format *f, format)
 		if (f->CanHandle(ext)){
 			if (!f->TestFormatCompatibility(a))
-				tsunami->log->Warning(_("Datenverlust!"));
+				tsunami->log->warning(_("Datenverlust!"));
 
-			tsunami->progress->Start(_("speichere"), 0);
+			tsunami->progress->start(_("speichere"), 0);
 
 			a->filename = filename;
 
 			f->SaveAudio(a, filename);
 
 			a->action_manager->MarkCurrentAsSave();
-			tsunami->progress->End();
+			tsunami->progress->end();
 			if (tsunami->win)
-				tsunami->win->UpdateMenu();
+				tsunami->win->updateMenu();
 			ok = true;
 			found = true;
 			break;
 		}
 
 	if (!found)
-		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
+		tsunami->log->error(_("unbekannte Dateiendung: ") + ext);
 
 	return ok;
 }
 
-bool Storage::Export(AudioFile *a, const Range &r, const string &filename)
+bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
 {
 	msg_db_f("Storage.Export", 1);
 	bool ok = false;
@@ -182,29 +182,29 @@ bool Storage::Export(AudioFile *a, const Range &r, const string &filename)
 
 	foreach(Format *f, format)
 		if (f->CanHandle(ext)){
-			tsunami->progress->Start(_("exportiere"), 0);
+			tsunami->progress->start(_("exportiere"), 0);
 
 			// render audio...
-			tsunami->progress->Set(_("rendere Audio"), 0);
+			tsunami->progress->set(_("rendere Audio"), 0);
 			BufferBox buf;
 			tsunami->renderer->RenderAudioFile(a, r, buf);
 
 			// save
 			f->SaveBuffer(a, &buf, filename);
 
-			tsunami->progress->End();
+			tsunami->progress->end();
 			ok = true;
 			found = true;
 			break;
 		}
 
 	if (!found)
-		tsunami->log->Error(_("unbekannte Dateiendung: ") + ext);
+		tsunami->log->error(_("unbekannte Dateiendung: ") + ext);
 
 	return ok;
 }
 
-bool Storage::AskByFlags(HuiWindow *win, const string &title, bool save, int flags)
+bool Storage::askByFlags(HuiWindow *win, const string &title, bool save, int flags)
 {
 	string filter, filter_show;
 	filter_show = _("alles m&ogliche (");
@@ -243,22 +243,22 @@ bool Storage::AskByFlags(HuiWindow *win, const string &title, bool save, int fla
 		return HuiFileDialogOpen(win, title, CurrentDirectory, filter_show, filter);
 }
 
-bool Storage::AskOpen(HuiWindow *win)
+bool Storage::askOpen(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei &offnen"), false, Format::FLAG_READ);
+	return askByFlags(win, _("Datei &offnen"), false, Format::FLAG_READ);
 }
 
-bool Storage::AskSave(HuiWindow *win)
+bool Storage::askSave(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei speichern"), true, Format::FLAG_WRITE);
+	return askByFlags(win, _("Datei speichern"), true, Format::FLAG_WRITE);
 }
 
-bool Storage::AskOpenImport(HuiWindow *win)
+bool Storage::askOpenImport(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei importieren"), false, Format::FLAG_SINGLE_TRACK | Format::FLAG_READ);
+	return askByFlags(win, _("Datei importieren"), false, Format::FLAG_SINGLE_TRACK | Format::FLAG_READ);
 }
 
-bool Storage::AskSaveExport(HuiWindow *win)
+bool Storage::askSaveExport(HuiWindow *win)
 {
-	return AskByFlags(win, _("Datei exportieren"), true, Format::FLAG_SINGLE_TRACK | Format::FLAG_WRITE);
+	return askByFlags(win, _("Datei exportieren"), true, Format::FLAG_SINGLE_TRACK | Format::FLAG_WRITE);
 }

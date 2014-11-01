@@ -25,7 +25,7 @@ void *ActionTrackEditVolume::execute(Data *d)
 	Track *t = a->get_track(track_no);
 
 	t->volume = new_value;
-	t->Notify();
+	t->notify();
 
 	return NULL;
 }
@@ -36,7 +36,7 @@ void ActionTrackEditVolume::undo(Data *d)
 	Track *t = a->get_track(track_no);
 
 	t->volume = old_value;
-	t->Notify();
+	t->notify();
 }
 
 

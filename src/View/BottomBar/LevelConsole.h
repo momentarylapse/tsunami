@@ -20,14 +20,14 @@ public:
 	LevelConsole(AudioView *view, AudioFile *audio);
 	virtual ~LevelConsole();
 
-	void LoadData();
+	void loadData();
 
-	void OnLevelsSelect();
-	void OnLevelsEdit();
-	void OnAddLevel();
-	void OnDeleteLevel();
+	void onLevelsSelect();
+	void onLevelsEdit();
+	void onAddLevel();
+	void onDeleteLevel();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioView *view;
 	AudioFile *audio;

@@ -52,7 +52,7 @@ int oe_write_page(ogg_page *page, FILE *fp)
 void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 {
 	msg_db_r("write_ogg_file", 1);
-	tsunami->progress->Set(_("exportiere ogg"), 0);
+	tsunami->progress->set(_("exportiere ogg"), 0);
 	int size = b->num * 4;
 
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
@@ -129,7 +129,7 @@ void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 		nn ++;
 		if (nn > 8){
-			tsunami->progress->Set(float(written) / (float)b->num);
+			tsunami->progress->set(float(written) / (float)b->num);
 			nn = 0;
 		}
 
@@ -197,7 +197,7 @@ void FormatOgg::LoadAudio(AudioFile *a, const string & filename)
 void FormatOgg::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("Ogg.LoadTracl", 1);
-	tsunami->progress->Set(_("lade ogg"), 0);
+	tsunami->progress->set(_("lade ogg"), 0);
 	if (ov_fopen((char*)filename.c_str(), &vf)){
 		msg_error("ogg: ov_fopen failed");
 		return;
@@ -245,7 +245,7 @@ void FormatOgg::LoadTrack(Track *t, const string & filename, int offset, int lev
 			read += r;
 			nn ++;
 			if (nn > 256){
-				tsunami->progress->Set((float)read / (float)(samples * 4));
+				tsunami->progress->set((float)read / (float)(samples * 4));
 				nn = 0;
 			}
 		}

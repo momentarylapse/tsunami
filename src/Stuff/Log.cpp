@@ -22,32 +22,32 @@ Log::~Log()
 }
 
 
-void Log::Error(const string &message)
+void Log::error(const string &message)
 {
-	AddMessage(TYPE_ERROR, message);
+	addMessage(TYPE_ERROR, message);
 }
 
 
-void Log::Warning(const string &message)
+void Log::warning(const string &message)
 {
-	AddMessage(TYPE_WARNING, message);
+	addMessage(TYPE_WARNING, message);
 }
 
 
-void Log::Info(const string &message)
+void Log::info(const string &message)
 {
-	AddMessage(TYPE_INFO, message);
+	addMessage(TYPE_INFO, message);
 }
 
 
-void Log::Clear()
+void Log::clear()
 {
 	messages.clear();
-	Notify(MESSAGE_CLEAR);
+	notify(MESSAGE_CLEAR);
 }
 
 
-void Log::AddMessage(int type, const string &_message)
+void Log::addMessage(int type, const string &_message)
 {
 	Message m;
 	m.type = type;
@@ -61,5 +61,5 @@ void Log::AddMessage(int type, const string &_message)
 	}else{
 		msg_write(_message);
 	}
-	Notify(MESSAGE_ADD);
+	notify(MESSAGE_ADD);
 }

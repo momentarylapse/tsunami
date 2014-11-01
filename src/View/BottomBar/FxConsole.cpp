@@ -39,7 +39,7 @@ public:
 		AddButton("!flat", 4, 0, 0, 0, "delete");
 		SetImage("delete", "hui:delete");
 		SetTooltip("delete", _("Effekt l&oschen"));
-		p = fx->CreatePanel();
+		p = fx->createPanel();
 		if (p){
 			Embed(p, "grid", 0, 1);
 			p->update();
@@ -57,13 +57,13 @@ public:
 
 		Check("enabled", fx->enabled);
 
-		old_param = fx->ConfigToString();
-		Subscribe(fx, fx->MESSAGE_CHANGE);
-		Subscribe(fx, fx->MESSAGE_CHANGE_BY_ACTION);
+		old_param = fx->configToString();
+		subscribe(fx, fx->MESSAGE_CHANGE);
+		subscribe(fx, fx->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SingleFxPanel()
 	{
-		Unsubscribe(fx);
+		unsubscribe(fx);
 	}
 	void onLoad()
 	{
@@ -75,7 +75,7 @@ public:
 			track->EditEffect(index, old_param);
 		else
 			audio->EditEffect(index, old_param);
-		old_param = fx->ConfigToString();
+		old_param = fx->configToString();
 	}
 	void onSave()
 	{
@@ -98,7 +98,7 @@ public:
 		else
 			audio->DeleteEffect(index);
 	}
-	virtual void OnUpdate(Observable *o, const string &message)
+	virtual void onUpdate(Observable *o, const string &message)
 	{
 		if (message == o->MESSAGE_CHANGE){
 			if (track)
@@ -108,7 +108,7 @@ public:
 		}
 		Check("enabled", fx->enabled);
 		p->update();
-		old_param = fx->ConfigToString();
+		old_param = fx->configToString();
 	}
 	AudioFile *audio;
 	Track *track;
@@ -139,21 +139,21 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 	//Enable("add", false);
 	Enable("track_name", false);
 
-	EventM("add", this, &FxConsole::OnAdd);
+	EventM("add", this, &FxConsole::onAdd);
 
-	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
-	Subscribe(audio, audio->MESSAGE_ADD_EFFECT);
-	Subscribe(audio, audio->MESSAGE_DELETE_EFFECT);
+	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	subscribe(audio, audio->MESSAGE_ADD_EFFECT);
+	subscribe(audio, audio->MESSAGE_DELETE_EFFECT);
 }
 
 FxConsole::~FxConsole()
 {
-	Clear();
-	Unsubscribe(view);
-	Unsubscribe(audio);
+	clear();
+	unsubscribe(view);
+	unsubscribe(audio);
 }
 
-void FxConsole::OnAdd()
+void FxConsole::onAdd()
 {
 	Effect *effect = tsunami->plugin_manager->ChooseEffect(this);
 	if (!effect)
@@ -164,10 +164,10 @@ void FxConsole::OnAdd()
 		audio->AddEffect(effect);
 }
 
-void FxConsole::Clear()
+void FxConsole::clear()
 {
 	if (track)
-		Unsubscribe(track);
+		unsubscribe(track);
 	foreachi(HuiPanel *p, panels, i){
 		delete(p);
 		RemoveControl("separator_" + i2s(i));
@@ -177,14 +177,14 @@ void FxConsole::Clear()
 	//Enable("add", false);
 }
 
-void FxConsole::SetTrack(Track *t)
+void FxConsole::setTrack(Track *t)
 {
-	Clear();
+	clear();
 	track = t;
 	if (track){
-		Subscribe(track, track->MESSAGE_DELETE);
-		Subscribe(track, track->MESSAGE_ADD_EFFECT);
-		Subscribe(track, track->MESSAGE_DELETE_EFFECT);
+		subscribe(track, track->MESSAGE_DELETE);
+		subscribe(track, track->MESSAGE_ADD_EFFECT);
+		subscribe(track, track->MESSAGE_DELETE_EFFECT);
 		SetString("track_name", format(_("!angle=90\\wirken auf die Spur '%s'"), track->GetNiceName().c_str()));
 	}else
 		SetString("track_name", _("!angle=90\\wirken auf die komplette Datei"));
@@ -204,13 +204,13 @@ void FxConsole::SetTrack(Track *t)
 	//Enable("add", track);
 }
 
-void FxConsole::OnUpdate(Observable* o, const string &message)
+void FxConsole::onUpdate(Observable* o, const string &message)
 {
 	if ((o == track) && (message == track->MESSAGE_DELETE)){
-		SetTrack(NULL);
+		setTrack(NULL);
 	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE))
-		SetTrack(view->cur_track);
+		setTrack(view->cur_track);
 	else
-		SetTrack(track);
+		setTrack(track);
 }
 

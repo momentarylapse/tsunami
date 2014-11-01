@@ -22,19 +22,19 @@ public:
 	TrackDialog(AudioView *view);
 	virtual ~TrackDialog();
 
-	void LoadData();
-	void ApplyData();
+	void loadData();
+	void applyData();
 
-	void OnName();
-	void OnVolume();
-	void OnPanning();
-	void OnSynthesizer();
-	void OnConfigSynthesizer();
-	void OnEditMidi();
+	void onName();
+	void onVolume();
+	void onPanning();
+	void onSynthesizer();
+	void onConfigSynthesizer();
+	void onEditMidi();
 
-	void SetTrack(Track *t);
+	void setTrack(Track *t);
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioView *view;
 	Track *track;

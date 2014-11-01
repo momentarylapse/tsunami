@@ -17,20 +17,20 @@ Action::~Action()
 
 void Action::undo_and_notify(Data *d)
 {
-	d->NotifyBegin();
+	d->notifyBegin();
 	undo(d);
-	d->Notify(d->MESSAGE_CHANGE);
-	d->NotifyEnd();
+	d->notify(d->MESSAGE_CHANGE);
+	d->notifyEnd();
 }
 
 
 
 void *Action::execute_and_notify(Data *d)
 {
-	d->NotifyBegin();
+	d->notifyBegin();
 	void *r = execute(d);
-	d->Notify(d->MESSAGE_CHANGE);
-	d->NotifyEnd();
+	d->notify(d->MESSAGE_CHANGE);
+	d->notifyEnd();
 	return r;
 }
 
@@ -38,10 +38,10 @@ void *Action::execute_and_notify(Data *d)
 
 void Action::redo_and_notify(Data *d)
 {
-	d->NotifyBegin();
+	d->notifyBegin();
 	redo(d);
-	d->Notify(d->MESSAGE_CHANGE);
-	d->NotifyEnd();
+	d->notify(d->MESSAGE_CHANGE);
+	d->notifyEnd();
 }
 
 

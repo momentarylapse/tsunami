@@ -96,19 +96,19 @@ CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
 	curve_rect = rect(0, 0, 0, 0);
 	hover = selected = -1;
 
-	Subscribe(audio, audio->MESSAGE_NEW);
-	Subscribe(audio, audio->MESSAGE_ADD_CURVE);
-	Subscribe(audio, audio->MESSAGE_DELETE_CURVE);
-	Subscribe(view, view->MESSAGE_VIEW_CHANGE);
+	subscribe(audio, audio->MESSAGE_NEW);
+	subscribe(audio, audio->MESSAGE_ADD_CURVE);
+	subscribe(audio, audio->MESSAGE_DELETE_CURVE);
+	subscribe(view, view->MESSAGE_VIEW_CHANGE);
 }
 
 CurveConsole::~CurveConsole()
 {
-	Unsubscribe(audio);
-	Unsubscribe(view);
+	unsubscribe(audio);
+	unsubscribe(view);
 }
 
-void CurveConsole::OnUpdate(Observable* o, const string &message)
+void CurveConsole::onUpdate(Observable* o, const string &message)
 {
 	if (o == audio){
 		updateList();
@@ -132,7 +132,7 @@ void CurveConsole::onAdd()
 	Curve *c = new Curve;
 	c->name = "new";
 	audio->curve.add(c);
-	audio->Notify(audio->MESSAGE_ADD_CURVE);
+	audio->notify(audio->MESSAGE_ADD_CURVE);
 }
 
 void CurveConsole::onDelete()
@@ -143,7 +143,7 @@ void CurveConsole::onDelete()
 		audio->curve.erase(n);
 		curve = NULL;
 	}
-	audio->Notify(audio->MESSAGE_DELETE_CURVE);
+	audio->notify(audio->MESSAGE_DELETE_CURVE);
 }
 
 void CurveConsole::onTarget()

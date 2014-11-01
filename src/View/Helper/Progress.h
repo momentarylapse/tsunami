@@ -16,16 +16,16 @@ class Progress : public Observable
 public:
 	Progress();
 	virtual ~Progress();
-	void Set(float progress);
-	void Set(const string &str, float progress);
-	void Start(const string &str, float progress);
-	void StartCancelable(const string &str, float progress);
-	void End();
+	void set(float progress);
+	void set(const string &str, float progress);
+	void start(const string &str, float progress);
+	void startCancelable(const string &str, float progress);
+	void end();
 
 	static const string MESSAGE_CANCEL;
 
-	void Cancel();
-	bool IsCancelled();
+	void cancel();
+	bool isCancelled();
 
 private:
 	HuiWindow *dlg;

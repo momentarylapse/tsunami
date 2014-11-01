@@ -53,23 +53,23 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 	r.reset();
 	l.reset();
 
-	panel->EventMX(id, "hui:draw", this, &PeakMeter::OnDraw);
-	panel->EventMX(id, "hui:left-button-down", this, &PeakMeter::OnLeftButtonDown);
+	panel->EventMX(id, "hui:draw", this, &PeakMeter::onDraw);
+	panel->EventMX(id, "hui:left-button-down", this, &PeakMeter::onLeftButtonDown);
 
-	Enable(true);
+	enable(true);
 }
 
 PeakMeter::~PeakMeter()
 {
-	Unsubscribe(source);
+	unsubscribe(source);
 }
 
-void PeakMeter::Enable(bool _enabled)
+void PeakMeter::enable(bool _enabled)
 {
 	if ((!enabled) && (_enabled))
-		Subscribe(source);
+		subscribe(source);
 	if ((enabled) && (!_enabled))
-		Unsubscribe(source);
+		unsubscribe(source);
 
 	enabled = _enabled;
 }
@@ -92,9 +92,9 @@ inline float nice_peak(float p)
 	return min(pow(p, 0.8f), 1);
 }
 
-void PeakMeter::DrawPeak(HuiPainter *c, const rect &r, Data &d)
+void PeakMeter::drawPeak(HuiPainter *c, const rect &r, Data &d)
 {
-	msg_db_f("PeakMeter.DrawPeak", 1);
+	msg_db_f("PeakMeter.drawPeak", 1);
 	int w = r.width();
 	int h = r.height();
 	float sp = d.get_sp();
@@ -115,16 +115,16 @@ void PeakMeter::DrawPeak(HuiPainter *c, const rect &r, Data &d)
 		c->drawRect(w * nice_peak(sp), r.y1, 2, h);
 }
 
-void PeakMeter::OnDraw()
+void PeakMeter::onDraw()
 {
-	msg_db_f("PeakMeter.OnDraw", 1);
+	msg_db_f("PeakMeter.onDraw", 1);
 	HuiPainter *c = panel->BeginDraw(id);
 	int w = c->width;
 	int h = c->height;
 	if (mode == ModePeaks){
 
-		DrawPeak(c, rect(2, w-2, 2, h/2-1), r);
-		DrawPeak(c, rect(2, w-2, h/2 + 1, h-2), l);
+		drawPeak(c, rect(2, w-2, 2, h/2-1), r);
+		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), l);
 	}else{
 		c->setColor(White);
 		c->drawRect(2, 2, w - 4, h - 4);
@@ -140,13 +140,13 @@ void PeakMeter::OnDraw()
 	c->end();
 }
 
-void PeakMeter::FindPeaks()
+void PeakMeter::findPeaks()
 {
 	r.update(buf.r, sample_rate);
 	l.update(buf.l, sample_rate);
 }
 
-void PeakMeter::ClearData()
+void PeakMeter::clearData()
 {
 	r.reset();
 	l.reset();
@@ -155,22 +155,22 @@ void PeakMeter::ClearData()
 inline float i_to_freq(int i)
 {	return FREQ_MIN * exp( (float)i / (float)SPECTRUM_SIZE * log(FREQ_MAX / FREQ_MIN));	}
 
-void PeakMeter::OnLeftButtonDown()
+void PeakMeter::onLeftButtonDown()
 {
-	SetMode((mode == ModePeaks) ? ModeSpectrum : ModePeaks);
+	setMode((mode == ModePeaks) ? ModeSpectrum : ModePeaks);
 }
 
-void PeakMeter::OnRightButtonDown()
+void PeakMeter::onRightButtonDown()
 {
 }
 
-void PeakMeter::SetMode(int _mode)
+void PeakMeter::setMode(int _mode)
 {
 	mode = _mode;
 	panel->Redraw(id);
 }
 
-void PeakMeter::FindSpectrum()
+void PeakMeter::findSpectrum()
 {
 	msg_db_f("PeakMeter.FindSp", 1);
 	Array<complex> cr, cl;
@@ -195,19 +195,19 @@ void PeakMeter::FindSpectrum()
 	}
 }
 
-void PeakMeter::OnUpdate(Observable *o, const string &message)
+void PeakMeter::onUpdate(Observable *o, const string &message)
 {
-	int state = source->GetState();
+	int state = source->getState();
 
 	if (state == source->STATE_PLAYING){
-		sample_rate = source->GetSampleRate();
-		source->GetSomeSamples(buf, NUM_SAMPLES);
+		sample_rate = source->getSampleRate();
+		source->getSomeSamples(buf, NUM_SAMPLES);
 		if (mode == ModePeaks)
-			FindPeaks();
+			findPeaks();
 		else if (mode == ModeSpectrum)
-			FindSpectrum();
+			findSpectrum();
 	}else if (state == source->STATE_STOPPED){
-		ClearData();
+		clearData();
 	}
 	panel->Redraw(id);
 }

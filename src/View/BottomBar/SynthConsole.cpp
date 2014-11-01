@@ -34,7 +34,7 @@ public:
 		SetImage("save_favorite", "hui:save");
 		SetTooltip("save_favorite", _("Parameter speichern"));
 		AddText("!bold,center,expandx\\" + synth->name, 2, 0, 0, 0, "");
-		p = synth->CreatePanel();
+		p = synth->createPanel();
 		if (p){
 			Embed(p, "grid", 0, 1);
 			p->update();
@@ -48,13 +48,13 @@ public:
 		EventM("load_favorite", this, &SynthPanel::onLoad);
 		EventM("save_favorite", this, &SynthPanel::onSave);
 
-		old_param = synth->ConfigToString();
-		Subscribe(synth, synth->MESSAGE_CHANGE);
-		Subscribe(synth, synth->MESSAGE_CHANGE_BY_ACTION);
+		old_param = synth->configToString();
+		subscribe(synth, synth->MESSAGE_CHANGE);
+		subscribe(synth, synth->MESSAGE_CHANGE_BY_ACTION);
 	}
 	virtual ~SynthPanel()
 	{
-		Unsubscribe(synth);
+		unsubscribe(synth);
 	}
 	void onLoad()
 	{
@@ -63,7 +63,7 @@ public:
 			return;
 		tsunami->plugin_manager->ApplyFavorite(synth, name);
 		track->EditSynthesizer(old_param);
-		old_param = synth->ConfigToString();
+		old_param = synth->configToString();
 	}
 	void onSave()
 	{
@@ -72,13 +72,13 @@ public:
 			return;
 		tsunami->plugin_manager->SaveFavorite(synth, name);
 	}
-	virtual void OnUpdate(Observable *o, const string &message)
+	virtual void onUpdate(Observable *o, const string &message)
 	{
 		if (message == o->MESSAGE_CHANGE){
 			track->EditSynthesizer(old_param);
 		}
 		p->update();
-		old_param = synth->ConfigToString();
+		old_param = synth->configToString();
 	}
 	Track *track;
 	Synthesizer *synth;
@@ -103,25 +103,25 @@ SynthConsole::SynthConsole(AudioView *_view, AudioFile *_audio) :
 	panel = NULL;
 	Enable("track_name", false);
 
-	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 }
 
 SynthConsole::~SynthConsole()
 {
-	Unsubscribe(view);
+	unsubscribe(view);
 	if (track){
-		Unsubscribe(track);
+		unsubscribe(track);
 		if (track->synth)
-			Unsubscribe(track->synth);
+			unsubscribe(track->synth);
 	}
 }
 
-void SynthConsole::Clear()
+void SynthConsole::clear()
 {
 	if (track){
-		Unsubscribe(track);
+		unsubscribe(track);
 		if (track->synth){
-			Unsubscribe(track->synth);
+			unsubscribe(track->synth);
 			delete(panel);
 			panel = NULL;
 			RemoveControl("separator_0");
@@ -130,17 +130,17 @@ void SynthConsole::Clear()
 	track = NULL;
 }
 
-void SynthConsole::SetTrack(Track *t)
+void SynthConsole::setTrack(Track *t)
 {
-	Clear();
+	clear();
 	track = t;
 	if (track){
-		Subscribe(track, track->MESSAGE_DELETE);
-		Subscribe(track, track->MESSAGE_CHANGE);
+		subscribe(track, track->MESSAGE_DELETE);
+		subscribe(track, track->MESSAGE_CHANGE);
 		SetString("track_name", format(_("!angle=90\\f&ur die Spur '%s'"), track->GetNiceName().c_str()));
 
 		if (track->synth){
-			Subscribe(track->synth, track->synth->MESSAGE_DELETE);
+			subscribe(track->synth, track->synth->MESSAGE_DELETE);
 			panel = new SynthPanel(track);
 			Embed(panel, id_inner, 2, 0);
 			AddSeparator("!vertical", 3, 0, 0, 0, "separator_0");
@@ -149,15 +149,15 @@ void SynthConsole::SetTrack(Track *t)
 		SetString("track_name", _("!angle=90\\keine Spur gew&ahlt"));
 }
 
-void SynthConsole::OnUpdate(Observable* o, const string &message)
+void SynthConsole::onUpdate(Observable* o, const string &message)
 {
-	if ((o->GetName() == "Synthesizer") && (message == o->MESSAGE_DELETE)){
-		Clear();
+	if ((o->getName() == "Synthesizer") && (message == o->MESSAGE_DELETE)){
+		clear();
 	}else if ((o == track) && (message == track->MESSAGE_DELETE)){
-		SetTrack(NULL);
+		setTrack(NULL);
 	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE))
-		SetTrack(view->cur_track);
+		setTrack(view->cur_track);
 	else
-		SetTrack(track);
+		setTrack(track);
 }
 

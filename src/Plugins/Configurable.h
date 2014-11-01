@@ -43,18 +43,18 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	virtual void _cdecl ResetConfig();
-	virtual void _cdecl ResetState();
-	bool Configure();
-	virtual ConfigPanel *_cdecl CreatePanel();
-	//virtual void _cdecl UpdateDialog();
+	virtual void _cdecl resetConfig();
+	virtual void _cdecl resetState();
+	bool configure();
+	virtual ConfigPanel *_cdecl createPanel();
+	//virtual void _cdecl updateDialog();
 	void _cdecl notify();
 
 	PluginData *get_config();
 	PluginData *get_state();
 
-	string ConfigToString();
-	void ConfigFromString(const string &options);
+	string configToString();
+	void configFromString(const string &options);
 
 	string name;
 	int configurable_type;

@@ -214,9 +214,9 @@ PluginData *Configurable::get_state()
 	return NULL;
 }
 
-string Configurable::ConfigToString()
+string Configurable::configToString()
 {
-	msg_db_f("Configurable.ConfigToString", 1);
+	msg_db_f("Configurable.configToString", 1);
 
 	PluginData *config = get_config();
 	if (!config)
@@ -226,9 +226,9 @@ string Configurable::ConfigToString()
 	return s;
 }
 
-void Configurable::ConfigFromString(const string &param)
+void Configurable::configFromString(const string &param)
 {
-	msg_db_f("Configurable.ConfigFromString", 1);
+	msg_db_f("Configurable.configFromString", 1);
 
 	PluginData *config = get_config();
 	if (!config)
@@ -242,9 +242,9 @@ void Configurable::ConfigFromString(const string &param)
 
 // default version of ResetConfig()
 //   try to execute   Configurable.config.reset()
-void Configurable::ResetConfig()
+void Configurable::resetConfig()
 {
-	msg_db_f("Configurable.ResetConfig", 1);
+	msg_db_f("Configurable.resetConfig", 1);
 
 	PluginData *config = get_config();
 	if (!config)
@@ -254,9 +254,9 @@ void Configurable::ResetConfig()
 
 // default version of ResetState()
 //   try to execute   Configurable.state.reset()
-void Configurable::ResetState()
+void Configurable::resetState()
 {
-	msg_db_f("Configurable.ResetState", 1);
+	msg_db_f("Configurable.resetState", 1);
 
 	PluginData *state = get_state();
 	if (!state)
@@ -348,7 +348,7 @@ public:
 };
 
 // default handler...
-ConfigPanel *Configurable::CreatePanel()
+ConfigPanel *Configurable::createPanel()
 {
 	PluginData *config = get_config();
 	if (!config)
@@ -359,7 +359,7 @@ ConfigPanel *Configurable::CreatePanel()
 	return new AutoConfigPanel(aa, this);
 }
 
-/*void Configurable::UpdateDialog()
+/*void Configurable::updateDialog()
 {
 	if (_auto_panel_){
 		_auto_panel_->update();
@@ -445,14 +445,14 @@ public:
 	ConfigPanel *panel;
 };
 
-bool Configurable::Configure()
+bool Configurable::configure()
 {
 	PluginData *config = get_config();
 	if (!config)
 		return true;
 
 	//_auto_panel_ = NULL;
-	ConfigPanel *panel = CreatePanel();
+	ConfigPanel *panel = createPanel();
 	if (!panel)
 		return false;
 	HuiDialog *dlg = new ConfigurationDialog(this, config, panel);
@@ -461,7 +461,7 @@ bool Configurable::Configure()
 
 void Configurable::notify()
 {
-	Notify();
+	Observable::notify();
 }
 
 

@@ -211,7 +211,7 @@ void FormatMidi::LoadAudio(AudioFile *a, const string &filename)
 	}catch(const string &s){
 		if (f)
 			FileClose(f);
-		tsunami->log->Error(s);
+		tsunami->log->error(s);
 	}
 }
 

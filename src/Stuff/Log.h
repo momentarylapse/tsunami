@@ -23,11 +23,11 @@ public:
 	static const string MESSAGE_ADD;
 	static const string MESSAGE_CLEAR;
 
-	void Error(const string &message);
-	void Warning(const string &message);
-	void Info(const string &message);
+	void error(const string &message);
+	void warning(const string &message);
+	void info(const string &message);
 
-	void Clear();
+	void clear();
 
 	enum{
 		TYPE_ERROR,
@@ -41,7 +41,7 @@ public:
 		string text;
 	};
 private:
-	void AddMessage(int type, const string &message);
+	void addMessage(int type, const string &message);
 	Array<Message> messages;
 };
 

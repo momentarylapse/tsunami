@@ -15,7 +15,7 @@ ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, const string 
 	track_no = get_track_index(t);
 	index = _index;
 	old_value = _old_params;
-	new_value = fx->ConfigToString();
+	new_value = fx->configToString();
 }
 
 ActionTrackEditEffect::~ActionTrackEditEffect()
@@ -28,8 +28,8 @@ void *ActionTrackEditEffect::execute(Data *d)
 
 	Effect *fx = a->get_fx(track_no, index);
 
-	fx->ConfigFromString(new_value);
-	fx->Notify(fx->MESSAGE_CHANGE_BY_ACTION);
+	fx->configFromString(new_value);
+	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }
@@ -40,8 +40,8 @@ void ActionTrackEditEffect::undo(Data *d)
 
 	Effect *fx = a->get_fx(track_no, index);
 
-	fx->ConfigFromString(old_value);
-	fx->Notify(fx->MESSAGE_CHANGE_BY_ACTION);
+	fx->configFromString(old_value);
+	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 }
 
 bool ActionTrackEditEffect::mergable(Action *a)

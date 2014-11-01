@@ -6,8 +6,8 @@
  */
 
 #include "AudioOutput.h"
+#include "AudioStream.h"
 #include "../Tsunami.h"
-#include "AudioRenderer.h"
 #include "../Stuff/Log.h"
 
 
@@ -27,64 +27,48 @@
 	#include <AL/alc.h>
 #endif
 
-//#define DEFAULT_BUFFER_SIZE		131072
-#define DEFAULT_BUFFER_SIZE		32768
-//#define DEFAULT_BUFFER_SIZE		16384
 
-#define UPDATE_TIME		0.050f
-
-
-const string AudioOutput::MESSAGE_STATE_CHANGE = "StateChange";
-const string AudioOutput::MESSAGE_UPDATE = "Update";
 
 AudioOutput::AudioOutput() :
-	PeakMeterSource("AudioOutput")
+	Observable("AudioOutput")
 {
 	al_initialized = false;
 	al_last_error = AL_NO_ERROR;
 
-	renderer = NULL;
-	generate_func = NULL;
-
-	playing = false;
-	volume = 1;
-
 	al_context = NULL;
 	al_dev = NULL;
-	buffer[0] = -1;
-	buffer[1] = -1;
-	source = -1;
-	data_samples = 0;
 
 	ChosenDevice = HuiConfig.getStr("Output.ChosenDevice", "");
 	volume = HuiConfig.getFloat("Output.Volume", 1.0f);
 
-	Init();
+	init();
 }
 
 AudioOutput::~AudioOutput()
 {
-	Stop();
-	Kill();
+	foreach(AudioStream *s, streams)
+		s->stop();
+
+	kill();
 	HuiConfig.setStr("Output.ChosenDevice", ChosenDevice);
 	HuiConfig.setFloat("Output.Volume", volume);
 }
 
-void AudioOutput::SetDevice(const string &device)
+void AudioOutput::setDevice(const string &device)
 {
 	ChosenDevice = device;
 	HuiConfig.setStr("ChosenOutputDevice", ChosenDevice);
 	HuiConfig.save();
-	tsunami->log->Warning(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
+	tsunami->log->warning(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
 	//KillPreview();
 	//PreviewInit();
 }
 
-void AudioOutput::Init()
+void AudioOutput::init()
 {
 	if (al_initialized)
 		return;
-	msg_db_f("Output.Init", 1);
+	msg_db_f("Output.init", 1);
 
 	// which device to use?
 	string dev_name;
@@ -104,15 +88,15 @@ void AudioOutput::Init()
 	if (dev_name.num > 0){
 		al_dev = alcOpenDevice(dev_name.c_str());
 		if (al_dev){
-			TestError("alcOpenDevice (init)");
+			testError("alcOpenDevice (init)");
 			al_context = alcCreateContext(al_dev, NULL);
-			TestError("alcCreateContext (init)");
+			testError("alcCreateContext (init)");
 			if (al_context){
 				if (alcMakeContextCurrent(al_context)){
-					tsunami->log->Info(_("benutze OpenAl Device: ") + dev_name);
+					tsunami->log->info(_("benutze OpenAl Device: ") + dev_name);
 					ok = true;
 				}
-				TestError("alcMakeContextCurrent (init)");
+				testError("alcMakeContextCurrent (init)");
 			}
 		}
 	}
@@ -120,49 +104,40 @@ void AudioOutput::Init()
 	// failed -> use automatic method
 	if (!ok){
 		ok = alutInit(NULL, 0);
-		TestError("alutInit (init)");
+		testError("alutInit (init)");
 		al_dev = NULL;
 		al_context = NULL;
 	}
 
 	if (!ok){
-		tsunami->log->Error(string("OpenAL init: ") + alutGetErrorString(al_last_error));
+		tsunami->log->error(string("OpenAL init: ") + alutGetErrorString(al_last_error));
 		return;
 	}
 
 	//SetListenerValues();
-	TestError("init...");
+	testError("init...");
 
-	//alGenBuffers(1, &buffer);
-	alGenSources(1, &source);
 	al_initialized = true;
 }
 
-void AudioOutput::Kill()
+void AudioOutput::kill()
 {
 	if (!al_initialized)
 		return;
-	msg_db_f("Output.Kill",1);
-	Stop();
-	TestError("? (pre kill)");
-	if (buffer[0] >= 0)
-		alDeleteBuffers(2, (ALuint*)buffer);
-	TestError("alDeteleBuffers (kill)");
-	if (source >= 0)
-		alDeleteSources(1, &source);
-	TestError("alDeleteSources (kill)");
+	msg_db_f("Output.kill",1);
+
 	// close devices
 	if (al_dev){
 		// manually
 		//msg_write("current context...");
 		alcMakeContextCurrent(NULL);
-		TestError("alcMakeContextCurrent (kill)");
+		testError("alcMakeContextCurrent (kill)");
 		//msg_write("destroy context...");
 		alcDestroyContext(al_context);
-		TestError("alcDestroyContext (kill)");
+		testError("alcDestroyContext (kill)");
 		//msg_write("close device...");
 		if (!alcCloseDevice(al_dev))
-			TestError("alcCloseDevice (kill)");
+			testError("alcCloseDevice (kill)");
 		//msg_write("ok");
 	}else{
 		// automatically
@@ -191,232 +166,18 @@ string ALError(int err)
 	return i2s(err);
 }
 
-void AudioOutput::stop_play()
-{
-	if (!playing)
-		return;
-
-	TestError("?  (prestop)");
-	alSourceStop(source);
-	TestError("alSourceStop (stop)");
-	int queued;
-	alGetSourcei(source, AL_BUFFERS_QUEUED, &queued);
-	TestError("alGetSourcei(queued) (stop)");
-	while(queued--){
-		ALuint buf;
-		alSourceUnqueueBuffers(source, 1, &buf);
-		TestError(format("alSourceUnqueueBuffers(%d) (stop)", queued));
-	}
-}
-
-void AudioOutput::Stop()
-{
-	if (!playing)
-		return;
-	msg_db_f("Output.Stop", 1);
-
-	stop_play();
-
-	alDeleteBuffers(2, (ALuint*)buffer);
-	TestError("alDeleteBuffers (stop)");
-	buffer[0] = -1;
-	playing = false;
-	renderer = NULL;
-
-	Notify(MESSAGE_STATE_CHANGE);
-}
-
-void AudioOutput::Pause()
-{
-	if (!playing)
-		return;
-	int param;
-	alGetSourcei(source, AL_SOURCE_STATE, &param);
-	if (param == AL_PLAYING)
-		alSourcePause(source);
-	else if (param == AL_PAUSED)
-		alSourcePlay(source);
-	Notify(MESSAGE_STATE_CHANGE);
-}
-
-bool AudioOutput::stream(int buf)
-{
-	msg_db_f("stream", 1);
-	BufferBox *b = (buf == buffer[0]) ? &box[0] : &box[1];
-	int size = 0;
-	b->resize(buffer_size);
-	//b->offset = stream_offset_next;
-	if (renderer){
-		size = renderer->read(*b);
-		//msg_write(size);
-	}else if (generate_func){
-		size = (*generate_func)(*b);
-	}
-	if (size == 0)
-		return false;
-	//b->offset = stream_offset_next;
-	b->get_16bit_buffer(data);
-	alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
-	TestError("alBufferData (stream)");
-
-	return true;
-}
-
-void AudioOutput::start_play(int pos)
-{
-	buffer_size = DEFAULT_BUFFER_SIZE;
-
-	int num_buffers = 0;
-	if (stream(buffer[0]))
-		num_buffers ++;
-	if (stream(buffer[1]))
-		num_buffers ++;
-
-	alSourcef (source, AL_PITCH,    1.0f);
-	alSourcef (source, AL_GAIN,     volume);
-//	alSourcefv(source, AL_POSITION, SourcePos);
-//	alSourcefv(source, AL_VELOCITY, SourceVel);
-	alSourcei (source, AL_LOOPING,  false);
-	if (TestError("alSourcef... (play)"))
-		return;
-
-	cur_buffer_no = 0;
-	alSourceQueueBuffers(source, num_buffers, (ALuint*)buffer);
-	TestError("alSourceQueueBuffers (play)");
-
-	alSourcePlay(source);
-	if (TestError("alSourcePlay (play)"))
-		return;
-}
-
-void AudioOutput::Play(AudioRenderer *r)
-{
-	msg_db_f("PreviewPlay", 1);
-
-	if (!al_initialized)
-		Init();
-
-	if (playing)
-		Stop();
-
-	alGenBuffers(2, (ALuint*)buffer);
-	TestError("alGenBuffers (play)");
-
-	renderer = r;
-	generate_func = NULL;
-	sample_rate = tsunami->audio->sample_rate; //r->sample_rate; // FIXME
-
-	start_play(0);
-
-	playing = true;
-
-	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
-
-	Notify(MESSAGE_STATE_CHANGE);
-}
-
-void AudioOutput::PlayGenerated(void *func, int _sample_rate)
-{
-	msg_db_f("PlayGenerated", 1);
-
-	if (!al_initialized)
-		Init();
-
-	if (playing)
-		Stop();
-
-	alGenBuffers(2, (ALuint*)buffer);
-	TestError("alGenBuffers (play)");
-
-	renderer = NULL;
-	generate_func = (generate_func_t*)func;
-	sample_rate = _sample_rate;
-
-	start_play(0);
-
-	playing = true;
-
-	HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
-
-	Notify(MESSAGE_STATE_CHANGE);
-}
-
-bool AudioOutput::IsPlaying()
-{
-	if (!playing)
-		return false;
-	int param = 0;
-	alGetSourcei(source, AL_SOURCE_STATE, &param);
-	TestError("alGetSourcei1 (getpos)");
-	return ((param == AL_PLAYING) or (param == AL_PAUSED));
-}
-
-int AudioOutput::GetState()
-{
-	/*if (IsPlaying())
-		return STATE_PLAYING;*/
-	int param;
-	alGetSourcei(source, AL_SOURCE_STATE, &param);
-	if (param == AL_PLAYING)
-		return STATE_PLAYING;
-	if (param == AL_PAUSED)
-		return STATE_PAUSED;
-	return STATE_STOPPED;
-}
-
-int AudioOutput::GetPos()
-{
-	int pos;
-	if (GetPosSafe(pos))
-		return pos;
-	return 0;
-}
-
-bool AudioOutput::GetPosSafe(int &pos)
-{
-	if (playing){
-		int param = 0;
-		alGetSourcei(source, AL_SOURCE_STATE, &param);
-		TestError("alGetSourcei1 (getpos)");
-		if ((param == AL_PLAYING) or (param == AL_PAUSED)){
-			alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
-			TestError("alGetSourcei2 (getpos)");
-			pos = box[cur_buffer_no].offset + param;
-			return true;
-		}
-	}
-	return false;
-}
-
-float AudioOutput::GetVolume()
+float AudioOutput::getVolume()
 {
 	return volume;
 }
 
-void AudioOutput::SetVolume(float _volume)
+void AudioOutput::setVolume(float _volume)
 {
 	volume = _volume;
-	Notify(MESSAGE_STATE_CHANGE);
+	notify(MESSAGE_CHANGE);
 }
 
-float AudioOutput::GetSampleRate()
-{
-	return sample_rate;
-}
-
-void AudioOutput::GetSomeSamples(BufferBox &buf, int num_samples)
-{
-	if (!playing)
-		return;
-
-	// (sample) position within current stream/buffer
-	int dpos = 0;
-	alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
-
-	buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
-}
-
-bool AudioOutput::TestError(const string &msg)
+bool AudioOutput::testError(const string &msg)
 {
 	int error;
 	if (al_dev)
@@ -434,43 +195,4 @@ bool AudioOutput::TestError(const string &msg)
 	return false;
 }
 
-void AudioOutput::Update()
-{
-	msg_db_f("Out.Update", 1);
-	TestError("idle");
-	if (playing){
-		alSourcef(source, AL_GAIN, volume);
-		TestError("alGetSourcef(volume) (idle)");
-		//msg_write("..");
-		int processed;
-		alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
-		TestError("alGetSourcei(processed) (idle)");
-		while(processed--){
-			cur_buffer_no = 1 - cur_buffer_no;
-			ALuint buf;
-			alSourceUnqueueBuffers(source, 1, &buf);
-			TestError("alSourceUnqueueBuffers (idle)");
-			if (stream(buf)){
-				alSourceQueueBuffers(source, 1, &buf);
-				TestError("alSourceQueueBuffers (idle)");
-			}
-		}
-		Notify(MESSAGE_UPDATE);
-
-
-		int param=0;
-		alGetSourcei(source,AL_SOURCE_STATE, &param);
-		TestError("alGetSourcei(state) (idle)");
-		if ((param != AL_PLAYING) and (param != AL_PAUSED)){
-			//msg_write("hat gestoppt...");
-				Stop();
-		}else{
-		}
-
-		if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
-			HuiRunLaterM(UPDATE_TIME, this, &AudioOutput::Update);
-		else
-			HuiRunLaterM(0, this, &AudioOutput::Update);
-	}
-}
 

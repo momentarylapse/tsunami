@@ -6,10 +6,12 @@
  */
 
 #include "AudioInputAudio.h"
-#include "AudioOutput.h"
+#include "AudioStream.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
+#include "../TsunamiWindow.h"
 #include "../Stuff/Log.h"
+#include "../View/AudioView.h"
 
 
 #ifdef NIX_OS_WINDOWS
@@ -28,7 +30,7 @@
 	#include <AL/alc.h>
 #endif
 
-void AudioInputAudio::SyncData::Reset()
+void AudioInputAudio::SyncData::reset()
 {
 	num_points = 0;
 	delay_sum = 0;
@@ -37,16 +39,16 @@ void AudioInputAudio::SyncData::Reset()
 		offset_out = tsunami->output->GetRange().offset;*/ // TODO
 }
 
-void AudioInputAudio::SyncData::Add(int samples)
+void AudioInputAudio::SyncData::add(int samples)
 {
-	if (tsunami->output->IsPlaying()){
+	if (tsunami->win->view->stream->isPlaying()){
 		samples_in += samples;
 		/*delay_sum += (tsunami->output->GetPos() - offset_out - samples_in);*/ // TODO
 		num_points ++;
 	}
 }
 
-int AudioInputAudio::SyncData::GetDelay()
+int AudioInputAudio::SyncData::getDelay()
 {
 	if (num_points > 0)
 		return (delay_sum / num_points);
@@ -58,7 +60,7 @@ AudioInputAudio::AudioInputAudio(BufferBox &buf, BufferBox &cur_buf) :
 {
 	Capturing = false;
 	capture = NULL;
-	accumulate = false;
+	accumulating = false;
 	memset(capture_temp, 0, sizeof(capture_temp));
 	SampleRate = DEFAULT_SAMPLE_RATE;
 
@@ -67,8 +69,8 @@ AudioInputAudio::AudioInputAudio(BufferBox &buf, BufferBox &cur_buf) :
 	TempFilename = HuiConfig.getStr("Input.TempFilename", "");
 	temp_file = NULL;
 
-	if (file_test_existence(GetTempFilename()))
-		tsunami->log->Warning(_("alte Aufnahmedaten gefunden: ") + GetTempFilename());
+	if (file_test_existence(getTempFilename()))
+		tsunami->log->warning(_("alte Aufnahmedaten gefunden: ") + getTempFilename());
 }
 
 AudioInputAudio::~AudioInputAudio()
@@ -76,7 +78,7 @@ AudioInputAudio::~AudioInputAudio()
 }
 
 
-void AudioInputAudio::Init()
+void AudioInputAudio::init()
 {
 	msg_db_f("CaptureInit", 1);
 	Device.clear();
@@ -91,7 +93,7 @@ void AudioInputAudio::Init()
 		ChosenDevice = "";
 }
 
-void AudioInputAudio::Stop()
+void AudioInputAudio::stop()
 {
 	msg_db_f("CaptureStop", 1);
 	if (Capturing){
@@ -105,14 +107,14 @@ void AudioInputAudio::Stop()
 	}
 }
 
-bool AudioInputAudio::Start(int sample_rate)
+bool AudioInputAudio::start(int sample_rate)
 {
 	msg_db_f("CaptureStart", 1);
 	if (Capturing)
-		Stop();
+		stop();
 
-	Init();
-	accumulate = false;
+	init();
+	accumulating = false;
 	SampleRate = sample_rate;
 	capture = alcCaptureOpenDevice(dev_name.c_str(), sample_rate, AL_FORMAT_STEREO16, NUM_CAPTURE_SAMPLES);
 	//msg_write((int)capture);
@@ -120,41 +122,41 @@ bool AudioInputAudio::Start(int sample_rate)
 		alcCaptureStart(capture);
 		Capturing = true;
 
-		cur_temp_filename = GetTempFilename();
-		temp_file = FileCreate(GetTempFilename());
+		cur_temp_filename = getTempFilename();
+		temp_file = FileCreate(getTempFilename());
 		temp_file->SetBinaryMode(true);
 	}
-	ResetSync();
+	resetSync();
 	return Capturing;
 }
 
-float AudioInputAudio::GetPlaybackDelayConst()
+float AudioInputAudio::getPlaybackDelayConst()
 {
 	return PlaybackDelayConst;
 }
 
-void AudioInputAudio::Accumulate(bool enable)
+void AudioInputAudio::accumulate(bool enable)
 {
-	accumulate = enable;
+	accumulating = enable;
 }
 
-void AudioInputAudio::ResetAccumulation()
+void AudioInputAudio::resetAccumulation()
 {
 	AccumulationBuffer.clear();
 }
 
-int AudioInputAudio::GetSampleCount()
+int AudioInputAudio::getSampleCount()
 {
 	return AccumulationBuffer.num;
 }
 
-void AudioInputAudio::SetPlaybackDelayConst(float f)
+void AudioInputAudio::setPlaybackDelayConst(float f)
 {
 	PlaybackDelayConst = f;
 	HuiConfig.setFloat("Input.PlaybackDelay", PlaybackDelayConst);
 }
 
-int AudioInputAudio::DoCapturing()
+int AudioInputAudio::doCapturing()
 {
 	msg_db_f("DoCapturing", 1);
 	int a = -42;
@@ -173,9 +175,9 @@ int AudioInputAudio::DoCapturing()
 		CurrentBuffer.set_16bit(capture_temp, 0, a);
 
 		if (!too_much_data)
-			sync.Add(a);
+			sync.add(a);
 
-		if (accumulate){
+		if (accumulating){
 			AccumulationBuffer.append(CurrentBuffer);
 			temp_file->WriteBuffer(&capture_temp, a * 4);
 		}
@@ -184,33 +186,33 @@ int AudioInputAudio::DoCapturing()
 	return a;
 }
 
-void AudioInputAudio::ResetSync()
+void AudioInputAudio::resetSync()
 {
-	sync.Reset();
+	sync.reset();
 }
 
-void AudioInputAudio::GetSomeSamples(BufferBox &buf, int num_samples)
+void AudioInputAudio::getSomeSamples(BufferBox &buf, int num_samples)
 {
 	num_samples = min(num_samples, CurrentBuffer.num);
 	buf.set_as_ref(CurrentBuffer, CurrentBuffer.num - num_samples, num_samples);
 }
 
-float AudioInputAudio::GetSampleRate()
+float AudioInputAudio::getSampleRate()
 {
 	return SampleRate;
 }
 
-bool AudioInputAudio::IsCapturing()
+bool AudioInputAudio::isCapturing()
 {
 	return Capturing;
 }
 
-int AudioInputAudio::GetDelay()
+int AudioInputAudio::getDelay()
 {
-	return sync.GetDelay() - PlaybackDelayConst * (float)SampleRate / 1000.0f;
+	return sync.getDelay() - PlaybackDelayConst * (float)SampleRate / 1000.0f;
 }
 
-string AudioInputAudio::GetDefaultTempFilename()
+string AudioInputAudio::getDefaultTempFilename()
 {
 #ifdef OS_WINDOWS
 	return "c:\\tsunami-input.raw";
@@ -219,14 +221,14 @@ string AudioInputAudio::GetDefaultTempFilename()
 #endif
 }
 
-string AudioInputAudio::GetTempFilename()
+string AudioInputAudio::getTempFilename()
 {
 	if (TempFilename.num > 0)
 		return TempFilename;
-	return GetDefaultTempFilename();
+	return getDefaultTempFilename();
 }
 
-void AudioInputAudio::SetTempFilename(const string &filename)
+void AudioInputAudio::setTempFilename(const string &filename)
 {
 	TempFilename = filename;
 	HuiConfig.setStr("Input.TempFilename", TempFilename);

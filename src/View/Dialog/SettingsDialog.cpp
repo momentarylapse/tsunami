@@ -16,17 +16,17 @@
 SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	HuiWindow("settings_dialog", _parent, _allow_parent)
 {
-	EventM("language", this, &SettingsDialog::OnLanguage);
-	EventM("ogg_bitrate", this, &SettingsDialog::OnOggBitrate);
-	EventM("preview_device", this, &SettingsDialog::OnPreviewDevice);
-	EventM("capture_device", this, &SettingsDialog::OnCaptureDevice);
-	EventM("capture_delay", this, &SettingsDialog::OnCaptureDelay);
-	EventM("capture_filename", this, &SettingsDialog::OnCaptureFilename);
-	EventM("capture_find", this, &SettingsDialog::OnCaptureFind);
-	EventM("hui:close", this, &SettingsDialog::OnClose);
-	EventM("close", this, &SettingsDialog::OnClose);
+	EventM("language", this, &SettingsDialog::onLanguage);
+	EventM("ogg_bitrate", this, &SettingsDialog::onOggBitrate);
+	EventM("preview_device", this, &SettingsDialog::onPreviewDevice);
+	EventM("capture_device", this, &SettingsDialog::onCaptureDevice);
+	EventM("capture_delay", this, &SettingsDialog::onCaptureDelay);
+	EventM("capture_filename", this, &SettingsDialog::onCaptureFilename);
+	EventM("capture_find", this, &SettingsDialog::onCaptureFind);
+	EventM("hui:close", this, &SettingsDialog::onClose);
+	EventM("close", this, &SettingsDialog::onClose);
 
-	SetOptions("capture_filename", "placeholder=" + tsunami->input->in_audio->GetDefaultTempFilename());
+	SetOptions("capture_filename", "placeholder=" + tsunami->input->in_audio->getDefaultTempFilename());
 
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
@@ -40,7 +40,7 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	ogg_quality.add(OggQuality(0.9f, 320));
 	ogg_quality.add(OggQuality(1.0f, 500));
 
-	LoadData();
+	loadData();
 
 }
 
@@ -48,7 +48,7 @@ SettingsDialog::~SettingsDialog()
 {
 }
 
-void SettingsDialog::LoadData()
+void SettingsDialog::loadData()
 {
 	Array<string> lang = HuiGetLanguages();
 	foreachi(string &l, lang, i){
@@ -61,7 +61,7 @@ void SettingsDialog::LoadData()
 		if (CurOggQuality > q.quality - 0.05f)
 			SetInt("ogg_bitrate", i);
 	SetDecimals(1);
-	//volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, &TrackDialog::OnVolume, t->volume);
+	//volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, &TrackDialog::onVolume, t->volume);
 	//AddSlider(SettingsDialog, "volume_slider", "volume", 0, 2, 100, &OnSettingsVolume, Preview.volume);
 	//tsunami->output->
 	//SetInt("preview_sleep", PreviewSleepTime);
@@ -82,16 +82,16 @@ void SettingsDialog::LoadData()
 			SetInt("capture_device", i + 1);
 	}
 
-	SetFloat("capture_delay", tsunami->input->in_audio->GetPlaybackDelayConst());
+	SetFloat("capture_delay", tsunami->input->in_audio->getPlaybackDelayConst());
 
 	SetString("capture_filename", tsunami->input->in_audio->TempFilename);
 }
 
-void SettingsDialog::ApplyData()
+void SettingsDialog::applyData()
 {
 }
 
-void SettingsDialog::OnLanguage()
+void SettingsDialog::onLanguage()
 {
 	Array<string> lang = HuiGetLanguages();
 	int l = GetInt("");
@@ -99,12 +99,12 @@ void SettingsDialog::OnLanguage()
 	HuiConfig.setStr("Language", lang[l]);
 }
 
-void SettingsDialog::OnOggBitrate()
+void SettingsDialog::onOggBitrate()
 {
 	HuiConfig.setFloat("OggQuality", ogg_quality[GetInt("")].quality);
 }
 
-void SettingsDialog::OnCaptureDevice()
+void SettingsDialog::onCaptureDevice()
 {
 	if (GetInt("") > 0)
 		tsunami->input->in_audio->ChosenDevice = tsunami->input->in_audio->Device[GetInt("") - 1];
@@ -113,33 +113,33 @@ void SettingsDialog::OnCaptureDevice()
 	HuiConfig.setStr("Input.ChosenDevice", tsunami->input->in_audio->ChosenDevice);
 }
 
-void SettingsDialog::OnPreviewDevice()
+void SettingsDialog::onPreviewDevice()
 {
 	int dev = GetInt("");
 	if (dev > 0)
-		tsunami->output->SetDevice(tsunami->output->Device[dev - 1]);
+		tsunami->output->setDevice(tsunami->output->Device[dev - 1]);
 	else
-		tsunami->output->SetDevice("");
+		tsunami->output->setDevice("");
 }
 
-void SettingsDialog::OnCaptureDelay()
+void SettingsDialog::onCaptureDelay()
 {
-	tsunami->input->in_audio->SetPlaybackDelayConst(GetFloat(""));
+	tsunami->input->in_audio->setPlaybackDelayConst(GetFloat(""));
 }
 
-void SettingsDialog::OnCaptureFilename()
+void SettingsDialog::onCaptureFilename()
 {
-	tsunami->input->in_audio->SetTempFilename(GetString(""));
+	tsunami->input->in_audio->setTempFilename(GetString(""));
 }
 
-void SettingsDialog::OnCaptureFind()
+void SettingsDialog::onCaptureFind()
 {
 	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), tsunami->input->in_audio->TempFilename.basename(), "*.raw", "*.raw"))
 		SetString("capture_filename", HuiFilename);
-		tsunami->input->in_audio->SetTempFilename(HuiFilename);
+		tsunami->input->in_audio->setTempFilename(HuiFilename);
 }
 
-void SettingsDialog::OnClose()
+void SettingsDialog::onClose()
 {
 	delete(this);
 }

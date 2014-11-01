@@ -36,15 +36,15 @@ Observable::Observable(const string &name)
 
 Observable::~Observable()
 {
-	Notify(MESSAGE_DELETE);
+	notify(MESSAGE_DELETE);
 }
 
-void Observable::AddObserver(Observer *o, const string &message)
+void Observable::addObserver(Observer *o, const string &message)
 {
 	requests.add(ObserverRequest(o, message));
 }
 
-void Observable::RemoveObserver(Observer *o)
+void Observable::removeObserver(Observer *o)
 {
 	for (int i=requests.num-1; i>=0; i--)
 		if (requests[i].observer == o){
@@ -52,13 +52,13 @@ void Observable::RemoveObserver(Observer *o)
 		}
 }
 
-void Observable::AddWrappedObserver(void* handler, void* func)
+void Observable::addWrappedObserver(void* handler, void* func)
 {
 	Observer *o = new ObserverWrapper(handler, func);
-	AddObserver(o, MESSAGE_ALL);
+	addObserver(o, MESSAGE_ALL);
 }
 
-void Observable::RemoveWrappedObserver(void* handler)
+void Observable::removeWrappedObserver(void* handler)
 {
 	foreachi(ObserverRequest &r, requests, i)
 		if (dynamic_cast<ObserverWrapper*>(r.observer)){
@@ -72,10 +72,10 @@ void Observable::RemoveWrappedObserver(void* handler)
 
 
 
-string Observable::GetName()
+string Observable::getName()
 {	return observable_name;	}
 
-void Observable::NotifySend()
+void Observable::notifySend()
 {
 	Array<Notification> notifications;
 
@@ -92,13 +92,13 @@ void Observable::NotifySend()
 
 	// send
 	foreach(Notification &n, notifications){
-		//msg_write("send " + GetName() + "/" + *n.message + "  >>  " + n.observer->GetName());
-		n.observer->OnUpdate(this, *n.message);
+		msg_write("send " + getName() + "/" + *n.message + "  >>  " + n.observer->getName());
+		n.observer->onUpdate(this, *n.message);
 	}
 }
 
 
-void Observable::NotifyEnqueue(const string &message)
+void Observable::notifyEnqueue(const string &message)
 {
 	// already enqueued?
 	foreach(const string *m, message_queue)
@@ -109,26 +109,26 @@ void Observable::NotifyEnqueue(const string &message)
 	message_queue.add(&message);
 }
 
-void Observable::NotifyBegin()
+void Observable::notifyBegin()
 {
 	notify_level ++;
 	//msg_write("notify ++");
 }
 
-void Observable::NotifyEnd()
+void Observable::notifyEnd()
 {
 	notify_level --;
 	//msg_write("notify --");
 	if (notify_level == 0)
-		NotifySend();
+		notifySend();
 }
 
 
-void Observable::Notify(const string &message)
+void Observable::notify(const string &message)
 {
-	NotifyEnqueue(message);
+	notifyEnqueue(message);
 	if (notify_level == 0)
-		NotifySend();
+		notifySend();
 }
 
 

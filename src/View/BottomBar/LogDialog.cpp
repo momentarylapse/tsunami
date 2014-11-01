@@ -22,40 +22,40 @@ LogDialog::LogDialog(Log *_log) :
 	SetImage("clear", "hui:clear");
 	SetTooltip("clear", _("alle Nachrichten l&oschen"));
 
-	EventM("clear", this, (void(HuiEventHandler::*)())&LogDialog::OnClear);
+	EventM("clear", this, &LogDialog::onClear);
 
-	HuiRunLaterM(0.5f, this, &LogDialog::Reload);
+	HuiRunLaterM(0.5f, this, &LogDialog::reload);
 
-	Subscribe(log);
+	subscribe(log);
 }
 
 LogDialog::~LogDialog()
 {
-	Unsubscribe(log);
+	unsubscribe(log);
 }
 
-void LogDialog::OnClear()
+void LogDialog::onClear()
 {
-	log->Clear();
+	log->clear();
 }
 
-void LogDialog::Reload()
+void LogDialog::reload()
 {
 	Reset("log_list");
 	foreach(Log::Message &m, log->messages){
 		if (m.type == Log::TYPE_ERROR){
 			AddString("log_list", "hui:error\\" + m.text);
-			((BottomBar*)parent)->Choose(BottomBar::LOG_CONSOLE);
+			((BottomBar*)parent)->choose(BottomBar::LOG_CONSOLE);
 		}else if (m.type == Log::TYPE_WARNING){
 			AddString("log_list", "hui:warning\\" + m.text);
-			((BottomBar*)parent)->Choose(BottomBar::LOG_CONSOLE);
+			((BottomBar*)parent)->choose(BottomBar::LOG_CONSOLE);
 		}else{
 			AddString("log_list", "hui:info\\" + m.text);
 		}
 	}
 }
 
-void LogDialog::OnUpdate(Observable *o, const string &message)
+void LogDialog::onUpdate(Observable *o, const string &message)
 {
-	Reload();
+	reload();
 }

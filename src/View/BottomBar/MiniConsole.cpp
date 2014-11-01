@@ -8,11 +8,11 @@
 #include "MiniConsole.h"
 #include "BottomBar.h"
 #include "../Helper/PeakMeter.h"
-#include "../../Audio/AudioOutput.h"
+#include "../../Audio/AudioStream.h"
 
-MiniConsole::MiniConsole(AudioOutput *_output)
+MiniConsole::MiniConsole(AudioStream *_stream)
 {
-	output = _output;
+	stream = _stream;
 	AddControlTable("!noexpandx", 0, 0, 5, 1, "grid");
 	SetTarget("grid", 0);
 	AddButton("Test", 0, 0, 0, 0, "test");
@@ -20,33 +20,33 @@ MiniConsole::MiniConsole(AudioOutput *_output)
 	AddButton(_("Mischpult"), 2, 0, 0, 0, "show_mixing_console");
 	AddButton(_("Effekte"), 3, 0, 0, 0, "show_fx_console");
 
-	peak_meter = new PeakMeter(this, "peaks", output);
+	peak_meter = new PeakMeter(this, "peaks", stream);
 
-	EventM("show_mixing_console", this, &MiniConsole::OnShowMixingConsole);
-	EventM("show_fx_console", this, &MiniConsole::OnShowFxConsole);
+	EventM("show_mixing_console", this, &MiniConsole::onShowMixingConsole);
+	EventM("show_fx_console", this, &MiniConsole::onShowFxConsole);
 }
 
 MiniConsole::~MiniConsole()
 {
 }
 
-void MiniConsole::OnShow()
+void MiniConsole::onShow()
 {
-	peak_meter->Enable(true);
+	peak_meter->enable(true);
 }
 
-void MiniConsole::OnHide()
+void MiniConsole::onHide()
 {
-	peak_meter->Enable(false);
+	peak_meter->enable(false);
 }
 
-void MiniConsole::OnShowFxConsole()
+void MiniConsole::onShowFxConsole()
 {
-	((BottomBar*)parent)->Choose(BottomBar::FX_CONSOLE);
+	((BottomBar*)parent)->choose(BottomBar::FX_CONSOLE);
 }
 
-void MiniConsole::OnShowMixingConsole()
+void MiniConsole::onShowMixingConsole()
 {
-	((BottomBar*)parent)->Choose(BottomBar::MIXING_CONSOLE);
+	((BottomBar*)parent)->choose(BottomBar::MIXING_CONSOLE);
 }
 

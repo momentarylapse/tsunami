@@ -34,26 +34,26 @@ TrackDialog::TrackDialog(AudioView *_view) :
 	Expand("ld_t_bars", 0, true);
 	Expand("ld_t_effects", 0, true);
 
-	LoadData();
-	Subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	loadData();
+	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
-	EventM("name", this, &TrackDialog::OnName);
-	EventM("volume", this, &TrackDialog::OnVolume);
-	EventM("panning", this, &TrackDialog::OnPanning);
-	EventM("synthesizer", this, &TrackDialog::OnSynthesizer);
-	EventM("config_synth", this, &TrackDialog::OnConfigSynthesizer);
-	EventM("edit_midi", this, &TrackDialog::OnEditMidi);
+	EventM("name", this, &TrackDialog::onName);
+	EventM("volume", this, &TrackDialog::onVolume);
+	EventM("panning", this, &TrackDialog::onPanning);
+	EventM("synthesizer", this, &TrackDialog::onSynthesizer);
+	EventM("config_synth", this, &TrackDialog::onConfigSynthesizer);
+	EventM("edit_midi", this, &TrackDialog::onEditMidi);
 }
 
 TrackDialog::~TrackDialog()
 {
-	Unsubscribe(view);
+	unsubscribe(view);
 	if (track)
-		Unsubscribe(track);
+		unsubscribe(track);
 	delete(bar_list);
 }
 
-void TrackDialog::LoadData()
+void TrackDialog::loadData()
 {
 	Enable("name", track);
 	Enable("volume", track);
@@ -78,55 +78,55 @@ void TrackDialog::LoadData()
 	}
 }
 
-void TrackDialog::SetTrack(Track *t)
+void TrackDialog::setTrack(Track *t)
 {
 	if (track)
-		Unsubscribe(track);
+		unsubscribe(track);
 	track = t;
-	LoadData();
+	loadData();
 	if (track)
-		Subscribe(track);
+		subscribe(track);
 }
 
-void TrackDialog::OnName()
+void TrackDialog::onName()
 {
 	track->SetName(GetString(""));
 }
 
-void TrackDialog::OnVolume()
+void TrackDialog::onVolume()
 {
 	track->SetVolume(db2amplitude(GetFloat("volume")));
 }
 
-void TrackDialog::OnPanning()
+void TrackDialog::onPanning()
 {
 	track->SetPanning(GetFloat("panning") / 100.0f);
 }
 
-void TrackDialog::OnSynthesizer()
+void TrackDialog::onSynthesizer()
 {
 	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
 	if (s)
 		track->SetSynthesizer(s);
 }
 
-void TrackDialog::OnConfigSynthesizer()
+void TrackDialog::onConfigSynthesizer()
 {
-	tsunami->win->bottom_bar->Choose(BottomBar::SYNTH_CONSOLE);
+	tsunami->win->bottom_bar->choose(BottomBar::SYNTH_CONSOLE);
 }
 
-void TrackDialog::OnEditMidi()
+void TrackDialog::onEditMidi()
 {
-	tsunami->win->bottom_bar->Choose(BottomBar::MIDI_EDITOR);
+	tsunami->win->bottom_bar->choose(BottomBar::MIDI_EDITOR);
 }
 
-void TrackDialog::OnUpdate(Observable *o, const string &message)
+void TrackDialog::onUpdate(Observable *o, const string &message)
 {
 	if (o == view){
-		SetTrack(view->cur_track);
+		setTrack(view->cur_track);
 	}else if ((o == track) && (message == track->MESSAGE_DELETE)){
-		SetTrack(NULL);
+		setTrack(NULL);
 	}else{
-		LoadData();
+		loadData();
 	}
 }

@@ -11,21 +11,21 @@
 #include "../../lib/hui/hui.h"
 
 class PeakMeter;
-class AudioOutput;
+class AudioStream;
 
 class MiniConsole : public HuiPanel
 {
 public:
-	MiniConsole(AudioOutput *output);
+	MiniConsole(AudioStream *stream);
 	virtual ~MiniConsole();
 
-	virtual void OnShow();
-	virtual void OnHide();
+	virtual void onShow();
+	virtual void onHide();
 
-	void OnShowFxConsole();
-	void OnShowMixingConsole();
+	void onShowFxConsole();
+	void onShowMixingConsole();
 
-	AudioOutput *output;
+	AudioStream *stream;
 	PeakMeter *peak_meter;
 };
 

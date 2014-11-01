@@ -29,7 +29,7 @@ void Clipboard::Clear()
 {
 	if (temp->track.num > 0){
 		temp->Reset();
-		Notify();
+		notify();
 	}
 	ref_uid.clear();
 }
@@ -62,7 +62,7 @@ void Clipboard::Copy(AudioView *view)
 		ref_uid.add(-1);
 	}
 
-	Notify();
+	notify();
 }
 
 void Clipboard::Paste(AudioView *view)
@@ -82,13 +82,13 @@ void Clipboard::Paste(AudioView *view)
 	foreach(Track *t, temp->track)
 		temp_type.add(track_type(t->type));
 	if (dest_type.num != temp->track.num){
-		tsunami->log->Error(format(_("%d Spuren zum Einf&ugen markiert (ohne Metronom gez&ahlt), aber %d Spuren in der Zwischenablage"), dest_type.num, temp->track.num));
+		tsunami->log->error(format(_("%d Spuren zum Einf&ugen markiert (ohne Metronom gez&ahlt), aber %d Spuren in der Zwischenablage"), dest_type.num, temp->track.num));
 		return;
 	}
 	string t1 = "[" + implode(temp_type, ", ") + "]";
 	string t2 = "[" + implode(dest_type, ", ") + "]";
 	if (t1 != t2){
-		tsunami->log->Error(format(_("Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingef&ugt werden soll (%s)"), t1.c_str(), t2.c_str()));
+		tsunami->log->error(format(_("Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingef&ugt werden soll (%s)"), t1.c_str(), t2.c_str()));
 		return;
 	}
 

@@ -98,7 +98,7 @@ Array<string> FavoriteManager::GetList(Configurable *c)
 
 void FavoriteManager::Apply(Configurable *c, const string &name)
 {
-	c->ResetConfig();
+	c->resetConfig();
 	if (name == ":def:")
 		return;
 	msg_db_f("ApplyFavorite", 1);
@@ -106,7 +106,7 @@ void FavoriteManager::Apply(Configurable *c, const string &name)
 		Load();
 	foreach(Favorite &f, favorites){
 		if ((f.type == c->configurable_type) && (f.config_name == c->name) && (f.name == name))
-			c->ConfigFromString(f.options);
+			c->configFromString(f.options);
 	}
 }
 
@@ -120,7 +120,7 @@ void FavoriteManager::Save(Configurable *c, const string &name)
 	f.config_name = c->name;
 	f.name = name;
 	f.read_only = false;
-	f.options = c->ConfigToString();
+	f.options = c->configToString();
 	set(f);
 	Save();
 }

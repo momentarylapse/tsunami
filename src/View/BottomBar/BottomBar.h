@@ -39,12 +39,12 @@ public:
 	BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log);
 	virtual ~BottomBar();
 
-	void OnClose();
-	void OnChoose();
-	//void OnOpenChooseMenu();
-	//void OnChooseByMenu();
-	virtual void OnShow();
-	virtual void OnHide();
+	void onClose();
+	void onChoose();
+	//void onOpenChooseMenu();
+	//void onChooseByMenu();
+	virtual void onShow();
+	virtual void onHide();
 
 	enum
 	{
@@ -59,8 +59,8 @@ public:
 		NUM_CONSOLES
 	};
 
-	void Choose(int console);
-	bool IsActive(int console);
+	void choose(int console);
+	bool isActive(int console);
 	int active_console;
 	bool visible;
 

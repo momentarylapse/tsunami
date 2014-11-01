@@ -26,11 +26,11 @@ FormatWave::~FormatWave()
 void FormatWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 	msg_db_r("write_wave_file", 1);
-	tsunami->progress->Set(_("exportiere wave"), 0);
+	tsunami->progress->set(_("exportiere wave"), 0);
 
 	Array<short> buf16;
 	if (!b->get_16bit_buffer(buf16))
-		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
+		tsunami->log->error(_("Amplitude zu gro&s, Signal &ubersteuert."));
 	char *data = (char*)buf16.data;
 
 	CFile *f = FileCreate(filename);
@@ -53,7 +53,7 @@ void FormatWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	f->WriteBuffer((char*)PVData,w->length*4);*/
 	int size = b->num * 4;
 	for (int i=0;i<size / WAVE_BUFFER_SIZE;i++){
-		tsunami->progress->Set(float(i * WAVE_BUFFER_SIZE) / (float)size);
+		tsunami->progress->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
 		f->WriteBuffer(&data[i * WAVE_BUFFER_SIZE], WAVE_BUFFER_SIZE);
 	}
 	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
@@ -73,7 +73,7 @@ static string read_chunk_name(CFile *f)
 void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_r("load_wave_file", 1);
-	tsunami->progress->Set(_("lade wave"), 0);
+	tsunami->progress->set(_("lade wave"), 0);
 
 	char *data = new char[WAVE_BUFFER_SIZE];
 	CFile *f = FileOpen(filename);
@@ -88,7 +88,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 	int stated_file_size = f->ReadInt();
 	int real_file_size = f->GetSize();
 	if (stated_file_size > real_file_size)
-		tsunami->log->Warning(format("wave file gives wrong size: %d  (real: %d)", stated_file_size, real_file_size));
+		tsunami->log->warning(format("wave file gives wrong size: %d  (real: %d)", stated_file_size, real_file_size));
 		// sometimes 0x2400ff7f
 	if (read_chunk_name(f) != "WAVE")
 		throw string("\"WAVE\" expected in wave file");
@@ -128,12 +128,12 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 
 
 			if ((chunk_size > real_file_size - 44) or (chunk_size < 0)){
-				tsunami->log->Warning(format("wave file gives wrong data size (given: %d,  by file size: %d)", chunk_size, real_file_size));
+				tsunami->log->warning(format("wave file gives wrong data size (given: %d,  by file size: %d)", chunk_size, real_file_size));
 				chunk_size = real_file_size - f->GetPos();
 			}
 
 			int samples = chunk_size / byte_per_sample;
-			tsunami->progress->Set(0.1f);
+			tsunami->progress->set(0.1f);
 
 			int read = 0;
 			int nn = 0;
@@ -145,7 +145,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 				if (nn > 16){
 					float perc_read = 0.1f;
 					float dperc_read = 0.9f;
-					tsunami->progress->Set(perc_read + dperc_read * (float)read / (float)chunk_size);
+					tsunami->progress->set(perc_read + dperc_read * (float)read / (float)chunk_size);
 					nn = 0;
 				}
 				if (r > 0){
@@ -159,7 +159,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 			}
 			break;
 		}else{
-			tsunami->log->Warning("unhandled wave chunk: " + chunk_name);
+			tsunami->log->warning("unhandled wave chunk: " + chunk_name);
 
 			for (int i=0;i<chunk_size;i++)
 				f->ReadByte();
@@ -167,7 +167,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 	}
 
 	}catch(const string &s){
-		tsunami->log->Error(s);
+		tsunami->log->error(s);
 	}
 
 	delete[](data);

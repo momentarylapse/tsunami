@@ -14,6 +14,7 @@
 #include "../Audio/AudioRenderer.h"
 #include "../Audio/AudioInput.h"
 #include "../Audio/AudioOutput.h"
+#include "../Audio/AudioStream.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../View/Helper/Progress.h"
@@ -121,7 +122,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("RemoveSliders", (void*)&GlobalRemoveSliders);
 	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
-	Script::LinkExternal("SelectSample", (void*)&SampleManager::Select);
+	Script::LinkExternal("SelectSample", (void*)&SampleManager::select);
 
 	Script::DeclareClassSize("Range", sizeof(Range));
 	Script::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
@@ -152,10 +153,10 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
 	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "process", Script::mf(&Effect::ProcessTrack), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::CreatePanel), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::ResetConfig), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::ResetState), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "process", Script::mf(&Effect::processTrack), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::createPanel), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::resetConfig), &effect);
+	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::resetState), &effect);
 	//Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
 	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
 
@@ -168,9 +169,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("MidiEffect.__init__", Script::mf(&MidiEffect::__init__));
 	Script::DeclareClassVirtualIndex("MidiEffect", "__delete__", Script::mf(&MidiEffect::__delete__), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "process", Script::mf(&MidiEffect::process), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "createPanel", Script::mf(&MidiEffect::CreatePanel), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "resetConfig", Script::mf(&MidiEffect::ResetConfig), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "resetState", Script::mf(&MidiEffect::ResetState), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "createPanel", Script::mf(&MidiEffect::createPanel), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "resetConfig", Script::mf(&MidiEffect::resetConfig), &midieffect);
+	Script::DeclareClassVirtualIndex("MidiEffect", "resetState", Script::mf(&MidiEffect::resetState), &midieffect);
 	//Script::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Script::mf(&MidiEffect::UpdateDialog), &midieffect);
 	Script::LinkExternal("MidiEffect.notify", Script::mf(&MidiEffect::notify));
 
@@ -213,15 +214,15 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::RenderNote), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::renderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::CreatePanel), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::createPanel), &synth);
 	//Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::Reset), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::ResetConfig), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::reset), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::resetConfig), &synth);
 	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
-	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::RenderMetronomeClick));
-	Script::LinkExternal("Synthesizer._reset", Script::mf(&Synthesizer::reset));
+	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::renderMetronomeClick));
+	Script::LinkExternal("Synthesizer._reset", Script::mf(&Synthesizer::_reset));
 	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
 
 
@@ -317,38 +318,39 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioInput", "cur_buf", _offsetof(AudioInput, current_buffer));
 	Script::DeclareClassOffset("AudioInput", "buf", _offsetof(AudioInput, buffer));
 	Script::DeclareClassOffset("AudioInput", "midi", _offsetof(AudioInput, midi));
-	Script::LinkExternal("AudioInput.start", Script::mf(&AudioInput::Start));
-	Script::LinkExternal("AudioInput.resetSync", Script::mf(&AudioInput::ResetSync));
-	Script::LinkExternal("AudioInput.stop",	 Script::mf(&AudioInput::Stop));
-	Script::LinkExternal("AudioInput.isCapturing", Script::mf(&AudioInput::IsCapturing));
-	Script::LinkExternal("AudioInput.getSampleCount", Script::mf(&AudioInput::GetSampleCount));
-	Script::LinkExternal("AudioInput.accumulate", Script::mf(&AudioInput::Accumulate));
-	Script::LinkExternal("AudioInput.resetAccumulation", Script::mf(&AudioInput::ResetAccumulation));
-	Script::LinkExternal("AudioInput.getDelay", Script::mf(&AudioInput::GetDelay));
-	Script::LinkExternal("AudioInput.addObserver", Script::mf(&AudioInput::AddWrappedObserver));
-	Script::LinkExternal("AudioInput.removeObserver", Script::mf(&AudioInput::RemoveWrappedObserver));
+	Script::LinkExternal("AudioInput.start", Script::mf(&AudioInput::start));
+	Script::LinkExternal("AudioInput.resetSync", Script::mf(&AudioInput::resetSync));
+	Script::LinkExternal("AudioInput.stop",	 Script::mf(&AudioInput::stop));
+	Script::LinkExternal("AudioInput.isCapturing", Script::mf(&AudioInput::isCapturing));
+	Script::LinkExternal("AudioInput.getSampleCount", Script::mf(&AudioInput::getSampleCount));
+	Script::LinkExternal("AudioInput.accumulate", Script::mf(&AudioInput::accumulate));
+	Script::LinkExternal("AudioInput.resetAccumulation", Script::mf(&AudioInput::resetAccumulation));
+	Script::LinkExternal("AudioInput.getDelay", Script::mf(&AudioInput::getDelay));
+	Script::LinkExternal("AudioInput.addObserver", Script::mf(&AudioInput::addWrappedObserver));
+	Script::LinkExternal("AudioInput.removeObserver", Script::mf(&AudioInput::removeWrappedObserver));
 	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
 
-	Script::LinkExternal("AudioOutput.play", Script::mf(&AudioOutput::Play));
-	Script::LinkExternal("AudioOutput.playGenerated", Script::mf(&AudioOutput::PlayGenerated));
-	Script::LinkExternal("AudioOutput.stop", Script::mf(&AudioOutput::Stop));
-	Script::LinkExternal("AudioOutput.isPlaying", Script::mf(&AudioOutput::IsPlaying));
-	Script::LinkExternal("AudioOutput.getPos", Script::mf(&AudioOutput::GetPos));
-	Script::LinkExternal("AudioOutput.getSampleRate", Script::mf(&AudioOutput::GetSampleRate));
-	Script::LinkExternal("AudioOutput.getVolume", Script::mf(&AudioOutput::GetVolume));
-	Script::LinkExternal("AudioOutput.setVolume", Script::mf(&AudioOutput::SetVolume));
-	Script::LinkExternal("AudioOutput.setBufferSize", Script::mf(&AudioOutput::SetBufferSize));
+	Script::LinkExternal("AudioStream.play", Script::mf(&AudioStream::play));
+	Script::LinkExternal("AudioStream.setSource", Script::mf(&AudioStream::setSource));
+	Script::LinkExternal("AudioStream.setSourceGenerated", Script::mf(&AudioStream::setSourceGenerated));
+	Script::LinkExternal("AudioStream.stop", Script::mf(&AudioStream::stop));
+	Script::LinkExternal("AudioStream.isPlaying", Script::mf(&AudioStream::isPlaying));
+	Script::LinkExternal("AudioStream.getPos", Script::mf(&AudioStream::getPos));
+	Script::LinkExternal("AudioStream.getSampleRate", Script::mf(&AudioStream::getSampleRate));
+	Script::LinkExternal("AudioStream.getVolume", Script::mf(&AudioStream::getVolume));
+	Script::LinkExternal("AudioStream.setVolume", Script::mf(&AudioStream::setVolume));
+	Script::LinkExternal("AudioStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));
 
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
 	Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 
-	Script::LinkExternal("Log.error", Script::mf(&Log::Error));
-	Script::LinkExternal("Log.warning", Script::mf(&Log::Warning));
-	Script::LinkExternal("Log.info", Script::mf(&Log::Info));
+	Script::LinkExternal("Log.error", Script::mf(&Log::error));
+	Script::LinkExternal("Log.warning", Script::mf(&Log::warning));
+	Script::LinkExternal("Log.info", Script::mf(&Log::info));
 
-	Script::LinkExternal("Storage.load", Script::mf(&Storage::Load));
-	Script::LinkExternal("Storage.save", Script::mf(&Storage::Save));
+	Script::LinkExternal("Storage.load", Script::mf(&Storage::load));
+	Script::LinkExternal("Storage.save", Script::mf(&Storage::save));
 
 	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
 	Script::DeclareClassOffset("PluginContext", "track", _offsetof(PluginManager::PluginContext, track));
@@ -465,16 +467,16 @@ string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool s
 	return favorites->SelectName(win, c, save);
 }
 
-void PluginManager::OnUpdate(Observable *o, const string &message)
+void PluginManager::onUpdate(Observable *o, const string &message)
 {
 	if (o == tsunami->progress){
 		if (message == tsunami->progress->MESSAGE_CANCEL)
 			PreviewEnd();
-	}else if (o == tsunami->output){
-		int pos = tsunami->output->GetPos();
+	}else if (o == tsunami->win->view->stream){
+		int pos = tsunami->win->view->stream->getPos();
 		Range r = tsunami->win->view->sel_range;
-		tsunami->progress->Set(_("Vorschau"), (float)(pos - r.offset) / r.length());
-		if (!tsunami->output->IsPlaying())
+		tsunami->progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
+		if (!tsunami->win->view->stream->isPlaying())
 			PreviewEnd();
 	}
 }
@@ -539,29 +541,29 @@ void PluginManager::ExecutePlugin(const string &filename)
 		// run
 		if (fx){
 			tsunami->plugin_manager->cur_effect = fx;
-			fx->ResetConfig();
-			if (fx->Configure()){
+			fx->resetConfig();
+			if (fx->configure()){
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				Range range = tsunami->win->view->GetPlaybackSelection();
 				a->action_manager->BeginActionGroup();
 				foreach(Track *t, a->track)
 					if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
-						fx->ResetState();
-						fx->DoProcessTrack(t, tsunami->win->view->cur_level, range);
+						fx->resetState();
+						fx->doProcessTrack(t, tsunami->win->view->cur_level, range);
 					}
 				a->action_manager->EndActionGroup();
 			}
 			delete(fx);
 		}else if (mfx){
 			tsunami->plugin_manager->cur_effect = NULL;//fx;
-			mfx->ResetConfig();
-			if (mfx->Configure()){
+			mfx->resetConfig();
+			if (mfx->configure()){
 				Range range = tsunami->win->view->GetPlaybackSelection();
 				a->action_manager->BeginActionGroup();
 				foreach(Track *t, a->track)
 					if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
-						mfx->ResetState();
+						mfx->resetState();
 						mfx->DoProcessTrack(t, range);
 					}
 				a->action_manager->EndActionGroup();
@@ -571,14 +573,14 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (a->used)
 				f_audio(a);
 			else
-				tsunami->log->Error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
+				tsunami->log->error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
 		}*/else if (f_main){
 			f_main();
 		}else{
-			tsunami->log->Error(_("Plugin ist kein Effekt/MidiEffekt und enth&alt keine Funktion 'void main()'"));
+			tsunami->log->error(_("Plugin ist kein Effekt/MidiEffekt und enth&alt keine Funktion 'void main()'"));
 		}
 	}else{
-		tsunami->log->Error(cur_plugin->GetError());
+		tsunami->log->error(cur_plugin->GetError());
 	}
 }
 
@@ -608,23 +610,23 @@ Plugin *PluginManager::GetPlugin(const string &name)
 void PluginManager::PreviewStart(Effect *fx)
 {
 	if (fx)
-		fx->ConfigToString();
+		fx->configToString();
 	tsunami->renderer->effect = fx;
 
 
-	tsunami->progress->StartCancelable(_("Vorschau"), 0);
-	Subscribe(tsunami->progress);
-	Subscribe(tsunami->output);
+	tsunami->progress->startCancelable(_("Vorschau"), 0);
+	subscribe(tsunami->progress);
+	subscribe(tsunami->win->view->stream);
 	tsunami->renderer->Prepare(tsunami->audio, tsunami->win->view->sel_range, false);
-	tsunami->output->Play(tsunami->renderer);
+	tsunami->win->view->stream->play();
 }
 
 void PluginManager::PreviewEnd()
 {
-	tsunami->output->Stop();
-	Unsubscribe(tsunami->output);
-	Unsubscribe(tsunami->progress);
-	tsunami->progress->End();
+	tsunami->win->view->stream->stop();
+	unsubscribe(tsunami->win->view->stream);
+	unsubscribe(tsunami->progress);
+	tsunami->progress->end();
 
 
 	tsunami->renderer->effect = NULL;
@@ -641,7 +643,7 @@ Effect *PluginManager::LoadEffect(const string &name)
 		}
 	}
 	if (!found){
-		tsunami->log->Error(format(_("Kann Effekt nicht laden: %s"), name.c_str()));
+		tsunami->log->error(format(_("Kann Effekt nicht laden: %s"), name.c_str()));
 		return NULL;
 	}
 
@@ -665,7 +667,7 @@ MidiEffect *PluginManager::LoadMidiEffect(const string &name)
 		}
 	}
 	if (!found){
-		tsunami->log->Error(format(_("Kann MidiEffekt nicht laden: %s"), name.c_str()));
+		tsunami->log->error(format(_("Kann MidiEffekt nicht laden: %s"), name.c_str()));
 		return NULL;
 	}
 
@@ -697,7 +699,7 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name)
 	try{
 		s = Script::Load(filename);
 	}catch(Script::Exception &e){
-		tsunami->log->Error(e.message);
+		tsunami->log->error(e.message);
 		return NULL;
 	}
 	foreach(Script::Type *t, s->syntax->Types){

@@ -50,9 +50,9 @@ void MidiEffect::__delete__()
 void MidiEffect::Prepare()
 {
 	msg_db_f("MidiEffect.Prepare", 1);
-	ResetState();
+	resetState();
 	if (!usable)
-		tsunami->log->Error(GetError());
+		tsunami->log->error(GetError());
 }
 
 string MidiEffect::GetError()
@@ -73,7 +73,7 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 	if (!usable){
 		msg_error("not usable... apply");
 		if (log_error)
-			tsunami->log->Error(_("Beim Anwenden eines MidiEffekts: ") + GetError());
+			tsunami->log->error(_("Beim Anwenden eines MidiEffekts: ") + GetError());
 	}
 }
 
@@ -106,7 +106,7 @@ MidiEffect *CreateMidiEffect(const string &name)
 	MidiEffect *f = tsunami->plugin_manager->LoadMidiEffect(name);
 	if (f){
 		f->name = name;
-		f->ResetConfig();
+		f->resetConfig();
 		return f;
 	}
 	f = new MidiEffect;

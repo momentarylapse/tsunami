@@ -21,12 +21,12 @@ public:
 	FxConsole(AudioView *view, AudioFile *audio);
 	virtual ~FxConsole();
 
-	void Clear();
-	void SetTrack(Track *t);
+	void clear();
+	void setTrack(Track *t);
 
-	void OnAdd();
+	void onAdd();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	string id_inner;
 

@@ -43,7 +43,7 @@ void FormatMp3::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
 void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("load_mp3_file", 1);
-	tsunami->progress->Set(_("lade mp3"), 0);
+	tsunami->progress->set(_("lade mp3"), 0);
 
 	unsigned char *data = new unsigned char[4096];
 	CFile *f = FileOpen(filename);
@@ -150,7 +150,7 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 						}
 
 					}else{
-						tsunami->log->Error(format("mp3: unsupported ID3 version: v2.%d.%d", version, v_min));
+						tsunami->log->error(format("mp3: unsupported ID3 version: v2.%d.%d", version, v_min));
 						break;
 					}
 				}
@@ -166,14 +166,14 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 		if (system("which avconv") == 0){
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(("avconv -i \"" + filename + "\" \"" + tmp + "\"").c_str());
-			tsunami->storage->LoadTrack(t, tmp, offset, level);
+			tsunami->storage->loadTrack(t, tmp, offset, level);
 			file_delete(tmp);
 		}else
-			tsunami->log->Error("mp3: need external program 'avconv' to decode");
+			tsunami->log->error("mp3: need external program 'avconv' to decode");
 
 
 	}catch(const string &s){
-		tsunami->log->Error(s);
+		tsunami->log->error(s);
 	}
 
 	delete[](data);

@@ -20,77 +20,77 @@ SubDialog::SubDialog(AudioView *v, AudioFile *a):
 	track = NULL;
 	sample = NULL;
 
-	EventM("volume", this, &SubDialog::OnVolume);
-	EventM("mute", this, &SubDialog::OnMute);
-	EventM("level_track", this, &SubDialog::OnLevelTrack);
-	EventM("repnum", this, &SubDialog::OnRepNum);
-	EventM("repdelay", this, &SubDialog::OnRepDelay);
+	EventM("volume", this, &SubDialog::onVolume);
+	EventM("mute", this, &SubDialog::onMute);
+	EventM("level_track", this, &SubDialog::onLevelTrack);
+	EventM("repnum", this, &SubDialog::onRepNum);
+	EventM("repdelay", this, &SubDialog::onRepDelay);
 
-	Subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
+	subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 SubDialog::~SubDialog()
 {
 	if (sample)
-		Unsubscribe(sample);
-	Unsubscribe(view);
+		unsubscribe(sample);
+	unsubscribe(view);
 }
 
 
-void SubDialog::OnName()
+void SubDialog::onName()
 {
 	//sample->origin->name = GetString("");
 }
 
-void SubDialog::OnMute()
+void SubDialog::onMute()
 {
 	if (!sample)
 		return;
-	Unsubscribe(sample);
+	unsubscribe(sample);
 	int index = sample->get_index();
 	track->EditSample(index, sample->volume, IsChecked(""), sample->rep_num, sample->rep_delay);
 
 	Enable("volume", !sample->muted);
-	Subscribe(sample);
+	subscribe(sample);
 }
 
-void SubDialog::OnLevelTrack()
+void SubDialog::onLevelTrack()
 {
 	int n = GetInt("");
 }
 
-void SubDialog::OnVolume()
+void SubDialog::onVolume()
 {
 	if (!sample)
 		return;
-	Unsubscribe(sample);
+	unsubscribe(sample);
 	int index = sample->get_index();
 	track->EditSample(index, db2amplitude(GetFloat("")), sample->muted, sample->rep_num, sample->rep_delay);
-	Subscribe(sample);
+	subscribe(sample);
 }
 
-void SubDialog::OnRepNum()
+void SubDialog::onRepNum()
 {
 	if (!sample)
 		return;
-	Unsubscribe(sample);
+	unsubscribe(sample);
 	int index = sample->get_index();
 	track->EditSample(index, sample->volume, sample->muted, GetInt("repnum") - 1, sample->rep_delay);
 	Enable("repdelay", sample->rep_num > 0);
-	Subscribe(sample);
+	subscribe(sample);
 }
 
-void SubDialog::OnRepDelay()
+void SubDialog::onRepDelay()
 {
 	if (!sample)
 		return;
-	Unsubscribe(sample);
+	unsubscribe(sample);
 	int index = sample->get_index();
 	track->EditSample(index, sample->volume, sample->muted, sample->rep_num, (int)(GetFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
-	Subscribe(sample);
+	subscribe(sample);
 }
 
-void SubDialog::LoadData()
+void SubDialog::loadData()
 {
 	Enable("name", false);
 	Enable("mute", sample);
@@ -116,21 +116,21 @@ void SubDialog::LoadData()
 	Enable("repdelay", sample->rep_num > 0);
 }
 
-void SubDialog::OnUpdate(Observable *o, const string &message)
+void SubDialog::onUpdate(Observable *o, const string &message)
 {
 	if (o == view){
 		if (sample)
-			Unsubscribe(sample);
+			unsubscribe(sample);
 		track = view->cur_track;
 		sample = view->cur_sample;
 		if (sample)
-			Subscribe(sample);
-		LoadData();
+			subscribe(sample);
+		loadData();
 	}else if ((o == sample) && (message == o->MESSAGE_DELETE)){
-		Unsubscribe(sample);
+		unsubscribe(sample);
 		sample = NULL;
-		LoadData();
+		loadData();
 	}else{
-		LoadData();
+		loadData();
 	}
 }

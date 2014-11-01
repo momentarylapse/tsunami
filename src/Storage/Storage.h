@@ -20,18 +20,18 @@ public:
 	Storage();
 	virtual ~Storage();
 
-	bool Load(AudioFile *a, const string &filename);
-	bool LoadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
-	bool LoadBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
-	bool Save(AudioFile *a, const string &filename);
-	bool Export(AudioFile *a, const Range &r, const string &filename);
+	bool load(AudioFile *a, const string &filename);
+	bool loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
+	bool loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
+	bool save(AudioFile *a, const string &filename);
+	bool _export(AudioFile *a, const Range &r, const string &filename);
 
-	bool AskByFlags(HuiWindow *win, const string &title, bool save, int flags);
+	bool askByFlags(HuiWindow *win, const string &title, bool save, int flags);
 
-	bool AskOpen(HuiWindow *win);
-	bool AskSave(HuiWindow *win);
-	bool AskOpenImport(HuiWindow *win);
-	bool AskSaveExport(HuiWindow *win);
+	bool askOpen(HuiWindow *win);
+	bool askSave(HuiWindow *win);
+	bool askOpenImport(HuiWindow *win);
+	bool askSaveExport(HuiWindow *win);
 
 private:
 	Array<Format*> format;

@@ -14,26 +14,29 @@
 #include "../Helper/PeakMeter.h"
 #include "../../Stuff/Observer.h"
 
+class AudioView;
+
 class CaptureDialog : public HuiWindow, public Observer
 {
 public:
 	CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a);
 	virtual ~CaptureDialog();
 
-	void OnTypeAudio();
-	void OnTypeMidi();
-	void OnStart();
-	void OnDelete();
-	void OnPause();
-	void OnOk();
-	void OnClose();
-	bool Insert();
+	void onTypeAudio();
+	void onTypeMidi();
+	void onStart();
+	void onDelete();
+	void onPause();
+	void onOk();
+	void onClose();
+	bool insert();
 
-	void FillTrackList();
+	void fillTrackList();
 
-	void OnUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
+	AudioView *view;
 	PeakMeter *peak_meter;
 	int type;
 };

@@ -25,15 +25,15 @@ public:
 	void __init__();
 	virtual void __delete__();
 
-	virtual void RenderNote(BufferBox &buf, const Range &range, float pitch, float volume){}
-	void RenderMetronomeClick(BufferBox &buf, int pos, int level, float volume);
+	virtual void renderNote(BufferBox &buf, const Range &range, float pitch, float volume){}
+	void renderMetronomeClick(BufferBox &buf, int pos, int level, float volume);
 
-	void reset();
+	void _reset();
 	void set(float pitch, float volume, int offset);
 	virtual int read(BufferBox &buf);
 	void iterate(int samples);
 
-	virtual void Reset();
+	virtual void reset();
 
 	int sample_rate;
 

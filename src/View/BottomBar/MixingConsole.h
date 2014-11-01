@@ -17,17 +17,18 @@ class AudioFile;
 class MixingConsole;
 class PeakMeter;
 class AudioOutput;
+class AudioStream;
 
 class TrackMixer: public HuiPanel
 {
 public:
 	TrackMixer();
 	~TrackMixer();
-	void OnVolume();
-	void OnMute();
-	void OnPanning();
-	void SetTrack(Track *t);
-	void Update();
+	void onVolume();
+	void onMute();
+	void onPanning();
+	void setTrack(Track *t);
+	void update();
 
 	static const float DB_MIN;
 	static const float DB_MAX;
@@ -50,17 +51,17 @@ public:
 class MixingConsole: public BottomBarConsole, public Observer
 {
 public:
-	MixingConsole(AudioFile *audio, AudioOutput *output);
+	MixingConsole(AudioFile *audio, AudioOutput *output, AudioStream *stream);
 	virtual ~MixingConsole();
 
-	void LoadData();
+	void loadData();
 
-	void OnOutputVolume();
+	void onOutputVolume();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
-	virtual void OnShow();
-	virtual void OnHide();
+	virtual void onShow();
+	virtual void onHide();
 
 	AudioFile *audio;
 	AudioOutput *output;

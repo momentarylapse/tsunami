@@ -18,9 +18,9 @@ public:
 	LogDialog(Log *log);
 	virtual ~LogDialog();
 
-	void OnClear();
-	void Reload();
-	virtual void OnUpdate(Observable *o, const string &message);
+	void onClear();
+	void reload();
+	virtual void onUpdate(Observable *o, const string &message);
 
 	Log *log;
 };

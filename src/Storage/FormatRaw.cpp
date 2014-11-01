@@ -36,11 +36,11 @@ RawConfigData GetRawConfigData()
 void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 	msg_db_f("write_raw_file", 1);
-	tsunami->progress->Set(_("exportiere raw"), 0);
+	tsunami->progress->set(_("exportiere raw"), 0);
 
 	Array<short> buf16;
 	if (!b->get_16bit_buffer(buf16))
-		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
+		tsunami->log->error(_("Amplitude zu gro&s, Signal &ubersteuert."));
 	char *data = (char*)buf16.data;
 
 	CFile *f = FileCreate(filename);
@@ -49,7 +49,7 @@ void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	f->WriteBuffer((char*)PVData,w->length*4);*/
 	int size = b->num * 4;
 	for (int i=0;i<size / WAVE_BUFFER_SIZE;i++){
-		tsunami->progress->Set(float(i * WAVE_BUFFER_SIZE) / (float)size);
+		tsunami->progress->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
 		f->WriteBuffer(&data[i * WAVE_BUFFER_SIZE], WAVE_BUFFER_SIZE);
 	}
 	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
@@ -60,7 +60,7 @@ void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("load_raw_file", 1);
-	tsunami->progress->Set(_("lade raw"), 0);
+	tsunami->progress->set(_("lade raw"), 0);
 
 	RawConfigData config = GetRawConfigData();
 
@@ -75,7 +75,7 @@ void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int lev
 	int byte_per_sample = (format_get_bits(config.format) / 8) * config.channels;
 	int size = f->GetSize() - config.offset;
 	int samples = size / byte_per_sample;
-	tsunami->progress->Set(0.1f);
+	tsunami->progress->set(0.1f);
 
 	if (config.offset > 0)
 		f->ReadBuffer(data, config.offset);
@@ -90,7 +90,7 @@ void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int lev
 		if (nn > 16){
 			float perc_read = 0.1f;
 			float dperc_read = 0.9f;
-			tsunami->progress->Set(perc_read + dperc_read * (float)read / (float)size);
+			tsunami->progress->set(perc_read + dperc_read * (float)read / (float)size);
 			nn = 0;
 		}
 		if (r > 0){
@@ -104,7 +104,7 @@ void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int lev
 	}
 
 	}catch(const string &s){
-		tsunami->log->Error(s);
+		tsunami->log->error(s);
 	}
 
 	delete[](data);

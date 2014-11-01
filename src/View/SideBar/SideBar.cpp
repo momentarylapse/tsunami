@@ -32,9 +32,9 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	Embed(track_dialog, "console_grid", 0, 1);
 	Embed(sub_dialog, "console_grid", 0, 2);
 
-	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::OnClose);
+	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
 
-	Choose(AUDIO_FILE_DIALOG);
+	choose(AUDIO_FILE_DIALOG);
 	visible = true;
 }
 
@@ -42,24 +42,24 @@ SideBar::~SideBar()
 {
 }
 
-void SideBar::OnClose()
+void SideBar::onClose()
 {
 	Hide();
 }
 
-void SideBar::OnShow()
+void SideBar::onShow()
 {
 	visible = true;
-	Notify();
+	notify();
 }
 
-void SideBar::OnHide()
+void SideBar::onHide()
 {
 	visible = false;
-	Notify();
+	notify();
 }
 
-void SideBar::Choose(int console)
+void SideBar::choose(int console)
 {
 	foreachi(HuiPanel *p, children, i){
 		if (i == console){
@@ -69,20 +69,20 @@ void SideBar::Choose(int console)
 			p->Hide();
 	}
 	active_console = console;
-	Notify();
+	notify();
 }
 
-void SideBar::Open(int console)
+void SideBar::open(int console)
 {
-	NotifyBegin();
-	Choose(console);
+	notifyBegin();
+	choose(console);
 	active_console = console;
 	if (!visible)
 		Show();
-	NotifyEnd();
+	notifyEnd();
 }
 
-bool SideBar::IsActive(int console)
+bool SideBar::isActive(int console)
 {
 	return (active_console == console) && visible;
 }

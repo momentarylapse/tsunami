@@ -16,17 +16,17 @@ public:
 	SettingsDialog(HuiWindow *_parent, bool _allow_parent);
 	virtual ~SettingsDialog();
 
-	void LoadData();
-	void ApplyData();
+	void loadData();
+	void applyData();
 
-	void OnLanguage();
-	void OnOggBitrate();
-	void OnPreviewDevice();
-	void OnCaptureDevice();
-	void OnCaptureDelay();
-	void OnCaptureFilename();
-	void OnCaptureFind();
-	void OnClose();
+	void onLanguage();
+	void onOggBitrate();
+	void onPreviewDevice();
+	void onCaptureDevice();
+	void onCaptureDelay();
+	void onCaptureFilename();
+	void onCaptureFind();
+	void onClose();
 
 
 private:

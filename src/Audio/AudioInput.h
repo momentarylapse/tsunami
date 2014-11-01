@@ -25,21 +25,21 @@ public:
 
 	static const string MESSAGE_CAPTURE;
 
-	bool Start(int type, int sample_rate);
-	void Stop();
-	void Update();
+	bool start(int type, int sample_rate);
+	void stop();
+	void update();
 
-	bool IsCapturing();
-	int GetDelay();
-	void ResetSync();
+	bool isCapturing();
+	int getDelay();
+	void resetSync();
 
-	void Accumulate(bool enable);
-	void ResetAccumulation();
-	int GetSampleCount();
+	void accumulate(bool enable);
+	void resetAccumulation();
+	int getSampleCount();
 
-	virtual float GetSampleRate();
-	virtual void GetSomeSamples(BufferBox &buf, int num_samples);
-	virtual int GetState();
+	virtual float getSampleRate();
+	virtual void getSomeSamples(BufferBox &buf, int num_samples);
+	virtual int getState();
 
 	BufferBox current_buffer, buffer;
 	MidiData midi;

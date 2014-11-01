@@ -18,7 +18,7 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.7.0";
+string AppVersion = "0.6.8.0";
 
 Tsunami *tsunami = NULL;
 
@@ -79,8 +79,8 @@ bool Tsunami::onStartup(const Array<string> &arg)
 void Tsunami::_HandleArguments()
 {
 	if (_arg.num >= 2)
-		storage->Load(audio, _arg[1]);
-	audio->Notify(audio->MESSAGE_NEW);
+		storage->load(audio, _arg[1]);
+	audio->notify(audio->MESSAGE_NEW);
 }
 
 bool Tsunami::HandleArguments(const Array<string> &arg)
@@ -89,8 +89,8 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		return true;
 	if (arg[1] == "--info"){
 		if (arg.num < 3){
-			log->Error(_("Aufruf: tsunami --info <Datei>"));
-		}else if (storage->Load(audio, arg[2])){
+			log->error(_("Aufruf: tsunami --info <Datei>"));
+		}else if (storage->load(audio, arg[2])){
 			msg_write(format("sample-rate: %d", audio->sample_rate));
 			msg_write(format("samples: %d", audio->GetRange().num));
 			msg_write("length: " + audio->get_time_str(audio->GetRange().num));
@@ -101,9 +101,9 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		return false;
 	}else if (arg[1] == "--export"){
 		if (arg.num < 4){
-			log->Error(_("Aufruf: tsunami --export <Datei> <Exportdatei>"));
-		}else if (storage->Load(audio, arg[2])){
-			storage->Export(audio, audio->GetRange(), arg[3]);
+			log->error(_("Aufruf: tsunami --export <Datei> <Exportdatei>"));
+		}else if (storage->load(audio, arg[2])){
+			storage->_export(audio, audio->GetRange(), arg[3]);
 		}
 		return false;
 	}
@@ -112,8 +112,8 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 
 void Tsunami::CreateWindow()
 {
-	log->Info(AppName + " " + AppVersion);
-	log->Info(_("  ...keine Sorge, das wird schon!"));
+	log->info(AppName + " " + AppVersion);
+	log->info(_("  ...keine Sorge, das wird schon!"));
 
 	win = new TsunamiWindow;
 	_win = dynamic_cast<HuiWindow*>(win);
@@ -131,7 +131,7 @@ void Tsunami::LoadKeyCodes()
 bool Tsunami::AllowTermination()
 {
 	if (win)
-		return win->AllowTermination();
+		return win->allowTermination();
 	return true;
 }
 

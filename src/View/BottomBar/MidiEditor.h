@@ -21,22 +21,22 @@ public:
 	MidiEditor(AudioView *view, AudioFile *audio);
 	virtual ~MidiEditor();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 	void update();
 
-	void OnPitch();
-	void OnScale();
-	void OnBeatPartition();
-	void OnMidiModeSelect();
-	void OnMidiModeNote();
-	void OnMidiModeChord();
-	void OnChordType();
-	void OnChordInversion();
+	void onPitch();
+	void onScale();
+	void onBeatPartition();
+	void onMidiModeSelect();
+	void onMidiModeNote();
+	void onMidiModeChord();
+	void onChordType();
+	void onChordInversion();
 
-	void Clear();
-	void SetTrack(Track *t);
+	void clear();
+	void setTrack(Track *t);
 
-	void OnAdd();
+	void onAdd();
 
 
 	string id_inner;

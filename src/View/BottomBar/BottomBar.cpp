@@ -38,7 +38,7 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	AddListView("!nobar\\name", 0, 1, 0, 0, "choose");
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
-	mixing_console = new MixingConsole(audio, output);
+	mixing_console = new MixingConsole(audio, output, view->stream);
 	level_console = new LevelConsole(view, audio);
 	curve_console = new CurveConsole(view, audio);
 	sample_manager = new SampleManager(audio);
@@ -53,7 +53,7 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	Embed(curve_console, "console_grid", 0, 6);
 	Embed(log_dialog, "console_grid", 0, 7);
 
-	view->Subscribe(this);
+	view->subscribe(this);
 
 	//menu = new HuiMenu;
 	foreachi(HuiPanel *p, children, i){
@@ -63,19 +63,19 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 		//EventM(id, (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChooseByMenu);
 	}
 
-	EventMX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChoose);
-	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnClose);
+	EventMX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);
+	EventM("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onClose);
 
 	visible = true;
 	ready = true;
-	Choose(console_when_ready);
+	choose(console_when_ready);
 }
 
 BottomBar::~BottomBar()
 {
 }
 
-void BottomBar::OnClose()
+void BottomBar::onClose()
 {
 	Hide();
 }
@@ -92,26 +92,26 @@ void BottomBar::OnChooseByMenu()
 	Choose(HuiGetEvent()->id.tail(1)._int());
 }*/
 
-void BottomBar::OnChoose()
+void BottomBar::onChoose()
 {
 	int n = GetInt("");
 	if (n >= 0)
-		Choose(n);
+		choose(n);
 }
 
-void BottomBar::OnShow()
+void BottomBar::onShow()
 {
 	visible = true;
-	Notify();
+	notify();
 }
 
-void BottomBar::OnHide()
+void BottomBar::onHide()
 {
 	visible = false;
-	Notify();
+	notify();
 }
 
-void BottomBar::Choose(int console)
+void BottomBar::choose(int console)
 {
 	if (!ready){
 		console_when_ready = console;
@@ -129,10 +129,10 @@ void BottomBar::Choose(int console)
 	active_console = console;
 	if (!visible)
 		Show();
-	Notify();
+	notify();
 }
 
-bool BottomBar::IsActive(int console)
+bool BottomBar::isActive(int console)
 {
 	return (active_console == console) && visible;
 }

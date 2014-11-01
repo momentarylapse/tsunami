@@ -28,25 +28,25 @@ AudioFileDialog::AudioFileDialog(AudioFile *a) :
 
 	Expand("ad_t_tags", 0, true);
 
-	LoadData();
+	loadData();
 
 	SetTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
 
-	EventMX("tags", "hui:select", this, &AudioFileDialog::OnTagsSelect);
-	EventMX("tags", "hui:change", this, &AudioFileDialog::OnTagsEdit);
-	EventM("add_tag", this, &AudioFileDialog::OnAddTag);
-	EventM("delete_tag", this, &AudioFileDialog::OnDeleteTag);
+	EventMX("tags", "hui:select", this, &AudioFileDialog::onTagsSelect);
+	EventMX("tags", "hui:change", this, &AudioFileDialog::onTagsEdit);
+	EventM("add_tag", this, &AudioFileDialog::onAddTag);
+	EventM("delete_tag", this, &AudioFileDialog::onDeleteTag);
 
-	Subscribe(audio);
+	subscribe(audio);
 }
 
 AudioFileDialog::~AudioFileDialog()
 {
-	Unsubscribe(audio);
+	unsubscribe(audio);
 	delete(bar_list);
 }
 
-void AudioFileDialog::LoadData()
+void AudioFileDialog::loadData()
 {
 	// tags
 	Reset("tags");
@@ -71,13 +71,13 @@ string get_vol(float volume, bool muted)
 	return muted ? _("(stumm)") : format("%.1f%%", volume * 100.0f);
 }
 
-void AudioFileDialog::OnTagsSelect()
+void AudioFileDialog::onTagsSelect()
 {
 	int s = GetInt("tags");
 	Enable("delete_tag", s >= 0);
 }
 
-void AudioFileDialog::OnTagsEdit()
+void AudioFileDialog::onTagsEdit()
 {
 	int r = HuiGetEvent()->row;
 	if (r < 0)
@@ -90,19 +90,19 @@ void AudioFileDialog::OnTagsEdit()
 	audio->EditTag(r, t.key, t.value);
 }
 
-void AudioFileDialog::OnAddTag()
+void AudioFileDialog::onAddTag()
 {
 	audio->AddTag("key", "value");
 }
 
-void AudioFileDialog::OnDeleteTag()
+void AudioFileDialog::onDeleteTag()
 {
 	int s = GetInt("tags");
 	if (s >= 0)
 		audio->DeleteTag(s);
 }
 
-void AudioFileDialog::OnUpdate(Observable *o, const string &message)
+void AudioFileDialog::onUpdate(Observable *o, const string &message)
 {
-	LoadData();
+	loadData();
 }

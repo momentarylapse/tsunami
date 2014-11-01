@@ -21,10 +21,10 @@ public:
 	SynthConsole(AudioView *view, AudioFile *audio);
 	virtual ~SynthConsole();
 
-	void Clear();
-	void SetTrack(Track *t);
+	void clear();
+	void setTrack(Track *t);
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	string id_inner;
 

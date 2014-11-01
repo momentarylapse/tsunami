@@ -122,7 +122,7 @@ void FormatGp4::LoadAudio(AudioFile *a, const string &filename)
 		}
 
 	}catch(const string &s){
-		tsunami->log->Error(s);
+		tsunami->log->error(s);
 	}
 
 	delete[](data);

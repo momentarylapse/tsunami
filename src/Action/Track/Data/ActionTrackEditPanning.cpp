@@ -25,7 +25,7 @@ void *ActionTrackEditPanning::execute(Data *d)
 	Track *t = a->get_track(track_no);
 
 	t->panning = new_value;
-	t->Notify();
+	t->notify();
 
 	return NULL;
 }
@@ -36,7 +36,7 @@ void ActionTrackEditPanning::undo(Data *d)
 	Track *t = a->get_track(track_no);
 
 	t->panning = old_value;
-	t->Notify();
+	t->notify();
 }
 
 

@@ -14,6 +14,7 @@
 
 class ActionTrackMoveSample;
 class AudioOutput;
+class AudioStream;
 class AudioInput;
 class AudioRenderer;
 class TsunamiWindow;
@@ -42,7 +43,7 @@ public:
 	void OnKeyUp();
 	void OnCommand(const string &id);
 
-	void OnUpdate(Observable *o, const string &message);
+	void onUpdate(Observable *o, const string &message);
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
 	static const string MESSAGE_CUR_LEVEL_CHANGE;
@@ -196,7 +197,7 @@ public:
 
 	AudioFile *audio;
 
-	AudioOutput *output;
+	AudioStream *stream;
 	AudioInput *input;
 	AudioRenderer *renderer;
 

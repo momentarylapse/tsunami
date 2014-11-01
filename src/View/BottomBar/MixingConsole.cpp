@@ -8,6 +8,7 @@
 #include "MixingConsole.h"
 #include "../../Data/AudioFile.h"
 #include "../../Audio/AudioOutput.h"
+#include "../../Audio/AudioStream.h"
 #include "../Helper/PeakMeter.h"
 #include <math.h>
 
@@ -42,9 +43,9 @@ TrackMixer::TrackMixer()
 	SetTooltip(vol_slider_id, _("Lautst&arke in dB"));
 	AddCheckBox("Stumm", 0, 3, 0, 0, mute_id);
 
-	EventM(vol_slider_id, this, &TrackMixer::OnVolume);
-	EventM(pan_slider_id, this, &TrackMixer::OnPanning);
-	EventM(mute_id, this, &TrackMixer::OnMute);
+	EventM(vol_slider_id, this, &TrackMixer::onVolume);
+	EventM(pan_slider_id, this, &TrackMixer::onPanning);
+	EventM(mute_id, this, &TrackMixer::onMute);
 }
 
 TrackMixer::~TrackMixer()
@@ -71,28 +72,28 @@ float TrackMixer::vol2slider(float vol)
 	return db2slider(amplitude2db(vol));
 }
 
-void TrackMixer::OnVolume()
+void TrackMixer::onVolume()
 {
 	track->SetVolume(slider2vol(GetFloat("")));
 }
 
-void TrackMixer::OnMute()
+void TrackMixer::onMute()
 {
 	track->SetMuted(IsChecked(""));
 }
 
-void TrackMixer::OnPanning()
+void TrackMixer::onPanning()
 {
 	track->SetPanning(GetFloat("")*2 - 1);
 }
 
-void TrackMixer::SetTrack(Track* t)
+void TrackMixer::setTrack(Track* t)
 {
 	track = t;
-	Update();
+	update();
 }
 
-void TrackMixer::Update()
+void TrackMixer::update()
 {
 	SetFloat(vol_slider_id, vol2slider(track->volume));
 	SetFloat(pan_slider_id, track->panning * 0.5f + 0.5f);
@@ -101,7 +102,7 @@ void TrackMixer::Update()
 }
 
 
-MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
+MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, AudioStream *stream) :
 	BottomBarConsole(_("Mischpult")),
 	Observer("MixingConsole")
 {
@@ -121,31 +122,31 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output) :
 	AddDrawingArea("!width=100,height=30,noexpandx,noexpandy", 0, 1, 0, 0, "mc_output_peaks");
 	AddSlider("!vertical,expandy", 0, 2, 0, 0, "mc_output_volume");
 
-	peak_meter = new PeakMeter(this, "mc_output_peaks", output);
-	SetFloat("mc_output_volume", output->GetVolume());
+	peak_meter = new PeakMeter(this, "mc_output_peaks", stream);
+	SetFloat("mc_output_volume", output->getVolume());
 
-	EventM("mc_output_volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::OnOutputVolume);
+	EventM("mc_output_volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);
 
-	Subscribe(audio);
-	Subscribe(output);
-	LoadData();
+	subscribe(audio);
+	subscribe(output);
+	loadData();
 }
 
 MixingConsole::~MixingConsole()
 {
-	Unsubscribe(audio);
-	Unsubscribe(output);
+	unsubscribe(audio);
+	unsubscribe(output);
 	foreach(TrackMixer *m, mixer)
 		delete(m);
 	delete(peak_meter);
 }
 
-void MixingConsole::OnOutputVolume()
+void MixingConsole::onOutputVolume()
 {
-	output->SetVolume(GetFloat(""));
+	output->setVolume(GetFloat(""));
 }
 
-void MixingConsole::LoadData()
+void MixingConsole::loadData()
 {
 	for (int i=mixer.num; i<audio->track.num; i++){
 		TrackMixer *m = new TrackMixer();
@@ -160,23 +161,23 @@ void MixingConsole::LoadData()
 	mixer.resize(audio->track.num);
 
 	foreachi(Track *t, audio->track, i)
-		mixer[i]->SetTrack(t);
+		mixer[i]->setTrack(t);
 }
 
-void MixingConsole::OnUpdate(Observable* o, const string &message)
+void MixingConsole::onUpdate(Observable* o, const string &message)
 {
 	if (o == output)
-		SetFloat("mc_output_volume", output->GetVolume());
+		SetFloat("mc_output_volume", output->getVolume());
 	else
-		LoadData();
+		loadData();
 }
 
-void MixingConsole::OnShow()
+void MixingConsole::onShow()
 {
-	peak_meter->Enable(true);
+	peak_meter->enable(true);
 }
 
-void MixingConsole::OnHide()
+void MixingConsole::onHide()
 {
-	peak_meter->Enable(false);
+	peak_meter->enable(false);
 }

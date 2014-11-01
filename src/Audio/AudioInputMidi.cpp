@@ -18,22 +18,22 @@ AudioInputMidi::AudioInputMidi(MidiData &_data) :
 	handle = NULL;
 	subs = NULL;
 
-	Init();
+	init();
 }
 
 AudioInputMidi::~AudioInputMidi()
 {
 	if (subs)
-		Unconnect();
+		unconnect();
 	if (handle)
 		snd_seq_close(handle);
 }
 
-void AudioInputMidi::Init()
+void AudioInputMidi::init()
 {
 	int r = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0){
-		tsunami->log->Error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
+		tsunami->log->error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
 		return;
 	}
 	snd_seq_set_client_name(handle, "Tsunami");
@@ -41,15 +41,15 @@ void AudioInputMidi::Init()
 				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
 				SND_SEQ_PORT_TYPE_APPLICATION);
 	if (portid < 0){
-		tsunami->log->Error(string("Error creating sequencer port: ") + snd_strerror(portid));
+		tsunami->log->error(string("Error creating sequencer port: ") + snd_strerror(portid));
 		return;
 	}
 }
 
-bool AudioInputMidi::ConnectTo(AudioInputMidi::MidiPort p)
+bool AudioInputMidi::connectTo(AudioInputMidi::MidiPort p)
 {
 	if (subs)
-		Unconnect();
+		unconnect();
 	snd_seq_addr_t sender, dest;
 	sender.client = p.client;
 	sender.port = p.port;
@@ -61,7 +61,7 @@ bool AudioInputMidi::ConnectTo(AudioInputMidi::MidiPort p)
 	snd_seq_port_subscribe_set_dest(subs, &dest);
 	int r = snd_seq_subscribe_port(handle, subs);
 	if (r != 0)
-		tsunami->log->Error(string("Error connecting to midi port: ") + snd_strerror(r));
+		tsunami->log->error(string("Error connecting to midi port: ") + snd_strerror(r));
 	return r == 0;
 
 	// simple version raises "no permission" error...?!?
@@ -71,20 +71,20 @@ bool AudioInputMidi::ConnectTo(AudioInputMidi::MidiPort p)
 	return r == 0;*/
 }
 
-bool AudioInputMidi::Unconnect()
+bool AudioInputMidi::unconnect()
 {
 	if (!subs)
 		return true;
 	int r = snd_seq_unsubscribe_port(handle, subs);
 	if (r != 0)
-		tsunami->log->Error(string("Error unconnecting to midi port: ") + snd_strerror(r));
+		tsunami->log->error(string("Error unconnecting to midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
 	subs = NULL;
 	return r == 0;
 }
 
 
-Array<AudioInputMidi::MidiPort> AudioInputMidi::FindPorts()
+Array<AudioInputMidi::MidiPort> AudioInputMidi::findPorts()
 {
 	Array<MidiPort> ports;
 	snd_seq_client_info_t *cinfo;
@@ -112,12 +112,12 @@ Array<AudioInputMidi::MidiPort> AudioInputMidi::FindPorts()
 	return ports;
 }
 
-void AudioInputMidi::Accumulate(bool enable)
+void AudioInputMidi::accumulate(bool enable)
 {
 	accumulating = enable;
 }
 
-void AudioInputMidi::ResetAccumulation()
+void AudioInputMidi::resetAccumulation()
 {
 	data.clear();
 	offset = 0;
@@ -126,12 +126,12 @@ void AudioInputMidi::ResetAccumulation()
 		tone_start[i] = -1;
 }
 
-int AudioInputMidi::GetSampleCount()
+int AudioInputMidi::getSampleCount()
 {
 	return offset * (double)sample_rate;
 }
 
-void AudioInputMidi::ClearInputQueue()
+void AudioInputMidi::clearInputQueue()
 {
 	while (true){
 		snd_seq_event_t *ev;
@@ -142,15 +142,15 @@ void AudioInputMidi::ClearInputQueue()
 	}
 }
 
-bool AudioInputMidi::Start(int _sample_rate)
+bool AudioInputMidi::start(int _sample_rate)
 {
 	if (!handle)
 		return false;
 	sample_rate = _sample_rate;
 	accumulating = false;
-	ResetAccumulation();
+	resetAccumulation();
 
-	ClearInputQueue();
+	clearInputQueue();
 
 	timer.reset();
 
@@ -158,12 +158,12 @@ bool AudioInputMidi::Start(int _sample_rate)
 	return true;
 }
 
-void AudioInputMidi::Stop()
+void AudioInputMidi::stop()
 {
 	capturing = false;
 }
 
-int AudioInputMidi::DoCapturing()
+int AudioInputMidi::doCapturing()
 {
 	double dt = timer.get();
 	if (accumulating)
@@ -200,18 +200,18 @@ int AudioInputMidi::DoCapturing()
 	return dt * (double)sample_rate;
 }
 
-bool AudioInputMidi::IsCapturing()
+bool AudioInputMidi::isCapturing()
 {
 	return capturing;
 }
 
 
-float AudioInputMidi::GetSampleRate()
+float AudioInputMidi::getSampleRate()
 {
 	return sample_rate;
 }
 
-void AudioInputMidi::GetSomeSamples(BufferBox &buf, int num_samples)
+void AudioInputMidi::getSomeSamples(BufferBox &buf, int num_samples)
 {
 	//int pos = offset * (double)sample_rate;
 	buf.resize(num_samples);
@@ -227,10 +227,10 @@ void AudioInputMidi::GetSomeSamples(BufferBox &buf, int num_samples)
 }
 
 
-int AudioInputMidi::GetDelay()
+int AudioInputMidi::getDelay()
 {
 	return 0;
 }
 
-void AudioInputMidi::ResetSync(){}
+void AudioInputMidi::resetSync(){}
 

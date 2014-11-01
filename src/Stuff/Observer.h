@@ -19,12 +19,12 @@ public:
 	Observer(const string &name);
 	virtual ~Observer();
 
-	void Subscribe(Observable *o, const string &message = Observable::MESSAGE_ALL);
-	void Unsubscribe(Observable *o);
+	void subscribe(Observable *o, const string &message = Observable::MESSAGE_ALL);
+	void unsubscribe(Observable *o);
 
-	string GetName();
+	string getName();
 
-	virtual void OnUpdate(Observable *o, const string &message) = 0;
+	virtual void onUpdate(Observable *o, const string &message) = 0;
 
 private:
 	string observer_name;
@@ -36,7 +36,7 @@ public:
 	ObserverWrapper(void *handler, void *func);
 	virtual ~ObserverWrapper();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	void *handler, *func;
 };

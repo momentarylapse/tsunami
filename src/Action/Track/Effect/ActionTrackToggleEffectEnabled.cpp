@@ -25,7 +25,7 @@ void *ActionTrackToggleEffectEnabled::execute(Data *d)
 
 	Effect *fx = a->get_fx(track_no, index);
 	fx->enabled = !fx->enabled;
-	fx->Notify(fx->MESSAGE_CHANGE_BY_ACTION);
+	fx->Observable::notify(fx->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }

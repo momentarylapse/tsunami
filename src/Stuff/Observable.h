@@ -24,18 +24,18 @@ public:
 	static const string MESSAGE_DELETE;
 	static const string MESSAGE_ALL;
 
-	void AddObserver(Observer *o, const string &message = MESSAGE_ALL);
-	void AddWrappedObserver(void *handler, void *func);
-	void RemoveObserver(Observer *o);
-	void RemoveWrappedObserver(void *handler);
-	string GetName();
+	void addObserver(Observer *o, const string &message = MESSAGE_ALL);
+	void addWrappedObserver(void *handler, void *func);
+	void removeObserver(Observer *o);
+	void removeWrappedObserver(void *handler);
+	string getName();
 
-	void NotifyBegin();
-	void Notify(const string &message = MESSAGE_CHANGE);
-	void NotifyEnd();
+	void notifyBegin();
+	void notify(const string &message = MESSAGE_CHANGE);
+	void notifyEnd();
 private:
-	void NotifyEnqueue(const string &message);
-	void NotifySend();
+	void notifyEnqueue(const string &message);
+	void notifySend();
 
 private:
 	string observable_name;

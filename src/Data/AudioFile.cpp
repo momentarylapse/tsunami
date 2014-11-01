@@ -135,19 +135,19 @@ void AudioFile::NewEmpty(int _sample_rate)
 	AddTag("artist", "tsunami");//AppTitle);
 
 	action_manager->Enable(true);
-	Notify();
+	notify();
 }
 
 void AudioFile::NewWithOneTrack(int track_type, int _sample_rate)
 {
 	msg_db_f("AudioFile.NewWithOneTrack",1);
 
-	NotifyBegin();
+	notifyBegin();
 	NewEmpty(_sample_rate);
 	action_manager->Enable(false);
 	AddTrack(track_type);
 	action_manager->Enable(true);
-	NotifyEnd();
+	notifyEnd();
 }
 
 // delete all data
@@ -180,8 +180,8 @@ void AudioFile::Reset()
 
 	action_manager->Reset();
 
-	Notify();
-	Notify(MESSAGE_NEW);
+	notify();
+	notify(MESSAGE_NEW);
 }
 
 AudioFile::~AudioFile()
@@ -198,7 +198,7 @@ void AudioFile::UpdateSelection(const Range &range)
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
 			s->is_selected = (t->is_selected) && range.overlaps(s->GetRange());
-	Notify(MESSAGE_SELECTION_CHANGE);
+	notify(MESSAGE_SELECTION_CHANGE);
 }
 
 
@@ -207,18 +207,18 @@ void AudioFile::UnselectAllSamples()
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
 			s->is_selected = false;
-	Notify(MESSAGE_SELECTION_CHANGE);
+	notify(MESSAGE_SELECTION_CHANGE);
 }
 
 
 bool AudioFile::Load(const string & filename, bool deep)
 {
-	return tsunami->storage->Load(this, filename);
+	return tsunami->storage->load(this, filename);
 }
 
 bool AudioFile::Save(const string & filename)
 {
-	return tsunami->storage->Save(this, filename);
+	return tsunami->storage->save(this, filename);
 }
 
 Range AudioFile::GetRange()
@@ -291,7 +291,7 @@ Track *AudioFile::AddTrack(int type, int index)
 	if (type == Track::TYPE_TIME){
 		// force single time track
 		if (GetTimeTrack()){
-			tsunami->log->Error(_("Es existiert schon eine Rhythmus-Spur."));
+			tsunami->log->error(_("Es existiert schon eine Rhythmus-Spur."));
 			return NULL;
 		}
 	}
@@ -347,7 +347,7 @@ void AudioFile::AddLevel(const string &name)
 
 void AudioFile::DeleteLevel(int index, bool merge)
 {
-	tsunami->log->Error(_("Ebene l&oschen: noch nicht implementiert..."));
+	tsunami->log->error(_("Ebene l&oschen: noch nicht implementiert..."));
 }
 
 void AudioFile::RenameLevel(int index, const string &name)
@@ -370,7 +370,7 @@ void AudioFile::DeleteSample(int index)
 	if (sample[index]->ref_count == 0)
 		Execute(new ActionAudioDeleteSample(index));
 	else
-		tsunami->log->Error(_("Kann nur Samples l&oschen, die nicht benutzt werden!"));
+		tsunami->log->error(_("Kann nur Samples l&oschen, die nicht benutzt werden!"));
 }
 
 void AudioFile::EditSampleName(int index, const string &name)

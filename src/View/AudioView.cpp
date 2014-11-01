@@ -13,7 +13,7 @@
 #include "BottomBar/BottomBar.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInput.h"
-#include "../Audio/AudioOutput.h"
+#include "../Audio/AudioStream.h"
 #include "../Audio/AudioRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Stuff/Log.h"
@@ -123,7 +123,6 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	cur_level = 0;
 
 	audio = _audio;
-	output = _output;
 	input = _input;
 	renderer = _renderer;
 
@@ -136,10 +135,13 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	chord_type = 0;
 	chord_inversion = 0;
 
+	stream = new AudioStream;
+	stream->setSource(renderer);
+
 	area = rect(0, 0, 0, 0);
-	Subscribe(audio);
-	Subscribe(output);
-	Subscribe(input);
+	subscribe(audio);
+	subscribe(stream);
+	subscribe(input);
 
 	// events
 	parent->EventMX("area", "hui:draw", this, &AudioView::OnDraw);
@@ -161,7 +163,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 
 	menu_audio = HuiCreateResourceMenu("popup_audio_file_menu");
 	menu_track = HuiCreateResourceMenu("popup_track_menu");
-	menu_sub= HuiCreateResourceMenu("popup_sample_menu");
+	menu_sub = HuiCreateResourceMenu("popup_sample_menu");
 
 	//ForceRedraw();
 	UpdateMenu();
@@ -169,9 +171,11 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 
 AudioView::~AudioView()
 {
-	Unsubscribe(audio);
-	Unsubscribe(output);
-	Unsubscribe(input);
+	unsubscribe(audio);
+	unsubscribe(stream);
+	unsubscribe(input);
+
+	delete(stream);
 
 	HuiConfig.setBool("View.Mono", show_mono);
 	HuiConfig.setInt("View.DetailSteps", detail_steps);
@@ -220,15 +224,15 @@ void AudioView::UpdateSelection()
 
 
 	renderer->range = GetPlaybackSelection();
-	if (output->IsPlaying()){
-		if (renderer->range.is_inside(output->GetPos()))
+	if (stream->isPlaying()){
+		if (renderer->range.is_inside(stream->getPos()))
 			renderer->range = GetPlaybackSelection();
 		else
-			output->Stop();
+			stream->stop();
 	}
 
 	audio->UpdateSelection(sel_range);
-	Notify(MESSAGE_SELECTION_CHANGE);
+	notify(MESSAGE_SELECTION_CHANGE);
 }
 
 bool mouse_over_time(AudioView *v, int pos)
@@ -268,8 +272,8 @@ AudioView::SelectionType AudioView::GetMouseOver()
 		s.type = SEL_TYPE_SELECTION_START;
 		return s;
 	}
-	if ((output->IsPlaying()) and (output->GetSource() == renderer)){
-		if (mouse_over_time(this, output->GetPos())){
+	if (stream->isPlaying()){
+		if (mouse_over_time(this, stream->getPos())){
 			s.type = SEL_TYPE_PLAYBACK;
 			return s;
 		}
@@ -445,7 +449,7 @@ void AudioView::OnMouseMove()
 		win->RedrawRect("area", x, area.y1, w, area.height());
 	}else if (selection.type == SEL_TYPE_PLAYBACK){
 		renderer->Seek(selection.pos);
-		output->Play(renderer);
+		stream->play();
 		_force_redraw_ = true;
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		ApplyBarriers(selection.pos);
@@ -482,15 +486,15 @@ void AudioView::OnMouseMove()
 
 void AudioView::SetCursorPos(int pos)
 {
-	if (output->IsPlaying()){
+	if (stream->isPlaying()){
 		if (renderer->range.is_inside(pos)){
 			renderer->Seek(pos);
-			output->Play(renderer);
+			stream->play();
 			selection.type = SEL_TYPE_PLAYBACK;
 			ForceRedraw();
 			return;
 		}else
-			output->Stop();
+			stream->stop();
 	}
 	mouse_possibly_selecting = 0;
 	sel_raw = Range(pos, 0);
@@ -632,12 +636,12 @@ void AudioView::OnLeftDoubleClick()
 
 	if (mouse_possibly_selecting < mouse_min_move_to_select){
 		if (selection.type == SEL_TYPE_SAMPLE){
-			win->side_bar->Open(SideBar::SUB_DIALOG);
+			win->side_bar->open(SideBar::SUB_DIALOG);
 		}else if ((selection.type == SEL_TYPE_TRACK) or ((selection.track) and ((selection.type == SEL_TYPE_SELECTION_START) or (selection.type == SEL_TYPE_SELECTION_END)))){
-			win->side_bar->Open(SideBar::TRACK_DIALOG);
+			win->side_bar->open(SideBar::TRACK_DIALOG);
 		}else if (!selection.track){
 			SetCurTrack(NULL);
-			win->side_bar->Open(SideBar::AUDIO_FILE_DIALOG);
+			win->side_bar->open(SideBar::AUDIO_FILE_DIALOG);
 		}
 		selection.type = SEL_TYPE_NONE;
 	}
@@ -674,10 +678,10 @@ void AudioView::OnKeyDown()
 		Zoom(exp(- ZoomSpeed));
 
 	if (k == KEY_SPACE){
-		if (output->IsPlaying()){
-			output->Pause();
+		if (stream->isPlaying()){
+			stream->pause();
 		}else{
-			win->OnPlay();
+			win->onPlay();
 		}
 	}
 	UpdateMenu();
@@ -764,7 +768,7 @@ void AudioView::DrawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 		c->drawLine(xx, r.y1, xx, r.y2);
 	}
 	if (show_time){
-		if ((output->IsPlaying()) and (output->GetSource() == renderer)){
+		if (stream->isPlaying()){
 			color cc = ColorPreviewMarker;
 			cc.a = 0.25f;
 			c->setColor(cc);
@@ -791,7 +795,7 @@ bool AudioView::EditingMidi()
 		return false;
 	if (cur_track->type != Track::TYPE_MIDI)
 		return false;
-	return win->bottom_bar->IsActive(BottomBar::MIDI_EDITOR);
+	return win->bottom_bar->isActive(BottomBar::MIDI_EDITOR);
 }
 
 void AudioView::DrawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
@@ -870,7 +874,7 @@ void AudioView::CheckConsistency()
 	}
 }
 
-void AudioView::OnUpdate(Observable *o, const string &message)
+void AudioView::onUpdate(Observable *o, const string &message)
 {
 	CheckConsistency();
 
@@ -891,13 +895,13 @@ void AudioView::OnUpdate(Observable *o, const string &message)
 
 		if (message == audio->MESSAGE_CHANGE)
 			audio->UpdatePeaks(peak_mode);
-	}else if (o == output){
-		if ((output->IsPlaying()) and (output->GetSource() == renderer))
-			MakeSampleVisible(output->GetPos());
+	}else if (o == stream){
+		if (stream->isPlaying())
+			MakeSampleVisible(stream->getPos());
 		ForceRedraw();
 	}else if (o == input){
-		if (input->IsCapturing())
-			MakeSampleVisible(sel_range.start() + input->GetSampleCount());
+		if (input->isCapturing())
+			MakeSampleVisible(sel_range.start() + input->getSampleCount());
 		ForceRedraw();
 	}else{
 		ForceRedraw();
@@ -935,6 +939,8 @@ void AudioView::UpdateTracks()
 			}
 		}
 	}
+
+	CheckConsistency();
 }
 
 bool AudioView::TrackHeightManager::check(AudioFile *a)
@@ -1143,14 +1149,14 @@ void AudioView::DrawAudioFile(HuiPainter *c, const rect &r)
 	DrawSelection(c, r);
 
 	// playing position
-	if ((output->IsPlaying()) and (output->GetSource() == renderer)){
-		if (!input->IsCapturing())
-			DrawTimeLine(c, output->GetPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
+	if (stream->isPlaying()){
+		if (!input->isCapturing())
+			DrawTimeLine(c, stream->getPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
 	}
 
 	// capturing position
-	if (input->IsCapturing())
-		DrawTimeLine(c, sel_range.start() + input->GetSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
+	if (input->isCapturing())
+		DrawTimeLine(c, sel_range.start() + input->getSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
 }
 
 int frame=0;
@@ -1196,7 +1202,7 @@ void AudioView::OptimizeView()
 	r.num += border * 2;
 	view_zoom = area.width() / (double)r.length();
 	view_pos = (double)r.start();
-	Notify(MESSAGE_VIEW_CHANGE);
+	notify(MESSAGE_VIEW_CHANGE);
 	ForceRedraw();
 }
 
@@ -1223,7 +1229,7 @@ void AudioView::SetShowMono(bool mono)
 {
 	show_mono = mono;
 	ForceRedraw();
-	Notify(MESSAGE_SETTINGS_CHANGE);
+	notify(MESSAGE_SETTINGS_CHANGE);
 	UpdateMenu();
 }
 
@@ -1241,7 +1247,7 @@ void AudioView::MakeSampleVisible(int sample)
 	double x = sample2screen(sample);
 	if ((x > area.x2) or (x < area.x1)){
 		view_pos = sample - area.width() / view_zoom * BORDER_FACTOR;
-		Notify(MESSAGE_VIEW_CHANGE);
+		notify(MESSAGE_VIEW_CHANGE);
 		ForceRedraw();
 	}
 }
@@ -1307,7 +1313,7 @@ void AudioView::SetCurSample(SampleRef *s)
 		return;
 	cur_sample = s;
 	ForceRedraw();
-	Notify(MESSAGE_CUR_SAMPLE_CHANGE);
+	notify(MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
 
@@ -1317,7 +1323,7 @@ void AudioView::SetCurTrack(Track *t)
 		return;
 	cur_track = t;
 	ForceRedraw();
-	Notify(MESSAGE_CUR_TRACK_CHANGE);
+	notify(MESSAGE_CUR_TRACK_CHANGE);
 }
 
 void AudioView::SetCurLevel(int l)
@@ -1328,7 +1334,7 @@ void AudioView::SetCurLevel(int l)
 		return;
 	cur_level = l;
 	ForceRedraw();
-	Notify(MESSAGE_CUR_LEVEL_CHANGE);
+	notify(MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 
@@ -1355,14 +1361,14 @@ void AudioView::Zoom(float f)
 
 	view_pos += (mx - area.x1) * (1.0/view_zoom - 1.0/zoom_new);
 	view_zoom = zoom_new;
-	Notify(MESSAGE_VIEW_CHANGE);
+	notify(MESSAGE_VIEW_CHANGE);
 	ForceRedraw();
 }
 
 void AudioView::Move(float dpos)
 {
 	view_pos += dpos;
-	Notify(MESSAGE_VIEW_CHANGE);
+	notify(MESSAGE_VIEW_CHANGE);
 	ForceRedraw();
 }
 

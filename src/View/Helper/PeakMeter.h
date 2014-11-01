@@ -17,9 +17,9 @@ class PeakMeterSource : public Observable
 {
 public:
 	PeakMeterSource(const string &name) : Observable(name){}
-	virtual float GetSampleRate() = 0;
-	virtual void GetSomeSamples(BufferBox &buf, int num_samples) = 0;
-	virtual int GetState() = 0;
+	virtual float getSampleRate() = 0;
+	virtual void getSomeSamples(BufferBox &buf, int num_samples) = 0;
+	virtual int getState() = 0;
 	enum{
 		STATE_PLAYING,
 		STATE_PAUSED,
@@ -33,17 +33,17 @@ public:
 	PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_source);
 	virtual ~PeakMeter();
 
-	void OnDraw();
-	void OnLeftButtonDown();
-	void OnRightButtonDown();
-	void SetMode(int _mode);
-	void OnUpdate(Observable *o, const string &message);
-	void Enable(bool enabled);
+	void onDraw();
+	void onLeftButtonDown();
+	void onRightButtonDown();
+	void setMode(int _mode);
+	void onUpdate(Observable *o, const string &message);
+	void enable(bool enabled);
 
 private:
-	void ClearData();
-	void FindPeaks();
-	void FindSpectrum();
+	void clearData();
+	void findPeaks();
+	void findSpectrum();
 
 	HuiPanel *panel;
 	string id;
@@ -66,7 +66,7 @@ private:
 	};
 	Data r, l;
 
-	void DrawPeak(HuiPainter *c, const rect &r, Data &d);
+	void drawPeak(HuiPainter *c, const rect &r, Data &d);
 
 	float sample_rate;
 	BufferBox buf;

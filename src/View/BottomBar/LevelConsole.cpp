@@ -18,28 +18,28 @@ LevelConsole::LevelConsole(AudioView *_view, AudioFile *_audio) :
 
 	FromResource("level_console");
 
-	EventMX("levels", "hui:select", this, &LevelConsole::OnLevelsSelect);
-	EventMX("levels", "hui:change", this, &LevelConsole::OnLevelsEdit);
-	EventM("add_level", this, &LevelConsole::OnAddLevel);
-	EventM("delete_level", this, &LevelConsole::OnDeleteLevel);
+	EventMX("levels", "hui:select", this, &LevelConsole::onLevelsSelect);
+	EventMX("levels", "hui:change", this, &LevelConsole::onLevelsEdit);
+	EventM("add_level", this, &LevelConsole::onAddLevel);
+	EventM("delete_level", this, &LevelConsole::onDeleteLevel);
 
-	Subscribe(audio);
-	Subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
+	subscribe(audio);
+	subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 LevelConsole::~LevelConsole()
 {
-	Unsubscribe(audio);
-	Unsubscribe(view);
+	unsubscribe(audio);
+	unsubscribe(view);
 }
 
-void LevelConsole::OnLevelsSelect()
+void LevelConsole::onLevelsSelect()
 {
 	int s = GetInt("levels");
 	view->SetCurLevel(s);
 }
 
-void LevelConsole::OnLevelsEdit()
+void LevelConsole::onLevelsEdit()
 {
 	int r = HuiGetEvent()->row;
 	if (r < 0)
@@ -47,12 +47,12 @@ void LevelConsole::OnLevelsEdit()
 	audio->RenameLevel(r, GetCell("levels", r, 1));
 }
 
-void LevelConsole::OnAddLevel()
+void LevelConsole::onAddLevel()
 {
 	audio->AddLevel("");
 }
 
-void LevelConsole::OnDeleteLevel()
+void LevelConsole::onDeleteLevel()
 {
 	int s = GetInt("levels");
 	if (s >= 0)
@@ -60,7 +60,7 @@ void LevelConsole::OnDeleteLevel()
 }
 
 
-void LevelConsole::LoadData()
+void LevelConsole::loadData()
 {
 	Reset("levels");
 	foreachi(string &n, audio->level_name, i)
@@ -69,8 +69,8 @@ void LevelConsole::LoadData()
 		SetInt("levels", view->cur_level);
 }
 
-void LevelConsole::OnUpdate(Observable *o, const string &message)
+void LevelConsole::onUpdate(Observable *o, const string &message)
 {
-	LoadData();
+	loadData();
 }
 

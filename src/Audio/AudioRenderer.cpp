@@ -94,7 +94,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(Beat &b, beats)
-		t->synth->RenderMetronomeClick(buf, b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
+		t->synth->renderMetronomeClick(buf, b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
 }
 
 void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
@@ -113,7 +113,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(MidiNote &n, notes){
 		Range rr = Range(n.range.offset - range_cur.offset, n.range.num);
-		t->synth->RenderNote(buf, rr, n.pitch, n.volume);
+		t->synth->renderNote(buf, rr, n.pitch, n.volume);
 	}
 }
 
@@ -149,12 +149,12 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_lis
 
 	// apply preview plugin?
 	if ((t) && (effect))
-		effect->Apply(buf, &fake_track, false);
+		effect->apply(buf, &fake_track, false);
 
 	// apply fx
 	foreach(Effect *fx, fx_list)
 		if (fx->enabled)
-			fx->Apply(buf, &fake_track, false);
+			fx->apply(buf, &fake_track, false);
 }
 
 void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
@@ -271,13 +271,13 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 	pos = range.offset;
 	midi.clear();
 	foreach(Effect *fx, a->fx)
-		fx->Prepare();
+		fx->prepare();
 	foreachi(Track *t, a->track, i){
 		//midi.add(t, t->midi);
 		midi.add(t->midi);
-		t->synth->Reset();
+		t->synth->reset();
 		foreach(Effect *fx, t->fx)
-			fx->Prepare();
+			fx->prepare();
 		foreach(MidiEffect *fx, t->midi.fx){
 			fx->Prepare();
 			tsunami->plugin_manager->context.set(t, 0, _range);
@@ -285,12 +285,12 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 		}
 	}
 	if (effect)
-		effect->Prepare();
+		effect->prepare();
 }
 
 void AudioRenderer::Seek(int _pos)
 {
 	pos = _pos;
 	foreach(Track *t, audio->track)
-		t->synth->Reset();
+		t->synth->reset();
 }

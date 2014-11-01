@@ -78,7 +78,7 @@ Synthesizer::Synthesizer() :
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
-	reset();
+	_reset();
 }
 
 Synthesizer::~Synthesizer()
@@ -95,15 +95,15 @@ void Synthesizer::__delete__()
 	this->Configurable::~Configurable();
 }
 
-void Synthesizer::reset()
+void Synthesizer::_reset()
 {
 	notes.clear();
 	keep_notes = 0;
 }
 
-void Synthesizer::Reset()
+void Synthesizer::reset()
 {
-	reset();
+	_reset();
 }
 
 void Synthesizer::set(float pitch, float volume, int offset)
@@ -136,18 +136,18 @@ int Synthesizer::read(BufferBox &buf)
 	// get from source...
 
 	foreach(MidiNote &n, notes)
-		RenderNote(buf, n.range, n.pitch, n.volume);
+		renderNote(buf, n.range, n.pitch, n.volume);
 
 	iterate(buf.num);
 	return buf.num;
 }
 
-void Synthesizer::RenderMetronomeClick(BufferBox &buf, int pos, int level, float volume)
+void Synthesizer::renderMetronomeClick(BufferBox &buf, int pos, int level, float volume)
 {
 	if (level == 0)
-		RenderNote(buf, Range(pos, 0), 81, volume);
+		renderNote(buf, Range(pos, 0), 81, volume);
 	else
-		RenderNote(buf, Range(pos, 0), 74, volume * 0.5f);
+		renderNote(buf, Range(pos, 0), 74, volume * 0.5f);
 }
 
 
@@ -160,11 +160,11 @@ Synthesizer *CreateSynthesizer(const string &name)
 		return new SampleSynthesizer;*/
 	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name);
 	if (s){
-		s->ResetConfig();
+		s->resetConfig();
 		s->name = name;
 		return s;
 	}
-	tsunami->log->Error(_("unbekannter Synthesizer: ") + name);
+	tsunami->log->error(_("unbekannter Synthesizer: ") + name);
 	s = new DummySynthesizer;
 	s->name = name;
 	return s;

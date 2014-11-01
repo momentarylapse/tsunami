@@ -31,9 +31,9 @@ public:
 	SideBar(AudioView *view, AudioFile *audio);
 	virtual ~SideBar();
 
-	void OnClose();
-	virtual void OnShow();
-	virtual void OnHide();
+	void onClose();
+	virtual void onShow();
+	virtual void onHide();
 
 	enum
 	{
@@ -43,9 +43,9 @@ public:
 		NUM_CONSOLES
 	};
 
-	void Choose(int console);
-	void Open(int console);
-	bool IsActive(int console);
+	void choose(int console);
+	void open(int console);
+	bool isActive(int console);
 	int active_console;
 	bool visible;
 

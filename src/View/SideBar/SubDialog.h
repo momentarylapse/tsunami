@@ -20,17 +20,17 @@ public:
 	SubDialog(AudioView *view, AudioFile *audio);
 	virtual ~SubDialog();
 
-	void LoadData();
-	void ApplyData();
+	void loadData();
+	void applyData();
 
-	void OnName();
-	void OnMute();
-	void OnLevelTrack();
-	void OnVolume();
-	void OnRepNum();
-	void OnRepDelay();
+	void onName();
+	void onMute();
+	void onLevelTrack();
+	void onVolume();
+	void onRepNum();
+	void onRepDelay();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioView *view;
 	AudioFile *audio;

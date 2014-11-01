@@ -19,22 +19,22 @@ public:
 	SampleManager(AudioFile *a);
 	virtual ~SampleManager();
 
-	void FillList();
+	void fillList();
 
-	void OnListSelect();
-	void OnListEdit();
-	void OnImportFromFile();
-	void OnInsert();
-	void OnCreateFromSelection();
-	void OnDelete();
+	void onListSelect();
+	void onListEdit();
+	void onImportFromFile();
+	void onInsert();
+	void onCreateFromSelection();
+	void onDelete();
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
 	Array<string> icon_names;
 	int selected_uid;
 
-	static Sample *_cdecl Select(HuiPanel *root, AudioFile *a, Sample *old);
+	static Sample *_cdecl select(HuiPanel *root, AudioFile *a, Sample *old);
 };
 
 #endif /* SAMPLEMANAGER_H_ */

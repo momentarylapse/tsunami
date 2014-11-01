@@ -14,7 +14,7 @@ ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t, const string &p
 {
 	track_no = get_track_index(t);
 	old_value = params_old;
-	new_value = t->synth->ConfigToString();
+	new_value = t->synth->configToString();
 }
 
 ActionTrackEditSynthesizer::~ActionTrackEditSynthesizer()
@@ -29,8 +29,8 @@ void *ActionTrackEditSynthesizer::execute(Data *d)
 	assert(t);
 	assert(t->synth);
 
-	t->synth->ConfigFromString(new_value);
-	t->synth->Notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
+	t->synth->configFromString(new_value);
+	((Observable*)t->synth)->notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }
@@ -43,8 +43,8 @@ void ActionTrackEditSynthesizer::undo(Data *d)
 	assert(t);
 	assert(t->synth);
 
-	t->synth->ConfigFromString(old_value);
-	t->synth->Notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
+	t->synth->configFromString(old_value);
+	((Observable*)t->synth)->notify(t->synth->MESSAGE_CHANGE_BY_ACTION);
 }
 
 bool ActionTrackEditSynthesizer::mergable(Action *a)

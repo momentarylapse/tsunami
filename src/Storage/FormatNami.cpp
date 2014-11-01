@@ -65,7 +65,7 @@ void WriteEffect(CFile *f, Effect *e)
 	f->WriteBool(e->only_on_selection);
 	f->WriteInt(e->range.offset);
 	f->WriteInt(e->range.num);
-	f->WriteStr(e->ConfigToString());
+	f->WriteStr(e->configToString());
 	f->WriteStr(e->enabled ? "" : "disabled");
 	EndChunk(f);
 }
@@ -80,7 +80,7 @@ void WriteBufferBox(CFile *f, BufferBox *b)
 
 	Array<short> data;
 	if (!b->get_16bit_buffer(data))
-		tsunami->log->Error(_("Amplitude zu gro&s, Signal &ubersteuert."));
+		tsunami->log->error(_("Amplitude zu gro&s, Signal &ubersteuert."));
 	f->WriteBuffer(data.data, data.num * sizeof(short));
 	EndChunk(f);
 }
@@ -150,7 +150,7 @@ void WriteMidiEffect(CFile *f, MidiEffect *e)
 	f->WriteBool(e->only_on_selection);
 	f->WriteInt(e->range.offset);
 	f->WriteInt(e->range.num);
-	f->WriteStr(e->ConfigToString());
+	f->WriteStr(e->configToString());
 	f->WriteStr(e->enabled ? "" : "disabled");
 	EndChunk(f);
 }
@@ -178,7 +178,7 @@ void WriteSynth(CFile *f, Synthesizer *s)
 	BeginChunk(f, "synth");
 
 	f->WriteStr(s->name);
-	f->WriteStr(s->ConfigToString());
+	f->WriteStr(s->configToString());
 	f->WriteStr("");
 	f->WriteInt(0); // reserved
 
@@ -242,7 +242,7 @@ void WriteLevelName(CFile *f, Array<string> level_name)
 
 void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 {
-	tsunami->progress->Start(_("speichere nami"), 0);
+	tsunami->progress->start(_("speichere nami"), 0);
 	a->filename = filename;
 
 //	int length = a->GetLength();
@@ -264,7 +264,7 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 	foreachi(Track *track, a->track, i){
 		WriteTrack(f, track);
-		tsunami->progress->Set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
+		tsunami->progress->set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
 	}
 
 	foreach(Effect *effect, a->fx)
@@ -273,7 +273,7 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 	EndChunk(f);
 
 	FileClose(f);
-	tsunami->progress->End();
+	tsunami->progress->end();
 }
 
 
@@ -362,7 +362,7 @@ void ReadChunkEffect(CFile *f, Array<Effect*> *fx)
 	e->range.offset = f->ReadInt();
 	e->range.num = f->ReadInt();
 	string params = f->ReadStr();
-	e->ConfigFromString(params);
+	e->configFromString(params);
 	string temp = f->ReadStr();
 	if (temp.find("disabled") >= 0)
 		e->enabled = false;
@@ -387,7 +387,7 @@ void ReadChunkBufferBox(CFile *f, TrackLevel *l)
 	int offset = 0;
 	for (int n=0;n<(num * 4) / CHUNK_SIZE;n++){
 		f->ReadBuffer(&data[offset], CHUNK_SIZE);
-		tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());
+		tsunami->progress->set((float)f->GetPos() / (float)f->GetSize());
 		offset += CHUNK_SIZE / 2;
 	}
 	f->ReadBuffer(&data[offset], (num * 4) % CHUNK_SIZE);
@@ -460,7 +460,7 @@ void ReadSub(CFile *f, Track *t)
 	f->ReadInt();
 
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &s->buf);
-	tsunami->log->Error("\"sub\" chunk is deprecated!");
+	tsunami->log->error("\"sub\" chunk is deprecated!");
 }
 
 void ReadChunkBar(CFile *f, Array<BarPattern> *bar)
@@ -492,7 +492,7 @@ void ReadChunkMidiEffect(CFile *f, MidiData *m)
 	e->range.offset = f->ReadInt();
 	e->range.num = f->ReadInt();
 	string params = f->ReadStr();
-	e->ConfigFromString(params);
+	e->configFromString(params);
 	string temp = f->ReadStr();
 	if (temp.find("disabled") >= 0)
 		e->enabled = false;
@@ -515,7 +515,7 @@ void ReadChunkSynth(CFile *f, Track *t)
 {
 	delete(t->synth);
 	t->synth = CreateSynthesizer(f->ReadStr());
-	t->synth->ConfigFromString(f->ReadStr());
+	t->synth->configFromString(f->ReadStr());
 	f->ReadStr();
 	f->ReadInt();
 }
@@ -536,7 +536,7 @@ void ReadChunkTrack(CFile *f, AudioFile *a)
 	t->panning = f->ReadFloat();
 	f->ReadInt(); // reserved
 	f->ReadInt();
-	tsunami->progress->Set((float)f->GetPos() / (float)f->GetSize());
+	tsunami->progress->set((float)f->GetPos() / (float)f->GetSize());
 
 	AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
 	AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
@@ -590,7 +590,7 @@ void ReadChunk(CFile *f)
 			ReadChunk(f);
 
 	}else
-		tsunami->log->Error("unknown nami chunk: " + cname + " (within " + chunk_data[chunk_data.num - 2].tag + ")");
+		tsunami->log->error("unknown nami chunk: " + cname + " (within " + chunk_data[chunk_data.num - 2].tag + ")");
 
 
 	f->SetPos(chunk_data.back().pos, true);
@@ -621,7 +621,7 @@ void check_empty_subs(AudioFile *a)
 void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_f("load_nami_file", 1);
-	tsunami->progress->Set(_("lade nami"), 0);
+	tsunami->progress->set(_("lade nami"), 0);
 
 	// TODO?
 	a->tag.clear();

@@ -45,7 +45,7 @@ public:
 	void SaveFavorite(Configurable *c, const string &name);
 	string SelectFavoriteName(HuiWindow *win, Configurable *c, bool save);
 
-	virtual void OnUpdate(Observable *o, const string &message);
+	virtual void onUpdate(Observable *o, const string &message);
 
 	Effect *LoadEffect(const string &name);
 	MidiEffect *LoadMidiEffect(const string &name);

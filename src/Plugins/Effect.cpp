@@ -47,39 +47,39 @@ void Effect::__delete__()
 	this->Configurable::~Configurable();
 }
 
-void Effect::Prepare()
+void Effect::prepare()
 {
 	msg_db_f("Effect.Prepare", 1);
-	ResetState();
+	resetState();
 	if (!usable)
-		tsunami->log->Error(GetError());
+		tsunami->log->error(getError());
 }
 
-string Effect::GetError()
+string Effect::getError()
 {
 	if (plugin)
 		return plugin->GetError();
 	return format(_("Effekt nicht ladbar: \"%s\""), name.c_str());
 }
 
-void Effect::Apply(BufferBox &buf, Track *t, bool log_error)
+void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 {
 	msg_db_f("Effect.Apply", 1);
 
 	// run
 	tsunami->plugin_manager->context.set(t, 0, buf.range());
-	ProcessTrack(&buf);
+	processTrack(&buf);
 
 	if (!usable){
 		msg_error("not usable... apply");
 		if (log_error)
-			tsunami->log->Error(_("Beim Anwenden eines Effekts: ") + GetError());
+			tsunami->log->error(_("Beim Anwenden eines Effekts: ") + getError());
 	}
 }
 
 
 
-void Effect::DoProcessTrack(Track *t, int level_no, const Range &r)
+void Effect::doProcessTrack(Track *t, int level_no, const Range &r)
 {
 	msg_db_f("Effect.DoProcessTrack", 1);
 
@@ -87,7 +87,7 @@ void Effect::DoProcessTrack(Track *t, int level_no, const Range &r)
 
 	BufferBox buf = t->GetBuffers(level_no, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
-	ProcessTrack(&buf);
+	processTrack(&buf);
 	t->root->Execute(a);
 }
 
@@ -97,7 +97,7 @@ Effect *CreateEffect(const string &name)
 	Effect *f = tsunami->plugin_manager->LoadEffect(name);
 	if (f){
 		f->name = name;
-		f->ResetConfig();
+		f->resetConfig();
 		return f;
 	}
 	f = new Effect;

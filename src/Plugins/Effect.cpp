@@ -85,10 +85,10 @@ void Effect::doProcessTrack(Track *t, int level_no, const Range &r)
 
 	tsunami->plugin_manager->context.set(t, level_no, r);
 
-	BufferBox buf = t->GetBuffers(level_no, r);
+	BufferBox buf = t->getBuffers(level_no, r);
 	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
 	processTrack(&buf);
-	t->root->Execute(a);
+	t->root->execute(a);
 }
 
 

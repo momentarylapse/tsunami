@@ -17,12 +17,12 @@ MidiNote::MidiNote(const Range &_range, float _pitch, float _volume)
 	volume = _volume;
 }
 
-float MidiNote::GetFrequency()
+float MidiNote::getFrequency()
 {
 	return 440.0f * pow(2.0f, (float)(pitch - 69) / 12.0f);
 }
 
-Array<MidiNote> MidiData::GetNotes(const Range &r)
+Array<MidiNote> MidiData::getNotes(const Range &r)
 {
 	Array<MidiNote> a;
 	for (int i=0;i<num;i++)
@@ -31,12 +31,12 @@ Array<MidiNote> MidiData::GetNotes(const Range &r)
 	return a;
 }
 
-int MidiData::GetNextNote(int pos)
+int MidiData::getNextNote(int pos)
 {
 	return 0;
 }
 
-Range MidiData::GetRange()
+Range MidiData::getRange()
 {
 	if (num == 0)
 		return Range(0, 0);

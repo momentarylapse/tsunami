@@ -44,19 +44,19 @@ void LevelConsole::onLevelsEdit()
 	int r = HuiGetEvent()->row;
 	if (r < 0)
 		return;
-	audio->RenameLevel(r, getCell("levels", r, 1));
+	audio->renameLevel(r, getCell("levels", r, 1));
 }
 
 void LevelConsole::onAddLevel()
 {
-	audio->AddLevel("");
+	audio->addLevel("");
 }
 
 void LevelConsole::onDeleteLevel()
 {
 	int s = getInt("levels");
 	if (s >= 0)
-		audio->DeleteLevel(s, false);
+		audio->deleteLevel(s, false);
 }
 
 

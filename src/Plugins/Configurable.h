@@ -47,7 +47,6 @@ public:
 	virtual void _cdecl resetState();
 	bool configure();
 	virtual ConfigPanel *_cdecl createPanel();
-	//virtual void _cdecl updateDialog();
 	void _cdecl notify();
 
 	PluginData *get_config();
@@ -56,9 +55,8 @@ public:
 	string configToString();
 	void configFromString(const string &options);
 
-	string name;
 	int configurable_type;
-	//AutoConfigPanel *_auto_panel_;
+	string name;
 
 
 	enum

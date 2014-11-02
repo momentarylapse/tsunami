@@ -24,7 +24,7 @@ public:
 	~Sample();
 
 	int get_index();
-	Range GetRange();
+	Range getRange();
 
 	AudioFile *owner;
 
@@ -57,8 +57,8 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	Track *GetParent();
-	Range GetRange();
+	Track *getParent();
+	Range getRange();
 
 	int get_index();
 

@@ -79,82 +79,82 @@ const string AudioFile::MESSAGE_ADD_CURVE = "AddCurve";
 const string AudioFile::MESSAGE_DELETE_CURVE = "DeleteCurve";
 
 
-void AudioFile::AddTag(const string &key, const string &value)
+void AudioFile::addTag(const string &key, const string &value)
 {
-	Execute(new ActionAudioAddTag(Tag(key, value)));
+	execute(new ActionAudioAddTag(Tag(key, value)));
 }
 
-void AudioFile::EditTag(int index, const string &key, const string &value)
+void AudioFile::editTag(int index, const string &key, const string &value)
 {
-	Execute(new ActionAudioEditTag(index, Tag(key, value)));
+	execute(new ActionAudioEditTag(index, Tag(key, value)));
 }
 
-void AudioFile::DeleteTag(int index)
+void AudioFile::deleteTag(int index)
 {
-	Execute(new ActionAudioDeleteTag(index));
+	execute(new ActionAudioDeleteTag(index));
 }
 
-void AudioFile::AddEffect(Effect *effect)
+void AudioFile::addEffect(Effect *effect)
 {
-	Execute(new ActionTrackAddEffect(NULL, effect));
+	execute(new ActionTrackAddEffect(NULL, effect));
 }
 
 // execute after editing...
-void AudioFile::EditEffect(int index, const string &param_old)
+void AudioFile::editEffect(int index, const string &param_old)
 {
-	Execute(new ActionTrackEditEffect(NULL, index, param_old, fx[index]));
+	execute(new ActionTrackEditEffect(NULL, index, param_old, fx[index]));
 }
 
-void AudioFile::EnableEffect(int index, bool enabled)
+void AudioFile::enableEffect(int index, bool enabled)
 {
 	if (fx[index]->enabled != enabled)
-		Execute(new ActionTrackToggleEffectEnabled(NULL, index));
+		execute(new ActionTrackToggleEffectEnabled(NULL, index));
 }
 
-void AudioFile::DeleteEffect(int index)
+void AudioFile::deleteEffect(int index)
 {
-	Execute(new ActionTrackDeleteEffect(NULL, index));
+	execute(new ActionTrackDeleteEffect(NULL, index));
 }
 
-void AudioFile::SetVolume(float volume)
+void AudioFile::setVolume(float volume)
 {
-	Execute(new ActionAudioSetVolume(this, volume));
+	execute(new ActionAudioSetVolume(this, volume));
 }
 
-void AudioFile::NewEmpty(int _sample_rate)
+void AudioFile::newEmpty(int _sample_rate)
 {
 	msg_db_f("AudioFile.NewEmpty",1);
 
-	Reset();
-	action_manager->Enable(false);
+	reset();
+	action_manager->enable(false);
 	sample_rate = _sample_rate;
 
 	// default tags
-	AddTag("title", "new audio file");//_("neue Audiodatei"));
-	AddTag("album", "tsunami");//AppTitle + " " + AppVersion);
-	AddTag("artist", "tsunami");//AppTitle);
+	addTag("title", "new audio file");//_("neue Audiodatei"));
+	addTag("album", "tsunami");//AppTitle + " " + AppVersion);
+	addTag("artist", "tsunami");//AppTitle);
 
-	action_manager->Enable(true);
+	action_manager->enable(true);
 	notify();
 }
 
-void AudioFile::NewWithOneTrack(int track_type, int _sample_rate)
+void AudioFile::newWithOneTrack(int track_type, int _sample_rate)
 {
 	msg_db_f("AudioFile.NewWithOneTrack",1);
 
 	notifyBegin();
-	NewEmpty(_sample_rate);
-	action_manager->Enable(false);
-	AddTrack(track_type);
-	action_manager->Enable(true);
+	newEmpty(_sample_rate);
+	action_manager->enable(false);
+	addTrack(track_type);
+	action_manager->enable(true);
 	notifyEnd();
 }
 
 // delete all data
-void AudioFile::Reset()
+void AudioFile::reset()
 {
 	msg_db_f("AudioFile.Reset",1);
-	action_manager->Reset();
+	action_manager->reset();
 
 	filename = "";
 	tag.clear();
@@ -178,7 +178,7 @@ void AudioFile::Reset()
 	level_name.clear();
 	level_name.add("");
 
-	action_manager->Reset();
+	action_manager->reset();
 
 	notify();
 	notify(MESSAGE_NEW);
@@ -186,23 +186,23 @@ void AudioFile::Reset()
 
 AudioFile::~AudioFile()
 {
-	Reset();
+	reset();
 }
 
 
-void AudioFile::UpdateSelection(const Range &range)
+void AudioFile::updateSelection(const Range &range)
 {
 	msg_db_f("UpdateSelection", 1);
 
 	// subs
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
-			s->is_selected = (t->is_selected) && range.overlaps(s->GetRange());
+			s->is_selected = (t->is_selected) && range.overlaps(s->getRange());
 	notify(MESSAGE_SELECTION_CHANGE);
 }
 
 
-void AudioFile::UnselectAllSamples()
+void AudioFile::unselectAllSamples()
 {
 	foreach(Track *t, track)
 		foreach(SampleRef *s, t->sample)
@@ -211,12 +211,12 @@ void AudioFile::UnselectAllSamples()
 }
 
 
-bool AudioFile::Load(const string & filename, bool deep)
+bool AudioFile::load(const string & filename, bool deep)
 {
 	return tsunami->storage->load(this, filename);
 }
 
-bool AudioFile::Save(const string & filename)
+bool AudioFile::save(const string & filename)
 {
 	return tsunami->storage->save(this, filename);
 }
@@ -227,7 +227,7 @@ Range AudioFile::GetRange()
 	int max = -1073741824;
 	Range r = Range(min, max - min);
 	foreach(Track *t, track)
-		r = r || t->GetRangeUnsafe();
+		r = r || t->getRangeUnsafe();
 
 	if (r.length() < 0)
 		return Range(0, 0);
@@ -286,34 +286,34 @@ string AudioFile::get_time_str_long(int t)
 
 
 
-Track *AudioFile::AddTrack(int type, int index)
+Track *AudioFile::addTrack(int type, int index)
 {
 	if (type == Track::TYPE_TIME){
 		// force single time track
-		if (GetTimeTrack()){
+		if (getTimeTrack()){
 			tsunami->log->error(_("Es existiert schon eine Rhythmus-Spur."));
 			return NULL;
 		}
 	}
 	if (index < 0)
 		index = track.num;
-	return (Track*)Execute(new ActionTrackAdd(index, type));
+	return (Track*)execute(new ActionTrackAdd(index, type));
 }
 
 extern HuiTimer debug_timer;
 
-void AudioFile::UpdatePeaks(int mode)
+void AudioFile::updatePeaks(int mode)
 {
 	msg_db_f("Audio.UpdatePeaks", 2);
 	debug_timer.reset();
 	foreach(Track *t, track)
-		t->UpdatePeaks(mode);
+		t->updatePeaks(mode);
 	foreach(Sample *s, sample)
 		s->buf.update_peaks(mode);
 	//msg_write(format("up %f", debug_timer.get()));
 }
 
-int AudioFile::GetNumSelectedSamples()
+int AudioFile::getNumSelectedSamples()
 {
 	int n = 0;
 	foreach(Track *t, track)
@@ -323,77 +323,77 @@ int AudioFile::GetNumSelectedSamples()
 	return n;
 }
 
-void AudioFile::InsertSelectedSamples(int level_no)
+void AudioFile::insertSelectedSamples(int level_no)
 {
-	if (GetNumSelectedSamples() > 0)
-		Execute(new ActionTrackInsertSelectedSamples(this, level_no));
+	if (getNumSelectedSamples() > 0)
+		execute(new ActionTrackInsertSelectedSamples(this, level_no));
 }
 
-void AudioFile::DeleteSelectedSamples()
+void AudioFile::deleteSelectedSamples()
 {
-	action_manager->BeginActionGroup();
+	action_manager->beginActionGroup();
 	foreachi(Track *t, track, i){
 		for (int j=t->sample.num-1;j>=0;j--)
 			if (t->sample[j]->is_selected)
-				t->DeleteSample(j);
+				t->deleteSample(j);
 	}
-	action_manager->EndActionGroup();
+	action_manager->endActionGroup();
 }
 
-void AudioFile::AddLevel(const string &name)
+void AudioFile::addLevel(const string &name)
 {
-	Execute(new ActionAudioAddLevel(name));
+	execute(new ActionAudioAddLevel(name));
 }
 
-void AudioFile::DeleteLevel(int index, bool merge)
+void AudioFile::deleteLevel(int index, bool merge)
 {
 	tsunami->log->error(_("Ebene l&oschen: noch nicht implementiert..."));
 }
 
-void AudioFile::RenameLevel(int index, const string &name)
+void AudioFile::renameLevel(int index, const string &name)
 {
-	Execute(new ActionAudioRenameLevel(index, name));
+	execute(new ActionAudioRenameLevel(index, name));
 }
 
-void AudioFile::DeleteTrack(int index)
+void AudioFile::deleteTrack(int index)
 {
-	Execute(new ActionTrackDelete(this, index));
+	execute(new ActionTrackDelete(this, index));
 }
 
-Sample *AudioFile::AddSample(const string &name, BufferBox &buf)
+Sample *AudioFile::addSample(const string &name, BufferBox &buf)
 {
-	return (Sample*)Execute(new ActionAudioAddSample(name, buf));
+	return (Sample*)execute(new ActionAudioAddSample(name, buf));
 }
 
-void AudioFile::DeleteSample(int index)
+void AudioFile::deleteSample(int index)
 {
 	if (sample[index]->ref_count == 0)
-		Execute(new ActionAudioDeleteSample(index));
+		execute(new ActionAudioDeleteSample(index));
 	else
 		tsunami->log->error(_("Kann nur Samples l&oschen, die nicht benutzt werden!"));
 }
 
-void AudioFile::EditSampleName(int index, const string &name)
+void AudioFile::editSampleName(int index, const string &name)
 {
-	Execute(new ActionAudioSampleEditName(this, index, name));
+	execute(new ActionAudioSampleEditName(this, index, name));
 }
 
-void AudioFile::DeleteSelection(int level_no, const Range &range, bool all_levels)
-{
-	if (!range.empty())
-		Execute(new ActionAudioDeleteSelection(this, level_no, range, all_levels));
-}
-
-void AudioFile::CreateSamplesFromSelection(int level_no, const Range &range)
+void AudioFile::deleteSelection(int level_no, const Range &range, bool all_levels)
 {
 	if (!range.empty())
-		Execute(new ActionTrackSampleFromSelection(this, range, level_no));
+		execute(new ActionAudioDeleteSelection(this, level_no, range, all_levels));
 }
 
-void AudioFile::InvalidateAllPeaks()
+void AudioFile::createSamplesFromSelection(int level_no, const Range &range)
+{
+	if (!range.empty())
+		execute(new ActionTrackSampleFromSelection(this, range, level_no));
+}
+
+void AudioFile::invalidateAllPeaks()
 {
 	foreach(Track *t, track)
-		t->InvalidateAllPeaks();
+		t->invalidateAllPeaks();
 	foreach(Sample *s, sample)
 		s->buf.invalidate_peaks(s->buf.range());
 }
@@ -448,7 +448,7 @@ MidiEffect *AudioFile::get_midi_fx(int track_no, int index)
 	return t->midi.fx[index];
 }
 
-Track *AudioFile::GetTimeTrack()
+Track *AudioFile::getTimeTrack()
 {
 	foreach(Track *t, track)
 		if (t->type == t->TYPE_TIME)
@@ -456,15 +456,15 @@ Track *AudioFile::GetTimeTrack()
 	return NULL;
 }
 
-int AudioFile::GetNextBeat(int pos)
+int AudioFile::getNextBeat(int pos)
 {
-	Track *t = GetTimeTrack();
+	Track *t = getTimeTrack();
 	if (!t)
 		return pos;
-	return t->bar.GetNextBeat(pos);
+	return t->bar.getNextBeat(pos);
 }
 
-string AudioFile::GetNiceLevelName(int index)
+string AudioFile::getNiceLevelName(int index)
 {
 	if (level_name[index].num > 0)
 		return level_name[index];

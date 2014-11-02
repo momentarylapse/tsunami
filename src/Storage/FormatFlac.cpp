@@ -37,7 +37,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
-	BufferBox buf = flac_track->GetBuffers(flac_level, range);
+	BufferBox buf = flac_track->getBuffers(flac_level, range);
 	Action *a = new ActionTrackEditBuffer(flac_track, 0, range);
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
@@ -45,7 +45,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 				buf.r[i] = buffer[j][i] / 32768.0f;
 			else
 				buf.l[i] = buffer[j][i] / 32768.0f;
-	flac_track->root->Execute(a);
+	flac_track->root->execute(a);
 
 	flac_read_samples += frame->header.blocksize;
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
@@ -66,7 +66,7 @@ void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stre
 			string s = (char*)metadata->data.vorbis_comment.comments[i].entry;
 			int pos = s.find("=");
 			if (pos >= 0)
-				flac_track->root->AddTag(s.head(pos).lower(), s.tail(s.num - pos - 1));
+				flac_track->root->addTag(s.head(pos).lower(), s.tail(s.num - pos - 1));
 		}
 	}else{
 		tsunami->log->warning("flac_metadata_callback: unhandled type: " + i2s(metadata->type));
@@ -88,11 +88,11 @@ FormatFlac::~FormatFlac()
 {
 }
 
-void FormatFlac::LoadTrack(Track *t, const string & filename, int offset, int level)
+void FormatFlac::loadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("load_flac_file", 1);
 	tsunami->progress->set(_("lade flac"), 0);
-	t->root->action_manager->BeginActionGroup();
+	t->root->action_manager->beginActionGroup();
 	bool ok = true;
 
 	flac_file_size = 1000000000;
@@ -137,7 +137,7 @@ void FormatFlac::LoadTrack(Track *t, const string & filename, int offset, int le
 
 
 	t->root->sample_rate = flac_freq;
-	t->root->action_manager->EndActionGroup();
+	t->root->action_manager->endActionGroup();
 }
 
 
@@ -155,14 +155,14 @@ static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 
 
-void FormatFlac::SaveAudio(AudioFile *a, const string & filename)
+void FormatFlac::saveAudio(AudioFile *a, const string & filename)
 {
-	ExportAudioAsTrack(a, filename);
+	exportAudioAsTrack(a, filename);
 }
 
 
 
-void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
+void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 {
 	tsunami->progress->set(_("exportiere flac"), 0);
 
@@ -247,10 +247,10 @@ void FormatFlac::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 
 
-void FormatFlac::LoadAudio(AudioFile *a, const string & filename)
+void FormatFlac::loadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddTrack(Track::TYPE_AUDIO, 0);
-	LoadTrack(t, filename);
+	Track *t = a->addTrack(Track::TYPE_AUDIO, 0);
+	loadTrack(t, filename);
 }
 
 

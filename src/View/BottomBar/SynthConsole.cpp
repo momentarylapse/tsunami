@@ -62,7 +62,7 @@ public:
 		if (name.num == 0)
 			return;
 		tsunami->plugin_manager->ApplyFavorite(synth, name);
-		track->EditSynthesizer(old_param);
+		track->editSynthesizer(old_param);
 		old_param = synth->configToString();
 	}
 	void onSave()
@@ -75,7 +75,7 @@ public:
 	virtual void onUpdate(Observable *o, const string &message)
 	{
 		if (message == o->MESSAGE_CHANGE){
-			track->EditSynthesizer(old_param);
+			track->editSynthesizer(old_param);
 		}
 		p->update();
 		old_param = synth->configToString();
@@ -137,7 +137,7 @@ void SynthConsole::setTrack(Track *t)
 	if (track){
 		subscribe(track, track->MESSAGE_DELETE);
 		subscribe(track, track->MESSAGE_CHANGE);
-		setString("track_name", format(_("!angle=90\\f&ur die Spur '%s'"), track->GetNiceName().c_str()));
+		setString("track_name", format(_("!angle=90\\f&ur die Spur '%s'"), track->getNiceName().c_str()));
 
 		if (track->synth){
 			subscribe(track->synth, track->synth->MESSAGE_DELETE);

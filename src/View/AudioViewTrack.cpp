@@ -138,7 +138,7 @@ void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_
 void AudioViewTrack::drawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay)
 {
 	// frame
-	Range rr = s->GetRange() + delay;
+	Range rr = s->getRange() + delay;
 	int asx = clampi(view->sample2screen(rr.start()), r.x1, r.x2);
 	int aex = clampi(view->sample2screen(rr.end()), r.x1, r.x2);
 
@@ -271,7 +271,7 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, color col, int trac
 	//c->setColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 //	c->setColor(ColorWaveCur);
 	c->setFont("", -1, (track == view->cur_track), false);
-	DrawStrBg(c, r.x1 + 23, r.y1 + 3, track->GetNiceName(), view->ColorWaveCur, view->ColorBackgroundCurWave);
+	DrawStrBg(c, r.x1 + 23, r.y1 + 3, track->getNiceName(), view->ColorWaveCur, view->ColorBackgroundCurWave);
 	c->setFont("", -1, false, false);
 
 	if (track->type == track->TYPE_TIME)

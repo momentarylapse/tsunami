@@ -46,7 +46,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	enable("ok", false);
 
 	foreach(Track *t, a->track)
-		addString("capture_target", t->GetNiceName() + "     (" + track_type(t->type) + ")");
+		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	addString("capture_target", _("neue Spur anlegen"));
 	if (view->cur_track)
 		setInt("capture_target", get_track_index(view->cur_track));
@@ -184,7 +184,7 @@ bool CaptureDialog::insert()
 
 	if (target >= audio->track.num){
 		// new track
-		t = audio->AddTrack(type, audio->track.num);
+		t = audio->addTrack(type, audio->track.num);
 	}else{
 		// overwrite
 		t = audio->track[target];
@@ -199,14 +199,14 @@ bool CaptureDialog::insert()
 	// insert data
 	if (type == t->TYPE_AUDIO){
 		Range r = Range(i0, tsunami->input->getSampleCount());
-		audio->action_manager->BeginActionGroup();
-		BufferBox tbuf = t->GetBuffers(tsunami->win->view->cur_level, r);
+		audio->action_manager->beginActionGroup();
+		BufferBox tbuf = t->getBuffers(tsunami->win->view->cur_level, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->win->view->cur_level, r);
 		tbuf.set(tsunami->input->buffer, 0, 1.0f);
-		audio->Execute(a);
-		audio->action_manager->EndActionGroup();
+		audio->execute(a);
+		audio->action_manager->endActionGroup();
 	}else if (type == t->TYPE_MIDI){
-		t->InsertMidiData(i0, tsunami->input->midi);
+		t->insertMidiData(i0, tsunami->input->midi);
 	}
 	tsunami->input->resetAccumulation();
 	return true;

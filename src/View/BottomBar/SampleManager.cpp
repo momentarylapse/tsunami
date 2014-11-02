@@ -63,7 +63,7 @@ void render_midi(Image &im, MidiData &m)
 {
 	int w = im.width;
 	int h = im.height;
-	Range r = m.GetRange();
+	Range r = m.getRange();
 	foreach(MidiNote &n, m){
 		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n.range.offset / (float)r.num, 0, 1);
@@ -93,7 +93,7 @@ void SampleManager::fillList()
 	icon_names.clear();
 	foreachi(Sample *s, audio->sample, i){
 		icon_names.add(render_sample(s));
-		setString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->GetRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
+		setString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->getRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
 	int sel = audio->get_sample_by_uid(selected_uid);
 	setInt("sample_list", sel);
@@ -116,7 +116,7 @@ void SampleManager::onListEdit()
 	int sel = HuiGetEvent()->row;
 	int col = HuiGetEvent()->column;
 	if (col == 2)
-		audio->EditSampleName(sel, getCell("sample_list", sel, 2));
+		audio->editSampleName(sel, getCell("sample_list", sel, 2));
 	else if (col == 5)
 		audio->sample[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
 }
@@ -126,7 +126,7 @@ void SampleManager::onImportFromFile()
 	if (tsunami->storage->askOpenImport(win)){
 		BufferBox buf;
 		tsunami->storage->loadBufferBox(audio, &buf, HuiFilename);
-		Sample *s = audio->AddSample(HuiFilename.basename(), buf);
+		Sample *s = audio->addSample(HuiFilename.basename(), buf);
 		selected_uid = s->uid;
 		setInt("sample_list", audio->sample.num - 1);
 		enable("delete_sample", true);
@@ -138,12 +138,12 @@ void SampleManager::onInsert()
 {
 	int n = getInt("sample_list");
 	if (n >= 0)
-		tsunami->win->view->cur_track->AddSample(tsunami->win->view->sel_range.start(), n);
+		tsunami->win->view->cur_track->addSample(tsunami->win->view->sel_range.start(), n);
 }
 
 void SampleManager::onCreateFromSelection()
 {
-	audio->CreateSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
+	audio->createSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
 	if (audio->sample.num > 0){
 		selected_uid = audio->sample.back()->uid;
 		enable("delete_sample", true);
@@ -155,7 +155,7 @@ void SampleManager::onDelete()
 {
 	int n = getInt("sample_list");
 	if (n >= 0)
-		audio->DeleteSample(n);
+		audio->deleteSample(n);
 }
 
 void SampleManager::onUpdate(Observable *o, const string &message)

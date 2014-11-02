@@ -21,9 +21,9 @@ FormatM4a::~FormatM4a()
 {
 }
 
-void FormatM4a::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
+void FormatM4a::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
 
-void FormatM4a::LoadTrack(Track *t, const string & filename, int offset, int level)
+void FormatM4a::loadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("load_m4a_file", 1);
 	tsunami->progress->set(_("lade m4a"), 0);
@@ -37,11 +37,11 @@ void FormatM4a::LoadTrack(Track *t, const string & filename, int offset, int lev
 		tsunami->log->error("mp3: need external program 'avconv' to decode");
 }
 
-void FormatM4a::SaveAudio(AudioFile *a, const string & filename){}
+void FormatM4a::saveAudio(AudioFile *a, const string & filename){}
 
-void FormatM4a::LoadAudio(AudioFile *a, const string & filename)
+void FormatM4a::loadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddTrack(Track::TYPE_AUDIO);
-	LoadTrack(t, filename);
+	Track *t = a->addTrack(Track::TYPE_AUDIO);
+	loadTrack(t, filename);
 }
 

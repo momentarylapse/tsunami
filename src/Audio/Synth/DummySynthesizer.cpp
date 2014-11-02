@@ -23,7 +23,7 @@ void DummySynthesizer::__init__()
 	new(this) DummySynthesizer;
 }
 
-void DummySynthesizer::RenderNote(BufferBox& buf, const Range& range, float pitch, float volume)
+void DummySynthesizer::renderNote(BufferBox& buf, const Range& range, float pitch, float volume)
 {
 	float freq = pitch_to_freq(pitch);
 	float f_w = 1.0f / sample_rate * freq * 2.0f * pi;

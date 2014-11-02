@@ -59,27 +59,25 @@ bool Storage::load(AudioFile *a, const string &filename)
 	string ext = filename.extension();
 
 	foreach(Format *f, format)
-		if (f->CanHandle(ext)){
+		if (f->canHandle(ext)){
 			tsunami->progress->start(_("lade"), 0);
 
-			a->notifyBegin();
-
-			a->Reset();
-			a->action_manager->Enable(false);
+			a->reset();
+			a->action_manager->enable(false);
 			a->filename = filename;
 
-			f->LoadAudio(a, filename);
+			f->loadAudio(a, filename);
 
 
-			a->action_manager->Enable(true);
+			a->action_manager->enable(true);
 			//tsunami->progress->Set("peaks", 1);
 
 			tsunami->progress->end();
 			if (a->track.num > 0)
 			{}//	a->SetCurTrack(a->track[0]);
-			a->action_manager->Reset();
+			a->action_manager->reset();
+			a->notify(a->MESSAGE_NEW);
 			a->notify(a->MESSAGE_CHANGE);
-			a->notifyEnd();
 			ok = (a->track.num > 0);
 			found = true;
 			break;
@@ -101,18 +99,16 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 	string ext = filename.extension();
 
 	foreach(Format *f, format)
-		if (f->CanHandle(ext)){
+		if (f->canHandle(ext)){
 			tsunami->progress->start(_("lade"), 0);
 
 			AudioFile *a = t->root;
-			a->notifyBegin();
-			a->action_manager->BeginActionGroup();
+			a->action_manager->beginActionGroup();
 
-			f->LoadTrack(t, filename, offset, level);
+			f->loadTrack(t, filename, offset, level);
 
 			tsunami->progress->end();
-			a->action_manager->EndActionGroup();
-			a->notifyEnd();
+			a->action_manager->endActionGroup();
 			found = true;
 			break;
 		}
@@ -127,7 +123,7 @@ bool Storage::loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename
 {
 	msg_db_f("Storage.LoadBufferBox", 1);
 	AudioFile *aa = new AudioFile;
-	aa->NewWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
+	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->track[0];
 	bool ok = loadTrack(t, filename, 0, 0);
 	buf->resize(t->level[0].buffer[0].num);
@@ -146,17 +142,17 @@ bool Storage::save(AudioFile *a, const string &filename)
 	string ext = filename.extension();
 
 	foreach(Format *f, format)
-		if (f->CanHandle(ext)){
-			if (!f->TestFormatCompatibility(a))
+		if (f->canHandle(ext)){
+			if (!f->testFormatCompatibility(a))
 				tsunami->log->warning(_("Datenverlust!"));
 
 			tsunami->progress->start(_("speichere"), 0);
 
 			a->filename = filename;
 
-			f->SaveAudio(a, filename);
+			f->saveAudio(a, filename);
 
-			a->action_manager->MarkCurrentAsSave();
+			a->action_manager->markCurrentAsSave();
 			tsunami->progress->end();
 			if (tsunami->win)
 				tsunami->win->updateMenu();
@@ -181,7 +177,7 @@ bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
 	string ext = filename.extension();
 
 	foreach(Format *f, format)
-		if (f->CanHandle(ext)){
+		if (f->canHandle(ext)){
 			tsunami->progress->start(_("exportiere"), 0);
 
 			// render audio...
@@ -190,7 +186,7 @@ bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
 			tsunami->renderer->RenderAudioFile(a, r, buf);
 
 			// save
-			f->SaveBuffer(a, &buf, filename);
+			f->saveBuffer(a, &buf, filename);
 
 			tsunami->progress->end();
 			ok = true;

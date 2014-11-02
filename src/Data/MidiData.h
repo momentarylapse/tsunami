@@ -18,7 +18,7 @@ class MidiNote
 public:
 	MidiNote(){}
 	MidiNote(const Range &range, float pitch, float volume);
-	float GetFrequency();
+	float getFrequency();
 	Range range;
 	float pitch;
 	float volume;
@@ -37,9 +37,9 @@ public:
 class MidiData : public Array<MidiNote>
 {
 public:
-	Array<MidiNote> GetNotes(const Range &r);
-	int GetNextNote(int pos);
-	Range GetRange();
+	Array<MidiNote> getNotes(const Range &r);
+	int getNextNote(int pos);
+	Range getRange();
 
 	void sort();
 

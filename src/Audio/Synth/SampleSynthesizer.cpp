@@ -32,7 +32,7 @@ void SampleSynthesizer::__delete__()
 	samples.clear();
 }
 
-void SampleSynthesizer::RenderNote(BufferBox& buf, const Range& range, float pitch, float volume)
+void SampleSynthesizer::renderNote(BufferBox& buf, const Range& range, float pitch, float volume)
 {
 	if ((pitch < 0) || (pitch >= samples.num))
 		return;

@@ -48,7 +48,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 	msg_db_f("bb_render_audio_track_no_fx", 1);
 
 	// track buffer
-	BufferBox buf0 = t->ReadBuffersCol(range_cur);
+	BufferBox buf0 = t->readBuffersCol(range_cur);
 	buf.swap_ref(buf0);
 
 	// subs
@@ -90,7 +90,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	make_silence(buf, range_cur.length());
 
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
-	Array<Beat> beats = t->bar.GetBeats(r);
+	Array<Beat> beats = t->bar.getBeats(r);
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(Beat &b, beats)
@@ -108,7 +108,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 		m = &midi[ti];
 
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
-	Array<MidiNote> notes = m->GetNotes(r);
+	Array<MidiNote> notes = m->getNotes(r);
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(MidiNote &n, notes){

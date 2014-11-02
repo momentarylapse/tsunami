@@ -65,6 +65,7 @@ OBJ = \
  Audio/AudioInputMidi.o\
  Audio/AudioOutput.o\
  Audio/AudioRenderer.o\
+ Audio/AudioStream.o\
  Data/AudioFile.o\
  Data/BufferBox.o\
  Data/Curve.o\
@@ -426,6 +427,9 @@ Audio/AudioOutput.o : Audio/AudioOutput.cpp
 
 Audio/AudioRenderer.o : Audio/AudioRenderer.cpp
 	$(CPP) -c Audio/AudioRenderer.cpp -o $@ $(CXXFLAGS)
+
+Audio/AudioStream.o : Audio/AudioStream.cpp
+	$(CPP) -c Audio/AudioStream.cpp -o $@ $(CXXFLAGS)
 
 Data/AudioFile.o : Data/AudioFile.cpp
 	$(CPP) -c Data/AudioFile.cpp -o $@ $(CXXFLAGS)

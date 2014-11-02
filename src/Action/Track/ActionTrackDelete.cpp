@@ -20,14 +20,14 @@ ActionTrackDelete::ActionTrackDelete(AudioFile *a, int index)
 	// delete buffers
 	foreachi(TrackLevel &l, t->level, li)
 		for (int i=l.buffer.num-1;i>=0;i--)
-			AddSubAction(new ActionTrack__DeleteBufferBox(t, li, i), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, li, i), a);
 
 	// delete samples
 	for (int i=t->sample.num-1;i>=0;i--)
-		AddSubAction(new ActionTrackDeleteSample(t, i), a);
+		addSubAction(new ActionTrackDeleteSample(t, i), a);
 
 	// delete the track itself
-	AddSubAction(new ActionTrack__DeleteEmpty(index), a);
+	addSubAction(new ActionTrack__DeleteEmpty(index), a);
 }
 
 ActionTrackDelete::~ActionTrackDelete()

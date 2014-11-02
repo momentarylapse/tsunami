@@ -22,20 +22,20 @@ class ActionManager
 public:
 	ActionManager(Data *_data);
 	virtual ~ActionManager();
-	void Reset();
-	void Enable(bool _enabled);
+	void reset();
+	void enable(bool _enabled);
 
-	void *Execute(Action *a);
-	void Undo();
-	void Redo();
+	void *execute(Action *a);
+	void undo();
+	void redo();
 
-	void BeginActionGroup();
-	void EndActionGroup();
+	void beginActionGroup();
+	void endActionGroup();
 
-	bool Undoable();
-	bool Redoable();
-	bool IsSave();
-	void MarkCurrentAsSave();
+	bool undoable();
+	bool redoable();
+	bool isSave();
+	void markCurrentAsSave();
 
 private:
 	void truncate();

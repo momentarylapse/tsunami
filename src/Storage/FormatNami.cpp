@@ -240,7 +240,7 @@ void WriteLevelName(CFile *f, Array<string> level_name)
 	EndChunk(f);
 }
 
-void FormatNami::SaveAudio(AudioFile *a, const string & filename)
+void FormatNami::saveAudio(AudioFile *a, const string & filename)
 {
 	tsunami->progress->start(_("speichere nami"), 0);
 	a->filename = filename;
@@ -278,7 +278,7 @@ void FormatNami::SaveAudio(AudioFile *a, const string & filename)
 
 
 
-void FormatNami::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatNami::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 }
 
@@ -306,8 +306,8 @@ SampleRef *__AddEmptySubTrack(Track *t, const Range &r, const string &name)
 {
 	BufferBox buf;
 	buf.resize(r.length());
-	t->root->AddSample(name, buf);
-	return t->AddSample(r.start(), t->root->sample.num - 1);
+	t->root->addSample(name, buf);
+	return t->addSample(r.start(), t->root->sample.num - 1);
 }
 
 typedef void chunk_reader(CFile*, void*);
@@ -437,7 +437,7 @@ void ReadSampleRef(CFile *f, Track *t)
 	string name = f->ReadStr();
 	int pos = f->ReadInt();
 	int index = f->ReadInt();
-	SampleRef *s = t->AddSample(pos, index);
+	SampleRef *s = t->addSample(pos, index);
 	s->volume = f->ReadFloat();
 	s->muted = f->ReadBool();
 	s->rep_num = f->ReadInt();
@@ -528,7 +528,7 @@ void ReadChunkTrackLevel(CFile *f, Track *t)
 
 void ReadChunkTrack(CFile *f, AudioFile *a)
 {
-	Track *t = a->AddTrack(Track::TYPE_AUDIO);
+	Track *t = a->addTrack(Track::TYPE_AUDIO);
 	t->name = f->ReadStr();
 	t->volume = f->ReadFloat();
 	t->muted = f->ReadBool();
@@ -618,7 +618,7 @@ void check_empty_subs(AudioFile *a)
 			}*/
 }
 
-void FormatNami::LoadAudio(AudioFile *a, const string & filename)
+void FormatNami::loadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_f("load_nami_file", 1);
 	tsunami->progress->set(_("lade nami"), 0);
@@ -636,12 +636,12 @@ void FormatNami::LoadAudio(AudioFile *a, const string & filename)
 	// some post processing
 	check_empty_subs(a);
 
-	a->UpdateSelection(Range(0, 0));
+	a->updateSelection(Range(0, 0));
 }
 
 
 
-void FormatNami::LoadTrack(Track *t, const string &filename, int offset, int level)
+void FormatNami::loadTrack(Track *t, const string &filename, int offset, int level)
 {
 }
 

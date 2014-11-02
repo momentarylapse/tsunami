@@ -23,7 +23,7 @@ FormatWave::~FormatWave()
 {
 }
 
-void FormatWave::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatWave::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 	msg_db_r("write_wave_file", 1);
 	tsunami->progress->set(_("exportiere wave"), 0);
@@ -70,7 +70,7 @@ static string read_chunk_name(CFile *f)
 	return s;
 }
 
-void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int level)
+void FormatWave::loadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_r("load_wave_file", 1);
 	tsunami->progress->set(_("lade wave"), 0);
@@ -151,7 +151,7 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 				if (r > 0){
 					int dsamples = r / byte_per_sample;
 					int _offset = read / byte_per_sample + offset;
-					ImportData(t, data, channels, format_for_bits(bits), dsamples, _offset, level);
+					importData(t, data, channels, format_for_bits(bits), dsamples, _offset, level);
 					read += r;
 				}else{
 					throw string("could not read in wave file...");
@@ -177,17 +177,17 @@ void FormatWave::LoadTrack(Track *t, const string & filename, int offset, int le
 	msg_db_l(1);
 }
 
-void FormatWave::SaveAudio(AudioFile *a, const string & filename)
+void FormatWave::saveAudio(AudioFile *a, const string & filename)
 {
-	ExportAudioAsTrack(a, filename);
+	exportAudioAsTrack(a, filename);
 }
 
 
 
-void FormatWave::LoadAudio(AudioFile *a, const string & filename)
+void FormatWave::loadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddTrack(Track::TYPE_AUDIO);
-	LoadTrack(t, filename);
+	Track *t = a->addTrack(Track::TYPE_AUDIO);
+	loadTrack(t, filename);
 }
 
 

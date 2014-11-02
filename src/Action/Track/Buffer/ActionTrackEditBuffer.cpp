@@ -22,7 +22,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(Track *t, int _level_no, Range _ran
 	assert(index >= 0);
 
 	// save old data
-	BufferBox b = t->ReadBuffers(level_no, range);
+	BufferBox b = t->readBuffers(level_no, range);
 	box.resize(b.num);
 	box.set(b, 0, 1.0f);
 }
@@ -40,7 +40,7 @@ void ActionTrackEditBuffer::undo(Data *d)
 
 	t->level[level_no].buffer[index].invalidate_peaks(range);
 
-	BufferBox b = t->ReadBuffers(level_no, range);
+	BufferBox b = t->readBuffers(level_no, range);
 	box.swap_value(b);
 }
 

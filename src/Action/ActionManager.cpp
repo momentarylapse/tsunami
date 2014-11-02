@@ -17,15 +17,15 @@ ActionManager::ActionManager(Data *_data)
 {
 	data = _data;
 	cur_group = NULL;
-	Reset();
+	reset();
 }
 
 ActionManager::~ActionManager()
 {
-	Reset();
+	reset();
 }
 
-void ActionManager::Reset()
+void ActionManager::reset()
 {
 	foreach(Action *a, action)
 		delete(a);
@@ -77,13 +77,13 @@ bool ActionManager::merge(Action *a)
 }
 
 
-void *ActionManager::Execute(Action *a)
+void *ActionManager::execute(Action *a)
 {
 	if (enabled){
 		if (a->is_trivial())
 			return NULL;
 		if (cur_group)
-			return cur_group->AddSubAction(a, data);
+			return cur_group->addSubAction(a, data);
 		add(a);
 		return action.back()->execute_and_notify(data);
 	}else
@@ -92,57 +92,57 @@ void *ActionManager::Execute(Action *a)
 
 
 
-void ActionManager::Undo()
+void ActionManager::undo()
 {
 	if (!enabled)
 		return;
-	if (Undoable())
+	if (undoable())
 		action[-- cur_pos]->undo_and_notify(data);
 }
 
 
 
-void ActionManager::Redo()
+void ActionManager::redo()
 {
 	if (!enabled)
 		return;
-	if (Redoable())
+	if (redoable())
 		action[cur_pos ++]->redo_and_notify(data);
 }
 
-bool ActionManager::Undoable()
+bool ActionManager::undoable()
 {
 	return (cur_pos > 0);
 }
 
 
 
-bool ActionManager::Redoable()
+bool ActionManager::redoable()
 {
 	return (cur_pos < action.num);
 }
 
 
 
-void ActionManager::MarkCurrentAsSave()
+void ActionManager::markCurrentAsSave()
 {
 	save_pos = cur_pos;
 }
 
 
 
-bool ActionManager::IsSave()
+bool ActionManager::isSave()
 {
 	return (cur_pos == save_pos);
 }
 
-void ActionManager::Enable(bool _enabled)
+void ActionManager::enable(bool _enabled)
 {
 	enabled = _enabled;
 }
 
 
-void ActionManager::BeginActionGroup()
+void ActionManager::beginActionGroup()
 {
 	if (!cur_group){
 		cur_group = new ActionGroup;
@@ -150,7 +150,7 @@ void ActionManager::BeginActionGroup()
 	cur_group_level ++;
 }
 
-void ActionManager::EndActionGroup()
+void ActionManager::endActionGroup()
 {
 	cur_group_level --;
 	assert(cur_group_level >= 0);
@@ -158,7 +158,7 @@ void ActionManager::EndActionGroup()
 	if (cur_group_level == 0){
 		ActionGroup *g = cur_group;
 		cur_group = NULL;
-		Execute(g);
+		execute(g);
 	}
 }
 

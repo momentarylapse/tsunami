@@ -96,7 +96,7 @@ void BarList::onListEdit()
 			b.length = (int)(text._float() * (float)sample_rate);
 		}
 	}
-	track->EditBar(index, b);
+	track->editBar(index, b);
 	fillList();
 }
 
@@ -113,7 +113,7 @@ void BarList::onAddPause()
 		return;
 	int s = panel->getInt(id);
 
-	track->AddPause(s, 2.0f);
+	track->addPause(s, 2.0f);
 	fillList();
 }
 
@@ -124,7 +124,7 @@ void BarList::onDelete()
 		return;
 	int s = panel->getInt(id);
 	if (s >= 0){
-		track->DeleteBar(s);
+		track->deleteBar(s);
 		fillList();
 	}
 }
@@ -141,7 +141,7 @@ void BarList::addNewBar()
 
 	int s = panel->getInt(id);
 
-	track->AddBars(s, 90.0f, 4, 10);
+	track->addBars(s, 90.0f, 4, 10);
 	fillList();
 }
 

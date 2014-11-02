@@ -21,7 +21,7 @@ Bar::Bar(const Range &r, int _num_beats, int _index)
 	index = _index;
 }
 
-Array<Beat> BarCollection::GetBeats(const Range &r)
+Array<Beat> BarCollection::getBeats(const Range &r)
 {
 	Array<Beat> beats;
 
@@ -45,7 +45,7 @@ Array<Beat> BarCollection::GetBeats(const Range &r)
 	return beats;
 }
 
-Array<Bar> BarCollection::GetBars(const Range &r)
+Array<Bar> BarCollection::getBars(const Range &r)
 {
 	Array<Bar> bars;
 
@@ -66,7 +66,7 @@ Array<Bar> BarCollection::GetBars(const Range &r)
 	return bars;
 }
 
-int BarCollection::GetNextBeat(int pos)
+int BarCollection::getNextBeat(int pos)
 {
 	int p0 = 0;
 	if (p0 > pos)
@@ -91,7 +91,7 @@ int BarCollection::GetNextBeat(int pos)
 	return pos;
 }
 
-Range BarCollection::GetRange()
+Range BarCollection::getRange()
 {
 	int pos0 = 0;
 	foreach(BarPattern &b, *this)

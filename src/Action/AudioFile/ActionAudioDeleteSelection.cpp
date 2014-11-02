@@ -27,14 +27,14 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_n
 			// subs
 			foreachib(SampleRef *s, t->sample, i)
 				if (s->is_selected){
-					AddSubAction(new ActionTrackDeleteSample(t, i), a);
+					addSubAction(new ActionTrackDeleteSample(t, i), a);
 					_foreach_it_.update(); // TODO...
 				}
 
 			// midi
 			foreachib(MidiNote &n, t->midi, i)
 				if (range.is_inside(n.range.offset)){
-					AddSubAction(new ActionTrackDeleteMidiNote(t, i), a);
+					addSubAction(new ActionTrackDeleteMidiNote(t, i), a);
 					_foreach_it_.update(); // TODO...
 				}
 		}
@@ -56,22 +56,22 @@ void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
 
 		if (range.covers(b.range())){
 			// b completely inside?
-			AddSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
 		}else if ((i0 > bi0) && (i1 > bi1) && (i0 < bi1)){
 			// overlapping end of b?
-			AddSubAction(new ActionTrack__ShrinkBufferBox(t, level_no, n, i0 - bi0), a);
+			addSubAction(new ActionTrack__ShrinkBufferBox(t, level_no, n, i0 - bi0), a);
 
 		}else if ((i0 <= bi0) && (i1 < bi1) && (i1 > bi0)){
 			// overlapping beginning of b?
-			AddSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
-			AddSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
+			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
 		}else if (b.range().covers(range)){
 			// inside b?
-			AddSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
-			AddSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i0 - bi0), a);
-			AddSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n + 1), a);
+			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i0 - bi0), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n + 1), a);
 
 		}
 		_foreach_it_.update();

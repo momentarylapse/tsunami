@@ -28,8 +28,8 @@ void ActionTrackSampleFromSelection::CreateSubsFromTrack(Track *t, const Range &
 	TrackLevel &l = t->level[level_no];
 	foreachib(BufferBox &b, l.buffer, bi)
 		if (r.covers(b.range())){
-			AddSubAction(new ActionTrackPasteAsSample(t, b.offset, &b), a);
+			addSubAction(new ActionTrackPasteAsSample(t, b.offset, &b), a);
 
-			AddSubAction(new ActionTrack__DeleteBufferBox(t, level_no, bi), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, bi), a);
 		}
 }

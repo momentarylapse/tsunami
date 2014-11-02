@@ -72,9 +72,9 @@ public:
 			return;
 		tsunami->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
-			track->EditEffect(index, old_param);
+			track->editEffect(index, old_param);
 		else
-			audio->EditEffect(index, old_param);
+			audio->editEffect(index, old_param);
 		old_param = fx->configToString();
 	}
 	void onSave()
@@ -87,24 +87,24 @@ public:
 	void onEnabled()
 	{
 		if (track)
-			track->EnableEffect(index, isChecked(""));
+			track->enableEffect(index, isChecked(""));
 		else
-			audio->EnableEffect(index, isChecked(""));
+			audio->enableEffect(index, isChecked(""));
 	}
 	void onDelete()
 	{
 		if (track)
-			track->DeleteEffect(index);
+			track->deleteEffect(index);
 		else
-			audio->DeleteEffect(index);
+			audio->deleteEffect(index);
 	}
 	virtual void onUpdate(Observable *o, const string &message)
 	{
 		if (message == o->MESSAGE_CHANGE){
 			if (track)
-				track->EditEffect(index, old_param);
+				track->editEffect(index, old_param);
 			else
-				audio->EditEffect(index, old_param);
+				audio->editEffect(index, old_param);
 		}
 		check("enabled", fx->enabled);
 		p->update();
@@ -159,9 +159,9 @@ void FxConsole::onAdd()
 	if (!effect)
 		return;
 	if (track)
-		track->AddEffect(effect);
+		track->addEffect(effect);
 	else
-		audio->AddEffect(effect);
+		audio->addEffect(effect);
 }
 
 void FxConsole::clear()
@@ -185,7 +185,7 @@ void FxConsole::setTrack(Track *t)
 		subscribe(track, track->MESSAGE_DELETE);
 		subscribe(track, track->MESSAGE_ADD_EFFECT);
 		subscribe(track, track->MESSAGE_DELETE_EFFECT);
-		setString("track_name", format(_("!angle=90\\wirken auf die Spur '%s'"), track->GetNiceName().c_str()));
+		setString("track_name", format(_("!angle=90\\wirken auf die Spur '%s'"), track->getNiceName().c_str()));
 	}else
 		setString("track_name", _("!angle=90\\wirken auf die komplette Datei"));
 

@@ -20,30 +20,30 @@ Data::~Data()
 
 
 
-void Data::Redo()
+void Data::redo()
 {
-	action_manager->Redo();
+	action_manager->redo();
 }
 
 
 
-void Data::Undo()
+void Data::undo()
 {
-	action_manager->Undo();
+	action_manager->undo();
 }
 
 
 
-void *Data::Execute(Action *a)
+void *Data::execute(Action *a)
 {
-	return action_manager->Execute(a);
+	return action_manager->execute(a);
 }
 
 
 
-void Data::ResetHistory()
+void Data::resetHistory()
 {
-	action_manager->Reset();
+	action_manager->reset();
 }
 
 

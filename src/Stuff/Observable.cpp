@@ -11,6 +11,7 @@
 const string Observable::MESSAGE_ALL = "";
 const string Observable::MESSAGE_CHANGE = "Change";
 const string Observable::MESSAGE_DELETE = "Delete";
+const bool Observable::DEBUG_MESSAGES = false;
 
 
 struct ObserverRequest
@@ -92,7 +93,8 @@ void Observable::notifySend()
 
 	// send
 	foreach(Notification &n, notifications){
-		//msg_write("send " + getName() + "/" + *n.message + "  >>  " + n.observer->getName());
+		if (DEBUG_MESSAGES)
+			msg_write("send " + getName() + "/" + *n.message + "  >>  " + n.observer->getName());
 		n.observer->onUpdate(this, *n.message);
 	}
 }

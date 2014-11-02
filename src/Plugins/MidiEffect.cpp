@@ -67,7 +67,7 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 	msg_db_f("MidiEffect.Apply", 1);
 
 	// run
-	tsunami->plugin_manager->context.set(t, 0, t->GetRange());
+	tsunami->plugin_manager->context.set(t, 0, t->getRange());
 	process(&midi);
 
 	if (!usable){
@@ -86,18 +86,18 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 	tsunami->plugin_manager->context.set(t, 0, r);
 
 	MidiData midi;
-	midi.append(t->midi.GetNotes(r));
+	midi.append(t->midi.getNotes(r));
 
-	t->root->action_manager->BeginActionGroup();
+	t->root->action_manager->beginActionGroup();
 
 	foreachib(MidiNote &n, t->midi, i)
 		if (r.is_inside(n.range.offset)){
-			t->DeleteMidiNote(i);
+			t->deleteMidiNote(i);
 			_foreach_it_.update(); // TODO...
 		}
 	process(&midi);
-	t->InsertMidiData(0, midi);
-	t->root->action_manager->EndActionGroup();
+	t->insertMidiData(0, midi);
+	t->root->action_manager->endActionGroup();
 }
 
 

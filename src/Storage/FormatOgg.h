@@ -16,11 +16,11 @@ public:
 	FormatOgg();
 	virtual ~FormatOgg();
 
-	void LoadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
-	void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename);
+	void loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
+	void saveBuffer(AudioFile *a, BufferBox *b, const string &filename);
 
-	void LoadAudio(AudioFile *a, const string &filename);
-	void SaveAudio(AudioFile *a, const string &filename);
+	void loadAudio(AudioFile *a, const string &filename);
+	void saveAudio(AudioFile *a, const string &filename);
 };
 
 #endif /* FORMATOGG_H_ */

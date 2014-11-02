@@ -231,7 +231,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
 	Script::LinkExternal("DummySynthesizer.__init__", Script::mf(&DummySynthesizer::__init__));
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "__delete__", Script::mf(&DummySynthesizer::__delete__), &dsynth);
-	Script::DeclareClassVirtualIndex("DummySynthesizer", "renderNote", Script::mf(&DummySynthesizer::RenderNote), &dsynth);
+	Script::DeclareClassVirtualIndex("DummySynthesizer", "renderNote", Script::mf(&DummySynthesizer::renderNote), &dsynth);
 	//Script::DeclareClassVirtualIndex("DummySynthesizer", "read", Script::mf(&DummySynthesizer::read), &dsynth);
 	//Script::DeclareClassVirtualIndex("DummySynthesizer", "onConfigure", Script::mf(&DummySynthesizer::OnConfigure), &dsynth);
 	//Script::LinkExternal("DummySynthesizer.set", Script::mf(&Synthesizer::set));
@@ -273,28 +273,28 @@ void PluginManager::LinkAppScriptData()
 //	Script::DeclareClassOffset("Track", "parent", _offsetof(Track, parent));
 	Script::DeclareClassOffset("Track", "root", _offsetof(Track, root));
 	Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
-	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::GetBuffers));
-	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::ReadBuffers));
-	Script::LinkExternal("Track.setName", Script::mf(&Track::SetName));
-	Script::LinkExternal("Track.setMuted", Script::mf(&Track::SetMuted));
-	Script::LinkExternal("Track.setVolume", Script::mf(&Track::SetVolume));
-	Script::LinkExternal("Track.setPanning", Script::mf(&Track::SetPanning));
-	Script::LinkExternal("Track.insertMidiData", Script::mf(&Track::InsertMidiData));
-	Script::LinkExternal("Track.addEffect", Script::mf(&Track::AddEffect));
-	Script::LinkExternal("Track.deleteEffect", Script::mf(&Track::DeleteEffect));
-	Script::LinkExternal("Track.editEffect", Script::mf(&Track::EditEffect));
-	Script::LinkExternal("Track.enableEffect", Script::mf(&Track::EnableEffect));
-	Script::LinkExternal("Track.addSample", Script::mf(&Track::AddSample));
-	Script::LinkExternal("Track.deleteSample", Script::mf(&Track::DeleteSample));
-	Script::LinkExternal("Track.editSample", Script::mf(&Track::EditSample));
-	Script::LinkExternal("Track.addMidiNote", Script::mf(&Track::AddMidiNote));
-	Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::AddMidiNotes));
-	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::DeleteMidiNote));
-	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::SetSynthesizer));
-	Script::LinkExternal("Track.addBars", Script::mf(&Track::AddBars));
-	Script::LinkExternal("Track.addPause", Script::mf(&Track::AddPause));
-	Script::LinkExternal("Track.editBar", Script::mf(&Track::EditBar));
-	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::DeleteBar));
+	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::getBuffers));
+	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::readBuffers));
+	Script::LinkExternal("Track.setName", Script::mf(&Track::setName));
+	Script::LinkExternal("Track.setMuted", Script::mf(&Track::setMuted));
+	Script::LinkExternal("Track.setVolume", Script::mf(&Track::setVolume));
+	Script::LinkExternal("Track.setPanning", Script::mf(&Track::setPanning));
+	Script::LinkExternal("Track.insertMidiData", Script::mf(&Track::insertMidiData));
+	Script::LinkExternal("Track.addEffect", Script::mf(&Track::addEffect));
+	Script::LinkExternal("Track.deleteEffect", Script::mf(&Track::deleteEffect));
+	Script::LinkExternal("Track.editEffect", Script::mf(&Track::editEffect));
+	Script::LinkExternal("Track.enableEffect", Script::mf(&Track::enableEffect));
+	Script::LinkExternal("Track.addSample", Script::mf(&Track::addSample));
+	Script::LinkExternal("Track.deleteSample", Script::mf(&Track::deleteSample));
+	Script::LinkExternal("Track.editSample", Script::mf(&Track::editSample));
+	Script::LinkExternal("Track.addMidiNote", Script::mf(&Track::addMidiNote));
+	Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::addMidiNotes));
+	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::deleteMidiNote));
+	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::setSynthesizer));
+	Script::LinkExternal("Track.addBars", Script::mf(&Track::addBars));
+	Script::LinkExternal("Track.addPause", Script::mf(&Track::addPause));
+	Script::LinkExternal("Track.editBar", Script::mf(&Track::editBar));
+	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::deleteBar));
 
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
 	Script::DeclareClassOffset("AudioFile", "filename", _offsetof(AudioFile, filename));
@@ -305,11 +305,11 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "track", _offsetof(AudioFile, track));
 	Script::DeclareClassOffset("AudioFile", "sample", _offsetof(AudioFile, sample));
 	Script::DeclareClassOffset("AudioFile", "level_name", _offsetof(AudioFile, level_name));
-	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::NewEmpty));
-	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::AddTrack));
-	Script::LinkExternal("AudioFile.deleteTrack", Script::mf(&AudioFile::DeleteTrack));
+	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::newEmpty));
+	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::addTrack));
+	Script::LinkExternal("AudioFile.deleteTrack", Script::mf(&AudioFile::deleteTrack));
 	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::GetRange));
-	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::GetNextBeat));
+	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::getNextBeat));
 
 	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::Prepare));
 	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
@@ -547,13 +547,13 @@ void PluginManager::ExecutePlugin(const string &filename)
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				Range range = tsunami->win->view->getPlaybackSelection();
-				a->action_manager->BeginActionGroup();
+				a->action_manager->beginActionGroup();
 				foreach(Track *t, a->track)
 					if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
 						fx->resetState();
 						fx->doProcessTrack(t, tsunami->win->view->cur_level, range);
 					}
-				a->action_manager->EndActionGroup();
+				a->action_manager->endActionGroup();
 			}
 			delete(fx);
 		}else if (mfx){
@@ -561,13 +561,13 @@ void PluginManager::ExecutePlugin(const string &filename)
 			mfx->resetConfig();
 			if (mfx->configure()){
 				Range range = tsunami->win->view->getPlaybackSelection();
-				a->action_manager->BeginActionGroup();
+				a->action_manager->beginActionGroup();
 				foreach(Track *t, a->track)
 					if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
 						mfx->resetState();
 						mfx->DoProcessTrack(t, range);
 					}
-				a->action_manager->EndActionGroup();
+				a->action_manager->endActionGroup();
 			}
 			delete(mfx);
 		}/*else if (f_audio){

@@ -87,19 +87,19 @@ void AudioFileDialog::onTagsEdit()
 		t.key = getCell("tags", r, 0);
 	else
 		t.value = getCell("tags", r, 1);
-	audio->EditTag(r, t.key, t.value);
+	audio->editTag(r, t.key, t.value);
 }
 
 void AudioFileDialog::onAddTag()
 {
-	audio->AddTag("key", "value");
+	audio->addTag("key", "value");
 }
 
 void AudioFileDialog::onDeleteTag()
 {
 	int s = getInt("tags");
 	if (s >= 0)
-		audio->DeleteTag(s);
+		audio->deleteTag(s);
 }
 
 void AudioFileDialog::onUpdate(Observable *o, const string &message)

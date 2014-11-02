@@ -18,7 +18,7 @@ ActionGroup::~ActionGroup()
 	action.clear();
 }
 
-void *ActionGroup::AddSubAction(Action *a, Data *d)
+void *ActionGroup::addSubAction(Action *a, Data *d)
 {
 	action.add(a);
 	return a->execute(d);

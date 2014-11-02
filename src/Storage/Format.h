@@ -16,17 +16,17 @@ class Format
 public:
 	Format(const string &description, const string &extensions, int _flags);
 	virtual ~Format();
-	bool CanHandle(const string &extension);
-	bool TestFormatCompatibility(AudioFile *a);
+	bool canHandle(const string &extension);
+	bool testFormatCompatibility(AudioFile *a);
 
-	void ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
-	void ExportAudioAsTrack(AudioFile *a, const string &filename);
+	void importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
+	void exportAudioAsTrack(AudioFile *a, const string &filename);
 
-	virtual void LoadTrack(Track *t, const string &filename, int offset = 0, int level = 0) = 0;
-	virtual void SaveBuffer(AudioFile *a, BufferBox *b, const string &filename) = 0;
+	virtual void loadTrack(Track *t, const string &filename, int offset = 0, int level = 0) = 0;
+	virtual void saveBuffer(AudioFile *a, BufferBox *b, const string &filename) = 0;
 
-	virtual void LoadAudio(AudioFile *a, const string &filename) = 0;
-	virtual void SaveAudio(AudioFile *a, const string &filename) = 0;
+	virtual void loadAudio(AudioFile *a, const string &filename) = 0;
+	virtual void saveAudio(AudioFile *a, const string &filename) = 0;
 
 	Array<string> extensions;
 	string description;

@@ -183,21 +183,21 @@ void TsunamiWindow::onAbout()
 
 void TsunamiWindow::onAddTrack()
 {
-	audio->AddTrack(Track::TYPE_AUDIO);
+	audio->addTrack(Track::TYPE_AUDIO);
 }
 
 void TsunamiWindow::onAddTimeTrack()
 {
-	audio->action_manager->BeginActionGroup();
-	Track *t = audio->AddTrack(Track::TYPE_TIME);
+	audio->action_manager->beginActionGroup();
+	Track *t = audio->addTrack(Track::TYPE_TIME);
 	if (t)
-		t->AddBars(-1, 90, 4, 10);
-	audio->action_manager->EndActionGroup();
+		t->addBars(-1, 90, 4, 10);
+	audio->action_manager->endActionGroup();
 }
 
 void TsunamiWindow::onAddMidiTrack()
 {
-	audio->AddTrack(Track::TYPE_MIDI);
+	audio->addTrack(Track::TYPE_MIDI);
 }
 
 void TsunamiWindow::onDeleteTrack()
@@ -208,7 +208,7 @@ void TsunamiWindow::onDeleteTrack()
 	}
 
 	if (view->cur_track)
-		audio->DeleteTrack(get_track_index(view->cur_track));
+		audio->deleteTrack(get_track_index(view->cur_track));
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
@@ -257,12 +257,12 @@ void TsunamiWindow::onShowLog()
 
 void TsunamiWindow::onUndo()
 {
-	audio->action_manager->Undo();
+	audio->action_manager->undo();
 }
 
 void TsunamiWindow::onRedo()
 {
-	audio->action_manager->Redo();
+	audio->action_manager->redo();
 }
 
 void TsunamiWindow::onSendBugReport()
@@ -279,7 +279,7 @@ string title_filename(const string &filename)
 
 bool TsunamiWindow::allowTermination()
 {
-	if (audio->action_manager->IsSave())
+	if (audio->action_manager->isSave())
 		return true;
 	string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio->filename).c_str()), true);
 	if (answer == "hui:yes"){
@@ -311,7 +311,7 @@ void TsunamiWindow::onFindAndExecutePlugin()
 
 void TsunamiWindow::onDelete()
 {
-	audio->DeleteSelection(view->cur_level, view->sel_range, false);
+	audio->deleteSelection(view->cur_level, view->sel_range, false);
 }
 
 void TsunamiWindow::onSampleManager()
@@ -346,14 +346,14 @@ void TsunamiWindow::onSettings()
 void TsunamiWindow::onTrackImport()
 {
 	if (tsunami->storage->askOpenImport(this)){
-		Track *t = audio->AddTrack(Track::TYPE_AUDIO);
+		Track *t = audio->addTrack(Track::TYPE_AUDIO);
 		tsunami->storage->loadTrack(t, HuiFilename, view->sel_range.start(), view->cur_level);
 	}
 }
 
 void TsunamiWindow::onRemoveAdded()
 {
-	audio->DeleteSelectedSamples();
+	audio->deleteSelectedSamples();
 }
 
 void TsunamiWindow::onPlayLoop()
@@ -380,7 +380,7 @@ void TsunamiWindow::onStop()
 
 void TsunamiWindow::onInsertAdded()
 {
-	audio->InsertSelectedSamples(view->cur_level);
+	audio->insertSelectedSamples(view->cur_level);
 }
 
 void TsunamiWindow::onRecord()
@@ -391,12 +391,12 @@ void TsunamiWindow::onRecord()
 
 void TsunamiWindow::onAddLevel()
 {
-	audio->AddLevel("");
+	audio->addLevel("");
 }
 
 void TsunamiWindow::onDeleteLevel()
 {
-	audio->DeleteLevel(view->cur_level, true);
+	audio->deleteLevel(view->cur_level, true);
 }
 
 void TsunamiWindow::onCurLevel()
@@ -416,7 +416,7 @@ void TsunamiWindow::onCurLevelDown()
 
 void TsunamiWindow::onSubFromSelection()
 {
-	audio->CreateSamplesFromSelection(view->cur_level, view->sel_range);
+	audio->createSamplesFromSelection(view->cur_level, view->sel_range);
 }
 
 void TsunamiWindow::onViewOptimal()
@@ -470,11 +470,11 @@ void TsunamiWindow::updateMenu()
 	bool selected = !view->sel_range.empty();
 // menu / toolbar
 	// edit
-	enable("undo", audio->action_manager->Undoable());
-	enable("redo", audio->action_manager->Redoable());
+	enable("undo", audio->action_manager->undoable());
+	enable("redo", audio->action_manager->redoable());
 	enable("copy", tsunami->clipboard->canCopy(view));
 	enable("paste", tsunami->clipboard->hasData());
-	enable("delete", selected or (audio->GetNumSelectedSamples() > 0));
+	enable("delete", selected or (audio->getNumSelectedSamples() > 0));
 	// file
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);
@@ -487,8 +487,8 @@ void TsunamiWindow::updateMenu()
 	enable("level_down", view->cur_level > 0);
 	// sub
 	enable("sample_from_selection", selected);
-	enable("insert_sample", audio->GetNumSelectedSamples() > 0);
-	enable("remove_sample", audio->GetNumSelectedSamples() > 0);
+	enable("insert_sample", audio->getNumSelectedSamples() > 0);
+	enable("remove_sample", audio->getNumSelectedSamples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
 	enable("stop", view->stream->isPlaying());
@@ -503,12 +503,12 @@ void TsunamiWindow::updateMenu()
 	if (m){
 		m->clear();
 		for (int i=0; i<audio->level_name.num; i++)
-			m->addItemCheckable(audio->GetNiceLevelName(i), format("jump_to_level_%d", i));
+			m->addItemCheckable(audio->getNiceLevelName(i), format("jump_to_level_%d", i));
 		check(format("jump_to_level_%d", view->cur_level), true);
 	}
 
 	string title = title_filename(audio->filename) + " - " + AppName;
-	if (!audio->action_manager->IsSave())
+	if (!audio->action_manager->isSave())
 		title = "*" + title;
 	setTitle(title);
 }

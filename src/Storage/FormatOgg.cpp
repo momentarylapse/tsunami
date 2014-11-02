@@ -31,9 +31,9 @@ FormatOgg::~FormatOgg()
 {
 }
 
-void FormatOgg::SaveAudio(AudioFile *a, const string & filename)
+void FormatOgg::saveAudio(AudioFile *a, const string & filename)
 {
-	ExportAudioAsTrack(a, filename);
+	exportAudioAsTrack(a, filename);
 }
 
 
@@ -49,7 +49,7 @@ int oe_write_page(ogg_page *page, FILE *fp)
 }
 
 
-void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
+void FormatOgg::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 {
 	msg_db_r("write_ogg_file", 1);
 	tsunami->progress->set(_("exportiere ogg"), 0);
@@ -186,15 +186,15 @@ void FormatOgg::SaveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 
 
-void FormatOgg::LoadAudio(AudioFile *a, const string & filename)
+void FormatOgg::loadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddTrack(Track::TYPE_AUDIO);
-	LoadTrack(t, filename);
+	Track *t = a->addTrack(Track::TYPE_AUDIO);
+	loadTrack(t, filename);
 }
 
 
 
-void FormatOgg::LoadTrack(Track *t, const string & filename, int offset, int level)
+void FormatOgg::loadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("Ogg.LoadTracl", 1);
 	tsunami->progress->set(_("lade ogg"), 0);
@@ -241,7 +241,7 @@ void FormatOgg::LoadTrack(Track *t, const string & filename, int offset, int lev
 		}else{
 			int dsamples = r / 4;
 			int _offset = read / 4 + offset;
-			ImportData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, level);
+			importData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, level);
 			read += r;
 			nn ++;
 			if (nn > 256){

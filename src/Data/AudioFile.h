@@ -52,44 +52,44 @@ public:
 	string get_time_str_fuzzy(int t, float dt);
 	string get_time_str_long(int t);
 
-	void Reset();
-	void _cdecl NewEmpty(int _sample_rate);
-	void _cdecl NewWithOneTrack(int track_type, int _sample_rate);
-	bool _cdecl Load(const string &filename, bool deep);
-	bool _cdecl Save(const string &filename);
-	void _cdecl UpdateSelection(const Range &range);
-	void UnselectAllSamples();
+	void reset();
+	void _cdecl newEmpty(int _sample_rate);
+	void _cdecl newWithOneTrack(int track_type, int _sample_rate);
+	bool _cdecl load(const string &filename, bool deep);
+	bool _cdecl save(const string &filename);
+	void _cdecl updateSelection(const Range &range);
+	void unselectAllSamples();
 
-	void UpdatePeaks(int mode);
-	void InvalidateAllPeaks();
+	void updatePeaks(int mode);
+	void invalidateAllPeaks();
 
-	int GetNumSelectedSamples();
+	int getNumSelectedSamples();
 
-	Track *_cdecl GetTimeTrack();
-	int _cdecl GetNextBeat(int pos);
-	string _cdecl GetNiceLevelName(int index);
+	Track *_cdecl getTimeTrack();
+	int _cdecl getNextBeat(int pos);
+	string _cdecl getNiceLevelName(int index);
 
 	// action
-	void _cdecl AddTag(const string &key, const string &value);
-	void _cdecl EditTag(int index, const string &key, const string &value);
-	void _cdecl DeleteTag(int index);
-	void _cdecl AddEffect(Effect *effect);
-	void _cdecl DeleteEffect(int index);
-	void _cdecl EditEffect(int index, const string &param_old);
-	void _cdecl EnableEffect(int index, bool enabled);
-	void _cdecl SetVolume(float volume);
-	Track *_cdecl AddTrack(int type, int index = -1);
-	void _cdecl DeleteTrack(int index);
-	Sample *_cdecl AddSample(const string &name, BufferBox &buf);
-	void _cdecl DeleteSample(int index);
-	void _cdecl EditSampleName(int index, const string &name);
-	void _cdecl AddLevel(const string &name);
-	void _cdecl DeleteLevel(int index, bool merge);
-	void _cdecl RenameLevel(int index, const string &name);
-	void _cdecl InsertSelectedSamples(int level_no);
-	void _cdecl DeleteSelectedSamples();
-	void _cdecl DeleteSelection(int level_no, const Range &range, bool all_levels);
-	void _cdecl CreateSamplesFromSelection(int level_no, const Range &range);
+	void _cdecl addTag(const string &key, const string &value);
+	void _cdecl editTag(int index, const string &key, const string &value);
+	void _cdecl deleteTag(int index);
+	void _cdecl addEffect(Effect *effect);
+	void _cdecl deleteEffect(int index);
+	void _cdecl editEffect(int index, const string &param_old);
+	void _cdecl enableEffect(int index, bool enabled);
+	void _cdecl setVolume(float volume);
+	Track *_cdecl addTrack(int type, int index = -1);
+	void _cdecl deleteTrack(int index);
+	Sample *_cdecl addSample(const string &name, BufferBox &buf);
+	void _cdecl deleteSample(int index);
+	void _cdecl editSampleName(int index, const string &name);
+	void _cdecl addLevel(const string &name);
+	void _cdecl deleteLevel(int index, bool merge);
+	void _cdecl renameLevel(int index, const string &name);
+	void _cdecl insertSelectedSamples(int level_no);
+	void _cdecl deleteSelectedSamples();
+	void _cdecl deleteSelection(int level_no, const Range &range, bool all_levels);
+	void _cdecl createSamplesFromSelection(int level_no, const Range &range);
 
 	Track *get_track(int track_no);
 	SampleRef *get_sample_ref(int track_no, int index);

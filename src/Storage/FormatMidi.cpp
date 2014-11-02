@@ -18,10 +18,10 @@ FormatMidi::~FormatMidi()
 {
 }
 
-void FormatMidi::LoadTrack(Track *t, const string &filename, int offset, int level)
+void FormatMidi::loadTrack(Track *t, const string &filename, int offset, int level)
 {}
 
-void FormatMidi::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatMidi::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {}
 
 static string read_chunk_name(CFile *f)
@@ -85,7 +85,7 @@ static string ascii2utf8(const string &s)
 	return r;
 }
 
-void FormatMidi::LoadAudio(AudioFile *a, const string &filename)
+void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 {
 	CFile *f = NULL;
 	try{
@@ -201,7 +201,7 @@ void FormatMidi::LoadAudio(AudioFile *a, const string &filename)
 			f->SetPos(pos0 + tsize, true);
 
 			if (notes.num > 0){
-				Track *t = a->AddTrack(Track::TYPE_MIDI);
+				Track *t = a->addTrack(Track::TYPE_MIDI);
 				t->midi.append(notes);
 				t->name = track_name;
 			}
@@ -215,7 +215,7 @@ void FormatMidi::LoadAudio(AudioFile *a, const string &filename)
 	}
 }
 
-void FormatMidi::SaveAudio(AudioFile *a, const string &filename)
+void FormatMidi::saveAudio(AudioFile *a, const string &filename)
 {
 }
 

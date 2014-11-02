@@ -48,7 +48,7 @@ void SubDialog::onMute()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->EditSample(index, sample->volume, isChecked(""), sample->rep_num, sample->rep_delay);
+	track->editSample(index, sample->volume, isChecked(""), sample->rep_num, sample->rep_delay);
 
 	enable("volume", !sample->muted);
 	subscribe(sample);
@@ -65,7 +65,7 @@ void SubDialog::onVolume()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->EditSample(index, db2amplitude(getFloat("")), sample->muted, sample->rep_num, sample->rep_delay);
+	track->editSample(index, db2amplitude(getFloat("")), sample->muted, sample->rep_num, sample->rep_delay);
 	subscribe(sample);
 }
 
@@ -75,7 +75,7 @@ void SubDialog::onRepNum()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->EditSample(index, sample->volume, sample->muted, getInt("repnum") - 1, sample->rep_delay);
+	track->editSample(index, sample->volume, sample->muted, getInt("repnum") - 1, sample->rep_delay);
 	enable("repdelay", sample->rep_num > 0);
 	subscribe(sample);
 }
@@ -86,7 +86,7 @@ void SubDialog::onRepDelay()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->EditSample(index, sample->volume, sample->muted, sample->rep_num, (int)(getFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
+	track->editSample(index, sample->volume, sample->muted, sample->rep_num, (int)(getFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
 	subscribe(sample);
 }
 
@@ -109,7 +109,7 @@ void SubDialog::loadData()
 	enable("volume", !sample->muted);
 	reset("level_track");
 	foreach(Track *t, audio->track)
-		addString("level_track", t->GetNiceName());
+		addString("level_track", t->getNiceName());
 	setInt("level_track", sample->track_no);
 	setInt("repnum", sample->rep_num + 1);
 	setFloat("repdelay", (float)sample->rep_delay / (float)sample->owner->sample_rate * 1000.0f);

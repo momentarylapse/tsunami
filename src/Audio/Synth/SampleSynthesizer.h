@@ -19,7 +19,7 @@ public:
 	void __init__();
 	virtual void __delete__();
 
-	virtual void RenderNote(BufferBox &buf, const Range &range, float pitch, float volume);
+	virtual void renderNote(BufferBox &buf, const Range &range, float pitch, float volume);
 
 	Array<SampleRef*> samples;
 };

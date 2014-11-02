@@ -231,7 +231,7 @@ void AudioView::updateSelection()
 			stream->stop();
 	}
 
-	audio->UpdateSelection(sel_range);
+	audio->updateSelection(sel_range);
 	notify(MESSAGE_SELECTION_CHANGE);
 }
 
@@ -345,7 +345,7 @@ void AudioView::selectUnderMouse()
 	if (selection.type == SEL_TYPE_TRACK){
 		selectTrack(t, control);
 		if (!control)
-			audio->UnselectAllSamples();
+			audio->unselectAllSamples();
 	}
 
 	// sub
@@ -520,16 +520,16 @@ void AudioView::onLeftButtonDown()
 		hover.type = SEL_TYPE_SELECTION_END;
 		sel_raw.invert();
 	}else if (selection.type == SEL_TYPE_MUTE){
-		selection.track->SetMuted(!selection.track->muted);
+		selection.track->setMuted(!selection.track->muted);
 	}else if (selection.type == SEL_TYPE_SOLO){
 		foreach(Track *t, audio->track)
 			t->is_selected = (t == selection.track);
 		if (selection.track->muted)
-			selection.track->SetMuted(false);
+			selection.track->setMuted(false);
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(audio);
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
-		cur_track->DeleteMidiNote(selection.note);
+		cur_track->deleteMidiNote(selection.note);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 
 	}else if (selection.type == SEL_TYPE_BOTTOM_BUTTON){
@@ -547,9 +547,9 @@ Array<MidiNote> AudioView::getSelectedNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection.pos);
 	int end = max(mouse_possibly_selecting_start, selection.pos);
-	Track *t = audio->GetTimeTrack();
+	Track *t = audio->getTimeTrack();
 	if (t){
-		Array<Beat> beats = t->bar.GetBeats(audio->GetRange());
+		Array<Beat> beats = t->bar.getBeats(audio->GetRange());
 		foreach(Beat &b, beats){
 			if (b.range.is_inside(start)){
 				int dl = b.range.num / beat_partition;
@@ -576,9 +576,9 @@ void AudioView::onLeftButtonUp()
 	msg_db_f("OnLBU", 2);
 	if (selection.type == SEL_TYPE_SAMPLE){
 		if (cur_action)
-			audio->Execute(cur_action);
+			audio->execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		cur_track->AddMidiNotes(getSelectedNotes());
+		cur_track->addMidiNotes(getSelectedNotes());
 	}
 	cur_action = NULL;
 
@@ -800,7 +800,7 @@ bool AudioView::editingMidi()
 
 void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
-	Track *t = audio->GetTimeTrack();
+	Track *t = audio->getTimeTrack();
 	if (!t)
 		return;
 	bool editing_midi = editingMidi();
@@ -811,7 +811,7 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 	dash.add(6);
 	dash.add(4);
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	Array<Bar> bars = t->bar.GetBars(Range(s0, s1 - s0));
+	Array<Bar> bars = t->bar.getBars(Range(s0, s1 - s0));
 	foreach(Bar &b, bars){
 		int xx = sample2screen(b.range.offset);
 
@@ -894,7 +894,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 		}
 
 		if (message == audio->MESSAGE_CHANGE)
-			audio->UpdatePeaks(peak_mode);
+			audio->updatePeaks(peak_mode);
 	}else if (o == stream){
 		if (stream->isPlaying())
 			makeSampleVisible(stream->getPos());
@@ -1219,8 +1219,8 @@ void AudioView::updateMenu()
 void AudioView::setPeaksMode(int mode)
 {
 	peak_mode = mode;
-	audio->InvalidateAllPeaks();
-	audio->UpdatePeaks(peak_mode);
+	audio->invalidateAllPeaks();
+	audio->updatePeaks(peak_mode);
 	forceRedraw();
 	updateMenu();
 }
@@ -1263,7 +1263,7 @@ void AudioView::selectNone()
 	// select all/none
 	sel_raw.clear();
 	updateSelection();
-	audio->UnselectAllSamples();
+	audio->unselectAllSamples();
 	setCurSample(NULL);
 }
 
@@ -1277,7 +1277,7 @@ void AudioView::selectSample(SampleRef *s, bool diff)
 		s->is_selected = !s->is_selected;
 	}else{
 		if (!s->is_selected)
-			s->owner->UnselectAllSamples();
+			s->owner->unselectAllSamples();
 
 		// select this sub
 		s->is_selected = true;

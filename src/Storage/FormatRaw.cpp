@@ -33,7 +33,7 @@ RawConfigData GetRawConfigData()
 	return data;
 }
 
-void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatRaw::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
 	msg_db_f("write_raw_file", 1);
 	tsunami->progress->set(_("exportiere raw"), 0);
@@ -57,7 +57,7 @@ void FormatRaw::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	FileClose(f);
 }
 
-void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int level)
+void FormatRaw::loadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("load_raw_file", 1);
 	tsunami->progress->set(_("lade raw"), 0);
@@ -96,7 +96,7 @@ void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int lev
 		if (r > 0){
 			int dsamples = r / byte_per_sample;
 			int _offset = read / byte_per_sample + offset;
-			ImportData(t, data, config.channels, config.format, dsamples, _offset, level);
+			importData(t, data, config.channels, config.format, dsamples, _offset, level);
 			read += r;
 		}else{
 			throw string("could not read in wave file...");
@@ -113,17 +113,17 @@ void FormatRaw::LoadTrack(Track *t, const string & filename, int offset, int lev
 		FileClose(f);
 }
 
-void FormatRaw::SaveAudio(AudioFile *a, const string & filename)
+void FormatRaw::saveAudio(AudioFile *a, const string & filename)
 {
-	ExportAudioAsTrack(a, filename);
+	exportAudioAsTrack(a, filename);
 }
 
 
 
-void FormatRaw::LoadAudio(AudioFile *a, const string & filename)
+void FormatRaw::loadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddTrack(Track::TYPE_AUDIO);
-	LoadTrack(t, filename);
+	Track *t = a->addTrack(Track::TYPE_AUDIO);
+	loadTrack(t, filename);
 }
 
 

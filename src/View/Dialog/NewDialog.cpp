@@ -37,13 +37,13 @@ void NewDialog::onClose()
 void NewDialog::onOk()
 {
 	int sample_rate = getString("sample_rate")._int();
-	audio->NewWithOneTrack(Track::TYPE_AUDIO, sample_rate);
-	audio->action_manager->Enable(false);
+	audio->newWithOneTrack(Track::TYPE_AUDIO, sample_rate);
+	audio->action_manager->enable(false);
 	if (isChecked("metronome")){
-		Track *t = audio->AddTrack(Track::TYPE_TIME, 0);
-		t->AddBars(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("num_bars"));
+		Track *t = audio->addTrack(Track::TYPE_TIME, 0);
+		t->addBars(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("num_bars"));
 	}
-	audio->action_manager->Enable(true);
+	audio->action_manager->enable(true);
 	onClose();
 }
 

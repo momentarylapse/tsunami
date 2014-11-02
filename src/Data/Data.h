@@ -23,14 +23,14 @@ public:
 	Data(const string &name);
 	virtual ~Data();
 
-	virtual void Reset() = 0;
-	virtual bool Load(const string &_filename, bool deep = true) = 0;
-	virtual bool Save(const string &_filename) = 0;
+	virtual void reset() = 0;
+	virtual bool load(const string &_filename, bool deep = true) = 0;
+	virtual bool save(const string &_filename) = 0;
 
-	void ResetHistory();
-	void *Execute(Action *a);
-	void Undo();
-	void Redo();
+	void resetHistory();
+	void *execute(Action *a);
+	void undo();
+	void redo();
 
 	string filename;
 	int file_time;

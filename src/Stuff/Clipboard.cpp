@@ -17,7 +17,7 @@ Clipboard::Clipboard() :
 	Observable("Clipboard")
 {
 	temp = new AudioFile;
-	temp->Reset();
+	temp->reset();
 }
 
 Clipboard::~Clipboard()
@@ -28,7 +28,7 @@ Clipboard::~Clipboard()
 void Clipboard::clear()
 {
 	if (temp->track.num > 0){
-		temp->Reset();
+		temp->reset();
 		notify();
 	}
 	ref_uid.clear();
@@ -49,13 +49,13 @@ void Clipboard::copy(AudioView *view)
 			continue;
 		if (t->type == Track::TYPE_TIME)
 			continue;
-		Track *tt = temp->AddTrack(t->type);
+		Track *tt = temp->addTrack(t->type);
 
 		if (t->type == Track::TYPE_AUDIO){
-			tt->level[0].buffer.add(t->ReadBuffers(view->cur_level, view->sel_range));
+			tt->level[0].buffer.add(t->readBuffers(view->cur_level, view->sel_range));
 			tt->level[0].buffer[0].make_own();
 		}else if (t->type == Track::TYPE_MIDI){
-			tt->midi.append(t->midi.GetNotes(view->sel_range));
+			tt->midi.append(t->midi.getNotes(view->sel_range));
 			foreach(MidiNote &n, tt->midi)
 				n.range.offset -= view->sel_range.offset;
 		}
@@ -93,7 +93,7 @@ void Clipboard::paste(AudioView *view)
 	}
 
 
-	a->action_manager->BeginActionGroup();
+	a->action_manager->beginActionGroup();
 	int ti = 0;
 	foreach(Track *t, a->track){
 		if (!t->is_selected)
@@ -104,20 +104,20 @@ void Clipboard::paste(AudioView *view)
 		Track *tt = temp->track[ti];
 		int ref_index = a->get_sample_by_uid(ref_uid[ti]);
 		if (ref_index >= 0){
-			t->AddSample(view->sel_range.start(), ref_index);
+			t->addSample(view->sel_range.start(), ref_index);
 		}else{
 			if (t->type == Track::TYPE_AUDIO){
-				a->Execute(new ActionTrackPasteAsSample(t, view->sel_range.start(), &tt->level[0].buffer[0]));
+				a->execute(new ActionTrackPasteAsSample(t, view->sel_range.start(), &tt->level[0].buffer[0]));
 				ref_uid[ti] = a->sample.back()->uid;
 			}else if (t->type == Track::TYPE_MIDI){
-				a->Execute(new ActionTrackPasteAsSample(t, view->sel_range.start(), &tt->midi));
+				a->execute(new ActionTrackPasteAsSample(t, view->sel_range.start(), &tt->midi));
 				ref_uid[ti] = a->sample.back()->uid;
 			}
 		}
 
 		ti ++;
 	}
-	a->action_manager->EndActionGroup();
+	a->action_manager->endActionGroup();
 }
 
 bool Clipboard::hasData()

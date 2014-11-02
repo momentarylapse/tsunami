@@ -75,7 +75,7 @@ public:
 			return;
 		tsunami->plugin_manager->ApplyFavorite(fx, name);
 		if (track)
-			track->EditMidiEffect(index, old_param);
+			track->editMidiEffect(index, old_param);
 		old_param = fx->configToString();
 	}
 	void onSave()
@@ -88,18 +88,18 @@ public:
 	void onEnabled()
 	{
 		if (track)
-			track->EnableMidiEffect(index, isChecked(""));
+			track->enableMidiEffect(index, isChecked(""));
 	}
 	void onDelete()
 	{
 		if (track)
-			track->DeleteMidiEffect(index);
+			track->deleteMidiEffect(index);
 	}
 	virtual void onUpdate(Observable *o, const string &message)
 	{
 		if (message == o->MESSAGE_CHANGE){
 			if (track)
-				track->EditMidiEffect(index, old_param);
+				track->editMidiEffect(index, old_param);
 		}
 		check("enabled", fx->enabled);
 		p->update();
@@ -246,7 +246,7 @@ void MidiEditor::onAdd()
 	if (!effect)
 		return;
 	if (track)
-		track->AddMidiEffect(effect);
+		track->addMidiEffect(effect);
 }
 
 void MidiEditor::clear()

@@ -61,7 +61,7 @@ void TrackDialog::loadData()
 	bar_list->setTrack(track);
 	if (track){
 		setString("name", track->name);
-		setOptions("name", "placeholder=" + track->GetNiceName());
+		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
 		setString("synthesizer", track->synth->name);
@@ -90,24 +90,24 @@ void TrackDialog::setTrack(Track *t)
 
 void TrackDialog::onName()
 {
-	track->SetName(getString(""));
+	track->setName(getString(""));
 }
 
 void TrackDialog::onVolume()
 {
-	track->SetVolume(db2amplitude(getFloat("volume")));
+	track->setVolume(db2amplitude(getFloat("volume")));
 }
 
 void TrackDialog::onPanning()
 {
-	track->SetPanning(getFloat("panning") / 100.0f);
+	track->setPanning(getFloat("panning") / 100.0f);
 }
 
 void TrackDialog::onSynthesizer()
 {
 	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
 	if (s)
-		track->SetSynthesizer(s);
+		track->setSynthesizer(s);
 }
 
 void TrackDialog::onConfigSynthesizer()

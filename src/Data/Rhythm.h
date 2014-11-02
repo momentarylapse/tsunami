@@ -52,10 +52,10 @@ public:
 class BarCollection : public Array<BarPattern>
 {
 public:
-	Array<Beat> GetBeats(const Range &r);
-	Array<Bar> GetBars(const Range &r);
-	int GetNextBeat(int pos);
-	Range GetRange();
+	Array<Beat> getBeats(const Range &r);
+	Array<Bar> getBars(const Range &r);
+	int getNextBeat(int pos);
+	Range getRange();
 };
 
 

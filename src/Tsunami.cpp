@@ -60,7 +60,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	renderer = new AudioRenderer;
 
 	audio = new AudioFile;
-	audio->NewWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
+	audio->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
 
 	storage = new Storage;
 

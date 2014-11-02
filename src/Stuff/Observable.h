@@ -46,6 +46,8 @@ private:
 	// current notifies
 	Array<const string*> message_queue;
 	int notify_level;
+
+	static const bool DEBUG_MESSAGES;
 };
 
 #endif /* OBSERVABLE_H_ */

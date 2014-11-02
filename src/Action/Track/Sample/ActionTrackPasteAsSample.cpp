@@ -13,15 +13,15 @@
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf) :
 	ActionGroup()
 {
-	AddSubAction(new ActionAudioAddSample("-paste-", *buf), t->root);
-	AddSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
+	addSubAction(new ActionAudioAddSample("-paste-", *buf), t->root);
+	addSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
 }
 
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, MidiData *midi) :
 	ActionGroup()
 {
-	AddSubAction(new ActionAudioAddSample("-paste-", *midi), t->root);
-	AddSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
+	addSubAction(new ActionAudioAddSample("-paste-", *midi), t->root);
+	addSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
 }
 
 ActionTrackPasteAsSample::~ActionTrackPasteAsSample()

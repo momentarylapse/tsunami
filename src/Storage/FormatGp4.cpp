@@ -68,13 +68,13 @@ static string read_str41(CFile *f)
 	return read_str1(f);
 }
 
-void FormatGp4::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
+void FormatGp4::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
 
-void FormatGp4::LoadTrack(Track *t, const string & filename, int offset, int level){}
+void FormatGp4::loadTrack(Track *t, const string & filename, int offset, int level){}
 
-void FormatGp4::SaveAudio(AudioFile *a, const string & filename){}
+void FormatGp4::saveAudio(AudioFile *a, const string & filename){}
 
-void FormatGp4::LoadAudio(AudioFile *a, const string &filename)
+void FormatGp4::loadAudio(AudioFile *a, const string &filename)
 {
 	CFile *f = FileOpen(filename);
 	char *data = new char[1024];
@@ -109,7 +109,7 @@ void FormatGp4::LoadAudio(AudioFile *a, const string &filename)
 		//msg_write(format("measures: %d   tracks: %d", measures, tracks));
 		for (int i=0; i<num_measures; i++)
 			read_measure_header(a, f);
-		a->AddTrack(Track::TYPE_TIME);
+		a->addTrack(Track::TYPE_TIME);
 		for (int i=0; i<num_tracks; i++)
 			read_track(a, f);
 
@@ -118,7 +118,7 @@ void FormatGp4::LoadAudio(AudioFile *a, const string &filename)
 			for (int j = 0; j < num_tracks; j++)
 				read_measure(a, f, measures[i], tracks[j], offset);
 			offset += a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator;
-			a->track[0]->AddBars(-1, tempo, measures[i].numerator, 1);
+			a->track[0]->addBars(-1, tempo, measures[i].numerator, 1);
 		}
 
 	}catch(const string &s){
@@ -136,16 +136,16 @@ void FormatGp4::read_info(AudioFile *a, CFile *f)
 	s = read_str41(f);
 	msg_write("title: "+s);
 	if (s.num > 0)
-		a->AddTag("title", s);
+		a->addTag("title", s);
 	read_str41(f);
 	s = read_str41(f);
 	msg_write("artist: "+s);
 	if (s.num > 0)
-		a->AddTag("artist", s);
+		a->addTag("artist", s);
 	s = read_str41(f);
 	msg_write("album: "+s);
 	if (s.num > 0)
-		a->AddTag("album", s);
+		a->addTag("album", s);
 	msg_write("author: "+read_str41(f));
 	msg_write("copy: "+read_str41(f));
 	msg_write("writer: "+read_str41(f));
@@ -213,8 +213,8 @@ void FormatGp4::read_track(AudioFile *a, CFile *f)
 	msg_db_f("track", 1);
 	f->ReadByte();
 	GpTrack tt;
-	tt.t = a->AddTrack(Track::TYPE_MIDI);
-	tt.t->SetName(read_str1c(f, 40));
+	tt.t = a->addTrack(Track::TYPE_MIDI);
+	tt.t->setName(read_str1c(f, 40));
 	tt.stringCount = f->ReadInt();
 	for (int i=0; i<7; i++){
 		int tuning = f->ReadInt(); // tuning
@@ -339,7 +339,7 @@ void FormatGp4::read_note(AudioFile *a, CFile *f, GpTrack &t, int string_no, int
 	if (n.volume > 1)
 		n.volume = 1;
 	if (n.pitch >= 0)
-		t.t->AddMidiNote(n);
+		t.t->addMidiNote(n);
 }
 
 void FormatGp4::read_note_fx(AudioFile *a, CFile *f)

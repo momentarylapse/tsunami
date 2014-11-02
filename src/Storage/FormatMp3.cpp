@@ -38,9 +38,9 @@ static int read_32bit_be(CFile *f)
 	return d[3] | (d[2] << 8) | (d[1] << 16) | (d[0] << 24);
 }
 
-void FormatMp3::SaveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
+void FormatMp3::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
 
-void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int level)
+void FormatMp3::loadTrack(Track *t, const string & filename, int offset, int level)
 {
 	msg_db_f("load_mp3_file", 1);
 	tsunami->progress->set(_("lade mp3"), 0);
@@ -134,17 +134,17 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 							val = val.replace(string("\0", 1), "");
 							//msg_write(val);
 							if (key == "TALB")
-								t->root->AddTag("album", val);
+								t->root->addTag("album", val);
 							else if (key == "TPE1")
-								t->root->AddTag("artist", val);
+								t->root->addTag("artist", val);
 							else if (key == "TIT2")
-								t->root->AddTag("title", val);
+								t->root->addTag("title", val);
 							else if (key == "TRCK")
-								t->root->AddTag("track", i2s(val._int()));
+								t->root->addTag("track", i2s(val._int()));
 							else if ((key == "TYER") || (key == "TDRC"))
-								t->root->AddTag("year", val);
+								t->root->addTag("year", val);
 							else if (key == "COMM")
-								t->root->AddTag("comment", val);
+								t->root->addTag("comment", val);
 						}else{
 							f->SetPos(_size, false);
 						}
@@ -182,11 +182,11 @@ void FormatMp3::LoadTrack(Track *t, const string & filename, int offset, int lev
 		FileClose(f);
 }
 
-void FormatMp3::SaveAudio(AudioFile *a, const string & filename){}
+void FormatMp3::saveAudio(AudioFile *a, const string & filename){}
 
-void FormatMp3::LoadAudio(AudioFile *a, const string & filename)
+void FormatMp3::loadAudio(AudioFile *a, const string & filename)
 {
-	Track *t = a->AddTrack(Track::TYPE_AUDIO);
-	LoadTrack(t, filename);
+	Track *t = a->addTrack(Track::TYPE_AUDIO);
+	loadTrack(t, filename);
 }
 

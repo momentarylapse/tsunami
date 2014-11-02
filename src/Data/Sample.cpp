@@ -40,10 +40,10 @@ int Sample::get_index()
 	return -1;
 }
 
-Range Sample::GetRange()
+Range Sample::getRange()
 {
 	if (type == Track::TYPE_MIDI)
-		return Range(0, midi.GetRange().num);
+		return Range(0, midi.getRange().num);
 	return Range(0, buf.num);
 }
 
@@ -100,7 +100,7 @@ void SampleRef::__delete__()
 
 int SampleRef::get_index()
 {
-	Track *t = GetParent();
+	Track *t = getParent();
 	if (t){
 		foreachi(SampleRef *s, t->sample, i)
 			if (this == s)
@@ -109,14 +109,14 @@ int SampleRef::get_index()
 	return -1;
 }
 
-Track *SampleRef::GetParent()
+Track *SampleRef::getParent()
 {
 	if (owner)
 		return owner->track[track_no];
 	return NULL;
 }
 
-Range SampleRef::GetRange()
+Range SampleRef::getRange()
 {
-	return origin->GetRange() + pos;
+	return origin->getRange() + pos;
 }

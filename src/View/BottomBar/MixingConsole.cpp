@@ -74,17 +74,17 @@ float TrackMixer::vol2slider(float vol)
 
 void TrackMixer::onVolume()
 {
-	track->SetVolume(slider2vol(getFloat("")));
+	track->setVolume(slider2vol(getFloat("")));
 }
 
 void TrackMixer::onMute()
 {
-	track->SetMuted(isChecked(""));
+	track->setMuted(isChecked(""));
 }
 
 void TrackMixer::onPanning()
 {
-	track->SetPanning(getFloat("")*2 - 1);
+	track->setPanning(getFloat("")*2 - 1);
 }
 
 void TrackMixer::setTrack(Track* t)
@@ -98,7 +98,7 @@ void TrackMixer::update()
 	setFloat(vol_slider_id, vol2slider(track->volume));
 	setFloat(pan_slider_id, track->panning * 0.5f + 0.5f);
 	check(mute_id, track->muted);
-	setString(id_name, "!bold\\" + track->GetNiceName());
+	setString(id_name, "!bold\\" + track->getNiceName());
 }
 
 

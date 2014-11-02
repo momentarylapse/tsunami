@@ -21,19 +21,19 @@ Format::~Format()
 {
 }
 
-void Format::ImportData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level)
+void Format::importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level)
 {
 	msg_db_f("ImportData", 1);
 
-	BufferBox buf = t->GetBuffers(level, Range(offset, samples));
+	BufferBox buf = t->getBuffers(level, Range(offset, samples));
 
 	Action *a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
 	buf.import(data, channels, format, samples);
-	t->root->action_manager->Execute(a);
+	t->root->action_manager->execute(a);
 }
 
 
-bool Format::CanHandle(const string & _extension)
+bool Format::canHandle(const string & _extension)
 {
 	foreach(string e, extensions)
 		if (e == _extension)
@@ -41,16 +41,16 @@ bool Format::CanHandle(const string & _extension)
 	return false;
 }
 
-void Format::ExportAudioAsTrack(AudioFile* a, const string& filename)
+void Format::exportAudioAsTrack(AudioFile* a, const string& filename)
 {
 	BufferBox buf;
 	tsunami->renderer->RenderAudioFile(a, a->GetRange(), buf);
-	SaveBuffer(a, &buf, filename);
+	saveBuffer(a, &buf, filename);
 }
 
 
 
-bool Format::TestFormatCompatibility(AudioFile *a)
+bool Format::testFormatCompatibility(AudioFile *a)
 {
 	int num_subs = a->sample.num;
 	int num_fx = a->fx.num;

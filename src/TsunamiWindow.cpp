@@ -364,7 +364,7 @@ void TsunamiWindow::onPlayLoop()
 
 void TsunamiWindow::onPlay()
 {
-	tsunami->renderer->Prepare(audio, view->getPlaybackSelection(), true);
+	tsunami->renderer->prepare(audio, view->getPlaybackSelection(), true);
 	view->stream->play();
 }
 

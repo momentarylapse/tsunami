@@ -297,13 +297,13 @@ void StartLesson(string name)
 	input.addObserver(nil, &UpdateInput)
 	
 	renderer.prepare(audio, audio.getRange(), false)
-	output.play(renderer)
+	view.stream.play()
 	win.enable("speed", false)
 	win.enable("cancel", true)
 	Mode = ModeLesson
 
 void StopLesson()	
-	output.stop()
+	view.stream.stop()
 	input.removeObserver(nil)
 	input.stop()
 	TotalScore += Score

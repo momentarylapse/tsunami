@@ -5,6 +5,7 @@ use "../api.kaba"
 Window *dlg
 
 const int SAMPLE_RATE = 44100
+AudioStream stream
 float freq
 float volume
 
@@ -22,7 +23,7 @@ void OnFrequency()
 	freq = dlg.getFloat("")
 
 void OnClose()
-	output.stop()
+	stream.stop()
 	delete dlg
 
 void main()
@@ -42,6 +43,7 @@ void main()
 	dlg.eventS("frequency", &OnFrequency)
 	
 	offset = 0
-	output.playGenerated(&fill, SAMPLE_RATE)
+	stream.setSourceGenerated(&fill, SAMPLE_RATE)
+	stream.play()
 	
 	dlg.run()

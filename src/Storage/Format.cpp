@@ -44,7 +44,7 @@ bool Format::canHandle(const string & _extension)
 void Format::exportAudioAsTrack(AudioFile* a, const string& filename)
 {
 	BufferBox buf;
-	tsunami->renderer->RenderAudioFile(a, a->GetRange(), buf);
+	tsunami->renderer->renderAudioFile(a, a->GetRange(), buf);
 	saveBuffer(a, &buf, filename);
 }
 

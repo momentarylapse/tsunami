@@ -183,7 +183,7 @@ bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
 			// render audio...
 			tsunami->progress->set(_("rendere Audio"), 0);
 			BufferBox buf;
-			tsunami->renderer->RenderAudioFile(a, r, buf);
+			tsunami->renderer->renderAudioFile(a, r, buf);
 
 			// save
 			f->saveBuffer(a, &buf, filename);

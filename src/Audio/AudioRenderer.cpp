@@ -251,18 +251,18 @@ int AudioRenderer::read(BufferBox &buf)
 	buf.offset = pos;
 	pos += size;
 	if ((pos >= range.end()) && (loop))
-		Seek(range.offset);
+		seek(range.offset);
 	return size;
 }
 
-void AudioRenderer::RenderAudioFile(AudioFile *a, const Range &range, BufferBox &buf)
+void AudioRenderer::renderAudioFile(AudioFile *a, const Range &range, BufferBox &buf)
 {
-	Prepare(a, range, false);
+	prepare(a, range, false);
 	buf.resize(range.num);
 	read(buf);
 }
 
-void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
+void AudioRenderer::prepare(AudioFile *a, const Range &_range, bool allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
 	audio = a;
@@ -288,7 +288,7 @@ void AudioRenderer::Prepare(AudioFile *a, const Range &_range, bool allow_loop)
 		effect->prepare();
 }
 
-void AudioRenderer::Seek(int _pos)
+void AudioRenderer::seek(int _pos)
 {
 	pos = _pos;
 	foreach(Track *t, audio->track)

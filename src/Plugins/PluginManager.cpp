@@ -105,7 +105,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("audio", &tsunami->audio);
 	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
-	Script::LinkExternal("stream", &tsunami->_view->stream);
 	Script::LinkExternal("renderer", &tsunami->renderer);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
@@ -311,9 +310,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::GetRange));
 	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::getNextBeat));
 
-	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::Prepare));
+	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::prepare));
 	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
-	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::RenderAudioFile));
+	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::renderAudioFile));
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
 	Script::DeclareClassOffset("AudioInput", "cur_buf", _offsetof(AudioInput, current_buffer));
@@ -331,10 +330,14 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioInput.removeObserver", Script::mf(&AudioInput::removeWrappedObserver));
 	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
 
-	Script::LinkExternal("AudioStream.play", Script::mf(&AudioStream::play));
+	Script::DeclareClassSize("AudioStream", sizeof(AudioStream));
+	Script::LinkExternal("AudioStream.__init__", Script::mf(&AudioStream::__init__));
+	Script::LinkExternal("AudioStream.__delete__", Script::mf(&AudioStream::__delete__));
 	Script::LinkExternal("AudioStream.setSource", Script::mf(&AudioStream::setSource));
 	Script::LinkExternal("AudioStream.setSourceGenerated", Script::mf(&AudioStream::setSourceGenerated));
+	Script::LinkExternal("AudioStream.play", Script::mf(&AudioStream::play));
 	Script::LinkExternal("AudioStream.stop", Script::mf(&AudioStream::stop));
+	Script::LinkExternal("AudioStream.pause", Script::mf(&AudioStream::pause));
 	Script::LinkExternal("AudioStream.isPlaying", Script::mf(&AudioStream::isPlaying));
 	Script::LinkExternal("AudioStream.getPos", Script::mf(&AudioStream::getPos));
 	Script::LinkExternal("AudioStream.getSampleRate", Script::mf(&AudioStream::getSampleRate));
@@ -345,6 +348,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
 	Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
+	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 
 	Script::LinkExternal("Log.error", Script::mf(&Log::error));
 	Script::LinkExternal("Log.warning", Script::mf(&Log::warning));
@@ -618,7 +622,7 @@ void PluginManager::PreviewStart(Effect *fx)
 	tsunami->progress->startCancelable(_("Vorschau"), 0);
 	subscribe(tsunami->progress);
 	subscribe(tsunami->win->view->stream);
-	tsunami->renderer->Prepare(tsunami->audio, tsunami->win->view->sel_range, false);
+	tsunami->renderer->prepare(tsunami->audio, tsunami->win->view->sel_range, false);
 	tsunami->win->view->stream->play();
 }
 

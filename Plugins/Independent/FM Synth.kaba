@@ -11,6 +11,8 @@ float phi
 
 float factor2, volume2, phi2
 
+AudioStream stream
+
 int fill(BufferBox buf)
 	float freq2 = freq * factor2
 	float w_f2 = freq2 * 2.0 * pi / SAMPLE_RATE
@@ -35,7 +37,7 @@ void OnVolume2()
 	volume2 = dlg.getFloat("") * 200
 
 void OnClose()
-	output.stop()
+	stream.stop()
 	delete dlg
 
 void main()
@@ -56,13 +58,14 @@ void main()
 	phi2 = 0
 	dlg.setFloat("frequency", freq)
 	
-	dlg.event("hui:close", &OnClose)
-	dlg.event("close", &OnClose)
-	dlg.event("frequency", &OnFrequency)
-	dlg.event("factor2", &OnFactor2)
-	dlg.event("volume2", &OnVolume2)
+	dlg.eventS("hui:close", &OnClose)
+	dlg.eventS("close", &OnClose)
+	dlg.eventS("frequency", &OnFrequency)
+	dlg.eventS("factor2", &OnFactor2)
+	dlg.eventS("volume2", &OnVolume2)
 	
-	output.playGenerated(&fill, SAMPLE_RATE)
-	output.setBufferSize(4096)//8192)
+	stream.setSourceGenerated(&fill, SAMPLE_RATE)
+	stream.setBufferSize(4096)//8192)
+	stream.play()
 	
 	dlg.run()

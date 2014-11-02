@@ -24,12 +24,12 @@ public:
 	AudioRenderer();
 	virtual ~AudioRenderer();
 
-	void RenderAudioFile(AudioFile *a, const Range &range, BufferBox &buf);
+	void renderAudioFile(AudioFile *a, const Range &range, BufferBox &buf);
 	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
 	virtual int read(BufferBox &buf);
-	void Prepare(AudioFile *a, const Range &range, bool alllow_loop);
+	void prepare(AudioFile *a, const Range &range, bool alllow_loop);
 
-	void Seek(int pos);
+	void seek(int pos);
 
 private:
 	void read_basic(BufferBox &buf, int pos, int size);

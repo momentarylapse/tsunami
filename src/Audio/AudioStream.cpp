@@ -159,7 +159,7 @@ void AudioStream::start_play(int pos)
 		num_buffers ++;
 
 	alSourcef (source, AL_PITCH,    1.0f);
-	alSourcef (source, AL_GAIN,     volume);
+	alSourcef (source, AL_GAIN,     volume * output->volume);
 //	alSourcefv(source, AL_POSITION, SourcePos);
 //	alSourcefv(source, AL_VELOCITY, SourceVel);
 	alSourcei (source, AL_LOOPING,  false);
@@ -300,7 +300,7 @@ void AudioStream::update()
 	msg_db_f("Stream.update", 1);
 	testError("idle");
 	if (playing){
-		alSourcef(source, AL_GAIN, volume);
+		alSourcef(source, AL_GAIN, volume * output->volume);
 		testError("alGetSourcef(volume) (idle)");
 		//msg_write("..");
 		int processed;

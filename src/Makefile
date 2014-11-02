@@ -59,6 +59,7 @@ OBJ = \
  Audio/Synth/DummySynthesizer.o\
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
+ Audio/Synth/SynthesizerRenderer.o\
  Audio/AudioInput.o\
  Audio/AudioInputAudio.o\
  Audio/AudioInputBase.o\
@@ -409,6 +410,9 @@ Audio/Synth/SampleSynthesizer.o : Audio/Synth/SampleSynthesizer.cpp
 
 Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 	$(CPP) -c Audio/Synth/Synthesizer.cpp -o $@ $(CXXFLAGS)
+
+Audio/Synth/SynthesizerRenderer.o : Audio/Synth/SynthesizerRenderer.cpp
+	$(CPP) -c Audio/Synth/SynthesizerRenderer.cpp -o $@ $(CXXFLAGS)
 
 Audio/AudioInput.o : Audio/AudioInput.cpp
 	$(CPP) -c Audio/AudioInput.cpp -o $@ $(CXXFLAGS)

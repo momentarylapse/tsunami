@@ -17,6 +17,7 @@
 #include "../Audio/AudioStream.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
+#include "../Audio/Synth/SynthesizerRenderer.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
@@ -215,15 +216,18 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::renderNote), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::createPanel), &synth);
 	//Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::reset), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::resetConfig), &synth);
-	Script::LinkExternal("Synthesizer.set", Script::mf(&Synthesizer::set));
 	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::renderMetronomeClick));
-	Script::LinkExternal("Synthesizer._reset", Script::mf(&Synthesizer::_reset));
 	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
+
+	SynthesizerRenderer synthren(NULL);
+	Script::DeclareClassSize("SynthesizerRenderer", sizeof(SynthesizerRenderer));
+	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
+	Script::LinkExternal("SynthesizerRenderer.set", Script::mf(&SynthesizerRenderer::set));
+	Script::LinkExternal("SynthesizerRenderer.reset", Script::mf(&SynthesizerRenderer::reset));
 
 
 	DummySynthesizer dsynth;

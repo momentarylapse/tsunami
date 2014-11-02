@@ -9,15 +9,12 @@
 #define SYNTHESIZER_H_
 
 #include "../../lib/base/base.h"
-#include "../AudioRenderer.h"
 #include "../../Plugins/Configurable.h"
 
 class Range;
 class BufferBox;
-class MidiNote;
-class MidiSource;
 
-class Synthesizer : /*public AudioRendererInterface,*/ public Configurable
+class Synthesizer : public Configurable
 {
 public:
 	Synthesizer();
@@ -28,19 +25,11 @@ public:
 	virtual void renderNote(BufferBox &buf, const Range &range, float pitch, float volume){}
 	void renderMetronomeClick(BufferBox &buf, int pos, int level, float volume);
 
-	void _reset();
-	void set(float pitch, float volume, int offset);
-	virtual int read(BufferBox &buf);
-	void iterate(int samples);
-
 	virtual void reset();
 
 	int sample_rate;
 
-	MidiSource *source;
-
 	int keep_notes;
-	Array<MidiNote> notes;
 };
 
 float pitch_to_freq(float pitch);

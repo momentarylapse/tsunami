@@ -19,6 +19,7 @@ class AudioInput;
 class AudioRenderer;
 class TsunamiWindow;
 class AudioViewTrack;
+class SynthesizerRenderer;
 
 class AudioView : public Observer, public Observable
 {
@@ -198,6 +199,8 @@ public:
 	AudioFile *audio;
 
 	AudioStream *stream;
+	AudioStream *midi_preview_stream;
+	SynthesizerRenderer *midi_preview_renderer;
 	AudioInput *input;
 	AudioRenderer *renderer;
 

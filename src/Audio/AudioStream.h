@@ -15,7 +15,7 @@
 #include "../Data/AudioFile.h"
 #include "../View/Helper/PeakMeter.h"
 
-class AudioRenderer;
+class AudioRendererInterface;
 class AudioOutput;
 
 class AudioStream : public PeakMeterSource
@@ -40,9 +40,9 @@ public:
 	bool _cdecl isPlaying();
 	bool _cdecl isPaused();
 	int _cdecl getState();
-	void _cdecl setSource(AudioRenderer *r);
+	void _cdecl setSource(AudioRendererInterface *r);
 	void _cdecl setSourceGenerated(void *func, int sample_rate);
-	AudioRenderer *getSource(){	return renderer;	}
+	AudioRendererInterface *getSource(){	return renderer;	}
 	int getPos();
 	bool getPosSafe(int &pos);
 	void flushBuffers();
@@ -68,7 +68,7 @@ private:
 	int sample_rate;
 	int buffer_size;
 
-	AudioRenderer *renderer;
+	AudioRendererInterface *renderer;
 	BufferBox box[2];
 
 	typedef int generate_func_t(BufferBox &);

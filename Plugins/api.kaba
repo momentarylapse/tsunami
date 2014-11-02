@@ -86,15 +86,17 @@ class Synthesizer
 	//extern virtual void updateDialog()
 	extern virtual void reset()
 	extern virtual void resetConfig()
-	extern virtual int read(BufferBox buf)
-	extern void set(float pitch, float volume, int offset)
 	extern void renderMetronomeClick(BufferBox buf, int pos, int level, float volume)
-	extern void _reset()
 	//extern void notify()
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()
 	extern overwrite void renderNote(BufferBox buf, Range range, float pitch, float volume)
+
+class SynthesizerRenderer
+	extern void reset()
+	extern virtual int read(BufferBox buf)
+	extern void set(float pitch, float volume, int offset)
 
 class TrackRenderBuffer
 	int dummy

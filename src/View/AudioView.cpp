@@ -16,6 +16,7 @@
 #include "../Audio/AudioStream.h"
 #include "../Audio/AudioRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
+#include "../Audio/Synth/SynthesizerRenderer.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
 
@@ -138,6 +139,10 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	stream = new AudioStream;
 	stream->setSource(renderer);
 
+	midi_preview_stream = new AudioStream;
+	midi_preview_renderer = new SynthesizerRenderer(NULL);
+	midi_preview_stream->setSource(midi_preview_renderer);
+
 	area = rect(0, 0, 0, 0);
 	subscribe(audio);
 	subscribe(stream);
@@ -176,6 +181,8 @@ AudioView::~AudioView()
 	unsubscribe(input);
 
 	delete(stream);
+	delete(midi_preview_stream);
+	delete(midi_preview_renderer);
 
 	HuiConfig.setBool("View.Mono", show_mono);
 	HuiConfig.setInt("View.DetailSteps", detail_steps);
@@ -531,7 +538,10 @@ void AudioView::onLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
 		cur_track->deleteMidiNote(selection.note);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-
+		midi_preview_renderer->reset();
+		midi_preview_renderer->setSynthesizer(cur_track->synth);
+		midi_preview_renderer->notes.add(MidiNote(Range(0, 20000), selection.pitch, 1));
+		midi_preview_stream->play();
 	}else if (selection.type == SEL_TYPE_BOTTOM_BUTTON){
 		win->bottom_bar->show();
 	}
@@ -579,6 +589,7 @@ void AudioView::onLeftButtonUp()
 			audio->execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 		cur_track->addMidiNotes(getSelectedNotes());
+		midi_preview_stream->stop();
 	}
 	cur_action = NULL;
 

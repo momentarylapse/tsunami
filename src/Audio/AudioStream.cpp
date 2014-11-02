@@ -175,7 +175,7 @@ void AudioStream::start_play(int pos)
 		return;
 }
 
-void AudioStream::setSource(AudioRenderer *r)
+void AudioStream::setSource(AudioRendererInterface *r)
 {
 	msg_db_f("Stream.setSource", 1);
 

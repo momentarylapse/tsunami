@@ -174,8 +174,8 @@ class CompressorPanel : ConfigPanel
 		grid.config = &_fx.config
 		grid.cp = self
 		
-		eventM("attack", self, &onEdit)
-		eventM("release", self, &onEdit)
+		event("attack", &onEdit)
+		event("release", &onEdit)
 	
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(MIN_DB, 0, false, "dB")

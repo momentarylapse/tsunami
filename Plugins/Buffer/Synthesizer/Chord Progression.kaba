@@ -64,11 +64,11 @@ class ChordProgPanel : ConfigPanel
 		addSpinButton("\\1\\100\\1", 2, 3, 0, 0, "beats")
 	
 		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)
-		eventM("chords", self, &onChords)
-		eventM("duration_type:beats", self, &onDurationTypeBeats)
-		eventM("duration_type:time", self, &onDurationTypeTime)
-		eventM("duration", self, &onDuration)
-		eventM("beats", self, &onBeats)
+		event("chords", &onChords)
+		event("duration_type:beats", &onDurationTypeBeats)
+		event("duration_type:time", &onDurationTypeTime)
+		event("duration", &onDuration)
+		event("beats", &onBeats)
 
 		update()
 	

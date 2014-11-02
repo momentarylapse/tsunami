@@ -37,9 +37,9 @@ void main()
 	freq = 880.0
 	dlg.setFloat("frequency", freq)
 	
-	dlg.event("hui:close", &OnClose)
-	dlg.event("close", &OnClose)
-	dlg.event("frequency", &OnFrequency)
+	dlg.eventS("hui:close", &OnClose)
+	dlg.eventS("close", &OnClose)
+	dlg.eventS("frequency", &OnFrequency)
 	
 	offset = 0
 	output.playGenerated(&fill, SAMPLE_RATE)

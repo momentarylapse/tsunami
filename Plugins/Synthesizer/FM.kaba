@@ -98,7 +98,7 @@ class FMPanel : ConfigPanel
 			addSpinButton("0\\0\\1000\\0.1", 5, j + 1, 0, 0, "attack_" + j)
 			addSpinButton("0\\0\\1000\\0.1", 6, j + 1, 0, 0, "decay_" + j)
 			addSpinButton("0\\0\\1000\\0.1", 7, j + 1, 0, 0, "release_" + j)
-		eventM("*", self, &onChange)
+		event("*", &onChange)
 	
 	void onChange()
 		for int j, 0, NUM_OSCILLATORS

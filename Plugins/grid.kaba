@@ -401,14 +401,14 @@ class Grid : GridData
 	void init(Panel *_panel, string _id)
 		panel = _panel
 		id = _id
-		panel.eventMX(id, "hui:draw", self, &onDrawAll)
-		panel.eventMX(id, "hui:left-button-down", self, &onLeftButtonDownAll)
-		panel.eventMX(id, "hui:left-button-up", self, &onLeftButtonUpAll)
-		panel.eventMX(id, "hui:right-button-down", self, &onRightButtonDownAll)
-		panel.eventMX(id, "hui:right-button-up", self, &onRightButtonUpAll)
-		panel.eventMX(id, "hui:mouse-move", self, &onMouseMoveAll)
-		panel.eventMX(id, "hui:mouse-wheel", self, &onMouseWheelAll)
-		panel.eventMX(id, "hui:key-down", self, &onKeyDownAll)
+		panel.eventX(id, "hui:draw", &onDrawAll)
+		panel.eventX(id, "hui:left-button-down", &onLeftButtonDownAll)
+		panel.eventX(id, "hui:left-button-up", &onLeftButtonUpAll)
+		panel.eventX(id, "hui:right-button-down", &onRightButtonDownAll)
+		panel.eventX(id, "hui:right-button-up", &onRightButtonUpAll)
+		panel.eventX(id, "hui:mouse-move", &onMouseMoveAll)
+		panel.eventX(id, "hui:mouse-wheel", &onMouseWheelAll)
+		panel.eventX(id, "hui:key-down", &onKeyDownAll)
 	
 	virtual void onDraw(Painter *c)
 	virtual void onLeftButtonDown()

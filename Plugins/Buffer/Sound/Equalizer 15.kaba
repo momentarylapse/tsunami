@@ -80,7 +80,7 @@ class Equalizer15Panel : ConfigPanel
 		addText("7k5", 12, 1, 0, 0, "")
 		addText("20k", 14, 1, 0, 0, "")
 	
-		eventM("*", self, &onEvent)
+		event("*", &onEvent)
 	
 		update()
 

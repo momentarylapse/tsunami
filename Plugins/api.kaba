@@ -240,10 +240,11 @@ class AudioRenderer
 	//extern virtual int read(BufferBox b)
 
 
-class AudioOutput
+class AudioStream
 	extern void stop()
-	extern void play(AudioRenderer *r)
-	extern void playGenerated(void *func, int sample_rate)
+	extern void play()
+	extern void setSource(AudioRenderer *r)
+	extern void setSourceGenerated(void *func, int sample_rate)
 	extern bool isPlaying()
 	extern int getPos()
 	extern float getSampleRate()
@@ -282,7 +283,8 @@ class PluginContext
 
 extern Window *MainWin
 extern AudioFile *audio
-extern AudioOutput *output
+//extern AudioOutput *output
+extern AudioStream *stream
 extern AudioInput *input
 extern AudioRenderer *renderer
 extern AudioView *view

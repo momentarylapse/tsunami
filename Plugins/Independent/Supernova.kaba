@@ -74,8 +74,8 @@ class SuperNovaWindow : Window
 		setInt("speed", 1)
 		enable("cancel", false)
 		
-		eventM("close", self, &onClose)
-		eventM("cancel", self, &onCancel)
+		event("close", &onClose)
+		event("cancel", &onCancel)
 		setFullscreen(true)
 	
 	void onClose()

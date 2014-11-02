@@ -37,7 +37,7 @@ class SamplePanel : ConfigPanel
 		super.__init__(_s)
 		sc = &c.config
 		addListView("!width=300\\Note\\Sample", 0, 0, 0, 0, "list")
-		eventM("list", self, &onSelect)
+		event("list", &onSelect)
 
 	overwrite void update()
 		reset("list")

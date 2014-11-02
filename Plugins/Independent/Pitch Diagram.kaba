@@ -131,8 +131,8 @@ void main()
 	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)
 	win.addDrawingArea("", 0, 0, 0, 0, "drawing")
 	
-	win.eventX("drawing", "hui:draw", &Draw)
-	win.event("hui:close", &OnClose)
+	win.eventSX("drawing", "hui:draw", &Draw)
+	win.eventS("hui:close", &OnClose)
 	
 
 

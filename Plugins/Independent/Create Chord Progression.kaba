@@ -76,8 +76,8 @@ Grid ? '' 1 4
 	dlg.setFloat("bpm", 90.0)
 	dlg.setInt("beats", 4)
 	
-	dlg.event("hui:close", &OnClose)
-	dlg.event("cancel", &OnClose)
-	dlg.event("ok", &OnOk)
+	dlg.eventS("hui:close", &OnClose)
+	dlg.eventS("cancel", &OnClose)
+	dlg.eventS("ok", &OnOk)
 	
 	dlg.run()

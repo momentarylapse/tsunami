@@ -4,7 +4,7 @@ class MyDialog : Dialog
 	void __init__()
 		super.__init__("", 300, 200, nil, false)
 		addEdit("", 0, 0, 0, 0, "edit")
-		eventM("edit", self, &onChange)
+		event("edit", &onChange)
 	void onChange()
 		print "ssss"
 

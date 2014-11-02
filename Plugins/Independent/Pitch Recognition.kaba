@@ -129,9 +129,9 @@ void main()
 	win.addButton("Schließen", 5, 145, 290, 25, "close")
 	win.setImage("close", "hui:close")
 	
-	win.eventX("drawing", "hui:draw", &Draw)
-	win.event("hui:close", &OnClose)
-	win.event("close", &OnClose)
+	win.eventSX("drawing", "hui:draw", &Draw)
+	win.eventS("hui:close", &OnClose)
+	win.eventS("close", &OnClose)
 	
 
 

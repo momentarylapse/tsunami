@@ -70,9 +70,9 @@ class MetronomePanel : ConfigPanel
 		addSpinButton("\\0\\100\\0.1", 1, 2, 0, 0, "volume")
 		addText("%", 2, 2, 0, 0, "")
 	
-		eventM("beats_per_minute", self, &onMetroBeats)
-		eventM("beats_per_measure", self, &onMetroMeasure)
-		eventM("volume", self, &onMetroVolume)
+		event("beats_per_minute", &onMetroBeats)
+		event("beats_per_measure", &onMetroMeasure)
+		event("volume", &onMetroVolume)
 	
 		update()
 

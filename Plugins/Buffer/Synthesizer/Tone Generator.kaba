@@ -66,11 +66,11 @@ class TonePanel : ConfigPanel
 			setString("pitch_rel", rel_pitch_name(i))
 	
 		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)
-		eventM("pitch_rel", self, &onPitch)
-		eventM("octave", self, &onPitch)
-		eventM("frequency",  self, &onFrequency)
-		eventM("type:freq",  self, &onTypeFreq)
-		eventM("type:pitch", self, &onTypePitch)
+		event("pitch_rel", &onPitch)
+		event("octave", &onPitch)
+		event("frequency",  &onFrequency)
+		event("type:freq",  &onTypeFreq)
+		event("type:pitch", &onTypePitch)
 
 		update()
 

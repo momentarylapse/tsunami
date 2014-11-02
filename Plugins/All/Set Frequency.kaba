@@ -15,9 +15,9 @@ void main()
 	dlg.addButton("Abbrechen", 5, 35, 100, 25, "cancel")
 	dlg.addDefButton("Ok", 110, 35, 95, 25, "ok")
 	
-	dlg.event("ok", &OnOk)
-	dlg.event("cancel", &OnClose)
-	dlg.event("hui:close", &OnClose)
+	dlg.eventS("ok", &OnOk)
+	dlg.eventS("cancel", &OnClose)
+	dlg.eventS("hui:close", &OnClose)
 	
 	dlg.setInt("freq", audio.sample_rate)
 	

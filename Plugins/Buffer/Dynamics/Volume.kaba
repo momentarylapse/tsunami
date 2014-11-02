@@ -46,7 +46,7 @@ class VolumePanel : ConfigPanel
 		
 		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.Volume)
 	
-		eventM("max", self, &onMax)
+		event("max", &onMax)
 
 	overwrite void update()
 		SliderSet(self, "volume", c.config.Volume)

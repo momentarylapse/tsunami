@@ -37,6 +37,9 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 		return;*/
 	}
 
+	if (view->cur_track)
+		tsunami->input->in_midi->setPreviewSynthesizer(view->cur_track->synth);
+
 	// dialog
 	check("capture_type:audio", true);
 	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
@@ -72,6 +75,8 @@ CaptureDialog::~CaptureDialog()
 	view->stream->stop();
 	tsunami->input->buffer.clear();
 	delete(peak_meter);
+
+	tsunami->input->in_midi->setPreviewSynthesizer(NULL);
 }
 
 

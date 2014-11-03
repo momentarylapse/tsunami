@@ -25,6 +25,7 @@ public:
 	void __init__();
 	virtual void __delete__();
 
+	Synthesizer *getSynthesizer(){ return s; }
 	void setSynthesizer(Synthesizer *s);
 
 	virtual int read(BufferBox &buf);

@@ -15,6 +15,9 @@
 
 struct _snd_seq;
 struct _snd_seq_port_subscribe;
+class AudioStream;
+class SynthesizerRenderer;
+class Synthesizer;
 
 class AudioInputMidi : public AudioInputBase
 {
@@ -49,6 +52,8 @@ public:
 	bool connectTo(MidiPort p);
 	bool unconnect();
 
+	void setPreviewSynthesizer(Synthesizer *s);
+
 private:
 
 	void clearInputQueue();
@@ -68,6 +73,9 @@ private:
 
 	int tone_start[128];
 	float tone_volume[128];
+
+	AudioStream *preview_stream;
+	SynthesizerRenderer *preview_renderer;
 };
 
 #endif /* AUDIOINPUTMIDI_H_ */

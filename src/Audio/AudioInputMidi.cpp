@@ -6,6 +6,9 @@
  */
 
 #include "AudioInputMidi.h"
+#include "AudioStream.h"
+#include "Synth/Synthesizer.h"
+#include "Synth/SynthesizerRenderer.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include <alsa/asoundlib.h>
@@ -19,6 +22,11 @@ AudioInputMidi::AudioInputMidi(MidiData &_data) :
 	subs = NULL;
 
 	init();
+
+	preview_renderer = new SynthesizerRenderer(NULL);
+	preview_stream = new AudioStream;
+	preview_stream->setSource(preview_renderer);
+	preview_stream->setBufferSize(1024);
 }
 
 AudioInputMidi::~AudioInputMidi()
@@ -27,6 +35,8 @@ AudioInputMidi::~AudioInputMidi()
 		unconnect();
 	if (handle)
 		snd_seq_close(handle);
+	delete(preview_renderer);
+	delete(preview_stream);
 }
 
 void AudioInputMidi::init()
@@ -44,6 +54,11 @@ void AudioInputMidi::init()
 		tsunami->log->error(string("Error creating sequencer port: ") + snd_strerror(portid));
 		return;
 	}
+}
+
+void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
+{
+	preview_renderer->setSynthesizer(s);
 }
 
 bool AudioInputMidi::connectTo(AudioInputMidi::MidiPort p)
@@ -77,7 +92,7 @@ bool AudioInputMidi::unconnect()
 		return true;
 	int r = snd_seq_unsubscribe_port(handle, subs);
 	if (r != 0)
-		tsunami->log->error(string("Error unconnecting to midi port: ") + snd_strerror(r));
+		tsunami->log->error(string("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
 	subs = NULL;
 	return r == 0;
@@ -151,6 +166,8 @@ bool AudioInputMidi::start(int _sample_rate)
 	resetAccumulation();
 
 	clearInputQueue();
+	if (preview_renderer->getSynthesizer())
+		preview_stream->play();
 
 	timer.reset();
 
@@ -161,6 +178,7 @@ bool AudioInputMidi::start(int _sample_rate)
 void AudioInputMidi::stop()
 {
 	capturing = false;
+	preview_stream->stop();
 }
 
 int AudioInputMidi::doCapturing()
@@ -175,23 +193,26 @@ int AudioInputMidi::doCapturing()
 		int r = snd_seq_event_input(handle, &ev);
 		if (r < 0)
 			break;
+		int pitch = ev->data.note.note;
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:
-				tone_start[ev->data.note.note] = pos;
-				tone_volume[ev->data.note.note] = (float)ev->data.note.velocity / 127.0f;
+				tone_start[pitch] = pos;
+				tone_volume[pitch] = (float)ev->data.note.velocity / 127.0f;
+				preview_renderer->add(0, pitch, tone_volume[pitch]);
 				//msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:
 				//msg_write(format("note off %d %d", ev->data.control.channel, ev->data.note.note));
-				if (tone_start[ev->data.note.note] >= 0){
+				if (tone_start[pitch] >= 0){
 					MidiNote n;
-					n.pitch = ev->data.note.note;
-					n.volume = tone_volume[ev->data.note.note];
-					n.range.offset = tone_start[ev->data.note.note];
-					n.range.num = pos - tone_start[ev->data.note.note];
-					tone_start[ev->data.note.note] = -1;
+					n.pitch = pitch;
+					n.volume = tone_volume[pitch];
+					n.range.offset = tone_start[pitch];
+					n.range.num = pos - tone_start[pitch];
+					tone_start[pitch] = -1;
 					if (accumulating)
 						data.add(n);
+					preview_renderer->add(0, pitch, 0);
 				}
 				break;
 		}

@@ -16,6 +16,7 @@ public:
 	AudioRendererInterface(){}
 	virtual ~AudioRendererInterface(){}
 	virtual int read(BufferBox &buf){ return 0; }
+	int sample_rate;
 };
 
 class AudioRenderer : public AudioRendererInterface

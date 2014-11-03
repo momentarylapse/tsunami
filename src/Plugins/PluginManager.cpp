@@ -226,7 +226,7 @@ void PluginManager::LinkAppScriptData()
 	SynthesizerRenderer synthren(NULL);
 	Script::DeclareClassSize("SynthesizerRenderer", sizeof(SynthesizerRenderer));
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
-	Script::LinkExternal("SynthesizerRenderer.set", Script::mf(&SynthesizerRenderer::set));
+	Script::LinkExternal("SynthesizerRenderer.add", Script::mf(&SynthesizerRenderer::add));
 	Script::LinkExternal("SynthesizerRenderer.reset", Script::mf(&SynthesizerRenderer::reset));
 
 

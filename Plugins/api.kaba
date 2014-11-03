@@ -96,7 +96,7 @@ class DummySynthesizer : Synthesizer
 class SynthesizerRenderer
 	extern void reset()
 	extern virtual int read(BufferBox buf)
-	extern void set(float pitch, float volume, int offset)
+	extern void add(int offset, float pitch, float volume)
 
 class TrackRenderBuffer
 	int dummy

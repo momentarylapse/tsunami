@@ -53,6 +53,12 @@ void MidiData::sort()
 				swap(i, j);
 }
 
+MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)
+{
+	pos = _pos;
+	pitch = _pitch;
+	volume = _volume;
+}
 
 
 string GetChordTypeName(int type)

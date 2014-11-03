@@ -12,6 +12,7 @@
 #include "../AudioRenderer.h"
 
 class Synthesizer;
+class MidiEvent;
 class MidiNote;
 class MidiSource;
 
@@ -27,15 +28,23 @@ public:
 	void setSynthesizer(Synthesizer *s);
 
 	virtual int read(BufferBox &buf);
-	void iterate(int samples);
 
-	void set(float pitch, float volume, int offset);
+	void add(int offset, float pitch, float volume);
 	void reset();
 
-	Synthesizer *s;
-	Array<MidiNote> notes;
+	bool auto_stop;
 
+private:
+	void createNotes();
+	void iterate(int samples);
+
+	Synthesizer *s;
 	MidiSource *source;
+
+	Array<MidiEvent> events;
+
+	// accumulated...
+	Array<MidiNote> cur_notes;
 };
 
 #endif /* SRC_AUDIO_SYNTH_SYNTHESIZERRENDERER_H_ */

@@ -139,8 +139,10 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	stream = new AudioStream;
 	stream->setSource(renderer);
 
-	midi_preview_stream = new AudioStream;
 	midi_preview_renderer = new SynthesizerRenderer(NULL);
+	midi_preview_renderer->auto_stop = true;
+	midi_preview_stream = new AudioStream;
+	midi_preview_stream->setBufferSize(1024);
 	midi_preview_stream->setSource(midi_preview_renderer);
 
 	area = rect(0, 0, 0, 0);
@@ -540,7 +542,7 @@ void AudioView::onLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 		midi_preview_renderer->reset();
 		midi_preview_renderer->setSynthesizer(cur_track->synth);
-		midi_preview_renderer->notes.add(MidiNote(Range(0, 20000), selection.pitch, 1));
+		midi_preview_renderer->add(0, selection.pitch, 1);
 		midi_preview_stream->play();
 	}else if (selection.type == SEL_TYPE_BOTTOM_BUTTON){
 		win->bottom_bar->show();
@@ -589,7 +591,8 @@ void AudioView::onLeftButtonUp()
 			audio->execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 		cur_track->addMidiNotes(getSelectedNotes());
-		midi_preview_stream->stop();
+
+		midi_preview_renderer->add(0, selection.pitch, 0);
 	}
 	cur_action = NULL;
 

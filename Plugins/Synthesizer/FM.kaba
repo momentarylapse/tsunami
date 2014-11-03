@@ -129,7 +129,6 @@ class FMSynthesizer : Synthesizer
 	FMState state
 
 	overwrite void reset()
-		_reset()
 		state.reset()
 
 	overwrite ConfigPanel *createPanel()

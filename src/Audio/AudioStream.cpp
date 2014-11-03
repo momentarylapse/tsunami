@@ -52,7 +52,7 @@ AudioStream::AudioStream() :
 	buffer[1] = -1;
 	source = -1;
 	data_samples = 0;
-	buffer_size = 0;
+	buffer_size = DEFAULT_BUFFER_SIZE;
 	cur_buffer_no = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 
@@ -128,20 +128,24 @@ bool AudioStream::stream(int buf)
 {
 	msg_db_f("stream", 1);
 
-	BufferBox *b = (buf == buffer[0]) ? &box[0] : &box[1];
+	int buf_no = (buf == buffer[0]) ? 0 : 1;
+	BufferBox &b = box[buf_no];
 	int size = 0;
-	b->resize(buffer_size);
-	//b->offset = stream_offset_next;
+	b.resize(buffer_size);
+
+	// read data
 	if (renderer){
-		size = renderer->read(*b);
-		//msg_write(size);
+		size = renderer->read(b);
 	}else if (generate_func){
-		size = (*generate_func)(*b);
+		size = (*generate_func)(b);
 	}
+
+	// out of data?
 	if (size == 0)
 		return false;
-	//b->offset = stream_offset_next;
-	b->get_16bit_buffer(data);
+
+	// add to queue
+	b.get_16bit_buffer(data);
 	alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
 	testError("alBufferData (stream)");
 
@@ -150,8 +154,6 @@ bool AudioStream::stream(int buf)
 
 void AudioStream::start_play(int pos)
 {
-	buffer_size = DEFAULT_BUFFER_SIZE;
-
 	int num_buffers = 0;
 	if (stream(buffer[0]))
 		num_buffers ++;
@@ -184,7 +186,7 @@ void AudioStream::setSource(AudioRendererInterface *r)
 
 	renderer = r;
 	generate_func = NULL;
-	sample_rate = tsunami->audio->sample_rate; //r->sample_rate; // FIXME
+	sample_rate = r->sample_rate;
 }
 
 void AudioStream::setSourceGenerated(void *func, int _sample_rate)
@@ -210,7 +212,10 @@ void AudioStream::play()
 
 	playing = true;
 
-	HuiRunLaterM(UPDATE_TIME, this, &AudioStream::update);
+	if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
+		HuiRunLaterM(UPDATE_TIME, this, &AudioStream::update);
+	else
+		HuiRunLaterM(0, this, &AudioStream::update);
 
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -248,18 +253,19 @@ int AudioStream::getPos()
 
 bool AudioStream::getPosSafe(int &pos)
 {
-	if (playing){
-		int param = 0;
-		alGetSourcei(source, AL_SOURCE_STATE, &param);
-		testError("alGetSourcei1 (getpos)");
-		if ((param == AL_PLAYING) or (param == AL_PAUSED)){
-			alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
-			testError("alGetSourcei2 (getpos)");
-			pos = box[cur_buffer_no].offset + param;
-			return true;
-		}
-	}
-	return false;
+	if (playing)
+		return false;
+
+	int param = 0;
+	alGetSourcei(source, AL_SOURCE_STATE, &param);
+	testError("alGetSourcei1 (getpos)");
+	if ((param != AL_PLAYING) and (param == AL_PAUSED))
+		return false;
+
+	alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
+	testError("alGetSourcei2 (getpos)");
+	pos = box[cur_buffer_no].offset + param;
+	return true;
 }
 
 float AudioStream::getVolume()
@@ -299,40 +305,42 @@ void AudioStream::update()
 {
 	msg_db_f("Stream.update", 1);
 	testError("idle");
-	if (playing){
-		alSourcef(source, AL_GAIN, volume * output->volume);
-		testError("alGetSourcef(volume) (idle)");
-		//msg_write("..");
-		int processed;
-		alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
-		testError("alGetSourcei(processed) (idle)");
-		while(processed--){
-			cur_buffer_no = 1 - cur_buffer_no;
-			ALuint buf;
-			alSourceUnqueueBuffers(source, 1, &buf);
-			testError("alSourceUnqueueBuffers (idle)");
-			if (stream(buf)){
-				alSourceQueueBuffers(source, 1, &buf);
-				testError("alSourceQueueBuffers (idle)");
-			}
-		}
-		notify(MESSAGE_UPDATE);
+	if (!playing)
+		return;
 
-
-		int param=0;
-		alGetSourcei(source,AL_SOURCE_STATE, &param);
-		testError("alGetSourcei(state) (idle)");
-		if ((param != AL_PLAYING) and (param != AL_PAUSED)){
-			//msg_write("hat gestoppt...");
-				stop();
+	alSourcef(source, AL_GAIN, volume * output->volume);
+	testError("alGetSourcef(volume) (idle)");
+	int processed;
+	alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
+	testError("alGetSourcei(processed) (idle)");
+	bool end_of_data = false;
+	while(processed--){
+		cur_buffer_no = 1 - cur_buffer_no;
+		ALuint buf;
+		alSourceUnqueueBuffers(source, 1, &buf);
+		testError("alSourceUnqueueBuffers (idle)");
+		if (stream(buf)){
+			alSourceQueueBuffers(source, 1, &buf);
+			testError("alSourceQueueBuffers (idle)");
 		}else{
+			end_of_data = true;
 		}
-
-		if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
-			HuiRunLaterM(UPDATE_TIME, this, &AudioStream::update);
-		else
-			HuiRunLaterM(0, this, &AudioStream::update);
 	}
+	notify(MESSAGE_UPDATE);
+
+	if (end_of_data){
+		stop();
+		return;
+	}
+
+	// stopped?  -> restart
+	if (!isPlaying())
+		alSourcePlay(source);
+
+	if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
+		HuiRunLaterM(UPDATE_TIME, this, &AudioStream::update);
+	else
+		HuiRunLaterM(0, this, &AudioStream::update);
 }
 
 

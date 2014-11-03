@@ -22,6 +22,7 @@ AudioRenderer::AudioRenderer()
 	loop_if_allowed = false;
 	pos = 0;
 	audio = NULL;
+	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
 AudioRenderer::~AudioRenderer()
@@ -266,6 +267,7 @@ void AudioRenderer::prepare(AudioFile *a, const Range &_range, bool allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
 	audio = a;
+	sample_rate = audio->sample_rate;
 	range = _range;
 	loop = loop_if_allowed && allow_loop;
 	pos = range.offset;

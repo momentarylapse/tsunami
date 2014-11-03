@@ -10,12 +10,13 @@
 
 
 
-const int MANY_SAMPLES = 0x7fffffff;
+const int MANY_SAMPLES = 0x60000000;
 
 SynthesizerRenderer::SynthesizerRenderer(Synthesizer *_s)
 {
-	s = _s;
 	source = NULL;
+	auto_stop = false;
+	setSynthesizer(_s);
 }
 
 SynthesizerRenderer::~SynthesizerRenderer()
@@ -35,22 +36,23 @@ void SynthesizerRenderer::__delete__()
 void SynthesizerRenderer::setSynthesizer(Synthesizer *_s)
 {
 	s = _s;
+	if (s)
+		sample_rate = s->sample_rate;
+	else
+		sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
 
-void SynthesizerRenderer::set(float pitch, float volume, int offset)
+void SynthesizerRenderer::add(int offset, float pitch, float volume)
 {
-	// end active notes
-	foreach(MidiNote &n, notes)
-		if (n.pitch == pitch)
-			if (n.range.is_inside(offset))
-				n.range.num = offset - n.range.offset;
+	MidiEvent ee = MidiEvent(offset, pitch, volume);
 
-	// start a new note
-	if (volume > 0){
-		MidiNote n = MidiNote(Range(offset, MANY_SAMPLES), pitch, volume);
-		notes.add(n);
-	}
+	for (int i=events.num-1; i>=0; i--)
+		if (events[i].pos <= offset){
+			events.insert(ee, i+1);
+			return;
+		}
+	events.add(ee);
 }
 
 void SynthesizerRenderer::iterate(int samples)
@@ -59,13 +61,31 @@ void SynthesizerRenderer::iterate(int samples)
 	if (s)
 		keep_notes = s->keep_notes;
 
-	for (int i=0;i<notes.num;i++){
-		notes[i].range.offset -= samples;
-		if (notes[i].range.end() + keep_notes < 0){
-			notes.erase(i);
+	for (int i=0;i<cur_notes.num;i++){
+		cur_notes[i].range.offset -= samples;
+		if (cur_notes[i].range.end() + keep_notes < 0){
+			cur_notes.erase(i);
 			i --;
 		}
 	}
+}
+
+void SynthesizerRenderer::createNotes()
+{
+	foreach(MidiEvent &e, events){
+		if (e.volume > 0){
+			// start new note
+			MidiNote n = MidiNote(Range(e.pos, MANY_SAMPLES), e.pitch, e.volume);
+			cur_notes.add(n);
+		}else{
+			// stop note
+			foreach(MidiNote &n, cur_notes)
+				if ((e.pitch == n.pitch) and (n.range.is_inside(e.pos)))
+					n.range.set_end(e.pos);
+		}
+	}
+
+	events.clear();
 }
 
 int SynthesizerRenderer::read(BufferBox &buf)
@@ -75,15 +95,22 @@ int SynthesizerRenderer::read(BufferBox &buf)
 	// get from source...
 	buf.scale(0);
 
-	foreach(MidiNote &n, notes)
+	createNotes();
+
+	if ((auto_stop) and (cur_notes.num == 0))
+		return 0;
+
+	foreach(MidiNote &n, cur_notes)
 		s->renderNote(buf, n.range, n.pitch, n.volume);
 
 	iterate(buf.num);
+
 	return buf.num;
 }
 
 void SynthesizerRenderer::reset()
 {
-	notes.clear();
+	events.clear();
+	cur_notes.clear();
 }
 

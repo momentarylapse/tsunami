@@ -24,6 +24,7 @@ public:
 
 	void onTypeAudio();
 	void onTypeMidi();
+	void onTarget();
 	void onStart();
 	void onDelete();
 	void onPause();
@@ -34,6 +35,9 @@ public:
 	void fillTrackList();
 
 	void onUpdate(Observable *o, const string &message);
+
+	void setTarget(int index);
+	void setType(int type);
 
 	AudioFile *audio;
 	AudioView *view;

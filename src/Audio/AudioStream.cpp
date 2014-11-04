@@ -253,13 +253,13 @@ int AudioStream::getPos()
 
 bool AudioStream::getPosSafe(int &pos)
 {
-	if (playing)
+	if (!playing)
 		return false;
 
 	int param = 0;
 	alGetSourcei(source, AL_SOURCE_STATE, &param);
 	testError("alGetSourcei1 (getpos)");
-	if ((param != AL_PLAYING) and (param == AL_PAUSED))
+	if ((param != AL_PLAYING) and (param != AL_PAUSED))
 		return false;
 
 	alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
@@ -328,14 +328,16 @@ void AudioStream::update()
 	}
 	notify(MESSAGE_UPDATE);
 
-	if (end_of_data){
-		stop();
-		return;
-	}
 
-	// stopped?  -> restart
-	if (!isPlaying())
+	if (!isPlaying()){
+		if (end_of_data){
+			stop();
+			return;
+		}
+
+		// stopped?  -> restart
 		alSourcePlay(source);
+	}
 
 	if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
 		HuiRunLaterM(UPDATE_TIME, this, &AudioStream::update);

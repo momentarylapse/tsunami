@@ -196,9 +196,11 @@ int AudioInputMidi::doCapturing()
 		int pitch = ev->data.note.note;
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:
-				tone_start[pitch] = pos;
-				tone_volume[pitch] = (float)ev->data.note.velocity / 127.0f;
-				preview_renderer->add(0, pitch, tone_volume[pitch]);
+				if (tone_start[pitch] < 0){
+					tone_start[pitch] = pos;
+					tone_volume[pitch] = (float)ev->data.note.velocity / 127.0f;
+					preview_renderer->add(0, pitch, tone_volume[pitch]);
+				}
 				//msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:

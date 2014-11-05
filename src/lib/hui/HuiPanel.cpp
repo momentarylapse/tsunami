@@ -42,7 +42,7 @@ void HuiPanel::__init__()
 
 void HuiPanel::__delete__()
 {
-	_ClearPanel_();
+	this->~HuiPanel();
 }
 
 // might be executed repeatedly

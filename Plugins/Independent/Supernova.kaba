@@ -78,6 +78,10 @@ class SuperNovaWindow : Window
 		event("cancel", &onCancel)
 		setFullscreen(true)
 	
+	void __delete__()
+		if Mode == ModeLesson
+			StopLesson()
+	
 	void onClose()
 		delete self
 	
@@ -302,7 +306,7 @@ void StartLesson(string name)
 	win.enable("cancel", true)
 	Mode = ModeLesson
 
-void StopLesson()	
+void StopLesson()
 	view.stream.stop()
 	input.removeObserver(nil)
 	input.stop()
@@ -340,6 +344,3 @@ void main()
 	MainWin.hide()
 	win.run()
 	MainWin.show()
-	
-	if Mode == ModeLesson
-		StopLesson()

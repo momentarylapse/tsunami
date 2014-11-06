@@ -36,13 +36,13 @@ int MidiData::getNextNote(int pos)
 	return 0;
 }
 
-Range MidiData::getRange()
+Range MidiData::getRange(int elongation)
 {
 	if (num == 0)
 		return Range(0, 0);
 	int i0 = (*this)[0].range.offset;
 	int i1 = back().range.end();
-	return Range(i0, i1 - i0);
+	return Range(i0, i1 - i0 + elongation);
 }
 
 void MidiData::sort()

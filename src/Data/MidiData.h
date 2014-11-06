@@ -39,7 +39,7 @@ class MidiData : public Array<MidiNote>
 public:
 	Array<MidiNote> getNotes(const Range &r);
 	int getNextNote(int pos);
-	Range getRange();
+	Range getRange(int elongation);
 
 	void sort();
 

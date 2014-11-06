@@ -43,7 +43,7 @@ int Sample::get_index()
 Range Sample::getRange()
 {
 	if (type == Track::TYPE_MIDI)
-		return Range(0, midi.getRange().num);
+		return Range(0, midi.getRange(0).num);
 	return Range(0, buf.num);
 }
 

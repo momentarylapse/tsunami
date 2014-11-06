@@ -113,11 +113,11 @@ Range Track::getRangeUnsafe()
 	}
 	Range r = Range(min, max - min);
 
-	if ((type == TYPE_TIME) && (bar.num > 0))
-		r = r || bar.getRange();
+//	if ((type == TYPE_TIME) && (bar.num > 0))
+//		r = r || bar.getRange();
 
 	if ((type == TYPE_MIDI) && (midi.num > 0))
-		r = r || midi.getRange();
+		r = r || midi.getRange(synth->keep_notes);
 
 	return r;
 }

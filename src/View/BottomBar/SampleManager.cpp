@@ -80,7 +80,7 @@ void render_midi(Image &im, MidiData &m)
 {
 	int w = im.width;
 	int h = im.height;
-	Range r = m.getRange();
+	Range r = m.getRange(0);
 	foreach(MidiNote &n, m){
 		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n.range.offset / (float)r.num, 0, 1);

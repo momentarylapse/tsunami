@@ -27,12 +27,14 @@ public:
 	bool save(AudioFile *a, const string &filename);
 	bool _export(AudioFile *a, const Range &r, const string &filename);
 
-	bool askByFlags(HuiWindow *win, const string &title, bool save, int flags);
+	bool askByFlags(HuiWindow *win, const string &title, int flags);
 
 	bool askOpen(HuiWindow *win);
 	bool askSave(HuiWindow *win);
 	bool askOpenImport(HuiWindow *win);
 	bool askSaveExport(HuiWindow *win);
+
+	Format *getFormat(const string &ext, int flags);
 
 private:
 	Array<Format*> format;

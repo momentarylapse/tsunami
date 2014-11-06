@@ -27,6 +27,8 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__();
 
+	void kill();
+
 
 	static const string MESSAGE_STATE_CHANGE;
 	static const string MESSAGE_UPDATE;
@@ -84,6 +86,7 @@ private:
 	int al_last_error;
 
 	AudioOutput *output;
+	bool killed;
 };
 
 #endif /* SRC_AUDIO_AUDIOSTREAM_H_ */

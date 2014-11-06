@@ -60,14 +60,14 @@ AudioStream::AudioStream() :
 
 	alGenBuffers(2, (ALuint*)buffer);
 	testError("alGenBuffers (play)");
+
+	output->addStream(this);
+	killed = false;
 }
 
 AudioStream::~AudioStream()
 {
-	stop();
-
-	alDeleteBuffers(2, (ALuint*)buffer);
-	testError("alDeleteBuffers (stop)");
+	kill();
 }
 
 void AudioStream::__init__()
@@ -78,6 +78,23 @@ void AudioStream::__init__()
 void AudioStream::__delete__()
 {
 	this->~AudioStream();
+}
+
+void AudioStream::kill()
+{
+	if (killed)
+		return;
+
+	stop();
+
+	alDeleteSources(1, &source);
+	testError("alDeleteBuffers (kill)");
+
+	alDeleteBuffers(2, (ALuint*)buffer);
+	testError("alDeleteBuffers (kill)");
+
+	output->removeStream(this);
+	killed = true;
 }
 
 void AudioStream::stop_play()

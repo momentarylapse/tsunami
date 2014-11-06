@@ -36,8 +36,8 @@ Tsunami::Tsunami() :
 Tsunami::~Tsunami()
 {
 	delete(storage);
-	delete(output);
 	delete(input);
+	delete(output);
 	delete(audio);
 	delete(renderer);
 	delete(plugin_manager);

@@ -46,9 +46,6 @@ AudioOutput::AudioOutput() :
 
 AudioOutput::~AudioOutput()
 {
-	foreach(AudioStream *s, streams)
-		s->stop();
-
 	kill();
 	HuiConfig.setStr("Output.ChosenDevice", ChosenDevice);
 	HuiConfig.setFloat("Output.Volume", volume);
@@ -126,6 +123,9 @@ void AudioOutput::kill()
 		return;
 	msg_db_f("Output.kill",1);
 
+	foreach(AudioStream *s, streams)
+		s->kill();
+
 	// close devices
 	if (al_dev){
 		// manually
@@ -175,6 +175,18 @@ void AudioOutput::setVolume(float _volume)
 {
 	volume = _volume;
 	notify(MESSAGE_CHANGE);
+}
+
+void AudioOutput::addStream(AudioStream* s)
+{
+	streams.add(s);
+}
+
+void AudioOutput::removeStream(AudioStream* s)
+{
+	for (int i=streams.num-1; i>=0; i--)
+		if (streams[i] == s)
+			streams.erase(i);
 }
 
 bool AudioOutput::testError(const string &msg)

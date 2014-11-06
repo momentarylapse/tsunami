@@ -35,6 +35,9 @@ public:
 	float getVolume();
 	void setVolume(float _volume);
 
+	void addStream(AudioStream *s);
+	void removeStream(AudioStream *s);
+
 private:
 	bool testError(const string &msg);
 

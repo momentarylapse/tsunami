@@ -16,6 +16,8 @@ HuiApplication::HuiApplication(const string &app_name, const string &def_lang, i
 
 	if (flags & HUI_FLAG_SILENT)
 		msg_init(HuiAppDirectory + "message.txt", false);
+
+	HuiEndKeepMsgAlive = true;
 }
 
 HuiApplication::~HuiApplication()
@@ -29,9 +31,15 @@ int HuiApplication::run()
 
 int HuiApplication::_Execute_(HuiApplication *app, const Array<string> &arg)
 {
+	int r = 0;
 	if (app->onStartup(arg))
-		return app->run();
+		r = app->run();
 	delete(app);
-	return 0;
+	if (HuiConfig.changed)
+		HuiConfig.save();
+
+	if ((msg_inited) /*&& (HuiMainLevel == 0)*/)
+		msg_end();
+	return r;
 }
 

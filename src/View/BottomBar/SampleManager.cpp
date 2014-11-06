@@ -38,6 +38,7 @@ SampleManager::SampleManager(AudioFile *a) :
 	event("delete_sample", this, &SampleManager::onDelete);
 	eventX("sample_list", "hui:change", this, &SampleManager::onListEdit);
 	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
+	event("sample_list", this, &SampleManager::onPreview);
 
 	preview_audio = new AudioFile;
 	preview_renderer = new AudioRenderer;

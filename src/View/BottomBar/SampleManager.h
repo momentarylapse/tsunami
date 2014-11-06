@@ -12,6 +12,8 @@
 
 class AudioFile;
 class Sample;
+class AudioStream;
+class AudioRenderer;
 
 class SampleManager : public BottomBarConsole, public Observer
 {
@@ -23,16 +25,25 @@ public:
 
 	void onListSelect();
 	void onListEdit();
-	void onImportFromFile();
+	void onImport();
+	void onExport();
+	void onPreview();
 	void onInsert();
 	void onCreateFromSelection();
 	void onDelete();
 
 	virtual void onUpdate(Observable *o, const string &message);
 
+	void endPreview();
+
 	AudioFile *audio;
 	Array<string> icon_names;
 	int selected_uid;
+
+	AudioStream *preview_stream;
+	AudioRenderer *preview_renderer;
+	AudioFile *preview_audio;
+	Sample *preview_sample;
 
 	static Sample *_cdecl select(HuiPanel *root, AudioFile *a, Sample *old);
 };

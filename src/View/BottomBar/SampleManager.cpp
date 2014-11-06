@@ -10,6 +10,9 @@
 #include "../../Storage/Storage.h"
 #include "../../View/AudioView.h"
 #include "../../View/AudioViewTrack.h"
+#include "../../Audio/AudioStream.h"
+#include "../../Audio/AudioRenderer.h"
+#include "../Helper/Progress.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include <math.h>
@@ -21,16 +24,26 @@ SampleManager::SampleManager(AudioFile *a) :
 {
 	fromResource("sample_manager_dialog");
 	setTooltip("import_from_file", _("aus Datei importieren"));
+	setTooltip("export", _("in Datei exportieren"));
+	setTooltip("preview_sample", _("Vorschau"));
 	setTooltip("delete_sample", _("l&oschen"));
 	setTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 	setTooltip("create_from_selection", _("aus Auswahl erzeugen"));
 
-	event("import_from_file", this, &SampleManager::onImportFromFile);
+	event("import_from_file", this, &SampleManager::onImport);
+	event("export_sample", this, &SampleManager::onExport);
+	event("preview_sample", this, &SampleManager::onPreview);
 	event("paste_sample", this, &SampleManager::onInsert);
 	event("create_from_selection", this, &SampleManager::onCreateFromSelection);
 	event("delete_sample", this, &SampleManager::onDelete);
 	eventX("sample_list", "hui:change", this, &SampleManager::onListEdit);
 	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
+
+	preview_audio = new AudioFile;
+	preview_renderer = new AudioRenderer;
+	preview_stream = new AudioStream;
+	preview_stream->setSource(preview_renderer);
+	preview_sample = NULL;
 
 	audio = a;
 	selected_uid = -1;
@@ -42,6 +55,9 @@ SampleManager::SampleManager(AudioFile *a) :
 SampleManager::~SampleManager()
 {
 	unsubscribe(audio);
+	delete(preview_stream);
+	delete(preview_renderer);
+	delete(preview_audio);
 }
 
 void render_bufbox(Image &im, BufferBox &b)
@@ -97,6 +113,8 @@ void SampleManager::fillList()
 	}
 	int sel = audio->get_sample_by_uid(selected_uid);
 	setInt("sample_list", sel);
+	enable("export_sample", sel >= 0);
+	enable("preview_sample", sel >= 0);
 	enable("delete_sample", sel >= 0);
 	enable("paste_sample", sel >= 0);
 }
@@ -107,6 +125,8 @@ void SampleManager::onListSelect()
 	selected_uid = -1;
 	if (sel >= 0)
 		selected_uid = audio->sample[sel]->uid;
+	enable("export_sample", sel >= 0);
+	enable("preview_sample", sel >= 0);
 	enable("delete_sample", sel >= 0);
 	enable("paste_sample", sel >= 0);
 }
@@ -121,7 +141,7 @@ void SampleManager::onListEdit()
 		audio->sample[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
 }
 
-void SampleManager::onImportFromFile()
+void SampleManager::onImport()
 {
 	if (tsunami->storage->askOpenImport(win)){
 		BufferBox buf;
@@ -131,6 +151,17 @@ void SampleManager::onImportFromFile()
 		setInt("sample_list", audio->sample.num - 1);
 		enable("delete_sample", true);
 		enable("paste_sample", true);
+	}
+}
+
+void SampleManager::onExport()
+{
+	if (tsunami->storage->askSaveExport(win)){
+		int sel = getInt("sample_list");
+		Sample *s = audio->sample[sel];
+		if (s->type == Track::TYPE_AUDIO){
+			tsunami->storage->saveBufferBox(audio, &s->buf, HuiFilename);
+		}
 	}
 }
 
@@ -160,7 +191,43 @@ void SampleManager::onDelete()
 
 void SampleManager::onUpdate(Observable *o, const string &message)
 {
-	fillList();
+	if (o == tsunami->progress){
+		if (message == tsunami->progress->MESSAGE_CANCEL)
+			endPreview();
+	}else if (o == preview_stream){
+		int pos = preview_stream->getPos();
+		Range r = preview_sample->getRange();
+		tsunami->progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
+		if (!preview_stream->isPlaying())
+			endPreview();
+	}else{
+		fillList();
+	}
+}
+
+void SampleManager::onPreview()
+{
+	int sel = getInt("sample_list");
+	preview_sample = audio->sample[sel];
+	preview_audio->reset();
+	preview_audio->addTrack(preview_sample->type);
+	preview_audio->track[0]->level[0].buffer.add(preview_sample->buf);
+	preview_audio->track[0]->midi = preview_sample->midi;
+	preview_renderer->prepare(preview_audio, preview_audio->GetRange(), false);
+
+	tsunami->progress->startCancelable(_("Vorschau"), 0);
+	subscribe(tsunami->progress);
+	subscribe(preview_stream);
+	preview_stream->play();
+}
+
+void SampleManager::endPreview()
+{
+	unsubscribe(preview_stream);
+	unsubscribe(tsunami->progress);
+	preview_stream->stop();
+	tsunami->progress->end();
+	preview_sample = NULL;
 }
 
 

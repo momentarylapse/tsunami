@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-208
+210
 // Data (ID,Text)
 about
 
@@ -106,6 +106,8 @@ sdiufh
 edit_midi
 
 exit
+
+export_sample
 
 export_selection
 
@@ -307,6 +309,8 @@ preview
 Preview
 preview_device
 
+preview_sample
+
 progress_bar
 
 progress_cancelable_dialog
@@ -317,9 +321,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_307753
+rand_id_238229
 
-rand_id_943448
+rand_id_479684
 
 rdt_source
 !bold\\Source
@@ -696,7 +700,7 @@ message.txt öffnen
 
 neue Audiodatei
 
-neue Spur anlegen
+neue Spur anlegen (
 
 neuen Effekt hinzufügen
 

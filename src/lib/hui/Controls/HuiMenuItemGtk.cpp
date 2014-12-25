@@ -17,7 +17,7 @@ void try_add_accel(GtkWidget *item, const string &id);
 
 gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data)
 {
-	((HuiControl*)data)->Notify("hui:click");
+	((HuiControl*)data)->notify("hui:click");
 	return FALSE;
 }
 
@@ -33,11 +33,7 @@ HuiMenuItem::HuiMenuItem(const string &title, const string &id) :
 	try_add_accel(widget, id);
 }
 
-HuiMenuItem::~HuiMenuItem()
-{
-}
-
-void HuiMenuItem::SetImage(const string &image)
+void HuiMenuItem::setImage(const string &image)
 {
 	/*GtkWidget *im = (GtkWidget*)get_gtk_image(image, false);
 	if (im)

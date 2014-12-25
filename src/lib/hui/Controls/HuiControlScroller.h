@@ -14,7 +14,6 @@ class HuiControlScroller : public HuiControl
 {
 public:
 	HuiControlScroller(const string &text, const string &id);
-	virtual ~HuiControlScroller();
 
 	virtual void add(HuiControl *child, int x, int y);
 

@@ -21,15 +21,12 @@ HuiMenuItemToggle::HuiMenuItemToggle(const string &title, const string &id) :
 	try_add_accel(widget, id);
 }
 
-HuiMenuItemToggle::~HuiMenuItemToggle()
-{
-}
-void HuiMenuItemToggle::__Check(bool checked)
+void HuiMenuItemToggle::__check(bool checked)
 {
 	gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(widget), checked);
 }
 
-bool HuiMenuItemToggle::IsChecked()
+bool HuiMenuItemToggle::isChecked()
 {
 	return gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget));
 }

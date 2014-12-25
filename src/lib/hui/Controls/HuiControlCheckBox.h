@@ -15,11 +15,10 @@ class HuiControlCheckBox : public HuiControl
 {
 public:
 	HuiControlCheckBox(const string &text, const string &id);
-	virtual ~HuiControlCheckBox();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual void __Check(bool checked);
-	virtual bool IsChecked();
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual void __check(bool checked);
+	virtual bool isChecked();
 };
 
 #endif /* HUICONTROLCHECKBOX_H_ */

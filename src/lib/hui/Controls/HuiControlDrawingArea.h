@@ -15,9 +15,8 @@ class HuiControlDrawingArea : public HuiControl
 {
 public:
 	HuiControlDrawingArea(const string &text, const string &id);
-	virtual ~HuiControlDrawingArea();
 
-	void HardReset();
+	void hardReset();
 };
 
 #endif /* HUICONTROLDRAWINGAREA_H_ */

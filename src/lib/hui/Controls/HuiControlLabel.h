@@ -15,10 +15,9 @@ class HuiControlLabel : public HuiControl
 {
 public:
 	HuiControlLabel(const string &text, const string &id);
-	virtual ~HuiControlLabel();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual void __SetOption(const string &op, const string &value);
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual void __setOption(const string &op, const string &value);
 };
 
 

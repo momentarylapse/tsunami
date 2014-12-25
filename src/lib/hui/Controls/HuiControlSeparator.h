@@ -15,7 +15,6 @@ class HuiControlSeparator : public HuiControl
 {
 public:
 	HuiControlSeparator(const string &text, const string &id);
-	virtual ~HuiControlSeparator();
 };
 
 #endif /* HUICONTROLSEPARATOR_H_ */

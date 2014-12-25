@@ -26,9 +26,5 @@ HuiToolItemMenuButton::HuiToolItemMenuButton(const string &title, HuiMenu *menu,
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkToolbarItemPress), this);
 }
 
-HuiToolItemMenuButton::~HuiToolItemMenuButton()
-{
-}
-
 #endif
 

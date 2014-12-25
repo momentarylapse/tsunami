@@ -17,7 +17,7 @@ int GtkAreaMouseSetX, GtkAreaMouseSetY;
 
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
-	((HuiControl*)user_data)->Notify("hui:draw");
+	((HuiControl*)user_data)->notify("hui:draw");
 	return false;
 }
 
@@ -76,7 +76,7 @@ gboolean OnGtkAreaMouseMove(GtkWidget *widget, GdkEventMotion *event, gpointer u
 	c->win->input.x = x;
 	c->win->input.y = y;*/
 
-	c->Notify("hui:mouse-move", false);
+	c->notify("hui:mouse-move", false);
 	gdk_event_request_motions(event); // to prevent too many signals for slow message processing
 	return false;
 }
@@ -86,7 +86,7 @@ gboolean OnGtkAreaMouseEnter(GtkWidget *widget, GdkEventCrossing *event, gpointe
 	HuiControl *c = (HuiControl*)user_data;
 	win_set_input(c->panel->win, event);
 
-	c->Notify("hui:mouse-enter", false);
+	c->notify("hui:mouse-enter", false);
 	return false;
 }
 
@@ -95,7 +95,7 @@ gboolean OnGtkAreaMouseLeave(GtkWidget *widget, GdkEventCrossing *event, gpointe
 	HuiControl *c = (HuiControl*)user_data;
 	win_set_input(c->panel->win, event);
 
-	c->Notify("hui:mouse-leave", false);
+	c->notify("hui:mouse-leave", false);
 	return false;
 }
 
@@ -120,7 +120,7 @@ gboolean OnGtkAreaButton(GtkWidget *widget, GdkEventButton *event, gpointer user
 		msg += "-button-up";
 
 	gtk_widget_grab_focus(widget);
-	c->Notify(msg, false);
+	c->notify(msg, false);
 	return false;
 }
 
@@ -132,7 +132,7 @@ gboolean OnGtkAreaMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer 
 			c->panel->win->input.dz = 1;
 		else if (event->direction == GDK_SCROLL_DOWN)
 			c->panel->win->input.dz = -1;
-		c->Notify("hui:mouse-wheel", false);
+		c->notify("hui:mouse-wheel", false);
 	}
 	return false;
 }
@@ -183,7 +183,7 @@ bool area_process_key(GdkEventKey *event, HuiControl *c, bool down)
 		c->panel->win->input.key_code = key_code;
 	}
 
-	c->Notify(down ? "hui:key-down" : "hui:key-up", false);
+	c->notify(down ? "hui:key-down" : "hui:key-up", false);
 
 	// stop further gtk key handling
 	return c->grab_focus;
@@ -235,13 +235,10 @@ HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &
 	widget = da;
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
-	SetOptions(OptionString);
+	setOptions(OptionString);
 }
 
-HuiControlDrawingArea::~HuiControlDrawingArea() {
-}
-
-void HuiControlDrawingArea::HardReset()
+void HuiControlDrawingArea::hardReset()
 {
 	msg_db_f("hard reset", 0);
 	GtkWidget *parent = gtk_widget_get_parent(widget);

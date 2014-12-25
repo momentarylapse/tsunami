@@ -14,7 +14,6 @@ class HuiControlPaned : public HuiControl
 {
 public:
 	HuiControlPaned(const string &text, const string &id);
-	virtual ~HuiControlPaned();
 
 	virtual void add(HuiControl *child, int x, int y);
 };

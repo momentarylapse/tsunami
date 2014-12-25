@@ -10,7 +10,7 @@
 #ifdef HUI_API_GTK
 
 void OnGtkSliderChange(GtkWidget *widget, gpointer data)
-{	((HuiControl*)data)->Notify("hui:change");	}
+{	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool _vertical) :
 	HuiControl(HuiKindSlider, id)
@@ -35,24 +35,20 @@ HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool _
 	}
 	gtk_scale_set_draw_value(GTK_SCALE(widget), false);
 	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkSliderChange), this);
-	SetOptions(OptionString);
+	setOptions(OptionString);
 }
 
-HuiControlSlider::~HuiControlSlider() {
-	// TODO Auto-generated destructor stub
-}
-
-float HuiControlSlider::GetFloat()
+float HuiControlSlider::getFloat()
 {
 	return (float)gtk_range_get_value(GTK_RANGE(widget));
 }
 
-void HuiControlSlider::__SetFloat(float f)
+void HuiControlSlider::__setFloat(float f)
 {
 	gtk_range_set_value(GTK_RANGE(widget), f);
 }
 
-void HuiControlSlider::__AddString(const string &s)
+void HuiControlSlider::__addString(const string &s)
 {
 	Array<string> p = s.explode("\\");//HuiComboBoxSeparator);
 	if (p.num != 2)
@@ -60,7 +56,7 @@ void HuiControlSlider::__AddString(const string &s)
 	gtk_scale_add_mark(GTK_SCALE(widget), p[0]._float(), vertical ? GTK_POS_LEFT : GTK_POS_TOP, ("<small>" + p[1] + "</small>").c_str());
 }
 
-void HuiControlSlider::__SetOption(const string &op, const string &value)
+void HuiControlSlider::__setOption(const string &op, const string &value)
 {
 	if (op == "range"){
 		float vmin = -100000000000.0f;
@@ -87,7 +83,7 @@ void HuiControlSlider::__SetOption(const string &op, const string &value)
 	else if (op == "show-value")
 		gtk_scale_set_draw_value(GTK_SCALE(widget), value._bool());
 	else if (op == "mark")
-		__AddString(value);
+		__addString(value);
 	else if (op == "clear-marks")
 		gtk_scale_clear_marks(GTK_SCALE(widget));
 }

@@ -9,19 +9,20 @@
 // force <i> within a boundary by cutting it off
 int clampi(int i, int min, int max)
 {
-	if (max >= min){
-		if (i > max)
-			return max;
-		if (i < min)
-			return min;
-		return i;
-	}else
+	if (max <= min)
 		return min;
+	if (i > max)
+		return max;
+	if (i < min)
+		return min;
+	return i;
 }
 
 // force <i> within a boundary by modulo-ing
 int loopi(int i, int min, int max)
 {
+	if (max <= min)
+		return min;
 	int d = max - min + 1;
 	if (i < min){
 		int n= (int)( (min-i-1) / d ) + 1;
@@ -37,7 +38,7 @@ int loopi(int i, int min, int max)
 // random int
 int randi(int m)
 {
-	return int((float)rand()*m/(float)RAND_MAX);
+	return int((float)rand() * m / (float)RAND_MAX);
 }
 
 

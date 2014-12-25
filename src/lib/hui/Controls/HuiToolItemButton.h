@@ -14,7 +14,6 @@ class HuiToolItemButton : public HuiControl
 {
 public:
 	HuiToolItemButton(const string &title, const string &image, const string &id);
-	virtual ~HuiToolItemButton();
 };
 
 #endif /* HUITOOLITEMBUTTON_H_ */

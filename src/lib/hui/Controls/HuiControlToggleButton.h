@@ -15,12 +15,11 @@ class HuiControlToggleButton : public HuiControl
 {
 public:
 	HuiControlToggleButton(const string &text, const string &id);
-	virtual ~HuiControlToggleButton();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual void SetImage(const string &str);
-	virtual void __Check(bool checked);
-	virtual bool IsChecked();
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual void setImage(const string &str);
+	virtual void __check(bool checked);
+	virtual bool isChecked();
 };
 
 #endif /* HUICONTROLTOGGLEBUTTON_H_ */

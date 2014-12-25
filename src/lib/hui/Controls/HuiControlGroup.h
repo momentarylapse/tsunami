@@ -15,9 +15,6 @@ class HuiControlGroup : public HuiControl
 {
 public:
 	HuiControlGroup(const string &text, const string &id);
-	virtual ~HuiControlGroup();
-	//virtual string GetString();
-	//virtual void SetString(const string &str);
 
 	virtual void add(HuiControl *child, int x, int y);
 };

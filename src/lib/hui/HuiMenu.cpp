@@ -37,7 +37,7 @@ void HuiMenu::addItem(const string &name, const string &id)
 void HuiMenu::addItemImage(const string &name, const string &image, const string &id)
 {
 	add(new HuiMenuItem(name, id));
-	item.back()->SetImage(image);
+	item.back()->setImage(image);
 }
 
 void HuiMenu::addItemCheckable(const string &name, const string &id)
@@ -135,7 +135,7 @@ void HuiMenu::enable(const string &id, bool enabled)
 {
 	foreach(HuiControl *c, item){
 		if (c->id == id)
-			c->Enable(enabled);
+			c->enable(enabled);
 		if (c->type == HuiKindMenuItemSubmenu)
 			dynamic_cast<HuiMenuItemSubmenu*>(c)->sub_menu->enable(id, enabled);
 	}

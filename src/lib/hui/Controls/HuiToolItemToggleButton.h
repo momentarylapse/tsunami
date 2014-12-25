@@ -14,10 +14,9 @@ class HuiToolItemToggleButton : public HuiControl
 {
 public:
 	HuiToolItemToggleButton(const string &title, const string &image, const string &id);
-	virtual ~HuiToolItemToggleButton();
 
-	virtual void __Check(bool checked);
-	virtual bool IsChecked();
+	virtual void __check(bool checked);
+	virtual bool isChecked();
 };
 
 #endif /* HUITOOLITEMTOGGLEBUTTON_H_ */

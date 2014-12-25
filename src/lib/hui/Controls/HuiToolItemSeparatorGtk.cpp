@@ -15,9 +15,5 @@ HuiToolItemSeparator::HuiToolItemSeparator() :
 	widget = GTK_WIDGET(gtk_separator_tool_item_new());
 }
 
-HuiToolItemSeparator::~HuiToolItemSeparator()
-{
-}
-
 #endif
 

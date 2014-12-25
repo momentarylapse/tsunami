@@ -14,10 +14,9 @@ class HuiMenuItemToggle : public HuiControl
 {
 public:
 	HuiMenuItemToggle(const string &title, const string &id);
-	virtual ~HuiMenuItemToggle();
 
-	virtual void __Check(bool checked);
-	virtual bool IsChecked();
+	virtual void __check(bool checked);
+	virtual bool isChecked();
 };
 
 #endif /* HUIMENUITEMTOGGLE_H_ */

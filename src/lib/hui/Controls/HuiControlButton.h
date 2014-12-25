@@ -15,11 +15,10 @@ class HuiControlButton : public HuiControl
 {
 public:
 	HuiControlButton(const string &text, const string &id);
-	virtual ~HuiControlButton();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual void SetImage(const string &str);
-	virtual void __SetOption(const string &op, const string &value);
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual void setImage(const string &str);
+	virtual void __setOption(const string &op, const string &value);
 };
 
 #endif /* HUICONTROLBUTTON_H_ */

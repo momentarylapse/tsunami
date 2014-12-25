@@ -13,7 +13,7 @@ void OnGtkButtonPress(GtkWidget *widget, gpointer data);
 
 
 void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
-{	((HuiControl*)data)->Notify("hui:change");	}
+{	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlColorButton::HuiControlColorButton(const string &title, const string &id) :
 	HuiControl(HuiKindColorButton, id)
@@ -24,11 +24,7 @@ HuiControlColorButton::HuiControlColorButton(const string &title, const string &
 		gtk_color_chooser_set_use_alpha(GTK_COLOR_CHOOSER(widget), true);
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
-	SetOptions(OptionString);
-}
-
-HuiControlColorButton::~HuiControlColorButton() {
-	// TODO Auto-generated destructor stub
+	setOptions(OptionString);
 }
 
 int col_f_to_i16(float f)
@@ -37,7 +33,7 @@ int col_f_to_i16(float f)
 float col_i16_to_f(int i)
 {	return (float)i / 65535.0f;	}
 
-void HuiControlColorButton::__SetColor(const color& c)
+void HuiControlColorButton::__setColor(const color& c)
 {
 	GdkRGBA gcol;
 	gcol.red = c.r;
@@ -47,7 +43,7 @@ void HuiControlColorButton::__SetColor(const color& c)
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(widget), &gcol);
 }
 
-color HuiControlColorButton::GetColor()
+color HuiControlColorButton::getColor()
 {
 	color col;
 	GdkRGBA gcol;

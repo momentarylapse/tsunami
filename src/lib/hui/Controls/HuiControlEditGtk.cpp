@@ -12,7 +12,7 @@
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str);
 
 void OnGtkEditChange(GtkWidget *widget, gpointer data)
-{	((HuiControl*)data)->Notify("hui:change");	}
+{	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlEdit::HuiControlEdit(const string &title, const string &id) :
 	HuiControl(HuiKindEdit, id)
@@ -23,24 +23,20 @@ HuiControlEdit::HuiControlEdit(const string &title, const string &id) :
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(PartString[0]));
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkEditChange), this);
-	SetOptions(OptionString);
+	setOptions(OptionString);
 }
 
-HuiControlEdit::~HuiControlEdit()
-{
-}
-
-void HuiControlEdit::__SetString(const string &str)
+void HuiControlEdit::__setString(const string &str)
 {
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(str));
 }
 
-string HuiControlEdit::GetString()
+string HuiControlEdit::getString()
 {
 	return de_sys_str(gtk_entry_get_text(GTK_ENTRY(widget)));
 }
 
-void HuiControlEdit::CompletionAdd(const string &text)
+void HuiControlEdit::completionAdd(const string &text)
 {
 	GtkEntryCompletion *comp = gtk_entry_get_completion(GTK_ENTRY(widget));
 	if (!comp){
@@ -59,12 +55,12 @@ void HuiControlEdit::CompletionAdd(const string &text)
 	set_list_cell(GTK_LIST_STORE(m), iter, 0, text);
 }
 
-void HuiControlEdit::CompletionClear()
+void HuiControlEdit::completionClear()
 {
 	gtk_entry_set_completion(GTK_ENTRY(widget), NULL);
 }
 
-void HuiControlEdit::__SetOption(const string &op, const string &value)
+void HuiControlEdit::__setOption(const string &op, const string &value)
 {
 	if (op == "clear-placeholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), "");
@@ -73,7 +69,7 @@ void HuiControlEdit::__SetOption(const string &op, const string &value)
 	else if (op == "placeholder")
 		gtk_entry_set_placeholder_text(GTK_ENTRY(widget), value.c_str());
 	else if (op == "completion")
-		CompletionAdd(value);
+		completionAdd(value);
 }
 
 #endif

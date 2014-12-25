@@ -65,16 +65,16 @@ void HuiToolbar::setByID(const string &id)
 	foreach(HuiResource &cmd, res->children){
 		if (cmd.type == "Item"){
 			addItem(get_lang(cmd.id, "", false), cmd.image, cmd.id);
-			item.back()->SetTooltip(get_lang(cmd.id, "", false));
+			item.back()->setTooltip(get_lang(cmd.id, "", false));
 		}else if (cmd.type == "ItemCheckable"){
 			addItemCheckable(get_lang(cmd.id, "", false), cmd.image, cmd.id);
-			item.back()->SetTooltip(get_lang(cmd.id, "", false));
+			item.back()->setTooltip(get_lang(cmd.id, "", false));
 		}else if (cmd.type == "ItemSeparator"){
 			addSeparator();
 		}else if (cmd.type == "ItemPopup"){
 			string title = get_lang(cmd.id, "", false);
 			addItemMenuByID(title, cmd.image, cmd.s_param[0], cmd.id);
-			item.back()->SetTooltip(title);
+			item.back()->setTooltip(title);
 		}
 	}
 	enable(true);

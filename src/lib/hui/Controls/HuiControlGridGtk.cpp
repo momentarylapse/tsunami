@@ -17,17 +17,13 @@ HuiControlGrid::HuiControlGrid(const string &title, const string &id, int num_x,
 	widget = gtk_grid_new();
 	gtk_grid_set_row_spacing(GTK_GRID(widget), panel->border_width);
 	gtk_grid_set_column_spacing(GTK_GRID(widget), panel->border_width);
-	SetOptions(OptionString);
+	setOptions(OptionString);
 	button_bar = (OptionString.find("buttonbar") >= 0);
 	if (button_bar){
 		gtk_widget_set_margin_top(widget, 7);
 		gtk_widget_set_margin_bottom(widget, 4);
 		gtk_widget_set_halign(widget, GTK_ALIGN_END);
 	}
-}
-
-HuiControlGrid::~HuiControlGrid() {
-	// TODO Auto-generated destructor stub
 }
 
 void HuiControlGrid::add(HuiControl *child, int x, int y)

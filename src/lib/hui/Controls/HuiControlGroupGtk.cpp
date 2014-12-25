@@ -18,11 +18,7 @@ HuiControlGroup::HuiControlGroup(const string &title, const string &id) :
 	gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_NONE);
 	GtkWidget *label = gtk_frame_get_label_widget(GTK_FRAME(widget));
 	gtk_label_set_markup(GTK_LABEL(label), sys_str("<b>" + PartString[0] + "</b>"));
-	SetOptions(OptionString);
-}
-
-HuiControlGroup::~HuiControlGroup()
-{
+	setOptions(OptionString);
 }
 
 

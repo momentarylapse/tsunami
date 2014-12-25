@@ -48,56 +48,59 @@ public:
 	HuiControl *parent;
 	Array<HuiControl*> children;
 
-	virtual void __Reset(){}
-	void Reset();
-	virtual string GetString(){ return ""; }
-	virtual int GetInt(){ return GetString()._int(); }
-	virtual float GetFloat(){ return GetString()._float(); }
-	virtual color GetColor(){ return Black; }
-	virtual void __SetString(const string &str){}
-	void SetString(const string &str);
-	virtual void __AddString(const string &str){}
-	void AddString(const string &str);
-	virtual void __SetInt(int i){ __SetString(i2s(i)); }
-	void SetInt(int i);
-	virtual void __SetFloat(float f){ __SetString(f2s(f, 3)); }
-	void SetFloat(float f);
-	virtual void __SetColor(const color &c){}
-	void SetColor(const color &c);
-	virtual void SetImage(const string &str){}
+	virtual void __reset(){}
+	void reset();
+	virtual string getString(){ return ""; }
+	virtual int getInt(){ return getString()._int(); }
+	virtual float getFloat(){ return getString()._float(); }
+	virtual color getColor(){ return Black; }
+	virtual void __setString(const string &str){}
+	void setString(const string &str);
+	virtual void __addString(const string &str){}
+	void addString(const string &str);
+	virtual void __setInt(int i){ __setString(i2s(i)); }
+	void setInt(int i);
+	virtual void __setFloat(float f){ __setString(f2s(f, 3)); }
+	void setFloat(float f);
+	virtual void __setColor(const color &c){}
+	void setColor(const color &c);
+	virtual void setImage(const string &str){}
 
-	virtual void __AddChildString(int parent_row, const string &str){}
-	void AddChildString(int parent_row, const string &str);
-	virtual void __ChangeString(int row, const string &str){}
-	void ChangeString(int row, const string &str);
-	virtual string GetCell(int row, int column){ return ""; }
-	virtual void __SetCell(int row, int column, const string &str){}
-	void SetCell(int row, int column, const string &str);
-	virtual Array<int> GetMultiSelection(){ Array<int> r; return r; }
-	virtual void __SetMultiSelection(Array<int> &sel){}
-	void SetMultiSelection(Array<int> &sel);
-	virtual void Expand(int row, bool expand){}
-	virtual void ExpandAll(bool expand){}
-	virtual bool IsExpanded(int row){ return false; }
+	virtual void __addChildString(int parent_row, const string &str){}
+	void addChildString(int parent_row, const string &str);
+	virtual void __changeString(int row, const string &str){}
+	void changeString(int row, const string &str);
+	virtual string getCell(int row, int column){ return ""; }
+	virtual void __setCell(int row, int column, const string &str){}
+	void setCell(int row, int column, const string &str);
+	virtual Array<int> getMultiSelection(){ Array<int> r; return r; }
+	virtual void __setSelection(Array<int> &sel){}
+	void setSelection(Array<int> &sel);
+	virtual void expand(int row, bool expand){}
+	virtual void expandAll(bool expand){}
+	virtual bool isExpanded(int row){ return false; }
 
-	virtual void Enable(bool enabled);
-	virtual bool IsEnabled();
-	virtual void Hide(bool hidden);
-	virtual void __Check(bool checked){}
-	void Check(bool checked);
-	virtual bool IsChecked(){ return false; }
-	virtual void SetTooltip(const string &str);
-	virtual void Focus();
-	virtual bool HasFocus();
-	virtual void CompletionAdd(const string &text){}
-	virtual void CompletionClear(){}
+	virtual void enable(bool enabled);
+	virtual bool isEnabled();
+	virtual void hide(bool hidden);
+	virtual void __check(bool checked){}
+	virtual void check(bool checked);
+	virtual bool isChecked(){ return false; }
+	virtual void setTooltip(const string &str);
+	virtual void focus();
+	virtual bool hasFocus();
+	virtual void completionAdd(const string &text){}
+	virtual void completionClear(){}
 
 	virtual void add(HuiControl *child, int x, int y){}
-	void SetOptions(const string &options);
-	virtual void __SetOption(const string &op, const string &value){}
-	void GetSize(int &w, int &h);
+	void setOptions(const string &options);
+	virtual void __setOption(const string &op, const string &value){}
+	void getSize(int &w, int &h);
 
-	void Notify(const string &message = "", bool is_default = true);
+	virtual void setFont(const string &font_name);
+	virtual void setTabSize(int tab_size){}
+
+	void notify(const string &message = "", bool is_default = true);
 };
 
 

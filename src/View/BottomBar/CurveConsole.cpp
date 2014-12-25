@@ -37,7 +37,7 @@ public:
 					break;
 				}
 		}
-		setMultiSelection("list", sel);
+		setSelection("list", sel);
 
 		event("hui:close", this, &CurveTargetDialog::onClose);
 		event("cancel", this, &CurveTargetDialog::onClose);
@@ -49,7 +49,7 @@ public:
 
 	void onOk()
 	{
-		Array<int> sel = getMultiSelection("list");
+		Array<int> sel = getSelection("list");
 		targets.clear();
 		foreach(int i, sel)
 			targets.add(all_targets[i]);

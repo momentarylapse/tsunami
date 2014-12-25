@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.13.13.0";
+string Version = "0.13.13.1";
 
 //#define ScriptDebug
 
@@ -75,6 +75,22 @@ Script *Load(const string &filename, bool just_analyse)
 
 	// store script in database
 	PublicScript.add(s);
+	return s;
+}
+
+Script *CreateForSource(const string &buffer, bool just_analyse)
+{
+	Script *s = new Script;
+	s->JustAnalyse = just_analyse;
+	try{
+		s->syntax->ParseBuffer(buffer, just_analyse);
+
+		if (!just_analyse)
+			s->Compiler();
+	}catch(const Exception &e){
+		delete(s);
+		throw e;
+	}
 	return s;
 }
 
@@ -147,7 +163,15 @@ void Script::Load(const string &filename, bool just_analyse)
 	msg_db_f("loading script", 1);
 	JustAnalyse = just_analyse;
 	Filename = filename.sys_filename();
-	syntax->LoadAndParseFile(filename, just_analyse);
+
+	// read file
+	CFile *f = FileOpen(config.Directory + filename);
+	if (!f){
+		DoError("script file not loadable");
+	}
+	string buffer = f->ReadComplete();
+	delete(f);
+	syntax->ParseBuffer(buffer, just_analyse);
 
 
 	if (!JustAnalyse)
@@ -321,7 +345,7 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 
 	// match
 	foreachi(Function *f, syntax->Functions, i)
-		if ((f->name == name) && (f->literal_return_type->name == return_type) && (num_params == f->num_params)){
+		if (((f->name == name) || (name == "*")) && (f->literal_return_type->name == return_type) && (num_params == f->num_params)){
 
 			bool params_ok = true;
 			for (int j=0;j<num_params;j++)

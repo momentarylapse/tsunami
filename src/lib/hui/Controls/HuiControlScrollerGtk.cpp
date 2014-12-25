@@ -17,11 +17,7 @@ HuiControlScroller::HuiControlScroller(const string &title, const string &id) :
 	//viewport = gtk_viewport_new(NULL, NULL);
 	//gtk_container_add(GTK_CONTAINER(widget), viewport);
 	//gtk_widget_show(viewport);
-	SetOptions(OptionString);
-}
-
-HuiControlScroller::~HuiControlScroller()
-{
+	setOptions(OptionString);
 }
 
 void HuiControlScroller::add(HuiControl *child, int x, int y)

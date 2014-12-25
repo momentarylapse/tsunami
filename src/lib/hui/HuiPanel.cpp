@@ -218,7 +218,7 @@ void HuiPanel::show()
 	if (this == win)
 		win->show();
 	else if (root_control)
-		root_control->Hide(false);
+		root_control->hide(false);
 	onShow();
 }
 
@@ -227,7 +227,7 @@ void HuiPanel::hide()
 	if (this == win)
 		win->hide();
 	else if (root_control)
-		root_control->Hide(true);
+		root_control->hide(true);
 	onHide();
 }
 
@@ -426,7 +426,7 @@ void HuiPanel::setString(const string &_id, const string &str)
 	if (win && (id == _id))
 		win->setTitle(str);
 	test_controls(_id, c)
-		c->SetString(str);
+		c->setString(str);
 }
 
 // replace all the text with a numerical value (int)
@@ -436,7 +436,7 @@ void HuiPanel::setString(const string &_id, const string &str)
 void HuiPanel::setInt(const string &_id, int n)
 {
 	test_controls(_id, c)
-		c->SetInt(n);
+		c->setInt(n);
 }
 
 // replace all the text with a float
@@ -444,19 +444,31 @@ void HuiPanel::setInt(const string &_id, int n)
 void HuiPanel::setFloat(const string &_id, float f)
 {
 	test_controls(_id, c)
-		c->SetFloat(f);
+		c->setFloat(f);
 }
 
 void HuiPanel::setImage(const string &_id, const string &image)
 {
 	test_controls(_id, c)
-		c->SetImage(image);
+		c->setImage(image);
 }
 
 void HuiPanel::setTooltip(const string &_id, const string &tip)
 {
 	test_controls(_id, c)
-		c->SetTooltip(tip);
+		c->setTooltip(tip);
+}
+
+void HuiPanel::setFont(const string &_id, const string &font_name)
+{
+	test_controls(_id, c)
+		c->setFont(font_name);
+}
+
+void HuiPanel::setTabSize(const string &_id, int tab_size)
+{
+	test_controls(_id, c)
+		c->setTabSize(tab_size);
 }
 
 
@@ -465,7 +477,7 @@ void HuiPanel::setTooltip(const string &_id, const string &tip)
 void HuiPanel::addString(const string &_id, const string &str)
 {
 	test_controls(_id, c)
-		c->AddString(str);
+		c->addString(str);
 }
 
 // add a single line as a child in the tree of a ListViewTree
@@ -473,7 +485,7 @@ void HuiPanel::addString(const string &_id, const string &str)
 void HuiPanel::addChildString(const string &_id, int parent_row, const string &str)
 {
 	test_controls(_id, c)
-		c->AddChildString(parent_row, str);
+		c->addChildString(parent_row, str);
 }
 
 // change a single line in the tree of a ListViewTree
@@ -481,14 +493,14 @@ void HuiPanel::addChildString(const string &_id, int parent_row, const string &s
 void HuiPanel::changeString(const string &_id,int row,const string &str)
 {
 	test_controls(_id, c)
-		c->ChangeString(row, str);
+		c->changeString(row, str);
 }
 
 // listview / treeview
 string HuiPanel::getCell(const string &_id, int row, int column)
 {
 	test_controls(_id, c)
-		return c->GetCell(row, column);
+		return c->getCell(row, column);
 	return "";
 }
 
@@ -496,13 +508,13 @@ string HuiPanel::getCell(const string &_id, int row, int column)
 void HuiPanel::setCell(const string &_id, int row, int column, const string &str)
 {
 	test_controls(_id, c)
-		c->SetCell(row, column, str);
+		c->setCell(row, column, str);
 }
 
 void HuiPanel::setColor(const string &_id, const color &col)
 {
 	test_controls(_id, c)
-		c->SetColor(col);
+		c->setColor(col);
 }
 
 // retrieve the text
@@ -510,7 +522,7 @@ void HuiPanel::setColor(const string &_id, const color &col)
 string HuiPanel::getString(const string &_id)
 {
 	test_controls(_id, c)
-		return c->GetString();
+		return c->getString();
 	return "";
 }
 
@@ -521,7 +533,7 @@ string HuiPanel::getString(const string &_id)
 int HuiPanel::getInt(const string &_id)
 {
 	test_controls(_id, c)
-		return c->GetInt();
+		return c->getInt();
 	return 0;
 }
 
@@ -530,14 +542,14 @@ int HuiPanel::getInt(const string &_id)
 float HuiPanel::getFloat(const string &_id)
 {
 	test_controls(_id, c)
-		return c->GetFloat();
+		return c->getFloat();
 	return 0;
 }
 
 color HuiPanel::getColor(const string &_id)
 {
 	test_controls(_id, c)
-		return c->GetColor();
+		return c->getColor();
 	return Black;
 }
 
@@ -546,7 +558,7 @@ color HuiPanel::getColor(const string &_id)
 void HuiPanel::enable(const string &_id,bool enabled)
 {
 	test_controls(_id, c)
-		c->Enable(enabled);
+		c->enable(enabled);
 }
 
 // show/hide control
@@ -554,7 +566,7 @@ void HuiPanel::enable(const string &_id,bool enabled)
 void HuiPanel::hideControl(const string &_id,bool hide)
 {
 	test_controls(_id, c)
-		c->Hide(hide);
+		c->hide(hide);
 }
 
 // mark as "checked"
@@ -562,7 +574,7 @@ void HuiPanel::hideControl(const string &_id,bool hide)
 void HuiPanel::check(const string &_id,bool checked)
 {
 	test_controls(_id, c)
-		c->Check(checked);
+		c->check(checked);
 }
 
 // is marked as "checked"?
@@ -570,24 +582,24 @@ void HuiPanel::check(const string &_id,bool checked)
 bool HuiPanel::isChecked(const string &_id)
 {
 	test_controls(_id, c)
-		return c->IsChecked();
+		return c->isChecked();
 	return false;
 }
 
 // which lines are selected?
 //    for ListView
-Array<int> HuiPanel::getMultiSelection(const string &_id)
+Array<int> HuiPanel::getSelection(const string &_id)
 {
 	test_controls(_id, c)
-		return c->GetMultiSelection();
+		return c->getMultiSelection();
 	Array<int> sel;
 	return sel;
 }
 
-void HuiPanel::setMultiSelection(const string &_id, Array<int> &sel)
+void HuiPanel::setSelection(const string &_id, Array<int> &sel)
 {
 	test_controls(_id, c)
-		c->SetMultiSelection(sel);
+		c->setSelection(sel);
 }
 
 // delete all the content
@@ -595,7 +607,7 @@ void HuiPanel::setMultiSelection(const string &_id, Array<int> &sel)
 void HuiPanel::reset(const string &_id)
 {
 	test_controls(_id, c)
-		c->Reset();
+		c->reset();
 }
 
 // expand a single row
@@ -603,7 +615,7 @@ void HuiPanel::reset(const string &_id)
 void HuiPanel::expand(const string &_id, int row, bool expand)
 {
 	test_controls(_id, c)
-		c->Expand(row, expand);
+		c->expand(row, expand);
 }
 
 // expand all rows
@@ -611,7 +623,7 @@ void HuiPanel::expand(const string &_id, int row, bool expand)
 void HuiPanel::expandAll(const string &_id, bool expand)
 {
 	test_controls(_id, c)
-		c->ExpandAll(expand);
+		c->expandAll(expand);
 }
 
 // is column in tree expanded?
@@ -633,6 +645,6 @@ void HuiPanel::deleteControl(const string &_id)
 void HuiPanel::setOptions(const string &_id, const string &options)
 {
 	test_controls(_id, c)
-		c->SetOptions(options);
+		c->setOptions(options);
 }
 

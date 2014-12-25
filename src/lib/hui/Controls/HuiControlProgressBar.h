@@ -15,11 +15,10 @@ class HuiControlProgressBar : public HuiControl
 {
 public:
 	HuiControlProgressBar(const string &text, const string &id);
-	virtual ~HuiControlProgressBar();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual float GetFloat();
-	virtual void __SetFloat(float f);
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual float getFloat();
+	virtual void __setFloat(float f);
 };
 
 #endif /* HUICONTROLPROGRESSBAR_H_ */

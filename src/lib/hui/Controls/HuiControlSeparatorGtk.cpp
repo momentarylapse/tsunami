@@ -15,10 +15,6 @@ HuiControlSeparator::HuiControlSeparator(const string &text, const string &_id) 
 		widget = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	else
 		widget = gtk_separator_new(GTK_ORIENTATION_HORIZONTAL);
-	SetOptions(OptionString);
-}
-
-HuiControlSeparator::~HuiControlSeparator()
-{
+	setOptions(OptionString);
 }
 

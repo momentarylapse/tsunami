@@ -13,7 +13,7 @@ gboolean OnGtkAreaKeyDown(GtkWidget *widget, GdkEventKey *event, gpointer user_d
 gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 
 void OnGtkMultilineEditChange(GtkWidget *widget, gpointer data)
-{	((HuiControl*)data)->Notify("hui:change");	}
+{	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlMultilineEdit::HuiControlMultilineEdit(const string &title, const string &id) :
 	HuiControl(HuiKindMultilineEdit, id)
@@ -44,21 +44,17 @@ HuiControlMultilineEdit::HuiControlMultilineEdit(const string &title, const stri
 		g_signal_connect(G_OBJECT(widget), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);
 		g_signal_connect(G_OBJECT(widget), "key-release-event", G_CALLBACK(&OnGtkAreaKeyUp), this);
 	}
-	SetOptions(OptionString);
+	setOptions(OptionString);
 }
 
-HuiControlMultilineEdit::~HuiControlMultilineEdit()
-{
-}
-
-void HuiControlMultilineEdit::__SetString(const string &str)
+void HuiControlMultilineEdit::__setString(const string &str)
 {
 	GtkTextBuffer *tb = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
 	const char *str2 = sys_str(str);
 	gtk_text_buffer_set_text(tb, str2, strlen(str2));
 }
 
-string HuiControlMultilineEdit::GetString()
+string HuiControlMultilineEdit::getString()
 {
 	GtkTextBuffer *tb = gtk_text_view_get_buffer(GTK_TEXT_VIEW(widget));
 	GtkTextIter is, ie;
@@ -67,8 +63,18 @@ string HuiControlMultilineEdit::GetString()
 	return de_sys_str(gtk_text_buffer_get_text(tb, &is, &ie, false));
 }
 
-void HuiControlMultilineEdit::__AddString(const string& str)
+void HuiControlMultilineEdit::__addString(const string& str)
 {
+}
+
+void HuiControlMultilineEdit::setTabSize(int tab_size)
+{
+	PangoLayout *layout = gtk_widget_create_pango_layout(widget, "W");
+	int width, height;
+	pango_layout_get_pixel_size(layout, &width, &height);
+	PangoTabArray *ta = pango_tab_array_new(1, true);
+	pango_tab_array_set_tab(ta, 0, PANGO_TAB_LEFT, width * tab_size);
+	gtk_text_view_set_tabs(GTK_TEXT_VIEW(widget), ta);
 }
 
 #endif

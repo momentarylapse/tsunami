@@ -129,11 +129,13 @@ public:
 	bool _cdecl isChecked(const string &id);
 	void _cdecl setImage(const string &id, const string &image);
 	void _cdecl setTooltip(const string &id, const string &tip);
-	Array<int> _cdecl getMultiSelection(const string &id);
-	void _cdecl setMultiSelection(const string &id, Array<int> &sel);
+	Array<int> _cdecl getSelection(const string &id);
+	void _cdecl setSelection(const string &id, Array<int> &sel);
 	void _cdecl reset(const string &id);
 	void _cdecl removeControl(const string &id);
 	void _cdecl setOptions(const string &id, const string &options);
+	void _cdecl setFont(const string &id, const string &font_name);
+	void _cdecl setTabSize(const string &id, int tab_size);
 
 	// drawing
 	void _cdecl redraw(const string &id);

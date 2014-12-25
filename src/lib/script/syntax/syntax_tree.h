@@ -156,8 +156,7 @@ public:
 	SyntaxTree(Script *_script);
 	~SyntaxTree();
 
-	void LoadAndParseFile(const string &filename, bool just_analyse);
-	void LoadToBuffer(const string &filename, bool just_analyse);
+	void ParseBuffer(const string &buffer, bool just_analyse);
 	void AddIncludeData(Script *s);
 
 	void DoError(const string &msg, int overwrite_line = -1);

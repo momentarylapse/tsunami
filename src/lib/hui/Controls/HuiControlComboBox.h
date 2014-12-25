@@ -15,13 +15,12 @@ class HuiControlComboBox : public HuiControl
 {
 public:
 	HuiControlComboBox(const string &text, const string &id);
-	virtual ~HuiControlComboBox();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual void __AddString(const string &str);
-	virtual void __SetInt(int i);
-	virtual int GetInt();
-	virtual void __Reset();
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual void __addString(const string &str);
+	virtual void __setInt(int i);
+	virtual int getInt();
+	virtual void __reset();
 };
 
 #endif /* HUICONTROLCOMBOBOX_H_ */

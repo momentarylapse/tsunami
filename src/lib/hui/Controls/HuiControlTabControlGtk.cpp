@@ -14,7 +14,7 @@ void OnGtkTabControlSwitch(GtkWidget *widget, GtkWidget *page, guint page_num, g
 {
 	HuiControlTabControl *c = (HuiControlTabControl*)data;
 	c->cur_page = page_num;
-	c->Notify("hui:change");
+	c->notify("hui:change");
 }
 
 
@@ -33,34 +33,30 @@ HuiControlTabControl::HuiControlTabControl(const string &title, const string &id
 	gtk_notebook_set_scrollable(GTK_NOTEBOOK(widget), true);
 	if (OptionString.find("nobar") >= 0)
 		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);
-	SetOptions(OptionString);
+	setOptions(OptionString);
 }
 
-HuiControlTabControl::~HuiControlTabControl() {
-	// TODO Auto-generated destructor stub
-}
-
-string HuiControlTabControl::GetString()
+string HuiControlTabControl::getString()
 {
 	return "";
 }
 
-void HuiControlTabControl::__SetString(const string& str)
+void HuiControlTabControl::__setString(const string& str)
 {
 }
 
-void HuiControlTabControl::__SetInt(int i)
+void HuiControlTabControl::__setInt(int i)
 {
 	gtk_notebook_set_current_page(GTK_NOTEBOOK(widget), i);
 	cur_page = i;
 }
 
-int HuiControlTabControl::GetInt()
+int HuiControlTabControl::getInt()
 {
 	return cur_page;
 }
 
-void HuiControlTabControl::__AddString(const string &str)
+void HuiControlTabControl::__addString(const string &str)
 {
 	addPage(str);
 }
@@ -95,7 +91,7 @@ void HuiControlTabControl::add(HuiControl *child, int x, int y)
 	child->parent = this;
 }
 
-void HuiControlTabControl::__SetOption(const string &op, const string &value)
+void HuiControlTabControl::__setOption(const string &op, const string &value)
 {
 	if (op == "nobar")
 		gtk_notebook_set_show_tabs(GTK_NOTEBOOK(widget), false);

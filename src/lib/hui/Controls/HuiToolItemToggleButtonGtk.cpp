@@ -26,16 +26,12 @@ HuiToolItemToggleButton::HuiToolItemToggleButton(const string &title, const stri
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkToolbarItemPress), this);
 }
 
-HuiToolItemToggleButton::~HuiToolItemToggleButton()
-{
-}
-
-void HuiToolItemToggleButton::__Check(bool checked)
+void HuiToolItemToggleButton::__check(bool checked)
 {
 	gtk_toggle_tool_button_set_active(GTK_TOGGLE_TOOL_BUTTON(widget), checked);
 }
 
-bool HuiToolItemToggleButton::IsChecked()
+bool HuiToolItemToggleButton::isChecked()
 {
 	return gtk_toggle_tool_button_get_active(GTK_TOGGLE_TOOL_BUTTON(widget));
 }

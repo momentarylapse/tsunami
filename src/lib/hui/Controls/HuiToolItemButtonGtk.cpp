@@ -12,7 +12,7 @@
 void *get_gtk_image(const string &image, bool large);
 
 void OnGtkToolbarItemPress(GtkWidget *widget, gpointer data)
-{	((HuiControl*)data)->Notify("hui:click");	}
+{	((HuiControl*)data)->notify("hui:click");	}
 
 HuiToolItemButton::HuiToolItemButton(const string &title, const string &image, const string &id) :
 	HuiControl(HuiKindToolButton, id)
@@ -30,10 +30,6 @@ HuiToolItemButton::HuiToolItemButton(const string &title, const string &image, c
 	/*gtk_toolbar_insert(GTK_TOOLBAR(cur_toolbar->widget),it,-1);
 	AddToolbarItem(cur_toolbar,id,HuiToolButton,NULL);
 	cur_toolbar->item.back().widget = it;*/
-}
-
-HuiToolItemButton::~HuiToolItemButton()
-{
 }
 
 #endif

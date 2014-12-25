@@ -12,7 +12,7 @@
 #ifdef HUI_API_GTK
 
 void OnGtkRadioButtonToggle(GtkWidget *widget, gpointer data)
-{	((HuiControl*)data)->Notify("hui:change");	}
+{	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlRadioButton::HuiControlRadioButton(const string &title, const string &id, HuiPanel *panel) :
 	HuiControl(HuiKindRadioButton, id)
@@ -28,29 +28,25 @@ HuiControlRadioButton::HuiControlRadioButton(const string &title, const string &
 
 	widget = gtk_radio_button_new_with_label(group, sys_str(PartString[0]));
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&OnGtkRadioButtonToggle), this);
-	SetOptions(OptionString);
+	setOptions(OptionString);
 }
 
-HuiControlRadioButton::~HuiControlRadioButton() {
-	// TODO Auto-generated destructor stub
-}
-
-void HuiControlRadioButton::__SetString(const string &str)
+void HuiControlRadioButton::__setString(const string &str)
 {
 	gtk_button_set_label(GTK_BUTTON(widget), sys_str(str));
 }
 
-void HuiControlRadioButton::__Check(bool checked)
+void HuiControlRadioButton::__check(bool checked)
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget), checked);
 }
 
-string HuiControlRadioButton::GetString()
+string HuiControlRadioButton::getString()
 {
 	return gtk_button_get_label(GTK_BUTTON(widget));
 }
 
-bool HuiControlRadioButton::IsChecked()
+bool HuiControlRadioButton::isChecked()
 {
 	return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }

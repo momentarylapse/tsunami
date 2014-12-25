@@ -15,10 +15,9 @@ class HuiControlColorButton : public HuiControl
 {
 public:
 	HuiControlColorButton(const string &text, const string &id);
-	virtual ~HuiControlColorButton();
 
-	virtual void __SetColor(const color &c);
-	virtual color GetColor();
+	virtual void __setColor(const color &c);
+	virtual color getColor();
 };
 
 #endif /* HUICONTROLCOLORBUTTON_H_ */

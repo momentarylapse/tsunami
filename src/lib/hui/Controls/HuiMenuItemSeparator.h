@@ -14,7 +14,6 @@ class HuiMenuItemSeparator : public HuiControl
 {
 public:
 	HuiMenuItemSeparator();
-	virtual ~HuiMenuItemSeparator();
 };
 
 #endif /* HUIMENUITEMSEPARATOR_H_ */

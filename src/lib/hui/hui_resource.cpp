@@ -217,7 +217,7 @@ HuiMenu *_create_res_menu_(HuiResource *res, int &index, int num)
 			menu->addSubMenu(get_lang(cmd->id, "", true), cmd->id, sub);
 			index --;
 		}
-		menu->item.back()->Enable(cmd->enabled);
+		menu->item.back()->enable(cmd->enabled);
 		index ++;
 	}
 	return menu;

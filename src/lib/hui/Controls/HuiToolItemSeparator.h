@@ -14,7 +14,6 @@ class HuiToolItemSeparator : public HuiControl
 {
 public:
 	HuiToolItemSeparator();
-	virtual ~HuiToolItemSeparator();
 };
 
 #endif /* HUITOOLITEMSEPARATOR_H_ */

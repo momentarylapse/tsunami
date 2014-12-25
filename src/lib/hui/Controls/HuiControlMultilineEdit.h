@@ -15,10 +15,10 @@ class HuiControlMultilineEdit : public HuiControl
 {
 public:
 	HuiControlMultilineEdit(const string &text, const string &id);
-	virtual ~HuiControlMultilineEdit();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual void __AddString(const string &str);
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual void __addString(const string &str);
+	virtual void setTabSize(int tab_size);
 
 	bool handle_keys;
 };

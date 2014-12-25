@@ -16,20 +16,16 @@ HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
 	GetPartStrings(id, title);
 	widget = gtk_label_new("");
 	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
-	HuiControlLabel::__SetString(title);
-	SetOptions(OptionString);
+	HuiControlLabel::__setString(title);
+	setOptions(OptionString);
 }
 
-string HuiControlLabel::GetString()
+string HuiControlLabel::getString()
 {
 	return "";
 }
 
-HuiControlLabel::~HuiControlLabel()
-{
-}
-
-void HuiControlLabel::__SetString(const string &str)
+void HuiControlLabel::__setString(const string &str)
 {
 	GetPartStrings(id, str);
 	string s = sys_str(PartString[0]);
@@ -42,7 +38,7 @@ void HuiControlLabel::__SetString(const string &str)
 	gtk_label_set_markup(GTK_LABEL(widget), s.c_str());
 }
 
-void HuiControlLabel::__SetOption(const string &op, const string &value)
+void HuiControlLabel::__setOption(const string &op, const string &value)
 {
 	if (op == "wrap")
 		gtk_label_set_line_wrap(GTK_LABEL(widget),true);

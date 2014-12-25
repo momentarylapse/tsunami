@@ -566,7 +566,7 @@ void HuiPanel::activate(const string &control_id)
 	if (control_id.num > 0)
 		for (int i=0;i<control.num;i++)
 			if (control_id == control[i]->id)
-				control[i]->Focus();
+				control[i]->focus();
 }
 
 bool HuiPanel::isActive(const string &control_id)
@@ -574,7 +574,7 @@ bool HuiPanel::isActive(const string &control_id)
 	if (control_id.num > 0){
 		for (int i=0;i<control.num;i++)
 			if (control_id == control[i]->id)
-				return control[i]->HasFocus();
+				return control[i]->hasFocus();
 		return false;
 	}
 	return gtk_widget_has_focus(win->window);

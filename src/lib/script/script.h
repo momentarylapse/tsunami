@@ -109,6 +109,7 @@ public:
 };
 
 Script *Load(const string &filename, bool just_analyse = false);
+Script *CreateForSource(const string &source, bool just_analyse = false);
 void Remove(Script *s);
 void ExecutePublicScripts();
 void DeleteAllScripts(bool even_immortal = false, bool force = false);

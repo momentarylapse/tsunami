@@ -24,7 +24,7 @@ class HarmonicPanel : ConfigPanel
 			if j > 0
 				addText("x " + (j + 1), 0, j, 0, 0, "")
 			addSpinButton("0\\0\\100\\0.1", 1, j, 0, 0, "intensity_" + j)
-			eventM("intensity_" + j, self, &onChange)
+			event("intensity_" + j, &onChange)
 		addText("Release", 2, 0, 0, 0, "")
 		addSpinButton("0\\0\\100\\0.1", 3, 0, 0, 0, "release")
 		addText("ms", 4, 0, 0, 0, "")

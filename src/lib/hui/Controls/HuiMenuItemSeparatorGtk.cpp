@@ -15,9 +15,5 @@ HuiMenuItemSeparator::HuiMenuItemSeparator() :
 	widget = gtk_separator_menu_item_new();
 }
 
-HuiMenuItemSeparator::~HuiMenuItemSeparator()
-{
-}
-
 #endif
 

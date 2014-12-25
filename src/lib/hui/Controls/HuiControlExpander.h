@@ -14,11 +14,10 @@ class HuiControlExpander : public HuiControl
 {
 public:
 	HuiControlExpander(const string &text, const string &id);
-	virtual ~HuiControlExpander();
 
-	virtual void Expand(int row, bool expand);
-	virtual void ExpandAll(bool expand);
-	virtual bool IsExpanded(int row);
+	virtual void expand(int row, bool expand);
+	virtual void expandAll(bool expand);
+	virtual bool isExpanded(int row);
 
 	virtual void add(HuiControl *child, int x, int y);
 };

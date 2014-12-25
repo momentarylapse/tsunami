@@ -289,7 +289,7 @@ void SIAddPackageHui()
 				func_add_param("id",		TypeString);
 			class_add_func("getInt",			TypeInt,		mf(&HuiPanel::getInt));
 				func_add_param("id",		TypeString);
-			class_add_func("getMultiSelection",			TypeIntList,		mf(&HuiPanel::getMultiSelection));
+			class_add_func("getSelection",			TypeIntList,		mf(&HuiPanel::getSelection));
 				func_add_param("id",		TypeString);
 			class_add_func("setInt",			TypeVoid,		mf(&HuiPanel::setInt));
 				func_add_param("id",		TypeString);

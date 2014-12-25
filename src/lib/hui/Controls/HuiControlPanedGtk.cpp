@@ -14,10 +14,6 @@ HuiControlPaned::HuiControlPaned(const string &title, const string &id) :
 {
 }
 
-HuiControlPaned::~HuiControlPaned()
-{
-}
-
 void HuiControlPaned::add(HuiControl *child, int x, int y)
 {
 }

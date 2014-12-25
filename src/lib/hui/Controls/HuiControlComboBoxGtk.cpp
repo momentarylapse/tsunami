@@ -10,7 +10,7 @@
 #ifdef HUI_API_GTK
 
 void OnGtkComboboxChange(GtkWidget *widget, gpointer data)
-{	((HuiControl*)data)->Notify("hui:change");	}
+{	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
 	HuiControl(HuiKindComboBox, id)
@@ -25,16 +25,12 @@ HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkComboboxChange), this);
 	if ((PartString.num > 1) || (PartString[0] != ""))
 		for (int i=0;i<PartString.num;i++)
-			__SetString(PartString[i]);
-	SetInt(0);
-	SetOptions(OptionString);
+			__setString(PartString[i]);
+	setInt(0);
+	setOptions(OptionString);
 }
 
-HuiControlComboBox::~HuiControlComboBox()
-{
-}
-
-string HuiControlComboBox::GetString()
+string HuiControlComboBox::getString()
 {
 	char *c = gtk_combo_box_text_get_active_text(GTK_COMBO_BOX_TEXT(widget));
 	string s = c;
@@ -42,12 +38,12 @@ string HuiControlComboBox::GetString()
 	return s;
 }
 
-void HuiControlComboBox::__SetString(const string &str)
+void HuiControlComboBox::__setString(const string &str)
 {
 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget),sys_str(str));
 }
 
-void HuiControlComboBox::__AddString(const string& str)
+void HuiControlComboBox::__addString(const string& str)
 {
 #if GTK_MAJOR_VERSION >= 3
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(widget), NULL, sys_str(str));
@@ -56,17 +52,17 @@ void HuiControlComboBox::__AddString(const string& str)
 #endif
 }
 
-void HuiControlComboBox::__SetInt(int i)
+void HuiControlComboBox::__setInt(int i)
 {
 	gtk_combo_box_set_active(GTK_COMBO_BOX(widget), i);
 }
 
-int HuiControlComboBox::GetInt()
+int HuiControlComboBox::getInt()
 {
 	return gtk_combo_box_get_active(GTK_COMBO_BOX(widget));
 }
 
-void HuiControlComboBox::__Reset()
+void HuiControlComboBox::__reset()
 {
 #if GTK_MAJOR_VERSION >= 3
 	gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(widget));

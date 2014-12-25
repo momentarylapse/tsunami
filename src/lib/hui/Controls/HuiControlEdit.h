@@ -15,12 +15,11 @@ class HuiControlEdit : public HuiControl
 {
 public:
 	HuiControlEdit(const string &text, const string &id);
-	virtual ~HuiControlEdit();
-	virtual string GetString();
-	virtual void __SetString(const string &str);
-	virtual void CompletionAdd(const string &text);
-	virtual void CompletionClear();
-	virtual void __SetOption(const string &op, const string &value);
+	virtual string getString();
+	virtual void __setString(const string &str);
+	virtual void completionAdd(const string &text);
+	virtual void completionClear();
+	virtual void __setOption(const string &op, const string &value);
 };
 
 #endif /* HUICONTROLEDIT_H_ */

@@ -160,6 +160,7 @@ SyntaxTree::SyntaxTree(Script *_script) :
 	script = _script;
 	AsmMetaInfo = new Asm::MetaInfo;
 	ForIndexCount = 0;
+	Exp.cur_line = NULL;
 
 	// "include" default stuff
 	foreach(Package &p, Packages)
@@ -168,12 +169,11 @@ SyntaxTree::SyntaxTree(Script *_script) :
 }
 
 
-void SyntaxTree::LoadAndParseFile(const string &filename, bool just_analyse)
+void SyntaxTree::ParseBuffer(const string &buffer, bool just_analyse)
 {
 	msg_db_f("LoadAndParseFile",4);
 
-	LoadToBuffer(config.Directory + filename, just_analyse);
-
+	Exp.Analyse(this, buffer + string("\0", 1)); // compatibility... expected by lexical
 	
 	PreCompiler(just_analyse);
 
@@ -716,24 +716,6 @@ Type *SyntaxTree::CreateArrayType(Type *element_type, int num_elements, const st
 }
 
 
-
-// read the file and do a lexical analysis
-void SyntaxTree::LoadToBuffer(const string &filename,bool just_analyse)
-{
-	msg_db_f("LoadToBuffer",4);
-
-// read file
-	CFile *f = FileOpen(filename);
-	if (!f){
-		Exp.cur_line = NULL;
-		DoError("script file not loadable");
-	}
-	string Buffer = f->ReadComplete();
-	Buffer.add(0); // compatibility... expected by lexical
-	FileClose(f);
-
-	Exp.Analyse(this, Buffer);
-}
 
 #define TRANSFORM_COMMANDS_RECURSION(FUNC, PREPARAMS, POSTPARAMS, CMD) \
 	for (int i=0;i<(CMD)->num_params;i++) \

@@ -31,21 +31,17 @@ HuiControlExpander::HuiControlExpander(const string &title, const string &id) :
 	//SetOptions(OptionString);
 }
 
-HuiControlExpander::~HuiControlExpander()
-{
-}
-
-void HuiControlExpander::Expand(int row, bool expand)
+void HuiControlExpander::expand(int row, bool expand)
 {
 	gtk_expander_set_expanded(GTK_EXPANDER(widget), expand);
 }
 
-void HuiControlExpander::ExpandAll(bool expand)
+void HuiControlExpander::expandAll(bool expand)
 {
 	gtk_expander_set_expanded(GTK_EXPANDER(widget), expand);
 }
 
-bool HuiControlExpander::IsExpanded(int row)
+bool HuiControlExpander::isExpanded(int row)
 {
 	return gtk_expander_get_expanded(GTK_EXPANDER(widget));
 }

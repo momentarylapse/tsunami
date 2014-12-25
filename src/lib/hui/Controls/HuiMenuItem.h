@@ -14,9 +14,8 @@ class HuiMenuItem : public HuiControl
 {
 public:
 	HuiMenuItem(const string &title, const string &id);
-	virtual ~HuiMenuItem();
 
-	virtual void SetImage(const string &image);
+	virtual void setImage(const string &image);
 };
 
 #endif /* HUIMENUITEM_H_ */

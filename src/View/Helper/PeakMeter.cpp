@@ -8,10 +8,11 @@
 #include "PeakMeter.h"
 #include "../../Plugins/FastFourierTransform.h"
 
-const int NUM_SAMPLES = 2048;
-const int SPECTRUM_SIZE = 30;
-const float FREQ_MIN = 40.0f;
-const float FREQ_MAX = 4000.0f;
+const int PeakMeter::NUM_SAMPLES = 1024;
+const int PeakMeter::SPECTRUM_SIZE = 30;
+const float PeakMeter::FREQ_MIN = 40.0f;
+const float PeakMeter::FREQ_MAX = 4000.0f;
+const float PeakMeter::UPDATE_DT = 0.05f;
 
 void PeakMeter::Data::reset()
 {
@@ -23,10 +24,10 @@ void PeakMeter::Data::reset()
 
 float PeakMeter::Data::get_sp()
 {
-	return super_peak * (1 - pow(super_peak_t, 3)*0.2f);
+	return max(super_peak * (1 - pow(super_peak_t, 3)*0.2f), 0.0001f);
 }
 
-void PeakMeter::Data::update(Array<float> &buf, float sample_rate)
+void PeakMeter::Data::update(Array<float> &buf, float dt)
 {
 	peak = 0;
 	for (int i=0; i<buf.num; i++){
@@ -37,7 +38,7 @@ void PeakMeter::Data::update(Array<float> &buf, float sample_rate)
 		super_peak = peak;
 		super_peak_t = 0;
 	}else{
-		super_peak_t += (float)buf.num / sample_rate;
+		super_peak_t += dt;
 	}
 }
 
@@ -142,8 +143,9 @@ void PeakMeter::onDraw()
 
 void PeakMeter::findPeaks()
 {
-	r.update(buf.r, sample_rate);
-	l.update(buf.l, sample_rate);
+	float dt = timer.peek();
+	r.update(buf.r, dt);
+	l.update(buf.l, dt);
 }
 
 void PeakMeter::clearData()
@@ -152,7 +154,7 @@ void PeakMeter::clearData()
 	l.reset();
 }
 
-inline float i_to_freq(int i)
+inline float PeakMeter::i_to_freq(int i)
 {	return FREQ_MIN * exp( (float)i / (float)SPECTRUM_SIZE * log(FREQ_MAX / FREQ_MIN));	}
 
 void PeakMeter::onLeftButtonDown()
@@ -200,12 +202,15 @@ void PeakMeter::onUpdate(Observable *o, const string &message)
 	int state = source->getState();
 
 	if (state == source->STATE_PLAYING){
+		if (timer.peek() < UPDATE_DT)
+			return;
 		sample_rate = source->getSampleRate();
 		source->getSomeSamples(buf, NUM_SAMPLES);
 		if (mode == ModePeaks)
 			findPeaks();
 		else if (mode == ModeSpectrum)
 			findSpectrum();
+		timer.get();
 	}else if (state == source->STATE_STOPPED){
 		clearData();
 	}

@@ -310,7 +310,10 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 	int dpos = 0;
 	alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
 
-	buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
+	if (box[cur_buffer_no].num - dpos > 0)
+		buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
+	else
+		buf.set_as_ref(box[1-cur_buffer_no], 0, min(num_samples, box[1-cur_buffer_no].num));
 }
 
 bool AudioStream::testError(const string &msg)

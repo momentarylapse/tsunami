@@ -40,10 +40,14 @@ public:
 	void onUpdate(Observable *o, const string &message);
 	void enable(bool enabled);
 
+	static const int NUM_SAMPLES;
+
 private:
 	void clearData();
 	void findPeaks();
 	void findSpectrum();
+
+	float i_to_freq(int i);
 
 	HuiPanel *panel;
 	string id;
@@ -61,7 +65,7 @@ private:
 		Array<float> spec;
 
 		void reset();
-		void update(Array<float> &buf, float sample_rate);
+		void update(Array<float> &buf, float dt);
 		float get_sp();
 	};
 	Data r, l;
@@ -70,6 +74,13 @@ private:
 
 	float sample_rate;
 	BufferBox buf;
+
+	HuiTimer timer;
+
+	static const int SPECTRUM_SIZE;
+	static const float FREQ_MIN;
+	static const float FREQ_MAX;
+	static const float UPDATE_DT;
 
 	bool enabled;
 };

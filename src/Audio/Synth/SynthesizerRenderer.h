@@ -31,6 +31,7 @@ public:
 	virtual int read(BufferBox &buf);
 
 	void add(int offset, float pitch, float volume);
+	void stopAll();
 	void reset();
 
 	bool auto_stop;

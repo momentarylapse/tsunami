@@ -55,6 +55,15 @@ void SynthesizerRenderer::add(int offset, float pitch, float volume)
 	events.add(ee);
 }
 
+void SynthesizerRenderer::stopAll()
+{
+	foreach(MidiNote &n, cur_notes){
+		if (n.range.end() > 0){
+			add(0, n.pitch, 0);
+		}
+	}
+}
+
 void SynthesizerRenderer::iterate(int samples)
 {
 	int keep_notes = 0;

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-210
+212
 // Data (ID,Text)
 about
 
@@ -62,6 +62,8 @@ capture_device
 capture_level
 
 capture_pause
+
+capture_source
 
 capture_start
 
@@ -321,9 +323,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_238229
+rand_id_119278
 
-rand_id_479684
+rand_id_926733
+
+rdt_capture
 
 rdt_source
 !bold\\Source
@@ -424,7 +428,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-149
+151
 // Data (ID,Text)
 
 
@@ -675,6 +679,10 @@ exportiere wave
 fügt am Cursor der aktuellen Spur ein
 
 i'm now going to clean up...
+
+in Datei exportieren
+
+inkompatibles Dateiformat für diese Aktion: 
 
 keine Sample gewählt
 

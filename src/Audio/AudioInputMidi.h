@@ -47,9 +47,11 @@ public:
 	{
 		int client, port;
 		string client_name, port_name;
+		MidiPort();
 	};
 	Array<MidiPort> findPorts();
-	bool connectTo(MidiPort p);
+	MidiPort getCurMidiPort();
+	bool connectTo(MidiPort &p);
 	bool unconnect();
 
 	void setPreviewSynthesizer(Synthesizer *s);
@@ -62,6 +64,8 @@ private:
 
 	_snd_seq *handle;
 	_snd_seq_port_subscribe *subs;
+	MidiPort cur_midi_port;
+	MidiPort no_midi_port;
 	int portid;
 	int npfd;
 	struct pollfd *pfd;

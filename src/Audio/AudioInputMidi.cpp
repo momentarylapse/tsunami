@@ -14,6 +14,11 @@
 #include <alsa/asoundlib.h>
 
 
+AudioInputMidi::MidiPort::MidiPort()
+{
+	client = port = -1;
+}
+
 
 AudioInputMidi::AudioInputMidi(MidiData &_data) :
 	data(_data)
@@ -61,22 +66,31 @@ void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 	preview_renderer->setSynthesizer(s);
 }
 
-bool AudioInputMidi::connectTo(AudioInputMidi::MidiPort p)
+bool AudioInputMidi::connectTo(AudioInputMidi::MidiPort &p)
 {
 	if (subs)
 		unconnect();
+
+	if ((p.client < 0) or (p.port < 0))
+		return true;
+
 	snd_seq_addr_t sender, dest;
 	sender.client = p.client;
 	sender.port = p.port;
 	dest.client = snd_seq_client_id(handle);
 	dest.port = portid;
+	cur_midi_port = p;
 
 	snd_seq_port_subscribe_malloc(&subs);
 	snd_seq_port_subscribe_set_sender(subs, &sender);
 	snd_seq_port_subscribe_set_dest(subs, &dest);
 	int r = snd_seq_subscribe_port(handle, subs);
-	if (r != 0)
+	if (r != 0){
 		tsunami->log->error(string("Error connecting to midi port: ") + snd_strerror(r));
+		snd_seq_port_subscribe_free(subs);
+		subs = NULL;
+		cur_midi_port = no_midi_port;
+	}
 	return r == 0;
 
 	// simple version raises "no permission" error...?!?
@@ -95,7 +109,13 @@ bool AudioInputMidi::unconnect()
 		tsunami->log->error(string("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
 	subs = NULL;
+	cur_midi_port = no_midi_port;
 	return r == 0;
+}
+
+AudioInputMidi::MidiPort AudioInputMidi::getCurMidiPort()
+{
+	return cur_midi_port;
 }
 
 

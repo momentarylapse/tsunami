@@ -13,6 +13,7 @@
 #include "../../Data/AudioFile.h"
 #include "../Helper/PeakMeter.h"
 #include "../../Stuff/Observer.h"
+#include "../../Audio/AudioInputMidi.h"
 
 class AudioView;
 
@@ -24,6 +25,7 @@ public:
 
 	void onTypeAudio();
 	void onTypeMidi();
+	void onSource();
 	void onTarget();
 	void onStart();
 	void onDelete();
@@ -33,6 +35,9 @@ public:
 	bool insert();
 
 	void fillTrackList();
+
+	void updateMidiPortList();
+	Array<AudioInputMidi::MidiPort> midi_ports;
 
 	void onUpdate(Observable *o, const string &message);
 

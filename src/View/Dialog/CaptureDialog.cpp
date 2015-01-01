@@ -34,27 +34,28 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	setString("capture_time", a->get_time_str_long(0));
 	enable("capture_delete", false);
 	enable("capture_pause", false);
-	enable("capture_type:audio", false);
-	enable("capture_type:midi", false);
 	enable("ok", false);
 
+	// target list
 	foreach(Track *t, a->track)
 		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-	addString("capture_target", _("neue Spur anlegen (" + track_type(Track::TYPE_AUDIO) + ")"));
-	addString("capture_target", _("neue Spur anlegen (" + track_type(Track::TYPE_MIDI) + ")"));
+	addString("capture_target", _("neue Spur anlegen )"));
 
 
 
-	if (view->cur_track)
+	if (view->cur_track){
 		setTarget(view->cur_track->get_index());
-	else
+	}else{
 		setTarget(audio->track.num);
+		setType(Track::TYPE_AUDIO);
+	}
 
 	event("cancel", this, &CaptureDialog::onClose);
 	event("hui:close", this, &CaptureDialog::onClose);
 	event("ok", this, &CaptureDialog::onOk);
-	//event("capture_type:audio", this, &CaptureDialog::onTypeAudio);
-	//event("capture_type:midi", this, &CaptureDialog::onTypeMidi);
+	event("capture_type:audio", this, &CaptureDialog::onTypeAudio);
+	event("capture_type:midi", this, &CaptureDialog::onTypeMidi);
+	event("capture_source", this, &CaptureDialog::onSource);
 	event("capture_target", this, &CaptureDialog::onTarget);
 	event("capture_start", this, &CaptureDialog::onStart);
 	event("capture_delete", this, &CaptureDialog::onDelete);
@@ -87,9 +88,7 @@ void CaptureDialog::onTypeAudio()
 	setType(Track::TYPE_AUDIO);
 }
 
-static Array<AudioInputMidi::MidiPort> ports;
-
-void OnSelectPort()
+/*void OnSelectPort()
 {
 	int n = HuiCurWindow->getInt("");
 	if (n < ports.num)
@@ -109,7 +108,7 @@ void SelectMidiPort(HuiWindow *parent)
 	dlg->setInt("port_list", 0);
 	dlg->eventS("port_list", &OnSelectPort);
 	dlg->run();
-}
+}*/
 
 void CaptureDialog::onTypeMidi()
 {
@@ -122,13 +121,39 @@ void CaptureDialog::setTarget(int index)
 		Track *t = audio->track[index];
 		setType(t->type);
 		tsunami->input->in_midi->setPreviewSynthesizer(t->synth);
-	}else if (index == audio->track.num){
-		setType(Track::TYPE_AUDIO);
 	}else{
-		setType(Track::TYPE_MIDI);
 		tsunami->input->in_midi->setPreviewSynthesizer(temp_synth);
 	}
 	setInt("capture_target", index);
+}
+
+void CaptureDialog::onSource()
+{
+	int n = HuiCurWindow->getInt("");
+	if (type == Track::TYPE_MIDI){
+		if (n < midi_ports.num)
+			tsunami->input->in_midi->connectTo(midi_ports[n]);
+		else
+			tsunami->input->in_midi->unconnect();
+	}
+}
+
+void CaptureDialog::updateMidiPortList()
+{
+	midi_ports = tsunami->input->in_midi->findPorts();
+	AudioInputMidi::MidiPort cur = tsunami->input->in_midi->getCurMidiPort();
+
+	reset("capture_source");
+	foreachi(AudioInputMidi::MidiPort &p, midi_ports, i){
+		setString("capture_source", p.client_name + " : " + p.port_name);
+		if ((p.client == cur.client) and (p.port == cur.port))
+			setInt("capture_source", i);
+	}
+	setString("capture_source", _("        - nicht verbinden -"));
+	if ((cur.client < 0) or (cur.port < 0))
+		setInt("capture_source", midi_ports.num);
+	enable("capture_source", true);
+
 }
 
 void CaptureDialog::setType(int _type)
@@ -136,13 +161,21 @@ void CaptureDialog::setType(int _type)
 	if (type == _type)
 		return;
 	type = _type;
+	reset("capture_source");
+	enable("capture_source", false);
 	if (type == Track::TYPE_MIDI){
-		SelectMidiPort(this);
+		updateMidiPortList();
 		check("capture_type:midi", true);
 	}else if (type == Track::TYPE_AUDIO){
 		check("capture_type:audio", true);
 	}else{
 	}
+
+	// consistency test: ...
+	int target = getInt("capture_target");
+	if ((target >= 0) and (target < audio->track.num))
+		if (type != audio->track[target]->type)
+			setInt("capture_target", audio->track.num);
 
 	if (!tsunami->input->start(type, audio->sample_rate)){
 		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
@@ -163,8 +196,9 @@ void CaptureDialog::onStart()
 	enable("capture_pause", true);
 	enable("capture_delete", true);
 	enable("ok", true);
-	//enable("capture_type:audio", false);
-	//enable("capture_type:midi", false);
+	enable("capture_type:audio", false);
+	enable("capture_type:midi", false);
+	enable("capture_source", false);
 	enable("capture_target", false);
 }
 
@@ -177,6 +211,9 @@ void CaptureDialog::onDelete()
 	enable("capture_start", true);
 	enable("capture_pause", false);
 	enable("capture_delete", false);
+	enable("capture_type:audio", true);
+	enable("capture_type:midi", true);
+	enable("capture_source", true);
 	enable("capture_target", true);
 	enable("ok", false);
 	onUpdate(NULL, "");

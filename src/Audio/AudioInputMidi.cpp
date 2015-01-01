@@ -236,17 +236,7 @@ float AudioInputMidi::getSampleRate()
 
 void AudioInputMidi::getSomeSamples(BufferBox &buf, int num_samples)
 {
-	//int pos = offset * (double)sample_rate;
-	buf.resize(num_samples);
-	for (int i=0;i<128;i++)
-		if (tone_start[i] >= 0){
-			buf.r.back() = buf.l.back() = 0.9f;
-			break;
-		}
-	/*if (data.num > 0)
-		if (data.back().range.end() > pos - num_samples){
-			buf.r.back() = buf.l.back() = 1;
-		}*/
+	preview_stream->getSomeSamples(buf, num_samples);
 }
 
 

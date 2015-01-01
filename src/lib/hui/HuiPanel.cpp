@@ -106,7 +106,7 @@ void HuiPanel::_set_cur_id_(const string &id)
 
 void HuiPanel::eventS(const string &id, hui_callback *function)
 {
-	events.add(HuiEventListener(id, "*", function));
+	events.add(HuiEventListener(id, ":def:", function));
 
 }
 

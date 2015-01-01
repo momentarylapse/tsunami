@@ -35,6 +35,7 @@
 
 #endif
 
+const int Socket::TYPE_DUMMY = 0;
 const int Socket::TYPE_TCP = 1;
 const int Socket::TYPE_UDP = 2;
 

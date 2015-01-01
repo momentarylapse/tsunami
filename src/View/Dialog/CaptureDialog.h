@@ -42,6 +42,7 @@ public:
 	AudioFile *audio;
 	AudioView *view;
 	PeakMeter *peak_meter;
+	Synthesizer *temp_synth;
 	int type;
 };
 

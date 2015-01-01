@@ -13,6 +13,7 @@
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
 #include "../../Audio/AudioRenderer.h"
+#include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include "../../Stuff/Log.h"
 
@@ -25,6 +26,8 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	audio = a;
 	view = tsunami->win->view;
 	type = -1;
+
+	temp_synth = CreateSynthesizer("");
 
 	// dialog
 	peak_meter = new PeakMeter(this, "capture_level", tsunami->input);
@@ -69,6 +72,7 @@ CaptureDialog::~CaptureDialog()
 	delete(peak_meter);
 
 	tsunami->input->in_midi->setPreviewSynthesizer(NULL);
+	delete(temp_synth);
 }
 
 void CaptureDialog::onTarget()
@@ -117,10 +121,13 @@ void CaptureDialog::setTarget(int index)
 	if (index < audio->track.num){
 		Track *t = audio->track[index];
 		setType(t->type);
-	}else if (index == audio->track.num)
+		tsunami->input->in_midi->setPreviewSynthesizer(t->synth);
+	}else if (index == audio->track.num){
 		setType(Track::TYPE_AUDIO);
-	else
+	}else{
 		setType(Track::TYPE_MIDI);
+		tsunami->input->in_midi->setPreviewSynthesizer(temp_synth);
+	}
 	setInt("capture_target", index);
 }
 

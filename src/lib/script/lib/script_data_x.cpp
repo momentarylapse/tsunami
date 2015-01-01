@@ -904,16 +904,16 @@ void SIAddPackageX()
 	add_ext_var("CurrentLayer",		TypeLayerP,	x_p(&CurrentGrouping));
 
 	// trace
-	add_const("TraceTypeNone",    TypeInt, x_p(TraceTypeNone));
-	add_const("TraceTypeTerrain", TypeInt, x_p(TraceTypeTerrain));
-	add_const("TraceTypeModel",   TypeInt, x_p(TraceTypeModel));
+	add_const("TraceTypeNone",    TypeInt, x_p(TRACE_TYPE_NONE));
+	add_const("TraceTypeTerrain", TypeInt, x_p(TRACE_TYPE_TERRAIN));
+	add_const("TraceTypeModel",   TypeInt, x_p(TRACE_TYPE_MODEL));
 	// animation operations
-	add_const("MoveOpSet",         TypeInt, x_p(MoveOpSet));
-	add_const("MoveOpSetNewKeyed", TypeInt, x_p(MoveOpSetNewKeyed));
-	add_const("MoveOpSetOldKeyed", TypeInt, x_p(MoveOpSetOldKeyed));
-	add_const("MoveOpAdd1Factor",  TypeInt, x_p(MoveOpAdd1Factor));
-	add_const("MoveOpMix1Factor",  TypeInt, x_p(MoveOpMix1Factor));
-	add_const("MoveOpMix2Factor",  TypeInt, x_p(MoveOpMix2Factor));
+	add_const("MoveOpSet",         TypeInt, x_p(MOVE_OP_SET));
+	add_const("MoveOpSetNewKeyed", TypeInt, x_p(MOVE_OP_SET_NEW_KEYED));
+	add_const("MoveOpSetOldKeyed", TypeInt, x_p(MOVE_OP_SET_OLD_KEYED));
+	add_const("MoveOpAdd1Factor",  TypeInt, x_p(MOVE_OP_ADD_1_FACTOR));
+	add_const("MoveOpMix1Factor",  TypeInt, x_p(MOVE_OP_MIX_1_FACTOR));
+	add_const("MoveOpMix2Factor",  TypeInt, x_p(MOVE_OP_MIX_2_FACTOR));
 	
 
 #if _X_ALLOW_X_

@@ -92,6 +92,7 @@ public:
 	NetAddress target;
 	NetAddress sender;
 
+	static const int TYPE_DUMMY;
 	static const int TYPE_TCP;
 	static const int TYPE_UDP;
 };

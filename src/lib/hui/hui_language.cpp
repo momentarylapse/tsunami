@@ -75,7 +75,7 @@
 	{
 		string r;
 		for (int i=0;i<str.num;i++){
-			if (str[i] == '&'){
+			if ((str[i] == '&') && (i < str.num - 1)){
 				if (str[i+1]=='a'){
 					r.add(0xc3);
 					r.add(0xa4);

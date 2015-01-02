@@ -29,7 +29,7 @@ Tsunami::Tsunami() :
 	HuiSetProperty("version", AppVersion);
 	HuiSetProperty("comment", _("Editor f&ur Audio Dateien"));
 	HuiSetProperty("website", "http://michi.is-a-geek.org/software");
-	HuiSetProperty("copyright", "© 2007-2015 by MichiSoft TM");
+	HuiSetProperty("copyright", "© 2007-2015 by Michael Ankele");
 	HuiSetProperty("author", "Michael Ankele <michi@lupina.de>");
 }
 
@@ -92,8 +92,8 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 			log->error(_("Aufruf: tsunami --info <Datei>"));
 		}else if (storage->load(audio, arg[2])){
 			msg_write(format("sample-rate: %d", audio->sample_rate));
-			msg_write(format("samples: %d", audio->GetRange().num));
-			msg_write("length: " + audio->get_time_str(audio->GetRange().num));
+			msg_write(format("samples: %d", audio->getRange().num));
+			msg_write("length: " + audio->get_time_str(audio->getRange().num));
 			msg_write(format("tracks: %d", audio->track.num));
 			foreach(Tag &t, audio->tag)
 				msg_write("tag: " + t.key + " = " + t.value);
@@ -103,7 +103,7 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		if (arg.num < 4){
 			log->error(_("Aufruf: tsunami --export <Datei> <Exportdatei>"));
 		}else if (storage->load(audio, arg[2])){
-			storage->_export(audio, audio->GetRange(), arg[3]);
+			storage->_export(audio, audio->getRange(), arg[3]);
 		}
 		return false;
 	}

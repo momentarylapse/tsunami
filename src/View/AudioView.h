@@ -159,7 +159,7 @@ public:
 	int y2pitch(int y);
 	float pitch2y(int p);
 
-	Array<MidiNote> getSelectedNotes();
+	Array<MidiNote> getCreationNotes();
 
 	void zoom(float f);
 	void move(float dpos);

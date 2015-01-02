@@ -311,7 +311,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::newEmpty));
 	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::addTrack));
 	Script::LinkExternal("AudioFile.deleteTrack", Script::mf(&AudioFile::deleteTrack));
-	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::GetRange));
+	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::getRange));
 	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::getNextBeat));
 
 	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::prepare));

@@ -331,7 +331,7 @@ AudioView::SelectionType AudioView::getMouseOver()
 Range AudioView::getPlaybackSelection()
 {
 	if (sel_range.empty()){
-		int num = audio->GetRange().end() - sel_range.start();
+		int num = audio->getRange().end() - sel_range.start();
 		if (num <= 0)
 			num = audio->sample_rate; // 1 second
 		return Range(sel_range.start(), num);
@@ -558,13 +558,13 @@ void AudioView::onLeftButtonDown()
 }
 
 
-Array<MidiNote> AudioView::getSelectedNotes()
+Array<MidiNote> AudioView::getCreationNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection.pos);
 	int end = max(mouse_possibly_selecting_start, selection.pos);
 	Track *t = audio->getTimeTrack();
 	if (t){
-		Array<Beat> beats = t->bar.getBeats(audio->GetRange());
+		Array<Beat> beats = t->bar.getBeats(Range(-0x4000000, 0x8000000));//audio->getRange());
 		foreach(Beat &b, beats){
 			if (b.range.is_inside(start)){
 				int dl = b.range.num / beat_partition;
@@ -593,7 +593,7 @@ void AudioView::onLeftButtonUp()
 		if (cur_action)
 			audio->execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		cur_track->addMidiNotes(getSelectedNotes());
+		cur_track->addMidiNotes(getCreationNotes());
 
 		midi_preview_renderer->stopAll();
 	}
@@ -1210,7 +1210,7 @@ void AudioView::optimizeView()
 	if (area.x2 <= 0)
 		area.x2 = drawing_rect.x2;
 
-	Range r = audio->GetRange();
+	Range r = audio->getRange();
 
 	if (r.num == 0)
 		r.num = 10 * audio->sample_rate;
@@ -1271,7 +1271,7 @@ void AudioView::makeSampleVisible(int sample)
 
 void AudioView::selectAll()
 {
-	sel_raw = audio->GetRange();
+	sel_raw = audio->getRange();
 	updateSelection();
 }
 

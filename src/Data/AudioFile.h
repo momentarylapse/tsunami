@@ -37,7 +37,7 @@ class AudioFile : public Data
 public:
 	AudioFile();
 	virtual ~AudioFile();
-	Range _cdecl GetRange();
+	Range _cdecl getRange();
 
 	static const string MESSAGE_NEW;
 	static const string MESSAGE_SELECTION_CHANGE;

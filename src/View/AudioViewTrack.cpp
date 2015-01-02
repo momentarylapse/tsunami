@@ -225,7 +225,7 @@ void AudioViewTrack::drawMidiEditable(HuiPainter *c, const rect &r, MidiData &mi
 		draw_note(c, n, col, view);
 	}
 	if ((HuiGetEvent()->lbut) and (view->selection.type == view->SEL_TYPE_MIDI_PITCH)){
-		Array<MidiNote> notes = view->getSelectedNotes();
+		Array<MidiNote> notes = view->getCreationNotes();
 		foreach(MidiNote &n, notes){
 			color col = getPitchColor(n.pitch);
 			col.a = 0.5f;

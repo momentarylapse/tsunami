@@ -214,7 +214,7 @@ void SampleManager::onPreview()
 	preview_audio->addTrack(preview_sample->type);
 	preview_audio->track[0]->level[0].buffer.add(preview_sample->buf);
 	preview_audio->track[0]->midi = preview_sample->midi;
-	preview_renderer->prepare(preview_audio, preview_audio->GetRange(), false);
+	preview_renderer->prepare(preview_audio, preview_audio->getRange(), false);
 
 	tsunami->progress->startCancelable(_("Vorschau"), 0);
 	subscribe(tsunami->progress);

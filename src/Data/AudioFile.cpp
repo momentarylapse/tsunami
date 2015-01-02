@@ -221,7 +221,7 @@ bool AudioFile::save(const string & filename)
 	return tsunami->storage->save(this, filename);
 }
 
-Range AudioFile::GetRange()
+Range AudioFile::getRange()
 {
 	int min =  1073741824;
 	int max = -1073741824;

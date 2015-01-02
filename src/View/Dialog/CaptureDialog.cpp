@@ -39,7 +39,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	// target list
 	foreach(Track *t, a->track)
 		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-	addString("capture_target", _("neue Spur anlegen )"));
+	addString("capture_target", _("  - neue Spur anlegen -"));
 
 
 

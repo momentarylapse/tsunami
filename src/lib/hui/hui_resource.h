@@ -21,8 +21,9 @@ HuiMenu *_cdecl HuiCreateResourceMenu(const string &id);
 
 
 
-struct HuiResource
+class HuiResource
 {
+public:
 	string type;
 	string id;
 	bool enabled;
@@ -47,8 +48,9 @@ struct HuiResource
 
 
 
-struct HuiResourceNew
+class HuiResourceNew
 {
+public:
 	string type;
 	string id;
 	string title;

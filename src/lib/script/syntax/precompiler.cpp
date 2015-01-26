@@ -8,7 +8,7 @@ namespace Script{
 
 //#define ScriptDebug
 
-extern int s2i2(const string &str);
+extern long long s2i2(const string &str);
 
 
 void SetImmortal(SyntaxTree *ps)
@@ -131,11 +131,11 @@ void SyntaxTree::HandleMacro(ExpressionBuffer::Line *l, int &line_no, int &NumIf
 					FlagOverwriteVariablesOffset = true;
 					if (d.Dest.num != 1)
 						DoError("offset value expected after __VARIABLE_OFFSET__");
-					VariablesOffset = s2i2(d.Dest[0]);
+					VariablesOffset = (int)s2i2(d.Dest[0]);
 				}else if (d.Source == "__CODE_ORIGIN__"){
 					if (d.Dest.num != 1)
 						DoError("offset value expected after __CODE_ORIGIN__");
-					AsmMetaInfo->CodeOrigin = s2i2(d.Dest[0]);
+					AsmMetaInfo->CodeOrigin = (long)s2i2(d.Dest[0]);
 				}else
 					DoError("unknown compiler flag (define starting and ending with \"__\"): " + d.Source);
 			}else

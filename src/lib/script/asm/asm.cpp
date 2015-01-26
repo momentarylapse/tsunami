@@ -2697,7 +2697,7 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 		WantedLabel w;
 		w.Pos = ocs;
 		w.Size = size;
-		w.LabelNo = value;
+		w.LabelNo = (int)value;
 		w.Name = list.label[p.value].Name;
 		w.Relative = rel;
 		w.InstNo = list.current_inst;
@@ -3222,7 +3222,7 @@ void InstructionWithParamsList::ShrinkJumps(void *oc, int ocs)
 	foreachi(InstructionWithParams &iwp, *this, i){
 		if ((iwp.inst == inst_jmp) || (iwp.inst == inst_jz) || (iwp.inst == inst_jnz) || (iwp.inst == inst_jl) || (iwp.inst == inst_jnl) || (iwp.inst == inst_jle) || (iwp.inst == inst_jnle)){
 			if (iwp.p1.is_label){
-				int target = label[iwp.p1.value].InstNo;
+				int target = label[(int)iwp.p1.value].InstNo;
 
 				// jump distance
 				int dist = 0;

@@ -360,7 +360,11 @@ string Socket::read()
 	msg_db_f("sock.read", 2);
 	int r;
 	sockaddr_in addr;
+#ifdef OS_WINDOWS
+	int addr_len = sizeof(addr);
+#else
 	socklen_t addr_len = sizeof(addr);
+#endif
 	if (type == TYPE_UDP)
 		r = recvfrom(s, _net_temp_buf_, sizeof(_net_temp_buf_), 0, (sockaddr*)&addr, &addr_len);
 	else
@@ -393,8 +397,12 @@ bool Socket::write(const string &buf)
 		memset((char *)&addr, 0, sizeof(addr));
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(target.port);
+#ifdef OS_WINDOWS
+			msg_error("inet_aton() on windows...\n");
+#else
 		if (inet_aton(target.host.c_str(), &addr.sin_addr)==0)
 			msg_error("inet_aton() failed\n");
+#endif
 	}
 
 	while (sent < buf.num){

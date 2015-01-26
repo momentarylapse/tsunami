@@ -223,8 +223,8 @@ bool HuiWindow::getKey(int k)
 
 bool HuiWindow::getMouse(int &x, int &y, int button)
 {
-	x = input.x;
-	y = input.y;
+	x = (int)input.x;
+	y = (int)input.y;
 	if (button == 0){
 		return input.lb;
 	}else if (button == 1){

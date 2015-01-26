@@ -29,7 +29,7 @@ void HuiInitTimers()
 {
 #ifdef OS_WINDOWS
 	LONGLONG perf_cnt;
-	HuiTimerPerfFlag = QueryPerformanceFrequency((LARGE_INTEGER*)&perf_cnt);
+	HuiTimerPerfFlag = (bool)QueryPerformanceFrequency((LARGE_INTEGER*)&perf_cnt);
 	if (HuiTimerPerfFlag)
 		HuitTimerScal = 1.0f / perf_cnt;
 	else
@@ -79,7 +79,7 @@ void HuiSleep(float duration)
 	if (duration <= 0)
 		return;
 #ifdef OS_WINDOWS
-	Sleep(duration * 1000);
+	Sleep((DWORD)(duration * 1000.0f));
 #endif
 #ifdef OS_LINUX
 	usleep(duration * 1000000);

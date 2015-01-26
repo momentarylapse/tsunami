@@ -61,7 +61,7 @@ color HuiPainter::getThemeColor(int i)
 		gtk_style_context_get_background_color(sc, state, &c);
 	else if (x == 2)
 		gtk_style_context_get_border_color(sc, state, &c);
-	return color(c.alpha, c.red, c.green, c.blue);
+	return color((float)c.alpha, (float)c.red, (float)c.green, (float)c.blue);
 }
 
 void HuiPainter::clip(const rect &r)
@@ -219,7 +219,7 @@ void HuiPainter::setFont(const string &font, float size, bool bold, bool italic)
 	if (font.num > 0)
 		cur_font = font;
 	if (size > 0)
-		cur_font_size = size;
+		cur_font_size = (int)size;
 	cur_font_bold = bold;
 	cur_font_italic = italic;
 }
@@ -229,7 +229,7 @@ void HuiPainter::setFontSize(float size)
 	if (!cr)
 		return;
 	//cairo_set_font_size(cr, size);
-	cur_font_size = size;
+	cur_font_size = (int)size;
 }
 
 void HuiPainter::setAntialiasing(bool enabled)

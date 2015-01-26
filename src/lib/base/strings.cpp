@@ -724,7 +724,7 @@ int string::_int() const
 	return res;
 }
 
-long long string::_int64() const
+long long string::i64() const
 {
 	bool minus=false;
 	long long res=0;
@@ -771,7 +771,7 @@ float string::_float() const
 }
 
 // convert a string to a float
-double string::_float64() const
+double string::f64() const
 {
 	bool minus=false;
 	int e=-1;
@@ -804,7 +804,7 @@ float s2f(const string &s)
 {	return s._float();	}
 
 double s2f64(const string &s)
-{	return s._float64();	}
+{	return s.f64();	}
 
 bool string::_bool() const
 {

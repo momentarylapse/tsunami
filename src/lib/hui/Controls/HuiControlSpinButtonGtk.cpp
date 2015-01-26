@@ -37,7 +37,7 @@ HuiControlSpinButton::HuiControlSpinButton(const string &title, const string &id
 
 string HuiControlSpinButton::getString()
 {
-	return f2s(gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget)), gtk_spin_button_get_digits(GTK_SPIN_BUTTON(widget)));
+	return f2s((float)gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget)), gtk_spin_button_get_digits(GTK_SPIN_BUTTON(widget)));
 	//return de_sys_str(gtk_entry_get_text(GTK_ENTRY(widget)));
 }
 
@@ -58,7 +58,7 @@ int HuiControlSpinButton::getInt()
 
 float HuiControlSpinButton::getFloat()
 {
-	return gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget));
+	return (float)gtk_spin_button_get_value(GTK_SPIN_BUTTON(widget));
 }
 
 void HuiControlSpinButton::__setFloat(float f)

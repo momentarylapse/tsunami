@@ -63,8 +63,10 @@ void Image::loadFlipped(const string &filename)
 		image_load_tga(filename, *this);
 	else if (ext == "jpg")
 		image_load_jpg(filename, *this);
+#ifndef OS_WINDOWS
 	else if (ext == "png")
 		image_load_png(filename, *this);
+#endif
 	else
 		msg_error("ImageLoad: unhandled file extension: " + ext);
 }
@@ -173,9 +175,9 @@ inline void col_conv_rgba_to_bgra(unsigned int &c)
 	if (a < 255){
 		// cairo wants pre multiplied alpha
 		float aa = (float)((c & 0xff000000) >> 24) / 255.0f;
-		unsigned int r = (float)(c & 0xff) * aa;
-		unsigned int g = (float)((c & 0xff00) >> 8) * aa;
-		unsigned int b = (float)((c & 0xff0000) >> 16) * aa;
+		unsigned int r = (unsigned int)((float)(c & 0xff) * aa);
+		unsigned int g = (unsigned int)((float)((c & 0xff00) >> 8) * aa);
+		unsigned int b = (unsigned int)((float)((c & 0xff0000) >> 16) * aa);
 		c = (c & 0xff000000) + b + (r << 16) + (g << 8);
 	}else{
 		unsigned int r = (c & 0xff);
@@ -240,11 +242,11 @@ color Image::getPixel(int x, int y) const
 //  each pixel has its maximum at offset (0.5, 0.5)
 color Image::getPixelInterpolated(float x, float y) const
 {
-	x = loopf(x, 0, width);
-	y = loopf(y, 0, height);
-	int x0 = (x >= 0.5f) ? (x - 0.5f) : (width - 1);
+	x = loopf(x, 0, (float)width);
+	y = loopf(y, 0, (float)height);
+	int x0 = (x >= 0.5f) ? (int)(x - 0.5f) : (width - 1);
 	int x1 = (x0 < width - 1) ? (x0 + 1) : 0;
-	int y0 = (y >= 0.5f) ? (y - 0.5f) : (height - 1);
+	int y0 = (y >= 0.5f) ? (int)(y - 0.5f) : (height - 1);
 	int y1 = (y0 < height- 1) ? (y0 + 1) : 0;
 	color c00 = getPixel(x0, y0);
 	color c01 = getPixel(x0, y1);

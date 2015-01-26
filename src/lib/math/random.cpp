@@ -25,7 +25,7 @@ int Random::_get()
 	i = (i + 1) & 4095;
 	t = a * Q[i] + c;
 	c = (t >> 32);
-	x = t + c;
+	x = (int)t + c;
 	if (x < c){
 		x++;
 		c++;
@@ -44,7 +44,7 @@ int Random::geti(int max)
 
 float Random::getu()
 {
-	float r = _get();
+	float r = (float)_get();
 	if (r < 0)
 		r = - r;
 	return r / 2147483648.0f;
@@ -52,7 +52,7 @@ float Random::getu()
 
 float Random::getf(float min, float max)
 {
-	float r = _get();
+	float r = (float)_get();
 	if (r < 0)
 		r = - r;
 	return min + (max - min) * r / 2147483648.0f;

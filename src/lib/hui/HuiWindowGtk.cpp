@@ -470,13 +470,13 @@ void HuiWindow::getSizeDesired(int &width, int &height)
 void HuiWindow::showCursor(bool show)
 {
 #ifdef OS_WINDOWS
-	int s=::showCursor(show);
+	int s=::ShowCursor(show);
 	if (show){
 		while(s<0)
-			s=::showCursor(show);
+			s=::ShowCursor(show);
 	}else{
 		while(s>=0)
-			s=::showCursor(show);
+			s=::ShowCursor(show);
 	}
 #else
 	if (show)
@@ -497,8 +497,8 @@ void HuiWindow::setCursorPos(int x, int y)
 		GtkAreaMouseSet = 2;
 		GtkAreaMouseSetX = x;
 		GtkAreaMouseSetY = y;
-		input.x = x;
-		input.y = y;
+		input.x = (float)x;
+		input.y = (float)y;
 		// TODO GTK3
 #ifdef OS_LINUX
 		XWarpPointer(hui_x_display, None, GDK_WINDOW_XID(gtk_widget_get_window(main_input_control->widget)), 0, 0, 0, 0, x, y);
@@ -507,7 +507,7 @@ void HuiWindow::setCursorPos(int x, int y)
 #ifdef OS_WINDOWS
 		RECT r;
 		GetWindowRect((HWND)GDK_WINDOW_HWND(gtk_widget_get_window(main_input_control->widget)), &r);
-		::setCursorPos(x + r.left, y + r.top);
+		::SetCursorPos(x + r.left, y + r.top);
 #endif
 	}
 }

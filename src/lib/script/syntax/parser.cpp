@@ -43,7 +43,7 @@ long long s2i2(const string &str)
 		}
 		return r;
 	}else
-		return	str._int64();
+		return	str.i64();
 }
 
 // find the type of a (potential) constant
@@ -131,7 +131,7 @@ string SyntaxTree::GetConstantValue()
 		return Exp.cur.substr(1, -2);
 	}
 	if (type == TypeInt){
-		_some_int_ = s2i2(Exp.cur);
+		_some_int_ = (int)s2i2(Exp.cur);
 		return string((char*)&_some_int_, sizeof(int));
 	}
 	if (type == TypeInt64){

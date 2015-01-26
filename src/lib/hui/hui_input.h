@@ -63,8 +63,9 @@ extern HuiEvent _HuiEvent_;
 HuiEvent *HuiGetEvent();
 
 
-struct HuiEventListener
+class HuiEventListener
 {
+public:
 	string id, message;
 	HuiCallback function;
 	HuiEventListener(){}

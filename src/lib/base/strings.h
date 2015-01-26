@@ -52,9 +52,9 @@ class string : public DynamicArray
 	Array<int> utf16_to_utf32() const;
 	int _cdecl hash() const;
 	int _cdecl _int() const;
-	long long _cdecl _int64() const;
+	long long _cdecl i64() const;
 	float _cdecl _float() const;
-	double _cdecl _float64() const;
+	double _cdecl f64() const;
 	bool _cdecl _bool() const;
 	const char *c_str() const;
 

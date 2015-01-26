@@ -47,7 +47,7 @@ void HuiControlToggleButton::__check(bool checked)
 
 bool HuiControlToggleButton::isChecked()
 {
-	return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
+	return (bool)gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(widget));
 }
 
 #endif

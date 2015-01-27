@@ -22,9 +22,7 @@
 	#pragma comment(lib,"libvorbisfile.lib")*/
 
 #else
-	#include <AL/al.h>
-	#include <AL/alut.h>
-	#include <AL/alc.h>
+	#include <portaudio.h>
 #endif
 
 
@@ -32,8 +30,8 @@
 AudioOutput::AudioOutput() :
 	Observable("AudioOutput")
 {
-	al_initialized = false;
-	al_last_error = AL_NO_ERROR;
+	initialized = false;
+	last_error = paNoError;
 
 	al_context = NULL;
 	al_dev = NULL;
@@ -63,12 +61,12 @@ void AudioOutput::setDevice(const string &device)
 
 void AudioOutput::init()
 {
-	if (al_initialized)
+	if (initialized)
 		return;
 	msg_db_f("Output.init", 1);
 
 	// which device to use?
-	string dev_name;
+	/*string dev_name;
 	const char *s = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
 	Device.clear();
 	while(*s != 0){
@@ -107,19 +105,20 @@ void AudioOutput::init()
 	}
 
 	if (!ok){
-		tsunami->log->error(string("OpenAL init: ") + alutGetErrorString(al_last_error));
+		tsunami->log->error(string("OpenAL init: ") + alutGetErrorString(last_error));
 		return;
 	}
 
 	//SetListenerValues();
-	testError("init...");
+	testError("init...");*/
+	 Pa_Initialize();
 
-	al_initialized = true;
+	initialized = true;
 }
 
 void AudioOutput::kill()
 {
-	if (!al_initialized)
+	if (!initialized)
 		return;
 	msg_db_f("Output.kill",1);
 
@@ -127,7 +126,7 @@ void AudioOutput::kill()
 		s->kill();
 
 	// close devices
-	if (al_dev){
+	/*if (al_dev){
 		// manually
 		//msg_write("current context...");
 		alcMakeContextCurrent(NULL);
@@ -144,27 +143,11 @@ void AudioOutput::kill()
 		int i = alutExit();
 		if (i == 0)
 			msg_error((char*)alutGetErrorString(alutGetError()));
-	}
-	al_initialized = false;
+	}*/
+	last_error = Pa_Terminate();
+	initialized = false;
 }
 
-
-string ALError(int err)
-{
-	if (err==AL_NO_ERROR)
-		return "AL_NO_ERROR";
-	if (err==AL_INVALID_NAME)
-		return "AL_INVALID_NAME";
-	if (err==AL_INVALID_ENUM)
-		return "AL_INVALID_ENUM";
-	if (err==AL_INVALID_VALUE)
-		return "AL_INVALID_VALUE";
-	if (err==AL_INVALID_OPERATION)
-		return "AL_INVALID_OPERATION";
-	if (err==AL_OUT_OF_MEMORY)
-		return "AL_OUT_OF_MEMORY";
-	return i2s(err);
-}
 
 float AudioOutput::getVolume()
 {
@@ -191,19 +174,24 @@ void AudioOutput::removeStream(AudioStream* s)
 
 bool AudioOutput::testError(const string &msg)
 {
-	int error;
+	if (last_error != paNoError){
+		tsunami->log->error(string("PortAudio error: ") + Pa_GetErrorText(last_error));
+		return true;
+	}
+
+	/*int error;
 	if (al_dev)
 		error = alcGetError(al_dev);
 	else
 		error = alGetError();
 	if (error != AL_NO_ERROR){
-		al_last_error = error;
+		last_error = error;
 		//tsunami->log->Error();
 		msg_error("OpenAL operation: " + msg);
 		msg_write(ALError(error));
 		//msg_write(alutGetErrorString(error));
 		return true;
-	}
+	}*/
 	return false;
 }
 

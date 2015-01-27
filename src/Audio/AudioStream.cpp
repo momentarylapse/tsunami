@@ -12,7 +12,7 @@
 #include "../Stuff/Log.h"
 
 
-#ifdef NIX_OS_WINDOWS
+#ifdef OS_WINDOWS
 	#include <al.h>
 	#include <alut.h>
 	#include <alc.h>
@@ -20,9 +20,7 @@
 	#pragma comment(lib,"OpenAL32.lib")
 
 #else
-	#include <AL/al.h>
-	#include <AL/alut.h>
-	#include <AL/alc.h>
+	#include <portaudio.h>
 #endif
 
 //#define DEFAULT_BUFFER_SIZE		131072
@@ -38,7 +36,7 @@ const string AudioStream::MESSAGE_UPDATE = "Update";
 AudioStream::AudioStream() :
 	PeakMeterSource("AudioStream")
 {
-	al_last_error = AL_NO_ERROR;
+	last_error = paNoError;
 
 	renderer = NULL;
 	generate_func = NULL;
@@ -48,18 +46,29 @@ AudioStream::AudioStream() :
 
 	output = tsunami->output;
 
-	buffer[0] = -1;
-	buffer[1] = -1;
-	source = -1;
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
-	cur_buffer_no = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 
-	alGenSources(1, &source);
+	int outDevNum = Pa_GetDefaultOutputDeviceID();
 
-	alGenBuffers(2, (ALuint*)buffer);
-	testError("alGenBuffers (play)");
+	PaStreamParameters outputParameters;
+	bzero(&outputParameters, sizeof(outputParameters));
+	outputParameters.channelCount = 2;
+	outputParameters.device = outDevNum;
+	outputParameters.hostApiSpecificStreamInfo = NULL;
+	outputParameters.sampleFormat = paFloat32;
+	outputParameters.suggestedLatency = Pa_GetDeviceInfo(outDevNum)->defaultLowOutputLatency;
+	outputParameters.hostApiSpecificStreamInfo = NULL; //See you specific host's API docs for info on using this field
+	last_error = Pa_OpenStream(
+	                &pa_stream,
+	                NULL,
+	                &outputParameters,
+	                sample_rate,
+	                buffer_size,
+	                paNoFlag, //flags that can be used to define dither, clip settings and more
+	                portAudioCallback,
+	                (void*)this);
 
 	output->addStream(this);
 	killed = false;
@@ -87,11 +96,8 @@ void AudioStream::kill()
 
 	stop();
 
-	alDeleteSources(1, &source);
-	testError("alDeleteBuffers (kill)");
-
-	alDeleteBuffers(2, (ALuint*)buffer);
-	testError("alDeleteBuffers (kill)");
+	last_error = Pa_CloseStream(&pa_stream);
+	testError("AudioStream.kill");
 
 	output->removeStream(this);
 	killed = true;
@@ -102,17 +108,8 @@ void AudioStream::stop_play()
 	if (!playing)
 		return;
 
-	testError("?  (prestop)");
-	alSourceStop(source);
-	testError("alSourceStop (stop)");
-	int queued;
-	alGetSourcei(source, AL_BUFFERS_QUEUED, &queued);
-	testError("alGetSourcei(queued) (stop)");
-	while(queued--){
-		ALuint buf;
-		alSourceUnqueueBuffers(source, 1, &buf);
-		testError(format("alSourceUnqueueBuffers(%d) (stop)", queued));
-	}
+	last_error = Pa_AbortStream(pa_stream);
+	testError("AudioStream.stop");
 }
 
 void AudioStream::stop()
@@ -132,12 +129,12 @@ void AudioStream::pause()
 {
 	if (!playing)
 		return;
-	int param;
+	/*int param;
 	alGetSourcei(source, AL_SOURCE_STATE, &param);
 	if (param == AL_PLAYING)
 		alSourcePause(source);
 	else if (param == AL_PAUSED)
-		alSourcePlay(source);
+		alSourcePlay(source);*/
 	notify(MESSAGE_STATE_CHANGE);
 }
 

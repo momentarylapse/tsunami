@@ -44,8 +44,8 @@ private:
 	ALCcontext_struct *al_context;
 	ALCdevice_struct *al_dev;
 
-	bool al_initialized;
-	int al_last_error;
+	bool initialized;
+	int last_error;
 
 	float volume;
 

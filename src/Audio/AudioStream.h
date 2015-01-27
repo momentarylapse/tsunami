@@ -17,6 +17,7 @@
 
 class AudioRendererInterface;
 class AudioOutput;
+typedef void PaStream;
 
 class AudioStream : public PeakMeterSource
 {
@@ -79,11 +80,9 @@ private:
 	Array<short> data;
 	int data_samples;
 
-	int buffer[2];
-	int cur_buffer_no;
-	unsigned int source;
+	PaStream *pa_stream;
 
-	int al_last_error;
+	int last_error;
 
 	AudioOutput *output;
 	bool killed;

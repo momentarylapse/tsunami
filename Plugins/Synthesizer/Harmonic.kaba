@@ -4,7 +4,7 @@ use "../tone.kaba"
 const int NUM_HARMONICS = 10
 
 class HarmonicConfig : PluginData
-	float intensity[NUM_HARMONICS]
+	float[NUM_HARMONICS] intensity
 	float release
 	overwrite void reset()
 		intensity[0] = 1

@@ -16,7 +16,7 @@ const float MAX_VOL = 0.0
 
 SpectrumDialog *dlg
 
-float sg[NT][NF]
+float[NT][NF] sg
 Image im0
 
 class SpecGrid : Grid
@@ -78,8 +78,8 @@ void show_spec()
 	BufferBox buf
 	renderer.renderAudioFile(audio, view.sel_range, buf)
 	
-	complex f[]
-	float sub[]
+	complex[] f
+	float[] sub
 	sub.resize(N)
 	
 	float _max = 0

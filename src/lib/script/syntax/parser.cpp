@@ -547,7 +547,7 @@ Command *SyntaxTree::GetOperand(Function *f)
 		Exp.next();
 	}else if (Exp.cur == "new"){ // new operator
 		Exp.next();
-		Type *t = GetType(Exp.cur, true);
+		Type *t = ParseType();
 		Operand = add_command_compilerfunc(CommandNew);
 		Operand->type = t->GetPointer();
 		if (Exp.cur == "("){
@@ -1201,7 +1201,7 @@ void SyntaxTree::ParseCompleteCommand(Block *block, Function *f)
 	msg_db_f("GetCompleteCommand", 4);
 	// cur_exp = 0!
 
-	Type *tType = GetType(Exp.cur, false);
+	bool is_type = FindType(Exp.cur);
 	int last_indent = Exp.indent_0;
 
 	// block?  <- indent
@@ -1236,16 +1236,16 @@ void SyntaxTree::ParseCompleteCommand(Block *block, Function *f)
 
 	// local (variable) definitions...
 	// type of variable
-	}else if (tType){
+	}else if (is_type){
+		Type *type = ParseType();
 		for (int l=0;!Exp.end_of_line();l++){
-			ParseVariableDefSingle(tType, f);
+			// name
+			f->AddVar(Exp.cur, type);
+			Exp.next();
 
 			// assignment?
 			if (Exp.cur == "="){
-				//Exp.rewind();
-				// insert variable name because declaration might end with "[]"
-				Exp.insert(f->var.back().name.c_str(), 0, Exp.cur_exp);
-				Exp.cur = f->var.back().name;
+				Exp.rewind();
 				// parse assignment
 				Command *c = GetCommand(f);
 				block->command.add(c);
@@ -1275,48 +1275,6 @@ void SyntaxTree::ParseCompleteCommand(Block *block, Function *f)
 	}
 
 	ExpectNewline();
-}
-
-// look for array definitions and correct pointers
-void SyntaxTree::TestArrayDefinition(Type **type, bool is_pointer)
-{
-	msg_db_f("TestArrayDef", 4);
-	if (is_pointer){
-		(*type) = (*type)->GetPointer();
-	}
-	if (Exp.cur == "["){
-		int array_size;
-		string or_name = (*type)->name;
-		int or_name_length = or_name.num;
-		Exp.next();
-
-		// no index -> super array
-		if (Exp.cur == "]"){
-			array_size = -1;
-
-		}else{
-
-			// find array index
-			Command *c = PreProcessCommand(GetCommand(&RootOfAllEvil));
-
-			if ((c->kind != KindConstant) || (c->type != TypeInt))
-				DoError("only constants of type \"int\" allowed for size of arrays");
-			array_size = Constants[c->link_no].getInt();
-			//Exp.next();
-			if (Exp.cur != "]")
-				DoError("\"]\" expected after array size");
-		}
-		Exp.next();
-		// recursion
-		TestArrayDefinition(type, false); // is_pointer=false, since pointers have been handled
-
-		// create array       (complicated name necessary to get correct ordering   int a[2][4] = (int[4])[2])
-		(*type) = CreateArrayType(*type, array_size, or_name, (*type)->name.substr(or_name_length, -1));
-		if (Exp.cur == "*"){
-			Exp.next();
-			TestArrayDefinition(type, true);
-		}
-	}
 }
 
 
@@ -1446,7 +1404,7 @@ void SyntaxTree::ParseClass()
 	// parent class
 	if (Exp.cur == ":"){
 		Exp.next();
-		Type *parent = GetType(Exp.cur, true);
+		Type *parent = ParseType(); // force
 		if (!_class->DeriveFrom(parent, true))
 			DoError(format("parental type in class definition after \":\" has to be a class, but (%s) is not", parent->name.c_str()));
 		_offset = parent->size;
@@ -1454,7 +1412,7 @@ void SyntaxTree::ParseClass()
 	ExpectNewline();
 
 	// elements
-	for (int num=0;!Exp.end_of_file();num++){
+	for (int num=0; !Exp.end_of_file(); num++){
 		Exp.next_line();
 		if (Exp.cur_line->indent <= indent0) //(unindented)
 			break;
@@ -1480,21 +1438,14 @@ void SyntaxTree::ParseClass()
 		}
 		int ie = Exp.cur_exp;
 
-		Type *tType = GetType(Exp.cur, true);
+		Type *type = ParseType(); // force
 		for (int j=0;!Exp.end_of_line();j++){
 			//int indent = Exp.cur_line->indent;
 
 			ClassElement el;
-			bool is_pointer = false;
-			Type *type = tType;
-			if (Exp.cur == "*"){
-				Exp.next();
-				is_pointer = true;
-			}
+			el.type = type;
 			el.name = Exp.cur;
 			Exp.next();
-			TestArrayDefinition(&type, is_pointer);
-			el.type = type;
 
 			// is a function?
 			bool is_function = false;
@@ -1612,43 +1563,22 @@ void SyntaxTree::ParseGlobalConst(const string &name, Type *type)
 	c->name = name;
 }
 
-Type *SyntaxTree::ParseVariableDefSingle(Type *type, Function *f, bool as_param)
-{
-	msg_db_f("ParseVariableDefSingle", 6);
-
-	bool is_pointer = false;
-	string name;
-
-	// pointer?
-	if (Exp.cur == "*"){
-		Exp.next();
-		is_pointer = true;
-	}
-
-	// name
-	name = Exp.cur;
-	Exp.next();
-
-	// array?
-	TestArrayDefinition(&type, is_pointer);
-
-	// add
-	if (next_const){
-		ParseGlobalConst(name, type);
-	}else
-		f->AddVar(name, type);
-	return type;
-}
-
 void SyntaxTree::ParseVariableDef(bool single, Function *f)
 {
 	msg_db_f("ParseVariableDef", 4);
-	Type *type = GetType(Exp.cur, true);
+	Type *type = ParseType(); // force
 
 	for (int j=0;true;j++){
 		ExpectNoNewline();
 
-		ParseVariableDefSingle(type, f);
+		// name
+		string name = Exp.cur;
+		Exp.next();
+
+		if (next_const){
+			ParseGlobalConst(name, type);
+		}else
+			f->AddVar(name, type);
 
 		if ((Exp.cur != ",") && (!Exp.end_of_line()))
 			DoError("\",\" or newline expected after definition of a global variable");
@@ -1661,7 +1591,7 @@ void SyntaxTree::ParseVariableDef(bool single, Function *f)
 	}
 }
 
-bool peak_commands_super(ExpressionBuffer &Exp)
+bool peek_commands_super(ExpressionBuffer &Exp)
 {
 	ExpressionBuffer::Line *l = Exp.cur_line + 1;
 	if (l->exp.num < 3)
@@ -1709,18 +1639,75 @@ void Function::Update(Type *class_type)
 	}
 }
 
+Type *_make_array_(SyntaxTree *s, Type *t, Array<int> dim)
+{
+	string orig_name = t->name;
+	foreachb(int d, dim){
+		// create array       (complicated name necessary to get correct ordering   int a[2][4] = (int[4])[2])
+		t = s->CreateArrayType(t, d, orig_name, t->name.substr(orig_name.num, -1));
+	}
+	return t;
+}
+
+Type *SyntaxTree::ParseType()
+{
+	// base type
+	Type *t = FindType(Exp.cur);
+	if (!t)
+		DoError("unknown type");
+	Exp.next();
+
+	Array<int> array_dim;
+
+	while (true){
+
+		// pointer?
+		if (Exp.cur == "*"){
+			t = _make_array_(this, t, array_dim);
+			Exp.next();
+			t = t->GetPointer();
+			array_dim.clear();
+			continue;
+		}
+
+		if (Exp.cur == "["){
+			int array_size;
+			Exp.next();
+
+			// no index -> super array
+			if (Exp.cur == "]"){
+				array_size = -1;
+
+			}else{
+
+				// find array index
+				Command *c = PreProcessCommand(GetCommand(&RootOfAllEvil));
+
+				if ((c->kind != KindConstant) || (c->type != TypeInt))
+					DoError("only constants of type \"int\" allowed for size of arrays");
+				array_size = Constants[c->link_no].getInt();
+				//Exp.next();
+				if (Exp.cur != "]")
+					DoError("\"]\" expected after array size");
+			}
+
+			Exp.next();
+
+			array_dim.add(array_size);
+			continue;
+		}
+		break;
+	}
+
+	return _make_array_(this, t, array_dim);
+}
+
 Function *SyntaxTree::ParseFunctionHeader(Type *class_type, bool as_extern)
 {
 	msg_db_f("ParseFunctionHeader", 4);
 
 // return type
-	Type *return_type = GetType(Exp.cur, true);
-
-	// pointer?
-	if (Exp.cur == "*"){
-		Exp.next();
-		return_type = return_type->GetPointer();
-	}
+	Type *return_type = ParseType(); // force...
 
 	Function *f = AddFunction(Exp.cur, return_type);
 	cur_func = f;
@@ -1735,12 +1722,11 @@ Function *SyntaxTree::ParseFunctionHeader(Type *class_type, bool as_extern)
 		for (int k=0;k<SCRIPT_MAX_PARAMS;k++){
 			// like variable definitions
 
-			f->num_params ++;
-
 			// type of parameter variable
-			Type *param_type = GetType(Exp.cur, true);
-			Type *pt = ParseVariableDefSingle(param_type, f, true);
-			f->var.back().type = pt;
+			Type *param_type = ParseType(); // force
+			f->AddVar(Exp.cur, param_type);
+			Exp.next();
+			f->num_params ++;
 
 			if (Exp.cur == ")")
 				break;
@@ -1779,7 +1765,7 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 
 	// auto implement constructor?
 	if (f->name.tail(9) == ".__init__"){
-		if (peak_commands_super(Exp)){
+		if (peek_commands_super(Exp)){
 			more_to_parse = ParseFunctionCommand(f, this_line);
 
 			AutoImplementDefaultConstructor(f, f->_class, false);
@@ -1875,8 +1861,6 @@ void SyntaxTree::Parser()
 		}else{
 
 			// type of definition
-			GetType(Exp.cur, true);
-			Exp.rewind();
 			bool is_function = false;
 			for (int j=1;j<Exp.cur_line->exp.num-1;j++)
 				if (Exp.cur_line->exp[j].name == "(")

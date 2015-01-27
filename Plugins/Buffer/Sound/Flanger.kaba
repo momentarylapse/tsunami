@@ -18,8 +18,8 @@ class PluginConfig : PluginData
 		Delay = 0.01
 
 class PluginState : PluginData
-	float temp_r[]
-	float temp_l[]
+	float[] temp_r
+	float[] temp_l
 	int offset
 	overwrite void reset()
 		temp_r.clear()
@@ -30,7 +30,7 @@ class Flanger : AudioEffect
 	PluginConfig config
 	PluginState state
 
-	void doFlanger(float b[], float temp[], int sample_rate)
+	void doFlanger(float[] b, float[] temp, int sample_rate)
 		int p = state.offset % temp.num
 	
 		float f_a = (1 - 0.5 * config.Depth) * config.Delay

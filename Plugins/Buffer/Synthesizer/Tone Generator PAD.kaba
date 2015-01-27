@@ -23,7 +23,7 @@ float gauss(float f, float bw)
 void ProcessTrack(BufferBox buf)
 	AudioFile *a = audio
 	
-	float A[]
+	float[] A
 	A.add(0) // dummy
 	A.add(1)
 	A.add(0.4)
@@ -33,8 +33,8 @@ void ProcessTrack(BufferBox buf)
 	float bw = 0.5
 	float bwscale = 0.7
 	
-	complex c[]
-	float amp[]
+	complex[] c
+	float[] amp
 	c.resize(buf.num / 2 - 1)
 	amp.resize(buf.num / 2 - 1)
 	

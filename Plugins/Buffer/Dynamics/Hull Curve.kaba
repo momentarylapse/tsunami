@@ -10,7 +10,7 @@ const int MIN_VOL = 0-55
 const int MAX_VOL = 35
 
 class Config : PluginData
-	complex curve[]
+	complex[] curve
 
 	void fill_inter(FloatInterpolator fi)
 		fi.setType("cubic-spline-notang")
@@ -31,7 +31,7 @@ class HullCurve : AudioEffect
 
 	Config config
 
-	void hull(float b[])
+	void hull(float[] b)
 	
 		FloatInterpolator fi
 		config.fill_inter(fi)

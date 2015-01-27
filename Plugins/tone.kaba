@@ -75,7 +75,7 @@ class Chord
 	int base_tone
 	int type
 
-void ParseChords(string str, Chord chord[])
+void ParseChords(string str, Chord[] chord)
 	chord.clear()
 	for int i, 0, str.num
 		Chord c
@@ -126,7 +126,7 @@ void AddRichTone(Synthesizer s, BufferBox buf, int pos0, int pos1, int pitch, fl
 	s.renderNote(buf, r, pitch + 48, vol * 0.1)
 
 void AddChord(Synthesizer s, BufferBox buf, int pos0, int pos1, Chord c, float volume)
-	float pitch[]
+	float[] pitch
 	pitch.add(c.base_tone)
 	if c.type == ChordMinor
 		pitch.add(c.base_tone + 3)

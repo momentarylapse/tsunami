@@ -226,7 +226,7 @@ void _HuiRunLater(float time, HuiCallback *c)
 		msg_todo("HuiRunLater");
 	#endif
 	#ifdef HUI_API_GTK
-		g_timeout_add_full(300, max((int)(time * 1000), 1), &GtkRunLaterFunction, (void*)c, NULL);
+		g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunLaterFunction, (void*)c, NULL);
 	#endif
 }
 

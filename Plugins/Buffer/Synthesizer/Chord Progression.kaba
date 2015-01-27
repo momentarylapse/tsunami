@@ -25,7 +25,7 @@ class ChordProgression : AudioEffect
 	DummySynthesizer synth
 
 	overwrite void process(BufferBox buf)
-		Chord chord[]
+		Chord[] chord
 		AudioFile *a = audio
 		ParseChords(config.Chords, chord)
 	

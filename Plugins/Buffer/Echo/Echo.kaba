@@ -20,7 +20,7 @@ class Config : PluginData
 
 
 class PluginState : PluginData
-	float buf_r[], buf_l[]
+	float[] buf_r, buf_l
 	int offset
 
 	overwrite void reset()
@@ -33,7 +33,7 @@ class Echo : AudioEffect
 	PluginState state
 
 
-	void doDelay(float b[], float d[])
+	void doDelay(float[] b, float[] d)
 		int p = state.offset % d.num
 		for int i, 0, b.num
 	

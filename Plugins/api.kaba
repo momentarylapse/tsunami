@@ -66,14 +66,14 @@ class MidiEffect
 
 class BufferBox
 	int offset, num
-	float r[], l[]
-	string peak[]
+	float[] r, l
+	string[] peak
 	extern void __assign__(BufferBox other)
 	extern void clear()
 	extern Range range()
 	extern void set(BufferBox b, int offset, float volume)
 	extern void add(BufferBox b, int offset, float volume, float panning)
-	extern void get_spectrum(complex spec_r[], complex spec_l[], int samples)
+	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
 
 class AudioRendererInterface
 	extern void __init__()
@@ -124,7 +124,7 @@ class MidiNote
 	float volume
 
 class MidiData
-	MidiNote note[]
+	MidiNote[] note
 	void add(int offset, int length, float pitch, float volume)
 		MidiNote n
 		n.range.offset = offset
@@ -139,7 +139,7 @@ enum
 	TRACK_TYPE_MIDI
 
 class TrackLevel
-	BufferBox buffer[]
+	BufferBox[] buffer
 
 class Sample // TODO
 	string name
@@ -165,7 +165,7 @@ enum
 class Track
 	int type
 	string name
-	TrackLevel level[]
+	TrackLevel[] level
 	int length, pos
 
 	float volume, panning
@@ -174,11 +174,11 @@ class Track
 	int rep_num
 	int rep_delay
 	
-	AudioEffect *fx[]
-	SampleRef *sample[]
+	AudioEffect[] *fx
+	SampleRef[] *sample
 	
 	// time track
-	BarPattern bar[]
+	BarPattern[] bar
 	
 	// midi track
 	MidiData midi
@@ -208,7 +208,7 @@ class Track
 	extern void deleteSample(int index)
 	extern void editSample(int index, float volume, bool mute, int rep_num, int rep_delay)
 	extern void addMidiNote(MidiNote n)
-	extern void addMidiNotes(MidiNote notes[])
+	extern void addMidiNotes(MidiNote[] notes)
 	extern void deleteMidiNote(int index)
 	extern void setSynthesizer(Synthesizer *synth)
 	extern void addBars(int index, float bpm, int beats, int bars)
@@ -221,16 +221,16 @@ class Tag
 
 class AudioFile
 	string filename
-	Tag tag[]
+	Tag[] tag
 	int sample_rate
 
 	float volume
 	
-	AudioEffect fx[]
-	Track *track[]
-	Sample *sample[]
+	AudioEffect[] fx
+	Track*[] track
+	Sample*[] sample
 	
-	string level_name[]
+	string[] level_name
 	
 	extern Range getRange()
 	extern int getNextBeat(int pos)
@@ -305,9 +305,9 @@ extern PluginContext plugin_context
 extern Storage *storage
 
 
-extern void fft_c2c(complex in[], complex out[], bool inverse)
-extern void fft_r2c(float in[], complex out[])
-extern void fft_c2r_inv(complex in[], float out[])
+extern void fft_c2c(complex[] in, complex[] out, bool inverse)
+extern void fft_r2c(float[] in, complex[] out)
+extern void fft_c2r_inv(complex[] in, float[] out)
 
 
 /*extern void ProgressStart(string s, float progress)

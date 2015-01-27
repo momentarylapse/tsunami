@@ -12,7 +12,7 @@ const int MIN_VOL = 0-45
 const int MAX_VOL = 45
 
 class Config : PluginData
-	vector curve[]
+	vector[] curve
 
 	void fill_inter(FloatInterpolator fi)
 		fi.setType("cubic-spline-notang")
@@ -32,8 +32,8 @@ class Equalizer : AudioEffect
 
 	Config config
 
-	void equalize(float b[])
-		complex f[]
+	void equalize(float[] b)
+		complex[] f
 	
 	
 		// transform

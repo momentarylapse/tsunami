@@ -33,7 +33,7 @@ class Phaser : AudioEffect
 	PluginConfig config
 	PluginState state
 
-	void doPhaser(float b[], PhaserChannelParams p, int sample_rate)
+	void doPhaser(float[] b, PhaserChannelParams p, int sample_rate)
 	
 		float ll = -0.51//sqr(config.Angle / sample_rate)
 		float r2 = 0.0

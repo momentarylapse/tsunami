@@ -11,11 +11,11 @@ const float threshold = 5.0
 
 
 const int buf_size = 4096
-float buf[]
+float[] buf
 
 Window *win
 
-int played[]
+int[] played
 
 float get_freq(float i)
 	return i / (buf_size / 2) * freq / 2
@@ -73,7 +73,7 @@ void OnClose()
 	win = nil
 
 void UpdateInput()
-	int stack_corrector[1] // needed for stack alignment (T_T)
+	int[1] stack_corrector // needed for stack alignment (T_T)
 	
 	int num = clampi(input.cur_buf.num, 0, buf_size)
 	buf.resize(buf_size)
@@ -91,7 +91,7 @@ void UpdateInput()
 		float tt = i * w_f
 		buf[i] = f2i(val_max * sin(tt) * 0.1)*/
 	
-	complex bufc[]
+	complex[] bufc
 	bufc.resize(buf.num / 2 + 1)
 	fft_r2c(buf, bufc)
 	float max = 0
@@ -125,7 +125,7 @@ void UpdateInput()
 	win.redraw("drawing")
 
 
-complex bufc[]
+complex[] bufc
 
 void main()
 	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)

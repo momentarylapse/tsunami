@@ -1,7 +1,7 @@
 use "../../api.kaba"
 
-void fold(float b[], float k[])
-	float o[]
+void fold(float[] b, float[] k)
+	float[] o
 	o.resize(b.num)
 	
 	int n = 50000

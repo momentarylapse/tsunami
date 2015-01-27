@@ -11,7 +11,7 @@ const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
 
 class Config : PluginData
-	float Factor[NUM_BANDS]
+	float[NUM_BANDS] Factor
 
 	overwrite void reset()
 		for int i, 0, NUM_BANDS
@@ -21,9 +21,9 @@ class Equalizer15 : AudioEffect
 
 	Config config
 
-	float FreqMin[NUM_BANDS], FreqMax[NUM_BANDS]
+	float[NUM_BANDS] FreqMin, FreqMax
 
-	complex f[]
+	complex[] f
 
 	void __init__()
 
@@ -33,7 +33,7 @@ class Equalizer15 : AudioEffect
 		FreqMin[0] = 0
 		FreqMax[NUM_BANDS - 1] = 1000000
 
-	void equalize(float b[])
+	void equalize(float[] b)
 		int _STACK_ALIGNMENT_
 	
 		// transform

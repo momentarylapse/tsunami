@@ -6,9 +6,9 @@ const float QUANT_FACTOR = 80.0
 
 Window *win
 
-float r[], r2[], d[]
+float[] r, r2, d
 float dmax
-complex c[]
+complex[] c
 
 void OnDraw()
 	Painter *c = win.beginDraw("area")
@@ -23,7 +23,7 @@ void OnDraw()
 	c.setColor(Red)
 	for int i, 1, 1024
 		c.drawLine(i - 1, d[i - 1] * 100 + 100, i, d[i] * 100 + 100)
-	c.drawStr(10, 10, f2s(dmax, 6))
+	c.drawStr(10, 10, dmax.str2(6))
 	c.end()
 
 File *fout
@@ -31,13 +31,13 @@ File *fout
 complex quant(complex z)
 	int a = f2i(z.x * QUANT_FACTOR)
 	int b = f2i(z.y * QUANT_FACTOR)
-	fout.WriteInt(a)
-	fout.WriteInt(b)
+	fout << a
+	fout << b
 	complex r = complex(i2f(a), i2f(b))
 	print r
 	return r
 
-void quantize(complex cc[])
+void quantize(complex[] cc)
 	for int i, 0, NUM_FREQS
 		cc[i] = quant(cc[i])
 	for int i, NUM_FREQS, cc.num
@@ -45,8 +45,8 @@ void quantize(complex cc[])
 	
 
 void main()
-	file f = FileOpen("ooo")
-	f.SetBinaryMode(true)
+	File *f = FileOpen("ooo")
+	f.setBinaryMode(true)
 	for int i, 0, SAMPLES
 		r.add(f.ReadFloat())
 		f.ReadFloat()

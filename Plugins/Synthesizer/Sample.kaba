@@ -3,7 +3,7 @@ use "../tone.kaba"
 
 
 class SampleConfig : PluginData
-	SampleRef *samples[]
+	SampleRef*[] samples
 	virtual void __delete__()
 		reset()
 	overwrite void reset()

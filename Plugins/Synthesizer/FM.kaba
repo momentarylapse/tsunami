@@ -13,8 +13,8 @@ class OscillatorLink
 	int source, dest
 
 class FMConfig : PluginData
-	OscillatorConfig osc[NUM_OSCILLATORS]
-	OscillatorLink link[]
+	OscillatorConfig[NUM_OSCILLATORS] osc
+	OscillatorLink[] link
 	overwrite void reset()
 		link.clear()
 		for int j, 0, NUM_OSCILLATORS
@@ -61,10 +61,10 @@ class OscillatorState
 	float last_before_release
 
 class NoteState
-	OscillatorState osc[NUM_OSCILLATORS]
+	OscillatorState[NUM_OSCILLATORS] osc
 
 class FMState : PluginData
-	NoteState note[128]
+	NoteState[128] note
 	overwrite void reset()
 		for int i, 0, 128
 			for int j, 0, NUM_OSCILLATORS
@@ -140,15 +140,15 @@ class FMSynthesizer : Synthesizer
 		float w_base = freq * 2.0 * pi / sample_rate
 		NoteState *ns = &state.note[n]
 		
-		float w[NUM_OSCILLATORS]
-		float oup[NUM_OSCILLATORS]
-		int attack[NUM_OSCILLATORS]
-		int decay[NUM_OSCILLATORS]
-		int release[NUM_OSCILLATORS]
-		int t1[NUM_OSCILLATORS]
-		float c_attack[NUM_OSCILLATORS]
-		float c_decay[NUM_OSCILLATORS]
-		float c_release[NUM_OSCILLATORS]
+		float[NUM_OSCILLATORS] w
+		float[NUM_OSCILLATORS] oup
+		int[NUM_OSCILLATORS] attack
+		int[NUM_OSCILLATORS] decay
+		int[NUM_OSCILLATORS] release
+		int[NUM_OSCILLATORS] t1
+		float[NUM_OSCILLATORS] c_attack
+		float[NUM_OSCILLATORS] c_decay
+		float[NUM_OSCILLATORS] c_release
 		
 		keep_notes = 0
 		

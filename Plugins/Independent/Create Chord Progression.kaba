@@ -8,7 +8,7 @@ Window *dlg
 const int SAMPLE_RATE = 44100
 
 void insert_chord(Track *t, Chord c, Range r)
-	float pitch[]
+	float[] pitch
 	pitch.add(c.base_tone)
 	if c.type == ChordMinor
 		pitch.add(c.base_tone + 3)
@@ -26,7 +26,7 @@ void insert_chord(Track *t, Chord c, Range r)
 
 void OnOk()
 	string str = dlg.getString("chords")
-	Chord chords[]
+	Chord[] chords
 	ParseChords(str, chords)
 	int sample_rate = dlg.getString("sample_rate").int()
 	int beats = dlg.getInt("beats")

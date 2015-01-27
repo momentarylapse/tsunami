@@ -7,7 +7,7 @@ use "../../grid.kaba"
 const float MIN_DB = 0.0 - 60.0
 
 class CompressorConfig : PluginData
-	complex curve[]
+	complex[] curve
 	float attack, release
 
 	void fill_inter(FloatInterpolator fi)
@@ -28,8 +28,8 @@ class CompressorConfig : PluginData
 
 class CompressorState : PluginData
 	float gain_r, gain_l
-	float squares_r[]
-	float squares_l[]
+	float[] squares_r
+	float[] squares_l
 	overwrite void reset()
 		gain_r = 1
 		gain_l = 1
@@ -45,7 +45,7 @@ class Compressor : AudioEffect
 
 	float dgain_attack, dgain_release
 
-	void compress(float b[], float squares[], float *gain)
+	void compress(float[] b, float[] squares, float *gain)
 		float bmin = pow(10, MIN_DB/20)
 		for int i, 0, b.num
 		

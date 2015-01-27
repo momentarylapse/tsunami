@@ -13,8 +13,8 @@ class OscillatorLink
 	int source, dest
 
 class FMConfig
-	OscillatorConfig osc[NUM_OSCILLATORS]
-	OscillatorLink link[]
+	OscillatorConfig[NUM_OSCILLATORS] osc
+	OscillatorLink[] link
 	void __init__()
 		osc[0].factor = 1
 		osc[0].amplitude = 1
@@ -46,10 +46,10 @@ class OscillatorState
 	float last_before_release
 
 class NoteState
-	OscillatorState osc[NUM_OSCILLATORS]
+	OscillatorState[NUM_OSCILLATORS] osc
 
 class FMState
-	NoteState note[128]
+	NoteState[128] note
 	void __init__()
 		for int i, 0, 128
 			for int j, 0, NUM_OSCILLATORS

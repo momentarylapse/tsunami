@@ -15,10 +15,10 @@ class Config : PluginData
 class PitchShift : AudioEffect
 	Config config
 
-	complex buf1[]
-	complex buf2[]
+	complex[] buf1
+	complex[] buf2
 
-	void shift_buf(float b[])
+	void shift_buf(float[] b)
 		int i, j
 		fft_r2c(b, buf1)
 		float f = 1.0 / b.num

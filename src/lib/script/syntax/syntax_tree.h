@@ -175,7 +175,7 @@ public:
 	void ParseFunctionBody(Function *f);
 	void ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtual, bool overwrite);
 	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
-	Type *ParseVariableDefSingle(Type *type, Function *f, bool as_param = false);
+	Type *ParseType();
 	void ParseVariableDef(bool single, Function *f);
 	void ParseGlobalConst(const string &name, Type *type);
 	int WhichPrimitiveOperator(const string &name);
@@ -204,11 +204,9 @@ public:
 	Type *GetConstantType();
 	string GetConstantValue();
 	Type *FindType(const string &name);
-	Type *GetType(const string &name, bool force);
-	void AddType(Type **type);
+	Type *AddType(Type *type);
 	Type *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Type *sub);
 	Type *CreateArrayType(Type *element_type, int num_elements, const string &name_pre = "", const string &suffix = "");
-	void TestArrayDefinition(Type **type, bool is_pointer);
 	bool GetExistence(const string &name, Function *f);
 	bool GetExistenceShared(const string &name);
 	void LinkMostImportantOperator(Array<Command*> &Operand, Array<Command*> &Operator, Array<int> &op_exp);

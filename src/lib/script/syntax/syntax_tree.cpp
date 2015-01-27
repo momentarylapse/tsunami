@@ -643,36 +643,20 @@ Type *SyntaxTree::FindType(const string &name)
 	return NULL;
 }
 
-// expression naming a type
-Type *SyntaxTree::GetType(const string &name, bool force)
-{
-	Type *type = FindType(name);
-	if ((force) && (!type))
-		DoError("unknown type");
-	if (type)
-		Exp.next();
-	return type;
-}
-
 // create a new type?
-void SyntaxTree::AddType(Type **type)
+Type *SyntaxTree::AddType(Type *type)
 {
-	for (int i=0;i<Types.num;i++)
-		if ((*type)->name == Types[i]->name){
-			(*type)=Types[i];
-			return;
-		}
+	foreach(Type *t, Types)
+		if (type->name == t->name)
+			return t;
 	foreach(Script *inc, Includes)
-		for (int i=0;i<inc->syntax->Types.num;i++)
-			if ((*type)->name == inc->syntax->Types[i]->name){
-				(*type) = inc->syntax->Types[i];
-				return;
-			}
+		foreach(Type *t, inc->syntax->Types)
+			if (type->name == t->name)
+				return t;
 	Type *t = new Type;
-	(*t) = (**type);
+	*t = *type;
 	t->owner = this;
-	t->name = (*type)->name;
-	(*type) = t;
+	t->name = type->name;
 	Types.add(t);
 
 
@@ -684,11 +668,12 @@ void SyntaxTree::AddType(Type **type)
 	}else if (t->is_array){
 		AddFunctionHeadersForClass(t);
 	}
+	return t;
 }
 
 Type *SyntaxTree::CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Type *sub)
 {
-	Type nt, *pt = &nt;
+	Type nt;
 	nt.is_array = is_array && (array_size >= 0);
 	nt.is_super_array = is_array && (array_size < 0);
 	nt.array_length = max(array_size, 0);
@@ -697,8 +682,7 @@ Type *SyntaxTree::CreateNewType(const string &name, int size, bool is_pointer, b
 	nt.name = name;
 	nt.size = size;
 	nt.parent = sub;
-	AddType(&pt);
-	return pt;
+	return AddType(&nt);
 }
 
 Type *SyntaxTree::CreateArrayType(Type *element_type, int num_elements, const string &_name_pre, const string &suffix)

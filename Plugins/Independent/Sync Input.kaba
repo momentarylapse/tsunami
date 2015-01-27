@@ -7,12 +7,14 @@ const int offset_out = 20000
 int offset_in
 int offset
 
+DummySynthesizer synth
+
 void fill(BufferBox buf)
 	buf.r = 0
 	buf.l = 0
 	
 	if offset == 0
-		buf.add_click(offset_out, 1, 880, SAMPLE_RATE)
+		synth.renderMetronomeClick(buf, offset_out, 1, 0, 880)
 
 void sync()
 	bool found = false
@@ -28,6 +30,8 @@ void sync()
 		offset_in += input.cur_buf.num
 
 void main()
+	synth.sample_rate = SAMPLE_RATE
+	
 	dlg = new Dialog("Sync", 200, 80, MainWin, false)
 	dlg.addText("Sync...", 0, 0, 0, 0, "")
 	offset_in = 0

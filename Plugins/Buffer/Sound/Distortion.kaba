@@ -5,8 +5,8 @@ use "../../api.kaba"
 class Distortion : AudioEffect
 
 	int num_x
-	float x_in[8]
-	float x_out[8]
+	float[8] x_in
+	float[8] x_out
 
 	float dist(float x)
 		float f = abs(x)

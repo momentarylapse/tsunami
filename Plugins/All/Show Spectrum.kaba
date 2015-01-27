@@ -15,8 +15,8 @@ enum
 	TypeLinear
 	TypeLogarithm
 
-//float x[], yr[], yl[]
-float ffr[], ffl[]
+//float[] x, yr, yl
+float[] ffr, ffl
 
 //GridData grid
 
@@ -29,7 +29,7 @@ float peak_max
 
 class SpecGrid : Grid
 	int type
-	complex pr[], pl[]
+	complex[] pr, pl
 
 	void createLines()
 		pr.resize(N)
@@ -93,7 +93,7 @@ void show_spec()
 	BufferBox buf
 	renderer.renderAudioFile(audio, view.sel_range, buf)
 	
-	complex fr[], fl[]
+	complex[] fr, fl
 	
 	int len2 = buf.r.num / 2 + 1
 	fr.resize(len2)

@@ -13,7 +13,7 @@ class Config : PluginData
 class Octaver : AudioEffect
 	Config config
 
-	void doOctaver(float b[])
+	void doOctaver(float[] b)
 		for int i, 0, b.num
 			b[i] = (b[i] * b[i]) * config.Level + b[i] * (1 - config.Level)
 

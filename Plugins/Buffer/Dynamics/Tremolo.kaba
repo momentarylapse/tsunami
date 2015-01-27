@@ -17,7 +17,7 @@ class Tremolo : AudioEffect
 
 	Config config
 
-	void doTremolo(float b[])
+	void doTremolo(float[] b)
 	
 		float f_c = 1.0 / audio.sample_rate * 2 * pi * config.Speed
 	

@@ -12,7 +12,7 @@ class GridTick
 	string label
 
 class GridPartition
-	GridTick tick[]
+	GridTick[] tick
 
 class GridAxis
 	float offset, size
@@ -249,8 +249,8 @@ class GridData
 		drawAxisY(c, part)
 	
 	void drawCurve(Painter *c, FloatInterpolator fi, bool fill_below)
-		float tt[], yy[]
-		complex pp[]
+		float[] tt, yy
+		complex[] pp
 		tt = rangef(0, 1, 0.003)
 		yy = fi.getList(tt)
 		for int i, 0, tt.num
@@ -266,8 +266,8 @@ class GridData
 		c.setColor(Black)
 		c.drawLines(pp)
 	
-	void drawCurveB(Painter *c, complex _p[], bool fill_below, color col)
-		complex pp[]
+	void drawCurveB(Painter *c, complex[] _p, bool fill_below, color col)
+		complex[] pp
 		for int i, 0, _p.num
 			pp.add(project2(_p[i]))
 		if fill_below

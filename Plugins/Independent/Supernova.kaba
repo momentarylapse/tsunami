@@ -11,7 +11,7 @@ const float threshold = 5.0
 
 
 const int buf_size = 4096
-float buf[]
+float[] buf
 
 SuperNovaWindow *win
 
@@ -21,7 +21,7 @@ class PlayedData
 	int offset
 	bool correct
 
-PlayedData played[]
+PlayedData[] played
 int Offset
 
 float get_freq(float i)
@@ -30,7 +30,7 @@ float get_freq(float i)
 float Frequency, Volume, Error
 bool LoudEnough
 
-int StringPitch[6]
+int[6] StringPitch
 int HandPosition
 
 Track *MidiTrack
@@ -44,7 +44,7 @@ int Mode
 enum
 	ModeConfig
 	ModeLesson
-string LessonName[]
+string[] LessonName
 
 float error
 string get_note(float f)
@@ -215,7 +215,7 @@ void UpdateInput()
 		float tt = i * w_f
 		buf[i] = f2i(val_max * sin(tt) * 0.1)*/
 	
-	complex bufc[]
+	complex[] bufc
 	bufc.resize(buf.num / 2 + 1)
 	fft_r2c(buf, bufc)
 	float max = 0
@@ -316,7 +316,7 @@ void StopLesson()
 	win.enable("speed", true)
 	win.enable("cancel", false)
 
-complex bufc[]
+complex[] bufc
 
 void main()
 	MidiTrack = nil
@@ -333,7 +333,7 @@ void main()
 	HandPosition = 5
 	
 	LessonName.clear()
-	DirEntry list[] = DirSearch(AppDirectoryStatic + "Lessons/", "*.nami", false)
+	DirEntry[] list = DirSearch(AppDirectoryStatic + "Lessons/", "*.nami", false)
 	for e in list
 		if e.name[0] != '0'
 			LessonName.add(e.name.substr(0, -6))

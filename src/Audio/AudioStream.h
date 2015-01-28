@@ -23,6 +23,7 @@ typedef void PaStream;
 class AudioStream : public PeakMeterSource
 {
 public:
+	AudioStream();
 	AudioStream(AudioRendererInterface *r);
 	virtual ~AudioStream();
 

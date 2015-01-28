@@ -172,6 +172,14 @@ void AudioOutput::removeStream(AudioStream* s)
 			streams.erase(i);
 }
 
+bool AudioOutput::streamExists(AudioStream* s)
+{
+	for (int i=streams.num-1; i>=0; i--)
+		if (streams[i] == s)
+			return true;
+	return false;
+}
+
 bool AudioOutput::testError(const string &msg)
 {
 	if (last_error != paNoError){

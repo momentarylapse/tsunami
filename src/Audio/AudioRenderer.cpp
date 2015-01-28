@@ -27,7 +27,6 @@ void AudioRendererInterface::__init__()
 
 void AudioRendererInterface::__delete__()
 {
-	this->~AudioRendererInterface();
 }
 
 AudioRenderer::AudioRenderer()

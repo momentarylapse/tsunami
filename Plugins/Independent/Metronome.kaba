@@ -2,59 +2,53 @@
 // Title[Deutsch] = Metronom
 use "../api.kaba"
 
-Window *dlg
+class MetronomeRenderer : AudioRendererInterface
+	float length
+	float freq
+	float bpm
+	int num_beats
+	float volume
 
-const int SAMPLE_RATE = 44100
-float length
-float freq
-float bpm
-int num_beats
-float volume
-
-DummySynthesizer synth
-AudioStream stream
-int offset
-int cur_beat
-
-int fill(BufferBox buf)
-	float dt_m = 60.0 / bpm
-	int sm_m = dt_m * SAMPLE_RATE
+	DummySynthesizer synth
+	int offset
+	int cur_beat
 	
-	// clear buffer
-	buf.r = 0
-	buf.l = 0
+	void __init__()
+		synth.sample_rate = sample_rate
+
+		offset = 0
+		cur_beat = 0
+
+	overwrite int read(BufferBox buf)
+		float dt_m = 60.0 / bpm
+		int sm_m = dt_m * sample_rate
 	
-	// re-render previous click
-	offset -= sm_m
-	cur_beat = loopi(cur_beat - 1, 0, num_beats - 1)
+		// clear buffer
+		buf.r = 0
+		buf.l = 0
 	
-	// render clicks
-	while offset < buf.num
-		if cur_beat == 0
-			synth.renderMetronomeClick(buf, offset, 0, volume)
-		else
-			synth.renderMetronomeClick(buf, offset, 1, volume)
-		cur_beat = loopi(cur_beat + 1, 0, num_beats - 1)
-		offset += sm_m
-	offset -= buf.num
-	return buf.num
+		// re-render previous click
+		offset -= sm_m
+		cur_beat = loopi(cur_beat - 1, 0, num_beats - 1)
+	
+		// render clicks
+		while offset < buf.num
+			if cur_beat == 0
+				synth.renderMetronomeClick(buf, offset, 0, volume)
+			else
+				synth.renderMetronomeClick(buf, offset, 1, volume)
+			cur_beat = loopi(cur_beat + 1, 0, num_beats - 1)
+			offset += sm_m
+		offset -= buf.num
+		return buf.num
 
-void OnBpm()
-	bpm = dlg.getFloat("")
-
-void OnNumBeats()
-	num_beats = dlg.getInt("")
-	cur_beat = 0
-	offset = 0
-	stream.play()
-
-void OnClose()
-	stream.stop()
-	delete dlg
-
-void main()
-	dlg = new Dialog("Metronome", 200, 80, MainWin, false)
-	dlg.fromSource("
+class MetronomeDialog : Dialog
+	AudioStream *stream
+	MetronomeRenderer *renderer
+	
+	void __init__(Window *parent)
+		super.__init__("Metronome", 200, 80, parent, false)
+		fromSource("
 Grid ? '' 1 2
 	Grid ? '' 3 2
 		Text ? 'Speed'
@@ -66,23 +60,39 @@ Grid ? '' 1 2
 	Grid ? '' 2 1 buttonbar
 		Button close 'Close' image=hui:close")
 	
-	freq = 880.0
-	length = 0.02
-	volume = 1
-	bpm = 90.0
-	num_beats = 4
-	dlg.setFloat("bpm", bpm)
+		renderer = new MetronomeRenderer
 	
-	dlg.eventS("hui:close", &OnClose)
-	dlg.eventS("close", &OnClose)
-	dlg.eventS("bpm", &OnBpm)
-	dlg.eventS("num_beats", &OnNumBeats)
+		renderer.freq = 880.0
+		renderer.length = 0.02
+		renderer.volume = 1
+		renderer.bpm = 90.0
+		renderer.num_beats = 4
+		setFloat("bpm", renderer.bpm)
 	
-	synth.sample_rate = SAMPLE_RATE
+		event("hui:close", &onClose)
+		event("close", &onClose)
+		event("bpm", &onBpm)
+		event("num_beats", &onNumBeats)
+	
+		stream = new AudioStream(renderer)
+		stream.play()
+	
+	virtual void __delete__()
+		delete stream
+		delete renderer
 
-	offset = 0
-	cur_beat = 0
-	stream.setSourceGenerated(&fill, SAMPLE_RATE)
-	stream.play()
-	
+	void onBpm()
+		renderer.bpm = getFloat("")
+
+	void onNumBeats()
+		renderer.num_beats = getInt("")
+		renderer.cur_beat = 0
+		renderer.offset = 0
+		stream.play()
+
+	void onClose()
+		delete self
+
+void main()
+	Dialog *dlg = new MetronomeDialog(MainWin)
 	dlg.run()

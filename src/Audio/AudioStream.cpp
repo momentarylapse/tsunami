@@ -67,7 +67,7 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 	}
 
 	if (available <= frameCount and stream->end_of_data){
-		HuiRunLaterM(0, stream, &AudioStream::stop);
+		HuiRunLaterM(0, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
 		return paComplete;
 	}
 	return paContinue;
@@ -130,11 +130,12 @@ void AudioStream::__init__(AudioRendererInterface *r)
 
 void AudioStream::__delete__()
 {
-	this->~AudioStream();
+	kill();
 }
 
 void AudioStream::kill()
 {
+	msg_db_f("Stream.kill", 1);
 	if (killed)
 		return;
 
@@ -154,6 +155,7 @@ void AudioStream::stop()
 	msg_db_f("Stream.stop", 1);
 
 	last_error = Pa_AbortStream(pa_stream);
+	//last_error = Pa_StopStream(pa_stream);
 	testError("AudioStream.stop");
 
 	// clean up
@@ -315,6 +317,10 @@ bool AudioStream::testError(const string &msg)
 
 void AudioStream::update()
 {
+	// <this> got deleted, while a timeout was still pending?
+	if (!tsunami->output->streamExists(this))
+		return;
+
 	msg_db_f("Stream.update", 1);
 	testError("idle");
 	if (!playing)

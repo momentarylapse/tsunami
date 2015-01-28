@@ -37,6 +37,7 @@ public:
 
 	void addStream(AudioStream *s);
 	void removeStream(AudioStream *s);
+	bool streamExists(AudioStream *s);
 
 private:
 	bool testError(const string &msg);

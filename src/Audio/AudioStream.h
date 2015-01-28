@@ -13,6 +13,7 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
+#include "../Data/RingBuffer.h"
 #include "../View/Helper/PeakMeter.h"
 
 class AudioRendererInterface;
@@ -45,7 +46,7 @@ public:
 	int _cdecl getState();
 	void _cdecl setSource(AudioRendererInterface *r);
 	void _cdecl setSourceGenerated(void *func, int sample_rate);
-	AudioRendererInterface *getSource(){	return renderer;	}
+	AudioRendererInterface *getSource(){ return renderer; }
 	int getPos();
 	bool getPosSafe(int &pos);
 	void flushBuffers();
@@ -56,23 +57,25 @@ public:
 	float getVolume();
 	void setVolume(float _volume);
 
-	void setBufferSize(int _size){	buffer_size = _size;	}
+	void setBufferSize(int _size){ buffer_size = _size; }
 
-private:
+//private:
 	bool testError(const string &msg);
-	bool stream(int buf);
-
-	void stop_play();
-	void start_play(int pos);
+	void stream();
 
 
 	float volume;
 	bool playing;
+	bool paused;
 	int sample_rate;
 	int buffer_size;
+	float update_dt;
 
 	AudioRendererInterface *renderer;
-	BufferBox box[2];
+	RingBuffer ring_buf;
+
+	bool reading;
+	bool end_of_data;
 
 	typedef int generate_func_t(BufferBox &);
 	generate_func_t *generate_func;
@@ -81,6 +84,9 @@ private:
 	int data_samples;
 
 	PaStream *pa_stream;
+	int cur_pos;
+
+	//static int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
 
 	int last_error;
 

@@ -18,6 +18,12 @@ RingBuffer::~RingBuffer()
 {
 }
 
+void RingBuffer::clear()
+{
+	write_pos = 0;
+	read_pos = 0;
+}
+
 int RingBuffer::available()
 {
 	if (write_pos < read_pos)

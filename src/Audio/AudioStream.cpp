@@ -22,19 +22,56 @@
 #else
 	#include <portaudio.h>
 #endif
+#include <math.h>
 
 //#define DEFAULT_BUFFER_SIZE		131072
 #define DEFAULT_BUFFER_SIZE		32768
 //#define DEFAULT_BUFFER_SIZE		16384
 
-#define UPDATE_TIME		0.050f
+#define DEFAULT_UPDATE_DT		0.050f
 
 
 const string AudioStream::MESSAGE_STATE_CHANGE = "StateChange";
 const string AudioStream::MESSAGE_UPDATE = "Update";
 
+int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
+{
+	AudioStream *stream = (AudioStream*)userData;
+	float *out = (float*)output;
+
+	int available = stream->ring_buf.available();
+	if ((stream->paused) or (available < frameCount)){
+		// output silence...
+		for (unsigned int i=0; i<frameCount; i++){
+			*out ++ = 0;
+			*out ++ = 0;
+		}
+	}else{
+		stream->cur_pos += frameCount;
+
+		int na = min(stream->ring_buf.buf.num - stream->ring_buf.read_pos, frameCount);
+		float *r = &stream->ring_buf.buf.r[stream->ring_buf.read_pos];
+		float *l = &stream->ring_buf.buf.l[stream->ring_buf.read_pos];
+		for (int i=0; i<na; i++){
+			*out ++ = *r ++;
+			*out ++ = *l ++;
+		}
+		stream->ring_buf.read_pos += frameCount;
+		if (stream->ring_buf.read_pos > stream->ring_buf.buf.num)
+			stream->ring_buf.read_pos -= stream->ring_buf.buf.num;
+	}
+
+	// read more?
+	if ((available < stream->buffer_size) and (!stream->reading)){
+		stream->reading = true;
+		HuiRunLaterM(0, stream, &AudioStream::stream);
+	}
+	return 0;
+}
+
 AudioStream::AudioStream() :
-	PeakMeterSource("AudioStream")
+	PeakMeterSource("AudioStream"),
+	ring_buf(1048576)
 {
 	last_error = paNoError;
 
@@ -42,15 +79,18 @@ AudioStream::AudioStream() :
 	generate_func = NULL;
 
 	playing = false;
+	paused = false;
 	volume = 1;
+	reading = false;
 
 	output = tsunami->output;
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
 	sample_rate = DEFAULT_SAMPLE_RATE;
+	update_dt = DEFAULT_UPDATE_DT;
 
-	int outDevNum = Pa_GetDefaultOutputDeviceID();
+	int outDevNum = Pa_GetDefaultOutputDevice();
 
 	PaStreamParameters outputParameters;
 	bzero(&outputParameters, sizeof(outputParameters));
@@ -59,16 +99,17 @@ AudioStream::AudioStream() :
 	outputParameters.hostApiSpecificStreamInfo = NULL;
 	outputParameters.sampleFormat = paFloat32;
 	outputParameters.suggestedLatency = Pa_GetDeviceInfo(outDevNum)->defaultLowOutputLatency;
-	outputParameters.hostApiSpecificStreamInfo = NULL; //See you specific host's API docs for info on using this field
+	outputParameters.hostApiSpecificStreamInfo = NULL;
 	last_error = Pa_OpenStream(
 	                &pa_stream,
 	                NULL,
 	                &outputParameters,
 	                sample_rate,
-	                buffer_size,
+					paFramesPerBufferUnspecified,
 	                paNoFlag, //flags that can be used to define dither, clip settings and more
 	                portAudioCallback,
 	                (void*)this);
+	testError("OpenStream");
 
 	output->addStream(this);
 	killed = false;
@@ -103,24 +144,17 @@ void AudioStream::kill()
 	killed = true;
 }
 
-void AudioStream::stop_play()
-{
-	if (!playing)
-		return;
-
-	last_error = Pa_AbortStream(pa_stream);
-	testError("AudioStream.stop");
-}
-
 void AudioStream::stop()
 {
 	if (!playing)
 		return;
 	msg_db_f("Stream.stop", 1);
 
-	stop_play();
+	last_error = Pa_AbortStream(pa_stream);
+	testError("AudioStream.stop");
 
 	playing = false;
+	paused = false;
 
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -129,23 +163,20 @@ void AudioStream::pause()
 {
 	if (!playing)
 		return;
-	/*int param;
-	alGetSourcei(source, AL_SOURCE_STATE, &param);
-	if (param == AL_PLAYING)
-		alSourcePause(source);
-	else if (param == AL_PAUSED)
-		alSourcePlay(source);*/
+
+	paused = !paused;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-bool AudioStream::stream(int buf)
+void AudioStream::stream()
 {
+	reading = true;
 	msg_db_f("stream", 1);
 
-	int buf_no = (buf == buffer[0]) ? 0 : 1;
-	BufferBox &b = box[buf_no];
 	int size = 0;
+	BufferBox b;
 	b.resize(buffer_size);
+	msg_write("stream");
 
 	// read data
 	if (renderer){
@@ -153,42 +184,21 @@ bool AudioStream::stream(int buf)
 	}else if (generate_func){
 		size = (*generate_func)(b);
 	}
+	msg_write(size);
 
 	// out of data?
-	if (size == 0)
-		return false;
+	if (size == 0){
+		msg_write("end of data");
+		end_of_data = true;
+		reading = false;
+		return;
+	}
 
 	// add to queue
-	b.get_16bit_buffer(data);
-	alBufferData(buf, AL_FORMAT_STEREO16, &data[0], size * 4, sample_rate);
-	testError("alBufferData (stream)");
+	ring_buf.write(b);
+	msg_write(ring_buf.available());
 
-	return true;
-}
-
-void AudioStream::start_play(int pos)
-{
-	int num_buffers = 0;
-	if (stream(buffer[0]))
-		num_buffers ++;
-	if (stream(buffer[1]))
-		num_buffers ++;
-
-	alSourcef (source, AL_PITCH,    1.0f);
-	alSourcef (source, AL_GAIN,     volume * output->volume);
-//	alSourcefv(source, AL_POSITION, SourcePos);
-//	alSourcefv(source, AL_VELOCITY, SourceVel);
-	alSourcei (source, AL_LOOPING,  false);
-	if (testError("alSourcef... (play)"))
-		return;
-
-	cur_buffer_no = 0;
-	alSourceQueueBuffers(source, num_buffers, (ALuint*)buffer);
-	testError("alSourceQueueBuffers (play)");
-
-	alSourcePlay(source);
-	if (testError("alSourcePlay (play)"))
-		return;
+	reading = false;
 }
 
 void AudioStream::setSource(AudioRendererInterface *r)
@@ -219,41 +229,51 @@ void AudioStream::play()
 {
 	msg_db_f("Stream.play", 1);
 
-	if (playing)
+	if (playing){
+		if (paused){
+			pause();
+			return;
+		}
 		stop();
+	}
 
-	start_play(0);
+
+	end_of_data = false;
+	reading = false;
+
+	stream();
+	last_error = Pa_StartStream(pa_stream);
+	testError("StartStream");
 
 	playing = true;
+	paused = false;
+	cur_pos = 0;
 
-	if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
-		HuiRunLaterM(UPDATE_TIME, this, &AudioStream::update);
-	else
-		HuiRunLaterM(0, this, &AudioStream::update);
-
+	HuiRunLaterM(update_dt, this, &AudioStream::update);
 	notify(MESSAGE_STATE_CHANGE);
 }
 
 bool AudioStream::isPlaying()
 {
-	if (!playing)
-		return false;
-	int param = 0;
-	alGetSourcei(source, AL_SOURCE_STATE, &param);
-	testError("alGetSourcei1 (getpos)");
-	return ((param == AL_PLAYING) or (param == AL_PAUSED));
+	return playing;
 }
 
 int AudioStream::getState()
 {
+	if (playing and paused)
+		return STATE_PAUSED;
+	if (playing)
+		return STATE_PLAYING;
+	/*if (Pa_IsStreamActive(pa_stream))
+		return STATE_PLAYING;*/
 	/*if (IsPlaying())
 		return STATE_PLAYING;*/
-	int param;
+	/*int param;
 	alGetSourcei(source, AL_SOURCE_STATE, &param);
 	if (param == AL_PLAYING)
 		return STATE_PLAYING;
 	if (param == AL_PAUSED)
-		return STATE_PAUSED;
+		return STATE_PAUSED;*/
 	return STATE_STOPPED;
 }
 
@@ -270,7 +290,10 @@ bool AudioStream::getPosSafe(int &pos)
 	if (!playing)
 		return false;
 
-	int param = 0;
+	//pos = (Pa_GetStreamTime(pa_stream) - pa_time_offset) * sample_rate;
+	//msg_write(f2s(Pa_GetStreamTime(pa_stream), 4));
+	pos = cur_pos;
+/*	int param = 0;
 	alGetSourcei(source, AL_SOURCE_STATE, &param);
 	testError("alGetSourcei1 (getpos)");
 	if ((param != AL_PLAYING) and (param != AL_PAUSED))
@@ -278,7 +301,7 @@ bool AudioStream::getPosSafe(int &pos)
 
 	alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
 	testError("alGetSourcei2 (getpos)");
-	pos = box[cur_buffer_no].offset + param;
+	pos = box[cur_buffer_no].offset + param;*/
 	return true;
 }
 
@@ -304,13 +327,13 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 		return;
 
 	// (sample) position within current stream/buffer
-	int dpos = 0;
+	/*int dpos = 0;
 	alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
 
 	if (box[cur_buffer_no].num - dpos > 0)
 		buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
 	else
-		buf.set_as_ref(box[1-cur_buffer_no], 0, min(num_samples, box[1-cur_buffer_no].num));
+		buf.set_as_ref(box[1-cur_buffer_no], 0, min(num_samples, box[1-cur_buffer_no].num));*/
 }
 
 bool AudioStream::testError(const string &msg)
@@ -325,41 +348,10 @@ void AudioStream::update()
 	if (!playing)
 		return;
 
-	alSourcef(source, AL_GAIN, volume * output->volume);
-	testError("alGetSourcef(volume) (idle)");
-	int processed;
-	alGetSourcei(source, AL_BUFFERS_PROCESSED, &processed);
-	testError("alGetSourcei(processed) (idle)");
-	bool end_of_data = false;
-	while(processed--){
-		cur_buffer_no = 1 - cur_buffer_no;
-		ALuint buf;
-		alSourceUnqueueBuffers(source, 1, &buf);
-		testError("alSourceUnqueueBuffers (idle)");
-		if (stream(buf)){
-			alSourceQueueBuffers(source, 1, &buf);
-			testError("alSourceQueueBuffers (idle)");
-		}else{
-			end_of_data = true;
-		}
-	}
-	notify(MESSAGE_UPDATE);
+	if (!paused)
+		notify(MESSAGE_UPDATE);
 
-
-	if (!isPlaying()){
-		if (end_of_data){
-			stop();
-			return;
-		}
-
-		// stopped?  -> restart
-		alSourcePlay(source);
-	}
-
-	if (buffer_size > DEFAULT_BUFFER_SIZE / 3)
-		HuiRunLaterM(UPDATE_TIME, this, &AudioStream::update);
-	else
-		HuiRunLaterM(0, this, &AudioStream::update);
+	HuiRunLaterM(update_dt, this, &AudioStream::update);
 }
 
 

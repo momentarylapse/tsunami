@@ -19,6 +19,8 @@ public:
 	void read(BufferBox &b);
 	void write(BufferBox &b);
 
+	void clear();
+
 	BufferBox buf;
 	int read_pos;
 	int write_pos;

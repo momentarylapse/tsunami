@@ -73,14 +73,13 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 	return paContinue;
 }
 
-AudioStream::AudioStream() :
+AudioStream::AudioStream(AudioRendererInterface *r) :
 	PeakMeterSource("AudioStream"),
 	ring_buf(1048576)
 {
 	last_error = paNoError;
 
-	renderer = NULL;
-	generate_func = NULL;
+	renderer = r;
 
 	playing = false;
 	paused = false;
@@ -124,9 +123,9 @@ AudioStream::~AudioStream()
 	kill();
 }
 
-void AudioStream::__init__()
+void AudioStream::__init__(AudioRendererInterface *r)
 {
-	new(this) AudioStream;
+	new(this) AudioStream(r);
 }
 
 void AudioStream::__delete__()
@@ -157,8 +156,11 @@ void AudioStream::stop()
 	last_error = Pa_AbortStream(pa_stream);
 	testError("AudioStream.stop");
 
+	// clean up
 	playing = false;
 	paused = false;
+	end_of_data = false;
+	ring_buf.clear();
 
 	notify(MESSAGE_STATE_CHANGE);
 }
@@ -182,11 +184,7 @@ void AudioStream::stream()
 	b.resize(buffer_size);
 
 	// read data
-	if (renderer){
-		size = renderer->read(b);
-	}else if (generate_func){
-		size = (*generate_func)(b);
-	}
+	size = renderer->read(b);
 
 	// out of data?
 	if (size == 0){
@@ -209,20 +207,7 @@ void AudioStream::setSource(AudioRendererInterface *r)
 		stop();
 
 	renderer = r;
-	generate_func = NULL;
 	sample_rate = r->sample_rate;
-}
-
-void AudioStream::setSourceGenerated(void *func, int _sample_rate)
-{
-	msg_db_f("Stream.setSourceGen", 1);
-
-	if (playing)
-		stop();
-
-	renderer = NULL;
-	generate_func = (generate_func_t*)func;
-	sample_rate = _sample_rate;
 }
 
 void AudioStream::play()
@@ -230,10 +215,10 @@ void AudioStream::play()
 	msg_db_f("Stream.play", 1);
 
 	if (playing){
-		if (paused){
+		/*if (paused){
 			pause();
 			return;
-		}
+		}*/
 		stop();
 	}
 
@@ -290,18 +275,12 @@ bool AudioStream::getPosSafe(int &pos)
 	if (!playing)
 		return false;
 
-	//pos = (Pa_GetStreamTime(pa_stream) - pa_time_offset) * sample_rate;
-	//msg_write(f2s(Pa_GetStreamTime(pa_stream), 4));
 	pos = cur_pos;
-/*	int param = 0;
-	alGetSourcei(source, AL_SOURCE_STATE, &param);
-	testError("alGetSourcei1 (getpos)");
-	if ((param != AL_PLAYING) and (param != AL_PAUSED))
-		return false;
 
-	alGetSourcei(source, AL_SAMPLE_OFFSET, &param);
-	testError("alGetSourcei2 (getpos)");
-	pos = box[cur_buffer_no].offset + param;*/
+	// translation
+	Range r = renderer->range();
+	if (r.num > 0)
+		pos = r.offset + ((cur_pos + renderer->offset()) %r.num);
 	return true;
 }
 

@@ -15,14 +15,29 @@
 
 #include "../lib/math/math.h"
 
+AudioRendererInterface::AudioRendererInterface()
+{
+	sample_rate = DEFAULT_SAMPLE_RATE;
+}
+
+void AudioRendererInterface::__init__()
+{
+	new(this) AudioRendererInterface;
+}
+
+void AudioRendererInterface::__delete__()
+{
+	this->~AudioRendererInterface();
+}
+
 AudioRenderer::AudioRenderer()
 {
 	effect = NULL;
 	loop = false;
 	loop_if_allowed = false;
 	pos = 0;
+	_offset = 0;
 	audio = NULL;
-	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
 AudioRenderer::~AudioRenderer()
@@ -236,7 +251,7 @@ void AudioRenderer::read_basic(BufferBox &buf, int pos, int size)
 int AudioRenderer::read(BufferBox &buf)
 {
 	msg_db_f("AudioRenderer.read", 1);
-	int size = max(min(buf.num, range.end() - pos), 0);
+	int size = max(min(buf.num, _range.end() - pos), 0);
 
 	if (audio->curve.num >= 0){
 		buf.resize(size);
@@ -251,8 +266,8 @@ int AudioRenderer::read(BufferBox &buf)
 
 	buf.offset = pos;
 	pos += size;
-	if ((pos >= range.end()) && (loop))
-		seek(range.offset);
+	if ((pos >= _range.end()) && (loop))
+		seek(_range.offset);
 	return size;
 }
 
@@ -263,14 +278,15 @@ void AudioRenderer::renderAudioFile(AudioFile *a, const Range &range, BufferBox 
 	read(buf);
 }
 
-void AudioRenderer::prepare(AudioFile *a, const Range &_range, bool allow_loop)
+void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
 	audio = a;
 	sample_rate = audio->sample_rate;
-	range = _range;
+	_range = __range;
 	loop = loop_if_allowed && allow_loop;
-	pos = range.offset;
+	pos = _range.offset;
+	_offset = 0;
 	midi.clear();
 	foreach(Effect *fx, a->fx)
 		fx->prepare();
@@ -293,6 +309,7 @@ void AudioRenderer::prepare(AudioFile *a, const Range &_range, bool allow_loop)
 void AudioRenderer::seek(int _pos)
 {
 	pos = _pos;
+	_offset = pos - _range.offset;
 	foreach(Track *t, audio->track)
 		t->synth->reset();
 }

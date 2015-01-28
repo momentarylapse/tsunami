@@ -23,11 +23,11 @@ typedef void PaStream;
 class AudioStream : public PeakMeterSource
 {
 public:
-	AudioStream();
+	AudioStream(AudioRendererInterface *r);
 	virtual ~AudioStream();
 
-	void _cdecl __init__();
-	void _cdecl __delete__();
+	void _cdecl __init__(AudioRendererInterface *r);
+	virtual void _cdecl __delete__();
 
 	void kill();
 
@@ -45,7 +45,7 @@ public:
 	bool _cdecl isPaused();
 	int _cdecl getState();
 	void _cdecl setSource(AudioRendererInterface *r);
-	void _cdecl setSourceGenerated(void *func, int sample_rate);
+	//void _cdecl setSourceGenerated(void *func, int sample_rate);
 	AudioRendererInterface *getSource(){ return renderer; }
 	int getPos();
 	bool getPosSafe(int &pos);
@@ -77,14 +77,14 @@ public:
 	bool reading;
 	bool end_of_data;
 
-	typedef int generate_func_t(BufferBox &);
-	generate_func_t *generate_func;
+	//typedef int generate_func_t(BufferBox &);
+	//generate_func_t *generate_func;
 
 	Array<short> data;
 	int data_samples;
 
 	PaStream *pa_stream;
-	int cur_pos;
+	long long cur_pos;
 
 	//static int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
 

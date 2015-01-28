@@ -42,8 +42,7 @@ SampleManager::SampleManager(AudioFile *a) :
 
 	preview_audio = new AudioFile;
 	preview_renderer = new AudioRenderer;
-	preview_stream = new AudioStream;
-	preview_stream->setSource(preview_renderer);
+	preview_stream = new AudioStream(preview_renderer);
 	preview_sample = NULL;
 
 	audio = a;

@@ -136,14 +136,12 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	chord_type = 0;
 	chord_inversion = 0;
 
-	stream = new AudioStream;
-	stream->setSource(renderer);
+	stream = new AudioStream(renderer);
 
 	midi_preview_renderer = new SynthesizerRenderer(NULL);
 	midi_preview_renderer->auto_stop = true;
-	midi_preview_stream = new AudioStream;
+	midi_preview_stream = new AudioStream(midi_preview_renderer);
 	midi_preview_stream->setBufferSize(2048);
-	midi_preview_stream->setSource(midi_preview_renderer);
 
 	area = rect(0, 0, 0, 0);
 	subscribe(audio);
@@ -232,10 +230,10 @@ void AudioView::updateSelection()
 		sel_range.invert();
 
 
-	renderer->range = getPlaybackSelection();
+	renderer->setRange(getPlaybackSelection());
 	if (stream->isPlaying()){
-		if (renderer->range.is_inside(stream->getPos()))
-			renderer->range = getPlaybackSelection();
+		if (renderer->range().is_inside(stream->getPos()))
+			renderer->setRange(getPlaybackSelection());
 		else
 			stream->stop();
 	}
@@ -496,7 +494,7 @@ void AudioView::onMouseMove()
 void AudioView::setCursorPos(int pos)
 {
 	if (stream->isPlaying()){
-		if (renderer->range.is_inside(pos)){
+		if (renderer->range().is_inside(pos)){
 			renderer->seek(pos);
 			stream->play();
 			selection.type = SEL_TYPE_PLAYBACK;
@@ -789,8 +787,8 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 			color cc = ColorPreviewMarker;
 			cc.a = 0.25f;
 			c->setColor(cc);
-			float x0 = sample2screen(renderer->range.start());
-			float x1 = sample2screen(renderer->range.end());
+			float x0 = sample2screen(renderer->range().start());
+			float x1 = sample2screen(renderer->range().end());
 			c->drawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
 		c->setColor(ColorGrid);

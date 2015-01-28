@@ -13,9 +13,15 @@
 class AudioRendererInterface : public VirtualBase
 {
 public:
-	AudioRendererInterface(){}
+	AudioRendererInterface();
 	virtual ~AudioRendererInterface(){}
+
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
+
 	virtual int read(BufferBox &buf){ return 0; }
+	virtual Range range(){ return Range(0, 0); }
+	virtual int offset(){ return 0; }
 	int sample_rate;
 };
 
@@ -32,6 +38,10 @@ public:
 
 	void seek(int pos);
 
+	void setRange(const Range &r){ _range = r; }
+	virtual Range range(){ return _range; }
+	virtual int offset(){ return _offset; }
+
 private:
 	void read_basic(BufferBox &buf, int pos, int size);
 	void bb_render_audio_track_no_fx(BufferBox &buf, Track *t);
@@ -44,13 +54,14 @@ private:
 	void bb_render_audio_no_fx(BufferBox &buf);
 
 	AudioFile *audio;
+	Range _range;
 	Range range_cur;
 	int pos;
+	int _offset;
 	Array<MidiData> midi;
 
 public:
 	Effect *effect;
-	Range range;
 	bool loop;
 	bool loop_if_allowed;
 };

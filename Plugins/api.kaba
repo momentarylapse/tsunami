@@ -75,6 +75,14 @@ class BufferBox
 	extern void add(BufferBox b, int offset, float volume, float panning)
 	extern void get_spectrum(complex spec_r[], complex spec_l[], int samples)
 
+class AudioRendererInterface
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual int read(BufferBox buf)
+	extern virtual Range range()
+	extern virtual int offset()
+	int sample_rate
+
 class Synthesizer
 	string name
 	int sample_rate
@@ -244,13 +252,12 @@ class AudioRenderer
 
 
 class AudioStream
-	extern void __init__()
+	extern void __init__(AudioRendererInterface *r)
 	extern void __delete__()
 	extern void stop()
 	extern void play()
 	extern void pause()
-	extern void setSource(AudioRenderer *r)
-	extern void setSourceGenerated(void *func, int sample_rate)
+	//extern void setSource(AudioRendererInterface *r)
 	extern bool isPlaying()
 	extern int getPos()
 	extern float getSampleRate()

@@ -29,8 +29,7 @@ AudioInputMidi::AudioInputMidi(MidiData &_data) :
 	init();
 
 	preview_renderer = new SynthesizerRenderer(NULL);
-	preview_stream = new AudioStream;
-	preview_stream->setSource(preview_renderer);
+	preview_stream = new AudioStream(preview_renderer);
 	preview_stream->setBufferSize(2048);
 }
 

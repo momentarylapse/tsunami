@@ -314,6 +314,16 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::getRange));
 	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::getNextBeat));
 
+	AudioRendererInterface ari;
+	Script::DeclareClassSize("AudioRendererInterface", sizeof(AudioRendererInterface));
+	Script::DeclareClassOffset("AudioRendererInterface", "sample_rate", _offsetof(AudioRendererInterface, sample_rate));
+	Script::LinkExternal("AudioRendererInterface.__init__", Script::mf(&AudioRendererInterface::__init__));
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "__delete__", Script::mf(&AudioRendererInterface::__delete__), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "read", Script::mf(&AudioRendererInterface::read), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "range", Script::mf(&AudioRendererInterface::range), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "offset", Script::mf(&AudioRendererInterface::offset), &ari);
+
+	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
 	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::prepare));
 	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
 	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::renderAudioFile));
@@ -334,11 +344,11 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioInput.removeObserver", Script::mf(&AudioInput::removeWrappedObserver));
 	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
 
+	AudioStream stream(NULL);
 	Script::DeclareClassSize("AudioStream", sizeof(AudioStream));
 	Script::LinkExternal("AudioStream.__init__", Script::mf(&AudioStream::__init__));
-	Script::LinkExternal("AudioStream.__delete__", Script::mf(&AudioStream::__delete__));
-	Script::LinkExternal("AudioStream.setSource", Script::mf(&AudioStream::setSource));
-	Script::LinkExternal("AudioStream.setSourceGenerated", Script::mf(&AudioStream::setSourceGenerated));
+	Script::DeclareClassVirtualIndex("AudioStream", "__delete__", Script::mf(&AudioStream::__delete__), &stream);
+	//Script::LinkExternal("AudioStream.setSource", Script::mf(&AudioStream::setSource));
 	Script::LinkExternal("AudioStream.play", Script::mf(&AudioStream::play));
 	Script::LinkExternal("AudioStream.stop", Script::mf(&AudioStream::stop));
 	Script::LinkExternal("AudioStream.pause", Script::mf(&AudioStream::pause));

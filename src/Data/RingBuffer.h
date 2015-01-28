@@ -19,6 +19,9 @@ public:
 	void read(BufferBox &b);
 	void write(BufferBox &b);
 
+	void readRef(BufferBox &b, int size);
+	void peekRef(BufferBox &b, int size);
+
 	void clear();
 
 	BufferBox buf;

@@ -47,26 +47,30 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 			*out ++ = 0;
 		}
 	}else{
-		stream->cur_pos += frameCount;
+		int done = 0;
 
-		int na = min(stream->ring_buf.buf.num - stream->ring_buf.read_pos, frameCount);
-		float *r = &stream->ring_buf.buf.r[stream->ring_buf.read_pos];
-		float *l = &stream->ring_buf.buf.l[stream->ring_buf.read_pos];
-		for (int i=0; i<na; i++){
-			*out ++ = *r ++;
-			*out ++ = *l ++;
+		for (int n=0; (n<2) and (done<frameCount); n++){
+			BufferBox b;
+			stream->ring_buf.readRef(b, frameCount - done);
+			b.interleave(out);
+			out += done * 2;
+			done += b.num;
 		}
-		stream->ring_buf.read_pos += frameCount;
-		if (stream->ring_buf.read_pos > stream->ring_buf.buf.num)
-			stream->ring_buf.read_pos -= stream->ring_buf.buf.num;
+
+		stream->cur_pos += done;
 	}
 
 	// read more?
-	if ((available < stream->buffer_size) and (!stream->reading)){
+	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->end_of_data)){
 		stream->reading = true;
 		HuiRunLaterM(0, stream, &AudioStream::stream);
 	}
-	return 0;
+
+	if (available <= frameCount and stream->end_of_data){
+		HuiRunLaterM(0, stream, &AudioStream::stop);
+		return paComplete;
+	}
+	return paContinue;
 }
 
 AudioStream::AudioStream() :
@@ -176,7 +180,6 @@ void AudioStream::stream()
 	int size = 0;
 	BufferBox b;
 	b.resize(buffer_size);
-	msg_write("stream");
 
 	// read data
 	if (renderer){
@@ -184,11 +187,9 @@ void AudioStream::stream()
 	}else if (generate_func){
 		size = (*generate_func)(b);
 	}
-	msg_write(size);
 
 	// out of data?
 	if (size == 0){
-		msg_write("end of data");
 		end_of_data = true;
 		reading = false;
 		return;
@@ -196,7 +197,6 @@ void AudioStream::stream()
 
 	// add to queue
 	ring_buf.write(b);
-	msg_write(ring_buf.available());
 
 	reading = false;
 }
@@ -326,14 +326,7 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 	if (!playing)
 		return;
 
-	// (sample) position within current stream/buffer
-	/*int dpos = 0;
-	alGetSourcei(source, AL_SAMPLE_OFFSET, &dpos);
-
-	if (box[cur_buffer_no].num - dpos > 0)
-		buf.set_as_ref(box[cur_buffer_no], dpos, min(num_samples, box[cur_buffer_no].num - dpos));
-	else
-		buf.set_as_ref(box[1-cur_buffer_no], 0, min(num_samples, box[1-cur_buffer_no].num));*/
+	ring_buf.peekRef(buf, num_samples);
 }
 
 bool AudioStream::testError(const string &msg)

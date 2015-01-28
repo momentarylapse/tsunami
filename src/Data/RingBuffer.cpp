@@ -53,3 +53,18 @@ void RingBuffer::write(BufferBox& b)
 	if (write_pos >= buf.num)
 		write_pos -= buf.num;
 }
+
+void RingBuffer::peekRef(BufferBox &b, int size)
+{
+	size = min(size, available());
+	size = min(size, buf.num - read_pos);
+	b.set_as_ref(buf, read_pos, size);
+}
+
+void RingBuffer::readRef(BufferBox &b, int size)
+{
+	peekRef(b, size);
+	read_pos += b.num;
+	if (read_pos >= buf.num)
+		read_pos -= buf.num;
+}

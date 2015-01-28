@@ -357,6 +357,16 @@ bool BufferBox::get_16bit_buffer(Array<short> &data)
 	return !wtb_overflow;
 }
 
+void BufferBox::interleave(float *p)
+{
+	float *pr = &r[0];
+	float *pl = &l[0];
+	for (int i=0; i<num; i++){
+		*p ++ = *pr ++;
+		*p ++ = *pl ++;
+	}
+}
+
 Range BufferBox::range()
 {
 	return Range(offset, num);

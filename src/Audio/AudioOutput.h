@@ -12,8 +12,6 @@
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 
-struct ALCdevice_struct;
-struct ALCcontext_struct;
 class AudioStream;
 
 class AudioOutput : public Observable
@@ -24,8 +22,8 @@ public:
 	AudioOutput();
 	virtual ~AudioOutput();
 
-	Array<string> Device;
-	string ChosenDevice;
+	Array<string> devices;
+	string chosen_device;
 	void setDevice(const string &device);
 
 	void init();
@@ -42,11 +40,10 @@ public:
 private:
 	bool testError(const string &msg);
 
-	ALCcontext_struct *al_context;
-	ALCdevice_struct *al_dev;
-
 	bool initialized;
 	int last_error;
+
+	int pa_device_no;
 
 	float volume;
 

@@ -67,9 +67,9 @@ void SettingsDialog::loadData()
 	//SetInt("preview_sleep", PreviewSleepTime);
 	setString("preview_device", _("- Standard -"));
 	setInt("preview_device", 0);
-	foreachi(string &d, tsunami->output->Device, i){
+	foreachi(string &d, tsunami->output->devices, i){
 		addString("preview_device", d);
-		if (d == tsunami->output->ChosenDevice)
+		if (d == tsunami->output->chosen_device)
 			setInt("preview_device", i + 1);
 	}
 
@@ -117,7 +117,7 @@ void SettingsDialog::onPreviewDevice()
 {
 	int dev = getInt("");
 	if (dev > 0)
-		tsunami->output->setDevice(tsunami->output->Device[dev - 1]);
+		tsunami->output->setDevice(tsunami->output->devices[dev - 1]);
 	else
 		tsunami->output->setDevice("");
 }

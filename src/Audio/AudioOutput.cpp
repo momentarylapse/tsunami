@@ -33,10 +33,7 @@ AudioOutput::AudioOutput() :
 	initialized = false;
 	last_error = paNoError;
 
-	al_context = NULL;
-	al_dev = NULL;
-
-	ChosenDevice = HuiConfig.getStr("Output.ChosenDevice", "");
+	chosen_device = HuiConfig.getStr("Output.ChosenDevice", "");
 	volume = HuiConfig.getFloat("Output.Volume", 1.0f);
 
 	init();
@@ -45,18 +42,32 @@ AudioOutput::AudioOutput() :
 AudioOutput::~AudioOutput()
 {
 	kill();
-	HuiConfig.setStr("Output.ChosenDevice", ChosenDevice);
+	HuiConfig.setStr("Output.ChosenDevice", chosen_device);
 	HuiConfig.setFloat("Output.Volume", volume);
 }
 
 void AudioOutput::setDevice(const string &device)
 {
-	ChosenDevice = device;
-	HuiConfig.setStr("ChosenOutputDevice", ChosenDevice);
-	HuiConfig.save();
-	tsunami->log->warning(_("Das neue Ger&at wird erst beim n&achsten Start verwendet!"));
-	//KillPreview();
-	//PreviewInit();
+	chosen_device = device;
+	//HuiConfig.setStr("ChosenOutputDevice", chosen_device);
+	//HuiConfig.save();
+
+	pa_device_no = -1;
+
+	int n = Pa_GetDeviceCount();
+	for (int i=0; i<n; i++){
+		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
+		if (chosen_device == string(di->name))
+			pa_device_no = i;
+	}
+
+	if (pa_device_no < 0){
+		pa_device_no = Pa_GetDefaultOutputDevice();
+		if (device != "")
+			tsunami->log->error(format("Portaudio: device '%s' not found. Using default.", device.c_str()));
+	}
+
+	tsunami->log->info(format("Portaudio: device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
 }
 
 void AudioOutput::init()
@@ -111,7 +122,19 @@ void AudioOutput::init()
 
 	//SetListenerValues();
 	testError("init...");*/
-	 Pa_Initialize();
+	last_error = Pa_Initialize();
+	testError("Output.initialize");
+
+	devices.clear();
+
+	int n = Pa_GetDeviceCount();
+	for (int i=0; i<n; i++){
+		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
+		if (di->maxOutputChannels >= 2)
+			devices.add(di->name);
+	}
+
+	setDevice(chosen_device);
 
 	initialized = true;
 }
@@ -125,26 +148,8 @@ void AudioOutput::kill()
 	foreach(AudioStream *s, streams)
 		s->kill();
 
-	// close devices
-	/*if (al_dev){
-		// manually
-		//msg_write("current context...");
-		alcMakeContextCurrent(NULL);
-		testError("alcMakeContextCurrent (kill)");
-		//msg_write("destroy context...");
-		alcDestroyContext(al_context);
-		testError("alcDestroyContext (kill)");
-		//msg_write("close device...");
-		if (!alcCloseDevice(al_dev))
-			testError("alcCloseDevice (kill)");
-		//msg_write("ok");
-	}else{
-		// automatically
-		int i = alutExit();
-		if (i == 0)
-			msg_error((char*)alutGetErrorString(alutGetError()));
-	}*/
 	last_error = Pa_Terminate();
+	testError("terminate");
 	initialized = false;
 }
 
@@ -186,20 +191,6 @@ bool AudioOutput::testError(const string &msg)
 		tsunami->log->error(string("PortAudio error: ") + Pa_GetErrorText(last_error));
 		return true;
 	}
-
-	/*int error;
-	if (al_dev)
-		error = alcGetError(al_dev);
-	else
-		error = alGetError();
-	if (error != AL_NO_ERROR){
-		last_error = error;
-		//tsunami->log->Error();
-		msg_error("OpenAL operation: " + msg);
-		msg_write(ALError(error));
-		//msg_write(alutGetErrorString(error));
-		return true;
-	}*/
 	return false;
 }
 

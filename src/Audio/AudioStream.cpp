@@ -93,7 +93,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	update_dt = DEFAULT_UPDATE_DT;
 
-	int outDevNum = Pa_GetDefaultOutputDevice();
+	int outDevNum = output->pa_device_no;
 
 	PaStreamParameters outputParameters;
 	bzero(&outputParameters, sizeof(outputParameters));

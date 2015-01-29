@@ -11,24 +11,25 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
+#include "../Data/RingBuffer.h"
 #include "AudioInputBase.h"
 
-struct ALCdevice_struct;
-
+typedef void PaStream;
 
 #define NUM_CAPTURE_SAMPLES		8192
 
 class AudioInputAudio : public AudioInputBase
 {
 public:
-	AudioInputAudio(BufferBox &buf, BufferBox &cur_buf);
+	AudioInputAudio(BufferBox &buf, RingBuffer &cur_buf);
 	virtual ~AudioInputAudio();
 
-	Array<string> Device;
-	string ChosenDevice;
-	string TempFilename;
+	Array<string> devices;
+	string chosen_device;
+	string temp_filename;
 
 	void init();
+	void setDevice(const string &device);
 
 	virtual bool start(int sample_rate);
 	virtual void stop();
@@ -53,17 +54,21 @@ public:
 	string getTempFilename();
 	void setTempFilename(const string &filename);
 
+	BufferBox &accumulation_buffer;
+	RingBuffer &current_buffer;
 private:
-	BufferBox &AccumulationBuffer, &CurrentBuffer;
 	bool accumulating;
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];
-	ALCdevice_struct *capture;
+
+	int pa_device_no;
+	PaStream *pa_stream;
+
+	bool testError(const string &msg);
+	int last_error;
 
 	CFile *temp_file;
 	string cur_temp_filename;
-
-	string dev_name;
 
 	struct SyncData
 	{
@@ -77,9 +82,9 @@ private:
 	};
 	SyncData sync;
 
-	bool Capturing;
-	int SampleRate;
-	float PlaybackDelayConst;
+	bool capturing;
+	int sample_rate;
+	float playback_delay_const;
 };
 
 #endif /* AUDIOINPUTAUDIO_H_ */

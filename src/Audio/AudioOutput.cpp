@@ -10,20 +10,7 @@
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 
-
-#ifdef NIX_OS_WINDOWS
-	#include <al.h>
-	#include <alut.h>
-	#include <alc.h>
-	#pragma comment(lib,"alut.lib")
-	#pragma comment(lib,"OpenAL32.lib")
-	/*#pragma comment(lib,"libogg.lib")
-	#pragma comment(lib,"libvorbis.lib")
-	#pragma comment(lib,"libvorbisfile.lib")*/
-
-#else
-	#include <portaudio.h>
-#endif
+#include <portaudio.h>
 
 
 
@@ -64,10 +51,10 @@ void AudioOutput::setDevice(const string &device)
 	if (pa_device_no < 0){
 		pa_device_no = Pa_GetDefaultOutputDevice();
 		if (device != "")
-			tsunami->log->error(format("Portaudio: device '%s' not found. Using default.", device.c_str()));
+			tsunami->log->error(format("output device '%s' not found. Using default.", device.c_str()));
 	}
 
-	tsunami->log->info(format("Portaudio: device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
+	tsunami->log->info(format("output device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
 }
 
 void AudioOutput::init()
@@ -188,7 +175,7 @@ bool AudioOutput::streamExists(AudioStream* s)
 bool AudioOutput::testError(const string &msg)
 {
 	if (last_error != paNoError){
-		tsunami->log->error(string("PortAudio error: ") + Pa_GetErrorText(last_error));
+		tsunami->log->error(string("PortAudio (general output) error: ") + Pa_GetErrorText(last_error));
 		return true;
 	}
 	return false;

@@ -11,17 +11,7 @@
 #include "AudioRenderer.h"
 #include "../Stuff/Log.h"
 
-
-#ifdef OS_WINDOWS
-	#include <al.h>
-	#include <alut.h>
-	#include <alc.h>
-	#pragma comment(lib,"alut.lib")
-	#pragma comment(lib,"OpenAL32.lib")
-
-#else
-	#include <portaudio.h>
-#endif
+#include <portaudio.h>
 #include <math.h>
 
 //#define DEFAULT_BUFFER_SIZE		131072
@@ -33,6 +23,8 @@
 
 const string AudioStream::MESSAGE_STATE_CHANGE = "StateChange";
 const string AudioStream::MESSAGE_UPDATE = "Update";
+
+bool AudioStream::JUST_FAKING_IT = false;
 
 int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
 {
@@ -92,6 +84,10 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	buffer_size = DEFAULT_BUFFER_SIZE;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	update_dt = DEFAULT_UPDATE_DT;
+	killed = false;
+
+	if (JUST_FAKING_IT)
+		return;
 
 	int outDevNum = output->pa_device_no;
 
@@ -112,10 +108,9 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	                paNoFlag, //flags that can be used to define dither, clip settings and more
 	                portAudioCallback,
 	                (void*)this);
-	testError("OpenStream");
+	testError("Pa_OpenStream");
 
 	output->addStream(this);
-	killed = false;
 }
 
 AudioStream::~AudioStream()
@@ -136,12 +131,12 @@ void AudioStream::__delete__()
 void AudioStream::kill()
 {
 	msg_db_f("Stream.kill", 1);
-	if (killed)
+	if (killed or JUST_FAKING_IT)
 		return;
 
 	stop();
 
-	last_error = Pa_CloseStream(&pa_stream);
+	last_error = Pa_CloseStream(pa_stream);
 	testError("AudioStream.kill");
 
 	output->removeStream(this);
@@ -156,7 +151,7 @@ void AudioStream::stop()
 
 	//last_error = Pa_AbortStream(pa_stream);
 	last_error = Pa_StopStream(pa_stream);
-	testError("AudioStream.stop");
+	testError("Pa_StopStream");
 
 	// clean up
 	playing = false;
@@ -230,7 +225,7 @@ void AudioStream::play()
 
 	stream();
 	last_error = Pa_StartStream(pa_stream);
-	testError("StartStream");
+	testError("Pa_StartStream");
 
 	playing = true;
 	paused = false;
@@ -312,7 +307,11 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 
 bool AudioStream::testError(const string &msg)
 {
-	return output->testError(msg);
+	if (last_error != paNoError){
+		tsunami->log->error(format(_("PortAudio (stream) error: '%s'   at %s"), Pa_GetErrorText(last_error), msg.c_str()));
+		return true;
+	}
+	return false;
 }
 
 void AudioStream::update()

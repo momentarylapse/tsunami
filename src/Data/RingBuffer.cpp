@@ -31,12 +31,23 @@ int RingBuffer::available()
 	return write_pos - read_pos;
 }
 
+void RingBuffer::moveReadPos(int delta)
+{
+	read_pos += delta;
+	if (read_pos >= buf.num)
+		read_pos -= buf.num;
+}
+void RingBuffer::moveWritePos(int delta)
+{
+	write_pos += delta;
+	if (write_pos >= buf.num)
+		write_pos -= buf.num;
+}
+
 void RingBuffer::read(BufferBox& b)
 {
 	b.set(buf, read_pos, 1.0f);
-	read_pos += b.num;
-	if (read_pos >= buf.num)
-		read_pos = 0;
+	moveReadPos(b.num);
 }
 
 void RingBuffer::write(BufferBox& b)
@@ -49,9 +60,7 @@ void RingBuffer::write(BufferBox& b)
 		buf.set(b, -size_a, 1.0f);
 	}
 
-	write_pos += b.num;
-	if (write_pos >= buf.num)
-		write_pos -= buf.num;
+	moveWritePos(b.num);
 }
 
 void RingBuffer::peekRef(BufferBox &b, int size)
@@ -64,7 +73,12 @@ void RingBuffer::peekRef(BufferBox &b, int size)
 void RingBuffer::readRef(BufferBox &b, int size)
 {
 	peekRef(b, size);
-	read_pos += b.num;
-	if (read_pos >= buf.num)
-		read_pos -= buf.num;
+	moveReadPos(b.num);
+}
+
+void RingBuffer::writeRef(BufferBox &b, int size)
+{
+	size = min(size, buf.num - write_pos);
+	b.set_as_ref(buf, write_pos, size);
+	moveWritePos(b.num);
 }

@@ -60,6 +60,7 @@ public:
 
 	bool get_16bit_buffer(Array<short> &data);
 	void interleave(float *p);
+	void deinterleave(float *p);
 
 	enum PeakMode
 	{

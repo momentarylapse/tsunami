@@ -344,6 +344,8 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioInput.removeObserver", Script::mf(&AudioInput::removeWrappedObserver));
 	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
 
+	AudioStream::JUST_FAKING_IT = true;
+	{
 	AudioStream stream(NULL);
 	Script::DeclareClassSize("AudioStream", sizeof(AudioStream));
 	Script::LinkExternal("AudioStream.__init__", Script::mf(&AudioStream::__init__));
@@ -358,6 +360,8 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioStream.getVolume", Script::mf(&AudioStream::getVolume));
 	Script::LinkExternal("AudioStream.setVolume", Script::mf(&AudioStream::setVolume));
 	Script::LinkExternal("AudioStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));
+	}
+	AudioStream::JUST_FAKING_IT = false;
 
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
 	Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));

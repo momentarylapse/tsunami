@@ -11,6 +11,7 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
+#include "../Data/RingBuffer.h"
 #include "../View/Helper/PeakMeter.h"
 
 class AudioInputBase;
@@ -41,7 +42,8 @@ public:
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 	virtual int getState();
 
-	BufferBox current_buffer, buffer;
+	RingBuffer current_buffer;
+	BufferBox buffer;
 	MidiData midi;
 
 	int type;

@@ -17,7 +17,8 @@
 const string AudioInput::MESSAGE_CAPTURE = "Capture";
 
 AudioInput::AudioInput() :
-	PeakMeterSource("AudioInput")
+	PeakMeterSource("AudioInput"),
+	current_buffer(1048576)
 {
 	in_audio = new AudioInputAudio(buffer, current_buffer);
 	in_midi = new AudioInputMidi(midi);

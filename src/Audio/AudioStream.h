@@ -60,6 +60,8 @@ public:
 
 	void setBufferSize(int _size){ buffer_size = _size; }
 
+	static bool JUST_FAKING_IT;
+
 //private:
 	bool testError(const string &msg);
 	void stream();

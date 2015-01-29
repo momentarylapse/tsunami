@@ -76,15 +76,15 @@ void SettingsDialog::loadData()
 
 	setString("capture_device", _("- Standard -"));
 	setInt("capture_device", 0);
-	foreachi(string &d, tsunami->input->in_audio->Device, i){
+	foreachi(string &d, tsunami->input->in_audio->devices, i){
 		addString("capture_device", d);
-		if (d == tsunami->input->in_audio->ChosenDevice)
+		if (d == tsunami->input->in_audio->chosen_device)
 			setInt("capture_device", i + 1);
 	}
 
 	setFloat("capture_delay", tsunami->input->in_audio->getPlaybackDelayConst());
 
-	setString("capture_filename", tsunami->input->in_audio->TempFilename);
+	setString("capture_filename", tsunami->input->in_audio->temp_filename);
 }
 
 void SettingsDialog::applyData()
@@ -107,10 +107,10 @@ void SettingsDialog::onOggBitrate()
 void SettingsDialog::onCaptureDevice()
 {
 	if (getInt("") > 0)
-		tsunami->input->in_audio->ChosenDevice = tsunami->input->in_audio->Device[getInt("") - 1];
+		tsunami->input->in_audio->chosen_device = tsunami->input->in_audio->devices[getInt("") - 1];
 	else
-		tsunami->input->in_audio->ChosenDevice = "";
-	HuiConfig.setStr("Input.ChosenDevice", tsunami->input->in_audio->ChosenDevice);
+		tsunami->input->in_audio->chosen_device = "";
+	HuiConfig.setStr("Input.ChosenDevice", tsunami->input->in_audio->chosen_device);
 }
 
 void SettingsDialog::onPreviewDevice()
@@ -134,7 +134,7 @@ void SettingsDialog::onCaptureFilename()
 
 void SettingsDialog::onCaptureFind()
 {
-	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), tsunami->input->in_audio->TempFilename.basename(), "*.raw", "*.raw"))
+	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), tsunami->input->in_audio->temp_filename.basename(), "*.raw", "*.raw"))
 		setString("capture_filename", HuiFilename);
 		tsunami->input->in_audio->setTempFilename(HuiFilename);
 }

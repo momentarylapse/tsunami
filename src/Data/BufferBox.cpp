@@ -367,6 +367,16 @@ void BufferBox::interleave(float *p)
 	}
 }
 
+void BufferBox::deinterleave(float *p)
+{
+	float *pr = &r[0];
+	float *pl = &l[0];
+	for (int i=0; i<num; i++){
+		*pr ++ = *p ++;
+		*pl ++ = *p ++;
+	}
+}
+
 Range BufferBox::range()
 {
 	return Range(offset, num);

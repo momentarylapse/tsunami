@@ -154,8 +154,8 @@ void AudioStream::stop()
 		return;
 	msg_db_f("Stream.stop", 1);
 
-	last_error = Pa_AbortStream(pa_stream);
-	//last_error = Pa_StopStream(pa_stream);
+	//last_error = Pa_AbortStream(pa_stream);
+	last_error = Pa_StopStream(pa_stream);
 	testError("AudioStream.stop");
 
 	// clean up

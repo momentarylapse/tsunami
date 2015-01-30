@@ -63,52 +63,6 @@ void AudioOutput::init()
 		return;
 	msg_db_f("Output.init", 1);
 
-	// which device to use?
-	/*string dev_name;
-	const char *s = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
-	Device.clear();
-	while(*s != 0){
-		Device.add(string(s));
-		if (string(s) == ChosenDevice)
-			dev_name = s;
-		s += strlen(s) + 1;
-	}
-	if (dev_name.num == 0)
-		ChosenDevice = "";
-
-	// try to open manually
-	bool ok = false;
-	if (dev_name.num > 0){
-		al_dev = alcOpenDevice(dev_name.c_str());
-		if (al_dev){
-			testError("alcOpenDevice (init)");
-			al_context = alcCreateContext(al_dev, NULL);
-			testError("alcCreateContext (init)");
-			if (al_context){
-				if (alcMakeContextCurrent(al_context)){
-					tsunami->log->info(_("benutze OpenAl Device: ") + dev_name);
-					ok = true;
-				}
-				testError("alcMakeContextCurrent (init)");
-			}
-		}
-	}
-
-	// failed -> use automatic method
-	if (!ok){
-		ok = alutInit(NULL, 0);
-		testError("alutInit (init)");
-		al_dev = NULL;
-		al_context = NULL;
-	}
-
-	if (!ok){
-		tsunami->log->error(string("OpenAL init: ") + alutGetErrorString(last_error));
-		return;
-	}
-
-	//SetListenerValues();
-	testError("init...");*/
 	last_error = Pa_Initialize();
 	testError("Output.initialize");
 

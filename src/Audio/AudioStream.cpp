@@ -31,7 +31,7 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 	AudioStream *stream = (AudioStream*)userData;
 	float *out = (float*)output;
 
-	int available = stream->ring_buf.available();
+	unsigned int available = stream->ring_buf.available();
 	if ((stream->paused) or (available < frameCount)){
 		// output silence...
 		for (unsigned int i=0; i<frameCount; i++){
@@ -39,7 +39,7 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 			*out ++ = 0;
 		}
 	}else{
-		int done = 0;
+		unsigned int done = 0;
 
 		for (int n=0; (n<2) and (done<frameCount); n++){
 			BufferBox b;
@@ -53,7 +53,7 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 	}
 
 	// read more?
-	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->end_of_data)){
+	if ((available < (unsigned)stream->buffer_size) and (!stream->reading) and (!stream->end_of_data)){
 		stream->reading = true;
 		HuiRunLaterM(0, stream, &AudioStream::stream);
 	}
@@ -246,16 +246,6 @@ int AudioStream::getState()
 		return STATE_PAUSED;
 	if (playing)
 		return STATE_PLAYING;
-	/*if (Pa_IsStreamActive(pa_stream))
-		return STATE_PLAYING;*/
-	/*if (IsPlaying())
-		return STATE_PLAYING;*/
-	/*int param;
-	alGetSourcei(source, AL_SOURCE_STATE, &param);
-	if (param == AL_PLAYING)
-		return STATE_PLAYING;
-	if (param == AL_PAUSED)
-		return STATE_PAUSED;*/
 	return STATE_STOPPED;
 }
 

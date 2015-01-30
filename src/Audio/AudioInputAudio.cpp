@@ -128,7 +128,7 @@ void AudioInputAudio::setDevice(const string &device)
 
 void AudioInputAudio::stop()
 {
-	msg_db_f("CaptureStop", 0);
+	msg_db_f("CaptureStop", 1);
 	if (!capturing)
 		return;
 	last_error = Pa_StopStream(pa_stream);
@@ -136,6 +136,7 @@ void AudioInputAudio::stop()
 	last_error = Pa_CloseStream(pa_stream);
 	testError("Pa_CloseStream");
 	capturing = false;
+	accumulating = false;
 	current_buffer.clear();
 	delete(temp_file);
 	temp_file = NULL;
@@ -144,10 +145,9 @@ void AudioInputAudio::stop()
 
 bool AudioInputAudio::start(int _sample_rate)
 {
-	msg_db_f("CaptureStart", 0);
+	msg_db_f("CaptureStart", 1);
 	if (capturing)
 		stop();
-	msg_write("aaa");
 
 	init();
 	accumulating = false;
@@ -222,6 +222,9 @@ void AudioInputAudio::setPlaybackDelayConst(float f)
 
 int AudioInputAudio::doCapturing()
 {
+	if (!capturing)
+		return 0;
+
 	msg_db_f("DoCapturing", 1);
 
 	int avail = current_buffer.available();
@@ -249,7 +252,7 @@ void AudioInputAudio::resetSync()
 
 void AudioInputAudio::getSomeSamples(BufferBox &buf, int num_samples)
 {
-	current_buffer.peekRef(buf, num_samples);
+	current_buffer.peekRef(buf, -num_samples);
 }
 
 float AudioInputAudio::getSampleRate()

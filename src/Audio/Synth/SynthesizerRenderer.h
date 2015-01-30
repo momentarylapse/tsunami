@@ -13,7 +13,6 @@
 
 class Synthesizer;
 class MidiEvent;
-class MidiNote;
 class MidiSource;
 
 class SynthesizerRenderer : public AudioRendererInterface
@@ -30,23 +29,14 @@ public:
 
 	virtual int read(BufferBox &buf);
 
-	void add(int offset, float pitch, float volume);
+	void add(const MidiEvent &e);
 	void stopAll();
-	void reset();
+	void resetMidiData();
 
 	bool auto_stop;
 
 private:
-	void createNotes();
-	void iterate(int samples);
-
 	Synthesizer *s;
-	MidiSource *source;
-
-	Array<MidiEvent> events;
-
-	// accumulated...
-	Array<MidiNote> cur_notes;
 };
 
 #endif /* SRC_AUDIO_SYNTH_SYNTHESIZERRENDERER_H_ */

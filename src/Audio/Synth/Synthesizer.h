@@ -13,6 +13,9 @@
 
 class Range;
 class BufferBox;
+class MidiSource;
+class MidiEvent;
+class MidiNote;
 
 class Synthesizer : public Configurable
 {
@@ -25,19 +28,33 @@ public:
 	virtual void renderNote(BufferBox &buf, const Range &range, float pitch, float volume){}
 	void renderMetronomeClick(BufferBox &buf, int pos, int level, float volume);
 
+	virtual void render(BufferBox &buf);
+
 	virtual void reset();
 
 	int sample_rate;
 
 	int keep_notes;
-};
 
-float pitch_to_freq(float pitch);
-int pitch_get_octave(int pitch);
-int pitch_from_octave_and_rel(int rel, int octave);
-int pitch_to_rel(int pitch);
-string rel_pitch_name(int pitch_rel);
-string pitch_name(int pitch);
+	virtual int read(BufferBox &buf);
+
+	void add(const MidiEvent &e);
+	void stopAll();
+	void resetMidiData();
+
+	bool auto_stop;
+
+private:
+	void createNotes();
+	void iterate(int samples);
+
+	MidiSource *source;
+
+	Array<MidiEvent> events[128];
+
+	// accumulated...
+	Array<MidiNote> cur_notes;
+};
 
 Synthesizer *CreateSynthesizer(const string &name);
 Array<string> FindSynthesizers();

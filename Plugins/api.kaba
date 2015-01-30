@@ -102,9 +102,9 @@ class DummySynthesizer : Synthesizer
 	extern overwrite void renderNote(BufferBox buf, Range range, float pitch, float volume)
 
 class SynthesizerRenderer
-	extern void reset()
+	extern void resetMidiData()
 	extern virtual int read(BufferBox buf)
-	extern void add(int offset, float pitch, float volume)
+	extern void add(MidiEvent e)
 
 class TrackRenderBuffer
 	int dummy
@@ -120,6 +120,11 @@ class BarPattern
 
 class MidiNote
 	Range range
+	float pitch
+	float volume
+
+class MidiEvent
+	int pos
 	float pitch
 	float volume
 

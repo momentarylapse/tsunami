@@ -538,12 +538,12 @@ void AudioView::onLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
 		cur_track->deleteMidiNote(selection.note);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		midi_preview_renderer->reset();
+		midi_preview_renderer->resetMidiData();
 		midi_preview_renderer->setSynthesizer(cur_track->synth);
 
 		Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
 		foreach(int p, pitch)
-			midi_preview_renderer->add(0, p, 1);
+			midi_preview_renderer->add(MidiEvent(0, p, 1));
 		midi_preview_stream->play();
 	}else if (selection.type == SEL_TYPE_BOTTOM_BUTTON){
 		win->bottom_bar->show();

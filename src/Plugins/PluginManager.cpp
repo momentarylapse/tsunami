@@ -220,6 +220,8 @@ void PluginManager::LinkAppScriptData()
 	//Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::reset), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::resetConfig), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
 	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::renderMetronomeClick));
 	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
 
@@ -227,7 +229,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("SynthesizerRenderer", sizeof(SynthesizerRenderer));
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
 	Script::LinkExternal("SynthesizerRenderer.add", Script::mf(&SynthesizerRenderer::add));
-	Script::LinkExternal("SynthesizerRenderer.reset", Script::mf(&SynthesizerRenderer::reset));
+	Script::LinkExternal("SynthesizerRenderer.resetMidiData", Script::mf(&SynthesizerRenderer::resetMidiData));
 
 
 	DummySynthesizer dsynth;

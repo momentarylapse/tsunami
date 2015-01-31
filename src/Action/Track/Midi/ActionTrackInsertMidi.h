@@ -15,7 +15,6 @@ class ActionTrackInsertMidi : public Action
 {
 public:
 	ActionTrackInsertMidi(Track *t, int offset, MidiData &midi);
-	virtual ~ActionTrackInsertMidi();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

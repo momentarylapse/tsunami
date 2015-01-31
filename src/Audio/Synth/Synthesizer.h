@@ -30,14 +30,13 @@ public:
 
 	virtual void render(BufferBox &buf);
 
-	virtual void reset();
-
 	int sample_rate;
 
 	int keep_notes;
 
 	virtual int read(BufferBox &buf);
 
+	void feed(const Array<MidiEvent> &events);
 	void add(const MidiEvent &e);
 	void stopAll();
 	void resetMidiData();
@@ -50,7 +49,7 @@ protected:
 
 	MidiSource *source;
 
-	Array<MidiEvent> events[128];
+	Array<MidiEvent> events;
 
 	// accumulated...
 	Array<MidiNote> cur_notes;

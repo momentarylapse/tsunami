@@ -15,6 +15,7 @@ void DummySynthesizer::State::reset()
 		pitch[i].phase = 0;
 		pitch[i].volume = 0;
 		pitch[i].fading = false;
+		pitch[i].lin_range = -1;
 	}
 }
 
@@ -34,41 +35,44 @@ void DummySynthesizer::__init__()
 
 void DummySynthesizer::render(BufferBox& buf)
 {
-	int sm_d = 0.02f * sample_rate;
+	float sm_d = 1.0f/(0.02f * sample_rate);
 
-	for (int p=0; p<128; p++){
-		float freq = pitch_to_freq(p);
-		float dphase = 1.0f / sample_rate * freq * 2.0f * pi;
-		//float f_w = 1.0f / sample_rate * freq * 2.0f * pi;
-		//keep_notes = sm_d * 8;
+	for (int i=0; i<buf.num; i++){
 
-		//int i0 = max(range.offset, 0);
-		//int i1 = min(range.end() + sm_d * 8, buf.num);
+		// current events?
+		foreach(MidiEvent &e, events)
+			if (e.pos == i){
+				int p = e.pitch;
+				if (e.volume == 0){
+					state.pitch[p].fading = true;
+					state.pitch[p].lin_range = -1;
+				}else{
+					state.pitch[p].fading = false;
+					state.pitch[p].lin_range = 100;
+					state.pitch[p].lin_step = (e.volume - state.pitch[p].volume) / (float)state.pitch[p].lin_range;
+				}
+			}
 
-		for (int i=0; i<buf.num; i++){
+		for (int p=0; p<128; p++){
+
 			if (state.pitch[p].fading){
 				state.pitch[p].volume *= exp(-sm_d);
 				if (state.pitch[p].volume <= 0.001f){
 					state.pitch[p].volume = 0;
 					state.pitch[p].fading = false;
 				}
+			}else if (state.pitch[p].lin_range >= 0){
+				state.pitch[p].volume += state.pitch[p].lin_step;
+				state.pitch[p].lin_range --;
 			}
-			msg_write(events[p].num);
-			foreach(MidiEvent &e, events[p])
-				if (e.pos == i){
-					msg_write("ppp");
-					if (e.volume == 0){
-						state.pitch[p].fading = true;
-					}else{
-						state.pitch[p].fading = false;
-						state.pitch[p].volume = e.volume;
-					}
-				}
+
+			if (state.pitch[p].volume == 0)
+				continue;
+
+			float freq = pitch_to_freq(p);
+			float dphase = freq * 2.0f * pi / sample_rate;
 
 			float d = sin(state.pitch[p].phase) * state.pitch[p].volume;
-			/*if (i < range.offset + 1000){
-				d *= (i - range.offset) * 0.001;
-			}*/
 			buf.r[i] += d;
 			buf.l[i] += d;
 
@@ -76,17 +80,5 @@ void DummySynthesizer::render(BufferBox& buf)
 			if (state.pitch[p].phase > 2*pi)
 				state.pitch[p].phase -= 2*pi;
 		}
-
-	/*for (int i=i0; i<i1; i++){
-		float tt = (i - range.offset) * f_w;
-		float d = sin(tt) * volume;
-		if (i > range.end()){
-			float fi = (float)(i - range.end()) / (float)sm_d;
-			d *= exp(-fi);//1 - fi;
-		}else if (i < range.offset + 1000){
-			d *= (i - range.offset) * 0.001;
-		}
-		buf.r[i] += d;
-		buf.l[i] += d;*/
 	}
 }

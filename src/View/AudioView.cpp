@@ -315,11 +315,14 @@ AudioView::SelectionType AudioView::getMouseOver()
 	if ((s.track) and (s.track == cur_track) and (editingMidi()) and (midi_mode != MIDI_MODE_SELECT)){
 		s.pitch = y2pitch(my);
 		s.type = SEL_TYPE_MIDI_PITCH;
+		// TODO  !!!!!
+#if skdjfhksjdfhkjsdhf
 		foreachi(MidiNote &n, s.track->midi, i)
 			if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
 				s.note = i;
 				s.type = SEL_TYPE_MIDI_NOTE;
 			}
+#endif
 	}
 
 	return s;
@@ -536,7 +539,7 @@ void AudioView::onLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(audio);
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
-		cur_track->deleteMidiNote(selection.note);
+/*		cur_track->deleteMidiNote(selection.note);    TODO  !!!!           */
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 		midi_preview_renderer->resetMidiData();
 		midi_preview_renderer->setSynthesizer(cur_track->synth);
@@ -591,7 +594,7 @@ void AudioView::onLeftButtonUp()
 		if (cur_action)
 			audio->execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		cur_track->addMidiNotes(getCreationNotes());
+		cur_track->addMidiEvents(midi_notes_to_events(getCreationNotes()));
 
 		midi_preview_renderer->stopAll();
 	}

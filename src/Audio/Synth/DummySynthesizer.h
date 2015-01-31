@@ -27,6 +27,8 @@ public:
 			float volume;
 			float phase;
 			bool fading;
+			float lin_step;
+			int lin_range;
 		}pitch[128];
 	};
 

@@ -14,8 +14,6 @@
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
-#include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
-#include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
@@ -33,6 +31,8 @@
 #include "../Action/Track/Bar/ActionTrackAddBar.h"
 #include "../Action/Track/Bar/ActionTrackEditBar.h"
 #include "../Action/Track/Bar/ActionTrackDeleteBar.h"
+#include "../Action/Track/Midi/ActionTrackAddMidiEvent.h"
+#include "../Action/Track/Midi/ActionTrackDeleteMidiEvent.h"
 
 
 string track_type(int type)
@@ -251,20 +251,28 @@ void Track::editSample(int index, float volume, bool mute, int rep_num, int rep_
 
 void Track::addMidiNote(const MidiNote &n)
 {
-	root->execute(new ActionTrackAddMidiNote(this, n));
-}
-
-void Track::addMidiNotes(Array<MidiNote> notes)
-{
 	root->action_manager->beginActionGroup();
-	foreach(MidiNote &n, notes)
-		addMidiNote(n);
+	addMidiEvent(MidiEvent(n.range.offset, n.pitch, n.volume));
+	addMidiEvent(MidiEvent(n.range.end(), n.pitch, 0));
 	root->action_manager->endActionGroup();
 }
 
-void Track::deleteMidiNote(int index)
+void Track::addMidiEvent(const MidiEvent &e)
 {
-	root->execute(new ActionTrackDeleteMidiNote(this, index));
+	root->execute(new ActionTrackAddMidiEvent(this, e));
+}
+
+void Track::addMidiEvents(const Array<MidiEvent> &events)
+{
+	root->action_manager->beginActionGroup();
+	foreach(MidiEvent &e, const_cast<Array<MidiEvent> &>(events))
+		addMidiEvent(e);
+	root->action_manager->endActionGroup();
+}
+
+void Track::deleteMidiEvent(int index)
+{
+	root->execute(new ActionTrackDeleteMidiEvent(this, index));
 }
 
 void Track::setName(const string& name)

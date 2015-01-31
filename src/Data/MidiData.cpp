@@ -79,16 +79,26 @@ float MidiNote::getFrequency()
 	return 440.0f * pow(2.0f, (float)(pitch - 69) / 12.0f);
 }
 
-Array<MidiNote> MidiData::getNotes(const Range &r)
+Array<MidiEvent> MidiData::getEvents(const Range &r)
 {
-	Array<MidiNote> a;
+	Array<MidiEvent> a;
 	for (int i=0;i<num;i++)
-		if ((*this)[i].range.overlaps(r))
+		if (r.is_inside((*this)[i].pos))
 			a.add((*this)[i]);
 	return a;
 }
 
-int MidiData::getNextNote(int pos)
+Array<MidiNote> MidiData::getNotes(const Range &r)
+{
+	Array<MidiNote> a = midi_events_to_notes(*this);
+	Array<MidiNote> b;
+	foreach(MidiNote &n, a)
+		if (r.overlaps(n.range))
+			b.add(n);
+	return b;
+}
+
+int MidiData::getNextEvent(int pos)
 {
 	return 0;
 }
@@ -97,8 +107,8 @@ Range MidiData::getRange(int elongation)
 {
 	if (num == 0)
 		return Range(0, 0);
-	int i0 = (*this)[0].range.offset;
-	int i1 = back().range.end();
+	int i0 = (*this)[0].pos;
+	int i1 = back().pos;
 	return Range(i0, i1 - i0 + elongation);
 }
 
@@ -106,7 +116,7 @@ void MidiData::sort()
 {
 	for (int i=0;i<num;i++)
 		for (int j=i+1;j<num;j++)
-			if ((*this)[i].range.offset > (*this)[j].range.offset)
+			if ((*this)[i].pos > (*this)[j].pos)
 				swap(i, j);
 }
 
@@ -115,6 +125,43 @@ MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)
 	pos = _pos;
 	pitch = _pitch;
 	volume = _volume;
+}
+
+Array<MidiEvent> midi_notes_to_events(const Array<MidiNote> &notes)
+{
+	Array<MidiEvent> r;
+	foreach(MidiNote &n, const_cast<Array<MidiNote>&>(notes)){
+		r.add(MidiEvent(n.range.offset, n.pitch, n.volume));
+		r.add(MidiEvent(n.range.end(), n.pitch, 0));
+	}
+	return r;
+}
+
+Array<MidiNote> midi_events_to_notes(const Array<MidiEvent> &events)
+{
+	Array<MidiNote> a;
+	Array<MidiEvent> b;
+	foreach(MidiEvent &e, const_cast<Array<MidiEvent>&>(events)){
+		if (e.volume > 0){
+			bool exists = false;
+			foreach(MidiEvent &bb, b)
+				if ((int)bb.pitch == (int)e.pitch){
+					exists = true;
+					break;
+				}
+			if (!exists)
+				b.add(e);
+		}else{
+			foreachi(MidiEvent &bb, b, i)
+				if ((int)bb.pitch == (int)e.pitch){
+					MidiNote n = MidiNote(Range(bb.pos, e.pos - bb.pos), bb.pitch, bb.volume);
+					a.add(n);
+					b.erase(i);
+					break;
+				}
+		}
+	}
+	return a;
 }
 
 

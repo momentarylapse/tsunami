@@ -155,9 +155,6 @@ void AudioInputMidi::resetAccumulation()
 {
 	data.clear();
 	offset = 0;
-
-	for (int i=0;i<128;i++)
-		tone_start[i] = -1;
 }
 
 int AudioInputMidi::getSampleCount()
@@ -215,26 +212,14 @@ int AudioInputMidi::doCapturing()
 		int pitch = ev->data.note.note;
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:
-				if (tone_start[pitch] < 0){
-					tone_start[pitch] = pos;
-					tone_volume[pitch] = (float)ev->data.note.velocity / 127.0f;
-					preview_renderer->add(MidiEvent(0, pitch, tone_volume[pitch]));
-				}
+				data.add(MidiEvent(pos, pitch, (float)ev->data.note.velocity / 127.0f));
+				preview_renderer->add(data.back());
 				//msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:
 				//msg_write(format("note off %d %d", ev->data.control.channel, ev->data.note.note));
-				if (tone_start[pitch] >= 0){
-					MidiNote n;
-					n.pitch = pitch;
-					n.volume = tone_volume[pitch];
-					n.range.offset = tone_start[pitch];
-					n.range.num = pos - tone_start[pitch];
-					tone_start[pitch] = -1;
-					if (accumulating)
-						data.add(n);
-					preview_renderer->add(MidiEvent(0, pitch, 0));
-				}
+				data.add(MidiEvent(pos, pitch, 0));
+				preview_renderer->add(data.back());
 				break;
 		}
 		snd_seq_free_event(ev);

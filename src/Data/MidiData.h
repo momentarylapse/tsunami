@@ -34,17 +34,21 @@ public:
 	float volume;
 };
 
-class MidiData : public Array<MidiNote>
+class MidiData : public Array<MidiEvent>
 {
 public:
+	Array<MidiEvent> getEvents(const Range &r);
 	Array<MidiNote> getNotes(const Range &r);
-	int getNextNote(int pos);
+	int getNextEvent(int pos);
 	Range getRange(int elongation);
 
 	void sort();
 
 	Array<MidiEffect*> fx;
 };
+
+Array<MidiEvent> midi_notes_to_events(const Array<MidiNote> &notes);
+Array<MidiNote> midi_events_to_notes(const Array<MidiEvent> &events);
 
 
 

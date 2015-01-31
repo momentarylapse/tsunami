@@ -188,8 +188,10 @@ void AudioViewTrack::drawSample(HuiPainter *c, const rect &r, SampleRef *s)
 
 void AudioViewTrack::drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift)
 {
+	Range range = Range(view->screen2sample(r.x1), view->screen2sample(r.x2) - view->screen2sample(r.x1));
+	Array<MidiNote> notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
-	foreach(MidiNote &n, midi){
+	foreach(MidiNote &n, notes){
 		c->setColor(getPitchColor(n.pitch));
 		float x1 = view->sample2screen(n.range.offset + shift);
 		float x2 = view->sample2screen(n.range.end() + shift);
@@ -216,7 +218,9 @@ void draw_note(HuiPainter *c, const MidiNote &n, color &col, AudioView *v)
 
 void AudioViewTrack::drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col)
 {
-	foreachi(MidiNote &n, midi, i){
+	Range range = Range(view->screen2sample(r.x1), view->screen2sample(r.x2) - view->screen2sample(r.x1));
+	Array<MidiNote> notes = midi.getNotes(range);
+	foreachi(MidiNote &n, notes, i){
 		if ((n.pitch < view->pitch_min) or (n.pitch >= view->pitch_max))
 			continue;
 		color col = getPitchColor(n.pitch);

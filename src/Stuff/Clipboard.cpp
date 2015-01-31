@@ -55,9 +55,9 @@ void Clipboard::copy(AudioView *view)
 			tt->level[0].buffer.add(t->readBuffers(view->cur_level, view->sel_range));
 			tt->level[0].buffer[0].make_own();
 		}else if (t->type == Track::TYPE_MIDI){
-			tt->midi.append(t->midi.getNotes(view->sel_range));
-			foreach(MidiNote &n, tt->midi)
-				n.range.offset -= view->sel_range.offset;
+			tt->midi.append(t->midi.getEvents(view->sel_range));
+			foreach(MidiEvent &e, tt->midi)
+				e.pos -= view->sel_range.offset;
 		}
 		ref_uid.add(-1);
 	}

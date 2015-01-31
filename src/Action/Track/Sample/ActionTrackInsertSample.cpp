@@ -9,8 +9,8 @@
 #include "ActionTrackDeleteSample.h"
 #include "../Buffer/ActionTrackCreateBuffers.h"
 #include "../Buffer/ActionTrackEditBuffer.h"
-#include "../Midi/ActionTrackAddMidiNote.h"
 #include "../../../Data/AudioFile.h"
+#include "../Midi/ActionTrackAddMidiEvent.h"
 
 ActionTrackInsertSample::ActionTrackInsertSample(AudioFile *a, int track_no, int index, int level_no)
 {
@@ -28,18 +28,14 @@ ActionTrackInsertSample::ActionTrackInsertSample(AudioFile *a, int track_no, int
 		buf.set(*sub->buf, 0, sub->volume);
 		addSubAction(action, a);
 	}else if (t->type == t->TYPE_MIDI){
-		foreach(MidiNote &n, *sub->midi){
-			MidiNote nn = n;
-			nn.range.offset += sub->pos;
-			addSubAction(new ActionTrackAddMidiNote(t, nn), a);
+		foreach(MidiEvent &e, *sub->midi){
+			MidiEvent ee = e;
+			ee.pos += sub->pos;
+			addSubAction(new ActionTrackAddMidiEvent(t, ee), a);
 		}
 	}
 
 	// delete sub
 	addSubAction(new ActionTrackDeleteSample(t, index), a);
-}
-
-ActionTrackInsertSample::~ActionTrackInsertSample()
-{
 }
 

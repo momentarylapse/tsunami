@@ -38,10 +38,6 @@ void Synthesizer::__delete__()
 	this->Configurable::~Configurable();
 }
 
-void Synthesizer::reset()
-{
-}
-
 void Synthesizer::renderMetronomeClick(BufferBox &buf, int pos, int level, float volume)
 {
 	if (level == 0)
@@ -51,17 +47,20 @@ void Synthesizer::renderMetronomeClick(BufferBox &buf, int pos, int level, float
 }
 
 
+// _events should be sorted...
+void Synthesizer::feed(const Array<MidiEvent> &_events)
+{
+	events = _events;
+}
 
 void Synthesizer::add(const MidiEvent &e)
 {
-	msg_write("add");
-	int p = e.pitch;
-	for (int i=events[p].num-1; i>=0; i--)
-		if (events[p][i].pos <= e.pos){
-			events[p].insert(e, i+1);
+	for (int i=events.num-1; i>=0; i--)
+		if (events[i].pos <= e.pos){
+			events.insert(e, i+1);
 			return;
 		}
-	events[p].add(e);
+	events.add(e);
 }
 
 void Synthesizer::stopAll()
@@ -86,7 +85,7 @@ void Synthesizer::iterate(int samples)
 
 void Synthesizer::createNotes()
 {
-	for (int p=0; p<128; p++){
+	/*for (int p=0; p<128; p++){
 		foreach(MidiEvent &e, events[p]){
 			if (e.volume > 0){
 				// start new note
@@ -101,7 +100,7 @@ void Synthesizer::createNotes()
 		}
 
 		//events[p].clear();
-	}
+	}*/
 }
 
 void Synthesizer::render(BufferBox &buf)
@@ -115,26 +114,24 @@ int Synthesizer::read(BufferBox &buf)
 	// get from source...
 	buf.scale(0);
 
-	createNotes();
+	//createNotes();
 
-	if ((auto_stop) and (cur_notes.num == 0))
-		return 0;
+	//if ((auto_stop) and (cur_notes.num == 0))
+	//	return 0;
 
 	render(buf);
 
-	iterate(buf.num);
+	//iterate(buf.num);
 
 
-	for (int p=0; p<128; p++)
-		events[p].clear();
+	events.clear();
 
 	return buf.num;
 }
 
 void Synthesizer::resetMidiData()
 {
-	for (int p=0; p<128; p++)
-		events[p].clear();
+	events.clear();
 	cur_notes.clear();
 }
 
@@ -150,7 +147,6 @@ Synthesizer *CreateSynthesizer(const string &name)
 		return new SampleSynthesizer;*/
 	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name);
 	if (s){
-		msg_write("resetConfig");
 		s->resetConfig();
 		s->name = name;
 		return s;

@@ -49,29 +49,6 @@ static int read_var(CFile *f)
 	return i;
 }
 
-static void note_off(int offset, int note_start[128], int note, int vel, Array<MidiNote> &notes)
-{
-	//msg_write("off");
-	if (note_start[note] < 0)
-		return;
-
-	MidiNote n;
-	n.range = Range(note_start[note], offset - note_start[note]);
-	n.pitch = note;
-	n.volume = 1;
-	notes.add(n);
-	note_start[note] = -1;
-}
-
-static void note_on(int offset, int note_start[128], int note, int vel, Array<MidiNote> &notes)
-{
-	//msg_write("on");
-	if (vel == 0)
-		note_off(offset, note_start, note, vel, notes);
-	else
-		note_start[note] = offset;
-}
-
 static string ascii2utf8(const string &s)
 {
 	string r;
@@ -123,10 +100,7 @@ void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 				throw string("midi track header is not \"MTrk\": " + tn);
 			//msg_write("----------------------- track");
 
-			int note_start[128];
-			for (int i=0;i<128;i++)
-				note_start[i] = -1;
-			Array<MidiNote> notes;
+			Array<MidiEvent> events;
 			string track_name;
 			int last_status = 0;
 
@@ -175,11 +149,11 @@ void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 					if (type == 9){ // on
 						int c1 = f->ReadByte() & 127;
 						int c2 = f->ReadByte() & 127;
-						note_on(offset, note_start, c1, c2, notes);
+						events.add(MidiEvent(offset, c1, (float)c2 / 127.0f));
 					}else if (type == 8){ // off
 						int c1 = f->ReadByte() & 127;
 						int c2 = f->ReadByte() & 127;
-						note_off(offset, note_start, c1, c2, notes);
+						events.add(MidiEvent(offset, c1, 0));
 					}else if (type == 10){ // note after touch
 						f->ReadByte();
 						f->ReadByte();
@@ -200,9 +174,9 @@ void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 
 			f->SetPos(pos0 + tsize, true);
 
-			if (notes.num > 0){
+			if (events.num > 0){
 				Track *t = a->addTrack(Track::TYPE_MIDI);
-				t->midi.append(notes);
+				t->midi.append(events);
 				t->name = track_name;
 			}
 		}

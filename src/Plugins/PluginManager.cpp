@@ -218,8 +218,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "renderNote", Script::mf(&Synthesizer::renderNote), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::createPanel), &synth);
 	//Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::reset), &synth);
+	//Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::reset), &synth);
 	Script::LinkExternal("Synthesizer.resetConfig", Script::mf(&Synthesizer::resetConfig));
+	Script::LinkExternal("Synthesizer.resetState", Script::mf(&Synthesizer::resetState));
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
 	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::renderMetronomeClick));
@@ -292,9 +293,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.addSample", Script::mf(&Track::addSample));
 	Script::LinkExternal("Track.deleteSample", Script::mf(&Track::deleteSample));
 	Script::LinkExternal("Track.editSample", Script::mf(&Track::editSample));
-	Script::LinkExternal("Track.addMidiNote", Script::mf(&Track::addMidiNote));
-	Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::addMidiNotes));
-	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::deleteMidiNote));
+	Script::LinkExternal("Track.addMidiEvent", Script::mf(&Track::addMidiEvent));
+	Script::LinkExternal("Track.addMidiEvents", Script::mf(&Track::addMidiEvents));
+	Script::LinkExternal("Track.deleteMidiEvent", Script::mf(&Track::deleteMidiEvent));
 	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::setSynthesizer));
 	Script::LinkExternal("Track.addBars", Script::mf(&Track::addBars));
 	Script::LinkExternal("Track.addPause", Script::mf(&Track::addPause));

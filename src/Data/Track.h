@@ -79,8 +79,9 @@ public:
 	void _cdecl deleteSample(int index);
 	void _cdecl editSample(int index, float volume, bool mute, int rep_num, int rep_delay);
 	void _cdecl addMidiNote(const MidiNote &n);
-	void _cdecl addMidiNotes(Array<MidiNote> notes);
-	void _cdecl deleteMidiNote(int index);
+	void _cdecl addMidiEvent(const MidiEvent &e);
+	void _cdecl addMidiEvents(const Array<MidiEvent> &events);
+	void _cdecl deleteMidiEvent(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
 	void _cdecl addBars(int index, float bpm, int beats, int bars);

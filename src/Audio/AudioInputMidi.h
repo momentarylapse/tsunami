@@ -75,9 +75,6 @@ private:
 	bool capturing;
 	bool accumulating;
 
-	int tone_start[128];
-	float tone_volume[128];
-
 	AudioStream *preview_stream;
 	SynthesizerRenderer *preview_renderer;
 };

@@ -130,14 +130,13 @@ void WriteBar(CFile *f, BarPattern &b)
 	EndChunk(f);
 }
 
-void WriteMidiNote(CFile *f, MidiNote &n)
+void WriteMidiEvent(CFile *f, MidiEvent &e)
 {
-	BeginChunk(f, "note");
+	BeginChunk(f, "event");
 
-	f->WriteInt(n.range.offset);
-	f->WriteInt(n.range.num);
-	f->WriteInt(n.pitch);
-	f->WriteFloat(n.volume);
+	f->WriteInt(e.pos);
+	f->WriteInt(e.pitch);
+	f->WriteFloat(e.volume);
 	f->WriteInt(0); // reserved
 
 	EndChunk(f);
@@ -164,8 +163,8 @@ void WriteMidi(CFile *f, MidiData &m)
 	f->WriteStr("");
 	f->WriteInt(0); // reserved
 
-	foreach(MidiNote &n, m)
-		WriteMidiNote(f, n);
+	foreach(MidiEvent &e, m)
+		WriteMidiEvent(f, e);
 
 	foreach(MidiEffect *e, m.fx)
 		WriteMidiEffect(f, e);
@@ -474,7 +473,7 @@ void ReadChunkBar(CFile *f, Array<BarPattern> *bar)
 	bar->add(b);
 }
 
-void ReadChunkMidiNote(CFile *f, Array<MidiNote> *notes)
+void ReadChunkMidiNote(CFile *f, MidiData *m)
 {
 	MidiNote n;
 	n.range.offset = f->ReadInt();
@@ -482,7 +481,18 @@ void ReadChunkMidiNote(CFile *f, Array<MidiNote> *notes)
 	n.pitch = f->ReadInt();
 	n.volume = f->ReadFloat();
 	f->ReadInt(); // reserved
-	notes->add(n);
+	m->add(MidiEvent(n.range.offset, n.pitch, n.volume));
+	m->add(MidiEvent(n.range.end(), n.pitch, 0));
+}
+
+void ReadChunkMidiEvent(CFile *f, MidiData *m)
+{
+	MidiEvent e;
+	e.pos = f->ReadInt();
+	e.pitch = f->ReadInt();
+	e.volume = f->ReadFloat();
+	f->ReadInt(); // reserved
+	m->add(e);
 }
 
 void ReadChunkMidiEffect(CFile *f, MidiData *m)
@@ -507,6 +517,7 @@ void ReadChunkMidiData(CFile *f, MidiData *midi)
 	f->ReadInt(); // reserved
 
 	AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
+	AddChunkHandler("event", (chunk_reader*)&ReadChunkMidiEvent, midi);
 	AddChunkHandler("note", (chunk_reader*)&ReadChunkMidiNote, midi);
 	AddChunkHandler("effect", (chunk_reader*)&ReadChunkMidiEffect, midi);
 }

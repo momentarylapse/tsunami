@@ -123,13 +123,13 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 		m = &midi[ti];
 
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
-	Array<MidiNote> notes = m->getNotes(r);
+	Array<MidiEvent> events = m->getEvents(r);
+	foreach(MidiEvent &e, events)
+		e.pos -= r.offset;
 
 	t->synth->sample_rate = audio->sample_rate;
-	foreach(MidiNote &n, notes){
-		Range rr = Range(n.range.offset - range_cur.offset, n.range.num);
-		t->synth->renderNote(buf, rr, n.pitch, n.volume);
-	}
+	t->synth->feed(events);
+	t->synth->read(buf);
 }
 
 void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
@@ -292,7 +292,7 @@ void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool allow_loop)
 	foreachi(Track *t, a->track, i){
 		//midi.add(t, t->midi);
 		midi.add(t->midi);
-		t->synth->reset();
+		t->synth->resetState();
 		foreach(Effect *fx, t->fx)
 			fx->prepare();
 		foreach(MidiEffect *fx, t->midi.fx){
@@ -310,5 +310,5 @@ void AudioRenderer::seek(int _pos)
 	pos = _pos;
 	_offset = pos - _range.offset;
 	foreach(Track *t, audio->track)
-		t->synth->reset();
+		t->synth->resetState();
 }

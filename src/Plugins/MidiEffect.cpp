@@ -86,13 +86,13 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 	tsunami->plugin_manager->context.set(t, 0, r);
 
 	MidiData midi;
-	midi.append(t->midi.getNotes(r));
+	midi.append(t->midi.getEvents(r));
 
 	t->root->action_manager->beginActionGroup();
 
-	foreachib(MidiNote &n, t->midi, i)
-		if (r.is_inside(n.range.offset)){
-			t->deleteMidiNote(i);
+	foreachib(MidiEvent &e, t->midi, i)
+		if (r.is_inside(e.pos)){
+			t->deleteMidiEvent(i);
 			_foreach_it_.update(); // TODO...
 		}
 	process(&midi);

@@ -13,13 +13,9 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, MidiData &_m
 	offset = _offset;
 	midi = _midi;
 	midi.sort();
-	foreach(MidiNote &n, midi)
-		n.range.offset += offset;
+	foreach(MidiEvent &e, midi)
+		e.pos += offset;
 	midi.sort();
-}
-
-ActionTrackInsertMidi::~ActionTrackInsertMidi()
-{
 }
 
 
@@ -30,14 +26,14 @@ void *ActionTrackInsertMidi::execute(Data *d)
 
 	inserted_at.clear();
 
-	foreachb(MidiNote &n, midi){
+	foreachb(MidiEvent &e, midi){
 		int index = 0;
 		for (int i=0;i<t->midi.num;i++)
-			if (n.range.offset >= t->midi[i].range.offset){
+			if (e.pos >= t->midi[i].pos){
 				index = i + 1;
 				break;
 			}
-		t->midi.insert(n, index);
+		t->midi.insert(e, index);
 		inserted_at.add(index);
 	}
 

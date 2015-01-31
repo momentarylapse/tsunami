@@ -92,7 +92,7 @@ class Synthesizer
 	extern virtual void renderNote(BufferBox buf, Range range, float pitch, float volume)
 	extern virtual ConfigPanel *createPanel()
 	//extern virtual void updateDialog()
-	extern virtual void reset()
+	extern void resetState()
 	//extern virtual PluginData* _get_config()
 	//extern virtual PluginData* _get_state()
 	extern void resetConfig()

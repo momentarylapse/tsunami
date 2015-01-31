@@ -156,8 +156,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "process", Script::mf(&Effect::processTrack), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::createPanel), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "resetConfig", Script::mf(&Effect::resetConfig), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "resetState", Script::mf(&Effect::resetState), &effect);
+	Script::LinkExternal("AudioEffect.resetConfig", Script::mf(&Effect::resetConfig));
+	Script::LinkExternal("AudioEffect.resetState", Script::mf(&Effect::resetState));
 	//Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
 	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
 
@@ -171,8 +171,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("MidiEffect", "__delete__", Script::mf(&MidiEffect::__delete__), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "process", Script::mf(&MidiEffect::process), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "createPanel", Script::mf(&MidiEffect::createPanel), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "resetConfig", Script::mf(&MidiEffect::resetConfig), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "resetState", Script::mf(&MidiEffect::resetState), &midieffect);
+	Script::LinkExternal("MidiEffect.resetConfig", Script::mf(&MidiEffect::resetConfig));
+	Script::LinkExternal("MidiEffect.resetState", Script::mf(&MidiEffect::resetState));
 	//Script::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Script::mf(&MidiEffect::UpdateDialog), &midieffect);
 	Script::LinkExternal("MidiEffect.notify", Script::mf(&MidiEffect::notify));
 
@@ -219,7 +219,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::createPanel), &synth);
 	//Script::DeclareClassVirtualIndex("Synthesizer", "updateDialog", Script::mf(&Synthesizer::UpdateDialog), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "reset", Script::mf(&Synthesizer::reset), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "resetConfig", Script::mf(&Synthesizer::resetConfig), &synth);
+	Script::LinkExternal("Synthesizer.resetConfig", Script::mf(&Synthesizer::resetConfig));
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
 	Script::LinkExternal("Synthesizer.renderMetronomeClick", Script::mf(&Synthesizer::renderMetronomeClick));

@@ -17,7 +17,20 @@ public:
 	virtual ~DummySynthesizer();
 	void __init__();
 
-	virtual void renderNote(BufferBox &buf, const Range &range, float pitch, float volume);
+	virtual void render(BufferBox &buf);
+
+	class State : public PluginData
+	{
+	public:
+		virtual void reset();
+		struct{
+			float volume;
+			float phase;
+			bool fading;
+		}pitch[128];
+	};
+
+	State state;
 };
 
 #endif /* DUMMYSYNTHESIZER_H_ */

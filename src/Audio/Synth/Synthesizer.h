@@ -44,7 +44,7 @@ public:
 
 	bool auto_stop;
 
-private:
+protected:
 	void createNotes();
 	void iterate(int samples);
 

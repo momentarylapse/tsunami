@@ -14,6 +14,7 @@
 #include "PluginManager.h"
 #include "../Stuff/Log.h"
 #include "../View/Helper/Slider.h"
+#include "../Audio/Synth/DummySynthesizer.h"
 
 void GlobalRemoveSliders(HuiPanel*);
 
@@ -203,8 +204,12 @@ PluginData *Configurable::get_config()
 PluginData *Configurable::get_state()
 {
 	Script::Type *type = Script::GetDynamicType(this);
-	if (!type)
+	if (!type){
+		DummySynthesizer *ds = dynamic_cast<DummySynthesizer*>(this);
+		if (ds)
+			return &ds->state;
 		return NULL;
+	}
 	foreach(Script::ClassElement &e, type->element)
 		if ((e.name == "state") && (e.type->GetRoot()->name == "PluginData")){
 			PluginData *state = (PluginData*)((char*)this + e.offset);
@@ -244,9 +249,11 @@ void Configurable::configFromString(const string &param)
 //   try to execute   Configurable.config.reset()
 void Configurable::resetConfig()
 {
-	msg_db_f("Configurable.resetConfig", 1);
+	msg_db_f("Configurable.resetConfig", 0);
+	msg_write(p2s(this));
 
 	PluginData *config = get_config();
+	msg_write(p2s(config));
 	if (!config)
 		return;
 	config->reset();

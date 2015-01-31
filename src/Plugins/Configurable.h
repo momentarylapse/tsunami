@@ -43,8 +43,8 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	virtual void _cdecl resetConfig();
-	virtual void _cdecl resetState();
+	void _cdecl resetConfig();
+	void _cdecl resetState();
 	bool configure();
 	virtual ConfigPanel *_cdecl createPanel();
 	void _cdecl notify();

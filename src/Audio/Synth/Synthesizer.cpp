@@ -54,6 +54,7 @@ void Synthesizer::renderMetronomeClick(BufferBox &buf, int pos, int level, float
 
 void Synthesizer::add(const MidiEvent &e)
 {
+	msg_write("add");
 	int p = e.pitch;
 	for (int i=events[p].num-1; i>=0; i--)
 		if (events[p][i].pos <= e.pos){
@@ -99,7 +100,7 @@ void Synthesizer::createNotes()
 			}
 		}
 
-		events[p].clear();
+		//events[p].clear();
 	}
 }
 
@@ -123,6 +124,10 @@ int Synthesizer::read(BufferBox &buf)
 
 	iterate(buf.num);
 
+
+	for (int p=0; p<128; p++)
+		events[p].clear();
+
 	return buf.num;
 }
 
@@ -145,6 +150,7 @@ Synthesizer *CreateSynthesizer(const string &name)
 		return new SampleSynthesizer;*/
 	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name);
 	if (s){
+		msg_write("resetConfig");
 		s->resetConfig();
 		s->name = name;
 		return s;

@@ -12,7 +12,7 @@
 #include "../../Tsunami.h"
 #include "../../Stuff/Log.h"
 #include "../../Plugins/PluginManager.h"
-#include <math.h>
+#include "../../lib/math/math.h"
 
 
 const int MANY_SAMPLES = 0x60000000;
@@ -38,12 +38,15 @@ void Synthesizer::__delete__()
 	this->Configurable::~Configurable();
 }
 
-void Synthesizer::renderMetronomeClick(BufferBox &buf, int pos, int level, float volume)
+void Synthesizer::addMetronomeClick(int pos, int level, float volume)
 {
-	if (level == 0)
-		renderNote(buf, Range(pos, 0), 81, volume);
-	else
-		renderNote(buf, Range(pos, 0), 74, volume * 0.5f);
+	if (level == 0){
+		add(MidiEvent(pos, 81, volume));
+		add(MidiEvent(pos+100, 81, 0));
+	}else{
+		add(MidiEvent(pos, 74, volume * 0.5f));
+		add(MidiEvent(pos+100, 74, 0));
+	}
 }
 
 
@@ -63,50 +66,18 @@ void Synthesizer::add(const MidiEvent &e)
 	events.add(e);
 }
 
-void Synthesizer::stopAll()
+void Synthesizer::endAllNotes()
 {
-	foreach(MidiNote &n, cur_notes){
-		if (n.range.end() > 0){
-			add(MidiEvent(0, n.pitch, 0));
-		}
-	}
 }
 
-void Synthesizer::iterate(int samples)
+void Synthesizer::enablePitch(int pitch)
 {
-	for (int i=0;i<cur_notes.num;i++){
-		cur_notes[i].range.offset -= samples;
-		if (cur_notes[i].range.end() + keep_notes < 0){
-			cur_notes.erase(i);
-			i --;
-		}
-	}
+	active_pitch.add(pitch);
 }
 
-void Synthesizer::createNotes()
+void Synthesizer::disablePitch(int pitch)
 {
-	/*for (int p=0; p<128; p++){
-		foreach(MidiEvent &e, events[p]){
-			if (e.volume > 0){
-				// start new note
-				MidiNote n = MidiNote(Range(e.pos, MANY_SAMPLES), e.pitch, e.volume);
-				cur_notes.add(n);
-			}else{
-				// stop note
-				foreach(MidiNote &n, cur_notes)
-					if ((e.pitch == n.pitch) and (n.range.is_inside(e.pos)))
-						n.range.set_end(e.pos);
-			}
-		}
-
-		//events[p].clear();
-	}*/
-}
-
-void Synthesizer::render(BufferBox &buf)
-{
-	foreach(MidiNote &n, cur_notes)
-		renderNote(buf, n.range, n.pitch, n.volume);
+	active_pitch.erase(pitch);
 }
 
 int Synthesizer::read(BufferBox &buf)
@@ -114,14 +85,10 @@ int Synthesizer::read(BufferBox &buf)
 	// get from source...
 	buf.scale(0);
 
-	//createNotes();
-
 	//if ((auto_stop) and (cur_notes.num == 0))
 	//	return 0;
 
 	render(buf);
-
-	//iterate(buf.num);
 
 
 	events.clear();
@@ -132,7 +99,16 @@ int Synthesizer::read(BufferBox &buf)
 void Synthesizer::resetMidiData()
 {
 	events.clear();
-	cur_notes.clear();
+}
+
+void Synthesizer::prepare()
+{
+	resetState();
+	active_pitch.clear();
+	for (int p=0; p<128; p++){
+		float freq = pitch_to_freq(p);
+		delta_phase[p] = freq * 2.0f * pi / sample_rate;
+	}
 }
 
 

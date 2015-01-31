@@ -109,7 +109,8 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	t->synth->sample_rate = audio->sample_rate;
 	foreach(Beat &b, beats)
-		t->synth->renderMetronomeClick(buf, b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
+		t->synth->addMetronomeClick(b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
+	t->synth->read(buf);
 }
 
 void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
@@ -292,7 +293,7 @@ void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool allow_loop)
 	foreachi(Track *t, a->track, i){
 		//midi.add(t, t->midi);
 		midi.add(t->midi);
-		t->synth->resetState();
+		t->synth->prepare();
 		foreach(Effect *fx, t->fx)
 			fx->prepare();
 		foreach(MidiEffect *fx, t->midi.fx){
@@ -310,5 +311,5 @@ void AudioRenderer::seek(int _pos)
 	pos = _pos;
 	_offset = pos - _range.offset;
 	foreach(Track *t, audio->track)
-		t->synth->resetState();
+		t->synth->prepare();
 }

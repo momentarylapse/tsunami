@@ -23,7 +23,7 @@ public:
 	{
 	public:
 		virtual void reset();
-		struct{
+		struct PitchState{
 			float volume;
 			float phase;
 			bool fading;

@@ -87,23 +87,26 @@ class Synthesizer
 	string name
 	int sample_rate
 	int keep_notes
+	float[128] delta_phase
+	int[] active_pitch
 	extern void __init__()
 	extern virtual void __delete__()
-	extern virtual void renderNote(BufferBox buf, Range range, float pitch, float volume)
+	extern virtual void render(BufferBox buf)
 	extern virtual ConfigPanel *createPanel()
-	//extern virtual void updateDialog()
 	extern void resetState()
-	//extern virtual PluginData* _get_config()
-	//extern virtual PluginData* _get_state()
 	extern void resetConfig()
-	extern void renderMetronomeClick(BufferBox buf, int pos, int level, float volume)
-	extern void render(BufferBox buf)
-	extern int read(BufferBox buf)
+	extern virtual int read(BufferBox buf)
+	
+	extern void addMetronomeClick(int pos, int level, float volume)
+	extern void feed(MidiEvent[] events)
+	
+	extern void enablePitch(int pitch)
+	extern void disablePitch(int pitch)
 	//extern void notify()
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()
-	extern overwrite void renderNote(BufferBox buf, Range range, float pitch, float volume)
+	extern overwrite void render(BufferBox buf)
 
 class SynthesizerRenderer
 	extern void resetMidiData()

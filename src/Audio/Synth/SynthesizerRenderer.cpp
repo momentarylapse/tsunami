@@ -49,7 +49,7 @@ void SynthesizerRenderer::add(const MidiEvent &e)
 void SynthesizerRenderer::stopAll()
 {
 	if (s)
-		s->stopAll();
+		s->endAllNotes();
 }
 
 int SynthesizerRenderer::read(BufferBox &buf)

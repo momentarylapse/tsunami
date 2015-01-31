@@ -43,42 +43,45 @@ void DummySynthesizer::render(BufferBox& buf)
 		foreach(MidiEvent &e, events)
 			if (e.pos == i){
 				int p = e.pitch;
+				State::PitchState &s = state.pitch[p];
 				if (e.volume == 0){
-					state.pitch[p].fading = true;
-					state.pitch[p].lin_range = -1;
+					s.fading = true;
+					s.lin_range = -1;
 				}else{
-					state.pitch[p].fading = false;
-					state.pitch[p].lin_range = 100;
-					state.pitch[p].lin_step = (e.volume - state.pitch[p].volume) / (float)state.pitch[p].lin_range;
+					s.fading = false;
+					s.lin_range = 100;
+					s.lin_step = (e.volume - s.volume) / (float)s.lin_range;
+					enablePitch(p);
 				}
 			}
 
-		for (int p=0; p<128; p++){
+		for (int ip=0; ip<active_pitch.num; ip++){
+			int p = active_pitch[ip];
+			State::PitchState &s = state.pitch[p];
 
-			if (state.pitch[p].fading){
-				state.pitch[p].volume *= exp(-sm_d);
-				if (state.pitch[p].volume <= 0.001f){
-					state.pitch[p].volume = 0;
-					state.pitch[p].fading = false;
+			if (s.fading){
+				s.volume *= exp(-sm_d);
+				if (s.volume <= 0.001f){
+					s.volume = 0;
+					s.fading = false;
 				}
-			}else if (state.pitch[p].lin_range >= 0){
-				state.pitch[p].volume += state.pitch[p].lin_step;
-				state.pitch[p].lin_range --;
+			}else if (s.lin_range >= 0){
+				s.volume += s.lin_step;
+				s.lin_range --;
 			}
 
-			if (state.pitch[p].volume == 0)
+			if (s.volume == 0){
+				disablePitch(p);
 				continue;
+			}
 
-			float freq = pitch_to_freq(p);
-			float dphase = freq * 2.0f * pi / sample_rate;
-
-			float d = sin(state.pitch[p].phase) * state.pitch[p].volume;
+			float d = sin(s.phase) * s.volume;
 			buf.r[i] += d;
 			buf.l[i] += d;
 
-			state.pitch[p].phase += dphase;
-			if (state.pitch[p].phase > 2*pi)
-				state.pitch[p].phase -= 2*pi;
+			s.phase += delta_phase[p];
+			if (s.phase > 2*pi)
+				s.phase -= 2*pi;
 		}
 	}
 }

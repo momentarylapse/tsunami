@@ -16,19 +16,18 @@ class BufferBox;
 class MidiSource;
 class MidiEvent;
 class MidiNote;
+class PluginManager;
 
 class Synthesizer : public Configurable
 {
+	friend class PluginManager;
 public:
 	Synthesizer();
 	virtual ~Synthesizer();
 	void __init__();
 	virtual void __delete__();
 
-	virtual void renderNote(BufferBox &buf, const Range &range, float pitch, float volume){}
-	void renderMetronomeClick(BufferBox &buf, int pos, int level, float volume);
-
-	virtual void render(BufferBox &buf);
+	virtual void render(BufferBox &buf){}
 
 	int sample_rate;
 
@@ -37,22 +36,25 @@ public:
 	virtual int read(BufferBox &buf);
 
 	void feed(const Array<MidiEvent> &events);
+	void addMetronomeClick(int pos, int level, float volume);
 	void add(const MidiEvent &e);
-	void stopAll();
+	void endAllNotes();
 	void resetMidiData();
+	void prepare();
 
 	bool auto_stop;
 
 protected:
-	void createNotes();
-	void iterate(int samples);
 
 	MidiSource *source;
 
 	Array<MidiEvent> events;
 
-	// accumulated...
-	Array<MidiNote> cur_notes;
+	Set<int> active_pitch;
+	void enablePitch(int pitch);
+	void disablePitch(int pitch);
+
+	float delta_phase[128];
 };
 
 Synthesizer *CreateSynthesizer(const string &name);

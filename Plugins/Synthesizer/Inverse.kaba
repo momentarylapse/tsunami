@@ -3,6 +3,9 @@ use "../api.kaba"
 
 class InverseSynthesizer : Synthesizer
 	DummySynthesizer sub
-	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
-		sub.sample_rate = sample_rate
-		sub.renderNote(buf, r, 150 - pitch, volume)
+	overwrite void render(BufferBox buf)
+		sub.setSampleRate(sample_rate)
+		sub.events = events
+		for e in sub.events
+			e.pitch = 150 - e.pitch
+		sub.render(buf)

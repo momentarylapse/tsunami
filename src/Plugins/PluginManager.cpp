@@ -212,6 +212,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
 	Script::DeclareClassOffset("Synthesizer", "name", _offsetof(Synthesizer, name));
 	Script::DeclareClassOffset("Synthesizer", "sample_rate", _offsetof(Synthesizer, sample_rate));
+	Script::DeclareClassOffset("Synthesizer", "events", _offsetof(Synthesizer, events));
 	Script::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
 	Script::DeclareClassOffset("Synthesizer", "active_pitch", _offsetof(Synthesizer, active_pitch));
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
@@ -220,12 +221,12 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.resetConfig", Script::mf(&Synthesizer::resetConfig));
 	Script::LinkExternal("Synthesizer.resetState", Script::mf(&Synthesizer::resetState));
 	Script::LinkExternal("Synthesizer.enablePitch", Script::mf(&Synthesizer::enablePitch));
-	Script::LinkExternal("Synthesizer.disablePitch", Script::mf(&Synthesizer::disablePitch));
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
 	Script::LinkExternal("Synthesizer.addMetronomeClick", Script::mf(&Synthesizer::addMetronomeClick));
 	Script::LinkExternal("Synthesizer.add", Script::mf(&Synthesizer::add));
 	Script::LinkExternal("Synthesizer.feed", Script::mf(&Synthesizer::feed));
+	Script::LinkExternal("Synthesizer.setSampleRate", Script::mf(&Synthesizer::setSampleRate));
 	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
 
 	SynthesizerRenderer synthren(NULL);

@@ -89,19 +89,20 @@ class Synthesizer
 	int keep_notes
 	float[128] delta_phase
 	int[] active_pitch
+	MidiEvent[] events
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void render(BufferBox buf)
 	extern virtual ConfigPanel *createPanel()
 	extern void resetState()
 	extern void resetConfig()
+	extern void setSampleRate(int sample_rate)
 	extern virtual int read(BufferBox buf)
 	
 	extern void addMetronomeClick(int pos, int level, float volume)
 	extern void feed(MidiEvent[] events)
 	
-	extern void enablePitch(int pitch)
-	extern void disablePitch(int pitch)
+	extern void enablePitch(int pitch, bool enable)
 	//extern void notify()
 
 class DummySynthesizer : Synthesizer
@@ -219,9 +220,9 @@ class Track
 	extern SampleRef *addSample(int pos, int index)
 	extern void deleteSample(int index)
 	extern void editSample(int index, float volume, bool mute, int rep_num, int rep_delay)
-	extern void addMidiNote(MidiNote n)
-	extern void addMidiNotes(MidiNote[] notes)
-	extern void deleteMidiNote(int index)
+	extern void addMidiEvent(MidiEvent e)
+	extern void addMidiEvents(MidiEvent[] events)
+	extern void deleteMidiEvent(int index)
 	extern void setSynthesizer(Synthesizer *synth)
 	extern void addBars(int index, float bpm, int beats, int bars)
 	extern void addPause(int index, float time)

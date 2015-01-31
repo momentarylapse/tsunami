@@ -30,6 +30,7 @@ public:
 	virtual void render(BufferBox &buf){}
 
 	int sample_rate;
+	void setSampleRate(int sample_rate);
 
 	int keep_notes;
 
@@ -51,8 +52,7 @@ protected:
 	Array<MidiEvent> events;
 
 	Set<int> active_pitch;
-	void enablePitch(int pitch);
-	void disablePitch(int pitch);
+	void enablePitch(int pitch, bool enable);
 
 	float delta_phase[128];
 };

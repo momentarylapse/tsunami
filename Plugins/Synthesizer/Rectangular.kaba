@@ -1,21 +1,35 @@
 use "../api.kaba"
 use "../tone.kaba"
 
+class RectangularState : PluginData
+	float[128] volume
+	float[128] phase
+	overwrite void reset()
+		for int p, 0, 128
+			volume[p] = 0
+			phase[p] = 0
+
 
 class RectangularSynthesizer : Synthesizer
-	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
-		float freq = pitch_to_freq(pitch)
-		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
+	RectangularState state
 
-		int i0 = max(r.offset, 0)
-		int i1 = min(r.offset + r.length, buf.num)
+	overwrite void render(BufferBox buf)
+		for int i, 0, buf.num
+			for e in events
+				if e.pos == i
+					int pp = e.pitch
+					state.volume[pp] = e.volume
+					enablePitch(pp, e.volume > 0)
+			
+			for p in active_pitch
+				float d = sin(state.phase[p])
+				if d > 0
+					buf.r[i] += state.volume[p]
+					buf.l[i] += state.volume[p]
+				else
+					buf.r[i] -= state.volume[p]
+					buf.l[i] -= state.volume[p]
+				state.phase[p] += delta_phase[p]
+				if state.phase[p] > 2*pi
+					state.phase[p] -= 2*pi
 
-		for int i, i0, i1
-			float tt = (i - r.offset) * f_w
-			float d = sin(tt)
-			if d > 0
-				buf.r[i] += volume
-				buf.l[i] += volume
-			else
-				buf.r[i] -= volume
-				buf.l[i] -= volume

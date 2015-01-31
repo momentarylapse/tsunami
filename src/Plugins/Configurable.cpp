@@ -249,11 +249,9 @@ void Configurable::configFromString(const string &param)
 //   try to execute   Configurable.config.reset()
 void Configurable::resetConfig()
 {
-	msg_db_f("Configurable.resetConfig", 0);
-	msg_write(p2s(this));
+	msg_db_f("Configurable.resetConfig", 1);
 
 	PluginData *config = get_config();
-	msg_write(p2s(config));
 	if (!config)
 		return;
 	config->reset();

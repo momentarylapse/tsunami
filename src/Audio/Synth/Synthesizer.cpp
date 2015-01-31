@@ -20,8 +20,10 @@ const int MANY_SAMPLES = 0x60000000;
 Synthesizer::Synthesizer() :
 	Configurable("Synthesizer", TYPE_SYNTHESIZER)
 {
-	sample_rate = DEFAULT_SAMPLE_RATE;
+	sample_rate = 0;
 	keep_notes = 0;
+
+	setSampleRate(DEFAULT_SAMPLE_RATE);
 }
 
 Synthesizer::~Synthesizer()
@@ -36,6 +38,18 @@ void Synthesizer::__init__()
 void Synthesizer::__delete__()
 {
 	this->Configurable::~Configurable();
+}
+
+void Synthesizer::setSampleRate(int _sample_rate)
+{
+	if (_sample_rate == sample_rate)
+		return;
+	sample_rate = _sample_rate;
+
+	for (int p=0; p<128; p++){
+		float freq = pitch_to_freq(p);
+		delta_phase[p] = freq * 2.0f * pi / sample_rate;
+	}
 }
 
 void Synthesizer::addMetronomeClick(int pos, int level, float volume)
@@ -70,14 +84,12 @@ void Synthesizer::endAllNotes()
 {
 }
 
-void Synthesizer::enablePitch(int pitch)
+void Synthesizer::enablePitch(int pitch, bool enable)
 {
-	active_pitch.add(pitch);
-}
-
-void Synthesizer::disablePitch(int pitch)
-{
-	active_pitch.erase(pitch);
+	if (enable)
+		active_pitch.add(pitch);
+	else
+		active_pitch.erase(pitch);
 }
 
 int Synthesizer::read(BufferBox &buf)
@@ -105,10 +117,6 @@ void Synthesizer::prepare()
 {
 	resetState();
 	active_pitch.clear();
-	for (int p=0; p<128; p++){
-		float freq = pitch_to_freq(p);
-		delta_phase[p] = freq * 2.0f * pi / sample_rate;
-	}
 }
 
 

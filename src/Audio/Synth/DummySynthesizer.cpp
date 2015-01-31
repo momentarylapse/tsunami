@@ -51,7 +51,7 @@ void DummySynthesizer::render(BufferBox& buf)
 					s.fading = false;
 					s.lin_range = 100;
 					s.lin_step = (e.volume - s.volume) / (float)s.lin_range;
-					enablePitch(p);
+					enablePitch(p, true);
 				}
 			}
 
@@ -71,7 +71,7 @@ void DummySynthesizer::render(BufferBox& buf)
 			}
 
 			if (s.volume == 0){
-				disablePitch(p);
+				enablePitch(p, false);
 				continue;
 			}
 

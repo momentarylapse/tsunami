@@ -3,6 +3,28 @@ use "../tone.kaba"
 
 const int NUM_OSCILLATORS = 6
 
+enum
+	MODE_OFF
+	MODE_ATTACK
+	MODE_DECAY
+	MODE_HOLD
+	MODE_RELEASE
+
+
+class PitchOscillatorState
+	float input, output
+	float volume
+	float phi
+	int mode
+	float mode_step
+	int mode_ttl
+
+class PitchState
+	PitchOscillatorState[NUM_OSCILLATORS] osc
+	float volume
+	int num_osc_active
+
+
 class OscillatorConfig
 	float factor
 	float amplitude
@@ -17,15 +39,15 @@ class FMConfig : PluginData
 	OscillatorLink[] link
 	overwrite void reset()
 		link.clear()
-		for int j, 0, NUM_OSCILLATORS
-			osc[j].factor = 1
-			osc[j].amplitude = 0
-			osc[j].attack = 0.01
-			osc[j].decay = 0.4
-			osc[j].release = 0.4
-			osc[j].initial = 0.01
-			osc[j].peak = 1
-			osc[j].sustain = 0.6
+		for o in osc
+			o.factor = 1
+			o.amplitude = 0
+			o.attack = 0.01
+			o.decay = 0.4
+			o.release = 0.4
+			o.initial = 0.01
+			o.peak = 1
+			o.sustain = 0.6
 		osc[0].factor = 1
 		osc[0].amplitude = 0.5
 		/*osc[1].factor = 1.9881
@@ -56,20 +78,17 @@ class FMConfig : PluginData
 		reset()
 	void __assign__(FMConfig o)
 
-class OscillatorState
-	float phi, inp
-	float last_before_release
-
-class NoteState
-	OscillatorState[NUM_OSCILLATORS] osc
-
 class FMState : PluginData
-	NoteState[128] note
+	PitchState[128] pitch
 	overwrite void reset()
-		for int i, 0, 128
-			for int j, 0, NUM_OSCILLATORS
-				note[i].osc[j].inp = 0
-				note[i].osc[j].phi = 0
+		for p in pitch
+			p.num_osc_active = 0
+			for o in p.osc
+				o.volume = 0
+				o.input = 0
+				o.output = 0
+				o.phi = 0
+				o.mode = MODE_OFF
 	void __init__()
 		reset()
 
@@ -89,7 +108,7 @@ class FMPanel : ConfigPanel
 		addText("Attack (ms)", 5, 0, 0, 0, "")
 		addText("Decay (ms)", 6, 0, 0, 0, "")
 		addText("Release (ms)", 7, 0, 0, 0, "")
-		for int j, 0, NUM_OSCILLATORS
+		for j in 0:NUM_OSCILLATORS
 			addSpinButton("0\\0\\32\\0.001", 0, j + 1, 0, 0, "factor_" + j)
 			addSpinButton("0\\0\\32\\0.001", 1, j + 1, 0, 0, "amplitude_" + j)
 			addSpinButton("0\\0\\1\\0.001", 2, j + 1, 0, 0, "initial_" + j)
@@ -101,27 +120,27 @@ class FMPanel : ConfigPanel
 		event("*", &onChange)
 	
 	void onChange()
-		for int j, 0, NUM_OSCILLATORS
-			fc.osc[j].factor = getFloat("factor_" + j)
-			fc.osc[j].amplitude = getFloat("amplitude_" + j)
-			fc.osc[j].initial = getFloat("initial_" + j)
-			fc.osc[j].peak = getFloat("peak_" + j)
-			fc.osc[j].sustain = getFloat("sustain_" + j)
-			fc.osc[j].attack = getFloat("attack_" + j) / 1000
-			fc.osc[j].decay = getFloat("decay_" + j) / 1000
-			fc.osc[j].release = getFloat("release_" + j) / 1000
+		for o,j in fc.osc
+			o.factor = getFloat("factor_" + j)
+			o.amplitude = getFloat("amplitude_" + j)
+			o.initial = getFloat("initial_" + j)
+			o.peak = getFloat("peak_" + j)
+			o.sustain = getFloat("sustain_" + j)
+			o.attack = getFloat("attack_" + j) / 1000
+			o.decay = getFloat("decay_" + j) / 1000
+			o.release = getFloat("release_" + j) / 1000
 		notify()
 	
 	overwrite void update()
-		for int j, 0, NUM_OSCILLATORS
-			setFloat("factor_" + j, fc.osc[j].factor)
-			setFloat("amplitude_" + j, fc.osc[j].amplitude)
-			setFloat("initial_" + j, fc.osc[j].initial)
-			setFloat("peak_" + j, fc.osc[j].peak)
-			setFloat("sustain_" + j, fc.osc[j].sustain)
-			setFloat("attack_" + j, fc.osc[j].attack * 1000)
-			setFloat("decay_" + j, fc.osc[j].decay * 1000)
-			setFloat("release_" + j, fc.osc[j].release * 1000)
+		for o,j in fc.osc
+			setFloat("factor_" + j, o.factor)
+			setFloat("amplitude_" + j, o.amplitude)
+			setFloat("initial_" + j, o.initial)
+			setFloat("peak_" + j, o.peak)
+			setFloat("sustain_" + j, o.sustain)
+			setFloat("attack_" + j, o.attack * 1000)
+			setFloat("decay_" + j, o.decay * 1000)
+			setFloat("release_" + j, o.release * 1000)
 		
 
 class FMSynthesizer : Synthesizer
@@ -132,71 +151,67 @@ class FMSynthesizer : Synthesizer
 		return new FMPanel(self)
 
 	overwrite void render(BufferBox buf)
-		/*int n = pitch + 0.4
-		float freq = pitch_to_freq(pitch)
-		float w_base = freq * 2.0 * pi / sample_rate
-		NoteState *ns = &state.note[n]
-		
-		float[NUM_OSCILLATORS] w
-		float[NUM_OSCILLATORS] oup
-		int[NUM_OSCILLATORS] attack
-		int[NUM_OSCILLATORS] decay
-		int[NUM_OSCILLATORS] release
-		int[NUM_OSCILLATORS] t1
-		float[NUM_OSCILLATORS] c_attack
-		float[NUM_OSCILLATORS] c_decay
-		float[NUM_OSCILLATORS] c_release
-		
-		keep_notes = 0
-		
-		for int j, 0, NUM_OSCILLATORS
-			w[j] = w_base * config.osc[j].factor
-			attack[j] = sample_rate * config.osc[j].attack
-			decay[j] = sample_rate * config.osc[j].decay
-			release[j] = sample_rate * config.osc[j].release
-			t1[j] = attack[j] + decay[j]
-			c_attack[j] = log(config.osc[j].peak / config.osc[j].initial) / attack[j]
-			c_decay[j] = log(config.osc[j].sustain / config.osc[j].peak) / decay[j]
-			c_release[j] = log(0.01 / config.osc[j].sustain) / release[j]
-			if release[j] > keep_notes
-				keep_notes = release[j]
-			
 
-		int i0 = max(r.offset, 0)
-		int i1 = min(r.offset + r.length + keep_notes, buf.num)
+		for i in 0:buf.num
 
-		for int i, i0, i1
-			float final = 0
-			int dt = i - r.offset
-			
-			// oscillate
-			for int j, 0, NUM_OSCILLATORS
-				ns.osc[j].phi += w[j] * (1 + ns.osc[j].inp)
-				oup[j] = sin(ns.osc[j].phi) * config.osc[j].amplitude
-				ns.osc[j].inp = 0
-				
-				// hull curve
-				float h
-				if dt > r.length
-					h = ns.osc[j].last_before_release * exp(c_release[j] * (dt - r.length))
-				else
-					if dt < attack[j]
-						h = config.osc[j].initial * exp(c_attack[j] * dt)
-					else if dt < t1[j]
-						h = config.osc[j].peak * exp(c_decay[j] * (dt - attack[j]))
+			// current events?
+			for e in events
+				if e.pos == i
+					int pp = e.pitch + 0.4
+					PitchState *s = &state.pitch[pp]
+					if e.volume == 0
+						for o,oi in s.osc
+							o.mode = MODE_RELEASE
+							o.mode_ttl = config.osc[oi].release * sample_rate
+							o.mode_step = -o.volume / o.mode_ttl
 					else
-						h = config.osc[j].sustain
-					ns.osc[j].last_before_release = h
-				oup[j] *= h
+						s.volume = e.volume
+						s.num_osc_active = NUM_OSCILLATORS
+						for o,oi in s.osc
+							OscillatorConfig *oc = &config.osc[oi]
+							o.mode = MODE_ATTACK
+							o.mode_ttl = oc.attack * sample_rate
+							o.mode_step = (oc.amplitude * oc.peak - o.volume) / o.mode_ttl
+						enablePitch(pp, true)
+
+			for p in active_pitch
+				PitchState *s = &state.pitch[p]
+				for o,oi in s.osc
+					oc = &config.osc[oi]
+					if o.mode == MODE_ATTACK
+						o.volume += o.mode_step
+						o.mode_ttl --
+						if o.mode_ttl < 0
+							o.mode = MODE_DECAY
+							o.mode_ttl = oc.decay * sample_rate
+							o.mode_step = (oc.sustain * oc.amplitude - o.volume) / o.mode_ttl
+					else if o.mode == MODE_DECAY
+						o.volume += o.mode_step
+						o.mode_ttl --
+						if o.mode_ttl < 0
+							o.mode = MODE_HOLD
+					else if o.mode == MODE_RELEASE
+						o.volume += o.mode_step
+						o.mode_ttl --
+						if o.mode_ttl < 0
+							o.mode = MODE_OFF
+							s.num_osc_active --
+							if s.num_osc_active == 0
+								enablePitch(p, false)
+								
+					o.phi += delta_phase[p] * oc.factor * (1 + o.input)
+					o.output = sin(o.phi) * o.volume
+					o.input = 0
+					if o.phi > 8*pi
+						o.phi = loop(o.phi, 0, 8*pi)
 			
-			// transport
-			for l in config.link
-				if l.dest >= 0
-					ns.osc[l.dest].inp += oup[l.source]
-				else
-					final += oup[l.source]
-					
-			// output
-			float d = final * volume
-			buf.r[i] += d
-			buf.l[i] += d*/
+				// transport
+				for l in config.link
+					if l.dest >= 0
+						s.osc[l.dest].input += s.osc[l.source].output
+					else
+						// output
+						float d = s.osc[l.source].output * s.volume
+						buf.r[i] += d
+						buf.l[i] += d
+	

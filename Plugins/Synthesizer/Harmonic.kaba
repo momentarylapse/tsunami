@@ -74,7 +74,7 @@ class HarmonicSynthesizer : Synthesizer
 			// current events?
 			for e in events
 				if e.pos == i
-					int pp = e.pitch
+					int pp = e.pitch+0.4
 					PitchState *s = &state.pitch[pp]
 					if e.volume == 0
 						s.fading = true

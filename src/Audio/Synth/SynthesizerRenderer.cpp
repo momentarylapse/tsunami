@@ -41,12 +41,11 @@ void SynthesizerRenderer::setSynthesizer(Synthesizer *_s)
 
 void SynthesizerRenderer::add(const MidiEvent &e)
 {
-	msg_write("-a");
 	if (s)
 		s->add(e);
 }
 
-void SynthesizerRenderer::stopAll()
+void SynthesizerRenderer::endAllNotes()
 {
 	if (s)
 		s->endAllNotes();

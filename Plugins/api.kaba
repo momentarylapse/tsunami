@@ -87,7 +87,7 @@ class Synthesizer
 	string name
 	int sample_rate
 	int keep_notes
-	float[128] delta_phase
+	float[128] delta_phi
 	int[] active_pitch
 	MidiEvent[] events
 	extern void __init__()

@@ -30,7 +30,7 @@ public:
 	virtual int read(BufferBox &buf);
 
 	void add(const MidiEvent &e);
-	void stopAll();
+	void endAllNotes();
 	void resetMidiData();
 
 	bool auto_stop;

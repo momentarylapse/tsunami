@@ -213,13 +213,13 @@ int AudioInputMidi::doCapturing()
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:
 				data.add(MidiEvent(pos, pitch, (float)ev->data.note.velocity / 127.0f));
-				preview_renderer->add(data.back());
+				preview_renderer->add(MidiEvent(0, pitch, (float)ev->data.note.velocity / 127.0f));
 				//msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:
 				//msg_write(format("note off %d %d", ev->data.control.channel, ev->data.note.note));
 				data.add(MidiEvent(pos, pitch, 0));
-				preview_renderer->add(data.back());
+				preview_renderer->add(MidiEvent(0, pitch, 0));
 				break;
 		}
 		snd_seq_free_event(ev);

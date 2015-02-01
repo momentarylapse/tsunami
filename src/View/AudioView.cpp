@@ -525,7 +525,7 @@ void AudioView::onLeftButtonDown()
 	if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TIME)){
 		setCursorPos(selection.pos);
 	}else if (selection.type == SEL_TYPE_SELECTION_START){
-		// switch end / start
+		// swap end / start
 		selection.type = SEL_TYPE_SELECTION_END;
 		hover.type = SEL_TYPE_SELECTION_END;
 		sel_raw.invert();
@@ -596,7 +596,7 @@ void AudioView::onLeftButtonUp()
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 		cur_track->addMidiEvents(midi_notes_to_events(getCreationNotes()));
 
-		midi_preview_renderer->stopAll();
+		midi_preview_renderer->endAllNotes();
 	}
 	cur_action = NULL;
 

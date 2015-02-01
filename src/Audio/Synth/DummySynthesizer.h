@@ -25,7 +25,7 @@ public:
 		virtual void reset();
 		struct PitchState{
 			float volume;
-			float phase;
+			float phi;
 			bool fading;
 			float lin_step;
 			int lin_range;

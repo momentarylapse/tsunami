@@ -12,7 +12,7 @@
 void DummySynthesizer::State::reset()
 {
 	for (int i=0; i<128; i++){
-		pitch[i].phase = 0;
+		pitch[i].phi = 0;
 		pitch[i].volume = 0;
 		pitch[i].fading = false;
 		pitch[i].lin_range = -1;
@@ -75,13 +75,13 @@ void DummySynthesizer::render(BufferBox& buf)
 				continue;
 			}
 
-			float d = sin(s.phase) * s.volume;
+			float d = sin(s.phi) * s.volume;
 			buf.r[i] += d;
 			buf.l[i] += d;
 
-			s.phase += delta_phase[p];
-			if (s.phase > 2*pi)
-				s.phase -= 2*pi;
+			s.phi += delta_phi[p];
+			if (s.phi > 8*pi)
+				s.phi = loopf(s.phi, 0, 2*pi);
 		}
 	}
 }

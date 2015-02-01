@@ -310,5 +310,5 @@ void AudioRenderer::seek(int _pos)
 	pos = _pos;
 	_offset = pos - _range.offset;
 	foreach(Track *t, audio->track)
-		t->synth->prepare();
+		t->synth->endAllNotes();
 }

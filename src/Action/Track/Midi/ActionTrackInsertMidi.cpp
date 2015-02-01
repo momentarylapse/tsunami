@@ -12,7 +12,6 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, MidiData &_m
 	track_no = get_track_index(t);
 	offset = _offset;
 	midi = _midi;
-	midi.sort();
 	foreach(MidiEvent &e, midi)
 		e.pos += offset;
 	midi.sort();
@@ -27,10 +26,10 @@ void *ActionTrackInsertMidi::execute(Data *d)
 	inserted_at.clear();
 
 	foreachb(MidiEvent &e, midi){
-		int index = 0;
+		int index = t->midi.num;
 		for (int i=0;i<t->midi.num;i++)
-			if (e.pos >= t->midi[i].pos){
-				index = i + 1;
+			if (e.pos < t->midi[i].pos){
+				index = i;
 				break;
 			}
 		t->midi.insert(e, index);

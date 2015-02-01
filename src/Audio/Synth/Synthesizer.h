@@ -43,6 +43,8 @@ public:
 	void resetMidiData();
 	void prepare();
 
+	void iterateEvents(int samples);
+
 	bool auto_stop;
 
 protected:
@@ -52,9 +54,10 @@ protected:
 	Array<MidiEvent> events;
 
 	Set<int> active_pitch;
+	Array<int> delete_me;
 	void enablePitch(int pitch, bool enable);
 
-	float delta_phase[128];
+	float delta_phi[128];
 };
 
 Synthesizer *CreateSynthesizer(const string &name);

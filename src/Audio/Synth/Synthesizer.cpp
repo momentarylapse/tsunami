@@ -48,7 +48,7 @@ void Synthesizer::setSampleRate(int _sample_rate)
 
 	for (int p=0; p<128; p++){
 		float freq = pitch_to_freq(p);
-		delta_phase[p] = freq * 2.0f * pi / sample_rate;
+		delta_phi[p] = freq * 2.0f * pi / sample_rate;
 	}
 }
 
@@ -67,7 +67,7 @@ void Synthesizer::addMetronomeClick(int pos, int level, float volume)
 // _events should be sorted...
 void Synthesizer::feed(const Array<MidiEvent> &_events)
 {
-	events = _events;
+	events.append(_events);
 }
 
 void Synthesizer::add(const MidiEvent &e)
@@ -82,6 +82,8 @@ void Synthesizer::add(const MidiEvent &e)
 
 void Synthesizer::endAllNotes()
 {
+	foreach(int p, active_pitch)
+		add(MidiEvent(0, p, 0));
 }
 
 void Synthesizer::enablePitch(int pitch, bool enable)
@@ -90,6 +92,17 @@ void Synthesizer::enablePitch(int pitch, bool enable)
 		active_pitch.add(pitch);
 	else
 		active_pitch.erase(pitch);
+		// delayed deletion (makes things easier in the render() function)
+		//delete_me.add(pitch);
+}
+
+void Synthesizer::iterateEvents(int samples)
+{
+	for (int i=events.num-1; i>=0; i--)
+		if (events[i].pos >= samples)
+			events[i].pos -= samples;
+		else
+			events.erase(i);
 }
 
 int Synthesizer::read(BufferBox &buf)
@@ -102,8 +115,7 @@ int Synthesizer::read(BufferBox &buf)
 
 	render(buf);
 
-
-	events.clear();
+	iterateEvents(buf.num);
 
 	return buf.num;
 }

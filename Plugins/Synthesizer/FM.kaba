@@ -174,6 +174,7 @@ class FMSynthesizer : Synthesizer
 							o.mode_step = (oc.amplitude * oc.peak - o.volume) / o.mode_ttl
 						enablePitch(pp, true)
 
+			int[] del_me
 			for p in active_pitch
 				PitchState *s = &state.pitch[p]
 				for o,oi in s.osc
@@ -197,9 +198,9 @@ class FMSynthesizer : Synthesizer
 							o.mode = MODE_OFF
 							s.num_osc_active --
 							if s.num_osc_active == 0
-								enablePitch(p, false)
+								del_me.add(p)
 								
-					o.phi += delta_phase[p] * oc.factor * (1 + o.input)
+					o.phi += delta_phi[p] * oc.factor * (1 + o.input)
 					o.output = sin(o.phi) * o.volume
 					o.input = 0
 					if o.phi > 8*pi
@@ -214,4 +215,5 @@ class FMSynthesizer : Synthesizer
 						float d = s.osc[l.source].output * s.volume
 						buf.r[i] += d
 						buf.l[i] += d
+			
 	

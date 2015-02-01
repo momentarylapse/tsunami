@@ -34,8 +34,8 @@ class SpecGrid : Grid
 		
 		Image im
 		im.create(w, h, Black)
-		for int x, 0, w
-			for int y, 0, h
+		for x in 0:w
+			for y in 0:h
 				im.setPixel(x, y, im0.getPixel(x * xa + xb, y * ya + yb))
 		c.drawImage(r.x1, r.y1, im)
 	
@@ -86,14 +86,14 @@ void show_spec()
 	
 	float log_max_min = log(MAX_FREQ / MIN_FREQ)
 	
-	for int t, 0, NT
+	for t in 0:NT
 		int offset = (buf.num - N) * t / NT
 		
-		for int j, 0, N
+		for j in 0:N
 			sub[j] = buf.r[offset + j]
 		fft_r2c(sub, f)
 		float ww = i2f(N) / audio.sample_rate
-		for int i, 0, NF
+		for i in 0:NF
 			float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
 			float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
 			int j0 = fmin * ww
@@ -101,7 +101,7 @@ void show_spec()
 			j0 = clamp(j0, 0, f.num)
 			j1 = clamp(j1, 0, f.num)
 			float bmaxr = 0
-			for int j, j0, j1
+			for j in j0:j1
 				float amp = f[j].x * f[j].x + f[j].y * f[j].y
 				if bmaxr < amp
 					bmaxr = amp
@@ -109,8 +109,8 @@ void show_spec()
 			sg[t][i] = bmaxr
 	
 	im0.create(NT, NF, Black)
-	for int t, 0, NT
-		for int i, 0, NF
+	for t in 0:NT
+		for i in 0:NF
 			float ff = sg[t][i] / _max
 			im0.setPixel(t, NF - i - 1, f2col(ff))
 	

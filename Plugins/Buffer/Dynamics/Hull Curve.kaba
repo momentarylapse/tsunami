@@ -15,7 +15,7 @@ class Config : PluginData
 	void fill_inter(FloatInterpolator fi)
 		fi.setType("cubic-spline-notang")
 		fi.add(curve[0].y, 0)
-		for int i, 1, curve.num
+		for i in 1:curve.num
 			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 		fi.normalize()
 
@@ -37,7 +37,7 @@ class HullCurve : AudioEffect
 		config.fill_inter(fi)
 	
 		// hull curve
-		for int i, 1, b.num
+		for i in 1:b.num
 			float param = i2f(i) / b.num
 			float db = fi.get(param)
 			b[i] = b[i] * pow(10, db / 20)
@@ -62,7 +62,7 @@ class HullGrid : Grid
 		drawCurve(c, fi, true)
 	
 		// points
-		for int i, 0, config.curve.num
+		for i in 0:config.curve.num
 			drawPoint2(c, config.curve[i], i == Selected, i == MouseOver)
 
 	// left button down -> select
@@ -81,7 +81,7 @@ class HullGrid : Grid
 
 	// right button down -> new point
 	overwrite void onRightButtonDown()
-		for int i, 1, config.curve.num
+		for i in 1:config.curve.num
 			complex q = project2(config.curve[i - 1])
 			complex p = project2(config.curve[i])
 			if (mx > q.x) and (mx < p.x)
@@ -112,8 +112,8 @@ class HullGrid : Grid
 		else
 		// mouse over?
 			MouseOver = -1
-			for int i, 0, config.curve.num
-				complex p = project2(config.curve[i])
+			for c,i in config.curve
+				complex p = project2(c)
 				if (mx > p.x - 5) and (mx < p.x + 5) and (my > p.y - 5) and (my < p.y + 5)
 					MouseOver = i
 		redraw()

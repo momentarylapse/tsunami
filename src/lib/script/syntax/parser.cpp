@@ -914,43 +914,49 @@ Command *SyntaxTree::GetCommand(Function *f)
 void SyntaxTree::ParseSpecialCommandFor(Block *block, Function *f)
 {
 	msg_db_f("ParseSpecialCommandFor", 4);
-	// variable
+
+	// variable name
 	Exp.next();
-	Command *for_var;
-	// internally declared?
-	bool internally = false;
-	if ((Exp.cur == "int") || (Exp.cur == "float")){
-		Type *t = (Exp.cur == "int") ? TypeInt : TypeFloat32;
-		internally = true;
-		Exp.next();
-		int var_no = f->AddVar(Exp.cur, t);
-		exlink_make_var_local(this, t, var_no);
-			for_var = cp_command(&GetExistenceLink);
-	}else{
-		GetExistence(Exp.cur, f);
-			for_var = cp_command(&GetExistenceLink);
-		if ((!is_variable(for_var->kind)) || ((for_var->type != TypeInt) && (for_var->type != TypeFloat32)))
-			DoError("int or float variable expected after \"for\"");
-	}
+	string var_name = Exp.cur;
+	Exp.next();
+
+	if (Exp.cur != "in")
+		DoError("\"in\" expected after variable in for");
 	Exp.next();
 
 	// first value
-	if (Exp.cur != ",")
-		DoError("\",\" expected after variable in for");
-	Exp.next();
-	Command *val0 = CheckParamLink(GetCommand(f), for_var->type, "for", 1);
+	Command *val0 = GetCommand(f);
+
 
 	// last value
-	if (Exp.cur != ",")
-		DoError("\",\" expected after first value in for");
+	if (Exp.cur != ":")
+		DoError("\":\" expected after first value in for");
 	Exp.next();
-	Command *val1 = val1 = CheckParamLink(GetCommand(f), for_var->type, "for", 2);
+	Command *val1 = GetCommand(f);
 
 	Command *val_step = NULL;
-	if (Exp.cur == ","){
+	if (Exp.cur == ":"){
 		Exp.next();
-		val_step = CheckParamLink(GetCommand(f), for_var->type, "for", 2);
+		val_step = GetCommand(f);
 	}
+
+	// type?
+	Type *t = val0->type;
+	if (val1->type == TypeFloat32)
+		t = val1->type;
+	if (val_step)
+		if (val_step->type == TypeFloat32)
+			t = val_step->type;
+	val0 = CheckParamLink(val0, t, "for", 1);
+	val1 = CheckParamLink(val1, t, "for", 1);
+	if (val_step)
+		val_step = CheckParamLink(val_step, t, "for", 1);
+
+	// variable
+	Command *for_var;
+	int var_no = f->AddVar(var_name, t);
+	exlink_make_var_local(this, t, var_no);
+	for_var = cp_command(&GetExistenceLink);
 
 	// implement
 	// for_var = val0
@@ -990,37 +996,45 @@ void SyntaxTree::ParseSpecialCommandFor(Block *block, Function *f)
 
 	// <for_var> declared internally?
 	// -> force it out of scope...
-	if (internally)
-		f->var[for_var->link_no].name = "-out-of-scope-";
+	f->var[for_var->link_no].name = "-out-of-scope-";
 }
 
 void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 {
 	msg_db_f("ParseSpecialCommandForall", 4);
-	// for index
-	int var_no_index = f->AddVar(format("-for_index_%d-", ForIndexCount ++), TypeInt);
-	exlink_make_var_local(this, TypeInt, var_no_index);
-		Command *for_index = cp_command(&GetExistenceLink);
 
 	// variable
 	Exp.next();
 	string var_name = Exp.cur;
 	Exp.next();
 
+	// index
+	string index_name = format("-for_index_%d-", ForIndexCount ++);
+	if (Exp.cur == ","){
+		Exp.next();
+		index_name = Exp.cur;
+		Exp.next();
+	}
+
+	// for index
+	int var_no_index = f->AddVar(index_name, TypeInt);
+	exlink_make_var_local(this, TypeInt, var_no_index);
+		Command *for_index = cp_command(&GetExistenceLink);
+
 	// super array
 	if (Exp.cur != "in")
 		DoError("\"in\" expected after variable in \"for . in .\"");
 	Exp.next();
 	Command *for_array = GetOperand(f);
-	if (!for_array->type->is_super_array)
-		DoError("list expected as second parameter in \"for . in .\"");
+	if ((!for_array->type->is_super_array) and (!for_array->type->is_array))
+		DoError("array or list expected as second parameter in \"for . in .\"");
 	//Exp.next();
 
 	// variable...
 	Type *var_type = for_array->type->parent;
 	int var_no = f->AddVar(var_name, var_type);
 	exlink_make_var_local(this, var_type, var_no);
-		Command *for_var = cp_command(&GetExistenceLink);
+	Command *for_var = cp_command(&GetExistenceLink);
 
 	// 0
 	int nc = AddConstant(TypeInt);
@@ -1032,10 +1046,18 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 	Command *cmd_assign = add_command_operator(for_index, val0, OperatorIntAssign);
 	block->command.add(cmd_assign);
 
-	// array.num
-	Command *val1 = AddCommand(KindAddressShift, config.PointerSize, TypeInt);
-	val1->set_num_params(1);
-	val1->set_param(0, for_array);
+	Command *val1;
+	if (for_array->type->is_super_array){
+		// array.num
+		val1 = AddCommand(KindAddressShift, config.PointerSize, TypeInt);
+		val1->set_num_params(1);
+		val1->set_param(0, for_array);
+	}else{
+		// array.size
+		int nc = AddConstant(TypeInt);
+		Constants[nc].setInt(for_array->type->array_length);
+		val1 = add_command_const(nc);
+	}
 
 	// while(for_index < val1)
 	Command *cmd_cmp = add_command_operator(for_index, val1, OperatorIntSmaller);
@@ -1058,9 +1080,16 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 	// &for_var
 	Command *for_var_ref = ref_command(for_var);
 
-	// &array.data[for_index]
-	Command *array_el = add_command_parray(shift_command(cp_command(for_array), false, 0, var_type->GetPointer()),
-	                                       for_index, var_type);
+	Command *array_el;
+	if (for_array->type->is_super_array){
+		// &array.data[for_index]
+		array_el = add_command_parray(shift_command(cp_command(for_array), false, 0, var_type->GetPointer()),
+	                                       	   for_index, var_type);
+	}else{
+		// &array[for_index]
+		array_el = add_command_parray(ref_command(for_array),
+	                                       	   for_index, var_type);
+	}
 	Command *array_el_ref = ref_command(array_el);
 
 	// &for_var = &array[for_index]
@@ -1074,7 +1103,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 
 	// force for_var out of scope...
 	f->var[for_var->link_no].name = "-out-of-scope-";
-	//f->var[for_index->link_no].name = "-out-of-scope-";
+	f->var[for_index->link_no].name = "-out-of-scope-";
 }
 
 void SyntaxTree::ParseSpecialCommandWhile(Block *block, Function *f)
@@ -1173,8 +1202,13 @@ void SyntaxTree::ParseSpecialCommandIf(Block *block, Function *f)
 
 void SyntaxTree::ParseSpecialCommand(Block *block, Function *f)
 {
+	bool has_colon = false;
+	foreach(ExpressionBuffer::Expression &e, Exp.cur_line->exp)
+		if (e.name == ":")
+			has_colon = true;
+
 	// special commands...
-	if ((Exp.cur == "for") && (Exp.cur_line->exp.num >= 3) && (Exp.cur_line->exp[2].name == "in")){
+	if (Exp.cur == "for" and !has_colon){
 		ParseSpecialCommandForall(block, f);
 	}else if (Exp.cur == "for"){
 		ParseSpecialCommandFor(block, f);

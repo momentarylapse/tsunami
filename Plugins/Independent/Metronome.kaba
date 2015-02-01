@@ -34,9 +34,10 @@ class MetronomeRenderer : AudioRendererInterface
 		// render clicks
 		while offset < buf.num
 			if cur_beat == 0
-				synth.renderMetronomeClick(buf, offset, 0, volume)
+				synth.addMetronomeClick(offset, 0, volume)
 			else
-				synth.renderMetronomeClick(buf, offset, 1, volume)
+				synth.addMetronomeClick(offset, 1, volume)
+			synth.read(buf)
 			cur_beat = loopi(cur_beat + 1, 0, num_beats - 1)
 			offset += sm_m
 		offset -= buf.num

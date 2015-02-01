@@ -128,14 +128,11 @@ class FMSynthesizer : Synthesizer
 	FMConfig config
 	FMState state
 
-	overwrite void reset()
-		state.reset()
-
 	overwrite ConfigPanel *createPanel()
 		return new FMPanel(self)
 
-	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
-		int n = pitch + 0.4
+	overwrite void render(BufferBox buf)
+		/*int n = pitch + 0.4
 		float freq = pitch_to_freq(pitch)
 		float w_base = freq * 2.0 * pi / sample_rate
 		NoteState *ns = &state.note[n]
@@ -202,4 +199,4 @@ class FMSynthesizer : Synthesizer
 			// output
 			float d = final * volume
 			buf.r[i] += d
-			buf.l[i] += d
+			buf.l[i] += d*/

@@ -14,7 +14,7 @@ class SampleConfig : PluginData
 
 class SampleSynthesizer : Synthesizer
 	SampleConfig config
-	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
+	overwrite void render(BufferBox buf)
 		keep_notes = sample_rate * 3
 		//plugin_context.track
 		//buf.add(audio.sample[0].buf, r.offset, volume, 0)

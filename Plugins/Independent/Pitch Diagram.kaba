@@ -54,11 +54,11 @@ void Draw()
 	c.setColor(Black)
 	c.drawStr(20, 20, Frequency.str2(1) + "Hz")
 	c.drawStr(20, 40, Volume.str())
-	for int i, 0, played.num
-		if played[i] < 0
+	for p,i in played
+		if p < 0
 			continue
 		float x = i
-		float y = h - h * (played[i] - 40.0) / 60.0
+		float y = h - h * (p - 40.0) / 60.0
 		c.drawLine(x, y, x + 2, y)
 	
 	c.setColor(Black)
@@ -79,11 +79,11 @@ void UpdateInput()
 	buf.resize(buf_size)
 	
 	// alten Pufferinhalt verschieben
-	for int i, 0, buf_size - num
+	for i in 0:(buf_size - num)
 		buf[i] = buf[i + num]
 	
 	// neuen Inhalt anfügen
-	for int i, 0, num
+	for i in 0:num
 		buf[buf_size - num + i] = (input.cur_buf.r[i] + input.cur_buf.l[i]) / 2
 	
 	/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
@@ -96,10 +96,10 @@ void UpdateInput()
 	fft_r2c(buf, bufc)
 	float max = 0
 	float fmax = 0, fmax2 = 0
-	for int i, 0, bufc.num
+	for b,i in bufc
 		float f = get_freq(i)
 		if f > f_min and f < f_max
-			float amp = (bufc[i].x*bufc[i].x + bufc[i].y*bufc[i].y) / f
+			float amp = (b.x*b.x + b.y*b.y) / f
 			//floatout f
 			/*if (amp > max * 2.5) or (amp > max and f < fmax2)
 				max = amp

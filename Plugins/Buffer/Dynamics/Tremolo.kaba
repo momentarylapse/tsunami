@@ -21,11 +21,11 @@ class Tremolo : AudioEffect
 	
 		float f_c = 1.0 / audio.sample_rate * 2 * pi * config.Speed
 	
-		for int i, 0, b.num
+		for bb,i in b
 			float f = 1 - (1 + cos(i * f_c)) * config.Depth * 0.5
 	
 			// old value
-			b[i] *= f
+			bb *= f
 	
 	overwrite void process(BufferBox buf)
 		doTremolo(buf.r)

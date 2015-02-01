@@ -6,6 +6,13 @@
 //------------------------------------------------------------------------------------------------//
 
 
+matrix3::matrix3(const float f[9])
+{
+	for (int i=0;i<9;i++)
+		e[i]=f[i];
+}
+
+
 matrix3 matrix3::operator + (const matrix3 &m) const
 {
 	matrix3 r;
@@ -65,6 +72,12 @@ matrix3 matrix3::operator * (const matrix3 &m) const
 	return r;
 }
 
+void matrix3::operator *= (const matrix3 &m)
+{
+	matrix3 r = (*this * m);
+	*this = r;
+}
+
 vector matrix3::operator * (const vector &v) const
 {
 	return vector(	v.x*_00 + v.y*_01 + v.z*_02,
@@ -76,6 +89,15 @@ string matrix3::str() const
 {
 	return format("(%f, %f, %f; %f, %f, %f; %f, %f, %f)", _00, _01, _02, _10, _11, _12, _20, _21, _22);
 }
+
+// kaba
+void matrix3::imul(const matrix3 &m)
+{	*this *= m;	}
+matrix3 matrix3::mul(const matrix3 &m) const
+{	return *this * m;	}
+
+vector matrix3::mul_v(const vector &v) const
+{	return *this * v;	}
 
 void Matrix3Identity(matrix3 &m)
 {

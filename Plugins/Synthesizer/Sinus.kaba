@@ -5,7 +5,7 @@ class SinusState : PluginData
 	float[128] volume
 	float[128] phase
 	overwrite void reset()
-		for int p, 0, 128
+		for p in 0:128
 			volume[p] = 0
 			phase[p] = 0
 
@@ -14,7 +14,7 @@ class SinusSynthesizer : Synthesizer
 	SinusState state
 
 	overwrite void render(BufferBox buf)
-		for int i, 0, buf.num
+		for i in 0:buf.num
 			for e in events
 				if e.pos == i
 					int pp = e.pitch

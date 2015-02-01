@@ -37,10 +37,10 @@ class Flanger : AudioEffect
 		float f_b = 0.5 * config.Depth * config.Delay
 		float f_c = 1.0 / sample_rate * 2 * pi * config.Speed
 	
-		for int i, 0, b.num
+		for bb,i in b
 	
 			// old value
-			temp[p] = b[i]
+			temp[p] = bb
 		
 			// shift
 			float dt = f_a - cos((i + state.offset) * f_c) * f_b
@@ -50,7 +50,7 @@ class Flanger : AudioEffect
 				p2 += temp.num
 		
 			// add echo
-			b[i] += temp[p2]
+			bb += temp[p2]
 		
 			p ++
 			if p >= temp.num

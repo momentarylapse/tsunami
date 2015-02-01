@@ -99,9 +99,9 @@ class GridAxis
 		GridPartition r
 		int e_min = log(abs(abs(val_min))) / log(10)
 		int e_max = log(abs(abs(val_max))) / log(10) + 1
-		for int e, e_min, e_max
+		for e in e_min:e_max
 			float vv0 = pow(10, e)
-			for int i, 1, 10
+			for i in 1:10
 				float vv = vv0 * i
 				if (vv >= val_min) and (vv <= val_max)
 					GridTick tt
@@ -133,7 +133,7 @@ class GridAxis
 		float pitch_max = freq_to_pitch(val_max)
 		int oct_min = pitch_get_octave(pitch_min)
 		int oct_max = pitch_get_octave(pitch_max) + 1
-		for int o, oct_min, oct_max
+		for o in oct_min:oct_max
 			int pitch = pitch_from_octave_and_rel(0, o)
 			GridTick tt
 			tt.value = pitch_to_freq(pitch)
@@ -253,8 +253,8 @@ class GridData
 		complex[] pp
 		tt = rangef(0, 1, 0.003)
 		yy = fi.getList(tt)
-		for int i, 0, tt.num
-			complex zz = project2(complex(x_axis.rel2val(tt[i]), yy[i]))
+		for t,i in tt
+			complex zz = project2(complex(x_axis.rel2val(t), yy[i]))
 			pp.add(zz)
 		if fill_below
 			pp.add(complex(x + w, y + h))
@@ -268,8 +268,8 @@ class GridData
 	
 	void drawCurveB(Painter *c, complex[] _p, bool fill_below, color col)
 		complex[] pp
-		for int i, 0, _p.num
-			pp.add(project2(_p[i]))
+		for p in _p
+			pp.add(project2(p))
 		if fill_below
 			pp.add(complex(x + w, y + h))
 			pp.add(complex(x, y + h))

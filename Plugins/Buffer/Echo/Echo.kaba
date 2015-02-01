@@ -35,13 +35,13 @@ class Echo : AudioEffect
 
 	void doDelay(float[] b, float[] d)
 		int p = state.offset % d.num
-		for int i, 0, b.num
+		for bb in b
 	
 			// old value
-			float b0 = b[i]
+			float b0 = bb
 		
 			// add echo
-			b[i] = b[i] + d[p] * config.Volume
+			bb = bb + d[p] * config.Volume
 			//clampf(b[i], -1, 1)
 		
 			// add to echo

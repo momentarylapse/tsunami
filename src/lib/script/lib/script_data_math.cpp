@@ -324,6 +324,8 @@ void amd64_vec_inter_get_tang(vector &r, Interpolator<vector> &inter, float t)
 {	r = inter.getTang(t);	}
 void amd64_mat_vec_mul(vector &r, matrix &m, vector &v)
 {	r = m * v;	}
+void amd64_mat3_vec_mul(vector &r, matrix3 &m, vector &v)
+{	r = m * v;	}
 void amd64_vec_ang_add(vector &r, vector &a, vector &b)
 {	r = VecAngAdd(a, b);	}
 void amd64_vec_ang_interpolate(vector &r, vector &a, vector &b, float t)
@@ -649,6 +651,10 @@ void SIAddPackageMath()
 		class_add_element("_33",	TypeFloat32,	32);
 		class_add_element("e",		TypeFloatArray3x3,	0, FLAG_HIDDEN);
 		class_add_element("_e",		TypeFloatArray9,	0, FLAG_HIDDEN);
+		class_add_func("__mul__",	TypeMatrix3,	mf(&matrix3::mul), FLAG_PURE);
+			func_add_param("other",	TypeMatrix3);
+		class_add_func("__mul__",	TypeVector,	amd64_wrap(mf(&matrix3::mul_v), &amd64_mat3_vec_mul), FLAG_PURE);
+			func_add_param("other",	TypeVector);
 		class_add_func("str",		TypeString,			mf(&matrix3::str), FLAG_PURE);
 	
 	add_class(TypeVli);
@@ -952,6 +958,9 @@ void SIAddPackageMath()
 	add_func("MatrixInverse",		TypeVoid,	(void*)&MatrixInverse, FLAG_PURE);
 		func_add_param("m_out",		TypeMatrix);
 		func_add_param("m_in",		TypeMatrix);
+	add_func("Matrix3Inverse",		TypeVoid,	(void*)&Matrix3Inverse, FLAG_PURE);
+		func_add_param("m_out",		TypeMatrix3);
+		func_add_param("m_in",		TypeMatrix3);
 	// quaternions
 	add_func("QuaternionRotationV",	TypeVoid,	(void*)&QuaternionRotationV, FLAG_PURE);
 		func_add_param("q_out",		TypeQuaternion);
@@ -1032,6 +1041,7 @@ void SIAddPackageMath()
 	add_const("e_z", TypeVector, (void*)&e_z);
 	// matrix
 	add_const("m_id", TypeMatrix, (void*)&m_id);
+	add_const("m3_id", TypeMatrix3, (void*)&m3_id);
 	// quaternion
 	add_const("q_id", TypeQuaternion, (void*)&q_id);
 	// color

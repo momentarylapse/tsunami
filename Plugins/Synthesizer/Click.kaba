@@ -12,7 +12,7 @@ class ClickSynthesizer : Synthesizer
 		int i0 = max(r.offset, 0)
 		int i1 = min(r.offset + sm_d * 8, buf.num)
 
-		for int i, i0, i1
+		for i in i0:i1
 			float tt = (i - r.offset) * f_w
 			float d = sin(tt) * volume
 			float fi = (i - r.offset) / sm_d

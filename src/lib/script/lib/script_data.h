@@ -208,7 +208,6 @@ enum{
 	OperatorVectorMultiplyVV,
 	OperatorVectorMultiplyVF,
 	OperatorVectorMultiplyFV,
-	OperatorVectorDivide,
 	OperatorVectorDivideVF,
 	OperatorVectorAddS,
 	OperatorVectorSubtractS,

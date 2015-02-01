@@ -14,8 +14,8 @@ class Octaver : AudioEffect
 	Config config
 
 	void doOctaver(float[] b)
-		for int i, 0, b.num
-			b[i] = (b[i] * b[i]) * config.Level + b[i] * (1 - config.Level)
+		for bb in b
+			bb = (bb * bb) * config.Level + bb * (1 - config.Level)
 
 	overwrite void process(BufferBox buf)
 		doOctaver(buf.r)

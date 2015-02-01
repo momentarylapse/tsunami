@@ -14,8 +14,8 @@ class Config : PluginData
 	float[NUM_BANDS] Factor
 
 	overwrite void reset()
-		for int i, 0, NUM_BANDS
-			Factor[i] = 1
+		for f in Factor
+			f = 1
 
 class Equalizer15 : AudioEffect
 
@@ -27,7 +27,7 @@ class Equalizer15 : AudioEffect
 
 	void __init__()
 
-		for int i, 0, NUM_BANDS
+		for i in 0:NUM_BANDS
 			FreqMin[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i - 0.5))
 			FreqMax[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i + 0.5))
 		FreqMin[0] = 0
@@ -43,11 +43,11 @@ class Equalizer15 : AudioEffect
 
 		// equalize
 		float w = i2f(b.num) / audio.sample_rate
-		for int i, 0, NUM_BANDS
+		for i in 0:NUM_BANDS
 			int j0 = clamp(FreqMin[i] * w, 0, len2)
 			int j1 = clamp(FreqMax[i] * w, 0, len2)
 			float ff = config.Factor[i] / b.num
-			for int j, j0, j1
+			for j in j0:j1
 				f[j] = f[j] * ff
 		
 		// transform back
@@ -68,7 +68,7 @@ class Equalizer15Panel : ConfigPanel
 		super.__init__(_eq)
 		addGrid("", 0, 1, NUM_BANDS, 2, "grid")
 		setTarget("grid", 0)
-		for int i, 0, NUM_BANDS
+		for i in 0:NUM_BANDS
 			addSlider("!expandy,vertical", i, 0, 0, 0, "slider_" + i)
 			//addString("slider_" + i, "0.5:0")
 		addText("20", 0, 1, 0, 0, "")
@@ -86,12 +86,12 @@ class Equalizer15Panel : ConfigPanel
 
 	void onEvent()
 		Event *e = HuiGetEvent()
-		for int i, 0, NUM_BANDS
+		for i in 0:NUM_BANDS
 			if e.id == ("slider_" + i)
 				c.config.Factor[i] = getFloat("") * 2
 				notify()
 		
 	overwrite void update()
-		for int i, 0, NUM_BANDS
+		for i in 0:NUM_BANDS
 			setFloat("slider_" + i, c.config.Factor[i] / 2)
 	

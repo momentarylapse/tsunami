@@ -1230,10 +1230,9 @@ void SIAddOperators()
 	add_operator(OperatorNotEqual,		TypeBool,		TypeClass,		TypeClass);
 	add_operator(OperatorAdd,			TypeVector,		TypeVector,		TypeVector);
 	add_operator(OperatorSubtract,		TypeVector,		TypeVector,		TypeVector);
-	add_operator(OperatorMultiply,		TypeVector,		TypeVector,		TypeVector);
+	add_operator(OperatorMultiply,		TypeFloat32,	TypeVector,		TypeVector);
 	add_operator(OperatorMultiply,		TypeVector,		TypeVector,		TypeFloat32);
 	add_operator(OperatorMultiply,		TypeVector,		TypeFloat32,		TypeVector);
-	add_operator(OperatorDivide,		TypeVector,		TypeVector,		TypeVector);
 	add_operator(OperatorDivide,		TypeVector,		TypeVector,		TypeFloat32);
 	add_operator(OperatorAddS,			TypeVoid,		TypeVector,		TypeVector);
 	add_operator(OperatorSubtractS,		TypeVoid,		TypeVector,		TypeVector);

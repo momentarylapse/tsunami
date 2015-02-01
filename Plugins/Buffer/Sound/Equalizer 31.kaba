@@ -14,8 +14,8 @@ class Config : PluginData
 	float[NUM_BANDS] Factor
 
 	overwrite void reset()
-		for int i, 0, NUM_BANDS
-			Factor[i] = 1
+		for f in Factor
+			f = 1
 
 class Equalizer31 : AudioEffect
 
@@ -27,7 +27,7 @@ class Equalizer31 : AudioEffect
 	complex[] f
 
 	void __init__()
-		for int i, 0, NUM_BANDS
+		for i in 0:NUM_BANDS
 			FreqMin[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i - 0.5))
 			FreqMax[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i + 0.5))
 		FreqMin[0] = 0
@@ -59,7 +59,7 @@ class Equalizer31 : AudioEffect
 		f.clear()
 
 	overwrite void updateDialog()
-		for int i, 0, NUM_BANDS
+		for i in 0:NUM_BANDS
 			dlg.setFloat("slider_" + i, config.Factor[i] / 2)
 	
 	overwrite void configure()

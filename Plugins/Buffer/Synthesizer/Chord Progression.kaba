@@ -32,15 +32,15 @@ class ChordProgression : AudioEffect
 		int p0 = a.getNextBeat(buf.offset)
 		synth.sample_rate = a.sample_rate
 	
-		for int i, 0, chord.num
+		for c,i in chord
 			int pos0 = f2i(a.sample_rate * config.Duration * i2f(i))
 			int pos1 = f2i(a.sample_rate * config.Duration * i2f(i + 1))
 			if config.DurationByBeats
 				pos0 = p0 - buf.offset
-				for int j, 0, config.Beats
+				for j in 0:config.Beats
 					p0 = a.getNextBeat(p0)
 				pos1 = p0 - buf.offset
-			AddChord(synth, buf, pos0, pos1, chord[i], config.Volume)
+			AddChord(synth, buf, pos0, pos1, c, config.Volume)
 
 	overwrite ConfigPanel *createPanel()
 		return new ChordProgPanel(self)

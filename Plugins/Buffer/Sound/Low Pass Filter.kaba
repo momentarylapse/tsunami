@@ -30,7 +30,7 @@ class LowPassFilter : AudioEffect
 			buf.r[0] = a * buf.r[0] + b * state.r
 			buf.l[0] = a * buf.l[0] + b * state.l
 	
-		for int i, 1, buf.num
+		for i in 1:buf.num
 			buf.r[i] = a * buf.r[i] + b * buf.r[i-1]
 			buf.l[i] = a * buf.l[i] + b * buf.l[i-1]
 		

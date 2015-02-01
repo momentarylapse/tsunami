@@ -39,7 +39,7 @@ class LowPassFilter : AudioEffect
 		// y[i] := b * (y[i-1] + x[i] - x[i-1])
 		// z[i] := α * y[i] + b * z[i-1]
 	
-		for int i, 1, buf.num
+		for i in 1:buf.num
 			tr = buf.r[i]
 			tl = buf.l[i]
 			buf.r[i] = bb * (buf.r[i] + buf.r[i-1] - prev_in_r)

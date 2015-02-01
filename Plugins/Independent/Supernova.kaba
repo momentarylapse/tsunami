@@ -103,14 +103,14 @@ class SuperNovaWindow : Window
 	
 	void drawSheet(float y0)
 		c.setColor(color(1, 0.6, 0.6, 0.6))
-		for int i, 0, 6
+		for i in 0:6
 			float ly = h - (i + 1) * 30
 			c.drawLine(0, ly, w, ly)
 		c.setColor(Black)
 		c.setFontSize(18)
 		for n in MidiTrack.midi.note
 			int s, f
-			for int i, 0, 6
+			for i in 0:6
 				if n.pitch >= StringPitch[i] + HandPosition
 					s = i
 					f = n.pitch - StringPitch[i]
@@ -157,12 +157,12 @@ class SuperNovaWindow : Window
 	
 	void drawConfig()
 		c.setFontSize(20)
-		for int i, 0, LessonName.num
+		for l,i in LessonName
 			if i == hover
 				c.setColor(color(1, 0.8, 0.8, 1))
 				c.drawRect(100, 35 + i * 40, 300, 35)
 			c.setColor(Black)
-			c.drawStr(100, 38 + i * 40, LessonName[i])
+			c.drawStr(100, 38 + i * 40, l)
 		c.setColor(Black)
 		c.setFontSize(24)
 		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
@@ -187,7 +187,7 @@ class SuperNovaWindow : Window
 		hover = -1
 		float mx = HuiGetEvent().mouse_x
 		float my = HuiGetEvent().mouse_y
-		for int i, 0, LessonName.num
+		for l,i in LessonName
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
 		redraw("drawing")
@@ -203,11 +203,11 @@ void UpdateInput()
 	buf.resize(buf_size)
 	
 	// alten Pufferinhalt verschieben
-	for int i, 0, buf_size - num
+	for i in 0:(buf_size - num)
 		buf[i] = buf[i + num]
 	
 	// neuen Inhalt anfügen
-	for int i, 0, num
+	for i in 0:num
 		buf[buf_size - num + i] = (input.cur_buf.r[i] + input.cur_buf.l[i]) / 2
 	
 	/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
@@ -220,10 +220,10 @@ void UpdateInput()
 	fft_r2c(buf, bufc)
 	float max = 0
 	float fmax = 0, fmax2 = 0
-	for int i, 0, bufc.num
+	for b,i in bufc
 		float f = get_freq(i)
 		if f > f_min and f < f_max
-			float amp = (bufc[i].x*bufc[i].x + bufc[i].y*bufc[i].y) / f
+			float amp = (b.x*b.x + b.y*b.y) / f
 			//floatout f
 			/*if (amp > max * 2.5) or (amp > max and f < fmax2)
 				max = amp

@@ -17,7 +17,7 @@ class Config : PluginData
 	void fill_inter(FloatInterpolator fi)
 		fi.setType("cubic-spline-notang")
 		fi.add3(curve[0].y, 0.0, exp(curve[0].z), 0.0)
-		for int i, 1, curve.num
+		for i in 1:curve.num
 			fi.add3(curve[i].y, 0.0, exp(curve[i].z), log(curve[i].x / curve[i - 1].x))
 		fi.normalize()
 
@@ -47,7 +47,7 @@ class Equalizer : AudioEffect
 		// equalize
 		f *= (1.0 / b.num)
 		float w = i2f(b.num) / audio.sample_rate
-		for int i, 1, f.num
+		for i in 1:f.num
 			float freq = i2f(i) / w
 			float param = lin2log(freq, MIN_FREQ, MAX_FREQ)
 			float db = fi.get(param)
@@ -75,7 +75,7 @@ class EqualizerGrid : Grid
 		drawCurve(p, fi, true)
 	
 		// points
-		for int i, 0, c.curve.num
+		for i in 0:c.curve.num
 			drawPoint3(p, c.curve[i], i == Selected, i == MouseOver)
 			
 
@@ -96,7 +96,7 @@ class EqualizerGrid : Grid
 	// right button down -> new point
 	overwrite void onRightButtonDown()
 		vector m = getMouse3(0)
-		for int i, 1, c.curve.num
+		for i in 1:c.curve.num
 			if (m.x > c.curve[i - 1].x) and (m.x < c.curve[i].x)
 				c.curve.insert(m, i)
 				cp.notify()
@@ -125,7 +125,7 @@ class EqualizerGrid : Grid
 		else
 		// mouse over?
 			MouseOver = -1
-			for int i, 0, c.curve.num
+			for i in 0:c.curve.num
 				if mouseOverPoint3(c.curve[i])
 					MouseOver = i
 		redraw()

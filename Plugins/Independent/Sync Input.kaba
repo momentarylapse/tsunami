@@ -14,7 +14,8 @@ void fill(BufferBox buf)
 	buf.l = 0
 	
 	if offset == 0
-		synth.renderMetronomeClick(buf, offset_out, 1, 0, 880)
+		synth.addMetronomeClick(offset_out, 1, 0, 880)
+		synth.read(buf)
 
 void sync()
 	bool found = false

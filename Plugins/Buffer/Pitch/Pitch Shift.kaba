@@ -19,12 +19,11 @@ class PitchShift : AudioEffect
 	complex[] buf2
 
 	void shift_buf(float[] b)
-		int i, j
 		fft_r2c(b, buf1)
 		float f = 1.0 / b.num
 		int ll = b.num / 2
 		buf2.resize(ll)
-		for i, 0, ll
+		for i in 0:ll
 			float i_s = i2f(i) / config.Pitch
 			int ii_s = f2i(i_s)
 			float di_s = i_s - i2f(ii_s)

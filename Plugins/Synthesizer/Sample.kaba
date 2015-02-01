@@ -12,20 +12,37 @@ class SampleConfig : PluginData
 				delete s
 		samples.clear()
 
+class SampleState : PluginData
+	MidiEvent[] events
+	
+
 class SampleSynthesizer : Synthesizer
 	SampleConfig config
+	SampleState state
 	overwrite void render(BufferBox buf)
-		keep_notes = sample_rate * 3
-		//plugin_context.track
-		//buf.add(audio.sample[0].buf, r.offset, volume, 0)
-		int n = pitch + 0.4
-		if n < 0 or n >= config.samples.num
-			return
-		SampleRef *s = config.samples[n]
-		if !s
-			return
+		for e in events
+			if e.volume > 0
+				state.events.add(e)
 		
-		buf.add(*s.buf, r.offset, volume, 0)
+		for e in state.events
+			int n = e.pitch + 0.4
+			if n < 0 or n >= config.samples.num
+				e.pitch = -1
+				continue
+			SampleRef *s = config.samples[n]
+			if !s
+				e.pitch = -1
+				continue
+			buf.add(*s.buf, e.pos, e.volume, 0)
+			e.pos -= buf.num
+			if e.pos < -s.buf.num
+				e.pitch = -1
+			
+		for e,i in state.events
+			if e.pitch < 0
+				state.events.remove(i)
+				i --
+			
 	
 	overwrite ConfigPanel *createPanel()
 		return new SamplePanel(self)
@@ -41,7 +58,7 @@ class SamplePanel : ConfigPanel
 
 	overwrite void update()
 		reset("list")
-		for int i, 0, 128
+		for i in 0:128
 			string name = ""
 			if i < sc.samples.num
 				if sc.samples[i]

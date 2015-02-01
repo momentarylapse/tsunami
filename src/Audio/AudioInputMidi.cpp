@@ -63,6 +63,8 @@ void AudioInputMidi::init()
 void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 {
 	preview_renderer->setSynthesizer(s);
+	if (s and capturing)
+		preview_stream->play();
 }
 
 bool AudioInputMidi::connectTo(AudioInputMidi::MidiPort &p)

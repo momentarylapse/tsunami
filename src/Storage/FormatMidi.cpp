@@ -100,7 +100,7 @@ void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 				throw string("midi track header is not \"MTrk\": " + tn);
 			//msg_write("----------------------- track");
 
-			Array<MidiEvent> events;
+			MidiData events;
 			string track_name;
 			int last_status = 0;
 

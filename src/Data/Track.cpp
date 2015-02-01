@@ -262,10 +262,10 @@ void Track::addMidiEvent(const MidiEvent &e)
 	root->execute(new ActionTrackAddMidiEvent(this, e));
 }
 
-void Track::addMidiEvents(const Array<MidiEvent> &events)
+void Track::addMidiEvents(const MidiData &events)
 {
 	root->action_manager->beginActionGroup();
-	foreach(MidiEvent &e, const_cast<Array<MidiEvent> &>(events))
+	foreach(MidiEvent &e, const_cast<MidiData&>(events))
 		addMidiEvent(e);
 	root->action_manager->endActionGroup();
 }

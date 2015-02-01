@@ -79,9 +79,9 @@ float MidiNote::getFrequency()
 	return 440.0f * pow(2.0f, (float)(pitch - 69) / 12.0f);
 }
 
-Array<MidiEvent> MidiData::getEvents(const Range &r)
+MidiData MidiData::getEvents(const Range &r)
 {
-	Array<MidiEvent> a;
+	MidiData a;
 	for (int i=0;i<num;i++)
 		if (r.is_inside((*this)[i].pos))
 			a.add((*this)[i]);
@@ -127,9 +127,9 @@ MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)
 	volume = _volume;
 }
 
-Array<MidiEvent> midi_notes_to_events(const Array<MidiNote> &notes)
+MidiData midi_notes_to_events(const Array<MidiNote> &notes)
 {
-	Array<MidiEvent> r;
+	MidiData r;
 	foreach(MidiNote &n, const_cast<Array<MidiNote>&>(notes)){
 		r.add(MidiEvent(n.range.offset, n.pitch, n.volume));
 		r.add(MidiEvent(n.range.end(), n.pitch, 0));
@@ -137,11 +137,11 @@ Array<MidiEvent> midi_notes_to_events(const Array<MidiNote> &notes)
 	return r;
 }
 
-Array<MidiNote> midi_events_to_notes(const Array<MidiEvent> &events)
+Array<MidiNote> midi_events_to_notes(const MidiData &events)
 {
 	Array<MidiNote> a;
-	Array<MidiEvent> b;
-	foreach(MidiEvent &e, const_cast<Array<MidiEvent>&>(events)){
+	MidiData b;
+	foreach(MidiEvent &e, const_cast<MidiData&>(events)){
 		if (e.volume > 0){
 			bool exists = false;
 			foreach(MidiEvent &bb, b)

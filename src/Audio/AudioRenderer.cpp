@@ -123,7 +123,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 		m = &midi[ti];
 
 	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
-	Array<MidiEvent> events = m->getEvents(r);
+	MidiData events = m->getEvents(r);
 	foreach(MidiEvent &e, events)
 		e.pos -= r.offset;
 

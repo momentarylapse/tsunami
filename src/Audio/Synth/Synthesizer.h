@@ -10,12 +10,11 @@
 
 #include "../../lib/base/base.h"
 #include "../../Plugins/Configurable.h"
+#include "../../Data/MidiData.h"
 
 class Range;
 class BufferBox;
 class MidiSource;
-class MidiEvent;
-class MidiNote;
 class PluginManager;
 
 class Synthesizer : public Configurable
@@ -36,7 +35,7 @@ public:
 
 	virtual int read(BufferBox &buf);
 
-	void feed(const Array<MidiEvent> &events);
+	void feed(const MidiData &events);
 	void addMetronomeClick(int pos, int level, float volume);
 	void add(const MidiEvent &e);
 	void endAllNotes();
@@ -51,7 +50,7 @@ protected:
 
 	MidiSource *source;
 
-	Array<MidiEvent> events;
+	MidiData events;
 
 	Set<int> active_pitch;
 	Array<int> delete_me;

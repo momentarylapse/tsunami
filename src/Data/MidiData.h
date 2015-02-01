@@ -37,7 +37,7 @@ public:
 class MidiData : public Array<MidiEvent>
 {
 public:
-	Array<MidiEvent> getEvents(const Range &r);
+	MidiData getEvents(const Range &r);
 	Array<MidiNote> getNotes(const Range &r);
 	int getNextEvent(int pos);
 	Range getRange(int elongation);
@@ -47,8 +47,8 @@ public:
 	Array<MidiEffect*> fx;
 };
 
-Array<MidiEvent> midi_notes_to_events(const Array<MidiNote> &notes);
-Array<MidiNote> midi_events_to_notes(const Array<MidiEvent> &events);
+MidiData midi_notes_to_events(const Array<MidiNote> &notes);
+Array<MidiNote> midi_events_to_notes(const MidiData &events);
 
 
 

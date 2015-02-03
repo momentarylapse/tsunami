@@ -37,7 +37,7 @@ void DummySynthesizer::onConfig()
 {
 	for (int i=0; i<128; i++)
 		//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
-		state.pitch[i].env.set(0.005f, 0, 1, 0.02f, sample_rate);
+		state.pitch[i].env.set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
 }
 
 void DummySynthesizer::render(BufferBox& buf)
@@ -52,7 +52,7 @@ void DummySynthesizer::render(BufferBox& buf)
 				if (e.volume == 0){
 					s.env.end();
 				}else{
-					s.env.start(e.volume * 0.8f);
+					s.env.start(e.volume * 0.5f);
 					enablePitch(p, true);
 				}
 			}

@@ -10,8 +10,6 @@
 
 class EnvelopeADSR {
 public:
-	EnvelopeADSR();
-	~EnvelopeADSR();
 
 	void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate);
 	void reset();

@@ -117,6 +117,13 @@ class SynthesizerRenderer
 	extern virtual int read(BufferBox buf)
 	extern void add(MidiEvent e)
 
+class EnvelopeADSR
+	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)
+	extern void reset()
+	extern void start(float volume)
+	extern void end()
+	extern float get()
+
 class TrackRenderBuffer
 	int dummy
 	

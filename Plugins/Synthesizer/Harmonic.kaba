@@ -5,26 +5,24 @@ const int NUM_HARMONICS = 10
 
 class PitchState
 	float volume
-	float phase
-	bool fading
-	float lin_step
-	int lin_range
+	float phi
+	EnvelopeADSR env
 
 class HarminocState : PluginData
 	PitchState[128] pitch
 	overwrite void reset()
 		for p in pitch
 			p.volume = 0
-			p.phase = 0
-			p.fading = false
-			p.lin_range = -1
+			p.phi = 0
+			p.env.reset()
 
 class HarmonicConfig : PluginData
 	float[NUM_HARMONICS] intensity
 	float release
 	overwrite void reset()
-		intensity[0] = 1
-		for i in 1:NUM_HARMONICS
+		intensity[0] = 0.3
+		intensity[1] = 0.1
+		for i in 2:NUM_HARMONICS
 			intensity[i] = 0
 		release = 0.02
 
@@ -65,10 +63,12 @@ class HarmonicSynthesizer : Synthesizer
 
 	overwrite ConfigPanel *createPanel()
 		return new HarmonicPanel(self)
+	
+	overwrite void onConfig()
+		for p in state.pitch
+			p.env.set(0.01, 0.01, 0.7, config.release, sample_rate)
 		
 	overwrite void render(BufferBox buf)
-		float sm_d = 1.0/(config.release * sample_rate)
-
 		for i in 0:buf.num
 
 			// current events?
@@ -77,25 +77,15 @@ class HarmonicSynthesizer : Synthesizer
 					int pp = e.pitch+0.4
 					PitchState *s = &state.pitch[pp]
 					if e.volume == 0
-						s.fading = true
-						s.lin_range = -1
+						s.env.end()
 					else
-						s.fading = false
-						s.lin_range = 100
-						s.lin_step = (e.volume - s.volume) / s.lin_range
+						s.env.start(e.volume)
 						enablePitch(pp, true)
 
 			for p in active_pitch
 				PitchState *s = &state.pitch[p]
 
-				if s.fading
-					s.volume *= exp(-sm_d)
-					if s.volume <= 0.001
-						s.volume = 0
-						s.fading = false
-				else if s.lin_range >= 0
-					s.volume += s.lin_step
-					s.lin_range --
+				s.volume = s.env.get()
 
 				if s.volume == 0
 					enablePitch(p, false)
@@ -103,10 +93,10 @@ class HarmonicSynthesizer : Synthesizer
 
 				float d = 0
 				for j in 0:NUM_HARMONICS
-					d += sin(s.phase * (j+1)) * config.intensity[j]
+					d += sin(s.phi * (j+1)) * config.intensity[j]
 				buf.r[i] += d * s.volume
 				buf.l[i] += d * s.volume
 
-				s.phase += delta_phase[p]
-				if s.phase > 2*pi
-					s.phase -= 2*pi
+				s.phi += delta_phi[p]
+				if s.phi > 8*pi
+					s.phi = loop(s.phi, 0, 2*pi)

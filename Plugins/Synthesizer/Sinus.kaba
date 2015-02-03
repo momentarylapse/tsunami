@@ -25,6 +25,6 @@ class SinusSynthesizer : Synthesizer
 				float d = sin(state.phase[p]) * state.volume[p]
 				buf.r[i] += d
 				buf.l[i] += d
-				state.phase[p] += delta_phase[p]
+				state.phase[p] += delta_phi[p]
 				if state.phase[p] > 2*pi
 					state.phase[p] -= 2*pi

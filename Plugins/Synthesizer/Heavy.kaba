@@ -7,13 +7,13 @@ class HeavySynthesizer : Synthesizer
 		sub.setSampleRate(sample_rate)
 		for e in events
 			MidiEvent ee = e
-			ee.volume = e.volume * 0.5
+			ee.volume = e.volume * 0.3
 			sub.events.add(ee)
 			ee.pitch = e.pitch + 12
-			ee.volume = e.volume * 0.2
+			ee.volume = e.volume * 0.1
 			sub.events.add(ee)
 			ee.pitch = e.pitch + 24
-			ee.volume = e.volume * 0.05
+			ee.volume = e.volume * 0.03
 			sub.events.add(ee)
 			ee.pitch = e.pitch + 36
 			ee.volume = e.volume * 0.01

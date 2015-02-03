@@ -33,7 +33,7 @@ class RectangularSynthesizer : Synthesizer
 				else
 					buf.r[i] -= p.volume
 					buf.l[i] -= p.volume
-				p.phase += delta_phase[ip]
+				p.phase += delta_phi[ip]
 				if p.phase > 2*pi
 					p.phase -= 2*pi
 

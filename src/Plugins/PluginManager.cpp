@@ -246,6 +246,13 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "__delete__", Script::mf(&DummySynthesizer::__delete__), &dsynth);
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "render", Script::mf(&DummySynthesizer::render), &dsynth);
 
+	Script::DeclareClassSize("EnvelopeADSR", sizeof(EnvelopeADSR));
+	Script::LinkExternal("EnvelopeADSR.set", Script::mf(&EnvelopeADSR::set));
+	Script::LinkExternal("EnvelopeADSR.reset", Script::mf(&EnvelopeADSR::reset));
+	Script::LinkExternal("EnvelopeADSR.start", Script::mf(&EnvelopeADSR::start));
+	Script::LinkExternal("EnvelopeADSR.end", Script::mf(&EnvelopeADSR::end));
+	Script::LinkExternal("EnvelopeADSR.get", Script::mf(&EnvelopeADSR::get));
+
 	Script::DeclareClassSize("BarPattern", sizeof(BarPattern));
 	Script::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));
 	Script::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));

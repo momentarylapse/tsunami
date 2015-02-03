@@ -3,21 +3,13 @@ use "../tone.kaba"
 
 const int NUM_OSCILLATORS = 6
 
-enum
-	MODE_OFF
-	MODE_ATTACK
-	MODE_DECAY
-	MODE_HOLD
-	MODE_RELEASE
 
 
 class PitchOscillatorState
 	float input, output
 	float volume
 	float phi
-	int mode
-	float mode_step
-	int mode_ttl
+	EnvelopeADSR env
 
 class PitchState
 	PitchOscillatorState[NUM_OSCILLATORS] osc
@@ -88,7 +80,7 @@ class FMState : PluginData
 				o.input = 0
 				o.output = 0
 				o.phi = 0
-				o.mode = MODE_OFF
+				o.env.reset()
 	void __init__()
 		reset()
 
@@ -110,7 +102,7 @@ class FMPanel : ConfigPanel
 		addText("Release (ms)", 7, 0, 0, 0, "")
 		for j in 0:NUM_OSCILLATORS
 			addSpinButton("0\\0\\32\\0.001", 0, j + 1, 0, 0, "factor_" + j)
-			addSpinButton("0\\0\\32\\0.001", 1, j + 1, 0, 0, "amplitude_" + j)
+			addSpinButton("0\\0\\1\\0.001", 1, j + 1, 0, 0, "amplitude_" + j)
 			addSpinButton("0\\0\\1\\0.001", 2, j + 1, 0, 0, "initial_" + j)
 			addSpinButton("0\\0\\1\\0.001", 3, j + 1, 0, 0, "peak_" + j)
 			addSpinButton("0\\0\\1\\0.001", 4, j + 1, 0, 0, "sustain_" + j)
@@ -149,6 +141,13 @@ class FMSynthesizer : Synthesizer
 
 	overwrite ConfigPanel *createPanel()
 		return new FMPanel(self)
+	
+	overwrite void onConfig()
+		for p in state.pitch
+			for o,i in p.osc
+				OscillatorConfig *c = &config.osc[i]
+				o.env.set(c.attack, c.decay, c.sustain, c.release, sample_rate)
+				o.env.set2(c.initial, c.peak)
 
 	overwrite void render(BufferBox buf)
 
@@ -161,46 +160,26 @@ class FMSynthesizer : Synthesizer
 					PitchState *s = &state.pitch[pp]
 					if e.volume == 0
 						for o,oi in s.osc
-							o.mode = MODE_RELEASE
-							o.mode_ttl = config.osc[oi].release * sample_rate
-							o.mode_step = -o.volume / o.mode_ttl
+							o.env.end()
 					else
-						s.volume = e.volume
 						s.num_osc_active = NUM_OSCILLATORS
 						for o,oi in s.osc
-							OscillatorConfig *oc = &config.osc[oi]
-							o.mode = MODE_ATTACK
-							o.mode_ttl = oc.attack * sample_rate
-							o.mode_step = (oc.amplitude * oc.peak - o.volume) / o.mode_ttl
+							// TODO: e.volume should only effect "output" oscs
+							o.env.start(e.volume * config.osc[oi].amplitude)
 						enablePitch(pp, true)
 
 			int[] del_me
+			del_me.clear()
 			for p in active_pitch
 				PitchState *s = &state.pitch[p]
-				for o,oi in s.osc
-					oc = &config.osc[oi]
-					if o.mode == MODE_ATTACK
-						o.volume += o.mode_step
-						o.mode_ttl --
-						if o.mode_ttl < 0
-							o.mode = MODE_DECAY
-							o.mode_ttl = oc.decay * sample_rate
-							o.mode_step = (oc.sustain * oc.amplitude - o.volume) / o.mode_ttl
-					else if o.mode == MODE_DECAY
-						o.volume += o.mode_step
-						o.mode_ttl --
-						if o.mode_ttl < 0
-							o.mode = MODE_HOLD
-					else if o.mode == MODE_RELEASE
-						o.volume += o.mode_step
-						o.mode_ttl --
-						if o.mode_ttl < 0
-							o.mode = MODE_OFF
-							s.num_osc_active --
-							if s.num_osc_active == 0
-								del_me.add(p)
+				for o in s.osc
+					o.volume = o.env.get()
+					if o.env.just_killed
+						s.num_osc_active --
+						if s.num_osc_active == 0
+							del_me.add(p)
 								
-					o.phi += delta_phi[p] * oc.factor * (1 + o.input)
+					o.phi += delta_phi[p] * (1 + o.input)
 					o.output = sin(o.phi) * o.volume
 					o.input = 0
 					if o.phi > 8*pi
@@ -212,7 +191,7 @@ class FMSynthesizer : Synthesizer
 						s.osc[l.dest].input += s.osc[l.source].output
 					else
 						// output
-						float d = s.osc[l.source].output * s.volume
+						float d = s.osc[l.source].output
 						buf.r[i] += d
 						buf.l[i] += d
 			

@@ -12,6 +12,7 @@ class EnvelopeADSR {
 public:
 
 	void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate);
+	void set2(float initial, float peak);
 	void reset();
 
 	void start(float volume);
@@ -23,6 +24,8 @@ public:
 	float step_attack;
 	float step_decay;
 	float factor_release;
+	float initial;
+	float peak;
 	float sustain;
 	int ttl_attack;
 	int ttl_decay;
@@ -32,6 +35,17 @@ public:
 	int mode;
 	int ttl;
 	float value;
+	bool just_killed;
+	float value_initial;
+	float value_peak;
+	float value_sustain;
+
+	void start_attack();
+	void start_attack_zombie();
+	void start_decay();
+	void start_sustain();
+	void start_release();
+	void kill();
 
 
 	enum

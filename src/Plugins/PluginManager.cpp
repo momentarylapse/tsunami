@@ -248,10 +248,12 @@ void PluginManager::LinkAppScriptData()
 
 	Script::DeclareClassSize("EnvelopeADSR", sizeof(EnvelopeADSR));
 	Script::LinkExternal("EnvelopeADSR.set", Script::mf(&EnvelopeADSR::set));
+	Script::LinkExternal("EnvelopeADSR.set2", Script::mf(&EnvelopeADSR::set2));
 	Script::LinkExternal("EnvelopeADSR.reset", Script::mf(&EnvelopeADSR::reset));
 	Script::LinkExternal("EnvelopeADSR.start", Script::mf(&EnvelopeADSR::start));
 	Script::LinkExternal("EnvelopeADSR.end", Script::mf(&EnvelopeADSR::end));
 	Script::LinkExternal("EnvelopeADSR.get", Script::mf(&EnvelopeADSR::get));
+	Script::DeclareClassOffset("EnvelopeADSR", "just_killed", _offsetof(EnvelopeADSR, just_killed));
 
 	Script::DeclareClassSize("BarPattern", sizeof(BarPattern));
 	Script::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));

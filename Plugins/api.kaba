@@ -119,10 +119,12 @@ class SynthesizerRenderer
 
 class EnvelopeADSR
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)
+	extern void set2(float initial, float peak)
 	extern void reset()
 	extern void start(float volume)
 	extern void end()
 	extern float get()
+	bool just_killed
 
 class TrackRenderBuffer
 	int dummy

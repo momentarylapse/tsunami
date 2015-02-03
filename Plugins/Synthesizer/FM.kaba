@@ -16,22 +16,30 @@ class PitchState
 	float volume
 	int num_osc_active
 
+enum
+	TYPE_SINE
+	TYPE_SQUARE
+	TYPE_SAW
 
 class OscillatorConfig
 	float factor
 	float amplitude
 	float initial, peak, sustain
 	float attack, decay, release
+	int type
+	bool[NUM_OSCILLATORS] target
+	bool target_out
 
 class OscillatorLink
 	int source, dest
 
 class FMConfig : PluginData
 	OscillatorConfig[NUM_OSCILLATORS] osc
-	OscillatorLink[] link
+	//OscillatorLink[] link
 	overwrite void reset()
-		link.clear()
+		//link.clear()
 		for o in osc
+			o.type = TYPE_SINE
 			o.factor = 1
 			o.amplitude = 0
 			o.attack = 0.01
@@ -40,6 +48,9 @@ class FMConfig : PluginData
 			o.initial = 0.01
 			o.peak = 1
 			o.sustain = 0.6
+			for t in o.target
+				t = false
+			o.target_out = false
 		osc[0].factor = 1
 		osc[0].amplitude = 0.5
 		/*osc[1].factor = 1.9881
@@ -50,10 +61,11 @@ class FMConfig : PluginData
 		osc[3].amplitude = 0.5
 		osc[4].factor = 1.9934
 		osc[4].amplitude = 0.7*/
-		OscillatorLink l
-		l.source = 0
-		l.dest = -1
-		link.add(l)
+//		OscillatorLink l
+//		l.source = 0
+//		l.dest = -1
+//		link.add(l)
+		osc[0].target_out = true
 		/*l.source = 1
 		l.dest = 0
 		link.add(l)
@@ -86,53 +98,98 @@ class FMState : PluginData
 
 class FMPanel : ConfigPanel
 	FMConfig *fc
+	int chosen
 	overwrite FMSynthesizer *c
 	void __init__(FMSynthesizer *_s)
 		super.__init__(_s)
 		fc = &c.config
-		addGrid("", 0, 0, 8, NUM_OSCILLATORS + 1, "main_table")
+		addGrid("", 0, 0, 9, NUM_OSCILLATORS + 1, "main_table")
 		setTarget("main_table", 0)
 		addText("Frequency", 0, 0, 0, 0, "")
 		addText("Amplitude", 1, 0, 0, 0, "")
-		addText("Initial", 2, 0, 0, 0, "")
-		addText("Peak", 3, 0, 0, 0, "")
-		addText("Sustain", 4, 0, 0, 0, "")
-		addText("Attack (ms)", 5, 0, 0, 0, "")
-		addText("Decay (ms)", 6, 0, 0, 0, "")
-		addText("Release (ms)", 7, 0, 0, 0, "")
+		addText("Initial", 3, 1, 0, 0, "")
+		addText("Peak", 3, 2, 0, 0, "")
+		addText("Sustain", 3, 3, 0, 0, "")
+		addText("Attack (ms)", 3, 4, 0, 0, "")
+		addText("Decay (ms)", 3, 5, 0, 0, "")
+		addText("Release (ms)", 3, 6, 0, 0, "")
 		for j in 0:NUM_OSCILLATORS
 			addSpinButton("0\\0\\32\\0.001", 0, j + 1, 0, 0, "factor_" + j)
 			addSpinButton("0\\0\\1\\0.001", 1, j + 1, 0, 0, "amplitude_" + j)
-			addSpinButton("0\\0\\1\\0.001", 2, j + 1, 0, 0, "initial_" + j)
-			addSpinButton("0\\0\\1\\0.001", 3, j + 1, 0, 0, "peak_" + j)
-			addSpinButton("0\\0\\1\\0.001", 4, j + 1, 0, 0, "sustain_" + j)
-			addSpinButton("0\\0\\1000\\0.1", 5, j + 1, 0, 0, "attack_" + j)
-			addSpinButton("0\\0\\1000\\0.1", 6, j + 1, 0, 0, "decay_" + j)
-			addSpinButton("0\\0\\1000\\0.1", 7, j + 1, 0, 0, "release_" + j)
+			addRadioButton("", 2, j+1, 0, 0, "chosen:osc_" + j)
+			event("chosen:osc_" + j, &onChosen)
+		addSpinButton("0\\0\\1\\0.001", 4, 1, 0, 0, "initial")
+		addSpinButton("0\\0\\1\\0.001", 4, 2, 0, 0, "peak")
+		addSpinButton("0\\0\\1\\0.001", 4, 3, 0, 0, "sustain")
+		addSpinButton("0\\0\\1000\\0.1", 4, 4, 0, 0, "attack")
+		addSpinButton("0\\0\\1000\\0.1", 4, 5, 0, 0, "decay")
+		addSpinButton("0\\0\\1000\\0.1", 4, 6, 0, 0, "release")
+		addComboBox("sine\\square\\saw", 6, 1, 0, 0, "type")
+		for j in 0:NUM_OSCILLATORS
+			addCheckBox("" + j, 5, j+1, 0, 0, "link_" + j)
+		addCheckBox("out", 5, NUM_OSCILLATORS + 1, 0, 0, "link_out")
 		event("*", &onChange)
+		chosen = 0
+	
+	void onChosen()
+		chosen = HuiGetEvent().id.substr(11, -1).int()
+		update()
 	
 	void onChange()
+		if HuiGetEvent().id.substr(0, 6) == "chosen"
+			return
 		for o,j in fc.osc
 			o.factor = getFloat("factor_" + j)
 			o.amplitude = getFloat("amplitude_" + j)
-			o.initial = getFloat("initial_" + j)
-			o.peak = getFloat("peak_" + j)
-			o.sustain = getFloat("sustain_" + j)
-			o.attack = getFloat("attack_" + j) / 1000
-			o.decay = getFloat("decay_" + j) / 1000
-			o.release = getFloat("release_" + j) / 1000
+			
+		OscillatorConfig *o = &fc.osc[chosen]
+		o.initial = getFloat("initial")
+		o.peak = getFloat("peak")
+		o.sustain = getFloat("sustain")
+		o.attack = getFloat("attack") / 1000
+		o.decay = getFloat("decay") / 1000
+		o.release = getFloat("release") / 1000
+		o.type = getInt("type")
+		
+		/*for l,i in fc.link
+			if l.source == chosen
+				fc.link.remove(i)
+				i --*/
+		o.target_out = isChecked("link_out")
+		/*if isChecked("link_out")
+			OscillatorLink l
+			l.source = chosen
+			l.dest = -1
+			fc.link.add(l)*/
+		for j in 0:NUM_OSCILLATORS
+			o.target[j] = isChecked("link_" + j)
+			/*if isChecked("link_" + j)
+				l.dest = j
+				fc.link.add(l)*/
+		
 		notify()
 	
 	overwrite void update()
 		for o,j in fc.osc
 			setFloat("factor_" + j, o.factor)
 			setFloat("amplitude_" + j, o.amplitude)
-			setFloat("initial_" + j, o.initial)
-			setFloat("peak_" + j, o.peak)
-			setFloat("sustain_" + j, o.sustain)
-			setFloat("attack_" + j, o.attack * 1000)
-			setFloat("decay_" + j, o.decay * 1000)
-			setFloat("release_" + j, o.release * 1000)
+		OscillatorConfig *o = &fc.osc[chosen]
+		setFloat("initial", o.initial)
+		setFloat("peak", o.peak)
+		setFloat("sustain", o.sustain)
+		setFloat("attack", o.attack * 1000)
+		setFloat("decay", o.decay * 1000)
+		setFloat("release", o.release * 1000)
+		setInt("type", o.type)
+		for j in 0:NUM_OSCILLATORS
+			check("link_" + j, o.target[j])
+		check("link_out", o.target_out)
+		/*for l in fc.link
+			if l.source == chosen
+				if l.dest == -1
+					check("link_out", true)
+				else
+					check("link_" + l.dest, true)*/
 		
 
 class FMSynthesizer : Synthesizer
@@ -172,27 +229,48 @@ class FMSynthesizer : Synthesizer
 			del_me.clear()
 			for p in active_pitch
 				PitchState *s = &state.pitch[p]
-				for o in s.osc
+				for o,oi in s.osc
 					o.volume = o.env.get()
 					if o.env.just_killed
 						s.num_osc_active --
 						if s.num_osc_active == 0
 							del_me.add(p)
-								
-					o.phi += delta_phi[p] * (1 + o.input)
-					o.output = sin(o.phi) * o.volume
+					
+					OscillatorConfig *co = &config.osc[oi]
+					o.phi += delta_phi[p] * (1 + o.input) * co.factor
+					if co.type == TYPE_SINE
+						o.output = sin(o.phi) * o.volume
+					else if co.type == TYPE_SQUARE
+						if sin(o.phi) > 0
+							o.output = o.volume
+						else
+							o.output = -o.volume
+					else if co.type == TYPE_SAW
+						o.output = (loop(o.phi, 0, 2*pi) / pi - 1) * o.volume
 					o.input = 0
 					if o.phi > 8*pi
 						o.phi = loop(o.phi, 0, 8*pi)
 			
 				// transport
-				for l in config.link
+				for o,oi in s.osc
+					co = &config.osc[oi]
+					if co.target_out
+						float d = o.output
+						buf.r[i] += d
+						buf.l[i] += d
+					for t,j in co.target
+						if t
+							s.osc[j].input += o.output
+				/*for l in config.link
 					if l.dest >= 0
 						s.osc[l.dest].input += s.osc[l.source].output
 					else
 						// output
 						float d = s.osc[l.source].output
 						buf.r[i] += d
-						buf.l[i] += d
+						buf.l[i] += d*/
+			
+			for d in del_me
+				enablePitch(d, false)
 			
 	

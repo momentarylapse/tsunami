@@ -49,7 +49,7 @@ void EnvelopeADSR::start(float volume)
 	if (ttl_decay > 0)
 		step_decay = (value_sustain - value_peak) / (float)ttl_decay;
 	if (ttl_release > 0)
-		factor_release = exp( - 1.0f / (float)ttl_release);
+		factor_release = exp( - 3.0f / (float)ttl_release);
 
 
 	start_attack();

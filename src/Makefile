@@ -36,8 +36,8 @@ OBJ = \
  Action/Track/Midi/ActionTrackDeleteMidiEffect.o\
  Action/Track/Midi/ActionTrackEditMidiEffect.o\
  Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.o\
- Action/Track/Midi/ActionTrackAddMidiNote.o\
- Action/Track/Midi/ActionTrackDeleteMidiNote.o\
+ Action/Track/Midi/ActionTrackAddMidiEvent.o\
+ Action/Track/Midi/ActionTrackDeleteMidiEvent.o\
  Action/Track/Midi/ActionTrackInsertMidi.o\
  Action/Track/Sample/ActionTrackAddSample.o\
  Action/Track/Sample/ActionTrackDeleteSample.o\
@@ -57,6 +57,7 @@ OBJ = \
  Action/ActionManager.o\
  Action/ActionMergable.o\
  Audio/Synth/DummySynthesizer.o\
+ Audio/Synth/EnvelopeADSR.o\
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
  Audio/Synth/SynthesizerRenderer.o\
@@ -73,6 +74,7 @@ OBJ = \
  Data/Data.o\
  Data/MidiData.o\
  Data/Range.o\
+ Data/RingBuffer.o\
  Data/Rhythm.o\
  Data/Sample.o\
  Data/Track.o\
@@ -238,7 +240,7 @@ CPP = g++
 GLOBALFLAGS = -O1 -g
 LIB_DIR = lib
 CXXFLAGS = `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
-CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -I/usr/include/AL -lopenal -lalut -lasound -lfftw3f -lFLAC -logg -lvorbis -lvorbisfile -lvorbisenc $(GLOBALFLAGS)
+CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lportaudio -lasound -lfftw3f -lFLAC -logg -lvorbis -lvorbisfile -lvorbisenc $(GLOBALFLAGS)
 
 $(BIN) : $(OBJ)
 	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
@@ -342,11 +344,11 @@ Action/Track/Midi/ActionTrackEditMidiEffect.o : Action/Track/Midi/ActionTrackEdi
 Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.o : Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.cpp
 	$(CPP) -c Action/Track/Midi/ActionTrackToggleMidiEffectEnabled.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Midi/ActionTrackAddMidiNote.o : Action/Track/Midi/ActionTrackAddMidiNote.cpp
-	$(CPP) -c Action/Track/Midi/ActionTrackAddMidiNote.cpp -o $@ $(CXXFLAGS)
+Action/Track/Midi/ActionTrackAddMidiEvent.o : Action/Track/Midi/ActionTrackAddMidiEvent.cpp
+	$(CPP) -c Action/Track/Midi/ActionTrackAddMidiEvent.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Midi/ActionTrackDeleteMidiNote.o : Action/Track/Midi/ActionTrackDeleteMidiNote.cpp
-	$(CPP) -c Action/Track/Midi/ActionTrackDeleteMidiNote.cpp -o $@ $(CXXFLAGS)
+Action/Track/Midi/ActionTrackDeleteMidiEvent.o : Action/Track/Midi/ActionTrackDeleteMidiEvent.cpp
+	$(CPP) -c Action/Track/Midi/ActionTrackDeleteMidiEvent.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Midi/ActionTrackInsertMidi.o : Action/Track/Midi/ActionTrackInsertMidi.cpp
 	$(CPP) -c Action/Track/Midi/ActionTrackInsertMidi.cpp -o $@ $(CXXFLAGS)
@@ -405,6 +407,9 @@ Action/ActionMergable.o : Action/ActionMergable.cpp
 Audio/Synth/DummySynthesizer.o : Audio/Synth/DummySynthesizer.cpp
 	$(CPP) -c Audio/Synth/DummySynthesizer.cpp -o $@ $(CXXFLAGS)
 
+Audio/Synth/EnvelopeADSR.o : Audio/Synth/EnvelopeADSR.cpp
+	$(CPP) -c Audio/Synth/EnvelopeADSR.cpp -o $@ $(CXXFLAGS)
+
 Audio/Synth/SampleSynthesizer.o : Audio/Synth/SampleSynthesizer.cpp
 	$(CPP) -c Audio/Synth/SampleSynthesizer.cpp -o $@ $(CXXFLAGS)
 
@@ -452,6 +457,9 @@ Data/MidiData.o : Data/MidiData.cpp
 
 Data/Range.o : Data/Range.cpp
 	$(CPP) -c Data/Range.cpp -o $@ $(CXXFLAGS)
+
+Data/RingBuffer.o : Data/RingBuffer.cpp
+	$(CPP) -c Data/RingBuffer.cpp -o $@ $(CXXFLAGS)
 
 Data/Rhythm.o : Data/Rhythm.cpp
 	$(CPP) -c Data/Rhythm.cpp -o $@ $(CXXFLAGS)

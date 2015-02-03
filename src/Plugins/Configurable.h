@@ -48,6 +48,7 @@ public:
 	bool configure();
 	virtual ConfigPanel *_cdecl createPanel();
 	void _cdecl notify();
+	virtual void _cdecl onConfig(){}
 
 	PluginData *get_config();
 	PluginData *get_state();

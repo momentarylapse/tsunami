@@ -236,12 +236,12 @@ void Configurable::configFromString(const string &param)
 	msg_db_f("Configurable.configFromString", 1);
 
 	PluginData *config = get_config();
-	if (!config)
-		return;
-
-	config->reset();
-	int pos = 0;
-	var_from_string(config->type, (char*)config, param, pos);
+	if (config){
+		config->reset();
+		int pos = 0;
+		var_from_string(config->type, (char*)config, param, pos);
+	}
+	onConfig();
 }
 
 
@@ -252,9 +252,9 @@ void Configurable::resetConfig()
 	msg_db_f("Configurable.resetConfig", 1);
 
 	PluginData *config = get_config();
-	if (!config)
-		return;
-	config->reset();
+	if (config)
+		config->reset();
+	onConfig();
 }
 
 // default version of ResetState()
@@ -264,9 +264,9 @@ void Configurable::resetState()
 	msg_db_f("Configurable.resetState", 1);
 
 	PluginData *state = get_state();
-	if (!state)
-		return;
-	state->reset();
+	if (state)
+		state->reset();
+	onConfig();
 }
 
 struct AutoConfigData
@@ -466,6 +466,7 @@ bool Configurable::configure()
 
 void Configurable::notify()
 {
+	onConfig();
 	Observable::notify();
 }
 

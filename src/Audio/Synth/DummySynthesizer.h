@@ -9,6 +9,7 @@
 #define DUMMYSYNTHESIZER_H_
 
 #include "Synthesizer.h"
+#include "EnvelopeADSR.h"
 
 class DummySynthesizer : public Synthesizer
 {
@@ -17,7 +18,9 @@ public:
 	virtual ~DummySynthesizer();
 	void __init__();
 
-	virtual void render(BufferBox &buf);
+	virtual void _cdecl render(BufferBox &buf);
+
+	virtual void _cdecl onConfig();
 
 	class State : public PluginData
 	{
@@ -26,9 +29,7 @@ public:
 		struct PitchState{
 			float volume;
 			float phi;
-			bool fading;
-			float lin_step;
-			int lin_range;
+			EnvelopeADSR env;
 		}pitch[128];
 	};
 

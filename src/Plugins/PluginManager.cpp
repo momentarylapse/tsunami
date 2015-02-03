@@ -160,6 +160,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioEffect.resetState", Script::mf(&Effect::resetState));
 	//Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
 	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
+	Script::DeclareClassVirtualIndex("AudioEffect", "onConfig", Script::mf(&Effect::onConfig), &effect);
 
 	MidiEffect midieffect;
 	Script::DeclareClassSize("MidiEffect", sizeof(MidiEffect));
@@ -175,6 +176,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("MidiEffect.resetState", Script::mf(&MidiEffect::resetState));
 	//Script::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Script::mf(&MidiEffect::UpdateDialog), &midieffect);
 	Script::LinkExternal("MidiEffect.notify", Script::mf(&MidiEffect::notify));
+	Script::DeclareClassVirtualIndex("MidiEffect", "onConfig", Script::mf(&MidiEffect::onConfig), &midieffect);
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
 	Script::DeclareClassOffset("BufferBox", "offset", _offsetof(BufferBox, offset));
@@ -224,6 +226,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.enablePitch", Script::mf(&Synthesizer::enablePitch));
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
+	Script::DeclareClassVirtualIndex("Synthesizer", "onConfig", Script::mf(&Synthesizer::onConfig), &synth);
 	Script::LinkExternal("Synthesizer.addMetronomeClick", Script::mf(&Synthesizer::addMetronomeClick));
 	Script::LinkExternal("Synthesizer.add", Script::mf(&Synthesizer::add));
 	Script::LinkExternal("Synthesizer.feed", Script::mf(&Synthesizer::feed));

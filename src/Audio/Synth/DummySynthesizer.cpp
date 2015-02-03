@@ -9,13 +9,13 @@
 #include "../../Data/AudioFile.h"
 #include "../../lib/math/math.h"
 
+
 void DummySynthesizer::State::reset()
 {
 	for (int i=0; i<128; i++){
 		pitch[i].phi = 0;
 		pitch[i].volume = 0;
-		pitch[i].fading = false;
-		pitch[i].lin_range = -1;
+		pitch[i].env.reset();
 	}
 }
 
@@ -33,10 +33,15 @@ void DummySynthesizer::__init__()
 	new(this) DummySynthesizer;
 }
 
+void DummySynthesizer::onConfig()
+{
+	for (int i=0; i<128; i++)
+		//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
+		state.pitch[i].env.set(0.005f, 0, 1, 0.02f, sample_rate);
+}
+
 void DummySynthesizer::render(BufferBox& buf)
 {
-	float sm_d = 1.0f/(0.02f * sample_rate);
-
 	for (int i=0; i<buf.num; i++){
 
 		// current events?
@@ -45,12 +50,9 @@ void DummySynthesizer::render(BufferBox& buf)
 				int p = e.pitch;
 				State::PitchState &s = state.pitch[p];
 				if (e.volume == 0){
-					s.fading = true;
-					s.lin_range = -1;
+					s.env.end();
 				}else{
-					s.fading = false;
-					s.lin_range = 100;
-					s.lin_step = (e.volume - s.volume) / (float)s.lin_range;
+					s.env.start(e.volume * 0.8f);
 					enablePitch(p, true);
 				}
 			}
@@ -59,16 +61,7 @@ void DummySynthesizer::render(BufferBox& buf)
 			int p = active_pitch[ip];
 			State::PitchState &s = state.pitch[p];
 
-			if (s.fading){
-				s.volume *= exp(-sm_d);
-				if (s.volume <= 0.001f){
-					s.volume = 0;
-					s.fading = false;
-				}
-			}else if (s.lin_range >= 0){
-				s.volume += s.lin_step;
-				s.lin_range --;
-			}
+			s.volume = s.env.get();
 
 			if (s.volume == 0){
 				enablePitch(p, false);

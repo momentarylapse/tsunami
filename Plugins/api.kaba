@@ -49,6 +49,7 @@ class AudioEffect
 	extern virtual ConfigPanel *createPanel()
 	//extern virtual void updateDialog()
 	//extern void notify()
+	extern virtual void onConfig()
 
 class MidiEffect
 	string name
@@ -63,6 +64,7 @@ class MidiEffect
 	extern virtual ConfigPanel *createPanel()
 	//extern virtual void updateDialog()
 	//extern void notify()
+	extern virtual void onConfig()
 
 class BufferBox
 	int offset, num
@@ -104,6 +106,7 @@ class Synthesizer
 	
 	extern void enablePitch(int pitch, bool enable)
 	//extern void notify()
+	extern virtual void onConfig()
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()

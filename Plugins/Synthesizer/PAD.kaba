@@ -1,0 +1,152 @@
+use "../api.kaba"
+use "../tone.kaba"
+
+const int N = 4096*16
+
+class PitchState
+	int pos
+	float[] buf
+	EnvelopeADSR env
+
+class PADState : PluginData
+	PitchState[128] pitch
+	void __init__()
+		for p in pitch
+			p.buf.__init__()
+	overwrite void reset()
+		for p in pitch
+			p.buf.clear()
+			p.pos = 0
+
+class PADConfig : PluginData
+	float[] A
+	float bw
+	float bwscale
+	overwrite void reset()
+		A.clear()
+		A.add(0) // dummy
+		A.add(1)
+		A.add(0.4)
+		A.add(0.2)
+		A.add(0.1)
+		A.add(0.05)
+		bw = 0.5
+		bwscale = 0.7
+
+float gauss(float f, float bw)
+	float x = f / bw
+	return exp(- x*x) / bw
+
+class PADSynthesizer : Synthesizer
+	PADState state
+	PADConfig config
+	
+	overwrite void onConfig()
+		state.reset()
+		for p in state.pitch
+			p.env.set(0.02, 0.02, 0.7, 0.5, sample_rate)
+		
+	void create(int pitch)
+		float freq = pitch_to_freq(pitch)
+		PitchState *p = &state.pitch[pitch]
+	
+		complex[] c
+		float[] amp
+		c.resize(N / 2 - 1)
+		amp.resize(N / 2 - 1)
+	
+		for n in  1:config.A.num
+			float nn = n + 0.03 * n * n
+			float bwHz = (pow(2, config.bw / 12.0) - 1.0) * freq * pow(nn, config.bwscale)
+			float bwi = bwHz / (2.0 * sample_rate)
+			float fi = freq * nn / sample_rate
+			for i in 0:amp.num
+				amp[i] += gauss((i2f(i) / N) - fi, bwi) * config.A[n]
+		
+		for i in 0:c.num
+			float phi = rand(2 * pi)
+			c[i] = complex(cos(phi), sin(phi)) * amp[i]
+		
+		p.buf.resize(N)
+		fft_c2r_inv(c, p.buf)
+	
+		float m = 0
+		for b in p.buf
+			m = max(b, m)
+		p.buf /= (m * 1.2)
+
+	overwrite void render(BufferBox buf)
+			
+		for i in 0:buf.num
+			for e in events
+				if e.pos == i
+					int pp = e.pitch + 0.4
+					PitchState *ps = &state.pitch[pp]
+					if e.volume > 0
+						ps.env.start(e.volume)
+						enablePitch(pp, true)
+					else
+						ps.env.end()
+					if state.pitch[pp].buf.num == 0
+						create(pp)
+			int[] to_del
+			for ip in active_pitch
+				PitchState *p = &state.pitch[ip]
+				
+				float d = p.buf[p.pos] * p.env.get()
+				buf.r[i] += d
+				buf.l[i] += d
+				if p.env.just_killed
+					to_del.add(ip)
+				p.pos ++
+				if p.pos >= N
+					p.pos = 0
+			for ip in to_del
+				enablePitch(ip, false)
+	
+	overwrite ConfigPanel *createPanel()
+		return new PADPanel(self)
+
+class PADPanel : ConfigPanel
+	PADConfig *pc
+	overwrite PADSynthesizer* c
+	void __init__(PADSynthesizer* _s)
+		super.__init__(_s)
+		pc = &c.config
+		fromSource("
+Grid ? '' 2 9
+	Text ? 'bw'
+	SpinButton bw '0\\0\\10\\0.01'
+	Text ? 'bwscale'
+	SpinButton bwscale '0\\0\\10\\0.01'
+	Text ? 'A[1]'
+	SpinButton a1 '0\\0\\1\\0.01'
+	Text ? 'A[2]'
+	SpinButton a2 '0\\0\\1\\0.01'
+	Text ? 'A[3]'
+	SpinButton a3 '0\\0\\1\\0.01'
+	Text ? 'A[4]'
+	SpinButton a4 '0\\0\\1\\0.01'
+	Text ? 'A[5]'
+	SpinButton a5 '0\\0\\1\\0.01'
+	Text ? 'A[6]'
+	SpinButton a6 '0\\0\\1\\0.01'
+	Text ? 'A[7]'
+	SpinButton a7 '0\\0\\1\\0.01'")
+		event("*", &onChange)
+		
+	void onChange()
+		pc.bw = getFloat("bw")
+		pc.bwscale = getFloat("bwscale")
+		pc.A.resize(8)
+		for a,i in pc.A
+			if i > 0 and i <= 7
+				a = getFloat("a"+i)
+		notify()
+	
+	overwrite void update()
+		setFloat("bw", pc.bw)
+		setFloat("bwscale", pc.bwscale)
+		for a,i in pc.A
+			if i > 0 and i <= 7
+				setFloat("a"+i, a)

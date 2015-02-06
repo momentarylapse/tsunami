@@ -24,11 +24,10 @@ public:
 	AudioInputAudio(BufferBox &buf, RingBuffer &cur_buf);
 	virtual ~AudioInputAudio();
 
-	Array<string> devices;
 	string chosen_device;
 	string temp_filename;
 
-	void init();
+	Array<string> getDevices();
 	void setDevice(const string &device);
 
 	virtual bool start(int sample_rate);

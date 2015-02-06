@@ -39,6 +39,8 @@ private:
 	};
 
 	Array<OggQuality> ogg_quality;
+	Array<string> output_devices;
+	Array<string> capture_devices;
 };
 
 #endif /* SETTINGSDIALOG_H_ */

@@ -22,7 +22,7 @@ public:
 	AudioOutput();
 	virtual ~AudioOutput();
 
-	Array<string> devices;
+	Array<string> getDevices();
 	string chosen_device;
 	void setDevice(const string &device);
 

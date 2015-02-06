@@ -61,25 +61,31 @@ void SettingsDialog::loadData()
 		if (CurOggQuality > q.quality - 0.05f)
 			setInt("ogg_bitrate", i);
 	setDecimals(1);
-	//volume_slider = new Slider(this, "volume_slider", "volume", 0, 2, 100, &TrackDialog::onVolume, t->volume);
-	//AddSlider(SettingsDialog, "volume_slider", "volume", 0, 2, 100, &OnSettingsVolume, Preview.volume);
-	//tsunami->output->
+
 	//SetInt("preview_sleep", PreviewSleepTime);
+
 	setString("preview_device", _("- Standard -"));
 	setInt("preview_device", 0);
-	foreachi(string &d, tsunami->output->devices, i){
+	output_devices = tsunami->output->getDevices();
+	output_devices.insert("", 0);
+	foreachi(string &d, output_devices, i){
+		if (i == 0)
+			continue;
 		addString("preview_device", d);
 		if (d == tsunami->output->chosen_device)
-			setInt("preview_device", i + 1);
+			setInt("preview_device", i);
 	}
 
-
-	setString("capture_device", _("- Standard -"));
+	addString("capture_device", _("- Standard -"));
 	setInt("capture_device", 0);
-	foreachi(string &d, tsunami->input->in_audio->devices, i){
+	capture_devices = tsunami->input->in_audio->getDevices();
+	capture_devices.insert("", 0);
+	foreachi(string &d, capture_devices, i){
+		if (i == 0)
+			continue;
 		addString("capture_device", d);
 		if (d == tsunami->input->in_audio->chosen_device)
-			setInt("capture_device", i + 1);
+			setInt("capture_device", i);
 	}
 
 	setFloat("capture_delay", tsunami->input->in_audio->getPlaybackDelayConst());
@@ -106,20 +112,16 @@ void SettingsDialog::onOggBitrate()
 
 void SettingsDialog::onCaptureDevice()
 {
-	if (getInt("") > 0)
-		tsunami->input->in_audio->chosen_device = tsunami->input->in_audio->devices[getInt("") - 1];
-	else
-		tsunami->input->in_audio->chosen_device = "";
-	HuiConfig.setStr("Input.ChosenDevice", tsunami->input->in_audio->chosen_device);
+	int dev = getInt("");
+	if (dev >= 0)
+		tsunami->input->in_audio->setDevice(capture_devices[dev]);
 }
 
 void SettingsDialog::onPreviewDevice()
 {
 	int dev = getInt("");
-	if (dev > 0)
-		tsunami->output->setDevice(tsunami->output->devices[dev - 1]);
-	else
-		tsunami->output->setDevice("");
+	if (dev >= 0)
+		tsunami->output->setDevice(output_devices[dev]);
 }
 
 void SettingsDialog::onCaptureDelay()

@@ -87,10 +87,9 @@ AudioInputAudio::~AudioInputAudio()
 }
 
 
-void AudioInputAudio::init()
+Array<string> AudioInputAudio::getDevices()
 {
-	msg_db_f("CaptureInit", 1);
-	devices.clear();
+	Array<string> devices;
 
 	int n = Pa_GetDeviceCount();
 	for (int i=0; i<n; i++){
@@ -98,15 +97,13 @@ void AudioInputAudio::init()
 		if (di->maxInputChannels >= 1)
 			devices.add(di->name);
 	}
-
-	setDevice(chosen_device);
+	return devices;
 }
 
 void AudioInputAudio::setDevice(const string &device)
 {
 	chosen_device = device;
-	//HuiConfig.setStr("ChosenOutputDevice", chosen_device);
-	//HuiConfig.save();
+	HuiConfig.setStr("Input.ChosenDevice", chosen_device);
 
 	pa_device_no = -1;
 
@@ -149,7 +146,8 @@ bool AudioInputAudio::start(int _sample_rate)
 	if (capturing)
 		stop();
 
-	init();
+	setDevice(chosen_device);
+
 	accumulating = false;
 	sample_rate = _sample_rate;
 

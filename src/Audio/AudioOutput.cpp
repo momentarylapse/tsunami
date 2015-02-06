@@ -36,8 +36,7 @@ AudioOutput::~AudioOutput()
 void AudioOutput::setDevice(const string &device)
 {
 	chosen_device = device;
-	//HuiConfig.setStr("ChosenOutputDevice", chosen_device);
-	//HuiConfig.save();
+	HuiConfig.setStr("Output.ChosenDevice", device);
 
 	pa_device_no = -1;
 
@@ -57,6 +56,20 @@ void AudioOutput::setDevice(const string &device)
 	tsunami->log->info(format("output device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
 }
 
+Array<string> AudioOutput::getDevices()
+{
+	Array<string> devices;
+
+	int n = Pa_GetDeviceCount();
+	for (int i=0; i<n; i++){
+		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
+		if (di->maxOutputChannels >= 2)
+			devices.add(di->name);
+	}
+
+	return devices;
+}
+
 void AudioOutput::init()
 {
 	if (initialized)
@@ -65,15 +78,6 @@ void AudioOutput::init()
 
 	last_error = Pa_Initialize();
 	testError("Output.initialize");
-
-	devices.clear();
-
-	int n = Pa_GetDeviceCount();
-	for (int i=0; i<n; i++){
-		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
-		if (di->maxOutputChannels >= 2)
-			devices.add(di->name);
-	}
 
 	setDevice(chosen_device);
 

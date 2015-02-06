@@ -31,7 +31,7 @@ HuiControlSpinButton::HuiControlSpinButton(const string &title, const string &id
 	widget = gtk_spin_button_new_with_range(vmin, vmax, step);
 	gtk_spin_button_set_value(GTK_SPIN_BUTTON(widget), s2f(PartString[0]));
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
-	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkEditChange), this);
+	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&OnGtkEditChange), this);
 	setOptions(OptionString);
 }
 

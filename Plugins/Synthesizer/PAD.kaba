@@ -1,5 +1,6 @@
 use "../api.kaba"
 use "../tone.kaba"
+use "../grid.kaba"
 
 const int N = 4096*16
 
@@ -23,15 +24,19 @@ class PADConfig : PluginData
 	float bw
 	float bwscale
 	overwrite void reset()
-		A.clear()
-		A.add(0) // dummy
-		A.add(1)
-		A.add(0.4)
-		A.add(0.2)
-		A.add(0.1)
-		A.add(0.05)
+		A = [1.0, 0.4, 0.2, 0.1, 0.05]
 		bw = 0.5
 		bwscale = 0.7
+	
+	void fill_curve(complex[] c, int n0)
+		c.clear()
+		float n = n0 + 1
+		float nn = n + 0.03 * n * n
+		float _bw = (pow(2, bw / 12.0) - 1.0) * pow(nn, bwscale)
+		for x in 0.5 : 8.5 : 0.01
+			float dx = x - n
+			float y = exp(-dx*dx/_bw/_bw) * A[n0]
+			c.add(complex(x, y))
 
 float gauss(float f, float bw)
 	float x = f / bw
@@ -55,13 +60,14 @@ class PADSynthesizer : Synthesizer
 		c.resize(N / 2 - 1)
 		amp.resize(N / 2 - 1)
 	
-		for n in  1:config.A.num
+		for a,n0 in config.A
+			int n = n0 + 1
 			float nn = n + 0.03 * n * n
 			float bwHz = (pow(2, config.bw / 12.0) - 1.0) * freq * pow(nn, config.bwscale)
 			float bwi = bwHz / (2.0 * sample_rate)
 			float fi = freq * nn / sample_rate
 			for i in 0:amp.num
-				amp[i] += gauss((i2f(i) / N) - fi, bwi) * config.A[n]
+				amp[i] += gauss((i2f(i) / N) - fi, bwi) * a
 		
 		for i in 0:c.num
 			float phi = rand(2 * pi)
@@ -87,11 +93,12 @@ class PADSynthesizer : Synthesizer
 						enablePitch(pp, true)
 					else
 						ps.env.end()
-					if state.pitch[pp].buf.num == 0
-						create(pp)
 			int[] to_del
 			for ip in active_pitch
 				PitchState *p = &state.pitch[ip]
+				
+				if p.buf.num == 0
+					create(ip)
 				
 				float d = p.buf[p.pos] * p.env.get()
 				buf.r[i] += d
@@ -107,46 +114,78 @@ class PADSynthesizer : Synthesizer
 	overwrite ConfigPanel *createPanel()
 		return new PADPanel(self)
 
+class PADGrid : Grid
+	PADConfig *pc
+	ConfigPanel *p
+	int Selected, Hover
+	
+	void __init__()
+		Selected = -1
+		Hover = -1
+
+	overwrite void onDraw(Painter *c)
+		pc.A.resize(8)
+	
+		// curve + area below
+		complex[] curve
+		for a,i in pc.A
+			pc.fill_curve(curve, i)
+			drawCurveB(c, curve, false, Red)
+	
+		// points
+		for a,i in pc.A
+			drawPoint2(c, complex(i+1, a), i == Selected, i == Hover)
+			
+	// left button down -> select
+	overwrite void onLeftButtonDown()
+		Selected = Hover
+		redraw()
+
+	overwrite void onMouseMove()
+		// move
+		if HuiGetEvent().button_l and (Selected >= 0)
+			pc.A[Selected] = clamp(getMouse2().y, 0, 1)
+			p.notify()
+		else
+		// hover?
+			Hover = -1
+			for a,i in pc.A
+				complex p = project2(complex(i+1, a))
+				if (mx > p.x - 10) and (mx < p.x + 10)
+					Hover = i
+		redraw()
+
 class PADPanel : ConfigPanel
 	PADConfig *pc
+	PADGrid grid
 	overwrite PADSynthesizer* c
 	void __init__(PADSynthesizer* _s)
 		super.__init__(_s)
 		pc = &c.config
 		fromSource("
-Grid ? '' 2 9
-	Text ? 'bw'
-	SpinButton bw '0\\0\\10\\0.01'
-	Text ? 'bwscale'
-	SpinButton bwscale '0\\0\\10\\0.01'
-	Text ? 'A[1]'
-	SpinButton a1 '0\\0\\1\\0.01'
-	Text ? 'A[2]'
-	SpinButton a2 '0\\0\\1\\0.01'
-	Text ? 'A[3]'
-	SpinButton a3 '0\\0\\1\\0.01'
-	Text ? 'A[4]'
-	SpinButton a4 '0\\0\\1\\0.01'
-	Text ? 'A[5]'
-	SpinButton a5 '0\\0\\1\\0.01'
-	Text ? 'A[6]'
-	SpinButton a6 '0\\0\\1\\0.01'
-	Text ? 'A[7]'
-	SpinButton a7 '0\\0\\1\\0.01'")
-		event("*", &onChange)
+Grid ? '' 1 2
+	Grid ? '' 2 2
+		Text ? 'bw'
+		SpinButton bw '0\\0\\10\\0.01'
+		Text ? 'bwscale'
+		SpinButton bwscale '0\\0\\10\\0.01'
+	DrawingArea drawing '' grabfocus width=500")
+		event("bw", &onChange)
+		event("bwscale", &onChange)
+		
+		grid.pc = pc
+		grid.p = self
+		grid.init(self, "drawing")
+		grid.x_axis.set(0.5, 8.5, false, "")
+		grid.y_axis.set(0, 1.05, false, "")
 		
 	void onChange()
 		pc.bw = getFloat("bw")
 		pc.bwscale = getFloat("bwscale")
-		pc.A.resize(8)
-		for a,i in pc.A
-			if i > 0 and i <= 7
-				a = getFloat("a"+i)
+		grid.redraw()
 		notify()
 	
 	overwrite void update()
 		setFloat("bw", pc.bw)
 		setFloat("bwscale", pc.bwscale)
-		for a,i in pc.A
-			if i > 0 and i <= 7
-				setFloat("a"+i, a)
+		grid.redraw()

@@ -1,5 +1,6 @@
 use "../api.kaba"
 use "../tone.kaba"
+use "../grid.kaba"
 
 const int NUM_HARMONICS = 10
 
@@ -26,34 +27,65 @@ class HarmonicConfig : PluginData
 			intensity[i] = 0
 		release = 0.02
 
+class HarmonicGrid : Grid
+	HarmonicConfig *hc
+	HarmonicPanel *p
+	int Selected, Hover
+
+	overwrite void onDraw(Painter *c)
+	
+		// points
+		for i,n in hc.intensity
+			drawPoint2(c, complex(n+1, i), n == Selected, n == Hover)
+			
+	// left button down -> select
+	overwrite void onLeftButtonDown()
+		Selected = Hover
+		redraw()
+
+	overwrite void onMouseMove()
+		// move
+		if HuiGetEvent().button_l and (Selected >= 0)
+			hc.intensity[Selected] = clamp(getMouse2().y, 0, 1)
+			p.notify()
+		else
+		// hover?
+			Hover = -1
+			for i,n in hc.intensity
+				complex p = project2(complex(n+1, i))
+				if (mx > p.x - 10) and (mx < p.x + 10)
+					Hover = n
+		redraw()
+
 class HarmonicPanel : ConfigPanel
 	overwrite HarmonicSynthesizer *c
 	HarmonicConfig *hc
+	HarmonicGrid grid
 	void __init__(HarmonicSynthesizer *_s)
 		super.__init__(_s)
-		addGrid("", 0, 0, 5, NUM_HARMONICS, "main_table")
+		addGrid("", 0, 0, 1, 2, "main_table")
 		setTarget("main_table", 0)
-		addText("Fundamental", 0, 0, 0, 0, "")
-		for j in 0:NUM_HARMONICS
-			if j > 0
-				addText("x " + (j + 1), 0, j, 0, 0, "")
-			addSpinButton("0\\0\\100\\0.1", 1, j, 0, 0, "intensity_" + j)
-			event("intensity_" + j, &onChange)
-		addText("Release", 2, 0, 0, 0, "")
-		addSpinButton("0\\0\\500\\0.1", 3, 0, 0, 0, "release")
-		addText("ms", 4, 0, 0, 0, "")
+		addGrid("", 0, 0, 4, 1, "table1")
+		addDrawingArea("!grabfocus,width=400", 0, 1, 0, 0, "drawing")
+		setTarget("table1", 0)
+		addText("Release", 0, 0, 0, 0, "")
+		addSpinButton("0\\0\\500\\0.1", 1, 0, 0, 0, "release")
+		addText("ms", 2, 0, 0, 0, "")
 		event("release", &onChange)
 		hc = &c.config
 		
+		grid.hc = hc
+		grid.p = self
+		grid.init(self, "drawing")
+		grid.x_axis.set(0.5, NUM_HARMONICS + 0.5, false, "")
+		grid.y_axis.set(0, 1.05, false, "")
+		
 	void onChange()
-		for j in 0:NUM_HARMONICS
-			hc.intensity[j] = getFloat("intensity_" + j) / 100
 		hc.release = getFloat("release") / 1000
 		notify()
 	
 	overwrite void update()
-		for j in 0:NUM_HARMONICS
-			setFloat("intensity_" + j, hc.intensity[j] * 100)
+		redraw("drawing")
 		setFloat("release", hc.release * 1000)
 		
 

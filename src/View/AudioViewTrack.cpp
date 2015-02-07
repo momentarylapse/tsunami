@@ -218,13 +218,12 @@ void draw_note(HuiPainter *c, const MidiNote &n, color &col, AudioView *v)
 
 void AudioViewTrack::drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col)
 {
-	Range range = Range(view->screen2sample(r.x1), view->screen2sample(r.x2) - view->screen2sample(r.x1));
-	Array<MidiNote> notes = midi.getNotes(range);
+	Array<MidiNote> notes = midi.getNotes(view->viewRange());
 	foreachi(MidiNote &n, notes, i){
 		if ((n.pitch < view->pitch_min) or (n.pitch >= view->pitch_max))
 			continue;
 		color col = getPitchColor(n.pitch);
-		if ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (view->hover.note == i))
+		if ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (n.range.offset == view->hover.note_start))
 			col.a = 0.5f;
 		draw_note(c, n, col, view);
 	}

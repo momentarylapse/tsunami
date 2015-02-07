@@ -115,7 +115,7 @@ public:
 		int sample_offset;
 		Array<int> barrier;
 		Track *show_track_controls;
-		int pitch, note;
+		int pitch, note_start;
 
 		SelectionType();
 	};
@@ -213,6 +213,7 @@ public:
 
 	double view_pos;
 	double view_zoom;
+	Range viewRange();
 
 	rect area;
 	struct TrackHeightManager

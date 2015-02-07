@@ -62,7 +62,6 @@ AudioView::SelectionType::SelectionType()
 	pos = 0;
 	sample_offset = 0;
 	show_track_controls = NULL;
-	note = -1;
 	pitch = -1;
 }
 
@@ -315,17 +314,20 @@ AudioView::SelectionType AudioView::getMouseOver()
 	if ((s.track) and (s.track == cur_track) and (editingMidi()) and (midi_mode != MIDI_MODE_SELECT)){
 		s.pitch = y2pitch(my);
 		s.type = SEL_TYPE_MIDI_PITCH;
-		// TODO  !!!!!
-#if skdjfhksjdfhkjsdhf
-		foreachi(MidiNote &n, s.track->midi, i)
+		Array<MidiNote> notes = s.track->midi.getNotes(viewRange());
+		foreach(MidiNote &n, notes)
 			if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
-				s.note = i;
+				s.note_start = n.range.offset;
 				s.type = SEL_TYPE_MIDI_NOTE;
 			}
-#endif
 	}
 
 	return s;
+}
+
+Range AudioView::viewRange()
+{
+	return Range(view_pos, area.width() / view_zoom);
 }
 
 
@@ -417,7 +419,7 @@ bool hover_changed(AudioView::SelectionType &hover, AudioView::SelectionType &ho
 	return (hover.type != hover_old.type)
 			or (hover.sample != hover_old.sample)
 			or (hover.show_track_controls != hover_old.show_track_controls)
-			or (hover.note != hover_old.note)
+			or (hover.note_start != hover_old.note_start)
 			or (hover.pitch != hover_old.pitch);
 }
 
@@ -511,6 +513,25 @@ void AudioView::setCursorPos(int pos)
 	updateSelection();
 }
 
+void deleteMidiNote(Track *t, int pitch, int start)
+{
+	Array<int> events;
+	foreachi(MidiEvent &e, t->midi, i)
+		if (e.pitch == pitch){
+			if (e.pos >= start){
+				if (e.volume >= 0)
+					events.add(i);
+				else
+					break;
+			}
+		}
+
+	t->root->action_manager->beginActionGroup();
+	foreachb(int i, events)
+		t->deleteMidiEvent(i);
+	t->root->action_manager->endActionGroup();
+}
+
 void AudioView::onLeftButtonDown()
 {
 	msg_db_f("OnLBD", 2);
@@ -539,7 +560,7 @@ void AudioView::onLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(audio);
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
-/*		cur_track->deleteMidiNote(selection.note);    TODO  !!!!           */
+		deleteMidiNote(cur_track, selection.pitch, selection.note_start);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
 		midi_preview_renderer->resetMidiData();
 		midi_preview_renderer->setSynthesizer(cur_track->synth);

@@ -79,6 +79,11 @@ float MidiNote::getFrequency()
 	return 440.0f * pow(2.0f, (float)(pitch - 69) / 12.0f);
 }
 
+MidiData::MidiData()
+{
+	samples = 0;
+}
+
 MidiData MidiData::getEvents(const Range &r)
 {
 	MidiData a;
@@ -118,6 +123,37 @@ void MidiData::sort()
 		for (int j=i+1;j<num;j++)
 			if ((*this)[i].pos > (*this)[j].pos)
 				swap(i, j);
+}
+
+void MidiData::sanify()
+{
+	int max_pos = 0;
+	Set<int> active;
+
+	// analyze
+	foreach(MidiEvent &e, *this){
+		max_pos = max(max_pos, e.pos);
+		int p = e.pitch;
+		if (e.volume > 0)
+			active.add(p);
+		else
+			active.erase(p);
+	}
+
+	// wrong end mark?
+	if (max_pos > samples)
+		samples = max_pos;
+
+	// end active notes
+	foreach(int p, active)
+		add(MidiEvent(samples, p, 0));
+}
+
+void MidiData::append(const MidiData &data)
+{
+	foreach(MidiEvent &e, const_cast<MidiData&>(data))
+		add(MidiEvent(e.pos + samples, e.pitch, e.volume));
+	samples += data.samples;
 }
 
 MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)

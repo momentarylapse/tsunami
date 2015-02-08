@@ -382,6 +382,11 @@ Range BufferBox::range()
 	return Range(offset, num);
 }
 
+Range BufferBox::range0()
+{
+	return Range(0, num);
+}
+
 #define shrink_max(a, b)	max((a), (b))
 #define shrink_mean(a, b)	(unsigned char)(sqrt(((float)(a) * (float)(a) + (float)(b) * (float)(b)) / 2))
 

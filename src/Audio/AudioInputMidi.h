@@ -22,7 +22,7 @@ class Synthesizer;
 class AudioInputMidi : public AudioInputBase
 {
 public:
-	AudioInputMidi(MidiData &data);
+	AudioInputMidi(MidiData &data, MidiData &cur_data);
 	virtual ~AudioInputMidi();
 
 	void init();
@@ -61,6 +61,7 @@ private:
 	void clearInputQueue();
 
 	MidiData &data;
+	MidiData &cur_data;
 
 	_snd_seq *handle;
 	_snd_seq_port_subscribe *subs;

@@ -18,7 +18,6 @@ class ActionTrackAddSample: public Action
 {
 public:
 	ActionTrackAddSample(Track *t, int pos, int index);
-	virtual ~ActionTrackAddSample();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

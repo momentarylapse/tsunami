@@ -131,7 +131,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	beat_partition = 4;
 	parent->setInt("beat_partition", beat_partition);
 	midi_scale = 0;
-	midi_mode = MIDI_MODE_SELECT;
+	midi_mode = MIDI_MODE_NOTE;
 	chord_type = 0;
 	chord_inversion = 0;
 

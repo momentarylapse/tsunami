@@ -24,7 +24,3 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, MidiData *
 	addSubAction(new ActionTrackAddSample(t, pos, t->root->sample.num - 1), t->root);
 }
 
-ActionTrackPasteAsSample::~ActionTrackPasteAsSample()
-{
-}
-

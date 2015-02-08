@@ -37,12 +37,18 @@ public:
 class MidiData : public Array<MidiEvent>
 {
 public:
+	MidiData();
 	MidiData getEvents(const Range &r);
 	Array<MidiNote> getNotes(const Range &r);
 	int getNextEvent(int pos);
+
 	Range getRange(int elongation);
+	int samples;
 
 	void sort();
+	void sanify();
+
+	void append(const MidiData &data);
 
 	Array<MidiEffect*> fx;
 };

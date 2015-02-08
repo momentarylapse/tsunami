@@ -20,13 +20,15 @@ AudioInputMidi::MidiPort::MidiPort()
 }
 
 
-AudioInputMidi::AudioInputMidi(MidiData &_data) :
-	data(_data)
+AudioInputMidi::AudioInputMidi(MidiData &_data, MidiData &_cur_data) :
+	data(_data),
+	cur_data(_cur_data)
 {
 	handle = NULL;
 	subs = NULL;
 
 	init();
+
 
 	preview_renderer = new SynthesizerRenderer(NULL);
 	preview_stream = new AudioStream(preview_renderer);
@@ -156,6 +158,7 @@ void AudioInputMidi::accumulate(bool enable)
 void AudioInputMidi::resetAccumulation()
 {
 	data.clear();
+	data.samples = 0;
 	offset = 0;
 }
 
@@ -197,14 +200,20 @@ void AudioInputMidi::stop()
 {
 	capturing = false;
 	preview_stream->stop();
+
+	data.sanify();
 }
 
 int AudioInputMidi::doCapturing()
 {
 	double dt = timer.get();
-	if (accumulating)
-		offset += dt;
+	double offset_new = offset + dt;
 	int pos = offset * (double)sample_rate;
+	int pos_new = offset_new * (double)sample_rate;
+	cur_data.clear();
+	cur_data.samples = pos_new - pos;
+	if (accumulating)
+		offset = offset_new;
 
 	while (true){
 		snd_seq_event_t *ev;
@@ -214,19 +223,22 @@ int AudioInputMidi::doCapturing()
 		int pitch = ev->data.note.note;
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:
-				data.add(MidiEvent(pos, pitch, (float)ev->data.note.velocity / 127.0f));
-				preview_renderer->add(MidiEvent(0, pitch, (float)ev->data.note.velocity / 127.0f));
-				//msg_write(format("note on %d %d", ev->data.control.channel, ev->data.note.note));
+				cur_data.add(MidiEvent(0, pitch, (float)ev->data.note.velocity / 127.0f));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:
-				//msg_write(format("note off %d %d", ev->data.control.channel, ev->data.note.note));
-				data.add(MidiEvent(pos, pitch, 0));
-				preview_renderer->add(MidiEvent(0, pitch, 0));
+				cur_data.add(MidiEvent(0, pitch, 0));
 				break;
 		}
 		snd_seq_free_event(ev);
 	}
-	return dt * (double)sample_rate;
+
+	foreach(MidiEvent &e, cur_data)
+		preview_renderer->add(e);
+
+	if (accumulating)
+		data.append(cur_data);
+
+	return cur_data.samples;
 }
 
 bool AudioInputMidi::isCapturing()

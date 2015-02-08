@@ -21,7 +21,7 @@ AudioInput::AudioInput() :
 	current_buffer(1048576)
 {
 	in_audio = new AudioInputAudio(buffer, current_buffer);
-	in_midi = new AudioInputMidi(midi);
+	in_midi = new AudioInputMidi(midi, current_midi);
 	in_cur = in_audio;
 	running = false;
 	type = -1;

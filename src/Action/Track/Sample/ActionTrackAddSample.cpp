@@ -15,10 +15,6 @@ ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, int _index)
 	index = _index;
 }
 
-ActionTrackAddSample::~ActionTrackAddSample()
-{
-}
-
 void ActionTrackAddSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);

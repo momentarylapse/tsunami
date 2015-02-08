@@ -42,6 +42,7 @@ public:
 	Array<string> peak;
 
 	Range range();
+	Range range0();
 
 	void clear();
 	void resize(int length);

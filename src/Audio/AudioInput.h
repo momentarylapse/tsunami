@@ -45,6 +45,7 @@ public:
 	RingBuffer current_buffer;
 	BufferBox buffer;
 	MidiData midi;
+	MidiData current_midi;
 
 	int type;
 	AudioInputBase *in_cur;

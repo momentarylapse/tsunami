@@ -234,54 +234,59 @@ Range AudioFile::getRange()
 	return r;
 }
 
-void disect_time(int t, int sample_rate, bool &sign, int &min, int &sec, int &msec)
+void disect_time(int t, int sample_rate, bool &sign, int &hours, int &min, int &sec, int &msec)
 {
 	sign = (t < 0);
 	if (sign)
 		t = -t;
-	min=(t / 60 / sample_rate);
-	sec=((t / sample_rate) % 60);
-	msec=(((t - sample_rate * (t / sample_rate)) * 1000 / sample_rate) % 1000);
+	hours = (t / 3600 / sample_rate);
+	min = ((t / 60 / sample_rate) % 60);
+	sec = ((t / sample_rate) % 60);
+	msec = (((t - sample_rate * (t / sample_rate)) * 1000 / sample_rate) % 1000);
 }
 
 string AudioFile::get_time_str(int t)
 {
 	bool sign;
-	int _min, _sec, _msec;
-	disect_time(t, sample_rate, sign, _min, _sec, _msec);
+	int _hours, _min, _sec, _msec;
+	disect_time(t, sample_rate, sign, _hours, _min, _sec, _msec);
+	if (_hours > 0)
+		return format("%s%d:%.2d:%.2d,%.3d",sign?"-":"",_hours,_min,_sec,_msec);
 	if (_min > 0)
 		return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);
-	else
-		return format("%s%.2d,%.3d",sign?"-":"",_sec,_msec);
+	return format("%s%.2d,%.3d",sign?"-":"",_sec,_msec);
 }
 
 string AudioFile::get_time_str_fuzzy(int t, float dt)
 {
 	bool sign;
-	int _min, _sec, _msec;
-	disect_time(t, sample_rate, sign, _min, _sec, _msec);
+	int _hours, _min, _sec, _msec;
+	disect_time(t, sample_rate, sign, _hours, _min, _sec, _msec);
 	if (dt < 1.0){
+		if (_hours > 0)
+			return format("%s%d:%.2d:%.2d,%.3d",sign?"-":"",_hours,_min,_sec,_msec);
 		if (_min > 0)
 			return format("%s%d:%.2d,%.3d",sign?"-":"",_min,_sec,_msec);
-		else
-			return format("%s%.2d,%.3d",sign?"-":"",_sec,_msec);
+		return format("%s%.2d,%.3d",sign?"-":"",_sec,_msec);
 	}else{
+		if (_hours > 0)
+			return format("%s%d:%.2d:%.2d",sign?"-":"",_hours,_min,_sec);
 		if (_min > 0)
 			return format("%s%d:%.2d",sign?"-":"",_min,_sec);
-		else
-			return format("%s%.2d",sign?"-":"",_sec);
+		return format("%s%.2d",sign?"-":"",_sec);
 	}
 }
 
 string AudioFile::get_time_str_long(int t)
 {
 	bool sign;
-	int _min, _sec, _msec;
-	disect_time(t, sample_rate, sign, _min, _sec, _msec);
+	int _hours, _min, _sec, _msec;
+	disect_time(t, sample_rate, sign, _hours, _min, _sec, _msec);
+	if (_hours > 0)
+		return format("%s%dh %.2dm %.2ds %.3dms",sign?"-":"",_hours,_min,_sec,_msec);
 	if (_min > 0)
 		return format("%s%dm %.2ds %.3dms",sign?"-":"",_min,_sec,_msec);
-	else
-		return format("%s%ds %.3dms",sign?"-":"",_sec,_msec);
+	return format("%s%ds %.3dms",sign?"-":"",_sec,_msec);
 }
 
 

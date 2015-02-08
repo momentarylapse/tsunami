@@ -792,16 +792,23 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 {
 	double dl = AudioViewTrack::MIN_GRID_DIST / view_zoom; // >= 10 pixel
 	double dt = dl / audio->sample_rate;
-	double exp_s = ceil(log10(dt));
-	double exp_s_mod = exp_s - log10(dt);
-	dt = pow(10, exp_s);
+	double ldt = log10(dt);
+	double factor = 1;
+	if (ldt > 1.5)
+		factor = 1.0/0.6/0.60000001;
+	else if (ldt > 0)
+		factor = 1.0/0.600000001;
+	ldt += log10(factor);
+	double exp_s = ceil(ldt);
+	double exp_s_mod = exp_s - ldt;
+	dt = pow(10, exp_s) / factor;
 	dl = dt * audio->sample_rate;
 //	double dw = dl * a->view_zoom;
 	int nx0 = floor(screen2sample(r.x1 - 1) / dl);
 	int nx1 = ceil(screen2sample(r.x2) / dl);
 	color c1 = ColorInterpolate(bg, ColorGrid, exp_s_mod);
 	color c2 = ColorGrid;
-	for (int n=nx0;n<nx1;n++){
+	for (int n=nx0; n<nx1; n++){
 		c->setColor(((n % 10) == 0) ? c2 : c1);
 		int xx = sample2screen(n * dl);
 		c->drawLine(xx, r.y1, xx, r.y2);
@@ -816,13 +823,13 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 			c->drawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
 		c->setColor(ColorGrid);
-		for (int n=nx0;n<nx1;n++){
-			if ((sample2screen(dl) - sample2screen(0)) > 30){
-				if ((((n % 10) % 3) == 0) and ((n % 10) != 9) and ((n % 10) != -9))
-					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy(n * dl, dt * 3));
+		for (int n=nx0; n<nx1; n++){
+			if ((sample2screen(dl) - sample2screen(0)) > 25){
+				if (n % 5 == 0)
+					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy((double)n * dl, dt * 5));
 			}else{
 				if ((n % 10) == 0)
-					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy(n * dl, dt * 10));
+					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy((double)n * dl, dt * 10));
 			}
 		}
 	}

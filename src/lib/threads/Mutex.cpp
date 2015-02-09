@@ -1,5 +1,5 @@
-#include "mutex.h"
 #include "../file/file.h"
+#include "Mutex.h"
 
 #ifdef OS_WINDOWS
 	#include <windows.h>
@@ -41,12 +41,12 @@ void Mutex::__init__()
 	internal->mutex = CreateMutex(NULL, false, NULL);
 }
 
-void Mutex::Lock()
+void Mutex::lock()
 {
 	WaitForSingleObject(internal->mutex, INFINITE);
 }
 
-void Mutex::Unlock()
+void Mutex::unlock()
 {
 	ReleaseMutex(internal->mutex);
 }
@@ -66,12 +66,12 @@ void Mutex::__init__()
 	pthread_mutex_init(&internal->mutex, NULL);
 }
 
-void Mutex::Lock()
+void Mutex::lock()
 {
 	pthread_mutex_lock(&internal->mutex);
 }
 
-void Mutex::Unlock()
+void Mutex::unlock()
 {
 	pthread_mutex_unlock(&internal->mutex);
 }

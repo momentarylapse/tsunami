@@ -15,8 +15,8 @@ class Mutex
 public:
 	Mutex();
 	~Mutex();
-	void _cdecl Lock();
-	void _cdecl Unlock();
+	void _cdecl lock();
+	void _cdecl unlock();
 
 	void _cdecl __init__();
 	void _cdecl __delete__();

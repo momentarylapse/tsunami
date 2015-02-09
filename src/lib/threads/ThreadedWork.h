@@ -6,8 +6,8 @@
 #if !defined(WORK_H_INCLUDED)
 #define WORK_H_INCLUDED
 
-#include "threads.h"
-#include "mutex.h"
+#include "Mutex.h"
+#include "Thread.h"
 
 #define MAX_THREADS			32
 
@@ -16,9 +16,9 @@ class ThreadedWork : public VirtualBase
 public:
 	ThreadedWork();
 	virtual ~ThreadedWork();
-	virtual void _cdecl DoStep(int index, int worker_id){}
-	virtual bool _cdecl OnStatus(){	return true;	}
-	bool _cdecl Run(int total_size, int partition_size);
+	virtual void _cdecl doStep(int index, int worker_id){}
+	virtual bool _cdecl onStatus(){	return true;	}
+	bool _cdecl run(int total_size, int partition_size);
 
 	int total_size, partition_size;
 	Array<Thread*> thread;
@@ -26,8 +26,8 @@ public:
 	int work_given;
 	Mutex *mx_list;
 
-	int _cdecl GetTotal();
-	int _cdecl GetDone();
+	int _cdecl getTotal();
+	int _cdecl getDone();
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();

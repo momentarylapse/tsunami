@@ -1,7 +1,7 @@
 #include "../file/file.h"
-#include "threads.h"
-#include "mutex.h"
-#include "work.h"
+#include "Mutex.h"
+#include "Thread.h"
+#include "ThreadedWork.h"
 
 
 static int OverwriteThreadNum = -1;
@@ -14,25 +14,25 @@ public:
 		id = _id;
 		work = _work;
 	}
-	bool Schedule()
+	bool schedule()
 	{
-		work->mx_list->Lock();
+		work->mx_list->lock();
 		num = 0;
 		if (work->work_given >= work->total_size){
-			work->mx_list->Unlock();
+			work->mx_list->unlock();
 			return false;
 		}
 		first = work->work_given;
 		num = min(work->total_size - work->work_given, work->partition_size);
 		work->work_given += num;
-		work->mx_list->Unlock();
+		work->mx_list->unlock();
 		return true;
 	}
-	virtual void _cdecl OnRun()
+	virtual void _cdecl onRun()
 	{
-		while(Schedule()){
+		while(schedule()){
 			for (int i=0;i<num;i++)
-				work->DoStep(first + i, id);
+				work->doStep(first + i, id);
 		}
 	}
 
@@ -56,7 +56,7 @@ void ThreadedWork::__init__()
 	thread.__init__();
 	mx_list = NULL;
 	// use max. number of cores?
-	int num_threads = ThreadGetNumCores();
+	int num_threads = Thread::getNumCores();
 	if (OverwriteThreadNum >= 0)
 		num_threads = OverwriteThreadNum;
 
@@ -70,7 +70,7 @@ void ThreadedWork::__delete__()
 		delete(t);
 }
 
-bool ThreadedWork::Run(int _total_size, int _partition_size)
+bool ThreadedWork::run(int _total_size, int _partition_size)
 {
 	total_size = _total_size;
 	partition_size = _partition_size;
@@ -81,37 +81,36 @@ bool ThreadedWork::Run(int _total_size, int _partition_size)
 
 	// run threads
 	for (int i=0;i<thread.num;i++)
-		thread[i]->Run();
+		thread[i]->run();
 
 	// main program: update gui
 	bool all_done = false;
 	bool thread_abort = false;
 	while((!all_done) && (!thread_abort)){
 
-		thread_abort = !OnStatus();
+		thread_abort = !onStatus();
 		all_done = true;
 		for (int i=0;i<thread.num;i++)
-			all_done &= thread[i]->IsDone();
+			all_done &= thread[i]->isDone();
 	}
 
 	if (thread_abort){
 		for (int i=0;i<thread.num;i++)
-			thread[i]->Kill();
+			thread[i]->kill();
 	}else{
 		for (int i=0;i<thread.num;i++)
-			thread[i]->Join();
+			thread[i]->join();
 	}
 
-	msg_db_l(1);
 	return !thread_abort;
 }
 
-int ThreadedWork::GetTotal()
+int ThreadedWork::getTotal()
 {
 	return total_size;
 }
 
-int ThreadedWork::GetDone()
+int ThreadedWork::getDone()
 {
 	return work_given;
 }

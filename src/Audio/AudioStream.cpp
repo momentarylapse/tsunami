@@ -10,9 +10,9 @@
 #include "../Tsunami.h"
 #include "AudioRenderer.h"
 #include "../Stuff/Log.h"
-
 #include <portaudio.h>
 #include <math.h>
+#include "../lib/threads/Thread.h"
 
 //#define DEFAULT_BUFFER_SIZE		131072
 #define DEFAULT_BUFFER_SIZE		32768
@@ -30,6 +30,7 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 {
 	AudioStream *stream = (AudioStream*)userData;
 	float *out = (float*)output;
+//	printf("%d\n", frameCount);
 
 	if (statusFlags != 0)
 		printf("flags: %d\n", statusFlags);
@@ -59,19 +60,49 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 	}
 
 	// read more?
-	if ((available < (unsigned)stream->buffer_size) and (!stream->reading) and (!stream->end_of_data)){
-		printf("+\n");
-		stream->reading = true;
-		HuiRunLaterM(0.001f, stream, &AudioStream::stream);
+	if ((available < (unsigned)stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->end_of_data)){
+//		printf("+\n");
+		stream->read_more = true;
 	}
 
 	if (available <= frameCount and stream->end_of_data){
-		printf("end\n");
+//		printf("end\n");
 		HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
 		return paComplete;
 	}
 	return paContinue;
 }
+
+class StreamThread : public Thread
+{
+public:
+	AudioStream *stream;
+	HuiTimer timer;
+	float t_idle;
+
+	StreamThread(AudioStream *s)
+	{
+		stream = s;
+		t_idle = 0;
+	}
+
+	virtual void onRun()
+	{
+		timer.reset();
+		while(true){
+			if (stream->read_more){
+				stream->stream();
+				float t_busy = timer.get();
+				stream->cpu_usage = t_busy / (t_busy + t_idle);
+				printf("%.1f %%\n", stream->cpu_usage * 100);
+				t_idle = 0;
+			}else{
+				HuiSleep(0.005f);
+				t_idle += timer.get();
+			}
+		}
+	}
+};
 
 AudioStream::AudioStream(AudioRendererInterface *r) :
 	PeakMeterSource("AudioStream"),
@@ -84,6 +115,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	playing = false;
 	paused = false;
 	volume = 1;
+	read_more = false;
 	reading = false;
 
 	output = tsunami->output;
@@ -93,6 +125,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	update_dt = DEFAULT_UPDATE_DT;
 	killed = false;
+	thread = NULL;
 
 	if (JUST_FAKING_IT)
 		return;
@@ -149,6 +182,12 @@ void AudioStream::kill()
 
 	output->removeStream(this);
 	killed = true;
+
+	if (thread){
+		thread->kill();
+		delete(thread);
+		thread = NULL;
+	}
 }
 
 void AudioStream::stop()
@@ -165,6 +204,7 @@ void AudioStream::stop()
 	playing = false;
 	paused = false;
 	end_of_data = false;
+	read_more = false;
 	ring_buf.clear();
 
 	notify(MESSAGE_STATE_CHANGE);
@@ -182,6 +222,7 @@ void AudioStream::pause()
 void AudioStream::stream()
 {
 	reading = true;
+	read_more = false;
 	msg_db_f("stream", 1);
 
 	int size = 0;
@@ -225,6 +266,11 @@ void AudioStream::play()
 			return;
 		}*/
 		stop();
+	}
+
+	if (!thread){
+		thread = new StreamThread(this);
+		thread->run();
 	}
 
 

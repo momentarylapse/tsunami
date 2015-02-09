@@ -1,4 +1,5 @@
-#include "threads.h"
+#include "Thread.h"
+
 #include "../file/file.h"
 
 #ifdef OS_WINDOWS
@@ -26,7 +27,7 @@ static Array<Thread*> _Thread_List_;
 //------------------------------------------------------------------------------
 // auxiliary
 
-int ThreadGetNumCores()
+int Thread::getNumCores()
 {
 #ifdef OS_WINDOWS
 	SYSTEM_INFO siSysInfo;
@@ -67,7 +68,7 @@ void Thread::__init__()
 
 void Thread::__delete__()
 {
-	Kill();
+	kill();
 	for (int i=0;i<_Thread_List_.num;i++)
 		if (_Thread_List_[i] == this)
 			_Thread_List_.erase(i);
@@ -82,14 +83,14 @@ void Thread::__delete__()
 static DWORD WINAPI thread_start_func(__in LPVOID p)
 {
 	Thread *t = (Thread*)p;
-	t->OnRun();
+	t->onRun();
 	t->running = false;
 	return 0;
 }
 
 
 // create and run a new thread
-void Thread::Run()
+void Thread::run()
 {
 	if (!internal)
 		internal = new ThreadInternal;
@@ -101,26 +102,26 @@ void Thread::Run()
 }
 
 
-void Thread::Kill()
+void Thread::kill()
 {
 	if (running)
 		TerminateThread(internal->thread, 0);
 	running = false;
 }
 
-void Thread::Join()
+void Thread::join()
 {
 	if (running)
 		WaitForSingleObject(internal->thread, INFINITE);
 	running = false;
 }
 
-void ThreadExit()
+void Thread::exit()
 {
 	ExitThread(0);
 }
 
-Thread *ThreadSelf()
+Thread *Thread::getSelf()
 {
 	HANDLE h = GetCurrentThread();
 	foreach(Thread *t, _Thread_List_)
@@ -137,14 +138,14 @@ Thread *ThreadSelf()
 static void *thread_start_func(void *p)
 {
 	Thread *t = (Thread*)p;
-	t->OnRun();
+	t->onRun();
 	t->running = false;
 	return NULL;
 }
 
 
 // create and run a new thread
-void Thread::Run()
+void Thread::run()
 {
 	if (!internal)
 		internal = new ThreadInternal;
@@ -156,26 +157,26 @@ void Thread::Run()
 }
 
 
-void Thread::Kill()
+void Thread::kill()
 {
 	if (running)
 		pthread_cancel(internal->thread);
 	running = false;
 }
 
-void Thread::Join()
+void Thread::join()
 {
 	if (running)
 		pthread_join(internal->thread, NULL);
 	running = false;
 }
 
-void ThreadExit()
+void Thread::exit()
 {
 	pthread_exit(NULL);
 }
 
-Thread *ThreadSelf()
+Thread *Thread::getSelf()
 {
 	pthread_t s = pthread_self();
 	foreach(Thread *t, _Thread_List_)
@@ -188,7 +189,7 @@ Thread *ThreadSelf()
 #endif
 
 
-bool Thread::IsDone()
+bool Thread::isDone()
 {
 	return !running;
 }

@@ -19,6 +19,7 @@
 class AudioRendererInterface;
 class AudioOutput;
 typedef void PaStream;
+class Thread;
 
 class AudioStream : public PeakMeterSource
 {
@@ -78,6 +79,7 @@ public:
 	RingBuffer ring_buf;
 
 	bool reading;
+	bool read_more;
 	bool end_of_data;
 
 	//typedef int generate_func_t(BufferBox &);
@@ -95,6 +97,9 @@ public:
 
 	AudioOutput *output;
 	bool killed;
+
+	Thread *thread;
+	float cpu_usage;
 };
 
 #endif /* SRC_AUDIO_AUDIOSTREAM_H_ */

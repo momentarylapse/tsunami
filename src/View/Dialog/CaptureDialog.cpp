@@ -187,7 +187,7 @@ void CaptureDialog::setType(int _type)
 
 void CaptureDialog::onStart()
 {
-	tsunami->renderer->prepare(audio, tsunami->win->view->getPlaybackSelection(), false);
+	view->renderer->prepare(audio, view->getPlaybackSelection(), false);
 	view->stream->play();
 
 	tsunami->input->resetSync();

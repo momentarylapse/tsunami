@@ -12,7 +12,6 @@
 #include "Stuff/Clipboard.h"
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioInput.h"
-#include "Audio/AudioRenderer.h"
 #include "View/Helper/Progress.h"
 #include "Plugins/PluginManager.h"
 
@@ -39,7 +38,6 @@ Tsunami::~Tsunami()
 	delete(input);
 	delete(output);
 	delete(audio);
-	delete(renderer);
 	delete(plugin_manager);
 }
 
@@ -57,7 +55,6 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	output = new AudioOutput;
 	input = new AudioInput;
-	renderer = new AudioRenderer;
 
 	audio = new AudioFile;
 	audio->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);

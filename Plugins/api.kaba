@@ -268,9 +268,12 @@ class AudioView
 	Range sel_range
 	Range sel_raw
 	AudioStream *stream
+	AudioRenderer *renderer
 
 
 class AudioRenderer
+	extern void __init__()
+	extern virtual void __delete__()
 	extern void renderAudioFile(AudioFile *a, Range r, BufferBox buf)
 	extern void prepare(AudioFile *a, Range r, bool allow_loop)
 	//extern virtual int read(BufferBox b)
@@ -323,7 +326,6 @@ extern Window *MainWin
 extern AudioFile *audio
 //extern AudioOutput *output
 extern AudioInput *input
-extern AudioRenderer *renderer
 extern AudioView *view
 extern Log *logging
 extern PluginContext plugin_context

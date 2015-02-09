@@ -106,7 +106,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("audio", &tsunami->audio);
 	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
-	Script::LinkExternal("renderer", &tsunami->renderer);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
 	Script::LinkExternal("view", &tsunami->_view);
@@ -338,10 +337,13 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "range", Script::mf(&AudioRendererInterface::range), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "offset", Script::mf(&AudioRendererInterface::offset), &ari);
 
+	AudioRenderer ar;
 	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
 	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::prepare));
 	//Script::LinkExternal("AudioRenderer.read", Script::mf(&AudioRenderer::read));
 	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::renderAudioFile));
+	Script::LinkExternal("AudioRenderer.__init__", Script::mf(&AudioRenderer::__init__));
+	Script::DeclareClassVirtualIndex("AudioRenderer", "__delete__", Script::mf(&AudioRenderer::__delete__), &ar);
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
 	Script::DeclareClassOffset("AudioInput", "cur_buf", _offsetof(AudioInput, current_buffer));
@@ -382,6 +384,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
+	Script::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
 
 	Script::LinkExternal("Log.error", Script::mf(&Log::error));
 	Script::LinkExternal("Log.warning", Script::mf(&Log::warning));
@@ -649,13 +652,13 @@ void PluginManager::PreviewStart(Effect *fx)
 {
 	if (fx)
 		fx->configToString();
-	tsunami->renderer->effect = fx;
+	tsunami->win->view->renderer->effect = fx;
 
 
 	tsunami->progress->startCancelable(_("Vorschau"), 0);
 	subscribe(tsunami->progress);
 	subscribe(tsunami->win->view->stream);
-	tsunami->renderer->prepare(tsunami->audio, tsunami->win->view->sel_range, false);
+	tsunami->win->view->renderer->prepare(tsunami->audio, tsunami->win->view->sel_range, false);
 	tsunami->win->view->stream->play();
 }
 
@@ -667,7 +670,7 @@ void PluginManager::PreviewEnd()
 	tsunami->progress->end();
 
 
-	tsunami->renderer->effect = NULL;
+	tsunami->win->view->renderer->effect = NULL;
 }
 
 Effect *PluginManager::LoadEffect(const string &name)

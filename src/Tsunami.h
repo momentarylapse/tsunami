@@ -55,7 +55,6 @@ public:
 
 	AudioOutput *output;
 	AudioInput *input;
-	AudioRenderer *renderer;
 
 	PluginManager *plugin_manager;
 	Clipboard *clipboard;

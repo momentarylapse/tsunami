@@ -65,7 +65,7 @@ AudioView::SelectionType::SelectionType()
 	pitch = -1;
 }
 
-AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input, AudioRenderer *_renderer) :
+AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input) :
 	Observer("AudioView"),
 	Observable("AudioView"),
 	BarrierDist(5)
@@ -124,7 +124,6 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 
 	audio = _audio;
 	input = _input;
-	renderer = _renderer;
 
 	pitch_min = 60;
 	pitch_max = 90;
@@ -135,6 +134,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	chord_type = 0;
 	chord_inversion = 0;
 
+	renderer = new AudioRenderer;
 	stream = new AudioStream(renderer);
 
 	midi_preview_renderer = new SynthesizerRenderer(NULL);
@@ -180,6 +180,7 @@ AudioView::~AudioView()
 	unsubscribe(input);
 
 	delete(stream);
+	delete(renderer);
 	delete(midi_preview_stream);
 	delete(midi_preview_renderer);
 

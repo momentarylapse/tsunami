@@ -24,7 +24,7 @@ class SynthesizerRenderer;
 class AudioView : public Observer, public Observable
 {
 public:
-	AudioView(TsunamiWindow *parent, AudioFile *audio, AudioOutput *output, AudioInput *input, AudioRenderer *renderer);
+	AudioView(TsunamiWindow *parent, AudioFile *audio, AudioOutput *output, AudioInput *input);
 	virtual ~AudioView();
 
 	void checkConsistency();
@@ -199,10 +199,10 @@ public:
 	AudioFile *audio;
 
 	AudioStream *stream;
+	AudioRenderer *renderer;
 	AudioStream *midi_preview_stream;
 	SynthesizerRenderer *midi_preview_renderer;
 	AudioInput *input;
-	AudioRenderer *renderer;
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);

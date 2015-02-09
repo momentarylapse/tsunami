@@ -31,6 +31,9 @@ public:
 	AudioRenderer();
 	virtual ~AudioRenderer();
 
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
+
 	void renderAudioFile(AudioFile *a, const Range &range, BufferBox &buf);
 	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
 	virtual int read(BufferBox &buf);

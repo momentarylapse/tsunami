@@ -76,6 +76,7 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
+	AudioRenderer renderer
 	renderer.renderAudioFile(audio, view.sel_range, buf)
 	
 	complex[] f

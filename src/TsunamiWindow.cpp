@@ -126,7 +126,7 @@ TsunamiWindow::TsunamiWindow() :
 	audio = tsunami->audio;
 
 
-	view = new AudioView(this, audio, tsunami->output, tsunami->input, tsunami->renderer);
+	view = new AudioView(this, audio, tsunami->output, tsunami->input);
 
 	// side bar
 	side_bar = new SideBar(view, audio);
@@ -358,13 +358,13 @@ void TsunamiWindow::onRemoveAdded()
 
 void TsunamiWindow::onPlayLoop()
 {
-	tsunami->renderer->loop_if_allowed = !tsunami->renderer->loop_if_allowed;
+	view->renderer->loop_if_allowed = !view->renderer->loop_if_allowed;
 	updateMenu();
 }
 
 void TsunamiWindow::onPlay()
 {
-	tsunami->renderer->prepare(audio, view->getPlaybackSelection(), true);
+	view->renderer->prepare(audio, view->getPlaybackSelection(), true);
 	view->stream->play();
 }
 
@@ -493,7 +493,7 @@ void TsunamiWindow::updateMenu()
 	// sound
 	enable("stop", view->stream->isPlaying());
 	enable("pause", view->stream->isPlaying());
-	check("play_loop", tsunami->renderer->loop_if_allowed);
+	check("play_loop", view->renderer->loop_if_allowed);
 	// view
 	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
 	check("show_fx_console", bottom_bar->isActive(BottomBar::FX_CONSOLE));

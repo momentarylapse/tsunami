@@ -43,6 +43,16 @@ AudioRenderer::~AudioRenderer()
 {
 }
 
+void AudioRenderer::__init__()
+{
+	new(this) AudioRenderer;
+}
+
+void AudioRenderer::__delete__()
+{
+	midi.clear();
+}
+
 bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 {
 	// intersected intervall (track-coordinates)

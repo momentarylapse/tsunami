@@ -300,7 +300,7 @@ void StartLesson(string name)
 	input.start(TRACK_TYPE_AUDIO, audio.sample_rate)
 	input.addObserver(nil, &UpdateInput)
 	
-	renderer.prepare(audio, audio.getRange(), false)
+	view.renderer.prepare(audio, audio.getRange(), false)
 	view.stream.play()
 	win.enable("speed", false)
 	win.enable("cancel", true)

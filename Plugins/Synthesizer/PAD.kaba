@@ -23,10 +23,12 @@ class PADConfig : PluginData
 	float[] A
 	float bw
 	float bwscale
+	float detune
 	overwrite void reset()
 		A = [1.0, 0.4, 0.2, 0.1, 0.05]
 		bw = 0.5
 		bwscale = 0.7
+		detune = 0.03
 	
 	void fill_curve(complex[] c, int n0)
 		c.clear()
@@ -62,10 +64,11 @@ class PADSynthesizer : Synthesizer
 	
 		for a,n0 in config.A
 			int n = n0 + 1
-			float nn = n + 0.03 * n * n
+			float nn = n + config.detune * n0 * n0
+			print nn
 			float bwHz = (pow(2, config.bw / 12.0) - 1.0) * freq * pow(nn, config.bwscale)
 			float bwi = bwHz / (2.0 * sample_rate)
-			float fi = freq * nn / sample_rate
+			float fi = freq * n / sample_rate
 			for i in 0:amp.num
 				amp[i] += gauss((i2f(i) / N) - fi, bwi) * a
 		
@@ -164,14 +167,17 @@ class PADPanel : ConfigPanel
 		pc = &c.config
 		fromSource("
 Grid ? '' 1 2
-	Grid ? '' 2 2
+	Grid ? '' 2 3
 		Text ? 'bw'
 		SpinButton bw '0\\0\\10\\0.01'
 		Text ? 'bwscale'
 		SpinButton bwscale '0\\0\\10\\0.01'
+		Text ? 'detune'
+		SpinButton detune '0\\-10\\10\\0.01'
 	DrawingArea drawing '' grabfocus width=500")
 		event("bw", &onChange)
 		event("bwscale", &onChange)
+		event("detune", &onChange)
 		
 		grid.pc = pc
 		grid.p = self
@@ -182,10 +188,12 @@ Grid ? '' 1 2
 	void onChange()
 		pc.bw = getFloat("bw")
 		pc.bwscale = getFloat("bwscale")
+		pc.detune = getFloat("detune")
 		grid.redraw()
 		notify()
 	
 	overwrite void update()
 		setFloat("bw", pc.bw)
 		setFloat("bwscale", pc.bwscale)
+		setFloat("detune", pc.detune)
 		grid.redraw()

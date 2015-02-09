@@ -39,6 +39,7 @@ class MidiData : public Array<MidiEvent>
 public:
 	MidiData();
 	MidiData getEvents(const Range &r);
+	int read(MidiData &data, const Range &r);
 	Array<MidiNote> getNotes(const Range &r);
 	int getNextEvent(int pos);
 

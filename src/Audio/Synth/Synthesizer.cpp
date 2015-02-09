@@ -22,6 +22,7 @@ Synthesizer::Synthesizer() :
 {
 	sample_rate = 0;
 	keep_notes = 0;
+	auto_stop = true;
 
 	setSampleRate(DEFAULT_SAMPLE_RATE);
 }
@@ -104,6 +105,7 @@ void Synthesizer::iterateEvents(int samples)
 			events[i].pos -= samples;
 		else
 			events.erase(i);
+	events.samples = max(events.samples - samples, 0);
 }
 
 int Synthesizer::read(BufferBox &buf)
@@ -111,8 +113,8 @@ int Synthesizer::read(BufferBox &buf)
 	// get from source...
 	buf.scale(0);
 
-	//if ((auto_stop) and (cur_notes.num == 0))
-	//	return 0;
+	if (auto_stop and hasEnded())
+		return 0;
 
 	render(buf);
 
@@ -121,9 +123,15 @@ int Synthesizer::read(BufferBox &buf)
 	return buf.num;
 }
 
+bool Synthesizer::hasEnded()
+{
+	return (events.num == 0) and (events.samples == 0) and (active_pitch.num == 0);
+}
+
 void Synthesizer::resetMidiData()
 {
 	events.clear();
+	events.samples = 0;
 }
 
 void Synthesizer::prepare()

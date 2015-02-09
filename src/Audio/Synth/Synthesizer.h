@@ -44,6 +44,7 @@ public:
 
 	void iterateEvents(int samples);
 
+	bool hasEnded();
 	bool auto_stop;
 
 protected:

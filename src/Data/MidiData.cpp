@@ -93,6 +93,15 @@ MidiData MidiData::getEvents(const Range &r)
 	return a;
 }
 
+int MidiData::read(MidiData &data, const Range &r)
+{
+	data.samples = min(r.num, samples - r.offset);
+	foreach(MidiEvent &e, *this)
+		if (r.is_inside(e.pos))
+			data.add(MidiEvent(e.pos - r.offset, e.pitch, e.volume));
+	return data.samples;
+}
+
 Array<MidiNote> MidiData::getNotes(const Range &r)
 {
 	Array<MidiNote> a = midi_events_to_notes(*this);

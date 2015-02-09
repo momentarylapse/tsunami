@@ -89,9 +89,9 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 
 void make_silence(BufferBox &buf, int size)
 {
-	if (buf.num == 0)
+	if (buf.num == 0){
 		buf.resize(size);
-	else{
+	}else{
 		buf.resize(size);
 		memset(buf.r.data, 0, size * sizeof(buf.r[0]));
 		memset(buf.l.data, 0, size * sizeof(buf.l[0]));
@@ -104,8 +104,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	make_silence(buf, range_cur.length());
 
-	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
-	Array<Beat> beats = t->bar.getBeats(r);
+	Array<Beat> beats = t->bar.getBeats(range_cur);
 
 	foreach(Beat &b, beats)
 		t->synth->addMetronomeClick(b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
@@ -122,10 +121,8 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 	if ((ti >= 0) && (ti < midi.num))
 		m = &midi[ti];
 
-	Range r = Range(range_cur.offset - t->synth->keep_notes, range_cur.num + t->synth->keep_notes);
-	MidiData events = m->getEvents(r);
-	foreach(MidiEvent &e, events)
-		e.pos -= r.offset;
+	MidiData events;
+	m->read(events, range_cur);
 
 	t->synth->feed(events);
 	t->synth->read(buf);

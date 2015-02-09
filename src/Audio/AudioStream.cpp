@@ -31,8 +31,13 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 	AudioStream *stream = (AudioStream*)userData;
 	float *out = (float*)output;
 
+	if (statusFlags != 0)
+		printf("flags: %d\n", statusFlags);
+	//paOutputUnderflow
+
 	unsigned int available = stream->ring_buf.available();
 	if ((stream->paused) or (available < frameCount)){
+		printf("<\n");
 		// output silence...
 		for (unsigned int i=0; i<frameCount; i++){
 			*out ++ = 0;
@@ -55,12 +60,14 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 
 	// read more?
 	if ((available < (unsigned)stream->buffer_size) and (!stream->reading) and (!stream->end_of_data)){
+		printf("+\n");
 		stream->reading = true;
-		HuiRunLaterM(0, stream, &AudioStream::stream);
+		HuiRunLaterM(0.001f, stream, &AudioStream::stream);
 	}
 
 	if (available <= frameCount and stream->end_of_data){
-		HuiRunLaterM(0, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
+		printf("end\n");
+		HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
 		return paComplete;
 	}
 	return paContinue;
@@ -105,7 +112,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	                NULL,
 	                &outputParameters,
 	                sample_rate,
-					paFramesPerBufferUnspecified,
+					512,//paFramesPerBufferUnspecified,
 	                paNoFlag, //flags that can be used to define dither, clip settings and more
 	                portAudioCallback,
 	                (void*)this);

@@ -270,7 +270,7 @@ class FMSynthesizer : Synthesizer
 						buf.r[i] += d
 						buf.l[i] += d*/
 			
-			for d in del_me
-				enablePitch(d, false)
+			for p in del_me
+				enablePitch(p, false)
 			
 	

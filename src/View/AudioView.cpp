@@ -138,7 +138,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	stream = new AudioStream(renderer);
 
 	midi_preview_renderer = new SynthesizerRenderer(NULL);
-	midi_preview_renderer->auto_stop = true;
+	midi_preview_renderer->setAutoStop(true);
 	midi_preview_stream = new AudioStream(midi_preview_renderer);
 	midi_preview_stream->setBufferSize(2048);
 

@@ -28,12 +28,14 @@ public:
 	void setSynthesizer(Synthesizer *s);
 
 	virtual int read(BufferBox &buf);
+	virtual void reset();
 
 	void add(const MidiEvent &e);
+	void feed(const MidiData &data);
 	void endAllNotes();
 	void resetMidiData();
 
-	bool auto_stop;
+	void setAutoStop(bool auto_stop);
 
 private:
 	Synthesizer *s;

@@ -293,13 +293,20 @@ void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool allow_loop)
 	pos = _range.offset;
 	_offset = 0;
 	midi.clear();
-	foreach(Effect *fx, a->fx)
+
+	reset();
+}
+
+void AudioRenderer::reset()
+{
+	sample_rate = audio->sample_rate;
+	foreach(Effect *fx, audio->fx)
 		fx->prepare();
-	foreachi(Track *t, a->track, i){
+	foreachi(Track *t, audio->track, i){
 		//midi.add(t, t->midi);
 		midi.add(t->midi);
 		t->synth->setSampleRate(audio->sample_rate);
-		t->synth->prepare();
+		t->synth->reset();
 		foreach(Effect *fx, t->fx)
 			fx->prepare();
 		foreach(MidiEffect *fx, t->midi.fx){

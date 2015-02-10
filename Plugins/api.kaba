@@ -81,6 +81,7 @@ class AudioRendererInterface
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual int read(BufferBox buf)
+	extern virtual void reset()
 	extern virtual Range range()
 	extern virtual int offset()
 	int sample_rate
@@ -115,6 +116,7 @@ class DummySynthesizer : Synthesizer
 class SynthesizerRenderer
 	extern void resetMidiData()
 	extern virtual int read(BufferBox buf)
+	extern virtual void reset()
 	extern void add(MidiEvent e)
 
 class EnvelopeADSR
@@ -276,7 +278,10 @@ class AudioRenderer
 	extern virtual void __delete__()
 	extern void renderAudioFile(AudioFile *a, Range r, BufferBox buf)
 	extern void prepare(AudioFile *a, Range r, bool allow_loop)
-	//extern virtual int read(BufferBox b)
+	extern virtual int read(BufferBox b)
+	extern virtual void reset()
+	extern virtual Range range()
+	extern virtual int offset()
 
 
 class AudioStream

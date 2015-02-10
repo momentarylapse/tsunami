@@ -277,6 +277,7 @@ void AudioStream::play()
 	end_of_data = false;
 	reading = false;
 
+	renderer->reset();
 	stream();
 	last_error = Pa_StartStream(pa_stream);
 	testError("Pa_StartStream");

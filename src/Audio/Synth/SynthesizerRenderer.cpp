@@ -12,8 +12,8 @@
 
 SynthesizerRenderer::SynthesizerRenderer(Synthesizer *_s)
 {
-	auto_stop = false;
 	setSynthesizer(_s);
+	setAutoStop(true);
 }
 
 SynthesizerRenderer::~SynthesizerRenderer()
@@ -45,6 +45,12 @@ void SynthesizerRenderer::add(const MidiEvent &e)
 		s->add(e);
 }
 
+void SynthesizerRenderer::feed(const MidiData &data)
+{
+	if (s)
+		s->feed(data);
+}
+
 void SynthesizerRenderer::endAllNotes()
 {
 	if (s)
@@ -58,9 +64,21 @@ int SynthesizerRenderer::read(BufferBox &buf)
 	return s->read(buf);
 }
 
+void SynthesizerRenderer::reset()
+{
+	if (s)
+		s->reset();
+}
+
 void SynthesizerRenderer::resetMidiData()
 {
 	if (s)
 		s->resetMidiData();
+}
+
+void SynthesizerRenderer::setAutoStop(bool auto_stop)
+{
+	if (s)
+		s->auto_stop = auto_stop;
 }
 

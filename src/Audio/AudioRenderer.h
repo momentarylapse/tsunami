@@ -20,6 +20,7 @@ public:
 	virtual void _cdecl __delete__();
 
 	virtual int read(BufferBox &buf){ return 0; }
+	virtual void reset(){}
 	virtual Range range(){ return Range(0, 0); }
 	virtual int offset(){ return 0; }
 	int sample_rate;
@@ -37,6 +38,7 @@ public:
 	void renderAudioFile(AudioFile *a, const Range &range, BufferBox &buf);
 	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
 	virtual int read(BufferBox &buf);
+	virtual void reset();
 	void prepare(AudioFile *a, const Range &range, bool alllow_loop);
 
 	void seek(int pos);

@@ -65,6 +65,7 @@ void AudioInputMidi::init()
 void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 {
 	preview_renderer->setSynthesizer(s);
+	preview_renderer->setAutoStop(false);
 	if (s and capturing)
 		preview_stream->play();
 }
@@ -187,6 +188,7 @@ bool AudioInputMidi::start(int _sample_rate)
 	resetAccumulation();
 
 	clearInputQueue();
+	preview_renderer->setAutoStop(false);
 	if (preview_renderer->getSynthesizer())
 		preview_stream->play();
 
@@ -199,7 +201,9 @@ bool AudioInputMidi::start(int _sample_rate)
 void AudioInputMidi::stop()
 {
 	capturing = false;
-	preview_stream->stop();
+	preview_renderer->setAutoStop(true);
+	preview_renderer->endAllNotes();
+	//preview_stream->stop();
 
 	data.sanify();
 }
@@ -232,8 +236,9 @@ int AudioInputMidi::doCapturing()
 		snd_seq_free_event(ev);
 	}
 
-	foreach(MidiEvent &e, cur_data)
-		preview_renderer->add(e);
+	preview_renderer->feed(cur_data);
+	if ((cur_data.num > 0) and (!preview_stream->isPlaying()))
+		preview_stream->play();
 
 	if (accumulating)
 		data.append(cur_data);

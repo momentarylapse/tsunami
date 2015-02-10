@@ -134,10 +134,11 @@ void Synthesizer::resetMidiData()
 	events.samples = 0;
 }
 
-void Synthesizer::prepare()
+void Synthesizer::reset()
 {
 	resetState();
 	active_pitch.clear();
+	//resetMidiData();
 }
 
 

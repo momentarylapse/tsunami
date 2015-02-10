@@ -40,7 +40,7 @@ public:
 	void add(const MidiEvent &e);
 	void endAllNotes();
 	void resetMidiData();
-	void prepare();
+	void reset();
 
 	void iterateEvents(int samples);
 

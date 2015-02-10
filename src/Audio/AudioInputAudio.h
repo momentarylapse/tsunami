@@ -55,6 +55,7 @@ public:
 
 	BufferBox &accumulation_buffer;
 	RingBuffer &current_buffer;
+	int num_channels;
 private:
 	bool accumulating;
 

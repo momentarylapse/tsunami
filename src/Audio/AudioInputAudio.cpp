@@ -53,12 +53,12 @@ int portAudioInputCallback(const void *input, void *output, unsigned long frameC
 	RingBuffer &buf = ia->current_buffer;
 	BufferBox b;
 	buf.writeRef(b, frameCount);
-	b.deinterleave(in);
+	b.deinterleave(in, ia->num_channels);
 
 	unsigned int done = b.num;
 	if (done < frameCount){
 		buf.writeRef(b, frameCount - done);
-		b.deinterleave(&in[2 * done]);
+		b.deinterleave(&in[2 * done], ia->num_channels);
 	}
 
 	return paContinue;
@@ -153,7 +153,9 @@ bool AudioInputAudio::start(int _sample_rate)
 
 	PaStreamParameters param;
 	bzero(&param, sizeof(param));
-	param.channelCount = 2;
+
+	num_channels = min(2, Pa_GetDeviceInfo(pa_device_no)->maxInputChannels);
+	param.channelCount = num_channels;
 	param.device = pa_device_no;
 	param.hostApiSpecificStreamInfo = NULL;
 	param.sampleFormat = paFloat32;

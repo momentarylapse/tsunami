@@ -367,13 +367,20 @@ void BufferBox::interleave(float *p)
 	}
 }
 
-void BufferBox::deinterleave(float *p)
+void BufferBox::deinterleave(float *p, int num_channels)
 {
 	float *pr = &r[0];
 	float *pl = &l[0];
-	for (int i=0; i<num; i++){
-		*pr ++ = *p ++;
-		*pl ++ = *p ++;
+	if (num_channels == 1){
+		for (int i=0; i<num; i++){
+			*pr ++ = *p;
+			*pl ++ = *p ++;
+		}
+	}else if (num_channels == 2){
+		for (int i=0; i<num; i++){
+			*pr ++ = *p ++;
+			*pl ++ = *p ++;
+		}
 	}
 }
 

@@ -61,7 +61,7 @@ public:
 
 	bool get_16bit_buffer(Array<short> &data);
 	void interleave(float *p);
-	void deinterleave(float *p);
+	void deinterleave(float *p, int num_channels);
 
 	enum PeakMode
 	{

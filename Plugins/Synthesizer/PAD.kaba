@@ -59,8 +59,8 @@ class PADSynthesizer : Synthesizer
 	
 		complex[] c
 		float[] amp
-		c.resize(N / 2 - 1)
-		amp.resize(N / 2 - 1)
+		c.resize(N / 2 + 1)
+		amp.resize(N / 2 + 1)
 	
 		for a,n0 in config.A
 			int n = n0 + 1

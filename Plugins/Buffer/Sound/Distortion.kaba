@@ -2,36 +2,21 @@
 // Title[Deutsch] = Verzerrer
 use "../../api.kaba"
 
+const string AutoConfigGain = "0:1:0.1:100:%"
+
+class Config : PluginData
+	float Gain
+	overwrite void reset()
+		Gain = 0.1
+
 class Distortion : AudioEffect
+	Config config
 
-	int num_x
-	float[8] x_in
-	float[8] x_out
-
-	float dist(float x)
-		float f = abs(x)
-		float sign = 1
-		if x < 0
-			sign = -1
-		//f = pow(f, 0.2) * 0.99
-		float ff = 0
-		for i in 0:num_x-1
-			if (f >= x_in[i]) and (f <= x_in[i + 1])
-				ff = x_out[i] + (x_out[i + 1] - x_out[i]) * (f - x_in[i]) / (x_in[i + 1] - x_in[i])
-		return sign * ff
 
 	overwrite void process(BufferBox buf)
-	
-		num_x = 4
-		x_in[0] = 0
-		x_in[1] = 0.05
-		x_in[2] = 0.15
-		x_in[3] = 1
-		x_out[0] = 0
-		x_out[1] = 0.9
-		x_out[2] = 0.95
-		x_out[3] = 1
+		float a = max(10000 * pow(config.Gain, 2), 0.01)
+		float b = 1 / atan(a)
 	
 		for i in 0:buf.num
-			buf.r[i] = dist(buf.r[i])
-			buf.l[i] = dist(buf.l[i])
+			buf.r[i] = b * atan(buf.r[i] * a)
+			buf.l[i] = b * atan(buf.l[i] * a)

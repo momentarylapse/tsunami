@@ -128,8 +128,6 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 
 	addControlTable("!expandy", 0, 0, 1, 32, id_inner);
 	setTarget(id_inner, 0);
-	addText("!angle=90\\...", 0, 0, 0, 0, "track_name");
-	addSeparator("!vertical", 1, 0, 0, 0, "");
 	addText(_("- hier sind (noch) keine Effekte aktiv -"), 30, 0, 0, 0, "comment_no_fx");
 	addButton("!expandy,flat", 31, 0, 0, 0, "add");
 	setImage("add", "hui:add");
@@ -137,11 +135,11 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 
 	track = NULL;
 	//Enable("add", false);
-	enable("track_name", false);
 
 	event("add", this, &FxConsole::onAdd);
 
-	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	if (view)
+		subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	subscribe(audio, audio->MESSAGE_ADD_EFFECT);
 	subscribe(audio, audio->MESSAGE_DELETE_EFFECT);
 }
@@ -149,7 +147,8 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 FxConsole::~FxConsole()
 {
 	clear();
-	unsubscribe(view);
+	if (view)
+		unsubscribe(view);
 	unsubscribe(audio);
 }
 
@@ -185,9 +184,7 @@ void FxConsole::setTrack(Track *t)
 		subscribe(track, track->MESSAGE_DELETE);
 		subscribe(track, track->MESSAGE_ADD_EFFECT);
 		subscribe(track, track->MESSAGE_DELETE_EFFECT);
-		setString("track_name", format(_("!angle=90\\wirken auf die Spur '%s'"), track->getNiceName().c_str()));
-	}else
-		setString("track_name", _("!angle=90\\wirken auf die komplette Datei"));
+	}
 
 
 	Array<Effect*> fx;
@@ -197,8 +194,8 @@ void FxConsole::setTrack(Track *t)
 		fx = audio->fx;
 	foreachi(Effect *e, fx, i){
 		panels.add(new SingleFxPanel(audio, track, e, i));
-		embed(panels.back(), id_inner, i*2 + 2, 0);
-		addSeparator("!vertical", i*2 + 3, 0, 0, 0, "separator_" + i2s(i));
+		embed(panels.back(), id_inner, i*2, 0);
+		addSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
 	}
 	hideControl("comment_no_fx", fx.num > 0);
 	//Enable("add", track);

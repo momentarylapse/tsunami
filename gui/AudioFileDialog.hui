@@ -1,13 +1,19 @@
 Dialog audio_file_dialog "Sound-Datei" 430 375
-	Grid afd_grid_1 "" 3 1 expandy
+	Grid afd_grid_1 "" 4 1 expandy
 		Group ad_t_data "Daten"
-			ListView data_list "key\\value" nobar width=260 noexpandx
+			ListView data_list "key\\value" nobar width=250 noexpandx
 		Group ad_t_tags "Tags"
 			Grid ? "" 1 2
-				ListView tags "Tag\\Wert" format=TT width=260 noexpandx
+				ListView tags "Tag\\Wert" format=TT width=250 noexpandx
 				Grid ? "" 2 1
 					Button add_tag "" image=hui:add flat
 					Button delete_tag "" image=hui:delete flat
+		Group ad_t_levels "Ebenen"
+			Grid ? "" 1 2
+				ListView levels "#\\Name" format=tT select-single width=250 noexpandx
+				Grid ? "" 2 1
+					Button add_level "" image=hui:add flat
+					Button delete_level "" image=hui:delete flat
 		Expander ad_t_bars "Takte"
 			Grid ? "" 1 2
 				ListView audio_bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT

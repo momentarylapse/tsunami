@@ -10,13 +10,15 @@
 #include "../../Data/AudioFile.h"
 #include "../Helper/BarList.h"
 #include "../../Stuff/Log.h"
+#include "../../View/AudioView.h"
 #include "AudioFileConsole.h"
 
-AudioFileConsole::AudioFileConsole(AudioFile *a) :
+AudioFileConsole::AudioFileConsole(AudioFile *a, AudioView *v) :
 	BottomBarConsole(_("Datei")),
 	Observer("AudioFileConsole")
 {
 	audio = a;
+	view = v;
 
 	// dialog
 	setBorderWidth(5);
@@ -36,12 +38,19 @@ AudioFileConsole::AudioFileConsole(AudioFile *a) :
 	event("add_tag", this, &AudioFileConsole::onAddTag);
 	event("delete_tag", this, &AudioFileConsole::onDeleteTag);
 
+	eventX("levels", "hui:select", this, &AudioFileConsole::onLevelsSelect);
+	eventX("levels", "hui:change", this, &AudioFileConsole::onLevelsEdit);
+	event("add_level", this, &AudioFileConsole::onAddLevel);
+	event("delete_level", this, &AudioFileConsole::onDeleteLevel);
+
 	subscribe(audio);
+	subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 AudioFileConsole::~AudioFileConsole()
 {
 	unsubscribe(audio);
+	unsubscribe(view);
 	delete(bar_list);
 }
 
@@ -62,6 +71,13 @@ void AudioFileConsole::loadData()
 	addString("data_list", _("Samples\\") + i2s(samples));
 	addString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
 	addString("data_list", _("Format\\16 bit stereo (nami)"));
+
+	// levels
+	reset("levels");
+	foreachi(string &n, audio->level_name, i)
+		addString("levels", i2s(i + 1) + "\\" + n);
+	if (audio->level_name.num > 0)
+		setInt("levels", view->cur_level);
 }
 
 
@@ -99,6 +115,32 @@ void AudioFileConsole::onDeleteTag()
 	int s = getInt("tags");
 	if (s >= 0)
 		audio->deleteTag(s);
+}
+
+void AudioFileConsole::onLevelsSelect()
+{
+	int s = getInt("levels");
+	view->setCurLevel(s);
+}
+
+void AudioFileConsole::onLevelsEdit()
+{
+	int r = HuiGetEvent()->row;
+	if (r < 0)
+		return;
+	audio->renameLevel(r, getCell("levels", r, 1));
+}
+
+void AudioFileConsole::onAddLevel()
+{
+	audio->addLevel("");
+}
+
+void AudioFileConsole::onDeleteLevel()
+{
+	int s = getInt("levels");
+	if (s >= 0)
+		audio->deleteLevel(s, false);
 }
 
 void AudioFileConsole::onUpdate(Observable *o, const string &message)

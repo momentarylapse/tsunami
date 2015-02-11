@@ -1,7 +1,7 @@
 Menu menu "" disabled
 	Menu menu_file "Datei"
 		Item new "Neu..." image=hui:new
-		Item open "Öffnen" image=hui:open
+		Item open "Öffnen..." image=hui:open
 		Separator "" ""
 		Item save "Speichern" image=hui:save
 		Item save_as "Speichern unter..." image=hui:save-as

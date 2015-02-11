@@ -100,12 +100,9 @@ SynthConsole::SynthConsole(AudioView *_view, AudioFile *_audio) :
 
 	addControlTable("!expandy", 0, 0, 1, 32, id_inner);
 	setTarget(id_inner, 0);
-	addText("!angle=90\\...", 0, 0, 0, 0, "track_name");
-	addSeparator("!vertical", 1, 0, 0, 0, "");
 
 	track = NULL;
 	panel = NULL;
-	enable("track_name", false);
 
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 }
@@ -138,19 +135,18 @@ void SynthConsole::setTrack(Track *t)
 {
 	clear();
 	track = t;
-	if (track){
-		subscribe(track, track->MESSAGE_DELETE);
-		subscribe(track, track->MESSAGE_CHANGE);
-		setString("track_name", format(_("!angle=90\\f&ur die Spur '%s'"), track->getNiceName().c_str()));
+	if (!track)
+		return;
 
-		if (track->synth){
-			subscribe(track->synth, track->synth->MESSAGE_DELETE);
-			panel = new SynthPanel(track);
-			embed(panel, id_inner, 2, 0);
-			addSeparator("!vertical", 3, 0, 0, 0, "separator_0");
-		}
-	}else
-		setString("track_name", _("!angle=90\\keine Spur gew&ahlt"));
+	subscribe(track, track->MESSAGE_DELETE);
+	subscribe(track, track->MESSAGE_CHANGE);
+
+	if (track->synth){
+		subscribe(track->synth, track->synth->MESSAGE_DELETE);
+		panel = new SynthPanel(track);
+		embed(panel, id_inner, 0, 0);
+		addSeparator("!vertical", 1, 0, 0, 0, "separator_0");
+	}
 }
 
 void SynthConsole::onUpdate(Observable* o, const string &message)

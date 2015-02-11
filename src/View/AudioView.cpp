@@ -841,7 +841,7 @@ bool AudioView::editingMidi()
 		return false;
 	if (cur_track->type != Track::TYPE_MIDI)
 		return false;
-	return win->bottom_bar->isActive(BottomBar::MIDI_EDITOR);
+	return win->bottom_bar->isActive(BottomBar::TRACK_MIDI_EDITOR);
 }
 
 void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)

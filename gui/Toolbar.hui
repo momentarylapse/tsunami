@@ -18,7 +18,7 @@ enum{
 
 	// toolbar
 	MainWin->ToolBarSetID(HMM_TOOLBAR);
-	MainWin->ToolBarAddItem("Neu","Neu",HuiImageNew,HMM_NEW);
+	MainWin->ToolBarAddItem("Neu...","Neu...",HuiImageNew,HMM_NEW);
 	MainWin->ToolBarAddItem("&Offnen...","&Offnen...",HuiImageOpen,HMM_OPEN);
 	MainWin->ToolBarAddItem("Speichern","Speichern",HuiImageSave,HMM_SAVE);
 	MainWin->ToolBarAddSeparator();
@@ -31,7 +31,7 @@ enum{
 	MainWin->ToolBarAddSeparator();
 	MainWin->ToolBarAddItem("Abspielen","Abspielen",HuiImageMediaPlay,HMM_PLAY);
 	MainWin->ToolBarAddItem("Pause","Pause",HuiImageMediaPause,HMM_PAUSE);
-	MainWin->ToolBarAddItem("Stop","Stop",HuiImageMediaStop,HMM_STOP);
+	MainWin->ToolBarAddItem("Stopp","Stopp",HuiImageMediaStop,HMM_STOP);
 	MainWin->ToolBarAddItem("Aufnehmen","Aufnehmen",HuiImageMediaRecord,HMM_RECORD);
 	MainWin->EnableToolBar(true);
 

@@ -1,13 +1,15 @@
 // Language
 English
 // Num IDs
-211
+212
 // Data (ID,Text)
 about
 
 ad_t_bars
 
 ad_t_data
+
+ad_t_levels
 
 ad_t_tags
 
@@ -315,11 +317,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_221654
+rand_id_339058
 
-rand_id_532726
+rand_id_428017
 
-rand_id_957600
+rand_id_703569
 
 rdt_capture
 
@@ -426,7 +428,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-153
+151
 // Data (ID,Text)
 
 
@@ -513,8 +515,6 @@ Datei importieren
 Datei speichern
 
 Datei öffnen
-
-Datei-Eigenschaften
 
 Datenverlust!
 
@@ -639,8 +639,6 @@ Sicherungsdatei für Aufnahmen wählen
 Spur
 
 Spur %d
-
-Spur-Eigenschaften
 
 Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingefügt werden soll (%s)
 

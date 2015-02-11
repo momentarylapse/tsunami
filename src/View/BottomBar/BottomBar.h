@@ -15,6 +15,7 @@ class AudioView;
 class AudioFile;
 class AudioOutput;
 class Track;
+class TrackConsole;
 class FxConsole;
 class SynthConsole;
 class MixingConsole;
@@ -41,21 +42,21 @@ public:
 
 	void onClose();
 	void onChoose();
-	//void onOpenChooseMenu();
-	//void onChooseByMenu();
 	virtual void onShow();
 	virtual void onHide();
 
 	enum
 	{
+		AUDIOFILE_CONSOLE,
 		MIXING_CONSOLE,
-		FX_CONSOLE,
-		SYNTH_CONSOLE,
-		MIDI_EDITOR,
 		LEVEL_CONSOLE,
 		SAMPLE_CONSOLE,
 		CURVE_CONSOLE,
 		LOG_CONSOLE,
+		TRACK_CONSOLE,
+		FX_CONSOLE,
+		SYNTH_CONSOLE,
+		MIDI_EDITOR,
 		NUM_CONSOLES
 	};
 
@@ -68,6 +69,7 @@ public:
 	int console_when_ready;
 
 	//HuiMenu *menu;
+	TrackConsole *track_console;
 	FxConsole *fx_console;
 	SynthConsole *synth_console;
 	MixingConsole *mixing_console;
@@ -76,6 +78,9 @@ public:
 	LogDialog *log_dialog;
 	SampleManager *sample_manager;
 	MidiEditor *midi_editor;
+
+	Array<BottomBarConsole*> consoles;
+	void addConsole(BottomBarConsole *c, const string &list_name);
 };
 
 #endif /* BOTTOMBAR_H_ */

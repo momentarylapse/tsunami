@@ -9,6 +9,7 @@
 #include "MiniConsole.h"
 #include "MixingConsole.h"
 #include "CurveConsole.h"
+#include "TrackConsole.h"
 #include "FxConsole.h"
 #include "SynthConsole.h"
 #include "LevelConsole.h"
@@ -36,6 +37,7 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	addButton("!noexpandy,flat", 0, 0, 0, 0, "close");
 	setImage("close", "hui:close");
 	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
+	track_console = new TrackConsole(view);
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
 	mixing_console = new MixingConsole(audio, output, view->stream);
@@ -44,24 +46,18 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	sample_manager = new SampleManager(audio);
 	log_dialog = new LogDialog(log);
 	midi_editor = new MidiEditor(view, audio);
-	embed(mixing_console, "console_grid", 0, 0);
-	embed(fx_console, "console_grid", 0, 1);
-	embed(synth_console, "console_grid", 0, 2);
-	embed(midi_editor, "console_grid", 0, 3);
-	embed(level_console, "console_grid", 0, 4);
-	embed(sample_manager, "console_grid", 0, 5);
-	embed(curve_console, "console_grid", 0, 6);
-	embed(log_dialog, "console_grid", 0, 7);
+	addConsole(mixing_console, "[]");
+	addConsole(mixing_console, "  ");
+	addConsole(level_console, "  ");
+	addConsole(sample_manager, "  ");
+	addConsole(curve_console, "  ");
+	addConsole(log_dialog, "  ");
+	addConsole(track_console, "");
+	addConsole(fx_console, "  ");
+	addConsole(synth_console, "  ");
+	addConsole(midi_editor, "  ");
 
 	view->subscribe(this);
-
-	//menu = new HuiMenu;
-	foreachi(HuiPanel *p, children, i){
-		addString("choose", ((BottomBarConsole*)p)->title);
-		//string id = "bottom_bar_choose_" + i2s(i);
-		//menu->AddItemCheckable(((BottomBarConsole*)p)->title, id);
-		//EventM(id, (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::OnChooseByMenu);
-	}
 
 	eventX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onClose);
@@ -78,6 +74,13 @@ BottomBar::~BottomBar()
 void BottomBar::onClose()
 {
 	hide();
+}
+
+void BottomBar::addConsole(BottomBarConsole *c, const string &list_name)
+{
+	embed(c, "console_grid", 0, consoles.num);
+	consoles.add(c);
+	addString("choose", list_name + c->title);
 }
 
 /*void BottomBar::OnOpenChooseMenu()
@@ -118,12 +121,12 @@ void BottomBar::choose(int console)
 		return;
 	}
 
-	foreachi(HuiPanel *p, children, i){
+	foreachi(BottomBarConsole *c, consoles, i){
 		if (i == console){
-			setString("title", "!big\\" + ((BottomBarConsole*)p)->title);
-			p->show();
+			setString("title", "!big\\" + c->title);
+			c->show();
 		}else
-			p->hide();
+			c->hide();
 	}
 	setInt("choose", console);
 	active_console = console;

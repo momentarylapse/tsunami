@@ -94,7 +94,7 @@ public:
 				stream->stream();
 				float t_busy = timer.get();
 				stream->cpu_usage = t_busy / (t_busy + t_idle);
-				printf("%.1f %%\n", stream->cpu_usage * 100);
+				//printf("%.1f %%\n", stream->cpu_usage * 100);
 				t_idle = 0;
 			}else{
 				HuiSleep(0.005f);

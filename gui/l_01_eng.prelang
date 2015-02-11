@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-212
+211
 // Data (ID,Text)
 about
 
@@ -161,8 +161,6 @@ ld_tt_volume
 
 level_add
 
-level_console
-
 level_delete
 
 level_down
@@ -317,11 +315,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_339058
+rand_id_109153
 
-rand_id_428017
+rand_id_254645
 
-rand_id_703569
+rand_id_992797
 
 rdt_capture
 
@@ -428,7 +426,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-151
+147
 // Data (ID,Text)
 
 
@@ -441,14 +439,6 @@ zoom_out
   ...keine Sorge, das wird schon!
 
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
-
-!angle=90\\für die Spur '%s'
-
-!angle=90\\keine Spur gewählt
-
-!angle=90\\wirken auf die Spur '%s'
-
-!angle=90\\wirken auf die komplette Datei
 
 !bold$Kommentar/Geschehnisse:
 
@@ -525,8 +515,6 @@ Dur
 Ebene %d
 
 Ebene löschen: noch nicht implementiert...
-
-Ebenen
 
 Editor für Audio Dateien
 
@@ -643,6 +631,8 @@ Spur %d
 Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingefügt werden soll (%s)
 
 Synthesizer
+
+Synthesizer wählen
 
 Unbenannt
 

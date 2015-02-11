@@ -231,13 +231,13 @@ void TsunamiWindow::onTrackEditFX()
 
 void TsunamiWindow::onAudioProperties()
 {
-	side_bar->choose(SideBar::AUDIO_FILE_DIALOG);
+	bottom_bar->choose(BottomBar::AUDIOFILE_CONSOLE);
 }
 
 void TsunamiWindow::onTrackProperties()
 {
 	if (view->cur_track)
-		side_bar->open(SideBar::TRACK_DIALOG);
+		bottom_bar->choose(BottomBar::TRACK_CONSOLE);
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }

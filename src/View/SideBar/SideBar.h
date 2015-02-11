@@ -12,9 +12,7 @@
 #include "../../Stuff/Observer.h"
 
 class AudioFile;
-class TrackDialog;
 class SubDialog;
-class AudioFileDialog;
 class AudioView;
 
 class SideBarConsole : public HuiPanel
@@ -37,8 +35,6 @@ public:
 
 	enum
 	{
-		AUDIO_FILE_DIALOG,
-		TRACK_DIALOG,
 		SUB_DIALOG,
 		NUM_CONSOLES
 	};
@@ -49,8 +45,6 @@ public:
 	int active_console;
 	bool visible;
 
-	AudioFileDialog *audio_file_dialog;
-	TrackDialog *track_dialog;
 	SubDialog *sub_dialog;
 };
 

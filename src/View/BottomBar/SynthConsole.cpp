@@ -14,6 +14,10 @@
 #include "../../Tsunami.h"
 
 
+	//Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
+	//if (s)
+	//	track->setSynthesizer(s);
+
 
 class SynthPanel : public HuiPanel, public Observer
 {

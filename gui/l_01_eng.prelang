@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-212
+211
 // Data (ID,Text)
 about
 
@@ -105,8 +105,6 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
-edit_midi
-
 exit
 
 export_sample
@@ -129,13 +127,9 @@ insert_sample
 
 language
 
-ld_t_bars
-
 ld_t_chord
 
 ld_t_inversion
-
-ld_t_midi
 
 ld_t_name
 !bold\\Name:
@@ -154,8 +148,6 @@ ld_t_repnum
 ld_t_scale
 
 ld_t_space
-
-ld_t_synth
 
 ld_t_track
 Track
@@ -323,9 +315,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_119278
+rand_id_221654
 
-rand_id_926733
+rand_id_532726
+
+rand_id_957600
 
 rdt_capture
 
@@ -385,10 +379,14 @@ stop
 Stop
 sub_track_dialog
 
-synthesizer
-
 tags
 !format=tT\\Tag\\Value
+td_t_bars
+
+td_t_name
+
+td_t_volume
+
 track_dialog
 Track
 track_edit_fx
@@ -428,13 +426,15 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-151
+153
 // Data (ID,Text)
 
 
                   Close dialog box to exit program.
 
         - nicht verbinden -
+
+  - neue Spur anlegen -
 
   ...keine Sorge, das wird schon!
 
@@ -488,7 +488,7 @@ Abtastrate\\\") + i2s(audio->sample_rate) +
 
 Amplitude zu groß, Signal übersteuert.
 
-Anfang\\\") + audio->get_time_str_long(audio->GetRange().start()));
+Anfang\\\") + audio->get_time_str_long(audio->getRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
 
@@ -504,8 +504,8 @@ Beim Anwenden eines MidiEffekts:
 
 Beschreibung
 
-Das neue Gerät wird erst beim nächsten Start verwendet!
-The new device will only be used after the next program start.
+Datei
+
 Datei exportieren
 
 Datei importieren
@@ -536,7 +536,7 @@ Effekt nicht ladbar: \"%s\"
 
 Effekte
 
-Ende\\\") + audio->get_time_str_long(audio->GetRange().end()));
+Ende\\\") + audio->get_time_str_long(audio->getRange().end()));
 
 Es existiert schon eine Rhythmus-Spur.
 
@@ -618,6 +618,10 @@ Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 
 Plugin-Script wählen
 
+PortAudio (input) error: '%s'  at %s
+
+PortAudio (stream) error: '%s'   at %s
+
 Raw Daten
 
 Sample wählen
@@ -631,6 +635,8 @@ Samples\\\") + i2s(samples));
 Script (*.kaba)
 
 Sicherungsdatei für Aufnahmen wählen
+
+Spur
 
 Spur %d
 
@@ -663,8 +669,6 @@ alte Aufnahmedaten gefunden:
 aus Auswahl erzeugen
 
 aus Datei importieren
-
-benutze OpenAl Device: 
 
 exportiere
 
@@ -707,8 +711,6 @@ löschen
 message.txt öffnen
 
 neue Audiodatei
-
-neue Spur anlegen (
 
 neuen Effekt hinzufügen
 

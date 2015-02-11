@@ -6,8 +6,6 @@
  */
 
 #include "SideBar.h"
-#include "AudioFileDialog.h"
-#include "TrackDialog.h"
 #include "SubDialog.h"
 
 SideBar::SideBar(AudioView *view, AudioFile *audio) :
@@ -25,16 +23,12 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	addButton("!noexpandx,flat", 0, 0, 0, 0, "close");
 	setImage("close", "hui:close");
 	addText("!big,expandx,center\\...", 1, 0, 0, 0, "title");
-	audio_file_dialog = new AudioFileDialog(audio);
-	track_dialog = new TrackDialog(view);
 	sub_dialog = new SubDialog(view, audio);
-	embed(audio_file_dialog, "console_grid", 0, 0);
-	embed(track_dialog, "console_grid", 0, 1);
-	embed(sub_dialog, "console_grid", 0, 2);
+	embed(sub_dialog, "console_grid", 0, 0);
 
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
 
-	choose(AUDIO_FILE_DIALOG);
+	choose(SUB_DIALOG);
 	visible = true;
 }
 

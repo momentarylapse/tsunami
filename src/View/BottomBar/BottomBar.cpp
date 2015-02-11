@@ -6,6 +6,7 @@
  */
 
 #include "BottomBar.h"
+#include "AudioFileConsole.h"
 #include "MiniConsole.h"
 #include "MixingConsole.h"
 #include "CurveConsole.h"
@@ -37,25 +38,26 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	addButton("!noexpandy,flat", 0, 0, 0, 0, "close");
 	setImage("close", "hui:close");
 	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
+	log_dialog = new LogDialog(log);
+	audio_file_console = new AudioFileConsole(audio);
+	mixing_console = new MixingConsole(audio, output, view->stream);
+	level_console = new LevelConsole(view, audio);
+	sample_manager = new SampleManager(audio);
+	curve_console = new CurveConsole(view, audio);
 	track_console = new TrackConsole(view);
 	fx_console = new FxConsole(view, audio);
 	synth_console = new SynthConsole(view, audio);
-	mixing_console = new MixingConsole(audio, output, view->stream);
-	level_console = new LevelConsole(view, audio);
-	curve_console = new CurveConsole(view, audio);
-	sample_manager = new SampleManager(audio);
-	log_dialog = new LogDialog(log);
 	midi_editor = new MidiEditor(view, audio);
-	addConsole(mixing_console, "[]");
-	addConsole(mixing_console, "  ");
-	addConsole(level_console, "  ");
-	addConsole(sample_manager, "  ");
-	addConsole(curve_console, "  ");
-	addConsole(log_dialog, "  ");
+	addConsole(log_dialog, "");
+	addConsole(audio_file_console, "");
+	addConsole(mixing_console, "\t");
+	addConsole(level_console, "\t");
+	addConsole(sample_manager, "\t");
+	addConsole(curve_console, "\t");
 	addConsole(track_console, "");
-	addConsole(fx_console, "  ");
-	addConsole(synth_console, "  ");
-	addConsole(midi_editor, "  ");
+	addConsole(fx_console, "\t");
+	addConsole(synth_console, "\t");
+	addConsole(midi_editor, "\t");
 
 	view->subscribe(this);
 

@@ -31,9 +31,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar");
 
 
-	expand("ld_t_synth", 0, true);
-	expand("ld_t_bars", 0, true);
-	expand("ld_t_effects", 0, true);
+	expand("td_t_bars", 0, true);
 
 	loadData();
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
@@ -62,12 +60,10 @@ void TrackConsole::loadData()
 		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
-		hideControl("ld_t_bars", track->type != Track::TYPE_TIME);
+		hideControl("td_t_bars", track->type != Track::TYPE_TIME);
 	}else{
-		hideControl("ld_t_bars", true);
+		hideControl("td_t_bars", true);
 	}
-	hideControl("ld_t_synth", true);
-	hideControl("ld_t_midi", true);
 }
 
 void TrackConsole::setTrack(Track *t)

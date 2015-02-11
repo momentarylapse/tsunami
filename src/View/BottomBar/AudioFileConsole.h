@@ -1,23 +1,23 @@
 /*
- * AudioFileDialog.h
+ * AudioFileConsole.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef AUDIOFILEDIALOG_H_
-#define AUDIOFILEDIALOG_H_
+#ifndef AUDIOFILECONSOLE_H_
+#define AUDIOFILECONSOLE_H_
 
-#include "SideBar.h"
+#include "BottomBar.h"
 #include "../../Stuff/Observer.h"
 class AudioFile;
 class BarList;
 
-class AudioFileDialog: public SideBarConsole, public Observer
+class AudioFileConsole: public BottomBarConsole, public Observer
 {
 public:
-	AudioFileDialog(AudioFile *a);
-	virtual ~AudioFileDialog();
+	AudioFileConsole(AudioFile *a);
+	virtual ~AudioFileConsole();
 
 	void loadData();
 	void applyData();
@@ -34,4 +34,4 @@ public:
 	BarList *bar_list;
 };
 
-#endif /* AUDIOFILEDIALOG_H_ */
+#endif /* AUDIOFILECONSOLE_H_ */

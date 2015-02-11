@@ -1,25 +1,24 @@
 /*
- * AudioFileDialog.cpp
+ * AudioFileConsole.cpp
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#include "AudioFileDialog.h"
 #include "../../Tsunami.h"
 #include "../../Stuff/Observer.h"
 #include "../../Data/AudioFile.h"
 #include "../Helper/BarList.h"
 #include "../../Stuff/Log.h"
+#include "AudioFileConsole.h"
 
-AudioFileDialog::AudioFileDialog(AudioFile *a) :
-	SideBarConsole(_("Datei-Eigenschaften")),
-	Observer("AudioFileDialog")
+AudioFileConsole::AudioFileConsole(AudioFile *a) :
+	BottomBarConsole(_("Datei")),
+	Observer("AudioFileConsole")
 {
 	audio = a;
 
 	// dialog
-//	SetTarget("audio_dialog_table", 0);
 	setBorderWidth(5);
 	embedDialog("audio_file_dialog", 0, 0);
 	setDecimals(1);
@@ -32,21 +31,21 @@ AudioFileDialog::AudioFileDialog(AudioFile *a) :
 
 	setTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
 
-	eventX("tags", "hui:select", this, &AudioFileDialog::onTagsSelect);
-	eventX("tags", "hui:change", this, &AudioFileDialog::onTagsEdit);
-	event("add_tag", this, &AudioFileDialog::onAddTag);
-	event("delete_tag", this, &AudioFileDialog::onDeleteTag);
+	eventX("tags", "hui:select", this, &AudioFileConsole::onTagsSelect);
+	eventX("tags", "hui:change", this, &AudioFileConsole::onTagsEdit);
+	event("add_tag", this, &AudioFileConsole::onAddTag);
+	event("delete_tag", this, &AudioFileConsole::onDeleteTag);
 
 	subscribe(audio);
 }
 
-AudioFileDialog::~AudioFileDialog()
+AudioFileConsole::~AudioFileConsole()
 {
 	unsubscribe(audio);
 	delete(bar_list);
 }
 
-void AudioFileDialog::loadData()
+void AudioFileConsole::loadData()
 {
 	// tags
 	reset("tags");
@@ -66,18 +65,18 @@ void AudioFileDialog::loadData()
 }
 
 
-string get_vol(float volume, bool muted)
-{
+string get_vol(float volume, bool muted);
+/*{
 	return muted ? _("(stumm)") : format("%.1f%%", volume * 100.0f);
-}
+}*/
 
-void AudioFileDialog::onTagsSelect()
+void AudioFileConsole::onTagsSelect()
 {
 	int s = getInt("tags");
 	enable("delete_tag", s >= 0);
 }
 
-void AudioFileDialog::onTagsEdit()
+void AudioFileConsole::onTagsEdit()
 {
 	int r = HuiGetEvent()->row;
 	if (r < 0)
@@ -90,19 +89,19 @@ void AudioFileDialog::onTagsEdit()
 	audio->editTag(r, t.key, t.value);
 }
 
-void AudioFileDialog::onAddTag()
+void AudioFileConsole::onAddTag()
 {
 	audio->addTag("key", "value");
 }
 
-void AudioFileDialog::onDeleteTag()
+void AudioFileConsole::onDeleteTag()
 {
 	int s = getInt("tags");
 	if (s >= 0)
 		audio->deleteTag(s);
 }
 
-void AudioFileDialog::onUpdate(Observable *o, const string &message)
+void AudioFileConsole::onUpdate(Observable *o, const string &message)
 {
 	loadData();
 }

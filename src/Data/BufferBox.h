@@ -60,7 +60,7 @@ public:
 	void import(void *data, int channels, SampleFormat format, int samples);
 
 	bool get_16bit_buffer(Array<short> &data);
-	void interleave(float *p);
+	void interleave(float *p, float volume);
 	void deinterleave(float *p, int num_channels);
 
 	enum PeakMode

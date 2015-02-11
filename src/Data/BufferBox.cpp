@@ -357,13 +357,20 @@ bool BufferBox::get_16bit_buffer(Array<short> &data)
 	return !wtb_overflow;
 }
 
-void BufferBox::interleave(float *p)
+void BufferBox::interleave(float *p, float volume)
 {
 	float *pr = &r[0];
 	float *pl = &l[0];
-	for (int i=0; i<num; i++){
-		*p ++ = *pr ++;
-		*p ++ = *pl ++;
+	if (volume == 1.0f){
+		for (int i=0; i<num; i++){
+			*p ++ = *pr ++;
+			*p ++ = *pl ++;
+		}
+	}else{
+		for (int i=0; i<num; i++){
+			*p ++ = (*pr ++) * volume;
+			*p ++ = (*pl ++) * volume;
+		}
 	}
 }
 

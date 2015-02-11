@@ -50,7 +50,7 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 		for (int n=0; (n<2) and (done<frameCount); n++){
 			BufferBox b;
 			stream->ring_buf.readRef(b, frameCount - done);
-			b.interleave(out);
+			b.interleave(out, stream->output->getVolume() * stream->volume);
 			out += b.num * 2;
 			done += b.num;
 			break;

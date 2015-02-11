@@ -7,16 +7,14 @@
 
 #include "SynthConsole.h"
 #include "../AudioView.h"
+#include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../Data/Track.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
 
-
-	//Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
-	//if (s)
-	//	track->setSynthesizer(s);
 
 
 class SynthPanel : public HuiPanel, public Observer
@@ -101,6 +99,12 @@ SynthConsole::SynthConsole(AudioView *_view, AudioFile *_audio) :
 	addControlTable("!expandy", 0, 0, 1, 32, id_inner);
 	setTarget(id_inner, 0);
 
+	addButton("!expandy,flat", 31, 0, 0, 0, "select");
+	setImage("select", "hui:open");
+	setTooltip("select", _("Synthesizer w&ahlen"));
+
+	event("select", this, &SynthConsole::onSelect);
+
 	track = NULL;
 	panel = NULL;
 
@@ -115,6 +119,15 @@ SynthConsole::~SynthConsole()
 		if (track->synth)
 			unsubscribe(track->synth);
 	}
+}
+
+void SynthConsole::onSelect()
+{
+	if (!track)
+		return;
+	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
+	if (s)
+		track->setSynthesizer(s);
 }
 
 void SynthConsole::clear()

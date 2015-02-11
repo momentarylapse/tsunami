@@ -24,6 +24,8 @@ public:
 	void clear();
 	void setTrack(Track *t);
 
+	void onSelect();
+
 	virtual void onUpdate(Observable *o, const string &message);
 
 	string id_inner;

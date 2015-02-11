@@ -326,7 +326,7 @@ void TsunamiWindow::onMixingConsole()
 
 void TsunamiWindow::onFxConsole()
 {
-	bottom_bar->choose(BottomBar::FX_CONSOLE);
+	bottom_bar->choose(BottomBar::TRACK_FX_CONSOLE);
 }
 
 void TsunamiWindow::onSubImport()

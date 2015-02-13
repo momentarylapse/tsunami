@@ -83,18 +83,25 @@ Type *SyntaxTree::GetConstantType()
 	// numerical (int/float)
 	Type *type = TypeInt;
 	bool hex = (Exp.cur.num > 1) && (Exp.cur[0] == '0') && (Exp.cur[1] == 'x');
-	for (int c=0;c<Exp.cur.num;c++)
-		if ((Exp.cur[c] < '0') || (Exp.cur[c] > '9')){
+	char last = 0;
+	for (int ic=0;ic<Exp.cur.num;ic++){
+		char c = Exp.cur[ic];
+		if ((c < '0') || (c > '9')){
 			if (hex){
-				if ((c >= 2) && (Exp.cur[c] < 'a') && (Exp.cur[c] > 'f'))
+				if ((ic >= 2) && (c < 'a') && (c > 'f'))
 					return TypeUnknown;
-			}else if (Exp.cur[c] == '.'){
+			}else if (c == '.'){
 				type = TypeFloat32;
 			}else{
-				if ((c != 0) || (Exp.cur[c] != '-')) // allow sign
-					return TypeUnknown;
+				if ((ic != 0) or (c != '-')){ // allow sign
+					if ((c != 'e') and (c != 'E'))
+						if (((c != '+') and (c != '-')) or ((last != 'e') and (last != 'E')))
+							return TypeUnknown;
+				}
 			}
 		}
+		last = c;
+	}
 	if (type == TypeInt){
 		if (hex){
 			if ((s2i2(Exp.cur) >= 0x100000000) || (-s2i2(Exp.cur) > 0x00000000))

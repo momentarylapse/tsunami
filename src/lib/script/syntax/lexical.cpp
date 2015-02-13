@@ -400,6 +400,7 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 	}else if (ExpKind == ExpKindNumber){
 		msg_db_m("num", 4);
 		bool hex = false;
+		char last = 0;
 		for (int i=0;true;i++){
 			char c = Temp[TempLength] = source[pos];
 			// "0x..." -> hexadecimal
@@ -410,12 +411,16 @@ bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, Expressio
 				if ((i > 1) && (kind != ExpKindNumber) && ((c < 'a') || (c > 'f')))
 					break;
 			}else{
-				// may contain numbers and '.' or 'f'
-				if ((kind != ExpKindNumber) && (c != '.'))// && (c != 'f'))
-					break;
+				// may contain numbers and '.' or 'e'/'E'
+				if ((kind != ExpKindNumber) and (c != '.')){
+					if ((c != 'e') and (c != 'E'))
+						if (((c != '-') and (c != '+')) or ((last != 'e') and (last != 'E')))
+							break;
+				}
 			}
 			TempLength ++;
 			pos ++;
+			last = c;
 		}
 
 	// symbol

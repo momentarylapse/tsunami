@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <locale.h>
+#include <math.h>
 
 #ifdef OS_WINDOWS
 	#include <stdio.h>
@@ -712,29 +713,33 @@ string sa2s(const Array<string> &a)
 // convert a string to an integer
 int string::_int() const
 {
-	bool minus=false;
-	int res=0;
-	for (int i=0;i<num;i++){
-		if ((*this)[i]=='-')
-			minus=true;
-		else res=res*10+((*this)[i]-48);
+	bool minus = false;
+	int res = 0;
+	for (int i=0; i<num; i++){
+		char c = (*this)[i];
+		if ((c == '-') and (i == 0))
+			minus = true;
+		else if ((c >= '0') and (c <= '9'))
+			res = res * 10 + (c - 48);
 	}
 	if (minus)
-		res=-res;
+		res = -res;
 	return res;
 }
 
 long long string::i64() const
 {
-	bool minus=false;
-	long long res=0;
-	for (int i=0;i<num;i++){
-		if ((*this)[i]=='-')
-			minus=true;
-		else res=res*10+((*this)[i]-48);
+	bool minus = false;
+	long long res = 0;
+	for (int i=0; i<num; i++){
+		char c = (*this)[i];
+		if ((c == '-') and (i == 0))
+			minus = true;
+		else if ((c >= '0') and (c <= '9'))
+			res = res * 10 + (c - 48);
 	}
 	if (minus)
-		res=-res;
+		res = -res;
 	return res;
 }
 
@@ -744,58 +749,36 @@ int s2i(const string &s)
 // convert a string to a float
 float string::_float() const
 {
-	bool minus=false;
-	int e=-1;
-	float res=0;
-	for (int i=0;i<num;i++){
-		if (e>0)
-			e*=10;
-		if ((*this)[i]=='-'){
-			minus=true;
-		}else{
-			if (((*this)[i]==',')||((*this)[i]=='.')){
-				e=1;
-			}else{
-				if((*this)[i]!='\n'){
-					if (e<0)
-						res=res*10+((*this)[i]-48);
-					else
-						res+=float((*this)[i]-48)/(float)e;
-				}
-			}
-		}
-	}
-	if (minus)
-		res=-res;
-	return res;
+	return (float)f64();
 }
 
 // convert a string to a float
 double string::f64() const
 {
-	bool minus=false;
-	int e=-1;
-	double res=0;
-	for (int i=0;i<num;i++){
-		if (e>0)
-			e*=10;
-		if ((*this)[i]=='-'){
-			minus=true;
-		}else{
-			if (((*this)[i]==',')||((*this)[i]=='.')){
-				e=1;
-			}else{
-				if((*this)[i]!='\n'){
-					if (e<0)
-						res=res*10+((*this)[i]-48);
-					else
-						res+=double((*this)[i]-48)/(double)e;
-				}
-			}
+	bool minus = false;
+	int e = -1;
+	double res = 0;
+	for (int i=0; i<num; i++){
+		if (e > 0)
+			e *= 10;
+		char c = (*this)[i];
+		if ((c =='-') and (i == 0)){
+			minus = true;
+		}else if ((c == ',') or (c == '.')){
+			e = 1;
+		}else if ((c >= '0') and (c <= '9')){
+			if (e < 0)
+				res = res * 10 + (c-48);
+			else
+				res += float(c-48) / (float)e;
+		}else if ((c == 'e') or (c == 'E')){
+			int ex = substr(i+1, -1)._int();
+			res *= pow(10.0, ex);
+			break;
 		}
 	}
 	if (minus)
-		res=-res;
+		res = -res;
 	return res;
 }
 

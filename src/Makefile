@@ -182,6 +182,9 @@ OBJ = \
  lib/script/syntax/syntax_tree.o\
  lib/script/syntax/type.o\
  lib/script/script.o\
+ lib/threads/Mutex.o\
+ lib/threads/Thread.o\
+ lib/threads/ThreadedWork.o\
  Plugins/ConfigPanel.o\
  Plugins/Configurable.o\
  Plugins/Effect.o\
@@ -208,16 +211,17 @@ OBJ = \
  Stuff/Log.o\
  Stuff/Observable.o\
  Stuff/Observer.o\
+ View/BottomBar/AudioFileConsole.o\
  View/BottomBar/BottomBar.o\
  View/BottomBar/CurveConsole.o\
  View/BottomBar/FxConsole.o\
- View/BottomBar/LevelConsole.o\
  View/BottomBar/LogDialog.o\
  View/BottomBar/MidiEditor.o\
  View/BottomBar/MiniConsole.o\
  View/BottomBar/MixingConsole.o\
  View/BottomBar/SampleManager.o\
  View/BottomBar/SynthConsole.o\
+ View/BottomBar/TrackConsole.o\
  View/Dialog/CaptureDialog.o\
  View/Dialog/NewDialog.o\
  View/Dialog/RecordDialog.o\
@@ -227,10 +231,8 @@ OBJ = \
  View/Helper/PeakMeter.o\
  View/Helper/Progress.o\
  View/Helper/Slider.o\
- View/SideBar/AudioFileDialog.o\
  View/SideBar/SideBar.o\
  View/SideBar/SubDialog.o\
- View/SideBar/TrackDialog.o\
  View/AudioView.o\
  View/AudioViewTrack.o\
  TsunamiWindow.o\
@@ -779,6 +781,15 @@ lib/script/syntax/type.o : lib/script/syntax/type.cpp
 lib/script/script.o : lib/script/script.cpp
 	$(CPP) -c lib/script/script.cpp -o $@ $(CXXFLAGS)
 
+lib/threads/Mutex.o : lib/threads/Mutex.cpp
+	$(CPP) -c lib/threads/Mutex.cpp -o $@ $(CXXFLAGS)
+
+lib/threads/Thread.o : lib/threads/Thread.cpp
+	$(CPP) -c lib/threads/Thread.cpp -o $@ $(CXXFLAGS)
+
+lib/threads/ThreadedWork.o : lib/threads/ThreadedWork.cpp
+	$(CPP) -c lib/threads/ThreadedWork.cpp -o $@ $(CXXFLAGS)
+
 Plugins/Configurable.o : Plugins/Configurable.cpp
 	$(CPP) -c Plugins/Configurable.cpp -o $@ $(CXXFLAGS)
 
@@ -857,6 +868,9 @@ Stuff/Observable.o : Stuff/Observable.cpp
 Stuff/Observer.o : Stuff/Observer.cpp
 	$(CPP) -c Stuff/Observer.cpp -o $@ $(CXXFLAGS)
 
+View/BottomBar/AudioFileConsole.o : View/BottomBar/AudioFileConsole.cpp
+	$(CPP) -c View/BottomBar/AudioFileConsole.cpp -o $@ $(CXXFLAGS)
+
 View/BottomBar/BottomBar.o : View/BottomBar/BottomBar.cpp
 	$(CPP) -c View/BottomBar/BottomBar.cpp -o $@ $(CXXFLAGS)
 
@@ -865,9 +879,6 @@ View/BottomBar/CurveConsole.o : View/BottomBar/CurveConsole.cpp
 
 View/BottomBar/FxConsole.o : View/BottomBar/FxConsole.cpp
 	$(CPP) -c View/BottomBar/FxConsole.cpp -o $@ $(CXXFLAGS)
-
-View/BottomBar/LevelConsole.o : View/BottomBar/LevelConsole.cpp
-	$(CPP) -c View/BottomBar/LevelConsole.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 	$(CPP) -c View/BottomBar/LogDialog.cpp -o $@ $(CXXFLAGS)
@@ -886,6 +897,9 @@ View/BottomBar/SampleManager.o : View/BottomBar/SampleManager.cpp
 
 View/BottomBar/SynthConsole.o : View/BottomBar/SynthConsole.cpp
 	$(CPP) -c View/BottomBar/SynthConsole.cpp -o $@ $(CXXFLAGS)
+
+View/BottomBar/TrackConsole.o : View/BottomBar/TrackConsole.cpp
+	$(CPP) -c View/BottomBar/TrackConsole.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/CaptureDialog.o : View/Dialog/CaptureDialog.cpp
 	$(CPP) -c View/Dialog/CaptureDialog.cpp -o $@ $(CXXFLAGS)
@@ -914,17 +928,11 @@ View/Helper/Progress.o : View/Helper/Progress.cpp
 View/Helper/Slider.o : View/Helper/Slider.cpp
 	$(CPP) -c View/Helper/Slider.cpp -o $@ $(CXXFLAGS)
 
-View/SideBar/AudioFileDialog.o : View/SideBar/AudioFileDialog.cpp
-	$(CPP) -c View/SideBar/AudioFileDialog.cpp -o $@ $(CXXFLAGS)
-
 View/SideBar/SideBar.o : View/SideBar/SideBar.cpp
 	$(CPP) -c View/SideBar/SideBar.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/SubDialog.o : View/SideBar/SubDialog.cpp
 	$(CPP) -c View/SideBar/SubDialog.cpp -o $@ $(CXXFLAGS)
-
-View/SideBar/TrackDialog.o : View/SideBar/TrackDialog.cpp
-	$(CPP) -c View/SideBar/TrackDialog.cpp -o $@ $(CXXFLAGS)
 
 View/AudioView.o : View/AudioView.cpp
 	$(CPP) -c View/AudioView.cpp -o $@ $(CXXFLAGS)

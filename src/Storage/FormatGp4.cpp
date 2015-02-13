@@ -78,6 +78,8 @@ void FormatGp4::loadAudio(AudioFile *a, const string &filename)
 {
 	CFile *f = FileOpen(filename);
 	char *data = new char[1024];
+	tracks.clear();
+	measures.clear();
 
 	try{
 

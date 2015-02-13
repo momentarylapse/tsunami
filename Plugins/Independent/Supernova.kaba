@@ -114,7 +114,7 @@ class SuperNovaWindow : Window
 				if n.pitch >= StringPitch[i] + HandPosition
 					s = i
 					f = n.pitch - StringPitch[i]
-			float ly = h - (s + 1) * 30
+			ly = h - (s + 1) * 30
 			c.setColor(ColorSetHSB(0.3, (n.pitch % 12) / 12.0, 1, 1))
 			c.drawRect(sample2x(n.range.offset), ly - 12, n.range.length / 700.0, 24)
 			c.setColor(Black)

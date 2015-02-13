@@ -115,7 +115,7 @@ class HarmonicSynthesizer : Synthesizer
 						enablePitch(pp, true)
 
 			for p in active_pitch
-				PitchState *s = &state.pitch[p]
+				s = &state.pitch[p]
 
 				s.volume = s.env.get()
 

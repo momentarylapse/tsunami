@@ -144,7 +144,7 @@ Command *SyntaxTree::add_command_block(Block *b)
 
 SyntaxTree::SyntaxTree(Script *_script) :
 	GetExistenceLink(KindUnknown, 0, NULL, TypeVoid),
-	RootOfAllEvil("RootOfAllEvil", TypeVoid)
+	RootOfAllEvil(this, "RootOfAllEvil", TypeVoid)
 {
 	FlagShow = false;
 	FlagShowPrae = false;
@@ -298,6 +298,9 @@ void SyntaxTree::CreateAsmMetaInfo()
 
 int Function::AddVar(const string &name, Type *type)
 {
+	foreach(Variable &vv, var)
+		if (vv.name == name)
+			tree->DoError(format("variable '%s' already declared in this context", name.c_str()));
 	Variable v;
 	v.name = name;
 	v.type = type;
@@ -357,8 +360,9 @@ void Block::set(int index, Command *c)
 // functions
 
 
-Function::Function(const string &_name, Type *_return_type)
+Function::Function(SyntaxTree *_tree, const string &_name, Type *_return_type)
 {
+	tree = _tree;
 	name = _name;
 	block = NULL;
 	num_params = 0;
@@ -384,7 +388,7 @@ int Function::get_var(const string &name)
 
 Function *SyntaxTree::AddFunction(const string &name, Type *type)
 {
-	Function *f = new Function(name, type);
+	Function *f = new Function(this, name, type);
 	Functions.add(f);
 	f->block = AddBlock();
 	return f;

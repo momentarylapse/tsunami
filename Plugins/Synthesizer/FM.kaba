@@ -228,7 +228,7 @@ class FMSynthesizer : Synthesizer
 			int[] del_me
 			del_me.clear()
 			for p in active_pitch
-				PitchState *s = &state.pitch[p]
+				s = &state.pitch[p]
 				for o,oi in s.osc
 					o.volume = o.env.get()
 					if o.env.just_killed

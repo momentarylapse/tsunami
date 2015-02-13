@@ -97,6 +97,8 @@ struct Variable
 // user defined functions
 struct Function
 {
+	SyntaxTree *tree;
+
 	string name;
 	// parameters (linked to intern variables)
 	int num_params;
@@ -114,7 +116,7 @@ struct Function
 	// for compilation...
 	int _var_size, _param_size;
 	int _logical_line_no;
-	Function(const string &name, Type *return_type);
+	Function(SyntaxTree *tree, const string &name, Type *return_type);
 	int get_var(const string &name);
 	int AddVar(const string &name, Type *type);
 	void Update(Type *class_type);

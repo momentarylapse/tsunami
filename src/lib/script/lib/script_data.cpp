@@ -422,7 +422,7 @@ Array<PreCommand> PreCommands;
 
 int add_func(const string &name, Type *return_type, void *func, ScriptFlag flag)
 {
-	Function *f = new Function(name, return_type);
+	Function *f = new Function(cur_package_script->syntax, name, return_type);
 	f->literal_return_type = return_type;
 	f->num_params = 0;
 	f->_class = NULL;

@@ -120,7 +120,6 @@ class GridAxis
 					r.tick.add(tt)
 				vv = vv0 * 1.5
 				if (i == 1) and (vv >= val_min) and (vv <= val_max)
-					GridTick tt
 					tt.value = vv
 					tt.weight = 0.5
 					tt.label = ""
@@ -142,7 +141,6 @@ class GridAxis
 				tt.label = pitch_name(pitch)
 				r.tick.add(tt)
 			pitch = pitch_from_octave_and_rel(6, o)
-			GridTick tt
 			tt.value = pitch_to_freq(pitch)
 			if (tt.value >= val_min) and (tt.value <= val_max)
 				tt.weight = 0.7

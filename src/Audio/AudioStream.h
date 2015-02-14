@@ -82,10 +82,6 @@ public:
 	bool read_more;
 	bool end_of_data;
 
-	//typedef int generate_func_t(BufferBox &);
-	//generate_func_t *generate_func;
-
-	Array<short> data;
 	int data_samples;
 
 	PaStream *pa_stream;

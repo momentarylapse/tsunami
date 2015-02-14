@@ -42,7 +42,13 @@ void HuiPanel::__init__()
 
 void HuiPanel::__delete__()
 {
-	this->~HuiPanel();
+	_ClearPanel_();
+	control.clear();
+	events.clear();
+
+	id.clear();
+	cur_id.clear();
+	children.clear();
 }
 
 // might be executed repeatedly
@@ -158,7 +164,7 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 		return false;
 	if (!win->allow_input)
 		return false;
-	msg_db_f("SendEvent", 2);
+	msg_db_f("SendEvent", 1);
 	//msg_write(e->id);
 	//msg_write(e->message);
 	HuiCurWindow = win;
@@ -183,7 +189,8 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 		_set_cur_id_(e->message);
 
 	bool sent = false;
-	foreach(HuiEventListener &ee, events){
+	for (int i=0; i<events.num; i++){
+		HuiEventListener &ee = events[i];
 		if (!_HuiEventMatch_(e, ee.id, ee.message))
 			continue;
 
@@ -197,7 +204,6 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 		foreach(HuiClosedPanel &cp, HuiClosedPanels)
 			if (cp.panel == this)
 				return sent;
-		_foreach_it_.update();
 	}
 
 	// reset

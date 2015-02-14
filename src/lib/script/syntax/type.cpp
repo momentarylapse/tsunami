@@ -107,12 +107,18 @@ bool Type::needs_destructor()
 		return false;
 	if (is_super_array)
 		return true;
-	if (parent)
+	if (parent){
+		if (parent->GetDestructor())
+			return true;
 		if (parent->needs_destructor())
 			return true;
-	foreach(ClassElement &e, element)
+	}
+	foreach(ClassElement &e, element){
+		if (e.type->GetDestructor())
+			return true;
 		if (e.type->needs_destructor())
 			return true;
+	}
 	return false;
 }
 

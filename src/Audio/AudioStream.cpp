@@ -126,6 +126,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	update_dt = DEFAULT_UPDATE_DT;
 	killed = false;
 	thread = NULL;
+	pa_stream = NULL;
 
 	if (JUST_FAKING_IT)
 		return;
@@ -172,13 +173,13 @@ void AudioStream::__delete__()
 void AudioStream::kill()
 {
 	msg_db_f("Stream.kill", 1);
-	if (killed or JUST_FAKING_IT)
-		return;
 
-	stop();
+	if (pa_stream){
+		stop();
 
-	last_error = Pa_CloseStream(pa_stream);
-	testError("AudioStream.kill");
+		last_error = Pa_CloseStream(pa_stream);
+		testError("AudioStream.kill");
+	}
 
 	output->removeStream(this);
 	killed = true;

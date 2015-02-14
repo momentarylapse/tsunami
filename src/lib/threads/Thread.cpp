@@ -159,8 +159,10 @@ void Thread::run()
 
 void Thread::kill()
 {
-	if (running)
+	if (running){
 		pthread_cancel(internal->thread);
+		pthread_join(internal->thread, NULL);
+	}
 	running = false;
 }
 

@@ -268,7 +268,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("MidiNote", "volume", _offsetof(MidiNote, volume));
 
 	Script::DeclareClassSize("MidiData", sizeof(MidiData));
-	Script::DeclareClassOffset("MidiData", "note", 0); //_offsetof(MidiData, note));
+	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
+	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiData::__init__));
 
 	Script::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
 	Script::DeclareClassOffset("TrackLevel", "buffer", _offsetof(TrackLevel, buffer));

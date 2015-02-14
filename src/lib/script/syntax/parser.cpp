@@ -235,14 +235,14 @@ Command *SyntaxTree::GetOperandExtensionArray(Command *Operand, Function *f)
 	}
 
 	// allowed?
-	bool allowed = ((Operand->type->is_array) || (Operand->type->is_super_array));
+	bool allowed = ((Operand->type->is_array) or (Operand->type->usable_as_super_array()));
 	bool pparray = false;
 	if (!allowed)
 		if (Operand->type->is_pointer){
-			if ((!Operand->type->parent->is_array) && (!Operand->type->parent->is_super_array))
+			if ((!Operand->type->parent->is_array) and (!Operand->type->parent->usable_as_super_array()))
 				DoError(format("using pointer type \"%s\" as an array (like in C) is not allowed any more", Operand->type->name.c_str()));
 			allowed = true;
-			pparray = (Operand->type->parent->is_super_array);
+			pparray = (Operand->type->parent->usable_as_super_array());
 		}
 	if (!allowed)
 		DoError(format("type \"%s\" is neither an array nor a pointer to an array nor does it have a function __get__(%s)", Operand->type->name.c_str(), index->type->name.c_str()));
@@ -257,9 +257,9 @@ Command *SyntaxTree::GetOperandExtensionArray(Command *Operand, Function *f)
 		Operand->type = t->type->parent;
 		deref_command_old(this, Operand);
 		array = Operand->param[0];*/
-	}else if (Operand->type->is_super_array){
+	}else if (Operand->type->usable_as_super_array()){
 		array = add_command_parray(shift_command(Operand, false, 0, Operand->type->GetPointer()),
-		                           index, Operand->type->parent);
+		                           index, Operand->type->GetArrayElement());
 	}else if (Operand->type->is_pointer){
 		array = add_command_parray(Operand, index, Operand->type->parent->parent);
 	}else{
@@ -1033,12 +1033,12 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 		DoError("\"in\" expected after variable in \"for . in .\"");
 	Exp.next();
 	Command *for_array = GetOperand(f);
-	if ((!for_array->type->is_super_array) and (!for_array->type->is_array))
+	if ((!for_array->type->usable_as_super_array()) and (!for_array->type->is_array))
 		DoError("array or list expected as second parameter in \"for . in .\"");
 	//Exp.next();
 
 	// variable...
-	Type *var_type = for_array->type->parent;
+	Type *var_type = for_array->type->GetArrayElement();
 	int var_no = f->AddVar(var_name, var_type);
 	exlink_make_var_local(this, var_type, var_no);
 	Command *for_var = cp_command(&GetExistenceLink);
@@ -1054,7 +1054,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 	block->command.add(cmd_assign);
 
 	Command *val1;
-	if (for_array->type->is_super_array){
+	if (for_array->type->usable_as_super_array()){
 		// array.num
 		val1 = AddCommand(KindAddressShift, config.PointerSize, TypeInt);
 		val1->set_num_params(1);
@@ -1088,7 +1088,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block, Function *f)
 	Command *for_var_ref = ref_command(for_var);
 
 	Command *array_el;
-	if (for_array->type->is_super_array){
+	if (for_array->type->usable_as_super_array()){
 		// &array.data[for_index]
 		array_el = add_command_parray(shift_command(cp_command(for_array), false, 0, var_type->GetPointer()),
 	                                       	   for_index, var_type);
@@ -1673,7 +1673,8 @@ void Function::Update(Type *class_type)
 	// class function
 	_class = class_type;
 	if (class_type){
-		AddVar("self", class_type->GetPointer());
+		if (get_var("self") < 0)
+			AddVar("self", class_type->GetPointer());
 
 		// convert name to Class.Function
 		name = class_type->name + "." +  name;

@@ -298,9 +298,8 @@ void SyntaxTree::CreateAsmMetaInfo()
 
 int Function::AddVar(const string &name, Type *type)
 {
-	foreach(Variable &vv, var)
-		if (vv.name == name)
-			tree->DoError(format("variable '%s' already declared in this context", name.c_str()));
+	if (get_var(name) >= 0)
+		tree->DoError(format("variable '%s' already declared in this context", name.c_str()));
 	Variable v;
 	v.name = name;
 	v.type = type;

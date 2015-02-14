@@ -14,7 +14,8 @@ class MetronomeRenderer : AudioRendererInterface
 	int cur_beat
 	
 	void __init__()
-		synth.sample_rate = sample_rate
+		synth.setSampleRate(sample_rate)
+		synth.resetState()
 
 		offset = 0
 		cur_beat = 0
@@ -26,10 +27,9 @@ class MetronomeRenderer : AudioRendererInterface
 		// clear buffer
 		buf.r = 0
 		buf.l = 0
-	
-		// re-render previous click
-		offset -= sm_m
-		cur_beat = loopi(cur_beat - 1, 0, num_beats - 1)
+		MidiData midi
+		midi.samples = buf.num
+		synth.feed(midi)
 	
 		// render clicks
 		while offset < buf.num
@@ -37,10 +37,11 @@ class MetronomeRenderer : AudioRendererInterface
 				synth.addMetronomeClick(offset, 0, volume)
 			else
 				synth.addMetronomeClick(offset, 1, volume)
-			synth.read(buf)
 			cur_beat = loopi(cur_beat + 1, 0, num_beats - 1)
 			offset += sm_m
 		offset -= buf.num
+		
+		synth.read(buf)
 		return buf.num
 
 class MetronomeDialog : Dialog
@@ -53,7 +54,7 @@ class MetronomeDialog : Dialog
 Grid ? '' 1 2
 	Grid ? '' 3 2
 		Text ? 'Speed'
-		SpinButton bpm '' expandx
+		SpinButton bpm '0\\1' expandx
 		Text ? '/min'
 		Text ? 'Beats'
 		SpinButton num_beats '4\\1\\99'

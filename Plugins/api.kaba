@@ -92,7 +92,7 @@ class Synthesizer
 	int keep_notes
 	float[128] delta_phi
 	int[] active_pitch
-	MidiEvent[] events
+	MidiData events
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void render(BufferBox buf)
@@ -150,15 +150,15 @@ class MidiEvent
 	float pitch
 	float volume
 
-class MidiData
-	MidiNote[] note
-	void add(int offset, int length, float pitch, float volume)
-		MidiNote n
-		n.range.offset = offset
-		n.range.length = length
-		n.pitch = pitch
-		n.volume = volume
-		note.add(n)
+class MidiData : MidiEvent[]
+	int samples
+	extern void __init__()
+	void add(int pos, float pitch, float volume)
+		MidiEvent e
+		e.pos = pos
+		e.pitch = pitch
+		e.volume = volume
+		super.add(e)
 
 enum
 	TRACK_TYPE_AUDIO

@@ -84,6 +84,11 @@ MidiData::MidiData()
 	samples = 0;
 }
 
+void MidiData::__init__()
+{
+	new(this) MidiData;
+}
+
 MidiData MidiData::getEvents(const Range &r)
 {
 	MidiData a;

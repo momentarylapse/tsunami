@@ -52,6 +52,8 @@ public:
 	bool UsesCallByReference();
 	bool UsesReturnByMemory();
 	bool is_simple_class();
+	Type *GetArrayElement();
+	bool usable_as_super_array();
 	bool needs_constructor();
 	bool needs_destructor();
 	bool IsDerivedFrom(Type *root) const;

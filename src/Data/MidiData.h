@@ -38,6 +38,7 @@ class MidiData : public Array<MidiEvent>
 {
 public:
 	MidiData();
+	void _cdecl __init__();
 	MidiData getEvents(const Range &r);
 	int read(MidiData &data, const Range &r);
 	Array<MidiNote> getNotes(const Range &r);

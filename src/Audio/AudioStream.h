@@ -47,7 +47,6 @@ public:
 	bool _cdecl isPaused();
 	int _cdecl getState();
 	void _cdecl setSource(AudioRendererInterface *r);
-	//void _cdecl setSourceGenerated(void *func, int sample_rate);
 	AudioRendererInterface *getSource(){ return renderer; }
 	int getPos();
 	bool getPosSafe(int &pos);

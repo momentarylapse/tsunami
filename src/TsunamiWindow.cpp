@@ -13,6 +13,7 @@
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/BottomBar/BottomBar.h"
+#include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
@@ -102,7 +103,7 @@ TsunamiWindow::TsunamiWindow() :
 	// table structure
 	setSize(width, height);
 	setBorderWidth(0);
-	addControlTable("", 0, 0, 1, 2, "root_table");
+	addControlTable("", 0, 0, 1, 3, "root_table");
 	setTarget("root_table", 0);
 	addControlTable("", 0, 0, 2, 1, "main_table");
 
@@ -137,6 +138,8 @@ TsunamiWindow::TsunamiWindow() :
 	bottom_bar = new BottomBar(view, audio, tsunami->output, tsunami->log);
 	embed(bottom_bar, "root_table", 0, 1);
 	bottom_bar->hide();
+	mini_bar = new MiniBar(bottom_bar, view->stream);
+	embed(mini_bar, "root_table", 0, 2);
 
 	subscribe(view);
 	subscribe(audio);
@@ -166,8 +169,8 @@ TsunamiWindow::~TsunamiWindow()
 	HuiConfig.setInt("Window.Width", w);
 	HuiConfig.setInt("Window.Height", h);
 	HuiConfig.setBool("Window.Maximized", isMaximized());
-
 	delete(side_bar);
+	delete(mini_bar);
 	delete(bottom_bar);
 	delete(view);
 	HuiEnd();

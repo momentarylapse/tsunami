@@ -217,7 +217,7 @@ OBJ = \
  View/BottomBar/FxConsole.o\
  View/BottomBar/LogDialog.o\
  View/BottomBar/MidiEditor.o\
- View/BottomBar/MiniConsole.o\
+ View/BottomBar/MiniBar.o\
  View/BottomBar/MixingConsole.o\
  View/BottomBar/SampleManager.o\
  View/BottomBar/SynthConsole.o\
@@ -886,8 +886,8 @@ View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 View/BottomBar/MidiEditor.o : View/BottomBar/MidiEditor.cpp
 	$(CPP) -c View/BottomBar/MidiEditor.cpp -o $@ $(CXXFLAGS)
 
-View/BottomBar/MiniConsole.o : View/BottomBar/MiniConsole.cpp
-	$(CPP) -c View/BottomBar/MiniConsole.cpp -o $@ $(CXXFLAGS)
+View/BottomBar/MiniBar.o : View/BottomBar/MiniBar.cpp
+	$(CPP) -c View/BottomBar/MiniBar.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/MixingConsole.o : View/BottomBar/MixingConsole.cpp
 	$(CPP) -c View/BottomBar/MixingConsole.cpp -o $@ $(CXXFLAGS)

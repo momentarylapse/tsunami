@@ -93,7 +93,6 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
 	drawing_rect = rect(0, 1024, 0, 768);
-	bottom_button_rect = rect(0, 0, 0, 0);
 
 	show_mono = HuiConfig.getBool("View.Mono", true);
 	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);
@@ -262,12 +261,6 @@ AudioView::SelectionType AudioView::getMouseOver()
 				s.show_track_controls = t->track;
 		}
 	}
-
-	if (!win->bottom_bar->visible)
-		if (bottom_button_rect.inside(mx, my)){
-			s.type = SEL_TYPE_BOTTOM_BUTTON;
-			return s;
-		}
 
 	// selection boundaries?
 	selectionUpdatePos(s);
@@ -570,8 +563,6 @@ void AudioView::onLeftButtonDown()
 		foreach(int p, pitch)
 			midi_preview_renderer->add(MidiEvent(0, p, 1));
 		midi_preview_stream->play();
-	}else if (selection.type == SEL_TYPE_BOTTOM_BUTTON){
-		win->bottom_bar->show();
 	}
 
 	setBarriers(&selection);
@@ -1222,13 +1213,6 @@ void AudioView::onDraw()
 	drawAudioFile(c, rect(0, c->width, 0, c->height));
 
 	//c->DrawStr(100, 100, i2s(frame++));
-
-	if (!win->bottom_bar->visible){
-		c->setColor((hover.type == SEL_TYPE_BOTTOM_BUTTON) ? Black : ColorWave);
-		bottom_button_rect = rect(5, 5 + c->getStrWidth(_("Leiste anzeigen")), c->height - 18, c->height);
-		c->drawStr(5, c->height - 18, _("Leiste anzeigen"));
-	}else
-		bottom_button_rect = rect(0, 0, 0, 0);
 
 	c->end();
 }

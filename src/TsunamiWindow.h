@@ -17,6 +17,7 @@ class AudioFile;
 class AudioView;
 class SideBar;
 class BottomBar;
+class MiniBar;
 
 class TsunamiWindow : public Observer, public HuiWindow
 {
@@ -97,6 +98,7 @@ public:
 
 	SideBar *side_bar;
 	BottomBar *bottom_bar;
+	MiniBar *mini_bar;
 };
 
 #endif /* TSUNAMIWINDOW_H_ */

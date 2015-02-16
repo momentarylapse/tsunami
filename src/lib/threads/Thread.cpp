@@ -48,7 +48,9 @@ int Thread::getNumCores()
 
 Thread::Thread()
 {
-	__init__();
+	internal = NULL;
+	running = false;
+	_Thread_List_.add(this);
 }
 
 Thread::~Thread()
@@ -59,9 +61,7 @@ Thread::~Thread()
 
 void Thread::__init__()
 {
-	internal = NULL;
-	running = false;
-	_Thread_List_.add(this);
+	new(this) Thread;
 }
 
 

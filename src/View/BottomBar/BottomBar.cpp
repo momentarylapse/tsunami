@@ -7,7 +7,6 @@
 
 #include "BottomBar.h"
 #include "AudioFileConsole.h"
-#include "MiniConsole.h"
 #include "MixingConsole.h"
 #include "CurveConsole.h"
 #include "TrackConsole.h"
@@ -18,6 +17,7 @@
 #include "MidiEditor.h"
 #include "../../lib/hui/Controls/HuiControl.h"
 #include "../AudioView.h"
+#include "MiniBar.h"
 
 BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")

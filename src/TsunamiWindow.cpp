@@ -138,7 +138,7 @@ TsunamiWindow::TsunamiWindow() :
 	bottom_bar = new BottomBar(view, audio, tsunami->output, tsunami->log);
 	embed(bottom_bar, "root_table", 0, 1);
 	bottom_bar->hide();
-	mini_bar = new MiniBar(bottom_bar, view->stream);
+	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->output);
 	embed(mini_bar, "root_table", 0, 2);
 
 	subscribe(view);

@@ -8,28 +8,39 @@
 #include "BottomBar.h"
 #include "../Helper/PeakMeter.h"
 #include "../../Audio/AudioStream.h"
+#include "../../Audio/AudioOutput.h"
 #include "MiniBar.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, AudioStream *_stream) :
+MiniBar::MiniBar(BottomBar *_bottom_bar, AudioStream *_stream, AudioOutput *_output) :
 	Observer("MiniBar")
 {
 	stream = _stream;
+	output = _output;
 	bottom_bar = _bottom_bar;
 	addControlTable("!noexpandx", 0, 0, 5, 1, "grid");
 	setTarget("grid", 0);
 	addButton("", 0, 0, 0, 0, "show_bottom_bar");
 	setImage("show_bottom_bar", "hui:up");
 	addDrawingArea("!width=100,noexpandx,noexpandy", 1, 0, 0, 0, "peaks");
+	addSlider("!width=100,noexpandx,noexpandy", 2, 0, 0, 0, "volume");
+
+	setTooltip("show_bottom_bar", _("Leiste aufklappen"));
+	setTooltip("volume", _("Ausgabelautst&arke"));
+	setTooltip("peaks", _("Ausgabepegel"));
 
 	peak_meter = new PeakMeter(this, "peaks", stream);
+	setFloat("volume", output->getVolume());
 
 	event("show_bottom_bar", this, &MiniBar::onShowBottomBar);
+	event("volume", this, &MiniBar::onVolume);
 
 	subscribe(bottom_bar);
+	subscribe(output);
 }
 
 MiniBar::~MiniBar()
 {
+	unsubscribe(output);
 	unsubscribe(bottom_bar);
 	delete(peak_meter);
 }
@@ -38,6 +49,11 @@ void MiniBar::onShowBottomBar()
 {
 	bottom_bar->show();
 	hide();
+}
+
+void MiniBar::onVolume()
+{
+	output->setVolume(getFloat(""));
 }
 
 void MiniBar::onShow()
@@ -52,7 +68,11 @@ void MiniBar::onHide()
 
 void MiniBar::onUpdate(Observable *o, const string &message)
 {
-	if (!bottom_bar->visible)
-		show();
+	if (o == bottom_bar){
+		if (!bottom_bar->visible)
+			show();
+	}else if (o == output){
+		setFloat("volume", output->getVolume());
+	}
 }
 

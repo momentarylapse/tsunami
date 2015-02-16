@@ -13,15 +13,17 @@
 
 class PeakMeter;
 class AudioStream;
+class AudioOutput;
 class BottomBar;
 
 class MiniBar : public HuiPanel, public Observer
 {
 public:
-	MiniBar(BottomBar *bottom_bar, AudioStream *stream);
+	MiniBar(BottomBar *bottom_bar, AudioStream *stream, AudioOutput *output);
 	virtual ~MiniBar();
 
 	void onShowBottomBar();
+	void onVolume();
 
 	virtual void onShow();
 	virtual void onHide();
@@ -29,6 +31,7 @@ public:
 	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioStream *stream;
+	AudioOutput *output;
 	PeakMeter *peak_meter;
 	BottomBar *bottom_bar;
 };

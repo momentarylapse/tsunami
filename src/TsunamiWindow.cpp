@@ -227,7 +227,7 @@ void TsunamiWindow::onTrackEditMidi()
 void TsunamiWindow::onTrackEditFX()
 {
 	if (view->cur_track)
-		bottom_bar->choose(BottomBar::FX_CONSOLE);
+		bottom_bar->choose(BottomBar::TRACK_FX_CONSOLE);
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
@@ -499,7 +499,7 @@ void TsunamiWindow::updateMenu()
 	check("play_loop", view->renderer->loop_if_allowed);
 	// view
 	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
-	check("show_fx_console", bottom_bar->isActive(BottomBar::FX_CONSOLE));
+	check("show_fx_console", bottom_bar->isActive(BottomBar::TRACK_FX_CONSOLE));
 	check("sample_manager", bottom_bar->isActive(BottomBar::SAMPLE_CONSOLE));
 
 	HuiMenu *m = getMenu()->getSubMenuByID("menu_level_target");

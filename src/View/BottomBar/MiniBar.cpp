@@ -69,7 +69,9 @@ void MiniBar::onHide()
 void MiniBar::onUpdate(Observable *o, const string &message)
 {
 	if (o == bottom_bar){
-		if (!bottom_bar->visible)
+		if (bottom_bar->visible)
+			hide();
+		else
 			show();
 	}else if (o == output){
 		setFloat("volume", output->getVolume());

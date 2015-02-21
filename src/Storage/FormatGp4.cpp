@@ -201,8 +201,10 @@ void FormatGp4::read_measure_header(AudioFile *a, CFile *f)
 		f->ReadByte(); // repeat close
 	if ((flags & 0x10) != 0)
 		f->ReadByte(); // repeat alternative
-	if ((flags & 0x20) != 0)
+	if ((flags & 0x20) != 0){
 		m.marker = read_str41(f);
+		f->ReadInt(); // color
+	}
 	if ((flags & 0x40) != 0){
 		f->ReadByte();
 		f->SetPos(1, false);

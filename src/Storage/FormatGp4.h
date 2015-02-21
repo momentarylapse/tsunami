@@ -23,6 +23,8 @@ public:
 	void loadAudio(AudioFile *a, const string &filename);
 	void saveAudio(AudioFile *a, const string &filename);
 
+	int version;
+
 	struct GpTrack
 	{
 		int stringCount;
@@ -39,20 +41,25 @@ public:
 	Array<GpMeasure> measures;
 	int tempo;
 
-	void read_info(AudioFile *a, CFile *f);
-	void read_lyrics(AudioFile *a, CFile *f);
-	void read_channels(AudioFile *a, CFile *f);
-	void read_measure_header(AudioFile *a, CFile *f);
-	void read_track(AudioFile *a, CFile *f);
-	void read_channel(AudioFile *a, CFile *f);
-	void read_measure(AudioFile *a, CFile *f, GpMeasure &m, GpTrack &t, int offset);
-	int read_beat(AudioFile *a, CFile *f, GpTrack &t, GpMeasure &m, int start);
-	void read_beat_fx(AudioFile *a, CFile *f);
-	void read_note(AudioFile *a, CFile *f, GpTrack &t, int string_base, int start, int length);
-	void read_note_fx(AudioFile *a, CFile *f);
-	int read_duration(AudioFile *a, CFile *f, int flags, GpMeasure &m);
-	void read_chord(AudioFile *a, CFile *f);
-	void read_mix_change(AudioFile *a, CFile *f);
+	AudioFile *a;
+	CFile *f;
+
+	void read_info();
+	void read_lyrics();
+	void read_channels();
+	void read_eq();
+	void read_page_setup();
+	void read_measure_header();
+	void read_track();
+	void read_channel();
+	void read_measure(GpMeasure &m, GpTrack &t, int offset);
+	int read_beat(GpTrack &t, GpMeasure &m, int start);
+	void read_beat_fx();
+	void read_note(GpTrack &t, int string_base, int start, int length);
+	void read_note_fx();
+	int read_duration(int flags, GpMeasure &m);
+	void read_chord();
+	void read_mix_change();
 };
 
 #endif /* SRC_STORAGE_FORMATGP4_H_ */

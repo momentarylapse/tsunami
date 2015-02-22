@@ -104,7 +104,7 @@ void FormatGp4::loadAudio(AudioFile *_a, const string &filename)
 
 		read_info();
 
-		if (version <= 400)
+		if (version < 500)
 			int tripplet_feel = f->ReadByte();
 
 		if (version >= 400)
@@ -243,6 +243,7 @@ void FormatGp4::read_page_setup()
 
 void FormatGp4::read_measure_header()
 {
+	msg_db_f("bar", 1);
 	GpMeasure m;
 	if (measures.num > 0){
 		m = measures.back();
@@ -257,15 +258,25 @@ void FormatGp4::read_measure_header()
 		m.denominator = f->ReadByte();
 	if ((flags & 0x08) != 0)
 		f->ReadByte(); // repeat close
-	if ((flags & 0x10) != 0)
+	if (((flags & 0x10) != 0) and (version < 500))
 		f->ReadByte(); // repeat alternative
 	if ((flags & 0x20) != 0){
 		m.marker = read_str41(f);
 		f->ReadInt(); // color
 	}
+	if (((flags & 0x10) != 0) and (version >= 500))
+		f->ReadByte(); // repeat alternative
 	if ((flags & 0x40) != 0){
+		f->ReadByte(); // key
 		f->ReadByte();
-		f->SetPos(1, false);
+	}
+	if (version >= 500){
+		if ((flags & 0x03) != 0)
+			f->ReadInt(); // beam 8 notes
+		if ((flags & 0x10) == 0)
+			f->ReadByte(); // repeat alternative
+		f->ReadByte(); // triplet feel
+		f->ReadByte();
 	}
 	measures.add(m);
 }
@@ -305,22 +316,35 @@ void FormatGp4::read_channel()
 
 void FormatGp4::read_measure(GpMeasure &m, GpTrack &t, int offset)
 {
-	msg_db_f("measure", 1);
-	int beats = f->ReadInt();
-	//msg_write(beats);
-	if (beats > 1000)
-		throw string("too many beats...");
-	for (int i=0; i<beats; i++){
-		int length = read_beat(t, m, offset);
-		offset += length;
+	msg_db_f("measure", 0);
+	msg_write(format("%x", f->GetPos()));
+
+	int num_voices = 1;
+	if (version >= 500)
+		num_voices = 2;
+
+	for (int v=0; v<num_voices; v++){
+
+		int num_beats = f->ReadInt();
+		//msg_write(num_beats);
+		if (num_beats > 1000)
+			throw string("too many beats... " + i2s(num_beats));
+		for (int i=0; i<num_beats; i++){
+			int length = read_beat(t, m, offset);
+			offset += length;
+		}
 	}
+
+	if (version >= 500)
+		f->ReadByte();
 }
 
 int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
 {
-	msg_db_f("beat", 1);
+	msg_db_f("beat", 0);
+	msg_write(format("%x", f->GetPos()));
 	int flags = f->ReadByte();
-	if((flags & 0x40) != 0)
+	if ((flags & 0x40) != 0)
 		f->ReadByte();
 
 	int duration = read_duration(flags, m);
@@ -337,6 +361,7 @@ int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
 	if ((flags & 0x10) != 0)
 		read_mix_change();
 	int stringFlags = f->ReadByte();
+	msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
 	for (int i = 6; i >= 0; i--) {
 		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.stringCount) {
 			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
@@ -345,15 +370,22 @@ int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
 			//voice.addNote(note);
 		}
 	}
+	if (version >= 500){
+		f->ReadByte();
+		int r = f->ReadByte();
+		if ((r & 0x08) != 0)
+			f->ReadByte();
+	}
 	return duration;
 }
 
 void FormatGp4::read_chord()
 {
-	msg_db_f("chord", 1);
+	msg_db_f("chord", 0);
 	int type = f->ReadByte();
-	if ((type & 0x01) == 0){
+	if (((type & 0x01) == 0) and (version < 500)){
 		string name = read_str41(f);
+		msg_write("chord: " + name);
 		int first_fret = f->ReadInt();
 		if (first_fret != 0){
 			for (int i=0; i<6; i++) {
@@ -366,6 +398,7 @@ void FormatGp4::read_chord()
 	}else{
 		f->SetPos(16, false);
 		string name = read_str1c(f, 21);
+		msg_write("chord: " + name);
 		f->SetPos(4, false);
 		int first_fret = f->ReadInt();
 		for (int i=0; i<7; i++){
@@ -380,7 +413,8 @@ void FormatGp4::read_chord()
 
 void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 {
-	msg_db_f("note", 1);
+	msg_db_f("note", 0);
+	msg_write(format("%x", f->GetPos()));
 	MidiNote n;
 	n.range = Range(start, length);
 	n.volume = 1;
@@ -389,7 +423,7 @@ void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 	if ((flags & 0x20) != 0) {
 		int noteType = f->ReadByte();
 	}
-	if ((flags & 0x01) != 0)
+	if (((flags & 0x01) != 0) and (version < 500))
 		f->SetPos(2, false);
 	if ((flags & 0x10) != 0)
 		n.volume = 0.1f + 0.9f * (float)f->ReadByte() / 10.0f;
@@ -402,6 +436,11 @@ void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 	}
 	if ((flags & 0x80) != 0)
 		f->SetPos(2, false);
+	if (version >= 500){
+		if ((flags & 0x01) != 0)
+			f->SetPos(8, false);
+		f->ReadByte();
+	}
 	if ((flags & 0x08) != 0) {
 		read_note_fx();
 	}
@@ -413,7 +452,7 @@ void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 
 void FormatGp4::read_note_fx()
 {
-	msg_db_f("note fx", 1);
+	msg_db_f("note fx", 0);
 	int flags1 = f->ReadByte();
 	int flags2 = 0;
 	if (version >= 400)
@@ -434,16 +473,19 @@ void FormatGp4::read_note_fx()
 		int volume = f->ReadByte();
 		int transition = f->ReadByte();
 		int duration = f->ReadByte();
+		if (version >= 500)
+			f->ReadByte();
 	}
 	if ((flags2 & 0x04) != 0){
 		// tremolo picking
 		f->ReadByte();
 	}
 	if ((flags2 & 0x08) != 0)
-		f->ReadByte();
+		f->ReadByte(); // slide
 	if ((flags2 & 0x10) != 0)
 		int type = f->ReadByte(); // harmonic
 	if ((flags2 & 0x20) != 0) {
+		// trill
 		int fret = f->ReadByte();
 		int period = f->ReadByte();
 	}
@@ -499,14 +541,20 @@ int FormatGp4::read_duration(int flags, GpMeasure &m)
 
 void FormatGp4::read_mix_change()
 {
-	msg_db_f("mix", 1);
+	msg_db_f("mix", 0);
 	f->ReadByte();
+	if (version >= 500){
+		for (int i=0; i<4; i++)
+			f->ReadInt();
+	}
 	int volume = (signed char)f->ReadByte();
 	int pan = (signed char)f->ReadByte();
 	int chorus = (signed char)f->ReadByte();
 	int reverb = (signed char)f->ReadByte();
 	int phaser = (signed char)f->ReadByte();
 	int tremolo = (signed char)f->ReadByte();
+	if (version > 500)
+		read_str41(f);
 	int tempoValue = f->ReadInt();
 	//msg_write(format("%d %d %d %d %d %d %d", volume, pan, chorus, reverb, phaser, tremolo, tempoValue));
 	if (volume >= 0)
@@ -524,13 +572,22 @@ void FormatGp4::read_mix_change()
 	if (tempoValue >= 0){
 		tempo = tempoValue;
 		f->ReadByte();
+		if (version > 500)
+			f->ReadByte();
 	}
-	f->ReadByte();
+	if (version >= 400)
+		f->ReadByte();
+	if (version >= 500)
+		f->ReadByte();
+	if (version > 500){
+		read_str41(f);
+		read_str41(f);
+	}
 }
 
 void FormatGp4::read_beat_fx()
 {
-	msg_db_f("beat fx", 1);
+	msg_db_f("beat fx", 0);
 	int flags1 = f->ReadByte();
 	int flags2 = 0;
 	if (version >= 400)

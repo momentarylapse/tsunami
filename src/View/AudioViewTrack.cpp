@@ -243,16 +243,20 @@ void AudioViewTrack::drawMidiEditable(HuiPainter *c, const rect &r, MidiData &mi
 		PluginData *c = track->synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];
 	}
+	bool is_drum = ((track->synth) and (track->synth->name == "Drumset"));
 	for (int i=view->pitch_min; i<view->pitch_max; i++){
 		c->setColor(cc);
 		if (((view->hover.type == view->SEL_TYPE_MIDI_PITCH) or (view->hover.type == view->SEL_TYPE_MIDI_NOTE)) and (i == view->hover.pitch))
 			c->setColor(view->ColorWaveCur);
 
 		string name = pitch_name(i);
-		if (p)
+		if (is_drum){
+			name = drum_pitch_name(i);
+		}else if (p){
 			if (i < p->num)
 				if ((*p)[i])
 					name = (*p)[i]->origin->name;
+		}
 		c->drawStr(20, r.y1 + r.height() * (view->pitch_max - i - 1) / (view->pitch_max - view->pitch_min), name);
 	}
 }

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-211
+212
 // Data (ID,Text)
 about
 
@@ -201,6 +201,8 @@ menu_plugins_other
 
 menu_plugins_pitch
 
+menu_plugins_repair
+
 menu_plugins_sound
 
 menu_plugins_synthesizer
@@ -315,11 +317,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_109153
+rand_id_162113
 
-rand_id_254645
+rand_id_458894
 
-rand_id_992797
+rand_id_488825
 
 rdt_capture
 
@@ -426,7 +428,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-147
+149
 // Data (ID,Text)
 
 
@@ -490,6 +492,10 @@ Aufruf: tsunami --export <Datei> <Exportdatei>
 
 Aufruf: tsunami --info <Datei>
 
+Ausgabelautstärke
+
+Ausgabepegel
+
 Beim Anwenden eines Effekts: 
 
 Beim Anwenden eines MidiEffekts: 
@@ -532,7 +538,7 @@ Es muss mindestens eine Spur existieren
 
 Failed writing header to output stream\n
 
-Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)
+Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaubt)
 
 Fehler
 Error
@@ -572,7 +578,7 @@ Kurven
 
 Lautstärke in dB
 
-Leiste anzeigen
+Leiste aufklappen
 
 MIDI Quelle auswählen
 

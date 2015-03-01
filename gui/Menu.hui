@@ -75,6 +75,7 @@ Menu menu "" disabled
 		Menu menu_plugins_dynamics "Dynamik"
 		Menu menu_plugins_echo "Echo"
 		Menu menu_plugins_pitch "Tonhöhe"
+		Menu menu_plugins_repair "Reparieren"
 		Menu menu_plugins_sound "Klang"
 		Menu menu_plugins_synthesizer "Synthese"
 		Separator "" ""

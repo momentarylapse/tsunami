@@ -43,7 +43,7 @@ bool AudioInput::start(int type, int sample_rate)
 		in_cur = in_midi;
 	}else{
 		in_cur = in_audio;
-		tsunami->log->error(_("Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaube)"));
+		tsunami->log->error(_("Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaubt)"));
 		return false;
 	}
 

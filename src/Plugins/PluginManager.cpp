@@ -457,6 +457,7 @@ void PluginManager::FindPlugins()
 	find_plugins_in_dir("Buffer/Dynamics/", this);
 	find_plugins_in_dir("Buffer/Echo/", this);
 	find_plugins_in_dir("Buffer/Pitch/", this);
+	find_plugins_in_dir("Buffer/Repair/", this);
 	find_plugins_in_dir("Buffer/Sound/", this);
 	find_plugins_in_dir("Buffer/Synthesizer/", this);
 
@@ -481,6 +482,7 @@ void PluginManager::AddPluginsToMenu(HuiWindow *win)
 	add_plugins_in_dir("Buffer/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"));
 	add_plugins_in_dir("Buffer/Echo/", this, m->getSubMenuByID("menu_plugins_echo"));
 	add_plugins_in_dir("Buffer/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"));
+	add_plugins_in_dir("Buffer/Repair/", this, m->getSubMenuByID("menu_plugins_repair"));
 	add_plugins_in_dir("Buffer/Sound/", this, m->getSubMenuByID("menu_plugins_sound"));
 	add_plugins_in_dir("Buffer/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"));
 

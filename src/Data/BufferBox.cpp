@@ -357,19 +357,28 @@ bool BufferBox::get_16bit_buffer(Array<short> &data)
 	return !wtb_overflow;
 }
 
+inline float _clamp_(float f)
+{
+	if (f < -0.999f)
+		return -0.999f;
+	if (f > 0.999f)
+		return 0.999f;
+	return f;
+}
+
 void BufferBox::interleave(float *p, float volume)
 {
 	float *pr = &r[0];
 	float *pl = &l[0];
 	if (volume == 1.0f){
 		for (int i=0; i<num; i++){
-			*p ++ = *pr ++;
-			*p ++ = *pl ++;
+			*p ++ = _clamp_(*pr ++);
+			*p ++ = _clamp_(*pl ++);
 		}
 	}else{
 		for (int i=0; i<num; i++){
-			*p ++ = (*pr ++) * volume;
-			*p ++ = (*pl ++) * volume;
+			*p ++ = _clamp_((*pr ++) * volume);
+			*p ++ = _clamp_((*pl ++) * volume);
 		}
 	}
 }

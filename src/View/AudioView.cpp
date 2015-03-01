@@ -513,9 +513,8 @@ void deleteMidiNote(Track *t, int pitch, int start)
 	foreachi(MidiEvent &e, t->midi, i)
 		if (e.pitch == pitch){
 			if (e.pos >= start){
-				if (e.volume >= 0)
-					events.add(i);
-				else
+				events.add(i);
+				if (e.volume <= 0)
 					break;
 			}
 		}

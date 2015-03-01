@@ -38,6 +38,8 @@ public:
 
 	void updateMidiPortList();
 	Array<AudioInputMidi::MidiPort> midi_ports;
+	void updateAudioSourceList();
+	Array<string> audio_sources;
 
 	void onUpdate(Observable *o, const string &message);
 

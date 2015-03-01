@@ -9,6 +9,7 @@
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../../Audio/AudioInput.h"
+#include "../../Audio/AudioInputAudio.h"
 #include "../../Audio/AudioInputMidi.h"
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
@@ -131,10 +132,13 @@ void CaptureDialog::onSource()
 {
 	int n = HuiCurWindow->getInt("");
 	if (type == Track::TYPE_MIDI){
-		if (n < midi_ports.num)
+		if ((n >= 0) and (n < midi_ports.num))
 			tsunami->input->in_midi->connectTo(midi_ports[n]);
 		else
 			tsunami->input->in_midi->unconnect();
+	}else if (type == Track::TYPE_AUDIO){
+		if ((n >= 0) and (n < audio_sources.num))
+			tsunami->input->in_audio->setDevice(audio_sources[n]);
 	}
 }
 
@@ -156,6 +160,29 @@ void CaptureDialog::updateMidiPortList()
 
 }
 
+void CaptureDialog::updateAudioSourceList()
+{
+	audio_sources = tsunami->input->in_audio->getDevices();
+	string cur = tsunami->input->in_audio->getChosenDevice();
+
+	// add all
+	reset("capture_source");
+	foreach(string &d, audio_sources)
+		setString("capture_source", d);
+
+	// add "default"
+	audio_sources.add("");
+	setString("capture_source", _("        - Standard -"));
+
+	// select current
+	foreachi(string &d, audio_sources, i)
+		if (cur == d)
+			setInt("capture_source", i);
+
+	enable("capture_source", true);
+
+}
+
 void CaptureDialog::setType(int _type)
 {
 	if (type == _type)
@@ -167,6 +194,7 @@ void CaptureDialog::setType(int _type)
 		updateMidiPortList();
 		check("capture_type:midi", true);
 	}else if (type == Track::TYPE_AUDIO){
+		updateAudioSourceList();
 		check("capture_type:audio", true);
 	}else{
 	}

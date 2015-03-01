@@ -29,6 +29,7 @@ public:
 
 	Array<string> getDevices();
 	void setDevice(const string &device);
+	string getChosenDevice();
 
 	virtual bool start(int sample_rate);
 	virtual void stop();

@@ -100,6 +100,14 @@ Array<string> AudioInputAudio::getDevices()
 	return devices;
 }
 
+string AudioInputAudio::getChosenDevice()
+{
+	if (pa_device_no >= 0)
+		if (pa_device_no == Pa_GetDefaultInputDevice())
+			return "";
+	return chosen_device;
+}
+
 void AudioInputAudio::setDevice(const string &device)
 {
 	chosen_device = device;
@@ -118,6 +126,11 @@ void AudioInputAudio::setDevice(const string &device)
 		pa_device_no = Pa_GetDefaultInputDevice();
 		if (device != "")
 			tsunami->log->error(format("input device '%s' not found. Using default.", device.c_str()));
+	}
+
+	if (capturing){
+		stop();
+		start(sample_rate);
 	}
 
 	tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));

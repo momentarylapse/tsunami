@@ -236,11 +236,12 @@ void Configurable::configFromString(const string &param)
 	msg_db_f("Configurable.configFromString", 1);
 
 	PluginData *config = get_config();
-	if (config){
-		config->reset();
-		int pos = 0;
-		var_from_string(config->type, (char*)config, param, pos);
-	}
+	if (!config)
+		return;
+
+	config->reset();
+	int pos = 0;
+	var_from_string(config->type, (char*)config, param, pos);
 	onConfig();
 }
 

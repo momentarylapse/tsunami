@@ -37,6 +37,10 @@ class AudioFile : public Data
 public:
 	AudioFile();
 	virtual ~AudioFile();
+
+	void _cdecl __init__();
+	void _cdecl __delete__();
+
 	Range _cdecl getRange();
 
 	static const string MESSAGE_NEW;

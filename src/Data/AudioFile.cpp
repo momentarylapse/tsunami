@@ -68,6 +68,17 @@ AudioFile::AudioFile() :
 	level_name.add("");
 }
 
+void AudioFile::__init__()
+{
+	new(this) AudioFile;
+	level_name.clear();
+}
+
+void AudioFile::__delete__()
+{
+	reset();
+}
+
 
 const string AudioFile::MESSAGE_NEW = "New";
 const string AudioFile::MESSAGE_SELECTION_CHANGE = "SelectionChange";

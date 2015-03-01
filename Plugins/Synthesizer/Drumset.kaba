@@ -1,0 +1,119 @@
+use "../api.kaba"
+use "../tone.kaba"
+
+class Drumset
+	string name
+	AudioFile *a
+	
+	void load()
+		if a
+			return
+		a = new AudioFile
+		storage.load(a, AppDirectoryStatic + "Data/Drumsets/" + name + ".nami")
+
+class DrumList
+	Drumset[] sets
+	
+	int find(string name)
+		if name == "" and sets.num > 0
+			return 0
+		for s,i in sets
+			if s.name == name
+				return i
+		return -1
+		
+	string[] getNames()
+		string[] list
+		for s in sets
+			list.add(s.name)
+		return list
+
+	//string[] find_drumsets()
+	void update()
+		DirEntry[] list = DirSearch(AppDirectoryStatic + "Data/Drumsets", "*.nami", false)
+		for e in list
+			string name = e.name.substr(0, -6)
+			if find(name) >= 0
+				continue
+			Drumset s
+			s.name = name
+			s.a = nil
+			sets.add(s)
+	
+	AudioFile *get(string name)
+		update()
+		int n = find(name)
+		if n < 0
+			if sets.num > 0
+				n = 0
+				logging.warning("Drumset not found: '" + name + "', using '" + sets[0].name + "' instead")
+			else
+				logging.error("Drumset not found: '" + name + "' (none found)")
+				return nil
+		Drumset *s = &sets[n]
+		s.load()
+		return s.a
+
+DrumList drumlist
+
+class DrumsetConfig : PluginData
+	string name
+	overwrite void reset()
+		name = ""
+
+class DrumsetState : PluginData
+	AudioFile *a
+	Synthesizer *s
+	
+
+class DrumsetSynthesizer : Synthesizer
+	DrumsetConfig config
+	DrumsetState state
+	void __init__()
+		state.a = nil
+	overwrite void onConfig()
+		state.a = drumlist.get(config.name)
+		state.s = nil
+		if state.a
+			state.s = state.a.track[0].synth
+		if state.s
+			state.s.onConfig()
+	overwrite void render(BufferBox buf)
+		Synthesizer *s = state.s
+		if !s
+			return
+		s.events = events
+		s.read(buf)
+			
+	
+	overwrite ConfigPanel *createPanel()
+		return new DrumsetPanel(self)
+
+class DrumsetPanel : ConfigPanel
+	DrumsetConfig *sc
+	overwrite DrumsetSynthesizer *c
+	void __init__(DrumsetSynthesizer *_s)
+		super.__init__(_s)
+		sc = &c.config
+		addGrid("", 0, 0, 2, 1, "grid")
+		setTarget("grid", 0)
+		addText("Set", 0 ,0, 0, 0, "")
+		addComboBox("", 1, 0, 0, 0, "sets")
+		event("sets", &onSelect)
+
+	overwrite void update()
+		reset("sets")
+		string[] sets = drumlist.getNames()
+		setString("sets", "  - Default -")
+		setInt("sets", 0)
+		for s,i in sets
+			setString("sets", s)
+			if s == sc.name
+				setInt("sets", i+1)
+		
+	void onSelect()
+		int n = getInt("")
+		sc.name = ""
+		if n > 0
+			sc.name = drumlist.sets[n-1].name
+		notify()

@@ -259,6 +259,9 @@ class AudioFile
 	
 	string[] level_name
 	
+	extern void __init__()
+	extern virtual void __delete__()
+	
 	extern Range getRange()
 	extern int getNextBeat(int pos)
 	

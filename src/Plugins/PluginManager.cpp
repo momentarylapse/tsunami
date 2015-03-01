@@ -315,6 +315,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.editBar", Script::mf(&Track::editBar));
 	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::deleteBar));
 
+	AudioFile af;
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
 	Script::DeclareClassOffset("AudioFile", "filename", _offsetof(AudioFile, filename));
 	Script::DeclareClassOffset("AudioFile", "tag", _offsetof(AudioFile, tag));
@@ -324,6 +325,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioFile", "track", _offsetof(AudioFile, track));
 	Script::DeclareClassOffset("AudioFile", "sample", _offsetof(AudioFile, sample));
 	Script::DeclareClassOffset("AudioFile", "level_name", _offsetof(AudioFile, level_name));
+	Script::LinkExternal("AudioFile.__init__", Script::mf(&AudioFile::__init__));
+	Script::DeclareClassVirtualIndex("AudioFile", "__delete__", Script::mf(&AudioFile::__delete__), &af);
 	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::newEmpty));
 	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::addTrack));
 	Script::LinkExternal("AudioFile.deleteTrack", Script::mf(&AudioFile::deleteTrack));

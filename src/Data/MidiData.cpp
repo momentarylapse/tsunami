@@ -214,7 +214,7 @@ MidiData midi_notes_to_events(const Array<MidiNote> &notes)
 	MidiData r;
 	foreach(MidiNote &n, const_cast<Array<MidiNote>&>(notes)){
 		r.add(MidiEvent(n.range.offset, n.pitch, n.volume));
-		r.add(MidiEvent(n.range.end(), n.pitch, 0));
+		r.add(MidiEvent(n.range.end()-1, n.pitch, 0));
 	}
 	return r;
 }

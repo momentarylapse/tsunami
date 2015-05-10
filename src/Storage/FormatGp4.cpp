@@ -289,6 +289,7 @@ void FormatGp4::read_info()
 void FormatGp4::write_info()
 {
 	write_str41(f, a->getTag("title"));
+	write_str41(f, "");
 	write_str41(f, a->getTag("artist"));
 	write_str41(f, a->getTag("album"));
 	if (version >= 500)
@@ -446,6 +447,14 @@ void FormatGp4::write_measure_header(Bar &b)
 	f->WriteByte(0x03);
 	f->WriteByte(b.num_beats);
 	f->WriteByte(4);
+	if (version >= 500){
+		//if ((flags & 0x03) != 0)
+			f->WriteInt(0); // beam 8 notes
+		//if ((flags & 0x10) == 0)
+			f->WriteByte(0); // repeat alternative
+		f->WriteByte(0); // triplet feel
+		f->WriteByte(0);
+	}
 }
 
 void FormatGp4::read_track()
@@ -478,7 +487,7 @@ void FormatGp4::read_track()
 void FormatGp4::write_track(Track *t)
 {
 	msg_db_f("track", 1);
-	f->ReadByte();
+	f->WriteByte(0);
 	GpTrack tt;
 	write_str1c(f, t->name, 40);
 	// tuning

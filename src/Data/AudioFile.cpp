@@ -92,7 +92,8 @@ const string AudioFile::MESSAGE_DELETE_CURVE = "DeleteCurve";
 
 void AudioFile::addTag(const string &key, const string &value)
 {
-	execute(new ActionAudioAddTag(Tag(key, value)));
+	if ((key != "") and (value != ""))
+		execute(new ActionAudioAddTag(Tag(key, value)));
 }
 
 void AudioFile::editTag(int index, const string &key, const string &value)

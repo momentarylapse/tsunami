@@ -33,36 +33,38 @@ void script_make_super_array(Type *t, SyntaxTree *ps = NULL);
 
 //--------------------------------------------------------------------------------------------------
 // operators
-enum{
-	OperatorAssign,			//  =
-	OperatorAdd,			//  +
-	OperatorSubtract,		//  -
-	OperatorMultiply,		//  *
-	OperatorDivide,			//  /
-	OperatorAddS,			// +=
-	OperatorSubtractS,		// -=
-	OperatorMultiplyS,		// *=
-	OperatorDivideS,		// /=
-	OperatorEqual,			// ==
-	OperatorNotEqual,		// !=
-	OperatorNegate,			//  !
-	OperatorSmaller,		//  <
-	OperatorGreater,		//  >
-	OperatorSmallerEqual,	// <=
-	OperatorGreaterEqual,	// >=
-	OperatorAnd,			// and
-	OperatorOr,				// or
-	OperatorModulo,			//  %
-	OperatorBitAnd,			//  &
-	OperatorBitOr,			//  |
-	OperatorShiftLeft,		// <<
-	OperatorShiftRight,		// >>
-	OperatorIncrease,		// ++
-	OperatorDecrease,		// --
+enum
+{
+	OPERATOR_ASSIGN,        //  =
+	OPERATOR_ADD,           //  +
+	OPERATOR_SUBTRACT,      //  -
+	OPERATOR_MULTIPLY,      //  *
+	OPERATOR_DIVIDE,        //  /
+	OPERATOR_ADDS,          // +=
+	OPERATOR_SUBTRACTS,     // -=
+	OPERATOR_MULTIPLYS,     // *=
+	OPERATOR_DIVIDES,       // /=
+	OPERATOR_EQUAL,         // ==
+	OPERATOR_NOTEQUAL,      // !=
+	OPERATOR_NEGATE,        //  !
+	OPERATOR_SMALLER,       //  <
+	OPERATOR_GREATER,       //  >
+	OPERATOR_SMALLER_EQUAL, // <=
+	OPERATOR_GREATER_EQUAL, // >=
+	OPERATOR_AND,           // and
+	OPERATOR_OR,            // or
+	OPERATOR_MODULO,        //  %
+	OPERATOR_BIT_AND,       //  &
+	OPERATOR_BIT_OR,        //  |
+	OPERATOR_SHIFT_LEFT,    // <<
+	OPERATOR_SHIFT_RIGHT,   // >>
+	OPERATOR_INCREASE,      // ++
+	OPERATOR_DECREASE,      // --
 	NUM_PRIMITIVE_OPERATORS
 };
 
-struct PrimitiveOperator{
+struct PrimitiveOperator
+{
 	string name;
 	int id;
 	bool left_modifiable;
@@ -71,7 +73,8 @@ struct PrimitiveOperator{
 };
 extern int NumPrimitiveOperators;
 extern PrimitiveOperator PrimitiveOperators[];
-struct PreOperator{
+struct PreOperator
+{
 	int primitive_id;
 	Type *return_type, *param_type_1, *param_type_2;
 	void *func;
@@ -81,7 +84,8 @@ extern Array<PreOperator> PreOperators;
 
 
 
-enum{
+enum
+{
 	OperatorPointerAssign,
 	OperatorPointerEqual,
 	OperatorPointerNotEqual,
@@ -222,11 +226,13 @@ enum{
 //--------------------------------------------------------------------------------------------------
 // commands
 
-struct PreCommandParam{
+struct PreCommandParam
+{
 	string name;
 	Type *type;
 };
-struct PreCommand{
+struct PreCommand
+{
 	string name;
 	Type *return_type;
 	Array<PreCommandParam> param;
@@ -235,36 +241,37 @@ struct PreCommand{
 extern Array<PreCommand> PreCommands;
 
 
-enum{
+enum
+{
 	// structural commands
-	CommandReturn,
-	CommandIf,
-	CommandIfElse,
-	CommandWhile,
-	CommandFor,
-	CommandBreak,
-	CommandContinue,
-	CommandNew,
-	CommandDelete,
-	CommandSizeof,
-	CommandWait,
-	CommandWaitRT,
-	CommandWaitOneFrame,
-	CommandAsm,
+	COMMAND_RETURN,
+	COMMAND_IF,
+	COMMAND_IF_ELSE,
+	COMMAND_WHILE,
+	COMMAND_FOR,
+	COMMAND_BREAK,
+	COMMAND_CONTINUE,
+	COMMAND_NEW,
+	COMMAND_DELETE,
+	COMMAND_SIZEOF,
+	COMMAND_WAIT,
+	COMMAND_WAIT_RT,
+	COMMAND_WAIT_ONE_FRAME,
+	COMMAND_ASM,
 	NUM_INTERN_PRE_COMMANDS,
-	CommandInlineFloatToInt,
-	CommandInlineFloatToFloat64,
-	CommandInlineFloat64ToFloat,
-	CommandInlineIntToFloat,
-	CommandInlineIntToInt64,
-	CommandInlineInt64ToInt,
-	CommandInlineIntToChar,
-	CommandInlineCharToInt,
-	CommandInlinePointerToBool,
-	CommandInlineComplexSet,
-	CommandInlineVectorSet,
-	CommandInlineRectSet,
-	CommandInlineColorSet,
+	COMMAND_INLINE_FLOAT_TO_INT,
+	COMMAND_INLINE_FLOAT_TO_FLOAT64,
+	COMMAND_INLINE_FLOAT64_TO_FLOAT,
+	COMMAND_INLINE_INT_TO_FLOAT,
+	COMMAND_INLINE_INT_TO_INT64,
+	COMMAND_INLINE_INT64_TO_INT,
+	COMMAND_INLINE_INT_TO_CHAR,
+	COMMAND_INLINE_CHAR_TO_INT,
+	COMMAND_INLINE_POINTER_TO_BOOL,
+	COMMAND_INLINE_COMPLEX_SET,
+	COMMAND_INLINE_VECTOR_SET,
+	COMMAND_INLINE_RECT_SET,
+	COMMAND_INLINE_COLOR_SET,
 };
 
 
@@ -275,7 +282,8 @@ enum{
 // type casting
 
 typedef string t_cast_func(string);
-struct TypeCast{
+struct TypeCast
+{
 	int penalty;
 	Type *source, *dest;
 	int kind;
@@ -287,43 +295,15 @@ extern Array<TypeCast> TypeCasts;
 
 
 typedef void t_func();
-/*class DummyClass
-{
-public:
-	void _cdecl func(){}
-};
-
-class DummyClassVirtual
-{
-public:
-	virtual void _cdecl func(){}
-	virtual void _cdecl func2(){}
-};
-
-typedef void (_cdecl DummyClass::*tmf)();
-typedef char *tcpa[4];
-void *mf(tmf vmf);
-	
-typedef void (_cdecl DummyClassVirtual::*vtmf)();
-void *vmf(vtmf vmf);*/
-
-template<typename T>
-void* mf(T tmf)
-{
-	union{
-		T f;
-		void *p;
-	}pp;
-	pp.f = tmf;
-	return pp.p;
-}
 
 enum
 {
-	AbiGnu32,
-	AbiGnu64,
-	AbiWindows32,
-	AbiWindows64,
+	ABI_GNU_32,
+	ABI_GNU_64,
+	ABI_WINDOWS_32,
+	ABI_WINDOWS_64,
+	ABI_GNU_ARM_32,
+	ABI_GNU_ARM_64,
 };
 
 struct CompilerConfiguration
@@ -332,25 +312,53 @@ struct CompilerConfiguration
 	int abi;
 	bool allow_std_lib;
 
-	int StackSize;
-	int PointerSize;
-	int SuperArraySize;
+	int stack_size;
+	int pointer_size;
+	int super_array_size;
 
 	bool allow_simplification;
 	bool allow_registers;
 
-	string Directory;
-	bool CompileSilently;
-	bool ShowCompilerStats;
-	bool UseConstAsGlobalVar;
+	string directory;
+	bool verbose;
+	bool compile_silently;
+	bool show_compiler_stats;
+	bool use_const_as_global_var;
 
-	int StackMemAlign;
-	int FunctionAlign;
-	int StackFrameAlign;
+	bool compile_os;
+	bool no_function_frame;
+	bool add_entry_point;
+	bool overwrite_variables_offset;
+	long long variables_offset;
+	bool overwrite_code_origin;
+	long long code_origin;
+
+	int stack_mem_align;
+	int function_align;
+	int stack_frame_align;
 
 };
 
 extern CompilerConfiguration config;
+
+
+
+
+template<typename T>
+void* mf(T tmf)
+{
+	union{
+		T f;
+		struct{
+			long p;
+			long i;
+		};
+	}pp;
+	pp.f = tmf;
+	// on ARM the "virtual bit" is in i, on x86 it is in p
+	return (void*)(pp.p | (pp.i & 1));
+}
+
 
 void Init(int instruction_set = -1, int abi = -1, bool allow_std_lib = true);
 void End();

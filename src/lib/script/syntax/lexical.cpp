@@ -276,7 +276,7 @@ void ExpressionBuffer::DoAsmBlock(const char *source, int &pos, int &line_no)
 	AsmBlock a;
 	a.line = cur_line->physical_line;
 	a.block = string(&source[asm_start], asm_end - asm_start);
-	syntax->AsmBlocks.add(a);
+	syntax->asm_blocks.add(a);
 
 	line_no += line_breaks;
 }

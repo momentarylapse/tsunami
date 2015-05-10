@@ -4,7 +4,7 @@
 
 // which operating system?
 
-#ifdef WIN32
+#if defined(WIN32) || defined(WIN64)
 	#define OS_WINDOWS
 #else
 	#define OS_LINUX
@@ -12,18 +12,40 @@
 
 
 
-// which developing environment?
+// which compiler?
 
 #ifdef _MSC_VER
 	#if _MSC_VER >= 1400
-		#define IDE_VCS8
+		#define COMPILER_VCS8
 	#else
-		#define IDE_VCS6
+		#define COMPULER_VCS6
 	#endif
-#else
-	#define IDE_DEVCPP
+#else // __GNUC__
+	#define COMPILER_GCC
 #endif
-//#define IDE_KDEVELOP ...?
+
+
+
+// which cpu?
+
+#ifdef OS_WINDOWS
+	#if defined(_M_AMD64) || defined(_M_X64)
+		#define CPU_AMD64
+	#elif defined(_M_ARM)
+		#define CPU_ARM
+	#else // _M_IX86
+		#define CPU_X86
+	#endif
+#endif
+#ifdef OS_LINUX
+	#if defined(__ARM_ARCH_6__) || defined(__arm__) || defined(__ARM_EABI__)
+		#define CPU_ARM
+	#elif defined(__amd64__) || defined(__x86_64__)
+		#define CPU_AMD64
+	#else
+		#define CPU_X86
+	#endif
+#endif
 
 
 

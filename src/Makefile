@@ -164,6 +164,9 @@ OBJ = \
  lib/script/asm/asm.o\
  lib/script/compiler/compiler.o\
  lib/script/compiler/serializer.o\
+ lib/script/compiler/serializer_amd64.o\
+ lib/script/compiler/serializer_arm.o\
+ lib/script/compiler/serializer_x86.o\
  lib/script/lib/script_data.o\
  lib/script/lib/script_data_file.o\
  lib/script/lib/script_data_hui.o\
@@ -726,6 +729,15 @@ lib/script/compiler/compiler.o : lib/script/compiler/compiler.cpp
 
 lib/script/compiler/serializer.o : lib/script/compiler/serializer.cpp
 	$(CPP) -c lib/script/compiler/serializer.cpp -o $@ $(CXXFLAGS)
+
+lib/script/compiler/serializer_amd64.o : lib/script/compiler/serializer_amd64.cpp
+	$(CPP) -c lib/script/compiler/serializer_amd64.cpp -o $@ $(CXXFLAGS)
+
+lib/script/compiler/serializer_arm.o : lib/script/compiler/serializer_arm.cpp
+	$(CPP) -c lib/script/compiler/serializer_arm.cpp -o $@ $(CXXFLAGS)
+
+lib/script/compiler/serializer_x86.o : lib/script/compiler/serializer_x86.cpp
+	$(CPP) -c lib/script/compiler/serializer_x86.cpp -o $@ $(CXXFLAGS)
 
 lib/script/lib/script_data.o : lib/script/lib/script_data.cpp
 	$(CPP) -c lib/script/lib/script_data.cpp -o $@ $(CXXFLAGS)

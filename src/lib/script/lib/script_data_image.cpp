@@ -31,7 +31,7 @@ extern Type *TypeIntList;
 #ifdef _X_USE_IMAGE_
 void amd64_image_get_pixel(color &r, Image &i, int x, int y)
 {	r = i.getPixel(x, y);	}
-#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::InstructionSetAMD64) ? ((void*)(wrap)) : ((void*)(orig)))
+#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) ? ((void*)(wrap)) : ((void*)(orig)))
 #else
 #define amd64_wrap(orig, wrap)	NULL
 #endif

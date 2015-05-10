@@ -99,7 +99,7 @@ bool GlobalAllowTermination()
 void PluginManager::LinkAppScriptData()
 {
 	msg_db_f("LinkAppScriptData", 2);
-	Script::config.Directory = "";
+	Script::config.directory = "";
 
 	// api definition
 	Script::LinkExternal("MainWin", &tsunami->_win);
@@ -572,7 +572,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 
 		Effect *fx = NULL;
 		MidiEffect *mfx = NULL;
-		foreach(Script::Type *t, s->syntax->Types){
+		foreach(Script::Type *t, s->syntax->types){
 			Script::Type *r = t;
 			while (r->parent)
 				r = r->parent;
@@ -700,7 +700,7 @@ Effect *PluginManager::LoadEffect(const string &name)
 	}
 
 	Script::Script *s = cur_plugin->s;
-	foreach(Script::Type *t, s->syntax->Types){
+	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "AudioEffect")
 			continue;
 		return (Effect*)t->CreateInstance();
@@ -724,7 +724,7 @@ MidiEffect *PluginManager::LoadMidiEffect(const string &name)
 	}
 
 	Script::Script *s = cur_plugin->s;
-	foreach(Script::Type *t, s->syntax->Types){
+	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "MidiEffect")
 			continue;
 		return (MidiEffect*)t->CreateInstance();
@@ -754,7 +754,7 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name)
 		tsunami->log->error(e.message);
 		return NULL;
 	}
-	foreach(Script::Type *t, s->syntax->Types){
+	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "Synthesizer")
 			continue;
 		return (Synthesizer*)t->CreateInstance();

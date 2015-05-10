@@ -44,7 +44,7 @@ Command *SyntaxTree::cp_command(Command *c)
 Command *SyntaxTree::ref_command(Command *sub, Type *overwrite_type)
 {
 	Type *t = overwrite_type ? overwrite_type : sub->type->GetPointer();
-	Command *c = AddCommand(KindReference, 0, t);
+	Command *c = AddCommand(KIND_REFERENCE, 0, t);
 	c->set_num_params(1);
 	c->set_param(0, sub);
 	return c;
@@ -52,8 +52,8 @@ Command *SyntaxTree::ref_command(Command *sub, Type *overwrite_type)
 
 Command *SyntaxTree::deref_command(Command *sub, Type *overwrite_type)
 {
-	Command *c = AddCommand(KindUnknown, 0, TypeVoid);
-	c->kind = KindDereference;
+	Command *c = AddCommand(KIND_UNKNOWN, 0, TypeVoid);
+	c->kind = KIND_DEREFERENCE;
 	c->set_num_params(1);
 	c->set_param(0, sub);
 	if (overwrite_type)
@@ -65,7 +65,7 @@ Command *SyntaxTree::deref_command(Command *sub, Type *overwrite_type)
 
 Command *SyntaxTree::shift_command(Command *sub, bool deref, int shift, Type *type)
 {
-	Command *c= AddCommand(deref ? KindDerefAddressShift : KindAddressShift, shift, type);
+	Command *c= AddCommand(deref ? KIND_DEREF_ADDRESS_SHIFT : KIND_ADDRESS_SHIFT, shift, type);
 	c->set_num_params(1);
 	c->set_param(0, sub);
 	return c;
@@ -73,13 +73,13 @@ Command *SyntaxTree::shift_command(Command *sub, bool deref, int shift, Type *ty
 
 Command *SyntaxTree::add_command_compilerfunc(int cf)
 {
-	Command *c = AddCommand(KindUnknown, 0, TypeVoid);
+	Command *c = AddCommand(KIND_UNKNOWN, 0, TypeVoid);
 
 	//if (FlagCompileOS)
 	//	DoError(format("external function call (%s) not allowed with #os", PreCommands[CF].name.c_str()));
 
 // a function the compiler knows
-	c->kind = KindCompilerFunction;
+	c->kind = KIND_COMPILER_FUNCTION;
 	c->link_no = cf;
 	c->script = Packages[0].script;
 	c->instance = NULL;
@@ -93,9 +93,9 @@ Command *SyntaxTree::add_command_classfunc(ClassFunction *f, Command *inst, bool
 {
 	Command *c;
 	if ((f->virtual_index >= 0) && (!force_non_virtual))
-		c = AddCommand(KindVirtualFunction, f->virtual_index, f->return_type);
+		c = AddCommand(KIND_VIRTUAL_FUNCTION, f->virtual_index, f->return_type);
 	else
-		c = AddCommand(KindFunction, f->nr, f->return_type);
+		c = AddCommand(KIND_FUNCTION, f->nr, f->return_type);
 	c->script = f->script;
 	c->set_instance(inst);
 	c->set_num_params(f->param_type.num);
@@ -104,16 +104,16 @@ Command *SyntaxTree::add_command_classfunc(ClassFunction *f, Command *inst, bool
 
 Command *SyntaxTree::add_command_func(Script *script, int no, Type *return_type)
 {
-	Command *c = AddCommand(KindFunction, no, return_type);
+	Command *c = AddCommand(KIND_FUNCTION, no, return_type);
 	c->script = script;
-	c->set_num_params(script->syntax->Functions[no]->num_params);
+	c->set_num_params(script->syntax->functions[no]->num_params);
 	return c;
 }
 
 
 Command *SyntaxTree::add_command_operator(Command *p1, Command *p2, int op)
 {
-	Command *cmd = AddCommand(KindOperator, op, PreOperators[op].return_type);
+	Command *cmd = AddCommand(KIND_OPERATOR, op, PreOperators[op].return_type);
 	bool unitary = ((PreOperators[op].param_type_1 == TypeVoid) || (PreOperators[op].param_type_2 == TypeVoid));
 	cmd->set_num_params( unitary ? 1 : 2); // unary / binary
 	cmd->set_param(0, p1);
@@ -125,12 +125,12 @@ Command *SyntaxTree::add_command_operator(Command *p1, Command *p2, int op)
 
 Command *SyntaxTree::add_command_local_var(int no, Type *type)
 {
-	return AddCommand(KindVarLocal, no, type);
+	return AddCommand(KIND_VAR_LOCAL, no, type);
 }
 
 Command *SyntaxTree::add_command_parray(Command *p, Command *index, Type *type)
 {
-	Command *cmd_el = AddCommand(KindPointerAsArray, 0, type);
+	Command *cmd_el = AddCommand(KIND_POINTER_AS_ARRAY, 0, type);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, p);
 	cmd_el->set_param(1, index);
@@ -139,27 +139,19 @@ Command *SyntaxTree::add_command_parray(Command *p, Command *index, Type *type)
 
 Command *SyntaxTree::add_command_block(Block *b)
 {
-	return AddCommand(KindBlock, b->index, TypeVoid);
+	return AddCommand(KIND_BLOCK, b->index, TypeVoid);
 }
 
 SyntaxTree::SyntaxTree(Script *_script) :
-	GetExistenceLink(KindUnknown, 0, NULL, TypeVoid),
-	RootOfAllEvil(this, "RootOfAllEvil", TypeVoid)
+	GetExistenceLink(KIND_UNKNOWN, 0, NULL, TypeVoid),
+	root_of_all_evil(this, "RootOfAllEvil", TypeVoid)
 {
-	FlagShow = false;
-	FlagShowPrae = false;
-	FlagDisassemble = false;
-	FlagCompileOS = false;
-	FlagStringConstAsCString = false;
-	FlagNoFunctionFrame = false;
-	FlagAddEntryPoint = false;
-	FlagOverwriteVariablesOffset = false;
-	FlagImmortal = false;
-	FlagNoExecution = false;
+	flag_string_const_as_cstring = false;
+	flag_immortal = false;
 	cur_func = NULL;
 	script = _script;
-	AsmMetaInfo = new Asm::MetaInfo;
-	ForIndexCount = 0;
+	asm_meta_info = new Asm::MetaInfo;
+	for_index_count = 0;
 	Exp.cur_line = NULL;
 
 	// "include" default stuff
@@ -179,7 +171,7 @@ void SyntaxTree::ParseBuffer(const string &buffer, bool just_analyse)
 
 	Parser();
 	
-	if (FlagShowPrae)
+	if (config.verbose)
 		Show();
 
 	ConvertCallByReference();
@@ -191,7 +183,7 @@ void SyntaxTree::ParseBuffer(const string &buffer, bool just_analyse)
 	
 	PreProcessor();
 
-	if (FlagShow)
+	if (config.verbose)
 		Show();
 
 	Exp.clear();
@@ -199,65 +191,69 @@ void SyntaxTree::ParseBuffer(const string &buffer, bool just_analyse)
 
 string Kind2Str(int kind)
 {
-	if (kind == KindVarLocal)			return "local variable";
-	if (kind == KindVarGlobal)			return "global variable";
-	if (kind == KindVarFunction)		return "function as variable";
-	if (kind == KindConstant)			return "constant";
-	if (kind == KindRefToConst)			return "reference to const";
-	if (kind == KindFunction)			return "function";
-	if (kind == KindVirtualFunction)	return "virtual function";
-	if (kind == KindCompilerFunction)	return "compiler function";
-	if (kind == KindOperator)			return "operator";
-	if (kind == KindPrimitiveOperator)	return "PRIMITIVE operator";
-	if (kind == KindBlock)				return "command block";
-	if (kind == KindAddressShift)		return "address shift";
-	if (kind == KindArray)				return "array element";
-	if (kind == KindPointerAsArray)		return "pointer as array element";
-	if (kind == KindReference)			return "address operator";
-	if (kind == KindDereference)		return "dereferencing";
-	if (kind == KindDerefAddressShift)	return "deref address shift";
-	if (kind == KindType)				return "type";
-	if (kind == KindArrayBuilder)		return "array builder";
-	if (kind == KindVarTemp)			return "temp";
-	if (kind == KindDerefVarTemp)		return "deref temp";
-	if (kind == KindRegister)			return "register";
-	if (kind == KindAddress)			return "address";
-	if (kind == KindMemory)				return "memory";
-	if (kind == KindLocalAddress)		return "local address";
-	if (kind == KindLocalMemory)		return "local memory";
-	if (kind == KindDerefRegister)		return "deref register";
-	if (kind == KindMarker)				return "marker";
-	if (kind == KindRefToLocal)			return "ref to local";
-	if (kind == KindRefToGlobal)		return "ref to global";
-	if (kind == KindRefToConst)			return "ref to const";
-	if (kind == KindDerefVarLocal)		return "deref local";
+	if (kind == KIND_VAR_LOCAL)			return "local variable";
+	if (kind == KIND_VAR_GLOBAL)			return "global variable";
+	if (kind == KIND_VAR_FUNCTION)		return "function as variable";
+	if (kind == KIND_CONSTANT)			return "constant";
+	if (kind == KIND_REF_TO_CONST)			return "reference to const";
+	if (kind == KIND_FUNCTION)			return "function";
+	if (kind == KIND_VIRTUAL_FUNCTION)	return "virtual function";
+	if (kind == KIND_COMPILER_FUNCTION)	return "compiler function";
+	if (kind == KIND_OPERATOR)			return "operator";
+	if (kind == KIND_PRIMITIVE_OPERATOR)	return "PRIMITIVE operator";
+	if (kind == KIND_BLOCK)				return "command block";
+	if (kind == KIND_ADDRESS_SHIFT)		return "address shift";
+	if (kind == KIND_ARRAY)				return "array element";
+	if (kind == KIND_POINTER_AS_ARRAY)		return "pointer as array element";
+	if (kind == KIND_REFERENCE)			return "address operator";
+	if (kind == KIND_DEREFERENCE)		return "dereferencing";
+	if (kind == KIND_DEREF_ADDRESS_SHIFT)	return "deref address shift";
+	if (kind == KIND_TYPE)				return "type";
+	if (kind == KIND_ARRAY_BUILDER)		return "array builder";
+	if (kind == KIND_VAR_TEMP)			return "temp";
+	if (kind == KIND_DEREF_VAR_TEMP)		return "deref temp";
+	if (kind == KIND_REGISTER)			return "register";
+	if (kind == KIND_ADDRESS)			return "address";
+	if (kind == KIND_MEMORY)				return "memory";
+	if (kind == KIND_LOCAL_ADDRESS)		return "local address";
+	if (kind == KIND_LOCAL_MEMORY)		return "local memory";
+	if (kind == KIND_DEREF_REGISTER)		return "deref register";
+	if (kind == KIND_MARKER)				return "marker";
+	if (kind == KIND_DEREF_MARKER)		return "deref marker";
+	if (kind == KIND_GLOBAL_LOOKUP)		return "global lookup";
+	if (kind == KIND_DEREF_GLOBAL_LOOKUP)	return "deref global lookup";
+	if (kind == KIND_IMMEDIATE)			return "immediate";
+	if (kind == KIND_REF_TO_LOCAL)			return "ref to local";
+	if (kind == KIND_REF_TO_GLOBAL)		return "ref to global";
+	if (kind == KIND_REF_TO_CONST)			return "ref to const";
+	if (kind == KIND_DEREF_VAR_LOCAL)		return "deref local";
 	return format("UNKNOWN KIND: %d", kind);
 }
 
 string LinkNr2Str(SyntaxTree *s,int kind,int nr)
 {
-	if (kind == KindVarLocal)			return i2s(nr);//s->cur_func->var[nr].name;
-	if (kind == KindVarGlobal)			return s->RootOfAllEvil.var[nr].name;
-	if (kind == KindVarFunction)		return s->Functions[nr]->name;
-	if (kind == KindConstant)			return i2s(nr);//s->Constants[nr].type->var2str(s->Constants[nr].data);
-	if (kind == KindFunction)			return s->Functions[nr]->name;
-	if (kind == KindVirtualFunction)	return i2s(nr);//s->Functions[nr]->name;
-	if (kind == KindCompilerFunction)	return PreCommands[nr].name;
-	if (kind == KindOperator)			return PreOperators[nr].str();
-	if (kind == KindPrimitiveOperator)	return PrimitiveOperators[nr].name;
-	if (kind == KindBlock)				return i2s(nr);
-	if (kind == KindAddressShift)		return i2s(nr);
-	if (kind == KindArray)				return "(no LinkNr)";
-	if (kind == KindPointerAsArray)		return "(no LinkNr)";
-	if (kind == KindReference)			return "(no LinkNr)";
-	if (kind == KindDereference)		return "(no LinkNr)";
-	if (kind == KindDerefAddressShift)	return i2s(nr);
-	if (kind == KindType)				return s->Types[nr]->name;
-	if (kind == KindRegister)			return Asm::GetRegName(nr);
-	if (kind == KindAddress)			return d2h(&nr, config.PointerSize);
-	if (kind == KindMemory)				return d2h(&nr, config.PointerSize);
-	if (kind == KindLocalAddress)		return d2h(&nr, config.PointerSize);
-	if (kind == KindLocalMemory)		return d2h(&nr, config.PointerSize);
+	if (kind == KIND_VAR_LOCAL)			return i2s(nr);//s->cur_func->var[nr].name;
+	if (kind == KIND_VAR_GLOBAL)			return s->root_of_all_evil.var[nr].name;
+	if (kind == KIND_VAR_FUNCTION)		return s->functions[nr]->name;
+	if (kind == KIND_CONSTANT)			return i2s(nr);//s->Constants[nr].type->var2str(s->Constants[nr].data);
+	if (kind == KIND_FUNCTION)			return s->functions[nr]->name;
+	if (kind == KIND_VIRTUAL_FUNCTION)	return i2s(nr);//s->Functions[nr]->name;
+	if (kind == KIND_COMPILER_FUNCTION)	return PreCommands[nr].name;
+	if (kind == KIND_OPERATOR)			return PreOperators[nr].str();
+	if (kind == KIND_PRIMITIVE_OPERATOR)	return PrimitiveOperators[nr].name;
+	if (kind == KIND_BLOCK)				return i2s(nr);
+	if (kind == KIND_ADDRESS_SHIFT)		return i2s(nr);
+	if (kind == KIND_ARRAY)				return "(no LinkNr)";
+	if (kind == KIND_POINTER_AS_ARRAY)		return "(no LinkNr)";
+	if (kind == KIND_REFERENCE)			return "(no LinkNr)";
+	if (kind == KIND_DEREFERENCE)		return "(no LinkNr)";
+	if (kind == KIND_DEREF_ADDRESS_SHIFT)	return i2s(nr);
+	if (kind == KIND_TYPE)				return s->types[nr]->name;
+	if (kind == KIND_REGISTER)			return Asm::GetRegName(nr);
+	if (kind == KIND_ADDRESS)			return d2h(&nr, config.pointer_size);
+	if (kind == KIND_MEMORY)				return d2h(&nr, config.pointer_size);
+	if (kind == KIND_LOCAL_ADDRESS)		return d2h(&nr, config.pointer_size);
+	if (kind == KIND_LOCAL_MEMORY)		return d2h(&nr, config.pointer_size);
 	return i2s(nr);
 }
 
@@ -285,13 +281,13 @@ void SyntaxTree::DoError(const string &str, int overwrite_line)
 void SyntaxTree::CreateAsmMetaInfo()
 {
 	msg_db_f("CreateAsmMetaInfo",5);
-	AsmMetaInfo->global_var.clear();
-	for (int i=0;i<RootOfAllEvil.var.num;i++){
+	asm_meta_info->global_var.clear();
+	for (int i=0;i<root_of_all_evil.var.num;i++){
 		Asm::GlobalVar v;
-		v.Name = RootOfAllEvil.var[i].name;
-		v.Size = RootOfAllEvil.var[i].type->size;
-		v.Pos = script->g_var[i];
-		AsmMetaInfo->global_var.add(v);
+		v.name = root_of_all_evil.var[i].name;
+		v.size = root_of_all_evil.var[i].type->size;
+		v.pos = script->g_var[i];
+		asm_meta_info->global_var.add(v);
 	}
 }
 
@@ -303,6 +299,7 @@ int Function::AddVar(const string &name, Type *type)
 	Variable v;
 	v.name = name;
 	v.type = type;
+	v._offset = 0;
 	v.is_extern = next_extern;
 	var.add(v);
 	return var.num - 1;
@@ -315,16 +312,16 @@ int SyntaxTree::AddConstant(Type *type)
 	Constant c;
 	c.name = "-none-";
 	c.type = type;
-	c.value.resize(max(type->size, config.PointerSize));
-	Constants.add(c);
-	return Constants.num - 1;
+	c.value.resize(max(type->size, config.pointer_size));
+	constants.add(c);
+	return constants.num - 1;
 }
 
 Block *SyntaxTree::AddBlock()
 {
 	Block *b = new Block;
-	b->index = Blocks.num;
-	Blocks.add(b);
+	b->index = blocks.num;
+	blocks.add(b);
 	return b;
 }
 
@@ -388,12 +385,12 @@ int Function::get_var(const string &name)
 Function *SyntaxTree::AddFunction(const string &name, Type *type)
 {
 	Function *f = new Function(this, name, type);
-	Functions.add(f);
+	functions.add(f);
 	f->block = AddBlock();
 	return f;
 }
 
-Command::Command(int _kind, int _link_no, Script *_script, Type *_type)
+Command::Command(int _kind, long long _link_no, Script *_script, Type *_type)
 {
 	type = _type;
 	kind = _kind;
@@ -406,7 +403,7 @@ Command::Command(int _kind, int _link_no, Script *_script, Type *_type)
 
 Block *Command::block() const
 {
-	return script->syntax->Blocks[link_no];
+	return script->syntax->blocks[link_no];
 }
 
 void Command::set_instance(Command *p)
@@ -426,24 +423,24 @@ void Command::set_param(int index, Command *p)
 	set_command(param[index], p);
 }
 
-Command *SyntaxTree::AddCommand(int kind, int link_no, Type *type)
+Command *SyntaxTree::AddCommand(int kind, long long link_no, Type *type)
 {
 	Command *c = new Command(kind, link_no, script, type);
-	Commands.add(c);
+	commands.add(c);
 	return c;
 }
 
-Command *SyntaxTree::AddCommand(int kind, int link_no, Type *type, Script *s)
+Command *SyntaxTree::AddCommand(int kind, long long link_no, Type *type, Script *s)
 {
 	Command *c = new Command(kind, link_no, s, type);
-	Commands.add(c);
+	commands.add(c);
 	return c;
 }
 
 
 Command *SyntaxTree::add_command_const(int nc)
 {
-	return AddCommand(KindConstant, nc, Constants[nc].type);
+	return AddCommand(KIND_CONSTANT, nc, constants[nc].type);
 }
 
 int SyntaxTree::WhichPrimitiveOperator(const string &name)
@@ -456,8 +453,8 @@ int SyntaxTree::WhichPrimitiveOperator(const string &name)
 
 int SyntaxTree::WhichType(const string &name)
 {
-	for (int i=0;i<Types.num;i++)
-		if (name == Types[i]->name)
+	for (int i=0;i<types.num;i++)
+		if (name == types[i]->name)
 			return i;
 
 	return -1;
@@ -481,7 +478,7 @@ void exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no)
 {
 	ps->GetExistenceLink.type = t;
 	ps->GetExistenceLink.link_no = var_no;
-	ps->GetExistenceLink.kind = KindVarLocal;
+	ps->GetExistenceLink.kind = KIND_VAR_LOCAL;
 	ps->GetExistenceLink.set_num_params(0);
 	ps->GetExistenceLink.script = ps->script;
 	ps->GetExistenceLink.instance = NULL;
@@ -492,7 +489,7 @@ void exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 	Command *self = ps->add_command_local_var(f->get_var("self"), f->_class->GetPointer());
 	ps->GetExistenceLink.type = e.type;
 	ps->GetExistenceLink.link_no = e.offset;
-	ps->GetExistenceLink.kind = KindDerefAddressShift;
+	ps->GetExistenceLink.kind = KIND_DEREF_ADDRESS_SHIFT;
 	ps->GetExistenceLink.set_num_params(1);
 	ps->GetExistenceLink.param[0] = self;
 	ps->GetExistenceLink.script = ps->script;
@@ -503,10 +500,10 @@ void exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
 	Command *self = ps->add_command_local_var(f->get_var("self"), f->_class->GetPointer());
 	if (cf.virtual_index >= 0){
-		ps->GetExistenceLink.kind = KindVirtualFunction;
+		ps->GetExistenceLink.kind = KIND_VIRTUAL_FUNCTION;
 		ps->GetExistenceLink.link_no = cf.virtual_index;
 	}else{
-		ps->GetExistenceLink.kind = KindFunction;
+		ps->GetExistenceLink.kind = KIND_FUNCTION;
 		ps->GetExistenceLink.link_no = cf.nr;
 	}
 	ps->GetExistenceLink.script = cf.script;
@@ -525,18 +522,18 @@ bool SyntaxTree::GetExistenceShared(const string &name)
 	GetExistenceLink.instance = NULL;
 
 	// global variables (=local variables in "RootOfAllEvil")
-	foreachi(Variable &v, RootOfAllEvil.var, i)
+	foreachi(Variable &v, root_of_all_evil.var, i)
 		if (v.name == name){
 			GetExistenceLink.type = v.type;
 			GetExistenceLink.link_no = i;
-			GetExistenceLink.kind = KindVarGlobal;
+			GetExistenceLink.kind = KIND_VAR_GLOBAL;
 			return true;
 		}
 
 	// then the (real) functions
-	foreachi(Function *f, Functions, i)
+	foreachi(Function *f, functions, i)
 		if (f->name == name){
-			GetExistenceLink.kind = KindFunction;
+			GetExistenceLink.kind = KIND_FUNCTION;
 			GetExistenceLink.link_no = i;
 			GetExistenceLink.type = f->literal_return_type;
 			GetExistenceLink.set_num_params(f->num_params);
@@ -546,14 +543,14 @@ bool SyntaxTree::GetExistenceShared(const string &name)
 	// types
 	int w = WhichType(name);
 	if (w >= 0){
-		GetExistenceLink.kind = KindType;
+		GetExistenceLink.kind = KIND_TYPE;
 		GetExistenceLink.link_no = w;
 		return true;
 	}
 
 	// ...unknown
 	GetExistenceLink.type = TypeUnknown;
-	GetExistenceLink.kind = KindUnknown;
+	GetExistenceLink.kind = KIND_UNKNOWN;
 	GetExistenceLink.link_no = 0;
 	return false;
 }
@@ -602,7 +599,7 @@ bool SyntaxTree::GetExistence(const string &name, Function *func)
 	// then the compiler functions
 	int w = WhichCompilerFunction(name);
 	if (w >= 0){
-		GetExistenceLink.kind = KindCompilerFunction;
+		GetExistenceLink.kind = KIND_COMPILER_FUNCTION;
 		GetExistenceLink.link_no = w;
 		GetExistenceLink.type = PreCommands[w].return_type;
 		GetExistenceLink.set_num_params(PreCommands[w].param.num);
@@ -612,13 +609,13 @@ bool SyntaxTree::GetExistence(const string &name, Function *func)
 	// operators
 	w = WhichPrimitiveOperator(name);
 	if (w >= 0){
-		GetExistenceLink.kind = KindPrimitiveOperator;
+		GetExistenceLink.kind = KIND_PRIMITIVE_OPERATOR;
 		GetExistenceLink.link_no = w;
 		return true;
 	}
 
 	// in include files (only global)...
-	foreach(Script *i, Includes)
+	foreach(Script *i, includes)
 		if (i->syntax->GetExistenceShared(name)){
 			memcpy(&GetExistenceLink, &(i->syntax->GetExistenceLink), sizeof(Command));
 			GetExistenceLink.script = i;
@@ -628,7 +625,7 @@ bool SyntaxTree::GetExistence(const string &name, Function *func)
 
 	// ...unknown
 	GetExistenceLink.type = TypeUnknown;
-	GetExistenceLink.kind = KindUnknown;
+	GetExistenceLink.kind = KIND_UNKNOWN;
 	GetExistenceLink.link_no = 0;
 	return false;
 }
@@ -636,31 +633,31 @@ bool SyntaxTree::GetExistence(const string &name, Function *func)
 // expression naming a type
 Type *SyntaxTree::FindType(const string &name)
 {
-	for (int i=0;i<Types.num;i++)
-		if (name == Types[i]->name)
-			return Types[i];
-	foreach(Script *inc, Includes)
-		for (int i=0;i<inc->syntax->Types.num;i++)
-			if (name == inc->syntax->Types[i]->name)
-				return inc->syntax->Types[i];
+	for (int i=0;i<types.num;i++)
+		if (name == types[i]->name)
+			return types[i];
+	foreach(Script *inc, includes)
+		for (int i=0;i<inc->syntax->types.num;i++)
+			if (name == inc->syntax->types[i]->name)
+				return inc->syntax->types[i];
 	return NULL;
 }
 
 // create a new type?
 Type *SyntaxTree::AddType(Type *type)
 {
-	foreach(Type *t, Types)
+	foreach(Type *t, types)
 		if (type->name == t->name)
 			return t;
-	foreach(Script *inc, Includes)
-		foreach(Type *t, inc->syntax->Types)
+	foreach(Script *inc, includes)
+		foreach(Type *t, inc->syntax->types)
 			if (type->name == t->name)
 				return t;
 	Type *t = new Type;
 	*t = *type;
 	t->owner = this;
 	t->name = type->name;
-	Types.add(t);
+	types.add(t);
 
 
 	if (t->is_super_array){
@@ -695,7 +692,7 @@ Type *SyntaxTree::CreateArrayType(Type *element_type, int num_elements, const st
 		name_pre = element_type->name;
 	if (num_elements < 0){
 		return CreateNewType(name_pre + "[]" +  suffix,
-			config.SuperArraySize, false, false, true, num_elements, element_type);
+			config.super_array_size, false, false, true, num_elements, element_type);
 	}else{
 		return CreateNewType(name_pre + format("[%d]", num_elements) + suffix,
 			element_type->size * num_elements, false, false, true, num_elements, element_type);
@@ -707,7 +704,7 @@ Type *SyntaxTree::CreateArrayType(Type *element_type, int num_elements, const st
 #define TRANSFORM_COMMANDS_RECURSION(FUNC, PREPARAMS, POSTPARAMS, CMD) \
 	for (int i=0;i<(CMD)->num_params;i++) \
 		(CMD)->set_param(i, FUNC(PREPARAMS, (CMD)->param[i], POSTPARAMS)); \
-	if ((CMD)->kind == KindBlock){ \
+	if ((CMD)->kind == KIND_BLOCK){ \
 		foreachi(Command *cc, (CMD)->block()->command, i) \
 			(CMD)->block()->set(i, FUNC(PREPARAMS, cc, POSTPARAMS)); \
 	} \
@@ -722,7 +719,7 @@ Command *conv_cbr(SyntaxTree *ps, Command *c, int var)
 	TRANSFORM_COMMANDS_RECURSION(conv_cbr, ps, var, c);
 
 	// convert
-	if ((c->kind == KindVarLocal) && (c->link_no == var)){
+	if ((c->kind == KIND_VAR_LOCAL) && (c->link_no == var)){
 		c->type = c->type->GetPointer();
 		return ps->deref_command(c);
 	}
@@ -736,7 +733,7 @@ void conv_return(SyntaxTree *ps, command *c)
 	for (int i=0;i<c->num_params;i++)
 		conv_return(ps, c->param[i]);
 	
-	if ((c->kind == KindCompilerFunction) && (c->link_no == CommandReturn)){
+	if ((c->kind == KIND_COMPILER_FUNCTION) && (c->link_no == COMMAND_RETURN)){
 		msg_write("conv ret");
 		ref_command_old(ps, c);
 	}
@@ -749,7 +746,7 @@ Command *conv_calls(SyntaxTree *ps, Command *c, int tt)
 	// recursion...
 	TRANSFORM_COMMANDS_RECURSION(conv_calls, ps, tt, c)
 
-	if ((c->kind == KindCompilerFunction) && (c->link_no == CommandReturn))
+	if ((c->kind == KIND_COMPILER_FUNCTION) && (c->link_no == COMMAND_RETURN))
 		if (c->num_params > 0){
 			if ((c->param[0]->type->is_array) /*|| (c->Param[j]->Type->IsSuperArray)*/){
 				c->set_param(0, ps->ref_command(c->param[0]));
@@ -757,7 +754,7 @@ Command *conv_calls(SyntaxTree *ps, Command *c, int tt)
 			return c;
 		}
 
-	if ((c->kind == KindFunction) || (c->kind == KindVirtualFunction) || (c->kind == KindCompilerFunction) || (c->kind == KindArrayBuilder)){
+	if ((c->kind == KIND_FUNCTION) || (c->kind == KIND_VIRTUAL_FUNCTION) || (c->kind == KIND_COMPILER_FUNCTION) || (c->kind == KIND_ARRAY_BUILDER)){
 		// parameters: array/class as reference
 		for (int j=0;j<c->num_params;j++)
 			if (c->param[j]->type->UsesCallByReference()){
@@ -773,7 +770,7 @@ Command *conv_calls(SyntaxTree *ps, Command *c, int tt)
 	}
 
 	// special string / list operators
-	if (c->kind == KindOperator){
+	if (c->kind == KIND_OPERATOR){
 		// parameters: super array as reference
 		for (int j=0;j<c->num_params;j++)
 			if ((c->param[j]->type->is_array) || (c->param[j]->type->is_super_array)){
@@ -794,7 +791,7 @@ Command *easyfy(SyntaxTree *ps, Command *c, int l)
 	// recursion...
 	for (int i=0;i<c->num_params;i++)
 		c->set_param(i, easyfy(ps, c->param[i], l+1));
-	if (c->kind == KindBlock)
+	if (c->kind == KIND_BLOCK)
 		for (int i=0;i<c->block()->command.num;i++)
 			c->block()->set(i, easyfy(ps, c->block()->command[i], l+1));
 	if (c->instance)
@@ -804,16 +801,16 @@ Command *easyfy(SyntaxTree *ps, Command *c, int l)
 
 
 	// convert
-	if (c->kind == KindReference){
-		if (c->param[0]->kind == KindDereference){
+	if (c->kind == KIND_REFERENCE){
+		if (c->param[0]->kind == KIND_DEREFERENCE){
 			// remove 2 knots...
 			return c->param[0]->param[0];
 		}
-	}else if ((c->kind == KindAddressShift) || (c->kind == KindArray)){
-		if (c->param[0]->kind == KindDereference){
+	}else if ((c->kind == KIND_ADDRESS_SHIFT) || (c->kind == KIND_ARRAY)){
+		if (c->param[0]->kind == KIND_DEREFERENCE){
 			// unify 2 knots (remove 1)
 			Command *t = c->param[0]->param[0];
-			c->kind = (c->kind == KindAddressShift) ? KindDerefAddressShift : KindPointerAsArray;
+			c->kind = (c->kind == KIND_ADDRESS_SHIFT) ? KIND_DEREF_ADDRESS_SHIFT : KIND_POINTER_AS_ARRAY;
 			c->set_param(0, t);
 			return c;
 		}
@@ -829,21 +826,21 @@ void convert_return_by_memory(SyntaxTree *ps, Block *b, Function *f)
 
 	foreachib(Command *c, b->command, i){
 		// recursion...
-		if (c->kind == KindBlock)
+		if (c->kind == KIND_BLOCK)
 			convert_return_by_memory(ps, c->block(), f);
-		if ((c->kind != KindCompilerFunction) || (c->link_no != CommandReturn))
+		if ((c->kind != KIND_COMPILER_FUNCTION) || (c->link_no != COMMAND_RETURN))
 			continue;
 
 		// convert into   *-return- = param
 		Command *p_ret = NULL;
 		foreachi(Variable &v, f->var, i)
 			if (v.name == "-return-"){
-				p_ret = ps->AddCommand(KindVarLocal, i, v.type);
+				p_ret = ps->AddCommand(KIND_VAR_LOCAL, i, v.type);
 			}
 		if (!p_ret)
 			ps->DoError("-return- not found...");
 		Command *ret = ps->deref_command(p_ret);
-		Command *op = ps->LinkOperator(OperatorAssign, ret, c->param[0]);
+		Command *op = ps->LinkOperator(OPERATOR_ASSIGN, ret, c->param[0]);
 		if (!op)
 			ps->DoError("no = operator for return from function found: " + f->name);
 		b->command.insert(op, i);
@@ -863,7 +860,7 @@ void SyntaxTree::ConvertCallByReference()
 
 
 	// convert functions
-	foreach(Function *f, Functions){
+	foreach(Function *f, functions){
 		
 		// parameter: array/class as reference
 		for (int j=0;j<f->num_params;j++)
@@ -890,12 +887,12 @@ void SyntaxTree::ConvertCallByReference()
 
 
 	// convert return...
-	foreach(Function *f, Functions)
+	foreach(Function *f, functions)
 		if (f->return_type->UsesReturnByMemory())
 			convert_return_by_memory(this, f->block, f);
 
 	// convert function calls
-	foreach(Function *f, Functions)
+	foreach(Function *f, functions)
 		foreachi(Command *c, f->block->command, i)
 			f->block->command[i] = conv_calls(this, c, 0);
 }
@@ -906,7 +903,7 @@ void SyntaxTree::Simplify()
 	msg_db_f("Simplify", 2);
 	
 	// remove &*
-	foreach(Function *f, Functions)
+	foreach(Function *f, functions)
 		foreachi(Command *c, f->block->command, i)
 			f->block->command[i] = easyfy(this, c, 0);
 }
@@ -916,14 +913,14 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 	// recursion...
 	for (int i=0;i<c->num_params;i++)
 		c->set_param(i, BreakDownComplicatedCommand(c->param[i]));
-	if (c->kind == KindBlock){
+	if (c->kind == KIND_BLOCK){
 		for (int i=0;i<c->block()->command.num;i++)
 			c->block()->set(i, BreakDownComplicatedCommand(c->block()->command[i]));
 	}
 	if (c->instance)
 		c->set_instance(BreakDownComplicatedCommand(c->instance));
 
-	if (c->kind == KindArray){
+	if (c->kind == KIND_ARRAY){
 
 		Type *el_type = c->type;
 
@@ -939,7 +936,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		Command *c_ref_array = ref_command(c->param[0]);
 		// create command for size constant
 		int nc = AddConstant(TypeInt);
-		Constants[nc].setInt(el_type->size);
+		constants[nc].setInt(el_type->size);
 		Command *c_size = add_command_const(nc);
 		// offset = size * index
 		Command *c_offset = add_command_operator(c_index, c_size, OperatorIntMultiply);
@@ -949,7 +946,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		c_address->type = el_type->GetPointer();//TypePointer;
 		// * address
 		return deref_command(c_address);
-	}else if (c->kind == KindPointerAsArray){
+	}else if (c->kind == KIND_POINTER_AS_ARRAY){
 
 		Type *el_type = c->type;
 
@@ -964,7 +961,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		Command *c_ref_array = c->param[0];
 		// create command for size constant
 		int nc = AddConstant(TypeInt);
-		Constants[nc].setInt(el_type->size);
+		constants[nc].setInt(el_type->size);
 		Command *c_size = add_command_const(nc);
 		// offset = size * index
 		Command *c_offset = add_command_operator(c_index, c_size, OperatorIntMultiply);
@@ -974,7 +971,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		c_address->type = el_type->GetPointer();//TypePointer;
 		// * address
 		return deref_command(c_address);
-	}else if (c->kind == KindAddressShift){
+	}else if (c->kind == KIND_ADDRESS_SHIFT){
 
 		Type *el_type = c->type;
 
@@ -988,14 +985,14 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		Command *c_ref_struct = ref_command(c->param[0]);
 		// create command for shift constant
 		int nc = AddConstant(TypeInt);
-		Constants[nc].setInt(c->link_no);
+		constants[nc].setInt(c->link_no);
 		Command *c_shift = add_command_const(nc);
 		// address = &struct + shift
 		Command *c_address = add_command_operator(c_ref_struct, c_shift, OperatorIntAdd);
 		c_address->type = el_type->GetPointer();//TypePointer;
 		// * address
 		return deref_command(c_address);
-	}else if (c->kind == KindDerefAddressShift){
+	}else if (c->kind == KIND_DEREF_ADDRESS_SHIFT){
 
 		Type *el_type = c->type;
 
@@ -1008,7 +1005,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		Command *c_ref_struct = c->param[0];
 		// create command for shift constant
 		int nc = AddConstant(TypeInt);
-		Constants[nc].setInt(c->link_no);
+		constants[nc].setInt(c->link_no);
 		Command *c_shift = add_command_const(nc);
 		// address = &struct + shift
 		Command *c_address = add_command_operator(c_ref_struct, c_shift, OperatorIntAdd);
@@ -1024,7 +1021,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 {
 	msg_db_f("BreakDownComplicatedCommands", 4);
 
-	foreach(Function *f, Functions){
+	foreach(Function *f, functions){
 		foreachi(Command *c, f->block->command, i)
 			f->block->command[i] = BreakDownComplicatedCommand(c);
 	}
@@ -1055,12 +1052,12 @@ void MapLVSX86Self(Function *f)
 void SyntaxTree::MapLocalVariablesToStack()
 {
 	msg_db_f("MapLocalVariablesToStack", 1);
-	foreach(Function *f, Functions){
-		f->_param_size = 2 * config.PointerSize; // space for return value and eBP
-		if (config.instruction_set == Asm::InstructionSetX86){
+	foreach(Function *f, functions){
+		f->_param_size = 2 * config.pointer_size; // space for return value and eBP
+		if (config.instruction_set == Asm::INSTRUCTION_SET_X86){
 			f->_var_size = 0;
 
-			if (config.abi == AbiWindows32){
+			if (config.abi == ABI_WINDOWS_32){
 				// map "self" to the VERY first parameter
 				MapLVSX86Self(f);
 
@@ -1090,12 +1087,20 @@ void SyntaxTree::MapLocalVariablesToStack()
 					f->_var_size += s;
 				}				
 			}
-		}else if (config.instruction_set == Asm::InstructionSetAMD64){
+		}else if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64){
 			f->_var_size = 0;
 			
 			foreachi(Variable &v, f->var, i){
 				int s = mem_align(v.type->size, 4);
 				v._offset = - f->_var_size - s;
+				f->_var_size += s;
+			}
+		}else if (config.instruction_set == Asm::INSTRUCTION_SET_ARM){
+			f->_var_size = 0;
+
+			foreachi(Variable &v, f->var, i){
+				int s = mem_align(v.type->size, 4);
+				v._offset = f->_var_size + s;
 				f->_var_size += s;
 			}
 		}
@@ -1111,25 +1116,29 @@ SyntaxTree::~SyntaxTree()
 	Exp.clear();
 
 	// delete all types created by this script
-	foreach(Type *t, Types)
-		delete(t);
+	foreach(Type *t, types)
+		if (t->owner == this)
+			delete(t);
 
-	if (AsmMetaInfo)
-		delete(AsmMetaInfo);
+	if (asm_meta_info)
+		delete(asm_meta_info);
 
-	foreach(Command *c, Commands)
+	foreach(Command *c, commands)
 		delete(c);
 
-	foreach(Block *b, Blocks)
+	foreach(Block *b, blocks)
 		delete(b);
 	
-	foreach(Function *f, Functions)
+	foreach(Function *f, functions)
 		delete(f);
 }
 
 void SyntaxTree::ShowCommand(Command *c)
 {
-	msg_write("[" + Kind2Str(c->kind) + "] " + c->type->name + " " + LinkNr2Str(c->script->syntax,c->kind,c->link_no) + " << " + c->script->Filename);
+	string orig;
+	if (c->script->syntax != this)
+		orig = " << " + c->script->filename;
+	msg_write("[" + Kind2Str(c->kind) + "] " + c->type->name + " " + LinkNr2Str(c->script->syntax,c->kind,c->link_no) + orig);
 	msg_right();
 	if (c->instance)
 		ShowCommand(c->instance);
@@ -1146,7 +1155,7 @@ void SyntaxTree::ShowBlock(Block *b)
 	msg_write("block");
 	msg_right();
 	foreach(Command *c, b->command){
-		if (c->kind == KindBlock)
+		if (c->kind == KIND_BLOCK)
 			ShowBlock(c->block());
 		else
 			ShowCommand(c);
@@ -1164,9 +1173,9 @@ void SyntaxTree::ShowFunction(Function *f)
 
 void SyntaxTree::Show()
 {
-	msg_write("--------- Syntax of " + script->Filename + " ---------");
+	msg_write("--------- Syntax of " + script->filename + " ---------");
 	msg_right();
-	foreach(Function *f, Functions)
+	foreach(Function *f, functions)
 		if (!f->is_extern)
 			ShowFunction(f);
 	msg_left();

@@ -361,7 +361,7 @@ void amd64_col_mul_c(color &r, color &a, color &b)
 void amd64_col_mul_f(color &r, color &a, float b)
 {	r = a * b;	}
 
-#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::InstructionSetAMD64) ? ((void*)(wrap)) : ((void*)(orig)))
+#define amd64_wrap(orig, wrap)	((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) ? ((void*)(wrap)) : ((void*)(orig)))
 
 
 void __complex_set(complex &r, float x, float y)
@@ -773,11 +773,11 @@ void SIAddPackageMath()
 		class_add_func("dir",		TypeVector, amd64_wrap(mf(&Random::dir), &amd64_vec_rand_dir));
 	
 	add_func("complex",		TypeComplex,	(void*)__complex_set, FLAG_PURE);
-		func_set_inline(CommandInlineComplexSet);
+		func_set_inline(COMMAND_INLINE_COMPLEX_SET);
 		func_add_param("x",		TypeFloat32);
 		func_add_param("y",		TypeFloat32);
 	add_func("rect",		TypeRect,	(void*)__rect_set, FLAG_PURE);
-		func_set_inline(CommandInlineRectSet);
+		func_set_inline(COMMAND_INLINE_RECT_SET);
 		func_add_param("x1",	TypeFloat32);
 		func_add_param("x2",	TypeFloat32);
 		func_add_param("y1",	TypeFloat32);
@@ -905,7 +905,7 @@ void SIAddPackageMath()
 		func_add_param("step",		TypeFloat32);
 	// vectors
 	add_func("vector",		TypeVector,	(void*)&__vector_set, FLAG_PURE);
-		func_set_inline(CommandInlineVectorSet);
+		func_set_inline(COMMAND_INLINE_VECTOR_SET);
 		func_add_param("x",		TypeFloat32);
 		func_add_param("y",		TypeFloat32);
 		func_add_param("z",		TypeFloat32);
@@ -1002,7 +1002,7 @@ void SIAddPackageMath()
 		func_add_param("f",		TypeFloatPs);
 		func_add_param("g",		TypeFloatPs);
 	add_func("color",		TypeColor,	(void*)&__color_set, FLAG_PURE);
-		func_set_inline(CommandInlineColorSet);
+		func_set_inline(COMMAND_INLINE_COLOR_SET);
 		func_add_param("a",		TypeFloat32);
 		func_add_param("r",		TypeFloat32);
 		func_add_param("g",		TypeFloat32);

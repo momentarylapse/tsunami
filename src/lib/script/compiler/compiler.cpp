@@ -39,16 +39,16 @@ int TaskReturnOffset;
 
 void AddEspAdd(Asm::InstructionWithParamsList *list,int d)
 {
-	if (d>0){
-		if (d>120)
-			list->add_easy(Asm::inst_add, Asm::PKRegister, 4, (void*)Asm::RegEsp, Asm::PKConstant, 4, (void*)(long)d);
+	if (d > 0){
+		if (d > 120)
+			list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(d, 4));
 		else
-			list->add_easy(Asm::inst_add, Asm::PKRegister, 4, (void*)Asm::RegEsp, Asm::PKConstant, 1, (void*)(long)d);
-	}else if (d<0){
-		if (d<-120)
-			list->add_easy(Asm::inst_sub, Asm::PKRegister, 4, (void*)Asm::RegEsp, Asm::PKConstant, 4, (void*)(long)(-d));
+			list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(d, 1));
+	}else if (d < 0){
+		if (d < -120)
+			list->add2(Asm::INST_SUB, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(-d, 4));
 		else
-			list->add_easy(Asm::inst_sub, Asm::PKRegister, 4, (void*)Asm::RegEsp, Asm::PKConstant, 1, (void*)(long)(-d));
+			list->add2(Asm::INST_SUB, Asm::param_reg(Asm::REG_ESP), Asm::param_imm(-d, 1));
 	}
 }
 
@@ -71,33 +71,40 @@ void try_init_global_var(Type *type, char* g_var)
 
 void init_all_global_objects(SyntaxTree *ps, Array<char*> &g_var)
 {
-	foreachi(Variable &v, ps->RootOfAllEvil.var, i)
+	foreachi(Variable &v, ps->root_of_all_evil.var, i)
 		try_init_global_var(v.type, g_var[i]);
 }
 
 void Script::AllocateMemory()
 {
 	// get memory size needed
-	MemorySize = 0;
-	for (int i=0;i<syntax->RootOfAllEvil.var.num;i++)
-		if (!syntax->RootOfAllEvil.var[i].is_extern)
-			MemorySize += mem_align(syntax->RootOfAllEvil.var[i].type->size, 4);
-	foreachi(Constant &c, syntax->Constants, i){
+	memory_size = 0;
+	for (int i=0;i<syntax->root_of_all_evil.var.num;i++)
+		if (!syntax->root_of_all_evil.var[i].is_extern)
+			memory_size += mem_align(syntax->root_of_all_evil.var[i].type->size, 4);
+
+	// constants
+	foreachi(Constant &c, syntax->constants, i){
 		int s = c.type->size;
 		if (c.type == TypeString){
 			// const string -> variable length   (+ super array frame)
-			s = c.value.num + config.SuperArraySize;
+			s = c.value.num + config.super_array_size;
 		}
-		MemorySize += mem_align(s, 4);
+		memory_size += mem_align(s, 4);
 	}
-	if (MemorySize > 0){
+	foreach(Type *t, syntax->types)
+		if (t->vtable.num > 0)
+			memory_size += config.pointer_size;
+
+	// allocate
+	if (memory_size > 0){
 #ifdef OS_WINDOWS
-		Memory = (char*)VirtualAlloc(NULL, MemorySize, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+		memory = (char*)VirtualAlloc(NULL, memory_size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 #else
 		//Memory = (char*)mmap(0, MemorySize, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS /*| MAP_EXECUTABLE*/ | MAP_32BIT, -1, 0);
-		Memory = (char*)mmap(0, mem_align(MemorySize, 4096), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS /*| MAP_EXECUTABLE*/ | MAP_32BIT, -1, 0);
-		if (Memory == (char*)-1)
-			Memory = new char[MemorySize];
+		memory = (char*)mmap(0, mem_align(memory_size, 4096), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS /*| MAP_EXECUTABLE*/ | MAP_32BIT, -1, 0);
+		if (memory == (char*)-1)
+			memory = new char[memory_size];
 			//DoErrorInternal(format("can not allocate memory, (%d) ", errno) + strerror(errno));
 #endif
 		//Memory = new char[MemorySize];
@@ -108,11 +115,11 @@ void Script::AllocateStack()
 {
 	// use your own stack if needed
 	//   wait() used -> needs to switch stacks ("tasks")
-	Stack = NULL;
-	foreach(Command *cmd, syntax->Commands){
-		if (cmd->kind == KindCompilerFunction)
-			if ((cmd->link_no == CommandWait) || (cmd->link_no == CommandWaitRT) || (cmd->link_no == CommandWaitOneFrame)){
-				Stack = new char[config.StackSize];
+	__stack = NULL;
+	foreach(Command *cmd, syntax->commands){
+		if (cmd->kind == KIND_COMPILER_FUNCTION)
+			if ((cmd->link_no == COMMAND_WAIT) or (cmd->link_no == COMMAND_WAIT_RT) or (cmd->link_no == COMMAND_WAIT_ONE_FRAME)){
+				__stack = new char[config.stack_size];
 				break;
 			}
 	}
@@ -121,114 +128,128 @@ void Script::AllocateStack()
 void Script::AllocateOpcode()
 {
 	int max_opcode = SCRIPT_MAX_OPCODE;
-	if (syntax->FlagCompileOS)
+	if (config.compile_os)
 		max_opcode *= 10;
 	// allocate some memory for the opcode......    has to be executable!!!   (important on amd64)
 #ifdef OS_WINDOWS
-	Opcode=(char*)VirtualAlloc(NULL,max_opcode,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
-	ThreadOpcode=(char*)VirtualAlloc(NULL,SCRIPT_MAX_THREAD_OPCODE,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
+	opcode=(char*)VirtualAlloc(NULL,max_opcode,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
 #else
-	Opcode = (char*)mmap(0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
-	ThreadOpcode = (char*)mmap(0, SCRIPT_MAX_THREAD_OPCODE, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
-	if (((long)Opcode==-1)||((long)ThreadOpcode==-1)){
-		Opcode = new char[max_opcode];
-		ThreadOpcode = new char[SCRIPT_MAX_THREAD_OPCODE];
-	}
+	opcode = (char*)mmap(0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
 #endif
-	if (((long)Opcode==-1)||((long)ThreadOpcode==-1))
-		DoErrorInternal("Script:  could not allocate executable memory");
-	if (syntax->AsmMetaInfo->CodeOrigin == 0)
-		syntax->AsmMetaInfo->CodeOrigin = (long)Opcode;
-	OpcodeSize=0;
-	ThreadOpcodeSize=0;
+	if ((long)opcode == -1){
+		//DoErrorInternal(string("Script:  could not allocate executable memory: ") + strerror(errno));
+		msg_error(string("Script:  could not allocate executable memory: ") + strerror(errno));
+		opcode = new char[max_opcode];
+	}
+	if (config.overwrite_code_origin)
+		syntax->asm_meta_info->code_origin = config.code_origin;
+	else
+		syntax->asm_meta_info->code_origin = (long)opcode;
+	opcode_size = 0;
 }
 
 void Script::MapConstantsToMemory()
 {
 	// constants -> Memory
-	cnst.resize(syntax->Constants.num);
-	foreachi(Constant &c, syntax->Constants, i){
-		cnst[i] = &Memory[MemorySize];
+	cnst.resize(syntax->constants.num);
+	foreachi(Constant &c, syntax->constants, i){
+		cnst[i] = &memory[memory_size];
 		int s = c.type->size;
 		if (c.type == TypeString){
 			// const string -> variable length
-			s = syntax->Constants[i].value.num;
+			s = syntax->constants[i].value.num;
 
-			*(void**)&Memory[MemorySize] = &Memory[MemorySize + config.SuperArraySize]; // .data
-			*(int*)&Memory[MemorySize + config.PointerSize    ] = s; // .num
-			*(int*)&Memory[MemorySize + config.PointerSize + 4] = 0; // .reserved
-			*(int*)&Memory[MemorySize + config.PointerSize + 8] = 1; // .item_size
-			MemorySize += config.SuperArraySize;
+			*(void**)&memory[memory_size] = &memory[memory_size + config.super_array_size]; // .data
+			*(int*)&memory[memory_size + config.pointer_size    ] = s; // .num
+			*(int*)&memory[memory_size + config.pointer_size + 4] = 0; // .reserved
+			*(int*)&memory[memory_size + config.pointer_size + 8] = 1; // .item_size
+			memory_size += config.super_array_size;
 		}
-		memcpy(&Memory[MemorySize], (void*)c.value.data, s);
-		MemorySize += mem_align(s, 4);
+		memcpy(&memory[memory_size], (void*)c.value.data, s);
+		memory_size += mem_align(s, 4);
 	}
 }
 
 void Script::MapGlobalVariablesToMemory()
 {
 	// global variables -> into Memory
-	g_var.resize(syntax->RootOfAllEvil.var.num);
-	foreachi(Variable &v, syntax->RootOfAllEvil.var, i){
+	g_var.resize(syntax->root_of_all_evil.var.num);
+	foreachi(Variable &v, syntax->root_of_all_evil.var, i){
 		if (v.is_extern){
 			g_var[i] = (char*)GetExternalLink(v.name);
 			if (!g_var[i])
 				DoErrorLink("external variable " + v.name + " was not linked");
 		}else{
-			if (syntax->FlagOverwriteVariablesOffset)
-				g_var[i] = (char*)(long)(MemorySize + syntax->VariablesOffset);
+			if (config.overwrite_variables_offset)
+				g_var[i] = (char*)(long)(memory_size + config.variables_offset);
 			else
-				g_var[i] = &Memory[MemorySize];
-			MemorySize += mem_align(v.type->size, 4);
+				g_var[i] = &memory[memory_size];
+			memory_size += mem_align(v.type->size, 4);
 		}
 	}
-	memset(Memory, 0, MemorySize); // reset all global variables to 0
+	memset(memory, 0, memory_size); // reset all global variables to 0
 }
 
 void Script::AlignOpcode()
 {
-	int ocs_new = mem_align(OpcodeSize, config.FunctionAlign);
-	for (int i=OpcodeSize;i<ocs_new;i++)
-		Opcode[i] = 0x90;
-	OpcodeSize = ocs_new;
+	int ocs_new = mem_align(opcode_size, config.function_align);
+	for (int i=opcode_size;i<ocs_new;i++)
+		opcode[i] = 0x90;
+	opcode_size = ocs_new;
 }
 
 static int OCORA;
 void Script::CompileOsEntryPoint()
 {
 	int nf=-1;
-	foreachi(Function *ff, syntax->Functions, index)
+	foreachi(Function *ff, syntax->functions, index)
 		if (ff->name == "main")
 			nf = index;
 	// call
 	if (nf>=0)
-		Asm::AddInstruction(Opcode, OpcodeSize, Asm::inst_call, Asm::PKConstant, 4, NULL);
-	TaskReturnOffset=OpcodeSize;
+		Asm::AddInstruction(opcode, opcode_size, Asm::INST_CALL, Asm::param_imm(0, 4));
+	TaskReturnOffset=opcode_size;
 	OCORA = Asm::OCParam;
+}
 
-	// put strings into Opcode!
-	foreachi(Constant &c, syntax->Constants, i){
-		if (syntax->FlagCompileOS){// && (c.type == TypeCString)){
-			cnst[i] = (char*)(OpcodeSize + syntax->AsmMetaInfo->CodeOrigin);
+void Script::MapConstantsToOpcode()
+{
+	cnst.resize(syntax->constants.num);
+
+	// vtables -> no data yet...
+	foreach(Type *t, syntax->types)
+		if (t->vtable.num > 0){
+			t->_vtable_location_compiler_ = &opcode[opcode_size];
+			t->_vtable_location_target_ = (void*)(opcode_size + syntax->asm_meta_info->code_origin);
+			opcode_size += config.pointer_size * t->vtable.num;
+			foreach(Constant &c, syntax->constants)
+				if ((c.type == TypePointer) and (*(int*)c.value.data == (int)(long)t->vtable.data))
+					memcpy(c.value.data, &t->_vtable_location_target_, config.pointer_size);
+		}
+
+	// put all constants into Opcode!
+	foreachi(Constant &c, syntax->constants, i){
+		if (config.compile_os){// && (c.type == TypeCString)){
+			cnst[i] = (char*)(opcode_size + syntax->asm_meta_info->code_origin);
 			int s = c.type->size;
 			if (c.type == TypeString){
 				// const string -> variable length
-				s = syntax->Constants[i].value .num;
+				s = syntax->constants[i].value .num;
 
-				*(void**)&Opcode[OpcodeSize] = (char*)(OpcodeSize + syntax->AsmMetaInfo->CodeOrigin + config.SuperArraySize); // .data
-				*(int*)&Opcode[OpcodeSize + config.PointerSize    ] = s; // .num
-				*(int*)&Opcode[OpcodeSize + config.PointerSize + 4] = 0; // .reserved
-				*(int*)&Opcode[OpcodeSize + config.PointerSize + 8] = 1; // .item_size
-				OpcodeSize += config.SuperArraySize;
+				*(void**)&opcode[opcode_size] = (char*)(opcode_size + syntax->asm_meta_info->code_origin + config.super_array_size); // .data
+				*(int*)&opcode[opcode_size + config.pointer_size    ] = s; // .num
+				*(int*)&opcode[opcode_size + config.pointer_size + 4] = 0; // .reserved
+				*(int*)&opcode[opcode_size + config.pointer_size + 8] = 1; // .item_size
+				opcode_size += config.super_array_size;
 			}else if (c.type == TypeCString){
-				s = syntax->Constants[i].value .num;
+				s = syntax->constants[i].value .num;
 			}
-			memcpy(&Opcode[OpcodeSize], (void*)c.value.data, s);
-			OpcodeSize += s;
+			memcpy(&opcode[opcode_size], (void*)c.value.data, s);
+			opcode_size += s;
 
 			// cstring -> 0 terminated
 			if (c.type == TypeCString)
-				Opcode[OpcodeSize ++] = 0;
+				opcode[opcode_size ++] = 0;
 		}
 	}
 
@@ -238,15 +259,15 @@ void Script::CompileOsEntryPoint()
 void Script::LinkOsEntryPoint()
 {
 	int nf = -1;
-	foreachi(Function *ff, syntax->Functions, index)
+	foreachi(Function *ff, syntax->functions, index)
 		if (ff->name == "main")
 			nf = index;
 	if (nf >= 0){
-		int lll = (long)func[nf] - syntax->AsmMetaInfo->CodeOrigin - TaskReturnOffset;
+		int lll = (long)func[nf] - syntax->asm_meta_info->code_origin - TaskReturnOffset;
 		//printf("insert   %d  an %d\n", lll, OCORA);
 		//msg_write(lll);
 		//msg_write(d2h(&lll,4,false));
-		*(int*)&Opcode[OCORA] = lll;
+		*(int*)&opcode[OCORA] = lll;
 	}
 }
 
@@ -262,58 +283,58 @@ void Script::CompileTaskEntryPoint()
 	// call
 	void *_main_ = MatchFunction("main", "void", 0);
 
-	if ((!Stack) || (!_main_)){
-		first_execution = (t_func*)_main_;
-		continue_execution = NULL;
+	if ((!__stack) or (!_main_)){
+		__first_execution = (t_func*)_main_;
+		__continue_execution = NULL;
 		return;
 	}
 
 	Asm::InstructionWithParamsList *list = new Asm::InstructionWithParamsList(0);
 
-	int label_first = list->add_label("_first_execution", true);
+	int label_first = list->add_label("_first_execution");
 
-	first_execution = (t_func*)&ThreadOpcode[ThreadOpcodeSize];
+	__first_execution = (t_func*)&__thread_opcode[__thread_opcode_size];
 	// intro
-	list->add_easy(Asm::inst_push, Asm::PKRegister, 4, (void*)Asm::RegEbp); // within the actual program
-	list->add_easy(Asm::inst_mov, Asm::PKRegister, 4, (void*)Asm::RegEbp, Asm::PKRegister, 4, (void*)Asm::RegEsp);
-	list->add_easy(Asm::inst_mov, Asm::PKRegister, 4, (void*)Asm::RegEsp, Asm::PKDerefConstant, 4, (void*)&Stack[config.StackSize]); // start of the script stack
-	list->add_easy(Asm::inst_push, Asm::PKRegister, 4, (void*)Asm::RegEbp); // address of the old stack
+	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // within the actual program
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((long)&__stack[config.stack_size], 4)); // start of the script stack
+	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // address of the old stack
 	AddEspAdd(list, -12); // space for wait() task data
-	list->add_easy(Asm::inst_mov, Asm::PKRegister, 4, (void*)Asm::RegEbp, Asm::PKRegister, 4, (void*)Asm::RegEsp);
-	list->add_easy(Asm::inst_mov, Asm::PKRegister, 4, (void*)Asm::RegEax, Asm::PKConstant, 4, (void*)WaitingModeNone); // "reset"
-	list->add_easy(Asm::inst_mov, Asm::PKDerefConstant, 4, (void*)&WaitingMode, Asm::PKRegister, 4, (void*)Asm::RegEax);
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EAX), Asm::param_imm(WAITING_MODE_NONE, 4)); // "reset"
+	list->add2(Asm::INST_MOV, Asm::param_deref_imm((long)&__waiting_mode, 4), Asm::param_reg(Asm::REG_EAX));
 
 	// call main()
-	list->add_easy(Asm::inst_call, Asm::PKConstant, 4, _main_);
+	list->add2(Asm::INST_CALL, Asm::param_imm((long)_main_, 4));
 
 	// outro
 	AddEspAdd(list, 12); // make space for wait() task data
-	list->add_easy(Asm::inst_pop, Asm::PKRegister, 4, (void*)Asm::RegEsp);
-	list->add_easy(Asm::inst_mov, Asm::PKRegister, 4, (void*)Asm::RegEbp, Asm::PKRegister, 4, (void*)Asm::RegEsp);
-	list->add_easy(Asm::inst_leave);
-	list->add_easy(Asm::inst_ret);
+	list->add2(Asm::INST_POP, Asm::param_reg(Asm::REG_ESP));
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
+	list->add2(Asm::INST_LEAVE);
+	list->add2(Asm::INST_RET);
 
 	// "task" for execution after some wait()
-	int label_cont = list->add_label("_continue_execution", true);
+	int label_cont = list->add_label("_continue_execution");
 
 	// Intro
-	list->add_easy(Asm::inst_push, Asm::PKRegister, 4, (void*)Asm::RegEbp); // within the external program
-	list->add_easy(Asm::inst_mov, Asm::PKRegister, 4, (void*)Asm::RegEbp, Asm::PKRegister, 4, (void*)Asm::RegEsp);
-	list->add_easy(Asm::inst_mov, Asm::PKDerefConstant, 4, &Stack[config.StackSize - 4], Asm::PKRegister, 4, (void*)Asm::RegEbp); // save the external ebp
-	list->add_easy(Asm::inst_mov, Asm::PKRegister, 4, (void*)Asm::RegEsp, Asm::PKDerefConstant, 4, &Stack[config.StackSize - 16]); // to the eIP of the script
-	list->add_easy(Asm::inst_pop, Asm::PKRegister, 4, (void*)Asm::RegEax);
-	list->add_easy(Asm::inst_add, Asm::PKRegister, 4, (void*)Asm::RegEax, Asm::PKConstant, 4, (void*)AfterWaitOCSize);
-	list->add_easy(Asm::inst_jmp, Asm::PKRegister, 4, (void*)Asm::RegEax);
-	//list->add_easy(Asm::inst_leave);
-	//list->add_easy(Asm::inst_ret);
+	list->add2(Asm::INST_PUSH, Asm::param_reg(Asm::REG_EBP)); // within the external program
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_EBP), Asm::param_reg(Asm::REG_ESP));
+	list->add2(Asm::INST_MOV, Asm::param_deref_imm((long)&__stack[config.stack_size - 4], 4), Asm::param_reg(Asm::REG_EBP)); // save the external ebp
+	list->add2(Asm::INST_MOV, Asm::param_reg(Asm::REG_ESP), Asm::param_deref_imm((long)&__stack[config.stack_size - 16], 4)); // to the eIP of the script
+	list->add2(Asm::INST_POP, Asm::param_reg(Asm::REG_EAX));
+	list->add2(Asm::INST_ADD, Asm::param_reg(Asm::REG_EAX), Asm::param_imm(AfterWaitOCSize, 4));
+	list->add2(Asm::INST_JMP, Asm::param_reg(Asm::REG_EAX));
+	//list->add2(Asm::inst_leave);
+	//list->add2(Asm::inst_ret);
 	/*OCAddChar(0x90);
 	OCAddChar(0x90);
 	OCAddChar(0x90);*/
 
-	list->Compile(ThreadOpcode, ThreadOpcodeSize);
+	list->Compile(__thread_opcode, __thread_opcode_size);
 
-	first_execution = (t_func*)(long)list->label[label_first].Value;
-	continue_execution = (t_func*)(long)list->label[label_cont].Value;
+	__first_execution = (t_func*)(long)list->label[label_first].value;
+	__continue_execution = (t_func*)(long)list->label[label_cont].value;
 
 	delete(list);
 }
@@ -336,82 +357,92 @@ bool find_and_replace(char *opcode, int opcode_size, char *pattern, int size, ch
 	return false;
 }
 
-void relink_calls(SyntaxTree *ps, SyntaxTree *a, SyntaxTree *b, int const_off, int var_off, int func_off)
-{
-	foreach(Command *c, ps->Commands){
-		// keep commands... just redirect var/const/func
-		//msg_write(p2s(c->script));
-		if (c->script != b->script)
-			continue;
-		if (c->kind == KindVarGlobal){
-			c->link_no += var_off;
-			c->script = a->script;
-		}else if (c->kind == KindConstant){
-			c->link_no += const_off;
-			c->script = a->script;
-		}else if ((c->kind == KindFunction) || (c->kind == KindVarFunction)){
-			c->link_no += func_off;
-			c->script = a->script;
-		}
-	}
-}
-
 struct IncludeTranslationData
 {
 	int const_off;
 	int func_off;
 	int var_off;
-	SyntaxTree *source;
+	Script *source;
 };
+
+void relink_calls(Script *s, Script *a, IncludeTranslationData &d)
+{
+	foreach(Command *c, s->syntax->commands){
+		// keep commands... just redirect var/const/func
+		//msg_write(p2s(c->script));
+		if (c->script != d.source)
+			continue;
+		if (c->kind == KIND_VAR_GLOBAL){
+			c->link_no += d.var_off;
+			c->script = a;
+		}else if (c->kind == KIND_CONSTANT){
+			c->link_no += d.const_off;
+			c->script = a;
+		}else if ((c->kind == KIND_FUNCTION) or (c->kind == KIND_VAR_FUNCTION)){
+			c->link_no += d.func_off;
+			c->script = a;
+		}
+	}
+
+	// we might need some constructors later on...
+	foreach(Type *t, s->syntax->types)
+		foreach(ClassFunction &f, t->function)
+			if (f.script == d.source){
+				f.script = a;
+				f.nr += d.func_off;
+			}
+}
 
 IncludeTranslationData import_deep(SyntaxTree *a, SyntaxTree *b)
 {
 	IncludeTranslationData d;
-	d.const_off = a->Constants.num;
-	d.var_off = a->RootOfAllEvil.var.num;
-	d.func_off = a->Functions.num;
-	d.source = b;
+	d.const_off = a->constants.num;
+	d.var_off = a->root_of_all_evil.var.num;
+	d.func_off = a->functions.num;
+	d.source = b->script;
 
-	a->Constants.append(b->Constants);
+	a->constants.append(b->constants);
 
-	a->RootOfAllEvil.var.append(b->RootOfAllEvil.var);
+	a->root_of_all_evil.var.append(b->root_of_all_evil.var);
 
-	foreach(Function *f, b->Functions){
+	foreach(Function *f, b->functions){
 		Function *ff = a->AddFunction(f->name, f->return_type);
 		*ff = *f;
 		// keep block pointing to include file...
 	}
+	a->types.append(b->types);
 
 	//int asm_off = a->AsmBlocks.num;
-	foreach(AsmBlock &ab, b->AsmBlocks){
-		a->AsmBlocks.add(ab);
+	foreach(AsmBlock &ab, b->asm_blocks){
+		a->asm_blocks.add(ab);
 	}
 
 	return d;
 }
 
-void add_includes(Script *s, Set<Script*> &includes)
+void find_all_includes_rec(Script *s, Set<Script*> &includes)
 {
-	foreach(Script *i, s->syntax->Includes){
-		if (i->Filename.find(".kaba") < 0)
+	foreach(Script *i, s->syntax->includes){
+		if (i->filename.find(".kaba") < 0)
 			continue;
 		includes.add(i);
-		add_includes(i, includes);
+		find_all_includes_rec(i, includes);
 	}
 }
 
 void import_includes(Script *s)
 {
 	Set<Script*> includes;
-	add_includes(s, includes);
+	find_all_includes_rec(s, includes);
 	Array<IncludeTranslationData> da;
 	foreach(Script *i, includes)
 		da.add(import_deep(s->syntax, i->syntax));
 
+	// we need to also correct the includes, since we kept the blocks/commands there
 	foreach(Script *i, includes){
 		foreach(IncludeTranslationData &d, da){
-			relink_calls(s->syntax, s->syntax, d.source, d.const_off, d.var_off, d.func_off);
-			relink_calls(i->syntax, s->syntax, d.source, d.const_off, d.var_off, d.func_off);
+			relink_calls(s, s, d);
+			relink_calls(i, s, d);
 		}
 	}
 }
@@ -420,9 +451,9 @@ void import_includes(Script *s)
 void Script::Compiler()
 {
 	msg_db_f("Compiler",2);
-	Asm::CurrentMetaInfo = syntax->AsmMetaInfo;
+	Asm::CurrentMetaInfo = syntax->asm_meta_info;
 
-	if (syntax->FlagCompileOS)
+	if (config.compile_os)
 		import_includes(this);
 
 	syntax->MapLocalVariablesToStack();
@@ -435,15 +466,16 @@ void Script::Compiler()
 	syntax->Simplify();
 	syntax->PreProcessor();
 
-	if (syntax->FlagShow)
+	if (config.verbose)
 		syntax->Show();
 
 	AllocateMemory();
 	AllocateStack();
 
-	MemorySize = 0;
+	memory_size = 0;
 	MapGlobalVariablesToMemory();
-	MapConstantsToMemory();
+	if (!config.compile_os)
+		MapConstantsToMemory();
 
 	AllocateOpcode();
 
@@ -451,35 +483,30 @@ void Script::Compiler()
 
 // compiling an operating system?
 //   -> create an entry point for execution... so we can just call Opcode like a function
-	if (syntax->FlagAddEntryPoint)
+	if (config.add_entry_point)
 		CompileOsEntryPoint();
+
+	if (config.compile_os)
+		MapConstantsToOpcode();
 
 
 
 	syntax->PreProcessorAddresses();
 
+	if (config.verbose)
+		syntax->Show();
+
 
 // compile functions into Opcode
-	func.resize(syntax->Functions.num);
-	foreachi(Function *f, syntax->Functions, i){
-		if (f->is_extern){
-			func[i] = (t_func*)GetExternalLink(f->name);
-			if (!func[i])
-				DoErrorLink("external function " + f->name + " not linkable");
-			//func[i] = (t_func*)((long)func[i] + (long)Opcode - syntax->AsmMetaInfo->CodeOrigin);
-		}else{
-			func[i] = (t_func*)(syntax->AsmMetaInfo->CodeOrigin + OpcodeSize);
-			CompileFunction(f, Opcode, OpcodeSize);
-		}
-	}
+	CompileFunctions(opcode, opcode_size);
 
 // link functions
 	foreach(Asm::WantedLabel &l, functions_to_link){
-		string name = l.Name.substr(10, -1);
+		string name = l.name.substr(10, -1);
 		bool found = false;
-		foreachi(Function *f, syntax->Functions, i)
+		foreachi(Function *f, syntax->functions, i)
 			if (f->name == name){
-				*(int*)&Opcode[l.Pos] = (long)func[i] - (syntax->AsmMetaInfo->CodeOrigin + l.Pos + 4);
+				*(int*)&opcode[l.pos] = (long)func[i] - (syntax->asm_meta_info->code_origin + l.pos + 4);
 				found = true;
 				break;
 			}
@@ -487,44 +514,50 @@ void Script::Compiler()
 			DoErrorLink("could not link function: " + name);
 	}
 	foreach(int n, function_vars_to_link){
-		void *p = (void*)(long)(n + 0xefef0000);
-		void *q = (void*)func[n];
-		if (!find_and_replace(Opcode, OpcodeSize, (char*)&p, config.PointerSize, (char*)&q))
-			DoErrorLink("could not link function as variable: " + syntax->Functions[n]->name);
+		long p = (n + 0xefef0000);
+		long q = (long)func[n];
+		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
+			DoErrorLink("could not link function as variable: " + syntax->functions[n]->name);
 	}
 
 // link virtual functions into vtables
-	foreach(Type *t, syntax->Types)
+	foreach(Type *t, syntax->types){
 		t->LinkVirtualTable();
+
+		if (config.compile_os){
+			for (int i=0; i<t->vtable.num; i++)
+				memcpy((char*)t->_vtable_location_compiler_ + i*config.pointer_size, &t->vtable[i], config.pointer_size);
+		}
+	}
 
 
 // "task" for the first execution of main() -> ThreadOpcode
-	if (!syntax->FlagCompileOS)
+	if (!config.compile_os)
 		CompileTaskEntryPoint();
 
 
 
 
-	if (syntax->FlagAddEntryPoint)
+	if (config.add_entry_point)
 		LinkOsEntryPoint();
 
 
 	// initialize global objects
-	if (!syntax->FlagCompileOS)
+	if (!config.compile_os)
 		init_all_global_objects(syntax, g_var);
 
 	//msg_db_out(1,GetAsm(Opcode,OpcodeSize));
 
 	//_expand(Opcode,OpcodeSize);
 
-	if (first_execution)
-		WaitingMode = WaitingModeFirst;
+	if (__first_execution)
+		__waiting_mode = WAITING_MODE_FIRST;
 	else
-		WaitingMode = WaitingModeNone;
+		__waiting_mode = WAITING_MODE_NONE;
 
-	if (ShowCompilerStats){
+	if (show_compiler_stats){
 		msg_write("--------------------------------");
-		msg_write(format("Opcode: %db, Memory: %db",OpcodeSize,MemorySize));
+		msg_write(format("Opcode: %db, Memory: %db",opcode_size,memory_size));
 	}
 }
 

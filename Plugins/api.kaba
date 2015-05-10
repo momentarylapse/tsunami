@@ -24,6 +24,28 @@ class Range
 	int end()
 		return offset + length
 
+
+
+class MidiNote
+	Range range
+	float pitch
+	float volume
+
+class MidiEvent
+	int pos
+	float pitch
+	float volume
+
+class MidiData : MidiEvent[]
+	int samples
+	extern void __init__()
+	void add(int pos, float pitch, float volume)
+		MidiEvent e
+		e.pos = pos
+		e.pitch = pitch
+		e.volume = volume
+		super.add(e)
+
 class PluginData
 	extern void __init__()
 	extern virtual void __delete__()
@@ -138,27 +160,6 @@ class BarPattern
 	int count
 	
 	bool is_selected
-
-
-class MidiNote
-	Range range
-	float pitch
-	float volume
-
-class MidiEvent
-	int pos
-	float pitch
-	float volume
-
-class MidiData : MidiEvent[]
-	int samples
-	extern void __init__()
-	void add(int pos, float pitch, float volume)
-		MidiEvent e
-		e.pos = pos
-		e.pitch = pitch
-		e.volume = volume
-		super.add(e)
 
 enum
 	TRACK_TYPE_AUDIO

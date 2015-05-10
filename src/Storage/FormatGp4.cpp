@@ -11,12 +11,39 @@
 #include "../Stuff/Log.h"
 
 FormatGp4::FormatGp4() :
-	Format("GuitarPro 4", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_MULTITRACK)
+	Format("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
 {
 }
 
 FormatGp4::~FormatGp4()
 {
+}
+
+
+static void write_str1(CFile *f, const string &s)
+{
+	f->WriteByte(s.num);
+	f->WriteBuffer(s.data, s.num);
+}
+
+static void write_str1c(CFile *f, const string &s, int size)
+{
+	f->WriteByte(s.num);
+	string t = s;
+	t.resize(size);
+	f->WriteBuffer(t.data, size);
+}
+
+static void write_str4(CFile *f, const string &s)
+{
+	f->WriteInt(s.num);
+	f->WriteBuffer(s.data, s.num);
+}
+
+static void write_str41(CFile *f, const string &s)
+{
+	f->WriteInt(s.num + 1);
+	write_str1(f, s);
 }
 
 static string read_str1(CFile *f)
@@ -48,15 +75,6 @@ static string read_str4(CFile *f)
 	return s;
 }
 
-static int read_int_be(CFile *f)
-{
-	int a = f->ReadByte();
-	int b = f->ReadByte();
-	int c = f->ReadByte();
-	int d = f->ReadByte();
-	return d | (c << 8) | (b << 16) | (a << 24);
-}
-
 static string read_str41(CFile *f)
 {
 	int l = f->ReadInt();
@@ -72,13 +90,91 @@ void FormatGp4::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
 
 void FormatGp4::loadTrack(Track *t, const string & filename, int offset, int level){}
 
-void FormatGp4::saveAudio(AudioFile *a, const string & filename){}
+void FormatGp4::saveAudio(AudioFile *_a, const string & filename)
+{
+	a = _a;
+	char data[16];
+
+	f = FileCreate(filename);
+	f->SetBinaryMode(true);
+	string ext = filename.extension();
+	if (ext == "gp3")
+		version = 300;
+	else if (ext == "gp4")
+		version = 400;
+	else
+		version = 500;
+
+	if (version == 300)
+		write_str1c(f, "FICHIER GUITAR PRO v3.00", 30);
+	else if (version == 400)
+		write_str1c(f, "FICHIER GUITAR PRO v4.00", 30);
+	else //if (version == 500)
+		write_str1c(f, "FICHIER GUITAR PRO v5.00", 30);
+
+	Track *tt = a->getTimeTrack();
+	Array<Track*> tracks;
+	foreach(Track *t, a->track)
+		if (t != tt)
+			tracks.add(t);
+	Array<Bar> bars = tt->bar.getBars(Range(-1000000000, 2000000000));
+	tempo = 60.0f * (float)bars[0].num_beats / (float)bars[0].range.num * (float)a->sample_rate;
+
+
+	write_info();
+
+	if (version < 500)
+		f->WriteByte(0); // tripplet feel
+
+	if (version >= 400)
+		write_lyrics();
+	if (version > 500)
+		write_eq();
+	if (version >= 500)
+		write_page_setup();
+
+	if (version >= 500)
+		write_str41(f, "");
+	f->WriteInt(tempo);
+
+	if (version > 500)
+		f->WriteByte(0); // ???
+
+	if (version >= 400){
+		f->WriteByte(0); // key signature
+		f->WriteBuffer(data, 3);
+		f->WriteByte(0); // octave
+	}else{
+		f->WriteInt(0); // key
+	}
+
+	write_channels();
+
+	if (version >= 500)
+		f->SetPos(42, false);
+
+	f->WriteInt(bars.num);
+	f->WriteInt(tracks.num);
+	foreach(Bar &b, bars)
+		write_measure_header(b);
+	foreach(Track *t, tracks)
+		write_track(t);
+
+	if (version >= 500)
+		f->WriteByte(0);
+
+	foreach(Bar &b, bars){
+		foreach(Track *t, tracks)
+			write_measure(t, b);
+	}
+	delete(f);
+}
 
 void FormatGp4::loadAudio(AudioFile *_a, const string &filename)
 {
 	a = _a;
 	f = FileOpen(filename);
-	char *data = new char[1024];
+	char data[16];
 	tracks.clear();
 	measures.clear();
 
@@ -159,7 +255,6 @@ void FormatGp4::loadAudio(AudioFile *_a, const string &filename)
 		tsunami->log->error(s);
 	}
 
-	delete[](data);
 	if (f)
 		FileClose(f);
 }
@@ -191,6 +286,20 @@ void FormatGp4::read_info()
 		msg_write("comment: " + read_str41(f));
 }
 
+void FormatGp4::write_info()
+{
+	write_str41(f, a->getTag("title"));
+	write_str41(f, a->getTag("artist"));
+	write_str41(f, a->getTag("album"));
+	if (version >= 500)
+		write_str41(f, a->getTag("lyricist"));
+	write_str41(f, a->getTag("author"));
+	write_str41(f, a->getTag("copy"));
+	write_str41(f, a->getTag("writer"));
+	write_str41(f, "");
+	f->WriteInt(0); // #comments
+}
+
 void FormatGp4::read_lyrics()
 {
 	int lyrics_track = f->ReadInt();
@@ -201,6 +310,19 @@ void FormatGp4::read_lyrics()
 	for (int i=0; i<4; i++){
 		f->ReadInt();
 		read_str4(f);
+	}
+}
+
+void FormatGp4::write_lyrics()
+{
+	f->WriteInt(0); // lyrics track
+	//msg_write(lyrics_track);
+
+	f->WriteInt(0);
+	write_str4(f, "");
+	for (int i=0; i<4; i++){
+		f->WriteInt(0);
+		write_str4(f, "");
 	}
 }
 
@@ -219,12 +341,35 @@ void FormatGp4::read_channels()
 	}
 }
 
+void FormatGp4::write_channels()
+{
+	for (int i = 0; i < 64; i++) {
+		f->WriteInt(0); // program
+		f->WriteByte(100); // volume
+		f->WriteByte(0); // balance
+		f->WriteByte(0); // chorus
+		f->WriteByte(0); // reverb
+		f->WriteByte(0); // phaser
+		f->WriteByte(0); // tremolo
+		//if (i == 9) -> percussion
+		f->SetPos(2, false);
+	}
+}
+
 void FormatGp4::read_eq()
 {
 	f->ReadInt(); // master volume
 	f->ReadInt();
 	for (int i = 0; i < 11; i++)
 		f->ReadByte(); // eq
+}
+
+void FormatGp4::write_eq()
+{
+	f->WriteInt(100); // master volume
+	f->WriteInt(0);
+	for (int i = 0; i < 11; i++)
+		f->WriteByte(100); // eq
 }
 
 void FormatGp4::read_page_setup()
@@ -239,6 +384,20 @@ void FormatGp4::read_page_setup()
 	f->ReadWord();
 	for (int i=0; i<10; i++)
 		read_str41(f);
+}
+
+void FormatGp4::write_page_setup()
+{
+	f->WriteInt(0);
+	f->WriteInt(0);
+	f->WriteInt(0);
+	f->WriteInt(0);
+	f->WriteInt(0);
+	f->WriteInt(0);
+	f->WriteInt(0);
+	f->WriteWord(0);
+	for (int i=0; i<10; i++)
+		write_str41(f, "");
 }
 
 void FormatGp4::read_measure_header()
@@ -281,6 +440,14 @@ void FormatGp4::read_measure_header()
 	measures.add(m);
 }
 
+void FormatGp4::write_measure_header(Bar &b)
+{
+	msg_db_f("bar", 1);
+	f->WriteByte(0x03);
+	f->WriteByte(b.num_beats);
+	f->WriteByte(4);
+}
+
 void FormatGp4::read_track()
 {
 	msg_db_f("track", 1);
@@ -308,10 +475,46 @@ void FormatGp4::read_track()
 		f->SetPos(45, false);
 }
 
+void FormatGp4::write_track(Track *t)
+{
+	msg_db_f("track", 1);
+	f->ReadByte();
+	GpTrack tt;
+	write_str1c(f, t->name, 40);
+	// tuning
+	f->WriteInt(6); // string count
+	f->WriteInt(64);
+	f->WriteInt(59);
+	f->WriteInt(55);
+	f->WriteInt(50);
+	f->WriteInt(45);
+	f->WriteInt(40);
+	f->WriteInt(0);
+
+	f->WriteInt(1);
+	write_channel();
+	f->WriteInt(24);
+	f->WriteInt(0); // offset
+	f->WriteInt(0); // color
+	if (version > 500){
+		f->SetPos(49, false);
+		write_str41(f, "");
+		write_str41(f, "");
+	}
+	if (version == 500)
+		f->SetPos(45, false);
+}
+
 void FormatGp4::read_channel()
 {
 	f->ReadInt();
 	f->ReadInt();
+}
+
+void FormatGp4::write_channel()
+{
+	f->WriteInt(1);
+	f->WriteInt(2);
 }
 
 void FormatGp4::read_measure(GpMeasure &m, GpTrack &t, int offset)
@@ -337,6 +540,23 @@ void FormatGp4::read_measure(GpMeasure &m, GpTrack &t, int offset)
 
 	if (version >= 500)
 		f->ReadByte();
+}
+
+void FormatGp4::write_measure(Track *t, Bar &b)
+{
+	msg_db_f("measure", 0);
+
+	f->WriteInt(0); // beats
+	/*for (int i=0; i<num_beats; i++){
+			int length = write_beat(t, m, offset);
+			offset += length;
+		}
+	}*/
+	if (version >= 500) // second voice
+		f->WriteInt(0);
+
+	if (version >= 500)
+		f->WriteByte(0);
 }
 
 int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)

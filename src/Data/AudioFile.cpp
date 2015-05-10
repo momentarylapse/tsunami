@@ -487,3 +487,11 @@ string AudioFile::getNiceLevelName(int index)
 	return format(_("Ebene %d"), index + 1);
 }
 
+string AudioFile::getTag(const string &key)
+{
+	foreach(Tag &t, tag)
+		if (t.key == key)
+			return t.value;
+	return "";
+}
+

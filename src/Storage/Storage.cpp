@@ -184,7 +184,7 @@ bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
 bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 {
 	string filter, filter_show;
-	filter_show = _("alles m&ogliche (");
+	filter_show = _("alles m&ogliche");
 	bool first = true;
 	foreach(Format *f, format)
 		if ((f->flags & flags) == flags){
@@ -192,13 +192,13 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 				if (!first)
 					filter += ";";
 				filter += "*." + e;
-				if (!first)
+				/*if (!first)
 					filter_show += ", ";
-				filter_show += "*." + e;
+				filter_show += "*." + e;*/
 				first = false;
 			}
 		}
-	filter_show += ")|" + _("alle Dateien");
+	filter_show += "|" + _("alle Dateien");
 	filter += "|*";
 	foreach(Format *f, format)
 		if ((f->flags & flags) == flags){

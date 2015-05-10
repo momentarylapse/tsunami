@@ -73,6 +73,8 @@ public:
 	int _cdecl getNextBeat(int pos);
 	string _cdecl getNiceLevelName(int index);
 
+	string getTag(const string &key);
+
 	// action
 	void _cdecl addTag(const string &key, const string &value);
 	void _cdecl editTag(int index, const string &key, const string &value);

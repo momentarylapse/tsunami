@@ -60,6 +60,23 @@ public:
 	int read_duration(int flags, GpMeasure &m);
 	void read_chord();
 	void read_mix_change();
+
+	void write_info();
+	void write_lyrics();
+	void write_channels();
+	void write_eq();
+	void write_page_setup();
+	void write_measure_header(Bar &b);
+	void write_track(Track *t);
+	void write_channel();
+	void write_measure(Track *t, Bar &b);
+	int write_beat(GpTrack &t, GpMeasure &m, int start);
+	void write_beat_fx();
+	void write_note(GpTrack &t, int string_base, int start, int length);
+	void write_note_fx();
+	int write_duration(int flags, GpMeasure &m);
+	void write_chord();
+	void write_mix_change();
 };
 
 #endif /* SRC_STORAGE_FORMATGP4_H_ */

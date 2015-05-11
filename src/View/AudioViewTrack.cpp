@@ -275,6 +275,11 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, color col, int trac
 	foreach(SampleRef *s, track->sample)
 		drawSample(c, r, s);
 
+	if (view->hover.type == view->SEL_TYPE_TRACK_HANDLE){
+		c->setColor(color(0.3f, 1, 1, 1));
+		c->drawRect(0, r.y1, view->TRACK_HANDLE_WIDTH, r.y2);
+	}
+
 	//c->setColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 //	c->setColor(ColorWaveCur);
 	c->setFont("", -1, (track == view->cur_track), false);

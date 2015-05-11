@@ -88,6 +88,7 @@ public:
 	static const float LINE_WIDTH;
 	static const int FONT_SIZE;
 	static const int MAX_TRACK_CHANNEL_HEIGHT;
+	static const int TRACK_HANDLE_WIDTH;
 
 	enum
 	{
@@ -97,6 +98,7 @@ public:
 		SEL_TYPE_PLAYBACK,
 		SEL_TYPE_TIME,
 		SEL_TYPE_TRACK,
+		SEL_TYPE_TRACK_HANDLE,
 		SEL_TYPE_MUTE,
 		SEL_TYPE_SOLO,
 		SEL_TYPE_SAMPLE,

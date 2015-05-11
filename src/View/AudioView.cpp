@@ -25,6 +25,7 @@ const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;
 const float AudioView::LINE_WIDTH = 1.0f;
 const int AudioView::SUB_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
+const int AudioView::TRACK_HANDLE_WIDTH = 60;
 
 const float BORDER_FACTOR = 1.0f / 15.0f;
 
@@ -257,7 +258,7 @@ AudioView::SelectionType AudioView::getMouseOver()
 			s.vtrack = t;
 			s.track = t->track;
 			s.type = SEL_TYPE_TRACK;
-			if (mx < t->area.x1 + 100)
+			if (mx < t->area.x1 + TRACK_HANDLE_WIDTH)
 				s.show_track_controls = t->track;
 		}
 	}
@@ -301,10 +302,12 @@ AudioView::SelectionType AudioView::getMouseOver()
 				s.sample = ss;
 				s.type = SEL_TYPE_SAMPLE;
 				s.sample_offset = offset;
+				return s;
 			}
 		}
 	}
 
+	// midi
 	if ((s.track) and (s.track == cur_track) and (editingMidi()) and (midi_mode != MIDI_MODE_SELECT)){
 		s.pitch = y2pitch(my);
 		s.type = SEL_TYPE_MIDI_PITCH;
@@ -313,7 +316,20 @@ AudioView::SelectionType AudioView::getMouseOver()
 			if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
 				s.note_start = n.range.offset;
 				s.type = SEL_TYPE_MIDI_NOTE;
+				return s;
 			}
+	}
+
+	// time scale
+	if (my < TIME_SCALE_HEIGHT){
+		s.type = SEL_TYPE_TIME;
+		return s;
+	}
+
+	// track handle
+	if ((s.track) and (mx < area.x1 + TRACK_HANDLE_WIDTH)){
+		s.type = SEL_TYPE_TRACK_HANDLE;
+		return s;
 	}
 
 	return s;
@@ -348,7 +364,7 @@ void AudioView::selectUnderMouse()
 	// track
 	if (selection.track)
 		setCurTrack(selection.track);
-	if (selection.type == SEL_TYPE_TRACK){
+	if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE)){
 		selectTrack(t, control);
 		if (!control)
 			audio->unselectAllSamples();
@@ -645,7 +661,7 @@ void AudioView::onRightButtonDown()
 
 	if (selection.type == SEL_TYPE_SAMPLE)
 		menu_sub->openPopup(win, 0, 0);
-	else if (selection.type == SEL_TYPE_TRACK){
+	else if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE)){
 		menu_track->enable("track_edit_midi", cur_track->type == Track::TYPE_MIDI);
 		menu_track->openPopup(win, 0, 0);
 	}else if (!selection.track)
@@ -667,7 +683,7 @@ void AudioView::onLeftDoubleClick()
 	if (mouse_possibly_selecting < mouse_min_move_to_select){
 		if (selection.type == SEL_TYPE_SAMPLE){
 			win->side_bar->open(SideBar::SUB_DIALOG);
-		}else if ((selection.type == SEL_TYPE_TRACK) or ((selection.track) and ((selection.type == SEL_TYPE_SELECTION_START) or (selection.type == SEL_TYPE_SELECTION_END)))){
+		}else if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE) or ((selection.track) and ((selection.type == SEL_TYPE_SELECTION_START) or (selection.type == SEL_TYPE_SELECTION_END)))){
 			win->bottom_bar->choose(BottomBar::TRACK_CONSOLE);
 		}else if (!selection.track){
 			win->bottom_bar->choose(BottomBar::AUDIOFILE_CONSOLE);

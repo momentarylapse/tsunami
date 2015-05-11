@@ -70,7 +70,7 @@ public:
 	void write_track(Track *t);
 	void write_channel();
 	void write_measure(Track *t, Bar &b);
-	int write_beat(GpTrack &t, GpMeasure &m, int start);
+	void write_beat(Array<int> &pitch, Array<int> &string, int length);
 	void write_beat_fx();
 	void write_note(GpTrack &t, int string_base, int start, int length);
 	void write_note_fx();

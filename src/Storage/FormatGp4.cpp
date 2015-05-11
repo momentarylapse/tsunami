@@ -10,6 +10,8 @@
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
 
+const int STD_TUNING[6] = {40, 45, 50, 55, 59, 64};
+
 FormatGp4::FormatGp4() :
 	Format("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
 {
@@ -469,6 +471,7 @@ void FormatGp4::read_track()
 		int tuning = f->ReadInt(); // tuning
 		tt.tuning.add(tuning);
 	}
+	msg_write("tuning: " + ia2s(tt.tuning));
 	tracks.add(tt);
 	f->ReadInt();
 	read_channel();
@@ -492,12 +495,8 @@ void FormatGp4::write_track(Track *t)
 	write_str1c(f, t->name, 40);
 	// tuning
 	f->WriteInt(6); // string count
-	f->WriteInt(64);
-	f->WriteInt(59);
-	f->WriteInt(55);
-	f->WriteInt(50);
-	f->WriteInt(45);
-	f->WriteInt(40);
+	for (int i=5; i>=0; i--)
+		f->WriteInt(STD_TUNING[i]);
 	f->WriteInt(0);
 
 	f->WriteInt(1);
@@ -528,8 +527,8 @@ void FormatGp4::write_channel()
 
 void FormatGp4::read_measure(GpMeasure &m, GpTrack &t, int offset)
 {
-	msg_db_f("measure", 0);
-	msg_write(format("%x", f->GetPos()));
+	msg_db_f("measure", 1);
+	//msg_write(format("%x", f->GetPos()));
 
 	int num_voices = 1;
 	if (version >= 500)
@@ -551,16 +550,94 @@ void FormatGp4::read_measure(GpMeasure &m, GpTrack &t, int offset)
 		f->ReadByte();
 }
 
+struct GuitarNote
+{
+	int offset, length;
+	Array<int> pitch;
+	Array<int> string;
+	void detune()
+	{
+		for (int i=0; i<pitch.num; i++)
+			for (int j=i+1; j<pitch.num; j++)
+				if (pitch[i] >= pitch[j]){
+					int t = pitch[i];
+					pitch[i] = pitch[j];
+					pitch[j] = t;
+				}
+
+		string.resize(pitch.num);
+		int prev = -1;
+		for (int n=0; n<pitch.num; n++){
+			for (int i=5; i>prev; i--){
+				if (pitch[n] >= STD_TUNING[i]){
+					string[n] = i;
+					pitch[n] -= STD_TUNING[i];
+					break;
+				}
+			}
+			prev = string[n];
+		}
+	}
+};
+
+Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
+{
+	// samples per 16th
+	float spu = (float)b.range.num / (float)b.num_beats / 4.0f;
+
+	Array<MidiNote> notes = t->midi.getNotes(b.range);
+	Array<GuitarNote> gnotes;
+
+	foreach(MidiNote &n, notes){
+		GuitarNote gn;
+		gn.offset = int((float)(n.range.offset - b.range.offset) / spu + 0.5f);
+		gn.length = int((float)n.range.num / spu + 0.5f);
+		gn.pitch.add(n.pitch);
+		if (gn.length == 0)
+			continue;
+		if (gn.offset < b.num_beats * 4)
+			gnotes.add(gn);
+	}
+
+	// merge
+	for (int i=0; i<gnotes.num; i++)
+		for (int j=i+1; j<gnotes.num; j++)
+			if (gnotes[i].offset == gnotes[j].offset){
+				gnotes[i].pitch.append(gnotes[j].pitch);
+				gnotes.erase(j);
+				j --;
+			}
+
+	// pauses
+	int offset = 0;
+	for (int i=0; i<gnotes.num; i++){
+		if (gnotes[i].offset > offset){
+			GuitarNote pause;
+			pause.offset = offset;
+			pause.length = gnotes[i].offset - offset;
+			gnotes.insert(pause, i);
+		}
+		offset = gnotes[i].offset + gnotes[i].length;
+	}
+
+	foreach(GuitarNote &n, gnotes)
+		n.detune();
+
+	return gnotes;
+}
+
 void FormatGp4::write_measure(Track *t, Bar &b)
 {
-	msg_db_f("measure", 0);
+	msg_db_f("measure", 1);
+	//msg_write(format("%x", f->GetPos()));
 
-	f->WriteInt(0); // beats
-	/*for (int i=0; i<num_beats; i++){
-			int length = write_beat(t, m, offset);
-			offset += length;
-		}
-	}*/
+	//msg_write("-----");
+	Array<GuitarNote> gnotes = create_guitar_notes(t, b);
+
+	f->WriteInt(gnotes.num); // beats
+	foreach(GuitarNote &n, gnotes)
+		write_beat(n.pitch, n.string, n.length);
+
 	if (version >= 500) // second voice
 		f->WriteInt(0);
 
@@ -570,8 +647,7 @@ void FormatGp4::write_measure(Track *t, Bar &b)
 
 int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
 {
-	msg_db_f("beat", 0);
-	msg_write(format("%x", f->GetPos()));
+	msg_db_f("beat", 2);
 	int flags = f->ReadByte();
 	if ((flags & 0x40) != 0)
 		f->ReadByte();
@@ -590,7 +666,7 @@ int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
 	if ((flags & 0x10) != 0)
 		read_mix_change();
 	int stringFlags = f->ReadByte();
-	msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
+	//msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
 	for (int i = 6; i >= 0; i--) {
 		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.stringCount) {
 			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
@@ -606,6 +682,70 @@ int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
 			f->ReadByte();
 	}
 	return duration;
+}
+
+void FormatGp4::write_beat(Array<int> &pitch, Array<int> &string, int length)
+{
+	msg_db_f("beat", 2);
+
+	bool is_pause = (pitch.num == 0);
+
+	bool dotted = (length == 3) or (length == 6) or (length == 12);
+	if (dotted)
+		length = (length * 2) / 3;
+
+	f->WriteByte((dotted ? 0x01 : 0x00) | (is_pause ? 0x40 : 0x00));
+
+	if (is_pause)
+		f->WriteByte(0x02);
+
+	if (length == 1)
+		f->WriteByte(2);
+	else if (length == 2)
+		f->WriteByte(1);
+	else if (length == 4)
+		f->WriteByte(0);
+	else if (length == 8)
+		f->WriteByte(255);
+	else if (length == 16)
+		f->WriteByte(254);
+	else{
+		f->WriteByte(0);
+		tsunami->log->error("invalid gp length: " + i2s(length));
+	}
+
+	if (pitch.num > 0){
+		int sflags = 0;
+		for (int i=0; i<string.num; i++)
+			sflags |= (0x02 << string[i]);
+		f->WriteByte(sflags);
+
+
+		for (int i=string.num-1; i>=0; i--){
+			f->WriteByte(0x20);
+			f->WriteByte(1);
+			f->WriteByte(pitch[i]);
+			if (version >= 500){
+				f->WriteByte(0);
+			}
+		}
+
+	}else{
+		f->WriteByte(0);
+	}
+	/*msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
+	for (int i = 6; i >= 0; i--) {
+		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.stringCount) {
+			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
+			read_note(t, (6 - i), start, duration);
+			//TGNote note = readNote(string, track,effect.clone(getFactory()));
+			//voice.addNote(note);
+		}
+	}*/
+	if (version >= 500){
+		f->WriteByte(0);
+		f->WriteByte(0);
+	}
 }
 
 void FormatGp4::read_chord()
@@ -642,8 +782,7 @@ void FormatGp4::read_chord()
 
 void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 {
-	msg_db_f("note", 0);
-	msg_write(format("%x", f->GetPos()));
+	msg_db_f("note", 2);
 	MidiNote n;
 	n.range = Range(start, length);
 	n.volume = 1;
@@ -661,6 +800,7 @@ void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 		int value = fret;
 		if ((string_no >= 0) && (string_no < t.tuning.num))
 			value = fret + t.tuning[string_no];
+		//msg_write(format("%d/%d -> %d", string_no, fret, value));
 		n.pitch = value;
 	}
 	if ((flags & 0x80) != 0)
@@ -681,7 +821,7 @@ void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 
 void FormatGp4::read_note_fx()
 {
-	msg_db_f("note fx", 0);
+	msg_db_f("note fx", 3);
 	int flags1 = f->ReadByte();
 	int flags2 = 0;
 	if (version >= 400)
@@ -770,7 +910,7 @@ int FormatGp4::read_duration(int flags, GpMeasure &m)
 
 void FormatGp4::read_mix_change()
 {
-	msg_db_f("mix", 0);
+	msg_db_f("mix", 1);
 	f->ReadByte();
 	if (version >= 500){
 		for (int i=0; i<4; i++)
@@ -816,7 +956,7 @@ void FormatGp4::read_mix_change()
 
 void FormatGp4::read_beat_fx()
 {
-	msg_db_f("beat fx", 0);
+	msg_db_f("beat fx", 2);
 	int flags1 = f->ReadByte();
 	int flags2 = 0;
 	if (version >= 400)

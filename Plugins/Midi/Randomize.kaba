@@ -21,7 +21,7 @@ class Randomize : MidiEffect
 		AudioFile *a = plugin_context.track.root
 		float delay = a.sample_rate * config.TimeDelay
 		float var = a.sample_rate * config.TimeVariation
-		for n in midi.note
+		for n in midi
 			int dt = randi(var*2) - var + delay
-			n.range.offset += dt
+			n.pos += dt
 			n.volume *= rand(config.Volume) + 1 - config.Volume

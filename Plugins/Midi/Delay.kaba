@@ -14,5 +14,5 @@ class Delay : MidiEffect
 	overwrite void process(MidiData midi)
 		AudioFile *a = plugin_context.track.root
 		int dt = a.sample_rate * config.delay
-		for n in midi.note
-			n.range.offset += dt
+		for n in midi
+			n.pos += dt

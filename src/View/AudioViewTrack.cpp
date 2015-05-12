@@ -188,13 +188,14 @@ void AudioViewTrack::drawSample(HuiPainter *c, const rect &r, SampleRef *s)
 
 void AudioViewTrack::drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift)
 {
-	Range range = Range(view->screen2sample(r.x1), view->screen2sample(r.x2) - view->screen2sample(r.x1));
+	Range range = Range(view->screen2sample(r.x1) - shift, view->screen2sample(r.x2) - view->screen2sample(r.x1));
 	Array<MidiNote> notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
 	foreach(MidiNote &n, notes){
 		c->setColor(getPitchColor(n.pitch));
 		float x1 = view->sample2screen(n.range.offset + shift);
 		float x2 = view->sample2screen(n.range.end() + shift);
+		x2 = max(x2, x1 + 4);
 		float h = r.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * r.height();
 		//c->drawRect(rect(x1, x2, r.y1, r.y2));
 		c->drawLine(x1, h, x2, h);
@@ -275,9 +276,9 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, color col, int trac
 	foreach(SampleRef *s, track->sample)
 		drawSample(c, r, s);
 
-	if (view->hover.type == view->SEL_TYPE_TRACK_HANDLE){
-		c->setColor(color(0.3f, 1, 1, 1));
-		c->drawRect(0, r.y1, view->TRACK_HANDLE_WIDTH, r.y2);
+	if ((view->hover.track == track) and (view->mx < view->TRACK_HANDLE_WIDTH)){
+		c->setColor(color(0.4f, 1, 1, 1));
+		c->drawRect(0, r.y1, view->TRACK_HANDLE_WIDTH, r.height());
 	}
 
 	//c->setColor((track_no == a->CurTrack) ? Black : ColorWaveCur);

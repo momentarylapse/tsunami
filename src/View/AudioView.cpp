@@ -64,6 +64,7 @@ AudioView::SelectionType::SelectionType()
 	sample_offset = 0;
 	show_track_controls = NULL;
 	pitch = -1;
+	note_start = -1;
 }
 
 AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input) :

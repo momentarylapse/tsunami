@@ -126,6 +126,10 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	killed = false;
 	thread = NULL;
 	pa_stream = NULL;
+	dev_sample_rate = -1;
+	cpu_usage = 0;
+	end_of_data = false;
+	cur_pos = 0;
 
 	if (JUST_FAKING_IT)
 		return;
@@ -135,7 +139,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 
 AudioStream::~AudioStream()
 {
-	kill_dev();
+	kill();
 }
 
 void AudioStream::__init__(AudioRendererInterface *r)
@@ -145,7 +149,7 @@ void AudioStream::__init__(AudioRendererInterface *r)
 
 void AudioStream::__delete__()
 {
-	kill_dev();
+	kill();
 }
 
 void AudioStream::create_dev()

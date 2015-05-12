@@ -163,11 +163,12 @@ void AudioStream::create_dev()
 	outputParameters.sampleFormat = paFloat32;
 	outputParameters.suggestedLatency = Pa_GetDeviceInfo(outDevNum)->defaultLowOutputLatency;
 	outputParameters.hostApiSpecificStreamInfo = NULL;
+	dev_sample_rate = renderer->getSampleRate();
 	last_error = Pa_OpenStream(
 	                &pa_stream,
 	                NULL,
 	                &outputParameters,
-	                renderer->getSampleRate(),
+					dev_sample_rate,
 					512,//paFramesPerBufferUnspecified,
 	                paNoFlag, //flags that can be used to define dither, clip settings and more
 	                portAudioCallback,
@@ -274,6 +275,8 @@ void AudioStream::play()
 {
 	msg_db_f("Stream.play", 1);
 
+	if (dev_sample_rate != renderer->getSampleRate())
+		kill_dev();
 	if (!pa_stream)
 		create_dev();
 

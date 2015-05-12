@@ -143,6 +143,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	midi_preview_stream->setBufferSize(2048);
 
 	area = rect(0, 0, 0, 0);
+	mx = my = 0;
 	subscribe(audio);
 	subscribe(stream);
 	subscribe(input);

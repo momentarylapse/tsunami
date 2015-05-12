@@ -122,13 +122,35 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
-	sample_rate = DEFAULT_SAMPLE_RATE;
 	update_dt = DEFAULT_UPDATE_DT;
 	killed = false;
 	thread = NULL;
 	pa_stream = NULL;
 
 	if (JUST_FAKING_IT)
+		return;
+
+	output->addStream(this);
+}
+
+AudioStream::~AudioStream()
+{
+	kill_dev();
+}
+
+void AudioStream::__init__(AudioRendererInterface *r)
+{
+	new(this) AudioStream(r);
+}
+
+void AudioStream::__delete__()
+{
+	kill_dev();
+}
+
+void AudioStream::create_dev()
+{
+	if (pa_stream)
 		return;
 
 	int outDevNum = output->pa_device_no;
@@ -145,41 +167,33 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	                &pa_stream,
 	                NULL,
 	                &outputParameters,
-	                sample_rate,
+	                renderer->getSampleRate(),
 					512,//paFramesPerBufferUnspecified,
 	                paNoFlag, //flags that can be used to define dither, clip settings and more
 	                portAudioCallback,
 	                (void*)this);
 	testError("Pa_OpenStream");
-
-	output->addStream(this);
 }
 
-AudioStream::~AudioStream()
+void AudioStream::kill_dev()
 {
-	kill();
-}
-
-void AudioStream::__init__(AudioRendererInterface *r)
-{
-	new(this) AudioStream(r);
-}
-
-void AudioStream::__delete__()
-{
-	kill();
-}
-
-void AudioStream::kill()
-{
-	msg_db_f("Stream.kill", 1);
+	msg_db_f("Stream.kill_dev", 1);
 
 	if (pa_stream){
 		stop();
 
 		last_error = Pa_CloseStream(pa_stream);
 		testError("AudioStream.kill");
+		pa_stream = NULL;
 	}
+}
+
+void AudioStream::kill()
+{
+	msg_db_f("Stream.kill", 1);
+
+	if (pa_stream)
+		kill_dev();
 
 	output->removeStream(this);
 	killed = true;
@@ -254,12 +268,15 @@ void AudioStream::setSource(AudioRendererInterface *r)
 		stop();
 
 	renderer = r;
-	sample_rate = r->sample_rate;
 }
 
 void AudioStream::play()
 {
 	msg_db_f("Stream.play", 1);
+
+	if (!pa_stream)
+		create_dev();
+
 
 	if (playing){
 		/*if (paused){
@@ -340,7 +357,7 @@ void AudioStream::setVolume(float _volume)
 
 float AudioStream::getSampleRate()
 {
-	return sample_rate;
+	return renderer->getSampleRate();
 }
 
 void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)

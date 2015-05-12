@@ -23,7 +23,7 @@ public:
 	virtual void reset(){}
 	virtual Range range(){ return Range(0, 0); }
 	virtual int offset(){ return 0; }
-	int sample_rate;
+	virtual int getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
 };
 
 class AudioRenderer : public AudioRendererInterface
@@ -46,6 +46,8 @@ public:
 	void setRange(const Range &r){ _range = r; }
 	virtual Range range(){ return _range; }
 	virtual int offset(){ return _offset; }
+
+	virtual int getSampleRate();
 
 private:
 	void read_basic(BufferBox &buf, int pos, int size);

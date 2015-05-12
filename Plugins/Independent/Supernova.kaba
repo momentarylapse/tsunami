@@ -108,7 +108,7 @@ class SuperNovaWindow : Window
 			c.drawLine(0, ly, w, ly)
 		c.setColor(Black)
 		c.setFontSize(18)
-		for n in MidiTrack.midi.note
+		for n in MidiTrack.midi
 			int s, f
 			for i in 0:6
 				if n.pitch >= StringPitch[i] + HandPosition

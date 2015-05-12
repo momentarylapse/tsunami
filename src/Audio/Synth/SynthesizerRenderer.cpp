@@ -32,10 +32,13 @@ void SynthesizerRenderer::__delete__()
 void SynthesizerRenderer::setSynthesizer(Synthesizer *_s)
 {
 	s = _s;
+}
+
+int SynthesizerRenderer::getSampleRate()
+{
 	if (s)
-		sample_rate = s->sample_rate;
-	else
-		sample_rate = DEFAULT_SAMPLE_RATE;
+		return s->sample_rate;
+	return DEFAULT_SAMPLE_RATE;
 }
 
 

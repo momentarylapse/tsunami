@@ -31,6 +31,8 @@ public:
 	void _cdecl __init__(AudioRendererInterface *r);
 	virtual void _cdecl __delete__();
 
+	void create_dev();
+	void kill_dev();
 	void kill();
 
 
@@ -70,7 +72,6 @@ public:
 	float volume;
 	bool playing;
 	bool paused;
-	int sample_rate;
 	int buffer_size;
 	float update_dt;
 

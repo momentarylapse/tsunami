@@ -37,6 +37,8 @@ public:
 
 	void setAutoStop(bool auto_stop);
 
+	virtual int getSampleRate();
+
 private:
 	Synthesizer *s;
 };

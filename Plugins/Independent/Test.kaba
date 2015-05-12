@@ -1,4 +1,3 @@
-#disasm
 
 class MyDialog : Dialog
 	void __init__()

@@ -236,6 +236,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("SynthesizerRenderer", sizeof(SynthesizerRenderer));
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "reset", Script::mf(&SynthesizerRenderer::reset), &synthren);
+	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "getSampleRate", Script::mf(&SynthesizerRenderer::getSampleRate), &synthren);
 	Script::LinkExternal("SynthesizerRenderer.add", Script::mf(&SynthesizerRenderer::add));
 	Script::LinkExternal("SynthesizerRenderer.resetMidiData", Script::mf(&SynthesizerRenderer::resetMidiData));
 
@@ -335,13 +336,14 @@ void PluginManager::LinkAppScriptData()
 
 	AudioRendererInterface ari;
 	Script::DeclareClassSize("AudioRendererInterface", sizeof(AudioRendererInterface));
-	Script::DeclareClassOffset("AudioRendererInterface", "sample_rate", _offsetof(AudioRendererInterface, sample_rate));
+	//Script::DeclareClassOffset("AudioRendererInterface", "sample_rate", _offsetof(AudioRendererInterface, sample_rate));
 	Script::LinkExternal("AudioRendererInterface.__init__", Script::mf(&AudioRendererInterface::__init__));
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "__delete__", Script::mf(&AudioRendererInterface::__delete__), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "read", Script::mf(&AudioRendererInterface::read), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "reset", Script::mf(&AudioRendererInterface::reset), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "range", Script::mf(&AudioRendererInterface::range), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "offset", Script::mf(&AudioRendererInterface::offset), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getSampleRate", Script::mf(&AudioRendererInterface::getSampleRate), &ari);
 
 	AudioRenderer ar;
 	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
@@ -349,10 +351,11 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::renderAudioFile));
 	Script::LinkExternal("AudioRenderer.__init__", Script::mf(&AudioRenderer::__init__));
 	Script::DeclareClassVirtualIndex("AudioRenderer", "__delete__", Script::mf(&AudioRenderer::__delete__), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "read", Script::mf(&AudioRenderer::read), &ari);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "reset", Script::mf(&AudioRenderer::reset), &ari);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "range", Script::mf(&AudioRenderer::range), &ari);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "offset", Script::mf(&AudioRenderer::offset), &ari);
+	Script::DeclareClassVirtualIndex("AudioRenderer", "read", Script::mf(&AudioRenderer::read), &ar);
+	Script::DeclareClassVirtualIndex("AudioRenderer", "reset", Script::mf(&AudioRenderer::reset), &ar);
+	Script::DeclareClassVirtualIndex("AudioRenderer", "range", Script::mf(&AudioRenderer::range), &ar);
+	Script::DeclareClassVirtualIndex("AudioRenderer", "offset", Script::mf(&AudioRenderer::offset), &ar);
+	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
 	Script::DeclareClassOffset("AudioInput", "cur_buf", _offsetof(AudioInput, current_buffer));

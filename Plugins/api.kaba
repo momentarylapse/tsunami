@@ -19,6 +19,8 @@
 
 const int NUM_PEAK_LEVELS = 24
 
+const int DEFAULT_SAMPLE_RATE = 44100
+
 class Range
 	int offset, length
 	int end()
@@ -106,7 +108,7 @@ class AudioRendererInterface
 	extern virtual void reset()
 	extern virtual Range range()
 	extern virtual int offset()
-	int sample_rate
+	extern virtual int getSampleRate()
 
 class Synthesizer
 	string name
@@ -140,6 +142,7 @@ class SynthesizerRenderer
 	extern virtual int read(BufferBox buf)
 	extern virtual void reset()
 	extern void add(MidiEvent e)
+	extern virtual int getSampleRate()
 
 class EnvelopeADSR
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)
@@ -286,6 +289,7 @@ class AudioRenderer
 	extern virtual void reset()
 	extern virtual Range range()
 	extern virtual int offset()
+	extern virtual int getSampleRate()
 
 
 class AudioStream

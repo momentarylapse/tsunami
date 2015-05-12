@@ -17,7 +17,6 @@
 
 AudioRendererInterface::AudioRendererInterface()
 {
-	sample_rate = DEFAULT_SAMPLE_RATE;
 }
 
 void AudioRendererInterface::__init__()
@@ -287,7 +286,6 @@ void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
 	audio = a;
-	sample_rate = audio->sample_rate;
 	_range = __range;
 	loop = loop_if_allowed && allow_loop;
 	pos = _range.offset;
@@ -299,7 +297,6 @@ void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool allow_loop)
 
 void AudioRenderer::reset()
 {
-	sample_rate = audio->sample_rate;
 	foreach(Effect *fx, audio->fx)
 		fx->prepare();
 	foreachi(Track *t, audio->track, i){
@@ -317,6 +314,11 @@ void AudioRenderer::reset()
 	}
 	if (effect)
 		effect->prepare();
+}
+
+int AudioRenderer::getSampleRate()
+{
+	return audio->sample_rate;
 }
 
 void AudioRenderer::seek(int _pos)

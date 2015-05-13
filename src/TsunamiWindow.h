@@ -51,6 +51,7 @@ public:
 	void onDeleteTrack();
 	void onTrackEditMidi();
 	void onTrackEditFX();
+	void onTrackAddMarker();
 	void onSubFromSelection();
 	void onInsertAdded();
 	void onRemoveAdded();

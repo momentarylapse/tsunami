@@ -16,6 +16,7 @@ class AudioView;
 class BufferBox;
 class SampleRef;
 class MidiData;
+class TrackMarker;
 
 class AudioViewTrack
 {
@@ -29,6 +30,7 @@ public:
 	void drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
 	void drawSample(HuiPainter *c, const rect &r, SampleRef *s);
+	void drawMarker(HuiPainter *c, const rect &r, TrackMarker &marker);
 	void drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift);
 	void drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col);
 	void drawTrack(HuiPainter *c, const rect &r, color col, int track_no);

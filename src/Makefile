@@ -32,6 +32,9 @@ OBJ = \
  Action/Track/Effect/ActionTrackDeleteEffect.o\
  Action/Track/Effect/ActionTrackEditEffect.o\
  Action/Track/Effect/ActionTrackToggleEffectEnabled.o\
+ Action/Track/Marker/ActionTrackAddMarker.o\
+ Action/Track/Marker/ActionTrackDeleteMarker.o\
+ Action/Track/Marker/ActionTrackMoveMarker.o\
  Action/Track/Midi/ActionTrackAddMidiEffect.o\
  Action/Track/Midi/ActionTrackDeleteMidiEffect.o\
  Action/Track/Midi/ActionTrackEditMidiEffect.o\
@@ -226,6 +229,7 @@ OBJ = \
  View/BottomBar/SynthConsole.o\
  View/BottomBar/TrackConsole.o\
  View/Dialog/CaptureDialog.o\
+ View/Dialog/MarkerDialog.o\
  View/Dialog/NewDialog.o\
  View/Dialog/RecordDialog.o\
  View/Dialog/SettingsDialog.o\
@@ -336,6 +340,15 @@ Action/Track/Effect/ActionTrackEditEffect.o : Action/Track/Effect/ActionTrackEdi
 
 Action/Track/Effect/ActionTrackToggleEffectEnabled.o : Action/Track/Effect/ActionTrackToggleEffectEnabled.cpp
 	$(CPP) -c Action/Track/Effect/ActionTrackToggleEffectEnabled.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Marker/ActionTrackAddMarker.o : Action/Track/Marker/ActionTrackAddMarker.cpp
+	$(CPP) -c Action/Track/Marker/ActionTrackAddMarker.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Marker/ActionTrackDeleteMarker.o : Action/Track/Marker/ActionTrackDeleteMarker.cpp
+	$(CPP) -c Action/Track/Marker/ActionTrackDeleteMarker.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Marker/ActionTrackMoveMarker.o : Action/Track/Marker/ActionTrackMoveMarker.cpp
+	$(CPP) -c Action/Track/Marker/ActionTrackMoveMarker.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Midi/ActionTrackAddMidiEffect.o : Action/Track/Midi/ActionTrackAddMidiEffect.cpp
 	$(CPP) -c Action/Track/Midi/ActionTrackAddMidiEffect.cpp -o $@ $(CXXFLAGS)
@@ -915,6 +928,9 @@ View/BottomBar/TrackConsole.o : View/BottomBar/TrackConsole.cpp
 
 View/Dialog/CaptureDialog.o : View/Dialog/CaptureDialog.cpp
 	$(CPP) -c View/Dialog/CaptureDialog.cpp -o $@ $(CXXFLAGS)
+
+View/Dialog/MarkerDialog.o : View/Dialog/MarkerDialog.cpp
+	$(CPP) -c View/Dialog/MarkerDialog.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/NewDialog.o : View/Dialog/NewDialog.cpp
 	$(CPP) -c View/Dialog/NewDialog.cpp -o $@ $(CXXFLAGS)

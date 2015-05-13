@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-212
+215
 // Data (ID,Text)
 about
 
@@ -173,6 +173,10 @@ log_clear
 Clear
 log_close
 Close
+marker_dialog
+
+marker_dialog_buttonbar
+
 me_grid_yes
 
 menu_edit
@@ -317,11 +321,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_162113
+rand_id_168841
 
-rand_id_458894
+rand_id_415919
 
-rand_id_488825
+rand_id_765134
 
 rdt_capture
 
@@ -389,6 +393,8 @@ td_t_name
 
 td_t_volume
 
+track_add_marker
+
 track_dialog
 Track
 track_edit_fx
@@ -428,11 +434,13 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-149
+150
 // Data (ID,Text)
 
 
                   Close dialog box to exit program.
+
+        - Standard -
 
         - nicht verbinden -
 
@@ -656,7 +664,7 @@ alle Dateien
 
 alle Nachrichten löschen
 
-alles mögliche (
+alles mögliche
 
 alte Aufnahmedaten gefunden: 
 

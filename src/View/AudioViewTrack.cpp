@@ -185,6 +185,13 @@ void AudioViewTrack::drawSample(HuiPainter *c, const rect &r, SampleRef *s)
 		c->drawStr(asx, r.y2 - view->SUB_FRAME_HEIGHT, s->origin->name);
 }
 
+void AudioViewTrack::drawMarker(HuiPainter *c, const rect &r, TrackMarker &marker)
+{
+	int x = view->sample2screen(marker.pos);
+	c->setColor(view->ColorWave);
+	c->drawStr(x, r.y1, marker.text);
+}
+
 
 void AudioViewTrack::drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift)
 {
@@ -275,6 +282,9 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, color col, int trac
 
 	foreach(SampleRef *s, track->sample)
 		drawSample(c, r, s);
+
+	foreach(TrackMarker &m, track->markers)
+		drawMarker(c, r, m);
 
 	if ((view->hover.track == track) and (view->mx < view->TRACK_HANDLE_WIDTH)){
 		c->setColor(color(0.4f, 1, 1, 1));

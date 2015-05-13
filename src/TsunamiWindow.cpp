@@ -12,6 +12,7 @@
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
+#include "View/Dialog/MarkerDialog.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
@@ -64,6 +65,7 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("delete_track", "hui:delete", -1, this, &TsunamiWindow::onDeleteTrack);
 	HuiAddCommandM("track_edit_midi", "hui:edit", -1, this, &TsunamiWindow::onTrackEditMidi);
 	HuiAddCommandM("track_edit_fx", "hui:edit", -1, this, &TsunamiWindow::onTrackEditFX);
+	HuiAddCommandM("track_add_marker", "hui:add", -1, this, &TsunamiWindow::onTrackAddMarker);
 	HuiAddCommandM("level_add", "hui:add", -1, this, &TsunamiWindow::onAddLevel);
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &TsunamiWindow::onDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &TsunamiWindow::onCurLevelUp);
@@ -229,6 +231,15 @@ void TsunamiWindow::onTrackEditFX()
 	if (view->cur_track)
 		bottom_bar->choose(BottomBar::TRACK_FX_CONSOLE);
 	else
+		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
+}
+
+void TsunamiWindow::onTrackAddMarker()
+{
+	if (view->cur_track){
+		MarkerDialog *d = new MarkerDialog(this, false, view->cur_track, view->hover.pos);
+		d->run();
+	}else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
 

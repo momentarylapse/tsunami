@@ -137,6 +137,15 @@ void WriteBar(CFile *f, BarPattern &b)
 	EndChunk(f);
 }
 
+void WriteMarker(CFile *f, TrackMarker &m)
+{
+	BeginChunk(f, "marker");
+	f->WriteInt(m.pos);
+	f->WriteStr(m.text);
+	f->WriteInt(0); // reserved
+	EndChunk(f);
+}
+
 void WriteMidiEvent(CFile *f, MidiEvent &e)
 {
 	BeginChunk(f, "event");
@@ -225,6 +234,9 @@ void WriteTrack(CFile *f, Track *t)
 
 	foreach(Effect *effect, t->fx)
 		WriteEffect(f, effect);
+
+	foreach(TrackMarker &m, t->markers)
+		WriteMarker(f, m);
 
 	if ((t->type == t->TYPE_TIME) || (t->type == t->TYPE_MIDI))
 		WriteSynth(f, t->synth);
@@ -508,6 +520,15 @@ void ReadChunkBar(ChunkStack *s, Array<BarPattern> *bar)
 	bar->add(b);
 }
 
+void ReadChunkMarker(ChunkStack *s, Array<TrackMarker> *markers)
+{
+	TrackMarker m;
+	m.pos = s->f->ReadInt();
+	m.text = s->f->ReadStr();
+	s->f->ReadInt(); // reserved
+	markers->add(m);
+}
+
 void ReadChunkMidiNote(ChunkStack *s, MidiData *m)
 {
 	MidiNote n;
@@ -607,6 +628,7 @@ void ReadChunkTrack(ChunkStack *s, AudioFile *a)
 	s->AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
 	s->AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
 	s->AddChunkHandler("synth", (chunk_reader*)&ReadChunkSynth, t);
+	s->AddChunkHandler("marker", (chunk_reader*)&ReadChunkMarker, &t->markers);
 }
 
 void ReadChunkNami(ChunkStack *s, AudioFile *a)

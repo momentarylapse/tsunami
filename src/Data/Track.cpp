@@ -28,6 +28,9 @@
 #include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
 #include "../Action/Track/Effect/ActionTrackToggleEffectEnabled.h"
+#include "../Action/Track/Marker/ActionTrackAddMarker.h"
+#include "../Action/Track/Marker/ActionTrackDeleteMarker.h"
+#include "../Action/Track/Marker/ActionTrackMoveMarker.h"
 #include "../Action/Track/Bar/ActionTrackAddBar.h"
 #include "../Action/Track/Bar/ActionTrackEditBar.h"
 #include "../Action/Track/Bar/ActionTrackDeleteBar.h"
@@ -389,6 +392,21 @@ void Track::editBar(int index, BarPattern &p)
 void Track::deleteBar(int index)
 {
 	root->execute(new ActionTrackDeleteBar(this, index));
+}
+
+void Track::addMarker(int pos, const string &text)
+{
+	root->execute(new ActionTrackAddMarker(this, pos, text));
+}
+
+void Track::deleteMarker(int index)
+{
+	root->execute(new ActionTrackDeleteMarker(this, index));
+}
+
+void Track::moveMarker(int index, int pos)
+{
+	root->execute(new ActionTrackMoveMarker(this, index, pos));
 }
 
 

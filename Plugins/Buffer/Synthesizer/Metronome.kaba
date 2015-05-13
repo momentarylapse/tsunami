@@ -22,12 +22,11 @@ class PluginState : PluginData
 		dpos = 0
 
 
-DummySynthesizer synth
-
 
 class Metronome : AudioEffect
 	PluginState state
 	Config config
+	DummySynthesizer synth
 
 	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
@@ -42,7 +41,6 @@ class Metronome : AudioEffect
 				synth.addMetronomeClick(state.dpos, 0, config.Volume)
 			else
 				synth.addMetronomeClick(state.dpos, 1, config.Volume)
-			synth.read(buf)
 		
 			state.beat ++
 			if state.beat >= config.BeatsPerMeasure
@@ -51,6 +49,7 @@ class Metronome : AudioEffect
 			if state.dpos >= buf.num
 				state.dpos -= buf.num
 				break
+		synth.read(buf)
 		
 	overwrite ConfigPanel *createPanel()
 		return new MetronomePanel(self)

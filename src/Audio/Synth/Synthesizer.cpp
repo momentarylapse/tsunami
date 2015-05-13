@@ -43,8 +43,8 @@ void Synthesizer::__delete__()
 
 void Synthesizer::setSampleRate(int _sample_rate)
 {
-	if (_sample_rate == sample_rate)
-		return;
+	//if (_sample_rate == sample_rate)
+	//	return;
 	sample_rate = _sample_rate;
 
 	for (int p=0; p<128; p++){

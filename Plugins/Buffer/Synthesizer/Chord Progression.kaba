@@ -25,14 +25,13 @@ class ChordProgression : AudioEffect
 	DummySynthesizer synth
 
 	overwrite void process(BufferBox buf)
-		Chord[] chord
+		Chord[] chords = ParseChords(config.Chords)
 		AudioFile *a = audio
-		ParseChords(config.Chords, chord)
 	
 		int p0 = a.getNextBeat(buf.offset)
-		synth.sample_rate = a.sample_rate
+		synth.setSampleRate(a.sample_rate)
 	
-		for c,i in chord
+		for c,i in chords
 			int pos0 = f2i(a.sample_rate * config.Duration * i2f(i))
 			int pos1 = f2i(a.sample_rate * config.Duration * i2f(i + 1))
 			if config.DurationByBeats
@@ -40,7 +39,8 @@ class ChordProgression : AudioEffect
 				for j in 0:config.Beats
 					p0 = a.getNextBeat(p0)
 				pos1 = p0 - buf.offset
-			AddChord(synth, buf, pos0, pos1, c, config.Volume)
+			AddChord(synth, pos0, pos1, c, config.Volume)
+		synth.read(buf)
 
 	overwrite ConfigPanel *createPanel()
 		return new ChordProgPanel(self)

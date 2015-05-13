@@ -171,7 +171,6 @@ void BufferBox::scale(float volume, float panning)
 {
 	if ((volume == 1.0f) && (panning == 0))
 		return;
-	make_own();
 
 	float f_r = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
 	float f_l = volume * cos((panning + 1) / 4 * pi) * sqrt(2);

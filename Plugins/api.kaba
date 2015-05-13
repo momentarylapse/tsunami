@@ -47,6 +47,15 @@ class MidiData : MidiEvent[]
 		e.pitch = pitch
 		e.volume = volume
 		super.add(e)
+	void addNote(MidiNote n)
+		MidiEvent e
+		e.pos = n.range.offset
+		e.pitch = n.pitch
+		e.volume = n.volume
+		super.add(e)
+		e.pos = n.range.end()
+		e.volume = 0
+		super.add(e)
 
 class PluginData
 	extern void __init__()
@@ -135,6 +144,7 @@ class Synthesizer
 
 class DummySynthesizer : Synthesizer
 	extern void __init__()
+	//extern virtual void __delete__()
 	extern overwrite void render(BufferBox buf)
 
 class SynthesizerRenderer

@@ -246,6 +246,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("DummySynthesizer.__init__", Script::mf(&DummySynthesizer::__init__));
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "__delete__", Script::mf(&DummySynthesizer::__delete__), &dsynth);
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "render", Script::mf(&DummySynthesizer::render), &dsynth);
+	Script::DeclareClassVirtualIndex("DummySynthesizer", "onConfig", Script::mf(&DummySynthesizer::onConfig), &dsynth);
 
 	Script::DeclareClassSize("EnvelopeADSR", sizeof(EnvelopeADSR));
 	Script::LinkExternal("EnvelopeADSR.set", Script::mf(&EnvelopeADSR::set));

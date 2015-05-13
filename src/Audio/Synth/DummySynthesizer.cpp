@@ -22,6 +22,7 @@ void DummySynthesizer::State::reset()
 DummySynthesizer::DummySynthesizer()
 {
 	name = "Dummy";
+	state.reset();
 }
 
 DummySynthesizer::~DummySynthesizer()

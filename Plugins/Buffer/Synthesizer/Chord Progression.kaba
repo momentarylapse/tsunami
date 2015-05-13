@@ -39,7 +39,7 @@ class ChordProgression : AudioEffect
 				for j in 0:config.Beats
 					p0 = a.getNextBeat(p0)
 				pos1 = p0 - buf.offset
-			AddChord(synth, pos0, pos1, c, config.Volume)
+			AddChord(synth, _Range(pos0, pos1-pos0), c, config.Volume)
 		synth.read(buf)
 
 	overwrite ConfigPanel *createPanel()

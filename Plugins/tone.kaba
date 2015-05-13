@@ -117,10 +117,7 @@ void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, 
 /*class RichtSynthesizer : DummySynthesizer
 	virtual void AddToneFreq(BufferBox buf, Range r, float freq, float volume)*/
 
-void AddChord(Synthesizer s, int pos0, int pos1, Chord c, float volume)
-	Range r
-	r.offset = pos0
-	r.length = pos1 - pos0
+void AddChord(Synthesizer s, Range r, Chord c, float volume)
 	
 	float[] pitch
 	pitch.add(c.base_tone)
@@ -132,10 +129,6 @@ void AddChord(Synthesizer s, int pos0, int pos1, Chord c, float volume)
 	pitch.add(c.base_tone + 12)
 	
 	MidiData midi
-	MidiNote n
-	n.volume = volume
-	n.range = r
 	for p in pitch
-		n.pitch = p
-		midi.addNote(n)
+		midi.addNote(_MidiNote(r, p, volume))
 	s.feed(midi)

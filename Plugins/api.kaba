@@ -25,37 +25,41 @@ class Range
 	int offset, length
 	int end()
 		return offset + length
-
+Range _Range(int offset, int length)
+	Range r
+	r.offset = offset
+	r.length = length
+	return r
 
 
 class MidiNote
 	Range range
 	float pitch
 	float volume
+MidiNote _MidiNote(Range r, float pitch, float volume)
+	MidiNote n
+	n.range = r
+	n.pitch = pitch
+	n.volume = volume
+	return n
 
 class MidiEvent
 	int pos
 	float pitch
 	float volume
+MidiEvent _MidiEvent(int pos, float pitch, float volume)
+	MidiEvent e
+	e.pos = pos
+	e.pitch = pitch
+	e.volume = volume
+	return e
 
 class MidiData : MidiEvent[]
 	int samples
 	extern void __init__()
-	void add(int pos, float pitch, float volume)
-		MidiEvent e
-		e.pos = pos
-		e.pitch = pitch
-		e.volume = volume
-		super.add(e)
 	void addNote(MidiNote n)
-		MidiEvent e
-		e.pos = n.range.offset
-		e.pitch = n.pitch
-		e.volume = n.volume
-		super.add(e)
-		e.pos = n.range.end()
-		e.volume = 0
-		super.add(e)
+		add(_MidiEvent(n.range.offset, n.pitch, n.volume))
+		add(_MidiEvent(n.range.end(), n.pitch, 0))
 
 class PluginData
 	extern void __init__()

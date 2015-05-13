@@ -20,21 +20,14 @@ class ToneGenerator : AudioEffect
 
 	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
-		synth.sample_rate = a.sample_rate
-		Range r
-		r.offset = 0
-		r.length = buf.num
-		synth.renderNote(buf, r, freq_to_pitch(config.Frequency), config.Volume)
-
-		/*float f = config.Frequency
-
-		float w_f = 1.0 / a.sample_rate * f * 2.0 * pi
-
-		for int i, 0, buf.num
-			float tt = i * w_f
-			float d = sin(tt) * config.Volume
-			buf.r[i] = clamp(buf.r[i] + d, -1, 1)
-			buf.l[i] = clamp(buf.l[i] + d, -1, 1)*/
+		synth.setSampleRate(a.sample_rate)
+		
+		Range r = _Range(0, buf.num)
+		MidiData midi
+		midi.addNote(_MidiNote(r, freq_to_pitch(config.Frequency), config.Volume))
+		synth.feed(midi)
+		
+		synth.read(buf)
 	
 
 	overwrite ConfigPanel *createPanel()
@@ -62,7 +55,7 @@ class TonePanel : ConfigPanel
 		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "volume")
 	
 		reset("pitch_rel")
-		for int i, 0, 12
+		for i in 0:12
 			setString("pitch_rel", rel_pitch_name(i))
 	
 		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)

@@ -36,6 +36,13 @@ public:
 	Array<BufferBox> buffer;
 };
 
+class TrackMarker
+{
+public:
+	int pos;
+	string text;
+};
+
 string track_type(int type);
 
 class Track : public Observable
@@ -88,6 +95,9 @@ public:
 	void _cdecl addPause(int index, float time);
 	void _cdecl editBar(int index, BarPattern &p);
 	void _cdecl deleteBar(int index);
+	void _cdecl addMarker(int pos, const string &text);
+	void _cdecl deleteMarker(int id);
+	void _cdecl moveMarker(int id, int pos);
 
 
 	enum
@@ -115,6 +125,8 @@ public:
 	// midi track
 	MidiData midi;
 	Synthesizer *synth;
+
+	Array<TrackMarker> markers;
 
 	AudioFile *root;
 

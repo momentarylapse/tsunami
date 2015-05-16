@@ -208,6 +208,7 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 
 		// first (un-muted) track
 		bb_render_track_fx(buf, audio->track[i0], i0);
+		buf.make_own();
 		buf.scale(audio->track[i0]->volume, audio->track[i0]->panning);
 
 		// other tracks

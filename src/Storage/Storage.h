@@ -36,7 +36,7 @@ public:
 
 	Format *getFormat(const string &ext, int flags);
 
-private:
+//private:
 	Array<Format*> format;
 	string CurrentDirectory;
 };

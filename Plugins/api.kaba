@@ -169,6 +169,10 @@ class EnvelopeADSR
 
 class TrackRenderBuffer
 	int dummy
+
+class TrackMarker
+	int pos
+	string text
 	
 class BarPattern
 	int num_beats
@@ -228,6 +232,8 @@ class Track
 	// midi track
 	MidiData midi
 	Synthesizer *synth
+	
+	TrackMarker[] markers
 
 	// editing
 	int parent
@@ -260,6 +266,9 @@ class Track
 	extern void addPause(int index, float time)
 	extern void editBar(int index, BarPattern p)
 	extern void deleteBar(int index)
+	extern void addMarker(int pos, string text)
+	extern void deleteMarker(int index)
+	extern void moveMarker(int index, int pos)
 
 class Tag
 	string key, value

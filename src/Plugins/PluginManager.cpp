@@ -273,6 +273,10 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
 	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiData::__init__));
 
+	Script::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
+	Script::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));
+	Script::DeclareClassOffset("TrackMarker", "pos", _offsetof(TrackMarker, text));
+
 	Script::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
 	Script::DeclareClassOffset("TrackLevel", "buffer", _offsetof(TrackLevel, buffer));
 
@@ -292,6 +296,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Track", "midi", _offsetof(Track, midi));
 	Script::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
 //	Script::DeclareClassOffset("Track", "parent", _offsetof(Track, parent));
+	Script::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Script::DeclareClassOffset("Track", "root", _offsetof(Track, root));
 	Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
 	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::getBuffers));
@@ -316,6 +321,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.addPause", Script::mf(&Track::addPause));
 	Script::LinkExternal("Track.editBar", Script::mf(&Track::editBar));
 	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::deleteBar));
+	Script::LinkExternal("Track.addMarker", Script::mf(&Track::addMarker));
+	Script::LinkExternal("Track.deleteMarker", Script::mf(&Track::deleteMarker));
+	Script::LinkExternal("Track.moveMarker", Script::mf(&Track::moveMarker));
 
 	AudioFile af;
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));

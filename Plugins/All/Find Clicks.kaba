@@ -1,0 +1,17 @@
+// Image = hui:clear
+// Title[Deutsch] = Klicks Entfernen
+use "../api.kaba"
+
+void unclick(float[] b, Track *t, int offset)
+	for i in 1:b.num-1
+		float m = (b[i-1] + b[i+1]) / 2
+		if abs(b[i-1] - b[i+1]) < 0.1 and abs(b[i] - m) > 0.4
+			t.addMarker(i + offset, "X")
+			i ++
+
+void main()
+	for t in audio.track
+		for l in t.level
+			for b in l.buffer
+				unclick(b.r, t, b.offset)
+				unclick(b.l, t, b.offset)

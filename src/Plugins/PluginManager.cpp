@@ -190,6 +190,19 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("BufferBox.set", Script::mf(&BufferBox::set));
 	Script::LinkExternal("BufferBox.get_spectrum", Script::mf(&ExtendedBufferBox::get_spectrum));
 
+
+	Script::DeclareClassSize("RingBuffer", sizeof(RingBuffer));
+	//Script::LinkExternal("RingBuffer.__init__", Script::mf(&RingBuffer::__init__));
+	Script::LinkExternal("RingBuffer.available", Script::mf(&RingBuffer::available));
+	Script::LinkExternal("RingBuffer.read", Script::mf(&RingBuffer::read));
+	Script::LinkExternal("RingBuffer.write", Script::mf(&RingBuffer::write));
+	Script::LinkExternal("RingBuffer.readRef", Script::mf(&RingBuffer::readRef));
+	Script::LinkExternal("RingBuffer.peekRef", Script::mf(&RingBuffer::peekRef));
+	Script::LinkExternal("RingBuffer.writeRef", Script::mf(&RingBuffer::writeRef));
+	Script::LinkExternal("RingBuffer.moveReadPos", Script::mf(&RingBuffer::moveReadPos));
+	Script::LinkExternal("RingBuffer.moveWritePos", Script::mf(&RingBuffer::moveWritePos));
+	Script::LinkExternal("RingBuffer.clear", Script::mf(&RingBuffer::clear));
+
 	Script::DeclareClassSize("Sample", sizeof(Sample));
 	Script::DeclareClassOffset("Sample", "name", _offsetof(Sample, name));
 	Script::DeclareClassOffset("Sample", "type", _offsetof(Sample, type));
@@ -272,6 +285,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("MidiData", sizeof(MidiData));
 	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
 	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiData::__init__));
+	Script::LinkExternal("MidiData.getEvents", Script::mf(&MidiData::getEvents));
+	Script::LinkExternal("MidiData.getNotes", Script::mf(&MidiData::getNotes));
+	Script::LinkExternal("MidiData.getRange", Script::mf(&MidiData::getRange));
 
 	Script::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Script::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));
@@ -367,8 +383,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
-	Script::DeclareClassOffset("AudioInput", "cur_buf", _offsetof(AudioInput, current_buffer));
-	Script::DeclareClassOffset("AudioInput", "buf", _offsetof(AudioInput, buffer));
+	Script::DeclareClassOffset("AudioInput", "current_buffer", _offsetof(AudioInput, current_buffer));
+	Script::DeclareClassOffset("AudioInput", "buffer", _offsetof(AudioInput, buffer));
 	Script::DeclareClassOffset("AudioInput", "midi", _offsetof(AudioInput, midi));
 	Script::LinkExternal("AudioInput.start", Script::mf(&AudioInput::start));
 	Script::LinkExternal("AudioInput.resetSync", Script::mf(&AudioInput::resetSync));

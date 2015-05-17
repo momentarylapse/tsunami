@@ -57,6 +57,9 @@ MidiEvent _MidiEvent(int pos, float pitch, float volume)
 class MidiData : MidiEvent[]
 	int samples
 	extern void __init__()
+	extern MidiNote[] getNotes(Range r)
+	extern MidiEvent[] getEvents(Range r)
+	extern Range getRange()
 	void addNote(MidiNote n)
 		add(_MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(_MidiEvent(n.range.end(), n.pitch, 0))
@@ -113,6 +116,18 @@ class BufferBox
 	extern void set(BufferBox b, int offset, float volume)
 	extern void add(BufferBox b, int offset, float volume, float panning)
 	extern void get_spectrum(complex[] spec_r, complex[] spec_l, int samples)
+
+class RingBuffer
+	extern int available()
+	extern void read(BufferBox b)
+	extern void write(BufferBox b)
+	extern void readRef(BufferBox b, int size)
+	extern void peekRef(BufferBox b, int size)
+	extern void writeRef(BufferBox b, int size)
+	extern void moveReadPos(int delta)
+	extern void moveWritePos(int delta)
+	extern void clear()
+	void __assign__(RingBuffer o)
 
 class AudioRendererInterface
 	extern void __init__()
@@ -330,7 +345,8 @@ class AudioStream
 	extern void setBufferSize(int size)
 
 class AudioInput //: Observable
-	BufferBox cur_buf, buf
+	RingBuffer current_buffer
+	BufferBox buffer
 	MidiData midi
 	extern void start(int type, int sample_rate)
 	extern void stop()

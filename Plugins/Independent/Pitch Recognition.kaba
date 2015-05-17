@@ -10,13 +10,13 @@ const int f_max = 5000
 const float threshold = 0.1
 
 
-const int buf_size = 32768
-float[] buf
+const int BUFFER_SIZE = 32768
+BufferBox buf
 
 Window *win
 
 float get_freq(float i)
-	return i / (buf_size / 2) * freq / 2
+	return i / (BUFFER_SIZE / 2) * freq / 2
 
 float Frequency, Volume, Error
 bool LoudEnough
@@ -74,27 +74,20 @@ void OnClose()
 	win = nil
 
 void UpdateInput()
-	int[1] stack_corrector // needed for stack alignment (T_T)
+	int available = input.current_buffer.available()
 	
-	int num = clampi(input.cur_buf.num, 0, buf_size)
-	buf.resize(buf_size)
+	if available > BUFFER_SIZE
+		input.current_buffer.moveReadPos(available - BUFFER_SIZE)
+	int num = clampi(available, 0, BUFFER_SIZE)
 	
-	// alten Pufferinhalt verschieben
-	for i in 0:(buf_size - num)
-		buf[i] = buf[i + num]
+	input.current_buffer.peekRef(buf, num)
 	
-	// neuen Inhalt anfügen
-	for i in 0:num
-		buf[buf_size - num + i] = (input.cur_buf.r[i] + input.cur_buf.l[i]) / 2
-	
-	/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
-	for int i, 0, buf_size
-		float tt = i * w_f
-		buf[i] = f2i(val_max * sin(tt) * 0.1)*/
+	float[] temp
+	temp = buf.r + buf.l
 	
 	complex[] bufc
 	bufc.resize(buf.num / 2 + 1)
-	fft_r2c(buf, bufc)
+	fft_r2c(temp, bufc)
 	float max = 0
 	float fmax = 0, fmax2 = 0
 	for b,i in bufc
@@ -135,9 +128,8 @@ void main()
 	
 
 
-	buf.resize(1000)
 	bufc.resize(1000)
-	fft_r2c(buf, bufc)
+	fft_r2c(buf.r, bufc)
 	
 	input.start(TRACK_TYPE_AUDIO, freq)
 	input.addObserver(nil, &UpdateInput)

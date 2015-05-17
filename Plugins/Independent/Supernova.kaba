@@ -10,8 +10,8 @@ const int f_max = 5000
 const float threshold = 5.0
 
 
-const int buf_size = 4096
-float[] buf
+const int BUFFER_SIZE = 4096
+BufferBox buf
 
 SuperNovaWindow *win
 
@@ -25,7 +25,7 @@ PlayedData[] played
 int Offset
 
 float get_freq(float i)
-	return i / (buf_size / 2) * audio.sample_rate / 2
+	return i / (BUFFER_SIZE / 2) * audio.sample_rate / 2
 
 float Frequency, Volume, Error
 bool LoudEnough
@@ -108,7 +108,8 @@ class SuperNovaWindow : Window
 			c.drawLine(0, ly, w, ly)
 		c.setColor(Black)
 		c.setFontSize(18)
-		for n in MidiTrack.midi
+		MidiNote[] notes = MidiTrack.midi.getNotes(audio.getRange())
+		for n in notes
 			int s, f
 			for i in 0:6
 				if n.pitch >= StringPitch[i] + HandPosition
@@ -198,26 +199,25 @@ class SuperNovaWindow : Window
 			StartLesson(LessonName[hover])
 
 void UpdateInput()
+	int available = input.current_buffer.available()
 	
-	int num = clampi(input.cur_buf.num, 0, buf_size)
-	buf.resize(buf_size)
+	if available > BUFFER_SIZE
+		input.current_buffer.moveReadPos(available - BUFFER_SIZE)
+		Offset += available - BUFFER_SIZE//input.cur_buf.num
 	
-	// alten Pufferinhalt verschieben
-	for i in 0:(buf_size - num)
-		buf[i] = buf[i + num]
-	
-	// neuen Inhalt anfügen
-	for i in 0:num
-		buf[buf_size - num + i] = (input.cur_buf.r[i] + input.cur_buf.l[i]) / 2
+	int num = clampi(available, 0, BUFFER_SIZE)
+	input.current_buffer.peekRef(buf, num)
 	
 	/*float w_f = 1.0 / freq * 440.0 * 2.0 * pi
 	for int i, 0, buf_size
 		float tt = i * w_f
 		buf[i] = f2i(val_max * sin(tt) * 0.1)*/
 	
+	float[] temp = buf.r + buf.l
+	
 	complex[] bufc
 	bufc.resize(buf.num / 2 + 1)
-	fft_r2c(buf, bufc)
+	fft_r2c(temp, bufc)
 	float max = 0
 	float fmax = 0, fmax2 = 0
 	for b,i in bufc
@@ -238,7 +238,7 @@ void UpdateInput()
 	if max > threshold
 		PlayedData p
 		p.offset = Offset
-		p.length = input.cur_buf.num
+		p.length = buf.num
 		p.correct = false
 		LoudEnough = true
 		Frequency = fmax
@@ -246,7 +246,8 @@ void UpdateInput()
 		//Frequency = fmax
 		Error = error
 	
-		for n in MidiTrack.midi.note
+		MidiNote[] notes = MidiTrack.midi.getNotes(audio.getRange())
+		for n in notes
 			if n.range.offset <= Offset and n.range.offset + n.range.length > Offset
 				if n.pitch == p.note
 					Score += p.length * ScoreFactor
@@ -254,7 +255,6 @@ void UpdateInput()
 		played.add(p)
 	else
 		LoudEnough = false
-	Offset += input.cur_buf.num
 	if played.num > 500
 		played.remove(0)
 		
@@ -274,7 +274,8 @@ void StartLesson(string name)
 			MidiTrack = t
 			
 	float num_samples = 0
-	for n in MidiTrack.midi.note
+	MidiNote[] notes = MidiTrack.midi.getNotes(audio.getRange())
+	for n in notes
 		num_samples += n.range.length
 	ScoreFactor = 100 / num_samples
 	for t in audio.tag
@@ -291,11 +292,9 @@ void StartLesson(string name)
 		audio.sample_rate = audio.sample_rate * 1.4
 		ScoreFactor *= 1.5
 	
-	LessonLength = MidiTrack.midi.note[MidiTrack.midi.note.num - 1].range.offset + audio.sample_rate * 4
+	LessonLength = MidiTrack.midi.getRange().length + audio.sample_rate * 4
 
-	buf.resize(1000)
 	bufc.resize(1000)
-	fft_r2c(buf, bufc)
 	
 	input.start(TRACK_TYPE_AUDIO, audio.sample_rate)
 	input.addObserver(nil, &UpdateInput)

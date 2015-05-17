@@ -24,9 +24,9 @@ void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpoin
 	gtk_tree_model_get_iter(model, &iter, path);
 	bool state = gtk_cell_renderer_toggle_get_active(cell);
 	state = !state;
-	if (c->type == HuiKindListView)
+	if (c->type == HUI_KIND_LISTVIEW)
 		gtk_list_store_set(GTK_LIST_STORE(model), &iter, column, state, -1);
-	else if (c->type == HuiKindTreeView)
+	else if (c->type == HUI_KIND_TREEVIEW)
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, column, state, -1);
 
 	c->panel->win->input.column = column;
@@ -44,9 +44,9 @@ void list_edited_callback(GtkCellRendererText *cell, const gchar *path_string, c
 	GtkTreeIter iter;
 	gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
 	gtk_tree_model_get_iter(model, &iter, path);
-	if (c->type == HuiKindListView)
+	if (c->type == HUI_KIND_LISTVIEW)
 		gtk_list_store_set(GTK_LIST_STORE(model), &iter, column, new_text, -1);
-	else if (c->type == HuiKindTreeView)
+	else if (c->type == HUI_KIND_TREEVIEW)
 		gtk_tree_store_set(GTK_TREE_STORE(model), &iter, column, new_text, -1);
 
 
@@ -108,7 +108,7 @@ void OnGtkListSelect(GtkTreeSelection *selection, gpointer data)
 
 
 HuiControlListView::HuiControlListView(const string &title, const string &id, HuiPanel *panel) :
-	HuiControl(HuiKindListView, id)
+	HuiControl(HUI_KIND_LISTVIEW, id)
 {
 	GetPartStrings(id, title);
 

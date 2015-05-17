@@ -10,7 +10,7 @@
 #ifdef HUI_API_GTK
 
 HuiControlPaned::HuiControlPaned(const string &title, const string &id) :
-	HuiControl(HuiKindPaned, id)
+	HuiControl(HUI_KIND_PANED, id)
 {
 }
 

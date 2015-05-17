@@ -250,8 +250,8 @@ void HuiPanel::addControl(const string &type, const string &title, int x, int y,
 		addColorButton(title, x, y, width, height, id);
 	else if (type == "DefButton")
 		addDefButton(title, x, y, width, height, id);
-	else if (type == "Text")
-		addText(title, x, y, width, height, id);
+	else if ((type == "Label") or (type == "Text"))
+		addLabel(title, x, y, width, height, id);
 	else if (type == "Edit")
 		addEdit(title, x, y, width, height, id);
 	else if (type == "MultilineEdit")
@@ -278,7 +278,7 @@ void HuiPanel::addControl(const string &type, const string &title, int x, int y,
 		addImage(title, x, y, width, height, id);
 	else if (type == "DrawingArea")
 		addDrawingArea(title, x, y, width, height, id);
-	else if ((type == "ControlTable") || (type == "Grid"))
+	else if ((type == "ControlTable") or (type == "Grid"))
 		addGrid(title, x, y, width, height, id);
 	else if (type == "SpinButton")
 		addSpinButton(title, x, y, width, height, id);
@@ -294,6 +294,10 @@ void HuiPanel::addControl(const string &type, const string &title, int x, int y,
 		addPaned(title, x, y, width, height, id);
 	else if (type == "Separator")
 		addSeparator(title, x, y, width, height, id);
+	else if (type == "Revealer")
+		addRevealer(title, x, y, width, height, id);
+	else
+		msg_error("unknown hui control: " + type);
 }
 
 void HuiPanel::fromResource(const string &id)
@@ -638,6 +642,21 @@ bool HuiPanel::isExpanded(const string &_id, int row)
 {
 	test_controls(_id, c)
 		return false;
+	return false;
+}
+
+//    for Revealer
+void HuiPanel::reveal(const string &_id, bool reveal)
+{
+	test_controls(_id, c)
+		c->reveal(reveal);
+}
+
+//    for Revealer
+bool HuiPanel::isRevealed(const string &_id)
+{
+	test_controls(_id, c)
+		return c->isRevealed();
 	return false;
 }
 

@@ -11,7 +11,7 @@
 #ifdef HUI_API_GTK
 
 HuiControlGroup::HuiControlGroup(const string &title, const string &id) :
-	HuiControl(HuiKindGroup, id)
+	HuiControl(HUI_KIND_GROUP, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_frame_new(sys_str(PartString[0]));

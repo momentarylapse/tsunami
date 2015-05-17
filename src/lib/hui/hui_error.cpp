@@ -66,15 +66,15 @@ void HuiSendBugReport()
 {
 	// dialog
 	ReportDialog = new HuiFixedDialog(_("Fehlerbericht"),400,295,ErrorDialog,false);
-	ReportDialog->addText(_("!bold$Name:"),5,5,360,25,"brd_t_name");
+	ReportDialog->addLabel(_("!bold$Name:"),5,5,360,25,"brd_t_name");
 	ReportDialog->addEdit("",5,35,385,25,"report_sender");
 	ReportDialog->addDefButton(_("OK"),265,255,120,25,"ok");
 	ReportDialog->setImage("ok", "hui:ok");
 	ReportDialog->addButton(_("Abbrechen"),140,255,120,25,"cancel");
 	ReportDialog->setImage("cancel", "hui:cancel");
-	ReportDialog->addText(_("!bold$Kommentar/Geschehnisse:"),5,65,360,25,"brd_t_comment");
+	ReportDialog->addLabel(_("!bold$Kommentar/Geschehnisse:"),5,65,360,25,"brd_t_comment");
 	ReportDialog->addMultilineEdit("",5,95,385,110,"comment");
-	ReportDialog->addText(_("!wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt"),5,210,390,35,"brd_t_explanation");
+	ReportDialog->addLabel(_("!wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt"),5,210,390,35,"brd_t_explanation");
 
 	ReportDialog->setString("report_sender",_("(anonym)"));
 	ReportDialog->setString("comment",_("Ist halt irgendwie passiert..."));
@@ -127,7 +127,7 @@ void hui_default_error_handler()
 
 	// dialog
 	ErrorDialog = new HuiFixedDialog(_("Fehler"),600,500,NULL,false);
-	ErrorDialog->addText(HuiGetProperty("name") + " " + HuiGetProperty("version") + _(" ist abgest&urzt!		Die letzten Zeilen der Datei message.txt:"),5,5,590,20,"error_header");
+	ErrorDialog->addLabel(HuiGetProperty("name") + " " + HuiGetProperty("version") + _(" ist abgest&urzt!		Die letzten Zeilen der Datei message.txt:"),5,5,590,20,"error_header");
 	ErrorDialog->addListView(_("Nachrichten"),5,30,590,420,"message_list");
 	//ErrorDialog->AddEdit("",5,30,590,420,"message_list";
 	ErrorDialog->addButton(_("OK"),5,460,100,25,"ok");

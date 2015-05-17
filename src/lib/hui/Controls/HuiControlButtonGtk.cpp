@@ -15,7 +15,7 @@ void OnGtkButtonPress(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:click");	}
 
 HuiControlButton::HuiControlButton(const string &title, const string &id) :
-	HuiControl(HuiKindButton, id)
+	HuiControl(HUI_KIND_BUTTON, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_button_new_with_label(sys_str(PartString[0]));

@@ -21,7 +21,7 @@ void OnGtkListSelect(GtkTreeSelection *selection, gpointer data);
 void *get_gtk_image_pixbuf(const string &image); // -> hui_menu_gtk.cpp
 
 HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, HuiPanel *panel) :
-	HuiControl(HuiKindTreeView, id)
+	HuiControl(HUI_KIND_TREEVIEW, id)
 {
 	GetPartStrings(id, title);
 

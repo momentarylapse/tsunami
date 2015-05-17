@@ -23,7 +23,7 @@ TrackMixer::TrackMixer()
 	addGrid("", 0, 0, 1, 4, id_grid);
 	setTarget(id_grid, 0);
 	id_name = "track_name";
-	addText("!center\\...", 0, 0, 0, 0, id_name);
+	addLabel("!center\\...", 0, 0, 0, 0, id_name);
 	vol_slider_id = "volume";
 	pan_slider_id = "panning";
 	mute_id = "mute";
@@ -118,7 +118,7 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, AudioStrea
 
 
 	setTarget("mc_output", 0);
-	addText(_("!bold,center\\Ausgabe"), 0, 0, 0, 0, "");
+	addLabel(_("!bold,center\\Ausgabe"), 0, 0, 0, 0, "");
 	addDrawingArea("!width=100,height=30,noexpandx,noexpandy", 0, 1, 0, 0, "mc_output_peaks");
 	addSlider("!vertical,expandy", 0, 2, 0, 0, "mc_output_volume");
 

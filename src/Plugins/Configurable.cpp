@@ -325,10 +325,10 @@ public:
 		addGrid("", 0, 1, 4, aa.num, "main-table");
 		setTarget("main-table", 0);
 		foreachi(AutoConfigData &a, aa, i){
-			addText(a.name, 0, i, 0, 0, "");
+			addLabel(a.name, 0, i, 0, 0, "");
 			addSlider("!width=150", 1, i, 0, 0, "slider-" + i);
 			addSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
-			addText(a.unit, 3, i, 0, 0, "");
+			addLabel(a.unit, 3, i, 0, 0, "");
 			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::onChange, *a.value, this));
 		}
 	}
@@ -405,7 +405,7 @@ public:
 			addButton(_("Vorschau"), 0, 0, 0, 0, "preview");
 			setImage("preview", "hui:media-play");
 		}
-		addText("!width=30", 1, 0, 0, 0, "");
+		addLabel("!width=30", 1, 0, 0, 0, "");
 		addButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
 		setImage("cancel", "hui:cancel");
 		addDefButton(_("OK"), 3, 0, 0, 0, "ok");

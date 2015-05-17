@@ -20,7 +20,7 @@ static void OnGtkExpanderExpand(GObject* object, GParamSpec *param_spec, gpointe
 }
 
 HuiControlExpander::HuiControlExpander(const string &title, const string &id) :
-	HuiControl(HuiKindExpander, id)
+	HuiControl(HUI_KIND_EXPANDER, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_expander_new(sys_str("<b>" + PartString[0] + "</b>"));

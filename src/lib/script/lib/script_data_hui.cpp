@@ -131,7 +131,7 @@ void SIAddPackageHui()
 				func_add_param("width",		TypeInt);
 				func_add_param("height",	TypeInt);
 				func_add_param("id",		TypeString);
-			class_add_func("addText",										TypeVoid,		mf(&HuiPanel::addText));
+			class_add_func("addLabel",										TypeVoid,		mf(&HuiPanel::addLabel));
 				func_add_param("title",		TypeString);
 				func_add_param("x",			TypeInt);
 				func_add_param("y",			TypeInt);
@@ -261,6 +261,13 @@ void SIAddPackageHui()
 				func_add_param("height",	TypeInt);
 				func_add_param("id",		TypeString);
 			class_add_func("addPaned",								TypeVoid,		mf(&HuiPanel::addPaned));
+				func_add_param("title",		TypeString);
+				func_add_param("x",			TypeInt);
+				func_add_param("y",			TypeInt);
+				func_add_param("width",		TypeInt);
+				func_add_param("height",	TypeInt);
+				func_add_param("id",		TypeString);
+			class_add_func("addRevealer",								TypeVoid,		mf(&HuiPanel::addRevealer));
 				func_add_param("title",		TypeString);
 				func_add_param("x",			TypeInt);
 				func_add_param("y",			TypeInt);

@@ -15,6 +15,7 @@
 #include "Controls/HuiControlPaned.h"
 #include "Controls/HuiControlProgressBar.h"
 #include "Controls/HuiControlRadioButton.h"
+#include "Controls/HuiControlRevealer.h"
 #include "Controls/HuiControlScroller.h"
 #include "Controls/HuiControlSeparator.h"
 #include "Controls/HuiControlSlider.h"
@@ -94,15 +95,15 @@ void HuiPanel::_insert_control_(HuiControl *c, int x, int y, int width, int heig
 	c->is_button_bar = false;
 	if (is_resizable){
 		if (cur_control){
-			if (cur_control->type == HuiKindControlTable){
+			if (cur_control->type == HUI_KIND_GRID){
 				cur_control->add(c, x, y);
-			}else if (cur_control->type == HuiKindTabControl){
+			}else if (cur_control->type == HUI_KIND_TABCONTROL){
 				cur_control->add(c, tab_creation_page, 0);
-			}else if (cur_control->type == HuiKindGroup){
+			}else if (cur_control->type == HUI_KIND_GROUP){
 				cur_control->add(c, 0, 0);
-			}else if (cur_control->type == HuiKindExpander){
+			}else if (cur_control->type == HUI_KIND_EXPANDER){
 				cur_control->add(c, 0, 0);
-			}else if (cur_control->type == HuiKindScroller){
+			}else if (cur_control->type == HUI_KIND_SCROLLER){
 				cur_control->add(c, 0, 0);
 			}
 		}else{
@@ -116,15 +117,15 @@ void HuiPanel::_insert_control_(HuiControl *c, int x, int y, int width, int heig
 			}
 		}
 	}else{
-		if ((c->type == HuiKindButton) || (c->type == HuiKindColorButton) || (c->type == HuiKindComboBox)){
+		if ((c->type == HUI_KIND_BUTTON) || (c->type == HUI_KIND_COLORBUTTON) || (c->type == HUI_KIND_COMBOBOX)){
 			x -= 1;
 			y -= 1;
 			width += 2;
 			height += 2;
-		}else if (c->type == HuiKindText){
+		}else if (c->type == HUI_KIND_LABEL){
 			y -= 4;
 			height += 8;
-		}else if (c->type == HuiKindDrawingArea){
+		}else if (c->type == HUI_KIND_DRAWINGAREA){
 			/*x -= 2;
 			y -= 2;*/
 		}
@@ -239,7 +240,7 @@ void HuiPanel::addCheckBox(const string &title,int x,int y,int width,int height,
 	_insert_control_(new HuiControlCheckBox(title, id), x, y, width, height);
 }
 
-void HuiPanel::addText(const string &title,int x,int y,int width,int height,const string &id)
+void HuiPanel::addLabel(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_insert_control_(new HuiControlLabel(title, id), x, y, width, height);
 }
@@ -398,6 +399,11 @@ void HuiPanel::addScroller(const string &title,int x,int y,int width,int height,
 void HuiPanel::addSeparator(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_insert_control_(new HuiControlSeparator(title, id), x, y, width, height);
+}
+
+void HuiPanel::addRevealer(const string &title,int x,int y,int width,int height,const string &id)
+{
+	_insert_control_(new HuiControlRevealer(title, id), x, y, width, height);
 }
 
 void HuiPanel::embedDialog(const string &id, int x, int y)

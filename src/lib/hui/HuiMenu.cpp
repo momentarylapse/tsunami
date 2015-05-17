@@ -136,7 +136,7 @@ void HuiMenu::enable(const string &id, bool enabled)
 	foreach(HuiControl *c, item){
 		if (c->id == id)
 			c->enable(enabled);
-		if (c->type == HuiKindMenuItemSubmenu)
+		if (c->type == HUI_KIND_MENU_SUBMENU)
 			dynamic_cast<HuiMenuItemSubmenu*>(c)->sub_menu->enable(id, enabled);
 	}
 }

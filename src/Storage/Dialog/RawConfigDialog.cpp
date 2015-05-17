@@ -22,13 +22,13 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, HuiWindow *parent) :
 	addGrid("", 0, 0, 2, 4, "table2");
 	addGrid("", 0, 1, 2, 1, "table3");
 	setTarget("table2", 0);
-	addText(_("Format"), 0, 0, 0, 0, "");
+	addLabel(_("Format"), 0, 0, 0, 0, "");
 	addComboBox("", 1, 0, 0, 0, "format");
-	addText(_("Kan&ale"), 0, 1, 0, 0, "");
+	addLabel(_("Kan&ale"), 0, 1, 0, 0, "");
 	addComboBox("Mono\\Stereo", 1, 1, 0, 0, "channels");
-	addText(_("Samplerate"), 0, 2, 0, 0, "");
+	addLabel(_("Samplerate"), 0, 2, 0, 0, "");
 	addSpinButton("44100\\1", 1, 2, 0, 0, "sample_rate");
-	addText(_("Offset"), 0, 3, 0, 0, "");
+	addLabel(_("Offset"), 0, 3, 0, 0, "");
 	addSpinButton("0\\0", 1, 3, 0, 0, "offset");
 	setTarget("table3", 0);
 	addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");

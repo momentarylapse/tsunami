@@ -71,14 +71,14 @@ class Equalizer15Panel : ConfigPanel
 		for i in 0:NUM_BANDS
 			addSlider("!expandy,vertical", i, 0, 0, 0, "slider_" + i)
 			//addString("slider_" + i, "0.5:0")
-		addText("20", 0, 1, 0, 0, "")
-		addText("54", 2, 1, 0, 0, "")
-		addText("140", 4, 1, 0, 0, "")
-		addText("390", 6, 1, 0, 0, "")
-		addText("1k", 8, 1, 0, 0, "")
-		addText("2k8", 10, 1, 0, 0, "")
-		addText("7k5", 12, 1, 0, 0, "")
-		addText("20k", 14, 1, 0, 0, "")
+		addLabel("20", 0, 1, 0, 0, "")
+		addLabel("54", 2, 1, 0, 0, "")
+		addLabel("140", 4, 1, 0, 0, "")
+		addLabel("390", 6, 1, 0, 0, "")
+		addLabel("1k", 8, 1, 0, 0, "")
+		addLabel("2k8", 10, 1, 0, 0, "")
+		addLabel("7k5", 12, 1, 0, 0, "")
+		addLabel("20k", 14, 1, 0, 0, "")
 	
 		event("*", &onEvent)
 	

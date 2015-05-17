@@ -16,7 +16,7 @@ void OnGtkMultilineEditChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlMultilineEdit::HuiControlMultilineEdit(const string &title, const string &id) :
-	HuiControl(HuiKindMultilineEdit, id)
+	HuiControl(HUI_KIND_MULTILINEEDIT, id)
 {
 	GetPartStrings(id, title);
 	GtkTextBuffer *tb = gtk_text_buffer_new(NULL);

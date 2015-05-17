@@ -102,6 +102,7 @@ OBJ = \
  lib/hui/Controls/HuiControlPanedGtk.o\
  lib/hui/Controls/HuiControlProgressBarGtk.o\
  lib/hui/Controls/HuiControlRadioButtonGtk.o\
+ lib/hui/Controls/HuiControlRevealerGtk.o\
  lib/hui/Controls/HuiControlScrollerGtk.o\
  lib/hui/Controls/HuiControlSeparatorGtk.o\
  lib/hui/Controls/HuiControlSliderGtk.o\
@@ -550,6 +551,9 @@ lib/hui/Controls/HuiControlProgressBarGtk.o : lib/hui/Controls/HuiControlProgres
 
 lib/hui/Controls/HuiControlRadioButtonGtk.o : lib/hui/Controls/HuiControlRadioButtonGtk.cpp
 	$(CPP) -c lib/hui/Controls/HuiControlRadioButtonGtk.cpp -o $@ $(CXXFLAGS)
+
+lib/hui/Controls/HuiControlRevealerGtk.o : lib/hui/Controls/HuiControlRevealerGtk.cpp
+	$(CPP) -c lib/hui/Controls/HuiControlRevealerGtk.cpp -o $@ $(CXXFLAGS)
 
 lib/hui/Controls/HuiControlScrollerGtk.o : lib/hui/Controls/HuiControlScrollerGtk.cpp
 	$(CPP) -c lib/hui/Controls/HuiControlScrollerGtk.cpp -o $@ $(CXXFLAGS)

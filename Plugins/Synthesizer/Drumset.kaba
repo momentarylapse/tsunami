@@ -97,7 +97,7 @@ class DrumsetPanel : ConfigPanel
 		sc = &c.config
 		addGrid("", 0, 0, 2, 1, "grid")
 		setTarget("grid", 0)
-		addText("Set", 0 ,0, 0, 0, "")
+		addLabel("Set", 0 ,0, 0, 0, "")
 		addComboBox("", 1, 0, 0, 0, "sets")
 		event("sets", &onSelect)
 

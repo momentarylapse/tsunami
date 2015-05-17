@@ -15,7 +15,7 @@ void OnGtkToolbarItemPress(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:click");	}
 
 HuiToolItemButton::HuiToolItemButton(const string &title, const string &image, const string &id) :
-	HuiControl(HuiKindToolButton, id)
+	HuiControl(HUI_KIND_TOOL_BUTTON, id)
 {
 	GtkWidget *im = (GtkWidget*)get_gtk_image(image, true);
 	gtk_widget_show(im);

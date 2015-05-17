@@ -15,7 +15,7 @@ void OnGtkToggleButtonToggle(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlToggleButton::HuiControlToggleButton(const string &title, const string &id) :
-	HuiControl(HuiKindToggleButton, id)
+	HuiControl(HUI_KIND_TOGGLEBUTTON, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_toggle_button_new_with_label(sys_str(PartString[0]));

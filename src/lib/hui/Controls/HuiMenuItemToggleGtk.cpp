@@ -13,7 +13,7 @@ void try_add_accel(GtkWidget *item, const string &id);
 gboolean OnGtkMenuClick(GtkWidget *widget, gpointer data);
 
 HuiMenuItemToggle::HuiMenuItemToggle(const string &title, const string &id) :
-	HuiControl(HuiKindMenuItemToggle, id)
+	HuiControl(HUI_KIND_MENU_TOGGLEITEM, id)
 {
 	widget = gtk_check_menu_item_new_with_label(get_lang_sys(id, title, false));
 	g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(OnGtkMenuClick), this);

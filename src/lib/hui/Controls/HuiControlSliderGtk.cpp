@@ -13,7 +13,7 @@ void OnGtkSliderChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool _vertical) :
-	HuiControl(HuiKindSlider, id)
+	HuiControl(HUI_KIND_SLIDER, id)
 {
 	vertical = _vertical;
 	GetPartStrings(id, title);

@@ -15,13 +15,13 @@ void OnGtkRadioButtonToggle(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlRadioButton::HuiControlRadioButton(const string &title, const string &id, HuiPanel *panel) :
-	HuiControl(HuiKindRadioButton, id)
+	HuiControl(HUI_KIND_RADIOBUTTON, id)
 {
 	GetPartStrings(id, title);
 	string group_id = id.head(id.find(":"));
 	GSList *group = NULL;
 	foreach(HuiControl *c, panel->control)
-		if (c->type == HuiKindRadioButton)
+		if (c->type == HUI_KIND_RADIOBUTTON)
 			if (c->id.find(":"))
 				if (c->id.head(c->id.find(":")) == group_id)
 					group = gtk_radio_button_get_group(GTK_RADIO_BUTTON(c->widget));

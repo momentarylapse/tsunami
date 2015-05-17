@@ -42,7 +42,7 @@ class VolumePanel : ConfigPanel
 		setTarget("table2", 0)
 		addSlider("!expandx", 0, 0, 0, 0, "volume_slider")
 		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
-		addText("%", 2, 0, 0, 0, "")
+		addLabel("%", 2, 0, 0, 0, "")
 		
 		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.Volume)
 	

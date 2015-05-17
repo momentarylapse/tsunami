@@ -164,12 +164,12 @@ class CompressorPanel : ConfigPanel
 		addDrawingArea("!grabfocus", 0, 0, 0, 0, "drawing_area")
 		addGrid("!noexpandy", 0, 1, 6, 1, "table2")
 		setTarget("table2", 0)
-		addText("Attack", 0, 0, 0, 0, "")
+		addLabel("Attack", 0, 0, 0, 0, "")
 		addSpinButton("\\0\\100\\0.1", 1, 0, 0, 0, "attack")
-		addText("ms", 2, 0, 0, 0, "")
-		addText("Release", 3, 0, 0, 0, "")
+		addLabel("ms", 2, 0, 0, 0, "")
+		addLabel("Release", 3, 0, 0, 0, "")
 		addSpinButton("\\0\\1000\\0.1", 4, 0, 0, 0, "release")
-		addText("ms", 5, 0, 0, 0, "")
+		addLabel("ms", 5, 0, 0, 0, "")
 		
 		grid.config = &_fx.config
 		grid.cp = self

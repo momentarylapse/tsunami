@@ -202,7 +202,7 @@ gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 }
 
 HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &id) :
-	HuiControl(HuiKindDrawingArea, id)
+	HuiControl(HUI_KIND_DRAWINGAREA, id)
 {
 	GetPartStrings(id, title);
 	GtkWidget *da = gtk_drawing_area_new();

@@ -10,7 +10,7 @@
 #ifdef HUI_API_GTK
 
 HuiControlScroller::HuiControlScroller(const string &title, const string &id) :
-	HuiControl(HuiKindScroller, id)
+	HuiControl(HUI_KIND_SCROLLER, id)
 {
 	widget = gtk_scrolled_window_new(NULL, NULL);
 	viewport = NULL;

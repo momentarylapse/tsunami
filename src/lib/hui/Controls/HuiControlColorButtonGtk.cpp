@@ -16,7 +16,7 @@ void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlColorButton::HuiControlColorButton(const string &title, const string &id) :
-	HuiControl(HuiKindColorButton, id)
+	HuiControl(HUI_KIND_COLORBUTTON, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_color_button_new();

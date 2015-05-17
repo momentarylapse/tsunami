@@ -22,7 +22,7 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	setTarget("button_grid", 0);
 	addButton("!noexpandx,flat", 0, 0, 0, 0, "close");
 	setImage("close", "hui:close");
-	addText("!big,expandx,center\\...", 1, 0, 0, 0, "title");
+	addLabel("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 	sub_dialog = new SubDialog(view, audio);
 	embed(sub_dialog, "console_grid", 0, 0);
 

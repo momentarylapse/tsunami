@@ -8,7 +8,7 @@
 #include "HuiControlSeparator.h"
 
 HuiControlSeparator::HuiControlSeparator(const string &text, const string &_id) :
-	HuiControl(HuiKindSeparator, _id)
+	HuiControl(HUI_KIND_SEPARATOR, _id)
 {
 	GetPartStrings(id, text);
 	if (OptionString.find("vertical") >= 0)

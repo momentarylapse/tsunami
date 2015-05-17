@@ -11,7 +11,7 @@
 #ifdef HUI_API_GTK
 
 HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
-	HuiControl(HuiKindText, id)
+	HuiControl(HUI_KIND_LABEL, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_label_new("");

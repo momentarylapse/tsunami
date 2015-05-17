@@ -70,7 +70,7 @@ public:
 	void _cdecl addToggleButton(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addCheckBox(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addRadioButton(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addText(const string &title,int x,int y,int width,int height,const string &id);
+	void _cdecl addLabel(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addEdit(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addMultilineEdit(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addGroup(const string &title,int x,int y,int width,int height,const string &id);
@@ -91,6 +91,7 @@ public:
 	void _cdecl addExpander(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addSeparator(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addPaned(const string &title,int x,int y,int width,int height,const string &id);
+	void _cdecl addRevealer(const string &title,int x,int y,int width,int height,const string &id);
 
 	void _cdecl embedDialog(const string &id, int x, int y);
 	void _cdecl embedSource(const string &source, const string &parent_id, int x, int y);
@@ -120,6 +121,9 @@ public:
 	void _cdecl expandAll(const string &id, bool expand);
 	void _cdecl expand(const string &id, int row, bool expand);
 	bool _cdecl isExpanded(const string &id, int row);
+	// revealer
+	void _cdecl reveal(const string &id, bool reveal);
+	bool _cdecl isRevealed(const string &id);
 	// stuff
 	void _cdecl enable(const string &id, bool enabled);
 	bool _cdecl isEnabled(const string &id);

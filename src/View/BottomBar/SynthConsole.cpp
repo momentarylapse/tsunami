@@ -35,14 +35,14 @@ public:
 		addButton("!flat", 1, 0, 0, 0, "save_favorite");
 		setImage("save_favorite", "hui:save");
 		setTooltip("save_favorite", _("Parameter speichern"));
-		addText("!bold,center,expandx\\" + synth->name, 2, 0, 0, 0, "");
+		addLabel("!bold,center,expandx\\" + synth->name, 2, 0, 0, 0, "");
 		p = synth->createPanel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
 			setTarget("grid", 0);
-			addText(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
+			addLabel(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}

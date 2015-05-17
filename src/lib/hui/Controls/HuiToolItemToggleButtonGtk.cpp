@@ -14,7 +14,7 @@ void *get_gtk_image(const string &image, bool large);
 void OnGtkToolbarItemPress(GtkWidget *widget, gpointer data);
 
 HuiToolItemToggleButton::HuiToolItemToggleButton(const string &title, const string &image, const string &id) :
-	HuiControl(HuiKindToolToggleButton, id)
+	HuiControl(HUI_KIND_TOOL_TOGGLEBUTTON, id)
 {
 	GtkWidget *im = (GtkWidget*)get_gtk_image(image, true);
 	gtk_widget_show(im);

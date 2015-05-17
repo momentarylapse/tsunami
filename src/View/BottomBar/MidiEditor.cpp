@@ -36,7 +36,7 @@ public:
 		addButton("!flat", 1, 0, 0, 0, "save_favorite");
 		setImage("save_favorite", "hui:save");
 		setTooltip("save_favorite", _("Parameter speichern"));
-		addText("!bold,center,expandx\\" + fx->name, 2, 0, 0, 0, "");
+		addLabel("!bold,center,expandx\\" + fx->name, 2, 0, 0, 0, "");
 		addCheckBox("", 3, 0, 0, 0, "enabled");
 		setTooltip("enabled", _("aktiv?"));
 		addButton("!flat", 4, 0, 0, 0, "delete");
@@ -48,7 +48,7 @@ public:
 			p->update();
 		}else{
 			setTarget("grid", 0);
-			addText(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
+			addLabel(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}

@@ -11,7 +11,7 @@
 #ifdef HUI_API_GTK
 
 HuiControlProgressBar::HuiControlProgressBar(const string &title, const string &id) :
-	HuiControl(HuiKindProgressBar, id)
+	HuiControl(HUI_KIND_PROGRESSBAR, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_progress_bar_new();

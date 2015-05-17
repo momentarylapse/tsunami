@@ -10,7 +10,7 @@
 #ifdef HUI_API_GTK
 
 HuiMenuItemSeparator::HuiMenuItemSeparator() :
-	HuiControl(HuiKindMenuItemSeparator, "")
+	HuiControl(HUI_KIND_MENU_SEPARATOR, "")
 {
 	widget = gtk_separator_menu_item_new();
 }

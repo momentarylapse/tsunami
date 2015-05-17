@@ -33,7 +33,7 @@ public:
 		addButton("!flat", 1, 0, 0, 0, "save_favorite");
 		setImage("save_favorite", "hui:save");
 		setTooltip("save_favorite", _("Parameter speichern"));
-		addText("!bold,center,expandx\\" + fx->name, 2, 0, 0, 0, "");
+		addLabel("!bold,center,expandx\\" + fx->name, 2, 0, 0, 0, "");
 		addCheckBox("", 3, 0, 0, 0, "enabled");
 		setTooltip("enabled", _("aktiv?"));
 		addButton("!flat", 4, 0, 0, 0, "delete");
@@ -45,7 +45,7 @@ public:
 			p->update();
 		}else{
 			setTarget("grid", 0);
-			addText(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
+			addLabel(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}
@@ -128,7 +128,7 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 
 	addGrid("!expandy", 0, 0, 1, 32, id_inner);
 	setTarget(id_inner, 0);
-	addText(_("- hier sind (noch) keine Effekte aktiv -"), 30, 0, 0, 0, "comment_no_fx");
+	addLabel(_("- hier sind (noch) keine Effekte aktiv -"), 30, 0, 0, 0, "comment_no_fx");
 	addButton("!expandy,flat", 31, 0, 0, 0, "add");
 	setImage("add", "hui:add");
 	setTooltip("add", _("neuen Effekt hinzuf&ugen"));

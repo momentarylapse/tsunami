@@ -11,7 +11,7 @@
 #ifdef HUI_API_GTK
 
 HuiControlGrid::HuiControlGrid(const string &title, const string &id, int num_x, int num_y, HuiPanel *panel) :
-	HuiControl(HuiKindControlTable, id)
+	HuiControl(HUI_KIND_GRID, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_grid_new();

@@ -79,6 +79,8 @@ public:
 	virtual void expand(int row, bool expand){}
 	virtual void expandAll(bool expand){}
 	virtual bool isExpanded(int row){ return false; }
+	virtual void reveal(bool reveal){}
+	virtual bool isRevealed(){ return false; }
 
 	virtual void enable(bool enabled);
 	virtual bool isEnabled();

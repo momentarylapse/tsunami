@@ -13,7 +13,7 @@ void OnGtkComboboxChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
-	HuiControl(HuiKindComboBox, id)
+	HuiControl(HUI_KIND_COMBOBOX, id)
 {
 	GetPartStrings(id, title);
 	if (OptionString.find("editable") >= 0){

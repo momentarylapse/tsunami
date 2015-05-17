@@ -11,7 +11,7 @@
 #ifdef HUI_API_GTK
 
 HuiMenuItemSubmenu::HuiMenuItemSubmenu(const string &title, HuiMenu *menu, const string &id) :
-	HuiControl(HuiKindMenuItemSubmenu, id)
+	HuiControl(HUI_KIND_MENU_SUBMENU, id)
 {
 	widget = gtk_menu_item_new_with_label(get_lang_sys(id, title));
 	gtk_menu_item_set_submenu(GTK_MENU_ITEM(widget), menu->widget);

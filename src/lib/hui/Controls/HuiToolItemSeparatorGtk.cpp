@@ -10,7 +10,7 @@
 #ifdef HUI_API_GTK
 
 HuiToolItemSeparator::HuiToolItemSeparator() :
-	HuiControl(HuiKindToolSeparator, "")
+	HuiControl(HUI_KIND_TOOL_SEPARATOR, "")
 {
 	widget = GTK_WIDGET(gtk_separator_tool_item_new());
 }

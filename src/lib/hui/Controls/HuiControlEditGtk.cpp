@@ -15,7 +15,7 @@ void OnGtkEditChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlEdit::HuiControlEdit(const string &title, const string &id) :
-	HuiControl(HuiKindEdit, id)
+	HuiControl(HUI_KIND_EDIT, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_entry_new();

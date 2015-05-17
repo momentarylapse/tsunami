@@ -13,7 +13,7 @@ void OnGtkCheckboxChange(GtkWidget *widget, gpointer data)
 {	((HuiControl*)data)->notify("hui:change");	}
 
 HuiControlCheckBox::HuiControlCheckBox(const string &title, const string &id) :
-	HuiControl(HuiKindCheckBox, id)
+	HuiControl(HUI_KIND_CHECKBOX, id)
 {
 	GetPartStrings(id, title);
 	widget = gtk_check_button_new_with_label(sys_str(PartString[0]));

@@ -25,6 +25,8 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	ready = false;
 	console_when_ready = MIXING_CONSOLE;
 
+	addRevealer("", 0, 0, 0, 0, "revealer");
+	setTarget("revealer", 0);
 	addGrid("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
 	setTarget("root_grid0", 0);
 	addSeparator("!horizontal,expandx", 0, 0, 0, 0, "");
@@ -65,7 +67,9 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 
 	visible = true;
 	ready = true;
+	HuiPanel::show();
 	choose(console_when_ready);
+	reveal("revealer", true);
 }
 
 BottomBar::~BottomBar()
@@ -75,6 +79,20 @@ BottomBar::~BottomBar()
 void BottomBar::onClose()
 {
 	hide();
+}
+
+void BottomBar::show()
+{
+	reveal("revealer", true);
+	visible = true;
+	notify();
+}
+
+void BottomBar::hide()
+{
+	reveal("revealer", false);
+	visible = false;
+	notify();
 }
 
 void BottomBar::addConsole(BottomBarConsole *c, const string &list_name)

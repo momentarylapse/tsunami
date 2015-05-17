@@ -105,6 +105,8 @@ void HuiPanel::_insert_control_(HuiControl *c, int x, int y, int width, int heig
 				cur_control->add(c, 0, 0);
 			}else if (cur_control->type == HUI_KIND_SCROLLER){
 				cur_control->add(c, 0, 0);
+			}else if (cur_control->type == HUI_KIND_REVEALER){
+				cur_control->add(c, 0, 0);
 			}
 		}else{
 			root_control = c;

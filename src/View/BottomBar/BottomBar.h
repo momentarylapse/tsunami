@@ -45,6 +45,9 @@ public:
 	virtual void onShow();
 	virtual void onHide();
 
+	void show();
+	void hide();
+
 	enum
 	{
 		LOG_CONSOLE,

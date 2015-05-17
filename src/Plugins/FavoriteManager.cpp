@@ -149,10 +149,10 @@ public:
 		save = _save;
 		FavoriteSelectionDialogReturn = "";
 		names = _names;
-		addControlTable("", 0, 0, 1, 2, "grid");
+		addGrid("", 0, 0, 1, 2, "grid");
 		setTarget("grid", 0);
 		addListView("Name", 0, 0, 0, 0, "list");
-		addControlTable("", 0, 1, 2, 1, "grid2");
+		addGrid("", 0, 1, 2, 1, "grid2");
 		setTarget("grid2", 0);
 		addEdit("!expandx,placeholder=" + _("neuen Namen eingeben"), 0, 0, 0, 0, "name");
 		addDefButton("Ok", 1, 0, 0, 0, "ok");

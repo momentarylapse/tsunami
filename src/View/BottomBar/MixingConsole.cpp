@@ -20,7 +20,7 @@ TrackMixer::TrackMixer()
 {
 	string id_grid = "mixing_track_table";
 	id_separator = "mixing_track_separator";
-	addControlTable("", 0, 0, 1, 4, id_grid);
+	addGrid("", 0, 0, 1, 4, id_grid);
 	setTarget(id_grid, 0);
 	id_name = "track_name";
 	addText("!center\\...", 0, 0, 0, 0, id_name);
@@ -111,9 +111,9 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, AudioStrea
 	id_inner = "inner_table";
 
 
-	addControlTable("", 0, 0, 1, 20, id_inner);
+	addGrid("", 0, 0, 1, 20, id_inner);
 	setTarget(id_inner, 0);
-	addControlTable("", 0, 0, 1, 5, "mc_output");
+	addGrid("", 0, 0, 1, 5, "mc_output");
 	addSeparator("!vertical", 1, 0, 0, 0, "");
 
 

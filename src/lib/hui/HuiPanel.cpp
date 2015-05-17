@@ -279,7 +279,7 @@ void HuiPanel::addControl(const string &type, const string &title, int x, int y,
 	else if (type == "DrawingArea")
 		addDrawingArea(title, x, y, width, height, id);
 	else if ((type == "ControlTable") || (type == "Grid"))
-		addControlTable(title, x, y, width, height, id);
+		addGrid(title, x, y, width, height, id);
 	else if (type == "SpinButton")
 		addSpinButton(title, x, y, width, height, id);
 	else if (type == "RadioButton")

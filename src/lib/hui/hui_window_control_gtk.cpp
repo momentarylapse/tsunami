@@ -375,7 +375,7 @@ void HuiPanel::addDrawingArea(const string &title,int x,int y,int width,int heig
 }
 
 
-void HuiPanel::addControlTable(const string &title, int x, int y, int width, int height, const string &id)
+void HuiPanel::addGrid(const string &title, int x, int y, int width, int height, const string &id)
 {
 	_insert_control_(new HuiControlGrid(title, id, width, height, this), x, y, width, height);
 }

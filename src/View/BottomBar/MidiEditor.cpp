@@ -26,9 +26,9 @@ public:
 		track = t;
 		fx = _fx;
 		index = _index;
-		addControlTable("!noexpandx,expandy", 0, 0, 1, 2, "grid");
+		addGrid("!noexpandx,expandy", 0, 0, 1, 2, "grid");
 		setTarget("grid", 0);
-		addControlTable("", 0, 0, 5, 1, "header");
+		addGrid("", 0, 0, 5, 1, "header");
 		setTarget("header", 0);
 		addButton("!flat", 0, 0, 0, 0, "load_favorite");
 		setImage("load_favorite", "hui:open");

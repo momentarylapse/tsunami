@@ -15,7 +15,7 @@ LogDialog::LogDialog(Log *_log) :
 {
 	log = _log;
 
-	addControlTable("", 0, 0, 2, 1, "grid");
+	addGrid("", 0, 0, 2, 1, "grid");
 	setTarget("grid", 0);
 	addListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
 	addButton("", 1, 0, 0, 0, "clear");

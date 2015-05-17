@@ -320,9 +320,9 @@ public:
 		ConfigPanel(_c)
 	{
 		aa = _aa;
-		addControlTable("", 0, 0, 1, 3, "root-table");
+		addGrid("", 0, 0, 1, 3, "root-table");
 		setTarget("root-table", 0);
-		addControlTable("", 0, 1, 4, aa.num, "main-table");
+		addGrid("", 0, 1, 4, aa.num, "main-table");
 		setTarget("main-table", 0);
 		foreachi(AutoConfigData &a, aa, i){
 			addText(a.name, 0, i, 0, 0, "");
@@ -380,13 +380,13 @@ public:
 	{
 		config = c;
 		panel = p;
-		addControlTable("", 0, 0, 1, 3, "root-table");
+		addGrid("", 0, 0, 1, 3, "root-table");
 		setTarget("root-table", 0);
 		embed(panel, "root-table", 0, 1);
 
 		// favorite grid
 		setTarget("root-table", 0);
-		addControlTable("!noexpandy", 0, 0, 5, 1, "favorite_grid");
+		addGrid("!noexpandy", 0, 0, 5, 1, "favorite_grid");
 		setTarget("favorite_grid", 0);
 		addButton("!flat", 0, 0, 0, 0, "load_favorite");
 		setImage("load_favorite", "hui:open");
@@ -399,7 +399,7 @@ public:
 
 		// command grid
 		setTarget("root-table", 0);
-		addControlTable("!buttonbar", 0, 2, 4, 1, "command_grid");
+		addGrid("!buttonbar", 0, 2, 4, 1, "command_grid");
 		setTarget("command_grid", 0);
 		if (c->configurable_type == c->TYPE_EFFECT){
 			addButton(_("Vorschau"), 0, 0, 0, 0, "preview");

@@ -25,14 +25,14 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	ready = false;
 	console_when_ready = MIXING_CONSOLE;
 
-	addControlTable("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
+	addGrid("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
 	setTarget("root_grid0", 0);
 	addSeparator("!horizontal,expandx", 0, 0, 0, 0, "");
-	addControlTable("!expandx", 0, 1, 3, 1, "root_grid");
+	addGrid("!expandx", 0, 1, 3, 1, "root_grid");
 	setTarget("root_grid", 0);
-	addControlTable("!noexpandx,width=130", 0, 0, 1, 2, "button_grid");
+	addGrid("!noexpandx,width=130", 0, 0, 1, 2, "button_grid");
 	addSeparator("!vertical", 1, 0, 0, 0, "");
-	addControlTable("", 2, 0, 1, 20, "console_grid");
+	addGrid("", 2, 0, 1, 20, "console_grid");
 	setTarget("button_grid", 0);
 	addButton("!noexpandy,flat", 0, 0, 0, 0, "close");
 	setImage("close", "hui:close");

@@ -17,10 +17,10 @@ public:
 		HuiDialog(_("target"), 300, 400, parent->win, false),
 		targets(t)
 	{
-		addControlTable("", 0, 0, 1, 2, "grid");
+		addGrid("", 0, 0, 1, 2, "grid");
 		setTarget("grid", 0);
 		addListView("!multiselection,nobar\\name", 0, 0, 0, 0, "list");
-		addControlTable("!buttonbar", 0, 1, 2, 1, "buttonbar");
+		addGrid("!buttonbar", 0, 1, 2, 1, "buttonbar");
 		setTarget("buttonbar", 0);
 		addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
 		addButton(_("Ok"), 1, 0, 0, 0, "ok");
@@ -69,13 +69,13 @@ CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
 	view = _view;
 	audio = _audio;
 
-	addControlTable("", 0, 0, 2, 1, "root");
+	addGrid("", 0, 0, 2, 1, "root");
 	setTarget("root", 0);
 	addDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
-	addControlTable("", 1, 0, 1, 2, "controller");
+	addGrid("", 1, 0, 1, 2, "controller");
 	setTarget("controller", 0);
 	addListView("!noexpandx,format=TTTt,width=300\\name\\min\\max\\target", 0, 0, 0, 0, "list");
-	addControlTable("", 0, 1, 4, 1, "controller_buttons");
+	addGrid("", 0, 1, 4, 1, "controller_buttons");
 	setTarget("controller_buttons", 0);
 	addButton("add", 0, 0, 0, 0, "add");
 	addButton("delete", 1, 0, 0, 0, "delete");

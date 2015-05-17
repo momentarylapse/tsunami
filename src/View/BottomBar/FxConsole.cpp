@@ -23,9 +23,9 @@ public:
 		track = t;
 		fx = _fx;
 		index = _index;
-		addControlTable("!noexpandx,expandy", 0, 0, 1, 2, "grid");
+		addGrid("!noexpandx,expandy", 0, 0, 1, 2, "grid");
 		setTarget("grid", 0);
-		addControlTable("", 0, 0, 5, 1, "header");
+		addGrid("", 0, 0, 5, 1, "header");
 		setTarget("header", 0);
 		addButton("!flat", 0, 0, 0, 0, "load_favorite");
 		setImage("load_favorite", "hui:open");
@@ -126,7 +126,7 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 	audio = _audio;
 	id_inner = "fx_inner_table";
 
-	addControlTable("!expandy", 0, 0, 1, 32, id_inner);
+	addGrid("!expandy", 0, 0, 1, 32, id_inner);
 	setTarget(id_inner, 0);
 	addText(_("- hier sind (noch) keine Effekte aktiv -"), 30, 0, 0, 0, "comment_no_fx");
 	addButton("!expandy,flat", 31, 0, 0, 0, "add");

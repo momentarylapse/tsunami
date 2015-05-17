@@ -85,7 +85,7 @@ public:
 	void _cdecl addSlider(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addImage(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addDrawingArea(const string &title,int x,int y,int width,int height,const string &id);
-	void _cdecl addControlTable(const string &title, int x, int y, int width, int height, const string &id);
+	void _cdecl addGrid(const string &title, int x, int y, int width, int height, const string &id);
 	void _cdecl addSpinButton(const string &title, int x, int y, int width, int height, const string &id);
 	void _cdecl addScroller(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addExpander(const string &title,int x,int y,int width,int height,const string &id);

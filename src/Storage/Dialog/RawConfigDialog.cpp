@@ -17,10 +17,10 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, HuiWindow *parent) :
 	data->sample_rate = DEFAULT_SAMPLE_RATE;
 	data->offset = 0;
 
-	addControlTable("", 0, 0, 1, 2, "table1");
+	addGrid("", 0, 0, 1, 2, "table1");
 	setTarget("table1", 0);
-	addControlTable("", 0, 0, 2, 4, "table2");
-	addControlTable("", 0, 1, 2, 1, "table3");
+	addGrid("", 0, 0, 2, 4, "table2");
+	addGrid("", 0, 1, 2, 1, "table3");
 	setTarget("table2", 0);
 	addText(_("Format"), 0, 0, 0, 0, "");
 	addComboBox("", 1, 0, 0, 0, "format");

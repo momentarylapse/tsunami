@@ -11,14 +11,14 @@
 SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	Observable("SideBar")
 {
-	addControlTable("!noexpandx,width=270,expandy", 0, 0, 2, 1, "root_grid0");
+	addGrid("!noexpandx,width=270,expandy", 0, 0, 2, 1, "root_grid0");
 	setTarget("root_grid0", 0);
 	addSeparator("!vertical,expandy", 0, 0, 0, 0, "");
-	addControlTable("!noexpandx,width=270,expandy", 1, 0, 1, 3, "root_grid");
+	addGrid("!noexpandx,width=270,expandy", 1, 0, 1, 3, "root_grid");
 	setTarget("root_grid", 0);
-	addControlTable("", 0, 0, 2, 1, "button_grid");
+	addGrid("", 0, 0, 2, 1, "button_grid");
 	addSeparator("", 0, 1, 0, 0, "");
-	addControlTable("", 0, 2, 1, 20, "console_grid");
+	addGrid("", 0, 2, 1, 20, "console_grid");
 	setTarget("button_grid", 0);
 	addButton("!noexpandx,flat", 0, 0, 0, 0, "close");
 	setImage("close", "hui:close");

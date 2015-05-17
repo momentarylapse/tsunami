@@ -18,11 +18,11 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, AudioStream *_stream, AudioOutput *_out
 	output = _output;
 	bottom_bar = _bottom_bar;
 	setBorderWidth(0);
-	addControlTable("!expandx", 0, 0, 1, 2, "grid0");
+	addGrid("!expandx", 0, 0, 1, 2, "grid0");
 	setTarget("grid0", 0);
 	addSeparator("!horizontal", 0, 0, 0, 0, "");
 	setBorderWidth(10);
-	addControlTable("!expandx", 0, 1, 5, 1, "grid");
+	addGrid("!expandx", 0, 1, 5, 1, "grid");
 	setTarget("grid", 0);
 	addButton("!flat", 0, 0, 0, 0, "show_bottom_bar");
 	setImage("show_bottom_bar", "hui:up");

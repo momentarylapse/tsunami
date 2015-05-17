@@ -105,9 +105,9 @@ TsunamiWindow::TsunamiWindow() :
 	// table structure
 	setSize(width, height);
 	setBorderWidth(0);
-	addControlTable("", 0, 0, 1, 3, "root_table");
+	addGrid("", 0, 0, 1, 3, "root_table");
 	setTarget("root_table", 0);
-	addControlTable("", 0, 0, 2, 1, "main_table");
+	addGrid("", 0, 0, 2, 1, "main_table");
 
 	// main table
 	setTarget("main_table", 0);

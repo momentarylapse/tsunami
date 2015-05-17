@@ -59,6 +59,7 @@ bool Storage::load(AudioFile *a, const string &filename)
 		return false;
 
 	tsunami->progress->start(_("lade"), 0);
+	tsunami->_view->unsubscribe(a);
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -67,6 +68,7 @@ bool Storage::load(AudioFile *a, const string &filename)
 	f->loadAudio(a, filename);
 
 
+	tsunami->_view->subscribe(a);
 	a->action_manager->enable(true);
 	//tsunami->progress->Set("peaks", 1);
 

@@ -2,12 +2,41 @@
 // Title[Deutsch] = Klicks Entfernen
 use "../api.kaba"
 
-void unclick(float[] b, Track *t, int offset)
+const int MAX_CLICK_SAMPLES = 128
+const float CLICK_ABS_THRESHOLD = 0.8
+const float CLICK_DIFF_THRESHOLD = 0.4
+
+bool click_start(float last, float cur)
+	return abs(cur) > CLICK_ABS_THRESHOLD and abs(cur - last) > CLICK_DIFF_THRESHOLD
+
+bool click_end(float last, float cur)
+	return abs(cur) < CLICK_ABS_THRESHOLD and abs(cur - last) > CLICK_DIFF_THRESHOLD
+
+int[] find_clicks(float[] b)
+	int[] clicks
 	for i in 1:b.num-1
-		float m = (b[i-1] + b[i+1]) / 2
-		if abs(b[i-1] - b[i+1]) < 0.1 and abs(b[i] - m) > 0.4
-			t.addMarker(i + offset, "X")
-			i ++
+		if click_start(b[i-1], b[i])
+			clicks.add(i)
+			int j1 = min(b.num, i + MAX_CLICK_SAMPLES)
+			for j in i:j1
+				if click_end(b[j-1], b[j])
+					i = j
+					clicks.add(i)
+					break
+	
+	for i in 0:clicks.num-2:2
+		if clicks[i+2] - clicks[i+1] < 8
+			clicks.remove(i+2)
+			clicks.remove(i+1)
+			i -= 2
+	print clicks
+	return clicks
+
+void unclick(float[] b, Track *t, int offset)
+	int[] clicks = find_clicks(b)
+	for i in 0:clicks.num:2
+		t.addMarker(clicks[i  ] + offset, "[click")
+		t.addMarker(clicks[i+1] + offset, "]")
 
 void main()
 	for t in audio.track

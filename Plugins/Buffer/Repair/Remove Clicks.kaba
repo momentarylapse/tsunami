@@ -2,13 +2,52 @@
 // Title[Deutsch] = Klicks Entfernen
 use "../../api.kaba"
 
+const int MAX_CLICK_SAMPLES = 128
+const float CLICK_ABS_THRESHOLD = 0.8
+const float CLICK_DIFF_THRESHOLD = 0.4
+
+bool click_start(float last, float cur)
+	return abs(cur) > CLICK_ABS_THRESHOLD and abs(cur - last) > CLICK_DIFF_THRESHOLD
+
+bool click_end(float last, float cur)
+	return abs(cur) < CLICK_ABS_THRESHOLD and abs(cur - last) > CLICK_DIFF_THRESHOLD
+
+int[] find_clicks(float[] b)
+	int[] clicks
+	for i in 1:b.num-1
+		if click_start(b[i-1], b[i])
+			clicks.add(i)
+			int j1 = min(b.num, i + MAX_CLICK_SAMPLES)
+			for j in i:j1
+				if click_end(b[j-1], b[j])
+					i = j
+					clicks.add(i)
+					break
+	
+	for i in 0:clicks.num-2:2
+		if clicks[i+2] - clicks[i+1] < 8
+			clicks.remove(i+2)
+			clicks.remove(i+1)
+			i -= 2
+	print clicks
+	return clicks
+
 class RemoveClicks : AudioEffect
-	void unclick(float[] b)
-		for i in 1:b.num-1
-			float m = (b[i-1] + b[i+1]) / 2
-			if abs(b[i-1] - b[i+1]) < 0.1 and abs(b[i] - m) > 0.4
-				b[i] = m
+	void unclick(float[] b, int start, int end)
+		int i0 = start - 1
+		int i1 = end + 1
+		float v0 = b[i0]
+		float v1 = b[i1]
+		float m = (v1 - v0) / (i1 - i0)
+		for i in i0:i1
+			b[i] = v0 + m * (i - i0)
+		
+	
+	void repair(float[] b)
+		int[] clicks = find_clicks(b)
+		for i in 0:clicks.num:2
+			unclick(b, clicks[i], clicks[i+1])
 
 	overwrite void process(BufferBox buf)
-		unclick(buf.r)
-		unclick(buf.l)
+		repair(buf.r)
+		repair(buf.l)

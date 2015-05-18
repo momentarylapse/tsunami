@@ -217,8 +217,10 @@ void AudioStream::stop()
 	msg_db_f("Stream.stop", 1);
 
 	//last_error = Pa_AbortStream(pa_stream);
-	last_error = Pa_StopStream(pa_stream);
-	testError("Pa_StopStream");
+	if (pa_stream){
+		last_error = Pa_StopStream(pa_stream);
+		testError("Pa_StopStream");
+	}
 
 	// clean up
 	playing = false;
@@ -283,6 +285,8 @@ void AudioStream::play()
 		kill_dev();
 	if (!pa_stream)
 		create_dev();
+	if (!pa_stream)
+		return;
 
 
 	if (playing){
@@ -304,8 +308,10 @@ void AudioStream::play()
 
 	renderer->reset();
 	stream();
-	last_error = Pa_StartStream(pa_stream);
-	testError("Pa_StartStream");
+	if (pa_stream){
+		last_error = Pa_StartStream(pa_stream);
+		testError("Pa_StartStream");
+	}
 
 	playing = true;
 	paused = false;

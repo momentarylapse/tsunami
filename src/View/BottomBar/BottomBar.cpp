@@ -83,6 +83,7 @@ void BottomBar::onClose()
 
 void BottomBar::show()
 {
+	HuiPanel::show();
 	reveal("revealer", true);
 	visible = true;
 	notify();
@@ -141,10 +142,9 @@ void BottomBar::choose(int console)
 	}
 
 	foreachi(BottomBarConsole *c, consoles, i){
-		if (i == console){
-			setString("title", "!big\\" + c->title);
+		if (i == console)
 			c->show();
-		}else
+		else
 			c->hide();
 	}
 	setInt("choose", console);

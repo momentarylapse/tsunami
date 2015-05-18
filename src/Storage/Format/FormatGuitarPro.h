@@ -1,21 +1,21 @@
 /*
- * FormatGp4.h
+ * FormatGuitarPro.h
  *
  *  Created on: 01.10.2014
  *      Author: michi
  */
 
-#ifndef SRC_STORAGE_FORMATGP4_H_
-#define SRC_STORAGE_FORMATGP4_H_
+#ifndef SRC_STORAGE_FORMATGUITARPRO_H_
+#define SRC_STORAGE_FORMATGUITARPRO_H_
 
 
 #include "Format.h"
 
-class FormatGp4: public Format
+class FormatGuitarPro: public Format
 {
 public:
-	FormatGp4();
-	virtual ~FormatGp4();
+	FormatGuitarPro();
+	virtual ~FormatGuitarPro();
 
 	void loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
 	void saveBuffer(AudioFile *a, BufferBox *b, const string &filename);
@@ -79,4 +79,4 @@ public:
 	void write_mix_change();
 };
 
-#endif /* SRC_STORAGE_FORMATGP4_H_ */
+#endif /* SRC_STORAGE_FORMATGUITARPRO_H_ */

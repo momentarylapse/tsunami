@@ -6,11 +6,11 @@
  */
 
 #include "FormatM4a.h"
-#include "../Tsunami.h"
-#include "../View/Helper/Progress.h"
-#include "../Stuff/Log.h"
-#include "Storage.h"
-#include "../lib/math/math.h"
+#include "../../Tsunami.h"
+#include "../../View/Helper/Progress.h"
+#include "../../Stuff/Log.h"
+#include "../Storage.h"
+#include "../../lib/math/math.h"
 
 FormatM4a::FormatM4a() :
 	Format("Apple lossless audio", "m4a", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)

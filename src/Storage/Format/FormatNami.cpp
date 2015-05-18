@@ -6,12 +6,12 @@
  */
 
 #include "FormatNami.h"
-#include "../Tsunami.h"
-#include "../Plugins/Effect.h"
-#include "../Plugins/MidiEffect.h"
-#include "../Stuff/Log.h"
-#include "../View/Helper/Progress.h"
-#include "../Audio/Synth/Synthesizer.h"
+#include "../../Tsunami.h"
+#include "../../Plugins/Effect.h"
+#include "../../Plugins/MidiEffect.h"
+#include "../../Stuff/Log.h"
+#include "../../View/Helper/Progress.h"
+#include "../../Audio/Synth/Synthesizer.h"
 
 
 const int CHUNK_SIZE = 1 << 16;

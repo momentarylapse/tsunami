@@ -1,23 +1,23 @@
 /*
- * FormatGp4.cpp
+ * FormatGuitarPro.cpp
  *
  *  Created on: 01.10.2014
  *      Author: michi
  */
 
-#include "FormatGp4.h"
-#include "../Tsunami.h"
-#include "../View/Helper/Progress.h"
-#include "../Stuff/Log.h"
+#include "../../Tsunami.h"
+#include "../../View/Helper/Progress.h"
+#include "../../Stuff/Log.h"
+#include "FormatGuitarPro.h"
 
 const int STD_TUNING[6] = {40, 45, 50, 55, 59, 64};
 
-FormatGp4::FormatGp4() :
+FormatGuitarPro::FormatGuitarPro() :
 	Format("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
 {
 }
 
-FormatGp4::~FormatGp4()
+FormatGuitarPro::~FormatGuitarPro()
 {
 }
 
@@ -88,11 +88,11 @@ static string read_str41(CFile *f)
 	return read_str1(f);
 }
 
-void FormatGp4::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
+void FormatGuitarPro::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
 
-void FormatGp4::loadTrack(Track *t, const string & filename, int offset, int level){}
+void FormatGuitarPro::loadTrack(Track *t, const string & filename, int offset, int level){}
 
-void FormatGp4::saveAudio(AudioFile *_a, const string & filename)
+void FormatGuitarPro::saveAudio(AudioFile *_a, const string & filename)
 {
 	a = _a;
 	char data[16];
@@ -172,7 +172,7 @@ void FormatGp4::saveAudio(AudioFile *_a, const string & filename)
 	delete(f);
 }
 
-void FormatGp4::loadAudio(AudioFile *_a, const string &filename)
+void FormatGuitarPro::loadAudio(AudioFile *_a, const string &filename)
 {
 	a = _a;
 	f = FileOpen(filename);
@@ -261,7 +261,7 @@ void FormatGp4::loadAudio(AudioFile *_a, const string &filename)
 		FileClose(f);
 }
 
-void FormatGp4::read_info()
+void FormatGuitarPro::read_info()
 {
 	string s;
 	s = read_str41(f);
@@ -288,7 +288,7 @@ void FormatGp4::read_info()
 		msg_write("comment: " + read_str41(f));
 }
 
-void FormatGp4::write_info()
+void FormatGuitarPro::write_info()
 {
 	write_str41(f, a->getTag("title"));
 	write_str41(f, "");
@@ -303,7 +303,7 @@ void FormatGp4::write_info()
 	f->WriteInt(0); // #comments
 }
 
-void FormatGp4::read_lyrics()
+void FormatGuitarPro::read_lyrics()
 {
 	int lyrics_track = f->ReadInt();
 	//msg_write(lyrics_track);
@@ -316,7 +316,7 @@ void FormatGp4::read_lyrics()
 	}
 }
 
-void FormatGp4::write_lyrics()
+void FormatGuitarPro::write_lyrics()
 {
 	f->WriteInt(0); // lyrics track
 	//msg_write(lyrics_track);
@@ -329,7 +329,7 @@ void FormatGp4::write_lyrics()
 	}
 }
 
-void FormatGp4::read_channels()
+void FormatGuitarPro::read_channels()
 {
 	for (int i = 0; i < 64; i++) {
 		f->ReadInt(); // program
@@ -344,7 +344,7 @@ void FormatGp4::read_channels()
 	}
 }
 
-void FormatGp4::write_channels()
+void FormatGuitarPro::write_channels()
 {
 	for (int i = 0; i < 64; i++) {
 		f->WriteInt(0); // program
@@ -359,7 +359,7 @@ void FormatGp4::write_channels()
 	}
 }
 
-void FormatGp4::read_eq()
+void FormatGuitarPro::read_eq()
 {
 	f->ReadInt(); // master volume
 	f->ReadInt();
@@ -367,7 +367,7 @@ void FormatGp4::read_eq()
 		f->ReadByte(); // eq
 }
 
-void FormatGp4::write_eq()
+void FormatGuitarPro::write_eq()
 {
 	f->WriteInt(100); // master volume
 	f->WriteInt(0);
@@ -375,7 +375,7 @@ void FormatGp4::write_eq()
 		f->WriteByte(100); // eq
 }
 
-void FormatGp4::read_page_setup()
+void FormatGuitarPro::read_page_setup()
 {
 	f->ReadInt();
 	f->ReadInt();
@@ -389,7 +389,7 @@ void FormatGp4::read_page_setup()
 		read_str41(f);
 }
 
-void FormatGp4::write_page_setup()
+void FormatGuitarPro::write_page_setup()
 {
 	f->WriteInt(0);
 	f->WriteInt(0);
@@ -403,7 +403,7 @@ void FormatGp4::write_page_setup()
 		write_str41(f, "");
 }
 
-void FormatGp4::read_measure_header()
+void FormatGuitarPro::read_measure_header()
 {
 	msg_db_f("bar", 1);
 	GpMeasure m;
@@ -443,7 +443,7 @@ void FormatGp4::read_measure_header()
 	measures.add(m);
 }
 
-void FormatGp4::write_measure_header(Bar &b)
+void FormatGuitarPro::write_measure_header(Bar &b)
 {
 	msg_db_f("bar", 1);
 	f->WriteByte(0x03);
@@ -459,7 +459,7 @@ void FormatGp4::write_measure_header(Bar &b)
 	}
 }
 
-void FormatGp4::read_track()
+void FormatGuitarPro::read_track()
 {
 	msg_db_f("track", 1);
 	f->ReadByte();
@@ -487,7 +487,7 @@ void FormatGp4::read_track()
 		f->SetPos(45, false);
 }
 
-void FormatGp4::write_track(Track *t)
+void FormatGuitarPro::write_track(Track *t)
 {
 	msg_db_f("track", 1);
 	f->WriteByte(0);
@@ -513,19 +513,19 @@ void FormatGp4::write_track(Track *t)
 		f->SetPos(45, false);
 }
 
-void FormatGp4::read_channel()
+void FormatGuitarPro::read_channel()
 {
 	f->ReadInt();
 	f->ReadInt();
 }
 
-void FormatGp4::write_channel()
+void FormatGuitarPro::write_channel()
 {
 	f->WriteInt(1);
 	f->WriteInt(2);
 }
 
-void FormatGp4::read_measure(GpMeasure &m, GpTrack &t, int offset)
+void FormatGuitarPro::read_measure(GpMeasure &m, GpTrack &t, int offset)
 {
 	msg_db_f("measure", 1);
 	//msg_write(format("%x", f->GetPos()));
@@ -626,7 +626,7 @@ Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
 	return gnotes;
 }
 
-void FormatGp4::write_measure(Track *t, Bar &b)
+void FormatGuitarPro::write_measure(Track *t, Bar &b)
 {
 	msg_db_f("measure", 1);
 	//msg_write(format("%x", f->GetPos()));
@@ -645,7 +645,7 @@ void FormatGp4::write_measure(Track *t, Bar &b)
 		f->WriteByte(0);
 }
 
-int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
+int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 {
 	msg_db_f("beat", 2);
 	int flags = f->ReadByte();
@@ -684,7 +684,7 @@ int FormatGp4::read_beat(GpTrack &t, GpMeasure &m, int start)
 	return duration;
 }
 
-void FormatGp4::write_beat(Array<int> &pitch, Array<int> &string, int length)
+void FormatGuitarPro::write_beat(Array<int> &pitch, Array<int> &string, int length)
 {
 	msg_db_f("beat", 2);
 
@@ -748,7 +748,7 @@ void FormatGp4::write_beat(Array<int> &pitch, Array<int> &string, int length)
 	}
 }
 
-void FormatGp4::read_chord()
+void FormatGuitarPro::read_chord()
 {
 	msg_db_f("chord", 0);
 	int type = f->ReadByte();
@@ -780,7 +780,7 @@ void FormatGp4::read_chord()
 	}
 }
 
-void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
+void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length)
 {
 	msg_db_f("note", 2);
 	MidiNote n;
@@ -819,7 +819,7 @@ void FormatGp4::read_note(GpTrack &t, int string_no, int start, int length)
 		t.t->addMidiNote(n);
 }
 
-void FormatGp4::read_note_fx()
+void FormatGuitarPro::read_note_fx()
 {
 	msg_db_f("note fx", 3);
 	int flags1 = f->ReadByte();
@@ -860,7 +860,7 @@ void FormatGp4::read_note_fx()
 	}
 }
 
-int FormatGp4::read_duration(int flags, GpMeasure &m)
+int FormatGuitarPro::read_duration(int flags, GpMeasure &m)
 {
 	msg_db_f("duration", 1);
 	int v = (signed char)f->ReadByte();
@@ -908,7 +908,7 @@ int FormatGp4::read_duration(int flags, GpMeasure &m)
 	return a->sample_rate * value * 60.0f / (float)tempo;
 }
 
-void FormatGp4::read_mix_change()
+void FormatGuitarPro::read_mix_change()
 {
 	msg_db_f("mix", 1);
 	f->ReadByte();
@@ -954,7 +954,7 @@ void FormatGp4::read_mix_change()
 	}
 }
 
-void FormatGp4::read_beat_fx()
+void FormatGuitarPro::read_beat_fx()
 {
 	msg_db_f("beat fx", 2);
 	int flags1 = f->ReadByte();

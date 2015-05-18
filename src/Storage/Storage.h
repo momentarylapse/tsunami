@@ -8,11 +8,14 @@
 #ifndef STORAGE_H_
 #define STORAGE_H_
 
-#include "Format.h"
 #include "../lib/file/file.h"
 #include "../lib/hui/hui.h"
 
 class Range;
+class Format;
+class AudioFile;
+class Track;
+class BufferBox;
 
 class Storage
 {

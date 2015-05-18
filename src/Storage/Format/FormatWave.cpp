@@ -6,10 +6,10 @@
  */
 
 #include "FormatWave.h"
-#include "../Tsunami.h"
-#include "../View/Helper/Progress.h"
-#include "../Stuff/Log.h"
-#include "../lib/math/math.h"
+#include "../../Tsunami.h"
+#include "../../View/Helper/Progress.h"
+#include "../../Stuff/Log.h"
+#include "../../lib/math/math.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 15;

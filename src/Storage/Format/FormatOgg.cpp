@@ -6,8 +6,8 @@
  */
 
 #include "FormatOgg.h"
-#include "../Tsunami.h"
-#include "../View/Helper/Progress.h"
+#include "../../Tsunami.h"
+#include "../../View/Helper/Progress.h"
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>

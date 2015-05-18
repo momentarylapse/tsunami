@@ -6,9 +6,9 @@
  */
 
 #include "Format.h"
-#include "../Tsunami.h"
-#include "../Audio/AudioRenderer.h"
-#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "../../Tsunami.h"
+#include "../../Audio/AudioRenderer.h"
+#include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 Format::Format(const string &_description, const string &_extensions, int _flags)
 {

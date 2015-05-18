@@ -6,16 +6,15 @@
  */
 
 #include "Storage.h"
-#include "Format.h"
-#include "FormatWave.h"
-#include "FormatRaw.h"
-#include "FormatOgg.h"
-#include "FormatFlac.h"
-#include "FormatGp4.h"
-#include "FormatM4a.h"
-#include "FormatMidi.h"
-#include "FormatMp3.h"
-#include "FormatNami.h"
+#include "Format/Format.h"
+#include "Format/FormatWave.h"
+#include "Format/FormatRaw.h"
+#include "Format/FormatOgg.h"
+#include "Format/FormatFlac.h"
+#include "Format/FormatM4a.h"
+#include "Format/FormatMidi.h"
+#include "Format/FormatMp3.h"
+#include "Format/FormatNami.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../lib/hui/hui.h"
@@ -24,6 +23,7 @@
 #include "../Audio/AudioRenderer.h"
 #include "../View/AudioView.h"
 #include "../Data/AudioFile.h"
+#include "Format/FormatGuitarPro.h"
 
 Storage::Storage()
 {
@@ -32,7 +32,7 @@ Storage::Storage()
 	formats.add(new FormatRaw());
 	formats.add(new FormatOgg());
 	formats.add(new FormatFlac());
-	formats.add(new FormatGp4());
+	formats.add(new FormatGuitarPro());
 	formats.add(new FormatMp3());
 	formats.add(new FormatM4a());
 	formats.add(new FormatMidi());

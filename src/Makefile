@@ -203,16 +203,16 @@ OBJ = \
  Plugins/Plugin.o\
  Plugins/PluginManager.o\
  Storage/Dialog/RawConfigDialog.o\
- Storage/Format.o\
- Storage/FormatFlac.o\
- Storage/FormatGp4.o\
- Storage/FormatMidi.o\
- Storage/FormatM4a.o\
- Storage/FormatMp3.o\
- Storage/FormatNami.o\
- Storage/FormatOgg.o\
- Storage/FormatRaw.o\
- Storage/FormatWave.o\
+ Storage/Format/Format.o\
+ Storage/Format/FormatFlac.o\
+ Storage/Format/FormatGuitarPro.o\
+ Storage/Format/FormatMidi.o\
+ Storage/Format/FormatM4a.o\
+ Storage/Format/FormatMp3.o\
+ Storage/Format/FormatNami.o\
+ Storage/Format/FormatOgg.o\
+ Storage/Format/FormatRaw.o\
+ Storage/Format/FormatWave.o\
  Storage/Storage.o\
  Stuff/Clipboard.o\
  Stuff/Log.o\
@@ -852,35 +852,35 @@ Plugins/PluginManager.o : Plugins/PluginManager.cpp
 Storage/Dialog/RawConfigDialog.o : Storage/Dialog/RawConfigDialog.cpp
 	$(CPP) -c Storage/Dialog/RawConfigDialog.cpp -o $@ $(CXXFLAGS)
 
-Storage/Format.o : Storage/Format.cpp
-	$(CPP) -c Storage/Format.cpp -o $@ $(CXXFLAGS)
+Storage/Format/Format.o : Storage/Format/Format.cpp
+	$(CPP) -c Storage/Format/Format.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatFlac.o : Storage/FormatFlac.cpp
-	$(CPP) -c Storage/FormatFlac.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatFlac.o : Storage/Format/FormatFlac.cpp
+	$(CPP) -c Storage/Format/FormatFlac.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatGp4.o : Storage/FormatGp4.cpp
-	$(CPP) -c Storage/FormatGp4.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatGuitarPro.o : Storage/Format/FormatGuitarPro.cpp
+	$(CPP) -c Storage/Format/FormatGuitarPro.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatMidi.o : Storage/FormatMidi.cpp
-	$(CPP) -c Storage/FormatMidi.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatMidi.o : Storage/Format/FormatMidi.cpp
+	$(CPP) -c Storage/Format/FormatMidi.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatM4a.o : Storage/FormatM4a.cpp
-	$(CPP) -c Storage/FormatM4a.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatM4a.o : Storage/Format/FormatM4a.cpp
+	$(CPP) -c Storage/Format/FormatM4a.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatMp3.o : Storage/FormatMp3.cpp
-	$(CPP) -c Storage/FormatMp3.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatMp3.o : Storage/Format/FormatMp3.cpp
+	$(CPP) -c Storage/Format/FormatMp3.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatNami.o : Storage/FormatNami.cpp
-	$(CPP) -c Storage/FormatNami.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatNami.o : Storage/Format/FormatNami.cpp
+	$(CPP) -c Storage/Format/FormatNami.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatOgg.o : Storage/FormatOgg.cpp
-	$(CPP) -c Storage/FormatOgg.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatOgg.o : Storage/Format/FormatOgg.cpp
+	$(CPP) -c Storage/Format/FormatOgg.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatRaw.o : Storage/FormatRaw.cpp
-	$(CPP) -c Storage/FormatRaw.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatRaw.o : Storage/Format/FormatRaw.cpp
+	$(CPP) -c Storage/Format/FormatRaw.cpp -o $@ $(CXXFLAGS)
 
-Storage/FormatWave.o : Storage/FormatWave.cpp
-	$(CPP) -c Storage/FormatWave.cpp -o $@ $(CXXFLAGS)
+Storage/Format/FormatWave.o : Storage/Format/FormatWave.cpp
+	$(CPP) -c Storage/Format/FormatWave.cpp -o $@ $(CXXFLAGS)
 
 Storage/Storage.o : Storage/Storage.cpp
 	$(CPP) -c Storage/Storage.cpp -o $@ $(CXXFLAGS)

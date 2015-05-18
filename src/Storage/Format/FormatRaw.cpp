@@ -6,12 +6,12 @@
  */
 
 #include "FormatRaw.h"
-#include "../Tsunami.h"
-#include "../TsunamiWindow.h"
-#include "../View/Helper/Progress.h"
-#include "../Stuff/Log.h"
-#include "../lib/math/math.h"
-#include "Dialog/RawConfigDialog.h"
+#include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
+#include "../../View/Helper/Progress.h"
+#include "../../Stuff/Log.h"
+#include "../../lib/math/math.h"
+#include "../Dialog/RawConfigDialog.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 15;

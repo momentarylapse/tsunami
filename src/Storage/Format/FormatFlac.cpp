@@ -6,9 +6,9 @@
  */
 
 #include "FormatFlac.h"
-#include "../Tsunami.h"
-#include "../View/Helper/Progress.h"
-#include "../Stuff/Log.h"
+#include "../../Tsunami.h"
+#include "../../View/Helper/Progress.h"
+#include "../../Stuff/Log.h"
 #include <math.h>
 
 #include <FLAC/all.h>
@@ -20,7 +20,7 @@ SampleFormat flac_format;
 int flac_read_samples;
 Track *flac_track;
 
-#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
 
 FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)

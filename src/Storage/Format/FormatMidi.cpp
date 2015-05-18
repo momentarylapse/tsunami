@@ -6,8 +6,8 @@
  */
 
 #include "FormatMidi.h"
-#include "../Tsunami.h"
-#include "../Stuff/Log.h"
+#include "../../Tsunami.h"
+#include "../../Stuff/Log.h"
 
 FormatMidi::FormatMidi() :
 	Format("Midi", "mid,midi", FLAG_MIDI | FLAG_MULTITRACK | FLAG_READ)

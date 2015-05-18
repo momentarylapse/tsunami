@@ -8,8 +8,8 @@
 #ifndef FORMAT_H_
 #define FORMAT_H_
 
-#include "../Data/Track.h"
-#include "../Data/AudioFile.h"
+#include "../../Data/Track.h"
+#include "../../Data/AudioFile.h"
 
 class Format
 {

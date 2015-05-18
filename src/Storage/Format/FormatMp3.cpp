@@ -6,11 +6,11 @@
  */
 
 #include "FormatMp3.h"
-#include "../Tsunami.h"
-#include "../View/Helper/Progress.h"
-#include "../Stuff/Log.h"
-#include "Storage.h"
-#include "../lib/math/math.h"
+#include "../../Tsunami.h"
+#include "../../View/Helper/Progress.h"
+#include "../../Stuff/Log.h"
+#include "../Storage.h"
+#include "../../lib/math/math.h"
 
 FormatMp3::FormatMp3() :
 	Format("Mp3", "mp3", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)

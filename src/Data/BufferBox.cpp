@@ -78,7 +78,7 @@ void BufferBox::operator=(const BufferBox &b)
 	num = b.num;
 	r = b.r;
 	l = b.l;
-	peak.clear();
+	peaks.clear();
 }
 
 BufferBox::~BufferBox()
@@ -90,7 +90,7 @@ void BufferBox::clear()
 	r.clear();
 	l.clear();
 	num = 0;
-	peak.clear();
+	peaks.clear();
 }
 
 void BufferBox::resize(int length)
@@ -163,8 +163,8 @@ void BufferBox::swap_value(BufferBox &b)
 	// buffer
 	float_array_swap_values(r, b.r);
 	float_array_swap_values(l, b.l);
-	peak.clear();
-	b.peak.clear();
+	peaks.clear();
+	b.peaks.clear();
 }
 
 void BufferBox::scale(float volume, float panning)
@@ -419,8 +419,8 @@ void BufferBox::invalidate_peaks(const Range &_range)
 	int i1 = _range.end() - range().start();
 	int n = r.num;
 
-	if (peak.num < 2)
-		peak.resize(2);
+	if (peaks.num < 2)
+		peaks.resize(2);
 
 	n /= 4;
 	i0 /= 4;
@@ -428,14 +428,14 @@ void BufferBox::invalidate_peaks(const Range &_range)
 	//msg_write(format("inval %d  %d-%d", n, i0, i1));
 
 	for (int k=0;k<2;k++)
-		if (peak[k].num < n){
-			int n0 = peak[k].num;
-			peak[k].resize(n);
-			peak[k][n0] = 255;
+		if (peaks[k].num < n){
+			int n0 = peaks[k].num;
+			peaks[k].resize(n);
+			peaks[k][n0] = 255;
 		}
 	for (int i=i0;i<i1;i++){
-		peak[0][i] = 255;
-		peak[1][i] = 255;
+		peaks[0][i] = 255;
+		peaks[1][i] = 255;
 	}
 }
 
@@ -476,19 +476,19 @@ inline float fabsmax(float a, float b, float c, float d)
 void BufferBox::update_peaks(int mode)
 {
 	// first level
-	if (peak.num < 2)
-		peak.resize(2);
+	if (peaks.num < 2)
+		peaks.resize(2);
 	int n = r.num / 4;
 	int i0 = 0;
 	int i1 = n;
-	if ((peak[0].num >= n) && (peak[1].num >= n))
-		find_update_peak_range(peak[0], peak[1], i0, i1, n);
-	peak[0].resize(n);
-	peak[1].resize(n);
+	if ((peaks[0].num >= n) && (peaks[1].num >= n))
+		find_update_peak_range(peaks[0], peaks[1], i0, i1, n);
+	peaks[0].resize(n);
+	peaks[1].resize(n);
 	//msg_write(format("  %d %d", i0, i1));
 	for (int i=i0;i<i1;i++){
-		peak[0][i] = fabsmax(r[i * 4], r[i * 4 + 1], r[i * 4 + 2], r[i * 4 + 3]) * 254;
-		peak[1][i] = fabsmax(l[i * 4], l[i * 4 + 1], l[i * 4 + 2], l[i * 4 + 3]) * 254;
+		peaks[0][i] = fabsmax(r[i * 4], r[i * 4 + 1], r[i * 4 + 2], r[i * 4 + 3]) * 254;
+		peaks[1][i] = fabsmax(l[i * 4], l[i * 4 + 1], l[i * 4 + 2], l[i * 4 + 3]) * 254;
 	}
 
 	// higher levels
@@ -497,19 +497,19 @@ void BufferBox::update_peaks(int mode)
 		n /= 2;
 		i0 /= 2;
 		i1 = min((i1 + 1) / 2, n);
-		if (peak.num < level + 2)
-			peak.resize(level + 2);
-		peak[level    ].resize(n);
-		peak[level + 1].resize(n);
+		if (peaks.num < level + 2)
+			peaks.resize(level + 2);
+		peaks[level    ].resize(n);
+		peaks[level + 1].resize(n);
 		if (mode == PEAK_MODE_MAXIMUM){
 			for (int i=i0;i<i1;i++){
-				peak[level    ][i] = shrink_max(peak[level - 2][i * 2], peak[level - 2][i * 2 + 1]);
-				peak[level + 1][i] = shrink_max(peak[level - 1][i * 2], peak[level - 1][i * 2 + 1]);
+				peaks[level    ][i] = shrink_max(peaks[level - 2][i * 2], peaks[level - 2][i * 2 + 1]);
+				peaks[level + 1][i] = shrink_max(peaks[level - 1][i * 2], peaks[level - 1][i * 2 + 1]);
 			}
 		}else if (mode == PEAK_MODE_SQUAREMEAN){
 			for (int i=i0;i<i1;i++){
-				peak[level    ][i] = shrink_mean(peak[level - 2][i * 2], peak[level - 2][i * 2 + 1]);
-				peak[level + 1][i] = shrink_mean(peak[level - 1][i * 2], peak[level - 1][i * 2 + 1]);
+				peaks[level    ][i] = shrink_mean(peaks[level - 2][i * 2], peaks[level - 2][i * 2 + 1]);
+				peaks[level + 1][i] = shrink_mean(peaks[level - 1][i * 2], peaks[level - 1][i * 2 + 1]);
 			}
 		}
 

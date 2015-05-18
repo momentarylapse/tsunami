@@ -27,7 +27,7 @@ void ActionTrack__AddBufferBox::undo(Data *d)
 	Track *t = a->get_track(track_no);
 
 	// should be zeroes at this point...
-	t->level[level_no].buffer.erase(index);
+	t->levels[level_no].buffers.erase(index);
 }
 
 
@@ -39,10 +39,10 @@ void *ActionTrack__AddBufferBox::execute(Data *d)
 	assert(t && "AddBufferBox.execute");
 
 	BufferBox dummy;
-	t->level[level_no].buffer.insert(dummy, index);
+	t->levels[level_no].buffers.insert(dummy, index);
 
 	// reserve memory
-	BufferBox &b = t->level[level_no].buffer[index];
+	BufferBox &b = t->levels[level_no].buffers[index];
 	b.offset = range.start();
 	b.resize(range.length());
 	return &b;

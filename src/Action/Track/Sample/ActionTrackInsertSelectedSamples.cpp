@@ -11,8 +11,8 @@
 
 ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(AudioFile *a, int level_no)
 {
-	foreachi(Track *t, a->track, ti)
-		foreachib(SampleRef *s, t->sample, si)
+	foreachi(Track *t, a->tracks, ti)
+		foreachib(SampleRef *s, t->samples, si)
 			if (s->is_selected)
 				addSubAction(new ActionTrackInsertSample(a, ti, si, level_no), a);
 }

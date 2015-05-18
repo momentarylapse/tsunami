@@ -120,7 +120,7 @@ void CurveConsole::onUpdate(Observable* o, const string &message)
 void CurveConsole::updateList()
 {
 	reset("list");
-	foreachi(Curve *c, audio->curve, i){
+	foreachi(Curve *c, audio->curves, i){
 		addString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(audio));
 		if (c == curve)
 			setInt("list", i);
@@ -131,7 +131,7 @@ void CurveConsole::onAdd()
 {
 	Curve *c = new Curve;
 	c->name = "new";
-	audio->curve.add(c);
+	audio->curves.add(c);
 	audio->notify(audio->MESSAGE_ADD_CURVE);
 }
 
@@ -139,8 +139,8 @@ void CurveConsole::onDelete()
 {
 	int n = getInt("list");
 	if (n >= 0){
-		delete(audio->curve[n]);
-		audio->curve.erase(n);
+		delete(audio->curves[n]);
+		audio->curves.erase(n);
 		curve = NULL;
 	}
 	audio->notify(audio->MESSAGE_DELETE_CURVE);
@@ -150,7 +150,7 @@ void CurveConsole::onTarget()
 {
 	if (!curve)
 		return;
-	CurveTargetDialog *dlg = new CurveTargetDialog(this, audio, curve->target);
+	CurveTargetDialog *dlg = new CurveTargetDialog(this, audio, curve->targets);
 	dlg->run();
 	updateList();
 }
@@ -160,7 +160,7 @@ void CurveConsole::onListSelect()
 	curve = NULL;
 	int n = getInt("list");
 	if (n >= 0)
-		curve = audio->curve[n];
+		curve = audio->curves[n];
 	redraw("area");
 }
 
@@ -170,11 +170,11 @@ void CurveConsole::onListEdit()
 	int col = HuiGetEvent()->column;
 	if (n >= 0){
 		if (col == 0)
-			audio->curve[n]->name = getCell("list", n, col);
+			audio->curves[n]->name = getCell("list", n, col);
 		else if (col == 1)
-			audio->curve[n]->min = getCell("list", n, col)._float();
+			audio->curves[n]->min = getCell("list", n, col)._float();
 		else if (col == 2)
-			audio->curve[n]->max = getCell("list", n, col)._float();
+			audio->curves[n]->max = getCell("list", n, col)._float();
 	}
 	redraw("area");
 }

@@ -33,7 +33,7 @@ class Effect;
 class TrackLevel
 {
 public:
-	Array<BufferBox> buffer;
+	Array<BufferBox> buffers;
 };
 
 class TrackMarker
@@ -51,21 +51,21 @@ public:
 	Track();
 	virtual ~Track();
 	Range _cdecl getRange();
-	Range getRangeUnsafe();
+	Range _cdecl getRangeUnsafe();
 
 	static const string MESSAGE_ADD_EFFECT;
 	static const string MESSAGE_DELETE_EFFECT;
 	static const string MESSAGE_ADD_MIDI_EFFECT;
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
 
-	void reset();
-	void updatePeaks(int mode);
-	void invalidateAllPeaks();
+	void _cdecl reset();
+	void _cdecl updatePeaks(int mode);
+	void _cdecl invalidateAllPeaks();
 	BufferBox _cdecl readBuffers(int level_no, const Range &r);
 	BufferBox _cdecl readBuffersCol(const Range &r);
 
 	string _cdecl getNiceName();
-	int get_index();
+	int _cdecl get_index();
 
 	// actions
 	void _cdecl setName(const string &name);
@@ -111,16 +111,16 @@ public:
 	int type;
 	string name;
 
-	Array<TrackLevel> level;
+	Array<TrackLevel> levels;
 
 	float volume, panning;
 	bool muted;
 
 	Array<Effect*> fx;
-	Array<SampleRef*> sample;
+	Array<SampleRef*> samples;
 
 	// time track
-	BarCollection bar;
+	BarCollection bars;
 
 	// midi track
 	MidiData midi;

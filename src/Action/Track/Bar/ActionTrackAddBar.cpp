@@ -25,9 +25,9 @@ void *ActionTrackAddBar::execute(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
 	assert(index >= 0);
-	assert(index <= t->bar.num);
+	assert(index <= t->bars.num);
 
-	t->bar.insert(bar, index);
+	t->bars.insert(bar, index);
 	t->notify();
 
 	return NULL;
@@ -38,7 +38,7 @@ void ActionTrackAddBar::undo(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
 	Track *t = a->get_track(track_no);
-	t->bar.erase(index);
+	t->bars.erase(index);
 	t->notify();
 }
 

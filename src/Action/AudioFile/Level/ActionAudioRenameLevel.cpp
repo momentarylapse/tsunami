@@ -23,11 +23,11 @@ void* ActionAudioRenameLevel::execute(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(index >= 0);
-	assert(index < a->level_name.num);
+	assert(index < a->level_names.num);
 
 	string temp = name;
-	name = a->level_name[index];
-	a->level_name[index] = temp;
+	name = a->level_names[index];
+	a->level_names[index] = temp;
 
 	return NULL;
 }

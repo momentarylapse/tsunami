@@ -14,13 +14,13 @@
 
 ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const Range &r)
 {
-	TrackLevel &l = t->level[level_no];
+	TrackLevel &l = t->levels[level_no];
 
 	// is <pos> inside a buffer?
 	// last buffer before <pos>?
 	int n_pos = -1;
 	int n_before = -1;
-	foreachi(BufferBox &b, l.buffer, i){
+	foreachi(BufferBox &b, l.buffers, i){
 		if ((r.offset >= b.offset) && (r.offset <= b.offset + b.num))
 			n_pos = i;
 		if (r.offset >= b.offset)
@@ -34,7 +34,7 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 		//msg_write("inside");
 
 		// use base buffers
-		BufferBox &b = l.buffer[n_pos];
+		BufferBox &b = l.buffers[n_pos];
 
 		// too small?
 		if (r.end() > b.offset + b.num)
@@ -47,8 +47,8 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 	}
 
 	// collision???  -> absorb
-	for (int i=l.buffer.num-1;i>n_pos;i--)
-		if (l.buffer[i].offset <= r.end())
+	for (int i=l.buffers.num-1;i>n_pos;i--)
+		if (l.buffers[i].offset <= r.end())
 			addSubAction(new ActionTrack__AbsorbBufferBox(t, level_no, n_pos, i), t->root);
 
 //	for (int i=0;i<t->buffer_r.num;i++)

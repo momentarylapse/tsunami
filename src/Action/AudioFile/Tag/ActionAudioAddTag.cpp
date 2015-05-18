@@ -20,7 +20,7 @@ void *ActionAudioAddTag::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	a->tag.add(tag);
+	a->tags.add(tag);
 
 	return NULL;
 }
@@ -29,6 +29,6 @@ void ActionAudioAddTag::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	a->tag.pop();
+	a->tags.pop();
 }
 

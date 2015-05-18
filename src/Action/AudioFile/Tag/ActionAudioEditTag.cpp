@@ -22,10 +22,10 @@ void *ActionAudioEditTag::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(index >= 0);
-	assert(index < a->tag.num);
+	assert(index < a->tags.num);
 
-	old_tag = a->tag[index];
-	a->tag[index] = new_tag;
+	old_tag = a->tags[index];
+	a->tags[index] = new_tag;
 
 	return NULL;
 }
@@ -34,6 +34,6 @@ void ActionAudioEditTag::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	a->tag[index] = old_tag;
+	a->tags[index] = old_tag;
 }
 

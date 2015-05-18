@@ -65,13 +65,13 @@ AudioFile::AudioFile() :
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	volume = 1;
-	level_name.add("");
+	level_names.add("");
 }
 
 void AudioFile::__init__()
 {
 	new(this) AudioFile;
-	level_name.clear();
+	level_names.clear();
 }
 
 void AudioFile::__delete__()
@@ -169,26 +169,26 @@ void AudioFile::reset()
 	action_manager->reset();
 
 	filename = "";
-	tag.clear();
+	tags.clear();
 	volume = 1;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	foreach(Effect *f, fx)
 		delete(f);
 	fx.clear();
-	foreach(Track *t, track)
+	foreach(Track *t, tracks)
 		delete(t);
-	track.clear();
+	tracks.clear();
 
-	foreach(Sample *s, sample)
+	foreach(Sample *s, samples)
 		delete(s);
-	sample.clear();
+	samples.clear();
 
-	foreach(Curve *c, curve)
+	foreach(Curve *c, curves)
 		delete(c);
-	curve.clear();
+	curves.clear();
 
-	level_name.clear();
-	level_name.add("");
+	level_names.clear();
+	level_names.add("");
 
 	action_manager->reset();
 
@@ -207,8 +207,8 @@ void AudioFile::updateSelection(const Range &range)
 	msg_db_f("UpdateSelection", 1);
 
 	// subs
-	foreach(Track *t, track)
-		foreach(SampleRef *s, t->sample)
+	foreach(Track *t, tracks)
+		foreach(SampleRef *s, t->samples)
 			s->is_selected = (t->is_selected) && range.overlaps(s->getRange());
 	notify(MESSAGE_SELECTION_CHANGE);
 }
@@ -216,8 +216,8 @@ void AudioFile::updateSelection(const Range &range)
 
 void AudioFile::unselectAllSamples()
 {
-	foreach(Track *t, track)
-		foreach(SampleRef *s, t->sample)
+	foreach(Track *t, tracks)
+		foreach(SampleRef *s, t->samples)
 			s->is_selected = false;
 	notify(MESSAGE_SELECTION_CHANGE);
 }
@@ -238,7 +238,7 @@ Range AudioFile::getRange()
 	int min =  1073741824;
 	int max = -1073741824;
 	Range r = Range(min, max - min);
-	foreach(Track *t, track)
+	foreach(Track *t, tracks)
 		r = r || t->getRangeUnsafe();
 
 	if (r.length() < 0)
@@ -313,7 +313,7 @@ Track *AudioFile::addTrack(int type, int index)
 		}
 	}
 	if (index < 0)
-		index = track.num;
+		index = tracks.num;
 	return (Track*)execute(new ActionTrackAdd(index, type));
 }
 
@@ -323,9 +323,9 @@ void AudioFile::updatePeaks(int mode)
 {
 	msg_db_f("Audio.UpdatePeaks", 2);
 	debug_timer.reset();
-	foreach(Track *t, track)
+	foreach(Track *t, tracks)
 		t->updatePeaks(mode);
-	foreach(Sample *s, sample)
+	foreach(Sample *s, samples)
 		s->buf.update_peaks(mode);
 	//msg_write(format("up %f", debug_timer.get()));
 }
@@ -333,8 +333,8 @@ void AudioFile::updatePeaks(int mode)
 int AudioFile::getNumSelectedSamples()
 {
 	int n = 0;
-	foreach(Track *t, track)
-		foreach(SampleRef *s, t->sample)
+	foreach(Track *t, tracks)
+		foreach(SampleRef *s, t->samples)
 			if (s->is_selected)
 				n ++;
 	return n;
@@ -349,9 +349,9 @@ void AudioFile::insertSelectedSamples(int level_no)
 void AudioFile::deleteSelectedSamples()
 {
 	action_manager->beginActionGroup();
-	foreachi(Track *t, track, i){
-		for (int j=t->sample.num-1;j>=0;j--)
-			if (t->sample[j]->is_selected)
+	foreachi(Track *t, tracks, i){
+		for (int j=t->samples.num-1;j>=0;j--)
+			if (t->samples[j]->is_selected)
 				t->deleteSample(j);
 	}
 	action_manager->endActionGroup();
@@ -384,7 +384,7 @@ Sample *AudioFile::addSample(const string &name, BufferBox &buf)
 
 void AudioFile::deleteSample(int index)
 {
-	if (sample[index]->ref_count == 0)
+	if (samples[index]->ref_count == 0)
 		execute(new ActionAudioDeleteSample(index));
 	else
 		tsunami->log->error(_("Kann nur Samples l&oschen, die nicht benutzt werden!"));
@@ -409,31 +409,31 @@ void AudioFile::createSamplesFromSelection(int level_no, const Range &range)
 
 void AudioFile::invalidateAllPeaks()
 {
-	foreach(Track *t, track)
+	foreach(Track *t, tracks)
 		t->invalidateAllPeaks();
-	foreach(Sample *s, sample)
+	foreach(Sample *s, samples)
 		s->buf.invalidate_peaks(s->buf.range());
 }
 
 Track *AudioFile::get_track(int track_no)
 {
-	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_track");
-	return track[track_no];
+	assert((track_no >= 0) && (track_no < tracks.num) && "AudioFile.get_track");
+	return tracks[track_no];
 }
 
 SampleRef *AudioFile::get_sample_ref(int track_no, int index)
 {
-	assert((track_no >= 0) && (track_no < track.num) && "AudioFile.get_sample");
-	Track *t = track[track_no];
+	assert((track_no >= 0) && (track_no < tracks.num) && "AudioFile.get_sample");
+	Track *t = tracks[track_no];
 
 	assert((index >= 0) && "AudioFile.get_sample");
-	assert((index < t->sample.num) && "AudioFile.get_sample");
-	return t->sample[index];
+	assert((index < t->samples.num) && "AudioFile.get_sample");
+	return t->samples[index];
 }
 
 int AudioFile::get_sample_by_uid(int uid)
 {
-	foreachi(Sample *s, sample, i)
+	foreachi(Sample *s, samples, i)
 		if (s->uid == uid)
 			return i;
 	return -1;
@@ -467,7 +467,7 @@ MidiEffect *AudioFile::get_midi_fx(int track_no, int index)
 
 Track *AudioFile::getTimeTrack()
 {
-	foreach(Track *t, track)
+	foreach(Track *t, tracks)
 		if (t->type == t->TYPE_TIME)
 			return t;
 	return NULL;
@@ -478,19 +478,19 @@ int AudioFile::getNextBeat(int pos)
 	Track *t = getTimeTrack();
 	if (!t)
 		return pos;
-	return t->bar.getNextBeat(pos);
+	return t->bars.getNextBeat(pos);
 }
 
 string AudioFile::getNiceLevelName(int index)
 {
-	if (level_name[index].num > 0)
-		return level_name[index];
+	if (level_names[index].num > 0)
+		return level_names[index];
 	return format(_("Ebene %d"), index + 1);
 }
 
 string AudioFile::getTag(const string &key)
 {
-	foreach(Tag &t, tag)
+	foreach(Tag &t, tags)
 		if (t.key == key)
 			return t.value;
 	return "";

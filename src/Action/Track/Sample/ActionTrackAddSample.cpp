@@ -18,8 +18,8 @@ ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, int _index)
 void ActionTrackAddSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->track[track_no];
-	SampleRef *s = t->sample.pop();
+	Track *t = a->tracks[track_no];
+	SampleRef *s = t->samples.pop();
 	delete(s);
 }
 
@@ -28,12 +28,12 @@ void ActionTrackAddSample::undo(Data *d)
 void *ActionTrackAddSample::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Track *t = a->track[track_no];
-	SampleRef *s = new SampleRef(a->sample[index]);
+	Track *t = a->tracks[track_no];
+	SampleRef *s = new SampleRef(a->samples[index]);
 	s->pos = pos;
 	s->track_no = track_no;
 	s->owner = a;
-	t->sample.add(s);
+	t->samples.add(s);
 	return s;
 }
 

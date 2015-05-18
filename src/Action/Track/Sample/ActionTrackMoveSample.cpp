@@ -10,8 +10,8 @@
 
 ActionTrackMoveSample::ActionTrackMoveSample(AudioFile *a)
 {
-	foreachi(Track *t, a->track, ti)
-		foreachi(SampleRef *s, t->sample, si)
+	foreachi(Track *t, a->tracks, ti)
+		foreachi(SampleRef *s, t->samples, si)
 			if (s->is_selected){
 				SubSaveData d;
 				d.track_no = ti;

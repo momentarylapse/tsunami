@@ -38,7 +38,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	enable("ok", false);
 
 	// target list
-	foreach(Track *t, a->track)
+	foreach(Track *t, a->tracks)
 		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	addString("capture_target", _("  - neue Spur anlegen -"));
 
@@ -47,7 +47,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	if (view->cur_track){
 		setTarget(view->cur_track->get_index());
 	}else{
-		setTarget(audio->track.num);
+		setTarget(audio->tracks.num);
 		setType(Track::TYPE_AUDIO);
 	}
 
@@ -118,8 +118,8 @@ void CaptureDialog::onTypeMidi()
 
 void CaptureDialog::setTarget(int index)
 {
-	if (index < audio->track.num){
-		Track *t = audio->track[index];
+	if (index < audio->tracks.num){
+		Track *t = audio->tracks[index];
 		setType(t->type);
 		tsunami->input->in_midi->setPreviewSynthesizer(t->synth);
 	}else{
@@ -201,9 +201,9 @@ void CaptureDialog::setType(int _type)
 
 	// consistency test: ...
 	int target = getInt("capture_target");
-	if ((target >= 0) and (target < audio->track.num))
-		if (type != audio->track[target]->type)
-			setInt("capture_target", audio->track.num);
+	if ((target >= 0) and (target < audio->tracks.num))
+		if (type != audio->tracks[target]->type)
+			setInt("capture_target", audio->tracks.num);
 
 	if (!tsunami->input->start(type, audio->sample_rate)){
 		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
@@ -285,12 +285,12 @@ bool CaptureDialog::insert()
 	// insert recorded data with some delay
 	int dpos = tsunami->input->getDelay();
 
-	if (target >= audio->track.num){
+	if (target >= audio->tracks.num){
 		// new track
-		t = audio->addTrack(type, audio->track.num);
+		t = audio->addTrack(type, audio->tracks.num);
 	}else{
 		// overwrite
-		t = audio->track[target];
+		t = audio->tracks[target];
 	}
 	i0 = s_start + dpos;
 

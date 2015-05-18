@@ -182,7 +182,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("BufferBox", "num", _offsetof(BufferBox, num));
 	Script::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, r));
 	Script::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, l));
-	Script::DeclareClassOffset("BufferBox", "peak", _offsetof(BufferBox, peak));
+	Script::DeclareClassOffset("BufferBox", "peaks", _offsetof(BufferBox, peaks));
 	Script::LinkExternal("BufferBox.clear", Script::mf(&BufferBox::clear));
 	Script::LinkExternal("BufferBox.__assign__", Script::mf(&BufferBox::__assign__));
 	Script::LinkExternal("BufferBox.range", Script::mf(&BufferBox::range));
@@ -294,24 +294,20 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("TrackMarker", "pos", _offsetof(TrackMarker, text));
 
 	Script::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
-	Script::DeclareClassOffset("TrackLevel", "buffer", _offsetof(TrackLevel, buffer));
+	Script::DeclareClassOffset("TrackLevel", "buffers", _offsetof(TrackLevel, buffers));
 
 	Script::DeclareClassSize("Track", sizeof(Track));
 	Script::DeclareClassOffset("Track", "type", _offsetof(Track, type));
 	Script::DeclareClassOffset("Track", "name", _offsetof(Track, name));
-	Script::DeclareClassOffset("Track", "level", _offsetof(Track, level));
-//	Script::DeclareClassOffset("Track", "length", _offsetof(Track, length));
-//	Script::DeclareClassOffset("Track", "pos", _offsetof(Track, pos));
+	Script::DeclareClassOffset("Track", "levels", _offsetof(Track, levels));
 	Script::DeclareClassOffset("Track", "volume", _offsetof(Track, volume));
 	Script::DeclareClassOffset("Track", "panning", _offsetof(Track, panning));
 	Script::DeclareClassOffset("Track", "muted", _offsetof(Track, muted));
-//	Script::DeclareClassOffset("Track", "rep_num", _offsetof(Track, rep_num));
-//	Script::DeclareClassOffset("Track", "rep_delay", _offsetof(Track, rep_delay));
+	Script::DeclareClassOffset("Track", "bars", _offsetof(Track, bars));
 	Script::DeclareClassOffset("Track", "fx", _offsetof(Track, fx));
-//	Script::DeclareClassOffset("Track", "sub", _offsetof(Track, sub));
 	Script::DeclareClassOffset("Track", "midi", _offsetof(Track, midi));
 	Script::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
-//	Script::DeclareClassOffset("Track", "parent", _offsetof(Track, parent));
+	Script::DeclareClassOffset("Track", "samples", _offsetof(Track, samples));
 	Script::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Script::DeclareClassOffset("Track", "root", _offsetof(Track, root));
 	Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
@@ -344,13 +340,13 @@ void PluginManager::LinkAppScriptData()
 	AudioFile af;
 	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
 	Script::DeclareClassOffset("AudioFile", "filename", _offsetof(AudioFile, filename));
-	Script::DeclareClassOffset("AudioFile", "tag", _offsetof(AudioFile, tag));
+	Script::DeclareClassOffset("AudioFile", "tag", _offsetof(AudioFile, tags));
 	Script::DeclareClassOffset("AudioFile", "sample_rate", _offsetof(AudioFile, sample_rate));
 	Script::DeclareClassOffset("AudioFile", "volume", _offsetof(AudioFile, volume));
 	Script::DeclareClassOffset("AudioFile", "fx", _offsetof(AudioFile, fx));
-	Script::DeclareClassOffset("AudioFile", "track", _offsetof(AudioFile, track));
-	Script::DeclareClassOffset("AudioFile", "sample", _offsetof(AudioFile, sample));
-	Script::DeclareClassOffset("AudioFile", "level_name", _offsetof(AudioFile, level_name));
+	Script::DeclareClassOffset("AudioFile", "tracks", _offsetof(AudioFile, tracks));
+	Script::DeclareClassOffset("AudioFile", "samples", _offsetof(AudioFile, samples));
+	Script::DeclareClassOffset("AudioFile", "level_names", _offsetof(AudioFile, level_names));
 	Script::LinkExternal("AudioFile.__init__", Script::mf(&AudioFile::__init__));
 	Script::DeclareClassVirtualIndex("AudioFile", "__delete__", Script::mf(&AudioFile::__delete__), &af);
 	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::newEmpty));
@@ -628,7 +624,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				Range range = tsunami->win->view->getPlaybackSelection();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, a->track)
+				foreach(Track *t, a->tracks)
 					if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
 						fx->resetState();
 						fx->doProcessTrack(t, tsunami->win->view->cur_level, range);
@@ -642,7 +638,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (mfx->configure()){
 				Range range = tsunami->win->view->getPlaybackSelection();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, a->track)
+				foreach(Track *t, a->tracks)
 					if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
 						mfx->resetState();
 						mfx->DoProcessTrack(t, range);

@@ -148,19 +148,19 @@ void MixingConsole::onOutputVolume()
 
 void MixingConsole::loadData()
 {
-	for (int i=mixer.num; i<audio->track.num; i++){
+	for (int i=mixer.num; i<audio->tracks.num; i++){
 		TrackMixer *m = new TrackMixer();
 		mixer.add(m);
 		embed(m, id_inner, i*2 + 2, 0);
 		addSeparator("!vertical", i*2 + 3, 0, 0, 0, "separator_" + i2s(i));
 	}
-	for (int i=audio->track.num; i<mixer.num; i++){
+	for (int i=audio->tracks.num; i<mixer.num; i++){
 		delete(mixer[i]);
 		removeControl("separator_" + i2s(i));
 	}
-	mixer.resize(audio->track.num);
+	mixer.resize(audio->tracks.num);
 
-	foreachi(Track *t, audio->track, i)
+	foreachi(Track *t, audio->tracks, i)
 		mixer[i]->setTrack(t);
 }
 

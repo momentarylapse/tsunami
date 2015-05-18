@@ -35,7 +35,7 @@ void *ActionAudioAddSample::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	sample->owner = a;
-	a->sample.add(sample);
+	a->samples.add(sample);
 	return sample;
 }
 
@@ -43,7 +43,7 @@ void ActionAudioAddSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(sample->ref_count == 0);
-	a->sample.pop();
+	a->samples.pop();
 	sample->owner = NULL;
 }
 

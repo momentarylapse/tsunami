@@ -77,7 +77,7 @@ class DrumsetSynthesizer : Synthesizer
 		state.a = drumlist.get(config.name)
 		state.s = nil
 		if state.a
-			state.s = state.a.track[0].synth
+			state.s = state.a.tracks[0].synth
 		if state.s
 			state.s.onConfig()
 	overwrite void render(BufferBox buf)

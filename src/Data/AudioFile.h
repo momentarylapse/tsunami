@@ -52,28 +52,28 @@ public:
 	static const string MESSAGE_ADD_CURVE;
 	static const string MESSAGE_DELETE_CURVE;
 
-	string get_time_str(int t);
-	string get_time_str_fuzzy(int t, float dt);
-	string get_time_str_long(int t);
+	string _cdecl get_time_str(int t);
+	string _cdecl get_time_str_fuzzy(int t, float dt);
+	string _cdecl get_time_str_long(int t);
 
-	void reset();
+	void _cdecl reset();
 	void _cdecl newEmpty(int _sample_rate);
 	void _cdecl newWithOneTrack(int track_type, int _sample_rate);
 	bool _cdecl load(const string &filename, bool deep);
 	bool _cdecl save(const string &filename);
 	void _cdecl updateSelection(const Range &range);
-	void unselectAllSamples();
+	void _cdecl unselectAllSamples();
 
-	void updatePeaks(int mode);
-	void invalidateAllPeaks();
+	void _cdecl updatePeaks(int mode);
+	void _cdecl invalidateAllPeaks();
 
-	int getNumSelectedSamples();
+	int _cdecl getNumSelectedSamples();
 
 	Track *_cdecl getTimeTrack();
 	int _cdecl getNextBeat(int pos);
 	string _cdecl getNiceLevelName(int index);
 
-	string getTag(const string &key);
+	string _cdecl getTag(const string &key);
 
 	// action
 	void _cdecl addTag(const string &key, const string &value);
@@ -97,25 +97,25 @@ public:
 	void _cdecl deleteSelection(int level_no, const Range &range, bool all_levels);
 	void _cdecl createSamplesFromSelection(int level_no, const Range &range);
 
-	Track *get_track(int track_no);
-	SampleRef *get_sample_ref(int track_no, int index);
-	int get_sample_by_uid(int uid);
-	Effect *get_fx(int track_no, int index);
-	MidiEffect *get_midi_fx(int track_no, int index);
+	Track *_cdecl get_track(int track_no);
+	SampleRef *_cdecl get_sample_ref(int track_no, int index);
+	int _cdecl get_sample_by_uid(int uid);
+	Effect *_cdecl get_fx(int track_no, int index);
+	MidiEffect *_cdecl get_midi_fx(int track_no, int index);
 
 // data
 	string filename;
-	Array<Tag> tag;
+	Array<Tag> tags;
 	int sample_rate;
 
 	float volume;
 
 	Array<Effect*> fx;
-	Array<Track*> track;
-	Array<Sample*> sample;
-	Array<Curve*> curve;
+	Array<Track*> tracks;
+	Array<Sample*> samples;
+	Array<Curve*> curves;
 
-	Array<string> level_name;
+	Array<string> level_names;
 };
 
 

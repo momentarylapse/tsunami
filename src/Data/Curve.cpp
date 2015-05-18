@@ -49,7 +49,7 @@ string Curve::Target::niceStr(AudioFile *a)
 Array<Curve::Target> Curve::Target::enumerate(AudioFile *a)
 {
 	Array<Target> list;
-	foreachi(Track *t, a->track, i)
+	foreachi(Track *t, a->tracks, i)
 		enumerateTrack(t, list, format("t:%d", i), format("track[%d]", i));
 	return list;
 }
@@ -133,24 +133,24 @@ float Curve::get(int pos)
 
 void Curve::apply(int pos)
 {
-	temp_value.resize(target.num);
-	for (int i=0; i<target.num; i++){
-		temp_value[i] = *target[i].p;
-		*target[i].p = get(pos);
+	temp_values.resize(targets.num);
+	for (int i=0; i<targets.num; i++){
+		temp_values[i] = *targets[i].p;
+		*targets[i].p = get(pos);
 	}
 }
 
 void Curve::unapply()
 {
-	for (int i=0; i<target.num; i++){
-		*target[i].p = temp_value[i];
+	for (int i=0; i<targets.num; i++){
+		*targets[i].p = temp_values[i];
 	}
 }
 
 string Curve::getTargets(AudioFile *a)
 {
 	string tt;
-	foreachi(Target &t, target, i){
+	foreachi(Target &t, targets, i){
 		if (i > 0)
 			tt += ", ";
 		tt += t.niceStr(a);

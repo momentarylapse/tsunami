@@ -26,11 +26,11 @@ void* ActionTrackDeleteSample::execute(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	ref = a->track[track_no]->sample[index];
+	ref = a->tracks[track_no]->samples[index];
 	ref->origin->unref();
 	ref->owner = NULL;
 
-	a->track[track_no]->sample.erase(index);
+	a->tracks[track_no]->samples.erase(index);
 
 	return NULL;
 }
@@ -39,7 +39,7 @@ void ActionTrackDeleteSample::undo(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	a->track[track_no]->sample.insert(ref, index);
+	a->tracks[track_no]->samples.insert(ref, index);
 	ref->origin->ref();
 	ref->owner = a;
 	ref = NULL;

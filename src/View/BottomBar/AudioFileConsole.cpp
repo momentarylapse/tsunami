@@ -58,7 +58,7 @@ void AudioFileConsole::loadData()
 {
 	// tags
 	reset("tags");
-	foreach(Tag &t, audio->tag)
+	foreach(Tag &t, audio->tags)
 		addString("tags", t.key + "\\" + t.value);
 	enable("delete_tag", false);
 
@@ -74,9 +74,9 @@ void AudioFileConsole::loadData()
 
 	// levels
 	reset("levels");
-	foreachi(string &n, audio->level_name, i)
+	foreachi(string &n, audio->level_names, i)
 		addString("levels", i2s(i + 1) + "\\" + n);
-	if (audio->level_name.num > 0)
+	if (audio->level_names.num > 0)
 		setInt("levels", view->cur_level);
 }
 
@@ -97,7 +97,7 @@ void AudioFileConsole::onTagsEdit()
 	int r = HuiGetEvent()->row;
 	if (r < 0)
 		return;
-	Tag t = audio->tag[r];
+	Tag t = audio->tags[r];
 	if (HuiGetEvent()->column == 0)
 		t.key = getCell("tags", r, 0);
 	else

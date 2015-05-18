@@ -24,21 +24,21 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
-	TrackLevel &l = t->level[level_no];
+	TrackLevel &l = t->levels[level_no];
 
 
-	BufferBox &b_src  = l.buffer[src];
-	BufferBox &b_dest = l.buffer[dest];
+	BufferBox &b_src  = l.buffers[src];
+	BufferBox &b_dest = l.buffers[dest];
 	dest_old_length = b_dest.num;
 	int new_size = b_src.offset + b_src.num - b_dest.offset;
 	if (new_size > b_dest.num)
 		b_dest.resize(new_size);
 
-	src_offset = l.buffer[src].offset;
-	src_length = l.buffer[src].num;
+	src_offset = l.buffers[src].offset;
+	src_length = l.buffers[src].num;
 	b_dest.set(b_src, b_src.offset - b_dest.offset, 1.0f);
 
-	l.buffer.erase(src);
+	l.buffers.erase(src);
 
 	return NULL;
 }
@@ -49,13 +49,13 @@ void ActionTrack__AbsorbBufferBox::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
-	TrackLevel &l = t->level[level_no];
+	TrackLevel &l = t->levels[level_no];
 
 	//msg_todo("absorb undo...");
 	BufferBox dummy;
-	l.buffer.insert(dummy, src);
-	BufferBox &b_src  = l.buffer[src];
-	BufferBox &b_dest = l.buffer[dest];
+	l.buffers.insert(dummy, src);
+	BufferBox &b_src  = l.buffers[src];
+	BufferBox &b_dest = l.buffers[dest];
 	b_src.offset = src_offset;
 	b_src.resize(src_length);
 

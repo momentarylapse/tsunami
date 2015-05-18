@@ -34,7 +34,7 @@ int Sample::get_index()
 {
 	if (!owner)
 		return -1;
-	foreachi(Sample *s, owner->sample, i)
+	foreachi(Sample *s, owner->samples, i)
 		if (this == s)
 			return i;
 	return -1;
@@ -102,7 +102,7 @@ int SampleRef::get_index()
 {
 	Track *t = getParent();
 	if (t){
-		foreachi(SampleRef *s, t->sample, i)
+		foreachi(SampleRef *s, t->samples, i)
 			if (this == s)
 				return i;
 	}
@@ -112,7 +112,7 @@ int SampleRef::get_index()
 Track *SampleRef::getParent()
 {
 	if (owner)
-		return owner->track[track_no];
+		return owner->tracks[track_no];
 	return NULL;
 }
 

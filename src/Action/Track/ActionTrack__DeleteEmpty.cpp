@@ -20,20 +20,20 @@ ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()
 void *ActionTrack__DeleteEmpty::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	assert(index >= 0 && index < a->track.num);
-	Track *t = a->track[index];
+	assert(index >= 0 && index < a->tracks.num);
+	Track *t = a->tracks[index];
 	int num_buf = 0;
-	foreach(TrackLevel &l, t->level)
-		num_buf += l.buffer.num;
+	foreach(TrackLevel &l, t->levels)
+		num_buf += l.buffers.num;
 	assert(num_buf == 0);
-	assert(t->sample.num == 0);
+	assert(t->samples.num == 0);
 
 	// save data
 	track = t;
 
 	// delete
 	track->notify(track->MESSAGE_DELETE);
-	a->track.erase(index);
+	a->tracks.erase(index);
 	a->notify(a->MESSAGE_DELETE_TRACK);
 	return NULL;
 }
@@ -43,7 +43,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 void ActionTrack__DeleteEmpty::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	a->track.insert(track, index);
+	a->tracks.insert(track, index);
 	a->notify(a->MESSAGE_ADD_TRACK);
 }
 

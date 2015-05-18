@@ -32,7 +32,7 @@ const float BORDER_FACTOR = 1.0f / 15.0f;
 int get_track_index_save(Track *t)
 {
 	if (t){
-		foreachi(Track *tt, tsunami->audio->track, i)
+		foreachi(Track *tt, tsunami->audio->tracks, i)
 			if (t == tt)
 				return i;
 	}
@@ -290,7 +290,7 @@ AudioView::SelectionType AudioView::getMouseOver()
 			s.type = SEL_TYPE_MUTE;
 			return s;
 		}
-		if ((audio->track.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
+		if ((audio->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
 			s.type = SEL_TYPE_SOLO;
 			return s;
 		}
@@ -299,7 +299,7 @@ AudioView::SelectionType AudioView::getMouseOver()
 	// sub?
 	if (s.track){
 		// TODO: prefer selected subs
-		foreach(SampleRef *ss, s.track->sample){
+		foreach(SampleRef *ss, s.track->samples){
 			int offset = mouseOverSample(ss);
 			if (offset >= 0){
 				s.sample = ss;
@@ -391,15 +391,15 @@ void AudioView::setBarriers(SelectionType *s)
 	if (s->type == SEL_TYPE_SAMPLE)
 		dpos = s->sample_offset;
 
-	foreach(Track *t, audio->track){
+	foreach(Track *t, audio->tracks){
 		// add subs
-		foreach(SampleRef *sam, t->sample){
+		foreach(SampleRef *sam, t->samples){
 			s->barrier.add(sam->pos + dpos);
 		}
 
 		// time bar...
 		int x0 = 0;
-		foreach(BarPattern &b, t->bar){
+		foreach(BarPattern &b, t->bars){
 			// FIXME
 			for (int i=0;i<b.num_beats;i++)
 				s->barrier.add(x0 + (int)((float)b.length * i / (float)b.num_beats) + dpos);
@@ -565,7 +565,7 @@ void AudioView::onLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_MUTE){
 		selection.track->setMuted(!selection.track->muted);
 	}else if (selection.type == SEL_TYPE_SOLO){
-		foreach(Track *t, audio->track)
+		foreach(Track *t, audio->tracks)
 			t->is_selected = (t == selection.track);
 		if (selection.track->muted)
 			selection.track->setMuted(false);
@@ -596,7 +596,7 @@ Array<MidiNote> AudioView::getCreationNotes()
 	int end = max(mouse_possibly_selecting_start, selection.pos);
 	Track *t = audio->getTimeTrack();
 	if (t){
-		Array<Beat> beats = t->bar.getBeats(Range(-0x4000000, 0x8000000));//audio->getRange());
+		Array<Beat> beats = t->bars.getBeats(Range(-0x4000000, 0x8000000));//audio->getRange());
 		foreach(Beat &b, beats){
 			if (b.range.is_inside(start)){
 				int dl = b.range.num / beat_partition;
@@ -866,7 +866,7 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 	dash.add(6);
 	dash.add(4);
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	Array<Bar> bars = t->bar.getBars(Range(s0, s1 - s0));
+	Array<Bar> bars = t->bars.getBars(Range(s0, s1 - s0));
 	foreach(Bar &b, bars){
 		int xx = sample2screen(b.range.offset);
 
@@ -919,11 +919,11 @@ void AudioView::checkConsistency()
 	// check cur_track consistency
 	int n = get_track_index_save(cur_track);
 	if ((cur_track) and (n < 0))
-		if (audio->track.num > 0)
-			setCurTrack(audio->track[0]);
+		if (audio->tracks.num > 0)
+			setCurTrack(audio->tracks[0]);
 
 	// check cur_level consistency
-	if ((cur_level < 0) or (cur_level >= audio->level_name.num)){
+	if ((cur_level < 0) or (cur_level >= audio->level_names.num)){
 		cur_level = 0;
 		forceRedraw();
 	}
@@ -938,8 +938,8 @@ void AudioView::onUpdate(Observable *o, const string &message)
 			updateTracks();
 			sel_range = sel_raw = Range(0, 0);
 			setCurTrack(NULL);
-			if (audio->track.num > 0)
-				setCurTrack(audio->track[0]);
+			if (audio->tracks.num > 0)
+				setCurTrack(audio->tracks[0]);
 			optimizeView();
 		}else{
 			if ((message == audio->MESSAGE_ADD_TRACK) or (message == audio->MESSAGE_DELETE_TRACK))
@@ -966,8 +966,8 @@ void AudioView::onUpdate(Observable *o, const string &message)
 void AudioView::updateTracks()
 {
 	Array<AudioViewTrack*> vtrack2;
-	vtrack2.resize(audio->track.num);
-	foreachi(Track *t, audio->track, ti){
+	vtrack2.resize(audio->tracks.num);
+	foreachi(Track *t, audio->tracks, ti){
 		bool found = false;
 		foreachi(AudioViewTrack *v, vtrack, vi)
 			if (v){
@@ -1060,7 +1060,7 @@ void AudioView::TrackHeightManager::plan(AudioView *v, AudioFile *a, const rect 
 		foreachi(AudioViewTrack *t, v->vtrack, i){
 			float h = v->TIME_SCALE_HEIGHT;
 			if (t->track == v->cur_track)
-				h = r.height() - a->track.num * v->TIME_SCALE_HEIGHT;
+				h = r.height() - a->tracks.num * v->TIME_SCALE_HEIGHT;
 			t->area_target = rect(r.x1, r.x2, y0, y0 + h);
 			y0 += h;
 		}
@@ -1071,7 +1071,7 @@ void AudioView::TrackHeightManager::plan(AudioView *v, AudioFile *a, const rect 
 	int h_wish = v->TIME_SCALE_HEIGHT;
 	int h_fix = v->TIME_SCALE_HEIGHT;
 	int n_var = 0;
-	foreach(Track *t, a->track){
+	foreach(Track *t, a->tracks){
 		if (t->type == t->TYPE_AUDIO){
 			h_wish += MAX_TRACK_CHANNEL_HEIGHT * n_ch;
 			n_var += n_ch;
@@ -1339,14 +1339,14 @@ void AudioView::selectTrack(Track *t, bool diff)
 		return;
 	if (diff){
 		bool is_only_selected = true;
-		foreach(Track *tt, t->root->track)
+		foreach(Track *tt, t->root->tracks)
 			if ((tt->is_selected) and (tt != t))
 				is_only_selected = false;
 		t->is_selected = !t->is_selected or is_only_selected;
 	}else{
 		if (!t->is_selected){
 			// unselect all tracks
-			foreach(Track *tt, t->root->track)
+			foreach(Track *tt, t->root->tracks)
 				tt->is_selected = false;
 		}
 
@@ -1379,7 +1379,7 @@ void AudioView::setCurLevel(int l)
 {
 	if (cur_level == l)
 		return;
-	if ((l < 0) or (l >= audio->level_name.num))
+	if ((l < 0) or (l >= audio->level_names.num))
 		return;
 	cur_level = l;
 	forceRedraw();

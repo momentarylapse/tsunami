@@ -12,7 +12,7 @@
 
 ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(AudioFile *a, const Range &r, int level_no)
 {
-	foreach(Track *t, a->track)
+	foreach(Track *t, a->tracks)
 		if (t->is_selected)
 			CreateSubsFromTrack(t, r, level_no);
 }
@@ -25,8 +25,8 @@ ActionTrackSampleFromSelection::~ActionTrackSampleFromSelection()
 void ActionTrackSampleFromSelection::CreateSubsFromTrack(Track *t, const Range &r, int level_no)
 {
 	AudioFile *a = t->root;
-	TrackLevel &l = t->level[level_no];
-	foreachib(BufferBox &b, l.buffer, bi)
+	TrackLevel &l = t->levels[level_no];
+	foreachib(BufferBox &b, l.buffers, bi)
 		if (r.covers(b.range())){
 			addSubAction(new ActionTrackPasteAsSample(t, b.offset, &b), a);
 

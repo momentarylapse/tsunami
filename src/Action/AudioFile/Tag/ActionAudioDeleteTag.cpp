@@ -21,10 +21,10 @@ void *ActionAudioDeleteTag::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(index >= 0);
-	assert(index < a->tag.num);
+	assert(index < a->tags.num);
 
-	old_tag = a->tag[index];
-	a->tag.erase(index);
+	old_tag = a->tags[index];
+	a->tags.erase(index);
 
 	return NULL;
 }
@@ -33,6 +33,6 @@ void ActionAudioDeleteTag::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	a->tag.insert(old_tag, index);
+	a->tags.insert(old_tag, index);
 }
 

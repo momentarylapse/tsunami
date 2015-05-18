@@ -106,11 +106,11 @@ void AudioViewTrack::drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, doub
 
 	int di = view->detail_steps;
 	c->setColor(col);
-	int l = min(view->prefered_buffer_level - 1, b.peak.num / 2);
+	int l = min(view->prefered_buffer_level - 1, b.peaks.num / 2);
 	if (l >= 1){//f < MIN_MAX_FACTOR){
-		draw_peak_buffer(c, r.width(), di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, r.x1, y0r, b.peak[l*2-2], b.offset);
+		draw_peak_buffer(c, r.width(), di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, r.x1, y0r, b.peaks[l*2-2], b.offset);
 		if (!view->show_mono)
-			draw_peak_buffer(c, r.width(), di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, r.x1, y0l, b.peak[l*2-1], b.offset);
+			draw_peak_buffer(c, r.width(), di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, r.x1, y0l, b.peaks[l*2-1], b.offset);
 	}else{
 		draw_line_buffer(c, r.width(), view_pos_rel, view->view_zoom, hf, r.x1, y0r, b.r, b.offset);
 		if (!view->show_mono)
@@ -123,15 +123,15 @@ void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_
 	msg_db_f("DrawTrackBuffers", 1);
 
 	// non-current levels
-	foreachi(TrackLevel &lev, track->level, level_no){
+	foreachi(TrackLevel &lev, track->levels, level_no){
 		if (level_no == view->cur_level)
 			continue;
-		foreach(BufferBox &b, lev.buffer)
+		foreach(BufferBox &b, lev.buffers)
 			drawBuffer(c, r, b, view_pos_rel, view->ColorWave);
 	}
 
 	// current
-	foreach(BufferBox &b, track->level[view->cur_level].buffer)
+	foreach(BufferBox &b, track->levels[view->cur_level].buffers)
 		drawBuffer(c, r, b, view_pos_rel, col);
 }
 
@@ -280,7 +280,7 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, color col, int trac
 
 	drawTrackBuffers(c, r, view->view_pos, col);
 
-	foreach(SampleRef *s, track->sample)
+	foreach(SampleRef *s, track->samples)
 		drawSample(c, r, s);
 
 	foreach(TrackMarker &m, track->markers)
@@ -306,7 +306,7 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, color col, int trac
 
 	if ((track->muted) or (view->hover.show_track_controls == track))
 		c->drawImage(r.x1 + 5, r.y1 + 22, track->muted ? view->image_muted : view->image_unmuted);
-	if ((view->audio->track.num > 1) and (view->hover.show_track_controls == track))
+	if ((view->audio->tracks.num > 1) and (view->hover.show_track_controls == track))
 		c->drawImage(r.x1 + 22, r.y1 + 22, view->image_solo);
 }
 

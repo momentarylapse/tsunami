@@ -14,18 +14,18 @@
 
 ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_no, const Range &range, bool all_levels)
 {
-	foreachi(Track *t, a->track, track_no)
+	foreachi(Track *t, a->tracks, track_no)
 		if (t->is_selected){
 			// buffer boxes
 			if (all_levels){
-				foreachi(TrackLevel &l, t->level, li)
+				foreachi(TrackLevel &l, t->levels, li)
 					DeleteBuffersFromTrackLevel(a, t, l, range, li);
 			}else{
-				DeleteBuffersFromTrackLevel(a, t, t->level[level_no], range, level_no);
+				DeleteBuffersFromTrackLevel(a, t, t->levels[level_no], range, level_no);
 			}
 
 			// subs
-			foreachib(SampleRef *s, t->sample, i)
+			foreachib(SampleRef *s, t->samples, i)
 				if (s->is_selected){
 					addSubAction(new ActionTrackDeleteSample(t, i), a);
 					_foreach_it_.update(); // TODO...
@@ -45,7 +45,7 @@ void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
 {
 	int i0 = range.start();
 	int i1 = range.end();
-	foreachib(BufferBox &b, l.buffer, n){
+	foreachib(BufferBox &b, l.buffers, n){
 		int bi0 = b.offset;
 		int bi1 = b.offset + b.num;
 

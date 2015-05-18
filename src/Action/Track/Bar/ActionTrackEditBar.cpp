@@ -26,11 +26,11 @@ void *ActionTrackEditBar::execute(Data *d)
 	Track *t = a->get_track(track_no);
 	assert(t);
 	assert(index >= 0);
-	assert(index < t->bar.num);
+	assert(index < t->bars.num);
 
 	BarPattern temp = bar;
-	bar = t->bar[index];
-	t->bar[index] = temp;
+	bar = t->bars[index];
+	t->bars[index] = temp;
 	t->notify();
 
 	return NULL;

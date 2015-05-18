@@ -14,8 +14,8 @@
 
 ActionTrackInsertSample::ActionTrackInsertSample(AudioFile *a, int track_no, int index, int level_no)
 {
-	Track *t = a->track[track_no];
-	SampleRef *sub = t->sample[index];
+	Track *t = a->tracks[track_no];
+	SampleRef *sub = t->samples[index];
 	if (t->type == t->TYPE_AUDIO){
 
 		// get target buffer

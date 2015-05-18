@@ -39,29 +39,29 @@ public:
 	int offset, num;
 	Array<float> r, l;
 
-	Array<string> peak;
+	Array<string> peaks;
 
-	Range range();
-	Range range0();
+	Range _cdecl range();
+	Range _cdecl range0();
 
-	void clear();
-	void resize(int length);
-	bool is_ref();
-	void make_own();
-	void scale(float volume, float panning = 0);
-	void swap_ref(BufferBox &b);
-	void swap_value(BufferBox &b);
-	void append(BufferBox &b);
-	void set(const BufferBox &b, int offset, float volume);
-	void add(const BufferBox &b, int offset, float volume, float panning);
-	void set_16bit(const void *b, int offset, int length);
-	void set_as_ref(const BufferBox &b, int offset, int length);
+	void _cdecl clear();
+	void _cdecl resize(int length);
+	bool _cdecl is_ref();
+	void _cdecl make_own();
+	void _cdecl scale(float volume, float panning = 0);
+	void _cdecl swap_ref(BufferBox &b);
+	void _cdecl swap_value(BufferBox &b);
+	void _cdecl append(BufferBox &b);
+	void _cdecl set(const BufferBox &b, int offset, float volume);
+	void _cdecl add(const BufferBox &b, int offset, float volume, float panning);
+	void _cdecl set_16bit(const void *b, int offset, int length);
+	void _cdecl set_as_ref(const BufferBox &b, int offset, int length);
 	//void import(void *data, int channels, int bits, int samples);
-	void import(void *data, int channels, SampleFormat format, int samples);
+	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 
-	bool get_16bit_buffer(Array<short> &data);
-	void interleave(float *p, float volume);
-	void deinterleave(float *p, int num_channels);
+	bool _cdecl get_16bit_buffer(Array<short> &data);
+	void _cdecl interleave(float *p, float volume);
+	void _cdecl deinterleave(float *p, int num_channels);
 
 	enum PeakMode
 	{
@@ -69,8 +69,8 @@ public:
 		PEAK_MODE_SQUAREMEAN
 	};
 
-	void invalidate_peaks(const Range &r);
-	void update_peaks(int mode);
+	void _cdecl invalidate_peaks(const Range &r);
+	void _cdecl update_peaks(int mode);
 };
 
 SampleFormat format_for_bits(int bits);

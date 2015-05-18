@@ -50,8 +50,8 @@ public:
 	};
 
 	string name;
-	Array<Target> target;
-	Array<float> temp_value;
+	Array<Target> targets;
+	Array<float> temp_values;
 	int type;
 
 	float min, max;

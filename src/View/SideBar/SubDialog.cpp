@@ -108,7 +108,7 @@ void SubDialog::loadData()
 	setFloat("volume", amplitude2db(sample->volume));
 	enable("volume", !sample->muted);
 	reset("level_track");
-	foreach(Track *t, audio->track)
+	foreach(Track *t, audio->tracks)
 		addString("level_track", t->getNiceName());
 	setInt("level_track", sample->track_no);
 	setInt("repnum", sample->rep_num + 1);

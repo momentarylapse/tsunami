@@ -73,7 +73,7 @@ bool Storage::load(AudioFile *a, const string &filename)
 	//tsunami->progress->Set("peaks", 1);
 
 	tsunami->progress->end();
-	if (a->track.num > 0)
+	if (a->tracks.num > 0)
 	{}//	a->SetCurTrack(a->track[0]);
 	a->action_manager->reset();
 	a->notify(a->MESSAGE_NEW);
@@ -109,10 +109,10 @@ bool Storage::loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename
 	msg_db_f("Storage.LoadBufferBox", 1);
 	AudioFile *aa = new AudioFile;
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
-	Track *t = aa->track[0];
+	Track *t = aa->tracks[0];
 	bool ok = loadTrack(t, filename, 0, 0);
-	buf->resize(t->level[0].buffer[0].num);
-	buf->set(t->level[0].buffer[0], 0, 1);
+	buf->resize(t->levels[0].buffers[0].num);
+	buf->set(t->levels[0].buffers[0], 0, 1);
 	delete(aa);
 	return ok;
 }

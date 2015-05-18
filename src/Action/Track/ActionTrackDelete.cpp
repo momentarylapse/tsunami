@@ -13,17 +13,17 @@
 
 ActionTrackDelete::ActionTrackDelete(AudioFile *a, int index)
 {
-	assert(index >= 0 && index < a->track.num);
+	assert(index >= 0 && index < a->tracks.num);
 
-	Track *t = a->track[index];
+	Track *t = a->tracks[index];
 
 	// delete buffers
-	foreachi(TrackLevel &l, t->level, li)
-		for (int i=l.buffer.num-1;i>=0;i--)
+	foreachi(TrackLevel &l, t->levels, li)
+		for (int i=l.buffers.num-1;i>=0;i--)
 			addSubAction(new ActionTrack__DeleteBufferBox(t, li, i), a);
 
 	// delete samples
-	for (int i=t->sample.num-1;i>=0;i--)
+	for (int i=t->samples.num-1;i>=0;i--)
 		addSubAction(new ActionTrackDeleteSample(t, i), a);
 
 	// delete the track itself

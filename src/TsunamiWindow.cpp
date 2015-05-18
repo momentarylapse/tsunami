@@ -150,8 +150,8 @@ TsunamiWindow::TsunamiWindow() :
 	subscribe(bottom_bar);
 
 
-	if (audio->track.num > 0)
-		view->setCurTrack(audio->track[0]);
+	if (audio->tracks.num > 0)
+		view->setCurTrack(audio->tracks[0]);
 	view->optimizeView();
 	HuiRunLaterM(0.5f, view, &AudioView::optimizeView);
 
@@ -207,7 +207,7 @@ void TsunamiWindow::onAddMidiTrack()
 
 void TsunamiWindow::onDeleteTrack()
 {
-	if (audio->track.num < 2){
+	if (audio->tracks.num < 2){
 		tsunami->log->error(_("Es muss mindestens eine Spur existieren"));
 		return;
 	}
@@ -496,8 +496,8 @@ void TsunamiWindow::updateMenu()
 	enable("delete_track", view->cur_track);
 	enable("track_properties", view->cur_track);
 	// level
-	enable("level_delete", audio->level_name.num > 1);
-	enable("level_up", view->cur_level < audio->level_name.num -1);
+	enable("level_delete", audio->level_names.num > 1);
+	enable("level_up", view->cur_level < audio->level_names.num -1);
 	enable("level_down", view->cur_level > 0);
 	// sub
 	enable("sample_from_selection", selected);
@@ -516,7 +516,7 @@ void TsunamiWindow::updateMenu()
 	HuiMenu *m = getMenu()->getSubMenuByID("menu_level_target");
 	if (m){
 		m->clear();
-		for (int i=0; i<audio->level_name.num; i++)
+		for (int i=0; i<audio->level_names.num; i++)
 			m->addItemCheckable(audio->getNiceLevelName(i), format("jump_to_level_%d", i));
 		check(format("jump_to_level_%d", view->cur_level), true);
 	}

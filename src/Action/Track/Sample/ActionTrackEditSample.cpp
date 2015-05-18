@@ -12,7 +12,7 @@ ActionTrackEditSample::ActionTrackEditSample(Track *t, int _index, float volume,
 {
 	track_no = get_track_index(t);
 	index = _index;
-	SampleRef *s = t->sample[index];
+	SampleRef *s = t->samples[index];
 	old_value.volume = s->volume;
 	old_value.mute = s->muted;
 	old_value.rep_num = s->rep_num;
@@ -31,7 +31,7 @@ void *ActionTrackEditSample::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
-	SampleRef *s = t->sample[index];
+	SampleRef *s = t->samples[index];
 
 	s->volume = new_value.volume;
 	s->muted = new_value.mute;
@@ -46,7 +46,7 @@ void ActionTrackEditSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
-	SampleRef *s = t->sample[index];
+	SampleRef *s = t->samples[index];
 
 	s->volume = old_value.volume;
 	s->muted = old_value.mute;

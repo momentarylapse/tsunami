@@ -205,7 +205,7 @@ void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
 	BeginChunk(f, "level");
 	f->WriteInt(level_no);
 
-	foreach(BufferBox &b, l->buffer)
+	foreach(BufferBox &b, l->buffers)
 		WriteBufferBox(f, &b);
 
 	EndChunk(f);
@@ -223,13 +223,13 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0); // reserved
 	f->WriteInt(0);
 
-	foreach(BarPattern &b, t->bar)
+	foreach(BarPattern &b, t->bars)
 		WriteBar(f, b);
 
-	foreachi(TrackLevel &l, t->level, i)
+	foreachi(TrackLevel &l, t->levels, i)
 		WriteTrackLevel(f, &l, i);
 
-	foreach(SampleRef *s, t->sample)
+	foreach(SampleRef *s, t->samples)
 		WriteSampleRef(f, s);
 
 	foreach(Effect *effect, t->fx)
@@ -272,17 +272,17 @@ void FormatNami::saveAudio(AudioFile *a, const string & filename)
 
 	f->WriteInt(a->sample_rate);
 
-	foreach(Tag &tag, a->tag)
+	foreach(Tag &tag, a->tags)
 		WriteTag(f, &tag);
 
-	WriteLevelName(f, a->level_name);
+	WriteLevelName(f, a->level_names);
 
-	foreach(Sample *sample, a->sample)
+	foreach(Sample *sample, a->samples)
 		WriteSample(f, sample);
 
-	foreachi(Track *track, a->track, i){
+	foreachi(Track *track, a->tracks, i){
 		WriteTrack(f, track);
-		tsunami->progress->set(_("speichere nami"), ((float)i + 0.5f) / (float)a->track.num);
+		tsunami->progress->set(_("speichere nami"), ((float)i + 0.5f) / (float)a->tracks.num);
 	}
 
 	foreach(Effect *effect, a->fx)
@@ -325,7 +325,7 @@ SampleRef *__AddEmptySubTrack(Track *t, const Range &r, const string &name)
 	BufferBox buf;
 	buf.resize(r.length());
 	t->root->addSample(name, buf);
-	return t->addSample(r.start(), t->root->sample.num - 1);
+	return t->addSample(r.start(), t->root->samples.num - 1);
 }
 
 struct ChunkStack;
@@ -411,9 +411,9 @@ void ReadChunkTag(ChunkStack *s, Array<Tag> *tag)
 void ReadChunkLevelName(ChunkStack *s, AudioFile *a)
 {
 	int num = s->f->ReadInt();
-	a->level_name.clear();
+	a->level_names.clear();
 	for (int i=0;i<num;i++)
-		a->level_name.add(s->f->ReadStr());
+		a->level_names.add(s->f->ReadStr());
 }
 
 void ReadChunkEffect(ChunkStack *s, Array<Effect*> *fx)
@@ -433,8 +433,8 @@ void ReadChunkEffect(ChunkStack *s, Array<Effect*> *fx)
 void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 {
 	BufferBox dummy;
-	l->buffer.add(dummy);
-	BufferBox *b = &l->buffer.back();
+	l->buffers.add(dummy);
+	BufferBox *b = &l->buffers.back();
 	b->offset = s->f->ReadInt();
 	int num = s->f->ReadInt();
 	b->resize(num);
@@ -590,7 +590,7 @@ void ReadChunkSynth(ChunkStack *s, Track *t)
 void ReadChunkSample(ChunkStack *s, AudioFile *a)
 {
 	Sample *sam = new Sample(Track::TYPE_AUDIO);
-	a->sample.add(sam);
+	a->samples.add(sam);
 	sam->owner = a;
 	sam->name = s->f->ReadStr();
 	sam->volume = s->f->ReadFloat();
@@ -605,7 +605,7 @@ void ReadChunkSample(ChunkStack *s, AudioFile *a)
 void ReadChunkTrackLevel(ChunkStack *s, Track *t)
 {
 	int l = s->f->ReadInt();
-	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[l]);
+	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->levels[l]);
 }
 
 void ReadChunkTrack(ChunkStack *s, AudioFile *a)
@@ -621,11 +621,11 @@ void ReadChunkTrack(ChunkStack *s, AudioFile *a)
 	tsunami->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
 
 	s->AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
-	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->level[0]);
+	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->levels[0]);
 	s->AddChunkHandler("samref", (chunk_reader*)&ReadChunkSampleRef, t);
 	s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
 	s->AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &t->fx);
-	s->AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bar);
+	s->AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bars);
 	s->AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
 	s->AddChunkHandler("synth", (chunk_reader*)&ReadChunkSynth, t);
 	s->AddChunkHandler("marker", (chunk_reader*)&ReadChunkMarker, &t->markers);
@@ -635,7 +635,7 @@ void ReadChunkNami(ChunkStack *s, AudioFile *a)
 {
 	a->sample_rate = s->f->ReadInt();
 
-	s->AddChunkHandler("tag", (chunk_reader*)&ReadChunkTag, &a->tag);
+	s->AddChunkHandler("tag", (chunk_reader*)&ReadChunkTag, &a->tags);
 	s->AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &a->fx);
 	s->AddChunkHandler("lvlname", (chunk_reader*)&ReadChunkLevelName, a);
 	s->AddChunkHandler("sample", (chunk_reader*)&ReadChunkSample, a);
@@ -675,7 +675,7 @@ void FormatNami::loadAudio(AudioFile *a, const string & filename)
 	tsunami->progress->set(_("lade nami"), 0);
 
 	// TODO?
-	a->tag.clear();
+	a->tags.clear();
 
 	CFile *f = FileOpen(a->filename);
 	f->SetBinaryMode(true);

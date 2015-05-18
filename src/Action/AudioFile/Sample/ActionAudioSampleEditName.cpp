@@ -12,7 +12,7 @@ ActionAudioSampleEditName::ActionAudioSampleEditName(AudioFile *a, int _index, c
 {
 	index = _index;
 	new_value = name;
-	old_value = a->sample[index]->name;
+	old_value = a->samples[index]->name;
 }
 
 ActionAudioSampleEditName::~ActionAudioSampleEditName()
@@ -22,7 +22,7 @@ ActionAudioSampleEditName::~ActionAudioSampleEditName()
 void *ActionAudioSampleEditName::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Sample *s = a->sample[index];
+	Sample *s = a->samples[index];
 
 	s->name = new_value;
 
@@ -32,7 +32,7 @@ void *ActionAudioSampleEditName::execute(Data *d)
 void ActionAudioSampleEditName::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
-	Sample *s = a->sample[index];
+	Sample *s = a->samples[index];
 
 	s->name = old_value;
 }

@@ -25,7 +25,7 @@ void *ActionTrack__GrowBufferBox::execute(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
 
-	BufferBox &b = t->level[level_no].buffer[index];
+	BufferBox &b = t->levels[level_no].buffers[index];
 	old_length = b.num;
 	b.resize(new_length);
 
@@ -39,7 +39,7 @@ void ActionTrack__GrowBufferBox::undo(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	Track *t = a->get_track(track_no);
 
-	BufferBox &b = t->level[level_no].buffer[index];
+	BufferBox &b = t->levels[level_no].buffers[index];
 	b.resize(old_length);
 }
 

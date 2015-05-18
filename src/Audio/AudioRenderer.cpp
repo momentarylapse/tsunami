@@ -76,7 +76,7 @@ void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 	buf.swap_ref(buf0);
 
 	// subs
-	foreach(SampleRef *s, t->sample){
+	foreach(SampleRef *s, t->samples){
 		if (s->muted)
 			continue;
 
@@ -113,7 +113,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	make_silence(buf, range_cur.length());
 
-	Array<Beat> beats = t->bar.getBeats(range_cur);
+	Array<Beat> beats = t->bars.getBeats(range_cur);
 
 	foreach(Beat &b, beats)
 		t->synth->addMetronomeClick(b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
@@ -153,9 +153,9 @@ void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
 {
 	//msg_write("fake track");
 	t->root = audio;
-	t->level.resize(1);
-	t->level[0].buffer.resize(1);
-	t->level[0].buffer[0].set_as_ref(buf, 0, range_cur.length());
+	t->levels.resize(1);
+	t->levels[0].buffers.resize(1);
+	t->levels[0].buffers[0].set_as_ref(buf, 0, range_cur.length());
 }
 
 void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)
@@ -189,7 +189,7 @@ void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 
 int get_first_usable_track(AudioFile *a)
 {
-	foreachi(Track *t, a->track, i)
+	foreachi(Track *t, a->tracks, i)
 		if ((!t->muted) && (t->is_selected))
 			return i;
 	return -1;
@@ -207,18 +207,18 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 	}else{
 
 		// first (un-muted) track
-		bb_render_track_fx(buf, audio->track[i0], i0);
+		bb_render_track_fx(buf, audio->tracks[i0], i0);
 		buf.make_own();
-		buf.scale(audio->track[i0]->volume, audio->track[i0]->panning);
+		buf.scale(audio->tracks[i0]->volume, audio->tracks[i0]->panning);
 
 		// other tracks
-		for (int i=i0+1;i<audio->track.num;i++){
-			if ((audio->track[i]->muted) || (!audio->track[i]->is_selected))
+		for (int i=i0+1;i<audio->tracks.num;i++){
+			if ((audio->tracks[i]->muted) || (!audio->tracks[i]->is_selected))
 				continue;
 			BufferBox tbuf;
-			bb_render_track_fx(tbuf, audio->track[i], i);
+			bb_render_track_fx(tbuf, audio->tracks[i], i);
 			buf.make_own();
-			buf.add(tbuf, 0, audio->track[i]->volume, audio->track[i]->panning);
+			buf.add(tbuf, 0, audio->tracks[i]->volume, audio->tracks[i]->panning);
 		}
 
 		buf.scale(audio->volume);
@@ -227,13 +227,13 @@ void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
 
 void apply_curves(AudioFile *audio, int pos)
 {
-	foreach(Curve *c, audio->curve)
+	foreach(Curve *c, audio->curves)
 		c->apply(pos);
 }
 
 void unapply_curves(AudioFile *audio)
 {
-	foreach(Curve *c, audio->curve)
+	foreach(Curve *c, audio->curves)
 		c->unapply();
 }
 
@@ -258,7 +258,7 @@ int AudioRenderer::read(BufferBox &buf)
 	msg_db_f("AudioRenderer.read", 1);
 	int size = max(min(buf.num, _range.end() - pos), 0);
 
-	if (audio->curve.num >= 0){
+	if (audio->curves.num >= 0){
 		buf.resize(size);
 		int chunk = 128;
 		for (int d=0; d<size; d+=chunk){
@@ -300,7 +300,7 @@ void AudioRenderer::reset()
 {
 	foreach(Effect *fx, audio->fx)
 		fx->prepare();
-	foreachi(Track *t, audio->track, i){
+	foreachi(Track *t, audio->tracks, i){
 		//midi.add(t, t->midi);
 		midi.add(t->midi);
 		t->synth->setSampleRate(audio->sample_rate);
@@ -326,6 +326,6 @@ void AudioRenderer::seek(int _pos)
 {
 	pos = _pos;
 	_offset = pos - _range.offset;
-	foreach(Track *t, audio->track)
+	foreach(Track *t, audio->tracks)
 		t->synth->endAllNotes();
 }

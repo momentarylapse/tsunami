@@ -152,8 +152,8 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		*(SampleRef**)v = NULL;
 		if (ss != "nil"){
 			int n = ss._int();
-			if ((n >= 0) && (n < tsunami->audio->sample.num))
-				*(SampleRef**)v = new SampleRef(tsunami->audio->sample[n]);
+			if ((n >= 0) && (n < tsunami->audio->samples.num))
+				*(SampleRef**)v = new SampleRef(tsunami->audio->samples[n]);
 		}
 	}else{
 		Array<Script::ClassElement> e = get_unique_elements(type);

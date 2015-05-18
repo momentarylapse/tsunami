@@ -29,9 +29,9 @@ void *ActionTrackSetSynthesizer::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	assert((track_no >= 0) && (track_no <= a->track.num));
+	assert((track_no >= 0) && (track_no <= a->tracks.num));
 
-	Track *t = a->track[track_no];
+	Track *t = a->tracks[track_no];
 
 	Synthesizer *temp = synth;
 	synth = t->synth;

@@ -269,7 +269,7 @@ void StartLesson(string name)
 	played.clear()
 
 	storage.load(audio, AppDirectoryStatic + "Lessons/" + name + ".nami")
-	for t in audio.track
+	for t in audio.tracks
 		if t.type == TRACK_TYPE_MIDI
 			MidiTrack = t
 			
@@ -278,7 +278,7 @@ void StartLesson(string name)
 	for n in notes
 		num_samples += n.range.length
 	ScoreFactor = 100 / num_samples
-	for t in audio.tag
+	for t in audio.tags
 		if t.key == "position"
 			HandPosition = t.value.int()
 		if t.key == "score"

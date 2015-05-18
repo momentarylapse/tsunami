@@ -76,16 +76,16 @@ Track::Track() :
 void Track::reset()
 {
 	msg_db_f("Track.Reset",1);
-	level.clear();
+	levels.clear();
 	name.clear();
 	volume = 1;
 	muted = false;
 	panning = 0;
-	bar.clear();
+	bars.clear();
 	foreach(Effect *f, fx)
 		delete(f);
 	fx.clear();
-	sample.clear();
+	samples.clear();
 	if (synth)
 		delete(synth);
 	synth = CreateSynthesizer("Dummy");
@@ -102,12 +102,12 @@ Range Track::getRangeUnsafe()
 {
 	int min =  1073741824;
 	int max = -1073741824;
-	foreach(TrackLevel &l, level)
-		if (l.buffer.num > 0){
-			min = min(l.buffer[0].offset, min);
-			max = max(l.buffer.back().range().end(), max);
+	foreach(TrackLevel &l, levels)
+		if (l.buffers.num > 0){
+			min = min(l.buffers[0].offset, min);
+			max = max(l.buffers.back().range().end(), max);
 		}
-	foreach(SampleRef *s, sample){
+	foreach(SampleRef *s, samples){
 		if (s->pos < min)
 			min = s->pos;
 		int smax = s->pos + s->buf->num + s->rep_num * s->rep_delay;
@@ -146,7 +146,7 @@ string Track::getNiceName()
 int Track::get_index()
 {
 	if (root){
-		foreachi(Track *t, root->track, i)
+		foreachi(Track *t, root->tracks, i)
 			if (this == t)
 				return i;
 	}
@@ -159,7 +159,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	msg_db_f("Track.ReadBuffers", 1);
 
 	// is <r> inside a buffer?
-	foreach(BufferBox &b, level[level_no].buffer){
+	foreach(BufferBox &b, levels[level_no].buffers){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.num;
 		if ((p0 >= 0) && (p1 <= b.num)){
@@ -173,7 +173,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	buf.resize(r.num);
 
 	// fill with overlapp
-	foreach(BufferBox &b, level[level_no].buffer)
+	foreach(BufferBox &b, levels[level_no].buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
 	return buf;
@@ -189,8 +189,8 @@ BufferBox Track::readBuffersCol(const Range &r)
 	int inside_level, inside_no;
 	int inside_p0, inside_p1;
 	bool intersected = false;
-	foreachi(TrackLevel &l, level, li)
-		foreachi(BufferBox &b, l.buffer, bi){
+	foreachi(TrackLevel &l, levels, li)
+		foreachi(BufferBox &b, l.buffers, bi){
 			if (b.range().covers(r)){
 				num_inside ++;
 				inside_level = li;
@@ -202,7 +202,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 		}
 	if ((num_inside == 1) && (!intersected)){
 		// set as reference to subarrays
-		buf.set_as_ref(level[inside_level].buffer[inside_no], inside_p0, inside_p1 - inside_p0);
+		buf.set_as_ref(levels[inside_level].buffers[inside_no], inside_p0, inside_p1 - inside_p0);
 		return buf;
 	}
 
@@ -210,8 +210,8 @@ BufferBox Track::readBuffersCol(const Range &r)
 	buf.resize(r.num);
 
 	// fill with overlapp
-	foreach(TrackLevel &l, level)
-		foreach(BufferBox &b, l.buffer)
+	foreach(TrackLevel &l, levels)
+		foreach(BufferBox &b, l.buffers)
 			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
 
 	return buf;
@@ -225,15 +225,15 @@ BufferBox Track::getBuffers(int level_no, const Range &r)
 
 void Track::updatePeaks(int mode)
 {
-	foreach(TrackLevel &l, level)
-		foreach(BufferBox &b, l.buffer)
+	foreach(TrackLevel &l, levels)
+		foreach(BufferBox &b, l.buffers)
 			b.update_peaks(mode);
 }
 
 void Track::invalidateAllPeaks()
 {
-	foreach(TrackLevel &l, level)
-		foreach(BufferBox &b, l.buffer)
+	foreach(TrackLevel &l, levels)
+		foreach(BufferBox &b, l.buffers)
 			b.invalidate_peaks(b.range());
 }
 
@@ -358,17 +358,17 @@ void Track::editSynthesizer(const string &param_old)
 	root->execute(new ActionTrackEditSynthesizer(this, param_old));
 }
 
-void Track::addBars(int index, float bpm, int beats, int bars)
+void Track::addBars(int index, float bpm, int beats, int num_bars)
 {
 	BarPattern b;
 	b.num_beats = beats;
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)root->sample_rate * 60.0f / bpm);
-	b.count = bars;
+	b.count = num_bars;
 	if (index >= 0)
 		root->execute(new ActionTrackAddBar(this, index + 1, b));
 	else
-		root->execute(new ActionTrackAddBar(this, bar.num, b));
+		root->execute(new ActionTrackAddBar(this, bars.num, b));
 }
 
 void Track::addPause(int index, float time)
@@ -381,7 +381,7 @@ void Track::addPause(int index, float time)
 	if (index >= 0)
 		root->execute(new ActionTrackAddBar(this, index + 1, b));
 	else
-		root->execute(new ActionTrackAddBar(this, bar.num, b));
+		root->execute(new ActionTrackAddBar(this, bars.num, b));
 }
 
 void Track::editBar(int index, BarPattern &p)

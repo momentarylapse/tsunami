@@ -191,7 +191,7 @@ void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	if (ok){
 		metadata[0] = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 		if (metadata[0]){
-			foreach(Tag &t, a->tag){
+			foreach(Tag &t, a->tags){
 				FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, t.key.upper().c_str(), t.value.c_str());
 				FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, true);
 			}

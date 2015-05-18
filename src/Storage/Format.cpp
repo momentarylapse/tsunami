@@ -53,11 +53,11 @@ void Format::exportAudioAsTrack(AudioFile* a, const string& filename)
 
 bool Format::testFormatCompatibility(AudioFile *a)
 {
-	int num_subs = a->sample.num;
+	int num_subs = a->samples.num;
 	int num_fx = a->fx.num;
 	int num_audio = 0;
 	int num_midi = 0;
-	foreach(Track *t, a->track){
+	foreach(Track *t, a->tracks){
 		num_fx += t->fx.num;
 		if (t->type == t->TYPE_AUDIO)
 			num_audio ++;
@@ -65,7 +65,7 @@ bool Format::testFormatCompatibility(AudioFile *a)
 			num_midi ++;
 	}
 
-	if ((a->track.num > 1) && ((flags & Format::FLAG_MULTITRACK) == 0))
+	if ((a->tracks.num > 1) && ((flags & Format::FLAG_MULTITRACK) == 0))
 		return false;
 	/*if ((a->tag.num > 0) && ((flags & StorageAny::FLAG_TAGS) == 0))
 		return false;*/

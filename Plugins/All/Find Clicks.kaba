@@ -39,8 +39,8 @@ void unclick(float[] b, Track *t, int offset)
 		t.addMarker(clicks[i+1] + offset, "]")
 
 void main()
-	for t in audio.track
-		for l in t.level
-			for b in l.buffer
+	for t in audio.tracks
+		for l in t.levels
+			for b in l.buffers
 				unclick(b.r, t, b.offset)
 				unclick(b.l, t, b.offset)

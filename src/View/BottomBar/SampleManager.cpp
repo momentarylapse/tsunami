@@ -108,7 +108,7 @@ void SampleManager::fillList()
 	foreach(string &name, icon_names)
 		HuiDeleteImage(name);
 	icon_names.clear();
-	foreachi(Sample *s, audio->sample, i){
+	foreachi(Sample *s, audio->samples, i){
 		icon_names.add(render_sample(s));
 		setString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->getRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
 	}
@@ -125,7 +125,7 @@ void SampleManager::onListSelect()
 	int sel = getInt("");
 	selected_uid = -1;
 	if (sel >= 0)
-		selected_uid = audio->sample[sel]->uid;
+		selected_uid = audio->samples[sel]->uid;
 	enable("export_sample", sel >= 0);
 	enable("preview_sample", sel >= 0);
 	enable("delete_sample", sel >= 0);
@@ -139,7 +139,7 @@ void SampleManager::onListEdit()
 	if (col == 2)
 		audio->editSampleName(sel, getCell("sample_list", sel, 2));
 	else if (col == 5)
-		audio->sample[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
+		audio->samples[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
 }
 
 void SampleManager::onImport()
@@ -149,7 +149,7 @@ void SampleManager::onImport()
 		tsunami->storage->loadBufferBox(audio, &buf, HuiFilename);
 		Sample *s = audio->addSample(HuiFilename.basename(), buf);
 		selected_uid = s->uid;
-		setInt("sample_list", audio->sample.num - 1);
+		setInt("sample_list", audio->samples.num - 1);
 		enable("delete_sample", true);
 		enable("paste_sample", true);
 	}
@@ -159,7 +159,7 @@ void SampleManager::onExport()
 {
 	if (tsunami->storage->askSaveExport(win)){
 		int sel = getInt("sample_list");
-		Sample *s = audio->sample[sel];
+		Sample *s = audio->samples[sel];
 		if (s->type == Track::TYPE_AUDIO){
 			tsunami->storage->saveBufferBox(audio, &s->buf, HuiFilename);
 		}
@@ -176,8 +176,8 @@ void SampleManager::onInsert()
 void SampleManager::onCreateFromSelection()
 {
 	audio->createSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
-	if (audio->sample.num > 0){
-		selected_uid = audio->sample.back()->uid;
+	if (audio->samples.num > 0){
+		selected_uid = audio->samples.back()->uid;
 		enable("delete_sample", true);
 		enable("paste_sample", true);
 	}
@@ -209,11 +209,11 @@ void SampleManager::onUpdate(Observable *o, const string &message)
 void SampleManager::onPreview()
 {
 	int sel = getInt("sample_list");
-	preview_sample = audio->sample[sel];
+	preview_sample = audio->samples[sel];
 	preview_audio->reset();
 	preview_audio->addTrack(preview_sample->type);
-	preview_audio->track[0]->level[0].buffer.add(preview_sample->buf);
-	preview_audio->track[0]->midi = preview_sample->midi;
+	preview_audio->tracks[0]->levels[0].buffers.add(preview_sample->buf);
+	preview_audio->tracks[0]->midi = preview_sample->midi;
 	preview_renderer->prepare(preview_audio, preview_audio->getRange(), false);
 
 	tsunami->progress->startCancelable(_("Vorschau"), 0);
@@ -250,7 +250,7 @@ public:
 
 		setString("list", _("\\- keines -\\"));
 		setInt("list", 0);
-		foreachi(Sample *s, audio->sample, i){
+		foreachi(Sample *s, audio->samples, i){
 			icon_names.add(render_sample(s));
 			setString("list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
 			if (s == old)
@@ -274,7 +274,7 @@ public:
 		int n = getInt("");
 		ret = NULL;
 		if (n >= 1)
-			ret = audio->sample[n - 1];
+			ret = audio->samples[n - 1];
 		enable("ok", n >= 0);
 	}
 
@@ -285,7 +285,7 @@ public:
 			ret = NULL;
 			delete(this);
 		}else if (n >= 1){
-			ret = audio->sample[n - 1];
+			ret = audio->samples[n - 1];
 			delete(this);
 		}
 	}

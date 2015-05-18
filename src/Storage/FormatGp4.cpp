@@ -116,10 +116,10 @@ void FormatGp4::saveAudio(AudioFile *_a, const string & filename)
 
 	Track *tt = a->getTimeTrack();
 	Array<Track*> tracks;
-	foreach(Track *t, a->track)
+	foreach(Track *t, a->tracks)
 		if (t != tt)
 			tracks.add(t);
-	Array<Bar> bars = tt->bar.getBars(Range(-1000000000, 2000000000));
+	Array<Bar> bars = tt->bars.getBars(Range(-1000000000, 2000000000));
 	tempo = 60.0f * (float)bars[0].num_beats / (float)bars[0].range.num * (float)a->sample_rate;
 
 
@@ -250,7 +250,7 @@ void FormatGp4::loadAudio(AudioFile *_a, const string &filename)
 			for (int j = 0; j < num_tracks; j++)
 				read_measure(measures[i], tracks[j], offset);
 			offset += a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator;
-			a->track[0]->addBars(-1, tempo, measures[i].numerator, 1);
+			a->tracks[0]->addBars(-1, tempo, measures[i].numerator, 1);
 		}
 
 	}catch(const string &s){

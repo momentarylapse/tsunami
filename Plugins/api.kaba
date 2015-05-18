@@ -109,7 +109,7 @@ class MidiEffect
 class BufferBox
 	int offset, num
 	float[] r, l
-	string[] peak
+	string[] peaks
 	extern void __assign__(BufferBox other)
 	extern void clear()
 	extern Range range()
@@ -203,7 +203,7 @@ enum
 	TRACK_TYPE_MIDI
 
 class TrackLevel
-	BufferBox[] buffer
+	BufferBox[] buffers
 
 class Sample // TODO
 	string name
@@ -229,7 +229,7 @@ enum
 class Track
 	int type
 	string name
-	TrackLevel[] level
+	TrackLevel[] levels
 	int length, pos
 
 	float volume, panning
@@ -239,10 +239,10 @@ class Track
 	int rep_delay
 	
 	AudioEffect[] *fx
-	SampleRef[] *sample
+	SampleRef[] *samples
 	
 	// time track
-	BarPattern[] bar
+	BarPattern[] bars
 	
 	// midi track
 	MidiData midi
@@ -290,16 +290,16 @@ class Tag
 
 class AudioFile
 	string filename
-	Tag[] tag
+	Tag[] tags
 	int sample_rate
 
 	float volume
 	
 	AudioEffect[] fx
-	Track*[] track
-	Sample*[] sample
+	Track*[] tracks
+	Sample*[] samples
 	
-	string[] level_name
+	string[] level_names
 	
 	extern void __init__()
 	extern virtual void __delete__()

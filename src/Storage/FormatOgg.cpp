@@ -77,7 +77,7 @@ void FormatOgg::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 	vorbis_comment vc;
 	vorbis_comment_init(&vc);
-	foreach(Tag &tag, a->tag)
+	foreach(Tag &tag, a->tags)
 		vorbis_comment_add_tag(&vc, (char*)tag.key.c_str(), (char*)tag.value.c_str());
 	ogg_packet header_main;
 	ogg_packet header_comments;
@@ -212,7 +212,7 @@ void FormatOgg::loadTrack(Track *t, const string & filename, int offset, int lev
 	}
 
 	// tags
-	t->root->tag.clear();
+	t->root->tags.clear();
 	char **ptr = ov_comment(&vf,-1)->user_comments;
 	while(*ptr){
 		string s = *ptr;
@@ -220,7 +220,7 @@ void FormatOgg::loadTrack(Track *t, const string & filename, int offset, int lev
 			Tag tag;
 			tag.key = s.substr(0, s.find("=")).lower();
 			tag.value = s.substr(s.find("=") + 1, -1);
-			t->root->tag.add(tag);
+			t->root->tags.add(tag);
 		}
 		++ptr;
     }

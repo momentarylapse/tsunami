@@ -26,10 +26,10 @@ void *ActionAudioDeleteSample::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	assert(index >= 0);
-	assert(index < a->sample.num);
-	sample = a->sample[index];
+	assert(index < a->samples.num);
+	sample = a->samples[index];
 	assert(sample->ref_count == 0);
-	a->sample.erase(index);
+	a->samples.erase(index);
 	sample->owner = NULL;
 	return NULL;
 }
@@ -38,6 +38,6 @@ void ActionAudioDeleteSample::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	sample->owner = a;
-	a->sample.insert(sample, index);
+	a->samples.insert(sample, index);
 }
 

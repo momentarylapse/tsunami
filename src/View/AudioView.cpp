@@ -95,6 +95,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
 
 	drawing_rect = rect(0, 1024, 0, 768);
+	enabled = true;
 
 	show_mono = HuiConfig.getBool("View.Mono", true);
 	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);
@@ -1227,7 +1228,8 @@ void AudioView::onDraw()
 	c->setAntialiasing(antialiasing);
 	//c->setColor(ColorWaveCur);
 
-	drawAudioFile(c, rect(0, c->width, 0, c->height));
+	if (enabled)
+		drawAudioFile(c, rect(0, c->width, 0, c->height));
 
 	//c->DrawStr(100, 100, i2s(frame++));
 
@@ -1419,6 +1421,14 @@ void AudioView::move(float dpos)
 	forceRedraw();
 }
 
+void AudioView::enable(bool _enabled)
+{
+	if (enabled and !_enabled)
+		unsubscribe(audio);
+	else if (!enabled and _enabled)
+		subscribe(audio);
+	enabled = _enabled;
+}
 
 
 

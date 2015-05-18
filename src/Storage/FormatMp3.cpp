@@ -167,7 +167,7 @@ void FormatMp3::loadTrack(Track *t, const string & filename, int offset, int lev
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(("avconv -i \"" + filename + "\" \"" + tmp + "\"").c_str());
 			tsunami->storage->loadTrack(t, tmp, offset, level);
-			tsunami->storage->CurrentDirectory = filename.dirname();
+			tsunami->storage->current_directory = filename.dirname();
 			file_delete(tmp);
 		}else
 			tsunami->log->error("mp3: need external program 'avconv' to decode");

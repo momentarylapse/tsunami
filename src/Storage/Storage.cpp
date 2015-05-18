@@ -27,48 +27,48 @@
 
 Storage::Storage()
 {
-	format.add(new FormatNami());
-	format.add(new FormatWave());
-	format.add(new FormatRaw());
-	format.add(new FormatOgg());
-	format.add(new FormatFlac());
-	format.add(new FormatGp4());
-	format.add(new FormatMp3());
-	format.add(new FormatM4a());
-	format.add(new FormatMidi());
+	formats.add(new FormatNami());
+	formats.add(new FormatWave());
+	formats.add(new FormatRaw());
+	formats.add(new FormatOgg());
+	formats.add(new FormatFlac());
+	formats.add(new FormatGp4());
+	formats.add(new FormatMp3());
+	formats.add(new FormatM4a());
+	formats.add(new FormatMidi());
 
-	CurrentDirectory = HuiConfig.getStr("CurrentDirectory", "");
+	current_directory = HuiConfig.getStr("CurrentDirectory", "");
 }
 
 Storage::~Storage()
 {
-	HuiConfig.setStr("CurrentDirectory", CurrentDirectory);
+	HuiConfig.setStr("CurrentDirectory", current_directory);
 
-	foreach(Format *f, format)
+	foreach(Format *f, formats)
 		delete(f);
-	format.clear();
+	formats.clear();
 }
 
 bool Storage::load(AudioFile *a, const string &filename)
 {
 	msg_db_f("Storage.Load", 1);
 
-	CurrentDirectory = filename.dirname();
+	current_directory = filename.dirname();
 	Format *f = getFormat(filename.extension(), 0);
 	if (!f)
 		return false;
 
 	tsunami->progress->start(_("lade"), 0);
-	tsunami->_view->unsubscribe(a);
 
 	a->reset();
+	tsunami->_view->enable(false);
 	a->action_manager->enable(false);
 	a->filename = filename;
 
 	f->loadAudio(a, filename);
 
 
-	tsunami->_view->subscribe(a);
+	tsunami->_view->enable(true);
 	a->action_manager->enable(true);
 	//tsunami->progress->Set("peaks", 1);
 
@@ -86,7 +86,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 {
 	msg_db_f("Storage.LoadTrack", 1);
 
-	CurrentDirectory = filename.dirname();
+	current_directory = filename.dirname();
 	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
 	if (!f)
 		return false;
@@ -121,7 +121,7 @@ bool Storage::saveBufferBox(AudioFile *a, BufferBox *buf, const string &filename
 {
 	msg_db_f("Storage.saveBuf", 1);
 
-	CurrentDirectory = filename.dirname();
+	current_directory = filename.dirname();
 	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
 	if (!f)
 		return false;
@@ -140,7 +140,7 @@ bool Storage::save(AudioFile *a, const string &filename)
 {
 	msg_db_f("Storage.Save", 1);
 
-	CurrentDirectory = filename.dirname();
+	current_directory = filename.dirname();
 
 	Format *f = getFormat(filename.extension(), 0);
 	if (!f)
@@ -188,7 +188,7 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 	string filter, filter_show;
 	filter_show = _("alles m&ogliche");
 	bool first = true;
-	foreach(Format *f, format)
+	foreach(Format *f, formats)
 		if ((f->flags & flags) == flags){
 			foreach(string &e, f->extensions){
 				if (!first)
@@ -202,7 +202,7 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 		}
 	filter_show += "|" + _("alle Dateien");
 	filter += "|*";
-	foreach(Format *f, format)
+	foreach(Format *f, formats)
 		if ((f->flags & flags) == flags){
 			filter += "|";
 			filter_show += "|" + f->description + " (";
@@ -217,9 +217,9 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 			filter_show += ")";
 		}
 	if (flags & Format::FLAG_WRITE)
-		return HuiFileDialogSave(win, title, CurrentDirectory, filter_show, filter);
+		return HuiFileDialogSave(win, title, current_directory, filter_show, filter);
 	else
-		return HuiFileDialogOpen(win, title, CurrentDirectory, filter_show, filter);
+		return HuiFileDialogOpen(win, title, current_directory, filter_show, filter);
 }
 
 bool Storage::askOpen(HuiWindow *win)
@@ -246,7 +246,7 @@ bool Storage::askSaveExport(HuiWindow *win)
 Format *Storage::getFormat(const string &ext, int flags)
 {
 	bool found = false;
-	foreach(Format *f, format)
+	foreach(Format *f, formats)
 		if (f->canHandle(ext)){
 			found = true;
 			if ((f->flags & flags) == flags)

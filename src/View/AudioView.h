@@ -127,6 +127,9 @@ public:
 
 	ActionTrackMoveSample *cur_action;
 
+	bool enabled;
+	void enable(bool enabled);
+
 	int mouse_possibly_selecting, mouse_possibly_selecting_start;
 	const int BarrierDist;
 	float ScrollSpeed;

@@ -9,7 +9,9 @@ class Drumset
 		if a
 			return
 		a = new AudioFile
+		string temp = storage.current_directory
 		storage.load(a, AppDirectoryStatic + "Data/Drumsets/" + name + ".nami")
+		storage.current_directory = temp
 
 class DrumList
 	Drumset[] sets

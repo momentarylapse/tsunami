@@ -429,6 +429,7 @@ void PluginManager::LinkAppScriptData()
 
 	Script::LinkExternal("Storage.load", Script::mf(&Storage::load));
 	Script::LinkExternal("Storage.save", Script::mf(&Storage::save));
+	Script::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
 
 	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
 	Script::DeclareClassOffset("PluginContext", "track", _offsetof(PluginManager::PluginContext, track));

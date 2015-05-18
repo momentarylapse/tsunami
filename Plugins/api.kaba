@@ -362,6 +362,7 @@ class AudioInput //: Observable
 class Storage
 	extern bool load(AudioFile *a, string filename)
 	extern bool save(AudioFile *a, string filename)
+	string current_directory
 
 class Log
 	extern void error(string message)

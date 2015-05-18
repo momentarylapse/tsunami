@@ -37,8 +37,8 @@ public:
 	Format *getFormat(const string &ext, int flags);
 
 //private:
-	Array<Format*> format;
-	string CurrentDirectory;
+	Array<Format*> formats;
+	string current_directory;
 };
 
 #endif /* STORAGE_H_ */

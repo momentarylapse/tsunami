@@ -251,9 +251,9 @@ int AudioInputAudio::doCapturing()
 	accumulation_buffer.append(b);
 
 	// write to file
-	Array<short> data;
-	b.get_16bit_buffer(data);
-	temp_file->WriteBuffer(&data[0], b.num * 4);
+	string data;
+	b.exports(data, 2, SAMPLE_FORMAT_16);
+	temp_file->WriteBuffer(&data[0], b.num);
 
 	return avail;
 }

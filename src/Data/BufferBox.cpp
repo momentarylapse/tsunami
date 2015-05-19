@@ -234,6 +234,7 @@ void BufferBox::set_as_ref(const BufferBox &b, int _offset, int _length)
 	l.set_ref(b.l.sub(_offset, _length));
 }
 
+#if 0
 void BufferBox::set_16bit(const void *b, int offset, int length)
 {
 	// relative to b
@@ -248,6 +249,7 @@ void BufferBox::set_16bit(const void *b, int offset, int length)
 		(*pl ++) = (float)(*pb ++) / 32768.0f;
 	}
 }
+#endif
 
 inline int invert_16(int i)
 {
@@ -267,35 +269,43 @@ inline int invert_32(int i)
 	return ((i & 0xff) << 24) + ((i & 0xff00) << 8) + ((i & 0xff0000) >> 8) + ((i & 0xff000000) >> 24);
 }
 
+inline float import_24(int i)
+{
+	if ((i & 0x00800000) != 0)
+		return (float)((i & 0x00ffffff) - 0x01000000) / 8388608.0f;
+	return (float)(i & 0x00ffffff) / 8388608.0f;
+}
 
 void BufferBox::import(void *data, int channels, SampleFormat format, int samples)
 {
 	char *cb = (char*)data;
 	short *sb = (short*)data;
+	int *ib = (int*)data;
+	float *fb = (float*)data;
 
 	for (int i=0;i<samples;i++){
 		if (channels == 2){
 			if (format == SAMPLE_FORMAT_8){
-				r[i] = (float)cb[i*2] / 128.0f;
-				l[i] = (float)cb[i*2+1] / 128.0f;
+				r[i] = (float)cb[i*2    ] / 128.0f;
+				l[i] = (float)cb[i*2 + 1] / 128.0f;
 			}else if (format == SAMPLE_FORMAT_16){
-				r[i] = (float)sb[i*2] / 32768.0f;
-				l[i] = (float)sb[i*2+1] / 32768.0f;
+				r[i] = (float)sb[i*2    ] / 32768.0f;
+				l[i] = (float)sb[i*2 + 1] / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_16_BIGENDIAN){
-				r[i] = (float)invert_16(sb[i*2]) / 32768.0f;
-				l[i] = (float)invert_16(sb[i*2+1]) / 32768.0f;
+				r[i] = (float)invert_16(sb[i*2    ]) / 32768.0f;
+				l[i] = (float)invert_16(sb[i*2 + 1]) / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_24){
-				r[i] = (float)*(short*)&cb[i*6 + 1] / 32768.0f; // only high 16 bits
-				l[i] = (float)*(short*)&cb[i*6 + 4] / 32768.0f;
+				r[i] = import_24(*(int*)&cb[i*6    ]);
+				l[i] = import_24(*(int*)&cb[i*6 + 3]);
 			}else if (format == SAMPLE_FORMAT_24_BIGENDIAN){
-				r[i] = (float)invert_24(*(int*)&cb[i*6 + 0] >> 8) / 32768.0f / 256;
-				l[i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 32768.0f / 256;
+				r[i] = (float)invert_24(*(int*)&cb[i*6    ] >> 8) / 8388608.0f;
+				l[i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 8388608.0f;
 			}else if (format == SAMPLE_FORMAT_32){
-				r[i] = (float)sb[i*4+1] / 32768.0f; // only high 16 bits...
-				l[i] = (float)sb[i*4+3] / 32768.0f;
+				r[i] = (float)ib[i*2  ] / 2147483648.0f;
+				l[i] = (float)ib[i*2+1] / 2147483648.0f;
 			}else if (format == SAMPLE_FORMAT_32_FLOAT){
-				r[i] = *(float*)&sb[i*4];
-				l[i] = *(float*)&sb[i*4+2];
+				r[i] = fb[i*2];
+				l[i] = fb[i*2+1];
 			}else
 				throw string("BufferBox.import: unhandled format");
 		}else{
@@ -306,13 +316,13 @@ void BufferBox::import(void *data, int channels, SampleFormat format, int sample
 			}else if (format == SAMPLE_FORMAT_16_BIGENDIAN){
 				r[i] = (float)invert_16(sb[i]) / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_24){
-				r[i] = (float)*(short*)&cb[i*3 + 1] / 32768.0f;
+				r[i] = import_24(*(int*)&cb[i*3]);
 			}else if (format == SAMPLE_FORMAT_24_BIGENDIAN){
-				r[i] = (float)invert_24(*(int*)&cb[i*3] >> 8) / 32768.0f / 256;
+				r[i] = (float)invert_24(*(int*)&cb[i*3] >> 8) / 8388608.0f;
 			}else if (format == SAMPLE_FORMAT_32){
-				r[i] = (float)sb[i*2+1] / 32768.0f;
+				r[i] = (float)ib[i] / 2147483648.0f;
 			}else if (format == SAMPLE_FORMAT_32_FLOAT){
-				r[i] = *(float*)&sb[i*2];
+				r[i] = fb[i];
 			}else
 				throw string("BufferBox.import: unhandled format");
 			l[i] = r[i];
@@ -322,38 +332,74 @@ void BufferBox::import(void *data, int channels, SampleFormat format, int sample
 
 
 
-#define val_max		32766
-#define val_alert	32770
+#define VAL_MAX_16		32766
+#define VAL_ALERT_16	32770
+#define VAL_MAX_24		8388606
+#define VAL_ALERT_24	8388610
 
 static bool wtb_overflow;
 
-inline void set_data(short *data, float value)
+inline int set_data(float value, float scale, int clamp, int warn_thresh)
 {
-	int value_int = (int)(value * 32768.0f);
-	if (value_int > val_max){
-		if (value_int > val_alert)
+	int value_int = (int)(value * scale);
+	if (value_int > clamp){
+		if (value_int > warn_thresh)
 			wtb_overflow = true;
-		value_int = val_max;
-	}else if (value_int < - val_max){
-		if (value_int < -val_alert)
+		value_int = clamp;
+	}else if (value_int < - clamp){
+		if (value_int < -warn_thresh)
 			wtb_overflow = true;
-		value_int = -val_max;
+		return -clamp;
 	}
-	*data = value_int;
+	return value_int;
 }
 
-bool BufferBox::get_16bit_buffer(Array<short> &data)
+inline void set_data_16(short *data, float value)
+{
+	*data = set_data(value, 32768.0f, VAL_MAX_16, VAL_ALERT_16);
+}
+
+inline void set_data_24(int *data, float value)
+{
+	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24);
+}
+
+bool BufferBox::_export(void *data, int channels, SampleFormat format)
 {
 	wtb_overflow = false;
 
-	data.resize(num * 2);
-	short *b = &data[0];
-	for (int i=0;i<num;i++){
-		set_data(b ++, r[i]);
-		set_data(b ++, l[i]);
+	if (format == SAMPLE_FORMAT_16){
+		short *sb = (short*)data;
+		for (int i=0;i<num;i++){
+			set_data_16(sb ++, r[i]);
+			set_data_16(sb ++, l[i]);
+		}
+	}else if (format == SAMPLE_FORMAT_24){
+		char *sc = (char*)data;
+		for (int i=0;i<num;i++){
+			set_data_24((int*)sc, r[i]);
+			sc += 3;
+			set_data_24((int*)sc, l[i]);
+			sc += 3;
+		}
+	}else if (format == SAMPLE_FORMAT_32_FLOAT){
+		float *fc = (float*)data;
+		for (int i=0;i<num;i++){
+			*(fc ++) = r[i];
+			*(fc ++) = l[i];
+		}
+	}else{
+		//tsunami->log->error("invalid export format");
+		msg_error("invalid export format");
 	}
 
 	return !wtb_overflow;
+}
+
+bool BufferBox::exports(string &data, int channels, SampleFormat format)
+{
+	data.resize(num * channels * (format_get_bits(format) / 8));
+	return _export(data.data, channels, format);
 }
 
 inline float _clamp_(float f)

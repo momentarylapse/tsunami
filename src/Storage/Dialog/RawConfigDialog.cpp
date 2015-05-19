@@ -20,10 +20,10 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, HuiWindow *parent) :
 	addGrid("", 0, 0, 1, 2, "table1");
 	setTarget("table1", 0);
 	addGrid("", 0, 0, 2, 4, "table2");
-	addGrid("", 0, 1, 2, 1, "table3");
+	addGrid("!buttonbar", 0, 1, 2, 1, "table3");
 	setTarget("table2", 0);
 	addLabel(_("Format"), 0, 0, 0, 0, "");
-	addComboBox("", 1, 0, 0, 0, "format");
+	addComboBox("!expandx", 1, 0, 0, 0, "format");
 	addLabel(_("Kan&ale"), 0, 1, 0, 0, "");
 	addComboBox("Mono\\Stereo", 1, 1, 0, 0, "channels");
 	addLabel(_("Samplerate"), 0, 2, 0, 0, "");
@@ -40,6 +40,7 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, HuiWindow *parent) :
 
 	event("hui:close", this, &RawConfigDialog::onClose);
 	event("close", this, &RawConfigDialog::onClose);
+	event("cancel", this, &RawConfigDialog::onClose);
 	event("ok", this, &RawConfigDialog::onOk);
 }
 

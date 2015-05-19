@@ -85,10 +85,10 @@ void WriteBufferBox(CFile *f, BufferBox *b)
 	f->WriteInt(2);
 	f->WriteInt(16);
 
-	Array<short> data;
-	if (!b->get_16bit_buffer(data))
-		tsunami->log->error(_("Amplitude zu gro&s, Signal &ubersteuert."));
-	f->WriteBuffer(data.data, data.num * sizeof(short));
+	string data;
+	if (!b->exports(data, 2, SAMPLE_FORMAT_16))
+		tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+	f->WriteBuffer(data.data, data.num);
 	EndChunk(f);
 }
 
@@ -238,7 +238,7 @@ void WriteTrack(CFile *f, Track *t)
 	foreach(TrackMarker &m, t->markers)
 		WriteMarker(f, m);
 
-	if ((t->type == t->TYPE_TIME) || (t->type == t->TYPE_MIDI))
+	if ((t->type == t->TYPE_TIME) or (t->type == t->TYPE_MIDI))
 		WriteSynth(f, t->synth);
 
 	if (t->midi.num > 0)
@@ -441,23 +441,20 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 	s->f->ReadInt(); // channels (2)
 	s->f->ReadInt(); // bit (16)
 
-	Array<short> data;
-	data.resize(num * 2);
+	string data;
+	data.resize(num * 4);
 
 	// read chunk'ed
 	int offset = 0;
-	for (int n=0;n<(num * 4) / CHUNK_SIZE;n++){
+	for (int n=0; n<data.num / CHUNK_SIZE; n++){
 		s->f->ReadBuffer(&data[offset], CHUNK_SIZE);
 		tsunami->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
-		offset += CHUNK_SIZE / 2;
+		offset += CHUNK_SIZE;
 	}
-	s->f->ReadBuffer(&data[offset], (num * 4) % CHUNK_SIZE);
+	s->f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
 
 	// insert
-	for (int i=0;i<num;i++){
-		b->r[i] =  (float)data[i * 2    ] / 32768.0f;
-		b->l[i] =  (float)data[i * 2 + 1] / 32768.0f;
-	}
+	b->import(data.data, 2, SAMPLE_FORMAT_16, num);
 }
 
 
@@ -469,13 +466,10 @@ void ReadChunkSampleBufferBox(ChunkStack *s, BufferBox *b)
 	s->f->ReadInt(); // channels (2)
 	s->f->ReadInt(); // bit (16)
 
-	Array<short> data;
-	data.resize(num * 2);
-	s->f->ReadBuffer(data.data, num * 4);
-	for (int i=0;i<num;i++){
-		b->r[i] =  (float)data[i * 2    ] / 32768.0f;
-		b->l[i] =  (float)data[i * 2 + 1] / 32768.0f;
-	}
+	string data;
+	data.resize(num * 4);
+	s->f->ReadBuffer(data.data, data.num);
+	b->import(data.data, 2, SAMPLE_FORMAT_16, num);
 }
 
 void ReadChunkSampleRef(ChunkStack *s, Track *t)

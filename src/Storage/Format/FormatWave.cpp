@@ -28,10 +28,9 @@ void FormatWave::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	msg_db_f("write_wave_file", 1);
 	tsunami->progress->set(_("exportiere wave"), 0);
 
-	Array<short> buf16;
-	if (!b->get_16bit_buffer(buf16))
-		tsunami->log->error(_("Amplitude zu gro&s, Signal &ubersteuert."));
-	char *data = (char*)buf16.data;
+	string data;
+	if (!b->exports(data, 2, SAMPLE_FORMAT_16))
+		tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
 
 	CFile *f = FileCreate(filename);
 	f->SetBinaryMode(true);

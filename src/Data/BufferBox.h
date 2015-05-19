@@ -54,12 +54,11 @@ public:
 	void _cdecl append(BufferBox &b);
 	void _cdecl set(const BufferBox &b, int offset, float volume);
 	void _cdecl add(const BufferBox &b, int offset, float volume, float panning);
-	void _cdecl set_16bit(const void *b, int offset, int length);
 	void _cdecl set_as_ref(const BufferBox &b, int offset, int length);
-	//void import(void *data, int channels, int bits, int samples);
 	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 
-	bool _cdecl get_16bit_buffer(Array<short> &data);
+	bool _cdecl _export(void *data, int channels, SampleFormat format);
+	bool _cdecl exports(string &data, int channels, SampleFormat format);
 	void _cdecl interleave(float *p, float volume);
 	void _cdecl deinterleave(float *p, int num_channels);
 

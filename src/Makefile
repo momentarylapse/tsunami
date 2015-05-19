@@ -212,6 +212,7 @@ OBJ = \
  Storage/Format/FormatNami.o\
  Storage/Format/FormatOgg.o\
  Storage/Format/FormatRaw.o\
+ Storage/Format/FormatSoundFont2.o\
  Storage/Format/FormatWave.o\
  Storage/Storage.o\
  Stuff/Clipboard.o\
@@ -878,6 +879,9 @@ Storage/Format/FormatOgg.o : Storage/Format/FormatOgg.cpp
 
 Storage/Format/FormatRaw.o : Storage/Format/FormatRaw.cpp
 	$(CPP) -c Storage/Format/FormatRaw.cpp -o $@ $(CXXFLAGS)
+
+Storage/Format/FormatSoundFont2.o : Storage/Format/FormatSoundFont2.cpp
+	$(CPP) -c Storage/Format/FormatSoundFont2.cpp -o $@ $(CXXFLAGS)
 
 Storage/Format/FormatWave.o : Storage/Format/FormatWave.cpp
 	$(CPP) -c Storage/Format/FormatWave.cpp -o $@ $(CXXFLAGS)

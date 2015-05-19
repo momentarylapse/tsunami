@@ -25,7 +25,7 @@ FormatWave::~FormatWave()
 
 void FormatWave::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {
-	msg_db_r("write_wave_file", 1);
+	msg_db_f("write_wave_file", 1);
 	tsunami->progress->set(_("exportiere wave"), 0);
 
 	Array<short> buf16;
@@ -59,7 +59,6 @@ void FormatWave::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
 
 	FileClose(f);
-	msg_db_l(1);
 }
 
 static string read_chunk_name(CFile *f)
@@ -72,7 +71,7 @@ static string read_chunk_name(CFile *f)
 
 void FormatWave::loadTrack(Track *t, const string & filename, int offset, int level)
 {
-	msg_db_r("load_wave_file", 1);
+	msg_db_f("load_wave_file", 1);
 	tsunami->progress->set(_("lade wave"), 0);
 
 	char *data = new char[WAVE_BUFFER_SIZE];
@@ -174,7 +173,6 @@ void FormatWave::loadTrack(Track *t, const string & filename, int offset, int le
 
 	if (f)
 		FileClose(f);
-	msg_db_l(1);
 }
 
 void FormatWave::saveAudio(AudioFile *a, const string & filename)

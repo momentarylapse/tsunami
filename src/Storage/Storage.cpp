@@ -14,6 +14,7 @@
 #include "Format/FormatM4a.h"
 #include "Format/FormatMidi.h"
 #include "Format/FormatMp3.h"
+#include "Format/FormatSoundFont2.h"
 #include "Format/FormatNami.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -33,6 +34,7 @@ Storage::Storage()
 	formats.add(new FormatOgg());
 	formats.add(new FormatFlac());
 	formats.add(new FormatGuitarPro());
+	formats.add(new FormatSoundFont2());
 	formats.add(new FormatMp3());
 	formats.add(new FormatM4a());
 	formats.add(new FormatMidi());

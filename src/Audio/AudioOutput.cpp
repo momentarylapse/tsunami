@@ -59,10 +59,15 @@ void AudioOutput::setDevice(const string &device)
 Array<string> AudioOutput::getDevices()
 {
 	Array<string> devices;
+	msg_write("------get dev");
 
 	int n = Pa_GetDeviceCount();
 	for (int i=0; i<n; i++){
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
+		msg_write(di->name);
+		msg_write(di->hostApi);
+		msg_write(di->maxOutputChannels);
+		msg_write(di->maxInputChannels);
 		if (di->maxOutputChannels >= 2)
 			devices.add(di->name);
 	}

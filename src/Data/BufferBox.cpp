@@ -361,26 +361,30 @@ inline void set_data_16(short *data, float value)
 
 inline void set_data_24(int *data, float value)
 {
-	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24);
+	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24) & 0x00ffffff;
 }
 
-bool BufferBox::_export(void *data, int channels, SampleFormat format)
+bool BufferBox::_export(void *data, int channels, SampleFormat format, bool align32)
 {
 	wtb_overflow = false;
 
 	if (format == SAMPLE_FORMAT_16){
 		short *sb = (short*)data;
+		int d = align32 ? 2 : 1;
 		for (int i=0;i<num;i++){
-			set_data_16(sb ++, r[i]);
-			set_data_16(sb ++, l[i]);
+			set_data_16(sb, r[i]);
+			sb += d;
+			set_data_16(sb, l[i]);
+			sb += d;
 		}
 	}else if (format == SAMPLE_FORMAT_24){
 		char *sc = (char*)data;
+		int d = align32 ? 4 : 3;
 		for (int i=0;i<num;i++){
 			set_data_24((int*)sc, r[i]);
-			sc += 3;
+			sc += d;
 			set_data_24((int*)sc, l[i]);
-			sc += 3;
+			sc += d;
 		}
 	}else if (format == SAMPLE_FORMAT_32_FLOAT){
 		float *fc = (float*)data;
@@ -399,7 +403,7 @@ bool BufferBox::_export(void *data, int channels, SampleFormat format)
 bool BufferBox::exports(string &data, int channels, SampleFormat format)
 {
 	data.resize(num * channels * (format_get_bits(format) / 8));
-	return _export(data.data, channels, format);
+	return _export(data.data, channels, format, false);
 }
 
 inline float _clamp_(float f)

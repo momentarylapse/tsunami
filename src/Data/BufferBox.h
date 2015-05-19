@@ -57,7 +57,7 @@ public:
 	void _cdecl set_as_ref(const BufferBox &b, int offset, int length);
 	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 
-	bool _cdecl _export(void *data, int channels, SampleFormat format);
+	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32);
 	bool _cdecl exports(string &data, int channels, SampleFormat format);
 	void _cdecl interleave(float *p, float volume);
 	void _cdecl deinterleave(float *p, int num_channels);

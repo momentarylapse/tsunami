@@ -142,12 +142,12 @@ void FormatFlac::loadTrack(Track *t, const string & filename, int offset, int le
 
 
 
-#define FLAC_READSIZE 1024
+#define FLAC_READSIZE 2048
 
 void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate, void *client_data)
 {
 	long length = (long)client_data;
-	if (samples_written % (FLAC_READSIZE * 128) == 0)
+	if (samples_written % (FLAC_READSIZE * 64) == 0)
 		tsunami->progress->set((float)samples_written / (float)length);
 }
 

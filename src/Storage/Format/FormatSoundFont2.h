@@ -26,23 +26,26 @@ public:
 	void read_samples(CFile *f);
 
 	int sample_offset;
+	int sample_count;
 
 
 	struct sfSample
 	{
-		char name[20];
+		string name;
 		int start;
 		int end;
 		int start_loop;
 		int end_loop;
 		int sample_rate;
-		unsigned char by_original_key;
-		char correction;
-		short sample_link;
-		short sample_type;
+		int original_key;
+		int correction;
+		int sample_link;
+		int sample_type;
 		void print();
 	};
 	Array<sfSample> samples;
+
+	void read_sample_header(CFile *f, sfSample &s);
 
 	AudioFile *audio;
 };

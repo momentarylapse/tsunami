@@ -13,6 +13,7 @@
 #include "../../View/Helper/Progress.h"
 #include "../../Audio/Synth/Synthesizer.h"
 
+#include <FLAC/all.h>
 
 const int CHUNK_SIZE = 1 << 16;
 
@@ -24,6 +25,82 @@ FormatNami::FormatNami() :
 
 FormatNami::~FormatNami()
 {
+}
+
+static FLAC__int32 flac_pcm[CHUNK_SIZE/*samples*/ * 2/*channels*/];
+
+FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)
+{
+	string *data = (string*)client_data;
+	for (unsigned int i=0; i<bytes; i++)
+		data->add(buffer[i]);
+
+	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
+}
+
+string compress_buffer(BufferBox &b)
+{
+	string data;
+
+
+	bool ok = true;
+	FLAC__StreamEncoderInitStatus init_status;
+
+	int channels = 2;
+
+	// allocate the encoder
+	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
+	if (!encoder){
+		tsunami->log->error("flac: allocating encoder");
+		return "";
+	}
+
+	ok &= FLAC__stream_encoder_set_verify(encoder, true);
+	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
+	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
+	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, 16);
+	ok &= FLAC__stream_encoder_set_sample_rate(encoder, DEFAULT_SAMPLE_RATE);
+	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.num);
+
+	// initialize encoder
+	if (ok){
+		init_status = FLAC__stream_encoder_init_stream(encoder, &FlacCompressWriteCallback, NULL, NULL, NULL, (void*)&data);
+		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
+			tsunami->log->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
+			ok = false;
+		}
+	}
+
+	// read blocks of samples from WAVE file and feed to encoder
+	if (ok){
+		int p0 = 0;
+		size_t left = (size_t)b.num;
+		while (ok && left){
+			size_t need = (left > CHUNK_SIZE ? (size_t)CHUNK_SIZE : (size_t)left);
+			{
+				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
+				for (unsigned int i=0;i<need;i++){
+					flac_pcm[i * 2 + 0] = (int)(b.r[p0 + i] * 32768.0f);
+					flac_pcm[i * 2 + 1] = (int)(b.l[p0 + i] * 32768.0f);
+				}
+				/* feed samples to encoder */
+				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
+			}
+			left -= need;
+			p0 += CHUNK_SIZE;
+		}
+	}
+
+	ok &= FLAC__stream_encoder_finish(encoder);
+
+	if (!ok){
+		tsunami->log->error("flac: encoding: FAILED");
+		tsunami->log->error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
+	}
+
+	FLAC__stream_encoder_delete(encoder);
+
+	return data;
 }
 
 void WriteMidi(CFile *f, MidiData &m);
@@ -88,6 +165,10 @@ void WriteBufferBox(CFile *f, BufferBox *b)
 	string data;
 	if (!b->exports(data, 2, SAMPLE_FORMAT_16))
 		tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+
+	//string cdata = compress_buffer(*b);
+	//msg_write(format("compress:  %d  -> %d    %.1f%%", data.num, cdata.num, (float)cdata.num / (float)data.num * 100.0f));
+
 	f->WriteBuffer(data.data, data.num);
 	EndChunk(f);
 }

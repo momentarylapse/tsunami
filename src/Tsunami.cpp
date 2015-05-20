@@ -49,7 +49,7 @@ void _pa_sink_info_cb(pa_context *c, const pa_sink_info *i, int eol, void *userd
 {
 	if (eol > 0)
 		return;
-	msg_write(string("sink info: ") + i->name);
+	printf("sink info: %s\n", i->name);
 }
 
 
@@ -57,9 +57,10 @@ void _pa_sink_info_cb(pa_context *c, const pa_sink_info *i, int eol, void *userd
 // care about when it's ready or if it has failed
 void pa_state_cb(pa_context *c, void *userdata)
 {
-	msg_write("  state");
+	printf("  state\n");
 	int *pa_ready = (int*)userdata;
 	pa_context_state_t state = pa_context_get_state(c);
+	printf("  %d\n", (int)state);
 	switch(state){
 		case PA_CONTEXT_UNCONNECTED:
 		case PA_CONTEXT_CONNECTING:
@@ -69,11 +70,11 @@ void pa_state_cb(pa_context *c, void *userdata)
 			break;
 		case PA_CONTEXT_FAILED:
 		case PA_CONTEXT_TERMINATED:
-			msg_write("  pa fail");
+			printf("  pa fail\n");
 			*pa_ready = 2;
 			break;
 		case PA_CONTEXT_READY:
-			msg_write("  pa ready");
+			printf("  pa ready\n");
 			*pa_ready = 1;
 			break;
 	}
@@ -81,21 +82,21 @@ void pa_state_cb(pa_context *c, void *userdata)
 
 void _pa_stream_request_cb(pa_stream *p, size_t nbytes, void *userdata)
 {
-	msg_write("read " + i2s(nbytes));
+	printf("read %d\n", (int)nbytes);
 	const void *data;
 	int r = pa_stream_peek(p, &data, &nbytes);
-	msg_write(r);
 
 	if (data){
-		msg_write(pa_stream_writable_size((pa_stream*)userdata));
+		//msg_write(pa_stream_writable_size((pa_stream*)userdata));
 		r = pa_stream_write((pa_stream*)userdata, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
-		msg_write(r);
+		//msg_write(r);
 		pa_stream_drop(p);
 	}
+	//msg_write(">");
 }
 void _pa_stream_notify_cb(pa_stream *p, void *userdata)
 {
-	msg_write("sstate..." + p2s(p));
+	printf("sstate... %p", p);
 }
 
 
@@ -125,29 +126,35 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	storage = new Storage;
 
 
-	pa_mainloop* m = pa_mainloop_new();
-	pa_mainloop_api *mainloop_api = pa_mainloop_get_api(m);
+
+	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
+	pa_mainloop_api *mainloop_api = pa_threaded_mainloop_get_api(m);
 	pa_context *context = pa_context_new(mainloop_api, "tsunami");
 	if (!context){
-		msg_error("pa_context_new() failed.\n");
-	}
-
-	if (pa_context_connect(context, NULL, (pa_context_flags_t)0, NULL) < 0) {
-		msg_error(string("pa_context_connect() failed: ") + pa_strerror(pa_context_errno(context)));
+		printf("pa_context_new() failed.\n");
+		return 1;
 	}
 
 	int pa_ready = 0;
-    pa_context_set_state_callback(context, pa_state_cb, &pa_ready);
+	pa_context_set_state_callback(context, pa_state_cb, &pa_ready);
+
+	if (pa_context_connect(context, NULL, (pa_context_flags_t)0, NULL) < 0) {
+		printf("pa_context_connect() failed: %s", pa_strerror(pa_context_errno(context)));
+		return 1;
+	}
+	pa_threaded_mainloop_start(m);
 
 	pa_operation *pa_op;
 
-    while (pa_ready == 0)
-        pa_mainloop_iterate(m, 1, NULL);
+	printf("init...\n");
+	while (pa_ready == 0)
+        	{}//pa_mainloop_iterate(m, 1, NULL);
+	printf("ok\n");
 
 
 	pa_op = pa_context_get_sink_info_list(context, _pa_sink_info_cb, NULL);
 	while (true){
-        pa_mainloop_iterate(m, 1, NULL);
+        	//pa_mainloop_iterate(m, 1, NULL);
 		if (pa_operation_get_state(pa_op) == PA_OPERATION_DONE) {
 			pa_operation_unref(pa_op);
 			break;
@@ -160,8 +167,8 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	//ss.format = PA_SAMPLE_S16LE;
 	pa_stream *stream_in = pa_stream_new(context, "stream-in", &ss, NULL);
 	pa_stream *stream_out = pa_stream_new(context, "stream-out", &ss, NULL);
-	msg_write(p2s(stream_in));
-	msg_write(p2s(stream_out));
+	printf("%p\n", stream_in);
+	printf("%p\n", stream_out);
 
 
 	pa_stream_set_read_callback(stream_in, &_pa_stream_request_cb, stream_out);
@@ -170,7 +177,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	pa_buffer_attr attr_out;
 	attr_out.fragsize = 512;
-	attr_out.maxlength = 1<<14;
+	attr_out.maxlength = 4096;
 	attr_out.minreq = -1;
 	attr_out.tlength = -1;
 	attr_out.prebuf = -1;
@@ -178,8 +185,9 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	msg_write(r);
 
 	pa_buffer_attr attr_in;
-	attr_in.fragsize = -1;//512;
-	attr_in.maxlength = -1;//1<<14;
+//	attr_in.fragsize = -1;
+	attr_in.fragsize = 512;
+	attr_in.maxlength = -1;
 	attr_in.minreq = -1;
 	attr_in.tlength = -1;
 	attr_in.prebuf = -1;
@@ -188,12 +196,12 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	msg_write("wait in");
 	while (pa_stream_get_state(stream_in) != PA_STREAM_READY)
-		pa_mainloop_iterate(m, 1, NULL);
+		{}//pa_mainloop_iterate(m, 1, NULL);
 	msg_write("ok");
 
 	msg_write("wait out");
 	while (pa_stream_get_state(stream_out) != PA_STREAM_READY)
-		pa_mainloop_iterate(m, 1, NULL);
+		{}//pa_mainloop_iterate(m, 1, NULL);
 	msg_write("ok");
 
     /*msg_write("trigger in");
@@ -218,6 +226,23 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	float *data = new float[1024];
 	float vol = 0;
 	while (true){
+		//pa_mainloop_iterate(m, 1, NULL);
+
+		continue;
+
+		int size = pa_stream_readable_size(stream_in);
+		if (size == 0)
+			continue;
+		msg_write(size);
+		const void *data;
+		unsigned long nbytes;
+		int r = pa_stream_peek(stream_in, &data, &nbytes);
+		//printf("%p   %d  %d\n", data, (int)nbytes, r);
+		if (data){
+			r = pa_stream_write(stream_out, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
+			printf("write %d\n", r);
+			pa_stream_drop(stream_in);
+		}
 
 		/*for (int i=0; i<512; i++){
 			data[i*2  ] = 0.2f * sin(offset) * vol;
@@ -231,8 +256,9 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 		int r = pa_stream_write(stream_out, data, 4096, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
 		msg_write("write " + i2s(r));*/
-        pa_mainloop_iterate(m, 1, NULL);
+//		msg_write("m");
 	}
+
 
 
 	// create (link) PluginManager after all other components are ready

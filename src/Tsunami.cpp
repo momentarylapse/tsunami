@@ -86,11 +86,18 @@ void _pa_stream_request_cb(pa_stream *p, size_t nbytes, void *userdata)
 	int r = pa_stream_peek(p, &data, &nbytes);
 	msg_write(r);
 
-	/*if (data){
+	if (data){
+		msg_write(pa_stream_writable_size((pa_stream*)userdata));
 		r = pa_stream_write((pa_stream*)userdata, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
 		msg_write(r);
-	}*/
+		pa_stream_drop(p);
+	}
 }
+void _pa_stream_notify_cb(pa_stream *p, void *userdata)
+{
+	msg_write("sstate..." + p2s(p));
+}
+
 
 void _pa_stream_success_cb(pa_stream *s, int success, void *userdata)
 {
@@ -149,7 +156,8 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	pa_sample_spec ss;
 	ss.rate = DEFAULT_SAMPLE_RATE;
 	ss.channels = 2;
-	ss.format = PA_SAMPLE_FLOAT32LE;//PA_SAMPLE_S16LE;
+	ss.format = PA_SAMPLE_FLOAT32LE;
+	//ss.format = PA_SAMPLE_S16LE;
 	pa_stream *stream_in = pa_stream_new(context, "stream-in", &ss, NULL);
 	pa_stream *stream_out = pa_stream_new(context, "stream-out", &ss, NULL);
 	msg_write(p2s(stream_in));
@@ -157,10 +165,12 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 
 	pa_stream_set_read_callback(stream_in, &_pa_stream_request_cb, stream_out);
+	pa_stream_set_state_callback(stream_in, &_pa_stream_notify_cb, NULL);
+	pa_stream_set_state_callback(stream_out, &_pa_stream_notify_cb, NULL);
 
 	pa_buffer_attr attr_out;
 	attr_out.fragsize = 512;
-	attr_out.maxlength = -1;
+	attr_out.maxlength = 1<<14;
 	attr_out.minreq = -1;
 	attr_out.tlength = -1;
 	attr_out.prebuf = -1;
@@ -168,64 +178,48 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	msg_write(r);
 
 	pa_buffer_attr attr_in;
-	attr_in.fragsize = 512;
-	attr_in.maxlength = -1;
+	attr_in.fragsize = -1;//512;
+	attr_in.maxlength = -1;//1<<14;
 	attr_in.minreq = -1;
 	attr_in.tlength = -1;
 	attr_in.prebuf = -1;
-	//r = pa_stream_connect_record(stream_in, NULL, &attr_in, (pa_stream_flags_t)0);
-	//msg_write(r);
+	r = pa_stream_connect_record(stream_in, NULL, &attr_in, (pa_stream_flags_t)0);
+	msg_write(r);
 
-
-	/*pa_ready = 0;
-    while (pa_ready == 0)
-        pa_mainloop_iterate(m, 1, NULL);
-    msg_write("trigger");
-	pa_op = pa_stream_trigger(stream_in, NULL, NULL);
-	while (true){
-        pa_mainloop_iterate(m, 1, NULL);
-		if (pa_operation_get_state(pa_op) == PA_OPERATION_DONE) {
-		    msg_write(" ok");
-			pa_operation_unref(pa_op);
-			break;
-		}
-	}*/
-
-
-	while (true){
-		int sstate = pa_stream_get_state(stream_out);
-		msg_write("sstate: " + i2s(sstate));
-		if (sstate == PA_STREAM_READY)
-			break;
+	msg_write("wait in");
+	while (pa_stream_get_state(stream_in) != PA_STREAM_READY)
 		pa_mainloop_iterate(m, 1, NULL);
-	}
 	msg_write("ok");
 
-	/*msg_write("wait");
-	pa_ready = 0;
-    while (pa_ready == 0)
-        pa_mainloop_iterate(m, 1, NULL);*/
+	msg_write("wait out");
+	while (pa_stream_get_state(stream_out) != PA_STREAM_READY)
+		pa_mainloop_iterate(m, 1, NULL);
+	msg_write("ok");
 
-	/*pa_mainloop_iterate(m, 1, NULL);
-	pa_mainloop_iterate(m, 1, NULL);*/
-    msg_write("trigger");
+    /*msg_write("trigger in");
+	pa_op = pa_stream_trigger(stream_in, NULL, NULL);
+	msg_write(p2s(pa_op));
+	while (pa_operation_get_state(pa_op) != PA_OPERATION_DONE)
+		pa_mainloop_iterate(m, 1, NULL);
+	pa_operation_unref(pa_op);
+	msg_write(" ok");*/
+
+
+
+	/*msg_write("trigger out");
 	pa_op = pa_stream_trigger(stream_out, &_pa_stream_success_cb, NULL);
 	msg_write(p2s(pa_op));
-	while (true){
-        pa_mainloop_iterate(m, 1, NULL);
-		if (pa_operation_get_state(pa_op) == PA_OPERATION_DONE) {
-		    msg_write(" ok");
-			pa_operation_unref(pa_op);
-			break;
-		}
-	}
+	while (pa_operation_get_state(pa_op) != PA_OPERATION_DONE)
+		pa_mainloop_iterate(m, 1, NULL);
+	pa_operation_unref(pa_op);
+	msg_write(" ok");*/
 
 	float offset = 0;
 	float *data = new float[1024];
 	float vol = 0;
 	while (true){
 
-		for (int i=0; i<512; i++){
+		/*for (int i=0; i<512; i++){
 			data[i*2  ] = 0.2f * sin(offset) * vol;
 			data[i*2+1] = 0.2f * sin(offset) * vol;
 			offset += 0.05f;
@@ -236,7 +230,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 		}
 
 		int r = pa_stream_write(stream_out, data, 4096, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
-		msg_write("write " + i2s(r));
+		msg_write("write " + i2s(r));*/
         pa_mainloop_iterate(m, 1, NULL);
 	}
 

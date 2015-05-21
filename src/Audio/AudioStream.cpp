@@ -78,30 +78,25 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 
 void pa_wait_op(pa_operation *op)
 {
-	msg_write(p2s(op));
+	msg_write("wait op " + p2s(op));
 	while (pa_operation_get_state(op) != PA_OPERATION_DONE)
 		{}//pa_mainloop_iterate(m, 1, NULL);
 	pa_operation_unref(op);
 	msg_write(" ok");
 }
 
-static float _offset__ = 0;
-
 static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
-	int nbytes0 = nbytes;
-	printf("request %d\n", (int)nbytes);
+	//printf("request %d\n", (int)nbytes);
 	AudioStream *stream = (AudioStream*)userdata;
 
 	void *data;
 	int r = pa_stream_begin_write(p, &data, &nbytes);
 	stream->testError("begin write");
-	printf("%d  %p  %d\n", r, data, (int)nbytes);
-	//if (nbytes > nbytes0)
-	//	nbytes = nbytes0;
+	//printf("%d  %p  %d\n", r, data, (int)nbytes);
 
 	if (!stream->playing){
-		msg_error("not playing");
+		//msg_error("not playing");
 		pa_stream_cancel_write(p);
 		stream->testError("cancel write");
 		return;
@@ -119,63 +114,54 @@ static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 			_offset__ -= 2*3.141592f;
 	}*/
 
-	while (frames > stream->ring_buf.available()){
-		if (stream->end_of_data){
-			HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
+	int available = stream->ring_buf.available();
+	if ((stream->paused) or (available < frames)){
+		printf("< underflow\n");
+		// output silence...
+		for (int i=0; i<frames; i++){
+			*out ++ = 0;
+			*out ++ = 0;
+		}
+	}else{
+		for (int n=0; (n<2) and (done < frames); n++){
+			BufferBox b;
+			stream->ring_buf.readRef(b, frames - done);
+			b.interleave(out, stream->output->getVolume() * stream->volume);
+			out += b.num * 2;
+			done += b.num;
 			break;
 		}
-		msg_write("----------need more");
-		stream->stream();
+		done = frames;
+		stream->cur_pos += done;
 	}
-
-	for (int n=0; (n<2) and (done < frames); n++){
-		BufferBox b;
-		stream->ring_buf.readRef(b, frames - done);
-		b.interleave(out, stream->output->getVolume() * stream->volume);
-		out += b.num * 2;
-		done += b.num;
-		break;
-	}
-	done = frames;
-
-	stream->cur_pos += done;
 
 	pa_stream_write(p, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
 	stream->testError("write");
 
-	/*int r = pa_stream_peek(p, &data, &nbytes);
 
-	if (data){
-		//msg_write(pa_stream_writable_size((pa_stream*)userdata));
-		r = pa_stream_write((pa_stream*)userdata, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
-		//msg_write(r);
-		pa_stream_drop(p);
+	// read more?
+	if ((available < stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->end_of_data)){
+		//printf("+\n");
+		stream->read_more = true;
 	}
-	//msg_write(">");*/
+
+	if (available <= frames and stream->end_of_data){
+		//printf("end\n");
+		HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
+	}
 }
 
 static void _pa_stream_success_cb(pa_stream *s, int success, void *userdata)
 {
-	msg_write("--success");
+	//msg_write("--success");
 }
 
 static void _pa_stream_underflow_cb(pa_stream *s, void *userdata)
 {
-	msg_error("underflow");
-
-	AudioStream *stream = (AudioStream*)userdata;
-
-
-	/*stream_request_callback(s, stream->buffer_size, stream);
-
-	msg_write("trigger out");
-	pa_operation *op = pa_stream_trigger(s, &_pa_stream_success_cb, NULL);
-	stream->testError("trigger");
-	pa_wait_op(op);*/
-	msg_write(pa_stream_get_state(s));
+	msg_error("pulse: underflow");
 }
 
-/*class StreamThread : public Thread
+class StreamThread : public Thread
 {
 public:
 	AudioStream *stream;
@@ -204,7 +190,7 @@ public:
 			}
 		}
 	}
-};*/
+};
 
 AudioStream::AudioStream(AudioRendererInterface *r) :
 	PeakMeterSource("AudioStream"),
@@ -310,7 +296,6 @@ void AudioStream::stop()
 
 	playing = false;
 
-	//last_error = Pa_AbortStream(pa_stream);
 	if (_stream){
 
 		pa_operation *op = pa_stream_drain(_stream, NULL, NULL);
@@ -398,10 +383,10 @@ void AudioStream::play()
 		stop();
 	}
 
-	/*if (!thread){
+	if (!thread){
 		thread = new StreamThread(this);
 		thread->run();
-	}*/
+	}
 
 
 
@@ -433,15 +418,12 @@ void AudioStream::play()
 
 
 	msg_write("wait out");
-	msg_write(pa_stream_get_state(_stream));
 	while (pa_stream_get_state(_stream) != PA_STREAM_READY)
 		{}//pa_mainloop_iterate(m, 1, NULL);
-	msg_write(pa_stream_get_state(_stream));
 	msg_write("ok");
 
 	//stream_request_callback(_stream, ring_buf.available(), this);
 
-	msg_write("trigger out");
 	pa_operation *op = pa_stream_trigger(_stream, &_pa_stream_success_cb, NULL);
 	testError("trigger");
 	pa_wait_op(op);
@@ -513,7 +495,8 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 bool AudioStream::testError(const string &msg)
 {
 	int e = pa_context_errno(output->context);
-	msg_write(msg + ": " + pa_strerror(e));
+	if (e != 0)
+		msg_error(msg + ": " + pa_strerror(e));
 	return (e != 0);
 }
 

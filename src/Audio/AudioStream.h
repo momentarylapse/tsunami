@@ -18,8 +18,8 @@
 
 class AudioRendererInterface;
 class AudioOutput;
-typedef void PaStream;
 class Thread;
+struct pa_stream;
 
 class AudioStream : public PeakMeterSource
 {
@@ -84,13 +84,11 @@ public:
 
 	int data_samples;
 
-	PaStream *pa_stream;
+	pa_stream *_stream;
 	int dev_sample_rate;
 	long long cur_pos;
 
 	//static int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
-
-	int last_error;
 
 	AudioOutput *output;
 	bool killed;

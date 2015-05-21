@@ -125,7 +125,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	storage = new Storage;
 
-
+#if 0
 
 	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
 	pa_mainloop_api *mainloop_api = pa_threaded_mainloop_get_api(m);
@@ -259,7 +259,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 //		msg_write("m");
 	}
 
-
+#endif
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;

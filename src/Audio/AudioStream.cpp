@@ -10,7 +10,7 @@
 #include "../Tsunami.h"
 #include "AudioRenderer.h"
 #include "../Stuff/Log.h"
-#include <portaudio.h>
+#include <pulse/pulseaudio.h>
 #include <math.h>
 #include "../lib/threads/Thread.h"
 
@@ -26,6 +26,7 @@ const string AudioStream::MESSAGE_UPDATE = "Update";
 
 bool AudioStream::JUST_FAKING_IT = false;
 
+#if 0
 int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
 {
 	AudioStream *stream = (AudioStream*)userData;
@@ -72,8 +73,109 @@ int portAudioCallback(const void *input, void *output, unsigned long frameCount,
 	}
 	return paContinue;
 }
+#endif
 
-class StreamThread : public Thread
+
+void pa_wait_op(pa_operation *op)
+{
+	msg_write(p2s(op));
+	while (pa_operation_get_state(op) != PA_OPERATION_DONE)
+		{}//pa_mainloop_iterate(m, 1, NULL);
+	pa_operation_unref(op);
+	msg_write(" ok");
+}
+
+static float _offset__ = 0;
+
+static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+{
+	int nbytes0 = nbytes;
+	printf("request %d\n", (int)nbytes);
+	AudioStream *stream = (AudioStream*)userdata;
+
+	void *data;
+	int r = pa_stream_begin_write(p, &data, &nbytes);
+	stream->testError("begin write");
+	printf("%d  %p  %d\n", r, data, (int)nbytes);
+	//if (nbytes > nbytes0)
+	//	nbytes = nbytes0;
+
+	if (!stream->playing){
+		msg_error("not playing");
+		pa_stream_cancel_write(p);
+		stream->testError("cancel write");
+		return;
+	}
+
+	int done = 0;
+	int frames = nbytes / 8;
+	float *out = (float*)data;
+
+	for (int i=0; i<frames; i++){
+		out[i*2  ] = sin(_offset__) * 0.02f;
+		out[i*2+1] = sin(_offset__) * 0.02f;
+		_offset__ += 0.04f;
+		if (_offset__ > 2*3.141592f)
+			_offset__ -= 2*3.141592f;
+	}
+
+	/*while (frames > stream->ring_buf.available()){
+		if (stream->end_of_data){
+			HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
+			break;
+		}
+		msg_write("----------need more");
+		stream->stream();
+	}
+
+	for (int n=0; (n<2) and (done < frames); n++){
+		BufferBox b;
+		stream->ring_buf.readRef(b, frames - done);
+		b.interleave(out, stream->output->getVolume() * stream->volume);
+		out += b.num * 2;
+		done += b.num;
+		break;
+	}*/
+	done = frames;
+
+	stream->cur_pos += done;
+
+	pa_stream_write(p, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
+	stream->testError("write");
+
+	/*int r = pa_stream_peek(p, &data, &nbytes);
+
+	if (data){
+		//msg_write(pa_stream_writable_size((pa_stream*)userdata));
+		r = pa_stream_write((pa_stream*)userdata, data, nbytes, NULL, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE);
+		//msg_write(r);
+		pa_stream_drop(p);
+	}
+	//msg_write(">");*/
+}
+
+static void _pa_stream_success_cb(pa_stream *s, int success, void *userdata)
+{
+	msg_write("--success");
+}
+
+static void _pa_stream_underflow_cb(pa_stream *s, void *userdata)
+{
+	msg_error("underflow");
+
+	AudioStream *stream = (AudioStream*)userdata;
+
+
+	/*stream_request_callback(s, stream->buffer_size, stream);
+
+	msg_write("trigger out");
+	pa_operation *op = pa_stream_trigger(s, &_pa_stream_success_cb, NULL);
+	stream->testError("trigger");
+	pa_wait_op(op);*/
+	msg_write(pa_stream_get_state(s));
+}
+
+/*class StreamThread : public Thread
 {
 public:
 	AudioStream *stream;
@@ -102,14 +204,12 @@ public:
 			}
 		}
 	}
-};
+};*/
 
 AudioStream::AudioStream(AudioRendererInterface *r) :
 	PeakMeterSource("AudioStream"),
 	ring_buf(1048576)
 {
-	last_error = paNoError;
-
 	renderer = r;
 
 	playing = false;
@@ -125,7 +225,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	update_dt = DEFAULT_UPDATE_DT;
 	killed = false;
 	thread = NULL;
-	pa_stream = NULL;
+	_stream = NULL;
 	dev_sample_rate = -1;
 	cpu_usage = 0;
 	end_of_data = false;
@@ -154,42 +254,34 @@ void AudioStream::__delete__()
 
 void AudioStream::create_dev()
 {
-	if (pa_stream)
+	if (_stream)
 		return;
 
-	int outDevNum = output->pa_device_no;
-
-	PaStreamParameters outputParameters;
-	bzero(&outputParameters, sizeof(outputParameters));
-	outputParameters.channelCount = 2;
-	outputParameters.device = outDevNum;
-	outputParameters.hostApiSpecificStreamInfo = NULL;
-	outputParameters.sampleFormat = paFloat32;
-	outputParameters.suggestedLatency = Pa_GetDeviceInfo(outDevNum)->defaultLowOutputLatency;
-	outputParameters.hostApiSpecificStreamInfo = NULL;
 	dev_sample_rate = renderer->getSampleRate();
-	last_error = Pa_OpenStream(
-	                &pa_stream,
-	                NULL,
-	                &outputParameters,
-					dev_sample_rate,
-					512,//paFramesPerBufferUnspecified,
-	                paNoFlag, //flags that can be used to define dither, clip settings and more
-	                portAudioCallback,
-	                (void*)this);
-	testError("Pa_OpenStream");
+
+	pa_sample_spec ss;
+	ss.rate = dev_sample_rate;
+	ss.channels = 2;
+	ss.format = PA_SAMPLE_FLOAT32LE;
+	//ss.format = PA_SAMPLE_S16LE;
+	_stream = pa_stream_new(output->context, "stream", &ss, NULL);
+	testError("stream new");
+
+	pa_stream_set_write_callback(_stream, &stream_request_callback, this);
+	pa_stream_set_underflow_callback(_stream, &_pa_stream_underflow_cb, this);
+	//pa_stream_set_underflow_callback(_stream, &_pa_stream_underflow_cb, this);
 }
 
 void AudioStream::kill_dev()
 {
 	msg_db_f("Stream.kill_dev", 1);
 
-	if (pa_stream){
+	if (_stream){
 		stop();
 
-		last_error = Pa_CloseStream(pa_stream);
-		testError("AudioStream.kill");
-		pa_stream = NULL;
+		pa_stream_unref(_stream);
+		testError("unref");
+		_stream = NULL;
 	}
 }
 
@@ -197,7 +289,7 @@ void AudioStream::kill()
 {
 	msg_db_f("Stream.kill", 1);
 
-	if (pa_stream)
+	if (_stream)
 		kill_dev();
 
 	output->removeStream(this);
@@ -216,10 +308,19 @@ void AudioStream::stop()
 		return;
 	msg_db_f("Stream.stop", 1);
 
+	playing = false;
+
 	//last_error = Pa_AbortStream(pa_stream);
-	if (pa_stream){
-		last_error = Pa_StopStream(pa_stream);
-		testError("Pa_StopStream");
+	if (_stream){
+
+		pa_operation *op = pa_stream_drain(_stream, NULL, NULL);
+		testError("drain");
+		pa_wait_op(op);
+
+		pa_stream_disconnect(_stream);
+		testError("disconnect");
+
+		kill_dev();
 	}
 
 	// clean up
@@ -281,12 +382,12 @@ void AudioStream::play()
 {
 	msg_db_f("Stream.play", 1);
 
-	if (dev_sample_rate != renderer->getSampleRate())
+	/*if (dev_sample_rate != renderer->getSampleRate())
 		kill_dev();
-	if (!pa_stream)
+	if (!_stream)
 		create_dev();
-	if (!pa_stream)
-		return;
+	if (!_stream)
+		return;*/
 
 
 	if (playing){
@@ -297,27 +398,55 @@ void AudioStream::play()
 		stop();
 	}
 
-	if (!thread){
+	/*if (!thread){
 		thread = new StreamThread(this);
 		thread->run();
-	}
+	}*/
+
 
 
 	end_of_data = false;
 	reading = false;
 
-	renderer->reset();
-	stream();
-	if (pa_stream){
-		last_error = Pa_StartStream(pa_stream);
-		testError("Pa_StartStream");
-	}
 
 	playing = true;
 	paused = false;
 	cur_pos = 0;
 
-	HuiRunLaterM(update_dt, this, &AudioStream::update);
+	renderer->reset();
+	stream();
+
+
+	create_dev();
+	if (!_stream)
+		return;
+
+	pa_buffer_attr attr_out;
+	attr_out.fragsize = 1024;//-1;//512;
+	attr_out.maxlength = 4096;
+	attr_out.minreq = -1;
+	attr_out.tlength = -1;
+	attr_out.prebuf = -1;
+	pa_stream_connect_playback(_stream, NULL, &attr_out, (pa_stream_flags)0, NULL, NULL);
+	testError("connect");
+
+
+
+	msg_write("wait out");
+	msg_write(pa_stream_get_state(_stream));
+	while (pa_stream_get_state(_stream) != PA_STREAM_READY)
+		{}//pa_mainloop_iterate(m, 1, NULL);
+	msg_write(pa_stream_get_state(_stream));
+	msg_write("ok");
+
+	//stream_request_callback(_stream, ring_buf.available(), this);
+
+	msg_write("trigger out");
+	pa_operation *op = pa_stream_trigger(_stream, &_pa_stream_success_cb, NULL);
+	testError("trigger");
+	pa_wait_op(op);
+
+	//HuiRunLaterM(update_dt, this, &AudioStream::update);
 	notify(MESSAGE_STATE_CHANGE);
 }
 
@@ -383,11 +512,9 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 
 bool AudioStream::testError(const string &msg)
 {
-	if (last_error != paNoError){
-		tsunami->log->error(format(_("PortAudio (stream) error: '%s'   at %s"), Pa_GetErrorText(last_error), msg.c_str()));
-		return true;
-	}
-	return false;
+	int e = pa_context_errno(output->context);
+	msg_write(msg + ": " + pa_strerror(e));
+	return (e != 0);
 }
 
 void AudioStream::update()

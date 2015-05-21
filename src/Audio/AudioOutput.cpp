@@ -10,7 +10,7 @@
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 
-#include <portaudio.h>
+#include <pulse/pulseaudio.h>
 
 
 
@@ -18,7 +18,6 @@ AudioOutput::AudioOutput() :
 	Observable("AudioOutput")
 {
 	initialized = false;
-	last_error = paNoError;
 
 	chosen_device = HuiConfig.getStr("Output.ChosenDevice", "");
 	volume = HuiConfig.getFloat("Output.Volume", 1.0f);
@@ -38,7 +37,7 @@ void AudioOutput::setDevice(const string &device)
 	chosen_device = device;
 	HuiConfig.setStr("Output.ChosenDevice", device);
 
-	pa_device_no = -1;
+	/*pa_device_no = -1;
 
 	int n = Pa_GetDeviceCount();
 	for (int i=0; i<n; i++){
@@ -53,7 +52,7 @@ void AudioOutput::setDevice(const string &device)
 			tsunami->log->error(format("output device '%s' not found. Using default.", device.c_str()));
 	}
 
-	tsunami->log->info(format("output device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
+	tsunami->log->info(format("output device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));*/
 }
 
 Array<string> AudioOutput::getDevices()
@@ -61,7 +60,7 @@ Array<string> AudioOutput::getDevices()
 	Array<string> devices;
 	msg_write("------get dev");
 
-	int n = Pa_GetDeviceCount();
+	/*int n = Pa_GetDeviceCount();
 	for (int i=0; i<n; i++){
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
 		msg_write(di->name);
@@ -70,7 +69,7 @@ Array<string> AudioOutput::getDevices()
 		msg_write(di->maxInputChannels);
 		if (di->maxOutputChannels >= 2)
 			devices.add(di->name);
-	}
+	}*/
 
 	return devices;
 }
@@ -81,8 +80,31 @@ void AudioOutput::init()
 		return;
 	msg_db_f("Output.init", 1);
 
-	last_error = Pa_Initialize();
-	testError("Output.initialize");
+
+
+	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
+	pa_mainloop_api *mainloop_api = pa_threaded_mainloop_get_api(m);
+	context = pa_context_new(mainloop_api, "tsunami");
+	if (!context){
+		tsunami->log->error("pa_context_new() failed.");
+		return;
+	}
+
+	int pa_ready = 0;
+	//pa_context_set_state_callback(context, pa_state_cb, &pa_ready);
+
+	if (pa_context_connect(context, NULL, (pa_context_flags_t)0, NULL) < 0) {
+		tsunami->log->error(string("pa_context_connect() failed: ") + pa_strerror(pa_context_errno(context)));
+		return;
+	}
+	pa_threaded_mainloop_start(m);
+
+	pa_operation *pa_op;
+
+	printf("init...\n");
+	while (pa_context_get_state(context) != PA_CONTEXT_READY)
+        	{}//pa_mainloop_iterate(m, 1, NULL);
+	printf("ok\n");
 
 	setDevice(chosen_device);
 
@@ -98,8 +120,8 @@ void AudioOutput::kill()
 	foreach(AudioStream *s, streams)
 		s->kill();
 
-	last_error = Pa_Terminate();
-	testError("terminate");
+	// TODO
+
 	initialized = false;
 }
 
@@ -137,10 +159,6 @@ bool AudioOutput::streamExists(AudioStream* s)
 
 bool AudioOutput::testError(const string &msg)
 {
-	if (last_error != paNoError){
-		tsunami->log->error(string("PortAudio (general output) error: ") + Pa_GetErrorText(last_error));
-		return true;
-	}
 	return false;
 }
 

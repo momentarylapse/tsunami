@@ -13,6 +13,7 @@
 #include "../Data/AudioFile.h"
 
 class AudioStream;
+struct pa_context;
 
 class AudioOutput : public Observable
 {
@@ -41,9 +42,7 @@ private:
 	bool testError(const string &msg);
 
 	bool initialized;
-	int last_error;
-
-	int pa_device_no;
+	pa_context *context;
 
 	float volume;
 

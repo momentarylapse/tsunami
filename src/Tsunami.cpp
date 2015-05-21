@@ -115,6 +115,9 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	progress = new Progress;
 	log = new Log;
 
+	log->info(AppName + " " + AppVersion);
+	log->info(_("  ...keine Sorge, das wird schon!"));
+
 	clipboard = new Clipboard;
 
 	output = new AudioOutput;
@@ -309,9 +312,6 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 
 void Tsunami::CreateWindow()
 {
-	log->info(AppName + " " + AppVersion);
-	log->info(_("  ...keine Sorge, das wird schon!"));
-
 	win = new TsunamiWindow;
 	_win = dynamic_cast<HuiWindow*>(win);
 	_view = win->view;

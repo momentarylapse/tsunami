@@ -26,64 +26,10 @@ const string AudioStream::MESSAGE_UPDATE = "Update";
 
 bool AudioStream::JUST_FAKING_IT = false;
 
-#if 0
-int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
-{
-	AudioStream *stream = (AudioStream*)userData;
-	float *out = (float*)output;
-//	printf("%d\n", frameCount);
-
-	if (statusFlags != 0)
-		printf("flags: %d\n", statusFlags);
-	//paOutputUnderflow
-
-	unsigned int available = stream->ring_buf.available();
-	if ((stream->paused) or (available < frameCount)){
-		printf("<\n");
-		// output silence...
-		for (unsigned int i=0; i<frameCount; i++){
-			*out ++ = 0;
-			*out ++ = 0;
-		}
-	}else{
-		unsigned int done = 0;
-
-		for (int n=0; (n<2) and (done<frameCount); n++){
-			BufferBox b;
-			stream->ring_buf.readRef(b, frameCount - done);
-			b.interleave(out, stream->output->getVolume() * stream->volume);
-			out += b.num * 2;
-			done += b.num;
-			break;
-		}
-
-		stream->cur_pos += done;
-	}
-
-	// read more?
-	if ((available < (unsigned)stream->buffer_size) and (!stream->reading) and (!stream->read_more) and (!stream->end_of_data)){
-//		printf("+\n");
-		stream->read_more = true;
-	}
-
-	if (available <= frameCount and stream->end_of_data){
-//		printf("end\n");
-		HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
-		return paComplete;
-	}
-	return paContinue;
-}
-#endif
 
 
-void pa_wait_op(pa_operation *op)
-{
-	msg_write("wait op " + p2s(op));
-	while (pa_operation_get_state(op) != PA_OPERATION_DONE)
-		{}//pa_mainloop_iterate(m, 1, NULL);
-	pa_operation_unref(op);
-	msg_write(" ok");
-}
+extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
+
 
 static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
@@ -106,17 +52,10 @@ static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 	int frames = nbytes / 8;
 	float *out = (float*)data;
 
-	/*for (int i=0; i<frames; i++){
-		out[i*2  ] = sin(_offset__) * 0.02f;
-		out[i*2+1] = sin(_offset__) * 0.02f;
-		_offset__ += 0.04f;
-		if (_offset__ > 2*3.141592f)
-			_offset__ -= 2*3.141592f;
-	}*/
-
 	int available = stream->ring_buf.available();
 	if ((stream->paused) or (available < frames)){
-		printf("< underflow\n");
+		if ((stream->playing) and (!stream->paused))
+			printf("< underflow\n");
 		// output silence...
 		for (int i=0; i<frames; i++){
 			*out ++ = 0;
@@ -151,14 +90,16 @@ static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 	}
 }
 
-static void _pa_stream_success_cb(pa_stream *s, int success, void *userdata)
+static void stream_success_callback(pa_stream *s, int success, void *userdata)
 {
 	//msg_write("--success");
 }
 
-static void _pa_stream_underflow_cb(pa_stream *s, void *userdata)
+static void stream_underflow_callback(pa_stream *s, void *userdata)
 {
-	msg_error("pulse: underflow");
+	AudioStream *stream = (AudioStream*)userdata;
+	if (stream->playing)
+		msg_error("pulse: underflow");
 }
 
 class StreamThread : public Thread
@@ -254,8 +195,7 @@ void AudioStream::create_dev()
 	testError("stream new");
 
 	pa_stream_set_write_callback(_stream, &stream_request_callback, this);
-	pa_stream_set_underflow_callback(_stream, &_pa_stream_underflow_cb, this);
-	//pa_stream_set_underflow_callback(_stream, &_pa_stream_underflow_cb, this);
+	pa_stream_set_underflow_callback(_stream, &stream_underflow_callback, this);
 }
 
 void AudioStream::kill_dev()
@@ -412,7 +352,10 @@ void AudioStream::play()
 	attr_out.minreq = -1;
 	attr_out.tlength = -1;
 	attr_out.prebuf = -1;
-	pa_stream_connect_playback(_stream, NULL, &attr_out, (pa_stream_flags)0, NULL, NULL);
+	const char *dev = NULL;
+	if (output->chosen_device != "")
+		dev = output->chosen_device.c_str();
+	pa_stream_connect_playback(_stream, dev, &attr_out, (pa_stream_flags)0, NULL, NULL);
 	testError("connect");
 
 
@@ -424,7 +367,7 @@ void AudioStream::play()
 
 	//stream_request_callback(_stream, ring_buf.available(), this);
 
-	pa_operation *op = pa_stream_trigger(_stream, &_pa_stream_success_cb, NULL);
+	pa_operation *op = pa_stream_trigger(_stream, &stream_success_callback, NULL);
 	testError("trigger");
 	pa_wait_op(op);
 

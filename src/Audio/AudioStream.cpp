@@ -111,15 +111,15 @@ static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 	int frames = nbytes / 8;
 	float *out = (float*)data;
 
-	for (int i=0; i<frames; i++){
+	/*for (int i=0; i<frames; i++){
 		out[i*2  ] = sin(_offset__) * 0.02f;
 		out[i*2+1] = sin(_offset__) * 0.02f;
 		_offset__ += 0.04f;
 		if (_offset__ > 2*3.141592f)
 			_offset__ -= 2*3.141592f;
-	}
+	}*/
 
-	/*while (frames > stream->ring_buf.available()){
+	while (frames > stream->ring_buf.available()){
 		if (stream->end_of_data){
 			HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
 			break;
@@ -135,7 +135,7 @@ static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 		out += b.num * 2;
 		done += b.num;
 		break;
-	}*/
+	}
 	done = frames;
 
 	stream->cur_pos += done;
@@ -446,7 +446,7 @@ void AudioStream::play()
 	testError("trigger");
 	pa_wait_op(op);
 
-	//HuiRunLaterM(update_dt, this, &AudioStream::update);
+	HuiRunLaterM(update_dt, this, &AudioStream::update);
 	notify(MESSAGE_STATE_CHANGE);
 }
 

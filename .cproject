@@ -41,12 +41,9 @@
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="ogg"/>
 									<listOptionValue builtIn="false" value="asound"/>
-									<listOptionValue builtIn="false" value="openal"/>
-									<listOptionValue builtIn="false" value="alut"/>
 									<listOptionValue builtIn="false" value="vorbis"/>
 									<listOptionValue builtIn="false" value="vorbisfile"/>
 									<listOptionValue builtIn="false" value="vorbisenc"/>
-									<listOptionValue builtIn="false" value="portaudio"/>
 									<listOptionValue builtIn="false" value="FLAC"/>
 									<listOptionValue builtIn="false" value="fftw3f"/>
 								</option>
@@ -106,12 +103,9 @@
 									<listOptionValue builtIn="false" value="X11"/>
 									<listOptionValue builtIn="false" value="ogg"/>
 									<listOptionValue builtIn="false" value="asound"/>
-									<listOptionValue builtIn="false" value="openal"/>
-									<listOptionValue builtIn="false" value="alut"/>
 									<listOptionValue builtIn="false" value="vorbis"/>
 									<listOptionValue builtIn="false" value="vorbisfile"/>
 									<listOptionValue builtIn="false" value="vorbisenc"/>
-									<listOptionValue builtIn="false" value="portaudio"/>
 									<listOptionValue builtIn="false" value="FLAC"/>
 									<listOptionValue builtIn="false" value="fftw3f"/>
 								</option>

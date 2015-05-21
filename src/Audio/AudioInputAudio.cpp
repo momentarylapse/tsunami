@@ -100,28 +100,6 @@ int AudioInputAudio::SyncData::getDelay()
 }
 
 
-
-/*int portAudioInputCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
-{
-	AudioInputAudio *ia = (AudioInputAudio*)userData;
-	if (!ia->isCapturing())
-		return paContinue;
-	float *in = (float*)input;
-
-	RingBuffer &buf = ia->current_buffer;
-	BufferBox b;
-	buf.writeRef(b, frameCount);
-	b.deinterleave(in, ia->num_channels);
-
-	unsigned int done = b.num;
-	if (done < frameCount){
-		buf.writeRef(b, frameCount - done);
-		b.deinterleave(&in[2 * done], ia->num_channels);
-	}
-
-	return paContinue;
-}*/
-
 AudioInputAudio::AudioInputAudio(BufferBox &buf, RingBuffer &cur_buf) :
 	accumulation_buffer(buf), current_buffer(cur_buf)
 {

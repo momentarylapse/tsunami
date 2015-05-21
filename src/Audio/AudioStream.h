@@ -19,10 +19,12 @@
 class AudioRendererInterface;
 class AudioOutput;
 class Thread;
+class StreamThread;
 struct pa_stream;
 
 class AudioStream : public PeakMeterSource
 {
+	friend StreamThread;
 public:
 	AudioStream();
 	AudioStream(AudioRendererInterface *r);
@@ -64,7 +66,7 @@ public:
 
 	static bool JUST_FAKING_IT;
 
-//private:
+private:
 	bool testError(const string &msg);
 	void stream();
 
@@ -88,8 +90,6 @@ public:
 	int dev_sample_rate;
 	long long cur_pos;
 
-	//static int portAudioCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
-
 	AudioOutput *output;
 	bool killed;
 
@@ -97,6 +97,8 @@ public:
 	float cpu_usage;
 
 	static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
+	static void stream_underflow_callback(pa_stream *s, void *userdata);
+	static void stream_success_callback(pa_stream *s, int success, void *userdata);
 };
 
 #endif /* SRC_AUDIO_AUDIOSTREAM_H_ */

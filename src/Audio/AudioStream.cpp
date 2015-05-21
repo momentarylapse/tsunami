@@ -106,12 +106,12 @@ void AudioStream::stream_request_callback(pa_stream *p, size_t nbytes, void *use
 	}
 }
 
-static void stream_success_callback(pa_stream *s, int success, void *userdata)
+void AudioStream::stream_success_callback(pa_stream *s, int success, void *userdata)
 {
 	//msg_write("--success");
 }
 
-static void stream_underflow_callback(pa_stream *s, void *userdata)
+void AudioStream::stream_underflow_callback(pa_stream *s, void *userdata)
 {
 	AudioStream *stream = (AudioStream*)userdata;
 	if (stream->playing)

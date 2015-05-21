@@ -11,7 +11,6 @@
 #include "AudioRenderer.h"
 #include "../Stuff/Log.h"
 #include <pulse/pulseaudio.h>
-#include <math.h>
 #include "../lib/threads/Thread.h"
 
 //#define DEFAULT_BUFFER_SIZE		131072
@@ -30,8 +29,25 @@ bool AudioStream::JUST_FAKING_IT = false;
 
 extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
 
+bool pa_wait_stream_ready(pa_stream *s)
+{
+	msg_write("wait stream ready");
+	int n = 0;
+	while (pa_stream_get_state(s) != PA_STREAM_READY){
+		//pa_mainloop_iterate(m, 1, NULL);
+		HuiSleep(0.01f);
+		n ++;
+		if (n >= 200)
+			return false;
+		if (pa_stream_get_state(s) == PA_STREAM_FAILED)
+			return false;
+	}
+	msg_write("ok");
+	return true;
+}
 
-static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+
+void AudioStream::stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
 	//printf("request %d\n", (int)nbytes);
 	AudioStream *stream = (AudioStream*)userdata;
@@ -359,11 +375,11 @@ void AudioStream::play()
 	testError("connect");
 
 
-
-	msg_write("wait out");
-	while (pa_stream_get_state(_stream) != PA_STREAM_READY)
-		{}//pa_mainloop_iterate(m, 1, NULL);
-	msg_write("ok");
+	if (!pa_wait_stream_ready(_stream)){
+		tsunami->log->error("pa_wait_for_stream_ready");
+		stop();
+		return;
+	}
 
 	//stream_request_callback(_stream, ring_buf.available(), this);
 

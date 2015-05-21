@@ -13,12 +13,14 @@
 #include "../Data/AudioFile.h"
 
 class AudioStream;
+class AudioInputAudio;
 struct pa_context;
 
 class AudioOutput : public Observable
 {
 public:
 	friend class AudioStream;
+	friend class AudioInputAudio;
 
 	AudioOutput();
 	virtual ~AudioOutput();

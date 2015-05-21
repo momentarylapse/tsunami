@@ -14,7 +14,7 @@
 #include "../Data/RingBuffer.h"
 #include "AudioInputBase.h"
 
-typedef void PaStream;
+struct pa_stream;
 
 #define NUM_CAPTURE_SAMPLES		8192
 
@@ -62,11 +62,9 @@ private:
 
 	int capture_temp[NUM_CAPTURE_SAMPLES];
 
-	int pa_device_no;
-	PaStream *pa_stream;
+	pa_stream *_stream;
 
 	bool testError(const string &msg);
-	int last_error;
 
 	CFile *temp_file;
 	string cur_temp_filename;
@@ -86,6 +84,8 @@ private:
 	bool capturing;
 	int sample_rate;
 	float playback_delay_const;
+
+	static void input_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 };
 
 #endif /* AUDIOINPUTAUDIO_H_ */

@@ -7,14 +7,72 @@
 
 #include "AudioInputAudio.h"
 #include "AudioStream.h"
+#include "AudioOutput.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 
+#include <pulse/pulseaudio.h>
 
-#include <portaudio.h>
+
+extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
+extern bool pa_wait_stream_ready(pa_stream *s); // -> AudioStream.cpp
+
+
+void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
+{
+	if (eol > 0)
+		return;
+
+	Array<string> *devices = (Array<string>*)userdata;
+	devices->add(i->name);
+}
+
+
+
+void AudioInputAudio::input_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+{
+	//printf("read %d\n", (int)nbytes);
+	AudioInputAudio *input = (AudioInputAudio*)userdata;
+	if (!input->isCapturing())
+		return;
+
+	const void *data;
+	pa_stream_peek(p, &data, &nbytes);
+	input->testError("pa_stream_peek");
+	int frames = nbytes / 4 / input->num_channels;
+
+	if (data){
+		float *in = (float*)data;
+
+		RingBuffer &buf = input->current_buffer;
+		BufferBox b;
+		buf.writeRef(b, frames);
+		b.deinterleave(in, input->num_channels);
+
+		int done = b.num;
+		if (done < frames){
+			buf.writeRef(b, frames - done);
+			b.deinterleave(&in[2 * done], input->num_channels);
+		}
+
+		pa_stream_drop(p);
+		input->testError("pa_stream_drop");
+	}
+	//msg_write(">");
+}
+void input_notify_callback(pa_stream *p, void *userdata)
+{
+	printf("sstate... %p\n", p);
+}
+
+
+void input_success_callback(pa_stream *s, int success, void *userdata)
+{
+	msg_write("--success");
+}
 
 void AudioInputAudio::SyncData::reset()
 {
@@ -43,7 +101,7 @@ int AudioInputAudio::SyncData::getDelay()
 
 
 
-int portAudioInputCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
+/*int portAudioInputCallback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
 {
 	AudioInputAudio *ia = (AudioInputAudio*)userData;
 	if (!ia->isCapturing())
@@ -62,13 +120,13 @@ int portAudioInputCallback(const void *input, void *output, unsigned long frameC
 	}
 
 	return paContinue;
-}
+}*/
 
 AudioInputAudio::AudioInputAudio(BufferBox &buf, RingBuffer &cur_buf) :
 	accumulation_buffer(buf), current_buffer(cur_buf)
 {
 	capturing = false;
-	pa_device_no = 0;
+	_stream = NULL;
 	accumulating = false;
 	memset(capture_temp, 0, sizeof(capture_temp));
 	sample_rate = DEFAULT_SAMPLE_RATE;
@@ -91,41 +149,40 @@ Array<string> AudioInputAudio::getDevices()
 {
 	Array<string> devices;
 
-	int n = Pa_GetDeviceCount();
-	for (int i=0; i<n; i++){
-		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
-		if (di->maxInputChannels >= 1)
-			devices.add(di->name);
-	}
+	pa_operation *op = pa_context_get_source_info_list(tsunami->output->context, pa_source_info_callback, &devices);
+	if (!testError("pa_context_get_source_info_list"))
+		pa_wait_op(op);
+
 	return devices;
 }
 
 string AudioInputAudio::getChosenDevice()
 {
-	if (pa_device_no >= 0)
+	/*if (pa_device_no >= 0)
 		if (pa_device_no == Pa_GetDefaultInputDevice())
-			return "";
+			return "";*/
 	return chosen_device;
 }
 
 void AudioInputAudio::setDevice(const string &device)
 {
-	chosen_device = device;
-	HuiConfig.setStr("Input.ChosenDevice", chosen_device);
+	HuiConfig.setStr("Input.ChosenDevice", device);
 
-	pa_device_no = -1;
 
-	int n = Pa_GetDeviceCount();
-	for (int i=0; i<n; i++){
-		const PaDeviceInfo *di = Pa_GetDeviceInfo(i);
-		if (chosen_device == string(di->name))
-			pa_device_no = i;
-	}
+	Array<string> devs = getDevices();
 
-	if (pa_device_no < 0){
-		pa_device_no = Pa_GetDefaultInputDevice();
-		if (device != "")
-			tsunami->log->error(format("input device '%s' not found. Using default.", device.c_str()));
+	// valid?
+	bool valid = (device == "");
+	foreach(string &d, devs)
+		if (d == device)
+			valid = true;
+
+
+	if (valid){
+		chosen_device = device;
+	}else{
+		tsunami->log->error(format("input device '%s' not found. Using default.", device.c_str()));
+		chosen_device = "";
 	}
 
 	if (capturing){
@@ -133,7 +190,7 @@ void AudioInputAudio::setDevice(const string &device)
 		start(sample_rate);
 	}
 
-	tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
+	//tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
 }
 
 void AudioInputAudio::stop()
@@ -141,10 +198,10 @@ void AudioInputAudio::stop()
 	msg_db_f("CaptureStop", 1);
 	if (!capturing)
 		return;
-	last_error = Pa_StopStream(pa_stream);
-	testError("Pa_StopStream");
-	last_error = Pa_CloseStream(pa_stream);
-	testError("Pa_CloseStream");
+
+	pa_stream_disconnect(_stream);
+	testError("disconnect");
+
 	capturing = false;
 	accumulating = false;
 	current_buffer.clear();
@@ -163,30 +220,37 @@ bool AudioInputAudio::start(int _sample_rate)
 
 	accumulating = false;
 	sample_rate = _sample_rate;
+	num_channels = 2;
 
-	PaStreamParameters param;
-	bzero(&param, sizeof(param));
+	pa_sample_spec ss;
+	ss.rate = sample_rate;
+	ss.channels = 2;
+	ss.format = PA_SAMPLE_FLOAT32LE;
+	_stream = pa_stream_new(tsunami->output->context, "stream-in", &ss, NULL);
+	testError("pa_stream_new");
 
-	num_channels = min(2, Pa_GetDeviceInfo(pa_device_no)->maxInputChannels);
-	param.channelCount = num_channels;
-	param.device = pa_device_no;
-	param.hostApiSpecificStreamInfo = NULL;
-	param.sampleFormat = paFloat32;
-	param.suggestedLatency = Pa_GetDeviceInfo(pa_device_no)->defaultLowInputLatency;
-	param.hostApiSpecificStreamInfo = NULL;
-	last_error = Pa_OpenStream(
-	                &pa_stream,
-	                &param,
-	                NULL,
-	                sample_rate,
-					paFramesPerBufferUnspecified,
-	                paNoFlag, //flags that can be used to define dither, clip settings and more
-	                portAudioInputCallback,
-	                (void*)this);
-	testError("Pa_OpenStream");
 
-	last_error = Pa_StartStream(pa_stream);
-	testError("Pa_StartStream");
+	pa_stream_set_read_callback(_stream, &input_request_callback, this);
+	pa_stream_set_state_callback(_stream, &input_notify_callback, NULL);
+
+	pa_buffer_attr attr_in;
+//	attr_in.fragsize = -1;
+	attr_in.fragsize = 512;
+	attr_in.maxlength = -1;
+	attr_in.minreq = -1;
+	attr_in.tlength = -1;
+	attr_in.prebuf = -1;
+	const char *dev = NULL;
+	if (chosen_device != "")
+		dev = chosen_device.c_str();
+	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)0);
+	testError("pa_stream_connect_record");
+
+	if (!pa_wait_stream_ready(_stream)){
+		tsunami->log->error("pa_wait_for_stream_ready");
+		return false;
+	}
+
 	capturing = true;
 
 	cur_temp_filename = getTempFilename();
@@ -194,16 +258,16 @@ bool AudioInputAudio::start(int _sample_rate)
 	temp_file->SetBinaryMode(true);
 
 	resetSync();
+	msg_write(" ok");
 	return capturing;
 }
 
 bool AudioInputAudio::testError(const string &msg)
 {
-	if (last_error != paNoError){
-		tsunami->log->error(format(_("PortAudio (input) error: '%s'  at %s"), Pa_GetErrorText(last_error), msg.c_str()));
-		return true;
-	}
-	return false;
+	int e = pa_context_errno(tsunami->output->context);
+	if (e != 0)
+		msg_error(msg + " (input): " + pa_strerror(e));
+	return (e != 0);
 }
 
 float AudioInputAudio::getPlaybackDelayConst()

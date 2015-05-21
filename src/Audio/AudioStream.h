@@ -95,6 +95,8 @@ public:
 
 	Thread *thread;
 	float cpu_usage;
+
+	static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 };
 
 #endif /* SRC_AUDIO_AUDIOSTREAM_H_ */

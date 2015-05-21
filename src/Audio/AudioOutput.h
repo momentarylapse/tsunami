@@ -22,6 +22,8 @@ public:
 	friend class AudioStream;
 	friend class AudioInputAudio;
 
+	static const string MESSAGE_CHANGE_DEVICES;
+
 	AudioOutput();
 	virtual ~AudioOutput();
 

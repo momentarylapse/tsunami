@@ -12,6 +12,8 @@
 
 #include <pulse/pulseaudio.h>
 
+const string AudioOutput::MESSAGE_CHANGE_DEVICES = "ChangeDevices";
+
 
 void pa_wait_op(pa_operation *op)
 {
@@ -32,6 +34,16 @@ void pa_wait_op(pa_operation *op)
 	//msg_write(" ok");
 }
 
+void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
+{
+	AudioOutput *out = (AudioOutput*)userdata;
+	out->notify(out->MESSAGE_CHANGE_DEVICES);
+	//msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
+	/*if ((t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK) == PA_SUBSCRIPTION_EVENT_SOURCE) {
+		if ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) {
+		}
+	}*/
+}
 
 AudioOutput::AudioOutput() :
 	Observable("AudioOutput")
@@ -133,6 +145,11 @@ void AudioOutput::init()
 	printf("ok\n");
 
 	setDevice(chosen_device);
+
+	pa_context_set_subscribe_callback(context, &pa_subscription_callback, this);
+	testError("pa_context_set_subscribe_callback");
+	pa_context_subscribe(context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
+	testError("pa_context_subscribe");
 
 	initialized = true;
 }

@@ -221,8 +221,8 @@ void AudioStream::kill_dev()
 	if (_stream){
 		stop();
 
-		pa_stream_unref(_stream);
-		testError("unref");
+		/*pa_stream_unref(_stream);
+		testError("unref");*/
 		_stream = NULL;
 	}
 }
@@ -260,6 +260,7 @@ void AudioStream::stop()
 
 		pa_stream_disconnect(_stream);
 		testError("disconnect");
+		_stream = NULL;
 
 		kill_dev();
 	}

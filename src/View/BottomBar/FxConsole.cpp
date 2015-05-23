@@ -140,6 +140,7 @@ FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
 
 	if (view)
 		subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	subscribe(audio, audio->MESSAGE_NEW);
 	subscribe(audio, audio->MESSAGE_ADD_EFFECT);
 	subscribe(audio, audio->MESSAGE_DELETE_EFFECT);
 }

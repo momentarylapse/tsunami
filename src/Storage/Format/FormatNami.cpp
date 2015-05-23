@@ -51,7 +51,7 @@ string FormatNami::compress_buffer(BufferBox &b)
 
 	int channels = 2;
 	int bits = min(format_get_bits(audio->default_format), 24);
-	float scale = pow(2.0f, bits) - 1.0f;
+	float scale = pow(2.0f, bits-1);
 
 	// allocate the encoder
 	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
@@ -60,7 +60,7 @@ string FormatNami::compress_buffer(BufferBox &b)
 		return "";
 	}
 
-	//ok &= FLAC__stream_encoder_set_verify(encoder, true);
+	ok &= FLAC__stream_encoder_set_verify(encoder, true);
 	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
 	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
@@ -133,7 +133,7 @@ FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDec
 
 	// read decoded PCM samples
 	BufferBox *buf = d->buf;
-	float scale = pow(2.0f, d->bits) - 1.0f;
+	float scale = pow(2.0f, d->bits-1);
 	int offset = d->sample_offset;
 	int n = min(frame->header.blocksize, buf->num - offset);
 	//msg_write(format("write %d  offset=%d  buf=%d", n, offset, buf->num));

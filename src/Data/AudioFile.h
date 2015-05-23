@@ -84,6 +84,7 @@ public:
 	void _cdecl editEffect(int index, const string &param_old);
 	void _cdecl enableEffect(int index, bool enabled);
 	void _cdecl setVolume(float volume);
+	void _cdecl changeAllTrackVolumes(Track *t, float volume);
 	void _cdecl setSampleRate(int sample_rate);
 	void _cdecl setDefaultFormat(SampleFormat format);
 	void _cdecl setCompression(int compression);

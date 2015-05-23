@@ -3,6 +3,7 @@
 BIN = ../tsunami
 all : $(BIN)
 OBJ = \
+ Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.o\
  Action/AudioFile/Data/ActionAudioSetDefaultFormat.o\
  Action/AudioFile/Data/ActionAudioSetSampleRate.o\
  Action/AudioFile/Data/ActionAudioSetVolume.o\
@@ -258,6 +259,9 @@ CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lpulse -laso
 
 $(BIN) : $(OBJ)
 	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
+
+Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.o : Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.cpp
+	$(CPP) -c Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.cpp -o $@ $(CXXFLAGS)
 
 Action/AudioFile/Data/ActionAudioSetDefaultFormat.o : Action/AudioFile/Data/ActionAudioSetDefaultFormat.cpp
 	$(CPP) -c Action/AudioFile/Data/ActionAudioSetDefaultFormat.cpp -o $@ $(CXXFLAGS)

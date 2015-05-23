@@ -11,6 +11,7 @@
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "../Action/AudioFile/Level/ActionAudioAddLevel.h"
 #include "../Action/AudioFile/Level/ActionAudioRenameLevel.h"
+#include "../Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.h"
 #include "../Action/AudioFile/Data/ActionAudioSetDefaultFormat.h"
 #include "../Action/AudioFile/Data/ActionAudioSetSampleRate.h"
 #include "../Action/AudioFile/Data/ActionAudioSetVolume.h"
@@ -133,6 +134,11 @@ void AudioFile::deleteEffect(int index)
 void AudioFile::setVolume(float volume)
 {
 	execute(new ActionAudioSetVolume(this, volume));
+}
+
+void AudioFile::changeAllTrackVolumes(Track *t, float volume)
+{
+	execute(new ActionAudioChangeAllTrackVolumes(this, t, volume));
 }
 
 void AudioFile::setSampleRate(int _sample_rate)

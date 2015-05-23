@@ -18,11 +18,11 @@ const float TrackMixer::TAN_SCALE = 10.0f;
 
 TrackMixer::TrackMixer()
 {
-	string id_grid = "mixing_track_table";
-	id_separator = "mixing_track_separator";
+	string id_grid = "mixing-track-grid";
+	id_separator = "mixing-track-separator";
 	addGrid("", 0, 0, 1, 4, id_grid);
 	setTarget(id_grid, 0);
-	id_name = "track_name";
+	id_name = "name";
 	addLabel("!center\\...", 0, 0, 0, 0, id_name);
 	vol_slider_id = "volume";
 	pan_slider_id = "panning";
@@ -74,7 +74,10 @@ float TrackMixer::vol2slider(float vol)
 
 void TrackMixer::onVolume()
 {
-	track->setVolume(slider2vol(getFloat("")));
+	if (parent->isChecked("link-volumes"))
+		track->root->changeAllTrackVolumes(track, slider2vol(getFloat("")));
+	else
+		track->setVolume(slider2vol(getFloat("")));
 }
 
 void TrackMixer::onMute()
@@ -108,24 +111,30 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, AudioStrea
 {
 	audio = _audio;
 	output = _output;
-	id_inner = "inner_table";
+	id_inner = "inner-grid";
 
 
-	addGrid("", 0, 0, 1, 20, id_inner);
-	setTarget(id_inner, 0);
-	addGrid("", 0, 0, 1, 5, "mc_output");
+	addGrid("", 0, 0, 4, 1, "outer-grid");
+	setTarget("outer-grid", 0);
+	addGrid("", 0, 0, 1, 5, "output");
 	addSeparator("!vertical", 1, 0, 0, 0, "");
+	addGrid("", 2, 0, 1, 20, id_inner);
+	addCheckBox(_("koppeln"), 3, 0, 0, 0, "link-volumes");
+	setTooltip("link-volumes", _("die Regler aller Spuren gemeinsam &andern"));
 
 
-	setTarget("mc_output", 0);
+	setTarget("output", 0);
 	addLabel(_("!bold,center\\Ausgabe"), 0, 0, 0, 0, "");
-	addDrawingArea("!width=100,height=30,noexpandx,noexpandy", 0, 1, 0, 0, "mc_output_peaks");
-	addSlider("!vertical,expandy", 0, 2, 0, 0, "mc_output_volume");
+	addDrawingArea("!width=100,height=30,noexpandx,noexpandy", 0, 1, 0, 0, "output-peaks");
+	addSlider("!vertical,expandy", 0, 2, 0, 0, "output-volume");
 
-	peak_meter = new PeakMeter(this, "mc_output_peaks", stream);
-	setFloat("mc_output_volume", output->getVolume());
+	peak_meter = new PeakMeter(this, "output-peaks", stream);
+	setFloat("output-volume", output->getVolume());
 
-	event("mc_output_volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);
+	setTooltip("output-volume", _("Ausgabelautst&arke"));
+	setTooltip("output-peaks", _("Ausgabepegel"));
+
+	event("output-volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);
 
 	subscribe(audio);
 	subscribe(output);
@@ -151,12 +160,12 @@ void MixingConsole::loadData()
 	for (int i=mixer.num; i<audio->tracks.num; i++){
 		TrackMixer *m = new TrackMixer();
 		mixer.add(m);
-		embed(m, id_inner, i*2 + 2, 0);
-		addSeparator("!vertical", i*2 + 3, 0, 0, 0, "separator_" + i2s(i));
+		embed(m, id_inner, i*2, 0);
+		addSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator-" + i2s(i));
 	}
 	for (int i=audio->tracks.num; i<mixer.num; i++){
 		delete(mixer[i]);
-		removeControl("separator_" + i2s(i));
+		removeControl("separator-" + i2s(i));
 	}
 	mixer.resize(audio->tracks.num);
 
@@ -167,7 +176,7 @@ void MixingConsole::loadData()
 void MixingConsole::onUpdate(Observable* o, const string &message)
 {
 	if (o == output)
-		setFloat("mc_output_volume", output->getVolume());
+		setFloat("output-volume", output->getVolume());
 	else
 		loadData();
 }

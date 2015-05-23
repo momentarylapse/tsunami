@@ -14,6 +14,7 @@
 #include "../../Audio/Synth/Synthesizer.h"
 
 #include <FLAC/all.h>
+#include <math.h>
 
 const int CHUNK_SIZE = 1 << 16;
 
@@ -21,6 +22,8 @@ const int CHUNK_SIZE = 1 << 16;
 FormatNami::FormatNami() :
 	Format("Tsunami", "nami", FLAG_AUDIO | FLAG_MIDI | FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS | FLAG_READ | FLAG_WRITE)
 {
+	audio = NULL;
+	f = NULL;
 }
 
 FormatNami::~FormatNami()
@@ -38,7 +41,7 @@ FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncod
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 }
 
-string compress_buffer(BufferBox &b)
+string FormatNami::compress_buffer(BufferBox &b)
 {
 	string data;
 
@@ -47,6 +50,8 @@ string compress_buffer(BufferBox &b)
 	FLAC__StreamEncoderInitStatus init_status;
 
 	int channels = 2;
+	int bits = min(format_get_bits(audio->default_format), 24);
+	float scale = pow(2.0f, bits);
 
 	// allocate the encoder
 	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
@@ -58,8 +63,8 @@ string compress_buffer(BufferBox &b)
 	ok &= FLAC__stream_encoder_set_verify(encoder, true);
 	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
-	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, 16);
-	ok &= FLAC__stream_encoder_set_sample_rate(encoder, DEFAULT_SAMPLE_RATE);
+	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
+	ok &= FLAC__stream_encoder_set_sample_rate(encoder, audio->sample_rate);
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.num);
 
 	// initialize encoder
@@ -80,8 +85,8 @@ string compress_buffer(BufferBox &b)
 			{
 				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
 				for (unsigned int i=0;i<need;i++){
-					flac_pcm[i * 2 + 0] = (int)(b.r[p0 + i] * 32768.0f);
-					flac_pcm[i * 2 + 1] = (int)(b.l[p0 + i] * 32768.0f);
+					flac_pcm[i * 2 + 0] = (int)(b.r[p0 + i] * scale);
+					flac_pcm[i * 2 + 1] = (int)(b.l[p0 + i] * scale);
 				}
 				/* feed samples to encoder */
 				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
@@ -103,10 +108,6 @@ string compress_buffer(BufferBox &b)
 	return data;
 }
 
-void WriteMidi(CFile *f, MidiData &m);
-
-Array<int> ChunkPos;
-
 
 
 void strip(string &s)
@@ -115,7 +116,7 @@ void strip(string &s)
 		s.resize(s.num - 1);
 }
 
-void BeginChunk(CFile *f, const string &name)
+void FormatNami::BeginChunk(const string &name)
 {
 	string s = name + "        ";
 	f->WriteBuffer(s.data, 8);
@@ -123,7 +124,7 @@ void BeginChunk(CFile *f, const string &name)
 	ChunkPos.add(f->GetPos());
 }
 
-void EndChunk(CFile *f)
+void FormatNami::EndChunk()
 {
 	int pos = ChunkPos.back();
 	ChunkPos.pop();
@@ -134,63 +135,69 @@ void EndChunk(CFile *f)
 	f->SetPos(pos0, true);
 }
 
-void WriteTag(CFile *f, Tag *t)
+void FormatNami::WriteTag(Tag *t)
 {
-	BeginChunk(f, "tag");
+	BeginChunk("tag");
 	f->WriteStr(t->key);
 	f->WriteStr(t->value);
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteEffect(CFile *f, Effect *e)
+void FormatNami::WriteEffect(Effect *e)
 {
-	BeginChunk(f, "effect");
+	BeginChunk("effect");
 	f->WriteStr(e->name);
 	f->WriteBool(e->only_on_selection);
 	f->WriteInt(e->range.offset);
 	f->WriteInt(e->range.num);
 	f->WriteStr(e->configToString());
 	f->WriteStr(e->enabled ? "" : "disabled");
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteBufferBox(CFile *f, BufferBox *b)
+void FormatNami::WriteBufferBox(BufferBox *b)
 {
-	BeginChunk(f, "bufbox");
+	BeginChunk("bufbox");
+	int channels = 2;
 	f->WriteInt(b->offset);
 	f->WriteInt(b->num);
-	f->WriteInt(2);
-	f->WriteInt(16);
+	f->WriteInt(channels);
+	f->WriteInt(format_get_bits(audio->default_format));
 
 	string data;
-	if (!b->exports(data, 2, SAMPLE_FORMAT_16))
-		tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+	msg_write(audio->compression);
+	if (audio->compression == 0){
+		if (!b->exports(data, channels, audio->default_format))
+			tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+	}else{
 
-	//string cdata = compress_buffer(*b);
-	//msg_write(format("compress:  %d  -> %d    %.1f%%", data.num, cdata.num, (float)cdata.num / (float)data.num * 100.0f));
-
+		int uncompressed_size = b->num * channels * format_get_bits(audio->default_format) / 8;
+		data = compress_buffer(*b);
+		msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
+	}
 	f->WriteBuffer(data.data, data.num);
-	EndChunk(f);
+
+	EndChunk();
 }
 
-void WriteSample(CFile *f, Sample *s)
+void FormatNami::WriteSample(Sample *s)
 {
-	BeginChunk(f, "sample");
+	BeginChunk("sample");
 	f->WriteStr(s->name);
 	f->WriteFloat(s->volume);
 	f->WriteInt(s->offset);
 	f->WriteInt(s->type); // reserved
 	f->WriteInt(0);
 	if (s->type == Track::TYPE_AUDIO)
-		WriteBufferBox(f, &s->buf);
+		WriteBufferBox(&s->buf);
 	else if (s->type == Track::TYPE_MIDI)
-		WriteMidi(f, s->midi);
-	EndChunk(f);
+		WriteMidi(s->midi);
+	EndChunk();
 }
 
-void WriteSampleRef(CFile *f, SampleRef *s)
+void FormatNami::WriteSampleRef(SampleRef *s)
 {
-	BeginChunk(f, "samref");
+	BeginChunk("samref");
 
 	f->WriteStr(s->origin->name);
 	f->WriteInt(s->pos);
@@ -202,12 +209,12 @@ void WriteSampleRef(CFile *f, SampleRef *s)
 	f->WriteInt(0); // reserved
 	f->WriteInt(0);
 
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteBar(CFile *f, BarPattern &b)
+void FormatNami::WriteBar(BarPattern &b)
 {
-	BeginChunk(f, "bar");
+	BeginChunk("bar");
 
 	f->WriteInt(b.type);
 	f->WriteInt(b.length);
@@ -215,45 +222,45 @@ void WriteBar(CFile *f, BarPattern &b)
 	f->WriteInt(b.count);
 	f->WriteInt(0); // reserved
 
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteMarker(CFile *f, TrackMarker &m)
+void FormatNami::WriteMarker(TrackMarker &m)
 {
-	BeginChunk(f, "marker");
+	BeginChunk("marker");
 	f->WriteInt(m.pos);
 	f->WriteStr(m.text);
 	f->WriteInt(0); // reserved
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteMidiEvent(CFile *f, MidiEvent &e)
+void FormatNami::WriteMidiEvent(MidiEvent &e)
 {
-	BeginChunk(f, "event");
+	BeginChunk("event");
 
 	f->WriteInt(e.pos);
 	f->WriteInt(e.pitch);
 	f->WriteFloat(e.volume);
 	f->WriteInt(0); // reserved
 
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteMidiEffect(CFile *f, MidiEffect *e)
+void FormatNami::WriteMidiEffect(MidiEffect *e)
 {
-	BeginChunk(f, "effect");
+	BeginChunk("effect");
 	f->WriteStr(e->name);
 	f->WriteBool(e->only_on_selection);
 	f->WriteInt(e->range.offset);
 	f->WriteInt(e->range.num);
 	f->WriteStr(e->configToString());
 	f->WriteStr(e->enabled ? "" : "disabled");
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteMidi(CFile *f, MidiData &m)
+void FormatNami::WriteMidi(MidiData &m)
 {
-	BeginChunk(f, "midi");
+	BeginChunk("midi");
 
 	f->WriteStr("");
 	f->WriteStr("");
@@ -261,40 +268,40 @@ void WriteMidi(CFile *f, MidiData &m)
 	f->WriteInt(0); // reserved
 
 	foreach(MidiEvent &e, m)
-		WriteMidiEvent(f, e);
+		WriteMidiEvent(e);
 
 	foreach(MidiEffect *e, m.fx)
-		WriteMidiEffect(f, e);
+		WriteMidiEffect(e);
 
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteSynth(CFile *f, Synthesizer *s)
+void FormatNami::WriteSynth(Synthesizer *s)
 {
-	BeginChunk(f, "synth");
+	BeginChunk("synth");
 
 	f->WriteStr(s->name);
 	f->WriteStr(s->configToString());
 	f->WriteStr("");
 	f->WriteInt(0); // reserved
 
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteTrackLevel(CFile *f, TrackLevel *l, int level_no)
+void FormatNami::WriteTrackLevel(TrackLevel *l, int level_no)
 {
-	BeginChunk(f, "level");
+	BeginChunk("level");
 	f->WriteInt(level_no);
 
 	foreach(BufferBox &b, l->buffers)
-		WriteBufferBox(f, &b);
+		WriteBufferBox(&b);
 
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteTrack(CFile *f, Track *t)
+void FormatNami::WriteTrack(Track *t)
 {
-	BeginChunk(f, "track");
+	BeginChunk("track");
 
 	f->WriteStr(t->name);
 	f->WriteFloat(t->volume);
@@ -305,71 +312,89 @@ void WriteTrack(CFile *f, Track *t)
 	f->WriteInt(0);
 
 	foreach(BarPattern &b, t->bars)
-		WriteBar(f, b);
+		WriteBar(b);
 
 	foreachi(TrackLevel &l, t->levels, i)
-		WriteTrackLevel(f, &l, i);
+		WriteTrackLevel(&l, i);
 
 	foreach(SampleRef *s, t->samples)
-		WriteSampleRef(f, s);
+		WriteSampleRef(s);
 
 	foreach(Effect *effect, t->fx)
-		WriteEffect(f, effect);
+		WriteEffect(effect);
 
 	foreach(TrackMarker &m, t->markers)
-		WriteMarker(f, m);
+		WriteMarker(m);
 
 	if ((t->type == t->TYPE_TIME) or (t->type == t->TYPE_MIDI))
-		WriteSynth(f, t->synth);
+		WriteSynth(t->synth);
 
 	if (t->midi.num > 0)
-		WriteMidi(f, t->midi);
+		WriteMidi(t->midi);
 
-	EndChunk(f);
+	EndChunk();
 }
 
-void WriteLevelName(CFile *f, Array<string> level_name)
+void FormatNami::WriteLevelName()
 {
-	BeginChunk(f, "lvlname");
+	BeginChunk("lvlname");
 
-	f->WriteInt(level_name.num);
-	foreach(string &l, level_name)
+	f->WriteInt(audio->level_names.num);
+	foreach(string &l, audio->level_names)
 		f->WriteStr(l);
 
-	EndChunk(f);
+	EndChunk();
+}
+
+void FormatNami::WriteFormat()
+{
+	BeginChunk("format");
+
+	f->WriteInt(audio->sample_rate);
+	f->WriteInt(audio->default_format);
+	f->WriteInt(2); // channels
+	f->WriteInt(audio->compression);
+	f->WriteInt(0); // reserved
+	f->WriteInt(0);
+	f->WriteInt(0);
+	f->WriteInt(0);
+
+	EndChunk();
 }
 
 void FormatNami::saveAudio(AudioFile *a, const string & filename)
 {
 	tsunami->progress->start(_("speichere nami"), 0);
 	a->filename = filename;
+	audio = a;
 
 //	int length = a->GetLength();
 //	int min = a->GetMin();
-	CFile *f = FileCreate(filename);
+	f = FileCreate(filename);
 	f->SetBinaryMode(true);
 
-	BeginChunk(f, "nami");
+	BeginChunk("nami");
 
 	f->WriteInt(a->sample_rate);
+	WriteFormat();
 
 	foreach(Tag &tag, a->tags)
-		WriteTag(f, &tag);
+		WriteTag(&tag);
 
-	WriteLevelName(f, a->level_names);
+	WriteLevelName();
 
 	foreach(Sample *sample, a->samples)
-		WriteSample(f, sample);
+		WriteSample(sample);
 
 	foreachi(Track *track, a->tracks, i){
-		WriteTrack(f, track);
+		WriteTrack(track);
 		tsunami->progress->set(_("speichere nami"), ((float)i + 0.5f) / (float)a->tracks.num);
 	}
 
 	foreach(Effect *effect, a->fx)
-		WriteEffect(f, effect);
+		WriteEffect(effect);
 
-	EndChunk(f);
+	EndChunk();
 
 	FileClose(f);
 	tsunami->progress->end();
@@ -435,6 +460,7 @@ struct ChunkStack
 {
 	Array<ChunkLevelData> chunk_data;
 	CFile *f;
+	AudioFile *a;
 
 
 	void AddChunkHandler(const string &tag, chunk_reader *reader, void *data)
@@ -481,6 +507,18 @@ struct ChunkStack
 	}
 };
 
+void ReadChunkFormat(ChunkStack *s, AudioFile *a)
+{
+	a->sample_rate = s->f->ReadInt();
+	a->default_format = (SampleFormat)s->f->ReadInt();
+	s->f->ReadInt(); // channels
+	a->compression = s->f->ReadInt();
+	s->f->ReadInt();
+	s->f->ReadInt();
+	s->f->ReadInt();
+	s->f->ReadInt();
+}
+
 void ReadChunkTag(ChunkStack *s, Array<Tag> *tag)
 {
 	Tag t;
@@ -519,11 +557,14 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 	b->offset = s->f->ReadInt();
 	int num = s->f->ReadInt();
 	b->resize(num);
-	s->f->ReadInt(); // channels (2)
-	s->f->ReadInt(); // bit (16)
+	int channels = s->f->ReadInt(); // channels (2)
+	int bits = s->f->ReadInt(); // bit (16)
+
+	if (s->a->compression)
+		throw string("can't read compressed nami files yet");
 
 	string data;
-	data.resize(num * 4);
+	data.resize(num * (bits / 8) * channels);
 
 	// read chunk'ed
 	int offset = 0;
@@ -535,7 +576,7 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 	s->f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
 
 	// insert
-	b->import(data.data, 2, SAMPLE_FORMAT_16, num);
+	b->import(data.data, channels, format_for_bits(bits), num);
 }
 
 
@@ -710,6 +751,7 @@ void ReadChunkNami(ChunkStack *s, AudioFile *a)
 {
 	a->sample_rate = s->f->ReadInt();
 
+	s->AddChunkHandler("format", (chunk_reader*)&ReadChunkFormat, a);
 	s->AddChunkHandler("tag", (chunk_reader*)&ReadChunkTag, &a->tags);
 	s->AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &a->fx);
 	s->AddChunkHandler("lvlname", (chunk_reader*)&ReadChunkLevelName, a);
@@ -725,6 +767,7 @@ void load_nami_file_new(CFile *f, AudioFile *a)
 
 	ChunkStack s;
 	s.f = f;
+	s.a = a;
 	s.chunk_data.add(ChunkLevelData("-top level-", 0));
 	s.AddChunkHandler("nami", (chunk_reader*)&ReadChunkNami, a);
 
@@ -755,7 +798,11 @@ void FormatNami::loadAudio(AudioFile *a, const string & filename)
 	CFile *f = FileOpen(a->filename);
 	f->SetBinaryMode(true);
 
-	load_nami_file_new(f, a);
+	try{
+		load_nami_file_new(f, a);
+	}catch(string &s){
+		tsunami->log->error("loading nami: " + s);
+	}
 
 	FileClose(f);
 

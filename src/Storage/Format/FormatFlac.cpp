@@ -39,12 +39,13 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
 	BufferBox buf = flac_track->getBuffers(flac_level, range);
 	Action *a = new ActionTrackEditBuffer(flac_track, 0, range);
+	float scale = pow(2.0f, flac_bits);
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
 			if (j == 0)
-				buf.r[i] = buffer[j][i] / 32768.0f;
+				buf.r[i] = buffer[j][i] / scale;
 			else
-				buf.l[i] = buffer[j][i] / 32768.0f;
+				buf.l[i] = buffer[j][i] / scale;
 	flac_track->root->execute(a);
 
 	flac_read_samples += frame->header.blocksize;
@@ -136,7 +137,10 @@ void FormatFlac::loadTrack(Track *t, const string & filename, int offset, int le
 	FLAC__stream_decoder_delete(decoder);
 
 
-	t->root->sample_rate = flac_freq;
+	if (t->get_index() == 0){
+		t->root->setSampleRate(flac_freq);
+		t->root->setDefaultFormat(format_for_bits(flac_bits));
+	}
 	t->root->action_manager->endActionGroup();
 }
 
@@ -172,6 +176,9 @@ void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	FLAC__StreamMetadata_VorbisComment_Entry entry;
 
 	int channels = 2;
+	int bits = format_get_bits(a->default_format);
+	if (bits > 24)
+		bits = 24;
 
 	// allocate the encoder
 	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
@@ -183,7 +190,7 @@ void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	ok &= FLAC__stream_encoder_set_verify(encoder, true);
 	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
-	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, 16);
+	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
 	ok &= FLAC__stream_encoder_set_sample_rate(encoder, a->sample_rate);
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b->num);
 
@@ -216,13 +223,15 @@ void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	if (ok){
 		int p0 = 0;
 		size_t left = (size_t)b->num;
+		float scale = pow(2.0f, bits);
+		msg_write(f2s(scale, 3));
 		while (ok && left){
 			size_t need = (left>FLAC_READSIZE? (size_t)FLAC_READSIZE : (size_t)left);
 			{
 				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
 				for (unsigned int i=0;i<need;i++){
-					flac_pcm[i * 2 + 0] = (int)(b->r[p0 + i] * 32768.0f);
-					flac_pcm[i * 2 + 1] = (int)(b->l[p0 + i] * 32768.0f);
+					flac_pcm[i * 2 + 0] = (int)(b->r[p0 + i] * scale);
+					flac_pcm[i * 2 + 1] = (int)(b->l[p0 + i] * scale);
 				}
 				/* feed samples to encoder */
 				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);

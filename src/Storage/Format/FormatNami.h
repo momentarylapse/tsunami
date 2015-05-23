@@ -21,6 +21,31 @@ public:
 
 	void loadAudio(AudioFile *a, const string &filename);
 	void saveAudio(AudioFile *a, const string &filename);
+
+	string compress_buffer(BufferBox &b);
+
+	Array<int> ChunkPos;
+
+	void BeginChunk(const string &name);
+	void EndChunk();
+	void WriteTag(Tag *t);
+	void WriteEffect(Effect *e);
+	void WriteBufferBox(BufferBox *b);
+	void WriteSample(Sample *s);
+	void WriteSampleRef(SampleRef *s);
+	void WriteBar(BarPattern &b);
+	void WriteMarker(TrackMarker &m);
+	void WriteMidiEvent(MidiEvent &e);
+	void WriteMidiEffect(MidiEffect *e);
+	void WriteMidi(MidiData &m);
+	void WriteSynth(Synthesizer *s);
+	void WriteTrackLevel(TrackLevel *l, int level_no);
+	void WriteTrack(Track *t);
+	void WriteLevelName();
+	void WriteFormat();
+
+	CFile *f;
+	AudioFile *audio;
 };
 
 #endif /* FORMATNAMI_H_ */

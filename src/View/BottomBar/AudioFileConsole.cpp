@@ -42,6 +42,8 @@ AudioFileConsole::AudioFileConsole(AudioFile *a) :
 	addString("samplerate", "96000");
 
 	setTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
+	setTooltip("format", _("beim Speichern"));
+	setTooltip("compress", _("beim Speichern"));
 
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		addString("format", format_name(POSSIBLE_FORMATS[i]));
@@ -50,7 +52,7 @@ AudioFileConsole::AudioFileConsole(AudioFile *a) :
 
 	event("samplerate", this, &AudioFileConsole::onSamplerate);
 	event("format", this, &AudioFileConsole::onFormat);
-	event("compression", this, &AudioFileConsole::onCompression);
+	event("compress", this, &AudioFileConsole::onCompression);
 	eventX("tags", "hui:select", this, &AudioFileConsole::onTagsSelect);
 	eventX("tags", "hui:change", this, &AudioFileConsole::onTagsEdit);
 	event("add_tag", this, &AudioFileConsole::onAddTag);
@@ -87,7 +89,7 @@ void AudioFileConsole::loadData()
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		if (audio->default_format == POSSIBLE_FORMATS[i])
 			setInt("format", i);
-	check("compression", audio->compression);
+	check("compress", audio->compression > 0);
 }
 
 void AudioFileConsole::onSamplerate()

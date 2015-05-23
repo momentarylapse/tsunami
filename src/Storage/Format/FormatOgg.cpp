@@ -53,7 +53,6 @@ void FormatOgg::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 {
 	msg_db_r("write_ogg_file", 1);
 	tsunami->progress->set(_("exportiere ogg"), 0);
-	int size = b->num * 4;
 
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
 
@@ -78,7 +77,7 @@ void FormatOgg::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	vorbis_comment vc;
 	vorbis_comment_init(&vc);
 	foreach(Tag &tag, a->tags)
-		vorbis_comment_add_tag(&vc, (char*)tag.key.c_str(), (char*)tag.value.c_str());
+		vorbis_comment_add_tag(&vc, tag.key.c_str(), tag.value.c_str());
 	ogg_packet header_main;
 	ogg_packet header_comments;
 	ogg_packet header_codebooks;
@@ -203,13 +202,15 @@ void FormatOgg::loadTrack(Track *t, const string & filename, int offset, int lev
 		return;
 	}
 	vorbis_info *vi = ov_info(&vf, -1);
-	int bits = 16;
+	//int bits = 16;
 	int channels = 2;
-	int freq = 44100;
+	int freq = DEFAULT_SAMPLE_RATE;
 	if (vi){
 		channels = vi->channels;
 		freq = vi->rate;
 	}
+	if (t->get_index() == 0)
+		t->root->setSampleRate(freq);
 
 	// tags
 	t->root->tags.clear();

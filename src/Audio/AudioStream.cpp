@@ -31,7 +31,7 @@ extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
 
 bool pa_wait_stream_ready(pa_stream *s)
 {
-	msg_write("wait stream ready");
+	//msg_write("wait stream ready");
 	int n = 0;
 	while (pa_stream_get_state(s) != PA_STREAM_READY){
 		//pa_mainloop_iterate(m, 1, NULL);
@@ -42,7 +42,7 @@ bool pa_wait_stream_ready(pa_stream *s)
 		if (pa_stream_get_state(s) == PA_STREAM_FAILED)
 			return false;
 	}
-	msg_write("ok");
+	//msg_write("ok");
 	return true;
 }
 

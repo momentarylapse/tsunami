@@ -236,7 +236,6 @@ bool AudioInputAudio::start(int _sample_rate)
 	temp_file->SetBinaryMode(true);
 
 	resetSync();
-	msg_write(" ok");
 	return capturing;
 }
 
@@ -244,7 +243,7 @@ bool AudioInputAudio::testError(const string &msg)
 {
 	int e = pa_context_errno(tsunami->output->context);
 	if (e != 0)
-		msg_error(msg + " (input): " + pa_strerror(e));
+		tsunami->log->error(msg + " (input): " + pa_strerror(e));
 	return (e != 0);
 }
 

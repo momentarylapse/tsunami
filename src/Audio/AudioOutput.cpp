@@ -52,7 +52,7 @@ AudioOutput::AudioOutput() :
 
 	chosen_device = HuiConfig.getStr("Output.ChosenDevice", "");
 	volume = HuiConfig.getFloat("Output.Volume", 1.0f);
-	msg_write("chosen: " + chosen_device);
+	//msg_write("chosen: " + chosen_device);
 
 	init();
 }
@@ -109,6 +109,24 @@ Array<string> AudioOutput::getDevices()
 	return devices;
 }
 
+
+bool pa_wait_context_ready(pa_context *c)
+{
+	//msg_write("wait stream ready");
+	int n = 0;
+	while (pa_context_get_state(c) != PA_CONTEXT_READY){
+		//pa_mainloop_iterate(m, 1, NULL);
+		HuiSleep(0.01f);
+		n ++;
+		if (n >= 500)
+			return false;
+		if (pa_context_get_state(c) == PA_CONTEXT_FAILED)
+			return false;
+	}
+	//msg_write("ok");
+	return true;
+}
+
 void AudioOutput::init()
 {
 	if (initialized)
@@ -139,10 +157,10 @@ void AudioOutput::init()
 	if (testError("pa_threaded_mainloop_start"))
 		return;
 
-	printf("init...\n");
-	while (pa_context_get_state(context) != PA_CONTEXT_READY)
-        {}//pa_mainloop_iterate(m, 1, NULL);
-	printf("ok\n");
+	if (!pa_wait_context_ready(context)){
+		tsunami->log->error("pulse audio context does not turn 'ready'");
+		return;
+	}
 
 	setDevice(chosen_device);
 

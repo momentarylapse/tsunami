@@ -108,7 +108,102 @@ string FormatNami::compress_buffer(BufferBox &b)
 	return data;
 }
 
+struct UncompressData
+{
+	BufferBox *buf;
+	string *data;
+	int sample_offset;
+	int byte_offset;
+	int bits;
+	int channels;
+};
 
+void FlacUncompressMetaCallback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
+{
+	UncompressData *d = (UncompressData*)client_data;
+	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO){
+		d->bits = metadata->data.stream_info.bits_per_sample;
+		d->channels = metadata->data.stream_info.channels;
+	}
+}
+
+FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
+{
+	UncompressData *d = (UncompressData*)client_data;
+
+	// read decoded PCM samples
+	BufferBox *buf = d->buf;
+	float scale = pow(2.0f, d->bits);
+	int offset = d->sample_offset;
+	int n = min(frame->header.blocksize, buf->num - offset);
+	for (int i=0; i<n; i++)
+		for (int j=0;j<d->channels;j++)
+			if (j == 0)
+				buf->r[offset + i] = buffer[j][i] / scale;
+			else
+				buf->l[offset + i] = buffer[j][i] / scale;
+	d->sample_offset += frame->header.blocksize;
+
+	//flac_read_samples += frame->header.blocksize;
+	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+}
+
+FLAC__StreamDecoderReadStatus FlacUncompressReadCallback(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
+{
+	UncompressData *d = (UncompressData*)client_data;
+	*bytes = min(*bytes, d->data->num - d->byte_offset);
+	if (*bytes > 0){
+		memcpy(buffer, (char*)d->data->data + d->byte_offset, *bytes);
+		d->byte_offset += *bytes;
+	}
+	return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+}
+
+static void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
+{
+	//msg_write("error");
+	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
+}
+
+void uncompress_buffer(BufferBox &b, string &data)
+{
+	bool ok = true;
+
+	FLAC__StreamDecoder *decoder = FLAC__stream_decoder_new();
+	if (!decoder)
+		throw string("flac: decoder_new()");
+
+	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO | FLAC__METADATA_TYPE_VORBIS_COMMENT));
+
+	UncompressData d;
+	d.buf = &b;
+	d.channels = 2;
+	d.bits = 16;
+	d.data = &data;
+	d.byte_offset = 0;
+	d.sample_offset = 0;
+
+	FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_stream(
+							decoder,
+							&FlacUncompressReadCallback,
+							NULL, NULL, NULL, NULL,
+							&FlacUncompressWriteCallback,
+							&FlacUncompressMetaCallback,
+							flac_error_callback, &d);
+	if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
+		tsunami->log->error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
+		ok = false;
+	}
+
+	if (ok){
+		ok = FLAC__stream_decoder_process_until_end_of_stream(decoder);
+		if (!ok){
+			tsunami->log->error("flac: decoding FAILED");
+			tsunami->log->error(string("   state: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+		}
+	}
+	FLAC__stream_decoder_delete(decoder);
+}
 
 void strip(string &s)
 {
@@ -449,11 +544,16 @@ struct ChunkHandler
 struct ChunkLevelData
 {
 	ChunkLevelData(){}
-	ChunkLevelData(const string &_tag, int _pos)
-	{	tag = _tag;	pos = _pos;	}
+	ChunkLevelData(const string &_tag, int _pos, int _size)
+	{ tag = _tag; pos = _pos; size = _size; }
 	int pos;
+	int size;
 	string tag;
 	Array<ChunkHandler> handler;
+	int end()
+	{
+		return pos + size;
+	}
 };
 
 struct ChunkStack
@@ -476,16 +576,21 @@ struct ChunkStack
 
 	void ReadChunk(CFile *f)
 	{
+		ChunkLevelData cur = chunk_data.back();
 		string cname;
 		cname.resize(8);
 		f->ReadBuffer(cname.data, 8);
 		strip(cname);
 		int size = f->ReadInt();
-		chunk_data.add(ChunkLevelData(cname, f->GetPos() + size));
+		chunk_data.add(ChunkLevelData(cname, f->GetPos(), size));
+		if (size < 0)
+			throw string("chunk with negative size found");
+		if (chunk_data.back().end() > cur.end())
+			throw string("inner chunk is larger than its parent");
 
 
 		bool handled = false;
-		foreach(ChunkHandler &h, chunk_data[chunk_data.num - 2].handler)
+		foreach(ChunkHandler &h, cur.handler)
 			if (cname == h.tag){
 				h.reader(this, h.data);
 				handled = true;
@@ -495,14 +600,14 @@ struct ChunkStack
 		if (handled){
 
 			// read nested chunks
-			while (f->GetPos() < chunk_data.back().pos)
+			while (f->GetPos() < chunk_data.back().end())
 				ReadChunk(f);
 
 		}else
 			tsunami->log->error("unknown nami chunk: " + cname + " (within " + chunk_data[chunk_data.num - 2].tag + ")");
 
 
-		f->SetPos(chunk_data.back().pos, true);
+		f->SetPos(chunk_data.back().end(), true);
 		chunk_data.pop();
 	}
 };
@@ -560,11 +665,10 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 	int channels = s->f->ReadInt(); // channels (2)
 	int bits = s->f->ReadInt(); // bit (16)
 
-	if (s->a->compression)
-		throw string("can't read compressed nami files yet");
-
 	string data;
-	data.resize(num * (bits / 8) * channels);
+
+	int bytes = s->chunk_data.back().size - 16;
+	data.resize(bytes);//num * (bits / 8) * channels);
 
 	// read chunk'ed
 	int offset = 0;
@@ -576,7 +680,14 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 	s->f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
 
 	// insert
-	b->import(data.data, channels, format_for_bits(bits), num);
+
+	if (s->a->compression > 0){
+		//throw string("can't read compressed nami files yet");
+		uncompress_buffer(*b, data);
+
+	}else{
+		b->import(data.data, channels, format_for_bits(bits), num);
+	}
 }
 
 
@@ -768,7 +879,7 @@ void load_nami_file_new(CFile *f, AudioFile *a)
 	ChunkStack s;
 	s.f = f;
 	s.a = a;
-	s.chunk_data.add(ChunkLevelData("-top level-", 0));
+	s.chunk_data.add(ChunkLevelData("-top level-", 0, f->GetSize()));
 	s.AddChunkHandler("nami", (chunk_reader*)&ReadChunkNami, a);
 
 	s.ReadChunk(f);

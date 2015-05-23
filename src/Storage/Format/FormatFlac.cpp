@@ -39,7 +39,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
 	BufferBox buf = flac_track->getBuffers(flac_level, range);
 	Action *a = new ActionTrackEditBuffer(flac_track, 0, range);
-	float scale = pow(2.0f, flac_bits);
+	float scale = pow(2.0f, flac_bits) - 1.0f;
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
 			if (j == 0)
@@ -223,7 +223,7 @@ void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 	if (ok){
 		int p0 = 0;
 		size_t left = (size_t)b->num;
-		float scale = pow(2.0f, bits);
+		float scale = pow(2.0f, bits) - 1.0f;
 		msg_write(f2s(scale, 3));
 		while (ok && left){
 			size_t need = (left>FLAC_READSIZE? (size_t)FLAC_READSIZE : (size_t)left);

@@ -51,7 +51,7 @@ string FormatNami::compress_buffer(BufferBox &b)
 
 	int channels = 2;
 	int bits = min(format_get_bits(audio->default_format), 24);
-	float scale = pow(2.0f, bits);
+	float scale = pow(2.0f, bits) - 1.0f;
 
 	// allocate the encoder
 	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
@@ -60,7 +60,7 @@ string FormatNami::compress_buffer(BufferBox &b)
 		return "";
 	}
 
-	ok &= FLAC__stream_encoder_set_verify(encoder, true);
+	//ok &= FLAC__stream_encoder_set_verify(encoder, true);
 	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
 	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
@@ -133,9 +133,10 @@ FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDec
 
 	// read decoded PCM samples
 	BufferBox *buf = d->buf;
-	float scale = pow(2.0f, d->bits);
+	float scale = pow(2.0f, d->bits) - 1.0f;
 	int offset = d->sample_offset;
 	int n = min(frame->header.blocksize, buf->num - offset);
+	//msg_write(format("write %d  offset=%d  buf=%d", n, offset, buf->num));
 	for (int i=0; i<n; i++)
 		for (int j=0;j<d->channels;j++)
 			if (j == 0)
@@ -152,10 +153,11 @@ FLAC__StreamDecoderReadStatus FlacUncompressReadCallback(const FLAC__StreamDecod
 {
 	UncompressData *d = (UncompressData*)client_data;
 	*bytes = min(*bytes, d->data->num - d->byte_offset);
-	if (*bytes > 0){
-		memcpy(buffer, (char*)d->data->data + d->byte_offset, *bytes);
-		d->byte_offset += *bytes;
-	}
+	//msg_write(format("read %d", *bytes));
+	if (*bytes <= 0)
+		return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
+	memcpy(buffer, (char*)d->data->data + d->byte_offset, *bytes);
+	d->byte_offset += *bytes;
 	return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
 }
 
@@ -173,7 +175,7 @@ void uncompress_buffer(BufferBox &b, string &data)
 	if (!decoder)
 		throw string("flac: decoder_new()");
 
-	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO | FLAC__METADATA_TYPE_VORBIS_COMMENT));
+	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO));
 
 	UncompressData d;
 	d.buf = &b;
@@ -260,7 +262,6 @@ void FormatNami::WriteBufferBox(BufferBox *b)
 	f->WriteInt(format_get_bits(audio->default_format));
 
 	string data;
-	msg_write(audio->compression);
 	if (audio->compression == 0){
 		if (!b->exports(data, channels, audio->default_format))
 			tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));

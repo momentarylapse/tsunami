@@ -13,12 +13,19 @@
 #include "../../View/AudioView.h"
 #include "AudioFileConsole.h"
 
-AudioFileConsole::AudioFileConsole(AudioFile *a, AudioView *v) :
+const int NUM_POSSIBLE_FORMATS = 4;
+const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
+	SAMPLE_FORMAT_16,
+	SAMPLE_FORMAT_24,
+	SAMPLE_FORMAT_32,
+	SAMPLE_FORMAT_32_FLOAT
+};
+
+AudioFileConsole::AudioFileConsole(AudioFile *a) :
 	BottomBarConsole(_("Datei")),
 	Observer("AudioFileConsole")
 {
 	audio = a;
-	view = v;
 
 	// dialog
 	setBorderWidth(5);
@@ -33,24 +40,23 @@ AudioFileConsole::AudioFileConsole(AudioFile *a, AudioView *v) :
 
 	setTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
 
+	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
+		addString("format", format_name(POSSIBLE_FORMATS[i]));
+
+	event("samplerate", this, &AudioFileConsole::onSamplerate);
+	event("format", this, &AudioFileConsole::onFormat);
+	event("compression", this, &AudioFileConsole::onCompression);
 	eventX("tags", "hui:select", this, &AudioFileConsole::onTagsSelect);
 	eventX("tags", "hui:change", this, &AudioFileConsole::onTagsEdit);
 	event("add_tag", this, &AudioFileConsole::onAddTag);
 	event("delete_tag", this, &AudioFileConsole::onDeleteTag);
 
-	eventX("levels", "hui:select", this, &AudioFileConsole::onLevelsSelect);
-	eventX("levels", "hui:change", this, &AudioFileConsole::onLevelsEdit);
-	event("add_level", this, &AudioFileConsole::onAddLevel);
-	event("delete_level", this, &AudioFileConsole::onDeleteLevel);
-
 	subscribe(audio);
-	subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 AudioFileConsole::~AudioFileConsole()
 {
 	unsubscribe(audio);
-	unsubscribe(view);
 	delete(bar_list);
 }
 
@@ -72,14 +78,29 @@ void AudioFileConsole::loadData()
 	addString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
 	addString("data_list", _("Format\\16 bit stereo (nami)"));
 
-	// levels
-	reset("levels");
-	foreachi(string &n, audio->level_names, i)
-		addString("levels", i2s(i + 1) + "\\" + n);
-	if (audio->level_names.num > 0)
-		setInt("levels", view->cur_level);
+	setInt("samplerate", audio->sample_rate);
+	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
+		if (audio->default_format == POSSIBLE_FORMATS[i])
+			setInt("format", i);
+	check("compression", audio->compression);
 }
 
+void AudioFileConsole::onSamplerate()
+{
+	audio->setSampleRate(getInt(""));
+}
+
+void AudioFileConsole::onFormat()
+{
+	int i = getInt("");
+	if (i >= 0)
+		audio->setDefaultFormat(POSSIBLE_FORMATS[i]);
+}
+
+void AudioFileConsole::onCompression()
+{
+	audio->setCompression(isChecked("") ? 1 : 0);
+}
 
 string get_vol(float volume, bool muted);
 /*{
@@ -115,32 +136,6 @@ void AudioFileConsole::onDeleteTag()
 	int s = getInt("tags");
 	if (s >= 0)
 		audio->deleteTag(s);
-}
-
-void AudioFileConsole::onLevelsSelect()
-{
-	int s = getInt("levels");
-	view->setCurLevel(s);
-}
-
-void AudioFileConsole::onLevelsEdit()
-{
-	int r = HuiGetEvent()->row;
-	if (r < 0)
-		return;
-	audio->renameLevel(r, getCell("levels", r, 1));
-}
-
-void AudioFileConsole::onAddLevel()
-{
-	audio->addLevel("");
-}
-
-void AudioFileConsole::onDeleteLevel()
-{
-	int s = getInt("levels");
-	if (s >= 0)
-		audio->deleteLevel(s, false);
 }
 
 void AudioFileConsole::onUpdate(Observable *o, const string &message)

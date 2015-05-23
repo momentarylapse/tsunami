@@ -11,6 +11,8 @@
 #include "../Action/AudioFile/ActionAudioDeleteSelection.h"
 #include "../Action/AudioFile/Level/ActionAudioAddLevel.h"
 #include "../Action/AudioFile/Level/ActionAudioRenameLevel.h"
+#include "../Action/AudioFile/Data/ActionAudioSetDefaultFormat.h"
+#include "../Action/AudioFile/Data/ActionAudioSetSampleRate.h"
 #include "../Action/AudioFile/Data/ActionAudioSetVolume.h"
 #include "../Action/AudioFile/Tag/ActionAudioAddTag.h"
 #include "../Action/AudioFile/Tag/ActionAudioEditTag.h"
@@ -133,6 +135,21 @@ void AudioFile::setVolume(float volume)
 	execute(new ActionAudioSetVolume(this, volume));
 }
 
+void AudioFile::setSampleRate(int _sample_rate)
+{
+	execute(new ActionAudioSetSampleRate(this, _sample_rate));
+}
+
+void AudioFile::setDefaultFormat(SampleFormat _format)
+{
+	execute(new ActionAudioSetDefaultFormat(_format, compression));
+}
+
+void AudioFile::setCompression(int _compression)
+{
+	execute(new ActionAudioSetDefaultFormat(default_format, _compression));
+}
+
 void AudioFile::newEmpty(int _sample_rate)
 {
 	msg_db_f("AudioFile.NewEmpty",1);
@@ -171,6 +188,8 @@ void AudioFile::reset()
 	filename = "";
 	tags.clear();
 	volume = 1;
+	default_format = SAMPLE_FORMAT_16;
+	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	foreach(Effect *f, fx)
 		delete(f);

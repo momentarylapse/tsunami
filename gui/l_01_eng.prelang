@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-215
+222
 // Data (ID,Text)
 about
 
@@ -9,7 +9,9 @@ ad_t_bars
 
 ad_t_data
 
-ad_t_levels
+ad_t_format
+
+ad_t_samplerate
 
 ad_t_tags
 
@@ -83,6 +85,8 @@ close
 Close
 comment_no_fx
 
+compress
+
 copy
 Copy
 create_from_selection
@@ -115,6 +119,8 @@ export_selection
 
 favorite_list
 - Default -
+format
+
 fx_dialog
 Effect
 fxdt_filename
@@ -163,6 +169,8 @@ level_add
 
 level_delete
 
+level_dialog
+
 level_down
 
 level_up
@@ -173,6 +181,8 @@ log_clear
 Clear
 log_close
 Close
+lvld_grid_1
+
 marker_dialog
 
 marker_dialog_buttonbar
@@ -321,11 +331,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_168841
+rand_id_351832
 
-rand_id_415919
+rand_id_400718
 
-rand_id_765134
+rand_id_789033
 
 rdt_capture
 
@@ -363,6 +373,8 @@ sample_properties
 
 sample_rate
 
+samplerate
+
 save
 Save
 save_as
@@ -392,6 +404,8 @@ td_t_bars
 td_t_name
 
 td_t_volume
+
+text
 
 track_add_marker
 
@@ -530,6 +544,8 @@ Ebene %d
 
 Ebene löschen: noch nicht implementiert...
 
+Ebenen
+
 Editor für Audio Dateien
 
 Effekt löschen
@@ -620,10 +636,6 @@ Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 
 Plugin-Script wählen
 
-PortAudio (input) error: '%s'  at %s
-
-PortAudio (stream) error: '%s'   at %s
-
 Raw Daten
 
 Sample wählen
@@ -685,6 +697,8 @@ exportiere wave
 fügt am Cursor der aktuellen Spur ein
 
 i'm now going to clean up...
+
+importiere sf2
 
 in Datei exportieren
 

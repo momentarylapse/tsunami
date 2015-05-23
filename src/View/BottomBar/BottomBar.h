@@ -14,6 +14,7 @@
 class AudioView;
 class AudioFile;
 class AudioFileConsole;
+class LevelConsole;
 class AudioOutput;
 class Track;
 class TrackConsole;
@@ -53,6 +54,7 @@ public:
 		LOG_CONSOLE,
 		AUDIOFILE_CONSOLE,
 		MIXING_CONSOLE,
+		LEVEL_CONSOLE,
 		FX_CONSOLE,
 		SAMPLE_CONSOLE,
 		CURVE_CONSOLE,
@@ -74,6 +76,7 @@ public:
 	//HuiMenu *menu;
 	AudioFileConsole *audio_file_console;
 	FxConsole *fx_console;
+	LevelConsole *level_console;
 	TrackConsole *track_console;
 	FxConsole *track_fx_console;
 	SynthConsole *track_synth_console;

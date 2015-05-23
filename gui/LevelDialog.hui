@@ -1,0 +1,6 @@
+Dialog level_dialog "Ebenen" 430 375
+	Grid lvld_grid_1 "" 1 2 expandy
+		ListView levels "#\\Name" format=tT select-single
+		Grid ? "" 2 1
+			Button add_level "" image=hui:add flat
+			Button delete_level "" image=hui:delete flat

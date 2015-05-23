@@ -8,6 +8,7 @@
 #include "BottomBar.h"
 #include "AudioFileConsole.h"
 #include "MixingConsole.h"
+#include "LevelConsole.h"
 #include "CurveConsole.h"
 #include "TrackConsole.h"
 #include "FxConsole.h"
@@ -40,8 +41,9 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	setImage("close", "hui:close");
 	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
 	log_dialog = new LogDialog(log);
-	audio_file_console = new AudioFileConsole(audio, view);
+	audio_file_console = new AudioFileConsole(audio);
 	mixing_console = new MixingConsole(audio, output, view->stream);
+	level_console = new LevelConsole(audio, view);
 	fx_console = new FxConsole(NULL, audio);
 	sample_manager = new SampleManager(audio);
 	curve_console = new CurveConsole(view, audio);
@@ -52,6 +54,7 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	addConsole(log_dialog, "");
 	addConsole(audio_file_console, "");
 	addConsole(mixing_console, "\t");
+	addConsole(level_console, "\t");
 	addConsole(fx_console, "\t");
 	addConsole(sample_manager, "\t");
 	addConsole(curve_console, "\t");

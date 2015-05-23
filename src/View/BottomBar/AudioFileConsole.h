@@ -16,27 +16,24 @@ class BarList;
 class AudioFileConsole: public BottomBarConsole, public Observer
 {
 public:
-	AudioFileConsole(AudioFile *a, AudioView *view);
+	AudioFileConsole(AudioFile *a);
 	virtual ~AudioFileConsole();
 
 	void loadData();
 	void applyData();
 
+	void onSamplerate();
+	void onFormat();
+	void onCompression();
 	void onTrackList();
 	void onTagsSelect();
 	void onTagsEdit();
 	void onAddTag();
 	void onDeleteTag();
 
-	void onLevelsSelect();
-	void onLevelsEdit();
-	void onAddLevel();
-	void onDeleteLevel();
-
 	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
-	AudioView *view;
 	BarList *bar_list;
 };
 

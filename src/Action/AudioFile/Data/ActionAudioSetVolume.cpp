@@ -14,10 +14,6 @@ ActionAudioSetVolume::ActionAudioSetVolume(AudioFile *a, float _volume)
 	old_value = a->volume;
 }
 
-ActionAudioSetVolume::~ActionAudioSetVolume()
-{
-}
-
 void *ActionAudioSetVolume::execute(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);

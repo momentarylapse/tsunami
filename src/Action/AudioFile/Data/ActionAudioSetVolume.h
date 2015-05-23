@@ -16,7 +16,7 @@ class ActionAudioSetVolume : public ActionMergable<float>
 {
 public:
 	ActionAudioSetVolume(AudioFile *a, float volume);
-	virtual ~ActionAudioSetVolume();
+	virtual ~ActionAudioSetVolume(){}
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

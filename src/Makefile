@@ -3,6 +3,8 @@
 BIN = ../tsunami
 all : $(BIN)
 OBJ = \
+ Action/AudioFile/Data/ActionAudioSetDefaultFormat.o\
+ Action/AudioFile/Data/ActionAudioSetSampleRate.o\
  Action/AudioFile/Data/ActionAudioSetVolume.o\
  Action/AudioFile/Level/ActionAudioAddLevel.o\
  Action/AudioFile/Level/ActionAudioRenameLevel.o\
@@ -223,6 +225,7 @@ OBJ = \
  View/BottomBar/BottomBar.o\
  View/BottomBar/CurveConsole.o\
  View/BottomBar/FxConsole.o\
+ View/BottomBar/LevelConsole.o\
  View/BottomBar/LogDialog.o\
  View/BottomBar/MidiEditor.o\
  View/BottomBar/MiniBar.o\
@@ -255,6 +258,12 @@ CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lpulse -laso
 
 $(BIN) : $(OBJ)
 	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
+
+Action/AudioFile/Data/ActionAudioSetDefaultFormat.o : Action/AudioFile/Data/ActionAudioSetDefaultFormat.cpp
+	$(CPP) -c Action/AudioFile/Data/ActionAudioSetDefaultFormat.cpp -o $@ $(CXXFLAGS)
+
+Action/AudioFile/Data/ActionAudioSetSampleRate.o : Action/AudioFile/Data/ActionAudioSetSampleRate.cpp
+	$(CPP) -c Action/AudioFile/Data/ActionAudioSetSampleRate.cpp -o $@ $(CXXFLAGS)
 
 Action/AudioFile/Data/ActionAudioSetVolume.o : Action/AudioFile/Data/ActionAudioSetVolume.cpp
 	$(CPP) -c Action/AudioFile/Data/ActionAudioSetVolume.cpp -o $@ $(CXXFLAGS)
@@ -912,6 +921,9 @@ View/BottomBar/CurveConsole.o : View/BottomBar/CurveConsole.cpp
 
 View/BottomBar/FxConsole.o : View/BottomBar/FxConsole.cpp
 	$(CPP) -c View/BottomBar/FxConsole.cpp -o $@ $(CXXFLAGS)
+
+View/BottomBar/LevelConsole.o : View/BottomBar/LevelConsole.cpp
+	$(CPP) -c View/BottomBar/LevelConsole.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 	$(CPP) -c View/BottomBar/LogDialog.cpp -o $@ $(CXXFLAGS)

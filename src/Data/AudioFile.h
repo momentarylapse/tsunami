@@ -84,6 +84,9 @@ public:
 	void _cdecl editEffect(int index, const string &param_old);
 	void _cdecl enableEffect(int index, bool enabled);
 	void _cdecl setVolume(float volume);
+	void _cdecl setSampleRate(int sample_rate);
+	void _cdecl setDefaultFormat(SampleFormat format);
+	void _cdecl setCompression(int compression);
 	Track *_cdecl addTrack(int type, int index = -1);
 	void _cdecl deleteTrack(int index);
 	Sample *_cdecl addSample(const string &name, BufferBox &buf);
@@ -107,6 +110,8 @@ public:
 	string filename;
 	Array<Tag> tags;
 	int sample_rate;
+	SampleFormat default_format;
+	int compression;
 
 	float volume;
 

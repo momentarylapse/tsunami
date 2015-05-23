@@ -36,12 +36,17 @@ AudioFileConsole::AudioFileConsole(AudioFile *a) :
 
 	expand("ad_t_tags", 0, true);
 
-	loadData();
+	addString("samplerate", "22050");
+	addString("samplerate", i2s(DEFAULT_SAMPLE_RATE));
+	addString("samplerate", "48000");
+	addString("samplerate", "96000");
 
 	setTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
 
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		addString("format", format_name(POSSIBLE_FORMATS[i]));
+
+	loadData();
 
 	event("samplerate", this, &AudioFileConsole::onSamplerate);
 	event("format", this, &AudioFileConsole::onFormat);
@@ -76,9 +81,9 @@ void AudioFileConsole::loadData()
 	addString("data_list", _("Dauer\\") + audio->get_time_str_long(samples));
 	addString("data_list", _("Samples\\") + i2s(samples));
 	addString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
-	addString("data_list", _("Format\\16 bit stereo (nami)"));
+	//addString("data_list", _("Format\\16 bit stereo (nami)"));
 
-	setInt("samplerate", audio->sample_rate);
+	setString("samplerate", i2s(audio->sample_rate));
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		if (audio->default_format == POSSIBLE_FORMATS[i])
 			setInt("format", i);
@@ -87,7 +92,7 @@ void AudioFileConsole::loadData()
 
 void AudioFileConsole::onSamplerate()
 {
-	audio->setSampleRate(getInt(""));
+	audio->setSampleRate(getString("")._int());
 }
 
 void AudioFileConsole::onFormat()

@@ -21,6 +21,8 @@ public:
 	virtual void __setInt(int i);
 	virtual int getInt();
 	virtual void __reset();
+
+	bool editable;
 };
 
 #endif /* HUICONTROLCOMBOBOX_H_ */

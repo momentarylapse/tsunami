@@ -16,7 +16,8 @@ HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
 	HuiControl(HUI_KIND_COMBOBOX, id)
 {
 	GetPartStrings(id, title);
-	if (OptionString.find("editable") >= 0){
+	editable = (OptionString.find("editable") >= 0);
+	if (editable){
 		widget = gtk_combo_box_text_new_with_entry();
 		gtk_entry_set_activates_default(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(widget))), true);
 	}else{
@@ -25,7 +26,7 @@ HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&OnGtkComboboxChange), this);
 	if ((PartString.num > 1) || (PartString[0] != ""))
 		for (int i=0;i<PartString.num;i++)
-			__setString(PartString[i]);
+			__addString(PartString[i]);
 	setInt(0);
 	setOptions(OptionString);
 }
@@ -40,7 +41,12 @@ string HuiControlComboBox::getString()
 
 void HuiControlComboBox::__setString(const string &str)
 {
-	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget),sys_str(str));
+	if (editable){
+		gtk_entry_set_text(GTK_ENTRY(gtk_bin_get_child(GTK_BIN(widget))), sys_str(str));
+	}else{
+		__addString(str);
+		//gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget),sys_str(str));
+	}
 }
 
 void HuiControlComboBox::__addString(const string& str)

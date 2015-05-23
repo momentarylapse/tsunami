@@ -12,10 +12,10 @@ NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
 {
 	audio = a;
 
-	setString("sample_rate", "22050");
-	setString("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
-	setString("sample_rate", "48000");
-	setString("sample_rate", "96000");
+	addString("sample_rate", "22050");
+	addString("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
+	addString("sample_rate", "48000");
+	addString("sample_rate", "96000");
 	setInt("sample_rate", 1);
 	hideControl("nd_g_metronome_params", true);
 

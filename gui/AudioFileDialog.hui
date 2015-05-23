@@ -5,7 +5,7 @@ Dialog audio_file_dialog "Sound-Datei" 430 375
 				ListView data_list "key\\value" nobar
 				Grid ? "" 2 3
 					Text ad_t_samplerate "Samplerate"
-					Edit samplerate "" expandx
+					ComboBox samplerate "" expandx,editable
 					Text ad_t_format "Format"
 					ComboBox format "" expandx
 					.

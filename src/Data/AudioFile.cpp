@@ -137,7 +137,8 @@ void AudioFile::setVolume(float volume)
 
 void AudioFile::setSampleRate(int _sample_rate)
 {
-	execute(new ActionAudioSetSampleRate(this, _sample_rate));
+	if (_sample_rate > 0)
+		execute(new ActionAudioSetSampleRate(this, _sample_rate));
 }
 
 void AudioFile::setDefaultFormat(SampleFormat _format)

@@ -7,6 +7,7 @@
 
 #include "SideBar.h"
 #include "AudioFileConsole.h"
+#include "TrackConsole.h"
 #include "SubDialog.h"
 
 SideBar::SideBar(AudioView *view, AudioFile *audio) :
@@ -26,11 +27,13 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	addLabel("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 
 	audio_file_console = new AudioFileConsole(audio);
+	track_console = new TrackConsole(view);
 	sub_dialog = new SubDialog(view, audio);
 
 	//addConsole(audio_file_console, "");
 	embed(audio_file_console, "console_grid", 0, 0);
-	embed(sub_dialog, "console_grid", 0, 1);
+	embed(track_console, "console_grid", 0, 1);
+	embed(sub_dialog, "console_grid", 0, 2);
 
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
 

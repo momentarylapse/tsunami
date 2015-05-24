@@ -251,7 +251,7 @@ void TsunamiWindow::onAudioProperties()
 void TsunamiWindow::onTrackProperties()
 {
 	if (view->cur_track)
-		bottom_bar->choose(BottomBar::TRACK_CONSOLE);
+		side_bar->open(SideBar::TRACK_CONSOLE);
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }

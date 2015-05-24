@@ -9,7 +9,6 @@
 #include "MixingConsole.h"
 #include "LevelConsole.h"
 #include "CurveConsole.h"
-#include "TrackConsole.h"
 #include "FxConsole.h"
 #include "SynthConsole.h"
 #include "LogDialog.h"
@@ -46,7 +45,6 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	fx_console = new FxConsole(NULL, audio);
 	sample_manager = new SampleManager(audio);
 	curve_console = new CurveConsole(view, audio);
-	track_console = new TrackConsole(view);
 	track_fx_console = new FxConsole(view, audio);
 	track_synth_console = new SynthConsole(view, audio);
 	track_midi_editor = new MidiEditor(view, audio);
@@ -57,7 +55,6 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	addConsole(fx_console, "");
 	addConsole(sample_manager, "");
 	addConsole(curve_console, "");
-	addConsole(track_console, "");
 	addConsole(track_fx_console, "\t");
 	addConsole(track_synth_console, "\t");
 	addConsole(track_midi_editor, "\t");

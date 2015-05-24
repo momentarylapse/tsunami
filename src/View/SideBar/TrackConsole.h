@@ -9,14 +9,14 @@
 #define TRACKCONSOLE_H_
 
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
 class BarList;
 class AudioView;
 
-class TrackConsole: public BottomBarConsole, public Observer
+class TrackConsole: public SideBarConsole, public Observer
 {
 public:
 	TrackConsole(AudioView *view);

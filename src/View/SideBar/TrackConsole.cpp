@@ -8,7 +8,6 @@
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
 #include "../Helper/BarList.h"
-#include "BottomBar.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../Tsunami.h"
@@ -19,7 +18,7 @@
 #include "TrackConsole.h"
 
 TrackConsole::TrackConsole(AudioView *_view) :
-	BottomBarConsole(_("Spur")),
+	SideBarConsole(_("Spur Eigenschaften")),
 	Observer("TrackConsole")
 {
 	view = _view;

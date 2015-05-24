@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-222
+221
 // Data (ID,Text)
 about
 
@@ -331,11 +331,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_341002
+rand_id_237608
 
-rand_id_621445
+rand_id_268430
 
-rand_id_674282
+rand_id_849151
 
 rdt_capture
 
@@ -425,8 +425,6 @@ track_properties
 
 trackdest_dialog
 Destination track
-ttd_grid_1
-
 undo
 Undo
 view_mono
@@ -650,9 +648,9 @@ Script (*.kaba)
 
 Sicherungsdatei für Aufnahmen wählen
 
-Spur
-
 Spur %d
+
+Spur Eigenschaften
 
 Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingefügt werden soll (%s)
 

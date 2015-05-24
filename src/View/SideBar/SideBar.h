@@ -13,6 +13,7 @@
 
 class AudioFile;
 class AudioFileConsole;
+class TrackConsole;
 class SubDialog;
 class AudioView;
 
@@ -37,6 +38,7 @@ public:
 	enum
 	{
 		AUDIOFILE_CONSOLE,
+		TRACK_CONSOLE,
 		SUB_DIALOG,
 		NUM_CONSOLES
 	};
@@ -48,6 +50,7 @@ public:
 	bool visible;
 
 	AudioFileConsole *audio_file_console;
+	TrackConsole *track_console;
 	SubDialog *sub_dialog;
 };
 

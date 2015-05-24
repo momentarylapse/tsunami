@@ -1,19 +1,19 @@
 Dialog track_dialog "Spur" 380 516
-	Grid ttd_grid_0 "" 2 1
-		Grid ttd_grid_1 "" 1 2 expandy
-			Group td_t_name "Name" width=290 noexpandx
+	Grid ttd_grid_0 "" 1 2
+		Grid ttd_grid_1 "" 1 2
+			Group td_t_name "Name"
 				Edit name "" expandx
 			Group td_t_volume "Lautstärke"
-				Grid ? "" 3 2 width=290 noexpandx
+				Grid ? "" 3 2 noexpandx
 					Text ld_tt_volume "Lautstärke"
 					SpinButton volume "0\\-10000\\10\\0.1" expandx
 					Text db "dB"
 					Text ld_tt_panning "Balance"
 					SpinButton panning "0\\-100\\100\\1"
 					Text percent "%"
-		Group td_t_bars "Takte"
+		Group td_t_bars "Takte" expandy
 			Grid ? "" 1 2
-				ListView bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT width=270 noexpandx
+				ListView bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT
 				Grid ? "" 3 1
 					Button add_bar "Takt" image=hui:add flat
 					Button add_bar_pause "Pause" image=hui:add flat

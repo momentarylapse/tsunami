@@ -16,7 +16,6 @@ class AudioFile;
 class LevelConsole;
 class AudioOutput;
 class Track;
-class TrackConsole;
 class FxConsole;
 class SynthConsole;
 class MixingConsole;
@@ -57,7 +56,6 @@ public:
 		FX_CONSOLE,
 		SAMPLE_CONSOLE,
 		CURVE_CONSOLE,
-		TRACK_CONSOLE,
 		TRACK_FX_CONSOLE,
 		TRACK_SYNTH_CONSOLE,
 		TRACK_MIDI_EDITOR,
@@ -76,7 +74,6 @@ public:
 	//HuiMenu *menu;
 	FxConsole *fx_console;
 	LevelConsole *level_console;
-	TrackConsole *track_console;
 	FxConsole *track_fx_console;
 	MidiFxConsole *track_midi_fx_console;
 	SynthConsole *track_synth_console;

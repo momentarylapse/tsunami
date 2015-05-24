@@ -1,5 +1,5 @@
 Dialog midi_editor "Midi" 380 516
-	Grid ? "" 3 1 noexpandx
+	Grid ? "" 2 1 noexpandx
 		Grid me_grid_no "" 1 1
 			Text ld_t_no_midi "keine Midi-Spur ausgewählt" expandy
 		Grid me_grid_yes "" 1 5 noexpandx
@@ -20,35 +20,4 @@ Dialog midi_editor "Midi" 380 516
 				.
 				Text ld_t_inversion "Umkehrung"
 				ComboBox chord_inversion ""
-		Grid midi_fx_inner_table "" 32 1
-			Separator ? "" vertical
-			Text midi_label_fx "Effekte" angle=90
-			Text comment_no_fx "- hier sind (noch) keine Effekte aktiv -"
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			.
-			Button add "" expandy flat image=hui:add
 

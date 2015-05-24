@@ -237,7 +237,7 @@ metronome
 
 midi_editor
 
-midi_label_fx
+midi_fx_editor
 
 midi_mode:chord
 
@@ -331,11 +331,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_185876
+rand_id_341002
 
-rand_id_374903
+rand_id_621445
 
-rand_id_665203
+rand_id_674282
 
 rdt_capture
 
@@ -524,7 +524,7 @@ Beim Anwenden eines MidiEffekts:
 
 Beschreibung
 
-Datei
+Datei Eigenschaften
 
 Datei exportieren
 
@@ -574,8 +574,6 @@ Fehlerbericht an Michi senden
 
 Format
 
-Format\\16 bit stereo (nami)
-
 Frage
 
 Grundform
@@ -611,6 +609,8 @@ MIDI Quellen
 Metronom
 
 Midi
+
+Midi Fx
 
 MidiEffekt nicht ladbar: \"%s\"
 

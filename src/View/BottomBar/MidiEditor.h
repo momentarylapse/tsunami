@@ -36,15 +36,12 @@ public:
 	void clear();
 	void setTrack(Track *t);
 
-	void onAdd();
-
 
 	string id_inner;
 
 	AudioView *view;
 	Track *track;
 	AudioFile *audio;
-	Array<HuiPanel*> panels;
 };
 
 #endif /* MIDIEDITOR_H_ */

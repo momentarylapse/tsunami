@@ -15,6 +15,7 @@
 #include "LogDialog.h"
 #include "SampleManager.h"
 #include "MidiEditor.h"
+#include "MidiFxConsole.h"
 #include "../../lib/hui/Controls/HuiControl.h"
 #include "../AudioView.h"
 #include "MiniBar.h"
@@ -49,16 +50,18 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	track_fx_console = new FxConsole(view, audio);
 	track_synth_console = new SynthConsole(view, audio);
 	track_midi_editor = new MidiEditor(view, audio);
+	track_midi_fx_console = new MidiFxConsole(view, audio);
 	addConsole(log_dialog, "");
-	addConsole(mixing_console, "\t");
-	addConsole(level_console, "\t");
-	addConsole(fx_console, "\t");
-	addConsole(sample_manager, "\t");
-	addConsole(curve_console, "\t");
+	addConsole(mixing_console, "");
+	addConsole(level_console, "");
+	addConsole(fx_console, "");
+	addConsole(sample_manager, "");
+	addConsole(curve_console, "");
 	addConsole(track_console, "");
 	addConsole(track_fx_console, "\t");
 	addConsole(track_synth_console, "\t");
 	addConsole(track_midi_editor, "\t");
+	addConsole(track_midi_fx_console, "\t");
 
 	view->subscribe(this);
 

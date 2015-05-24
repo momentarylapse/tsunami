@@ -1,0 +1,34 @@
+Dialog midi_fx_editor "Midi Fx" 380 516
+	Grid ? "" 2 1 noexpandx
+		Grid me_grid_no "" 1 1
+			Text ld_t_no_midi "keine Midi-Spur ausgewählt" expandy
+		Grid midi_fx_inner_table "" 32 1
+			Text comment_no_fx "- hier sind (noch) keine Effekte aktiv -"
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			.
+			Button add "" expandy flat image=hui:add
+

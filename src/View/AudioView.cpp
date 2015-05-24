@@ -689,7 +689,7 @@ void AudioView::onLeftDoubleClick()
 		}else if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE) or ((selection.track) and ((selection.type == SEL_TYPE_SELECTION_START) or (selection.type == SEL_TYPE_SELECTION_END)))){
 			win->bottom_bar->choose(BottomBar::TRACK_CONSOLE);
 		}else if (!selection.track){
-			win->bottom_bar->choose(BottomBar::AUDIOFILE_CONSOLE);
+			win->side_bar->open(SideBar::AUDIOFILE_CONSOLE);
 		}
 		selection.type = SEL_TYPE_NONE;
 	}

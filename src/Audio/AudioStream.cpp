@@ -115,7 +115,7 @@ void AudioStream::stream_underflow_callback(pa_stream *s, void *userdata)
 {
 	AudioStream *stream = (AudioStream*)userdata;
 	if (stream->playing)
-		msg_error("pulse: underflow");
+		printf("pulse: underflow\n");
 }
 
 class StreamThread : public Thread

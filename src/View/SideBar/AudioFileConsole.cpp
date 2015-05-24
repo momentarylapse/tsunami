@@ -22,7 +22,7 @@ const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
 };
 
 AudioFileConsole::AudioFileConsole(AudioFile *a) :
-	BottomBarConsole(_("Datei")),
+	SideBarConsole(_("Datei Eigenschaften")),
 	Observer("AudioFileConsole")
 {
 	audio = a;
@@ -82,8 +82,7 @@ void AudioFileConsole::loadData()
 	addString("data_list", _("Ende\\") + audio->get_time_str_long(audio->getRange().end()));
 	addString("data_list", _("Dauer\\") + audio->get_time_str_long(samples));
 	addString("data_list", _("Samples\\") + i2s(samples));
-	addString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
-	//addString("data_list", _("Format\\16 bit stereo (nami)"));
+	//addString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
 
 	setString("samplerate", i2s(audio->sample_rate));
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)

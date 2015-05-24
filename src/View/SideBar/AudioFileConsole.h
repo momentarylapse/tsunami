@@ -8,12 +8,12 @@
 #ifndef AUDIOFILECONSOLE_H_
 #define AUDIOFILECONSOLE_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 class AudioFile;
 class BarList;
 
-class AudioFileConsole: public BottomBarConsole, public Observer
+class AudioFileConsole: public SideBarConsole, public Observer
 {
 public:
 	AudioFileConsole(AudioFile *a);

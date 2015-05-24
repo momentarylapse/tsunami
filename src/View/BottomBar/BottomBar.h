@@ -13,7 +13,6 @@
 
 class AudioView;
 class AudioFile;
-class AudioFileConsole;
 class LevelConsole;
 class AudioOutput;
 class Track;
@@ -52,7 +51,6 @@ public:
 	enum
 	{
 		LOG_CONSOLE,
-		AUDIOFILE_CONSOLE,
 		MIXING_CONSOLE,
 		LEVEL_CONSOLE,
 		FX_CONSOLE,
@@ -74,7 +72,6 @@ public:
 	int console_when_ready;
 
 	//HuiMenu *menu;
-	AudioFileConsole *audio_file_console;
 	FxConsole *fx_console;
 	LevelConsole *level_console;
 	TrackConsole *track_console;

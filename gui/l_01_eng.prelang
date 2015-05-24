@@ -331,11 +331,11 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_19732
+rand_id_185876
 
-rand_id_509775
+rand_id_374903
 
-rand_id_619355
+rand_id_665203
 
 rdt_capture
 
@@ -448,7 +448,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-150
+153
 // Data (ID,Text)
 
 
@@ -684,6 +684,10 @@ aus Auswahl erzeugen
 
 aus Datei importieren
 
+beim Speichern
+
+die Regler aller Spuren gemeinsam ändern
+
 exportiere
 
 exportiere flac
@@ -705,6 +709,8 @@ in Datei exportieren
 inkompatibles Dateiformat für diese Aktion: 
 
 keine Sample gewählt
+
+koppeln
 
 lade
 

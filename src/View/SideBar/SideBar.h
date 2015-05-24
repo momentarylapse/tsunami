@@ -12,6 +12,7 @@
 #include "../../Stuff/Observer.h"
 
 class AudioFile;
+class AudioFileConsole;
 class SubDialog;
 class AudioView;
 
@@ -35,6 +36,7 @@ public:
 
 	enum
 	{
+		AUDIOFILE_CONSOLE,
 		SUB_DIALOG,
 		NUM_CONSOLES
 	};
@@ -45,6 +47,7 @@ public:
 	int active_console;
 	bool visible;
 
+	AudioFileConsole *audio_file_console;
 	SubDialog *sub_dialog;
 };
 

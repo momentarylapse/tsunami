@@ -245,7 +245,7 @@ void TsunamiWindow::onTrackAddMarker()
 
 void TsunamiWindow::onAudioProperties()
 {
-	bottom_bar->choose(BottomBar::AUDIOFILE_CONSOLE);
+	side_bar->open(SideBar::AUDIOFILE_CONSOLE);
 }
 
 void TsunamiWindow::onTrackProperties()

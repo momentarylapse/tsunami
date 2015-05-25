@@ -17,10 +17,10 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 {
 	addRevealer("!slide-left", 0, 0, 0, 0, "revealer");
 	setTarget("revealer", 0);
-	addGrid("!noexpandx,width=270,expandy", 0, 0, 2, 1, "root_grid0");
+	addGrid("!noexpandx,width=310,expandy", 0, 0, 2, 1, "root_grid0");
 	setTarget("root_grid0", 0);
 	addSeparator("!vertical,expandy", 0, 0, 0, 0, "");
-	addGrid("!noexpandx,width=270,expandy", 1, 0, 1, 3, "root_grid");
+	addGrid("!expandx,expandy", 1, 0, 1, 3, "root_grid");
 	setTarget("root_grid", 0);
 	addGrid("", 0, 0, 2, 1, "button_grid");
 	addSeparator("", 0, 1, 0, 0, "");

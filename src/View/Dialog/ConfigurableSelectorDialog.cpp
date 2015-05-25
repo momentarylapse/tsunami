@@ -17,7 +17,13 @@ Configurable *ConfigurableSelectorDialog::_return;
 ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _type, const string &old_name) :
 	HuiDialog("Selector", 400, 500, _parent, false)
 {
+	addGrid("", 0, 0, 1, 2, "root-grid");
+	setTarget("root-grid", 0);
 	addTreeView("Name", 0, 0, 0, 0, "list");
+	addGrid("!buttonbar", 0, 1, 1, 2, "button-bar");
+	setTarget("button-bar", 0);
+	addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
+	addButton(_("Ok"), 1, 0, 0, 0, "ok");
 
 	type = _type;
 	if (type == Configurable::TYPE_EFFECT){
@@ -54,13 +60,23 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _
 	}
 
 	event("hui:close", this, &ConfigurableSelectorDialog::onClose);
+	eventX("list", "hui:select", this, &ConfigurableSelectorDialog::onListSelect);
 	event("list", this, &ConfigurableSelectorDialog::onSelect);
+	event("cancel", this, &ConfigurableSelectorDialog::onCancel);
+	event("ok", this, &ConfigurableSelectorDialog::onOk);
+	enable("ok", false);
 
 	_return = NULL;
 }
 
 ConfigurableSelectorDialog::~ConfigurableSelectorDialog()
 {
+}
+
+void ConfigurableSelectorDialog::onListSelect()
+{
+	int n = getInt("list") - ugroups.num;
+	enable("ok", n >= 0);
 }
 
 void ConfigurableSelectorDialog::onSelect()
@@ -80,6 +96,16 @@ void ConfigurableSelectorDialog::onSelect()
 void ConfigurableSelectorDialog::onClose()
 {
 	delete(this);
+}
+
+void ConfigurableSelectorDialog::onCancel()
+{
+	delete(this);
+}
+
+void ConfigurableSelectorDialog::onOk()
+{
+	onSelect();
 }
 
 Synthesizer *ChooseSynthesizer(HuiWindow *parent, const string &old_name)

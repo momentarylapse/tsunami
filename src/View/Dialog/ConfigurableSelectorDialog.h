@@ -19,8 +19,11 @@ public:
 	ConfigurableSelectorDialog(HuiWindow *_parent, int type, const string &old_name = "");
 	virtual ~ConfigurableSelectorDialog();
 
+	void onListSelect();
 	void onSelect();
 	void onClose();
+	void onCancel();
+	void onOk();
 
 	int type;
 	Array<string> names;

@@ -18,8 +18,12 @@ Dialog track_dialog "Spur" 380 516
 					Button add_bar_pause "Pause" image=hui:add flat
 					Button delete_bar "" image=hui:delete flat
 		Group td_t_edit "Bearbeiten"
-			Grid ? "" 3 1
-				Button edit_fx "Fx"
-				Button edit_midi "Midi"
-				Button edit_midi_fx "Midi-Fx"
+			Grid ? "" 1 2
+				Grid ? "" 2 1
+					Button edit_fx "Fx"
+					Button edit_file "Datei"
+				Grid ? "" 3 1
+					Button edit_midi "Midi"
+					Button edit_midi_fx "Midi-Fx"
+					Button edit_synth "Synth"
 

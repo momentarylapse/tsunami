@@ -1,5 +1,5 @@
-Dialog sub_track_dialog "Sub Track" 375 230
-	Grid ? "" 1 4
+Dialog sample_ref_dialog "Sub Track" 375 230
+	Grid ? "" 1 5
 		Group ld_t_name "Name"
 			Edit name "" expandx
 		Group ld_t_track "Spur"
@@ -17,3 +17,7 @@ Dialog sub_track_dialog "Sub Track" 375 230
 				Text ld_t_repdelay "Abstand:"
 				SpinButton repdelay "0\\0\\\\0.1"
 				Text ms "ms"
+		Group ld_t_edit "Bearbeiten"
+			Grid ? "" 2 1
+				Button edit_track "Spur"
+				Button edit_file "Datei"

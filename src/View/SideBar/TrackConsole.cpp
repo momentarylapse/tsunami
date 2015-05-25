@@ -14,7 +14,7 @@
 #include "../../TsunamiWindow.h"
 #include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"
-#include "../../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
+#include "../BottomBar/BottomBar.h"
 #include "TrackConsole.h"
 
 TrackConsole::TrackConsole(AudioView *_view) :
@@ -38,6 +38,12 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("name", this, &TrackConsole::onName);
 	event("volume", this, &TrackConsole::onVolume);
 	event("panning", this, &TrackConsole::onPanning);
+
+	event("edit_file", this, &TrackConsole::onEditFile);
+	event("edit_fx", this, &TrackConsole::onEditFx);
+	event("edit_midi", this, &TrackConsole::onEditMidi);
+	event("edit_midi_fx", this, &TrackConsole::onEditMidiFx);
+	event("edit_synth", this, &TrackConsole::onEditSynth);
 }
 
 TrackConsole::~TrackConsole()
@@ -54,12 +60,16 @@ void TrackConsole::loadData()
 	enable("volume", track);
 	enable("panning", track);
 	bar_list->setTrack(track);
+	hideControl("td_t_edit", !track);
 	if (track){
 		setString("name", track->name);
 		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
 		hideControl("td_t_bars", track->type != Track::TYPE_TIME);
+		enable("edit_midi", track->type == Track::TYPE_MIDI);
+		enable("edit_midi_fx", track->type == Track::TYPE_MIDI);
+		enable("edit_synth", track->type != Track::TYPE_AUDIO);
 	}else{
 		hideControl("td_t_bars", true);
 	}
@@ -88,6 +98,35 @@ void TrackConsole::onVolume()
 void TrackConsole::onPanning()
 {
 	track->setPanning(getFloat("panning") / 100.0f);
+}
+
+void TrackConsole::applyData()
+{
+}
+
+void TrackConsole::onEditFile()
+{
+	tsunami->win->side_bar->open(SideBar::AUDIOFILE_CONSOLE);
+}
+
+void TrackConsole::onEditFx()
+{
+	tsunami->win->bottom_bar->choose(BottomBar::TRACK_FX_CONSOLE);
+}
+
+void TrackConsole::onEditMidi()
+{
+	tsunami->win->side_bar->open(SideBar::TRACK_MIDI_EDITOR);
+}
+
+void TrackConsole::onEditMidiFx()
+{
+	tsunami->win->bottom_bar->choose(BottomBar::TRACK_MIDI_FX_CONCOLE);
+}
+
+void TrackConsole::onEditSynth()
+{
+	tsunami->win->bottom_bar->choose(BottomBar::TRACK_SYNTH_CONSOLE);
 }
 
 /*void TrackConsole::onSynthesizer()

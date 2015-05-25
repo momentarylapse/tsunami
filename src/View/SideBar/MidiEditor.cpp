@@ -14,6 +14,8 @@
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
+#include "../BottomBar/BottomBar.h"
 
 
 
@@ -55,6 +57,9 @@ MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
 	event("midi_mode:chord", this, &MidiEditor::onMidiModeChord);
 	event("chord_type", this, &MidiEditor::onChordType);
 	event("chord_inversion", this, &MidiEditor::onChordInversion);
+	event("edit_track", this, &MidiEditor::onEditTrack);
+	event("edit_midi_fx", this, &MidiEditor::onEditMidiFx);
+	event("edit_file", this, &MidiEditor::onEditFile);
 
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
@@ -137,6 +142,21 @@ void MidiEditor::onChordType()
 void MidiEditor::onChordInversion()
 {
 	view->chord_inversion = getInt("");
+}
+
+void MidiEditor::onEditTrack()
+{
+	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+}
+
+void MidiEditor::onEditMidiFx()
+{
+	tsunami->win->bottom_bar->choose(BottomBar::TRACK_MIDI_FX_CONCOLE);
+}
+
+void MidiEditor::onEditFile()
+{
+	((SideBar*)parent)->open(SideBar::AUDIOFILE_CONSOLE);
 }
 
 void MidiEditor::clear()

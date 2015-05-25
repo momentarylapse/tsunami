@@ -29,6 +29,12 @@ public:
 	void onVolume();
 	void onPanning();
 
+	void onEditFile();
+	void onEditFx();
+	void onEditMidi();
+	void onEditMidiFx();
+	void onEditSynth();
+
 	void setTrack(Track *t);
 
 	virtual void onUpdate(Observable *o, const string &message);

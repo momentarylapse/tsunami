@@ -14,7 +14,7 @@ SubDialog::SubDialog(AudioView *v, AudioFile *a):
 	SideBarConsole("Sample-Eigenschaften"),
 	Observer("SubDialog")
 {
-	fromResource("sub_track_dialog");
+	fromResource("sample_ref_dialog");
 	view = v;
 	audio = a;
 	track = NULL;

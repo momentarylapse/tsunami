@@ -22,5 +22,9 @@ Dialog midi_editor "Midi" 380 516
 						.
 						Text ld_t_inversion "Umkehrung"
 						ComboBox chord_inversion ""
-			Button back_to_track "Spur"
+			Group me_group_edit "Bearbeiten"
+				Grid ? "" 3 1
+					Button edit_midi_fx "Midi-Fx"
+					Button edit_track "Spur"
+					Button edit_file "Datei"
 

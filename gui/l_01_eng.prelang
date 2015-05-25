@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-225
+229
 // Data (ID,Text)
 about
 
@@ -46,8 +46,6 @@ audio_file_dialog
 audio_file_menu_header
 
 audio_file_properties
-
-back_to_track
 
 bar_list
 
@@ -113,11 +111,17 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
+edit_file
+
 edit_fx
 
 edit_midi
 
 edit_midi_fx
+
+edit_synth
+
+edit_track
 
 exit
 
@@ -144,6 +148,8 @@ insert_sample
 language
 
 ld_t_chord
+
+ld_t_edit
 
 ld_t_inversion
 
@@ -196,6 +202,8 @@ marker_dialog
 marker_dialog_buttonbar
 
 me_group_chord
+
+me_group_edit
 
 me_group_view
 
@@ -339,9 +347,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_542604
+rand_id_132500
 
-rand_id_886581
+rand_id_448187
 
 rdt_capture
 
@@ -379,6 +387,8 @@ sample_properties
 
 sample_rate
 
+sample_ref_dialog
+
 samplerate
 
 save
@@ -401,8 +411,6 @@ show_mixing_console
 
 stop
 Stop
-sub_track_dialog
-
 tags
 !format=tT\\Tag\\Value
 td_t_bars

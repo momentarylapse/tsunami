@@ -34,6 +34,10 @@ public:
 	void onChordType();
 	void onChordInversion();
 
+	void onEditTrack();
+	void onEditMidiFx();
+	void onEditFile();
+
 	void clear();
 	void setTrack(Track *t);
 

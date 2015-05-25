@@ -30,6 +30,7 @@ void* ActionTrackDeleteSample::execute(Data* d)
 	ref->origin->unref();
 	ref->owner = NULL;
 
+	ref->notify(ref->MESSAGE_DELETE);
 	a->tracks[track_no]->samples.erase(index);
 
 	return NULL;

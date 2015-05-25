@@ -85,6 +85,7 @@ SampleRef::SampleRef(Sample *sample) :
 
 SampleRef::~SampleRef()
 {
+	notify(MESSAGE_DELETE);
 	origin->unref();
 }
 

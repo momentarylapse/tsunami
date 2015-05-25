@@ -11,6 +11,7 @@
 ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(int _index)
 {
 	index = _index;
+	track = NULL;
 }
 
 ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()

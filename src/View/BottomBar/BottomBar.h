@@ -22,7 +22,6 @@ class MixingConsole;
 class CurveConsole;
 class LogDialog;
 class SampleManager;
-class MidiEditor;
 class MidiFxConsole;
 class Log;
 
@@ -58,7 +57,6 @@ public:
 		CURVE_CONSOLE,
 		TRACK_FX_CONSOLE,
 		TRACK_SYNTH_CONSOLE,
-		TRACK_MIDI_EDITOR,
 		TRACK_MIDI_FX_CONCOLE,
 		NUM_CONSOLES
 	};
@@ -81,7 +79,6 @@ public:
 	CurveConsole *curve_console;
 	LogDialog *log_dialog;
 	SampleManager *sample_manager;
-	MidiEditor *track_midi_editor;
 
 	Array<BottomBarConsole*> consoles;
 	void addConsole(BottomBarConsole *c, const string &list_name);

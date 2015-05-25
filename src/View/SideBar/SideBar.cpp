@@ -8,6 +8,7 @@
 #include "SideBar.h"
 #include "AudioFileConsole.h"
 #include "TrackConsole.h"
+#include "MidiEditor.h"
 #include "SubDialog.h"
 
 SideBar::SideBar(AudioView *view, AudioFile *audio) :
@@ -28,12 +29,14 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 
 	audio_file_console = new AudioFileConsole(audio);
 	track_console = new TrackConsole(view);
+	track_midi_editor = new MidiEditor(view, audio);
 	sub_dialog = new SubDialog(view, audio);
 
 	//addConsole(audio_file_console, "");
 	embed(audio_file_console, "console_grid", 0, 0);
 	embed(track_console, "console_grid", 0, 1);
-	embed(sub_dialog, "console_grid", 0, 2);
+	embed(track_midi_editor, "console_grid", 0, 2);
+	embed(sub_dialog, "console_grid", 0, 3);
 
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
 

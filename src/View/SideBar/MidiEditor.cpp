@@ -18,7 +18,7 @@
 
 
 MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
-	BottomBarConsole(_("Midi")),
+	SideBarConsole(_("Midi")),
 	Observer("MidiEditor")
 {
 	view = _view;

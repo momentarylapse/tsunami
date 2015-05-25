@@ -8,14 +8,15 @@
 #ifndef MIDIEDITOR_H_
 #define MIDIEDITOR_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
 class AudioFile;
 class AudioView;
+class Track;
 
-class MidiEditor : public BottomBarConsole, public Observer
+class MidiEditor : public SideBarConsole, public Observer
 {
 public:
 	MidiEditor(AudioView *view, AudioFile *audio);

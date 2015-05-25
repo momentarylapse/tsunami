@@ -14,6 +14,7 @@
 class AudioFile;
 class AudioFileConsole;
 class TrackConsole;
+class MidiEditor;
 class SubDialog;
 class AudioView;
 
@@ -39,6 +40,7 @@ public:
 	{
 		AUDIOFILE_CONSOLE,
 		TRACK_CONSOLE,
+		TRACK_MIDI_EDITOR,
 		SUB_DIALOG,
 		NUM_CONSOLES
 	};
@@ -51,6 +53,7 @@ public:
 
 	AudioFileConsole *audio_file_console;
 	TrackConsole *track_console;
+	MidiEditor *track_midi_editor;
 	SubDialog *sub_dialog;
 };
 

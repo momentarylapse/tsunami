@@ -151,7 +151,7 @@ void MidiEditor::onEditTrack()
 
 void MidiEditor::onEditMidiFx()
 {
-	tsunami->win->bottom_bar->choose(BottomBar::TRACK_MIDI_FX_CONCOLE);
+	tsunami->win->bottom_bar->open(BottomBar::TRACK_MIDI_FX_CONCOLE);
 }
 
 void MidiEditor::onEditFile()

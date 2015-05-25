@@ -15,7 +15,7 @@ class AudioFile;
 class AudioFileConsole;
 class TrackConsole;
 class MidiEditor;
-class SubDialog;
+class SampleRefDialog;
 class AudioView;
 
 class SideBarConsole : public HuiPanel
@@ -33,15 +33,17 @@ public:
 	virtual ~SideBar();
 
 	void onClose();
-	virtual void onShow();
-	virtual void onHide();
+	void onChoose();
+
+	void _show();
+	void _hide();
 
 	enum
 	{
 		AUDIOFILE_CONSOLE,
 		TRACK_CONSOLE,
 		TRACK_MIDI_EDITOR,
-		SUB_DIALOG,
+		SAMPLEREF_DIALOG,
 		NUM_CONSOLES
 	};
 
@@ -54,7 +56,10 @@ public:
 	AudioFileConsole *audio_file_console;
 	TrackConsole *track_console;
 	MidiEditor *track_midi_editor;
-	SubDialog *sub_dialog;
+	SampleRefDialog *sample_ref_dialog;
+
+	Array<SideBarConsole*> consoles;
+	void addConsole(SideBarConsole *c);
 };
 
 #endif /* BOTTOMBAR_H_ */

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-229
+230
 // Data (ID,Text)
 about
 
@@ -253,6 +253,8 @@ menu_view_peaks
 
 metronome
 
+mfx_t_no_midi
+
 midi_editor
 
 midi_fx_editor
@@ -347,9 +349,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_132500
+rand_id_25591
 
-rand_id_448187
+rand_id_900665
 
 rdt_capture
 

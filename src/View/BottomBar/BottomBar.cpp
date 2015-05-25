@@ -21,10 +21,7 @@
 BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
 {
-	ready = false;
-	console_when_ready = MIXING_CONSOLE;
-
-	addRevealer("", 0, 0, 0, 0, "revealer");
+	addRevealer("!slide-up", 0, 0, 0, 0, "revealer");
 	setTarget("revealer", 0);
 	addGrid("!noexpandy,height=300,expandx", 0, 0, 1, 2, "root_grid0");
 	setTarget("root_grid0", 0);
@@ -57,16 +54,14 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	addConsole(track_synth_console, "\t");
 	addConsole(track_midi_fx_console, "\t");
 
-	view->subscribe(this);
-
 	eventX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onClose);
 
-	visible = true;
-	ready = true;
-	HuiPanel::show();
-	choose(console_when_ready);
-	reveal("revealer", true);
+	reveal("revealer", false);
+	visible = false;
+	active_console = -1;
+
+	choose(MIXING_CONSOLE);
 }
 
 BottomBar::~BottomBar()
@@ -75,18 +70,17 @@ BottomBar::~BottomBar()
 
 void BottomBar::onClose()
 {
-	hide();
+	_hide();
 }
 
-void BottomBar::show()
+void BottomBar::_show()
 {
-	HuiPanel::show();
 	reveal("revealer", true);
 	visible = true;
 	notify();
 }
 
-void BottomBar::hide()
+void BottomBar::_hide()
 {
 	reveal("revealer", false);
 	visible = false;
@@ -98,56 +92,35 @@ void BottomBar::addConsole(BottomBarConsole *c, const string &list_name)
 	embed(c, "console_grid", 0, consoles.num);
 	consoles.add(c);
 	addString("choose", list_name + c->title);
+	c->hide();
 }
-
-/*void BottomBar::OnOpenChooseMenu()
-{
-	foreachi(HuiControl *c, menu->item, i)
-		c->Check(i == active_console);
-	menu->OpenPopup(this, 0, 0);
-}
-
-void BottomBar::OnChooseByMenu()
-{
-	Choose(HuiGetEvent()->id.tail(1)._int());
-}*/
 
 void BottomBar::onChoose()
 {
 	int n = getInt("");
 	if (n >= 0)
-		choose(n);
-}
-
-void BottomBar::onShow()
-{
-	visible = true;
-	notify();
-}
-
-void BottomBar::onHide()
-{
-	visible = false;
-	notify();
+		open(n);
 }
 
 void BottomBar::choose(int console)
 {
-	if (!ready){
-		console_when_ready = console;
-		return;
-	}
+	if (active_console >= 0)
+		consoles[active_console]->hide();
 
-	foreachi(BottomBarConsole *c, consoles, i){
-		if (i == console)
-			c->show();
-		else
-			c->hide();
-	}
-	setInt("choose", console);
 	active_console = console;
+
+	consoles[active_console]->show();
+	setInt("choose", console);
+
+	notify();
+}
+
+void BottomBar::open(int console)
+{
+	choose(console);
+
 	if (!visible)
-		show();
+		_show();
 	notify();
 }
 

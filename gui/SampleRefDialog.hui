@@ -19,5 +19,5 @@ Dialog sample_ref_dialog "Sub Track" 375 230
 				Text ms "ms"
 		Group ld_t_edit "Bearbeiten"
 			Grid ? "" 2 1
-				Button edit_track "Spur"
 				Button edit_file "Datei"
+				Button edit_track "Spur"

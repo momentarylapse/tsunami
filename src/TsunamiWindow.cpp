@@ -134,12 +134,10 @@ TsunamiWindow::TsunamiWindow() :
 	// side bar
 	side_bar = new SideBar(view, audio);
 	embed(side_bar, "main_table", 1, 0);
-	side_bar->hide();
 
 	// bottom bar
 	bottom_bar = new BottomBar(view, audio, tsunami->output, tsunami->log);
 	embed(bottom_bar, "root_table", 0, 1);
-	bottom_bar->hide();
 	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->output);
 	embed(mini_bar, "root_table", 0, 2);
 
@@ -229,7 +227,7 @@ void TsunamiWindow::onTrackEditMidi()
 void TsunamiWindow::onTrackEditFX()
 {
 	if (view->cur_track)
-		bottom_bar->choose(BottomBar::TRACK_FX_CONSOLE);
+		bottom_bar->open(BottomBar::TRACK_FX_CONSOLE);
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
@@ -259,14 +257,14 @@ void TsunamiWindow::onTrackProperties()
 void TsunamiWindow::onSubProperties()
 {
 	if (view->cur_sample)
-		side_bar->open(SideBar::SUB_DIALOG);
+		side_bar->open(SideBar::SAMPLEREF_DIALOG);
 	else
 		tsunami->log->error(_("Kein Sample ausgew&ahlt"));
 }
 
 void TsunamiWindow::onShowLog()
 {
-	bottom_bar->choose(BottomBar::LOG_CONSOLE);
+	bottom_bar->open(BottomBar::LOG_CONSOLE);
 }
 
 void TsunamiWindow::onUndo()
@@ -330,17 +328,17 @@ void TsunamiWindow::onDelete()
 
 void TsunamiWindow::onSampleManager()
 {
-	bottom_bar->choose(BottomBar::SAMPLE_CONSOLE);
+	bottom_bar->open(BottomBar::SAMPLE_CONSOLE);
 }
 
 void TsunamiWindow::onMixingConsole()
 {
-	bottom_bar->choose(BottomBar::MIXING_CONSOLE);
+	bottom_bar->open(BottomBar::MIXING_CONSOLE);
 }
 
 void TsunamiWindow::onFxConsole()
 {
-	bottom_bar->choose(BottomBar::TRACK_FX_CONSOLE);
+	bottom_bar->open(BottomBar::TRACK_FX_CONSOLE);
 }
 
 void TsunamiWindow::onSubImport()

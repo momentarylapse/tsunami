@@ -9,11 +9,14 @@
 #include "AudioFileConsole.h"
 #include "TrackConsole.h"
 #include "MidiEditor.h"
-#include "SubDialog.h"
+#include "SampleRefDialog.h"
+#include "../AudioView.h"
 
 SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	Observable("SideBar")
 {
+	addRevealer("!slide-left", 0, 0, 0, 0, "revealer");
+	setTarget("revealer", 0);
 	addGrid("!noexpandx,width=270,expandy", 0, 0, 2, 1, "root_grid0");
 	setTarget("root_grid0", 0);
 	addSeparator("!vertical,expandy", 0, 0, 0, 0, "");
@@ -30,66 +33,76 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	audio_file_console = new AudioFileConsole(audio);
 	track_console = new TrackConsole(view);
 	track_midi_editor = new MidiEditor(view, audio);
-	sub_dialog = new SubDialog(view, audio);
+	sample_ref_dialog = new SampleRefDialog(view, audio);
 
-	//addConsole(audio_file_console, "");
-	embed(audio_file_console, "console_grid", 0, 0);
-	embed(track_console, "console_grid", 0, 1);
-	embed(track_midi_editor, "console_grid", 0, 2);
-	embed(sub_dialog, "console_grid", 0, 3);
+	addConsole(audio_file_console);
+	addConsole(track_console);
+	addConsole(track_midi_editor);
+	addConsole(sample_ref_dialog);
 
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
 
-	choose(AUDIOFILE_CONSOLE);
-	visible = true;
+	reveal("revealer", false);
+	visible = false;
+	active_console = -1;
+
+	view->subscribe(this);
 }
 
 SideBar::~SideBar()
 {
 }
 
-void SideBar::onClose()
+void SideBar::addConsole(SideBarConsole *c)
 {
-	hide();
+	embed(c, "console_grid", 0, consoles.num);
+	consoles.add(c);
+	c->hide();
 }
 
-void SideBar::onShow()
+void SideBar::onClose()
 {
+	_hide();
+}
+
+void SideBar::_show()
+{
+	reveal("revealer", true);
 	visible = true;
 	notify();
 }
 
-void SideBar::onHide()
+void SideBar::_hide()
 {
+	reveal("revealer", false);
 	visible = false;
 	notify();
 }
 
 void SideBar::choose(int console)
 {
-	foreachi(HuiPanel *p, children, i){
-		if (i == console){
-			setString("title", "!big\\" + ((SideBarConsole*)p)->title);
-			p->show();
-		}else
-			p->hide();
-	}
+	if (active_console >= 0)
+		consoles[active_console]->hide();
+
 	active_console = console;
+
+	consoles[active_console]->show();
+	setString("title", "!big\\" + consoles[active_console]->title);
+
 	notify();
 }
 
 void SideBar::open(int console)
 {
-	notifyBegin();
 	choose(console);
-	active_console = console;
+
 	if (!visible)
-		show();
-	notifyEnd();
+		_show();
+	notify();
 }
 
 bool SideBar::isActive(int console)
 {
-	return (active_console == console) && visible;
+	return (active_console == console) and visible;
 }
 

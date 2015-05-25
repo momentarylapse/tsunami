@@ -1,12 +1,12 @@
 /*
- * SubDialog.h
+ * SampleRefDialog.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef SUBDIALOG_H_
-#define SUBDIALOG_H_
+#ifndef SAMPLEREFDIALOG_H_
+#define SAMPLEREFDIALOG_H_
 
 #include "SideBar.h"
 class AudioFile;
@@ -14,11 +14,11 @@ class Track;
 class SampleRef;
 class AudioView;
 
-class SubDialog: public SideBarConsole, public Observer
+class SampleRefDialog: public SideBarConsole, public Observer
 {
 public:
-	SubDialog(AudioView *view, AudioFile *audio);
-	virtual ~SubDialog();
+	SampleRefDialog(AudioView *view, AudioFile *audio);
+	virtual ~SampleRefDialog();
 
 	void loadData();
 	void applyData();
@@ -38,4 +38,4 @@ public:
 	SampleRef *sample;
 };
 
-#endif /* SUBDIALOG_H_ */
+#endif /* SAMPLEREFDIALOG_H_ */

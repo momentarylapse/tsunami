@@ -52,7 +52,7 @@ MiniBar::~MiniBar()
 
 void MiniBar::onShowBottomBar()
 {
-	bottom_bar->show();
+	bottom_bar->_show();
 	hide();
 }
 

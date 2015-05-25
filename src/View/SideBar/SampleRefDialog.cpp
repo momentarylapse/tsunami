@@ -1,18 +1,18 @@
 /*
- * SubDialog.cpp
+ * SampleRefDialog.cpp
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#include "SubDialog.h"
 #include "../AudioView.h"
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
+#include "SampleRefDialog.h"
 
-SubDialog::SubDialog(AudioView *v, AudioFile *a):
+SampleRefDialog::SampleRefDialog(AudioView *v, AudioFile *a):
 	SideBarConsole("Sample-Eigenschaften"),
-	Observer("SubDialog")
+	Observer("SampleRefDialog")
 {
 	fromResource("sample_ref_dialog");
 	view = v;
@@ -20,16 +20,16 @@ SubDialog::SubDialog(AudioView *v, AudioFile *a):
 	track = NULL;
 	sample = NULL;
 
-	event("volume", this, &SubDialog::onVolume);
-	event("mute", this, &SubDialog::onMute);
-	event("level_track", this, &SubDialog::onLevelTrack);
-	event("repnum", this, &SubDialog::onRepNum);
-	event("repdelay", this, &SubDialog::onRepDelay);
+	event("volume", this, &SampleRefDialog::onVolume);
+	event("mute", this, &SampleRefDialog::onMute);
+	event("level_track", this, &SampleRefDialog::onLevelTrack);
+	event("repnum", this, &SampleRefDialog::onRepNum);
+	event("repdelay", this, &SampleRefDialog::onRepDelay);
 
 	subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
-SubDialog::~SubDialog()
+SampleRefDialog::~SampleRefDialog()
 {
 	if (sample)
 		unsubscribe(sample);
@@ -37,12 +37,12 @@ SubDialog::~SubDialog()
 }
 
 
-void SubDialog::onName()
+void SampleRefDialog::onName()
 {
 	//sample->origin->name = GetString("");
 }
 
-void SubDialog::onMute()
+void SampleRefDialog::onMute()
 {
 	if (!sample)
 		return;
@@ -54,12 +54,12 @@ void SubDialog::onMute()
 	subscribe(sample);
 }
 
-void SubDialog::onLevelTrack()
+void SampleRefDialog::onLevelTrack()
 {
 	int n = getInt("");
 }
 
-void SubDialog::onVolume()
+void SampleRefDialog::onVolume()
 {
 	if (!sample)
 		return;
@@ -69,7 +69,7 @@ void SubDialog::onVolume()
 	subscribe(sample);
 }
 
-void SubDialog::onRepNum()
+void SampleRefDialog::onRepNum()
 {
 	if (!sample)
 		return;
@@ -80,7 +80,7 @@ void SubDialog::onRepNum()
 	subscribe(sample);
 }
 
-void SubDialog::onRepDelay()
+void SampleRefDialog::onRepDelay()
 {
 	if (!sample)
 		return;
@@ -90,7 +90,7 @@ void SubDialog::onRepDelay()
 	subscribe(sample);
 }
 
-void SubDialog::loadData()
+void SampleRefDialog::loadData()
 {
 	enable("name", false);
 	enable("mute", sample);
@@ -116,7 +116,7 @@ void SubDialog::loadData()
 	enable("repdelay", sample->rep_num > 0);
 }
 
-void SubDialog::onUpdate(Observable *o, const string &message)
+void SampleRefDialog::onUpdate(Observable *o, const string &message)
 {
 	if (o == view){
 		if (sample)

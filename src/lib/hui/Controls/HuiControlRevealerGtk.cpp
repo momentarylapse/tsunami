@@ -16,8 +16,16 @@ HuiControlRevealer::HuiControlRevealer(const string &title, const string &id) :
 	widget = gtk_revealer_new();
 	setOptions(OptionString);
 
-	// GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP
-	//gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_CROSSFADE);
+	if (OptionString.find("slide-up") >= 0)
+		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_UP);
+	if (OptionString.find("slide-down") >= 0)
+		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_DOWN);
+	if (OptionString.find("slide-left") >= 0)
+		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_LEFT);
+	if (OptionString.find("slide-right") >= 0)
+		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_SLIDE_RIGHT);
+	if (OptionString.find("cross-fade") >= 0)
+		gtk_revealer_set_transition_type(GTK_REVEALER(widget), GTK_REVEALER_TRANSITION_TYPE_CROSSFADE);
 }
 
 

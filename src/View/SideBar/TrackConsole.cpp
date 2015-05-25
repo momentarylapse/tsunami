@@ -111,7 +111,7 @@ void TrackConsole::onEditFile()
 
 void TrackConsole::onEditFx()
 {
-	tsunami->win->bottom_bar->choose(BottomBar::TRACK_FX_CONSOLE);
+	tsunami->win->bottom_bar->open(BottomBar::TRACK_FX_CONSOLE);
 }
 
 void TrackConsole::onEditMidi()
@@ -121,12 +121,12 @@ void TrackConsole::onEditMidi()
 
 void TrackConsole::onEditMidiFx()
 {
-	tsunami->win->bottom_bar->choose(BottomBar::TRACK_MIDI_FX_CONCOLE);
+	tsunami->win->bottom_bar->open(BottomBar::TRACK_MIDI_FX_CONCOLE);
 }
 
 void TrackConsole::onEditSynth()
 {
-	tsunami->win->bottom_bar->choose(BottomBar::TRACK_SYNTH_CONSOLE);
+	tsunami->win->bottom_bar->open(BottomBar::TRACK_SYNTH_CONSOLE);
 }
 
 /*void TrackConsole::onSynthesizer()

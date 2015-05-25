@@ -41,11 +41,9 @@ public:
 
 	void onClose();
 	void onChoose();
-	virtual void onShow();
-	virtual void onHide();
 
-	void show();
-	void hide();
+	void _show();
+	void _hide();
 
 	enum
 	{
@@ -62,14 +60,11 @@ public:
 	};
 
 	void choose(int console);
+	void open(int console);
 	bool isActive(int console);
 	int active_console;
 	bool visible;
 
-	bool ready;
-	int console_when_ready;
-
-	//HuiMenu *menu;
 	FxConsole *fx_console;
 	LevelConsole *level_console;
 	FxConsole *track_fx_console;

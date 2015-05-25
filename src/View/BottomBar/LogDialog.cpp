@@ -45,10 +45,10 @@ void LogDialog::reload()
 	foreach(Log::Message &m, log->messages){
 		if (m.type == Log::TYPE_ERROR){
 			addString("log_list", "hui:error\\" + m.text);
-			((BottomBar*)parent)->choose(BottomBar::LOG_CONSOLE);
+			((BottomBar*)parent)->open(BottomBar::LOG_CONSOLE);
 		}else if (m.type == Log::TYPE_WARNING){
 			addString("log_list", "hui:warning\\" + m.text);
-			((BottomBar*)parent)->choose(BottomBar::LOG_CONSOLE);
+			((BottomBar*)parent)->open(BottomBar::LOG_CONSOLE);
 		}else{
 			addString("log_list", "hui:info\\" + m.text);
 		}

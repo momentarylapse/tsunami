@@ -142,7 +142,7 @@ struct s_a_file{
 	int size,offset,dir_no;
 	bool decompressed;
 }*a_file;
-static CFile *a_f=NULL;
+static File *a_f=NULL;
 
 static int a_num_created_dirs=0;
 static string a_created_dir[256];
@@ -154,7 +154,7 @@ void file_set_archive(const string &filename)
 {
 	if (a_f)
 		file_clean_up_archive();
-	a_f=new CFile();
+	a_f=new File();
 	a_f->SilentFileAccess=true;
 	if (!a_f->Open(filename)){
 		delete(a_f);
@@ -299,7 +299,7 @@ bool file_get_from_archive(const char *filename)
 		}
 	}
 	// write the file
-	CFile *f=new CFile();
+	File *f=new File();
 	f->SilentFileAccess=true;
 	f->SetBinaryMode(true);
 	f->Create(filename);
@@ -338,14 +338,14 @@ void file_clean_up_archive()
 }
 #endif
 
-void _file_set_error_(CFile *f, const string &str)
+void _file_set_error_(File *f, const string &str)
 {
 	msg_error("during file access: " + str);
 	f->Error = f->ErrorReported = true;
 }
 
 
-CFile::CFile()
+File::File()
 {
 	Error = false;
 	ErrorReported = false;
@@ -354,24 +354,24 @@ CFile::CFile()
 	handle = -1;
 }
 
-CFile::~CFile()
+File::~File()
 {
 	if (handle>=0)
 		Close();
 }
 
-CFile *FileOpen(const string &filename)
+File *FileOpen(const string &filename)
 {
-	CFile *f = new CFile();
+	File *f = new File();
 	if (f->Open(filename))
 		return f;
 	delete(f);
 	return NULL;
 }
 
-CFile *FileOpenSilent(const string &filename)
+File *FileOpenSilent(const string &filename)
 {
-	CFile *f = new CFile();
+	File *f = new File();
 	f->SilentFileAccess = true;
 	if (f->Open(filename))
 		return f;
@@ -379,18 +379,18 @@ CFile *FileOpenSilent(const string &filename)
 	return NULL;
 }
 
-CFile *FileCreate(const string &filename)
+File *FileCreate(const string &filename)
 {
-	CFile *f = new CFile();
+	File *f = new File();
 	if (f->Create(filename))
 		return f;
 	delete(f);
 	return NULL;
 }
 
-CFile *FileCreateSilent(const string &filename)
+File *FileCreateSilent(const string &filename)
 {
-	CFile *f = new CFile();
+	File *f = new File();
 	f->SilentFileAccess = true;
 	if (f->Create(filename))
 		return f;
@@ -398,16 +398,16 @@ CFile *FileCreateSilent(const string &filename)
 	return NULL;
 }
 
-CFile *FileAppend(const string &filename)
+File *FileAppend(const string &filename)
 {
-	CFile *f = new CFile();
+	File *f = new File();
 	if (f->Append(filename))
 		return f;
 	delete(f);
 	return NULL;
 }
 
-void FileClose(CFile *f)
+void FileClose(File *f)
 {
 	f->Close();
 	delete(f);
@@ -415,7 +415,7 @@ void FileClose(CFile *f)
 
 string FileRead(const string &filename)
 {
-	CFile *f = FileOpen(filename);
+	File *f = FileOpen(filename);
 	if (!f)
 		return "";
 	string r = f->ReadComplete();
@@ -425,7 +425,7 @@ string FileRead(const string &filename)
 
 void FileWrite(const string &filename, const string &str)
 {
-	CFile *f = FileCreate(filename);
+	File *f = FileCreate(filename);
 	if (!f)
 		return;
 	f->WriteBuffer(str.data, str.num);
@@ -434,7 +434,7 @@ void FileWrite(const string &filename, const string &str)
 
 
 // open a file
-bool CFile::Open(const string &filename)
+bool File::Open(const string &filename)
 {
 	if (!SilentFileAccess){
 		msg_write("loading file: " + filename.sys_filename());
@@ -471,7 +471,7 @@ bool CFile::Open(const string &filename)
 }
 
 // create a new file or reset an existing one
-bool CFile::Create(const string &filename)
+bool File::Create(const string &filename)
 {
 	if (!SilentFileAccess){
 		msg_write("creating file: " + filename.sys_filename());
@@ -501,7 +501,7 @@ bool CFile::Create(const string &filename)
 }
 
 // create a new file or append data to an existing one
-bool CFile::Append(const string &filename)
+bool File::Append(const string &filename)
 {
 	if (!SilentFileAccess){
 		msg_write("appending file: " + filename.sys_filename());
@@ -531,7 +531,7 @@ bool CFile::Append(const string &filename)
 }
 
 // close the file
-bool _cdecl CFile::Close()
+bool _cdecl File::Close()
 {
 	//flush(handle);
 	if (handle >= 0)
@@ -554,7 +554,7 @@ bool _cdecl CFile::Close()
 }
 
 // switch between text mode and binary mode
-void CFile::SetBinaryMode(bool binary)
+void File::SetBinaryMode(bool binary)
 {
 	if (Error)		return;
 	if (handle<0)	return;
@@ -570,14 +570,14 @@ void CFile::SetBinaryMode(bool binary)
 }
 
 // jump to an position in the file or to a position relative to the current
-void CFile::SetPos(int pos,bool absolute)
+void File::SetPos(int pos,bool absolute)
 {
 	if (absolute)	_lseek(handle,pos,SEEK_SET);
 	else			_lseek(handle,pos,SEEK_CUR);
 }
 
 // retrieve the size of the opened(!) file
-int CFile::GetSize()
+int File::GetSize()
 {
 #ifdef OS_WINDOWS
 	return (int)_filelength(handle);
@@ -589,21 +589,21 @@ int CFile::GetSize()
 #endif
 }
 
-Date CFile::GetDateCreation()
+Date File::GetDateCreation()
 {
 	struct stat _stat;
 	fstat(handle, &_stat);
 	return time2date(_stat.st_ctime);
 }
 
-Date CFile::GetDateModification()
+Date File::GetDateModification()
 {
 	struct stat _stat;
 	fstat(handle, &_stat);
 	return time2date(_stat.st_mtime);
 }
 
-Date CFile::GetDateAccess()
+Date File::GetDateAccess()
 {
 	struct stat _stat;
 	fstat(handle, &_stat);
@@ -611,13 +611,13 @@ Date CFile::GetDateAccess()
 }
 
 // where is the current reading position in the file?
-int CFile::GetPos()
+int File::GetPos()
 {
 	return _lseek(handle, 0, SEEK_CUR);
 }
 
 // read a single character followed by the file-format-version-number
-int CFile::ReadFileFormatVersion()
+int File::ReadFileFormatVersion()
 {
 	if (Error)	return -1;
 	unsigned char a=0;
@@ -638,7 +638,7 @@ int CFile::ReadFileFormatVersion()
 }
 
 // write a single character followed by the file-format-version-number
-void CFile::WriteFileFormatVersion(bool binary,int fvv)
+void File::WriteFileFormatVersion(bool binary,int fvv)
 {
 	char a=binary?'b':'t';
 	int r=_write(handle,&a,1);
@@ -650,7 +650,7 @@ void CFile::WriteFileFormatVersion(bool binary,int fvv)
 char chunk[chunk_size];
 
 // read the complete file into the buffer
-string CFile::ReadComplete()
+string File::ReadComplete()
 {
 	string buf;
 	int t_len=chunk_size;
@@ -680,7 +680,7 @@ string CFile::ReadComplete()
 }
 
 // read a part of the file into the buffer
-int CFile::ReadBuffer(void *buffer,int size)
+int File::ReadBuffer(void *buffer,int size)
 {
 	return _read(handle,buffer,size);
 /*	int t_len=chunk_size;
@@ -704,14 +704,14 @@ int CFile::ReadBuffer(void *buffer,int size)
 }
 
 // insert the buffer into the file
-int CFile::WriteBuffer(const void *buffer,int size)
+int File::WriteBuffer(const void *buffer,int size)
 {
 	return _write(handle,buffer,size);
 }
 
 
 // read a single character (1 byte)
-char CFile::ReadChar()
+char File::ReadChar()
 {
 	if (Error)	return 0;
 	char c=0;
@@ -721,7 +721,7 @@ char CFile::ReadChar()
 }
 
 // read a single character (1 byte)
-unsigned char CFile::ReadByte()
+unsigned char File::ReadByte()
 {
 	if (Error)	return 0;
 	if (Binary){
@@ -733,14 +733,8 @@ unsigned char CFile::ReadByte()
 	return s2i(ReadStr());
 }
 
-unsigned char CFile::ReadByteC()
-{
-	ReadComment();
-	return ReadByte();
-}
-
 // read the rest of the line (only text mode)
-void CFile::ReadComment()
+void File::ReadComment()
 {
 	if ((Error)||(Binary))	return;
 #ifdef FILE_COMMENTS_DEBUG
@@ -759,7 +753,7 @@ void CFile::ReadComment()
 }
 
 // read a word (2 bytes in binary mode)
-unsigned short CFile::ReadWord()
+unsigned short File::ReadWord()
 {
 	if (Error)	return 0;
 	if (Binary){
@@ -774,14 +768,8 @@ unsigned short CFile::ReadWord()
 	return s2i(ReadStr());
 }
 
-unsigned short CFile::ReadWordC()
-{
-	ReadComment();
-	return ReadWord();
-}
-
 // read a word (2 bytes in binary mode)
-unsigned short CFile::ReadReversedWord()
+unsigned short File::ReadReversedWord()
 {
 	if (Error)	return 0;
 	if (Binary){
@@ -805,7 +793,7 @@ unsigned short CFile::ReadReversedWord()
 }
 
 // read an integer (4 bytes in binary mode)
-int _cdecl CFile::ReadInt()
+int _cdecl File::ReadInt()
 {
 	if (Error)	return 0;
 	if (Binary){
@@ -817,15 +805,8 @@ int _cdecl CFile::ReadInt()
 	return s2i(ReadStr());
 }
 
-// ignore this line, then read an integer
-int _cdecl CFile::ReadIntC()
-{
-	ReadComment();
-	return ReadInt();
-}
-
 // read a float (4 bytes in binary mode)
-float CFile::ReadFloat()
+float File::ReadFloat()
 {
 	if (Error)	return 0;
 	if (Binary){
@@ -837,15 +818,8 @@ float CFile::ReadFloat()
 	return s2f(ReadStr());
 }
 
-// ignore this line, then read an float
-float CFile::ReadFloatC()
-{
-	ReadComment();
-	return ReadFloat();
-}
-
 // read a boolean (1 byte in binary mode)
-bool _cdecl CFile::ReadBool()
+bool _cdecl File::ReadBool()
 {
 	if (Error)	return false;
 	unsigned char a=0;
@@ -870,17 +844,10 @@ bool _cdecl CFile::ReadBool()
 	return res;
 }
 
-// ignore this line, then read an boolean
-bool _cdecl CFile::ReadBoolC()
-{
-	ReadComment();
-	return ReadBool();
-}
-
 // read a string
 //   text mode:   complete rest of this line
 //   binary mode: length word, then string
-string _cdecl CFile::ReadStr()
+string _cdecl File::ReadStr()
 {
 	Error|=Eof;
 	if (Error)	return "";
@@ -934,7 +901,7 @@ string _cdecl CFile::ReadStr()
 }
 
 // read a null-terminated string
-string CFile::ReadStrNT()
+string File::ReadStrNT()
 {
 	Error|=Eof;
 	if (Error)	return "";
@@ -957,15 +924,8 @@ string CFile::ReadStrNT()
 	return "";
 }
 
-// ignore this line, then read an string
-string _cdecl CFile::ReadStrC()
-{
-	ReadComment();
-	return ReadStr();
-}
-
 // read a string having reversed byte as length in binary mode
-string CFile::ReadStrRW()
+string File::ReadStrRW()
 {
 	Error|=Eof;
 	if (Error)	return "";
@@ -984,7 +944,7 @@ string CFile::ReadStrRW()
 	}
 }
 
-void CFile::ReadVector(void *v)
+void File::ReadVector(void *v)
 {
 	((float*)v)[0] = ReadFloat();
 	((float*)v)[1] = ReadFloat();
@@ -992,21 +952,21 @@ void CFile::ReadVector(void *v)
 }
 
 // write a single character (1 byte)
-void CFile::WriteChar(char c)
+void File::WriteChar(char c)
 {
 	if (Binary)	int r=_write(handle,&c,1);
 	else		WriteStr(i2s(c));
 }
 
 // write a single character (1 byte)
-void CFile::WriteByte(unsigned char c)
+void File::WriteByte(unsigned char c)
 {
 	if (Binary)	int r=_write(handle,&c,1);
 	else		WriteStr(i2s(c));
 }
 
 // write a word (2 bytes)
-void CFile::WriteWord(unsigned short w)
+void File::WriteWord(unsigned short w)
 {
 	/*char c=(w/256)%256;
 	write(handle,&c,1);
@@ -1017,21 +977,21 @@ void CFile::WriteWord(unsigned short w)
 }
 
 // write an integer (4 bytes)
-void _cdecl CFile::WriteInt(int in)
+void _cdecl File::WriteInt(int in)
 {
 	if (Binary)	int r=_write(handle,&in,4);
 	else		WriteStr(i2s(in));
 }
 
 // write a float (4 bytes)
-void CFile::WriteFloat(float f)
+void File::WriteFloat(float f)
 {
 	if (Binary)	int r=_write(handle,&f,4);
 	else		WriteStr(f2s(f,FloatDecimals));
 }
 
 // write a boolean (1 byte)
-void _cdecl CFile::WriteBool(bool b)
+void _cdecl File::WriteBool(bool b)
 {
 	int r;
 	if (b)	r=_write(handle,"1",1);
@@ -1042,7 +1002,7 @@ void _cdecl CFile::WriteBool(bool b)
 // write a string
 //   text mode:   complete rest of this line
 //   binary mode: length word, then string
-void CFile::WriteStr(const string &str)
+void File::WriteStr(const string &str)
 {
 	if (Binary)
 		WriteWord(str.num);
@@ -1053,7 +1013,7 @@ void CFile::WriteStr(const string &str)
 }
 
 // write a comment line
-void CFile::WriteComment(const string &str)
+void File::WriteComment(const string &str)
 {
 #ifdef FILE_COMMENTS_DEBUG
 	msg_write("comment: " + str);
@@ -1062,183 +1022,15 @@ void CFile::WriteComment(const string &str)
 		WriteStr(str);
 }
 
-void CFile::WriteVector(const void *v)
+void File::WriteVector(const void *v)
 {
 	WriteFloat(((float*)v)[0]);
 	WriteFloat(((float*)v)[1]);
 	WriteFloat(((float*)v)[2]);
 }
 
-
-void CFile::Int(int &i)
-{
-	if (Reading)
-		i = ReadInt();
-	else
-		WriteInt(i);
-}
-
-void CFile::Float(float &f)
-{
-	if (Reading)
-		f = ReadFloat();
-	else
-		WriteFloat(f);
-}
-
-void CFile::Bool(bool &b)
-{
-	if (Reading)
-		b = ReadBool();
-	else
-		WriteBool(b);
-}
-
-void CFile::String(string &str)
-{
-	if (Reading)
-		str = ReadStr();
-	else
-		WriteStr(str);
-}
-
-void CFile::Vector(float *v)
-{
-	if (Reading)
-		ReadVector(v);
-	else
-		WriteVector(v);
-}
-
-struct sStructFormatItem
-{
-	int offset, size, type, num, total_size;
-};
-
-struct sStructFormat
-{
-	const char *format;
-	Array<sStructFormatItem> item_t;
-	Array<sStructFormatItem> item_b;
-	int size;
-};
-
-Array<sStructFormat> StructFormat;
-
-void add_sfi(Array<sStructFormatItem> &it, int offset, int size, int type, int num, int total_size)
-{
-	sStructFormatItem ii = {offset, size, type, num, total_size};
-	it.add(ii);
-}
-
-int get_sfi_num(const char *str)
-{
-	if ((*str >= '1') && (*str <= '9')){
-		int n = 0;
-		for (int i=0;i<7;i++){
-			if ((str[i] >= '1') && (str[i] <= '9'))
-				n = n*10 + (str[i] - 48);
-			else
-				return n;
-		}
-	}
-	return 1;
-}
-
-sStructFormat *get_format(const char *format)
-{
-	for (int i=0;i<StructFormat.num;i++)
-		if (StructFormat[i].format == format)
-			return &StructFormat[i];
-	sStructFormat f;
-	f.format = format;
-	f.size = 0;
-	int l = strlen(format);
-	int offset = 0;
-	for (int i=0;i<l;i++){
-		if (format[i] == 'C'){
-			//add_sfi(f.item_t, );
-		}else if (format[i] == 'i'){
-			int num = get_sfi_num(&format[i + 1]);
-			add_sfi(f.item_t, offset, 4, 1, num, 4 * num);
-			//add_sfi(f.item_b, offset, 4, 1, num, 4 * num);
-			offset += 4 * num;
-		}else if (format[i] == 'f'){
-			int num = get_sfi_num(&format[i + 1]);
-			add_sfi(f.item_t, offset, 4, 2, num, 4 * num);
-			//add_sfi(f.item_b, offset, 4, 2, num, 4 * num);
-			offset += 4 * num;
-		}else if (format[i] == 'b'){
-			int num = get_sfi_num(&format[i + 1]);
-			add_sfi(f.item_t, offset, 1, 3, num, 1 * num);
-			//add_sfi(f.item_b, offset, 1, 3, num, 1 * num);
-			offset += 1 * num;
-		}
-	}
-	f.size = offset;
-	StructFormat.add(f);
-	return &StructFormat.back();
-}
-
-void CFile::Struct(const char *format, void *data)
-{
-	sStructFormat *f = get_format(format);
-	if (Reading){
-		if (Binary){
-			ReadBuffer(data, f->size);
-		}else{
-			char *cdata = (char*)data;
-			for (int i=0;i<f->item_t.num;i++){
-				int n = f->item_t[i].num;
-				if (f->item_t[i].type == 0)
-					ReadComment();
-				else if (f->item_t[i].type == 1)
-					for (int j=0;j<n;j++)
-						*(int*)&cdata[f->item_t[i].offset + j * 4] = ReadInt();
-				else if (f->item_t[i].type == 2)
-					for (int j=0;j<n;j++)
-						*(float*)&cdata[f->item_t[i].offset + j * 4] = ReadFloat();
-				else if (f->item_t[i].type == 3)
-					for (int j=0;j<n;j++)
-						*(bool*)&cdata[f->item_t[i].offset + j] = ReadBool();
-			}
-		}
-	}else{
-		if (Binary){
-			WriteBuffer(data, f->size);
-		}else{
-			char *cdata = (char*)data;
-			for (int i=0;i<f->item_t.num;i++){
-				int n = f->item_t[i].num;
-				if (f->item_t[i].type == 0)
-					msg_todo("CFile::Struct can't write comments");
-				else if (f->item_t[i].type == 1)
-					for (int j=0;j<n;j++)
-						WriteInt(*(int*)&cdata[f->item_t[i].offset + j * 4]);
-				else if (f->item_t[i].type == 2)
-					for (int j=0;j<n;j++)
-						WriteFloat(*(float*)&cdata[f->item_t[i].offset + j * 4]);
-				else if (f->item_t[i].type == 3)
-					for (int j=0;j<n;j++)
-						WriteBool(*(bool*)&cdata[f->item_t[i].offset + j]);
-			}
-		}
-		//msg_todo("CFile::Struct writing mode");
-	}
-}
-
-void CFile::StructN(const char *format, int &num, void *data, int shift)
-{
-	if (Reading)
-		num = ReadInt();
-	else
-		WriteInt(num);
-	for (int i=0;i<num;i++)
-		Struct(format, &((char*)data)[shift * i]);
-}
-
 // insert some white spaces
-void CFile::ShiftRight(int s)
+void File::ShiftRight(int s)
 {
 	int r;
 #ifdef StructuredShifts

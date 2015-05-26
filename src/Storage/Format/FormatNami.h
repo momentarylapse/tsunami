@@ -44,7 +44,7 @@ public:
 	void WriteLevelName();
 	void WriteFormat();
 
-	CFile *f;
+	File *f;
 	AudioFile *audio;
 };
 

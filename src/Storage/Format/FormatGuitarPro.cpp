@@ -22,13 +22,13 @@ FormatGuitarPro::~FormatGuitarPro()
 }
 
 
-static void write_str1(CFile *f, const string &s)
+static void write_str1(File *f, const string &s)
 {
 	f->WriteByte(s.num);
 	f->WriteBuffer(s.data, s.num);
 }
 
-static void write_str1c(CFile *f, const string &s, int size)
+static void write_str1c(File *f, const string &s, int size)
 {
 	f->WriteByte(s.num);
 	string t = s;
@@ -36,19 +36,19 @@ static void write_str1c(CFile *f, const string &s, int size)
 	f->WriteBuffer(t.data, size);
 }
 
-static void write_str4(CFile *f, const string &s)
+static void write_str4(File *f, const string &s)
 {
 	f->WriteInt(s.num);
 	f->WriteBuffer(s.data, s.num);
 }
 
-static void write_str41(CFile *f, const string &s)
+static void write_str41(File *f, const string &s)
 {
 	f->WriteInt(s.num + 1);
 	write_str1(f, s);
 }
 
-static string read_str1(CFile *f)
+static string read_str1(File *f)
 {
 	int l = f->ReadByte();
 	//msg_write(l);
@@ -58,7 +58,7 @@ static string read_str1(CFile *f)
 	return s;
 }
 
-static string read_str1c(CFile *f, int size)
+static string read_str1c(File *f, int size)
 {
 	int l = f->ReadByte();
 	string s;
@@ -68,7 +68,7 @@ static string read_str1c(CFile *f, int size)
 	return s;
 }
 
-static string read_str4(CFile *f)
+static string read_str4(File *f)
 {
 	int l = f->ReadInt();
 	string s;
@@ -77,7 +77,7 @@ static string read_str4(CFile *f)
 	return s;
 }
 
-static string read_str41(CFile *f)
+static string read_str41(File *f)
 {
 	int l = f->ReadInt();
 	/*msg_write(l);

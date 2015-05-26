@@ -66,7 +66,7 @@ private:
 
 	bool testError(const string &msg);
 
-	CFile *temp_file;
+	File *temp_file;
 	string cur_temp_filename;
 
 	struct SyncData

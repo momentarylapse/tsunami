@@ -22,7 +22,7 @@ FormatMp3::~FormatMp3()
 }
 
 // (-_-) 4*7bit big endian
-static int read_mp3_28bit(CFile *f)
+static int read_mp3_28bit(File *f)
 {
 	unsigned char d[4];
 	f->ReadBuffer(d, 4);
@@ -30,7 +30,7 @@ static int read_mp3_28bit(CFile *f)
 	return (d[3] & 0x7f) | ((d[2] & 0x7f) << 7) | ((d[1] & 0x7f) << 14) | ((d[0] & 0x7f) << 21);
 }
 
-static int read_32bit_be(CFile *f)
+static int read_32bit_be(File *f)
 {
 	unsigned char d[4];
 	f->ReadBuffer(d, 4);
@@ -46,7 +46,7 @@ void FormatMp3::loadTrack(Track *t, const string & filename, int offset, int lev
 	tsunami->progress->set(_("lade mp3"), 0);
 
 	unsigned char *data = new unsigned char[4096];
-	CFile *f = FileOpen(filename);
+	File *f = FileOpen(filename);
 
 	try{
 

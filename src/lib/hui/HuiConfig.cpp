@@ -96,10 +96,11 @@ string HuiConfiguration::getStr(const string& name, const string& default_str)
 
 void HuiConfiguration::load()
 {
-	CFile *f = FileOpenSilent(filename);
+	File *f = FileOpenSilent(filename);
 	map.clear();
 	if (f){
-		int num = f->ReadIntC();
+		f->ReadComment();
+		int num = f->ReadInt();
 		for (int i=0;i<num;i++){
 			string temp = f->ReadStr();
 			string key = temp.substr(3, temp.num - 3);
@@ -115,7 +116,7 @@ void HuiConfiguration::load()
 void HuiConfiguration::save()
 {
 	dir_create(filename.dirname());
-	CFile *f = FileCreateSilent(filename);
+	File *f = FileCreateSilent(filename);
 	f->WriteStr("// NumConfigs");
 	f->WriteInt(map.num);
 	foreach(HuiConfigEntry &e, map){

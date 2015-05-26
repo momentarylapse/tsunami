@@ -66,11 +66,11 @@ extern t_file_try_again_func *FileTryAgainFunc;
 void file_set_archive(const string &filename);
 void file_clean_up_archive();
 
-class CFile
+class File
 {
 public:
-	CFile();
-	~CFile();
+	File();
+	~File();
 
 	// opening
 	bool _cdecl Open(const string &filename);
@@ -100,19 +100,13 @@ public:
 	void _cdecl ReadComment();
 	char _cdecl ReadChar();
 	unsigned char _cdecl ReadByte();
-	unsigned char _cdecl ReadByteC();
 	unsigned short _cdecl ReadWord();
-	unsigned short _cdecl ReadWordC();
 	unsigned short _cdecl ReadReversedWord(); // for antique versions!!
 	int _cdecl ReadInt();
-	int _cdecl ReadIntC();
 	float _cdecl ReadFloat();
-	float _cdecl ReadFloatC();
 	bool _cdecl ReadBool();
-	bool _cdecl ReadBoolC();
 	string _cdecl ReadStr();
 	string _cdecl ReadStrNT();
-	string _cdecl ReadStrC();
 	string _cdecl ReadStrRW(); // for antique versions!!
 	void _cdecl ReadVector(void *v);
 
@@ -126,15 +120,6 @@ public:
 	void _cdecl WriteComment(const string &str);
 	void _cdecl WriteVector(const void *v);
 
-	// high level
-	void _cdecl Int(int &i);
-	void _cdecl Float(float &f);
-	void _cdecl Bool(bool &b);
-	void _cdecl String(string &str);
-	void _cdecl Vector(float *v);
-	void _cdecl Struct(const char *format, void *data);
-	void _cdecl StructN(const char *format, int &num, void *data, int shift);
-
 	void _cdecl ShiftRight(int s);
 
 	bool Eof, Binary, SilentFileAccess, Reading;
@@ -145,12 +130,12 @@ public:
 	bool Error,ErrorReported,DontReportErrors;
 };
 
-extern CFile *_cdecl FileOpen(const string &filename);
-extern CFile *_cdecl FileOpenSilent(const string &filename);
-extern CFile *_cdecl FileCreate(const string &filename);
-extern CFile *_cdecl FileCreateSilent(const string &filename);
-extern CFile *_cdecl FileAppend(const string &filename);
-extern void _cdecl FileClose(CFile *f);
+extern File *_cdecl FileOpen(const string &filename);
+extern File *_cdecl FileOpenSilent(const string &filename);
+extern File *_cdecl FileCreate(const string &filename);
+extern File *_cdecl FileCreateSilent(const string &filename);
+extern File *_cdecl FileAppend(const string &filename);
+extern void _cdecl FileClose(File *f);
 extern string _cdecl FileRead(const string &filename);
 extern void _cdecl FileWrite(const string &filename, const string &str);
 

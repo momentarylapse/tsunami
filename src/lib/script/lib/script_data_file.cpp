@@ -36,7 +36,7 @@ public:
 	}
 };
 
-class KabaFile : public CFile
+class KabaFile : public File
 {
 public:
 	void _cdecl __delete__()
@@ -100,29 +100,29 @@ void SIAddPackageFile()
 	
 	add_class(TypeFile);
 		class_add_func("__delete__",		TypeVoid,		mf(&KabaFile::__delete__));
-		class_add_func("getCDate",		TypeDate,		mf(&CFile::GetDateCreation));
-		class_add_func("getMDate",		TypeDate,		mf(&CFile::GetDateModification));
-		class_add_func("getADate",		TypeDate,		mf(&CFile::GetDateAccess));
-		class_add_func("getSize",		TypeInt,		mf(&CFile::GetSize));
-		class_add_func("getPos",		TypeInt,		mf(&CFile::GetPos));
-		class_add_func("seek",		TypeVoid,		mf(&CFile::SetPos));
+		class_add_func("getCDate",		TypeDate,		mf(&File::GetDateCreation));
+		class_add_func("getMDate",		TypeDate,		mf(&File::GetDateModification));
+		class_add_func("getADate",		TypeDate,		mf(&File::GetDateAccess));
+		class_add_func("getSize",		TypeInt,		mf(&File::GetSize));
+		class_add_func("getPos",		TypeInt,		mf(&File::GetPos));
+		class_add_func("seek",		TypeVoid,		mf(&File::SetPos));
 			func_add_param("pos",		TypeInt);
 			func_add_param("absolute",	TypeBool);
-		class_add_func("setBinaryMode",	TypeVoid,		mf(&CFile::SetBinaryMode));
+		class_add_func("setBinaryMode",	TypeVoid,		mf(&File::SetBinaryMode));
 			func_add_param("binary",	TypeBool);
 		class_add_func("read",		TypeString,			mf(&KabaFile::_ReadBuffer));
 			func_add_param("size",			TypeInt);
 		class_add_func("write",		TypeInt,			mf(&KabaFile::_WriteBuffer));
 			func_add_param("s",			TypeString);
-		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteBool));
+		class_add_func("__lshift__",		TypeVoid,			mf(&File::WriteBool));
 			func_add_param("b",			TypeBool);
-		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteInt));
+		class_add_func("__lshift__",		TypeVoid,			mf(&File::WriteInt));
 			func_add_param("i",			TypeInt);
-		class_add_func("__lshift__",	TypeVoid,			mf(&CFile::WriteFloat));
+		class_add_func("__lshift__",	TypeVoid,			mf(&File::WriteFloat));
 			func_add_param("x",			TypeFloat32);
-		class_add_func("__lshift__",	TypeVoid,			mf(&CFile::WriteVector));
+		class_add_func("__lshift__",	TypeVoid,			mf(&File::WriteVector));
 			func_add_param("v",			TypeVector);
-		class_add_func("__lshift__",		TypeVoid,			mf(&CFile::WriteStr));
+		class_add_func("__lshift__",		TypeVoid,			mf(&File::WriteStr));
 			func_add_param("s",			TypeString);
 		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadBool));
 			func_add_param("b",			TypeBoolPs);
@@ -134,7 +134,7 @@ void SIAddPackageFile()
 			func_add_param("v",			TypeVector);
 		class_add_func("__rshift__",		TypeVoid,			mf(&KabaFile::_ReadStr));
 			func_add_param("s",			TypeString);
-		class_add_func("readComplete",	TypeString,			mf(&CFile::ReadComplete));
+		class_add_func("readComplete",	TypeString,			mf(&File::ReadComplete));
 
 	
 	add_class(TypeDirEntry);

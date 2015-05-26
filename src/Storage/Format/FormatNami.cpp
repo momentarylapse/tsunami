@@ -504,7 +504,7 @@ void FormatNami::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 
 
 #if 0
-void ReadCompressed(CFile *f, char *data, int size)
+void ReadCompressed(File *f, char *data, int size)
 {
 	memset(data, 0, size);
 	int done = 0;
@@ -560,7 +560,7 @@ struct ChunkLevelData
 struct ChunkStack
 {
 	Array<ChunkLevelData> chunk_data;
-	CFile *f;
+	File *f;
 	AudioFile *a;
 
 
@@ -575,7 +575,7 @@ struct ChunkStack
 
 
 
-	void ReadChunk(CFile *f)
+	void ReadChunk(File *f)
 	{
 		ChunkLevelData cur = chunk_data.back();
 		string cname;
@@ -872,7 +872,7 @@ void ReadChunkNami(ChunkStack *s, AudioFile *a)
 }
 
 
-void load_nami_file_new(CFile *f, AudioFile *a)
+void load_nami_file_new(File *f, AudioFile *a)
 {
 	AudioFile *old = tsunami->audio;
 	tsunami->audio = a;
@@ -907,7 +907,7 @@ void FormatNami::loadAudio(AudioFile *a, const string & filename)
 	// TODO?
 	a->tags.clear();
 
-	CFile *f = FileOpen(a->filename);
+	File *f = FileOpen(a->filename);
 	f->SetBinaryMode(true);
 
 	try{

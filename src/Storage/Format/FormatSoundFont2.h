@@ -22,8 +22,8 @@ public:
 	void loadAudio(AudioFile *a, const string &filename);
 	void saveAudio(AudioFile *a, const string &filename);
 
-	void read_chunk(CFile *f);
-	void read_samples(CFile *f);
+	void read_chunk(File *f);
+	void read_samples(File *f);
 
 	int sample_offset;
 	int sample_count;
@@ -45,7 +45,7 @@ public:
 	};
 	Array<sfSample> samples;
 
-	void read_sample_header(CFile *f, sfSample &s);
+	void read_sample_header(File *f, sfSample &s);
 
 	AudioFile *audio;
 };

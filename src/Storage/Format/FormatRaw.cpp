@@ -44,7 +44,7 @@ void FormatRaw::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	if (!b->exports(data, config.channels, config.format))
 		tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
 
-	CFile *f = FileCreate(filename);
+	File *f = FileCreate(filename);
 	f->SetBinaryMode(true);
 
 	for (int i=0; i<config.offset; i++)
@@ -68,7 +68,7 @@ void FormatRaw::loadTrack(Track *t, const string & filename, int offset, int lev
 	RawConfigData config = GetRawConfigData();
 
 	char *data = new char[WAVE_BUFFER_SIZE];
-	CFile *f = FileOpen(filename);
+	File *f = FileOpen(filename);
 
 	try{
 

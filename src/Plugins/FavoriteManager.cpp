@@ -45,7 +45,7 @@ void FavoriteManager::LoadFromFile(const string &filename, bool read_only)
 {
 	if (!file_test_existence(filename))
 		return;
-	CFile *f = FileOpen(filename);
+	File *f = FileOpen(filename);
 	if (!f)
 		return;
 	int n = f->ReadInt();
@@ -71,7 +71,7 @@ void FavoriteManager::Load()
 
 void FavoriteManager::Save()
 {
-	CFile *f = FileCreate(HuiAppDirectory + "Data/favorites.txt");
+	File *f = FileCreate(HuiAppDirectory + "Data/favorites.txt");
 	if (!f)
 		return;
 	f->WriteInt(favorites.num);

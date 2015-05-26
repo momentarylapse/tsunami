@@ -17,7 +17,7 @@ int endian_big_to_little(int i)
 	return ((i & 0xff) << 24) | ((i & 0xff00) << 8) | ((i & 0xff0000) >> 8) | ((i & 0xff000000) >> 24);
 }
 
-int read_int_big_endian(CFile *f)
+int read_int_big_endian(File *f)
 {
 	int a = f->ReadByte();
 	int b = f->ReadByte();
@@ -66,7 +66,7 @@ void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, 
 void image_load_png(const string &filename, Image &image)
 {
 	char buf[8];
-	CFile *f = FileOpen(filename);
+	File *f = FileOpen(filename);
 	f->SetBinaryMode(true);
 
 	try{

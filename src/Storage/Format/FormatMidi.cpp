@@ -24,7 +24,7 @@ void FormatMidi::loadTrack(Track *t, const string &filename, int offset, int lev
 void FormatMidi::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 {}
 
-static string read_chunk_name(CFile *f)
+static string read_chunk_name(File *f)
 {
 	string s;
 	s.resize(4);
@@ -32,13 +32,13 @@ static string read_chunk_name(CFile *f)
 	return s;
 }
 
-static int read_int(CFile *f)
+static int read_int(File *f)
 {
 	int i = f->ReadInt();
 	return ((i & 255) << 24) + (((i >> 8) & 255) << 16) + (((i >> 16) & 255) << 8) + ((i >> 24) & 255);
 }
 
-static int read_var(CFile *f)
+static int read_var(File *f)
 {
 	unsigned char c0;
 	int i = 0;
@@ -64,7 +64,7 @@ static string ascii2utf8(const string &s)
 
 void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 {
-	CFile *f = NULL;
+	File *f = NULL;
 	try{
 		f = FileOpen(filename);
 		if (!f)

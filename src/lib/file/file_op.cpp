@@ -44,13 +44,13 @@
 
 
 
-static CFile *test_file=NULL;
+static File *test_file=NULL;
 
 // just test the existence of a file
 bool file_test_existence(const string &filename)
 {
 	if (!test_file)
-		test_file=new CFile();
+		test_file=new File();
 	test_file->SilentFileAccess=test_file->DontReportErrors=true;
 	if (!test_file->Open(filename)){
 		//delete(test_file);

@@ -42,7 +42,7 @@ public:
 	int tempo;
 
 	AudioFile *a;
-	CFile *f;
+	File *f;
 
 	void read_info();
 	void read_lyrics();

@@ -36,7 +36,7 @@ static Array<string> TodoStr;
 
 bool msg_inited = false;
 
-static CFile *file = NULL;
+static File *file = NULL;
 static string msg_file_name = "message.txt";
 static int Shift;
 
@@ -62,7 +62,7 @@ static int CurrentTraceLevel=0;
 void msg_init(const string &force_filename, bool verbose)
 {
 	Verbose = false;
-	file = new CFile();
+	file = new File();
 	Shift = 0;
 	ErrorOccured = false;
 	msg_inited = true;

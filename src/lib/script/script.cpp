@@ -170,7 +170,7 @@ void Script::Load(const string &_filename, bool _just_analyse)
 	try{
 
 	// read file
-	CFile *f = FileOpen(config.directory + filename);
+	File *f = FileOpen(config.directory + filename);
 	if (!f)
 		DoError("script file not loadable");
 	string buffer = f->ReadComplete();

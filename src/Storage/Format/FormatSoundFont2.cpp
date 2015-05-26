@@ -31,7 +31,7 @@ void FormatSoundFont2::loadAudio(AudioFile* a, const string &filename)
 {
 	audio = a;
 
-	CFile *f = FileOpen(filename);
+	File *f = FileOpen(filename);
 	f->SetBinaryMode(true);
 
 	sample_offset = -1;
@@ -61,7 +61,7 @@ void FormatSoundFont2::sfSample::print()
 	msg_write(sample_type);
 }
 
-void FormatSoundFont2::read_chunk(CFile *f)
+void FormatSoundFont2::read_chunk(File *f)
 {
 	char temp[4];
 	f->ReadBuffer(temp, 4);
@@ -107,7 +107,7 @@ void FormatSoundFont2::read_chunk(CFile *f)
 	msg_left();
 }
 
-void FormatSoundFont2::read_sample_header(CFile *f, FormatSoundFont2::sfSample &s)
+void FormatSoundFont2::read_sample_header(File *f, FormatSoundFont2::sfSample &s)
 {
 	char temp[21];
 	f->ReadBuffer(temp, 20);
@@ -123,7 +123,7 @@ void FormatSoundFont2::read_sample_header(CFile *f, FormatSoundFont2::sfSample &
 	s.sample_type = f->ReadWord();
 }
 
-void FormatSoundFont2::read_samples(CFile *f)
+void FormatSoundFont2::read_samples(File *f)
 {
 	int samples_all = 0;
 	int samples_read = 0;

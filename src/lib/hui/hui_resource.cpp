@@ -53,7 +53,7 @@ string str_escape(const string &str)
 extern Array<HuiLanguage> _HuiLanguage_;
 Array<HuiResource> _HuiResource_;
 
-void LoadResourceCommand(CFile *f, HuiResource *c)
+void LoadResourceCommand(File *f, HuiResource *c)
 {
 	c->type = f->ReadStr();
 	c->id = f->ReadStr();
@@ -77,10 +77,11 @@ void HuiLoadResource(const string &filename)
 	_HuiResource_.clear();
 	_HuiLanguage_.clear();
 
-	CFile *f = FileOpen(filename);
+	File *f = FileOpen(filename);
 	if (f){
 		int ffv = f->ReadFileFormatVersion();
-		int nres = f->ReadIntC();
+		f->ReadComment();
+		int nres = f->ReadInt();
 		for (int i=0;i<nres;i++){
 			HuiResource res;
 			res.children.clear();
@@ -96,15 +97,18 @@ void HuiLoadResource(const string &filename)
 		}
 
 		// languages
-		int nl = f->ReadIntC();
+		f->ReadComment();
+		int nl = f->ReadInt();
 		for (int l=0;l<nl;l++){
 			HuiLanguage hl;
 
 			// Language
-			hl.name = f->ReadStrC();
+			f->ReadComment();
+			hl.name = f->ReadStr();
 
 			//  NumIDs
-			int n = f->ReadIntC();
+			f->ReadComment();
+			int n = f->ReadInt();
 			f->ReadComment(); // Text
 			for (int i=0;i<n;i++){
 				HuiLanguageCommand c;
@@ -113,7 +117,8 @@ void HuiLoadResource(const string &filename)
 				hl.cmd.add(c);
 			}
 			// Num Language Strings
-			n = f->ReadIntC();
+			f->ReadComment();
+			n = f->ReadInt();
 			// Text
 			f->ReadComment();
 			for (int i=0;i<n;i++){

@@ -7,6 +7,8 @@
 
 #include "PeakMeter.h"
 #include "../../Plugins/FastFourierTransform.h"
+#include "../../Tsunami.h"
+#include "../AudioView.h"
 
 const int PeakMeter::NUM_SAMPLES = 1024;
 const int PeakMeter::SPECTRUM_SIZE = 30;
@@ -100,8 +102,8 @@ void PeakMeter::drawPeak(HuiPainter *c, const rect &r, Data &d)
 	int h = r.height();
 	float sp = d.get_sp();
 
-	c->setColor(White);
-	if ((sp > 1) || (sp > 1))
+	c->setColor(tsunami->_view->colors.background);
+	if (sp > 1)
 		c->setColor(Red);
 	c->drawRect(r);
 
@@ -111,7 +113,7 @@ void PeakMeter::drawPeak(HuiPainter *c, const rect &r, Data &d)
 	c->setColor(peak_color(d.peak));
 	c->drawRect(r.x1, r.y1,       (float)w * nice_peak(d.peak), h);
 
-	c->setColor(Black);
+	c->setColor(tsunami->_view->colors.text);
 	if (sp > 0)
 		c->drawRect(w * nice_peak(sp), r.y1, 2, h);
 }
@@ -127,9 +129,9 @@ void PeakMeter::onDraw()
 		drawPeak(c, rect(2, w-2, 2, h/2-1), r);
 		drawPeak(c, rect(2, w-2, h/2 + 1, h-2), l);
 	}else{
-		c->setColor(White);
+		c->setColor(tsunami->_view->colors.background);
 		c->drawRect(2, 2, w - 4, h - 4);
-		c->setColor(Black);
+		c->setColor(tsunami->_view->colors.text);
 		float dx = 1.0f / (float)SPECTRUM_SIZE * (w - 2);
 		for (int i=0;i<100;i++){
 			float x0 = 2 + (float)i / (float)SPECTRUM_SIZE * (w - 2);

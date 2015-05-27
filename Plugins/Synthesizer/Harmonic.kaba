@@ -36,7 +36,11 @@ class HarmonicGrid : Grid
 	
 		// points
 		for i,n in hc.intensity
-			drawPoint2(c, complex(n+1, i), n == Selected, n == Hover)
+			complex z0 = complex(n+1, 0)
+			complex z1 = complex(n+1, i)
+			c.setLineWidth(2)
+			drawLine2(c, z0, z1, n == Selected, n == Hover)
+			drawPoint2(c, z1, n == Selected, n == Hover)
 			
 	// left button down -> select
 	overwrite void onLeftButtonDown()

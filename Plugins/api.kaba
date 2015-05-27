@@ -311,12 +311,22 @@ class AudioFile
 	extern Track *addTrack(int type, int index)
 	extern void deleteTrack(int index)
 
+class ColorScheme
+	color background
+	color background_track
+	color background_track_selected
+	color text
+	color text_soft
+	color grid
+	color selection
+	color hover
+
 class AudioView
 	Range sel_range
 	Range sel_raw
 	AudioStream *stream
 	AudioRenderer *renderer
-
+	ColorScheme colors
 
 class AudioRenderer
 	extern void __init__()

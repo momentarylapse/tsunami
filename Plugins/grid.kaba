@@ -1,4 +1,5 @@
 use "tone.kaba"
+use "api.kaba"
 
 
 float log2lin(float f, float f_min, float f_max)
@@ -168,9 +169,9 @@ class GridData
 	color col_text
 	
 	void __init__()
-		col_grid = color(1, 0.8, 0.8, 0.8)
-		col_text = color(1, 0.4, 0.4, 0.4)
-		col_bg = White
+		col_grid = view.colors.grid//color(1, 0.8, 0.8, 0.8)
+		col_text = view.colors.text_soft//color(1, 0.4, 0.4, 0.4)
+		col_bg = view.colors.background
 		allow_bg = true
 		x_axis.min_label_dist = 60
 		y_axis.min_label_dist = 30
@@ -261,7 +262,7 @@ class GridData
 			c.drawPolygon(pp)
 			pp.resize(pp.num - 2)
 		c.setLineWidth(2)
-		c.setColor(Black)
+		c.setColor(col_text)
 		c.drawLines(pp)
 	
 	void drawCurveB(Painter *c, complex[] _p, bool fill_below, color col)
@@ -282,7 +283,7 @@ class GridData
 	
 	void drawPoint2(Painter *c, complex p, bool selected, bool hover)
 		complex pp = project2(p)
-		c.setColor(Black)
+		c.setColor(col_text)
 		float radius = 3
 		if hover
 			c.setColor(Red)
@@ -293,7 +294,7 @@ class GridData
 	
 	void drawPoint3(Painter *c, vector p, bool selected, bool hover)
 		vector pp = project3(p)
-		c.setColor(Black)
+		c.setColor(col_text)
 		float radius = 3
 		if hover
 			c.setColor(Red)
@@ -302,6 +303,18 @@ class GridData
 		else if selected
 			c.setColor(color(1, 0.7, 0, 0))
 		c.drawCircle(pp.x, pp.y, radius)
+	
+	void drawLine2(Painter *c, complex p0, complex p1, bool selected, bool hover)
+		complex pp0 = project2(p0)
+		complex pp1 = project2(p1)
+		c.setColor(col_text)
+		float radius = 3
+		if hover
+			c.setColor(Red)
+			radius = 4
+		else if selected
+			c.setColor(color(1, 0.7, 0, 0))
+		c.drawLine(pp0.x, pp0.y, pp1.x, pp1.y)
 	
 	complex getMouse2()
 		float mx = HuiGetEvent().mouse_x

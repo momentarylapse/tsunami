@@ -72,6 +72,8 @@ void AudioView::ColorScheme::create(ColorSchemeBasic &basic)
 	background = basic.background;
 	background_track_selected = ColorInterpolate(basic.background, basic.selection*1.5f, 0.17f);
 	background_track = ColorInterpolate(background, background_track_selected, 0.5f);
+	selection = basic.selection;
+	hover = basic.hover;
 	selection_internal = basic.selection;
 	selection_internal.a = 0.2f;
 	selection_boundary = basic.selection;
@@ -110,10 +112,12 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	dark.text = color(1, 0.95f, 0.95f, 0.95f);
 	dark.selection = color(1, 0.1f, 0.1f, 0.5f);
 	dark.hover = White;
-	dark.gamma = 0.5f;
+	dark.gamma = 0.3f;
 
-	colors.create(bright);
-	//colors.create(dark);
+	if (HuiConfig.getStr("View.ColorScheme", "bright") == "dark")
+		colors.create(dark);
+	else
+		colors.create(bright);
 
 	drawing_rect = rect(0, 1024, 0, 768);
 	enabled = true;

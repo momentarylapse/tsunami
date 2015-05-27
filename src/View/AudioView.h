@@ -86,6 +86,8 @@ public:
 		color background_track;
 		color background_track_selected;
 		color grid;
+		color selection;
+		color hover;
 		color selection_internal;
 		color selection_boundary;
 		color selection_boundary_hover;

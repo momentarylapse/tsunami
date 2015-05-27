@@ -418,6 +418,17 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Script::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
+	Script::DeclareClassOffset("AudioView", "colors", _offsetof(AudioView, colors));
+
+	Script::DeclareClassSize("ColorScheme", sizeof(AudioView::ColorScheme));
+	Script::DeclareClassOffset("ColorScheme", "background", _offsetof(AudioView::ColorScheme, background));
+	Script::DeclareClassOffset("ColorScheme", "background_track", _offsetof(AudioView::ColorScheme, background_track));
+	Script::DeclareClassOffset("ColorScheme", "background_track_selected", _offsetof(AudioView::ColorScheme, background_track_selected));
+	Script::DeclareClassOffset("ColorScheme", "text", _offsetof(AudioView::ColorScheme, text));
+	Script::DeclareClassOffset("ColorScheme", "text_soft", _offsetof(AudioView::ColorScheme, text_soft));
+	Script::DeclareClassOffset("ColorScheme", "grid", _offsetof(AudioView::ColorScheme, grid));
+	Script::DeclareClassOffset("ColorScheme", "selection", _offsetof(AudioView::ColorScheme, selection));
+	Script::DeclareClassOffset("ColorScheme", "hover", _offsetof(AudioView::ColorScheme, hover));
 
 	Script::LinkExternal("Log.error", Script::mf(&Log::error));
 	Script::LinkExternal("Log.warning", Script::mf(&Log::warning));

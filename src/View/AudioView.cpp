@@ -79,20 +79,30 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	thm.animating = false;
 	thm.midi_track = NULL;
 
-	ColorBackground = White;
-	ColorBackgroundCurWave = color(1, 0.93f, 0.93f, 1);
-	ColorBackgroundCurTrack = color(1, 0.88f, 0.88f, 1);
-	ColorGrid = color(1, 0.75f, 0.75f, 0.9f);
-	ColorSelectionInternal = color(0.2f, 0.2f, 0.2f, 0.8f);
-	ColorSelectionBoundary = color(1, 0.2f, 0.2f, 0.8f);
-	ColorSelectionBoundaryMO = color(1, 0.8f, 0.2f, 0.2f);
-	ColorPreviewMarker = color(1, 0, 0.7f, 0);
-	ColorCaptureMarker = color(1, 0.7f, 0, 0);
-	ColorWave = Gray;
-	ColorWaveCur = color(1, 0.3f, 0.3f, 0.3f);
-	ColorSub = color(1, 0.6f, 0.6f, 0);
-	ColorSubMO = color(1, 0.6f, 0, 0);
-	ColorSubNotCur = color(1, 0.4f, 0.4f, 0.4f);
+	ColorSchemeBasic bright;
+	bright.background = White;
+	bright.text = color(1, 0.3f, 0.3f, 0.3f);
+	bright.selection = color(1, 0.2f, 0.2f, 0.7f);
+
+	ColorSchemeBasic dark;
+	dark.background = color(1, 0.2f, 0.2f, 0.2f);
+	dark.text = color(1, 0.7f, 0.7f, 0.7f);
+	dark.selection = color(1, 0.2f, 0.2f, 0.7f);
+
+	colors.background = White;
+	colors.Background_track = color(1, 0.93f, 0.93f, 1);
+	colors.background_track_selected = color(1, 0.88f, 0.88f, 1);
+	colors.grid = color(1, 0.75f, 0.75f, 0.9f);
+	colors.selection_internal = color(0.2f, 0.2f, 0.2f, 0.8f);
+	colors.selection_boundary = color(1, 0.2f, 0.2f, 0.8f);
+	colors.selection_boundary_hover = color(1, 0.8f, 0.2f, 0.2f);
+	colors.preview_marker = color(1, 0, 0.7f, 0);
+	colors.capture_marker = color(1, 0.7f, 0, 0);
+	colors.text_soft = Gray;
+	colors.text = color(1, 0.3f, 0.3f, 0.3f);
+	colors.sample = color(1, 0.6f, 0.6f, 0);
+	colors.sample_hover = color(1, 0.6f, 0, 0);
+	colors.sample_selected = color(1, 0.4f, 0.4f, 0.4f);
 
 	drawing_rect = rect(0, 1024, 0, 768);
 	enabled = true;
@@ -815,8 +825,8 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 //	double dw = dl * a->view_zoom;
 	int nx0 = floor(screen2sample(r.x1 - 1) / dl);
 	int nx1 = ceil(screen2sample(r.x2) / dl);
-	color c1 = ColorInterpolate(bg, ColorGrid, exp_s_mod);
-	color c2 = ColorGrid;
+	color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod);
+	color c2 = colors.grid;
 	for (int n=nx0; n<nx1; n++){
 		c->setColor(((n % 10) == 0) ? c2 : c1);
 		int xx = sample2screen(n * dl);
@@ -824,14 +834,14 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 	}
 	if (show_time){
 		if (stream->isPlaying()){
-			color cc = ColorPreviewMarker;
+			color cc = colors.preview_marker;
 			cc.a = 0.25f;
 			c->setColor(cc);
 			float x0 = sample2screen(renderer->range().start());
 			float x1 = sample2screen(renderer->range().end());
 			c->drawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
-		c->setColor(ColorGrid);
+		c->setColor(colors.grid);
 		for (int n=nx0; n<nx1; n++){
 			if ((sample2screen(dl) - sample2screen(0)) > 25){
 				if (n % 5 == 0)
@@ -878,13 +888,13 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 		float f2 = min(1.0f, dx_beat / 25.0f);
 
 		if (f1 >= 0.1f){
-			c->setColor(ColorInterpolate(bg, ColorWave, f1));
+			c->setColor(ColorInterpolate(bg, colors.text_soft, f1));
 			c->setLineDash(no_dash, r.y1);
 			c->drawLine(xx, r.y1, xx, r.y2);
 		}
 
 		if (f2 >= 0.1f){
-			color c1 = ColorInterpolate(bg, ColorWave, f2);
+			color c1 = ColorInterpolate(bg, colors.text_soft, f2);
 			float beat_length = (float)b.range.num / (float)b.num_beats;
 			c->setLineDash(dash, r.y1);
 			for (int i=0; i<b.num_beats; i++){
@@ -906,7 +916,7 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 		}
 
 		if ((show_time) and (f1 > 0.9f)){
-			c->setColor(ColorWave);
+			c->setColor(colors.text_soft);
 			c->drawStr(xx + 2, r.y1, i2s(b.index + 1));
 		}
 	}
@@ -1103,7 +1113,7 @@ void AudioView::drawTimeLine(HuiPainter *c, int pos, int type, color &col, bool 
 {
 	int p = sample2screen(pos);
 	if ((p >= area.x1) and (p <= area.x2)){
-		c->setColor((type == hover.type) ? ColorSelectionBoundaryMO : col);
+		c->setColor((type == hover.type) ? colors.selection_boundary_hover : col);
 		c->drawLine(p, area.y1, p, area.y2);
 		if (show_time)
 			c->drawStr(p, (area.y1 + area.y2) / 2, audio->get_time_str_long(pos));
@@ -1117,13 +1127,13 @@ void AudioView::drawBackground(HuiPainter *c, const rect &r)
 		yy = vtrack.back()->area.y2;
 
 	// time scale
-	c->setColor(ColorBackgroundCurWave);
+	c->setColor(colors.Background_track);
 	c->drawRect(r.x1, r.y1, r.width(), TIME_SCALE_HEIGHT);
-	drawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), ColorBackgroundCurWave, true);
+	drawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), colors.Background_track, true);
 
 	// tracks
 	foreachi(AudioViewTrack *t, vtrack, i){
-		color cc = (t->track->is_selected) ? ColorBackgroundCurTrack : ColorBackgroundCurWave;
+		color cc = (t->track->is_selected) ? colors.background_track_selected : colors.Background_track;
 		c->setColor(cc);
 		c->drawRect(t->area);
 
@@ -1150,14 +1160,14 @@ void AudioView::drawBackground(HuiPainter *c, const rect &r)
 
 	// free space below tracks
 	if (yy < r.y2){
-		c->setColor(ColorBackground);
+		c->setColor(colors.background);
 		rect rr = rect(r.x1, r.x2, yy, r.y2);
 		c->drawRect(rr);
-		drawGridTime(c, rr, ColorBackground, false);
+		drawGridTime(c, rr, colors.background, false);
 	}
 
 	// lines between tracks
-	c->setColor(ColorGrid);
+	c->setColor(colors.grid);
 	foreachi(AudioViewTrack *t, vtrack, i)
 		c->drawLine(0, t->area.y1, r.width(), t->area.y1);
 	if (yy < r.y2)
@@ -1172,12 +1182,12 @@ void AudioView::drawSelection(HuiPainter *c, const rect &r)
 	int sx2 = sample2screen(sel_range.end());
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
-	c->setColor(ColorSelectionInternal);
+	c->setColor(colors.selection_internal);
 	foreachi(AudioViewTrack *t, vtrack, i)
 		if (t->track->is_selected)
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
-	drawTimeLine(c, sel_raw.start(), SEL_TYPE_SELECTION_START, ColorSelectionBoundary);
-	drawTimeLine(c, sel_raw.end(), SEL_TYPE_SELECTION_END, ColorSelectionBoundary);
+	drawTimeLine(c, sel_raw.start(), SEL_TYPE_SELECTION_START, colors.selection_boundary);
+	drawTimeLine(c, sel_raw.end(), SEL_TYPE_SELECTION_END, colors.selection_boundary);
 }
 
 void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
@@ -1190,14 +1200,9 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 	// background
 	drawBackground(c, r);
 
-
-	c->setColor(ColorWaveCur);
-
 	// tracks
 	foreachi(AudioViewTrack *t, vtrack, i)
-		t->drawTrack(c, t->area, ColorWaveCur, i);
-	/*foreachi(Track *tt, audio->track, i)
-		DrawTrack(c, thm.area[i], tt, ColorWaveCur, i);*/
+		t->drawTrack(c, t->area, i);
 
 
 	// selection
@@ -1206,12 +1211,12 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 	// playing position
 	if (stream->isPlaying()){
 		if (!input->isCapturing())
-			drawTimeLine(c, stream->getPos(), SEL_TYPE_PLAYBACK, ColorPreviewMarker, true);
+			drawTimeLine(c, stream->getPos(), SEL_TYPE_PLAYBACK, colors.preview_marker, true);
 	}
 
 	// capturing position
 	if (input->isCapturing())
-		drawTimeLine(c, sel_range.start() + input->getSampleCount(), SEL_TYPE_PLAYBACK, ColorCaptureMarker, true);
+		drawTimeLine(c, sel_range.start() + input->getSampleCount(), SEL_TYPE_PLAYBACK, colors.capture_marker, true);
 }
 
 int frame=0;

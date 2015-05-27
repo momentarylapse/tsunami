@@ -69,20 +69,35 @@ public:
 	void updateMenu();
 
 
-	color ColorBackground;
-	color ColorBackgroundCurWave;
-	color ColorBackgroundCurTrack;
-	color ColorGrid;
-	color ColorSelectionInternal;
-	color ColorSelectionBoundary;
-	color ColorSelectionBoundaryMO;
-	color ColorPreviewMarker;
-	color ColorCaptureMarker;
-	color ColorWave;
-	color ColorWaveCur;
-	color ColorSub;
-	color ColorSubMO;
-	color ColorSubNotCur;
+	struct ColorSchemeBasic
+	{
+		color background;
+		color text;
+		color selection;
+		string name;
+	};
+	Array<ColorSchemeBasic> basic_schemes;
+
+	struct ColorScheme
+	{
+		color background;
+		color Background_track;
+		color background_track_selected;
+		color grid;
+		color selection_internal;
+		color selection_boundary;
+		color selection_boundary_hover;
+		color preview_marker;
+		color capture_marker;
+		color text;
+		color text_soft;
+		color sample;
+		color sample_selected;
+		color sample_hover;
+		void create(ColorSchemeBasic &basic);
+	};
+	ColorScheme colors;
+
 	static const int SUB_FRAME_HEIGHT;
 	static const int TIME_SCALE_HEIGHT;
 	static const float LINE_WIDTH;

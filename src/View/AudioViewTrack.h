@@ -32,8 +32,8 @@ public:
 	void drawSample(HuiPainter *c, const rect &r, SampleRef *s);
 	void drawMarker(HuiPainter *c, const rect &r, TrackMarker &marker);
 	void drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift);
-	void drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi, color col);
-	void drawTrack(HuiPainter *c, const rect &r, color col, int track_no);
+	void drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi);
+	void drawTrack(HuiPainter *c, const rect &r, int track_no);
 
 	Track *track;
 	rect area;

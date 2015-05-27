@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-233
+234
 // Data (ID,Text)
 about
 
@@ -311,6 +311,8 @@ pdp_capture
 !bold\\Recording
 pdp_capturedevice
 
+pdp_colorscheme
+
 pdp_general
 !bold\\General
 pdp_language
@@ -355,9 +357,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_137882
+rand_id_765758
 
-rand_id_574108
+rand_id_85720
 
 rdt_capture
 

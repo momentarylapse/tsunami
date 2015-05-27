@@ -12,11 +12,13 @@
 #include "../../Audio/AudioInputAudio.h"
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"
+#include "../AudioView.h"
 
 SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	HuiWindow("settings_dialog", _parent, _allow_parent)
 {
 	event("language", this, &SettingsDialog::onLanguage);
+	event("color_scheme", this, &SettingsDialog::onColorScheme);
 	event("ogg_bitrate", this, &SettingsDialog::onOggBitrate);
 	event("preview_device", this, &SettingsDialog::onPreviewDevice);
 	event("capture_device", this, &SettingsDialog::onCaptureDevice);
@@ -50,12 +52,22 @@ SettingsDialog::~SettingsDialog()
 
 void SettingsDialog::loadData()
 {
+	// language
 	Array<string> lang = HuiGetLanguages();
 	foreachi(string &l, lang, i){
-		setString("language", l);
+		addString("language", l);
 		if (l == HuiGetCurLanguage())
 			setInt("language", i);
 	}
+
+	// color scheme
+	foreachi(AudioView::ColorSchemeBasic &b, tsunami->_view->basic_schemes, i){
+		addString("color_scheme", b.name);
+		if (b.name == tsunami->_view->colors.name)
+			setInt("color_scheme", i);
+	}
+
+	// ogg quality
 	float CurOggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
 	foreachi(OggQuality &q, ogg_quality, i)
 		if (CurOggQuality > q.quality - 0.05f)
@@ -103,6 +115,13 @@ void SettingsDialog::onLanguage()
 	int l = getInt("");
 	HuiSetLanguage(lang[l]);
 	HuiConfig.setStr("Language", lang[l]);
+}
+
+void SettingsDialog::onColorScheme()
+{
+	int i = getInt("");
+	if ((i >= 0) and (i < tsunami->_view->basic_schemes.num))
+		tsunami->_view->setColorScheme(tsunami->_view->basic_schemes[i].name);
 }
 
 void SettingsDialog::onOggBitrate()

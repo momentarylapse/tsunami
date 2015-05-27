@@ -20,6 +20,7 @@ public:
 	void applyData();
 
 	void onLanguage();
+	void onColorScheme();
 	void onOggBitrate();
 	void onPreviewDevice();
 	void onCaptureDevice();

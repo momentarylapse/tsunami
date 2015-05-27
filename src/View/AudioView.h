@@ -80,19 +80,15 @@ public:
 	};
 	Array<ColorSchemeBasic> basic_schemes;
 
-	struct ColorScheme
+	struct ColorScheme : ColorSchemeBasic
 	{
-		color background;
 		color background_track;
 		color background_track_selected;
-		color selection;
-		color hover;
 		color selection_internal;
 		color selection_boundary;
 		color selection_boundary_hover;
 		color preview_marker;
 		color capture_marker;
-		color text;
 		color text_soft1;
 		color text_soft2;
 		color text_soft3;
@@ -103,6 +99,7 @@ public:
 		void create(ColorSchemeBasic &basic);
 	};
 	ColorScheme colors;
+	void setColorScheme(const string &name);
 
 	static const int SUB_FRAME_HEIGHT;
 	static const int TIME_SCALE_HEIGHT;

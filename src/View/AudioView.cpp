@@ -69,6 +69,7 @@ AudioView::SelectionType::SelectionType()
 
 void AudioView::ColorScheme::create(ColorSchemeBasic &basic)
 {
+	name = basic.name;
 	background = basic.background;
 	background_track_selected = ColorInterpolate(basic.background, basic.selection*1.5f, 0.17f);
 	background_track = ColorInterpolate(background, background_track_selected, 0.5f);
@@ -108,6 +109,8 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	bright.selection = color(1, 0.2f, 0.2f, 0.7f);
 	bright.hover = White;
 	bright.gamma = 1.0f;
+	bright.name = "bright";
+	basic_schemes.add(bright);
 
 	ColorSchemeBasic dark;
 	dark.background = color(1, 0.15f, 0.15f, 0.15f);
@@ -115,11 +118,10 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	dark.selection = color(1, 0.3f, 0.3f, 0.8f);
 	dark.hover = White;
 	dark.gamma = 0.3f;
+	dark.name = "dark";
+	basic_schemes.add(dark);
 
-	if (HuiConfig.getStr("View.ColorScheme", "bright") == "dark")
-		colors.create(dark);
-	else
-		colors.create(bright);
+	setColorScheme(HuiConfig.getStr("View.ColorScheme", "bright"));
 
 	drawing_rect = rect(0, 1024, 0, 768);
 	enabled = true;
@@ -223,6 +225,15 @@ AudioView::~AudioView()
 	HuiConfig.setBool("View.Antialiasing", antialiasing);
 }
 
+void AudioView::setColorScheme(const string &name)
+{
+	HuiConfig.setStr("View.ColorScheme", name);
+	colors.create(basic_schemes[0]);
+	foreach(ColorSchemeBasic &b, basic_schemes)
+		if (b.name == name)
+			colors.create(b);
+	forceRedraw();
+}
 
 void AudioView::setMouse()
 {

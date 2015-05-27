@@ -203,7 +203,7 @@ ad_t_data
 afd_grid_1
 
 ControlTable
-rand_id_93203
+rand_id_661507
 
 1
 0
@@ -226,10 +226,10 @@ data_list
 -1
 0
 0
-rand_id_93203
+rand_id_661507
 
 ControlTable
-rand_id_21913
+rand_id_999606
 
 1
 0
@@ -239,7 +239,7 @@ rand_id_21913
 -1
 0
 0
-rand_id_93203
+rand_id_661507
 
 Text
 ad_t_samplerate
@@ -252,7 +252,7 @@ ad_t_samplerate
 -1
 0
 0
-rand_id_21913
+rand_id_999606
 
 ComboBox
 samplerate
@@ -265,7 +265,7 @@ samplerate
 -1
 0
 0
-rand_id_21913
+rand_id_999606
 
 Text
 ad_t_format
@@ -278,7 +278,7 @@ ad_t_format
 -1
 0
 0
-rand_id_21913
+rand_id_999606
 
 ComboBox
 format
@@ -291,7 +291,7 @@ format
 -1
 0
 0
-rand_id_21913
+rand_id_999606
 
 CheckBox
 compress
@@ -304,7 +304,7 @@ compress
 -1
 0
 0
-rand_id_21913
+rand_id_999606
 
 Group
 ad_t_tags
@@ -320,7 +320,7 @@ ad_t_tags
 afd_grid_1
 
 ControlTable
-rand_id_336317
+rand_id_192582
 
 1
 0
@@ -343,10 +343,10 @@ tags
 -1
 0
 0
-rand_id_336317
+rand_id_192582
 
 ControlTable
-rand_id_400537
+rand_id_591505
 
 1
 0
@@ -356,7 +356,7 @@ rand_id_400537
 -1
 0
 0
-rand_id_336317
+rand_id_192582
 
 Button
 add_tag
@@ -369,7 +369,7 @@ hui:add
 -1
 0
 0
-rand_id_400537
+rand_id_591505
 
 Button
 delete_tag
@@ -382,7 +382,7 @@ hui:delete
 -1
 0
 0
-rand_id_400537
+rand_id_591505
 
 Expander
 ad_t_bars
@@ -398,7 +398,7 @@ ad_t_bars
 afd_grid_1
 
 ControlTable
-rand_id_735720
+rand_id_919435
 
 1
 0
@@ -421,10 +421,10 @@ audio_bar_list
 -1
 0
 0
-rand_id_735720
+rand_id_919435
 
 ControlTable
-rand_id_716398
+rand_id_459972
 
 1
 0
@@ -434,7 +434,7 @@ rand_id_716398
 -1
 0
 0
-rand_id_735720
+rand_id_919435
 
 Button
 audio_add_bar
@@ -447,7 +447,7 @@ hui:add
 -1
 0
 0
-rand_id_716398
+rand_id_459972
 
 Button
 audio_add_bar_pause
@@ -460,7 +460,7 @@ hui:add
 -1
 0
 0
-rand_id_716398
+rand_id_459972
 
 Button
 audio_delete_bar
@@ -473,7 +473,7 @@ hui:delete
 -1
 0
 0
-rand_id_716398
+rand_id_459972
 
 Group
 ad_t_edit
@@ -489,7 +489,7 @@ ad_t_edit
 afd_grid_1
 
 ControlTable
-rand_id_618694
+rand_id_718715
 
 1
 0
@@ -512,7 +512,7 @@ edit_levels
 -1
 0
 0
-rand_id_618694
+rand_id_718715
 
 // Resource
 SizableDialog
@@ -677,7 +677,7 @@ levels
 lvld_grid_1
 
 ControlTable
-rand_id_859778
+rand_id_578034
 
 1
 0
@@ -700,7 +700,7 @@ hui:add
 -1
 0
 0
-rand_id_859778
+rand_id_578034
 
 Button
 delete_level
@@ -713,7 +713,7 @@ hui:delete
 -1
 0
 0
-rand_id_859778
+rand_id_578034
 
 Group
 lvld_t_edit
@@ -729,7 +729,7 @@ lvld_t_edit
 lvld_grid_1
 
 ControlTable
-rand_id_472267
+rand_id_282115
 
 1
 0
@@ -752,7 +752,7 @@ edit_file
 -1
 0
 0
-rand_id_472267
+rand_id_282115
 
 // Resource
 Toolbar
@@ -811,7 +811,7 @@ marker_dialog
 
 5
 ControlTable
-rand_id_963164
+rand_id_375046
 
 1
 0
@@ -834,7 +834,7 @@ text
 -1
 0
 0
-rand_id_963164
+rand_id_375046
 
 ControlTable
 marker_dialog_buttonbar
@@ -847,7 +847,7 @@ marker_dialog_buttonbar
 -1
 0
 0
-rand_id_963164
+rand_id_375046
 
 Button
 cancel
@@ -2063,7 +2063,7 @@ midi_editor
 
 27
 ControlTable
-rand_id_158962
+rand_id_888224
 
 1
 0
@@ -2086,7 +2086,7 @@ me_grid_no
 -1
 0
 0
-rand_id_158962
+rand_id_888224
 
 Text
 ld_t_no_midi
@@ -2112,7 +2112,7 @@ me_grid_yes
 -1
 0
 0
-rand_id_158962
+rand_id_888224
 
 Group
 me_group_view
@@ -2128,7 +2128,7 @@ me_group_view
 me_grid_yes
 
 ControlTable
-rand_id_219099
+rand_id_81205
 
 1
 0
@@ -2151,7 +2151,7 @@ ld_t_pitch
 -1
 0
 0
-rand_id_219099
+rand_id_81205
 
 SpinButton
 pitch_offset
@@ -2164,7 +2164,7 @@ pitch_offset
 -1
 0
 0
-rand_id_219099
+rand_id_81205
 
 Text
 ld_t_partition
@@ -2177,7 +2177,7 @@ ld_t_partition
 -1
 0
 0
-rand_id_219099
+rand_id_81205
 
 SpinButton
 beat_partition
@@ -2190,7 +2190,7 @@ beat_partition
 -1
 0
 0
-rand_id_219099
+rand_id_81205
 
 Text
 ld_t_scale
@@ -2203,7 +2203,7 @@ ld_t_scale
 -1
 0
 0
-rand_id_219099
+rand_id_81205
 
 ComboBox
 scale
@@ -2216,7 +2216,7 @@ scale
 -1
 0
 0
-rand_id_219099
+rand_id_81205
 
 Group
 me_group_chord
@@ -2232,7 +2232,7 @@ me_group_chord
 me_grid_yes
 
 ControlTable
-rand_id_904578
+rand_id_19924
 
 1
 0
@@ -2255,7 +2255,7 @@ midi_mode:note
 -1
 0
 0
-rand_id_904578
+rand_id_19924
 
 RadioButton
 midi_mode:chord
@@ -2268,10 +2268,10 @@ midi_mode:chord
 -1
 0
 0
-rand_id_904578
+rand_id_19924
 
 ControlTable
-rand_id_494514
+rand_id_26873
 
 1
 0
@@ -2281,7 +2281,7 @@ rand_id_494514
 -1
 0
 0
-rand_id_904578
+rand_id_19924
 
 Text
 ld_t_space
@@ -2294,7 +2294,7 @@ ld_t_space
 -1
 0
 0
-rand_id_494514
+rand_id_26873
 
 Text
 ld_t_chord
@@ -2307,7 +2307,7 @@ ld_t_chord
 -1
 0
 0
-rand_id_494514
+rand_id_26873
 
 ComboBox
 chord_type
@@ -2320,7 +2320,7 @@ chord_type
 -1
 0
 0
-rand_id_494514
+rand_id_26873
 
 Text
 ld_t_inversion
@@ -2333,7 +2333,7 @@ ld_t_inversion
 -1
 0
 0
-rand_id_494514
+rand_id_26873
 
 ComboBox
 chord_inversion
@@ -2346,7 +2346,7 @@ chord_inversion
 -1
 0
 0
-rand_id_494514
+rand_id_26873
 
 Group
 me_group_edit
@@ -2362,7 +2362,7 @@ me_group_edit
 me_grid_yes
 
 ControlTable
-rand_id_284341
+rand_id_310728
 
 1
 0
@@ -2385,7 +2385,7 @@ edit_file
 -1
 0
 0
-rand_id_284341
+rand_id_310728
 
 Button
 edit_track
@@ -2398,7 +2398,7 @@ edit_track
 -1
 0
 0
-rand_id_284341
+rand_id_310728
 
 Button
 edit_midi_fx
@@ -2411,7 +2411,7 @@ edit_midi_fx
 -1
 0
 0
-rand_id_284341
+rand_id_310728
 
 // Resource
 SizableDialog
@@ -2429,7 +2429,7 @@ midi_fx_editor
 
 6
 ControlTable
-rand_id_983875
+rand_id_430560
 
 1
 0
@@ -2452,7 +2452,7 @@ me_grid_no
 -1
 0
 0
-rand_id_983875
+rand_id_430560
 
 Text
 mfx_t_no_midi
@@ -2478,7 +2478,7 @@ midi_fx_inner_table
 -1
 0
 0
-rand_id_983875
+rand_id_430560
 
 Text
 comment_no_fx
@@ -2522,7 +2522,7 @@ new_dialog
 
 19
 ControlTable
-rand_id_364557
+rand_id_796933
 
 1
 0
@@ -2545,10 +2545,10 @@ nd_g_frequency
 -1
 0
 0
-rand_id_364557
+rand_id_796933
 
 ControlTable
-rand_id_78175
+rand_id_544254
 
 1
 0
@@ -2571,7 +2571,7 @@ sample_rate
 -1
 0
 0
-rand_id_78175
+rand_id_544254
 
 Text
 per_second
@@ -2584,7 +2584,7 @@ per_second
 -1
 0
 0
-rand_id_78175
+rand_id_544254
 
 Group
 nd_g_metronome
@@ -2597,10 +2597,10 @@ nd_g_metronome
 -1
 0
 0
-rand_id_364557
+rand_id_796933
 
 ControlTable
-rand_id_814769
+rand_id_713000
 
 1
 0
@@ -2623,7 +2623,7 @@ metronome
 -1
 0
 0
-rand_id_814769
+rand_id_713000
 
 ControlTable
 nd_g_metronome_params
@@ -2636,7 +2636,7 @@ nd_g_metronome_params
 -1
 0
 0
-rand_id_814769
+rand_id_713000
 
 Text
 nd_t_bpm
@@ -2740,7 +2740,7 @@ new_dialog_buttonbar
 -1
 0
 0
-rand_id_364557
+rand_id_796933
 
 Button
 cancel
@@ -3132,7 +3132,7 @@ record_dialog
 
 21
 ControlTable
-rand_id_506591
+rand_id_470043
 
 1
 0
@@ -3155,10 +3155,10 @@ rdt_source
 -1
 0
 0
-rand_id_506591
+rand_id_470043
 
 ControlTable
-rand_id_164716
+rand_id_93855
 
 1
 0
@@ -3171,7 +3171,7 @@ rand_id_164716
 rdt_source
 
 ControlTable
-rand_id_300131
+rand_id_916217
 
 1
 0
@@ -3181,7 +3181,7 @@ rand_id_300131
 -1
 0
 0
-rand_id_164716
+rand_id_93855
 
 RadioButton
 capture_type:audio
@@ -3194,7 +3194,7 @@ capture_type:audio
 -1
 0
 0
-rand_id_300131
+rand_id_916217
 
 RadioButton
 capture_type:midi
@@ -3207,7 +3207,7 @@ capture_type:midi
 -1
 0
 0
-rand_id_300131
+rand_id_916217
 
 ComboBox
 capture_source
@@ -3220,7 +3220,7 @@ capture_source
 -1
 0
 0
-rand_id_164716
+rand_id_93855
 
 Group
 rdt_capture
@@ -3233,10 +3233,10 @@ rdt_capture
 -1
 0
 0
-rand_id_506591
+rand_id_470043
 
 ControlTable
-rand_id_492935
+rand_id_924401
 
 1
 0
@@ -3249,7 +3249,7 @@ rand_id_492935
 rdt_capture
 
 ControlTable
-rand_id_272475
+rand_id_984113
 
 1
 0
@@ -3259,7 +3259,7 @@ rand_id_272475
 -1
 0
 0
-rand_id_492935
+rand_id_924401
 
 Text
 capture_time
@@ -3272,7 +3272,7 @@ capture_time
 -1
 0
 0
-rand_id_272475
+rand_id_984113
 
 DrawingArea
 capture_level
@@ -3285,10 +3285,10 @@ capture_level
 -1
 0
 0
-rand_id_272475
+rand_id_984113
 
 ControlTable
-rand_id_596814
+rand_id_283499
 
 1
 0
@@ -3298,7 +3298,7 @@ rand_id_596814
 -1
 0
 0
-rand_id_492935
+rand_id_924401
 
 Button
 capture_start
@@ -3311,7 +3311,7 @@ hui:media-record
 -1
 0
 0
-rand_id_596814
+rand_id_283499
 
 Button
 capture_pause
@@ -3324,7 +3324,7 @@ hui:media-pause
 -1
 0
 0
-rand_id_596814
+rand_id_283499
 
 Button
 capture_delete
@@ -3337,7 +3337,7 @@ hui:delete
 -1
 0
 0
-rand_id_596814
+rand_id_283499
 
 Group
 rdt_target
@@ -3350,7 +3350,7 @@ rdt_target
 -1
 0
 0
-rand_id_506591
+rand_id_470043
 
 ComboBox
 capture_target
@@ -3376,7 +3376,7 @@ record_dialog_buttonbar
 -1
 0
 0
-rand_id_506591
+rand_id_470043
 
 Button
 cancel
@@ -3420,7 +3420,7 @@ sample_manager_dialog
 
 9
 ControlTable
-rand_id_592055
+rand_id_551583
 
 1
 0
@@ -3443,10 +3443,10 @@ sample_list
 -1
 0
 0
-rand_id_592055
+rand_id_551583
 
 ControlTable
-rand_id_975559
+rand_id_300749
 
 1
 0
@@ -3456,7 +3456,7 @@ rand_id_975559
 -1
 0
 0
-rand_id_592055
+rand_id_551583
 
 Button
 import_from_file
@@ -3469,7 +3469,7 @@ hui:open
 -1
 0
 0
-rand_id_975559
+rand_id_300749
 
 Button
 export_sample
@@ -3482,7 +3482,7 @@ hui:save
 -1
 0
 0
-rand_id_975559
+rand_id_300749
 
 Button
 delete_sample
@@ -3495,7 +3495,7 @@ hui:delete
 -1
 0
 0
-rand_id_975559
+rand_id_300749
 
 Button
 preview_sample
@@ -3508,7 +3508,7 @@ hui:media-play
 -1
 0
 0
-rand_id_975559
+rand_id_300749
 
 Button
 paste_sample
@@ -3521,7 +3521,7 @@ hui:paste
 -1
 0
 0
-rand_id_975559
+rand_id_300749
 
 Button
 create_from_selection
@@ -3534,7 +3534,7 @@ hui:copy
 -1
 0
 0
-rand_id_975559
+rand_id_300749
 
 // Resource
 SizableDialog
@@ -3552,7 +3552,7 @@ sample_ref_dialog
 
 21
 ControlTable
-rand_id_790925
+rand_id_131962
 
 1
 0
@@ -3575,7 +3575,7 @@ ld_t_name
 -1
 0
 0
-rand_id_790925
+rand_id_131962
 
 Edit
 name
@@ -3601,7 +3601,7 @@ ld_t_track
 -1
 0
 0
-rand_id_790925
+rand_id_131962
 
 ComboBox
 level_track
@@ -3627,10 +3627,10 @@ ld_t_volume
 -1
 0
 0
-rand_id_790925
+rand_id_131962
 
 ControlTable
-rand_id_815136
+rand_id_303870
 
 1
 0
@@ -3653,7 +3653,7 @@ volume
 -1
 0
 0
-rand_id_815136
+rand_id_303870
 
 Text
 db
@@ -3666,7 +3666,7 @@ db
 -1
 0
 0
-rand_id_815136
+rand_id_303870
 
 CheckBox
 mute
@@ -3679,7 +3679,7 @@ mute
 -1
 0
 0
-rand_id_815136
+rand_id_303870
 
 Group
 ld_t_repetition
@@ -3692,10 +3692,10 @@ ld_t_repetition
 -1
 0
 0
-rand_id_790925
+rand_id_131962
 
 ControlTable
-rand_id_878634
+rand_id_917107
 
 1
 0
@@ -3718,7 +3718,7 @@ ld_t_repnum
 -1
 0
 0
-rand_id_878634
+rand_id_917107
 
 SpinButton
 repnum
@@ -3731,7 +3731,7 @@ repnum
 -1
 0
 0
-rand_id_878634
+rand_id_917107
 
 Text
 ld_t_repdelay
@@ -3744,7 +3744,7 @@ ld_t_repdelay
 -1
 0
 0
-rand_id_878634
+rand_id_917107
 
 SpinButton
 repdelay
@@ -3757,7 +3757,7 @@ repdelay
 -1
 0
 0
-rand_id_878634
+rand_id_917107
 
 Text
 ms
@@ -3770,7 +3770,7 @@ ms
 -1
 0
 0
-rand_id_878634
+rand_id_917107
 
 Group
 ld_t_edit
@@ -3783,10 +3783,10 @@ ld_t_edit
 -1
 0
 0
-rand_id_790925
+rand_id_131962
 
 ControlTable
-rand_id_900279
+rand_id_692595
 
 1
 0
@@ -3809,7 +3809,7 @@ edit_file
 -1
 0
 0
-rand_id_900279
+rand_id_692595
 
 Button
 edit_track
@@ -3822,7 +3822,7 @@ edit_track
 -1
 0
 0
-rand_id_900279
+rand_id_692595
 
 // Resource
 SizableDialog
@@ -3838,9 +3838,9 @@ settings_dialog
 0
 
 
-23
+25
 ControlTable
-rand_id_908339
+rand_id_965377
 
 1
 0
@@ -3863,16 +3863,16 @@ pdp_general
 -1
 0
 0
-rand_id_908339
+rand_id_965377
 
 ControlTable
-rand_id_900547
+rand_id_916713
 
 1
 0
 0
-3
 2
+3
 -1
 0
 0
@@ -3889,7 +3889,7 @@ pdp_language
 -1
 0
 0
-rand_id_900547
+rand_id_916713
 
 ComboBox
 language
@@ -3902,33 +3902,59 @@ language
 -1
 0
 0
-rand_id_900547
+rand_id_916713
+
+Text
+pdp_colorscheme
+
+1
+0
+1
+1
+1
+-1
+0
+0
+rand_id_916713
+
+ComboBox
+color_scheme
+
+1
+1
+1
+1
+1
+-1
+0
+0
+rand_id_916713
 
 Text
 pdt_oggrate
 
 1
 0
-1
+2
 1
 1
 -1
 0
 0
-rand_id_900547
+rand_id_916713
 
 ComboBox
 ogg_bitrate
 
 1
 1
-1
+2
 1
 1
 -1
 0
 0
-rand_id_900547
+rand_id_916713
 
 Group
 pdp_preview
@@ -3941,10 +3967,10 @@ pdp_preview
 -1
 0
 0
-rand_id_908339
+rand_id_965377
 
 ControlTable
-rand_id_236596
+rand_id_885178
 
 1
 0
@@ -3967,7 +3993,7 @@ pdp_previewdevice
 -1
 0
 0
-rand_id_236596
+rand_id_885178
 
 ComboBox
 preview_device
@@ -3980,7 +4006,7 @@ preview_device
 -1
 0
 0
-rand_id_236596
+rand_id_885178
 
 Group
 pdp_capture
@@ -3993,10 +4019,10 @@ pdp_capture
 -1
 0
 0
-rand_id_908339
+rand_id_965377
 
 ControlTable
-rand_id_308876
+rand_id_556883
 
 1
 0
@@ -4019,7 +4045,7 @@ pdp_capturedevice
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 ComboBox
 capture_device
@@ -4032,7 +4058,7 @@ capture_device
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 Text
 pdt_capturedelay
@@ -4045,7 +4071,7 @@ pdt_capturedelay
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 SpinButton
 capture_delay
@@ -4058,7 +4084,7 @@ capture_delay
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 Text
 ms
@@ -4071,7 +4097,7 @@ ms
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 Text
 pdt_capturetempfile
@@ -4084,7 +4110,7 @@ pdt_capturetempfile
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 Edit
 capture_filename
@@ -4097,7 +4123,7 @@ capture_filename
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 Button
 capture_find
@@ -4110,7 +4136,7 @@ hui:open
 -1
 0
 0
-rand_id_308876
+rand_id_556883
 
 ControlTable
 properties_dialog_buttonbar
@@ -4123,7 +4149,7 @@ properties_dialog_buttonbar
 -1
 0
 0
-rand_id_908339
+rand_id_965377
 
 DefButton
 close
@@ -4416,7 +4442,7 @@ td_t_volume
 ttd_grid_0
 
 ControlTable
-rand_id_636268
+rand_id_836149
 
 1
 0
@@ -4439,7 +4465,7 @@ ld_tt_volume
 -1
 0
 0
-rand_id_636268
+rand_id_836149
 
 SpinButton
 volume
@@ -4452,7 +4478,7 @@ volume
 -1
 0
 0
-rand_id_636268
+rand_id_836149
 
 Text
 db
@@ -4465,7 +4491,7 @@ db
 -1
 0
 0
-rand_id_636268
+rand_id_836149
 
 Text
 ld_tt_panning
@@ -4478,7 +4504,7 @@ ld_tt_panning
 -1
 0
 0
-rand_id_636268
+rand_id_836149
 
 SpinButton
 panning
@@ -4491,7 +4517,7 @@ panning
 -1
 0
 0
-rand_id_636268
+rand_id_836149
 
 Text
 percent
@@ -4504,7 +4530,7 @@ percent
 -1
 0
 0
-rand_id_636268
+rand_id_836149
 
 Group
 td_t_bars
@@ -4520,7 +4546,7 @@ td_t_bars
 ttd_grid_0
 
 ControlTable
-rand_id_952995
+rand_id_345150
 
 1
 0
@@ -4543,10 +4569,10 @@ bar_list
 -1
 0
 0
-rand_id_952995
+rand_id_345150
 
 ControlTable
-rand_id_927571
+rand_id_275598
 
 1
 0
@@ -4556,7 +4582,7 @@ rand_id_927571
 -1
 0
 0
-rand_id_952995
+rand_id_345150
 
 Button
 add_bar
@@ -4569,7 +4595,7 @@ hui:add
 -1
 0
 0
-rand_id_927571
+rand_id_275598
 
 Button
 add_bar_pause
@@ -4582,7 +4608,7 @@ hui:add
 -1
 0
 0
-rand_id_927571
+rand_id_275598
 
 Button
 delete_bar
@@ -4595,7 +4621,7 @@ hui:delete
 -1
 0
 0
-rand_id_927571
+rand_id_275598
 
 Group
 td_t_edit
@@ -4611,7 +4637,7 @@ td_t_edit
 ttd_grid_0
 
 ControlTable
-rand_id_496046
+rand_id_414183
 
 1
 0
@@ -4624,7 +4650,7 @@ rand_id_496046
 td_t_edit
 
 ControlTable
-rand_id_425262
+rand_id_627266
 
 1
 0
@@ -4634,7 +4660,7 @@ rand_id_425262
 -1
 0
 0
-rand_id_496046
+rand_id_414183
 
 Button
 edit_file
@@ -4647,7 +4673,7 @@ edit_file
 -1
 0
 0
-rand_id_425262
+rand_id_627266
 
 Button
 edit_fx
@@ -4660,7 +4686,7 @@ edit_fx
 -1
 0
 0
-rand_id_425262
+rand_id_627266
 
 Button
 edit_midi
@@ -4673,10 +4699,10 @@ edit_midi
 -1
 0
 0
-rand_id_425262
+rand_id_627266
 
 ControlTable
-rand_id_890735
+rand_id_650645
 
 1
 0
@@ -4686,7 +4712,7 @@ rand_id_890735
 -1
 0
 0
-rand_id_496046
+rand_id_414183
 
 Button
 edit_midi_fx
@@ -4699,7 +4725,7 @@ edit_midi_fx
 -1
 0
 0
-rand_id_890735
+rand_id_650645
 
 Button
 edit_synth
@@ -4712,14 +4738,14 @@ edit_synth
 -1
 0
 0
-rand_id_890735
+rand_id_650645
 
 // Number Of Languages
 2
 // Language
 Deutsch
 // NumIDs
-292
+294
 // Text
 about
 Info
@@ -4809,6 +4835,8 @@ chord_type
 !expandx\\
 close
 Schließen
+color_scheme
+
 comment_no_fx
 - hier sind (noch) keine Effekte aktiv -
 compress
@@ -5057,6 +5085,8 @@ pdp_capture
 Aufnahme
 pdp_capturedevice
 Gerät
+pdp_colorscheme
+Farbschema
 pdp_general
 Generell
 pdp_language
@@ -5107,87 +5137,87 @@ progress_dialog
 in Arbeit
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_107758
+rand_id_125104
 
-rand_id_109354
+rand_id_127209
 
-rand_id_112775
+rand_id_138649
 
-rand_id_118838
+rand_id_164065
 
-rand_id_123961
+rand_id_172824
 
-rand_id_124057
+rand_id_203216
 
-rand_id_142033
+rand_id_229522
 
-rand_id_194111
+rand_id_233525
 
-rand_id_199990
+rand_id_267390
 
-rand_id_21217
+rand_id_282439
 
-rand_id_218157
+rand_id_299721
 
-rand_id_223080
+rand_id_310189
 
-rand_id_226963
+rand_id_316636
 
-rand_id_296682
+rand_id_340657
 
-rand_id_299184
+rand_id_367282
 
-rand_id_307333
+rand_id_383248
 
-rand_id_335551
+rand_id_410636
 
-rand_id_344470
+rand_id_426378
 
-rand_id_380080
+rand_id_454357
 
-rand_id_485362
+rand_id_481180
 
-rand_id_595325
+rand_id_549600
 
-rand_id_65242
+rand_id_560633
 
-rand_id_654467
+rand_id_616357
 
-rand_id_703084
+rand_id_627182
 
-rand_id_713806
+rand_id_631949
 
-rand_id_746831
+rand_id_644877
 
-rand_id_755869
+rand_id_656331
 
-rand_id_79296
+rand_id_658599
 
-rand_id_793833
+rand_id_673109
 
-rand_id_811320
+rand_id_712170
 
-rand_id_830894
+rand_id_752286
 
-rand_id_844310
+rand_id_770060
 
-rand_id_86541
+rand_id_781247
 
-rand_id_870042
+rand_id_799089
 
-rand_id_870122
+rand_id_822143
 
-rand_id_897428
+rand_id_848463
 
-rand_id_903074
+rand_id_890258
 
-rand_id_915242
+rand_id_909221
 
-rand_id_941413
+rand_id_919828
 
-rand_id_986344
+rand_id_920776
 
-rand_id_99119
+rand_id_929998
 
 rdt_capture
 Aufnahme
@@ -5311,7 +5341,7 @@ Verkleinern
 // Language
 English
 // NumIDs
-292
+294
 // Text
 about
 
@@ -5401,6 +5431,8 @@ chord_type
 
 close
 Close
+color_scheme
+
 comment_no_fx
 
 compress
@@ -5649,6 +5681,8 @@ pdp_capture
 !bold\\Recording
 pdp_capturedevice
 
+pdp_colorscheme
+
 pdp_general
 !bold\\General
 pdp_language
@@ -5699,87 +5733,87 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_107758
+rand_id_125104
 
-rand_id_109354
+rand_id_127209
 
-rand_id_112775
+rand_id_138649
 
-rand_id_118838
+rand_id_164065
 
-rand_id_123961
+rand_id_172824
 
-rand_id_124057
+rand_id_203216
 
-rand_id_142033
+rand_id_229522
 
-rand_id_194111
+rand_id_233525
 
-rand_id_199990
+rand_id_267390
 
-rand_id_21217
+rand_id_282439
 
-rand_id_218157
+rand_id_299721
 
-rand_id_223080
+rand_id_310189
 
-rand_id_226963
+rand_id_316636
 
-rand_id_296682
+rand_id_340657
 
-rand_id_299184
+rand_id_367282
 
-rand_id_307333
+rand_id_383248
 
-rand_id_335551
+rand_id_410636
 
-rand_id_344470
+rand_id_426378
 
-rand_id_380080
+rand_id_454357
 
-rand_id_485362
+rand_id_481180
 
-rand_id_595325
+rand_id_549600
 
-rand_id_65242
+rand_id_560633
 
-rand_id_654467
+rand_id_616357
 
-rand_id_703084
+rand_id_627182
 
-rand_id_713806
+rand_id_631949
 
-rand_id_746831
+rand_id_644877
 
-rand_id_755869
+rand_id_656331
 
-rand_id_79296
+rand_id_658599
 
-rand_id_793833
+rand_id_673109
 
-rand_id_811320
+rand_id_712170
 
-rand_id_830894
+rand_id_752286
 
-rand_id_844310
+rand_id_770060
 
-rand_id_86541
+rand_id_781247
 
-rand_id_870042
+rand_id_799089
 
-rand_id_870122
+rand_id_822143
 
-rand_id_897428
+rand_id_848463
 
-rand_id_903074
+rand_id_890258
 
-rand_id_915242
+rand_id_909221
 
-rand_id_941413
+rand_id_919828
 
-rand_id_986344
+rand_id_920776
 
-rand_id_99119
+rand_id_929998
 
 rdt_capture
 

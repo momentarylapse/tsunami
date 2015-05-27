@@ -1,10 +1,11 @@
 Dialog settings_dialog "Einstellungen" 300 300
 	Grid ? "" 1 4
 		Group pdp_general "Generell"
-			Grid ? "" 3 2
+			Grid ? "" 2 3
 				Text pdp_language "Sprache"
 				ComboBox language "" expandx
-				.
+				Text pdp_colorscheme "Farbschema"
+				ComboBox color_scheme ""
 				Text pdt_oggrate "OGG-Bitrate"
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
 		Group pdp_preview "Ausgabe"

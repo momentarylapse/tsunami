@@ -316,7 +316,9 @@ class ColorScheme
 	color background_track
 	color background_track_selected
 	color text
-	color text_soft
+	color text_soft1
+	color text_soft2
+	color text_soft3
 	color grid
 	color selection
 	color hover

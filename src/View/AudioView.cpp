@@ -81,8 +81,10 @@ void AudioView::ColorScheme::create(ColorSchemeBasic &basic)
 	preview_marker = color(1, 0, 0.7f, 0);
 	capture_marker = color(1, 0.7f, 0, 0);
 	text = basic.text;
-	text_soft = ColorInterpolate(basic.background, basic.text, pow(0.72f, basic.gamma));
-	grid = ColorInterpolate(basic.background, ColorInterpolate(basic.text, basic.selection, 0.7f), pow(0.3f, basic.gamma));
+	text_soft1 = ColorInterpolate(basic.background, basic.text, pow(0.72f, basic.gamma));
+	text_soft3 = ColorInterpolate(basic.background, ColorInterpolate(basic.text, basic.selection, 0.7f), pow(0.3f, basic.gamma));
+	text_soft2 = ColorInterpolate(text_soft3, text_soft1, 0.4f);
+	grid = text_soft3;
 	sample = color(1, 0.6f, 0.6f, 0);
 	sample_hover = color(1, 0.6f, 0, 0);
 	sample_selected = color(1, 0.4f, 0.4f, 0.4f);
@@ -108,9 +110,9 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	bright.gamma = 1.0f;
 
 	ColorSchemeBasic dark;
-	dark.background = color(1, 0.05f, 0.05f, 0.05f);
+	dark.background = color(1, 0.15f, 0.15f, 0.15f);
 	dark.text = color(1, 0.95f, 0.95f, 0.95f);
-	dark.selection = color(1, 0.1f, 0.1f, 0.5f);
+	dark.selection = color(1, 0.3f, 0.3f, 0.8f);
 	dark.hover = White;
 	dark.gamma = 0.3f;
 
@@ -903,13 +905,13 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 		float f2 = min(1.0f, dx_beat / 25.0f);
 
 		if (f1 >= 0.1f){
-			c->setColor(ColorInterpolate(bg, colors.text_soft, f1));
+			c->setColor(ColorInterpolate(bg, colors.text_soft1, f1));
 			c->setLineDash(no_dash, r.y1);
 			c->drawLine(xx, r.y1, xx, r.y2);
 		}
 
 		if (f2 >= 0.1f){
-			color c1 = ColorInterpolate(bg, colors.text_soft, f2);
+			color c1 = ColorInterpolate(bg, colors.text_soft1, f2);
 			float beat_length = (float)b.range.num / (float)b.num_beats;
 			c->setLineDash(dash, r.y1);
 			for (int i=0; i<b.num_beats; i++){
@@ -931,7 +933,7 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 		}
 
 		if ((show_time) and (f1 > 0.9f)){
-			c->setColor(colors.text_soft);
+			c->setColor(colors.text_soft1);
 			c->drawStr(xx + 2, r.y1, i2s(b.index + 1));
 		}
 	}

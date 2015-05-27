@@ -166,11 +166,13 @@ class GridData
 	
 	color col_bg
 	color col_grid
+	color col_line
 	color col_text
 	
 	void __init__()
-		col_grid = view.colors.grid//color(1, 0.8, 0.8, 0.8)
-		col_text = view.colors.text_soft//color(1, 0.4, 0.4, 0.4)
+		col_grid = view.colors.grid
+		col_text = view.colors.text
+		col_line = view.colors.text_soft1
 		col_bg = view.colors.background
 		allow_bg = true
 		x_axis.min_label_dist = 60
@@ -197,7 +199,7 @@ class GridData
 				continue
 			c.drawLine(x, yy, x + w, yy)
 			if t.label.num > 0
-				c.setColor(col_text)
+				c.setColor(col_line)
 				c.drawLine(x, yy, x + 6, yy)
 				c.drawStr(x0 + 2, yy - 6, t.label)
 	
@@ -209,7 +211,7 @@ class GridData
 				continue
 			c.drawLine(xx, y, xx, y + h)
 			if t.label.num > 0
-				c.setColor(col_text)
+				c.setColor(col_line)
 				c.drawLine(xx, y + h - 6, xx, y + h)
 				c.drawStr(xx - 8, y + h + 5, t.label)
 	
@@ -262,7 +264,7 @@ class GridData
 			c.drawPolygon(pp)
 			pp.resize(pp.num - 2)
 		c.setLineWidth(2)
-		c.setColor(col_text)
+		c.setColor(col_line)
 		c.drawLines(pp)
 	
 	void drawCurveB(Painter *c, complex[] _p, bool fill_below, color col)
@@ -307,7 +309,7 @@ class GridData
 	void drawLine2(Painter *c, complex p0, complex p1, bool selected, bool hover)
 		complex pp0 = project2(p0)
 		complex pp1 = project2(p1)
-		c.setColor(col_text)
+		c.setColor(col_line)
 		float radius = 3
 		if hover
 			c.setColor(Red)

@@ -127,7 +127,7 @@ void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_
 		if (level_no == view->cur_level)
 			continue;
 		foreach(BufferBox &b, lev.buffers)
-			drawBuffer(c, r, b, view_pos_rel, view->colors.text_soft);
+			drawBuffer(c, r, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current

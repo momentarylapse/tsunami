@@ -425,7 +425,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("ColorScheme", "background_track", _offsetof(AudioView::ColorScheme, background_track));
 	Script::DeclareClassOffset("ColorScheme", "background_track_selected", _offsetof(AudioView::ColorScheme, background_track_selected));
 	Script::DeclareClassOffset("ColorScheme", "text", _offsetof(AudioView::ColorScheme, text));
-	Script::DeclareClassOffset("ColorScheme", "text_soft", _offsetof(AudioView::ColorScheme, text_soft));
+	Script::DeclareClassOffset("ColorScheme", "text_soft1", _offsetof(AudioView::ColorScheme, text_soft1));
+	Script::DeclareClassOffset("ColorScheme", "text_soft2", _offsetof(AudioView::ColorScheme, text_soft2));
+	Script::DeclareClassOffset("ColorScheme", "text_soft3", _offsetof(AudioView::ColorScheme, text_soft3));
 	Script::DeclareClassOffset("ColorScheme", "grid", _offsetof(AudioView::ColorScheme, grid));
 	Script::DeclareClassOffset("ColorScheme", "selection", _offsetof(AudioView::ColorScheme, selection));
 	Script::DeclareClassOffset("ColorScheme", "hover", _offsetof(AudioView::ColorScheme, hover));

@@ -13,7 +13,6 @@
 
 class AudioView;
 class AudioFile;
-class LevelConsole;
 class AudioOutput;
 class Track;
 class FxConsole;
@@ -49,7 +48,6 @@ public:
 	{
 		LOG_CONSOLE,
 		MIXING_CONSOLE,
-		LEVEL_CONSOLE,
 		FX_CONSOLE,
 		SAMPLE_CONSOLE,
 		CURVE_CONSOLE,
@@ -66,7 +64,6 @@ public:
 	bool visible;
 
 	FxConsole *fx_console;
-	LevelConsole *level_console;
 	FxConsole *track_fx_console;
 	MidiFxConsole *track_midi_fx_console;
 	SynthConsole *track_synth_console;

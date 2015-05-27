@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_BOTTOMBAR_LEVELCONSOLE_H_
-#define SRC_VIEW_BOTTOMBAR_LEVELCONSOLE_H_
+#ifndef SRC_VIEW_SIDEBAR_LEVELCONSOLE_H_
+#define SRC_VIEW_SIDEBAR_LEVELCONSOLE_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 class AudioFile;
 
-class LevelConsole: public BottomBarConsole, public Observer
+class LevelConsole: public SideBarConsole, public Observer
 {
 public:
 	LevelConsole(AudioFile *a, AudioView *view);
@@ -26,10 +26,12 @@ public:
 	void onAdd();
 	void onDelete();
 
+	void onEditFile();
+
 	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;
 	AudioView *view;
 };
 
-#endif /* SRC_VIEW_BOTTOMBAR_LEVELCONSOLE_H_ */
+#endif /* SRC_VIEW_SIDEBAR_LEVELCONSOLE_H_ */

@@ -171,6 +171,8 @@ void MixingConsole::loadData()
 
 	foreachi(Track *t, audio->tracks, i)
 		mixer[i]->setTrack(t);
+
+	hideControl("link-volumes", audio->tracks.num <= 1);
 }
 
 void MixingConsole::onUpdate(Observable* o, const string &message)

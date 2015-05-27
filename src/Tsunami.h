@@ -10,6 +10,9 @@
 
 #include "lib/hui/hui.h"
 
+extern string AppName;
+extern string AppVersion;
+
 
 class AudioFile;
 class PluginManager;

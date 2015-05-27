@@ -225,7 +225,6 @@ OBJ = \
  View/BottomBar/BottomBar.o\
  View/BottomBar/CurveConsole.o\
  View/BottomBar/FxConsole.o\
- View/BottomBar/LevelConsole.o\
  View/BottomBar/LogDialog.o\
  View/BottomBar/MidiFxConsole.o\
  View/BottomBar/MiniBar.o\
@@ -244,6 +243,7 @@ OBJ = \
  View/Helper/Slider.o\
  View/SideBar/SideBar.o\
  View/SideBar/AudioFileConsole.o\
+ View/SideBar/LevelConsole.o\
  View/SideBar/MidiEditor.o\
  View/SideBar/SampleRefDialog.o\
  View/SideBar/TrackConsole.o\
@@ -924,9 +924,6 @@ View/BottomBar/CurveConsole.o : View/BottomBar/CurveConsole.cpp
 View/BottomBar/FxConsole.o : View/BottomBar/FxConsole.cpp
 	$(CPP) -c View/BottomBar/FxConsole.cpp -o $@ $(CXXFLAGS)
 
-View/BottomBar/LevelConsole.o : View/BottomBar/LevelConsole.cpp
-	$(CPP) -c View/BottomBar/LevelConsole.cpp -o $@ $(CXXFLAGS)
-
 View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 	$(CPP) -c View/BottomBar/LogDialog.cpp -o $@ $(CXXFLAGS)
 
@@ -980,6 +977,9 @@ View/SideBar/SideBar.o : View/SideBar/SideBar.cpp
 
 View/SideBar/AudioFileConsole.o : View/SideBar/AudioFileConsole.cpp
 	$(CPP) -c View/SideBar/AudioFileConsole.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/LevelConsole.o : View/SideBar/LevelConsole.cpp
+	$(CPP) -c View/SideBar/LevelConsole.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/MidiEditor.o : View/SideBar/MidiEditor.cpp
 	$(CPP) -c View/SideBar/MidiEditor.cpp -o $@ $(CXXFLAGS)

@@ -7,6 +7,7 @@
 
 #include "SideBar.h"
 #include "AudioFileConsole.h"
+#include "LevelConsole.h"
 #include "TrackConsole.h"
 #include "MidiEditor.h"
 #include "SampleRefDialog.h"
@@ -31,11 +32,13 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	addLabel("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 
 	audio_file_console = new AudioFileConsole(audio);
+	level_console = new LevelConsole(audio, view);
 	track_console = new TrackConsole(view);
 	track_midi_editor = new MidiEditor(view, audio);
 	sample_ref_dialog = new SampleRefDialog(view, audio);
 
 	addConsole(audio_file_console);
+	addConsole(level_console);
 	addConsole(track_console);
 	addConsole(track_midi_editor);
 	addConsole(sample_ref_dialog);

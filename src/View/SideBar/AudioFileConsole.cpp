@@ -58,6 +58,8 @@ AudioFileConsole::AudioFileConsole(AudioFile *a) :
 	event("add_tag", this, &AudioFileConsole::onAddTag);
 	event("delete_tag", this, &AudioFileConsole::onDeleteTag);
 
+	event("edit_levels", this, &AudioFileConsole::onEditLevels);
+
 	subscribe(audio);
 }
 
@@ -142,6 +144,11 @@ void AudioFileConsole::onDeleteTag()
 	int s = getInt("tags");
 	if (s >= 0)
 		audio->deleteTag(s);
+}
+
+void AudioFileConsole::onEditLevels()
+{
+	((SideBar*)parent)->open(SideBar::LEVEL_CONSOLE);
 }
 
 void AudioFileConsole::onUpdate(Observable *o, const string &message)

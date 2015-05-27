@@ -14,7 +14,7 @@
 
 
 LevelConsole::LevelConsole(AudioFile *a, AudioView *v) :
-	BottomBarConsole(_("Ebenen")),
+	SideBarConsole(_("Ebenen")),
 	Observer("LevelConsole")
 {
 	audio = a;
@@ -31,6 +31,7 @@ LevelConsole::LevelConsole(AudioFile *a, AudioView *v) :
 	eventX("levels", "hui:change", this, &LevelConsole::onEdit);
 	event("add_level", this, &LevelConsole::onAdd);
 	event("delete_level", this, &LevelConsole::onDelete);
+	event("edit_file", this, &LevelConsole::onEditFile);
 
 	subscribe(audio);
 	subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
@@ -76,6 +77,11 @@ void LevelConsole::onDelete()
 	int s = getInt("levels");
 	if (s >= 0)
 		audio->deleteLevel(s, false);
+}
+
+void LevelConsole::onEditFile()
+{
+	((SideBar*)parent)->open(SideBar::AUDIOFILE_CONSOLE);
 }
 
 void LevelConsole::onUpdate(Observable *o, const string &message)

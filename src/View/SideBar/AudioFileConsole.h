@@ -31,6 +31,8 @@ public:
 	void onAddTag();
 	void onDeleteTag();
 
+	void onEditLevels();
+
 	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioFile *audio;

@@ -13,6 +13,7 @@
 
 class AudioFile;
 class AudioFileConsole;
+class LevelConsole;
 class TrackConsole;
 class MidiEditor;
 class SampleRefDialog;
@@ -41,6 +42,7 @@ public:
 	enum
 	{
 		AUDIOFILE_CONSOLE,
+		LEVEL_CONSOLE,
 		TRACK_CONSOLE,
 		TRACK_MIDI_EDITOR,
 		SAMPLEREF_DIALOG,
@@ -54,6 +56,7 @@ public:
 	bool visible;
 
 	AudioFileConsole *audio_file_console;
+	LevelConsole *level_console;
 	TrackConsole *track_console;
 	MidiEditor *track_midi_editor;
 	SampleRefDialog *sample_ref_dialog;

@@ -67,6 +67,8 @@ AudioFile::AudioFile() :
 	Data("AudioFile")
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
+	default_format = SAMPLE_FORMAT_16;
+	compression = 0;
 	volume = 1;
 	level_names.add("");
 }
@@ -74,7 +76,6 @@ AudioFile::AudioFile() :
 void AudioFile::__init__()
 {
 	new(this) AudioFile;
-	level_names.clear();
 }
 
 void AudioFile::__delete__()
@@ -166,9 +167,9 @@ void AudioFile::newEmpty(int _sample_rate)
 	sample_rate = _sample_rate;
 
 	// default tags
-	addTag("title", "new audio file");//_("neue Audiodatei"));
-	addTag("album", "tsunami");//AppTitle + " " + AppVersion);
-	addTag("artist", "tsunami");//AppTitle);
+	addTag("title", "New Audio File");//_("neue Audiodatei"));
+	addTag("album", AppName);
+	addTag("artist", AppName);
 
 	action_manager->enable(true);
 	notify();

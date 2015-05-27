@@ -74,6 +74,8 @@ public:
 		color background;
 		color text;
 		color selection;
+		color hover;
+		float gamma;
 		string name;
 	};
 	Array<ColorSchemeBasic> basic_schemes;
@@ -81,7 +83,7 @@ public:
 	struct ColorScheme
 	{
 		color background;
-		color Background_track;
+		color background_track;
 		color background_track_selected;
 		color grid;
 		color selection_internal;

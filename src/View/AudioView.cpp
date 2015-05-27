@@ -67,6 +67,25 @@ AudioView::SelectionType::SelectionType()
 	note_start = -1;
 }
 
+void AudioView::ColorScheme::create(ColorSchemeBasic &basic)
+{
+	background = basic.background;
+	background_track_selected = ColorInterpolate(basic.background, basic.selection*1.5f, 0.17f);
+	background_track = ColorInterpolate(background, background_track_selected, 0.5f);
+	selection_internal = basic.selection;
+	selection_internal.a = 0.2f;
+	selection_boundary = basic.selection;
+	selection_boundary_hover = ColorInterpolate(basic.selection, basic.hover, 0.6f);
+	preview_marker = color(1, 0, 0.7f, 0);
+	capture_marker = color(1, 0.7f, 0, 0);
+	text = basic.text;
+	text_soft = ColorInterpolate(basic.background, basic.text, pow(0.72f, basic.gamma));
+	grid = ColorInterpolate(basic.background, ColorInterpolate(basic.text, basic.selection, 0.7f), pow(0.3f, basic.gamma));
+	sample = color(1, 0.6f, 0.6f, 0);
+	sample_hover = color(1, 0.6f, 0, 0);
+	sample_selected = color(1, 0.4f, 0.4f, 0.4f);
+}
+
 AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input) :
 	Observer("AudioView"),
 	Observable("AudioView"),
@@ -83,26 +102,18 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	bright.background = White;
 	bright.text = color(1, 0.3f, 0.3f, 0.3f);
 	bright.selection = color(1, 0.2f, 0.2f, 0.7f);
+	bright.hover = White;
+	bright.gamma = 1.0f;
 
 	ColorSchemeBasic dark;
-	dark.background = color(1, 0.2f, 0.2f, 0.2f);
-	dark.text = color(1, 0.7f, 0.7f, 0.7f);
-	dark.selection = color(1, 0.2f, 0.2f, 0.7f);
+	dark.background = color(1, 0.05f, 0.05f, 0.05f);
+	dark.text = color(1, 0.95f, 0.95f, 0.95f);
+	dark.selection = color(1, 0.1f, 0.1f, 0.5f);
+	dark.hover = White;
+	dark.gamma = 0.5f;
 
-	colors.background = White;
-	colors.Background_track = color(1, 0.93f, 0.93f, 1);
-	colors.background_track_selected = color(1, 0.88f, 0.88f, 1);
-	colors.grid = color(1, 0.75f, 0.75f, 0.9f);
-	colors.selection_internal = color(0.2f, 0.2f, 0.2f, 0.8f);
-	colors.selection_boundary = color(1, 0.2f, 0.2f, 0.8f);
-	colors.selection_boundary_hover = color(1, 0.8f, 0.2f, 0.2f);
-	colors.preview_marker = color(1, 0, 0.7f, 0);
-	colors.capture_marker = color(1, 0.7f, 0, 0);
-	colors.text_soft = Gray;
-	colors.text = color(1, 0.3f, 0.3f, 0.3f);
-	colors.sample = color(1, 0.6f, 0.6f, 0);
-	colors.sample_hover = color(1, 0.6f, 0, 0);
-	colors.sample_selected = color(1, 0.4f, 0.4f, 0.4f);
+	colors.create(bright);
+	//colors.create(dark);
 
 	drawing_rect = rect(0, 1024, 0, 768);
 	enabled = true;
@@ -1127,13 +1138,13 @@ void AudioView::drawBackground(HuiPainter *c, const rect &r)
 		yy = vtrack.back()->area.y2;
 
 	// time scale
-	c->setColor(colors.Background_track);
+	c->setColor(colors.background_track);
 	c->drawRect(r.x1, r.y1, r.width(), TIME_SCALE_HEIGHT);
-	drawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), colors.Background_track, true);
+	drawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), colors.background_track, true);
 
 	// tracks
 	foreachi(AudioViewTrack *t, vtrack, i){
-		color cc = (t->track->is_selected) ? colors.background_track_selected : colors.Background_track;
+		color cc = (t->track->is_selected) ? colors.background_track_selected : colors.background_track;
 		c->setColor(cc);
 		c->drawRect(t->area);
 

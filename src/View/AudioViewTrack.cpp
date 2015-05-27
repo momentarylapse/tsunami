@@ -118,7 +118,7 @@ void AudioViewTrack::drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, doub
 	}
 }
 
-void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_pos_rel, const color &col)
+void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_pos_rel)
 {
 	msg_db_f("DrawTrackBuffers", 1);
 
@@ -132,7 +132,7 @@ void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_
 
 	// current
 	foreach(BufferBox &b, track->levels[view->cur_level].buffers)
-		drawBuffer(c, r, b, view_pos_rel, col);
+		drawBuffer(c, r, b, view_pos_rel, view->colors.text);
 }
 
 void AudioViewTrack::drawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay)
@@ -278,7 +278,7 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, int track_no)
 	else
 		drawMidi(c, r, track->midi, 0);
 
-	drawTrackBuffers(c, r, view->view_pos, view->colors.text);
+	drawTrackBuffers(c, r, view->view_pos);
 
 	foreach(SampleRef *s, track->samples)
 		drawSample(c, r, s);
@@ -294,7 +294,7 @@ void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, int track_no)
 	//c->setColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 //	c->setColor(ColorWaveCur);
 	c->setFont("", -1, (track == view->cur_track), false);
-	DrawStrBg(c, r.x1 + 23, r.y1 + 3, track->getNiceName(), view->colors.text, view->colors.Background_track);
+	DrawStrBg(c, r.x1 + 23, r.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
 	c->setFont("", -1, false, false);
 
 	if (track->type == track->TYPE_TIME)

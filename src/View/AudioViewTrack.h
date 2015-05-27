@@ -26,7 +26,7 @@ public:
 
 	static color getPitchColor(int pitch);
 
-	void drawTrackBuffers(HuiPainter *c, const rect &r, double pos, const color &col);
+	void drawTrackBuffers(HuiPainter *c, const rect &r, double pos);
 	void drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
 	void drawSample(HuiPainter *c, const rect &r, SampleRef *s);

@@ -19,6 +19,7 @@
 #include "../Audio/Synth/SynthesizerRenderer.h"
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
+#include "../lib/threads/Thread.h"
 
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;
@@ -91,6 +92,22 @@ void AudioView::ColorScheme::create(ColorSchemeBasic &basic)
 	sample_hover = color(1, 0.6f, 0, 0);
 	sample_selected = color(1, 0.4f, 0.4f, 0.4f);
 }
+
+
+class PeakThread : public Thread
+{
+public:
+	AudioView *view;
+	PeakThread(AudioView *_view)
+	{
+		view = _view;
+	}
+	virtual void onRun()
+	{
+		view->audio->updatePeaks(view->peak_mode);
+		view->is_updating_peaks = false;
+	}
+};
 
 AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input) :
 	Observer("AudioView"),
@@ -165,6 +182,9 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	chord_type = 0;
 	chord_inversion = 0;
 
+	peak_thread = new PeakThread(this);
+	is_updating_peaks = false;
+
 	renderer = new AudioRenderer;
 	stream = new AudioStream(renderer);
 
@@ -211,6 +231,7 @@ AudioView::~AudioView()
 	unsubscribe(stream);
 	unsubscribe(input);
 
+	delete(peak_thread);
 	delete(stream);
 	delete(renderer);
 	delete(midi_preview_stream);
@@ -989,7 +1010,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 		}
 
 		if (message == audio->MESSAGE_CHANGE)
-			audio->updatePeaks(peak_mode);
+			updatePeaks(false);
 	}else if (o == stream){
 		if (stream->isPlaying())
 			makeSampleVisible(stream->getPos());
@@ -1051,7 +1072,7 @@ rect rect_inter(const rect &a, const rect &b, float t)
 			(1-t) * a.y2 + t * b.y2);
 }
 
-void AudioView::TrackHeightManager::update(AudioView *v, AudioFile *a, const rect &r)
+bool AudioView::TrackHeightManager::update(AudioView *v, AudioFile *a, const rect &r)
 {
 	Track *new_midi_track = (v->editingMidi() ? v->cur_track : NULL);
 	if ((dirty) or (render_area != r) or (midi_track != new_midi_track)){
@@ -1079,7 +1100,7 @@ void AudioView::TrackHeightManager::update(AudioView *v, AudioFile *a, const rec
 	}
 
 	if (!animating)
-		return;
+		return false;
 
 	t += 0.07f;
 	if (t >= 1){
@@ -1089,8 +1110,7 @@ void AudioView::TrackHeightManager::update(AudioView *v, AudioFile *a, const rec
 	foreach(AudioViewTrack *v, v->vtrack)
 		v->area = rect_inter(v->area_last, v->area_target, (t < 0.5f) ? 2*t*t : -2*t*t+4*t-1);
 
-	if (animating)
-		HuiRunLaterM(0.03f, v, &AudioView::forceRedraw);
+	return animating;
 }
 
 void AudioView::TrackHeightManager::plan(AudioView *v, AudioFile *a, const rect &r)
@@ -1224,7 +1244,7 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 {
 	area = r;
 
-	thm.update(this, audio, r);
+	bool repeat = thm.update(this, audio, r);
 	updateBufferZoom();
 
 	// background
@@ -1247,6 +1267,11 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 	// capturing position
 	if (input->isCapturing())
 		drawTimeLine(c, sel_range.start() + input->getSampleCount(), SEL_TYPE_PLAYBACK, colors.capture_marker, true);
+
+	repeat |= is_updating_peaks;
+
+	if (repeat)
+		HuiRunLaterM(0.03f, this, &AudioView::forceRedraw);
 }
 
 int frame=0;
@@ -1300,13 +1325,29 @@ void AudioView::updateMenu()
 	win->enable("view_samples", false);
 }
 
+void AudioView::updatePeaks(bool invalidate_all)
+{
+	if (invalidate_all)
+		audio->invalidateAllPeaks();
+
+	is_updating_peaks = true;
+	peak_thread->run();
+	for (int i=0; i<10; i++){
+		if (peak_thread->isDone())
+			break;
+		else
+			HuiSleep(0.001f);
+	}
+
+	forceRedraw();
+}
+
 void AudioView::setPeaksMode(int mode)
 {
 	peak_mode = mode;
-	audio->invalidateAllPeaks();
-	audio->updatePeaks(peak_mode);
-	forceRedraw();
 	updateMenu();
+
+	updatePeaks(true);
 }
 
 void AudioView::setShowMono(bool mono)

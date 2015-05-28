@@ -106,6 +106,13 @@ void AudioViewTrack::drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, doub
 
 	int di = view->detail_steps;
 	c->setColor(col);
+
+	if (b.peaks.num <= 2){
+		// no peaks yet...
+		c->drawRect((b.offset - view_pos_rel) * view->view_zoom, r.y1, b.num * view->view_zoom, r.height());
+		return;
+	}
+
 	int l = min(view->prefered_buffer_level - 1, b.peaks.num / 2);
 	if (l >= 1){//f < MIN_MAX_FACTOR){
 		draw_peak_buffer(c, r.width(), di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, r.x1, y0r, b.peaks[l*2-2], b.offset);

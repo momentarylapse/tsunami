@@ -20,6 +20,7 @@ class AudioRenderer;
 class TsunamiWindow;
 class AudioViewTrack;
 class SynthesizerRenderer;
+class PeakThread;
 
 class AudioView : public Observer, public Observable
 {
@@ -54,6 +55,7 @@ public:
 
 	void setShowMono(bool mono);
 	void setPeaksMode(int mode);
+	void updatePeaks(bool invalidate_all);
 	void zoomIn();
 	void zoomOut();
 	void makeSampleVisible(int sample);
@@ -248,7 +250,7 @@ public:
 		Track *midi_track;
 
 		bool check(AudioFile *a);
-		void update(AudioView *v, AudioFile *a, const rect &r);
+		bool update(AudioView *v, AudioFile *a, const rect &r);
 		void plan(AudioView *v, AudioFile *a, const rect &r);
 	};
 	TrackHeightManager thm;
@@ -259,6 +261,9 @@ public:
 	int prefered_buffer_level;
 	double buffer_zoom_factor;
 	void updateBufferZoom();
+
+	PeakThread *peak_thread;
+	bool is_updating_peaks;
 
 	Image image_muted, image_unmuted, image_solo;
 	Image image_track_audio, image_track_time, image_track_midi;

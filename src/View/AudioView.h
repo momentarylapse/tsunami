@@ -107,6 +107,7 @@ public:
 	static const int FONT_SIZE;
 	static const int MAX_TRACK_CHANNEL_HEIGHT;
 	static const int TRACK_HANDLE_WIDTH;
+	static const int BARRIER_DIST;
 
 	enum
 	{
@@ -148,8 +149,8 @@ public:
 	bool enabled;
 	void enable(bool enabled);
 
-	int mouse_possibly_selecting, mouse_possibly_selecting_start;
-	const int BarrierDist;
+	float mouse_possibly_selecting;
+	int mouse_possibly_selecting_start;
 	float ScrollSpeed;
 	float ScrollSpeedFast;
 	float ZoomSpeed;

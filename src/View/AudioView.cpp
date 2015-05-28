@@ -26,6 +26,7 @@ const float AudioView::LINE_WIDTH = 1.0f;
 const int AudioView::SUB_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 60;
+const int AudioView::BARRIER_DIST = 8;
 
 const float BORDER_FACTOR = 1.0f / 15.0f;
 
@@ -93,8 +94,7 @@ void AudioView::ColorScheme::create(ColorSchemeBasic &basic)
 
 AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input) :
 	Observer("AudioView"),
-	Observable("AudioView"),
-	BarrierDist(5)
+	Observable("AudioView")
 {
 	win = parent;
 	thm.dirty = true;
@@ -436,13 +436,9 @@ void AudioView::setBarriers(SelectionType *s)
 		}
 
 		// time bar...
-		int x0 = 0;
-		foreach(BarPattern &b, t->bars){
-			// FIXME
-			for (int i=0;i<b.num_beats;i++)
-				s->barrier.add(x0 + (int)((float)b.length * i / (float)b.num_beats) + dpos);
-			x0 += b.length;
-		}
+		Array<Beat> beats = t->bars.getBeats(viewRange());
+		foreach(Beat &b, beats)
+			s->barrier.add(b.range.offset);
 	}
 
 	// selection marker
@@ -456,7 +452,7 @@ void AudioView::setBarriers(SelectionType *s)
 void AudioView::applyBarriers(int &pos)
 {
 	msg_db_f("ApplyBarriers", 2);
-	int dmin = BarrierDist;
+	int dmin = BARRIER_DIST;
 	bool found = false;
 	int new_pos;
 	foreach(int b, selection.barrier){
@@ -465,6 +461,7 @@ void AudioView::applyBarriers(int &pos)
 			//msg_write(format("barrier:  %d  ->  %d", pos, b));
 			new_pos = b;
 			found = true;
+			dmin = dist;
 		}
 	}
 	if (found)
@@ -532,7 +529,7 @@ void AudioView::onMouseMove()
 		mouse_possibly_selecting = -1;
 	}
 	if (mouse_possibly_selecting >= 0)
-		mouse_possibly_selecting += abs(HuiGetEvent()->dx);
+		mouse_possibly_selecting += fabs(HuiGetEvent()->dx);
 	if (mouse_possibly_selecting > mouse_min_move_to_select){
 		sel_raw.offset = mouse_possibly_selecting_start;
 		sel_raw.num = selection.pos - mouse_possibly_selecting_start;
@@ -593,6 +590,9 @@ void AudioView::onLeftButtonDown()
 	selectUnderMouse();
 	updateMenu();
 
+	setBarriers(&selection);
+
+	applyBarriers(selection.pos);
 	mouse_possibly_selecting_start = selection.pos;
 
 	// selection:
@@ -624,8 +624,6 @@ void AudioView::onLeftButtonDown()
 			midi_preview_renderer->add(MidiEvent(0, p, 1));
 		midi_preview_stream->play();
 	}
-
-	setBarriers(&selection);
 
 	forceRedraw();
 	updateMenu();

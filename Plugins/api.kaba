@@ -135,7 +135,8 @@ class AudioRendererInterface
 	extern virtual int read(BufferBox buf)
 	extern virtual void reset()
 	extern virtual Range range()
-	extern virtual int offset()
+	extern virtual int getPos()
+	extern virtual int seek()
 	extern virtual int getSampleRate()
 
 class Synthesizer
@@ -338,7 +339,8 @@ class AudioRenderer
 	extern virtual int read(BufferBox b)
 	extern virtual void reset()
 	extern virtual Range range()
-	extern virtual int offset()
+	extern virtual int getPos()
+	extern virtual int seek()
 	extern virtual int getSampleRate()
 
 

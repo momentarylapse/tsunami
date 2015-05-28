@@ -511,8 +511,7 @@ void AudioView::onMouseMove()
 		}
 		win->redrawRect("area", x, area.y1, w, area.height());
 	}else if (selection.type == SEL_TYPE_PLAYBACK){
-		renderer->seek(selection.pos);
-		stream->play();
+		stream->seek(selection.pos);
 		_force_redraw_ = true;
 	}else if (selection.type == SEL_TYPE_SAMPLE){
 		applyBarriers(selection.pos);
@@ -551,8 +550,7 @@ void AudioView::setCursorPos(int pos)
 {
 	if (stream->isPlaying()){
 		if (renderer->range().is_inside(pos)){
-			renderer->seek(pos);
-			stream->play();
+			stream->seek(pos);
 			selection.type = SEL_TYPE_PLAYBACK;
 			forceRedraw();
 			return;

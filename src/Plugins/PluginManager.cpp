@@ -363,7 +363,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "read", Script::mf(&AudioRendererInterface::read), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "reset", Script::mf(&AudioRendererInterface::reset), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "range", Script::mf(&AudioRendererInterface::range), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "offset", Script::mf(&AudioRendererInterface::offset), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getPos", Script::mf(&AudioRendererInterface::getPos), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "seek", Script::mf(&AudioRendererInterface::seek), &ari);
 	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getSampleRate", Script::mf(&AudioRendererInterface::getSampleRate), &ari);
 
 	AudioRenderer ar;
@@ -375,7 +376,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRenderer", "read", Script::mf(&AudioRenderer::read), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "reset", Script::mf(&AudioRenderer::reset), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "range", Script::mf(&AudioRenderer::range), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "offset", Script::mf(&AudioRenderer::offset), &ar);
+	Script::DeclareClassVirtualIndex("AudioRenderer", "getPos", Script::mf(&AudioRenderer::getPos), &ar);
+	Script::DeclareClassVirtualIndex("AudioRenderer", "seek", Script::mf(&AudioRenderer::seek), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
 
 	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));

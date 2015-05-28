@@ -55,6 +55,7 @@ public:
 	int getPos();
 	bool getPosSafe(int &pos);
 	void flushBuffers();
+	void seek(int pos);
 
 	float getSampleRate();
 	void getSomeSamples(BufferBox &buf, int num_samples);

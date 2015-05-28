@@ -22,7 +22,8 @@ public:
 	virtual int read(BufferBox &buf){ return 0; }
 	virtual void reset(){}
 	virtual Range range(){ return Range(0, 0); }
-	virtual int offset(){ return 0; }
+	virtual int getPos(){ return 0; }
+	virtual void seek(int pos){}
 	virtual int getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
 };
 
@@ -41,11 +42,11 @@ public:
 	virtual void reset();
 	void prepare(AudioFile *a, const Range &range, bool alllow_loop);
 
-	void seek(int pos);
+	virtual void seek(int pos);
 
 	void setRange(const Range &r){ _range = r; }
 	virtual Range range(){ return _range; }
-	virtual int offset(){ return _offset; }
+	virtual int getPos(){ return pos; }
 
 	virtual int getSampleRate();
 
@@ -64,7 +65,6 @@ private:
 	Range _range;
 	Range range_cur;
 	int pos;
-	int _offset;
 	Array<MidiData> midi;
 
 public:

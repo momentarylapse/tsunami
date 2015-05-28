@@ -307,6 +307,10 @@ void AudioStream::stream()
 	// add to queue
 	ring_buf.write(b);
 
+	// update pos
+	Range rr = renderer->range();
+	cur_pos = rr.offset + (renderer->getPos() - rr.offset - ring_buf.available() + rr.num) % rr.num;
+
 	reading = false;
 }
 
@@ -353,7 +357,7 @@ void AudioStream::play()
 
 	playing = true;
 	paused = false;
-	cur_pos = 0;
+	cur_pos = renderer->range().offset;
 
 	renderer->reset();
 	stream();
@@ -424,8 +428,15 @@ bool AudioStream::getPosSafe(int &pos)
 	// translation
 	Range r = renderer->range();
 	if (r.num > 0)
-		pos = r.offset + ((cur_pos + renderer->offset()) %r.num);
+		pos = cur_pos; //r.offset + ((cur_pos + renderer->offset()) %r.num);
 	return true;
+}
+
+void AudioStream::seek(int pos)
+{
+	renderer->seek(pos);
+	play();
+	cur_pos = pos;
 }
 
 float AudioStream::getVolume()

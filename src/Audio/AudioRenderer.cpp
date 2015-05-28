@@ -34,7 +34,6 @@ AudioRenderer::AudioRenderer()
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
-	_offset = 0;
 	audio = NULL;
 }
 
@@ -290,7 +289,6 @@ void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool _allow_loop
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
-	_offset = 0;
 	midi.clear();
 
 	reset();
@@ -325,7 +323,6 @@ int AudioRenderer::getSampleRate()
 void AudioRenderer::seek(int _pos)
 {
 	pos = _pos;
-	_offset = pos - _range.offset;
 	foreach(Track *t, audio->tracks)
 		t->synth->reset();//endAllNotes();
 }

@@ -13,11 +13,11 @@
 #include <pulse/pulseaudio.h>
 #include "../lib/threads/Thread.h"
 
-//#define DEFAULT_BUFFER_SIZE		131072
-#define DEFAULT_BUFFER_SIZE		32768
-//#define DEFAULT_BUFFER_SIZE		16384
+//const int DEFAULT_BUFFER_SIZE = 131072;
+const int DEFAULT_BUFFER_SIZE = 32768;
+//const int DEFAULT_BUFFER_SIZE = 16384;
 
-#define DEFAULT_UPDATE_DT		0.050f
+const float DEFAULT_UPDATE_DT = 0.050f;
 
 
 const string AudioStream::MESSAGE_STATE_CHANGE = "StateChange";
@@ -309,7 +309,9 @@ void AudioStream::stream()
 
 	// update pos
 	Range rr = renderer->range();
-	cur_pos = rr.offset + (renderer->getPos() - rr.offset - ring_buf.available() + rr.num) % rr.num;
+	cur_pos = renderer->getPos() - rr.offset - ring_buf.available();
+	if (rr.num > 0)
+		cur_pos = rr.offset + (cur_pos + rr.num) % rr.num;
 
 	reading = false;
 }

@@ -456,13 +456,19 @@ void AudioView::setBarriers(SelectionType *s)
 void AudioView::applyBarriers(int &pos)
 {
 	msg_db_f("ApplyBarriers", 2);
+	int dmin = BarrierDist;
+	bool found = false;
+	int new_pos;
 	foreach(int b, selection.barrier){
-		int dpos = sample2screen(b) - sample2screen(pos);
-		if (abs(dpos) <= BarrierDist){
+		int dist = abs(sample2screen(b) - sample2screen(pos));
+		if (dist < dmin){
 			//msg_write(format("barrier:  %d  ->  %d", pos, b));
-			pos = b;
+			new_pos = b;
+			found = true;
 		}
 	}
+	if (found)
+		pos = new_pos;
 }
 
 bool hover_changed(AudioView::SelectionType &hover, AudioView::SelectionType &hover_old)

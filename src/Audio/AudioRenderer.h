@@ -69,7 +69,7 @@ private:
 
 public:
 	Effect *effect;
-	bool loop;
+	bool allow_loop;
 	bool loop_if_allowed;
 };
 

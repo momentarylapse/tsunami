@@ -93,6 +93,8 @@ void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *
 {
 	if (eol > 0)
 		return;
+	if (!i or !userdata)
+		return;
 
 	Array<string> *devices = (Array<string>*)userdata;
 	devices->add(i->name);

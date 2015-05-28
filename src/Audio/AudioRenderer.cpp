@@ -31,7 +31,7 @@ void AudioRendererInterface::__delete__()
 AudioRenderer::AudioRenderer()
 {
 	effect = NULL;
-	loop = false;
+	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
 	_offset = 0;
@@ -271,7 +271,7 @@ int AudioRenderer::read(BufferBox &buf)
 
 	buf.offset = pos;
 	pos += size;
-	if ((pos >= _range.end()) && (loop))
+	if ((pos >= _range.end()) and allow_loop and loop_if_allowed)
 		seek(_range.offset);
 	return size;
 }
@@ -283,12 +283,12 @@ void AudioRenderer::renderAudioFile(AudioFile *a, const Range &range, BufferBox 
 	read(buf);
 }
 
-void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool allow_loop)
+void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool _allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
 	audio = a;
 	_range = __range;
-	loop = loop_if_allowed && allow_loop;
+	allow_loop = _allow_loop;
 	pos = _range.offset;
 	_offset = 0;
 	midi.clear();
@@ -327,5 +327,5 @@ void AudioRenderer::seek(int _pos)
 	pos = _pos;
 	_offset = pos - _range.offset;
 	foreach(Track *t, audio->tracks)
-		t->synth->endAllNotes();
+		t->synth->reset();//endAllNotes();
 }

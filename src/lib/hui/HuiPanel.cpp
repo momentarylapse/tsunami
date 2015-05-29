@@ -500,10 +500,18 @@ void HuiPanel::addChildString(const string &_id, int parent_row, const string &s
 
 // change a single line in the tree of a ListViewTree
 //    for ListViewTree
-void HuiPanel::changeString(const string &_id,int row,const string &str)
+void HuiPanel::changeString(const string &_id, int row, const string &str)
 {
 	test_controls(_id, c)
 		c->changeString(row, str);
+}
+
+// change a single line in the tree of a ListViewTree
+//    for ListViewTree
+void HuiPanel::removeString(const string &_id, int row)
+{
+	test_controls(_id, c)
+		c->removeString(row);
 }
 
 // listview / treeview

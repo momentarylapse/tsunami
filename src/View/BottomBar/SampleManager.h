@@ -14,6 +14,7 @@ class AudioFile;
 class Sample;
 class AudioStream;
 class AudioRenderer;
+class SampleManagerItem;
 
 class SampleManager : public BottomBarConsole, public Observer
 {
@@ -21,7 +22,7 @@ public:
 	SampleManager(AudioFile *a);
 	virtual ~SampleManager();
 
-	void fillList();
+	void updateList();
 
 	void onListSelect();
 	void onListEdit();
@@ -37,7 +38,11 @@ public:
 	void endPreview();
 
 	AudioFile *audio;
-	Array<string> icon_names;
+	Array<SampleManagerItem*> items;
+	Array<SampleManagerItem*> old_items;
+	void add(SampleManagerItem *item);
+	void remove(SampleManagerItem *item);
+	int getIndex(Sample *s);
 	int selected_uid;
 
 	AudioStream *preview_stream;

@@ -70,6 +70,8 @@ public:
 	void addChildString(int parent_row, const string &str);
 	virtual void __changeString(int row, const string &str){}
 	void changeString(int row, const string &str);
+	virtual void __removeString(int row){}
+	void removeString(int row);
 	virtual string getCell(int row, int column){ return ""; }
 	virtual void __setCell(int row, int column, const string &str){}
 	void setCell(int row, int column, const string &str);

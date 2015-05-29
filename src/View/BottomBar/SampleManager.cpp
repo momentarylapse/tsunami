@@ -18,50 +18,6 @@
 #include <math.h>
 #include "../../lib/math/math.h"
 
-SampleManager::SampleManager(AudioFile *a) :
-	BottomBarConsole(_("Samples")),
-	Observer("SampleManager")
-{
-	fromResource("sample_manager_dialog");
-	setTooltip("import_from_file", _("aus Datei importieren"));
-	setTooltip("export", _("in Datei exportieren"));
-	setTooltip("preview_sample", _("Vorschau"));
-	setTooltip("delete_sample", _("l&oschen"));
-	setTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
-	setTooltip("create_from_selection", _("aus Auswahl erzeugen"));
-
-	event("import_from_file", this, &SampleManager::onImport);
-	event("export_sample", this, &SampleManager::onExport);
-	event("preview_sample", this, &SampleManager::onPreview);
-	event("paste_sample", this, &SampleManager::onInsert);
-	event("create_from_selection", this, &SampleManager::onCreateFromSelection);
-	event("delete_sample", this, &SampleManager::onDelete);
-	eventX("sample_list", "hui:change", this, &SampleManager::onListEdit);
-	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
-	event("sample_list", this, &SampleManager::onPreview);
-
-	preview_audio = new AudioFile;
-	preview_renderer = new AudioRenderer;
-	preview_stream = new AudioStream(preview_renderer);
-	preview_sample = NULL;
-
-	audio = a;
-	selected_uid = -1;
-	fillList();
-
-	subscribe(audio, audio->MESSAGE_ADD_SAMPLE);
-	subscribe(audio, audio->MESSAGE_NEW);
-}
-
-SampleManager::~SampleManager()
-{
-	foreach(Sample *s, audio->samples)
-		unsubscribe(s);
-	unsubscribe(audio);
-	delete(preview_stream);
-	delete(preview_renderer);
-	delete(preview_audio);
-}
 
 void render_bufbox(Image &im, BufferBox &b)
 {
@@ -105,16 +61,113 @@ string render_sample(Sample *s)
 	return HuiSetImage(im);
 }
 
-void SampleManager::fillList()
+class SampleManagerItem : public Observer
 {
-	reset("sample_list");
-	foreach(string &name, icon_names)
-		HuiDeleteImage(name);
-	icon_names.clear();
-	foreachi(Sample *s, audio->samples, i){
-		icon_names.add(render_sample(s));
-		setString("sample_list", icon_names[i] + "\\" + track_type(s->type) + "\\" + s->name + "\\" + audio->get_time_str_long(s->getRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete));
+public:
+	SampleManagerItem(SampleManager *_manager, Sample *_s) : Observer("SampleManagerItem")
+	{
+		manager = _manager;
+		s = _s;
+		icon = render_sample(s);
+		subscribe(s);
 	}
+	virtual ~SampleManagerItem()
+	{
+		zombify();
+	}
+	virtual void onUpdate(Observable *o, const string &message)
+	{
+		//msg_write("item:  " + message);
+		if (message == s->MESSAGE_DELETE){
+			manager->remove(this);
+		}else{
+			int n = manager->getIndex(s);
+			if (n >= 0)
+				manager->changeString("sample_list", n, str());
+		}
+	}
+
+	void zombify()
+	{
+		if (s){
+			unsubscribe(s);
+			s = NULL;
+			HuiDeleteImage(icon);
+		}
+	}
+
+	string str()
+	{
+		return icon + "\\" + track_type(s->type) + "\\" + s->name + "\\" + s->owner->get_time_str_long(s->getRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete);
+	}
+	string icon;
+	Sample *s;
+	SampleManager *manager;
+};
+
+SampleManager::SampleManager(AudioFile *a) :
+	BottomBarConsole(_("Samples")),
+	Observer("SampleManager")
+{
+	fromResource("sample_manager_dialog");
+	setTooltip("import_from_file", _("aus Datei importieren"));
+	setTooltip("export", _("in Datei exportieren"));
+	setTooltip("preview_sample", _("Vorschau"));
+	setTooltip("delete_sample", _("l&oschen"));
+	setTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
+	setTooltip("create_from_selection", _("aus Auswahl erzeugen"));
+
+	event("import_from_file", this, &SampleManager::onImport);
+	event("export_sample", this, &SampleManager::onExport);
+	event("preview_sample", this, &SampleManager::onPreview);
+	event("paste_sample", this, &SampleManager::onInsert);
+	event("create_from_selection", this, &SampleManager::onCreateFromSelection);
+	event("delete_sample", this, &SampleManager::onDelete);
+	eventX("sample_list", "hui:change", this, &SampleManager::onListEdit);
+	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
+	event("sample_list", this, &SampleManager::onPreview);
+
+	preview_audio = new AudioFile;
+	preview_renderer = new AudioRenderer;
+	preview_stream = new AudioStream(preview_renderer);
+	preview_sample = NULL;
+
+	audio = a;
+	selected_uid = -1;
+	updateList();
+
+	subscribe(audio, audio->MESSAGE_ADD_SAMPLE);
+	subscribe(audio, audio->MESSAGE_DELETE_SAMPLE);
+	subscribe(audio, audio->MESSAGE_NEW);
+}
+
+SampleManager::~SampleManager()
+{
+	foreach(SampleManagerItem *si, items)
+		delete(si);
+	items.clear();
+
+	unsubscribe(audio);
+	delete(preview_stream);
+	delete(preview_renderer);
+	delete(preview_audio);
+}
+
+int SampleManager::getIndex(Sample *s)
+{
+	foreachi(SampleManagerItem *si, items, i)
+		if (si->s == s)
+			return i;
+	return -1;
+}
+
+void SampleManager::updateList()
+{
+	// new samples?
+	foreach(Sample *s, audio->samples)
+		if (getIndex(s) < 0)
+			add(new SampleManagerItem(this, s));
+
 	int sel = audio->get_sample_by_uid(selected_uid);
 	setInt("sample_list", sel);
 	enable("export_sample", sel >= 0);
@@ -193,6 +246,28 @@ void SampleManager::onDelete()
 		audio->deleteSample(n);
 }
 
+void SampleManager::add(SampleManagerItem *item)
+{
+	//msg_write("add");
+	items.add(item);
+	addString("sample_list", item->str());
+}
+
+void SampleManager::remove(SampleManagerItem *item)
+{
+	//msg_write("remove");
+	foreachi(SampleManagerItem *si, items, i)
+		if (si == item){
+			//msg_write(i);
+			items.erase(i);
+			removeString("sample_list", i);
+
+			// don't delete now... we're still in notify()?
+			item->zombify();
+			old_items.add(item);
+		}
+}
+
 void SampleManager::onUpdate(Observable *o, const string &message)
 {
 	if (o == tsunami->progress){
@@ -204,13 +279,9 @@ void SampleManager::onUpdate(Observable *o, const string &message)
 		tsunami->progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
 		if (!preview_stream->isPlaying())
 			endPreview();
-	}else{
+	}else if (o == audio){
 		//msg_write(o->getName() + " / " + message);
-		foreach(Sample *s, audio->samples)
-			unsubscribe(s);
-		foreach(Sample *s, audio->samples)
-			subscribe(s);
-		fillList();
+		updateList();
 	}
 }
 

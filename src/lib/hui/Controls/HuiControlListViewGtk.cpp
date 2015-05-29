@@ -211,6 +211,17 @@ void HuiControlListView::__changeString(int row, const string& str)
 			set_list_cell(store, _item_[row], j, PartString[j]);
 }
 
+void HuiControlListView::__removeString(int row)
+{
+	if ((row < 0) or (row >= _item_.num))
+		return;
+	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
+	if (gtk_list_store_iter_is_valid(store, &_item_[row])){
+		gtk_list_store_remove(store, &_item_[row]);
+		_item_.erase(row);
+	}
+}
+
 string HuiControlListView::getCell(int row, int column)
 {
 	if ((row < 0) or (row >= _item_.num))

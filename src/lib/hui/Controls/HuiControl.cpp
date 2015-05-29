@@ -252,6 +252,13 @@ void HuiControl::changeString(int row, const string& str)
 	allow_signal_level --;
 }
 
+void HuiControl::removeString(int row)
+{
+	allow_signal_level ++;
+	__removeString(row);
+	allow_signal_level --;
+}
+
 void HuiControl::setCell(int row, int column, const string& str)
 {
 	allow_signal_level ++;

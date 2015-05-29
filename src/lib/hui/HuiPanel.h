@@ -104,6 +104,7 @@ public:
 	void _cdecl addString(const string &id, const string &str);
 	void _cdecl addChildString(const string &id, int parent_row, const string &str);
 	void _cdecl changeString(const string &id, int row, const string &str);
+	void _cdecl removeString(const string &id, int row);
 	string _cdecl getString(const string &id);
 	string _cdecl getCell(const string &id, int row, int column);
 	void _cdecl setCell(const string &id, int row, int column, const string &str);

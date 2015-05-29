@@ -22,6 +22,7 @@ public:
 	virtual int getInt();
 	virtual void __addChildString(int parent_row, const string &str);
 	virtual void __changeString(int row, const string &str);
+	virtual void __removeString(int row);
 	virtual string getCell(int row, int column);
 	virtual void __setCell(int row, int column, const string &str);
 	virtual Array<int> getMultiSelection();

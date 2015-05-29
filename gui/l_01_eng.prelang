@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-235
+238
 // Data (ID,Text)
 about
 
@@ -359,9 +359,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_775518
+rand_id_190964
 
-rand_id_901272
+rand_id_970334
 
 rdt_capture
 
@@ -401,7 +401,13 @@ sample_rate
 
 sample_ref_dialog
 
+sample_selection_dialog
+
+sample_selection_list
+
 samplerate
+
+samsel_buttonbar
 
 save
 Save
@@ -474,7 +480,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-153
+152
 // Data (ID,Text)
 
 
@@ -663,8 +669,6 @@ Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 Plugin-Script wählen
 
 Raw Daten
-
-Sample wählen
 
 Samplerate
 

@@ -1,0 +1,7 @@
+Dialog sample_selection_dialog "Sample wählen" 300 400
+	Grid ? "" 1 2
+		ListView sample_selection_list "Vorschau\\Name\\Dauer" format=itt
+		Grid samsel_buttonbar "" 2 1 buttonbar
+			Button cancel "Abbrechen"
+			Button ok "OK"
+

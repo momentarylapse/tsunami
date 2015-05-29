@@ -29,6 +29,8 @@ void* ActionAudioRenameLevel::execute(Data* d)
 	name = a->level_names[index];
 	a->level_names[index] = temp;
 
+	a->notify(a->MESSAGE_EDIT_LEVEL);
+
 	return NULL;
 }
 

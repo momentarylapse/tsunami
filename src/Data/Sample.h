@@ -17,11 +17,15 @@ class AudioFile;
 class Track;
 class SampleRef;
 
-class Sample
+class Sample : public Observable
 {
 public:
 	Sample(int type);
-	~Sample();
+	virtual ~Sample();
+
+	static const string MESSAGE_CHANGE_BY_ACTION;
+	static const string MESSAGE_REFERENCE;
+	static const string MESSAGE_UNREFERENCE;
 
 	int get_index();
 	Range getRange();

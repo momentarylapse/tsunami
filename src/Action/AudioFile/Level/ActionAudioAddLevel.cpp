@@ -25,6 +25,7 @@ void* ActionAudioAddLevel::execute(Data* d)
 	TrackLevel new_level;
 	foreach(Track *t, a->tracks)
 		t->levels.add(new_level);
+	a->notify(a->MESSAGE_ADD_LEVEL);
 
 	return NULL;
 }
@@ -32,10 +33,13 @@ void* ActionAudioAddLevel::execute(Data* d)
 void ActionAudioAddLevel::undo(Data* d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
+
 	a->level_names.pop();
 
 	foreach(Track *t, a->tracks)
 		t->levels.pop();
+
+	a->notify(a->MESSAGE_DELETE_LEVEL);
 }
 
 

@@ -92,6 +92,11 @@ const string AudioFile::MESSAGE_ADD_EFFECT = "AddEffect";
 const string AudioFile::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string AudioFile::MESSAGE_ADD_CURVE = "AddCurve";
 const string AudioFile::MESSAGE_DELETE_CURVE = "DeleteCurve";
+const string AudioFile::MESSAGE_ADD_SAMPLE = "AddSample";
+const string AudioFile::MESSAGE_DELETE_SAMPLE = "DeleteSample";
+const string AudioFile::MESSAGE_ADD_LEVEL = "AddLevel";
+const string AudioFile::MESSAGE_EDIT_LEVEL = "EditLevel";
+const string AudioFile::MESSAGE_DELETE_LEVEL = "DeleteLevel";
 
 
 void AudioFile::addTag(const string &key, const string &value)

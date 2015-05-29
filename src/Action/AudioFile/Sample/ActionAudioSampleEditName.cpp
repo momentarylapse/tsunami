@@ -25,6 +25,7 @@ void *ActionAudioSampleEditName::execute(Data *d)
 	Sample *s = a->samples[index];
 
 	s->name = new_value;
+	s->notify(s->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }

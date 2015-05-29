@@ -9,9 +9,13 @@
 #include "AudioFile.h"
 #include "../lib/math/math.h"
 
+const string Sample::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
+const string Sample::MESSAGE_REFERENCE = "Reference";
+const string Sample::MESSAGE_UNREFERENCE= "Unreference";
 const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
-Sample::Sample(int _type)
+Sample::Sample(int _type) :
+	Observable("Sample")
 {
 	owner = NULL;
 	type = _type;
@@ -27,6 +31,7 @@ Sample::Sample(int _type)
 
 Sample::~Sample()
 {
+	notify(MESSAGE_DELETE);
 }
 
 
@@ -50,11 +55,13 @@ Range Sample::getRange()
 void Sample::ref()
 {
 	ref_count ++;
+	notify(MESSAGE_REFERENCE);
 }
 
 void Sample::unref()
 {
 	ref_count --;
+	notify(MESSAGE_UNREFERENCE);
 }
 
 SampleRef *Sample::create_ref()

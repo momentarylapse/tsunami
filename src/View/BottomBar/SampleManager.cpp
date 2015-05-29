@@ -49,11 +49,14 @@ SampleManager::SampleManager(AudioFile *a) :
 	selected_uid = -1;
 	fillList();
 
-	subscribe(audio, audio->MESSAGE_CHANGE);
+	subscribe(audio, audio->MESSAGE_ADD_SAMPLE);
+	subscribe(audio, audio->MESSAGE_NEW);
 }
 
 SampleManager::~SampleManager()
 {
+	foreach(Sample *s, audio->samples)
+		unsubscribe(s);
 	unsubscribe(audio);
 	delete(preview_stream);
 	delete(preview_renderer);
@@ -202,6 +205,11 @@ void SampleManager::onUpdate(Observable *o, const string &message)
 		if (!preview_stream->isPlaying())
 			endPreview();
 	}else{
+		msg_write(o->getName() + " / " + message);
+		foreach(Sample *s, audio->samples)
+			unsubscribe(s);
+		foreach(Sample *s, audio->samples)
+			subscribe(s);
 		fillList();
 	}
 }
@@ -236,32 +244,30 @@ class SampleSelector : public HuiDialog
 {
 public:
 	SampleSelector(HuiPanel *root, AudioFile *a, Sample *old) :
-		HuiDialog(_("Sample w&ahlen"), 300, 400, root->win, false)
+		HuiDialog("", 300, 400, root->win, false)
 	{
 		audio = a;
 		ret = NULL;;
 		_old = old;
 
-		fromSource("Grid ? '' 1 2\n"\
-					"	ListView list 'Vorschau\\Name\\Dauer' format=itt\n"\
-					"	Grid ? '' 2 1 buttonbar\n"\
-					"		Button cancel 'Abbrechen'\n"\
-					"		Button ok 'Ok'");
+		fromResource("sample_selection_dialog");
 
-		setString("list", _("\\- keines -\\"));
-		setInt("list", 0);
+		list_id = "sample_selection_list";
+
+		setString(list_id, _("\\- keines -\\"));
+		setInt(list_id, 0);
 		foreachi(Sample *s, audio->samples, i){
 			icon_names.add(render_sample(s));
-			setString("list", icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
+			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
 			if (s == old)
-				setInt("list", i + 1);
+				setInt(list_id, i + 1);
 		}
 
 		event("ok", this, &SampleSelector::onOk);
 		event("cancel", this, &SampleSelector::onCancel);
 		event("hui:close", this, &SampleSelector::onCancel);
-		eventX("list", "hui:select", this, &SampleSelector::onSelect);
-		event("list", this, &SampleSelector::onList);
+		eventX(list_id, "hui:select", this, &SampleSelector::onSelect);
+		event(list_id, this, &SampleSelector::onList);
 	}
 	virtual ~SampleSelector()
 	{
@@ -305,6 +311,7 @@ public:
 	Sample *_old;
 	Array<string> icon_names;
 	AudioFile *audio;
+	string list_id;
 };
 
 Sample *SampleSelector::ret;

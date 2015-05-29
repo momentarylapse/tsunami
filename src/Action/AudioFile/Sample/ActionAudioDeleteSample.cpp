@@ -29,8 +29,12 @@ void *ActionAudioDeleteSample::execute(Data *d)
 	assert(index < a->samples.num);
 	sample = a->samples[index];
 	assert(sample->ref_count == 0);
+
+	sample->notify(sample->MESSAGE_DELETE);
 	a->samples.erase(index);
 	sample->owner = NULL;
+
+	a->notify(a->MESSAGE_DELETE_SAMPLE);
 	return NULL;
 }
 
@@ -39,5 +43,7 @@ void ActionAudioDeleteSample::undo(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 	sample->owner = a;
 	a->samples.insert(sample, index);
+
+	a->notify(a->MESSAGE_ADD_SAMPLE);
 }
 

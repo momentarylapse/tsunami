@@ -137,6 +137,11 @@ Range Range::operator+ (int shift) const
 	return Range(offset + shift, num);
 }
 
+Range Range::operator- (int shift) const
+{
+	return Range(offset - shift, num);
+}
+
 
 
 

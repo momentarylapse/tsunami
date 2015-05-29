@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-234
+235
 // Data (ID,Text)
 about
 
@@ -122,6 +122,8 @@ edit_levels
 edit_midi
 
 edit_midi_fx
+
+edit_samples
 
 edit_synth
 
@@ -357,9 +359,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_765758
+rand_id_775518
 
-rand_id_85720
+rand_id_901272
 
 rdt_capture
 

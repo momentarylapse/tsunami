@@ -6,11 +6,13 @@
  */
 
 #include "../../Tsunami.h"
+#include "../../TsunamiWindow.h"
 #include "../../Stuff/Observer.h"
 #include "../../Data/AudioFile.h"
 #include "../Helper/BarList.h"
 #include "../../Stuff/Log.h"
 #include "../../View/AudioView.h"
+#include "../BottomBar/BottomBar.h"
 #include "AudioFileConsole.h"
 
 const int NUM_POSSIBLE_FORMATS = 4;
@@ -59,6 +61,8 @@ AudioFileConsole::AudioFileConsole(AudioFile *a) :
 	event("delete_tag", this, &AudioFileConsole::onDeleteTag);
 
 	event("edit_levels", this, &AudioFileConsole::onEditLevels);
+	event("edit_samples", this, &AudioFileConsole::onEditSamples);
+	event("edit_fx", this, &AudioFileConsole::onEditFx);
 
 	subscribe(audio);
 }
@@ -149,6 +153,16 @@ void AudioFileConsole::onDeleteTag()
 void AudioFileConsole::onEditLevels()
 {
 	((SideBar*)parent)->open(SideBar::LEVEL_CONSOLE);
+}
+
+void AudioFileConsole::onEditSamples()
+{
+	tsunami->win->bottom_bar->open(BottomBar::SAMPLE_CONSOLE);
+}
+
+void AudioFileConsole::onEditFx()
+{
+	tsunami->win->bottom_bar->open(BottomBar::FX_CONSOLE);
 }
 
 void AudioFileConsole::onUpdate(Observable *o, const string &message)

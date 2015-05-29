@@ -206,7 +206,7 @@ void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker)
 
 void AudioViewTrack::drawMidi(HuiPainter *c, MidiData &midi, int shift)
 {
-	Range range = Range(view->screen2sample(area.x1) - shift, view->screen2sample(area.x2) - view->screen2sample(area.x1));
+	Range range = view->viewRange() - shift;
 	Array<MidiNote> notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
 	foreach(MidiNote &n, notes){

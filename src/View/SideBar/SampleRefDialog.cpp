@@ -26,6 +26,9 @@ SampleRefDialog::SampleRefDialog(AudioView *v, AudioFile *a):
 	event("repnum", this, &SampleRefDialog::onRepNum);
 	event("repdelay", this, &SampleRefDialog::onRepDelay);
 
+	event("edit_file", this, &SampleRefDialog::onEditFile);
+	event("edit_track", this, &SampleRefDialog::onEditTrack);
+
 	subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
@@ -88,6 +91,16 @@ void SampleRefDialog::onRepDelay()
 	int index = sample->get_index();
 	track->editSample(index, sample->volume, sample->muted, sample->rep_num, (int)(getFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
 	subscribe(sample);
+}
+
+void SampleRefDialog::onEditFile()
+{
+	((SideBar*)parent)->open(SideBar::AUDIOFILE_CONSOLE);
+}
+
+void SampleRefDialog::onEditTrack()
+{
+	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
 }
 
 void SampleRefDialog::loadData()

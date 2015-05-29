@@ -24,5 +24,7 @@ Dialog audio_file_dialog "Sound-Datei" 430 375
 					Button audio_add_bar_pause "Pause" image=hui:add flat
 					Button audio_delete_bar "" image=hui:delete flat
 		Group ad_t_edit "Bearbeiten"
-			Grid ? "" 2 1
+			Grid ? "" 3 1
 				Button edit_levels "Ebenen"
+				Button edit_samples "Samples"
+				Button edit_fx "Fx"

@@ -32,6 +32,8 @@ public:
 	void onDeleteTag();
 
 	void onEditLevels();
+	void onEditSamples();
+	void onEditFx();
 
 	virtual void onUpdate(Observable *o, const string &message);
 

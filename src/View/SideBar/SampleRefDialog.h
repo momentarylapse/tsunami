@@ -30,6 +30,9 @@ public:
 	void onRepNum();
 	void onRepDelay();
 
+	void onEditFile();
+	void onEditTrack();
+
 	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioView *view;

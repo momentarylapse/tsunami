@@ -169,6 +169,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	cur_track = NULL;
 	cur_sample = NULL;
 	cur_level = 0;
+	capturing_track = 0;
 
 	audio = _audio;
 	input = _input;
@@ -1252,21 +1253,25 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 
 	// tracks
 	foreachi(AudioViewTrack *t, vtrack, i)
-		t->drawTrack(c, t->area, i);
+		t->draw(c, i);
+
+	// capturing preview
+	if (input->isCapturing()){
+		input->buffer.update_peaks(peak_mode);
+		if ((capturing_track >= 0) and (capturing_track < vtrack.num))
+			vtrack[capturing_track]->drawBuffer(c, input->buffer, view_pos - sel_range.offset, colors.capture_marker);
+	}
 
 
 	// selection
 	drawSelection(c, r);
 
-	// playing position
-	if (stream->isPlaying()){
-		if (!input->isCapturing())
-			drawTimeLine(c, stream->getPos(), SEL_TYPE_PLAYBACK, colors.preview_marker, true);
-	}
 
-	// capturing position
+	// playing/capturing position
 	if (input->isCapturing())
 		drawTimeLine(c, sel_range.start() + input->getSampleCount(), SEL_TYPE_PLAYBACK, colors.capture_marker, true);
+	else if (stream->isPlaying())
+		drawTimeLine(c, stream->getPos(), SEL_TYPE_PLAYBACK, colors.preview_marker, true);
 
 	repeat |= is_updating_peaks;
 

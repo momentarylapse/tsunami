@@ -88,18 +88,22 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 	c->drawPolygon(tt);
 }
 
-void AudioViewTrack::drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col)
+void AudioViewTrack::drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col)
 {
 	msg_db_f("DrawBuffer", 1);
 
-	// zero heights of both channels
-	float y0r = r.y1 + r.height() / 4;
-	float y0l = r.y1 + r.height() * 3 / 4;
+	float w = area.width();
+	float h = area.height();
+	float hf = h / 4;
+	float x1 = area.x1;
+	float y1 = area.y1;
 
-	float hf = r.height() / 4;
+	// zero heights of both channels
+	float y0r = y1 + hf;
+	float y0l = y1 + hf * 3;
 
 	if (view->show_mono){
-		y0r = r.y1 + r.height() / 2;
+		y0r = y1 + h / 2;
 		hf *= 2;
 	}
 
@@ -107,25 +111,25 @@ void AudioViewTrack::drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, doub
 	int di = view->detail_steps;
 	c->setColor(col);
 
+	// no peaks yet? -> show dummy
 	if (b.peaks.num <= 2){
-		// no peaks yet...
-		c->drawRect((b.offset - view_pos_rel) * view->view_zoom, r.y1, b.num * view->view_zoom, r.height());
+		c->drawRect((b.offset - view_pos_rel) * view->view_zoom, y1, b.num * view->view_zoom, h);
 		return;
 	}
 
 	int l = min(view->prefered_buffer_level - 1, b.peaks.num / 2);
 	if (l >= 1){//f < MIN_MAX_FACTOR){
-		draw_peak_buffer(c, r.width(), di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, r.x1, y0r, b.peaks[l*2-2], b.offset);
+		draw_peak_buffer(c, w, di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, x1, y0r, b.peaks[l*2-2], b.offset);
 		if (!view->show_mono)
-			draw_peak_buffer(c, r.width(), di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, r.x1, y0l, b.peaks[l*2-1], b.offset);
+			draw_peak_buffer(c, w, di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, x1, y0l, b.peaks[l*2-1], b.offset);
 	}else{
-		draw_line_buffer(c, r.width(), view_pos_rel, view->view_zoom, hf, r.x1, y0r, b.r, b.offset);
+		draw_line_buffer(c, w, view_pos_rel, view->view_zoom, hf, x1, y0r, b.r, b.offset);
 		if (!view->show_mono)
-			draw_line_buffer(c, r.width(), view_pos_rel, view->view_zoom, hf, r.x1, y0l, b.l, b.offset);
+			draw_line_buffer(c, w, view_pos_rel, view->view_zoom, hf, x1, y0l, b.l, b.offset);
 	}
 }
 
-void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_pos_rel)
+void AudioViewTrack::drawTrackBuffers(HuiPainter *c, double view_pos_rel)
 {
 	msg_db_f("DrawTrackBuffers", 1);
 
@@ -134,39 +138,39 @@ void AudioViewTrack::drawTrackBuffers(HuiPainter *c, const rect &r, double view_
 		if (level_no == view->cur_level)
 			continue;
 		foreach(BufferBox &b, lev.buffers)
-			drawBuffer(c, r, b, view_pos_rel, view->colors.text_soft2);
+			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current
 	foreach(BufferBox &b, track->levels[view->cur_level].buffers)
-		drawBuffer(c, r, b, view_pos_rel, view->colors.text);
+		drawBuffer(c, b, view_pos_rel, view->colors.text);
 }
 
-void AudioViewTrack::drawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay)
+void AudioViewTrack::drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay)
 {
 	// frame
 	Range rr = s->getRange() + delay;
-	int asx = clampi(view->sample2screen(rr.start()), r.x1, r.x2);
-	int aex = clampi(view->sample2screen(rr.end()), r.x1, r.x2);
+	int asx = clampi(view->sample2screen(rr.start()), area.x1, area.x2);
+	int aex = clampi(view->sample2screen(rr.end()), area.x1, area.x2);
 
 	if (delay == 0)
-		s->area = rect(asx, aex, r.y1, r.y2);
+		s->area = rect(asx, aex, area.y1, area.y2);
 
 
 	color col2 = col;
 	col2.a *= 0.2f;
 	c->setColor(col2);
-	c->drawRect(asx, r.y1,                          aex - asx, view->SUB_FRAME_HEIGHT);
-	c->drawRect(asx, r.y2 - view->SUB_FRAME_HEIGHT, aex - asx, view->SUB_FRAME_HEIGHT);
+	c->drawRect(asx, area.y1,                          aex - asx, view->SUB_FRAME_HEIGHT);
+	c->drawRect(asx, area.y2 - view->SUB_FRAME_HEIGHT, aex - asx, view->SUB_FRAME_HEIGHT);
 
 	c->setColor(col);
-	c->drawLine(asx, r.y1, asx, r.y2);
-	c->drawLine(aex, r.y1, aex, r.y2);
-	c->drawLine(asx, r.y1, aex, r.y1);
-	c->drawLine(asx, r.y2, aex, r.y2);
+	c->drawLine(asx, area.y1, asx, area.y2);
+	c->drawLine(aex, area.y1, aex, area.y2);
+	c->drawLine(asx, area.y1, aex, area.y1);
+	c->drawLine(asx, area.y2, aex, area.y2);
 }
 
-void AudioViewTrack::drawSample(HuiPainter *c, const rect &r, SampleRef *s)
+void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 {
 	color col = view->colors.sample;
 	//bool is_cur = ((s == cur_sub) and (t->IsSelected));
@@ -176,33 +180,33 @@ void AudioViewTrack::drawSample(HuiPainter *c, const rect &r, SampleRef *s)
 		col = view->colors.sample_hover;
 	//col.a = 0.2f;
 
-	drawSampleFrame(c, r, s, col, 0);
+	drawSampleFrame(c, s, col, 0);
 
 	color col2 = col;
 	col2.a *= 0.5f;
 	for (int i=0;i<s->rep_num;i++)
-		drawSampleFrame(c, r, s, col2, (i + 1) * s->rep_delay);
+		drawSampleFrame(c, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	drawBuffer(c, r, *s->buf, view->view_pos - (double)s->pos, col);
-	drawMidi(c, r, *s->midi, s->pos);
+	drawBuffer(c, *s->buf, view->view_pos - (double)s->pos, col);
+	drawMidi(c, *s->midi, s->pos);
 
-	int asx = clampi(view->sample2screen(s->pos), r.x1, r.x2);
+	int asx = clampi(view->sample2screen(s->pos), area.x1, area.x2);
 	if (s->is_selected)//((is_cur) or (a->sub_mouse_over == s))
-		c->drawStr(asx, r.y2 - view->SUB_FRAME_HEIGHT, s->origin->name);
+		c->drawStr(asx, area.y2 - view->SUB_FRAME_HEIGHT, s->origin->name);
 }
 
-void AudioViewTrack::drawMarker(HuiPainter *c, const rect &r, TrackMarker &marker)
+void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker)
 {
 	int x = view->sample2screen(marker.pos);
 	c->setColor(view->colors.text);
-	c->drawStr(x, r.y1, marker.text);
+	c->drawStr(x, area.y1, marker.text);
 }
 
 
-void AudioViewTrack::drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift)
+void AudioViewTrack::drawMidi(HuiPainter *c, MidiData &midi, int shift)
 {
-	Range range = Range(view->screen2sample(r.x1) - shift, view->screen2sample(r.x2) - view->screen2sample(r.x1));
+	Range range = Range(view->screen2sample(area.x1) - shift, view->screen2sample(area.x2) - view->screen2sample(area.x1));
 	Array<MidiNote> notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
 	foreach(MidiNote &n, notes){
@@ -210,7 +214,7 @@ void AudioViewTrack::drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int 
 		float x1 = view->sample2screen(n.range.offset + shift);
 		float x2 = view->sample2screen(n.range.end() + shift);
 		x2 = max(x2, x1 + 4);
-		float h = r.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * r.height();
+		float h = area.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * area.height();
 		//c->drawRect(rect(x1, x2, r.y1, r.y2));
 		c->drawLine(x1, h, x2, h);
 	}
@@ -231,7 +235,7 @@ void draw_note(HuiPainter *c, const MidiNote &n, color &col, AudioView *v)
 	c->drawRect(rect(xm, x2, y1, y2));
 }
 
-void AudioViewTrack::drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi)
+void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi)
 {
 	Array<MidiNote> notes = midi.getNotes(view->viewRange());
 	foreachi(MidiNote &n, notes, i){
@@ -272,49 +276,49 @@ void AudioViewTrack::drawMidiEditable(HuiPainter *c, const rect &r, MidiData &mi
 				if ((*p)[i])
 					name = (*p)[i]->origin->name;
 		}
-		c->drawStr(20, r.y1 + r.height() * (view->pitch_max - i - 1) / (view->pitch_max - view->pitch_min), name);
+		c->drawStr(20, area.y1 + area.height() * (view->pitch_max - i - 1) / (view->pitch_max - view->pitch_min), name);
 	}
 }
 
-void AudioViewTrack::drawTrack(HuiPainter *c, const rect &r, int track_no)
+void AudioViewTrack::draw(HuiPainter *c, int track_no)
 {
 	msg_db_f("DrawTrack", 1);
 
 	if ((view->cur_track == track) and (view->editingMidi()))
-		drawMidiEditable(c, r, track->midi);
+		drawMidiEditable(c, track->midi);
 	else
-		drawMidi(c, r, track->midi, 0);
+		drawMidi(c, track->midi, 0);
 
-	drawTrackBuffers(c, r, view->view_pos);
+	drawTrackBuffers(c, view->view_pos);
 
 	foreach(SampleRef *s, track->samples)
-		drawSample(c, r, s);
+		drawSample(c, s);
 
 	foreach(TrackMarker &m, track->markers)
-		drawMarker(c, r, m);
+		drawMarker(c, m);
 
 	if ((view->hover.track == track) and (view->mx < view->TRACK_HANDLE_WIDTH)){
 		c->setColor(color(0.4f, 1, 1, 1));
-		c->drawRect(0, r.y1, view->TRACK_HANDLE_WIDTH, r.height());
+		c->drawRect(0, area.y1, view->TRACK_HANDLE_WIDTH, area.height());
 	}
 
 	//c->setColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
 //	c->setColor(ColorWaveCur);
 	c->setFont("", -1, (track == view->cur_track), false);
-	DrawStrBg(c, r.x1 + 23, r.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
+	DrawStrBg(c, area.x1 + 23, area.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
 	c->setFont("", -1, false, false);
 
 	if (track->type == track->TYPE_TIME)
-		c->drawImage(r.x1 + 5, r.y1 + 5, view->image_track_time);
+		c->drawImage(area.x1 + 5, area.y1 + 5, view->image_track_time);
 	else if (track->type == track->TYPE_MIDI)
-		c->drawImage(r.x1 + 5, r.y1 + 5, view->image_track_midi);
+		c->drawImage(area.x1 + 5, area.y1 + 5, view->image_track_midi);
 	else
-		c->drawImage(r.x1 + 5, r.y1 + 5, view->image_track_audio);
+		c->drawImage(area.x1 + 5, area.y1 + 5, view->image_track_audio);
 
 	if ((track->muted) or (view->hover.show_track_controls == track))
-		c->drawImage(r.x1 + 5, r.y1 + 22, track->muted ? view->image_muted : view->image_unmuted);
+		c->drawImage(area.x1 + 5, area.y1 + 22, track->muted ? view->image_muted : view->image_unmuted);
 	if ((view->audio->tracks.num > 1) and (view->hover.show_track_controls == track))
-		c->drawImage(r.x1 + 22, r.y1 + 22, view->image_solo);
+		c->drawImage(area.x1 + 22, area.y1 + 22, view->image_solo);
 }
 
 

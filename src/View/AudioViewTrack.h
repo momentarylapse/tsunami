@@ -26,14 +26,14 @@ public:
 
 	static color getPitchColor(int pitch);
 
-	void drawTrackBuffers(HuiPainter *c, const rect &r, double pos);
-	void drawBuffer(HuiPainter *c, const rect &r, BufferBox &b, double view_pos_rel, const color &col);
-	void drawSampleFrame(HuiPainter *c, const rect &r, SampleRef *s, const color &col, int delay);
-	void drawSample(HuiPainter *c, const rect &r, SampleRef *s);
-	void drawMarker(HuiPainter *c, const rect &r, TrackMarker &marker);
-	void drawMidi(HuiPainter *c, const rect &r, MidiData &midi, int shift);
-	void drawMidiEditable(HuiPainter *c, const rect &r, MidiData &midi);
-	void drawTrack(HuiPainter *c, const rect &r, int track_no);
+	void drawTrackBuffers(HuiPainter *c, double pos);
+	void drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col);
+	void drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay);
+	void drawSample(HuiPainter *c, SampleRef *s);
+	void drawMarker(HuiPainter *c, TrackMarker &marker);
+	void drawMidi(HuiPainter *c, MidiData &midi, int shift);
+	void drawMidiEditable(HuiPainter *c, MidiData &midi);
+	void draw(HuiPainter *c, int track_no);
 
 	Track *track;
 	rect area;

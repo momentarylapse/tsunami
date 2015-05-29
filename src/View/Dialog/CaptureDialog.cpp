@@ -125,6 +125,7 @@ void CaptureDialog::setTarget(int index)
 	}else{
 		tsunami->input->in_midi->setPreviewSynthesizer(temp_synth);
 	}
+	view->capturing_track = index;
 	setInt("capture_target", index);
 }
 

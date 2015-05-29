@@ -234,6 +234,7 @@ public:
 	Track *cur_track;
 	SampleRef *cur_sample;
 	int cur_level;
+	int capturing_track;
 
 	double view_pos;
 	double view_zoom;

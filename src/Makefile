@@ -83,6 +83,7 @@ OBJ = \
  Data/RingBuffer.o\
  Data/Rhythm.o\
  Data/Sample.o\
+ Data/SampleRef.o\
  Data/Track.o\
  lib/base/array.o\
  lib/base/strings.o\
@@ -500,6 +501,9 @@ Data/Rhythm.o : Data/Rhythm.cpp
 
 Data/Sample.o : Data/Sample.cpp
 	$(CPP) -c Data/Sample.cpp -o $@ $(CXXFLAGS)
+
+Data/SampleRef.o : Data/SampleRef.cpp
+	$(CPP) -c Data/SampleRef.cpp -o $@ $(CXXFLAGS)
 
 Data/Track.o : Data/Track.cpp
 	$(CPP) -c Data/Track.cpp -o $@ $(CXXFLAGS)

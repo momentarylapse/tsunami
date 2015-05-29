@@ -74,7 +74,7 @@ void render_bufbox(Image &im, BufferBox &b)
 		for (int i=i0; i<i1; i++)
 			m = max(m, fabs(b.r[i]));
 		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
-			im.setPixel(x, y, Black);
+			im.setPixel(x, y, tsunami->_view->colors.text);
 	}
 }
 
@@ -205,7 +205,7 @@ void SampleManager::onUpdate(Observable *o, const string &message)
 		if (!preview_stream->isPlaying())
 			endPreview();
 	}else{
-		msg_write(o->getName() + " / " + message);
+		//msg_write(o->getName() + " / " + message);
 		foreach(Sample *s, audio->samples)
 			unsubscribe(s);
 		foreach(Sample *s, audio->samples)

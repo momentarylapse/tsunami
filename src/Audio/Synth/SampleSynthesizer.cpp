@@ -6,6 +6,7 @@
  */
 
 #include "SampleSynthesizer.h"
+#include "../../Data/SampleRef.h"
 
 SampleSynthesizer::SampleSynthesizer()
 {

@@ -32,11 +32,25 @@ ActionAudioDeleteSelection::ActionAudioDeleteSelection(AudioFile *a, int level_n
 				}
 
 			// midi
-			foreachib(MidiEvent &e, t->midi, i)
-				if (range.is_inside(e.pos)){
-					addSubAction(new ActionTrackDeleteMidiEvent(t, i), a);
-					_foreach_it_.update(); // TODO...
+			Set<int> to_delete;
+			Array<int> note_events[128];
+			foreachi(MidiEvent &e, t->midi, i){
+				int pitch = (int)e.pitch;
+				note_events[pitch].add(i);
+				if (e.volume <= 0){
+					int p0 = t->midi[note_events[pitch][0]].pos;
+					int p1 = t->midi[note_events[pitch].back()].pos;
+					Range r = Range(p0, p1 - p0);
+					if (r.overlaps(range)){
+						foreach(int n, note_events[pitch])
+						to_delete.add(n);
+					}
+					note_events[pitch].clear();
 				}
+			}
+
+			foreachb(int n, to_delete)
+				addSubAction(new ActionTrackDeleteMidiEvent(t, n), a);
 		}
 }
 

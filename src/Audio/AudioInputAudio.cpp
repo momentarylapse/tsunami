@@ -293,7 +293,7 @@ int AudioInputAudio::doCapturing()
 
 	// write to file
 	string data;
-	b.exports(data, 2, SAMPLE_FORMAT_16);
+	b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
 	temp_file->WriteBuffer(&data[0], b.num);
 
 	return avail;

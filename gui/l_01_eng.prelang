@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-238
+239
 // Data (ID,Text)
 about
 
@@ -327,6 +327,8 @@ pdt_capturedelay
 Playback delay
 pdt_capturetempfile
 
+pdt_defaultartist
+
 pdt_oggrate
 OGG bitrate
 per_minute
@@ -359,9 +361,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_190964
+rand_id_315503
 
-rand_id_970334
+rand_id_326174
 
 rdt_capture
 

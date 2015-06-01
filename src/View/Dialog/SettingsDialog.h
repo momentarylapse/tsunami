@@ -22,6 +22,7 @@ public:
 	void onLanguage();
 	void onColorScheme();
 	void onOggBitrate();
+	void onDefaultArtist();
 	void onPreviewDevice();
 	void onCaptureDevice();
 	void onCaptureDelay();

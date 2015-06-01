@@ -174,7 +174,7 @@ void AudioFile::newEmpty(int _sample_rate)
 	// default tags
 	addTag("title", "New Audio File");//_("neue Audiodatei"));
 	addTag("album", AppName);
-	addTag("artist", AppName);
+	addTag("artist", HuiConfig.getStr("DefaultArtist", AppName));
 
 	action_manager->enable(true);
 	notify();

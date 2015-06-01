@@ -20,6 +20,7 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	event("language", this, &SettingsDialog::onLanguage);
 	event("color_scheme", this, &SettingsDialog::onColorScheme);
 	event("ogg_bitrate", this, &SettingsDialog::onOggBitrate);
+	event("default_artist", this, &SettingsDialog::onDefaultArtist);
 	event("preview_device", this, &SettingsDialog::onPreviewDevice);
 	event("capture_device", this, &SettingsDialog::onCaptureDevice);
 	event("capture_delay", this, &SettingsDialog::onCaptureDelay);
@@ -29,6 +30,10 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	event("close", this, &SettingsDialog::onClose);
 
 	setOptions("capture_filename", "placeholder=" + tsunami->input->in_audio->getDefaultTempFilename());
+	setOptions("default_artist", "placeholder=" + AppName);
+
+	setTooltip("default_artist", _("wird als Tag artist=... in neue Dateien eingetragen"));
+	setTooltip("capture_filename", _("Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und sp&ater gel&oscht), falls das Program w&ahrendher abst&urzt"));
 
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
@@ -73,6 +78,8 @@ void SettingsDialog::loadData()
 		if (CurOggQuality > q.quality - 0.05f)
 			setInt("ogg_bitrate", i);
 	setDecimals(1);
+
+	setString("default_artist", HuiConfig.getStr("DefaultArtist", ""));
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
@@ -127,6 +134,11 @@ void SettingsDialog::onColorScheme()
 void SettingsDialog::onOggBitrate()
 {
 	HuiConfig.setFloat("OggQuality", ogg_quality[getInt("")].quality);
+}
+
+void SettingsDialog::onDefaultArtist()
+{
+	HuiConfig.setStr("DefaultArtist", getString(""));
 }
 
 void SettingsDialog::onCaptureDevice()

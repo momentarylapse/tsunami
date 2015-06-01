@@ -1,13 +1,15 @@
 Dialog settings_dialog "Einstellungen" 300 300
 	Grid ? "" 1 4
 		Group pdp_general "Generell"
-			Grid ? "" 2 3
+			Grid ? "" 2 4
 				Text pdp_language "Sprache"
 				ComboBox language "" expandx
 				Text pdp_colorscheme "Farbschema"
 				ComboBox color_scheme ""
 				Text pdt_oggrate "OGG-Bitrate"
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
+				Text pdt_defaultartist "Standard Artist"
+				Edit default_artist ""
 		Group pdp_preview "Ausgabe"
 			Grid ? "" 2 1
 				Text pdp_previewdevice "Gerät"

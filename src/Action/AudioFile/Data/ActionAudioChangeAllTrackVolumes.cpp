@@ -25,8 +25,10 @@ void *ActionAudioChangeAllTrackVolumes::execute(Data *d)
 
 	float factor = new_value / old_value;
 
-	foreachi(Track *tt, a->tracks, i)
+	foreachi(Track *tt, a->tracks, i){
 		tt->volume = old_volumes[i] * factor;
+		tt->notify(tt->MESSAGE_CHANGE);
+	}
 
 	return NULL;
 }
@@ -35,8 +37,10 @@ void ActionAudioChangeAllTrackVolumes::undo(Data *d)
 {
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
-	foreachi(Track *tt, a->tracks, i)
+	foreachi(Track *tt, a->tracks, i){
 		tt->volume = old_volumes[i];
+		tt->notify(tt->MESSAGE_CHANGE);
+	}
 }
 
 

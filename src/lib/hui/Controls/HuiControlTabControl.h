@@ -20,6 +20,7 @@ public:
 	virtual void __setInt(int i);
 	virtual int getInt();
 	virtual void __addString(const string &str);
+	virtual void __removeString(int row);
 	virtual void __setOption(const string &op, const string &value);
 
 	virtual void add(HuiControl *child, int x, int y);

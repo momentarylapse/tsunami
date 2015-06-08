@@ -58,6 +58,10 @@ protected:
 	void enablePitch(int pitch, bool enable);
 
 	float delta_phi[128];
+
+	void lock();
+	void unlock();
+	bool locked;
 };
 
 Synthesizer *CreateSynthesizer(const string &name);

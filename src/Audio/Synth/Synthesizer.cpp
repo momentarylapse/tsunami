@@ -23,6 +23,7 @@ Synthesizer::Synthesizer() :
 	sample_rate = 0;
 	keep_notes = 0;
 	auto_stop = true;
+	locked = false;
 
 	setSampleRate(DEFAULT_SAMPLE_RATE);
 }
@@ -52,6 +53,18 @@ void Synthesizer::setSampleRate(int _sample_rate)
 		delta_phi[p] = freq * 2.0f * pi / sample_rate;
 	}
 	onConfig();
+}
+
+void Synthesizer::lock()
+{
+	// really unsafe locking mechanism
+	while (locked){}
+	locked = true;
+}
+
+void Synthesizer::unlock()
+{
+	locked = false;
 }
 
 void Synthesizer::addMetronomeClick(int pos, int level, float volume)
@@ -147,7 +160,7 @@ void Synthesizer::reset()
 // factory
 Synthesizer *CreateSynthesizer(const string &name)
 {
-	if ((name == "Dummy") || (name == ""))
+	if ((name == "Dummy") or (name == ""))
 		return new DummySynthesizer;
 	/*if (name == "Sample")
 		return new SampleSynthesizer;*/

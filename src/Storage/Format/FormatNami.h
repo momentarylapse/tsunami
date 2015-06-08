@@ -25,6 +25,7 @@ public:
 	string compress_buffer(BufferBox &b);
 
 	Array<int> ChunkPos;
+	void make_consistent(AudioFile *a);
 
 	void BeginChunk(const string &name);
 	void EndChunk();

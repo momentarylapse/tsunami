@@ -899,6 +899,17 @@ void check_empty_subs(AudioFile *a)
 			}*/
 }
 
+void FormatNami::make_consistent(AudioFile *a)
+{
+	foreach(Sample *s, a->samples){
+		if (s->type == Track::TYPE_MIDI){
+			if ((s->midi.samples == 0) and (s->midi.num > 0)){
+				s->midi.samples = s->midi.back().pos;
+			}
+		}
+	}
+}
+
 void FormatNami::loadAudio(AudioFile *a, const string & filename)
 {
 	msg_db_f("load_nami_file", 1);
@@ -919,7 +930,7 @@ void FormatNami::loadAudio(AudioFile *a, const string & filename)
 	FileClose(f);
 
 	// some post processing
-	check_empty_subs(a);
+	make_consistent(a);
 
 	a->updateSelection(Range(0, 0));
 }

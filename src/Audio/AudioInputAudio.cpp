@@ -110,7 +110,7 @@ AudioInputAudio::AudioInputAudio(BufferBox &buf, RingBuffer &cur_buf) :
 	sample_rate = DEFAULT_SAMPLE_RATE;
 
 	chosen_device = HuiConfig.getStr("Input.ChosenDevice", "");
-	playback_delay_const = HuiConfig.getFloat("Input.PlaybackDelay", 80.0f);
+	playback_delay_const = HuiConfig.getFloat("Input.PlaybackDelay", 0.0f);
 	temp_filename = HuiConfig.getStr("Input.TempFilename", "");
 	temp_file = NULL;
 

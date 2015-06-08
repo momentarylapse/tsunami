@@ -61,6 +61,11 @@ void HuiControlTabControl::__addString(const string &str)
 	addPage(str);
 }
 
+void HuiControlTabControl::__removeString(int row)
+{
+	gtk_notebook_remove_page(GTK_NOTEBOOK(widget), row);
+}
+
 void HuiControlTabControl::addPage(const string &str)
 {
 	GtkWidget *inside;

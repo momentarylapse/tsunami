@@ -68,11 +68,11 @@ void ActionAudioDeleteSelection::DeleteBuffersFromTrackLevel(AudioFile* a,
 			// b completely inside?
 			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
-		}else if ((i0 > bi0) && (i1 > bi1) && (i0 < bi1)){
+		}else if ((i0 > bi0) and (i1 > bi1) and (i0 < bi1)){
 			// overlapping end of b?
 			addSubAction(new ActionTrack__ShrinkBufferBox(t, level_no, n, i0 - bi0), a);
 
-		}else if ((i0 <= bi0) && (i1 < bi1) && (i1 > bi0)){
+		}else if ((i0 <= bi0) and (i1 < bi1) and (i1 > bi0)){
 			// overlapping beginning of b?
 			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
 			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);

@@ -241,7 +241,7 @@ void AudioFile::updateSelection(const Range &range)
 	// subs
 	foreach(Track *t, tracks)
 		foreach(SampleRef *s, t->samples)
-			s->is_selected = (t->is_selected) && range.overlaps(s->getRange());
+			s->is_selected = (t->is_selected) and range.overlaps(s->getRange());
 	notify(MESSAGE_SELECTION_CHANGE);
 }
 

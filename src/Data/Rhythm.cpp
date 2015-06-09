@@ -14,6 +14,15 @@ Beat::Beat(const Range &r, int bar, int beat)
 	beat_no = beat;
 };
 
+Range Beat::sub(int index, int parts)
+{
+	int length = range.num / parts;
+	int start = range.offset + index * length;
+	if (index == parts - 1)
+		return Range(start, range.num - start);
+	return Range(start, length);
+}
+
 Bar::Bar(const Range &r, int _num_beats, int _index)
 {
 	range = r;

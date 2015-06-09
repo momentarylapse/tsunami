@@ -8,6 +8,9 @@
 #include "Range.h"
 #include "../lib/file/file.h"
 
+const Range Range::ALL = Range(-0x4000000, 0x8000000); // TODO
+const Range Range::EMPTY = Range(0, 0);
+
 Range::Range(const Range & r)
 {
 	offset = r.offset;

@@ -17,13 +17,25 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.17.0";
+string AppVersion = "0.6.17.1";
 
 Tsunami *tsunami = NULL;
 
 Tsunami::Tsunami() :
 	HuiApplication("tsunami", "Deutsch", HUI_FLAG_LOAD_RESOURCE)
 {
+	audio = NULL;
+	input = NULL;
+	_view = NULL;
+	output = NULL;
+	log = NULL;
+	_win = NULL;
+	clipboard = NULL;
+	win = NULL;
+	plugin_manager = NULL;
+	storage = NULL;
+	progress = NULL;
+
 	HuiSetProperty("name", AppName);
 	HuiSetProperty("version", AppVersion);
 	HuiSetProperty("comment", _("Editor f&ur Audio Dateien"));

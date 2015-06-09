@@ -651,31 +651,72 @@ void AudioView::onLeftButtonDown()
 	updateMenu();
 }
 
+Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
+{
+	Range allowed = Range::ALL;
+	Array<MidiNote> notes = midi_events_to_notes(t->midi);
+	foreach(MidiNote &n, notes){
+		foreach(int p, pitch)
+			if (n.pitch == p){
+				if (n.range.is_inside(start))
+					return Range::EMPTY;
+			}
+	}
+
+	foreach(MidiEvent &e, t->midi)
+		foreach(int p, pitch)
+			if (e.pitch == p){
+				if ((e.pos >= start) and (e.pos < allowed.end()))
+					allowed.set_end(e.pos);
+				if ((e.pos < start) and (e.pos >= allowed.start()))
+					allowed.set_start(e.pos);
+			}
+	return allowed;
+}
+
+void align_to_beats(Track *t, Range &r, int beat_partition)
+{
+	Array<Beat> beats = t->bars.getBeats(Range::ALL);//audio->getRange());
+	foreach(Beat &b, beats){
+		/*for (int i=0; i<beat_partition; i++){
+			Range sr = b.sub(i, beat_partition);
+			if (sr.overlaps(sr))
+				r = r or sr;
+		}*/
+		if (b.range.is_inside(r.start())){
+			int dl = b.range.num / beat_partition;
+			r.set_start(b.range.offset + dl * ((r.start() - b.range.offset) / dl));
+		}
+		if (b.range.is_inside(r.end())){
+			int dl = b.range.num / beat_partition;
+			r.set_end(b.range.offset + dl * ((r.end() - b.range.offset) / dl + 1));
+			break;
+		}
+	}
+}
 
 Array<MidiNote> AudioView::getCreationNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection.pos);
 	int end = max(mouse_possibly_selecting_start, selection.pos);
-	Track *t = audio->getTimeTrack();
-	if (t){
-		Array<Beat> beats = t->bars.getBeats(Range(-0x4000000, 0x8000000));//audio->getRange());
-		foreach(Beat &b, beats){
-			if (b.range.is_inside(start)){
-				int dl = b.range.num / beat_partition;
-				start = b.range.offset + dl * ((start - b.range.offset) / dl);
-			}
-			if (b.range.is_inside(end)){
-				int dl = b.range.num / beat_partition;
-				end = b.range.offset + dl * ((end - b.range.offset) / dl + 1);
-				break;
-			}
-		}
-	}
 	Range r = Range(start, end - start);
-	Array<MidiNote> notes;
+
+	// align to beats
+	Track *t = audio->getTimeTrack();
+	if (t)
+		align_to_beats(t, r, beat_partition);
+
 	Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
+
+	// collision?
+	Range allowed = get_allowed_midi_range(cur_track, pitch, mouse_possibly_selecting_start);
+
+	// create notes
+	Array<MidiNote> notes;
+	if (allowed.empty())
+		return notes;
 	foreach(int p, pitch)
-		notes.add(MidiNote(r, p, 1));
+		notes.add(MidiNote(r and allowed, p, 1));
 	return notes;
 }
 

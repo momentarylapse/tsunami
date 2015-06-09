@@ -47,6 +47,7 @@ public:
 	Range range;
 	int bar_no;
 	int beat_no;
+	Range sub(int index, int parts);
 };
 
 class BarCollection : public Array<BarPattern>

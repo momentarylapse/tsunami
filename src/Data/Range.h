@@ -18,6 +18,9 @@ public:
 	Range(const Range &r);
 	~Range();
 
+	static const Range ALL;
+	static const Range EMPTY;
+
 	string str() const;
 
 	void clear();

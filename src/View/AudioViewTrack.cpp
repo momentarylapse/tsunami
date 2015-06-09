@@ -221,37 +221,52 @@ void AudioViewTrack::drawMidi(HuiPainter *c, MidiData &midi, int shift)
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void draw_note(HuiPainter *c, const MidiNote &n, color &col, AudioView *v)
+void AudioViewTrack::drawMidiNote(HuiPainter *c, const MidiNote &n, bool hover)
 {
-	float x1 = v->sample2screen(n.range.offset);
-	float x2 = v->sample2screen(n.range.end());
-	float xm = x1 * 0.8f + x2 * 0.2f;
-	float y1 = v->pitch2y(n.pitch + 1);
-	float y2 = v->pitch2y(n.pitch);
+	float x1 = view->sample2screen(n.range.offset);
+	float x2 = view->sample2screen(n.range.end());
+	float y1 = view->pitch2y(n.pitch + 1);
+	float y2 = view->pitch2y(n.pitch);
+	color col = getPitchColor(n.pitch);
+	if (hover)
+		col.a = 0.5f;
 	c->setColor(col);
-	c->drawRect(rect(x1, xm, y1, y2));
-	color col2 = ColorInterpolate(col, Black, 0.1f);
-	c->setColor(col2);
-	c->drawRect(rect(xm, x2, y1, y2));
+	c->drawRect(rect(x1, x2, y1, y2));
+}
+
+void AudioViewTrack::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
+{
+	float x = view->sample2screen(e.pos);
+	float y1 = view->pitch2y(e.pitch + 1);
+	float y2 = view->pitch2y(e.pitch);
+	color col = getPitchColor(e.pitch);
+	col = ColorInterpolate(col, view->colors.text, 0.5f);
+	c->setColor(col);
+	c->drawRect(rect(x-1.5f, x+1.5f, y1, y2));
 }
 
 void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi)
 {
+	Array<MidiEvent> events = midi.getEvents(view->viewRange());
 	Array<MidiNote> notes = midi.getNotes(view->viewRange());
+
+	// draw notes
 	foreachi(MidiNote &n, notes, i){
 		if ((n.pitch < view->pitch_min) or (n.pitch >= view->pitch_max))
 			continue;
-		color col = getPitchColor(n.pitch);
-		if ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (n.range.offset == view->hover.note_start))
-			col.a = 0.5f;
-		draw_note(c, n, col, view);
+		bool hover = ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (n.range.offset == view->hover.note_start));
+		drawMidiNote(c, n, hover);
 	}
+
+	// draw events
+	foreach(MidiEvent &e, events)
+		drawMidiEvent(c, e);
+
+	// current creation
 	if ((HuiGetEvent()->lbut) and (view->selection.type == view->SEL_TYPE_MIDI_PITCH)){
 		Array<MidiNote> notes = view->getCreationNotes();
 		foreach(MidiNote &n, notes){
-			color col = getPitchColor(n.pitch);
-			col.a = 0.5f;
-			draw_note(c, n, col, view);
+			drawMidiNote(c, n, true);
 		}
 	}
 

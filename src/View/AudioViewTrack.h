@@ -16,6 +16,8 @@ class AudioView;
 class BufferBox;
 class SampleRef;
 class MidiData;
+class MidiEvent;
+class MidiNote;
 class TrackMarker;
 
 class AudioViewTrack
@@ -33,6 +35,8 @@ public:
 	void drawMarker(HuiPainter *c, TrackMarker &marker);
 	void drawMidi(HuiPainter *c, MidiData &midi, int shift);
 	void drawMidiEditable(HuiPainter *c, MidiData &midi);
+	void drawMidiNote(HuiPainter *c, const MidiNote &n, bool hover);
+	void drawMidiEvent(HuiPainter *c, const MidiEvent &e);
 	void draw(HuiPainter *c, int track_no);
 
 	Track *track;

@@ -271,7 +271,7 @@ Range AudioFile::getRange()
 	int max = -1073741824;
 	Range r = Range(min, max - min);
 	foreach(Track *t, tracks)
-		r = r || t->getRangeUnsafe();
+		r = r or t->getRangeUnsafe();
 
 	if (r.length() < 0)
 		return Range(0, 0);
@@ -449,17 +449,17 @@ void AudioFile::invalidateAllPeaks()
 
 Track *AudioFile::get_track(int track_no)
 {
-	assert((track_no >= 0) && (track_no < tracks.num) && "AudioFile.get_track");
+	assert((track_no >= 0) and (track_no < tracks.num) and "AudioFile.get_track");
 	return tracks[track_no];
 }
 
 SampleRef *AudioFile::get_sample_ref(int track_no, int index)
 {
-	assert((track_no >= 0) && (track_no < tracks.num) && "AudioFile.get_sample");
+	assert((track_no >= 0) and (track_no < tracks.num) and "AudioFile.get_sample");
 	Track *t = tracks[track_no];
 
-	assert((index >= 0) && "AudioFile.get_sample");
-	assert((index < t->samples.num) && "AudioFile.get_sample");
+	assert((index >= 0) and "AudioFile.get_sample");
+	assert((index < t->samples.num) and "AudioFile.get_sample");
 	return t->samples[index];
 }
 

@@ -116,11 +116,11 @@ Range Track::getRangeUnsafe()
 	}
 	Range r = Range(min, max - min);
 
-	if ((type == TYPE_TIME) && (bars.num > 0))
-		r = r || bars.getRange();
+	if ((type == TYPE_TIME) and (bars.num > 0))
+		r = r or bars.getRange();
 
-	if ((type == TYPE_MIDI) && (midi.num > 0))
-		r = r || midi.getRange(synth->keep_notes);
+	if ((type == TYPE_MIDI) and (midi.num > 0))
+		r = r or midi.getRange(synth->keep_notes);
 
 	return r;
 }
@@ -162,7 +162,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	foreach(BufferBox &b, levels[level_no].buffers){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.num;
-		if ((p0 >= 0) && (p1 <= b.num)){
+		if ((p0 >= 0) and (p1 <= b.num)){
 			// set as reference to subarrays
 			buf.set_as_ref(b, p0, p1 - p0);
 			return buf;
@@ -200,7 +200,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 			}else if (b.range().overlaps(r))
 				intersected = true;
 		}
-	if ((num_inside == 1) && (!intersected)){
+	if ((num_inside == 1) and (!intersected)){
 		// set as reference to subarrays
 		buf.set_as_ref(levels[inside_level].buffers[inside_no], inside_p0, inside_p1 - inside_p0);
 		return buf;

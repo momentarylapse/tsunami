@@ -9,77 +9,69 @@
 
 const string Progress::MESSAGE_CANCEL = "Cancel";
 
+Progress::Progress(const string &str, HuiWindow *parent) :
+	Observable("Progress")
+{
+	dlg = HuiCreateResourceDialog("progress_dialog", parent);
+	dlg->setString("progress_bar", str);
+	dlg->setFloat("progress_bar", 0);
+	dlg->show();
+	dlg->eventS("hui:close", &HuiFuncIgnore);
+	HuiDoSingleMainLoop();
+	cancelled = false;
+}
+
 Progress::Progress() :
 	Observable("Progress"), dlg(NULL)
 {
-	Cancelled = false;
+	cancelled = false;
 }
 
 Progress::~Progress()
 {
+	delete(dlg);
 }
 
 
 void Progress::set(const string &str, float progress)
 {
-	if (dlg){
-		dlg->setString("progress_bar", str);
-		dlg->setFloat("progress_bar", progress);
-		HuiDoSingleMainLoop();
-	}
+	dlg->setString("progress_bar", str);
+	dlg->setFloat("progress_bar", progress);
+	HuiDoSingleMainLoop();
 }
 
 
 void Progress::set(float progress)
 {
-	if (dlg){
-		dlg->setFloat("progress_bar", progress);
-		HuiDoSingleMainLoop();
-	}
-}
-
-void Progress::start(const string &str, float progress)
-{
-	if ((dlg == NULL) && (HuiCurWindow)){
-		dlg = HuiCreateResourceDialog("progress_dialog", HuiCurWindow);
-		dlg->setString("progress_bar", str);
-		dlg->setFloat("progress_bar", progress);
-		dlg->show();
-		dlg->eventS("hui:close", &HuiFuncIgnore);
-		HuiDoSingleMainLoop();
-	}
-	Cancelled = false;
+	dlg->setFloat("progress_bar", progress);
+	HuiDoSingleMainLoop();
 }
 
 void Progress::cancel()
 {
+	cancelled = true;
 	notify(MESSAGE_CANCEL);
-	Cancelled = true;
 }
 
 bool Progress::isCancelled()
 {
-	return Cancelled;
+	return cancelled;
 }
 
-void Progress::startCancelable(const string &str, float progress)
+
+
+ProgressCancelable::ProgressCancelable(const string &str, HuiWindow *parent) :
+	Progress()
 {
-	if ((dlg == NULL) && (HuiCurWindow)){
-		dlg = HuiCreateResourceDialog("progress_cancelable_dialog", HuiCurWindow);
-		dlg->setString("progress_bar", str);
-		dlg->setFloat("progress_bar", progress);
-		dlg->show();
-		dlg->event("hui:close", this, &Progress::cancel);
-		dlg->event("cancel", this, &Progress::cancel);
-		HuiDoSingleMainLoop();
-	}
-	Cancelled = false;
+	dlg = HuiCreateResourceDialog("progress_cancelable_dialog", parent);
+	dlg->setString("progress_bar", str);
+	dlg->setFloat("progress_bar", 0);
+	dlg->show();
+	dlg->event("hui:close", this, &Progress::cancel);
+	dlg->event("cancel", this, &Progress::cancel);
+	HuiDoSingleMainLoop();
 }
 
-void Progress::end()
+ProgressCancelable::~ProgressCancelable()
 {
-	if (dlg){
-		delete(dlg);
-		dlg = NULL;
-	}
 }

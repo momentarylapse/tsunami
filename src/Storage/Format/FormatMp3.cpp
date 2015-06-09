@@ -38,15 +38,16 @@ static int read_32bit_be(File *f)
 	return d[3] | (d[2] << 8) | (d[1] << 16) | (d[0] << 24);
 }
 
-void FormatMp3::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
+void FormatMp3::saveBuffer(StorageOperationData *od){}
 
-void FormatMp3::loadTrack(Track *t, const string & filename, int offset, int level)
+void FormatMp3::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_mp3_file", 1);
-	tsunami->progress->set(_("lade mp3"), 0);
+	od->progress->set(_("lade mp3"), 0);
+	Track *t = od->track;
 
 	unsigned char *data = new unsigned char[4096];
-	File *f = FileOpen(filename);
+	File *f = FileOpen(od->filename);
 
 	try{
 
@@ -165,9 +166,9 @@ void FormatMp3::loadTrack(Track *t, const string & filename, int offset, int lev
 
 		if (system("which avconv") == 0){
 			string tmp = "/tmp/tsunami_mp3_out.wav";
-			system(("avconv -i \"" + filename + "\" \"" + tmp + "\"").c_str());
-			tsunami->storage->loadTrack(t, tmp, offset, level);
-			tsunami->storage->current_directory = filename.dirname();
+			system(("avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
+			tsunami->storage->loadTrack(t, tmp, od->offset, od->level);
+			tsunami->storage->current_directory = od->filename.dirname();
 			file_delete(tmp);
 		}else
 			tsunami->log->error("mp3: need external program 'avconv' to decode");
@@ -183,11 +184,11 @@ void FormatMp3::loadTrack(Track *t, const string & filename, int offset, int lev
 		FileClose(f);
 }
 
-void FormatMp3::saveAudio(AudioFile *a, const string & filename){}
+void FormatMp3::saveAudio(StorageOperationData *od){}
 
-void FormatMp3::loadAudio(AudioFile *a, const string & filename)
+void FormatMp3::loadAudio(StorageOperationData *od)
 {
-	Track *t = a->addTrack(Track::TYPE_AUDIO);
-	loadTrack(t, filename);
+	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	loadTrack(od);
 }
 

@@ -10,6 +10,9 @@
 
 #include "../../Data/Track.h"
 #include "../../Data/AudioFile.h"
+#include "../StorageOperationData.h"
+
+class StorageOperationData;
 
 class Format
 {
@@ -20,13 +23,13 @@ public:
 	bool testFormatCompatibility(AudioFile *a);
 
 	void importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
-	void exportAudioAsTrack(AudioFile *a, const string &filename);
+	void exportAudioAsTrack(StorageOperationData *od);
 
-	virtual void loadTrack(Track *t, const string &filename, int offset = 0, int level = 0) = 0;
-	virtual void saveBuffer(AudioFile *a, BufferBox *b, const string &filename) = 0;
+	virtual void loadTrack(StorageOperationData *od) = 0;
+	virtual void saveBuffer(StorageOperationData *od) = 0;
 
-	virtual void loadAudio(AudioFile *a, const string &filename) = 0;
-	virtual void saveAudio(AudioFile *a, const string &filename) = 0;
+	virtual void loadAudio(StorageOperationData *od) = 0;
+	virtual void saveAudio(StorageOperationData *od) = 0;
 
 	Array<string> extensions;
 	string description;

@@ -31,9 +31,9 @@ FormatOgg::~FormatOgg()
 {
 }
 
-void FormatOgg::saveAudio(AudioFile *a, const string & filename)
+void FormatOgg::saveAudio(StorageOperationData *od)
 {
-	exportAudioAsTrack(a, filename);
+	exportAudioAsTrack(od);
 }
 
 
@@ -49,14 +49,16 @@ int oe_write_page(ogg_page *page, FILE *fp)
 }
 
 
-void FormatOgg::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
+void FormatOgg::saveBuffer(StorageOperationData *od)
 {
 	msg_db_r("write_ogg_file", 1);
-	tsunami->progress->set(_("exportiere ogg"), 0);
+	od->progress->set(_("exportiere ogg"), 0);
+	AudioFile *a = od->audio;
+	BufferBox *b = od->buf;
 
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
 
-	FILE *f = fopen(filename.c_str(), "wb");
+	FILE *f = fopen(od->filename.c_str(), "wb");
 
 	vorbis_info vi;
 	vorbis_info_init(&vi);
@@ -128,7 +130,7 @@ void FormatOgg::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 		nn ++;
 		if (nn > 8){
-			tsunami->progress->set(float(written) / (float)b->num);
+			od->progress->set(float(written) / (float)b->num);
 			nn = 0;
 		}
 
@@ -185,19 +187,21 @@ void FormatOgg::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 
 
-void FormatOgg::loadAudio(AudioFile *a, const string & filename)
+void FormatOgg::loadAudio(StorageOperationData *od)
 {
-	Track *t = a->addTrack(Track::TYPE_AUDIO);
-	loadTrack(t, filename);
+	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	loadTrack(od);
 }
 
 
 
-void FormatOgg::loadTrack(Track *t, const string & filename, int offset, int level)
+void FormatOgg::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("Ogg.LoadTracl", 1);
-	tsunami->progress->set(_("lade ogg"), 0);
-	if (ov_fopen((char*)filename.c_str(), &vf)){
+	od->progress->set(_("lade ogg"), 0);
+	Track *t = od->track;
+
+	if (ov_fopen((char*)od->filename.c_str(), &vf)){
 		msg_error("ogg: ov_fopen failed");
 		return;
 	}
@@ -241,12 +245,12 @@ void FormatOgg::loadTrack(Track *t, const string & filename, int offset, int lev
 			break;
 		}else{
 			int dsamples = r / 4;
-			int _offset = read / 4 + offset;
-			importData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, level);
+			int _offset = read / 4 + od->offset;
+			importData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, od->level);
 			read += r;
 			nn ++;
 			if (nn > 256){
-				tsunami->progress->set((float)read / (float)(samples * 4));
+				od->progress->set((float)read / (float)(samples * 4));
 				nn = 0;
 			}
 		}

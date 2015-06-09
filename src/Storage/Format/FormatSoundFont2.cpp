@@ -19,25 +19,26 @@ FormatSoundFont2::~FormatSoundFont2()
 {
 }
 
-void FormatSoundFont2::loadTrack(Track* t, const string& filename, int offset, int level)
+void FormatSoundFont2::loadTrack(StorageOperationData *od)
 {
 }
 
-void FormatSoundFont2::saveBuffer(AudioFile* a, BufferBox* b, const string& filename)
+void FormatSoundFont2::saveBuffer(StorageOperationData *od)
 {
 }
 
-void FormatSoundFont2::loadAudio(AudioFile* a, const string &filename)
+void FormatSoundFont2::loadAudio(StorageOperationData *_od)
 {
-	audio = a;
+	od = _od;
+	audio = od->audio;
 
-	File *f = FileOpen(filename);
+	File *f = FileOpen(od->filename);
 	f->SetBinaryMode(true);
 
 	sample_offset = -1;
 
 	try{
-		tsunami->progress->set(_("importiere sf2"), 0);
+		od->progress->set(_("importiere sf2"), 0);
 		read_chunk(f);
 		if (sample_offset > 0)
 			read_samples(f);
@@ -153,10 +154,10 @@ void FormatSoundFont2::read_samples(File *f)
 		delete data;
 
 		samples_read += num_samples;
-		tsunami->progress->set(float(samples_read) / (float)samples_all);
+		od->progress->set(float(samples_read) / (float)samples_all);
 	}
 }
 
-void FormatSoundFont2::saveAudio(AudioFile* a, const string &filename)
+void FormatSoundFont2::saveAudio(StorageOperationData *od)
 {
 }

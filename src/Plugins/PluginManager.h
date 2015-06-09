@@ -11,7 +11,6 @@
 #include "../lib/hui/hui.h"
 #include "../lib/script/script.h"
 #include "../Data/AudioFile.h"
-#include "../Stuff/Observer.h"
 
 class Plugin;
 class Effect;
@@ -20,7 +19,7 @@ class Synthesizer;
 class Configurable;
 class FavoriteManager;
 
-class PluginManager : public HuiEventHandler, public Observer
+class PluginManager : public HuiEventHandler
 {
 public:
 	PluginManager();
@@ -38,14 +37,9 @@ public:
 
 	bool LoadAndCompilePlugin(const string&);
 
-	void PreviewStart(Effect *fx);
-	void PreviewEnd();
-
 	void ApplyFavorite(Configurable *c, const string &name);
 	void SaveFavorite(Configurable *c, const string &name);
 	string SelectFavoriteName(HuiWindow *win, Configurable *c, bool save);
-
-	virtual void onUpdate(Observable *o, const string &message);
 
 	Effect *LoadEffect(const string &name);
 	MidiEffect *LoadMidiEffect(const string &name);
@@ -74,7 +68,6 @@ public:
 
 	Array<Plugin*> plugin;
 	Plugin *cur_plugin;
-	Effect *cur_effect;
 
 	struct PluginContext
 	{

@@ -88,18 +88,18 @@ static string read_str41(File *f)
 	return read_str1(f);
 }
 
-void FormatGuitarPro::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
+void FormatGuitarPro::saveBuffer(StorageOperationData *od){}
 
-void FormatGuitarPro::loadTrack(Track *t, const string & filename, int offset, int level){}
+void FormatGuitarPro::loadTrack(StorageOperationData *od){}
 
-void FormatGuitarPro::saveAudio(AudioFile *_a, const string & filename)
+void FormatGuitarPro::saveAudio(StorageOperationData *od)
 {
-	a = _a;
+	a = od->audio;
 	char data[16];
 
-	f = FileCreate(filename);
+	f = FileCreate(od->filename);
 	f->SetBinaryMode(true);
-	string ext = filename.extension();
+	string ext = od->filename.extension();
 	if (ext == "gp3")
 		version = 300;
 	else if (ext == "gp4")
@@ -172,10 +172,10 @@ void FormatGuitarPro::saveAudio(AudioFile *_a, const string & filename)
 	delete(f);
 }
 
-void FormatGuitarPro::loadAudio(AudioFile *_a, const string &filename)
+void FormatGuitarPro::loadAudio(StorageOperationData *od)
 {
-	a = _a;
-	f = FileOpen(filename);
+	a = od->audio;
+	f = FileOpen(od->filename);
 	char data[16];
 	tracks.clear();
 	measures.clear();

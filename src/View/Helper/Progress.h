@@ -14,22 +14,27 @@
 class Progress : public Observable
 {
 public:
-	Progress();
+	Progress(const string &str, HuiWindow *parent);
 	virtual ~Progress();
 	void set(float progress);
 	void set(const string &str, float progress);
-	void start(const string &str, float progress);
-	void startCancelable(const string &str, float progress);
-	void end();
 
 	static const string MESSAGE_CANCEL;
 
 	void cancel();
 	bool isCancelled();
 
-private:
+protected:
+	Progress();
 	HuiWindow *dlg;
-	bool Cancelled;
+	bool cancelled;
+};
+
+class ProgressCancelable : public Progress
+{
+public:
+	ProgressCancelable(const string &str, HuiWindow *parent);
+	virtual ~ProgressCancelable();
 };
 
 #endif /* PROGRESS_H_ */

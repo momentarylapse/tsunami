@@ -458,47 +458,46 @@ void FormatNami::WriteFormat()
 	EndChunk();
 }
 
-void FormatNami::saveAudio(AudioFile *a, const string & filename)
+void FormatNami::saveAudio(StorageOperationData *od)
 {
-	tsunami->progress->start(_("speichere nami"), 0);
-	a->filename = filename;
-	audio = a;
+	od->progress->set(_("speichere nami"), 0);
+	audio = od->audio;
+	audio->filename = od->filename;
 
 //	int length = a->GetLength();
 //	int min = a->GetMin();
-	f = FileCreate(filename);
+	f = FileCreate(od->filename);
 	f->SetBinaryMode(true);
 
 	BeginChunk("nami");
 
-	f->WriteInt(a->sample_rate);
+	f->WriteInt(audio->sample_rate);
 	WriteFormat();
 
-	foreach(Tag &tag, a->tags)
+	foreach(Tag &tag, audio->tags)
 		WriteTag(&tag);
 
 	WriteLevelName();
 
-	foreach(Sample *sample, a->samples)
+	foreach(Sample *sample, audio->samples)
 		WriteSample(sample);
 
-	foreachi(Track *track, a->tracks, i){
+	foreachi(Track *track, audio->tracks, i){
 		WriteTrack(track);
-		tsunami->progress->set(_("speichere nami"), ((float)i + 0.5f) / (float)a->tracks.num);
+		od->progress->set(_("speichere nami"), ((float)i + 0.5f) / (float)audio->tracks.num);
 	}
 
-	foreach(Effect *effect, a->fx)
+	foreach(Effect *effect, audio->fx)
 		WriteEffect(effect);
 
 	EndChunk();
 
 	FileClose(f);
-	tsunami->progress->end();
 }
 
 
 
-void FormatNami::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatNami::saveBuffer(StorageOperationData *od)
 {
 }
 
@@ -562,6 +561,7 @@ struct ChunkStack
 	Array<ChunkLevelData> chunk_data;
 	File *f;
 	AudioFile *a;
+	StorageOperationData *od;
 
 
 	void AddChunkHandler(const string &tag, chunk_reader *reader, void *data)
@@ -675,7 +675,7 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 	int offset = 0;
 	for (int n=0; n<data.num / CHUNK_SIZE; n++){
 		s->f->ReadBuffer(&data[offset], CHUNK_SIZE);
-		tsunami->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
+		s->od->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
 		offset += CHUNK_SIZE;
 	}
 	s->f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
@@ -846,7 +846,7 @@ void ReadChunkTrack(ChunkStack *s, AudioFile *a)
 	t->panning = s->f->ReadFloat();
 	s->f->ReadInt(); // reserved
 	s->f->ReadInt();
-	tsunami->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
+	s->od->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
 
 	s->AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
 	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->levels[0]);
@@ -872,16 +872,17 @@ void ReadChunkNami(ChunkStack *s, AudioFile *a)
 }
 
 
-void load_nami_file_new(File *f, AudioFile *a)
+void load_nami_file_new(StorageOperationData *od, File *f)
 {
 	AudioFile *old = tsunami->audio;
-	tsunami->audio = a;
+	tsunami->audio = od->audio;
 
 	ChunkStack s;
 	s.f = f;
-	s.a = a;
+	s.a = od->audio;
+	s.od = od;
 	s.chunk_data.add(ChunkLevelData("-top level-", 0, f->GetSize()));
-	s.AddChunkHandler("nami", (chunk_reader*)&ReadChunkNami, a);
+	s.AddChunkHandler("nami", (chunk_reader*)&ReadChunkNami, od->audio);
 
 	s.ReadChunk(f);
 
@@ -910,19 +911,19 @@ void FormatNami::make_consistent(AudioFile *a)
 	}
 }
 
-void FormatNami::loadAudio(AudioFile *a, const string & filename)
+void FormatNami::loadAudio(StorageOperationData *od)
 {
 	msg_db_f("load_nami_file", 1);
-	tsunami->progress->set(_("lade nami"), 0);
+	od->progress->set(_("lade nami"), 0);
 
 	// TODO?
-	a->tags.clear();
+	od->audio->tags.clear();
 
-	File *f = FileOpen(a->filename);
+	File *f = FileOpen(od->filename);
 	f->SetBinaryMode(true);
 
 	try{
-		load_nami_file_new(f, a);
+		load_nami_file_new(od, f);
 	}catch(string &s){
 		tsunami->log->error("loading nami: " + s);
 	}
@@ -930,14 +931,14 @@ void FormatNami::loadAudio(AudioFile *a, const string & filename)
 	FileClose(f);
 
 	// some post processing
-	make_consistent(a);
+	make_consistent(od->audio);
 
-	a->updateSelection(Range(0, 0));
+	od->audio->updateSelection(Range(0, 0));
 }
 
 
 
-void FormatNami::loadTrack(Track *t, const string &filename, int offset, int level)
+void FormatNami::loadTrack(StorageOperationData *od)
 {
 }
 

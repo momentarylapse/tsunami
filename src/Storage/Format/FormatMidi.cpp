@@ -18,10 +18,10 @@ FormatMidi::~FormatMidi()
 {
 }
 
-void FormatMidi::loadTrack(Track *t, const string &filename, int offset, int level)
+void FormatMidi::loadTrack(StorageOperationData *od)
 {}
 
-void FormatMidi::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatMidi::saveBuffer(StorageOperationData *od)
 {}
 
 static string read_chunk_name(File *f)
@@ -62,11 +62,11 @@ static string ascii2utf8(const string &s)
 	return r;
 }
 
-void FormatMidi::loadAudio(AudioFile *a, const string &filename)
+void FormatMidi::loadAudio(StorageOperationData *od)
 {
 	File *f = NULL;
 	try{
-		f = FileOpen(filename);
+		f = FileOpen(od->filename);
 		if (!f)
 			throw string("can't open file");
 		f->SetBinaryMode(true);
@@ -107,7 +107,7 @@ void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 			int offset = 0;
 			while(f->GetPos() < pos0 + tsize){
 				int v = read_var(f);
-				offset += (double)v * (double)mpqn / 1000000.0 * (double)a->sample_rate / (double)ticks_per_beat;
+				offset += (double)v * (double)mpqn / 1000000.0 * (double)od->audio->sample_rate / (double)ticks_per_beat;
 				int c0 = f->ReadByte();
 				if ((c0 & 128) == 0){ // "running status"
 					c0 = last_status;
@@ -175,7 +175,7 @@ void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 			f->SetPos(pos0 + tsize, true);
 
 			if (events.num > 0){
-				Track *t = a->addTrack(Track::TYPE_MIDI);
+				Track *t = od->audio->addTrack(Track::TYPE_MIDI);
 				t->midi.append(events);
 				t->name = track_name;
 			}
@@ -189,7 +189,7 @@ void FormatMidi::loadAudio(AudioFile *a, const string &filename)
 	}
 }
 
-void FormatMidi::saveAudio(AudioFile *a, const string &filename)
+void FormatMidi::saveAudio(StorageOperationData *od)
 {
 }
 

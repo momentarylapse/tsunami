@@ -132,6 +132,8 @@ SampleManager::SampleManager(AudioFile *a) :
 	preview_stream = new AudioStream(preview_renderer);
 	preview_sample = NULL;
 
+	progress = NULL;
+
 	audio = a;
 	selected_uid = -1;
 	updateList();
@@ -270,13 +272,13 @@ void SampleManager::remove(SampleManagerItem *item)
 
 void SampleManager::onUpdate(Observable *o, const string &message)
 {
-	if (o == tsunami->progress){
-		if (message == tsunami->progress->MESSAGE_CANCEL)
+	if ((progress) and (o == progress)){
+		if (message == progress->MESSAGE_CANCEL)
 			endPreview();
 	}else if (o == preview_stream){
 		int pos = preview_stream->getPos();
 		Range r = preview_sample->getRange();
-		tsunami->progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
+		progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
 		if (!preview_stream->isPlaying())
 			endPreview();
 	}else if (o == audio){
@@ -287,6 +289,8 @@ void SampleManager::onUpdate(Observable *o, const string &message)
 
 void SampleManager::onPreview()
 {
+	if (progress)
+		endPreview();
 	int sel = getInt("sample_list");
 	preview_sample = audio->samples[sel];
 	preview_audio->reset();
@@ -295,18 +299,21 @@ void SampleManager::onPreview()
 	preview_audio->tracks[0]->midi = preview_sample->midi;
 	preview_renderer->prepare(preview_audio, preview_audio->getRange(), false);
 
-	tsunami->progress->startCancelable(_("Vorschau"), 0);
-	subscribe(tsunami->progress);
+	progress = new ProgressCancelable(_("Vorschau"), win);
+	subscribe(progress);
 	subscribe(preview_stream);
 	preview_stream->play();
 }
 
 void SampleManager::endPreview()
 {
+	if (!progress)
+		return;
 	unsubscribe(preview_stream);
-	unsubscribe(tsunami->progress);
+	unsubscribe(progress);
 	preview_stream->stop();
-	tsunami->progress->end();
+	delete(progress);
+	progress = NULL;
 	preview_sample = NULL;
 }
 

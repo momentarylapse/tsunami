@@ -41,11 +41,9 @@ void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
 	track_no = get_track_index(t);
 }
 
-PluginManager::PluginManager() :
-	Observer("PluginManager")
+PluginManager::PluginManager()
 {
 	cur_plugin = NULL;
-	cur_effect = NULL;
 
 	favorites = new FavoriteManager;
 
@@ -559,20 +557,6 @@ string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool s
 	return favorites->SelectName(win, c, save);
 }
 
-void PluginManager::onUpdate(Observable *o, const string &message)
-{
-	if (o == tsunami->progress){
-		if (message == tsunami->progress->MESSAGE_CANCEL)
-			PreviewEnd();
-	}else if (o == tsunami->win->view->stream){
-		int pos = tsunami->win->view->stream->getPos();
-		Range r = tsunami->win->view->sel_range;
-		tsunami->progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
-		if (!tsunami->win->view->stream->isPlaying())
-			PreviewEnd();
-	}
-}
-
 // always push the script... even if an error occurred
 bool PluginManager::LoadAndCompilePlugin(const string &filename)
 {
@@ -613,9 +597,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 		Effect *fx = NULL;
 		MidiEffect *mfx = NULL;
 		foreach(Script::Type *t, s->syntax->types){
-			Script::Type *r = t;
-			while (r->parent)
-				r = r->parent;
+			Script::Type *r = t->GetRoot();
 			if (r->name == "AudioEffect"){
 				fx = (Effect*)t->CreateInstance();
 				fx->name = p->filename.basename();
@@ -632,7 +614,6 @@ void PluginManager::ExecutePlugin(const string &filename)
 
 		// run
 		if (fx){
-			tsunami->plugin_manager->cur_effect = fx;
 			fx->resetConfig();
 			if (fx->configure()){
 				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
@@ -648,7 +629,6 @@ void PluginManager::ExecutePlugin(const string &filename)
 			}
 			delete(fx);
 		}else if (mfx){
-			tsunami->plugin_manager->cur_effect = NULL;//fx;
 			mfx->resetConfig();
 			if (mfx->configure()){
 				Range range = tsunami->win->view->getPlaybackSelection();
@@ -696,32 +676,6 @@ Plugin *PluginManager::GetPlugin(const string &name)
 			return cur_plugin;
 		}
 	return NULL;
-}
-
-
-void PluginManager::PreviewStart(Effect *fx)
-{
-	if (fx)
-		fx->configToString();
-	tsunami->win->view->renderer->effect = fx;
-
-
-	tsunami->progress->startCancelable(_("Vorschau"), 0);
-	subscribe(tsunami->progress);
-	subscribe(tsunami->win->view->stream);
-	tsunami->win->view->renderer->prepare(tsunami->audio, tsunami->win->view->sel_range, false);
-	tsunami->win->view->stream->play();
-}
-
-void PluginManager::PreviewEnd()
-{
-	tsunami->win->view->stream->stop();
-	unsubscribe(tsunami->win->view->stream);
-	unsubscribe(tsunami->progress);
-	tsunami->progress->end();
-
-
-	tsunami->win->view->renderer->effect = NULL;
 }
 
 Effect *PluginManager::LoadEffect(const string &name)

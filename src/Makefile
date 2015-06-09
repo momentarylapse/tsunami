@@ -219,6 +219,7 @@ OBJ = \
  Storage/Format/FormatSoundFont2.o\
  Storage/Format/FormatWave.o\
  Storage/Storage.o\
+ Storage/StorageOperationData.o\
  Stuff/Clipboard.o\
  Stuff/Log.o\
  Stuff/Observable.o\
@@ -906,6 +907,9 @@ Storage/Format/FormatWave.o : Storage/Format/FormatWave.cpp
 
 Storage/Storage.o : Storage/Storage.cpp
 	$(CPP) -c Storage/Storage.cpp -o $@ $(CXXFLAGS)
+
+Storage/StorageOperationData.o : Storage/StorageOperationData.cpp
+	$(CPP) -c Storage/StorageOperationData.cpp -o $@ $(CXXFLAGS)
 
 Stuff/Clipboard.o : Stuff/Clipboard.cpp
 	$(CPP) -c Stuff/Clipboard.cpp -o $@ $(CXXFLAGS)

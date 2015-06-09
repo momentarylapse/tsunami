@@ -16,11 +16,11 @@ public:
 	FormatNami();
 	virtual ~FormatNami();
 
-	void loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
-	void saveBuffer(AudioFile *a, BufferBox *b, const string &filename);
+	void loadTrack(StorageOperationData *od);
+	void saveBuffer(StorageOperationData *od);
 
-	void loadAudio(AudioFile *a, const string &filename);
-	void saveAudio(AudioFile *a, const string &filename);
+	void loadAudio(StorageOperationData *od);
+	void saveAudio(StorageOperationData *od);
 
 	string compress_buffer(BufferBox &b);
 

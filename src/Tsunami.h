@@ -23,7 +23,6 @@ class AudioOutput;
 class AudioRenderer;
 class AudioView;
 class Storage;
-class Progress;
 class Clipboard;
 class TsunamiWindow;
 
@@ -53,7 +52,6 @@ public:
 
 	Storage *storage;
 
-	Progress *progress;
 	Log *log;
 
 	AudioOutput *output;

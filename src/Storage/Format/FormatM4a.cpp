@@ -21,27 +21,27 @@ FormatM4a::~FormatM4a()
 {
 }
 
-void FormatM4a::saveBuffer(AudioFile *a, BufferBox *b, const string &filename){}
+void FormatM4a::saveBuffer(StorageOperationData *od){}
 
-void FormatM4a::loadTrack(Track *t, const string & filename, int offset, int level)
+void FormatM4a::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_m4a_file", 1);
-	tsunami->progress->set(_("lade m4a"), 0);
+	od->progress->set(_("lade m4a"), 0);
 
 	if (system("which avconv") == 0){
 		string tmp = "/tmp/tsunami_m4a_out.wav";
-		system(("avconv -i \"" + filename + "\" \"" + tmp + "\"").c_str());
-		tsunami->storage->loadTrack(t, tmp, offset, level);
+		system(("avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
+		tsunami->storage->loadTrack(od->track, od->filename, od->offset, od->level);
 		file_delete(tmp);
 	}else
 		tsunami->log->error("mp3: need external program 'avconv' to decode");
 }
 
-void FormatM4a::saveAudio(AudioFile *a, const string & filename){}
+void FormatM4a::saveAudio(StorageOperationData *od){}
 
-void FormatM4a::loadAudio(AudioFile *a, const string & filename)
+void FormatM4a::loadAudio(StorageOperationData *od)
 {
-	Track *t = a->addTrack(Track::TYPE_AUDIO);
-	loadTrack(t, filename);
+	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	loadTrack(od);
 }
 

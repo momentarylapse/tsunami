@@ -16,11 +16,11 @@ public:
 	FormatSoundFont2();
 	virtual ~FormatSoundFont2();
 
-	void loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
-	void saveBuffer(AudioFile *a, BufferBox *b, const string &filename);
+	void loadTrack(StorageOperationData *od);
+	void saveBuffer(StorageOperationData *od);
 
-	void loadAudio(AudioFile *a, const string &filename);
-	void saveAudio(AudioFile *a, const string &filename);
+	void loadAudio(StorageOperationData *od);
+	void saveAudio(StorageOperationData *od);
 
 	void read_chunk(File *f);
 	void read_samples(File *f);
@@ -48,6 +48,7 @@ public:
 	void read_sample_header(File *f, sfSample &s);
 
 	AudioFile *audio;
+	StorageOperationData *od;
 };
 
 #endif /* SRC_STORAGE_FORMAT_FORMATSOUNDFONT2_H_ */

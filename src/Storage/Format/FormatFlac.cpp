@@ -27,12 +27,13 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 {
 	if (frame->header.number.sample_number == 0)
 		flac_read_samples = 0;
+	StorageOperationData *od = (StorageOperationData*)client_data;
 
 	if (frame->header.number.sample_number % 1024 == 0){
 		if (flac_tells_samples)
-			tsunami->progress->set((float)(flac_read_samples / flac_channels) / (float)(flac_samples));
+			od->progress->set((float)(flac_read_samples / flac_channels) / (float)(flac_samples));
 		else // estimate... via increasingly compressed size
-			tsunami->progress->set(( 1 - exp(- (float)(flac_read_samples * flac_channels * (flac_bits / 8)) / (float)flac_file_size ) ));
+			od->progress->set(( 1 - exp(- (float)(flac_read_samples * flac_channels * (flac_bits / 8)) / (float)flac_file_size ) ));
 	}
 
 	// read decoded PCM samples
@@ -89,22 +90,23 @@ FormatFlac::~FormatFlac()
 {
 }
 
-void FormatFlac::loadTrack(Track *t, const string & filename, int offset, int level)
+void FormatFlac::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_flac_file", 1);
-	tsunami->progress->set(_("lade flac"), 0);
+	od->progress->set(_("lade flac"), 0);
+	Track *t = od->track;
 	t->root->action_manager->beginActionGroup();
 	bool ok = true;
 
 	flac_file_size = 1000000000;
-	File *f = FileOpen(filename);
+	File *f = FileOpen(od->filename);
 	if (f){
 		flac_file_size = f->GetSize();
 		FileClose(f);
 	}
 
-	flac_level = level;
-	flac_offset = offset;
+	flac_level = od->level;
+	flac_offset = od->offset;
 	flac_read_samples = 0;
 	flac_track = t;
 	//bits = channels = samples = freq = 0;
@@ -118,10 +120,10 @@ void FormatFlac::loadTrack(Track *t, const string & filename, int offset, int le
 
 	FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_file(
 							decoder,
-							filename.c_str(),
+							od->filename.c_str(),
 							flac_write_callback,
 							flac_metadata_callback,
-							flac_error_callback, NULL);
+							flac_error_callback, od);
 	if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
 		tsunami->log->error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
 		ok = false;
@@ -150,25 +152,27 @@ void FormatFlac::loadTrack(Track *t, const string & filename, int offset, int le
 
 void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate, void *client_data)
 {
-	long length = (long)client_data;
+	StorageOperationData *od = (StorageOperationData*)client_data;
 	if (samples_written % (FLAC_READSIZE * 64) == 0)
-		tsunami->progress->set((float)samples_written / (float)length);
+		od->progress->set((float)samples_written / (float)od->buf->num);
 }
 
 static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 
 
-void FormatFlac::saveAudio(AudioFile *a, const string & filename)
+void FormatFlac::saveAudio(StorageOperationData *od)
 {
-	exportAudioAsTrack(a, filename);
+	exportAudioAsTrack(od);
 }
 
 
 
-void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
+void FormatFlac::saveBuffer(StorageOperationData *od)
 {
-	tsunami->progress->set(_("exportiere flac"), 0);
+	od->progress->set(_("exportiere flac"), 0);
+	AudioFile *a = od->audio;
+	BufferBox *b = od->buf;
 
 	bool ok = true;
 	FLAC__StreamEncoderInitStatus init_status;
@@ -212,7 +216,8 @@ void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 	// initialize encoder
 	if (ok){
-		init_status = FLAC__stream_encoder_init_file(encoder, filename.c_str(), flac_progress_callback, /*client_data=*/(void*)(long)b->num);
+		od->buf = b;
+		init_status = FLAC__stream_encoder_init_file(encoder, od->filename.c_str(), flac_progress_callback, od);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
 			tsunami->log->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
 			ok = false;
@@ -255,10 +260,10 @@ void FormatFlac::saveBuffer(AudioFile *a, BufferBox *b, const string & filename)
 
 
 
-void FormatFlac::loadAudio(AudioFile *a, const string & filename)
+void FormatFlac::loadAudio(StorageOperationData *od)
 {
-	Track *t = a->addTrack(Track::TYPE_AUDIO, 0);
-	loadTrack(t, filename);
+	od->track = od->audio->addTrack(Track::TYPE_AUDIO, 0);
+	loadTrack(od);
 }
 
 

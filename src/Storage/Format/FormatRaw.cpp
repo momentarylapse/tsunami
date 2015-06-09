@@ -33,18 +33,18 @@ RawConfigData GetRawConfigData()
 	return data;
 }
 
-void FormatRaw::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
+void FormatRaw::saveBuffer(StorageOperationData *od)
 {
 	msg_db_f("write_raw_file", 1);
-	tsunami->progress->set(_("exportiere raw"), 0);
+	od->progress->set(_("exportiere raw"), 0);
 
 	RawConfigData config = GetRawConfigData();
 
 	string data;
-	if (!b->exports(data, config.channels, config.format))
+	if (!od->buf->exports(data, config.channels, config.format))
 		tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
 
-	File *f = FileCreate(filename);
+	File *f = FileCreate(od->filename);
 	f->SetBinaryMode(true);
 
 	for (int i=0; i<config.offset; i++)
@@ -52,7 +52,7 @@ void FormatRaw::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 
 	int size = data.num;
 	for (int i=0;i<size / WAVE_BUFFER_SIZE;i++){
-		tsunami->progress->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
+		od->progress->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
 		f->WriteBuffer(&data[i * WAVE_BUFFER_SIZE], WAVE_BUFFER_SIZE);
 	}
 	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
@@ -60,15 +60,15 @@ void FormatRaw::saveBuffer(AudioFile *a, BufferBox *b, const string &filename)
 	FileClose(f);
 }
 
-void FormatRaw::loadTrack(Track *t, const string & filename, int offset, int level)
+void FormatRaw::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_raw_file", 1);
-	tsunami->progress->set(_("lade raw"), 0);
+	od->progress->set(_("lade raw"), 0);
 
 	RawConfigData config = GetRawConfigData();
 
 	char *data = new char[WAVE_BUFFER_SIZE];
-	File *f = FileOpen(filename);
+	File *f = FileOpen(od->filename);
 
 	try{
 
@@ -78,7 +78,7 @@ void FormatRaw::loadTrack(Track *t, const string & filename, int offset, int lev
 		int byte_per_sample = (format_get_bits(config.format) / 8) * config.channels;
 		int size = f->GetSize() - config.offset;
 		int samples = size / byte_per_sample;
-		tsunami->progress->set(0.1f);
+		od->progress->set(0.1f);
 
 		if (config.offset > 0)
 			f->ReadBuffer(data, config.offset);
@@ -93,13 +93,13 @@ void FormatRaw::loadTrack(Track *t, const string & filename, int offset, int lev
 			if (nn > 16){
 				float perc_read = 0.1f;
 				float dperc_read = 0.9f;
-				tsunami->progress->set(perc_read + dperc_read * (float)read / (float)size);
+				od->progress->set(perc_read + dperc_read * (float)read / (float)size);
 				nn = 0;
 			}
 			if (r > 0){
 				int dsamples = r / byte_per_sample;
-				int _offset = read / byte_per_sample + offset;
-				importData(t, data, config.channels, config.format, dsamples, _offset, level);
+				int _offset = read / byte_per_sample + od->offset;
+				importData(od->track, data, config.channels, config.format, dsamples, _offset, od->level);
 				read += r;
 			}else{
 				throw string("could not read in wave file...");
@@ -116,17 +116,17 @@ void FormatRaw::loadTrack(Track *t, const string & filename, int offset, int lev
 		FileClose(f);
 }
 
-void FormatRaw::saveAudio(AudioFile *a, const string & filename)
+void FormatRaw::saveAudio(StorageOperationData *od)
 {
-	exportAudioAsTrack(a, filename);
+	exportAudioAsTrack(od);
 }
 
 
 
-void FormatRaw::loadAudio(AudioFile *a, const string & filename)
+void FormatRaw::loadAudio(StorageOperationData *od)
 {
-	Track *t = a->addTrack(Track::TYPE_AUDIO);
-	loadTrack(t, filename);
+	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	loadTrack(od);
 }
 
 

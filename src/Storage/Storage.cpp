@@ -60,21 +60,19 @@ bool Storage::load(AudioFile *a, const string &filename)
 	if (!f)
 		return false;
 
-	tsunami->progress->start(_("lade"), 0);
+	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("lade"), tsunami->_win);
 
 	a->reset();
 	tsunami->_view->enable(false);
 	a->action_manager->enable(false);
 	a->filename = filename;
 
-	f->loadAudio(a, filename);
+	f->loadAudio(&od);
 
 
 	tsunami->_view->enable(true);
 	a->action_manager->enable(true);
-	//tsunami->progress->Set("peaks", 1);
 
-	tsunami->progress->end();
 	if (a->tracks.num > 0)
 	{}//	a->SetCurTrack(a->track[0]);
 	a->action_manager->reset();
@@ -93,14 +91,14 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 	if (!f)
 		return false;
 
-	tsunami->progress->start(_("lade"), 0);
-
 	AudioFile *a = t->root;
+	StorageOperationData od = StorageOperationData(a, t, NULL, filename, _("lade"), tsunami->_win);
+	od.offset = offset;
+	od.level = level;
+
 	a->action_manager->beginActionGroup();
 
-	f->loadTrack(t, filename, offset, level);
-
-	tsunami->progress->end();
+	f->loadTrack(&od);
 	a->action_manager->endActionGroup();
 
 	return true;
@@ -128,12 +126,23 @@ bool Storage::saveBufferBox(AudioFile *a, BufferBox *buf, const string &filename
 	if (!f)
 		return false;
 
-	tsunami->progress->start(_("exportiere"), 0);
+	StorageOperationData od = StorageOperationData(a, NULL, buf, filename, _("exportiere"), tsunami->_win);
 
 	// save
-	f->saveBuffer(a, buf, filename);
+	return _saveBufferBox(&od);
+}
 
-	tsunami->progress->end();
+bool Storage::_saveBufferBox(StorageOperationData *od)
+{
+	msg_db_f("Storage.saveBuf", 1);
+
+	current_directory = od->filename.dirname();
+	Format *f = getFormat(od->filename.extension(), Format::FLAG_AUDIO);
+	if (!f)
+		return false;
+
+	// save
+	f->saveBuffer(od);
 
 	return true;
 }
@@ -151,14 +160,13 @@ bool Storage::save(AudioFile *a, const string &filename)
 	if (!f->testFormatCompatibility(a))
 		tsunami->log->warning(_("Datenverlust!"));
 
-	tsunami->progress->start(_("speichere"), 0);
+	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("speichere"), tsunami->_win);
 
 	a->filename = filename;
 
-	f->saveAudio(a, filename);
+	f->saveAudio(&od);
 
 	a->action_manager->markCurrentAsSave();
-	tsunami->progress->end();
 	if (tsunami->win)
 		tsunami->win->updateMenu();
 
@@ -171,18 +179,16 @@ bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
 	if (!getFormat(filename.extension(), Format::FLAG_AUDIO))
 		return false;
 
-	tsunami->progress->start(_("exportiere"), 0);
+	BufferBox buf;
+	StorageOperationData *od = new StorageOperationData(a, NULL, &buf, filename, _("exportiere"), tsunami->_win);
 
 	// render audio...
-	tsunami->progress->set(_("rendere Audio"), 0);
-	BufferBox buf;
+	od->progress->set(_("rendere Audio"), 0);
 	AudioRenderer renderer;
 	renderer.renderAudioFile(a, r, buf);
+	delete(od);
 
-	bool ok = saveBufferBox(a, &buf, filename);
-
-	tsunami->progress->end();
-	return ok;
+	return _saveBufferBox(od);
 }
 
 bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)

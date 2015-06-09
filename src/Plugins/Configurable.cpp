@@ -14,7 +14,11 @@
 #include "PluginManager.h"
 #include "../Stuff/Log.h"
 #include "../View/Helper/Slider.h"
+#include "../View/Helper/Progress.h"
+#include "../View/AudioView.h"
 #include "../Audio/Synth/DummySynthesizer.h"
+#include "../Audio/AudioRenderer.h"
+#include "../Audio/AudioStream.h"
 
 void GlobalRemoveSliders(HuiPanel*);
 
@@ -372,14 +376,16 @@ ConfigPanel *Configurable::createPanel()
 	}
 }*/
 
-class ConfigurationDialog : public HuiDialog
+class ConfigurationDialog : public HuiDialog, public Observer
 {
 public:
 	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p) :
-		HuiDialog(c->name, 300, 100, tsunami->win, false)
+		HuiDialog(c->name, 300, 100, tsunami->win, false),
+		Observer("")
 	{
 		config = c;
 		panel = p;
+		progress = NULL;
 		addGrid("", 0, 0, 1, 3, "root-table");
 		setTarget("root-table", 0);
 		embed(panel, "root-table", 0, 1);
@@ -429,7 +435,7 @@ public:
 	}
 	void onPreview()
 	{
-		tsunami->plugin_manager->PreviewStart((Effect*)config);
+		previewStart();
 	}
 	void onLoad()
 	{
@@ -447,8 +453,52 @@ public:
 		tsunami->plugin_manager->SaveFavorite(config, name);
 	}
 
+	void previewStart()
+	{
+		if (progress)
+			previewEnd();
+		config->configToString();
+		tsunami->win->view->renderer->effect = (Effect*)config;
+
+
+		progress = new ProgressCancelable(_("Vorschau"), win);
+		subscribe(progress);
+		subscribe(tsunami->win->view->stream);
+		tsunami->win->view->renderer->prepare(tsunami->audio, tsunami->win->view->sel_range, false);
+		tsunami->win->view->stream->play();
+	}
+
+	virtual void onUpdate(Observable *o, const string &message)
+	{
+		if (progress and (o == progress)){
+			if (message == progress->MESSAGE_CANCEL)
+				previewEnd();
+		}else if (progress and (o == tsunami->win->view->stream)){
+			int pos = tsunami->win->view->stream->getPos();
+			Range r = tsunami->win->view->sel_range;
+			progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
+			if (!tsunami->win->view->stream->isPlaying())
+				previewEnd();
+		}
+	}
+
+	void previewEnd()
+	{
+		if (!progress)
+			return;
+		unsubscribe(tsunami->win->view->stream);
+		unsubscribe(progress);
+		tsunami->win->view->stream->stop();
+		delete(progress);
+		progress = NULL;
+
+
+		tsunami->win->view->renderer->effect = NULL;
+	}
+
 	Configurable *config;
 	ConfigPanel *panel;
+	Progress *progress;
 };
 
 bool Configurable::configure()

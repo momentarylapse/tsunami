@@ -15,6 +15,7 @@ class Sample;
 class AudioStream;
 class AudioRenderer;
 class SampleManagerItem;
+class Progress;
 
 class SampleManager : public BottomBarConsole, public Observer
 {
@@ -49,6 +50,8 @@ public:
 	AudioRenderer *preview_renderer;
 	AudioFile *preview_audio;
 	Sample *preview_sample;
+
+	Progress *progress;
 
 	static Sample *_cdecl select(HuiPanel *root, AudioFile *a, Sample *old);
 };

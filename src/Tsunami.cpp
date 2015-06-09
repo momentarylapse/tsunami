@@ -12,12 +12,11 @@
 #include "Stuff/Clipboard.h"
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioInput.h"
-#include "View/Helper/Progress.h"
 #include "Plugins/PluginManager.h"
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.17.1";
+string AppVersion = "0.6.17.2x";
 
 Tsunami *tsunami = NULL;
 
@@ -34,7 +33,6 @@ Tsunami::Tsunami() :
 	win = NULL;
 	plugin_manager = NULL;
 	storage = NULL;
-	progress = NULL;
 
 	HuiSetProperty("name", AppName);
 	HuiSetProperty("version", AppVersion);
@@ -61,7 +59,6 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	_win = NULL;
 	_view = NULL;
 
-	progress = new Progress;
 	log = new Log;
 
 	log->info(AppName + " " + AppVersion);

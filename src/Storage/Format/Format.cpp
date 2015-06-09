@@ -41,12 +41,13 @@ bool Format::canHandle(const string & _extension)
 	return false;
 }
 
-void Format::exportAudioAsTrack(AudioFile* a, const string& filename)
+void Format::exportAudioAsTrack(StorageOperationData *od)
 {
 	BufferBox buf;
 	AudioRenderer renderer;
-	renderer.renderAudioFile(a, a->getRange(), buf);
-	saveBuffer(a, &buf, filename);
+	renderer.renderAudioFile(od->audio, od->audio->getRange(), buf);
+	od->buf = &buf;
+	saveBuffer(od);
 }
 
 

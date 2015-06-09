@@ -16,6 +16,7 @@ class Format;
 class AudioFile;
 class Track;
 class BufferBox;
+class StorageOperationData;
 
 class Storage
 {
@@ -27,6 +28,7 @@ public:
 	bool loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
 	bool loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
 	bool saveBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
+	bool _saveBufferBox(StorageOperationData *od);
 	bool save(AudioFile *a, const string &filename);
 	bool _export(AudioFile *a, const Range &r, const string &filename);
 

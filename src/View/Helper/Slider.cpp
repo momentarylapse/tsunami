@@ -7,6 +7,9 @@
 
 #include "Slider.h"
 
+Slider::Slider()
+{
+}
 
 
 Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_callback *_func, float _value)
@@ -43,7 +46,7 @@ Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_e
 	set(_value);
 }
 
-Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_kaba_callback *_func, float _value, HuiEventHandler *_handler)
+Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_edit, float _v_min, float _v_max, float _factor, hui_kaba_callback *_func, float _value)
 {
 	panel = _panel;
 	id_slider = _id_slider;
@@ -51,7 +54,7 @@ Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_e
 	value_min = _v_min;
 	value_max = _v_max;
 	factor = _factor;
-	func = HuiCallback(_handler ? _handler : panel, _func);
+	func = HuiCallback(panel, _func);
 
 	panel->event(id_slider, this, &Slider::onSlide);
 	panel->event(id_edit, this, &Slider::onEdit);
@@ -62,6 +65,17 @@ Slider::Slider(HuiPanel *_panel, const string & _id_slider, const string & _id_e
 
 Slider::~Slider()
 {
+}
+
+void Slider::__init_ext__(HuiPanel *_panel, const string &_id_slider, const string &_id_edit, float _v_min, float _v_max, float _factor, hui_kaba_callback *_func, float _value)
+{
+	new(this) Slider(_panel, _id_slider, _id_edit, _v_min, _v_max, _factor, _func, _value);
+}
+
+void Slider::__delete__()
+{
+	id_slider.clear();
+	id_edit.clear();
 }
 
 void Slider::set(float value)
@@ -82,12 +96,6 @@ void Slider::enable(bool enabled)
 {
 	panel->enable(id_slider, enabled);
 	panel->enable(id_edit, enabled);
-}
-
-
-bool Slider::match(HuiPanel *_panel, const string &id)
-{
-	return ((panel == _panel) and ((id == id_slider) or (id == id_edit)));
 }
 
 

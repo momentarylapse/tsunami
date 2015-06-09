@@ -4,6 +4,10 @@
 use "../../api.kaba"
 
 
+const string AutoConfigAngle = "-3.1415:3.1415:1:57.2958:°" // -pi : pi : 180/pi
+const string AutoConfigSpeed = "0:2:0.01:1:Hz"
+const string AutoConfigDepth = "0:1:0.1:100:%"
+
 
 class PluginConfig : PluginData
 	float Angle
@@ -29,7 +33,6 @@ class PluginState : PluginData
 		l.reset()
 
 class Phaser : AudioEffect
-	PhaserPanel *panel
 	PluginConfig config
 	PluginState state
 
@@ -38,7 +41,7 @@ class Phaser : AudioEffect
 		float ll = -0.51//sqr(config.Angle / sample_rate)
 		float r2 = 0.0
 	
-		for int i, 0, b.num
+		for i in 0:b.num
 	
 			float x = b[i]
 			float y = p.x2 - r2 * p.x1 + ll * x + r2 * p.y1 - ll*p.y2
@@ -48,13 +51,6 @@ class Phaser : AudioEffect
 			p.x1 = x
 			
 			b[i] = y
-
-	overwrite void updateDialog()
-		panel.fill()
-
-	overwrite Panel *createPanel()
-		panel = new PhaserPanel(self)
-		return panel
 	
 	overwrite void process(BufferBox buf)
 		AudioFile *a = audio
@@ -62,45 +58,3 @@ class Phaser : AudioEffect
 		doPhaser(buf.r, state.r, a.sample_rate)
 		doPhaser(buf.l, state.l, a.sample_rate)
 	
-class PhaserPanel : Panel
-	Phaser *f
-	void __init__(Phaser *_f)
-		fromSource("
-Grid ? '' 4 3 width=400
-	Text ? 'Geschwindigkeit'
-	Slider speed_slider '' expandx
-	SpinButton speed '\\0\\10000\\0.1'
-	Text ? 'Hz'
-	Text ? 'Phase'
-	Slider angle_slider ''
-	SpinButton angle '\\-180\\180\\1'
-	Text ? '°'
-	Text ? 'Tiefe'
-	Slider depth_slider ''
-	SpinButton depth '\\0\\100\\0.1'
-	Text ? '%'")
-		f = _f
-	
-		CreateSliderM(self, "speed_slider", "speed", 0, 2,    1,    &onSpeed, f.config.Speed)
-		CreateSliderM(self, "depth_slider", "depth", 0, 1,    100,  &onDepth, f.config.Depth)
-		CreateSliderM(self, "angle_slider", "angle", -pi, pi, 180/pi, &onAngle, f.config.Angle)
-	
-		fill()
-		
-	void fill()
-		SliderSet(self, "speed", f.config.Speed)
-		SliderSet(self, "depth", f.config.Depth)
-		SliderSet(self, "angle", f.config.Angle)
-		
-	void onSpeed()
-		f.config.Speed = SliderGet(self, "speed")
-		f.notify()
-
-	void onDepth()
-		f.config.Depth = SliderGet(self, "depth")
-		f.notify()
-
-	void onAngle()
-		f.config.Angle = SliderGet(self, "angle")
-		f.notify()
-

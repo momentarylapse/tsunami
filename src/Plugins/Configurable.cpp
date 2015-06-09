@@ -20,8 +20,6 @@
 #include "../Audio/AudioRenderer.h"
 #include "../Audio/AudioStream.h"
 
-void GlobalRemoveSliders(HuiPanel*);
-
 const string Configurable::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 
 
@@ -423,7 +421,6 @@ public:
 	}
 	~ConfigurationDialog()
 	{
-		GlobalRemoveSliders(this);
 	}
 	void onOk()
 	{

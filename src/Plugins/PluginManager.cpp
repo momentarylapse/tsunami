@@ -55,36 +55,6 @@ PluginManager::~PluginManager()
 }
 
 
-Array<Slider*> global_slider;
-
-void GlobalCreateSlider(HuiPanel *panel, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_callback *func, float value)
-{	global_slider.add(new Slider(panel, id_slider, id_edit, v_min, v_max, factor, func, value));	}
-
-void GlobalCreateSliderM(HuiPanel *panel, const string &id_slider, const string &id_edit, float v_min, float v_max, float factor, hui_kaba_callback *func, float value)
-{	global_slider.add(new Slider(panel, id_slider, id_edit, v_min, v_max, factor, func, value));	}
-
-void GlobalSliderSet(HuiPanel *panel, const string &id, float value)
-{
-	foreach(Slider *s, global_slider)
-		if (s->match(panel, id))
-			s->set(value);
-}
-
-float GlobalSliderGet(HuiPanel *panel, const string &id)
-{
-	foreach(Slider *s, global_slider)
-		if (s->match(panel, id))
-			return s->get();
-	return 0;
-}
-
-void GlobalRemoveSliders(HuiPanel *panel)
-{
-	foreach(Slider *s, global_slider)
-		delete(s);
-	global_slider.clear();
-}
-
 bool GlobalAllowTermination()
 {
 	return tsunami->AllowTermination();
@@ -106,14 +76,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
-	/*Script::LinkExternal("ProgressStart", (void*)&ProgressStart);
-	Script::LinkExternal("ProgressEnd", (void*)&ProgressEnd);
-	Script::LinkExternal("Progress", (void*)&ProgressStatus);*/
-	Script::LinkExternal("CreateSlider", (void*)&GlobalCreateSlider);
-	Script::LinkExternal("CreateSliderM", (void*)&GlobalCreateSliderM);
-	Script::LinkExternal("SliderSet", (void*)&GlobalSliderSet);
-	Script::LinkExternal("SliderGet", (void*)&GlobalSliderGet);
-	Script::LinkExternal("RemoveSliders", (void*)&GlobalRemoveSliders);
 	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 	Script::LinkExternal("SelectSample", (void*)&SampleManager::select);
@@ -442,6 +404,14 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("PluginContext", "range", _offsetof(PluginManager::PluginContext, range));
 	Script::DeclareClassOffset("PluginContext", "level", _offsetof(PluginManager::PluginContext, level));
 	Script::LinkExternal("plugin_context",	(void*)&context);
+
+
+	Slider slider;
+	Script::DeclareClassSize("Slider", sizeof(Slider));
+	Script::LinkExternal("Slider.__init__", Script::mf(&Slider::__init_ext__));
+	Script::DeclareClassVirtualIndex("Slider", "__delete__", Script::mf(&Slider::__delete__), &slider);
+	Script::LinkExternal("Slider.get", Script::mf(&Slider::get));
+	Script::LinkExternal("Slider.set", Script::mf(&Slider::set));
 }
 
 void PluginManager::OnMenuExecutePlugin()

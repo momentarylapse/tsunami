@@ -33,6 +33,7 @@ class Volume : AudioEffect
 	
 class VolumePanel : ConfigPanel
 	overwrite Volume *c
+	Slider *slider
 	void __init__(Volume *_v)
 		super.__init__(_v)
 		addGrid("!width=400", 0, 0, 1, 2, "table1")
@@ -44,12 +45,15 @@ class VolumePanel : ConfigPanel
 		addSpinButton("\\0\\1000\\0.1", 1, 0, 0, 0, "volume")
 		addLabel("%", 2, 0, 0, 0, "")
 		
-		CreateSliderM(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.Volume)
+		slider = new Slider(self, "volume_slider", "volume", 0, 2, 100, &onVolume, c.config.Volume)
 	
 		event("max", &onMax)
+	
+	virtual void __delete__()
+		delete(slider)
 
 	overwrite void update()
-		SliderSet(self, "volume", c.config.Volume)
+		slider.set(c.config.Volume)
 		check("max", c.config.Maximize)
 		enable("volume", !c.config.Maximize)
 		enable("volume_slider", !c.config.Maximize)
@@ -61,6 +65,6 @@ class VolumePanel : ConfigPanel
 		notify()
 
 	void onVolume()
-		c.config.Volume = SliderGet(self, "volume")
+		c.config.Volume = slider.get()
 		notify()
 

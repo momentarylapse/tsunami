@@ -47,6 +47,7 @@ class ChordProgression : AudioEffect
 
 class ChordProgPanel : ConfigPanel
 	overwrite ChordProgression *c
+	Slider *slider
 	void __init__(ChordProgression *_c)
 		super.__init__(_c)
 		addGrid("", 0, 0, 4, 4, "table2")
@@ -63,7 +64,7 @@ class ChordProgPanel : ConfigPanel
 		addRadioButton("Schläge", 1, 3, 0, 0, "duration_type:beats")
 		addSpinButton("\\1\\100\\1", 2, 3, 0, 0, "beats")
 	
-		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)
+		slider = new Slider(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)
 		event("chords", &onChords)
 		event("duration_type:beats", &onDurationTypeBeats)
 		event("duration_type:time", &onDurationTypeTime)
@@ -72,9 +73,12 @@ class ChordProgPanel : ConfigPanel
 
 		update()
 	
+	virtual void __delete__()
+		delete slider
+	
 	overwrite void update()
 		setString("chords", c.config.Chords)
-		SliderSet(self, "volume", c.config.Volume)
+		slider.set(c.config.Volume)
 		check("duration_by_beats", c.config.DurationByBeats)
 		setFloat("duration", c.config.Duration)
 		setInt("beats", c.config.Beats)
@@ -86,7 +90,7 @@ class ChordProgPanel : ConfigPanel
 		notify()
 
 	void onVolume()
-		c.config.Volume = SliderGet(self, "volume")
+		c.config.Volume = slider.get()
 		notify()
 
 	void onDurationTypeBeats()

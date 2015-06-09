@@ -35,6 +35,7 @@ class ToneGenerator : AudioEffect
 
 class TonePanel : ConfigPanel
 	overwrite ToneGenerator *c
+	Slider *vol_slider
 	void __init__(ToneGenerator *_t)
 		super.__init__(_t)
 		addGrid("!width=350", 0, 0, 3, 3, "table2")
@@ -58,7 +59,7 @@ class TonePanel : ConfigPanel
 		for i in 0:12
 			setString("pitch_rel", rel_pitch_name(i))
 	
-		CreateSliderM(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)
+		vol_slider = new Slider(self, "volume_slider", "volume", 0, 1, 100, &onVolume, c.config.Volume)
 		event("pitch_rel", &onPitch)
 		event("octave", &onPitch)
 		event("frequency",  &onFrequency)
@@ -66,6 +67,9 @@ class TonePanel : ConfigPanel
 		event("type:pitch", &onTypePitch)
 
 		update()
+	
+	virtual void __delete__()
+		delete vol_slider
 
 	void onFrequency()
 		c.config.Pitch = -1
@@ -83,7 +87,7 @@ class TonePanel : ConfigPanel
 		notify()
 
 	void onVolume()
-		c.config.Volume = SliderGet(self, "volume")
+		c.config.Volume = vol_slider.get()
 		notify()
 
 	overwrite void update()
@@ -95,7 +99,7 @@ class TonePanel : ConfigPanel
 		else
 			check("type:freq", true)
 		setFloat("frequency", c.config.Frequency)
-		SliderSet(self, "volume", c.config.Volume)
+		vol_slider.set(c.config.Volume)
 
 		enable("frequency", !by_pitch)
 		enable("octave", by_pitch)

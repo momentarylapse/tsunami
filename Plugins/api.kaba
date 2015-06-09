@@ -389,6 +389,12 @@ class PluginContext
 	int level
 	Range range
 
+class Slider
+	extern void __init__(Panel *panel, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
+	extern virtual void __delete__()
+	extern float get()
+	extern void set(float f)
+
 extern Window *MainWin
 extern AudioFile *audio
 //extern AudioOutput *output
@@ -403,16 +409,6 @@ extern void fft_c2c(complex[] in, complex[] out, bool inverse)
 extern void fft_r2c(float[] in, complex[] out)
 extern void fft_c2r_inv(complex[] in, float[] out)
 
-
-/*extern void ProgressStart(string s, float progress)
-extern void ProgressEnd()
-extern void Progress(string s, float progress)*/
-
 extern bool AllowTermination()
-extern void CreateSlider(Panel *panel, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
-extern void CreateSliderM(Panel *panel, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
-extern void SliderSet(Panel *panel, string id, float value)
-extern float SliderGet(Panel *panel, string id)
-extern void RemoveSliders(Panel *panel)
 extern Synthesizer *CreateSynthesizer(string name)
 extern Sample *SelectSample(Panel *panel, AudioFile *a, Sample *old)

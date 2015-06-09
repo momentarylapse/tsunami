@@ -7,7 +7,6 @@
 
 #include "FormatMp3.h"
 #include "../../Tsunami.h"
-#include "../../View/Helper/Progress.h"
 #include "../../Stuff/Log.h"
 #include "../Storage.h"
 #include "../../lib/math/math.h"
@@ -43,7 +42,6 @@ void FormatMp3::saveBuffer(StorageOperationData *od){}
 void FormatMp3::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_mp3_file", 1);
-	od->progress->set(_("lade mp3"), 0);
 	Track *t = od->track;
 
 	unsigned char *data = new unsigned char[4096];

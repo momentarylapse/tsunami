@@ -28,7 +28,7 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _
 	type = _type;
 	if (type == Configurable::TYPE_EFFECT){
 		string prefix = HuiAppDirectoryStatic + "Plugins/Buffer/";
-		foreach(PluginManager::PluginFile &pf, tsunami->plugin_manager->plugin_file){
+		foreach(PluginManager::PluginFile &pf, tsunami->plugin_manager->plugin_files){
 			if (pf.filename.match(prefix + "*")){
 				names.add(pf.name);
 				string g = pf.filename.substr(prefix.num, -1).explode("/")[0];
@@ -37,7 +37,7 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _
 			}
 		}
 	}else if (type == Configurable::TYPE_MIDI_EFFECT){
-		foreach(PluginManager::PluginFile &pf, tsunami->plugin_manager->plugin_file){
+		foreach(PluginManager::PluginFile &pf, tsunami->plugin_manager->plugin_files){
 			if (pf.filename.match(HuiAppDirectoryStatic + "Plugins/Midi/*"))
 				names.add(pf.name);
 		}

@@ -26,7 +26,6 @@ void FormatM4a::saveBuffer(StorageOperationData *od){}
 void FormatM4a::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_m4a_file", 1);
-	od->progress->set(_("lade m4a"), 0);
 
 	if (system("which avconv") == 0){
 		string tmp = "/tmp/tsunami_m4a_out.wav";

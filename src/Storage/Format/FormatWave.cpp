@@ -26,7 +26,6 @@ FormatWave::~FormatWave()
 void FormatWave::saveBuffer(StorageOperationData *od)
 {
 	msg_db_f("write_wave_file", 1);
-	od->progress->set(_("exportiere wave"), 0);
 	AudioFile *a = od->audio;
 	BufferBox *b = od->buf;
 
@@ -57,7 +56,7 @@ void FormatWave::saveBuffer(StorageOperationData *od)
 	f->WriteBuffer("data", 4);
 	f->WriteInt(b->num * bytes_per_sample);
 
-	/*ProgressStatus(_("exportiere wave"), 0.5f);
+	/*
 	f->WriteBuffer((char*)PVData,w->length*4);*/
 	int size = b->num * 4;
 	for (int i=0;i<size / WAVE_BUFFER_SIZE;i++){
@@ -80,7 +79,6 @@ static string read_chunk_name(File *f)
 void FormatWave::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_wave_file", 1);
-	od->progress->set(_("lade wave"), 0);
 	Track *t = od->track;
 
 	char *data = new char[WAVE_BUFFER_SIZE];

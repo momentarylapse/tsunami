@@ -35,7 +35,7 @@ public:
 
 	Plugin *GetPlugin(const string &name);
 
-	bool LoadAndCompilePlugin(const string&);
+	Plugin *LoadAndCompilePlugin(const string &filename);
 
 	void ApplyFavorite(Configurable *c, const string &name);
 	void SaveFavorite(Configurable *c, const string &name);
@@ -61,13 +61,11 @@ public:
 		Array<string> title;
 	};
 
-	Array<PluginFile> plugin_file;
-	bool ErrorApplyingEffect;
+	Array<PluginFile> plugin_files;
 
-	Array<string> PluginFavoriteName;
+	Array<string> plugin_favorite_names;
 
-	Array<Plugin*> plugin;
-	Plugin *cur_plugin;
+	Array<Plugin*> plugins;
 
 	struct PluginContext
 	{

@@ -460,7 +460,6 @@ void FormatNami::WriteFormat()
 
 void FormatNami::saveAudio(StorageOperationData *od)
 {
-	od->progress->set(_("speichere nami"), 0);
 	audio = od->audio;
 	audio->filename = od->filename;
 
@@ -484,7 +483,7 @@ void FormatNami::saveAudio(StorageOperationData *od)
 
 	foreachi(Track *track, audio->tracks, i){
 		WriteTrack(track);
-		od->progress->set(_("speichere nami"), ((float)i + 0.5f) / (float)audio->tracks.num);
+		od->progress->set(((float)i + 0.5f) / (float)audio->tracks.num);
 	}
 
 	foreach(Effect *effect, audio->fx)
@@ -914,7 +913,6 @@ void FormatNami::make_consistent(AudioFile *a)
 void FormatNami::loadAudio(StorageOperationData *od)
 {
 	msg_db_f("load_nami_file", 1);
-	od->progress->set(_("lade nami"), 0);
 
 	// TODO?
 	od->audio->tags.clear();

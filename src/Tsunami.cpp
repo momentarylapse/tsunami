@@ -113,7 +113,7 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		if (arg.num < 4){
 			log->error(_("Aufruf: tsunami --export <Datei> <Exportdatei>"));
 		}else if (storage->load(audio, arg[2])){
-			storage->_export(audio, audio->getRange(), arg[3]);
+			storage->save(audio, arg[3]);
 		}
 		return false;
 	}

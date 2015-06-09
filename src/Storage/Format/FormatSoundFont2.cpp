@@ -38,7 +38,6 @@ void FormatSoundFont2::loadAudio(StorageOperationData *_od)
 	sample_offset = -1;
 
 	try{
-		od->progress->set(_("importiere sf2"), 0);
 		read_chunk(f);
 		if (sample_offset > 0)
 			read_samples(f);

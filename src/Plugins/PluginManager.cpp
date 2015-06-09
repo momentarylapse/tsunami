@@ -43,11 +43,7 @@ void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
 
 PluginManager::PluginManager()
 {
-	cur_plugin = NULL;
-
 	favorites = new FavoriteManager;
-
-	ErrorApplyingEffect = false;
 
 	FindPlugins();
 	LinkAppScriptData();
@@ -452,8 +448,8 @@ void PluginManager::OnMenuExecutePlugin()
 {
 	int n = s2i(HuiGetEvent()->id.substr(strlen("execute_plugin_"), -1));
 
-	if ((n >= 0) && (n < plugin_file.num))
-		ExecutePlugin(plugin_file[n].filename);
+	if ((n >= 0) and (n < plugin_files.num))
+		ExecutePlugin(plugin_files[n].filename);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf)
@@ -475,13 +471,13 @@ void find_plugins_in_dir(const string &dir, PluginManager *pm)
 		pf.name = e.name.replace(".kaba", "");
 		pf.filename = HuiAppDirectoryStatic + "Plugins/" + dir + e.name;
 		get_plugin_file_data(pf);
-		pm->plugin_file.add(pf);
+		pm->plugin_files.add(pf);
 	}
 }
 
 void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
 {
-	foreachi(PluginManager::PluginFile &f, pm->plugin_file, i){
+	foreachi(PluginManager::PluginFile &f, pm->plugin_files, i){
 		if (f.filename.find(dir) >= 0){
             m->addItemImage(f.name, f.image, format("execute_plugin_%d", i));
 		}
@@ -537,7 +533,7 @@ void PluginManager::AddPluginsToMenu(HuiWindow *win)
 	add_plugins_in_dir("Independent/", this, m->getSubMenuByID("menu_plugins_other"));
 
 	// Events
-	for (int i=0;i<plugin_file.num;i++)
+	for (int i=0;i<plugin_files.num;i++)
 		win->event(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
 }
 
@@ -558,28 +554,26 @@ string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool s
 }
 
 // always push the script... even if an error occurred
-bool PluginManager::LoadAndCompilePlugin(const string &filename)
+Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 {
 	msg_db_f("LoadAndCompilePlugin", 1);
 
 	//msg_write(filename);
 
-	foreach(Plugin *p, plugin){
+	foreach(Plugin *p, plugins){
 		if (filename == p->filename){
-			cur_plugin = p;
-			return p->usable;
+			return p;
 		}
 	}
 
 	//InitPluginData();
 
 	Plugin *p = new Plugin(filename);
-	p->index = plugin.num;
+	p->index = plugins.num;
 
-	plugin.add(p);
-	cur_plugin = p;
+	plugins.add(p);
 
-	return p->usable;
+	return p;
 }
 typedef void main_audiofile_func(AudioFile*);
 typedef void main_void_func();
@@ -588,8 +582,8 @@ void PluginManager::ExecutePlugin(const string &filename)
 {
 	msg_db_f("ExecutePlugin", 1);
 
-	if (LoadAndCompilePlugin(filename)){
-		Plugin *p = cur_plugin;
+	Plugin *p = LoadAndCompilePlugin(filename);
+	if (p->usable){
 		Script::Script *s = p->s;
 
 		AudioFile *a = tsunami->audio;
@@ -616,12 +610,12 @@ void PluginManager::ExecutePlugin(const string &filename)
 		if (fx){
 			fx->resetConfig();
 			if (fx->configure()){
-				main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
+			//	main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				Range range = tsunami->win->view->getPlaybackSelection();
 				a->action_manager->beginActionGroup();
 				foreach(Track *t, a->tracks)
-					if ((t->is_selected) && (t->type == t->TYPE_AUDIO)){
+					if ((t->is_selected) and (t->type == t->TYPE_AUDIO)){
 						fx->resetState();
 						fx->doProcessTrack(t, tsunami->win->view->cur_level, range);
 					}
@@ -634,7 +628,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 				Range range = tsunami->win->view->getPlaybackSelection();
 				a->action_manager->beginActionGroup();
 				foreach(Track *t, a->tracks)
-					if ((t->is_selected) && (t->type == t->TYPE_MIDI)){
+					if ((t->is_selected) and (t->type == t->TYPE_MIDI)){
 						mfx->resetState();
 						mfx->DoProcessTrack(t, range);
 					}
@@ -652,7 +646,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 			tsunami->log->error(_("Plugin ist kein Effekt/MidiEffekt und enth&alt keine Funktion 'void main()'"));
 		}
 	}else{
-		tsunami->log->error(cur_plugin->GetError());
+		tsunami->log->error(p->GetError());
 	}
 }
 
@@ -670,30 +664,30 @@ void PluginManager::FindAndExecutePlugin()
 
 Plugin *PluginManager::GetPlugin(const string &name)
 {
-	foreach(PluginFile &pf, plugin_file)
+	foreach(PluginFile &pf, plugin_files)
 		if (name == pf.name){
-			LoadAndCompilePlugin(pf.filename);
-			return cur_plugin;
+			return LoadAndCompilePlugin(pf.filename);
 		}
 	return NULL;
 }
 
 Effect *PluginManager::LoadEffect(const string &name)
 {
-	bool found = false;
-	foreach(PluginFile &pf, plugin_file){
-		if ((pf.name == name) && (pf.filename.find("/Buffer/") >= 0)){
-			found = true;
-			if (!LoadAndCompilePlugin(pf.filename))
+	Plugin *p = NULL;
+	foreach(PluginFile &pf, plugin_files){
+		if ((pf.name == name) and (pf.filename.find("/Buffer/") >= 0)){
+			p = LoadAndCompilePlugin(pf.filename);
+			if (!p->usable)
 				return NULL;
+			break;
 		}
 	}
-	if (!found){
+	if (p){
 		tsunami->log->error(format(_("Kann Effekt nicht laden: %s"), name.c_str()));
 		return NULL;
 	}
 
-	Script::Script *s = cur_plugin->s;
+	Script::Script *s = p->s;
 	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "AudioEffect")
 			continue;
@@ -705,10 +699,12 @@ Effect *PluginManager::LoadEffect(const string &name)
 MidiEffect *PluginManager::LoadMidiEffect(const string &name)
 {
 	bool found = false;
-	foreach(PluginFile &pf, plugin_file){
-		if ((pf.name == name) && (pf.filename.find("/Midi/") >= 0)){
+	Plugin *p = NULL;
+	foreach(PluginFile &pf, plugin_files){
+		if ((pf.name == name) and (pf.filename.find("/Midi/") >= 0)){
 			found = true;
-			if (!LoadAndCompilePlugin(pf.filename))
+			p = LoadAndCompilePlugin(pf.filename);
+			if (!p->usable)
 				return NULL;
 		}
 	}
@@ -717,7 +713,7 @@ MidiEffect *PluginManager::LoadMidiEffect(const string &name)
 		return NULL;
 	}
 
-	Script::Script *s = cur_plugin->s;
+	Script::Script *s = p->s;
 	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "MidiEffect")
 			continue;

@@ -52,7 +52,6 @@ int oe_write_page(ogg_page *page, FILE *fp)
 void FormatOgg::saveBuffer(StorageOperationData *od)
 {
 	msg_db_r("write_ogg_file", 1);
-	od->progress->set(_("exportiere ogg"), 0);
 	AudioFile *a = od->audio;
 	BufferBox *b = od->buf;
 
@@ -198,7 +197,6 @@ void FormatOgg::loadAudio(StorageOperationData *od)
 void FormatOgg::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("Ogg.LoadTracl", 1);
-	od->progress->set(_("lade ogg"), 0);
 	Track *t = od->track;
 
 	if (ov_fopen((char*)od->filename.c_str(), &vf)){

@@ -93,7 +93,6 @@ FormatFlac::~FormatFlac()
 void FormatFlac::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_flac_file", 1);
-	od->progress->set(_("lade flac"), 0);
 	Track *t = od->track;
 	t->root->action_manager->beginActionGroup();
 	bool ok = true;
@@ -170,7 +169,6 @@ void FormatFlac::saveAudio(StorageOperationData *od)
 
 void FormatFlac::saveBuffer(StorageOperationData *od)
 {
-	od->progress->set(_("exportiere flac"), 0);
 	AudioFile *a = od->audio;
 	BufferBox *b = od->buf;
 

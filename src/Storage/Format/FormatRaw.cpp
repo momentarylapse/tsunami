@@ -36,7 +36,6 @@ RawConfigData GetRawConfigData()
 void FormatRaw::saveBuffer(StorageOperationData *od)
 {
 	msg_db_f("write_raw_file", 1);
-	od->progress->set(_("exportiere raw"), 0);
 
 	RawConfigData config = GetRawConfigData();
 
@@ -63,7 +62,6 @@ void FormatRaw::saveBuffer(StorageOperationData *od)
 void FormatRaw::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_raw_file", 1);
-	od->progress->set(_("lade raw"), 0);
 
 	RawConfigData config = GetRawConfigData();
 

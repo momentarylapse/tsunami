@@ -60,7 +60,7 @@ bool Storage::load(AudioFile *a, const string &filename)
 	if (!f)
 		return false;
 
-	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("lade"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("lade ") + f->description, tsunami->_win);
 
 	a->reset();
 	tsunami->_view->enable(false);
@@ -92,7 +92,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 		return false;
 
 	AudioFile *a = t->root;
-	StorageOperationData od = StorageOperationData(a, t, NULL, filename, _("lade"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(a, t, NULL, filename, _("lade ") + f->description, tsunami->_win);
 	od.offset = offset;
 	od.level = level;
 
@@ -126,7 +126,7 @@ bool Storage::saveBufferBox(AudioFile *a, BufferBox *buf, const string &filename
 	if (!f)
 		return false;
 
-	StorageOperationData od = StorageOperationData(a, NULL, buf, filename, _("exportiere"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(a, NULL, buf, filename, _("exportiere ") + f->description, tsunami->_win);
 
 	// save
 	return _saveBufferBox(&od);
@@ -160,7 +160,7 @@ bool Storage::save(AudioFile *a, const string &filename)
 	if (!f->testFormatCompatibility(a))
 		tsunami->log->warning(_("Datenverlust!"));
 
-	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("speichere"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("speichere ") + f->description, tsunami->_win);
 
 	a->filename = filename;
 

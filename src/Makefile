@@ -69,7 +69,6 @@ OBJ = \
  Audio/Synth/SynthesizerRenderer.o\
  Audio/AudioInput.o\
  Audio/AudioInputAudio.o\
- Audio/AudioInputBase.o\
  Audio/AudioInputMidi.o\
  Audio/AudioOutput.o\
  Audio/AudioRenderer.o\
@@ -460,9 +459,6 @@ Audio/AudioInput.o : Audio/AudioInput.cpp
 
 Audio/AudioInputAudio.o : Audio/AudioInputAudio.cpp
 	$(CPP) -c Audio/AudioInputAudio.cpp -o $@ $(CXXFLAGS)
-
-Audio/AudioInputBase.o : Audio/AudioInputBase.cpp
-	$(CPP) -c Audio/AudioInputBase.cpp -o $@ $(CXXFLAGS)
 
 Audio/AudioInputMidi.o : Audio/AudioInputMidi.cpp
 	$(CPP) -c Audio/AudioInputMidi.cpp -o $@ $(CXXFLAGS)

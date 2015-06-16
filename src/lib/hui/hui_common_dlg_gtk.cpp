@@ -15,8 +15,8 @@ bool HuiFileDialogDir(HuiWindow *win, const string &title, const string &dir/*, 
 	GtkWidget* dlg=gtk_file_chooser_dialog_new(	sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-												GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-												GTK_STOCK_OPEN,		GTK_RESPONSE_ACCEPT,
+												"gtk-cancel",	GTK_RESPONSE_CANCEL,
+												"gtk-accept",		GTK_RESPONSE_ACCEPT,
 												NULL);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
 	int r = gtk_dialog_run(GTK_DIALOG(dlg));
@@ -51,8 +51,8 @@ bool HuiFileDialogOpen(HuiWindow *win,const string &title,const string &dir,cons
 	GtkWidget *dlg=gtk_file_chooser_dialog_new(	sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_OPEN,
-												GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-												GTK_STOCK_OPEN,		GTK_RESPONSE_ACCEPT,
+												"gtk-cancel",	GTK_RESPONSE_CANCEL,
+												"gtk-open",		GTK_RESPONSE_ACCEPT,
 												NULL);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));
@@ -91,8 +91,8 @@ bool HuiFileDialogSave(HuiWindow *win,const string &title,const string &dir,cons
 	GtkWidget* dlg=gtk_file_chooser_dialog_new(	sys_str(title),
 												w,
 												GTK_FILE_CHOOSER_ACTION_SAVE,
-												GTK_STOCK_CANCEL,	GTK_RESPONSE_CANCEL,
-												GTK_STOCK_SAVE,		GTK_RESPONSE_ACCEPT,
+												"gtk-cancel",	GTK_RESPONSE_CANCEL,
+												"gtk-save",		GTK_RESPONSE_ACCEPT,
 												NULL);
 	gtk_file_chooser_set_do_overwrite_confirmation(GTK_FILE_CHOOSER (dlg), TRUE);
 	gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), sys_str_f(dir));

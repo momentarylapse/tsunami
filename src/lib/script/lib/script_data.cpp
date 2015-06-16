@@ -768,21 +768,6 @@ public:
 	string _cdecl str(){	return p2s(p);	}
 };
 
-class VirtualTest : public VirtualBase
-{
-public:
-	int i;
-	static bool enable_logging;
-	VirtualTest(){ if (enable_logging) msg_write("VirtualTest.init()"); i = 13; }
-	virtual ~VirtualTest(){ if (enable_logging) msg_write("VirtualTest.~"); }
-	void _cdecl __init__(){ new(this) VirtualTest; }
-	virtual void _cdecl __delete__(){ if (enable_logging) msg_write("VirtualTest.delete()"); }
-	virtual void _cdecl f_virtual(){ msg_write(i); msg_write("VirtualTest.f_virtual()"); }
-	void _cdecl f_normal(){ msg_write(i); msg_write("VirtualTest.f_normal()"); }
-	void _cdecl test(){ msg_write("VirtualTest.test()"); f_virtual(); }
-};
-bool VirtualTest::enable_logging;
-
 void SIAddPackageBase()
 {
 	msg_db_f("SIAddPackageBase", 3);
@@ -887,9 +872,6 @@ void SIAddPackageBase()
 		func_set_inline(COMMAND_INLINE_POINTER_TO_BOOL);
 		func_add_param("p",		TypePointer);
 
-	
-	Type *TypeVirtualTest=add_type  ("VirtualTest",	sizeof(VirtualTest));
-
 	add_class(TypeInt);
 		class_add_func("str", TypeString, mf(&IntClass::str), FLAG_PURE);
 	add_class(TypeInt64);
@@ -977,17 +959,6 @@ void SIAddPackageBase()
 			func_add_param("other",		TypeStringList);
 		class_add_func("join", TypeString, mf(&StringList::join), FLAG_PURE);
 			func_add_param("glue",		TypeString);
-
-	VirtualTest::enable_logging = false;
-	add_class(TypeVirtualTest);
-		class_add_element("i", TypeInt, offsetof(VirtualTest, i));
-		class_add_func("__init__", TypeVoid, mf(&VirtualTest::__init__));
-		class_add_func_virtual("__delete__", TypeVoid, mf(&VirtualTest::__delete__));
-		class_add_func_virtual("f_virtual", TypeVoid, mf(&VirtualTest::f_virtual));
-		class_add_func("f_normal", TypeVoid, mf(&VirtualTest::f_normal));
-		class_add_func("test", TypeVoid, mf(&VirtualTest::test));
-		class_set_vtable(VirtualTest);
-	VirtualTest::enable_logging = true;
 
 
 	add_const("nil", TypePointer, NULL);

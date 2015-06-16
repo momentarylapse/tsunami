@@ -461,7 +461,6 @@ void FormatNami::WriteFormat()
 void FormatNami::saveAudio(StorageOperationData *od)
 {
 	audio = od->audio;
-	audio->filename = od->filename;
 
 //	int length = a->GetLength();
 //	int min = a->GetMin();

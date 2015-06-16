@@ -180,15 +180,14 @@ bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
 		return false;
 
 	BufferBox buf;
-	StorageOperationData *od = new StorageOperationData(a, NULL, &buf, filename, _("exportiere"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(a, NULL, &buf, filename, _("exportiere"), tsunami->_win);
 
 	// render audio...
-	od->progress->set(_("rendere Audio"), 0);
+	od.progress->set(_("rendere Audio"), 0);
 	AudioRenderer renderer;
 	renderer.renderAudioFile(a, r, buf);
-	delete(od);
 
-	return _saveBufferBox(od);
+	return _saveBufferBox(&od);
 }
 
 bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
@@ -254,12 +253,13 @@ bool Storage::askSaveExport(HuiWindow *win)
 Format *Storage::getFormat(const string &ext, int flags)
 {
 	bool found = false;
-	foreach(Format *f, formats)
+	foreach(Format *f, formats){
 		if (f->canHandle(ext)){
 			found = true;
 			if ((f->flags & flags) == flags)
 				return f;
 		}
+	}
 
 	if (found)
 		tsunami->log->error(_("inkompatibles Dateiformat f&ur diese Aktion: ") + ext);

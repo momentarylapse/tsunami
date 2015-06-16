@@ -14,33 +14,51 @@
 #include "../Data/RingBuffer.h"
 #include "../View/Helper/PeakMeter.h"
 
-class AudioInputBase;
-class AudioInputAudio;
-class AudioInputMidi;
-
 class AudioInput : public PeakMeterSource
 {
 public:
-	AudioInput();
+	struct MidiPort
+	{
+		int client, port;
+		string client_name, port_name;
+		MidiPort();
+	};
+
+	AudioInput(int sample_rate);
 	virtual ~AudioInput();
 
 	static const string MESSAGE_CAPTURE;
 
-	bool start(int type, int sample_rate);
-	void stop();
+	virtual bool start() = 0;
+	virtual void stop() = 0;
+
+	void _startUpdate();
 	void update();
+	virtual int doCapturing() = 0;
 
-	bool isCapturing();
-	int getDelay();
-	void resetSync();
+	virtual bool isCapturing();
+	virtual int getDelay(){ return 0; }
+	virtual void resetSync(){}
 
-	void accumulate(bool enable);
-	void resetAccumulation();
-	int getSampleCount();
+	virtual void accumulate(bool enable);
+	virtual void resetAccumulation() = 0;
+	virtual int getSampleCount() = 0;
 
-	virtual float getSampleRate();
-	virtual void getSomeSamples(BufferBox &buf, int num_samples);
+	virtual float getSampleRate(){ return sample_rate; }
+	virtual void getSomeSamples(BufferBox &buf, int num_samples) = 0;
 	virtual int getState();
+
+	virtual void setDevice(const string &dev){}
+	virtual string getChosenDevice(){ return ""; }
+
+	virtual MidiPort getCurMidiPort(){ MidiPort p; return p; }
+	virtual Array<MidiPort> findMidiPorts(){ Array<MidiPort> a; return a; }
+	virtual void connectMidiPort(MidiPort &p){}
+	virtual void setPreviewSynthesizer(Synthesizer *s){}
+
+	int sample_rate;
+	bool accumulating;
+	bool capturing;
 
 	RingBuffer current_buffer;
 	BufferBox buffer;
@@ -48,9 +66,6 @@ public:
 	MidiData current_midi;
 
 	int type;
-	AudioInputBase *in_cur;
-	AudioInputAudio *in_audio;
-	AudioInputMidi *in_midi;
 	bool running;
 };
 

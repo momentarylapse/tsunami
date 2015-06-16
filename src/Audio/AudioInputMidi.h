@@ -11,7 +11,7 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
-#include "AudioInputBase.h"
+#include "AudioInput.h"
 
 struct _snd_seq;
 struct _snd_seq_port_subscribe;
@@ -19,15 +19,16 @@ class AudioStream;
 class SynthesizerRenderer;
 class Synthesizer;
 
-class AudioInputMidi : public AudioInputBase
+class AudioInputMidi : public AudioInput
 {
 public:
-	AudioInputMidi(MidiData &data, MidiData &cur_data);
+
+	AudioInputMidi(int sample_rate);
 	virtual ~AudioInputMidi();
 
 	void init();
 
-	virtual bool start(int sample_rate);
+	virtual bool start();
 	virtual void stop();
 	virtual int doCapturing();
 
@@ -40,15 +41,8 @@ public:
 	virtual void resetAccumulation();
 	virtual int getSampleCount();
 
-	virtual float getSampleRate();
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 
-	struct MidiPort
-	{
-		int client, port;
-		string client_name, port_name;
-		MidiPort();
-	};
 	Array<MidiPort> findPorts();
 	MidiPort getCurMidiPort();
 	bool connectTo(MidiPort &p);
@@ -59,9 +53,6 @@ public:
 private:
 
 	void clearInputQueue();
-
-	MidiData &data;
-	MidiData &cur_data;
 
 	_snd_seq *handle;
 	_snd_seq_port_subscribe *subs;

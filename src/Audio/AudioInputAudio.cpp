@@ -17,17 +17,24 @@
 #include <pulse/pulseaudio.h>
 
 
+string AudioInputAudio::temp_filename;
+string AudioInputAudio::favorite_device;
+string AudioInputAudio::cur_temp_filename;
+float AudioInputAudio::playback_delay_const;
+
+
 extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
 extern bool pa_wait_stream_ready(pa_stream *s); // -> AudioStream.cpp
 
 
 void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
 {
-	if (eol > 0)
+	if ((eol > 0) or (!i))
 		return;
 
 	Array<string> *devices = (Array<string>*)userdata;
-	devices->add(i->name);
+	if (devices)
+		devices->add(i->name);
 }
 
 
@@ -100,16 +107,14 @@ int AudioInputAudio::SyncData::getDelay()
 }
 
 
-AudioInputAudio::AudioInputAudio(BufferBox &buf, RingBuffer &cur_buf) :
-	accumulation_buffer(buf), current_buffer(cur_buf)
+AudioInputAudio::AudioInputAudio(int _sample_rate) :
+	AudioInput(_sample_rate)
 {
 	capturing = false;
 	_stream = NULL;
-	accumulating = false;
-	memset(capture_temp, 0, sizeof(capture_temp));
-	sample_rate = DEFAULT_SAMPLE_RATE;
 
-	chosen_device = HuiConfig.getStr("Input.ChosenDevice", "");
+	favorite_device = HuiConfig.getStr("Input.ChosenDevice", "");
+	chosen_device = favorite_device;
 	playback_delay_const = HuiConfig.getFloat("Input.PlaybackDelay", 0.0f);
 	temp_filename = HuiConfig.getStr("Input.TempFilename", "");
 	temp_file = NULL;
@@ -134,12 +139,22 @@ Array<string> AudioInputAudio::getDevices()
 	return devices;
 }
 
+string AudioInputAudio::getFavoriteDevice()
+{
+	return favorite_device;
+}
+
 string AudioInputAudio::getChosenDevice()
 {
 	/*if (pa_device_no >= 0)
 		if (pa_device_no == Pa_GetDefaultInputDevice())
 			return "";*/
 	return chosen_device;
+}
+
+void AudioInputAudio::setFavoriteDevice(const string &device)
+{
+	favorite_device = device;
 }
 
 void AudioInputAudio::setDevice(const string &device)
@@ -162,10 +177,11 @@ void AudioInputAudio::setDevice(const string &device)
 		tsunami->log->error(format("input device '%s' not found. Using default.", device.c_str()));
 		chosen_device = "";
 	}
+	setFavoriteDevice(chosen_device);
 
 	if (capturing){
 		stop();
-		start(sample_rate);
+		start();
 	}
 
 	//tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
@@ -188,7 +204,7 @@ void AudioInputAudio::stop()
 	file_delete(cur_temp_filename);
 }
 
-bool AudioInputAudio::start(int _sample_rate)
+bool AudioInputAudio::start()
 {
 	msg_db_f("CaptureStart", 1);
 	if (capturing)
@@ -197,7 +213,6 @@ bool AudioInputAudio::start(int _sample_rate)
 	setDevice(chosen_device);
 
 	accumulating = false;
-	sample_rate = _sample_rate;
 	num_channels = 2;
 
 	pa_sample_spec ss;
@@ -252,20 +267,14 @@ float AudioInputAudio::getPlaybackDelayConst()
 	return playback_delay_const;
 }
 
-void AudioInputAudio::accumulate(bool enable)
-{
-	current_buffer.clear();
-	accumulating = enable;
-}
-
 void AudioInputAudio::resetAccumulation()
 {
-	accumulation_buffer.clear();
+	buffer.clear();
 }
 
 int AudioInputAudio::getSampleCount()
 {
-	return accumulation_buffer.num;
+	return buffer.num;
 }
 
 void AudioInputAudio::setPlaybackDelayConst(float f)
@@ -289,7 +298,7 @@ int AudioInputAudio::doCapturing()
 
 	BufferBox b;
 	current_buffer.readRef(b, avail);
-	accumulation_buffer.append(b);
+	buffer.append(b);
 
 	// write to file
 	string data;
@@ -312,11 +321,6 @@ void AudioInputAudio::getSomeSamples(BufferBox &buf, int num_samples)
 float AudioInputAudio::getSampleRate()
 {
 	return sample_rate;
-}
-
-bool AudioInputAudio::isCapturing()
-{
-	return capturing;
 }
 
 int AudioInputAudio::getDelay()

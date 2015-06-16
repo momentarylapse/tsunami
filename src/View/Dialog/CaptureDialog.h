@@ -16,6 +16,7 @@
 #include "../../Audio/AudioInputMidi.h"
 
 class AudioView;
+class AudioInput;
 
 class CaptureDialog : public HuiWindow, public Observer
 {
@@ -37,9 +38,10 @@ public:
 	void fillTrackList();
 
 	void updateMidiPortList();
-	Array<AudioInputMidi::MidiPort> midi_ports;
+	Array<AudioInput::MidiPort> midi_ports;
 	void updateAudioSourceList();
 	Array<string> audio_sources;
+	string selected_audio_source;
 
 	void onUpdate(Observable *o, const string &message);
 
@@ -48,6 +50,7 @@ public:
 
 	AudioFile *audio;
 	AudioView *view;
+	AudioInput *input;
 	PeakMeter *peak_meter;
 	Synthesizer *temp_synth;
 	int type;

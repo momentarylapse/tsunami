@@ -129,7 +129,7 @@ TsunamiWindow::TsunamiWindow() :
 	audio = tsunami->audio;
 
 
-	view = new AudioView(this, audio, tsunami->output, tsunami->input);
+	view = new AudioView(this, audio, tsunami->output);
 
 	// side bar
 	side_bar = new SideBar(view, audio);
@@ -528,11 +528,8 @@ void TsunamiWindow::updateMenu()
 
 void TsunamiWindow::onUpdate(Observable *o, const string &message)
 {
-	if (o == tsunami->output){
-		view->forceRedraw();
-		updateMenu();
-	}else // "Clipboard", "AudioFile" or "AudioView"
-		updateMenu();
+	// "Clipboard", "AudioFile" or "AudioView"
+	updateMenu();
 }
 
 

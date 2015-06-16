@@ -109,7 +109,7 @@ public:
 	}
 };
 
-AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output, AudioInput *_input) :
+AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output) :
 	Observer("AudioView"),
 	Observable("AudioView")
 {
@@ -172,7 +172,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	capturing_track = 0;
 
 	audio = _audio;
-	input = _input;
+	input = NULL;
 
 	pitch_min = 60;
 	pitch_max = 90;
@@ -198,7 +198,6 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	mx = my = 0;
 	subscribe(audio);
 	subscribe(stream);
-	subscribe(input);
 
 	// events
 	parent->eventX("area", "hui:draw", this, &AudioView::onDraw);
@@ -230,7 +229,7 @@ AudioView::~AudioView()
 {
 	unsubscribe(audio);
 	unsubscribe(stream);
-	unsubscribe(input);
+	setInput(NULL);
 
 	delete(peak_thread);
 	delete(stream);
@@ -1057,7 +1056,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 		if (stream->isPlaying())
 			makeSampleVisible(stream->getPos());
 		forceRedraw();
-	}else if (o == input){
+	}else if (input and o == input){
 		if (input->isCapturing())
 			makeSampleVisible(sel_range.start() + input->getSampleCount());
 		forceRedraw();
@@ -1297,7 +1296,7 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 		t->draw(c, i);
 
 	// capturing preview
-	if (input->isCapturing()){
+	if (input and input->isCapturing()){
 		input->buffer.update_peaks(peak_mode);
 		if ((capturing_track >= 0) and (capturing_track < vtrack.num))
 			vtrack[capturing_track]->drawBuffer(c, input->buffer, view_pos - sel_range.offset, colors.capture_marker);
@@ -1309,7 +1308,7 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 
 
 	// playing/capturing position
-	if (input->isCapturing())
+	if (input and input->isCapturing())
 		drawTimeLine(c, sel_range.start() + input->getSampleCount(), SEL_TYPE_PLAYBACK, colors.capture_marker, true);
 	else if (stream->isPlaying())
 		drawTimeLine(c, stream->getPos(), SEL_TYPE_PLAYBACK, colors.preview_marker, true);
@@ -1508,7 +1507,16 @@ void AudioView::setCurLevel(int l)
 	notify(MESSAGE_CUR_LEVEL_CHANGE);
 }
 
+void AudioView::setInput(AudioInput *_input)
+{
+	if (input)
+		unsubscribe(input);
 
+	input = _input;
+
+	if (input)
+		subscribe(input);
+}
 
 double AudioView::screen2sample(double _x)
 {

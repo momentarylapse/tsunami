@@ -30,17 +30,19 @@ public:
 class PeakMeter : public HuiEventHandler, public Observer
 {
 public:
-	PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_source);
+	PeakMeter(HuiPanel *panel, const string &id, PeakMeterSource *source);
 	virtual ~PeakMeter();
 
 	void onDraw();
 	void onLeftButtonDown();
 	void onRightButtonDown();
-	void setMode(int _mode);
+	void setMode(int mode);
 	void onUpdate(Observable *o, const string &message);
 	void enable(bool enabled);
 
 	static const int NUM_SAMPLES;
+
+	void setSource(PeakMeterSource *source);
 
 private:
 	void clearData();

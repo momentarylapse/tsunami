@@ -68,7 +68,6 @@ void PluginManager::LinkAppScriptData()
 	// api definition
 	Script::LinkExternal("MainWin", &tsunami->_win);
 	Script::LinkExternal("audio", &tsunami->audio);
-	Script::LinkExternal("input", &tsunami->input);
 	Script::LinkExternal("output", &tsunami->output);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
@@ -370,6 +369,23 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));
 	}
 	AudioStream::JUST_FAKING_IT = false;
+
+	{
+	/*AudioInputAudio stream(NULL);
+	Script::DeclareClassSize("InputStreamAudio", sizeof(AudioStream));
+	Script::LinkExternal("AudioStream.__init__", Script::mf(&AudioStream::__init__));
+	Script::DeclareClassVirtualIndex("AudioStream", "__delete__", Script::mf(&AudioStream::__delete__), &stream);
+	//Script::LinkExternal("AudioStream.setSource", Script::mf(&AudioStream::setSource));
+	Script::LinkExternal("AudioStream.play", Script::mf(&AudioStream::play));
+	Script::LinkExternal("AudioStream.stop", Script::mf(&AudioStream::stop));
+	Script::LinkExternal("AudioStream.pause", Script::mf(&AudioStream::pause));
+	Script::LinkExternal("AudioStream.isPlaying", Script::mf(&AudioStream::isPlaying));
+	Script::LinkExternal("AudioStream.getPos", Script::mf(&AudioStream::getPos));
+	Script::LinkExternal("AudioStream.getSampleRate", Script::mf(&AudioStream::getSampleRate));
+	Script::LinkExternal("AudioStream.getVolume", Script::mf(&AudioStream::getVolume));
+	Script::LinkExternal("AudioStream.setVolume", Script::mf(&AudioStream::setVolume));
+	Script::LinkExternal("AudioStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));*/
+	}
 
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
 	Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));

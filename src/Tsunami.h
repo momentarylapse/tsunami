@@ -55,7 +55,6 @@ public:
 	Log *log;
 
 	AudioOutput *output;
-	AudioInput *input;
 
 	PluginManager *plugin_manager;
 	Clipboard *clipboard;

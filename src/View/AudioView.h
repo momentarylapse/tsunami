@@ -25,7 +25,7 @@ class PeakThread;
 class AudioView : public Observer, public Observable
 {
 public:
-	AudioView(TsunamiWindow *parent, AudioFile *audio, AudioOutput *output, AudioInput *input);
+	AudioView(TsunamiWindow *parent, AudioFile *audio, AudioOutput *output);
 	virtual ~AudioView();
 
 	void checkConsistency();
@@ -227,6 +227,7 @@ public:
 	AudioStream *midi_preview_stream;
 	SynthesizerRenderer *midi_preview_renderer;
 	AudioInput *input;
+	void setInput(AudioInput *input);
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);

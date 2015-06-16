@@ -20,9 +20,8 @@ AudioInputMidi::MidiPort::MidiPort()
 }
 
 
-AudioInputMidi::AudioInputMidi(MidiData &_data, MidiData &_cur_data) :
-	data(_data),
-	cur_data(_cur_data)
+AudioInputMidi::AudioInputMidi(int _sample_rate) :
+	AudioInput(_sample_rate)
 {
 	handle = NULL;
 	subs = NULL;
@@ -158,8 +157,8 @@ void AudioInputMidi::accumulate(bool enable)
 
 void AudioInputMidi::resetAccumulation()
 {
-	data.clear();
-	data.samples = 0;
+	midi.clear();
+	midi.samples = 0;
 	offset = 0;
 }
 
@@ -179,11 +178,10 @@ void AudioInputMidi::clearInputQueue()
 	}
 }
 
-bool AudioInputMidi::start(int _sample_rate)
+bool AudioInputMidi::start()
 {
 	if (!handle)
 		return false;
-	sample_rate = _sample_rate;
 	accumulating = false;
 	resetAccumulation();
 
@@ -205,7 +203,7 @@ void AudioInputMidi::stop()
 	preview_renderer->endAllNotes();
 	//preview_stream->stop();
 
-	data.sanify();
+	midi.sanify();
 }
 
 int AudioInputMidi::doCapturing()
@@ -214,8 +212,8 @@ int AudioInputMidi::doCapturing()
 	double offset_new = offset + dt;
 	int pos = offset * (double)sample_rate;
 	int pos_new = offset_new * (double)sample_rate;
-	cur_data.clear();
-	cur_data.samples = pos_new - pos;
+	current_midi.clear();
+	current_midi.samples = pos_new - pos;
 	if (accumulating)
 		offset = offset_new;
 
@@ -227,34 +225,28 @@ int AudioInputMidi::doCapturing()
 		int pitch = ev->data.note.note;
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:
-				cur_data.add(MidiEvent(0, pitch, (float)ev->data.note.velocity / 127.0f));
+				current_midi.add(MidiEvent(0, pitch, (float)ev->data.note.velocity / 127.0f));
 				break;
 			case SND_SEQ_EVENT_NOTEOFF:
-				cur_data.add(MidiEvent(0, pitch, 0));
+				current_midi.add(MidiEvent(0, pitch, 0));
 				break;
 		}
 		snd_seq_free_event(ev);
 	}
 
-	preview_renderer->feed(cur_data);
-	if ((cur_data.num > 0) and (!preview_stream->isPlaying()))
+	preview_renderer->feed(current_midi);
+	if ((current_midi.num > 0) and (!preview_stream->isPlaying()))
 		preview_stream->play();
 
 	if (accumulating)
-		data.append(cur_data);
+		midi.append(current_midi);
 
-	return cur_data.samples;
+	return current_midi.samples;
 }
 
 bool AudioInputMidi::isCapturing()
 {
 	return capturing;
-}
-
-
-float AudioInputMidi::getSampleRate()
-{
-	return sample_rate;
 }
 
 void AudioInputMidi::getSomeSamples(BufferBox &buf, int num_samples)

@@ -29,7 +29,7 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	event("hui:close", this, &SettingsDialog::onClose);
 	event("close", this, &SettingsDialog::onClose);
 
-	setOptions("capture_filename", "placeholder=" + tsunami->input->in_audio->getDefaultTempFilename());
+	setOptions("capture_filename", "placeholder=" + AudioInputAudio::getDefaultTempFilename());
 	setOptions("default_artist", "placeholder=" + AppName);
 
 	setTooltip("default_artist", _("wird als Tag artist=... in neue Dateien eingetragen"));
@@ -97,19 +97,19 @@ void SettingsDialog::loadData()
 
 	addString("capture_device", _("- Standard -"));
 	setInt("capture_device", 0);
-	capture_devices = tsunami->input->in_audio->getDevices();
+	capture_devices = AudioInputAudio::getDevices();
 	capture_devices.insert("", 0);
 	foreachi(string &d, capture_devices, i){
 		if (i == 0)
 			continue;
 		addString("capture_device", d);
-		if (d == tsunami->input->in_audio->chosen_device)
+		if (d == AudioInputAudio::getFavoriteDevice())
 			setInt("capture_device", i);
 	}
 
-	setFloat("capture_delay", tsunami->input->in_audio->getPlaybackDelayConst());
+	setFloat("capture_delay", AudioInputAudio::getPlaybackDelayConst());
 
-	setString("capture_filename", tsunami->input->in_audio->temp_filename);
+	setString("capture_filename", AudioInputAudio::temp_filename);
 }
 
 void SettingsDialog::applyData()
@@ -145,7 +145,7 @@ void SettingsDialog::onCaptureDevice()
 {
 	int dev = getInt("");
 	if (dev >= 0)
-		tsunami->input->in_audio->setDevice(capture_devices[dev]);
+		AudioInputAudio::setFavoriteDevice(capture_devices[dev]);
 }
 
 void SettingsDialog::onPreviewDevice()
@@ -157,19 +157,19 @@ void SettingsDialog::onPreviewDevice()
 
 void SettingsDialog::onCaptureDelay()
 {
-	tsunami->input->in_audio->setPlaybackDelayConst(getFloat(""));
+	AudioInputAudio::setPlaybackDelayConst(getFloat(""));
 }
 
 void SettingsDialog::onCaptureFilename()
 {
-	tsunami->input->in_audio->setTempFilename(getString(""));
+	AudioInputAudio::setTempFilename(getString(""));
 }
 
 void SettingsDialog::onCaptureFind()
 {
-	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), tsunami->input->in_audio->temp_filename.basename(), "*.raw", "*.raw"))
+	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), AudioInputAudio::temp_filename.basename(), "*.raw", "*.raw"))
 		setString("capture_filename", HuiFilename);
-		tsunami->input->in_audio->setTempFilename(HuiFilename);
+	AudioInputAudio::setTempFilename(HuiFilename);
 }
 
 void SettingsDialog::onClose()

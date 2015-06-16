@@ -12,62 +12,60 @@
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Data/RingBuffer.h"
-#include "AudioInputBase.h"
+#include "AudioInput.h"
 
 struct pa_stream;
 
 #define NUM_CAPTURE_SAMPLES		8192
 
-class AudioInputAudio : public AudioInputBase
+class AudioInputAudio : public AudioInput
 {
 public:
-	AudioInputAudio(BufferBox &buf, RingBuffer &cur_buf);
+	AudioInputAudio(int sample_rate);
 	virtual ~AudioInputAudio();
 
-	string chosen_device;
-	string temp_filename;
+	static Array<string> getDevices();
+	static void setFavoriteDevice(const string &device);
+	static string getFavoriteDevice();
+	virtual void setDevice(const string &device);
+	virtual string getChosenDevice();
 
-	Array<string> getDevices();
-	void setDevice(const string &device);
-	string getChosenDevice();
-
-	virtual bool start(int sample_rate);
+	virtual bool start();
 	virtual void stop();
 
-	virtual bool isCapturing();
 	virtual int getDelay();
 	virtual void resetSync();
 
 	virtual int doCapturing();
 
-	virtual void accumulate(bool enable);
 	virtual void resetAccumulation();
 	virtual int getSampleCount();
 
 	virtual float getSampleRate();
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 
-	float getPlaybackDelayConst();
-	void setPlaybackDelayConst(float f);
+	static float getPlaybackDelayConst();
+	static void setPlaybackDelayConst(float f);
 
-	string getDefaultTempFilename();
-	string getTempFilename();
-	void setTempFilename(const string &filename);
+	static string getDefaultTempFilename();
+	static string getTempFilename();
+	static void setTempFilename(const string &filename);
 
-	BufferBox &accumulation_buffer;
-	RingBuffer &current_buffer;
-	int num_channels;
+	static string temp_filename;
+
 private:
-	bool accumulating;
 
-	int capture_temp[NUM_CAPTURE_SAMPLES];
+	int num_channels;
+
+	static string favorite_device;
+	string chosen_device;
 
 	pa_stream *_stream;
 
-	bool testError(const string &msg);
+	static bool testError(const string &msg);
 
 	File *temp_file;
-	string cur_temp_filename;
+	static string cur_temp_filename;
 
 	struct SyncData
 	{
@@ -81,9 +79,7 @@ private:
 	};
 	SyncData sync;
 
-	bool capturing;
-	int sample_rate;
-	float playback_delay_const;
+	static float playback_delay_const;
 
 	static void input_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 };

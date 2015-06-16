@@ -11,7 +11,6 @@
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
 #include "Audio/AudioOutput.h"
-#include "Audio/AudioInput.h"
 #include "Plugins/PluginManager.h"
 
 
@@ -24,7 +23,6 @@ Tsunami::Tsunami() :
 	HuiApplication("tsunami", "Deutsch", HUI_FLAG_LOAD_RESOURCE)
 {
 	audio = NULL;
-	input = NULL;
 	_view = NULL;
 	output = NULL;
 	log = NULL;
@@ -45,7 +43,6 @@ Tsunami::Tsunami() :
 Tsunami::~Tsunami()
 {
 	delete(storage);
-	delete(input);
 	delete(output);
 	delete(audio);
 	delete(plugin_manager);
@@ -67,7 +64,6 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	clipboard = new Clipboard;
 
 	output = new AudioOutput;
-	input = new AudioInput;
 
 	audio = new AudioFile;
 	audio->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);

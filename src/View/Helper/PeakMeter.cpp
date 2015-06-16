@@ -49,7 +49,7 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 {
 	panel = _panel;
 	id = _id;
-	source = _source;
+	source = NULL;
 	mode = ModePeaks;
 	sample_rate = 44100;
 	enabled = false;
@@ -59,20 +59,34 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 	panel->eventX(id, "hui:draw", this, &PeakMeter::onDraw);
 	panel->eventX(id, "hui:left-button-down", this, &PeakMeter::onLeftButtonDown);
 
+	setSource(_source);
 	enable(true);
 }
 
 PeakMeter::~PeakMeter()
 {
-	unsubscribe(source);
+	setSource(NULL);
+}
+
+void PeakMeter::setSource(PeakMeterSource *_source)
+{
+	if (source and enabled)
+		unsubscribe(source);
+
+	source = _source;
+
+	if (source and enabled)
+		subscribe(source);
 }
 
 void PeakMeter::enable(bool _enabled)
 {
-	if ((!enabled) && (_enabled))
-		subscribe(source);
-	if ((enabled) && (!_enabled))
-		unsubscribe(source);
+	if (source){
+		if (!enabled and _enabled)
+			subscribe(source);
+		if (enabled and !_enabled)
+			unsubscribe(source);
+	}
 
 	enabled = _enabled;
 }

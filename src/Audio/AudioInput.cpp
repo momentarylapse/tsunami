@@ -24,10 +24,12 @@ AudioInput::AudioInput(int _sample_rate) :
 	type = -1;
 	accumulating = false;
 	capturing = false;
+	hui_runner_id = -1;
 }
 
 AudioInput::~AudioInput()
 {
+	msg_write("~AudioInput");
 }
 
 void AudioInput::accumulate(bool enable)
@@ -38,9 +40,19 @@ void AudioInput::accumulate(bool enable)
 
 void AudioInput::_startUpdate()
 {
-	if (!running)
-		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::update);
+	if (running)
+		return;
+	hui_runner_id = HuiRunRepeatedM(UPDATE_TIME, this, &AudioInput::update);
 	running = true;
+}
+
+void AudioInput::_stopUpdate()
+{
+	if (!running)
+		return;
+	HuiCancelRunner(hui_runner_id);
+	hui_runner_id = -1;
+	running = false;
 }
 
 void AudioInput::update()
@@ -49,8 +61,6 @@ void AudioInput::update()
 		notify(MESSAGE_CAPTURE);
 
 	running = isCapturing();
-	if (running)
-		HuiRunLaterM(UPDATE_TIME, this, &AudioInput::update);
 }
 
 bool AudioInput::isCapturing()

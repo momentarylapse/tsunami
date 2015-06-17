@@ -33,6 +33,7 @@ public:
 	virtual void stop() = 0;
 
 	void _startUpdate();
+	void _stopUpdate();
 	void update();
 	virtual int doCapturing() = 0;
 
@@ -67,6 +68,7 @@ public:
 
 	int type;
 	bool running;
+	int hui_runner_id;
 };
 
 #endif /* AUDIOINPUT_H_ */

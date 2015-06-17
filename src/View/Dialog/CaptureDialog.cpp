@@ -69,11 +69,16 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 
 CaptureDialog::~CaptureDialog()
 {
+	msg_write("~CaptureDialog");
 	view->stream->stop();
+	msg_write("a");
 	unsubscribe(input);
+	msg_write("b");
 	delete(input);
+	msg_write("c");
 	delete(peak_meter);
 	delete(temp_synth);
+	msg_write("/~CaptureDialog");
 }
 
 void CaptureDialog::onTarget()

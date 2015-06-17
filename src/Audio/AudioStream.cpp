@@ -160,6 +160,7 @@ AudioStream::AudioStream(AudioRendererInterface *r) :
 	volume = 1;
 	read_more = false;
 	reading = false;
+	hui_runner_id = -1;
 
 	output = tsunami->output;
 
@@ -251,6 +252,8 @@ void AudioStream::stop()
 	msg_db_f("Stream.stop", 1);
 
 	playing = false;
+	HuiCancelRunner(hui_runner_id);
+	hui_runner_id = -1;
 
 	if (_stream){
 
@@ -394,7 +397,8 @@ void AudioStream::play()
 	testError("trigger");
 	pa_wait_op(op);
 
-	HuiRunLaterM(update_dt, this, &AudioStream::update);
+	hui_runner_id = HuiRunRepeatedM(update_dt, this, &AudioStream::update);
+
 	notify(MESSAGE_STATE_CHANGE);
 }
 
@@ -475,9 +479,10 @@ bool AudioStream::testError(const string &msg)
 
 void AudioStream::update()
 {
+	msg_write("u");
 	// <this> got deleted, while a timeout was still pending?
-	if (!tsunami->output->streamExists(this))
-		return;
+	//if (!tsunami->output->streamExists(this))
+//		return;
 
 	msg_db_f("Stream.update", 1);
 	testError("idle");
@@ -486,8 +491,6 @@ void AudioStream::update()
 
 	if (!paused)
 		notify(MESSAGE_UPDATE);
-
-	HuiRunLaterM(update_dt, this, &AudioStream::update);
 }
 
 

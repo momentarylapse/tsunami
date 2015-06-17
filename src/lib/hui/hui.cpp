@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.11.0";
+string HuiVersion = "0.5.12.0";
 
 #include <stdio.h>
 #include <signal.h>
@@ -191,7 +191,14 @@ int main(int NumArgs, char *Args[])
 		HuiCallback *c = (HuiCallback*)data;
 		c->call();
 		delete(c);
-		return false;
+		return FALSE;
+	}
+
+	gboolean GtkRunRepeatedFunction(gpointer data)
+	{
+		HuiCallback *c = (HuiCallback*)data;
+		c->call();
+		return TRUE;
 	}
 #endif
 
@@ -220,24 +227,53 @@ void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*funct
 	_HuiSetIdleFunction(HuiCallback(object, function));
 }
 
-void _HuiRunLater(float time, HuiCallback *c)
+int _HuiRunLater(float time, HuiCallback *c)
 {
 	#ifdef HUI_API_WIN
 		msg_todo("HuiRunLater");
+		return 0;
 	#endif
 	#ifdef HUI_API_GTK
-		g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunLaterFunction, (void*)c, NULL);
+		return g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunLaterFunction, (void*)c, NULL);
 	#endif
 }
 
-void HuiRunLater(float time, hui_callback *function)
+int HuiRunLater(float time, hui_callback *function)
 {
-	_HuiRunLater(time, new HuiCallback(function));
+	return _HuiRunLater(time, new HuiCallback(function));
 }
 
-void _HuiRunLaterM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
+int _HuiRunLaterM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
 {
-	_HuiRunLater(time, new HuiCallback(object, function));
+	return _HuiRunLater(time, new HuiCallback(object, function));
+}
+
+int _HuiRunRepeated(float time, HuiCallback *c)
+{
+	#ifdef HUI_API_WIN
+		msg_todo("HuiRunRepeated");
+		return 0;
+	#endif
+	#ifdef HUI_API_GTK
+		return g_timeout_add_full(300, max((int)(time * 1000), 0), &GtkRunRepeatedFunction, (void*)c, NULL);
+	#endif
+}
+
+int HuiRunRepeated(float time, hui_callback *function)
+{
+	return _HuiRunRepeated(time, new HuiCallback(function));
+}
+
+int _HuiRunRepeatedM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)())
+{
+	return _HuiRunRepeated(time, new HuiCallback(object, function));
+}
+
+void HuiCancelRunner(int id)
+{
+#ifdef HUI_API_GTK
+	g_source_remove(id);
+#endif
 }
 
 void _HuiMakeUsable_()

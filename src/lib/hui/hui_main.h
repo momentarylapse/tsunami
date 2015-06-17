@@ -15,16 +15,27 @@ void _HuiMakeUsable_();
 int HuiRun();
 void HuiPushMainLevel();
 void HuiPopMainLevel();
+
 void HuiSetIdleFunction(hui_callback *idle_function);
 void _HuiSetIdleFunctionM(HuiEventHandler *object, void (HuiEventHandler::*function)());
 template<typename T>
 void HuiSetIdleFunctionM(HuiEventHandler *object, T fun)
 {	_HuiSetIdleFunctionM(object, (void(HuiEventHandler::*)())fun);	}
-void HuiRunLater(float time, hui_callback *function);
-void _HuiRunLaterM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)());
+
+int HuiRunLater(float time, hui_callback *function);
+int _HuiRunLaterM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)());
 template<typename T>
-void HuiRunLaterM(float time, HuiEventHandler *object, T fun)
-{	_HuiRunLaterM(time, object, (void(HuiEventHandler::*)())fun);	}
+int HuiRunLaterM(float time, HuiEventHandler *object, T fun)
+{	return _HuiRunLaterM(time, object, (void(HuiEventHandler::*)())fun);	}
+
+int HuiRunRepeated(float time, hui_callback *function);
+int _HuiRunRepeatedM(float time, HuiEventHandler *object, void (HuiEventHandler::*function)());
+template<typename T>
+int HuiRunRepeatedM(float time, HuiEventHandler *object, T fun)
+{	return _HuiRunRepeatedM(time, object, (void(HuiEventHandler::*)())fun);	}
+
+void HuiCancelRunner(int i);
+
 void HuiDoSingleMainLoop();
 void HuiEnd();
 

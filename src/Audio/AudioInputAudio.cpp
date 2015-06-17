@@ -125,6 +125,9 @@ AudioInputAudio::AudioInputAudio(int _sample_rate) :
 
 AudioInputAudio::~AudioInputAudio()
 {
+	msg_write("~AudioInputAudio");
+	stop();
+	msg_write("/~AudioInputAudio");
 }
 
 
@@ -192,6 +195,7 @@ void AudioInputAudio::stop()
 	msg_db_f("CaptureStop", 1);
 	if (!capturing)
 		return;
+	_stopUpdate();
 
 	pa_stream_disconnect(_stream);
 	testError("disconnect");
@@ -249,6 +253,8 @@ bool AudioInputAudio::start()
 	cur_temp_filename = getTempFilename();
 	temp_file = FileCreate(getTempFilename());
 	temp_file->SetBinaryMode(true);
+
+	_startUpdate();
 
 	resetSync();
 	return capturing;

@@ -77,6 +77,7 @@ private:
 	bool paused;
 	int buffer_size;
 	float update_dt;
+	int hui_runner_id;
 
 	AudioRendererInterface *renderer;
 	RingBuffer ring_buf;

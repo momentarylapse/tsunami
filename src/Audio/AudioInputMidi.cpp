@@ -36,6 +36,7 @@ AudioInputMidi::AudioInputMidi(int _sample_rate) :
 
 AudioInputMidi::~AudioInputMidi()
 {
+	stop();
 	if (subs)
 		unconnect();
 	if (handle)
@@ -192,12 +193,14 @@ bool AudioInputMidi::start()
 
 	timer.reset();
 
+	_startUpdate();
 	capturing = true;
 	return true;
 }
 
 void AudioInputMidi::stop()
 {
+	_stopUpdate();
 	capturing = false;
 	preview_renderer->setAutoStop(true);
 	preview_renderer->endAllNotes();

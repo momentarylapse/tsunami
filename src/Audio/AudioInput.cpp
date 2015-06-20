@@ -29,7 +29,6 @@ AudioInput::AudioInput(int _sample_rate) :
 
 AudioInput::~AudioInput()
 {
-	msg_write("~AudioInput");
 }
 
 void AudioInput::accumulate(bool enable)

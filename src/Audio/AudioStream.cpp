@@ -263,6 +263,8 @@ void AudioStream::stop()
 
 		pa_stream_disconnect(_stream);
 		testError("disconnect");
+		pa_stream_unref(_stream);
+		testError("unref");
 		_stream = NULL;
 
 		kill_dev();

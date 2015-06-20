@@ -72,7 +72,15 @@ void AudioInputAudio::input_request_callback(pa_stream *p, size_t nbytes, void *
 }
 void input_notify_callback(pa_stream *p, void *userdata)
 {
-	printf("sstate... %p\n", p);
+	printf("sstate... %p:  ", p);
+	int s = pa_stream_get_state(p);
+	if (s == PA_STREAM_UNCONNECTED)
+		printf("unconnected");
+	if (s == PA_STREAM_READY)
+		printf("ready");
+	if (s == PA_STREAM_TERMINATED)
+		printf("terminated");
+	printf("\n");
 }
 
 
@@ -125,9 +133,7 @@ AudioInputAudio::AudioInputAudio(int _sample_rate) :
 
 AudioInputAudio::~AudioInputAudio()
 {
-	msg_write("~AudioInputAudio");
 	stop();
-	msg_write("/~AudioInputAudio");
 }
 
 
@@ -192,13 +198,22 @@ void AudioInputAudio::setDevice(const string &device)
 
 void AudioInputAudio::stop()
 {
-	msg_db_f("CaptureStop", 1);
+	msg_db_f("AudioInputAudio.stop", 1);
 	if (!capturing)
 		return;
 	_stopUpdate();
 
 	pa_stream_disconnect(_stream);
 	testError("disconnect");
+
+	for (int i=0; i<1000; i++){
+		if (pa_stream_get_state(_stream) == PA_STREAM_TERMINATED)
+			break;
+		HuiSleep(0.001f);
+	}
+
+	pa_stream_unref(_stream);
+	testError("unref");
 
 	capturing = false;
 	accumulating = false;
@@ -210,7 +225,7 @@ void AudioInputAudio::stop()
 
 bool AudioInputAudio::start()
 {
-	msg_db_f("CaptureStart", 1);
+	msg_db_f("AudioInputAudio.start", 1);
 	if (capturing)
 		stop();
 
@@ -228,7 +243,7 @@ bool AudioInputAudio::start()
 
 
 	pa_stream_set_read_callback(_stream, &input_request_callback, this);
-	pa_stream_set_state_callback(_stream, &input_notify_callback, NULL);
+	//pa_stream_set_state_callback(_stream, &input_notify_callback, NULL);
 
 	pa_buffer_attr attr_in;
 //	attr_in.fragsize = -1;

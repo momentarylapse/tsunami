@@ -70,9 +70,11 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 CaptureDialog::~CaptureDialog()
 {
 	view->stream->stop();
-	peak_meter->setSource(NULL);
-	unsubscribe(input);
-	delete(input);
+
+	AudioInput *i = input;
+	setInput(NULL);
+	delete(i);
+
 	delete(peak_meter);
 	delete(temp_synth);
 }
@@ -211,17 +213,34 @@ void CaptureDialog::setType(int _type)
 	}
 
 	if (type == Track::TYPE_AUDIO)
-		input = new AudioInputAudio(audio->sample_rate);
+		setInput(new AudioInputAudio(audio->sample_rate));
 	else if (type == Track::TYPE_MIDI)
-		input = new AudioInputMidi(audio->sample_rate);
-	subscribe(input);
-	peak_meter->setSource(input);
+		setInput(new AudioInputMidi(audio->sample_rate));
 
 	if (!input->start()){
 		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
 		CapturingByDialog = false;
 		msg_db_l(1);
 		return;*/
+	}
+}
+
+void CaptureDialog::setInput(AudioInput *_input)
+{
+	// unset
+	if (input){
+		unsubscribe(input);
+		peak_meter->setSource(NULL);
+		view->setInput(NULL);
+	}
+
+	input = _input;
+
+	// set
+	if (input){
+		subscribe(input);
+		peak_meter->setSource(input);
+		view->setInput(input);
 	}
 }
 

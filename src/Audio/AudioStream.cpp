@@ -481,11 +481,6 @@ bool AudioStream::testError(const string &msg)
 
 void AudioStream::update()
 {
-	msg_write("u");
-	// <this> got deleted, while a timeout was still pending?
-	//if (!tsunami->output->streamExists(this))
-//		return;
-
 	msg_db_f("Stream.update", 1);
 	testError("idle");
 	if (!playing)

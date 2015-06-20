@@ -48,6 +48,8 @@ public:
 	void setTarget(int index);
 	void setType(int type);
 
+	void setInput(AudioInput *input);
+
 	AudioFile *audio;
 	AudioView *view;
 	AudioInput *input;

@@ -33,7 +33,9 @@ AudioInput::~AudioInput()
 
 void AudioInput::accumulate(bool enable)
 {
-	resetAccumulation();
+	//resetAccumulation();
+	current_buffer.clear();
+	current_midi.clear();
 	accumulating = enable;
 }
 

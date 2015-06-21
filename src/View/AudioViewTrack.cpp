@@ -113,19 +113,19 @@ void AudioViewTrack::drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel
 
 	// no peaks yet? -> show dummy
 	if (b.peaks.num <= 2){
-		c->drawRect((b.offset - view_pos_rel) * view->view_zoom, y1, b.num * view->view_zoom, h);
+		c->drawRect((b.offset - view_pos_rel) * view->cam.scale, y1, b.num * view->cam.scale, h);
 		return;
 	}
 
 	int l = min(view->prefered_buffer_level - 1, b.peaks.num / 2);
 	if (l >= 1){//f < MIN_MAX_FACTOR){
-		draw_peak_buffer(c, w, di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, x1, y0r, b.peaks[l*2-2], b.offset);
+		draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, view->buffer_zoom_factor, hf, x1, y0r, b.peaks[l*2-2], b.offset);
 		if (!view->show_mono)
-			draw_peak_buffer(c, w, di, view_pos_rel, view->view_zoom, view->buffer_zoom_factor, hf, x1, y0l, b.peaks[l*2-1], b.offset);
+			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, view->buffer_zoom_factor, hf, x1, y0l, b.peaks[l*2-1], b.offset);
 	}else{
-		draw_line_buffer(c, w, view_pos_rel, view->view_zoom, hf, x1, y0r, b.r, b.offset);
+		draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0r, b.r, b.offset);
 		if (!view->show_mono)
-			draw_line_buffer(c, w, view_pos_rel, view->view_zoom, hf, x1, y0l, b.l, b.offset);
+			draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0l, b.l, b.offset);
 	}
 }
 
@@ -150,8 +150,8 @@ void AudioViewTrack::drawSampleFrame(HuiPainter *c, SampleRef *s, const color &c
 {
 	// frame
 	Range rr = s->getRange() + delay;
-	int asx = clampi(view->sample2screen(rr.start()), area.x1, area.x2);
-	int aex = clampi(view->sample2screen(rr.end()), area.x1, area.x2);
+	int asx = clampi(view->cam.sample2screen(rr.start()), area.x1, area.x2);
+	int aex = clampi(view->cam.sample2screen(rr.end()), area.x1, area.x2);
 
 	if (delay == 0)
 		s->area = rect(asx, aex, area.y1, area.y2);
@@ -188,17 +188,17 @@ void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 		drawSampleFrame(c, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	drawBuffer(c, *s->buf, view->view_pos - (double)s->pos, col);
+	drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
 	drawMidi(c, *s->midi, s->pos);
 
-	int asx = clampi(view->sample2screen(s->pos), area.x1, area.x2);
+	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
 	if (s->is_selected)//((is_cur) or (a->sub_mouse_over == s))
 		c->drawStr(asx, area.y2 - view->SUB_FRAME_HEIGHT, s->origin->name);
 }
 
 void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker)
 {
-	int x = view->sample2screen(marker.pos);
+	int x = view->cam.sample2screen(marker.pos);
 	c->setColor(view->colors.text);
 	c->drawStr(x, area.y1, marker.text);
 }
@@ -206,13 +206,13 @@ void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker)
 
 void AudioViewTrack::drawMidi(HuiPainter *c, MidiData &midi, int shift)
 {
-	Range range = view->viewRange() - shift;
+	Range range = view->cam.range() - shift;
 	Array<MidiNote> notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
 	foreach(MidiNote &n, notes){
 		c->setColor(getPitchColor(n.pitch));
-		float x1 = view->sample2screen(n.range.offset + shift);
-		float x2 = view->sample2screen(n.range.end() + shift);
+		float x1 = view->cam.sample2screen(n.range.offset + shift);
+		float x2 = view->cam.sample2screen(n.range.end() + shift);
 		x2 = max(x2, x1 + 4);
 		float h = area.y2 - clampf((float)n.pitch / 80.0f - 0.3f, 0, 1) * area.height();
 		//c->drawRect(rect(x1, x2, r.y1, r.y2));
@@ -223,8 +223,8 @@ void AudioViewTrack::drawMidi(HuiPainter *c, MidiData &midi, int shift)
 
 void AudioViewTrack::drawMidiNote(HuiPainter *c, const MidiNote &n, bool hover)
 {
-	float x1 = view->sample2screen(n.range.offset);
-	float x2 = view->sample2screen(n.range.end());
+	float x1 = view->cam.sample2screen(n.range.offset);
+	float x2 = view->cam.sample2screen(n.range.end());
 	float y1 = view->pitch2y(n.pitch + 1);
 	float y2 = view->pitch2y(n.pitch);
 	color col = getPitchColor(n.pitch);
@@ -236,7 +236,7 @@ void AudioViewTrack::drawMidiNote(HuiPainter *c, const MidiNote &n, bool hover)
 
 void AudioViewTrack::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
 {
-	float x = view->sample2screen(e.pos);
+	float x = view->cam.sample2screen(e.pos);
 	float y1 = view->pitch2y(e.pitch + 1);
 	float y2 = view->pitch2y(e.pitch);
 	color col = getPitchColor(e.pitch);
@@ -247,8 +247,8 @@ void AudioViewTrack::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
 
 void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi)
 {
-	Array<MidiEvent> events = midi.getEvents(view->viewRange());
-	Array<MidiNote> notes = midi.getNotes(view->viewRange());
+	Array<MidiEvent> events = midi.getEvents(view->cam.range());
+	Array<MidiNote> notes = midi.getNotes(view->cam.range());
 
 	// draw notes
 	foreachi(MidiNote &n, notes, i){
@@ -304,7 +304,7 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 	else
 		drawMidi(c, track->midi, 0);
 
-	drawTrackBuffers(c, view->view_pos);
+	drawTrackBuffers(c, view->cam.pos);
 
 	foreach(SampleRef *s, track->samples)
 		drawSample(c, s);

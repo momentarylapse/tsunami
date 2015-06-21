@@ -267,12 +267,12 @@ void CurveConsole::onDraw()
 
 float CurveConsole::sample2screen(float pos)
 {
-	return view->sample2screen(pos) * curve_rect.width() / view->drawing_rect.width();
+	return view->cam.sample2screen(pos) * curve_rect.width() / view->drawing_rect.width();
 }
 
 float CurveConsole::screen2sample(float x)
 {
-	return view->screen2sample(x * view->drawing_rect.width() / curve_rect.width());
+	return view->cam.screen2sample(x * view->drawing_rect.width() / curve_rect.width());
 }
 
 float CurveConsole::value2screen(float value)

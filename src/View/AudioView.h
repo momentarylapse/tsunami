@@ -12,6 +12,7 @@
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
 #include "TrackHeightManager.h"
+#include "ViewPort.h"
 
 class ActionTrackMoveSample;
 class AudioOutput;
@@ -59,7 +60,6 @@ public:
 	void updatePeaks(bool invalidate_all);
 	void zoomIn();
 	void zoomOut();
-	void makeSampleVisible(int sample);
 
 	void drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
 	void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
@@ -179,16 +179,10 @@ public:
 	void selectSample(SampleRef *s, bool diff);
 	void selectTrack(Track *t, bool diff);
 
-	double screen2sample(double x);
-	double sample2screen(double s);
-	double dsample2screen(double ds);
 	int y2pitch(int y);
 	float pitch2y(int p);
 
 	Array<MidiNote> getCreationNotes();
-
-	void zoom(float f);
-	void move(float dpos);
 
 
 	bool force_redraw;
@@ -238,12 +232,10 @@ public:
 	int cur_level;
 	int capturing_track;
 
-	double view_pos;
-	double view_zoom;
-	Range viewRange();
-
 	rect area;
 	TrackHeightManager thm;
+
+	ViewPort cam;
 
 	Array<AudioViewTrack*> vtrack;
 	void updateTracks();

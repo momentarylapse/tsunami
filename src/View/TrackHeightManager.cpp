@@ -12,6 +12,11 @@
 
 TrackHeightManager::TrackHeightManager()
 {
+	animating = false;
+	t = 0;
+	dirty = false;
+	render_area = r_id;
+	midi_track = NULL;
 }
 
 

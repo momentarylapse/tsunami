@@ -29,8 +29,6 @@ const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 60;
 const int AudioView::BARRIER_DIST = 8;
 
-const float BORDER_FACTOR = 1.0f / 15.0f;
-
 int get_track_index_save(Track *t)
 {
 	if (t){
@@ -111,7 +109,8 @@ public:
 
 AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output) :
 	Observer("AudioView"),
-	Observable("AudioView")
+	Observable("AudioView"),
+	cam(this)
 {
 	win = parent;
 	thm.dirty = true;
@@ -159,9 +158,6 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	image_track_audio.load(HuiAppDirectoryStatic + "Data/track-audio.tga");
 	image_track_time.load(HuiAppDirectoryStatic + "Data/track-time.tga");
 	image_track_midi.load(HuiAppDirectoryStatic + "Data/track-midi.tga");
-
-	view_zoom = 0.001;
-	view_pos = 0;
 
 	mouse_possibly_selecting = -1;
 	cur_action = NULL;
@@ -270,7 +266,7 @@ bool AudioView::mouseOverTrack(AudioViewTrack *t)
 int AudioView::mouseOverSample(SampleRef *s)
 {
 	if ((mx >= s->area.x1) and (mx < s->area.x2)){
-		int offset = screen2sample(mx) - s->pos;
+		int offset = cam.screen2sample(mx) - s->pos;
 		if ((my >= s->area.y1) and (my < s->area.y1 + SUB_FRAME_HEIGHT))
 			return offset;
 		if ((my >= s->area.y2 - SUB_FRAME_HEIGHT) and (my < s->area.y2))
@@ -281,7 +277,7 @@ int AudioView::mouseOverSample(SampleRef *s)
 
 void AudioView::selectionUpdatePos(SelectionType &s)
 {
-	s.pos = screen2sample(mx);
+	s.pos = cam.screen2sample(mx);
 }
 
 void AudioView::updateSelection()
@@ -306,7 +302,7 @@ void AudioView::updateSelection()
 
 bool mouse_over_time(AudioView *v, int pos)
 {
-	int ssx = v->sample2screen(pos);
+	int ssx = v->cam.sample2screen(pos);
 	return ((v->mx >= ssx - 5) and (v->mx <= ssx + 5));
 }
 
@@ -373,7 +369,7 @@ AudioView::SelectionType AudioView::getMouseOver()
 	if ((s.track) and (s.track == cur_track) and (editingMidi()) and (midi_mode != MIDI_MODE_SELECT)){
 		s.pitch = y2pitch(my);
 		s.type = SEL_TYPE_MIDI_PITCH;
-		Array<MidiNote> notes = s.track->midi.getNotes(viewRange());
+		Array<MidiNote> notes = s.track->midi.getNotes(cam.range());
 		foreach(MidiNote &n, notes)
 			if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
 				s.note_start = n.range.offset;
@@ -395,11 +391,6 @@ AudioView::SelectionType AudioView::getMouseOver()
 	}
 
 	return s;
-}
-
-Range AudioView::viewRange()
-{
-	return Range(view_pos, area.width() / view_zoom);
 }
 
 
@@ -457,7 +448,7 @@ void AudioView::setBarriers(SelectionType *s)
 		}
 
 		// time bar...
-		Array<Beat> beats = t->bars.getBeats(viewRange());
+		Array<Beat> beats = t->bars.getBeats(cam.range());
 		foreach(Beat &b, beats)
 			s->barrier.add(b.range.offset);
 	}
@@ -477,7 +468,7 @@ void AudioView::applyBarriers(int &pos)
 	bool found = false;
 	int new_pos;
 	foreach(int b, selection.barrier){
-		int dist = abs(sample2screen(b) - sample2screen(pos));
+		int dist = abs(cam.sample2screen(b) - cam.sample2screen(pos));
 		if (dist < dmin){
 			//msg_write(format("barrier:  %d  ->  %d", pos, b));
 			new_pos = b;
@@ -814,18 +805,18 @@ void AudioView::onKeyDown()
 	// moving
 	float dt = 0.05f;
 	if (k == KEY_RIGHT)
-		move(ScrollSpeed * dt / view_zoom);
+		cam.move(ScrollSpeed * dt / cam.scale);
 	if (k == KEY_LEFT)
-		move(- ScrollSpeed * dt / view_zoom);
+		cam.move(- ScrollSpeed * dt / cam.scale);
 	if (k == KEY_NEXT)
-		move(ScrollSpeedFast * dt / view_zoom);
+		cam.move(ScrollSpeedFast * dt / cam.scale);
 	if (k == KEY_PRIOR)
-		move(- ScrollSpeedFast * dt / view_zoom);
+		cam.move(- ScrollSpeedFast * dt / cam.scale);
 	// zoom
 	if (k == KEY_ADD)
-		zoom(exp(  ZoomSpeed));
+		cam.zoom(exp(  ZoomSpeed));
 	if (k == KEY_SUBTRACT)
-		zoom(exp(- ZoomSpeed));
+		cam.zoom(exp(- ZoomSpeed));
 
 	if (k == KEY_SPACE){
 		if (stream->isPlaying()){
@@ -847,7 +838,7 @@ void AudioView::onKeyUp()
 
 void AudioView::onMouseWheel()
 {
-	zoom(exp(ZoomSpeed * HuiGetEvent()->dz));
+	cam.zoom(exp(ZoomSpeed * HuiGetEvent()->dz));
 }
 
 
@@ -865,10 +856,10 @@ void AudioView::updateBufferZoom()
 	buffer_zoom_factor = 1.0;
 
 	// which level of detail?
-	if (view_zoom < 0.8f)
+	if (cam.scale < 0.8f)
 		for (int i=24-1;i>=0;i--){
 			double _f = pow(2, (double)i);
-			if (_f > 1.0 / view_zoom){
+			if (_f > 1.0 / cam.scale){
 				prefered_buffer_level = i;
 				buffer_zoom_factor = _f;
 			}
@@ -901,7 +892,7 @@ float AudioView::pitch2y(int p)
 
 void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
-	double dl = AudioViewTrack::MIN_GRID_DIST / view_zoom; // >= 10 pixel
+	double dl = AudioViewTrack::MIN_GRID_DIST / cam.scale; // >= 10 pixel
 	double dt = dl / audio->sample_rate;
 	double ldt = log10(dt);
 	double factor = 1;
@@ -915,13 +906,13 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 	dt = pow(10, exp_s) / factor;
 	dl = dt * audio->sample_rate;
 //	double dw = dl * a->view_zoom;
-	int nx0 = floor(screen2sample(r.x1 - 1) / dl);
-	int nx1 = ceil(screen2sample(r.x2) / dl);
+	int nx0 = floor(cam.screen2sample(r.x1 - 1) / dl);
+	int nx1 = ceil(cam.screen2sample(r.x2) / dl);
 	color c1 = ColorInterpolate(bg, colors.grid, exp_s_mod);
 	color c2 = colors.grid;
 	for (int n=nx0; n<nx1; n++){
 		c->setColor(((n % 10) == 0) ? c2 : c1);
-		int xx = sample2screen(n * dl);
+		int xx = cam.sample2screen(n * dl);
 		c->drawLine(xx, r.y1, xx, r.y2);
 	}
 	if (show_time){
@@ -929,18 +920,18 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 			color cc = colors.preview_marker;
 			cc.a = 0.25f;
 			c->setColor(cc);
-			float x0 = sample2screen(renderer->range().start());
-			float x1 = sample2screen(renderer->range().end());
+			float x0 = cam.sample2screen(renderer->range().start());
+			float x1 = cam.sample2screen(renderer->range().end());
 			c->drawRect(x0, r.y1, x1 - x0, r.y1 + TIME_SCALE_HEIGHT);
 		}
 		c->setColor(colors.grid);
 		for (int n=nx0; n<nx1; n++){
-			if ((sample2screen(dl) - sample2screen(0)) > 25){
+			if ((cam.sample2screen(dl) - cam.sample2screen(0)) > 25){
 				if (n % 5 == 0)
-					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy((double)n * dl, dt * 5));
+					c->drawStr(cam.sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy((double)n * dl, dt * 5));
 			}else{
 				if ((n % 10) == 0)
-					c->drawStr(sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy((double)n * dl, dt * 10));
+					c->drawStr(cam.sample2screen(n * dl) + 2, r.y1, audio->get_time_str_fuzzy((double)n * dl, dt * 10));
 			}
 		}
 	}
@@ -961,8 +952,8 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 	if (!t)
 		return;
 	bool editing_midi = editingMidi();
-	int s0 = screen2sample(r.x1 - 1);
-	int s1 = screen2sample(r.x2);
+	int s0 = cam.screen2sample(r.x1 - 1);
+	int s1 = cam.screen2sample(r.x2);
 	//c->SetLineWidth(2.0f);
 	Array<float> dash, no_dash;
 	dash.add(6);
@@ -970,9 +961,9 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
 	Array<Bar> bars = t->bars.getBars(Range(s0, s1 - s0));
 	foreach(Bar &b, bars){
-		int xx = sample2screen(b.range.offset);
+		int xx = cam.sample2screen(b.range.offset);
 
-		float dx_bar = dsample2screen(b.range.num);
+		float dx_bar = cam.dsample2screen(b.range.num);
 		float dx_beat = dx_bar / b.num_beats;
 		float f1 = min(1.0f, dx_bar / 40.0f);
 		if ((b.index % 5) == 0)
@@ -995,14 +986,14 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 					color c2 = ColorInterpolate(bg, c1, 0.6f);
 					c->setColor(c2);
 					for (int j=1; j<beat_partition; j++){
-						int x = sample2screen(beat_offset + beat_length * j / beat_partition);
+						int x = cam.sample2screen(beat_offset + beat_length * j / beat_partition);
 						c->drawLine(x, r.y1, x, r.y2);
 					}
 				}
 				if (i == 0)
 					continue;
 				c->setColor(c1);
-				int x = sample2screen(beat_offset);
+				int x = cam.sample2screen(beat_offset);
 				c->drawLine(x, r.y1, x, r.y2);
 			}
 		}
@@ -1054,11 +1045,11 @@ void AudioView::onUpdate(Observable *o, const string &message)
 			updatePeaks(false);
 	}else if (o == stream){
 		if (stream->isPlaying())
-			makeSampleVisible(stream->getPos());
+			cam.makeSampleVisible(stream->getPos());
 		forceRedraw();
 	}else if (input and o == input){
 		if (input->isCapturing())
-			makeSampleVisible(sel_range.start() + input->getSampleCount());
+			cam.makeSampleVisible(sel_range.start() + input->getSampleCount());
 		forceRedraw();
 	}else{
 		forceRedraw();
@@ -1102,7 +1093,7 @@ void AudioView::updateTracks()
 
 void AudioView::drawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time)
 {
-	int p = sample2screen(pos);
+	int p = cam.sample2screen(pos);
 	if ((p >= area.x1) and (p <= area.x2)){
 		c->setColor((type == hover.type) ? colors.selection_boundary_hover : col);
 		c->drawLine(p, area.y1, p, area.y2);
@@ -1169,8 +1160,8 @@ void AudioView::drawBackground(HuiPainter *c, const rect &r)
 
 void AudioView::drawSelection(HuiPainter *c, const rect &r)
 {
-	int sx1 = sample2screen(sel_range.start());
-	int sx2 = sample2screen(sel_range.end());
+	int sx1 = cam.sample2screen(sel_range.start());
+	int sx2 = cam.sample2screen(sel_range.end());
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(colors.selection_internal);
@@ -1199,7 +1190,7 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 	if (input and input->isCapturing()){
 		input->buffer.update_peaks(peak_mode);
 		if ((capturing_track >= 0) and (capturing_track < vtrack.num)){
-			vtrack[capturing_track]->drawBuffer(c, input->buffer, view_pos - sel_range.offset, colors.capture_marker);
+			vtrack[capturing_track]->drawBuffer(c, input->buffer, cam.pos - sel_range.offset, colors.capture_marker);
 			vtrack[capturing_track]->drawMidi(c, input->midi, sel_range.start());
 		}
 	}
@@ -1253,13 +1244,8 @@ void AudioView::optimizeView()
 
 	if (r.num == 0)
 		r.num = 10 * audio->sample_rate;
-	int border = r.num * BORDER_FACTOR;
-	r.offset -= border;
-	r.num += border * 2;
-	view_zoom = area.width() / (double)r.length();
-	view_pos = (double)r.start();
-	notify(MESSAGE_VIEW_CHANGE);
-	forceRedraw();
+
+	cam.show(r);
 }
 
 void AudioView::updateMenu()
@@ -1307,21 +1293,12 @@ void AudioView::setShowMono(bool mono)
 
 void AudioView::zoomIn()
 {
-	zoom(2.0f);
+	cam.zoom(2.0f);
 }
 
 void AudioView::zoomOut()
 {
-	zoom(0.5f);
-}
-void AudioView::makeSampleVisible(int sample)
-{
-	double x = sample2screen(sample);
-	if ((x > area.x2) or (x < area.x1)){
-		view_pos = sample - area.width() / view_zoom * BORDER_FACTOR;
-		notify(MESSAGE_VIEW_CHANGE);
-		forceRedraw();
-	}
+	cam.zoom(0.5f);
 }
 
 void AudioView::selectAll()
@@ -1418,39 +1395,6 @@ void AudioView::setInput(AudioInput *_input)
 
 	if (input)
 		subscribe(input);
-}
-
-double AudioView::screen2sample(double _x)
-{
-	return (_x - area.x1) / view_zoom + view_pos;
-}
-
-double AudioView::sample2screen(double s)
-{
-	return area.x1 + (s - view_pos) * view_zoom;
-}
-
-double AudioView::dsample2screen(double ds)
-{
-	return ds * view_zoom;
-}
-
-void AudioView::zoom(float f)
-{
-	// max zoom: 20 pixel per sample
-	double zoom_new = clampf(view_zoom * f, 0.000001, 20.0);
-
-	view_pos += (mx - area.x1) * (1.0/view_zoom - 1.0/zoom_new);
-	view_zoom = zoom_new;
-	notify(MESSAGE_VIEW_CHANGE);
-	forceRedraw();
-}
-
-void AudioView::move(float dpos)
-{
-	view_pos += dpos;
-	notify(MESSAGE_VIEW_CHANGE);
-	forceRedraw();
 }
 
 void AudioView::enable(bool _enabled)

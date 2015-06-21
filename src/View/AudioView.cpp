@@ -1298,8 +1298,10 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 	// capturing preview
 	if (input and input->isCapturing()){
 		input->buffer.update_peaks(peak_mode);
-		if ((capturing_track >= 0) and (capturing_track < vtrack.num))
+		if ((capturing_track >= 0) and (capturing_track < vtrack.num)){
 			vtrack[capturing_track]->drawBuffer(c, input->buffer, view_pos - sel_range.offset, colors.capture_marker);
+			vtrack[capturing_track]->drawMidi(c, input->midi, sel_range.start());
+		}
 	}
 
 

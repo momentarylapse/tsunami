@@ -66,7 +66,7 @@ void SettingsDialog::loadData()
 	}
 
 	// color scheme
-	foreachi(AudioView::ColorSchemeBasic &b, tsunami->_view->basic_schemes, i){
+	foreachi(ColorSchemeBasic &b, tsunami->_view->basic_schemes, i){
 		addString("color_scheme", b.name);
 		if (b.name == tsunami->_view->colors.name)
 			setInt("color_scheme", i);

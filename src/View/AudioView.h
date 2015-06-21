@@ -13,6 +13,7 @@
 #include "../Stuff/Observer.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
+#include "ColorScheme.h"
 
 class ActionTrackMoveSample;
 class AudioOutput;
@@ -71,36 +72,7 @@ public:
 	void optimizeView();
 	void updateMenu();
 
-
-	struct ColorSchemeBasic
-	{
-		color background;
-		color text;
-		color selection;
-		color hover;
-		float gamma;
-		string name;
-	};
 	Array<ColorSchemeBasic> basic_schemes;
-
-	struct ColorScheme : ColorSchemeBasic
-	{
-		color background_track;
-		color background_track_selected;
-		color selection_internal;
-		color selection_boundary;
-		color selection_boundary_hover;
-		color preview_marker;
-		color capture_marker;
-		color text_soft1;
-		color text_soft2;
-		color text_soft3;
-		color grid;
-		color sample;
-		color sample_selected;
-		color sample_hover;
-		void create(ColorSchemeBasic &basic);
-	};
 	ColorScheme colors;
 	void setColorScheme(const string &name);
 
@@ -158,8 +130,7 @@ public:
 	float ScrollSpeedFast;
 	float ZoomSpeed;
 
-	int mx,my;
-	int mx0,my0;
+	int mx, my;
 
 	void selectNone();
 	void selectAll();

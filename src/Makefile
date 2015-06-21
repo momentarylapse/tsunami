@@ -250,6 +250,7 @@ OBJ = \
  View/SideBar/TrackConsole.o\
  View/AudioView.o\
  View/AudioViewTrack.o\
+ View/ColorScheme.o\
  View/TrackHeightManager.o\
  View/ViewPort.o\
  TsunamiWindow.o\
@@ -1001,6 +1002,9 @@ View/AudioView.o : View/AudioView.cpp
 
 View/AudioViewTrack.o : View/AudioViewTrack.cpp
 	$(CPP) -c View/AudioViewTrack.cpp -o $@ $(CXXFLAGS)
+
+View/ColorScheme.o : View/ColorScheme.cpp
+	$(CPP) -c View/ColorScheme.cpp -o $@ $(CXXFLAGS)
 
 View/TrackHeightManager.o : View/TrackHeightManager.cpp
 	$(CPP) -c View/TrackHeightManager.cpp -o $@ $(CXXFLAGS)

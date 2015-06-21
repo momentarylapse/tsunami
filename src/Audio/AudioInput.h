@@ -54,7 +54,7 @@ public:
 
 	virtual MidiPort getCurMidiPort(){ MidiPort p; return p; }
 	virtual Array<MidiPort> findMidiPorts(){ Array<MidiPort> a; return a; }
-	virtual void connectMidiPort(MidiPort &p){}
+	virtual bool connectMidiPort(MidiPort &p){ return false; }
 	virtual void setPreviewSynthesizer(Synthesizer *s){}
 
 	int sample_rate;

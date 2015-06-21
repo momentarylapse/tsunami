@@ -70,7 +70,7 @@ void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 		preview_stream->play();
 }
 
-bool AudioInputMidi::connectTo(AudioInputMidi::MidiPort &p)
+bool AudioInputMidi::connectMidiPort(AudioInputMidi::MidiPort &p)
 {
 	if (subs)
 		unconnect();
@@ -123,7 +123,7 @@ AudioInputMidi::MidiPort AudioInputMidi::getCurMidiPort()
 }
 
 
-Array<AudioInputMidi::MidiPort> AudioInputMidi::findPorts()
+Array<AudioInputMidi::MidiPort> AudioInputMidi::findMidiPorts()
 {
 	Array<MidiPort> ports;
 	snd_seq_client_info_t *cinfo;
@@ -184,6 +184,7 @@ bool AudioInputMidi::start()
 	if (!handle)
 		return false;
 	accumulating = false;
+	offset = 0;
 	resetAccumulation();
 
 	clearInputQueue();

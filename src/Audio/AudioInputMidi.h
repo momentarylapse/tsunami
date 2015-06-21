@@ -43,9 +43,9 @@ public:
 
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 
-	Array<MidiPort> findPorts();
+	Array<MidiPort> findMidiPorts();
 	MidiPort getCurMidiPort();
-	bool connectTo(MidiPort &p);
+	bool connectMidiPort(MidiPort &p);
 	bool unconnect();
 
 	void setPreviewSynthesizer(Synthesizer *s);
@@ -61,7 +61,6 @@ private:
 	int portid;
 	int npfd;
 	struct pollfd *pfd;
-	int sample_rate;
 	HuiTimer timer;
 	double offset;
 	bool capturing;

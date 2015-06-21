@@ -190,6 +190,24 @@ void CaptureDialog::setType(int _type)
 	if (type == _type)
 		return;
 	type = _type;
+
+	// consistency test: ...
+	int target = getInt("capture_target");
+	if ((target >= 0) and (target < audio->tracks.num))
+		if (type != audio->tracks[target]->type)
+			setInt("capture_target", audio->tracks.num);
+
+	if (input){
+		AudioInput *i = input;
+		setInput(NULL);
+		delete(i);
+	}
+
+	if (type == Track::TYPE_AUDIO)
+		setInput(new AudioInputAudio(audio->sample_rate));
+	else if (type == Track::TYPE_MIDI)
+		setInput(new AudioInputMidi(audio->sample_rate));
+
 	reset("capture_source");
 	enable("capture_source", false);
 	if (type == Track::TYPE_MIDI){
@@ -200,22 +218,6 @@ void CaptureDialog::setType(int _type)
 		check("capture_type:audio", true);
 	}else{
 	}
-
-	// consistency test: ...
-	int target = getInt("capture_target");
-	if ((target >= 0) and (target < audio->tracks.num))
-		if (type != audio->tracks[target]->type)
-			setInt("capture_target", audio->tracks.num);
-
-	if (input){
-		unsubscribe(input);
-		delete(input);
-	}
-
-	if (type == Track::TYPE_AUDIO)
-		setInput(new AudioInputAudio(audio->sample_rate));
-	else if (type == Track::TYPE_MIDI)
-		setInput(new AudioInputMidi(audio->sample_rate));
 
 	if (!input->start()){
 		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
@@ -275,7 +277,7 @@ void CaptureDialog::onDelete()
 	enable("capture_source", true);
 	enable("capture_target", true);
 	enable("ok", false);
-	onUpdate(NULL, "");
+	updateTime();
 }
 
 void CaptureDialog::onPause()
@@ -300,9 +302,14 @@ void CaptureDialog::onClose()
 	delete(this);
 }
 
-void CaptureDialog::onUpdate(Observable *o, const string &message)
+void CaptureDialog::updateTime()
 {
 	setString("capture_time", audio->get_time_str_long(input->getSampleCount()));
+}
+
+void CaptureDialog::onUpdate(Observable *o, const string &message)
+{
+	updateTime();
 }
 
 bool CaptureDialog::insert()

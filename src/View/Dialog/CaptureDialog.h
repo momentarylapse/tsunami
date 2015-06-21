@@ -42,6 +42,7 @@ public:
 	void updateAudioSourceList();
 	Array<string> audio_sources;
 	string selected_audio_source;
+	void updateTime();
 
 	void onUpdate(Observable *o, const string &message);
 

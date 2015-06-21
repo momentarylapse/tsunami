@@ -11,6 +11,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
+#include "TrackHeightManager.h"
 
 class ActionTrackMoveSample;
 class AudioOutput;
@@ -242,19 +243,6 @@ public:
 	Range viewRange();
 
 	rect area;
-	struct TrackHeightManager
-	{
-		float t;
-		bool dirty;
-		bool animating;
-		rect render_area;
-		HuiTimer timer;
-		Track *midi_track;
-
-		bool check(AudioFile *a);
-		bool update(AudioView *v, AudioFile *a, const rect &r);
-		void plan(AudioView *v, AudioFile *a, const rect &r);
-	};
 	TrackHeightManager thm;
 
 	Array<AudioViewTrack*> vtrack;

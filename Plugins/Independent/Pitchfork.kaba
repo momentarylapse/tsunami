@@ -20,7 +20,7 @@ class Renderer : AudioRendererInterface
 		return buf.num
 
 class PitchFork : Dialog
-	AudioStream *stream
+	OutputStream *stream
 	Renderer *renderer
 	
 	void __init__(Window *parent)
@@ -36,7 +36,7 @@ class PitchFork : Dialog
 		event("frequency", &onFrequency)
 	
 		renderer = new Renderer
-		stream = new AudioStream(renderer)
+		stream = new OutputStream(renderer)
 		stream.play()
 	
 		setFloat("frequency", renderer.freq)

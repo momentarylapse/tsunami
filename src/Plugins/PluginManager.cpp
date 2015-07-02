@@ -335,38 +335,45 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRenderer", "seek", Script::mf(&AudioRenderer::seek), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
 
-	Script::DeclareClassSize("AudioInput", sizeof(AudioInput));
-	Script::DeclareClassOffset("AudioInput", "current_buffer", _offsetof(AudioInput, current_buffer));
-	Script::DeclareClassOffset("AudioInput", "buffer", _offsetof(AudioInput, buffer));
-	Script::DeclareClassOffset("AudioInput", "midi", _offsetof(AudioInput, midi));
-	Script::LinkExternal("AudioInput.start", Script::mf(&AudioInput::start));
-	Script::LinkExternal("AudioInput.resetSync", Script::mf(&AudioInput::resetSync));
-	Script::LinkExternal("AudioInput.stop",	 Script::mf(&AudioInput::stop));
-	Script::LinkExternal("AudioInput.isCapturing", Script::mf(&AudioInput::isCapturing));
-	Script::LinkExternal("AudioInput.getSampleCount", Script::mf(&AudioInput::getSampleCount));
-	Script::LinkExternal("AudioInput.accumulate", Script::mf(&AudioInput::accumulate));
-	Script::LinkExternal("AudioInput.resetAccumulation", Script::mf(&AudioInput::resetAccumulation));
-	Script::LinkExternal("AudioInput.getDelay", Script::mf(&AudioInput::getDelay));
-	Script::LinkExternal("AudioInput.addObserver", Script::mf(&AudioInput::addWrappedObserver));
-	Script::LinkExternal("AudioInput.removeObserver", Script::mf(&AudioInput::removeWrappedObserver));
+	/*{
+	AudioInputAudio input(0);
+	Script::DeclareClassSize("InputStream", sizeof(AudioInput));
+	Script::DeclareClassOffset("InputStream", "current_buffer", _offsetof(AudioInput, current_buffer));
+	Script::DeclareClassOffset("InputStream", "buffer", _offsetof(AudioInput, buffer));
+	Script::DeclareClassOffset("InputStream", "current_midi", _offsetof(AudioInput, current_midi));
+	Script::DeclareClassOffset("InputStream", "midi", _offsetof(AudioInput, midi));
+	Script::DeclareClassOffset("InputStream", "sample_rate", _offsetof(AudioInput, sample_rate));
+	Script::DeclareClassOffset("InputStream", "accumulating", _offsetof(AudioInput, accumulating));
+	Script::DeclareClassOffset("InputStream", "capturing", _offsetof(AudioInput, capturing));
+	Script::LinkExternal("InputStream.start", Script::mf(&AudioInput::start));
+	Script::LinkExternal("InputStream.resetSync", Script::mf(&AudioInput::resetSync));
+	Script::LinkExternal("InputStream.stop",	 Script::mf(&AudioInput::stop));
+	Script::LinkExternal("InputStream.isCapturing", Script::mf(&AudioInput::isCapturing));
+	Script::LinkExternal("InputStream.getSampleCount", Script::mf(&AudioInput::getSampleCount));
+	Script::LinkExternal("InputStream.accumulate", Script::mf(&AudioInput::accumulate));
+	Script::LinkExternal("InputStream.resetAccumulation", Script::mf(&AudioInput::resetAccumulation));
+	Script::LinkExternal("InputStream.getDelay", Script::mf(&AudioInput::getDelay));
+	Script::LinkExternal("InputStream.addObserver", Script::mf(&AudioInput::addWrappedObserver));
+	Script::LinkExternal("InputStream.removeObserver", Script::mf(&AudioInput::removeWrappedObserver));
 	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
+	}*/
 
 	AudioStream::JUST_FAKING_IT = true;
 	{
 	AudioStream stream(NULL);
-	Script::DeclareClassSize("AudioStream", sizeof(AudioStream));
-	Script::LinkExternal("AudioStream.__init__", Script::mf(&AudioStream::__init__));
-	Script::DeclareClassVirtualIndex("AudioStream", "__delete__", Script::mf(&AudioStream::__delete__), &stream);
-	//Script::LinkExternal("AudioStream.setSource", Script::mf(&AudioStream::setSource));
-	Script::LinkExternal("AudioStream.play", Script::mf(&AudioStream::play));
-	Script::LinkExternal("AudioStream.stop", Script::mf(&AudioStream::stop));
-	Script::LinkExternal("AudioStream.pause", Script::mf(&AudioStream::pause));
-	Script::LinkExternal("AudioStream.isPlaying", Script::mf(&AudioStream::isPlaying));
-	Script::LinkExternal("AudioStream.getPos", Script::mf(&AudioStream::getPos));
-	Script::LinkExternal("AudioStream.getSampleRate", Script::mf(&AudioStream::getSampleRate));
-	Script::LinkExternal("AudioStream.getVolume", Script::mf(&AudioStream::getVolume));
-	Script::LinkExternal("AudioStream.setVolume", Script::mf(&AudioStream::setVolume));
-	Script::LinkExternal("AudioStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));
+	Script::DeclareClassSize("OutputStream", sizeof(AudioStream));
+	Script::LinkExternal("OutputStream.__init__", Script::mf(&AudioStream::__init__));
+	Script::DeclareClassVirtualIndex("OutputStream", "__delete__", Script::mf(&AudioStream::__delete__), &stream);
+	//Script::LinkExternal("OutputStream.setSource", Script::mf(&AudioStream::setSource));
+	Script::LinkExternal("OutputStream.play", Script::mf(&AudioStream::play));
+	Script::LinkExternal("OutputStream.stop", Script::mf(&AudioStream::stop));
+	Script::LinkExternal("OutputStream.pause", Script::mf(&AudioStream::pause));
+	Script::LinkExternal("OutputStream.isPlaying", Script::mf(&AudioStream::isPlaying));
+	Script::LinkExternal("OutputStream.getPos", Script::mf(&AudioStream::getPos));
+	Script::LinkExternal("OutputStream.getSampleRate", Script::mf(&AudioStream::getSampleRate));
+	Script::LinkExternal("OutputStream.getVolume", Script::mf(&AudioStream::getVolume));
+	Script::LinkExternal("OutputStream.setVolume", Script::mf(&AudioStream::setVolume));
+	Script::LinkExternal("OutputStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));
 	}
 	AudioStream::JUST_FAKING_IT = false;
 
@@ -544,8 +551,6 @@ Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 {
 	msg_db_f("LoadAndCompilePlugin", 1);
 
-	//msg_write(filename);
-
 	foreach(Plugin *p, plugins){
 		if (filename == p->filename){
 			return p;
@@ -668,7 +673,7 @@ Effect *PluginManager::LoadEffect(const string &name)
 			break;
 		}
 	}
-	if (p){
+	if (!p){
 		tsunami->log->error(format(_("Kann Effekt nicht laden: %s"), name.c_str()));
 		return NULL;
 	}

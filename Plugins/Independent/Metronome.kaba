@@ -45,7 +45,7 @@ class MetronomeRenderer : AudioRendererInterface
 		return buf.num
 
 class MetronomeDialog : Dialog
-	AudioStream *stream
+	OutputStream *stream
 	MetronomeRenderer *renderer
 	
 	void __init__(Window *parent)
@@ -76,7 +76,7 @@ Grid ? '' 1 2
 		event("bpm", &onBpm)
 		event("num_beats", &onNumBeats)
 	
-		stream = new AudioStream(renderer)
+		stream = new OutputStream(renderer)
 		stream.play()
 	
 	virtual void __delete__()

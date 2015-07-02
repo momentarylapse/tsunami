@@ -327,7 +327,7 @@ class ColorScheme
 class AudioView
 	Range sel_range
 	Range sel_raw
-	AudioStream *stream
+	OutputStream *stream
 	AudioRenderer *renderer
 	ColorScheme colors
 
@@ -344,7 +344,7 @@ class AudioRenderer
 	extern virtual int getSampleRate()
 
 
-class AudioStream
+class OutputStream
 	extern void __init__(AudioRendererInterface *r)
 	extern void __delete__()
 	extern void stop()
@@ -358,7 +358,7 @@ class AudioStream
 	extern void setVolume(float volume)
 	extern void setBufferSize(int size)
 
-class AudioInput //: Observable
+/*class AudioInput //: Observable
 	RingBuffer current_buffer
 	BufferBox buffer
 	MidiData midi
@@ -371,7 +371,58 @@ class AudioInput //: Observable
 	extern void accumulate(bool enable)
 	extern void resetAccumulation()
 	extern void addObserver(void *handler, void *func)
+	extern void removeObserver(void *handler)*/
+	
+class MidiPort
+	int client, port
+	string client_name, port_name
+	
+/*class InputStream
+	extern virtual void __delete__()
+
+	extern virtual bool start()
+	extern virtual void stop()
+	extern virtual int doCapturing()
+
+	extern virtual bool isCapturing()
+	extern virtual int getDelay()
+	extern virtual void resetSync()
+
+	extern virtual void accumulate(bool enable)
+	extern virtual void resetAccumulation()
+	extern virtual int getSampleCount()
+
+	extern virtual float getSampleRate()
+	extern virtual void getSomeSamples(BufferBox buf, int num_samples)
+	extern virtual int getState()
+
+	extern virtual void setDevice(string dev)
+	extern virtual string getChosenDevice()
+
+	extern virtual MidiPort getCurMidiPort()
+	extern virtual MidiPort[] findMidiPorts()
+	extern virtual bool connectMidiPort(MidiPort p)
+	extern virtual void setPreviewSynthesizer(Synthesizer *s)
+	
+	extern void addObserver(void *handler, void *func)
 	extern void removeObserver(void *handler)
+
+	int sample_rate
+	bool accumulating
+	bool capturing
+
+	RingBuffer current_buffer
+	BufferBox buffer
+	MidiData midi
+	MidiData current_midi
+
+class InputStreamAudio : InputStream
+	extern void __init__(int sample_rate)
+	extern virtual void __delete__()
+
+class InputStreamMidi : InputStream
+	extern void __init__(int sample_rate)
+	extern virtual void __delete__()*/
 
 class Storage
 	extern bool load(AudioFile *a, string filename)
@@ -397,8 +448,6 @@ class Slider
 
 extern Window *MainWin
 extern AudioFile *audio
-//extern AudioOutput *output
-extern AudioInput *input
 extern AudioView *view
 extern Log *logging
 extern PluginContext plugin_context

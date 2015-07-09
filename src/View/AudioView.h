@@ -113,6 +113,7 @@ public:
 		int pitch, note_start;
 
 		SelectionType();
+		bool allowAutoScroll();
 	};
 
 	SelectionType hover, selection;

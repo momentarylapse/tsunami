@@ -67,6 +67,11 @@ AudioView::SelectionType::SelectionType()
 	note_start = -1;
 }
 
+bool AudioView::SelectionType::allowAutoScroll()
+{
+	return (type == SEL_TYPE_SELECTION_END) or (type == SEL_TYPE_SAMPLE) or (type == SEL_TYPE_PLAYBACK);
+}
+
 
 class PeakThread : public Thread
 {
@@ -472,6 +477,15 @@ void AudioView::onMouseMove()
 	bool _force_redraw_ = false;
 
 	if (HuiGetEvent()->lbut){
+
+		// cheap auto scrolling
+		if (hover.allowAutoScroll()){
+			if (mx < 50)
+				cam.move(-10 / cam.scale);
+			if (mx > area.width() - 50)
+				cam.move(10 / cam.scale);
+		}
+
 		selectionUpdatePos(selection);
 	}else{
 		SelectionType hover_old = hover;

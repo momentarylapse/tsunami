@@ -57,6 +57,7 @@ void Clipboard::copy(AudioView *view)
 		}else if (t->type == Track::TYPE_MIDI){
 			tt->midi = t->midi.getEvents(view->sel_range);
 			tt->midi.samples = view->sel_range.num;
+			tt->midi.sanify(view->sel_range);
 			foreach(MidiEvent &e, tt->midi)
 				e.pos -= view->sel_range.offset;
 		}

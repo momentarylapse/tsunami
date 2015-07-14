@@ -157,7 +157,7 @@ int MidiData::getNextEvent(int pos)
 Range MidiData::getRange(int elongation)
 {
 	if (num == 0)
-		return Range(0, 0);
+		return Range::EMPTY;
 	int i0 = (*this)[0].pos;
 	int i1 = back().pos;
 	return Range(i0, i1 - i0 + elongation);
@@ -171,28 +171,47 @@ void MidiData::sort()
 				swap(i, j);
 }
 
-void MidiData::sanify()
+void MidiData::sanify(const Range &r)
 {
-	int max_pos = 0;
+	//int max_pos = 0;
 	Set<int> active;
+	Array<int> del_me;
+
+	sort();
 
 	// analyze
-	foreach(MidiEvent &e, *this){
-		max_pos = max(max_pos, e.pos);
+	foreachi(MidiEvent &e, *this, i){
 		int p = e.pitch;
-		if (e.volume > 0)
+
+		// out of range
+		if (!r.is_inside(e.pos)){
+			del_me.add(i);
+			continue;
+		}
+
+		if (e.volume > 0){
 			active.add(p);
-		else
-			active.erase(p);
+		}else{
+			if (active.contains(p)){
+				active.erase(p);
+			}else{
+				// unnecessary stop -> delete
+				del_me.add(i);
+			}
+		}
 	}
 
+	// delete
+	foreachb(int i, del_me)
+		erase(i);
+
 	// wrong end mark?
-	if (max_pos > samples)
-		samples = max_pos;
+//	if (max_pos > samples)
+//		samples = max_pos;
 
 	// end active notes
 	foreach(int p, active)
-		add(MidiEvent(samples, p, 0));
+		add(MidiEvent(r.end(), p, 0));
 }
 
 void MidiData::append(const MidiData &data)

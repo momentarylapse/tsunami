@@ -129,7 +129,7 @@ Range Track::getRange()
 {
 	Range r = getRangeUnsafe();
 	if (r.length() < 0)
-		return Range(0, 0);
+		return Range::EMPTY;
 	return r;
 }
 

@@ -48,7 +48,7 @@ public:
 	int samples;
 
 	void sort();
-	void sanify();
+	void sanify(const Range &r);
 
 	void append(const MidiData &data);
 

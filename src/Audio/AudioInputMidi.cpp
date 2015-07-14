@@ -207,7 +207,7 @@ void AudioInputMidi::stop()
 	preview_renderer->endAllNotes();
 	//preview_stream->stop();
 
-	midi.sanify();
+	midi.sanify(Range(0, midi.samples));
 }
 
 int AudioInputMidi::doCapturing()

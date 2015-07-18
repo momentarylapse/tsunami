@@ -23,6 +23,7 @@ NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
 	event("hui:close", this, &NewDialog::onClose);
 	event("ok", this, &NewDialog::onOk);
 	event("metronome", this, &NewDialog::onMetronome);
+	event("new_track_type:midi", this, &NewDialog::onTypeMidi);
 }
 
 NewDialog::~NewDialog()
@@ -37,7 +38,8 @@ void NewDialog::onClose()
 void NewDialog::onOk()
 {
 	int sample_rate = getString("sample_rate")._int();
-	audio->newWithOneTrack(Track::TYPE_AUDIO, sample_rate);
+	bool midi = isChecked("new_track_type:midi");
+	audio->newWithOneTrack(midi ? Track::TYPE_MIDI : Track::TYPE_AUDIO, sample_rate);
 	audio->action_manager->enable(false);
 	if (isChecked("metronome")){
 		Track *t = audio->addTrack(Track::TYPE_TIME, 0);
@@ -50,5 +52,10 @@ void NewDialog::onOk()
 void NewDialog::onMetronome()
 {
 	hideControl("nd_g_metronome_params", !isChecked(""));
+}
+
+void NewDialog::onTypeMidi()
+{
+	//hideControl("nd_g_metronome_params", !isChecked(""));
 }
 

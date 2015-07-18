@@ -24,6 +24,7 @@ public:
 	void onOk();
 	void onClose();
 	void onMetronome();
+	void onTypeMidi();
 
 	AudioFile *audio;
 };

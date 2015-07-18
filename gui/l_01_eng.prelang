@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-239
+242
 // Data (ID,Text)
 about
 
@@ -281,6 +281,8 @@ nd_g_frequency
 
 nd_g_metronome
 
+nd_g_track
+
 nd_t_bars
 
 nd_t_beats
@@ -292,6 +294,10 @@ New...
 new_dialog
 New file
 new_dialog_buttonbar
+
+new_track_type:audio
+
+new_track_type:midi
 
 num_bars
 
@@ -361,9 +367,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_315503
+rand_id_252147
 
-rand_id_326174
+rand_id_291377
 
 rdt_capture
 
@@ -482,7 +488,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-152
+141
 // Data (ID,Text)
 
 
@@ -544,6 +550,8 @@ Anwendung ohne Netzwerk-Unterstützung compiliert...
 
 Audio
 
+Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
+
 Aufruf: tsunami --export <Datei> <Exportdatei>
 
 Aufruf: tsunami --info <Datei>
@@ -595,8 +603,6 @@ Es existiert schon eine Rhythmus-Spur.
 Es muss mindestens eine Spur existieren
 
 Failed writing header to output stream\n
-
-Falscher Aufnahme-Typ! (nur AUDIO/MIDI erlaubt)
 
 Fehler
 Error
@@ -722,19 +728,11 @@ die Regler aller Spuren gemeinsam ändern
 
 exportiere
 
-exportiere flac
-
-exportiere ogg
-
-exportiere raw
-
-exportiere wave
+exportiere 
 
 fügt am Cursor der aktuellen Spur ein
 
 i'm now going to clean up...
-
-importiere sf2
 
 in Datei exportieren
 
@@ -744,21 +742,7 @@ keine Sample gewählt
 
 koppeln
 
-lade
-
-lade flac
-
-lade m4a
-
-lade mp3
-
-lade nami
-
-lade ogg
-
-lade raw
-
-lade wave
+lade 
 
 löschen
 
@@ -776,15 +760,15 @@ program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 
 rendere Audio
 
-speichere
-
-speichere nami
+speichere 
 
 target
 
 unbekannte Dateiendung: 
 
 unbekannter Synthesizer: 
+
+wird als Tag artist=... in neue Dateien eingetragen
 
 Übermäßig
 

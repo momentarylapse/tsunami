@@ -43,6 +43,7 @@ public:
 	void _cdecl __delete__();
 
 	Range _cdecl getRange();
+	Range _cdecl getRangeWithTime();
 
 	static const string MESSAGE_NEW;
 	static const string MESSAGE_SELECTION_CHANGE;

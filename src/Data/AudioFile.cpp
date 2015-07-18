@@ -271,6 +271,20 @@ Range AudioFile::getRange()
 	int max = -1073741824;
 	Range r = Range(min, max - min);
 	foreach(Track *t, tracks)
+		if (t->type != t->TYPE_TIME)
+			r = r or t->getRangeUnsafe();
+
+	if (r.length() < 0)
+		return Range(0, 0);
+	return r;
+}
+
+Range AudioFile::getRangeWithTime()
+{
+	int min =  1073741824;
+	int max = -1073741824;
+	Range r = Range(min, max - min);
+	foreach(Track *t, tracks)
 		r = r or t->getRangeUnsafe();
 
 	if (r.length() < 0)

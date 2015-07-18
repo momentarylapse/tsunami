@@ -1230,7 +1230,7 @@ void AudioView::optimizeView()
 	if (area.x2 <= 0)
 		area.x2 = drawing_rect.x2;
 
-	Range r = audio->getRange();
+	Range r = audio->getRangeWithTime();
 
 	if (r.num == 0)
 		r.num = 10 * audio->sample_rate;

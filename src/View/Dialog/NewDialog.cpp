@@ -46,6 +46,7 @@ void NewDialog::onOk()
 		t->addBars(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("num_bars"));
 	}
 	audio->action_manager->enable(true);
+	audio->notify(audio->MESSAGE_NEW);
 	onClose();
 }
 

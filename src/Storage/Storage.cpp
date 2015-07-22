@@ -15,6 +15,7 @@
 #include "Format/FormatMidi.h"
 #include "Format/FormatMp3.h"
 #include "Format/FormatSoundFont2.h"
+#include "Format/FormatGuitarPro.h"
 #include "Format/FormatNami.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -22,9 +23,7 @@
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
 #include "../Audio/AudioRenderer.h"
-#include "../View/AudioView.h"
 #include "../Data/AudioFile.h"
-#include "Format/FormatGuitarPro.h"
 
 Storage::Storage()
 {
@@ -63,14 +62,12 @@ bool Storage::load(AudioFile *a, const string &filename)
 	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("lade ") + f->description, tsunami->_win);
 
 	a->reset();
-	tsunami->_view->enable(false);
 	a->action_manager->enable(false);
 	a->filename = filename;
 
 	f->loadAudio(&od);
 
 
-	tsunami->_view->enable(true);
 	a->action_manager->enable(true);
 
 	if (a->tracks.num > 0)

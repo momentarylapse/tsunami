@@ -315,7 +315,7 @@ void FormatNami::WriteBar(BarPattern &b)
 	f->WriteInt(b.type);
 	f->WriteInt(b.length);
 	f->WriteInt(b.num_beats);
-	f->WriteInt(b.count);
+	f->WriteInt(1);
 	f->WriteInt(0); // reserved
 
 	EndChunk();
@@ -741,9 +741,12 @@ void ReadChunkBar(ChunkStack *s, Array<BarPattern> *bar)
 	b.type = s->f->ReadInt();
 	b.length = s->f->ReadInt();
 	b.num_beats = s->f->ReadInt();
-	b.count = s->f->ReadInt();
+	if (b.type == BarPattern::TYPE_PAUSE)
+		b.num_beats = 0;
+	int count = s->f->ReadInt();
 	s->f->ReadInt(); // reserved
-	bar->add(b);
+	for (int i=0; i<count; i++)
+		bar->add(b);
 }
 
 void ReadChunkMarker(ChunkStack *s, Array<TrackMarker> *markers)

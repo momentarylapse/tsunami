@@ -38,16 +38,14 @@ Array<Beat> BarCollection::getBeats(const Range &r)
 	int bar_no = 0;
 	foreach(BarPattern &b, *this)
 		if (b.type == b.TYPE_BAR){
-			for (int j=0;j<b.count;j++){
-				int beat_length = b.length / b.num_beats;
-				for (int i=0;i<b.num_beats;i++){
-					int pos = pos0 + i * beat_length;
-					if (r.is_inside(pos))
-						beats.add(Beat(Range(pos, beat_length), bar_no, i));
-				}
-				pos0 += b.length;
-				bar_no ++;
+			int beat_length = b.length / b.num_beats;
+			for (int i=0;i<b.num_beats;i++){
+				int pos = pos0 + i * beat_length;
+				if (r.is_inside(pos))
+					beats.add(Beat(Range(pos, beat_length), bar_no, i));
 			}
+			pos0 += b.length;
+			bar_no ++;
 		}else if (b.type == b.TYPE_PAUSE){
 			pos0 += b.length;
 		}
@@ -62,13 +60,11 @@ Array<Bar> BarCollection::getBars(const Range &r)
 	int bar_no = 0;
 	foreach(BarPattern &b, *this)
 		if (b.type == b.TYPE_BAR){
-			for (int j=0;j<b.count;j++){
-				Range rr = Range(pos0, b.length);
-				if (rr.overlaps(r))
-					bars.add(Bar(rr, b.num_beats, bar_no));
-				pos0 += b.length;
-				bar_no ++;
-			}
+			Range rr = Range(pos0, b.length);
+			if (rr.overlaps(r))
+				bars.add(Bar(rr, b.num_beats, bar_no));
+			pos0 += b.length;
+			bar_no ++;
 		}else if (b.type == b.TYPE_PAUSE){
 			pos0 += b.length;
 		}
@@ -82,15 +78,13 @@ int BarCollection::getNextBeat(int pos)
 		return p0;
 	foreach(BarPattern &b, *this){
 		if (b.type == b.TYPE_BAR){
-			for (int i=0;i<b.count;i++){
-				int pp = p0;
-				for (int j=0;j<b.num_beats;j++){
-					pp += b.length / b.num_beats;
-					if (pp > pos)
-						return pp;
-				}
-				p0 += b.length;
+			int pp = p0;
+			for (int j=0;j<b.num_beats;j++){
+				pp += b.length / b.num_beats;
+				if (pp > pos)
+					return pp;
 			}
+			p0 += b.length;
 		}else if (b.type == b.TYPE_PAUSE){
 			p0 += b.length;
 			if (p0 > pos)
@@ -104,11 +98,7 @@ Range BarCollection::getRange()
 {
 	int pos0 = 0;
 	foreach(BarPattern &b, *this)
-		if (b.type == b.TYPE_BAR){
-			pos0 += b.length * b.count;
-		}else if (b.type == b.TYPE_PAUSE){
-			pos0 += b.length;
-		}
+		pos0 += b.length;
 	return Range(0, pos0);
 }
 

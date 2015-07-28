@@ -229,7 +229,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));
 	Script::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));
 	Script::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
-	Script::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));
+	//Script::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));
 	Script::DeclareClassOffset("BarPattern", "is_selected", _offsetof(BarPattern, is_selected));
 
 	Script::DeclareClassSize("MidiNote", sizeof(MidiNote));
@@ -284,7 +284,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.addMidiEvents", Script::mf(&Track::addMidiEvents));
 	Script::LinkExternal("Track.deleteMidiEvent", Script::mf(&Track::deleteMidiEvent));
 	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::setSynthesizer));
-	Script::LinkExternal("Track.addBars", Script::mf(&Track::addBars));
+	Script::LinkExternal("Track.addBar", Script::mf(&Track::addBar));
 	Script::LinkExternal("Track.addPause", Script::mf(&Track::addPause));
 	Script::LinkExternal("Track.editBar", Script::mf(&Track::editBar));
 	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::deleteBar));

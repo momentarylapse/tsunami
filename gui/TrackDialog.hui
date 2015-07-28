@@ -12,11 +12,13 @@ Dialog track_dialog "Spur" 380 516
 				Text percent "%"
 		Group td_t_bars "Takte" expandy
 			Grid ? "" 1 2
-				ListView bar_list "#\\Schläge\\Bpm\\Anzahl" format=tTTT
-				Grid ? "" 3 1
+				ListView bar_list "#\\Schläge\\Bpm\\Dauer" format=tTTT,select-multi
+				Grid ? "" 4 1
 					Button add_bar "Takt" image=hui:add flat
 					Button add_bar_pause "Pause" image=hui:add flat
 					Button delete_bar "" image=hui:delete flat
+					Button set_speed "Bpm..." flat
+				CheckBox link_to_midi "Midi mitbearbeiten"
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2
 				Grid ? "" 3 1

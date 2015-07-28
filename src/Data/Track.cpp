@@ -358,13 +358,12 @@ void Track::editSynthesizer(const string &param_old)
 	root->execute(new ActionTrackEditSynthesizer(this, param_old));
 }
 
-void Track::addBars(int index, float bpm, int beats, int num_bars)
+void Track::addBar(int index, float bpm, int beats)
 {
 	BarPattern b;
 	b.num_beats = beats;
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)root->sample_rate * 60.0f / bpm);
-	b.count = num_bars;
 	if (index >= 0)
 		root->execute(new ActionTrackAddBar(this, index + 1, b));
 	else
@@ -374,10 +373,9 @@ void Track::addBars(int index, float bpm, int beats, int num_bars)
 void Track::addPause(int index, float time)
 {
 	BarPattern b;
-	b.num_beats = 1;
+	b.num_beats = 0;
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)root->sample_rate * time);
-	b.count = 1;
 	if (index >= 0)
 		root->execute(new ActionTrackAddBar(this, index + 1, b));
 	else

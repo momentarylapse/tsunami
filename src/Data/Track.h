@@ -91,7 +91,7 @@ public:
 	void _cdecl deleteMidiEvent(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
-	void _cdecl addBars(int index, float bpm, int beats, int bars);
+	void _cdecl addBar(int index, float bpm, int beats);
 	void _cdecl addPause(int index, float time);
 	void _cdecl editBar(int index, BarPattern &p);
 	void _cdecl deleteBar(int index);

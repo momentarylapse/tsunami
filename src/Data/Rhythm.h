@@ -17,7 +17,6 @@ public:
 	int num_beats;
 	int length;
 	int type;
-	int count;
 
 	enum{
 		TYPE_BAR,

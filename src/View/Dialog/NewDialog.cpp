@@ -43,7 +43,9 @@ void NewDialog::onOk()
 	audio->action_manager->enable(false);
 	if (isChecked("metronome")){
 		Track *t = audio->addTrack(Track::TYPE_TIME, 0);
-		t->addBars(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("num_bars"));
+		int count = getInt("num_bars");
+		for (int i=0; i<count; i++)
+			t->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"));
 	}
 	audio->action_manager->enable(true);
 	audio->notify(audio->MESSAGE_NEW);

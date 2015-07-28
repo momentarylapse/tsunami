@@ -8,16 +8,20 @@
 #include "BarList.h"
 #include "../../Tsunami.h"
 #include "../../Data/AudioFile.h"
+#include "../AudioView.h"
 
 
 
-BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete)
+BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_set_bpm, AudioView *_view) :
+	Observer("BarList")
 {
 	panel = _panel;
 	id = _id;
 	id_add = _id_add;
 	id_add_pause = _id_add_pause;
 	id_delete = _id_delete;
+	id_set_bpm = _id_set_bpm;
+	view = _view;
 
 	track = NULL;
 
@@ -28,6 +32,7 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 	panel->event(id_add, this, &BarList::onAdd);
 	panel->event(id_add_pause, this, &BarList::onAddPause);
 	panel->event(id_delete, this, &BarList::onDelete);
+	panel->event(id_set_bpm, this, &BarList::onSetBpm);
 }
 
 
@@ -40,18 +45,17 @@ void BarList::fillList()
 		int sample_rate = track->root->sample_rate;
 		int n = 1;
 		foreach(BarPattern &b, track->bars){
+			float duration = (float)b.length / (float)sample_rate;
 			if (b.type == b.TYPE_BAR){
-				if (b.count == 1)
-					panel->addString(id, format("%d\\%d\\%.1f\\%d", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
-				else
-					panel->addString(id, format("%d-%d\\%d\\%.1f\\%d", n, n + b.count - 1, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), b.count));
-				n += b.count;
+				panel->addString(id, format("%d\\%d\\%.1f\\%.3f", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), duration));
+				n ++;
 			}else if (b.type == b.TYPE_PAUSE){
-				panel->addString(id, format(_("(Pause)\\-\\-\\%.3f"), (float)b.length / (float)sample_rate));
+				panel->addString(id, format(_("(Pause)\\-\\-\\%.3f"), duration));
 			}
 		}
 	}
-	panel->enable(id_delete, false);
+	//panel->enable(id_delete, false);
+	onListSelect();
 }
 
 
@@ -68,8 +72,23 @@ void BarList::onList()
 
 void BarList::onListSelect()
 {
-	int s = panel->getInt(id);
-	panel->enable(id_delete, s >= 0);
+	Array<int> s = panel->getSelection(id);
+	panel->enable(id_delete, s.num > 0);
+	panel->enable(id_set_bpm, s.num > 0);
+
+	if (track and view and (s.num > 0)){
+		int pos = 0;
+		int p0, p1;
+		foreachi(BarPattern &b, track->bars, i){
+			if (i == s[0])
+				p0 = pos;
+			pos += b.length;
+			if (i == s.back())
+				p1 = pos;
+		}
+		view->sel_raw = Range(p0, p1 - p0);
+		view->updateSelection();
+	}
 }
 
 
@@ -81,7 +100,7 @@ void BarList::onListEdit()
 	int index = HuiGetEvent()->row;
 	BarPattern b = track->bars[index];
 	string text = panel->getCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
-	if (b.type == b.TYPE_BAR){
+	if (b.num_beats > 0){
 		if (HuiGetEvent()->column == 1){
 			float l = (float)b.length / (float)b.num_beats;
 			b.num_beats = text._int();
@@ -89,9 +108,9 @@ void BarList::onListEdit()
 		}else if (HuiGetEvent()->column == 2){
 			b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / text._float());
 		}else if (HuiGetEvent()->column == 3){
-			b.count = text._int();
+			b.length = (int)(text._float() * (float)sample_rate);
 		}
-	}else if (b.type == b.TYPE_PAUSE){
+	}else{
 		if (HuiGetEvent()->column == 3){
 			b.length = (int)(text._float() * (float)sample_rate);
 		}
@@ -122,11 +141,20 @@ void BarList::onDelete()
 {
 	if (!track)
 		return;
-	int s = panel->getInt(id);
-	if (s >= 0){
-		track->deleteBar(s);
-		fillList();
-	}
+	Array<int> s = panel->getSelection(id);
+	foreachb(int i, s)
+		track->deleteBar(i);
+	fillList();
+}
+
+void BarList::onSetBpm()
+{
+	if (!track)
+		return;
+	Array<int> s = panel->getSelection(id);
+	foreachb(int i, s)
+		track->deleteBar(i);
+	fillList();
 }
 
 BarList::~BarList()
@@ -141,7 +169,8 @@ void BarList::addNewBar()
 
 	int s = panel->getInt(id);
 
-	track->addBars(s, 90.0f, 4, 10);
+	for (int i=0; i<10; i++)
+		track->addBar(s, 90.0f, 4);
 	fillList();
 }
 
@@ -161,5 +190,9 @@ void BarList::setTrack(Track *t)
 	panel->enable(id, track);
 	panel->enable(id_add, track);
 	panel->enable(id_add_pause, track);
+}
+
+void BarList::onUpdate(Observable *o, const string &message)
+{
 }
 

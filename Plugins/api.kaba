@@ -194,7 +194,6 @@ class BarPattern
 	int num_beats
 	int length
 	int type
-	int count
 	
 	bool is_selected
 
@@ -278,7 +277,7 @@ class Track
 	extern void addMidiEvents(MidiEvent[] events)
 	extern void deleteMidiEvent(int index)
 	extern void setSynthesizer(Synthesizer *synth)
-	extern void addBars(int index, float bpm, int beats, int bars)
+	extern void addBar(int index, float bpm, int beats)
 	extern void addPause(int index, float time)
 	extern void editBar(int index, BarPattern p)
 	extern void deleteBar(int index)

@@ -33,7 +33,7 @@ AudioFileConsole::AudioFileConsole(AudioFile *a) :
 	setBorderWidth(5);
 	embedDialog("audio_file_dialog", 0, 0);
 	setDecimals(1);
-	bar_list = new BarList(this, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar");
+	bar_list = new BarList(this, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar", "----", NULL);
 	hideControl("ad_t_bars", true);
 
 	expand("ad_t_tags", 0, true);

@@ -33,6 +33,9 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 	panel->event(id_add_pause, this, &BarList::onAddPause);
 	panel->event(id_delete, this, &BarList::onDelete);
 	panel->event(id_set_bpm, this, &BarList::onSetBpm);
+
+	if (view)
+		subscribe(view, view->MESSAGE_SELECTION_CHANGE);
 }
 
 
@@ -84,7 +87,7 @@ void BarList::onListSelect()
 				p0 = pos;
 			pos += b.length;
 			if (i == s.back())
-				p1 = pos;
+				p1 = pos - 1;
 		}
 		view->sel_raw = Range(p0, p1 - p0);
 		view->updateSelection();
@@ -159,6 +162,8 @@ void BarList::onSetBpm()
 
 BarList::~BarList()
 {
+	if (view)
+		unsubscribe(view);
 }
 
 void BarList::addNewBar()
@@ -194,5 +199,16 @@ void BarList::setTrack(Track *t)
 
 void BarList::onUpdate(Observable *o, const string &message)
 {
+	if (!track)
+		return;
+	Array<int> s;
+	int pos = 0;
+	foreachi(BarPattern &b, track->bars, i){
+		Range r = Range(pos, b.length - 1);
+		if (r.overlaps(view->sel_range))
+			s.add(i);
+		pos += b.length;
+	}
+	panel->setSelection(id, s);
 }
 

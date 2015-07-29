@@ -170,12 +170,15 @@ class BarBpmDialog : public HuiDialog
 public:
 	Track *track;
 	Array<int> sel;
-	BarBpmDialog(HuiWindow *root, Track *_t, Array<int> &_s):
+	bool apply_to_midi;
+
+	BarBpmDialog(HuiWindow *root, Track *_t, Array<int> &_s, bool _apply_to_midi):
 		HuiDialog("", 100, 100, win, false)
 	{
 		fromResource("bar_bpm_dialog");
 		track = _t;
 		sel = _s;
+		apply_to_midi = _apply_to_midi;
 
 		BarPattern &b = track->bars[sel[0]];
 		setFloat("bpm", track->root->sample_rate * 60.0f / (b.length / b.num_beats));
@@ -189,10 +192,31 @@ public:
 	{
 		float bpm = getFloat("bpm");
 		track->root->action_manager->beginActionGroup();
-		foreach(int i, sel){
+		foreachb(int i, sel){
+			int pos = 0;
+			for (int j=0; j<i; j++)
+				pos += track->bars[j].length;
+
 			BarPattern b = track->bars[i];
+			int l0 = b.length;
 			b.length = track->root->sample_rate * 60.0f * b.num_beats / bpm;
 			track->editBar(i, b);
+
+			if (apply_to_midi){
+				foreach(Track *t, track->root->tracks){
+					if (t->type != t->TYPE_MIDI)
+						continue;
+					foreachi(MidiEvent &e, t->midi, j){
+						if (e.pos <= pos){
+						}else if (e.pos > pos + l0){
+							e.pos += b.length - l0;
+							//t->addMidiEvent(e);
+						}else{
+							e.pos = pos + (float)(e.pos - pos) * (float)b.length / (float)l0;
+						}
+					}
+				}
+			}
 		}
 		track->root->action_manager->endActionGroup();
 
@@ -211,7 +235,7 @@ void BarList::onSetBpm()
 		return;
 	Array<int> s = panel->getSelection(id);
 
-	HuiDialog *dlg = new BarBpmDialog(panel->win, track, s);
+	HuiDialog *dlg = new BarBpmDialog(panel->win, track, s, panel->isChecked("link_to_midi"));
 	dlg->show();
 
 	fillList();

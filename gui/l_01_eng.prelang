@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-244
+247
 // Data (ID,Text)
 about
 
@@ -49,13 +49,19 @@ audio_file_menu_header
 
 audio_file_properties
 
+bar_bpm_dialog
+
 bar_list
+
+bbd_bpm
 
 beat_partition
 
 beats_per_bar
 
 beats_per_minute
+
+bpm
 
 cancel
 Cancel
@@ -369,9 +375,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_122292
+rand_id_149609
 
-rand_id_151912
+rand_id_71659
 
 rdt_capture
 

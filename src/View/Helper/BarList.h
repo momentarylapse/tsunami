@@ -35,6 +35,9 @@ public:
 
 	virtual void onUpdate(Observable *o, const string &message);
 
+	void selectToView();
+	void selectFromView();
+
 public:
 	HuiPanel *panel;
 	string id;

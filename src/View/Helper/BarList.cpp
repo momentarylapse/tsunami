@@ -79,9 +79,20 @@ void BarList::onListSelect()
 	panel->enable(id_delete, s.num > 0);
 	panel->enable(id_set_bpm, s.num > 0);
 
-	if (track and view and (s.num > 0)){
+	selectToView();
+}
+
+void BarList::selectToView()
+{
+	if (!view)
+		return;
+	if (!track)
+		return;
+	Array<int> s = panel->getSelection(id);
+
+	if (s.num > 0){
 		int pos = 0;
-		int p0, p1;
+		int p0 = 0, p1 = 0;
 		foreachi(BarPattern &b, track->bars, i){
 			if (i == s[0])
 				p0 = pos;
@@ -90,8 +101,10 @@ void BarList::onListSelect()
 				p1 = pos - 1;
 		}
 		view->sel_raw = Range(p0, p1 - p0);
-		view->updateSelection();
+	}else{
+		view->sel_raw = Range::EMPTY;
 	}
+	view->updateSelection();
 }
 
 
@@ -145,19 +158,65 @@ void BarList::onDelete()
 	if (!track)
 		return;
 	Array<int> s = panel->getSelection(id);
+	track->root->action_manager->beginActionGroup();
 	foreachb(int i, s)
 		track->deleteBar(i);
+	track->root->action_manager->endActionGroup();
 	fillList();
 }
+
+class BarBpmDialog : public HuiDialog
+{
+public:
+	Track *track;
+	Array<int> sel;
+	BarBpmDialog(HuiWindow *root, Track *_t, Array<int> &_s):
+		HuiDialog("", 100, 100, win, false)
+	{
+		fromResource("bar_bpm_dialog");
+		track = _t;
+		sel = _s;
+
+		BarPattern &b = track->bars[sel[0]];
+		setFloat("bpm", track->root->sample_rate * 60.0f / (b.length / b.num_beats));
+
+		event("ok", this, &BarBpmDialog::onOk);
+		event("cancel", this, &BarBpmDialog::onClose);
+		event("hui:close", this, &BarBpmDialog::onClose);
+	}
+
+	void onOk()
+	{
+		float bpm = getFloat("bpm");
+		track->root->action_manager->beginActionGroup();
+		foreach(int i, sel){
+			BarPattern b = track->bars[i];
+			b.length = track->root->sample_rate * 60.0f * b.num_beats / bpm;
+			track->editBar(i, b);
+		}
+		track->root->action_manager->endActionGroup();
+
+		delete(this);
+	}
+
+	void onClose()
+	{
+		delete(this);
+	}
+};
 
 void BarList::onSetBpm()
 {
 	if (!track)
 		return;
 	Array<int> s = panel->getSelection(id);
-	foreachb(int i, s)
-		track->deleteBar(i);
+
+	HuiDialog *dlg = new BarBpmDialog(panel->win, track, s);
+	dlg->show();
+
 	fillList();
+	panel->setSelection(id, s);
+	selectToView();
 }
 
 BarList::~BarList()
@@ -201,6 +260,12 @@ void BarList::onUpdate(Observable *o, const string &message)
 {
 	if (!track)
 		return;
+
+	selectFromView();
+}
+
+void BarList::selectFromView()
+{
 	Array<int> s;
 	int pos = 0;
 	foreachi(BarPattern &b, track->bars, i){
@@ -210,5 +275,7 @@ void BarList::onUpdate(Observable *o, const string &message)
 		pos += b.length;
 	}
 	panel->setSelection(id, s);
+	panel->enable(id_delete, s.num > 0);
+	panel->enable(id_set_bpm, s.num > 0);
 }
 

@@ -1,0 +1,8 @@
+Dialog bar_bpm_dialog "Takte" 250 80
+	Grid ? "" 1 2
+		Grid ? "" 2 1
+			Text bbd_bpm "Bpm"
+			SpinButton bpm "0\\0\\1000\\0.1" expandx
+		Grid marker_dialog_buttonbar "" 2 1 buttonbar
+			Button cancel "Abbrechen" image=hui:cancel
+			DefButton ok "OK" image=hui:ok

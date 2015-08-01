@@ -122,8 +122,14 @@ void CaptureDialog::setTarget(int index)
 {
 	if (index < audio->tracks.num){
 		Track *t = audio->tracks[index];
-		setType(t->type);
-		input->setPreviewSynthesizer(t->synth);
+		if (t->type == t->TYPE_TIME){
+			index = audio->tracks.num;
+			setType(Track::TYPE_AUDIO);
+			input->setPreviewSynthesizer(temp_synth);
+		}else{
+			setType(t->type);
+			input->setPreviewSynthesizer(t->synth);
+		}
 	}else{
 		input->setPreviewSynthesizer(temp_synth);
 	}

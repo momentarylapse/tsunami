@@ -173,7 +173,7 @@ public:
 	bool apply_to_midi;
 
 	BarBpmDialog(HuiWindow *root, Track *_t, Array<int> &_s, bool _apply_to_midi):
-		HuiDialog("", 100, 100, win, false)
+		HuiDialog("", 100, 100, root, false)
 	{
 		fromResource("bar_bpm_dialog");
 		track = _t;

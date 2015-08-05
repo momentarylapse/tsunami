@@ -137,10 +137,10 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 
 	// recursion
 	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->block()->command.num;i++)
-			c->block()->command[i] = PreProcessCommand(c->block()->command[i]);
+		for (int i=0;i<c->as_block()->command.num;i++)
+			c->as_block()->command[i] = PreProcessCommand(c->as_block()->command[i]);
 	}
-	for (int i=0;i<c->num_params;i++)
+	for (int i=0;i<c->param.num;i++)
 		c->set_param(i, PreProcessCommand(c->param[i]));
 	if (c->instance)
 		c->set_instance(PreProcessCommand(c->instance));
@@ -161,7 +161,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 			bool all_const = true;
 			bool is_address = false;
 			bool is_local = false;
-			for (int i=0;i<c->num_params;i++)
+			for (int i=0;i<c->param.num;i++)
 				if (c->param[i]->kind == KIND_ADDRESS)
 					is_address = true;
 				else if (c->param[i]->kind == KIND_LOCAL_ADDRESS)
@@ -187,7 +187,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 					int nc = AddConstant(o->return_type);
 					string d1 = constants[c->param[0]->link_no].value;
 					string d2;
-					if (c->num_params > 1)
+					if (c->param.num > 1)
 						d2 = constants[c->param[1]->link_no].value;
 					f(constants[nc].value, d1, d2);
 					return add_command_const(nc);
@@ -205,7 +205,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 		bool all_const = true;
 		bool is_address = false;
 		bool is_local = false;
-		for (int i=0;i<c->num_params;i++){
+		for (int i=0;i<c->param.num;i++){
 			if (c->param[i]->kind == KIND_ADDRESS)
 				is_address = true;
 			else if (c->param[i]->kind == KIND_LOCAL_ADDRESS)
@@ -227,7 +227,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 		string temp;
 		temp.resize(f->return_type->size);
 		Array<void*> p;
-		for (int i=0; i<c->num_params; i++)
+		for (int i=0; i<c->param.num; i++)
 			p.add(constants[c->param[i]->link_no].value.data);
 		if (!call_function(f, ff, temp.data, inst, p))
 			return c;
@@ -237,7 +237,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 #endif
 	}else if (c->kind == KIND_ARRAY_BUILDER){
 		bool all_consts = true;
-		for (int i=0; i<c->num_params; i++)
+		for (int i=0; i<c->param.num; i++)
 			if (c->param[i]->kind != KIND_CONSTANT)
 				all_consts = false;
 		if (all_consts){
@@ -245,8 +245,8 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 			int el_size = c->type->parent->size;
 			DynamicArray *da = (DynamicArray*)constants[nc].value.data;
 			da->init(el_size);
-			da->resize(c->num_params);
-			for (int i=0; i<c->num_params; i++)
+			da->resize(c->param.num);
+			for (int i=0; i<c->param.num; i++)
 				memcpy((char*)da->data + el_size * i, constants[c->param[i]->link_no].value.data, el_size);
 			return add_command_const(nc);
 		}
@@ -301,10 +301,10 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 
 	// recursion
 	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->block()->command.num;i++)
-			c->block()->set(i, PreProcessCommandAddresses(c->block()->command[i]));
+		for (int i=0;i<c->as_block()->command.num;i++)
+			c->as_block()->set(i, PreProcessCommandAddresses(c->as_block()->command[i]));
 	}
-	for (int i=0;i<c->num_params;i++)
+	for (int i=0;i<c->param.num;i++)
 		c->set_param(i, PreProcessCommandAddresses(c->param[i]));
 	if (c->instance)
 		c->set_instance(PreProcessCommandAddresses(c->instance));
@@ -317,7 +317,7 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 			bool all_const = true;
 			bool is_address = false;
 			bool is_local = false;
-			for (int i=0;i<c->num_params;i++)
+			for (int i=0;i<c->param.num;i++)
 				if (c->param[i]->kind == KIND_ADDRESS)
 					is_address = true;
 				else if (c->param[i]->kind == KIND_LOCAL_ADDRESS)

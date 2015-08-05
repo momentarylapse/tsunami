@@ -14,7 +14,6 @@ namespace Script{
 class Script;
 class SyntaxTree;
 
-#define SCRIPT_MAX_PARAMS				16		// number of possible parameters per function/command
 #define SCRIPT_MAX_STRING_CONST_LENGTH	2048
 
 // macros
@@ -110,7 +109,7 @@ struct Function
 	Block *block;
 	// local variables
 	Array<Variable> var;
-	Type *literal_param_type[SCRIPT_MAX_PARAMS];
+	Array<Type*> literal_param_type;
 	Type *_class;
 	Type *return_type;
 	Type *literal_return_type;
@@ -134,14 +133,13 @@ struct Command
 	Script *script;
 	int ref_count;
 	// parameters
-	int num_params;
-	Command *param[SCRIPT_MAX_PARAMS];
+	Array<Command*> param;
 	// linking of class function instances
 	Command *instance;
 	// return value
 	Type *type;
 	Command(int kind, long long link_no, Script *script, Type *type);
-	Block *block() const;
+	Block *as_block() const;
 	void set_num_params(int n);
 	void set_param(int index, Command *p);
 	void set_instance(Command *p);
@@ -216,20 +214,20 @@ public:
 	Type *CreateArrayType(Type *element_type, int num_elements, const string &name_pre = "", const string &suffix = "");
 	bool GetExistence(const string &name, Function *f);
 	bool GetExistenceShared(const string &name);
-	void LinkMostImportantOperator(Array<Command*> &Operand, Array<Command*> &Operator, Array<int> &op_exp);
+	void LinkMostImportantOperator(Array<Command*> &operand, Array<Command*> &_operator, Array<int> &op_exp);
 	Command *LinkOperator(int op_no, Command *param1, Command *param2);
-	Command *GetOperandExtension(Command *Operand, Function *f);
-	Command *GetOperandExtensionElement(Command *Operand, Function *f);
-	Command *GetOperandExtensionArray(Command *Operand, Function *f);
+	Command *GetOperandExtension(Command *operand, Function *f);
+	Command *GetOperandExtensionElement(Command *operand, Function *f);
+	Command *GetOperandExtensionArray(Command *operand, Function *f);
 	Command *GetCommand(Function *f);
 	void ParseCompleteCommand(Block *block, Function *f);
 	Command *GetOperand(Function *f);
 	Command *GetPrimitiveOperator(Function *f);
-	void FindFunctionParameters(int &np, Type **WantedType, Function *f, Command *cmd);
-	void FindFunctionSingleParameter(int p, Type **WantedType, Function *f, Command *cmd);
-	Command *GetFunctionCall(const string &f_name, Command *Operand, Function *f);
+	void FindFunctionParameters(Array<Type*> &wanted_type, Function *f, Command *cmd);
+	void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Function *f, Command *cmd);
+	Command *GetFunctionCall(const string &f_name, Command *operand, Function *f);
 	Command *DoClassFunction(Command *ob, ClassFunction &cf, Function *f);
-	Command *GetSpecialFunctionCall(const string &f_name, Command *Operand, Function *f);
+	Command *GetSpecialFunctionCall(const string &f_name, Command *operand, Function *f);
 	Command *CheckParamLink(Command *link, Type *type, const string &f_name = "", int param_no = -1);
 	void ParseSpecialCommand(Block *block, Function *f);
 	void ParseSpecialCommandFor(Block *block, Function *f);

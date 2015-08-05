@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.14.2.1";
+string Version = "0.14.2.2";
 
 //#define ScriptDebug
 
@@ -334,14 +334,14 @@ void *Script::MatchFunction(const string &name, const string &return_type, int n
 	// process argument list
 	va_list marker;
 	va_start(marker, num_params);
-	string param_type[SCRIPT_MAX_PARAMS];
+	Array<string> param_type;
 	for (int p=0;p<num_params;p++)
-		param_type[p] = string(va_arg(marker, char*));
+		param_type.add(string(va_arg(marker, char*)));
 	va_end(marker);
 
 	// match
 	foreachi(Function *f, syntax->functions, i)
-		if (((f->name == name) || (name == "*")) && (f->literal_return_type->name == return_type) && (num_params == f->num_params)){
+		if (((f->name == name) or (name == "*")) and (f->literal_return_type->name == return_type) and (num_params == f->num_params)){
 
 			bool params_ok = true;
 			for (int j=0;j<num_params;j++)
@@ -366,9 +366,9 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 	// process argument list
 	va_list marker;
 	va_start(marker, num_params);
-	string param_type[SCRIPT_MAX_PARAMS];
+	Array<string> param_type;
 	for (int p=0;p<num_params;p++)
-		param_type[p] = string(va_arg(marker, char*));
+		param_type.add(string(va_arg(marker, char*)));
 	va_end(marker);
 
 	Type *root_type = syntax->FindType(_class);

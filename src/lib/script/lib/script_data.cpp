@@ -471,7 +471,7 @@ void func_add_param(const string &name, Type *type)
 		v.type = type;
 		if (cur_func){
 			cur_func->var.add(v);
-			cur_func->literal_param_type[cur_func->num_params] = type;
+			cur_func->literal_param_type.add(type);
 			cur_func->num_params ++;
 		}
 		if (cur_class_func)

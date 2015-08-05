@@ -10,6 +10,7 @@ class SyntaxTree;
 
 struct ExpressionBuffer
 {
+	ExpressionBuffer();
 
 	struct Expression
 	{
@@ -28,7 +29,8 @@ struct ExpressionBuffer
 	Line *cur_line;
 	int cur_exp;
 	int comment_level;
-	string cur;
+	string dummy;
+	string &cur;
 	SyntaxTree *syntax;
 
 	string get_name(int n);

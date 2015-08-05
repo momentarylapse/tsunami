@@ -614,18 +614,19 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 	add_temp(com->type, ret, create_constructor_for_return);
 
 
+	Array<SerialCommandParam> param;
+
 	// special new-operator work-around
 	if ((com->kind == KIND_COMPILER_FUNCTION) and (com->link_no == COMMAND_NEW)){
-		if (com->num_params == 0)
-			com->param[0] = NULL;
-		com->num_params = 0;
-	}
 
-	// compile parameters
-	Array<SerialCommandParam> param;
-	param.resize(com->num_params);
-	for (int p=0;p<com->num_params;p++)
-		param[p] = SerializeParameter(com->param[p], level, index);
+		// com->param[0] might be a function to call...
+	}else{
+
+		// compile parameters
+		param.resize(com->param.num);
+		for (int p=0;p<com->param.num;p++)
+			param[p] = SerializeParameter(com->param[p], level, index);
+	}
 
 	// class function -> compile instance
 	bool is_class_function = false;
@@ -656,7 +657,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 			return ret;
 		}
 
-		for (int p=0;p<com->num_params;p++)
+		for (int p=0;p<com->param.num;p++)
 			AddFuncParam(param[p]);
 
 		AddFuncReturn(ret);
@@ -668,7 +669,7 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 
 	}else if (com->kind == KIND_VIRTUAL_FUNCTION){
 
-		for (int p=0;p<com->num_params;p++)
+		for (int p=0;p<com->param.num;p++)
 			AddFuncParam(param[p]);
 
 		AddFuncReturn(ret);
@@ -682,13 +683,13 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 		if (!cf)
 			DoError(format("[..]: can not find %s.add() function???", com->type->name.c_str()));
 		instance = AddReference(ret, com->type->GetPointer());
-		for (int i=0; i<com->num_params; i++){
+		for (int i=0; i<com->param.num; i++){
 			AddFuncInstance(instance);
 			AddFuncParam(param[i]);
 			AddFunctionCall(cf->script, cf->nr);
 		}
 	}else if (com->kind == KIND_BLOCK){
-		SerializeBlock(com->block(), level + 1);
+		SerializeBlock(com->as_block(), level + 1);
 	}else{
 		//DoError(string("type of command is unimplemented (call Michi!): ",Kind2Str(com->Kind)));
 	}

@@ -25,6 +25,12 @@ enum
 };
 
 
+ExpressionBuffer::ExpressionBuffer():
+	cur(dummy)
+{
+	clear();
+}
+
 string ExpressionBuffer::get_name(int n)
 {
 	return cur_line->exp[n].name;

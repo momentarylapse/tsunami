@@ -93,31 +93,31 @@ void SyntaxTree::HandleMacro(ExpressionBuffer::Line *l, int &line_no, int &NumIf
 		case MacroDefine:
 			// source
 			Exp.next();
-			d.Source = Exp.cur;
+			d.source = Exp.cur;
 			// dests
 			while(true){
 				Exp.next();
 				if (Exp.end_of_line())
 					break;
-				d.Dest.add(Exp.cur);
+				d.dest.add(Exp.cur);
 			}
 
 			// special defines?
-			if ((d.Source.num > 4) && (d.Source.head(2) == "__") && (d.Source.tail(2) == "__")){
-				if (d.Source == "__OS__"){
+			if ((d.source.num > 4) && (d.source.head(2) == "__") && (d.source.tail(2) == "__")){
+				if (d.source == "__OS__"){
 					DoError("#define __OS__ deprecated");
-				}else if (d.Source == "__STRING_CONST_AS_CSTRING__"){
+				}else if (d.source == "__STRING_CONST_AS_CSTRING__"){
 					flag_string_const_as_cstring = true;
-				}else if (d.Source == "__NO_FUNCTION_FRAME__"){
+				}else if (d.source == "__NO_FUNCTION_FRAME__"){
 					DoError("#define __NO_FUNCTION_FRAME__ deprecated");
-				}else if (d.Source == "__ADD_ENTRY_POINT__"){
+				}else if (d.source == "__ADD_ENTRY_POINT__"){
 					DoError("#define __ADD_ENTRY_POINT__ deprecated");
-				}else if (d.Source == "__VARIABLE_OFFSET__"){
+				}else if (d.source == "__VARIABLE_OFFSET__"){
 					DoError("#define __VARIABLE_OFFSET__ deprecated");
-				}else if (d.Source == "__CODE_ORIGIN__"){
+				}else if (d.source == "__CODE_ORIGIN__"){
 					DoError("#define __CODE_ORIGING__ deprecated");
 				}else
-					DoError("unknown compiler flag (define starting and ending with \"__\"): " + d.Source);
+					DoError("unknown compiler flag (define starting and ending with \"__\"): " + d.source);
 			}else
 				// normal define
 				defines.add(d);
@@ -161,14 +161,14 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 			int num_defs_inserted = 0;
 			while(!Exp.end_of_line()){
 				foreachi(Define &d, defines, j){
-					if (Exp.cur == d.Source){
+					if (Exp.cur == d.source){
 						int pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 						Exp.remove(Exp.cur_exp);
-						for (int k=0;k<d.Dest.num;k++){
-							Exp.insert(d.Dest[k].c_str(), pos, Exp.cur_exp);
+						for (int k=0;k<d.dest.num;k++){
+							Exp.insert(d.dest[k].c_str(), pos, Exp.cur_exp);
 							Exp.next();
 						}
-						Exp.cur_exp -= d.Dest.num;
+						Exp.cur_exp -= d.dest.num;
 						Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
 						num_defs_inserted ++;
 						if (num_defs_inserted > SCRIPT_MAX_DEFINE_RECURSIONS)

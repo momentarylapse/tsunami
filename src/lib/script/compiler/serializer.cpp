@@ -699,14 +699,14 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, int level, int ind
 void Serializer::SerializeBlock(Block *block, int level)
 {
 	msg_db_f("SerializeBlock", 4);
-	for (int i=0;i<block->command.num;i++){
+	for (int i=0;i<block->commands.num;i++){
 		stack_offset = cur_func->_var_size;
 		next_command = NULL;
-		if (block->command.num > i + 1)
-			next_command = block->command[i + 1];
+		if (block->commands.num > i + 1)
+			next_command = block->commands[i + 1];
 
 		// serialize
-		SerializeCommand(block->command[i], level, i);
+		SerializeCommand(block->commands[i], level, i);
 		
 		// destruct new temp vars
 		FillInDestructors(true);
@@ -1620,8 +1620,8 @@ void Serializer::SerializeFunction(Function *f)
 
 	// outro (if last command != return)
 	bool need_outro = true;
-	if (f->block->command.num > 0)
-		if ((f->block->command.back()->kind == KIND_COMPILER_FUNCTION) && (f->block->command.back()->link_no == COMMAND_RETURN))
+	if (f->block->commands.num > 0)
+		if ((f->block->commands.back()->kind == KIND_COMPILER_FUNCTION) && (f->block->commands.back()->link_no == COMMAND_RETURN))
 			need_outro = false;
 	if (need_outro){
 		FillInDestructors(false);

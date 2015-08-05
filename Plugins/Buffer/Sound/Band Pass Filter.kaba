@@ -40,8 +40,8 @@ class LowPassFilter : AudioEffect
 		// z[i] := α * y[i] + b * z[i-1]
 	
 		for i in 1:buf.num
-			tr = buf.r[i]
-			tl = buf.l[i]
+			float tr = buf.r[i]
+			float tl = buf.l[i]
 			buf.r[i] = bb * (buf.r[i] + buf.r[i-1] - prev_in_r)
 			buf.l[i] = bb * (buf.l[i] + buf.l[i-1] - prev_in_l)
 			prev_in_r = tr

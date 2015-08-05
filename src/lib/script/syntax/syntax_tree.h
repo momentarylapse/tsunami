@@ -19,8 +19,8 @@ class SyntaxTree;
 // macros
 struct Define
 {
-	string Source;
-	Array<string> Dest;
+	string source;
+	Array<string> dest;
 };
 
 // for any type of constant used in the script
@@ -84,9 +84,15 @@ struct Command;
 struct Block
 {
 	int index;
-	Array<Command*> command;
+	Array<Command*> commands;
+	Array<int> vars;
+	Function *function;
+	Block *parent;
 	void add(Command *c);
 	void set(int index, Command *c);
+
+	int get_var(const string &name);
+	int add_var(const string &name, Type *type);
 };
 
 struct Variable
@@ -120,8 +126,7 @@ struct Function
 	int _var_size, _param_size;
 	int _logical_line_no;
 	Function(SyntaxTree *tree, const string &name, Type *return_type);
-	int get_var(const string &name);
-	int AddVar(const string &name, Type *type);
+	int __get_var(const string &name);
 	void Update(Type *class_type);
 };
 
@@ -181,7 +186,7 @@ public:
 	void ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtual, bool overwrite);
 	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
 	Type *ParseType();
-	void ParseVariableDef(bool single, Function *f);
+	void ParseVariableDef(bool single, Block *block);
 	void ParseGlobalConst(const string &name, Type *type);
 	int WhichPrimitiveOperator(const string &name);
 	int WhichCompilerFunction(const string &name);
@@ -212,31 +217,31 @@ public:
 	Type *AddType(Type *type);
 	Type *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Type *sub);
 	Type *CreateArrayType(Type *element_type, int num_elements, const string &name_pre = "", const string &suffix = "");
-	bool GetExistence(const string &name, Function *f);
+	bool GetExistence(const string &name, Block *block);
 	bool GetExistenceShared(const string &name);
 	void LinkMostImportantOperator(Array<Command*> &operand, Array<Command*> &_operator, Array<int> &op_exp);
 	Command *LinkOperator(int op_no, Command *param1, Command *param2);
-	Command *GetOperandExtension(Command *operand, Function *f);
-	Command *GetOperandExtensionElement(Command *operand, Function *f);
-	Command *GetOperandExtensionArray(Command *operand, Function *f);
-	Command *GetCommand(Function *f);
-	void ParseCompleteCommand(Block *block, Function *f);
-	Command *GetOperand(Function *f);
-	Command *GetPrimitiveOperator(Function *f);
-	void FindFunctionParameters(Array<Type*> &wanted_type, Function *f, Command *cmd);
-	void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Function *f, Command *cmd);
-	Command *GetFunctionCall(const string &f_name, Command *operand, Function *f);
-	Command *DoClassFunction(Command *ob, ClassFunction &cf, Function *f);
-	Command *GetSpecialFunctionCall(const string &f_name, Command *operand, Function *f);
+	Command *GetOperandExtension(Command *operand, Block *block);
+	Command *GetOperandExtensionElement(Command *operand, Block *block);
+	Command *GetOperandExtensionArray(Command *operand, Block *block);
+	Command *GetCommand(Block *block);
+	void ParseCompleteCommand(Block *block);
+	Command *GetOperand(Block *block);
+	Command *GetPrimitiveOperator(Block *block);
+	void FindFunctionParameters(Array<Type*> &wanted_type, Block *block, Command *cmd);
+	void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, Command *cmd);
+	Command *GetFunctionCall(const string &f_name, Command *operand, Block *block);
+	Command *DoClassFunction(Command *ob, ClassFunction &cf, Block *block);
+	Command *GetSpecialFunctionCall(const string &f_name, Command *operand, Block *block);
 	Command *CheckParamLink(Command *link, Type *type, const string &f_name = "", int param_no = -1);
-	void ParseSpecialCommand(Block *block, Function *f);
-	void ParseSpecialCommandFor(Block *block, Function *f);
-	void ParseSpecialCommandForall(Block *block, Function *f);
-	void ParseSpecialCommandWhile(Block *block, Function *f);
-	void ParseSpecialCommandBreak(Block *block, Function *f);
-	void ParseSpecialCommandContinue(Block *block, Function *f);
-	void ParseSpecialCommandReturn(Block *block, Function *f);
-	void ParseSpecialCommandIf(Block *block, Function *f);
+	void ParseSpecialCommand(Block *block);
+	void ParseSpecialCommandFor(Block *block);
+	void ParseSpecialCommandForall(Block *block);
+	void ParseSpecialCommandWhile(Block *block);
+	void ParseSpecialCommandBreak(Block *block);
+	void ParseSpecialCommandContinue(Block *block);
+	void ParseSpecialCommandReturn(Block *block);
+	void ParseSpecialCommandIf(Block *block);
 
 	void CreateAsmMetaInfo();
 
@@ -248,7 +253,7 @@ public:
 
 	// data creation
 	int AddConstant(Type *type);
-	Block *AddBlock();
+	Block *AddBlock(Function *f, Block *parent);
 	Function *AddFunction(const string &name, Type *type);
 
 	// command

@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.14.2.2";
+string Version = "0.14.3.-1";
 
 //#define ScriptDebug
 
@@ -301,7 +301,7 @@ void ExecuteSingleScriptCommand(const string &cmd)
 
 	// parse
 	ps->Exp.reset_parser();
-	ps->ParseCompleteCommand(func->block, func);
+	ps->ParseCompleteCommand(func->block);
 	//pre_script->GetCompleteCommand((pre_script->Exp->ExpNr,0,0,&func);
 
 	ps->ConvertCallByReference();

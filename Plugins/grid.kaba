@@ -121,6 +121,7 @@ class GridAxis
 					r.tick.add(tt)
 				vv = vv0 * 1.5
 				if (i == 1) and (vv >= val_min) and (vv <= val_max)
+					GridTick tt
 					tt.value = vv
 					tt.weight = 0.5
 					tt.label = ""

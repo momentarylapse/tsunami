@@ -137,8 +137,8 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 
 	// recursion
 	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->as_block()->command.num;i++)
-			c->as_block()->command[i] = PreProcessCommand(c->as_block()->command[i]);
+		for (int i=0;i<c->as_block()->commands.num;i++)
+			c->as_block()->commands[i] = PreProcessCommand(c->as_block()->commands[i]);
 	}
 	for (int i=0;i<c->param.num;i++)
 		c->set_param(i, PreProcessCommand(c->param[i]));
@@ -301,8 +301,8 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 
 	// recursion
 	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->as_block()->command.num;i++)
-			c->as_block()->set(i, PreProcessCommandAddresses(c->as_block()->command[i]));
+		for (int i=0;i<c->as_block()->commands.num;i++)
+			c->as_block()->set(i, PreProcessCommandAddresses(c->as_block()->commands[i]));
 	}
 	for (int i=0;i<c->param.num;i++)
 		c->set_param(i, PreProcessCommandAddresses(c->param[i]));
@@ -370,8 +370,8 @@ void SyntaxTree::PreProcessor()
 	msg_db_f("PreProcessor", 4);
 	foreach(Function *f, functions){
 		cur_func = f;
-		foreachi(Command *c, f->block->command, i)
-			f->block->command[i] = PreProcessCommand(c);
+		foreachi(Command *c, f->block->commands, i)
+			f->block->commands[i] = PreProcessCommand(c);
 	}
 	//Show();
 }
@@ -381,8 +381,8 @@ void SyntaxTree::PreProcessorAddresses()
 	msg_db_f("PreProcessorAddr", 4);
 	foreach(Function *f, functions){
 		cur_func = f;
-		foreachi(Command *c, f->block->command, i)
-			f->block->command[i] = PreProcessCommandAddresses(c);
+		foreachi(Command *c, f->block->commands, i)
+			f->block->commands[i] = PreProcessCommandAddresses(c);
 	}
 	//Show();
 }

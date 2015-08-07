@@ -7,13 +7,21 @@
 
 #include "MarkerDialog.h"
 
-MarkerDialog::MarkerDialog(HuiWindow* _parent, bool _allow_parent, Track* _t, int _pos):
+MarkerDialog::MarkerDialog(HuiWindow* _parent, bool _allow_parent, Track* _t, int _pos, int _index):
 	HuiWindow("marker_dialog", _parent, _allow_parent)
 {
 	track = _t;
 	pos = _pos;
+	index = _index;
 
-	enable("ok", false);
+	if (index >= 0){
+		setString("text", track->markers[index].text);
+		pos = track->markers[index].pos;
+
+		enable("ok", true);
+	}else{
+		enable("ok", false);
+	}
 
 	event("text", this, &MarkerDialog::onEdit);
 	event("cancel", this, &MarkerDialog::onClose);
@@ -32,7 +40,15 @@ void MarkerDialog::onEdit()
 
 void MarkerDialog::onOk()
 {
-	track->addMarker(pos, getString("text"));
+	if (index >= 0){
+		// cheap solution...
+		track->root->action_manager->beginActionGroup();
+		track->deleteMarker(index);
+		track->addMarker(pos, getString("text"));
+		track->root->action_manager->endActionGroup();
+	}else{
+		track->addMarker(pos, getString("text"));
+	}
 	delete(this);
 }
 

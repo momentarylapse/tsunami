@@ -24,7 +24,7 @@
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;
 const float AudioView::LINE_WIDTH = 1.0f;
-const int AudioView::SUB_FRAME_HEIGHT = 20;
+const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 60;
 const int AudioView::BARRIER_DIST = 8;
@@ -60,6 +60,7 @@ AudioView::SelectionType::SelectionType()
 	track = NULL;
 	vtrack = NULL;
 	sample = NULL;
+	index = 0;
 	pos = 0;
 	sample_offset = 0;
 	show_track_controls = NULL;
@@ -196,7 +197,8 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 
 	menu_audio = HuiCreateResourceMenu("popup_audio_file_menu");
 	menu_track = HuiCreateResourceMenu("popup_track_menu");
-	menu_sub = HuiCreateResourceMenu("popup_sample_menu");
+	menu_sample = HuiCreateResourceMenu("popup_sample_menu");
+	menu_marker = HuiCreateResourceMenu("popup_marker_menu");
 
 	//ForceRedraw();
 	updateMenu();
@@ -248,9 +250,9 @@ int AudioView::mouseOverSample(SampleRef *s)
 {
 	if ((mx >= s->area.x1) and (mx < s->area.x2)){
 		int offset = cam.screen2sample(mx) - s->pos;
-		if ((my >= s->area.y1) and (my < s->area.y1 + SUB_FRAME_HEIGHT))
+		if ((my >= s->area.y1) and (my < s->area.y1 + SAMPLE_FRAME_HEIGHT))
 			return offset;
-		if ((my >= s->area.y2 - SUB_FRAME_HEIGHT) and (my < s->area.y2))
+		if ((my >= s->area.y2 - SAMPLE_FRAME_HEIGHT) and (my < s->area.y2))
 			return offset;
 	}
 	return -1;
@@ -295,6 +297,7 @@ AudioView::SelectionType AudioView::getMouseOver()
 	foreachi(AudioViewTrack *t, vtrack, i){
 		if (mouseOverTrack(t)){
 			s.vtrack = t;
+			s.index = i;
 			s.track = t->track;
 			s.type = SEL_TYPE_TRACK;
 			if (mx < t->area.x1 + TRACK_HANDLE_WIDTH)
@@ -334,6 +337,16 @@ AudioView::SelectionType AudioView::getMouseOver()
 
 	// sub?
 	if (s.track){
+
+		// markers
+		for (int i=0; i<min(s.track->markers.num, vtrack[s.index]->marker_areas.num); i++){
+			if (vtrack[s.index]->marker_areas[i].inside(mx, my)){
+				s.type = SEL_TYPE_MARKER;
+				s.index = i;
+				return s;
+			}
+		}
+
 		// TODO: prefer selected subs
 		foreach(SampleRef *ss, s.track->samples){
 			int offset = mouseOverSample(ss);
@@ -746,7 +759,9 @@ void AudioView::onRightButtonDown()
 	updateMenu();
 
 	if (selection.type == SEL_TYPE_SAMPLE)
-		menu_sub->openPopup(win, 0, 0);
+		menu_sample->openPopup(win, 0, 0);
+	else if (selection.type == SEL_TYPE_MARKER)
+		menu_marker->openPopup(win, 0, 0);
 	else if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE)){
 		menu_track->enable("track_edit_midi", cur_track->type == Track::TYPE_MIDI);
 		menu_track->openPopup(win, 0, 0);

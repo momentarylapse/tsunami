@@ -160,8 +160,8 @@ void AudioViewTrack::drawSampleFrame(HuiPainter *c, SampleRef *s, const color &c
 	color col2 = col;
 	col2.a *= 0.2f;
 	c->setColor(col2);
-	c->drawRect(asx, area.y1,                          aex - asx, view->SUB_FRAME_HEIGHT);
-	c->drawRect(asx, area.y2 - view->SUB_FRAME_HEIGHT, aex - asx, view->SUB_FRAME_HEIGHT);
+	c->drawRect(asx, area.y1,                          aex - asx, view->SAMPLE_FRAME_HEIGHT);
+	c->drawRect(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, aex - asx, view->SAMPLE_FRAME_HEIGHT);
 
 	c->setColor(col);
 	c->drawLine(asx, area.y1, asx, area.y2);
@@ -193,12 +193,19 @@ void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 
 	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
 	if (s->is_selected)//((is_cur) or (a->sub_mouse_over == s))
-		c->drawStr(asx, area.y2 - view->SUB_FRAME_HEIGHT, s->origin->name);
+		c->drawStr(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name);
 }
 
-void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker)
+void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker, int index)
 {
+	float w = c->getStrWidth(marker.text);
 	int x = view->cam.sample2screen(marker.pos);
+
+	c->setColor(White);
+	rect bg = rect(x-2, x+w+2, area.y1, area.y1+18);
+	c->drawRect(bg);
+	marker_areas[index] = bg;
+
 	c->setColor(view->colors.text);
 	c->drawStr(x, area.y1, marker.text);
 }
@@ -309,8 +316,9 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 	foreach(SampleRef *s, track->samples)
 		drawSample(c, s);
 
-	foreach(TrackMarker &m, track->markers)
-		drawMarker(c, m);
+	marker_areas.resize(track->markers.num);
+	foreachi(TrackMarker &m, track->markers, i)
+		drawMarker(c, m, i);
 
 	if ((view->hover.track == track) and (view->mx < view->TRACK_HANDLE_WIDTH)){
 		c->setColor(color(0.4f, 1, 1, 1));

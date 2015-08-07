@@ -32,7 +32,7 @@ public:
 	void drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(HuiPainter *c, SampleRef *s);
-	void drawMarker(HuiPainter *c, TrackMarker &marker);
+	void drawMarker(HuiPainter *c, TrackMarker &marker, int index);
 	void drawMidi(HuiPainter *c, MidiData &midi, int shift);
 	void drawMidiEditable(HuiPainter *c, MidiData &midi);
 	void drawMidiNote(HuiPainter *c, const MidiNote &n, bool hover);
@@ -42,6 +42,7 @@ public:
 	Track *track;
 	rect area;
 	rect area_last, area_target;
+	Array<rect> marker_areas;
 	AudioView *view;
 	static const float MIN_GRID_DIST;
 };

@@ -73,14 +73,16 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("sample_manager", "", -1, this, &TsunamiWindow::onSampleManager);
 	HuiAddCommandM("show_mixing_console", "", -1, this, &TsunamiWindow::onMixingConsole);
 	HuiAddCommandM("show_fx_console", "", -1, this, &TsunamiWindow::onFxConsole);
-	HuiAddCommandM("sample_from_selection", "hui:cut", -1, this, &TsunamiWindow::onSubFromSelection);
-	HuiAddCommandM("insert_sample", "", KEY_I + KEY_CONTROL, this, &TsunamiWindow::onInsertAdded);
-	HuiAddCommandM("remove_sample", "", -1, this, &TsunamiWindow::onRemoveAdded);
+	HuiAddCommandM("sample_from_selection", "hui:cut", -1, this, &TsunamiWindow::onSampleFromSelection);
+	HuiAddCommandM("insert_sample", "", KEY_I + KEY_CONTROL, this, &TsunamiWindow::onInsertSample);
+	HuiAddCommandM("remove_sample", "", -1, this, &TsunamiWindow::onRemoveSample);
+	HuiAddCommandM("delete_marker", "", -1, this, &TsunamiWindow::onDeleteMarker);
+	HuiAddCommandM("edit_marker", "", -1, this, &TsunamiWindow::onEditMarker);
 	HuiAddCommandM("track_import", "", -1, this, &TsunamiWindow::onTrackImport);
-	HuiAddCommandM("sub_import", "", -1, this, &TsunamiWindow::onSubImport);
+	HuiAddCommandM("sub_import", "", -1, this, &TsunamiWindow::onSampleImport);
 	HuiAddCommandM("audio_file_properties", "", KEY_F4, this, &TsunamiWindow::onAudioProperties);
 	HuiAddCommandM("track_properties", "", -1, this, &TsunamiWindow::onTrackProperties);
-	HuiAddCommandM("sample_properties", "", -1, this, &TsunamiWindow::onSubProperties);
+	HuiAddCommandM("sample_properties", "", -1, this, &TsunamiWindow::onSampleProperties);
 	HuiAddCommandM("settings", "", -1, this, &TsunamiWindow::onSettings);
 	HuiAddCommandM("play", "hui:media-play", -1, this, &TsunamiWindow::onPlay);
 	HuiAddCommandM("play_loop", "", -1, this, &TsunamiWindow::onPlayLoop);
@@ -238,7 +240,7 @@ void TsunamiWindow::onTrackEditFX()
 void TsunamiWindow::onTrackAddMarker()
 {
 	if (view->cur_track){
-		MarkerDialog *d = new MarkerDialog(this, false, view->cur_track, view->hover.pos);
+		MarkerDialog *d = new MarkerDialog(this, false, view->cur_track, view->hover.pos, -1);
 		d->run();
 	}else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
@@ -257,12 +259,29 @@ void TsunamiWindow::onTrackProperties()
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
 
-void TsunamiWindow::onSubProperties()
+void TsunamiWindow::onSampleProperties()
 {
 	if (view->cur_sample)
 		side_bar->open(SideBar::SAMPLEREF_DIALOG);
 	else
 		tsunami->log->error(_("Kein Sample ausgew&ahlt"));
+}
+
+void TsunamiWindow::onDeleteMarker()
+{
+	if (view->selection.type == view->SEL_TYPE_MARKER)
+		view->cur_track->deleteMarker(view->selection.index);
+	else
+		tsunami->log->error(_("Kein Marker ausgew&ahlt"));
+}
+
+void TsunamiWindow::onEditMarker()
+{
+	if (view->selection.type == view->SEL_TYPE_MARKER){
+		MarkerDialog *d = new MarkerDialog(this, false, view->cur_track, -1, view->selection.index);
+		d->run();
+	}else
+		tsunami->log->error(_("Kein Marker ausgew&ahlt"));
 }
 
 void TsunamiWindow::onShowLog()
@@ -344,7 +363,7 @@ void TsunamiWindow::onFxConsole()
 	bottom_bar->open(BottomBar::TRACK_FX_CONSOLE);
 }
 
-void TsunamiWindow::onSubImport()
+void TsunamiWindow::onSampleImport()
 {
 }
 
@@ -366,7 +385,7 @@ void TsunamiWindow::onTrackImport()
 	}
 }
 
-void TsunamiWindow::onRemoveAdded()
+void TsunamiWindow::onRemoveSample()
 {
 	audio->deleteSelectedSamples();
 }
@@ -393,7 +412,7 @@ void TsunamiWindow::onStop()
 	view->stream->stop();
 }
 
-void TsunamiWindow::onInsertAdded()
+void TsunamiWindow::onInsertSample()
 {
 	audio->insertSelectedSamples(view->cur_level);
 }
@@ -429,7 +448,7 @@ void TsunamiWindow::onCurLevelDown()
 	view->setCurLevel(view->cur_level - 1);
 }
 
-void TsunamiWindow::onSubFromSelection()
+void TsunamiWindow::onSampleFromSelection()
 {
 	audio->createSamplesFromSelection(view->cur_level, view->sel_range);
 }

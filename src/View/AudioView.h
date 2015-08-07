@@ -76,7 +76,7 @@ public:
 	ColorScheme colors;
 	void setColorScheme(const string &name);
 
-	static const int SUB_FRAME_HEIGHT;
+	static const int SAMPLE_FRAME_HEIGHT;
 	static const int TIME_SCALE_HEIGHT;
 	static const float LINE_WIDTH;
 	static const int FONT_SIZE;
@@ -98,6 +98,7 @@ public:
 		SEL_TYPE_SAMPLE,
 		SEL_TYPE_MIDI_NOTE,
 		SEL_TYPE_MIDI_PITCH,
+		SEL_TYPE_MARKER,
 	};
 
 	struct SelectionType
@@ -111,6 +112,7 @@ public:
 		Array<int> barrier;
 		Track *show_track_controls;
 		int pitch, note_start;
+		int index;
 
 		SelectionType();
 		bool allowAutoScroll();
@@ -223,7 +225,8 @@ public:
 	Image image_track_audio, image_track_time, image_track_midi;
 
 	HuiMenu *menu_track;
-	HuiMenu *menu_sub;
+	HuiMenu *menu_sample;
+	HuiMenu *menu_marker;
 	HuiMenu *menu_audio;
 };
 

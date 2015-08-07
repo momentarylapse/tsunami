@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-247
+250
 // Data (ID,Text)
 about
 
@@ -111,6 +111,8 @@ delete_effect
 Delete
 delete_level
 
+delete_marker
+
 delete_sample
 
 delete_tag
@@ -124,6 +126,8 @@ edit_file
 edit_fx
 
 edit_levels
+
+edit_marker
 
 edit_midi
 
@@ -216,6 +220,8 @@ lvld_t_edit
 marker_dialog
 
 marker_dialog_buttonbar
+
+marker_menu_header
 
 me_group_chord
 
@@ -375,9 +381,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_149609
+rand_id_109651
 
-rand_id_71659
+rand_id_307365
 
 rdt_capture
 
@@ -498,7 +504,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-141
+142
 // Data (ID,Text)
 
 
@@ -639,6 +645,8 @@ Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 Kann nur Samples löschen, die nicht benutzt werden!
 
 Kanäle
+
+Kein Marker ausgewählt
 
 Kein Sample ausgewählt
 

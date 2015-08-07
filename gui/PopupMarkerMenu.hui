@@ -1,0 +1,6 @@
+Menu popup_marker_menu ""
+	Item marker_menu_header "Marker" disabled
+	Separator "" ""
+	Item edit_marker "Bearbeiten"
+	Item delete_marker "Löschen"
+

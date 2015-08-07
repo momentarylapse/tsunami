@@ -15,7 +15,7 @@
 class MarkerDialog: public HuiWindow
 {
 public:
-	MarkerDialog(HuiWindow *_parent, bool _allow_parent, Track *t, int pos);
+	MarkerDialog(HuiWindow *_parent, bool _allow_parent, Track *t, int pos, int index);
 	virtual ~MarkerDialog();
 
 	void onEdit();
@@ -24,6 +24,7 @@ public:
 
 	Track *track;
 	int pos;
+	int index;
 };
 
 #endif /* SRC_VIEW_DIALOG_MARKERDIALOG_H_ */

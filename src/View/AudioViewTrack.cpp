@@ -201,7 +201,7 @@ void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker, int index)
 	float w = c->getStrWidth(marker.text);
 	int x = view->cam.sample2screen(marker.pos);
 
-	c->setColor(White);
+	c->setColor(view->colors.background);
 	rect bg = rect(x-2, x+w+2, area.y1, area.y1+18);
 	c->drawRect(bg);
 	marker_areas[index] = bg;

@@ -41,7 +41,7 @@ public:
 public:
 	HuiPanel *panel;
 	string id;
-	string id_add, id_add_pause, id_delete, id_set_bpm;
+	string id_add, id_add_pause, id_delete, id_set_bpm, id_link;
 	Track *track;
 	AudioView *view;
 };

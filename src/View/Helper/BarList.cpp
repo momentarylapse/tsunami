@@ -21,11 +21,12 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 	id_add_pause = _id_add_pause;
 	id_delete = _id_delete;
 	id_set_bpm = _id_set_bpm;
+	id_link = "link_to_midi";
 	view = _view;
 
 	track = NULL;
 
-	panel->check("link_to_midi", true);
+	panel->check(id_link, true);
 
 	fillList();
 	panel->event(id, this, &BarList::onList);
@@ -163,8 +164,40 @@ void BarList::onDelete()
 		return;
 	Array<int> s = panel->getSelection(id);
 	track->root->action_manager->beginActionGroup();
-	foreachb(int i, s)
+
+	foreachb(int i, s){
+
+		int pos = 0;
+		for (int j=0; j<i; j++)
+			pos += track->bars[j].length;
+
+		BarPattern b = track->bars[i];
+		int l0 = b.length;
+		if (panel->isChecked(id_link)){
+			foreach(Track *t, track->root->tracks){
+				if (t->type != t->TYPE_MIDI)
+					continue;
+				Set<int> del;
+				Array<MidiEvent> add;
+				foreachi(MidiEvent &e, t->midi, j){
+					if (e.pos <= pos){
+					}else if (e.pos >= pos + l0){
+						MidiEvent e2 = e;
+						e2.pos -= l0;
+						add.add(e2);
+						del.add(j);
+					}else{
+						del.add(j);
+					}
+				}
+				foreachb(int j, del)
+					t->deleteMidiEvent(j);
+				foreach(MidiEvent &e, add)
+					t->addMidiEvent(e);
+			}
+		}
 		track->deleteBar(i);
+	}
 	track->root->action_manager->endActionGroup();
 	fillList();
 }
@@ -250,7 +283,7 @@ void BarList::onSetBpm()
 		return;
 	Array<int> s = panel->getSelection(id);
 
-	HuiDialog *dlg = new BarBpmDialog(panel->win, track, s, panel->isChecked("link_to_midi"));
+	HuiDialog *dlg = new BarBpmDialog(panel->win, track, s, panel->isChecked(id_link));
 	dlg->show();
 
 	fillList();

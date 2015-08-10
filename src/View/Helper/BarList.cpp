@@ -272,7 +272,9 @@ public:
 		setInt("beats", 4);
 		setFloat("bpm", 90.0f);
 		if (track->bars.num > 0){
-			BarPattern &b = track->bars[index];
+			BarPattern &b = track->bars.back();
+			if (index >= 0)
+				b = track->bars[index];
 			setInt("beats", b.num_beats);
 			setFloat("bpm", track->root->sample_rate * 60.0f / (b.length / b.num_beats));
 		}

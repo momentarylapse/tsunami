@@ -11,10 +11,11 @@
 #include "Observable.h"
 #include "../lib/base/base.h"
 
-//class Observable;
+class Observable;
 
 class Observer
 {
+	friend class Observable;
 public:
 	Observer(const string &name);
 	virtual ~Observer();
@@ -28,6 +29,9 @@ public:
 
 private:
 	string observer_name;
+	bool observer_enabled;
+protected:
+	void allowNotification(bool allow);
 };
 
 class ObserverWrapper : public Observer

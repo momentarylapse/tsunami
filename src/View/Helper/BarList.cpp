@@ -25,6 +25,8 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 
 	track = NULL;
 
+	panel->check("link_to_midi", true);
+
 	fillList();
 	panel->event(id, this, &BarList::onList);
 	panel->eventX(id, "hui:select", this, &BarList::onListSelect);
@@ -104,7 +106,9 @@ void BarList::selectToView()
 	}else{
 		view->sel_raw = Range::EMPTY;
 	}
+	allowNotification(false);
 	view->updateSelection();
+	allowNotification(true);
 }
 
 

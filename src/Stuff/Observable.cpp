@@ -85,7 +85,8 @@ void Observable::notifySend()
 		//msg_write("send " + observable_name + ": " + queue[i]);
 		foreach(ObserverRequest &r, requests){
 			if ((r.message == m) or (r.message == &MESSAGE_ALL))
-				notifications.add(Notification(r.observer, *m));
+				if (r.observer->observer_enabled)
+					notifications.add(Notification(r.observer, *m));
 		}
 	}
 

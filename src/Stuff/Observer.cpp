@@ -10,6 +10,7 @@
 Observer::Observer(const string &name)
 {
 	observer_name = name;
+	observer_enabled = true;
 }
 
 Observer::~Observer()
@@ -31,6 +32,11 @@ void Observer::unsubscribe(Observable *o)
 string Observer::getName()
 {
 	return observer_name;
+}
+
+void Observer::allowNotification(bool allow)
+{
+	observer_enabled = allow;
 }
 
 

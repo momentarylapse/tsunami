@@ -16,7 +16,7 @@ class AudioView;
 class BarList : public HuiEventHandler, public Observer
 {
 public:
-	BarList(HuiPanel *_panel, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_set_bpm, AudioView *view);
+	BarList(HuiPanel *_panel, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_edit, AudioView *view);
 	virtual ~BarList();
 
 	void fillList();
@@ -26,7 +26,7 @@ public:
 	void onAdd();
 	void onAddPause();
 	void onDelete();
-	void onSetBpm();
+	void onEdit();
 
 	void addNewBar();
 	void executeBarDialog(int index);
@@ -41,7 +41,7 @@ public:
 public:
 	HuiPanel *panel;
 	string id;
-	string id_add, id_add_pause, id_delete, id_set_bpm, id_link;
+	string id_add, id_add_pause, id_delete, id_edit, id_link;
 	Track *track;
 	AudioView *view;
 };

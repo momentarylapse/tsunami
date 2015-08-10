@@ -27,7 +27,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	fromResource("track_dialog");
 	setOptions("ttd_grid_1", "noexpandx,width=300");
 	setDecimals(1);
-	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", "set_speed", view);
+	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", "edit_bars", view);
 
 
 	expand("td_t_bars", 0, true);

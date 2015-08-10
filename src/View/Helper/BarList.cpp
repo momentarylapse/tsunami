@@ -12,7 +12,7 @@
 
 
 
-BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_set_bpm, AudioView *_view) :
+BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_edit, AudioView *_view) :
 	Observer("BarList")
 {
 	panel = _panel;
@@ -20,7 +20,7 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 	id_add = _id_add;
 	id_add_pause = _id_add_pause;
 	id_delete = _id_delete;
-	id_set_bpm = _id_set_bpm;
+	id_edit = _id_edit;
 	id_link = "link_to_midi";
 	view = _view;
 
@@ -35,7 +35,7 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 	panel->event(id_add, this, &BarList::onAdd);
 	panel->event(id_add_pause, this, &BarList::onAddPause);
 	panel->event(id_delete, this, &BarList::onDelete);
-	panel->event(id_set_bpm, this, &BarList::onSetBpm);
+	panel->event(id_edit, this, &BarList::onEdit);
 
 	if (view)
 		subscribe(view, view->MESSAGE_SELECTION_CHANGE);
@@ -80,7 +80,7 @@ void BarList::onListSelect()
 {
 	Array<int> s = panel->getSelection(id);
 	panel->enable(id_delete, s.num > 0);
-	panel->enable(id_set_bpm, s.num > 0);
+	panel->enable(id_edit, s.num > 0);
 
 	selectToView();
 }
@@ -202,36 +202,44 @@ void BarList::onDelete()
 	fillList();
 }
 
-class BarBpmDialog : public HuiDialog
+class BarEditDialog : public HuiDialog
 {
 public:
 	Track *track;
 	Array<int> sel;
 	bool apply_to_midi;
 
-	BarBpmDialog(HuiWindow *root, Track *_t, Array<int> &_s, bool _apply_to_midi):
+	BarEditDialog(HuiWindow *root, Track *_t, Array<int> &_s, bool _apply_to_midi):
 		HuiDialog("", 100, 100, root, false)
 	{
-		fromResource("bar_bpm_dialog");
+		fromResource("bar_edit_dialog");
 		track = _t;
 		sel = _s;
 		apply_to_midi = _apply_to_midi;
 
 		BarPattern &b = track->bars[sel[0]];
+		setInt("beats", b.num_beats);
 		setFloat("bpm", track->root->sample_rate * 60.0f / (b.length / b.num_beats));
+		check("edit_bpm", true);
 
-		event("ok", this, &BarBpmDialog::onOk);
-		event("cancel", this, &BarBpmDialog::onClose);
-		event("hui:close", this, &BarBpmDialog::onClose);
+		event("ok", this, &BarEditDialog::onOk);
+		event("cancel", this, &BarEditDialog::onClose);
+		event("hui:close", this, &BarEditDialog::onClose);
 	}
 
 	void onOk()
 	{
+		int beats = getInt("beats");
 		float bpm = getFloat("bpm");
+		bool edit_beats = isChecked("edit_beats");
+		bool edit_bpm = isChecked("edit_bpm");
 		track->root->action_manager->beginActionGroup();
 		foreachb(int i, sel){
 			BarPattern b = track->bars[i];
-			b.length = track->root->sample_rate * 60.0f * b.num_beats / bpm;
+			if (edit_beats)
+				b.num_beats = beats;
+			if (edit_bpm)
+				b.length = track->root->sample_rate * 60.0f * b.num_beats / bpm;
 			track->editBar(i, b, apply_to_midi);
 		}
 		track->root->action_manager->endActionGroup();
@@ -245,13 +253,63 @@ public:
 	}
 };
 
-void BarList::onSetBpm()
+class BarAddDialog : public HuiDialog
+{
+public:
+	Track *track;
+	int index;
+	bool apply_to_midi;
+
+	BarAddDialog(HuiWindow *root, Track *_t, int _index, bool _apply_to_midi):
+		HuiDialog("", 100, 100, root, false)
+	{
+		fromResource("bar_add_dialog");
+		track = _t;
+		index = _index;
+		apply_to_midi = _apply_to_midi;
+
+		setInt("count", 1);
+		setInt("beats", 4);
+		setFloat("bpm", 90.0f);
+		if (track->bars.num > 0){
+			BarPattern &b = track->bars[index];
+			setInt("beats", b.num_beats);
+			setFloat("bpm", track->root->sample_rate * 60.0f / (b.length / b.num_beats));
+		}
+
+		event("ok", this, &BarAddDialog::onOk);
+		event("cancel", this, &BarAddDialog::onClose);
+		event("hui:close", this, &BarAddDialog::onClose);
+	}
+
+	void onOk()
+	{
+		int count = getInt("count");
+		int beats = getInt("beats");
+		float bpm = getFloat("bpm");
+		track->root->action_manager->beginActionGroup();
+
+
+		for (int i=0; i<count; i++)
+			track->addBar(index, bpm, beats, apply_to_midi);
+		track->root->action_manager->endActionGroup();
+
+		delete(this);
+	}
+
+	void onClose()
+	{
+		delete(this);
+	}
+};
+
+void BarList::onEdit()
 {
 	if (!track)
 		return;
 	Array<int> s = panel->getSelection(id);
 
-	HuiDialog *dlg = new BarBpmDialog(panel->win, track, s, panel->isChecked(id_link));
+	HuiDialog *dlg = new BarEditDialog(panel->win, track, s, panel->isChecked(id_link));
 	dlg->show();
 
 	fillList();
@@ -273,9 +331,9 @@ void BarList::addNewBar()
 
 	int s = panel->getInt(id);
 
-	for (int i=0; i<10; i++)
-		track->addBar(s, 90.0f, 4, panel->isChecked(id_link));
-	fillList();
+
+	HuiDialog *dlg = new BarAddDialog(panel->win, track, s, panel->isChecked(id_link));
+	dlg->show();
 }
 
 void BarList::executeBarDialog(int index)
@@ -316,6 +374,6 @@ void BarList::selectFromView()
 	}
 	panel->setSelection(id, s);
 	panel->enable(id_delete, s.num > 0);
-	panel->enable(id_set_bpm, s.num > 0);
+	panel->enable(id_edit, s.num > 0);
 }
 

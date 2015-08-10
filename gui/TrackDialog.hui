@@ -17,7 +17,7 @@ Dialog track_dialog "Spur" 380 516
 					Button add_bar "Takt" image=hui:add flat
 					Button add_bar_pause "Pause" image=hui:add flat
 					Button delete_bar "" image=hui:delete flat
-					Button set_speed "Bpm..." flat
+					Button edit_bars "" image=hui:edit flat
 				CheckBox link_to_midi "Midi mitbearbeiten"
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2

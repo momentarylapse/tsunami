@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-250
+259
 // Data (ID,Text)
 about
 
@@ -49,17 +49,29 @@ audio_file_menu_header
 
 audio_file_properties
 
-bar_bpm_dialog
+bad_buttonbar
+
+bad_t_beats
+
+bad_t_bpm
+
+bad_t_count
+
+bar_add_dialog
+
+bar_edit_dialog
 
 bar_list
 
-bbd_bpm
-
 beat_partition
+
+beats
 
 beats_per_bar
 
 beats_per_minute
+
+bed_buttonbar
 
 bpm
 
@@ -97,6 +109,8 @@ compress
 
 copy
 Copy
+count
+
 create_from_selection
 
 data_list
@@ -121,6 +135,12 @@ delete_track
 
 dummy_favorite_dialog
 sdiufh
+edit_bars
+
+edit_beats
+
+edit_bpm
+
 edit_file
 
 edit_fx
@@ -381,9 +401,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_109651
+rand_id_754799
 
-rand_id_307365
+rand_id_784567
 
 rdt_capture
 
@@ -438,8 +458,6 @@ save_as
 select_all
 
 select_nothing
-
-set_speed
 
 settings
 

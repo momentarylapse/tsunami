@@ -198,7 +198,7 @@ void TsunamiWindow::onAddTimeTrack()
 	if (t){
 		// some default data
 		for (int i=0; i<10; i++)
-			t->addBar(-1, 90, 4);
+			t->addBar(-1, 90, 4, false);
 	}
 	audio->action_manager->endActionGroup();
 }

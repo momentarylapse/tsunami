@@ -250,7 +250,7 @@ void FormatGuitarPro::loadAudio(StorageOperationData *od)
 			for (int j = 0; j < num_tracks; j++)
 				read_measure(measures[i], tracks[j], offset);
 			offset += a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator;
-			a->tracks[0]->addBar(-1, tempo, measures[i].numerator);
+			a->tracks[0]->addBar(-1, tempo, measures[i].numerator, false);
 		}
 
 	}catch(const string &s){

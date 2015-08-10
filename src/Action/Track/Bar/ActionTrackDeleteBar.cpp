@@ -9,10 +9,11 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackDeleteBar::ActionTrackDeleteBar(Track *t, int _index)
+ActionTrackDeleteBar::ActionTrackDeleteBar(Track *t, int _index, bool _affect_midi)
 {
 	track_no = get_track_index(t);
 	index = _index;
+	affect_midi = _affect_midi;
 }
 
 ActionTrackDeleteBar::~ActionTrackDeleteBar()

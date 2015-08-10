@@ -14,7 +14,7 @@
 class ActionTrackDeleteBar: public Action
 {
 public:
-	ActionTrackDeleteBar(Track *t, int index);
+	ActionTrackDeleteBar(Track *t, int index, bool affect_midi);
 	virtual ~ActionTrackDeleteBar();
 
 	virtual void *execute(Data *d);
@@ -24,6 +24,7 @@ private:
 	BarPattern bar;
 	int track_no;
 	int index;
+	bool affect_midi;
 };
 
 #endif /* ACTIONTRACKDELETEBAR_H_ */

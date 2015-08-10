@@ -153,6 +153,14 @@ int Track::get_index()
 	return -1;
 }
 
+int Track::barOffset(int index)
+{
+	int pos = 0;
+	for (int i=0; i<min(index, bars.num); i++)
+		pos += bars[i].length;
+	return pos;
+}
+
 BufferBox Track::readBuffers(int level_no, const Range &r)
 {
 	BufferBox buf;
@@ -358,38 +366,38 @@ void Track::editSynthesizer(const string &param_old)
 	root->execute(new ActionTrackEditSynthesizer(this, param_old));
 }
 
-void Track::addBar(int index, float bpm, int beats)
+void Track::addBar(int index, float bpm, int beats, bool affect_midi)
 {
 	BarPattern b;
 	b.num_beats = beats;
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)root->sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		root->execute(new ActionTrackAddBar(this, index + 1, b));
+		root->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
 	else
-		root->execute(new ActionTrackAddBar(this, bars.num, b));
+		root->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
 }
 
-void Track::addPause(int index, float time)
+void Track::addPause(int index, float time, bool affect_midi)
 {
 	BarPattern b;
 	b.num_beats = 0;
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)root->sample_rate * time);
 	if (index >= 0)
-		root->execute(new ActionTrackAddBar(this, index + 1, b));
+		root->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
 	else
-		root->execute(new ActionTrackAddBar(this, bars.num, b));
+		root->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
 }
 
-void Track::editBar(int index, BarPattern &p)
+void Track::editBar(int index, BarPattern &p, bool affect_midi)
 {
-	root->execute(new ActionTrackEditBar(this, index, p));
+	root->execute(new ActionTrackEditBar(this, index, p, affect_midi));
 }
 
-void Track::deleteBar(int index)
+void Track::deleteBar(int index, bool affect_midi)
 {
-	root->execute(new ActionTrackDeleteBar(this, index));
+	root->execute(new ActionTrackDeleteBar(this, index, affect_midi));
 }
 
 void Track::addMarker(int pos, const string &text)

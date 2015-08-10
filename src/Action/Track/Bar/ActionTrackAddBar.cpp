@@ -9,11 +9,12 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackAddBar::ActionTrackAddBar(Track *t, int _index, BarPattern &_bar)
+ActionTrackAddBar::ActionTrackAddBar(Track *t, int _index, BarPattern &_bar, bool _affect_midi)
 {
 	track_no = get_track_index(t);
 	index = _index;
 	bar = _bar;
+	affect_midi = _affect_midi;
 }
 
 ActionTrackAddBar::~ActionTrackAddBar()
@@ -27,6 +28,18 @@ void *ActionTrackAddBar::execute(Data *d)
 	assert(index >= 0);
 	assert(index <= t->bars.num);
 
+	if (affect_midi){
+		int pos0 = t->barOffset(index);
+		foreach(Track *tt, a->tracks){
+			if (tt->type != tt->TYPE_MIDI)
+				continue;
+			foreachi(MidiEvent &e, tt->midi, j){
+				if (e.pos >= pos0)
+					e.pos += bar.length;
+			}
+		}
+	}
+
 	t->bars.insert(bar, index);
 	t->notify();
 
@@ -38,6 +51,19 @@ void ActionTrackAddBar::undo(Data *d)
 	AudioFile *a = dynamic_cast<AudioFile*>(d);
 
 	Track *t = a->get_track(track_no);
+
+	if (affect_midi){
+		int pos0 = t->barOffset(index);
+		foreach(Track *tt, a->tracks){
+			if (tt->type != tt->TYPE_MIDI)
+				continue;
+			foreachi(MidiEvent &e, tt->midi, j){
+				if (e.pos >= pos0)
+					e.pos -= bar.length;
+			}
+		}
+	}
+
 	t->bars.erase(index);
 	t->notify();
 }

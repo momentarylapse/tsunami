@@ -136,7 +136,7 @@ void BarList::onListEdit()
 			b.length = (int)(text._float() * (float)sample_rate);
 		}
 	}
-	track->editBar(index, b);
+	track->editBar(index, b, panel->isChecked(id_link));
 	fillList();
 }
 
@@ -153,7 +153,7 @@ void BarList::onAddPause()
 		return;
 	int s = panel->getInt(id);
 
-	track->addPause(s, 2.0f);
+	track->addPause(s, 2.0f, panel->isChecked(id_link));
 	fillList();
 }
 
@@ -196,7 +196,7 @@ void BarList::onDelete()
 					t->addMidiEvent(e);
 			}
 		}
-		track->deleteBar(i);
+		track->deleteBar(i, panel->isChecked(id_link));
 	}
 	track->root->action_manager->endActionGroup();
 	fillList();
@@ -230,41 +230,9 @@ public:
 		float bpm = getFloat("bpm");
 		track->root->action_manager->beginActionGroup();
 		foreachb(int i, sel){
-			int pos = 0;
-			for (int j=0; j<i; j++)
-				pos += track->bars[j].length;
-
 			BarPattern b = track->bars[i];
-			int l0 = b.length;
 			b.length = track->root->sample_rate * 60.0f * b.num_beats / bpm;
-			track->editBar(i, b);
-
-			if (apply_to_midi){
-				foreach(Track *t, track->root->tracks){
-					if (t->type != t->TYPE_MIDI)
-						continue;
-					Set<int> del;
-					Array<MidiEvent> add;
-					foreachi(MidiEvent &e, t->midi, j){
-						if (e.pos <= pos){
-						}else if (e.pos > pos + l0){
-							MidiEvent e2 = e;
-							e2.pos += b.length - l0;
-							add.add(e2);
-							del.add(j);
-						}else{
-							MidiEvent e2 = e;
-							e2.pos = pos + (float)(e2.pos - pos) * (float)b.length / (float)l0;
-							add.add(e2);
-							del.add(j);
-						}
-					}
-					foreachb(int j, del)
-						t->deleteMidiEvent(j);
-					foreach(MidiEvent &e, add)
-						t->addMidiEvent(e);
-				}
-			}
+			track->editBar(i, b, apply_to_midi);
 		}
 		track->root->action_manager->endActionGroup();
 
@@ -306,7 +274,7 @@ void BarList::addNewBar()
 	int s = panel->getInt(id);
 
 	for (int i=0; i<10; i++)
-		track->addBar(s, 90.0f, 4);
+		track->addBar(s, 90.0f, 4, panel->isChecked(id_link));
 	fillList();
 }
 

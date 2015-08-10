@@ -45,7 +45,7 @@ void NewDialog::onOk()
 		Track *t = audio->addTrack(Track::TYPE_TIME, 0);
 		int count = getInt("num_bars");
 		for (int i=0; i<count; i++)
-			t->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"));
+			t->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), false);
 	}
 	audio->action_manager->enable(true);
 	audio->notify(audio->MESSAGE_NEW);

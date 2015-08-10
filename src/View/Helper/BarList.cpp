@@ -210,15 +210,26 @@ public:
 				foreach(Track *t, track->root->tracks){
 					if (t->type != t->TYPE_MIDI)
 						continue;
+					Set<int> del;
+					Array<MidiEvent> add;
 					foreachi(MidiEvent &e, t->midi, j){
 						if (e.pos <= pos){
 						}else if (e.pos > pos + l0){
-							e.pos += b.length - l0;
-							//t->addMidiEvent(e);
+							MidiEvent e2 = e;
+							e2.pos += b.length - l0;
+							add.add(e2);
+							del.add(j);
 						}else{
-							e.pos = pos + (float)(e.pos - pos) * (float)b.length / (float)l0;
+							MidiEvent e2 = e;
+							e2.pos = pos + (float)(e2.pos - pos) * (float)b.length / (float)l0;
+							add.add(e2);
+							del.add(j);
 						}
 					}
+					foreachb(int j, del)
+						t->deleteMidiEvent(j);
+					foreach(MidiEvent &e, add)
+						t->addMidiEvent(e);
 				}
 			}
 		}

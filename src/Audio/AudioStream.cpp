@@ -249,7 +249,7 @@ void AudioStream::stop()
 {
 	if (!playing)
 		return;
-	msg_db_f("Stream.stop", 1);
+	msg_db_f("Stream.stop", 0);
 
 	playing = false;
 	HuiCancelRunner(hui_runner_id);
@@ -293,7 +293,7 @@ void AudioStream::stream()
 {
 	reading = true;
 	read_more = false;
-	msg_db_f("stream", 1);
+	msg_db_f("stream", 0);
 
 	int size = 0;
 	BufferBox b;
@@ -333,7 +333,7 @@ void AudioStream::setSource(AudioRendererInterface *r)
 
 void AudioStream::play()
 {
-	msg_db_f("Stream.play", 1);
+	msg_db_f("Stream.play", 0);
 
 	/*if (dev_sample_rate != renderer->getSampleRate())
 		kill_dev();

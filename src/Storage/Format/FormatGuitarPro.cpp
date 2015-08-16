@@ -249,6 +249,8 @@ void FormatGuitarPro::loadAudio(StorageOperationData *od)
 		for (int i = 0; i < num_measures; i++){
 			for (int j = 0; j < num_tracks; j++)
 				read_measure(measures[i], tracks[j], offset);
+			if (measures[i].marker.num > 0)
+				a->tracks[0]->addMarker(offset, measures[i].marker);
 			offset += a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator;
 			a->tracks[0]->addBar(-1, tempo, measures[i].numerator, false);
 		}
@@ -409,6 +411,7 @@ void FormatGuitarPro::read_measure_header()
 	GpMeasure m;
 	if (measures.num > 0){
 		m = measures.back();
+		m.marker = "";
 	}else{
 		m.numerator = 1;
 		m.denominator = 1;

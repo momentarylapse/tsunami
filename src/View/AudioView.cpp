@@ -631,13 +631,18 @@ void AudioView::onLeftButtonDown()
 	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
 		deleteMidiNote(cur_track, selection.pitch, selection.note_start);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
+		msg_write("down");
 		midi_preview_renderer->resetMidiData();
+		msg_write("a");
 		midi_preview_renderer->setSynthesizer(cur_track->synth);
+		msg_write("b");
 
 		Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
 		foreach(int p, pitch)
 			midi_preview_renderer->add(MidiEvent(0, p, 1));
+		msg_write("c");
 		midi_preview_stream->play();
+		msg_write("d");
 	}
 
 	forceRedraw();
@@ -721,9 +726,12 @@ void AudioView::onLeftButtonUp()
 		if (cur_action)
 			audio->execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
+		msg_write("up");
 		cur_track->addMidiEvents(midi_notes_to_events(getCreationNotes()));
+		msg_write("a");
 
 		midi_preview_renderer->endAllNotes();
+		msg_write("b");
 	}
 	cur_action = NULL;
 

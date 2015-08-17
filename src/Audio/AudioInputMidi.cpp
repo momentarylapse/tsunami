@@ -70,9 +70,9 @@ void AudioInputMidi::init()
 void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 {
 	preview_renderer->setSynthesizer(s);
-	preview_renderer->setAutoStop(false);
+	/*preview_renderer->setAutoStop(false);
 	if (s and capturing)
-		preview_stream->play();
+		preview_stream->play();*/
 }
 
 bool AudioInputMidi::connectMidiPort(AudioInputMidi::MidiPort &p)
@@ -193,9 +193,9 @@ bool AudioInputMidi::start()
 	resetAccumulation();
 
 	clearInputQueue();
-	preview_renderer->setAutoStop(false);
+	/*preview_renderer->setAutoStop(false);
 	if (preview_renderer->getSynthesizer())
-		preview_stream->play();
+		preview_stream->play();*/
 
 	timer.reset();
 
@@ -208,7 +208,7 @@ void AudioInputMidi::stop()
 {
 	_stopUpdate();
 	capturing = false;
-	preview_renderer->setAutoStop(true);
+	//preview_renderer->setAutoStop(true);
 	preview_renderer->endAllNotes();
 	//preview_stream->stop();
 

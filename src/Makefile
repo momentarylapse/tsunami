@@ -67,7 +67,7 @@ OBJ = \
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
  Audio/Synth/SynthesizerRenderer.o\
- Audio/AudioInput.o\
+ Audio/AudioInputAny.o\
  Audio/AudioInputAudio.o\
  Audio/AudioInputMidi.o\
  Audio/AudioOutput.o\
@@ -457,8 +457,8 @@ Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 Audio/Synth/SynthesizerRenderer.o : Audio/Synth/SynthesizerRenderer.cpp
 	$(CPP) -c Audio/Synth/SynthesizerRenderer.cpp -o $@ $(CXXFLAGS)
 
-Audio/AudioInput.o : Audio/AudioInput.cpp
-	$(CPP) -c Audio/AudioInput.cpp -o $@ $(CXXFLAGS)
+Audio/AudioInputAny.o : Audio/AudioInputAny.cpp
+	$(CPP) -c Audio/AudioInputAny.cpp -o $@ $(CXXFLAGS)
 
 Audio/AudioInputAudio.o : Audio/AudioInputAudio.cpp
 	$(CPP) -c Audio/AudioInputAudio.cpp -o $@ $(CXXFLAGS)

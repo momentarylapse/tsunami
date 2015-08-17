@@ -142,6 +142,19 @@ AudioInputAudio::~AudioInputAudio()
 	stop();
 }
 
+void AudioInputAudio::__init__(int _sample_rate)
+{
+	new(this) AudioInputAudio(_sample_rate);
+}
+
+void AudioInputAudio::__delete__()
+{
+	stop();
+	current_buffer.clear();
+	buffer.clear();
+	chosen_device.clear();
+}
+
 
 Array<string> AudioInputAudio::getDevices()
 {

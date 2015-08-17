@@ -12,6 +12,7 @@ const float threshold = 0.1
 
 const int BUFFER_SIZE = 32768
 BufferBox buf
+InputStreamAudio *input
 
 Window *win
 
@@ -70,6 +71,7 @@ void Draw()
 	c.end()
 
 void OnClose()
+	delete input
 	delete win
 	win = nil
 
@@ -131,7 +133,8 @@ void main()
 	bufc.resize(1000)
 	fft_r2c(buf.r, bufc)
 	
-	input.start(TRACK_TYPE_AUDIO, freq)
+	input = new InputStreamAudio(freq)
+	input.start()
 	input.addObserver(nil, &UpdateInput)
 	
 	win.run()

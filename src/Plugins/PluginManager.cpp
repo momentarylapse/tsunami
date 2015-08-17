@@ -342,28 +342,31 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRenderer", "seek", Script::mf(&AudioRenderer::seek), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
 
-	/*{
+	{
 	AudioInputAudio input(0);
-	Script::DeclareClassSize("InputStream", sizeof(AudioInput));
-	Script::DeclareClassOffset("InputStream", "current_buffer", _offsetof(AudioInput, current_buffer));
-	Script::DeclareClassOffset("InputStream", "buffer", _offsetof(AudioInput, buffer));
-	Script::DeclareClassOffset("InputStream", "current_midi", _offsetof(AudioInput, current_midi));
-	Script::DeclareClassOffset("InputStream", "midi", _offsetof(AudioInput, midi));
-	Script::DeclareClassOffset("InputStream", "sample_rate", _offsetof(AudioInput, sample_rate));
-	Script::DeclareClassOffset("InputStream", "accumulating", _offsetof(AudioInput, accumulating));
-	Script::DeclareClassOffset("InputStream", "capturing", _offsetof(AudioInput, capturing));
-	Script::LinkExternal("InputStream.start", Script::mf(&AudioInput::start));
-	Script::LinkExternal("InputStream.resetSync", Script::mf(&AudioInput::resetSync));
-	Script::LinkExternal("InputStream.stop",	 Script::mf(&AudioInput::stop));
-	Script::LinkExternal("InputStream.isCapturing", Script::mf(&AudioInput::isCapturing));
-	Script::LinkExternal("InputStream.getSampleCount", Script::mf(&AudioInput::getSampleCount));
-	Script::LinkExternal("InputStream.accumulate", Script::mf(&AudioInput::accumulate));
-	Script::LinkExternal("InputStream.resetAccumulation", Script::mf(&AudioInput::resetAccumulation));
-	Script::LinkExternal("InputStream.getDelay", Script::mf(&AudioInput::getDelay));
-	Script::LinkExternal("InputStream.addObserver", Script::mf(&AudioInput::addWrappedObserver));
-	Script::LinkExternal("InputStream.removeObserver", Script::mf(&AudioInput::removeWrappedObserver));
+	Script::DeclareClassSize("InputStreamAudio", sizeof(AudioInputAudio));
+	Script::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(AudioInputAudio, current_buffer));
+	Script::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(AudioInputAudio, buffer));
+	Script::DeclareClassOffset("InputStreamAudio", "sample_rate", _offsetof(AudioInputAudio, sample_rate));
+	Script::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(AudioInputAudio, accumulating));
+	Script::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(AudioInputAudio, capturing));
+	Script::LinkExternal("InputStreamAudio.__init__", Script::mf(&AudioInputAudio::__init__));
+	Script::DeclareClassVirtualIndex("InputStreamAudio", "__delete__", Script::mf(&AudioInputAudio::__delete__), &input);
+	Script::LinkExternal("InputStreamAudio.start", Script::mf(&AudioInputAudio::start));
+	//Script::LinkExternal("InputStreamAudio.resetSync", Script::mf(&AudioInputAudio::resetSync));
+	Script::LinkExternal("InputStreamAudio.stop",	 Script::mf(&AudioInputAudio::stop));
+	Script::LinkExternal("InputStreamAudio.isCapturing", Script::mf(&AudioInputAudio::isCapturing));
+	Script::LinkExternal("InputStreamAudio.getSampleCount", Script::mf(&AudioInputAudio::getSampleCount));
+	Script::LinkExternal("InputStreamAudio.accumulate", Script::mf(&AudioInputAudio::accumulate));
+	Script::LinkExternal("InputStreamAudio.resetAccumulation", Script::mf(&AudioInputAudio::resetAccumulation));
+	//Script::LinkExternal("InputStreamAudio.getDelay", Script::mf(&AudioInputAudio::getDelay));
+	Script::LinkExternal("InputStreamAudio.addObserver", Script::mf(&AudioInputAudio::addWrappedObserver));
+	Script::LinkExternal("InputStreamAudio.removeObserver", Script::mf(&AudioInputAudio::removeWrappedObserver));
 	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
-	}*/
+	Script::DeclareClassVirtualIndex("InputStreamAudio", "getSampleRate", Script::mf(&AudioInputAudio::getSampleRate), &input);
+	Script::DeclareClassVirtualIndex("InputStreamAudio", "getSomeSamples", Script::mf(&AudioInputAudio::getSomeSamples), &input);
+	Script::DeclareClassVirtualIndex("InputStreamAudio", "getState", Script::mf(&AudioInputAudio::getState), &input);
+	}
 
 	AudioStream::JUST_FAKING_IT = true;
 	{

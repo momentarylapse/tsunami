@@ -15,12 +15,17 @@
 #include "../View/Helper/PeakMeter.h"
 
 struct pa_stream;
+class PluginManager;
 
 class AudioInputAudio : public PeakMeterSource
 {
+	friend class PluginManager;
 public:
 	AudioInputAudio(int sample_rate);
 	virtual ~AudioInputAudio();
+
+	void _cdecl __init__(int sample_rate);
+	virtual void _cdecl __delete__();
 
 	static const string MESSAGE_CAPTURE;
 
@@ -31,28 +36,28 @@ public:
 	static Array<string> getDevices();
 	static void setFavoriteDevice(const string &device);
 	static string getFavoriteDevice();
-	void setDevice(const string &device);
-	string getChosenDevice();
+	void _cdecl setDevice(const string &device);
+	string _cdecl getChosenDevice();
 
-	bool start();
-	void stop();
+	bool _cdecl start();
+	void _cdecl stop();
 
-	int getDelay();
-	void resetSync();
+	int _cdecl getDelay();
+	void _cdecl resetSync();
 
 	int doCapturing();
 
 
-	bool isCapturing();
+	bool _cdecl isCapturing();
 
 
-	void accumulate(bool enable);
-	void resetAccumulation();
-	int getSampleCount();
+	void _cdecl accumulate(bool enable);
+	void _cdecl resetAccumulation();
+	int _cdecl getSampleCount();
 
-	virtual float getSampleRate();
-	virtual void getSomeSamples(BufferBox &buf, int num_samples);
-	virtual int getState();
+	virtual float _cdecl getSampleRate();
+	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
+	virtual int _cdecl getState();
 
 	static float getPlaybackDelayConst();
 	static void setPlaybackDelayConst(float f);

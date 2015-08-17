@@ -12,37 +12,47 @@
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
 #include "../Data/RingBuffer.h"
-#include "AudioInput.h"
+#include "../View/Helper/PeakMeter.h"
 
 struct pa_stream;
 
-#define NUM_CAPTURE_SAMPLES		8192
-
-class AudioInputAudio : public AudioInput
+class AudioInputAudio : public PeakMeterSource
 {
 public:
 	AudioInputAudio(int sample_rate);
 	virtual ~AudioInputAudio();
 
+	static const string MESSAGE_CAPTURE;
+
+	void _startUpdate();
+	void _stopUpdate();
+	void update();
+
 	static Array<string> getDevices();
 	static void setFavoriteDevice(const string &device);
 	static string getFavoriteDevice();
-	virtual void setDevice(const string &device);
-	virtual string getChosenDevice();
+	void setDevice(const string &device);
+	string getChosenDevice();
 
-	virtual bool start();
-	virtual void stop();
+	bool start();
+	void stop();
 
-	virtual int getDelay();
-	virtual void resetSync();
+	int getDelay();
+	void resetSync();
 
-	virtual int doCapturing();
+	int doCapturing();
 
-	virtual void resetAccumulation();
-	virtual int getSampleCount();
+
+	bool isCapturing();
+
+
+	void accumulate(bool enable);
+	void resetAccumulation();
+	int getSampleCount();
 
 	virtual float getSampleRate();
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
+	virtual int getState();
 
 	static float getPlaybackDelayConst();
 	static void setPlaybackDelayConst(float f);
@@ -53,7 +63,18 @@ public:
 
 	static string temp_filename;
 
+
+	RingBuffer current_buffer;
+	BufferBox buffer;
+
 private:
+
+	int sample_rate;
+	bool accumulating;
+	bool capturing;
+
+	bool running;
+	int hui_runner_id;
 
 	int num_channels;
 

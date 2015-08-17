@@ -8,7 +8,6 @@
 #include "SettingsDialog.h"
 #include "../../Tsunami.h"
 #include "../../Audio/AudioOutput.h"
-#include "../../Audio/AudioInput.h"
 #include "../../Audio/AudioInputAudio.h"
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"

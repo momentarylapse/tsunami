@@ -18,7 +18,7 @@
 class ActionTrackMoveSample;
 class AudioOutput;
 class AudioStream;
-class AudioInput;
+class AudioInputAny;
 class AudioRenderer;
 class TsunamiWindow;
 class AudioViewTrack;
@@ -195,8 +195,8 @@ public:
 	AudioRenderer *renderer;
 	AudioStream *midi_preview_stream;
 	SynthesizerRenderer *midi_preview_renderer;
-	AudioInput *input;
-	void setInput(AudioInput *input);
+	AudioInputAny *input;
+	void setInput(AudioInputAny *input);
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);

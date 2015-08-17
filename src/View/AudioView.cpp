@@ -12,7 +12,7 @@
 #include "SideBar/SideBar.h"
 #include "BottomBar/BottomBar.h"
 #include "../Action/Track/Sample/ActionTrackMoveSample.h"
-#include "../Audio/AudioInput.h"
+#include "../Audio/AudioInputAny.h"
 #include "../Audio/AudioStream.h"
 #include "../Audio/AudioRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
@@ -1193,10 +1193,13 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 
 	// capturing preview
 	if (input and input->isCapturing()){
-		input->buffer.update_peaks(peak_mode);
+		if (input->type == Track::TYPE_AUDIO)
+			input->buffer->update_peaks(peak_mode);
 		if ((capturing_track >= 0) and (capturing_track < vtrack.num)){
-			vtrack[capturing_track]->drawBuffer(c, input->buffer, cam.pos - sel_range.offset, colors.capture_marker);
-			vtrack[capturing_track]->drawMidi(c, input->midi, sel_range.start());
+			if (input->type == Track::TYPE_AUDIO)
+				vtrack[capturing_track]->drawBuffer(c, *input->buffer, cam.pos - sel_range.offset, colors.capture_marker);
+			if (input->type == Track::TYPE_MIDI)
+				vtrack[capturing_track]->drawMidi(c, *input->midi, sel_range.start());
 		}
 	}
 
@@ -1391,7 +1394,7 @@ void AudioView::setCurLevel(int l)
 	notify(MESSAGE_CUR_LEVEL_CHANGE);
 }
 
-void AudioView::setInput(AudioInput *_input)
+void AudioView::setInput(AudioInputAny *_input)
 {
 	if (input)
 		unsubscribe(input);

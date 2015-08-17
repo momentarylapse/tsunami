@@ -11,7 +11,7 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/AudioFile.h"
-#include "AudioInput.h"
+#include "../View/Helper/PeakMeter.h"
 
 struct _snd_seq;
 struct _snd_seq_port_subscribe;
@@ -19,29 +19,45 @@ class AudioStream;
 class SynthesizerRenderer;
 class Synthesizer;
 
-class AudioInputMidi : public AudioInput
+class AudioInputMidi : public PeakMeterSource
 {
 public:
 
 	AudioInputMidi(int sample_rate);
 	virtual ~AudioInputMidi();
 
+
+	static const string MESSAGE_CAPTURE;
+
+	struct MidiPort
+	{
+		int client, port;
+		string client_name, port_name;
+		MidiPort();
+	};
+
 	void init();
 
-	virtual bool start();
-	virtual void stop();
-	virtual int doCapturing();
+	bool start();
+	void stop();
 
-	virtual bool isCapturing();
+	void _startUpdate();
+	void _stopUpdate();
+	void update();
+	int doCapturing();
 
-	virtual int getDelay();
-	virtual void resetSync();
+	bool isCapturing();
 
-	virtual void accumulate(bool enable);
-	virtual void resetAccumulation();
-	virtual int getSampleCount();
+	int getDelay();
+	void resetSync();
 
+	void accumulate(bool enable);
+	void resetAccumulation();
+	int getSampleCount();
+
+	virtual float getSampleRate();
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
+	virtual int getState();
 
 	Array<MidiPort> findMidiPorts();
 	MidiPort getCurMidiPort();
@@ -49,6 +65,12 @@ public:
 	bool unconnect();
 
 	void setPreviewSynthesizer(Synthesizer *s);
+
+
+	int sample_rate;
+
+	MidiData midi;
+	MidiData current_midi;
 
 private:
 
@@ -65,6 +87,9 @@ private:
 	double offset;
 	bool capturing;
 	bool accumulating;
+
+	bool running;
+	int hui_runner_id;
 
 	AudioStream *preview_stream;
 	SynthesizerRenderer *preview_renderer;

@@ -12,7 +12,8 @@
 #include "ExtendedBufferBox.h"
 #include "../View/Helper/Slider.h"
 #include "../Audio/AudioRenderer.h"
-#include "../Audio/AudioInput.h"
+#include "../Audio/AudioInputAudio.h"
+#include "../Audio/AudioInputMidi.h"
 #include "../Audio/AudioOutput.h"
 #include "../Audio/AudioStream.h"
 #include "../Audio/Synth/Synthesizer.h"
@@ -59,6 +60,12 @@ bool GlobalAllowTermination()
 {
 	return tsunami->AllowTermination();
 }
+
+class InputAudioWrapper
+{
+public:
+
+};
 
 void PluginManager::LinkAppScriptData()
 {

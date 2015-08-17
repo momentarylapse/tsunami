@@ -8,9 +8,8 @@
 #include "CaptureDialog.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
-#include "../../Audio/AudioInput.h"
+#include "../../Audio/AudioInputAny.h"
 #include "../../Audio/AudioInputAudio.h"
-#include "../../Audio/AudioInputMidi.h"
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
 #include "../../Audio/AudioRenderer.h"
@@ -27,7 +26,8 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	audio = a;
 	view = tsunami->win->view;
 	type = -1;
-	input = NULL;
+	input = new AudioInputAny(audio->sample_rate);
+	subscribe(input);
 
 	temp_synth = CreateSynthesizer("");
 
@@ -35,7 +35,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 
 
 	// dialog
-	peak_meter = new PeakMeter(this, "capture_level", NULL);
+	peak_meter = new PeakMeter(this, "capture_level", input);
 	setString("capture_time", a->get_time_str_long(0));
 	enable("capture_delete", false);
 	enable("capture_pause", false);
@@ -71,12 +71,11 @@ CaptureDialog::~CaptureDialog()
 {
 	view->stream->stop();
 
-	AudioInput *i = input;
-	setInput(NULL);
-	delete(i);
-
 	delete(peak_meter);
 	delete(temp_synth);
+
+	unsubscribe(input);
+	delete(input);
 }
 
 void CaptureDialog::onTarget()
@@ -203,16 +202,7 @@ void CaptureDialog::setType(int _type)
 		if (type != audio->tracks[target]->type)
 			setInt("capture_target", audio->tracks.num);
 
-	if (input){
-		AudioInput *i = input;
-		setInput(NULL);
-		delete(i);
-	}
-
-	if (type == Track::TYPE_AUDIO)
-		setInput(new AudioInputAudio(audio->sample_rate));
-	else if (type == Track::TYPE_MIDI)
-		setInput(new AudioInputMidi(audio->sample_rate));
+	input->setType(type);
 
 	reset("capture_source");
 	enable("capture_source", false);
@@ -230,25 +220,6 @@ void CaptureDialog::setType(int _type)
 		CapturingByDialog = false;
 		msg_db_l(1);
 		return;*/
-	}
-}
-
-void CaptureDialog::setInput(AudioInput *_input)
-{
-	// unset
-	if (input){
-		unsubscribe(input);
-		peak_meter->setSource(NULL);
-		view->setInput(NULL);
-	}
-
-	input = _input;
-
-	// set
-	if (input){
-		subscribe(input);
-		peak_meter->setSource(input);
-		view->setInput(input);
 	}
 }
 
@@ -349,11 +320,11 @@ bool CaptureDialog::insert()
 		audio->action_manager->beginActionGroup();
 		BufferBox tbuf = t->getBuffers(tsunami->win->view->cur_level, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->win->view->cur_level, r);
-		tbuf.set(input->buffer, 0, 1.0f);
+		tbuf.set(*input->buffer, 0, 1.0f);
 		audio->execute(a);
 		audio->action_manager->endActionGroup();
 	}else if (type == t->TYPE_MIDI){
-		t->insertMidiData(i0, input->midi);
+		t->insertMidiData(i0, *input->midi);
 	}
 	input->resetAccumulation();
 	return true;

@@ -3,11 +3,10 @@
 use "../api.kaba"
 use "../tone.kaba"
 
-const int freq = 44100
-const int f_min = 50
-const int f_max = 5000
+const int F_MIN = 50
+const int F_MAX = 5000
 
-const float threshold = 0.1
+const float THRESHOLD = 0.1
 
 
 const int BUFFER_SIZE = 32768
@@ -17,7 +16,7 @@ InputStreamAudio *input
 Window *win
 
 float get_freq(float i)
-	return i / (BUFFER_SIZE / 2) * freq / 2
+	return i / (BUFFER_SIZE / 2) * DEFAULT_SAMPLE_RATE / 2
 
 float Frequency, Volume, Error
 bool LoudEnough
@@ -94,7 +93,7 @@ void UpdateInput()
 	float fmax = 0, fmax2 = 0
 	for b,i in bufc
 		float f = get_freq(i)
-		if f > f_min and f < f_max
+		if f > F_MIN and f < F_MAX
 			float amp = abs(b.x)
 			//floatout f
 			if (amp > max * 2.5) or (amp > max and f < fmax2)
@@ -102,8 +101,8 @@ void UpdateInput()
 				fmax = f
 				fmax2 = f * 1.5
 	max /= sqrt(buf.num) * 2 * pi
-	Volume = clamp(max / threshold / 2, 0, 1)
-	if max > threshold
+	Volume = clamp(max / THRESHOLD / 2, 0, 1)
+	if max > THRESHOLD
 		LoudEnough = true
 		if abs(log(fmax / Frequency)) < 0.1
 			Frequency *= 1 + log(fmax / Frequency) * 0.1
@@ -115,9 +114,6 @@ void UpdateInput()
 		LoudEnough = false
 	win.redraw("drawing")
 
-
-complex[] bufc
-
 void main()
 	win = new FixedDialog("Tonerkennung", 300, 175, MainWin, false)
 	win.addDrawingArea("", 5, 5, 290, 135, "drawing")
@@ -128,12 +124,7 @@ void main()
 	win.eventS("hui:close", &OnClose)
 	win.eventS("close", &OnClose)
 	
-
-
-	bufc.resize(1000)
-	fft_r2c(buf.r, bufc)
-	
-	input = new InputStreamAudio(freq)
+	input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
 	input.start()
 	input.addObserver(nil, &UpdateInput)
 	

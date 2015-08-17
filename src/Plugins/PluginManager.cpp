@@ -209,11 +209,15 @@ void PluginManager::LinkAppScriptData()
 
 	SynthesizerRenderer synthren(NULL);
 	Script::DeclareClassSize("SynthesizerRenderer", sizeof(SynthesizerRenderer));
+	Script::LinkExternal("SynthesizerRenderer.__init__", Script::mf(&SynthesizerRenderer::__init__));
+	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "__delete__", Script::mf(&SynthesizerRenderer::__delete__), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "reset", Script::mf(&SynthesizerRenderer::reset), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "getSampleRate", Script::mf(&SynthesizerRenderer::getSampleRate), &synthren);
 	Script::LinkExternal("SynthesizerRenderer.add", Script::mf(&SynthesizerRenderer::add));
 	Script::LinkExternal("SynthesizerRenderer.resetMidiData", Script::mf(&SynthesizerRenderer::resetMidiData));
+	Script::LinkExternal("SynthesizerRenderer.setAutoStop", Script::mf(&SynthesizerRenderer::setAutoStop));
+	Script::LinkExternal("SynthesizerRenderer.setSynthesizer", Script::mf(&SynthesizerRenderer::setSynthesizer));
 
 
 	DummySynthesizer dsynth;

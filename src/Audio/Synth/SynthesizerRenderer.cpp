@@ -20,9 +20,9 @@ SynthesizerRenderer::~SynthesizerRenderer()
 {
 }
 
-void SynthesizerRenderer::__init__()
+void SynthesizerRenderer::__init__(Synthesizer *s)
 {
-	new(this) SynthesizerRenderer(NULL);
+	new(this) SynthesizerRenderer(s);
 }
 
 void SynthesizerRenderer::__delete__()

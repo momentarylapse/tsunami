@@ -21,7 +21,7 @@ public:
 	SynthesizerRenderer(Synthesizer *s);
 	virtual ~SynthesizerRenderer();
 
-	void __init__();
+	void __init__(Synthesizer *s);
 	virtual void __delete__();
 
 	Synthesizer *getSynthesizer(){ return s; }

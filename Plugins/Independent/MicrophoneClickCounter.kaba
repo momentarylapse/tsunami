@@ -1,0 +1,132 @@
+// Image = hui:find
+// Title[Deutsch] = Tonerkennung
+use "../api.kaba"
+use "../tone.kaba"
+
+const float THRESHOLD = 0.2
+const float FREEZE_TIME = 0.1
+
+
+InputStreamAudio *input
+OutputStream *stream
+Synthesizer *synth
+SynthesizerRenderer *renderer
+
+Window *win
+
+float Volume
+int counter
+
+bool active
+int last_active_pos
+
+
+void DrawVolume(Painter *c)
+	c.setColor(color(1, 0.8, 0.8, 0.8))
+	float y0 = 30
+	float y1 = c.height - 5
+	float h = y1 - y0
+	c.drawRect(5, y0 + h * (1 - Volume), 5, h)
+	c.setColor(color(1, 0.6, 0.6, 0.6))
+	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+
+void Draw()
+	Painter *c = win.beginDraw("drawing")
+	c.setColor(White)
+	c.setFontSize(12)
+	c.drawRect(0, 0, c.width, c.height)
+	
+	DrawVolume(c)
+	
+	c.setColor(Black)
+	c.drawStr(100, 100, counter.str())
+	c.end()
+
+void OnClose()
+	delete input
+	delete win
+	win = nil
+
+void UpdateInput()
+	int available = input.current_buffer.available()
+	
+	BufferBox buf
+	input.current_buffer.readRef(buf, available)
+	
+	float[] temp
+	temp = buf.r + buf.l
+	
+	int freeze_samples = DEFAULT_SAMPLE_RATE * FREEZE_TIME
+	
+	Volume = 0
+	for f,i in temp
+		if f > Volume
+			Volume = f
+		if f > THRESHOLD
+			if !active
+				print "start"
+				active = true
+				renderer.add(_MidiEvent(0, 80, 1))
+				renderer.add(_MidiEvent(1, 80, 0))
+				if !stream.isPlaying()
+					stream.play()
+				counter ++
+			last_active_pos = i
+		if active and (i > last_active_pos + freeze_samples)
+			print "end"
+			active = false
+	
+	last_active_pos -= temp.num
+	
+	win.redraw("drawing")
+
+void OnIncrease()
+	counter ++
+	win.redraw("drawing")
+
+void OnDecrease()
+	counter --
+	win.redraw("drawing")
+
+void main()
+	win = new Dialog("Click Counter", 300, 175, MainWin, false)
+	win.addGrid("", 0, 0, 1, 2, "grid")
+	win.setTarget("grid", 0)
+	win.addDrawingArea("", 0, 0, 0, 0, "drawing")
+	win.addGrid("", 0, 1, 3, 1, "grid2")
+	win.setTarget("grid2", 0)
+	win.addButton("+", 0, 0, 0, 0, "inc")
+	win.addButton("-", 1, 0, 0, 0, "dec")
+	win.addButton("Close", 2, 0, 0, 0, "close")
+	win.setImage("close", "hui:close")
+	
+	win.eventSX("drawing", "hui:draw", &Draw)
+	win.eventS("inc", &OnIncrease)
+	win.eventS("dec", &OnDecrease)
+	win.eventS("hui:close", &OnClose)
+	win.eventS("close", &OnClose)
+
+	counter = 0	
+	active = false
+	last_active_pos = -1
+	
+	
+	input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
+	input.start()
+	input.addObserver(nil, &UpdateInput)
+	
+	synth = CreateSynthesizer("")
+	renderer = new SynthesizerRenderer(synth)
+	renderer.setAutoStop(false)
+	stream = new OutputStream(renderer)
+	stream.setBufferSize(2048)
+	stream.play()
+	
+	win.run()
+	
+	input.removeObserver(nil)
+	input.stop()
+	
+	delete stream
+	delete renderer
+	delete synth

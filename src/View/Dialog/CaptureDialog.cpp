@@ -28,6 +28,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 	type = -1;
 	input = new AudioInputAny(audio->sample_rate);
 	subscribe(input);
+	view->setInput(input);
 
 	temp_synth = CreateSynthesizer("");
 
@@ -74,6 +75,7 @@ CaptureDialog::~CaptureDialog()
 	delete(peak_meter);
 	delete(temp_synth);
 
+	view->setInput(NULL);
 	unsubscribe(input);
 	delete(input);
 }

@@ -10,13 +10,13 @@
 #include "../Helper/Slider.h"
 #include "SampleRefDialog.h"
 
-SampleRefDialog::SampleRefDialog(AudioView *v, AudioFile *a):
+SampleRefDialog::SampleRefDialog(AudioView *v, Song *s):
 	SideBarConsole("Sample-Eigenschaften"),
 	Observer("SampleRefDialog")
 {
 	fromResource("sample_ref_dialog");
 	view = v;
-	audio = a;
+	song = s;
 	track = NULL;
 	sample = NULL;
 
@@ -26,7 +26,7 @@ SampleRefDialog::SampleRefDialog(AudioView *v, AudioFile *a):
 	event("repnum", this, &SampleRefDialog::onRepNum);
 	event("repdelay", this, &SampleRefDialog::onRepDelay);
 
-	event("edit_file", this, &SampleRefDialog::onEditFile);
+	event("edit_song", this, &SampleRefDialog::onEditSong);
 	event("edit_track", this, &SampleRefDialog::onEditTrack);
 
 	subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
@@ -93,9 +93,9 @@ void SampleRefDialog::onRepDelay()
 	subscribe(sample);
 }
 
-void SampleRefDialog::onEditFile()
+void SampleRefDialog::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::AUDIOFILE_CONSOLE);
+	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
 }
 
 void SampleRefDialog::onEditTrack()
@@ -121,7 +121,7 @@ void SampleRefDialog::loadData()
 	setFloat("volume", amplitude2db(sample->volume));
 	enable("volume", !sample->muted);
 	reset("level_track");
-	foreach(Track *t, audio->tracks)
+	foreach(Track *t, song->tracks)
 		addString("level_track", t->getNiceName());
 	setInt("level_track", sample->track_no);
 	setInt("repnum", sample->rep_num + 1);

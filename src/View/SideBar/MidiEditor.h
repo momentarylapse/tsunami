@@ -12,14 +12,14 @@
 #include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
-class AudioFile;
+class Song;
 class AudioView;
 class Track;
 
 class MidiEditor : public SideBarConsole, public Observer
 {
 public:
-	MidiEditor(AudioView *view, AudioFile *audio);
+	MidiEditor(AudioView *view, Song *audio);
 	virtual ~MidiEditor();
 
 	virtual void onUpdate(Observable *o, const string &message);
@@ -36,7 +36,7 @@ public:
 
 	void onEditTrack();
 	void onEditMidiFx();
-	void onEditFile();
+	void onEditSong();
 
 	void clear();
 	void setTrack(Track *t);
@@ -46,7 +46,7 @@ public:
 
 	AudioView *view;
 	Track *track;
-	AudioFile *audio;
+	Song *song;
 };
 
 #endif /* MIDIEDITOR_H_ */

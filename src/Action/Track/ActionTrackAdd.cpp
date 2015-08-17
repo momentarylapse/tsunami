@@ -6,10 +6,10 @@
  */
 
 #include "ActionTrackAdd.h"
-#include "../../Data/AudioFile.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../lib/hui/hui.h"
 #include <assert.h>
+#include "../../Data/Song.h"
 
 ActionTrackAdd::ActionTrackAdd(int _index, int _type)
 {
@@ -23,7 +23,7 @@ ActionTrackAdd::~ActionTrackAdd()
 
 void ActionTrackAdd::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	delete(a->tracks[index]);
 	a->tracks.erase(index);
 	a->notify(a->MESSAGE_DELETE_TRACK);
@@ -33,14 +33,14 @@ void ActionTrackAdd::undo(Data *d)
 
 void *ActionTrackAdd::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	assert((index >= 0) && (index <= a->tracks.num));
 
 	Track *t = new Track;
 
 	//t->name = format(_("Spur %d"), a->track.num + 1);
-	t->root = a;
+	t->song = a;
 	t->is_selected = true;
 	t->type = type;
 	t->levels.resize(a->level_names.num);

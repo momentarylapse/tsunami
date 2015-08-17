@@ -8,7 +8,7 @@
 #include "AudioViewTrack.h"
 #include "AudioView.h"
 #include "../Tsunami.h"
-#include "../Data/AudioFile.h"
+#include "../Data/Song.h"
 #include "../Audio/Synth/Synthesizer.h"
 
 void DrawStrBg(HuiPainter *c, float x, float y, const string &str, const color &fg, const color &bg);

@@ -19,7 +19,7 @@
 class SingleMidiFxPanel : public HuiPanel, public Observer
 {
 public:
-	SingleMidiFxPanel(AudioFile *a, Track *t, MidiEffect *_fx, int _index) :
+	SingleMidiFxPanel(Song *a, Track *t, MidiEffect *_fx, int _index) :
 		Observer("SingleMidiFxPanel")
 	{
 		audio = a;
@@ -105,7 +105,7 @@ public:
 		p->update();
 		old_param = fx->configToString();
 	}
-	AudioFile *audio;
+	Song *audio;
 	Track *track;
 	MidiEffect *fx;
 	ConfigPanel *p;
@@ -113,7 +113,7 @@ public:
 	int index;
 };
 
-MidiFxConsole::MidiFxConsole(AudioView *_view, AudioFile *_audio) :
+MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_audio) :
 	BottomBarConsole(_("Midi Fx")),
 	Observer("MidiFxConsole")
 {

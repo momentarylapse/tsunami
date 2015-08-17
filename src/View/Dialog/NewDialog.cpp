@@ -7,7 +7,7 @@
 
 #include "NewDialog.h"
 
-NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
+NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, Song *a):
 	HuiWindow("new_dialog", _parent, _allow_parent)
 {
 	audio = a;

@@ -13,7 +13,7 @@
 
 class Observer;
 class HuiWindow;
-class AudioFile;
+class Song;
 class AudioView;
 class SideBar;
 class BottomBar;
@@ -62,7 +62,7 @@ public:
 	void onMixingConsole();
 	void onFxConsole();
 	void onSampleImport();
-	void onAudioProperties();
+	void onSongProperties();
 	void onTrackProperties();
 	void onSampleProperties();
 	void onEditMarker();
@@ -97,7 +97,7 @@ public:
 
 	AudioView *view;
 
-	AudioFile *audio;
+	Song *song;
 
 	SideBar *side_bar;
 	BottomBar *bottom_bar;

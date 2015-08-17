@@ -10,7 +10,7 @@
 
 #include "../Stuff/Observable.h"
 
-class AudioFile;
+class Song;
 class Track;
 class Effect;
 class Configurable;
@@ -39,11 +39,11 @@ public:
 		Target();
 		Target(float *p);
 		Target(float *p, const string &name, const string &name_nice);
-		void fromString(const string &str, AudioFile *a);
-		string str(AudioFile *a);
-		string niceStr(AudioFile *a);
+		void fromString(const string &str, Song *a);
+		string str(Song *a);
+		string niceStr(Song *a);
 
-		static Array<Target> enumerate(AudioFile *a);
+		static Array<Target> enumerate(Song *a);
 		static void enumerateTrack(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
 		static void enumerateConfigurable(Configurable *c, Array<Target> &list, const string &prefix, const string &prefix_nice);
 		static void enumerateType(char *p, Script::Type *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
@@ -70,7 +70,7 @@ public:
 	void apply(int pos);
 	void unapply();
 
-	string getTargets(AudioFile *a);
+	string getTargets(Song *a);
 };
 
 #endif /* CURVE_H_ */

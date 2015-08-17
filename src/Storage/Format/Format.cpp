@@ -29,7 +29,7 @@ void Format::importData(Track *t, void *data, int channels, SampleFormat format,
 
 	Action *a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
 	buf.import(data, channels, format, samples);
-	t->root->action_manager->execute(a);
+	t->song->action_manager->execute(a);
 }
 
 
@@ -41,18 +41,18 @@ bool Format::canHandle(const string & _extension)
 	return false;
 }
 
-void Format::exportAudioAsTrack(StorageOperationData *od)
+void Format::exportAsTrack(StorageOperationData *od)
 {
 	BufferBox buf;
-	AudioRenderer renderer;
-	renderer.renderAudioFile(od->audio, od->audio->getRange(), buf);
+	SongRenderer renderer;
+	renderer.render(od->song, od->song->getRange(), buf);
 	od->buf = &buf;
 	saveBuffer(od);
 }
 
 
 
-bool Format::testFormatCompatibility(AudioFile *a)
+bool Format::testFormatCompatibility(Song *a)
 {
 	int num_subs = a->samples.num;
 	int num_fx = a->fx.num;

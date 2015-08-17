@@ -9,7 +9,7 @@
 #define CLIPBOARD_H_
 
 #include "Observable.h"
-class AudioFile;
+class Song;
 class BufferBox;
 class AudioView;
 class MidiData;
@@ -27,7 +27,7 @@ public:
 	bool canCopy(AudioView *view);
 
 private:
-	AudioFile *temp;
+	Song *temp;
 	Array<int> ref_uid;
 };
 

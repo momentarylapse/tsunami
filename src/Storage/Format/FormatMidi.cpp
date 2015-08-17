@@ -62,7 +62,7 @@ static string ascii2utf8(const string &s)
 	return r;
 }
 
-void FormatMidi::loadAudio(StorageOperationData *od)
+void FormatMidi::loadSong(StorageOperationData *od)
 {
 	File *f = NULL;
 	try{
@@ -107,7 +107,7 @@ void FormatMidi::loadAudio(StorageOperationData *od)
 			int offset = 0;
 			while(f->GetPos() < pos0 + tsize){
 				int v = read_var(f);
-				offset += (double)v * (double)mpqn / 1000000.0 * (double)od->audio->sample_rate / (double)ticks_per_beat;
+				offset += (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
 				int c0 = f->ReadByte();
 				if ((c0 & 128) == 0){ // "running status"
 					c0 = last_status;
@@ -175,7 +175,7 @@ void FormatMidi::loadAudio(StorageOperationData *od)
 			f->SetPos(pos0 + tsize, true);
 
 			if (events.num > 0){
-				Track *t = od->audio->addTrack(Track::TYPE_MIDI);
+				Track *t = od->song->addTrack(Track::TYPE_MIDI);
 				t->midi.append(events);
 				t->name = track_name;
 			}
@@ -189,7 +189,7 @@ void FormatMidi::loadAudio(StorageOperationData *od)
 	}
 }
 
-void FormatMidi::saveAudio(StorageOperationData *od)
+void FormatMidi::saveSong(StorageOperationData *od)
 {
 }
 

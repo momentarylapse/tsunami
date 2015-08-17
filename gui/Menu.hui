@@ -7,7 +7,7 @@ Menu menu "" disabled
 		Item save_as "Speichern unter..." image=hui:save-as
 		Item export_selection "Auswahl Exportieren..." image=hui:save-as
 		Separator "" ""
-		Item audio_file_properties "Eigenschaften" image=hui:properties
+		Item song_properties "Eigenschaften" image=hui:properties
 		Separator "" ""
 		Item exit "Beenden" image=hui:quit
 	Menu menu_edit "Bearbeiten"
@@ -81,7 +81,7 @@ Menu menu "" disabled
 		Separator "" ""
 		Menu menu_plugins_on_midi "Auf Midi"
 		Separator "" ""
-		Menu menu_plugins_on_audio "Auf Alles"
+		Menu menu_plugins_on_all "Auf Alles"
 		Menu menu_plugins_other "Eigenständig"
 	Menu menu_help "?"
 		Item help "Hilfe" image=hui:help

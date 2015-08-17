@@ -13,7 +13,7 @@
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
-class AudioFile;
+class Song;
 class MixingConsole;
 class PeakMeter;
 class AudioOutput;
@@ -51,7 +51,7 @@ public:
 class MixingConsole: public BottomBarConsole, public Observer
 {
 public:
-	MixingConsole(AudioFile *audio, AudioOutput *output, AudioStream *stream);
+	MixingConsole(Song *audio, AudioOutput *output, AudioStream *stream);
 	virtual ~MixingConsole();
 
 	void loadData();
@@ -63,7 +63,7 @@ public:
 	virtual void onShow();
 	virtual void onHide();
 
-	AudioFile *audio;
+	Song *audio;
 	AudioOutput *output;
 	PeakMeter *peak_meter;
 

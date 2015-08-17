@@ -88,7 +88,7 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 	MidiData midi;
 	midi.append(t->midi.getEvents(r));
 
-	t->root->action_manager->beginActionGroup();
+	t->song->action_manager->beginActionGroup();
 
 	foreachib(MidiEvent &e, t->midi, i)
 		if (r.is_inside(e.pos)){
@@ -97,7 +97,7 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 		}
 	process(&midi);
 	t->insertMidiData(0, midi);
-	t->root->action_manager->endActionGroup();
+	t->song->action_manager->endActionGroup();
 }
 
 

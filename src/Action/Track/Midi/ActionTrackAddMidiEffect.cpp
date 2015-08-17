@@ -21,7 +21,7 @@ ActionTrackAddMidiEffect::~ActionTrackAddMidiEffect()
 
 void *ActionTrackAddMidiEffect::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	Track *t = a->get_track(track_no);
 	t->midi.fx.add(effect);
@@ -32,7 +32,7 @@ void *ActionTrackAddMidiEffect::execute(Data *d)
 
 void ActionTrackAddMidiEffect::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	((Observable*)effect)->notify(effect->MESSAGE_DELETE);
 	Track *t = a->get_track(track_no);
 	t->midi.fx.pop();

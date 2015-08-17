@@ -6,11 +6,11 @@
  */
 
 #include "MixingConsole.h"
-#include "../../Data/AudioFile.h"
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
 #include "../Helper/PeakMeter.h"
 #include <math.h>
+#include "../../Data/Song.h"
 
 const float TrackMixer::DB_MIN = -1000000;
 const float TrackMixer::DB_MAX = 10;
@@ -75,7 +75,7 @@ float TrackMixer::vol2slider(float vol)
 void TrackMixer::onVolume()
 {
 	if (parent->isChecked("link-volumes"))
-		track->root->changeAllTrackVolumes(track, slider2vol(getFloat("")));
+		track->song->changeAllTrackVolumes(track, slider2vol(getFloat("")));
 	else
 		track->setVolume(slider2vol(getFloat("")));
 }
@@ -105,7 +105,7 @@ void TrackMixer::update()
 }
 
 
-MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, AudioStream *stream) :
+MixingConsole::MixingConsole(Song *_audio, AudioOutput *_output, AudioStream *stream) :
 	BottomBarConsole(_("Mischpult")),
 	Observer("MixingConsole")
 {

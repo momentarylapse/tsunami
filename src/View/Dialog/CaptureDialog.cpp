@@ -19,7 +19,7 @@
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
+CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *a):
 	HuiWindow("record_dialog", _parent, _allow_parent),
 	Observer("CaptureDialog")
 {

@@ -22,7 +22,7 @@ Tsunami *tsunami = NULL;
 Tsunami::Tsunami() :
 	HuiApplication("tsunami", "Deutsch", HUI_FLAG_LOAD_RESOURCE)
 {
-	audio = NULL;
+	song = NULL;
 	_view = NULL;
 	output = NULL;
 	log = NULL;
@@ -44,7 +44,7 @@ Tsunami::~Tsunami()
 {
 	delete(storage);
 	delete(output);
-	delete(audio);
+	delete(song);
 	delete(plugin_manager);
 }
 
@@ -65,8 +65,8 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	output = new AudioOutput;
 
-	audio = new AudioFile;
-	audio->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
+	song = new Song;
+	song->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
 
 	storage = new Storage;
 
@@ -85,8 +85,8 @@ bool Tsunami::onStartup(const Array<string> &arg)
 void Tsunami::_HandleArguments()
 {
 	if (_arg.num >= 2)
-		storage->load(audio, _arg[1]);
-	audio->notify(audio->MESSAGE_NEW);
+		storage->load(song, _arg[1]);
+	song->notify(song->MESSAGE_NEW);
 }
 
 bool Tsunami::HandleArguments(const Array<string> &arg)
@@ -96,20 +96,20 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 	if (arg[1] == "--info"){
 		if (arg.num < 3){
 			log->error(_("Aufruf: tsunami --info <Datei>"));
-		}else if (storage->load(audio, arg[2])){
-			msg_write(format("sample-rate: %d", audio->sample_rate));
-			msg_write(format("samples: %d", audio->getRange().num));
-			msg_write("length: " + audio->get_time_str(audio->getRange().num));
-			msg_write(format("tracks: %d", audio->tracks.num));
-			foreach(Tag &t, audio->tags)
+		}else if (storage->load(song, arg[2])){
+			msg_write(format("sample-rate: %d", song->sample_rate));
+			msg_write(format("samples: %d", song->getRange().num));
+			msg_write("length: " + song->get_time_str(song->getRange().num));
+			msg_write(format("tracks: %d", song->tracks.num));
+			foreach(Tag &t, song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
 		return false;
 	}else if (arg[1] == "--export"){
 		if (arg.num < 4){
 			log->error(_("Aufruf: tsunami --export <Datei> <Exportdatei>"));
-		}else if (storage->load(audio, arg[2])){
-			storage->save(audio, arg[3]);
+		}else if (storage->load(song, arg[2])){
+			storage->save(song, arg[3]);
 		}
 		return false;
 	}

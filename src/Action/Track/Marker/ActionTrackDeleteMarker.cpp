@@ -17,7 +17,7 @@ ActionTrackDeleteMarker::ActionTrackDeleteMarker(Track *t, int _index)
 
 void *ActionTrackDeleteMarker::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	Track *t = a->get_track(track_no);
 	assert(index >= 0);
@@ -32,7 +32,7 @@ void *ActionTrackDeleteMarker::execute(Data *d)
 
 void ActionTrackDeleteMarker::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	TrackMarker m;

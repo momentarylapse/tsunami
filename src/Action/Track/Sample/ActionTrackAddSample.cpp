@@ -6,7 +6,8 @@
  */
 
 #include "ActionTrackAddSample.h"
-#include "../../../Data/AudioFile.h"
+
+#include "../../../Data/Song.h"
 
 ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, int _index)
 {
@@ -17,7 +18,7 @@ ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, int _index)
 
 void ActionTrackAddSample::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->tracks[track_no];
 	SampleRef *s = t->samples.pop();
 	s->notify(s->MESSAGE_DELETE);
@@ -28,7 +29,7 @@ void ActionTrackAddSample::undo(Data *d)
 
 void *ActionTrackAddSample::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->tracks[track_no];
 	SampleRef *s = new SampleRef(a->samples[index]);
 	s->pos = pos;

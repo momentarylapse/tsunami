@@ -16,7 +16,7 @@
 class SingleFxPanel : public HuiPanel, public Observer
 {
 public:
-	SingleFxPanel(AudioFile *a, Track *t, Effect *_fx, int _index) :
+	SingleFxPanel(Song *a, Track *t, Effect *_fx, int _index) :
 		Observer("SingleFxPanel")
 	{
 		audio = a;
@@ -110,7 +110,7 @@ public:
 		p->update();
 		old_param = fx->configToString();
 	}
-	AudioFile *audio;
+	Song *audio;
 	Track *track;
 	Effect *fx;
 	string old_param;
@@ -118,7 +118,7 @@ public:
 	int index;
 };
 
-FxConsole::FxConsole(AudioView *_view, AudioFile *_audio) :
+FxConsole::FxConsole(AudioView *_view, Song *_audio) :
 	BottomBarConsole(_("Effekte")),
 	Observer("FxConsole")
 {

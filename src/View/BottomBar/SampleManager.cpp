@@ -6,7 +6,6 @@
  */
 
 #include "SampleManager.h"
-#include "../../Data/AudioFile.h"
 #include "../../Storage/Storage.h"
 #include "../../View/AudioView.h"
 #include "../../View/AudioViewTrack.h"
@@ -16,6 +15,8 @@
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include <math.h>
+
+#include "../../Data/Song.h"
 #include "../../lib/math/math.h"
 
 
@@ -105,7 +106,7 @@ public:
 	SampleManager *manager;
 };
 
-SampleManager::SampleManager(AudioFile *a) :
+SampleManager::SampleManager(Song *a) :
 	BottomBarConsole(_("Samples")),
 	Observer("SampleManager")
 {
@@ -127,8 +128,8 @@ SampleManager::SampleManager(AudioFile *a) :
 	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
 	event("sample_list", this, &SampleManager::onPreview);
 
-	preview_audio = new AudioFile;
-	preview_renderer = new AudioRenderer;
+	preview_audio = new Song;
+	preview_renderer = new SongRenderer;
 	preview_stream = new AudioStream(preview_renderer);
 	preview_sample = NULL;
 
@@ -321,7 +322,7 @@ void SampleManager::endPreview()
 class SampleSelector : public HuiDialog
 {
 public:
-	SampleSelector(HuiPanel *root, AudioFile *a, Sample *old) :
+	SampleSelector(HuiPanel *root, Song *a, Sample *old) :
 		HuiDialog("", 300, 400, root->win, false)
 	{
 		audio = a;
@@ -388,13 +389,13 @@ public:
 	static Sample *ret;
 	Sample *_old;
 	Array<string> icon_names;
-	AudioFile *audio;
+	Song *audio;
 	string list_id;
 };
 
 Sample *SampleSelector::ret;
 
-Sample *SampleManager::select(HuiPanel *root, AudioFile *a, Sample *old)
+Sample *SampleManager::select(HuiPanel *root, Song *a, Sample *old)
 {
 	SampleSelector *s = new SampleSelector(root, a, old);
 	s->run();

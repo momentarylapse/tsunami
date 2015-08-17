@@ -10,7 +10,7 @@
 #include "../Buffer/ActionTrackEditBuffer.h"
 #include "../Buffer/ActionTrack__DeleteBufferBox.h"
 
-ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(AudioFile *a, const Range &r, int level_no)
+ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(Song *a, const Range &r, int level_no)
 {
 	foreach(Track *t, a->tracks)
 		if (t->is_selected)
@@ -24,7 +24,7 @@ ActionTrackSampleFromSelection::~ActionTrackSampleFromSelection()
 
 void ActionTrackSampleFromSelection::CreateSubsFromTrack(Track *t, const Range &r, int level_no)
 {
-	AudioFile *a = t->root;
+	Song *a = t->song;
 	TrackLevel &l = t->levels[level_no];
 	foreachib(BufferBox &b, l.buffers, bi)
 		if (r.covers(b.range())){

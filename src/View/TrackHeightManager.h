@@ -11,7 +11,7 @@
 #include "../lib/hui/hui.h"
 #include "../lib/math/rect.h"
 
-class AudioFile;
+class Song;
 class AudioView;
 class Track;
 
@@ -27,9 +27,9 @@ public:
 	HuiTimer timer;
 	Track *midi_track;
 
-	bool check(AudioFile *a);
-	bool update(AudioView *v, AudioFile *a, const rect &r);
-	void plan(AudioView *v, AudioFile *a, const rect &r);
+	bool check(Song *s);
+	bool update(AudioView *v, Song *s, const rect &r);
+	void plan(AudioView *v, Song *s, const rect &r);
 };
 
 #endif /* SRC_VIEW_TRACKHEIGHTMANAGER_H_ */

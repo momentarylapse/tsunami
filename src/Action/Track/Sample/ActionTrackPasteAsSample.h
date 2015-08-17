@@ -11,7 +11,7 @@
 #include "../../ActionGroup.h"
 
 class Track;
-class AudioFile;
+class Song;
 class BufferBox;
 class MidiData;
 

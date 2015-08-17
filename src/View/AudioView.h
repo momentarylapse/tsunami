@@ -8,8 +8,8 @@
 #ifndef AUDIOVIEW_H_
 #define AUDIOVIEW_H_
 
+#include "../Data/Song.h"
 #include "../lib/hui/hui.h"
-#include "../Data/AudioFile.h"
 #include "../Stuff/Observer.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
@@ -19,7 +19,7 @@ class ActionTrackMoveSample;
 class AudioOutput;
 class AudioStream;
 class AudioInputAny;
-class AudioRenderer;
+class SongRenderer;
 class TsunamiWindow;
 class AudioViewTrack;
 class SynthesizerRenderer;
@@ -28,7 +28,7 @@ class PeakThread;
 class AudioView : public Observer, public Observable
 {
 public:
-	AudioView(TsunamiWindow *parent, AudioFile *audio, AudioOutput *output);
+	AudioView(TsunamiWindow *parent, Song *audio, AudioOutput *output);
 	virtual ~AudioView();
 
 	void checkConsistency();
@@ -189,10 +189,10 @@ public:
 
 	TsunamiWindow *win;
 
-	AudioFile *audio;
+	Song *audio;
 
 	AudioStream *stream;
-	AudioRenderer *renderer;
+	SongRenderer *renderer;
 	AudioStream *midi_preview_stream;
 	SynthesizerRenderer *midi_preview_renderer;
 	AudioInputAny *input;
@@ -227,7 +227,7 @@ public:
 	HuiMenu *menu_track;
 	HuiMenu *menu_sample;
 	HuiMenu *menu_marker;
-	HuiMenu *menu_audio;
+	HuiMenu *menu_song;
 };
 
 #endif /* AUDIOVIEW_H_ */

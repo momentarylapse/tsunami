@@ -21,7 +21,7 @@ ActionTrackToggleMidiEffectEnabled::~ActionTrackToggleMidiEffectEnabled()
 
 void *ActionTrackToggleMidiEffectEnabled::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	MidiEffect *fx = a->get_midi_fx(track_no, index);
 	fx->enabled = !fx->enabled;

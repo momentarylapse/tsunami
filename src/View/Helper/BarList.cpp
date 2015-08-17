@@ -6,8 +6,9 @@
  */
 
 #include "BarList.h"
+
+#include "../../Data/Song.h"
 #include "../../Tsunami.h"
-#include "../../Data/AudioFile.h"
 #include "../AudioView.h"
 
 
@@ -48,7 +49,7 @@ void BarList::fillList()
 	msg_db_f("FillBarList", 1);
 	panel->reset(id);
 	if (track){
-		int sample_rate = track->root->sample_rate;
+		int sample_rate = track->song->sample_rate;
 		int n = 1;
 		foreach(BarPattern &b, track->bars){
 			float duration = (float)b.length / (float)sample_rate;
@@ -117,7 +118,7 @@ void BarList::onListEdit()
 {
 	if (!track)
 		return;
-	int sample_rate = track->root->sample_rate;
+	int sample_rate = track->song->sample_rate;
 	int index = HuiGetEvent()->row;
 	BarPattern b = track->bars[index];
 	string text = panel->getCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
@@ -163,7 +164,7 @@ void BarList::onDelete()
 	if (!track)
 		return;
 	Array<int> s = panel->getSelection(id);
-	track->root->action_manager->beginActionGroup();
+	track->song->action_manager->beginActionGroup();
 
 	foreachb(int i, s){
 
@@ -174,7 +175,7 @@ void BarList::onDelete()
 		BarPattern b = track->bars[i];
 		int l0 = b.length;
 		if (panel->isChecked(id_link)){
-			foreach(Track *t, track->root->tracks){
+			foreach(Track *t, track->song->tracks){
 				if (t->type != t->TYPE_MIDI)
 					continue;
 				Set<int> del;
@@ -198,7 +199,7 @@ void BarList::onDelete()
 		}
 		track->deleteBar(i, panel->isChecked(id_link));
 	}
-	track->root->action_manager->endActionGroup();
+	track->song->action_manager->endActionGroup();
 	fillList();
 }
 
@@ -219,7 +220,7 @@ public:
 
 		BarPattern &b = track->bars[sel[0]];
 		setInt("beats", b.num_beats);
-		setFloat("bpm", track->root->sample_rate * 60.0f / (b.length / b.num_beats));
+		setFloat("bpm", track->song->sample_rate * 60.0f / (b.length / b.num_beats));
 		check("edit_bpm", true);
 
 		event("ok", this, &BarEditDialog::onOk);
@@ -233,16 +234,16 @@ public:
 		float bpm = getFloat("bpm");
 		bool edit_beats = isChecked("edit_beats");
 		bool edit_bpm = isChecked("edit_bpm");
-		track->root->action_manager->beginActionGroup();
+		track->song->action_manager->beginActionGroup();
 		foreachb(int i, sel){
 			BarPattern b = track->bars[i];
 			if (edit_beats)
 				b.num_beats = beats;
 			if (edit_bpm)
-				b.length = track->root->sample_rate * 60.0f * b.num_beats / bpm;
+				b.length = track->song->sample_rate * 60.0f * b.num_beats / bpm;
 			track->editBar(i, b, apply_to_midi);
 		}
-		track->root->action_manager->endActionGroup();
+		track->song->action_manager->endActionGroup();
 
 		delete(this);
 	}
@@ -276,7 +277,7 @@ public:
 			if (index >= 0)
 				b = track->bars[index];
 			setInt("beats", b.num_beats);
-			setFloat("bpm", track->root->sample_rate * 60.0f / (b.length / b.num_beats));
+			setFloat("bpm", track->song->sample_rate * 60.0f / (b.length / b.num_beats));
 		}
 
 		event("ok", this, &BarAddDialog::onOk);
@@ -289,12 +290,12 @@ public:
 		int count = getInt("count");
 		int beats = getInt("beats");
 		float bpm = getFloat("bpm");
-		track->root->action_manager->beginActionGroup();
+		track->song->action_manager->beginActionGroup();
 
 
 		for (int i=0; i<count; i++)
 			track->addBar(index, bpm, beats, apply_to_midi);
-		track->root->action_manager->endActionGroup();
+		track->song->action_manager->endActionGroup();
 
 		delete(this);
 	}

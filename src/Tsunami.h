@@ -14,13 +14,13 @@ extern string AppName;
 extern string AppVersion;
 
 
-class AudioFile;
+class Song;
 class PluginManager;
 class Slider;
 class Log;
 class AudioInput;
 class AudioOutput;
-class AudioRenderer;
+class SongRenderer;
 class AudioView;
 class Storage;
 class Clipboard;
@@ -48,7 +48,7 @@ public:
 	AudioView *_view;
 
 
-	AudioFile *audio;
+	Song *song;
 
 	Storage *storage;
 

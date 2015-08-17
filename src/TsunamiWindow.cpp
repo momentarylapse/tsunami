@@ -8,7 +8,6 @@
 #include "lib/hui/hui.h"
 #include "TsunamiWindow.h"
 #include "Tsunami.h"
-#include "Data/AudioFile.h"
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
@@ -27,6 +26,7 @@
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioStream.h"
 #include "Audio/AudioRenderer.h"
+#include "Data/Song.h"
 
 #include "Plugins/FastFourierTransform.h"
 
@@ -79,7 +79,7 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("edit_marker", "", -1, this, &TsunamiWindow::onEditMarker);
 	HuiAddCommandM("track_import", "", -1, this, &TsunamiWindow::onTrackImport);
 	HuiAddCommandM("sub_import", "", -1, this, &TsunamiWindow::onSampleImport);
-	HuiAddCommandM("audio_file_properties", "", KEY_F4, this, &TsunamiWindow::onAudioProperties);
+	HuiAddCommandM("song_properties", "", KEY_F4, this, &TsunamiWindow::onSongProperties);
 	HuiAddCommandM("track_properties", "", -1, this, &TsunamiWindow::onTrackProperties);
 	HuiAddCommandM("sample_properties", "", -1, this, &TsunamiWindow::onSampleProperties);
 	HuiAddCommandM("settings", "", -1, this, &TsunamiWindow::onSettings);
@@ -127,30 +127,30 @@ TsunamiWindow::TsunamiWindow() :
 	for (int i=0;i<256;i++)
 		event(format("jump_to_level_%d", i), this, &TsunamiWindow::onCurLevel);
 
-	audio = tsunami->audio;
+	song = tsunami->song;
 
 
-	view = new AudioView(this, audio, tsunami->output);
+	view = new AudioView(this, song, tsunami->output);
 
 	// side bar
-	side_bar = new SideBar(view, audio);
+	side_bar = new SideBar(view, song);
 	embed(side_bar, "main_table", 1, 0);
 
 	// bottom bar
-	bottom_bar = new BottomBar(view, audio, tsunami->output, tsunami->log);
+	bottom_bar = new BottomBar(view, song, tsunami->output, tsunami->log);
 	embed(bottom_bar, "root_table", 0, 1);
 	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->output);
 	embed(mini_bar, "root_table", 0, 2);
 
 	subscribe(view);
-	subscribe(audio);
+	subscribe(song);
 	subscribe(view->stream, AudioStream::MESSAGE_STATE_CHANGE);
 	subscribe(tsunami->clipboard);
 	subscribe(bottom_bar);
 
 
-	if (audio->tracks.num > 0)
-		view->setCurTrack(audio->tracks[0]);
+	if (song->tracks.num > 0)
+		view->setCurTrack(song->tracks[0]);
 	view->optimizeView();
 	HuiRunLaterM(0.5f, view, &AudioView::optimizeView);
 
@@ -160,7 +160,7 @@ TsunamiWindow::TsunamiWindow() :
 TsunamiWindow::~TsunamiWindow()
 {
 	unsubscribe(view);
-	unsubscribe(audio);
+	unsubscribe(song);
 	unsubscribe(view->stream);
 	unsubscribe(tsunami->clipboard);
 	unsubscribe(bottom_bar);
@@ -187,35 +187,35 @@ void TsunamiWindow::onAbout()
 
 void TsunamiWindow::onAddTrack()
 {
-	audio->addTrack(Track::TYPE_AUDIO);
+	song->addTrack(Track::TYPE_AUDIO);
 }
 
 void TsunamiWindow::onAddTimeTrack()
 {
-	audio->action_manager->beginActionGroup();
-	Track *t = audio->addTrack(Track::TYPE_TIME);
+	song->action_manager->beginActionGroup();
+	Track *t = song->addTrack(Track::TYPE_TIME);
 	if (t){
 		// some default data
 		for (int i=0; i<10; i++)
 			t->addBar(-1, 90, 4, false);
 	}
-	audio->action_manager->endActionGroup();
+	song->action_manager->endActionGroup();
 }
 
 void TsunamiWindow::onAddMidiTrack()
 {
-	audio->addTrack(Track::TYPE_MIDI);
+	song->addTrack(Track::TYPE_MIDI);
 }
 
 void TsunamiWindow::onDeleteTrack()
 {
-	if (audio->tracks.num < 2){
+	if (song->tracks.num < 2){
 		tsunami->log->error(_("Es muss mindestens eine Spur existieren"));
 		return;
 	}
 
 	if (view->cur_track)
-		audio->deleteTrack(get_track_index(view->cur_track));
+		song->deleteTrack(get_track_index(view->cur_track));
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
@@ -245,9 +245,9 @@ void TsunamiWindow::onTrackAddMarker()
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
 
-void TsunamiWindow::onAudioProperties()
+void TsunamiWindow::onSongProperties()
 {
-	side_bar->open(SideBar::AUDIOFILE_CONSOLE);
+	side_bar->open(SideBar::SONG_CONSOLE);
 }
 
 void TsunamiWindow::onTrackProperties()
@@ -290,12 +290,12 @@ void TsunamiWindow::onShowLog()
 
 void TsunamiWindow::onUndo()
 {
-	audio->action_manager->undo();
+	song->action_manager->undo();
 }
 
 void TsunamiWindow::onRedo()
 {
-	audio->action_manager->redo();
+	song->action_manager->redo();
 }
 
 void TsunamiWindow::onSendBugReport()
@@ -312,9 +312,9 @@ string title_filename(const string &filename)
 
 bool TsunamiWindow::allowTermination()
 {
-	if (audio->action_manager->isSave())
+	if (song->action_manager->isSave())
 		return true;
-	string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(audio->filename).c_str()), true);
+	string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(song->filename).c_str()), true);
 	if (answer == "hui:yes"){
 		/*if (!OnSave())
 			return false;*/
@@ -344,7 +344,7 @@ void TsunamiWindow::onFindAndExecutePlugin()
 
 void TsunamiWindow::onDelete()
 {
-	audio->deleteSelection(view->cur_level, view->sel_range, false);
+	song->deleteSelection(view->cur_level, view->sel_range, false);
 }
 
 void TsunamiWindow::onSampleManager()
@@ -379,14 +379,14 @@ void TsunamiWindow::onSettings()
 void TsunamiWindow::onTrackImport()
 {
 	if (tsunami->storage->askOpenImport(this)){
-		Track *t = audio->addTrack(Track::TYPE_AUDIO);
+		Track *t = song->addTrack(Track::TYPE_AUDIO);
 		tsunami->storage->loadTrack(t, HuiFilename, view->sel_range.start(), view->cur_level);
 	}
 }
 
 void TsunamiWindow::onRemoveSample()
 {
-	audio->deleteSelectedSamples();
+	song->deleteSelectedSamples();
 }
 
 void TsunamiWindow::onPlayLoop()
@@ -397,7 +397,7 @@ void TsunamiWindow::onPlayLoop()
 
 void TsunamiWindow::onPlay()
 {
-	view->renderer->prepare(audio, view->getPlaybackSelection(), true);
+	view->renderer->prepare(song, view->getPlaybackSelection(), true);
 	view->stream->play();
 }
 
@@ -413,23 +413,23 @@ void TsunamiWindow::onStop()
 
 void TsunamiWindow::onInsertSample()
 {
-	audio->insertSelectedSamples(view->cur_level);
+	song->insertSelectedSamples(view->cur_level);
 }
 
 void TsunamiWindow::onRecord()
 {
-	CaptureDialog *dlg = new CaptureDialog(this, false, audio);
+	CaptureDialog *dlg = new CaptureDialog(this, false, song);
 	dlg->run();
 }
 
 void TsunamiWindow::onAddLevel()
 {
-	audio->addLevel("");
+	song->addLevel("");
 }
 
 void TsunamiWindow::onDeleteLevel()
 {
-	audio->deleteLevel(view->cur_level, true);
+	song->deleteLevel(view->cur_level, true);
 }
 
 void TsunamiWindow::onCurLevel()
@@ -449,7 +449,7 @@ void TsunamiWindow::onCurLevelDown()
 
 void TsunamiWindow::onSampleFromSelection()
 {
-	audio->createSamplesFromSelection(view->cur_level, view->sel_range);
+	song->createSamplesFromSelection(view->cur_level, view->sel_range);
 }
 
 void TsunamiWindow::onViewOptimal()
@@ -503,11 +503,11 @@ void TsunamiWindow::updateMenu()
 	bool selected = !view->sel_range.empty();
 // menu / toolbar
 	// edit
-	enable("undo", audio->action_manager->undoable());
-	enable("redo", audio->action_manager->redoable());
+	enable("undo", song->action_manager->undoable());
+	enable("redo", song->action_manager->redoable());
 	enable("copy", tsunami->clipboard->canCopy(view));
 	enable("paste", tsunami->clipboard->hasData());
-	enable("delete", selected or (audio->getNumSelectedSamples() > 0));
+	enable("delete", selected or (song->getNumSelectedSamples() > 0));
 	// file
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);
@@ -515,13 +515,13 @@ void TsunamiWindow::updateMenu()
 	enable("delete_track", view->cur_track);
 	enable("track_properties", view->cur_track);
 	// level
-	enable("level_delete", audio->level_names.num > 1);
-	enable("level_up", view->cur_level < audio->level_names.num -1);
+	enable("level_delete", song->level_names.num > 1);
+	enable("level_up", view->cur_level < song->level_names.num -1);
 	enable("level_down", view->cur_level > 0);
 	// sub
 	enable("sample_from_selection", selected);
-	enable("insert_sample", audio->getNumSelectedSamples() > 0);
-	enable("remove_sample", audio->getNumSelectedSamples() > 0);
+	enable("insert_sample", song->getNumSelectedSamples() > 0);
+	enable("remove_sample", song->getNumSelectedSamples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
 	enable("stop", view->stream->isPlaying());
@@ -535,13 +535,13 @@ void TsunamiWindow::updateMenu()
 	HuiMenu *m = getMenu()->getSubMenuByID("menu_level_target");
 	if (m){
 		m->clear();
-		for (int i=0; i<audio->level_names.num; i++)
-			m->addItemCheckable(audio->getNiceLevelName(i), format("jump_to_level_%d", i));
+		for (int i=0; i<song->level_names.num; i++)
+			m->addItemCheckable(song->getNiceLevelName(i), format("jump_to_level_%d", i));
 		check(format("jump_to_level_%d", view->cur_level), true);
 	}
 
-	string title = title_filename(audio->filename) + " - " + AppName;
-	if (!audio->action_manager->isSave())
+	string title = title_filename(song->filename) + " - " + AppName;
+	if (!song->action_manager->isSave())
 		title = "*" + title;
 	setTitle(title);
 }
@@ -565,7 +565,7 @@ void TsunamiWindow::onNew()
 {
 	if (!allowTermination())
 		return;
-	NewDialog *d = new NewDialog(this, false, audio);
+	NewDialog *d = new NewDialog(this, false, song);
 	d->run();
 }
 
@@ -575,27 +575,27 @@ void TsunamiWindow::onOpen()
 	if (!allowTermination())
 		return;
 	if (tsunami->storage->askOpen(this))
-		tsunami->storage->load(audio, HuiFilename);
+		tsunami->storage->load(song, HuiFilename);
 }
 
 
 void TsunamiWindow::onSave()
 {
-	if (audio->filename == "")
+	if (song->filename == "")
 		onSaveAs();
 	else
-		tsunami->storage->save(audio, audio->filename);
+		tsunami->storage->save(song, song->filename);
 }
 
 
 void TsunamiWindow::onSaveAs()
 {
 	if (tsunami->storage->askSave(this))
-		tsunami->storage->save(audio, HuiFilename);
+		tsunami->storage->save(song, HuiFilename);
 }
 
 void TsunamiWindow::onExport()
 {
 	if (tsunami->storage->askSaveExport(this))
-		tsunami->storage->_export(audio, view->getPlaybackSelection(), HuiFilename);
+		tsunami->storage->_export(song, view->getPlaybackSelection(), HuiFilename);
 }

@@ -19,12 +19,12 @@
 
 
 
-MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
+MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
 	SideBarConsole(_("Midi")),
 	Observer("MidiEditor")
 {
 	view = _view;
-	audio = _audio;
+	song = _song;
 
 	fromResource("midi_editor");
 
@@ -59,7 +59,7 @@ MidiEditor::MidiEditor(AudioView *_view, AudioFile *_audio) :
 	event("chord_inversion", this, &MidiEditor::onChordInversion);
 	event("edit_track", this, &MidiEditor::onEditTrack);
 	event("edit_midi_fx", this, &MidiEditor::onEditMidiFx);
-	event("edit_file", this, &MidiEditor::onEditFile);
+	event("edit_song", this, &MidiEditor::onEditSong);
 
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
@@ -69,7 +69,7 @@ MidiEditor::~MidiEditor()
 {
 	clear();
 	unsubscribe(view);
-	unsubscribe(audio);
+	unsubscribe(song);
 }
 
 void MidiEditor::update()
@@ -154,9 +154,9 @@ void MidiEditor::onEditMidiFx()
 	tsunami->win->bottom_bar->open(BottomBar::TRACK_MIDI_FX_CONCOLE);
 }
 
-void MidiEditor::onEditFile()
+void MidiEditor::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::AUDIOFILE_CONSOLE);
+	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
 }
 
 void MidiEditor::clear()

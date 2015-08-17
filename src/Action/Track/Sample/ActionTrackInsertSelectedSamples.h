@@ -9,12 +9,12 @@
 #define ACTIONTRACKINSERTSELECTEDSAMPLES_H_
 
 #include "../../ActionGroup.h"
-class AudioFile;
+class Song;
 
 class ActionTrackInsertSelectedSamples : public ActionGroup
 {
 public:
-	ActionTrackInsertSelectedSamples(AudioFile *a, int level_no);
+	ActionTrackInsertSelectedSamples(Song *a, int level_no);
 	virtual ~ActionTrackInsertSelectedSamples();
 };
 

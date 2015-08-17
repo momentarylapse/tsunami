@@ -6,8 +6,8 @@
  */
 
 #include "Sample.h"
-#include "AudioFile.h"
 #include "../lib/math/math.h"
+#include "Song.h"
 
 const string Sample::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 const string Sample::MESSAGE_REFERENCE = "Reference";

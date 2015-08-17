@@ -8,9 +8,9 @@
 #ifndef PLUGINMANAGER_H_
 #define PLUGINMANAGER_H_
 
+#include "../Data/Song.h"
 #include "../lib/hui/hui.h"
 #include "../lib/script/script.h"
-#include "../Data/AudioFile.h"
 
 class Plugin;
 class Effect;

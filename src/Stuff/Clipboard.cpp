@@ -6,17 +6,17 @@
  */
 
 #include "Clipboard.h"
-#include "../Data/AudioFile.h"
 #include "../View/AudioView.h"
 #include "../Action/Track/Sample/ActionTrackPasteAsSample.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include <assert.h>
+#include "../Data/Song.h"
 
 Clipboard::Clipboard() :
 	Observable("Clipboard")
 {
-	temp = new AudioFile;
+	temp = new Song;
 	temp->reset();
 }
 
@@ -40,7 +40,7 @@ void Clipboard::copy(AudioView *view)
 		return;
 	clear();
 
-	AudioFile *a = view->audio;
+	Song *a = view->audio;
 
 	temp->sample_rate = a->sample_rate;
 
@@ -71,7 +71,7 @@ void Clipboard::paste(AudioView *view)
 {
 	if (!hasData())
 		return;
-	AudioFile *a = view->audio;
+	Song *a = view->audio;
 
 	Array<string> temp_type, dest_type;
 	foreach(Track *t, a->tracks){

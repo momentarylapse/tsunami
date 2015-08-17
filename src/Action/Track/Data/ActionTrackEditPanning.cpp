@@ -21,7 +21,7 @@ ActionTrackEditPanning::~ActionTrackEditPanning()
 
 void *ActionTrackEditPanning::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	t->panning = new_value;
@@ -32,7 +32,7 @@ void *ActionTrackEditPanning::execute(Data *d)
 
 void ActionTrackEditPanning::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	t->panning = old_value;

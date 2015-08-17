@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrack__AbsorbBufferBox.h"
-#include "../../../Data/AudioFile.h"
+#include "../../../Data/Song.h"
 
 ActionTrack__AbsorbBufferBox::ActionTrack__AbsorbBufferBox(Track *t, int _level_no, int _dest, int _src)
 {
@@ -22,7 +22,7 @@ ActionTrack__AbsorbBufferBox::~ActionTrack__AbsorbBufferBox()
 
 void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	TrackLevel &l = t->levels[level_no];
 
@@ -47,7 +47,7 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 
 void ActionTrack__AbsorbBufferBox::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	TrackLevel &l = t->levels[level_no];
 

@@ -20,8 +20,8 @@ public:
 	void loadTrack(StorageOperationData *od);
 	void saveBuffer(StorageOperationData *od);
 
-	void loadAudio(StorageOperationData *od);
-	void saveAudio(StorageOperationData *od);
+	void loadSong(StorageOperationData *od);
+	void saveSong(StorageOperationData *od);
 
 	int version;
 
@@ -41,7 +41,7 @@ public:
 	Array<GpMeasure> measures;
 	int tempo;
 
-	AudioFile *a;
+	Song *a;
 	File *f;
 
 	void read_info();

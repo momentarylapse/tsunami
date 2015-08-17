@@ -13,7 +13,7 @@
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
 
-class AudioFile;
+class Song;
 class Track;
 class SampleRef;
 
@@ -30,7 +30,7 @@ public:
 	int get_index();
 	Range getRange();
 
-	AudioFile *owner;
+	Song *owner;
 
 	string name;
 	int type;

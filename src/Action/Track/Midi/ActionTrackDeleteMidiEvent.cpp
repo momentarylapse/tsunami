@@ -15,7 +15,7 @@ ActionTrackDeleteMidiEvent::ActionTrackDeleteMidiEvent(Track* t, int _index)
 
 void* ActionTrackDeleteMidiEvent::execute(Data* d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	event = t->midi[index];
@@ -25,7 +25,7 @@ void* ActionTrackDeleteMidiEvent::execute(Data* d)
 
 void ActionTrackDeleteMidiEvent::undo(Data* d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	t->midi.insert(event, index);

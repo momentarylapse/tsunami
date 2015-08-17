@@ -1,0 +1,6 @@
+Menu popup_song_menu ""
+	Item song_menu_header "Datei" disabled
+	Separator "" ""
+	Item add_track "Leere Spur hinzufügen"
+	Item add_midi_track "Midi Spur hinzufügen"
+	Item song_properties "Eigenschaften"

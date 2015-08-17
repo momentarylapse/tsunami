@@ -17,7 +17,7 @@
 #include "../AudioView.h"
 #include "MiniBar.h"
 
-BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
+BottomBar::BottomBar(AudioView *view, Song *audio, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
 {
 	addRevealer("!slide-up", 0, 0, 0, 0, "revealer");

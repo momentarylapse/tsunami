@@ -19,8 +19,8 @@ public:
 	void loadTrack(StorageOperationData *od);
 	void saveBuffer(StorageOperationData *od);
 
-	void loadAudio(StorageOperationData *od);
-	void saveAudio(StorageOperationData *od);
+	void loadSong(StorageOperationData *od);
+	void saveSong(StorageOperationData *od);
 
 	void read_chunk(File *f);
 	void read_samples(File *f);
@@ -47,7 +47,7 @@ public:
 
 	void read_sample_header(File *f, sfSample &s);
 
-	AudioFile *audio;
+	Song *song;
 	StorageOperationData *od;
 };
 

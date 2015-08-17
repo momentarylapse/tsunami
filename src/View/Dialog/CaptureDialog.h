@@ -10,10 +10,10 @@
 
 
 #include "../../lib/hui/hui.h"
-#include "../../Data/AudioFile.h"
 #include "../Helper/PeakMeter.h"
 #include "../../Stuff/Observer.h"
 #include "../../Audio/AudioInputMidi.h"
+#include "../../Data/Song.h"
 
 class AudioView;
 class AudioInputAny;
@@ -21,7 +21,7 @@ class AudioInputAny;
 class CaptureDialog : public HuiWindow, public Observer
 {
 public:
-	CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a);
+	CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *a);
 	virtual ~CaptureDialog();
 
 	void onTypeAudio();
@@ -49,7 +49,7 @@ public:
 	void setTarget(int index);
 	void setType(int type);
 
-	AudioFile *audio;
+	Song *audio;
 	AudioView *view;
 	AudioInputAny *input;
 	PeakMeter *peak_meter;

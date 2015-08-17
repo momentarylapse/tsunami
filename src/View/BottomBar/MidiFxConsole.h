@@ -12,13 +12,13 @@
 #include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
-class AudioFile;
+class Song;
 class AudioView;
 
 class MidiFxConsole : public BottomBarConsole, public Observer
 {
 public:
-	MidiFxConsole(AudioView *view, AudioFile *audio);
+	MidiFxConsole(AudioView *view, Song *audio);
 	virtual ~MidiFxConsole();
 
 	virtual void onUpdate(Observable *o, const string &message);
@@ -34,7 +34,7 @@ public:
 
 	AudioView *view;
 	Track *track;
-	AudioFile *audio;
+	Song *audio;
 	Array<HuiPanel*> panels;
 };
 

@@ -9,13 +9,13 @@
 #define NEWDIALOG_H_
 
 
+#include "../../Data/Song.h"
 #include "../../lib/hui/hui.h"
-#include "../../Data/AudioFile.h"
 
 class NewDialog: public HuiWindow
 {
 public:
-	NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a);
+	NewDialog(HuiWindow *_parent, bool _allow_parent, Song *a);
 	virtual ~NewDialog();
 
 	void loadData();
@@ -26,7 +26,7 @@ public:
 	void onMetronome();
 	void onTypeMidi();
 
-	AudioFile *audio;
+	Song *audio;
 };
 
 #endif /* NEWDIALOG_H_ */

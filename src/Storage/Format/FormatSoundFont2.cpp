@@ -13,6 +13,10 @@
 FormatSoundFont2::FormatSoundFont2() :
 	Format("SoundFont2", "sf2", FLAG_AUDIO | FLAG_TAGS | FLAG_SUBS | FLAG_READ)
 {
+	song = NULL;
+	sample_offset = 0;
+	sample_count = 0;
+	od = NULL;
 }
 
 FormatSoundFont2::~FormatSoundFont2()
@@ -27,10 +31,10 @@ void FormatSoundFont2::saveBuffer(StorageOperationData *od)
 {
 }
 
-void FormatSoundFont2::loadAudio(StorageOperationData *_od)
+void FormatSoundFont2::loadSong(StorageOperationData *_od)
 {
 	od = _od;
-	audio = od->audio;
+	song = od->song;
 
 	File *f = FileOpen(od->filename);
 	f->SetBinaryMode(true);
@@ -149,7 +153,7 @@ void FormatSoundFont2::read_samples(File *f)
 		f->ReadBuffer(data, num_samples*2);
 		buf.resize(num_samples);
 		buf.import(data, 1, SAMPLE_FORMAT_16, num_samples);// / 2);
-		audio->addSample(s.name, buf);
+		song->addSample(s.name, buf);
 		delete data;
 
 		samples_read += num_samples;
@@ -157,6 +161,6 @@ void FormatSoundFont2::read_samples(File *f)
 	}
 }
 
-void FormatSoundFont2::saveAudio(StorageOperationData *od)
+void FormatSoundFont2::saveSong(StorageOperationData *od)
 {
 }

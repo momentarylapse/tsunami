@@ -8,7 +8,7 @@
 #ifndef AUDIORENDERER_H_
 #define AUDIORENDERER_H_
 
-#include "../Data/AudioFile.h"
+#include "../Data/Song.h"
 
 class AudioRendererInterface : public VirtualBase
 {
@@ -27,20 +27,19 @@ public:
 	virtual int getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
 };
 
-class AudioRenderer : public AudioRendererInterface
+class SongRenderer : public AudioRendererInterface
 {
 public:
-	AudioRenderer();
-	virtual ~AudioRenderer();
+	SongRenderer();
+	virtual ~SongRenderer();
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 
-	void renderAudioFile(AudioFile *a, const Range &range, BufferBox &buf);
-	//BufferBox RenderAudioFilePart(AudioFile *a, const Range &range);
+	void render(Song *a, const Range &range, BufferBox &buf);
 	virtual int read(BufferBox &buf);
 	virtual void reset();
-	void prepare(AudioFile *a, const Range &range, bool alllow_loop);
+	void prepare(Song *a, const Range &range, bool alllow_loop);
 
 	virtual void seek(int pos);
 
@@ -59,9 +58,9 @@ private:
 	void make_fake_track(Track *t, BufferBox &buf);
 	void bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list);
 	void bb_render_track_fx(BufferBox &buf, Track *t, int ti);
-	void bb_render_audio_no_fx(BufferBox &buf);
+	void bb_render_song_no_fx(BufferBox &buf);
 
-	AudioFile *audio;
+	Song *song;
 	Range _range;
 	Range range_cur;
 	int pos;

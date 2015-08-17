@@ -9,7 +9,7 @@
 #define SAMPLEREFDIALOG_H_
 
 #include "SideBar.h"
-class AudioFile;
+class Song;
 class Track;
 class SampleRef;
 class AudioView;
@@ -17,7 +17,7 @@ class AudioView;
 class SampleRefDialog: public SideBarConsole, public Observer
 {
 public:
-	SampleRefDialog(AudioView *view, AudioFile *audio);
+	SampleRefDialog(AudioView *view, Song *song);
 	virtual ~SampleRefDialog();
 
 	void loadData();
@@ -30,13 +30,13 @@ public:
 	void onRepNum();
 	void onRepDelay();
 
-	void onEditFile();
+	void onEditSong();
 	void onEditTrack();
 
 	virtual void onUpdate(Observable *o, const string &message);
 
 	AudioView *view;
-	AudioFile *audio;
+	Song *song;
 	Track *track;
 	SampleRef *sample;
 };

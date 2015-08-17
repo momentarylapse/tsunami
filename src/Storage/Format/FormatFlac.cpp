@@ -47,7 +47,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 				buf.r[i] = buffer[j][i] / scale;
 			else
 				buf.l[i] = buffer[j][i] / scale;
-	flac_track->root->execute(a);
+	flac_track->song->execute(a);
 
 	flac_read_samples += frame->header.blocksize;
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
@@ -68,7 +68,7 @@ void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stre
 			string s = (char*)metadata->data.vorbis_comment.comments[i].entry;
 			int pos = s.find("=");
 			if (pos >= 0)
-				flac_track->root->addTag(s.head(pos).lower(), s.tail(s.num - pos - 1));
+				flac_track->song->addTag(s.head(pos).lower(), s.tail(s.num - pos - 1));
 		}
 	}else{
 		tsunami->log->warning("flac_metadata_callback: unhandled type: " + i2s(metadata->type));
@@ -94,7 +94,7 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_flac_file", 1);
 	Track *t = od->track;
-	t->root->action_manager->beginActionGroup();
+	t->song->action_manager->beginActionGroup();
 	bool ok = true;
 
 	flac_file_size = 1000000000;
@@ -139,10 +139,10 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 
 
 	if (t->get_index() == 0){
-		t->root->setSampleRate(flac_freq);
-		t->root->setDefaultFormat(format_for_bits(flac_bits));
+		t->song->setSampleRate(flac_freq);
+		t->song->setDefaultFormat(format_for_bits(flac_bits));
 	}
-	t->root->action_manager->endActionGroup();
+	t->song->action_manager->endActionGroup();
 }
 
 
@@ -160,16 +160,16 @@ static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 
 
-void FormatFlac::saveAudio(StorageOperationData *od)
+void FormatFlac::saveSong(StorageOperationData *od)
 {
-	exportAudioAsTrack(od);
+	exportAsTrack(od);
 }
 
 
 
 void FormatFlac::saveBuffer(StorageOperationData *od)
 {
-	AudioFile *a = od->audio;
+	Song *a = od->song;
 	BufferBox *b = od->buf;
 
 	bool ok = true;
@@ -258,9 +258,9 @@ void FormatFlac::saveBuffer(StorageOperationData *od)
 
 
 
-void FormatFlac::loadAudio(StorageOperationData *od)
+void FormatFlac::loadSong(StorageOperationData *od)
 {
-	od->track = od->audio->addTrack(Track::TYPE_AUDIO, 0);
+	od->track = od->song->addTrack(Track::TYPE_AUDIO, 0);
 	loadTrack(od);
 }
 

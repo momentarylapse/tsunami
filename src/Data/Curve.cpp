@@ -6,10 +6,10 @@
  */
 
 #include "Curve.h"
-#include "AudioFile.h"
 #include "../Plugins/Effect.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../lib/script/script.h"
+#include "Song.h"
 
 Curve::Target::Target()
 {
@@ -28,7 +28,7 @@ Curve::Target::Target(float *_p, const string &name, const string &name_nice)
 	temp_name_nice = name_nice;
 }
 
-string Curve::Target::str(AudioFile *a)
+string Curve::Target::str(Song *a)
 {
 	Array<Target> list = enumerate(a);
 	foreach(Target &t, list)
@@ -37,7 +37,7 @@ string Curve::Target::str(AudioFile *a)
 	return "";
 }
 
-string Curve::Target::niceStr(AudioFile *a)
+string Curve::Target::niceStr(Song *a)
 {
 	Array<Target> list = enumerate(a);
 	foreach(Target &t, list)
@@ -46,7 +46,7 @@ string Curve::Target::niceStr(AudioFile *a)
 	return "";
 }
 
-Array<Curve::Target> Curve::Target::enumerate(AudioFile *a)
+Array<Curve::Target> Curve::Target::enumerate(Song *a)
 {
 	Array<Target> list;
 	foreachi(Track *t, a->tracks, i)
@@ -147,7 +147,7 @@ void Curve::unapply()
 	}
 }
 
-string Curve::getTargets(AudioFile *a)
+string Curve::getTargets(Song *a)
 {
 	string tt;
 	foreachi(Target &t, targets, i){

@@ -22,7 +22,7 @@ ActionTrackDeleteBar::~ActionTrackDeleteBar()
 
 void *ActionTrackDeleteBar::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	assert(index >= 0);
 	assert(index < t->bars.num);
@@ -36,7 +36,7 @@ void *ActionTrackDeleteBar::execute(Data *d)
 
 void ActionTrackDeleteBar::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	assert(t);
 	assert(index >= 0);

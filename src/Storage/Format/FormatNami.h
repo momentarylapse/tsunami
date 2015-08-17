@@ -19,13 +19,13 @@ public:
 	void loadTrack(StorageOperationData *od);
 	void saveBuffer(StorageOperationData *od);
 
-	void loadAudio(StorageOperationData *od);
-	void saveAudio(StorageOperationData *od);
+	void loadSong(StorageOperationData *od);
+	void saveSong(StorageOperationData *od);
 
 	string compress_buffer(BufferBox &b);
 
 	Array<int> ChunkPos;
-	void make_consistent(AudioFile *a);
+	void make_consistent(Song *s);
 
 	void BeginChunk(const string &name);
 	void EndChunk();
@@ -46,7 +46,7 @@ public:
 	void WriteFormat();
 
 	File *f;
-	AudioFile *audio;
+	Song *song;
 };
 
 #endif /* FORMATNAMI_H_ */

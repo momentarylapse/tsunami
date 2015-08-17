@@ -20,7 +20,7 @@ ActionTrackAddMidiEvent::ActionTrackAddMidiEvent(Track* t, const MidiEvent& e)
 
 void* ActionTrackAddMidiEvent::execute(Data* d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	t->midi.insert(event, insert_index);
@@ -30,7 +30,7 @@ void* ActionTrackAddMidiEvent::execute(Data* d)
 
 void ActionTrackAddMidiEvent::undo(Data* d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	t->midi.erase(insert_index);

@@ -32,7 +32,7 @@ const int AudioView::BARRIER_DIST = 8;
 int get_track_index_save(Track *t)
 {
 	if (t){
-		foreachi(Track *tt, tsunami->audio->tracks, i)
+		foreachi(Track *tt, tsunami->song->tracks, i)
 			if (t == tt)
 				return i;
 	}
@@ -89,7 +89,7 @@ public:
 	}
 };
 
-AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_output) :
+AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) :
 	Observer("AudioView"),
 	Observable("AudioView"),
 	cam(this)
@@ -164,7 +164,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	peak_thread = new PeakThread(this);
 	is_updating_peaks = false;
 
-	renderer = new AudioRenderer;
+	renderer = new SongRenderer;
 	stream = new AudioStream(renderer);
 
 	midi_preview_renderer = new SynthesizerRenderer(NULL);
@@ -195,7 +195,7 @@ AudioView::AudioView(TsunamiWindow *parent, AudioFile *_audio, AudioOutput *_out
 	parent->activate("area");
 
 
-	menu_audio = HuiCreateResourceMenu("popup_audio_file_menu");
+	menu_song = HuiCreateResourceMenu("popup_song_menu");
 	menu_track = HuiCreateResourceMenu("popup_track_menu");
 	menu_sample = HuiCreateResourceMenu("popup_sample_menu");
 	menu_marker = HuiCreateResourceMenu("popup_marker_menu");
@@ -592,10 +592,10 @@ void deleteMidiNote(Track *t, int pitch, int start)
 			}
 		}
 
-	t->root->action_manager->beginActionGroup();
+	t->song->action_manager->beginActionGroup();
 	foreachb(int i, events)
 		t->deleteMidiEvent(i);
-	t->root->action_manager->endActionGroup();
+	t->song->action_manager->endActionGroup();
 }
 
 void AudioView::onLeftButtonDown()
@@ -766,7 +766,7 @@ void AudioView::onRightButtonDown()
 		menu_track->enable("track_edit_midi", cur_track->type == Track::TYPE_MIDI);
 		menu_track->openPopup(win, 0, 0);
 	}else if (!selection.track)
-		menu_audio->openPopup(win, 0, 0);
+		menu_song->openPopup(win, 0, 0);
 }
 
 
@@ -787,7 +787,7 @@ void AudioView::onLeftDoubleClick()
 		}else if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE) or ((selection.track) and ((selection.type == SEL_TYPE_SELECTION_START) or (selection.type == SEL_TYPE_SELECTION_END)))){
 			win->side_bar->open(SideBar::TRACK_CONSOLE);
 		}else if (!selection.track){
-			win->side_bar->open(SideBar::AUDIOFILE_CONSOLE);
+			win->side_bar->open(SideBar::SONG_CONSOLE);
 		}
 		selection.type = SEL_TYPE_NONE;
 	}
@@ -1347,14 +1347,14 @@ void AudioView::selectTrack(Track *t, bool diff)
 		return;
 	if (diff){
 		bool is_only_selected = true;
-		foreach(Track *tt, t->root->tracks)
+		foreach(Track *tt, t->song->tracks)
 			if ((tt->is_selected) and (tt != t))
 				is_only_selected = false;
 		t->is_selected = !t->is_selected or is_only_selected;
 	}else{
 		if (!t->is_selected){
 			// unselect all tracks
-			foreach(Track *tt, t->root->tracks)
+			foreach(Track *tt, t->song->tracks)
 				tt->is_selected = false;
 		}
 

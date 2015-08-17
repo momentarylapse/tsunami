@@ -88,7 +88,7 @@ public:
 	string old_param;
 };
 
-SynthConsole::SynthConsole(AudioView *_view, AudioFile *_audio) :
+SynthConsole::SynthConsole(AudioView *_view, Song *_audio) :
 	BottomBarConsole(_("Synthesizer")),
 	Observer("SynthConsole")
 {

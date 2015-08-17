@@ -20,7 +20,7 @@ ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()
 
 void *ActionTrack__DeleteEmpty::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0 && index < a->tracks.num);
 	Track *t = a->tracks[index];
 	int num_buf = 0;
@@ -43,7 +43,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 
 void ActionTrack__DeleteEmpty::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	a->tracks.insert(track, index);
 	a->notify(a->MESSAGE_ADD_TRACK);
 }

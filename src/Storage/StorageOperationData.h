@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 
-class AudioFile;
+class Song;
 class Progress;
 class HuiWindow;
 class BufferBox;
@@ -19,10 +19,10 @@ class Track;
 class StorageOperationData
 {
 public:
-	StorageOperationData(AudioFile *a, Track *t, BufferBox *b, const string &filename, const string &message, HuiWindow *win);
+	StorageOperationData(Song *s, Track *t, BufferBox *b, const string &filename, const string &message, HuiWindow *win);
 	virtual ~StorageOperationData();
 
-	AudioFile *audio;
+	Song *song;
 	Progress *progress;
 	string filename;
 	BufferBox *buf;

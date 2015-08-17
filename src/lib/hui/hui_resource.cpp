@@ -138,6 +138,8 @@ HuiResource *HuiGetResource(const string &id)
 	foreach(HuiResource &r, _HuiResource_)
 		if (r.id == id)
 			return &r;
+	if (id.num > 0)
+		msg_error("hui-id not found: " + id);
 	return NULL;
 }
 

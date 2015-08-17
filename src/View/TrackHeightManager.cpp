@@ -21,7 +21,7 @@ TrackHeightManager::TrackHeightManager()
 
 
 
-bool TrackHeightManager::check(AudioFile *a)
+bool TrackHeightManager::check(Song *a)
 {
 	return true;
 }
@@ -34,7 +34,7 @@ rect rect_inter(const rect &a, const rect &b, float t)
 			(1-t) * a.y2 + t * b.y2);
 }
 
-bool TrackHeightManager::update(AudioView *v, AudioFile *a, const rect &r)
+bool TrackHeightManager::update(AudioView *v, Song *a, const rect &r)
 {
 	Track *new_midi_track = (v->editingMidi() ? v->cur_track : NULL);
 	if ((dirty) or (render_area != r) or (midi_track != new_midi_track)){
@@ -75,7 +75,7 @@ bool TrackHeightManager::update(AudioView *v, AudioFile *a, const rect &r)
 	return animating;
 }
 
-void TrackHeightManager::plan(AudioView *v, AudioFile *a, const rect &r)
+void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 {
 	if (v->editingMidi()){
 		float y0 = v->TIME_SCALE_HEIGHT;

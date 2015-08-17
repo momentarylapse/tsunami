@@ -28,25 +28,25 @@ void AudioRendererInterface::__delete__()
 {
 }
 
-AudioRenderer::AudioRenderer()
+SongRenderer::SongRenderer()
 {
 	effect = NULL;
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
-	audio = NULL;
+	song = NULL;
 }
 
-AudioRenderer::~AudioRenderer()
+SongRenderer::~SongRenderer()
 {
 }
 
-void AudioRenderer::__init__()
+void SongRenderer::__init__()
 {
-	new(this) AudioRenderer;
+	new(this) SongRenderer;
 }
 
-void AudioRenderer::__delete__()
+void SongRenderer::__delete__()
 {
 	midi.clear();
 }
@@ -66,7 +66,7 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 	return !ir.empty();
 }
 
-void AudioRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
+void SongRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_f("bb_render_audio_track_no_fx", 1);
 
@@ -106,7 +106,7 @@ void make_silence(BufferBox &buf, int size)
 	}
 }
 
-void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
+void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_f("bb_render_time_track_no_fx", 1);
 
@@ -119,7 +119,7 @@ void AudioRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	t->synth->read(buf);
 }
 
-void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
+void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 {
 	msg_db_f("bb_render_midi_track_no_fx", 1);
 
@@ -136,7 +136,7 @@ void AudioRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 	t->synth->read(buf);
 }
 
-void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
+void SongRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
 {
 	msg_db_f("bb_render_track_no_fx", 1);
 
@@ -148,16 +148,16 @@ void AudioRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
 		bb_render_midi_track_no_fx(buf, t, ti);
 }
 
-void AudioRenderer::make_fake_track(Track *t, BufferBox &buf)
+void SongRenderer::make_fake_track(Track *t, BufferBox &buf)
 {
 	//msg_write("fake track");
-	t->root = audio;
+	t->song = song;
 	t->levels.resize(1);
 	t->levels[0].buffers.resize(1);
 	t->levels[0].buffers[0].set_as_ref(buf, 0, range_cur.length());
 }
 
-void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)
+void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)
 {
 	msg_db_f("bb_apply_fx", 1);
 
@@ -176,7 +176,7 @@ void AudioRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_lis
 			fx->apply(buf, &fake_track, false);
 }
 
-void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
+void SongRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 {
 	msg_db_f("bb_render_track_fx", 1);
 
@@ -186,7 +186,7 @@ void AudioRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 		bb_apply_fx(buf, t, t->fx);
 }
 
-int get_first_usable_track(AudioFile *a)
+int get_first_usable_track(Song *a)
 {
 	foreachi(Track *t, a->tracks, i)
 		if ((!t->muted) && (t->is_selected))
@@ -194,70 +194,70 @@ int get_first_usable_track(AudioFile *a)
 	return -1;
 }
 
-void AudioRenderer::bb_render_audio_no_fx(BufferBox &buf)
+void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 {
 	msg_db_f("bb_render_audio_no_fx", 1);
 
 	// any un-muted track?
-	int i0 = get_first_usable_track(audio);
+	int i0 = get_first_usable_track(song);
 	if (i0 < 0){
 		// no -> return silence
 		buf.resize(range_cur.length());
 	}else{
 
 		// first (un-muted) track
-		bb_render_track_fx(buf, audio->tracks[i0], i0);
+		bb_render_track_fx(buf, song->tracks[i0], i0);
 		buf.make_own();
-		buf.scale(audio->tracks[i0]->volume, audio->tracks[i0]->panning);
+		buf.scale(song->tracks[i0]->volume, song->tracks[i0]->panning);
 
 		// other tracks
-		for (int i=i0+1;i<audio->tracks.num;i++){
-			if ((audio->tracks[i]->muted) || (!audio->tracks[i]->is_selected))
+		for (int i=i0+1;i<song->tracks.num;i++){
+			if ((song->tracks[i]->muted) || (!song->tracks[i]->is_selected))
 				continue;
 			BufferBox tbuf;
-			bb_render_track_fx(tbuf, audio->tracks[i], i);
+			bb_render_track_fx(tbuf, song->tracks[i], i);
 			buf.make_own();
-			buf.add(tbuf, 0, audio->tracks[i]->volume, audio->tracks[i]->panning);
+			buf.add(tbuf, 0, song->tracks[i]->volume, song->tracks[i]->panning);
 		}
 
-		buf.scale(audio->volume);
+		buf.scale(song->volume);
 	}
 }
 
-void apply_curves(AudioFile *audio, int pos)
+void apply_curves(Song *audio, int pos)
 {
 	foreach(Curve *c, audio->curves)
 		c->apply(pos);
 }
 
-void unapply_curves(AudioFile *audio)
+void unapply_curves(Song *audio)
 {
 	foreach(Curve *c, audio->curves)
 		c->unapply();
 }
 
-void AudioRenderer::read_basic(BufferBox &buf, int pos, int size)
+void SongRenderer::read_basic(BufferBox &buf, int pos, int size)
 {
 	range_cur = Range(pos, size);
 
-	apply_curves(audio, pos);
+	apply_curves(song, pos);
 
 	// render without fx
-	bb_render_audio_no_fx(buf);
+	bb_render_song_no_fx(buf);
 
 	// apply global fx
-	if (audio->fx.num > 0)
-		bb_apply_fx(buf, NULL, audio->fx);
+	if (song->fx.num > 0)
+		bb_apply_fx(buf, NULL, song->fx);
 
-	unapply_curves(audio);
+	unapply_curves(song);
 }
 
-int AudioRenderer::read(BufferBox &buf)
+int SongRenderer::read(BufferBox &buf)
 {
 	msg_db_f("AudioRenderer.read", 1);
 	int size = max(min(buf.num, _range.end() - pos), 0);
 
-	if (audio->curves.num >= 0){
+	if (song->curves.num >= 0){
 		buf.resize(size);
 		int chunk = 128;
 		for (int d=0; d<size; d+=chunk){
@@ -275,17 +275,17 @@ int AudioRenderer::read(BufferBox &buf)
 	return size;
 }
 
-void AudioRenderer::renderAudioFile(AudioFile *a, const Range &range, BufferBox &buf)
+void SongRenderer::render(Song *s, const Range &range, BufferBox &buf)
 {
-	prepare(a, range, false);
+	prepare(s, range, false);
 	buf.resize(range.num);
 	read(buf);
 }
 
-void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool _allow_loop)
+void SongRenderer::prepare(Song *s, const Range &__range, bool _allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
-	audio = a;
+	song = s;
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
@@ -294,14 +294,14 @@ void AudioRenderer::prepare(AudioFile *a, const Range &__range, bool _allow_loop
 	reset();
 }
 
-void AudioRenderer::reset()
+void SongRenderer::reset()
 {
-	foreach(Effect *fx, audio->fx)
+	foreach(Effect *fx, song->fx)
 		fx->prepare();
-	foreachi(Track *t, audio->tracks, i){
+	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
 		midi.add(t->midi);
-		t->synth->setSampleRate(audio->sample_rate);
+		t->synth->setSampleRate(song->sample_rate);
 		t->synth->reset();
 		foreach(Effect *fx, t->fx)
 			fx->prepare();
@@ -315,14 +315,14 @@ void AudioRenderer::reset()
 		effect->prepare();
 }
 
-int AudioRenderer::getSampleRate()
+int SongRenderer::getSampleRate()
 {
-	return audio->sample_rate;
+	return song->sample_rate;
 }
 
-void AudioRenderer::seek(int _pos)
+void SongRenderer::seek(int _pos)
 {
 	pos = _pos;
-	foreach(Track *t, audio->tracks)
+	foreach(Track *t, song->tracks)
 		t->synth->reset();//endAllNotes();
 }

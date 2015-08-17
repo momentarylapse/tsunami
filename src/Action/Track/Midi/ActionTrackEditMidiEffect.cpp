@@ -24,7 +24,7 @@ ActionTrackEditMidiEffect::~ActionTrackEditMidiEffect()
 
 void *ActionTrackEditMidiEffect::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	MidiEffect *fx = a->get_midi_fx(track_no, index);
 
@@ -36,7 +36,7 @@ void *ActionTrackEditMidiEffect::execute(Data *d)
 
 void ActionTrackEditMidiEffect::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	MidiEffect *fx = a->get_midi_fx(track_no, index);
 

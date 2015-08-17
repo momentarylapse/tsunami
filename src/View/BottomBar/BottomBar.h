@@ -12,7 +12,7 @@
 #include "../../Stuff/Observer.h"
 
 class AudioView;
-class AudioFile;
+class Song;
 class AudioOutput;
 class Track;
 class FxConsole;
@@ -35,7 +35,7 @@ public:
 class BottomBar : public HuiPanel, public Observable
 {
 public:
-	BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log);
+	BottomBar(AudioView *view, Song *audio, AudioOutput *output, Log *log);
 	virtual ~BottomBar();
 
 	void onClose();

@@ -31,9 +31,9 @@ FormatOgg::~FormatOgg()
 {
 }
 
-void FormatOgg::saveAudio(StorageOperationData *od)
+void FormatOgg::saveSong(StorageOperationData *od)
 {
-	exportAudioAsTrack(od);
+	exportAsTrack(od);
 }
 
 
@@ -52,7 +52,7 @@ int oe_write_page(ogg_page *page, FILE *fp)
 void FormatOgg::saveBuffer(StorageOperationData *od)
 {
 	msg_db_r("write_ogg_file", 1);
-	AudioFile *a = od->audio;
+	Song *a = od->song;
 	BufferBox *b = od->buf;
 
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
@@ -186,9 +186,9 @@ void FormatOgg::saveBuffer(StorageOperationData *od)
 
 
 
-void FormatOgg::loadAudio(StorageOperationData *od)
+void FormatOgg::loadSong(StorageOperationData *od)
 {
-	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	od->track = od->song->addTrack(Track::TYPE_AUDIO);
 	loadTrack(od);
 }
 
@@ -212,10 +212,10 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 		freq = vi->rate;
 	}
 	if (t->get_index() == 0)
-		t->root->setSampleRate(freq);
+		t->song->setSampleRate(freq);
 
 	// tags
-	t->root->tags.clear();
+	t->song->tags.clear();
 	char **ptr = ov_comment(&vf,-1)->user_comments;
 	while(*ptr){
 		string s = *ptr;
@@ -223,7 +223,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 			Tag tag;
 			tag.key = s.substr(0, s.find("=")).lower();
 			tag.value = s.substr(s.find("=") + 1, -1);
-			t->root->tags.add(tag);
+			t->song->tags.add(tag);
 		}
 		++ptr;
     }

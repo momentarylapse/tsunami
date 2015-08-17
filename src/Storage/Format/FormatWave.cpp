@@ -26,7 +26,7 @@ FormatWave::~FormatWave()
 void FormatWave::saveBuffer(StorageOperationData *od)
 {
 	msg_db_f("write_wave_file", 1);
-	AudioFile *a = od->audio;
+	Song *a = od->song;
 	BufferBox *b = od->buf;
 
 	SampleFormat format = a->default_format;
@@ -122,14 +122,14 @@ void FormatWave::loadTrack(StorageOperationData *od)
 				throw ::format("wave file has format %d (1 or 3 expected)", format_code);
 			channels = *(short*)&header[2];
 			freq = *(int*)&header[4];
-			t->root->sample_rate = freq;
+			t->song->sample_rate = freq;
 			block_align = *(short*)&header[12];
 			bits = *(short*)&header[14];
 			byte_per_sample = (bits / 8) * channels;
 
 			format = format_for_bits(bits);
 			if (t->get_index() == 0)
-				t->root->setDefaultFormat(format);
+				t->song->setDefaultFormat(format);
 
 			fmt_chunk_read = true;
 		}else if (chunk_name == "data"){
@@ -186,16 +186,16 @@ void FormatWave::loadTrack(StorageOperationData *od)
 		FileClose(f);
 }
 
-void FormatWave::saveAudio(StorageOperationData *od)
+void FormatWave::saveSong(StorageOperationData *od)
 {
-	exportAudioAsTrack(od);
+	exportAsTrack(od);
 }
 
 
 
-void FormatWave::loadAudio(StorageOperationData *od)
+void FormatWave::loadSong(StorageOperationData *od)
 {
-	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	od->track = od->song->addTrack(Track::TYPE_AUDIO);
 	loadTrack(od);
 }
 

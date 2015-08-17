@@ -8,9 +8,9 @@
 #ifndef AUDIOOUTPUT_H_
 #define AUDIOOUTPUT_H_
 
+#include "../Data/Song.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
-#include "../Data/AudioFile.h"
 
 class AudioStream;
 class AudioInputAudio;

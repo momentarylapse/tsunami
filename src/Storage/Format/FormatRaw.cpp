@@ -114,16 +114,16 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 		FileClose(f);
 }
 
-void FormatRaw::saveAudio(StorageOperationData *od)
+void FormatRaw::saveSong(StorageOperationData *od)
 {
-	exportAudioAsTrack(od);
+	exportAsTrack(od);
 }
 
 
 
-void FormatRaw::loadAudio(StorageOperationData *od)
+void FormatRaw::loadSong(StorageOperationData *od)
 {
-	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	od->track = od->song->addTrack(Track::TYPE_AUDIO);
 	loadTrack(od);
 }
 

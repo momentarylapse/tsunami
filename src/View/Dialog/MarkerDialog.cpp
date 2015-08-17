@@ -42,10 +42,10 @@ void MarkerDialog::onOk()
 {
 	if (index >= 0){
 		// cheap solution...
-		track->root->action_manager->beginActionGroup();
+		track->song->action_manager->beginActionGroup();
 		track->deleteMarker(index);
 		track->addMarker(pos, getString("text"));
-		track->root->action_manager->endActionGroup();
+		track->song->action_manager->endActionGroup();
 	}else{
 		track->addMarker(pos, getString("text"));
 	}

@@ -22,7 +22,7 @@ ActionTrack__ShrinkBufferBox::~ActionTrack__ShrinkBufferBox()
 
 void ActionTrack__ShrinkBufferBox::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	BufferBox &b = t->levels[level_no].buffers[index];
 
@@ -38,7 +38,7 @@ void ActionTrack__ShrinkBufferBox::undo(Data *d)
 
 void *ActionTrack__ShrinkBufferBox::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	BufferBox &b = t->levels[level_no].buffers[index];
 

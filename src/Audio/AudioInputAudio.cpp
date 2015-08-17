@@ -274,7 +274,8 @@ bool AudioInputAudio::start()
 	const char *dev = NULL;
 	if (chosen_device != "")
 		dev = chosen_device.c_str();
-	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)0);
+	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
+	// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 	testError("pa_stream_connect_record");
 
 	if (!pa_wait_stream_ready(_stream)){

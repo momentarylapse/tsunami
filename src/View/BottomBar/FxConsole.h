@@ -32,7 +32,7 @@ public:
 
 	AudioView *view;
 	Track *track;
-	Song *audio;
+	Song *song;
 	Array<HuiPanel*> panels;
 };
 

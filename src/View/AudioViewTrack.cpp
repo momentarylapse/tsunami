@@ -340,7 +340,7 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 
 	if ((track->muted) or (view->hover.show_track_controls == track))
 		c->drawImage(area.x1 + 5, area.y1 + 22, track->muted ? view->image_muted : view->image_unmuted);
-	if ((view->audio->tracks.num > 1) and (view->hover.show_track_controls == track))
+	if ((view->song->tracks.num > 1) and (view->hover.show_track_controls == track))
 		c->drawImage(area.x1 + 22, area.y1 + 22, view->image_solo);
 }
 

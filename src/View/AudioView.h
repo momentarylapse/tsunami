@@ -189,7 +189,7 @@ public:
 
 	TsunamiWindow *win;
 
-	Song *audio;
+	Song *song;
 
 	AudioStream *stream;
 	SongRenderer *renderer;

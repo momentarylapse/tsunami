@@ -40,7 +40,7 @@ void Clipboard::copy(AudioView *view)
 		return;
 	clear();
 
-	Song *a = view->audio;
+	Song *a = view->song;
 
 	temp->sample_rate = a->sample_rate;
 
@@ -71,7 +71,7 @@ void Clipboard::paste(AudioView *view)
 {
 	if (!hasData())
 		return;
-	Song *a = view->audio;
+	Song *a = view->song;
 
 	Array<string> temp_type, dest_type;
 	foreach(Track *t, a->tracks){

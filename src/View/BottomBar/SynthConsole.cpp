@@ -88,12 +88,11 @@ public:
 	string old_param;
 };
 
-SynthConsole::SynthConsole(AudioView *_view, Song *_audio) :
+SynthConsole::SynthConsole(AudioView *_view) :
 	BottomBarConsole(_("Synthesizer")),
 	Observer("SynthConsole")
 {
 	view = _view;
-	audio = _audio;
 	id_inner = "grid";
 
 	addGrid("!expandy", 0, 0, 1, 32, id_inner);

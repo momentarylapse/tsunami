@@ -19,7 +19,7 @@ public:
 	SingleFxPanel(Song *a, Track *t, Effect *_fx, int _index) :
 		Observer("SingleFxPanel")
 	{
-		audio = a;
+		song = a;
 		track = t;
 		fx = _fx;
 		index = _index;
@@ -74,7 +74,7 @@ public:
 		if (track)
 			track->editEffect(index, old_param);
 		else
-			audio->editEffect(index, old_param);
+			song->editEffect(index, old_param);
 		old_param = fx->configToString();
 	}
 	void onSave()
@@ -89,14 +89,14 @@ public:
 		if (track)
 			track->enableEffect(index, isChecked(""));
 		else
-			audio->enableEffect(index, isChecked(""));
+			song->enableEffect(index, isChecked(""));
 	}
 	void onDelete()
 	{
 		if (track)
 			track->deleteEffect(index);
 		else
-			audio->deleteEffect(index);
+			song->deleteEffect(index);
 	}
 	virtual void onUpdate(Observable *o, const string &message)
 	{
@@ -104,13 +104,13 @@ public:
 			if (track)
 				track->editEffect(index, old_param);
 			else
-				audio->editEffect(index, old_param);
+				song->editEffect(index, old_param);
 		}
 		check("enabled", fx->enabled);
 		p->update();
 		old_param = fx->configToString();
 	}
-	Song *audio;
+	Song *song;
 	Track *track;
 	Effect *fx;
 	string old_param;
@@ -118,12 +118,12 @@ public:
 	int index;
 };
 
-FxConsole::FxConsole(AudioView *_view, Song *_audio) :
+FxConsole::FxConsole(AudioView *_view, Song *_song) :
 	BottomBarConsole(_("Effekte")),
 	Observer("FxConsole")
 {
 	view = _view;
-	audio = _audio;
+	song = _song;
 	id_inner = "fx_inner_table";
 
 	addGrid("!expandy", 0, 0, 1, 32, id_inner);
@@ -140,9 +140,9 @@ FxConsole::FxConsole(AudioView *_view, Song *_audio) :
 
 	if (view)
 		subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
-	subscribe(audio, audio->MESSAGE_NEW);
-	subscribe(audio, audio->MESSAGE_ADD_EFFECT);
-	subscribe(audio, audio->MESSAGE_DELETE_EFFECT);
+	subscribe(song, song->MESSAGE_NEW);
+	subscribe(song, song->MESSAGE_ADD_EFFECT);
+	subscribe(song, song->MESSAGE_DELETE_EFFECT);
 }
 
 FxConsole::~FxConsole()
@@ -150,7 +150,7 @@ FxConsole::~FxConsole()
 	clear();
 	if (view)
 		unsubscribe(view);
-	unsubscribe(audio);
+	unsubscribe(song);
 }
 
 void FxConsole::onAdd()
@@ -161,7 +161,7 @@ void FxConsole::onAdd()
 	if (track)
 		track->addEffect(effect);
 	else
-		audio->addEffect(effect);
+		song->addEffect(effect);
 }
 
 void FxConsole::clear()
@@ -192,9 +192,9 @@ void FxConsole::setTrack(Track *t)
 	if (track)
 		fx = track->fx;
 	else
-		fx = audio->fx;
+		fx = song->fx;
 	foreachi(Effect *e, fx, i){
-		panels.add(new SingleFxPanel(audio, track, e, i));
+		panels.add(new SingleFxPanel(song, track, e, i));
 		embed(panels.back(), id_inner, i*2, 0);
 		addSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
 	}

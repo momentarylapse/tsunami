@@ -22,7 +22,7 @@ public:
 	SingleMidiFxPanel(Song *a, Track *t, MidiEffect *_fx, int _index) :
 		Observer("SingleMidiFxPanel")
 	{
-		audio = a;
+		song = a;
 		track = t;
 		fx = _fx;
 		index = _index;
@@ -105,7 +105,7 @@ public:
 		p->update();
 		old_param = fx->configToString();
 	}
-	Song *audio;
+	Song *song;
 	Track *track;
 	MidiEffect *fx;
 	ConfigPanel *p;
@@ -113,12 +113,12 @@ public:
 	int index;
 };
 
-MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_audio) :
+MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
 	BottomBarConsole(_("Midi Fx")),
 	Observer("MidiFxConsole")
 {
 	view = _view;
-	audio = _audio;
+	song = _song;
 
 	fromResource("midi_fx_editor");
 
@@ -140,7 +140,7 @@ MidiFxConsole::~MidiFxConsole()
 {
 	clear();
 	unsubscribe(view);
-	unsubscribe(audio);
+	unsubscribe(song);
 }
 
 void MidiFxConsole::update()
@@ -199,7 +199,7 @@ void MidiFxConsole::setTrack(Track *t)
 
 	if (track){
 		foreachi(MidiEffect *e, track->midi.fx, i){
-			panels.add(new SingleMidiFxPanel(audio, track, e, i));
+			panels.add(new SingleMidiFxPanel(song, track, e, i));
 			embed(panels.back(), id_inner, i*2 + 3, 0);
 			addSeparator("!vertical", i*2 + 4, 0, 0, 0, "separator_" + i2s(i));
 		}

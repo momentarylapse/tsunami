@@ -63,7 +63,7 @@ public:
 	virtual void onShow();
 	virtual void onHide();
 
-	Song *audio;
+	Song *song;
 	AudioOutput *output;
 	PeakMeter *peak_meter;
 

@@ -11,7 +11,7 @@
 #include "FastFourierTransform.h"
 #include "ExtendedBufferBox.h"
 #include "../View/Helper/Slider.h"
-#include "../Audio/AudioRenderer.h"
+#include "../Audio/SongRenderer.h"
 #include "../Audio/AudioInputAudio.h"
 #include "../Audio/AudioInputMidi.h"
 #include "../Audio/AudioOutput.h"
@@ -315,17 +315,17 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("AudioFile.getRange", Script::mf(&Song::getRange));
 	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&Song::getNextBeat));
 
-	AudioRendererInterface ari;
-	Script::DeclareClassSize("AudioRendererInterface", sizeof(AudioRendererInterface));
+	AudioRenderer ari;
+	Script::DeclareClassSize("AudioRendererInterface", sizeof(AudioRenderer));
 	//Script::DeclareClassOffset("AudioRendererInterface", "sample_rate", _offsetof(AudioRendererInterface, sample_rate));
-	Script::LinkExternal("AudioRendererInterface.__init__", Script::mf(&AudioRendererInterface::__init__));
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "__delete__", Script::mf(&AudioRendererInterface::__delete__), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "read", Script::mf(&AudioRendererInterface::read), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "reset", Script::mf(&AudioRendererInterface::reset), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "range", Script::mf(&AudioRendererInterface::range), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getPos", Script::mf(&AudioRendererInterface::getPos), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "seek", Script::mf(&AudioRendererInterface::seek), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getSampleRate", Script::mf(&AudioRendererInterface::getSampleRate), &ari);
+	Script::LinkExternal("AudioRendererInterface.__init__", Script::mf(&AudioRenderer::__init__));
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "__delete__", Script::mf(&AudioRenderer::__delete__), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "read", Script::mf(&AudioRenderer::read), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "reset", Script::mf(&AudioRenderer::reset), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "range", Script::mf(&AudioRenderer::range), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getPos", Script::mf(&AudioRenderer::getPos), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "seek", Script::mf(&AudioRenderer::seek), &ari);
+	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ari);
 
 	SongRenderer ar;
 	Script::DeclareClassSize("AudioRenderer", sizeof(SongRenderer));

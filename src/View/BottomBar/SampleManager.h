@@ -38,7 +38,7 @@ public:
 
 	void endPreview();
 
-	Song *audio;
+	Song *song;
 	Array<SampleManagerItem*> items;
 	Array<SampleManagerItem*> old_items;
 	void add(SampleManagerItem *item);

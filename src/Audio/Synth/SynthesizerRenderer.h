@@ -15,7 +15,7 @@ class Synthesizer;
 class MidiEvent;
 class MidiSource;
 
-class SynthesizerRenderer : public AudioRendererInterface
+class SynthesizerRenderer : public AudioRenderer
 {
 public:
 	SynthesizerRenderer(Synthesizer *s);

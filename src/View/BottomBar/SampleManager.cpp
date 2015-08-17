@@ -10,7 +10,7 @@
 #include "../../View/AudioView.h"
 #include "../../View/AudioViewTrack.h"
 #include "../../Audio/AudioStream.h"
-#include "../../Audio/AudioRenderer.h"
+#include "../../Audio/SongRenderer.h"
 #include "../Helper/Progress.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
@@ -106,7 +106,7 @@ public:
 	SampleManager *manager;
 };
 
-SampleManager::SampleManager(Song *a) :
+SampleManager::SampleManager(Song *s) :
 	BottomBarConsole(_("Samples")),
 	Observer("SampleManager")
 {
@@ -135,13 +135,13 @@ SampleManager::SampleManager(Song *a) :
 
 	progress = NULL;
 
-	audio = a;
+	song = s;
 	selected_uid = -1;
 	updateList();
 
-	subscribe(audio, audio->MESSAGE_ADD_SAMPLE);
-	subscribe(audio, audio->MESSAGE_DELETE_SAMPLE);
-	subscribe(audio, audio->MESSAGE_NEW);
+	subscribe(song, song->MESSAGE_ADD_SAMPLE);
+	subscribe(song, song->MESSAGE_DELETE_SAMPLE);
+	subscribe(song, song->MESSAGE_NEW);
 }
 
 SampleManager::~SampleManager()
@@ -150,7 +150,7 @@ SampleManager::~SampleManager()
 		delete(si);
 	items.clear();
 
-	unsubscribe(audio);
+	unsubscribe(song);
 	delete(preview_stream);
 	delete(preview_renderer);
 	delete(preview_audio);
@@ -167,11 +167,11 @@ int SampleManager::getIndex(Sample *s)
 void SampleManager::updateList()
 {
 	// new samples?
-	foreach(Sample *s, audio->samples)
+	foreach(Sample *s, song->samples)
 		if (getIndex(s) < 0)
 			add(new SampleManagerItem(this, s));
 
-	int sel = audio->get_sample_by_uid(selected_uid);
+	int sel = song->get_sample_by_uid(selected_uid);
 	setInt("sample_list", sel);
 	enable("export_sample", sel >= 0);
 	enable("preview_sample", sel >= 0);
@@ -184,7 +184,7 @@ void SampleManager::onListSelect()
 	int sel = getInt("");
 	selected_uid = -1;
 	if (sel >= 0)
-		selected_uid = audio->samples[sel]->uid;
+		selected_uid = song->samples[sel]->uid;
 	enable("export_sample", sel >= 0);
 	enable("preview_sample", sel >= 0);
 	enable("delete_sample", sel >= 0);
@@ -196,19 +196,19 @@ void SampleManager::onListEdit()
 	int sel = HuiGetEvent()->row;
 	int col = HuiGetEvent()->column;
 	if (col == 2)
-		audio->editSampleName(sel, getCell("sample_list", sel, 2));
+		song->editSampleName(sel, getCell("sample_list", sel, 2));
 	else if (col == 5)
-		audio->samples[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
+		song->samples[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
 }
 
 void SampleManager::onImport()
 {
 	if (tsunami->storage->askOpenImport(win)){
 		BufferBox buf;
-		tsunami->storage->loadBufferBox(audio, &buf, HuiFilename);
-		Sample *s = audio->addSample(HuiFilename.basename(), buf);
+		tsunami->storage->loadBufferBox(song, &buf, HuiFilename);
+		Sample *s = song->addSample(HuiFilename.basename(), buf);
 		selected_uid = s->uid;
-		setInt("sample_list", audio->samples.num - 1);
+		setInt("sample_list", song->samples.num - 1);
 		enable("delete_sample", true);
 		enable("paste_sample", true);
 	}
@@ -218,9 +218,9 @@ void SampleManager::onExport()
 {
 	if (tsunami->storage->askSaveExport(win)){
 		int sel = getInt("sample_list");
-		Sample *s = audio->samples[sel];
+		Sample *s = song->samples[sel];
 		if (s->type == Track::TYPE_AUDIO){
-			tsunami->storage->saveBufferBox(audio, &s->buf, HuiFilename);
+			tsunami->storage->saveBufferBox(song, &s->buf, HuiFilename);
 		}
 	}
 }
@@ -234,9 +234,9 @@ void SampleManager::onInsert()
 
 void SampleManager::onCreateFromSelection()
 {
-	audio->createSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
-	if (audio->samples.num > 0){
-		selected_uid = audio->samples.back()->uid;
+	song->createSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
+	if (song->samples.num > 0){
+		selected_uid = song->samples.back()->uid;
 		enable("delete_sample", true);
 		enable("paste_sample", true);
 	}
@@ -246,7 +246,7 @@ void SampleManager::onDelete()
 {
 	int n = getInt("sample_list");
 	if (n >= 0)
-		audio->deleteSample(n);
+		song->deleteSample(n);
 }
 
 void SampleManager::add(SampleManagerItem *item)
@@ -282,7 +282,7 @@ void SampleManager::onUpdate(Observable *o, const string &message)
 		progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
 		if (!preview_stream->isPlaying())
 			endPreview();
-	}else if (o == audio){
+	}else if (o == song){
 		//msg_write(o->getName() + " / " + message);
 		updateList();
 	}
@@ -293,7 +293,7 @@ void SampleManager::onPreview()
 	if (progress)
 		endPreview();
 	int sel = getInt("sample_list");
-	preview_sample = audio->samples[sel];
+	preview_sample = song->samples[sel];
 	preview_audio->reset();
 	preview_audio->addTrack(preview_sample->type);
 	preview_audio->tracks[0]->levels[0].buffers.add(preview_sample->buf);
@@ -325,7 +325,7 @@ public:
 	SampleSelector(HuiPanel *root, Song *a, Sample *old) :
 		HuiDialog("", 300, 400, root->win, false)
 	{
-		audio = a;
+		song = a;
 		ret = NULL;;
 		_old = old;
 
@@ -335,9 +335,9 @@ public:
 
 		setString(list_id, _("\\- keines -\\"));
 		setInt(list_id, 0);
-		foreachi(Sample *s, audio->samples, i){
+		foreachi(Sample *s, song->samples, i){
 			icon_names.add(render_sample(s));
-			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + audio->get_time_str_long(s->buf.num));
+			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + song->get_time_str_long(s->buf.num));
 			if (s == old)
 				setInt(list_id, i + 1);
 		}
@@ -359,7 +359,7 @@ public:
 		int n = getInt("");
 		ret = NULL;
 		if (n >= 1)
-			ret = audio->samples[n - 1];
+			ret = song->samples[n - 1];
 		enable("ok", n >= 0);
 	}
 
@@ -370,7 +370,7 @@ public:
 			ret = NULL;
 			delete(this);
 		}else if (n >= 1){
-			ret = audio->samples[n - 1];
+			ret = song->samples[n - 1];
 			delete(this);
 		}
 	}
@@ -389,7 +389,7 @@ public:
 	static Sample *ret;
 	Sample *_old;
 	Array<string> icon_names;
-	Song *audio;
+	Song *song;
 	string list_id;
 };
 

@@ -20,7 +20,6 @@ class Slider;
 class Log;
 class AudioInput;
 class AudioOutput;
-class SongRenderer;
 class AudioView;
 class Storage;
 class Clipboard;

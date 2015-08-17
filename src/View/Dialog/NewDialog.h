@@ -26,7 +26,7 @@ public:
 	void onMetronome();
 	void onTypeMidi();
 
-	Song *audio;
+	Song *song;
 };
 
 #endif /* NEWDIALOG_H_ */

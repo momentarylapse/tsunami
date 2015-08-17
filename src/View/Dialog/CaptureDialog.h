@@ -49,7 +49,7 @@ public:
 	void setTarget(int index);
 	void setType(int type);
 
-	Song *audio;
+	Song *song;
 	AudioView *view;
 	AudioInputAny *input;
 	PeakMeter *peak_meter;

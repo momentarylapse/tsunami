@@ -12,13 +12,12 @@
 #include "../../Stuff/Observer.h"
 
 class Track;
-class Song;
 class AudioView;
 
 class SynthConsole : public BottomBarConsole, public Observer
 {
 public:
-	SynthConsole(AudioView *view, Song *audio);
+	SynthConsole(AudioView *view);
 	virtual ~SynthConsole();
 
 	void clear();
@@ -34,7 +33,6 @@ public:
 
 	AudioView *view;
 	Track *track;
-	Song *audio;
 };
 
 #endif /* SYNTHCONSOLE_H_ */

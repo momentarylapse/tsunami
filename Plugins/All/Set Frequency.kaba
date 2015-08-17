@@ -3,7 +3,7 @@ use "../api.kaba"
 Window *dlg
 
 void OnOk()
-	audio.sample_rate = dlg.getInt("freq")
+	song.sample_rate = dlg.getInt("freq")
 	delete dlg
 
 void OnClose()
@@ -19,6 +19,6 @@ void main()
 	dlg.eventS("cancel", &OnClose)
 	dlg.eventS("hui:close", &OnClose)
 	
-	dlg.setInt("freq", audio.sample_rate)
+	dlg.setInt("freq", song.sample_rate)
 	
 	dlg.run()

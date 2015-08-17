@@ -55,7 +55,7 @@ Grid ? '' 1 2
 		Button close 'Close' width=120 image=hui:close")
 		
 		grid.init(self, "drawing_area")
-		grid.x_axis.set(view.sel_range.offset / i2f(audio.sample_rate), view.sel_range.end() / i2f(audio.sample_rate), false, "s")
+		grid.x_axis.set(view.sel_range.offset / i2f(song.sample_rate), view.sel_range.end() / i2f(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		//grid.allow_bg = false
 	
@@ -76,8 +76,8 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	AudioRenderer renderer
-	renderer.renderAudioFile(audio, view.sel_range, buf)
+	SongRenderer renderer
+	renderer.render(song, view.sel_range, buf)
 	
 	complex[] f
 	float[] sub
@@ -93,7 +93,7 @@ void show_spec()
 		for j in 0:N
 			sub[j] = buf.r[offset + j]
 		fft_r2c(sub, f)
-		float ww = i2f(N) / audio.sample_rate
+		float ww = i2f(N) / song.sample_rate
 		for i in 0:NF
 			float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
 			float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))

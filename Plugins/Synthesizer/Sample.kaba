@@ -74,7 +74,7 @@ class SamplePanel : ConfigPanel
 		Sample *old = nil
 		if sc.samples[n]
 			old = sc.samples[n].origin
-		Sample *s = SelectSample(self, audio, old)
+		Sample *s = SelectSample(self, song, old)
 		if s != old
 			if sc.samples[n]
 				delete sc.samples[n]

@@ -53,7 +53,7 @@ class Phaser : AudioEffect
 			b[i] = y
 	
 	overwrite void process(BufferBox buf)
-		AudioFile *a = audio
+		Song *a = song
 	
 		doPhaser(buf.r, state.r, a.sample_rate)
 		doPhaser(buf.l, state.l, a.sample_rate)

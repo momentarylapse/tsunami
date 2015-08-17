@@ -91,8 +91,8 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	AudioRenderer renderer
-	renderer.renderAudioFile(audio, view.sel_range, buf)
+	SongRenderer renderer
+	renderer.render(song, view.sel_range, buf)
 	
 	complex[] fr, fl
 	
@@ -104,7 +104,7 @@ void show_spec()
 	//fft_r2c(buf.l, fl)
 	buf.get_spectrum(fr, fl, 4096)
 	
-	float ww = i2f(buf.r.num) / audio.sample_rate
+	float ww = i2f(buf.r.num) / song.sample_rate
 	for i in 0:N
 		float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
 		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))

@@ -129,7 +129,7 @@ class RingBuffer
 	extern void clear()
 	void __assign__(RingBuffer o)
 
-class AudioRendererInterface
+class AudioRenderer
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual int read(BufferBox buf)
@@ -256,7 +256,7 @@ class Track
 
 	// editing
 	int parent
-	AudioFile *root
+	Song *song
 
 	bool is_selected
 
@@ -292,7 +292,7 @@ class Track
 class Tag
 	string key, value
 
-class AudioFile
+class Song
 	string filename
 	Tag[] tags
 	int sample_rate
@@ -334,11 +334,11 @@ class AudioView
 	AudioRenderer *renderer
 	ColorScheme colors
 
-class AudioRenderer
+class SongRenderer
 	extern void __init__()
 	extern virtual void __delete__()
-	extern void renderAudioFile(AudioFile *a, Range r, BufferBox buf)
-	extern void prepare(AudioFile *a, Range r, bool allow_loop)
+	extern void render(Song *s, Range r, BufferBox buf)
+	extern void prepare(Song *s, Range r, bool allow_loop)
 	extern virtual int read(BufferBox b)
 	extern virtual void reset()
 	extern virtual Range range()
@@ -348,12 +348,12 @@ class AudioRenderer
 
 
 class OutputStream
-	extern void __init__(AudioRendererInterface *r)
+	extern void __init__(AudioRenderer *r)
 	extern void __delete__()
 	extern void stop()
 	extern void play()
 	extern void pause()
-	//extern void setSource(AudioRendererInterface *r)
+	//extern void setSource(AudioRenderer *r)
 	extern bool isPlaying()
 	extern int getPos()
 	extern float getSampleRate()
@@ -446,8 +446,8 @@ class InputStreamMidi : InputStream
 	extern virtual void __delete__()*/
 
 class Storage
-	extern bool load(AudioFile *a, string filename)
-	extern bool save(AudioFile *a, string filename)
+	extern bool load(Song *s, string filename)
+	extern bool save(Song *s, string filename)
 	string current_directory
 
 class Log
@@ -468,7 +468,7 @@ class Slider
 	extern void set(float f)
 
 extern Window *MainWin
-extern AudioFile *audio
+extern Song *song
 extern AudioView *view
 extern Log *logging
 extern PluginContext plugin_context
@@ -481,4 +481,4 @@ extern void fft_c2r_inv(complex[] in, float[] out)
 
 extern bool AllowTermination()
 extern Synthesizer *CreateSynthesizer(string name)
-extern Sample *SelectSample(Panel *panel, AudioFile *a, Sample *old)
+extern Sample *SelectSample(Panel *panel, Song *s, Sample *old)

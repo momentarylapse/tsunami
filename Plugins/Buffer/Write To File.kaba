@@ -3,7 +3,7 @@ use "../api.kaba"
 void ProcessTrack(BufferBox buf)
 	File *f = FileCreate("ooo")
 	f.setBinaryMode(true)
-	for int i, 0, buf.num
+	for i in 0:buf.num
 		f << buf.r[i]
 		f << buf.l[i]
 	delete(f)

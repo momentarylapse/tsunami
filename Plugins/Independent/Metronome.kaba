@@ -2,7 +2,7 @@
 // Title[Deutsch] = Metronom
 use "../api.kaba"
 
-class MetronomeRenderer : AudioRendererInterface
+class MetronomeRenderer : AudioRenderer
 	float length
 	float freq
 	float bpm

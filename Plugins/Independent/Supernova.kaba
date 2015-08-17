@@ -25,7 +25,7 @@ PlayedData[] played
 int Offset
 
 float get_freq(float i)
-	return i / (BUFFER_SIZE / 2) * audio.sample_rate / 2
+	return i / (BUFFER_SIZE / 2) * song.sample_rate / 2
 
 float Frequency, Volume, Error
 bool LoudEnough
@@ -108,7 +108,7 @@ class SuperNovaWindow : Window
 			c.drawLine(0, ly, w, ly)
 		c.setColor(Black)
 		c.setFontSize(18)
-		MidiNote[] notes = MidiTrack.midi.getNotes(audio.getRange())
+		MidiNote[] notes = MidiTrack.midi.getNotes(song.getRange())
 		for n in notes
 			int s, f
 			for i in 0:6

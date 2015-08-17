@@ -23,7 +23,7 @@ class SinusSmoothSynthesizer : Synthesizer
 		int i0 = max(r.offset, 0)
 		int i1 = min(r_end + sm_d * 8, buf.num)
 
-		for int i, i0, i1
+		for i in i0:i1
 			float tt = (i - r.offset) * f_w
 			float d = sin(tt) * volume
 			if i > r_end

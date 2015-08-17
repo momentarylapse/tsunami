@@ -3,7 +3,7 @@
 use "../api.kaba"
 
 
-class Renderer : AudioRendererInterface
+class ForkRenderer : AudioRenderer
 	int offset
 	float freq
 	float volume
@@ -21,7 +21,7 @@ class Renderer : AudioRendererInterface
 
 class PitchFork : Dialog
 	OutputStream *stream
-	Renderer *renderer
+	ForkRenderer *renderer
 	
 	void __init__(Window *parent)
 		super.__init__("Pitchfork", 200, 80, parent, false)
@@ -35,7 +35,7 @@ class PitchFork : Dialog
 		event("close", &onClose)
 		event("frequency", &onFrequency)
 	
-		renderer = new Renderer
+		renderer = new ForkRenderer
 		stream = new OutputStream(renderer)
 		stream.play()
 	

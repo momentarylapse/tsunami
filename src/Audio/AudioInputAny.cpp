@@ -142,6 +142,12 @@ string AudioInputAny::getChosenDevice()
 	return "";
 }
 
+void AudioInputAny::setSaveMode(bool enabled)
+{
+	if (type == Track::TYPE_AUDIO)
+		input_audio->setSaveMode(enabled);
+}
+
 AudioInputMidi::MidiPort AudioInputAny::getCurMidiPort()
 {
 	if (type == Track::TYPE_MIDI)

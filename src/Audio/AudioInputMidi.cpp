@@ -31,6 +31,8 @@ AudioInputMidi::AudioInputMidi(int _sample_rate) :
 	subs = NULL;
 	sample_rate = _sample_rate;
 
+	running = false;
+
 	init();
 
 

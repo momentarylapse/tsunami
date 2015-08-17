@@ -65,6 +65,7 @@ public:
 	static string getDefaultTempFilename();
 	static string getTempFilename();
 	static void setTempFilename(const string &filename);
+	void setSaveMode(bool enable);
 
 	static string temp_filename;
 
@@ -92,6 +93,7 @@ private:
 
 	File *temp_file;
 	static string cur_temp_filename;
+	bool save_mode;
 
 	struct SyncData
 	{

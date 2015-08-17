@@ -132,6 +132,9 @@ AudioInputAudio::AudioInputAudio(int _sample_rate) :
 	playback_delay_const = HuiConfig.getFloat("Input.PlaybackDelay", 0.0f);
 	temp_filename = HuiConfig.getStr("Input.TempFilename", "");
 	temp_file = NULL;
+	save_mode = false;
+
+	running = false;
 
 	if (file_test_existence(getTempFilename()))
 		tsunami->log->warning(_("alte Aufnahmedaten gefunden: ") + getTempFilename());
@@ -237,9 +240,11 @@ void AudioInputAudio::stop()
 	capturing = false;
 	accumulating = false;
 	current_buffer.clear();
-	delete(temp_file);
-	temp_file = NULL;
-	file_delete(cur_temp_filename);
+	if (temp_file){
+		delete(temp_file);
+		temp_file = NULL;
+		file_delete(cur_temp_filename);
+	}
 }
 
 bool AudioInputAudio::start()
@@ -285,9 +290,11 @@ bool AudioInputAudio::start()
 
 	capturing = true;
 
-	cur_temp_filename = getTempFilename();
-	temp_file = FileCreate(getTempFilename());
-	temp_file->SetBinaryMode(true);
+	if (save_mode){
+		cur_temp_filename = getTempFilename();
+		temp_file = FileCreate(getTempFilename());
+		temp_file->SetBinaryMode(true);
+	}
 
 	_startUpdate();
 
@@ -351,7 +358,9 @@ int AudioInputAudio::doCapturing()
 	// write to file
 	string data;
 	b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
-	temp_file->WriteBuffer(&data[0], b.num);
+
+	if (temp_file)
+		temp_file->WriteBuffer(&data[0], b.num);
 
 	return avail;
 }
@@ -408,6 +417,11 @@ void AudioInputAudio::setTempFilename(const string &filename)
 {
 	temp_filename = filename;
 	HuiConfig.setStr("Input.TempFilename", temp_filename);
+}
+
+void AudioInputAudio::setSaveMode(bool enabled)
+{
+	save_mode = enabled;
 }
 
 void AudioInputAudio::_startUpdate()

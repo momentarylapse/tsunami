@@ -27,6 +27,7 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
 	view = tsunami->win->view;
 	type = -1;
 	input = new AudioInputAny(song->sample_rate);
+	input->setSaveMode(true);
 	subscribe(input);
 	view->setInput(input);
 

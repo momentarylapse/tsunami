@@ -47,6 +47,8 @@ public:
 	void setDevice(const string &dev);
 	string getChosenDevice();
 
+	void setSaveMode(bool enabled);
+
 	AudioInputMidi::MidiPort getCurMidiPort();
 	Array<AudioInputMidi::MidiPort> findMidiPorts();
 	bool connectMidiPort(AudioInputMidi::MidiPort &p);

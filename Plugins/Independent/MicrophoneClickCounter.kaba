@@ -3,8 +3,9 @@
 use "../api.kaba"
 use "../tone.kaba"
 
-const float THRESHOLD = 0.2
-const float FREEZE_TIME = 0.1
+const float THRESHOLD1 = 0.20
+const float THRESHOLD2 = 0.12
+const float RECOVER_TIME = 0.10
 
 
 InputStreamAudio *input
@@ -18,7 +19,7 @@ float Volume
 int counter
 
 bool active
-int last_active_pos
+int active_ttl
 
 
 void DrawVolume(Painter *c)
@@ -56,13 +57,13 @@ void UpdateInput()
 	float[] temp
 	temp = buf.r + buf.l
 	
-	int freeze_samples = DEFAULT_SAMPLE_RATE * FREEZE_TIME
+	int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
 	
 	Volume = 0
 	for f,i in temp
 		if f > Volume
 			Volume = f
-		if f > THRESHOLD
+		if f > THRESHOLD1
 			if !active
 				print "start"
 				active = true
@@ -71,12 +72,16 @@ void UpdateInput()
 				if !stream.isPlaying()
 					stream.play()
 				counter ++
-			last_active_pos = i
-		if active and (i > last_active_pos + freeze_samples)
+				active_ttl = recover_samples
+		if active and (active_ttl > 0)
+			if f > THRESHOLD2
+				active_ttl = recover_samples
+			else
+				active_ttl --
+		if active and (active_ttl <= 0)
 			print "end"
 			active = false
-	
-	last_active_pos -= temp.num
+			active_ttl = -1
 	
 	win.redraw("drawing")
 
@@ -108,7 +113,7 @@ void main()
 
 	counter = 0	
 	active = false
-	last_active_pos = -1
+	active_ttl = -1
 	
 	
 	input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)

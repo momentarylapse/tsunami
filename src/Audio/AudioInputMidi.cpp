@@ -14,6 +14,10 @@
 #include <alsa/asoundlib.h>
 
 
+static const float UPDATE_TIME = 0.005f;
+const string AudioInputMidi::MESSAGE_CAPTURE = "Capture";
+
+
 AudioInputMidi::MidiPort::MidiPort()
 {
 	client = port = -1;
@@ -21,10 +25,11 @@ AudioInputMidi::MidiPort::MidiPort()
 
 
 AudioInputMidi::AudioInputMidi(int _sample_rate) :
-	AudioInput(_sample_rate)
+	PeakMeterSource("AudioInputMidi")
 {
 	handle = NULL;
 	subs = NULL;
+	sample_rate = _sample_rate;
 
 	init();
 
@@ -65,9 +70,9 @@ void AudioInputMidi::init()
 void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 {
 	preview_renderer->setSynthesizer(s);
-	preview_renderer->setAutoStop(false);
+	/*preview_renderer->setAutoStop(false);
 	if (s and capturing)
-		preview_stream->play();
+		preview_stream->play();*/
 }
 
 bool AudioInputMidi::connectMidiPort(AudioInputMidi::MidiPort &p)
@@ -188,9 +193,9 @@ bool AudioInputMidi::start()
 	resetAccumulation();
 
 	clearInputQueue();
-	preview_renderer->setAutoStop(false);
+	/*preview_renderer->setAutoStop(false);
 	if (preview_renderer->getSynthesizer())
-		preview_stream->play();
+		preview_stream->play();*/
 
 	timer.reset();
 
@@ -203,7 +208,7 @@ void AudioInputMidi::stop()
 {
 	_stopUpdate();
 	capturing = false;
-	preview_renderer->setAutoStop(true);
+	//preview_renderer->setAutoStop(true);
 	preview_renderer->endAllNotes();
 	//preview_stream->stop();
 
@@ -253,6 +258,13 @@ bool AudioInputMidi::isCapturing()
 	return capturing;
 }
 
+int AudioInputMidi::getState()
+{
+	if (isCapturing())
+		return STATE_PLAYING;
+	return STATE_STOPPED;
+}
+
 void AudioInputMidi::getSomeSamples(BufferBox &buf, int num_samples)
 {
 	preview_stream->getSomeSamples(buf, num_samples);
@@ -264,5 +276,36 @@ int AudioInputMidi::getDelay()
 	return 0;
 }
 
-void AudioInputMidi::resetSync(){}
+void AudioInputMidi::resetSync()
+{
+}
 
+void AudioInputMidi::_startUpdate()
+{
+	if (running)
+		return;
+	hui_runner_id = HuiRunRepeatedM(UPDATE_TIME, this, &AudioInputMidi::update);
+	running = true;
+}
+
+void AudioInputMidi::_stopUpdate()
+{
+	if (!running)
+		return;
+	HuiCancelRunner(hui_runner_id);
+	hui_runner_id = -1;
+	running = false;
+}
+
+void AudioInputMidi::update()
+{
+	if (doCapturing() > 0)
+		notify(MESSAGE_CAPTURE);
+
+	running = isCapturing();
+}
+
+float AudioInputMidi::getSampleRate()
+{
+	return sample_rate;
+}

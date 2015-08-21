@@ -23,6 +23,10 @@ string AudioInputAudio::cur_temp_filename;
 float AudioInputAudio::playback_delay_const;
 
 
+static const float UPDATE_TIME = 0.005f;
+const string AudioInputAudio::MESSAGE_CAPTURE = "Capture";
+
+
 extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
 extern bool pa_wait_stream_ready(pa_stream *s); // -> AudioStream.cpp
 
@@ -116,8 +120,10 @@ int AudioInputAudio::SyncData::getDelay()
 
 
 AudioInputAudio::AudioInputAudio(int _sample_rate) :
-	AudioInput(_sample_rate)
+	PeakMeterSource("AudioInputAudio"),
+	current_buffer(1048576)
 {
+	sample_rate = _sample_rate;
 	capturing = false;
 	_stream = NULL;
 
@@ -134,6 +140,19 @@ AudioInputAudio::AudioInputAudio(int _sample_rate) :
 AudioInputAudio::~AudioInputAudio()
 {
 	stop();
+}
+
+void AudioInputAudio::__init__(int _sample_rate)
+{
+	new(this) AudioInputAudio(_sample_rate);
+}
+
+void AudioInputAudio::__delete__()
+{
+	stop();
+	current_buffer.clear();
+	buffer.clear();
+	chosen_device.clear();
 }
 
 
@@ -255,7 +274,8 @@ bool AudioInputAudio::start()
 	const char *dev = NULL;
 	if (chosen_device != "")
 		dev = chosen_device.c_str();
-	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)0);
+	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
+	// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 	testError("pa_stream_connect_record");
 
 	if (!pa_wait_stream_ready(_stream)){
@@ -286,6 +306,13 @@ bool AudioInputAudio::testError(const string &msg)
 float AudioInputAudio::getPlaybackDelayConst()
 {
 	return playback_delay_const;
+}
+
+void AudioInputAudio::accumulate(bool enable)
+{
+	//resetAccumulation();
+	current_buffer.clear();
+	accumulating = enable;
 }
 
 void AudioInputAudio::resetAccumulation()
@@ -344,6 +371,18 @@ float AudioInputAudio::getSampleRate()
 	return sample_rate;
 }
 
+bool AudioInputAudio::isCapturing()
+{
+	return capturing;
+}
+
+int AudioInputAudio::getState()
+{
+	if (isCapturing())
+		return STATE_PLAYING;
+	return STATE_STOPPED;
+}
+
 int AudioInputAudio::getDelay()
 {
 	return sync.getDelay() - playback_delay_const * (float)sample_rate / 1000.0f;
@@ -369,4 +408,29 @@ void AudioInputAudio::setTempFilename(const string &filename)
 {
 	temp_filename = filename;
 	HuiConfig.setStr("Input.TempFilename", temp_filename);
+}
+
+void AudioInputAudio::_startUpdate()
+{
+	if (running)
+		return;
+	hui_runner_id = HuiRunRepeatedM(UPDATE_TIME, this, &AudioInputAudio::update);
+	running = true;
+}
+
+void AudioInputAudio::_stopUpdate()
+{
+	if (!running)
+		return;
+	HuiCancelRunner(hui_runner_id);
+	hui_runner_id = -1;
+	running = false;
+}
+
+void AudioInputAudio::update()
+{
+	if (doCapturing() > 0)
+		notify(MESSAGE_CAPTURE);
+
+	running = isCapturing();
 }

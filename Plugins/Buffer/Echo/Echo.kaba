@@ -54,7 +54,7 @@ class Echo : AudioEffect
 
 	overwrite void process(BufferBox buf)
 
-		AudioFile *a = audio
+		Song *a = song
 		int delay_samples = a.sample_rate * config.Delay
 		state.buf_r.resize(delay_samples)
 		state.buf_l.resize(delay_samples)

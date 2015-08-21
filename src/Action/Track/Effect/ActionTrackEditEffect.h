@@ -11,7 +11,7 @@
 #include "../../ActionMergable.h"
 class Track;
 class Effect;
-class AudioFile;
+class Song;
 
 class ActionTrackEditEffect: public ActionMergable<string>
 {

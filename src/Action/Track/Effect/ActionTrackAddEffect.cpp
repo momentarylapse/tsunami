@@ -21,7 +21,7 @@ ActionTrackAddEffect::~ActionTrackAddEffect()
 
 void *ActionTrackAddEffect::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	if (track_no >= 0){
 		Track *t = a->get_track(track_no);
@@ -37,7 +37,7 @@ void *ActionTrackAddEffect::execute(Data *d)
 
 void ActionTrackAddEffect::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	effect->Observable::notify(effect->MESSAGE_DELETE);
 	if (track_no >= 0){
 		Track *t = a->get_track(track_no);

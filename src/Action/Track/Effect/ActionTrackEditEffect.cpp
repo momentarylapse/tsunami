@@ -24,7 +24,7 @@ ActionTrackEditEffect::~ActionTrackEditEffect()
 
 void *ActionTrackEditEffect::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	Effect *fx = a->get_fx(track_no, index);
 
@@ -36,7 +36,7 @@ void *ActionTrackEditEffect::execute(Data *d)
 
 void ActionTrackEditEffect::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	Effect *fx = a->get_fx(track_no, index);
 

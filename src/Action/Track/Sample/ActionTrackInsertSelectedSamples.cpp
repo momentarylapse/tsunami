@@ -6,10 +6,11 @@
  */
 
 #include "ActionTrackInsertSelectedSamples.h"
-#include "ActionTrackInsertSample.h"
-#include "../../../Data/AudioFile.h"
 
-ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(AudioFile *a, int level_no)
+#include "../../../Data/Song.h"
+#include "ActionTrackInsertSample.h"
+
+ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(Song *a, int level_no)
 {
 	foreachi(Track *t, a->tracks, ti)
 		foreachib(SampleRef *s, t->samples, si)

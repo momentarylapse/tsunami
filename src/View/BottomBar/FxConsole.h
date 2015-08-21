@@ -12,13 +12,13 @@
 #include "../../Stuff/Observer.h"
 
 class Track;
-class AudioFile;
+class Song;
 class AudioView;
 
 class FxConsole : public BottomBarConsole, public Observer
 {
 public:
-	FxConsole(AudioView *view, AudioFile *audio);
+	FxConsole(AudioView *view, Song *audio);
 	virtual ~FxConsole();
 
 	void clear();
@@ -32,7 +32,7 @@ public:
 
 	AudioView *view;
 	Track *track;
-	AudioFile *audio;
+	Song *song;
 	Array<HuiPanel*> panels;
 };
 

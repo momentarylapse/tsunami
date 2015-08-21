@@ -149,7 +149,7 @@ public:
 	}
 };
 
-AudioStream::AudioStream(AudioRendererInterface *r) :
+AudioStream::AudioStream(AudioRenderer *r) :
 	PeakMeterSource("AudioStream"),
 	ring_buf(1048576)
 {
@@ -186,7 +186,7 @@ AudioStream::~AudioStream()
 	kill();
 }
 
-void AudioStream::__init__(AudioRendererInterface *r)
+void AudioStream::__init__(AudioRenderer *r)
 {
 	new(this) AudioStream(r);
 }
@@ -321,7 +321,7 @@ void AudioStream::stream()
 	reading = false;
 }
 
-void AudioStream::setSource(AudioRendererInterface *r)
+void AudioStream::setSource(AudioRenderer *r)
 {
 	msg_db_f("Stream.setSource", 1);
 

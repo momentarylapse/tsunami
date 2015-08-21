@@ -9,14 +9,14 @@
 #define ACTIONTRACKSAMPLEFROMSELECTION_H_
 
 #include "../../ActionGroup.h"
-class AudioFile;
+class Song;
 class Track;
 class Range;
 
 class ActionTrackSampleFromSelection : public ActionGroup
 {
 public:
-	ActionTrackSampleFromSelection(AudioFile *a, const Range &r, int level_no);
+	ActionTrackSampleFromSelection(Song *a, const Range &r, int level_no);
 	virtual ~ActionTrackSampleFromSelection();
 
 private:

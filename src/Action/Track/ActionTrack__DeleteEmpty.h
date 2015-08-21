@@ -9,7 +9,7 @@
 #define ACTIONTRACK__DELETEEMPTY_H_
 
 #include "../Action.h"
-#include "../../Data/AudioFile.h"
+#include "../../Data/Song.h"
 
 class ActionTrack__DeleteEmpty: public Action
 {

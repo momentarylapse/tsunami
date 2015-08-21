@@ -6,11 +6,11 @@
  */
 
 #include "MixingConsole.h"
-#include "../../Data/AudioFile.h"
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
 #include "../Helper/PeakMeter.h"
 #include <math.h>
+#include "../../Data/Song.h"
 
 const float TrackMixer::DB_MIN = -1000000;
 const float TrackMixer::DB_MAX = 10;
@@ -75,7 +75,7 @@ float TrackMixer::vol2slider(float vol)
 void TrackMixer::onVolume()
 {
 	if (parent->isChecked("link-volumes"))
-		track->root->changeAllTrackVolumes(track, slider2vol(getFloat("")));
+		track->song->changeAllTrackVolumes(track, slider2vol(getFloat("")));
 	else
 		track->setVolume(slider2vol(getFloat("")));
 }
@@ -105,11 +105,11 @@ void TrackMixer::update()
 }
 
 
-MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, AudioStream *stream) :
+MixingConsole::MixingConsole(Song *_song, AudioOutput *_output, AudioStream *stream) :
 	BottomBarConsole(_("Mischpult")),
 	Observer("MixingConsole")
 {
-	audio = _audio;
+	song = _song;
 	output = _output;
 	id_inner = "inner-grid";
 
@@ -136,14 +136,14 @@ MixingConsole::MixingConsole(AudioFile *_audio, AudioOutput *_output, AudioStrea
 
 	event("output-volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);
 
-	subscribe(audio);
+	subscribe(song);
 	subscribe(output);
 	loadData();
 }
 
 MixingConsole::~MixingConsole()
 {
-	unsubscribe(audio);
+	unsubscribe(song);
 	unsubscribe(output);
 	foreach(TrackMixer *m, mixer)
 		delete(m);
@@ -157,22 +157,22 @@ void MixingConsole::onOutputVolume()
 
 void MixingConsole::loadData()
 {
-	for (int i=mixer.num; i<audio->tracks.num; i++){
+	for (int i=mixer.num; i<song->tracks.num; i++){
 		TrackMixer *m = new TrackMixer();
 		mixer.add(m);
 		embed(m, id_inner, i*2, 0);
 		addSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator-" + i2s(i));
 	}
-	for (int i=audio->tracks.num; i<mixer.num; i++){
+	for (int i=song->tracks.num; i<mixer.num; i++){
 		delete(mixer[i]);
 		removeControl("separator-" + i2s(i));
 	}
-	mixer.resize(audio->tracks.num);
+	mixer.resize(song->tracks.num);
 
-	foreachi(Track *t, audio->tracks, i)
+	foreachi(Track *t, song->tracks, i)
 		mixer[i]->setTrack(t);
 
-	hideControl("link-volumes", audio->tracks.num <= 1);
+	hideControl("link-volumes", song->tracks.num <= 1);
 }
 
 void MixingConsole::onUpdate(Observable* o, const string &message)

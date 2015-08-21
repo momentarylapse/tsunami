@@ -22,7 +22,7 @@ Dialog track_dialog "Spur" 380 516
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2
 				Grid ? "" 3 1
-					Button edit_file "Datei"
+					Button edit_song "Datei"
 					Button edit_fx "Fx"
 					Button edit_midi "Midi"
 				Grid ? "" 2 1

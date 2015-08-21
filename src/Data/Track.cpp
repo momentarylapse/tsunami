@@ -61,7 +61,7 @@ Track::Track() :
 	muted = false;
 	volume = 1;
 	panning = 0;
-	root = NULL;
+	song = NULL;
 	is_selected = false;
 
 	volume = 1;
@@ -145,8 +145,8 @@ string Track::getNiceName()
 
 int Track::get_index()
 {
-	if (root){
-		foreachi(Track *t, root->tracks, i)
+	if (song){
+		foreachi(Track *t, song->tracks, i)
 			if (this == t)
 				return i;
 	}
@@ -227,7 +227,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 
 BufferBox Track::getBuffers(int level_no, const Range &r)
 {
-	root->execute(new ActionTrackCreateBuffers(this, level_no, r));
+	song->execute(new ActionTrackCreateBuffers(this, level_no, r));
 	return readBuffers(level_no, r);
 }
 
@@ -247,123 +247,123 @@ void Track::invalidateAllPeaks()
 
 SampleRef *Track::addSample(int pos, int index)
 {
-	return (SampleRef*)root->execute(new ActionTrackAddSample(this, pos, index));
+	return (SampleRef*)song->execute(new ActionTrackAddSample(this, pos, index));
 }
 
 void Track::deleteSample(int index)
 {
-	root->execute(new ActionTrackDeleteSample(this, index));
+	song->execute(new ActionTrackDeleteSample(this, index));
 }
 
 void Track::editSample(int index, float volume, bool mute, int rep_num, int rep_delay)
 {
-	root->execute(new ActionTrackEditSample(this, index, volume, mute, rep_num, rep_delay));
+	song->execute(new ActionTrackEditSample(this, index, volume, mute, rep_num, rep_delay));
 }
 
 void Track::addMidiNote(const MidiNote &n)
 {
-	root->action_manager->beginActionGroup();
+	song->action_manager->beginActionGroup();
 	addMidiEvent(MidiEvent(n.range.offset, n.pitch, n.volume));
 	addMidiEvent(MidiEvent(n.range.end(), n.pitch, 0));
-	root->action_manager->endActionGroup();
+	song->action_manager->endActionGroup();
 }
 
 void Track::addMidiEvent(const MidiEvent &e)
 {
-	root->execute(new ActionTrackAddMidiEvent(this, e));
+	song->execute(new ActionTrackAddMidiEvent(this, e));
 }
 
 void Track::addMidiEvents(const MidiData &events)
 {
-	root->action_manager->beginActionGroup();
+	song->action_manager->beginActionGroup();
 	foreach(MidiEvent &e, const_cast<MidiData&>(events))
 		addMidiEvent(e);
-	root->action_manager->endActionGroup();
+	song->action_manager->endActionGroup();
 }
 
 void Track::deleteMidiEvent(int index)
 {
-	root->execute(new ActionTrackDeleteMidiEvent(this, index));
+	song->execute(new ActionTrackDeleteMidiEvent(this, index));
 }
 
 void Track::setName(const string& name)
 {
-	root->execute(new ActionTrackEditName(this, name));
+	song->execute(new ActionTrackEditName(this, name));
 }
 
 void Track::setMuted(bool muted)
 {
-	root->execute(new ActionTrackEditMuted(this, muted));
+	song->execute(new ActionTrackEditMuted(this, muted));
 }
 
 void Track::setVolume(float volume)
 {
-	root->execute(new ActionTrackEditVolume(this, volume));
+	song->execute(new ActionTrackEditVolume(this, volume));
 }
 
 void Track::setPanning(float panning)
 {
-	root->execute(new ActionTrackEditPanning(this, panning));
+	song->execute(new ActionTrackEditPanning(this, panning));
 }
 
 void Track::insertMidiData(int offset, MidiData& midi)
 {
-	root->execute(new ActionTrackInsertMidi(this, offset, midi));
+	song->execute(new ActionTrackInsertMidi(this, offset, midi));
 }
 
 void Track::addEffect(Effect *effect)
 {
-	root->execute(new ActionTrackAddEffect(this, effect));
+	song->execute(new ActionTrackAddEffect(this, effect));
 }
 
 // execute after editing...
 void Track::editEffect(int index, const string &param_old)
 {
-	root->execute(new ActionTrackEditEffect(this, index, param_old, fx[index]));
+	song->execute(new ActionTrackEditEffect(this, index, param_old, fx[index]));
 }
 
 void Track::enableEffect(int index, bool enabled)
 {
 	if (fx[index]->enabled != enabled)
-		root->execute(new ActionTrackToggleEffectEnabled(this, index));
+		song->execute(new ActionTrackToggleEffectEnabled(this, index));
 }
 
 void Track::deleteEffect(int index)
 {
-	root->execute(new ActionTrackDeleteEffect(this, index));
+	song->execute(new ActionTrackDeleteEffect(this, index));
 }
 
 void Track::addMidiEffect(MidiEffect *effect)
 {
-	root->execute(new ActionTrackAddMidiEffect(this, effect));
+	song->execute(new ActionTrackAddMidiEffect(this, effect));
 }
 
 // execute after editing...
 void Track::editMidiEffect(int index, const string &param_old)
 {
-	root->execute(new ActionTrackEditMidiEffect(this, index, param_old, midi.fx[index]));
+	song->execute(new ActionTrackEditMidiEffect(this, index, param_old, midi.fx[index]));
 }
 
 void Track::enableMidiEffect(int index, bool enabled)
 {
 	if (midi.fx[index]->enabled != enabled)
-		root->execute(new ActionTrackToggleMidiEffectEnabled(this, index));
+		song->execute(new ActionTrackToggleMidiEffectEnabled(this, index));
 }
 
 void Track::deleteMidiEffect(int index)
 {
-	root->execute(new ActionTrackDeleteMidiEffect(this, index));
+	song->execute(new ActionTrackDeleteMidiEffect(this, index));
 }
 
 void Track::setSynthesizer(Synthesizer *_synth)
 {
-	root->execute(new ActionTrackSetSynthesizer(this, _synth));
+	song->execute(new ActionTrackSetSynthesizer(this, _synth));
 }
 
 // execute after editing...
 void Track::editSynthesizer(const string &param_old)
 {
-	root->execute(new ActionTrackEditSynthesizer(this, param_old));
+	song->execute(new ActionTrackEditSynthesizer(this, param_old));
 }
 
 void Track::addBar(int index, float bpm, int beats, bool affect_midi)
@@ -371,11 +371,11 @@ void Track::addBar(int index, float bpm, int beats, bool affect_midi)
 	BarPattern b;
 	b.num_beats = beats;
 	b.type = b.TYPE_BAR;
-	b.length = (int)((float)b.num_beats * (float)root->sample_rate * 60.0f / bpm);
+	b.length = (int)((float)b.num_beats * (float)song->sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		root->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
+		song->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
 	else
-		root->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
+		song->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
 }
 
 void Track::addPause(int index, float time, bool affect_midi)
@@ -383,36 +383,36 @@ void Track::addPause(int index, float time, bool affect_midi)
 	BarPattern b;
 	b.num_beats = 0;
 	b.type = b.TYPE_PAUSE;
-	b.length = (int)((float)root->sample_rate * time);
+	b.length = (int)((float)song->sample_rate * time);
 	if (index >= 0)
-		root->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
+		song->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
 	else
-		root->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
+		song->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
 }
 
 void Track::editBar(int index, BarPattern &p, bool affect_midi)
 {
-	root->execute(new ActionTrackEditBar(this, index, p, affect_midi));
+	song->execute(new ActionTrackEditBar(this, index, p, affect_midi));
 }
 
 void Track::deleteBar(int index, bool affect_midi)
 {
-	root->execute(new ActionTrackDeleteBar(this, index, affect_midi));
+	song->execute(new ActionTrackDeleteBar(this, index, affect_midi));
 }
 
 void Track::addMarker(int pos, const string &text)
 {
-	root->execute(new ActionTrackAddMarker(this, pos, text));
+	song->execute(new ActionTrackAddMarker(this, pos, text));
 }
 
 void Track::deleteMarker(int index)
 {
-	root->execute(new ActionTrackDeleteMarker(this, index));
+	song->execute(new ActionTrackDeleteMarker(this, index));
 }
 
 void Track::moveMarker(int index, int pos)
 {
-	root->execute(new ActionTrackMoveMarker(this, index, pos));
+	song->execute(new ActionTrackMoveMarker(this, index, pos));
 }
 
 

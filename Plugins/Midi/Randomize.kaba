@@ -18,7 +18,7 @@ class Randomize : MidiEffect
 	Config config
 	
 	overwrite void process(MidiData midi)
-		AudioFile *a = plugin_context.track.root
+		Song *a = plugin_context.track.song
 		float delay = a.sample_rate * config.TimeDelay
 		float var = a.sample_rate * config.TimeVariation
 		for n in midi

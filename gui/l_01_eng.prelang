@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-259
+257
 // Data (ID,Text)
 about
 
@@ -35,19 +35,7 @@ add_track
 
 afd_grid_1
 
-audio_add_bar
-
-audio_add_bar_pause
-
 audio_bar_list
-
-audio_delete_bar
-
-audio_file_dialog
-
-audio_file_menu_header
-
-audio_file_properties
 
 bad_buttonbar
 
@@ -154,6 +142,8 @@ edit_midi
 edit_midi_fx
 
 edit_samples
+
+edit_song
 
 edit_synth
 
@@ -267,7 +257,7 @@ menu_plugins_dynamics
 
 menu_plugins_echo
 
-menu_plugins_on_audio
+menu_plugins_on_all
 
 menu_plugins_on_midi
 
@@ -401,9 +391,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_754799
+rand_id_342148
 
-rand_id_784567
+rand_id_750996
 
 rdt_capture
 
@@ -469,6 +459,12 @@ show_log
 
 show_mixing_console
 
+song_dialog
+
+song_menu_header
+
+song_properties
+
 stop
 Stop
 tags
@@ -522,7 +518,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-142
+141
 // Data (ID,Text)
 
 
@@ -556,8 +552,6 @@ zoom_out
 
 (anonym)
 
-(stumm)
-(muted)
 * entweder eine Quelle wählen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen überlassen, eine Verbindung herzustellen
 
 - Standard -
@@ -578,7 +572,7 @@ Abtastrate\\\") + i2s(audio->sample_rate) +
 
 Amplitude zu groß, Signal übersteuert.
 
-Anfang\\\") + audio->get_time_str_long(audio->getRange().start()));
+Anfang\\\") + song->get_time_str_long(song->getRange().start()));
 
 Anwendung ohne Netzwerk-Unterstützung compiliert...
 
@@ -612,7 +606,7 @@ Datei öffnen
 
 Datenverlust!
 
-Dauer\\\") + audio->get_time_str_long(samples));
+Dauer\\\") + song->get_time_str_long(samples));
 
 Dur
 
@@ -630,7 +624,7 @@ Effekt nicht ladbar: \"%s\"
 
 Effekte
 
-Ende\\\") + audio->get_time_str_long(audio->getRange().end()));
+Ende\\\") + song->get_time_str_long(song->getRange().end()));
 
 Es existiert schon eine Rhythmus-Spur.
 

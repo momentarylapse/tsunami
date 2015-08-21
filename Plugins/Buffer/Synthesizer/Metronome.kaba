@@ -29,7 +29,7 @@ class Metronome : AudioEffect
 	DummySynthesizer synth
 
 	overwrite void process(BufferBox buf)
-		AudioFile *a = audio
+		Song *a = song
 
 		float dt_m = 60.0 / config.BeatsPerMinute
 		int sm_m = dt_m * a.sample_rate

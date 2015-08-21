@@ -3,19 +3,19 @@
 BIN = ../tsunami
 all : $(BIN)
 OBJ = \
- Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.o\
- Action/AudioFile/Data/ActionAudioSetDefaultFormat.o\
- Action/AudioFile/Data/ActionAudioSetSampleRate.o\
- Action/AudioFile/Data/ActionAudioSetVolume.o\
- Action/AudioFile/Level/ActionAudioAddLevel.o\
- Action/AudioFile/Level/ActionAudioRenameLevel.o\
- Action/AudioFile/Sample/ActionAudioAddSample.o\
- Action/AudioFile/Sample/ActionAudioDeleteSample.o\
- Action/AudioFile/Sample/ActionAudioSampleEditName.o\
- Action/AudioFile/Tag/ActionAudioAddTag.o\
- Action/AudioFile/Tag/ActionAudioDeleteTag.o\
- Action/AudioFile/Tag/ActionAudioEditTag.o\
- Action/AudioFile/ActionAudioDeleteSelection.o\
+ Action/Song/Data/ActionSongChangeAllTrackVolumes.o\
+ Action/Song/Data/ActionSongSetDefaultFormat.o\
+ Action/Song/Data/ActionSongSetSampleRate.o\
+ Action/Song/Data/ActionSongSetVolume.o\
+ Action/Song/Level/ActionSongAddLevel.o\
+ Action/Song/Level/ActionSongRenameLevel.o\
+ Action/Song/Sample/ActionSongAddSample.o\
+ Action/Song/Sample/ActionSongDeleteSample.o\
+ Action/Song/Sample/ActionSongSampleEditName.o\
+ Action/Song/Tag/ActionSongAddTag.o\
+ Action/Song/Tag/ActionSongDeleteTag.o\
+ Action/Song/Tag/ActionSongEditTag.o\
+ Action/Song/ActionSongDeleteSelection.o\
  Action/Track/Bar/ActionTrackAddBar.o\
  Action/Track/Bar/ActionTrackDeleteBar.o\
  Action/Track/Bar/ActionTrackEditBar.o\
@@ -73,7 +73,7 @@ OBJ = \
  Audio/AudioOutput.o\
  Audio/AudioRenderer.o\
  Audio/AudioStream.o\
- Data/AudioFile.o\
+ Audio/SongRenderer.o\
  Data/BufferBox.o\
  Data/Curve.o\
  Data/Data.o\
@@ -83,6 +83,7 @@ OBJ = \
  Data/Rhythm.o\
  Data/Sample.o\
  Data/SampleRef.o\
+ Data/Song.o\
  Data/Track.o\
  lib/base/array.o\
  lib/base/strings.o\
@@ -243,10 +244,10 @@ OBJ = \
  View/Helper/Progress.o\
  View/Helper/Slider.o\
  View/SideBar/SideBar.o\
- View/SideBar/AudioFileConsole.o\
  View/SideBar/LevelConsole.o\
  View/SideBar/MidiEditor.o\
  View/SideBar/SampleRefDialog.o\
+ View/SideBar/SongConsole.o\
  View/SideBar/TrackConsole.o\
  View/AudioView.o\
  View/AudioViewTrack.o\
@@ -265,44 +266,44 @@ CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lpulse -laso
 $(BIN) : $(OBJ)
 	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
 
-Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.o : Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.cpp
-	$(CPP) -c Action/AudioFile/Data/ActionAudioChangeAllTrackVolumes.cpp -o $@ $(CXXFLAGS)
+Action/Song/Data/ActionSongChangeAllTrackVolumes.o : Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp
+	$(CPP) -c Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Data/ActionAudioSetDefaultFormat.o : Action/AudioFile/Data/ActionAudioSetDefaultFormat.cpp
-	$(CPP) -c Action/AudioFile/Data/ActionAudioSetDefaultFormat.cpp -o $@ $(CXXFLAGS)
+Action/Song/Data/ActionSongSetDefaultFormat.o : Action/Song/Data/ActionSongSetDefaultFormat.cpp
+	$(CPP) -c Action/Song/Data/ActionSongSetDefaultFormat.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Data/ActionAudioSetSampleRate.o : Action/AudioFile/Data/ActionAudioSetSampleRate.cpp
-	$(CPP) -c Action/AudioFile/Data/ActionAudioSetSampleRate.cpp -o $@ $(CXXFLAGS)
+Action/Song/Data/ActionSongSetSampleRate.o : Action/Song/Data/ActionSongSetSampleRate.cpp
+	$(CPP) -c Action/Song/Data/ActionSongSetSampleRate.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Data/ActionAudioSetVolume.o : Action/AudioFile/Data/ActionAudioSetVolume.cpp
-	$(CPP) -c Action/AudioFile/Data/ActionAudioSetVolume.cpp -o $@ $(CXXFLAGS)
+Action/Song/Data/ActionSongSetVolume.o : Action/Song/Data/ActionSongSetVolume.cpp
+	$(CPP) -c Action/Song/Data/ActionSongSetVolume.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Level/ActionAudioAddLevel.o : Action/AudioFile/Level/ActionAudioAddLevel.cpp
-	$(CPP) -c Action/AudioFile/Level/ActionAudioAddLevel.cpp -o $@ $(CXXFLAGS)
+Action/Song/Level/ActionSongAddLevel.o : Action/Song/Level/ActionSongAddLevel.cpp
+	$(CPP) -c Action/Song/Level/ActionSongAddLevel.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Level/ActionAudioRenameLevel.o : Action/AudioFile/Level/ActionAudioRenameLevel.cpp
-	$(CPP) -c Action/AudioFile/Level/ActionAudioRenameLevel.cpp -o $@ $(CXXFLAGS)
+Action/Song/Level/ActionSongRenameLevel.o : Action/Song/Level/ActionSongRenameLevel.cpp
+	$(CPP) -c Action/Song/Level/ActionSongRenameLevel.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Sample/ActionAudioAddSample.o : Action/AudioFile/Sample/ActionAudioAddSample.cpp
-	$(CPP) -c Action/AudioFile/Sample/ActionAudioAddSample.cpp -o $@ $(CXXFLAGS)
+Action/Song/Sample/ActionSongAddSample.o : Action/Song/Sample/ActionSongAddSample.cpp
+	$(CPP) -c Action/Song/Sample/ActionSongAddSample.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Sample/ActionAudioDeleteSample.o : Action/AudioFile/Sample/ActionAudioDeleteSample.cpp
-	$(CPP) -c Action/AudioFile/Sample/ActionAudioDeleteSample.cpp -o $@ $(CXXFLAGS)
+Action/Song/Sample/ActionSongDeleteSample.o : Action/Song/Sample/ActionSongDeleteSample.cpp
+	$(CPP) -c Action/Song/Sample/ActionSongDeleteSample.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Sample/ActionAudioSampleEditName.o : Action/AudioFile/Sample/ActionAudioSampleEditName.cpp
-	$(CPP) -c Action/AudioFile/Sample/ActionAudioSampleEditName.cpp -o $@ $(CXXFLAGS)
+Action/Song/Sample/ActionSongSampleEditName.o : Action/Song/Sample/ActionSongSampleEditName.cpp
+	$(CPP) -c Action/Song/Sample/ActionSongSampleEditName.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Tag/ActionAudioAddTag.o : Action/AudioFile/Tag/ActionAudioAddTag.cpp
-	$(CPP) -c Action/AudioFile/Tag/ActionAudioAddTag.cpp -o $@ $(CXXFLAGS)
+Action/Song/Tag/ActionSongAddTag.o : Action/Song/Tag/ActionSongAddTag.cpp
+	$(CPP) -c Action/Song/Tag/ActionSongAddTag.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Tag/ActionAudioDeleteTag.o : Action/AudioFile/Tag/ActionAudioDeleteTag.cpp
-	$(CPP) -c Action/AudioFile/Tag/ActionAudioDeleteTag.cpp -o $@ $(CXXFLAGS)
+Action/Song/Tag/ActionSongDeleteTag.o : Action/Song/Tag/ActionSongDeleteTag.cpp
+	$(CPP) -c Action/Song/Tag/ActionSongDeleteTag.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/Tag/ActionAudioEditTag.o : Action/AudioFile/Tag/ActionAudioEditTag.cpp
-	$(CPP) -c Action/AudioFile/Tag/ActionAudioEditTag.cpp -o $@ $(CXXFLAGS)
+Action/Song/Tag/ActionSongEditTag.o : Action/Song/Tag/ActionSongEditTag.cpp
+	$(CPP) -c Action/Song/Tag/ActionSongEditTag.cpp -o $@ $(CXXFLAGS)
 
-Action/AudioFile/ActionAudioDeleteSelection.o : Action/AudioFile/ActionAudioDeleteSelection.cpp
-	$(CPP) -c Action/AudioFile/ActionAudioDeleteSelection.cpp -o $@ $(CXXFLAGS)
+Action/Song/ActionSongDeleteSelection.o : Action/Song/ActionSongDeleteSelection.cpp
+	$(CPP) -c Action/Song/ActionSongDeleteSelection.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Bar/ActionTrackAddBar.o : Action/Track/Bar/ActionTrackAddBar.cpp
 	$(CPP) -c Action/Track/Bar/ActionTrackAddBar.cpp -o $@ $(CXXFLAGS)
@@ -475,8 +476,8 @@ Audio/AudioRenderer.o : Audio/AudioRenderer.cpp
 Audio/AudioStream.o : Audio/AudioStream.cpp
 	$(CPP) -c Audio/AudioStream.cpp -o $@ $(CXXFLAGS)
 
-Data/AudioFile.o : Data/AudioFile.cpp
-	$(CPP) -c Data/AudioFile.cpp -o $@ $(CXXFLAGS)
+Audio/SongRenderer.o : Audio/SongRenderer.cpp
+	$(CPP) -c Audio/SongRenderer.cpp -o $@ $(CXXFLAGS)
 
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)
@@ -504,6 +505,9 @@ Data/Sample.o : Data/Sample.cpp
 
 Data/SampleRef.o : Data/SampleRef.cpp
 	$(CPP) -c Data/SampleRef.cpp -o $@ $(CXXFLAGS)
+
+Data/Song.o : Data/Song.cpp
+	$(CPP) -c Data/Song.cpp -o $@ $(CXXFLAGS)
 
 Data/Track.o : Data/Track.cpp
 	$(CPP) -c Data/Track.cpp -o $@ $(CXXFLAGS)
@@ -982,9 +986,6 @@ View/Helper/Slider.o : View/Helper/Slider.cpp
 View/SideBar/SideBar.o : View/SideBar/SideBar.cpp
 	$(CPP) -c View/SideBar/SideBar.cpp -o $@ $(CXXFLAGS)
 
-View/SideBar/AudioFileConsole.o : View/SideBar/AudioFileConsole.cpp
-	$(CPP) -c View/SideBar/AudioFileConsole.cpp -o $@ $(CXXFLAGS)
-
 View/SideBar/LevelConsole.o : View/SideBar/LevelConsole.cpp
 	$(CPP) -c View/SideBar/LevelConsole.cpp -o $@ $(CXXFLAGS)
 
@@ -993,6 +994,9 @@ View/SideBar/MidiEditor.o : View/SideBar/MidiEditor.cpp
 
 View/SideBar/SampleRefDialog.o : View/SideBar/SampleRefDialog.cpp
 	$(CPP) -c View/SideBar/SampleRefDialog.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/SongConsole.o : View/SideBar/SongConsole.cpp
+	$(CPP) -c View/SideBar/SongConsole.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/TrackConsole.o : View/SideBar/TrackConsole.cpp
 	$(CPP) -c View/SideBar/TrackConsole.cpp -o $@ $(CXXFLAGS)

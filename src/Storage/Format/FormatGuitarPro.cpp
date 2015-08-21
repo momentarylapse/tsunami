@@ -92,9 +92,9 @@ void FormatGuitarPro::saveBuffer(StorageOperationData *od){}
 
 void FormatGuitarPro::loadTrack(StorageOperationData *od){}
 
-void FormatGuitarPro::saveAudio(StorageOperationData *od)
+void FormatGuitarPro::saveSong(StorageOperationData *od)
 {
-	a = od->audio;
+	a = od->song;
 	char data[16];
 
 	f = FileCreate(od->filename);
@@ -172,9 +172,9 @@ void FormatGuitarPro::saveAudio(StorageOperationData *od)
 	delete(f);
 }
 
-void FormatGuitarPro::loadAudio(StorageOperationData *od)
+void FormatGuitarPro::loadSong(StorageOperationData *od)
 {
-	a = od->audio;
+	a = od->song;
 	f = FileOpen(od->filename);
 	char data[16];
 	tracks.clear();

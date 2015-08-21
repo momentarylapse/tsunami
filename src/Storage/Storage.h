@@ -13,7 +13,7 @@
 
 class Range;
 class Format;
-class AudioFile;
+class Song;
 class Track;
 class BufferBox;
 class StorageOperationData;
@@ -24,13 +24,13 @@ public:
 	Storage();
 	virtual ~Storage();
 
-	bool load(AudioFile *a, const string &filename);
+	bool load(Song *a, const string &filename);
 	bool loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
-	bool loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
-	bool saveBufferBox(AudioFile *a, BufferBox *buf, const string &filename);
+	bool loadBufferBox(Song *a, BufferBox *buf, const string &filename);
+	bool saveBufferBox(Song *a, BufferBox *buf, const string &filename);
 	bool _saveBufferBox(StorageOperationData *od);
-	bool save(AudioFile *a, const string &filename);
-	bool _export(AudioFile *a, const Range &r, const string &filename);
+	bool save(Song *a, const string &filename);
+	bool _export(Song *a, const Range &r, const string &filename);
 
 	bool askByFlags(HuiWindow *win, const string &title, int flags);
 

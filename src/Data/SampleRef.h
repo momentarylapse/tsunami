@@ -11,7 +11,7 @@
 #include "../Stuff/Observable.h"
 #include "../lib/math/rect.h"
 
-class AudioFile;
+class Song;
 class Track;
 class Sample;
 class MidiData;
@@ -47,7 +47,7 @@ public:
 	// editing
 	rect area;
 	int track_no;
-	AudioFile *owner;
+	Song *owner;
 
 	bool is_selected;
 };

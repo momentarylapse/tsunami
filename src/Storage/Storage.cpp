@@ -22,8 +22,8 @@
 #include "../lib/hui/hui.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
-#include "../Audio/AudioRenderer.h"
-#include "../Data/AudioFile.h"
+#include "../Audio/SongRenderer.h"
+#include "../Data/Song.h"
 
 Storage::Storage()
 {
@@ -50,7 +50,7 @@ Storage::~Storage()
 	formats.clear();
 }
 
-bool Storage::load(AudioFile *a, const string &filename)
+bool Storage::load(Song *a, const string &filename)
 {
 	msg_db_f("Storage.Load", 1);
 
@@ -65,7 +65,7 @@ bool Storage::load(AudioFile *a, const string &filename)
 	a->action_manager->enable(false);
 	a->filename = filename;
 
-	f->loadAudio(&od);
+	f->loadSong(&od);
 
 
 	a->action_manager->enable(true);
@@ -88,7 +88,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 	if (!f)
 		return false;
 
-	AudioFile *a = t->root;
+	Song *a = t->song;
 	StorageOperationData od = StorageOperationData(a, t, NULL, filename, _("lade ") + f->description, tsunami->_win);
 	od.offset = offset;
 	od.level = level;
@@ -101,10 +101,10 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 	return true;
 }
 
-bool Storage::loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename)
+bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 {
 	msg_db_f("Storage.LoadBufferBox", 1);
-	AudioFile *aa = new AudioFile;
+	Song *aa = new Song;
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->tracks[0];
 	bool ok = loadTrack(t, filename, 0, 0);
@@ -114,7 +114,7 @@ bool Storage::loadBufferBox(AudioFile *a, BufferBox *buf, const string &filename
 	return ok;
 }
 
-bool Storage::saveBufferBox(AudioFile *a, BufferBox *buf, const string &filename)
+bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
 {
 	msg_db_f("Storage.saveBuf", 1);
 
@@ -144,7 +144,7 @@ bool Storage::_saveBufferBox(StorageOperationData *od)
 	return true;
 }
 
-bool Storage::save(AudioFile *a, const string &filename)
+bool Storage::save(Song *a, const string &filename)
 {
 	msg_db_f("Storage.Save", 1);
 
@@ -161,7 +161,7 @@ bool Storage::save(AudioFile *a, const string &filename)
 
 	a->filename = filename;
 
-	f->saveAudio(&od);
+	f->saveSong(&od);
 
 	a->action_manager->markCurrentAsSave();
 	if (tsunami->win)
@@ -170,19 +170,19 @@ bool Storage::save(AudioFile *a, const string &filename)
 	return true;
 }
 
-bool Storage::_export(AudioFile *a, const Range &r, const string &filename)
+bool Storage::_export(Song *s, const Range &r, const string &filename)
 {
 	msg_db_f("Storage.Export", 1);
 	if (!getFormat(filename.extension(), Format::FLAG_AUDIO))
 		return false;
 
 	BufferBox buf;
-	StorageOperationData od = StorageOperationData(a, NULL, &buf, filename, _("exportiere"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(s, NULL, &buf, filename, _("exportiere"), tsunami->_win);
 
 	// render audio...
 	od.progress->set(_("rendere Audio"), 0);
-	AudioRenderer renderer;
-	renderer.renderAudioFile(a, r, buf);
+	SongRenderer renderer;
+	renderer.render(s, r, buf);
 
 	return _saveBufferBox(&od);
 }

@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
-#include "../Data/AudioFile.h"
+#include "../Data/Song.h"
 #include "../Data/RingBuffer.h"
 #include "../View/Helper/PeakMeter.h"
 
@@ -65,6 +65,7 @@ public:
 	static string getDefaultTempFilename();
 	static string getTempFilename();
 	static void setTempFilename(const string &filename);
+	void setSaveMode(bool enable);
 
 	static string temp_filename;
 
@@ -92,6 +93,7 @@ private:
 
 	File *temp_file;
 	static string cur_temp_filename;
+	bool save_mode;
 
 	struct SyncData
 	{

@@ -3,12 +3,12 @@ use "../tone.kaba"
 
 class Drumset
 	string name
-	AudioFile *a
+	Song *a
 	
 	void load()
 		if a
 			return
-		a = new AudioFile
+		a = new Song
 		string temp = storage.current_directory
 		storage.load(a, AppDirectoryStatic + "Data/Drumsets/" + name + ".nami")
 		storage.current_directory = temp
@@ -42,7 +42,7 @@ class DrumList
 			s.a = nil
 			sets.add(s)
 	
-	AudioFile *get(string name)
+	Song *get(string name)
 		update()
 		int n = find(name)
 		if n < 0
@@ -64,7 +64,7 @@ class DrumsetConfig : PluginData
 		name = ""
 
 class DrumsetState : PluginData
-	AudioFile *a
+	Song *a
 	Synthesizer *s
 	
 

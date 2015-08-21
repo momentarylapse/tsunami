@@ -11,7 +11,7 @@
 #include "FastFourierTransform.h"
 #include "ExtendedBufferBox.h"
 #include "../View/Helper/Slider.h"
-#include "../Audio/AudioRenderer.h"
+#include "../Audio/SongRenderer.h"
 #include "../Audio/AudioInputAudio.h"
 #include "../Audio/AudioInputMidi.h"
 #include "../Audio/AudioOutput.h"
@@ -61,12 +61,6 @@ bool GlobalAllowTermination()
 	return tsunami->AllowTermination();
 }
 
-class InputAudioWrapper
-{
-public:
-
-};
-
 void PluginManager::LinkAppScriptData()
 {
 	msg_db_f("LinkAppScriptData", 2);
@@ -74,7 +68,7 @@ void PluginManager::LinkAppScriptData()
 
 	// api definition
 	Script::LinkExternal("MainWin", &tsunami->_win);
-	Script::LinkExternal("audio", &tsunami->audio);
+	Script::LinkExternal("song", &tsunami->song);
 	Script::LinkExternal("output", &tsunami->output);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
@@ -175,7 +169,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Sample.createRef", Script::mf(&Sample::create_ref));
 
 	Sample sample(0);
-	sample.owner = tsunami->audio;
+	sample.owner = tsunami->song;
 	SampleRef sampleref(&sample);
 	Script::DeclareClassSize("SampleRef", sizeof(SampleRef));
 	Script::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
@@ -275,7 +269,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
 	Script::DeclareClassOffset("Track", "samples", _offsetof(Track, samples));
 	Script::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
-	Script::DeclareClassOffset("Track", "root", _offsetof(Track, root));
+	Script::DeclareClassOffset("Track", "root", _offsetof(Track, song));
 	Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
 	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::getBuffers));
 	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::readBuffers));
@@ -303,40 +297,27 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.deleteMarker", Script::mf(&Track::deleteMarker));
 	Script::LinkExternal("Track.moveMarker", Script::mf(&Track::moveMarker));
 
-	AudioFile af;
-	Script::DeclareClassSize("AudioFile", sizeof(AudioFile));
-	Script::DeclareClassOffset("AudioFile", "filename", _offsetof(AudioFile, filename));
-	Script::DeclareClassOffset("AudioFile", "tag", _offsetof(AudioFile, tags));
-	Script::DeclareClassOffset("AudioFile", "sample_rate", _offsetof(AudioFile, sample_rate));
-	Script::DeclareClassOffset("AudioFile", "volume", _offsetof(AudioFile, volume));
-	Script::DeclareClassOffset("AudioFile", "fx", _offsetof(AudioFile, fx));
-	Script::DeclareClassOffset("AudioFile", "tracks", _offsetof(AudioFile, tracks));
-	Script::DeclareClassOffset("AudioFile", "samples", _offsetof(AudioFile, samples));
-	Script::DeclareClassOffset("AudioFile", "level_names", _offsetof(AudioFile, level_names));
-	Script::LinkExternal("AudioFile.__init__", Script::mf(&AudioFile::__init__));
-	Script::DeclareClassVirtualIndex("AudioFile", "__delete__", Script::mf(&AudioFile::__delete__), &af);
-	Script::LinkExternal("AudioFile.newEmpty", Script::mf(&AudioFile::newEmpty));
-	Script::LinkExternal("AudioFile.addTrack", Script::mf(&AudioFile::addTrack));
-	Script::LinkExternal("AudioFile.deleteTrack", Script::mf(&AudioFile::deleteTrack));
-	Script::LinkExternal("AudioFile.getRange", Script::mf(&AudioFile::getRange));
-	Script::LinkExternal("AudioFile.getNextBeat", Script::mf(&AudioFile::getNextBeat));
-
-	AudioRendererInterface ari;
-	Script::DeclareClassSize("AudioRendererInterface", sizeof(AudioRendererInterface));
-	//Script::DeclareClassOffset("AudioRendererInterface", "sample_rate", _offsetof(AudioRendererInterface, sample_rate));
-	Script::LinkExternal("AudioRendererInterface.__init__", Script::mf(&AudioRendererInterface::__init__));
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "__delete__", Script::mf(&AudioRendererInterface::__delete__), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "read", Script::mf(&AudioRendererInterface::read), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "reset", Script::mf(&AudioRendererInterface::reset), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "range", Script::mf(&AudioRendererInterface::range), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getPos", Script::mf(&AudioRendererInterface::getPos), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "seek", Script::mf(&AudioRendererInterface::seek), &ari);
-	Script::DeclareClassVirtualIndex("AudioRendererInterface", "getSampleRate", Script::mf(&AudioRendererInterface::getSampleRate), &ari);
+	Song af;
+	Script::DeclareClassSize("Song", sizeof(Song));
+	Script::DeclareClassOffset("Song", "filename", _offsetof(Song, filename));
+	Script::DeclareClassOffset("Song", "tag", _offsetof(Song, tags));
+	Script::DeclareClassOffset("Song", "sample_rate", _offsetof(Song, sample_rate));
+	Script::DeclareClassOffset("Song", "volume", _offsetof(Song, volume));
+	Script::DeclareClassOffset("Song", "fx", _offsetof(Song, fx));
+	Script::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
+	Script::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
+	Script::DeclareClassOffset("Song", "level_names", _offsetof(Song, level_names));
+	Script::LinkExternal("Song.__init__", Script::mf(&Song::__init__));
+	Script::DeclareClassVirtualIndex("Song", "__delete__", Script::mf(&Song::__delete__), &af);
+	Script::LinkExternal("Song.newEmpty", Script::mf(&Song::newEmpty));
+	Script::LinkExternal("Song.addTrack", Script::mf(&Song::addTrack));
+	Script::LinkExternal("Song.deleteTrack", Script::mf(&Song::deleteTrack));
+	Script::LinkExternal("Song.getRange", Script::mf(&Song::getRange));
+	Script::LinkExternal("Song.getNextBeat", Script::mf(&Song::getNextBeat));
 
 	AudioRenderer ar;
 	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
-	Script::LinkExternal("AudioRenderer.prepare", Script::mf(&AudioRenderer::prepare));
-	Script::LinkExternal("AudioRenderer.renderAudioFile", Script::mf(&AudioRenderer::renderAudioFile));
+	//Script::DeclareClassOffset("AudioRenderer", "sample_rate", _offsetof(AudioRenderer, sample_rate));
 	Script::LinkExternal("AudioRenderer.__init__", Script::mf(&AudioRenderer::__init__));
 	Script::DeclareClassVirtualIndex("AudioRenderer", "__delete__", Script::mf(&AudioRenderer::__delete__), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "read", Script::mf(&AudioRenderer::read), &ar);
@@ -345,6 +326,19 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getPos", Script::mf(&AudioRenderer::getPos), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "seek", Script::mf(&AudioRenderer::seek), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
+
+	SongRenderer sr;
+	Script::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
+	Script::LinkExternal("SongRenderer.prepare", Script::mf(&SongRenderer::prepare));
+	Script::LinkExternal("SongRenderer.render", Script::mf(&SongRenderer::render));
+	Script::LinkExternal("SongRenderer.__init__", Script::mf(&SongRenderer::__init__));
+	Script::DeclareClassVirtualIndex("SongRenderer", "__delete__", Script::mf(&SongRenderer::__delete__), &sr);
+	Script::DeclareClassVirtualIndex("SongRenderer", "read", Script::mf(&SongRenderer::read), &sr);
+	Script::DeclareClassVirtualIndex("SongRenderer", "reset", Script::mf(&SongRenderer::reset), &sr);
+	Script::DeclareClassVirtualIndex("SongRenderer", "range", Script::mf(&SongRenderer::range), &sr);
+	Script::DeclareClassVirtualIndex("SongRenderer", "getPos", Script::mf(&SongRenderer::getPos), &sr);
+	Script::DeclareClassVirtualIndex("SongRenderer", "seek", Script::mf(&SongRenderer::seek), &sr);
+	Script::DeclareClassVirtualIndex("SongRenderer", "getSampleRate", Script::mf(&SongRenderer::getSampleRate), &sr);
 
 	{
 	AudioInputAudio input(0);
@@ -534,7 +528,7 @@ void PluginManager::AddPluginsToMenu(HuiWindow *win)
 	add_plugins_in_dir("Midi/", this, m->getSubMenuByID("menu_plugins_on_midi"));
 
 	// "All"
-	add_plugins_in_dir("All/", this, m->getSubMenuByID("menu_plugins_on_audio"));
+	add_plugins_in_dir("All/", this, m->getSubMenuByID("menu_plugins_on_all"));
 
 	// rest
 	add_plugins_in_dir("Independent/", this, m->getSubMenuByID("menu_plugins_other"));
@@ -580,7 +574,7 @@ Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 
 	return p;
 }
-typedef void main_audiofile_func(AudioFile*);
+typedef void main_audiofile_func(Song*);
 typedef void main_void_func();
 
 void PluginManager::ExecutePlugin(const string &filename)
@@ -591,7 +585,7 @@ void PluginManager::ExecutePlugin(const string &filename)
 	if (p->usable){
 		Script::Script *s = p->s;
 
-		AudioFile *a = tsunami->audio;
+		Song *a = tsunami->song;
 
 		Effect *fx = NULL;
 		MidiEffect *mfx = NULL;

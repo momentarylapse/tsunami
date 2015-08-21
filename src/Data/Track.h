@@ -13,9 +13,9 @@
 #include "MidiData.h"
 #include "Rhythm.h"
 #include "Sample.h"
-#include "AudioFile.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
+#include "Song.h"
 
 
 #define NUM_PEAK_LEVELS		24
@@ -25,7 +25,7 @@
 #define DEFAULT_SAMPLE_RATE		44100
 
 class BufferBox;
-class AudioFile;
+class Song;
 class Synthesizer;
 class Effect;
 
@@ -129,7 +129,7 @@ public:
 
 	Array<TrackMarker> markers;
 
-	AudioFile *root;
+	Song *song;
 
 	bool is_selected;
 };

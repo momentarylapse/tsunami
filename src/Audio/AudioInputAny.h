@@ -10,8 +10,8 @@
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
-#include "../Data/AudioFile.h"
 #include "../Data/RingBuffer.h"
+#include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
 #include "AudioInputMidi.h"
 
@@ -46,6 +46,8 @@ public:
 
 	void setDevice(const string &dev);
 	string getChosenDevice();
+
+	void setSaveMode(bool enabled);
 
 	AudioInputMidi::MidiPort getCurMidiPort();
 	Array<AudioInputMidi::MidiPort> findMidiPorts();

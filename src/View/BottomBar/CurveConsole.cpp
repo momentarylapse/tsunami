@@ -7,13 +7,13 @@
 
 #include "CurveConsole.h"
 #include "../AudioView.h"
-#include "../../Data/AudioFile.h"
+#include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
 class CurveTargetDialog : public HuiDialog
 {
 public:
-	CurveTargetDialog(HuiPanel *parent, AudioFile *a, Array<Curve::Target> &t) :
+	CurveTargetDialog(HuiPanel *parent, Song *song, Array<Curve::Target> &t) :
 		HuiDialog(_("target"), 300, 400, parent->win, false),
 		targets(t)
 	{
@@ -24,12 +24,12 @@ public:
 		setTarget("buttonbar", 0);
 		addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
 		addButton(_("Ok"), 1, 0, 0, 0, "ok");
-		all_targets = Curve::Target::enumerate(a);
+		all_targets = Curve::Target::enumerate(song);
 
 		Array<int> sel;
 
 		foreachi(Curve::Target &t, all_targets, i){
-			addString("list", t.niceStr(a));
+			addString("list", t.niceStr(song));
 
 			foreach(Curve::Target &tt, targets)
 				if (t.p == tt.p){
@@ -62,12 +62,12 @@ public:
 	}
 };
 
-CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
+CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
 	BottomBarConsole(_("Kurven")),
 	Observer("CurveConsole")
 {
 	view = _view;
-	audio = _audio;
+	song = _song;
 
 	addGrid("", 0, 0, 2, 1, "root");
 	setTarget("root", 0);
@@ -96,21 +96,21 @@ CurveConsole::CurveConsole(AudioView *_view, AudioFile *_audio) :
 	curve_rect = rect(0, 0, 0, 0);
 	hover = selected = -1;
 
-	subscribe(audio, audio->MESSAGE_NEW);
-	subscribe(audio, audio->MESSAGE_ADD_CURVE);
-	subscribe(audio, audio->MESSAGE_DELETE_CURVE);
+	subscribe(song, song->MESSAGE_NEW);
+	subscribe(song, song->MESSAGE_ADD_CURVE);
+	subscribe(song, song->MESSAGE_DELETE_CURVE);
 	subscribe(view, view->MESSAGE_VIEW_CHANGE);
 }
 
 CurveConsole::~CurveConsole()
 {
-	unsubscribe(audio);
+	unsubscribe(song);
 	unsubscribe(view);
 }
 
 void CurveConsole::onUpdate(Observable* o, const string &message)
 {
-	if (o == audio){
+	if (o == song){
 		updateList();
 	}else if (o == view){
 		redraw("area");
@@ -120,8 +120,8 @@ void CurveConsole::onUpdate(Observable* o, const string &message)
 void CurveConsole::updateList()
 {
 	reset("list");
-	foreachi(Curve *c, audio->curves, i){
-		addString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(audio));
+	foreachi(Curve *c, song->curves, i){
+		addString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(song));
 		if (c == curve)
 			setInt("list", i);
 	}
@@ -131,26 +131,26 @@ void CurveConsole::onAdd()
 {
 	Curve *c = new Curve;
 	c->name = "new";
-	audio->curves.add(c);
-	audio->notify(audio->MESSAGE_ADD_CURVE);
+	song->curves.add(c);
+	song->notify(song->MESSAGE_ADD_CURVE);
 }
 
 void CurveConsole::onDelete()
 {
 	int n = getInt("list");
 	if (n >= 0){
-		delete(audio->curves[n]);
-		audio->curves.erase(n);
+		delete(song->curves[n]);
+		song->curves.erase(n);
 		curve = NULL;
 	}
-	audio->notify(audio->MESSAGE_DELETE_CURVE);
+	song->notify(song->MESSAGE_DELETE_CURVE);
 }
 
 void CurveConsole::onTarget()
 {
 	if (!curve)
 		return;
-	CurveTargetDialog *dlg = new CurveTargetDialog(this, audio, curve->targets);
+	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, curve->targets);
 	dlg->run();
 	updateList();
 }
@@ -160,7 +160,7 @@ void CurveConsole::onListSelect()
 	curve = NULL;
 	int n = getInt("list");
 	if (n >= 0)
-		curve = audio->curves[n];
+		curve = song->curves[n];
 	redraw("area");
 }
 
@@ -170,11 +170,11 @@ void CurveConsole::onListEdit()
 	int col = HuiGetEvent()->column;
 	if (n >= 0){
 		if (col == 0)
-			audio->curves[n]->name = getCell("list", n, col);
+			song->curves[n]->name = getCell("list", n, col);
 		else if (col == 1)
-			audio->curves[n]->min = getCell("list", n, col)._float();
+			song->curves[n]->min = getCell("list", n, col)._float();
 		else if (col == 2)
-			audio->curves[n]->max = getCell("list", n, col)._float();
+			song->curves[n]->max = getCell("list", n, col)._float();
 	}
 	redraw("area");
 }

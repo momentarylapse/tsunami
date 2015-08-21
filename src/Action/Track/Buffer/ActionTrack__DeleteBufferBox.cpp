@@ -23,7 +23,7 @@ ActionTrack__DeleteBufferBox::~ActionTrack__DeleteBufferBox()
 
 void ActionTrack__DeleteBufferBox::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	// restore
@@ -38,7 +38,7 @@ void ActionTrack__DeleteBufferBox::undo(Data *d)
 void *ActionTrack__DeleteBufferBox::execute(Data *d)
 {
 	//msg_write("delete " + i2s(index));
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	assert(level_no >= 0);
 	assert(level_no < t->levels.num);

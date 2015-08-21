@@ -66,9 +66,9 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 				int bit_rate_index = ((data[2] & 0xf0) >> 4);
 				int freq_index = ((data[2] & 0x06) >> 2);
 				int bit_rate = BIT_RATES[bit_rate_index];
-				t->root->sample_rate = FREQS[freq_index];
+				t->song->sample_rate = FREQS[freq_index];
 				msg_write(bit_rate);
-				msg_write(t->root->sample_rate);
+				msg_write(t->song->sample_rate);
 				bool padding = ((data[2] & 0x02) > 0);
 				int mode = ((data[3] & 0xc0) >> 6);
 				msg_write(mode);
@@ -133,17 +133,17 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 							val = val.replace(string("\0", 1), "");
 							//msg_write(val);
 							if (key == "TALB")
-								t->root->addTag("album", val);
+								t->song->addTag("album", val);
 							else if (key == "TPE1")
-								t->root->addTag("artist", val);
+								t->song->addTag("artist", val);
 							else if (key == "TIT2")
-								t->root->addTag("title", val);
+								t->song->addTag("title", val);
 							else if (key == "TRCK")
-								t->root->addTag("track", i2s(val._int()));
+								t->song->addTag("track", i2s(val._int()));
 							else if ((key == "TYER") || (key == "TDRC"))
-								t->root->addTag("year", val);
+								t->song->addTag("year", val);
 							else if (key == "COMM")
-								t->root->addTag("comment", val);
+								t->song->addTag("comment", val);
 						}else{
 							f->SetPos(_size, false);
 						}
@@ -182,11 +182,11 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 		FileClose(f);
 }
 
-void FormatMp3::saveAudio(StorageOperationData *od){}
+void FormatMp3::saveSong(StorageOperationData *od){}
 
-void FormatMp3::loadAudio(StorageOperationData *od)
+void FormatMp3::loadSong(StorageOperationData *od)
 {
-	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	od->track = od->song->addTrack(Track::TYPE_AUDIO);
 	loadTrack(od);
 }
 

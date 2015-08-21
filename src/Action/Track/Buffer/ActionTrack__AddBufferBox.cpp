@@ -6,7 +6,7 @@
  */
 
 #include "ActionTrack__AddBufferBox.h"
-#include "../../../Data/AudioFile.h"
+#include "../../../Data/Song.h"
 #include <assert.h>
 
 ActionTrack__AddBufferBox::ActionTrack__AddBufferBox(Track *t, int _level_no, int _index, Range r)
@@ -23,7 +23,7 @@ ActionTrack__AddBufferBox::~ActionTrack__AddBufferBox()
 
 void ActionTrack__AddBufferBox::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	// should be zeroes at this point...
@@ -34,7 +34,7 @@ void ActionTrack__AddBufferBox::undo(Data *d)
 
 void *ActionTrack__AddBufferBox::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	assert(t && "AddBufferBox.execute");
 

@@ -6,21 +6,22 @@
  */
 
 #include "ActionTrackPasteAsSample.h"
+
+#include "../../../Data/Song.h"
+#include "../../Song/Sample/ActionSongAddSample.h"
 #include "ActionTrackAddSample.h"
-#include "../../AudioFile/Sample/ActionAudioAddSample.h"
-#include "../../../Data/AudioFile.h"
 
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf) :
 	ActionGroup()
 {
-	addSubAction(new ActionAudioAddSample("-paste-", *buf), t->root);
-	addSubAction(new ActionTrackAddSample(t, pos, t->root->samples.num - 1), t->root);
+	addSubAction(new ActionSongAddSample("-paste-", *buf), t->song);
+	addSubAction(new ActionTrackAddSample(t, pos, t->song->samples.num - 1), t->song);
 }
 
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, MidiData *midi) :
 	ActionGroup()
 {
-	addSubAction(new ActionAudioAddSample("-paste-", *midi), t->root);
-	addSubAction(new ActionTrackAddSample(t, pos, t->root->samples.num - 1), t->root);
+	addSubAction(new ActionSongAddSample("-paste-", *midi), t->song);
+	addSubAction(new ActionTrackAddSample(t, pos, t->song->samples.num - 1), t->song);
 }
 

@@ -6,7 +6,8 @@
  */
 
 #include "ActionTrackDeleteSample.h"
-#include "../../../Data/AudioFile.h"
+
+#include "../../../Data/Song.h"
 
 ActionTrackDeleteSample::ActionTrackDeleteSample(Track *t, int _index)
 {
@@ -24,7 +25,7 @@ ActionTrackDeleteSample::~ActionTrackDeleteSample()
 
 void* ActionTrackDeleteSample::execute(Data* d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	ref = a->tracks[track_no]->samples[index];
 	ref->origin->unref();
@@ -38,7 +39,7 @@ void* ActionTrackDeleteSample::execute(Data* d)
 
 void ActionTrackDeleteSample::undo(Data* d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	a->tracks[track_no]->samples.insert(ref, index);
 	ref->origin->ref();

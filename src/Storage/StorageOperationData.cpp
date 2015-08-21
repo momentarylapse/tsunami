@@ -8,9 +8,9 @@
 #include "StorageOperationData.h"
 #include "../View/Helper/Progress.h"
 
-StorageOperationData::StorageOperationData(AudioFile *a, Track *t, BufferBox *b, const string &_filename, const string &message, HuiWindow *win)
+StorageOperationData::StorageOperationData(Song *s, Track *t, BufferBox *b, const string &_filename, const string &message, HuiWindow *win)
 {
-	audio = a;
+	song = s;
 	filename = _filename;
 	progress = new Progress(message, win);
 	buf = b;

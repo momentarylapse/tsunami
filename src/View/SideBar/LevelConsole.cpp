@@ -8,16 +8,16 @@
 
 #include "../../Tsunami.h"
 #include "../../Stuff/Observer.h"
-#include "../../Data/AudioFile.h"
 #include "../../View/AudioView.h"
 #include "LevelConsole.h"
+#include "../../Data/Song.h"
 
 
-LevelConsole::LevelConsole(AudioFile *a, AudioView *v) :
+LevelConsole::LevelConsole(Song *s, AudioView *v) :
 	SideBarConsole(_("Ebenen")),
 	Observer("LevelConsole")
 {
-	audio = a;
+	song = s;
 	view = v;
 
 	// dialog
@@ -31,24 +31,24 @@ LevelConsole::LevelConsole(AudioFile *a, AudioView *v) :
 	eventX("levels", "hui:change", this, &LevelConsole::onEdit);
 	event("add_level", this, &LevelConsole::onAdd);
 	event("delete_level", this, &LevelConsole::onDelete);
-	event("edit_file", this, &LevelConsole::onEditFile);
+	event("edit_song", this, &LevelConsole::onEditSong);
 
-	subscribe(audio);
+	subscribe(song);
 	subscribe(view, view->MESSAGE_CUR_LEVEL_CHANGE);
 }
 
 LevelConsole::~LevelConsole()
 {
-	unsubscribe(audio);
+	unsubscribe(song);
 	unsubscribe(view);
 }
 
 void LevelConsole::loadData()
 {
 	reset("levels");
-	foreachi(string &n, audio->level_names, i)
+	foreachi(string &n, song->level_names, i)
 		addString("levels", i2s(i + 1) + "\\" + n);
-	if (audio->level_names.num > 0)
+	if (song->level_names.num > 0)
 		setInt("levels", view->cur_level);
 }
 
@@ -64,24 +64,24 @@ void LevelConsole::onEdit()
 	int r = HuiGetEvent()->row;
 	if (r < 0)
 		return;
-	audio->renameLevel(r, getCell("levels", r, 1));
+	song->renameLevel(r, getCell("levels", r, 1));
 }
 
 void LevelConsole::onAdd()
 {
-	audio->addLevel("");
+	song->addLevel("");
 }
 
 void LevelConsole::onDelete()
 {
 	int s = getInt("levels");
 	if (s >= 0)
-		audio->deleteLevel(s, false);
+		song->deleteLevel(s, false);
 }
 
-void LevelConsole::onEditFile()
+void LevelConsole::onEditSong()
 {
-	((SideBar*)parent)->open(SideBar::AUDIOFILE_CONSOLE);
+	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
 }
 
 void LevelConsole::onUpdate(Observable *o, const string &message)

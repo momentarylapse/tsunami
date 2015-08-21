@@ -17,7 +17,7 @@
 #include "../View/Helper/Progress.h"
 #include "../View/AudioView.h"
 #include "../Audio/Synth/DummySynthesizer.h"
-#include "../Audio/AudioRenderer.h"
+#include "../Audio/SongRenderer.h"
 #include "../Audio/AudioStream.h"
 
 const string Configurable::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
@@ -154,8 +154,8 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		*(SampleRef**)v = NULL;
 		if (ss != "nil"){
 			int n = ss._int();
-			if ((n >= 0) && (n < tsunami->audio->samples.num))
-				*(SampleRef**)v = new SampleRef(tsunami->audio->samples[n]);
+			if ((n >= 0) && (n < tsunami->song->samples.num))
+				*(SampleRef**)v = new SampleRef(tsunami->song->samples[n]);
 		}
 	}else{
 		Array<Script::ClassElement> e = get_unique_elements(type);
@@ -461,7 +461,7 @@ public:
 		progress = new ProgressCancelable(_("Vorschau"), win);
 		subscribe(progress);
 		subscribe(tsunami->win->view->stream);
-		tsunami->win->view->renderer->prepare(tsunami->audio, tsunami->win->view->sel_range, false);
+		tsunami->win->view->renderer->prepare(tsunami->song, tsunami->win->view->sel_range, false);
 		tsunami->win->view->stream->play();
 	}
 

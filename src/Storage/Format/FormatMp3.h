@@ -19,8 +19,8 @@ public:
 	void loadTrack(StorageOperationData *od);
 	void saveBuffer(StorageOperationData *od);
 
-	void loadAudio(StorageOperationData *od);
-	void saveAudio(StorageOperationData *od);
+	void loadSong(StorageOperationData *od);
+	void saveSong(StorageOperationData *od);
 };
 
 #endif /* FORMATMP3_H_ */

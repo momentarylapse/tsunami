@@ -6,8 +6,8 @@
  */
 
 #include "ActionTrackSetSynthesizer.h"
-#include "../../../Data/AudioFile.h"
 #include <assert.h>
+#include "../../../Data/Song.h"
 
 ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_synth)
 {
@@ -27,7 +27,7 @@ void ActionTrackSetSynthesizer::undo(Data *d)
 
 void *ActionTrackSetSynthesizer::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	assert((track_no >= 0) && (track_no <= a->tracks.num));
 

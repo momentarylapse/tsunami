@@ -7,10 +7,10 @@
 
 #include "NewDialog.h"
 
-NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
+NewDialog::NewDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
 	HuiWindow("new_dialog", _parent, _allow_parent)
 {
-	audio = a;
+	song = s;
 
 	addString("sample_rate", "22050");
 	addString("sample_rate", i2s(DEFAULT_SAMPLE_RATE));
@@ -39,16 +39,16 @@ void NewDialog::onOk()
 {
 	int sample_rate = getString("sample_rate")._int();
 	bool midi = isChecked("new_track_type:midi");
-	audio->newWithOneTrack(midi ? Track::TYPE_MIDI : Track::TYPE_AUDIO, sample_rate);
-	audio->action_manager->enable(false);
+	song->newWithOneTrack(midi ? Track::TYPE_MIDI : Track::TYPE_AUDIO, sample_rate);
+	song->action_manager->enable(false);
 	if (isChecked("metronome")){
-		Track *t = audio->addTrack(Track::TYPE_TIME, 0);
+		Track *t = song->addTrack(Track::TYPE_TIME, 0);
 		int count = getInt("num_bars");
 		for (int i=0; i<count; i++)
 			t->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), false);
 	}
-	audio->action_manager->enable(true);
-	audio->notify(audio->MESSAGE_NEW);
+	song->action_manager->enable(true);
+	song->notify(song->MESSAGE_NEW);
 	onClose();
 }
 

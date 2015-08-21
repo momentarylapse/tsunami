@@ -36,11 +36,11 @@ void FormatM4a::loadTrack(StorageOperationData *od)
 		tsunami->log->error("mp3: need external program 'avconv' to decode");
 }
 
-void FormatM4a::saveAudio(StorageOperationData *od){}
+void FormatM4a::saveSong(StorageOperationData *od){}
 
-void FormatM4a::loadAudio(StorageOperationData *od)
+void FormatM4a::loadSong(StorageOperationData *od)
 {
-	od->track = od->audio->addTrack(Track::TYPE_AUDIO);
+	od->track = od->song->addTrack(Track::TYPE_AUDIO);
 	loadTrack(od);
 }
 

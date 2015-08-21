@@ -6,14 +6,14 @@
  */
 
 #include "SideBar.h"
-#include "AudioFileConsole.h"
 #include "LevelConsole.h"
 #include "TrackConsole.h"
 #include "MidiEditor.h"
 #include "SampleRefDialog.h"
 #include "../AudioView.h"
+#include "SongConsole.h"
 
-SideBar::SideBar(AudioView *view, AudioFile *audio) :
+SideBar::SideBar(AudioView *view, Song *song) :
 	Observable("SideBar")
 {
 	addRevealer("!slide-left", 0, 0, 0, 0, "revealer");
@@ -31,13 +31,13 @@ SideBar::SideBar(AudioView *view, AudioFile *audio) :
 	setImage("close", "hui:close");
 	addLabel("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 
-	audio_file_console = new AudioFileConsole(audio);
-	level_console = new LevelConsole(audio, view);
+	song_console = new SongConsole(song);
+	level_console = new LevelConsole(song, view);
 	track_console = new TrackConsole(view);
-	track_midi_editor = new MidiEditor(view, audio);
-	sample_ref_dialog = new SampleRefDialog(view, audio);
+	track_midi_editor = new MidiEditor(view, song);
+	sample_ref_dialog = new SampleRefDialog(view, song);
 
-	addConsole(audio_file_console);
+	addConsole(song_console);
 	addConsole(level_console);
 	addConsole(track_console);
 	addConsole(track_midi_editor);

@@ -8,13 +8,13 @@
 #ifndef ACTIONTRACKDELETET_H_
 #define ACTIONTRACKDELETET_H_
 
+#include "../../Data/Song.h"
 #include "../ActionGroup.h"
-#include "../../Data/AudioFile.h"
 
 class ActionTrackDelete : public ActionGroup
 {
 public:
-	ActionTrackDelete(AudioFile *a, int index);
+	ActionTrackDelete(Song *a, int index);
 	virtual ~ActionTrackDelete();
 };
 

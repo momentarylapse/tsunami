@@ -6,7 +6,8 @@
  */
 
 #include "DummySynthesizer.h"
-#include "../../Data/AudioFile.h"
+
+#include "../../Data/Song.h"
 #include "../../lib/math/math.h"
 
 

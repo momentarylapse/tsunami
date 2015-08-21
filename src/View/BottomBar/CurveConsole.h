@@ -12,14 +12,14 @@
 #include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
-class AudioFile;
+class Song;
 class AudioView;
 class Curve;
 
 class CurveConsole : public BottomBarConsole, public Observer
 {
 public:
-	CurveConsole(AudioView *view, AudioFile *audio);
+	CurveConsole(AudioView *view, Song *song);
 	virtual ~CurveConsole();
 
 	virtual void onUpdate(Observable *o, const string &message);
@@ -36,7 +36,7 @@ public:
 	void onLeftButtonUp();
 	void onMouseMove();
 
-	AudioFile *audio;
+	Song *song;
 	AudioView *view;
 	Curve *curve;
 

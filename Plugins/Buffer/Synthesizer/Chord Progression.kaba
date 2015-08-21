@@ -26,7 +26,7 @@ class ChordProgression : AudioEffect
 
 	overwrite void process(BufferBox buf)
 		Chord[] chords = ParseChords(config.Chords)
-		AudioFile *a = audio
+		Song *a = song
 	
 		int p0 = a.getNextBeat(buf.offset)
 		synth.setSampleRate(a.sample_rate)

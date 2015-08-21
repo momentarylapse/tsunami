@@ -17,7 +17,7 @@ ActionTrackAddMarker::ActionTrackAddMarker(Track *t, int _pos, const string &_te
 
 void *ActionTrackAddMarker::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 
 	Track *t = a->get_track(track_no);
 	TrackMarker m;
@@ -30,7 +30,7 @@ void *ActionTrackAddMarker::execute(Data *d)
 
 void ActionTrackAddMarker::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	t->markers.pop();
 }

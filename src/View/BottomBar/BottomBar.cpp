@@ -17,7 +17,7 @@
 #include "../AudioView.h"
 #include "MiniBar.h"
 
-BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log *log) :
+BottomBar::BottomBar(AudioView *view, Song *song, AudioOutput *output, Log *log) :
 	Observable("BottomBar")
 {
 	addRevealer("!slide-up", 0, 0, 0, 0, "revealer");
@@ -35,13 +35,13 @@ BottomBar::BottomBar(AudioView *view, AudioFile *audio, AudioOutput *output, Log
 	setImage("close", "hui:close");
 	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
 	log_dialog = new LogDialog(log);
-	mixing_console = new MixingConsole(audio, output, view->stream);
-	fx_console = new FxConsole(NULL, audio);
-	sample_manager = new SampleManager(audio);
-	curve_console = new CurveConsole(view, audio);
-	track_fx_console = new FxConsole(view, audio);
-	track_synth_console = new SynthConsole(view, audio);
-	track_midi_fx_console = new MidiFxConsole(view, audio);
+	mixing_console = new MixingConsole(song, output, view->stream);
+	fx_console = new FxConsole(NULL, song);
+	sample_manager = new SampleManager(song);
+	curve_console = new CurveConsole(view, song);
+	track_fx_console = new FxConsole(view, song);
+	track_synth_console = new SynthConsole(view);
+	track_midi_fx_console = new MidiFxConsole(view, song);
 	addConsole(log_dialog, "");
 	addConsole(mixing_console, "");
 	addConsole(fx_console, "");

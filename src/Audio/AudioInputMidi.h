@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
-#include "../Data/AudioFile.h"
+#include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
 
 struct _snd_seq;

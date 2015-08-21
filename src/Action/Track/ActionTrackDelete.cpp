@@ -11,7 +11,7 @@
 #include "ActionTrack__DeleteEmpty.h"
 #include <assert.h>
 
-ActionTrackDelete::ActionTrackDelete(AudioFile *a, int index)
+ActionTrackDelete::ActionTrackDelete(Song *a, int index)
 {
 	assert(index >= 0 && index < a->tracks.num);
 

@@ -12,21 +12,22 @@
 #include "../../Audio/AudioInputAudio.h"
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
-#include "../../Audio/AudioRenderer.h"
+#include "../../Audio/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include "../../Stuff/Log.h"
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *a):
+CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
 	HuiWindow("record_dialog", _parent, _allow_parent),
 	Observer("CaptureDialog")
 {
-	audio = a;
+	song = s;
 	view = tsunami->win->view;
 	type = -1;
-	input = new AudioInputAny(audio->sample_rate);
+	input = new AudioInputAny(song->sample_rate);
+	input->setSaveMode(true);
 	subscribe(input);
 	view->setInput(input);
 
@@ -37,20 +38,20 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, AudioFile *
 
 	// dialog
 	peak_meter = new PeakMeter(this, "capture_level", input);
-	setString("capture_time", a->get_time_str_long(0));
+	setString("capture_time", s->get_time_str_long(0));
 	enable("capture_delete", false);
 	enable("capture_pause", false);
 	enable("ok", false);
 
 	// target list
-	foreach(Track *t, a->tracks)
+	foreach(Track *t, s->tracks)
 		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	addString("capture_target", _("  - neue Spur anlegen -"));
 
 	if (view->cur_track){
 		setTarget(view->cur_track->get_index());
 	}else{
-		setTarget(audio->tracks.num);
+		setTarget(song->tracks.num);
 		setType(Track::TYPE_AUDIO);
 	}
 
@@ -121,10 +122,10 @@ void CaptureDialog::onTypeMidi()
 
 void CaptureDialog::setTarget(int index)
 {
-	if (index < audio->tracks.num){
-		Track *t = audio->tracks[index];
+	if (index < song->tracks.num){
+		Track *t = song->tracks[index];
 		if (t->type == t->TYPE_TIME){
-			index = audio->tracks.num;
+			index = song->tracks.num;
 			setType(Track::TYPE_AUDIO);
 			input->setPreviewSynthesizer(temp_synth);
 		}else{
@@ -200,9 +201,9 @@ void CaptureDialog::setType(int _type)
 
 	// consistency test: ...
 	int target = getInt("capture_target");
-	if ((target >= 0) and (target < audio->tracks.num))
-		if (type != audio->tracks[target]->type)
-			setInt("capture_target", audio->tracks.num);
+	if ((target >= 0) and (target < song->tracks.num))
+		if (type != song->tracks[target]->type)
+			setInt("capture_target", song->tracks.num);
 
 	input->setType(type);
 
@@ -227,7 +228,7 @@ void CaptureDialog::setType(int _type)
 
 void CaptureDialog::onStart()
 {
-	view->renderer->prepare(audio, view->getPlaybackSelection(), false);
+	view->renderer->prepare(song, view->getPlaybackSelection(), false);
 	view->stream->play();
 
 	input->resetSync();
@@ -283,7 +284,7 @@ void CaptureDialog::onClose()
 
 void CaptureDialog::updateTime()
 {
-	setString("capture_time", audio->get_time_str_long(input->getSampleCount()));
+	setString("capture_time", song->get_time_str_long(input->getSampleCount()));
 }
 
 void CaptureDialog::onUpdate(Observable *o, const string &message)
@@ -302,12 +303,12 @@ bool CaptureDialog::insert()
 	// insert recorded data with some delay
 	int dpos = input->getDelay();
 
-	if (target >= audio->tracks.num){
+	if (target >= song->tracks.num){
 		// new track
-		t = audio->addTrack(type, audio->tracks.num);
+		t = song->addTrack(type, song->tracks.num);
 	}else{
 		// overwrite
-		t = audio->tracks[target];
+		t = song->tracks[target];
 	}
 	i0 = s_start + dpos;
 
@@ -319,12 +320,12 @@ bool CaptureDialog::insert()
 	// insert data
 	if (type == t->TYPE_AUDIO){
 		Range r = Range(i0, input->getSampleCount());
-		audio->action_manager->beginActionGroup();
+		song->action_manager->beginActionGroup();
 		BufferBox tbuf = t->getBuffers(tsunami->win->view->cur_level, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->win->view->cur_level, r);
 		tbuf.set(*input->buffer, 0, 1.0f);
-		audio->execute(a);
-		audio->action_manager->endActionGroup();
+		song->execute(a);
+		song->action_manager->endActionGroup();
 	}else if (type == t->TYPE_MIDI){
 		t->insertMidiData(i0, *input->midi);
 	}

@@ -10,12 +10,12 @@
 
 #include "SideBar.h"
 #include "../../Stuff/Observer.h"
-class AudioFile;
+class Song;
 
 class LevelConsole: public SideBarConsole, public Observer
 {
 public:
-	LevelConsole(AudioFile *a, AudioView *view);
+	LevelConsole(Song *s, AudioView *view);
 	virtual ~LevelConsole();
 
 	void loadData();
@@ -26,11 +26,11 @@ public:
 	void onAdd();
 	void onDelete();
 
-	void onEditFile();
+	void onEditSong();
 
 	virtual void onUpdate(Observable *o, const string &message);
 
-	AudioFile *audio;
+	Song *song;
 	AudioView *view;
 };
 

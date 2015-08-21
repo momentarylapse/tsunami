@@ -6,4 +6,4 @@ Dialog level_dialog "Ebenen" 430 375
 			Button delete_level "" image=hui:delete flat
 		Group lvld_t_edit "Bearbeiten"
 			Grid ? "" 2 1
-				Button edit_file "Datei"
+				Button edit_song "Datei"

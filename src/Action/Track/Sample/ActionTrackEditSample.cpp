@@ -6,7 +6,8 @@
  */
 
 #include "ActionTrackEditSample.h"
-#include "../../../Data/AudioFile.h"
+
+#include "../../../Data/Song.h"
 
 ActionTrackEditSample::ActionTrackEditSample(Track *t, int _index, float volume, bool mute, int rep_num, int rep_delay)
 {
@@ -29,7 +30,7 @@ ActionTrackEditSample::~ActionTrackEditSample()
 
 void *ActionTrackEditSample::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	SampleRef *s = t->samples[index];
 
@@ -44,7 +45,7 @@ void *ActionTrackEditSample::execute(Data *d)
 
 void ActionTrackEditSample::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	SampleRef *s = t->samples[index];
 

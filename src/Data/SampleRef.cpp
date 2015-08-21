@@ -7,8 +7,8 @@
 
 #include "SampleRef.h"
 #include "Sample.h"
-#include "AudioFile.h"
 #include "../lib/math/math.h"
+#include "Song.h"
 
 const string SampleRef::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 

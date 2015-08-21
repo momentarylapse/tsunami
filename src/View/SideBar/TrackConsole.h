@@ -29,7 +29,7 @@ public:
 	void onVolume();
 	void onPanning();
 
-	void onEditFile();
+	void onEditSong();
 	void onEditFx();
 	void onEditMidi();
 	void onEditMidiFx();

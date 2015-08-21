@@ -21,7 +21,7 @@ ActionTrackDeleteMidiEffect::~ActionTrackDeleteMidiEffect()
 
 void *ActionTrackDeleteMidiEffect::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 
 	Track *t = a->get_track(track_no);
@@ -37,7 +37,7 @@ void *ActionTrackDeleteMidiEffect::execute(Data *d)
 
 void ActionTrackDeleteMidiEffect::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 
 	Track *t = a->get_track(track_no);

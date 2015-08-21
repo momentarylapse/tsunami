@@ -6,9 +6,10 @@
  */
 
 #include "ActionTrackMoveSample.h"
-#include "../../../Data/AudioFile.h"
 
-ActionTrackMoveSample::ActionTrackMoveSample(AudioFile *a)
+#include "../../../Data/Song.h"
+
+ActionTrackMoveSample::ActionTrackMoveSample(Song *a)
 {
 	foreachi(Track *t, a->tracks, ti)
 		foreachi(SampleRef *s, t->samples, si)
@@ -32,7 +33,7 @@ ActionTrackMoveSample::~ActionTrackMoveSample()
 
 void *ActionTrackMoveSample::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	foreach(SubSaveData &d, sub)
 		a->get_sample_ref(d.track_no, d.sub_no)->pos = d.pos_old + param;
 	return NULL;
@@ -49,7 +50,7 @@ void ActionTrackMoveSample::abort(Data *d)
 
 void ActionTrackMoveSample::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	foreach(SubSaveData &d, sub)
 		a->get_sample_ref(d.track_no, d.sub_no)->pos = d.pos_old;
 }

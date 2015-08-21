@@ -21,7 +21,7 @@ ActionTrackDeleteEffect::~ActionTrackDeleteEffect()
 
 void *ActionTrackDeleteEffect::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 
 	if (track_no >= 0){
@@ -46,7 +46,7 @@ void *ActionTrackDeleteEffect::execute(Data *d)
 
 void ActionTrackDeleteEffect::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 
 	if (track_no >= 0){

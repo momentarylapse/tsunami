@@ -39,7 +39,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("volume", this, &TrackConsole::onVolume);
 	event("panning", this, &TrackConsole::onPanning);
 
-	event("edit_file", this, &TrackConsole::onEditFile);
+	event("edit_song", this, &TrackConsole::onEditSong);
 	event("edit_fx", this, &TrackConsole::onEditFx);
 	event("edit_midi", this, &TrackConsole::onEditMidi);
 	event("edit_midi_fx", this, &TrackConsole::onEditMidiFx);
@@ -104,9 +104,9 @@ void TrackConsole::applyData()
 {
 }
 
-void TrackConsole::onEditFile()
+void TrackConsole::onEditSong()
 {
-	tsunami->win->side_bar->open(SideBar::AUDIOFILE_CONSOLE);
+	tsunami->win->side_bar->open(SideBar::SONG_CONSOLE);
 }
 
 void TrackConsole::onEditFx()

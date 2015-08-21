@@ -9,7 +9,7 @@
 #define FORMAT_H_
 
 #include "../../Data/Track.h"
-#include "../../Data/AudioFile.h"
+#include "../../Data/Song.h"
 #include "../StorageOperationData.h"
 
 class StorageOperationData;
@@ -20,16 +20,16 @@ public:
 	Format(const string &description, const string &extensions, int _flags);
 	virtual ~Format();
 	bool canHandle(const string &extension);
-	bool testFormatCompatibility(AudioFile *a);
+	bool testFormatCompatibility(Song *s);
 
 	void importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
-	void exportAudioAsTrack(StorageOperationData *od);
+	void exportAsTrack(StorageOperationData *od);
 
 	virtual void loadTrack(StorageOperationData *od) = 0;
 	virtual void saveBuffer(StorageOperationData *od) = 0;
 
-	virtual void loadAudio(StorageOperationData *od) = 0;
-	virtual void saveAudio(StorageOperationData *od) = 0;
+	virtual void loadSong(StorageOperationData *od) = 0;
+	virtual void saveSong(StorageOperationData *od) = 0;
 
 	Array<string> extensions;
 	string description;

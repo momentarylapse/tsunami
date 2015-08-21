@@ -11,8 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observer.h"
 
-class AudioFile;
-class AudioFileConsole;
+class Song;
+class SongConsole;
 class LevelConsole;
 class TrackConsole;
 class MidiEditor;
@@ -30,7 +30,7 @@ public:
 class SideBar : public HuiPanel, public Observable
 {
 public:
-	SideBar(AudioView *view, AudioFile *audio);
+	SideBar(AudioView *view, Song *song);
 	virtual ~SideBar();
 
 	void onClose();
@@ -41,7 +41,7 @@ public:
 
 	enum
 	{
-		AUDIOFILE_CONSOLE,
+		SONG_CONSOLE,
 		LEVEL_CONSOLE,
 		TRACK_CONSOLE,
 		TRACK_MIDI_EDITOR,
@@ -55,7 +55,7 @@ public:
 	int active_console;
 	bool visible;
 
-	AudioFileConsole *audio_file_console;
+	SongConsole *song_console;
 	LevelConsole *level_console;
 	TrackConsole *track_console;
 	MidiEditor *track_midi_editor;

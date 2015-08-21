@@ -9,12 +9,12 @@
 #define ACTIONTRACKMOVESAMPLE_H_
 
 #include "../../Action.h"
-class AudioFile;
+class Song;
 
 class ActionTrackMoveSample: public Action
 {
 public:
-	ActionTrackMoveSample(AudioFile *a);
+	ActionTrackMoveSample(Song *a);
 	virtual ~ActionTrackMoveSample();
 
 	virtual void *execute(Data *d);

@@ -35,7 +35,7 @@ ActionTrackEditBuffer::~ActionTrackEditBuffer()
 
 void ActionTrackEditBuffer::undo(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	t->levels[level_no].buffers[index].invalidate_peaks(range);
@@ -51,7 +51,7 @@ void ActionTrackEditBuffer::redo(Data *d)
 
 void *ActionTrackEditBuffer::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	t->levels[level_no].buffers[index].invalidate_peaks(range);

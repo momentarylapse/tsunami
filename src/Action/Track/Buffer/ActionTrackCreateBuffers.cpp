@@ -38,18 +38,18 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 
 		// too small?
 		if (r.end() > b.offset + b.num)
-			addSubAction(new ActionTrack__GrowBufferBox(t, level_no, n_pos, r.end() - b.offset), t->root);
+			addSubAction(new ActionTrack__GrowBufferBox(t, level_no, n_pos, r.end() - b.offset), t->song);
 	}else{
 
 		// insert new buffers
 		n_pos = n_before + 1;
-		addSubAction(new ActionTrack__AddBufferBox(t, level_no, n_pos, r), t->root);
+		addSubAction(new ActionTrack__AddBufferBox(t, level_no, n_pos, r), t->song);
 	}
 
 	// collision???  -> absorb
 	for (int i=l.buffers.num-1;i>n_pos;i--)
 		if (l.buffers[i].offset <= r.end())
-			addSubAction(new ActionTrack__AbsorbBufferBox(t, level_no, n_pos, i), t->root);
+			addSubAction(new ActionTrack__AbsorbBufferBox(t, level_no, n_pos, i), t->song);
 
 //	for (int i=0;i<t->buffer_r.num;i++)
 //		msg_write(format("%d   %d  %s", t->buffer_r[i].offset, t->buffer_r[i].b.num, (i == n_pos) ? "(*)" : ""));

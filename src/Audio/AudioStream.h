@@ -12,11 +12,11 @@
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
-#include "../Data/AudioFile.h"
+#include "../Data/Song.h"
 #include "../Data/RingBuffer.h"
 #include "../View/Helper/PeakMeter.h"
 
-class AudioRendererInterface;
+class AudioRenderer;
 class AudioOutput;
 class Thread;
 class StreamThread;
@@ -27,10 +27,10 @@ class AudioStream : public PeakMeterSource
 	friend StreamThread;
 public:
 	AudioStream();
-	AudioStream(AudioRendererInterface *r);
+	AudioStream(AudioRenderer *r);
 	virtual ~AudioStream();
 
-	void _cdecl __init__(AudioRendererInterface *r);
+	void _cdecl __init__(AudioRenderer *r);
 	virtual void _cdecl __delete__();
 
 	void create_dev();
@@ -50,8 +50,8 @@ public:
 	bool _cdecl isPlaying();
 	bool _cdecl isPaused();
 	int _cdecl getState();
-	void _cdecl setSource(AudioRendererInterface *r);
-	AudioRendererInterface *getSource(){ return renderer; }
+	void _cdecl setSource(AudioRenderer *r);
+	AudioRenderer *getSource(){ return renderer; }
 	int getPos();
 	bool getPosSafe(int &pos);
 	void flushBuffers();
@@ -79,7 +79,7 @@ private:
 	float update_dt;
 	int hui_runner_id;
 
-	AudioRendererInterface *renderer;
+	AudioRenderer *renderer;
 	RingBuffer ring_buf;
 
 	bool reading;

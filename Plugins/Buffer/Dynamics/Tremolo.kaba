@@ -19,7 +19,7 @@ class Tremolo : AudioEffect
 
 	void doTremolo(float[] b)
 	
-		float f_c = 1.0 / audio.sample_rate * 2 * pi * config.Speed
+		float f_c = 1.0 / song.sample_rate * 2 * pi * config.Speed
 	
 		for bb,i in b
 			float f = 1 - (1 + cos(i * f_c)) * config.Depth * 0.5

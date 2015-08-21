@@ -19,7 +19,7 @@ class ToneGenerator : AudioEffect
 	DummySynthesizer synth
 
 	overwrite void process(BufferBox buf)
-		AudioFile *a = audio
+		Song *a = song
 		synth.setSampleRate(a.sample_rate)
 		
 		Range r = _Range(0, buf.num)

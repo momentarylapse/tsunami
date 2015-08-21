@@ -21,7 +21,7 @@ float gauss(float f, float bw)
 	return exp(- x*x) / bw
 
 void ProcessTrack(BufferBox buf)
-	AudioFile *a = audio
+	Song *a = song
 	
 	float[] A
 	A.add(0) // dummy

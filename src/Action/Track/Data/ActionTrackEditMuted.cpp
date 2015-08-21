@@ -20,7 +20,7 @@ ActionTrackEditMuted::~ActionTrackEditMuted()
 
 void *ActionTrackEditMuted::execute(Data *d)
 {
-	AudioFile *a = dynamic_cast<AudioFile*>(d);
+	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
 	bool temp = muted;

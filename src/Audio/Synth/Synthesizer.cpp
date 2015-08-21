@@ -6,9 +6,10 @@
  */
 
 #include "Synthesizer.h"
+
+#include "../../Data/Song.h"
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
-#include "../../Data/AudioFile.h"
 #include "../../Tsunami.h"
 #include "../../Stuff/Log.h"
 #include "../../Plugins/PluginManager.h"

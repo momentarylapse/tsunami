@@ -134,7 +134,8 @@ public:
 	virtual void onRun()
 	{
 		timer.reset();
-		while(true){
+		msg_write("thread run");
+		while(stream->playing){
 			if (stream->read_more){
 				stream->stream();
 				float t_busy = timer.get();
@@ -146,6 +147,7 @@ public:
 				t_idle += timer.get();
 			}
 		}
+		msg_write("thread done...");
 	}
 };
 
@@ -228,6 +230,7 @@ void AudioStream::kill_dev()
 	}
 }
 
+// only used for clean up
 void AudioStream::kill()
 {
 	msg_db_f("Stream.kill", 1);
@@ -252,6 +255,7 @@ void AudioStream::stop()
 	msg_db_f("Stream.stop", 0);
 
 	playing = false;
+	read_more = false;
 	HuiCancelRunner(hui_runner_id);
 	hui_runner_id = -1;
 
@@ -270,11 +274,15 @@ void AudioStream::stop()
 		kill_dev();
 	}
 
+	// stop thread
+	thread->join();
+	delete thread;
+	thread = NULL;
+
 	// clean up
 	playing = false;
 	paused = false;
 	end_of_data = false;
-	read_more = false;
 	ring_buf.clear();
 
 	notify(MESSAGE_STATE_CHANGE);
@@ -351,11 +359,6 @@ void AudioStream::play()
 		stop();
 	}
 
-	if (!thread){
-		thread = new StreamThread(this);
-		thread->run();
-	}
-
 
 
 	end_of_data = false;
@@ -368,6 +371,12 @@ void AudioStream::play()
 
 	renderer->reset();
 	stream();
+
+
+	//if (!thread){
+		thread = new StreamThread(this);
+		thread->run();
+	//}
 
 
 	create_dev();

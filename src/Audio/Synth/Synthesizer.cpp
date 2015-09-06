@@ -124,20 +124,16 @@ void Synthesizer::iterateEvents(int samples)
 
 int Synthesizer::read(BufferBox &buf)
 {
-	msg_write("s.read");
 	// get from source...
 	buf.scale(0);
 
-	if (auto_stop and hasEnded()){
-		msg_write("/s.read (end)");
+	if (auto_stop and hasEnded())
 		return 0;
-	}
 
 	render(buf);
 
 	iterateEvents(buf.num);
 
-	msg_write("/s.read");
 	return buf.num;
 }
 

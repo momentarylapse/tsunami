@@ -134,7 +134,7 @@ public:
 	virtual void onRun()
 	{
 		timer.reset();
-		msg_write("thread run");
+		//msg_write("thread run");
 		while(stream->playing){
 			if (stream->read_more){
 				stream->stream();
@@ -147,7 +147,7 @@ public:
 				t_idle += timer.get();
 			}
 		}
-		msg_write("thread done...");
+		//msg_write("thread done...");
 	}
 };
 
@@ -252,7 +252,7 @@ void AudioStream::stop()
 {
 	if (!playing)
 		return;
-	msg_db_f("Stream.stop", 0);
+	msg_db_f("Stream.stop", 1);
 
 	playing = false;
 	read_more = false;
@@ -301,7 +301,7 @@ void AudioStream::stream()
 {
 	reading = true;
 	read_more = false;
-	msg_db_f("stream", 0);
+	msg_db_f("stream", 1);
 
 	int size = 0;
 	BufferBox b;
@@ -341,7 +341,7 @@ void AudioStream::setSource(AudioRenderer *r)
 
 void AudioStream::play()
 {
-	msg_db_f("Stream.play", 0);
+	msg_db_f("Stream.play", 1);
 
 	/*if (dev_sample_rate != renderer->getSampleRate())
 		kill_dev();

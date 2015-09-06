@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-257
+256
 // Data (ID,Text)
 about
 
@@ -128,8 +128,6 @@ edit_bars
 edit_beats
 
 edit_bpm
-
-edit_file
 
 edit_fx
 
@@ -391,9 +389,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_342148
+rand_id_536333
 
-rand_id_750996
+rand_id_605054
 
 rdt_capture
 

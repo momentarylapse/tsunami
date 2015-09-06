@@ -24,7 +24,7 @@ Dialog midi_editor "Midi" 380 516
 						ComboBox chord_inversion ""
 			Group me_group_edit "Bearbeiten"
 				Grid ? "" 3 1
-					Button edit_file "Datei"
+					Button edit_song "Datei"
 					Button edit_track "Spur"
 					Button edit_midi_fx "Midi-Fx"
 

@@ -67,6 +67,10 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
 	event("capture_start", this, &CaptureDialog::onStart);
 	event("capture_delete", this, &CaptureDialog::onDelete);
 	event("capture_pause", this, &CaptureDialog::onPause);
+
+
+	// automatically start
+	onStart();
 }
 
 CaptureDialog::~CaptureDialog()

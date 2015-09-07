@@ -24,6 +24,7 @@ AudioInputAny::AudioInputAny(int _sample_rate) :
 	current_buffer = NULL;
 	midi = NULL;
 	current_midi = NULL;
+	save_mode = false;
 }
 
 AudioInputAny::~AudioInputAny()
@@ -51,6 +52,7 @@ void AudioInputAny::setType(int _type)
 		input_audio = new AudioInputAudio(sample_rate);
 		buffer = &input_audio->buffer;
 		current_buffer = &input_audio->current_buffer;
+		input_audio->setSaveMode(save_mode);
 		subscribe(input_audio);
 	}
 	if (type == Track::TYPE_MIDI){
@@ -144,6 +146,7 @@ string AudioInputAny::getChosenDevice()
 
 void AudioInputAny::setSaveMode(bool enabled)
 {
+	save_mode = enabled;
 	if (type == Track::TYPE_AUDIO)
 		input_audio->setSaveMode(enabled);
 }

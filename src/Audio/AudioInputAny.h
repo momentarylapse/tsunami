@@ -66,6 +66,7 @@ public:
 	int type;
 	AudioInputAudio *input_audio;
 	AudioInputMidi *input_midi;
+	bool save_mode;
 };
 
 #endif /* SRC_AUDIO_AUDIOINPUTANY_H_ */

@@ -355,12 +355,13 @@ int AudioInputAudio::doCapturing()
 	current_buffer.readRef(b, avail);
 	buffer.append(b);
 
-	// write to file
-	string data;
-	b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
+	if (temp_file){
+		// write to file
+		string data;
+		b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
 
-	if (temp_file)
-		temp_file->WriteBuffer(&data[0], b.num);
+		temp_file->WriteBuffer(&data[0], data.num);
+	}
 
 	return avail;
 }

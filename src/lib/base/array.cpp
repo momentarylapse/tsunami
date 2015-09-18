@@ -26,22 +26,22 @@ void DynamicArray::reserve(int size)
 //	printf("        reserve  %d\n", size);
 	if (allocated == 0){
 		if (size > 0){
-			allocated = size * element_size;
+			allocated = size;
 #if ALIGNMENT > 0
 	#ifdef OS_WINDOWS
-			data = _aligned_malloc(ALIGNMENT, allocated);
+			data = _aligned_malloc(ALIGNMENT, (size_t)allocated * (size_t)element_size);
 	#else
-			posix_memalign(&data, ALIGNMENT, allocated);
+			posix_memalign(&data, ALIGNMENT, (size_t)allocated * (size_t)element_size);
 	#endif
 #else
 			data = malloc(allocated);
 #endif
 //			printf("          new  %p  ", data);
 		}
-	}else if (size * element_size > allocated){
-		allocated = size * element_size * 2;
+	}else if (size > allocated){
+		allocated = size * 2;
 		void *data0 = data;
-		data = realloc(data, allocated);
+		data = realloc(data, (size_t)allocated * (size_t)element_size);
 //		printf("          %p  ->  %p ", data0, data);
 	}else if (size == 0)
 		clear();

@@ -196,6 +196,7 @@ public:
 	AudioStream *midi_preview_stream;
 	SynthesizerRenderer *midi_preview_renderer;
 	AudioInputAny *input;
+	HuiTimer *input_timer;
 	void setInput(AudioInputAny *input);
 
 	void setCurSample(SampleRef *s);

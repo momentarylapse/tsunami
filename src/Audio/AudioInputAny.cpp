@@ -17,6 +17,8 @@ AudioInputAny::AudioInputAny(int _sample_rate) :
 	Observer("AudioInputAny")
 {
 	sample_rate = _sample_rate;
+	chunk_size = -1;
+	update_dt = -1;
 	type = -1;
 	input_audio = NULL;
 	input_midi = NULL;
@@ -53,6 +55,8 @@ void AudioInputAny::setType(int _type)
 		buffer = &input_audio->buffer;
 		current_buffer = &input_audio->current_buffer;
 		input_audio->setSaveMode(save_mode);
+		input_audio->setChunkSize(chunk_size);
+		input_audio->setUpdateDt(update_dt);
 		subscribe(input_audio);
 	}
 	if (type == Track::TYPE_MIDI){
@@ -178,6 +182,24 @@ void AudioInputAny::setPreviewSynthesizer(Synthesizer* s)
 {
 	if (type == Track::TYPE_MIDI)
 		input_midi->setPreviewSynthesizer(s);
+}
+
+void AudioInputAny::setChunkSize(int size)
+{
+	chunk_size = size;
+	if (type == Track::TYPE_AUDIO)
+		input_audio->setChunkSize(size);
+	else if (type == Track::TYPE_MIDI)
+		input_midi->setChunkSize(size);
+}
+
+void AudioInputAny::setUpdateDt(float dt)
+{
+	update_dt = dt;
+	if (type == Track::TYPE_AUDIO)
+		input_audio->setUpdateDt(dt);
+	else if (type == Track::TYPE_MIDI)
+		input_midi->setUpdateDt(dt);
 }
 
 void AudioInputAny::onUpdate(Observable *o, const string &message)

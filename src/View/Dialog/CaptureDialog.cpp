@@ -28,6 +28,8 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
 	type = -1;
 	input = new AudioInputAny(song->sample_rate);
 	input->setSaveMode(true);
+	input->setChunkSize(4096);
+	input->setUpdateDt(0.03f);
 	subscribe(input);
 	view->setInput(input);
 

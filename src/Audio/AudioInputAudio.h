@@ -69,6 +69,11 @@ public:
 
 	static string temp_filename;
 
+	void _cdecl setChunkSize(int size);
+	int chunk_size;
+	void _cdecl setUpdateDt(float dt);
+	float update_dt;
+
 
 	RingBuffer current_buffer;
 	BufferBox buffer;

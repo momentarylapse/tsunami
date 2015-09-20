@@ -151,7 +151,6 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) 
 
 	song = _audio;
 	input = NULL;
-	input_timer = new HuiTimer;
 
 	pitch_min = 60;
 	pitch_max = 90;
@@ -216,7 +215,6 @@ AudioView::~AudioView()
 	delete(renderer);
 	delete(midi_preview_stream);
 	delete(midi_preview_renderer);
-	delete(input_timer);
 
 	HuiConfig.setBool("View.Mono", show_mono);
 	HuiConfig.setInt("View.DetailSteps", detail_steps);
@@ -1057,12 +1055,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 	}else if (input and o == input){
 		if (input->isCapturing())
 			cam.makeSampleVisible(sel_range.start() + input->getSampleCount());
-		float t_rec = input->getSampleCount() / input->getSampleRate();
-		float dt = input_timer->peek();
-		if ((dt > 0.5f) or ((t_rec < 40) and (dt > 0.2f)) or (t_rec < 20)){
-			input_timer->get();
-			forceRedraw();
-		}
+		forceRedraw();
 	}else{
 		forceRedraw();
 	}

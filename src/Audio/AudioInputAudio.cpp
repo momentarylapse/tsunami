@@ -23,7 +23,8 @@ string AudioInputAudio::cur_temp_filename;
 float AudioInputAudio::playback_delay_const;
 
 
-static const float UPDATE_TIME = 0.005f;
+static const int DEFAULT_CHUNK_SIZE = 512;
+static const float DEFAULT_UPDATE_TIME = 0.005f;
 const string AudioInputAudio::MESSAGE_CAPTURE = "Capture";
 
 
@@ -135,6 +136,8 @@ AudioInputAudio::AudioInputAudio(int _sample_rate) :
 	save_mode = false;
 
 	running = false;
+	update_dt = DEFAULT_UPDATE_TIME;
+	chunk_size = DEFAULT_CHUNK_SIZE;
 
 	if (file_test_existence(getTempFilename()))
 		tsunami->log->warning(_("alte Aufnahmedaten gefunden: ") + getTempFilename());
@@ -271,7 +274,7 @@ bool AudioInputAudio::start()
 
 	pa_buffer_attr attr_in;
 //	attr_in.fragsize = -1;
-	attr_in.fragsize = 512;
+	attr_in.fragsize = chunk_size;
 	attr_in.maxlength = -1;
 	attr_in.minreq = -1;
 	attr_in.tlength = -1;
@@ -336,6 +339,22 @@ void AudioInputAudio::setPlaybackDelayConst(float f)
 {
 	playback_delay_const = f;
 	HuiConfig.setFloat("Input.PlaybackDelay", playback_delay_const);
+}
+
+void AudioInputAudio::setChunkSize(int size)
+{
+	if (size > 0)
+		chunk_size = size;
+	else
+		chunk_size = DEFAULT_CHUNK_SIZE;
+}
+
+void AudioInputAudio::setUpdateDt(float dt)
+{
+	if (dt > 0)
+		update_dt = dt;
+	else
+		update_dt = DEFAULT_UPDATE_TIME;
 }
 
 int AudioInputAudio::doCapturing()
@@ -429,7 +448,7 @@ void AudioInputAudio::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeatedM(UPDATE_TIME, this, &AudioInputAudio::update);
+	hui_runner_id = HuiRunRepeatedM(update_dt, this, &AudioInputAudio::update);
 	running = true;
 }
 

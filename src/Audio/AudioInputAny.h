@@ -56,6 +56,12 @@ public:
 
 	virtual void onUpdate(Observable *o, const string &message);
 
+
+	void _cdecl setChunkSize(int size);
+	void _cdecl setUpdateDt(float dt);
+	int chunk_size;
+	float update_dt;
+
 	int sample_rate;
 
 	RingBuffer *current_buffer;

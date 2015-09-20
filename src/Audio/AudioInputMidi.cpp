@@ -14,7 +14,7 @@
 #include <alsa/asoundlib.h>
 
 
-static const float UPDATE_TIME = 0.005f;
+static const float DEFAULT_UPDATE_TIME = 0.005f;
 const string AudioInputMidi::MESSAGE_CAPTURE = "Capture";
 
 
@@ -30,6 +30,8 @@ AudioInputMidi::AudioInputMidi(int _sample_rate) :
 	handle = NULL;
 	subs = NULL;
 	sample_rate = _sample_rate;
+	update_dt = DEFAULT_UPDATE_TIME;
+	chunk_size = 512;
 
 	running = false;
 
@@ -286,7 +288,7 @@ void AudioInputMidi::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeatedM(UPDATE_TIME, this, &AudioInputMidi::update);
+	hui_runner_id = HuiRunRepeatedM(update_dt, this, &AudioInputMidi::update);
 	running = true;
 }
 
@@ -310,4 +312,20 @@ void AudioInputMidi::update()
 float AudioInputMidi::getSampleRate()
 {
 	return sample_rate;
+}
+
+void AudioInputMidi::setUpdateDt(float dt)
+{
+	if (dt > 0)
+		update_dt = dt;
+	else
+		update_dt = DEFAULT_UPDATE_TIME;
+}
+
+void AudioInputMidi::setChunkSize(int size)
+{
+	if (size > 0)
+		chunk_size = size;
+	else
+		chunk_size = 512;
 }

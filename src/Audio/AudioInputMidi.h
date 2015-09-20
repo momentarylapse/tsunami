@@ -66,6 +66,11 @@ public:
 
 	void setPreviewSynthesizer(Synthesizer *s);
 
+	void _cdecl setChunkSize(int size);
+	void _cdecl setUpdateDt(float dt);
+	int chunk_size;
+	float update_dt;
+
 
 	int sample_rate;
 

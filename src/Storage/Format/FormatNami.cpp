@@ -41,7 +41,7 @@ FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncod
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 }
 
-string FormatNami::compress_buffer(BufferBox &b)
+string compress_buffer(BufferBox &b, Song *song)
 {
 	string data;
 
@@ -213,6 +213,784 @@ void strip(string &s)
 		s.resize(s.num - 1);
 }
 
+class FileChunkBasic
+{
+public:
+	FileChunkBasic(const string &_name)
+	{
+		chunk_pos = 0;
+		name = _name;
+		root = NULL;
+		context = NULL;
+	}
+	virtual ~FileChunkBasic()
+	{
+		foreach(FileChunkBasic *c, children)
+			delete(c);
+	}
+	virtual void write(File *f) = 0;
+	virtual void read(File *f) = 0;
+	virtual void create(){ throw string("no data creation... " + name); }
+	virtual void on_notify(){};
+	string name;
+
+	void notify()
+	{
+		if (root)
+			root->on_notify();
+	}
+
+	void add_child(FileChunkBasic *c)
+	{
+		//msg_write("add child: " + name + " -> " + c->name);
+		children.add(c);
+	}
+	void set_root(FileChunkBasic *r)
+	{
+		root = r;
+		foreach(FileChunkBasic *c, children)
+			c->set_root(r);
+	}
+	void add(const string &name, void *p, bool is_array = false)
+	{
+		foreach(FileChunkBasic *c, children)
+			if (c->name == name)
+				subs.add(Sub(c, p, is_array));
+	}
+
+	virtual void set(void *t){};
+	virtual void set_parent(void *t){};
+	virtual void *get(){ return NULL; }
+
+	struct Context
+	{
+		Context(File *_f)
+		{
+			f = _f;
+		}
+		void pop()
+		{
+			msg_write("pop");
+			names.pop();
+			pos0.pop();
+			sizes.pop();
+		}
+		void push(const string &name, int pos, int size)
+		{
+			msg_write("push " + name);
+			names.add(name);
+			pos0.add(pos);
+			sizes.add(size);
+		}
+		int end()
+		{
+			if (names.num > 0)
+				return pos0.back() + sizes.back();
+			return 2000000000;
+		}
+		string str()
+		{
+			return implode(names, "/");
+		}
+		File *f;
+		Array<string> names;
+		Array<int> pos0, sizes;
+	};
+	Context *context;
+
+	struct Sub
+	{
+		FileChunkBasic *c;
+		void *p;
+		bool is_array;
+
+		Sub(){}
+		Sub(FileChunkBasic *_c, void *_p, bool _is_array)
+		{
+			c = _c;
+			p = _p;
+			is_array = _is_array;
+		}
+	};
+	Array<FileChunkBasic*> children;
+	FileChunkBasic *root;
+	Array<Sub> subs;
+
+	void write_subs(Context *context)
+	{
+		foreach(Sub &s, subs){
+			if (s.is_array){
+				DynamicArray *a = (DynamicArray*)s.p;
+				for (int i=0; i<a->num; i++){
+					s.c->set((char*)a->data + a->element_size * i);
+					s.c->write_complete(context);
+				}
+			}else{
+				s.c->set(s.p);
+				s.c->write_complete(context);
+			}
+		}
+	}
+
+	int chunk_pos;
+	void write_begin_chunk(File *f)
+	{
+		string s = name + "        ";
+		f->WriteBuffer(s.data, 8);
+		f->WriteInt(0); // temporary
+		chunk_pos = f->GetPos();
+	}
+
+	void write_end_chunk(File *f)
+	{
+		int pos0 = f->GetPos();
+		f->SetPos(chunk_pos - 4, true);
+		f->WriteInt(pos0 - chunk_pos);
+		f->SetPos(pos0, true);
+	}
+	void write_complete(Context *context)
+	{
+		File *f = context->f;
+		write_begin_chunk(f);
+		write(f);
+		write_subs(context);
+		write_end_chunk(f);
+	}
+
+
+	void read_contents()
+	{
+		File *f = context->f;
+		msg_write(name + ": read_contents " + i2s(f->GetPos()));
+
+		read(f);
+
+		msg_write(name + ": read_children " + i2s(f->GetPos()));
+		msg_right();
+
+
+		// read nested chunks
+		while (f->GetPos() < context->end()){
+			msg_write(name + ": read_child " + i2s(f->GetPos()));
+
+
+			string cname;
+			cname.resize(8);
+			f->ReadBuffer(cname.data, 8);
+			strip(cname);
+			int size = f->ReadInt();
+
+			int pos0 = f->GetPos();
+
+			if (size < 0)
+				throw string("chunk with negative size found");
+			if (pos0 + size > context->end())
+				throw string("inner chunk is larger than its parent");
+
+			context->push(cname, pos0, size);
+
+
+
+			bool ok = false;
+			foreach(FileChunkBasic *c, children)
+				if (c->name == cname){
+					c->set_parent(get());
+					c->create();
+					c->context = context;
+					c->read_contents();
+					ok = true;
+					break;
+				}
+			if (!ok)
+				throw string("no sub handler: " + context->str());
+
+			msg_write("jump " + i2s(context->end()));
+			f->SetPos(context->end(), true);
+			context->pop();
+			msg_write(name + ": /read_child " + i2s(f->GetPos()));
+		}
+		msg_left();
+		msg_write(name + ": /read_contents " + i2s(f->GetPos()));
+	}
+};
+
+template<class PT, class T>
+class FileChunk : public FileChunkBasic
+{
+public:
+	FileChunk(const string &name) : FileChunkBasic(name){ me = NULL; parent = NULL; }
+	virtual void *get()
+	{
+		return me;
+	}
+	virtual void set(void *_me)
+	{
+		me = (T*)_me;
+	}
+	virtual void set_parent(void *_parent)
+	{
+		parent = (PT*)_parent;
+	}
+	T *me;
+	PT *parent;
+};
+
+class FileChunkTag : public FileChunk<Song,Tag>
+{
+public:
+	FileChunkTag() : FileChunk<Song,Tag>("tag"){}
+	virtual void create()
+	{
+		parent->tags.add(Tag());
+		me = &parent->tags.back();
+	}
+	virtual void read(File *f)
+	{
+		me->key = f->ReadStr();
+		me->value = f->ReadStr();
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr(me->key);
+		f->WriteStr(me->value);
+	}
+};
+
+class FileChunkLevelName : public FileChunk<Song,Song>
+{
+public:
+	FileChunkLevelName() : FileChunk<Song,Song>("lvlname"){}
+	virtual void create(){ me = parent; }
+	virtual void read(File *f)
+	{
+		int num = f->ReadInt();
+		me->level_names.clear();
+		for (int i=0;i<num;i++)
+			me->level_names.add(f->ReadStr());
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->level_names.num);
+		for (int i=0; i<me->level_names.num; i++)
+			f->WriteStr(me->level_names[i]);
+	}
+};
+
+class FileChunkFormat : public FileChunk<Song,Song>
+{
+public:
+	FileChunkFormat() : FileChunk<Song,Song>("format"){}
+	virtual void create(){ me = parent; }
+	virtual void read(File *f)
+	{
+		me->sample_rate = f->ReadInt();
+		me->default_format = (SampleFormat)f->ReadInt();
+		f->ReadInt(); // channels
+		me->compression = f->ReadInt();
+		f->ReadInt();
+		f->ReadInt();
+		f->ReadInt();
+		f->ReadInt();
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->sample_rate);
+		f->WriteInt(me->default_format);
+		f->WriteInt(2); // channels
+		f->WriteInt(me->compression);
+		f->WriteInt(0); // reserved
+		f->WriteInt(0);
+		f->WriteInt(0);
+		f->WriteInt(0);
+	}
+};
+
+class FileChunkEffect : public FileChunk<Track,Effect>
+{
+public:
+	FileChunkEffect() : FileChunk<Track,Effect>("effect"){}
+	virtual void create(){}
+	virtual void read(File *f)
+	{
+		me = CreateEffect(f->ReadStr());
+		me->only_on_selection = f->ReadBool();
+		me->range.offset = f->ReadInt();
+		me->range.num = f->ReadInt();
+		string params = f->ReadStr();
+		me->configFromString(params);
+		string temp = f->ReadStr();
+		if (temp.find("disabled") >= 0)
+			me->enabled = false;
+		parent->fx.add(me);
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr(me->name);
+		f->WriteBool(me->only_on_selection);
+		f->WriteInt(me->range.offset);
+		f->WriteInt(me->range.num);
+		f->WriteStr(me->configToString());
+		f->WriteStr(me->enabled ? "" : "disabled");
+	}
+};
+
+class FileChunkBufferBox : public FileChunk<TrackLevel,BufferBox>
+{
+public:
+	FileChunkBufferBox() : FileChunk<TrackLevel,BufferBox>("bufbox"){}
+	virtual void create()
+	{
+		BufferBox dummy;
+		parent->buffers.add(dummy);
+		me = &parent->buffers.back();
+	}
+	virtual void read(File *f)
+	{
+		me->offset = f->ReadInt();
+		int num = f->ReadInt();
+		me->resize(num);
+		int channels = f->ReadInt(); // channels (2)
+		int bits = f->ReadInt(); // bit (16)
+
+		string data;
+
+		int bytes = context->sizes.back() - 16;
+		data.resize(bytes);//num * (bits / 8) * channels);
+
+		// read chunk'ed
+		int offset = 0;
+		for (int n=0; n<data.num / CHUNK_SIZE; n++){
+			f->ReadBuffer(&data[offset], CHUNK_SIZE);
+			notify();
+			offset += CHUNK_SIZE;
+		}
+		f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
+
+		// insert
+
+		Song *s = (Song*)root->get();
+		if (s->compression > 0){
+			//throw string("can't read compressed nami files yet");
+			uncompress_buffer(*me, data);
+
+		}else{
+			me->import(data.data, channels, format_for_bits(bits), num);
+		}
+	}
+	virtual void write(File *f)
+	{
+		Song *song = (Song*)root->get();
+
+		int channels = 2;
+		f->WriteInt(me->offset);
+		f->WriteInt(me->num);
+		f->WriteInt(channels);
+		f->WriteInt(format_get_bits(song->default_format));
+
+		string data;
+		if (song->compression == 0){
+			if (!me->exports(data, channels, song->default_format))
+				tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+		}else{
+
+			int uncompressed_size = me->num * channels * format_get_bits(song->default_format) / 8;
+			data = compress_buffer(*me, song);
+			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
+		}
+		f->WriteBuffer(data.data, data.num);
+	}
+};
+
+#if 0
+void ReadChunkSampleBufferBox(ChunkStack *s, BufferBox *b)
+{
+	b->offset = s->f->ReadInt();
+	int num = s->f->ReadInt();
+	b->resize(num);
+	s->f->ReadInt(); // channels (2)
+	s->f->ReadInt(); // bit (16)
+
+	string data;
+	data.resize(num * 4);
+	s->f->ReadBuffer(data.data, data.num);
+	b->import(data.data, 2, SAMPLE_FORMAT_16, num);
+}
+
+void ReadChunkSampleRef(ChunkStack *s, Track *t)
+{
+	string name = s->f->ReadStr();
+	int pos = s->f->ReadInt();
+	int index = s->f->ReadInt();
+	SampleRef *r = t->addSample(pos, index);
+	r->volume = s->f->ReadFloat();
+	r->muted = s->f->ReadBool();
+	r->rep_num = s->f->ReadInt();
+	r->rep_delay = s->f->ReadInt();
+	s->f->ReadInt(); // reserved
+	s->f->ReadInt();
+}
+
+void ReadChunkSub(ChunkStack *s, Track *t)
+{
+	string name = s->f->ReadStr();
+	int pos = s->f->ReadInt();
+	int length = s->f->ReadInt();
+	SampleRef *r = __AddEmptySubTrack(t, Range(pos, length), name);
+	r->volume = s->f->ReadFloat();
+	r->muted = s->f->ReadBool();
+	r->rep_num = s->f->ReadInt();
+	r->rep_delay = s->f->ReadInt();
+	s->f->ReadInt(); // reserved
+	s->f->ReadInt();
+
+	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &r->buf);
+	tsunami->log->error("\"sub\" chunk is deprecated!");
+}
+
+void ReadChunkMidiNote(ChunkStack *s, MidiData *m)
+{
+	MidiNote n;
+	n.range.offset = s->f->ReadInt();
+	n.range.num = s->f->ReadInt();
+	n.pitch = s->f->ReadInt();
+	n.volume = s->f->ReadFloat();
+	s->f->ReadInt(); // reserved
+	m->add(MidiEvent(n.range.offset, n.pitch, n.volume));
+	m->add(MidiEvent(n.range.end(), n.pitch, 0));
+}
+
+void ReadChunkMidiEffect(ChunkStack *s, MidiData *m)
+{
+	MidiEffect *e = CreateMidiEffect(s->f->ReadStr());
+	e->only_on_selection = s->f->ReadBool();
+	e->range.offset = s->f->ReadInt();
+	e->range.num = s->f->ReadInt();
+	string params = s->f->ReadStr();
+	e->configFromString(params);
+	string temp = s->f->ReadStr();
+	if (temp.find("disabled") >= 0)
+		e->enabled = false;
+	m->fx.add(e);
+}
+#endif
+
+
+class FileChunkMidiEvent : public FileChunk<MidiData,MidiEvent>
+{
+public:
+	FileChunkMidiEvent() : FileChunk<MidiData,MidiEvent>("event"){}
+	virtual void create()
+	{
+		parent->add(MidiEvent());
+		me = &parent->back();
+	}
+	virtual void read(File *f)
+	{
+		me->pos = f->ReadInt();
+		me->pitch = f->ReadInt();
+		me->volume = f->ReadFloat();
+		f->ReadInt(); // reserved
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->pos);
+		f->WriteInt(me->pitch);
+		f->WriteFloat(me->volume);
+		f->WriteInt(0); // reserved
+	}
+};
+
+class FileChunkSampleMidiData : public FileChunk<Sample,MidiData>
+{
+public:
+	FileChunkSampleMidiData() : FileChunk<Sample,MidiData>("midi")
+	{
+		add_child(new FileChunkMidiEvent);
+		//s->AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
+		//s->AddChunkHandler("note", (chunk_reader*)&ReadChunkMidiNote, midi);
+		//s->AddChunkHandler("effect", (chunk_reader*)&ReadChunkMidiEffect, midi);
+	}
+	virtual void create(){ me = &parent->midi; }
+	virtual void read(File *f)
+	{
+		f->ReadStr();
+		f->ReadStr();
+		f->ReadStr();
+		f->ReadInt(); // reserved
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr("");
+		f->WriteStr("");
+		f->WriteStr("");
+		f->WriteInt(0);
+	}
+};
+
+class FileChunkTrackMidiData : public FileChunk<Track,MidiData>
+{
+public:
+	FileChunkTrackMidiData() : FileChunk<Track,MidiData>("midi")
+	{
+		add_child(new FileChunkMidiEvent);
+		//s->AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
+		//s->AddChunkHandler("note", (chunk_reader*)&ReadChunkMidiNote, midi);
+		//s->AddChunkHandler("effect", (chunk_reader*)&ReadChunkMidiEffect, midi);
+	}
+	virtual void create(){ me = &parent->midi; }
+	virtual void read(File *f)
+	{
+		f->ReadStr();
+		f->ReadStr();
+		f->ReadStr();
+		f->ReadInt(); // reserved
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr("");
+		f->WriteStr("");
+		f->WriteStr("");
+		f->WriteInt(0);
+	}
+};
+
+class FileChunkSample : public FileChunk<Song,Sample>
+{
+public:
+	FileChunkSample() : FileChunk<Song,Sample>("sample")
+	{
+		//add_child(new ) bufbox, midi
+		add_child(new FileChunkSampleMidiData);
+	}
+	virtual void create()
+	{
+		parent->samples.add(new Sample(Track::TYPE_AUDIO));
+		me = parent->samples.back();
+		me->owner = parent;
+	}
+	virtual void read(File *f)
+	{
+		me->name = f->ReadStr();
+		me->volume = f->ReadFloat();
+		me->offset = f->ReadInt();
+		me->type = f->ReadInt();
+		f->ReadInt(); // reserved
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr(me->name);
+		f->WriteFloat(me->volume);
+		f->WriteInt(me->offset);
+		f->WriteInt(me->type); // reserved
+		f->WriteInt(0);
+	}
+};
+
+class FileChunkTrackLevel : public FileChunk<Track,TrackLevel>
+{
+public:
+	int n;
+	FileChunkTrackLevel() : FileChunk<Track,TrackLevel>("level")
+	{
+		n = 0;
+		add_child(new FileChunkBufferBox);
+	}
+	virtual void create()
+	{
+		//me = &parent->levels[n];
+	}
+	virtual void read(File *f)
+	{
+		n = f->ReadInt();
+		me = &parent->levels[n];
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(parent->levels.index(me));
+	}
+};
+
+class FileChunkSynthesizer : public FileChunk<Track,Synthesizer>
+{
+public:
+	FileChunkSynthesizer() : FileChunk<Track,Synthesizer>("synth"){}
+	virtual void create(){}
+	virtual void read(File *f)
+	{
+		me = CreateSynthesizer(f->ReadStr());
+		me->configFromString(f->ReadStr());
+		f->ReadStr();
+		f->ReadInt();
+
+		delete(parent->synth);
+		parent->synth = me;
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr(me->name);
+		f->WriteStr(me->configToString());
+		f->WriteStr("");
+		f->WriteInt(0); // reserved
+	}
+};
+
+class FileChunkBar : public FileChunk<Track,BarPattern>
+{
+public:
+	FileChunkBar() : FileChunk<Track,BarPattern>("bar"){}
+	virtual void create(){ me = NULL; }
+	virtual void read(File *f)
+	{
+		BarPattern b;
+		b.type = f->ReadInt();
+		b.length = f->ReadInt();
+		b.num_beats = f->ReadInt();
+		if (b.type == BarPattern::TYPE_PAUSE)
+			b.num_beats = 0;
+		int count = f->ReadInt();
+		f->ReadInt(); // reserved
+		for (int i=0; i<count; i++)
+			parent->bars.add(b);
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->type);
+		f->WriteInt(me->length);
+		f->WriteInt(me->num_beats);
+		f->WriteInt(1);
+		f->WriteInt(0); // reserved
+	}
+};
+
+class FileChunkMarker : public FileChunk<Track,TrackMarker>
+{
+public:
+	FileChunkMarker() : FileChunk<Track,TrackMarker>("marker"){}
+	virtual void create()
+	{
+		parent->markers.add(TrackMarker());
+		me = &parent->markers.back();
+	}
+	virtual void read(File *f)
+	{
+		me->pos = f->ReadInt();
+		me->text = f->ReadStr();
+		f->ReadInt(); // reserved
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->pos);
+		f->WriteStr(me->text);
+		f->WriteInt(0);
+	}
+};
+
+class FileChunkTrack : public FileChunk<Song,Track>
+{
+public:
+	FileChunkTrack() : FileChunk<Song,Track>("track")
+	{
+		add_child(new FileChunkTrackLevel);
+		add_child(new FileChunkSynthesizer);
+		add_child(new FileChunkEffect);
+		add_child(new FileChunkTrackMidiData);
+		add_child(new FileChunkBar);
+		add_child(new FileChunkMarker);
+			//s->AddChunkHandler("samref", (chunk_reader*)&ReadChunkSampleRef, t);
+			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
+	}
+	virtual void create()
+	{
+		me = parent->addTrack(Track::TYPE_AUDIO);
+	}
+	virtual void read(File *f)
+	{
+		me->name = f->ReadStr();
+		me->volume = f->ReadFloat();
+		me->muted = f->ReadBool();
+		me->type = f->ReadInt();
+		me->panning = f->ReadFloat();
+		f->ReadInt(); // reserved
+		f->ReadInt();
+
+		notify();
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr(me->name);
+		f->WriteFloat(me->volume);
+		f->WriteBool(me->muted);
+		f->WriteInt(me->type);
+		f->WriteFloat(me->panning);
+		f->WriteInt(0); // reserved
+		f->WriteInt(0);
+
+		notify();
+	}
+};
+
+class FileChunkNami : public FileChunk<Song,Song>
+{
+public:
+	FileChunkNami() :
+		FileChunk<Song,Song>("nami")
+	{
+		add_child(new FileChunkFormat);
+		add_child(new FileChunkTag);
+		add_child(new FileChunkLevelName);
+		add_child(new FileChunkSample);
+		add_child(new FileChunkTrack);
+	}
+	virtual void create(){ me = parent; }
+	virtual void read(File *f)
+	{
+		me->sample_rate = f->ReadInt();
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->sample_rate);
+	}
+};
+
+class ChunkedFileFormatNami : public FileChunk<void,Song>
+{
+public:
+	ChunkedFileFormatNami() :
+		FileChunk<void,Song>("")
+	{
+		od = NULL;
+		song = NULL;
+		add_child(new FileChunkNami);
+		set_root(this);
+	}
+	virtual void read(File *f){}
+	virtual void write(File *f){}
+	StorageOperationData *od;
+	Song *song;
+
+	bool read_file(const string &filename, StorageOperationData *_od)
+	{
+		od = _od;
+		song = od->song;
+		File *f = FileOpen(filename);
+		f->SetBinaryMode(true);
+		context = new FileChunkBasic::Context(f);
+		context->push(name, 0, f->GetSize());
+
+		set(song);
+		read_contents();
+		delete(context);
+
+		delete(f);
+
+		return true;
+	}
+	virtual void on_notify()
+	{
+		od->progress->set((float)context->f->GetPos() / (float)context->f->GetSize());
+	}
+};
+
 void FormatNami::BeginChunk(const string &name)
 {
 	string s = name + "        ";
@@ -268,7 +1046,7 @@ void FormatNami::WriteBufferBox(BufferBox *b)
 	}else{
 
 		int uncompressed_size = b->num * channels * format_get_bits(song->default_format) / 8;
-		data = compress_buffer(*b);
+		data = compress_buffer(*b, song);
 		msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 	}
 	f->WriteBuffer(data.data, data.num);
@@ -919,6 +1697,7 @@ void FormatNami::loadSong(StorageOperationData *od)
 	// TODO?
 	od->song->tags.clear();
 
+#if 0
 	File *f = FileOpen(od->filename);
 	f->SetBinaryMode(true);
 
@@ -929,6 +1708,15 @@ void FormatNami::loadSong(StorageOperationData *od)
 	}
 
 	FileClose(f);
+#else
+
+	try{
+		ChunkedFileFormatNami n;
+		n.read_file(od->filename, od);
+	}catch(string &s){
+		tsunami->log->error("loading nami: " + s);
+	}
+#endif
 
 	// some post processing
 	make_consistent(od->song);

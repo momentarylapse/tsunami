@@ -22,8 +22,6 @@ public:
 	void loadSong(StorageOperationData *od);
 	void saveSong(StorageOperationData *od);
 
-	string compress_buffer(BufferBox &b);
-
 	Array<int> ChunkPos;
 	void make_consistent(Song *s);
 

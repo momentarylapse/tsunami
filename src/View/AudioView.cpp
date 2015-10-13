@@ -53,6 +53,7 @@ const string AudioView::MESSAGE_CUR_LEVEL_CHANGE = "CurLevelChange";
 const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
+const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
 
 AudioView::SelectionType::SelectionType()
 {
@@ -1063,6 +1064,8 @@ void AudioView::onUpdate(Observable *o, const string &message)
 
 void AudioView::updateTracks()
 {
+	bool changed = false;
+
 	Array<AudioViewTrack*> vtrack2;
 	vtrack2.resize(song->tracks.num);
 	foreachi(Track *t, song->tracks, ti){
@@ -1076,12 +1079,16 @@ void AudioView::updateTracks()
 					break;
 				}
 			}
-		if (!found)
+		if (!found){
 			vtrack2[ti] = new AudioViewTrack(this, t);
+			changed = true;
+		}
 	}
 	foreach(AudioViewTrack *v, vtrack)
-		if (v)
+		if (v){
 			delete(v);
+			changed = true;
+		}
 	vtrack = vtrack2;
 	thm.dirty = true;
 	foreachi(AudioViewTrack *v, vtrack, i){
@@ -1094,6 +1101,9 @@ void AudioView::updateTracks()
 	}
 
 	checkConsistency();
+
+	if (changed)
+		notify(MESSAGE_VTRACK_CHANGE);
 }
 
 void AudioView::drawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time)

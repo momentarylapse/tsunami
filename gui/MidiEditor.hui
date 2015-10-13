@@ -2,7 +2,7 @@ Dialog midi_editor "Midi" 380 516
 	Grid ? "" 1 2
 		Grid me_grid_no "" 1 1
 			Text ld_t_no_midi "keine Midi-Spur ausgewählt"
-		Grid me_grid_yes "" 1 2
+		Grid me_grid_yes "" 1 4
 			Group me_group_view "Ansicht"
 				Grid ? "" 2 3
 					Text ld_t_pitch "Pitch"
@@ -22,6 +22,8 @@ Dialog midi_editor "Midi" 380 516
 						.
 						Text ld_t_inversion "Umkehrung"
 						ComboBox chord_inversion ""
+			Group me_group_reference "Referenz-Spur"
+				ComboBox reference_track ""
 			Group me_group_edit "Bearbeiten"
 				Grid ? "" 3 1
 					Button edit_song "Datei"

@@ -17,6 +17,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 {
 	view = _view;
 	track = _track;
+	reference_track = -1;
 
 	area = rect(0, 0, 0, 0);
 }
@@ -228,15 +229,19 @@ void AudioViewTrack::drawMidi(HuiPainter *c, MidiData &midi, int shift)
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void AudioViewTrack::drawMidiNote(HuiPainter *c, const MidiNote &n, bool hover)
+void AudioViewTrack::drawMidiNote(HuiPainter *c, const MidiNote &n, MidiNoteState state)
 {
 	float x1 = view->cam.sample2screen(n.range.offset);
 	float x2 = view->cam.sample2screen(n.range.end());
 	float y1 = view->pitch2y(n.pitch + 1);
 	float y2 = view->pitch2y(n.pitch);
 	color col = getPitchColor(n.pitch);
-	if (hover)
+	if (state == STATE_HOVER){
 		col.a = 0.5f;
+	}else if (state == STATE_REFERENCE){
+		col = ColorInterpolate(col, view->colors.text_soft2, 0.7f);
+		col.a = 0.5f;
+	}
 	c->setColor(col);
 	c->drawRect(rect(x1, x2, y1, y2));
 }
@@ -252,7 +257,7 @@ void AudioViewTrack::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
 	c->drawRect(rect(x-1.5f, x+1.5f, y1, y2));
 }
 
-void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi)
+void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi, bool as_reference)
 {
 	Array<MidiEvent> events = midi.getEvents(view->cam.range());
 	Array<MidiNote> notes = midi.getNotes(view->cam.range());
@@ -262,8 +267,14 @@ void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi)
 		if ((n.pitch < view->pitch_min) or (n.pitch >= view->pitch_max))
 			continue;
 		bool hover = ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (n.range.offset == view->hover.note_start));
-		drawMidiNote(c, n, hover);
+		if (as_reference){
+			drawMidiNote(c, n, STATE_REFERENCE);
+		}else{
+			drawMidiNote(c, n, hover ? STATE_HOVER : STATE_DEFAULT);
+		}
 	}
+	if (as_reference)
+		return;
 
 	// draw events
 	foreach(MidiEvent &e, events)
@@ -273,7 +284,7 @@ void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi)
 	if ((HuiGetEvent()->lbut) and (view->selection.type == view->SEL_TYPE_MIDI_PITCH)){
 		Array<MidiNote> notes = view->getCreationNotes();
 		foreach(MidiNote &n, notes){
-			drawMidiNote(c, n, true);
+			drawMidiNote(c, n, STATE_HOVER);
 		}
 	}
 
@@ -306,10 +317,13 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 {
 	msg_db_f("DrawTrack", 1);
 
-	if ((view->cur_track == track) and (view->editingMidi()))
-		drawMidiEditable(c, track->midi);
-	else
+	if ((view->cur_track == track) and (view->editingMidi())){
+		if ((reference_track >= 0) and (reference_track < track->song->tracks.num))
+			drawMidiEditable(c, track->song->tracks[reference_track]->midi, true);
+		drawMidiEditable(c, track->midi, false);
+	}else{
 		drawMidi(c, track->midi, 0);
+	}
 
 	drawTrackBuffers(c, view->cam.pos);
 

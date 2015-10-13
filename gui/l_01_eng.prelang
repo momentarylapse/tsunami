@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-256
+257
 // Data (ID,Text)
 about
 
@@ -235,6 +235,8 @@ me_group_chord
 
 me_group_edit
 
+me_group_reference
+
 me_group_view
 
 menu_edit
@@ -389,9 +391,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_536333
+rand_id_684954
 
-rand_id_605054
+rand_id_725657
 
 rdt_capture
 

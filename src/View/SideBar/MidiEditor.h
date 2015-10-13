@@ -33,6 +33,7 @@ public:
 	void onMidiModeChord();
 	void onChordType();
 	void onChordInversion();
+	void onReferenceTrack();
 
 	void onEditTrack();
 	void onEditMidiFx();

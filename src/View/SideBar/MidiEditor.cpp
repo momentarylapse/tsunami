@@ -10,6 +10,7 @@
 #include "../../Data/MidiData.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
+#include "../AudioViewTrack.h"
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
@@ -57,11 +58,13 @@ MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
 	event("midi_mode:chord", this, &MidiEditor::onMidiModeChord);
 	event("chord_type", this, &MidiEditor::onChordType);
 	event("chord_inversion", this, &MidiEditor::onChordInversion);
+	event("reference_track", this, &MidiEditor::onReferenceTrack);
 	event("edit_track", this, &MidiEditor::onEditTrack);
 	event("edit_midi_fx", this, &MidiEditor::onEditMidiFx);
 	event("edit_song", this, &MidiEditor::onEditSong);
 
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
+	subscribe(view, view->MESSAGE_VTRACK_CHANGE);
 	update();
 }
 
@@ -87,10 +90,27 @@ void MidiEditor::onUpdate(Observable* o, const string &message)
 	update();
 	if ((o == track) && (message == track->MESSAGE_DELETE)){
 		setTrack(NULL);
-	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE))
+	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE)){
 		setTrack(view->cur_track);
-	else
+	}else if ((o == view) && (message == view->MESSAGE_VTRACK_CHANGE)){
+
+		reset("reference_track");
+		addString("reference_track", _("   - keine Referenz -"));
+		if (song){
+			foreach(Track *t, song->tracks)
+				addString("reference_track", t->getNiceName());
+		}
+		setInt("reference_track", 0);
+
+		if (track){
+			int tn = track->get_index();
+			if ((tn >= 0) and (tn < view->vtrack.num))
+				if (view->vtrack[tn])
+					setInt("reference_track", view->vtrack[tn]->reference_track + 1);
+		}
+	}else{
 		setTrack(track);
+	}
 }
 
 
@@ -144,6 +164,14 @@ void MidiEditor::onChordInversion()
 	view->chord_inversion = getInt("");
 }
 
+void MidiEditor::onReferenceTrack()
+{
+	int n = getInt("") - 1;
+	int tn = track->get_index();
+	view->vtrack[tn]->reference_track = n;
+	view->forceRedraw();
+}
+
 void MidiEditor::onEditTrack()
 {
 	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
@@ -164,17 +192,25 @@ void MidiEditor::clear()
 	if (track)
 		unsubscribe(track);
 	track = NULL;
+	setInt("reference_track", 0);
 	//Enable("add", false);
 }
 
 void MidiEditor::setTrack(Track *t)
 {
 	clear();
+
 	track = t;
 	if (track){
 		subscribe(track, track->MESSAGE_DELETE);
 		subscribe(track, track->MESSAGE_ADD_MIDI_EFFECT);
 		subscribe(track, track->MESSAGE_DELETE_MIDI_EFFECT);
+
+		int tn = track->get_index();
+		if ((tn >= 0) and (tn < view->vtrack.num))
+			if (view->vtrack[tn])
+				setInt("reference_track", view->vtrack[tn]->reference_track + 1);
 	}
+
 }
 

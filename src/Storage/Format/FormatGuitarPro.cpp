@@ -637,9 +637,23 @@ void FormatGuitarPro::write_measure(Track *t, Bar &b)
 	//msg_write("-----");
 	Array<GuitarNote> gnotes = create_guitar_notes(t, b);
 
-	f->WriteInt(gnotes.num); // beats
+	int num = gnotes.num;
 	foreach(GuitarNote &n, gnotes)
-		write_beat(n.pitch, n.string, n.length);
+		if ((n.length == 20) or (n.length == 28))
+			num ++;
+
+	f->WriteInt(num); // beats
+	foreach(GuitarNote &n, gnotes){
+		if (n.length == 20){
+			write_beat(n.pitch, n.string, 16);
+			write_beat(n.pitch, n.string, 4);
+		}else if (n.length == 28){
+			write_beat(n.pitch, n.string, 16);
+			write_beat(n.pitch, n.string, 12);
+		}else{
+			write_beat(n.pitch, n.string, n.length);
+		}
+	}
 
 	if (version >= 500) // second voice
 		f->WriteInt(0);

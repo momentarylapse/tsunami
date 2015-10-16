@@ -12,6 +12,7 @@
 #include "SynthConsole.h"
 #include "SampleRefDialog.h"
 #include "SampleManager.h"
+#include "MidiFxConsole.h"
 #include "../AudioView.h"
 #include "SongConsole.h"
 
@@ -39,6 +40,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	track_console = new TrackConsole(view);
 	midi_editor = new MidiEditor(view, song);
 	synth_console = new SynthConsole(view);
+	midi_fx_console = new MidiFxConsole(view, song);
 	sample_ref_dialog = new SampleRefDialog(view, song);
 
 	addConsole(song_console);
@@ -47,6 +49,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	addConsole(track_console);
 	addConsole(midi_editor);
 	addConsole(synth_console);
+	addConsole(midi_fx_console);
 	addConsole(sample_ref_dialog);
 
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);

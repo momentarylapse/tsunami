@@ -121,7 +121,7 @@ void TrackConsole::onEditMidi()
 
 void TrackConsole::onEditMidiFx()
 {
-	tsunami->win->bottom_bar->open(BottomBar::TRACK_MIDI_FX_CONCOLE);
+	tsunami->win->side_bar->open(SideBar::MIDI_FX_CONCOLE);
 }
 
 void TrackConsole::onEditSynth()

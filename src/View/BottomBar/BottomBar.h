@@ -19,7 +19,6 @@ class FxConsole;
 class MixingConsole;
 class CurveConsole;
 class LogDialog;
-class MidiFxConsole;
 class Log;
 
 class BottomBarConsole : public HuiPanel
@@ -49,7 +48,6 @@ public:
 		FX_CONSOLE,
 		CURVE_CONSOLE,
 		TRACK_FX_CONSOLE,
-		TRACK_MIDI_FX_CONCOLE,
 		NUM_CONSOLES
 	};
 
@@ -61,7 +59,6 @@ public:
 
 	FxConsole *fx_console;
 	FxConsole *track_fx_console;
-	MidiFxConsole *track_midi_fx_console;
 	MixingConsole *mixing_console;
 	CurveConsole *curve_console;
 	LogDialog *log_dialog;

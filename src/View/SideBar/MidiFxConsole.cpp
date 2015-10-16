@@ -26,7 +26,7 @@ public:
 		track = t;
 		fx = _fx;
 		index = _index;
-		addGrid("!noexpandx,expandy", 0, 0, 1, 2, "grid");
+		addGrid("!expandx,noexpandy", 0, 0, 1, 2, "grid");
 		setTarget("grid", 0);
 		addGrid("", 0, 0, 5, 1, "header");
 		setTarget("header", 0);
@@ -114,7 +114,7 @@ public:
 };
 
 MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
-	BottomBarConsole(_("Midi Fx")),
+	SideBarConsole(_("Midi Fx")),
 	Observer("MidiFxConsole")
 {
 	view = _view;
@@ -200,8 +200,8 @@ void MidiFxConsole::setTrack(Track *t)
 	if (track){
 		foreachi(MidiEffect *e, track->midi.fx, i){
 			panels.add(new SingleMidiFxPanel(song, track, e, i));
-			embed(panels.back(), id_inner, i*2 + 3, 0);
-			addSeparator("!vertical", i*2 + 4, 0, 0, 0, "separator_" + i2s(i));
+			embed(panels.back(), id_inner, 0, i*2 + 3);
+			addSeparator("!horizontal", 0, i*2 + 4, 0, 0, "separator_" + i2s(i));
 		}
 		hideControl("comment_no_fx", track->midi.fx.num > 0);
 	}else{

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-259
+263
 // Data (ID,Text)
 about
 
@@ -175,6 +175,8 @@ language
 
 ld_t_chord
 
+ld_t_dummy
+
 ld_t_edit
 
 ld_t_inversion
@@ -241,6 +243,8 @@ me_group_reference
 
 me_group_view
 
+me_t_dummy
+
 menu_edit
 
 menu_file
@@ -286,6 +290,10 @@ menu_view_channels
 menu_view_peaks
 
 metronome
+
+mfe_g_edit
+
+mfe_t_dummy
 
 mfx_t_no_midi
 
@@ -393,9 +401,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_520923
+rand_id_116378
 
-rand_id_743894
+rand_id_301052
 
 rdt_capture
 
@@ -522,7 +530,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-142
+145
 // Data (ID,Text)
 
 
@@ -594,11 +602,15 @@ Ausgabelautstärke
 
 Ausgabepegel
 
+Bearbeiten
+
 Beim Anwenden eines Effekts: 
 
 Beim Anwenden eines MidiEffekts: 
 
 Beschreibung
+
+Datei
 
 Datei Eigenschaften
 
@@ -723,6 +735,8 @@ Samples\\\") + i2s(samples));
 Script (*.kaba)
 
 Sicherungsdatei für Aufnahmen wählen
+
+Spur
 
 Spur %d
 

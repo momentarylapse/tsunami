@@ -1,9 +1,9 @@
 Dialog midi_fx_editor "Midi Fx" 380 516
-	Grid ? "" 2 1 noexpandx
+	Grid ? "" 1 4 expandy
 		Grid me_grid_no "" 1 1
-			Text mfx_t_no_midi "keine Midi-Spur ausgewählt" expandy
-		Grid midi_fx_inner_table "" 32 1
-			Text comment_no_fx "- hier sind (noch) keine Effekte aktiv -"
+			Text mfx_t_no_midi "keine Midi-Spur ausgewählt" expandx center
+		Grid midi_fx_inner_table "" 1 32
+			Text comment_no_fx "- hier sind (noch) keine Effekte aktiv -" center
 			.
 			.
 			.
@@ -30,5 +30,11 @@ Dialog midi_fx_editor "Midi Fx" 380 516
 			.
 			.
 			.
-			Button add "" expandy flat image=hui:add
+			Button add "" expandx flat image=hui:add
+		Text mfe_t_dummy "" expandy
+		Group mfe_g_edit "Bearbeiten"
+			Grid ? "" 3 1
+				Button edit_song "Datei"
+				Button edit_track "Spur"
+				Button edit_midi "Midi"
 

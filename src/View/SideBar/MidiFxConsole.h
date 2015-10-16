@@ -8,14 +8,15 @@
 #ifndef MIDIFXCONSOLE_H_
 #define MIDIFXCONSOLE_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
 class Song;
+class Track;
 class AudioView;
 
-class MidiFxConsole : public BottomBarConsole, public Observer
+class MidiFxConsole : public SideBarConsole, public Observer
 {
 public:
 	MidiFxConsole(AudioView *view, Song *audio);

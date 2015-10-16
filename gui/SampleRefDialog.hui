@@ -17,6 +17,7 @@ Dialog sample_ref_dialog "Sub Track" 375 230
 				Text ld_t_repdelay "Abstand:"
 				SpinButton repdelay "0\\0\\\\0.1"
 				Text ms "ms"
+		Text ld_t_dummy "" expandy
 		Group ld_t_edit "Bearbeiten"
 			Grid ? "" 2 1
 				Button edit_song "Datei"

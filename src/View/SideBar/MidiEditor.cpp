@@ -179,7 +179,7 @@ void MidiEditor::onEditTrack()
 
 void MidiEditor::onEditMidiFx()
 {
-	tsunami->win->bottom_bar->open(BottomBar::TRACK_MIDI_FX_CONCOLE);
+	((SideBar*)parent)->open(SideBar::MIDI_FX_CONCOLE);
 }
 
 void MidiEditor::onEditSong()

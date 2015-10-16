@@ -24,7 +24,7 @@
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
-#include "../View/BottomBar/SampleManager.h"
+#include "../View/SideBar/SampleManager.h"
 #include "Plugin.h"
 #include "Effect.h"
 #include "ConfigPanel.h"

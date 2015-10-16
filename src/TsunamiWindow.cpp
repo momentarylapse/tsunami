@@ -360,7 +360,7 @@ void TsunamiWindow::onDelete()
 
 void TsunamiWindow::onSampleManager()
 {
-	bottom_bar->open(BottomBar::SAMPLE_CONSOLE);
+	side_bar->open(SideBar::SAMPLE_CONSOLE);
 }
 
 void TsunamiWindow::onMixingConsole()
@@ -541,7 +541,7 @@ void TsunamiWindow::updateMenu()
 	// view
 	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
 	check("show_fx_console", bottom_bar->isActive(BottomBar::TRACK_FX_CONSOLE));
-	check("sample_manager", bottom_bar->isActive(BottomBar::SAMPLE_CONSOLE));
+	check("sample_manager", side_bar->isActive(SideBar::SAMPLE_CONSOLE));
 
 	HuiMenu *m = getMenu()->getSubMenuByID("menu_level_target");
 	if (m){

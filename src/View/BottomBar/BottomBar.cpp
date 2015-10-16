@@ -11,7 +11,6 @@
 #include "FxConsole.h"
 #include "SynthConsole.h"
 #include "LogDialog.h"
-#include "SampleManager.h"
 #include "MidiFxConsole.h"
 #include "../../lib/hui/Controls/HuiControl.h"
 #include "../AudioView.h"
@@ -37,7 +36,6 @@ BottomBar::BottomBar(AudioView *view, Song *song, AudioOutput *output, Log *log)
 	log_dialog = new LogDialog(log);
 	mixing_console = new MixingConsole(song, output, view->stream);
 	fx_console = new FxConsole(NULL, song);
-	sample_manager = new SampleManager(song);
 	curve_console = new CurveConsole(view, song);
 	track_fx_console = new FxConsole(view, song);
 	track_synth_console = new SynthConsole(view);
@@ -45,7 +43,6 @@ BottomBar::BottomBar(AudioView *view, Song *song, AudioOutput *output, Log *log)
 	addConsole(log_dialog, "");
 	addConsole(mixing_console, "");
 	addConsole(fx_console, "");
-	addConsole(sample_manager, "");
 	addConsole(curve_console, "");
 	addConsole(track_fx_console, "\t");
 	addConsole(track_synth_console, "\t");

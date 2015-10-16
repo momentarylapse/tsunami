@@ -152,7 +152,7 @@ void SongConsole::onEditLevels()
 
 void SongConsole::onEditSamples()
 {
-	tsunami->win->bottom_bar->open(BottomBar::SAMPLE_CONSOLE);
+	((SideBar*)parent)->open(SideBar::SAMPLE_CONSOLE);
 }
 
 void SongConsole::onEditFx()

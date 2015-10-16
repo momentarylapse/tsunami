@@ -99,7 +99,7 @@ public:
 
 	string str()
 	{
-		return icon + "\\" + track_type(s->type) + "\\" + s->name + "\\" + s->owner->get_time_str_long(s->getRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete);
+		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->getRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete);
 	}
 	string icon;
 	Sample *s;
@@ -107,7 +107,7 @@ public:
 };
 
 SampleManager::SampleManager(Song *s) :
-	BottomBarConsole(_("Samples")),
+	SideBarConsole(_("Samples")),
 	Observer("SampleManager")
 {
 	fromResource("sample_manager_dialog");
@@ -195,10 +195,10 @@ void SampleManager::onListEdit()
 {
 	int sel = HuiGetEvent()->row;
 	int col = HuiGetEvent()->column;
-	if (col == 2)
-		song->editSampleName(sel, getCell("sample_list", sel, 2));
-	else if (col == 5)
-		song->samples[sel]->auto_delete = getCell("sample_list", sel, 5)._bool();
+	if (col == 1)
+		song->editSampleName(sel, getCell("sample_list", sel, 1));
+	else if (col == 4)
+		song->samples[sel]->auto_delete = getCell("sample_list", sel, 4)._bool();
 }
 
 void SampleManager::onImport()

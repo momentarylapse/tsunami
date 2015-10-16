@@ -10,6 +10,7 @@
 #include "TrackConsole.h"
 #include "MidiEditor.h"
 #include "SampleRefDialog.h"
+#include "SampleManager.h"
 #include "../AudioView.h"
 #include "SongConsole.h"
 
@@ -18,7 +19,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 {
 	addRevealer("!slide-left", 0, 0, 0, 0, "revealer");
 	setTarget("revealer", 0);
-	addGrid("!noexpandx,width=310,expandy", 0, 0, 2, 1, "root_grid0");
+	addGrid("!noexpandx,width=380,expandy", 0, 0, 2, 1, "root_grid0");
 	setTarget("root_grid0", 0);
 	addSeparator("!vertical,expandy", 0, 0, 0, 0, "");
 	addGrid("!expandx,expandy", 1, 0, 1, 3, "root_grid");
@@ -33,12 +34,14 @@ SideBar::SideBar(AudioView *view, Song *song) :
 
 	song_console = new SongConsole(song);
 	level_console = new LevelConsole(song, view);
+	sample_manager = new SampleManager(song);
 	track_console = new TrackConsole(view);
 	track_midi_editor = new MidiEditor(view, song);
 	sample_ref_dialog = new SampleRefDialog(view, song);
 
 	addConsole(song_console);
 	addConsole(level_console);
+	addConsole(sample_manager);
 	addConsole(track_console);
 	addConsole(track_midi_editor);
 	addConsole(sample_ref_dialog);

@@ -20,7 +20,6 @@ class SynthConsole;
 class MixingConsole;
 class CurveConsole;
 class LogDialog;
-class SampleManager;
 class MidiFxConsole;
 class Log;
 
@@ -49,7 +48,6 @@ public:
 		LOG_CONSOLE,
 		MIXING_CONSOLE,
 		FX_CONSOLE,
-		SAMPLE_CONSOLE,
 		CURVE_CONSOLE,
 		TRACK_FX_CONSOLE,
 		TRACK_SYNTH_CONSOLE,
@@ -70,7 +68,6 @@ public:
 	MixingConsole *mixing_console;
 	CurveConsole *curve_console;
 	LogDialog *log_dialog;
-	SampleManager *sample_manager;
 
 	Array<BottomBarConsole*> consoles;
 	void addConsole(BottomBarConsole *c, const string &list_name);

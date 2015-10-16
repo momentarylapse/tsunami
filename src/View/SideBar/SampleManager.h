@@ -8,7 +8,7 @@
 #ifndef SAMPLEMANAGER_H_
 #define SAMPLEMANAGER_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 
 class Song;
 class Sample;
@@ -17,7 +17,7 @@ class SongRenderer;
 class SampleManagerItem;
 class Progress;
 
-class SampleManager : public BottomBarConsole, public Observer
+class SampleManager : public SideBarConsole, public Observer
 {
 public:
 	SampleManager(Song *a);

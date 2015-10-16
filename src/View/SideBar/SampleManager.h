@@ -34,6 +34,8 @@ public:
 	void onCreateFromSelection();
 	void onDelete();
 
+	void onEditSong();
+
 	virtual void onUpdate(Observable *o, const string &message);
 
 	void endPreview();

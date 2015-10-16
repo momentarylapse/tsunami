@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-258
+259
 // Data (ID,Text)
 about
 
@@ -393,9 +393,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_386777
+rand_id_520923
 
-rand_id_762741
+rand_id_743894
 
 rdt_capture
 
@@ -460,6 +460,8 @@ show_fx_console
 show_log
 
 show_mixing_console
+
+smd_group_edit
 
 song_dialog
 

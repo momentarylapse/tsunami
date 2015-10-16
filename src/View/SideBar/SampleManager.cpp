@@ -128,6 +128,8 @@ SampleManager::SampleManager(Song *s) :
 	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
 	event("sample_list", this, &SampleManager::onPreview);
 
+	event("edit_song", this, &SampleManager::onEditSong);
+
 	preview_audio = new Song;
 	preview_renderer = new SongRenderer;
 	preview_stream = new AudioStream(preview_renderer);
@@ -269,6 +271,11 @@ void SampleManager::remove(SampleManagerItem *item)
 			item->zombify();
 			old_items.add(item);
 		}
+}
+
+void SampleManager::onEditSong()
+{
+	tsunami->win->side_bar->open(SideBar::SONG_CONSOLE);
 }
 
 void SampleManager::onUpdate(Observable *o, const string &message)

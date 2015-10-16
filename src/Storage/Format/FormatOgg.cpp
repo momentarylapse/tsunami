@@ -196,7 +196,7 @@ void FormatOgg::loadSong(StorageOperationData *od)
 
 void FormatOgg::loadTrack(StorageOperationData *od)
 {
-	msg_db_f("Ogg.LoadTracl", 1);
+	msg_db_f("Ogg.LoadTrack", 1);
 	Track *t = od->track;
 
 	if (ov_fopen((char*)od->filename.c_str(), &vf)){

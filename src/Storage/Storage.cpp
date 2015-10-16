@@ -108,8 +108,10 @@ bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->tracks[0];
 	bool ok = loadTrack(t, filename, 0, 0);
-	buf->resize(t->levels[0].buffers[0].num);
-	buf->set(t->levels[0].buffers[0], 0, 1);
+	if (t->levels[0].buffers.num > 0){
+		buf->resize(t->levels[0].buffers[0].num);
+		buf->set(t->levels[0].buffers[0], 0, 1);
+	}
 	delete(aa);
 	return ok;
 }

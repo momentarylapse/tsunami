@@ -41,6 +41,8 @@ TsunamiWindow::TsunamiWindow() :
 
 	tsunami->win = this;
 
+	copy_multi = false;
+
 	int width = HuiConfig.getInt("Window.Width", 800);
 	int height = HuiConfig.getInt("Window.Height", 600);
 	bool maximized = HuiConfig.getBool("Window.Maximized", true);
@@ -55,6 +57,7 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("copy", "hui:copy", KEY_C + KEY_CONTROL, this, &TsunamiWindow::onCopy);
 	HuiAddCommandM("paste", "hui:paste", KEY_V + KEY_CONTROL, this, &TsunamiWindow::onPaste);
 	HuiAddCommandM("delete", "hui:delete", -1, this, &TsunamiWindow::onDelete);
+	HuiAddCommandM("copy_multi", "", -1, this, &TsunamiWindow::onCopyMulti);
 	HuiAddCommandM("export_selection", "", KEY_X + KEY_CONTROL, this, &TsunamiWindow::onExport);
 	HuiAddCommandM("undo", "hui:undo", KEY_Z + KEY_CONTROL, this, &TsunamiWindow::onUndo);
 	HuiAddCommandM("redo", "hui:redo", KEY_Y + KEY_CONTROL, this, &TsunamiWindow::onRedo);
@@ -329,12 +332,20 @@ bool TsunamiWindow::allowTermination()
 
 void TsunamiWindow::onCopy()
 {
-	tsunami->clipboard->copy(view);
+	if (copy_multi)
+		tsunami->clipboard->copy_from_selected_tracks(view);
+	else
+		tsunami->clipboard->copy_from_track(view->cur_track, view);
 }
 
 void TsunamiWindow::onPaste()
 {
 	tsunami->clipboard->paste(view);
+}
+
+void TsunamiWindow::onCopyMulti()
+{
+	copy_multi = isChecked("");
 }
 
 void TsunamiWindow::onFindAndExecutePlugin()

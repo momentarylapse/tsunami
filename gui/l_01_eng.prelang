@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-257
+258
 // Data (ID,Text)
 about
 
@@ -97,6 +97,8 @@ compress
 
 copy
 Copy
+copy_multi
+
 count
 
 create_from_selection
@@ -391,9 +393,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_684954
+rand_id_312786
 
-rand_id_725657
+rand_id_953630
 
 rdt_capture
 
@@ -518,7 +520,7 @@ zoom_in
 zoom_out
 
 // Num Language Strings
-141
+142
 // Data (ID,Text)
 
 
@@ -527,6 +529,8 @@ zoom_out
         - Standard -
 
         - nicht verbinden -
+
+   - keine Referenz -
 
   - neue Spur anlegen -
 

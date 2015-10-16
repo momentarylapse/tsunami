@@ -42,6 +42,7 @@ public:
 	void onCopy();
 	void onPaste();
 	void onDelete();
+	void onCopyMulti();
 	void onExport();
 	void onUndo();
 	void onRedo();
@@ -102,6 +103,8 @@ public:
 	SideBar *side_bar;
 	BottomBar *bottom_bar;
 	MiniBar *mini_bar;
+
+	bool copy_multi;
 };
 
 #endif /* TSUNAMIWINDOW_H_ */

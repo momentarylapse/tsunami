@@ -17,6 +17,7 @@ Menu menu "" disabled
 		Item select_all "Alles auswählen" image=hui:select-all
 		Item select_nothing "Nichts auswählen" image=hui:delete
 		Separator "" ""
+		Item copy_multi "Aus mehreren Spuren kopieren" checkable
 		Item copy "Kopieren" image=hui:copy
 		Item paste "Einfügen" image=hui:paste
 		Item delete "Löschen" image=hui:delete

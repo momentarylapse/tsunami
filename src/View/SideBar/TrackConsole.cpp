@@ -67,6 +67,7 @@ void TrackConsole::loadData()
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
 		hideControl("td_t_bars", track->type != Track::TYPE_TIME);
+		hideControl("td_t_dummy", track->type == Track::TYPE_TIME);
 		enable("edit_midi", track->type == Track::TYPE_MIDI);
 		enable("edit_midi_fx", track->type == Track::TYPE_MIDI);
 		enable("edit_synth", track->type != Track::TYPE_AUDIO);
@@ -106,7 +107,7 @@ void TrackConsole::applyData()
 
 void TrackConsole::onEditSong()
 {
-	tsunami->win->side_bar->open(SideBar::SONG_CONSOLE);
+	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
 }
 
 void TrackConsole::onEditFx()
@@ -116,25 +117,18 @@ void TrackConsole::onEditFx()
 
 void TrackConsole::onEditMidi()
 {
-	tsunami->win->side_bar->open(SideBar::MIDI_EDITOR);
+	((SideBar*)parent)->open(SideBar::MIDI_EDITOR);
 }
 
 void TrackConsole::onEditMidiFx()
 {
-	tsunami->win->side_bar->open(SideBar::MIDI_FX_CONCOLE);
+	((SideBar*)parent)->open(SideBar::MIDI_FX_CONCOLE);
 }
 
 void TrackConsole::onEditSynth()
 {
-	tsunami->win->side_bar->open(SideBar::SYNTH_CONSOLE);
+	((SideBar*)parent)->open(SideBar::SYNTH_CONSOLE);
 }
-
-/*void TrackConsole::onSynthesizer()
-{
-	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
-	if (s)
-		track->setSynthesizer(s);
-}*/
 
 void TrackConsole::onUpdate(Observable *o, const string &message)
 {

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-263
+264
 // Data (ID,Text)
 about
 
@@ -401,9 +401,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_116378
+rand_id_120576
 
-rand_id_301052
+rand_id_822870
 
 rdt_capture
 
@@ -482,6 +482,8 @@ Stop
 tags
 !format=tT\\Tag\\Value
 td_t_bars
+
+td_t_dummy
 
 td_t_edit
 

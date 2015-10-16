@@ -19,6 +19,7 @@ Dialog track_dialog "Spur" 380 516
 					Button delete_bar "" image=hui:delete flat
 					Button edit_bars "" image=hui:edit flat
 				CheckBox link_to_midi "Midi mitbearbeiten"
+		Text td_t_dummy "" expandy
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2
 				Grid ? "" 3 1

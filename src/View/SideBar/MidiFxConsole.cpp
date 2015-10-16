@@ -132,6 +132,10 @@ MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
 
 	event("add", this, &MidiFxConsole::onAdd);
 
+	event("edit_song", this, &MidiFxConsole::onEditSong);
+	event("edit_track", this, &MidiFxConsole::onEditTrack);
+	event("edit_midi", this, &MidiFxConsole::onEditMidi);
+
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	update();
 }
@@ -184,6 +188,21 @@ void MidiFxConsole::clear()
 	panels.clear();
 	track = NULL;
 	//Enable("add", false);
+}
+
+void MidiFxConsole::onEditSong()
+{
+	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+}
+
+void MidiFxConsole::onEditTrack()
+{
+	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+}
+
+void MidiFxConsole::onEditMidi()
+{
+	((SideBar*)parent)->open(SideBar::MIDI_EDITOR);
 }
 
 void MidiFxConsole::setTrack(Track *t)

@@ -30,6 +30,9 @@ public:
 
 	void onAdd();
 
+	void onEditSong();
+	void onEditTrack();
+	void onEditMidi();
 
 	string id_inner;
 

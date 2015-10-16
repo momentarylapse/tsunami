@@ -20,7 +20,7 @@ string AppVersion = "0.6.22.0";
 Tsunami *tsunami = NULL;
 
 Tsunami::Tsunami() :
-	HuiApplication("tsunami", "Deutsch", HUI_FLAG_LOAD_RESOURCE)
+	HuiApplication("tsunami", "English", HUI_FLAG_LOAD_RESOURCE)
 {
 	song = NULL;
 	_view = NULL;

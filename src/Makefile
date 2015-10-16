@@ -226,13 +226,9 @@ OBJ = \
  Stuff/Observer.o\
  View/BottomBar/BottomBar.o\
  View/BottomBar/CurveConsole.o\
- View/BottomBar/FxConsole.o\
  View/BottomBar/LogDialog.o\
- View/BottomBar/MidiFxConsole.o\
  View/BottomBar/MiniBar.o\
  View/BottomBar/MixingConsole.o\
- View/BottomBar/SampleManager.o\
- View/BottomBar/SynthConsole.o\
  View/Dialog/CaptureDialog.o\
  View/Dialog/MarkerDialog.o\
  View/Dialog/NewDialog.o\
@@ -244,10 +240,14 @@ OBJ = \
  View/Helper/Progress.o\
  View/Helper/Slider.o\
  View/SideBar/SideBar.o\
+ View/SideBar/FxConsole.o\
  View/SideBar/LevelConsole.o\
  View/SideBar/MidiEditor.o\
+ View/SideBar/MidiFxConsole.o\
+ View/SideBar/SampleManager.o\
  View/SideBar/SampleRefDialog.o\
  View/SideBar/SongConsole.o\
+ View/SideBar/SynthConsole.o\
  View/SideBar/TrackConsole.o\
  View/AudioView.o\
  View/AudioViewTrack.o\
@@ -932,26 +932,14 @@ View/BottomBar/BottomBar.o : View/BottomBar/BottomBar.cpp
 View/BottomBar/CurveConsole.o : View/BottomBar/CurveConsole.cpp
 	$(CPP) -c View/BottomBar/CurveConsole.cpp -o $@ $(CXXFLAGS)
 
-View/BottomBar/FxConsole.o : View/BottomBar/FxConsole.cpp
-	$(CPP) -c View/BottomBar/FxConsole.cpp -o $@ $(CXXFLAGS)
-
 View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 	$(CPP) -c View/BottomBar/LogDialog.cpp -o $@ $(CXXFLAGS)
-
-View/BottomBar/MidiFxConsole.o : View/BottomBar/MidiFxConsole.cpp
-	$(CPP) -c View/BottomBar/MidiFxConsole.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/MiniBar.o : View/BottomBar/MiniBar.cpp
 	$(CPP) -c View/BottomBar/MiniBar.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/MixingConsole.o : View/BottomBar/MixingConsole.cpp
 	$(CPP) -c View/BottomBar/MixingConsole.cpp -o $@ $(CXXFLAGS)
-
-View/BottomBar/SampleManager.o : View/BottomBar/SampleManager.cpp
-	$(CPP) -c View/BottomBar/SampleManager.cpp -o $@ $(CXXFLAGS)
-
-View/BottomBar/SynthConsole.o : View/BottomBar/SynthConsole.cpp
-	$(CPP) -c View/BottomBar/SynthConsole.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/CaptureDialog.o : View/Dialog/CaptureDialog.cpp
 	$(CPP) -c View/Dialog/CaptureDialog.cpp -o $@ $(CXXFLAGS)
@@ -992,11 +980,23 @@ View/SideBar/LevelConsole.o : View/SideBar/LevelConsole.cpp
 View/SideBar/MidiEditor.o : View/SideBar/MidiEditor.cpp
 	$(CPP) -c View/SideBar/MidiEditor.cpp -o $@ $(CXXFLAGS)
 
+View/SideBar/FxConsole.o : View/SideBar/FxConsole.cpp
+	$(CPP) -c View/SideBar/FxConsole.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/MidiFxConsole.o : View/SideBar/MidiFxConsole.cpp
+	$(CPP) -c View/SideBar/MidiFxConsole.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/SampleManager.o : View/SideBar/SampleManager.cpp
+	$(CPP) -c View/SideBar/SampleManager.cpp -o $@ $(CXXFLAGS)
+
 View/SideBar/SampleRefDialog.o : View/SideBar/SampleRefDialog.cpp
 	$(CPP) -c View/SideBar/SampleRefDialog.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/SongConsole.o : View/SideBar/SongConsole.cpp
 	$(CPP) -c View/SideBar/SongConsole.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/SynthConsole.o : View/SideBar/SynthConsole.cpp
+	$(CPP) -c View/SideBar/SynthConsole.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/TrackConsole.o : View/SideBar/TrackConsole.cpp
 	$(CPP) -c View/SideBar/TrackConsole.cpp -o $@ $(CXXFLAGS)

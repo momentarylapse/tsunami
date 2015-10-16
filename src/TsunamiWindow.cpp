@@ -109,9 +109,9 @@ TsunamiWindow::TsunamiWindow() :
 	// table structure
 	setSize(width, height);
 	setBorderWidth(0);
-	addGrid("", 0, 0, 1, 3, "root_table");
+	addGrid("", 0, 0, 2, 1, "root_table");
 	setTarget("root_table", 0);
-	addGrid("", 0, 0, 2, 1, "main_table");
+	addGrid("", 0, 0, 1, 3, "main_table");
 
 	// main table
 	setTarget("main_table", 0);
@@ -137,13 +137,13 @@ TsunamiWindow::TsunamiWindow() :
 
 	// side bar
 	side_bar = new SideBar(view, song);
-	embed(side_bar, "main_table", 1, 0);
+	embed(side_bar, "root_table", 1, 0);
 
 	// bottom bar
 	bottom_bar = new BottomBar(view, song, tsunami->output, tsunami->log);
-	embed(bottom_bar, "root_table", 0, 1);
+	embed(bottom_bar, "main_table", 0, 1);
 	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->output);
-	embed(mini_bar, "root_table", 0, 2);
+	embed(mini_bar, "main_table", 0, 2);
 
 	subscribe(view);
 	subscribe(song);

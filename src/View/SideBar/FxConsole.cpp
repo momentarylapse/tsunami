@@ -23,7 +23,7 @@ public:
 		track = t;
 		fx = _fx;
 		index = _index;
-		addGrid("!noexpandx,expandy", 0, 0, 1, 2, "grid");
+		addGrid("!expandx,noexpandy", 0, 0, 1, 2, "grid");
 		setTarget("grid", 0);
 		addGrid("", 0, 0, 5, 1, "header");
 		setTarget("header", 0);
@@ -119,24 +119,27 @@ public:
 };
 
 FxConsole::FxConsole(AudioView *_view, Song *_song) :
-	BottomBarConsole(_("Effekte")),
+	SideBarConsole(_("Effekte")),
 	Observer("FxConsole")
 {
 	view = _view;
 	song = _song;
 	id_inner = "fx_inner_table";
 
-	addGrid("!expandy", 0, 0, 1, 32, id_inner);
-	setTarget(id_inner, 0);
-	addLabel(_("- hier sind (noch) keine Effekte aktiv -"), 30, 0, 0, 0, "comment_no_fx");
-	addButton("!expandy,flat", 31, 0, 0, 0, "add");
-	setImage("add", "hui:add");
+	fromResource("fx_editor");
+
 	setTooltip("add", _("neuen Effekt hinzuf&ugen"));
 
 	track = NULL;
 	//Enable("add", false);
 
+	if (!view)
+		hideControl("edit_track", true);
+
 	event("add", this, &FxConsole::onAdd);
+
+	event("edit_song", this, &FxConsole::onEditSong);
+	event("edit_track", this, &FxConsole::onEditTrack);
 
 	if (view)
 		subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
@@ -162,6 +165,16 @@ void FxConsole::onAdd()
 		track->addEffect(effect);
 	else
 		song->addEffect(effect);
+}
+
+void FxConsole::onEditSong()
+{
+	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
+}
+
+void FxConsole::onEditTrack()
+{
+	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
 }
 
 void FxConsole::clear()
@@ -195,8 +208,8 @@ void FxConsole::setTrack(Track *t)
 		fx = song->fx;
 	foreachi(Effect *e, fx, i){
 		panels.add(new SingleFxPanel(song, track, e, i));
-		embed(panels.back(), id_inner, i*2, 0);
-		addSeparator("!vertical", i*2 + 1, 0, 0, 0, "separator_" + i2s(i));
+		embed(panels.back(), id_inner, 0, i*2);
+		addSeparator("!horizontal", 0, i*2 + 1, 0, 0, "separator_" + i2s(i));
 	}
 	hideControl("comment_no_fx", fx.num > 0);
 	//Enable("add", track);

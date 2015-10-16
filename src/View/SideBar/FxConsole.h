@@ -8,14 +8,14 @@
 #ifndef FXCONSOLE_H_
 #define FXCONSOLE_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 
 class Track;
 class Song;
 class AudioView;
 
-class FxConsole : public BottomBarConsole, public Observer
+class FxConsole : public SideBarConsole, public Observer
 {
 public:
 	FxConsole(AudioView *view, Song *audio);
@@ -25,6 +25,9 @@ public:
 	void setTrack(Track *t);
 
 	void onAdd();
+
+	void onEditSong();
+	void onEditTrack();
 
 	virtual void onUpdate(Observable *o, const string &message);
 

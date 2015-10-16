@@ -10,11 +10,8 @@
 #include "../Helper/BarList.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
-#include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
 #include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"
-#include "../BottomBar/BottomBar.h"
 #include "TrackConsole.h"
 
 TrackConsole::TrackConsole(AudioView *_view) :
@@ -112,7 +109,7 @@ void TrackConsole::onEditSong()
 
 void TrackConsole::onEditFx()
 {
-	tsunami->win->bottom_bar->open(BottomBar::TRACK_FX_CONSOLE);
+	((SideBar*)parent)->open(SideBar::FX_CONSOLE);
 }
 
 void TrackConsole::onEditMidi()

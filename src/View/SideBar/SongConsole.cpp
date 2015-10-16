@@ -157,7 +157,7 @@ void SongConsole::onEditSamples()
 
 void SongConsole::onEditFx()
 {
-	tsunami->win->bottom_bar->open(BottomBar::FX_CONSOLE);
+	((SideBar*)parent)->open(SideBar::GLOBAL_FX_CONSOLE);
 }
 
 void SongConsole::onUpdate(Observable *o, const string &message)

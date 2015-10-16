@@ -18,6 +18,7 @@ class TrackConsole;
 class MidiEditor;
 class SampleRefDialog;
 class SampleManager;
+class FxConsole;
 class SynthConsole;
 class MidiFxConsole;
 class AudioView;
@@ -47,8 +48,10 @@ public:
 		SONG_CONSOLE,
 		LEVEL_CONSOLE,
 		SAMPLE_CONSOLE,
+		GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
 		MIDI_EDITOR,
+		FX_CONSOLE,
 		SYNTH_CONSOLE,
 		MIDI_FX_CONCOLE,
 		SAMPLEREF_DIALOG,
@@ -63,8 +66,10 @@ public:
 
 	SongConsole *song_console;
 	LevelConsole *level_console;
+	FxConsole *global_fx_console;
 	TrackConsole *track_console;
 	MidiEditor *midi_editor;
+	FxConsole *fx_console;
 	SynthConsole *synth_console;
 	MidiFxConsole *midi_fx_console;
 	SampleRefDialog *sample_ref_dialog;

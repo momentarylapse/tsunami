@@ -8,7 +8,6 @@
 #include "BottomBar.h"
 #include "MixingConsole.h"
 #include "CurveConsole.h"
-#include "FxConsole.h"
 #include "LogDialog.h"
 #include "../../lib/hui/Controls/HuiControl.h"
 #include "../AudioView.h"
@@ -33,14 +32,10 @@ BottomBar::BottomBar(AudioView *view, Song *song, AudioOutput *output, Log *log)
 	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
 	log_dialog = new LogDialog(log);
 	mixing_console = new MixingConsole(song, output, view->stream);
-	fx_console = new FxConsole(NULL, song);
 	curve_console = new CurveConsole(view, song);
-	track_fx_console = new FxConsole(view, song);
 	addConsole(log_dialog, "");
 	addConsole(mixing_console, "");
-	addConsole(fx_console, "");
 	addConsole(curve_console, "");
-	addConsole(track_fx_console, "\t");
 
 	eventX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onClose);

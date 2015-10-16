@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-264
+267
 // Data (ID,Text)
 about
 
@@ -157,10 +157,16 @@ export_selection
 
 favorite_list
 - Default -
+fe_g_edit
+
+fe_t_dummy
+
 format
 
 fx_dialog
 Effect
+fx_editor
+
 fxdt_filename
 !bold\\Filename
 fxdt_params
@@ -401,9 +407,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 
-rand_id_120576
+rand_id_459907
 
-rand_id_822870
+rand_id_54003
 
 rdt_capture
 

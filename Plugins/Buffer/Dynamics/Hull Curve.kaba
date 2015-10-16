@@ -123,8 +123,8 @@ class HullCurvePanel : ConfigPanel
 	void __init__(HullCurve *_h)
 		super.__init__(_h)
 		fromSource("
-Grid ? '' 1 2 width=450
-	DrawingArea drawing '' grabfocus
+Grid ? '' 1 2
+	DrawingArea drawing '' grabfocus height=250
 	Grid ? '' 2 1 noexpandy
 		ComboBox type 'linear\\log'
 		CheckBox preview 'show buffer'")

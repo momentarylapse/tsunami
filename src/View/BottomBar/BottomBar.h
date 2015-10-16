@@ -15,7 +15,6 @@ class AudioView;
 class Song;
 class AudioOutput;
 class Track;
-class FxConsole;
 class MixingConsole;
 class CurveConsole;
 class LogDialog;
@@ -45,9 +44,7 @@ public:
 	{
 		LOG_CONSOLE,
 		MIXING_CONSOLE,
-		FX_CONSOLE,
 		CURVE_CONSOLE,
-		TRACK_FX_CONSOLE,
 		NUM_CONSOLES
 	};
 
@@ -57,8 +54,6 @@ public:
 	int active_console;
 	bool visible;
 
-	FxConsole *fx_console;
-	FxConsole *track_fx_console;
 	MixingConsole *mixing_console;
 	CurveConsole *curve_console;
 	LogDialog *log_dialog;

@@ -89,20 +89,32 @@ public:
 };
 
 SynthConsole::SynthConsole(AudioView *_view) :
-	BottomBarConsole(_("Synthesizer")),
+	SideBarConsole(_("Synthesizer")),
 	Observer("SynthConsole")
 {
 	view = _view;
 	id_inner = "grid";
 
-	addGrid("!expandy", 0, 0, 1, 32, id_inner);
+	addGrid("!expandy", 0, 0, 1, 2, "outer");
+	setTarget("outer", 0);
+	addGroup(_("Bearbeiten"), 0, 1, 0, 0, "sc_group_edit");
+	addGrid("!expandy", 0, 0, 3, 1, id_inner);
 	setTarget(id_inner, 0);
 
-	addButton("!expandy,flat", 31, 0, 0, 0, "select");
+	addButton("!expandx,flat", 0, 2, 0, 0, "select");
 	setImage("select", "hui:open");
 	setTooltip("select", _("Synthesizer w&ahlen"));
 
+	setTarget("sc_group_edit", 0);
+	addGrid("", 0, 0, 2, 1, "edit_button_grid");
+	setTarget("edit_button_grid", 0);
+	addButton(_("Datei"), 0, 0, 0, 0, "edit_song");
+	addButton(_("Spur"), 1, 0, 0, 0, "edit_track");
+
 	event("select", this, &SynthConsole::onSelect);
+
+	event("edit_song", this, &SynthConsole::onEditSong);
+	event("edit_track", this, &SynthConsole::onEditTrack);
 
 	track = NULL;
 	panel = NULL;
@@ -127,6 +139,16 @@ void SynthConsole::onSelect()
 	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
+}
+
+void SynthConsole::onEditSong()
+{
+	tsunami->win->side_bar->open(SideBar::SONG_CONSOLE);
+}
+
+void SynthConsole::onEditTrack()
+{
+	tsunami->win->side_bar->open(SideBar::TRACK_CONSOLE);
 }
 
 void SynthConsole::clear()
@@ -157,7 +179,7 @@ void SynthConsole::setTrack(Track *t)
 		subscribe(track->synth, track->synth->MESSAGE_DELETE);
 		panel = new SynthPanel(track);
 		embed(panel, id_inner, 0, 0);
-		addSeparator("!vertical", 1, 0, 0, 0, "separator_0");
+		addSeparator("!horizontal", 0, 1, 0, 0, "separator_0");
 	}
 }
 

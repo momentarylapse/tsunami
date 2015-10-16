@@ -16,7 +16,6 @@ class Song;
 class AudioOutput;
 class Track;
 class FxConsole;
-class SynthConsole;
 class MixingConsole;
 class CurveConsole;
 class LogDialog;
@@ -50,7 +49,6 @@ public:
 		FX_CONSOLE,
 		CURVE_CONSOLE,
 		TRACK_FX_CONSOLE,
-		TRACK_SYNTH_CONSOLE,
 		TRACK_MIDI_FX_CONCOLE,
 		NUM_CONSOLES
 	};
@@ -64,7 +62,6 @@ public:
 	FxConsole *fx_console;
 	FxConsole *track_fx_console;
 	MidiFxConsole *track_midi_fx_console;
-	SynthConsole *track_synth_console;
 	MixingConsole *mixing_console;
 	CurveConsole *curve_console;
 	LogDialog *log_dialog;

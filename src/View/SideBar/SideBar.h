@@ -18,6 +18,7 @@ class TrackConsole;
 class MidiEditor;
 class SampleRefDialog;
 class SampleManager;
+class SynthConsole;
 class AudioView;
 
 class SideBarConsole : public HuiPanel
@@ -46,7 +47,8 @@ public:
 		LEVEL_CONSOLE,
 		SAMPLE_CONSOLE,
 		TRACK_CONSOLE,
-		TRACK_MIDI_EDITOR,
+		MIDI_EDITOR,
+		SYNTH_CONSOLE,
 		SAMPLEREF_DIALOG,
 		NUM_CONSOLES
 	};
@@ -60,7 +62,8 @@ public:
 	SongConsole *song_console;
 	LevelConsole *level_console;
 	TrackConsole *track_console;
-	MidiEditor *track_midi_editor;
+	MidiEditor *midi_editor;
+	SynthConsole *synth_console;
 	SampleRefDialog *sample_ref_dialog;
 	SampleManager *sample_manager;
 

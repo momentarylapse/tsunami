@@ -226,7 +226,7 @@ void TsunamiWindow::onDeleteTrack()
 void TsunamiWindow::onTrackEditMidi()
 {
 	if (view->cur_track)
-		side_bar->open(SideBar::TRACK_MIDI_EDITOR);
+		side_bar->open(SideBar::MIDI_EDITOR);
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }

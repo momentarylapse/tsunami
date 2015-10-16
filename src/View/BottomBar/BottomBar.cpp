@@ -9,7 +9,6 @@
 #include "MixingConsole.h"
 #include "CurveConsole.h"
 #include "FxConsole.h"
-#include "SynthConsole.h"
 #include "LogDialog.h"
 #include "MidiFxConsole.h"
 #include "../../lib/hui/Controls/HuiControl.h"
@@ -38,14 +37,12 @@ BottomBar::BottomBar(AudioView *view, Song *song, AudioOutput *output, Log *log)
 	fx_console = new FxConsole(NULL, song);
 	curve_console = new CurveConsole(view, song);
 	track_fx_console = new FxConsole(view, song);
-	track_synth_console = new SynthConsole(view);
 	track_midi_fx_console = new MidiFxConsole(view, song);
 	addConsole(log_dialog, "");
 	addConsole(mixing_console, "");
 	addConsole(fx_console, "");
 	addConsole(curve_console, "");
 	addConsole(track_fx_console, "\t");
-	addConsole(track_synth_console, "\t");
 	addConsole(track_midi_fx_console, "\t");
 
 	eventX("choose", "hui:select", (HuiPanel*)this, (void(HuiPanel::*)())&BottomBar::onChoose);

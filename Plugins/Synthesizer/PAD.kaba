@@ -173,7 +173,7 @@ Grid ? '' 1 2
 		SpinButton bwscale '0\\0\\10\\0.01'
 		Text ? 'detune'
 		SpinButton detune '0\\-10\\10\\0.01'
-	DrawingArea drawing '' grabfocus width=500")
+	DrawingArea drawing '' grabfocus height=300 noexpandy")
 		event("bw", &onChange)
 		event("bwscale", &onChange)
 		event("detune", &onChange)

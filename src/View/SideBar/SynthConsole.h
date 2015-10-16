@@ -8,13 +8,13 @@
 #ifndef SYNTHCONSOLE_H_
 #define SYNTHCONSOLE_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 
 class Track;
 class AudioView;
 
-class SynthConsole : public BottomBarConsole, public Observer
+class SynthConsole : public SideBarConsole, public Observer
 {
 public:
 	SynthConsole(AudioView *view);
@@ -24,6 +24,9 @@ public:
 	void setTrack(Track *t);
 
 	void onSelect();
+
+	void onEditSong();
+	void onEditTrack();
 
 	virtual void onUpdate(Observable *o, const string &message);
 

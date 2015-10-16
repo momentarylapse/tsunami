@@ -9,6 +9,7 @@
 #include "LevelConsole.h"
 #include "TrackConsole.h"
 #include "MidiEditor.h"
+#include "SynthConsole.h"
 #include "SampleRefDialog.h"
 #include "SampleManager.h"
 #include "../AudioView.h"
@@ -36,14 +37,16 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	level_console = new LevelConsole(song, view);
 	sample_manager = new SampleManager(song);
 	track_console = new TrackConsole(view);
-	track_midi_editor = new MidiEditor(view, song);
+	midi_editor = new MidiEditor(view, song);
+	synth_console = new SynthConsole(view);
 	sample_ref_dialog = new SampleRefDialog(view, song);
 
 	addConsole(song_console);
 	addConsole(level_console);
 	addConsole(sample_manager);
 	addConsole(track_console);
-	addConsole(track_midi_editor);
+	addConsole(midi_editor);
+	addConsole(synth_console);
 	addConsole(sample_ref_dialog);
 
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);

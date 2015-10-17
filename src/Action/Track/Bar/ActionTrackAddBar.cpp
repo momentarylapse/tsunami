@@ -33,9 +33,9 @@ void *ActionTrackAddBar::execute(Data *d)
 		foreach(Track *tt, a->tracks){
 			if (tt->type != tt->TYPE_MIDI)
 				continue;
-			foreachi(MidiEvent &e, tt->midi, j){
-				if (e.pos >= pos0)
-					e.pos += bar.length;
+			foreachi(MidiNote &n, tt->midi, j){
+				if (n.range.offset >= pos0)
+					n.range.offset += bar.length;
 			}
 		}
 	}
@@ -57,9 +57,9 @@ void ActionTrackAddBar::undo(Data *d)
 		foreach(Track *tt, a->tracks){
 			if (tt->type != tt->TYPE_MIDI)
 				continue;
-			foreachi(MidiEvent &e, tt->midi, j){
-				if (e.pos >= pos0)
-					e.pos -= bar.length;
+			foreachi(MidiNote &n, tt->midi, j){
+				if (n.range.offset >= pos0)
+					n.range.offset -= bar.length;
 			}
 		}
 	}

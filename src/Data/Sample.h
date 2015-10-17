@@ -35,7 +35,7 @@ public:
 	string name;
 	int type;
 	BufferBox buf;
-	MidiData midi;
+	MidiNoteData midi;
 	float volume;
 	int offset;
 

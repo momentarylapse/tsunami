@@ -14,14 +14,14 @@
 class ActionTrackInsertMidi : public Action
 {
 public:
-	ActionTrackInsertMidi(Track *t, int offset, MidiData &midi);
+	ActionTrackInsertMidi(Track *t, int offset, const MidiNoteData &midi);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
 	int track_no;
-	MidiData midi;
+	MidiNoteData midi;
 	int offset;
 	Array<int> inserted_at;
 };

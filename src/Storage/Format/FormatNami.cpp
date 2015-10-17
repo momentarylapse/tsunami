@@ -80,7 +80,7 @@ string compress_buffer(BufferBox &b, Song *song)
 	if (ok){
 		int p0 = 0;
 		size_t left = (size_t)b.num;
-		while (ok && left){
+		while (ok and left){
 			size_t need = (left > CHUNK_SIZE ? (size_t)CHUNK_SIZE : (size_t)left);
 			{
 				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
@@ -209,7 +209,7 @@ void uncompress_buffer(BufferBox &b, string &data)
 
 void strip(string &s)
 {
-	while((s.num > 0) && (s.back() == ' '))
+	while((s.num > 0) and (s.back() == ' '))
 		s.resize(s.num - 1);
 }
 
@@ -672,21 +672,37 @@ void ReadChunkSub(ChunkStack *s, Track *t)
 #endif
 
 
-class FileChunkMidiEvent : public FileChunk<MidiData,MidiEvent>
+class FileChunkMidiEvent : public FileChunk<MidiNoteData,MidiEvent>
 {
 public:
-	FileChunkMidiEvent() : FileChunk<MidiData,MidiEvent>("event"){}
+	FileChunkMidiEvent() : FileChunk<MidiNoteData,MidiEvent>("event"){}
 	virtual void create()
 	{
-		parent->add(MidiEvent());
-		me = &parent->back();
+		//parent->add(MidiEvent());
+		//me = &parent->back();
 	}
 	virtual void read(File *f)
 	{
-		me->pos = f->ReadInt();
-		me->pitch = f->ReadInt();
-		me->volume = f->ReadFloat();
+		MidiEvent e;
+		e.pos = f->ReadInt();
+		e.pitch = f->ReadInt();
+		e.volume = f->ReadFloat();
 		f->ReadInt(); // reserved
+
+		int unended = -1;
+		foreachi(MidiNote &n, *parent, i)
+			if ((n.pitch == e.pitch) and (n.range.num == -1))
+				unended = i;
+
+		if ((unended >= 0) and (e.volume == 0)){
+			(*parent)[unended].range.set_end(e.pos);
+		}else if ((unended < 0) and (e.volume > 0)){
+			parent->add(MidiNote(Range(e.pos, -1), e.pitch, e.volume));
+		}else if (unended >= 0){
+			tsunami->log->error("nami/midi: starting new note without ending old one");
+		}else{
+			tsunami->log->error("nami/midi: no note to end");
+		}
 	}
 	virtual void write(File *f)
 	{
@@ -697,10 +713,10 @@ public:
 	}
 };
 
-class FileChunkMidiEffect : public FileChunk<MidiData,MidiEffect>
+class FileChunkMidiEffect : public FileChunk<MidiNoteData,MidiEffect>
 {
 public:
-	FileChunkMidiEffect() : FileChunk<MidiData,MidiEffect>("effect"){}
+	FileChunkMidiEffect() : FileChunk<MidiNoteData,MidiEffect>("effect"){}
 	virtual void create()
 	{}
 	virtual void read(File *f)
@@ -728,10 +744,10 @@ public:
 };
 
 // DEPRECATED
-class FileChunkMidiNote : public FileChunk<MidiData,MidiNote>
+class FileChunkMidiNote : public FileChunk<MidiNoteData,MidiNote>
 {
 public:
-	FileChunkMidiNote() : FileChunk<MidiData,MidiNote>("note"){}
+	FileChunkMidiNote() : FileChunk<MidiNoteData,MidiNote>("note"){}
 	virtual void create(){}
 	virtual void read(File *f)
 	{
@@ -741,17 +757,16 @@ public:
 		n.pitch = f->ReadInt();
 		n.volume = f->ReadFloat();
 		f->ReadInt(); // reserved
-		parent->add(MidiEvent(n.range.offset, n.pitch, n.volume));
-		parent->add(MidiEvent(n.range.end(), n.pitch, 0));
+		parent->add(n);
 	}
 	virtual void write(File *f)
 	{}
 };
 
-class FileChunkSampleMidiData : public FileChunk<Sample,MidiData>
+class FileChunkSampleMidiData : public FileChunk<Sample,MidiNoteData>
 {
 public:
-	FileChunkSampleMidiData() : FileChunk<Sample,MidiData>("midi")
+	FileChunkSampleMidiData() : FileChunk<Sample,MidiNoteData>("midi")
 	{
 		add_child(new FileChunkMidiEvent);
 		add_child(new FileChunkMidiNote);
@@ -775,10 +790,10 @@ public:
 	}
 };
 
-class FileChunkTrackMidiData : public FileChunk<Track,MidiData>
+class FileChunkTrackMidiData : public FileChunk<Track,MidiNoteData>
 {
 public:
-	FileChunkTrackMidiData() : FileChunk<Track,MidiData>("midi")
+	FileChunkTrackMidiData() : FileChunk<Track,MidiNoteData>("midi")
 	{
 		add_child(new FileChunkMidiEvent);
 		add_child(new FileChunkMidiNote);
@@ -1184,7 +1199,7 @@ void FormatNami::WriteMidiEffect(MidiEffect *e)
 	EndChunk();
 }
 
-void FormatNami::WriteMidi(MidiData &m)
+void FormatNami::WriteMidi(MidiNoteData &m)
 {
 	BeginChunk("midi");
 
@@ -1193,7 +1208,9 @@ void FormatNami::WriteMidi(MidiData &m)
 	f->WriteStr("");
 	f->WriteInt(0); // reserved
 
-	foreach(MidiEvent &e, m)
+	MidiRawData midi = midi_notes_to_events(m);
+
+	foreach(MidiEvent &e, midi)
 		WriteMidiEvent(e);
 
 	foreach(MidiEffect *e, m.fx)
@@ -1588,7 +1605,7 @@ void ReadChunkMarker(ChunkStack *s, Array<TrackMarker> *markers)
 	markers->add(m);
 }
 
-void ReadChunkMidiNote(ChunkStack *s, MidiData *m)
+void ReadChunkMidiNote(ChunkStack *s, MidiNoteData *m)
 {
 	MidiNote n;
 	n.range.offset = s->f->ReadInt();
@@ -1596,21 +1613,21 @@ void ReadChunkMidiNote(ChunkStack *s, MidiData *m)
 	n.pitch = s->f->ReadInt();
 	n.volume = s->f->ReadFloat();
 	s->f->ReadInt(); // reserved
-	m->add(MidiEvent(n.range.offset, n.pitch, n.volume));
-	m->add(MidiEvent(n.range.end(), n.pitch, 0));
+	m->add(n);
 }
 
-void ReadChunkMidiEvent(ChunkStack *s, MidiData *m)
+void ReadChunkMidiEvent(ChunkStack *s, MidiNoteData *m)
 {
 	MidiEvent e;
 	e.pos = s->f->ReadInt();
 	e.pitch = s->f->ReadInt();
 	e.volume = s->f->ReadFloat();
 	s->f->ReadInt(); // reserved
-	m->add(e);
+	//m->add(e);
+	tsunami->log->error("ReadChunkMidiEvent");
 }
 
-void ReadChunkMidiEffect(ChunkStack *s, MidiData *m)
+void ReadChunkMidiEffect(ChunkStack *s, MidiNoteData *m)
 {
 	MidiEffect *e = CreateMidiEffect(s->f->ReadStr());
 	e->only_on_selection = s->f->ReadBool();
@@ -1624,7 +1641,7 @@ void ReadChunkMidiEffect(ChunkStack *s, MidiData *m)
 	m->fx.add(e);
 }
 
-void ReadChunkMidiData(ChunkStack *s, MidiData *midi)
+void ReadChunkMidiData(ChunkStack *s, MidiNoteData *midi)
 {
 	s->f->ReadStr();
 	s->f->ReadStr();
@@ -1736,7 +1753,7 @@ void FormatNami::make_consistent(Song *a)
 	foreach(Sample *s, a->samples){
 		if (s->type == Track::TYPE_MIDI){
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
-				s->midi.samples = s->midi.back().pos;
+				s->midi.samples = s->midi.back().range.end();
 			}
 		}
 	}

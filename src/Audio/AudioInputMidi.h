@@ -74,8 +74,8 @@ public:
 
 	int sample_rate;
 
-	MidiData midi;
-	MidiData current_midi;
+	MidiRawData midi;
+	MidiRawData current_midi;
 
 private:
 

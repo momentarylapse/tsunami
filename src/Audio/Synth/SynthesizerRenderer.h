@@ -31,7 +31,7 @@ public:
 	virtual void reset();
 
 	void add(const MidiEvent &e);
-	void feed(const MidiData &data);
+	void feed(const MidiRawData &data);
 	void endAllNotes();
 	void resetMidiData();
 

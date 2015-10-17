@@ -48,7 +48,7 @@ void SynthesizerRenderer::add(const MidiEvent &e)
 		s->add(e);
 }
 
-void SynthesizerRenderer::feed(const MidiData &data)
+void SynthesizerRenderer::feed(const MidiRawData &data)
 {
 	if (s)
 		s->feed(data);

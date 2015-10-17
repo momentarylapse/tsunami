@@ -81,7 +81,7 @@ void Synthesizer::addMetronomeClick(int pos, int level, float volume)
 
 
 // _events should be sorted...
-void Synthesizer::feed(const MidiData &_events)
+void Synthesizer::feed(const MidiRawData &_events)
 {
 	events.append(_events);
 }

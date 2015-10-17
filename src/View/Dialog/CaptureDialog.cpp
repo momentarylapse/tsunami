@@ -333,7 +333,7 @@ bool CaptureDialog::insert()
 		song->execute(a);
 		song->action_manager->endActionGroup();
 	}else if (type == t->TYPE_MIDI){
-		t->insertMidiData(i0, *input->midi);
+		t->insertMidiData(i0, midi_events_to_notes(*input->midi));
 	}
 	input->resetAccumulation();
 	return true;

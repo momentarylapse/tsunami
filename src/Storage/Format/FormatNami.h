@@ -36,7 +36,7 @@ public:
 	void WriteMarker(TrackMarker &m);
 	void WriteMidiEvent(MidiEvent &e);
 	void WriteMidiEffect(MidiEffect *e);
-	void WriteMidi(MidiData &m);
+	void WriteMidi(MidiNoteData &m);
 	void WriteSynth(Synthesizer *s);
 	void WriteTrackLevel(TrackLevel *l, int level_no);
 	void WriteTrack(Track *t);

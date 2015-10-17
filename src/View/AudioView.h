@@ -157,7 +157,7 @@ public:
 	int y2pitch(int y);
 	float pitch2y(int p);
 
-	Array<MidiNote> getCreationNotes();
+	MidiNoteData getCreationNotes();
 
 
 	bool force_redraw;

@@ -7,13 +7,13 @@
 
 #include "ActionTrackInsertMidi.h"
 
-ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, MidiData &_midi)
+ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, const MidiNoteData &_midi)
 {
 	track_no = get_track_index(t);
 	offset = _offset;
 	midi = _midi;
-	foreach(MidiEvent &e, midi)
-		e.pos += offset;
+	foreach(MidiNote &n, midi)
+		n.range.offset += offset;
 	midi.sort();
 }
 
@@ -25,10 +25,10 @@ void *ActionTrackInsertMidi::execute(Data *d)
 
 	inserted_at.clear();
 
-	foreachb(MidiEvent &e, midi){
+	foreachb(MidiNote &e, midi){
 		int index = t->midi.num;
 		for (int i=0;i<t->midi.num;i++)
-			if (e.pos < t->midi[i].pos){
+			if (e.range.offset < t->midi[i].range.offset){
 				index = i;
 				break;
 			}

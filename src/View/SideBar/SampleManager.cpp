@@ -35,7 +35,7 @@ void render_bufbox(Image &im, BufferBox &b)
 	}
 }
 
-void render_midi(Image &im, MidiData &m)
+void render_midi(Image &im, MidiNoteData &m)
 {
 	int w = im.width;
 	int h = im.height;

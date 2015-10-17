@@ -34,29 +34,44 @@ public:
 	float volume;
 };
 
-class MidiData : public Array<MidiEvent>
+class MidiRawData : public Array<MidiEvent>
 {
 public:
-	MidiData();
+	MidiRawData();
 	void _cdecl __init__();
-	MidiData getEvents(const Range &r);
-	int read(MidiData &data, const Range &r);
-	Array<MidiNote> getNotes(const Range &r);
-	int getNextEvent(int pos);
+	MidiRawData getEvents(const Range &r) const;
+	int read(MidiRawData &data, const Range &r) const;
+	Array<MidiNote> getNotes(const Range &r) const;
+	int getNextEvent(int pos) const;
 
-	Range getRange(int elongation);
+	Range getRange(int elongation) const;
 	int samples;
 
 	void sort();
 	void sanify(const Range &r);
 
-	void append(const MidiData &data);
+	void append(const MidiRawData &data);
+};
+
+class MidiNoteData : public Array<MidiNote>
+{
+public:
+	MidiNoteData();
+	void _cdecl __init__();
+	MidiRawData getEvents(const Range &r) const;
+	MidiNoteData getNotes(const Range &r) const;
+
+	Range getRange(int elongation) const;
+	int samples;
+
+	void sort();
+	void sanify(const Range &r);
 
 	Array<MidiEffect*> fx;
 };
 
-MidiData midi_notes_to_events(const Array<MidiNote> &notes);
-Array<MidiNote> midi_events_to_notes(const MidiData &events);
+MidiRawData midi_notes_to_events(const MidiNoteData &notes);
+MidiNoteData midi_events_to_notes(const MidiRawData &events);
 
 
 

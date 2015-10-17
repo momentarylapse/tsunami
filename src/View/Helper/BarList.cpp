@@ -179,22 +179,22 @@ void BarList::onDelete()
 				if (t->type != t->TYPE_MIDI)
 					continue;
 				Set<int> del;
-				Array<MidiEvent> add;
-				foreachi(MidiEvent &e, t->midi, j){
-					if (e.pos <= pos){
-					}else if (e.pos >= pos + l0){
-						MidiEvent e2 = e;
-						e2.pos -= l0;
-						add.add(e2);
+				Array<MidiNote> add;
+				foreachi(MidiNote &n, t->midi, j){
+					if (n.range.end() <= pos){
+					}else if (n.range.offset >= pos + l0){
+						MidiNote n2 = n;
+						n2.range.offset -= l0;
+						add.add(n2);
 						del.add(j);
 					}else{
 						del.add(j);
 					}
 				}
 				foreachb(int j, del)
-					t->deleteMidiEvent(j);
-				foreach(MidiEvent &e, add)
-					t->addMidiEvent(e);
+					t->deleteMidiNote(j);
+				foreach(MidiNote &n, add)
+					t->addMidiNote(n);
 			}
 		}
 		track->deleteBar(i, panel->isChecked(id_link));

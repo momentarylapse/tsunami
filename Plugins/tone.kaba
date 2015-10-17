@@ -128,7 +128,7 @@ void AddChord(Synthesizer s, Range r, Chord c, float volume)
 	pitch.add(c.base_tone + 7)
 	pitch.add(c.base_tone + 12)
 	
-	MidiData midi
+	MidiRawData midi
 	for p in pitch
 		midi.addNote(_MidiNote(r, p, volume))
 	s.feed(midi)

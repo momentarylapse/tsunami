@@ -197,7 +197,7 @@ void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 		c->drawStr(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name);
 }
 
-void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker, int index)
+void AudioViewTrack::drawMarker(HuiPainter *c, const TrackMarker &marker, int index)
 {
 	float w = c->getStrWidth(marker.text);
 	int x = view->cam.sample2screen(marker.pos);
@@ -212,7 +212,7 @@ void AudioViewTrack::drawMarker(HuiPainter *c, TrackMarker &marker, int index)
 }
 
 
-void AudioViewTrack::drawMidi(HuiPainter *c, MidiData &midi, int shift)
+void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
 	Array<MidiNote> notes = midi.getNotes(range);
@@ -257,7 +257,7 @@ void AudioViewTrack::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
 	c->drawRect(rect(x-1.5f, x+1.5f, y1, y2));
 }
 
-void AudioViewTrack::drawMidiEditable(HuiPainter *c, MidiData &midi, bool as_reference)
+void AudioViewTrack::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, bool as_reference)
 {
 	Array<MidiEvent> events = midi.getEvents(view->cam.range());
 	Array<MidiNote> notes = midi.getNotes(view->cam.range());

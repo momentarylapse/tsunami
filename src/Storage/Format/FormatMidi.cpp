@@ -100,7 +100,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				throw string("midi track header is not \"MTrk\": " + tn);
 			//msg_write("----------------------- track");
 
-			MidiData events;
+			MidiRawData events;
 			string track_name;
 			int last_status = 0;
 
@@ -176,7 +176,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 
 			if (events.num > 0){
 				Track *t = od->song->addTrack(Track::TYPE_MIDI);
-				t->midi.append(events);
+				t->midi = midi_events_to_notes(events);
 				t->name = track_name;
 			}
 		}

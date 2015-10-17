@@ -112,12 +112,15 @@ void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 
 	make_silence(buf, range_cur.length());
 
-	MidiData *m = &t->midi;
-	if ((ti >= 0) && (ti < midi.num))
-		m = &midi[ti];
+	MidiNoteData *m = &t->midi;
+//	if ((ti >= 0) && (ti < midi.num))
+//		m = &midi[ti];
+	// TODO
 
-	MidiData events;
-	m->read(events, range_cur);
+	MidiRawData raw = midi_notes_to_events(*m);
+
+	MidiRawData events;
+	raw.read(events, range_cur);
 
 	t->synth->feed(events);
 	t->synth->read(buf);
@@ -287,7 +290,7 @@ void SongRenderer::reset()
 		fx->prepare();
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
-		midi.add(t->midi);
+		midi.add(midi_notes_to_events(t->midi));
 		t->synth->setSampleRate(song->sample_rate);
 		t->synth->reset();
 		foreach(Effect *fx, t->fx)

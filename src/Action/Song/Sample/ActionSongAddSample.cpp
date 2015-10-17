@@ -18,7 +18,7 @@ ActionSongAddSample::ActionSongAddSample(const string &name, BufferBox &buf)
 	sample->name = name;
 }
 
-ActionSongAddSample::ActionSongAddSample(const string &name, MidiData &midi)
+ActionSongAddSample::ActionSongAddSample(const string &name, MidiNoteData &midi)
 {
 	sample = new Sample(Track::TYPE_MIDI);
 	sample->midi = midi;

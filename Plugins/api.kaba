@@ -54,7 +54,7 @@ MidiEvent _MidiEvent(int pos, float pitch, float volume)
 	e.volume = volume
 	return e
 
-class MidiData : MidiEvent[]
+class MidiRawData : MidiEvent[]
 	int samples
 	extern void __init__()
 	extern MidiNote[] getNotes(Range r)
@@ -63,6 +63,13 @@ class MidiData : MidiEvent[]
 	void addNote(MidiNote n)
 		add(_MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(_MidiEvent(n.range.end(), n.pitch, 0))
+
+class MidiData : MidiNote[]
+	int samples
+	extern void __init__()
+	extern MidiNote[] getNotes(Range r)
+	extern MidiEvent[] getEvents(Range r)
+	extern Range getRange()
 
 class PluginData
 	extern void __init__()
@@ -145,7 +152,7 @@ class Synthesizer
 	int keep_notes
 	float[128] delta_phi
 	int[] active_pitch
-	MidiData events
+	MidiRawData events
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void render(BufferBox buf)
@@ -156,7 +163,7 @@ class Synthesizer
 	extern virtual int read(BufferBox buf)
 	
 	extern void addMetronomeClick(int pos, int level, float volume)
-	extern void feed(MidiEvent[] events)
+	extern void feed(MidiRawData midi)
 	
 	extern void enablePitch(int pitch, bool enable)
 	//extern void notify()
@@ -277,9 +284,9 @@ class Track
 	extern SampleRef *addSample(int pos, int index)
 	extern void deleteSample(int index)
 	extern void editSample(int index, float volume, bool mute, int rep_num, int rep_delay)
-	extern void addMidiEvent(MidiEvent e)
-	extern void addMidiEvents(MidiEvent[] events)
-	extern void deleteMidiEvent(int index)
+	extern void addMidiNote(MidiNote n)
+	extern void addMidiNotes(MidiData midi)
+	extern void deleteMidiNote(int index)
 	extern void setSynthesizer(Synthesizer *synth)
 	extern void addBar(int index, float bpm, int beats, bool affect_midi)
 	extern void addPause(int index, float time, bool affect_midi)

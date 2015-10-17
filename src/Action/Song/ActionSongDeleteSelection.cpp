@@ -8,9 +8,9 @@
 #include "../Track/Buffer/ActionTrack__CutBufferBox.h"
 #include "../Track/Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../Track/Buffer/ActionTrack__ShrinkBufferBox.h"
-#include "../Track/Midi/ActionTrackDeleteMidiEvent.h"
 #include "../Track/Sample/ActionTrackDeleteSample.h"
 #include "ActionSongDeleteSelection.h"
+#include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 
 ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, const Range &range, bool all_levels)
 {
@@ -33,24 +33,13 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, cons
 
 			// midi
 			Set<int> to_delete;
-			Array<int> note_events[128];
-			foreachi(MidiEvent &e, t->midi, i){
-				int pitch = (int)e.pitch;
-				note_events[pitch].add(i);
-				if (e.volume <= 0){
-					int p0 = t->midi[note_events[pitch][0]].pos;
-					int p1 = t->midi[note_events[pitch].back()].pos;
-					Range r = Range(p0, p1 - p0);
-					if (r.overlaps(range)){
-						foreach(int n, note_events[pitch])
-						to_delete.add(n);
-					}
-					note_events[pitch].clear();
-				}
+			foreachi(MidiNote &n, t->midi, i){
+				if (n.range.overlaps(range))
+					to_delete.add(i);
 			}
 
-			foreachb(int n, to_delete)
-				addSubAction(new ActionTrackDeleteMidiEvent(t, n), a);
+			foreachb(int i, to_delete)
+				addSubAction(new ActionTrackDeleteMidiNote(t, i), a);
 		}
 }
 

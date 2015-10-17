@@ -35,7 +35,7 @@ public:
 
 	virtual int read(BufferBox &buf);
 
-	void feed(const MidiData &events);
+	void feed(const MidiRawData &events);
 	void addMetronomeClick(int pos, int level, float volume);
 	void add(const MidiEvent &e);
 	void endAllNotes();
@@ -51,7 +51,7 @@ protected:
 
 	MidiSource *source;
 
-	MidiData events;
+	MidiRawData events;
 
 	Set<int> active_pitch;
 	Array<int> delete_me;

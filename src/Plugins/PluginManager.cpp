@@ -242,12 +242,19 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("MidiNote", "pitch", _offsetof(MidiNote, pitch));
 	Script::DeclareClassOffset("MidiNote", "volume", _offsetof(MidiNote, volume));
 
-	Script::DeclareClassSize("MidiData", sizeof(MidiData));
-	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
-	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiData::__init__));
-	Script::LinkExternal("MidiData.getEvents", Script::mf(&MidiData::getEvents));
-	Script::LinkExternal("MidiData.getNotes", Script::mf(&MidiData::getNotes));
-	Script::LinkExternal("MidiData.getRange", Script::mf(&MidiData::getRange));
+	Script::DeclareClassSize("MidiRawData", sizeof(MidiRawData));
+	Script::DeclareClassOffset("MidiRawData", "samples", _offsetof(MidiRawData, samples));
+	Script::LinkExternal("MidiRawData.__init__", Script::mf(&MidiRawData::__init__));
+	Script::LinkExternal("MidiRawData.getEvents", Script::mf(&MidiRawData::getEvents));
+	Script::LinkExternal("MidiRawData.getNotes", Script::mf(&MidiRawData::getNotes));
+	Script::LinkExternal("MidiRawData.getRange", Script::mf(&MidiRawData::getRange));
+
+	Script::DeclareClassSize("MidiData", sizeof(MidiNoteData));
+	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiNoteData, samples));
+	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiNoteData::__init__));
+	Script::LinkExternal("MidiData.getEvents", Script::mf(&MidiNoteData::getEvents));
+	Script::LinkExternal("MidiData.getNotes", Script::mf(&MidiNoteData::getNotes));
+	Script::LinkExternal("MidiData.getRange", Script::mf(&MidiNoteData::getRange));
 
 	Script::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Script::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));
@@ -285,9 +292,9 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.addSample", Script::mf(&Track::addSample));
 	Script::LinkExternal("Track.deleteSample", Script::mf(&Track::deleteSample));
 	Script::LinkExternal("Track.editSample", Script::mf(&Track::editSample));
-	Script::LinkExternal("Track.addMidiEvent", Script::mf(&Track::addMidiEvent));
-	Script::LinkExternal("Track.addMidiEvents", Script::mf(&Track::addMidiEvents));
-	Script::LinkExternal("Track.deleteMidiEvent", Script::mf(&Track::deleteMidiEvent));
+	Script::LinkExternal("Track.addMidiNote", Script::mf(&Track::addMidiNote));
+	Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::addMidiNotes));
+	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::deleteMidiNote));
 	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::setSynthesizer));
 	Script::LinkExternal("Track.addBar", Script::mf(&Track::addBar));
 	Script::LinkExternal("Track.addPause", Script::mf(&Track::addPause));

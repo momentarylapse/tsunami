@@ -66,8 +66,8 @@ public:
 
 	RingBuffer *current_buffer;
 	BufferBox *buffer;
-	MidiData *midi;
-	MidiData *current_midi;
+	MidiRawData *midi;
+	MidiRawData *current_midi;
 
 	int type;
 	AudioInputAudio *input_audio;

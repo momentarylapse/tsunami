@@ -45,11 +45,11 @@ void Clipboard::append_track(Track *t, AudioView *view)
 		tt->levels[0].buffers.add(t->readBuffers(view->cur_level, view->sel_range));
 		tt->levels[0].buffers[0].make_own();
 	}else if (t->type == Track::TYPE_MIDI){
-		tt->midi = t->midi.getEvents(view->sel_range);
+		tt->midi = t->midi.getNotes(view->sel_range);
 		tt->midi.samples = view->sel_range.num;
 		tt->midi.sanify(view->sel_range);
-		foreach(MidiEvent &e, tt->midi)
-			e.pos -= view->sel_range.offset;
+		foreach(MidiNote &n, tt->midi)
+			n.range.offset -= view->sel_range.offset;
 	}
 
 	ref_uid.add(-1);

@@ -583,20 +583,9 @@ void AudioView::setCursorPos(int pos)
 
 void deleteMidiNote(Track *t, int pitch, int start)
 {
-	Array<int> events;
-	foreachi(MidiEvent &e, t->midi, i)
-		if (e.pitch == pitch){
-			if (e.pos >= start){
-				events.add(i);
-				if (e.volume <= 0)
-					break;
-			}
-		}
-
-	t->song->action_manager->beginActionGroup();
-	foreachb(int i, events)
-		t->deleteMidiEvent(i);
-	t->song->action_manager->endActionGroup();
+	foreachi(MidiNote &n, t->midi, i)
+		if ((n.pitch == pitch) and (n.range.offset == start))
+			t->deleteMidiNote(i);
 }
 
 void AudioView::onLeftButtonDown()
@@ -648,8 +637,7 @@ void AudioView::onLeftButtonDown()
 Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 {
 	Range allowed = Range::ALL;
-	Array<MidiNote> notes = midi_events_to_notes(t->midi);
-	foreach(MidiNote &n, notes){
+	foreach(MidiNote &n, t->midi){
 		foreach(int p, pitch)
 			if (n.pitch == p){
 				if (n.range.is_inside(start))
@@ -657,7 +645,8 @@ Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 			}
 	}
 
-	foreach(MidiEvent &e, t->midi)
+	MidiRawData midi = midi_notes_to_events(t->midi);
+	foreach(MidiEvent &e, midi)
 		foreach(int p, pitch)
 			if (e.pitch == p){
 				if ((e.pos >= start) and (e.pos < allowed.end()))
@@ -689,7 +678,7 @@ void align_to_beats(Track *t, Range &r, int beat_partition)
 	}
 }
 
-Array<MidiNote> AudioView::getCreationNotes()
+MidiNoteData AudioView::getCreationNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection.pos);
 	int end = max(mouse_possibly_selecting_start, selection.pos);
@@ -706,7 +695,7 @@ Array<MidiNote> AudioView::getCreationNotes()
 	Range allowed = get_allowed_midi_range(cur_track, pitch, mouse_possibly_selecting_start);
 
 	// create notes
-	Array<MidiNote> notes;
+	MidiNoteData notes;
 	if (allowed.empty())
 		return notes;
 	foreach(int p, pitch)
@@ -722,7 +711,7 @@ void AudioView::onLeftButtonUp()
 		if (cur_action)
 			song->execute(cur_action);
 	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		cur_track->addMidiEvents(midi_notes_to_events(getCreationNotes()));
+		cur_track->addMidiNotes(getCreationNotes());
 
 		midi_preview_renderer->endAllNotes();
 	}
@@ -1209,7 +1198,7 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 			if (input->type == Track::TYPE_AUDIO)
 				vtrack[capturing_track]->drawBuffer(c, *input->buffer, cam.pos - sel_range.offset, colors.capture_marker);
 			if (input->type == Track::TYPE_MIDI)
-				vtrack[capturing_track]->drawMidi(c, *input->midi, sel_range.start());
+				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(*input->midi), sel_range.start());
 		}
 	}
 

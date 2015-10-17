@@ -10,7 +10,7 @@
 #include "../Buffer/ActionTrackCreateBuffers.h"
 #include "../Buffer/ActionTrackEditBuffer.h"
 #include "../../../Data/Song.h"
-#include "../Midi/ActionTrackAddMidiEvent.h"
+#include "../Midi/ActionTrackAddMidiNote.h"
 
 ActionTrackInsertSample::ActionTrackInsertSample(Song *s, int track_no, int index, int level_no)
 {
@@ -28,10 +28,10 @@ ActionTrackInsertSample::ActionTrackInsertSample(Song *s, int track_no, int inde
 		buf.set(*sub->buf, 0, sub->volume);
 		addSubAction(action, s);
 	}else if (t->type == t->TYPE_MIDI){
-		foreach(MidiEvent &e, *sub->midi){
-			MidiEvent ee = e;
-			ee.pos += sub->pos;
-			addSubAction(new ActionTrackAddMidiEvent(t, ee), s);
+		foreach(MidiNote &n, *sub->midi){
+			MidiNote nn = n;
+			nn.range.offset += sub->pos;
+			addSubAction(new ActionTrackAddMidiNote(t, nn), s);
 		}
 	}
 

@@ -111,37 +111,37 @@ float MidiNote::getFrequency()
 	return 440.0f * pow(2.0f, (float)(pitch - 69) / 12.0f);
 }
 
-MidiData::MidiData()
+MidiRawData::MidiRawData()
 {
 	samples = 0;
 }
 
-void MidiData::__init__()
+void MidiRawData::__init__()
 {
-	new(this) MidiData;
+	new(this) MidiRawData;
 }
 
-MidiData MidiData::getEvents(const Range &r)
+MidiRawData MidiRawData::getEvents(const Range &r) const
 {
-	MidiData a;
+	MidiRawData a;
 	for (int i=0;i<num;i++)
 		if (r.is_inside((*this)[i].pos))
 			a.add((*this)[i]);
 	return a;
 }
 
-int MidiData::read(MidiData &data, const Range &r)
+int MidiRawData::read(MidiRawData &data, const Range &r) const
 {
 	data.samples = min(r.num, samples - r.offset);
-	foreach(MidiEvent &e, *this)
+	foreach(MidiEvent &e, const_cast<MidiRawData&>(*this))
 		if (r.is_inside(e.pos))
 			data.add(MidiEvent(e.pos - r.offset, e.pitch, e.volume));
 	return data.samples;
 }
 
-Array<MidiNote> MidiData::getNotes(const Range &r)
+Array<MidiNote> MidiRawData::getNotes(const Range &r) const
 {
-	Array<MidiNote> a = midi_events_to_notes(*this);
+	MidiNoteData a = midi_events_to_notes(*this);
 	Array<MidiNote> b;
 	foreach(MidiNote &n, a)
 		if (r.overlaps(n.range))
@@ -149,12 +149,12 @@ Array<MidiNote> MidiData::getNotes(const Range &r)
 	return b;
 }
 
-int MidiData::getNextEvent(int pos)
+int MidiRawData::getNextEvent(int pos) const
 {
 	return 0;
 }
 
-Range MidiData::getRange(int elongation)
+Range MidiRawData::getRange(int elongation) const
 {
 	if (num == 0)
 		return Range::EMPTY;
@@ -163,7 +163,7 @@ Range MidiData::getRange(int elongation)
 	return Range(i0, i1 - i0 + elongation);
 }
 
-void MidiData::sort()
+void MidiRawData::sort()
 {
 	for (int i=0;i<num;i++)
 		for (int j=i+1;j<num;j++)
@@ -171,7 +171,7 @@ void MidiData::sort()
 				swap(i, j);
 }
 
-void MidiData::sanify(const Range &r)
+void MidiRawData::sanify(const Range &r)
 {
 	//int max_pos = 0;
 	Set<int> active;
@@ -214,11 +214,58 @@ void MidiData::sanify(const Range &r)
 		add(MidiEvent(r.end(), p, 0));
 }
 
-void MidiData::append(const MidiData &data)
+void MidiRawData::append(const MidiRawData &data)
 {
-	foreach(MidiEvent &e, const_cast<MidiData&>(data))
+	foreach(MidiEvent &e, const_cast<MidiRawData&>(data))
 		add(MidiEvent(e.pos + samples, e.pitch, e.volume));
 	samples += data.samples;
+}
+
+MidiNoteData::MidiNoteData()
+{
+	samples = 0;
+}
+
+void MidiNoteData::__init__()
+{
+	new(this) MidiNoteData;
+}
+
+MidiRawData MidiNoteData::getEvents(const Range &r) const
+{
+	MidiNoteData b = getNotes(r);
+	return midi_notes_to_events(b);
+}
+
+MidiNoteData MidiNoteData::getNotes(const Range &r) const
+{
+	MidiNoteData b;
+	foreach(MidiNote &n, const_cast<MidiNoteData&>(*this))
+		if (r.overlaps(n.range))
+			b.add(n);
+	return b;
+}
+
+Range MidiNoteData::getRange(int elongation) const
+{
+	if (num == 0)
+		return Range::EMPTY;
+	int i0 = (*this)[0].range.offset;
+	int i1 = back().range.end(); // FIXME...
+	return Range(i0, i1 - i0 + elongation);
+}
+
+void MidiNoteData::sort()
+{
+	for (int i=0;i<num;i++)
+		for (int j=i+1;j<num;j++)
+			if ((*this)[i].range.offset > (*this)[j].range.offset)
+				swap(i, j);
+}
+
+void MidiNoteData::sanify(const Range &r)
+{
+	sort();
 }
 
 MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)
@@ -228,21 +275,21 @@ MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)
 	volume = _volume;
 }
 
-MidiData midi_notes_to_events(const Array<MidiNote> &notes)
+MidiRawData midi_notes_to_events(const MidiNoteData &notes)
 {
-	MidiData r;
-	foreach(MidiNote &n, const_cast<Array<MidiNote>&>(notes)){
+	MidiRawData r;
+	foreach(MidiNote &n, const_cast<MidiNoteData&>(notes)){
 		r.add(MidiEvent(n.range.offset, n.pitch, n.volume));
 		r.add(MidiEvent(n.range.end()-1, n.pitch, 0));
 	}
 	return r;
 }
 
-Array<MidiNote> midi_events_to_notes(const MidiData &events)
+MidiNoteData midi_events_to_notes(const MidiRawData &events)
 {
-	Array<MidiNote> a;
-	MidiData b;
-	foreach(MidiEvent &e, const_cast<MidiData&>(events)){
+	MidiNoteData a;
+	MidiRawData b;
+	foreach(MidiEvent &e, const_cast<MidiRawData&>(events)){
 		if (e.volume > 0){
 			bool exists = false;
 			foreach(MidiEvent &bb, b)

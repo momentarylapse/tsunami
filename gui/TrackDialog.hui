@@ -10,15 +10,6 @@ Dialog track_dialog "Spur" 380 516
 				Text ld_tt_panning "Balance"
 				SpinButton panning "0\\-100\\100\\1"
 				Text percent "%"
-		Group td_t_bars "Takte" expandy
-			Grid ? "" 1 2
-				ListView bar_list "#\\Schläge\\Bpm\\Dauer" format=tTTT,select-multi
-				Grid ? "" 4 1
-					Button add_bar "Takt" image=hui:add flat
-					Button add_bar_pause "Pause" image=hui:add flat
-					Button delete_bar "" image=hui:delete flat
-					Button edit_bars "" image=hui:edit flat
-				CheckBox link_to_midi "Midi mitbearbeiten"
 		Text td_t_dummy "" expandy
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2
@@ -26,7 +17,8 @@ Dialog track_dialog "Spur" 380 516
 					Button edit_song "Datei"
 					Button edit_fx "Fx"
 					Button edit_midi "Midi"
-				Grid ? "" 2 1
+				Grid ? "" 3 1
 					Button edit_midi_fx "Midi-Fx"
 					Button edit_synth "Synth"
+					Button edit_bars "Bars"
 

@@ -21,6 +21,7 @@ class SampleManager;
 class FxConsole;
 class SynthConsole;
 class MidiFxConsole;
+class BarsConsole;
 class AudioView;
 
 class SideBarConsole : public HuiPanel
@@ -47,6 +48,7 @@ public:
 	{
 		SONG_CONSOLE,
 		LEVEL_CONSOLE,
+		BARS_CONSOLE,
 		SAMPLE_CONSOLE,
 		GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
@@ -66,6 +68,7 @@ public:
 
 	SongConsole *song_console;
 	LevelConsole *level_console;
+	BarsConsole *bars_console;
 	FxConsole *global_fx_console;
 	TrackConsole *track_console;
 	MidiEditor *midi_editor;

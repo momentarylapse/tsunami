@@ -77,6 +77,8 @@ public:
 	void onCurLevel();
 	void onCurLevelUp();
 	void onCurLevelDown();
+	void onLevelManager();
+	void onBarsManager();
 	void onViewPeaksMax();
 	void onViewPeaksMean();
 	void onZoomIn();

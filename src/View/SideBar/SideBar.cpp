@@ -7,6 +7,7 @@
 
 #include "SideBar.h"
 #include "LevelConsole.h"
+#include "BarsConsole.h"
 #include "TrackConsole.h"
 #include "MidiEditor.h"
 #include "FxConsole.h"
@@ -37,6 +38,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 
 	song_console = new SongConsole(song);
 	level_console = new LevelConsole(song, view);
+	bars_console = new BarsConsole(song, view);
 	sample_manager = new SampleManager(song);
 	global_fx_console = new FxConsole(NULL, song);
 	track_console = new TrackConsole(view);
@@ -48,6 +50,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 
 	addConsole(song_console);
 	addConsole(level_console);
+	addConsole(bars_console);
 	addConsole(sample_manager);
 	addConsole(global_fx_console);
 	addConsole(track_console);

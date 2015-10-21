@@ -1,10 +1,10 @@
 // Language
 English
 // Num IDs
-267
+271
 // Data (ID,Text)
 about
-Indo
+Info
 ad_t_bars
 Bars
 ad_t_data
@@ -51,6 +51,10 @@ bar_edit_dialog
 edit bars
 bar_list
 !format=tTTT,select-multi\\#\\Beats\\Bpm\\Duration
+bars_dialog
+Bars
+bars_manager
+Manage...
 beat_partition
 4\\1\\256
 beats
@@ -126,7 +130,7 @@ Delete
 dummy_favorite_dialog
 Effect
 edit_bars
-!flat\\
+Bars
 edit_beats
 Beats
 edit_bpm
@@ -143,6 +147,8 @@ edit_midi_fx
 Midi-Fx
 edit_samples
 Samples
+edit_selected_bars
+!flat\\
 edit_song
 File
 edit_synth
@@ -221,6 +227,8 @@ level_dialog
 Levels
 level_down
 Down
+level_manager
+Manage...
 level_up
 Up
 levels
@@ -251,6 +259,8 @@ me_group_view
 View
 me_t_dummy
 !expandy\\
+menu_bars
+Bars
 menu_edit
 Edit
 menu_file
@@ -407,10 +417,10 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_371706
-!expandy\\
-rand_id_810845
-!noexpandx\\
+rand_id_853029
+
+rand_id_903979
+
 rdt_capture
 Recording
 rdt_source
@@ -487,8 +497,6 @@ stop
 Stop
 tags
 !format=tT\\Tag\\Value
-td_t_bars
-!expandy\\Bars
 td_t_dummy
 !expandy\\
 td_t_edit
@@ -538,7 +546,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-144
+145
 // Data (ID,Text)
 
 
@@ -754,6 +762,8 @@ Synthesizer
 Synthesizer
 Synthesizer wählen
 Select synthesizer
+Takte
+
 Unbenannt
 No name
 Vermindert
@@ -761,7 +771,7 @@ Diminished
 Vorschau
 Preview
 Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
-
+Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
 \\- keines -\\\"));
 
 aktiv?

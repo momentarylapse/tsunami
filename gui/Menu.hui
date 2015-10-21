@@ -27,18 +27,22 @@ Menu menu "" disabled
 		Item track_import "Aus Datei importieren..." image=hui:open
 		Separator "" ""
 		Item add_track "Leere Spur hinzufügen" image=hui:add
-		Item add_time_track "Rhythmus Spur hinzufügen..." image=hui:add
+		Item add_time_track "Rhythmus Spur hinzufügen" image=hui:add
 		Item add_midi_track "Midi Spur hinzufügen" image=hui:add
 		Item delete_track "Löschen" image=hui:delete
 		Separator "" ""
 		Item track_properties "Eigenschaften" image=hui:properties
-	Menu menu_level "Ebene"
+	Menu menu_level "Ebenen"
+		Item level_manager "Verwalten..." image=hui:properties
+		Separator "" ""
 		Item level_add "Hinzufügen" image=hui:add
 		Item level_delete "Löschen" image=hui:delete
 		Separator "" ""
 		Menu menu_level_target "Gehe zu"
 		Item level_up "Hoch" image=hui:up
 		Item level_down "Runter" image=hui:down
+	Menu menu_bars "Takte"
+		Item bars_manager "Verwalten..." image=hui:properties
 	Menu menu_sub "Samples"
 		Item sample_manager "Verwalten..." image=hui:properties
 		Separator "" ""

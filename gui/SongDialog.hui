@@ -23,9 +23,10 @@ Dialog song_dialog "Sound-Datei" 430 375
 					Button add_bar "Takt" image=hui:add flat
 					Button add_bar_pause "Pause" image=hui:add flat
 					Button delete_bar "" image=hui:delete flat
-					Button edit_bars "" image=hui:edit flat
+					Button edit_selected_bars "" image=hui:edit flat
 		Group ad_t_edit "Bearbeiten"
-			Grid ? "" 3 1
+			Grid ? "" 4 1
 				Button edit_levels "Ebenen"
 				Button edit_samples "Samples"
+				Button edit_bars "Bars"
 				Button edit_fx "Fx"

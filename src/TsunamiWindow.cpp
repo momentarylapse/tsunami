@@ -68,10 +68,12 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("track_edit_midi", "hui:edit", -1, this, &TsunamiWindow::onTrackEditMidi);
 	HuiAddCommandM("track_edit_fx", "hui:edit", -1, this, &TsunamiWindow::onTrackEditFX);
 	HuiAddCommandM("track_add_marker", "hui:add", -1, this, &TsunamiWindow::onTrackAddMarker);
+	HuiAddCommandM("level_manager", "hui:settings", -1, this, &TsunamiWindow::onLevelManager);
 	HuiAddCommandM("level_add", "hui:add", -1, this, &TsunamiWindow::onAddLevel);
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &TsunamiWindow::onDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &TsunamiWindow::onCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &TsunamiWindow::onCurLevelDown);
+	HuiAddCommandM("bars_manager", "hui:settings", -1, this, &TsunamiWindow::onBarsManager);
 	HuiAddCommandM("sample_manager", "", -1, this, &TsunamiWindow::onSampleManager);
 	HuiAddCommandM("show_mixing_console", "", -1, this, &TsunamiWindow::onMixingConsole);
 	HuiAddCommandM("show_fx_console", "", -1, this, &TsunamiWindow::onFxConsole);
@@ -454,6 +456,16 @@ void TsunamiWindow::onCurLevelUp()
 void TsunamiWindow::onCurLevelDown()
 {
 	view->setCurLevel(view->cur_level - 1);
+}
+
+void TsunamiWindow::onLevelManager()
+{
+	side_bar->open(SideBar::LEVEL_CONSOLE);
+}
+
+void TsunamiWindow::onBarsManager()
+{
+	side_bar->open(SideBar::BARS_CONSOLE);
 }
 
 void TsunamiWindow::onSampleFromSelection()

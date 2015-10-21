@@ -8,7 +8,6 @@
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../../Stuff/Observer.h"
-#include "../Helper/BarList.h"
 #include "../../Stuff/Log.h"
 #include "../../View/AudioView.h"
 #include "../BottomBar/BottomBar.h"
@@ -33,8 +32,6 @@ SongConsole::SongConsole(Song *a) :
 	setBorderWidth(5);
 	embedDialog("song_dialog", 0, 0);
 	setDecimals(1);
-	bar_list = new BarList(this, "audio_bar_list", "audio_add_bar", "audio_add_bar_pause", "audio_delete_bar", "----", song, NULL);
-	hideControl("ad_t_bars", true);
 
 	expand("ad_t_tags", 0, true);
 
@@ -71,7 +68,6 @@ SongConsole::SongConsole(Song *a) :
 SongConsole::~SongConsole()
 {
 	unsubscribe(song);
-	delete(bar_list);
 }
 
 void SongConsole::loadData()

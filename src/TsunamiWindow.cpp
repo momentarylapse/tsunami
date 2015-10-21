@@ -74,7 +74,9 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("level_up", "hui:up", -1, this, &TsunamiWindow::onCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &TsunamiWindow::onCurLevelDown);
 	HuiAddCommandM("bars_manager", "hui:settings", -1, this, &TsunamiWindow::onBarsManager);
+	HuiAddCommandM("song_bars_manager", "hui:settings", -1, this, &TsunamiWindow::onBarsManager);
 	HuiAddCommandM("sample_manager", "", -1, this, &TsunamiWindow::onSampleManager);
+	HuiAddCommandM("song_samples_manager", "", -1, this, &TsunamiWindow::onSampleManager);
 	HuiAddCommandM("show_mixing_console", "", -1, this, &TsunamiWindow::onMixingConsole);
 	HuiAddCommandM("show_fx_console", "", -1, this, &TsunamiWindow::onFxConsole);
 	HuiAddCommandM("sample_from_selection", "hui:cut", -1, this, &TsunamiWindow::onSampleFromSelection);

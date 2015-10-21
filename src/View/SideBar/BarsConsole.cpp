@@ -6,25 +6,43 @@
  */
 
 #include "../Helper/BarList.h"
+#include "../../Data/Song.h"
 #include "BarsConsole.h"
 
-BarsConsole::BarsConsole(Song *song, AudioView *view) :
+BarsConsole::BarsConsole(Song *_song, AudioView *view) :
 	SideBarConsole(_("Takte")),
 	Observer("BarsConsole")
 {
+	song = _song;
 	setBorderWidth(5);
 	fromResource("bars_dialog");
-	setOptions("ttd_grid_1", "noexpandx,width=300");
-	setDecimals(1);
 	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", "edit_selected_bars", song, view);
 
+	subscribe(song, song->MESSAGE_ADD_TRACK);
+	subscribe(song, song->MESSAGE_DELETE_TRACK);
+
+	updateMessage();
+
+	event("create_bars_track", this, &BarsConsole::onCreateTimeTrack);
 
 	event("edit_song", this, &BarsConsole::onEditSong);
 }
 
 BarsConsole::~BarsConsole()
 {
+	unsubscribe(song);
 	delete(bar_list);
+}
+
+void BarsConsole::updateMessage()
+{
+	Track *t = song->getTimeTrack();
+	hideControl("bbd_g_no_bars", t);
+}
+
+void BarsConsole::onCreateTimeTrack()
+{
+	song->addTrack(Track::TYPE_TIME);
 }
 
 void BarsConsole::onEditSong()
@@ -34,4 +52,5 @@ void BarsConsole::onEditSong()
 
 void BarsConsole::onUpdate(Observable *o, const string &message)
 {
+	updateMessage();
 }

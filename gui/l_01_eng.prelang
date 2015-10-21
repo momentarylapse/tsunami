@@ -1,12 +1,10 @@
 // Language
 English
 // Num IDs
-271
+274
 // Data (ID,Text)
 about
 Info
-ad_t_bars
-Bars
 ad_t_data
 Data
 ad_t_edit
@@ -35,8 +33,6 @@ add_track
 Add empty track
 afd_grid_1
 !expandy\\
-audio_bar_list
-!format=tTTT\\#\\Beats\\Bpm\\Number
 bad_buttonbar
 !buttonbar\\
 bad_t_beats
@@ -55,6 +51,10 @@ bars_dialog
 Bars
 bars_manager
 Manage...
+bbd_t_edit
+Edit
+bbd_t_no_bars
+no rhythm track found
 beat_partition
 4\\1\\256
 beats
@@ -105,6 +105,8 @@ copy_multi
 Copy from all selected tracks
 count
 !expandx\\1\\1\\10000\\1
+create_bars_track
+create
 create_from_selection
 !flat\\
 data_list
@@ -417,9 +419,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_853029
+rand_id_255882
 
-rand_id_903979
+rand_id_258486
 
 rdt_capture
 Recording
@@ -487,12 +489,16 @@ show_mixing_console
 Mixing
 smd_group_edit
 Edit
+song_bars_manager
+Edit bars
 song_dialog
 Audio file
 song_menu_header
 File
 song_properties
 Properties
+song_samples_manager
+Manage samples
 stop
 Stop
 tags
@@ -763,7 +769,7 @@ Synthesizer
 Synthesizer wählen
 Select synthesizer
 Takte
-
+Bars
 Unbenannt
 No name
 Vermindert

@@ -13,7 +13,6 @@
 #include "../../Stuff/Observer.h"
 class Track;
 class Slider;
-class BarList;
 class AudioView;
 
 class TrackConsole: public SideBarConsole, public Observer
@@ -34,6 +33,7 @@ public:
 	void onEditMidi();
 	void onEditMidiFx();
 	void onEditSynth();
+	void onEditBars();
 
 	void setTrack(Track *t);
 
@@ -41,7 +41,6 @@ public:
 
 	AudioView *view;
 	Track *track;
-	BarList *bar_list;
 };
 
 #endif /* TRACKCONSOLE_H_ */

@@ -240,6 +240,7 @@ OBJ = \
  View/Helper/Progress.o\
  View/Helper/Slider.o\
  View/SideBar/SideBar.o\
+ View/SideBar/BarsConsole.o\
  View/SideBar/FxConsole.o\
  View/SideBar/LevelConsole.o\
  View/SideBar/MidiEditor.o\
@@ -979,6 +980,9 @@ View/SideBar/LevelConsole.o : View/SideBar/LevelConsole.cpp
 
 View/SideBar/MidiEditor.o : View/SideBar/MidiEditor.cpp
 	$(CPP) -c View/SideBar/MidiEditor.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/BarsConsole.o : View/SideBar/BarsConsole.cpp
+	$(CPP) -c View/SideBar/BarsConsole.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/FxConsole.o : View/SideBar/FxConsole.cpp
 	$(CPP) -c View/SideBar/FxConsole.cpp -o $@ $(CXXFLAGS)

@@ -7,7 +7,6 @@
 
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
-#include "../Helper/BarList.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
 #include "../../Plugins/PluginManager.h"
@@ -22,12 +21,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	track = NULL;
 	setBorderWidth(5);
 	fromResource("track_dialog");
-	setOptions("ttd_grid_1", "noexpandx,width=300");
 	setDecimals(1);
-	bar_list = new BarList(this, "bar_list", "add_bar", "add_bar_pause", "delete_bar", "edit_bars", view->song, view);
-
-
-	expand("td_t_bars", 0, true);
 
 	loadData();
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
@@ -41,6 +35,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("edit_midi", this, &TrackConsole::onEditMidi);
 	event("edit_midi_fx", this, &TrackConsole::onEditMidiFx);
 	event("edit_synth", this, &TrackConsole::onEditSynth);
+	event("edit_bars", this, &TrackConsole::onEditBars);
 }
 
 TrackConsole::~TrackConsole()
@@ -48,7 +43,6 @@ TrackConsole::~TrackConsole()
 	unsubscribe(view);
 	if (track)
 		unsubscribe(track);
-	delete(bar_list);
 }
 
 void TrackConsole::loadData()
@@ -62,8 +56,6 @@ void TrackConsole::loadData()
 		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
-		hideControl("td_t_bars", track->type != Track::TYPE_TIME);
-		hideControl("td_t_dummy", track->type == Track::TYPE_TIME);
 		enable("edit_midi", track->type == Track::TYPE_MIDI);
 		enable("edit_midi_fx", track->type == Track::TYPE_MIDI);
 		enable("edit_synth", track->type != Track::TYPE_AUDIO);
@@ -124,6 +116,11 @@ void TrackConsole::onEditMidiFx()
 void TrackConsole::onEditSynth()
 {
 	((SideBar*)parent)->open(SideBar::SYNTH_CONSOLE);
+}
+
+void TrackConsole::onEditBars()
+{
+	((SideBar*)parent)->open(SideBar::BARS_CONSOLE);
 }
 
 void TrackConsole::onUpdate(Observable *o, const string &message)

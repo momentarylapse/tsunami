@@ -11,7 +11,6 @@
 #include "SideBar.h"
 #include "../../Stuff/Observer.h"
 class Song;
-class BarList;
 
 class SongConsole: public SideBarConsole, public Observer
 {
@@ -39,7 +38,6 @@ public:
 	virtual void onUpdate(Observable *o, const string &message);
 
 	Song *song;
-	BarList *bar_list;
 };
 
 #endif /* SONGCONSOLE_H_ */

@@ -1,5 +1,8 @@
 Dialog bars_dialog "Takte" 380 516
 	Grid bbd_grid_0 "" 1 2
+		Grid bbd_g_no_bars "" 2 1
+			Text bbd_t_no_bars "keine Takt-Spur vorhanden"
+			Button create_bars_track "anlegen"
 		Grid ? "" 1 2
 			ListView bar_list "#\\Schläge\\Bpm\\Dauer" format=tTTT,select-multi
 			Grid ? "" 4 1
@@ -8,7 +11,7 @@ Dialog bars_dialog "Takte" 380 516
 				Button delete_bar "" image=hui:delete flat
 				Button edit_selected_bars "" image=hui:edit flat
 			CheckBox link_to_midi "Midi mitbearbeiten"
-		Group td_t_edit "Bearbeiten"
+		Group bbd_t_edit "Bearbeiten"
 			Grid ? "" 3 1
 				Button edit_song "Datei"
 

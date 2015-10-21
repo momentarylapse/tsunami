@@ -21,10 +21,15 @@ public:
 	BarsConsole(Song *song, AudioView *view);
 	virtual ~BarsConsole();
 
+	void updateMessage();
+
+	void onCreateTimeTrack();
+
 	void onEditSong();
 
 	virtual void onUpdate(Observable *o, const string &message);
 
+	Song *song;
 	BarList *bar_list;
 };
 

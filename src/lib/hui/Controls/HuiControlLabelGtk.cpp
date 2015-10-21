@@ -41,7 +41,7 @@ void HuiControlLabel::__setString(const string &str)
 void HuiControlLabel::__setOption(const string &op, const string &value)
 {
 	if (op == "wrap")
-		gtk_label_set_line_wrap(GTK_LABEL(widget),true);
+		gtk_label_set_line_wrap(GTK_LABEL(widget), true);
 	else if (op == "center")
 		gtk_misc_set_alignment(GTK_MISC(widget), 0.5f, 0.5f);
 	else if (op == "right")

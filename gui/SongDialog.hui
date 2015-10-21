@@ -20,5 +20,5 @@ Dialog song_dialog "Sound-Datei" 430 375
 			Grid ? "" 4 1
 				Button edit_levels "Ebenen"
 				Button edit_samples "Samples"
-				Button edit_bars "Bars"
+				Button edit_bars "Takte"
 				Button edit_fx "Fx"

@@ -23,7 +23,7 @@ BarsConsole::BarsConsole(Song *_song, AudioView *view) :
 
 	updateMessage();
 
-	event("create_bars_track", this, &BarsConsole::onCreateTimeTrack);
+	event("create_time_track", this, &BarsConsole::onCreateTimeTrack);
 
 	event("edit_song", this, &BarsConsole::onEditSong);
 }
@@ -37,7 +37,7 @@ BarsConsole::~BarsConsole()
 void BarsConsole::updateMessage()
 {
 	Track *t = song->getTimeTrack();
-	hideControl("bbd_g_no_bars", t);
+	hideControl("bbd_g_no_time_track", t);
 }
 
 void BarsConsole::onCreateTimeTrack()

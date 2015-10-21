@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-274
+275
 // Data (ID,Text)
 about
 Info
@@ -53,8 +53,10 @@ bars_manager
 Manage...
 bbd_t_edit
 Edit
-bbd_t_no_bars
+bbd_t_no_time_track
 no rhythm track found
+bbd_t_no_time_track_comment
+!wrap\\This track is not necessary for editing, but makes the metronome audible.
 beat_partition
 4\\1\\256
 beats
@@ -105,10 +107,10 @@ copy_multi
 Copy from all selected tracks
 count
 !expandx\\1\\1\\10000\\1
-create_bars_track
-create
 create_from_selection
 !flat\\
+create_time_track
+create
 data_list
 !nobar,height=110,noexpandy\\key\\value
 db
@@ -419,9 +421,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_255882
+rand_id_13756
 
-rand_id_258486
+rand_id_910725
 
 rdt_capture
 Recording
@@ -489,16 +491,16 @@ show_mixing_console
 Mixing
 smd_group_edit
 Edit
-song_bars_manager
-Edit bars
 song_dialog
 Audio file
+song_edit_bars
+Edit bars
+song_edit_samples
+Manage samples
 song_menu_header
 File
 song_properties
 Properties
-song_samples_manager
-Manage samples
 stop
 Stop
 tags

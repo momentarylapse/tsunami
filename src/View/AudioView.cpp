@@ -659,9 +659,9 @@ Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 	return allowed;
 }
 
-void align_to_beats(Track *t, Range &r, int beat_partition)
+void align_to_beats(Song *s, Range &r, int beat_partition)
 {
-	Array<Beat> beats = t->song->bars.getBeats(Range::ALL);//audio->getRange());
+	Array<Beat> beats = s->bars.getBeats(Range::ALL);//audio->getRange());
 	foreach(Beat &b, beats){
 		/*for (int i=0; i<beat_partition; i++){
 			Range sr = b.sub(i, beat_partition);
@@ -687,9 +687,8 @@ MidiNoteData AudioView::getCreationNotes()
 	Range r = Range(start, end - start);
 
 	// align to beats
-	Track *t = song->getTimeTrack();
-	if (t)
-		align_to_beats(t, r, beat_partition);
+	if (song->bars.num > 0)
+		align_to_beats(song, r, beat_partition);
 
 	Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
 
@@ -945,8 +944,7 @@ bool AudioView::editingMidi()
 
 void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
 {
-	Track *t = song->getTimeTrack();
-	if (!t)
+	if (song->bars.num == 0)
 		return;
 	bool editing_midi = editingMidi();
 	int s0 = cam.screen2sample(r.x1 - 1);

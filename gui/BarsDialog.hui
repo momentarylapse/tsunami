@@ -1,8 +1,10 @@
 Dialog bars_dialog "Takte" 380 516
 	Grid bbd_grid_0 "" 1 2
-		Grid bbd_g_no_bars "" 2 1
-			Text bbd_t_no_bars "keine Takt-Spur vorhanden"
-			Button create_bars_track "anlegen"
+		Grid bbd_g_no_time_track "" 1 2
+			Grid ? "" 2 1
+				Text bbd_t_no_time_track "keine Rhythmus-Spur vorhanden"
+				Button create_time_track "anlegen"
+			Text bbd_t_no_time_track_comment "Diese Spur ist nicht notwendig zum Editieren, macht aber das Metronom hörbar." wrap
 		Grid ? "" 1 2
 			ListView bar_list "#\\Schläge\\Bpm\\Dauer" format=tTTT,select-multi
 			Grid ? "" 4 1

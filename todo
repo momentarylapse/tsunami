@@ -1,0 +1,88 @@
+X portaudio stabiler???
+J pulse verwenden
+j midi Noten löschen
+j saubere Midi-Aufnahmen
+J Klicks entfernen
+
+J MidiData mit Range?
+J Klick-Erkennung?
+J untere Leiste?
+
+
+j GP export
+* midi export
+* midi-Inkonsistenzen
+* leichteres midi Bearbeiten
+  J kleiner Ansichts-Bug
+  J markieren/editieren
+  ~ auto-einrasten
+  * logischeres copy/paste
+
+* Ausgabe Ziel Combobox?
+* Ausgabe Puffergröße
+
+* Kurven in Spur
+* Kurven Ziel mitändern
+
+* Plugins
+  * Metronom-Animation
+  J Pitcherkennung fix
+
+J Laden + Animation fix
+J Marker bearbeiten
+X Performance beim mehremaligen Aufnehmen???
+J Aufnahme langsam
+J AudioView Farben
+j nami Kompression
+J kollektive Lautstärke
+* Gitarren-Marker (tuning, hand)
+J drumset -> Verzeichnis nicht setzen
+
+J mehr SideBar...
+
+J Aufnahme in AudioView anzeigen
+J peaks erst nach Laden anzeigen
+J MidiEvents anzeigen
+* MidiEvent +-1 Problem
+j hyperaktive Observer
+* temporäre Samples automatisch löschen
+* Speicher sparen bei Laden (action)
+
+* graphischer Takteditor
+* View Modes
+* Tab-Mode
+* Echtzeit-Effekte auf Aufnahme
+J Song.range mit bars
+
+J auto scrollen beim Markieren
+J Aufnahme automatisch starten
+* Aufnahme Lautstärke regeln
+
+J einzel-Spur kopieren
+* Takt-Editor
+  * keine Liste -> nur Auswahl
+  * Parts?
+
+== Refactoring ==
+
+J viele Progress Objekte
+J PluginManager.cur_script/fx
+J Slider Plugin-Klasse
+J viele InputStream Objekte
+* AudioOutput -> AudioManager
+* mehr-Fenster-freundlich
+
+== bugs ==
+
+J Selektion löschen -> midi inkonsistent
+J Maus Midi-Inkonsistenz
+J Sample Dialog nach Löschen
+J AudioView beim Laden...
+J globale Effekte + neu
+? invalid free beim Abspielen
+J Selektionseinrasten
+? Stream Abstürze
+j SelectionRange beim Abspielen
+* Änderungen beim Abspielen
+* freeze beim Midi Editieren
+

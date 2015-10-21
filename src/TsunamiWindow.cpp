@@ -196,12 +196,10 @@ void TsunamiWindow::onAddTrack()
 void TsunamiWindow::onAddTimeTrack()
 {
 	song->action_manager->beginActionGroup();
-	Track *t = song->addTrack(Track::TYPE_TIME);
-	if (t){
-		// some default data
-		for (int i=0; i<10; i++)
-			t->addBar(-1, 90, 4, false);
-	}
+	song->addTrack(Track::TYPE_TIME);
+	// some default data
+	for (int i=0; i<10; i++)
+		song->addBar(-1, 90, 4, false);
 	song->action_manager->endActionGroup();
 }
 

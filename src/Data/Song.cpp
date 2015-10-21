@@ -26,6 +26,9 @@
 #include "Song.h"
 
 #include "../Action/Song/ActionSongDeleteSelection.h"
+#include "../Action/Song/Bar/ActionSongAddBar.h"
+#include "../Action/Song/Bar/ActionSongEditBar.h"
+#include "../Action/Song/Bar/ActionSongDeleteBar.h"
 #include "../Action/Song/Data/ActionSongChangeAllTrackVolumes.h"
 #include "../Action/Song/Data/ActionSongSetDefaultFormat.h"
 #include "../Action/Song/Data/ActionSongSetSampleRate.h"
@@ -98,6 +101,7 @@ const string Song::MESSAGE_DELETE_SAMPLE = "DeleteSample";
 const string Song::MESSAGE_ADD_LEVEL = "AddLevel";
 const string Song::MESSAGE_EDIT_LEVEL = "EditLevel";
 const string Song::MESSAGE_DELETE_LEVEL = "DeleteLevel";
+const string Song::MESSAGE_EDIT_BARS = "EditBars";
 
 
 void Song::addTag(const string &key, const string &value)
@@ -201,6 +205,7 @@ void Song::reset()
 
 	filename = "";
 	tags.clear();
+	bars.clear();
 	volume = 1;
 	default_format = SAMPLE_FORMAT_16;
 	compression = 0;
@@ -271,9 +276,9 @@ Range Song::getRange()
 	int min =  1073741824;
 	int max = -1073741824;
 	Range r = Range(min, max - min);
+
 	foreach(Track *t, tracks)
-		if (t->type != t->TYPE_TIME)
-			r = r or t->getRangeUnsafe();
+		r = r or t->getRangeUnsafe();
 
 	if (r.length() < 0)
 		return Range(0, 0);
@@ -285,6 +290,10 @@ Range Song::getRangeWithTime()
 	int min =  1073741824;
 	int max = -1073741824;
 	Range r = Range(min, max - min);
+
+	if (bars.num > 0)
+		r = r or bars.getRange();
+
 	foreach(Track *t, tracks)
 		r = r or t->getRangeUnsafe();
 
@@ -346,6 +355,14 @@ string Song::get_time_str_long(int t)
 	if (_min > 0)
 		return format("%s%dm %.2ds %.3dms",sign?"-":"",_min,_sec,_msec);
 	return format("%s%ds %.3dms",sign?"-":"",_sec,_msec);
+}
+
+int Song::barOffset(int index)
+{
+	int pos = 0;
+	for (int i=0; i<min(index, bars.num); i++)
+		pos += bars[i].length;
+	return pos;
 }
 
 
@@ -454,6 +471,40 @@ void Song::createSamplesFromSelection(int level_no, const Range &range)
 		execute(new ActionTrackSampleFromSelection(this, range, level_no));
 }
 
+void Song::addBar(int index, float bpm, int beats, bool affect_midi)
+{
+	BarPattern b;
+	b.num_beats = beats;
+	b.type = b.TYPE_BAR;
+	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / bpm);
+	if (index >= 0)
+		execute(new ActionSongAddBar(index + 1, b, affect_midi));
+	else
+		execute(new ActionSongAddBar(bars.num, b, affect_midi));
+}
+
+void Song::addPause(int index, float time, bool affect_midi)
+{
+	BarPattern b;
+	b.num_beats = 0;
+	b.type = b.TYPE_PAUSE;
+	b.length = (int)((float)sample_rate * time);
+	if (index >= 0)
+		execute(new ActionSongAddBar(index + 1, b, affect_midi));
+	else
+		execute(new ActionSongAddBar(bars.num, b, affect_midi));
+}
+
+void Song::editBar(int index, BarPattern &p, bool affect_midi)
+{
+	execute(new ActionSongEditBar(index, p, affect_midi));
+}
+
+void Song::deleteBar(int index, bool affect_midi)
+{
+	execute(new ActionSongDeleteBar(index, affect_midi));
+}
+
 void Song::invalidateAllPeaks()
 {
 	foreach(Track *t, tracks)
@@ -522,10 +573,7 @@ Track *Song::getTimeTrack()
 
 int Song::getNextBeat(int pos)
 {
-	Track *t = getTimeTrack();
-	if (!t)
-		return pos;
-	return t->bars.getNextBeat(pos);
+	return bars.getNextBeat(pos);
 }
 
 string Song::getNiceLevelName(int index)

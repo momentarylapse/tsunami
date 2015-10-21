@@ -1,41 +1,35 @@
 /*
- * ActionTrackEditBar.cpp
+ * ActionSongEditBar.cpp
  *
  *  Created on: 15.12.2012
  *      Author: michi
  */
 
-#include "ActionTrackEditBar.h"
+#include "ActionSongEditBar.h"
+
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionTrackEditBar::ActionTrackEditBar(Track *t, int _index, BarPattern &_bar, bool _affect_midi)
+ActionSongEditBar::ActionSongEditBar(int _index, BarPattern &_bar, bool _affect_midi)
 {
-	track_no = get_track_index(t);
 	index = _index;
 	bar = _bar;
 	affect_midi = _affect_midi;
 }
 
-ActionTrackEditBar::~ActionTrackEditBar()
+void *ActionSongEditBar::execute(Data *d)
 {
-}
-
-void *ActionTrackEditBar::execute(Data *d)
-{
-	Song *a = dynamic_cast<Song*>(d);
-	Track *t = a->get_track(track_no);
-	assert(t);
+	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
-	assert(index < t->bars.num);
+	assert(index < s->bars.num);
 
 	if (affect_midi){
-		int pos = t->barOffset(index);
-		int l0 = t->bars[index].length;
-		foreach(Track *tt, a->tracks){
-			if (tt->type != tt->TYPE_MIDI)
+		int pos = s->barOffset(index);
+		int l0 = s->bars[index].length;
+		foreach(Track *t, s->tracks){
+			if (t->type != t->TYPE_MIDI)
 				continue;
-			foreachi(MidiNote &n, tt->midi, j){
+			foreachi(MidiNote &n, t->midi, j){
 				// note start
 				if (n.range.start() > pos + l0)
 					// after bar
@@ -55,14 +49,14 @@ void *ActionTrackEditBar::execute(Data *d)
 	}
 
 	BarPattern temp = bar;
-	bar = t->bars[index];
-	t->bars[index] = temp;
-	t->notify();
+	bar = s->bars[index];
+	s->bars[index] = temp;
+	s->notify(s->MESSAGE_EDIT_BARS);
 
 	return NULL;
 }
 
-void ActionTrackEditBar::undo(Data *d)
+void ActionSongEditBar::undo(Data *d)
 {
 	execute(d);
 }

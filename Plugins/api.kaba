@@ -251,9 +251,6 @@ class Track
 	AudioEffect[] *fx
 	SampleRef[] *samples
 	
-	// time track
-	BarPattern[] bars
-	
 	// midi track
 	MidiData midi
 	Synthesizer *synth
@@ -287,10 +284,6 @@ class Track
 	extern void addMidiNotes(MidiData midi)
 	extern void deleteMidiNote(int index)
 	extern void setSynthesizer(Synthesizer *synth)
-	extern void addBar(int index, float bpm, int beats, bool affect_midi)
-	extern void addPause(int index, float time, bool affect_midi)
-	extern void editBar(int index, BarPattern p, bool affect_midi)
-	extern void deleteBar(int index, bool affect_midi)
 	extern void addMarker(int pos, string text)
 	extern void deleteMarker(int index)
 	extern void moveMarker(int index, int pos)
@@ -309,6 +302,8 @@ class Song
 	Track*[] tracks
 	Sample*[] samples
 	
+	BarPattern[] bars
+	
 	string[] level_names
 	
 	extern void __init__()
@@ -320,6 +315,10 @@ class Song
 	extern void newEmpty(int sample_rate)
 	extern Track *addTrack(int type, int index)
 	extern void deleteTrack(int index)
+	extern void addBar(int index, float bpm, int beats, bool affect_midi)
+	extern void addPause(int index, float time, bool affect_midi)
+	extern void editBar(int index, BarPattern p, bool affect_midi)
+	extern void deleteBar(int index, bool affect_midi)
 
 class ColorScheme
 	color background

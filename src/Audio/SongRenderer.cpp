@@ -99,7 +99,7 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	make_silence(buf, range_cur.length());
 
-	Array<Beat> beats = t->bars.getBeats(range_cur);
+	Array<Beat> beats = song->bars.getBeats(range_cur);
 
 	MidiRawData raw;
 	raw.samples = buf.num;

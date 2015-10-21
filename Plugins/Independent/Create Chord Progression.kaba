@@ -31,11 +31,11 @@ void OnOk()
 	int beats = dlg.getInt("beats")
 	float bpm = dlg.getFloat("bpm")
 	song.newEmpty(sample_rate)
-	Track *t = song.addTrack(TYPE_TIME, 0)
+	song.addTrack(TYPE_TIME, 0)
 	for i in 0:chords.num
-		t.addBar(-1, bpm, beats, false)
-	int dt = t.bars[0].length
-	t = song.addTrack(TYPE_MIDI, 1)
+		song.addBar(-1, bpm, beats, false)
+	int dt = song.bars[0].length
+	Track* t = song.addTrack(TYPE_MIDI, 1)
 	Range r
 	r.offset = 0
 	r.length = dt

@@ -11,7 +11,6 @@
 #include "Range.h"
 #include "BufferBox.h"
 #include "MidiData.h"
-#include "Rhythm.h"
 #include "Sample.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
@@ -66,7 +65,6 @@ public:
 
 	string _cdecl getNiceName();
 	int _cdecl get_index();
-	int _cdecl barOffset(int index);
 
 	// actions
 	void _cdecl setName(const string &name);
@@ -91,10 +89,6 @@ public:
 	void _cdecl deleteMidiNote(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
-	void _cdecl addBar(int index, float bpm, int beats, bool affect_midi);
-	void _cdecl addPause(int index, float time, bool affect_midi);
-	void _cdecl editBar(int index, BarPattern &p, bool affect_midi);
-	void _cdecl deleteBar(int index, bool affect_midi);
 	void _cdecl addMarker(int pos, const string &text);
 	void _cdecl deleteMarker(int id);
 	void _cdecl moveMarker(int id, int pos);
@@ -118,9 +112,6 @@ public:
 
 	Array<Effect*> fx;
 	Array<SampleRef*> samples;
-
-	// time track
-	BarCollection bars;
 
 	// midi track
 	MidiNoteData midi;

@@ -10,13 +10,13 @@
 
 #include "../../lib/hui/hui.h"
 #include "../../Stuff/Observer.h"
-class Track;
+class Song;
 class AudioView;
 
 class BarList : public HuiEventHandler, public Observer
 {
 public:
-	BarList(HuiPanel *_panel, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_edit, AudioView *view);
+	BarList(HuiPanel *_panel, const string &_id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_edit, Song *song, AudioView *view);
 	virtual ~BarList();
 
 	void fillList();
@@ -31,8 +31,6 @@ public:
 	void addNewBar();
 	void executeBarDialog(int index);
 
-	void setTrack(Track *t);
-
 	virtual void onUpdate(Observable *o, const string &message);
 
 	void selectToView();
@@ -42,7 +40,7 @@ public:
 	HuiPanel *panel;
 	string id;
 	string id_add, id_add_pause, id_delete, id_edit, id_link;
-	Track *track;
+	Song *song;
 	AudioView *view;
 };
 

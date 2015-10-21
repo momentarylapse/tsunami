@@ -114,12 +114,11 @@ void FormatGuitarPro::saveSong(StorageOperationData *od)
 	else //if (version == 500)
 		write_str1c(f, "FICHIER GUITAR PRO v5.00", 30);
 
-	Track *tt = a->getTimeTrack();
 	Array<Track*> tracks;
 	foreach(Track *t, a->tracks)
-		if (t != tt)
+		if (t->type == t->TYPE_MIDI)
 			tracks.add(t);
-	Array<Bar> bars = tt->bars.getBars(Range(-1000000000, 2000000000));
+	Array<Bar> bars = a->bars.getBars(Range(-1000000000, 2000000000));
 	tempo = 60.0f * (float)bars[0].num_beats / (float)bars[0].range.num * (float)a->sample_rate;
 
 
@@ -252,7 +251,7 @@ void FormatGuitarPro::loadSong(StorageOperationData *od)
 			if (measures[i].marker.num > 0)
 				a->tracks[0]->addMarker(offset, measures[i].marker);
 			offset += a->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator;
-			a->tracks[0]->addBar(-1, tempo, measures[i].numerator, false);
+			a->addBar(-1, tempo, measures[i].numerator, false);
 		}
 
 	}catch(const string &s){

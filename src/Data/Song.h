@@ -12,6 +12,7 @@
 #include "Track.h"
 #include "Sample.h"
 #include "SampleRef.h"
+#include "Rhythm.h"
 #include "../lib/base/base.h"
 #include "../lib/math/rect.h"
 
@@ -58,6 +59,7 @@ public:
 	static const string MESSAGE_ADD_LEVEL;
 	static const string MESSAGE_EDIT_LEVEL;
 	static const string MESSAGE_DELETE_LEVEL;
+	static const string MESSAGE_EDIT_BARS;
 
 	string _cdecl get_time_str(int t);
 	string _cdecl get_time_str_fuzzy(int t, float dt);
@@ -78,6 +80,7 @@ public:
 
 	Track *_cdecl getTimeTrack();
 	int _cdecl getNextBeat(int pos);
+	int _cdecl barOffset(int index);
 	string _cdecl getNiceLevelName(int index);
 
 	string _cdecl getTag(const string &key);
@@ -103,6 +106,10 @@ public:
 	void _cdecl addLevel(const string &name);
 	void _cdecl deleteLevel(int index, bool merge);
 	void _cdecl renameLevel(int index, const string &name);
+	void _cdecl addBar(int index, float bpm, int beats, bool affect_midi);
+	void _cdecl addPause(int index, float time, bool affect_midi);
+	void _cdecl editBar(int index, BarPattern &p, bool affect_midi);
+	void _cdecl deleteBar(int index, bool affect_midi);
 	void _cdecl insertSelectedSamples(int level_no);
 	void _cdecl deleteSelectedSamples();
 	void _cdecl deleteSelection(int level_no, const Range &range, bool all_levels);
@@ -127,6 +134,7 @@ public:
 	Array<Track*> tracks;
 	Array<Sample*> samples;
 	Array<Curve*> curves;
+	BarCollection bars;
 
 	Array<string> level_names;
 };

@@ -443,7 +443,7 @@ void AudioView::setBarriers(SelectionType *s)
 		}
 
 		// time bar...
-		Array<Beat> beats = t->bars.getBeats(cam.range());
+		Array<Beat> beats = song->bars.getBeats(cam.range());
 		foreach(Beat &b, beats)
 			s->barrier.add(b.range.offset);
 	}
@@ -661,7 +661,7 @@ Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 
 void align_to_beats(Track *t, Range &r, int beat_partition)
 {
-	Array<Beat> beats = t->bars.getBeats(Range::ALL);//audio->getRange());
+	Array<Beat> beats = t->song->bars.getBeats(Range::ALL);//audio->getRange());
 	foreach(Beat &b, beats){
 		/*for (int i=0; i<beat_partition; i++){
 			Range sr = b.sub(i, beat_partition);
@@ -956,7 +956,7 @@ void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool
 	dash.add(6);
 	dash.add(4);
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	Array<Bar> bars = t->bars.getBars(Range(s0, s1 - s0));
+	Array<Bar> bars = song->bars.getBars(Range(s0, s1 - s0));
 	foreach(Bar &b, bars){
 		int xx = cam.sample2screen(b.range.offset);
 

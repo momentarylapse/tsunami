@@ -13,7 +13,7 @@
 
 
 
-BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_edit, AudioView *_view) :
+BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, const string &_id_add_pause, const string &_id_delete, const string &_id_edit, Song *_song, AudioView *_view) :
 	Observer("BarList")
 {
 	panel = _panel;
@@ -25,9 +25,12 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 	id_link = "link_to_midi";
 	view = _view;
 
-	track = NULL;
+	song = _song;
 
 	panel->check(id_link, true);
+	panel->enable(id, true);
+	panel->enable(id_add, true);
+	panel->enable(id_add_pause, true);
 
 	fillList();
 	panel->event(id, this, &BarList::onList);
@@ -40,25 +43,24 @@ BarList::BarList(HuiPanel *_panel, const string & _id, const string &_id_add, co
 
 	if (view)
 		subscribe(view, view->MESSAGE_SELECTION_CHANGE);
+	subscribe(song, song->MESSAGE_EDIT_BARS);
+	subscribe(song, song->MESSAGE_NEW);
 }
 
 
 
 void BarList::fillList()
 {
-	msg_db_f("FillBarList", 1);
 	panel->reset(id);
-	if (track){
-		int sample_rate = track->song->sample_rate;
-		int n = 1;
-		foreach(BarPattern &b, track->bars){
-			float duration = (float)b.length / (float)sample_rate;
-			if (b.type == b.TYPE_BAR){
-				panel->addString(id, format("%d\\%d\\%.1f\\%.3f", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), duration));
-				n ++;
-			}else if (b.type == b.TYPE_PAUSE){
-				panel->addString(id, format(_("(Pause)\\-\\-\\%.3f"), duration));
-			}
+	int sample_rate = song->sample_rate;
+	int n = 1;
+	foreach(BarPattern &b, song->bars){
+		float duration = (float)b.length / (float)sample_rate;
+		if (b.type == b.TYPE_BAR){
+			panel->addString(id, format("%d\\%d\\%.1f\\%.3f", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), duration));
+			n ++;
+		}else if (b.type == b.TYPE_PAUSE){
+			panel->addString(id, format(_("(Pause)\\-\\-\\%.3f"), duration));
 		}
 	}
 	//panel->enable(id_delete, false);
@@ -70,10 +72,8 @@ void BarList::fillList()
 void BarList::onList()
 {
 	int s = panel->getInt(id);
-	if (s >= 0){
+	if (s >= 0)
 		executeBarDialog(s);
-		fillList();
-	}
 }
 
 
@@ -90,14 +90,12 @@ void BarList::selectToView()
 {
 	if (!view)
 		return;
-	if (!track)
-		return;
 	Array<int> s = panel->getSelection(id);
 
 	if (s.num > 0){
 		int pos = 0;
 		int p0 = 0, p1 = 0;
-		foreachi(BarPattern &b, track->bars, i){
+		foreachi(BarPattern &b, song->bars, i){
 			if (i == s[0])
 				p0 = pos;
 			pos += b.length;
@@ -116,11 +114,9 @@ void BarList::selectToView()
 
 void BarList::onListEdit()
 {
-	if (!track)
-		return;
-	int sample_rate = track->song->sample_rate;
+	int sample_rate = song->sample_rate;
 	int index = HuiGetEvent()->row;
-	BarPattern b = track->bars[index];
+	BarPattern b = song->bars[index];
 	string text = panel->getCell(id, HuiGetEvent()->row, HuiGetEvent()->column);
 	if (b.num_beats > 0){
 		if (HuiGetEvent()->column == 1){
@@ -137,8 +133,7 @@ void BarList::onListEdit()
 			b.length = (int)(text._float() * (float)sample_rate);
 		}
 	}
-	track->editBar(index, b, panel->isChecked(id_link));
-	fillList();
+	song->editBar(index, b, panel->isChecked(id_link));
 }
 
 
@@ -150,32 +145,27 @@ void BarList::onAdd()
 
 void BarList::onAddPause()
 {
-	if (!track)
-		return;
 	int s = panel->getInt(id);
 
-	track->addPause(s, 2.0f, panel->isChecked(id_link));
-	fillList();
+	song->addPause(s, 2.0f, panel->isChecked(id_link));
 }
 
 
 void BarList::onDelete()
 {
-	if (!track)
-		return;
 	Array<int> s = panel->getSelection(id);
-	track->song->action_manager->beginActionGroup();
+	song->action_manager->beginActionGroup();
 
 	foreachb(int i, s){
 
 		int pos = 0;
 		for (int j=0; j<i; j++)
-			pos += track->bars[j].length;
+			pos += song->bars[j].length;
 
-		BarPattern b = track->bars[i];
+		BarPattern b = song->bars[i];
 		int l0 = b.length;
 		if (panel->isChecked(id_link)){
-			foreach(Track *t, track->song->tracks){
+			foreach(Track *t, song->tracks){
 				if (t->type != t->TYPE_MIDI)
 					continue;
 				Set<int> del;
@@ -197,30 +187,29 @@ void BarList::onDelete()
 					t->addMidiNote(n);
 			}
 		}
-		track->deleteBar(i, panel->isChecked(id_link));
+		song->deleteBar(i, panel->isChecked(id_link));
 	}
-	track->song->action_manager->endActionGroup();
-	fillList();
+	song->action_manager->endActionGroup();
 }
 
 class BarEditDialog : public HuiDialog
 {
 public:
-	Track *track;
+	Song *song;
 	Array<int> sel;
 	bool apply_to_midi;
 
-	BarEditDialog(HuiWindow *root, Track *_t, Array<int> &_s, bool _apply_to_midi):
+	BarEditDialog(HuiWindow *root, Song *_song, Array<int> &_s, bool _apply_to_midi):
 		HuiDialog("", 100, 100, root, false)
 	{
 		fromResource("bar_edit_dialog");
-		track = _t;
+		song = _song;
 		sel = _s;
 		apply_to_midi = _apply_to_midi;
 
-		BarPattern &b = track->bars[sel[0]];
+		BarPattern &b = song->bars[sel[0]];
 		setInt("beats", b.num_beats);
-		setFloat("bpm", track->song->sample_rate * 60.0f / (b.length / b.num_beats));
+		setFloat("bpm", song->sample_rate * 60.0f / (b.length / b.num_beats));
 		check("edit_bpm", true);
 
 		event("ok", this, &BarEditDialog::onOk);
@@ -234,16 +223,16 @@ public:
 		float bpm = getFloat("bpm");
 		bool edit_beats = isChecked("edit_beats");
 		bool edit_bpm = isChecked("edit_bpm");
-		track->song->action_manager->beginActionGroup();
+		song->action_manager->beginActionGroup();
 		foreachb(int i, sel){
-			BarPattern b = track->bars[i];
+			BarPattern b = song->bars[i];
 			if (edit_beats)
 				b.num_beats = beats;
 			if (edit_bpm)
-				b.length = track->song->sample_rate * 60.0f * b.num_beats / bpm;
-			track->editBar(i, b, apply_to_midi);
+				b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
+			song->editBar(i, b, apply_to_midi);
 		}
-		track->song->action_manager->endActionGroup();
+		song->action_manager->endActionGroup();
 
 		delete(this);
 	}
@@ -257,27 +246,27 @@ public:
 class BarAddDialog : public HuiDialog
 {
 public:
-	Track *track;
+	Song *song;
 	int index;
 	bool apply_to_midi;
 
-	BarAddDialog(HuiWindow *root, Track *_t, int _index, bool _apply_to_midi):
+	BarAddDialog(HuiWindow *root, Song *_s, int _index, bool _apply_to_midi):
 		HuiDialog("", 100, 100, root, false)
 	{
 		fromResource("bar_add_dialog");
-		track = _t;
+		song = _s;
 		index = _index;
 		apply_to_midi = _apply_to_midi;
 
 		setInt("count", 1);
 		setInt("beats", 4);
 		setFloat("bpm", 90.0f);
-		if (track->bars.num > 0){
-			BarPattern &b = track->bars.back();
+		if (song->bars.num > 0){
+			BarPattern &b = song->bars.back();
 			if (index >= 0)
-				b = track->bars[index];
+				b = song->bars[index];
 			setInt("beats", b.num_beats);
-			setFloat("bpm", track->song->sample_rate * 60.0f / (b.length / b.num_beats));
+			setFloat("bpm", song->sample_rate * 60.0f / (b.length / b.num_beats));
 		}
 
 		event("ok", this, &BarAddDialog::onOk);
@@ -290,12 +279,12 @@ public:
 		int count = getInt("count");
 		int beats = getInt("beats");
 		float bpm = getFloat("bpm");
-		track->song->action_manager->beginActionGroup();
+		song->action_manager->beginActionGroup();
 
 
 		for (int i=0; i<count; i++)
-			track->addBar(index, bpm, beats, apply_to_midi);
-		track->song->action_manager->endActionGroup();
+			song->addBar(index, bpm, beats, apply_to_midi);
+		song->action_manager->endActionGroup();
 
 		delete(this);
 	}
@@ -308,11 +297,9 @@ public:
 
 void BarList::onEdit()
 {
-	if (!track)
-		return;
 	Array<int> s = panel->getSelection(id);
 
-	HuiDialog *dlg = new BarEditDialog(panel->win, track, s, panel->isChecked(id_link));
+	HuiDialog *dlg = new BarEditDialog(panel->win, song, s, panel->isChecked(id_link));
 	dlg->show();
 
 	fillList();
@@ -322,20 +309,17 @@ void BarList::onEdit()
 
 BarList::~BarList()
 {
+	unsubscribe(song);
 	if (view)
 		unsubscribe(view);
 }
 
 void BarList::addNewBar()
 {
-	if (!track)
-		return;
-	msg_db_f("AddNewBar", 1);
-
 	int s = panel->getInt(id);
 
 
-	HuiDialog *dlg = new BarAddDialog(panel->win, track, s, panel->isChecked(id_link));
+	HuiDialog *dlg = new BarAddDialog(panel->win, song, s, panel->isChecked(id_link));
 	dlg->show();
 }
 
@@ -344,32 +328,19 @@ void BarList::executeBarDialog(int index)
 	msg_db_f("executeBarDialog", 1);
 }
 
-void BarList::setTrack(Track *t)
-{
-	track = NULL;
-	if (t)
-		if (t->type == t->TYPE_TIME)
-			track = t;
-	fillList();
-
-	panel->enable(id, track);
-	panel->enable(id_add, track);
-	panel->enable(id_add_pause, track);
-}
-
 void BarList::onUpdate(Observable *o, const string &message)
 {
-	if (!track)
-		return;
-
-	selectFromView();
+	if (o == view)
+		selectFromView();
+	else if (o == song)
+		fillList();
 }
 
 void BarList::selectFromView()
 {
 	Array<int> s;
 	int pos = 0;
-	foreachi(BarPattern &b, track->bars, i){
+	foreachi(BarPattern &b, song->bars, i){
 		Range r = Range(pos, b.length - 1);
 		if (r.overlaps(view->sel_range))
 			s.add(i);

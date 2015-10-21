@@ -3,6 +3,9 @@
 BIN = ../tsunami
 all : $(BIN)
 OBJ = \
+ Action/Song/Bar/ActionSongAddBar.o\
+ Action/Song/Bar/ActionSongDeleteBar.o\
+ Action/Song/Bar/ActionSongEditBar.o\
  Action/Song/Data/ActionSongChangeAllTrackVolumes.o\
  Action/Song/Data/ActionSongSetDefaultFormat.o\
  Action/Song/Data/ActionSongSetSampleRate.o\
@@ -16,9 +19,6 @@ OBJ = \
  Action/Song/Tag/ActionSongDeleteTag.o\
  Action/Song/Tag/ActionSongEditTag.o\
  Action/Song/ActionSongDeleteSelection.o\
- Action/Track/Bar/ActionTrackAddBar.o\
- Action/Track/Bar/ActionTrackDeleteBar.o\
- Action/Track/Bar/ActionTrackEditBar.o\
  Action/Track/Buffer/ActionTrack__AbsorbBufferBox.o\
  Action/Track/Buffer/ActionTrack__AddBufferBox.o\
  Action/Track/Buffer/ActionTrack__CutBufferBox.o\
@@ -266,6 +266,15 @@ CXXFLAGSLINKING =  `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lpulse -laso
 $(BIN) : $(OBJ)
 	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
 
+Action/Song/Bar/ActionSongAddBar.o : Action/Song/Bar/ActionSongAddBar.cpp
+	$(CPP) -c Action/Song/Bar/ActionSongAddBar.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Bar/ActionSongDeleteBar.o : Action/Song/Bar/ActionSongDeleteBar.cpp
+	$(CPP) -c Action/Song/Bar/ActionSongDeleteBar.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Bar/ActionSongEditBar.o : Action/Song/Bar/ActionSongEditBar.cpp
+	$(CPP) -c Action/Song/Bar/ActionSongEditBar.cpp -o $@ $(CXXFLAGS)
+
 Action/Song/Data/ActionSongChangeAllTrackVolumes.o : Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp
 	$(CPP) -c Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp -o $@ $(CXXFLAGS)
 
@@ -304,15 +313,6 @@ Action/Song/Tag/ActionSongEditTag.o : Action/Song/Tag/ActionSongEditTag.cpp
 
 Action/Song/ActionSongDeleteSelection.o : Action/Song/ActionSongDeleteSelection.cpp
 	$(CPP) -c Action/Song/ActionSongDeleteSelection.cpp -o $@ $(CXXFLAGS)
-
-Action/Track/Bar/ActionTrackAddBar.o : Action/Track/Bar/ActionTrackAddBar.cpp
-	$(CPP) -c Action/Track/Bar/ActionTrackAddBar.cpp -o $@ $(CXXFLAGS)
-
-Action/Track/Bar/ActionTrackDeleteBar.o : Action/Track/Bar/ActionTrackDeleteBar.cpp
-	$(CPP) -c Action/Track/Bar/ActionTrackDeleteBar.cpp -o $@ $(CXXFLAGS)
-
-Action/Track/Bar/ActionTrackEditBar.o : Action/Track/Bar/ActionTrackEditBar.cpp
-	$(CPP) -c Action/Track/Bar/ActionTrackEditBar.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Buffer/ActionTrack__AbsorbBufferBox.o : Action/Track/Buffer/ActionTrack__AbsorbBufferBox.cpp
 	$(CPP) -c Action/Track/Buffer/ActionTrack__AbsorbBufferBox.cpp -o $@ $(CXXFLAGS)

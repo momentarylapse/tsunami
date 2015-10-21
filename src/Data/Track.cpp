@@ -31,9 +31,6 @@
 #include "../Action/Track/Marker/ActionTrackAddMarker.h"
 #include "../Action/Track/Marker/ActionTrackDeleteMarker.h"
 #include "../Action/Track/Marker/ActionTrackMoveMarker.h"
-#include "../Action/Track/Bar/ActionTrackAddBar.h"
-#include "../Action/Track/Bar/ActionTrackEditBar.h"
-#include "../Action/Track/Bar/ActionTrackDeleteBar.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiNote.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiNote.h"
 
@@ -81,7 +78,6 @@ void Track::reset()
 	volume = 1;
 	muted = false;
 	panning = 0;
-	bars.clear();
 	foreach(Effect *f, fx)
 		delete(f);
 	fx.clear();
@@ -116,9 +112,6 @@ Range Track::getRangeUnsafe()
 	}
 	Range r = Range(min, max - min);
 
-	if ((type == TYPE_TIME) and (bars.num > 0))
-		r = r or bars.getRange();
-
 	if ((type == TYPE_MIDI) and (midi.num > 0))
 		r = r or midi.getRange(synth->keep_notes);
 
@@ -151,14 +144,6 @@ int Track::get_index()
 				return i;
 	}
 	return -1;
-}
-
-int Track::barOffset(int index)
-{
-	int pos = 0;
-	for (int i=0; i<min(index, bars.num); i++)
-		pos += bars[i].length;
-	return pos;
 }
 
 BufferBox Track::readBuffers(int level_no, const Range &r)
@@ -356,40 +341,6 @@ void Track::setSynthesizer(Synthesizer *_synth)
 void Track::editSynthesizer(const string &param_old)
 {
 	song->execute(new ActionTrackEditSynthesizer(this, param_old));
-}
-
-void Track::addBar(int index, float bpm, int beats, bool affect_midi)
-{
-	BarPattern b;
-	b.num_beats = beats;
-	b.type = b.TYPE_BAR;
-	b.length = (int)((float)b.num_beats * (float)song->sample_rate * 60.0f / bpm);
-	if (index >= 0)
-		song->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
-	else
-		song->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
-}
-
-void Track::addPause(int index, float time, bool affect_midi)
-{
-	BarPattern b;
-	b.num_beats = 0;
-	b.type = b.TYPE_PAUSE;
-	b.length = (int)((float)song->sample_rate * time);
-	if (index >= 0)
-		song->execute(new ActionTrackAddBar(this, index + 1, b, affect_midi));
-	else
-		song->execute(new ActionTrackAddBar(this, bars.num, b, affect_midi));
-}
-
-void Track::editBar(int index, BarPattern &p, bool affect_midi)
-{
-	song->execute(new ActionTrackEditBar(this, index, p, affect_midi));
-}
-
-void Track::deleteBar(int index, bool affect_midi)
-{
-	song->execute(new ActionTrackDeleteBar(this, index, affect_midi));
 }
 
 void Track::addMarker(int pos, const string &text)

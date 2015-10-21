@@ -16,7 +16,7 @@ j GP export
   J kleiner Ansichts-Bug
   J markieren/editieren
   ~ auto-einrasten
-  * logischeres copy/paste
+  ~ logischeres copy/paste
 
 * Ausgabe Ziel Combobox?
 * Ausgabe Puffergröße
@@ -71,6 +71,7 @@ J Slider Plugin-Klasse
 J viele InputStream Objekte
 * AudioOutput -> AudioManager
 * mehr-Fenster-freundlich
+* bars in Song statt Track
 
 == bugs ==
 
@@ -79,10 +80,18 @@ J Maus Midi-Inkonsistenz
 J Sample Dialog nach Löschen
 J AudioView beim Laden...
 J globale Effekte + neu
-? invalid free beim Abspielen
+~ invalid free beim Abspielen
 J Selektionseinrasten
-? Stream Abstürze
+~ Stream Abstürze
 j SelectionRange beim Abspielen
 * Änderungen beim Abspielen
-* freeze beim Midi Editieren
+~ freeze beim Midi Editieren
 
+
+== Version 0.7 ==
+
+J Englisch
+* klarere SideBar
+* besseres Takt-Editieren
+* Instrumente (midi)
+* interner Kurven-Editor

@@ -897,10 +897,10 @@ public:
 	}
 };
 
-class FileChunkBar : public FileChunk<Track,BarPattern>
+class FileChunkBar : public FileChunk<Song,BarPattern>
 {
 public:
-	FileChunkBar() : FileChunk<Track,BarPattern>("bar"){}
+	FileChunkBar() : FileChunk<Song,BarPattern>("bar"){}
 	virtual void create(){ me = NULL; }
 	virtual void read(File *f)
 	{
@@ -914,6 +914,34 @@ public:
 		f->ReadInt(); // reserved
 		for (int i=0; i<count; i++)
 			parent->bars.add(b);
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->type);
+		f->WriteInt(me->length);
+		f->WriteInt(me->num_beats);
+		f->WriteInt(1);
+		f->WriteInt(0); // reserved
+	}
+};
+
+class FileChunkTrackBar : public FileChunk<Track,BarPattern>
+{
+public:
+	FileChunkTrackBar() : FileChunk<Track,BarPattern>("bar"){}
+	virtual void create(){ me = NULL; }
+	virtual void read(File *f)
+	{
+		BarPattern b;
+		b.type = f->ReadInt();
+		b.length = f->ReadInt();
+		b.num_beats = f->ReadInt();
+		if (b.type == BarPattern::TYPE_PAUSE)
+			b.num_beats = 0;
+		int count = f->ReadInt();
+		f->ReadInt(); // reserved
+		for (int i=0; i<count; i++)
+			parent->song->bars.add(b);
 	}
 	virtual void write(File *f)
 	{
@@ -957,7 +985,7 @@ public:
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
 		add_child(new FileChunkTrackMidiData);
-		add_child(new FileChunkBar);
+		add_child(new FileChunkTrackBar);
 		add_child(new FileChunkMarker);
 		add_child(new FileChunkSampleRef);
 			//s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
@@ -1001,6 +1029,7 @@ public:
 		add_child(new FileChunkFormat);
 		add_child(new FileChunkTag);
 		add_child(new FileChunkLevelName);
+		add_child(new FileChunkBar);
 		add_child(new FileChunkSample);
 		add_child(new FileChunkTrack);
 	}
@@ -1254,9 +1283,6 @@ void FormatNami::WriteTrack(Track *t)
 	f->WriteInt(0); // reserved
 	f->WriteInt(0);
 
-	foreach(BarPattern &b, t->bars)
-		WriteBar(b);
-
 	foreachi(TrackLevel &l, t->levels, i)
 		WriteTrackLevel(&l, i);
 
@@ -1323,6 +1349,9 @@ void FormatNami::saveSong(StorageOperationData *od)
 		WriteTag(&tag);
 
 	WriteLevelName();
+
+	foreach(BarPattern &b, song->bars)
+		WriteBar(b);
 
 	foreach(Sample *sample, song->samples)
 		WriteSample(sample);
@@ -1701,7 +1730,7 @@ void ReadChunkTrack(ChunkStack *s, Song *a)
 	s->AddChunkHandler("samref", (chunk_reader*)&ReadChunkSampleRef, t);
 	s->AddChunkHandler("sub", (chunk_reader*)&ReadChunkSub, t);
 	s->AddChunkHandler("effect", (chunk_reader*)&ReadChunkEffect, &t->fx);
-	s->AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &t->bars);
+	s->AddChunkHandler("bar", (chunk_reader*)&ReadChunkBar, &a->bars);
 	s->AddChunkHandler("midi", (chunk_reader*)&ReadChunkMidiData, &t->midi);
 	s->AddChunkHandler("synth", (chunk_reader*)&ReadChunkSynth, t);
 	s->AddChunkHandler("marker", (chunk_reader*)&ReadChunkMarker, &t->markers);

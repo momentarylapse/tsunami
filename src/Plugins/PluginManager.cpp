@@ -268,7 +268,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Track", "volume", _offsetof(Track, volume));
 	Script::DeclareClassOffset("Track", "panning", _offsetof(Track, panning));
 	Script::DeclareClassOffset("Track", "muted", _offsetof(Track, muted));
-	Script::DeclareClassOffset("Track", "bars", _offsetof(Track, bars));
 	Script::DeclareClassOffset("Track", "fx", _offsetof(Track, fx));
 	Script::DeclareClassOffset("Track", "midi", _offsetof(Track, midi));
 	Script::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
@@ -294,10 +293,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::addMidiNotes));
 	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::deleteMidiNote));
 	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::setSynthesizer));
-	Script::LinkExternal("Track.addBar", Script::mf(&Track::addBar));
-	Script::LinkExternal("Track.addPause", Script::mf(&Track::addPause));
-	Script::LinkExternal("Track.editBar", Script::mf(&Track::editBar));
-	Script::LinkExternal("Track.deleteBar", Script::mf(&Track::deleteBar));
 	Script::LinkExternal("Track.addMarker", Script::mf(&Track::addMarker));
 	Script::LinkExternal("Track.deleteMarker", Script::mf(&Track::deleteMarker));
 	Script::LinkExternal("Track.moveMarker", Script::mf(&Track::moveMarker));
@@ -312,6 +307,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
 	Script::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
 	Script::DeclareClassOffset("Song", "level_names", _offsetof(Song, level_names));
+	Script::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
 	Script::LinkExternal("Song.__init__", Script::mf(&Song::__init__));
 	Script::DeclareClassVirtualIndex("Song", "__delete__", Script::mf(&Song::__delete__), &af);
 	Script::LinkExternal("Song.newEmpty", Script::mf(&Song::newEmpty));
@@ -319,6 +315,10 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Song.deleteTrack", Script::mf(&Song::deleteTrack));
 	Script::LinkExternal("Song.getRange", Script::mf(&Song::getRange));
 	Script::LinkExternal("Song.getNextBeat", Script::mf(&Song::getNextBeat));
+	Script::LinkExternal("Song.addBar", Script::mf(&Song::addBar));
+	Script::LinkExternal("Song.addPause", Script::mf(&Song::addPause));
+	Script::LinkExternal("Song.editBar", Script::mf(&Song::editBar));
+	Script::LinkExternal("Song.deleteBar", Script::mf(&Song::deleteBar));
 
 	AudioRenderer ar;
 	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));

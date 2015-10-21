@@ -63,6 +63,7 @@ class MidiRawData : MidiEvent[]
 	void addNote(MidiNote n)
 		add(_MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(_MidiEvent(n.range.end(), n.pitch, 0))
+	extern void addMetronomeClick(int pos, int level, float volume)
 
 class MidiData : MidiNote[]
 	int samples
@@ -162,7 +163,6 @@ class Synthesizer
 	extern void setSampleRate(int sample_rate)
 	extern virtual int read(BufferBox buf)
 	
-	extern void addMetronomeClick(int pos, int level, float volume)
 	extern void feed(MidiRawData midi)
 	
 	extern void enablePitch(int pitch, bool enable)
@@ -181,7 +181,6 @@ class SynthesizerRenderer
 	extern void resetMidiData()
 	extern virtual int read(BufferBox buf)
 	extern virtual void reset()
-	extern void add(MidiEvent e)
 	extern virtual int getSampleRate()
 	extern void setAutoStop(bool active)
 

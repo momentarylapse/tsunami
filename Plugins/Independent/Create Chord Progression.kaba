@@ -26,16 +26,16 @@ void insert_chord(Track *t, Chord c, Range r)
 
 void OnOk()
 	string str = dlg.getString("chords")
-	Chord[] chords
-	ParseChords(str, chords)
+	Chord[] chords = ParseChords(str)
 	int sample_rate = dlg.getString("sample_rate").int()
 	int beats = dlg.getInt("beats")
 	float bpm = dlg.getFloat("bpm")
-	audio.newEmpty(sample_rate)
-	Track *t = audio.addTrack(TYPE_TIME, 0)
-	t.addBars(-1, bpm, beats, chords.num)
-	int dt = t.bar[0].length
-	t = audio.addTrack(TYPE_MIDI, 1)
+	song.newEmpty(sample_rate)
+	Track *t = song.addTrack(TYPE_TIME, 0)
+	for i in 0:chords.num
+		t.addBar(-1, bpm, beats, false)
+	int dt = t.bars[0].length
+	t = song.addTrack(TYPE_MIDI, 1)
 	Range r
 	r.offset = 0
 	r.length = dt

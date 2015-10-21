@@ -27,20 +27,20 @@ class MetronomeRenderer : AudioRenderer
 		// clear buffer
 		buf.r = 0
 		buf.l = 0
-		MidiData midi
+		MidiRawData midi
 		midi.samples = buf.num
-		synth.feed(midi)
 	
 		// render clicks
 		while offset < buf.num
 			if cur_beat == 0
-				synth.addMetronomeClick(offset, 0, volume)
+				midi.addMetronomeClick(offset, 0, volume)
 			else
-				synth.addMetronomeClick(offset, 1, volume)
+				midi.addMetronomeClick(offset, 1, volume)
 			cur_beat = loopi(cur_beat + 1, 0, num_beats - 1)
 			offset += sm_m
 		offset -= buf.num
 		
+		synth.feed(midi)
 		synth.read(buf)
 		return buf.num
 

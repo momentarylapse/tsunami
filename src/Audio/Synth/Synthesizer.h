@@ -36,8 +36,6 @@ public:
 	virtual int read(BufferBox &buf);
 
 	void feed(const MidiRawData &events);
-	void addMetronomeClick(int pos, int level, float volume);
-	void add(const MidiEvent &e);
 	void endAllNotes();
 	void resetMidiData();
 	void reset();

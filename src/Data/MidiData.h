@@ -50,6 +50,7 @@ public:
 	void sort();
 	void sanify(const Range &r);
 
+	void addMetronomeClick(int pos, int level, float volume);
 	void append(const MidiRawData &data);
 };
 

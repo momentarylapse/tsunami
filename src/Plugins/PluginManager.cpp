@@ -195,8 +195,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "onConfig", Script::mf(&Synthesizer::onConfig), &synth);
-	Script::LinkExternal("Synthesizer.addMetronomeClick", Script::mf(&Synthesizer::addMetronomeClick));
-	Script::LinkExternal("Synthesizer.add", Script::mf(&Synthesizer::add));
 	Script::LinkExternal("Synthesizer.feed", Script::mf(&Synthesizer::feed));
 	Script::LinkExternal("Synthesizer.setSampleRate", Script::mf(&Synthesizer::setSampleRate));
 	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
@@ -208,7 +206,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "reset", Script::mf(&SynthesizerRenderer::reset), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "getSampleRate", Script::mf(&SynthesizerRenderer::getSampleRate), &synthren);
-	Script::LinkExternal("SynthesizerRenderer.add", Script::mf(&SynthesizerRenderer::add));
 	Script::LinkExternal("SynthesizerRenderer.resetMidiData", Script::mf(&SynthesizerRenderer::resetMidiData));
 	Script::LinkExternal("SynthesizerRenderer.setAutoStop", Script::mf(&SynthesizerRenderer::setAutoStop));
 	Script::LinkExternal("SynthesizerRenderer.setSynthesizer", Script::mf(&SynthesizerRenderer::setSynthesizer));
@@ -248,6 +245,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("MidiRawData.getEvents", Script::mf(&MidiRawData::getEvents));
 	Script::LinkExternal("MidiRawData.getNotes", Script::mf(&MidiRawData::getNotes));
 	Script::LinkExternal("MidiRawData.getRange", Script::mf(&MidiRawData::getRange));
+	Script::LinkExternal("MidiRawData.addMetronomeClick", Script::mf(&MidiRawData::addMetronomeClick));
 
 	Script::DeclareClassSize("MidiData", sizeof(MidiNoteData));
 	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiNoteData, samples));

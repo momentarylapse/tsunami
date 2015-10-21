@@ -68,17 +68,6 @@ void Synthesizer::unlock()
 	locked = false;
 }
 
-void Synthesizer::addMetronomeClick(int pos, int level, float volume)
-{
-	if (level == 0){
-		add(MidiEvent(pos, 81, volume));
-		add(MidiEvent(pos+1, 81, 0));
-	}else{
-		add(MidiEvent(pos, 74, volume * 0.5f));
-		add(MidiEvent(pos+1, 74, 0));
-	}
-}
-
 
 // _events should be sorted...
 void Synthesizer::feed(const MidiRawData &_events)
@@ -86,7 +75,7 @@ void Synthesizer::feed(const MidiRawData &_events)
 	events.append(_events);
 }
 
-void Synthesizer::add(const MidiEvent &e)
+/*void Synthesizer::add(const MidiEvent &e)
 {
 	for (int i=events.num-1; i>=0; i--)
 		if (events[i].pos <= e.pos){
@@ -94,12 +83,15 @@ void Synthesizer::add(const MidiEvent &e)
 			return;
 		}
 	events.add(e);
-}
+}*/
 
 void Synthesizer::endAllNotes()
 {
+	MidiRawData midi;
 	foreach(int p, active_pitch)
-		add(MidiEvent(0, p, 0));
+		midi.add(MidiEvent(0, p, 0));
+	if (midi.num > 0)
+		feed(midi);
 }
 
 void Synthesizer::enablePitch(int pitch, bool enable)

@@ -41,13 +41,6 @@ int SynthesizerRenderer::getSampleRate()
 	return DEFAULT_SAMPLE_RATE;
 }
 
-
-void SynthesizerRenderer::add(const MidiEvent &e)
-{
-	if (s)
-		s->add(e);
-}
-
 void SynthesizerRenderer::feed(const MidiRawData &data)
 {
 	if (s)

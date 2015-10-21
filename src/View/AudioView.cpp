@@ -625,8 +625,10 @@ void AudioView::onLeftButtonDown()
 		midi_preview_renderer->setSynthesizer(cur_track->synth);
 
 		Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
+		MidiRawData midi;
 		foreach(int p, pitch)
-			midi_preview_renderer->add(MidiEvent(0, p, 1));
+			midi.add(MidiEvent(0, p, 1));
+		midi_preview_renderer->feed(midi);
 		midi_preview_stream->play();
 	}
 

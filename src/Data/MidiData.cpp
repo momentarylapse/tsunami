@@ -214,6 +214,17 @@ void MidiRawData::sanify(const Range &r)
 		add(MidiEvent(r.end(), p, 0));
 }
 
+void MidiRawData::addMetronomeClick(int pos, int level, float volume)
+{
+	if (level == 0){
+		add(MidiEvent(pos, 81, volume));
+		add(MidiEvent(pos+1, 81, 0));
+	}else{
+		add(MidiEvent(pos, 74, volume * 0.5f));
+		add(MidiEvent(pos+1, 74, 0));
+	}
+}
+
 void MidiRawData::append(const MidiRawData &data)
 {
 	foreach(MidiEvent &e, const_cast<MidiRawData&>(data))

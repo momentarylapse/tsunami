@@ -266,7 +266,7 @@ void AudioViewTrack::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, b
 	foreachi(MidiNote &n, notes, i){
 		if ((n.pitch < view->pitch_min) or (n.pitch >= view->pitch_max))
 			continue;
-		bool hover = ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (n.range.offset == view->hover.note_start));
+		bool hover = ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (n.range.offset == view->hover.note_start) and (n.pitch == view->hover.pitch));
 		if (as_reference){
 			drawMidiNote(c, n, STATE_REFERENCE);
 		}else{

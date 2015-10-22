@@ -26,7 +26,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	addGrid("!noexpandx,width=380,expandy", 0, 0, 2, 1, "root_grid0");
 	setTarget("root_grid0", 0);
 	addSeparator("!vertical,expandy", 0, 0, 0, 0, "");
-	addGrid("!expandx,expandy", 1, 0, 1, 3, "root_grid");
+	addGrid("!expandx,expandy,margin-right=5,margin-bottom=5", 1, 0, 1, 3, "root_grid");
 	setTarget("root_grid", 0);
 	addGrid("", 0, 0, 2, 1, "button_grid");
 	addSeparator("", 0, 1, 0, 0, "");

@@ -71,7 +71,7 @@ J Slider Plugin-Klasse
 J viele InputStream Objekte
 * AudioOutput -> AudioManager
 * mehr-Fenster-freundlich
-* bars in Song statt Track
+J bars in Song statt Track
 
 == bugs ==
 
@@ -91,7 +91,7 @@ j SelectionRange beim Abspielen
 == Version 0.7 ==
 
 J Englisch
-* klarere SideBar
+J klarere SideBar
 * besseres Takt-Editieren
 * Instrumente (midi)
 * interner Kurven-Editor

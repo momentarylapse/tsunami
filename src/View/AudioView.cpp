@@ -392,7 +392,7 @@ AudioView::SelectionType AudioView::getMouseOver()
 Range AudioView::getPlaybackSelection()
 {
 	if (sel_range.empty()){
-		int num = song->getRange().end() - sel_range.start();
+		int num = song->getRangeWithTime().end() - sel_range.start();
 		if (num <= 0)
 			num = song->sample_rate; // 1 second
 		return Range(sel_range.start(), num);

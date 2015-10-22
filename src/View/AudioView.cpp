@@ -96,11 +96,6 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) 
 	cam(this)
 {
 	win = parent;
-	thm.dirty = true;
-	thm.t = 0;
-	thm.render_area = rect(0, 0, 0, 0);
-	thm.animating = false;
-	thm.midi_track = NULL;
 
 	ColorSchemeBasic bright;
 	bright.background = White;

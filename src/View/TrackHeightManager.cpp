@@ -14,7 +14,7 @@ TrackHeightManager::TrackHeightManager()
 {
 	animating = false;
 	t = 0;
-	dirty = false;
+	dirty = true;
 	render_area = r_id;
 	midi_track = NULL;
 }
@@ -34,43 +34,58 @@ rect rect_inter(const rect &a, const rect &b, float t)
 			(1-t) * a.y2 + t * b.y2);
 }
 
+float smooth_parametrization(float t)
+{
+	if (t < 0.5f)
+		return 2*t*t;
+	return -2*t*t+4*t-1;
+}
+
 bool TrackHeightManager::update(AudioView *v, Song *a, const rect &r)
 {
 	Track *new_midi_track = (v->editingMidi() ? v->cur_track : NULL);
-	if ((dirty) or (render_area != r) or (midi_track != new_midi_track)){
+
+
+	// start animation?
+	if ((dirty) or (midi_track != new_midi_track)){
 		plan(v, a, r);
 		t = 0;
 		animating = true;
 		dirty = false;
+		midi_track = new_midi_track;
 
 		foreach(AudioViewTrack *v, v->vtrack)
 			v->area_last = v->area;
 	}
-	midi_track = new_midi_track;
+
+	if (render_area != r){
+		render_area = r;
+		plan(v, a, r);
+
+		// instant change?
+		if (!animating){
+			foreach(AudioViewTrack *v, v->vtrack)
+				v->area = v->area_target;
+		}
+	}
+
+	// force instant changes on x-axis
 	foreach(AudioViewTrack *v, v->vtrack){
 		v->area.x1 = v->area_target.x1 = v->area_last.x1 = r.x1;
 		v->area.x2 = v->area_target.x2 = v->area_last.x2 = r.x2;
 	}
 
-
-	if (render_area != r){
-		render_area = r;
-		foreach(AudioViewTrack *v, v->vtrack)
-			v->area = v->area_target;
-		animating = false;
-		t = 0;
-	}
-
 	if (!animating)
 		return false;
 
+	// do the animation
 	t += 0.07f;
 	if (t >= 1){
 		t = 1;
 		animating = false;
 	}
 	foreach(AudioViewTrack *v, v->vtrack)
-		v->area = rect_inter(v->area_last, v->area_target, (t < 0.5f) ? 2*t*t : -2*t*t+4*t-1);
+		v->area = rect_inter(v->area_last, v->area_target, smooth_parametrization(t));
 
 	return animating;
 }

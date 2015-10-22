@@ -56,7 +56,7 @@ Edit
 bbd_t_no_time_track
 no rhythm track found
 bbd_t_no_time_track_comment
-!wrap\\This track is not necessary for editing, but makes the metronome audible.
+!wrap\\This track is not necessary for editing.\nBut it makes the metronome audible.
 beat_partition
 4\\1\\256
 beats
@@ -421,9 +421,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_13756
+rand_id_107856
 
-rand_id_910725
+rand_id_3209
 
 rdt_capture
 Recording

@@ -1123,12 +1123,8 @@ void AudioView::drawBackground(HuiPainter *c, const rect &r)
 		c->setColor(cc);
 		c->drawRect(t->area);
 
-		if (t->track->type == Track::TYPE_TIME){
-			drawGridBars(c, t->area, cc, true);
-		}else{
-			drawGridTime(c, t->area, cc, false);
-			drawGridBars(c, t->area, cc, false);
-		}
+		drawGridTime(c, t->area, cc, false);
+		drawGridBars(c, t->area, cc, (t->track->type == Track::TYPE_TIME));
 
 		if ((t->track == cur_track) and (editingMidi())){
 			// pitch grid

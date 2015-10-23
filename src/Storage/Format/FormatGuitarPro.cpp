@@ -559,6 +559,7 @@ struct GuitarNote
 	Array<int> string;
 	void detune()
 	{
+		// sort ascending
 		for (int i=0; i<pitch.num; i++)
 			for (int j=i+1; j<pitch.num; j++)
 				if (pitch[i] >= pitch[j]){
@@ -568,16 +569,16 @@ struct GuitarNote
 				}
 
 		string.resize(pitch.num);
-		int prev = -1;
-		for (int n=0; n<pitch.num; n++){
-			for (int i=5; i>prev; i--){
+		int highest_available_string = 5;
+		for (int n=pitch.num-1; n>=0; n--){
+			for (int i=highest_available_string; i>=0; i--){
 				if (pitch[n] >= STD_TUNING[i]){
 					string[n] = i;
 					pitch[n] -= STD_TUNING[i];
+					highest_available_string = i-1;
 					break;
 				}
 			}
-			prev = string[n];
 		}
 	}
 };
@@ -638,14 +639,23 @@ void FormatGuitarPro::write_measure(Track *t, Bar &b)
 
 	int num = gnotes.num;
 	foreach(GuitarNote &n, gnotes)
-		if ((n.length == 20) or (n.length == 28))
+		if ((n.length == 5) or (n.length == 10) or (n.length == 20) or (n.length == 14) or (n.length == 28))
 			num ++;
 
 	f->WriteInt(num); // beats
 	foreach(GuitarNote &n, gnotes){
-		if (n.length == 20){
+		if (n.length == 5){
+			write_beat(n.pitch, n.string, 4);
+			write_beat(n.pitch, n.string, 1);
+		}else if (n.length == 10){
+			write_beat(n.pitch, n.string, 8);
+			write_beat(n.pitch, n.string, 2);
+		}else if (n.length == 20){
 			write_beat(n.pitch, n.string, 16);
 			write_beat(n.pitch, n.string, 4);
+		}else if (n.length == 14){
+			write_beat(n.pitch, n.string, 8);
+			write_beat(n.pitch, n.string, 6);
 		}else if (n.length == 28){
 			write_beat(n.pitch, n.string, 16);
 			write_beat(n.pitch, n.string, 12);

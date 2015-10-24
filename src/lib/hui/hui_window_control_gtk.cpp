@@ -529,6 +529,7 @@ HuiPainter *HuiPanel::beginDraw(const string &_id)
 		hui_drawing_context.height = gdk_window_get_height(gtk_widget_get_window(c->widget));
 		//hui_drawing_context.setFontSize(16);
 		hui_drawing_context.setFont("Sans", 16, false, false);
+		hui_drawing_context.mode_fill = true;
 	}
 	return &hui_drawing_context;
 }

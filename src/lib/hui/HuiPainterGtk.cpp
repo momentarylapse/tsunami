@@ -111,7 +111,11 @@ void HuiPainter::drawPolygon(Array<complex> &p)
 	for (int i=1; i<p.num; i++)
 		cairo_line_to(cr, p[i].x, p[i].y);
 	cairo_close_path(cr);
-	cairo_fill(cr);
+
+	if (mode_fill)
+		cairo_fill(cr);
+	else
+		cairo_stroke(cr);
 }
 
 void HuiPainter::drawStr(float x, float y, const string &str)
@@ -169,7 +173,11 @@ void HuiPainter::drawRect(float x, float y, float w, float h)
 	if (!cr)
 		return;
 	cairo_rectangle(cr, x, y, w, h);
-	cairo_fill(cr);
+
+	if (mode_fill)
+		cairo_fill(cr);
+	else
+		cairo_stroke(cr);
 }
 
 void HuiPainter::drawRect(const rect &r)
@@ -177,7 +185,11 @@ void HuiPainter::drawRect(const rect &r)
 	if (!cr)
 		return;
 	cairo_rectangle(cr, r.x1, r.y1, r.width(), r.height());
-	cairo_fill(cr);
+
+	if (mode_fill)
+		cairo_fill(cr);
+	else
+		cairo_stroke(cr);
 }
 
 void HuiPainter::drawCircle(float x, float y, float radius)
@@ -185,7 +197,11 @@ void HuiPainter::drawCircle(float x, float y, float radius)
 	if (!cr)
 		return;
 	cairo_arc(cr, x, y, radius, 0, 2 * pi);
-	cairo_fill(cr);
+
+	if (mode_fill)
+		cairo_fill(cr);
+	else
+		cairo_stroke(cr);
 }
 
 void HuiPainter::drawImage(float x, float y, const Image &image)
@@ -240,6 +256,11 @@ void HuiPainter::setAntialiasing(bool enabled)
 		cairo_set_antialias(cr, CAIRO_ANTIALIAS_DEFAULT);
 	else
 		cairo_set_antialias(cr, CAIRO_ANTIALIAS_NONE);
+}
+
+void HuiPainter::setFill(bool fill)
+{
+	mode_fill = fill;
 }
 
 #endif

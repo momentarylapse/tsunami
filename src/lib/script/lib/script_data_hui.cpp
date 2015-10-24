@@ -456,6 +456,8 @@ void SIAddPackageHui()
 			func_add_param("enabled",			TypeBool);
 		class_add_func("setFontSize",								TypeVoid,		mf(&HuiPainter::setFontSize));
 			func_add_param("size",			TypeFloat32);
+		class_add_func("setFill",								TypeVoid,		mf(&HuiPainter::setFill));
+			func_add_param("fill",			TypeBool);
 		class_add_func("clip",								TypeVoid,		mf(&HuiPainter::clip));
 			func_add_param("r",			TypeRect);
 		class_add_func("drawPoint",								TypeVoid,		mf(&HuiPainter::drawPoint));

@@ -25,7 +25,7 @@ j GP export
 * Kurven Ziel mitändern
 
 * Plugins
-  * Metronom-Animation
+  J Metronom-Animation
   J Pitcherkennung fix
 
 J Laden + Animation fix
@@ -96,3 +96,5 @@ J klarere SideBar
 * besseres Takt-Editieren
 * Instrumente (midi)
 * interner Kurven-Editor
+* Spur-Icons hover
+

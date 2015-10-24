@@ -12,17 +12,29 @@ class MetronomeRenderer : AudioRenderer
 	DummySynthesizer synth
 	int offset
 	int cur_beat
+	Window* win
+	float fraction
+	int sm_m
 	
-	void __init__()
+	void __init__(Window* w, float _bpm, int _beats)
+		win = w
+		freq = 880.0
+		length = 0.02
+		volume = 1
+		bpm = _bpm
+		num_beats = _beats
 		//synth.setSampleRate(getSampleRate())
 		synth.resetState()
 
 		offset = 0
 		cur_beat = 0
+		fraction = 0
+		float dt_m = 60.0 / bpm
+		sm_m = dt_m * synth.sample_rate
 
 	overwrite int read(BufferBox buf)
 		float dt_m = 60.0 / bpm
-		int sm_m = dt_m * synth.sample_rate
+		sm_m = dt_m * synth.sample_rate
 	
 		// clear buffer
 		buf.r = 0
@@ -40,18 +52,30 @@ class MetronomeRenderer : AudioRenderer
 			offset += sm_m
 		offset -= buf.num
 		
+		fraction = 1 - i2f(offset) / i2f(sm_m)
+		
 		synth.feed(midi)
 		synth.read(buf)
+		win.redraw("area")
 		return buf.num
+	
+	void setBpm(float bpm_new)
+		bpm = bpm_new
+		
+		float dt_m = 60.0 / bpm
+		sm_m = dt_m * synth.sample_rate
+		
+		offset = (1 - fraction) * sm_m
 
 class MetronomeDialog : Dialog
 	OutputStream *stream
 	MetronomeRenderer *renderer
 	
 	void __init__(Window *parent)
-		super.__init__("Metronome", 200, 80, parent, false)
+		super.__init__("Metronome", 300, 250, parent, false)
 		fromSource("
-Grid ? '' 1 2
+Grid ? '' 1 3
+	DrawingArea area ''
 	Grid ? '' 3 2
 		Text ? 'Speed'
 		SpinButton bpm '0\\1' expandx
@@ -62,13 +86,8 @@ Grid ? '' 1 2
 	Grid ? '' 2 1 buttonbar
 		Button close 'Close' image=hui:close")
 	
-		renderer = new MetronomeRenderer
+		renderer = new MetronomeRenderer(self, 90, 4)
 	
-		renderer.freq = 880.0
-		renderer.length = 0.02
-		renderer.volume = 1
-		renderer.bpm = 90.0
-		renderer.num_beats = 4
 		setFloat("bpm", renderer.bpm)
 	
 		event("hui:close", &onClose)
@@ -77,20 +96,54 @@ Grid ? '' 1 2
 		event("num_beats", &onNumBeats)
 	
 		stream = new OutputStream(renderer)
+		stream.setBufferSize(1024)
 		stream.play()
 	
 	virtual void __delete__()
 		delete stream
 		delete renderer
+	
+	overwrite void onDraw()
+		Painter *p = beginDraw("area")
+		float w = p.width
+		float h = p.height
+		float x0 = w / 2
+		float y0 = h / 2
+		float r = min(x0, y0) * 0.9
+		
+		// background
+		p.setColor(view.colors.background)
+		p.drawRect(0, 0, w, h)
+		
+		// circle
+		p.setColor(ColorInterpolate(view.colors.grid, view.colors.background, 0.5))
+		p.setFill(false)
+		p.drawCircle(x0, y0, r)
+		
+		// top point
+		p.setFill(true)
+		p.setColor(view.colors.text_soft3)
+		p.drawCircle(x0, y0 - r, 5)
+		
+		// moving point
+		p.setColor(view.colors.text)
+		float t = renderer.fraction - 0.5
+		float phi = 2 *pi * (2*t*t*t + t/2)
+		p.drawCircle(x0 - sin(phi) * r, y0 + cos(phi) * r, 5)
+		
+		// beat number
+		int n = loopi(renderer.cur_beat - 1, 0, renderer.num_beats - 1) + 1
+		p.drawStr(x0-7, y0-11, n)
+		
+		p.end()
 
 	void onBpm()
-		renderer.bpm = getFloat("")
+		renderer.setBpm(getFloat(""))
 
 	void onNumBeats()
 		renderer.num_beats = getInt("")
-		renderer.cur_beat = 0
-		renderer.offset = 0
-		stream.play()
+		//renderer.cur_beat = 0
+		//renderer.offset = 0
 
 	void onClose()
 		delete self

@@ -857,16 +857,6 @@ void AudioView::updateBufferZoom()
 		}
 }
 
-void DrawStrBg(HuiPainter *c, float x, float y, const string &str, const color &fg, const color &bg)
-{
-	color bg2 = bg;
-	bg2.a = 0.6f;
-	c->setColor(bg2);
-	c->drawRect(x, y, c->getStrWidth(str), AudioView::FONT_SIZE * 1.5f);
-	c->setColor(fg);
-	c->drawStr(x, y, str);
-}
-
 int AudioView::y2pitch(int y)
 {
 	int ti = cur_track->get_index();

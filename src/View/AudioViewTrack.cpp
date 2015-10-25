@@ -315,8 +315,7 @@ void AudioViewTrack::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, b
 
 void AudioViewTrack::draw(HuiPainter *c, int track_no)
 {
-	msg_db_f("DrawTrack", 1);
-
+	// midi
 	if ((view->cur_track == track) and (view->editingMidi())){
 		if ((reference_track >= 0) and (reference_track < track->song->tracks.num))
 			drawMidiEditable(c, track->song->tracks[reference_track]->midi, true);
@@ -325,11 +324,13 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 		drawMidi(c, track->midi, 0);
 	}
 
+	// audio buffer
 	drawTrackBuffers(c, view->cam.pos);
 
 	foreach(SampleRef *s, track->samples)
 		drawSample(c, s);
 
+	// marker
 	marker_areas.resize(track->markers.num);
 	foreachi(TrackMarker &m, track->markers, i)
 		drawMarker(c, m, i);
@@ -339,12 +340,19 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 		c->drawRect(0, area.y1, view->TRACK_HANDLE_WIDTH, area.height());
 	}
 
-	//c->setColor((track_no == a->CurTrack) ? Black : ColorWaveCur);
-//	c->setColor(ColorWaveCur);
+	// track title
 	c->setFont("", -1, (track == view->cur_track), false);
-	DrawStrBg(c, area.x1 + 23, area.y1 + 3, track->getNiceName(), view->colors.text, view->colors.background_track);
+	c->setFill(false);
+	c->setLineWidth(3);
+	c->setColor(view->colors.background_track);
+	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName());
+	c->setFill(true);
+	c->setLineWidth(1);
+	c->setColor(view->colors.text);
+	c->drawStr(area.x1 + 23, area.y1 + 3, track->getNiceName());
 	c->setFont("", -1, false, false);
 
+	// icons
 	if (track->type == track->TYPE_TIME)
 		c->drawMaskImage(area.x1 + 5, area.y1 + 5, view->image_track_time);
 	else if (track->type == track->TYPE_MIDI)

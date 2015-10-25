@@ -137,7 +137,12 @@ void HuiPainter::drawStr(float x, float y, const string &str)
 	//pango_font_description_set_size(desc, 10);//cur_font_size);
 	pango_layout_set_font_description(layout, desc);
 	pango_font_description_free(desc);
-	pango_cairo_show_layout(cr, layout);
+	if (mode_fill){
+		pango_cairo_show_layout(cr, layout);
+	}else{
+		pango_cairo_layout_path(cr, layout);
+		cairo_stroke(cr);
+	}
 	g_object_unref(layout);
 
 	//cairo_show_text(cr, str);

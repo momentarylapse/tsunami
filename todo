@@ -86,7 +86,7 @@ J Selektionseinrasten
 j SelectionRange beim Abspielen
 * Änderungen beim Abspielen
 ~ freeze beim Midi Editieren
-* Animation zum MidiEditor
+J Animation zum MidiEditor
 
 
 == Version 0.7 ==
@@ -96,5 +96,9 @@ J klarere SideBar
 * besseres Takt-Editieren
 * Instrumente (midi)
 * interner Kurven-Editor
-* Spur-Icons hover
+J Spur-Icons hover
+
+== Wunschliste ==
+
+* Aufnahme-Metronom (grafisch + Vorlauf)
 

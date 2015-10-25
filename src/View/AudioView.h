@@ -222,8 +222,14 @@ public:
 	PeakThread *peak_thread;
 	bool is_updating_peaks;
 
-	Image image_muted, image_unmuted, image_solo;
-	Image image_track_audio, image_track_time, image_track_midi;
+	struct ImageData
+	{
+		Image *speaker, *x, *solo;
+		Image *speaker_bg, *x_bg, *solo_bg;
+		Image *track_audio, *track_time, *track_midi;
+		Image *track_audio_bg, *track_time_bg, *track_midi_bg;
+	};
+	ImageData images;
 
 	HuiMenu *menu_track;
 	HuiMenu *menu_sample;

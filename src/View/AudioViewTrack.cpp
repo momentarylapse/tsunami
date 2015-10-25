@@ -335,7 +335,7 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 	foreachi(TrackMarker &m, track->markers, i)
 		drawMarker(c, m, i);
 
-	if ((view->hover.track == track) and (view->mx < view->TRACK_HANDLE_WIDTH)){
+	if (view->hover.show_track_controls == track){
 		c->setColor(color(0.4f, 1, 1, 1));
 		c->drawRect(0, area.y1, view->TRACK_HANDLE_WIDTH, area.height());
 	}
@@ -353,17 +353,44 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 	c->setFont("", -1, false, false);
 
 	// icons
-	if (track->type == track->TYPE_TIME)
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, view->image_track_time);
-	else if (track->type == track->TYPE_MIDI)
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, view->image_track_midi);
-	else
-		c->drawMaskImage(area.x1 + 5, area.y1 + 5, view->image_track_audio);
+	if (track->type == track->TYPE_TIME){
+		c->setColor(view->colors.background_track);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time_bg);
+		c->setColor(view->colors.text);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_time);
+	}else if (track->type == track->TYPE_MIDI){
+		c->setColor(view->colors.background_track);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi_bg);
+		c->setColor(view->colors.text);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_midi);
+	}else{
+		c->setColor(view->colors.background_track);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio_bg);
+		c->setColor(view->colors.text);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, *view->images.track_audio);
+	}
 
-	if ((track->muted) or (view->hover.show_track_controls == track))
-		c->drawMaskImage(area.x1 + 5, area.y1 + 22, track->muted ? view->image_muted : view->image_unmuted);
-	if ((view->song->tracks.num > 1) and (view->hover.show_track_controls == track))
-		c->drawMaskImage(area.x1 + 22, area.y1 + 22, view->image_solo);
+	c->setColor(view->colors.text);
+	if ((track->muted) or (view->hover.show_track_controls == track)){
+		c->setColor(view->colors.background_track);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker_bg);
+		if (track->muted)
+			c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.x_bg);
+		c->setColor(view->colors.text);
+		if (view->hover.type == view->SEL_TYPE_MUTE)
+			c->setColor(view->colors.text_soft2);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
+		if (track->muted)
+			c->drawImage(area.x1 + 5, area.y1 + 22, *view->images.x);
+	}
+	if ((view->song->tracks.num > 1) and (view->hover.show_track_controls == track)){
+		c->setColor(view->colors.background_track);
+		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo_bg);
+		c->setColor(view->colors.text);
+		if (view->hover.type == view->SEL_TYPE_SOLO)
+			c->setColor(view->colors.text_soft2);
+		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
+	}
 }
 
 

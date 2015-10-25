@@ -90,6 +90,28 @@ public:
 	}
 };
 
+Image *ExpandImage(Image *im, float d)
+{
+	Image *r = new Image(im->width, im->height, Black);
+	for (int x=0; x<r->width; x++)
+		for (int y=0; y<r->height; y++){
+			float a = 0;
+			for (int i=0; i<r->width; i++)
+				for (int j=0; j<r->height; j++){
+					float dd = sqrt(pow(i-x, 2) + pow(j-y, 2));
+					if (dd > d+0.5f)
+						continue;
+					float aa = im->getPixel(i, j).a;
+					if (dd > d-0.5f)
+						aa *= (d + 0.5f - dd);
+					if (aa > a)
+						a = aa;
+				}
+			r->setPixel(x, y, color(a, 0, 0, 0));
+		}
+	return r;
+}
+
 AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) :
 	Observer("AudioView"),
 	Observable("AudioView"),
@@ -130,12 +152,18 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) 
 	peak_mode = HuiConfig.getInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
 	antialiasing = HuiConfig.getBool("View.Antialiasing", false);
 
-	image_unmuted.load(HuiAppDirectoryStatic + "Data/volume.tga");
-	image_muted.load(HuiAppDirectoryStatic + "Data/mute.tga");
-	image_solo.load(HuiAppDirectoryStatic + "Data/solo.tga");
-	image_track_audio.load(HuiAppDirectoryStatic + "Data/track-audio.tga");
-	image_track_time.load(HuiAppDirectoryStatic + "Data/track-time.tga");
-	image_track_midi.load(HuiAppDirectoryStatic + "Data/track-midi.tga");
+	images.speaker = LoadImage(HuiAppDirectoryStatic + "Data/volume.tga");
+	images.speaker_bg = ExpandImage(images.speaker, 1.5f);
+	images.x = LoadImage(HuiAppDirectoryStatic + "Data/x.tga");
+	images.x_bg = ExpandImage(images.x, 1.5f);
+	images.solo = LoadImage(HuiAppDirectoryStatic + "Data/solo.tga");
+	images.solo_bg = ExpandImage(images.solo, 1.5f);
+	images.track_audio = LoadImage(HuiAppDirectoryStatic + "Data/track-audio.tga");
+	images.track_audio_bg = ExpandImage(images.track_audio, 1.5f);
+	images.track_time = LoadImage(HuiAppDirectoryStatic + "Data/track-time.tga");
+	images.track_time_bg = ExpandImage(images.track_time, 1.5f);
+	images.track_midi = LoadImage(HuiAppDirectoryStatic + "Data/track-midi.tga");
+	images.track_midi_bg = ExpandImage(images.track_midi, 1.5f);
 
 	mouse_possibly_selecting = -1;
 	cur_action = NULL;
@@ -211,6 +239,19 @@ AudioView::~AudioView()
 	delete(renderer);
 	delete(midi_preview_stream);
 	delete(midi_preview_renderer);
+
+	delete(images.speaker);
+	delete(images.speaker_bg);
+	delete(images.x);
+	delete(images.x_bg);
+	delete(images.solo);
+	delete(images.solo_bg);
+	delete(images.track_audio);
+	delete(images.track_audio_bg);
+	delete(images.track_midi);
+	delete(images.track_midi_bg);
+	delete(images.track_time);
+	delete(images.track_time_bg);
 
 	HuiConfig.setBool("View.Mono", show_mono);
 	HuiConfig.setInt("View.DetailSteps", detail_steps);

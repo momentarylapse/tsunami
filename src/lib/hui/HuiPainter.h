@@ -44,6 +44,7 @@ class HuiPainter
 	void _cdecl drawStr(float x, float y, const string &str);
 	float _cdecl getStrWidth(const string &str);
 	void _cdecl drawImage(float x, float y, const Image &image);
+	void _cdecl drawMaskImage(float x, float y, const Image &image);
 	int width, height;
 };
 

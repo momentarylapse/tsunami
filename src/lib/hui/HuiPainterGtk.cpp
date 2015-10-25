@@ -218,11 +218,27 @@ void HuiPainter::drawImage(float x, float y, const Image &image)
                                                          image.height,
 	    image.width * 4);
 
-	cairo_set_source_surface (cr, img, x, y);
+	cairo_set_source_surface(cr, img, x, y);
 	cairo_paint(cr);
 	cairo_surface_destroy(img);
 	cairo_set_source(cr, p);
 	cairo_pattern_destroy(p);
+#endif
+}
+
+void HuiPainter::drawMaskImage(float x, float y, const Image &image)
+{
+#ifdef _X_USE_IMAGE_
+	if (!cr)
+		return;
+	image.setMode(Image::ModeBGRA);
+	cairo_surface_t *img = cairo_image_surface_create_for_data((unsigned char*)image.data.data,
+                                                         CAIRO_FORMAT_ARGB32,
+                                                         image.width,
+                                                         image.height,
+	    image.width * 4);
+
+	cairo_mask_surface(cr, img, x, y);
 #endif
 }
 

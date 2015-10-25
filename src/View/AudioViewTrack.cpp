@@ -346,16 +346,16 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 	c->setFont("", -1, false, false);
 
 	if (track->type == track->TYPE_TIME)
-		c->drawImage(area.x1 + 5, area.y1 + 5, view->image_track_time);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, view->image_track_time);
 	else if (track->type == track->TYPE_MIDI)
-		c->drawImage(area.x1 + 5, area.y1 + 5, view->image_track_midi);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, view->image_track_midi);
 	else
-		c->drawImage(area.x1 + 5, area.y1 + 5, view->image_track_audio);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 5, view->image_track_audio);
 
 	if ((track->muted) or (view->hover.show_track_controls == track))
-		c->drawImage(area.x1 + 5, area.y1 + 22, track->muted ? view->image_muted : view->image_unmuted);
+		c->drawMaskImage(area.x1 + 5, area.y1 + 22, track->muted ? view->image_muted : view->image_unmuted);
 	if ((view->song->tracks.num > 1) and (view->hover.show_track_controls == track))
-		c->drawImage(area.x1 + 22, area.y1 + 22, view->image_solo);
+		c->drawMaskImage(area.x1 + 22, area.y1 + 22, view->image_solo);
 }
 
 

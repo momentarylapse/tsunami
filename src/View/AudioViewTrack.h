@@ -39,7 +39,7 @@ public:
 	void drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(HuiPainter *c, SampleRef *s);
-	void drawMarker(HuiPainter *c, const TrackMarker &marker, int index);
+	void drawMarker(HuiPainter *c, const TrackMarker &marker, int index, bool hover);
 	void drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift);
 	void drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, bool as_reference);
 	void drawMidiNote(HuiPainter *c, const MidiNote &n, MidiNoteState state);

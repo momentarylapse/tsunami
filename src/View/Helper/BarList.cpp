@@ -259,15 +259,17 @@ public:
 		apply_to_midi = _apply_to_midi;
 
 		setInt("count", 1);
-		setInt("beats", 4);
-		setFloat("bpm", 90.0f);
+		int beats = 4;
+		float bpm = 90.0f;
 		if (song->bars.num > 0){
-			BarPattern &b = song->bars.back();
-			if (index >= 0)
-				b = song->bars[index];
-			setInt("beats", b.num_beats);
-			setFloat("bpm", song->sample_rate * 60.0f / (b.length / b.num_beats));
+			foreachi(BarPattern &b, song->bars, i)
+				if ((i <= index) and (b.num_beats > 0)){
+					beats = b.num_beats;
+					bpm = song->sample_rate * 60.0f / (b.length / b.num_beats);
+				}
 		}
+		setInt("beats", beats);
+		setFloat("bpm", bpm);
 
 		event("ok", this, &BarAddDialog::onOk);
 		event("cancel", this, &BarAddDialog::onClose);

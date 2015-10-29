@@ -35,12 +35,15 @@ class Metronome : AudioEffect
 		int sm_m = dt_m * a.sample_rate
 	
 		synth.setSampleRate(a.sample_rate)
+		
+		MidiRawData midi
+		midi.samples = buf.num
 
 		while true
 			if state.beat == 0
-				synth.addMetronomeClick(state.dpos, 0, config.Volume)
+				midi.addMetronomeClick(state.dpos, 0, config.Volume)
 			else
-				synth.addMetronomeClick(state.dpos, 1, config.Volume)
+				midi.addMetronomeClick(state.dpos, 1, config.Volume)
 		
 			state.beat ++
 			if state.beat >= config.BeatsPerMeasure
@@ -49,6 +52,7 @@ class Metronome : AudioEffect
 			if state.dpos >= buf.num
 				state.dpos -= buf.num
 				break
+		synth.feed(midi)
 		synth.read(buf)
 		
 	overwrite ConfigPanel *createPanel()

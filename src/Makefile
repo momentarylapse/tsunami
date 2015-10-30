@@ -235,7 +235,6 @@ OBJ = \
  View/Dialog/RecordDialog.o\
  View/Dialog/SettingsDialog.o\
  View/Dialog/ConfigurableSelectorDialog.o\
- View/Helper/BarList.o\
  View/Helper/PeakMeter.o\
  View/Helper/Progress.o\
  View/Helper/Slider.o\
@@ -959,9 +958,6 @@ View/Dialog/SettingsDialog.o : View/Dialog/SettingsDialog.cpp
 
 View/Dialog/ConfigurableSelectorDialog.o : View/Dialog/ConfigurableSelectorDialog.cpp
 	$(CPP) -c View/Dialog/ConfigurableSelectorDialog.cpp -o $@ $(CXXFLAGS)
-
-View/Helper/BarList.o : View/Helper/BarList.cpp
-	$(CPP) -c View/Helper/BarList.cpp -o $@ $(CXXFLAGS)
 
 View/Helper/PeakMeter.o : View/Helper/PeakMeter.cpp
 	$(CPP) -c View/Helper/PeakMeter.cpp -o $@ $(CXXFLAGS)

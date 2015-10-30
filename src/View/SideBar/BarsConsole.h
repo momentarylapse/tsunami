@@ -22,15 +22,31 @@ public:
 	virtual ~BarsConsole();
 
 	void updateMessage();
-
 	void onCreateTimeTrack();
+
+	void fillList();
+	void onList();
+	void onListSelect();
+	void onListEdit();
+	void onAdd();
+	void onAddPause();
+	void onDelete();
+	void onEdit();
+
+	void addNewBar();
+	void executeBarDialog(int index);
+
+	void selectToView();
+	void selectFromView();
 
 	void onEditSong();
 
 	virtual void onUpdate(Observable *o, const string &message);
 
 	Song *song;
-	BarList *bar_list;
+	string id;
+	string id_add, id_add_pause, id_delete, id_edit, id_link;
+	AudioView *view;
 };
 
 #endif /* BARSCONSOLE_H_ */

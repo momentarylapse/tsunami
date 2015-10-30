@@ -335,7 +335,8 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 	// marker
 	marker_areas.resize(track->markers.num);
 	foreachi(TrackMarker &m, track->markers, i)
-		drawMarker(c, m, i, (view->hover.type == view->SEL_TYPE_MARKER) and (view->hover.track == track) and (view->hover.index == i));
+		if (!m.text.match(":*:"))
+			drawMarker(c, m, i, (view->hover.type == view->SEL_TYPE_MARKER) and (view->hover.track == track) and (view->hover.index == i));
 
 	if (view->hover.show_track_controls == track){
 		c->setColor(color(0.4f, 1, 1, 1));

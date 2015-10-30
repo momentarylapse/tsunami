@@ -11,6 +11,7 @@
 
 #include "SideBar.h"
 #include "../../Stuff/Observer.h"
+#include "../../Data/Range.h"
 class BarList;
 class Song;
 class AudioView;
@@ -32,12 +33,13 @@ public:
 	void onAddPause();
 	void onDelete();
 	void onEdit();
+	void onScale();
 
 	void addNewBar();
-	void executeBarDialog(int index);
 
 	void selectToView();
 	void selectFromView();
+	void performScale();
 
 	void onEditSong();
 
@@ -45,8 +47,13 @@ public:
 
 	Song *song;
 	string id;
-	string id_add, id_add_pause, id_delete, id_edit, id_link;
+	string id_add, id_add_pause, id_delete, id_edit, id_scale, id_link;
 	AudioView *view;
+
+	bool scaling;
+	bool scaling_change;
+	Array<int> scaling_sel;
+	Range scaling_range_orig;
 };
 
 #endif /* BARSCONSOLE_H_ */

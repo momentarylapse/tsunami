@@ -56,6 +56,7 @@ public:
 	static const string MESSAGE_SETTINGS_CHANGE;
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
+	static const string MESSAGE_MOUSE_UP;
 
 	void setShowMono(bool mono);
 	void setPeaksMode(int mode);

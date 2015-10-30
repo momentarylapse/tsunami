@@ -54,6 +54,7 @@ const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
+const string AudioView::MESSAGE_MOUSE_UP = "MouseUp";
 
 AudioView::SelectionType::SelectionType()
 {
@@ -753,6 +754,8 @@ void AudioView::onLeftButtonUp()
 		midi_preview_renderer->endAllNotes();
 	}
 	cur_action = NULL;
+
+	notify(MESSAGE_MOUSE_UP);
 
 	// TODO !!!!!!!!
 	selection.type = SEL_TYPE_NONE;

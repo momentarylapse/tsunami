@@ -7,6 +7,8 @@
 
 #include "../../Data/Song.h"
 #include "../AudioView.h"
+#include "../Dialog/BarAddDialog.h"
+#include "../Dialog/BarEditDialog.h"
 #include "BarsConsole.h"
 
 BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
@@ -23,9 +25,16 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	id_add_pause = "add_bar_pause";
 	id_delete = "delete_bar";
 	id_edit = "edit_selected_bars";
+	id_scale = "scale_selected_bars";
 	id_link = "link_to_midi";
 
-	song = _song;
+	setTooltip(id_add, _("neue Takte einf&ugen"));
+	setTooltip(id_add_pause, _("Pause einf&ugen"));
+	setTooltip(id_delete, _("markierte Takte l&oschen"));
+	setTooltip(id_edit, _("markierte Takte editieren"));
+	setTooltip(id_scale, _("markierte Takte skalieren (durch Ziehen der Markierung links)"));
+
+	scaling = false;
 
 	check(id_link, true);
 	enable(id, true);
@@ -40,8 +49,10 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	event(id_add_pause, this, &BarsConsole::onAddPause);
 	event(id_delete, this, &BarsConsole::onDelete);
 	event(id_edit, this, &BarsConsole::onEdit);
+	event(id_scale, this, &BarsConsole::onScale);
 
 	subscribe(view, view->MESSAGE_SELECTION_CHANGE);
+	subscribe(view, view->MESSAGE_MOUSE_UP);
 	subscribe(song, song->MESSAGE_EDIT_BARS);
 	subscribe(song, song->MESSAGE_NEW);
 	subscribe(song, song->MESSAGE_ADD_TRACK);
@@ -99,8 +110,7 @@ void BarsConsole::fillList()
 void BarsConsole::onList()
 {
 	int s = getInt(id);
-	if (s >= 0)
-		executeBarDialog(s);
+	if (s >= 0){}
 }
 
 
@@ -109,6 +119,7 @@ void BarsConsole::onListSelect()
 	Array<int> s = getSelection(id);
 	enable(id_delete, s.num > 0);
 	enable(id_edit, s.num > 0);
+	enable(id_scale, s.num > 0);
 
 	selectToView();
 }
@@ -219,121 +230,34 @@ void BarsConsole::onDelete()
 	song->action_manager->endActionGroup();
 }
 
-class BarEditDialog : public HuiDialog
-{
-public:
-	Song *song;
-	Array<int> sel;
-	bool apply_to_midi;
-
-	BarEditDialog(HuiWindow *root, Song *_song, Array<int> &_s, bool _apply_to_midi):
-		HuiDialog("", 100, 100, root, false)
-	{
-		fromResource("bar_edit_dialog");
-		song = _song;
-		sel = _s;
-		apply_to_midi = _apply_to_midi;
-
-		BarPattern &b = song->bars[sel[0]];
-		setInt("beats", b.num_beats);
-		setFloat("bpm", song->sample_rate * 60.0f / (b.length / b.num_beats));
-		check("edit_bpm", true);
-
-		event("ok", this, &BarEditDialog::onOk);
-		event("cancel", this, &BarEditDialog::onClose);
-		event("hui:close", this, &BarEditDialog::onClose);
-	}
-
-	void onOk()
-	{
-		int beats = getInt("beats");
-		float bpm = getFloat("bpm");
-		bool edit_beats = isChecked("edit_beats");
-		bool edit_bpm = isChecked("edit_bpm");
-		song->action_manager->beginActionGroup();
-		foreachb(int i, sel){
-			BarPattern b = song->bars[i];
-			if (edit_beats)
-				b.num_beats = beats;
-			if (edit_bpm)
-				b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
-			song->editBar(i, b, apply_to_midi);
-		}
-		song->action_manager->endActionGroup();
-
-		delete(this);
-	}
-
-	void onClose()
-	{
-		delete(this);
-	}
-};
-
-class BarAddDialog : public HuiDialog
-{
-public:
-	Song *song;
-	int index;
-	bool apply_to_midi;
-
-	BarAddDialog(HuiWindow *root, Song *_s, int _index, bool _apply_to_midi):
-		HuiDialog("", 100, 100, root, false)
-	{
-		fromResource("bar_add_dialog");
-		song = _s;
-		index = _index;
-		apply_to_midi = _apply_to_midi;
-
-		setInt("count", 1);
-		int beats = 4;
-		float bpm = 90.0f;
-		if (song->bars.num > 0){
-			foreachi(BarPattern &b, song->bars, i)
-				if ((i <= index) and (b.num_beats > 0)){
-					beats = b.num_beats;
-					bpm = song->sample_rate * 60.0f / (b.length / b.num_beats);
-				}
-		}
-		setInt("beats", beats);
-		setFloat("bpm", bpm);
-
-		event("ok", this, &BarAddDialog::onOk);
-		event("cancel", this, &BarAddDialog::onClose);
-		event("hui:close", this, &BarAddDialog::onClose);
-	}
-
-	void onOk()
-	{
-		int count = getInt("count");
-		int beats = getInt("beats");
-		float bpm = getFloat("bpm");
-		song->action_manager->beginActionGroup();
-
-
-		for (int i=0; i<count; i++)
-			song->addBar(index, bpm, beats, apply_to_midi);
-		song->action_manager->endActionGroup();
-
-		delete(this);
-	}
-
-	void onClose()
-	{
-		delete(this);
-	}
-};
-
 void BarsConsole::onEdit()
 {
 	Array<int> s = getSelection(id);
 
 	HuiDialog *dlg = new BarEditDialog(win, song, s, isChecked(id_link));
 	dlg->show();
+}
 
-	fillList();
-	setSelection(id, s);
-	selectToView();
+void BarsConsole::onScale()
+{
+	scaling = true;
+	scaling_change = false;
+	scaling_sel = getSelection(id);
+	scaling_range_orig = view->sel_range;
+}
+
+void BarsConsole::performScale()
+{
+	scaling = false;
+	float factor = (float)view->sel_range.num / (float)scaling_range_orig.num;
+
+	song->action_manager->beginActionGroup();
+	foreachb(int i, scaling_sel){
+		BarPattern b = song->bars[i];
+		b.length *= factor;
+		song->editBar(i, b, isChecked(id_link));
+	}
+	song->action_manager->endActionGroup();
 }
 
 void BarsConsole::addNewBar()
@@ -343,11 +267,6 @@ void BarsConsole::addNewBar()
 
 	HuiDialog *dlg = new BarAddDialog(win, song, s, isChecked(id_link));
 	dlg->show();
-}
-
-void BarsConsole::executeBarDialog(int index)
-{
-	msg_db_f("executeBarDialog", 1);
 }
 
 void BarsConsole::selectFromView()
@@ -363,15 +282,23 @@ void BarsConsole::selectFromView()
 	setSelection(id, s);
 	enable(id_delete, s.num > 0);
 	enable(id_edit, s.num > 0);
+	enable(id_scale, s.num > 0);
 }
 
 
 
 void BarsConsole::onUpdate(Observable *o, const string &message)
 {
-	if (o == view)
-		selectFromView();
-	else if (o == song)
+	if (o == view){
+		if (scaling){
+			if (message == view->MESSAGE_SELECTION_CHANGE)
+				scaling_change = true;
+			if (message == view->MESSAGE_MOUSE_UP)
+				performScale();
+		}else
+			selectFromView();
+	}else if (o == song){
 		fillList();
+	}
 	updateMessage();
 }

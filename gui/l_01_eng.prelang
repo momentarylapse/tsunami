@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-275
+276
 // Data (ID,Text)
 about
 Info
@@ -421,9 +421,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_107856
+rand_id_814409
 
-rand_id_3209
+rand_id_98562
 
 rdt_capture
 Recording
@@ -475,6 +475,8 @@ save
 Save
 save_as
 Save as...
+scale_selected_bars
+!flat\\
 select_all
 Select all
 select_nothing
@@ -554,7 +556,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-145
+150
 // Data (ID,Text)
 
 
@@ -723,7 +725,7 @@ Midi
 Midi Fx
 Midi Fx
 MidiEffekt nicht ladbar: \"%s\"
-
+Can not load MidiEffect: \"%s\"
 Mischpult
 Mixing console
 Moll
@@ -740,6 +742,8 @@ Parameter laden
 Load parameter
 Parameter speichern
 Save parameter
+Pause einfügen
+add pause
 Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'
 Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
@@ -820,10 +824,18 @@ lade
 loading
 löschen
 delete
+markierte Takte editieren
+edit selected bars
+markierte Takte löschen
+delete selected bars
+markierte Takte skalieren (durch Ziehen der Markierung links)
+scale selected bars (by moving the selection on the left)
 message.txt öffnen
 open message.txt
 neue Audiodatei
 new audio file
+neue Takte einfügen
+add new bars
 neuen Effekt hinzufügen
 add new effect
 neuen Namen eingeben

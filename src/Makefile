@@ -229,6 +229,8 @@ OBJ = \
  View/BottomBar/LogDialog.o\
  View/BottomBar/MiniBar.o\
  View/BottomBar/MixingConsole.o\
+ View/Dialog/BarAddDialog.o\
+ View/Dialog/BarEditDialog.o\
  View/Dialog/CaptureDialog.o\
  View/Dialog/MarkerDialog.o\
  View/Dialog/NewDialog.o\
@@ -940,6 +942,12 @@ View/BottomBar/MiniBar.o : View/BottomBar/MiniBar.cpp
 
 View/BottomBar/MixingConsole.o : View/BottomBar/MixingConsole.cpp
 	$(CPP) -c View/BottomBar/MixingConsole.cpp -o $@ $(CXXFLAGS)
+
+View/Dialog/BarAddDialog.o : View/Dialog/BarAddDialog.cpp
+	$(CPP) -c View/Dialog/BarAddDialog.cpp -o $@ $(CXXFLAGS)
+
+View/Dialog/BarEditDialog.o : View/Dialog/BarEditDialog.cpp
+	$(CPP) -c View/Dialog/BarEditDialog.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/CaptureDialog.o : View/Dialog/CaptureDialog.cpp
 	$(CPP) -c View/Dialog/CaptureDialog.cpp -o $@ $(CXXFLAGS)

@@ -6,9 +6,6 @@
  */
 
 #include "FormatSoundFont2.h"
-#include "../../Tsunami.h"
-#include "../../Stuff/Log.h"
-#include "../../View/Helper/Progress.h"
 
 FormatSoundFont2::FormatSoundFont2() :
 	Format("SoundFont2", "sf2", FLAG_AUDIO | FLAG_TAGS | FLAG_SUBS | FLAG_READ)
@@ -46,7 +43,7 @@ void FormatSoundFont2::loadSong(StorageOperationData *_od)
 		if (sample_offset > 0)
 			read_samples(f);
 	}catch(string &s){
-		tsunami->log->error(s);
+		od->error(s);
 	}
 
 
@@ -157,7 +154,7 @@ void FormatSoundFont2::read_samples(File *f)
 		delete data;
 
 		samples_read += num_samples;
-		od->progress->set(float(samples_read) / (float)samples_all);
+		od->set(float(samples_read) / (float)samples_all);
 	}
 }
 

@@ -59,7 +59,7 @@ bool Storage::load(Song *a, const string &filename)
 	if (!f)
 		return false;
 
-	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("lade ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("lade ") + f->description, tsunami->_win);
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -89,7 +89,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 		return false;
 
 	Song *a = t->song;
-	StorageOperationData od = StorageOperationData(a, t, NULL, filename, _("lade ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("lade ") + f->description, tsunami->_win);
 	od.offset = offset;
 	od.level = level;
 
@@ -125,7 +125,7 @@ bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
 	if (!f)
 		return false;
 
-	StorageOperationData od = StorageOperationData(a, NULL, buf, filename, _("exportiere ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, buf, filename, _("exportiere ") + f->description, tsunami->_win);
 
 	// save
 	return _saveBufferBox(&od);
@@ -157,9 +157,9 @@ bool Storage::save(Song *a, const string &filename)
 		return false;
 
 	if (!f->testFormatCompatibility(a))
-		tsunami->log->warning(_("Datenverlust!"));
+		tsunami->log->warn(_("Datenverlust!"));
 
-	StorageOperationData od = StorageOperationData(a, NULL, NULL, filename, _("speichere ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("speichere ") + f->description, tsunami->_win);
 
 	a->filename = filename;
 
@@ -175,11 +175,12 @@ bool Storage::save(Song *a, const string &filename)
 bool Storage::_export(Song *s, const Range &r, const string &filename)
 {
 	msg_db_f("Storage.Export", 1);
-	if (!getFormat(filename.extension(), Format::FLAG_AUDIO))
+	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
+	if (!f)
 		return false;
 
 	BufferBox buf;
-	StorageOperationData od = StorageOperationData(s, NULL, &buf, filename, _("exportiere"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, s, NULL, &buf, filename, _("exportiere"), tsunami->_win);
 
 	// render audio...
 	od.progress->set(_("rendere Audio"), 0);

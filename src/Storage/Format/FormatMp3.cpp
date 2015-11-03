@@ -6,8 +6,6 @@
  */
 
 #include "FormatMp3.h"
-#include "../../Tsunami.h"
-#include "../../Stuff/Log.h"
 #include "../Storage.h"
 #include "../../lib/math/math.h"
 
@@ -149,7 +147,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 						}
 
 					}else{
-						tsunami->log->error(format("mp3: unsupported ID3 version: v2.%d.%d", version, v_min));
+						od->error(format("mp3: unsupported ID3 version: v2.%d.%d", version, v_min));
 						break;
 					}
 				}
@@ -165,15 +163,15 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 		if (system("which avconv") == 0){
 			string tmp = "/tmp/tsunami_mp3_out.wav";
 			system(("avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
-			tsunami->storage->loadTrack(t, tmp, od->offset, od->level);
-			tsunami->storage->current_directory = od->filename.dirname();
+			od->storage->loadTrack(t, tmp, od->offset, od->level);
+			od->storage->current_directory = od->filename.dirname();
 			file_delete(tmp);
 		}else
-			tsunami->log->error("mp3: need external program 'avconv' to decode");
+			od->error("mp3: need external program 'avconv' to decode");
 
 
 	}catch(const string &s){
-		tsunami->log->error(s);
+		od->error(s);
 	}
 
 	delete[](data);

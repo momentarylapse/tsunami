@@ -15,12 +15,26 @@ class Progress;
 class HuiWindow;
 class BufferBox;
 class Track;
+class Storage;
+class Format;
 
 class StorageOperationData
 {
 public:
-	StorageOperationData(Song *s, Track *t, BufferBox *b, const string &filename, const string &message, HuiWindow *win);
+	StorageOperationData(Storage *storage, Format *format, Song *s, Track *t, BufferBox *b, const string &filename, const string &message, HuiWindow *win);
 	virtual ~StorageOperationData();
+
+	void info(const string &message);
+	void warn(const string &message);
+	void error(const string &message);
+
+	void set(float t);
+	void set(const string &str, float t);
+
+	Storage *storage;
+	Format *format;
+
+	HuiWindow *win;
 
 	Song *song;
 	Progress *progress;

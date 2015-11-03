@@ -24,7 +24,7 @@ public:
 	static const string MESSAGE_CLEAR;
 
 	void error(const string &message);
-	void warning(const string &message);
+	void warn(const string &message);
 	void info(const string &message);
 
 	void clear();

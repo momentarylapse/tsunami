@@ -5,9 +5,6 @@
  *      Author: michi
  */
 
-#include "../../Tsunami.h"
-#include "../../View/Helper/Progress.h"
-#include "../../Stuff/Log.h"
 #include "FormatGuitarPro.h"
 
 const int STD_TUNING[6] = {40, 45, 50, 55, 59, 64};
@@ -92,8 +89,9 @@ void FormatGuitarPro::saveBuffer(StorageOperationData *od){}
 
 void FormatGuitarPro::loadTrack(StorageOperationData *od){}
 
-void FormatGuitarPro::saveSong(StorageOperationData *od)
+void FormatGuitarPro::saveSong(StorageOperationData *_od)
 {
+	od = _od;
 	a = od->song;
 	char data[16];
 
@@ -171,8 +169,9 @@ void FormatGuitarPro::saveSong(StorageOperationData *od)
 	delete(f);
 }
 
-void FormatGuitarPro::loadSong(StorageOperationData *od)
+void FormatGuitarPro::loadSong(StorageOperationData *_od)
 {
+	od = _od;
 	a = od->song;
 	f = FileOpen(od->filename);
 	char data[16];
@@ -255,7 +254,7 @@ void FormatGuitarPro::loadSong(StorageOperationData *od)
 		}
 
 	}catch(const string &s){
-		tsunami->log->error(s);
+		od->error(s);
 	}
 
 	if (f)
@@ -737,7 +736,7 @@ void FormatGuitarPro::write_beat(Array<int> &pitch, Array<int> &string, int leng
 		f->WriteByte(254);
 	else{
 		f->WriteByte(0);
-		tsunami->log->error("invalid gp length: " + i2s(length));
+		od->error("invalid gp length: " + i2s(length));
 	}
 
 	if (pitch.num > 0){

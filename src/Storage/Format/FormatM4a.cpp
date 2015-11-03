@@ -6,9 +6,6 @@
  */
 
 #include "FormatM4a.h"
-#include "../../Tsunami.h"
-#include "../../View/Helper/Progress.h"
-#include "../../Stuff/Log.h"
 #include "../Storage.h"
 #include "../../lib/math/math.h"
 
@@ -25,15 +22,14 @@ void FormatM4a::saveBuffer(StorageOperationData *od){}
 
 void FormatM4a::loadTrack(StorageOperationData *od)
 {
-	msg_db_f("load_m4a_file", 1);
-
 	if (system("which avconv") == 0){
 		string tmp = "/tmp/tsunami_m4a_out.wav";
 		system(("avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
-		tsunami->storage->loadTrack(od->track, od->filename, od->offset, od->level);
+		od->storage->loadTrack(od->track, tmp, od->offset, od->level);
+		od->storage->current_directory = od->filename.dirname();
 		file_delete(tmp);
 	}else
-		tsunami->log->error("mp3: need external program 'avconv' to decode");
+		od->error("mp3: need external program 'avconv' to decode");
 }
 
 void FormatM4a::saveSong(StorageOperationData *od){}

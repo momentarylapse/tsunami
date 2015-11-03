@@ -9,8 +9,6 @@
 #include "../../Tsunami.h"
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
-#include "../../Stuff/Log.h"
-#include "../../View/Helper/Progress.h"
 #include "../../Audio/Synth/Synthesizer.h"
 
 #include <FLAC/all.h>
@@ -41,7 +39,7 @@ FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncod
 	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
 }
 
-string compress_buffer(BufferBox &b, Song *song)
+string compress_buffer(BufferBox &b, StorageOperationData *od)
 {
 	string data;
 
@@ -50,13 +48,13 @@ string compress_buffer(BufferBox &b, Song *song)
 	FLAC__StreamEncoderInitStatus init_status;
 
 	int channels = 2;
-	int bits = min(format_get_bits(song->default_format), 24);
+	int bits = min(format_get_bits(od->song->default_format), 24);
 	float scale = pow(2.0f, bits-1);
 
 	// allocate the encoder
 	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
 	if (!encoder){
-		tsunami->log->error("flac: allocating encoder");
+		od->error("flac: allocating encoder");
 		return "";
 	}
 
@@ -64,14 +62,14 @@ string compress_buffer(BufferBox &b, Song *song)
 	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
 	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
-	ok &= FLAC__stream_encoder_set_sample_rate(encoder, song->sample_rate);
+	ok &= FLAC__stream_encoder_set_sample_rate(encoder, od->song->sample_rate);
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.num);
 
 	// initialize encoder
 	if (ok){
 		init_status = FLAC__stream_encoder_init_stream(encoder, &FlacCompressWriteCallback, NULL, NULL, NULL, (void*)&data);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
-			tsunami->log->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
+			od->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
 			ok = false;
 		}
 	}
@@ -99,8 +97,8 @@ string compress_buffer(BufferBox &b, Song *song)
 	ok &= FLAC__stream_encoder_finish(encoder);
 
 	if (!ok){
-		tsunami->log->error("flac: encoding: FAILED");
-		tsunami->log->error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
+		od->error("flac: encoding: FAILED");
+		od->error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
 	}
 
 	FLAC__stream_encoder_delete(encoder);
@@ -167,7 +165,7 @@ static void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__Stream
 	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
 }
 
-void uncompress_buffer(BufferBox &b, string &data)
+void uncompress_buffer(BufferBox &b, string &data, StorageOperationData *od)
 {
 	bool ok = true;
 
@@ -193,15 +191,15 @@ void uncompress_buffer(BufferBox &b, string &data)
 							&FlacUncompressMetaCallback,
 							flac_error_callback, &d);
 	if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
-		tsunami->log->error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
+		od->error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
 		ok = false;
 	}
 
 	if (ok){
 		ok = FLAC__stream_decoder_process_until_end_of_stream(decoder);
 		if (!ok){
-			tsunami->log->error("flac: decoding FAILED");
-			tsunami->log->error(string("   state: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+			od->error("flac: decoding FAILED");
+			od->error(string("   state: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
 		}
 	}
 	FLAC__stream_decoder_delete(decoder);
@@ -233,12 +231,30 @@ public:
 	virtual void create(){ throw string("no data creation... " + name); }
 	virtual void on_notify(){};
 	virtual void on_unhandled(){};
+	virtual void on_error(const string &message){}
+	virtual void on_warn(const string &message){}
+	virtual void on_info(const string &message){}
 	string name;
 
 	void notify()
 	{
 		if (root)
 			root->on_notify();
+	}
+	void info(const string &message)
+	{
+		if (root)
+			root->on_info(message);
+	}
+	void warn(const string &message)
+	{
+		if (root)
+			root->on_warn(message);
+	}
+	void error(const string &message)
+	{
+		if (root)
+			root->on_error(message);
 	}
 
 	void add_child(FileChunkBasic *c)
@@ -558,10 +574,10 @@ public:
 
 		// insert
 
-		Song *s = (Song*)root->get();
-		if (s->compression > 0){
+		StorageOperationData *od = (StorageOperationData*)root->get();
+		if (od->song->compression > 0){
 			//throw string("can't read compressed nami files yet");
-			uncompress_buffer(*me, data);
+			uncompress_buffer(*me, data, od);
 
 		}else{
 			me->import(data.data, channels, format_for_bits(bits), num);
@@ -569,7 +585,8 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		Song *song = (Song*)root->get();
+		StorageOperationData *od = (StorageOperationData*)root->get();
+		Song *song = od->song;
 
 		int channels = 2;
 		f->WriteInt(me->offset);
@@ -580,11 +597,11 @@ public:
 		string data;
 		if (song->compression == 0){
 			if (!me->exports(data, channels, song->default_format))
-				tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+				warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
 		}else{
 
 			int uncompressed_size = me->num * channels * format_get_bits(song->default_format) / 8;
-			data = compress_buffer(*me, song);
+			data = compress_buffer(*me, od);
 			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}
 		f->WriteBuffer(data.data, data.num);
@@ -699,9 +716,9 @@ public:
 		}else if ((unended < 0) and (e.volume > 0)){
 			parent->add(MidiNote(Range(e.pos, -1), e.pitch, e.volume));
 		}else if (unended >= 0){
-			tsunami->log->error("nami/midi: starting new note without ending old one");
+			error("nami/midi: starting new note without ending old one");
 		}else{
-			tsunami->log->error("nami/midi: no note to end");
+			error("nami/midi: no note to end");
 		}
 	}
 	virtual void write(File *f)
@@ -1020,11 +1037,11 @@ public:
 	}
 };
 
-class FileChunkNami : public FileChunk<Song,Song>
+class FileChunkNami : public FileChunk<StorageOperationData,Song>
 {
 public:
 	FileChunkNami() :
-		FileChunk<Song,Song>("nami")
+		FileChunk<StorageOperationData,Song>("nami")
 	{
 		add_child(new FileChunkFormat);
 		add_child(new FileChunkTag);
@@ -1033,7 +1050,7 @@ public:
 		add_child(new FileChunkSample);
 		add_child(new FileChunkTrack);
 	}
-	virtual void create(){ me = parent; }
+	virtual void create(){ me = parent->song; }
 	virtual void read(File *f)
 	{
 		me->sample_rate = f->ReadInt();
@@ -1044,32 +1061,29 @@ public:
 	}
 };
 
-class ChunkedFileFormatNami : public FileChunk<void,Song>
+class ChunkedFileFormatNami : public FileChunk<void,StorageOperationData>
 {
 public:
 	ChunkedFileFormatNami() :
-		FileChunk<void,Song>("")
+		FileChunk<void,StorageOperationData>("")
 	{
 		od = NULL;
-		song = NULL;
 		add_child(new FileChunkNami);
 		set_root(this);
 	}
 	virtual void read(File *f){}
 	virtual void write(File *f){}
 	StorageOperationData *od;
-	Song *song;
 
 	bool read_file(const string &filename, StorageOperationData *_od)
 	{
 		od = _od;
-		song = od->song;
 		File *f = FileOpen(filename);
 		f->SetBinaryMode(true);
 		context = new FileChunkBasic::Context(f);
 		context->push(name, 0, f->GetSize());
 
-		set(song);
+		set(od);
 		read_contents();
 		delete(context);
 
@@ -1079,11 +1093,19 @@ public:
 	}
 	virtual void on_notify()
 	{
-		od->progress->set((float)context->f->GetPos() / (float)context->f->GetSize());
+		od->set((float)context->f->GetPos() / (float)context->f->GetSize());
 	}
 	virtual void on_unhandled()
 	{
-		tsunami->log->error("unhandled nami chunk: " + context->str());
+		od->error("unhandled nami chunk: " + context->str());
+	}
+	virtual void on_error(const string &message)
+	{
+		od->error(message);
+	}
+	virtual void on_warn(const string &message)
+	{
+		od->warn(message);
 	}
 };
 
@@ -1138,11 +1160,11 @@ void FormatNami::WriteBufferBox(BufferBox *b)
 	string data;
 	if (song->compression == 0){
 		if (!b->exports(data, channels, song->default_format))
-			tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+			od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
 	}else{
 
 		int uncompressed_size = b->num * channels * format_get_bits(song->default_format) / 8;
-		data = compress_buffer(*b, song);
+		data = compress_buffer(*b, od);
 		msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 	}
 	f->WriteBuffer(data.data, data.num);
@@ -1331,8 +1353,9 @@ void FormatNami::WriteFormat()
 	EndChunk();
 }
 
-void FormatNami::saveSong(StorageOperationData *od)
+void FormatNami::saveSong(StorageOperationData *_od)
 {
+	od = _od;
 	song = od->song;
 
 //	int length = a->GetLength();
@@ -1358,7 +1381,7 @@ void FormatNami::saveSong(StorageOperationData *od)
 
 	foreachi(Track *track, song->tracks, i){
 		WriteTrack(track);
-		od->progress->set(((float)i + 0.5f) / (float)song->tracks.num);
+		od->set(((float)i + 0.5f) / (float)song->tracks.num);
 	}
 
 	foreach(Effect *effect, song->fx)
@@ -1479,7 +1502,7 @@ struct ChunkStack
 				ReadChunk(f);
 
 		}else
-			tsunami->log->error("unknown nami chunk: " + cname + " (within " + chunk_data[chunk_data.num - 2].tag + ")");
+			od->error("unknown nami chunk: " + cname + " (within " + chunk_data[chunk_data.num - 2].tag + ")");
 
 
 		f->SetPos(chunk_data.back().end(), true);
@@ -1549,7 +1572,7 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 	int offset = 0;
 	for (int n=0; n<data.num / CHUNK_SIZE; n++){
 		s->f->ReadBuffer(&data[offset], CHUNK_SIZE);
-		s->od->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
+		s->od->set((float)s->f->GetPos() / (float)s->f->GetSize());
 		offset += CHUNK_SIZE;
 	}
 	s->f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
@@ -1558,7 +1581,7 @@ void ReadChunkBufferBox(ChunkStack *s, TrackLevel *l)
 
 	if (s->s->compression > 0){
 		//throw string("can't read compressed nami files yet");
-		uncompress_buffer(*b, data);
+		uncompress_buffer(*b, data, s->od);
 
 	}else{
 		b->import(data.data, channels, format_for_bits(bits), num);
@@ -1608,7 +1631,7 @@ void ReadChunkSub(ChunkStack *s, Track *t)
 	s->f->ReadInt();
 
 	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkSampleBufferBox, &r->buf);
-	tsunami->log->error("\"sub\" chunk is deprecated!");
+	s->od->error("\"sub\" chunk is deprecated!");
 }
 
 void ReadChunkBar(ChunkStack *s, Array<BarPattern> *bar)
@@ -1653,7 +1676,7 @@ void ReadChunkMidiEvent(ChunkStack *s, MidiNoteData *m)
 	e.volume = s->f->ReadFloat();
 	s->f->ReadInt(); // reserved
 	//m->add(e);
-	tsunami->log->error("ReadChunkMidiEvent");
+	s->od->error("ReadChunkMidiEvent");
 }
 
 void ReadChunkMidiEffect(ChunkStack *s, MidiNoteData *m)
@@ -1723,7 +1746,7 @@ void ReadChunkTrack(ChunkStack *s, Song *a)
 	t->panning = s->f->ReadFloat();
 	s->f->ReadInt(); // reserved
 	s->f->ReadInt();
-	s->od->progress->set((float)s->f->GetPos() / (float)s->f->GetSize());
+	s->od->set((float)s->f->GetPos() / (float)s->f->GetSize());
 
 	s->AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
 	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->levels[0]);
@@ -1788,9 +1811,9 @@ void FormatNami::make_consistent(Song *a)
 	}
 }
 
-void FormatNami::loadSong(StorageOperationData *od)
+void FormatNami::loadSong(StorageOperationData *_od)
 {
-	msg_db_f("load_nami_file", 1);
+	od = _od;
 
 	// TODO?
 	od->song->tags.clear();
@@ -1812,7 +1835,7 @@ void FormatNami::loadSong(StorageOperationData *od)
 		ChunkedFileFormatNami n;
 		n.read_file(od->filename, od);
 	}catch(string &s){
-		tsunami->log->error("loading nami: " + s);
+		od->error("loading nami: " + s);
 	}
 #endif
 

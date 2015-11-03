@@ -457,7 +457,7 @@ class Storage
 
 class Log
 	extern void error(string message)
-	extern void warning(string message)
+	extern void warn(string message)
 	extern void info(string message)
 
 class PluginContext

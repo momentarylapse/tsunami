@@ -45,6 +45,7 @@ public:
 
 	File *f;
 	Song *song;
+	StorageOperationData *od;
 };
 
 #endif /* FORMATNAMI_H_ */

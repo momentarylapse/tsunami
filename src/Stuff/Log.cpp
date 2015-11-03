@@ -28,7 +28,7 @@ void Log::error(const string &message)
 }
 
 
-void Log::warning(const string &message)
+void Log::warn(const string &message)
 {
 	addMessage(TYPE_WARNING, message);
 }

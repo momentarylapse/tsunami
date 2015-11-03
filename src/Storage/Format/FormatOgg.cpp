@@ -6,8 +6,6 @@
  */
 
 #include "FormatOgg.h"
-#include "../../Tsunami.h"
-#include "../../View/Helper/Progress.h"
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
@@ -129,7 +127,7 @@ void FormatOgg::saveBuffer(StorageOperationData *od)
 
 		nn ++;
 		if (nn > 8){
-			od->progress->set(float(written) / (float)b->num);
+			od->set(float(written) / (float)b->num);
 			nn = 0;
 		}
 
@@ -248,7 +246,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 			read += r;
 			nn ++;
 			if (nn > 256){
-				od->progress->set((float)read / (float)(samples * 4));
+				od->set((float)read / (float)(samples * 4));
 				nn = 0;
 			}
 		}

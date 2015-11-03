@@ -6,10 +6,6 @@
  */
 
 #include "FormatRaw.h"
-#include "../../Tsunami.h"
-#include "../../TsunamiWindow.h"
-#include "../../View/Helper/Progress.h"
-#include "../../Stuff/Log.h"
 #include "../../lib/math/math.h"
 #include "../Dialog/RawConfigDialog.h"
 
@@ -25,23 +21,21 @@ FormatRaw::~FormatRaw()
 {
 }
 
-RawConfigData GetRawConfigData()
+RawConfigData GetRawConfigData(HuiWindow *win)
 {
 	RawConfigData data;
-	RawConfigDialog *dlg = new RawConfigDialog(&data, tsunami->win);
+	RawConfigDialog *dlg = new RawConfigDialog(&data, win);
 	dlg->run();
 	return data;
 }
 
 void FormatRaw::saveBuffer(StorageOperationData *od)
 {
-	msg_db_f("write_raw_file", 1);
-
-	RawConfigData config = GetRawConfigData();
+	RawConfigData config = GetRawConfigData(od->win);
 
 	string data;
 	if (!od->buf->exports(data, config.channels, config.format))
-		tsunami->log->warning(_("Amplitude zu gro&s, Signal &ubersteuert."));
+		od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
 
 	File *f = FileCreate(od->filename);
 	f->SetBinaryMode(true);
@@ -51,7 +45,7 @@ void FormatRaw::saveBuffer(StorageOperationData *od)
 
 	int size = data.num;
 	for (int i=0;i<size / WAVE_BUFFER_SIZE;i++){
-		od->progress->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
+		od->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
 		f->WriteBuffer(&data[i * WAVE_BUFFER_SIZE], WAVE_BUFFER_SIZE);
 	}
 	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
@@ -61,9 +55,7 @@ void FormatRaw::saveBuffer(StorageOperationData *od)
 
 void FormatRaw::loadTrack(StorageOperationData *od)
 {
-	msg_db_f("load_raw_file", 1);
-
-	RawConfigData config = GetRawConfigData();
+	RawConfigData config = GetRawConfigData(od->win);
 
 	char *data = new char[WAVE_BUFFER_SIZE];
 	File *f = FileOpen(od->filename);
@@ -76,7 +68,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 		int byte_per_sample = (format_get_bits(config.format) / 8) * config.channels;
 		int size = f->GetSize() - config.offset;
 		int samples = size / byte_per_sample;
-		od->progress->set(0.1f);
+		od->set(0.1f);
 
 		if (config.offset > 0)
 			f->ReadBuffer(data, config.offset);
@@ -91,7 +83,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 			if (nn > 16){
 				float perc_read = 0.1f;
 				float dperc_read = 0.9f;
-				od->progress->set(perc_read + dperc_read * (float)read / (float)size);
+				od->set(perc_read + dperc_read * (float)read / (float)size);
 				nn = 0;
 			}
 			if (r > 0){
@@ -105,7 +97,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 		}
 
 	}catch(const string &s){
-		tsunami->log->error(s);
+		od->error(s);
 	}
 
 	delete[](data);

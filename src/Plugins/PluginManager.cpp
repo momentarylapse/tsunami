@@ -427,7 +427,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("ColorScheme", "hover", _offsetof(ColorScheme, hover));
 
 	Script::LinkExternal("Log.error", Script::mf(&Log::error));
-	Script::LinkExternal("Log.warning", Script::mf(&Log::warning));
+	Script::LinkExternal("Log.warn", Script::mf(&Log::warn));
 	Script::LinkExternal("Log.info", Script::mf(&Log::info));
 
 	Script::LinkExternal("Storage.load", Script::mf(&Storage::load));

@@ -43,6 +43,7 @@ public:
 
 	Song *a;
 	File *f;
+	StorageOperationData *od;
 
 	void read_info();
 	void read_lyrics();

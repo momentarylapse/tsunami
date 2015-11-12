@@ -7,11 +7,12 @@
 
 #include "AudioView.h"
 #include "AudioViewTrack.h"
+#include "Mode/ViewModeDefault.h"
+#include "Mode/ViewModeMidi.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "SideBar/SideBar.h"
 #include "BottomBar/BottomBar.h"
-#include "../Action/Track/Sample/ActionTrackMoveSample.h"
 #include "../Audio/AudioInputAny.h"
 #include "../Audio/AudioStream.h"
 #include "../Audio/SongRenderer.h"
@@ -40,13 +41,6 @@ int get_track_index_save(Track *t)
 }
 
 
-bool AudioView::is_sharp(int pitch)
-{
-	int r = (pitch - midi_scale + 12) % 12;
-	// 69 = 9 = a
-	return ((r == 10) or (r == 1) or (r == 3) or (r == 6) or (r == 8));
-}
-
 const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "CurTrackChange";
 const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "CurSampleChange";
 const string AudioView::MESSAGE_CUR_LEVEL_CHANGE = "CurLevelChange";
@@ -55,25 +49,6 @@ const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
 const string AudioView::MESSAGE_MOUSE_UP = "MouseUp";
-
-AudioView::SelectionType::SelectionType()
-{
-	type = SEL_TYPE_NONE;
-	track = NULL;
-	vtrack = NULL;
-	sample = NULL;
-	index = 0;
-	pos = 0;
-	sample_offset = 0;
-	show_track_controls = NULL;
-	pitch = -1;
-	note_start = -1;
-}
-
-bool AudioView::SelectionType::allowAutoScroll()
-{
-	return (type == SEL_TYPE_SELECTION_END) or (type == SEL_TYPE_SAMPLE) or (type == SEL_TYPE_PLAYBACK);
-}
 
 
 class PeakThread : public Thread
@@ -113,7 +88,7 @@ Image *ExpandImage(Image *im, float d)
 	return r;
 }
 
-AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) :
+AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	Observer("AudioView"),
 	Observable("AudioView"),
 	cam(this)
@@ -139,6 +114,15 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) 
 	basic_schemes.add(dark);
 
 	setColorScheme(HuiConfig.getStr("View.ColorScheme", "bright"));
+
+	song = _song;
+	input = NULL;
+
+	// modes
+	mode = NULL;
+	mode_default = new ViewModeDefault(this, NULL);
+	mode_midi = new ViewModeMidi(this, mode_default);
+	setMode(mode_default);
 
 	drawing_rect = rect(0, 1024, 0, 768);
 	enabled = true;
@@ -166,25 +150,10 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_audio, AudioOutput *_output) 
 	images.track_midi = LoadImage(HuiAppDirectoryStatic + "Data/track-midi.tga");
 	images.track_midi_bg = ExpandImage(images.track_midi, 1.5f);
 
-	mouse_possibly_selecting = -1;
-	cur_action = NULL;
-
 	cur_track = NULL;
 	cur_sample = NULL;
 	cur_level = 0;
 	capturing_track = 0;
-
-	song = _audio;
-	input = NULL;
-
-	pitch_min = 60;
-	pitch_max = 90;
-	beat_partition = 4;
-	parent->setInt("beat_partition", beat_partition);
-	midi_scale = 0;
-	midi_mode = MIDI_MODE_NOTE;
-	chord_type = 0;
-	chord_inversion = 0;
 
 	peak_thread = new PeakThread(this);
 	is_updating_peaks = false;
@@ -235,6 +204,8 @@ AudioView::~AudioView()
 	unsubscribe(stream);
 	setInput(NULL);
 
+	delete(mode_default);
+
 	delete(peak_thread);
 	delete(stream);
 	delete(renderer);
@@ -273,6 +244,11 @@ void AudioView::setColorScheme(const string &name)
 	forceRedraw();
 }
 
+void AudioView::setMode(ViewMode *m)
+{
+	mode = m;
+}
+
 void AudioView::setMouse()
 {
 	mx = HuiGetEvent()->mx;
@@ -296,14 +272,13 @@ int AudioView::mouseOverSample(SampleRef *s)
 	return -1;
 }
 
-void AudioView::selectionUpdatePos(SelectionType &s)
+void AudioView::selectionUpdatePos(Selection &s)
 {
 	s.pos = cam.screen2sample(mx);
 }
 
 void AudioView::updateSelection()
 {
-	msg_db_f("UpdateSelection", 1);
 	sel_range = sel_raw;
 	if (sel_range.num < 0)
 		sel_range.invert();
@@ -321,108 +296,10 @@ void AudioView::updateSelection()
 	notify(MESSAGE_SELECTION_CHANGE);
 }
 
-bool mouse_over_time(AudioView *v, int pos)
+bool AudioView::mouse_over_time(int pos)
 {
-	int ssx = v->cam.sample2screen(pos);
-	return ((v->mx >= ssx - 5) and (v->mx <= ssx + 5));
-}
-
-AudioView::SelectionType AudioView::getMouseOver()
-{
-	SelectionType s;
-
-	// track?
-	foreachi(AudioViewTrack *t, vtrack, i){
-		if (mouseOverTrack(t)){
-			s.vtrack = t;
-			s.index = i;
-			s.track = t->track;
-			s.type = SEL_TYPE_TRACK;
-			if (mx < t->area.x1 + TRACK_HANDLE_WIDTH)
-				s.show_track_controls = t->track;
-		}
-	}
-
-	// selection boundaries?
-	selectionUpdatePos(s);
-	if (mouse_over_time(this, sel_raw.end())){
-		s.type = SEL_TYPE_SELECTION_END;
-		return s;
-	}
-	if (mouse_over_time(this, sel_raw.start())){
-		s.type = SEL_TYPE_SELECTION_START;
-		return s;
-	}
-	if (stream->isPlaying()){
-		if (mouse_over_time(this, stream->getPos())){
-			s.type = SEL_TYPE_PLAYBACK;
-			return s;
-		}
-	}
-
-	// mute button?
-	if (s.track){
-		AudioViewTrack *t = s.vtrack;
-		if ((mx >= t->area.x1 + 5) and (mx < t->area.x1 + 17) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = SEL_TYPE_MUTE;
-			return s;
-		}
-		if ((song->tracks.num > 1) and (mx >= t->area.x1 + 22) and (mx < t->area.x1 + 34) and (my >= t->area.y1 + 22) and (my < t->area.y1 + 34)){
-			s.type = SEL_TYPE_SOLO;
-			return s;
-		}
-	}
-
-	// sub?
-	if (s.track){
-
-		// markers
-		for (int i=0; i<min(s.track->markers.num, vtrack[s.index]->marker_areas.num); i++){
-			if (vtrack[s.index]->marker_areas[i].inside(mx, my)){
-				s.type = SEL_TYPE_MARKER;
-				s.index = i;
-				return s;
-			}
-		}
-
-		// TODO: prefer selected subs
-		foreach(SampleRef *ss, s.track->samples){
-			int offset = mouseOverSample(ss);
-			if (offset >= 0){
-				s.sample = ss;
-				s.type = SEL_TYPE_SAMPLE;
-				s.sample_offset = offset;
-				return s;
-			}
-		}
-	}
-
-	// midi
-	if ((s.track) and (s.track == cur_track) and (editingMidi()) and (midi_mode != MIDI_MODE_SELECT)){
-		s.pitch = y2pitch(my);
-		s.type = SEL_TYPE_MIDI_PITCH;
-		Array<MidiNote> notes = s.track->midi.getNotes(cam.range());
-		foreach(MidiNote &n, notes)
-			if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
-				s.note_start = n.range.offset;
-				s.type = SEL_TYPE_MIDI_NOTE;
-				return s;
-			}
-	}
-
-	// time scale
-	if (my < TIME_SCALE_HEIGHT){
-		s.type = SEL_TYPE_TIME;
-		return s;
-	}
-
-	// track handle
-	if ((s.track) and (mx < area.x1 + TRACK_HANDLE_WIDTH)){
-		s.type = SEL_TYPE_TRACK_HANDLE;
-		return s;
-	}
-
-	return s;
+	int ssx = cam.sample2screen(pos);
+	return ((mx >= ssx - 5) and (mx <= ssx + 5));
 }
 
 
@@ -437,263 +314,16 @@ Range AudioView::getPlaybackSelection()
 	return sel_range;
 }
 
-void AudioView::selectUnderMouse()
-{
-	msg_db_f("SelectUnderMouse", 2);
-	hover = getMouseOver();
-	selection = hover;
-	Track *t = selection.track;
-	SampleRef *s = selection.sample;
-	bool control = win->getKey(KEY_CONTROL);
-
-	// track
-	if (selection.track)
-		setCurTrack(selection.track);
-	if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE)){
-		selectTrack(t, control);
-		if (!control)
-			song->unselectAllSamples();
-	}
-
-	// sub
-	setCurSample(s);
-	if (selection.type == SEL_TYPE_SAMPLE){
-		selectSample(s, control);
-	}
-}
-
-void AudioView::setBarriers(SelectionType *s)
-{
-	msg_db_f("SetBarriers", 2);
-	s->barrier.clear();
-	if (s->type == SEL_TYPE_NONE)
-		return;
-
-	int dpos = 0;
-	if (s->type == SEL_TYPE_SAMPLE)
-		dpos = s->sample_offset;
-
-	foreach(Track *t, song->tracks){
-		// add subs
-		foreach(SampleRef *sam, t->samples){
-			s->barrier.add(sam->pos + dpos);
-		}
-
-		// time bar...
-		Array<Beat> beats = song->bars.getBeats(cam.range());
-		foreach(Beat &b, beats)
-			s->barrier.add(b.range.offset);
-	}
-
-	// selection marker
-	if (!sel_range.empty()){
-		s->barrier.add(sel_raw.start());
-		if (mouse_possibly_selecting < 0)
-			s->barrier.add(sel_raw.end());
-	}
-}
-
-void AudioView::applyBarriers(int &pos)
-{
-	msg_db_f("ApplyBarriers", 2);
-	int dmin = BARRIER_DIST;
-	bool found = false;
-	int new_pos;
-	foreach(int b, selection.barrier){
-		int dist = abs(cam.sample2screen(b) - cam.sample2screen(pos));
-		if (dist < dmin){
-			//msg_write(format("barrier:  %d  ->  %d", pos, b));
-			new_pos = b;
-			found = true;
-			dmin = dist;
-		}
-	}
-	if (found)
-		pos = new_pos;
-}
-
-bool hover_changed(AudioView::SelectionType &hover, AudioView::SelectionType &hover_old)
-{
-	return (hover.type != hover_old.type)
-			or (hover.sample != hover_old.sample)
-			or (hover.show_track_controls != hover_old.show_track_controls)
-			or (hover.note_start != hover_old.note_start)
-			or (hover.pitch != hover_old.pitch);
-}
-
 void AudioView::onMouseMove()
 {
-	msg_db_f("OnMouseMove", 2);
 	setMouse();
-	bool _force_redraw_ = false;
-
-	if (HuiGetEvent()->lbut){
-
-		// cheap auto scrolling
-		if (hover.allowAutoScroll()){
-			if (mx < 50)
-				cam.move(-10 / cam.scale);
-			if (mx > area.width() - 50)
-				cam.move(10 / cam.scale);
-		}
-
-		selectionUpdatePos(selection);
-	}else{
-		SelectionType hover_old = hover;
-		hover = getMouseOver();
-		_force_redraw_ |= hover_changed(hover, hover_old);
-	}
-
-
-	// drag & drop
-	if (selection.type == SEL_TYPE_SELECTION_END){
-		SelectionType mo = getMouseOver();
-		if (mo.track)
-			mo.track->is_selected = true;
-
-		applyBarriers(selection.pos);
-		sel_raw.set_end(selection.pos);
-		updateSelection();
-		//_force_redraw_ = true;
-		_force_redraw_ = false;
-		int x, w;
-		int r = 4;
-		if (HuiGetEvent()->dx < 0){
-			x = mx - r;
-			w = - HuiGetEvent()->dx + 2*r;
-		}else{
-			x = mx + r;
-			w = - HuiGetEvent()->dx - 2*r;
-		}
-		win->redrawRect("area", x, area.y1, w, area.height());
-	}else if (selection.type == SEL_TYPE_PLAYBACK){
-		stream->seek(selection.pos);
-		_force_redraw_ = true;
-	}else if (selection.type == SEL_TYPE_SAMPLE){
-		applyBarriers(selection.pos);
-		int dpos = (float)selection.pos - selection.sample_offset - selection.sample->pos;
-		if (cur_action)
-			cur_action->set_param_and_notify(song, dpos);
-		_force_redraw_ = true;
-	}
-
-	// selection:
-	if (!HuiGetEvent()->lbut){
-		mouse_possibly_selecting = -1;
-	}
-	if (mouse_possibly_selecting >= 0)
-		mouse_possibly_selecting += fabs(HuiGetEvent()->dx);
-	if (mouse_possibly_selecting > mouse_min_move_to_select){
-		sel_raw.offset = mouse_possibly_selecting_start;
-		sel_raw.num = selection.pos - mouse_possibly_selecting_start;
-		setBarriers(&selection);
-		updateSelection();
-		selection.type = SEL_TYPE_SELECTION_END;
-		hover.type = SEL_TYPE_SELECTION_END;
-		_force_redraw_ = true;
-		mouse_possibly_selecting = -1;
-	}
-
-	if ((HuiGetEvent()->lbut) and (selection.type == SEL_TYPE_MIDI_PITCH))
-		_force_redraw_ = true;
-
-	if (_force_redraw_)
-		forceRedraw();
-}
-
-
-void AudioView::setCursorPos(int pos)
-{
-	if (stream->isPlaying()){
-		if (renderer->range().is_inside(pos)){
-			stream->seek(pos);
-			selection.type = SEL_TYPE_PLAYBACK;
-			forceRedraw();
-			return;
-		}else
-			stream->stop();
-	}
-	mouse_possibly_selecting = 0;
-	sel_raw = Range(pos, 0);
-	updateSelection();
-}
-
-void deleteMidiNote(Track *t, int pitch, int start)
-{
-	foreachi(MidiNote &n, t->midi, i)
-		if ((n.pitch == pitch) and (n.range.offset == start))
-			t->deleteMidiNote(i);
+	mode->onMouseMove();
 }
 
 void AudioView::onLeftButtonDown()
 {
-	msg_db_f("OnLBD", 2);
 	setMouse();
-	selectUnderMouse();
-	updateMenu();
-
-	setBarriers(&selection);
-
-	applyBarriers(selection.pos);
-	mouse_possibly_selecting_start = selection.pos;
-
-	// selection:
-	//   start after lb down and moving
-	if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TIME)){
-		setCursorPos(selection.pos);
-	}else if (selection.type == SEL_TYPE_SELECTION_START){
-		// swap end / start
-		selection.type = SEL_TYPE_SELECTION_END;
-		hover.type = SEL_TYPE_SELECTION_END;
-		sel_raw.invert();
-	}else if (selection.type == SEL_TYPE_MUTE){
-		selection.track->setMuted(!selection.track->muted);
-	}else if (selection.type == SEL_TYPE_SOLO){
-		foreach(Track *t, song->tracks)
-			t->is_selected = (t == selection.track);
-		if (selection.track->muted)
-			selection.track->setMuted(false);
-	}else if (selection.type == SEL_TYPE_SAMPLE){
-		cur_action = new ActionTrackMoveSample(song);
-	}else if (selection.type == SEL_TYPE_MIDI_NOTE){
-		deleteMidiNote(cur_track, selection.pitch, selection.note_start);
-	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		midi_preview_renderer->resetMidiData();
-		midi_preview_renderer->setSynthesizer(cur_track->synth);
-
-		Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
-		MidiRawData midi;
-		foreach(int p, pitch)
-			midi.add(MidiEvent(0, p, 1));
-		midi_preview_renderer->feed(midi);
-		midi_preview_stream->play();
-	}
-
-	forceRedraw();
-	updateMenu();
-}
-
-Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
-{
-	Range allowed = Range::ALL;
-	foreach(MidiNote &n, t->midi){
-		foreach(int p, pitch)
-			if (n.pitch == p){
-				if (n.range.is_inside(start))
-					return Range::EMPTY;
-			}
-	}
-
-	MidiRawData midi = midi_notes_to_events(t->midi);
-	foreach(MidiEvent &e, midi)
-		foreach(int p, pitch)
-			if (e.pitch == p){
-				if ((e.pos >= start) and (e.pos < allowed.end()))
-					allowed.set_end(e.pos);
-				if ((e.pos < start) and (e.pos >= allowed.start()))
-					allowed.set_start(e.pos);
-			}
-	return allowed;
+	mode->onLeftButtonDown();
 }
 
 void align_to_beats(Song *s, Range &r, int beat_partition)
@@ -717,60 +347,16 @@ void align_to_beats(Song *s, Range &r, int beat_partition)
 	}
 }
 
-MidiNoteData AudioView::getCreationNotes()
-{
-	int start = min(mouse_possibly_selecting_start, selection.pos);
-	int end = max(mouse_possibly_selecting_start, selection.pos);
-	Range r = Range(start, end - start);
-
-	// align to beats
-	if (song->bars.num > 0)
-		align_to_beats(song, r, beat_partition);
-
-	Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection.pitch);
-
-	// collision?
-	Range allowed = get_allowed_midi_range(cur_track, pitch, mouse_possibly_selecting_start);
-
-	// create notes
-	MidiNoteData notes;
-	if (allowed.empty())
-		return notes;
-	foreach(int p, pitch)
-		notes.add(MidiNote(r and allowed, p, 1));
-	return notes;
-}
-
 
 void AudioView::onLeftButtonUp()
 {
-	msg_db_f("OnLBU", 2);
-	if (selection.type == SEL_TYPE_SAMPLE){
-		if (cur_action)
-			song->execute(cur_action);
-	}else if (selection.type == SEL_TYPE_MIDI_PITCH){
-		cur_track->addMidiNotes(getCreationNotes());
-
-		midi_preview_renderer->endAllNotes();
-	}
-	cur_action = NULL;
-
-	notify(MESSAGE_MOUSE_UP);
-
-	// TODO !!!!!!!!
-	selection.type = SEL_TYPE_NONE;
-	forceRedraw();
-	updateMenu();
+	mode->onLeftButtonUp();
 }
 
 
 
 void AudioView::onMiddleButtonDown()
 {
-	selectUnderMouse();
-
-	selectNone();
-	updateMenu();
 }
 
 
@@ -783,45 +369,19 @@ void AudioView::onMiddleButtonUp()
 
 void AudioView::onRightButtonDown()
 {
-	selectUnderMouse();
-
-	// pop up menu...
-	updateMenu();
-
-	if (selection.type == SEL_TYPE_SAMPLE)
-		menu_sample->openPopup(win, 0, 0);
-	else if (selection.type == SEL_TYPE_MARKER)
-		menu_marker->openPopup(win, 0, 0);
-	else if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE)){
-		menu_track->enable("track_edit_midi", cur_track->type == Track::TYPE_MIDI);
-		menu_track->openPopup(win, 0, 0);
-	}else if (!selection.track)
-		menu_song->openPopup(win, 0, 0);
+	mode->onRightButtonDown();
 }
-
-
 
 void AudioView::onRightButtonUp()
 {
+	mode->onRightButtonUp();
 }
 
 
 
 void AudioView::onLeftDoubleClick()
 {
-	selectUnderMouse();
-
-	if (mouse_possibly_selecting < mouse_min_move_to_select){
-		if (selection.type == SEL_TYPE_SAMPLE){
-			win->side_bar->open(SideBar::SAMPLEREF_DIALOG);
-		}else if ((selection.type == SEL_TYPE_TRACK) or (selection.type == SEL_TYPE_TRACK_HANDLE) or ((selection.track) and ((selection.type == SEL_TYPE_SELECTION_START) or (selection.type == SEL_TYPE_SELECTION_END)))){
-			win->side_bar->open(SideBar::TRACK_CONSOLE);
-		}else if (!selection.track){
-			win->side_bar->open(SideBar::SONG_CONSOLE);
-		}
-		selection.type = SEL_TYPE_NONE;
-	}
-	updateMenu();
+	mode->onLeftDoubleClick();
 }
 
 
@@ -835,45 +395,18 @@ void AudioView::onCommand(const string & id)
 void AudioView::onKeyDown()
 {
 	int k = HuiGetEvent()->key_code;
-
-// view
-	// moving
-	float dt = 0.05f;
-	if (k == KEY_RIGHT)
-		cam.move(ScrollSpeed * dt / cam.scale);
-	if (k == KEY_LEFT)
-		cam.move(- ScrollSpeed * dt / cam.scale);
-	if (k == KEY_NEXT)
-		cam.move(ScrollSpeedFast * dt / cam.scale);
-	if (k == KEY_PRIOR)
-		cam.move(- ScrollSpeedFast * dt / cam.scale);
-	// zoom
-	if (k == KEY_ADD)
-		cam.zoom(exp(  ZoomSpeed));
-	if (k == KEY_SUBTRACT)
-		cam.zoom(exp(- ZoomSpeed));
-
-	if (k == KEY_SPACE){
-		if (stream->isPlaying()){
-			stream->pause();
-		}else{
-			win->onPlay();
-		}
-	}
-	updateMenu();
+	mode->onKeyDown(k);
 }
-
-
 
 void AudioView::onKeyUp()
 {
+	int k = HuiGetEvent()->key_code;
+	mode->onKeyUp(k);
 }
-
-
 
 void AudioView::onMouseWheel()
 {
-	cam.zoom(exp(ZoomSpeed * HuiGetEvent()->dz));
+	mode->onMouseWheel();
 }
 
 
@@ -899,20 +432,6 @@ void AudioView::updateBufferZoom()
 				buffer_zoom_factor = _f;
 			}
 		}
-}
-
-int AudioView::y2pitch(int y)
-{
-	int ti = cur_track->get_index();
-	AudioViewTrack *t = vtrack[ti];
-	return pitch_min + ((t->area.y2 - y) * (pitch_max - pitch_min) / t->area.height());
-}
-
-float AudioView::pitch2y(int p)
-{
-	int ti = cur_track->get_index();
-	AudioViewTrack *t = vtrack[ti];
-	return t->area.y2 - t->area.height() * ((float)p - pitch_min) / (pitch_max - pitch_min);
 }
 
 void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time)
@@ -969,66 +488,6 @@ bool AudioView::editingMidi()
 	if (cur_track->type != Track::TYPE_MIDI)
 		return false;
 	return win->side_bar->isActive(SideBar::MIDI_EDITOR);
-}
-
-void AudioView::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
-{
-	if (song->bars.num == 0)
-		return;
-	bool editing_midi = editingMidi();
-	int s0 = cam.screen2sample(r.x1 - 1);
-	int s1 = cam.screen2sample(r.x2);
-	//c->SetLineWidth(2.0f);
-	Array<float> dash, no_dash;
-	dash.add(6);
-	dash.add(4);
-	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
-	Array<Bar> bars = song->bars.getBars(Range(s0, s1 - s0));
-	foreach(Bar &b, bars){
-		int xx = cam.sample2screen(b.range.offset);
-
-		float dx_bar = cam.dsample2screen(b.range.num);
-		float dx_beat = dx_bar / b.num_beats;
-		float f1 = min(1.0f, dx_bar / 40.0f);
-		if ((b.index % 5) == 0)
-			f1 = 1;
-		float f2 = min(1.0f, dx_beat / 25.0f);
-
-		if (f1 >= 0.1f){
-			c->setColor(ColorInterpolate(bg, colors.text_soft1, f1));
-			c->setLineDash(no_dash, r.y1);
-			c->drawLine(xx, r.y1, xx, r.y2);
-		}
-
-		if (f2 >= 0.1f){
-			color c1 = ColorInterpolate(bg, colors.text_soft1, f2);
-			float beat_length = (float)b.range.num / (float)b.num_beats;
-			c->setLineDash(dash, r.y1);
-			for (int i=0; i<b.num_beats; i++){
-				float beat_offset = b.range.offset + (float)i * beat_length;
-				if (editing_midi){
-					color c2 = ColorInterpolate(bg, c1, 0.6f);
-					c->setColor(c2);
-					for (int j=1; j<beat_partition; j++){
-						int x = cam.sample2screen(beat_offset + beat_length * j / beat_partition);
-						c->drawLine(x, r.y1, x, r.y2);
-					}
-				}
-				if (i == 0)
-					continue;
-				c->setColor(c1);
-				int x = cam.sample2screen(beat_offset);
-				c->drawLine(x, r.y1, x, r.y2);
-			}
-		}
-
-		if ((show_time) and (f1 > 0.9f)){
-			c->setColor(colors.text_soft1);
-			c->drawStr(xx + 2, r.y1, i2s(b.index + 1));
-		}
-	}
-	c->setLineDash(no_dash, 0);
-	c->setLineWidth(LINE_WIDTH);
 }
 
 void AudioView::checkConsistency()
@@ -1147,27 +606,8 @@ void AudioView::drawBackground(HuiPainter *c, const rect &r)
 	drawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), colors.background_track, true);
 
 	// tracks
-	foreachi(AudioViewTrack *t, vtrack, i){
-		color cc = (t->track->is_selected) ? colors.background_track_selected : colors.background_track;
-		c->setColor(cc);
-		c->drawRect(t->area);
-
-		drawGridTime(c, t->area, cc, false);
-		drawGridBars(c, t->area, cc, (t->track->type == Track::TYPE_TIME));
-
-		if ((t->track == cur_track) and (editingMidi())){
-			// pitch grid
-			c->setColor(color(0.25f, 0, 0, 0));
-			for (int i=pitch_min; i<pitch_max; i++){
-				float y0 = pitch2y(i + 1);
-				float y1 = pitch2y(i);
-				if (is_sharp(i)){
-					c->setColor(color(0.2f, 0, 0, 0));
-					c->drawRect(r.x1, y0, r.width(), y1 - y0);
-				}
-			}
-		}
-	}
+	foreachi(AudioViewTrack *t, vtrack, i)
+		mode->drawTrackBackground(c, t);
 
 	// free space below tracks
 	if (yy < r.y2){
@@ -1197,8 +637,8 @@ void AudioView::drawSelection(HuiPainter *c, const rect &r)
 	foreachi(AudioViewTrack *t, vtrack, i)
 		if (t->track->is_selected)
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
-	drawTimeLine(c, sel_raw.start(), SEL_TYPE_SELECTION_START, colors.selection_boundary);
-	drawTimeLine(c, sel_raw.end(), SEL_TYPE_SELECTION_END, colors.selection_boundary);
+	drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
+	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
 }
 
 void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
@@ -1212,8 +652,8 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 	drawBackground(c, r);
 
 	// tracks
-	foreachi(AudioViewTrack *t, vtrack, i)
-		t->draw(c, i);
+	foreach(AudioViewTrack *t, vtrack)
+		t->draw(c);
 
 	// capturing preview
 	if (input and input->isCapturing()){
@@ -1234,9 +674,9 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 
 	// playing/capturing position
 	if (input and input->isCapturing())
-		drawTimeLine(c, sel_range.start() + input->getSampleCount(), SEL_TYPE_PLAYBACK, colors.capture_marker, true);
+		drawTimeLine(c, sel_range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, colors.capture_marker, true);
 	else if (stream->isPlaying())
-		drawTimeLine(c, stream->getPos(), SEL_TYPE_PLAYBACK, colors.preview_marker, true);
+		drawTimeLine(c, stream->getPos(), Selection::TYPE_PLAYBACK, colors.preview_marker, true);
 
 	repeat |= is_updating_peaks;
 
@@ -1248,7 +688,6 @@ int frame=0;
 
 void AudioView::onDraw()
 {
-	msg_db_f("OnDraw", 1);
 	force_redraw = false;
 
 	HuiPainter *c = win->beginDraw("area");
@@ -1268,7 +707,6 @@ void AudioView::onDraw()
 
 void AudioView::optimizeView()
 {
-	msg_db_f("OptimizeView", 1);
 	if (area.x2 <= 0)
 		area.x2 = drawing_rect.x2;
 

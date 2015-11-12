@@ -17,7 +17,6 @@ class BufferBox;
 class SampleRef;
 class MidiNoteData;
 class MidiEvent;
-class MidiNote;
 class TrackMarker;
 
 class AudioViewTrack
@@ -28,23 +27,14 @@ public:
 
 	static color getPitchColor(int pitch);
 
-	enum MidiNoteState
-	{
-		STATE_DEFAULT,
-		STATE_HOVER,
-		STATE_REFERENCE
-	};
-
 	void drawTrackBuffers(HuiPainter *c, double pos);
 	void drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(HuiPainter *c, SampleRef *s);
 	void drawMarker(HuiPainter *c, const TrackMarker &marker, int index, bool hover);
 	void drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift);
-	void drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, bool as_reference);
-	void drawMidiNote(HuiPainter *c, const MidiNote &n, MidiNoteState state);
-	void drawMidiEvent(HuiPainter *c, const MidiEvent &e);
-	void draw(HuiPainter *c, int track_no);
+	void drawHeader(HuiPainter *c);
+	void draw(HuiPainter *c);
 
 	Track *track;
 	rect area;

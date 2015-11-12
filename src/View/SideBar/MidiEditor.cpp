@@ -11,6 +11,7 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
+#include "../Mode/ViewModeMidi.h"
 #include "../../Plugins/ConfigPanel.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
@@ -44,7 +45,7 @@ MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
 
 	for (int i=0; i<12; i++)
 		addString("scale", rel_pitch_name(i) + " " + GetChordTypeName(CHORD_TYPE_MAJOR) + " / " + rel_pitch_name(pitch_to_rel(i + 9)) + " " + GetChordTypeName(CHORD_TYPE_MINOR));
-	setInt("scale", view->midi_scale);
+	setInt("scale", view->mode_midi->midi_scale);
 
 	track = NULL;
 	//Enable("add", false);
@@ -116,52 +117,52 @@ void MidiEditor::onUpdate(Observable* o, const string &message)
 
 void MidiEditor::onPitch()
 {
-	view->pitch_min = getInt("");
-	view->pitch_max = getInt("") + 30;
+	view->mode_midi->pitch_min = getInt("");
+	view->mode_midi->pitch_max = getInt("") + 30;
 	view->forceRedraw();
 }
 
 void MidiEditor::onScale()
 {
-	view->midi_scale = getInt("");
+	view->mode_midi->midi_scale = getInt("");
 	view->forceRedraw();
 }
 
 void MidiEditor::onBeatPartition()
 {
-	view->beat_partition = getInt("");
+	view->mode_midi->beat_partition = getInt("");
 	view->forceRedraw();
 }
 
 void MidiEditor::onMidiModeSelect()
 {
-	view->midi_mode = view->MIDI_MODE_SELECT;
+	view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_SELECT;
 	enable("chord_type", false);
 	enable("chord_inversion", false);
 }
 
 void MidiEditor::onMidiModeNote()
 {
-	view->midi_mode = view->MIDI_MODE_NOTE;
+	view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_NOTE;
 	enable("chord_type", false);
 	enable("chord_inversion", false);
 }
 
 void MidiEditor::onMidiModeChord()
 {
-	view->midi_mode = view->MIDI_MODE_CHORD;
+	view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_CHORD;
 	enable("chord_type", true);
 	enable("chord_inversion", true);
 }
 
 void MidiEditor::onChordType()
 {
-	view->chord_type = getInt("");
+	view->mode_midi->chord_type = getInt("");
 }
 
 void MidiEditor::onChordInversion()
 {
-	view->chord_inversion = getInt("");
+	view->mode_midi->chord_inversion = getInt("");
 }
 
 void MidiEditor::onReferenceTrack()

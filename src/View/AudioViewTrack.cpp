@@ -7,11 +7,10 @@
 
 #include "AudioViewTrack.h"
 #include "AudioView.h"
+#include "Mode/ViewMode.h"
 #include "../Tsunami.h"
 #include "../Data/Song.h"
 #include "../Audio/Synth/Synthesizer.h"
-
-void DrawStrBg(HuiPainter *c, float x, float y, const string &str, const color &fg, const color &bg);
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 {
@@ -231,113 +230,15 @@ void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void AudioViewTrack::drawMidiNote(HuiPainter *c, const MidiNote &n, MidiNoteState state)
+void AudioViewTrack::draw(HuiPainter *c)
 {
-	float x1 = view->cam.sample2screen(n.range.offset);
-	float x2 = view->cam.sample2screen(n.range.end());
-	float y1 = view->pitch2y(n.pitch + 1);
-	float y2 = view->pitch2y(n.pitch);
-	color col = getPitchColor(n.pitch);
-	if (state == STATE_HOVER){
-		col.a = 0.5f;
-	}else if (state == STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.text_soft2, 0.7f);
-		col.a = 0.5f;
-	}
-	c->setColor(col);
-	c->drawRect(rect(x1, x2, y1, y2));
+	view->mode->drawTrackData(c, this);
+
+	drawHeader(c);
 }
 
-void AudioViewTrack::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
+void AudioViewTrack::drawHeader(HuiPainter *c)
 {
-	float x = view->cam.sample2screen(e.pos);
-	float y1 = view->pitch2y(e.pitch + 1);
-	float y2 = view->pitch2y(e.pitch);
-	color col = getPitchColor(e.pitch);
-	col = ColorInterpolate(col, view->colors.text, 0.5f);
-	c->setColor(col);
-	c->drawRect(rect(x-1.5f, x+1.5f, y1, y2));
-}
-
-void AudioViewTrack::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, bool as_reference)
-{
-	Array<MidiEvent> events = midi.getEvents(view->cam.range());
-	Array<MidiNote> notes = midi.getNotes(view->cam.range());
-
-	// draw notes
-	foreachi(MidiNote &n, notes, i){
-		if ((n.pitch < view->pitch_min) or (n.pitch >= view->pitch_max))
-			continue;
-		bool hover = ((view->hover.type == view->SEL_TYPE_MIDI_NOTE) and (n.range.offset == view->hover.note_start) and (n.pitch == view->hover.pitch));
-		if (as_reference){
-			drawMidiNote(c, n, STATE_REFERENCE);
-		}else{
-			drawMidiNote(c, n, hover ? STATE_HOVER : STATE_DEFAULT);
-		}
-	}
-	if (as_reference)
-		return;
-
-	// draw events
-	foreach(MidiEvent &e, events)
-		drawMidiEvent(c, e);
-
-	// current creation
-	if ((HuiGetEvent()->lbut) and (view->selection.type == view->SEL_TYPE_MIDI_PITCH)){
-		Array<MidiNote> notes = view->getCreationNotes();
-		foreach(MidiNote &n, notes){
-			drawMidiNote(c, n, STATE_HOVER);
-		}
-	}
-
-	color cc = view->colors.text;
-	cc.a = 0.4f;
-	Array<SampleRef*> *p = NULL;
-	if ((track->synth) and (track->synth->name == "Sample")){
-		PluginData *c = track->synth->get_config();
-		p = (Array<SampleRef*> *)&c[1];
-	}
-	bool is_drum = ((track->synth) and (track->synth->name == "Drumset"));
-	for (int i=view->pitch_min; i<view->pitch_max; i++){
-		c->setColor(cc);
-		if (((view->hover.type == view->SEL_TYPE_MIDI_PITCH) or (view->hover.type == view->SEL_TYPE_MIDI_NOTE)) and (i == view->hover.pitch))
-			c->setColor(view->colors.text);
-
-		string name = pitch_name(i);
-		if (is_drum){
-			name = drum_pitch_name(i);
-		}else if (p){
-			if (i < p->num)
-				if ((*p)[i])
-					name = (*p)[i]->origin->name;
-		}
-		c->drawStr(20, area.y1 + area.height() * (view->pitch_max - i - 1) / (view->pitch_max - view->pitch_min), name);
-	}
-}
-
-void AudioViewTrack::draw(HuiPainter *c, int track_no)
-{
-	// midi
-	if ((view->cur_track == track) and (view->editingMidi())){
-		if ((reference_track >= 0) and (reference_track < track->song->tracks.num))
-			drawMidiEditable(c, track->song->tracks[reference_track]->midi, true);
-		drawMidiEditable(c, track->midi, false);
-	}else{
-		drawMidi(c, track->midi, 0);
-	}
-
-	// audio buffer
-	drawTrackBuffers(c, view->cam.pos);
-
-	foreach(SampleRef *s, track->samples)
-		drawSample(c, s);
-
-	// marker
-	marker_areas.resize(track->markers.num);
-	foreachi(TrackMarker &m, track->markers, i)
-		if (!m.text.match(":*:"))
-			drawMarker(c, m, i, (view->hover.type == view->SEL_TYPE_MARKER) and (view->hover.track == track) and (view->hover.index == i));
-
 	if (view->hover.show_track_controls == track){
 		c->setColor(color(0.4f, 1, 1, 1));
 		c->drawRect(0, area.y1, view->TRACK_HANDLE_WIDTH, area.height());
@@ -380,7 +281,7 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 		if (track->muted)
 			c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.x_bg);
 		c->setColor(view->colors.text);
-		if (view->hover.type == view->SEL_TYPE_MUTE)
+		if (view->hover.type == Selection::TYPE_MUTE)
 			c->setColor(view->colors.text_soft2);
 		c->drawMaskImage(area.x1 + 5, area.y1 + 22, *view->images.speaker);
 		if (track->muted)
@@ -390,7 +291,7 @@ void AudioViewTrack::draw(HuiPainter *c, int track_no)
 		c->setColor(view->colors.background_track);
 		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo_bg);
 		c->setColor(view->colors.text);
-		if (view->hover.type == view->SEL_TYPE_SOLO)
+		if (view->hover.type == Selection::TYPE_SOLO)
 			c->setColor(view->colors.text_soft2);
 		c->drawMaskImage(area.x1 + 22, area.y1 + 22, *view->images.solo);
 	}

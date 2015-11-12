@@ -273,7 +273,7 @@ void TsunamiWindow::onSampleProperties()
 
 void TsunamiWindow::onDeleteMarker()
 {
-	if (view->selection.type == view->SEL_TYPE_MARKER)
+	if (view->selection.type == Selection::TYPE_MARKER)
 		view->cur_track->deleteMarker(view->selection.index);
 	else
 		tsunami->log->error(_("Kein Marker ausgew&ahlt"));
@@ -281,7 +281,7 @@ void TsunamiWindow::onDeleteMarker()
 
 void TsunamiWindow::onEditMarker()
 {
-	if (view->selection.type == view->SEL_TYPE_MARKER){
+	if (view->selection.type == Selection::TYPE_MARKER){
 		MarkerDialog *d = new MarkerDialog(this, false, view->cur_track, -1, view->selection.index);
 		d->run();
 	}else

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-276
+274
 // Data (ID,Text)
 about
 Info
@@ -203,8 +203,6 @@ ld_t_no_midi
 !expandx,center\\No midi track selected
 ld_t_partition
 Partitioning
-ld_t_pitch
-Pitch
 ld_t_repdelay
 Delay
 ld_t_repetition
@@ -397,8 +395,6 @@ per_second
 /s
 percent
 %
-pitch_offset
-!expandx\\60\\0\\90
 play
 Play
 play_loop
@@ -421,9 +417,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_814409
+rand_id_422634
 
-rand_id_98562
+rand_id_885585
 
 rdt_capture
 Recording
@@ -556,7 +552,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-150
+151
 // Data (ID,Text)
 
 
@@ -760,6 +756,8 @@ Samples\\\") + i2s(samples));
 
 Script (*.kaba)
 Script (*.kaba)
+Selektierung ziehen zum Skalieren
+move selection to scale
 Sicherungsdatei für Aufnahmen wählen
 Select backup file for recordings
 Spur

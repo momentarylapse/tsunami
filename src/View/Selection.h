@@ -43,6 +43,7 @@ public:
 		TYPE_MIDI_NOTE,
 		TYPE_MIDI_PITCH,
 		TYPE_MARKER,
+		TYPE_SCROLL,
 	};
 
 	Selection();

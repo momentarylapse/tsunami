@@ -4,11 +4,9 @@ Dialog midi_editor "Midi" 380 516
 			Text ld_t_no_midi "keine Midi-Spur ausgewählt" expandx center
 		Grid me_grid_yes "" 1 4
 			Group me_group_view "Ansicht"
-				Grid ? "" 2 3
-					Text ld_t_pitch "Pitch"
-					SpinButton pitch_offset "60\\0\\90" expandx
+				Grid ? "" 2 2
 					Text ld_t_partition "Unterteilung"
-					SpinButton beat_partition "4\\1\\256"
+					SpinButton beat_partition "4\\1\\256" expandx
 					Text ld_t_scale "Tonleiter"
 					ComboBox scale ""
 			Group me_group_chord "Akkord"

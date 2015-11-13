@@ -51,7 +51,6 @@ MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("pitch_offset", this, &MidiEditor::onPitch);
 	event("beat_partition", this, &MidiEditor::onBeatPartition);
 	event("scale", this, &MidiEditor::onScale);
 	event("midi_mode:select", this, &MidiEditor::onMidiModeSelect);
@@ -115,23 +114,14 @@ void MidiEditor::onUpdate(Observable* o, const string &message)
 }
 
 
-void MidiEditor::onPitch()
-{
-	view->mode_midi->pitch_min = getInt("");
-	view->mode_midi->pitch_max = getInt("") + 30;
-	view->forceRedraw();
-}
-
 void MidiEditor::onScale()
 {
-	view->mode_midi->midi_scale = getInt("");
-	view->forceRedraw();
+	view->mode_midi->setScale(getInt(""));
 }
 
 void MidiEditor::onBeatPartition()
 {
-	view->mode_midi->beat_partition = getInt("");
-	view->forceRedraw();
+	view->mode_midi->setBeatPartition(getInt(""));
 }
 
 void MidiEditor::onMidiModeSelect()

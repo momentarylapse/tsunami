@@ -16,17 +16,23 @@
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
+const int PITCH_SHOW_COUNT = 30;
+
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
 {
-	pitch_min = 60;
-	pitch_max = 90;
+	pitch_min = 55;
+	pitch_max = pitch_min + PITCH_SHOW_COUNT;
 	beat_partition = 4;
 	win->setInt("beat_partition", beat_partition);
 	midi_scale = 0;
 	midi_mode = MIDI_MODE_NOTE;
 	chord_type = 0;
 	chord_inversion = 0;
+
+	scroll_offset = 0;
+	scroll_bar = rect(0, 0, 0, 0);
+	track_rect = rect(0, 0, 0, 0);
 
 
 	preview_renderer = new SynthesizerRenderer(NULL);
@@ -58,6 +64,8 @@ void ViewModeMidi::onLeftButtonDown()
 			midi.add(MidiEvent(0, p, 1));
 		preview_renderer->feed(midi);
 		preview_stream->play();
+	}else if (selection->type == Selection::TYPE_SCROLL){
+		scroll_offset = view->my - scroll_bar.y1;
 	}
 }
 
@@ -79,6 +87,9 @@ void ViewModeMidi::onMouseMove()
 	// drag & drop
 	if (selection->type == Selection::TYPE_MIDI_PITCH){
 		view->forceRedraw();
+	}else if (selection->type == Selection::TYPE_SCROLL){
+		pitch_max = (track_rect.y2 + scroll_offset - view->my) / track_rect.height() * 127.0f;
+		setPitchMin(pitch_max - PITCH_SHOW_COUNT);
 	}
 }
 
@@ -166,6 +177,25 @@ float ViewModeMidi::pitch2y(int p)
 	int ti = view->cur_track->get_index();
 	AudioViewTrack *t = view->vtrack[ti];
 	return t->area.y2 - t->area.height() * ((float)p - pitch_min) / (pitch_max - pitch_min);
+}
+
+void ViewModeMidi::setPitchMin(int pitch)
+{
+	pitch_min = clampi(pitch, 0, 127 - PITCH_SHOW_COUNT);
+	pitch_max = pitch_min + PITCH_SHOW_COUNT;
+	view->forceRedraw();
+}
+
+void ViewModeMidi::setScale(int scale)
+{
+	midi_scale = scale;
+	view->forceRedraw();
+}
+
+void ViewModeMidi::setBeatPartition(int partition)
+{
+	beat_partition = partition;
+	view->forceRedraw();
 }
 
 void ViewModeMidi::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
@@ -321,16 +351,22 @@ Selection ViewModeMidi::getHover()
 	}
 
 	// midi
-	if ((s.track) and (s.track->type == Track::TYPE_MIDI) and (s.track == view->cur_track) and (midi_mode != MIDI_MODE_SELECT)){
-		s.pitch = y2pitch(my);
-		s.type = Selection::TYPE_MIDI_PITCH;
-		Array<MidiNote> notes = s.track->midi.getNotes(cam->range());
-		foreachi(MidiNote &n, notes, i)
-			if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
-				s.index = i;
-				s.type = Selection::TYPE_MIDI_NOTE;
-				return s;
-			}
+	if ((s.track) and (s.track->type == Track::TYPE_MIDI) and (s.track == view->cur_track)){
+		if (scroll_bar.inside(view->mx, view->my)){
+			s.type = Selection::TYPE_SCROLL;
+			return s;
+		}
+		if (midi_mode != MIDI_MODE_SELECT){
+			s.pitch = y2pitch(my);
+			s.type = Selection::TYPE_MIDI_PITCH;
+			Array<MidiNote> notes = s.track->midi.getNotes(cam->range());
+			foreachi(MidiNote &n, notes, i)
+				if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
+					s.index = i;
+					s.type = Selection::TYPE_MIDI_NOTE;
+					return s;
+				}
+		}
 	}
 
 	// time scale
@@ -383,6 +419,8 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, boo
 	Array<MidiEvent> events = midi.getEvents(view->cam.range());
 	Array<MidiNote> notes = midi.getNotes(view->cam.range());
 
+	track_rect = area;
+
 	// draw notes
 	foreachi(MidiNote &n, notes, i){
 		if ((n.pitch < pitch_min) or (n.pitch >= pitch_max))
@@ -399,7 +437,8 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, boo
 
 	// draw events
 	foreach(MidiEvent &e, events)
-		drawMidiEvent(c, e);
+		if ((e.pitch >= pitch_min) and (e.pitch < pitch_max))
+			drawMidiEvent(c, e);
 
 	// current creation
 	if ((HuiGetEvent()->lbut) and (selection->type == Selection::TYPE_MIDI_PITCH)){
@@ -430,8 +469,16 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, boo
 				if ((*p)[i])
 					name = (*p)[i]->origin->name;
 		}
-		c->drawStr(20, area.y1 + area.height() * (pitch_max - i - 1) / (pitch_max - pitch_min), name);
+		c->drawStr(20, area.y1 + area.height() * (pitch_max - i - 1) / PITCH_SHOW_COUNT, name);
 	}
+
+	// scrollbar
+	if (hover->type == Selection::TYPE_SCROLL)
+		c->setColor(view->colors.text);
+	else
+		c->setColor(view->colors.text_soft1);
+	scroll_bar = rect(area.x2 - 40, area.x2 - 20, area.y2 - area.height() * pitch_max / 127.0f, area.y2 - area.height() * pitch_min / 127.0f);
+	c->drawRect(scroll_bar);
 }
 
 void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)

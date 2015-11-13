@@ -28,7 +28,6 @@ public:
 	virtual void onUpdate(Observable *o, const string &message);
 	void update();
 
-	void onPitch();
 	void onScale();
 	void onBeatPartition();
 	void onMidiModeSelect();

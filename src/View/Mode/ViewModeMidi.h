@@ -9,6 +9,7 @@
 #define SRC_VIEW_MODE_VIEWMODEMIDI_H_
 
 #include "ViewModeDefault.h"
+#include "../../lib/math/math.h"
 
 class MidiNoteData;
 class MidiNote;
@@ -47,6 +48,9 @@ public:
 	MidiNoteData getCreationNotes();
 	int y2pitch(int y);
 	float pitch2y(int p);
+	void setPitchMin(int pitch);
+	void setScale(int scale);
+	void setBeatPartition(int partition);
 
 	int pitch_min, pitch_max;
 	int beat_partition;
@@ -65,6 +69,10 @@ public:
 
 	AudioStream *preview_stream;
 	SynthesizerRenderer *preview_renderer;
+
+	rect scroll_bar;
+	rect track_rect;
+	float scroll_offset;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

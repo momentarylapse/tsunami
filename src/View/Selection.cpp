@@ -10,7 +10,17 @@
 
 Selection::Selection()
 {
-	type = Selection::TYPE_NONE;
+	clear();
+}
+
+bool Selection::allowAutoScroll()
+{
+	return (type == Selection::TYPE_SELECTION_END) or (type == Selection::TYPE_SAMPLE) or (type == Selection::TYPE_PLAYBACK);
+}
+
+void Selection::clear()
+{
+	type = TYPE_NONE;
 	track = NULL;
 	vtrack = NULL;
 	sample = NULL;
@@ -20,11 +30,6 @@ Selection::Selection()
 	show_track_controls = NULL;
 	pitch = -1;
 	note_start = -1;
-}
-
-bool Selection::allowAutoScroll()
-{
-	return (type == Selection::TYPE_SELECTION_END) or (type == Selection::TYPE_SAMPLE) or (type == Selection::TYPE_PLAYBACK);
 }
 
 bool hover_changed(Selection &hover, Selection &hover_old)

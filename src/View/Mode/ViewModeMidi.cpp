@@ -9,8 +9,6 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../../Audio/AudioStream.h"
-#include "../../Action/Track/Sample/ActionTrackMoveSample.h"
-#include "../../Audio/AudioStream.h"
 #include "../../Audio/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Audio/Synth/SynthesizerRenderer.h"
@@ -29,82 +27,59 @@ ViewModeMidi::ViewModeMidi(AudioView *view, ViewMode *parent) :
 	midi_mode = MIDI_MODE_NOTE;
 	chord_type = 0;
 	chord_inversion = 0;
+
+
+	preview_renderer = new SynthesizerRenderer(NULL);
+	preview_renderer->setAutoStop(true);
+	preview_stream = new AudioStream(preview_renderer);
+	preview_stream->setBufferSize(2048);
 }
 
 ViewModeMidi::~ViewModeMidi()
 {
-}
-
-
-void deleteMidiNote(Track *t, int pitch, int start)
-{
-	foreachi(MidiNote &n, t->midi, i)
-		if ((n.pitch == pitch) and (n.range.offset == start))
-			t->deleteMidiNote(i);
+	delete(preview_stream);
+	delete(preview_renderer);
 }
 
 void ViewModeMidi::onLeftButtonDown()
 {
-	selectUnderMouse();
-	view->updateMenu();
+	ViewModeDefault::onLeftButtonDown();
 
-	setBarriers(selection);
-
-	applyBarriers(selection->pos);
-	mouse_possibly_selecting_start = selection->pos;
-
-	// selection:
-	//   start after lb down and moving
-	if ((selection->type == Selection::TYPE_TRACK) or (selection->type == Selection::TYPE_TIME)){
-		setCursorPos(selection->pos);
-	}else if (selection->type == Selection::TYPE_SELECTION_START){
-		// swap end / start
-		selection->type = Selection::TYPE_SELECTION_END;
-		hover->type = Selection::TYPE_SELECTION_END;
-		view->sel_raw.invert();
-	}else if (selection->type == Selection::TYPE_MUTE){
-		selection->track->setMuted(!selection->track->muted);
-	}else if (selection->type == Selection::TYPE_SOLO){
-		foreach(Track *t, song->tracks)
-			t->is_selected = (t == selection->track);
-		if (selection->track->muted)
-			selection->track->setMuted(false);
-	}else if (selection->type == Selection::TYPE_SAMPLE){
-		cur_action = new ActionTrackMoveSample(view->song);
-	}else if (selection->type == Selection::TYPE_MIDI_NOTE){
-		deleteMidiNote(view->cur_track, selection->pitch, selection->note_start);
+	if (selection->type == Selection::TYPE_MIDI_NOTE){
+		selection->track->deleteMidiNote(selection->index);
+		hover->clear();
 	}else if (selection->type == Selection::TYPE_MIDI_PITCH){
-		view->midi_preview_renderer->resetMidiData();
-		view->midi_preview_renderer->setSynthesizer(view->cur_track->synth);
+		preview_renderer->resetMidiData();
+		preview_renderer->setSynthesizer(view->cur_track->synth);
 
 		Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection->pitch);
 		MidiRawData midi;
 		foreach(int p, pitch)
 			midi.add(MidiEvent(0, p, 1));
-		view->midi_preview_renderer->feed(midi);
-		view->midi_preview_stream->play();
+		preview_renderer->feed(midi);
+		preview_stream->play();
 	}
-
-	view->forceRedraw();
-	view->updateMenu();
 }
 
 void ViewModeMidi::onLeftButtonUp()
 {
-	if (selection->type == Selection::TYPE_SAMPLE){
-		if (cur_action)
-			song->execute(cur_action);
-	}else if (selection->type == Selection::TYPE_MIDI_PITCH){
+	ViewModeDefault::onLeftButtonUp();
+
+	if (selection->type == Selection::TYPE_MIDI_PITCH){
 		view->cur_track->addMidiNotes(getCreationNotes());
 
-		view->midi_preview_renderer->endAllNotes();
+		preview_renderer->endAllNotes();
 	}
-	cur_action = NULL;
+}
 
-	// TODO !!!!!!!!
-	selection->type = Selection::TYPE_NONE;
-	view->forceRedraw();
-	view->updateMenu();
+void ViewModeMidi::onMouseMove()
+{
+	ViewModeDefault::onMouseMove();
+
+	// drag & drop
+	if (selection->type == Selection::TYPE_MIDI_PITCH){
+		view->forceRedraw();
+	}
 }
 
 
@@ -242,7 +217,7 @@ void ViewModeMidi::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 	view->drawGridTime(c, t->area, cc, false);
 	drawGridBars(c, t->area, cc, (t->track->type == Track::TYPE_TIME));
 
-	if (t->track == view->cur_track){
+	if ((t->track == view->cur_track) and (t->track->type == Track::TYPE_MIDI)){
 		// pitch grid
 		c->setColor(color(0.25f, 0, 0, 0));
 		for (int i=pitch_min; i<pitch_max; i++){
@@ -333,9 +308,9 @@ Selection ViewModeMidi::getHover()
 		s.pitch = y2pitch(my);
 		s.type = Selection::TYPE_MIDI_PITCH;
 		Array<MidiNote> notes = s.track->midi.getNotes(cam->range());
-		foreach(MidiNote &n, notes)
+		foreachi(MidiNote &n, notes, i)
 			if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
-				s.note_start = n.range.offset;
+				s.index = i;
 				s.type = Selection::TYPE_MIDI_NOTE;
 				return s;
 			}
@@ -395,7 +370,7 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, boo
 	foreachi(MidiNote &n, notes, i){
 		if ((n.pitch < pitch_min) or (n.pitch >= pitch_max))
 			continue;
-		bool _hover = ((hover->type == Selection::TYPE_MIDI_NOTE) and (n.range.offset == hover->note_start) and (n.pitch == hover->pitch));
+		bool _hover = ((hover->type == Selection::TYPE_MIDI_NOTE) and (i == hover->index));
 		if (as_reference){
 			drawMidiNote(c, n, STATE_REFERENCE);
 		}else{

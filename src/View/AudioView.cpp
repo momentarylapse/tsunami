@@ -160,11 +160,6 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	renderer = new SongRenderer;
 	stream = new AudioStream(renderer);
 
-	midi_preview_renderer = new SynthesizerRenderer(NULL);
-	midi_preview_renderer->setAutoStop(true);
-	midi_preview_stream = new AudioStream(midi_preview_renderer);
-	midi_preview_stream->setBufferSize(2048);
-
 	area = rect(0, 0, 0, 0);
 	mx = my = 0;
 	subscribe(song);
@@ -203,13 +198,13 @@ AudioView::~AudioView()
 	unsubscribe(stream);
 	setInput(NULL);
 
+	delete(mode_bars);
+	delete(mode_midi);
 	delete(mode_default);
 
 	delete(peak_thread);
 	delete(stream);
 	delete(renderer);
-	delete(midi_preview_stream);
-	delete(midi_preview_renderer);
 
 	delete(images.speaker);
 	delete(images.speaker_bg);
@@ -323,6 +318,8 @@ void AudioView::onLeftButtonDown()
 {
 	setMouse();
 	mode->onLeftButtonDown();
+	forceRedraw();
+	updateMenu();
 }
 
 void align_to_beats(Song *s, Range &r, int beat_partition)
@@ -350,6 +347,12 @@ void align_to_beats(Song *s, Range &r, int beat_partition)
 void AudioView::onLeftButtonUp()
 {
 	mode->onLeftButtonUp();
+
+	// TODO !!!!!!!!
+	selection.clear();
+
+	forceRedraw();
+	updateMenu();
 }
 
 
@@ -381,6 +384,8 @@ void AudioView::onRightButtonUp()
 void AudioView::onLeftDoubleClick()
 {
 	mode->onLeftDoubleClick();
+	forceRedraw();
+	updateMenu();
 }
 
 

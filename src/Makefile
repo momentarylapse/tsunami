@@ -240,6 +240,10 @@ OBJ = \
  View/Helper/PeakMeter.o\
  View/Helper/Progress.o\
  View/Helper/Slider.o\
+ View/Mode/ViewMode.o\
+ View/Mode/ViewModeBars.o\
+ View/Mode/ViewModeDefault.o\
+ View/Mode/ViewModeMidi.o\
  View/SideBar/SideBar.o\
  View/SideBar/BarsConsole.o\
  View/SideBar/FxConsole.o\
@@ -254,6 +258,7 @@ OBJ = \
  View/AudioView.o\
  View/AudioViewTrack.o\
  View/ColorScheme.o\
+ View/Selection.o\
  View/TrackHeightManager.o\
  View/ViewPort.o\
  TsunamiWindow.o\
@@ -976,6 +981,18 @@ View/Helper/Progress.o : View/Helper/Progress.cpp
 View/Helper/Slider.o : View/Helper/Slider.cpp
 	$(CPP) -c View/Helper/Slider.cpp -o $@ $(CXXFLAGS)
 
+View/Mode/ViewMode.o : View/Mode/ViewMode.cpp
+	$(CPP) -c View/Mode/ViewMode.cpp -o $@ $(CXXFLAGS)
+
+View/Mode/ViewModeBars.o : View/Mode/ViewModeBars.cpp
+	$(CPP) -c View/Mode/ViewModeBars.cpp -o $@ $(CXXFLAGS)
+
+View/Mode/ViewModeDefault.o : View/Mode/ViewModeDefault.cpp
+	$(CPP) -c View/Mode/ViewModeDefault.cpp -o $@ $(CXXFLAGS)
+
+View/Mode/ViewModeMidi.o : View/Mode/ViewModeMidi.cpp
+	$(CPP) -c View/Mode/ViewModeMidi.cpp -o $@ $(CXXFLAGS)
+
 View/SideBar/SideBar.o : View/SideBar/SideBar.cpp
 	$(CPP) -c View/SideBar/SideBar.cpp -o $@ $(CXXFLAGS)
 
@@ -1017,6 +1034,9 @@ View/AudioViewTrack.o : View/AudioViewTrack.cpp
 
 View/ColorScheme.o : View/ColorScheme.cpp
 	$(CPP) -c View/ColorScheme.cpp -o $@ $(CXXFLAGS)
+
+View/Selection.o : View/Selection.cpp
+	$(CPP) -c View/Selection.cpp -o $@ $(CXXFLAGS)
 
 View/TrackHeightManager.o : View/TrackHeightManager.cpp
 	$(CPP) -c View/TrackHeightManager.cpp -o $@ $(CXXFLAGS)

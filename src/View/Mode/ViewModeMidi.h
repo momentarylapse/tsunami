@@ -13,6 +13,8 @@
 class MidiNoteData;
 class MidiNote;
 class MidiEvent;
+class AudioStream;
+class SynthesizerRenderer;
 
 class ViewModeMidi : public ViewModeDefault
 {
@@ -22,6 +24,7 @@ public:
 
 	virtual void onLeftButtonDown();
 	virtual void onLeftButtonUp();
+	virtual void onMouseMove();
 
 	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time);
 	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t);
@@ -58,6 +61,9 @@ public:
 		MIDI_MODE_NOTE,
 		MIDI_MODE_CHORD
 	};
+
+	AudioStream *preview_stream;
+	SynthesizerRenderer *preview_renderer;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

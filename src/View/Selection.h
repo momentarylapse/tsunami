@@ -47,6 +47,7 @@ public:
 
 	Selection();
 	bool allowAutoScroll();
+	void clear();
 };
 
 bool hover_changed(Selection &hover, Selection &hover_old);

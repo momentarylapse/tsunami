@@ -31,7 +31,6 @@ ViewModeDefault::~ViewModeDefault()
 void ViewModeDefault::onLeftButtonDown()
 {
 	selectUnderMouse();
-	view->updateMenu();
 
 	setBarriers(selection);
 
@@ -57,9 +56,6 @@ void ViewModeDefault::onLeftButtonDown()
 	}else if (selection->type == Selection::TYPE_SAMPLE){
 		cur_action = new ActionTrackMoveSample(view->song);
 	}
-
-	view->forceRedraw();
-	view->updateMenu();
 }
 
 void ViewModeDefault::onLeftButtonUp()
@@ -69,11 +65,6 @@ void ViewModeDefault::onLeftButtonUp()
 			song->execute(cur_action);
 	}
 	cur_action = NULL;
-
-	// TODO !!!!!!!!
-	selection->type = Selection::TYPE_NONE;
-	view->forceRedraw();
-	view->updateMenu();
 }
 
 void ViewModeDefault::onLeftDoubleClick()
@@ -90,7 +81,6 @@ void ViewModeDefault::onLeftDoubleClick()
 		}
 		selection->type = Selection::TYPE_NONE;
 	}
-	view->updateMenu();
 }
 
 void ViewModeDefault::onRightButtonDown()
@@ -139,6 +129,7 @@ void ViewModeDefault::onMouseMove()
 
 	// drag & drop
 	if (selection->type == Selection::TYPE_SELECTION_END){
+
 		Selection mo = getHover();
 		if (mo.track)
 			mo.track->is_selected = true;
@@ -480,7 +471,7 @@ void ViewModeDefault::setCursorPos(int pos)
 void ViewModeDefault::selectUnderMouse()
 {
 	*hover = getHover();
-	selection = hover;
+	*selection = *hover;
 	Track *t = selection->track;
 	SampleRef *s = selection->sample;
 	bool control = win->getKey(KEY_CONTROL);

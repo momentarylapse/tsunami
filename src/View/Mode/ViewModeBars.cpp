@@ -51,7 +51,7 @@ void ViewModeBars::startScaling(const Array<int> &sel)
 
 void ViewModeBars::onLeftButtonUp()
 {
-	parent->onLeftButtonUp();
+	ViewModeDefault::onLeftButtonUp();
 
 	if (scaling)
 		view->mode_bars->performScale();
@@ -59,7 +59,7 @@ void ViewModeBars::onLeftButtonUp()
 
 void ViewModeBars::onMouseMove()
 {
-	parent->onMouseMove();
+	ViewModeDefault::onMouseMove();
 
 	if (scaling)
 		scaling_change = true;

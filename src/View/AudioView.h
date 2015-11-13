@@ -22,7 +22,6 @@ class AudioInputAny;
 class SongRenderer;
 class TsunamiWindow;
 class AudioViewTrack;
-class SynthesizerRenderer;
 class PeakThread;
 class ViewMode;
 class ViewModeDefault;
@@ -142,8 +141,6 @@ public:
 
 	AudioStream *stream;
 	SongRenderer *renderer;
-	AudioStream *midi_preview_stream;
-	SynthesizerRenderer *midi_preview_renderer;
 	AudioInputAny *input;
 	void setInput(AudioInputAny *input);
 

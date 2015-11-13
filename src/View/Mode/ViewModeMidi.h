@@ -19,12 +19,13 @@ class SynthesizerRenderer;
 class ViewModeMidi : public ViewModeDefault
 {
 public:
-	ViewModeMidi(AudioView *view, ViewMode *parent);
+	ViewModeMidi(AudioView *view);
 	virtual ~ViewModeMidi();
 
 	virtual void onLeftButtonDown();
 	virtual void onLeftButtonUp();
 	virtual void onMouseMove();
+	virtual void updateTrackHeights();
 
 	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time);
 	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t);

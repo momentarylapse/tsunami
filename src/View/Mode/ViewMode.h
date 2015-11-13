@@ -22,20 +22,19 @@ class color;
 class ViewMode
 {
 public:
-	ViewMode(AudioView *view, ViewMode *parent);
+	ViewMode(AudioView *view);
 	virtual ~ViewMode();
 
-	virtual void onLeftButtonDown();
-	virtual void onLeftButtonUp();
-	virtual void onLeftDoubleClick();
-	virtual void onRightButtonDown();
-	virtual void onRightButtonUp();
-	virtual void onMouseMove();
-	virtual void onMouseWheel();
-	virtual void onKeyDown(int k);
-	virtual void onKeyUp(int k);
-	virtual int getTrackHeightMin(Track *t);
-	virtual int getTrackHeightMax(Track *t);
+	virtual void onLeftButtonDown(){}
+	virtual void onLeftButtonUp(){}
+	virtual void onLeftDoubleClick(){}
+	virtual void onRightButtonDown(){}
+	virtual void onRightButtonUp(){}
+	virtual void onMouseMove(){}
+	virtual void onMouseWheel(){}
+	virtual void onKeyDown(int k){}
+	virtual void onKeyUp(int k){}
+	virtual void updateTrackHeights(){}
 
 	virtual Selection getHover();
 
@@ -45,7 +44,6 @@ public:
 	virtual void drawPost(HuiPainter *c){}
 
 	AudioView *view;
-	ViewMode *parent;
 	ViewPort *cam;
 	Selection *selection;
 	Selection *hover;

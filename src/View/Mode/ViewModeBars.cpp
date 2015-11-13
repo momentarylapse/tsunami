@@ -10,8 +10,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/math/math.h"
 
-ViewModeBars::ViewModeBars(AudioView *view, ViewMode *parent) :
-	ViewModeDefault(view, parent)
+ViewModeBars::ViewModeBars(AudioView *view) :
+	ViewModeDefault(view)
 {
 
 	scaling = false;

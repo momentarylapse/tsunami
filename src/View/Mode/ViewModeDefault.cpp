@@ -16,8 +16,8 @@
 #include "../../Audio/SongRenderer.h"
 #include "math.h"
 
-ViewModeDefault::ViewModeDefault(AudioView *view, ViewMode *parent) :
-	ViewMode(view, parent)
+ViewModeDefault::ViewModeDefault(AudioView *view) :
+	ViewMode(view)
 {
 	cur_action = NULL;
 	mouse_possibly_selecting = -1;
@@ -220,19 +220,18 @@ void ViewModeDefault::onKeyUp(int k)
 {
 }
 
-int ViewModeDefault::getTrackHeightMin(Track* t)
-{
-	return view->TIME_SCALE_HEIGHT * 2;
-}
-
-int ViewModeDefault::getTrackHeightMax(Track* t)
+void ViewModeDefault::updateTrackHeights()
 {
 	int n_ch = 1;
-	if (t->type == t->TYPE_AUDIO)
-		return view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
-	if (t->type == t->TYPE_MIDI)
-		return view->MAX_TRACK_CHANNEL_HEIGHT;
-	return view->TIME_SCALE_HEIGHT * 2;
+	foreach(AudioViewTrack *t, view->vtrack){
+		t->height_min = view->TIME_SCALE_HEIGHT * 2;
+		if (t->track->type == Track::TYPE_AUDIO)
+			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
+		else if (t->track->type == Track::TYPE_MIDI)
+			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
+		else
+			t->height_wish =view->TIME_SCALE_HEIGHT * 2;
+	}
 }
 
 

@@ -16,8 +16,8 @@
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
-ViewModeMidi::ViewModeMidi(AudioView *view, ViewMode *parent) :
-	ViewModeDefault(view, parent)
+ViewModeMidi::ViewModeMidi(AudioView *view) :
+	ViewModeDefault(view)
 {
 	pitch_min = 60;
 	pitch_max = 90;
@@ -79,6 +79,23 @@ void ViewModeMidi::onMouseMove()
 	// drag & drop
 	if (selection->type == Selection::TYPE_MIDI_PITCH){
 		view->forceRedraw();
+	}
+}
+
+void ViewModeMidi::updateTrackHeights()
+{
+	foreach(AudioViewTrack *t, view->vtrack){
+		t->height_min = view->TIME_SCALE_HEIGHT;
+		if (t->track->type == Track::TYPE_AUDIO){
+			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
+		}else if (t->track->type == Track::TYPE_MIDI){
+			if (t->track == view->cur_track)
+				t->height_wish = 5000;
+			else
+				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
+		}else{
+			t->height_wish = view->TIME_SCALE_HEIGHT * 2;
+		}
 	}
 }
 

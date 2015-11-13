@@ -9,6 +9,7 @@
 
 #include "AudioView.h"
 #include "AudioViewTrack.h"
+#include "Mode/ViewMode.h"
 
 TrackHeightManager::TrackHeightManager()
 {
@@ -92,45 +93,26 @@ bool TrackHeightManager::update(AudioView *v, Song *a, const rect &r)
 
 void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 {
-	if (v->editingMidi()){
-		float y0 = v->TIME_SCALE_HEIGHT;
-		foreachi(AudioViewTrack *t, v->vtrack, i){
-			float h = v->TIME_SCALE_HEIGHT;
-			if (t->track == v->cur_track)
-				h = r.height() - a->tracks.num * v->TIME_SCALE_HEIGHT;
-			t->area_target = rect(r.x1, r.x2, y0, y0 + h);
-			y0 += h;
-		}
-		return;
-	}
-	int n_ch = v->show_mono ? 1 : 2;
+	v->mode->updateTrackHeights();
 
-	int h_wish = v->TIME_SCALE_HEIGHT;
-	int h_fix = v->TIME_SCALE_HEIGHT;
-	int n_var = 0;
-	foreach(Track *t, a->tracks){
-		if (t->type == t->TYPE_AUDIO){
-			h_wish += v->MAX_TRACK_CHANNEL_HEIGHT * n_ch;
-			n_var += n_ch;
-		}else if (t->type == t->TYPE_MIDI){
-			h_wish += v->MAX_TRACK_CHANNEL_HEIGHT;
-			n_var ++;
-		}else{
-			h_wish += v->TIME_SCALE_HEIGHT * 2;
-			h_fix += v->TIME_SCALE_HEIGHT * 2;
-		}
+	// wanted space
+	int h_wish = 0;
+	int h_min = 0;
+	foreach(AudioViewTrack *t, v->vtrack){
+		h_wish += t->height_wish;
+		h_min += t->height_min;
 	}
 
+	// available
+	int h_available = v->area.height() - v->TIME_SCALE_HEIGHT;
+	float f = 1.0f;
+	if (h_wish > h_min)
+		f = clampf((float)(h_available - h_min) / (float)(h_wish - h_min), 0, 1);
+
+	// distribute
 	int y0 = r.y1 + v->TIME_SCALE_HEIGHT;
-	int opt_channel_height = v->MAX_TRACK_CHANNEL_HEIGHT;
-	if (h_wish > r.height())
-		opt_channel_height = (r.height() - h_fix) / n_var;
 	foreachi(AudioViewTrack *t, v->vtrack, i){
-		float h = v->TIME_SCALE_HEIGHT*2;
-		if (t->track->type == Track::TYPE_AUDIO)
-			h = opt_channel_height * n_ch;
-		else if (t->track->type == Track::TYPE_MIDI)
-			h = opt_channel_height;
+		float h = t->height_min + (t->height_wish - t->height_min) * f;
 		t->area_target = rect(r.x1, r.x2, y0, y0 + h);
 		y0 += h;
 	}

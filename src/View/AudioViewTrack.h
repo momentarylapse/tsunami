@@ -43,6 +43,8 @@ public:
 	int reference_track;
 	AudioView *view;
 	static const float MIN_GRID_DIST;
+
+	int height_wish, height_min;
 };
 
 #endif /* SRC_VIEW_AUDIOVIEWTRACK_H_ */

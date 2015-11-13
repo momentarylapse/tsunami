@@ -15,7 +15,7 @@ class ActionTrackMoveSample;
 class ViewModeDefault : public ViewMode
 {
 public:
-	ViewModeDefault(AudioView *view, ViewMode *parent);
+	ViewModeDefault(AudioView *view);
 	virtual ~ViewModeDefault();
 
 	virtual void onLeftButtonDown();
@@ -27,8 +27,7 @@ public:
 	virtual void onMouseMove();
 	virtual void onKeyDown(int k);
 	virtual void onKeyUp(int k);
-	virtual int getTrackHeightMin(Track *t);
-	virtual int getTrackHeightMax(Track *t);
+	virtual void updateTrackHeights();
 
 	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time);
 	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t);

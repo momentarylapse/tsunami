@@ -118,9 +118,9 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 
 	// modes
 	mode = NULL;
-	mode_default = new ViewModeDefault(this, NULL);
-	mode_midi = new ViewModeMidi(this, mode_default);
-	mode_bars = new ViewModeBars(this, mode_default);
+	mode_default = new ViewModeDefault(this);
+	mode_midi = new ViewModeMidi(this);
+	mode_bars = new ViewModeBars(this);
 	setMode(mode_default);
 
 	drawing_rect = rect(0, 1024, 0, 768);

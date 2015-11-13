@@ -15,7 +15,7 @@
 class ViewModeBars : public ViewModeDefault
 {
 public:
-	ViewModeBars(AudioView *view, ViewMode *parent);
+	ViewModeBars(AudioView *view);
 	virtual ~ViewModeBars();
 
 	virtual void onLeftButtonUp();

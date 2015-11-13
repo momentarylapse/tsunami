@@ -30,6 +30,9 @@ public:
 	SideBarConsole(const string &_title)
 	{ title = _title; }
 	string title;
+
+	virtual void onEnter(){}
+	virtual void onLeave(){}
 };
 
 class SideBar : public HuiPanel, public Observable

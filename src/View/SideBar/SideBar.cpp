@@ -87,6 +87,9 @@ void SideBar::onClose()
 
 void SideBar::_show()
 {
+	if ((!visible) and (active_console >= 0))
+		consoles[active_console]->onEnter();
+
 	reveal("revealer", true);
 	visible = true;
 	notify();
@@ -94,6 +97,9 @@ void SideBar::_show()
 
 void SideBar::_hide()
 {
+	if ((visible) and (active_console >= 0))
+		consoles[active_console]->onLeave();
+
 	reveal("revealer", false);
 	visible = false;
 	notify();
@@ -101,12 +107,17 @@ void SideBar::_hide()
 
 void SideBar::choose(int console)
 {
-	if (active_console >= 0)
+	if (active_console >= 0){
+		if (visible)
+			consoles[active_console]->onLeave();
 		consoles[active_console]->hide();
+	}
 
 	active_console = console;
 
 	consoles[active_console]->show();
+	if (visible)
+		consoles[active_console]->onEnter();
 	setString("title", "!big\\" + consoles[active_console]->title);
 
 	notify();

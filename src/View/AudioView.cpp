@@ -11,8 +11,6 @@
 #include "Mode/ViewModeMidi.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
-#include "SideBar/SideBar.h"
-#include "BottomBar/BottomBar.h"
 #include "../Audio/AudioInputAny.h"
 #include "../Audio/AudioStream.h"
 #include "../Audio/SongRenderer.h"
@@ -487,7 +485,7 @@ bool AudioView::editingMidi()
 		return false;
 	if (cur_track->type != Track::TYPE_MIDI)
 		return false;
-	return win->side_bar->isActive(SideBar::MIDI_EDITOR);
+	return (mode == mode_midi);
 }
 
 void AudioView::checkConsistency()

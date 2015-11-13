@@ -188,9 +188,6 @@ void ViewModeDefault::onMouseMove()
 		mouse_possibly_selecting = -1;
 	}
 
-	if ((HuiGetEvent()->lbut) and (selection->type == Selection::TYPE_MIDI_PITCH))
-		_force_redraw_ = true;
-
 	if (_force_redraw_)
 		view->forceRedraw();
 }
@@ -315,17 +312,12 @@ void ViewModeDefault::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 void ViewModeDefault::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 {
 	// midi
-	/*if ((view->cur_track == track) and (view->editingMidi())){
-		if ((reference_track >= 0) and (reference_track < track->song->tracks.num))
-			drawMidiEditable(c, track->song->tracks[reference_track]->midi, true);
-		drawMidiEditable(c, track->midi, false);
-	}else{
-	}*/
 	t->drawMidi(c, t->track->midi, 0);
 
 	// audio buffer
 	t->drawTrackBuffers(c, view->cam.pos);
 
+	// samples
 	foreach(SampleRef *s, t->track->samples)
 		t->drawSample(c, s);
 

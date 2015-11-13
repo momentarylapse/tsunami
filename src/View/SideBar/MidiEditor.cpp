@@ -197,6 +197,16 @@ void MidiEditor::clear()
 	//Enable("add", false);
 }
 
+void MidiEditor::onEnter()
+{
+	view->setMode(view->mode_midi);
+}
+
+void MidiEditor::onLeave()
+{
+	view->setMode(view->mode_default);
+}
+
 void MidiEditor::setTrack(Track *t)
 {
 	clear();

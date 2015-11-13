@@ -22,6 +22,9 @@ public:
 	MidiEditor(AudioView *view, Song *audio);
 	virtual ~MidiEditor();
 
+	virtual void onEnter();
+	virtual void onLeave();
+
 	virtual void onUpdate(Observable *o, const string &message);
 	void update();
 

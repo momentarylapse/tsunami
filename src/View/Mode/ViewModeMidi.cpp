@@ -331,7 +331,7 @@ Selection ViewModeMidi::getHover()
 	}
 
 	// midi
-	if ((s.track) and (s.track == view->cur_track) and (midi_mode != MIDI_MODE_SELECT)){
+	if ((s.track) and (s.track->type == Track::TYPE_MIDI) and (s.track == view->cur_track) and (midi_mode != MIDI_MODE_SELECT)){
 		s.pitch = y2pitch(my);
 		s.type = Selection::TYPE_MIDI_PITCH;
 		Array<MidiNote> notes = s.track->midi.getNotes(cam->range());
@@ -447,7 +447,7 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, boo
 void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 {
 	// midi
-	if (view->cur_track == t->track){
+	if ((view->cur_track == t->track) and (t->track->type == Track::TYPE_MIDI)){
 		if ((t->reference_track >= 0) and (t->reference_track < song->tracks.num))
 			drawMidiEditable(c, song->tracks[t->reference_track]->midi, true, t->track, t->area);
 		drawMidiEditable(c, t->track->midi, false, t->track, t->area);
@@ -458,6 +458,7 @@ void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 	// audio buffer
 	t->drawTrackBuffers(c, view->cam.pos);
 
+	// samples
 	foreach(SampleRef *s, t->track->samples)
 		t->drawSample(c, s);
 

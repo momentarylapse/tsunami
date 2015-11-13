@@ -22,6 +22,9 @@ public:
 	BarsConsole(Song *song, AudioView *view);
 	virtual ~BarsConsole();
 
+	virtual void onEnter();
+	virtual void onLeave();
+
 	void updateMessage();
 	void onCreateTimeTrack();
 
@@ -34,12 +37,12 @@ public:
 	void onDelete();
 	void onEdit();
 	void onScale();
+	void onModifyMidi();
 
 	void addNewBar();
 
 	void selectToView();
 	void selectFromView();
-	void performScale();
 
 	void onEditSong();
 
@@ -49,11 +52,6 @@ public:
 	string id;
 	string id_add, id_add_pause, id_delete, id_edit, id_scale, id_link;
 	AudioView *view;
-
-	bool scaling;
-	bool scaling_change;
-	Array<int> scaling_sel;
-	Range scaling_range_orig;
 };
 
 #endif /* BARSCONSOLE_H_ */

@@ -70,8 +70,6 @@ void ViewModeDefault::onLeftButtonUp()
 	}
 	cur_action = NULL;
 
-	view->notify(view->MESSAGE_MOUSE_UP);
-
 	// TODO !!!!!!!!
 	selection->type = Selection::TYPE_NONE;
 	view->forceRedraw();

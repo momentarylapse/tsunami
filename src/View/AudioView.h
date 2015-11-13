@@ -27,6 +27,7 @@ class PeakThread;
 class ViewMode;
 class ViewModeDefault;
 class ViewModeMidi;
+class ViewModeBars;
 
 class AudioView : public Observer, public Observable
 {
@@ -59,7 +60,6 @@ public:
 	static const string MESSAGE_SETTINGS_CHANGE;
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
-	static const string MESSAGE_MOUSE_UP;
 
 	void setShowMono(bool mono);
 	void setPeaksMode(int mode);
@@ -134,6 +134,7 @@ public:
 	void setMode(ViewMode *m);
 	ViewModeDefault *mode_default;
 	ViewModeMidi *mode_midi;
+	ViewModeBars *mode_bars;
 
 	TsunamiWindow *win;
 

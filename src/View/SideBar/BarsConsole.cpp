@@ -7,6 +7,8 @@
 
 #include "../../Data/Song.h"
 #include "../AudioView.h"
+#include "../Mode/ViewModeBars.h"
+#include "../Mode/ViewModeDefault.h"
 #include "../Dialog/BarAddDialog.h"
 #include "../Dialog/BarEditDialog.h"
 #include "BarsConsole.h"
@@ -34,9 +36,8 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	setTooltip(id_edit, _("markierte Takte editieren"));
 	setTooltip(id_scale, _("markierte Takte skalieren (durch Ziehen der Markierung links)"));
 
-	scaling = false;
-
-	check(id_link, true);
+	view->mode_bars->modify_midi = true;
+	check(id_link, view->mode_bars->modify_midi);
 	enable(id, true);
 	enable(id_add, true);
 	enable(id_add_pause, true);
@@ -50,9 +51,9 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	event(id_delete, this, &BarsConsole::onDelete);
 	event(id_edit, this, &BarsConsole::onEdit);
 	event(id_scale, this, &BarsConsole::onScale);
+	event(id_link, this, &BarsConsole::onModifyMidi);
 
 	subscribe(view, view->MESSAGE_SELECTION_CHANGE);
-	subscribe(view, view->MESSAGE_MOUSE_UP);
 	subscribe(song, song->MESSAGE_EDIT_BARS);
 	subscribe(song, song->MESSAGE_NEW);
 	subscribe(song, song->MESSAGE_ADD_TRACK);
@@ -240,24 +241,12 @@ void BarsConsole::onEdit()
 
 void BarsConsole::onScale()
 {
-	scaling = true;
-	scaling_change = false;
-	scaling_sel = getSelection(id);
-	scaling_range_orig = view->sel_range;
+	view->mode_bars->startScaling(getSelection(id));
 }
 
-void BarsConsole::performScale()
+void BarsConsole::onModifyMidi()
 {
-	scaling = false;
-	float factor = (float)view->sel_range.num / (float)scaling_range_orig.num;
-
-	song->action_manager->beginActionGroup();
-	foreachb(int i, scaling_sel){
-		BarPattern b = song->bars[i];
-		b.length *= factor;
-		song->editBar(i, b, isChecked(id_link));
-	}
-	song->action_manager->endActionGroup();
+	view->mode_bars->modify_midi = isChecked(id_link);
 }
 
 void BarsConsole::addNewBar()
@@ -285,17 +274,20 @@ void BarsConsole::selectFromView()
 	enable(id_scale, s.num > 0);
 }
 
+void BarsConsole::onEnter()
+{
+	view->setMode(view->mode_bars);
+}
 
+void BarsConsole::onLeave()
+{
+	view->setMode(view->mode_default);
+}
 
 void BarsConsole::onUpdate(Observable *o, const string &message)
 {
 	if (o == view){
-		if (scaling){
-			if (message == view->MESSAGE_SELECTION_CHANGE)
-				scaling_change = true;
-			if (message == view->MESSAGE_MOUSE_UP)
-				performScale();
-		}else
+		if (!view->mode_bars->scaling)
 			selectFromView();
 	}else if (o == song){
 		fillList();

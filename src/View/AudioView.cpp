@@ -9,6 +9,7 @@
 #include "AudioViewTrack.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
+#include "Mode/ViewModeBars.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Audio/AudioInputAny.h"
@@ -46,7 +47,6 @@ const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
 const string AudioView::MESSAGE_VTRACK_CHANGE = "VTrackChange";
-const string AudioView::MESSAGE_MOUSE_UP = "MouseUp";
 
 
 class PeakThread : public Thread
@@ -120,6 +120,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	mode = NULL;
 	mode_default = new ViewModeDefault(this, NULL);
 	mode_midi = new ViewModeMidi(this, mode_default);
+	mode_bars = new ViewModeBars(this, mode_default);
 	setMode(mode_default);
 
 	drawing_rect = rect(0, 1024, 0, 768);
@@ -675,6 +676,8 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 		drawTimeLine(c, sel_range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, colors.capture_marker, true);
 	else if (stream->isPlaying())
 		drawTimeLine(c, stream->getPos(), Selection::TYPE_PLAYBACK, colors.preview_marker, true);
+
+	mode->drawPost(c);
 
 	repeat |= is_updating_peaks;
 

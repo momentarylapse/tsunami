@@ -42,6 +42,7 @@ public:
 	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false){}
 	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t){}
 	virtual void drawTrackData(HuiPainter *c, AudioViewTrack *t){}
+	virtual void drawPost(HuiPainter *c){}
 
 	AudioView *view;
 	ViewMode *parent;

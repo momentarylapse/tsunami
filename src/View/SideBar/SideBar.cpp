@@ -11,6 +11,7 @@
 #include "TrackConsole.h"
 #include "MidiEditor.h"
 #include "FxConsole.h"
+#include "CurveConsole.h"
 #include "SynthConsole.h"
 #include "SampleRefDialog.h"
 #include "SampleManager.h"
@@ -44,6 +45,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	track_console = new TrackConsole(view);
 	midi_editor = new MidiEditor(view, song);
 	fx_console = new FxConsole(view, song);
+	curve_console = new CurveConsole(view, song);
 	synth_console = new SynthConsole(view);
 	midi_fx_console = new MidiFxConsole(view, song);
 	sample_ref_dialog = new SampleRefDialog(view, song);
@@ -56,6 +58,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	addConsole(track_console);
 	addConsole(midi_editor);
 	addConsole(fx_console);
+	addConsole(curve_console);
 	addConsole(synth_console);
 	addConsole(midi_fx_console);
 	addConsole(sample_ref_dialog);

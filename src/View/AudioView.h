@@ -27,6 +27,7 @@ class ViewMode;
 class ViewModeDefault;
 class ViewModeMidi;
 class ViewModeBars;
+class ViewModeCurve;
 
 class AudioView : public Observer, public Observable
 {
@@ -134,6 +135,7 @@ public:
 	ViewModeDefault *mode_default;
 	ViewModeMidi *mode_midi;
 	ViewModeBars *mode_bars;
+	ViewModeCurve *mode_curve;
 
 	TsunamiWindow *win;
 

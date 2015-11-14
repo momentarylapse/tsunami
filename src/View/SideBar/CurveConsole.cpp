@@ -7,6 +7,8 @@
 
 #include "CurveConsole.h"
 #include "../AudioView.h"
+#include "../Mode/ViewModeCurve.h"
+#include "../Mode/ViewModeDefault.h"
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
@@ -63,34 +65,21 @@ public:
 };
 
 CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
-	BottomBarConsole(_("Kurven")),
+	SideBarConsole(_("Kurven")),
 	Observer("CurveConsole")
 {
 	view = _view;
 	song = _song;
 
-	addGrid("", 0, 0, 2, 1, "root");
-	setTarget("root", 0);
-	addDrawingArea("!grabfocus", 0, 0, 0, 0, "area");
-	addGrid("", 1, 0, 1, 2, "controller");
-	setTarget("controller", 0);
-	addListView("!noexpandx,format=TTTt,width=300\\name\\min\\max\\target", 0, 0, 0, 0, "list");
-	addGrid("", 0, 1, 4, 1, "controller_buttons");
-	setTarget("controller_buttons", 0);
-	addButton("add", 0, 0, 0, 0, "add");
-	addButton("delete", 1, 0, 0, 0, "delete");
-	addButton("target", 2, 0, 0, 0, "target");
+	fromResource("curve_console");
+
+	id_list = "curves";
 
 	event("add", this, &CurveConsole::onAdd);
 	event("delete", this, &CurveConsole::onDelete);
 	event("target", this, &CurveConsole::onTarget);
-	eventX("list", "hui:select", this, &CurveConsole::onListSelect);
-	eventX("list", "hui:change", this, &CurveConsole::onListEdit);
-	eventX("area", "hui:key-down", this, &CurveConsole::onKeyDown);
-	eventX("area", "hui:left-button-down", this, &CurveConsole::onLeftButtonDown);
-	eventX("area", "hui:left-button-up", this, &CurveConsole::onLeftButtonUp);
-	eventX("area", "hui:mouse-move", this, &CurveConsole::onMouseMove);
-	eventX("area", "hui:draw", this, &CurveConsole::onDraw);
+	eventX(id_list, "hui:select", this, &CurveConsole::onListSelect);
+	eventX(id_list, "hui:change", this, &CurveConsole::onListEdit);
 
 	curve = NULL;
 	curve_rect = rect(0, 0, 0, 0);
@@ -117,13 +106,23 @@ void CurveConsole::onUpdate(Observable* o, const string &message)
 	}
 }
 
+void CurveConsole::onEnter()
+{
+	view->setMode(view->mode_curve);
+}
+
+void CurveConsole::onLeave()
+{
+	view->setMode(view->mode_default);
+}
+
 void CurveConsole::updateList()
 {
-	reset("list");
+	reset(id_list);
 	foreachi(Curve *c, song->curves, i){
-		addString("list", c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(song));
+		addString(id_list, c->name + format("\\%.3f\\%.3f\\", c->min, c->max) + c->getTargets(song));
 		if (c == curve)
-			setInt("list", i);
+			setInt(id_list, i);
 	}
 }
 
@@ -137,7 +136,7 @@ void CurveConsole::onAdd()
 
 void CurveConsole::onDelete()
 {
-	int n = getInt("list");
+	int n = getInt(id_list);
 	if (n >= 0){
 		delete(song->curves[n]);
 		song->curves.erase(n);
@@ -158,7 +157,7 @@ void CurveConsole::onTarget()
 void CurveConsole::onListSelect()
 {
 	curve = NULL;
-	int n = getInt("list");
+	int n = getInt(id_list);
 	if (n >= 0)
 		curve = song->curves[n];
 	redraw("area");
@@ -170,11 +169,11 @@ void CurveConsole::onListEdit()
 	int col = HuiGetEvent()->column;
 	if (n >= 0){
 		if (col == 0)
-			song->curves[n]->name = getCell("list", n, col);
+			song->curves[n]->name = getCell(id_list, n, col);
 		else if (col == 1)
-			song->curves[n]->min = getCell("list", n, col)._float();
+			song->curves[n]->min = getCell(id_list, n, col)._float();
 		else if (col == 2)
-			song->curves[n]->max = getCell("list", n, col)._float();
+			song->curves[n]->max = getCell(id_list, n, col)._float();
 	}
 	redraw("area");
 }

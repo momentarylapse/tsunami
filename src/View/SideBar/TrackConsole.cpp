@@ -32,6 +32,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 
 	event("edit_song", this, &TrackConsole::onEditSong);
 	event("edit_fx", this, &TrackConsole::onEditFx);
+	event("edit_curves", this, &TrackConsole::onEditCurves);
 	event("edit_midi", this, &TrackConsole::onEditMidi);
 	event("edit_midi_fx", this, &TrackConsole::onEditMidiFx);
 	event("edit_synth", this, &TrackConsole::onEditSynth);
@@ -101,6 +102,11 @@ void TrackConsole::onEditSong()
 void TrackConsole::onEditFx()
 {
 	((SideBar*)parent)->open(SideBar::FX_CONSOLE);
+}
+
+void TrackConsole::onEditCurves()
+{
+	((SideBar*)parent)->open(SideBar::CURVE_CONSOLE);
 }
 
 void TrackConsole::onEditMidi()

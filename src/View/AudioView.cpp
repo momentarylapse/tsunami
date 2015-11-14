@@ -10,6 +10,7 @@
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
 #include "Mode/ViewModeBars.h"
+#include "Mode/ViewModeCurve.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Audio/AudioInputAny.h"
@@ -121,6 +122,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	mode_default = new ViewModeDefault(this);
 	mode_midi = new ViewModeMidi(this);
 	mode_bars = new ViewModeBars(this);
+	mode_curve = new ViewModeCurve(this);
 	setMode(mode_default);
 
 	drawing_rect = rect(0, 1024, 0, 768);
@@ -198,6 +200,7 @@ AudioView::~AudioView()
 	unsubscribe(stream);
 	setInput(NULL);
 
+	delete(mode_curve);
 	delete(mode_bars);
 	delete(mode_midi);
 	delete(mode_default);

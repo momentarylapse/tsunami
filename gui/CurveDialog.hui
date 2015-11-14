@@ -1,0 +1,12 @@
+Dialog curve_console "Kurven" 380 516
+	Grid ? "" 1 3
+		ListView curves "name\\min\\max\\target" expandx format=TTTt
+		Grid controller_buttons "" 4  1
+			Button add "" image=hui:add
+			Button delete "" image=hui:delete
+			Button target "Parameter"
+		Group cc_group_edit "Bearbeiten"
+			Grid ? "" 3 1
+				Button edit_song "Datei"
+				Button edit_track "Spur"
+				Button edit_fx "Fx"

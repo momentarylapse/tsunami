@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-274
+279
 // Data (ID,Text)
 about
 Info
@@ -88,11 +88,13 @@ capture_start
 capture_target
 !expandx\\
 capture_time
-0:00
+!width=120\\0:00
 capture_type:audio
 Audio
 capture_type:midi
 Midi
+cc_group_edit
+Edit
 chord_type
 !expandx\\
 close
@@ -111,6 +113,10 @@ create_from_selection
 !flat\\
 create_time_track
 create
+curve_console
+Curves
+curves
+!expandx,format=TTTt\\name\\min\\max\\target
 data_list
 !nobar,height=110,noexpandy\\key\\value
 db
@@ -139,6 +145,8 @@ edit_beats
 Beats
 edit_bpm
 Bpm
+edit_curves
+Curves
 edit_fx
 Fx
 edit_levels
@@ -417,9 +425,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_422634
+rand_id_89292
 
-rand_id_885585
+rand_id_976490
 
 rdt_capture
 Recording
@@ -503,6 +511,8 @@ stop
 Stop
 tags
 !format=tT\\Tag\\Value
+target
+Parameter
 td_t_dummy
 !expandy\\
 td_t_edit

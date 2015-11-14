@@ -19,6 +19,7 @@ class MidiEditor;
 class SampleRefDialog;
 class SampleManager;
 class FxConsole;
+class CurveConsole;
 class SynthConsole;
 class MidiFxConsole;
 class BarsConsole;
@@ -57,6 +58,7 @@ public:
 		TRACK_CONSOLE,
 		MIDI_EDITOR,
 		FX_CONSOLE,
+		CURVE_CONSOLE,
 		SYNTH_CONSOLE,
 		MIDI_FX_CONCOLE,
 		SAMPLEREF_DIALOG,
@@ -76,6 +78,7 @@ public:
 	TrackConsole *track_console;
 	MidiEditor *midi_editor;
 	FxConsole *fx_console;
+	CurveConsole *curve_console;
 	SynthConsole *synth_console;
 	MidiFxConsole *midi_fx_console;
 	SampleRefDialog *sample_ref_dialog;

@@ -8,7 +8,7 @@
 #ifndef CURVECONSOLE_H_
 #define CURVECONSOLE_H_
 
-#include "BottomBar.h"
+#include "SideBar.h"
 #include "../../Stuff/Observer.h"
 #include "../../lib/math/math.h"
 
@@ -16,7 +16,7 @@ class Song;
 class AudioView;
 class Curve;
 
-class CurveConsole : public BottomBarConsole, public Observer
+class CurveConsole : public SideBarConsole, public Observer
 {
 public:
 	CurveConsole(AudioView *view, Song *song);
@@ -36,9 +36,14 @@ public:
 	void onLeftButtonUp();
 	void onMouseMove();
 
+	virtual void onEnter();
+	virtual void onLeave();
+
 	Song *song;
 	AudioView *view;
 	Curve *curve;
+
+	string id_list;
 
 	rect curve_rect;
 

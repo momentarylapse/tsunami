@@ -30,6 +30,7 @@ public:
 
 	void onEditSong();
 	void onEditFx();
+	void onEditCurves();
 	void onEditMidi();
 	void onEditMidiFx();
 	void onEditSynth();

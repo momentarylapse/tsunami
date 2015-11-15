@@ -123,16 +123,22 @@ void AudioViewTrack::drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel
 
 
 		if ((view->peak_mode == BufferBox::PEAK_MAXIMUM) or (view->peak_mode == BufferBox::PEAK_BOTH)){
+			double bzf = view->buffer_zoom_factor;
+			int ll = l;
 			if (view->peak_mode == BufferBox::PEAK_BOTH){
 				color cc = col;
 				cc.a *= 0.3f;
 				c->setColor(cc);
+				if (ll < b.peaks.num / 4){
+					ll ++;
+					bzf *= 2;
+				}
 			}else{
 				c->setColor(col);
 			}
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, view->buffer_zoom_factor, hf, x1, y0r, b.peaks[l*4-4], b.offset);
+			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0r, b.peaks[ll*4-4], b.offset);
 			if (!view->show_mono)
-				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, view->buffer_zoom_factor, hf, x1, y0l, b.peaks[l*4-3], b.offset);
+				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0l, b.peaks[ll*4-3], b.offset);
 		}
 
 		if ((view->peak_mode == BufferBox::PEAK_SQUAREMEAN) or (view->peak_mode == BufferBox::PEAK_BOTH)){

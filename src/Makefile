@@ -225,7 +225,6 @@ OBJ = \
  Stuff/Observable.o\
  Stuff/Observer.o\
  View/BottomBar/BottomBar.o\
- View/BottomBar/CurveConsole.o\
  View/BottomBar/LogDialog.o\
  View/BottomBar/MiniBar.o\
  View/BottomBar/MixingConsole.o\
@@ -242,10 +241,12 @@ OBJ = \
  View/Helper/Slider.o\
  View/Mode/ViewMode.o\
  View/Mode/ViewModeBars.o\
+ View/Mode/ViewModeCurve.o\
  View/Mode/ViewModeDefault.o\
  View/Mode/ViewModeMidi.o\
  View/SideBar/SideBar.o\
  View/SideBar/BarsConsole.o\
+ View/SideBar/CurveConsole.o\
  View/SideBar/FxConsole.o\
  View/SideBar/LevelConsole.o\
  View/SideBar/MidiEditor.o\
@@ -936,9 +937,6 @@ Stuff/Observer.o : Stuff/Observer.cpp
 View/BottomBar/BottomBar.o : View/BottomBar/BottomBar.cpp
 	$(CPP) -c View/BottomBar/BottomBar.cpp -o $@ $(CXXFLAGS)
 
-View/BottomBar/CurveConsole.o : View/BottomBar/CurveConsole.cpp
-	$(CPP) -c View/BottomBar/CurveConsole.cpp -o $@ $(CXXFLAGS)
-
 View/BottomBar/LogDialog.o : View/BottomBar/LogDialog.cpp
 	$(CPP) -c View/BottomBar/LogDialog.cpp -o $@ $(CXXFLAGS)
 
@@ -987,6 +985,9 @@ View/Mode/ViewMode.o : View/Mode/ViewMode.cpp
 View/Mode/ViewModeBars.o : View/Mode/ViewModeBars.cpp
 	$(CPP) -c View/Mode/ViewModeBars.cpp -o $@ $(CXXFLAGS)
 
+View/Mode/ViewModeCurve.o : View/Mode/ViewModeCurve.cpp
+	$(CPP) -c View/Mode/ViewModeCurve.cpp -o $@ $(CXXFLAGS)
+
 View/Mode/ViewModeDefault.o : View/Mode/ViewModeDefault.cpp
 	$(CPP) -c View/Mode/ViewModeDefault.cpp -o $@ $(CXXFLAGS)
 
@@ -1004,6 +1005,9 @@ View/SideBar/MidiEditor.o : View/SideBar/MidiEditor.cpp
 
 View/SideBar/BarsConsole.o : View/SideBar/BarsConsole.cpp
 	$(CPP) -c View/SideBar/BarsConsole.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/CurveConsole.o : View/SideBar/CurveConsole.cpp
+	$(CPP) -c View/SideBar/CurveConsole.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/FxConsole.o : View/SideBar/FxConsole.cpp
 	$(CPP) -c View/SideBar/FxConsole.cpp -o $@ $(CXXFLAGS)

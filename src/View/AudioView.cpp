@@ -60,7 +60,7 @@ public:
 	}
 	virtual void onRun()
 	{
-		view->song->updatePeaks(view->peak_mode);
+		view->song->updatePeaks();
 		view->is_updating_peaks = false;
 	}
 };
@@ -135,7 +135,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	ScrollSpeed = HuiConfig.getInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = HuiConfig.getInt("View.ScrollSpeedFast", 3000);
 	ZoomSpeed = HuiConfig.getFloat("View.ZoomSpeed", 0.1f);
-	peak_mode = HuiConfig.getInt("View.PeakMode", BufferBox::PEAK_MODE_SQUAREMEAN);
+	peak_mode = HuiConfig.getInt("View.PeakMode", BufferBox::PEAK_BOTH);
 	antialiasing = HuiConfig.getBool("View.Antialiasing", false);
 
 	images.speaker = LoadImage(HuiAppDirectoryStatic + "Data/volume.tga");
@@ -524,7 +524,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 		}
 
 		if (message == song->MESSAGE_CHANGE)
-			updatePeaks(false);
+			updatePeaks();
 	}else if (o == stream){
 		if (stream->isPlaying())
 			cam.makeSampleVisible(stream->getPos());
@@ -657,7 +657,7 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 	// capturing preview
 	if (input and input->isCapturing()){
 		if (input->type == Track::TYPE_AUDIO)
-			input->buffer->update_peaks(peak_mode);
+			input->buffer->update_peaks();
 		if ((capturing_track >= 0) and (capturing_track < vtrack.num)){
 			if (input->type == Track::TYPE_AUDIO)
 				vtrack[capturing_track]->drawBuffer(c, *input->buffer, cam.pos - sel_range.offset, colors.capture_marker);
@@ -724,16 +724,14 @@ void AudioView::updateMenu()
 	// view
 	win->check("view_mono", show_mono);
 	win->check("view_stereo", !show_mono);
-	win->check("view_peaks_max", peak_mode == BufferBox::PEAK_MODE_MAXIMUM);
-	win->check("view_peaks_mean", peak_mode == BufferBox::PEAK_MODE_SQUAREMEAN);
+	win->check("view_peaks_max", peak_mode == BufferBox::PEAK_MAXIMUM);
+	win->check("view_peaks_mean", peak_mode == BufferBox::PEAK_SQUAREMEAN);
+	win->check("view_peaks_both", peak_mode == BufferBox::PEAK_BOTH);
 	win->enable("view_samples", false);
 }
 
-void AudioView::updatePeaks(bool invalidate_all)
+void AudioView::updatePeaks()
 {
-	if (invalidate_all)
-		song->invalidateAllPeaks();
-
 	is_updating_peaks = true;
 	peak_thread->run();
 	for (int i=0; i<10; i++){
@@ -749,9 +747,8 @@ void AudioView::updatePeaks(bool invalidate_all)
 void AudioView::setPeaksMode(int mode)
 {
 	peak_mode = mode;
+	forceRedraw();
 	updateMenu();
-
-	updatePeaks(true);
 }
 
 void AudioView::setShowMono(bool mono)

@@ -63,7 +63,7 @@ public:
 
 	void setShowMono(bool mono);
 	void setPeaksMode(int mode);
-	void updatePeaks(bool invalidate_all);
+	void updatePeaks();
 	void zoomIn();
 	void zoomOut();
 

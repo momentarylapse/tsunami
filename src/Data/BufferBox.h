@@ -64,12 +64,13 @@ public:
 
 	enum PeakMode
 	{
-		PEAK_MODE_MAXIMUM,
-		PEAK_MODE_SQUAREMEAN
+		PEAK_MAXIMUM = 1,
+		PEAK_SQUAREMEAN = 2,
+		PEAK_BOTH = 3,
 	};
 
 	void _cdecl invalidate_peaks(const Range &r);
-	void _cdecl update_peaks(int mode);
+	void _cdecl update_peaks();
 };
 
 SampleFormat format_for_bits(int bits);

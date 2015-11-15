@@ -81,6 +81,7 @@ public:
 	void onBarsManager();
 	void onViewPeaksMax();
 	void onViewPeaksMean();
+	void onViewPeaksBoth();
 	void onZoomIn();
 	void onZoomOut();
 	void onViewMono();

@@ -58,6 +58,7 @@ Menu menu "" disabled
 		Menu menu_view_peaks "Peaks"
 			Item view_peaks_max "Maximum" checkable
 			Item view_peaks_mean "Quadratisches Mittel" checkable
+			Item view_peaks_both "Beides" checkable
 		Item show_mixing_console "Mischpult" checkable
 		Item show_fx_console "Effekte" checkable
 		Separator "" ""

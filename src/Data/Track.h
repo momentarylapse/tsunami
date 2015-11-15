@@ -58,7 +58,7 @@ public:
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
 
 	void _cdecl reset();
-	void _cdecl updatePeaks(int mode);
+	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
 	BufferBox _cdecl readBuffers(int level_no, const Range &r);
 	BufferBox _cdecl readBuffersCol(const Range &r);

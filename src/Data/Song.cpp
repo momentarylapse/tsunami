@@ -383,14 +383,13 @@ Track *Song::addTrack(int type, int index)
 
 extern HuiTimer debug_timer;
 
-void Song::updatePeaks(int mode)
+void Song::updatePeaks()
 {
-	msg_db_f("Audio.UpdatePeaks", 2);
 	debug_timer.reset();
 	foreach(Track *t, tracks)
-		t->updatePeaks(mode);
+		t->updatePeaks();
 	foreach(Sample *s, samples)
-		s->buf.update_peaks(mode);
+		s->buf.update_peaks();
 	//msg_write(format("up %f", debug_timer.get()));
 }
 

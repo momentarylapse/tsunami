@@ -73,7 +73,7 @@ public:
 	void _cdecl updateSelection(const Range &range);
 	void _cdecl unselectAllSamples();
 
-	void _cdecl updatePeaks(int mode);
+	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
 
 	int _cdecl getNumSelectedSamples();

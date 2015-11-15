@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-279
+280
 // Data (ID,Text)
 about
 Info
@@ -425,9 +425,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_89292
+rand_id_243595
 
-rand_id_976490
+rand_id_693363
 
 rdt_capture
 Recording
@@ -547,6 +547,8 @@ view_mono
 Mono
 view_optimal
 Optimal
+view_peaks_both
+Both
 view_peaks_max
 Maximum
 view_peaks_mean

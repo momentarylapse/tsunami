@@ -469,8 +469,8 @@ void BufferBox::invalidate_peaks(const Range &_range)
 	int i1 = _range.end() - range().start();
 	int n = r.num;
 
-	if (peaks.num < 2)
-		peaks.resize(2);
+	if (peaks.num < 4)
+		peaks.resize(4);
 
 	n /= 4;
 	i0 /= 4;
@@ -523,11 +523,11 @@ inline float fabsmax(float a, float b, float c, float d)
 	return max(max(a, b), max(c, d));
 }
 
-void BufferBox::update_peaks(int mode)
+void BufferBox::update_peaks()
 {
 	// first level
-	if (peaks.num < 2)
-		peaks.resize(2);
+	if (peaks.num < 4)
+		peaks.resize(4);
 	int n = r.num / 4;
 	int i0 = 0;
 	int i1 = n;
@@ -535,34 +535,35 @@ void BufferBox::update_peaks(int mode)
 		find_update_peak_range(peaks[0], peaks[1], i0, i1, n);
 	peaks[0].resize(n);
 	peaks[1].resize(n);
+	peaks[2].resize(n);
+	peaks[3].resize(n);
 	//msg_write(format("  %d %d", i0, i1));
 	for (int i=i0;i<i1;i++){
 		peaks[0][i] = fabsmax(r[i * 4], r[i * 4 + 1], r[i * 4 + 2], r[i * 4 + 3]) * 254;
 		peaks[1][i] = fabsmax(l[i * 4], l[i * 4 + 1], l[i * 4 + 2], l[i * 4 + 3]) * 254;
+		peaks[2][i] = peaks[0][i];
+		peaks[3][i] = peaks[1][i];
 	}
 
 	// higher levels
-	int level = 2;
+	int level = 4;
 	while (n > 4){
 		n /= 2;
 		i0 /= 2;
 		i1 = min((i1 + 1) / 2, n);
-		if (peaks.num < level + 2)
-			peaks.resize(level + 2);
+		if (peaks.num < level + 4)
+			peaks.resize(level + 4);
 		peaks[level    ].resize(n);
 		peaks[level + 1].resize(n);
-		if (mode == PEAK_MODE_MAXIMUM){
-			for (int i=i0;i<i1;i++){
-				peaks[level    ][i] = shrink_max(peaks[level - 2][i * 2], peaks[level - 2][i * 2 + 1]);
-				peaks[level + 1][i] = shrink_max(peaks[level - 1][i * 2], peaks[level - 1][i * 2 + 1]);
-			}
-		}else if (mode == PEAK_MODE_SQUAREMEAN){
-			for (int i=i0;i<i1;i++){
-				peaks[level    ][i] = shrink_mean(peaks[level - 2][i * 2], peaks[level - 2][i * 2 + 1]);
-				peaks[level + 1][i] = shrink_mean(peaks[level - 1][i * 2], peaks[level - 1][i * 2 + 1]);
-			}
+		peaks[level + 2].resize(n);
+		peaks[level + 3].resize(n);
+		for (int i=i0;i<i1;i++){
+			peaks[level    ][i] = shrink_max(peaks[level - 4][i * 2], peaks[level - 4][i * 2 + 1]);
+			peaks[level + 1][i] = shrink_max(peaks[level - 3][i * 2], peaks[level - 3][i * 2 + 1]);
+			peaks[level + 2][i] = shrink_mean(peaks[level - 2][i * 2], peaks[level - 2][i * 2 + 1]);
+			peaks[level + 3][i] = shrink_mean(peaks[level - 1][i * 2], peaks[level - 1][i * 2 + 1]);
 		}
 
-		level += 2;
+		level += 4;
 	}
 }

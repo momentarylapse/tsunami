@@ -27,6 +27,7 @@ public:
 	virtual void onLeftButtonUp();
 	virtual void onMouseMove();
 	virtual void updateTrackHeights();
+	virtual void onCurTrackChange();
 
 	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time);
 	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t);

@@ -35,6 +35,7 @@ public:
 	virtual void onKeyDown(int k){}
 	virtual void onKeyUp(int k){}
 	virtual void updateTrackHeights(){}
+	virtual void onCurTrackChange(){}
 
 	virtual Selection getHover();
 

@@ -244,6 +244,7 @@ void AudioView::setColorScheme(const string &name)
 void AudioView::setMode(ViewMode *m)
 {
 	mode = m;
+	thm.dirty = true;
 }
 
 void AudioView::setMouse()
@@ -486,15 +487,6 @@ void AudioView::drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool
 			}
 		}
 	}
-}
-
-bool AudioView::editingMidi()
-{
-	if (!cur_track)
-		return false;
-	if (cur_track->type != Track::TYPE_MIDI)
-		return false;
-	return (mode == mode_midi);
 }
 
 void AudioView::checkConsistency()
@@ -850,6 +842,7 @@ void AudioView::setCurTrack(Track *t)
 	if (cur_track == t)
 		return;
 	cur_track = t;
+	mode->onCurTrackChange();
 	forceRedraw();
 	notify(MESSAGE_CUR_TRACK_CHANGE);
 }

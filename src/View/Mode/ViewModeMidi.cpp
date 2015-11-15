@@ -110,6 +110,11 @@ void ViewModeMidi::updateTrackHeights()
 	}
 }
 
+void ViewModeMidi::onCurTrackChange()
+{
+	view->thm.dirty = true;
+}
+
 
 Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 {

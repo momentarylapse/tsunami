@@ -128,8 +128,6 @@ public:
 
 	rect drawing_rect;
 
-	bool editingMidi();
-
 	ViewMode *mode;
 	void setMode(ViewMode *m);
 	ViewModeDefault *mode_default;

@@ -17,7 +17,6 @@ TrackHeightManager::TrackHeightManager()
 	t = 0;
 	dirty = true;
 	render_area = r_id;
-	midi_track = NULL;
 }
 
 
@@ -44,16 +43,12 @@ float smooth_parametrization(float t)
 
 bool TrackHeightManager::update(AudioView *v, Song *a, const rect &r)
 {
-	Track *new_midi_track = (v->editingMidi() ? v->cur_track : NULL);
-
-
 	// start animation?
-	if ((dirty) or (midi_track != new_midi_track)){
+	if (dirty){
 		plan(v, a, r);
 		t = 0;
 		animating = true;
 		dirty = false;
-		midi_track = new_midi_track;
 
 		foreach(AudioViewTrack *v, v->vtrack)
 			v->area_last = v->area;

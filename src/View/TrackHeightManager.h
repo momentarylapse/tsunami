@@ -25,7 +25,6 @@ public:
 	bool animating;
 	rect render_area;
 	HuiTimer timer;
-	Track *midi_track;
 
 	bool check(Song *s);
 	bool update(AudioView *v, Song *s, const rect &r);

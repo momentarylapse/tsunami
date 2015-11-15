@@ -8,6 +8,7 @@
 #include "ViewModeCurve.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
+#include "../../Data/Curve.h"
 #include "../../Audio/AudioStream.h"
 #include "../../TsunamiWindow.h"
 
@@ -15,6 +16,7 @@ ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)
 {
 	curve = NULL;
+	cur_track = NULL;
 }
 
 ViewModeCurve::~ViewModeCurve()
@@ -24,6 +26,12 @@ ViewModeCurve::~ViewModeCurve()
 void ViewModeCurve::onLeftButtonDown()
 {
 	ViewModeDefault::onLeftButtonDown();
+
+
+	if ((curve) && (selection->type == Selection::TYPE_TRACK)){
+		curve->add(cam->screen2sample(view->mx), screen2value(view->my));
+		view->forceRedraw();
+	}
 }
 
 void ViewModeCurve::onLeftButtonUp()
@@ -34,19 +42,61 @@ void ViewModeCurve::onLeftButtonUp()
 void ViewModeCurve::onMouseMove()
 {
 	ViewModeDefault::onMouseMove();
+
+	if (HuiGetEvent()->lbut){
+		if ((curve) && (selection->type == Selection::TYPE_CURVE_POINT)){
+			curve->points[selection->index].pos = cam->screen2sample(view->mx);
+			curve->points[selection->index].value = clampf(screen2value(view->my), curve->min, curve->max);
+			view->forceRedraw();
+		}
+	}
 }
 
 void ViewModeCurve::onKeyDown(int k)
 {
 	ViewModeDefault::onKeyDown(k);
+
+	if ((curve) && (selection->type == Selection::TYPE_CURVE_POINT))
+		if (k == KEY_DELETE){
+			curve->points.erase(selection->index);
+			selection->clear();
+			hover->clear();
+			view->forceRedraw();
+		}
 }
 
 void ViewModeCurve::drawTrackData(HuiPainter* c, AudioViewTrack* t)
 {
 	ViewModeDefault::drawTrackData(c, t);
 
-	c->setColor(Black);
-	c->drawStr(100, 100, "test");
+	if (t->track != view->cur_track)
+		return;
+
+	cur_track = t;
+
+	rect r = t->area;
+	if (curve){
+
+		// lines
+		c->setAntialiasing(true);
+		c->setLineWidth(1.0f);
+		c->setColor(view->colors.text);
+		Array<complex> pp;
+		for (int x=r.x1; x<r.x2; x+=3)
+			pp.add(complex(x, value2screen(curve->get(cam->screen2sample(x)))));
+		c->drawLines(pp);
+
+		// points
+		foreachi(Curve::Point &p, curve->points, i){
+			if ((hover->type == Selection::TYPE_CURVE_POINT) and (i == hover->index))
+				c->setColor(view->colors.selection_boundary_hover);
+			else if ((selection->type == Selection::TYPE_CURVE_POINT) and (i == selection->index))
+				c->setColor(view->colors.selection_boundary);
+			else
+				c->setColor(view->colors.text);
+			c->drawCircle(cam->sample2screen(p.pos), value2screen(p.value), 3);
+		}
+	}
 }
 
 Selection ViewModeCurve::getHover()
@@ -121,24 +171,18 @@ Selection ViewModeCurve::getHover()
 		}
 	}
 
-	// midi
-	/*if ((s.track) and (s.track->type == Track::TYPE_MIDI) and (s.track == view->cur_track)){
-		if (scroll_bar.inside(view->mx, view->my)){
-			s.type = Selection::TYPE_SCROLL;
-			return s;
+	// curve points
+	if ((s.track) and (curve)){
+		foreachi(Curve::Point &p, curve->points, i){
+			float x = cam->sample2screen(p.pos);
+			float y = value2screen(p.value);
+			if ((fabs(mx - x) < 10) && (fabs(my - y) < 10)){
+				s.type = Selection::TYPE_CURVE_POINT;
+				s.index = i;
+				return s;
+			}
 		}
-		if (midi_mode != MIDI_MODE_SELECT){
-			s.pitch = y2pitch(my);
-			s.type = Selection::TYPE_MIDI_PITCH;
-			Array<MidiNote> notes = s.track->midi.getNotes(cam->range());
-			foreachi(MidiNote &n, notes, i)
-				if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
-					s.index = i;
-					s.type = Selection::TYPE_MIDI_NOTE;
-					return s;
-				}
-		}
-	}*/
+	}
 
 	// time scale
 	if (my < view->TIME_SCALE_HEIGHT){
@@ -159,4 +203,18 @@ void ViewModeCurve::setCurve(Curve* c)
 {
 	curve = c;
 	view->forceRedraw();
+}
+
+float ViewModeCurve::value2screen(float value)
+{
+	if ((!curve) or (!cur_track))
+		return 0;
+	return cur_track->area.y2 - cur_track->area.height() * (value - curve->min) / (curve->max - curve->min);
+}
+
+float ViewModeCurve::screen2value(float y)
+{
+	if ((!curve) or (!cur_track))
+		return 0;
+	return curve->min + (cur_track->area.y2 - y) / cur_track->area.height() * (curve->max - curve->min);
 }

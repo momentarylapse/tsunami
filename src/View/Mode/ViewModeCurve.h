@@ -27,7 +27,12 @@ public:
 
 	virtual Selection getHover();
 
+
+	float value2screen(float value);
+	float screen2value(float y);
+
 	Curve *curve;
+	AudioViewTrack *cur_track;
 	void setCurve(Curve *c);
 };
 

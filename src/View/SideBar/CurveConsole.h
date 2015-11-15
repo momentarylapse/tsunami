@@ -30,11 +30,6 @@ public:
 	void onTarget();
 	void onListEdit();
 	void onListSelect();
-	void onDraw();
-	void onKeyDown();
-	void onLeftButtonDown();
-	void onLeftButtonUp();
-	void onMouseMove();
 
 	virtual void onEnter();
 	virtual void onLeave();
@@ -44,16 +39,6 @@ public:
 	Curve *curve;
 
 	string id_list;
-
-	rect curve_rect;
-
-	int hover, selected;
-
-	float sample2screen(float pos);
-	float screen2sample(float x);
-	float value2screen(float value);
-	float screen2value(float y);
-	int getHover();
 };
 
 #endif /* CURVECONSOLE_H_ */

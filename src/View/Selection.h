@@ -44,6 +44,7 @@ public:
 		TYPE_MIDI_PITCH,
 		TYPE_MARKER,
 		TYPE_SCROLL,
+		TYPE_CURVE_POINT,
 	};
 
 	Selection();

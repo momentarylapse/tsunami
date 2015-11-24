@@ -22,7 +22,7 @@
 #include "../lib/hui/hui.h"
 #include "../View/Helper/Progress.h"
 #include "../Stuff/Log.h"
-#include "../Audio/SongRenderer.h"
+#include "../Audio/Renderer/SongRenderer.h"
 #include "../Data/Song.h"
 
 Storage::Storage()

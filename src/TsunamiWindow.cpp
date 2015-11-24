@@ -25,7 +25,7 @@
 #include "Stuff/Clipboard.h"
 #include "Audio/AudioOutput.h"
 #include "Audio/AudioStream.h"
-#include "Audio/SongRenderer.h"
+#include "Audio/Renderer/SongRenderer.h"
 #include "Data/Song.h"
 
 #include "Plugins/FastFourierTransform.h"

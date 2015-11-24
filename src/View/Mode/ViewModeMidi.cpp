@@ -9,9 +9,9 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../../Audio/AudioStream.h"
-#include "../../Audio/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
-#include "../../Audio/Synth/SynthesizerRenderer.h"
+#include "../../Audio/Renderer/SongRenderer.h"
+#include "../../Audio/Renderer/SynthesizerRenderer.h"
 #include "../../TsunamiWindow.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);

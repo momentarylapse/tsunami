@@ -7,7 +7,7 @@
 
 #include "FormatFlac.h"
 #include <math.h>
-#include "../../Audio/AudioRenderer.h"
+#include "../../Audio/Renderer/AudioRenderer.h"
 
 #include <FLAC/all.h>
 

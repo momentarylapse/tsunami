@@ -8,7 +8,7 @@
 #include "AudioStream.h"
 #include "AudioOutput.h"
 #include "../Tsunami.h"
-#include "AudioRenderer.h"
+#include "Renderer/AudioRenderer.h"
 #include "../Stuff/Log.h"
 #include <pulse/pulseaudio.h>
 #include "../lib/threads/Thread.h"

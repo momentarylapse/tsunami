@@ -12,7 +12,7 @@
 #include "../../Audio/AudioInputAudio.h"
 #include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
-#include "../../Audio/SongRenderer.h"
+#include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include "../../Stuff/Log.h"

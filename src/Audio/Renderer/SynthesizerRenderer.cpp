@@ -6,7 +6,7 @@
  */
 
 #include "SynthesizerRenderer.h"
-#include "Synthesizer.h"
+#include "../Synth/Synthesizer.h"
 
 
 

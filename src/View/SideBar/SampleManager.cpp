@@ -10,7 +10,7 @@
 #include "../../View/AudioView.h"
 #include "../../View/AudioViewTrack.h"
 #include "../../Audio/AudioStream.h"
-#include "../../Audio/SongRenderer.h"
+#include "../../Audio/Renderer/SongRenderer.h"
 #include "../Helper/Progress.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"

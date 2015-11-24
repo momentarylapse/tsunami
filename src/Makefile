@@ -62,18 +62,18 @@ OBJ = \
  Action/ActionGroup.o\
  Action/ActionManager.o\
  Action/ActionMergable.o\
+ Audio/Renderer/AudioRenderer.o\
+ Audio/Renderer/SongRenderer.o\
+ Audio/Renderer/SynthesizerRenderer.o\
  Audio/Synth/DummySynthesizer.o\
  Audio/Synth/EnvelopeADSR.o\
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
- Audio/Synth/SynthesizerRenderer.o\
  Audio/AudioInputAny.o\
  Audio/AudioInputAudio.o\
  Audio/AudioInputMidi.o\
  Audio/AudioOutput.o\
- Audio/AudioRenderer.o\
  Audio/AudioStream.o\
- Audio/SongRenderer.o\
  Data/BufferBox.o\
  Data/Curve.o\
  Data/Data.o\
@@ -451,6 +451,15 @@ Action/ActionManager.o : Action/ActionManager.cpp
 Action/ActionMergable.o : Action/ActionMergable.cpp
 	$(CPP) -c Action/ActionMergable.cpp -o $@ $(CXXFLAGS)
 
+Audio/Renderer/SynthesizerRenderer.o : Audio/Renderer/SynthesizerRenderer.cpp
+	$(CPP) -c Audio/Renderer/SynthesizerRenderer.cpp -o $@ $(CXXFLAGS)
+
+Audio/Renderer/AudioRenderer.o : Audio/Renderer/AudioRenderer.cpp
+	$(CPP) -c Audio/Renderer/AudioRenderer.cpp -o $@ $(CXXFLAGS)
+
+Audio/Renderer/SongRenderer.o : Audio/Renderer/SongRenderer.cpp
+	$(CPP) -c Audio/Renderer/SongRenderer.cpp -o $@ $(CXXFLAGS)
+
 Audio/Synth/DummySynthesizer.o : Audio/Synth/DummySynthesizer.cpp
 	$(CPP) -c Audio/Synth/DummySynthesizer.cpp -o $@ $(CXXFLAGS)
 
@@ -462,9 +471,6 @@ Audio/Synth/SampleSynthesizer.o : Audio/Synth/SampleSynthesizer.cpp
 
 Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 	$(CPP) -c Audio/Synth/Synthesizer.cpp -o $@ $(CXXFLAGS)
-
-Audio/Synth/SynthesizerRenderer.o : Audio/Synth/SynthesizerRenderer.cpp
-	$(CPP) -c Audio/Synth/SynthesizerRenderer.cpp -o $@ $(CXXFLAGS)
 
 Audio/AudioInputAny.o : Audio/AudioInputAny.cpp
 	$(CPP) -c Audio/AudioInputAny.cpp -o $@ $(CXXFLAGS)
@@ -478,14 +484,8 @@ Audio/AudioInputMidi.o : Audio/AudioInputMidi.cpp
 Audio/AudioOutput.o : Audio/AudioOutput.cpp
 	$(CPP) -c Audio/AudioOutput.cpp -o $@ $(CXXFLAGS)
 
-Audio/AudioRenderer.o : Audio/AudioRenderer.cpp
-	$(CPP) -c Audio/AudioRenderer.cpp -o $@ $(CXXFLAGS)
-
 Audio/AudioStream.o : Audio/AudioStream.cpp
 	$(CPP) -c Audio/AudioStream.cpp -o $@ $(CXXFLAGS)
-
-Audio/SongRenderer.o : Audio/SongRenderer.cpp
-	$(CPP) -c Audio/SongRenderer.cpp -o $@ $(CXXFLAGS)
 
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)

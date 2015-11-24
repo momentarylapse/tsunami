@@ -8,7 +8,7 @@
 #include "AudioInputMidi.h"
 #include "AudioStream.h"
 #include "Synth/Synthesizer.h"
-#include "Synth/SynthesizerRenderer.h"
+#include "Renderer/SynthesizerRenderer.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include <alsa/asoundlib.h>

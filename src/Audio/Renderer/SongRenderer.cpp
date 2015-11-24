@@ -6,14 +6,14 @@
  */
 
 #include "SongRenderer.h"
-#include "Synth/Synthesizer.h"
-#include "../Plugins/Effect.h"
-#include "../Plugins/MidiEffect.h"
-#include "../Plugins/PluginManager.h"
-#include "../Data/Curve.h"
-#include "../Tsunami.h"
+#include "../Synth/Synthesizer.h"
+#include "../../Plugins/Effect.h"
+#include "../../Plugins/MidiEffect.h"
+#include "../../Plugins/PluginManager.h"
+#include "../../Data/Curve.h"
+#include "../../Tsunami.h"
 
-#include "../lib/math/math.h"
+#include "../../lib/math/math.h"
 
 SongRenderer::SongRenderer(Song *s)
 {

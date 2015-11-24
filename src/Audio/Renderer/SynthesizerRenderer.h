@@ -9,7 +9,7 @@
 #define SRC_AUDIO_SYNTH_SYNTHESIZERRENDERER_H_
 
 
-#include "../AudioRenderer.h"
+#include "AudioRenderer.h"
 
 class Synthesizer;
 class MidiEvent;

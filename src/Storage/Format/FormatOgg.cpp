@@ -6,7 +6,7 @@
  */
 
 #include "FormatOgg.h"
-#include "../../Audio/AudioRenderer.h"
+#include "../../Audio/Renderer/AudioRenderer.h"
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>

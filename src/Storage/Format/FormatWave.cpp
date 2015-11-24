@@ -7,7 +7,7 @@
 
 #include "FormatWave.h"
 #include "../../lib/math/math.h"
-#include "../../Audio/AudioRenderer.h"
+#include "../../Audio/Renderer/AudioRenderer.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 15;

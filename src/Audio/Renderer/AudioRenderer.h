@@ -8,7 +8,7 @@
 #ifndef AUDIORENDERER_H_
 #define AUDIORENDERER_H_
 
-#include "../Data/Song.h"
+#include "../../Data/Song.h"
 
 class AudioRenderer : public VirtualBase
 {

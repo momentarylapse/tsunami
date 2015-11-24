@@ -39,8 +39,11 @@ void DynamicArray::reserve(int size)
 //			printf("          new  %p  ", data);
 		}
 	}else if (size > allocated){
-		allocated = size * 2;
-		void *data0 = data;
+		if (size > 10000)
+			allocated = size + size / 2;
+		else
+			allocated = size * 2;
+//		void *data0 = data;
 		data = realloc(data, (size_t)allocated * (size_t)element_size);
 //		printf("          %p  ->  %p ", data0, data);
 	}else if (size == 0)

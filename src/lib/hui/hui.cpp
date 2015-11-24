@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.12.0";
+string HuiVersion = "0.5.12.1";
 
 #include <stdio.h>
 #include <signal.h>
@@ -311,28 +311,15 @@ void HuiInit(const string &program, bool load_res, const string &def_lang)
 	#endif
 
 	#ifdef OS_LINUX
+		HuiAppDirectory = HuiInitialWorkingDirectory;
+		HuiAppDirectoryStatic = HuiAppDirectory;
 		if (HuiArgument.num > 0){
-			if (HuiArgument[0][0] == '/'){
-				if (HuiArgument[0][1] == 'u'){ // /usr/...
-					HuiAppFilename = HuiArgument[0];
-					HuiAppDirectory = format("%s/.%s/", getenv("HOME"), program.c_str());
-					HuiAppDirectoryStatic = "/usr/share/" + program + "/";
-				}else{
-					HuiAppFilename = HuiArgument[0];
-					HuiAppDirectory = HuiAppFilename.dirname();
-					HuiAppDirectoryStatic = HuiAppDirectory;
-				}
-			}else{
-				HuiAppDirectory.dir_ensure_ending();
-				if (HuiArgument[0][0] == '.'){
-					HuiAppFilename = HuiArgument[0].substr(2, -1);
-					HuiAppDirectory = HuiInitialWorkingDirectory;
-					HuiAppDirectoryStatic = HuiAppDirectory;
-				}else{
-					HuiAppFilename = HuiArgument[0];
-					HuiAppDirectory = format("%s/.%s/", getenv("HOME"), program.c_str());
-					HuiAppDirectoryStatic = "/usr/share/" + program + "/";
-				}
+			HuiAppFilename = HuiArgument[0];
+			if (HuiArgument[0].head(5) == "/usr/"){
+				// installed version?
+				HuiAppFilename = HuiArgument[0];
+				HuiAppDirectory = format("%s/.%s/", getenv("HOME"), program.c_str());
+				HuiAppDirectoryStatic = "/usr/share/" + program + "/";
 			}
 		}
 		dir_create(HuiAppDirectory);

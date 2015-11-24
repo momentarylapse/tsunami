@@ -141,6 +141,11 @@ void ActionManager::enable(bool _enabled)
 	enabled = _enabled;
 }
 
+bool ActionManager::isEnabled()
+{
+	return enabled;
+}
+
 
 void ActionManager::beginActionGroup()
 {

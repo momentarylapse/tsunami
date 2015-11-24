@@ -27,9 +27,12 @@ void Format::importData(Track *t, void *data, int channels, SampleFormat format,
 
 	BufferBox buf = t->getBuffers(level, Range(offset, samples));
 
-	Action *a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
+	Action *a;
+	if (t->song->action_manager->isEnabled())
+		a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
 	buf.import(data, channels, format, samples);
-	t->song->action_manager->execute(a);
+	if (t->song->action_manager->isEnabled())
+		t->song->action_manager->execute(a);
 }
 
 

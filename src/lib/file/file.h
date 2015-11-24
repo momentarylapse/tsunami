@@ -82,6 +82,7 @@ public:
 	void _cdecl SetBinaryMode(bool bm);
 	void _cdecl SetPos(int pos,bool absolute);
 	int _cdecl GetSize();
+	long long _cdecl GetSize64();
 	int _cdecl GetPos();
 	Date _cdecl GetDateCreation();
 	Date _cdecl GetDateModification();

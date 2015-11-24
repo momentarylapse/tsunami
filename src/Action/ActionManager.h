@@ -23,7 +23,8 @@ public:
 	ActionManager(Data *_data);
 	virtual ~ActionManager();
 	void reset();
-	void enable(bool _enabled);
+	void enable(bool enabled);
+	bool isEnabled();
 
 	void *execute(Action *a);
 	void undo();

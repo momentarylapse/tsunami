@@ -589,6 +589,19 @@ int File::GetSize()
 #endif
 }
 
+// retrieve the size of the opened(!) file
+long long File::GetSize64()
+{
+#ifdef OS_WINDOWS
+	return (long long)_filelength(handle);
+#endif
+#ifdef OS_LINUX
+	struct stat _stat;
+	fstat(handle, &_stat);
+	return _stat.st_size;
+#endif
+}
+
 Date File::GetDateCreation()
 {
 	struct stat _stat;

@@ -234,7 +234,7 @@ void CaptureDialog::setType(int _type)
 
 void CaptureDialog::onStart()
 {
-	view->renderer->prepare(song, view->getPlaybackSelection(), false);
+	view->renderer->prepare(view->getPlaybackSelection(), false);
 	view->stream->play();
 
 	input->resetSync();

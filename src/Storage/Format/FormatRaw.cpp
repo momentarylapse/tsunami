@@ -7,10 +7,9 @@
 
 #include "FormatRaw.h"
 #include "../../lib/math/math.h"
+#include "../../Audio/SongRenderer.h"
 #include "../Dialog/RawConfigDialog.h"
 
-
-const int WAVE_BUFFER_SIZE = 1 << 15;
 
 FormatRaw::FormatRaw() :
 	Format("Raw audio data", "raw", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)
@@ -29,14 +28,11 @@ RawConfigData GetRawConfigData(HuiWindow *win)
 	return data;
 }
 
-void FormatRaw::saveBuffer(StorageOperationData *od)
+void FormatRaw::saveViaRenderer(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->win);
-
-	// TODO: large buffers...
-	string data;
-	if (!od->buf->exports(data, config.channels, config.format))
-		od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
+	const int CHUNK_SIZE = 1<<15;
+	AudioRenderer *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
 	f->SetBinaryMode(true);
@@ -44,12 +40,18 @@ void FormatRaw::saveBuffer(StorageOperationData *od)
 	for (int i=0; i<config.offset; i++)
 		f->WriteByte(0);
 
-	int size = data.num;
-	for (int i=0;i<size / WAVE_BUFFER_SIZE;i++){
-		od->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
-		f->WriteBuffer(&data[i * WAVE_BUFFER_SIZE], WAVE_BUFFER_SIZE);
+	BufferBox buf;
+	buf.resize(CHUNK_SIZE);
+	int samples = r->getNumSamples();
+	int done = 0;
+	while (r->readResize(buf) > 0){
+		string data;
+		if (!buf.exports(data, config.channels, config.format))
+			od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
+		od->set(float(done) / (float)samples);
+		f->WriteBuffer(data.data, data.num);
+		done += buf.num;
 	}
-	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
 
 	FileClose(f);
 }
@@ -57,6 +59,8 @@ void FormatRaw::saveBuffer(StorageOperationData *od)
 void FormatRaw::loadTrack(StorageOperationData *od)
 {
 	RawConfigData config = GetRawConfigData(od->win);
+
+	const int WAVE_BUFFER_SIZE = 1 << 16;
 
 	char *data = new char[WAVE_BUFFER_SIZE];
 	File *f = FileOpen(od->filename);
@@ -106,20 +110,6 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 	if (f)
 		FileClose(f);
 }
-
-void FormatRaw::saveSong(StorageOperationData *od)
-{
-	exportAsTrack(od);
-}
-
-
-
-void FormatRaw::loadSong(StorageOperationData *od)
-{
-	od->track = od->song->addTrack(Track::TYPE_AUDIO);
-	loadTrack(od);
-}
-
 
 
 

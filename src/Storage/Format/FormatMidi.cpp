@@ -16,12 +16,6 @@ FormatMidi::~FormatMidi()
 {
 }
 
-void FormatMidi::loadTrack(StorageOperationData *od)
-{}
-
-void FormatMidi::saveBuffer(StorageOperationData *od)
-{}
-
 static string read_chunk_name(File *f)
 {
 	string s;

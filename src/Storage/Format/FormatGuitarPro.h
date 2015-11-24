@@ -17,8 +17,8 @@ public:
 	FormatGuitarPro();
 	virtual ~FormatGuitarPro();
 
-	void loadTrack(StorageOperationData *od);
-	void saveBuffer(StorageOperationData *od);
+	void loadTrack(StorageOperationData *od){}
+	void saveViaRenderer(StorageOperationData *od){}
 
 	void loadSong(StorageOperationData *od);
 	void saveSong(StorageOperationData *od);

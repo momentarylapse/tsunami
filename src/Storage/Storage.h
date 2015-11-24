@@ -28,7 +28,6 @@ public:
 	bool loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
 	bool loadBufferBox(Song *a, BufferBox *buf, const string &filename);
 	bool saveBufferBox(Song *a, BufferBox *buf, const string &filename);
-	bool _saveBufferBox(StorageOperationData *od);
 	bool save(Song *a, const string &filename);
 	bool _export(Song *a, const Range &r, const string &filename);
 

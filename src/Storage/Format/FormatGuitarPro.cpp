@@ -85,10 +85,6 @@ static string read_str41(File *f)
 	return read_str1(f);
 }
 
-void FormatGuitarPro::saveBuffer(StorageOperationData *od){}
-
-void FormatGuitarPro::loadTrack(StorageOperationData *od){}
-
 void FormatGuitarPro::saveSong(StorageOperationData *_od)
 {
 	od = _od;

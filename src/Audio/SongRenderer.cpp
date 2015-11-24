@@ -15,22 +15,23 @@
 
 #include "../lib/math/math.h"
 
-SongRenderer::SongRenderer()
+SongRenderer::SongRenderer(Song *s)
 {
+	song = s;
 	effect = NULL;
 	allow_loop = false;
 	loop_if_allowed = false;
 	pos = 0;
-	song = NULL;
+	prepare(s->getRange(), false);
 }
 
 SongRenderer::~SongRenderer()
 {
 }
 
-void SongRenderer::__init__()
+void SongRenderer::__init__(Song *s)
 {
-	new(this) SongRenderer;
+	new(this) SongRenderer(s);
 }
 
 void SongRenderer::__delete__()
@@ -270,17 +271,16 @@ int SongRenderer::read(BufferBox &buf)
 	return size;
 }
 
-void SongRenderer::render(Song *s, const Range &range, BufferBox &buf)
+void SongRenderer::render(const Range &range, BufferBox &buf)
 {
-	prepare(s, range, false);
+	prepare(range, false);
 	buf.resize(range.num);
 	read(buf);
 }
 
-void SongRenderer::prepare(Song *s, const Range &__range, bool _allow_loop)
+void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 {
 	msg_db_f("Renderer.Prepare", 2);
-	song = s;
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
@@ -313,6 +313,13 @@ void SongRenderer::reset()
 int SongRenderer::getSampleRate()
 {
 	return song->sample_rate;
+}
+
+int SongRenderer::getNumSamples()
+{
+	if (allow_loop and loop_if_allowed)
+		return -1;
+	return _range.num;
 }
 
 void SongRenderer::seek(int _pos)

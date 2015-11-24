@@ -159,7 +159,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	peak_thread = new PeakThread(this);
 	is_updating_peaks = false;
 
-	renderer = new SongRenderer;
+	renderer = new SongRenderer(song);
 	stream = new AudioStream(renderer);
 
 	area = rect(0, 0, 0, 0);

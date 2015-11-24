@@ -20,11 +20,13 @@ public:
 	virtual void _cdecl __delete__();
 
 	virtual int read(BufferBox &buf){ return 0; }
+	int readResize(BufferBox &buf);
 	virtual void reset(){}
 	virtual Range range(){ return Range(0, 0); }
 	virtual int getPos(){ return 0; }
 	virtual void seek(int pos){}
 	virtual int getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
+	virtual int getNumSamples(){ return 0; }
 };
 
 #endif /* AUDIORENDERER_H_ */

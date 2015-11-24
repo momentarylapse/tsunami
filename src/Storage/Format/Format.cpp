@@ -44,14 +44,26 @@ bool Format::canHandle(const string & _extension)
 	return false;
 }
 
-void Format::exportAsTrack(StorageOperationData *od)
+/*void Format::exportAsTrack(StorageOperationData *od)
 {
-	BufferBox buf;
 	SongRenderer renderer;
-	renderer.render(od->song, od->song->getRange(), buf);
-	od->buf = &buf;
-	saveBuffer(od);
-}
+
+	const int CHUNK_SIZE = 1<<16;
+
+	Range r = od->song->getRange();
+	od->samples = r.num;
+	saveBufferBegin(od);
+	int written = 0;
+	while(written < r.num){
+
+		BufferBox buf;
+		renderer.render(od->song, Range(r.offset + written, CHUNK_SIZE), buf);
+		od->buf = &buf;
+		saveBufferPart(od);
+		written += CHUNK_SIZE;
+	}
+	saveBufferEnd(od);
+}*/
 
 
 
@@ -84,3 +96,15 @@ bool Format::testFormatCompatibility(Song *a)
 	return true;
 }
 
+void Format::loadSong(StorageOperationData *od)
+{
+	od->track = od->song->addTrack(Track::TYPE_AUDIO, 0);
+	loadTrack(od);
+}
+
+void Format::saveSong(StorageOperationData* od)
+{
+	SongRenderer renderer(od->song);
+	od->renderer = &renderer;
+	saveViaRenderer(od);
+}

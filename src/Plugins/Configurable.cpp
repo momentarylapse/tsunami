@@ -461,7 +461,7 @@ public:
 		progress = new ProgressCancelable(_("Vorschau"), win);
 		subscribe(progress);
 		subscribe(tsunami->win->view->stream);
-		tsunami->win->view->renderer->prepare(tsunami->song, tsunami->win->view->sel_range, false);
+		tsunami->win->view->renderer->prepare(tsunami->win->view->sel_range, false);
 		tsunami->win->view->stream->play();
 	}
 

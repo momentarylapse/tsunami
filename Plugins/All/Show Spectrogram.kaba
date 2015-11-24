@@ -76,8 +76,9 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	SongRenderer renderer
-	renderer.render(song, view.sel_range, buf)
+	SongRenderer* renderer = new SongRenderer(song)
+	renderer.render(view.sel_range, buf)
+	delete renderer
 	
 	complex[] f
 	float[] sub

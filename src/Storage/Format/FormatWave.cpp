@@ -7,6 +7,7 @@
 
 #include "FormatWave.h"
 #include "../../lib/math/math.h"
+#include "../../Audio/AudioRenderer.h"
 
 
 const int WAVE_BUFFER_SIZE = 1 << 15;
@@ -20,10 +21,12 @@ FormatWave::~FormatWave()
 {
 }
 
-void FormatWave::saveBuffer(StorageOperationData *od)
+void FormatWave::saveViaRenderer(StorageOperationData *od)
 {
+	const int CHUNK_SIZE = 1 << 15;
+
 	Song *a = od->song;
-	BufferBox *b = od->buf;
+	AudioRenderer *r = od->renderer;
 
 	SampleFormat format = a->default_format;
 	if (format == SAMPLE_FORMAT_32_FLOAT)
@@ -31,16 +34,13 @@ void FormatWave::saveBuffer(StorageOperationData *od)
 	int bit_depth = format_get_bits(format);
 	int channels = 2;
 	int bytes_per_sample = bit_depth / 8 * channels;
-
-	string data;
-	if (!b->exports(data, 2, SAMPLE_FORMAT_16))
-		od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
+	int samples = r->getNumSamples();
 
 	File *f = FileCreate(od->filename);
 	f->SetBinaryMode(true);
 
 	f->WriteBuffer("RIFF", 4);
-	f->WriteInt(b->num * bytes_per_sample + 44);
+	f->WriteInt(samples * bytes_per_sample + 44);
 	f->WriteBuffer("WAVEfmt ",8);
 	f->WriteInt(16); // chunk size (fmt)
 	f->WriteWord(1); // version
@@ -50,16 +50,21 @@ void FormatWave::saveBuffer(StorageOperationData *od)
 	f->WriteWord(4); // block align
 	f->WriteWord(bit_depth);
 	f->WriteBuffer("data", 4);
-	f->WriteInt(b->num * bytes_per_sample);
+	f->WriteInt(samples * bytes_per_sample);
 
-	/*
-	f->WriteBuffer((char*)PVData,w->length*4);*/
-	int size = b->num * 4;
-	for (int i=0;i<size / WAVE_BUFFER_SIZE;i++){
-		od->set(float(i * WAVE_BUFFER_SIZE) / (float)size);
-		f->WriteBuffer(&data[i * WAVE_BUFFER_SIZE], WAVE_BUFFER_SIZE);
+	BufferBox buf;
+	buf.resize(CHUNK_SIZE);
+	int done = 0;
+	while (r->readResize(buf) > 0){
+		string data;
+		if (!buf.exports(data, 2, SAMPLE_FORMAT_16))
+			od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
+
+		od->set(float(done) / (float)samples);
+		f->WriteBuffer(data.data, data.num);
+
+		done += buf.num;
 	}
-	f->WriteBuffer(&data[(size / WAVE_BUFFER_SIZE) * WAVE_BUFFER_SIZE], size & (WAVE_BUFFER_SIZE - 1));
 
 	FileClose(f);
 }
@@ -180,19 +185,6 @@ void FormatWave::loadTrack(StorageOperationData *od)
 
 	if (f)
 		FileClose(f);
-}
-
-void FormatWave::saveSong(StorageOperationData *od)
-{
-	exportAsTrack(od);
-}
-
-
-
-void FormatWave::loadSong(StorageOperationData *od)
-{
-	od->track = od->song->addTrack(Track::TYPE_AUDIO);
-	loadTrack(od);
 }
 
 

@@ -332,7 +332,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRenderer", "seek", Script::mf(&AudioRenderer::seek), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
 
-	SongRenderer sr;
+	SongRenderer sr(&af);
 	Script::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
 	Script::LinkExternal("SongRenderer.prepare", Script::mf(&SongRenderer::prepare));
 	Script::LinkExternal("SongRenderer.render", Script::mf(&SongRenderer::render));

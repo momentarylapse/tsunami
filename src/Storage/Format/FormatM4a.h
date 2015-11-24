@@ -16,11 +16,8 @@ public:
 	FormatM4a();
 	virtual ~FormatM4a();
 
-	void loadTrack(StorageOperationData *od);
-	void saveBuffer(StorageOperationData *od);
-
-	void loadSong(StorageOperationData *od);
-	void saveSong(StorageOperationData *od);
+	virtual void loadTrack(StorageOperationData *od);
+	virtual void saveViaRenderer(StorageOperationData *od){}
 };
 
 #endif /* FORMATMP3_H_ */

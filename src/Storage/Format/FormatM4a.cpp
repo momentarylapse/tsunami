@@ -18,8 +18,6 @@ FormatM4a::~FormatM4a()
 {
 }
 
-void FormatM4a::saveBuffer(StorageOperationData *od){}
-
 void FormatM4a::loadTrack(StorageOperationData *od)
 {
 	if (system("which avconv") == 0){
@@ -30,13 +28,5 @@ void FormatM4a::loadTrack(StorageOperationData *od)
 		file_delete(tmp);
 	}else
 		od->error("mp3: need external program 'avconv' to decode");
-}
-
-void FormatM4a::saveSong(StorageOperationData *od){}
-
-void FormatM4a::loadSong(StorageOperationData *od)
-{
-	od->track = od->song->addTrack(Track::TYPE_AUDIO);
-	loadTrack(od);
 }
 

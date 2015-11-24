@@ -19,3 +19,10 @@ void AudioRenderer::__init__()
 void AudioRenderer::__delete__()
 {
 }
+
+int AudioRenderer::readResize(BufferBox &buf)
+{
+	int n = read(buf);
+	buf.resize(n);
+	return n;
+}

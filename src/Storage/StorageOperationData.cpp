@@ -9,6 +9,8 @@
 #include "../View/Helper/Progress.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
+#include "../Data/BufferBox.h"
+#include "../Audio/AudioRenderer.h"
 
 StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, Song *s, Track *t, BufferBox *b, const string &_filename, const string &message, HuiWindow *_win)
 {
@@ -22,6 +24,7 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	track = t;
 	offset = 0;
 	level = 0;
+	renderer = NULL;
 }
 
 StorageOperationData::~StorageOperationData()
@@ -52,4 +55,13 @@ void StorageOperationData::set(float t)
 void StorageOperationData::set(const string &str, float t)
 {
 	progress->set(str, t);
+}
+
+int StorageOperationData::get_num_samples()
+{
+	if (buf)
+		return buf->num;
+	if (renderer)
+		return renderer->getNumSamples();
+	return 0;
 }

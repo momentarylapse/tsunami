@@ -1394,11 +1394,6 @@ void FormatNami::saveSong(StorageOperationData *_od)
 
 
 
-void FormatNami::saveBuffer(StorageOperationData *od)
-{
-}
-
-
 #if 0
 void ReadCompressed(File *f, char *data, int size)
 {
@@ -1845,9 +1840,4 @@ void FormatNami::loadSong(StorageOperationData *_od)
 	od->song->updateSelection(Range(0, 0));
 }
 
-
-
-void FormatNami::loadTrack(StorageOperationData *od)
-{
-}
 

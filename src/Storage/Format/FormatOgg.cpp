@@ -6,6 +6,7 @@
  */
 
 #include "FormatOgg.h"
+#include "../../Audio/AudioRenderer.h"
 
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
@@ -29,11 +30,6 @@ FormatOgg::~FormatOgg()
 {
 }
 
-void FormatOgg::saveSong(StorageOperationData *od)
-{
-	exportAsTrack(od);
-}
-
 
 
 
@@ -47,11 +43,11 @@ int oe_write_page(ogg_page *page, FILE *fp)
 }
 
 
-void FormatOgg::saveBuffer(StorageOperationData *od)
+void FormatOgg::saveViaRenderer(StorageOperationData *od)
 {
-	msg_db_r("write_ogg_file", 1);
+	msg_db_f("write_ogg_file", 1);
 	Song *a = od->song;
-	BufferBox *b = od->buf;
+	AudioRenderer *r = od->renderer;
 
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
 
@@ -88,46 +84,48 @@ void FormatOgg::saveBuffer(StorageOperationData *od)
 	ogg_packet op;
 
 	int result;
-        while((result = ogg_stream_flush(&os, &og)))
-        {
-            if(!result) break;
-            int ret = oe_write_page(&og, f);
-            if(ret != og.header_len + og.body_len)
-            {
-                /*opt->error(_("Failed writing header to output stream\n"));
-                ret = 1;
-                goto cleanup;*/
-				msg_error("ssss");
-				return;
-            }
-        }
+	while((result = ogg_stream_flush(&os, &og))){
+		if (!result)
+			break;
+		int ret = oe_write_page(&og, f);
+		if (ret != og.header_len + og.body_len){
+			/*opt->error(_("Failed writing header to output stream\n"));
+			ret = 1;
+			goto cleanup;*/
+			msg_error("ssss");
+			return;
+		}
+	}
 
 //#if 1
 	//int eos = 0;
 	int written = 0;
-#define READSIZE		2048
+	int samples = r->getNumSamples();
+#define READSIZE		1<<12
 	int nn = 0;
 
-				int eos = 0;
+	BufferBox buf;
+	buf.resize(READSIZE);
+
+	int eos = 0;
 	while(!eos){
 		//msg_write(written);
 
-		int num = READSIZE;
-		if (num + written > b->num)
-			num = b->num - written;
-		float **buffer = vorbis_analysis_buffer(&vd, READSIZE);
-		for (int i=0;i<num;i++){
-			buffer[0][i] = b->r[written + i];
-			buffer[1][i] = b->l[written + i];
+		if (r->readResize(buf) <= 0)
+			break;
+
+		float **buffer = vorbis_analysis_buffer(&vd, buf.num);
+		for (int i=0;i<buf.num;i++){
+			buffer[0][i] = buf.r[i];
+			buffer[1][i] = buf.l[i];
 		}
-		written += num;
-		vorbis_analysis_wrote(&vd, num);
-		//msg_write(num);
+		written += buf.num;
+		vorbis_analysis_wrote(&vd, buf.num);
 
 
 		nn ++;
 		if (nn > 8){
-			od->set(float(written) / (float)b->num);
+			od->set(float(written) / (float)samples);
 			nn = 0;
 		}
 
@@ -178,17 +176,8 @@ void FormatOgg::saveBuffer(StorageOperationData *od)
 	vorbis_dsp_clear(&vd);
 	vorbis_info_clear(&vi);
 	fclose(f);
-
-	msg_db_l(1);
 }
 
-
-
-void FormatOgg::loadSong(StorageOperationData *od)
-{
-	od->track = od->song->addTrack(Track::TYPE_AUDIO);
-	loadTrack(od);
-}
 
 
 

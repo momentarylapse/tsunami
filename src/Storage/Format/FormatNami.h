@@ -16,11 +16,11 @@ public:
 	FormatNami();
 	virtual ~FormatNami();
 
-	void loadTrack(StorageOperationData *od);
-	void saveBuffer(StorageOperationData *od);
+	virtual void loadTrack(StorageOperationData *od){}
+	virtual void saveViaRenderer(StorageOperationData *od){}
 
-	void loadSong(StorageOperationData *od);
-	void saveSong(StorageOperationData *od);
+	virtual void loadSong(StorageOperationData *od);
+	virtual void saveSong(StorageOperationData *od);
 
 	Array<int> ChunkPos;
 	void make_consistent(Song *s);

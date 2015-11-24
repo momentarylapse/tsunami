@@ -13,6 +13,7 @@
 #include "../StorageOperationData.h"
 
 class StorageOperationData;
+class AudioRenderer;
 
 class Format
 {
@@ -23,13 +24,12 @@ public:
 	bool testFormatCompatibility(Song *s);
 
 	void importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
-	void exportAsTrack(StorageOperationData *od);
 
 	virtual void loadTrack(StorageOperationData *od) = 0;
-	virtual void saveBuffer(StorageOperationData *od) = 0;
+	virtual void saveViaRenderer(StorageOperationData *od) = 0;
 
-	virtual void loadSong(StorageOperationData *od) = 0;
-	virtual void saveSong(StorageOperationData *od) = 0;
+	virtual void loadSong(StorageOperationData *od);
+	virtual void saveSong(StorageOperationData *od);
 
 	Array<string> extensions;
 	string description;

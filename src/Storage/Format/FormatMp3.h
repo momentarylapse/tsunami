@@ -17,10 +17,7 @@ public:
 	virtual ~FormatMp3();
 
 	void loadTrack(StorageOperationData *od);
-	void saveBuffer(StorageOperationData *od);
-
-	void loadSong(StorageOperationData *od);
-	void saveSong(StorageOperationData *od);
+	void saveViaRenderer(StorageOperationData *od){}
 };
 
 #endif /* FORMATMP3_H_ */

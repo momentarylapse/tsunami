@@ -131,7 +131,7 @@ SampleManager::SampleManager(Song *s) :
 	event("edit_song", this, &SampleManager::onEditSong);
 
 	preview_audio = new Song;
-	preview_renderer = new SongRenderer;
+	preview_renderer = new SongRenderer(preview_audio);
 	preview_stream = new AudioStream(preview_renderer);
 	preview_sample = NULL;
 
@@ -222,7 +222,12 @@ void SampleManager::onExport()
 		int sel = getInt("sample_list");
 		Sample *s = song->samples[sel];
 		if (s->type == Track::TYPE_AUDIO){
-			tsunami->storage->saveBufferBox(song, &s->buf, HuiFilename);
+			Song *ss = new Song;
+			ss->newWithOneTrack(Track::TYPE_AUDIO, s->owner->sample_rate);
+			ss->tracks[0]->levels[0].buffers.resize(1);
+			ss->tracks[0]->levels[0].buffers[0].set_as_ref(s->buf, 0, s->buf.num);
+			tsunami->storage->save(ss, HuiFilename);
+			delete(ss);
 		}
 	}
 }
@@ -305,7 +310,7 @@ void SampleManager::onPreview()
 	preview_audio->addTrack(preview_sample->type);
 	preview_audio->tracks[0]->levels[0].buffers.add(preview_sample->buf);
 	preview_audio->tracks[0]->midi = preview_sample->midi;
-	preview_renderer->prepare(preview_audio, preview_audio->getRange(), false);
+	preview_renderer->prepare(preview_audio->getRange(), false);
 
 	progress = new ProgressCancelable(_("Vorschau"), win);
 	subscribe(progress);

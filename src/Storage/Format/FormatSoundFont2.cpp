@@ -20,14 +20,6 @@ FormatSoundFont2::~FormatSoundFont2()
 {
 }
 
-void FormatSoundFont2::loadTrack(StorageOperationData *od)
-{
-}
-
-void FormatSoundFont2::saveBuffer(StorageOperationData *od)
-{
-}
-
 void FormatSoundFont2::loadSong(StorageOperationData *_od)
 {
 	od = _od;
@@ -156,8 +148,4 @@ void FormatSoundFont2::read_samples(File *f)
 		samples_read += num_samples;
 		od->set(float(samples_read) / (float)samples_all);
 	}
-}
-
-void FormatSoundFont2::saveSong(StorageOperationData *od)
-{
 }

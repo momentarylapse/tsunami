@@ -7,6 +7,7 @@
 
 #include "FormatFlac.h"
 #include <math.h>
+#include "../../Audio/AudioRenderer.h"
 
 #include <FLAC/all.h>
 
@@ -151,24 +152,18 @@ void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 byt
 {
 	StorageOperationData *od = (StorageOperationData*)client_data;
 	if (samples_written % (FLAC_READSIZE * 64) == 0)
-		od->set((float)samples_written / (float)od->buf->num);
+		od->set((float)samples_written / (float)od->get_num_samples());
 }
 
 static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 
 
-void FormatFlac::saveSong(StorageOperationData *od)
-{
-	exportAsTrack(od);
-}
 
-
-
-void FormatFlac::saveBuffer(StorageOperationData *od)
+void FormatFlac::saveViaRenderer(StorageOperationData *od)
 {
 	Song *a = od->song;
-	BufferBox *b = od->buf;
+	AudioRenderer *r = od->renderer;
 
 	bool ok = true;
 	FLAC__StreamEncoderInitStatus init_status;
@@ -192,7 +187,7 @@ void FormatFlac::saveBuffer(StorageOperationData *od)
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
 	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
 	ok &= FLAC__stream_encoder_set_sample_rate(encoder, a->sample_rate);
-	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b->num);
+	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, r->getNumSamples());
 
 	// metadata
 	if (ok){
@@ -212,7 +207,6 @@ void FormatFlac::saveBuffer(StorageOperationData *od)
 
 	// initialize encoder
 	if (ok){
-		od->buf = b;
 		init_status = FLAC__stream_encoder_init_file(encoder, od->filename.c_str(), flac_progress_callback, od);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
 			od->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
@@ -222,22 +216,19 @@ void FormatFlac::saveBuffer(StorageOperationData *od)
 
 	// read blocks of samples from WAVE file and feed to encoder
 	if (ok){
-		int p0 = 0;
-		size_t left = (size_t)b->num;
 		float scale = pow(2.0f, bits-1);
-		while (ok && left){
-			size_t need = (left>FLAC_READSIZE? (size_t)FLAC_READSIZE : (size_t)left);
-			{
-				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
-				for (unsigned int i=0;i<need;i++){
-					flac_pcm[i * 2 + 0] = (int)(b->r[p0 + i] * scale);
-					flac_pcm[i * 2 + 1] = (int)(b->l[p0 + i] * scale);
-				}
-				/* feed samples to encoder */
-				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
+		BufferBox buf;
+		buf.resize(FLAC_READSIZE);
+		while (r->readResize(buf)){
+			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
+			for (int i=0;i<buf.num;i++){
+				flac_pcm[i * 2 + 0] = (int)(buf.r[i] * scale);
+				flac_pcm[i * 2 + 1] = (int)(buf.l[i] * scale);
 			}
-			left -= need;
-			p0 += FLAC_READSIZE;
+			/* feed samples to encoder */
+			ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, buf.num);
+			if (!ok)
+				break;
 		}
 	}
 
@@ -252,14 +243,6 @@ void FormatFlac::saveBuffer(StorageOperationData *od)
 	FLAC__metadata_object_delete(metadata[0]);
 
 	FLAC__stream_encoder_delete(encoder);
-}
-
-
-
-void FormatFlac::loadSong(StorageOperationData *od)
-{
-	od->track = od->song->addTrack(Track::TYPE_AUDIO, 0);
-	loadTrack(od);
 }
 
 

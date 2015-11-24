@@ -17,6 +17,7 @@ class BufferBox;
 class Track;
 class Storage;
 class Format;
+class AudioRenderer;
 
 class StorageOperationData
 {
@@ -31,6 +32,8 @@ public:
 	void set(float t);
 	void set(const string &str, float t);
 
+	int get_num_samples();
+
 	Storage *storage;
 	Format *format;
 
@@ -41,6 +44,7 @@ public:
 	string filename;
 	BufferBox *buf;
 	Track *track;
+	AudioRenderer *renderer;
 	int offset;
 	int level;
 };

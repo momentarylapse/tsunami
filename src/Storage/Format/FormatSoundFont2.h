@@ -16,11 +16,11 @@ public:
 	FormatSoundFont2();
 	virtual ~FormatSoundFont2();
 
-	void loadTrack(StorageOperationData *od);
-	void saveBuffer(StorageOperationData *od);
+	void loadTrack(StorageOperationData *od){}
+	void saveViaRenderer(StorageOperationData *od){}
 
 	void loadSong(StorageOperationData *od);
-	void saveSong(StorageOperationData *od);
+	void saveSong(StorageOperationData *od){}
 
 	void read_chunk(File *f);
 	void read_samples(File *f);

@@ -35,8 +35,6 @@ static int read_32bit_be(File *f)
 	return d[3] | (d[2] << 8) | (d[1] << 16) | (d[0] << 24);
 }
 
-void FormatMp3::saveBuffer(StorageOperationData *od){}
-
 void FormatMp3::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_mp3_file", 1);
@@ -178,13 +176,5 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 
 	if (f)
 		FileClose(f);
-}
-
-void FormatMp3::saveSong(StorageOperationData *od){}
-
-void FormatMp3::loadSong(StorageOperationData *od)
-{
-	od->track = od->song->addTrack(Track::TYPE_AUDIO);
-	loadTrack(od);
 }
 

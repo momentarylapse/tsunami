@@ -340,10 +340,10 @@ class AudioView
 	ColorScheme colors
 
 class SongRenderer
-	extern void __init__()
+	extern void __init__(Song *s)
 	extern virtual void __delete__()
-	extern void render(Song *s, Range r, BufferBox buf)
-	extern void prepare(Song *s, Range r, bool allow_loop)
+	extern void render(Range r, BufferBox buf)
+	extern void prepare(Range r, bool allow_loop)
 	extern virtual int read(BufferBox b)
 	extern virtual void reset()
 	extern virtual Range range()

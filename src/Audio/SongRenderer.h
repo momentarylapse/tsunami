@@ -13,16 +13,16 @@
 class SongRenderer : public AudioRenderer
 {
 public:
-	SongRenderer();
+	SongRenderer(Song *a);
 	virtual ~SongRenderer();
 
-	void _cdecl __init__();
+	void _cdecl __init__(Song *s);
 	virtual void _cdecl __delete__();
 
-	void render(Song *a, const Range &range, BufferBox &buf);
+	void render(const Range &range, BufferBox &buf);
 	virtual int read(BufferBox &buf);
 	virtual void reset();
-	void prepare(Song *a, const Range &range, bool alllow_loop);
+	void prepare(const Range &range, bool alllow_loop);
 
 	virtual void seek(int pos);
 
@@ -31,6 +31,7 @@ public:
 	virtual int getPos(){ return pos; }
 
 	virtual int getSampleRate();
+	virtual int getNumSamples();
 
 private:
 	void read_basic(BufferBox &buf, int pos, int size);

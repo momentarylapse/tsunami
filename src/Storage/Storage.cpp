@@ -116,6 +116,7 @@ bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 	return ok;
 }
 
+#if 0
 bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
 {
 	msg_db_f("Storage.saveBuf", 1);
@@ -130,21 +131,7 @@ bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
 	// save
 	return _saveBufferBox(&od);
 }
-
-bool Storage::_saveBufferBox(StorageOperationData *od)
-{
-	msg_db_f("Storage.saveBuf", 1);
-
-	current_directory = od->filename.dirname();
-	Format *f = getFormat(od->filename.extension(), Format::FLAG_AUDIO);
-	if (!f)
-		return false;
-
-	// save
-	f->saveBuffer(od);
-
-	return true;
-}
+#endif
 
 bool Storage::save(Song *a, const string &filename)
 {
@@ -182,12 +169,11 @@ bool Storage::_export(Song *s, const Range &r, const string &filename)
 	BufferBox buf;
 	StorageOperationData od = StorageOperationData(this, f, s, NULL, &buf, filename, _("exportiere"), tsunami->_win);
 
-	// render audio...
-	od.progress->set(_("rendere Audio"), 0);
-	SongRenderer renderer;
-	renderer.render(s, r, buf);
-
-	return _saveBufferBox(&od);
+	SongRenderer renderer(s);
+	renderer.prepare(r, false);
+	od.renderer = &renderer;
+	f->saveViaRenderer(&od);
+	return true;
 }
 
 bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)

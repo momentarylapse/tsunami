@@ -46,37 +46,37 @@ bool call_function(Function *f, void *ff, void *ret, void *inst, Array<void*> pa
 		}
 	}else if (f->num_params == 2){
 		if (f->return_type == TypeInt){
-			if ((f->literal_param_type[0] == TypeInt) && (f->literal_param_type[1] == TypeInt)){
+			if ((f->literal_param_type[0] == TypeInt) and(f->literal_param_type[1] == TypeInt)){
 				*(int*)ret = ((int(*)(int, int))ff)(*(int*)param[0], *(int*)param[1]);
 				return true;
 			}
 		}else if (f->return_type == TypeFloat32){
-			if ((f->literal_param_type[0] == TypeFloat32) && (f->literal_param_type[1] == TypeFloat32)){
+			if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32)){
 				*(float*)ret = ((float(*)(float, float))ff)(*(float*)param[0], *(float*)param[1]);
 				return true;
 			}
 		}else if (f->return_type->UsesReturnByMemory()){
-			if ((f->literal_param_type[0] == TypeInt) && (f->literal_param_type[1] == TypeInt)){
+			if ((f->literal_param_type[0] == TypeInt) and(f->literal_param_type[1] == TypeInt)){
 				((void(*)(void*, int, int))ff)(ret, *(int*)param[0], *(int*)param[1]);
 				return true;
-			}else if ((f->literal_param_type[0] == TypeFloat32) && (f->literal_param_type[1] == TypeFloat32)){
+			}else if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32)){
 				((void(*)(void*, float, float))ff)(ret, *(float*)param[0], *(float*)param[1]);
 				return true;
-			}else if ((f->literal_param_type[0]->UsesCallByReference()) && (f->literal_param_type[1]->UsesCallByReference())){
+			}else if ((f->literal_param_type[0]->UsesCallByReference()) and(f->literal_param_type[1]->UsesCallByReference())){
 				((void(*)(void*, void*, void*))ff)(ret, param[0], param[1]);
 				return true;
 			}
 		}
 	}else if (f->num_params == 3){
 		if (f->return_type->UsesReturnByMemory()){
-			if ((f->literal_param_type[0] == TypeFloat32) && (f->literal_param_type[1] == TypeFloat32) && (f->literal_param_type[2] == TypeFloat32)){
+			if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32) and(f->literal_param_type[2] == TypeFloat32)){
 				((void(*)(void*, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2]);
 				return true;
 			}
 		}
 	}else if (f->num_params == 4){
 		if (f->return_type->UsesReturnByMemory()){
-			if ((f->literal_param_type[0] == TypeFloat32) && (f->literal_param_type[1] == TypeFloat32) && (f->literal_param_type[2] == TypeFloat32) && (f->literal_param_type[3] == TypeFloat32)){
+			if ((f->literal_param_type[0] == TypeFloat32) and(f->literal_param_type[1] == TypeFloat32) and(f->literal_param_type[2] == TypeFloat32) and(f->literal_param_type[3] == TypeFloat32)){
 				((void(*)(void*, float, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
 				return true;
 			}
@@ -199,6 +199,8 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 		Function *f = c->script->syntax->functions[c->link_no];
 		if (!f->is_pure)
 			return c;
+		if (f->return_type->GetDefaultConstructor()) // TODO
+			return c;
 		void *ff = (void*)c->script->func[c->link_no];
 		if (!ff)
 			return c;
@@ -253,7 +255,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 	}/*else if (c->kind == KindReference){
 	// no... we don't know the addresses of globals/constants yet...
 		if (s){
-			if ((c->Param[0]->Kind == KindVarGlobal) || (c->Param[0]->Kind == KindVarLocal) || (c->Param[0]->Kind == KindVarExternal) || (c->Param[0]->Kind == KindConstant)){
+			if ((c->Param[0]->Kind == KindVarGlobal) or (c->Param[0]->Kind == KindVarLocal) or (c->Param[0]->Kind == KindVarExternal) or (c->Param[0]->Kind == KindConstant)){
 				// pre process ref var
 				c->Kind = KindAddress;
 				c->NumParams = 0;
@@ -342,7 +344,7 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 		}
 	}else if (c->kind == KIND_REFERENCE){
 		if (c->script){
-			if ((c->param[0]->kind == KIND_VAR_GLOBAL) || (c->param[0]->kind == KIND_VAR_LOCAL) || (c->param[0]->kind == KIND_CONSTANT)){
+			if ((c->param[0]->kind == KIND_VAR_GLOBAL) or (c->param[0]->kind == KIND_VAR_LOCAL) or (c->param[0]->kind == KIND_CONSTANT)){
 				// pre process ref var
 				if (c->param[0]->kind == KIND_VAR_GLOBAL){
 					return AddCommand(KIND_ADDRESS, (long)c->param[0]->script->g_var[c->param[0]->link_no], c->type, c->param[0]->script);

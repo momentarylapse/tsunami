@@ -364,7 +364,7 @@ Selection ViewModeMidi::getHover()
 		if (midi_mode != MIDI_MODE_SELECT){
 			s.pitch = y2pitch(my);
 			s.type = Selection::TYPE_MIDI_PITCH;
-			Array<MidiNote> notes = s.track->midi.getNotes(cam->range());
+			Array<MidiNote> notes = s.track->midi;
 			foreachi(MidiNote &n, notes, i)
 				if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
 					s.index = i;
@@ -422,7 +422,7 @@ void ViewModeMidi::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
 void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area)
 {
 	Array<MidiEvent> events = midi.getEvents(view->cam.range());
-	Array<MidiNote> notes = midi.getNotes(view->cam.range());
+	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
 
 	track_rect = area;
 

@@ -46,7 +46,6 @@ int oe_write_page(ogg_page *page, FILE *fp)
 void FormatOgg::saveViaRenderer(StorageOperationData *od)
 {
 	msg_db_f("write_ogg_file", 1);
-	Song *a = od->song;
 	AudioRenderer *r = od->renderer;
 
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
@@ -55,7 +54,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 	vorbis_info vi;
 	vorbis_info_init(&vi);
-	if (vorbis_encode_setup_vbr(&vi, 2, a->sample_rate, OggQuality))
+	if (vorbis_encode_setup_vbr(&vi, 2, r->getSampleRate(), OggQuality))
 		_error("vorbis_encode_setup_vbr", 1);
 	vorbis_encode_setup_init(&vi); // ?
 
@@ -71,7 +70,8 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 	vorbis_comment vc;
 	vorbis_comment_init(&vc);
-	foreach(Tag &tag, a->tags)
+	Array<Tag> tags = r->getTags();
+	foreach(Tag &tag, tags)
 		vorbis_comment_add_tag(&vc, tag.key.c_str(), tag.value.c_str());
 	ogg_packet header_main;
 	ogg_packet header_comments;

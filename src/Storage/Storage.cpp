@@ -159,19 +159,16 @@ bool Storage::save(Song *a, const string &filename)
 	return true;
 }
 
-bool Storage::_export(Song *s, const Range &r, const string &filename)
+bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 {
-	msg_db_f("Storage.Export", 1);
+	msg_db_f("Storage.saveViaRenderer", 1);
 	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
 	if (!f)
 		return false;
 
-	BufferBox buf;
-	StorageOperationData od = StorageOperationData(this, f, s, NULL, &buf, filename, _("exportiere"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exportiere"), tsunami->_win);
 
-	SongRenderer renderer(s);
-	renderer.prepare(r, false);
-	od.renderer = &renderer;
+	od.renderer = r;
 	f->saveViaRenderer(&od);
 	return true;
 }

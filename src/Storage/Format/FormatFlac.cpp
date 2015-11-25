@@ -162,7 +162,6 @@ static FLAC__int32 flac_pcm[FLAC_READSIZE/*samples*/ * 2/*channels*/];
 
 void FormatFlac::saveViaRenderer(StorageOperationData *od)
 {
-	Song *a = od->song;
 	AudioRenderer *r = od->renderer;
 
 	bool ok = true;
@@ -171,7 +170,10 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 	FLAC__StreamMetadata_VorbisComment_Entry entry;
 
 	int channels = 2;
-	int bits = format_get_bits(a->default_format);
+	SampleFormat format = SAMPLE_FORMAT_16;
+	if (od->song)
+		format = od->song->default_format;
+	int bits = format_get_bits(format);
 	if (bits > 24)
 		bits = 24;
 
@@ -186,14 +188,15 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
 	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
-	ok &= FLAC__stream_encoder_set_sample_rate(encoder, a->sample_rate);
+	ok &= FLAC__stream_encoder_set_sample_rate(encoder, r->getSampleRate());
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, r->getNumSamples());
 
 	// metadata
 	if (ok){
 		metadata[0] = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 		if (metadata[0]){
-			foreach(Tag &t, a->tags){
+			Array<Tag> tags = r->getTags();
+			foreach(Tag &t, tags){
 				FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, t.key.upper().c_str(), t.value.c_str());
 				FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, true);
 			}

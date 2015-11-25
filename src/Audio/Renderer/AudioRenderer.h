@@ -27,6 +27,7 @@ public:
 	virtual void seek(int pos){}
 	virtual int getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
 	virtual int getNumSamples(){ return 0; }
+	virtual Array<Tag> getTags();
 };
 
 #endif /* AUDIORENDERER_H_ */

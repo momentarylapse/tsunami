@@ -16,6 +16,7 @@ class Format;
 class Song;
 class Track;
 class BufferBox;
+class AudioRenderer;
 class StorageOperationData;
 
 class Storage
@@ -27,9 +28,8 @@ public:
 	bool load(Song *a, const string &filename);
 	bool loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
 	bool loadBufferBox(Song *a, BufferBox *buf, const string &filename);
-	bool saveBufferBox(Song *a, BufferBox *buf, const string &filename);
+	bool saveViaRenderer(AudioRenderer *r, const string &filename);
 	bool save(Song *a, const string &filename);
-	bool _export(Song *a, const Range &r, const string &filename);
 
 	bool askByFlags(HuiWindow *win, const string &title, int flags);
 

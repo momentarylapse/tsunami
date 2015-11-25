@@ -26,3 +26,9 @@ int AudioRenderer::readResize(BufferBox &buf)
 	buf.resize(n);
 	return n;
 }
+
+Array<Tag> AudioRenderer::getTags()
+{
+	Array<Tag> tags;
+	return tags;
+}

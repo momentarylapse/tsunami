@@ -32,6 +32,7 @@ public:
 
 	virtual int getSampleRate();
 	virtual int getNumSamples();
+	virtual Array<Tag> getTags();
 
 private:
 	void read_basic(BufferBox &buf, int pos, int size);

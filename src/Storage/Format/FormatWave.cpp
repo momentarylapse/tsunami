@@ -25,10 +25,11 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 {
 	const int CHUNK_SIZE = 1 << 15;
 
-	Song *a = od->song;
 	AudioRenderer *r = od->renderer;
 
-	SampleFormat format = a->default_format;
+	SampleFormat format = SAMPLE_FORMAT_16;
+	if (od->song)
+		format = od->song->default_format;
 	if (format == SAMPLE_FORMAT_32_FLOAT)
 		format = SAMPLE_FORMAT_32;
 	int bit_depth = format_get_bits(format);
@@ -45,8 +46,8 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	f->WriteInt(16); // chunk size (fmt)
 	f->WriteWord(1); // version
 	f->WriteWord(channels); // channels
-	f->WriteInt(a->sample_rate);
-	f->WriteInt(a->sample_rate * bytes_per_sample); // bytes per sec
+	f->WriteInt(r->getSampleRate());
+	f->WriteInt(r->getSampleRate() * bytes_per_sample); // bytes per sec
 	f->WriteWord(4); // block align
 	f->WriteWord(bit_depth);
 	f->WriteBuffer("data", 4);

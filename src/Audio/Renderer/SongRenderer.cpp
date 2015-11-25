@@ -322,6 +322,11 @@ int SongRenderer::getNumSamples()
 	return _range.num;
 }
 
+Array<Tag> SongRenderer::getTags()
+{
+	return song->tags;
+}
+
 void SongRenderer::seek(int _pos)
 {
 	pos = _pos;

@@ -625,6 +625,9 @@ void TsunamiWindow::onSaveAs()
 
 void TsunamiWindow::onExport()
 {
-	if (tsunami->storage->askSaveExport(this))
-		tsunami->storage->_export(song, view->getPlaybackSelection(), HuiFilename);
+	if (tsunami->storage->askSaveExport(this)){
+		SongRenderer rr(song);
+		rr.prepare(view->getPlaybackSelection(), false);
+		tsunami->storage->saveViaRenderer(&rr, HuiFilename);
+	}
 }

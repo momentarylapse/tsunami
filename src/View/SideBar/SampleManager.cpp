@@ -10,6 +10,7 @@
 #include "../../View/AudioView.h"
 #include "../../View/AudioViewTrack.h"
 #include "../../Audio/AudioStream.h"
+#include "../../Audio/Renderer/BufferRenderer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../Helper/Progress.h"
 #include "../../Tsunami.h"
@@ -222,12 +223,8 @@ void SampleManager::onExport()
 		int sel = getInt("sample_list");
 		Sample *s = song->samples[sel];
 		if (s->type == Track::TYPE_AUDIO){
-			Song *ss = new Song;
-			ss->newWithOneTrack(Track::TYPE_AUDIO, s->owner->sample_rate);
-			ss->tracks[0]->levels[0].buffers.resize(1);
-			ss->tracks[0]->levels[0].buffers[0].set_as_ref(s->buf, 0, s->buf.num);
-			tsunami->storage->save(ss, HuiFilename);
-			delete(ss);
+			BufferRenderer rr(&s->buf);
+			tsunami->storage->saveViaRenderer(&rr, HuiFilename);
 		}
 	}
 }

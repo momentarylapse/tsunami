@@ -174,6 +174,9 @@ void SampleManager::updateList()
 		if (getIndex(s) < 0)
 			add(new SampleManagerItem(this, s));
 
+	if ((selected_uid < 0) and (song->samples.num > 0))
+		selected_uid = song->samples.back()->uid;
+
 	int sel = song->get_sample_by_uid(selected_uid);
 	setInt("sample_list", sel);
 	enable("export_sample", sel >= 0);

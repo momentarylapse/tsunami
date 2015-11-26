@@ -31,6 +31,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	chord_type = 0;
 	chord_inversion = 0;
 
+	deleting = false;
+
 	scroll_offset = 0;
 	scroll_bar = rect(0, 0, 0, 0);
 	track_rect = rect(0, 0, 0, 0);
@@ -55,6 +57,7 @@ void ViewModeMidi::onLeftButtonDown()
 	if (selection->type == Selection::TYPE_MIDI_NOTE){
 		selection->track->deleteMidiNote(selection->index);
 		hover->clear();
+		deleting = true;
 	}else if (selection->type == Selection::TYPE_MIDI_PITCH){
 		preview_renderer->resetMidiData();
 		preview_renderer->setSynthesizer(view->cur_track->synth);
@@ -79,11 +82,20 @@ void ViewModeMidi::onLeftButtonUp()
 
 		preview_renderer->endAllNotes();
 	}
+	deleting = false;
 }
 
 void ViewModeMidi::onMouseMove()
 {
 	ViewModeDefault::onMouseMove();
+
+	if (deleting){
+		*hover = getHover();
+		if ((hover->type == Selection::TYPE_MIDI_NOTE) and (hover->track == view->cur_track)){
+			selection->track->deleteMidiNote(hover->index);
+			hover->clear();
+		}
+	}
 
 	// drag & drop
 	if (selection->type == Selection::TYPE_MIDI_PITCH){

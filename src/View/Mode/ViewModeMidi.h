@@ -78,6 +78,8 @@ public:
 	rect scroll_bar;
 	rect track_rect;
 	float scroll_offset;
+
+	bool deleting;
 };
 
 #endif /* SRC_VIEW_MODE_VIEWMODEMIDI_H_ */

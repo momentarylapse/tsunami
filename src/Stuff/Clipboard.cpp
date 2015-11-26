@@ -55,21 +55,7 @@ void Clipboard::append_track(Track *t, AudioView *view)
 	ref_uid.add(-1);
 }
 
-void Clipboard::copy_from_track(Track *t, AudioView *view)
-{
-	if (!canCopy(view))
-		return;
-
-	clear();
-
-	Song *a = view->song;
-	temp->sample_rate = a->sample_rate;
-	append_track(t, view);
-
-	notify();
-}
-
-void Clipboard::copy_from_selected_tracks(AudioView *view)
+void Clipboard::copy(AudioView *view)
 {
 	if (!canCopy(view))
 		return;
@@ -79,11 +65,9 @@ void Clipboard::copy_from_selected_tracks(AudioView *view)
 
 	temp->sample_rate = a->sample_rate;
 
-	foreach(Track *t, a->tracks){
-		if (!t->is_selected)
-			continue;
+	Array<Track*> tracks = view->getEditTracks();
+	foreach(Track *t, tracks)
 		append_track(t, view);
-	}
 
 	notify();
 }

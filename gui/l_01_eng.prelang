@@ -105,8 +105,6 @@ compress
 Compression
 copy
 Copy
-copy_multi
-Copy from all selected tracks
 count
 !expandx\\1\\1\\10000\\1
 create_from_selection
@@ -157,6 +155,8 @@ edit_midi
 Midi
 edit_midi_fx
 Midi-Fx
+edit_multi
+Apply to all selected tracks
 edit_samples
 Samples
 edit_selected_bars
@@ -195,6 +195,8 @@ import_from_file
 !flat\\
 insert_sample
 Insert statically
+interval
+Interval
 language
 !expandx\\
 ld_t_chord
@@ -203,6 +205,8 @@ ld_t_dummy
 !expandy\\
 ld_t_edit
 Edit
+ld_t_interval
+Interval
 ld_t_inversion
 Inversion
 ld_t_name
@@ -259,8 +263,6 @@ marker_dialog_buttonbar
 !buttonbar\\
 marker_menu_header
 Marker
-me_group_chord
-Chord
 me_group_edit
 Edit
 me_group_reference
@@ -327,10 +329,6 @@ midi_editor
 Midi
 midi_fx_editor
 Midi Fx
-midi_mode:chord
-Chord
-midi_mode:note
-Single note
 ms
 ms
 mute
@@ -425,9 +423,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_243595
+rand_id_798800
 
-rand_id_693363
+rand_id_896824
 
 rdt_capture
 Recording
@@ -509,6 +507,8 @@ song_properties
 Properties
 stop
 Stop
+tab_midi_edit
+Single tone\\Interval\\Chord
 tags
 !format=tT\\Tag\\Value
 target
@@ -564,7 +564,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-151
+150
 // Data (ID,Text)
 
 
@@ -854,8 +854,6 @@ nicht konfigurierbar
 not configurable
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
-rendere Audio
-rendering audio
 speichere 
 saving
 target

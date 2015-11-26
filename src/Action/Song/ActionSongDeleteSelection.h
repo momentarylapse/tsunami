@@ -14,7 +14,7 @@
 class ActionSongDeleteSelection : public ActionGroup
 {
 public:
-	ActionSongDeleteSelection(Song *s, int level_no, const Range &range, bool all_levels);
+	ActionSongDeleteSelection(Song *s, int level_no, const Range &range, const Array<Track*> &tracks, bool all_levels);
 
 	void DeleteBuffersFromTrackLevel(Song *s, Track *t, TrackLevel &l, const Range &range, int level_no);
 };

@@ -9,17 +9,19 @@ Dialog midi_editor "Midi" 380 516
 					SpinButton beat_partition "4\\1\\256" expandx
 					Text ld_t_scale "Tonleiter"
 					ComboBox scale ""
-			Group me_group_chord "Akkord"
-				Grid ? "" 1 4
-					RadioButton midi_mode:note "Einzeltöne"
-					RadioButton midi_mode:chord "Akkord"
-					Grid ? "" 3 2
-						Text ld_t_space "" width=12
-						Text ld_t_chord "Typ"
-						ComboBox chord_type "" expandx
-						.
-						Text ld_t_inversion "Umkehrung"
-						ComboBox chord_inversion ""
+			TabControl tab_midi_edit "Einzelton\\Intervall\\Akkord"
+				Grid ? "" 1 1
+					.
+				Grid me_group_interval "" 2 1
+					Text ld_t_interval "Intervall"
+					SpinButton interval "0\\-99\\99"
+				Grid ? "" 3 2
+					Text ld_t_space "" width=12
+					Text ld_t_chord "Typ"
+					ComboBox chord_type "" expandx
+					.
+					Text ld_t_inversion "Umkehrung"
+					ComboBox chord_inversion ""
 			Group me_group_reference "Referenz-Spur"
 				ComboBox reference_track ""
 		Text me_t_dummy "" expandy

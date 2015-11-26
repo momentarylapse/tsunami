@@ -117,6 +117,8 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	song = _song;
 	input = NULL;
 
+	edit_multi = false;
+
 	// modes
 	mode = NULL;
 	mode_default = new ViewModeDefault(this);
@@ -721,6 +723,8 @@ void AudioView::optimizeView()
 
 void AudioView::updateMenu()
 {
+	// edit
+	win->check("edit_multi", edit_multi);
 	// view
 	win->check("view_mono", show_mono);
 	win->check("view_stereo", !show_mono);
@@ -875,5 +879,21 @@ void AudioView::enable(bool _enabled)
 	enabled = _enabled;
 }
 
+void AudioView::setEditMulti(bool enabled)
+{
+	edit_multi = enabled;
+	updateMenu();
+}
 
-
+Array<Track*> AudioView::getEditTracks()
+{
+	Array<Track*> tracks;
+	if (edit_multi){
+		foreach(Track *t, song->tracks)
+			if (t->is_selected)
+				tracks.add(t);
+	}else{
+		tracks.add(cur_track);
+	}
+	return tracks;
+}

@@ -112,7 +112,7 @@ public:
 	void _cdecl deleteBar(int index, bool affect_midi);
 	void _cdecl insertSelectedSamples(int level_no);
 	void _cdecl deleteSelectedSamples();
-	void _cdecl deleteSelection(int level_no, const Range &range, bool all_levels);
+	void _cdecl deleteSelection(int level_no, const Range &range, const Array<Track*> &tracks, bool all_levels);
 	void _cdecl createSamplesFromSelection(int level_no, const Range &range);
 
 	Track *_cdecl get_track(int track_no);

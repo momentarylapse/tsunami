@@ -12,39 +12,37 @@
 #include "ActionSongDeleteSelection.h"
 #include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 
-ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, const Range &range, bool all_levels)
+ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, const Range &range, const Array<Track*> &tracks, bool all_levels)
 {
-	foreachi(Track *t, a->tracks, track_no)
-		if (t->is_selected){
-			// buffer boxes
-			if (all_levels){
-				foreachi(TrackLevel &l, t->levels, li)
-					DeleteBuffersFromTrackLevel(a, t, l, range, li);
-			}else{
-				DeleteBuffersFromTrackLevel(a, t, t->levels[level_no], range, level_no);
-			}
-
-			// subs
-			foreachib(SampleRef *s, t->samples, i)
-				if (s->is_selected){
-					addSubAction(new ActionTrackDeleteSample(t, i), a);
-					_foreach_it_.update(); // TODO...
-				}
-
-			// midi
-			Set<int> to_delete;
-			foreachi(MidiNote &n, t->midi, i){
-				if (n.range.overlaps(range))
-					to_delete.add(i);
-			}
-
-			foreachb(int i, to_delete)
-				addSubAction(new ActionTrackDeleteMidiNote(t, i), a);
+	foreach(Track *t, const_cast<Array<Track*>&>(tracks)){
+		// buffer boxes
+		if (all_levels){
+			foreachi(TrackLevel &l, t->levels, li)
+				DeleteBuffersFromTrackLevel(a, t, l, range, li);
+		}else{
+			DeleteBuffersFromTrackLevel(a, t, t->levels[level_no], range, level_no);
 		}
+
+		// subs
+		foreachib(SampleRef *s, t->samples, i)
+			if (s->is_selected){
+				addSubAction(new ActionTrackDeleteSample(t, i), a);
+				_foreach_it_.update(); // TODO...
+			}
+
+		// midi
+		Set<int> to_delete;
+		foreachi(MidiNote &n, t->midi, i){
+			if (n.range.overlaps(range))
+				to_delete.add(i);
+		}
+
+		foreachb(int i, to_delete)
+			addSubAction(new ActionTrackDeleteMidiNote(t, i), a);
+	}
 }
 
-void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a,
-		Track *t, TrackLevel& l, const Range &range, int level_no)
+void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, TrackLevel& l, const Range &range, int level_no)
 {
 	int i0 = range.start();
 	int i1 = range.end();

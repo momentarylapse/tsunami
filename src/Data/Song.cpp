@@ -458,10 +458,10 @@ void Song::editSampleName(int index, const string &name)
 	execute(new ActionSongSampleEditName(this, index, name));
 }
 
-void Song::deleteSelection(int level_no, const Range &range, bool all_levels)
+void Song::deleteSelection(int level_no, const Range &range, const Array<Track*> &_tracks, bool all_levels)
 {
 	if (!range.empty())
-		execute(new ActionSongDeleteSelection(this, level_no, range, all_levels));
+		execute(new ActionSongDeleteSelection(this, level_no, range, _tracks, all_levels));
 }
 
 void Song::createSamplesFromSelection(int level_no, const Range &range)

@@ -126,6 +126,11 @@ public:
 
 	int peak_mode;
 
+	bool edit_multi;
+	void setEditMulti(bool enabled);
+
+	Array<Track*> getEditTracks();
+
 	rect drawing_rect;
 
 	ViewMode *mode;

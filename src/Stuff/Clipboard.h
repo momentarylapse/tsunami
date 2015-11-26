@@ -19,8 +19,7 @@ public:
 	Clipboard();
 	virtual ~Clipboard();
 
-	void copy_from_track(Track *t, AudioView *view);
-	void copy_from_selected_tracks(AudioView *view);
+	void copy(AudioView *view);
 	void paste(AudioView *view);
 
 	void clear();

@@ -27,6 +27,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	win->setInt("beat_partition", beat_partition);
 	midi_scale = 0;
 	midi_mode = MIDI_MODE_NOTE;
+	midi_interval = 3;
 	chord_type = 0;
 	chord_inversion = 0;
 
@@ -58,7 +59,7 @@ void ViewModeMidi::onLeftButtonDown()
 		preview_renderer->resetMidiData();
 		preview_renderer->setSynthesizer(view->cur_track->synth);
 
-		Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection->pitch);
+		Array<int> pitch = getCreationPitch();
 		MidiRawData midi;
 		foreach(int p, pitch)
 			midi.add(MidiEvent(0, p, 1));
@@ -146,6 +147,21 @@ bool ViewModeMidi::is_sharp(int pitch)
 	return ((r == 10) or (r == 1) or (r == 3) or (r == 6) or (r == 8));
 }
 
+Array<int> ViewModeMidi::getCreationPitch()
+{
+	Array<int> pitch;
+	if (midi_mode == MIDI_MODE_NOTE){
+		pitch.add(selection->pitch);
+	}else if (midi_mode == MIDI_MODE_INTERVAL){
+		pitch.add(selection->pitch);
+		if (midi_interval != 0)
+			pitch.add(selection->pitch + midi_interval);
+	}else if (midi_mode == MIDI_MODE_CHORD){
+		pitch = GetChordNotes(chord_type, chord_inversion, selection->pitch);
+	}
+	return pitch;
+}
+
 MidiNoteData ViewModeMidi::getCreationNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection->pos);
@@ -156,7 +172,7 @@ MidiNoteData ViewModeMidi::getCreationNotes()
 	if (song->bars.num > 0)
 		align_to_beats(song, r, beat_partition);
 
-	Array<int> pitch = GetChordNotes((midi_mode == MIDI_MODE_CHORD) ? chord_type : -1, chord_inversion, selection->pitch);
+	Array<int> pitch = getCreationPitch();
 
 	// collision?
 	Range allowed = get_allowed_midi_range(view->cur_track, pitch, mouse_possibly_selecting_start);

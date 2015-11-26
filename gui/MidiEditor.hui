@@ -9,7 +9,7 @@ Dialog midi_editor "Midi" 380 516
 					SpinButton beat_partition "4\\1\\256" expandx
 					Text ld_t_scale "Tonleiter"
 					ComboBox scale ""
-			TabControl tab_midi_edit "Einzelton\\Intervall\\Akkord"
+			TabControl midi_edit_mode "Einzelton\\Intervall\\Akkord"
 				Grid ? "" 1 1
 					.
 				Grid me_group_interval "" 2 1

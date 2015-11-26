@@ -325,6 +325,8 @@ mfe_t_dummy
 !expandy\\
 mfx_t_no_midi
 !expandx,center\\no midi track selected
+midi_edit_mode
+Single tone\\Interval\\Chord
 midi_editor
 Midi
 midi_fx_editor
@@ -423,9 +425,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_798800
+rand_id_213819
 
-rand_id_896824
+rand_id_444345
 
 rdt_capture
 Recording
@@ -507,8 +509,6 @@ song_properties
 Properties
 stop
 Stop
-tab_midi_edit
-Single tone\\Interval\\Chord
 tags
 !format=tT\\Tag\\Value
 target

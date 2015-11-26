@@ -53,18 +53,22 @@ public:
 	void setScale(int scale);
 	void setBeatPartition(int partition);
 
+	Array<int> getCreationPitch();
+
 	int pitch_min, pitch_max;
 	int beat_partition;
 	int midi_mode;
 	int midi_scale;
 	int chord_type;
 	int chord_inversion;
+	int midi_interval;
 	bool is_sharp(int pitch);
 
 	enum
 	{
 		MIDI_MODE_SELECT,
 		MIDI_MODE_NOTE,
+		MIDI_MODE_INTERVAL,
 		MIDI_MODE_CHORD
 	};
 

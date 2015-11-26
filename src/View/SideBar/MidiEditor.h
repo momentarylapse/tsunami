@@ -30,9 +30,8 @@ public:
 
 	void onScale();
 	void onBeatPartition();
-	void onMidiModeSelect();
-	void onMidiModeNote();
-	void onMidiModeChord();
+	void onMidiEditMode();
+	void onInterval();
 	void onChordType();
 	void onChordInversion();
 	void onReferenceTrack();

@@ -32,16 +32,16 @@ MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
 
 	id_inner = "midi_fx_inner_table";
 
+	setInt("interval", view->mode_midi->midi_interval);
+
 	Array<string> chord_types = GetChordTypeNames();
 	foreach(string &ct, chord_types)
 		addString("chord_type", ct);
 	setInt("chord_type", 0);
-	enable("chord_type", false);
 	addString("chord_inversion", _("Grundform"));
 	addString("chord_inversion", _("1. Umkehrung"));
 	addString("chord_inversion", _("2. Umkehrung"));
 	setInt("chord_inversion", 0);
-	enable("chord_inversion", false);
 
 	for (int i=0; i<12; i++)
 		addString("scale", rel_pitch_name(i) + " " + GetChordTypeName(CHORD_TYPE_MAJOR) + " / " + rel_pitch_name(pitch_to_rel(i + 9)) + " " + GetChordTypeName(CHORD_TYPE_MINOR));
@@ -53,9 +53,8 @@ MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
 
 	event("beat_partition", this, &MidiEditor::onBeatPartition);
 	event("scale", this, &MidiEditor::onScale);
-	event("midi_mode:select", this, &MidiEditor::onMidiModeSelect);
-	event("midi_mode:note", this, &MidiEditor::onMidiModeNote);
-	event("midi_mode:chord", this, &MidiEditor::onMidiModeChord);
+	event("midi_edit_mode", this, &MidiEditor::onMidiEditMode);
+	event("interval", this, &MidiEditor::onInterval);
 	event("chord_type", this, &MidiEditor::onChordType);
 	event("chord_inversion", this, &MidiEditor::onChordInversion);
 	event("reference_track", this, &MidiEditor::onReferenceTrack);
@@ -124,25 +123,21 @@ void MidiEditor::onBeatPartition()
 	view->mode_midi->setBeatPartition(getInt(""));
 }
 
-void MidiEditor::onMidiModeSelect()
+void MidiEditor::onMidiEditMode()
 {
-	view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_SELECT;
-	enable("chord_type", false);
-	enable("chord_inversion", false);
+	int n = getInt("midi_edit_mode");
+	if (n == 0){
+		view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_NOTE;
+	}else if (n == 1){
+		view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_INTERVAL;
+	}else if (n == 2){
+		view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_CHORD;
+	}
 }
 
-void MidiEditor::onMidiModeNote()
+void MidiEditor::onInterval()
 {
-	view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_NOTE;
-	enable("chord_type", false);
-	enable("chord_inversion", false);
-}
-
-void MidiEditor::onMidiModeChord()
-{
-	view->mode_midi->midi_mode = ViewModeMidi::MIDI_MODE_CHORD;
-	enable("chord_type", true);
-	enable("chord_inversion", true);
+	view->mode_midi->midi_interval = getInt("");
 }
 
 void MidiEditor::onChordType()

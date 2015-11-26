@@ -617,9 +617,10 @@ void PluginManager::ExecutePlugin(const string &filename)
 			//	main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				Range range = tsunami->win->view->getPlaybackSelection();
+				Array<Track*> tracks = tsunami->win->view->getEditTracks();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, a->tracks)
-					if ((t->is_selected) and (t->type == t->TYPE_AUDIO)){
+				foreach(Track *t, tracks)
+					if (t->type == t->TYPE_AUDIO){
 						fx->resetState();
 						fx->doProcessTrack(t, tsunami->win->view->cur_level, range);
 					}
@@ -630,9 +631,10 @@ void PluginManager::ExecutePlugin(const string &filename)
 			mfx->resetConfig();
 			if (mfx->configure()){
 				Range range = tsunami->win->view->getPlaybackSelection();
+				Array<Track*> tracks = tsunami->win->view->getEditTracks();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, a->tracks)
-					if ((t->is_selected) and (t->type == t->TYPE_MIDI)){
+				foreach(Track *t, tracks)
+					if (t->type == t->TYPE_MIDI){
 						mfx->resetState();
 						mfx->DoProcessTrack(t, range);
 					}

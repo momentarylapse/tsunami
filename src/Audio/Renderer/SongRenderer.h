@@ -49,7 +49,7 @@ private:
 	Range _range;
 	Range range_cur;
 	int pos;
-	Array<MidiRawData> midi;
+	Array<MidiNoteData> midi;
 
 public:
 	Effect *effect;

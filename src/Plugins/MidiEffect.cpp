@@ -62,7 +62,7 @@ string MidiEffect::GetError()
 	return format(_("MidiEffekt nicht ladbar: \"%s\""), name.c_str());
 }
 
-void MidiEffect::Apply(MidiRawData &midi, Track *t, bool log_error)
+void MidiEffect::Apply(MidiNoteData &midi, Track *t, bool log_error)
 {
 	msg_db_f("MidiEffect.Apply", 1);
 
@@ -85,8 +85,7 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 
 	tsunami->plugin_manager->context.set(t, 0, r);
 
-	MidiRawData midi;
-	midi.append(t->midi.getEvents(r));
+	MidiNoteData midi = t->midi;
 
 	t->song->action_manager->beginActionGroup();
 
@@ -96,7 +95,7 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 			_foreach_it_.update(); // TODO...
 		}
 	process(&midi);
-	t->insertMidiData(0, midi_events_to_notes(midi));
+	t->insertMidiData(0, midi);
 	t->song->action_manager->endActionGroup();
 }
 

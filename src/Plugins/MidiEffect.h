@@ -16,7 +16,7 @@
 class Plugin;
 class Track;
 class BufferBox;
-class MidiRawData;
+class MidiNoteData;
 
 namespace Script{
 class Script;
@@ -39,12 +39,12 @@ public:
 	bool usable;
 	bool enabled;
 
-	virtual void _cdecl process(MidiRawData *midi){};
+	virtual void _cdecl process(MidiNoteData *midi){};
 
 	void DoProcessTrack(Track *t, const Range &r);
 
 	void Prepare();
-	void Apply(MidiRawData &midi, Track *t, bool log_error);
+	void Apply(MidiNoteData &midi, Track *t, bool log_error);
 
 	string GetError();
 };

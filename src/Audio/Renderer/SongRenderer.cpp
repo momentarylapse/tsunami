@@ -295,7 +295,7 @@ void SongRenderer::reset()
 		fx->prepare();
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
-		midi.add(midi_notes_to_events(t->midi));
+		midi.add(t->midi);
 		t->synth->setSampleRate(song->sample_rate);
 		t->synth->reset();
 		foreach(Effect *fx, t->fx)

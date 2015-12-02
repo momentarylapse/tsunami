@@ -85,7 +85,7 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 
 	tsunami->plugin_manager->context.set(t, 0, r);
 
-	MidiNoteData midi = t->midi;
+	MidiNoteData midi = t->midi.getNotes(r);
 
 	t->song->action_manager->beginActionGroup();
 

@@ -14,6 +14,7 @@
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
 #include "../Action/Track/Data/ActionTrackEditPanning.h"
+#include "../Action/Track/Data/ActionTrackSetInstrument.h"
 #include "../Action/Track/Midi/ActionTrackInsertMidi.h"
 #include "../Action/Track/Midi/ActionTrackAddMidiEffect.h"
 #include "../Action/Track/Midi/ActionTrackDeleteMidiEffect.h"
@@ -46,10 +47,108 @@ string track_type(int type)
 	return "???";
 }
 
+Array<string> get_instruments()
+{
+	Array<string> instruments;
+	instruments.add("piano");
+	instruments.add("organ");
+	instruments.add("hapsichord");
+	instruments.add("keyboard");
+	instruments.add("guitar");
+	instruments.add("drums");
+	instruments.add("bass");
+	instruments.add("vocals");
+	instruments.add("violin");
+	instruments.add("cello");
+	instruments.add("flute");
+	return instruments;
+}
+
+string get_instrument_name(const string &instrument)
+{
+	if (instrument == "piano")
+		return _("Piano");
+	if (instrument == "organ")
+		return _("Orgel");
+	if (instrument == "hapsichord")
+		return _("Hapsichord");
+	if (instrument == "keyboard")
+		return _("Keyboard");
+	if (instrument == "guitar")
+		return _("Gitarre");
+	if (instrument == "bass")
+		return _("Bass");
+	if (instrument == "drums")
+		return _("Schlagzeug");
+	if (instrument == "vocals")
+		return _("Gesang");
+	if (instrument == "violin")
+		return _("Geige");
+	if (instrument == "cello")
+		return _("Cello");
+	if (instrument == "flute")
+		return _("Fl&ote");
+	return "???";
+}
+
+int instrument_to_midi_no(const string &instrument)
+{
+	return 0;
+}
+
+string instrument_from_midi_no(int no)
+{
+	return "";
+}
+
+Array<int> get_default_tuning(const string &instrument)
+{
+	Array<int> tuning;
+	if (instrument == "guitar"){
+		tuning.add(40);
+		tuning.add(45);
+		tuning.add(50);
+		tuning.add(55);
+		tuning.add(59);
+		tuning.add(64);
+	}
+	if (instrument == "bass"){
+		tuning.add(28);
+		tuning.add(33);
+		tuning.add(38);
+		tuning.add(43);
+	}
+	if (instrument == "cello"){
+		tuning.add(36);
+		tuning.add(43);
+		tuning.add(50);
+		tuning.add(57);
+	}
+	if (instrument == "violin"){
+		tuning.add(55);
+		tuning.add(62);
+		tuning.add(69);
+		tuning.add(76);
+	}
+	return tuning;
+}
+
+bool is_default_tuning(const string &instrument, const Array<int> &tuning)
+{
+	Array<int> def = get_default_tuning(instrument);
+	if (def.num != tuning.num)
+		return false;
+	for (int i=0; i<tuning.num; i++)
+		if (def[i] != tuning[i])
+			return false;
+	return true;
+}
+
 const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
+const Array<int> Track::DEFAULT_TUNING;
 
 Track::Track() :
 	Observable("Track")
@@ -75,6 +174,8 @@ void Track::reset()
 	msg_db_f("Track.Reset",1);
 	levels.clear();
 	name.clear();
+	instrument.clear();
+	tuning.clear();
 	volume = 1;
 	muted = false;
 	panning = 0;
@@ -266,6 +367,11 @@ void Track::deleteMidiNote(int index)
 void Track::setName(const string& name)
 {
 	song->execute(new ActionTrackEditName(this, name));
+}
+
+void Track::setInstrument(const string& instrument, const Array<int> &tuning)
+{
+	song->execute(new ActionTrackSetInstrument(this, instrument, tuning));
 }
 
 void Track::setMuted(bool muted)

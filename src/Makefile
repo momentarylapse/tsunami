@@ -31,6 +31,7 @@ OBJ = \
  Action/Track/Data/ActionTrackEditName.o\
  Action/Track/Data/ActionTrackEditPanning.o\
  Action/Track/Data/ActionTrackEditVolume.o\
+ Action/Track/Data/ActionTrackSetInstrument.o\
  Action/Track/Effect/ActionTrackAddEffect.o\
  Action/Track/Effect/ActionTrackDeleteEffect.o\
  Action/Track/Effect/ActionTrackEditEffect.o\
@@ -358,6 +359,9 @@ Action/Track/Data/ActionTrackEditPanning.o : Action/Track/Data/ActionTrackEditPa
 
 Action/Track/Data/ActionTrackEditVolume.o : Action/Track/Data/ActionTrackEditVolume.cpp
 	$(CPP) -c Action/Track/Data/ActionTrackEditVolume.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Data/ActionTrackSetInstrument.o : Action/Track/Data/ActionTrackSetInstrument.cpp
+	$(CPP) -c Action/Track/Data/ActionTrackSetInstrument.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Effect/ActionTrackAddEffect.o : Action/Track/Effect/ActionTrackAddEffect.cpp
 	$(CPP) -c Action/Track/Effect/ActionTrackAddEffect.cpp -o $@ $(CXXFLAGS)

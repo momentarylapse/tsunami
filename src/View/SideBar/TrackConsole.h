@@ -27,6 +27,8 @@ public:
 	void onName();
 	void onVolume();
 	void onPanning();
+	void onInstrument();
+	void onStrings();
 
 	void onEditSong();
 	void onEditFx();

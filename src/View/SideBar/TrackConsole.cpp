@@ -23,12 +23,19 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	fromResource("track_dialog");
 	setDecimals(1);
 
+	setString("instrument", _("    - keins -"));
+	Array<string> instruments = get_instruments();
+	foreach(string &i, instruments)
+		setString("instrument", get_instrument_name(i));
+
 	loadData();
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
 	event("name", this, &TrackConsole::onName);
 	event("volume", this, &TrackConsole::onVolume);
 	event("panning", this, &TrackConsole::onPanning);
+	event("instrument", this, &TrackConsole::onInstrument);
+	event("strings", this, &TrackConsole::onStrings);
 
 	event("edit_song", this, &TrackConsole::onEditSong);
 	event("edit_fx", this, &TrackConsole::onEditFx);
@@ -51,6 +58,8 @@ void TrackConsole::loadData()
 	enable("name", track);
 	enable("volume", track);
 	enable("panning", track);
+	enable("instrument", track);
+	enable("strings", track);
 	hideControl("td_t_edit", !track);
 	if (track){
 		setString("name", track->name);
@@ -60,6 +69,14 @@ void TrackConsole::loadData()
 		enable("edit_midi", track->type == Track::TYPE_MIDI);
 		enable("edit_midi_fx", track->type == Track::TYPE_MIDI);
 		enable("edit_synth", track->type != Track::TYPE_AUDIO);
+
+		setInt("instrument", 0);
+		Array<string> instruments = get_instruments();
+		foreachi(string &ii, instruments, i){
+			if (track->instrument == ii)
+				setInt("instrument", i + 1);
+		}
+		setInt("strings", track->tuning.num);
 	}else{
 		hideControl("td_t_bars", true);
 	}
@@ -88,6 +105,19 @@ void TrackConsole::onVolume()
 void TrackConsole::onPanning()
 {
 	track->setPanning(getFloat("panning") / 100.0f);
+}
+
+void TrackConsole::onInstrument()
+{
+	int n = getInt("");
+	string instrument;
+	Array<int> tuning;
+	Array<string> instruments = get_instruments();
+	if (n > 0){
+		instrument = instruments[n - 1];
+		tuning = get_default_tuning(instrument);
+	}
+	track->setInstrument(instrument, tuning);
 }
 
 void TrackConsole::applyData()
@@ -133,9 +163,13 @@ void TrackConsole::onUpdate(Observable *o, const string &message)
 {
 	if (o == view){
 		setTrack(view->cur_track);
-	}else if ((o == track) && (message == track->MESSAGE_DELETE)){
+	}else if ((o == track) and (message == track->MESSAGE_DELETE)){
 		setTrack(NULL);
 	}else{
 		loadData();
 	}
+}
+
+void TrackConsole::onStrings()
+{
 }

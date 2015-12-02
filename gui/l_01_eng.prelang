@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-280
+284
 // Data (ID,Text)
 about
 Info
@@ -425,9 +425,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_213819
+rand_id_645036
 
-rand_id_444345
+rand_id_934950
 
 rdt_capture
 Recording
@@ -509,6 +509,8 @@ song_properties
 Properties
 stop
 Stop
+strings
+!expandx\\\\1\\100
 tags
 !format=tT\\Tag\\Value
 target
@@ -517,8 +519,14 @@ td_t_dummy
 !expandy\\
 td_t_edit
 Edit
+td_t_instrument
+Instrument
 td_t_name
 Name
+td_t_strings
+Strings
+td_t_tuning
+Tuning
 td_t_volume
 Volume
 text

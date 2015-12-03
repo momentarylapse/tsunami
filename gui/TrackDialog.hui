@@ -15,7 +15,7 @@ Dialog track_dialog "Spur" 380 516
 		Group td_t_tuning "Stimmung"
 			Grid td_g_tuning "" 2 1
 				Text td_t_strings "Saiten"
-				SpinButton strings "\\1\\100" expandx
+				SpinButton strings "\\0\\100" expandx
 		Text td_t_dummy "" expandy
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2

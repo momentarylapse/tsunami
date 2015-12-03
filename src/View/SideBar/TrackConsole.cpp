@@ -28,6 +28,8 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	foreach(string &i, instruments)
 		setString("instrument", get_instrument_name(i));
 
+	num_strings = 0;
+
 	loadData();
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
@@ -36,6 +38,8 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("panning", this, &TrackConsole::onPanning);
 	event("instrument", this, &TrackConsole::onInstrument);
 	event("strings", this, &TrackConsole::onStrings);
+	for (int i=0; i<100; i++)
+		event(format("string%d", i), this, &TrackConsole::onString);
 
 	event("edit_song", this, &TrackConsole::onEditSong);
 	event("edit_fx", this, &TrackConsole::onEditFx);
@@ -76,7 +80,23 @@ void TrackConsole::loadData()
 			if (track->instrument == ii)
 				setInt("instrument", i + 1);
 		}
+		for (int i=track->tuning.num; i<num_strings; i++){
+			removeControl(format("string%d", i));
+			removeControl(format("string%d_label", i));
+		}
 		setInt("strings", track->tuning.num);
+		setTarget("td_g_tuning", 0);
+		foreachi(int t, track->tuning, i){
+			string id = format("string%d", i);
+			if (i >= num_strings){
+				addLabel(i2s(i+1), 0, 100 - i, 0, 0, format("string%d_label", i));
+				addComboBox("", 1, 100 - i, 0, 0, id);
+				for (int p=0; p<128; p++)
+					setString(id, pitch_name(p));
+			}
+			setInt(id, t);
+		}
+		num_strings = track->tuning.num;
 	}else{
 		hideControl("td_t_bars", true);
 	}
@@ -172,4 +192,18 @@ void TrackConsole::onUpdate(Observable *o, const string &message)
 
 void TrackConsole::onStrings()
 {
+	int n = getInt("");
+	Array<int> tuning = track->tuning;
+	tuning.resize(n);
+	track->setInstrument(track->instrument, tuning);
+}
+
+void TrackConsole::onString()
+{
+	string id = HuiGetEvent()->id;
+	int n = id.substr(6, -1)._int();
+	int p = getInt(id);
+	Array<int> tuning = track->tuning;
+	tuning[n] = p;
+	track->setInstrument(track->instrument, tuning);
 }

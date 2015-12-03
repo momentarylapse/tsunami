@@ -29,6 +29,7 @@ public:
 	void onPanning();
 	void onInstrument();
 	void onStrings();
+	void onString();
 
 	void onEditSong();
 	void onEditFx();
@@ -44,6 +45,8 @@ public:
 
 	AudioView *view;
 	Track *track;
+
+	int num_strings;
 };
 
 #endif /* TRACKCONSOLE_H_ */

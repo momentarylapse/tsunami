@@ -425,9 +425,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_645036
+rand_id_40077
 
-rand_id_934950
+rand_id_612615
 
 rdt_capture
 Recording
@@ -510,7 +510,7 @@ Properties
 stop
 Stop
 strings
-!expandx\\\\1\\100
+!expandx\\\\0\\100
 tags
 !format=tT\\Tag\\Value
 target
@@ -572,7 +572,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-150
+162
 // Data (ID,Text)
 
 
@@ -582,6 +582,8 @@ Zoom out
         - Default -
         - nicht verbinden -
         - don't connect -
+    - keins -
+    - none -
    - keine Referenz -
    - no reference -
   - neue Spur anlegen -
@@ -642,6 +644,8 @@ Ausgabelautstärke
 Output volume
 Ausgabepegel
 Output level
+Bass
+Bass
 Bearbeiten
 Edit
 Beim Anwenden eines Effekts: 
@@ -650,6 +654,8 @@ Beim Anwenden eines MidiEffekts:
 While applying a midi effect:
 Beschreibung
 Description
+Cello
+Cello
 Datei
 File
 Datei Eigenschaften
@@ -698,12 +704,22 @@ Fehlerbericht
 Error message
 Fehlerbericht an Michi senden
 Send error message to Michi
+Flöte
+Flute
 Format
 Format
 Frage
 Question
+Geige
+Violin
+Gesang
+Voice
+Gitarre
+Guitar
 Grundform
 Basic form
+Hapsichord
+Hapsichord
 Ist halt irgendwie passiert...
 Just happened somehow...
 Kann Effekt nicht laden: %s
@@ -722,6 +738,8 @@ Kein Sample ausgewählt
 No sample selected
 Keine Spur ausgewählt
 No track selected
+Keyboard
+Keyboard
 Konnte Aufnahmegerät nicht öffnen
 Could not open recording device
 Kurven
@@ -754,12 +772,16 @@ Offset
 Offset
 Ok
 Ok
+Orgel
+Organ
 Parameter laden
 Load parameter
 Parameter speichern
 Save parameter
 Pause einfügen
 add pause
+Piano
+Piano
 Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'
 Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
@@ -774,6 +796,8 @@ Samples
 Samples
 Samples\\\") + i2s(samples));
 
+Schlagzeug
+Drums
 Script (*.kaba)
 Script (*.kaba)
 Selektierung ziehen zum Skalieren

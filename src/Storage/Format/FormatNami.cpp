@@ -993,11 +993,34 @@ public:
 	}
 };
 
+class FileChunkTuning : public FileChunk<Track,Track>
+{
+public:
+	FileChunkTuning() : FileChunk<Track,Track>("tuning"){}
+	virtual void create()
+	{
+		me = parent;
+	}
+	virtual void read(File *f)
+	{
+		me->tuning.resize(f->ReadInt());
+		for (int i=0; i<me->tuning.num; i++)
+			me->tuning[i] = f->ReadInt();
+	}
+	virtual void write(File *f)
+	{
+		f->WriteInt(me->tuning.num);
+		for (int i=0; i<me->tuning.num; i++)
+			f->WriteInt(me->tuning[i]);
+	}
+};
+
 class FileChunkTrack : public FileChunk<Song,Track>
 {
 public:
 	FileChunkTrack() : FileChunk<Song,Track>("track")
 	{
+		add_child(new FileChunkTuning);
 		add_child(new FileChunkTrackLevel);
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
@@ -1018,8 +1041,10 @@ public:
 		me->muted = f->ReadBool();
 		me->type = f->ReadInt();
 		me->panning = f->ReadFloat();
+		me->instrument = Instrument(f->ReadInt());
 		f->ReadInt(); // reserved
-		f->ReadInt();
+
+		me->tuning = me->instrument.default_tuning();
 
 		notify();
 	}
@@ -1030,8 +1055,8 @@ public:
 		f->WriteBool(me->muted);
 		f->WriteInt(me->type);
 		f->WriteFloat(me->panning);
+		f->WriteInt(me->instrument.type);
 		f->WriteInt(0); // reserved
-		f->WriteInt(0);
 
 		notify();
 	}
@@ -1293,6 +1318,17 @@ void FormatNami::WriteTrackLevel(TrackLevel *l, int level_no)
 	EndChunk();
 }
 
+void FormatNami::WriteTuning(Array<int> &tuning)
+{
+	BeginChunk("tuning");
+	f->WriteInt(tuning.num);
+
+	for (int i=0; i<tuning.num; i++)
+		f->WriteInt(tuning[i]);
+
+	EndChunk();
+}
+
 void FormatNami::WriteTrack(Track *t)
 {
 	BeginChunk("track");
@@ -1302,8 +1338,11 @@ void FormatNami::WriteTrack(Track *t)
 	f->WriteBool(t->muted);
 	f->WriteInt(t->type);
 	f->WriteFloat(t->panning);
+	f->WriteInt(t->instrument.type);
 	f->WriteInt(0); // reserved
-	f->WriteInt(0);
+
+	if (!t->instrument.is_default_tuning(t->tuning))
+		WriteTuning(t->tuning);
 
 	foreachi(TrackLevel &l, t->levels, i)
 		WriteTrackLevel(&l, i);
@@ -1739,9 +1778,11 @@ void ReadChunkTrack(ChunkStack *s, Song *a)
 	t->muted = s->f->ReadBool();
 	t->type = s->f->ReadInt();
 	t->panning = s->f->ReadFloat();
+	t->instrument = Instrument(s->f->ReadInt());
 	s->f->ReadInt(); // reserved
-	s->f->ReadInt();
 	s->od->set((float)s->f->GetPos() / (float)s->f->GetSize());
+
+	t->tuning = t->instrument.default_tuning();
 
 	s->AddChunkHandler("level", (chunk_reader*)&ReadChunkTrackLevel, t);
 	s->AddChunkHandler("bufbox", (chunk_reader*)&ReadChunkBufferBox, &t->levels[0]);

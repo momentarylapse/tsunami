@@ -12,6 +12,7 @@
 #include "BufferBox.h"
 #include "MidiData.h"
 #include "Sample.h"
+#include "Instrument.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
 #include "Song.h"
@@ -70,7 +71,7 @@ public:
 
 	// actions
 	void _cdecl setName(const string &name);
-	void _cdecl setInstrument(const string &instrument, const Array<int> &tuning);
+	void _cdecl setInstrument(const Instrument &instrument, const Array<int> &tuning);
 	void _cdecl setMuted(bool muted);
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
@@ -108,7 +109,7 @@ public:
 	int type;
 	string name;
 
-	string instrument;
+	Instrument instrument;
 	Array<int> tuning;
 
 	Array<TrackLevel> levels;
@@ -129,12 +130,5 @@ public:
 
 	bool is_selected;
 };
-
-Array<string> get_instruments();
-string get_instrument_name(const string &instrument);
-int instrument_to_midi_no(const string &instrument);
-string instrument_from_midi_no(int no);
-Array<int> get_default_tuning(const string &instrument);
-bool is_default_tuning(const string &instrument, const Array<int> &tuning);
 
 #endif /* TRACK_H_ */

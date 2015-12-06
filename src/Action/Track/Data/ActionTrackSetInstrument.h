@@ -8,22 +8,26 @@
 #ifndef SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_
 #define SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_
 
-#include "../../Action.h"
+#include "../../ActionMergable.h"
 class Track;
+class Instrument;
 
-class ActionTrackSetInstrument: public Action
+class ActionTrackSetInstrument: public ActionMergable<int>
 {
 public:
-	ActionTrackSetInstrument(Track *t, const string &instrument, const Array<int> &tuning);
+	ActionTrackSetInstrument(Track *t, const Instrument &instrument, const Array<int> &tuning);
 	virtual ~ActionTrackSetInstrument(){}
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
+	virtual bool mergable(Action *a);
+	virtual bool absorb(ActionMergableBase *a);
+
 private:
 	int track_no;
-	string instrument;
-	Array<int> tuning;
+	Array<int> new_tuning;
+	Array<int> old_tuning;
 };
 
 #endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_ */

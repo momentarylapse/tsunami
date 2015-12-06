@@ -79,6 +79,7 @@ OBJ = \
  Data/BufferBox.o\
  Data/Curve.o\
  Data/Data.o\
+ Data/Instrument.o\
  Data/MidiData.o\
  Data/Range.o\
  Data/RingBuffer.o\
@@ -503,6 +504,9 @@ Data/Curve.o : Data/Curve.cpp
 
 Data/Data.o : Data/Data.cpp
 	$(CPP) -c Data/Data.cpp -o $@ $(CXXFLAGS)
+
+Data/Instrument.o : Data/Instrument.cpp
+	$(CPP) -c Data/Instrument.cpp -o $@ $(CXXFLAGS)
 
 Data/MidiData.o : Data/MidiData.cpp
 	$(CPP) -c Data/MidiData.cpp -o $@ $(CXXFLAGS)

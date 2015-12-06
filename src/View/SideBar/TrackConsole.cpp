@@ -23,10 +23,9 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	fromResource("track_dialog");
 	setDecimals(1);
 
-	setString("instrument", _("    - keins -"));
-	Array<string> instruments = get_instruments();
-	foreach(string &i, instruments)
-		setString("instrument", get_instrument_name(i));
+	Array<Instrument> instruments = Instrument::enumerate();
+	foreach(Instrument &i, instruments)
+		setString("instrument", i.name());
 
 	num_strings = 0;
 
@@ -38,8 +37,6 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("panning", this, &TrackConsole::onPanning);
 	event("instrument", this, &TrackConsole::onInstrument);
 	event("strings", this, &TrackConsole::onStrings);
-	for (int i=0; i<100; i++)
-		event(format("string%d", i), this, &TrackConsole::onString);
 
 	event("edit_song", this, &TrackConsole::onEditSong);
 	event("edit_fx", this, &TrackConsole::onEditFx);
@@ -74,11 +71,10 @@ void TrackConsole::loadData()
 		enable("edit_midi_fx", track->type == Track::TYPE_MIDI);
 		enable("edit_synth", track->type != Track::TYPE_AUDIO);
 
-		setInt("instrument", 0);
-		Array<string> instruments = get_instruments();
-		foreachi(string &ii, instruments, i){
+		Array<Instrument> instruments = Instrument::enumerate();
+		foreachi(Instrument &ii, instruments, i){
 			if (track->instrument == ii)
-				setInt("instrument", i + 1);
+				setInt("instrument", i);
 		}
 		for (int i=track->tuning.num; i<num_strings; i++){
 			removeControl(format("string%d", i));
@@ -91,6 +87,7 @@ void TrackConsole::loadData()
 			if (i >= num_strings){
 				addLabel(i2s(i+1), 0, 100 - i, 0, 0, format("string%d_label", i));
 				addComboBox("", 1, 100 - i, 0, 0, id);
+				event(id, this, &TrackConsole::onString);
 				for (int p=0; p<128; p++)
 					setString(id, pitch_name(p));
 			}
@@ -130,14 +127,9 @@ void TrackConsole::onPanning()
 void TrackConsole::onInstrument()
 {
 	int n = getInt("");
-	string instrument;
 	Array<int> tuning;
-	Array<string> instruments = get_instruments();
-	if (n > 0){
-		instrument = instruments[n - 1];
-		tuning = get_default_tuning(instrument);
-	}
-	track->setInstrument(instrument, tuning);
+	Array<Instrument> instruments = Instrument::enumerate();
+	track->setInstrument(instruments[n], instruments[n].default_tuning());
 }
 
 void TrackConsole::applyData()

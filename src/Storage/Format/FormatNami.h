@@ -38,6 +38,7 @@ public:
 	void WriteMidiEffect(MidiEffect *e);
 	void WriteMidi(MidiNoteData &m);
 	void WriteSynth(Synthesizer *s);
+	void WriteTuning(Array<int> &tuning);
 	void WriteTrackLevel(TrackLevel *l, int level_no);
 	void WriteTrack(Track *t);
 	void WriteLevelName();

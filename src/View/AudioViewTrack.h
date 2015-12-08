@@ -33,6 +33,8 @@ public:
 	void drawSample(HuiPainter *c, SampleRef *s);
 	void drawMarker(HuiPainter *c, const TrackMarker &marker, int index, bool hover);
 	void drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift);
+	void drawMidiDefault(HuiPainter *c, const MidiNoteData &midi, int shift);
+	void drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int shift);
 	void drawHeader(HuiPainter *c);
 	void draw(HuiPainter *c);
 

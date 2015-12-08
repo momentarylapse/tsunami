@@ -12,7 +12,7 @@ Dialog track_dialog "Spur" 380 516
 				Text percent "%"
 		Group td_t_instrument "Instrument"
 			ComboBox instrument ""
-		Group td_t_tuning "Stimmung"
+		Expander td_t_tuning "Stimmung"
 			Grid td_g_tuning "" 2 1
 				Text td_t_strings "Saiten"
 				SpinButton strings "\\0\\100" expandx

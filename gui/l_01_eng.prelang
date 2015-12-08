@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-284
+287
 // Data (ID,Text)
 about
 Info
@@ -315,6 +315,8 @@ menu_view
 View
 menu_view_channels
 Channels
+menu_view_midi
+Midi
 menu_view_peaks
 Peaks
 metronome
@@ -425,9 +427,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_40077
+rand_id_286847
 
-rand_id_612615
+rand_id_797083
 
 rdt_capture
 Recording
@@ -551,6 +553,10 @@ trackdest_dialog
 Destination track
 undo
 Undo
+view_midi_default
+Default
+view_midi_tab
+Tabulature
 view_mono
 Mono
 view_optimal
@@ -572,7 +578,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-162
+164
 // Data (ID,Text)
 
 
@@ -582,10 +588,10 @@ Zoom out
         - Default -
         - nicht verbinden -
         - don't connect -
-    - keins -
-    - none -
    - keine Referenz -
    - no reference -
+  - keins -
+  - none -
   - neue Spur anlegen -
   - create new track -
   ...keine Sorge, das wird schon!
@@ -644,8 +650,6 @@ Ausgabelautstärke
 Output volume
 Ausgabepegel
 Output level
-Bass
-Bass
 Bearbeiten
 Edit
 Beim Anwenden eines Effekts: 
@@ -674,6 +678,10 @@ Dauer\\\") + song->get_time_str_long(samples));
 
 Dur
 Major
+E-Bass
+Electric Bass
+E-Gitarre
+Electric Guitar
 Ebene %d
 Level %d
 Ebene löschen: noch nicht implementiert...
@@ -742,6 +750,8 @@ Keyboard
 Keyboard
 Konnte Aufnahmegerät nicht öffnen
 Could not open recording device
+Kontra-Bass
+Double Bass
 Kurven
 Curves
 Lautstärke in dB

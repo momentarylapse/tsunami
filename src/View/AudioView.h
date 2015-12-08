@@ -63,6 +63,7 @@ public:
 
 	void setShowMono(bool mono);
 	void setPeaksMode(int mode);
+	void setMidiViewMode(int mode);
 	void updatePeaks();
 	void zoomIn();
 	void zoomOut();
@@ -125,6 +126,12 @@ public:
 	bool antialiasing;
 
 	int peak_mode;
+
+	int midi_view_mode;
+	enum{
+		VIEW_MIDI_DEFAULT,
+		VIEW_MIDI_TAB,
+	};
 
 	bool edit_multi;
 	void setEditMulti(bool enabled);

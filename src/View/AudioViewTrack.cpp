@@ -240,6 +240,14 @@ void AudioViewTrack::drawMarker(HuiPainter *c, const TrackMarker &marker, int in
 
 void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift)
 {
+	if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->tuning.num > 0))
+		drawMidiTab(c, midi, shift);
+	else
+		drawMidiDefault(c, midi, shift);
+}
+
+void AudioViewTrack::drawMidiDefault(HuiPainter *c, const MidiNoteData &midi, int shift)
+{
 	Range range = view->cam.range() - shift;
 	Array<MidiNote> notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
@@ -253,6 +261,40 @@ void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift
 		c->drawLine(x1, h, x2, h);
 	}
 	c->setLineWidth(view->LINE_WIDTH);
+}
+
+void get_tab(int &stringno, int &position, int pitch, Array<int> &tuning)
+{
+	stringno = 0;
+	position = 0;
+	for (int i=0; i<tuning.num; i++)
+		if (pitch >= tuning[i]){
+			stringno = i;
+			position = pitch - tuning[i];
+		}
+}
+
+void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int shift)
+{
+	Range range = view->cam.range() - shift;
+	Array<MidiNote> notes = midi.getNotes(range);
+
+	foreach(MidiNote &n, notes){
+		int stringno, position;
+		get_tab(stringno, position, n.pitch, track->tuning);
+		c->setColor(getPitchColor(n.pitch));
+		float x1 = view->cam.sample2screen(n.range.offset + shift);
+		float x2 = view->cam.sample2screen(n.range.end() + shift);
+		x2 = max(x2, x1 + 4);
+		float y1 = area.y2 - area.height() * (stringno + 1) / track->tuning.num;
+		float y2 = area.y2 - area.height() * stringno / track->tuning.num;
+		c->drawRect(rect(x1, x2, y1, y2));
+
+		if (x2 - x1 > 15){
+			c->setColor(view->colors.text_soft1);
+			c->drawStr(x1 + 1, (y1 + y2) / 2 - 10, i2s(position));
+		}
+	}
 }
 
 void AudioViewTrack::draw(HuiPainter *c)

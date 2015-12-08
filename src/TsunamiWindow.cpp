@@ -105,6 +105,8 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("view_peaks_max", "", -1, this, &TsunamiWindow::onViewPeaksMax);
 	HuiAddCommandM("view_peaks_mean", "", -1, this, &TsunamiWindow::onViewPeaksMean);
 	HuiAddCommandM("view_peaks_both", "", -1, this, &TsunamiWindow::onViewPeaksBoth);
+	HuiAddCommandM("view_midi_default", "", -1, this, &TsunamiWindow::onViewMidiDefault);
+	HuiAddCommandM("view_midi_tab", "", -1, this, &TsunamiWindow::onViewMidiTab);
 	HuiAddCommandM("view_optimal", "", -1, this, &TsunamiWindow::onViewOptimal);
 	HuiAddCommandM("zoom_in", "", -1, this, &TsunamiWindow::onZoomIn);
 	HuiAddCommandM("zoom_out", "", -1, this, &TsunamiWindow::onZoomOut);
@@ -509,6 +511,16 @@ void TsunamiWindow::onViewMono()
 void TsunamiWindow::onViewStereo()
 {
 	view->setShowMono(false);
+}
+
+void TsunamiWindow::onViewMidiDefault()
+{
+	view->setMidiViewMode(view->VIEW_MIDI_DEFAULT);
+}
+
+void TsunamiWindow::onViewMidiTab()
+{
+	view->setMidiViewMode(view->VIEW_MIDI_TAB);
 }
 
 void TsunamiWindow::onZoomIn()

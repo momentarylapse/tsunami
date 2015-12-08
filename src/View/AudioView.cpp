@@ -118,6 +118,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	input = NULL;
 
 	edit_multi = false;
+	midi_view_mode = VIEW_MIDI_DEFAULT;
 
 	// modes
 	mode = NULL;
@@ -731,6 +732,8 @@ void AudioView::updateMenu()
 	win->check("view_peaks_max", peak_mode == BufferBox::PEAK_MAXIMUM);
 	win->check("view_peaks_mean", peak_mode == BufferBox::PEAK_SQUAREMEAN);
 	win->check("view_peaks_both", peak_mode == BufferBox::PEAK_BOTH);
+	win->check("view_midi_default", midi_view_mode == VIEW_MIDI_DEFAULT);
+	win->check("view_midi_tab", midi_view_mode == VIEW_MIDI_TAB);
 	win->enable("view_samples", false);
 }
 
@@ -752,12 +755,21 @@ void AudioView::setPeaksMode(int mode)
 {
 	peak_mode = mode;
 	forceRedraw();
+	notify(MESSAGE_SETTINGS_CHANGE);
 	updateMenu();
 }
 
 void AudioView::setShowMono(bool mono)
 {
 	show_mono = mono;
+	forceRedraw();
+	notify(MESSAGE_SETTINGS_CHANGE);
+	updateMenu();
+}
+
+void AudioView::setMidiViewMode(int mode)
+{
+	midi_view_mode = mode;
 	forceRedraw();
 	notify(MESSAGE_SETTINGS_CHANGE);
 	updateMenu();

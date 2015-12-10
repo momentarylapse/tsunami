@@ -216,7 +216,6 @@ class FileChunkBasic
 public:
 	FileChunkBasic(const string &_name)
 	{
-		chunk_pos = 0;
 		name = _name;
 		root = NULL;
 		context = NULL;
@@ -267,12 +266,6 @@ public:
 		foreach(FileChunkBasic *c, children)
 			c->set_root(r);
 	}
-	void add(const string &name, void *p, bool is_array = false)
-	{
-		foreach(FileChunkBasic *c, children)
-			if (c->name == name)
-				subs.add(Sub(c, p, is_array));
-	}
 
 	virtual void set(void *t){};
 	virtual void set_parent(void *t){};
@@ -280,95 +273,121 @@ public:
 
 	struct Context
 	{
+		struct Layer
+		{
+			string name;
+			int pos0, size;
+			Layer(){}
+			Layer(const string &_name, int _pos, int _size)
+			{
+				name = _name;
+				pos0 = _pos;
+				size = _size;
+			}
+		};
 		Context(File *_f)
 		{
 			f = _f;
 		}
 		void pop()
 		{
-			names.pop();
-			pos0.pop();
-			sizes.pop();
+			layers.pop();
 		}
-		void push(const string &name, int pos, int size)
+		void push(const Layer &l)
 		{
-			names.add(name);
-			pos0.add(pos);
-			sizes.add(size);
+			layers.add(l);
 		}
 		int end()
 		{
-			if (names.num > 0)
-				return pos0.back() + sizes.back();
+			if (layers.num > 0)
+				return layers.back().pos0 + layers.back().size;
 			return 2000000000;
 		}
 		string str()
 		{
-			return implode(names, "/");
+			string s;
+			foreach(Layer &l, layers){
+				if (s.num > 0)
+					s += "/";
+				s += l.name;
+			}
+			return s;
 		}
 		File *f;
-		Array<string> names;
-		Array<int> pos0, sizes;
+		Array<Layer> layers;
 	};
 	Context *context;
-
-	struct Sub
-	{
-		FileChunkBasic *c;
-		void *p;
-		bool is_array;
-
-		Sub(){}
-		Sub(FileChunkBasic *_c, void *_p, bool _is_array)
-		{
-			c = _c;
-			p = _p;
-			is_array = _is_array;
-		}
-	};
 	Array<FileChunkBasic*> children;
 	FileChunkBasic *root;
-	Array<Sub> subs;
 
-	void write_subs(Context *context)
+	virtual void write_subs(){}
+
+	FileChunkBasic *get_sub(const string &name)
 	{
-		foreach(Sub &s, subs){
-			if (s.is_array){
-				DynamicArray *a = (DynamicArray*)s.p;
-				for (int i=0; i<a->num; i++){
-					s.c->set((char*)a->data + a->element_size * i);
-					s.c->write_complete(context);
-				}
-			}else{
-				s.c->set(s.p);
-				s.c->write_complete(context);
+		foreach(FileChunkBasic *c, children)
+			if (c->name == name){
+				c->context = context;
+				c->set_parent(get());
+				return c;
 			}
+		throw string("no sub... " + name + " in " + context->str());
+	}
+
+	void write_sub(const string &name, void *p)
+	{
+		FileChunkBasic *c = get_sub(name);
+		c->set(p);
+		c->write_complete();
+	}
+
+	void write_sub_parray(const string &name, DynamicArray &a)
+	{
+		FileChunkBasic *c = get_sub(name);
+		Array<void*> *pa = (Array<void*>*)&a;
+		for (int i=0; i<pa->num; i++){
+			c->set((*pa)[i]);
+			c->write_complete();
+		}
+	}
+	void write_sub_array(const string &name, DynamicArray &a)
+	{
+		FileChunkBasic *c = get_sub(name);
+		for (int i=0; i<a.num; i++){
+			c->set((char*)a.data + a.element_size * i);
+			c->write_complete();
 		}
 	}
 
-	int chunk_pos;
+	//int chunk_pos;
 	void write_begin_chunk(File *f)
 	{
 		string s = name + "        ";
 		f->WriteBuffer(s.data, 8);
 		f->WriteInt(0); // temporary
-		chunk_pos = f->GetPos();
+		context->push(Context::Layer(name, context->f->GetPos(), 0));
 	}
 
 	void write_end_chunk(File *f)
 	{
-		int pos0 = f->GetPos();
+		int pos = f->GetPos();
+		int chunk_pos = context->layers.back().pos0;
 		f->SetPos(chunk_pos - 4, true);
-		f->WriteInt(pos0 - chunk_pos);
-		f->SetPos(pos0, true);
+		f->WriteInt(pos - chunk_pos);
+		f->SetPos(pos, true);
+		context->pop();
 	}
-	void write_complete(Context *context)
+	void write_complete()
 	{
 		File *f = context->f;
 		write_begin_chunk(f);
-		write(f);
-		write_subs(context);
+		write_contents();
 		write_end_chunk(f);
+	}
+	void write_contents()
+	{
+		File *f = context->f;
+		write(f);
+		write_subs();
 	}
 
 
@@ -394,7 +413,7 @@ public:
 			if (pos0 + size > context->end())
 				throw string("inner chunk is larger than its parent");
 
-			context->push(cname, pos0, size);
+			context->push(Context::Layer(cname, pos0, size));
 
 
 
@@ -540,6 +559,35 @@ public:
 	}
 };
 
+class FileChunkGlobalEffect : public FileChunk<Song,Effect>
+{
+public:
+	FileChunkGlobalEffect() : FileChunk<Song,Effect>("effect"){}
+	virtual void create(){}
+	virtual void read(File *f)
+	{
+		me = CreateEffect(f->ReadStr());
+		me->only_on_selection = f->ReadBool();
+		me->range.offset = f->ReadInt();
+		me->range.num = f->ReadInt();
+		string params = f->ReadStr();
+		me->configFromString(params);
+		string temp = f->ReadStr();
+		if (temp.find("disabled") >= 0)
+			me->enabled = false;
+		parent->fx.add(me);
+	}
+	virtual void write(File *f)
+	{
+		f->WriteStr(me->name);
+		f->WriteBool(me->only_on_selection);
+		f->WriteInt(me->range.offset);
+		f->WriteInt(me->range.num);
+		f->WriteStr(me->configToString());
+		f->WriteStr(me->enabled ? "" : "disabled");
+	}
+};
+
 class FileChunkBufferBox : public FileChunk<TrackLevel,BufferBox>
 {
 public:
@@ -560,7 +608,7 @@ public:
 
 		string data;
 
-		int bytes = context->sizes.back() - 16;
+		int bytes = context->layers.back().size - 16;
 		data.resize(bytes);//num * (bits / 8) * channels);
 
 		// read chunk'ed
@@ -633,6 +681,7 @@ public:
 	}
 	virtual void write(File *f)
 	{
+		throw string("write SampleBufferBox...");
 	}
 };
 
@@ -777,7 +826,13 @@ public:
 		parent->add(n);
 	}
 	virtual void write(File *f)
-	{}
+	{
+		f->WriteInt(me->range.offset);
+		f->WriteInt(me->range.num);
+		f->WriteInt(me->pitch);
+		f->WriteFloat(me->volume);
+		f->WriteInt(0); // reserved
+	}
 };
 
 class FileChunkSampleMidiData : public FileChunk<Sample,MidiNoteData>
@@ -804,6 +859,13 @@ public:
 		f->WriteStr("");
 		f->WriteStr("");
 		f->WriteInt(0);
+	}
+	virtual void write_subs()
+	{
+		Array<MidiEvent> events = me->getEvents(Range::ALL);
+		write_sub_array("event", events);
+		//write_sub_array("note", *me);
+		write_sub_parray("effect", me->fx);
 	}
 };
 
@@ -832,6 +894,13 @@ public:
 		f->WriteStr("");
 		f->WriteInt(0);
 	}
+	virtual void write_subs()
+	{
+		Array<MidiEvent> events = me->getEvents(Range::ALL);
+		write_sub_array("event", events);
+		//write_sub_array("note", *me);
+		write_sub_parray("effect", me->fx);
+	}
 };
 
 class FileChunkSample : public FileChunk<Song,Sample>
@@ -844,9 +913,9 @@ public:
 	}
 	virtual void create()
 	{
-		parent->samples.add(new Sample(Track::TYPE_AUDIO));
-		me = parent->samples.back();
+		me = new Sample(Track::TYPE_AUDIO);
 		me->owner = parent;
+		parent->samples.add(me);
 	}
 	virtual void read(File *f)
 	{
@@ -863,6 +932,13 @@ public:
 		f->WriteInt(me->offset);
 		f->WriteInt(me->type); // reserved
 		f->WriteInt(0);
+	}
+	virtual void write_subs()
+	{
+		if (me->type == Track::TYPE_AUDIO)
+			write_sub("bufbox", &me->buf);
+		else if (me->type == Track::TYPE_MIDI)
+			write_sub("midi", &me->midi);
 	}
 };
 
@@ -887,6 +963,10 @@ public:
 	virtual void write(File *f)
 	{
 		f->WriteInt(parent->levels.index(me));
+	}
+	virtual void write_subs()
+	{
+		write_sub_array("bufbox", me->buffers);
 	}
 };
 
@@ -1060,6 +1140,20 @@ public:
 
 		notify();
 	}
+	virtual void write_subs()
+	{
+		if (!me->instrument.is_default_tuning(me->tuning))
+			write_sub("tuning", me);
+		write_sub_array("level", me->levels);
+		write_sub_parray("samref", me->samples);
+		write_sub_parray("effect", me->fx);
+		write_sub_array("marker", me->markers);
+		if ((me->type == me->TYPE_TIME) or (me->type == me->TYPE_MIDI))
+		if (me->synth->name != "Dummy")
+			write_sub("synth", me->synth);
+		if (me->midi.num > 0)
+			write_sub("midi", &me->midi);
+	}
 };
 
 class FileChunkNami : public FileChunk<StorageOperationData,Song>
@@ -1074,6 +1168,7 @@ public:
 		add_child(new FileChunkBar);
 		add_child(new FileChunkSample);
 		add_child(new FileChunkTrack);
+		add_child(new FileChunkGlobalEffect);
 	}
 	virtual void create(){ me = parent->song; }
 	virtual void read(File *f)
@@ -1083,6 +1178,16 @@ public:
 	virtual void write(File *f)
 	{
 		f->WriteInt(me->sample_rate);
+	}
+	virtual void write_subs()
+	{
+		write_sub("format", me);
+		write_sub_array("tag", me->tags);
+		write_sub("lvlname", me);
+		write_sub_array("bar", me->bars);
+		write_sub_parray("sample", me->samples);
+		write_sub_parray("track", me->tracks);
+		write_sub_parray("effect", me->fx);
 	}
 };
 
@@ -1106,7 +1211,7 @@ public:
 		File *f = FileOpen(filename);
 		f->SetBinaryMode(true);
 		context = new FileChunkBasic::Context(f);
-		context->push(name, 0, f->GetSize());
+		context->push(Context::Layer(name, 0, f->GetSize()));
 
 		set(od);
 		read_contents();
@@ -1115,6 +1220,26 @@ public:
 		delete(f);
 
 		return true;
+	}
+	bool write_file(const string &filename, StorageOperationData *_od)
+	{
+		od = _od;
+		File *f = FileCreate(filename);
+		f->SetBinaryMode(true);
+		context = new FileChunkBasic::Context(f);
+		context->push(Context::Layer(name, 0, 0));
+
+		set(od);
+		write_contents();
+		delete(context);
+
+		delete(f);
+
+		return true;
+	}
+	virtual void write_subs()
+	{
+		write_sub("nami", od->song);
 	}
 	virtual void on_notify()
 	{
@@ -1397,6 +1522,8 @@ void FormatNami::saveSong(StorageOperationData *_od)
 	od = _od;
 	song = od->song;
 
+#if 0
+
 //	int length = a->GetLength();
 //	int min = a->GetMin();
 	f = FileCreate(od->filename);
@@ -1429,6 +1556,16 @@ void FormatNami::saveSong(StorageOperationData *_od)
 	EndChunk();
 
 	FileClose(f);
+#else
+
+
+	try{
+		ChunkedFileFormatNami n;
+		n.write_file(od->filename, od);
+	}catch(string &s){
+		od->error("saving nami: " + s);
+	}
+#endif
 }
 
 

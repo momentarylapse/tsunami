@@ -28,188 +28,84 @@ FormatNami::~FormatNami()
 {
 }
 
-static FLAC__int32 flac_pcm[CHUNK_SIZE/*samples*/ * 2/*channels*/];
-
-FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)
-{
-	string *data = (string*)client_data;
-	for (unsigned int i=0; i<bytes; i++)
-		data->add(buffer[i]);
-
-	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
-}
-
-string compress_buffer(BufferBox &b, StorageOperationData *od)
-{
-	string data;
-
-
-	bool ok = true;
-	FLAC__StreamEncoderInitStatus init_status;
-
-	int channels = 2;
-	int bits = min(format_get_bits(od->song->default_format), 24);
-	float scale = pow(2.0f, bits-1);
-
-	// allocate the encoder
-	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
-	if (!encoder){
-		od->error("flac: allocating encoder");
-		return "";
-	}
-
-	ok &= FLAC__stream_encoder_set_verify(encoder, true);
-	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
-	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
-	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
-	ok &= FLAC__stream_encoder_set_sample_rate(encoder, od->song->sample_rate);
-	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.num);
-
-	// initialize encoder
-	if (ok){
-		init_status = FLAC__stream_encoder_init_stream(encoder, &FlacCompressWriteCallback, NULL, NULL, NULL, (void*)&data);
-		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
-			od->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
-			ok = false;
-		}
-	}
-
-	// read blocks of samples from WAVE file and feed to encoder
-	if (ok){
-		int p0 = 0;
-		size_t left = (size_t)b.num;
-		while (ok and left){
-			size_t need = (left > CHUNK_SIZE ? (size_t)CHUNK_SIZE : (size_t)left);
-			{
-				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
-				for (unsigned int i=0;i<need;i++){
-					flac_pcm[i * 2 + 0] = (int)(b.r[p0 + i] * scale);
-					flac_pcm[i * 2 + 1] = (int)(b.l[p0 + i] * scale);
-				}
-				/* feed samples to encoder */
-				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
-			}
-			left -= need;
-			p0 += CHUNK_SIZE;
-		}
-	}
-
-	ok &= FLAC__stream_encoder_finish(encoder);
-
-	if (!ok){
-		od->error("flac: encoding: FAILED");
-		od->error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
-	}
-
-	FLAC__stream_encoder_delete(encoder);
-
-	return data;
-}
-
-struct UncompressData
-{
-	BufferBox *buf;
-	string *data;
-	int sample_offset;
-	int byte_offset;
-	int bits;
-	int channels;
-};
-
-void FlacUncompressMetaCallback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
-{
-	UncompressData *d = (UncompressData*)client_data;
-	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO){
-		d->bits = metadata->data.stream_info.bits_per_sample;
-		d->channels = metadata->data.stream_info.channels;
-	}
-}
-
-FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
-{
-	UncompressData *d = (UncompressData*)client_data;
-
-	// read decoded PCM samples
-	BufferBox *buf = d->buf;
-	float scale = pow(2.0f, d->bits-1);
-	int offset = d->sample_offset;
-	int n = min(frame->header.blocksize, buf->num - offset);
-	//msg_write(format("write %d  offset=%d  buf=%d", n, offset, buf->num));
-	for (int i=0; i<n; i++)
-		for (int j=0;j<d->channels;j++)
-			if (j == 0)
-				buf->r[offset + i] = buffer[j][i] / scale;
-			else
-				buf->l[offset + i] = buffer[j][i] / scale;
-	d->sample_offset += frame->header.blocksize;
-
-	//flac_read_samples += frame->header.blocksize;
-	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
-}
-
-FLAC__StreamDecoderReadStatus FlacUncompressReadCallback(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
-{
-	UncompressData *d = (UncompressData*)client_data;
-	*bytes = min(*bytes, d->data->num - d->byte_offset);
-	//msg_write(format("read %d", *bytes));
-	if (*bytes <= 0)
-		return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
-	memcpy(buffer, (char*)d->data->data + d->byte_offset, *bytes);
-	d->byte_offset += *bytes;
-	return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
-}
-
-static void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
-{
-	//msg_write("error");
-	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
-}
-
-void uncompress_buffer(BufferBox &b, string &data, StorageOperationData *od)
-{
-	bool ok = true;
-
-	FLAC__StreamDecoder *decoder = FLAC__stream_decoder_new();
-	if (!decoder)
-		throw string("flac: decoder_new()");
-
-	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO));
-
-	UncompressData d;
-	d.buf = &b;
-	d.channels = 2;
-	d.bits = 16;
-	d.data = &data;
-	d.byte_offset = 0;
-	d.sample_offset = 0;
-
-	FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_stream(
-							decoder,
-							&FlacUncompressReadCallback,
-							NULL, NULL, NULL, NULL,
-							&FlacUncompressWriteCallback,
-							&FlacUncompressMetaCallback,
-							flac_error_callback, &d);
-	if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
-		od->error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
-		ok = false;
-	}
-
-	if (ok){
-		ok = FLAC__stream_decoder_process_until_end_of_stream(decoder);
-		if (!ok){
-			od->error("flac: decoding FAILED");
-			od->error(string("   state: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
-		}
-	}
-	FLAC__stream_decoder_delete(decoder);
-}
-
 void strip(string &s)
 {
 	while((s.num > 0) and (s.back() == ' '))
 		s.resize(s.num - 1);
 }
+
+class FileChunkBasic;
+
+class ChunkedFileParser
+{
+public:
+	ChunkedFileParser(int _header_name_size)
+	{
+		header_name_size = _header_name_size;
+		base = NULL;
+	}
+	virtual ~ChunkedFileParser(); // -> implementation later (depends on FileChunkBasic)
+	bool read(const string &filename, void *p);
+	bool write(const string &filename, void *p);
+	void set_base(FileChunkBasic *base);
+
+	virtual void on_notify(){};
+	virtual void on_unhandled(){};
+	virtual void on_error(const string &message){}
+	virtual void on_warn(const string &message){}
+	virtual void on_info(const string &message){}
+
+	FileChunkBasic *base;
+	int header_name_size;
+
+	struct Context
+	{
+		struct Layer
+		{
+			string name;
+			int pos0, size;
+			Layer(){}
+			Layer(const string &_name, int _pos, int _size)
+			{
+				name = _name;
+				pos0 = _pos;
+				size = _size;
+			}
+		};
+		Context()
+		{
+			f = NULL;
+		}
+		void pop()
+		{
+			layers.pop();
+		}
+		void push(const string &name, int pos, int size)
+		{
+			layers.add(Layer(name, pos, size));
+		}
+		int end()
+		{
+			if (layers.num > 0)
+				return layers.back().pos0 + layers.back().size;
+			return 2000000000;
+		}
+		string str()
+		{
+			string s;
+			foreach(Layer &l, layers){
+				if (s.num > 0)
+					s += "/";
+				s += l.name;
+			}
+			return s;
+		}
+		File *f;
+		Array<Layer> layers;
+	};
+	Context context;
+
+};
 
 class FileChunkBasic
 {
@@ -228,11 +124,6 @@ public:
 	virtual void write(File *f) = 0;
 	virtual void read(File *f) = 0;
 	virtual void create(){ throw string("no data creation... " + name); }
-	virtual void on_notify(){};
-	virtual void on_unhandled(){};
-	virtual void on_error(const string &message){}
-	virtual void on_warn(const string &message){}
-	virtual void on_info(const string &message){}
 	string name;
 
 	void notify()
@@ -260,9 +151,10 @@ public:
 	{
 		children.add(c);
 	}
-	void set_root(FileChunkBasic *r)
+	void set_root(ChunkedFileParser *r)
 	{
 		root = r;
+		context = &r->context;
 		foreach(FileChunkBasic *c, children)
 			c->set_root(r);
 	}
@@ -271,54 +163,9 @@ public:
 	virtual void set_parent(void *t){};
 	virtual void *get(){ return NULL; }
 
-	struct Context
-	{
-		struct Layer
-		{
-			string name;
-			int pos0, size;
-			Layer(){}
-			Layer(const string &_name, int _pos, int _size)
-			{
-				name = _name;
-				pos0 = _pos;
-				size = _size;
-			}
-		};
-		Context(File *_f)
-		{
-			f = _f;
-		}
-		void pop()
-		{
-			layers.pop();
-		}
-		void push(const Layer &l)
-		{
-			layers.add(l);
-		}
-		int end()
-		{
-			if (layers.num > 0)
-				return layers.back().pos0 + layers.back().size;
-			return 2000000000;
-		}
-		string str()
-		{
-			string s;
-			foreach(Layer &l, layers){
-				if (s.num > 0)
-					s += "/";
-				s += l.name;
-			}
-			return s;
-		}
-		File *f;
-		Array<Layer> layers;
-	};
-	Context *context;
+	ChunkedFileParser::Context *context;
 	Array<FileChunkBasic*> children;
-	FileChunkBasic *root;
+	ChunkedFileParser *root;
 
 	virtual void write_subs(){}
 
@@ -362,9 +209,9 @@ public:
 	void write_begin_chunk(File *f)
 	{
 		string s = name + "        ";
-		f->WriteBuffer(s.data, 8);
+		f->WriteBuffer(s.data, root->header_name_size);
 		f->WriteInt(0); // temporary
-		context->push(Context::Layer(name, context->f->GetPos(), 0));
+		context->push(name, context->f->GetPos(), 0);
 	}
 
 	void write_end_chunk(File *f)
@@ -390,6 +237,25 @@ public:
 		write_subs();
 	}
 
+	string read_header()
+	{
+		string cname;
+		cname.resize(root->header_name_size);
+		context->f->ReadBuffer(cname.data, cname.num);
+		strip(cname);
+		int size = context->f->ReadInt();
+
+		int pos0 = context->f->GetPos();
+
+		if (size < 0)
+			throw string("chunk with negative size found");
+		if (pos0 + size > context->end())
+			throw string("inner chunk is larger than its parent");
+
+		context->push(cname, pos0, size);
+		return cname;
+	}
+
 
 	void read_contents()
 	{
@@ -400,22 +266,7 @@ public:
 		// read nested chunks
 		while (f->GetPos() < context->end()){
 
-			string cname;
-			cname.resize(8);
-			f->ReadBuffer(cname.data, 8);
-			strip(cname);
-			int size = f->ReadInt();
-
-			int pos0 = f->GetPos();
-
-			if (size < 0)
-				throw string("chunk with negative size found");
-			if (pos0 + size > context->end())
-				throw string("inner chunk is larger than its parent");
-
-			context->push(Context::Layer(cname, pos0, size));
-
-
+			string cname = read_header();
 
 			bool ok = false;
 			foreach(FileChunkBasic *c, children)
@@ -438,6 +289,47 @@ public:
 		}
 	}
 };
+
+
+ChunkedFileParser::~ChunkedFileParser()
+{
+	delete base;
+}
+
+bool ChunkedFileParser::read(const string &filename, void *p)
+{
+	File *f = FileOpen(filename);
+	f->SetBinaryMode(true);
+	context.f = f;
+	//context.push(Context::Layer(name, 0, f->GetSize()));
+
+	base->set_root(this);
+	base->set(p);
+	string cname = base->read_header();
+	if (cname != base->name)
+		throw string("wrong base chunk: ") + cname + " (" + base->name + " expected)";
+	base->read_contents();
+
+	delete(f);
+
+	return true;
+}
+
+bool ChunkedFileParser::write(const string &filename, void *p)
+{
+	File *f = FileCreate(filename);
+	f->SetBinaryMode(true);
+	context.f = f;
+	//context->push(Context::Layer(name, 0, 0));
+
+	base->set_root(this);
+	base->set(p);
+	base->write_complete();
+
+	delete(f);
+
+	return true;
+}
 
 template<class PT, class T>
 class FileChunk : public FileChunkBasic
@@ -588,6 +480,183 @@ public:
 	}
 };
 
+static FLAC__int32 flac_pcm[CHUNK_SIZE/*samples*/ * 2/*channels*/];
+
+FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)
+{
+	string *data = (string*)client_data;
+	for (unsigned int i=0; i<bytes; i++)
+		data->add(buffer[i]);
+
+	return FLAC__STREAM_ENCODER_WRITE_STATUS_OK;
+}
+
+string compress_buffer(BufferBox &b, Song *song, FileChunkBasic *p)
+{
+	string data;
+
+
+	bool ok = true;
+	FLAC__StreamEncoderInitStatus init_status;
+
+	int channels = 2;
+	int bits = min(format_get_bits(song->default_format), 24);
+	float scale = pow(2.0f, bits-1);
+
+	// allocate the encoder
+	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
+	if (!encoder){
+		p->error("flac: allocating encoder");
+		return "";
+	}
+
+	ok &= FLAC__stream_encoder_set_verify(encoder, true);
+	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
+	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
+	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
+	ok &= FLAC__stream_encoder_set_sample_rate(encoder, DEFAULT_SAMPLE_RATE); // we don't really care...
+	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.num);
+
+	// initialize encoder
+	if (ok){
+		init_status = FLAC__stream_encoder_init_stream(encoder, &FlacCompressWriteCallback, NULL, NULL, NULL, (void*)&data);
+		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
+			p->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
+			ok = false;
+		}
+	}
+
+	// read blocks of samples from WAVE file and feed to encoder
+	if (ok){
+		int p0 = 0;
+		size_t left = (size_t)b.num;
+		while (ok and left){
+			size_t need = (left > CHUNK_SIZE ? (size_t)CHUNK_SIZE : (size_t)left);
+			{
+				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
+				for (unsigned int i=0;i<need;i++){
+					flac_pcm[i * 2 + 0] = (int)(b.r[p0 + i] * scale);
+					flac_pcm[i * 2 + 1] = (int)(b.l[p0 + i] * scale);
+				}
+				/* feed samples to encoder */
+				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
+			}
+			left -= need;
+			p0 += CHUNK_SIZE;
+		}
+	}
+
+	ok &= FLAC__stream_encoder_finish(encoder);
+
+	if (!ok){
+		p->error("flac: encoding: FAILED");
+		p->error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
+	}
+
+	FLAC__stream_encoder_delete(encoder);
+
+	return data;
+}
+
+struct UncompressData
+{
+	BufferBox *buf;
+	string *data;
+	int sample_offset;
+	int byte_offset;
+	int bits;
+	int channels;
+};
+
+void FlacUncompressMetaCallback(const FLAC__StreamDecoder *decoder, const FLAC__StreamMetadata *metadata, void *client_data)
+{
+	UncompressData *d = (UncompressData*)client_data;
+	if (metadata->type == FLAC__METADATA_TYPE_STREAMINFO){
+		d->bits = metadata->data.stream_info.bits_per_sample;
+		d->channels = metadata->data.stream_info.channels;
+	}
+}
+
+FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
+{
+	UncompressData *d = (UncompressData*)client_data;
+
+	// read decoded PCM samples
+	BufferBox *buf = d->buf;
+	float scale = pow(2.0f, d->bits-1);
+	int offset = d->sample_offset;
+	int n = min(frame->header.blocksize, buf->num - offset);
+	//msg_write(format("write %d  offset=%d  buf=%d", n, offset, buf->num));
+	for (int i=0; i<n; i++)
+		for (int j=0;j<d->channels;j++)
+			if (j == 0)
+				buf->r[offset + i] = buffer[j][i] / scale;
+			else
+				buf->l[offset + i] = buffer[j][i] / scale;
+	d->sample_offset += frame->header.blocksize;
+
+	//flac_read_samples += frame->header.blocksize;
+	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
+}
+
+FLAC__StreamDecoderReadStatus FlacUncompressReadCallback(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
+{
+	UncompressData *d = (UncompressData*)client_data;
+	*bytes = min(*bytes, d->data->num - d->byte_offset);
+	//msg_write(format("read %d", *bytes));
+	if (*bytes <= 0)
+		return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;
+	memcpy(buffer, (char*)d->data->data + d->byte_offset, *bytes);
+	d->byte_offset += *bytes;
+	return FLAC__STREAM_DECODER_READ_STATUS_CONTINUE;
+}
+
+static void flac_error_callback(const FLAC__StreamDecoder *decoder, FLAC__StreamDecoderErrorStatus status, void *client_data)
+{
+	//msg_write("error");
+	fprintf(stderr, "Got error callback: %s\n", FLAC__StreamDecoderErrorStatusString[status]);
+}
+
+void uncompress_buffer(BufferBox &b, string &data, FileChunkBasic *p)
+{
+	bool ok = true;
+
+	FLAC__StreamDecoder *decoder = FLAC__stream_decoder_new();
+	if (!decoder)
+		throw string("flac: decoder_new()");
+
+	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO));
+
+	UncompressData d;
+	d.buf = &b;
+	d.channels = 2;
+	d.bits = 16;
+	d.data = &data;
+	d.byte_offset = 0;
+	d.sample_offset = 0;
+
+	FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_stream(
+							decoder,
+							&FlacUncompressReadCallback,
+							NULL, NULL, NULL, NULL,
+							&FlacUncompressWriteCallback,
+							&FlacUncompressMetaCallback,
+							flac_error_callback, &d);
+	if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
+		p->error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
+		ok = false;
+	}
+
+	if (ok){
+		ok = FLAC__stream_decoder_process_until_end_of_stream(decoder);
+		if (!ok){
+			p->error("flac: decoding FAILED");
+			p->error(string("   state: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+		}
+	}
+	FLAC__stream_decoder_delete(decoder);
+}
+
 class FileChunkBufferBox : public FileChunk<TrackLevel,BufferBox>
 {
 public:
@@ -622,10 +691,10 @@ public:
 
 		// insert
 
-		StorageOperationData *od = (StorageOperationData*)root->get();
-		if (od->song->compression > 0){
+		Song *song = (Song*)root->base->get();
+		if (song->compression > 0){
 			//throw string("can't read compressed nami files yet");
-			uncompress_buffer(*me, data, od);
+			uncompress_buffer(*me, data, this);
 
 		}else{
 			me->import(data.data, channels, format_for_bits(bits), num);
@@ -633,8 +702,7 @@ public:
 	}
 	virtual void write(File *f)
 	{
-		StorageOperationData *od = (StorageOperationData*)root->get();
-		Song *song = od->song;
+		Song *song = (Song*)root->base->get();
 
 		int channels = 2;
 		f->WriteInt(me->offset);
@@ -649,7 +717,7 @@ public:
 		}else{
 
 			int uncompressed_size = me->num * channels * format_get_bits(song->default_format) / 8;
-			data = compress_buffer(*me, od);
+			data = compress_buffer(*me, song, this);
 			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}
 		f->WriteBuffer(data.data, data.num);
@@ -1156,11 +1224,11 @@ public:
 	}
 };
 
-class FileChunkNami : public FileChunk<StorageOperationData,Song>
+class FileChunkNami : public FileChunk<Song,Song>
 {
 public:
 	FileChunkNami() :
-		FileChunk<StorageOperationData,Song>("nami")
+		FileChunk<Song,Song>("nami")
 	{
 		add_child(new FileChunkFormat);
 		add_child(new FileChunkTag);
@@ -1170,7 +1238,7 @@ public:
 		add_child(new FileChunkTrack);
 		add_child(new FileChunkGlobalEffect);
 	}
-	virtual void create(){ me = parent->song; }
+	virtual void create(){ me = parent; }
 	virtual void read(File *f)
 	{
 		me->sample_rate = f->ReadInt();
@@ -1191,63 +1259,34 @@ public:
 	}
 };
 
-class ChunkedFileFormatNami : public FileChunk<void,StorageOperationData>
+class ChunkedFileFormatNami : public ChunkedFileParser
 {
 public:
 	ChunkedFileFormatNami() :
-		FileChunk<void,StorageOperationData>("")
+		ChunkedFileParser(8)
 	{
 		od = NULL;
-		add_child(new FileChunkNami);
-		set_root(this);
+		base = new FileChunkNami;
 	}
-	virtual void read(File *f){}
-	virtual void write(File *f){}
 	StorageOperationData *od;
 
-	bool read_file(const string &filename, StorageOperationData *_od)
+	bool read_file(StorageOperationData *_od)
 	{
 		od = _od;
-		File *f = FileOpen(filename);
-		f->SetBinaryMode(true);
-		context = new FileChunkBasic::Context(f);
-		context->push(Context::Layer(name, 0, f->GetSize()));
-
-		set(od);
-		read_contents();
-		delete(context);
-
-		delete(f);
-
-		return true;
+		return this->read(od->filename, od->song);
 	}
-	bool write_file(const string &filename, StorageOperationData *_od)
+	bool write_file(StorageOperationData *_od)
 	{
 		od = _od;
-		File *f = FileCreate(filename);
-		f->SetBinaryMode(true);
-		context = new FileChunkBasic::Context(f);
-		context->push(Context::Layer(name, 0, 0));
-
-		set(od);
-		write_contents();
-		delete(context);
-
-		delete(f);
-
-		return true;
-	}
-	virtual void write_subs()
-	{
-		write_sub("nami", od->song);
+		return this->write(od->filename, od->song);
 	}
 	virtual void on_notify()
 	{
-		od->set((float)context->f->GetPos() / (float)context->f->GetSize());
+		od->set((float)context.f->GetPos() / (float)context.f->GetSize());
 	}
 	virtual void on_unhandled()
 	{
-		od->error("unhandled nami chunk: " + context->str());
+		od->error("unhandled nami chunk: " + context.str());
 	}
 	virtual void on_error(const string &message)
 	{
@@ -1267,7 +1306,7 @@ void FormatNami::saveSong(StorageOperationData *_od)
 
 	try{
 		ChunkedFileFormatNami n;
-		n.write_file(od->filename, od);
+		n.write_file(od);
 	}catch(string &s){
 		od->error("saving nami: " + s);
 	}
@@ -1304,7 +1343,7 @@ void FormatNami::loadSong(StorageOperationData *_od)
 
 	try{
 		ChunkedFileFormatNami n;
-		n.read_file(od->filename, od);
+		n.read_file(od);
 	}catch(string &s){
 		od->error("loading nami: " + s);
 	}

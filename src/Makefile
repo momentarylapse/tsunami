@@ -199,6 +199,7 @@ OBJ = \
  lib/threads/Mutex.o\
  lib/threads/Thread.o\
  lib/threads/ThreadedWork.o\
+ lib/xfile/chunked.o\
  Plugins/ConfigPanel.o\
  Plugins/Configurable.o\
  Plugins/Effect.o\
@@ -861,6 +862,9 @@ lib/threads/Thread.o : lib/threads/Thread.cpp
 
 lib/threads/ThreadedWork.o : lib/threads/ThreadedWork.cpp
 	$(CPP) -c lib/threads/ThreadedWork.cpp -o $@ $(CXXFLAGS)
+
+lib/xfile/chunked.o : lib/xfile/chunked.cpp
+	$(CPP) -c lib/xfile/chunked.cpp -o $@ $(CXXFLAGS)
 
 Plugins/Configurable.o : Plugins/Configurable.cpp
 	$(CPP) -c Plugins/Configurable.cpp -o $@ $(CXXFLAGS)

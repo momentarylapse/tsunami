@@ -208,7 +208,7 @@ public:
 	SerialCommandParam p_rax;
 	SerialCommandParam p_ax, p_al, p_al_bool, p_al_char;
 	SerialCommandParam p_st0, p_st1, p_xmm0, p_xmm1;
-	const SerialCommandParam p_none;
+	static const SerialCommandParam p_none;
 
 	void AddFuncParam(const SerialCommandParam &p);
 	void AddFuncReturn(const SerialCommandParam &r);

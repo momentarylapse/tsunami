@@ -101,9 +101,6 @@ public:
 	virtual void __setOption(const string &op, const string &value){}
 	void getSize(int &w, int &h);
 
-	virtual void setFont(const string &font_name);
-	virtual void setTabSize(int tab_size){}
-
 	void notify(const string &message = "", bool is_default = true);
 };
 

@@ -146,7 +146,11 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 		//gtk_dialog_set_has_separator(GTK_DIALOG(window), false);
 		//gtk_container_set_border_width(GTK_CONTAINER(window), 0);
 #ifndef OS_WINDOWS
+#if GTK_MAJOR_VERSION < 3
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
+#elif GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 12
+		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
+#endif
 #endif
 	}else
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);

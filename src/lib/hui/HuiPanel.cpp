@@ -469,18 +469,6 @@ void HuiPanel::setTooltip(const string &_id, const string &tip)
 		c->setTooltip(tip);
 }
 
-void HuiPanel::setFont(const string &_id, const string &font_name)
-{
-	test_controls(_id, c)
-		c->setFont(font_name);
-}
-
-void HuiPanel::setTabSize(const string &_id, int tab_size)
-{
-	test_controls(_id, c)
-		c->setTabSize(tab_size);
-}
-
 
 // add a single line/string
 //    for ComboBox, ListView, ListViewTree, ListViewIcons

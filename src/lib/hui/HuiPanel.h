@@ -139,8 +139,6 @@ public:
 	void _cdecl reset(const string &id);
 	void _cdecl removeControl(const string &id);
 	void _cdecl setOptions(const string &id, const string &options);
-	void _cdecl setFont(const string &id, const string &font_name);
-	void _cdecl setTabSize(const string &id, int tab_size);
 
 	// drawing
 	void _cdecl redraw(const string &id);

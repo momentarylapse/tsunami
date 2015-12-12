@@ -25,7 +25,11 @@ HuiControlGroup::HuiControlGroup(const string &title, const string &id) :
 void HuiControlGroup::add(HuiControl *child, int x, int y)
 {
 	GtkWidget *child_widget = child->get_frame();
+#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 12
+	gtk_widget_set_margin_start(child_widget, panel->expander_indent);
+#else
 	gtk_widget_set_margin_left(child_widget, panel->expander_indent);
+#endif
 	gtk_widget_set_margin_top(child_widget, 2);
 	gtk_container_add(GTK_CONTAINER(widget), child_widget);
 	children.add(child);

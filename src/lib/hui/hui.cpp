@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.12.1";
+string HuiVersion = "0.5.12.2";
 
 #include <stdio.h>
 #include <signal.h>
@@ -296,7 +296,11 @@ void _HuiMakeUsable_()
 		_hui_x_display_ = XOpenDisplay(0);
 	#endif
 
+#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 16
+	invisible_cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_BLANK_CURSOR);
+#else
 	invisible_cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
+#endif
 
 #endif
 	_HuiScreenOpened_ = true;

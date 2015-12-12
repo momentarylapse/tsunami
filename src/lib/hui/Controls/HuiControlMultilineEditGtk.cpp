@@ -25,6 +25,9 @@ HuiControlMultilineEdit::HuiControlMultilineEdit(const string &title, const stri
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroll), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_widget_show(scroll);
 	gtk_container_add(GTK_CONTAINER(scroll), widget);
+	if (OptionString.find("monospace") >= 0){
+		gtk_text_view_set_monospace(GTK_TEXT_VIEW(widget), true);
+	}
 
 	// frame
 	frame = scroll;

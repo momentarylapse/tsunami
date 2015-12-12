@@ -6,10 +6,6 @@
 #include "../../file/file.h"
 
 
-namespace Asm{
-	extern int ARM_DATA_INSTRUCTIONS[16]; // -> asm.cpp
-};
-
 namespace Script{
 
 
@@ -17,6 +13,8 @@ namespace Script{
 
 //#ifdef ScriptDebug
 
+
+const SerialCommandParam Serializer::p_none = {-1, -1, 0, NULL, 0};
 
 
 int Serializer::add_virtual_reg(int preg)
@@ -1919,8 +1917,7 @@ void Serializer::DoErrorLink(const string &msg)
 	script->DoErrorLink(msg);
 }
 
-Serializer::Serializer(Script *s, Asm::InstructionWithParamsList *_list) :
-	p_none({-1, -1, 0, NULL, 0})
+Serializer::Serializer(Script *s, Asm::InstructionWithParamsList *_list)
 {
 	script = s;
 	syntax_tree = s->syntax;

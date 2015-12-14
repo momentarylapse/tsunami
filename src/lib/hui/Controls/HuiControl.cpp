@@ -158,7 +158,7 @@ void HuiControl::setOptions(const string &options)
 		else if (aa == "noexpandy")
 			gtk_widget_set_vexpand(widget, false);
 		else if (aa == "indent")
-#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 12
+#if GTK_CHECK_VERSION(3,12,0)
 			gtk_widget_set_margin_start(get_frame(), 20);
 #else
 			gtk_widget_set_margin_left(get_frame(), 20);
@@ -171,13 +171,13 @@ void HuiControl::setOptions(const string &options)
 			else if (a0 == "height")
 				height = a1._int();
 			else if (a0 == "margin-left"){
-#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 12
+#if GTK_CHECK_VERSION(3,12,0)
 				gtk_widget_set_margin_start(get_frame(), 20);
 #else
 				gtk_widget_set_margin_left(get_frame(), a1._int());
 #endif
 			}else if (a0 == "margin-right"){
-#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 12
+#if GTK_CHECK_VERSION(3,12,0)
 				gtk_widget_set_margin_end(get_frame(), a1._int());
 #else
 				gtk_widget_set_margin_right(get_frame(), a1._int());

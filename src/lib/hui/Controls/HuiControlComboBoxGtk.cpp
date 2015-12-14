@@ -51,7 +51,7 @@ void HuiControlComboBox::__setString(const string &str)
 
 void HuiControlComboBox::__addString(const string& str)
 {
-#if GTK_MAJOR_VERSION >= 3
+#if GTK_CHECK_VERSION(3,0,0)
 	gtk_combo_box_text_append(GTK_COMBO_BOX_TEXT(widget), NULL, sys_str(str));
 #else
 	gtk_combo_box_text_append_text(GTK_COMBO_BOX_TEXT(widget), sys_str(str));
@@ -70,7 +70,7 @@ int HuiControlComboBox::getInt()
 
 void HuiControlComboBox::__reset()
 {
-#if GTK_MAJOR_VERSION >= 3
+#if GTK_CHECK_VERSION(3,0,0)
 	gtk_combo_box_text_remove_all(GTK_COMBO_BOX_TEXT(widget));
 #else
 	/*GtkTreeModel *m = gtk_combo_box_get_model(GTK_COMBO_BOX(widget));

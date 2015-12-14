@@ -118,7 +118,7 @@ bool HuiSelectColor(HuiWindow *win,int r,int g,int b)
 
 bool HuiSelectFont(HuiWindow *win, const string &title)
 {
-#if GTK_MAJOR_VERSION >= 3
+#if GTK_CHECK_VERSION(3,0,0)
 	msg_db_r("HuiSelectFont",1);
 	GtkWindow *w = get_window_save(win);
 	msg_db_m("dialog_new",1);

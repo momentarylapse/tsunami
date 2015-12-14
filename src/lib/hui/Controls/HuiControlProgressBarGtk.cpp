@@ -27,7 +27,7 @@ string HuiControlProgressBar::getString()
 
 void HuiControlProgressBar::__setString(const string &str)
 {
-#if GTK_MAJOR_VERSION >= 3
+#if GTK_CHECK_VERSION(3,0,0)
 	gtk_progress_bar_set_show_text(GTK_PROGRESS_BAR(widget), true);
 #endif
 	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget), sys_str(str));

@@ -49,8 +49,7 @@ enum{
 	HuiGtkInsertTabControl,
 };
 
-#if GTK_MAJOR_VERSION == 2
-#if GTK_MINOR_VERSION < 22
+#if !GTK_CHECK_VERSION(2,22,0)
 	void gtk_table_get_size(GtkTable *table, guint *rows, guint *columns)
 	{
 		g_object_get(G_OBJECT(table), "n-rows", rows, NULL);
@@ -58,6 +57,7 @@ enum{
 	}
 #endif
 
+#if !GTK_CHECK_VERSION(3,0,0)
 	GtkWidget *gtk_scale_new_with_range(GtkOrientation orientation, double min, double max, double step)
 	{
 		if (orientation == GTK_ORIENTATION_VERTICAL)

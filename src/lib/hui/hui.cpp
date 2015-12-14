@@ -296,7 +296,7 @@ void _HuiMakeUsable_()
 		_hui_x_display_ = XOpenDisplay(0);
 	#endif
 
-#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 16
+#if GTK_CHECK_VERSION(3,16,0)
 	invisible_cursor = gdk_cursor_new_for_display(gdk_display_get_default(), GDK_BLANK_CURSOR);
 #else
 	invisible_cursor = gdk_cursor_new(GDK_BLANK_CURSOR);
@@ -532,7 +532,7 @@ void HuiEnd()
 		//	XCloseDisplay(hui_x_display);
 #endif
 
-#if GTK_MAJOR_VERSION == 3
+#if GTK_CHECK_VERSION(3,0,0)
 		g_object_unref(invisible_cursor);
 #endif
 #endif

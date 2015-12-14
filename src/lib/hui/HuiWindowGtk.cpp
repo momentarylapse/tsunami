@@ -15,7 +15,7 @@
 
 void add_key_to_buffer(HuiInputData *d, int key);
 
-#if GTK_MAJOR_VERSION == 2
+#if !GTK_CHECK_VERSION(3,0,0)
 GtkWidget *gtk_box_new(GtkOrientation orientation, int spacing); // -> hui_window_control_gtk.cpp
 #endif
 
@@ -146,9 +146,9 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 		//gtk_dialog_set_has_separator(GTK_DIALOG(window), false);
 		//gtk_container_set_border_width(GTK_CONTAINER(window), 0);
 #ifndef OS_WINDOWS
-#if GTK_MAJOR_VERSION < 3
+#if !GTK_CHECK_VERSION(3,0,0)
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
-#elif GTK_MAJOR_VERSION == 3 && GTK_MINOR_VERSION < 12
+#elif !GTK_CHECK_VERSION(3,12,0)
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
 #endif
 #endif
@@ -208,7 +208,7 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 	gtk_box_pack_start(GTK_BOX(vbox), menubar, FALSE, FALSE, 0);
 
 	// tool bars
-#if GTK_MAJOR_VERSION >= 3
+#if GTK_CHECK_VERSION(3,0,0)
 	gtk_style_context_add_class(gtk_widget_get_style_context(toolbar[HuiToolbarTop]->widget), "primary-toolbar");
 #endif
 	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarTop]->widget, FALSE, FALSE, 0);

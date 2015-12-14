@@ -15,7 +15,7 @@ HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
 {
 	GetPartStrings(id, title);
 	widget = gtk_label_new("");
-#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 16
+#if GTK_CHECK_VERSION(3,16,0)
 	gtk_label_set_xalign(GTK_LABEL(widget), 0);
 #else
 	gtk_misc_set_alignment(GTK_MISC(widget), 0, 0.5f);
@@ -47,13 +47,13 @@ void HuiControlLabel::__setOption(const string &op, const string &value)
 	if (op == "wrap"){
 		gtk_label_set_line_wrap(GTK_LABEL(widget), true);
 	}else if (op == "center"){
-#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 16
+#if GTK_CHECK_VERSION(3,16,0)
 		gtk_label_set_xalign(GTK_LABEL(widget), 0.5f);
 #else
 		gtk_misc_set_alignment(GTK_MISC(widget), 0.5f, 0.5f);
 #endif
 	}else if (op == "right"){
-#if GTK_MAJOR_VERSION >= 3 && GTK_MINOR_VERSION >= 16
+#if GTK_CHECK_VERSION(3,16,0)
 		gtk_label_set_xalign(GTK_LABEL(widget), 1);
 #else
 		gtk_misc_set_alignment(GTK_MISC(widget), 1, 0.5f);

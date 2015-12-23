@@ -26,6 +26,10 @@ Synthesizer::Synthesizer() :
 	auto_stop = true;
 	locked = false;
 
+	for (int p=0; p<MAX_PITCH; p++)
+		freq[p] = pitch_to_freq(p);
+
+
 	setSampleRate(DEFAULT_SAMPLE_RATE);
 }
 
@@ -49,11 +53,14 @@ void Synthesizer::setSampleRate(int _sample_rate)
 	//	return;
 	sample_rate = _sample_rate;
 
-	for (int p=0; p<128; p++){
-		float freq = pitch_to_freq(p);
-		delta_phi[p] = freq * 2.0f * pi / sample_rate;
-	}
+	update_delta_phi();
 	onConfig();
+}
+
+void Synthesizer::update_delta_phi()
+{
+	for (int p=0; p<MAX_PITCH; p++)
+		delta_phi[p] = freq[p] * 2.0f * pi / sample_rate;
 }
 
 void Synthesizer::lock()

@@ -30,7 +30,7 @@ public:
 			float volume;
 			float phi;
 			EnvelopeADSR env;
-		}pitch[128];
+		}pitch[MAX_PITCH];
 	};
 
 	State state;

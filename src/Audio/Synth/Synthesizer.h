@@ -31,6 +31,8 @@ public:
 	int sample_rate;
 	void setSampleRate(int sample_rate);
 
+	void update_delta_phi();
+
 	int keep_notes;
 
 	virtual int read(BufferBox &buf);
@@ -55,7 +57,8 @@ protected:
 	Array<int> delete_me;
 	void enablePitch(int pitch, bool enable);
 
-	float delta_phi[128];
+	float freq[MAX_PITCH];
+	float delta_phi[MAX_PITCH];
 
 	void lock();
 	void unlock();

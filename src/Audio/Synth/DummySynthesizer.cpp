@@ -13,7 +13,7 @@
 
 void DummySynthesizer::State::reset()
 {
-	for (int i=0; i<128; i++){
+	for (int i=0; i<MAX_PITCH; i++){
 		pitch[i].phi = 0;
 		pitch[i].volume = 0;
 		pitch[i].env.reset();
@@ -37,7 +37,7 @@ void DummySynthesizer::__init__()
 
 void DummySynthesizer::onConfig()
 {
-	for (int i=0; i<128; i++){
+	for (int i=0; i<MAX_PITCH; i++){
 		//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
 		state.pitch[i].env.set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
 		state.pitch[i].env.set2(0, 0.9f);

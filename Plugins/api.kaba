@@ -21,6 +21,8 @@ const int NUM_PEAK_LEVELS = 24
 
 const int DEFAULT_SAMPLE_RATE = 44100
 
+const int MAX_PITCH = 128
+
 class Range
 	int offset, length
 	int end()
@@ -151,7 +153,8 @@ class Synthesizer
 	string name
 	int sample_rate
 	int keep_notes
-	float[128] delta_phi
+	float[MAX_PITCH] freq
+	float[MAX_PITCH] delta_phi
 	int[] active_pitch
 	MidiRawData events
 	extern void __init__()

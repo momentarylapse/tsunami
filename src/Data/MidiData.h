@@ -11,6 +11,8 @@
 #include "../lib/base/base.h"
 #include "Range.h"
 
+#define MAX_PITCH		128
+
 class MidiEffect;
 
 class MidiNote

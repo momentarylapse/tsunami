@@ -101,7 +101,7 @@ void ViewModeMidi::onMouseMove()
 	if (selection->type == Selection::TYPE_MIDI_PITCH){
 		view->forceRedraw();
 	}else if (selection->type == Selection::TYPE_SCROLL){
-		pitch_max = (track_rect.y2 + scroll_offset - view->my) / track_rect.height() * 127.0f;
+		pitch_max = (track_rect.y2 + scroll_offset - view->my) / track_rect.height() * (MAX_PITCH - 1.0f);
 		setPitchMin(pitch_max - PITCH_SHOW_COUNT);
 	}
 }
@@ -214,7 +214,7 @@ float ViewModeMidi::pitch2y(int p)
 
 void ViewModeMidi::setPitchMin(int pitch)
 {
-	pitch_min = clampi(pitch, 0, 127 - PITCH_SHOW_COUNT);
+	pitch_min = clampi(pitch, 0, MAX_PITCH - 1 - PITCH_SHOW_COUNT);
 	pitch_max = pitch_min + PITCH_SHOW_COUNT;
 	view->forceRedraw();
 }
@@ -510,7 +510,7 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, boo
 		c->setColor(view->colors.text);
 	else
 		c->setColor(view->colors.text_soft1);
-	scroll_bar = rect(area.x2 - 40, area.x2 - 20, area.y2 - area.height() * pitch_max / 127.0f, area.y2 - area.height() * pitch_min / 127.0f);
+	scroll_bar = rect(area.x2 - 40, area.x2 - 20, area.y2 - area.height() * pitch_max / (MAX_PITCH - 1.0f), area.y2 - area.height() * pitch_min / (MAX_PITCH - 1.0f));
 	c->drawRect(scroll_bar);
 }
 

@@ -10,7 +10,7 @@ class PitchState
 	EnvelopeADSR env
 
 class HarminocState : PluginData
-	PitchState[128] pitch
+	PitchState[MAX_PITCH] pitch
 	overwrite void reset()
 		for p in pitch
 			p.volume = 0

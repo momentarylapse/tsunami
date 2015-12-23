@@ -2,10 +2,10 @@ use "../api.kaba"
 use "../tone.kaba"
 
 class SinusState : PluginData
-	float[128] volume
-	float[128] phase
+	float[MAX_PITCH] volume
+	float[MAX_PITCH] phase
 	overwrite void reset()
-		for p in 0:128
+		for p in 0:MAX_PITCH
 			volume[p] = 0
 			phase[p] = 0
 

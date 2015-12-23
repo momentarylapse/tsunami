@@ -83,7 +83,7 @@ class FMConfig : PluginData
 	void __assign__(FMConfig o)
 
 class FMState : PluginData
-	PitchState[128] pitch
+	PitchState[MAX_PITCH] pitch
 	overwrite void reset()
 		for p in pitch
 			p.num_osc_active = 0

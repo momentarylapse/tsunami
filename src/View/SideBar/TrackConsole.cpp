@@ -88,7 +88,7 @@ void TrackConsole::loadData()
 				addLabel(i2s(i+1), 0, 100 - i, 0, 0, format("string%d_label", i));
 				addComboBox("", 1, 100 - i, 0, 0, id);
 				event(id, this, &TrackConsole::onString);
-				for (int p=0; p<128; p++)
+				for (int p=0; p<MAX_PITCH; p++)
 					setString(id, pitch_name(p));
 			}
 			setInt(id, t);

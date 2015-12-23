@@ -58,7 +58,7 @@ class SamplePanel : ConfigPanel
 
 	overwrite void update()
 		reset("list")
-		for i in 0:128
+		for i in 0:MAX_PITCH
 			string name = ""
 			if i < sc.samples.num
 				if sc.samples[i]

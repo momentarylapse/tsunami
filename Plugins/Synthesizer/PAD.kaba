@@ -10,7 +10,7 @@ class PitchState
 	EnvelopeADSR env
 
 class PADState : PluginData
-	PitchState[128] pitch
+	PitchState[MAX_PITCH] pitch
 	void __init__()
 		for p in pitch
 			p.buf.__init__()

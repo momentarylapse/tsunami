@@ -1,0 +1,138 @@
+// Image = hui:properties
+// Title[Deutsch] = Schaltkreis
+//use "../../api.kaba"
+
+class Matrix
+	float[] e
+	int n, m
+	void clear(int _n, int _m)
+		n = _n
+		m = _m
+		e.clear()
+		e.resize(n*m)
+	void add(int i, int j, float f)
+		e[i * m + j] += f
+	float get(int i, int j)
+		return e[i * m + j]
+	void _print()
+		for i in 0:n
+			print e.subarray(i*m,m)
+	void diagonalize(float[] b)
+		for i in 0:n
+			float f = get(i,i)
+			if f == 0
+				f = 0.0000001
+			//print f
+			for j in i:m
+				e[i * m + j] /= f
+			b[i] /= f
+			
+			for ii in i+1:n
+				float g = get(ii, i)
+				for j in i:m
+					e[ii * m + j] -= e[i * m + j] * g
+				b[ii] -= b[i] * g
+	void solve(float[] x, float[] b)
+		if n != m or b.num != n
+			return
+		Matrix mm = *self
+		float[] bb = b
+		mm.diagonalize(bb)
+		
+		//mm._print()
+		//print bb
+		
+		int i = n-1
+		while i >= 0
+			float s = 0
+			for j in i+1:n
+				s += mm.get(i, j) * x[j]
+			float f = mm.get(i, i)
+			if abs(f) > 0.00001
+				x[i] = (bb[i] - s) // / f
+			else
+				x[i] = 0
+			i --
+		//print ""
+		//print x
+
+class Edge
+	int a, b
+
+class Resistor : Edge
+	float value
+Resistor _Resistor(int a, int b, float v)
+	Resistor r
+	r.a = a
+	r.b = b
+	r.value = v
+	return r
+
+class Capacitor : Edge
+	float value
+Capacitor _Capacitor(int a, int b, float v)
+	Capacitor c
+	c.a = a
+	c.b = b
+	c.value = v
+	return c
+
+
+class Config //: PluginData
+	complex[] vertices
+	Resistor[] resistors
+	Capacitor[] capacitors
+	//overwrite void reset()
+	int out
+	void reset()
+		vertices.clear()
+		vertices.add(complex(0.1, 0.1))
+		vertices.add(complex(0.1, 0.4))
+		vertices.add(complex(0.9, 0.4))
+		out = 2
+		resistors.clear()
+		capacitors.clear()
+
+/*class State : PluginData
+	overwrite void reset()
+
+class Circuit : AudioEffect
+	Config config
+	State state
+
+	overwrite void process(BufferBox buf)*/
+
+
+void main()
+	Config c
+	c.reset()
+	c.resistors.add(_Resistor(0, 1, 100))
+	c.resistors.add(_Resistor(0, 2, 100))
+	c.resistors.add(_Resistor(1, 2, 100))
+	int n = c.vertices.num
+	Matrix m
+	m.clear(n,n)
+	float[] b = [-1.0, 1.0] // suppose I = 1A...
+	b.resize(n)
+	for i in 0:n
+		for r in c.resistors
+			if r.a == i
+				m.add(i, r.a,   1 / r.value)
+				m.add(i, r.b, - 1 / r.value)
+			if r.b == i
+				m.add(i, r.a, - 1 / r.value)
+				m.add(i, r.b,   1 / r.value)
+		
+	/*m._print()
+	print ""
+	print b
+	print ""*/
+	
+	float[] x
+	x.resize(n)
+	m.solve(x, b)
+	//print x
+	float Uin = x[1] - x[0]
+	float Uout = x[c.out] - x[0]
+	float factor = Uout / Uin
+	print factor

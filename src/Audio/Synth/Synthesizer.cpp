@@ -164,6 +164,10 @@ void Synthesizer::reset()
 	//resetMidiData();
 }
 
+bool Synthesizer::isDefault()
+{
+	return (name == "Dummy") and (tuning.is_default());
+}
 
 
 

@@ -715,10 +715,31 @@ public:
 	}
 };
 
+class FileChunkSynthesizerTuning : public FileChunk<Synthesizer,Synthesizer::Tuning>
+{
+public:
+	FileChunkSynthesizerTuning() : FileChunk<Synthesizer,Synthesizer::Tuning>("tuning"){}
+	virtual void create(){ me = &parent->tuning; }
+	virtual void read(File *f)
+	{
+		for (int i=0; i<MAX_PITCH; i++)
+			me->freq[i] = f->ReadFloat();
+		parent->update_delta_phi();
+	}
+	virtual void write(File *f)
+	{
+		for (int i=0; i<MAX_PITCH; i++)
+			f->WriteFloat(me->freq[i]);
+	}
+};
+
 class FileChunkSynthesizer : public FileChunk<Track,Synthesizer>
 {
 public:
-	FileChunkSynthesizer() : FileChunk<Track,Synthesizer>("synth"){}
+	FileChunkSynthesizer() : FileChunk<Track,Synthesizer>("synth")
+	{
+		add_child(new FileChunkSynthesizerTuning);
+	}
 	virtual void create(){}
 	virtual void read(File *f)
 	{
@@ -736,6 +757,11 @@ public:
 		f->WriteStr(me->configToString());
 		f->WriteStr("");
 		f->WriteInt(0); // reserved
+	}
+	virtual void write_subs()
+	{
+		if (!me->tuning.is_default())
+			write_sub("tuning", &me->tuning);
 	}
 };
 
@@ -894,8 +920,8 @@ public:
 		write_sub_parray("effect", me->fx);
 		write_sub_array("marker", me->markers);
 		if ((me->type == me->TYPE_TIME) or (me->type == me->TYPE_MIDI))
-		if (me->synth->name != "Dummy")
-			write_sub("synth", me->synth);
+			if (!me->synth->isDefault())
+				write_sub("synth", me->synth);
 		if (me->midi.num > 0)
 			write_sub("midi", &me->midi);
 	}

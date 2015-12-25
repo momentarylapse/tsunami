@@ -18,12 +18,16 @@ class MidiSource;
 class PluginManager;
 class DetuneSynthesizerDialog;
 class ActionTrackDetuneSynthesizer;
+class FileChunkSynthesizer;
+class FileChunkSynthesizerTuning;
 
 class Synthesizer : public Configurable
 {
 	friend class PluginManager;
 	friend class DetuneSynthesizerDialog;
 	friend class ActionTrackDetuneSynthesizer;
+	friend class FileChunkSynthesizer;
+	friend class FileChunkSynthesizerTuning;
 public:
 	Synthesizer();
 	virtual ~Synthesizer();
@@ -50,6 +54,8 @@ public:
 
 	bool hasEnded();
 	bool auto_stop;
+
+	bool isDefault();
 
 protected:
 

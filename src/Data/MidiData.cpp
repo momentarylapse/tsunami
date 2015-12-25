@@ -15,6 +15,11 @@ float pitch_to_freq(float pitch)
 	return 440.0f * pow(2, (pitch - 69.0f) / 12.0f);
 }
 
+float freq_to_pitch(float freq)
+{
+	return log2(freq / 440.0f) * 12.0f + 69.0f;
+}
+
 
 // "scientific" notation
 //   naive MIDI octave is off by 1

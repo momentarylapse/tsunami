@@ -8,6 +8,7 @@
 #include "SynthConsole.h"
 #include "../AudioView.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
+#include "../Dialog/DetuneSynthesizerDialog.h"
 #include "../../Data/Track.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Plugins/ConfigPanel.h"
@@ -79,7 +80,8 @@ public:
 		if (message == o->MESSAGE_CHANGE){
 			track->editSynthesizer(old_param);
 		}
-		p->update();
+		if (p)
+			p->update();
 		old_param = synth->configToString();
 	}
 	Track *track;
@@ -98,12 +100,18 @@ SynthConsole::SynthConsole(AudioView *_view) :
 	addGrid("!expandy", 0, 0, 1, 2, "outer");
 	setTarget("outer", 0);
 	addGroup(_("Bearbeiten"), 0, 1, 0, 0, "sc_group_edit");
-	addGrid("!expandy", 0, 0, 3, 1, id_inner);
+	addGrid("!expandy", 0, 0, 1, 3, id_inner);
 	setTarget(id_inner, 0);
 
-	addButton("!expandx,flat", 0, 2, 0, 0, "select");
+	addGrid("", 0, 2, 2, 1, "button_grid");
+	setTarget("button_grid", 0);
+	addButton("!expandx,flat", 0, 0, 0, 0, "select");
 	setImage("select", "hui:open");
 	setTooltip("select", _("Synthesizer w&ahlen"));
+
+	addButton("!noexpandx,flat", 1, 0, 0, 0, "detune");
+	setImage("detune", "hui:properties");
+	setTooltip("detune", _("Verstimmen"));
 
 	setTarget("sc_group_edit", 0);
 	addGrid("", 0, 0, 2, 1, "edit_button_grid");
@@ -112,6 +120,7 @@ SynthConsole::SynthConsole(AudioView *_view) :
 	addButton(_("Spur"), 1, 0, 0, 0, "edit_track");
 
 	event("select", this, &SynthConsole::onSelect);
+	event("detune", this, &SynthConsole::onDetune);
 
 	event("edit_song", this, &SynthConsole::onEditSong);
 	event("edit_track", this, &SynthConsole::onEditTrack);
@@ -139,6 +148,12 @@ void SynthConsole::onSelect()
 	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
+}
+
+void SynthConsole::onDetune()
+{
+	HuiDialog *dlg = new DetuneSynthesizerDialog(track->synth, track, win);
+	dlg->show();
 }
 
 void SynthConsole::onEditSong()

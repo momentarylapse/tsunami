@@ -79,6 +79,7 @@ MidiNoteData midi_events_to_notes(const MidiRawData &events);
 
 
 float pitch_to_freq(float pitch);
+float freq_to_pitch(float freq);
 int pitch_get_octave(int pitch);
 int pitch_from_octave_and_rel(int rel, int octave);
 int pitch_to_rel(int pitch);

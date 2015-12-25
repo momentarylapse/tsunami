@@ -54,6 +54,7 @@ OBJ = \
  Action/Track/Sample/ActionTrackMoveSample.o\
  Action/Track/Sample/ActionTrackPasteAsSample.o\
  Action/Track/Sample/ActionTrackSampleFromSelection.o\
+ Action/Track/Synthesizer/ActionTrackDetuneSynthesizer.o\
  Action/Track/Synthesizer/ActionTrackEditSynthesizer.o\
  Action/Track/Synthesizer/ActionTrackSetSynthesizer.o\
  Action/Track/ActionTrack__DeleteEmpty.o\
@@ -235,6 +236,7 @@ OBJ = \
  View/Dialog/BarAddDialog.o\
  View/Dialog/BarEditDialog.o\
  View/Dialog/CaptureDialog.o\
+ View/Dialog/DetuneSynthesizerDialog.o\
  View/Dialog/MarkerDialog.o\
  View/Dialog/NewDialog.o\
  View/Dialog/RecordDialog.o\
@@ -430,6 +432,9 @@ Action/Track/Sample/ActionTrackPasteAsSample.o : Action/Track/Sample/ActionTrack
 
 Action/Track/Sample/ActionTrackSampleFromSelection.o : Action/Track/Sample/ActionTrackSampleFromSelection.cpp
 	$(CPP) -c Action/Track/Sample/ActionTrackSampleFromSelection.cpp -o $@ $(CXXFLAGS)
+
+Action/Track/Synthesizer/ActionTrackDetuneSynthesizer.o : Action/Track/Synthesizer/ActionTrackDetuneSynthesizer.cpp
+	$(CPP) -c Action/Track/Synthesizer/ActionTrackDetuneSynthesizer.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Synthesizer/ActionTrackEditSynthesizer.o : Action/Track/Synthesizer/ActionTrackEditSynthesizer.cpp
 	$(CPP) -c Action/Track/Synthesizer/ActionTrackEditSynthesizer.cpp -o $@ $(CXXFLAGS)
@@ -970,6 +975,9 @@ View/Dialog/BarEditDialog.o : View/Dialog/BarEditDialog.cpp
 
 View/Dialog/CaptureDialog.o : View/Dialog/CaptureDialog.cpp
 	$(CPP) -c View/Dialog/CaptureDialog.cpp -o $@ $(CXXFLAGS)
+
+View/Dialog/DetuneSynthesizerDialog.o : View/Dialog/DetuneSynthesizerDialog.cpp
+	$(CPP) -c View/Dialog/DetuneSynthesizerDialog.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/MarkerDialog.o : View/Dialog/MarkerDialog.cpp
 	$(CPP) -c View/Dialog/MarkerDialog.cpp -o $@ $(CXXFLAGS)

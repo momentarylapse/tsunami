@@ -17,7 +17,6 @@ class ActionTrackSetSynthesizer : public Action
 {
 public:
 	ActionTrackSetSynthesizer(Track *t, Synthesizer *synth);
-	virtual ~ActionTrackSetSynthesizer();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

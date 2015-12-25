@@ -24,6 +24,7 @@ public:
 	void setTrack(Track *t);
 
 	void onSelect();
+	void onDetune();
 
 	void onEditSong();
 	void onEditTrack();

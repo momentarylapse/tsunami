@@ -16,8 +16,6 @@
 #include "../../lib/math/math.h"
 
 
-const int MANY_SAMPLES = 0x60000000;
-
 Synthesizer::Synthesizer() :
 	Configurable("Synthesizer", TYPE_SYNTHESIZER)
 {
@@ -26,9 +24,7 @@ Synthesizer::Synthesizer() :
 	auto_stop = true;
 	locked = false;
 
-	for (int p=0; p<MAX_PITCH; p++)
-		freq[p] = pitch_to_freq(p);
-
+	tuning.set_default();
 
 	setSampleRate(DEFAULT_SAMPLE_RATE);
 }
@@ -47,6 +43,20 @@ void Synthesizer::__delete__()
 	this->Configurable::~Configurable();
 }
 
+void Synthesizer::Tuning::set_default()
+{
+	for (int p=0; p<MAX_PITCH; p++)
+		freq[p] = pitch_to_freq(p);
+}
+
+bool Synthesizer::Tuning::is_default()
+{
+	for (int p=0; p<MAX_PITCH; p++)
+		if (fabs(freq[p] - pitch_to_freq(p)) > 0.1f)
+			return false;
+	return true;
+}
+
 void Synthesizer::setSampleRate(int _sample_rate)
 {
 	//if (_sample_rate == sample_rate)
@@ -60,7 +70,7 @@ void Synthesizer::setSampleRate(int _sample_rate)
 void Synthesizer::update_delta_phi()
 {
 	for (int p=0; p<MAX_PITCH; p++)
-		delta_phi[p] = freq[p] * 2.0f * pi / sample_rate;
+		delta_phi[p] = tuning.freq[p] * 2.0f * pi / sample_rate;
 }
 
 void Synthesizer::lock()

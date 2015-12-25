@@ -25,6 +25,7 @@
 #include "../Action/Track/Sample/ActionTrackEditSample.h"
 #include "../Action/Track/Synthesizer/ActionTrackSetSynthesizer.h"
 #include "../Action/Track/Synthesizer/ActionTrackEditSynthesizer.h"
+#include "../Action/Track/Synthesizer/ActionTrackDetuneSynthesizer.h"
 #include "../Action/Track/Effect/ActionTrackAddEffect.h"
 #include "../Action/Track/Effect/ActionTrackDeleteEffect.h"
 #include "../Action/Track/Effect/ActionTrackEditEffect.h"
@@ -350,6 +351,11 @@ void Track::setSynthesizer(Synthesizer *_synth)
 void Track::editSynthesizer(const string &param_old)
 {
 	song->execute(new ActionTrackEditSynthesizer(this, param_old));
+}
+
+void Track::detuneSynthesizer(int pitch, float dpitch, bool all_octaves)
+{
+	song->execute(new ActionTrackDetuneSynthesizer(this, pitch, dpitch, all_octaves));
 }
 
 void Track::addMarker(int pos, const string &text)

@@ -93,6 +93,7 @@ public:
 	void _cdecl deleteMidiNote(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
+	void _cdecl detuneSynthesizer(int pitch, float dpitch, bool all_octaves);
 	void _cdecl addMarker(int pos, const string &text);
 	void _cdecl deleteMarker(int id);
 	void _cdecl moveMarker(int id, int pos);

@@ -16,10 +16,14 @@ class Range;
 class BufferBox;
 class MidiSource;
 class PluginManager;
+class DetuneSynthesizerDialog;
+class ActionTrackDetuneSynthesizer;
 
 class Synthesizer : public Configurable
 {
 	friend class PluginManager;
+	friend class DetuneSynthesizerDialog;
+	friend class ActionTrackDetuneSynthesizer;
 public:
 	Synthesizer();
 	virtual ~Synthesizer();
@@ -57,7 +61,12 @@ protected:
 	Array<int> delete_me;
 	void enablePitch(int pitch, bool enable);
 
-	float freq[MAX_PITCH];
+	struct Tuning
+	{
+		float freq[MAX_PITCH];
+		void set_default();
+		bool is_default();
+	}tuning;
 	float delta_phi[MAX_PITCH];
 
 	void lock();

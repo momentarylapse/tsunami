@@ -185,7 +185,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Synthesizer", "events", _offsetof(Synthesizer, events));
 	Script::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
 	Script::DeclareClassOffset("Synthesizer", "active_pitch", _offsetof(Synthesizer, active_pitch));
-	Script::DeclareClassOffset("Synthesizer", "freq", _offsetof(Synthesizer, freq));
+	Script::DeclareClassOffset("Synthesizer", "freq", _offsetof(Synthesizer, tuning.freq));
 	Script::DeclareClassOffset("Synthesizer", "delta_phi", _offsetof(Synthesizer, delta_phi));
 	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
 	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);

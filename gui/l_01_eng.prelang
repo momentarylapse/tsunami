@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-287
+291
 // Data (ID,Text)
 about
 Info
@@ -33,6 +33,8 @@ add_track
 Add empty track
 afd_grid_1
 !expandy\\
+all_octaves
+all octaves
 bad_buttonbar
 !buttonbar\\
 bad_t_beats
@@ -135,6 +137,12 @@ delete_tag
 !flat\\
 delete_track
 Delete
+detune_area
+!expandx,expandy\\
+detune_synth_dialog_buttonbar
+!buttonbar\\
+detune_synthesizer_dialog
+Detune
 dummy_favorite_dialog
 Effect
 edit_bars
@@ -427,9 +435,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_286847
+rand_id_404852
 
-rand_id_797083
+rand_id_469201
 
 rdt_capture
 Recording
@@ -578,7 +586,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-164
+165
 // Data (ID,Text)
 
 
@@ -832,6 +840,8 @@ Unbenannt
 No name
 Vermindert
 Diminished
+Verstimmen
+Detune
 Vorschau
 Preview
 Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre

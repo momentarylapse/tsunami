@@ -15,10 +15,6 @@ ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_syn
 	synth = _synth;
 }
 
-ActionTrackSetSynthesizer::~ActionTrackSetSynthesizer()
-{
-}
-
 void ActionTrackSetSynthesizer::undo(Data *d)
 {
 	execute(d);

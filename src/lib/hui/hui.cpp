@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.12.2";
+string HuiVersion = "0.5.12.3";
 
 #include <stdio.h>
 #include <signal.h>
@@ -319,7 +319,7 @@ void HuiInit(const string &program, bool load_res, const string &def_lang)
 		HuiAppDirectoryStatic = HuiAppDirectory;
 		if (HuiArgument.num > 0){
 			HuiAppFilename = HuiArgument[0];
-			if (HuiArgument[0].head(5) == "/usr/"){
+			if ((HuiArgument[0].head(5) == "/usr/") or (HuiArgument[0].find("/") < 0)){
 				// installed version?
 				HuiAppFilename = HuiArgument[0];
 				HuiAppDirectory = format("%s/.%s/", getenv("HOME"), program.c_str());

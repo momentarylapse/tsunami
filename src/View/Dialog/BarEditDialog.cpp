@@ -19,11 +19,13 @@ BarEditDialog::BarEditDialog(HuiWindow *root, Song *_song, Array<int> &_s, bool 
 	BarPattern &b = song->bars[sel[0]];
 	setInt("beats", b.num_beats);
 	setFloat("bpm", song->sample_rate * 60.0f / (b.length / b.num_beats));
-	check("edit_bpm", true);
+	//check("edit_bpm", true);
 
 	event("ok", this, &BarEditDialog::onOk);
 	event("cancel", this, &BarEditDialog::onClose);
 	event("hui:close", this, &BarEditDialog::onClose);
+	event("beats", this, &BarEditDialog::onBeats);
+	event("bpm", this, &BarEditDialog::onBpm);
 }
 
 void BarEditDialog::onOk()
@@ -49,4 +51,14 @@ void BarEditDialog::onOk()
 void BarEditDialog::onClose()
 {
 	delete(this);
+}
+
+void BarEditDialog::onBeats()
+{
+	check("edit_beats", true);
+}
+
+void BarEditDialog::onBpm()
+{
+	check("edit_bpm", true);
 }

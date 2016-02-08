@@ -48,7 +48,7 @@ class DrumList
 		if n < 0
 			if sets.num > 0
 				n = 0
-				logging.warning("Drumset not found: '" + name + "', using '" + sets[0].name + "' instead")
+				logging.warn("Drumset not found: '" + name + "', using '" + sets[0].name + "' instead")
 			else
 				logging.error("Drumset not found: '" + name + "' (none found)")
 				return nil
@@ -82,6 +82,7 @@ class DrumsetSynthesizer : Synthesizer
 			state.s.onConfig()
 	overwrite void render(BufferBox buf)
 		Synthesizer *s = state.s
+		print s
 		if !s
 			return
 		s.events = events

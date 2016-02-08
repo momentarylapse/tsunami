@@ -16,12 +16,19 @@ BarAddDialog::BarAddDialog(HuiWindow *root, Song *_s, int _index, bool _apply_to
 	index = _index;
 	apply_to_midi = _apply_to_midi;
 
+	// no reference bar selected -> use last bar
+	int ref = index;
+	if (ref < 0)
+		ref = song->bars.num;
+
 	setInt("count", 1);
 	int beats = 4;
 	float bpm = 90.0f;
+
+	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
 		foreachi(BarPattern &b, song->bars, i)
-			if ((i <= index) and (b.num_beats > 0)){
+			if ((i <= ref) and (b.num_beats > 0)){
 				beats = b.num_beats;
 				bpm = song->sample_rate * 60.0f / (b.length / b.num_beats);
 			}

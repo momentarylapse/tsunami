@@ -22,6 +22,8 @@ public:
 	BarEditDialog(HuiWindow *root, Song *song, Array<int> &s, bool apply_to_midi);
 	void onOk();
 	void onClose();
+	void onBeats();
+	void onBpm();
 };
 
 #endif /* SRC_VIEW_DIALOG_BAREDITDIALOG_H_ */

@@ -15,7 +15,7 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.29.0";
+string AppVersion = "0.6.29.1";
 
 Tsunami *tsunami = NULL;
 
@@ -36,7 +36,7 @@ Tsunami::Tsunami() :
 	HuiSetProperty("version", AppVersion);
 	HuiSetProperty("comment", _("Editor f&ur Audio Dateien"));
 	HuiSetProperty("website", "http://michi.is-a-geek.org/software");
-	HuiSetProperty("copyright", "© 2007-2015 by Michael Ankele");
+	HuiSetProperty("copyright", "© 2007-2016 by Michael Ankele");
 	HuiSetProperty("author", "Michael Ankele <michi@lupina.de>");
 }
 

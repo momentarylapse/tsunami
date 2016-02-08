@@ -25,7 +25,7 @@ public:
 	int sample_offset;
 	Array<int> barrier;
 	Track *show_track_controls;
-	int pitch, note_start;
+	int pitch;
 	int index;
 
 	enum

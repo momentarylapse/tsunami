@@ -85,12 +85,12 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 
 	tsunami->plugin_manager->context.set(t, 0, r);
 
-	MidiNoteData midi = t->midi.getNotes(r);
+	MidiNoteData midi = t->midi.getNotesSafe(r);
 
 	t->song->action_manager->beginActionGroup();
 
 	foreachib(MidiNote &n, t->midi, i)
-		if (r.overlaps(n.range)){
+		if (r.is_inside(n.range.center())){
 			t->deleteMidiNote(i);
 			_foreach_it_.update(); // TODO...
 		}

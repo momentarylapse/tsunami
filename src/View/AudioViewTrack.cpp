@@ -307,10 +307,15 @@ int get_score_position(int pitch, int clef, bool &sharp)
 
 	const int pp[12] = {0,0,1,1,2,3,3,4,4,5,5,6};
 	const bool ss[12] = {false,true,false,true,false,false,true,false,true,false,true,false};
-	const int clef_offset[4] = {5*7, 4*7, 2 + 3*7, 2 + 2*7};
+	const int clef_offset[4] = {5*7, 4*7, 3*7+2, 2*7+2};
 
 	sharp = ss[rel];
-	return pp[rel] + 7 * octave + 1 - clef_offset[clef];
+	return pp[rel] + 7 * octave + 5 - clef_offset[clef];
+}
+
+float clef_pos_to_screen(int pos, rect &area, float dy)
+{
+	return area.y2 - area.height() / 2 - (pos - 4) * dy / 2;
 }
 
 void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int shift)
@@ -324,19 +329,21 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 
 	// clef lines
 	float dy = area.height() / 13;
-	for (int i=-4; i<6; i+=2){
-		float y = area.y2 - area.height() / 2 - i * dy / 2;
+	for (int i=0; i<10; i+=2){
+		float y = clef_pos_to_screen(i, area, dy);
 		c->drawLine(area.x1, y, area.x2, y);
 	}
-
-	if ((clef == CLEF_TYPE_VIOLIN) or (clef == CLEF_TYPE_VIOLIN_8))
-		c->drawStr(10, (area.y1 + area.y2)/2, "$");
-	else
-		c->drawStr(10, (area.y1 + area.y2)/2, "C");
-	if ((clef == CLEF_TYPE_VIOLIN_8) or (clef == CLEF_TYPE_BASS_8))
-		c->drawStr(10, area.y2 - area.height()/6, "8 basso");
-
 	c->setAntialiasing(true);
+
+	c->setFontSize(dy*4);
+	if ((clef == CLEF_TYPE_TREBLE) or (clef == CLEF_TYPE_TREBLE_8))
+		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄞"); // \uD834\uDD1E
+	else
+		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄢"); // \uD834\uDD22
+	c->setFontSize(view->FONT_SIZE);
+	if ((clef == CLEF_TYPE_TREBLE_8) or (clef == CLEF_TYPE_BASS_8))
+		c->drawStr(10+dy, clef_pos_to_screen(-2, area, dy), "8");
+
 	foreach(MidiNote &n, notes){
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
@@ -347,22 +354,22 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 		bool sharp;
 		int p = get_score_position(n.pitch, clef, sharp);
 
-		float y = area.y2 - area.height() / 2 - p * dy / 2;
+		float y = clef_pos_to_screen(p, area, dy);
 
 		// auxiliary lines
-		for (int i=6; i<p; i+=2){
+		for (int i=10; i<p; i+=2){
 			c->setColor(view->colors.text_soft1);
-			float y = area.y2 - area.height() / 2 - i * dy / 2;
+			float y = clef_pos_to_screen(i, area, dy);
 			c->drawLine(x - dy, y, x + dy, y);
 		}
-		for (int i=-4; i>=p; i-=2){
+		for (int i=-2; i>=p; i-=2){
 			c->setColor(view->colors.text_soft1);
-			float y = area.y2 - area.height() / 2 - i * dy / 2;
+			float y = clef_pos_to_screen(i, area, dy);
 			c->drawLine(x - dy, y, x + dy, y);
 		}
 
 
-		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.5f);
+		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
 
 		// "shadow" to indicate length
 		if (x2 - x1 > dy * 2){

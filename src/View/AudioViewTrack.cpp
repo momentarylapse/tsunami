@@ -241,12 +241,12 @@ void AudioViewTrack::drawMarker(HuiPainter *c, const TrackMarker &marker, int in
 
 void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift)
 {
-	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
-		drawMidiScore(c, midi, shift);
+	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
+		drawMidiDefault(c, midi, shift);
 	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->tuning.num > 0))
 		drawMidiTab(c, midi, shift);
-	else
-		drawMidiDefault(c, midi, shift);
+	else // if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+		drawMidiScore(c, midi, shift);
 }
 
 void AudioViewTrack::drawMidiDefault(HuiPainter *c, const MidiNoteData &midi, int shift)
@@ -282,22 +282,56 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 	Range range = view->cam.range() - shift;
 	Array<MidiNote> notes = midi.getNotes(range);
 
+
+
+	c->setColor(view->colors.text);
+
+	// clef lines
+	float h = area.height() * 0.7f;
+	float dy = h / track->tuning.num;
+	float y0 = area.y2 - (area.height() - h) / 2 - dy/2;
+	for (int i=0; i<track->tuning.num; i++){
+		float y = y0 - i*dy;
+		c->drawLine(area.x1, y, area.x2, y);
+	}
+	c->setAntialiasing(true);
+
+	c->setFontSize(h / 6);
+	c->drawStr(10, area.y1 + area.height() * 0.22f, "T\nA\nB");
+	c->setFontSize(dy * 0.8f);
+
 	foreach(MidiNote &n, notes){
-		int stringno, position;
-		get_tab(stringno, position, n.pitch, track->tuning);
-		c->setColor(getPitchColor(n.pitch));
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
 		x2 = max(x2, x1 + 4);
-		float y1 = area.y2 - area.height() * (stringno + 1) / track->tuning.num;
-		float y2 = area.y2 - area.height() * stringno / track->tuning.num;
-		c->drawRect(rect(x1, x2, y1, y2));
+		float x = x1 + dy / 2;
 
-		if (x2 - x1 > 15){
-			c->setColor(view->colors.text_soft1);
-			c->drawStr(x1 + 1, (y1 + y2) / 2 - 10, i2s(position));
+		int stringno, position;
+		get_tab(stringno, position, n.pitch, track->tuning);
+
+		float y = y0 - stringno * dy;
+
+		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
+
+		// "shadow" to indicate length
+		if (x2 - x1 > dy){
+			color col2 = col;
+			col2.a *= 0.4f;
+			c->setColor(col2);
+			c->drawRect(x, y - dy/2, x2 - x1 - dy*3/4, dy);
 		}
+
+		// the note circle
+		c->setColor(col);
+		c->drawCircle(x, y, dy / 2);
+		if (x2 - x1 > dy/2){
+			c->setColor(view->colors.text);
+			c->drawStr(x1 + 1, y - dy * 0.60f, i2s(position));
+		}
+
 	}
+	c->setAntialiasing(false);
+	c->setFontSize(view->FONT_SIZE);
 }
 
 int get_score_position(int pitch, int clef, bool &sharp)
@@ -372,7 +406,7 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
 
 		// "shadow" to indicate length
-		if (x2 - x1 > dy * 2){
+		if (x2 - x1 > dy){
 			color col2 = col;
 			col2.a *= 0.4f;
 			c->setColor(col2);

@@ -118,7 +118,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	input = NULL;
 
 	edit_multi = false;
-	midi_view_mode = HuiConfig.getInt("View.MidiMode", VIEW_MIDI_DEFAULT);
+	midi_view_mode = HuiConfig.getInt("View.MidiMode", VIEW_MIDI_SCORE);
 
 	// modes
 	mode = NULL;

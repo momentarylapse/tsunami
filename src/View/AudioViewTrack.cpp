@@ -322,6 +322,7 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 		}
 
 		// the note circle
+		col.a *= 0.4f;
 		c->setColor(col);
 		c->drawCircle(x, y, dy / 2);
 		if (x2 - x1 > dy/2){

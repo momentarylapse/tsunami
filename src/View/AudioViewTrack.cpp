@@ -337,6 +337,48 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 
 int get_score_position(int pitch, int clef, bool &sharp)
 {
+	if (clef == CLEF_TYPE_DRUMS){
+		sharp = false;
+		/*if (pitch == 35)	return "bass      (akk)";
+		if (pitch == 36)	return "bass";
+		if (pitch == 37)	return "side stick";
+		if (pitch == 38)	return "snare";
+		if (pitch == 39)	return "clap";
+		if (pitch == 40)	return "snare     (electronic)";
+		if (pitch == 41)	return "tom - floor low";
+		if (pitch == 42)	return "hihat - closed";
+		if (pitch == 43)	return "tom - floor hi";
+		if (pitch == 44)	return "hihat - pedal";
+		if (pitch == 45)	return "tom - low";
+		if (pitch == 46)	return "hihat - open";
+		if (pitch == 47)	return "tom - low mid";
+		if (pitch == 48)	return "tom - hi mid";
+		if (pitch == 49)	return "crash 1";
+		if (pitch == 50)	return "tom - hi";
+		if (pitch == 51)	return "ride 1";
+		if (pitch == 52)	return "chinese";
+		if (pitch == 53)	return "bell ride";
+		if (pitch == 54)	return "tambourine";
+		if (pitch == 55)	return "splash";
+		if (pitch == 56)	return "cowbell";
+		if (pitch == 57)	return "crash 2";
+		if (pitch == 58)	return "vibraslash?";
+		if (pitch == 59)	return "ride 2";
+		if (pitch == 60)	return "bongo - hi";
+		if (pitch == 61)	return "bongo - low";*/
+		if ((pitch == 35) or (pitch == 36)) // bass
+			return 1;
+		if ((pitch == 38) or (pitch == 40)) // snare
+			return 5;
+		if ((pitch == 48) or (pitch == 50)) // tom hi
+			return 9;
+		if ((pitch == 45) or (pitch == 47)) // tom mid
+			return 8;
+		if ((pitch == 41) or (pitch == 43)) // tom floor
+			return 3;
+		sharp = true;
+		return 0;
+	}
 	int octave = pitch_get_octave(pitch);
 	int rel = pitch_to_rel(pitch);
 
@@ -371,7 +413,9 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 	c->setAntialiasing(true);
 
 	c->setFontSize(dy*4);
-	if ((clef == CLEF_TYPE_TREBLE) or (clef == CLEF_TYPE_TREBLE_8))
+	if (clef == CLEF_TYPE_DRUMS)
+		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄥");
+	else if ((clef == CLEF_TYPE_TREBLE) or (clef == CLEF_TYPE_TREBLE_8))
 		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄞"); // \uD834\uDD1E
 	else
 		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄢"); // \uD834\uDD22

@@ -196,6 +196,8 @@ Array<Instrument> Instrument::enumerate()
 
 int Instrument::get_clef()
 {
+	if (type == TYPE_DRUMS)
+		return CLEF_TYPE_DRUMS;
 	if ((type == TYPE_ELECTRIC_GUITAR) or (type == TYPE_GUITAR))
 		return CLEF_TYPE_TREBLE_8;
 	if (type == TYPE_CELLO)

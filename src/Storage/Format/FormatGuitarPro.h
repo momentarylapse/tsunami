@@ -41,6 +41,14 @@ public:
 	Array<GpMeasure> measures;
 	int tempo;
 
+	struct GpChannel
+	{
+		int instrument;
+		int volume;
+		int balance;
+	};
+	GpChannel channels[64];
+
 	Song *a;
 	File *f;
 	StorageOperationData *od;
@@ -52,7 +60,6 @@ public:
 	void read_page_setup();
 	void read_measure_header();
 	void read_track();
-	void read_channel();
 	void read_measure(GpMeasure &m, GpTrack &t, int offset);
 	int read_beat(GpTrack &t, GpMeasure &m, int start);
 	void read_beat_fx();
@@ -68,8 +75,7 @@ public:
 	void write_eq();
 	void write_page_setup();
 	void write_measure_header(Bar &b);
-	void write_track(Track *t);
-	void write_channel();
+	void write_track(Track *t, int index);
 	void write_measure(Track *t, Bar &b);
 	void write_beat(Array<int> &pitch, Array<int> &string, int length);
 	void write_beat_fx();

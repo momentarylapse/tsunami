@@ -152,8 +152,8 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 	f->WriteInt(tracks.num);
 	foreach(Bar &b, bars)
 		write_measure_header(b);
-	foreach(Track *t, tracks)
-		write_track(t);
+	foreachi(Track *t, tracks, i)
+		write_track(t, i);
 
 	if (version >= 500)
 		f->WriteByte(0);
@@ -328,9 +328,9 @@ void FormatGuitarPro::write_lyrics()
 void FormatGuitarPro::read_channels()
 {
 	for (int i = 0; i < 64; i++) {
-		f->ReadInt(); // program
-		f->ReadByte(); // volume
-		f->ReadByte(); // balance
+		channels[i].instrument = f->ReadInt(); // program
+		channels[i].volume = f->ReadByte(); // volume
+		channels[i].balance = f->ReadByte(); // balance
 		f->ReadByte(); // chorus
 		f->ReadByte(); // reverb
 		f->ReadByte(); // phaser
@@ -343,7 +343,10 @@ void FormatGuitarPro::read_channels()
 void FormatGuitarPro::write_channels()
 {
 	for (int i = 0; i < 64; i++) {
-		f->WriteInt(0); // program
+		int instrument = 0;
+		if (i < a->tracks.num)
+			instrument = a->tracks[i]->instrument.midi_no();
+		f->WriteInt(instrument); // program
 		f->WriteByte(100); // volume
 		f->WriteByte(0); // balance
 		f->WriteByte(0); // chorus
@@ -468,10 +471,20 @@ void FormatGuitarPro::read_track()
 		int tuning = f->ReadInt(); // tuning
 		tt.tuning.add(tuning);
 	}
-	msg_write("tuning: " + ia2s(tt.tuning));
 	tracks.add(tt);
-	f->ReadInt();
-	read_channel();
+	int port = f->ReadInt();
+	int channel = f->ReadInt();
+	int channel_fx = f->ReadInt();
+	Instrument instrument = Instrument(Instrument::TYPE_DRUMS);
+	if (channel != 10)
+		instrument.set_midi_no(channels[(port-1) * 16 + (channel-1)].instrument);
+
+	Array<int> tuning_rev = tt.tuning;
+	tuning_rev.reverse();
+	for (int i=tuning_rev.num-1; i>=0; i--)
+		if (tuning_rev[i] <= 0)
+			tuning_rev.erase(i);
+	tt.t->setInstrument(instrument, tuning_rev);
 	f->ReadInt();
 	f->ReadInt(); // offset
 	f->ReadInt(); // color
@@ -484,7 +497,7 @@ void FormatGuitarPro::read_track()
 		f->SetPos(45, false);
 }
 
-void FormatGuitarPro::write_track(Track *t)
+void FormatGuitarPro::write_track(Track *t, int index)
 {
 	msg_db_f("track", 1);
 	f->WriteByte(0);
@@ -497,7 +510,13 @@ void FormatGuitarPro::write_track(Track *t)
 	f->WriteInt(0);
 
 	f->WriteInt(1);
-	write_channel();
+	if (t->instrument.type == Instrument::TYPE_DRUMS){
+		f->WriteInt(1);
+		f->WriteInt(10);
+	}else{
+		f->WriteInt((index / 16) + 1);
+		f->WriteInt((index % 16) + 1);
+	}
 	f->WriteInt(24);
 	f->WriteInt(0); // offset
 	f->WriteInt(0); // color
@@ -508,18 +527,6 @@ void FormatGuitarPro::write_track(Track *t)
 	}
 	if (version == 500)
 		f->SetPos(45, false);
-}
-
-void FormatGuitarPro::read_channel()
-{
-	f->ReadInt();
-	f->ReadInt();
-}
-
-void FormatGuitarPro::write_channel()
-{
-	f->WriteInt(1);
-	f->WriteInt(2);
 }
 
 void FormatGuitarPro::read_measure(GpMeasure &m, GpTrack &t, int offset)

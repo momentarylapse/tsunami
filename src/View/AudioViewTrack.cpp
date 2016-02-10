@@ -324,7 +324,10 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 		// the note circle
 		col.a *= 0.4f;
 		c->setColor(col);
-		c->drawCircle(x, y, dy / 2);
+		if (x2 - x1 > 10)
+			c->drawCircle(x, y, dy / 2);
+		else
+			c->drawRect(x - dy/2, y - dy/2, dy, dy);
 		if (x2 - x1 > dy/2){
 			c->setColor(view->colors.text);
 			c->drawStr(x1 + 1, y - dy * 0.60f, i2s(position));
@@ -462,7 +465,10 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 		c->setColor(col);
 		if (sharp)
 			c->drawStr(x - 15, y - 8, "#");
-		c->drawCircle(x, y, dy / 2);
+		if (x2 - x1 > 10)
+			c->drawCircle(x, y, dy / 2);
+		else
+			c->drawRect(x - dy/2, y - dy/2, dy, dy);
 	}
 	c->setAntialiasing(false);
 }

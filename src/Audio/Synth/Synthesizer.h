@@ -11,6 +11,7 @@
 #include "../../lib/base/base.h"
 #include "../../Plugins/Configurable.h"
 #include "../../Data/MidiData.h"
+#include "../../Data/Instrument.h"
 
 class Range;
 class BufferBox;
@@ -41,6 +42,8 @@ public:
 
 	void update_delta_phi();
 
+	void setInstrument(Instrument &i);
+
 	int keep_notes;
 
 	virtual int read(BufferBox &buf);
@@ -58,6 +61,8 @@ public:
 	bool isDefault();
 
 protected:
+
+	Instrument instrument;
 
 	MidiSource *source;
 

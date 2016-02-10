@@ -488,7 +488,7 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, boo
 		PluginData *c = track->synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];
 	}
-	bool is_drum = ((track->synth) and (track->synth->name == "Drumset"));
+	bool is_drum = (track->instrument.type == Instrument::TYPE_DRUMS);
 	for (int i=pitch_min; i<pitch_max; i++){
 		c->setColor(cc);
 		if (((hover->type == Selection::TYPE_MIDI_PITCH) or (hover->type == Selection::TYPE_MIDI_NOTE)) and (i == hover->pitch))

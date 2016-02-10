@@ -34,6 +34,8 @@ public:
 	};
 
 	State state;
+
+	void _set_drum(int no, float freq, float volume, float attack, float release);
 };
 
 #endif /* DUMMYSYNTHESIZER_H_ */

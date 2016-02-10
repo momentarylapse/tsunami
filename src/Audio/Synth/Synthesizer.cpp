@@ -23,6 +23,7 @@ Synthesizer::Synthesizer() :
 	keep_notes = 0;
 	auto_stop = true;
 	locked = false;
+	instrument = Instrument(Instrument::TYPE_PIANO);
 
 	tuning.set_default();
 
@@ -71,6 +72,12 @@ void Synthesizer::update_delta_phi()
 {
 	for (int p=0; p<MAX_PITCH; p++)
 		delta_phi[p] = tuning.freq[p] * 2.0f * pi / sample_rate;
+}
+
+void Synthesizer::setInstrument(Instrument &i)
+{
+	instrument = i;
+	onConfig();
 }
 
 void Synthesizer::lock()

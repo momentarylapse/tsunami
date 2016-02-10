@@ -84,6 +84,7 @@ public:
 	void onViewPeaksBoth();
 	void onViewMidiDefault();
 	void onViewMidiTab();
+	void onViewMidiScore();
 	void onZoomIn();
 	void onZoomOut();
 	void onViewMono();

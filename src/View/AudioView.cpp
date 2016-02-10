@@ -118,7 +118,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	input = NULL;
 
 	edit_multi = false;
-	midi_view_mode = VIEW_MIDI_DEFAULT;
+	midi_view_mode = HuiConfig.getInt("View.MidiMode", VIEW_MIDI_DEFAULT);
 
 	// modes
 	mode = NULL;
@@ -232,6 +232,7 @@ AudioView::~AudioView()
 	HuiConfig.setInt("View.ScrollSpeedFast", ScrollSpeedFast);
 	HuiConfig.setFloat("View.ZoomSpeed", ZoomSpeed);
 	HuiConfig.setBool("View.Antialiasing", antialiasing);
+	HuiConfig.setInt("View.MidiMode", midi_view_mode);
 }
 
 void AudioView::setColorScheme(const string &name)
@@ -734,6 +735,7 @@ void AudioView::updateMenu()
 	win->check("view_peaks_both", peak_mode == BufferBox::PEAK_BOTH);
 	win->check("view_midi_default", midi_view_mode == VIEW_MIDI_DEFAULT);
 	win->check("view_midi_tab", midi_view_mode == VIEW_MIDI_TAB);
+	win->check("view_midi_score", midi_view_mode == VIEW_MIDI_SCORE);
 	win->enable("view_samples", false);
 }
 

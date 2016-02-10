@@ -131,6 +131,7 @@ public:
 	enum{
 		VIEW_MIDI_DEFAULT,
 		VIEW_MIDI_TAB,
+		VIEW_MIDI_SCORE,
 	};
 
 	bool edit_multi;

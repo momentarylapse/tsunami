@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-291
+292
 // Data (ID,Text)
 about
 Info
@@ -435,9 +435,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_404852
+rand_id_123967
 
-rand_id_469201
+rand_id_421276
 
 rdt_capture
 Recording
@@ -563,6 +563,8 @@ undo
 Undo
 view_midi_default
 Default
+view_midi_score
+Score
 view_midi_tab
 Tabulature
 view_mono

@@ -522,7 +522,8 @@ void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 			drawMidiEditable(c, song->tracks[t->reference_track]->midi, true, t->track, t->area);
 		drawMidiEditable(c, t->track->midi, false, t->track, t->area);
 	}else{
-		t->drawMidi(c, t->track->midi, 0);
+		if ((t->track->type == Track::TYPE_MIDI) or (t->track->midi.num > 0))
+			t->drawMidi(c, t->track->midi, 0);
 	}
 
 	// audio buffer

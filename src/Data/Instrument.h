@@ -44,6 +44,8 @@ public:
 
 	void set_midi_no(int no);
 
+	int get_clef();
+
 	static Array<Instrument> enumerate();
 };
 

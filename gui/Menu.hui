@@ -63,6 +63,7 @@ Menu menu "" disabled
 		Menu menu_view_midi "Midi"
 			Item view_midi_default "Standard" checkable
 			Item view_midi_tab "Tabulatur" checkable
+			Item view_midi_score "Klassisch" checkable
 		Item show_mixing_console "Mischpult" checkable
 		Item show_fx_console "Effekte" checkable
 		Separator "" ""

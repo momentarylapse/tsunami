@@ -7,6 +7,7 @@
 
 #include "../lib/hui/hui.h"
 #include "Instrument.h"
+#include "MidiData.h"
 
 Instrument::Instrument()
 {
@@ -116,6 +117,17 @@ Array<Instrument> Instrument::enumerate()
 	for (int i=0; i<NUM_TYPES; i++)
 		instruments.add(Instrument(i));
 	return instruments;
+}
+
+int Instrument::get_clef()
+{
+	if ((type == TYPE_ELECTRIC_GUITAR) or (type == TYPE_GUITAR))
+		return CLEF_TYPE_VIOLIN_8;
+	if (type == TYPE_CELLO)
+		return CLEF_TYPE_BASS;
+	if ((type == TYPE_ELECTRIC_BASS) or (type == TYPE_DOUBLE_BASS))
+		return CLEF_TYPE_BASS_8;
+	return CLEF_TYPE_VIOLIN;
 }
 
 bool Instrument::operator==(const Instrument &i) const

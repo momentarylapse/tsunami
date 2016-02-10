@@ -300,7 +300,8 @@ void ViewModeDefault::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 void ViewModeDefault::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 {
 	// midi
-	t->drawMidi(c, t->track->midi, 0);
+	if ((t->track->type == Track::TYPE_MIDI) or (t->track->midi.num > 0))
+		t->drawMidi(c, t->track->midi, 0);
 
 	// audio buffer
 	t->drawTrackBuffers(c, view->cam.pos);

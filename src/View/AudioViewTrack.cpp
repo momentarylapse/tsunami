@@ -214,7 +214,8 @@ void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 
 	// buffer
 	drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
-	drawMidi(c, *s->midi, s->pos);
+	if (s->midi)
+		drawMidi(c, *s->midi, s->pos);
 
 	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
 	if (s->is_selected)//((is_cur) or (a->sub_mouse_over == s))
@@ -240,7 +241,9 @@ void AudioViewTrack::drawMarker(HuiPainter *c, const TrackMarker &marker, int in
 
 void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift)
 {
-	if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->tuning.num > 0))
+	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+		drawMidiScore(c, midi, shift);
+	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->tuning.num > 0))
 		drawMidiTab(c, midi, shift);
 	else
 		drawMidiDefault(c, midi, shift);
@@ -295,6 +298,75 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 			c->drawStr(x1 + 1, (y1 + y2) / 2 - 10, i2s(position));
 		}
 	}
+}
+
+int get_score_position(int pitch, int clef, bool &sharp)
+{
+	int octave = pitch_get_octave(pitch);
+	int rel = pitch_to_rel(pitch);
+
+	const int pp[12] = {0,0,1,1,2,3,3,4,4,5,5,6};
+	const bool ss[12] = {false,true,false,true,false,false,true,false,true,false,true,false};
+	const int clef_offset[4] = {5*7, 4*7, 2 + 3*7, 2 + 2*7};
+
+	sharp = ss[rel];
+	return pp[rel] + 7 * octave + 1 - clef_offset[clef];
+}
+
+void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int shift)
+{
+	Range range = view->cam.range() - shift;
+	Array<MidiNote> notes = midi.getNotes(range);
+
+	int clef = track->instrument.get_clef();
+
+	c->setColor(view->colors.text);
+
+	float dy = area.height() / 13;
+	for (int i=-4; i<6; i+=2){
+		float y = area.y2 - area.height() / 2 - i * dy / 2;
+		c->drawLine(area.x1, y, area.x2, y);
+	}
+
+	if ((clef == CLEF_TYPE_VIOLIN) or (clef == CLEF_TYPE_VIOLIN_8))
+		c->drawStr(10, (area.y1 + area.y2)/2, "$");
+	else
+		c->drawStr(10, (area.y1 + area.y2)/2, "C");
+	if ((clef == CLEF_TYPE_VIOLIN_8) or (clef == CLEF_TYPE_BASS_8))
+		c->drawStr(10, area.y2 - area.height()/6, "8 basso");
+
+	c->setAntialiasing(true);
+	foreach(MidiNote &n, notes){
+		float x1 = view->cam.sample2screen(n.range.offset + shift);
+		float x2 = view->cam.sample2screen(n.range.end() + shift);
+		x2 = max(x2, x1 + 4);
+		float x = (x1 + x2) / 2;
+
+
+		bool sharp;
+		int p = get_score_position(n.pitch, clef, sharp);
+
+		float y = area.y2 - area.height() / 2 - p * dy / 2;
+
+		for (int i=6; i<p; i+=2){
+			c->setColor(view->colors.text_soft1);
+			float y = area.y2 - area.height() / 2 - i * dy / 2;
+			c->drawLine(x - dy, y, x + dy, y);
+		}
+		for (int i=-4; i>=p; i-=2){
+			c->setColor(view->colors.text_soft1);
+			float y = area.y2 - area.height() / 2 - i * dy / 2;
+			c->drawLine(x - dy, y, x + dy, y);
+		}
+
+
+		c->setColor(ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.5f));
+
+		if (sharp)
+			c->drawStr(x - 15, y - 8, "#");
+		c->drawCircle(x, y, dy / 2);
+	}
+	c->setAntialiasing(false);
 }
 
 void AudioViewTrack::draw(HuiPainter *c)

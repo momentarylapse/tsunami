@@ -103,4 +103,12 @@ enum
 };
 
 
+enum{
+	CLEF_TYPE_VIOLIN,
+	CLEF_TYPE_VIOLIN_8,
+	CLEF_TYPE_BASS,
+	CLEF_TYPE_BASS_8,
+};
+
+
 #endif /* MIDIDATA_H_ */

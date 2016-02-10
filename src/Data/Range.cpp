@@ -88,6 +88,11 @@ int Range::end() const
 	return offset + num;
 }
 
+int Range::center() const
+{
+	return offset + num / 2;
+}
+
 bool Range::empty() const
 {
 	return num <= 0;

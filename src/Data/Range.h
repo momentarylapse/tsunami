@@ -36,6 +36,7 @@ public:
 	int start() const;
 	int length() const;
 	int end() const;
+	int center() const;
 	bool empty() const;
 
 	bool is_inside(int pos) const;

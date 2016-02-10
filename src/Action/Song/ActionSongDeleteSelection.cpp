@@ -33,7 +33,7 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, cons
 		// midi
 		Set<int> to_delete;
 		foreachi(MidiNote &n, t->midi, i){
-			if (n.range.overlaps(range))
+			if (range.is_inside(n.range.center()))
 				to_delete.add(i);
 		}
 

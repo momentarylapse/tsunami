@@ -63,6 +63,7 @@ public:
 	void _cdecl __init__();
 	MidiRawData getEvents(const Range &r) const;
 	MidiNoteData getNotes(const Range &r) const;
+	MidiNoteData getNotesSafe(const Range &r) const;
 
 	Range getRange(int elongation) const;
 	int samples;

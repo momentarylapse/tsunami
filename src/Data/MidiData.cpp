@@ -262,6 +262,15 @@ MidiNoteData MidiNoteData::getNotes(const Range &r) const
 	return b;
 }
 
+MidiNoteData MidiNoteData::getNotesSafe(const Range &r) const
+{
+	MidiNoteData b;
+	foreach(MidiNote &n, const_cast<MidiNoteData&>(*this))
+		if (r.is_inside(n.range.center()))
+			b.add(n);
+	return b;
+}
+
 Range MidiNoteData::getRange(int elongation) const
 {
 	if (num == 0)

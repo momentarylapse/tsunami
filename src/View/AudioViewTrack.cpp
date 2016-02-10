@@ -357,7 +357,7 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 		float y = clef_pos_to_screen(p, area, dy);
 
 		// auxiliary lines
-		for (int i=10; i<p; i+=2){
+		for (int i=10; i<=p; i+=2){
 			c->setColor(view->colors.text_soft1);
 			float y = clef_pos_to_screen(i, area, dy);
 			c->drawLine(x - dy, y, x + dy, y);

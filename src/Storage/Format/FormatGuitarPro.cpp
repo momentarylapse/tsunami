@@ -479,12 +479,13 @@ void FormatGuitarPro::read_track()
 	if (channel != 10)
 		instrument.set_midi_no(channels[(port-1) * 16 + (channel-1)].instrument);
 
-	Array<int> tuning_rev = tt.tuning;
-	tuning_rev.reverse();
-	for (int i=tuning_rev.num-1; i>=0; i--)
-		if (tuning_rev[i] <= 0)
-			tuning_rev.erase(i);
-	tt.t->setInstrument(instrument, tuning_rev);
+	instrument.tuning = tt.tuning;
+	instrument.tuning.reverse();
+	for (int i=instrument.tuning.num-1; i>=0; i--)
+		if (instrument.tuning[i] <= 0)
+			instrument.tuning.erase(i);
+	tt.t->setInstrument(instrument);
+
 	f->ReadInt();
 	f->ReadInt(); // offset
 	f->ReadInt(); // color

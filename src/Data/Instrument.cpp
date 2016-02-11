@@ -17,6 +17,7 @@ Instrument::Instrument()
 Instrument::Instrument(int _type)
 {
 	type = _type;
+	tuning = default_tuning();
 }
 
 Array<int> Instrument::default_tuning() const
@@ -139,7 +140,7 @@ int Instrument::midi_no() const
 	return 1;
 }
 
-bool Instrument::is_default_tuning(const Array<int>& tuning) const
+bool Instrument::has_default_tuning() const
 {
 	Array<int> def = default_tuning();
 	if (def.num != tuning.num)
@@ -184,6 +185,7 @@ void Instrument::set_midi_no(int no)
 		type = TYPE_CLARINET;
 	else
 		type = TYPE_NONE;
+	tuning = default_tuning();
 }
 
 Array<Instrument> Instrument::enumerate()

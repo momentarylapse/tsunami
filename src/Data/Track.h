@@ -58,8 +58,6 @@ public:
 	static const string MESSAGE_ADD_MIDI_EFFECT;
 	static const string MESSAGE_DELETE_MIDI_EFFECT;
 
-	static const Array<int> DEFAULT_TUNING;
-
 	void _cdecl reset();
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
@@ -71,7 +69,7 @@ public:
 
 	// actions
 	void _cdecl setName(const string &name);
-	void _cdecl setInstrument(const Instrument &instrument, const Array<int> &tuning);
+	void _cdecl setInstrument(const Instrument &instrument);
 	void _cdecl setMuted(bool muted);
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
@@ -111,7 +109,6 @@ public:
 	string name;
 
 	Instrument instrument;
-	Array<int> tuning;
 
 	Array<TrackLevel> levels;
 

@@ -52,7 +52,6 @@ const string Track::MESSAGE_ADD_EFFECT = "AddEffect";
 const string Track::MESSAGE_DELETE_EFFECT = "DeleteEffect";
 const string Track::MESSAGE_ADD_MIDI_EFFECT = "AddMidiEffect";
 const string Track::MESSAGE_DELETE_MIDI_EFFECT = "DeleteMidiEffect";
-const Array<int> Track::DEFAULT_TUNING;
 
 Track::Track() :
 	Observable("Track")
@@ -79,7 +78,6 @@ void Track::reset()
 	levels.clear();
 	name.clear();
 	instrument = Instrument(Instrument::TYPE_NONE);
-	tuning.clear();
 	volume = 1;
 	muted = false;
 	panning = 0;
@@ -273,9 +271,9 @@ void Track::setName(const string& name)
 	song->execute(new ActionTrackEditName(this, name));
 }
 
-void Track::setInstrument(const Instrument& instrument, const Array<int> &tuning)
+void Track::setInstrument(const Instrument& instrument)
 {
-	song->execute(new ActionTrackSetInstrument(this, instrument, tuning));
+	song->execute(new ActionTrackSetInstrument(this, instrument));
 }
 
 void Track::setMuted(bool muted)

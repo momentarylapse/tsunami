@@ -844,13 +844,13 @@ public:
 	}
 };
 
-class FileChunkTuning : public FileChunk<Track,Track>
+class FileChunkTuning : public FileChunk<Track,Instrument>
 {
 public:
-	FileChunkTuning() : FileChunk<Track,Track>("tuning"){}
+	FileChunkTuning() : FileChunk<Track,Instrument>("tuning"){}
 	virtual void create()
 	{
-		me = parent;
+		me = &parent->instrument;
 	}
 	virtual void read(File *f)
 	{
@@ -895,8 +895,6 @@ public:
 		me->instrument = Instrument(f->ReadInt());
 		f->ReadInt(); // reserved
 
-		me->tuning = me->instrument.default_tuning();
-
 		notify();
 	}
 	virtual void write(File *f)
@@ -913,8 +911,8 @@ public:
 	}
 	virtual void write_subs()
 	{
-		if (!me->instrument.is_default_tuning(me->tuning))
-			write_sub("tuning", me);
+		if (!me->instrument.has_default_tuning())
+			write_sub("tuning", &me->instrument);
 		write_sub_array("level", me->levels);
 		write_sub_parray("samref", me->samples);
 		write_sub_parray("effect", me->fx);

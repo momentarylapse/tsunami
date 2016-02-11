@@ -40,11 +40,12 @@ public:
 	};
 
 	int type;
+	Array<int> tuning;
 
 	Array<int> default_tuning() const;
 	string name() const;
 	int midi_no() const;
-	bool is_default_tuning(const Array<int> &tuning) const;
+	bool has_default_tuning() const;
 
 	bool operator==(const Instrument &i) const;
 

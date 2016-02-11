@@ -243,7 +243,7 @@ void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
 		drawMidiDefault(c, midi, shift);
-	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->tuning.num > 0))
+	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->instrument.tuning.num > 0))
 		drawMidiTab(c, midi, shift);
 	else // if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
 		drawMidiScore(c, midi, shift);
@@ -288,9 +288,9 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 
 	// clef lines
 	float h = area.height() * 0.7f;
-	float dy = h / track->tuning.num;
+	float dy = h / track->instrument.tuning.num;
 	float y0 = area.y2 - (area.height() - h) / 2 - dy/2;
-	for (int i=0; i<track->tuning.num; i++){
+	for (int i=0; i<track->instrument.tuning.num; i++){
 		float y = y0 - i*dy;
 		c->drawLine(area.x1, y, area.x2, y);
 	}
@@ -307,7 +307,7 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 		float x = x1 + dy / 2;
 
 		int stringno, position;
-		get_tab(stringno, position, n.pitch, track->tuning);
+		get_tab(stringno, position, n.pitch, track->instrument.tuning);
 
 		float y = y0 - stringno * dy;
 

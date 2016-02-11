@@ -10,12 +10,12 @@
 
 #include "../../ActionMergable.h"
 class Track;
-class Instrument;
+#include "../../../Data/Instrument.h"
 
-class ActionTrackSetInstrument: public ActionMergable<int>
+class ActionTrackSetInstrument: public ActionMergable<Instrument>
 {
 public:
-	ActionTrackSetInstrument(Track *t, const Instrument &instrument, const Array<int> &tuning);
+	ActionTrackSetInstrument(Track *t, const Instrument &instrument);
 	virtual ~ActionTrackSetInstrument(){}
 
 	virtual void *execute(Data *d);
@@ -26,8 +26,6 @@ public:
 
 private:
 	int track_no;
-	Array<int> new_tuning;
-	Array<int> old_tuning;
 };
 
 #endif /* SRC_ACTION_TRACK_DATA_ACTIONTRACKSETINSTRUMENT_H_ */

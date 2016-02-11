@@ -76,13 +76,13 @@ void TrackConsole::loadData()
 			if (track->instrument == ii)
 				setInt("instrument", i);
 		}
-		for (int i=track->tuning.num; i<num_strings; i++){
+		for (int i=track->instrument.tuning.num; i<num_strings; i++){
 			removeControl(format("string%d", i));
 			removeControl(format("string%d_label", i));
 		}
-		setInt("strings", track->tuning.num);
+		setInt("strings", track->instrument.tuning.num);
 		setTarget("td_g_tuning", 0);
-		foreachi(int t, track->tuning, i){
+		foreachi(int t, track->instrument.tuning, i){
 			string id = format("string%d", i);
 			if (i >= num_strings){
 				addLabel(i2s(i+1), 0, 100 - i, 0, 0, format("string%d_label", i));
@@ -93,7 +93,7 @@ void TrackConsole::loadData()
 			}
 			setInt(id, t);
 		}
-		num_strings = track->tuning.num;
+		num_strings = track->instrument.tuning.num;
 	}else{
 		hideControl("td_t_bars", true);
 	}
@@ -129,7 +129,7 @@ void TrackConsole::onInstrument()
 	int n = getInt("");
 	Array<int> tuning;
 	Array<Instrument> instruments = Instrument::enumerate();
-	track->setInstrument(instruments[n], instruments[n].default_tuning());
+	track->setInstrument(instruments[n]);
 }
 
 void TrackConsole::applyData()
@@ -185,9 +185,9 @@ void TrackConsole::onUpdate(Observable *o, const string &message)
 void TrackConsole::onStrings()
 {
 	int n = getInt("");
-	Array<int> tuning = track->tuning;
-	tuning.resize(n);
-	track->setInstrument(track->instrument, tuning);
+	Instrument i = track->instrument;
+	i.tuning.resize(n);
+	track->setInstrument(i);
 }
 
 void TrackConsole::onString()
@@ -195,7 +195,7 @@ void TrackConsole::onString()
 	string id = HuiGetEvent()->id;
 	int n = id.substr(6, -1)._int();
 	int p = getInt(id);
-	Array<int> tuning = track->tuning;
-	tuning[n] = p;
-	track->setInstrument(track->instrument, tuning);
+	Instrument i = track->instrument;
+	i.tuning[n] = p;
+	track->setInstrument(i);
 }

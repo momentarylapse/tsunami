@@ -248,9 +248,6 @@ class Track
 	float volume, panning
 	bool muted
 	
-	int rep_num
-	int rep_delay
-	
 	AudioEffect[] *fx
 	SampleRef[] *samples
 	

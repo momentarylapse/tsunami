@@ -17,7 +17,7 @@ class AudioOutput;
 class Track;
 class MixingConsole;
 class CurveConsole;
-class LogDialog;
+class LogConsole;
 class Log;
 
 class BottomBarConsole : public HuiPanel
@@ -56,7 +56,7 @@ public:
 
 	MixingConsole *mixing_console;
 	CurveConsole *curve_console;
-	LogDialog *log_dialog;
+	LogConsole *log_dialog;
 
 	Array<BottomBarConsole*> consoles;
 	void addConsole(BottomBarConsole *c, const string &list_name);

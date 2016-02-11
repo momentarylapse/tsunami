@@ -11,11 +11,11 @@
 #include "../lib/base/base.h"
 #include "Observable.h"
 
-class LogDialog;
+class LogConsole;
 
 class Log : public Observable
 {
-	friend class LogDialog;
+	friend class LogConsole;
 public:
 	Log();
 	virtual ~Log();

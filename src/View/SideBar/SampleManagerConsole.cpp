@@ -1,11 +1,10 @@
 /*
- * SampleManager.cpp
+ * SampleManagerConsole.cpp
  *
  *  Created on: 15.07.2013
  *      Author: michi
  */
 
-#include "SampleManager.h"
 #include "../../Storage/Storage.h"
 #include "../../View/AudioView.h"
 #include "../../View/AudioViewTrack.h"
@@ -19,6 +18,7 @@
 
 #include "../../Data/Song.h"
 #include "../../lib/math/math.h"
+#include "SampleManagerConsole.h"
 
 
 void render_bufbox(Image &im, BufferBox &b)
@@ -66,7 +66,7 @@ string render_sample(Sample *s)
 class SampleManagerItem : public Observer
 {
 public:
-	SampleManagerItem(SampleManager *_manager, Sample *_s) : Observer("SampleManagerItem")
+	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s) : Observer("SampleManagerItem")
 	{
 		manager = _manager;
 		s = _s;
@@ -104,12 +104,12 @@ public:
 	}
 	string icon;
 	Sample *s;
-	SampleManager *manager;
+	SampleManagerConsole *manager;
 };
 
-SampleManager::SampleManager(Song *s) :
+SampleManagerConsole::SampleManagerConsole(Song *s) :
 	SideBarConsole(_("Samples")),
-	Observer("SampleManager")
+	Observer("SampleManagerConsole")
 {
 	fromResource("sample_manager_dialog");
 	setTooltip("import_from_file", _("aus Datei importieren"));
@@ -119,17 +119,17 @@ SampleManager::SampleManager(Song *s) :
 	setTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
 	setTooltip("create_from_selection", _("aus Auswahl erzeugen"));
 
-	event("import_from_file", this, &SampleManager::onImport);
-	event("export_sample", this, &SampleManager::onExport);
-	event("preview_sample", this, &SampleManager::onPreview);
-	event("paste_sample", this, &SampleManager::onInsert);
-	event("create_from_selection", this, &SampleManager::onCreateFromSelection);
-	event("delete_sample", this, &SampleManager::onDelete);
-	eventX("sample_list", "hui:change", this, &SampleManager::onListEdit);
-	eventX("sample_list", "hui:select", this, &SampleManager::onListSelect);
-	event("sample_list", this, &SampleManager::onPreview);
+	event("import_from_file", this, &SampleManagerConsole::onImport);
+	event("export_sample", this, &SampleManagerConsole::onExport);
+	event("preview_sample", this, &SampleManagerConsole::onPreview);
+	event("paste_sample", this, &SampleManagerConsole::onInsert);
+	event("create_from_selection", this, &SampleManagerConsole::onCreateFromSelection);
+	event("delete_sample", this, &SampleManagerConsole::onDelete);
+	eventX("sample_list", "hui:change", this, &SampleManagerConsole::onListEdit);
+	eventX("sample_list", "hui:select", this, &SampleManagerConsole::onListSelect);
+	event("sample_list", this, &SampleManagerConsole::onPreview);
 
-	event("edit_song", this, &SampleManager::onEditSong);
+	event("edit_song", this, &SampleManagerConsole::onEditSong);
 
 	preview_audio = new Song;
 	preview_renderer = new SongRenderer(preview_audio);
@@ -147,7 +147,7 @@ SampleManager::SampleManager(Song *s) :
 	subscribe(song, song->MESSAGE_NEW);
 }
 
-SampleManager::~SampleManager()
+SampleManagerConsole::~SampleManagerConsole()
 {
 	foreach(SampleManagerItem *si, items)
 		delete(si);
@@ -159,7 +159,7 @@ SampleManager::~SampleManager()
 	delete(preview_audio);
 }
 
-int SampleManager::getIndex(Sample *s)
+int SampleManagerConsole::getIndex(Sample *s)
 {
 	foreachi(SampleManagerItem *si, items, i)
 		if (si->s == s)
@@ -167,7 +167,7 @@ int SampleManager::getIndex(Sample *s)
 	return -1;
 }
 
-void SampleManager::updateList()
+void SampleManagerConsole::updateList()
 {
 	// new samples?
 	foreach(Sample *s, song->samples)
@@ -185,7 +185,7 @@ void SampleManager::updateList()
 	enable("paste_sample", sel >= 0);
 }
 
-void SampleManager::onListSelect()
+void SampleManagerConsole::onListSelect()
 {
 	int sel = getInt("");
 	selected_uid = -1;
@@ -197,7 +197,7 @@ void SampleManager::onListSelect()
 	enable("paste_sample", sel >= 0);
 }
 
-void SampleManager::onListEdit()
+void SampleManagerConsole::onListEdit()
 {
 	int sel = HuiGetEvent()->row;
 	int col = HuiGetEvent()->column;
@@ -207,7 +207,7 @@ void SampleManager::onListEdit()
 		song->samples[sel]->auto_delete = getCell("sample_list", sel, 4)._bool();
 }
 
-void SampleManager::onImport()
+void SampleManagerConsole::onImport()
 {
 	if (tsunami->storage->askOpenImport(win)){
 		BufferBox buf;
@@ -220,7 +220,7 @@ void SampleManager::onImport()
 	}
 }
 
-void SampleManager::onExport()
+void SampleManagerConsole::onExport()
 {
 	if (tsunami->storage->askSaveExport(win)){
 		int sel = getInt("sample_list");
@@ -232,14 +232,14 @@ void SampleManager::onExport()
 	}
 }
 
-void SampleManager::onInsert()
+void SampleManagerConsole::onInsert()
 {
 	int n = getInt("sample_list");
 	if (n >= 0)
 		tsunami->win->view->cur_track->addSample(tsunami->win->view->sel_range.start(), n);
 }
 
-void SampleManager::onCreateFromSelection()
+void SampleManagerConsole::onCreateFromSelection()
 {
 	song->createSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
 	if (song->samples.num > 0){
@@ -249,21 +249,21 @@ void SampleManager::onCreateFromSelection()
 	}
 }
 
-void SampleManager::onDelete()
+void SampleManagerConsole::onDelete()
 {
 	int n = getInt("sample_list");
 	if (n >= 0)
 		song->deleteSample(n);
 }
 
-void SampleManager::add(SampleManagerItem *item)
+void SampleManagerConsole::add(SampleManagerItem *item)
 {
 	//msg_write("add");
 	items.add(item);
 	addString("sample_list", item->str());
 }
 
-void SampleManager::remove(SampleManagerItem *item)
+void SampleManagerConsole::remove(SampleManagerItem *item)
 {
 	//msg_write("remove");
 	foreachi(SampleManagerItem *si, items, i)
@@ -278,12 +278,12 @@ void SampleManager::remove(SampleManagerItem *item)
 		}
 }
 
-void SampleManager::onEditSong()
+void SampleManagerConsole::onEditSong()
 {
 	tsunami->win->side_bar->open(SideBar::SONG_CONSOLE);
 }
 
-void SampleManager::onUpdate(Observable *o, const string &message)
+void SampleManagerConsole::onUpdate(Observable *o, const string &message)
 {
 	if ((progress) and (o == progress)){
 		if (message == progress->MESSAGE_CANCEL)
@@ -300,7 +300,7 @@ void SampleManager::onUpdate(Observable *o, const string &message)
 	}
 }
 
-void SampleManager::onPreview()
+void SampleManagerConsole::onPreview()
 {
 	if (progress)
 		endPreview();
@@ -318,7 +318,7 @@ void SampleManager::onPreview()
 	preview_stream->play();
 }
 
-void SampleManager::endPreview()
+void SampleManagerConsole::endPreview()
 {
 	if (!progress)
 		return;
@@ -407,7 +407,7 @@ public:
 
 Sample *SampleSelector::ret;
 
-Sample *SampleManager::select(HuiPanel *root, Song *a, Sample *old)
+Sample *SampleManagerConsole::select(HuiPanel *root, Song *a, Sample *old)
 {
 	SampleSelector *s = new SampleSelector(root, a, old);
 	s->run();

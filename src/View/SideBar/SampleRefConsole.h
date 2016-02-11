@@ -1,12 +1,12 @@
 /*
- * SampleRefDialog.h
+ * SampleRefConsole.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef SAMPLEREFDIALOG_H_
-#define SAMPLEREFDIALOG_H_
+#ifndef SAMPLEREFCONSOLE_H_
+#define SAMPLEREFCONSOLE_H_
 
 #include "SideBar.h"
 class Song;
@@ -14,11 +14,11 @@ class Track;
 class SampleRef;
 class AudioView;
 
-class SampleRefDialog: public SideBarConsole, public Observer
+class SampleRefConsole: public SideBarConsole, public Observer
 {
 public:
-	SampleRefDialog(AudioView *view, Song *song);
-	virtual ~SampleRefDialog();
+	SampleRefConsole(AudioView *view, Song *song);
+	virtual ~SampleRefConsole();
 
 	void loadData();
 	void applyData();
@@ -41,4 +41,4 @@ public:
 	SampleRef *sample;
 };
 
-#endif /* SAMPLEREFDIALOG_H_ */
+#endif /* SAMPLEREFCONSOLE_H_ */

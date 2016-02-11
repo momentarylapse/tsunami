@@ -9,14 +9,14 @@
 #include "LevelConsole.h"
 #include "BarsConsole.h"
 #include "TrackConsole.h"
-#include "MidiEditor.h"
 #include "FxConsole.h"
 #include "CurveConsole.h"
 #include "SynthConsole.h"
-#include "SampleRefDialog.h"
-#include "SampleManager.h"
 #include "MidiFxConsole.h"
 #include "../AudioView.h"
+#include "MidiEditorConsole.h"
+#include "SampleManagerConsole.h"
+#include "SampleRefConsole.h"
 #include "SongConsole.h"
 
 SideBar::SideBar(AudioView *view, Song *song) :
@@ -40,15 +40,15 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	song_console = new SongConsole(song);
 	level_console = new LevelConsole(song, view);
 	bars_console = new BarsConsole(song, view);
-	sample_manager = new SampleManager(song);
+	sample_manager = new SampleManagerConsole(song);
 	global_fx_console = new FxConsole(NULL, song);
 	track_console = new TrackConsole(view);
-	midi_editor = new MidiEditor(view, song);
+	midi_editor = new MidiEditorConsole(view, song);
 	fx_console = new FxConsole(view, song);
 	curve_console = new CurveConsole(view, song);
 	synth_console = new SynthConsole(view);
 	midi_fx_console = new MidiFxConsole(view, song);
-	sample_ref_dialog = new SampleRefDialog(view, song);
+	sample_ref_dialog = new SampleRefConsole(view, song);
 
 	addConsole(song_console);
 	addConsole(level_console);

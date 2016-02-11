@@ -1,22 +1,22 @@
 /*
- * LogDialog.h
+ * LogConsole.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef LOGDIALOG_H_
-#define LOGDIALOG_H_
+#ifndef LOGCONSOLE_H_
+#define LOGCONSOLE_H_
 
 #include "BottomBar.h"
 
 class Log;
 
-class LogDialog: public BottomBarConsole, public Observer
+class LogConsole: public BottomBarConsole, public Observer
 {
 public:
-	LogDialog(Log *log);
-	virtual ~LogDialog();
+	LogConsole(Log *log);
+	virtual ~LogConsole();
 
 	void onClear();
 	void reload();
@@ -25,4 +25,4 @@ public:
 	Log *log;
 };
 
-#endif /* LOGDIALOG_H_ */
+#endif /* LOGCONSOLE_H_ */

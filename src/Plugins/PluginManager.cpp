@@ -24,7 +24,7 @@
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 #include "../View/Dialog/ConfigurableSelectorDialog.h"
-#include "../View/SideBar/SampleManager.h"
+#include "../View/SideBar/SampleManagerConsole.h"
 #include "Plugin.h"
 #include "Effect.h"
 #include "ConfigPanel.h"
@@ -78,7 +78,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
 	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
 	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
-	Script::LinkExternal("SelectSample", (void*)&SampleManager::select);
+	Script::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 
 	Script::DeclareClassSize("Range", sizeof(Range));
 	Script::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));

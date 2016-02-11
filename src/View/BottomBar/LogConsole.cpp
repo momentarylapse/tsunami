@@ -1,17 +1,17 @@
 /*
- * LogDialog.cpp
+ * LogConsole.cpp
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#include "LogDialog.h"
 #include "BottomBar.h"
 #include "../../Stuff/Log.h"
+#include "LogConsole.h"
 
-LogDialog::LogDialog(Log *_log) :
+LogConsole::LogConsole(Log *_log) :
 	BottomBarConsole(_("Nachrichten")),
-	Observer("LogDialog")
+	Observer("LogConsole")
 {
 	log = _log;
 
@@ -22,24 +22,24 @@ LogDialog::LogDialog(Log *_log) :
 	setImage("clear", "hui:clear");
 	setTooltip("clear", _("alle Nachrichten l&oschen"));
 
-	event("clear", this, &LogDialog::onClear);
+	event("clear", this, &LogConsole::onClear);
 
-	HuiRunLaterM(0.5f, this, &LogDialog::reload);
+	HuiRunLaterM(0.5f, this, &LogConsole::reload);
 
 	subscribe(log);
 }
 
-LogDialog::~LogDialog()
+LogConsole::~LogConsole()
 {
 	unsubscribe(log);
 }
 
-void LogDialog::onClear()
+void LogConsole::onClear()
 {
 	log->clear();
 }
 
-void LogDialog::reload()
+void LogConsole::reload()
 {
 	reset("log_list");
 	foreach(Log::Message &m, log->messages){
@@ -55,7 +55,7 @@ void LogDialog::reload()
 	}
 }
 
-void LogDialog::onUpdate(Observable *o, const string &message)
+void LogConsole::onUpdate(Observable *o, const string &message)
 {
 	reload();
 }

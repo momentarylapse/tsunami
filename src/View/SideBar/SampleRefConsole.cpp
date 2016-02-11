@@ -1,5 +1,5 @@
 /*
- * SampleRefDialog.cpp
+ * SampleRefConsole.cpp
  *
  *  Created on: 26.03.2012
  *      Author: michi
@@ -8,11 +8,11 @@
 #include "../AudioView.h"
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
-#include "SampleRefDialog.h"
+#include "SampleRefConsole.h"
 
-SampleRefDialog::SampleRefDialog(AudioView *v, Song *s):
+SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 	SideBarConsole("Sample-Eigenschaften"),
-	Observer("SampleRefDialog")
+	Observer("SampleRefConsole")
 {
 	fromResource("sample_ref_dialog");
 	view = v;
@@ -20,19 +20,19 @@ SampleRefDialog::SampleRefDialog(AudioView *v, Song *s):
 	track = NULL;
 	sample = NULL;
 
-	event("volume", this, &SampleRefDialog::onVolume);
-	event("mute", this, &SampleRefDialog::onMute);
-	event("level_track", this, &SampleRefDialog::onLevelTrack);
-	event("repnum", this, &SampleRefDialog::onRepNum);
-	event("repdelay", this, &SampleRefDialog::onRepDelay);
+	event("volume", this, &SampleRefConsole::onVolume);
+	event("mute", this, &SampleRefConsole::onMute);
+	event("level_track", this, &SampleRefConsole::onLevelTrack);
+	event("repnum", this, &SampleRefConsole::onRepNum);
+	event("repdelay", this, &SampleRefConsole::onRepDelay);
 
-	event("edit_song", this, &SampleRefDialog::onEditSong);
-	event("edit_track", this, &SampleRefDialog::onEditTrack);
+	event("edit_song", this, &SampleRefConsole::onEditSong);
+	event("edit_track", this, &SampleRefConsole::onEditTrack);
 
 	subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
 
-SampleRefDialog::~SampleRefDialog()
+SampleRefConsole::~SampleRefConsole()
 {
 	if (sample)
 		unsubscribe(sample);
@@ -40,12 +40,12 @@ SampleRefDialog::~SampleRefDialog()
 }
 
 
-void SampleRefDialog::onName()
+void SampleRefConsole::onName()
 {
 	//sample->origin->name = GetString("");
 }
 
-void SampleRefDialog::onMute()
+void SampleRefConsole::onMute()
 {
 	if (!sample)
 		return;
@@ -57,12 +57,12 @@ void SampleRefDialog::onMute()
 	subscribe(sample);
 }
 
-void SampleRefDialog::onLevelTrack()
+void SampleRefConsole::onLevelTrack()
 {
 	int n = getInt("");
 }
 
-void SampleRefDialog::onVolume()
+void SampleRefConsole::onVolume()
 {
 	if (!sample)
 		return;
@@ -72,7 +72,7 @@ void SampleRefDialog::onVolume()
 	subscribe(sample);
 }
 
-void SampleRefDialog::onRepNum()
+void SampleRefConsole::onRepNum()
 {
 	if (!sample)
 		return;
@@ -83,7 +83,7 @@ void SampleRefDialog::onRepNum()
 	subscribe(sample);
 }
 
-void SampleRefDialog::onRepDelay()
+void SampleRefConsole::onRepDelay()
 {
 	if (!sample)
 		return;
@@ -93,17 +93,17 @@ void SampleRefDialog::onRepDelay()
 	subscribe(sample);
 }
 
-void SampleRefDialog::onEditSong()
+void SampleRefConsole::onEditSong()
 {
 	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
 }
 
-void SampleRefDialog::onEditTrack()
+void SampleRefConsole::onEditTrack()
 {
 	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
 }
 
-void SampleRefDialog::loadData()
+void SampleRefConsole::loadData()
 {
 	enable("name", false);
 	enable("mute", sample);
@@ -129,7 +129,7 @@ void SampleRefDialog::loadData()
 	enable("repdelay", sample->rep_num > 0);
 }
 
-void SampleRefDialog::onUpdate(Observable *o, const string &message)
+void SampleRefConsole::onUpdate(Observable *o, const string &message)
 {
 	if (o == view){
 		if (sample)

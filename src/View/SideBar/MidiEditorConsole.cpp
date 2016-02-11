@@ -1,11 +1,10 @@
 /*
- * MidiEditor.cpp
+ * MidiEditorConsole.cpp
  *
  *  Created on: 09.09.2014
  *      Author: michi
  */
 
-#include "MidiEditor.h"
 #include "../../Data/Track.h"
 #include "../../Data/MidiData.h"
 #include "../../Audio/Synth/Synthesizer.h"
@@ -18,12 +17,13 @@
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../BottomBar/BottomBar.h"
+#include "MidiEditorConsole.h"
 
 
 
-MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
+MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	SideBarConsole(_("Midi")),
-	Observer("MidiEditor")
+	Observer("MidiEditorConsole")
 {
 	view = _view;
 	song = _song;
@@ -51,30 +51,30 @@ MidiEditor::MidiEditor(AudioView *_view, Song *_song) :
 	//Enable("add", false);
 	enable("track_name", false);
 
-	event("beat_partition", this, &MidiEditor::onBeatPartition);
-	event("scale", this, &MidiEditor::onScale);
-	event("midi_edit_mode", this, &MidiEditor::onMidiEditMode);
-	event("interval", this, &MidiEditor::onInterval);
-	event("chord_type", this, &MidiEditor::onChordType);
-	event("chord_inversion", this, &MidiEditor::onChordInversion);
-	event("reference_track", this, &MidiEditor::onReferenceTrack);
-	event("edit_track", this, &MidiEditor::onEditTrack);
-	event("edit_midi_fx", this, &MidiEditor::onEditMidiFx);
-	event("edit_song", this, &MidiEditor::onEditSong);
+	event("beat_partition", this, &MidiEditorConsole::onBeatPartition);
+	event("scale", this, &MidiEditorConsole::onScale);
+	event("midi_edit_mode", this, &MidiEditorConsole::onMidiEditMode);
+	event("interval", this, &MidiEditorConsole::onInterval);
+	event("chord_type", this, &MidiEditorConsole::onChordType);
+	event("chord_inversion", this, &MidiEditorConsole::onChordInversion);
+	event("reference_track", this, &MidiEditorConsole::onReferenceTrack);
+	event("edit_track", this, &MidiEditorConsole::onEditTrack);
+	event("edit_midi_fx", this, &MidiEditorConsole::onEditMidiFx);
+	event("edit_song", this, &MidiEditorConsole::onEditSong);
 
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	subscribe(view, view->MESSAGE_VTRACK_CHANGE);
 	update();
 }
 
-MidiEditor::~MidiEditor()
+MidiEditorConsole::~MidiEditorConsole()
 {
 	clear();
 	unsubscribe(view);
 	unsubscribe(song);
 }
 
-void MidiEditor::update()
+void MidiEditorConsole::update()
 {
 	bool allow = false;
 	if (view->cur_track)
@@ -84,7 +84,7 @@ void MidiEditor::update()
 	hideControl(id_inner, !allow);
 }
 
-void MidiEditor::onUpdate(Observable* o, const string &message)
+void MidiEditorConsole::onUpdate(Observable* o, const string &message)
 {
 	update();
 	if ((o == track) && (message == track->MESSAGE_DELETE)){
@@ -113,17 +113,17 @@ void MidiEditor::onUpdate(Observable* o, const string &message)
 }
 
 
-void MidiEditor::onScale()
+void MidiEditorConsole::onScale()
 {
 	view->mode_midi->setScale(getInt(""));
 }
 
-void MidiEditor::onBeatPartition()
+void MidiEditorConsole::onBeatPartition()
 {
 	view->mode_midi->setBeatPartition(getInt(""));
 }
 
-void MidiEditor::onMidiEditMode()
+void MidiEditorConsole::onMidiEditMode()
 {
 	int n = getInt("midi_edit_mode");
 	if (n == 0){
@@ -135,22 +135,22 @@ void MidiEditor::onMidiEditMode()
 	}
 }
 
-void MidiEditor::onInterval()
+void MidiEditorConsole::onInterval()
 {
 	view->mode_midi->midi_interval = getInt("");
 }
 
-void MidiEditor::onChordType()
+void MidiEditorConsole::onChordType()
 {
 	view->mode_midi->chord_type = getInt("");
 }
 
-void MidiEditor::onChordInversion()
+void MidiEditorConsole::onChordInversion()
 {
 	view->mode_midi->chord_inversion = getInt("");
 }
 
-void MidiEditor::onReferenceTrack()
+void MidiEditorConsole::onReferenceTrack()
 {
 	int n = getInt("") - 1;
 	int tn = track->get_index();
@@ -158,22 +158,22 @@ void MidiEditor::onReferenceTrack()
 	view->forceRedraw();
 }
 
-void MidiEditor::onEditTrack()
+void MidiEditorConsole::onEditTrack()
 {
 	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
 }
 
-void MidiEditor::onEditMidiFx()
+void MidiEditorConsole::onEditMidiFx()
 {
 	((SideBar*)parent)->open(SideBar::MIDI_FX_CONCOLE);
 }
 
-void MidiEditor::onEditSong()
+void MidiEditorConsole::onEditSong()
 {
 	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
 }
 
-void MidiEditor::clear()
+void MidiEditorConsole::clear()
 {
 	if (track)
 		unsubscribe(track);
@@ -182,17 +182,17 @@ void MidiEditor::clear()
 	//Enable("add", false);
 }
 
-void MidiEditor::onEnter()
+void MidiEditorConsole::onEnter()
 {
 	view->setMode(view->mode_midi);
 }
 
-void MidiEditor::onLeave()
+void MidiEditorConsole::onLeave()
 {
 	view->setMode(view->mode_default);
 }
 
-void MidiEditor::setTrack(Track *t)
+void MidiEditorConsole::setTrack(Track *t)
 {
 	clear();
 

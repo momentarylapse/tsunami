@@ -7,9 +7,9 @@
 
 #include "BottomBar.h"
 #include "MixingConsole.h"
-#include "LogDialog.h"
 #include "../../lib/hui/Controls/HuiControl.h"
 #include "../AudioView.h"
+#include "LogConsole.h"
 #include "MiniBar.h"
 
 BottomBar::BottomBar(AudioView *view, Song *song, AudioOutput *output, Log *log) :
@@ -30,7 +30,7 @@ BottomBar::BottomBar(AudioView *view, Song *song, AudioOutput *output, Log *log)
 	setImage("close", "hui:close");
 	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
 
-	log_dialog = new LogDialog(log);
+	log_dialog = new LogConsole(log);
 	mixing_console = new MixingConsole(song, output, view->stream);
 	addConsole(log_dialog, "");
 	addConsole(mixing_console, "");

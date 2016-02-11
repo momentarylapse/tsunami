@@ -1,12 +1,12 @@
 /*
- * MidiEditor.h
+ * MidiEditorConsole.h
  *
  *  Created on: 09.09.2014
  *      Author: michi
  */
 
-#ifndef MIDIEDITOR_H_
-#define MIDIEDITOR_H_
+#ifndef MIDIEDITORCONSOLE_H_
+#define MIDIEDITORCONSOLE_H_
 
 #include "SideBar.h"
 #include "../../Stuff/Observer.h"
@@ -16,11 +16,11 @@ class Song;
 class AudioView;
 class Track;
 
-class MidiEditor : public SideBarConsole, public Observer
+class MidiEditorConsole : public SideBarConsole, public Observer
 {
 public:
-	MidiEditor(AudioView *view, Song *audio);
-	virtual ~MidiEditor();
+	MidiEditorConsole(AudioView *view, Song *audio);
+	virtual ~MidiEditorConsole();
 
 	virtual void onEnter();
 	virtual void onLeave();
@@ -51,4 +51,4 @@ public:
 	Song *song;
 };
 
-#endif /* MIDIEDITOR_H_ */
+#endif /* MIDIEDITORCONSOLE_H_ */

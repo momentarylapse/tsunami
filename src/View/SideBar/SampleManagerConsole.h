@@ -1,12 +1,12 @@
 /*
- * SampleManager.h
+ * SampleManagerConsole.h
  *
  *  Created on: 15.07.2013
  *      Author: michi
  */
 
-#ifndef SAMPLEMANAGER_H_
-#define SAMPLEMANAGER_H_
+#ifndef SAMPLEMANAGERCONSOLE_H_
+#define SAMPLEMANAGERCONSOLE_H_
 
 #include "SideBar.h"
 
@@ -17,11 +17,11 @@ class SongRenderer;
 class SampleManagerItem;
 class Progress;
 
-class SampleManager : public SideBarConsole, public Observer
+class SampleManagerConsole : public SideBarConsole, public Observer
 {
 public:
-	SampleManager(Song *a);
-	virtual ~SampleManager();
+	SampleManagerConsole(Song *a);
+	virtual ~SampleManagerConsole();
 
 	void updateList();
 
@@ -58,4 +58,4 @@ public:
 	static Sample *_cdecl select(HuiPanel *root, Song *a, Sample *old);
 };
 
-#endif /* SAMPLEMANAGER_H_ */
+#endif /* SAMPLEMANAGERCONSOLE_H_ */

@@ -11,11 +11,11 @@ Dialog track_dialog "Spur" 380 516
 				SpinButton panning "0\\-100\\100\\1"
 				Text percent "%"
 		Group td_t_instrument "Instrument"
-			ComboBox instrument ""
-		Expander td_t_tuning "Stimmung"
-			Grid td_g_tuning "" 2 1
-				Text td_t_strings "Saiten"
-				SpinButton strings "\\0\\100" expandx
+			Grid ? "" 1 2
+				ComboBox instrument "" expandx
+				Grid ? "" 2 1
+					Text tuning "" expandx
+					Button edit_tuning "" image=hui:properties
 		Text td_t_dummy "" expandy
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2

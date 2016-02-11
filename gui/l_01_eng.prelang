@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-294
+295
 // Data (ID,Text)
 about
 Info
@@ -207,6 +207,8 @@ insert:before
 before
 insert_sample
 Insert statically
+instrument
+!expandx\\
 interval
 Interval
 language
@@ -439,9 +441,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_439548
+rand_id_228865
 
-rand_id_560089
+rand_id_458577
 
 rdt_capture
 Recording
@@ -523,8 +525,6 @@ song_properties
 Properties
 stop
 Stop
-strings
-!expandx\\\\0\\100
 tags
 !format=tT\\Tag\\Value
 target
@@ -537,10 +537,6 @@ td_t_instrument
 Instrument
 td_t_name
 Name
-td_t_strings
-Strings
-td_t_tuning
-Tuning
 td_t_volume
 Volume
 text
@@ -563,6 +559,12 @@ track_properties
 Properties
 trackdest_dialog
 Destination track
+tuning
+!expandx\\
+tuning_dialog
+Tuning
+tuning_dialog_buttonbar
+!buttonbar\\
 undo
 Undo
 view_midi_default
@@ -592,7 +594,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-171
+173
 // Data (ID,Text)
 
 
@@ -610,6 +612,8 @@ Zoom out
   - create new track -
   ...keine Sorge, das wird schon!
 ...don't worry. Everything will be fine!
+ - keine Saiten -
+ - no strings -
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
 has crashed!\t\tLast lines from file message.txt:
 !bold$Kommentar/Geschehnisse:
@@ -620,6 +624,8 @@ has crashed!\t\tLast lines from file message.txt:
 !bold,center\\Output
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
+%d Saiten: 
+%d strings: 
 %d Spuren zum Einfügen markiert (ohne Metronom gezählt), aber %d Spuren in der Zwischenablage
 %d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard
 %d mal

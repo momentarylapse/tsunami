@@ -15,7 +15,7 @@
 class NewDialog: public HuiWindow
 {
 public:
-	NewDialog(HuiWindow *_parent, bool _allow_parent, Song *a);
+	NewDialog(HuiWindow *_parent, Song *a);
 	virtual ~NewDialog();
 
 	void loadData();

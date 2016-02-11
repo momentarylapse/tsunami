@@ -236,12 +236,13 @@ OBJ = \
  View/Dialog/BarAddDialog.o\
  View/Dialog/BarEditDialog.o\
  View/Dialog/CaptureDialog.o\
+ View/Dialog/ConfigurableSelectorDialog.o\
  View/Dialog/DetuneSynthesizerDialog.o\
  View/Dialog/MarkerDialog.o\
  View/Dialog/NewDialog.o\
  View/Dialog/RecordDialog.o\
  View/Dialog/SettingsDialog.o\
- View/Dialog/ConfigurableSelectorDialog.o\
+ View/Dialog/TuningDialog.o\
  View/Helper/PeakMeter.o\
  View/Helper/Progress.o\
  View/Helper/Slider.o\
@@ -976,6 +977,9 @@ View/Dialog/BarEditDialog.o : View/Dialog/BarEditDialog.cpp
 View/Dialog/CaptureDialog.o : View/Dialog/CaptureDialog.cpp
 	$(CPP) -c View/Dialog/CaptureDialog.cpp -o $@ $(CXXFLAGS)
 
+View/Dialog/ConfigurableSelectorDialog.o : View/Dialog/ConfigurableSelectorDialog.cpp
+	$(CPP) -c View/Dialog/ConfigurableSelectorDialog.cpp -o $@ $(CXXFLAGS)
+
 View/Dialog/DetuneSynthesizerDialog.o : View/Dialog/DetuneSynthesizerDialog.cpp
 	$(CPP) -c View/Dialog/DetuneSynthesizerDialog.cpp -o $@ $(CXXFLAGS)
 
@@ -991,8 +995,8 @@ View/Dialog/RecordDialog.o : View/Dialog/RecordDialog.cpp
 View/Dialog/SettingsDialog.o : View/Dialog/SettingsDialog.cpp
 	$(CPP) -c View/Dialog/SettingsDialog.cpp -o $@ $(CXXFLAGS)
 
-View/Dialog/ConfigurableSelectorDialog.o : View/Dialog/ConfigurableSelectorDialog.cpp
-	$(CPP) -c View/Dialog/ConfigurableSelectorDialog.cpp -o $@ $(CXXFLAGS)
+View/Dialog/TuningDialog.o : View/Dialog/TuningDialog.cpp
+	$(CPP) -c View/Dialog/TuningDialog.cpp -o $@ $(CXXFLAGS)
 
 View/Helper/PeakMeter.o : View/Helper/PeakMeter.cpp
 	$(CPP) -c View/Helper/PeakMeter.cpp -o $@ $(CXXFLAGS)

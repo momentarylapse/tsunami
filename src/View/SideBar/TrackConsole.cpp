@@ -9,6 +9,7 @@
 #include "../Helper/Slider.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../Dialog/ConfigurableSelectorDialog.h"
+#include "../Dialog/TuningDialog.h"
 #include "../../Plugins/PluginManager.h"
 #include "../AudioView.h"
 #include "TrackConsole.h"
@@ -27,8 +28,6 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	foreach(Instrument &i, instruments)
 		setString("instrument", i.name());
 
-	num_strings = 0;
-
 	loadData();
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 
@@ -36,7 +35,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("volume", this, &TrackConsole::onVolume);
 	event("panning", this, &TrackConsole::onPanning);
 	event("instrument", this, &TrackConsole::onInstrument);
-	event("strings", this, &TrackConsole::onStrings);
+	event("edit_tuning", this, &TrackConsole::onEditTuning);
 
 	event("edit_song", this, &TrackConsole::onEditSong);
 	event("edit_fx", this, &TrackConsole::onEditFx);
@@ -60,7 +59,6 @@ void TrackConsole::loadData()
 	enable("volume", track);
 	enable("panning", track);
 	enable("instrument", track);
-	enable("strings", track);
 	hideControl("td_t_edit", !track);
 	if (track){
 		setString("name", track->name);
@@ -76,26 +74,19 @@ void TrackConsole::loadData()
 			if (track->instrument == ii)
 				setInt("instrument", i);
 		}
-		for (int i=track->instrument.tuning.num; i<num_strings; i++){
-			removeControl(format("string%d", i));
-			removeControl(format("string%d_label", i));
+
+		string tuning = format(_("%d Saiten: "), track->instrument.tuning.num);
+		for (int i=0; i<track->instrument.tuning.num; i++){
+			if (i > 0)
+				tuning += ", ";
+			tuning += pitch_name(track->instrument.tuning[i]);
 		}
-		setInt("strings", track->instrument.tuning.num);
-		setTarget("td_g_tuning", 0);
-		foreachi(int t, track->instrument.tuning, i){
-			string id = format("string%d", i);
-			if (i >= num_strings){
-				addLabel(i2s(i+1), 0, 100 - i, 0, 0, format("string%d_label", i));
-				addComboBox("", 1, 100 - i, 0, 0, id);
-				event(id, this, &TrackConsole::onString);
-				for (int p=0; p<MAX_PITCH; p++)
-					setString(id, pitch_name(p));
-			}
-			setInt(id, t);
-		}
-		num_strings = track->instrument.tuning.num;
+		if (track->instrument.tuning.num == 0)
+			tuning = _(" - keine Saiten -");
+		setString("tuning", tuning);
 	}else{
 		hideControl("td_t_bars", true);
+		setString("tuning", "");
 	}
 }
 
@@ -130,6 +121,12 @@ void TrackConsole::onInstrument()
 	Array<int> tuning;
 	Array<Instrument> instruments = Instrument::enumerate();
 	track->setInstrument(instruments[n]);
+}
+
+void TrackConsole::onEditTuning()
+{
+	TuningDialog *dlg = new TuningDialog(win, track);
+	dlg->run();
 }
 
 void TrackConsole::applyData()
@@ -180,22 +177,4 @@ void TrackConsole::onUpdate(Observable *o, const string &message)
 	}else{
 		loadData();
 	}
-}
-
-void TrackConsole::onStrings()
-{
-	int n = getInt("");
-	Instrument i = track->instrument;
-	i.tuning.resize(n);
-	track->setInstrument(i);
-}
-
-void TrackConsole::onString()
-{
-	string id = HuiGetEvent()->id;
-	int n = id.substr(6, -1)._int();
-	int p = getInt(id);
-	Instrument i = track->instrument;
-	i.tuning[n] = p;
-	track->setInstrument(i);
 }

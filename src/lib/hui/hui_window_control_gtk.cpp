@@ -472,9 +472,10 @@ void hui_rm_event(Array<HuiEventListener> &event, HuiControl *c)
 void HuiPanel::removeControl(const string &id)
 {
 	HuiControl *c = _get_control_(id);
-	hui_rm_event(events, c);
-	if (c)
+	if (c){
+		hui_rm_event(events, c);
 		delete(c);
+	}
 }
 
 

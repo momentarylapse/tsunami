@@ -607,7 +607,7 @@ void TsunamiWindow::onNew()
 {
 	if (!allowTermination())
 		return;
-	NewDialog *d = new NewDialog(this, false, song);
+	NewDialog *d = new NewDialog(this, song);
 	d->run();
 }
 

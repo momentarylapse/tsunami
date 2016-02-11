@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-292
+294
 // Data (ID,Text)
 about
 Info
@@ -201,6 +201,10 @@ help
 Help
 import_from_file
 !flat\\
+insert:after
+after
+insert:before
+before
 insert_sample
 Insert statically
 interval
@@ -435,9 +439,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_123967
+rand_id_439548
 
-rand_id_421276
+rand_id_560089
 
 rdt_capture
 Recording
@@ -588,7 +592,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-165
+171
 // Data (ID,Text)
 
 
@@ -738,6 +742,8 @@ Grundform
 Basic form
 Hapsichord
 Hapsichord
+Horn
+Horn
 Ist halt irgendwie passiert...
 Just happened somehow...
 Kann Effekt nicht laden: %s
@@ -758,6 +764,8 @@ Keine Spur ausgewählt
 No track selected
 Keyboard
 Keyboard
+Klarinette
+Clarinette
 Konnte Aufnahmegerät nicht öffnen
 Could not open recording device
 Kontra-Bass
@@ -808,6 +816,8 @@ Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 Can't execute plugin on an empty audio file
 Plugin-Script wählen
 Select plugin script
+Posaune
+Trombone
 Raw Daten
 Raw data
 Samplerate
@@ -816,6 +826,8 @@ Samples
 Samples
 Samples\\\") + i2s(samples));
 
+Saxophon
+Saxophone
 Schlagzeug
 Drums
 Script (*.kaba)
@@ -838,6 +850,10 @@ Synthesizer wählen
 Select synthesizer
 Takte
 Bars
+Trompete
+Trumpet
+Tuba
+Tuba
 Unbenannt
 No name
 Vermindert

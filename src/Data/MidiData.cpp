@@ -63,7 +63,7 @@ string rel_pitch_name(int pitch_rel)
 	if (pitch_rel == 10)
 		return "A#";
 	if (pitch_rel == 11)
-		return "H";
+		return "B";
 	return "???";
 }
 

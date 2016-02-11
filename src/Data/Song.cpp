@@ -477,7 +477,7 @@ void Song::addBar(int index, float bpm, int beats, bool affect_midi)
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		execute(new ActionSongAddBar(index + 1, b, affect_midi));
+		execute(new ActionSongAddBar(index, b, affect_midi));
 	else
 		execute(new ActionSongAddBar(bars.num, b, affect_midi));
 }
@@ -489,7 +489,7 @@ void Song::addPause(int index, float time, bool affect_midi)
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)sample_rate * time);
 	if (index >= 0)
-		execute(new ActionSongAddBar(index + 1, b, affect_midi));
+		execute(new ActionSongAddBar(index, b, affect_midi));
 	else
 		execute(new ActionSongAddBar(bars.num, b, affect_midi));
 }

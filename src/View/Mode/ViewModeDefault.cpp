@@ -460,8 +460,13 @@ void ViewModeDefault::setCursorPos(int pos)
 			selection->type = Selection::TYPE_PLAYBACK;
 			view->forceRedraw();
 			return;
-		}else
+		}else{
 			view->stream->stop();
+			/*view->stream->seek(pos);
+			selection->type = Selection::TYPE_PLAYBACK;
+			view->forceRedraw();
+			return;*/
+		}
 	}
 	mouse_possibly_selecting = 0;
 	view->sel_raw = Range(pos, 0);

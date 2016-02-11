@@ -36,6 +36,8 @@ BarAddDialog::BarAddDialog(HuiWindow *root, Song *_s, int _index, bool _apply_to
 	setInt("beats", beats);
 	setFloat("bpm", bpm);
 
+	check("insert:after", true);
+
 	event("ok", this, &BarAddDialog::onOk);
 	event("cancel", this, &BarAddDialog::onClose);
 	event("hui:close", this, &BarAddDialog::onClose);
@@ -46,7 +48,16 @@ void BarAddDialog::onOk()
 	int count = getInt("count");
 	int beats = getInt("beats");
 	float bpm = getFloat("bpm");
+	bool after = isChecked("insert:after");
 	song->action_manager->beginActionGroup();
+
+	if (after){
+		if (index >= 0)
+			index ++;
+	}else{
+		if (index < 0)
+			index = 0;
+	}
 
 	for (int i=0; i<count; i++)
 		song->addBar(index, bpm, beats, apply_to_midi);

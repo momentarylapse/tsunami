@@ -19,6 +19,7 @@ TuningDialog::TuningDialog(HuiWindow *_parent, Track *t) :
 	update();
 
 	event("ok", this, &TuningDialog::onOk);
+	event("cancel", this, &TuningDialog::onClose);
 	event("hui:close", this, &TuningDialog::onClose);
 	event("add_first", this, &TuningDialog::onAddFirst);
 }
@@ -51,10 +52,12 @@ void TuningDialog::update()
 			event(id, this, &TuningDialog::onEdit);
 			event("delete_" + id, this, &TuningDialog::onDelete);
 			event("add_" + id, this, &TuningDialog::onAdd);
-			for (int p=0; p<MAX_PITCH; p++)
+
+			// reverse order list... nicer gui
+			for (int p=MAX_PITCH-1; p>=0; p--)
 				setString(id, pitch_name(p));
 		}
-		setInt(id, t);
+		setInt(id, MAX_PITCH - 1 - t);
 	}
 	if (tuning.num == 0){
 		addButton("", 0, 0, 0, 0, "add_first");
@@ -81,7 +84,7 @@ void TuningDialog::onEdit()
 {
 	string id = HuiGetEvent()->id;
 	int n = id.substr(6, -1)._int();
-	int p = getInt(id);
+	int p = MAX_PITCH - 1 - getInt(id);
 	tuning[n] = p;
 }
 

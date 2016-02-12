@@ -72,12 +72,15 @@ protected:
 	Array<int> delete_me;
 	void enablePitch(int pitch, bool enable);
 
+public:
 	struct Tuning
 	{
 		float freq[MAX_PITCH];
 		void set_default();
 		bool is_default();
-	}tuning;
+	};
+protected:
+	Tuning tuning;
 	float delta_phi[MAX_PITCH];
 
 	void lock();

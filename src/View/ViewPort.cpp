@@ -60,7 +60,8 @@ Range ViewPort::range()
 void ViewPort::makeSampleVisible(int sample)
 {
 	double x = sample2screen(sample);
-	if ((x > view->area.x2) or (x < view->area.x1)){
+	float dx = view->area.width() * BORDER_FACTOR;
+	if ((x > view->area.x2 - dx) or (x < view->area.x1 + dx)){
 		pos = sample - view->area.width() / scale * BORDER_FACTOR;
 		view->notify(view->MESSAGE_VIEW_CHANGE);
 		view->forceRedraw();

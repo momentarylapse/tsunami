@@ -155,6 +155,7 @@ TsunamiWindow::TsunamiWindow() :
 	subscribe(view->stream, AudioStream::MESSAGE_STATE_CHANGE);
 	subscribe(tsunami->clipboard);
 	subscribe(bottom_bar);
+	subscribe(side_bar);
 
 
 	if (song->tracks.num > 0)
@@ -408,18 +409,25 @@ void TsunamiWindow::onPlayLoop()
 
 void TsunamiWindow::onPlay()
 {
+	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+		return;
 	view->renderer->prepare(view->getPlaybackSelection(), true);
 	view->stream->play();
 }
 
 void TsunamiWindow::onPause()
 {
+	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+		return;
 	view->stream->pause();
 }
 
 void TsunamiWindow::onStop()
 {
-	view->stream->stop();
+	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE))
+		side_bar->_hide();
+	else
+		view->stream->stop();
 }
 
 void TsunamiWindow::onInsertSample()
@@ -564,9 +572,11 @@ void TsunamiWindow::updateMenu()
 	enable("remove_sample", song->getNumSelectedSamples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
-	enable("stop", view->stream->isPlaying());
+	enable("play", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
+	enable("stop", view->stream->isPlaying() or side_bar->isActive(SideBar::CAPTURE_CONSOLE));
 	enable("pause", view->stream->isPlaying());
 	check("play_loop", view->renderer->loop_if_allowed);
+	enable("record", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
 	// view
 	check("show_mixing_console", bottom_bar->isActive(BottomBar::MIXING_CONSOLE));
 	check("show_fx_console", side_bar->isActive(SideBar::FX_CONSOLE));

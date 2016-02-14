@@ -73,7 +73,7 @@ void ViewModeDefault::onLeftDoubleClick()
 
 	if (mouse_possibly_selecting < view->mouse_min_move_to_select){
 		if (selection->type == Selection::TYPE_SAMPLE){
-			win->side_bar->open(SideBar::SAMPLEREF_DIALOG);
+			win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 		}else if ((selection->type == Selection::TYPE_TRACK) or (selection->type == Selection::TYPE_TRACK_HANDLE) or ((selection->track) and ((selection->type == Selection::TYPE_SELECTION_START) or (selection->type == Selection::TYPE_SELECTION_END)))){
 			win->side_bar->open(SideBar::TRACK_CONSOLE);
 		}else if (!selection->track){

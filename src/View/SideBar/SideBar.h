@@ -23,6 +23,7 @@ class CurveConsole;
 class SynthConsole;
 class MidiFxConsole;
 class BarsConsole;
+class CaptureConsole;
 class AudioView;
 
 class SideBarConsole : public HuiPanel
@@ -56,12 +57,13 @@ public:
 		SAMPLE_CONSOLE,
 		GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
-		MIDI_EDITOR,
+		MIDI_EDITOR_CONSOLE,
 		FX_CONSOLE,
 		CURVE_CONSOLE,
 		SYNTH_CONSOLE,
 		MIDI_FX_CONCOLE,
-		SAMPLEREF_DIALOG,
+		SAMPLEREF_CONSOLE,
+		CAPTURE_CONSOLE,
 		NUM_CONSOLES
 	};
 
@@ -76,13 +78,14 @@ public:
 	BarsConsole *bars_console;
 	FxConsole *global_fx_console;
 	TrackConsole *track_console;
-	MidiEditorConsole *midi_editor;
+	MidiEditorConsole *midi_editor_console;
 	FxConsole *fx_console;
 	CurveConsole *curve_console;
 	SynthConsole *synth_console;
 	MidiFxConsole *midi_fx_console;
-	SampleRefConsole *sample_ref_dialog;
+	SampleRefConsole *sample_ref_console;
 	SampleManagerConsole *sample_manager;
+	CaptureConsole *capture_console;
 
 	Array<SideBarConsole*> consoles;
 	void addConsole(SideBarConsole *c);

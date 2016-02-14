@@ -5,11 +5,11 @@
  *      Author: michi
  */
 
-#ifndef CAPTUREDIALOG_H_
-#define CAPTUREDIALOG_H_
+#ifndef CAPTURECONSOLE_H_
+#define CAPTURECONSOLE_H_
 
 
-#include "../../lib/hui/hui.h"
+#include "SideBar.h"
 #include "../Helper/PeakMeter.h"
 #include "../../Stuff/Observer.h"
 #include "../../Audio/AudioInputMidi.h"
@@ -18,11 +18,16 @@
 class AudioView;
 class AudioInputAny;
 
-class CaptureDialog : public HuiWindow, public Observer
+class CaptureConsole : public SideBarConsole, public Observer
 {
 public:
-	CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *a);
-	virtual ~CaptureDialog();
+	CaptureConsole(Song *s, AudioView *view);
+	virtual ~CaptureConsole();
+
+
+
+	virtual void onEnter();
+	virtual void onLeave();
 
 	void onTypeAudio();
 	void onTypeMidi();
@@ -57,4 +62,4 @@ public:
 	int type;
 };
 
-#endif /* CAPTUREDIALOG_H_ */
+#endif /* CAPTURECONSOLE_H_ */

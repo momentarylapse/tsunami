@@ -9,7 +9,6 @@
 #include "TsunamiWindow.h"
 #include "Tsunami.h"
 #include "View/Dialog/NewDialog.h"
-#include "View/Dialog/CaptureDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/MarkerDialog.h"
 #include "View/BottomBar/BottomBar.h"
@@ -230,7 +229,7 @@ void TsunamiWindow::onDeleteTrack()
 void TsunamiWindow::onTrackEditMidi()
 {
 	if (view->cur_track)
-		side_bar->open(SideBar::MIDI_EDITOR);
+		side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 	else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
 }
@@ -268,7 +267,7 @@ void TsunamiWindow::onTrackProperties()
 void TsunamiWindow::onSampleProperties()
 {
 	if (view->cur_sample)
-		side_bar->open(SideBar::SAMPLEREF_DIALOG);
+		side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 	else
 		tsunami->log->error(_("Kein Sample ausgew&ahlt"));
 }
@@ -430,8 +429,7 @@ void TsunamiWindow::onInsertSample()
 
 void TsunamiWindow::onRecord()
 {
-	CaptureDialog *dlg = new CaptureDialog(this, false, song);
-	dlg->run();
+	side_bar->open(SideBar::CAPTURE_CONSOLE);
 }
 
 void TsunamiWindow::onAddLevel()

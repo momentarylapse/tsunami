@@ -441,9 +441,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_228865
+rand_id_13863
 
-rand_id_458577
+rand_id_501066
 
 rdt_capture
 Recording
@@ -594,7 +594,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-173
+174
 // Data (ID,Text)
 
 
@@ -660,6 +660,8 @@ Anwendung ohne Netzwerk-Unterstützung compiliert...
 Program was compiled without network abilities...
 Audio
 Audio
+Aufnahme
+Recording
 Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
 Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
 Aufruf: tsunami --export <Datei> <Exportdatei>

@@ -235,7 +235,6 @@ OBJ = \
  View/BottomBar/MixingConsole.o\
  View/Dialog/BarAddDialog.o\
  View/Dialog/BarEditDialog.o\
- View/Dialog/CaptureDialog.o\
  View/Dialog/ConfigurableSelectorDialog.o\
  View/Dialog/DetuneSynthesizerDialog.o\
  View/Dialog/MarkerDialog.o\
@@ -248,10 +247,12 @@ OBJ = \
  View/Helper/Slider.o\
  View/Mode/ViewMode.o\
  View/Mode/ViewModeBars.o\
+ View/Mode/ViewModeCapture.o\
  View/Mode/ViewModeCurve.o\
  View/Mode/ViewModeDefault.o\
  View/Mode/ViewModeMidi.o\
  View/SideBar/BarsConsole.o\
+ View/SideBar/CaptureConsole.o\
  View/SideBar/CurveConsole.o\
  View/SideBar/FxConsole.o\
  View/SideBar/LevelConsole.o\
@@ -974,9 +975,6 @@ View/Dialog/BarAddDialog.o : View/Dialog/BarAddDialog.cpp
 View/Dialog/BarEditDialog.o : View/Dialog/BarEditDialog.cpp
 	$(CPP) -c View/Dialog/BarEditDialog.cpp -o $@ $(CXXFLAGS)
 
-View/Dialog/CaptureDialog.o : View/Dialog/CaptureDialog.cpp
-	$(CPP) -c View/Dialog/CaptureDialog.cpp -o $@ $(CXXFLAGS)
-
 View/Dialog/ConfigurableSelectorDialog.o : View/Dialog/ConfigurableSelectorDialog.cpp
 	$(CPP) -c View/Dialog/ConfigurableSelectorDialog.cpp -o $@ $(CXXFLAGS)
 
@@ -1013,6 +1011,9 @@ View/Mode/ViewMode.o : View/Mode/ViewMode.cpp
 View/Mode/ViewModeBars.o : View/Mode/ViewModeBars.cpp
 	$(CPP) -c View/Mode/ViewModeBars.cpp -o $@ $(CXXFLAGS)
 
+View/Mode/ViewModeCapture.o : View/Mode/ViewModeCapture.cpp
+	$(CPP) -c View/Mode/ViewModeCapture.cpp -o $@ $(CXXFLAGS)
+
 View/Mode/ViewModeCurve.o : View/Mode/ViewModeCurve.cpp
 	$(CPP) -c View/Mode/ViewModeCurve.cpp -o $@ $(CXXFLAGS)
 
@@ -1024,6 +1025,9 @@ View/Mode/ViewModeMidi.o : View/Mode/ViewModeMidi.cpp
 
 View/SideBar/BarsConsole.o : View/SideBar/BarsConsole.cpp
 	$(CPP) -c View/SideBar/BarsConsole.cpp -o $@ $(CXXFLAGS)
+
+View/SideBar/CurveCapture.o : View/SideBar/CurveCapture.cpp
+	$(CPP) -c View/SideBar/CurveCapture.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/CurveConsole.o : View/SideBar/CurveConsole.cpp
 	$(CPP) -c View/SideBar/CurveConsole.cpp -o $@ $(CXXFLAGS)

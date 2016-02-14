@@ -10,7 +10,7 @@ Dialog record_dialog "Aufnahme" 300 200
 			Grid ? "" 1 2
 				Grid ? "" 2 1
 					Text capture_time "0:00" width=120
-					DrawingArea capture_level "" height=25
+					DrawingArea capture_level "" height=25 noexpandy
 				Grid ? "" 3 1
 					Button capture_start "" image=hui:media-record flat
 					Button capture_pause "" image=hui:media-pause flat
@@ -20,3 +20,4 @@ Dialog record_dialog "Aufnahme" 300 200
 		Grid record_dialog_buttonbar "" 2 1 buttonbar
 			Button cancel "Abbrechen" image=hui:cancel
 			DefButton ok "OK" image=hui:ok
+		Text td_t_dummy "" expandy

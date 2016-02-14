@@ -202,7 +202,7 @@ void MidiFxConsole::onEditTrack()
 
 void MidiFxConsole::onEditMidi()
 {
-	((SideBar*)parent)->open(SideBar::MIDI_EDITOR);
+	((SideBar*)parent)->open(SideBar::MIDI_EDITOR_CONSOLE);
 }
 
 void MidiFxConsole::setTrack(Track *t)

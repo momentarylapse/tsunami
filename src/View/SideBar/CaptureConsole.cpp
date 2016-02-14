@@ -5,7 +5,6 @@
  *      Author: michi
  */
 
-#include "CaptureDialog.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include "../../Audio/AudioInputAny.h"
@@ -15,23 +14,25 @@
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
+#include "../Mode/ViewModeCapture.h"
 #include "../../Stuff/Log.h"
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
+#include "CaptureConsole.h"
 
-CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
-	HuiWindow("record_dialog", _parent, _allow_parent),
+CaptureConsole::CaptureConsole(Song *s, AudioView *v):
+	SideBarConsole(_("Aufnahme")),
 	Observer("CaptureDialog")
 {
 	song = s;
-	view = tsunami->win->view;
+	view = v;
 	type = -1;
-	input = new AudioInputAny(song->sample_rate);
-	input->setSaveMode(true);
-	input->setChunkSize(4096);
-	input->setUpdateDt(0.03f);
-	subscribe(input);
-	view->setInput(input);
+	input = NULL;
+
+
+	// dialog
+	setBorderWidth(5);
+	embedDialog("record_dialog", 0, 0);
 
 	temp_synth = CreateSynthesizer("");
 
@@ -40,13 +41,52 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
 
 	// dialog
 	peak_meter = new PeakMeter(this, "capture_level", input);
-	setString("capture_time", s->get_time_str_long(0));
+
+
+
+	event("cancel", this, &CaptureConsole::onClose);
+	//event("hui:close", this, &CaptureConsole::onClose);
+	event("ok", this, &CaptureConsole::onOk);
+	event("capture_type:audio", this, &CaptureConsole::onTypeAudio);
+	event("capture_type:midi", this, &CaptureConsole::onTypeMidi);
+	event("capture_source", this, &CaptureConsole::onSource);
+	event("capture_target", this, &CaptureConsole::onTarget);
+	event("capture_start", this, &CaptureConsole::onStart);
+	event("capture_delete", this, &CaptureConsole::onDelete);
+	event("capture_pause", this, &CaptureConsole::onPause);
+}
+
+CaptureConsole::~CaptureConsole()
+{
+	delete(peak_meter);
+	delete(temp_synth);
+}
+
+void CaptureConsole::onEnter()
+{
+	type = -1;
+	input = new AudioInputAny(song->sample_rate);
+	input->setSaveMode(true);
+	input->setChunkSize(4096);
+	input->setUpdateDt(0.03f);
+	subscribe(input);
+	view->setInput(input);
+	peak_meter->setSource(input);
+
+
+
+	selected_audio_source = AudioInputAudio::getFavoriteDevice();
+
+
+	// dialog
+	setString("capture_time", song->get_time_str_long(0));
 	enable("capture_delete", false);
 	enable("capture_pause", false);
 	enable("ok", false);
 
 	// target list
-	foreach(Track *t, s->tracks)
+	reset("capture_target");
+	foreach(Track *t, song->tracks)
 		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	addString("capture_target", _("  - neue Spur anlegen -"));
 
@@ -58,43 +98,32 @@ CaptureDialog::CaptureDialog(HuiWindow *_parent, bool _allow_parent, Song *s):
 	}
 
 
-
-	event("cancel", this, &CaptureDialog::onClose);
-	event("hui:close", this, &CaptureDialog::onClose);
-	event("ok", this, &CaptureDialog::onOk);
-	event("capture_type:audio", this, &CaptureDialog::onTypeAudio);
-	event("capture_type:midi", this, &CaptureDialog::onTypeMidi);
-	event("capture_source", this, &CaptureDialog::onSource);
-	event("capture_target", this, &CaptureDialog::onTarget);
-	event("capture_start", this, &CaptureDialog::onStart);
-	event("capture_delete", this, &CaptureDialog::onDelete);
-	event("capture_pause", this, &CaptureDialog::onPause);
-
+	view->setMode(view->mode_capture);
 
 	// automatically start
 	onStart();
 }
 
-CaptureDialog::~CaptureDialog()
+void CaptureConsole::onLeave()
 {
+	peak_meter->setSource(NULL);
 	view->stream->stop();
-
-	delete(peak_meter);
-	delete(temp_synth);
 
 	view->setInput(NULL);
 	unsubscribe(input);
 	delete(input);
+
+	view->setMode(view->mode_default);
 }
 
-void CaptureDialog::onTarget()
+void CaptureConsole::onTarget()
 {
 	int target = getInt("capture_target");
 	setTarget(target);
 }
 
 
-void CaptureDialog::onTypeAudio()
+void CaptureConsole::onTypeAudio()
 {
 	setType(Track::TYPE_AUDIO);
 }
@@ -121,12 +150,12 @@ void SelectMidiPort(HuiWindow *parent)
 	dlg->run();
 }*/
 
-void CaptureDialog::onTypeMidi()
+void CaptureConsole::onTypeMidi()
 {
 	setType(Track::TYPE_MIDI);
 }
 
-void CaptureDialog::setTarget(int index)
+void CaptureConsole::setTarget(int index)
 {
 	if (index < song->tracks.num){
 		Track *t = song->tracks[index];
@@ -145,7 +174,7 @@ void CaptureDialog::setTarget(int index)
 	setInt("capture_target", index);
 }
 
-void CaptureDialog::onSource()
+void CaptureConsole::onSource()
 {
 	int n = HuiCurWindow->getInt("");
 	if (type == Track::TYPE_MIDI){
@@ -159,7 +188,7 @@ void CaptureDialog::onSource()
 	}
 }
 
-void CaptureDialog::updateMidiPortList()
+void CaptureConsole::updateMidiPortList()
 {
 	midi_ports = input->findMidiPorts();
 	AudioInputMidi::MidiPort cur = input->getCurMidiPort();
@@ -177,7 +206,7 @@ void CaptureDialog::updateMidiPortList()
 
 }
 
-void CaptureDialog::updateAudioSourceList()
+void CaptureConsole::updateAudioSourceList()
 {
 	audio_sources = AudioInputAudio::getDevices();
 
@@ -199,7 +228,7 @@ void CaptureDialog::updateAudioSourceList()
 
 }
 
-void CaptureDialog::setType(int _type)
+void CaptureConsole::setType(int _type)
 {
 	if (type == _type)
 		return;
@@ -232,7 +261,7 @@ void CaptureDialog::setType(int _type)
 	}
 }
 
-void CaptureDialog::onStart()
+void CaptureConsole::onStart()
 {
 	view->renderer->prepare(view->getPlaybackSelection(), false);
 	view->stream->play();
@@ -249,7 +278,7 @@ void CaptureDialog::onStart()
 	enable("capture_target", false);
 }
 
-void CaptureDialog::onDelete()
+void CaptureConsole::onDelete()
 {
 	if (view->stream->isPlaying())
 		view->stream->stop();
@@ -266,7 +295,7 @@ void CaptureDialog::onDelete()
 	updateTime();
 }
 
-void CaptureDialog::onPause()
+void CaptureConsole::onPause()
 {
 	// TODO...
 	if (view->stream->isPlaying())
@@ -277,34 +306,34 @@ void CaptureDialog::onPause()
 }
 
 
-void CaptureDialog::onOk()
+void CaptureConsole::onOk()
 {
 	if (insert())
-		delete(this);
+		((SideBar*)parent)->_hide();
 }
 
-void CaptureDialog::onClose()
+void CaptureConsole::onClose()
 {
-	delete(this);
+	((SideBar*)parent)->_hide();
 }
 
-void CaptureDialog::updateTime()
+void CaptureConsole::updateTime()
 {
 	setString("capture_time", song->get_time_str_long(input->getSampleCount()));
 }
 
-void CaptureDialog::onUpdate(Observable *o, const string &message)
+void CaptureConsole::onUpdate(Observable *o, const string &message)
 {
 	updateTime();
 }
 
-bool CaptureDialog::insert()
+bool CaptureConsole::insert()
 {
 	msg_db_f("CaptureInsert", 1);
 	Track *t;
 	int target = getInt("capture_target");
 	int i0;
-	int s_start = tsunami->win->view->sel_range.start();
+	int s_start = view->sel_range.start();
 
 	// insert recorded data with some delay
 	int dpos = input->getDelay();
@@ -327,8 +356,8 @@ bool CaptureDialog::insert()
 	if (type == t->TYPE_AUDIO){
 		Range r = Range(i0, input->getSampleCount());
 		song->action_manager->beginActionGroup();
-		BufferBox tbuf = t->getBuffers(tsunami->win->view->cur_level, r);
-		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, tsunami->win->view->cur_level, r);
+		BufferBox tbuf = t->getBuffers(view->cur_level, r);
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_level, r);
 		tbuf.set(*input->buffer, 0, 1.0f);
 		song->execute(a);
 		song->action_manager->endActionGroup();

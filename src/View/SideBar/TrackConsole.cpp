@@ -150,7 +150,7 @@ void TrackConsole::onEditCurves()
 
 void TrackConsole::onEditMidi()
 {
-	((SideBar*)parent)->open(SideBar::MIDI_EDITOR);
+	((SideBar*)parent)->open(SideBar::MIDI_EDITOR_CONSOLE);
 }
 
 void TrackConsole::onEditMidiFx()

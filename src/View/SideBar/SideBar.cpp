@@ -18,6 +18,7 @@
 #include "SampleManagerConsole.h"
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
+#include "CaptureConsole.h"
 
 SideBar::SideBar(AudioView *view, Song *song) :
 	Observable("SideBar")
@@ -43,12 +44,13 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	sample_manager = new SampleManagerConsole(song);
 	global_fx_console = new FxConsole(NULL, song);
 	track_console = new TrackConsole(view);
-	midi_editor = new MidiEditorConsole(view, song);
+	midi_editor_console = new MidiEditorConsole(view, song);
 	fx_console = new FxConsole(view, song);
 	curve_console = new CurveConsole(view, song);
 	synth_console = new SynthConsole(view);
 	midi_fx_console = new MidiFxConsole(view, song);
-	sample_ref_dialog = new SampleRefConsole(view, song);
+	sample_ref_console = new SampleRefConsole(view, song);
+	capture_console = new CaptureConsole(song, view);
 
 	addConsole(song_console);
 	addConsole(level_console);
@@ -56,12 +58,13 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	addConsole(sample_manager);
 	addConsole(global_fx_console);
 	addConsole(track_console);
-	addConsole(midi_editor);
+	addConsole(midi_editor_console);
 	addConsole(fx_console);
 	addConsole(curve_console);
 	addConsole(synth_console);
 	addConsole(midi_fx_console);
-	addConsole(sample_ref_dialog);
+	addConsole(sample_ref_console);
+	addConsole(capture_console);
 
 	event("close", (HuiPanel*)this, (void(HuiPanel::*)())&SideBar::onClose);
 

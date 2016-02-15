@@ -298,7 +298,8 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 
 	c->setFontSize(h / 6);
 	c->drawStr(10, area.y1 + area.height() * 0.22f, "T\nA\nB");
-	c->setFontSize(dy * 0.8f);
+	float r = min(dy/2, 8);
+	c->setFontSize(r * 1.6f);
 
 	foreach(MidiNote &n, notes){
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
@@ -314,23 +315,24 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
 
 		// "shadow" to indicate length
-		if (x2 - x1 > dy){
+		if (x2 - x1 > r*2){
 			color col2 = col;
 			col2.a *= 0.4f;
 			c->setColor(col2);
-			c->drawRect(x, y - dy/2, x2 - x1 - dy*3/4, dy);
+			c->drawRect(x, y - r, x2 - x1 - r, r*2);
 		}
 
 		// the note circle
-		col.a *= 0.4f;
+		col = ColorInterpolate(col, view->colors.background_track, 0.5f);
+		//col.a *= 0.4f;
 		c->setColor(col);
 		if (x2 - x1 > 6)
-			c->drawCircle(x, y, dy / 2);
+			c->drawCircle(x, y, r);
 		else
-			c->drawRect(x - dy/2, y - dy/2, dy, dy);
-		if (x2 - x1 > dy/2){
+			c->drawRect(x - r, y - r, r*2, r*2);
+		if (x2 - x1 > r/2){
 			c->setColor(view->colors.text);
-			c->drawStr(x1 + 1, y - dy * 0.60f, i2s(position));
+			c->drawStr(x1 + r/3, y - r * 1.20f, i2s(position));
 		}
 
 	}
@@ -426,11 +428,13 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 	if ((clef == CLEF_TYPE_TREBLE_8) or (clef == CLEF_TYPE_BASS_8))
 		c->drawStr(10+dy, clef_pos_to_screen(-2, area, dy), "8");
 
+	float r = dy/2;
+
 	foreach(MidiNote &n, notes){
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
 		x2 = max(x2, x1 + 4);
-		float x = x1 + dy / 2;
+		float x = x1 + r;
 
 
 		bool sharp;
@@ -454,11 +458,11 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
 
 		// "shadow" to indicate length
-		if (x2 - x1 > dy){
+		if (x2 - x1 > r*2){
 			color col2 = col;
 			col2.a *= 0.4f;
 			c->setColor(col2);
-			c->drawRect(x, y - dy/2, x2 - x1 - dy*3/4, dy);
+			c->drawRect(x, y - r, x2 - x1 - r, r*2);
 		}
 
 		// the note circle
@@ -466,9 +470,9 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 		if (sharp)
 			c->drawStr(x - 15, y - 8, "#");
 		if (x2 - x1 > 6)
-			c->drawCircle(x, y, dy / 2);
+			c->drawCircle(x, y, r);
 		else
-			c->drawRect(x - dy/2, y - dy/2, dy, dy);
+			c->drawRect(x - r, y - r, r*2, r*2);
 	}
 	c->setAntialiasing(false);
 }

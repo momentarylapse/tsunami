@@ -586,6 +586,25 @@ struct GuitarNote
 	}
 };
 
+Array<int> decompose_time(int length)
+{
+	Array<int> t;
+	while (length > 0){
+		int largest = 1;
+		for (int i=2; i<=length; i*=2){
+			// dotted
+			if (i/2*3 <= length)
+				largest = i/2*3;
+			// normal
+			else if (i <= length)
+				largest = i;
+		}
+		t.add(largest);
+		length -= largest;
+	}
+	return t;
+}
+
 Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
 {
 	// samples per 16th
@@ -595,9 +614,10 @@ Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
 	Array<GuitarNote> gnotes;
 
 	foreach(MidiNote &n, notes){
+		Range r = n.range and b.range;
 		GuitarNote gn;
-		gn.offset = int((float)(n.range.offset - b.range.offset) / spu + 0.5f);
-		gn.length = int((float)n.range.num / spu + 0.5f);
+		gn.offset = int((float)(r.offset - b.range.offset) / spu + 0.5f);
+		gn.length = int((float)(r.end() - b.range.offset) / spu + 0.5f) - gn.offset;
 		gn.pitch.add(n.pitch);
 		if (gn.length == 0)
 			continue;
@@ -626,6 +646,24 @@ Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
 		offset = gnotes[i].offset + gnotes[i].length;
 	}
 
+	// decompose evil timings
+	for (int i=gnotes.num-1; i>=0; i--){
+		Array<int> t = decompose_time(gnotes[i].length);
+		if (t.num > 1){
+			int offset = gnotes[i].offset;
+			for (int j=0; j<t.num; j++){
+				GuitarNote n;
+				n.pitch = gnotes[i].pitch;
+				n.offset = offset;
+				n.length = t[j];
+				gnotes.insert(n, i + j + 1);
+				offset += t[j];
+			}
+			gnotes.erase(i);
+		}
+		offset = gnotes[i].offset + gnotes[i].length;
+	}
+
 	foreach(GuitarNote &n, gnotes)
 		n.detune();
 
@@ -640,32 +678,9 @@ void FormatGuitarPro::write_measure(Track *t, Bar &b)
 	//msg_write("-----");
 	Array<GuitarNote> gnotes = create_guitar_notes(t, b);
 
-	int num = gnotes.num;
+	f->WriteInt(gnotes.num); // beats
 	foreach(GuitarNote &n, gnotes)
-		if ((n.length == 5) or (n.length == 10) or (n.length == 20) or (n.length == 14) or (n.length == 28))
-			num ++;
-
-	f->WriteInt(num); // beats
-	foreach(GuitarNote &n, gnotes){
-		if (n.length == 5){
-			write_beat(n.pitch, n.string, 4);
-			write_beat(n.pitch, n.string, 1);
-		}else if (n.length == 10){
-			write_beat(n.pitch, n.string, 8);
-			write_beat(n.pitch, n.string, 2);
-		}else if (n.length == 20){
-			write_beat(n.pitch, n.string, 16);
-			write_beat(n.pitch, n.string, 4);
-		}else if (n.length == 14){
-			write_beat(n.pitch, n.string, 8);
-			write_beat(n.pitch, n.string, 6);
-		}else if (n.length == 28){
-			write_beat(n.pitch, n.string, 16);
-			write_beat(n.pitch, n.string, 12);
-		}else{
-			write_beat(n.pitch, n.string, n.length);
-		}
-	}
+		write_beat(n.pitch, n.string, n.length);
 
 	if (version >= 500) // second voice
 		f->WriteInt(0);
@@ -719,7 +734,7 @@ void FormatGuitarPro::write_beat(Array<int> &pitch, Array<int> &string, int leng
 
 	bool is_pause = (pitch.num == 0);
 
-	bool dotted = (length == 3) or (length == 6) or (length == 12);
+	bool dotted = (length == 3) or (length == 6) or (length == 12) or (length == 24);
 	if (dotted)
 		length = (length * 2) / 3;
 

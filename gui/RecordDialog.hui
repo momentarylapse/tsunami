@@ -8,9 +8,9 @@ Dialog record_dialog "Aufnahme" 300 200
 				ComboBox capture_source "" expandx
 		Group rdt_capture "Aufnahme"
 			Grid ? "" 1 2
-				Grid ? "" 2 1
+				Grid rd_g_data "" 2 1 noexpandy
 					Text capture_time "0:00" width=120
-					DrawingArea capture_level "" height=25 noexpandy
+					DrawingArea capture_level "" height=25
 				Grid ? "" 3 1
 					Button capture_start "" image=hui:media-record flat
 					Button capture_pause "" image=hui:media-pause flat

@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-295
+296
 // Data (ID,Text)
 about
 Info
@@ -441,10 +441,12 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_13863
+rand_id_661144
 
-rand_id_501066
+rand_id_998914
 
+rd_g_data
+!noexpandy\\
 rdt_capture
 Recording
 rdt_source

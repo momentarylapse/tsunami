@@ -319,6 +319,13 @@ string title_filename(const string &filename)
 
 bool TsunamiWindow::allowTermination()
 {
+	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE)){
+		string answer = HuiQuestionBox(this, _("Frage"), _("Aufnahme abbrechen?"), true);
+		if (answer != "hui:yes")
+			return false;
+		side_bar->_hide();
+	}
+
 	if (song->action_manager->isSave())
 		return true;
 	string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(song->filename).c_str()), true);

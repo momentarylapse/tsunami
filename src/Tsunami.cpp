@@ -48,7 +48,6 @@ Tsunami::~Tsunami()
 	delete(plugin_manager);
 }
 
-
 bool Tsunami::onStartup(const Array<string> &arg)
 {
 	tsunami = this;

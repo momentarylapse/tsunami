@@ -67,9 +67,41 @@ string rel_pitch_name(int pitch_rel)
 	return "???";
 }
 
+// convert an integer to a string
+string i2s_small(int i)
+{
+	string r;
+	int l=0;
+	bool m=false;
+	if (i<0){
+		i=-i;
+		m=true;
+	}
+	char a[128];
+	while (1){
+		a[l]=(i%10)+0x80;
+		a[l+1]=0x82;
+		a[l+2]=0xe2;
+		l+=3;
+		i=(int)(i/10);
+		if (i==0)
+			break;
+	}
+	if (m){
+		a[l]=0x8b;
+		a[l+1]=0x82;
+		a[l+2]=0xe2;
+		l+=3;
+	}
+	r.resize(l);
+	for (int j=0;j<l;j++)
+		r[l-j-1]=a[j];
+	return r;
+}
+
 string pitch_name(int pitch)
 {
-	return rel_pitch_name(pitch_to_rel(pitch)) + " " + i2s(pitch_get_octave(pitch));
+	return rel_pitch_name(pitch_to_rel(pitch)) + i2s_small(pitch_get_octave(pitch));
 }
 
 string drum_pitch_name(int pitch)

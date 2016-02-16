@@ -589,9 +589,21 @@ struct GuitarNote
 Array<int> decompose_time(int length)
 {
 	Array<int> t;
+
+	// tripples * 2^n
+	if ((length % 3) != 0){
+		for (int i=1; i<=length; i*=2)
+			if (i == length){
+				t.add(length);
+				return t;
+			}
+		msg_error("non decomposable time: " + i2s(length));
+	}
+
+	// non-trippels
 	while (length > 0){
-		int largest = 1;
-		for (int i=2; i<=length; i*=2){
+		int largest = 3;
+		for (int i=3; i<=length; i*=2){
 			// dotted
 			if (i/2*3 <= length)
 				largest = i/2*3;
@@ -607,8 +619,8 @@ Array<int> decompose_time(int length)
 
 Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
 {
-	// samples per 16th
-	float spu = (float)b.range.num / (float)b.num_beats / 4.0f;
+	// samples per 16th / 3
+	float spu = (float)b.range.num / (float)b.num_beats / 12.0f;
 
 	Array<MidiNote> notes = t->midi.getNotes(b.range);
 	Array<GuitarNote> gnotes;
@@ -621,7 +633,7 @@ Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
 		gn.pitch.add(n.pitch);
 		if (gn.length == 0)
 			continue;
-		if (gn.offset < b.num_beats * 4)
+		if (gn.offset < b.num_beats * 12)
 			gnotes.add(gn);
 	}
 
@@ -734,11 +746,17 @@ void FormatGuitarPro::write_beat(Array<int> &pitch, Array<int> &string, int leng
 
 	bool is_pause = (pitch.num == 0);
 
+	bool tripple = ((length % 3) != 0);
+	if (tripple)
+		length = length / 2;
+	else
+		length /= 3;
+
 	bool dotted = (length == 3) or (length == 6) or (length == 12) or (length == 24);
 	if (dotted)
 		length = (length * 2) / 3;
 
-	f->WriteByte((dotted ? 0x01 : 0x00) | (is_pause ? 0x40 : 0x00));
+	f->WriteByte((dotted ? 0x01 : 0x00) | (tripple ? 0x20 : 0x00) | (is_pause ? 0x40 : 0x00));
 
 	if (is_pause)
 		f->WriteByte(0x02);
@@ -757,6 +775,9 @@ void FormatGuitarPro::write_beat(Array<int> &pitch, Array<int> &string, int leng
 		f->WriteByte(0);
 		od->error("invalid gp length: " + i2s(length));
 	}
+
+	if (tripple)
+		f->WriteInt(3);
 
 	if (pitch.num > 0){
 		int sflags = 0;
@@ -916,37 +937,31 @@ int FormatGuitarPro::read_duration(int flags, GpMeasure &m)
 		int divisionType = f->ReadInt();
 		switch (divisionType) {
 		case 3:
-			//duration.getDivision().setEnters(3);
-			//duration.getDivision().setTimes(2);
+			value *= 2.0f/3.0f;
 			break;
 		case 5:
-			//duration.getDivision().setEnters(5);
-			//duration.getDivision().setTimes(4);
+			value *= 4.0f/5.0f;
 			break;
 		case 6:
-			//duration.getDivision().setEnters(6);
-			//duration.getDivision().setTimes(4);
+			value *= 4.0f/6.0f; // wtf?
 			break;
 		case 7:
-			//duration.getDivision().setEnters(7);
-			//duration.getDivision().setTimes(4);
+			value *= 4.0f/7.0f;
 			break;
 		case 9:
-			//duration.getDivision().setEnters(9);
-			//duration.getDivision().setTimes(8);
+			value *= 8.0f/9.0f;
 			break;
 		case 10:
-			//duration.getDivision().setEnters(10);
-			//duration.getDivision().setTimes(8);
+			value *= 8.0f/10.0f; // ?
 			break;
 		case 11:
-			//duration.getDivision().setEnters(11);
-			//duration.getDivision().setTimes(8);
+			value *= 8.0f/11.0f;
 			break;
 		case 12:
-			//duration.getDivision().setEnters(12);
-			//duration.getDivision().setTimes(8);
+			value *= 8.0f/12.0f; // ?
 			break;
+		default:
+			od->error(format("unknown beat division: %d", divisionType));
 		}
 	}
 	return a->sample_rate * value * 60.0f / (float)tempo;

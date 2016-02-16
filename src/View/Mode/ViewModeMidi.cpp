@@ -25,7 +25,8 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	pitch_max = pitch_min + PITCH_SHOW_COUNT;
 	beat_partition = 4;
 	win->setInt("beat_partition", beat_partition);
-	midi_scale = 0;
+	midi_scale_type = SCALE_TYPE_MAJOR;
+	midi_scale_root = 0;
 	midi_mode = MIDI_MODE_NOTE;
 	midi_interval = 3;
 	chord_type = 0;
@@ -152,13 +153,6 @@ Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 	return allowed;
 }
 
-bool ViewModeMidi::is_sharp(int pitch)
-{
-	int r = (pitch - midi_scale + 12) % 12;
-	// 69 = 9 = a
-	return ((r == 10) or (r == 1) or (r == 3) or (r == 6) or (r == 8));
-}
-
 Array<int> ViewModeMidi::getCreationPitch()
 {
 	Array<int> pitch;
@@ -169,7 +163,7 @@ Array<int> ViewModeMidi::getCreationPitch()
 		if (midi_interval != 0)
 			pitch.add(selection->pitch + midi_interval);
 	}else if (midi_mode == MIDI_MODE_CHORD){
-		pitch = GetChordNotes(chord_type, chord_inversion, selection->pitch);
+		pitch = chord_notes(chord_type, chord_inversion, selection->pitch);
 	}
 	return pitch;
 }
@@ -219,9 +213,10 @@ void ViewModeMidi::setPitchMin(int pitch)
 	view->forceRedraw();
 }
 
-void ViewModeMidi::setScale(int scale)
+void ViewModeMidi::setScale(int type, int root)
 {
-	midi_scale = scale;
+	midi_scale_type = type;
+	midi_scale_root = root;
 	view->forceRedraw();
 }
 
@@ -303,7 +298,7 @@ void ViewModeMidi::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 		for (int i=pitch_min; i<pitch_max; i++){
 			float y0 = pitch2y(i + 1);
 			float y1 = pitch2y(i);
-			if (is_sharp(i)){
+			if (!is_in_scale(i, midi_scale_type, midi_scale_root)){
 				c->setColor(color(0.2f, 0, 0, 0));
 				c->drawRect(t->area.x1, y0, t->area.width(), y1 - y0);
 			}

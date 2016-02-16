@@ -441,9 +441,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_661144
+rand_id_375987
 
-rand_id_998914
+rand_id_563923
 
 rd_g_data
 !noexpandy\\
@@ -596,7 +596,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-174
+180
 // Data (ID,Text)
 
 
@@ -664,6 +664,8 @@ Audio
 Audio
 Aufnahme
 Recording
+Aufnahme abbrechen?
+Cancel recording?
 Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
 Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
 Aufruf: tsunami --export <Datei> <Exportdatei>
@@ -700,6 +702,8 @@ Datenverlust!
 Data loss!
 Dauer\\\") + song->get_time_str_long(samples));
 
+Dorisch
+Dorian
 Dur
 Major
 E-Bass
@@ -786,6 +790,10 @@ Lautstärke in dB
 Volume in dB
 Leiste aufklappen
 Expand
+Locrisch
+Locrian
+Lydisch
+Lydian
 MIDI Quelle auswählen
 Select MIDI source
 MIDI Quellen
@@ -800,6 +808,8 @@ MidiEffekt nicht ladbar: \"%s\"
 Can not load MidiEffect: \"%s\"
 Mischpult
 Mixing console
+Mixolydisch
+Mixolydian
 Moll
 Minor
 Nachrichten
@@ -818,6 +828,8 @@ Parameter speichern
 Save parameter
 Pause einfügen
 add pause
+Phrygisch
+Phrygian
 Piano
 Piano
 Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'

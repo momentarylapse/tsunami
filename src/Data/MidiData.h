@@ -88,10 +88,6 @@ string rel_pitch_name(int pitch_rel);
 string pitch_name(int pitch);
 string drum_pitch_name(int pitch);
 
-string GetChordTypeName(int type);
-Array<string> GetChordTypeNames();
-Array<int> GetChordNotes(int type, int inversion, int pitch);
-
 
 enum
 {
@@ -102,6 +98,24 @@ enum
 	NUM_CHORD_TYPES
 };
 
+string chord_type_name(int type);
+Array<int> chord_notes(int type, int inversion, int pitch);
+
+enum
+{
+	SCALE_TYPE_MAJOR,
+	SCALE_TYPE_DORIAN,
+	SCALE_TYPE_PHRYGIAN,
+	SCALE_TYPE_LYDIAN,
+	SCALE_TYPE_MIXOLYDIAN,
+	SCALE_TYPE_MINOR,
+	SCALE_TYPE_LOCRIAN,
+	NUM_SCALE_TYPES
+};
+
+string scale_type_name(int type);
+bool is_in_scale(int pitch, int scale_type, int scale_root);
+
 
 enum{
 	CLEF_TYPE_TREBLE,
@@ -109,7 +123,10 @@ enum{
 	CLEF_TYPE_BASS,
 	CLEF_TYPE_BASS_8,
 	CLEF_TYPE_DRUMS,
+	NUM_CLEF_TYPES
 };
+
+string clef_symbol(int clef);
 
 
 #endif /* MIDIDATA_H_ */

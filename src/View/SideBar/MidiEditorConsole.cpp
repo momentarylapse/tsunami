@@ -34,9 +34,8 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 
 	setInt("interval", view->mode_midi->midi_interval);
 
-	Array<string> chord_types = GetChordTypeNames();
-	foreach(string &ct, chord_types)
-		addString("chord_type", ct);
+	for (int i=0; i<NUM_CHORD_TYPES; i++)
+		addString("chord_type", chord_type_name(i));
 	setInt("chord_type", 0);
 	addString("chord_inversion", _("Grundform"));
 	addString("chord_inversion", _("1. Umkehrung"));
@@ -44,15 +43,19 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	setInt("chord_inversion", 0);
 
 	for (int i=0; i<12; i++)
-		addString("scale", rel_pitch_name(i) + " " + GetChordTypeName(CHORD_TYPE_MAJOR) + " / " + rel_pitch_name(pitch_to_rel(i + 9)) + " " + GetChordTypeName(CHORD_TYPE_MINOR));
-	setInt("scale", view->mode_midi->midi_scale);
+		addString("scale_root", rel_pitch_name(11 - i));
+	for (int i=0; i<NUM_SCALE_TYPES; i++)
+		addString("scale_type", scale_type_name(i));
+	setInt("scale_root", 11 - view->mode_midi->midi_scale_root);
+	setInt("scale_type", view->mode_midi->midi_scale_type);
 
 	track = NULL;
 	//Enable("add", false);
 	enable("track_name", false);
 
 	event("beat_partition", this, &MidiEditorConsole::onBeatPartition);
-	event("scale", this, &MidiEditorConsole::onScale);
+	event("scale_root", this, &MidiEditorConsole::onScale);
+	event("scale_type", this, &MidiEditorConsole::onScale);
 	event("midi_edit_mode", this, &MidiEditorConsole::onMidiEditMode);
 	event("interval", this, &MidiEditorConsole::onInterval);
 	event("chord_type", this, &MidiEditorConsole::onChordType);
@@ -112,10 +115,9 @@ void MidiEditorConsole::onUpdate(Observable* o, const string &message)
 	}
 }
 
-
 void MidiEditorConsole::onScale()
 {
-	view->mode_midi->setScale(getInt(""));
+	view->mode_midi->setScale(getInt("scale_type"), 11 - getInt("scale_root"));
 }
 
 void MidiEditorConsole::onBeatPartition()

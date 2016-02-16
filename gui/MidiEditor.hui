@@ -8,7 +8,9 @@ Dialog midi_editor "Midi" 380 516
 					Text ld_t_partition "Unterteilung"
 					SpinButton beat_partition "4\\1\\256" expandx
 					Text ld_t_scale "Tonleiter"
-					ComboBox scale ""
+					Grid ? "" 2 1
+						ComboBox scale_root ""
+						ComboBox scale_type ""
 			TabControl midi_edit_mode "Einzelton\\Intervall\\Akkord"
 				Grid ? "" 1 1
 					.

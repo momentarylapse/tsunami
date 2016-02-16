@@ -304,8 +304,7 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 	foreach(MidiNote &n, notes){
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
-		x2 = max(x2, x1 + 4);
-		float x = x1 + dy / 2;
+		float x = x1 + r;
 
 		int stringno, position;
 		get_tab(stringno, position, n.pitch, track->instrument.tuning);
@@ -319,7 +318,7 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 			color col2 = col;
 			col2.a *= 0.4f;
 			c->setColor(col2);
-			c->drawRect(x, y - r, x2 - x1 - r, r*2);
+			c->drawRect(x, y - r, x2 - x, r*2);
 		}
 
 		// the note circle
@@ -418,22 +417,14 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 	c->setAntialiasing(true);
 
 	c->setFontSize(dy*4);
-	if (clef == CLEF_TYPE_DRUMS)
-		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄥");
-	else if ((clef == CLEF_TYPE_TREBLE) or (clef == CLEF_TYPE_TREBLE_8))
-		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄞"); // \uD834\uDD1E
-	else
-		c->drawStr(10, clef_pos_to_screen(10, area, dy), "𝄢"); // \uD834\uDD22
-	c->setFontSize(view->FONT_SIZE);
-	if ((clef == CLEF_TYPE_TREBLE_8) or (clef == CLEF_TYPE_BASS_8))
-		c->drawStr(10+dy, clef_pos_to_screen(-2, area, dy), "8");
+	c->drawStr(10, clef_pos_to_screen(10, area, dy), clef_symbol(clef));
+	c->setFontSize(dy);
 
 	float r = dy/2;
 
 	foreach(MidiNote &n, notes){
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
-		x2 = max(x2, x1 + 4);
 		float x = x1 + r;
 
 
@@ -462,18 +453,19 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 			color col2 = col;
 			col2.a *= 0.4f;
 			c->setColor(col2);
-			c->drawRect(x, y - r, x2 - x1 - r, r*2);
+			c->drawRect(x, y - r, x2 - x, r*2);
 		}
 
 		// the note circle
 		c->setColor(col);
 		if (sharp)
-			c->drawStr(x - 15, y - 8, "#");
+			c->drawStr(x - 15, y - 8, "\u266F");
 		if (x2 - x1 > 6)
 			c->drawCircle(x, y, r);
 		else
 			c->drawRect(x - r, y - r, r*2, r*2);
 	}
+	c->setFontSize(view->FONT_SIZE);
 	c->setAntialiasing(false);
 }
 

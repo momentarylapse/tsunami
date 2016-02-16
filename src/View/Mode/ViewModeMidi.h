@@ -50,7 +50,7 @@ public:
 	int y2pitch(int y);
 	float pitch2y(int p);
 	void setPitchMin(int pitch);
-	void setScale(int scale);
+	void setScale(int type, int root);
 	void setBeatPartition(int partition);
 
 	Array<int> getCreationPitch();
@@ -58,11 +58,11 @@ public:
 	int pitch_min, pitch_max;
 	int beat_partition;
 	int midi_mode;
-	int midi_scale;
+	int midi_scale_type;
+	int midi_scale_root; // relative pitch
 	int chord_type;
 	int chord_inversion;
 	int midi_interval;
-	bool is_sharp(int pitch);
 
 	enum
 	{

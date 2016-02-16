@@ -43,25 +43,25 @@ string rel_pitch_name(int pitch_rel)
 	if (pitch_rel == 0)
 		return "C";
 	if (pitch_rel == 1)
-		return "C#";
+		return "C\u266F";
 	if (pitch_rel == 2)
 		return "D";
 	if (pitch_rel == 3)
-		return "D#";
+		return "D\u266F";
 	if (pitch_rel == 4)
 		return "E";
 	if (pitch_rel == 5)
 		return "F";
 	if (pitch_rel == 6)
-		return "F#";
+		return "F\u266F";
 	if (pitch_rel == 7)
 		return "G";
 	if (pitch_rel == 8)
-		return "G#";
+		return "G\u266F";
 	if (pitch_rel == 9)
 		return "A";
 	if (pitch_rel == 10)
-		return "A#";
+		return "A\u266F";
 	if (pitch_rel == 11)
 		return "B";
 	return "???";
@@ -134,6 +134,21 @@ string drum_pitch_name(int pitch)
 	if (pitch == 60)	return "bongo - hi";
 	if (pitch == 61)	return "bongo - low";
 	return pitch_name(pitch);
+}
+
+string clef_symbol(int clef)
+{
+	if (clef == CLEF_TYPE_DRUMS)
+		return "𝄥";
+	if (clef == CLEF_TYPE_TREBLE)
+		return "𝄞"; // \uD834\uDD1E
+	if (clef == CLEF_TYPE_TREBLE_8)
+		return "𝄠"; // \uD834\uDD20
+	if (clef == CLEF_TYPE_BASS)
+		return "𝄢"; // \uD834\uDD22
+	if (clef == CLEF_TYPE_BASS_8)
+		return "𝄤"; // \uD834\uDD24
+	return "?";
 }
 
 MidiNote::MidiNote(const Range &_range, float _pitch, float _volume)
@@ -370,7 +385,7 @@ MidiNoteData midi_events_to_notes(const MidiRawData &events)
 }
 
 
-string GetChordTypeName(int type)
+string chord_type_name(int type)
 {
 	if (type == CHORD_TYPE_MINOR)
 		return _("Moll");
@@ -383,15 +398,7 @@ string GetChordTypeName(int type)
 	return "???";
 }
 
-Array<string> GetChordTypeNames()
-{
-	Array<string> r;
-	for (int i=0; i<NUM_CHORD_TYPES; i++)
-		r.add(GetChordTypeName(i));
-	return r;
-}
-
-Array<int> GetChordNotes(int type, int inversion, int pitch)
+Array<int> chord_notes(int type, int inversion, int pitch)
 {
 	Array<int> r;
 	r.add(pitch);
@@ -417,3 +424,29 @@ Array<int> GetChordNotes(int type, int inversion, int pitch)
 	return r;
 }
 
+string scale_type_name(int type)
+{
+	if (type == SCALE_TYPE_MAJOR)
+		return _("Dur");
+	if (type == SCALE_TYPE_DORIAN)
+		return _("Dorisch");
+	if (type == SCALE_TYPE_PHRYGIAN)
+		return _("Phrygisch");
+	if (type == SCALE_TYPE_LYDIAN)
+		return _("Lydisch");
+	if (type == SCALE_TYPE_MIXOLYDIAN)
+		return _("Mixolydisch");
+	if (type == SCALE_TYPE_MINOR)
+		return _("Moll");
+	if (type == SCALE_TYPE_LOCRIAN)
+		return _("Locrisch");
+	return "???";
+}
+
+bool is_in_scale(int pitch, int scale_type, int scale_root)
+{
+	int offset[7] = {0, 2, 4, 5, 7, 9, 11};
+	int r = (pitch - scale_root + offset[scale_type] + 24) % 12;
+	// 69 = 9 = a
+	return !((r == 10) or (r == 1) or (r == 3) or (r == 6) or (r == 8));
+}

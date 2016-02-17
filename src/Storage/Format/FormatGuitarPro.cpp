@@ -772,8 +772,10 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 {
 	msg_db_f("beat", 2);
 
-	if (length <= 2)
+	if (length <= 1){
+		msg_error("write_beat: evil length: " + i2s(length));
 		length = 3; // quick and dirty fix :P
+	}
 
 	bool is_pause = (pitch.num == 0);
 

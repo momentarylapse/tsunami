@@ -36,6 +36,7 @@ public:
 	Range range;
 	int num_beats;
 	int index;
+	float bpm(float sample_rate);
 };
 
 class Beat

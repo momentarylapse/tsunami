@@ -30,6 +30,11 @@ Bar::Bar(const Range &r, int _num_beats, int _index)
 	index = _index;
 }
 
+float Bar::bpm(float sample_rate)
+{
+	return 60.0f / (float)range.num * (float)num_beats * sample_rate;
+}
+
 Array<Beat> BarCollection::getBeats(const Range &r)
 {
 	Array<Beat> beats;

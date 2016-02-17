@@ -16,6 +16,8 @@
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "math.h"
 
+string i2s_small(int i);
+
 ViewModeDefault::ViewModeDefault(AudioView *view) :
 	ViewMode(view)
 {
@@ -240,6 +242,8 @@ void ViewModeDefault::drawGridBars(HuiPainter *c, const rect &r, const color &bg
 {
 	if (song->bars.num == 0)
 		return;
+	int prev_num_beats = 0;
+	float prev_bpm = 0;
 	int s0 = cam->screen2sample(r.x1 - 1);
 	int s1 = cam->screen2sample(r.x2);
 	//c->SetLineWidth(2.0f);
@@ -278,9 +282,23 @@ void ViewModeDefault::drawGridBars(HuiPainter *c, const rect &r, const color &bg
 			}
 		}
 
-		if ((show_time) and (f1 > 0.9f)){
-			c->setColor(view->colors.text_soft1);
-			c->drawStr(xx + 2, r.y1, i2s(b.index + 1));
+		if (show_time){
+			if (f1 > 0.9f){
+				c->setColor(view->colors.text_soft1);
+				c->drawStr(xx + 2, r.y1, i2s(b.index + 1));
+			}
+			float bpm = b.bpm(song->sample_rate);
+			string s;
+			if (prev_num_beats != b.num_beats)
+				s = i2s(b.num_beats) + "/" + i2s_small(4);
+			if (fabs(prev_bpm - bpm) > 0.5f)
+				s += format(" %.0f", bpm);
+			if (s.num > 0){
+				c->setColor(view->colors.text);
+				c->drawStr(max(xx + 5, 20), r.y1 + 18, s);
+			}
+			prev_num_beats = b.num_beats;
+			prev_bpm = bpm;
 		}
 	}
 	c->setLineDash(no_dash, 0);

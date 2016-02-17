@@ -118,8 +118,10 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 			tt.t = t;
 			tracks.add(tt);
 		}
-	Array<Bar> bars = a->bars.getBars(Range(-1000000000, 2000000000));
-	tempo = 60.0f * (float)bars[0].num_beats / (float)bars[0].range.num * (float)a->sample_rate;
+	Array<Bar> bars = a->bars.getBars(Range::ALL);
+	tempo = 90;
+	if (bars.num > 0)
+		tempo = (bars[0].bpm(a->sample_rate) + 0.5f);
 
 
 	write_info();
@@ -715,12 +717,25 @@ void FormatGuitarPro::write_measure(GpTrack *t, Bar &b)
 	msg_db_f("measure", 1);
 	//msg_write(format("m %x", f->GetPos()));
 
+	int bpm = (b.bpm(t->t->song->sample_rate) + 0.5f);
+	bool update_tempo = (bpm != tempo);
+	tempo = bpm;
+
 	//msg_write("-----");
 	Array<GuitarNote> gnotes = create_guitar_notes(t, b);
 
-	f->WriteInt(gnotes.num); // beats
-	foreach(GuitarNote &n, gnotes)
-		write_beat(t, n.pitch, n.string, n.length);
+	// empty? -> at least fill in a long break
+	if (gnotes.num == 0){
+		GuitarNote g;
+		g.length = 12 * b.num_beats;
+		g.offset = 0;
+		gnotes.add(g);
+	}
+
+	// beats
+	f->WriteInt(gnotes.num);
+	foreachi(GuitarNote &n, gnotes, i)
+		write_beat(t, n.pitch, n.string, n.length, update_tempo and (i == 0));
 
 	if (version >= 500) // second voice
 		f->WriteInt(0);
@@ -751,14 +766,10 @@ int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 		read_mix_change();
 	int stringFlags = f->ReadByte();
 	//msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
-	for (int i = 6; i >= 0; i--) {
-		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.tuning.num) {
-			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
+	for (int i = 6; i >= 0; i--)
+		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.tuning.num)
 			read_note(t, (6 - i), start, duration);
-			//TGNote note = readNote(string, track,effect.clone(getFactory()));
-			//voice.addNote(note);
-		}
-	}
+
 	if (version >= 500){
 		f->ReadByte();
 		int r = f->ReadByte();
@@ -768,7 +779,7 @@ int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 	return duration;
 }
 
-void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &string, int length)
+void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &string, int length, bool update_tempo)
 {
 	msg_db_f("beat", 2);
 
@@ -789,7 +800,7 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 	if (dotted)
 		length = (length * 2) / 3;
 
-	f->WriteByte((dotted ? 0x01 : 0x00) | (tripple ? 0x20 : 0x00) | (is_pause ? 0x40 : 0x00));
+	f->WriteByte((dotted ? 0x01 : 0x00) | (tripple ? 0x20 : 0x00) | (is_pause ? 0x40 : 0x00) | (update_tempo ? 0x10 : 0x00));
 
 	if (is_pause)
 		f->WriteByte(0x02);
@@ -811,6 +822,9 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 
 	if (tripple)
 		f->WriteInt(3);
+
+	if (update_tempo)
+		write_mix_change_tempo();
 
 	if (pitch.num > 0){
 		int sflags = 0;
@@ -1002,8 +1016,8 @@ int FormatGuitarPro::read_duration(int flags, GpMeasure &m)
 
 void FormatGuitarPro::read_mix_change()
 {
-	msg_db_f("mix", 1);
-	f->ReadByte();
+	msg_db_f("mix", 0);
+	f->ReadByte(); // instrument
 	if (version >= 500){
 		for (int i=0; i<4; i++)
 			f->ReadInt();
@@ -1014,7 +1028,7 @@ void FormatGuitarPro::read_mix_change()
 	int reverb = (signed char)f->ReadByte();
 	int phaser = (signed char)f->ReadByte();
 	int tremolo = (signed char)f->ReadByte();
-	if (version > 500)
+	if (version >= 500)
 		read_str41(f);
 	int tempoValue = f->ReadInt();
 	//msg_write(format("%d %d %d %d %d %d %d", volume, pan, chorus, reverb, phaser, tremolo, tempoValue));
@@ -1043,6 +1057,38 @@ void FormatGuitarPro::read_mix_change()
 	if (version > 500){
 		read_str41(f);
 		read_str41(f);
+	}
+}
+
+void FormatGuitarPro::write_mix_change_tempo()
+{
+	msg_db_f("mix", 1);
+	f->WriteByte(0xff);
+	if (version >= 500){
+		for (int i=0; i<4; i++)
+			f->WriteInt(0);
+	}
+	f->WriteByte(0xff); // volume
+	f->WriteByte(0xff); // pan
+	f->WriteByte(0xff); // chorus
+	f->WriteByte(0xff); // reverb
+	f->WriteByte(0xff); // phaser
+	f->WriteByte(0xff); // tremolo
+	if (version >= 500)
+		write_str41(f, "");
+
+	f->WriteInt(tempo);
+	f->WriteByte(0);
+	if (version > 500)
+		f->WriteByte(0);
+
+	if (version >= 400)
+		f->WriteByte(0);
+	if (version >= 500)
+		f->WriteByte(0);
+	if (version > 500){
+		write_str41(f, "");
+		write_str41(f, "");
 	}
 }
 

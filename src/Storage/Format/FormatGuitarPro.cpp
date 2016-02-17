@@ -7,8 +7,6 @@
 
 #include "FormatGuitarPro.h"
 
-const int STD_TUNING[6] = {40, 45, 50, 55, 59, 64};
-
 FormatGuitarPro::FormatGuitarPro() :
 	Format("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
 {
@@ -108,10 +106,18 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 	else //if (version == 500)
 		write_str1c(f, "FICHIER GUITAR PRO v5.00", 30);
 
-	Array<Track*> tracks;
+	//Array<Track*> tracks;
 	foreach(Track *t, a->tracks)
-		if (t->type == t->TYPE_MIDI)
-			tracks.add(t);
+		if (t->type == t->TYPE_MIDI){
+			GpTrack tt;
+			tt.is_drum = (t->instrument.type == Instrument::TYPE_DRUMS);
+			tt.midi_instrument = t->instrument.midi_no();
+			tt.tuning = t->instrument.tuning;
+			if (tt.tuning.num == 0)
+				tt.tuning = Instrument(Instrument::TYPE_ELECTRIC_GUITAR).tuning;
+			tt.t = t;
+			tracks.add(tt);
+		}
 	Array<Bar> bars = a->bars.getBars(Range(-1000000000, 2000000000));
 	tempo = 60.0f * (float)bars[0].num_beats / (float)bars[0].range.num * (float)a->sample_rate;
 
@@ -152,15 +158,15 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 	f->WriteInt(tracks.num);
 	foreach(Bar &b, bars)
 		write_measure_header(b);
-	foreachi(Track *t, tracks, i)
-		write_track(t, i);
+	foreachi(GpTrack &t, tracks, i)
+		write_track(&t, i);
 
 	if (version >= 500)
 		f->WriteByte(0);
 
 	foreach(Bar &b, bars){
-		foreach(Track *t, tracks)
-			write_measure(t, b);
+		foreach(GpTrack &t, tracks)
+			write_measure(&t, b);
 	}
 	delete(f);
 }
@@ -261,23 +267,29 @@ void FormatGuitarPro::read_info()
 {
 	string s;
 	s = read_str41(f);
-	msg_write("title: "+s);
 	if (s.num > 0)
 		a->addTag("title", s);
 	read_str41(f);
 	s = read_str41(f);
-	msg_write("artist: "+s);
 	if (s.num > 0)
 		a->addTag("artist", s);
 	s = read_str41(f);
-	msg_write("album: "+s);
 	if (s.num > 0)
 		a->addTag("album", s);
-	if (version >= 500)
-		msg_write("lyricist: "+read_str41(f));
-	msg_write("author: "+read_str41(f));
-	msg_write("copy: "+read_str41(f));
-	msg_write("writer: "+read_str41(f));
+	if (version >= 500){
+		s = read_str41(f);
+		if (s.num > 0)
+			a->addTag("lyricist", s);
+	}
+	s = read_str41(f);
+	if (s.num > 0)
+		a->addTag("author", s);
+	s = read_str41(f);
+	if (s.num > 0)
+		a->addTag("copyright", s);
+	s = read_str41(f);
+	if (s.num > 0)
+		a->addTag("writer", s);
 	read_str41(f);
 	int n = f->ReadInt();
 	for (int i=0; i<n; i++)
@@ -344,8 +356,8 @@ void FormatGuitarPro::write_channels()
 {
 	for (int i = 0; i < 64; i++) {
 		int instrument = 0;
-		if (i < a->tracks.num)
-			instrument = a->tracks[i]->instrument.midi_no();
+		if (i < tracks.num)
+			instrument = tracks[i].midi_instrument;
 		f->WriteInt(instrument); // program
 		f->WriteByte(100); // volume
 		f->WriteByte(0); // balance
@@ -466,11 +478,12 @@ void FormatGuitarPro::read_track()
 	GpTrack tt;
 	tt.t = a->addTrack(Track::TYPE_MIDI);
 	tt.t->setName(read_str1c(f, 40));
-	tt.stringCount = f->ReadInt();
+	int stringCount = f->ReadInt();
 	for (int i=0; i<7; i++){
 		int tuning = f->ReadInt(); // tuning
 		tt.tuning.add(tuning);
 	}
+	tt.tuning.resize(stringCount);
 	tracks.add(tt);
 	int port = f->ReadInt();
 	int channel = f->ReadInt();
@@ -498,26 +511,29 @@ void FormatGuitarPro::read_track()
 		f->SetPos(45, false);
 }
 
-void FormatGuitarPro::write_track(Track *t, int index)
+void FormatGuitarPro::write_track(GpTrack *t, int index)
 {
 	msg_db_f("track", 1);
 	f->WriteByte(0);
 	GpTrack tt;
-	write_str1c(f, t->name, 40);
+	write_str1c(f, t->t->name, 40);
 	// tuning
-	f->WriteInt(6); // string count
-	for (int i=5; i>=0; i--)
-		f->WriteInt(STD_TUNING[i]);
-	f->WriteInt(0);
+	f->WriteInt(t->tuning.num); // string count
+	for (int i=min(t->tuning.num, 7)-1; i>=0; i--)
+		f->WriteInt(t->tuning[i]);
+	for (int i=t->tuning.num; i<7; i++)
+		f->WriteInt(0);
 
-	f->WriteInt(1);
-	if (t->instrument.type == Instrument::TYPE_DRUMS){
+	// port / channel
+	if (t->is_drum){
 		f->WriteInt(1);
 		f->WriteInt(10);
 	}else{
 		f->WriteInt((index / 16) + 1);
 		f->WriteInt((index % 16) + 1);
 	}
+	f->WriteInt(0); // channel fx
+
 	f->WriteInt(24);
 	f->WriteInt(0); // offset
 	f->WriteInt(0); // color
@@ -533,7 +549,7 @@ void FormatGuitarPro::write_track(Track *t, int index)
 void FormatGuitarPro::read_measure(GpMeasure &m, GpTrack &t, int offset)
 {
 	msg_db_f("measure", 1);
-	//msg_write(format("%x", f->GetPos()));
+	//msg_write(format("m %x", f->GetPos()));
 
 	int num_voices = 1;
 	if (version >= 500)
@@ -560,7 +576,7 @@ struct GuitarNote
 	int offset, length;
 	Array<int> pitch;
 	Array<int> string;
-	void detune()
+	void detune(Array<int> &tuning)
 	{
 		// sort ascending
 		for (int i=0; i<pitch.num; i++)
@@ -570,17 +586,27 @@ struct GuitarNote
 					pitch[i] = pitch[j];
 					pitch[j] = t;
 				}
+		Array<int> p0 = pitch;
 
 		string.resize(pitch.num);
-		int highest_available_string = 5;
+		int highest_available_string = tuning.num-1;
 		for (int n=pitch.num-1; n>=0; n--){
+			bool found = false;
 			for (int i=highest_available_string; i>=0; i--){
-				if (pitch[n] >= STD_TUNING[i]){
+				if (pitch[n] >= tuning[i]){
 					string[n] = i;
-					pitch[n] -= STD_TUNING[i];
+					pitch[n] -= tuning[i];
 					highest_available_string = i-1;
+					found = true;
 					break;
 				}
+			}
+			if (!found){
+				msg_error("could not detune:");
+				msg_write(ia2s(p0));
+				msg_write(ia2s(tuning));
+				pitch.erase(n);
+				string.erase(n);
 			}
 		}
 	}
@@ -591,13 +617,15 @@ Array<int> decompose_time(int length)
 	Array<int> t;
 
 	// tripples * 2^n
-	if ((length % 3) != 0){
-		for (int i=1; i<=length; i*=2)
-			if (i == length){
-				t.add(length);
-				return t;
-			}
-		msg_error("non decomposable time: " + i2s(length));
+	while ((length % 3) != 0){
+		int largest = 2;
+		for (int i=2; i<=length; i*=2)
+			if (i <= length)
+				largest = i;
+
+		t.add(largest);
+		length -= largest;
+		//msg_error("non decomposable time: " + i2s(length));
 	}
 
 	// non-trippels
@@ -617,12 +645,12 @@ Array<int> decompose_time(int length)
 	return t;
 }
 
-Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
+Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 {
 	// samples per 16th / 3
 	float spu = (float)b.range.num / (float)b.num_beats / 12.0f;
 
-	Array<MidiNote> notes = t->midi.getNotes(b.range);
+	Array<MidiNote> notes = t->t->midi.getNotes(b.range);
 	Array<GuitarNote> gnotes;
 
 	foreach(MidiNote &n, notes){
@@ -677,22 +705,22 @@ Array<GuitarNote> create_guitar_notes(Track *t, Bar &b)
 	}
 
 	foreach(GuitarNote &n, gnotes)
-		n.detune();
+		n.detune(t->tuning);
 
 	return gnotes;
 }
 
-void FormatGuitarPro::write_measure(Track *t, Bar &b)
+void FormatGuitarPro::write_measure(GpTrack *t, Bar &b)
 {
 	msg_db_f("measure", 1);
-	//msg_write(format("%x", f->GetPos()));
+	//msg_write(format("m %x", f->GetPos()));
 
 	//msg_write("-----");
 	Array<GuitarNote> gnotes = create_guitar_notes(t, b);
 
 	f->WriteInt(gnotes.num); // beats
 	foreach(GuitarNote &n, gnotes)
-		write_beat(n.pitch, n.string, n.length);
+		write_beat(t, n.pitch, n.string, n.length);
 
 	if (version >= 500) // second voice
 		f->WriteInt(0);
@@ -724,7 +752,7 @@ int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 	int stringFlags = f->ReadByte();
 	//msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
 	for (int i = 6; i >= 0; i--) {
-		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.stringCount) {
+		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.tuning.num) {
 			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
 			read_note(t, (6 - i), start, duration);
 			//TGNote note = readNote(string, track,effect.clone(getFactory()));
@@ -740,9 +768,12 @@ int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 	return duration;
 }
 
-void FormatGuitarPro::write_beat(Array<int> &pitch, Array<int> &string, int length)
+void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &string, int length)
 {
 	msg_db_f("beat", 2);
+
+	if (length <= 2)
+		length = 3; // quick and dirty fix :P
 
 	bool is_pause = (pitch.num == 0);
 
@@ -782,7 +813,7 @@ void FormatGuitarPro::write_beat(Array<int> &pitch, Array<int> &string, int leng
 	if (pitch.num > 0){
 		int sflags = 0;
 		for (int i=0; i<string.num; i++)
-			sflags |= (0x02 << string[i]);
+			sflags |= (0x01 << (string[i] + 7 - t->tuning.num));
 		f->WriteByte(sflags);
 
 

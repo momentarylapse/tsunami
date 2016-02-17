@@ -27,8 +27,9 @@ public:
 
 	struct GpTrack
 	{
-		int stringCount;
 		Array<int> tuning;
+		int midi_instrument;
+		bool is_drum;
 		Track *t;
 	};
 	Array<GpTrack> tracks;
@@ -75,9 +76,9 @@ public:
 	void write_eq();
 	void write_page_setup();
 	void write_measure_header(Bar &b);
-	void write_track(Track *t, int index);
-	void write_measure(Track *t, Bar &b);
-	void write_beat(Array<int> &pitch, Array<int> &string, int length);
+	void write_track(GpTrack *t, int index);
+	void write_measure(GpTrack *t, Bar &b);
+	void write_beat(GpTrack *t, Array<int> &pitch, Array<int> &string, int length);
 	void write_beat_fx();
 	void write_note(GpTrack &t, int string_base, int start, int length);
 	void write_note_fx();

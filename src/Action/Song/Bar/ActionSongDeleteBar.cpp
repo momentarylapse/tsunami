@@ -22,6 +22,11 @@ void *ActionSongDeleteBar::execute(Data *d)
 	assert(index >= 0);
 	assert(index < s->bars.num);
 
+	if (affect_midi){
+		int pos0 = s->barOffset(index);
+		s->__shift_data(Range(pos0, s->bars[index].length), 0);
+	}
+
 	bar = s->bars[index];
 	s->bars.erase(index);
 	s->notify(s->MESSAGE_EDIT_BARS);
@@ -34,6 +39,11 @@ void ActionSongDeleteBar::undo(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index <= s->bars.num);
+
+	if (affect_midi){
+		int pos0 = s->barOffset(index);
+		s->__shift_data(Range(pos0, 0), bar.length);
+	}
 
 	s->bars.insert(bar, index);
 	s->notify(s->MESSAGE_EDIT_BARS);

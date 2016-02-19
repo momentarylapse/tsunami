@@ -25,14 +25,7 @@ void *ActionSongAddBar::execute(Data *d)
 
 	if (affect_midi){
 		int pos0 = s->barOffset(index);
-		foreach(Track *t, s->tracks){
-			if (t->type != t->TYPE_MIDI)
-				continue;
-			foreachi(MidiNote &n, t->midi, j){
-				if (n.range.offset >= pos0)
-					n.range.offset += bar.length;
-			}
-		}
+		s->__shift_data(Range(pos0, 0), bar.length);
 	}
 
 	s->bars.insert(bar, index);
@@ -47,14 +40,7 @@ void ActionSongAddBar::undo(Data *d)
 
 	if (affect_midi){
 		int pos0 = s->barOffset(index);
-		foreach(Track *tt, s->tracks){
-			if (tt->type != tt->TYPE_MIDI)
-				continue;
-			foreachi(MidiNote &n, tt->midi, j){
-				if (n.range.offset >= pos0)
-					n.range.offset -= bar.length;
-			}
-		}
+		s->__shift_data(Range(pos0, bar.length), 0);
 	}
 
 	s->bars.erase(index);

@@ -504,6 +504,53 @@ void Song::deleteBar(int index, bool affect_midi)
 	execute(new ActionSongDeleteBar(index, affect_midi));
 }
 
+int __shift_data_shift(const Range &source, int new_length, int pos)
+{
+	if (pos >= source.end())
+		// after source
+		return pos + new_length - source.num;
+	if (pos >= source.offset){
+		// inside source
+		if (source.num == 0)
+			return pos - new_length;
+		return source.offset + (float)(pos - source.offset) * (float)new_length / (float)source.num;
+	}
+	return pos;
+}
+
+void Song::__shift_data(const Range &source, int new_length)
+{
+	int pos0 = source.offset;
+	foreach(Track *t, tracks){
+
+		// midi
+		foreachi(MidiNote &n, t->midi, j){
+			// note start
+			if (n.range.start() >= pos0)
+				n.range.set_start(__shift_data_shift(source, new_length, n.range.start()));
+			// note end
+			if (n.range.end() >= pos0)
+				n.range.set_end(__shift_data_shift(source, new_length, n.range.end()));
+		}
+
+		// marker
+		foreach(TrackMarker &m, t->markers)
+			if (m.pos >= pos0)
+				m.pos = __shift_data_shift(source, new_length, m.pos);
+
+		// buffer
+		foreach(TrackLevel &l, t->levels)
+			foreach(BufferBox &b, l.buffers)
+				if (b.offset >= pos0)
+					b.offset = __shift_data_shift(source, new_length, b.offset);
+
+		// marker
+		foreach(SampleRef *s, t->samples)
+			if (s->pos >= pos0)
+				s->pos = __shift_data_shift(source, new_length, s->pos);
+	}
+}
+
 void Song::invalidateAllPeaks()
 {
 	foreach(Track *t, tracks)

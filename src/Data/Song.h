@@ -115,6 +115,9 @@ public:
 	void _cdecl deleteSelection(int level_no, const Range &range, const Array<Track*> &tracks, bool all_levels);
 	void _cdecl createSamplesFromSelection(int level_no, const Range &range);
 
+	// helper
+	void __shift_data(const Range &source, int new_length);
+
 	Track *_cdecl get_track(int track_no);
 	SampleRef *_cdecl get_sample_ref(int track_no, int index);
 	int _cdecl get_sample_by_uid(int uid);

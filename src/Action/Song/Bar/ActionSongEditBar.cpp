@@ -26,26 +26,7 @@ void *ActionSongEditBar::execute(Data *d)
 	if (affect_midi){
 		int pos = s->barOffset(index);
 		int l0 = s->bars[index].length;
-		foreach(Track *t, s->tracks){
-			if (t->type != t->TYPE_MIDI)
-				continue;
-			foreachi(MidiNote &n, t->midi, j){
-				// note start
-				if (n.range.start() > pos + l0)
-					// after bar
-					n.range.set_start(n.range.start() + bar.length - l0);
-				else if (n.range.start() > pos)
-					// inside bar
-					n.range.set_start(pos + (float)(n.range.start() - pos) * (float)bar.length / (float)l0);
-				// note end
-				if (n.range.end() > pos + l0)
-					// after bar
-					n.range.set_end(n.range.end() + bar.length - l0);
-				else if (n.range.end() > pos)
-					// inside bar
-					n.range.set_end(pos + (float)(n.range.end() - pos) * (float)bar.length / (float)l0);
-			}
-		}
+		s->__shift_data(Range(pos, l0), bar.length);
 	}
 
 	BarPattern temp = bar;

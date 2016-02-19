@@ -203,27 +203,35 @@ void BarsConsole::onDelete()
 
 		BarPattern b = song->bars[i];
 		int l0 = b.length;
+		Range r = Range(pos, l0);
 		if (isChecked(id_link)){
 			foreach(Track *t, song->tracks){
-				if (t->type != t->TYPE_MIDI)
-					continue;
+				/*if (t->type != t->TYPE_MIDI)
+					continue;*/
 				Set<int> del;
 				Array<MidiNote> add;
+				Set<int> del_marker;
 				foreachi(MidiNote &n, t->midi, j){
 					if (n.range.end() <= pos){
 					}else if (n.range.offset >= pos + l0){
-						MidiNote n2 = n;
+						/*MidiNote n2 = n;
 						n2.range.offset -= l0;
 						add.add(n2);
-						del.add(j);
+						del.add(j);*/
 					}else{
 						del.add(j);
 					}
 				}
+				foreachi(TrackMarker &m, t->markers, i)
+					if (r.is_inside(m.pos))
+						del_marker.add(i);
+
 				foreachb(int j, del)
 					t->deleteMidiNote(j);
-				foreach(MidiNote &n, add)
-					t->addMidiNote(n);
+				/*foreach(MidiNote &n, add)
+					t->addMidiNote(n);*/
+				foreachb(int j, del_marker)
+					t->deleteMarker(j);
 			}
 		}
 		song->deleteBar(i, isChecked(id_link));

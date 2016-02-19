@@ -7,6 +7,8 @@
 
 #include "FormatGuitarPro.h"
 
+const int BEAT_PARTITION = 12;
+
 FormatGuitarPro::FormatGuitarPro() :
 	Format("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
 {
@@ -650,7 +652,7 @@ Array<int> decompose_time(int length)
 Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 {
 	// samples per 16th / 3
-	float spu = (float)b.range.num / (float)b.num_beats / 12.0f;
+	float spu = (float)b.range.num / (float)b.num_beats / (float)BEAT_PARTITION;
 
 	Array<MidiNote> notes = t->t->midi.getNotes(b.range);
 	Array<GuitarNote> gnotes;
@@ -663,7 +665,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 		gn.pitch.add(n.pitch);
 		if (gn.length == 0)
 			continue;
-		if (gn.offset < b.num_beats * 12)
+		if (gn.offset < b.num_beats * BEAT_PARTITION)
 			gnotes.add(gn);
 	}
 
@@ -727,7 +729,12 @@ void FormatGuitarPro::write_measure(GpTrack *t, Bar &b)
 	// empty? -> at least fill in a long break
 	if (gnotes.num == 0){
 		GuitarNote g;
-		g.length = 12 * b.num_beats;
+		g.length = BEAT_PARTITION;
+		while (true){
+			if (g.length * 2 > BEAT_PARTITION * b.num_beats)
+				break;
+			g.length *= 2;
+		}
 		g.offset = 0;
 		gnotes.add(g);
 	}
@@ -784,7 +791,7 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 	msg_db_f("beat", 2);
 
 	if (length <= 1){
-		msg_error("write_beat: evil length: " + i2s(length));
+		od->error("write_beat: evil length: " + i2s(length));
 		length = 3; // quick and dirty fix :P
 	}
 
@@ -817,7 +824,7 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 		f->WriteByte(254);
 	else{
 		f->WriteByte(0);
-		od->error("invalid gp length: " + i2s(length));
+		od->error(format("invalid gp length: %d", length));
 	}
 
 	if (tripple)

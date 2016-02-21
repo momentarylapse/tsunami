@@ -128,5 +128,26 @@ enum{
 
 string clef_symbol(int clef);
 
+int pitch_to_clef_position(int pitch, int clef, int &modifier);
+int clef_position_to_pitch(int position, int clef, int modifier);
+
+enum{
+	MODIFIER_NONE,
+	MODIFIER_SHARP,
+	MODIFIER_FLAT,
+	MODIFIER_NATURAL,
+};
+
+inline string modifier_symbol(int mod)
+{
+	if (mod == MODIFIER_SHARP)
+		return "\u266f";
+	if (mod == MODIFIER_FLAT)
+		return "\u266d";
+	if (mod == MODIFIER_NATURAL)
+		return "\u266e";
+	return "";
+}
+
 
 #endif /* MIDIDATA_H_ */

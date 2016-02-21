@@ -16,6 +16,7 @@ class AudioView;
 class BufferBox;
 class SampleRef;
 class MidiNoteData;
+class MidiNote;
 class MidiEvent;
 class TrackMarker;
 
@@ -27,6 +28,17 @@ public:
 
 	static color getPitchColor(int pitch);
 
+	float clef_pos_to_screen(int pos);
+	int screen_to_clef_pos(float y);
+
+	enum MidiNoteState
+	{
+		STATE_DEFAULT,
+		STATE_HOVER,
+		STATE_REFERENCE
+	};
+
+
 	void drawTrackBuffers(HuiPainter *c, double pos);
 	void drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay);
@@ -36,6 +48,7 @@ public:
 	void drawMidiDefault(HuiPainter *c, const MidiNoteData &midi, int shift);
 	void drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int shift);
 	void drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int shift);
+	void drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, int clef);
 	void drawHeader(HuiPainter *c);
 	void draw(HuiPainter *c);
 
@@ -48,6 +61,8 @@ public:
 	static const float MIN_GRID_DIST;
 
 	int height_wish, height_min;
+
+	float clef_dy;
 };
 
 #endif /* SRC_VIEW_AUDIOVIEWTRACK_H_ */

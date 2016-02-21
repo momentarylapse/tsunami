@@ -10,6 +10,7 @@
 #include "Mode/ViewMode.h"
 #include "../Tsunami.h"
 #include "../Data/Song.h"
+#include "../Data/MidiData.h"
 #include "../Audio/Synth/Synthesizer.h"
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
@@ -20,6 +21,7 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 
 	area = rect(0, 0, 0, 0);
 	height_min = height_wish = 0;
+	clef_dy = 0;
 }
 
 AudioViewTrack::~AudioViewTrack()
@@ -339,64 +341,63 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 	c->setFontSize(view->FONT_SIZE);
 }
 
-int get_score_position(int pitch, int clef, bool &sharp)
+float AudioViewTrack::clef_pos_to_screen(int pos)
 {
-	if (clef == CLEF_TYPE_DRUMS){
-		sharp = false;
-		/*if (pitch == 35)	return "bass      (akk)";
-		if (pitch == 36)	return "bass";
-		if (pitch == 37)	return "side stick";
-		if (pitch == 38)	return "snare";
-		if (pitch == 39)	return "clap";
-		if (pitch == 40)	return "snare     (electronic)";
-		if (pitch == 41)	return "tom - floor low";
-		if (pitch == 42)	return "hihat - closed";
-		if (pitch == 43)	return "tom - floor hi";
-		if (pitch == 44)	return "hihat - pedal";
-		if (pitch == 45)	return "tom - low";
-		if (pitch == 46)	return "hihat - open";
-		if (pitch == 47)	return "tom - low mid";
-		if (pitch == 48)	return "tom - hi mid";
-		if (pitch == 49)	return "crash 1";
-		if (pitch == 50)	return "tom - hi";
-		if (pitch == 51)	return "ride 1";
-		if (pitch == 52)	return "chinese";
-		if (pitch == 53)	return "bell ride";
-		if (pitch == 54)	return "tambourine";
-		if (pitch == 55)	return "splash";
-		if (pitch == 56)	return "cowbell";
-		if (pitch == 57)	return "crash 2";
-		if (pitch == 58)	return "vibraslash?";
-		if (pitch == 59)	return "ride 2";
-		if (pitch == 60)	return "bongo - hi";
-		if (pitch == 61)	return "bongo - low";*/
-		if ((pitch == 35) or (pitch == 36)) // bass
-			return 1;
-		if ((pitch == 38) or (pitch == 40)) // snare
-			return 5;
-		if ((pitch == 48) or (pitch == 50)) // tom hi
-			return 9;
-		if ((pitch == 45) or (pitch == 47)) // tom mid
-			return 8;
-		if ((pitch == 41) or (pitch == 43)) // tom floor
-			return 3;
-		sharp = true;
-		return 0;
-	}
-	int octave = pitch_get_octave(pitch);
-	int rel = pitch_to_rel(pitch);
-
-	const int pp[12] = {0,0,1,1,2,3,3,4,4,5,5,6};
-	const bool ss[12] = {false,true,false,true,false,false,true,false,true,false,true,false};
-	const int clef_offset[4] = {5*7, 4*7, 3*7+2, 2*7+2};
-
-	sharp = ss[rel];
-	return pp[rel] + 7 * octave + 5 - clef_offset[clef];
+	return area.y2 - area.height() / 2 - (pos - 4) * clef_dy / 2.0f;
 }
 
-float clef_pos_to_screen(int pos, rect &area, float dy)
+int AudioViewTrack::screen_to_clef_pos(float y)
 {
-	return area.y2 - area.height() / 2 - (pos - 4) * dy / 2;
+	return (int)floor((area.y2 - y - area.height() / 2) * 2.0f / clef_dy + 0.5f) + 4;
+}
+
+void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, int clef)
+{
+	float r = clef_dy/2;
+
+	float x1 = view->cam.sample2screen(n.range.offset + shift);
+	float x2 = view->cam.sample2screen(n.range.end() + shift);
+	float x = x1 + r;
+
+
+	int mod;
+	int p = pitch_to_clef_position(n.pitch, clef, mod);
+
+	float y = clef_pos_to_screen(p);
+
+	// auxiliary lines
+	for (int i=10; i<=p; i+=2){
+		c->setColor(view->colors.text_soft1);
+		float y = clef_pos_to_screen(i);
+		c->drawLine(x - clef_dy, y, x + clef_dy, y);
+	}
+	for (int i=-2; i>=p; i-=2){
+		c->setColor(view->colors.text_soft1);
+		float y = clef_pos_to_screen(i);
+		c->drawLine(x - clef_dy, y, x + clef_dy, y);
+	}
+
+
+	color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
+	if (state == STATE_HOVER)
+		col.a = 0.5f;
+
+	// "shadow" to indicate length
+	if (x2 - x1 > r*2){
+		color col2 = col;
+		col2.a *= 0.4f;
+		c->setColor(col2);
+		c->drawRect(x, y - r, x2 - x, r*2);
+	}
+
+	// the note circle
+	c->setColor(col);
+	if (mod != MODIFIER_NONE)
+		c->drawStr(x - 15, y - 8, modifier_symbol(mod));
+	if ((x2 - x1 > 6) or (state == STATE_HOVER))
+		c->drawCircle(x, y, r);
+	else
+		c->drawRect(x - r, y - r, r*2, r*2);
 }
 
 void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int shift)
@@ -410,61 +411,20 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 
 	// clef lines
 	float dy = area.height() / 13;
+	clef_dy = dy;
 	for (int i=0; i<10; i+=2){
-		float y = clef_pos_to_screen(i, area, dy);
+		float y = clef_pos_to_screen(i);
 		c->drawLine(area.x1, y, area.x2, y);
 	}
 	c->setAntialiasing(true);
 
 	c->setFontSize(dy*4);
-	c->drawStr(10, clef_pos_to_screen(10, area, dy), clef_symbol(clef));
+	c->drawStr(10, clef_pos_to_screen(10), clef_symbol(clef));
 	c->setFontSize(dy);
 
-	float r = dy/2;
+	foreach(MidiNote &n, notes)
+		drawMidiNoteScore(c, n, shift, STATE_DEFAULT, clef);
 
-	foreach(MidiNote &n, notes){
-		float x1 = view->cam.sample2screen(n.range.offset + shift);
-		float x2 = view->cam.sample2screen(n.range.end() + shift);
-		float x = x1 + r;
-
-
-		bool sharp;
-		int p = get_score_position(n.pitch, clef, sharp);
-
-		float y = clef_pos_to_screen(p, area, dy);
-
-		// auxiliary lines
-		for (int i=10; i<=p; i+=2){
-			c->setColor(view->colors.text_soft1);
-			float y = clef_pos_to_screen(i, area, dy);
-			c->drawLine(x - dy, y, x + dy, y);
-		}
-		for (int i=-2; i>=p; i-=2){
-			c->setColor(view->colors.text_soft1);
-			float y = clef_pos_to_screen(i, area, dy);
-			c->drawLine(x - dy, y, x + dy, y);
-		}
-
-
-		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
-
-		// "shadow" to indicate length
-		if (x2 - x1 > r*2){
-			color col2 = col;
-			col2.a *= 0.4f;
-			c->setColor(col2);
-			c->drawRect(x, y - r, x2 - x, r*2);
-		}
-
-		// the note circle
-		c->setColor(col);
-		if (sharp)
-			c->drawStr(x - 15, y - 8, "\u266F");
-		if (x2 - x1 > 6)
-			c->drawCircle(x, y, r);
-		else
-			c->drawRect(x - r, y - r, r*2, r*2);
-	}
 	c->setFontSize(view->FONT_SIZE);
 	c->setAntialiasing(false);
 }

@@ -208,6 +208,7 @@ AudioView::~AudioView()
 	delete(mode_curve);
 	delete(mode_bars);
 	delete(mode_midi);
+	delete(mode_capture);
 	delete(mode_default);
 
 	delete(peak_thread);

@@ -31,18 +31,14 @@ public:
 
 	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time);
 	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t);
+	void drawTrackBackgroundDefault(HuiPainter *c, AudioViewTrack *t);
 	virtual void drawTrackData(HuiPainter *c, AudioViewTrack *t);
 
-	enum MidiNoteState
-	{
-		STATE_DEFAULT,
-		STATE_HOVER,
-		STATE_REFERENCE
-	};
-
-	void drawMidiNote(HuiPainter *c, const MidiNote &n, MidiNoteState state);
+	void drawMidiNote(HuiPainter *c, const MidiNote &n, int state);
 	void drawMidiEvent(HuiPainter *c, const MidiEvent &e);
-	void drawMidiEditable(HuiPainter *c, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area);
 
 	virtual Selection getHover();
 

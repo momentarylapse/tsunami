@@ -167,6 +167,10 @@ public:
 	int cur_level;
 	int capturing_track;
 
+
+	void setScale(const Scale &s);
+	Scale midi_scale;
+
 	rect area;
 	TrackHeightManager thm;
 

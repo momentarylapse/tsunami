@@ -48,6 +48,7 @@ public:
 	void drawMidiDefault(HuiPainter *c, const MidiNoteData &midi, int shift);
 	void drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int shift);
 	void drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int shift);
+	void drawMidiScoreClef(HuiPainter *c, int clef);
 	void drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, int clef);
 	void drawHeader(HuiPainter *c);
 	void draw(HuiPainter *c);

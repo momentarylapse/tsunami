@@ -44,10 +44,10 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 
 	for (int i=0; i<12; i++)
 		addString("scale_root", rel_pitch_name(11 - i));
-	for (int i=0; i<NUM_SCALE_TYPES; i++)
-		addString("scale_type", scale_type_name(i));
-	setInt("scale_root", 11 - view->mode_midi->midi_scale_root);
-	setInt("scale_type", view->mode_midi->midi_scale_type);
+	for (int i=0; i<Scale::NUM_TYPES; i++)
+		addString("scale_type", Scale::type_name(i));
+	setInt("scale_root", 11 - view->midi_scale.root);
+	setInt("scale_type", view->midi_scale.type);
 
 	track = NULL;
 	//Enable("add", false);
@@ -117,7 +117,7 @@ void MidiEditorConsole::onUpdate(Observable* o, const string &message)
 
 void MidiEditorConsole::onScale()
 {
-	view->mode_midi->setScale(getInt("scale_type"), 11 - getInt("scale_root"));
+	view->setScale(Scale(getInt("scale_type"), 11 - getInt("scale_root")));
 }
 
 void MidiEditorConsole::onBeatPartition()

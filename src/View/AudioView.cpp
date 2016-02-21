@@ -91,6 +91,7 @@ Image *ExpandImage(Image *im, float d)
 AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	Observer("AudioView"),
 	Observable("AudioView"),
+	midi_scale(Scale::TYPE_MAJOR, 0),
 	cam(this)
 {
 	win = parent;
@@ -252,6 +253,13 @@ void AudioView::setMode(ViewMode *m)
 {
 	mode = m;
 	thm.dirty = true;
+}
+
+void AudioView::setScale(const Scale &s)
+{
+	midi_scale = s;
+	notify(MESSAGE_SETTINGS_CHANGE);
+	forceRedraw();
 }
 
 void AudioView::setMouse()

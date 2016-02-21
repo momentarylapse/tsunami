@@ -25,8 +25,6 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	pitch_max = pitch_min + PITCH_SHOW_COUNT;
 	beat_partition = 4;
 	win->setInt("beat_partition", beat_partition);
-	midi_scale_type = SCALE_TYPE_MAJOR;
-	midi_scale_root = 0;
 	midi_mode = MIDI_MODE_NOTE;
 	midi_interval = 3;
 	chord_type = 0;
@@ -199,7 +197,7 @@ int ViewModeMidi::y2pitch(int y)
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
 		int clef = t->track->instrument.get_clef();
 		int pos = t->screen_to_clef_pos(y);
-		return clef_position_to_pitch(pos, clef, false);
+		return clef_position_to_pitch(pos, clef, view->midi_scale, MODIFIER_NONE);
 	}
 	return pitch_min + ((t->area.y2 - y) * (pitch_max - pitch_min) / t->area.height());
 }
@@ -212,7 +210,7 @@ float ViewModeMidi::pitch2y(int pitch)
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
 		int mod;
 		int clef = t->track->instrument.get_clef();
-		int p = pitch_to_clef_position(pitch, clef, mod);
+		int p = pitch_to_clef_position(pitch, clef, view->midi_scale, mod);
 		return t->clef_pos_to_screen(p);
 	}
 
@@ -223,13 +221,6 @@ void ViewModeMidi::setPitchMin(int pitch)
 {
 	pitch_min = clampi(pitch, 0, MAX_PITCH - 1 - PITCH_SHOW_COUNT);
 	pitch_max = pitch_min + PITCH_SHOW_COUNT;
-	view->forceRedraw();
-}
-
-void ViewModeMidi::setScale(int type, int root)
-{
-	midi_scale_type = type;
-	midi_scale_root = root;
 	view->forceRedraw();
 }
 
@@ -319,7 +310,7 @@ void ViewModeMidi::drawTrackBackgroundDefault(HuiPainter *c, AudioViewTrack *t)
 		for (int i=pitch_min; i<pitch_max; i++){
 			float y0 = pitch2y(i + 1);
 			float y1 = pitch2y(i);
-			if (!is_in_scale(i, midi_scale_type, midi_scale_root)){
+			if (!view->midi_scale.contains(i)){
 				c->setColor(color(0.2f, 0, 0, 0));
 				c->drawRect(t->area.x1, y0, t->area.width(), y1 - y0);
 			}
@@ -500,10 +491,32 @@ void ViewModeMidi::drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, con
 
 void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area)
 {
-	Array<MidiEvent> events = midi.getEvents(view->cam.range());
 	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
 
-	t->drawMidiScore(c, midi, 0);
+	int clef = track->instrument.get_clef();
+
+	t->drawMidiScoreClef(c, clef);
+	//const int *mod = view->midi_scale.get_modifiers_clef();
+
+	c->setFontSize(t->clef_dy);
+	c->setAntialiasing(true);
+
+	/*for (int i=0; i<7; i++)
+		if (mod[i] != MODIFIER_NONE)
+			c->drawStr(100, t->clef_pos_to_screen(i), modifier_symbol(mod[i]));*/
+
+	// draw notes
+	foreachi(MidiNote &n, notes, i){
+		bool _hover = ((hover->type == Selection::TYPE_MIDI_NOTE) and (i == hover->index));
+		if (as_reference){
+			t->drawMidiNoteScore(c, n, 0, AudioViewTrack::STATE_REFERENCE, clef);
+		}else{
+			t->drawMidiNoteScore(c, n, 0, _hover ? AudioViewTrack::STATE_HOVER : AudioViewTrack::STATE_DEFAULT, clef);
+		}
+	}
+
+	c->setFontSize(view->FONT_SIZE);
+	c->setAntialiasing(false);
 }
 
 void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
@@ -536,7 +549,7 @@ void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 
 				float x = view->cam.sample2screen(r.offset);
 				int mod;
-				int p = pitch_to_clef_position(hover->pitch, clef, mod);
+				int p = pitch_to_clef_position(hover->pitch, clef, view->midi_scale, mod);
 				float y = t->clef_pos_to_screen(p);
 				c->setColor(view->colors.text);
 				c->setFontSize(view->FONT_SIZE);

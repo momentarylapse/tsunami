@@ -101,20 +101,31 @@ enum
 string chord_type_name(int type);
 Array<int> chord_notes(int type, int inversion, int pitch);
 
-enum
+class Scale
 {
-	SCALE_TYPE_MAJOR,
-	SCALE_TYPE_DORIAN,
-	SCALE_TYPE_PHRYGIAN,
-	SCALE_TYPE_LYDIAN,
-	SCALE_TYPE_MIXOLYDIAN,
-	SCALE_TYPE_MINOR,
-	SCALE_TYPE_LOCRIAN,
-	NUM_SCALE_TYPES
-};
+public:
 
-string scale_type_name(int type);
-bool is_in_scale(int pitch, int scale_type, int scale_root);
+	enum
+	{
+		TYPE_MAJOR,
+		TYPE_DORIAN,
+		TYPE_PHRYGIAN,
+		TYPE_LYDIAN,
+		TYPE_MIXOLYDIAN,
+		TYPE_MINOR,
+		TYPE_LOCRIAN,
+		NUM_TYPES
+	};
+	int type, root;
+
+	Scale(int type, int root);
+	bool contains(int pitch) const;
+	const int* get_modifiers_clef();
+	//int* get_modifiers_pitch();
+	int transform_out(int x, int modifier) const;
+
+	static string type_name(int type);
+};
 
 
 enum{
@@ -128,8 +139,8 @@ enum{
 
 string clef_symbol(int clef);
 
-int pitch_to_clef_position(int pitch, int clef, int &modifier);
-int clef_position_to_pitch(int position, int clef, int modifier);
+int pitch_to_clef_position(int pitch, int clef, Scale &s, int &modifier);
+int clef_position_to_pitch(int position, int clef, Scale &s, int modifier);
 
 enum{
 	MODIFIER_NONE,

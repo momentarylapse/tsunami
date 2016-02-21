@@ -428,35 +428,109 @@ Array<int> chord_notes(int type, int inversion, int pitch)
 	return r;
 }
 
-string scale_type_name(int type)
+Scale::Scale(int _type, int _root)
 {
-	if (type == SCALE_TYPE_MAJOR)
+	type = _type;
+	root = _root;
+}
+
+string Scale::type_name(int type)
+{
+	if (type == TYPE_MAJOR)
 		return _("Dur");
-	if (type == SCALE_TYPE_DORIAN)
+	if (type == TYPE_DORIAN)
 		return _("Dorisch");
-	if (type == SCALE_TYPE_PHRYGIAN)
+	if (type == TYPE_PHRYGIAN)
 		return _("Phrygisch");
-	if (type == SCALE_TYPE_LYDIAN)
+	if (type == TYPE_LYDIAN)
 		return _("Lydisch");
-	if (type == SCALE_TYPE_MIXOLYDIAN)
+	if (type == TYPE_MIXOLYDIAN)
 		return _("Mixolydisch");
-	if (type == SCALE_TYPE_MINOR)
+	if (type == TYPE_MINOR)
 		return _("Moll");
-	if (type == SCALE_TYPE_LOCRIAN)
+	if (type == TYPE_LOCRIAN)
 		return _("Locrisch");
 	return "???";
 }
 
-bool is_in_scale(int pitch, int scale_type, int scale_root)
+bool Scale::contains(int pitch) const
 {
 	int offset[7] = {0, 2, 4, 5, 7, 9, 11};
-	int r = (pitch - scale_root + offset[scale_type] + 24) % 12;
+	int r = (pitch - root + offset[type] + 24) % 12;
 	// 69 = 9 = a
 	return !((r == 10) or (r == 1) or (r == 3) or (r == 6) or (r == 8));
 }
 
+static const int scale_major_modifiers[12 * 7] = {
+	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, // C
+	MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_FLAT, // Db
+	MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, // D
+	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, // Eb
+	MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, // E
+	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, // F
+	MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, // F#
+	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, // G
+	MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, // Ab
+	MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, // A
+	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, // Bb
+	MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, // B
+};
 
-int pitch_to_clef_position(int pitch, int clef, int &modifier)
+inline int apply_modifier(int pitch, int scale_mod, int mod)
+{
+	int d = 0;
+	if (scale_mod == MODIFIER_SHARP)
+		d = 1;
+	else if (scale_mod == MODIFIER_FLAT)
+		d = -1;
+	if (mod == MODIFIER_SHARP)
+		d += 1;
+	else if (mod == MODIFIER_FLAT)
+		d -= 1;
+	else if (mod == MODIFIER_NATURAL)
+		d = 0;
+	return pitch + d;
+}
+
+inline int scale_to_major(const Scale &s)
+{
+	if (s.type == Scale::TYPE_MAJOR)
+		return s.root;
+	if (s.type == Scale::TYPE_LOCRIAN)
+		return (s.root + 1) % 12;
+	if (s.type == Scale::TYPE_MINOR)
+		return (s.root + 3) % 12;
+	if (s.type == Scale::TYPE_MIXOLYDIAN)
+		return (s.root + 5) % 12;
+	if (s.type == Scale::TYPE_LYDIAN)
+		return (s.root + 7) % 12;
+	if (s.type == Scale::TYPE_PHRYGIAN)
+		return (s.root + 8) % 12;
+	if (s.type == Scale::TYPE_DORIAN)
+		return (s.root + 10) % 12;
+	return s.root;
+}
+
+const int* Scale::get_modifiers_clef()
+{
+	return &scale_major_modifiers[7*scale_to_major(*this)];
+}
+
+// x in major scale notation
+int Scale::transform_out(int x, int mod) const
+{
+	const int pp[7] = {0,2,4,5,7,9,11};
+
+	int octave = x / 7;
+	int rel = x % 7;
+
+	int scale_mod = scale_major_modifiers[rel + 7*scale_to_major(*this)];
+
+	return apply_modifier(pitch_from_octave_and_rel(pp[rel], octave), scale_mod, mod);
+}
+
+
+int pitch_to_clef_position(int pitch, int clef, Scale &s, int &modifier)
 {
 	if (clef == CLEF_TYPE_DRUMS){
 		modifier = MODIFIER_NONE;
@@ -503,30 +577,23 @@ int pitch_to_clef_position(int pitch, int clef, int &modifier)
 	int octave = pitch_get_octave(pitch);
 	int rel = pitch_to_rel(pitch);
 
-	const int pp[12] = {0,0,1,1,2,3,3,4,4,5,5,6};
-	const int ss[12] = {MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE};
+	const int pp[12] = {0,0,1,2,2,3,3,4,4,5,6,6};
+	const int ss[12] = {MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_FLAT,MODIFIER_NONE,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_FLAT,MODIFIER_NONE};
 	const int clef_offset[4] = {5*7, 4*7, 3*7+2, 2*7+2};
 
 	modifier = ss[rel];
 	return pp[rel] + 7 * octave + 5 - clef_offset[clef];
 }
 
-int clef_position_to_pitch(int pos, int clef, int mod)
+inline int clef_rel_to_major_scale(int pos, int clef)
 {
-	const int pp[7] = {0,2,4,5,7,9,11};
-	//const bool ss[12] = {false,true,false,true,false,false,true,false,true,false,true,false};
 	const int clef_offset[4] = {5*7, 4*7, 3*7+2, 2*7+2};
+	return pos + clef_offset[clef] - 5;
+}
 
-	int x = pos + clef_offset[clef] - 5;
-	int octave = x / 7;
-	int rel = x % 7;
-
-	int d = 0;
-	if (mod == MODIFIER_SHARP)
-		d = 1;
-	else if (mod == MODIFIER_FLAT)
-		d = -1;
-
-	return pitch_from_octave_and_rel(pp[rel], octave) + d;
+int clef_position_to_pitch(int pos, int clef, Scale &s, int mod)
+{
+	int x = clef_rel_to_major_scale(pos, clef);
+	return s.transform_out(x, mod);
 }
 

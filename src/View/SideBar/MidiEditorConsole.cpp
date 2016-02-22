@@ -49,6 +49,7 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	setInt("scale_root", 11 - view->midi_scale.root);
 	setInt("scale_type", view->midi_scale.type);
 
+
 	track = NULL;
 	//Enable("add", false);
 	enable("track_name", false);
@@ -60,13 +61,18 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	event("interval", this, &MidiEditorConsole::onInterval);
 	event("chord_type", this, &MidiEditorConsole::onChordType);
 	event("chord_inversion", this, &MidiEditorConsole::onChordInversion);
-	event("reference_track", this, &MidiEditorConsole::onReferenceTrack);
+	eventX("reference_tracks", "hui:select", this, &MidiEditorConsole::onReferenceTracks);
+	event("modifier:none", this, &MidiEditorConsole::onModifierNone);
+	event("modifier:sharp", this, &MidiEditorConsole::onModifierSharp);
+	event("modifier:flat", this, &MidiEditorConsole::onModifierFlat);
+	event("modifier:natural", this, &MidiEditorConsole::onModifierNatural);
 	event("edit_track", this, &MidiEditorConsole::onEditTrack);
 	event("edit_midi_fx", this, &MidiEditorConsole::onEditMidiFx);
 	event("edit_song", this, &MidiEditorConsole::onEditSong);
 
 	subscribe(view, view->MESSAGE_CUR_TRACK_CHANGE);
 	subscribe(view, view->MESSAGE_VTRACK_CHANGE);
+	subscribe(view, view->MESSAGE_SETTINGS_CHANGE);
 	update();
 }
 
@@ -85,6 +91,10 @@ void MidiEditorConsole::update()
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);
+	check("modifier:none", view->mode_midi->modifier == MODIFIER_NONE);
+	check("modifier:sharp", view->mode_midi->modifier == MODIFIER_SHARP);
+	check("modifier:flat", view->mode_midi->modifier == MODIFIER_FLAT);
+	check("modifier:natural", view->mode_midi->modifier == MODIFIER_NATURAL);
 }
 
 void MidiEditorConsole::onUpdate(Observable* o, const string &message)
@@ -96,19 +106,17 @@ void MidiEditorConsole::onUpdate(Observable* o, const string &message)
 		setTrack(view->cur_track);
 	}else if ((o == view) && (message == view->MESSAGE_VTRACK_CHANGE)){
 
-		reset("reference_track");
-		addString("reference_track", _("   - keine Referenz -"));
+		reset("reference_tracks");
 		if (song){
 			foreach(Track *t, song->tracks)
-				addString("reference_track", t->getNiceName());
+				addString("reference_tracks", t->getNiceName());
 		}
-		setInt("reference_track", 0);
 
 		if (track){
 			int tn = track->get_index();
 			if ((tn >= 0) and (tn < view->vtrack.num))
 				if (view->vtrack[tn])
-					setInt("reference_track", view->vtrack[tn]->reference_track + 1);
+					setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
 		}
 	}else{
 		setTrack(track);
@@ -152,11 +160,10 @@ void MidiEditorConsole::onChordInversion()
 	view->mode_midi->chord_inversion = getInt("");
 }
 
-void MidiEditorConsole::onReferenceTrack()
+void MidiEditorConsole::onReferenceTracks()
 {
-	int n = getInt("") - 1;
 	int tn = track->get_index();
-	view->vtrack[tn]->reference_track = n;
+	view->vtrack[tn]->reference_tracks = getSelection("");
 	view->forceRedraw();
 }
 
@@ -175,12 +182,32 @@ void MidiEditorConsole::onEditSong()
 	((SideBar*)parent)->open(SideBar::SONG_CONSOLE);
 }
 
+void MidiEditorConsole::onModifierNone()
+{
+	view->mode_midi->modifier = MODIFIER_NONE;
+}
+
+void MidiEditorConsole::onModifierSharp()
+{
+	view->mode_midi->modifier = MODIFIER_SHARP;
+}
+
+void MidiEditorConsole::onModifierFlat()
+{
+	view->mode_midi->modifier = MODIFIER_FLAT;
+}
+
+void MidiEditorConsole::onModifierNatural()
+{
+	view->mode_midi->modifier = MODIFIER_NATURAL;
+}
+
 void MidiEditorConsole::clear()
 {
 	if (track)
 		unsubscribe(track);
 	track = NULL;
-	setInt("reference_track", 0);
+	setInt("reference_tracks", -1);
 	//Enable("add", false);
 }
 
@@ -207,7 +234,7 @@ void MidiEditorConsole::setTrack(Track *t)
 		int tn = track->get_index();
 		if ((tn >= 0) and (tn < view->vtrack.num))
 			if (view->vtrack[tn])
-				setInt("reference_track", view->vtrack[tn]->reference_track + 1);
+				setSelection("reference_tracks", view->vtrack[tn]->reference_tracks);
 	}
 
 }

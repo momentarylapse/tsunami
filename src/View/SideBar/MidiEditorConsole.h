@@ -34,7 +34,11 @@ public:
 	void onInterval();
 	void onChordType();
 	void onChordInversion();
-	void onReferenceTrack();
+	void onReferenceTracks();
+	void onModifierNone();
+	void onModifierSharp();
+	void onModifierFlat();
+	void onModifierNatural();
 
 	void onEditTrack();
 	void onEditMidiFx();

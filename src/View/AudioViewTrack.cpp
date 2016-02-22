@@ -17,7 +17,6 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
 {
 	view = _view;
 	track = _track;
-	reference_track = -1;
 
 	area = rect(0, 0, 0, 0);
 	height_min = height_wish = 0;

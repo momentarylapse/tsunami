@@ -26,6 +26,7 @@ public:
 	virtual void onLeftButtonDown();
 	virtual void onLeftButtonUp();
 	virtual void onMouseMove();
+	virtual void onKeyDown(int k);
 	virtual void updateTrackHeights();
 	virtual void onCurTrackChange();
 
@@ -56,6 +57,8 @@ public:
 	int chord_type;
 	int chord_inversion;
 	int midi_interval;
+
+	int modifier;
 
 	enum
 	{

@@ -57,7 +57,7 @@ public:
 	rect area;
 	rect area_last, area_target;
 	Array<rect> marker_areas;
-	int reference_track;
+	Array<int> reference_tracks;
 	AudioView *view;
 	static const float MIN_GRID_DIST;
 

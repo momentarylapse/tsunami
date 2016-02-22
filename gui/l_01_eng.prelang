@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-296
+304
 // Data (ID,Text)
 about
 Info
@@ -279,8 +279,10 @@ marker_menu_header
 Marker
 me_group_edit
 Edit
+me_group_modifier
+Modifier
 me_group_reference
-Reference track
+Reference tracks
 me_group_view
 View
 me_t_dummy
@@ -347,6 +349,14 @@ midi_editor
 Midi
 midi_fx_editor
 Midi Fx
+modifier:flat
+!expandx\\♭
+modifier:natural
+!expandx\\♮
+modifier:none
+!expandx\\none
+modifier:sharp
+!expandx\\♯
 ms
 ms
 mute
@@ -441,9 +451,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_375987
+rand_id_191830
 
-rand_id_563923
+rand_id_452311
 
 rd_g_data
 !noexpandy\\
@@ -461,6 +471,8 @@ record_dialog_buttonbar
 !buttonbar\\
 redo
 Redo
+reference_tracks
+!height=200,noexpandy,nobar,select-multi\\
 remove_sample
 Delete
 repdelay
@@ -497,8 +509,12 @@ save
 Save
 save_as
 Save as...
+scale_root
+!expandx\\
 scale_selected_bars
 !flat\\
+scale_type
+!expandx\\
 select_all
 Select all
 select_nothing
@@ -596,7 +612,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-180
+179
 // Data (ID,Text)
 
 
@@ -606,8 +622,6 @@ Zoom out
         - Default -
         - nicht verbinden -
         - don't connect -
-   - keine Referenz -
-   - no reference -
   - keins -
   - none -
   - neue Spur anlegen -

@@ -9,8 +9,8 @@ Dialog midi_editor "Midi" 380 516
 					SpinButton beat_partition "4\\1\\256" expandx
 					Text ld_t_scale "Tonleiter"
 					Grid ? "" 2 1
-						ComboBox scale_root ""
-						ComboBox scale_type ""
+						ComboBox scale_root "" expandx
+						ComboBox scale_type "" expandx
 			TabControl midi_edit_mode "Einzelton\\Intervall\\Akkord"
 				Grid ? "" 1 1
 					.
@@ -24,8 +24,14 @@ Dialog midi_editor "Midi" 380 516
 					.
 					Text ld_t_inversion "Umkehrung"
 					ComboBox chord_inversion ""
-			Group me_group_reference "Referenz-Spur"
-				ComboBox reference_track ""
+			Group me_group_modifier "Modifizierer"
+				Grid ? "" 4 1
+					RadioButton modifier:none "nichts" expandx
+					RadioButton modifier:sharp "♯" expandx
+					RadioButton modifier:flat "♭" expandx
+					RadioButton modifier:natural "♮" expandx
+			Expander me_group_reference "Referenz-Spuren"
+				ListView reference_tracks "" height=200 noexpandy nobar select-multi
 		Text me_t_dummy "" expandy
 		Group me_group_edit "Bearbeiten"
 			Grid ? "" 3 1

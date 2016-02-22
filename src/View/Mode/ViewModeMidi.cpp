@@ -29,6 +29,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	midi_interval = 3;
 	chord_type = 0;
 	chord_inversion = 0;
+	modifier = MODIFIER_NONE;
 
 	deleting = false;
 
@@ -102,6 +103,23 @@ void ViewModeMidi::onMouseMove()
 	}else if (selection->type == Selection::TYPE_SCROLL){
 		pitch_max = (track_rect.y2 + scroll_offset - view->my) / track_rect.height() * (MAX_PITCH - 1.0f);
 		setPitchMin(pitch_max - PITCH_SHOW_COUNT);
+	}
+}
+
+void ViewModeMidi::onKeyDown(int k)
+{
+	if (k == KEY_1){
+		modifier = MODIFIER_NONE;
+		view->notify(view->MESSAGE_SETTINGS_CHANGE);
+	}else if (k == KEY_2){
+		modifier = MODIFIER_SHARP;
+		view->notify(view->MESSAGE_SETTINGS_CHANGE);
+	}else if (k == KEY_3){
+		modifier = MODIFIER_FLAT;
+		view->notify(view->MESSAGE_SETTINGS_CHANGE);
+	}else if (k == KEY_4){
+		modifier = MODIFIER_NATURAL;
+		view->notify(view->MESSAGE_SETTINGS_CHANGE);
 	}
 }
 
@@ -201,7 +219,7 @@ int ViewModeMidi::y2pitch(int y)
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
 		int clef = t->track->instrument.get_clef();
 		int pos = t->screen_to_clef_pos(y);
-		return clef_position_to_pitch(pos, clef, view->midi_scale, MODIFIER_NONE);
+		return clef_position_to_pitch(pos, clef, view->midi_scale, modifier);
 	}
 	return pitch_min + ((t->area.y2 - y) * (pitch_max - pitch_min) / t->area.height());
 }
@@ -527,8 +545,9 @@ void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 {
 	// midi
 	if ((view->cur_track == t->track) and (t->track->type == Track::TYPE_MIDI)){
-		if ((t->reference_track >= 0) and (t->reference_track < song->tracks.num))
-			drawMidiEditable(c, t, song->tracks[t->reference_track]->midi, true, t->track, t->area);
+		foreach(int n, t->reference_tracks)
+			if ((n >= 0) and (n < song->tracks.num) and (n != t->track->get_index()))
+				drawMidiEditable(c, t, song->tracks[n]->midi, true, t->track, t->area);
 		drawMidiEditable(c, t, t->track->midi, false, t->track, t->area);
 
 

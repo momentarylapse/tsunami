@@ -620,7 +620,7 @@ Array<int> decompose_time(int length)
 {
 	Array<int> t;
 
-	// tripples * 2^n
+	// triplets * 2^n
 	while ((length % 3) != 0){
 		int largest = 2;
 		for (int i=2; i<=length; i*=2)
@@ -632,7 +632,7 @@ Array<int> decompose_time(int length)
 		//msg_error("non decomposable time: " + i2s(length));
 	}
 
-	// non-trippels
+	// non-triplets
 	while (length > 0){
 		int largest = 3;
 		for (int i=3; i<=length; i*=2){
@@ -1023,7 +1023,7 @@ int FormatGuitarPro::read_duration(int flags, GpMeasure &m)
 
 void FormatGuitarPro::read_mix_change()
 {
-	msg_db_f("mix", 0);
+	msg_db_f("mix", 1);
 	f->ReadByte(); // instrument
 	if (version >= 500){
 		for (int i=0; i<4; i++)

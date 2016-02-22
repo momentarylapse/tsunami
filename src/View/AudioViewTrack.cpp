@@ -380,7 +380,7 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 
 	color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
 	if ((state == STATE_HOVER) or (state == STATE_REFERENCE))
-		col.a = 0.5f;
+		col.a = 0.33f;
 
 	// "shadow" to indicate length
 	if (x2 - x1 > r*2){
@@ -392,8 +392,11 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 
 	// the note circle
 	c->setColor(col);
-	if (mod != MODIFIER_NONE)
-		c->drawStr(x - 15, y - 8, modifier_symbol(mod));
+	if (mod != MODIFIER_NONE){
+		float size = r*2;
+		c->setFontSize(size);
+		c->drawStr(x1 - size*0.7f, y - clef_dy*0.8f , modifier_symbol(mod));
+	}
 	if ((x2 - x1 > 6) or (state == STATE_HOVER))
 		c->drawCircle(x, y, r);
 	else
@@ -403,7 +406,7 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, int clef)
 {
 	// clef lines
-	float dy = area.height() / 13;
+	float dy = min(area.height() / 13, 30);
 	clef_dy = dy;
 	c->setColor(view->colors.text);
 	for (int i=0; i<10; i+=2){
@@ -426,7 +429,6 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int 
 
 	drawMidiScoreClef(c, clef);
 
-	c->setFontSize(clef_dy);
 	c->setAntialiasing(true);
 
 	foreach(MidiNote &n, notes)

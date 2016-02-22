@@ -112,10 +112,14 @@ void ViewModeMidi::updateTrackHeights()
 		if (t->track->type == Track::TYPE_AUDIO){
 			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
 		}else if (t->track->type == Track::TYPE_MIDI){
-			if (t->track == view->cur_track)
-				t->height_wish = 5000;
-			else
+			if (t->track == view->cur_track){
+				if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+					t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
+				else
+					t->height_wish = 5000;
+			}else{
 				t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
+			}
 		}else{
 			t->height_wish = view->TIME_SCALE_HEIGHT * 2;
 		}
@@ -399,6 +403,7 @@ Selection ViewModeMidi::getHover()
 		if (midi_mode != MIDI_MODE_SELECT){
 			s.pitch = y2pitch(my);
 			s.type = Selection::TYPE_MIDI_PITCH;
+			s.index = randi(1000); // quick'n'dirty fix to force view update every time the mouse moves
 			Array<MidiNote> notes = s.track->midi;
 			foreachi(MidiNote &n, notes, i)
 				if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
@@ -498,7 +503,6 @@ void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const
 	t->drawMidiScoreClef(c, clef);
 	//const int *mod = view->midi_scale.get_modifiers_clef();
 
-	c->setFontSize(t->clef_dy);
 	c->setAntialiasing(true);
 
 	/*for (int i=0; i<7; i++)
@@ -537,6 +541,7 @@ void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 				else
 					drawMidiNote(c, n, AudioViewTrack::STATE_HOVER);
 			}
+			c->setFontSize(view->FONT_SIZE);
 		}
 
 

@@ -55,6 +55,13 @@ public:
 		n = add(key, dummy);
 		return ((Entry*)data)[n].value;
 	}
+	Array<T1> keys() const
+	{
+		Array<T1> keys;
+		for (int i=0; i<this->num; i++)
+			keys.add(((Entry*)data)[i].key);
+		return keys;
+	}
 };
 
 template<class T1, class T2>

@@ -72,8 +72,12 @@ void FormatMidi::loadSong(StorageOperationData *od)
 		int time_division = f->ReadReversedWord();
 		if (format_type > 2)
 			throw format("only format type 1 allowed: %d", format_type);
-		msg_write(num_tracks);
-		msg_write(time_division);
+		msg_write(format("tracks: %d", num_tracks));
+		msg_write(format("time division: %d", time_division));
+
+		if (hsize > 6)
+			f->SetPos(hsize - 6, false);
+
 		int ticks_per_beat;
 
 		if ((time_division & 0x8000) > 0){
@@ -82,7 +86,14 @@ void FormatMidi::loadSong(StorageOperationData *od)
 			ticks_per_beat = time_division;
 		}
 
-		int mpqn = 60000000 / 120;
+		// beat = quarter note
+		int mpqn = 500000; // micro s/beat = 120 beats/min;
+
+		int numerator = 4;
+		int denominator = 4;
+		int last_bar = 0;
+
+		od->song->addTrack(Track::TYPE_TIME);
 
 		for (int i=0; i<num_tracks; i++){
 			string tn = read_chunk_name(f);
@@ -92,14 +103,19 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				throw string("midi track header is not \"MTrk\": " + tn);
 			//msg_write("----------------------- track");
 
-			MidiRawData events;
+			Map<int, MidiRawData> events;
 			string track_name;
 			int last_status = 0;
 
 			int offset = 0;
 			while(f->GetPos() < pos0 + tsize){
 				int v = read_var(f);
-				offset += (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
+				int dt = (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
+				offset += dt;
+				while (offset > last_bar){
+					od->song->addBar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, false);
+					last_bar = od->song->bars.getRange().end();
+				}
 				int c0 = f->ReadByte();
 				if ((c0 & 128) == 0){ // "running status"
 					c0 = last_status;
@@ -107,7 +123,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				}
 				//msg_write(format("  %d %p", v, c0));
 				last_status = c0;
-				if (c0 == 255){
+				if (c0 == 0xff){
 					int type = f->ReadByte();
 					//msg_write("meta " + i2s(type));
 					int l = read_var(f);
@@ -116,13 +132,15 @@ void FormatMidi::loadSong(StorageOperationData *od)
 						int a1 = f->ReadByte();
 						int a2 = f->ReadByte();
 						mpqn = (a0 << 16) + (a1 << 8) + a2;
-						msg_write(mpqn);
+						msg_write(format("%.1f bpm", 60000000.0f / (float)mpqn));
 					}else if (type == 88){
 						int a0 = f->ReadByte();
 						int a1 = f->ReadByte();
 						int a2 = f->ReadByte();
 						int a3 = f->ReadByte();
-						msg_write(format("time %d %d %d %d", a0, a1, a2, a3));
+						numerator = a0;
+						denominator = 1<<a1;
+						msg_write(format("time %d %d %d %d", a0, 1<<a1, a2, a3));
 					}else{
 						string t;
 						t.resize(l);
@@ -141,11 +159,12 @@ void FormatMidi::loadSong(StorageOperationData *od)
 					if (type == 9){ // on
 						int c1 = f->ReadByte() & 127;
 						int c2 = f->ReadByte() & 127;
-						events.add(MidiEvent(offset, c1, (float)c2 / 127.0f));
+						events[channel].add(MidiEvent(offset, c1, (float)c2 / 127.0f));
+						//msg_write(format("on %d  %d   %d %d", offset, c1, type, channel));
 					}else if (type == 8){ // off
 						int c1 = f->ReadByte() & 127;
 						int c2 = f->ReadByte() & 127;
-						events.add(MidiEvent(offset, c1, 0));
+						events[channel].add(MidiEvent(offset, c1, 0));
 					}else if (type == 10){ // note after touch
 						f->ReadByte();
 						f->ReadByte();
@@ -160,16 +179,19 @@ void FormatMidi::loadSong(StorageOperationData *od)
 						f->ReadByte();
 						f->ReadByte();
 					}else
-						msg_error("midi event " + i2s(type));
+						od->warn("unhandled midi event " + i2s(type));
 				}
 			}
 
 			f->SetPos(pos0 + tsize, true);
 
-			if (events.num > 0){
-				Track *t = od->song->addTrack(Track::TYPE_MIDI);
-				t->midi = midi_events_to_notes(events);
-				t->name = track_name;
+			if ((events.num > 0) or (i > 0)){
+				Array<int> keys = events.keys();
+				foreach(int k, keys){
+					Track *t = od->song->addTrack(Track::TYPE_MIDI);
+					t->midi = midi_events_to_notes(events[k]);
+					t->name = track_name;
+				}
 			}
 		}
 

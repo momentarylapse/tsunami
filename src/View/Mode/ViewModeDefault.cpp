@@ -292,10 +292,12 @@ void ViewModeDefault::drawGridBars(HuiPainter *c, const rect &r, const color &bg
 			if (prev_num_beats != b.num_beats)
 				s = i2s(b.num_beats) + "/" + i2s_small(4);
 			if (fabs(prev_bpm - bpm) > 0.5f)
-				s += format(" %.0f", bpm);
+				s += format(" \u2669=%.0f", bpm);
 			if (s.num > 0){
-				c->setColor(view->colors.text);
-				c->drawStr(max(xx + 5, 20), r.y1 + 18, s);
+				c->setColor(view->colors.text_soft1);
+				c->setFont("", view->FONT_SIZE, true, false);
+				c->drawStr(max(xx + 4, 20), r.y2 - 16, s);
+				c->setFont("", view->FONT_SIZE, false, false);
 			}
 			prev_num_beats = b.num_beats;
 			prev_bpm = bpm;

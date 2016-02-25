@@ -329,7 +329,7 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 		if (x2 - x1 > 6)
 			c->drawCircle(x, y, r);
 		else
-			c->drawRect(x - r, y - r, r*2, r*2);
+			c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
 		if (x2 - x1 > r/2){
 			c->setColor(view->colors.text);
 			c->drawStr(x1 + r/3, y - r * 1.20f, i2s(position));
@@ -399,7 +399,7 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 	if ((x2 - x1 > 6) or (state == STATE_HOVER))
 		c->drawCircle(x, y, r);
 	else
-		c->drawRect(x - r, y - r, r*2, r*2);
+		c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
 }
 
 void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, int clef)

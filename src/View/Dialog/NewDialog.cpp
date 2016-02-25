@@ -19,6 +19,8 @@ NewDialog::NewDialog(HuiWindow *_parent, Song *s):
 	setInt("sample_rate", 1);
 	hideControl("nd_g_metronome_params", true);
 
+	setInt("num_bars", 32);
+
 	event("cancel", this, &NewDialog::onClose);
 	event("hui:close", this, &NewDialog::onClose);
 	event("ok", this, &NewDialog::onOk);
@@ -59,6 +61,7 @@ void NewDialog::onMetronome()
 
 void NewDialog::onTypeMidi()
 {
-	//hideControl("nd_g_metronome_params", !isChecked(""));
+	check("metronome", true);
+	hideControl("nd_g_metronome_params", false);
 }
 

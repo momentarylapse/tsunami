@@ -120,6 +120,8 @@ void ViewModeMidi::onKeyDown(int k)
 	}else if (k == KEY_4){
 		modifier = MODIFIER_NATURAL;
 		view->notify(view->MESSAGE_SETTINGS_CHANGE);
+	}else{
+		ViewModeDefault::onKeyDown(k);
 	}
 }
 

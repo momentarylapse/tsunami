@@ -13,14 +13,18 @@
 class FormatMidi: public Format
 {
 public:
-	FormatMidi();
-	virtual ~FormatMidi();
-
 	virtual void loadTrack(StorageOperationData *od){}
 	virtual void saveViaRenderer(StorageOperationData *od){}
 
 	virtual void loadSong(StorageOperationData *od);
 	virtual void saveSong(StorageOperationData *od);
+};
+
+class FormatDescriptorMidi : public FormatDescriptor
+{
+public:
+	FormatDescriptorMidi();
+	virtual Format *create(){ return new FormatMidi; }
 };
 
 #endif /* FORMATMIDI_H_ */

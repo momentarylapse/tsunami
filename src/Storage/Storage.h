@@ -13,6 +13,7 @@
 
 class Range;
 class Format;
+class FormatDescriptor;
 class Song;
 class Track;
 class BufferBox;
@@ -38,10 +39,10 @@ public:
 	bool askOpenImport(HuiWindow *win);
 	bool askSaveExport(HuiWindow *win);
 
-	Format *getFormat(const string &ext, int flags);
+	FormatDescriptor *getFormat(const string &ext, int flags);
 
 //private:
-	Array<Format*> formats;
+	Array<FormatDescriptor*> formats;
 	string current_directory;
 };
 

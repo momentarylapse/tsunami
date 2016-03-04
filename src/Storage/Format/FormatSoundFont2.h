@@ -14,7 +14,6 @@ class FormatSoundFont2: public Format
 {
 public:
 	FormatSoundFont2();
-	virtual ~FormatSoundFont2();
 
 	void loadTrack(StorageOperationData *od){}
 	void saveViaRenderer(StorageOperationData *od){}
@@ -46,9 +45,13 @@ public:
 	Array<sfSample> samples;
 
 	void read_sample_header(File *f, sfSample &s);
+};
 
-	Song *song;
-	StorageOperationData *od;
+class FormatDescriptorSoundFont2 : public FormatDescriptor
+{
+public:
+	FormatDescriptorSoundFont2();
+	virtual Format *create(){ return new FormatSoundFont2; }
 };
 
 #endif /* SRC_STORAGE_FORMAT_FORMATSOUNDFONT2_H_ */

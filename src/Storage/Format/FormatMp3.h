@@ -13,11 +13,15 @@
 class FormatMp3: public Format
 {
 public:
-	FormatMp3();
-	virtual ~FormatMp3();
-
 	void loadTrack(StorageOperationData *od);
 	void saveViaRenderer(StorageOperationData *od){}
+};
+
+class FormatDescriptorMp3 : public FormatDescriptor
+{
+public:
+	FormatDescriptorMp3();
+	virtual Format *create(){ return new FormatMp3; }
 };
 
 #endif /* FORMATMP3_H_ */

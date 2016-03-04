@@ -12,14 +12,11 @@
 
 const int WAVE_BUFFER_SIZE = 1 << 15;
 
-FormatWave::FormatWave() :
-	Format("Wave", "wav,wave", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)
+FormatDescriptorWave::FormatDescriptorWave() :
+	FormatDescriptor("Wave", "wav,wave", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)
 {
 }
 
-FormatWave::~FormatWave()
-{
-}
 
 void FormatWave::saveViaRenderer(StorageOperationData *od)
 {

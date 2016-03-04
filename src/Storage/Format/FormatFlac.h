@@ -13,11 +13,15 @@
 class FormatFlac: public Format
 {
 public:
-	FormatFlac();
-	virtual ~FormatFlac();
-
 	virtual void loadTrack(StorageOperationData *od);
 	virtual void saveViaRenderer(StorageOperationData *od);
+};
+
+class FormatDescriptorFlac : public FormatDescriptor
+{
+public:
+	FormatDescriptorFlac();
+	virtual Format *create(){ return new FormatFlac; }
 };
 
 #endif /* FORMATFLAC_H_ */

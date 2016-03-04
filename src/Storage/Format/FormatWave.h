@@ -13,11 +13,15 @@
 class FormatWave: public Format
 {
 public:
-	FormatWave();
-	virtual ~FormatWave();
-
 	virtual void loadTrack(StorageOperationData *od);
 	virtual void saveViaRenderer(StorageOperationData *od);
+};
+
+class FormatDescriptorWave : public FormatDescriptor
+{
+public:
+	FormatDescriptorWave();
+	virtual Format *create(){ return new FormatWave; }
 };
 
 #endif /* FORMATWAVE_H_ */

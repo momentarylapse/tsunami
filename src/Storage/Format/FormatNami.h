@@ -13,9 +13,6 @@
 class FormatNami : public Format
 {
 public:
-	FormatNami();
-	virtual ~FormatNami();
-
 	virtual void loadTrack(StorageOperationData *od){}
 	virtual void saveViaRenderer(StorageOperationData *od){}
 
@@ -23,10 +20,13 @@ public:
 	virtual void saveSong(StorageOperationData *od);
 
 	void make_consistent(Song *s);
+};
 
-	File *f;
-	Song *song;
-	StorageOperationData *od;
+class FormatDescriptorNami : public FormatDescriptor
+{
+public:
+	FormatDescriptorNami();
+	virtual Format *create(){ return new FormatNami; }
 };
 
 #endif /* FORMATNAMI_H_ */

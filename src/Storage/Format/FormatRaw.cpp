@@ -11,12 +11,8 @@
 #include "../Dialog/RawConfigDialog.h"
 
 
-FormatRaw::FormatRaw() :
-	Format("Raw audio data", "raw", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)
-{
-}
-
-FormatRaw::~FormatRaw()
+FormatDescriptorRaw::FormatDescriptorRaw() :
+	FormatDescriptor("Raw audio data", "raw", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)
 {
 }
 

@@ -13,11 +13,15 @@
 class FormatM4a: public Format
 {
 public:
-	FormatM4a();
-	virtual ~FormatM4a();
-
 	virtual void loadTrack(StorageOperationData *od);
 	virtual void saveViaRenderer(StorageOperationData *od){}
+};
+
+class FormatDescriptorM4a : public FormatDescriptor
+{
+public:
+	FormatDescriptorM4a();
+	virtual Format *create(){ return new FormatM4a; }
 };
 
 #endif /* FORMATMP3_H_ */

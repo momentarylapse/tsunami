@@ -7,17 +7,15 @@
 
 #include "FormatSoundFont2.h"
 
-FormatSoundFont2::FormatSoundFont2() :
-	Format("SoundFont2", "sf2", FLAG_AUDIO | FLAG_TAGS | FLAG_SUBS | FLAG_READ)
+FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
+	FormatDescriptor("SoundFont2", "sf2", FLAG_AUDIO | FLAG_TAGS | FLAG_SUBS | FLAG_READ)
 {
-	song = NULL;
-	sample_offset = 0;
-	sample_count = 0;
-	od = NULL;
 }
 
-FormatSoundFont2::~FormatSoundFont2()
+FormatSoundFont2::FormatSoundFont2()
 {
+	sample_offset = 0;
+	sample_count = 0;
 }
 
 void FormatSoundFont2::loadSong(StorageOperationData *_od)

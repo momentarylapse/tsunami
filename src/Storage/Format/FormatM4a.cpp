@@ -9,12 +9,8 @@
 #include "../Storage.h"
 #include "../../lib/math/math.h"
 
-FormatM4a::FormatM4a() :
-	Format("Apple lossless audio", "m4a", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)
-{
-}
-
-FormatM4a::~FormatM4a()
+FormatDescriptorM4a::FormatDescriptorM4a() :
+	FormatDescriptor("Apple lossless audio", "m4a", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)
 {
 }
 

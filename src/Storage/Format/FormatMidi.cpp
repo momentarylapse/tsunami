@@ -7,12 +7,8 @@
 
 #include "FormatMidi.h"
 
-FormatMidi::FormatMidi() :
-	Format("Midi", "mid,midi", FLAG_MIDI | FLAG_MULTITRACK | FLAG_READ)
-{
-}
-
-FormatMidi::~FormatMidi()
+FormatDescriptorMidi::FormatDescriptorMidi() :
+	FormatDescriptor("Midi", "mid,midi", FLAG_MIDI | FLAG_MULTITRACK | FLAG_READ)
 {
 }
 

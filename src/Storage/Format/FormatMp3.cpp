@@ -9,12 +9,8 @@
 #include "../Storage.h"
 #include "../../lib/math/math.h"
 
-FormatMp3::FormatMp3() :
-	Format("Mp3", "mp3", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)
-{
-}
-
-FormatMp3::~FormatMp3()
+FormatDescriptorMp3::FormatDescriptorMp3() :
+	FormatDescriptor("Mp3", "mp3", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ)
 {
 }
 

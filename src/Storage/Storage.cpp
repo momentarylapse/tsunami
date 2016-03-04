@@ -27,16 +27,16 @@
 
 Storage::Storage()
 {
-	formats.add(new FormatNami());
-	formats.add(new FormatWave());
-	formats.add(new FormatRaw());
-	formats.add(new FormatOgg());
-	formats.add(new FormatFlac());
-	formats.add(new FormatGuitarPro());
-	formats.add(new FormatSoundFont2());
-	formats.add(new FormatMp3());
-	formats.add(new FormatM4a());
-	formats.add(new FormatMidi());
+	formats.add(new FormatDescriptorNami());
+	formats.add(new FormatDescriptorWave());
+	formats.add(new FormatDescriptorRaw());
+	formats.add(new FormatDescriptorOgg());
+	formats.add(new FormatDescriptorFlac());
+	formats.add(new FormatDescriptorGuitarPro());
+	formats.add(new FormatDescriptorSoundFont2());
+	formats.add(new FormatDescriptorMp3());
+	formats.add(new FormatDescriptorM4a());
+	formats.add(new FormatDescriptorMidi());
 
 	current_directory = HuiConfig.getStr("CurrentDirectory", "");
 }
@@ -45,8 +45,8 @@ Storage::~Storage()
 {
 	HuiConfig.setStr("CurrentDirectory", current_directory);
 
-	foreach(Format *f, formats)
-		delete(f);
+	foreach(FormatDescriptor *d, formats)
+		delete(d);
 	formats.clear();
 }
 
@@ -55,11 +55,12 @@ bool Storage::load(Song *a, const string &filename)
 	msg_db_f("Storage.Load", 1);
 
 	current_directory = filename.dirname();
-	Format *f = getFormat(filename.extension(), 0);
-	if (!f)
+	FormatDescriptor *d = getFormat(filename.extension(), 0);
+	if (!d)
 		return false;
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("lade ") + f->description, tsunami->_win);
+	Format *f = d->create();
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("lade ") + d->description, tsunami->_win);
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -76,6 +77,7 @@ bool Storage::load(Song *a, const string &filename)
 	a->notify(a->MESSAGE_NEW);
 	a->notify(a->MESSAGE_CHANGE);
 
+	delete(f);
 	return true;
 }
 
@@ -84,12 +86,13 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 	msg_db_f("Storage.LoadTrack", 1);
 
 	current_directory = filename.dirname();
-	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
-	if (!f)
+	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
+	if (!d)
 		return false;
 
+	Format *f = d->create();
 	Song *a = t->song;
-	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("lade ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("lade ") + d->description, tsunami->_win);
 	od.offset = offset;
 	od.level = level;
 
@@ -98,6 +101,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 	f->loadTrack(&od);
 	a->action_manager->endActionGroup();
 
+	delete(f);
 	return true;
 }
 
@@ -139,14 +143,15 @@ bool Storage::save(Song *a, const string &filename)
 
 	current_directory = filename.dirname();
 
-	Format *f = getFormat(filename.extension(), 0);
-	if (!f)
+	FormatDescriptor *d = getFormat(filename.extension(), 0);
+	if (!d)
 		return false;
 
-	if (!f->testFormatCompatibility(a))
+	if (!d->testFormatCompatibility(a))
 		tsunami->log->warn(_("Datenverlust!"));
+	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("speichere ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("speichere ") + d->description, tsunami->_win);
 
 	a->filename = filename;
 
@@ -156,20 +161,23 @@ bool Storage::save(Song *a, const string &filename)
 	if (tsunami->win)
 		tsunami->win->updateMenu();
 
+	delete(f);
 	return true;
 }
 
 bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 {
 	msg_db_f("Storage.saveViaRenderer", 1);
-	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
-	if (!f)
+	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
+	if (!d)
 		return false;
 
+	Format *f = d->create();
 	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exportiere"), tsunami->_win);
 
 	od.renderer = r;
 	f->saveViaRenderer(&od);
+	delete(d);
 	return true;
 }
 
@@ -178,7 +186,7 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 	string filter, filter_show;
 	filter_show = _("alles m&ogliche");
 	bool first = true;
-	foreach(Format *f, formats)
+	foreach(FormatDescriptor *f, formats)
 		if ((f->flags & flags) == flags){
 			foreach(string &e, f->extensions){
 				if (!first)
@@ -192,7 +200,7 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 		}
 	filter_show += "|" + _("alle Dateien");
 	filter += "|*";
-	foreach(Format *f, formats)
+	foreach(FormatDescriptor *f, formats)
 		if ((f->flags & flags) == flags){
 			filter += "|";
 			filter_show += "|" + f->description + " (";
@@ -206,7 +214,7 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 			}
 			filter_show += ")";
 		}
-	if (flags & Format::FLAG_WRITE)
+	if (flags & FormatDescriptor::FLAG_WRITE)
 		return HuiFileDialogSave(win, title, current_directory, filter_show, filter);
 	else
 		return HuiFileDialogOpen(win, title, current_directory, filter_show, filter);
@@ -214,33 +222,33 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 
 bool Storage::askOpen(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei &offnen"), Format::FLAG_READ);
+	return askByFlags(win, _("Datei &offnen"), FormatDescriptor::FLAG_READ);
 }
 
 bool Storage::askSave(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei speichern"), Format::FLAG_WRITE);
+	return askByFlags(win, _("Datei speichern"), FormatDescriptor::FLAG_WRITE);
 }
 
 bool Storage::askOpenImport(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei importieren"), Format::FLAG_SINGLE_TRACK | Format::FLAG_READ);
+	return askByFlags(win, _("Datei importieren"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_READ);
 }
 
 bool Storage::askSaveExport(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei exportieren"), Format::FLAG_SINGLE_TRACK | Format::FLAG_WRITE);
+	return askByFlags(win, _("Datei exportieren"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_WRITE);
 }
 
 
-Format *Storage::getFormat(const string &ext, int flags)
+FormatDescriptor *Storage::getFormat(const string &ext, int flags)
 {
 	bool found = false;
-	foreach(Format *f, formats){
-		if (f->canHandle(ext)){
+	foreach(FormatDescriptor *d, formats){
+		if (d->canHandle(ext)){
 			found = true;
-			if ((f->flags & flags) == flags)
-				return f;
+			if ((d->flags & flags) == flags)
+				return d;
 		}
 	}
 

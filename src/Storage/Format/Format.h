@@ -14,22 +14,17 @@
 
 class StorageOperationData;
 class AudioRenderer;
+class Format;
 
-class Format
+class FormatDescriptor
 {
 public:
-	Format(const string &description, const string &extensions, int _flags);
-	virtual ~Format();
+	FormatDescriptor(const string &description, const string &extensions, int _flags);
+	virtual ~FormatDescriptor(){}
 	bool canHandle(const string &extension);
 	bool testFormatCompatibility(Song *s);
 
-	void importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
-
-	virtual void loadTrack(StorageOperationData *od) = 0;
-	virtual void saveViaRenderer(StorageOperationData *od) = 0;
-
-	virtual void loadSong(StorageOperationData *od);
-	virtual void saveSong(StorageOperationData *od);
+	virtual Format *create() = 0;
 
 	Array<string> extensions;
 	string description;
@@ -46,6 +41,25 @@ public:
 		FLAG_READ = 1<<7,
 		FLAG_WRITE = 1<<8,
 	};
+};
+
+class Format
+{
+public:
+	Format();
+	virtual ~Format(){}
+
+	void importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level);
+
+	virtual void loadTrack(StorageOperationData *od) = 0;
+	virtual void saveViaRenderer(StorageOperationData *od) = 0;
+
+	virtual void loadSong(StorageOperationData *od);
+	virtual void saveSong(StorageOperationData *od);
+
+	File *f;
+	Song *song;
+	StorageOperationData *od;
 };
 
 #endif /* FORMAT_H_ */

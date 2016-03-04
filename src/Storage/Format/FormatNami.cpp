@@ -16,17 +16,9 @@
 
 const int CHUNK_SIZE = 1 << 16;
 
-
-FormatNami::FormatNami() :
-	Format("Tsunami", "nami", FLAG_AUDIO | FLAG_MIDI | FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS | FLAG_READ | FLAG_WRITE)
-{
-	song = NULL;
-	f = NULL;
-}
-
-FormatNami::~FormatNami()
-{
-}
+FormatDescriptorNami::FormatDescriptorNami() :
+	FormatDescriptor("Tsunami", "nami", FLAG_AUDIO | FLAG_MIDI | FLAG_FX | FLAG_MULTITRACK | FLAG_TAGS | FLAG_SUBS | FLAG_READ | FLAG_WRITE)
+{}
 
 
 class FileChunkTag : public FileChunk<Song,Tag>

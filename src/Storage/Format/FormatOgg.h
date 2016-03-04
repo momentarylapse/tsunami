@@ -13,11 +13,15 @@
 class FormatOgg: public Format
 {
 public:
-	FormatOgg();
-	virtual ~FormatOgg();
-
 	virtual void loadTrack(StorageOperationData *od);
 	virtual void saveViaRenderer(StorageOperationData *od);
+};
+
+class FormatDescriptorOgg : public FormatDescriptor
+{
+public:
+	FormatDescriptorOgg();
+	virtual Format *create(){ return new FormatOgg; }
 };
 
 #endif /* FORMATOGG_H_ */

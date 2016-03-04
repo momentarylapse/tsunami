@@ -21,15 +21,10 @@ const int CHUNK_SIZE = 1 << 15;
 OggVorbis_File vf;
 char ogg_buffer[4096];
 
-FormatOgg::FormatOgg() :
-	Format("Ogg vorbis", "ogg", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ | FLAG_WRITE)
+FormatDescriptorOgg::FormatDescriptorOgg() :
+	FormatDescriptor("Ogg vorbis", "ogg", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ | FLAG_WRITE)
 {
 }
-
-FormatOgg::~FormatOgg()
-{
-}
-
 
 
 

@@ -13,11 +13,15 @@
 class FormatRaw: public Format
 {
 public:
-	FormatRaw();
-	virtual ~FormatRaw();
-
 	virtual void loadTrack(StorageOperationData *od);
 	virtual void saveViaRenderer(StorageOperationData *od);
+};
+
+class FormatDescriptorRaw : public FormatDescriptor
+{
+public:
+	FormatDescriptorRaw();
+	virtual Format *create(){ return new FormatRaw; }
 };
 
 #endif /* FORMATRAW_H_ */

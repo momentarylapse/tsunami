@@ -9,12 +9,8 @@
 
 const int BEAT_PARTITION = 12;
 
-FormatGuitarPro::FormatGuitarPro() :
-	Format("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
-{
-}
-
-FormatGuitarPro::~FormatGuitarPro()
+FormatDescriptorGuitarPro::FormatDescriptorGuitarPro() :
+	FormatDescriptor("GuitarPro", "gp3,gp4,gp5", FLAG_MIDI | FLAG_READ | FLAG_WRITE | FLAG_MULTITRACK)
 {
 }
 

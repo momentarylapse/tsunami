@@ -14,9 +14,6 @@
 class FormatGuitarPro: public Format
 {
 public:
-	FormatGuitarPro();
-	virtual ~FormatGuitarPro();
-
 	void loadTrack(StorageOperationData *od){}
 	void saveViaRenderer(StorageOperationData *od){}
 
@@ -85,6 +82,14 @@ public:
 	int write_duration(int flags, GpMeasure &m);
 	void write_chord();
 	void write_mix_change_tempo();
+};
+
+
+class FormatDescriptorGuitarPro : public FormatDescriptor
+{
+public:
+	FormatDescriptorGuitarPro();
+	virtual Format *create(){ return new FormatGuitarPro; }
 };
 
 #endif /* SRC_STORAGE_FORMATGUITARPRO_H_ */

@@ -10,15 +10,55 @@
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
-Format::Format(const string &_description, const string &_extensions, int _flags)
+FormatDescriptor::FormatDescriptor(const string &_description, const string &_extensions, int _flags)
 {
 	description = _description;
 	extensions = _extensions.explode(",");
 	flags = _flags;
 }
 
-Format::~Format()
+bool FormatDescriptor::canHandle(const string & _extension)
 {
+	foreach(string e, extensions)
+		if (e == _extension)
+			return true;
+	return false;
+}
+
+bool FormatDescriptor::testFormatCompatibility(Song *a)
+{
+	int num_subs = a->samples.num;
+	int num_fx = a->fx.num;
+	int num_audio = 0;
+	int num_midi = 0;
+	foreach(Track *t, a->tracks){
+		num_fx += t->fx.num;
+		if (t->type == t->TYPE_AUDIO)
+			num_audio ++;
+		if (t->type == t->TYPE_MIDI)
+			num_midi ++;
+	}
+
+	if ((a->tracks.num > 1) && ((flags & FLAG_MULTITRACK) == 0))
+		return false;
+	/*if ((a->tag.num > 0) && ((flags & FLAG_TAGS) == 0))
+		return false;*/
+	if ((num_fx > 0) && ((flags & FLAG_FX) == 0))
+		return false;
+	if ((num_subs > 0) && ((flags & FLAG_SUBS) == 0))
+		return false;
+	if ((num_audio > 0) && ((flags & FLAG_AUDIO) == 0))
+		return false;
+	if ((num_midi > 0) && ((flags & FLAG_MIDI) == 0))
+		return false;
+	return true;
+}
+
+Format::Format()
+{
+	song = NULL;
+	od = NULL;
+	f = NULL;
 }
 
 void Format::importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level)
@@ -33,15 +73,6 @@ void Format::importData(Track *t, void *data, int channels, SampleFormat format,
 	buf.import(data, channels, format, samples);
 	if (t->song->action_manager->isEnabled())
 		t->song->action_manager->execute(a);
-}
-
-
-bool Format::canHandle(const string & _extension)
-{
-	foreach(string e, extensions)
-		if (e == _extension)
-			return true;
-	return false;
 }
 
 /*void Format::exportAsTrack(StorageOperationData *od)
@@ -66,35 +97,6 @@ bool Format::canHandle(const string & _extension)
 }*/
 
 
-
-bool Format::testFormatCompatibility(Song *a)
-{
-	int num_subs = a->samples.num;
-	int num_fx = a->fx.num;
-	int num_audio = 0;
-	int num_midi = 0;
-	foreach(Track *t, a->tracks){
-		num_fx += t->fx.num;
-		if (t->type == t->TYPE_AUDIO)
-			num_audio ++;
-		if (t->type == t->TYPE_MIDI)
-			num_midi ++;
-	}
-
-	if ((a->tracks.num > 1) && ((flags & Format::FLAG_MULTITRACK) == 0))
-		return false;
-	/*if ((a->tag.num > 0) && ((flags & StorageAny::FLAG_TAGS) == 0))
-		return false;*/
-	if ((num_fx > 0) && ((flags & Format::FLAG_FX) == 0))
-		return false;
-	if ((num_subs > 0) && ((flags & Format::FLAG_SUBS) == 0))
-		return false;
-	if ((num_audio > 0) && ((flags & Format::FLAG_AUDIO) == 0))
-		return false;
-	if ((num_midi > 0) && ((flags & Format::FLAG_MIDI) == 0))
-		return false;
-	return true;
-}
 
 void Format::loadSong(StorageOperationData *od)
 {

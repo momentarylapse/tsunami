@@ -1034,6 +1034,10 @@ void FormatNami::loadSong(StorageOperationData *_od)
 	// TODO?
 	od->song->tags.clear();
 
+	// quick'n'dirty fix for loading synth with sample-refs
+	Song *temp = tsunami->song;
+	tsunami->song = od->song;
+
 	try{
 		ChunkedFileFormatNami n;
 		n.read_file(od);
@@ -1045,6 +1049,8 @@ void FormatNami::loadSong(StorageOperationData *_od)
 	make_consistent(od->song);
 
 	od->song->updateSelection(Range(0, 0));
+
+	tsunami->song = temp;
 }
 
 

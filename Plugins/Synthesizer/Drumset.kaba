@@ -79,10 +79,10 @@ class DrumsetSynthesizer : Synthesizer
 		if state.a
 			state.s = state.a.tracks[0].synth
 		if state.s
+			state.s.setSampleRate(sample_rate)
 			state.s.onConfig()
 	overwrite void render(BufferBox buf)
 		Synthesizer *s = state.s
-		print s
 		if !s
 			return
 		s.events = events

@@ -12,11 +12,12 @@
 
 class Configurable;
 class Synthesizer;
+class Song;
 
 class ConfigurableSelectorDialog: public HuiDialog
 {
 public:
-	ConfigurableSelectorDialog(HuiWindow *_parent, int type, const string &old_name = "");
+	ConfigurableSelectorDialog(HuiWindow *_parent, int type, Song *song, const string &old_name = "");
 	virtual ~ConfigurableSelectorDialog();
 
 	void onListSelect();
@@ -26,6 +27,7 @@ public:
 	void onOk();
 
 	int type;
+	Song *song;
 	Array<string> names;
 	Set<string> ugroups;
 	Array<string> groups;
@@ -33,6 +35,6 @@ public:
 	static Configurable *_return;
 };
 
-Synthesizer *ChooseSynthesizer(HuiWindow *parent, const string &old_name = "");
+Synthesizer *ChooseSynthesizer(HuiWindow *parent, Song *song, const string &old_name = "");
 
 #endif /* CONFIGURABLESELECTORDIALOG_H_ */

@@ -49,6 +49,6 @@ public:
 	string GetError();
 };
 
-MidiEffect *_cdecl CreateMidiEffect(const string &name);
+MidiEffect *_cdecl CreateMidiEffect(const string &name, Song *song);
 
 #endif /* MIDIEFFECT_H_ */

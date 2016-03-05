@@ -13,10 +13,7 @@ ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index)
 {
 	track_no = get_track_index(t);
 	index = _index;
-}
-
-ActionTrackDeleteEffect::~ActionTrackDeleteEffect()
-{
+	effect = NULL;
 }
 
 void *ActionTrackDeleteEffect::execute(Data *d)

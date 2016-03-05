@@ -179,13 +179,13 @@ bool Synthesizer::isDefault()
 
 
 // factory
-Synthesizer *CreateSynthesizer(const string &name)
+Synthesizer *CreateSynthesizer(const string &name, Song *song)
 {
 	if ((name == "Dummy") or (name == ""))
 		return new DummySynthesizer;
 	/*if (name == "Sample")
 		return new SampleSynthesizer;*/
-	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name);
+	Synthesizer *s = tsunami->plugin_manager->LoadSynthesizer(name, song);
 	if (s){
 		s->resetConfig();
 		s->name = name;
@@ -193,6 +193,7 @@ Synthesizer *CreateSynthesizer(const string &name)
 	}
 	tsunami->log->error(_("unbekannter Synthesizer: ") + name);
 	s = new DummySynthesizer;
+	s->song = song;
 	s->name = name;
 	return s;
 }

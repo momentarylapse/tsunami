@@ -16,7 +16,6 @@ class ActionTrackDetuneSynthesizer: public Action
 {
 public:
 	ActionTrackDetuneSynthesizer(Track *t, int pitch, float dpitch, bool all_octaves);
-	virtual ~ActionTrackDetuneSynthesizer(){}
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

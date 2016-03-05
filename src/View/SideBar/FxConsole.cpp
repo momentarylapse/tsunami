@@ -158,7 +158,7 @@ FxConsole::~FxConsole()
 
 void FxConsole::onAdd()
 {
-	Effect *effect = tsunami->plugin_manager->ChooseEffect(this);
+	Effect *effect = tsunami->plugin_manager->ChooseEffect(this, track->song);
 	if (!effect)
 		return;
 	if (track)

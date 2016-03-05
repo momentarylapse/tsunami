@@ -8,11 +8,13 @@
 #include "ActionTrackSetSynthesizer.h"
 #include <assert.h>
 #include "../../../Data/Song.h"
+#include "../../../Audio/Synth/Synthesizer.h"
 
 ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, Synthesizer *_synth)
 {
 	track_no = get_track_index(t);
 	synth = _synth;
+	synth->song = t->song;
 }
 
 void ActionTrackSetSynthesizer::undo(Data *d)

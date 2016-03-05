@@ -98,7 +98,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(f->ReadStr());
+		me = CreateEffect(f->ReadStr(), parent->song);
 		me->only_on_selection = f->ReadBool();
 		me->range.offset = f->ReadInt();
 		me->range.num = f->ReadInt();
@@ -127,7 +127,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateEffect(f->ReadStr());
+		me = CreateEffect(f->ReadStr(), parent);
 		me->only_on_selection = f->ReadBool();
 		me->range.offset = f->ReadInt();
 		me->range.num = f->ReadInt();
@@ -524,7 +524,7 @@ public:
 	{}
 	virtual void read(File *f)
 	{
-		me = CreateMidiEffect(f->ReadStr());
+		me = CreateMidiEffect(f->ReadStr(), NULL);
 		me->only_on_selection = f->ReadBool();
 		me->range.offset = f->ReadInt();
 		me->range.num = f->ReadInt();
@@ -735,7 +735,7 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		me = CreateSynthesizer(f->ReadStr());
+		me = CreateSynthesizer(f->ReadStr(), parent->song);
 		me->configFromString(f->ReadStr());
 		f->ReadStr();
 		f->ReadInt();
@@ -1034,10 +1034,6 @@ void FormatNami::loadSong(StorageOperationData *_od)
 	// TODO?
 	od->song->tags.clear();
 
-	// quick'n'dirty fix for loading synth with sample-refs
-	Song *temp = tsunami->song;
-	tsunami->song = od->song;
-
 	try{
 		ChunkedFileFormatNami n;
 		n.read_file(od);
@@ -1049,8 +1045,6 @@ void FormatNami::loadSong(StorageOperationData *_od)
 	make_consistent(od->song);
 
 	od->song->updateSelection(Range(0, 0));
-
-	tsunami->song = temp;
 }
 
 

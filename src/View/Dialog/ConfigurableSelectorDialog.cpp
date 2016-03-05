@@ -14,7 +14,7 @@
 
 Configurable *ConfigurableSelectorDialog::_return;
 
-ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _type, const string &old_name) :
+ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _type, Song *_song, const string &old_name) :
 	HuiDialog("Selector", 400, 500, _parent, false)
 {
 	addGrid("", 0, 0, 1, 2, "root-grid");
@@ -26,6 +26,7 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _
 	addButton(_("Ok"), 1, 0, 0, 0, "ok");
 
 	type = _type;
+	song = _song;
 	if (type == Configurable::TYPE_EFFECT){
 		string prefix = HuiAppDirectoryStatic + "Plugins/Buffer/";
 		foreach(PluginManager::PluginFile &pf, tsunami->plugin_manager->plugin_files){
@@ -85,11 +86,11 @@ void ConfigurableSelectorDialog::onSelect()
 	if (n < 0)
 		return;
 	if (type == Configurable::TYPE_EFFECT)
-		_return = CreateEffect(names[n]);
+		_return = CreateEffect(names[n], song);
 	else if (type == Configurable::TYPE_MIDI_EFFECT)
-		_return = CreateMidiEffect(names[n]);
+		_return = CreateMidiEffect(names[n], song);
 	else if (type == Configurable::TYPE_SYNTHESIZER)
-		_return = CreateSynthesizer(names[n]);
+		_return = CreateSynthesizer(names[n], song);
 	delete(this);
 }
 
@@ -108,9 +109,9 @@ void ConfigurableSelectorDialog::onOk()
 	onSelect();
 }
 
-Synthesizer *ChooseSynthesizer(HuiWindow *parent, const string &old_name)
+Synthesizer *ChooseSynthesizer(HuiWindow *parent, Song *song, const string &old_name)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, old_name);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, song, old_name);
 	dlg->run();
 	return (Synthesizer*)ConfigurableSelectorDialog::_return;
 }

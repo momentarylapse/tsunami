@@ -41,14 +41,14 @@ public:
 	void SaveFavorite(Configurable *c, const string &name);
 	string SelectFavoriteName(HuiWindow *win, Configurable *c, bool save);
 
-	Effect *LoadEffect(const string &name);
-	MidiEffect *LoadMidiEffect(const string &name);
+	Effect *LoadEffect(const string &name, Song *song);
+	MidiEffect *LoadMidiEffect(const string &name, Song *song);
 
 	Array<string> FindSynthesizers();
-	Synthesizer *LoadSynthesizer(const string &name);
+	Synthesizer *LoadSynthesizer(const string &name, Song *song);
 
-	Effect *ChooseEffect(HuiPanel *parent);
-	MidiEffect *ChooseMidiEffect(HuiPanel *parent);
+	Effect *ChooseEffect(HuiPanel *parent, Song *song);
+	MidiEffect *ChooseMidiEffect(HuiPanel *parent, Song *song);
 	//Synthesizer *ChooseSynthesizer(HuiPanel *parent);
 
 

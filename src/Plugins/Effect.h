@@ -47,6 +47,6 @@ public:
 	string getError();
 };
 
-Effect *_cdecl CreateEffect(const string &name);
+Effect *_cdecl CreateEffect(const string &name, Song *song);
 
 #endif /* EFFECT_H_ */

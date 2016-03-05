@@ -17,7 +17,6 @@ class ActionTrackEditMidiEffect: public ActionMergable<string>
 {
 public:
 	ActionTrackEditMidiEffect(Track *t, int index, const string &old_params, MidiEffect *fx);
-	virtual ~ActionTrackEditMidiEffect();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

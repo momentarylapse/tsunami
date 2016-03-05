@@ -678,7 +678,7 @@ Plugin *PluginManager::GetPlugin(const string &name)
 	return NULL;
 }
 
-Effect *PluginManager::LoadEffect(const string &name)
+Effect *PluginManager::LoadEffect(const string &name, Song *song)
 {
 	Plugin *p = NULL;
 	foreach(PluginFile &pf, plugin_files){
@@ -698,12 +698,14 @@ Effect *PluginManager::LoadEffect(const string &name)
 	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "AudioEffect")
 			continue;
-		return (Effect*)t->CreateInstance();
+		Effect *fx = (Effect*)t->CreateInstance();
+		fx->song = song;
+		return fx;
 	}
 	return NULL;
 }
 
-MidiEffect *PluginManager::LoadMidiEffect(const string &name)
+MidiEffect *PluginManager::LoadMidiEffect(const string &name, Song *song)
 {
 	bool found = false;
 	Plugin *p = NULL;
@@ -724,7 +726,9 @@ MidiEffect *PluginManager::LoadMidiEffect(const string &name)
 	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "MidiEffect")
 			continue;
-		return (MidiEffect*)t->CreateInstance();
+		MidiEffect *m = (MidiEffect*)t->CreateInstance();
+		m->song = song;
+		return m;
 	}
 	return NULL;
 }
@@ -739,7 +743,7 @@ Array<string> PluginManager::FindSynthesizers()
 	return names;
 }
 
-Synthesizer *PluginManager::LoadSynthesizer(const string &name)
+Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 {
 	string filename = HuiAppDirectoryStatic + "Plugins/Synthesizer/" + name + ".kaba";
 	if (!file_test_existence(filename))
@@ -754,21 +758,23 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name)
 	foreach(Script::Type *t, s->syntax->types){
 		if (t->GetRoot()->name != "Synthesizer")
 			continue;
-		return (Synthesizer*)t->CreateInstance();
+		Synthesizer *synth = (Synthesizer*)t->CreateInstance();
+		synth->song = song;
+		return synth;
 	}
 	return NULL;
 }
 
-Effect* PluginManager::ChooseEffect(HuiPanel *parent)
+Effect* PluginManager::ChooseEffect(HuiPanel *parent, Song *song)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT, song);
 	dlg->run();
 	return (Effect*)ConfigurableSelectorDialog::_return;
 }
 
-MidiEffect* PluginManager::ChooseMidiEffect(HuiPanel *parent)
+MidiEffect* PluginManager::ChooseMidiEffect(HuiPanel *parent, Song *song)
 {
-	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT);
+	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT, song);
 	dlg->run();
 	return (MidiEffect*)ConfigurableSelectorDialog::_return;
 }

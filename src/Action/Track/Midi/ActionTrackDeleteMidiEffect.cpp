@@ -13,10 +13,7 @@ ActionTrackDeleteMidiEffect::ActionTrackDeleteMidiEffect(Track *t, int _index)
 {
 	track_no = get_track_index(t);
 	index = _index;
-}
-
-ActionTrackDeleteMidiEffect::~ActionTrackDeleteMidiEffect()
-{
+	effect = NULL;
 }
 
 void *ActionTrackDeleteMidiEffect::execute(Data *d)

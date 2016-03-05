@@ -16,7 +16,6 @@ class ActionTrackToggleEffectEnabled: public Action
 {
 public:
 	ActionTrackToggleEffectEnabled(Track *t, int index);
-	virtual ~ActionTrackToggleEffectEnabled();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

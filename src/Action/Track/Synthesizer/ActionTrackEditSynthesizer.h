@@ -15,7 +15,6 @@ class ActionTrackEditSynthesizer: public ActionMergable<string>
 {
 public:
 	ActionTrackEditSynthesizer(Track *t, const string &params_old);
-	virtual ~ActionTrackEditSynthesizer();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

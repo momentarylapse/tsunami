@@ -18,10 +18,6 @@ ActionTrackEditEffect::ActionTrackEditEffect(Track *t, int _index, const string 
 	new_value = fx->configToString();
 }
 
-ActionTrackEditEffect::~ActionTrackEditEffect()
-{
-}
-
 void *ActionTrackEditEffect::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);

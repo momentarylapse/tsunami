@@ -16,7 +16,6 @@ class ActionTrackDeleteEffect: public Action
 {
 public:
 	ActionTrackDeleteEffect(Track *t, int index);
-	virtual ~ActionTrackDeleteEffect();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

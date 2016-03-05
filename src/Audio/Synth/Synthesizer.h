@@ -88,7 +88,7 @@ protected:
 	bool locked;
 };
 
-Synthesizer *CreateSynthesizer(const string &name);
+Synthesizer *CreateSynthesizer(const string &name, Song *song);
 Array<string> FindSynthesizers();
 
 #endif /* SYNTHESIZER_H_ */

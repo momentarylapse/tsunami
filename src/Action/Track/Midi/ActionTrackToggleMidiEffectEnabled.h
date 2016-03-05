@@ -16,7 +16,6 @@ class ActionTrackToggleMidiEffectEnabled: public Action
 {
 public:
 	ActionTrackToggleMidiEffectEnabled(Track *t, int index);
-	virtual ~ActionTrackToggleMidiEffectEnabled();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

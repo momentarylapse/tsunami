@@ -17,7 +17,6 @@ class ActionTrackEditEffect: public ActionMergable<string>
 {
 public:
 	ActionTrackEditEffect(Track *t, int index, const string &old_params, Effect *fx);
-	virtual ~ActionTrackEditEffect();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

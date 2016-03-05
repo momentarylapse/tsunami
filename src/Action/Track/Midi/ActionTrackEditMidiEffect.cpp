@@ -18,10 +18,6 @@ ActionTrackEditMidiEffect::ActionTrackEditMidiEffect(Track *t, int _index, const
 	new_value = fx->configToString();
 }
 
-ActionTrackEditMidiEffect::~ActionTrackEditMidiEffect()
-{
-}
-
 void *ActionTrackEditMidiEffect::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);

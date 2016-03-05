@@ -15,10 +15,6 @@ ActionTrackToggleEffectEnabled::ActionTrackToggleEffectEnabled(Track *t, int _in
 	index = _index;
 }
 
-ActionTrackToggleEffectEnabled::~ActionTrackToggleEffectEnabled()
-{
-}
-
 void *ActionTrackToggleEffectEnabled::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);

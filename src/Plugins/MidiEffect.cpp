@@ -100,9 +100,9 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 }
 
 
-MidiEffect *CreateMidiEffect(const string &name)
+MidiEffect *CreateMidiEffect(const string &name, Song *song)
 {
-	MidiEffect *f = tsunami->plugin_manager->LoadMidiEffect(name);
+	MidiEffect *f = tsunami->plugin_manager->LoadMidiEffect(name, song);
 	if (f){
 		f->name = name;
 		f->resetConfig();
@@ -110,6 +110,7 @@ MidiEffect *CreateMidiEffect(const string &name)
 	}
 	f = new MidiEffect;
 	f->name = name;
+	f->song = song;
 	f->plugin = tsunami->plugin_manager->GetPlugin(name);
 	if (f->plugin){
 		f->usable = f->plugin->usable;

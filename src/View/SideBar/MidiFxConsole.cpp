@@ -170,7 +170,7 @@ void MidiFxConsole::onUpdate(Observable* o, const string &message)
 
 void MidiFxConsole::onAdd()
 {
-	MidiEffect *effect = tsunami->plugin_manager->ChooseMidiEffect(this);
+	MidiEffect *effect = tsunami->plugin_manager->ChooseMidiEffect(this, track->song);
 	if (!effect)
 		return;
 	if (track)

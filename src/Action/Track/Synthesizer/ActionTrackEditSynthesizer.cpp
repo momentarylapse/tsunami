@@ -17,10 +17,6 @@ ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t, const string &p
 	new_value = t->synth->configToString();
 }
 
-ActionTrackEditSynthesizer::~ActionTrackEditSynthesizer()
-{
-}
-
 void *ActionTrackEditSynthesizer::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);

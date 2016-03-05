@@ -92,15 +92,16 @@ void Effect::doProcessTrack(Track *t, int level_no, const Range &r)
 }
 
 
-Effect *CreateEffect(const string &name)
+Effect *CreateEffect(const string &name, Song *song)
 {
-	Effect *f = tsunami->plugin_manager->LoadEffect(name);
+	Effect *f = tsunami->plugin_manager->LoadEffect(name, song);
 	if (f){
 		f->name = name;
 		f->resetConfig();
 		return f;
 	}
 	f = new Effect;
+	f->song = song;
 	f->name = name;
 	f->plugin = tsunami->plugin_manager->GetPlugin(name);
 	if (f->plugin){

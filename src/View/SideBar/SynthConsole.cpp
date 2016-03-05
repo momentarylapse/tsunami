@@ -145,7 +145,7 @@ void SynthConsole::onSelect()
 {
 	if (!track)
 		return;
-	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->synth->name);
+	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->song, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
 }

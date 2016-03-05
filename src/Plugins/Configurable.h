@@ -32,6 +32,7 @@ public:
 
 //class AutoConfigPanel;
 class ConfigPanel;
+class Song;
 
 class Configurable : public Observable
 {
@@ -58,6 +59,7 @@ public:
 
 	int configurable_type;
 	string name;
+	Song *song;
 
 
 	enum

@@ -97,7 +97,7 @@ string get_next(const string &var_temp, int &pos)
 	int start = pos;
 	bool in_string = false;
 	for (int i=start;i<var_temp.num;i++){
-		if ((i == start) && (var_temp[i] == '"')){
+		if ((i == start) and (var_temp[i] == '"')){
 			in_string = true;
 		}else if (in_string){
 			if (var_temp[i] == '\\'){
@@ -106,7 +106,7 @@ string get_next(const string &var_temp, int &pos)
 				pos = i + 1;
 				return str_unescape(var_temp.substr(start + 1, i - start - 1));
 			}
-		}else if ((var_temp[i] == ' ') || (var_temp[i] == ']') || (var_temp[i] == ')') || (var_temp[i] == '[') || (var_temp[i] == '(')){
+		}else if ((var_temp[i] == ' ') or (var_temp[i] == ']') or (var_temp[i] == ')') or (var_temp[i] == '[') or (var_temp[i] == '(')){
 			pos = i;
 			return var_temp.substr(start, i - start);
 		}
@@ -114,7 +114,7 @@ string get_next(const string &var_temp, int &pos)
 	return var_temp.substr(start, -1);
 }
 
-void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
+void var_from_string(Script::Type *type, char *v, const string &s, int &pos, Song *song)
 {
 	if (pos >= s.num)
 		return;
@@ -133,7 +133,7 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		for (int i=0;i<type->array_length;i++){
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(type->parent, &v[i * type->parent->size], s, pos);
+			var_from_string(type->parent, &v[i * type->parent->size], s, pos, song);
 		}
 		pos ++; // ']'
 	}else if (type->is_super_array){
@@ -141,21 +141,21 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		DynamicArray *a = (DynamicArray*)v;
 		a->clear(); // todo...
 		while (true){
-			if ((s[pos] == ']') || (pos >= s.num))
+			if ((s[pos] == ']') or (pos >= s.num))
 				break;
 			if (a->num > 0)
 				pos ++; // ' '
 			a->resize(a->num + 1);
-			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos);
+			var_from_string(type->parent, &(((char*)a->data)[(a->num - 1) * type->parent->size]), s, pos, song);
 		}
 		pos ++; // ']'
 	}else if (type->name == "SampleRef*"){
 		string ss = get_next(s, pos);
 		*(SampleRef**)v = NULL;
-		if (ss != "nil"){
+		if ((ss != "nil") and song){
 			int n = ss._int();
-			if ((n >= 0) && (n < tsunami->song->samples.num)){
-				*(SampleRef**)v = new SampleRef(tsunami->song->samples[n]);
+			if ((n >= 0) and (n < song->samples.num)){
+				*(SampleRef**)v = new SampleRef(song->samples[n]);
 			}
 		}
 	}else{
@@ -164,7 +164,7 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos)
 		for(int i=0;i<e.num;i++){
 			if (i > 0)
 				pos ++; // ' '
-			var_from_string(e[i].type, &v[e[i].offset], s, pos);
+			var_from_string(e[i].type, &v[e[i].offset], s, pos, song);
 		}
 		pos ++; // ')'
 	}
@@ -174,6 +174,7 @@ Configurable::Configurable(const string &observable_name, int type) :
 	Observable(observable_name)
 {
 	configurable_type = type;
+	song = NULL;
 }
 
 Configurable::~Configurable()
@@ -196,7 +197,7 @@ PluginData *Configurable::get_config()
 	if (!type)
 		return NULL;
 	foreach(Script::ClassElement &e, type->element)
-		if ((e.name == "config") && (e.type->GetRoot()->name == "PluginData")){
+		if ((e.name == "config") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *config = (PluginData*)((char*)this + e.offset);
 			config->type = e.type;
 			return config;
@@ -214,7 +215,7 @@ PluginData *Configurable::get_state()
 		return NULL;
 	}
 	foreach(Script::ClassElement &e, type->element)
-		if ((e.name == "state") && (e.type->GetRoot()->name == "PluginData")){
+		if ((e.name == "state") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *state = (PluginData*)((char*)this + e.offset);
 			state->type = e.type;
 			return state;
@@ -244,7 +245,7 @@ void Configurable::configFromString(const string &param)
 
 	config->reset();
 	int pos = 0;
-	var_from_string(config->type, (char*)config, param, pos);
+	var_from_string(config->type, (char*)config, param, pos, song);
 	onConfig();
 }
 

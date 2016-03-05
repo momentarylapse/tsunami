@@ -16,7 +16,6 @@ class ActionTrackAddMidiEffect: public Action
 {
 public:
 	ActionTrackAddMidiEffect(Track *t, MidiEffect *effect);
-	virtual ~ActionTrackAddMidiEffect();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

@@ -15,10 +15,6 @@ ActionTrackToggleMidiEffectEnabled::ActionTrackToggleMidiEffectEnabled(Track *t,
 	index = _index;
 }
 
-ActionTrackToggleMidiEffectEnabled::~ActionTrackToggleMidiEffectEnabled()
-{
-}
-
 void *ActionTrackToggleMidiEffectEnabled::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);

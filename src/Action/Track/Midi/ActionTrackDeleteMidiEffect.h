@@ -16,7 +16,6 @@ class ActionTrackDeleteMidiEffect: public Action
 {
 public:
 	ActionTrackDeleteMidiEffect(Track *t, int index);
-	virtual ~ActionTrackDeleteMidiEffect();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

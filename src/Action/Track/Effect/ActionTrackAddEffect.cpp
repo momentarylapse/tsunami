@@ -13,10 +13,7 @@ ActionTrackAddEffect::ActionTrackAddEffect(Track *t, Effect *_effect)
 {
 	track_no = get_track_index(t);
 	effect = _effect;
-}
-
-ActionTrackAddEffect::~ActionTrackAddEffect()
-{
+	effect->song = t->song;
 }
 
 void *ActionTrackAddEffect::execute(Data *d)

@@ -34,7 +34,7 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	setBorderWidth(5);
 	embedDialog("record_dialog", 0, 0);
 
-	temp_synth = CreateSynthesizer("");
+	temp_synth = CreateSynthesizer("", s);
 
 	selected_audio_source = AudioInputAudio::getFavoriteDevice();
 

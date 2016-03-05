@@ -66,7 +66,7 @@ Track::Track() :
 	volume = 1;
 	muted = false;
 
-	synth = CreateSynthesizer("Dummy");
+	synth = CreateSynthesizer("Dummy", song);
 }
 
 
@@ -87,7 +87,7 @@ void Track::reset()
 	samples.clear();
 	if (synth)
 		delete(synth);
-	synth = CreateSynthesizer("Dummy");
+	synth = CreateSynthesizer("Dummy", song);
 }
 
 Track::~Track()

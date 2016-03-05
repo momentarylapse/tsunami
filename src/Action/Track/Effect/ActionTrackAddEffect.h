@@ -16,7 +16,6 @@ class ActionTrackAddEffect: public Action
 {
 public:
 	ActionTrackAddEffect(Track *t, Effect *effect);
-	virtual ~ActionTrackAddEffect();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

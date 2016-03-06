@@ -12,6 +12,7 @@
 #include "../Stuff/Log.h"
 #include <assert.h>
 #include "../Data/Song.h"
+#include "../Data/SongSelection.h"
 
 Clipboard::Clipboard() :
 	Observable("Clipboard")
@@ -42,14 +43,14 @@ void Clipboard::append_track(Track *t, AudioView *view)
 	Track *tt = temp->addTrack(t->type);
 
 	if (t->type == Track::TYPE_AUDIO){
-		tt->levels[0].buffers.add(t->readBuffers(view->cur_level, view->sel_range));
+		tt->levels[0].buffers.add(t->readBuffers(view->cur_level, view->sel.range));
 		tt->levels[0].buffers[0].make_own();
 	}else if (t->type == Track::TYPE_MIDI){
-		tt->midi = t->midi.getNotesSafe(view->sel_range);
-		tt->midi.samples = view->sel_range.num;
-		tt->midi.sanify(view->sel_range);
+		tt->midi = t->midi.getNotesSafe(view->sel.range);
+		tt->midi.samples = view->sel.range.num;
+		tt->midi.sanify(view->sel.range);
 		foreach(MidiNote &n, tt->midi)
-			n.range.offset -= view->sel_range.offset;
+			n.range.offset -= view->sel.range.offset;
 	}
 
 	ref_uid.add(-1);
@@ -61,13 +62,14 @@ void Clipboard::copy(AudioView *view)
 		return;
 	clear();
 
-	Song *a = view->song;
+	Song *s = view->song;
 
-	temp->sample_rate = a->sample_rate;
+	temp->sample_rate = s->sample_rate;
 
-	Array<Track*> tracks = view->getEditTracks();
-	foreach(Track *t, tracks)
-		append_track(t, view);
+	SongSelection sel = view->getEditSeletion();
+	foreach(Track *t, s->tracks)
+		if (sel.has(t))
+			append_track(t, view);
 
 	notify();
 }
@@ -79,13 +81,13 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 
 	int ref_index = s->get_sample_by_uid(ref_uid[source_index]);
 	if (ref_index >= 0){
-		target->addSample(view->sel_range.start(), ref_index);
+		target->addSample(view->sel.range.start(), ref_index);
 	}else{
 		if (target->type == Track::TYPE_AUDIO){
-			s->execute(new ActionTrackPasteAsSample(target, view->sel_range.start(), &source->levels[0].buffers[0]));
+			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), &source->levels[0].buffers[0]));
 			ref_uid[source_index] = s->samples.back()->uid;
 		}else if (target->type == Track::TYPE_MIDI){
-			s->execute(new ActionTrackPasteAsSample(target, view->sel_range.start(), &source->midi));
+			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), &source->midi));
 			ref_uid[source_index] = s->samples.back()->uid;
 		}
 	}
@@ -99,7 +101,7 @@ void Clipboard::paste(AudioView *view)
 
 	Array<string> temp_type, dest_type;
 	foreach(Track *t, a->tracks){
-		if (!t->is_selected)
+		if (!view->sel.has(t))
 			continue;
 		if (t->type == Track::TYPE_TIME)
 			continue;
@@ -135,7 +137,7 @@ void Clipboard::paste(AudioView *view)
 	}else{
 		int ti = 0;
 		foreach(Track *t, a->tracks){
-			if (!t->is_selected)
+			if (!view->sel.has(t))
 				continue;
 			if (t->type == Track::TYPE_TIME)
 				continue;
@@ -154,6 +156,6 @@ bool Clipboard::hasData()
 
 bool Clipboard::canCopy(AudioView *view)
 {
-	return !view->sel_range.empty();// or (view->audio->GetNumSelectedSamples() > 0);
+	return !view->sel.range.empty();// or (view->audio->GetNumSelectedSamples() > 0);
 }
 

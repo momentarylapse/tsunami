@@ -89,7 +89,6 @@ void Song::__delete__()
 
 
 const string Song::MESSAGE_NEW = "New";
-const string Song::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string Song::MESSAGE_ADD_TRACK = "AddTrack";
 const string Song::MESSAGE_DELETE_TRACK = "DeleteTrack";
 const string Song::MESSAGE_ADD_EFFECT = "AddEffect";
@@ -240,27 +239,6 @@ Song::~Song()
 }
 
 
-void Song::updateSelection(const Range &range)
-{
-	msg_db_f("UpdateSelection", 1);
-
-	// subs
-	foreach(Track *t, tracks)
-		foreach(SampleRef *s, t->samples)
-			s->is_selected = (t->is_selected) and range.overlaps(s->getRange());
-	notify(MESSAGE_SELECTION_CHANGE);
-}
-
-
-void Song::unselectAllSamples()
-{
-	foreach(Track *t, tracks)
-		foreach(SampleRef *s, t->samples)
-			s->is_selected = false;
-	notify(MESSAGE_SELECTION_CHANGE);
-}
-
-
 bool Song::load(const string & filename, bool deep)
 {
 	return tsunami->storage->load(this, filename);
@@ -393,28 +371,18 @@ void Song::updatePeaks()
 	//msg_write(format("up %f", debug_timer.get()));
 }
 
-int Song::getNumSelectedSamples()
+void Song::insertSelectedSamples(const SongSelection &sel, int level_no)
 {
-	int n = 0;
-	foreach(Track *t, tracks)
-		foreach(SampleRef *s, t->samples)
-			if (s->is_selected)
-				n ++;
-	return n;
+	if (sel.getNumSamples() > 0)
+		execute(new ActionTrackInsertSelectedSamples(this, sel, level_no));
 }
 
-void Song::insertSelectedSamples(int level_no)
-{
-	if (getNumSelectedSamples() > 0)
-		execute(new ActionTrackInsertSelectedSamples(this, level_no));
-}
-
-void Song::deleteSelectedSamples()
+void Song::deleteSelectedSamples(const SongSelection &sel)
 {
 	action_manager->beginActionGroup();
 	foreachi(Track *t, tracks, i){
 		for (int j=t->samples.num-1;j>=0;j--)
-			if (t->samples[j]->is_selected)
+			if (sel.has(t->samples[j]))
 				t->deleteSample(j);
 	}
 	action_manager->endActionGroup();
@@ -458,16 +426,16 @@ void Song::editSampleName(int index, const string &name)
 	execute(new ActionSongSampleEditName(this, index, name));
 }
 
-void Song::deleteSelection(int level_no, const Range &range, const Array<Track*> &_tracks, bool all_levels)
+void Song::deleteSelection(const SongSelection &sel, int level_no, bool all_levels)
 {
-	if (!range.empty())
-		execute(new ActionSongDeleteSelection(this, level_no, range, _tracks, all_levels));
+	if (!sel.range.empty())
+		execute(new ActionSongDeleteSelection(this, level_no, sel, all_levels));
 }
 
-void Song::createSamplesFromSelection(int level_no, const Range &range)
+void Song::createSamplesFromSelection(const SongSelection &sel, int level_no)
 {
-	if (!range.empty())
-		execute(new ActionTrackSampleFromSelection(this, range, level_no));
+	if (!sel.range.empty())
+		execute(new ActionTrackSampleFromSelection(this, sel, level_no));
 }
 
 void Song::addBar(int index, float bpm, int beats, bool affect_midi)

@@ -107,7 +107,7 @@ public:
 	SampleManagerConsole *manager;
 };
 
-SampleManagerConsole::SampleManagerConsole(Song *s) :
+SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 	SideBarConsole(_("Samples")),
 	Observer("SampleManagerConsole")
 {
@@ -132,13 +132,14 @@ SampleManagerConsole::SampleManagerConsole(Song *s) :
 	event("edit_song", this, &SampleManagerConsole::onEditSong);
 
 	preview_audio = new Song;
-	preview_renderer = new SongRenderer(preview_audio);
+	preview_renderer = new SongRenderer(preview_audio, NULL);
 	preview_stream = new AudioStream(preview_renderer);
 	preview_sample = NULL;
 
 	progress = NULL;
 
 	song = s;
+	view = _view;
 	selected_uid = -1;
 	updateList();
 
@@ -236,12 +237,12 @@ void SampleManagerConsole::onInsert()
 {
 	int n = getInt("sample_list");
 	if (n >= 0)
-		tsunami->win->view->cur_track->addSample(tsunami->win->view->sel_range.start(), n);
+		view->cur_track->addSample(view->sel.range.start(), n);
 }
 
 void SampleManagerConsole::onCreateFromSelection()
 {
-	song->createSamplesFromSelection(tsunami->win->view->cur_level, tsunami->win->view->sel_range);
+	song->createSamplesFromSelection(view->sel, view->cur_level);
 	if (song->samples.num > 0){
 		selected_uid = song->samples.back()->uid;
 		enable("delete_sample", true);

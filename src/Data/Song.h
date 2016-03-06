@@ -22,6 +22,7 @@ class Track;
 class Sample;
 class Synthesizer;
 class Curve;
+class SongSelection;
 
 struct Tag
 {
@@ -47,7 +48,6 @@ public:
 	Range _cdecl getRangeWithTime();
 
 	static const string MESSAGE_NEW;
-	static const string MESSAGE_SELECTION_CHANGE;
 	static const string MESSAGE_ADD_TRACK;
 	static const string MESSAGE_DELETE_TRACK;
 	static const string MESSAGE_ADD_EFFECT;
@@ -70,13 +70,9 @@ public:
 	void _cdecl newWithOneTrack(int track_type, int _sample_rate);
 	bool _cdecl load(const string &filename, bool deep);
 	bool _cdecl save(const string &filename);
-	void _cdecl updateSelection(const Range &range);
-	void _cdecl unselectAllSamples();
 
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
-
-	int _cdecl getNumSelectedSamples();
 
 	Track *_cdecl getTimeTrack();
 	int _cdecl getNextBeat(int pos);
@@ -110,10 +106,10 @@ public:
 	void _cdecl addPause(int index, float time, bool affect_midi);
 	void _cdecl editBar(int index, BarPattern &p, bool affect_midi);
 	void _cdecl deleteBar(int index, bool affect_midi);
-	void _cdecl insertSelectedSamples(int level_no);
-	void _cdecl deleteSelectedSamples();
-	void _cdecl deleteSelection(int level_no, const Range &range, const Array<Track*> &tracks, bool all_levels);
-	void _cdecl createSamplesFromSelection(int level_no, const Range &range);
+	void _cdecl insertSelectedSamples(const SongSelection &sel, int level_no);
+	void _cdecl deleteSelectedSamples(const SongSelection &sel);
+	void _cdecl deleteSelection(const SongSelection &sel, int level_no, bool all_levels);
+	void _cdecl createSamplesFromSelection(const SongSelection &sel, int level_no);
 
 	// helper
 	void __shift_data(const Range &source, int new_length);

@@ -321,7 +321,7 @@ void ViewModeMidi::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 
 void ViewModeMidi::drawTrackBackgroundDefault(HuiPainter *c, AudioViewTrack *t)
 {
-	color cc = (t->track->is_selected) ? view->colors.background_track_selected : view->colors.background_track;
+	color cc = (view->sel.has(t->track)) ? view->colors.background_track_selected : view->colors.background_track;
 	c->setColor(cc);
 	c->drawRect(t->area);
 

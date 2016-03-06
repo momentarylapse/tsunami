@@ -41,7 +41,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	song_console = new SongConsole(song);
 	level_console = new LevelConsole(song, view);
 	bars_console = new BarsConsole(song, view);
-	sample_manager = new SampleManagerConsole(song);
+	sample_manager = new SampleManagerConsole(song, view);
 	global_fx_console = new FxConsole(NULL, song);
 	track_console = new TrackConsole(view);
 	midi_editor_console = new MidiEditorConsole(view, song);

@@ -11,12 +11,14 @@
 #include "../../Data/Song.h"
 #include "../ActionGroup.h"
 
+class SongSelection;
+
 class ActionSongDeleteSelection : public ActionGroup
 {
 public:
-	ActionSongDeleteSelection(Song *s, int level_no, const Range &range, const Array<Track*> &tracks, bool all_levels);
+	ActionSongDeleteSelection(Song *s, int level_no, const SongSelection &sel, bool all_levels);
 
-	void DeleteBuffersFromTrackLevel(Song *s, Track *t, TrackLevel &l, const Range &range, int level_no);
+	void DeleteBuffersFromTrackLevel(Song *s, Track *t, TrackLevel &l, const SongSelection &sel, int level_no);
 };
 
 #endif /* ACTIONSONGDELETESELECTION_H_ */

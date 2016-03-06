@@ -48,8 +48,6 @@ public:
 	rect area;
 	int track_no;
 	Song *owner;
-
-	bool is_selected;
 };
 
 #endif /* SAMPLEREF_H_ */

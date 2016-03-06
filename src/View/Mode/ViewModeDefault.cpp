@@ -52,11 +52,11 @@ void ViewModeDefault::onLeftButtonDown()
 		selection->track->setMuted(!selection->track->muted);
 	}else if (selection->type == Selection::TYPE_SOLO){
 		foreach(Track *t, song->tracks)
-			t->is_selected = (t == selection->track);
+			view->sel.set(t, (t == selection->track));
 		if (selection->track->muted)
 			selection->track->setMuted(false);
 	}else if (selection->type == Selection::TYPE_SAMPLE){
-		cur_action = new ActionTrackMoveSample(view->song);
+		cur_action = new ActionTrackMoveSample(view->song, view->sel);
 	}
 }
 
@@ -134,7 +134,7 @@ void ViewModeDefault::onMouseMove()
 
 		Selection mo = getHover();
 		if (mo.track)
-			mo.track->is_selected = true;
+			view->sel.add(mo.track);
 
 		applyBarriers(selection->pos);
 		view->sel_raw.set_end(selection->pos);
@@ -309,7 +309,7 @@ void ViewModeDefault::drawGridBars(HuiPainter *c, const rect &r, const color &bg
 
 void ViewModeDefault::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 {
-	color cc = (t->track->is_selected) ? view->colors.background_track_selected : view->colors.background_track;
+	color cc = (view->sel.has(t->track)) ? view->colors.background_track_selected : view->colors.background_track;
 	c->setColor(cc);
 	c->drawRect(t->area);
 
@@ -360,7 +360,7 @@ void ViewModeDefault::setBarriers(Selection *s)
 	}
 
 	// selection marker
-	if (!view->sel_range.empty()){
+	if (!view->sel.range.empty()){
 		s->barrier.add(view->sel_raw.start());
 		if (mouse_possibly_selecting < 0)
 			s->barrier.add(view->sel_raw.end());
@@ -507,7 +507,7 @@ void ViewModeDefault::selectUnderMouse()
 	if ((selection->type == Selection::TYPE_TRACK) or (selection->type == Selection::TYPE_TRACK_HANDLE)){
 		view->selectTrack(t, control);
 		if (!control)
-			song->unselectAllSamples();
+			view->unselectAllSamples();
 	}
 
 	// sub

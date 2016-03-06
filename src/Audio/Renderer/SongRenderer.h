@@ -10,19 +10,22 @@
 
 #include "AudioRenderer.h"
 
+class SongSelection;
+
 class SongRenderer : public AudioRenderer
 {
 public:
-	SongRenderer(Song *a);
+	SongRenderer(Song *a, SongSelection *sel);
 	virtual ~SongRenderer();
 
-	void _cdecl __init__(Song *s);
+	void _cdecl __init__(Song *s, SongSelection *sel);
 	virtual void _cdecl __delete__();
 
 	void render(const Range &range, BufferBox &buf);
 	virtual int read(BufferBox &buf);
 	virtual void reset();
 	void prepare(const Range &range, bool alllow_loop);
+	void applySelection(SongSelection &sel);
 
 	virtual void seek(int pos);
 
@@ -50,6 +53,9 @@ private:
 	Range range_cur;
 	int pos;
 	Array<MidiNoteData> midi;
+
+	SongSelection *sel;
+	bool sel_own;
 
 public:
 	Effect *effect;

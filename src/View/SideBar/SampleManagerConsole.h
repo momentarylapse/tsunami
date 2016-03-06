@@ -16,11 +16,12 @@ class AudioStream;
 class SongRenderer;
 class SampleManagerItem;
 class Progress;
+class AudioView;
 
 class SampleManagerConsole : public SideBarConsole, public Observer
 {
 public:
-	SampleManagerConsole(Song *a);
+	SampleManagerConsole(Song *a, AudioView *v);
 	virtual ~SampleManagerConsole();
 
 	void updateList();
@@ -41,6 +42,7 @@ public:
 	void endPreview();
 
 	Song *song;
+	AudioView *view;
 	Array<SampleManagerItem*> items;
 	Array<SampleManagerItem*> old_items;
 	void add(SampleManagerItem *item);

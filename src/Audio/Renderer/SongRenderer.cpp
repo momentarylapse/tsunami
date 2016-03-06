@@ -11,13 +11,22 @@
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
 #include "../../Data/Curve.h"
+#include "../../Data/SongSelection.h"
 #include "../../Tsunami.h"
 
 #include "../../lib/math/math.h"
 
-SongRenderer::SongRenderer(Song *s)
+SongRenderer::SongRenderer(Song *s, SongSelection *_sel)
 {
 	song = s;
+	sel = _sel;
+	sel_own = false;
+
+	if (!sel){
+		sel = new SongSelection;
+		sel->all(song);
+		sel_own = true;
+	}
 	effect = NULL;
 	allow_loop = false;
 	loop_if_allowed = false;
@@ -27,16 +36,20 @@ SongRenderer::SongRenderer(Song *s)
 
 SongRenderer::~SongRenderer()
 {
+	if (sel_own)
+		delete sel;
 }
 
-void SongRenderer::__init__(Song *s)
+void SongRenderer::__init__(Song *s, SongSelection *sel)
 {
-	new(this) SongRenderer(s);
+	new(this) SongRenderer(s, sel);
 }
 
 void SongRenderer::__delete__()
 {
 	midi.clear();
+	if (sel_own)
+		delete sel;
 }
 
 bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
@@ -119,7 +132,7 @@ void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 	make_silence(buf, range_cur.length());
 
 	MidiNoteData *m = &t->midi;
-//	if ((ti >= 0) && (ti < midi.num))
+//	if ((ti >= 0) and (ti < midi.num))
 //		m = &midi[ti];
 	// TODO
 
@@ -163,7 +176,7 @@ void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list
 	make_fake_track(&fake_track, buf);
 
 	// apply preview plugin?
-	if ((t) && (effect))
+	if ((t) and (effect))
 		effect->apply(buf, &fake_track, false);
 
 	// apply fx
@@ -178,14 +191,14 @@ void SongRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 
 	bb_render_track_no_fx(buf, t, ti);
 
-	if ((t->fx.num > 0) || (effect))
+	if ((t->fx.num > 0) or (effect))
 		bb_apply_fx(buf, t, t->fx);
 }
 
-int get_first_usable_track(Song *a)
+int get_first_usable_track(Song *a, SongSelection *sel)
 {
 	foreachi(Track *t, a->tracks, i)
-		if ((!t->muted) && (t->is_selected))
+		if (!t->muted and sel->has(t))
 			return i;
 	return -1;
 }
@@ -195,7 +208,7 @@ void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 	msg_db_f("bb_render_audio_no_fx", 1);
 
 	// any un-muted track?
-	int i0 = get_first_usable_track(song);
+	int i0 = get_first_usable_track(song, sel);
 	if (i0 < 0){
 		// no -> return silence
 		buf.resize(range_cur.length());
@@ -208,7 +221,7 @@ void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 
 		// other tracks
 		for (int i=i0+1;i<song->tracks.num;i++){
-			if ((song->tracks[i]->muted) || (!song->tracks[i]->is_selected))
+			if (song->tracks[i]->muted or !sel->has(song->tracks[i]))
 				continue;
 			BufferBox tbuf;
 			bb_render_track_fx(tbuf, song->tracks[i], i);

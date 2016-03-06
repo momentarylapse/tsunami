@@ -272,7 +272,7 @@ void BarsConsole::selectFromView()
 	int pos = 0;
 	foreachi(BarPattern &b, song->bars, i){
 		Range r = Range(pos, b.length - 1);
-		if (r.overlaps(view->sel_range))
+		if (r.overlaps(view->sel.range))
 			s.add(i);
 		pos += b.length;
 	}

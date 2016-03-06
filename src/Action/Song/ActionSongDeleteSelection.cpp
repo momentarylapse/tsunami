@@ -11,21 +11,23 @@
 #include "../Track/Sample/ActionTrackDeleteSample.h"
 #include "ActionSongDeleteSelection.h"
 #include "../Track/Midi/ActionTrackDeleteMidiNote.h"
+#include "../../Data/SongSelection.h"
 
-ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, const Range &range, const Array<Track*> &tracks, bool all_levels)
+ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, const SongSelection &sel, bool all_levels)
 {
-	foreach(Track *t, const_cast<Array<Track*>&>(tracks)){
+	Set<Track*> tracks = sel.tracks;
+	foreach(Track *t, tracks){
 		// buffer boxes
 		if (all_levels){
 			foreachi(TrackLevel &l, t->levels, li)
-				DeleteBuffersFromTrackLevel(a, t, l, range, li);
+				DeleteBuffersFromTrackLevel(a, t, l, sel, li);
 		}else{
-			DeleteBuffersFromTrackLevel(a, t, t->levels[level_no], range, level_no);
+			DeleteBuffersFromTrackLevel(a, t, t->levels[level_no], sel, level_no);
 		}
 
 		// subs
 		foreachib(SampleRef *s, t->samples, i)
-			if (s->is_selected){
+			if (sel.has(s)){
 				addSubAction(new ActionTrackDeleteSample(t, i), a);
 				_foreach_it_.update(); // TODO...
 			}
@@ -33,7 +35,7 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, cons
 		// midi
 		Set<int> to_delete;
 		foreachi(MidiNote &n, t->midi, i){
-			if (range.is_inside(n.range.center()))
+			if (sel.range.is_inside(n.range.center()))
 				to_delete.add(i);
 		}
 
@@ -42,16 +44,16 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, cons
 	}
 }
 
-void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, TrackLevel& l, const Range &range, int level_no)
+void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, TrackLevel& l, const SongSelection &sel, int level_no)
 {
-	int i0 = range.start();
-	int i1 = range.end();
+	int i0 = sel.range.start();
+	int i1 = sel.range.end();
 	foreachib(BufferBox &b, l.buffers, n){
 		int bi0 = b.offset;
 		int bi1 = b.offset + b.num;
 
 
-		if (range.covers(b.range())){
+		if (sel.range.covers(b.range())){
 			// b completely inside?
 			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
@@ -64,7 +66,7 @@ void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, T
 			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
 			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
-		}else if (b.range().covers(range)){
+		}else if (b.range().covers(sel.range)){
 			// inside b?
 			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
 			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i0 - bi0), a);

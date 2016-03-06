@@ -9,6 +9,7 @@
 #define AUDIOVIEW_H_
 
 #include "../Data/Song.h"
+#include "../Data/SongSelection.h"
 #include "../lib/hui/hui.h"
 #include "../Stuff/Observer.h"
 #include "TrackHeightManager.h"
@@ -91,8 +92,10 @@ public:
 	static const int BARRIER_DIST;
 
 	Selection hover, selection;
-	Range sel_range;
+	SongSelection sel;
 	Range sel_raw;
+
+	void _cdecl unselectAllSamples();
 
 	bool enabled;
 	void enable(bool enabled);
@@ -138,7 +141,7 @@ public:
 	bool edit_multi;
 	void setEditMulti(bool enabled);
 
-	Array<Track*> getEditTracks();
+	SongSelection getEditSeletion();
 
 	rect drawing_rect;
 

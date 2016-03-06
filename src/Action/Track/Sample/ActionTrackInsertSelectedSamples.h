@@ -10,12 +10,12 @@
 
 #include "../../ActionGroup.h"
 class Song;
+class SongSelection;
 
 class ActionTrackInsertSelectedSamples : public ActionGroup
 {
 public:
-	ActionTrackInsertSelectedSamples(Song *a, int level_no);
-	virtual ~ActionTrackInsertSelectedSamples();
+	ActionTrackInsertSelectedSamples(Song *a, const SongSelection &sel, int level_no);
 };
 
 #endif /* ACTIONTRACKINSERTSELECTEDSAMPLES_H_ */

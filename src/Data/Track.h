@@ -125,8 +125,6 @@ public:
 	Array<TrackMarker> markers;
 
 	Song *song;
-
-	bool is_selected;
 };
 
 #endif /* TRACK_H_ */

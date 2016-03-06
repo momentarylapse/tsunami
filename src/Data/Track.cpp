@@ -61,7 +61,6 @@ Track::Track() :
 	volume = 1;
 	panning = 0;
 	song = NULL;
-	is_selected = false;
 
 	volume = 1;
 	muted = false;

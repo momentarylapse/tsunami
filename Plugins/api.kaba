@@ -139,6 +139,7 @@ class RingBuffer
 	extern void clear()
 	void __assign__(RingBuffer o)
 
+// general "interface"
 class AudioRenderer
 	extern void __init__()
 	extern virtual void __delete__()
@@ -261,8 +262,6 @@ class Track
 	int parent
 	Song *song
 
-	bool is_selected
-
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
 	extern BufferBox getBuffers(int level_no, Range r)
@@ -320,6 +319,10 @@ class Song
 	extern void editBar(int index, BarPattern p, bool affect_midi)
 	extern void deleteBar(int index, bool affect_midi)
 
+class SongSelection
+	Range range
+	// ...
+
 class ColorScheme
 	color background
 	color background_track
@@ -333,14 +336,14 @@ class ColorScheme
 	color hover
 
 class AudioView
-	Range sel_range
-	Range sel_raw
+	//Range sel_raw
+	SongSelection sel
 	OutputStream *stream
 	AudioRenderer *renderer
 	ColorScheme colors
 
 class SongRenderer
-	extern void __init__(Song *s)
+	extern void __init__(Song *s, SongSelection *sel)
 	extern virtual void __delete__()
 	extern void render(Range r, BufferBox buf)
 	extern void prepare(Range r, bool allow_loop)

@@ -200,7 +200,7 @@ void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 {
 	color col = view->colors.sample;
 	//bool is_cur = ((s == cur_sub) and (t->IsSelected));
-	if (!s->is_selected)
+	if (!view->sel.has(s))
 		col = view->colors.sample_selected;
 	if (view->hover.sample == s)
 		col = view->colors.sample_hover;
@@ -219,7 +219,7 @@ void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 		drawMidi(c, *s->midi, s->pos);
 
 	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
-	if (s->is_selected)//((is_cur) or (a->sub_mouse_over == s))
+	if (view->sel.has(s))//((is_cur) or (a->sub_mouse_over == s))
 		c->drawStr(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name);
 }
 

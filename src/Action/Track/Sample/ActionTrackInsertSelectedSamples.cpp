@@ -8,17 +8,14 @@
 #include "ActionTrackInsertSelectedSamples.h"
 
 #include "../../../Data/Song.h"
+#include "../../../Data/SongSelection.h"
 #include "ActionTrackInsertSample.h"
 
-ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(Song *a, int level_no)
+ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(Song *a, const SongSelection &sel, int level_no)
 {
 	foreachi(Track *t, a->tracks, ti)
 		foreachib(SampleRef *s, t->samples, si)
-			if (s->is_selected)
+			if (sel.has(s))
 				addSubAction(new ActionTrackInsertSample(a, ti, si, level_no), a);
-}
-
-ActionTrackInsertSelectedSamples::~ActionTrackInsertSelectedSamples()
-{
 }
 

@@ -463,7 +463,7 @@ public:
 		progress = new ProgressCancelable(_("Vorschau"), win);
 		subscribe(progress);
 		subscribe(tsunami->win->view->stream);
-		tsunami->win->view->renderer->prepare(tsunami->win->view->sel_range, false);
+		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
 		tsunami->win->view->stream->play();
 	}
 
@@ -474,7 +474,7 @@ public:
 				previewEnd();
 		}else if (progress and (o == tsunami->win->view->stream)){
 			int pos = tsunami->win->view->stream->getPos();
-			Range r = tsunami->win->view->sel_range;
+			Range r = tsunami->win->view->sel.range;
 			progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
 			if (!tsunami->win->view->stream->isPlaying())
 				previewEnd();

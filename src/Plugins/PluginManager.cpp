@@ -275,7 +275,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Track", "samples", _offsetof(Track, samples));
 	Script::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
 	Script::DeclareClassOffset("Track", "root", _offsetof(Track, song));
-	Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
+	//Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
 	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::getBuffers));
 	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::readBuffers));
 	Script::LinkExternal("Track.setName", Script::mf(&Track::setName));
@@ -333,7 +333,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("AudioRenderer", "seek", Script::mf(&AudioRenderer::seek), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
 
-	SongRenderer sr(&af);
+	SongRenderer sr(&af, NULL);
 	Script::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
 	Script::LinkExternal("SongRenderer.prepare", Script::mf(&SongRenderer::prepare));
 	Script::LinkExternal("SongRenderer.render", Script::mf(&SongRenderer::render));
@@ -409,7 +409,7 @@ void PluginManager::LinkAppScriptData()
 	}
 
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
-	Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));
+	//Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Script::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
@@ -618,9 +618,9 @@ void PluginManager::ExecutePlugin(const string &filename)
 			//	main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
 			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
 				Range range = tsunami->win->view->getPlaybackSelection();
-				Array<Track*> tracks = tsunami->win->view->getEditTracks();
+				SongSelection sel = tsunami->win->view->getEditSeletion();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, tracks)
+				foreach(Track *t, sel.tracks)
 					if (t->type == t->TYPE_AUDIO){
 						fx->resetState();
 						fx->doProcessTrack(t, tsunami->win->view->cur_level, range);
@@ -632,9 +632,9 @@ void PluginManager::ExecutePlugin(const string &filename)
 			mfx->resetConfig();
 			if (mfx->configure()){
 				Range range = tsunami->win->view->getPlaybackSelection();
-				Array<Track*> tracks = tsunami->win->view->getEditTracks();
+				SongSelection sel = tsunami->win->view->getEditSeletion();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, tracks)
+				foreach(Track *t, sel.tracks)
 					if (t->type == t->TYPE_MIDI){
 						mfx->resetState();
 						mfx->DoProcessTrack(t, range);

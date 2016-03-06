@@ -165,7 +165,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	peak_thread = new PeakThread(this);
 	is_updating_peaks = false;
 
-	renderer = new SongRenderer(song);
+	renderer = new SongRenderer(song, &sel);
 	stream = new AudioStream(renderer);
 
 	area = rect(0, 0, 0, 0);
@@ -292,9 +292,9 @@ void AudioView::selectionUpdatePos(Selection &s)
 
 void AudioView::updateSelection()
 {
-	sel_range = sel_raw;
-	if (sel_range.num < 0)
-		sel_range.invert();
+	sel.range = sel_raw;
+	if (sel.range.num < 0)
+		sel.range.invert();
 
 
 	renderer->setRange(getPlaybackSelection());
@@ -305,7 +305,6 @@ void AudioView::updateSelection()
 			stream->stop();
 	}
 
-	song->updateSelection(sel_range);
 	notify(MESSAGE_SELECTION_CHANGE);
 }
 
@@ -318,13 +317,13 @@ bool AudioView::mouse_over_time(int pos)
 
 Range AudioView::getPlaybackSelection()
 {
-	if (sel_range.empty()){
-		int num = song->getRangeWithTime().end() - sel_range.start();
+	if (sel.range.empty()){
+		int num = song->getRangeWithTime().end() - sel.range.start();
 		if (num <= 0)
 			num = song->sample_rate; // 1 second
-		return Range(sel_range.start(), num);
+		return Range(sel.range.start(), num);
 	}
-	return sel_range;
+	return sel.range;
 }
 
 void AudioView::onMouseMove()
@@ -439,7 +438,10 @@ void AudioView::forceRedraw()
 	win->redraw("area");
 }
 
-
+void AudioView::unselectAllSamples()
+{
+	sel.samples.clear();
+}
 
 void AudioView::updateBufferZoom()
 {
@@ -526,7 +528,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 	if (o == song){
 		if (message == song->MESSAGE_NEW){
 			updateTracks();
-			sel_range = sel_raw = Range(0, 0);
+			sel.range = sel_raw = Range(0, 0);
 			setCurTrack(NULL);
 			if (song->tracks.num > 0)
 				setCurTrack(song->tracks[0]);
@@ -546,7 +548,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 		forceRedraw();
 	}else if (input and o == input){
 		if (input->isCapturing())
-			cam.makeSampleVisible(sel_range.start() + input->getSampleCount());
+			cam.makeSampleVisible(sel.range.start() + input->getSampleCount());
 		forceRedraw();
 	}else{
 		forceRedraw();
@@ -643,13 +645,13 @@ void AudioView::drawBackground(HuiPainter *c, const rect &r)
 
 void AudioView::drawSelection(HuiPainter *c, const rect &r)
 {
-	int sx1 = cam.sample2screen(sel_range.start());
-	int sx2 = cam.sample2screen(sel_range.end());
+	int sx1 = cam.sample2screen(sel.range.start());
+	int sx2 = cam.sample2screen(sel.range.end());
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(colors.selection_internal);
 	foreachi(AudioViewTrack *t, vtrack, i)
-		if (t->track->is_selected)
+		if (sel.has(t->track))
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 	drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
 	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
@@ -675,9 +677,9 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 			input->buffer->update_peaks();
 		if ((capturing_track >= 0) and (capturing_track < vtrack.num)){
 			if (input->type == Track::TYPE_AUDIO)
-				vtrack[capturing_track]->drawBuffer(c, *input->buffer, cam.pos - sel_range.offset, colors.capture_marker);
+				vtrack[capturing_track]->drawBuffer(c, *input->buffer, cam.pos - sel.range.offset, colors.capture_marker);
 			if (input->type == Track::TYPE_MIDI)
-				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(*input->midi), sel_range.start());
+				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(*input->midi), sel.range.start());
 		}
 	}
 
@@ -688,7 +690,7 @@ void AudioView::drawAudioFile(HuiPainter *c, const rect &r)
 
 	// playing/capturing position
 	if (input and input->isCapturing())
-		drawTimeLine(c, sel_range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, colors.capture_marker, true);
+		drawTimeLine(c, sel.range.start() + input->getSampleCount(), Selection::TYPE_PLAYBACK, colors.capture_marker, true);
 	else if (stream->isPlaying())
 		drawTimeLine(c, stream->getPos(), Selection::TYPE_PLAYBACK, colors.preview_marker, true);
 
@@ -809,7 +811,7 @@ void AudioView::selectNone()
 	// select all/none
 	sel_raw.clear();
 	updateSelection();
-	song->unselectAllSamples();
+	unselectAllSamples();
 	setCurSample(NULL);
 }
 
@@ -820,13 +822,13 @@ void AudioView::selectSample(SampleRef *s, bool diff)
 	if (!s)
 		return;
 	if (diff){
-		s->is_selected = !s->is_selected;
+		sel.set(s, !sel.has(s));
 	}else{
-		if (!s->is_selected)
-			s->owner->unselectAllSamples();
+		if (!sel.has(s))
+			unselectAllSamples();
 
 		// select this sub
-		s->is_selected = true;
+		sel.add(s);
 	}
 }
 
@@ -837,18 +839,18 @@ void AudioView::selectTrack(Track *t, bool diff)
 	if (diff){
 		bool is_only_selected = true;
 		foreach(Track *tt, t->song->tracks)
-			if ((tt->is_selected) and (tt != t))
+			if (sel.has(tt) and (tt != t))
 				is_only_selected = false;
-		t->is_selected = !t->is_selected or is_only_selected;
+		sel.set(t, !sel.has(t) or is_only_selected);
 	}else{
-		if (!t->is_selected){
+		if (!sel.has(t)){
 			// unselect all tracks
 			foreach(Track *tt, t->song->tracks)
-				tt->is_selected = false;
+				sel.set(tt, false);
 		}
 
 		// select this track
-		t->is_selected = true;
+		sel.add(t);
 	}
 	updateSelection();
 }
@@ -910,15 +912,12 @@ void AudioView::setEditMulti(bool enabled)
 	updateMenu();
 }
 
-Array<Track*> AudioView::getEditTracks()
+SongSelection AudioView::getEditSeletion()
 {
-	Array<Track*> tracks;
-	if (edit_multi){
-		foreach(Track *t, song->tracks)
-			if (t->is_selected)
-				tracks.add(t);
-	}else{
-		tracks.add(cur_track);
-	}
-	return tracks;
+	if (edit_multi)
+		return sel;
+
+	SongSelection s;
+	s.add(cur_track);
+	return s;
 }

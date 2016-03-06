@@ -30,7 +30,6 @@ SampleRef::SampleRef(Sample *sample) :
 	rep_delay = 0;
 	if (sample->owner)
 		rep_delay = sample->owner->sample_rate;
-	is_selected = false;
 }
 
 SampleRef::~SampleRef()

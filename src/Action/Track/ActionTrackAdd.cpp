@@ -41,7 +41,6 @@ void *ActionTrackAdd::execute(Data *d)
 
 	//t->name = format(_("Spur %d"), a->track.num + 1);
 	t->song = a;
-	t->is_selected = true;
 	t->type = type;
 	t->levels.resize(a->level_names.num);
 

@@ -1044,7 +1044,7 @@ void FormatNami::loadSong(StorageOperationData *_od)
 	// some post processing
 	make_consistent(od->song);
 
-	od->song->updateSelection(Range(0, 0));
+	//od->song->updateSelection(Range(0, 0));
 }
 
 

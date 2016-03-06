@@ -333,7 +333,7 @@ bool CaptureConsole::insert()
 	Track *t;
 	int target = getInt("capture_target");
 	int i0;
-	int s_start = view->sel_range.start();
+	int s_start = view->sel.range.start();
 
 	// insert recorded data with some delay
 	int dpos = input->getDelay();

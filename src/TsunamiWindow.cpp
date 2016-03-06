@@ -26,6 +26,7 @@
 #include "Audio/AudioStream.h"
 #include "Audio/Renderer/SongRenderer.h"
 #include "Data/Song.h"
+#include "Data/SongSelection.h"
 
 #include "Plugins/FastFourierTransform.h"
 
@@ -363,7 +364,7 @@ void TsunamiWindow::onFindAndExecutePlugin()
 
 void TsunamiWindow::onDelete()
 {
-	song->deleteSelection(view->cur_level, view->sel_range, view->getEditTracks(), false);
+	song->deleteSelection(view->getEditSeletion(), view->cur_level, false);
 }
 
 void TsunamiWindow::onSampleManager()
@@ -399,13 +400,13 @@ void TsunamiWindow::onTrackImport()
 {
 	if (tsunami->storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::TYPE_AUDIO);
-		tsunami->storage->loadTrack(t, HuiFilename, view->sel_range.start(), view->cur_level);
+		tsunami->storage->loadTrack(t, HuiFilename, view->sel.range.start(), view->cur_level);
 	}
 }
 
 void TsunamiWindow::onRemoveSample()
 {
-	song->deleteSelectedSamples();
+	song->deleteSelectedSamples(view->getEditSeletion());
 }
 
 void TsunamiWindow::onPlayLoop()
@@ -439,7 +440,7 @@ void TsunamiWindow::onStop()
 
 void TsunamiWindow::onInsertSample()
 {
-	song->insertSelectedSamples(view->cur_level);
+	song->insertSelectedSamples(view->getEditSeletion(), view->cur_level);
 }
 
 void TsunamiWindow::onRecord()
@@ -484,7 +485,7 @@ void TsunamiWindow::onBarsManager()
 
 void TsunamiWindow::onSampleFromSelection()
 {
-	song->createSamplesFromSelection(view->cur_level, view->sel_range);
+	song->createSamplesFromSelection(view->getEditSeletion(), view->cur_level);
 }
 
 void TsunamiWindow::onViewOptimal()
@@ -555,14 +556,14 @@ void TsunamiWindow::onZoomOut()
 void TsunamiWindow::updateMenu()
 {
 	msg_db_f("UpdateMenu", 1);
-	bool selected = !view->sel_range.empty();
+	bool selected = !view->sel.range.empty();
 // menu / toolbar
 	// edit
 	enable("undo", song->action_manager->undoable());
 	enable("redo", song->action_manager->redoable());
 	enable("copy", tsunami->clipboard->canCopy(view));
 	enable("paste", tsunami->clipboard->hasData());
-	enable("delete", selected or (song->getNumSelectedSamples() > 0));
+	enable("delete", selected or (view->sel.getNumSamples() > 0));
 	// file
 	//Enable("export_selection", true);
 	//Enable("wave_properties", true);
@@ -575,8 +576,8 @@ void TsunamiWindow::updateMenu()
 	enable("level_down", view->cur_level > 0);
 	// sub
 	enable("sample_from_selection", selected);
-	enable("insert_sample", song->getNumSelectedSamples() > 0);
-	enable("remove_sample", song->getNumSelectedSamples() > 0);
+	enable("insert_sample", view->sel.getNumSamples() > 0);
+	enable("remove_sample", view->sel.getNumSamples() > 0);
 	enable("sample_properties", view->cur_sample);
 	// sound
 	enable("play", !side_bar->isActive(SideBar::CAPTURE_CONSOLE));
@@ -654,7 +655,7 @@ void TsunamiWindow::onSaveAs()
 void TsunamiWindow::onExport()
 {
 	if (tsunami->storage->askSaveExport(this)){
-		SongRenderer rr(song);
+		SongRenderer rr(song, &view->sel);
 		rr.prepare(view->getPlaybackSelection(), false);
 		tsunami->storage->saveViaRenderer(&rr, HuiFilename);
 	}

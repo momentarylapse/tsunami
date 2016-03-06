@@ -10,17 +10,16 @@
 
 #include "../../ActionGroup.h"
 class Song;
+class SongSelection;
 class Track;
-class Range;
 
 class ActionTrackSampleFromSelection : public ActionGroup
 {
 public:
-	ActionTrackSampleFromSelection(Song *a, const Range &r, int level_no);
-	virtual ~ActionTrackSampleFromSelection();
+	ActionTrackSampleFromSelection(Song *a, const SongSelection &sel, int level_no);
 
 private:
-	void CreateSubsFromTrack(Track *t, const Range &r, int level_no);
+	void CreateSubsFromTrack(Track *t, const SongSelection &sel, int level_no);
 };
 
 #endif /* ACTIONTRACKSAMPLEFROMSELECTION_H_ */

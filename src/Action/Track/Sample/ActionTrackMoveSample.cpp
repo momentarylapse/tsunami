@@ -8,12 +8,13 @@
 #include "ActionTrackMoveSample.h"
 
 #include "../../../Data/Song.h"
+#include "../../../Data/SongSelection.h"
 
-ActionTrackMoveSample::ActionTrackMoveSample(Song *a)
+ActionTrackMoveSample::ActionTrackMoveSample(Song *a, SongSelection &sel)
 {
 	foreachi(Track *t, a->tracks, ti)
 		foreachi(SampleRef *s, t->samples, si)
-			if (s->is_selected){
+			if (sel.has(s)){
 				SubSaveData d;
 				d.track_no = ti;
 				d.sub_no = si;
@@ -21,12 +22,6 @@ ActionTrackMoveSample::ActionTrackMoveSample(Song *a)
 				sub.add(d);
 			}
 	param = 0;
-}
-
-
-
-ActionTrackMoveSample::~ActionTrackMoveSample()
-{
 }
 
 

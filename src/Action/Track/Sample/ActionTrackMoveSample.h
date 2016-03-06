@@ -10,12 +10,12 @@
 
 #include "../../Action.h"
 class Song;
+class SongSelection;
 
 class ActionTrackMoveSample: public Action
 {
 public:
-	ActionTrackMoveSample(Song *a);
-	virtual ~ActionTrackMoveSample();
+	ActionTrackMoveSample(Song *a, SongSelection &sel);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

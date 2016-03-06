@@ -26,8 +26,8 @@ ViewModeBars::~ViewModeBars()
 void ViewModeBars::drawPost(HuiPainter *c)
 {
 	if (scaling){
-		int sx1 = cam->sample2screen(view->sel_range.start());
-		int sx2 = cam->sample2screen(view->sel_range.end());
+		int sx1 = cam->sample2screen(view->sel.range.start());
+		int sx2 = cam->sample2screen(view->sel.range.end());
 		int sxx1 = clampi(sx1, view->area.x1, view->area.x2);
 		int sxx2 = clampi(sx2, view->area.x1, view->area.x2);
 
@@ -45,7 +45,7 @@ void ViewModeBars::startScaling(const Array<int> &sel)
 	scaling = true;
 	scaling_change = false;
 	scaling_sel = sel;
-	scaling_range_orig = view->sel_range;
+	scaling_range_orig = view->sel.range;
 	view->forceRedraw();
 }
 
@@ -68,7 +68,7 @@ void ViewModeBars::onMouseMove()
 void ViewModeBars::performScale()
 {
 	scaling = false;
-	float factor = (float)view->sel_range.num / (float)scaling_range_orig.num;
+	float factor = (float)view->sel.range.num / (float)scaling_range_orig.num;
 
 	song->action_manager->beginActionGroup();
 	foreachb(int i, scaling_sel){

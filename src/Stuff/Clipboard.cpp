@@ -105,13 +105,16 @@ void Clipboard::paste(AudioView *view)
 			continue;
 		dest_type.add(track_type(t->type));
 	}
+
 	foreach(Track *t, temp->tracks)
 		temp_type.add(track_type(t->type));
 
 	// only 1 track in clipboard => paste into current
 	bool paste_single = (temp->tracks.num == 1);
-	if (paste_single)
-		dest_type.resize(1);
+	if (paste_single){
+		dest_type.clear();
+		dest_type.add(track_type(view->cur_track->type));
+	}
 
 	if (dest_type.num != temp->tracks.num){
 		tsunami->log->error(format(_("%d Spuren zum Einf&ugen markiert (ohne Metronom gez&ahlt), aber %d Spuren in der Zwischenablage"), dest_type.num, temp->tracks.num));

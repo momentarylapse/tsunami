@@ -572,9 +572,12 @@ void AudioView::updateTracks()
 					break;
 				}
 			}
+
+		// new track
 		if (!found){
 			vtrack2[ti] = new AudioViewTrack(this, t);
 			changed = true;
+			sel.add(t);
 		}
 	}
 	foreach(AudioViewTrack *v, vtrack)
@@ -918,6 +921,10 @@ SongSelection AudioView::getEditSeletion()
 		return sel;
 
 	SongSelection s;
+	s.range = sel.range;
 	s.add(cur_track);
+	foreach(SampleRef *sample, cur_track->samples)
+		if (sel.has(sample))
+			s.add(sample);
 	return s;
 }

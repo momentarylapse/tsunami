@@ -15,7 +15,7 @@ class Scale;
 class Clef
 {
 public:
-	Clef(int type);
+	Clef(int type, const string &symbol, int offset);
 	enum{
 		TYPE_TREBLE,
 		TYPE_TREBLE_8,

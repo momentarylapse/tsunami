@@ -8,34 +8,17 @@
 #include "Clef.h"
 #include "MidiData.h"
 
-const Clef Clef::TREBLE(Clef::TYPE_TREBLE);
-const Clef Clef::TREBLE_8(Clef::TYPE_TREBLE_8);
-const Clef Clef::BASS(Clef::TYPE_BASS);
-const Clef Clef::BASS_8(Clef::TYPE_BASS_8);
-const Clef Clef::DRUMS(Clef::TYPE_DRUMS);
+const Clef Clef::TREBLE(Clef::TYPE_TREBLE, "𝄞", 5*7-5); // \uD834\uDD1E   "\u1d11e";
+const Clef Clef::TREBLE_8(Clef::TYPE_TREBLE_8, "𝄠", 4*7-5); // \uD834\uDD20   "\u1d120";
+const Clef Clef::BASS(Clef::TYPE_BASS, "𝄢", 3*7-3); // \uD834\uDD22    "\u1d122";
+const Clef Clef::BASS_8(Clef::TYPE_BASS_8, "𝄤", 2*7-3); // \uD834\uDD24   "\u1d124";
+const Clef Clef::DRUMS(Clef::TYPE_DRUMS, "𝄥", 0);
 
-Clef::Clef(int _type)
+Clef::Clef(int _type, const string &_symbol, int _offset)
 {
 	type = _type;
-	offset = -1;
-
-
-	if (type == TYPE_DRUMS)
-		symbol = "𝄥";
-	else if (type == TYPE_TREBLE)
-		symbol = "𝄞"; // \uD834\uDD1E
-		//return "\u1d11e";
-	else if (type == TYPE_TREBLE_8)
-		symbol = "𝄠"; // \uD834\uDD20
-		//return "\u1d120";
-	else if (type == TYPE_BASS)
-		symbol = "𝄢"; // \uD834\uDD22
-		//return "\u1d122";
-	else if (type == TYPE_BASS_8)
-		symbol = "𝄤"; // \uD834\uDD24
-		//return "\u1d124";
-	else
-		symbol = "?";
+	symbol = _symbol;
+	offset = _offset;
 }
 
 int Clef::pitch_to_position(int pitch, const Scale &s, int &modifier) const
@@ -87,20 +70,13 @@ int Clef::pitch_to_position(int pitch, const Scale &s, int &modifier) const
 
 	const int pp[12] = {0,0,1,2,2,3,3,4,4,5,6,6};
 	const int ss[12] = {MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_FLAT,MODIFIER_NONE,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_SHARP,MODIFIER_NONE,MODIFIER_FLAT,MODIFIER_NONE};
-	const int clef_offset[4] = {5*7, 4*7, 3*7+2, 2*7+2};
 
 	modifier = ss[rel];
-	return pp[rel] + 7 * octave + 5 - clef_offset[type];
-}
-
-inline int clef_rel_to_major_scale(int pos, int clef)
-{
-	const int clef_offset[4] = {5*7, 4*7, 3*7+2, 2*7+2};
-	return pos + clef_offset[clef] - 5;
+	return pp[rel] + 7 * octave - offset;
 }
 
 int Clef::position_to_pitch(int pos, const Scale &s, int mod) const
 {
-	int x = clef_rel_to_major_scale(pos, type);
+	int x = pos + offset;
 	return s.transform_out(x, mod);
 }

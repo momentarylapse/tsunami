@@ -19,6 +19,7 @@ class MidiData;
 class MidiNote;
 class MidiEvent;
 class TrackMarker;
+class Clef;
 
 class AudioViewTrack
 {
@@ -48,8 +49,8 @@ public:
 	void drawMidiDefault(HuiPainter *c, const MidiData &midi, int shift);
 	void drawMidiTab(HuiPainter *c, const MidiData &midi, int shift);
 	void drawMidiScore(HuiPainter *c, const MidiData &midi, int shift);
-	void drawMidiScoreClef(HuiPainter *c, int clef);
-	void drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, int clef);
+	void drawMidiScoreClef(HuiPainter *c, const Clef &clef);
+	void drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef);
 	void drawHeader(HuiPainter *c);
 	void draw(HuiPainter *c);
 

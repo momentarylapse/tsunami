@@ -12,6 +12,7 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Audio/Renderer/SynthesizerRenderer.h"
+#include "../../Data/Clef.h"
 #include "../../TsunamiWindow.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
@@ -219,9 +220,9 @@ int ViewModeMidi::y2pitch(int y)
 	int ti = view->cur_track->get_index();
 	AudioViewTrack *t = view->vtrack[ti];
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
-		int clef = t->track->instrument.get_clef();
+		const Clef& clef = t->track->instrument.get_clef();
 		int pos = t->screen_to_clef_pos(y);
-		return clef_position_to_pitch(pos, clef, view->midi_scale, modifier);
+		return clef.position_to_pitch(pos, view->midi_scale, modifier);
 	}
 	return pitch_min + ((t->area.y2 - y) * (pitch_max - pitch_min) / t->area.height());
 }
@@ -233,8 +234,8 @@ float ViewModeMidi::pitch2y(int pitch)
 
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
 		int mod;
-		int clef = t->track->instrument.get_clef();
-		int p = pitch_to_clef_position(pitch, clef, view->midi_scale, mod);
+		const Clef& clef = t->track->instrument.get_clef();
+		int p = clef.pitch_to_position(pitch, view->midi_scale, mod);
 		return t->clef_pos_to_screen(p);
 	}
 
@@ -518,7 +519,7 @@ void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const
 {
 	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
 
-	int clef = track->instrument.get_clef();
+	const Clef& clef = track->instrument.get_clef();
 
 	t->drawMidiScoreClef(c, clef);
 	//const int *mod = view->midi_scale.get_modifiers_clef();
@@ -570,12 +571,12 @@ void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 			if ((!HuiGetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
 				Range r = Range(hover->pos, 0);
 				align_to_beats(song, r, beat_partition);
-				int clef = t->track->instrument.get_clef();
+				const Clef &clef = t->track->instrument.get_clef();
 				t->drawMidiNoteScore(c, MidiNote(r, hover->pitch, 1), 0, t->STATE_HOVER, clef);
 
 				float x = view->cam.sample2screen(r.offset);
 				int mod;
-				int p = pitch_to_clef_position(hover->pitch, clef, view->midi_scale, mod);
+				int p = clef.pitch_to_position(hover->pitch, view->midi_scale, mod);
 				float y = t->clef_pos_to_screen(p);
 				c->setColor(view->colors.text);
 				c->setFontSize(view->FONT_SIZE);

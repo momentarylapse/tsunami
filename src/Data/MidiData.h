@@ -19,6 +19,7 @@
 class MidiDataRef;
 class MidiEffect;
 class Instrument;
+class Clef;
 
 
 class MidiRawData : public Array<MidiEvent>
@@ -55,7 +56,9 @@ public:
 
 	void sort();
 	void sanify(const Range &r);
+
 	void update_meta(const Instrument &i, const Scale &s) const;
+	void clear_meta() const;
 
 	Array<MidiEffect*> fx;
 };
@@ -94,19 +97,6 @@ string chord_type_name(int type);
 Array<int> chord_notes(int type, int inversion, int pitch);
 
 
-enum{
-	CLEF_TYPE_TREBLE,
-	CLEF_TYPE_TREBLE_8,
-	CLEF_TYPE_BASS,
-	CLEF_TYPE_BASS_8,
-	CLEF_TYPE_DRUMS,
-	NUM_CLEF_TYPES
-};
-
-string clef_symbol(int clef);
-
-int pitch_to_clef_position(int pitch, int clef, const Scale &s, int &modifier);
-int clef_position_to_pitch(int position, int clef, const Scale &s, int modifier);
 
 enum{
 	MODIFIER_NONE,

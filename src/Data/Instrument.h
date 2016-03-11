@@ -8,6 +8,8 @@
 #ifndef SRC_DATA_INSTRUMENT_H_
 #define SRC_DATA_INSTRUMENT_H_
 
+class Clef;
+
 class Instrument
 {
 public:
@@ -51,7 +53,7 @@ public:
 
 	void set_midi_no(int no);
 
-	int get_clef() const;
+	const Clef& get_clef() const;
 
 	static Array<Instrument> enumerate();
 };

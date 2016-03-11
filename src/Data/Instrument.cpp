@@ -8,6 +8,7 @@
 #include "../lib/hui/hui.h"
 #include "Instrument.h"
 #include "MidiData.h"
+#include "Clef.h"
 
 Instrument::Instrument()
 {
@@ -196,17 +197,17 @@ Array<Instrument> Instrument::enumerate()
 	return instruments;
 }
 
-int Instrument::get_clef() const
+const Clef& Instrument::get_clef() const
 {
 	if (type == TYPE_DRUMS)
-		return CLEF_TYPE_DRUMS;
+		return Clef::DRUMS;
 	if ((type == TYPE_ELECTRIC_GUITAR) or (type == TYPE_GUITAR))
-		return CLEF_TYPE_TREBLE_8;
+		return Clef::TREBLE_8;
 	if (type == TYPE_CELLO)
-		return CLEF_TYPE_BASS;
+		return Clef::BASS;
 	if ((type == TYPE_ELECTRIC_BASS) or (type == TYPE_DOUBLE_BASS))
-		return CLEF_TYPE_BASS_8;
-	return CLEF_TYPE_TREBLE;
+		return Clef::BASS_8;
+	return Clef::TREBLE;
 }
 
 bool Instrument::operator==(const Instrument &i) const

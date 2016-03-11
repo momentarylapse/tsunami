@@ -7,6 +7,7 @@
 
 #include "MidiNote.h"
 #include "MidiData.h"
+#include "Clef.h"
 #include "Instrument.h"
 
 
@@ -39,12 +40,11 @@ float MidiNote::getFrequency()
 void MidiNote::update_meta(const Instrument &instrument, const Scale& scale) const
 {
 	if (clef_position < 0){
-		int clef = instrument.get_clef();
-		clef_position = pitch_to_clef_position(pitch, clef, scale, modifier);
+		const Clef& clef = instrument.get_clef();
+		clef_position = clef.pitch_to_position(pitch, scale, modifier);
 	}
 
 	if (stringno < 0){
-		printf("%d  %p\n", stringno, this);
 		stringno = 0;
 		for (int i=0; i<instrument.tuning.num; i++)
 			if (pitch >= instrument.tuning[i]){

@@ -21,6 +21,7 @@ void* ActionTrackSetInstrument::execute(Data* d)
 	Track *t = a->get_track(track_no);
 
 	t->instrument = new_value;
+	t->midi.clear_meta();
 
 	t->notify();
 
@@ -33,6 +34,7 @@ void ActionTrackSetInstrument::undo(Data* d)
 	Track *t = a->get_track(track_no);
 
 	t->instrument = old_value;
+	t->midi.clear_meta();
 
 	t->notify();
 }

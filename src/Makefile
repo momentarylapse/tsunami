@@ -78,6 +78,7 @@ OBJ = \
  Audio/AudioOutput.o\
  Audio/AudioStream.o\
  Data/BufferBox.o\
+ Data/Clef.o\
  Data/Curve.o\
  Data/Data.o\
  Data/Instrument.o\
@@ -509,6 +510,9 @@ Audio/AudioStream.o : Audio/AudioStream.cpp
 
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)
+
+Data/Clef.o : Data/Clef.cpp
+	$(CPP) -c Data/Clef.cpp -o $@ $(CXXFLAGS)
 
 Data/Curve.o : Data/Curve.cpp
 	$(CPP) -c Data/Curve.cpp -o $@ $(CXXFLAGS)

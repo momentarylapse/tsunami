@@ -11,6 +11,7 @@
 #include "../Tsunami.h"
 #include "../Data/Song.h"
 #include "../Data/MidiData.h"
+#include "../Data/Clef.h"
 #include "../Audio/Synth/Synthesizer.h"
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)
@@ -271,7 +272,7 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
-	midi.update_meta(track->instrument, view->midi_scale);
+	notes.update_meta(track->instrument, view->midi_scale);
 
 
 
@@ -338,7 +339,7 @@ int AudioViewTrack::screen_to_clef_pos(float y)
 	return (int)floor((area.y2 - y - area.height() / 2) * 2.0f / clef_dy + 0.5f) + 4;
 }
 
-void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, int clef)
+void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef)
 {
 	float r = clef_dy/2;
 
@@ -390,7 +391,7 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 		c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
 }
 
-void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, int clef)
+void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, const Clef &clef)
 {
 	// clef lines
 	float dy = min(area.height() / 13, 30);
@@ -403,7 +404,7 @@ void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, int clef)
 
 	// clef symbol
 	c->setFontSize(dy*4);
-	c->drawStr(10, clef_pos_to_screen(10), clef_symbol(clef));
+	c->drawStr(10, clef_pos_to_screen(10), clef.symbol);
 	c->setFontSize(view->FONT_SIZE);
 }
 
@@ -411,8 +412,9 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiData &midi, int shif
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
+	notes.update_meta(track->instrument, view->midi_scale);
 
-	int clef = track->instrument.get_clef();
+	const Clef& clef = track->instrument.get_clef();
 
 	drawMidiScoreClef(c, clef);
 

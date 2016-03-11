@@ -82,11 +82,14 @@ OBJ = \
  Data/Data.o\
  Data/Instrument.o\
  Data/MidiData.o\
+ Data/MidiEvent.o\
+ Data/MidiNote.o\
  Data/Range.o\
  Data/RingBuffer.o\
  Data/Rhythm.o\
  Data/Sample.o\
  Data/SampleRef.o\
+ Data/Scale.o\
  Data/Song.o\
  Data/Track.o\
  lib/base/array.o\
@@ -519,6 +522,12 @@ Data/Instrument.o : Data/Instrument.cpp
 Data/MidiData.o : Data/MidiData.cpp
 	$(CPP) -c Data/MidiData.cpp -o $@ $(CXXFLAGS)
 
+Data/MidiEvent.o : Data/MidiEvent.cpp
+	$(CPP) -c Data/MidiEvent.cpp -o $@ $(CXXFLAGS)
+
+Data/MidiNote.o : Data/MidiNote.cpp
+	$(CPP) -c Data/MidiNote.cpp -o $@ $(CXXFLAGS)
+
 Data/Range.o : Data/Range.cpp
 	$(CPP) -c Data/Range.cpp -o $@ $(CXXFLAGS)
 
@@ -533,6 +542,9 @@ Data/Sample.o : Data/Sample.cpp
 
 Data/SampleRef.o : Data/SampleRef.cpp
 	$(CPP) -c Data/SampleRef.cpp -o $@ $(CXXFLAGS)
+
+Data/Scale.o : Data/Scale.cpp
+	$(CPP) -c Data/Scale.cpp -o $@ $(CXXFLAGS)
 
 Data/Song.o : Data/Song.cpp
 	$(CPP) -c Data/Song.cpp -o $@ $(CXXFLAGS)

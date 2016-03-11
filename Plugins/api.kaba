@@ -38,11 +38,14 @@ class MidiNote
 	Range range
 	float pitch
 	float volume
+	int string, clef_position, modifier
 MidiNote _MidiNote(Range r, float pitch, float volume)
 	MidiNote n
 	n.range = r
 	n.pitch = pitch
 	n.volume = volume
+	n.string = -1
+	n.clef_position = -1
 	return n
 
 class MidiEvent

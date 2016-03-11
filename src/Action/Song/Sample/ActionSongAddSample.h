@@ -11,14 +11,14 @@
 #include "../../Action.h"
 
 class BufferBox;
-class MidiNoteData;
+class MidiData;
 class Sample;
 
 class ActionSongAddSample : public Action
 {
 public:
 	ActionSongAddSample(const string &name, BufferBox &buf);
-	ActionSongAddSample(const string &name, MidiNoteData &midi);
+	ActionSongAddSample(const string &name, MidiData &midi);
 	virtual ~ActionSongAddSample();
 
 	virtual void *execute(Data *d);

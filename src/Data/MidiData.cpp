@@ -6,6 +6,7 @@
  */
 
 #include "MidiData.h"
+#include "Instrument.h"
 #include <math.h>
 #include "../lib/hui/hui.h"
 
@@ -155,17 +156,6 @@ string clef_symbol(int clef)
 	return "?";
 }
 
-MidiNote::MidiNote(const Range &_range, float _pitch, float _volume)
-{
-	range = _range;
-	pitch = _pitch;
-	volume = _volume;
-}
-
-float MidiNote::getFrequency()
-{
-	return 440.0f * pow(2.0f, (float)(pitch - 69) / 12.0f);
-}
 
 MidiRawData::MidiRawData()
 {
@@ -197,7 +187,7 @@ int MidiRawData::read(MidiRawData &data, const Range &r) const
 
 Array<MidiNote> MidiRawData::getNotes(const Range &r) const
 {
-	MidiNoteData a = midi_events_to_notes(*this);
+	MidiData a = midi_events_to_notes(*this);
 	Array<MidiNote> b;
 	foreach(MidiNote &n, a)
 		if (r.overlaps(n.range))
@@ -288,41 +278,63 @@ void MidiRawData::append(const MidiRawData &data)
 	samples += data.samples;
 }
 
-MidiNoteData::MidiNoteData()
+MidiData::MidiData()
 {
 	samples = 0;
 }
 
-void MidiNoteData::__init__()
+void MidiData::__init__()
 {
-	new(this) MidiNoteData;
+	new(this) MidiData;
 }
 
-MidiRawData MidiNoteData::getEvents(const Range &r) const
+MidiRawData MidiData::getEvents(const Range &r) const
 {
-	MidiNoteData b = getNotes(r);
+	MidiDataRef b = getNotes(r);
 	return midi_notes_to_events(b);
 }
 
-MidiNoteData MidiNoteData::getNotes(const Range &r) const
+MidiDataRef MidiData::getNotes(const Range &r) const
 {
-	MidiNoteData b;
-	foreach(MidiNote &n, const_cast<MidiNoteData&>(*this))
-		if (r.overlaps(n.range))
-			b.add(n);
+	MidiData b;
+	int first = -1;
+	int last = -1;
+	foreachi(MidiNote &n, const_cast<MidiData&>(*this), i)
+		if (r.overlaps(n.range)){
+			first = i;
+			break;
+		}
+	foreachib(MidiNote &n, const_cast<MidiData&>(*this), i)
+		if (r.overlaps(n.range)){
+			last = i;
+			break;
+		}
+	if (first >= 0)
+		b.set_ref(sub(first, last - first + 1));
 	return b;
 }
 
-MidiNoteData MidiNoteData::getNotesSafe(const Range &r) const
+MidiDataRef MidiData::getNotesSafe(const Range &r) const
 {
-	MidiNoteData b;
-	foreach(MidiNote &n, const_cast<MidiNoteData&>(*this))
-		if (r.is_inside(n.range.center()))
-			b.add(n);
+	MidiData b;
+	int first = -1;
+	int last = -1;
+	foreachi(MidiNote &n, const_cast<MidiData&>(*this), i)
+		if (r.is_inside(n.range.center())){
+			first = i;
+			break;
+		}
+	foreachib(MidiNote &n, const_cast<MidiData&>(*this), i)
+		if (r.is_inside(n.range.center())){
+			last = i;
+			break;
+		}
+	if (first >= 0)
+		b.set_ref(sub(first, last - first + 1));
 	return b;
 }
 
-Range MidiNoteData::getRange(int elongation) const
+Range MidiData::getRange(int elongation) const
 {
 	if (num == 0)
 		return Range::EMPTY;
@@ -331,7 +343,7 @@ Range MidiNoteData::getRange(int elongation) const
 	return Range(i0, i1 - i0 + elongation);
 }
 
-void MidiNoteData::sort()
+void MidiData::sort()
 {
 	for (int i=0;i<num;i++)
 		for (int j=i+1;j<num;j++)
@@ -339,31 +351,29 @@ void MidiNoteData::sort()
 				swap(i, j);
 }
 
-void MidiNoteData::sanify(const Range &r)
+void MidiData::sanify(const Range &r)
 {
 	sort();
 }
 
-MidiEvent::MidiEvent(int _pos, float _pitch, float _volume)
+MidiDataRef::MidiDataRef(const MidiData &midi)
 {
-	pos = _pos;
-	pitch = _pitch;
-	volume = _volume;
+	set_ref(midi);
 }
 
-MidiRawData midi_notes_to_events(const MidiNoteData &notes)
+MidiRawData midi_notes_to_events(const MidiData &notes)
 {
 	MidiRawData r;
-	foreach(MidiNote &n, const_cast<MidiNoteData&>(notes)){
+	foreach(MidiNote &n, const_cast<MidiData&>(notes)){
 		r.add(MidiEvent(n.range.offset, n.pitch, n.volume));
 		r.add(MidiEvent(n.range.end()-1, n.pitch, 0));
 	}
 	return r;
 }
 
-MidiNoteData midi_events_to_notes(const MidiRawData &events)
+MidiData midi_events_to_notes(const MidiRawData &events)
 {
-	MidiNoteData a;
+	MidiData a;
 	MidiRawData b;
 	foreach(MidiEvent &e, const_cast<MidiRawData&>(events)){
 		if (e.volume > 0){
@@ -428,109 +438,8 @@ Array<int> chord_notes(int type, int inversion, int pitch)
 	return r;
 }
 
-Scale::Scale(int _type, int _root)
-{
-	type = _type;
-	root = _root;
-}
 
-string Scale::type_name(int type)
-{
-	if (type == TYPE_MAJOR)
-		return _("Dur");
-	if (type == TYPE_DORIAN)
-		return _("Dorisch");
-	if (type == TYPE_PHRYGIAN)
-		return _("Phrygisch");
-	if (type == TYPE_LYDIAN)
-		return _("Lydisch");
-	if (type == TYPE_MIXOLYDIAN)
-		return _("Mixolydisch");
-	if (type == TYPE_MINOR)
-		return _("Moll");
-	if (type == TYPE_LOCRIAN)
-		return _("Locrisch");
-	return "???";
-}
-
-bool Scale::contains(int pitch) const
-{
-	int offset[7] = {0, 2, 4, 5, 7, 9, 11};
-	int r = (pitch - root + offset[type] + 24) % 12;
-	// 69 = 9 = a
-	return !((r == 10) or (r == 1) or (r == 3) or (r == 6) or (r == 8));
-}
-
-static const int scale_major_modifiers[12 * 7] = {
-	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, // C
-	MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_FLAT, // Db
-	MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, // D
-	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, // Eb
-	MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, // E
-	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, // F
-	MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, // F#
-	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, // G
-	MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_FLAT, // Ab
-	MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_NONE, // A
-	MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_NONE, MODIFIER_FLAT, // Bb
-	MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_SHARP,MODIFIER_NONE, // B
-};
-
-inline int apply_modifier(int pitch, int scale_mod, int mod)
-{
-	int d = 0;
-	if (scale_mod == MODIFIER_SHARP)
-		d = 1;
-	else if (scale_mod == MODIFIER_FLAT)
-		d = -1;
-	if (mod == MODIFIER_SHARP)
-		d += 1;
-	else if (mod == MODIFIER_FLAT)
-		d -= 1;
-	else if (mod == MODIFIER_NATURAL)
-		d = 0;
-	return pitch + d;
-}
-
-inline int scale_to_major(const Scale &s)
-{
-	if (s.type == Scale::TYPE_MAJOR)
-		return s.root;
-	if (s.type == Scale::TYPE_LOCRIAN)
-		return (s.root + 1) % 12;
-	if (s.type == Scale::TYPE_MINOR)
-		return (s.root + 3) % 12;
-	if (s.type == Scale::TYPE_MIXOLYDIAN)
-		return (s.root + 5) % 12;
-	if (s.type == Scale::TYPE_LYDIAN)
-		return (s.root + 7) % 12;
-	if (s.type == Scale::TYPE_PHRYGIAN)
-		return (s.root + 8) % 12;
-	if (s.type == Scale::TYPE_DORIAN)
-		return (s.root + 10) % 12;
-	return s.root;
-}
-
-const int* Scale::get_modifiers_clef()
-{
-	return &scale_major_modifiers[7*scale_to_major(*this)];
-}
-
-// x in major scale notation
-int Scale::transform_out(int x, int mod) const
-{
-	const int pp[7] = {0,2,4,5,7,9,11};
-
-	int octave = x / 7;
-	int rel = x % 7;
-
-	int scale_mod = scale_major_modifiers[rel + 7*scale_to_major(*this)];
-
-	return apply_modifier(pitch_from_octave_and_rel(pp[rel], octave), scale_mod, mod);
-}
-
-
-int pitch_to_clef_position(int pitch, int clef, Scale &s, int &modifier)
+int pitch_to_clef_position(int pitch, int clef, const Scale &s, int &modifier)
 {
 	if (clef == CLEF_TYPE_DRUMS){
 		modifier = MODIFIER_NONE;
@@ -591,9 +500,14 @@ inline int clef_rel_to_major_scale(int pos, int clef)
 	return pos + clef_offset[clef] - 5;
 }
 
-int clef_position_to_pitch(int pos, int clef, Scale &s, int mod)
+int clef_position_to_pitch(int pos, int clef, const Scale &s, int mod)
 {
 	int x = clef_rel_to_major_scale(pos, clef);
 	return s.transform_out(x, mod);
 }
 
+void MidiData::update_meta(const Instrument &instrument, const Scale& scale) const
+{
+	for (int i=0; i<num; i++)
+		(*this)[i].update_meta(instrument, scale);
+}

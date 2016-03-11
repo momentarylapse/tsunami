@@ -196,7 +196,7 @@ Array<Instrument> Instrument::enumerate()
 	return instruments;
 }
 
-int Instrument::get_clef()
+int Instrument::get_clef() const
 {
 	if (type == TYPE_DRUMS)
 		return CLEF_TYPE_DRUMS;

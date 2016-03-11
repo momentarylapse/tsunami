@@ -52,7 +52,7 @@ private:
 	Range _range;
 	Range range_cur;
 	int pos;
-	Array<MidiNoteData> midi;
+	Array<MidiData> midi;
 
 	SongSelection *sel;
 	bool sel_own;

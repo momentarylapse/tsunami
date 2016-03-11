@@ -74,7 +74,7 @@ public:
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
 	BufferBox _cdecl getBuffers(int level_no, const Range &r);
-	void _cdecl insertMidiData(int offset, const MidiNoteData &midi);
+	void _cdecl insertMidiData(int offset, const MidiData &midi);
 	void _cdecl addEffect(Effect *effect);
 	void _cdecl deleteEffect(int index);
 	void _cdecl editEffect(int index, const string &param_old);
@@ -87,7 +87,7 @@ public:
 	void _cdecl deleteSample(int index);
 	void _cdecl editSample(int index, float volume, bool mute, int rep_num, int rep_delay);
 	void _cdecl addMidiNote(const MidiNote &n);
-	void _cdecl addMidiNotes(const MidiNoteData &notes);
+	void _cdecl addMidiNotes(const MidiData &notes);
 	void _cdecl deleteMidiNote(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
@@ -119,7 +119,7 @@ public:
 	Array<SampleRef*> samples;
 
 	// midi track
-	MidiNoteData midi;
+	MidiData midi;
 	Synthesizer *synth;
 
 	Array<TrackMarker> markers;

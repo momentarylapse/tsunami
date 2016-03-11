@@ -475,10 +475,10 @@ void ReadChunkSub(ChunkStack *s, Track *t)
 #endif
 
 
-class FileChunkMidiEvent : public FileChunk<MidiNoteData,MidiEvent>
+class FileChunkMidiEvent : public FileChunk<MidiData,MidiEvent>
 {
 public:
-	FileChunkMidiEvent() : FileChunk<MidiNoteData,MidiEvent>("event"){}
+	FileChunkMidiEvent() : FileChunk<MidiData,MidiEvent>("event"){}
 	virtual void create()
 	{
 		//parent->add(MidiEvent());
@@ -516,10 +516,10 @@ public:
 	}
 };
 
-class FileChunkMidiEffect : public FileChunk<MidiNoteData,MidiEffect>
+class FileChunkMidiEffect : public FileChunk<MidiData,MidiEffect>
 {
 public:
-	FileChunkMidiEffect() : FileChunk<MidiNoteData,MidiEffect>("effect"){}
+	FileChunkMidiEffect() : FileChunk<MidiData,MidiEffect>("effect"){}
 	virtual void create()
 	{}
 	virtual void read(File *f)
@@ -547,10 +547,10 @@ public:
 };
 
 // DEPRECATED
-class FileChunkMidiNote : public FileChunk<MidiNoteData,MidiNote>
+class FileChunkMidiNote : public FileChunk<MidiData,MidiNote>
 {
 public:
-	FileChunkMidiNote() : FileChunk<MidiNoteData,MidiNote>("note"){}
+	FileChunkMidiNote() : FileChunk<MidiData,MidiNote>("note"){}
 	virtual void create(){}
 	virtual void read(File *f)
 	{
@@ -572,10 +572,10 @@ public:
 	}
 };
 
-class FileChunkSampleMidiData : public FileChunk<Sample,MidiNoteData>
+class FileChunkSampleMidiData : public FileChunk<Sample,MidiData>
 {
 public:
-	FileChunkSampleMidiData() : FileChunk<Sample,MidiNoteData>("midi")
+	FileChunkSampleMidiData() : FileChunk<Sample,MidiData>("midi")
 	{
 		add_child(new FileChunkMidiEvent);
 		add_child(new FileChunkMidiNote);
@@ -606,10 +606,10 @@ public:
 	}
 };
 
-class FileChunkTrackMidiData : public FileChunk<Track,MidiNoteData>
+class FileChunkTrackMidiData : public FileChunk<Track,MidiData>
 {
 public:
-	FileChunkTrackMidiData() : FileChunk<Track,MidiNoteData>("midi")
+	FileChunkTrackMidiData() : FileChunk<Track,MidiData>("midi")
 	{
 		add_child(new FileChunkMidiEvent);
 		add_child(new FileChunkMidiNote);

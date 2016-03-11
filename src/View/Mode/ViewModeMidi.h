@@ -11,7 +11,7 @@
 #include "ViewModeDefault.h"
 #include "../../lib/math/math.h"
 
-class MidiNoteData;
+class MidiData;
 class MidiNote;
 class MidiEvent;
 class AudioStream;
@@ -37,13 +37,13 @@ public:
 
 	void drawMidiNote(HuiPainter *c, const MidiNote &n, int state);
 	void drawMidiEvent(HuiPainter *c, const MidiEvent &e);
-	void drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area);
-	void drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area);
-	void drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
 
 	virtual Selection getHover();
 
-	MidiNoteData getCreationNotes();
+	MidiData getCreationNotes();
 	int y2pitch(int y);
 	float pitch2y(int p);
 	void setPitchMin(int pitch);

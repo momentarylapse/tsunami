@@ -252,10 +252,10 @@ void Track::addMidiNote(const MidiNote &n)
 	song->execute(new ActionTrackAddMidiNote(this, n));
 }
 
-void Track::addMidiNotes(const MidiNoteData &midi)
+void Track::addMidiNotes(const MidiData &midi)
 {
 	song->action_manager->beginActionGroup();
-	foreach(MidiNote &n, const_cast<MidiNoteData&>(midi))
+	foreach(MidiNote &n, const_cast<MidiData&>(midi))
 		addMidiNote(n);
 	song->action_manager->endActionGroup();
 }
@@ -290,7 +290,7 @@ void Track::setPanning(float panning)
 	song->execute(new ActionTrackEditPanning(this, panning));
 }
 
-void Track::insertMidiData(int offset, const MidiNoteData& midi)
+void Track::insertMidiData(int offset, const MidiData& midi)
 {
 	song->execute(new ActionTrackInsertMidi(this, offset, midi));
 }

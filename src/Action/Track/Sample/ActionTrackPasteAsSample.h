@@ -13,13 +13,13 @@
 class Track;
 class Song;
 class BufferBox;
-class MidiNoteData;
+class MidiData;
 
 class ActionTrackPasteAsSample : public ActionGroup
 {
 public:
 	ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf);
-	ActionTrackPasteAsSample(Track *t, int pos, MidiNoteData *midi);
+	ActionTrackPasteAsSample(Track *t, int pos, MidiData *midi);
 };
 
 #endif /* ACTIONTRACKPASTEASSAMPLE_H_ */

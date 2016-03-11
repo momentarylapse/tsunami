@@ -14,7 +14,7 @@
 class Song;
 class Track;
 class Sample;
-class MidiNoteData;
+class MidiData;
 class BufferBox;
 class Range;
 
@@ -36,7 +36,7 @@ public:
 	int pos;
 	Sample *origin;
 	BufferBox *buf;
-	MidiNoteData *midi;
+	MidiData *midi;
 	bool muted;
 	float volume;
 

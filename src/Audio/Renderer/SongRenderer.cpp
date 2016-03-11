@@ -131,7 +131,7 @@ void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 
 	make_silence(buf, range_cur.length());
 
-	MidiNoteData *m = &t->midi;
+	MidiData *m = &t->midi;
 //	if ((ti >= 0) and (ti < midi.num))
 //		m = &midi[ti];
 	// TODO

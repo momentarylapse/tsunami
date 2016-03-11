@@ -10,31 +10,16 @@
 
 #include "../lib/base/base.h"
 #include "Range.h"
+#include "MidiNote.h"
+#include "MidiEvent.h"
+#include "Scale.h"
 
 #define MAX_PITCH		128
 
+class MidiDataRef;
 class MidiEffect;
+class Instrument;
 
-class MidiNote
-{
-public:
-	MidiNote(){}
-	MidiNote(const Range &range, float pitch, float volume);
-	float getFrequency();
-	Range range;
-	float pitch;
-	float volume;
-};
-
-class MidiEvent
-{
-public:
-	MidiEvent(){}
-	MidiEvent(int pos, float pitch, float volume);
-	int pos;
-	float pitch;
-	float volume;
-};
 
 class MidiRawData : public Array<MidiEvent>
 {
@@ -56,26 +41,33 @@ public:
 	void append(const MidiRawData &data);
 };
 
-class MidiNoteData : public Array<MidiNote>
+class MidiData : public Array<MidiNote>
 {
 public:
-	MidiNoteData();
+	MidiData();
 	void _cdecl __init__();
 	MidiRawData getEvents(const Range &r) const;
-	MidiNoteData getNotes(const Range &r) const;
-	MidiNoteData getNotesSafe(const Range &r) const;
+	MidiDataRef getNotes(const Range &r) const;
+	MidiDataRef getNotesSafe(const Range &r) const;
 
 	Range getRange(int elongation) const;
 	int samples;
 
 	void sort();
 	void sanify(const Range &r);
+	void update_meta(const Instrument &i, const Scale &s) const;
 
 	Array<MidiEffect*> fx;
 };
 
-MidiRawData midi_notes_to_events(const MidiNoteData &notes);
-MidiNoteData midi_events_to_notes(const MidiRawData &events);
+class MidiDataRef : public MidiData
+{
+public:
+	MidiDataRef(const MidiData &m);
+};
+
+MidiRawData midi_notes_to_events(const MidiData &notes);
+MidiData midi_events_to_notes(const MidiRawData &events);
 
 
 
@@ -101,32 +93,6 @@ enum
 string chord_type_name(int type);
 Array<int> chord_notes(int type, int inversion, int pitch);
 
-class Scale
-{
-public:
-
-	enum
-	{
-		TYPE_MAJOR,
-		TYPE_DORIAN,
-		TYPE_PHRYGIAN,
-		TYPE_LYDIAN,
-		TYPE_MIXOLYDIAN,
-		TYPE_MINOR,
-		TYPE_LOCRIAN,
-		NUM_TYPES
-	};
-	int type, root;
-
-	Scale(int type, int root);
-	bool contains(int pitch) const;
-	const int* get_modifiers_clef();
-	//int* get_modifiers_pitch();
-	int transform_out(int x, int modifier) const;
-
-	static string type_name(int type);
-};
-
 
 enum{
 	CLEF_TYPE_TREBLE,
@@ -139,8 +105,8 @@ enum{
 
 string clef_symbol(int clef);
 
-int pitch_to_clef_position(int pitch, int clef, Scale &s, int &modifier);
-int clef_position_to_pitch(int position, int clef, Scale &s, int modifier);
+int pitch_to_clef_position(int pitch, int clef, const Scale &s, int &modifier);
+int clef_position_to_pitch(int position, int clef, const Scale &s, int modifier);
 
 enum{
 	MODIFIER_NONE,

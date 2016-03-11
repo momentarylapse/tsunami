@@ -240,7 +240,7 @@ void AudioViewTrack::drawMarker(HuiPainter *c, const TrackMarker &marker, int in
 }
 
 
-void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift)
+void AudioViewTrack::drawMidi(HuiPainter *c, const MidiData &midi, int shift)
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
 		drawMidiDefault(c, midi, shift);
@@ -250,10 +250,10 @@ void AudioViewTrack::drawMidi(HuiPainter *c, const MidiNoteData &midi, int shift
 		drawMidiScore(c, midi, shift);
 }
 
-void AudioViewTrack::drawMidiDefault(HuiPainter *c, const MidiNoteData &midi, int shift)
+void AudioViewTrack::drawMidiDefault(HuiPainter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
-	Array<MidiNote> notes = midi.getNotes(range);
+	MidiDataRef notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
 	foreach(MidiNote &n, notes){
 		c->setColor(getPitchColor(n.pitch));
@@ -267,21 +267,11 @@ void AudioViewTrack::drawMidiDefault(HuiPainter *c, const MidiNoteData &midi, in
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void get_tab(int &stringno, int &position, int pitch, Array<int> &tuning)
-{
-	stringno = 0;
-	position = 0;
-	for (int i=0; i<tuning.num; i++)
-		if (pitch >= tuning[i]){
-			stringno = i;
-			position = pitch - tuning[i];
-		}
-}
-
-void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int shift)
+void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
-	Array<MidiNote> notes = midi.getNotes(range);
+	MidiDataRef notes = midi.getNotes(range);
+	midi.update_meta(track->instrument, view->midi_scale);
 
 
 
@@ -303,14 +293,12 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 	c->setFontSize(r * 1.6f);
 
 	foreach(MidiNote &n, notes){
+
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
 		float x = x1 + r;
 
-		int stringno, position;
-		get_tab(stringno, position, n.pitch, track->instrument.tuning);
-
-		float y = y0 - stringno * dy;
+		float y = y0 - n.stringno * dy;
 
 		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
 
@@ -332,7 +320,7 @@ void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiNoteData &midi, int sh
 			c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
 		if (x2 - x1 > r/2){
 			c->setColor(view->colors.text);
-			c->drawStr(x1 + r/3, y - r * 1.20f, i2s(position));
+			c->drawStr(x1 + r/3, y - r * 1.20f, i2s(n.pitch - track->instrument.tuning[n.stringno]));
 		}
 
 	}
@@ -358,10 +346,10 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 	float x2 = view->cam.sample2screen(n.range.end() + shift);
 	float x = x1 + r;
 
+	if (n.clef_position < 0)
+		n.update_meta(track->instrument, view->midi_scale);
 
-	int mod;
-	int p = pitch_to_clef_position(n.pitch, clef, view->midi_scale, mod);
-
+	int p = n.clef_position;
 	float y = clef_pos_to_screen(p);
 
 	// auxiliary lines
@@ -391,10 +379,10 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 
 	// the note circle
 	c->setColor(col);
-	if (mod != MODIFIER_NONE){
+	if (n.modifier != MODIFIER_NONE){
 		float size = r*2;
 		c->setFontSize(size);
-		c->drawStr(x1 - size*0.7f, y - clef_dy*0.8f , modifier_symbol(mod));
+		c->drawStr(x1 - size*0.7f, y - clef_dy*0.8f , modifier_symbol(n.modifier));
 	}
 	if ((x2 - x1 > 6) or (state == STATE_HOVER))
 		c->drawCircle(x, y, r);
@@ -419,10 +407,10 @@ void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, int clef)
 	c->setFontSize(view->FONT_SIZE);
 }
 
-void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiNoteData &midi, int shift)
+void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
-	Array<MidiNote> notes = midi.getNotes(range);
+	MidiDataRef notes = midi.getNotes(range);
 
 	int clef = track->instrument.get_clef();
 

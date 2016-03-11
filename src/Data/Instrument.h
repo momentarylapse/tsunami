@@ -51,7 +51,7 @@ public:
 
 	void set_midi_no(int no);
 
-	int get_clef();
+	int get_clef() const;
 
 	static Array<Instrument> enumerate();
 };

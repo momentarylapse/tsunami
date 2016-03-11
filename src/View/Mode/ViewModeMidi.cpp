@@ -190,7 +190,7 @@ Array<int> ViewModeMidi::getCreationPitch()
 	return pitch;
 }
 
-MidiNoteData ViewModeMidi::getCreationNotes()
+MidiData ViewModeMidi::getCreationNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection->pos);
 	int end = max(mouse_possibly_selecting_start, selection->pos);
@@ -206,7 +206,7 @@ MidiNoteData ViewModeMidi::getCreationNotes()
 	Range allowed = get_allowed_midi_range(view->cur_track, pitch, mouse_possibly_selecting_start);
 
 	// create notes
-	MidiNoteData notes;
+	MidiData notes;
 	if (allowed.empty())
 		return notes;
 	foreach(int p, pitch)
@@ -479,7 +479,7 @@ void ViewModeMidi::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
 	c->drawRect(rect(x-1.5f, x+1.5f, y1, y2));
 }
 
-void ViewModeMidi::drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
 		drawMidiEditableScore(c, t, midi, as_reference, track, area);
@@ -487,7 +487,7 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const Midi
 		drawMidiEditableDefault(c, t, midi, as_reference, track, area);
 }
 
-void ViewModeMidi::drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	Array<MidiEvent> events = midi.getEvents(view->cam.range());
 	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
@@ -514,7 +514,7 @@ void ViewModeMidi::drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, con
 			drawMidiEvent(c, e);
 }
 
-void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiNoteData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
 

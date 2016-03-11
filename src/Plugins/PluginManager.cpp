@@ -248,12 +248,12 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("MidiRawData.getRange", Script::mf(&MidiRawData::getRange));
 	Script::LinkExternal("MidiRawData.addMetronomeClick", Script::mf(&MidiRawData::addMetronomeClick));
 
-	Script::DeclareClassSize("MidiData", sizeof(MidiNoteData));
-	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiNoteData, samples));
-	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiNoteData::__init__));
-	Script::LinkExternal("MidiData.getEvents", Script::mf(&MidiNoteData::getEvents));
-	Script::LinkExternal("MidiData.getNotes", Script::mf(&MidiNoteData::getNotes));
-	Script::LinkExternal("MidiData.getRange", Script::mf(&MidiNoteData::getRange));
+	Script::DeclareClassSize("MidiData", sizeof(MidiData));
+	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
+	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiData::__init__));
+	Script::LinkExternal("MidiData.getEvents", Script::mf(&MidiData::getEvents));
+	Script::LinkExternal("MidiData.getNotes", Script::mf(&MidiData::getNotes));
+	Script::LinkExternal("MidiData.getRange", Script::mf(&MidiData::getRange));
 
 	Script::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
 	Script::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));

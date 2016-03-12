@@ -107,33 +107,60 @@ string pitch_name(int pitch)
 
 string drum_pitch_name(int pitch)
 {
-	if (pitch == 35)	return "bass      (akk)";
-	if (pitch == 36)	return "bass";
-	if (pitch == 37)	return "side stick";
-	if (pitch == 38)	return "snare";
-	if (pitch == 39)	return "clap";
-	if (pitch == 40)	return "snare     (electronic)";
-	if (pitch == 41)	return "tom - floor low";
-	if (pitch == 42)	return "hihat - closed";
-	if (pitch == 43)	return "tom - floor hi";
-	if (pitch == 44)	return "hihat - pedal";
-	if (pitch == 45)	return "tom - low";
-	if (pitch == 46)	return "hihat - open";
-	if (pitch == 47)	return "tom - low mid";
-	if (pitch == 48)	return "tom - hi mid";
-	if (pitch == 49)	return "crash 1";
-	if (pitch == 50)	return "tom - hi";
-	if (pitch == 51)	return "ride 1";
-	if (pitch == 52)	return "chinese";
-	if (pitch == 53)	return "bell ride";
-	if (pitch == 54)	return "tambourine";
-	if (pitch == 55)	return "splash";
-	if (pitch == 56)	return "cowbell";
-	if (pitch == 57)	return "crash 2";
-	if (pitch == 58)	return "vibraslash?";
-	if (pitch == 59)	return "ride 2";
-	if (pitch == 60)	return "bongo - hi";
-	if (pitch == 61)	return "bongo - low";
+	if (pitch == DRUM_PITCH_BASS_ACCOUSTIC)
+		return "bass      (akk)";
+	if (pitch == DRUM_PITCH_BASS)
+		return "bass";
+	if (pitch == DRUM_PITCH_SIDE_STICK)
+		return "side stick";
+	if (pitch == DRUM_PITCH_SNARE)
+		return "snare";
+	if (pitch == DRUM_PITCH_CLAP)
+		return "clap";
+	if (pitch == DRUM_PITCH_SNARE_ELECTRONIC)
+		return "snare     (electronic)";
+	if (pitch == DRUM_PITCH_TOM_FLOOR_LOW)
+		return "tom - floor low";
+	if (pitch == DRUM_PITCH_HIHAT_CLOSED)
+		return "hihat - closed";
+	if (pitch == DRUM_PITCH_TOM_FLOOR_HI)
+		return "tom - floor hi";
+	if (pitch == DRUM_PITCH_HIHAT_PEDAL)
+		return "hihat - pedal";
+	if (pitch == DRUM_PITCH_TOM_LOW)
+		return "tom - low";
+	if (pitch == DRUM_PITCH_HIHAT_OPEN)
+		return "hihat - open";
+	if (pitch == DRUM_PITCH_TOM_LOW_MID)
+		return "tom - low mid";
+	if (pitch == DRUM_PITCH_TOM_HI_MID)
+		return "tom - hi mid";
+	if (pitch == DRUM_PITCH_CRASH_1)
+		return "crash 1";
+	if (pitch == DRUM_PITCH_TOM_HI)
+		return "tom - hi";
+	if (pitch == DRUM_PITCH_RIDE_1)
+		return "ride 1";
+	if (pitch == DRUM_PITCH_CHINESE)
+		return "chinese";
+	if (pitch == DRUM_PITCH_BELL_RIDE)
+		return "bell ride";
+	if (pitch == DRUM_PITCH_TAMBOURINE)
+		return "tambourine";
+	if (pitch == DRUM_PITCH_SPLASH)
+		return "splash";
+	if (pitch == DRUM_PITCH_COWBELL)
+		return "cowbell";
+	if (pitch == DRUM_PITCH_CRASH_2)
+		return "crash 2";
+	if (pitch == DRUM_PITCH_VIBRASLASH)
+		return "vibraslash?";
+	if (pitch == DRUM_PITCH_RIDE_2)
+		return "ride 2";
+	if (pitch == DRUM_PITCH_BONGO_HI)
+		return "bongo - hi";
+	if (pitch == DRUM_PITCH_BONGO_LOW)
+		return "bongo - low";
 	return pitch_name(pitch);
 }
 

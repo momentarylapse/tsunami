@@ -391,7 +391,7 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 		c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
 }
 
-void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, const Clef &clef)
+void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, const Clef &clef, const Scale &scale)
 {
 	// clef lines
 	float dy = min(area.height() / 13, 30);
@@ -405,6 +405,11 @@ void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, const Clef &clef)
 	// clef symbol
 	c->setFontSize(dy*4);
 	c->drawStr(10, clef_pos_to_screen(10), clef.symbol);
+	c->setFontSize(dy);
+
+	for (int i=0; i<7; i++)
+		if (scale.modifiers[i] != MODIFIER_NONE)
+			c->drawStr(18 + dy*3.0f + dy*0.6f*(i % 3), clef_pos_to_screen((i - clef.offset + 7*20) % 7) - dy*0.8f, modifier_symbol(scale.modifiers[i]));
 	c->setFontSize(view->FONT_SIZE);
 }
 
@@ -416,7 +421,7 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiData &midi, int shif
 
 	const Clef& clef = track->instrument.get_clef();
 
-	drawMidiScoreClef(c, clef);
+	drawMidiScoreClef(c, clef, view->midi_scale);
 
 	c->setAntialiasing(true);
 

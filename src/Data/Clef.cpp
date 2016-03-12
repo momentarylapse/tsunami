@@ -21,6 +21,7 @@ Clef::Clef(int _type, const string &_symbol, int _offset)
 	offset = _offset;
 }
 
+// TODO account for scale!
 int Clef::pitch_to_position(int pitch, const Scale &s, int &modifier) const
 {
 	if (type == TYPE_DRUMS){
@@ -77,6 +78,5 @@ int Clef::pitch_to_position(int pitch, const Scale &s, int &modifier) const
 
 int Clef::position_to_pitch(int pos, const Scale &s, int mod) const
 {
-	int x = pos + offset;
-	return s.transform_out(x, mod);
+	return s.transform_out(pos + offset, mod);
 }

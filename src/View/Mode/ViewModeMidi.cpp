@@ -521,7 +521,7 @@ void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const
 
 	const Clef& clef = track->instrument.get_clef();
 
-	t->drawMidiScoreClef(c, clef);
+	t->drawMidiScoreClef(c, clef, view->midi_scale);
 	//const int *mod = view->midi_scale.get_modifiers_clef();
 
 	c->setAntialiasing(true);

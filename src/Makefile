@@ -92,6 +92,7 @@ OBJ = \
  Data/SampleRef.o\
  Data/Scale.o\
  Data/Song.o\
+ Data/SongSelection.o\
  Data/Track.o\
  lib/base/array.o\
  lib/base/strings.o\
@@ -552,6 +553,9 @@ Data/Scale.o : Data/Scale.cpp
 
 Data/Song.o : Data/Song.cpp
 	$(CPP) -c Data/Song.cpp -o $@ $(CXXFLAGS)
+
+Data/SongSelection.o : Data/SongSelection.cpp
+	$(CPP) -c Data/SongSelection.cpp -o $@ $(CXXFLAGS)
 
 Data/Track.o : Data/Track.cpp
 	$(CPP) -c Data/Track.cpp -o $@ $(CXXFLAGS)

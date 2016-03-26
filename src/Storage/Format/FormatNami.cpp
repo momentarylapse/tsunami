@@ -546,7 +546,7 @@ public:
 	}
 };
 
-// DEPRECATED
+
 class FileChunkMidiNote : public FileChunk<MidiData,MidiNote>
 {
 public:
@@ -580,7 +580,6 @@ public:
 		add_child(new FileChunkMidiEvent);
 		add_child(new FileChunkMidiNote);
 		add_child(new FileChunkMidiEffect);
-		//s->AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
 	}
 	virtual void create(){ me = &parent->midi; }
 	virtual void read(File *f)
@@ -588,20 +587,45 @@ public:
 		f->ReadStr();
 		f->ReadStr();
 		f->ReadStr();
-		f->ReadInt(); // reserved
+		int version = f->ReadInt();
+		if (version < 1)
+			return;
+		int num = f->ReadInt();
+		int meta = f->ReadInt();
+		for (int i=0; i<num; i++){
+			MidiNote n;
+			n.range.offset = f->ReadInt();
+			n.range.num = f->ReadInt();
+			n.pitch = f->ReadInt();
+			n.volume = f->ReadFloat();
+			if (meta & 1)
+				n.stringno = f->ReadInt();
+			if (meta & 2)
+				n.clef_position = f->ReadInt();
+			me->add(n);
+		}
 	}
 	virtual void write(File *f)
 	{
 		f->WriteStr("");
 		f->WriteStr("");
 		f->WriteStr("");
-		f->WriteInt(0);
+		f->WriteInt(1); // version
+
+		f->WriteInt(me->num);
+		f->WriteInt(3); // stringno + clef_position
+		foreach(MidiNote &n, *me){
+			f->WriteInt(n.range.offset);
+			f->WriteInt(n.range.num);
+			f->WriteInt(n.pitch);
+			f->WriteFloat(n.volume);
+			f->WriteInt(n.stringno);
+			f->WriteInt(n.clef_position);
+		}
+		f->WriteInt(0); // reserved
 	}
 	virtual void write_subs()
 	{
-		//Array<MidiEvent> events = me->getEvents(Range::ALL);
-		//write_sub_array("event", events);
-		write_sub_array("note", *me);
 		write_sub_parray("effect", me->fx);
 	}
 };
@@ -614,7 +638,6 @@ public:
 		add_child(new FileChunkMidiEvent);
 		add_child(new FileChunkMidiNote);
 		add_child(new FileChunkMidiEffect);
-		//s->AddChunkHandler("midinote", (chunk_reader*)&ReadChunkMidiNote, midi);
 	}
 	virtual void create(){ me = &parent->midi; }
 	virtual void read(File *f)
@@ -622,6 +645,23 @@ public:
 		f->ReadStr();
 		f->ReadStr();
 		f->ReadStr();
+		int version = f->ReadInt();
+		if (version < 1)
+			return;
+		int num = f->ReadInt();
+		int meta = f->ReadInt();
+		for (int i=0; i<num; i++){
+			MidiNote n;
+			n.range.offset = f->ReadInt();
+			n.range.num = f->ReadInt();
+			n.pitch = f->ReadInt();
+			n.volume = f->ReadFloat();
+			if (meta & 1)
+				n.stringno = f->ReadInt();
+			if (meta & 2)
+				n.clef_position = f->ReadInt();
+			me->add(n);
+		}
 		f->ReadInt(); // reserved
 	}
 	virtual void write(File *f)
@@ -629,13 +669,22 @@ public:
 		f->WriteStr("");
 		f->WriteStr("");
 		f->WriteStr("");
-		f->WriteInt(0);
+		f->WriteInt(1); // version
+
+		f->WriteInt(me->num);
+		f->WriteInt(3); // stringno + clef_position
+		foreach(MidiNote &n, *me){
+			f->WriteInt(n.range.offset);
+			f->WriteInt(n.range.num);
+			f->WriteInt(n.pitch);
+			f->WriteFloat(n.volume);
+			f->WriteInt(n.stringno);
+			f->WriteInt(n.clef_position);
+		}
+		f->WriteInt(0); // reserved
 	}
 	virtual void write_subs()
 	{
-		//Array<MidiEvent> events = me->getEvents(Range::ALL);
-		//write_sub_array("event", events);
-		write_sub_array("note", *me);
 		write_sub_parray("effect", me->fx);
 	}
 };

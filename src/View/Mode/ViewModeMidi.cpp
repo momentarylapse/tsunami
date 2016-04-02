@@ -212,7 +212,22 @@ MidiData ViewModeMidi::getCreationNotes()
 		return notes;
 	foreach(int p, pitch)
 		notes.add(MidiNote(r and allowed, p, 1));
+	notes[0].clef_position = selection->clef_position;
+	notes[0].modifier = selection->modifier;
 	return notes;
+}
+
+int ViewModeMidi::y2clef(int y, int &mod)
+{
+	int ti = view->cur_track->get_index();
+	AudioViewTrack *t = view->vtrack[ti];
+	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
+		mod = MODIFIER_NONE;
+		return t->screen_to_clef_pos(y);
+	}
+	int pitch = pitch_min + ((t->area.y2 - y) * (pitch_max - pitch_min) / t->area.height());
+	const Clef& clef = t->track->instrument.get_clef();
+	return clef.pitch_to_position(pitch, view->midi_scale, mod);
 }
 
 int ViewModeMidi::y2pitch(int y)
@@ -343,6 +358,18 @@ void ViewModeMidi::drawTrackBackgroundDefault(HuiPainter *c, AudioViewTrack *t)
 	}
 }
 
+inline bool hover_note(const MidiNote &n, Selection &s, AudioView *view)
+{
+	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+		if (n.clef_position != s.clef_position)
+			return false;
+	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
+		if (n.pitch != s.pitch)
+			return false;
+
+	return n.range.is_inside(s.pos);
+}
+
 Selection ViewModeMidi::getHover()
 {
 	Selection s;
@@ -423,11 +450,12 @@ Selection ViewModeMidi::getHover()
 		}
 		if (midi_mode != MIDI_MODE_SELECT){
 			s.pitch = y2pitch(my);
+			s.clef_position = y2clef(my, s.modifier);
 			s.type = Selection::TYPE_MIDI_PITCH;
 			s.index = randi(1000); // quick'n'dirty fix to force view update every time the mouse moves
 			Array<MidiNote> notes = s.track->midi;
 			foreachi(MidiNote &n, notes, i)
-				if ((n.pitch == s.pitch) and (n.range.is_inside(s.pos))){
+				if (hover_note(n, s, view)){
 					s.index = i;
 					s.type = Selection::TYPE_MIDI_NOTE;
 					return s;
@@ -572,7 +600,10 @@ void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
 				Range r = Range(hover->pos, 0);
 				align_to_beats(song, r, beat_partition);
 				const Clef &clef = t->track->instrument.get_clef();
-				t->drawMidiNoteScore(c, MidiNote(r, hover->pitch, 1), 0, t->STATE_HOVER, clef);
+				MidiNote n = MidiNote(r, hover->pitch, 1);
+				n.clef_position = hover->clef_position;
+				n.modifier = hover->modifier;
+				t->drawMidiNoteScore(c, n, 0, t->STATE_HOVER, clef);
 
 				float x = view->cam.sample2screen(r.offset);
 				int mod;

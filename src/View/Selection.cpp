@@ -6,6 +6,7 @@
  */
 
 #include "Selection.h"
+#include "../Data/MidiData.h"
 
 
 Selection::Selection()
@@ -13,9 +14,9 @@ Selection::Selection()
 	clear();
 }
 
-bool Selection::allowAutoScroll()
+bool Selection::allow_auto_scroll() const
 {
-	return (type == Selection::TYPE_SELECTION_END) or (type == Selection::TYPE_SAMPLE) or (type == Selection::TYPE_PLAYBACK);
+	return (type == TYPE_SELECTION_END) or (type == TYPE_SAMPLE) or (type == TYPE_PLAYBACK);
 }
 
 void Selection::clear()
@@ -29,6 +30,8 @@ void Selection::clear()
 	sample_offset = 0;
 	show_track_controls = NULL;
 	pitch = -1;
+	clef_position = -1;
+	modifier = MODIFIER_NONE;
 }
 
 bool hover_changed(Selection &hover, Selection &hover_old)
@@ -37,6 +40,7 @@ bool hover_changed(Selection &hover, Selection &hover_old)
 			or (hover.sample != hover_old.sample)
 			or (hover.show_track_controls != hover_old.show_track_controls)
 			or (hover.index != hover_old.index)
-			or (hover.pitch != hover_old.pitch);
+			or (hover.pitch != hover_old.pitch)
+			or (hover.clef_position != hover_old.clef_position);
 }
 

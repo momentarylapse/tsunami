@@ -26,6 +26,7 @@ public:
 	Array<int> barrier;
 	Track *show_track_controls;
 	int pitch;
+	int clef_position, modifier;
 	int index;
 
 	enum
@@ -48,7 +49,7 @@ public:
 	};
 
 	Selection();
-	bool allowAutoScroll();
+	bool allow_auto_scroll() const;
 	void clear();
 };
 

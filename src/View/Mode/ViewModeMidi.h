@@ -44,6 +44,7 @@ public:
 	virtual Selection getHover();
 
 	MidiData getCreationNotes();
+	int y2clef(int y, int &mod);
 	int y2pitch(int y);
 	float pitch2y(int p);
 	void setPitchMin(int pitch);

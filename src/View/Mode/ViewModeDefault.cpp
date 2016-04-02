@@ -114,7 +114,7 @@ void ViewModeDefault::onMouseMove()
 	if (HuiGetEvent()->lbut){
 
 		// cheap auto scrolling
-		if (hover->allowAutoScroll()){
+		if (hover->allow_auto_scroll()){
 			if (view->mx < 50)
 				cam->move(-10 / cam->scale);
 			if (view->mx > view->area.width() - 50)

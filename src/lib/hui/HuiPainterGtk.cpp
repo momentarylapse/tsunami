@@ -11,6 +11,17 @@
 
 #ifdef HUI_API_GTK
 
+HuiPainter::HuiPainter()
+{
+	width = 0;
+	height = 0;
+	cr = NULL;
+}
+
+HuiPainter::~HuiPainter()
+{
+}
+
 void HuiPainter::end()
 {
 	if (!cr)

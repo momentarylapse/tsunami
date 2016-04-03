@@ -23,7 +23,7 @@ ViewModeBars::~ViewModeBars()
 {
 }
 
-void ViewModeBars::drawPost(HuiPainter *c)
+void ViewModeBars::drawPost(Painter *c)
 {
 	if (scaling){
 		int sx1 = cam->sample2screen(view->sel.range.start());

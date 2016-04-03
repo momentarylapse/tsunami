@@ -91,8 +91,8 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	SongRenderer* renderer = new SongRenderer(song)
-	renderer.render(view.sel_range, buf)
+	SongRenderer* renderer = new SongRenderer(song, &view.sel)
+	renderer.render(view.sel.range, buf)
 	delete renderer
 	
 	complex[] fr, fl
@@ -140,7 +140,7 @@ void show_spec()
 	ffl.clear()
 
 void main()
-	if view.sel_range.length > 0
+	if view.sel.range.length > 0
 		show_spec()
 	else
 		logging.error("'Show Spectrum.kaba': Needs some selection!")

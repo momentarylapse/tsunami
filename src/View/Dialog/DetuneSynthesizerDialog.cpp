@@ -33,9 +33,8 @@ DetuneSynthesizerDialog::~DetuneSynthesizerDialog()
 {
 }
 
-void DetuneSynthesizerDialog::onDraw()
+void DetuneSynthesizerDialog::onDraw(Painter *p)
 {
-	HuiPainter *p = beginDraw("");
 	p->setLineWidth(0.8f);
 	p->setFontSize(12);
 	float w = p->width;
@@ -85,8 +84,6 @@ void DetuneSynthesizerDialog::onDraw()
 		p->drawStr(20, 20, pitch_name(hover));
 		p->drawStr(70, 20, format("%+.2f", freq_to_pitch(synth->tuning.freq[hover]) - hover));
 	}
-
-	p->end();
 }
 
 float DetuneSynthesizerDialog::pitch2x(float p)

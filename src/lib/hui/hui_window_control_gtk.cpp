@@ -515,26 +515,5 @@ void HuiPanel::redrawRect(const string &_id, int x, int y, int w, int h)
 }
 
 
-static HuiPainter hui_drawing_context;
-
-HuiPainter *HuiPanel::beginDraw(const string &_id)
-{
-	HuiControl *c = _get_control_(_id);
-	hui_drawing_context.win = win;
-	hui_drawing_context.id = _id;
-	hui_drawing_context.cr = NULL;
-	if (c){
-		hui_drawing_context.cr = gdk_cairo_create(gtk_widget_get_window(c->widget));
-		//gdk_drawable_get_size(gtk_widget_get_window(c->widget), &hui_drawing_context.width, &hui_drawing_context.height);
-		hui_drawing_context.width = gdk_window_get_width(gtk_widget_get_window(c->widget));
-		hui_drawing_context.height = gdk_window_get_height(gtk_widget_get_window(c->widget));
-		//hui_drawing_context.setFontSize(16);
-		hui_drawing_context.setFont("Sans", 16, false, false);
-		hui_drawing_context.mode_fill = true;
-	}
-	return &hui_drawing_context;
-}
-
-
 
 #endif

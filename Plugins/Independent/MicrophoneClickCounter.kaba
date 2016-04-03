@@ -31,8 +31,7 @@ void DrawVolume(Painter *c)
 	c.setColor(color(1, 0.6, 0.6, 0.6))
 	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-void Draw()
-	Painter *c = win.beginDraw("drawing")
+void Draw(Painter *c)
 	c.setColor(White)
 	c.setFontSize(12)
 	c.drawRect(0, 0, c.width, c.height)
@@ -41,7 +40,6 @@ void Draw()
 	
 	c.setColor(Black)
 	c.drawStr(100, 100, counter.str())
-	c.end()
 
 void OnClose()
 	delete input

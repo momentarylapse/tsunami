@@ -270,7 +270,7 @@ void ViewModeMidi::setBeatPartition(int partition)
 	view->forceRedraw();
 }
 
-void ViewModeMidi::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
+void ViewModeMidi::drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time)
 {
 	if (song->bars.num == 0)
 		return;
@@ -327,7 +327,7 @@ void ViewModeMidi::drawGridBars(HuiPainter *c, const rect &r, const color &bg, b
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void ViewModeMidi::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
+void ViewModeMidi::drawTrackBackground(Painter *c, AudioViewTrack *t)
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
 		ViewModeDefault::drawTrackBackground(c, t);
@@ -335,7 +335,7 @@ void ViewModeMidi::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 		drawTrackBackgroundDefault(c, t);
 }
 
-void ViewModeMidi::drawTrackBackgroundDefault(HuiPainter *c, AudioViewTrack *t)
+void ViewModeMidi::drawTrackBackgroundDefault(Painter *c, AudioViewTrack *t)
 {
 	color cc = (view->sel.has(t->track)) ? view->colors.background_track_selected : view->colors.background_track;
 	c->setColor(cc);
@@ -480,7 +480,7 @@ Selection ViewModeMidi::getHover()
 
 
 
-void ViewModeMidi::drawMidiNote(HuiPainter *c, const MidiNote &n, int state)
+void ViewModeMidi::drawMidiNote(Painter *c, const MidiNote &n, int state)
 {
 	float x1 = cam->sample2screen(n.range.offset);
 	float x2 = cam->sample2screen(n.range.end());
@@ -497,7 +497,7 @@ void ViewModeMidi::drawMidiNote(HuiPainter *c, const MidiNote &n, int state)
 	c->drawRect(rect(x1, x2, y1, y2));
 }
 
-void ViewModeMidi::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
+void ViewModeMidi::drawMidiEvent(Painter *c, const MidiEvent &e)
 {
 	float x = cam->sample2screen(e.pos);
 	float y1 = pitch2y(e.pitch + 1);
@@ -508,7 +508,7 @@ void ViewModeMidi::drawMidiEvent(HuiPainter *c, const MidiEvent &e)
 	c->drawRect(rect(x-1.5f, x+1.5f, y1, y2));
 }
 
-void ViewModeMidi::drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditable(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
 		drawMidiEditableScore(c, t, midi, as_reference, track, area);
@@ -516,7 +516,7 @@ void ViewModeMidi::drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const Midi
 		drawMidiEditableDefault(c, t, midi, as_reference, track, area);
 }
 
-void ViewModeMidi::drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	Array<MidiEvent> events = midi.getEvents(view->cam.range());
 	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
@@ -543,7 +543,7 @@ void ViewModeMidi::drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, con
 			drawMidiEvent(c, e);
 }
 
-void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
+void ViewModeMidi::drawMidiEditableScore(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
 	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
 
@@ -572,7 +572,7 @@ void ViewModeMidi::drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const
 	c->setAntialiasing(false);
 }
 
-void ViewModeMidi::drawTrackData(HuiPainter *c, AudioViewTrack *t)
+void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
 	if ((view->cur_track == t->track) and (t->track->type == Track::TYPE_MIDI)){

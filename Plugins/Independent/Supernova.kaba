@@ -168,8 +168,8 @@ class SuperNovaWindow : Window
 		c.setFontSize(24)
 		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
 
-	overwrite void onDraw()
-		c = beginDraw("drawing")
+	overwrite void onDraw(Painter *p)
+		c = p
 		c.setColor(White)
 		c.setFontSize(12)
 		w = c.width
@@ -180,7 +180,6 @@ class SuperNovaWindow : Window
 			drawConfig()
 		else if Mode == ModeLesson
 			drawLesson()
-		c.end()
 		
 	overwrite void onMouseMove()
 		if Mode != ModeConfig

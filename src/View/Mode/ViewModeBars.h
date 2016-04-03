@@ -21,7 +21,7 @@ public:
 	virtual void onLeftButtonUp();
 	virtual void onMouseMove();
 
-	virtual void drawPost(HuiPainter *c);
+	virtual void drawPost(Painter *c);
 
 	void startScaling(const Array<int> &sel);
 	void performScale();

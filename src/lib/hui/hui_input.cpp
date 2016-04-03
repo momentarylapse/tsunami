@@ -27,7 +27,7 @@ HuiCallback::HuiCallback(hui_callback *_func)
 	kaba_func = NULL;
 }
 
-HuiCallback::HuiCallback(HuiEventHandler *_object, void (HuiEventHandler::*_member_function)())
+HuiCallback::HuiCallback(HuiEventHandler *_object, MemberFuncP _member_function)
 {
 	func = NULL;
 	object = _object;
@@ -52,6 +52,20 @@ void HuiCallback::call()
 			(object->*member_function)();
 		else if (kaba_func)
 			kaba_func(object);
+	}
+}
+
+void HuiCallback::call_p(void *p)
+{
+	if (func){
+		((hui_callback_p*)func)(p);
+	}else if (object){
+		if (member_function){
+			MemberFuncPP f = (MemberFuncPP)member_function;
+			(object->*f)(p);
+		}else if (kaba_func){
+			((hui_kaba_callback_p*)kaba_func)(object, p);
+		}
 	}
 }
 

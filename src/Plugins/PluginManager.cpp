@@ -409,7 +409,7 @@ void PluginManager::LinkAppScriptData()
 	}
 
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
-	//Script::DeclareClassOffset("AudioView", "sel_range", _offsetof(AudioView, sel_range));
+	Script::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Script::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));

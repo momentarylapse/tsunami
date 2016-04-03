@@ -63,6 +63,7 @@ public:
 };
 
 typedef void hui_callback();
+typedef void hui_callback_p(void *p);
 
 
 

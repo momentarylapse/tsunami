@@ -347,16 +347,13 @@ class Grid : GridData
 	string id
 	float mx, my
 	
-	void onDrawAll()
-		Painter *c = panel.beginDraw(id)
+	void onDrawAll(Painter *c)
 		float w = c.width
 		float h = c.height
 	
 		drawBackground(c, 0, 0, w, h)
 		c.clip(plot_rect)
 		onDraw(c)
-		
-		c.end()
 	
 	void redraw()
 		panel.redraw(id)

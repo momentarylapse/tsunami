@@ -12,15 +12,19 @@
 class HuiEventHandler;
 
 typedef void hui_kaba_callback(HuiEventHandler *h);
+typedef void hui_kaba_callback_p(HuiEventHandler *h, void *p);
 
 class HuiCallback
 {
+	typedef void (HuiEventHandler::*MemberFuncP)();
+	typedef void (HuiEventHandler::*MemberFuncPP)(void *p);
 public:
 	HuiCallback();
 	HuiCallback(hui_callback *func);
-	HuiCallback(HuiEventHandler *object, void (HuiEventHandler::*member_function)());
+	HuiCallback(HuiEventHandler *object, MemberFuncP f);
 	HuiCallback(HuiEventHandler *object, hui_kaba_callback *function);
 	void call();
+	void call_p(void *p);
 	bool is_set();
 	bool has_handler(HuiEventHandler *object);
 
@@ -28,7 +32,7 @@ private:
 	hui_callback *func;
 	HuiEventHandler *object;
 	hui_kaba_callback *kaba_func;
-	void (HuiEventHandler::*member_function)();
+	MemberFuncP member_function;
 };
 
 struct HuiCommand

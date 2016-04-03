@@ -23,7 +23,7 @@ public:
 	virtual void onMouseMove();
 	virtual void onKeyDown(int k);
 
-	virtual void drawTrackData(HuiPainter *c, AudioViewTrack *t);
+	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 
 	virtual Selection getHover();
 

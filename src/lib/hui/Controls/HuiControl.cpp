@@ -343,8 +343,10 @@ void HuiControl::notify(const string &message, bool is_default)
 			WinTrySendByKeyCode(win, HuiGetEvent()->key_code);
 		}else if (message == "hui:key-up")
 			win->onKeyUp();
-		else if (message == "hui:draw")
-			win->onDraw();
+		else if (message == "hui:draw"){
+			HuiPainter p(win, id);
+			win->onDraw(&p);
+		}
 	}else if (type == HUI_KIND_MULTILINEEDIT){
 		if (message == "hui:key-down"){
 			if (((HuiControlMultilineEdit*)this)->handle_keys)

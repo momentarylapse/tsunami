@@ -166,6 +166,7 @@ OBJ = \
  lib/image/image_jpg.o\
  lib/image/image_png.o\
  lib/image/image_tga.o\
+ lib/image/ImagePainter.o\
  lib/math/complex.o\
  lib/math/interpolation.o\
  lib/math/math.o\
@@ -772,6 +773,9 @@ lib/image/image_png.o : lib/image/image_png.cpp
 
 lib/image/image_tga.o : lib/image/image_tga.cpp
 	$(CPP) -c lib/image/image_tga.cpp -o $@ $(CXXFLAGS)
+
+lib/image/ImagePainter.o : lib/image/ImagePainter.cpp
+	$(CPP) -c lib/image/ImagePainter.cpp -o $@ $(CXXFLAGS)
 
 lib/math/complex.o : lib/math/complex.cpp
 	$(CPP) -c lib/math/complex.cpp -o $@ $(CXXFLAGS)

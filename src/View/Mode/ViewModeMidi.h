@@ -30,16 +30,16 @@ public:
 	virtual void updateTrackHeights();
 	virtual void onCurTrackChange();
 
-	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time);
-	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t);
-	void drawTrackBackgroundDefault(HuiPainter *c, AudioViewTrack *t);
-	virtual void drawTrackData(HuiPainter *c, AudioViewTrack *t);
+	virtual void drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time);
+	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
+	void drawTrackBackgroundDefault(Painter *c, AudioViewTrack *t);
+	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 
-	void drawMidiNote(HuiPainter *c, const MidiNote &n, int state);
-	void drawMidiEvent(HuiPainter *c, const MidiEvent &e);
-	void drawMidiEditable(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
-	void drawMidiEditableDefault(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
-	void drawMidiEditableScore(HuiPainter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiNote(Painter *c, const MidiNote &n, int state);
+	void drawMidiEvent(Painter *c, const MidiEvent &e);
+	void drawMidiEditable(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
+	void drawMidiEditableScore(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area);
 
 	virtual Selection getHover();
 

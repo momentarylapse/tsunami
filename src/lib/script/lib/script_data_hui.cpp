@@ -343,8 +343,8 @@ void SIAddPackageHui()
 				func_add_param("msg",			TypeString);
 				func_add_param("handler",		TypePointer);
 				func_add_param("func",			TypePointer);
-			class_add_func("beginDraw",								TypeHuiPainterP,		mf(&HuiPanel::beginDraw));
-				func_add_param("id",		TypeString);
+			//class_add_func("beginDraw",								TypeHuiPainterP,		mf(&HuiPanel::beginDraw));
+			//	func_add_param("id",		TypeString);
 			class_set_vtable(HuiPanel);
 
 
@@ -406,6 +406,7 @@ void SIAddPackageHui()
 		class_add_func_virtual("onKeyDown", TypeVoid, mf(&HuiWindow::onKeyDown));
 		class_add_func_virtual("onKeyUp", TypeVoid, mf(&HuiWindow::onKeyUp));
 		class_add_func_virtual("onDraw", TypeVoid, mf(&HuiWindow::onDraw));
+			func_add_param("p", TypeHuiPainterP);
 		class_set_vtable(HuiWindow);
 
 	add_class(TypeHuiNixWindow);
@@ -447,7 +448,7 @@ void SIAddPackageHui()
 	add_class(TypeHuiPainter);
 		class_add_element("width",		TypeInt,	GetDAPainter(width));
 		class_add_element("height",		TypeInt,	GetDAPainter(height));
-		class_add_func_virtual("end",								TypeVoid,		mf(&HuiPainter::end));
+		//class_add_func_virtual("end",								TypeVoid,		mf(&HuiPainter::end));
 		class_add_func_virtual("setColor",								TypeVoid,		mf(&HuiPainter::setColor));
 			func_add_param("c",			TypeColor);
 		class_add_func_virtual("setLineWidth",								TypeVoid,		mf(&HuiPainter::setLineWidth));

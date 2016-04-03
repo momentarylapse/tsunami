@@ -39,8 +39,7 @@ void DrawVolume(Painter *c)
 	c.setColor(color(1, 0.6, 0.6, 0.6))
 	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-void Draw()
-	Painter *c = win.beginDraw("drawing")
+void Draw(Painter *c)
 	c.setColor(White)
 	c.setFontSize(12)
 	c.drawRect(0, 0, c.width, c.height)
@@ -67,7 +66,6 @@ void Draw()
 		c.drawLine(x, y, x + r * sin(Error * pi), y - r * cos(Error * pi))
 	else
 		c.drawStr(x - 30, y - 20, "zu leise")
-	c.end()
 
 void OnClose()
 	delete input

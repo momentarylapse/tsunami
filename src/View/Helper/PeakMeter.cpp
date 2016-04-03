@@ -109,7 +109,7 @@ inline float nice_peak(float p)
 	return min(pow(p, 0.8f), 1);
 }
 
-void PeakMeter::drawPeak(HuiPainter *c, const rect &r, Data &d)
+void PeakMeter::drawPeak(Painter *c, const rect &r, Data &d)
 {
 	msg_db_f("PeakMeter.drawPeak", 1);
 	int w = r.width();
@@ -132,10 +132,9 @@ void PeakMeter::drawPeak(HuiPainter *c, const rect &r, Data &d)
 		c->drawRect(w * nice_peak(sp), r.y1, 2, h);
 }
 
-void PeakMeter::onDraw()
+void PeakMeter::onDraw(Painter *c)
 {
 	msg_db_f("PeakMeter.onDraw", 1);
-	HuiPainter *c = panel->beginDraw(id);
 	int w = c->width;
 	int h = c->height;
 	if (mode == ModePeaks){
@@ -153,8 +152,6 @@ void PeakMeter::onDraw()
 			c->drawRect(x0, h - 2 - hh, dx, hh);
 		}
 	}
-
-	c->end();
 }
 
 void PeakMeter::findPeaks()

@@ -7,27 +7,49 @@
 
 #include "hui.h"
 #include "HuiPainter.h"
+#include "Controls/HuiControl.h"
+#include "Controls/HuiControlDrawingArea.h"
 #include "../math/math.h"
 
 #ifdef HUI_API_GTK
 
 HuiPainter::HuiPainter()
 {
+	win = NULL;
+	cr = NULL;
 	width = 0;
 	height = 0;
+	mode_fill = true;
+}
+
+HuiPainter::HuiPainter(HuiPanel *panel, const string &_id)
+{
+	win = panel->win;
+	id = _id;
 	cr = NULL;
+	width = 0;
+	height = 0;
+	mode_fill = true;
+	HuiControl *c = panel->_get_control_(id);
+	if (c){
+		cr = (cairo_t*)((HuiControlDrawingArea*)c)->cur_cairo;
+//		cr = gdk_cairo_create(gtk_widget_get_window(c->widget));
+
+		//gdk_drawable_get_size(gtk_widget_get_window(c->widget), &hui_drawing_context.width, &hui_drawing_context.height);
+		width = gdk_window_get_width(gtk_widget_get_window(c->widget));
+		height = gdk_window_get_height(gtk_widget_get_window(c->widget));
+		//hui_drawing_context.setFontSize(16);
+		setFont("Sans", 16, false, false);
+	}
 }
 
 HuiPainter::~HuiPainter()
 {
-}
-
-void HuiPainter::end()
-{
 	if (!cr)
 		return;
 
-	cairo_destroy(cr);
+//	cairo_destroy(cr);
+	cr = NULL;
 }
 
 void HuiPainter::setColor(const color &c)
@@ -44,13 +66,13 @@ void HuiPainter::setLineWidth(float w)
 	cairo_set_line_width(cr, w);
 }
 
-void HuiPainter::setLineDash(Array<float> &dash, float offset)
+void HuiPainter::setLineDash(const Array<float> &dash, float offset)
 {
 	if (!cr)
 		return;
 	Array<double> d;
-	foreach(float f, dash)
-		d.add(f);
+	for (int i=0; i<dash.num; i++)
+		d.add(dash[i]);
 	cairo_set_dash(cr, (double*)d.data, d.num, offset);
 }
 
@@ -98,7 +120,7 @@ void HuiPainter::drawLine(float x1, float y1, float x2, float y2)
 	cairo_stroke(cr);
 }
 
-void HuiPainter::drawLines(Array<complex> &p)
+void HuiPainter::drawLines(const Array<complex> &p)
 {
 	if (!cr)
 		return;
@@ -112,7 +134,7 @@ void HuiPainter::drawLines(Array<complex> &p)
 	cairo_stroke(cr);
 }
 
-void HuiPainter::drawPolygon(Array<complex> &p)
+void HuiPainter::drawPolygon(const Array<complex> &p)
 {
 	if (!cr)
 		return;

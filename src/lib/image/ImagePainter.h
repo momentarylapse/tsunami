@@ -1,38 +1,27 @@
 /*
- * HuiPainter.h
+ * ImagePainter.h
  *
- *  Created on: 25.06.2013
+ *  Created on: 02.04.2016
  *      Author: michi
  */
 
-#ifndef HUIPAINTER_H_
-#define HUIPAINTER_H_
+#ifndef SRC_LIB_IMAGE_IMAGEPAINTER_H_
+#define SRC_LIB_IMAGE_IMAGEPAINTER_H_
 
-#include "../image/Painter.h"
+#include "Painter.h"
+#include "color.h"
+#include "../math/rect.h"
 
-class HuiWindow;
-class complex;
-class rect;
 
-class HuiPainter : public Painter
+class ImagePainter : public Painter
 {
-	public:
-#ifdef HUI_API_GTK
-	cairo_t *cr;
-#endif
-	HuiWindow *win;
-	string id;
-	int cur_font_size;
-	string cur_font;
-	bool cur_font_bold, cur_font_italic;
-	bool mode_fill;
+public:
+	ImagePainter(Image *image);
+	virtual ~ImagePainter();
 
-	HuiPainter();
-	HuiPainter(HuiPanel *panel, const string &id);
-	virtual ~HuiPainter();
+	Image *image;
 
-	color _cdecl getThemeColor(int i);
-
+	virtual void _cdecl end();
 	virtual void _cdecl setColor(const color &c);
 	virtual void _cdecl setFont(const string &font, float size, bool bold, bool italic);
 	virtual void _cdecl setFontSize(float size);
@@ -52,6 +41,14 @@ class HuiPainter : public Painter
 	virtual float _cdecl getStrWidth(const string &str);
 	virtual void _cdecl drawImage(float x, float y, const Image &image);
 	virtual void _cdecl drawMaskImage(float x, float y, const Image &image);
+
+	color _color;
+	rect _clip;
+	Array<float> dash;
+	float dash_offset;
+	float line_width;
+	bool anti_aliasing;
+	bool fill;
 };
 
-#endif /* HUIPAINTER_H_ */
+#endif /* SRC_LIB_IMAGE_IMAGEPAINTER_H_ */

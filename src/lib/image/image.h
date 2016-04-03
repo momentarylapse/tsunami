@@ -15,6 +15,8 @@
 
 extern string ImageVersion;
 
+class ImagePainter;
+
 class Image
 {
 	public:
@@ -48,6 +50,7 @@ class Image
 	void _cdecl flipV();
 	void _cdecl setMode(int mode) const;
 	void _cdecl setPixel(int x, int y, const color &c);
+	void _cdecl drawPixel(int x, int y, const color &c);
 	color _cdecl getPixel(int x, int y) const;
 	color _cdecl getPixelInterpolated(float x, float y) const;
 };

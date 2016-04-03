@@ -33,7 +33,7 @@ public:
 	PeakMeter(HuiPanel *panel, const string &id, PeakMeterSource *source);
 	virtual ~PeakMeter();
 
-	void onDraw();
+	void onDraw(Painter *p);
 	void onLeftButtonDown();
 	void onRightButtonDown();
 	void setMode(int mode);
@@ -72,7 +72,7 @@ private:
 	};
 	Data r, l;
 
-	void drawPeak(HuiPainter *c, const rect &r, Data &d);
+	void drawPeak(Painter *c, const rect &r, Data &d);
 
 	float sample_rate;
 	BufferBox buf;

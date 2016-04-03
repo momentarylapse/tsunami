@@ -238,7 +238,7 @@ void ViewModeDefault::updateTrackHeights()
 
 
 
-void ViewModeDefault::drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time)
+void ViewModeDefault::drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time)
 {
 	if (song->bars.num == 0)
 		return;
@@ -307,7 +307,7 @@ void ViewModeDefault::drawGridBars(HuiPainter *c, const rect &r, const color &bg
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void ViewModeDefault::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
+void ViewModeDefault::drawTrackBackground(Painter *c, AudioViewTrack *t)
 {
 	color cc = (view->sel.has(t->track)) ? view->colors.background_track_selected : view->colors.background_track;
 	c->setColor(cc);
@@ -317,7 +317,7 @@ void ViewModeDefault::drawTrackBackground(HuiPainter *c, AudioViewTrack *t)
 	drawGridBars(c, t->area, cc, (t->track->type == Track::TYPE_TIME));
 }
 
-void ViewModeDefault::drawTrackData(HuiPainter *c, AudioViewTrack *t)
+void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
 	if ((t->track->type == Track::TYPE_MIDI) or (t->track->midi.num > 0))

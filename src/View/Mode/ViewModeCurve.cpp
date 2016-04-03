@@ -28,7 +28,7 @@ void ViewModeCurve::onLeftButtonDown()
 	ViewModeDefault::onLeftButtonDown();
 
 
-	if ((curve) && (selection->type == Selection::TYPE_TRACK)){
+	if ((curve) and (selection->type == Selection::TYPE_TRACK)){
 		curve->add(cam->screen2sample(view->mx), screen2value(view->my));
 		view->forceRedraw();
 	}
@@ -44,7 +44,7 @@ void ViewModeCurve::onMouseMove()
 	ViewModeDefault::onMouseMove();
 
 	if (HuiGetEvent()->lbut){
-		if ((curve) && (selection->type == Selection::TYPE_CURVE_POINT)){
+		if ((curve) and (selection->type == Selection::TYPE_CURVE_POINT)){
 			curve->points[selection->index].pos = cam->screen2sample(view->mx);
 			curve->points[selection->index].value = clampf(screen2value(view->my), curve->min, curve->max);
 			view->forceRedraw();
@@ -56,7 +56,7 @@ void ViewModeCurve::onKeyDown(int k)
 {
 	ViewModeDefault::onKeyDown(k);
 
-	if ((curve) && (selection->type == Selection::TYPE_CURVE_POINT))
+	if ((curve) and (selection->type == Selection::TYPE_CURVE_POINT))
 		if (k == KEY_DELETE){
 			curve->points.erase(selection->index);
 			selection->clear();
@@ -65,7 +65,7 @@ void ViewModeCurve::onKeyDown(int k)
 		}
 }
 
-void ViewModeCurve::drawTrackData(HuiPainter* c, AudioViewTrack* t)
+void ViewModeCurve::drawTrackData(Painter* c, AudioViewTrack* t)
 {
 	ViewModeDefault::drawTrackData(c, t);
 
@@ -176,7 +176,7 @@ Selection ViewModeCurve::getHover()
 		foreachi(Curve::Point &p, curve->points, i){
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
-			if ((fabs(mx - x) < 10) && (fabs(my - y) < 10)){
+			if ((fabs(mx - x) < 10) and (fabs(my - y) < 10)){
 				s.type = Selection::TYPE_CURVE_POINT;
 				s.index = i;
 				return s;

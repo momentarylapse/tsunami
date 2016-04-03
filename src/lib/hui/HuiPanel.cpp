@@ -196,7 +196,13 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 
 		// send the event
 		if (ee.function.is_set()){
-			ee.function.call();
+
+			if (e->message == "hui:draw"){
+				HuiPainter p(win, e->id);
+				ee.function.call_p(&p);
+			}else{
+				ee.function.call();
+			}
 			sent = true;
 		}
 

@@ -39,7 +39,7 @@ const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
 static Array<complex> tt;
 
-inline void draw_line_buffer(HuiPainter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
+inline void draw_line_buffer(Painter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
 {
 	int nl = 0;
 	int i0 = max((double) x          / zoom + view_pos - offset    , 0);
@@ -61,7 +61,7 @@ inline void draw_line_buffer(HuiPainter *c, int width, double view_pos, double z
 	c->drawLines(tt);
 }
 
-inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
+inline void draw_peak_buffer(Painter *c, int width, int di, double view_pos_rel, double zoom, float f, float hf, float x, float y0, const string &buf, int offset)
 {
 	int nl = 0;
 	double dpos = 1.0 / zoom;
@@ -91,7 +91,7 @@ inline void draw_peak_buffer(HuiPainter *c, int width, int di, double view_pos_r
 	c->drawPolygon(tt);
 }
 
-void AudioViewTrack::drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col)
+void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col)
 {
 	msg_db_f("DrawBuffer", 1);
 
@@ -156,7 +156,7 @@ void AudioViewTrack::drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel
 	}
 }
 
-void AudioViewTrack::drawTrackBuffers(HuiPainter *c, double view_pos_rel)
+void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 {
 	msg_db_f("DrawTrackBuffers", 1);
 
@@ -173,7 +173,7 @@ void AudioViewTrack::drawTrackBuffers(HuiPainter *c, double view_pos_rel)
 		drawBuffer(c, b, view_pos_rel, view->colors.text);
 }
 
-void AudioViewTrack::drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay)
+void AudioViewTrack::drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay)
 {
 	// frame
 	Range rr = s->getRange() + delay;
@@ -197,7 +197,7 @@ void AudioViewTrack::drawSampleFrame(HuiPainter *c, SampleRef *s, const color &c
 	c->drawLine(asx, area.y2, aex, area.y2);
 }
 
-void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
+void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 {
 	color col = view->colors.sample;
 	//bool is_cur = ((s == cur_sub) and (t->IsSelected));
@@ -224,7 +224,7 @@ void AudioViewTrack::drawSample(HuiPainter *c, SampleRef *s)
 		c->drawStr(asx, area.y2 - view->SAMPLE_FRAME_HEIGHT, s->origin->name);
 }
 
-void AudioViewTrack::drawMarker(HuiPainter *c, const TrackMarker &marker, int index, bool hover)
+void AudioViewTrack::drawMarker(Painter *c, const TrackMarker &marker, int index, bool hover)
 {
 	float w = c->getStrWidth(marker.text);
 	int x = view->cam.sample2screen(marker.pos);
@@ -241,7 +241,7 @@ void AudioViewTrack::drawMarker(HuiPainter *c, const TrackMarker &marker, int in
 }
 
 
-void AudioViewTrack::drawMidi(HuiPainter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidi(Painter *c, const MidiData &midi, int shift)
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
 		drawMidiDefault(c, midi, shift);
@@ -251,7 +251,7 @@ void AudioViewTrack::drawMidi(HuiPainter *c, const MidiData &midi, int shift)
 		drawMidiScore(c, midi, shift);
 }
 
-void AudioViewTrack::drawMidiDefault(HuiPainter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
@@ -268,7 +268,7 @@ void AudioViewTrack::drawMidiDefault(HuiPainter *c, const MidiData &midi, int sh
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void AudioViewTrack::drawMidiTab(HuiPainter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
@@ -339,7 +339,7 @@ int AudioViewTrack::screen_to_clef_pos(float y)
 	return (int)floor((area.y2 - y - area.height() / 2) * 2.0f / clef_dy + 0.5f) + 4;
 }
 
-void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef)
+void AudioViewTrack::drawMidiNoteScore(Painter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef)
 {
 	float r = clef_dy/2;
 
@@ -391,7 +391,7 @@ void AudioViewTrack::drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shi
 		c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
 }
 
-void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, const Clef &clef, const Scale &scale)
+void AudioViewTrack::drawMidiScoreClef(Painter *c, const Clef &clef, const Scale &scale)
 {
 	// clef lines
 	float dy = min(area.height() / 13, 30);
@@ -413,7 +413,7 @@ void AudioViewTrack::drawMidiScoreClef(HuiPainter *c, const Clef &clef, const Sc
 	c->setFontSize(view->FONT_SIZE);
 }
 
-void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidiScore(Painter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
@@ -432,14 +432,14 @@ void AudioViewTrack::drawMidiScore(HuiPainter *c, const MidiData &midi, int shif
 	c->setAntialiasing(false);
 }
 
-void AudioViewTrack::draw(HuiPainter *c)
+void AudioViewTrack::draw(Painter *c)
 {
 	view->mode->drawTrackData(c, this);
 
 	drawHeader(c);
 }
 
-void AudioViewTrack::drawHeader(HuiPainter *c)
+void AudioViewTrack::drawHeader(Painter *c)
 {
 	if (view->hover.show_track_controls == track){
 		c->setColor(color(0.4f, 1, 1, 1));

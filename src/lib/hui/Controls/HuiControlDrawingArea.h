@@ -17,6 +17,8 @@ public:
 	HuiControlDrawingArea(const string &text, const string &id);
 
 	void hardReset();
+
+	void *cur_cairo;
 };
 
 #endif /* HUICONTROLDRAWINGAREA_H_ */

@@ -16,7 +16,7 @@ class HuiMenu;
 class HuiEvent;
 class HuiControl;
 class HuiWindow;
-class HuiPainter;
+class Painter;
 class HuiToolbar;
 class rect;
 class HuiResourceNew;
@@ -127,7 +127,7 @@ public:
 	virtual void _cdecl onCloseRequest();
 	virtual void _cdecl onKeyDown(){}
 	virtual void _cdecl onKeyUp(){}
-	virtual void _cdecl onDraw(){}
+	virtual void _cdecl onDraw(Painter *p){}
 
 	// input
 	bool _cdecl getKey(int key);

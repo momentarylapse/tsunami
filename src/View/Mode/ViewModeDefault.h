@@ -29,9 +29,9 @@ public:
 	virtual void onKeyUp(int k);
 	virtual void updateTrackHeights();
 
-	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time);
-	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t);
-	virtual void drawTrackData(HuiPainter *c, AudioViewTrack *t);
+	virtual void drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time);
+	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t);
+	virtual void drawTrackData(Painter *c, AudioViewTrack *t);
 
 	void selectUnderMouse();
 	void setCursorPos(int pos);

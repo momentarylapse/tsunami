@@ -11,7 +11,7 @@
 #include "../lib/math/math.h"
 
 class Track;
-class HuiPainter;
+class Painter;
 class AudioView;
 class BufferBox;
 class SampleRef;
@@ -41,19 +41,19 @@ public:
 	};
 
 
-	void drawTrackBuffers(HuiPainter *c, double pos);
-	void drawBuffer(HuiPainter *c, BufferBox &b, double view_pos_rel, const color &col);
-	void drawSampleFrame(HuiPainter *c, SampleRef *s, const color &col, int delay);
-	void drawSample(HuiPainter *c, SampleRef *s);
-	void drawMarker(HuiPainter *c, const TrackMarker &marker, int index, bool hover);
-	void drawMidi(HuiPainter *c, const MidiData &midi, int shift);
-	void drawMidiDefault(HuiPainter *c, const MidiData &midi, int shift);
-	void drawMidiTab(HuiPainter *c, const MidiData &midi, int shift);
-	void drawMidiScore(HuiPainter *c, const MidiData &midi, int shift);
-	void drawMidiScoreClef(HuiPainter *c, const Clef &clef, const Scale &scale);
-	void drawMidiNoteScore(HuiPainter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef);
-	void drawHeader(HuiPainter *c);
-	void draw(HuiPainter *c);
+	void drawTrackBuffers(Painter *c, double pos);
+	void drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col);
+	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
+	void drawSample(Painter *c, SampleRef *s);
+	void drawMarker(Painter *c, const TrackMarker &marker, int index, bool hover);
+	void drawMidi(Painter *c, const MidiData &midi, int shift);
+	void drawMidiDefault(Painter *c, const MidiData &midi, int shift);
+	void drawMidiTab(Painter *c, const MidiData &midi, int shift);
+	void drawMidiScore(Painter *c, const MidiData &midi, int shift);
+	void drawMidiScoreClef(Painter *c, const Clef &clef, const Scale &scale);
+	void drawMidiNoteScore(Painter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef);
+	void drawHeader(Painter *c);
+	void draw(Painter *c);
 
 	Track *track;
 	rect area;

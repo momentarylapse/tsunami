@@ -31,7 +31,7 @@ class ViewModeBars;
 class ViewModeCurve;
 class ViewModeCapture;
 
-class AudioView : public Observer, public Observable
+class AudioView : public Observable, public Observer
 {
 public:
 	AudioView(TsunamiWindow *parent, Song *audio, AudioOutput *output);
@@ -40,7 +40,7 @@ public:
 	void checkConsistency();
 	void forceRedraw();
 
-	void onDraw();
+	void onDraw(Painter *p);
 	void onMouseMove();
 	void onLeftButtonDown();
 	void onLeftButtonUp();
@@ -70,11 +70,11 @@ public:
 	void zoomIn();
 	void zoomOut();
 
-	void drawGridTime(HuiPainter *c, const rect &r, const color &bg, bool show_time = false);
-	void drawTimeLine(HuiPainter *c, int pos, int type, color &col, bool show_time = false);
-	void drawSelection(HuiPainter *c, const rect &r);
-	void drawBackground(HuiPainter *c, const rect &r);
-	void drawAudioFile(HuiPainter *c, const rect &r);
+	void drawGridTime(Painter *c, const rect &r, const color &bg, bool show_time = false);
+	void drawTimeLine(Painter *c, int pos, int type, color &col, bool show_time = false);
+	void drawSelection(Painter *c, const rect &r);
+	void drawBackground(Painter *c, const rect &r);
+	void drawAudioFile(Painter *c, const rect &r);
 
 	void optimizeView();
 	void updateMenu();

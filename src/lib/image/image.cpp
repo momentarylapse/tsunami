@@ -7,8 +7,10 @@
 #include "image_jpg.h"
 #include "image_png.h"
 
+#include "ImagePainter.h"
 
-string ImageVersion = "0.2.4.1";
+
+string ImageVersion = "0.2.5.0";
 
 Image::Image()
 {
@@ -225,6 +227,17 @@ void Image::setPixel(int x, int y, const color &c)
 	}
 }
 
+void Image::drawPixel(int x, int y, const color &c)
+{
+	if (c.a >= 1){
+		setPixel(x, y, c);
+	}else if (c.a <= 0){
+	}else{
+		color c0 = getPixel(x, y);
+		setPixel(x, y, ColorInterpolate(c0, c, c.a));
+	}
+}
+
 color Image::getPixel(int x, int y) const
 {
 	if ((x >= 0) and (x < width) and (y >= 0) and (y < height)){
@@ -267,3 +280,4 @@ Image *LoadImage(const string &filename)
 	delete(im);
 	return NULL;
 }
+

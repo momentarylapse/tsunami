@@ -48,6 +48,7 @@ public:
 	void _cdecl eventSX(const string &id, const string &msg, hui_callback *function);
 	void _cdecl _event(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)());
 	void _cdecl _eventX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)());
+	void _cdecl _eventXP(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)(void *p));
 	template<typename T>
 	void _cdecl event(const string &id, HuiEventHandler* handler, T fun)
 	{	_event(id, handler, (void(HuiEventHandler::*)())fun);	}
@@ -143,7 +144,6 @@ public:
 	// drawing
 	void _cdecl redraw(const string &id);
 	void _cdecl redrawRect(const string &_id, int x, int y, int w, int h);
-	HuiPainter* _cdecl beginDraw(const string &id);
 	HuiControl *_get_control_(const string &id);
 #ifdef HUI_API_GTK
 	HuiControl *_get_control_by_widget_(GtkWidget *widget);

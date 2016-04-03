@@ -41,8 +41,7 @@ void DrawVolume(Painter *c)
 	c.setColor(color(1, 0.6, 0.6, 0.6))
 	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-void Draw()
-	Painter *c = win.beginDraw("drawing")
+void Draw(Painter *c)
 	c.setColor(White)
 	c.setFontSize(12)
 	int w = c.width
@@ -66,7 +65,6 @@ void Draw()
 		c.drawStr(120, 20, rel_pitch_name(played[played.num - 1] % 12))
 	else
 		c.drawStr(w / 2 - 30, h / 2 - 20, "zu leise")
-	c.end()
 
 void OnClose()
 	delete win

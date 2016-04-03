@@ -19,7 +19,7 @@ public:
 	DetuneSynthesizerDialog(Synthesizer *s, Track *t, HuiWindow *parent);
 	virtual ~DetuneSynthesizerDialog();
 
-	virtual void onDraw();
+	virtual void onDraw(Painter *p);
 	virtual void onLeftButtonDown();
 	virtual void onLeftButtonUp();
 	virtual void onMouseMove();

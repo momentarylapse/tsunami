@@ -15,7 +15,7 @@ class Track;
 class ViewPort;
 class TsunamiWindow;
 class Song;
-class HuiPainter;
+class Painter;
 class rect;
 class color;
 
@@ -39,10 +39,10 @@ public:
 
 	virtual Selection getHover();
 
-	virtual void drawGridBars(HuiPainter *c, const rect &r, const color &bg, bool show_time = false){}
-	virtual void drawTrackBackground(HuiPainter *c, AudioViewTrack *t){}
-	virtual void drawTrackData(HuiPainter *c, AudioViewTrack *t){}
-	virtual void drawPost(HuiPainter *c){}
+	virtual void drawGridBars(Painter *c, const rect &r, const color &bg, bool show_time = false){}
+	virtual void drawTrackBackground(Painter *c, AudioViewTrack *t){}
+	virtual void drawTrackData(Painter *c, AudioViewTrack *t){}
+	virtual void drawPost(Painter *c){}
 
 	AudioView *view;
 	ViewPort *cam;

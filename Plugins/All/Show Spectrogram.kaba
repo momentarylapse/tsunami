@@ -55,7 +55,7 @@ Grid ? '' 1 2
 		Button close 'Close' width=120 image=hui:close")
 		
 		grid.init(self, "drawing_area")
-		grid.x_axis.set(view.sel_range.offset / i2f(song.sample_rate), view.sel_range.end() / i2f(song.sample_rate), false, "s")
+		grid.x_axis.set(view.sel.range.offset / i2f(song.sample_rate), view.sel.range.end() / i2f(song.sample_rate), false, "s")
 		grid.y_axis.set(MIN_FREQ, MAX_FREQ, true, "Hz")
 		//grid.allow_bg = false
 	
@@ -76,8 +76,8 @@ void show_spec()
 	dlg = new SpectrumDialog
 	
 	BufferBox buf
-	SongRenderer* renderer = new SongRenderer(song)
-	renderer.render(view.sel_range, buf)
+	SongRenderer* renderer = new SongRenderer(song, &view.sel)
+	renderer.render(view.sel.range, buf)
 	delete renderer
 	
 	complex[] f
@@ -123,7 +123,7 @@ void show_spec()
 
 void main()
 	
-	if view.sel_range.length > 0
+	if view.sel.range.length > 0
 		show_spec()
 	else
 		logging.error("'Show Spectrogram.kaba': Needs some selection!")

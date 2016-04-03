@@ -17,6 +17,7 @@ int GtkAreaMouseSetX, GtkAreaMouseSetY;
 
 gboolean OnGtkAreaDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
+	((HuiControlDrawingArea*)user_data)->cur_cairo = cr;
 	((HuiControl*)user_data)->notify("hui:draw");
 	return false;
 }
@@ -236,6 +237,8 @@ HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
 	setOptions(OptionString);
+
+	cur_cairo = NULL;
 }
 
 void HuiControlDrawingArea::hardReset()

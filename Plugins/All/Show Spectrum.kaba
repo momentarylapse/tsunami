@@ -126,7 +126,7 @@ void show_spec()
 		ffl.add(bmaxl)
 
 	peak_max = max(ffr.max(), ffl.max())
-	float mmax = sqr(buf.num) / 4
+	float mmax = sqr(buf.length) / 4
 	if mmax > 0
 		ffr /= mmax
 		ffl /= mmax

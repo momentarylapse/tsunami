@@ -46,7 +46,7 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 			od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
 		od->set(float(done) / (float)samples);
 		f->WriteBuffer(data.data, data.num);
-		done += buf.num;
+		done += buf.length;
 	}
 
 	FileClose(f);

@@ -285,7 +285,7 @@ void ViewModeMidi::drawGridBars(Painter *c, const rect &r, const color &bg, bool
 	foreach(Bar &b, bars){
 		int xx = cam->sample2screen(b.range.offset);
 
-		float dx_bar = cam->dsample2screen(b.range.num);
+		float dx_bar = cam->dsample2screen(b.range.length);
 		float dx_beat = dx_bar / b.num_beats;
 		float f1 = min(1.0f, dx_bar / 40.0f);
 		if ((b.index % 5) == 0)
@@ -300,7 +300,7 @@ void ViewModeMidi::drawGridBars(Painter *c, const rect &r, const color &bg, bool
 
 		if (f2 >= 0.1f){
 			color c1 = ColorInterpolate(bg, view->colors.text_soft1, f2);
-			float beat_length = (float)b.range.num / (float)b.num_beats;
+			float beat_length = (float)b.range.length / (float)b.num_beats;
 			c->setLineDash(dash, r.y1);
 			for (int i=0; i<b.num_beats; i++){
 				float beat_offset = b.range.offset + (float)i * beat_length;

@@ -26,7 +26,7 @@ void *ActionTrack__GrowBufferBox::execute(Data *d)
 	Track *t = a->get_track(track_no);
 
 	BufferBox &b = t->levels[level_no].buffers[index];
-	old_length = b.num;
+	old_length = b.length;
 	b.resize(new_length);
 
 	return NULL;

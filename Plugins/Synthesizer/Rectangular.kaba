@@ -17,7 +17,7 @@ class RectangularSynthesizer : Synthesizer
 	RectangularState state
 
 	overwrite void render(BufferBox buf)
-		for i in 0:buf.num
+		for i in 0:buf.length
 			for e in events
 				if e.pos == i
 					int pp = e.pitch

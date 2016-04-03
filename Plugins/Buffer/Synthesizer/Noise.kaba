@@ -3,7 +3,7 @@ use "../../api.kaba"
 
 class Noise : AudioEffect
 	overwrite void process(BufferBox buf)
-		for i in 0:buf.num
+		for i in 0:buf.length
 			buf.r[i] = rand(2.0) - 1.0
 			buf.l[i] = rand(2.0) - 1.0
 

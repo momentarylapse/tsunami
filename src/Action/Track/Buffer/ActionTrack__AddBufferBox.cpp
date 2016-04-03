@@ -17,10 +17,6 @@ ActionTrack__AddBufferBox::ActionTrack__AddBufferBox(Track *t, int _level_no, in
 	level_no = _level_no;
 }
 
-ActionTrack__AddBufferBox::~ActionTrack__AddBufferBox()
-{
-}
-
 void ActionTrack__AddBufferBox::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
@@ -44,7 +40,7 @@ void *ActionTrack__AddBufferBox::execute(Data *d)
 	// reserve memory
 	BufferBox &b = t->levels[level_no].buffers[index];
 	b.offset = range.start();
-	b.resize(range.length());
+	b.resize(range.length);
 	return &b;
 }
 

@@ -295,7 +295,7 @@ void AudioView::selectionUpdatePos(Selection &s)
 void AudioView::updateSelection()
 {
 	sel.range = sel_raw;
-	if (sel.range.num < 0)
+	if (sel.range.length < 0)
 		sel.range.invert();
 
 
@@ -352,11 +352,11 @@ void align_to_beats(Song *s, Range &r, int beat_partition)
 				r = r or sr;
 		}*/
 		if (b.range.is_inside(r.start())){
-			int dl = b.range.num / beat_partition;
+			int dl = b.range.length / beat_partition;
 			r.set_start(b.range.offset + dl * ((r.start() - b.range.offset) / dl));
 		}
 		if (b.range.is_inside(r.end())){
-			int dl = b.range.num / beat_partition;
+			int dl = b.range.length / beat_partition;
 			r.set_end(b.range.offset + dl * ((r.end() - b.range.offset) / dl + 1));
 			break;
 		}
@@ -733,8 +733,8 @@ void AudioView::optimizeView()
 
 	Range r = song->getRangeWithTime();
 
-	if (r.num == 0)
-		r.num = 10 * song->sample_rate;
+	if (r.length == 0)
+		r.length = 10 * song->sample_rate;
 
 	cam.show(r);
 }

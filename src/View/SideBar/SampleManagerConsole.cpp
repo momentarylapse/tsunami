@@ -27,10 +27,10 @@ void render_bufbox(Image &im, BufferBox &b)
 	int h = im.height;
 	for (int x=0; x<w; x++){
 		float m = 0;
-		int i0 = (b.num * x) / w;
-		int i1 = (b.num * (x + 1)) / w;
+		int i0 = (b.length * x) / w;
+		int i1 = (b.length * (x + 1)) / w;
 		for (int i=i0; i<i1; i++)
-			m = max(m, fabs(b.r[i]));
+			m = max(m, fabs(b.c[0][i]));
 		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
 			im.setPixel(x, y, tsunami->_view->colors.text);
 	}
@@ -44,8 +44,8 @@ void render_midi(Image &im, MidiData &m)
 	MidiDataRef notes = m.getNotes(r);
 	foreach(MidiNote &n, notes){
 		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
-		float x0 = w * clampf((float)n.range.offset / (float)r.num, 0, 1);
-		float x1 = w * clampf((float)n.range.end() / (float)r.num, 0, 1);
+		float x0 = w * clampf((float)n.range.offset / (float)r.length, 0, 1);
+		float x1 = w * clampf((float)n.range.end() / (float)r.length, 0, 1);
 		color c = AudioViewTrack::getPitchColor(n.pitch);
 		for (int x=x0; x<=x1; x++)
 			im.setPixel(x, y, c);
@@ -100,7 +100,7 @@ public:
 
 	string str()
 	{
-		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->getRange().num) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete);
+		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->getRange().length) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete);
 	}
 	string icon;
 	Sample *s;
@@ -292,7 +292,7 @@ void SampleManagerConsole::onUpdate(Observable *o, const string &message)
 	}else if (o == preview_stream){
 		int pos = preview_stream->getPos();
 		Range r = preview_sample->getRange();
-		progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
+		progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length);
 		if (!preview_stream->isPlaying())
 			endPreview();
 	}else if (o == song){
@@ -350,7 +350,7 @@ public:
 		setInt(list_id, 0);
 		foreachi(Sample *s, song->samples, i){
 			icon_names.add(render_sample(s));
-			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + song->get_time_str_long(s->buf.num));
+			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + song->get_time_str_long(s->buf.length));
 			if (s == old)
 				setInt(list_id, i + 1);
 		}

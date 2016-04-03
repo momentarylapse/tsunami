@@ -35,7 +35,7 @@ class LowPassFilter : AudioEffect
 			prev_in_l = tl
 
 	
-		for i in 1:buf.num
+		for i in 1:buf.length
 			float tr = buf.r[i]
 			float tl = buf.l[i]
 			buf.r[i] = a * (buf.r[i] + buf.r[i-1] - prev_in_r)
@@ -46,5 +46,5 @@ class LowPassFilter : AudioEffect
 		state.used = true
 		state.in_r = prev_in_r
 		state.in_l = prev_in_l
-		state.out_r = buf.r[buf.num - 1]
-		state.out_l = buf.l[buf.num - 1]
+		state.out_r = buf.r[buf.length - 1]
+		state.out_l = buf.l[buf.length - 1]

@@ -34,8 +34,8 @@ class SampleSynthesizer : Synthesizer
 				e.pitch = -1
 				continue
 			buf.add(*s.buf, e.pos, e.volume, 0)
-			e.pos -= buf.num
-			if e.pos < -s.buf.num
+			e.pos -= buf.length
+			if e.pos < -s.buf.length
 				e.pitch = -1
 			
 		for e,i in state.events

@@ -148,9 +148,9 @@ int Synthesizer::read(BufferBox &buf)
 
 	render(buf);
 
-	iterateEvents(buf.num);
+	iterateEvents(buf.length);
 
-	return buf.num;
+	return buf.length;
 }
 
 bool Synthesizer::hasEnded()

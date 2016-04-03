@@ -648,7 +648,7 @@ Array<int> decompose_time(int length)
 Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 {
 	// samples per 16th / 3
-	float spu = (float)b.range.num / (float)b.num_beats / (float)BEAT_PARTITION;
+	float spu = (float)b.range.length / (float)b.num_beats / (float)BEAT_PARTITION;
 
 	Array<MidiNote> notes = t->t->midi.getNotes(b.range);
 	Array<GuitarNote> gnotes;

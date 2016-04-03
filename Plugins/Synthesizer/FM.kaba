@@ -213,7 +213,7 @@ class FMSynthesizer : Synthesizer
 
 	overwrite void render(BufferBox buf)
 
-		for i in 0:buf.num
+		for i in 0:buf.length
 
 			// current events?
 			for e in events

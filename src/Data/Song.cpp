@@ -258,8 +258,8 @@ Range Song::getRange()
 	foreach(Track *t, tracks)
 		r = r or t->getRangeUnsafe();
 
-	if (r.length() < 0)
-		return Range(0, 0);
+	if (r.length < 0)
+		return Range::EMPTY;
 	return r;
 }
 
@@ -275,8 +275,8 @@ Range Song::getRangeWithTime()
 	foreach(Track *t, tracks)
 		r = r or t->getRangeUnsafe();
 
-	if (r.length() < 0)
-		return Range(0, 0);
+	if (r.length < 0)
+		return Range::EMPTY;
 	return r;
 }
 
@@ -476,12 +476,12 @@ int __shift_data_shift(const Range &source, int new_length, int pos)
 {
 	if (pos >= source.end())
 		// after source
-		return pos + new_length - source.num;
+		return pos + new_length - source.length;
 	if (pos >= source.offset){
 		// inside source
-		if (source.num == 0)
+		if (source.length == 0)
 			return pos - new_length;
-		return source.offset + (float)(pos - source.offset) * (float)new_length / (float)source.num;
+		return source.offset + (float)(pos - source.offset) * (float)new_length / (float)source.length;
 	}
 	return pos;
 }

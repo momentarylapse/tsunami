@@ -475,7 +475,7 @@ public:
 		}else if (progress and (o == tsunami->win->view->stream)){
 			int pos = tsunami->win->view->stream->getPos();
 			Range r = tsunami->win->view->sel.range;
-			progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length());
+			progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length);
 			if (!tsunami->win->view->stream->isPlaying())
 				previewEnd();
 		}

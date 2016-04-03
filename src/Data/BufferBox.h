@@ -34,10 +34,11 @@ public:
 	BufferBox(const BufferBox &b);
 	~BufferBox();
 	void operator=(const BufferBox &b);
-	void __assign__(const BufferBox &other){	*this = other;	}
+	void __assign__(const BufferBox &other){ *this = other; }
 
-	int offset, num;
-	Array<float> r, l;
+	int offset, length;
+	int channels;
+	Array<float> c[2];
 
 	Array<string> peaks;
 

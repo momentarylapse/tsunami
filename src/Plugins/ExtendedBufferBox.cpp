@@ -13,7 +13,7 @@
 
 void ExtendedBufferBox::get_spectrum(Array<complex> &spec_r, Array<complex> &spec_l, int samples)
 {
-	FastFourierTransform::fft_r2c(r, spec_r);
-	FastFourierTransform::fft_r2c(l, spec_l);
+	FastFourierTransform::fft_r2c(c[0], spec_r);
+	FastFourierTransform::fft_r2c(c[1], spec_l);
 }
 

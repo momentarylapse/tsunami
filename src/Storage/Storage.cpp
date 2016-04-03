@@ -60,7 +60,7 @@ bool Storage::load(Song *a, const string &filename)
 		return false;
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("lade ") + d->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("lade ") + d->description, tsunami->win);
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -92,7 +92,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 
 	Format *f = d->create();
 	Song *a = t->song;
-	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("lade ") + d->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("lade ") + d->description, tsunami->win);
 	od.offset = offset;
 	od.level = level;
 
@@ -113,7 +113,7 @@ bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 	Track *t = aa->tracks[0];
 	bool ok = loadTrack(t, filename, 0, 0);
 	if (t->levels[0].buffers.num > 0){
-		buf->resize(t->levels[0].buffers[0].num);
+		buf->resize(t->levels[0].buffers[0].length);
 		buf->set(t->levels[0].buffers[0], 0, 1);
 	}
 	delete(aa);
@@ -151,7 +151,7 @@ bool Storage::save(Song *a, const string &filename)
 		tsunami->log->warn(_("Datenverlust!"));
 	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("speichere ") + d->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("speichere ") + d->description, tsunami->win);
 
 	a->filename = filename;
 
@@ -173,7 +173,7 @@ bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 		return false;
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exportiere"), tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exportiere"), tsunami->win);
 
 	od.renderer = r;
 	f->saveViaRenderer(&od);

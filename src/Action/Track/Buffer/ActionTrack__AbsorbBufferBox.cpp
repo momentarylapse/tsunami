@@ -29,13 +29,13 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 
 	BufferBox &b_src  = l.buffers[src];
 	BufferBox &b_dest = l.buffers[dest];
-	dest_old_length = b_dest.num;
-	int new_size = b_src.offset + b_src.num - b_dest.offset;
-	if (new_size > b_dest.num)
+	dest_old_length = b_dest.length;
+	int new_size = b_src.offset + b_src.length - b_dest.offset;
+	if (new_size > b_dest.length)
 		b_dest.resize(new_size);
 
 	src_offset = l.buffers[src].offset;
-	src_length = l.buffers[src].num;
+	src_length = l.buffers[src].length;
 	b_dest.set(b_src, b_src.offset - b_dest.offset, 1.0f);
 
 	l.buffers.erase(src);

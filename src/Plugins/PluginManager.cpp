@@ -82,7 +82,7 @@ void PluginManager::LinkAppScriptData()
 
 	Script::DeclareClassSize("Range", sizeof(Range));
 	Script::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
-	Script::DeclareClassOffset("Range", "length", _offsetof(Range, num));
+	Script::DeclareClassOffset("Range", "length", _offsetof(Range, length));
 
 
 	PluginData plugin_data;
@@ -135,9 +135,10 @@ void PluginManager::LinkAppScriptData()
 
 	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
 	Script::DeclareClassOffset("BufferBox", "offset", _offsetof(BufferBox, offset));
-	Script::DeclareClassOffset("BufferBox", "num", _offsetof(BufferBox, num));
-	Script::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, r));
-	Script::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, l));
+	Script::DeclareClassOffset("BufferBox", "length", _offsetof(BufferBox, length));
+	Script::DeclareClassOffset("BufferBox", "channels", _offsetof(BufferBox, channels));
+	Script::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, c[0]));
+	Script::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, c[1]));
 	Script::DeclareClassOffset("BufferBox", "peaks", _offsetof(BufferBox, peaks));
 	Script::LinkExternal("BufferBox.clear", Script::mf(&BufferBox::clear));
 	Script::LinkExternal("BufferBox.__assign__", Script::mf(&BufferBox::__assign__));

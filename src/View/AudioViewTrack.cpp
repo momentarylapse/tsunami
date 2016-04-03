@@ -116,7 +116,7 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 
 	// no peaks yet? -> show dummy
 	if (b.peaks.num <= 4){
-		c->drawRect((b.offset - view_pos_rel) * view->cam.scale, y1, b.num * view->cam.scale, h);
+		c->drawRect((b.offset - view_pos_rel) * view->cam.scale, y1, b.length * view->cam.scale, h);
 		return;
 	}
 
@@ -150,9 +150,9 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, view->buffer_zoom_factor, hf, x1, y0l, b.peaks[l*4-1], b.offset);
 		}
 	}else{
-		draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0r, b.r, b.offset);
+		draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0r, b.c[0], b.offset);
 		if (!view->show_mono)
-			draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0l, b.l, b.offset);
+			draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0l, b.c[1], b.offset);
 	}
 }
 

@@ -56,13 +56,13 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 {
 	// intersected intervall (track-coordinates)
 	int i0 = max(s->pos, r.start());
-	int i1 = min(s->pos + s->buf->num, r.end());
+	int i1 = min(s->pos + s->buf->length, r.end());
 
 	// beginning of the intervall (relative to sub)
 	ir.offset = i0 - s->pos;
 	// ~ (relative to old intervall)
 	bpos = i0 - r.start();
-	ir.num = i1 - i0;
+	ir.length = i1 - i0;
 
 	return !ir.empty();
 }
@@ -98,12 +98,12 @@ void SongRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 
 void make_silence(BufferBox &buf, int size)
 {
-	if (buf.num == 0){
+	if (buf.length == 0){
 		buf.resize(size);
 	}else{
 		buf.resize(size);
-		memset(buf.r.data, 0, size * sizeof(buf.r[0]));
-		memset(buf.l.data, 0, size * sizeof(buf.l[0]));
+		memset(buf.c[0].data, 0, size * sizeof(buf.c[0][0]));
+		memset(buf.c[1].data, 0, size * sizeof(buf.c[1][0]));
 	}
 }
 
@@ -111,12 +111,12 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 {
 	msg_db_f("bb_render_time_track_no_fx", 1);
 
-	make_silence(buf, range_cur.length());
+	make_silence(buf, range_cur.length);
 
 	Array<Beat> beats = song->bars.getBeats(range_cur);
 
 	MidiRawData raw;
-	raw.samples = buf.num;
+	raw.samples = buf.length;
 
 	foreach(Beat &b, beats)
 		raw.addMetronomeClick(b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
@@ -129,7 +129,7 @@ void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 {
 	msg_db_f("bb_render_midi_track_no_fx", 1);
 
-	make_silence(buf, range_cur.length());
+	make_silence(buf, range_cur.length);
 
 	MidiData *m = &t->midi;
 //	if ((ti >= 0) and (ti < midi.num))
@@ -163,7 +163,7 @@ void SongRenderer::make_fake_track(Track *t, BufferBox &buf)
 	t->song = song;
 	t->levels.resize(1);
 	t->levels[0].buffers.resize(1);
-	t->levels[0].buffers[0].set_as_ref(buf, 0, range_cur.length());
+	t->levels[0].buffers[0].set_as_ref(buf, 0, range_cur.length);
 }
 
 void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)
@@ -211,7 +211,7 @@ void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 	int i0 = get_first_usable_track(song, sel);
 	if (i0 < 0){
 		// no -> return silence
-		buf.resize(range_cur.length());
+		buf.resize(range_cur.length);
 	}else{
 
 		// first (un-muted) track
@@ -264,7 +264,7 @@ void SongRenderer::read_basic(BufferBox &buf, int pos, int size)
 int SongRenderer::read(BufferBox &buf)
 {
 	msg_db_f("AudioRenderer.read", 1);
-	int size = max(min(buf.num, _range.end() - pos), 0);
+	int size = max(min(buf.length, _range.end() - pos), 0);
 
 	if (song->curves.num >= 0){
 		buf.resize(size);
@@ -287,7 +287,7 @@ int SongRenderer::read(BufferBox &buf)
 void SongRenderer::render(const Range &range, BufferBox &buf)
 {
 	prepare(range, false);
-	buf.resize(range.num);
+	buf.resize(range.length);
 	read(buf);
 }
 
@@ -333,7 +333,7 @@ int SongRenderer::getNumSamples()
 {
 	if (allow_loop and loop_if_allowed)
 		return -1;
-	return _range.num;
+	return _range.length;
 }
 
 Array<Tag> SongRenderer::getTags()

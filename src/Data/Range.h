@@ -16,7 +16,6 @@ public:
 	Range();
 	Range(int _offset, int _length);
 	Range(const Range &r);
-	~Range();
 
 	static const Range ALL;
 	static const Range EMPTY;
@@ -32,9 +31,8 @@ public:
 
 	void invert();
 
-	int offset, num;
+	int offset, length;
 	int start() const;
-	int length() const;
 	int end() const;
 	int center() const;
 	bool empty() const;

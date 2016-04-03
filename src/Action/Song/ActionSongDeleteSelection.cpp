@@ -50,7 +50,7 @@ void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, T
 	int i1 = sel.range.end();
 	foreachib(BufferBox &b, l.buffers, n){
 		int bi0 = b.offset;
-		int bi1 = b.offset + b.num;
+		int bi1 = b.offset + b.length;
 
 
 		if (sel.range.covers(b.range())){

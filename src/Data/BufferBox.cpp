@@ -27,11 +27,11 @@ int format_get_bits(SampleFormat format)
 {
 	if (format == SAMPLE_FORMAT_8)
 		return 8;
-	if ((format == SAMPLE_FORMAT_16) || (format == SAMPLE_FORMAT_16_BIGENDIAN))
+	if ((format == SAMPLE_FORMAT_16) or (format == SAMPLE_FORMAT_16_BIGENDIAN))
 		return 16;
-	if ((format == SAMPLE_FORMAT_24) || (format == SAMPLE_FORMAT_24_BIGENDIAN))
+	if ((format == SAMPLE_FORMAT_24) or (format == SAMPLE_FORMAT_24_BIGENDIAN))
 		return 24;
-	if ((format == SAMPLE_FORMAT_32) || (format == SAMPLE_FORMAT_32_BIGENDIAN) || (format == SAMPLE_FORMAT_32_FLOAT))
+	if ((format == SAMPLE_FORMAT_32) or (format == SAMPLE_FORMAT_32_BIGENDIAN) or (format == SAMPLE_FORMAT_32_FLOAT))
 		return 32;
 	return 0;
 }
@@ -61,23 +61,26 @@ string format_name(SampleFormat format)
 BufferBox::BufferBox()
 {
 	offset = 0;
-	num = 0;
+	length = 0;
+	channels = 2;
 }
 
 BufferBox::BufferBox(const BufferBox &b)
 {
 	offset = b.offset;
-	num = b.num;
-	r = b.r;
-	l = b.l;
+	length = b.length;
+	channels = b.channels;
+	for (int i=0; i<channels; i++)
+		c[i] = b.c[i];
 }
 
 void BufferBox::operator=(const BufferBox &b)
 {
 	offset = b.offset;
-	num = b.num;
-	r = b.r;
-	l = b.l;
+	length = b.length;
+	channels = b.channels;
+	for (int i=0; i<channels; i++)
+		c[i] = b.c[i];
 	peaks.clear();
 }
 
@@ -87,24 +90,24 @@ BufferBox::~BufferBox()
 
 void BufferBox::clear()
 {
-	r.clear();
-	l.clear();
-	num = 0;
+	for (int i=0; i<channels; i++)
+		c[i].clear();
+	length = 0;
 	peaks.clear();
 }
 
-void BufferBox::resize(int length)
+void BufferBox::resize(int _length)
 {
-	if (length < num)
+	if (_length < length)
 		//peak.clear();
-		invalidate_peaks(Range(offset + length, num - length));
-	r.resize(length);
-	l.resize(length);
-	num = length;
+		invalidate_peaks(Range(offset + _length, length - _length));
+	for (int i=0; i<channels; i++)
+		c[i].resize(_length);
+	length = _length;
 }
 
 bool BufferBox::is_ref()
-{	return ((num > 0) && (r.allocated == 0));	}
+{	return ((length > 0) and (c[0].allocated == 0));	}
 
 void fa_make_own(Array<float> &a)
 {
@@ -119,21 +122,21 @@ void BufferBox::make_own()
 {
 	if (is_ref()){
 		//msg_write("bb::make_own!");
-		fa_make_own(r);
-		fa_make_own(l);
+		for (int i=0; i<channels; i++)
+			fa_make_own(c[i]);
 	}
 }
 
 void BufferBox::swap_ref(BufferBox &b)
 {
 	// buffer
-	r.exchange(b.r);
-	l.exchange(b.l);
+	for (int i=0; i<channels; i++)
+		c[i].exchange(b.c[i]);
 
 	// num
-	int t = num;
-	num = b.num;
-	b.num = t;
+	int t = length;
+	length = b.length;
+	b.length = t;
 
 	// offset
 	t = offset;
@@ -143,8 +146,8 @@ void BufferBox::swap_ref(BufferBox &b)
 
 void BufferBox::append(BufferBox &b)
 {
-	int num0 = num;
-	resize(num + b.num);
+	int num0 = length;
+	resize(length + b.length);
 	set(b, num0, 1.0f);
 }
 
@@ -159,48 +162,55 @@ void float_array_swap_values(Array<float> &a, Array<float> &b)
 
 void BufferBox::swap_value(BufferBox &b)
 {
-	assert(num == b.num && "BufferBox.swap_value");
+	assert(length == b.length and "BufferBox.swap_value");
 	// buffer
-	float_array_swap_values(r, b.r);
-	float_array_swap_values(l, b.l);
+	for (int i=0; i<channels; i++)
+		float_array_swap_values(c[i], b.c[i]);
 	peaks.clear();
 	b.peaks.clear();
 }
 
 void BufferBox::scale(float volume, float panning)
 {
-	if ((volume == 1.0f) && (panning == 0))
+	if ((volume == 1.0f) and (panning == 0))
 		return;
 
-	float f_r = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
-	float f_l = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
+	float f[2];
+	if (channels == 2){
+		f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
+		f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
+	}else{
+		f[0] = volume;
+	}
 
 	// scale
-	for (int i=0;i<r.num;i++){
-		r[i] *= f_r;
-		l[i] *= f_l;
-	}
+	for (int j=0; j<channels; j++)
+		for (int i=0;i<length;i++)
+			c[j][i] *= f[j];
 }
 
-void BufferBox::add(const BufferBox &b, int offset, float volume, float panning)
+void BufferBox::add(const BufferBox &b, int _offset, float volume, float panning)
 {
 	// relative to b
-	int i0 = max(0, -offset);
-	int i1 = min(b.r.num, r.num - offset);
+	int i0 = max(0, -_offset);
+	int i1 = min(b.length, length - _offset);
 
 	// add buffers
-	if ((volume == 1.0f) && (panning == 0.0f)){
-		for (int i=i0;i<i1;i++){
-			r[i + offset] += b.r[i];
-			l[i + offset] += b.l[i];
-		}
+	if ((volume == 1.0f) and (panning == 0.0f)){
+		for (int j=0; j<channels; j++)
+			for (int i=i0;i<i1;i++)
+				c[j][i + _offset] += b.c[j][i];
 	}else{
-		float f_r = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
-		float f_l = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
-		for (int i=i0;i<i1;i++){
-			r[i + offset] += b.r[i] * f_r;
-			l[i + offset] += b.l[i] * f_l;
+		float f[2];
+		if (channels == 2){
+			f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
+			f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
+		}else{
+			f[0] = volume;
 		}
+		for (int j=0; j<channels; j++)
+			for (int i=i0;i<i1;i++)
+				c[j][i + _offset] += b.c[j][i] * f[j];
 	}
 }
 
@@ -208,19 +218,18 @@ void BufferBox::set(const BufferBox &b, int _offset, float volume)
 {
 	// relative to b
 	int i0 = max(0, -_offset);
-	int i1 = min(b.r.num, r.num - _offset);
+	int i1 = min(b.length, length - _offset);
 	if (i1 <= i0)
 		return;
 
 	// set buffers
 	if (volume == 1.0f){
-		memcpy(&r[i0 + _offset], (float*)b.r.data + i0, sizeof(float) * (i1 - i0));
-		memcpy(&l[i0 + _offset], (float*)b.l.data + i0, sizeof(float) * (i1 - i0));
+		for (int j=0; j<channels; j++)
+			memcpy(&c[j][i0 + _offset], (float*)b.c[j].data + i0, sizeof(float) * (i1 - i0));
 	}else{
-		for (int i=i0;i<i1;i++){
-			r[i + _offset] = b.r[i] * volume;
-			l[i + _offset] = b.l[i] * volume;
-		}
+		for (int j=0; j<channels; j++)
+			for (int i=i0;i<i1;i++)
+				c[j][i + _offset] = b.c[j][i] * volume;
 	}
 	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
@@ -228,10 +237,10 @@ void BufferBox::set(const BufferBox &b, int _offset, float volume)
 void BufferBox::set_as_ref(const BufferBox &b, int _offset, int _length)
 {
 	clear();
-	num = _length;
+	length = _length;
 	offset = _offset + b.offset;
-	r.set_ref(b.r.sub(_offset, _length));
-	l.set_ref(b.l.sub(_offset, _length));
+	for (int i=0; i<channels; i++)
+		c[i].set_ref(b.c[i].sub(_offset, _length));
 }
 
 #if 0
@@ -239,7 +248,7 @@ void BufferBox::set_16bit(const void *b, int offset, int length)
 {
 	// relative to b
 	int i0 = max(0, - offset);
-	int i1 = min(length, num - offset);
+	int i1 = min(length, length - offset);
 	length = i1 - i0;
 	float *pr = &r[i0 + offset];
 	float *pl = &l[i0 + offset];
@@ -276,7 +285,7 @@ inline float import_24(int i)
 	return (float)(i & 0x00ffffff) / 8388608.0f;
 }
 
-void BufferBox::import(void *data, int channels, SampleFormat format, int samples)
+void BufferBox::import(void *data, int _channels, SampleFormat format, int samples)
 {
 	char *cb = (char*)data;
 	short *sb = (short*)data;
@@ -284,48 +293,48 @@ void BufferBox::import(void *data, int channels, SampleFormat format, int sample
 	float *fb = (float*)data;
 
 	for (int i=0;i<samples;i++){
-		if (channels == 2){
+		if (_channels == 2){
 			if (format == SAMPLE_FORMAT_8){
-				r[i] = (float)cb[i*2    ] / 128.0f;
-				l[i] = (float)cb[i*2 + 1] / 128.0f;
+				c[0][i] = (float)cb[i*2    ] / 128.0f;
+				c[1][i] = (float)cb[i*2 + 1] / 128.0f;
 			}else if (format == SAMPLE_FORMAT_16){
-				r[i] = (float)sb[i*2    ] / 32768.0f;
-				l[i] = (float)sb[i*2 + 1] / 32768.0f;
+				c[0][i] = (float)sb[i*2    ] / 32768.0f;
+				c[1][i] = (float)sb[i*2 + 1] / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_16_BIGENDIAN){
-				r[i] = (float)invert_16(sb[i*2    ]) / 32768.0f;
-				l[i] = (float)invert_16(sb[i*2 + 1]) / 32768.0f;
+				c[0][i] = (float)invert_16(sb[i*2    ]) / 32768.0f;
+				c[1][i] = (float)invert_16(sb[i*2 + 1]) / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_24){
-				r[i] = import_24(*(int*)&cb[i*6    ]);
-				l[i] = import_24(*(int*)&cb[i*6 + 3]);
+				c[0][i] = import_24(*(int*)&cb[i*6    ]);
+				c[1][i] = import_24(*(int*)&cb[i*6 + 3]);
 			}else if (format == SAMPLE_FORMAT_24_BIGENDIAN){
-				r[i] = (float)invert_24(*(int*)&cb[i*6    ] >> 8) / 8388608.0f;
-				l[i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 8388608.0f;
+				c[0][i] = (float)invert_24(*(int*)&cb[i*6    ] >> 8) / 8388608.0f;
+				c[1][i] = (float)invert_24(*(int*)&cb[i*6 + 3] >> 8) / 8388608.0f;
 			}else if (format == SAMPLE_FORMAT_32){
-				r[i] = (float)ib[i*2  ] / 2147483648.0f;
-				l[i] = (float)ib[i*2+1] / 2147483648.0f;
+				c[0][i] = (float)ib[i*2  ] / 2147483648.0f;
+				c[1][i] = (float)ib[i*2+1] / 2147483648.0f;
 			}else if (format == SAMPLE_FORMAT_32_FLOAT){
-				r[i] = fb[i*2];
-				l[i] = fb[i*2+1];
+				c[0][i] = fb[i*2];
+				c[1][i] = fb[i*2+1];
 			}else
 				throw string("BufferBox.import: unhandled format");
 		}else{
 			if (format == SAMPLE_FORMAT_8){
-				r[i] = (float)cb[i] / 128.0f;
+				c[0][i] = (float)cb[i] / 128.0f;
 			}else if (format == SAMPLE_FORMAT_16){
-				r[i] = (float)sb[i] / 32768.0f;
+				c[0][i] = (float)sb[i] / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_16_BIGENDIAN){
-				r[i] = (float)invert_16(sb[i]) / 32768.0f;
+				c[0][i] = (float)invert_16(sb[i]) / 32768.0f;
 			}else if (format == SAMPLE_FORMAT_24){
-				r[i] = import_24(*(int*)&cb[i*3]);
+				c[0][i] = import_24(*(int*)&cb[i*3]);
 			}else if (format == SAMPLE_FORMAT_24_BIGENDIAN){
-				r[i] = (float)invert_24(*(int*)&cb[i*3] >> 8) / 8388608.0f;
+				c[0][i] = (float)invert_24(*(int*)&cb[i*3] >> 8) / 8388608.0f;
 			}else if (format == SAMPLE_FORMAT_32){
-				r[i] = (float)ib[i] / 2147483648.0f;
+				c[0][i] = (float)ib[i] / 2147483648.0f;
 			}else if (format == SAMPLE_FORMAT_32_FLOAT){
-				r[i] = fb[i];
+				c[0][i] = fb[i];
 			}else
 				throw string("BufferBox.import: unhandled format");
-			l[i] = r[i];
+			c[1][i] = c[0][i];
 		}
 	}
 }
@@ -364,33 +373,33 @@ inline void set_data_24(int *data, float value)
 	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24) & 0x00ffffff;
 }
 
-bool BufferBox::_export(void *data, int channels, SampleFormat format, bool align32)
+bool BufferBox::_export(void *data, int _channels, SampleFormat format, bool align32)
 {
 	wtb_overflow = false;
 
 	if (format == SAMPLE_FORMAT_16){
 		short *sb = (short*)data;
 		int d = align32 ? 2 : 1;
-		for (int i=0;i<num;i++){
-			set_data_16(sb, r[i]);
+		for (int i=0;i<length;i++){
+			set_data_16(sb, c[0][i]);
 			sb += d;
-			set_data_16(sb, l[i]);
+			set_data_16(sb, c[1][i]);
 			sb += d;
 		}
 	}else if (format == SAMPLE_FORMAT_24){
 		char *sc = (char*)data;
 		int d = align32 ? 4 : 3;
-		for (int i=0;i<num;i++){
-			set_data_24((int*)sc, r[i]);
+		for (int i=0;i<length;i++){
+			set_data_24((int*)sc, c[0][i]);
 			sc += d;
-			set_data_24((int*)sc, l[i]);
+			set_data_24((int*)sc, c[1][i]);
 			sc += d;
 		}
 	}else if (format == SAMPLE_FORMAT_32_FLOAT){
 		float *fc = (float*)data;
-		for (int i=0;i<num;i++){
-			*(fc ++) = r[i];
-			*(fc ++) = l[i];
+		for (int i=0;i<length;i++){
+			*(fc ++) = c[0][i];
+			*(fc ++) = c[1][i];
 		}
 	}else{
 		//tsunami->log->error("invalid export format");
@@ -400,10 +409,10 @@ bool BufferBox::_export(void *data, int channels, SampleFormat format, bool alig
 	return !wtb_overflow;
 }
 
-bool BufferBox::exports(string &data, int channels, SampleFormat format)
+bool BufferBox::exports(string &data, int _channels, SampleFormat format)
 {
-	data.resize(num * channels * (format_get_bits(format) / 8));
-	return _export(data.data, channels, format, false);
+	data.resize(length * _channels * (format_get_bits(format) / 8));
+	return _export(data.data, _channels, format, false);
 }
 
 inline float _clamp_(float f)
@@ -417,15 +426,15 @@ inline float _clamp_(float f)
 
 void BufferBox::interleave(float *p, float volume)
 {
-	float *pr = &r[0];
-	float *pl = &l[0];
+	float *pr = &c[0][0];
+	float *pl = &c[1][0];
 	if (volume == 1.0f){
-		for (int i=0; i<num; i++){
+		for (int i=0; i<length; i++){
 			*p ++ = _clamp_(*pr ++);
 			*p ++ = _clamp_(*pl ++);
 		}
 	}else{
-		for (int i=0; i<num; i++){
+		for (int i=0; i<length; i++){
 			*p ++ = _clamp_((*pr ++) * volume);
 			*p ++ = _clamp_((*pl ++) * volume);
 		}
@@ -434,15 +443,15 @@ void BufferBox::interleave(float *p, float volume)
 
 void BufferBox::deinterleave(float *p, int num_channels)
 {
-	float *pr = &r[0];
-	float *pl = &l[0];
+	float *pr = &c[0][0];
+	float *pl = &c[1][0];
 	if (num_channels == 1){
-		for (int i=0; i<num; i++){
+		for (int i=0; i<length; i++){
 			*pr ++ = *p;
 			*pl ++ = *p ++;
 		}
 	}else if (num_channels == 2){
-		for (int i=0; i<num; i++){
+		for (int i=0; i<length; i++){
 			*pr ++ = *p ++;
 			*pl ++ = *p ++;
 		}
@@ -451,12 +460,12 @@ void BufferBox::deinterleave(float *p, int num_channels)
 
 Range BufferBox::range()
 {
-	return Range(offset, num);
+	return Range(offset, length);
 }
 
 Range BufferBox::range0()
 {
-	return Range(0, num);
+	return Range(0, length);
 }
 
 #define shrink_max(a, b)	max((a), (b))
@@ -465,9 +474,9 @@ Range BufferBox::range0()
 void BufferBox::invalidate_peaks(const Range &_range)
 {
 	assert(range().covers(_range));
-	int i0 = _range.start() - range().start();
-	int i1 = _range.end() - range().start();
-	int n = r.num;
+	int i0 = _range.start() - offset;
+	int i1 = _range.end() - offset;
+	int n = length;
 
 	if (peaks.num < 4)
 		peaks.resize(4);
@@ -493,7 +502,7 @@ inline void find_update_peak_range(string &p0, string &p1, int &i0, int &i1, int
 {
 	i0 = 0;
 	i1 = n;
-	if ((p0.num < n) || (p1.num < n))
+	if ((p0.num < n) or (p1.num < n))
 		return;
 	//msg_write("t");
 	bool found = false;
@@ -528,10 +537,10 @@ void BufferBox::update_peaks()
 	// first level
 	if (peaks.num < 4)
 		peaks.resize(4);
-	int n = r.num / 4;
+	int n = length / 4;
 	int i0 = 0;
 	int i1 = n;
-	if ((peaks[0].num >= n) && (peaks[1].num >= n))
+	if ((peaks[0].num >= n) and (peaks[1].num >= n))
 		find_update_peak_range(peaks[0], peaks[1], i0, i1, n);
 	peaks[0].resize(n);
 	peaks[1].resize(n);
@@ -539,8 +548,8 @@ void BufferBox::update_peaks()
 	peaks[3].resize(n);
 	//msg_write(format("  %d %d", i0, i1));
 	for (int i=i0;i<i1;i++){
-		peaks[0][i] = fabsmax(r[i * 4], r[i * 4 + 1], r[i * 4 + 2], r[i * 4 + 3]) * 254;
-		peaks[1][i] = fabsmax(l[i * 4], l[i * 4 + 1], l[i * 4 + 2], l[i * 4 + 3]) * 254;
+		for (int j=0; j<channels; j++)
+			peaks[j][i] = fabsmax(c[j][i * 4], c[j][i * 4 + 1], c[j][i * 4 + 2], c[j][i * 4 + 3]) * 254;
 		peaks[2][i] = peaks[0][i];
 		peaks[3][i] = peaks[1][i];
 	}

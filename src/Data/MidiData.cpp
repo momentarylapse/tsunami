@@ -186,7 +186,7 @@ MidiRawData MidiRawData::getEvents(const Range &r) const
 
 int MidiRawData::read(MidiRawData &data, const Range &r) const
 {
-	data.samples = min(r.num, samples - r.offset);
+	data.samples = min(r.length, samples - r.offset);
 	foreach(MidiEvent &e, const_cast<MidiRawData&>(*this))
 		if (r.is_inside(e.pos))
 			data.add(MidiEvent(e.pos - r.offset, e.pitch, e.volume));

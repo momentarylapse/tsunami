@@ -16,10 +16,10 @@ Beat::Beat(const Range &r, int bar, int beat)
 
 Range Beat::sub(int index, int parts)
 {
-	int length = range.num / parts;
+	int length = range.length / parts;
 	int start = range.offset + index * length;
 	if (index == parts - 1)
-		return Range(start, range.num - start);
+		return Range(start, range.length - start);
 	return Range(start, length);
 }
 
@@ -32,7 +32,7 @@ Bar::Bar(const Range &r, int _num_beats, int _index)
 
 float Bar::bpm(float sample_rate)
 {
-	return 60.0f / (float)range.num * (float)num_beats * sample_rate;
+	return 60.0f / (float)range.length * (float)num_beats * sample_rate;
 }
 
 Array<Beat> BarCollection::getBeats(const Range &r)

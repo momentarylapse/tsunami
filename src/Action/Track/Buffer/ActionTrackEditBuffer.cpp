@@ -23,7 +23,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(Track *t, int _level_no, Range _ran
 
 	// save old data
 	BufferBox b = t->readBuffers(level_no, range);
-	box.resize(b.num);
+	box.resize(b.length);
 	box.set(b, 0, 1.0f);
 }
 

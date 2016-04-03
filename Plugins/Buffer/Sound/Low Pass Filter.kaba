@@ -30,10 +30,10 @@ class LowPassFilter : AudioEffect
 			buf.r[0] = a * buf.r[0] + b * state.r
 			buf.l[0] = a * buf.l[0] + b * state.l
 	
-		for i in 1:buf.num
+		for i in 1:buf.length
 			buf.r[i] = a * buf.r[i] + b * buf.r[i-1]
 			buf.l[i] = a * buf.l[i] + b * buf.l[i-1]
 		
 		state.used = true
-		state.r = buf.r[buf.num-1]
-		state.l = buf.l[buf.num-1]
+		state.r = buf.r[buf.length-1]
+		state.l = buf.l[buf.length-1]

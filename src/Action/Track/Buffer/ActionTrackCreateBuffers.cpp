@@ -21,7 +21,7 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 	int n_pos = -1;
 	int n_before = -1;
 	foreachi(BufferBox &b, l.buffers, i){
-		if ((r.offset >= b.offset) && (r.offset <= b.offset + b.num))
+		if ((r.offset >= b.offset) && (r.offset <= b.offset + b.length))
 			n_pos = i;
 		if (r.offset >= b.offset)
 			n_before = i;
@@ -37,7 +37,7 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 		BufferBox &b = l.buffers[n_pos];
 
 		// too small?
-		if (r.end() > b.offset + b.num)
+		if (r.end() > b.offset + b.length)
 			addSubAction(new ActionTrack__GrowBufferBox(t, level_no, n_pos, r.end() - b.offset), t->song);
 	}else{
 

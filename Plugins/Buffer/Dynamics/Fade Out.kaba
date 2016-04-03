@@ -5,8 +5,8 @@ use "../../api.kaba"
 
 class FadeOut : AudioEffect
 	overwrite void process(BufferBox buf)
-		for i in 0:buf.num
-			float vol = 1 - i2f(i) / buf.r.num
+		for i in 0:buf.length
+			float vol = 1 - i2f(i) / buf.length
 			buf.r[i] = buf.r[i] * vol
 			buf.l[i] = buf.l[i] * vol
 

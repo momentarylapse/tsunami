@@ -82,8 +82,8 @@ void AudioStream::stream_request_callback(pa_stream *p, size_t nbytes, void *use
 			BufferBox b;
 			stream->ring_buf.readRef(b, frames - done);
 			b.interleave(out, stream->output->getVolume() * stream->volume);
-			out += b.num * 2;
-			done += b.num;
+			out += b.length * 2;
+			done += b.length;
 			break;
 		}
 		done = frames;
@@ -323,8 +323,8 @@ void AudioStream::stream()
 	// update pos
 	Range rr = renderer->range();
 	cur_pos = renderer->getPos() - rr.offset - ring_buf.available();
-	if (rr.num > 0)
-		cur_pos = rr.offset + (cur_pos + rr.num) % rr.num;
+	if (rr.length > 0)
+		cur_pos = rr.offset + (cur_pos + rr.length) % rr.length;
 
 	reading = false;
 }
@@ -444,7 +444,7 @@ bool AudioStream::getPosSafe(int &pos)
 
 	// translation
 	Range r = renderer->range();
-	if (r.num > 0)
+	if (r.length > 0)
 		pos = cur_pos; //r.offset + ((cur_pos + renderer->offset()) %r.num);
 	return true;
 }

@@ -24,7 +24,7 @@ void BufferRenderer::__delete__()
 
 int BufferRenderer::read(BufferBox& _buf)
 {
-	int n = min(_buf.num, buf->num - offset);
+	int n = min(_buf.length, buf->length - offset);
 	_buf.set(*buf, -offset, 1);
 	offset += n;
 	return n;
@@ -37,7 +37,7 @@ void BufferRenderer::reset()
 
 Range BufferRenderer::range()
 {
-	return Range(0, buf->num);
+	return Range(0, buf->length);
 }
 
 void BufferRenderer::seek(int pos)
@@ -47,5 +47,5 @@ void BufferRenderer::seek(int pos)
 
 int BufferRenderer::getNumSamples()
 {
-	return buf->num;
+	return buf->length;
 }

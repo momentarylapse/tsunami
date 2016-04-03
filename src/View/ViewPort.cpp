@@ -70,10 +70,10 @@ void ViewPort::makeSampleVisible(int sample)
 
 void ViewPort::show(Range &r)
 {
-	int border = r.num * BORDER_FACTOR;
+	int border = r.length * BORDER_FACTOR;
 	r.offset -= border;
-	r.num += border * 2;
-	scale = view->area.width() / (double)r.length();
+	r.length += border * 2;
+	scale = view->area.width() / (double)r.length;
 	pos = (double)r.start();
 	view->notify(view->MESSAGE_VIEW_CHANGE);
 	view->forceRedraw();

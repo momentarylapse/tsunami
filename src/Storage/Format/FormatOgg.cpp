@@ -109,13 +109,13 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 		if (r->readResize(buf) <= 0)
 			break;
 
-		float **buffer = vorbis_analysis_buffer(&vd, buf.num);
-		for (int i=0;i<buf.num;i++){
-			buffer[0][i] = buf.r[i];
-			buffer[1][i] = buf.l[i];
+		float **buffer = vorbis_analysis_buffer(&vd, buf.length);
+		for (int i=0;i<buf.length;i++){
+			buffer[0][i] = buf.c[0][i];
+			buffer[1][i] = buf.c[1][i];
 		}
-		written += buf.num;
-		vorbis_analysis_wrote(&vd, buf.num);
+		written += buf.length;
+		vorbis_analysis_wrote(&vd, buf.length);
 
 
 		nn ++;

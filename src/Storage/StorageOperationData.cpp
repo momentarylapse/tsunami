@@ -60,7 +60,7 @@ void StorageOperationData::set(const string &str, float t)
 int StorageOperationData::get_num_samples()
 {
 	if (buf)
-		return buf->num;
+		return buf->length;
 	if (renderer)
 		return renderer->getNumSamples();
 	return 0;

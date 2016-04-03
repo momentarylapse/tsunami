@@ -44,10 +44,10 @@ void *ActionTrack__ShrinkBufferBox::execute(Data *d)
 
 	//msg_write(format("shrink %d   %d -> %d", index, b.num, new_length));
 
-	assert(new_length < b.num);
+	assert(new_length < b.length);
 
 	// copy data
-	old_length = b.num;
+	old_length = b.length;
 	buf.resize(old_length - new_length);
 	buf.set(b, -new_length, 1.0f);
 

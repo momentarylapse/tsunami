@@ -80,7 +80,7 @@ void SongConsole::loadData()
 
 	// data
 	reset("data_list");
-	int samples = song->getRange().length();
+	int samples = song->getRange().length;
 	addString("data_list", _("Anfang\\") + song->get_time_str_long(song->getRange().start()));
 	addString("data_list", _("Ende\\") + song->get_time_str_long(song->getRange().end()));
 	addString("data_list", _("Dauer\\") + song->get_time_str_long(samples));

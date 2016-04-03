@@ -89,7 +89,7 @@ void show_spec()
 	float log_max_min = log(MAX_FREQ / MIN_FREQ)
 	
 	for t in 0:NT
-		int offset = (buf.num - N) * t / NT
+		int offset = (buf.length - N) * t / NT
 		
 		for j in 0:N
 			sub[j] = buf.r[offset + j]

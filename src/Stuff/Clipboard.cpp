@@ -47,7 +47,7 @@ void Clipboard::append_track(Track *t, AudioView *view)
 		tt->levels[0].buffers[0].make_own();
 	}else if (t->type == Track::TYPE_MIDI){
 		tt->midi = t->midi.getNotesSafe(view->sel.range);
-		tt->midi.samples = view->sel.range.num;
+		tt->midi.samples = view->sel.range.length;
 		tt->midi.sanify(view->sel.range);
 		foreach(MidiNote &n, tt->midi)
 			n.range.offset -= view->sel.range.offset;

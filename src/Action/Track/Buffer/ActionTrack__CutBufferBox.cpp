@@ -30,7 +30,7 @@ void ActionTrack__CutBufferBox::undo(Data *d)
 	BufferBox &b2 = t->levels[level_no].buffers[index + 1];
 
 	// transfer data
-	b.resize(b.num + b2.num);
+	b.resize(b.length + b2.length);
 	b.set(b2, offset, 1.0f);
 
 	// delete
@@ -46,7 +46,7 @@ void *ActionTrack__CutBufferBox::execute(Data *d)
 	Track *t = a->get_track(track_no);
 	TrackLevel &l = t->levels[level_no];
 
-	assert(offset > 0 && offset < (l.buffers[index].num - 1));
+	assert(offset > 0 && offset < (l.buffers[index].length - 1));
 
 	// create new
 	BufferBox dummy;
@@ -59,7 +59,7 @@ void *ActionTrack__CutBufferBox::execute(Data *d)
 	b2.offset = b.offset + offset;
 
 	// transfer data
-	b2.resize(b.num - offset);
+	b2.resize(b.length - offset);
 	b2.set(b, -offset, 1.0f);
 	b.resize(offset);
 	return &b;

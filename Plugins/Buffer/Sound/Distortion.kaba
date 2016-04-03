@@ -17,6 +17,6 @@ class Distortion : AudioEffect
 		float a = max(10000 * pow(config.Gain, 2), 0.01)
 		float b = 1 / atan(a)
 	
-		for i in 0:buf.num
+		for i in 0:buf.length
 			buf.r[i] = b * atan(buf.r[i] * a)
 			buf.l[i] = b * atan(buf.l[i] * a)

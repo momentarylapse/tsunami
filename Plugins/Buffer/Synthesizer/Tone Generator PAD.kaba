@@ -35,8 +35,8 @@ void ProcessTrack(BufferBox buf)
 	
 	complex[] c
 	float[] amp
-	c.resize(buf.num / 2 - 1)
-	amp.resize(buf.num / 2 - 1)
+	c.resize(buf.length / 2 - 1)
+	amp.resize(buf.length / 2 - 1)
 	
 	for n in  1:A.num
 		float nn = n + 0.03 * n * n
@@ -46,7 +46,7 @@ void ProcessTrack(BufferBox buf)
 		print fi
 		print A[n]
 		for i in 0:amp.num
-			amp[i] += gauss((i2f(i) / buf.num) - fi, bwi) * A[n]
+			amp[i] += gauss((i2f(i) / buf.length) - fi, bwi) * A[n]
 		
 	for i in 0:c.num
 		float phi = rand(2 * pi)
@@ -58,7 +58,7 @@ void ProcessTrack(BufferBox buf)
 	fft_c2r_inv(c, buf.l)
 	
 	float m = 0
-	for i in 0:buf.num
+	for i in 0:buf.length
 		m = max(buf.r[i], m)
 	print m
 	buf.r /= (m * 1.2)

@@ -21,13 +21,13 @@ class Volume : AudioEffect
 		float factor = config.Volume
 		if config.Maximize
 			float max = 0
-			for i in 0:buf.num
+			for i in 0:buf.length
 				if abs(buf.r[i]) > max
 					max = abs(buf.r[i])
 				if abs(buf.l[i]) > max
 					max = abs(buf.l[i])
 			factor = 1 / max
-		for i in 0:buf.num
+		for i in 0:buf.length
 			buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
 			buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
 	

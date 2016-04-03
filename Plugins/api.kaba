@@ -120,7 +120,8 @@ class MidiEffect
 	extern virtual void onConfig()
 
 class BufferBox
-	int offset, num
+	int offset, length
+	int channels
 	float[] r, l
 	string[] peaks
 	extern void __assign__(BufferBox other)

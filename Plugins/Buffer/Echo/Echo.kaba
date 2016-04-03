@@ -62,4 +62,4 @@ class Echo : AudioEffect
 		doDelay(buf.r, state.buf_r)
 		doDelay(buf.l, state.buf_l)
 	
-		state.offset += buf.num
+		state.offset += buf.length

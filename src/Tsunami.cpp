@@ -71,48 +71,6 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	storage = new Storage;
 
-
-	Image *im = new Image(512, 512, White);
-	ImagePainter p(im);
-	p.setColor(Black);
-
-	p.setAntialiasing(false);
-	p.setLineWidth(1);
-	p.drawCircle(100, 100, 30);
-	p.setLineWidth(10);
-	p.drawCircle(100, 200, 30);
-	p.setAntialiasing(true);
-	p.setLineWidth(1);
-	p.drawCircle(200, 100, 30);
-	p.setLineWidth(10);
-	p.drawCircle(200, 200, 30);
-
-	p.setFill(false);
-	p.setAntialiasing(false);
-	p.setLineWidth(1);
-	p.drawCircle(300, 100, 30);
-	p.setLineWidth(10);
-	p.drawCircle(300, 200, 30);
-	p.setAntialiasing(true);
-	p.setLineWidth(1);
-	p.drawCircle(400, 100, 30);
-	p.setLineWidth(10);
-	p.drawCircle(400, 200, 30);
-
-
-	p.setAntialiasing(false);
-	p.setLineWidth(1);
-	p.drawLine(100, 300, 130, 330);
-	p.setLineWidth(10);
-	p.drawLine(100, 400, 130, 430);
-	p.setAntialiasing(true);
-	p.setLineWidth(1);
-	p.drawLine(200, 300, 230, 330);
-	p.setLineWidth(10);
-	p.drawLine(200, 400, 230, 430);
-
-	im->save("xxxx.bmp");
-
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
 
@@ -141,8 +99,8 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 			log->error(_("Aufruf: tsunami --info <Datei>"));
 		}else if (storage->load(song, arg[2])){
 			msg_write(format("sample-rate: %d", song->sample_rate));
-			msg_write(format("samples: %d", song->getRange().num));
-			msg_write("length: " + song->get_time_str(song->getRange().num));
+			msg_write(format("samples: %d", song->getRange().length));
+			msg_write("length: " + song->get_time_str(song->getRange().length));
 			msg_write(format("tracks: %d", song->tracks.num));
 			foreach(Tag &t, song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);

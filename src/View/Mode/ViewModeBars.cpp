@@ -68,7 +68,7 @@ void ViewModeBars::onMouseMove()
 void ViewModeBars::performScale()
 {
 	scaling = false;
-	float factor = (float)view->sel.range.num / (float)scaling_range_orig.num;
+	float factor = (float)view->sel.range.length / (float)scaling_range_orig.length;
 
 	song->action_manager->beginActionGroup();
 	foreachb(int i, scaling_sel){

@@ -105,7 +105,7 @@ class HarmonicSynthesizer : Synthesizer
 			p.env.set(0.01, 0.01, 0.7, config.release, sample_rate)
 		
 	overwrite void render(BufferBox buf)
-		for i in 0:buf.num
+		for i in 0:buf.length
 
 			// current events?
 			for e in events

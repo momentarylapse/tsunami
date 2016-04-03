@@ -90,7 +90,7 @@ void DummySynthesizer::onConfig()
 
 void DummySynthesizer::render(BufferBox& buf)
 {
-	for (int i=0; i<buf.num; i++){
+	for (int i=0; i<buf.length; i++){
 
 		// current events?
 		foreach(MidiEvent &e, events)
@@ -117,8 +117,8 @@ void DummySynthesizer::render(BufferBox& buf)
 			}
 
 			float d = sin(s.phi) * s.volume;
-			buf.r[i] += d;
-			buf.l[i] += d;
+			buf.c[0][i] += d;
+			buf.c[1][i] += d;
 
 			s.phi += delta_phi[p];
 			if (s.phi > 8*pi)

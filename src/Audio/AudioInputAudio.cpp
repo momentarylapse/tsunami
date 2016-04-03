@@ -64,7 +64,7 @@ void AudioInputAudio::input_request_callback(pa_stream *p, size_t nbytes, void *
 		buf.writeRef(b, frames);
 		b.deinterleave(in, input->num_channels);
 
-		int done = b.num;
+		int done = b.length;
 		if (done < frames){
 			buf.writeRef(b, frames - done);
 			b.deinterleave(&in[2 * done], input->num_channels);
@@ -332,7 +332,7 @@ void AudioInputAudio::resetAccumulation()
 
 int AudioInputAudio::getSampleCount()
 {
-	return buffer.num;
+	return buffer.length;
 }
 
 void AudioInputAudio::setPlaybackDelayConst(float f)

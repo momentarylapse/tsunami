@@ -157,8 +157,8 @@ void PeakMeter::onDraw(Painter *c)
 void PeakMeter::findPeaks()
 {
 	float dt = timer.peek();
-	r.update(buf.r, dt);
-	l.update(buf.l, dt);
+	r.update(buf.c[0], dt);
+	l.update(buf.c[1], dt);
 }
 
 void PeakMeter::clearData()
@@ -189,17 +189,17 @@ void PeakMeter::findSpectrum()
 {
 	msg_db_f("PeakMeter.FindSp", 1);
 	Array<complex> cr, cl;
-	cr.resize(buf.num / 2 + 1);
-	cl.resize(buf.num / 2 + 1);
-	FastFourierTransform::fft_r2c(buf.r, cr);
-	FastFourierTransform::fft_r2c(buf.l, cl);
+	cr.resize(buf.length / 2 + 1);
+	cl.resize(buf.length / 2 + 1);
+	FastFourierTransform::fft_r2c(buf.c[0], cr);
+	FastFourierTransform::fft_r2c(buf.c[1], cl);
 	r.spec.resize(SPECTRUM_SIZE);
 	l.spec.resize(SPECTRUM_SIZE);
 	for (int i=0;i<SPECTRUM_SIZE;i++){
 		float f0 = i_to_freq(i);
 		float f1 = i_to_freq(i + 1);
-		int n0 = f0 * buf.num / sample_rate;
-		int n1 = max(f1 * buf.num / sample_rate, n0 + 1);
+		int n0 = f0 * buf.length / sample_rate;
+		int n1 = max(f1 * buf.length / sample_rate, n0 + 1);
 		float s = 0;
 		for (int n=n0;n<n1;n++)
 			if (n < cr.num){

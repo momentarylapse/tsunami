@@ -101,7 +101,7 @@ public:
 		me = CreateEffect(f->ReadStr(), parent->song);
 		me->only_on_selection = f->ReadBool();
 		me->range.offset = f->ReadInt();
-		me->range.num = f->ReadInt();
+		me->range.length = f->ReadInt();
 		string params = f->ReadStr();
 		me->configFromString(params);
 		string temp = f->ReadStr();
@@ -114,7 +114,7 @@ public:
 		f->WriteStr(me->name);
 		f->WriteBool(me->only_on_selection);
 		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.num);
+		f->WriteInt(me->range.length);
 		f->WriteStr(me->configToString());
 		f->WriteStr(me->enabled ? "" : "disabled");
 	}
@@ -130,7 +130,7 @@ public:
 		me = CreateEffect(f->ReadStr(), parent);
 		me->only_on_selection = f->ReadBool();
 		me->range.offset = f->ReadInt();
-		me->range.num = f->ReadInt();
+		me->range.length = f->ReadInt();
 		string params = f->ReadStr();
 		me->configFromString(params);
 		string temp = f->ReadStr();
@@ -143,7 +143,7 @@ public:
 		f->WriteStr(me->name);
 		f->WriteBool(me->only_on_selection);
 		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.num);
+		f->WriteInt(me->range.length);
 		f->WriteStr(me->configToString());
 		f->WriteStr(me->enabled ? "" : "disabled");
 	}
@@ -184,7 +184,7 @@ string compress_buffer(BufferBox &b, Song *song, FileChunkBasic *p)
 	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
 	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
 	ok &= FLAC__stream_encoder_set_sample_rate(encoder, DEFAULT_SAMPLE_RATE); // we don't really care...
-	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.num);
+	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, b.length);
 
 	// initialize encoder
 	if (ok){
@@ -198,14 +198,14 @@ string compress_buffer(BufferBox &b, Song *song, FileChunkBasic *p)
 	// read blocks of samples from WAVE file and feed to encoder
 	if (ok){
 		int p0 = 0;
-		size_t left = (size_t)b.num;
+		size_t left = (size_t)b.length;
 		while (ok and left){
 			size_t need = (left > CHUNK_SIZE ? (size_t)CHUNK_SIZE : (size_t)left);
 			{
 				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
 				for (unsigned int i=0;i<need;i++){
-					flac_pcm[i * 2 + 0] = (int)(b.r[p0 + i] * scale);
-					flac_pcm[i * 2 + 1] = (int)(b.l[p0 + i] * scale);
+					flac_pcm[i * 2 + 0] = (int)(b.c[0][p0 + i] * scale);
+					flac_pcm[i * 2 + 1] = (int)(b.c[1][p0 + i] * scale);
 				}
 				/* feed samples to encoder */
 				ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, need);
@@ -254,14 +254,11 @@ FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDec
 	BufferBox *buf = d->buf;
 	float scale = pow(2.0f, d->bits-1);
 	int offset = d->sample_offset;
-	int n = min(frame->header.blocksize, buf->num - offset);
+	int n = min(frame->header.blocksize, buf->length - offset);
 	//msg_write(format("write %d  offset=%d  buf=%d", n, offset, buf->num));
 	for (int i=0; i<n; i++)
 		for (int j=0;j<d->channels;j++)
-			if (j == 0)
-				buf->r[offset + i] = buffer[j][i] / scale;
-			else
-				buf->l[offset + i] = buffer[j][i] / scale;
+			buf->c[j][offset + i] = buffer[j][i] / scale;
 	d->sample_offset += frame->header.blocksize;
 
 	//flac_read_samples += frame->header.blocksize;
@@ -375,7 +372,7 @@ public:
 
 		int channels = 2;
 		f->WriteInt(me->offset);
-		f->WriteInt(me->num);
+		f->WriteInt(me->length);
 		f->WriteInt(channels);
 		f->WriteInt(format_get_bits(song->default_format));
 
@@ -385,7 +382,7 @@ public:
 				warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
 		}else{
 
-			int uncompressed_size = me->num * channels * format_get_bits(song->default_format) / 8;
+			int uncompressed_size = me->length * channels * format_get_bits(song->default_format) / 8;
 			data = compress_buffer(*me, song, this);
 			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
 		}
@@ -494,7 +491,7 @@ public:
 
 		int unended = -1;
 		foreachi(MidiNote &n, *parent, i)
-			if ((n.pitch == e.pitch) and (n.range.num == -1))
+			if ((n.pitch == e.pitch) and (n.range.length == -1))
 				unended = i;
 
 		if ((unended >= 0) and (e.volume == 0)){
@@ -527,7 +524,7 @@ public:
 		me = CreateMidiEffect(f->ReadStr(), NULL);
 		me->only_on_selection = f->ReadBool();
 		me->range.offset = f->ReadInt();
-		me->range.num = f->ReadInt();
+		me->range.length = f->ReadInt();
 		string params = f->ReadStr();
 		me->configFromString(params);
 		string temp = f->ReadStr();
@@ -540,7 +537,7 @@ public:
 		f->WriteStr(me->name);
 		f->WriteBool(me->only_on_selection);
 		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.num);
+		f->WriteInt(me->range.length);
 		f->WriteStr(me->configToString());
 		f->WriteStr(me->enabled ? "" : "disabled");
 	}
@@ -556,7 +553,7 @@ public:
 	{
 		MidiNote n;
 		n.range.offset = f->ReadInt();
-		n.range.num = f->ReadInt();
+		n.range.length = f->ReadInt();
 		n.pitch = f->ReadInt();
 		n.volume = f->ReadFloat();
 		f->ReadInt(); // reserved
@@ -565,7 +562,7 @@ public:
 	virtual void write(File *f)
 	{
 		f->WriteInt(me->range.offset);
-		f->WriteInt(me->range.num);
+		f->WriteInt(me->range.length);
 		f->WriteInt(me->pitch);
 		f->WriteFloat(me->volume);
 		f->WriteInt(0); // reserved
@@ -595,7 +592,7 @@ public:
 		for (int i=0; i<num; i++){
 			MidiNote n;
 			n.range.offset = f->ReadInt();
-			n.range.num = f->ReadInt();
+			n.range.length = f->ReadInt();
 			n.pitch = f->ReadInt();
 			n.volume = f->ReadFloat();
 			if (meta & 1)
@@ -616,7 +613,7 @@ public:
 		f->WriteInt(3); // stringno + clef_position
 		foreach(MidiNote &n, *me){
 			f->WriteInt(n.range.offset);
-			f->WriteInt(n.range.num);
+			f->WriteInt(n.range.length);
 			f->WriteInt(n.pitch);
 			f->WriteFloat(n.volume);
 			f->WriteInt(n.stringno);
@@ -653,7 +650,7 @@ public:
 		for (int i=0; i<num; i++){
 			MidiNote n;
 			n.range.offset = f->ReadInt();
-			n.range.num = f->ReadInt();
+			n.range.length = f->ReadInt();
 			n.pitch = f->ReadInt();
 			n.volume = f->ReadFloat();
 			if (meta & 1)
@@ -675,7 +672,7 @@ public:
 		f->WriteInt(3); // stringno + clef_position
 		foreach(MidiNote &n, *me){
 			f->WriteInt(n.range.offset);
-			f->WriteInt(n.range.num);
+			f->WriteInt(n.range.length);
 			f->WriteInt(n.pitch);
 			f->WriteFloat(n.volume);
 			f->WriteInt(n.stringno);

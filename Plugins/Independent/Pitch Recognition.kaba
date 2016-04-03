@@ -85,7 +85,7 @@ void UpdateInput()
 	temp = buf.r + buf.l
 	
 	complex[] bufc
-	bufc.resize(buf.num / 2 + 1)
+	bufc.resize(buf.length / 2 + 1)
 	fft_r2c(temp, bufc)
 	float max = 0
 	float fmax = 0, fmax2 = 0
@@ -98,7 +98,7 @@ void UpdateInput()
 				max = amp
 				fmax = f
 				fmax2 = f * 1.5
-	max /= sqrt(buf.num) * 2 * pi
+	max /= sqrt(buf.length) * 2 * pi
 	Volume = clamp(max / THRESHOLD / 2, 0, 1)
 	if max > THRESHOLD
 		LoudEnough = true

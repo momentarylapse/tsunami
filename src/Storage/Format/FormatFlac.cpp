@@ -41,10 +41,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 	float scale = pow(2.0f, flac_bits-1);
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
-			if (j == 0)
-				buf.r[i] = buffer[j][i] / scale;
-			else
-				buf.l[i] = buffer[j][i] / scale;
+			buf.c[j][i] = buffer[j][i] / scale;
 	flac_track->song->execute(a);
 
 	flac_read_samples += frame->header.blocksize;
@@ -220,12 +217,12 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		buf.resize(FLAC_READSIZE);
 		while (r->readResize(buf)){
 			/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
-			for (int i=0;i<buf.num;i++){
-				flac_pcm[i * 2 + 0] = (int)(buf.r[i] * scale);
-				flac_pcm[i * 2 + 1] = (int)(buf.l[i] * scale);
+			for (int i=0;i<buf.length;i++){
+				flac_pcm[i * 2 + 0] = (int)(buf.c[0][i] * scale);
+				flac_pcm[i * 2 + 1] = (int)(buf.c[1][i] * scale);
 			}
 			/* feed samples to encoder */
-			ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, buf.num);
+			ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, buf.length);
 			if (!ok)
 				break;
 		}

@@ -61,7 +61,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 		od->set(float(done) / (float)samples);
 		f->WriteBuffer(data.data, data.num);
 
-		done += buf.num;
+		done += buf.length;
 	}
 
 	FileClose(f);

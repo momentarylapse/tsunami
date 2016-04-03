@@ -14,34 +14,30 @@ const Range Range::EMPTY = Range(0, 0);
 Range::Range(const Range & r)
 {
 	offset = r.offset;
-	num = r.num;
+	length = r.length;
 }
 
 Range::Range()
 {
 	offset = 0;
-	num = 0;
+	length = 0;
 }
 
 Range::Range(int _offset, int _length)
 {
 	offset = _offset;
-	num = _length;
-}
-
-Range::~Range()
-{
+	length = _length;
 }
 
 void Range::clear()
 {
 	offset = 0;
-	num = 0;
+	length = 0;
 }
 
 string Range::str() const
 {
-	return format("(%d %d)", offset, num);
+	return format("(%d %d)", offset, length);
 }
 
 void Range::move(int dpos)
@@ -51,24 +47,24 @@ void Range::move(int dpos)
 
 void Range::resize(int new_length)
 {
-	num = new_length;
+	length = new_length;
 }
 
 void Range::set_end(int end)
 {
-	num = end - offset;
+	length = end - offset;
 }
 
 void Range::set_start(int start)
 {
-	num = offset + num - start;
+	length = offset + length - start;
 	offset = start;
 }
 
 void Range::invert()
 {
-	offset += num;
-	num = - num;
+	offset += length;
+	length = - length;
 }
 
 
@@ -78,24 +74,19 @@ int Range::start() const
 	return offset;
 }
 
-int Range::length() const
-{
-	return num;
-}
-
 int Range::end() const
 {
-	return offset + num;
+	return offset + length;
 }
 
 int Range::center() const
 {
-	return offset + num / 2;
+	return offset + length / 2;
 }
 
 bool Range::empty() const
 {
-	return num <= 0;
+	return length <= 0;
 }
 
 // do <this> and <r> overlap?
@@ -136,12 +127,12 @@ Range Range::operator&&(const Range &r) const
 
 Range Range::operator+ (int shift) const
 {
-	return Range(offset + shift, num);
+	return Range(offset + shift, length);
 }
 
 Range Range::operator- (int shift) const
 {
-	return Range(offset - shift, num);
+	return Range(offset - shift, length);
 }
 
 

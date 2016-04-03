@@ -66,4 +66,4 @@ class Flanger : AudioEffect
 		doFlanger(buf.r, state.temp_r, a.sample_rate)
 		doFlanger(buf.l, state.temp_l, a.sample_rate)
 	
-		state.offset += buf.num
+		state.offset += buf.length

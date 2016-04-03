@@ -4,9 +4,9 @@ use "../../api.kaba"
 
 class Reverse : AudioEffect
 	overwrite void process(BufferBox buf)
-		int n = buf.num / 2
+		int n = buf.length / 2
 		for i in 0:n
-			int j = buf.num - i - 1
+			int j = buf.length - i - 1
 			float x = buf.r[i]
 			buf.r[i] = buf.r[j]
 			buf.r[j] = x

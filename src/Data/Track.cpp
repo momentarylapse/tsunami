@@ -108,7 +108,7 @@ Range Track::getRangeUnsafe()
 	foreach(SampleRef *s, samples){
 		if (s->pos < min)
 			min = s->pos;
-		int smax = s->pos + s->buf->num + s->rep_num * s->rep_delay;
+		int smax = s->pos + s->buf->length + s->rep_num * s->rep_delay;
 		if (smax > max)
 			max = smax;
 	}
@@ -123,7 +123,7 @@ Range Track::getRangeUnsafe()
 Range Track::getRange()
 {
 	Range r = getRangeUnsafe();
-	if (r.length() < 0)
+	if (r.length < 0)
 		return Range::EMPTY;
 	return r;
 }
@@ -156,8 +156,8 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	// is <r> inside a buffer?
 	foreach(BufferBox &b, levels[level_no].buffers){
 		int p0 = r.offset - b.offset;
-		int p1 = r.offset - b.offset + r.num;
-		if ((p0 >= 0) and (p1 <= b.num)){
+		int p1 = r.offset - b.offset + r.length;
+		if ((p0 >= 0) and (p1 <= b.length)){
 			// set as reference to subarrays
 			buf.set_as_ref(b, p0, p1 - p0);
 			return buf;
@@ -165,7 +165,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	}
 
 	// create own...
-	buf.resize(r.num);
+	buf.resize(r.length);
 
 	// fill with overlapp
 	foreach(BufferBox &b, levels[level_no].buffers)
@@ -191,7 +191,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 				inside_level = li;
 				inside_no = bi;
 				inside_p0 = r.offset - b.offset;
-				inside_p1 = r.offset - b.offset + r.num;
+				inside_p1 = r.offset - b.offset + r.length;
 			}else if (b.range().overlaps(r))
 				intersected = true;
 		}
@@ -202,7 +202,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 	}
 
 	// create own...
-	buf.resize(r.num);
+	buf.resize(r.length);
 
 	// fill with overlapp
 	foreach(TrackLevel &l, levels)

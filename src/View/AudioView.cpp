@@ -185,7 +185,6 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
 	parent->eventX("area", "hui:middle-button-up", this, &AudioView::onMiddleButtonUp);
 	parent->eventX("area", "hui:right-button-down", this, &AudioView::onRightButtonDown);
 	parent->eventX("area", "hui:right-button-up", this, &AudioView::onRightButtonUp);
-	//parent->eventX("area", "hui:key-down", this, &AudioView::OnKeyDown);
 	parent->eventX("area", "hui:key-down", this, &AudioView::onKeyDown);
 	parent->eventX("area", "hui:key-up", this, &AudioView::onKeyUp);
 	parent->eventX("area", "hui:mouse-wheel", this, &AudioView::onMouseWheel);

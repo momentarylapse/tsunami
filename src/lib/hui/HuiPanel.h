@@ -48,7 +48,6 @@ public:
 	void _cdecl eventSX(const string &id, const string &msg, hui_callback *function);
 	void _cdecl _event(const string &id, HuiEventHandler *handler, void (HuiEventHandler::*function)());
 	void _cdecl _eventX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)());
-	void _cdecl _eventXP(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)(void *p));
 	template<typename T>
 	void _cdecl event(const string &id, HuiEventHandler* handler, T fun)
 	{	_event(id, handler, (void(HuiEventHandler::*)())fun);	}

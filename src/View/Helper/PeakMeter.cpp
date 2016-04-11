@@ -51,7 +51,7 @@ PeakMeter::PeakMeter(HuiPanel *_panel, const string &_id, PeakMeterSource *_sour
 	id = _id;
 	source = NULL;
 	mode = ModePeaks;
-	sample_rate = 44100;
+	sample_rate = DEFAULT_SAMPLE_RATE;
 	enabled = false;
 	r.reset();
 	l.reset();
@@ -111,7 +111,6 @@ inline float nice_peak(float p)
 
 void PeakMeter::drawPeak(Painter *c, const rect &r, Data &d)
 {
-	msg_db_f("PeakMeter.drawPeak", 1);
 	int w = r.width();
 	int h = r.height();
 	float sp = d.get_sp();
@@ -134,7 +133,6 @@ void PeakMeter::drawPeak(Painter *c, const rect &r, Data &d)
 
 void PeakMeter::onDraw(Painter *c)
 {
-	msg_db_f("PeakMeter.onDraw", 1);
 	int w = c->width;
 	int h = c->height;
 	if (mode == ModePeaks){
@@ -187,7 +185,6 @@ void PeakMeter::setMode(int _mode)
 
 void PeakMeter::findSpectrum()
 {
-	msg_db_f("PeakMeter.FindSp", 1);
 	Array<complex> cr, cl;
 	cr.resize(buf.length / 2 + 1);
 	cl.resize(buf.length / 2 + 1);

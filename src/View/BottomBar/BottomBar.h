@@ -13,11 +13,11 @@
 
 class AudioView;
 class Song;
-class AudioOutput;
+class DeviceManager;
 class Track;
 class MixingConsole;
-class CurveConsole;
 class LogConsole;
+class DeviceConsole;
 class Log;
 
 class BottomBarConsole : public HuiPanel
@@ -31,7 +31,7 @@ public:
 class BottomBar : public HuiPanel, public Observable
 {
 public:
-	BottomBar(AudioView *view, Song *audio, AudioOutput *output, Log *log);
+	BottomBar(AudioView *view, Song *audio, DeviceManager *device_manager, Log *log);
 	virtual ~BottomBar();
 
 	void onClose();
@@ -55,8 +55,8 @@ public:
 	bool visible;
 
 	MixingConsole *mixing_console;
-	CurveConsole *curve_console;
-	LogConsole *log_dialog;
+	LogConsole *log_console;
+	DeviceConsole *device_console;
 
 	Array<BottomBarConsole*> consoles;
 	void addConsole(BottomBarConsole *c, const string &list_name);

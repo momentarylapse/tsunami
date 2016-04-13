@@ -17,7 +17,7 @@
 #include "../View/Helper/PeakMeter.h"
 
 class AudioRenderer;
-class AudioOutput;
+class DeviceManager;
 class Thread;
 class StreamThread;
 struct pa_stream;
@@ -92,7 +92,7 @@ private:
 	int dev_sample_rate;
 	long long cur_pos;
 
-	AudioOutput *output;
+	DeviceManager *manager;
 	bool killed;
 
 	Thread *thread;

@@ -75,8 +75,8 @@ OBJ = \
  Audio/AudioInputAny.o\
  Audio/AudioInputAudio.o\
  Audio/AudioInputMidi.o\
- Audio/AudioOutput.o\
  Audio/AudioStream.o\
+ Audio/DeviceManager.o\
  Data/BufferBox.o\
  Data/Clef.o\
  Data/Curve.o\
@@ -236,6 +236,7 @@ OBJ = \
  Stuff/Observable.o\
  Stuff/Observer.o\
  View/BottomBar/BottomBar.o\
+ View/BottomBar/DeviceConsole.o\
  View/BottomBar/LogConsole.o\
  View/BottomBar/MiniBar.o\
  View/BottomBar/MixingConsole.o\
@@ -504,11 +505,11 @@ Audio/AudioInputAudio.o : Audio/AudioInputAudio.cpp
 Audio/AudioInputMidi.o : Audio/AudioInputMidi.cpp
 	$(CPP) -c Audio/AudioInputMidi.cpp -o $@ $(CXXFLAGS)
 
-Audio/AudioOutput.o : Audio/AudioOutput.cpp
-	$(CPP) -c Audio/AudioOutput.cpp -o $@ $(CXXFLAGS)
-
 Audio/AudioStream.o : Audio/AudioStream.cpp
 	$(CPP) -c Audio/AudioStream.cpp -o $@ $(CXXFLAGS)
+
+Audio/DeviceManager.o : Audio/DeviceManager.cpp
+	$(CPP) -c Audio/DeviceManager.cpp -o $@ $(CXXFLAGS)
 
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)
@@ -983,6 +984,9 @@ Stuff/Observer.o : Stuff/Observer.cpp
 
 View/BottomBar/BottomBar.o : View/BottomBar/BottomBar.cpp
 	$(CPP) -c View/BottomBar/BottomBar.cpp -o $@ $(CXXFLAGS)
+
+View/BottomBar/DeviceConsole.o : View/BottomBar/DeviceConsole.cpp
+	$(CPP) -c View/BottomBar/DeviceConsole.cpp -o $@ $(CXXFLAGS)
 
 View/BottomBar/LogConsole.o : View/BottomBar/LogConsole.cpp
 	$(CPP) -c View/BottomBar/LogConsole.cpp -o $@ $(CXXFLAGS)

@@ -6,10 +6,11 @@
  */
 
 #include "MixingConsole.h"
-#include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
 #include "../Helper/PeakMeter.h"
 #include <math.h>
+
+#include "../../Audio/DeviceManager.h"
 #include "../../Data/Song.h"
 
 const float TrackMixer::DB_MIN = -1000000;
@@ -105,12 +106,12 @@ void TrackMixer::update()
 }
 
 
-MixingConsole::MixingConsole(Song *_song, AudioOutput *_output, AudioStream *stream) :
+MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, AudioStream *stream) :
 	BottomBarConsole(_("Mischpult")),
 	Observer("MixingConsole")
 {
 	song = _song;
-	output = _output;
+	device_manager = _device_manager;
 	id_inner = "inner-grid";
 
 
@@ -129,7 +130,7 @@ MixingConsole::MixingConsole(Song *_song, AudioOutput *_output, AudioStream *str
 	addSlider("!vertical,expandy", 0, 2, 0, 0, "output-volume");
 
 	peak_meter = new PeakMeter(this, "output-peaks", stream);
-	setFloat("output-volume", output->getVolume());
+	setFloat("output-volume", device_manager->getOutputVolume());
 
 	setTooltip("output-volume", _("Ausgabelautst&arke"));
 	setTooltip("output-peaks", _("Ausgabepegel"));
@@ -137,14 +138,14 @@ MixingConsole::MixingConsole(Song *_song, AudioOutput *_output, AudioStream *str
 	event("output-volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);
 
 	subscribe(song);
-	subscribe(output);
+	subscribe(device_manager);
 	loadData();
 }
 
 MixingConsole::~MixingConsole()
 {
 	unsubscribe(song);
-	unsubscribe(output);
+	unsubscribe(device_manager);
 	foreach(TrackMixer *m, mixer)
 		delete(m);
 	delete(peak_meter);
@@ -152,7 +153,7 @@ MixingConsole::~MixingConsole()
 
 void MixingConsole::onOutputVolume()
 {
-	output->setVolume(getFloat(""));
+	device_manager->setOutputVolume(getFloat(""));
 }
 
 void MixingConsole::loadData()
@@ -177,8 +178,8 @@ void MixingConsole::loadData()
 
 void MixingConsole::onUpdate(Observable* o, const string &message)
 {
-	if (o == output)
-		setFloat("output-volume", output->getVolume());
+	if (o == device_manager)
+		setFloat("output-volume", device_manager->getOutputVolume());
 	else
 		loadData();
 }

@@ -6,12 +6,12 @@
  */
 
 #include "AudioStream.h"
-#include "AudioOutput.h"
 #include "../Tsunami.h"
 #include "Renderer/AudioRenderer.h"
 #include "../Stuff/Log.h"
 #include <pulse/pulseaudio.h>
 #include "../lib/threads/Thread.h"
+#include "DeviceManager.h"
 
 //const int DEFAULT_BUFFER_SIZE = 131072;
 const int DEFAULT_BUFFER_SIZE = 32768;
@@ -81,7 +81,7 @@ void AudioStream::stream_request_callback(pa_stream *p, size_t nbytes, void *use
 		for (int n=0; (n<2) and (done < frames); n++){
 			BufferBox b;
 			stream->ring_buf.readRef(b, frames - done);
-			b.interleave(out, stream->output->getVolume() * stream->volume);
+			b.interleave(out, stream->manager->getOutputVolume() * stream->volume);
 			out += b.length * 2;
 			done += b.length;
 			break;
@@ -164,7 +164,7 @@ AudioStream::AudioStream(AudioRenderer *r) :
 	reading = false;
 	hui_runner_id = -1;
 
-	output = tsunami->output;
+	manager = tsunami->device_manager;
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
@@ -180,7 +180,7 @@ AudioStream::AudioStream(AudioRenderer *r) :
 	if (JUST_FAKING_IT)
 		return;
 
-	output->addStream(this);
+	manager->addStream(this);
 }
 
 AudioStream::~AudioStream()
@@ -210,7 +210,7 @@ void AudioStream::create_dev()
 	ss.channels = 2;
 	ss.format = PA_SAMPLE_FLOAT32LE;
 	//ss.format = PA_SAMPLE_S16LE;
-	_stream = pa_stream_new(output->context, "stream", &ss, NULL);
+	_stream = pa_stream_new(manager->context, "stream", &ss, NULL);
 	testError("stream new");
 
 	pa_stream_set_write_callback(_stream, &stream_request_callback, this);
@@ -238,7 +238,7 @@ void AudioStream::kill()
 	if (_stream)
 		kill_dev();
 
-	output->removeStream(this);
+	manager->removeStream(this);
 	killed = true;
 
 	if (thread){
@@ -390,8 +390,8 @@ void AudioStream::play()
 	attr_out.tlength = -1;
 	attr_out.prebuf = -1;
 	const char *dev = NULL;
-	if (output->chosen_device != "")
-		dev = output->chosen_device.c_str();
+	if (manager->chosen_device != "")
+		dev = manager->chosen_device.c_str();
 	pa_stream_connect_playback(_stream, dev, &attr_out, (pa_stream_flags)0, NULL, NULL);
 	testError("connect");
 
@@ -482,7 +482,7 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 
 bool AudioStream::testError(const string &msg)
 {
-	int e = pa_context_errno(output->context);
+	int e = pa_context_errno(manager->context);
 	if (e != 0)
 		msg_error(msg + ": " + pa_strerror(e));
 	return (e != 0);

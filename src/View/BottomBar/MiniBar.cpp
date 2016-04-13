@@ -8,10 +8,10 @@
 #include "BottomBar.h"
 #include "../Helper/PeakMeter.h"
 #include "../../Audio/AudioStream.h"
-#include "../../Audio/AudioOutput.h"
 #include "MiniBar.h"
+#include "../../Audio/DeviceManager.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, AudioStream *_stream, AudioOutput *_output) :
+MiniBar::MiniBar(BottomBar *_bottom_bar, AudioStream *_stream, DeviceManager *_output) :
 	Observer("MiniBar")
 {
 	stream = _stream;
@@ -34,7 +34,7 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, AudioStream *_stream, AudioOutput *_out
 	setTooltip("peaks", _("Ausgabepegel"));
 
 	peak_meter = new PeakMeter(this, "peaks", stream);
-	setFloat("volume", output->getVolume());
+	setFloat("volume", output->getOutputVolume());
 
 	event("show_bottom_bar", this, &MiniBar::onShowBottomBar);
 	event("volume", this, &MiniBar::onVolume);
@@ -58,7 +58,7 @@ void MiniBar::onShowBottomBar()
 
 void MiniBar::onVolume()
 {
-	output->setVolume(getFloat(""));
+	output->setOutputVolume(getFloat(""));
 }
 
 void MiniBar::onShow()
@@ -79,7 +79,7 @@ void MiniBar::onUpdate(Observable *o, const string &message)
 		else
 			show();
 	}else if (o == output){
-		setFloat("volume", output->getVolume());
+		setFloat("volume", output->getOutputVolume());
 	}
 }
 

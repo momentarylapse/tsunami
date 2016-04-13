@@ -7,8 +7,8 @@
 
 #include "SettingsDialog.h"
 #include "../../Tsunami.h"
-#include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioInputAudio.h"
+#include "../../Audio/DeviceManager.h"
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
@@ -84,13 +84,13 @@ void SettingsDialog::loadData()
 
 	setString("preview_device", _("- Standard -"));
 	setInt("preview_device", 0);
-	output_devices = tsunami->output->getDevices();
+	output_devices = tsunami->device_manager->getDevices();
 	output_devices.insert("", 0);
 	foreachi(string &d, output_devices, i){
 		if (i == 0)
 			continue;
 		addString("preview_device", d);
-		if (d == tsunami->output->chosen_device)
+		if (d == tsunami->device_manager->chosen_device)
 			setInt("preview_device", i);
 	}
 
@@ -151,7 +151,7 @@ void SettingsDialog::onPreviewDevice()
 {
 	int dev = getInt("");
 	if (dev >= 0)
-		tsunami->output->setDevice(output_devices[dev]);
+		tsunami->device_manager->setDevice(output_devices[dev]);
 }
 
 void SettingsDialog::onCaptureDelay()

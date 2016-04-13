@@ -7,7 +7,6 @@
 
 #include "AudioInputAudio.h"
 #include "AudioStream.h"
-#include "AudioOutput.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -15,6 +14,7 @@
 #include "../View/AudioView.h"
 
 #include <pulse/pulseaudio.h>
+#include "DeviceManager.h"
 
 
 string AudioInputAudio::temp_filename;
@@ -30,17 +30,6 @@ const string AudioInputAudio::MESSAGE_CAPTURE = "Capture";
 
 extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
 extern bool pa_wait_stream_ready(pa_stream *s); // -> AudioStream.cpp
-
-
-void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
-{
-	if ((eol > 0) or (!i))
-		return;
-
-	Array<string> *devices = (Array<string>*)userdata;
-	if (devices)
-		devices->add(i->name);
-}
 
 
 
@@ -166,9 +155,9 @@ Array<string> AudioInputAudio::getDevices()
 {
 	Array<string> devices;
 
-	pa_operation *op = pa_context_get_source_info_list(tsunami->output->context, pa_source_info_callback, &devices);
-	if (!testError("pa_context_get_source_info_list"))
-		pa_wait_op(op);
+	Array<Device> input_dev = tsunami->device_manager->getInputDevices();
+	foreach(Device &d, input_dev)
+		devices.add(d.name);
 
 	return devices;
 }
@@ -265,7 +254,7 @@ bool AudioInputAudio::start()
 	ss.rate = sample_rate;
 	ss.channels = 2;
 	ss.format = PA_SAMPLE_FLOAT32LE;
-	_stream = pa_stream_new(tsunami->output->context, "stream-in", &ss, NULL);
+	_stream = pa_stream_new(tsunami->device_manager->context, "stream-in", &ss, NULL);
 	testError("pa_stream_new");
 
 
@@ -307,7 +296,7 @@ bool AudioInputAudio::start()
 
 bool AudioInputAudio::testError(const string &msg)
 {
-	int e = pa_context_errno(tsunami->output->context);
+	int e = pa_context_errno(tsunami->device_manager->context);
 	if (e != 0)
 		tsunami->log->error(msg + " (input): " + pa_strerror(e));
 	return (e != 0);

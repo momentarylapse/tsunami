@@ -16,7 +16,7 @@ class Slider;
 class Song;
 class MixingConsole;
 class PeakMeter;
-class AudioOutput;
+class DeviceManager;
 class AudioStream;
 
 class TrackMixer: public HuiPanel
@@ -51,7 +51,7 @@ public:
 class MixingConsole: public BottomBarConsole, public Observer
 {
 public:
-	MixingConsole(Song *audio, AudioOutput *output, AudioStream *stream);
+	MixingConsole(Song *audio, DeviceManager *device_manager, AudioStream *stream);
 	virtual ~MixingConsole();
 
 	void loadData();
@@ -64,7 +64,7 @@ public:
 	virtual void onHide();
 
 	Song *song;
-	AudioOutput *output;
+	DeviceManager *device_manager;
 	PeakMeter *peak_meter;
 
 	string id_inner;

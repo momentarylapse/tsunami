@@ -22,8 +22,8 @@
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
-#include "Audio/AudioOutput.h"
 #include "Audio/AudioStream.h"
+#include "Audio/DeviceManager.h"
 #include "Audio/Renderer/SongRenderer.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
@@ -139,16 +139,16 @@ TsunamiWindow::TsunamiWindow() :
 	song = tsunami->song;
 
 
-	view = new AudioView(this, song, tsunami->output);
+	view = new AudioView(this, song, tsunami->device_manager);
 
 	// side bar
 	side_bar = new SideBar(view, song);
 	embed(side_bar, "root_table", 1, 0);
 
 	// bottom bar
-	bottom_bar = new BottomBar(view, song, tsunami->output, tsunami->log);
+	bottom_bar = new BottomBar(view, song, tsunami->device_manager, tsunami->log);
 	embed(bottom_bar, "main_table", 0, 1);
-	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->output);
+	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->device_manager);
 	embed(mini_bar, "main_table", 0, 2);
 
 	subscribe(view);

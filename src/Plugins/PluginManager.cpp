@@ -13,8 +13,8 @@
 #include "../View/Helper/Slider.h"
 #include "../Audio/AudioInputAudio.h"
 #include "../Audio/AudioInputMidi.h"
-#include "../Audio/AudioOutput.h"
 #include "../Audio/AudioStream.h"
+#include "../Audio/DeviceManager.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Audio/Renderer/SynthesizerRenderer.h"
@@ -69,7 +69,7 @@ void PluginManager::LinkAppScriptData()
 	// api definition
 	Script::LinkExternal("MainWin", &tsunami->_win);
 	Script::LinkExternal("song", &tsunami->song);
-	Script::LinkExternal("output", &tsunami->output);
+	Script::LinkExternal("output", &tsunami->device_manager);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
 	Script::LinkExternal("view", &tsunami->_view);

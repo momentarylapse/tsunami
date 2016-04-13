@@ -1,18 +1,18 @@
 /*
- * AudioOutput.cpp
+ * DeviceManager.cpp
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#include "AudioOutput.h"
 #include "AudioStream.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 
 #include <pulse/pulseaudio.h>
+#include "DeviceManager.h"
 
-const string AudioOutput::MESSAGE_CHANGE_DEVICES = "ChangeDevices";
+const string DeviceManager::MESSAGE_CHANGE_DEVICES = "ChangeDevices";
 
 
 void pa_wait_op(pa_operation *op)
@@ -36,35 +36,75 @@ void pa_wait_op(pa_operation *op)
 
 void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
 {
-	AudioOutput *out = (AudioOutput*)userdata;
-	out->notify(out->MESSAGE_CHANGE_DEVICES);
-	//msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
+	printf("----change   %d\n", idx);
+	DeviceManager *out = (DeviceManager*)userdata;
+	out->dirty = true;
+
+	HuiRunLaterM(0.1f, out, &DeviceManager::SendDeviceChange);
+	msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
 	/*if ((t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK) == PA_SUBSCRIPTION_EVENT_SOURCE) {
 		if ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) {
 		}
 	}*/
 }
 
-AudioOutput::AudioOutput() :
+Array<Device> str2devs(const string &s, int type)
+{
+	Array<Device> devices;
+	Array<string> a = s.explode("||");
+	foreach(string &b, a){
+		Array<string> c = b.explode("|");
+		if (c.num < 4)
+			continue;
+		Device d;
+		d.type = type;
+		d.name = c[0];
+		d.internal_name = c[1];
+		d.channels = c[2]._int();
+		d.hidden = c[3]._bool();
+		devices.add(d);
+	}
+	return devices;
+}
+
+string devs2str(Array<Device> devices)
+{
+	string r;
+	foreachi(Device &d, devices, i){
+		if (i > 0)
+			r += "||";
+		r += d.name + "|";
+		r += d.internal_name + "|";
+		r += i2s(d.channels) + "|";
+		r += b2s(d.hidden);
+	}
+	return r;
+}
+
+DeviceManager::DeviceManager() :
 	Observable("AudioOutput")
 {
 	initialized = false;
+	dirty = true;
+
+	output_devices = str2devs(HuiConfig.getStr("Output.Devices", ""), Device::TYPE_OUTPUT);
+	input_devices = str2devs(HuiConfig.getStr("Input.Devices", ""), Device::TYPE_INPUT);
 
 	chosen_device = HuiConfig.getStr("Output.ChosenDevice", "");
-	volume = HuiConfig.getFloat("Output.Volume", 1.0f);
+	output_volume = HuiConfig.getFloat("Output.Volume", 1.0f);
 	//msg_write("chosen: " + chosen_device);
 
 	init();
 }
 
-AudioOutput::~AudioOutput()
+DeviceManager::~DeviceManager()
 {
 	kill();
 	HuiConfig.setStr("Output.ChosenDevice", chosen_device);
-	HuiConfig.setFloat("Output.Volume", volume);
+	HuiConfig.setFloat("Output.Volume", output_volume);
 }
 
-void AudioOutput::setDevice(const string &device)
+void DeviceManager::setDevice(const string &device)
 {
 	HuiConfig.setStr("Output.ChosenDevice", device);
 
@@ -91,24 +131,102 @@ void AudioOutput::setDevice(const string &device)
 
 void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata)
 {
-	if (eol > 0)
-		return;
-	if (!i or !userdata)
+	if (eol > 0 or !i or !userdata)
 		return;
 
-	Array<string> *devices = (Array<string>*)userdata;
-	devices->add(i->name);
+
+	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
+
+	Array<Device> *devices = (Array<Device>*)userdata;
+	Device d;
+	d.type = d.TYPE_OUTPUT;
+	d.name = i->description;
+	d.internal_name = i->name;
+	d.channels = i->channel_map.channels;
+	d.present = true;
+	d.hidden = false;
+	foreach(Device &dd, *devices){
+		if (dd.name == d.name){
+			dd.present = true;
+			//dd = d;
+			return;
+		}
+	}
+	devices->add(d);
 }
 
-Array<string> AudioOutput::getDevices()
+void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
+{
+	if (eol > 0 or !i or !userdata)
+		return;
+
+	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
+
+	Array<Device> *devices = (Array<Device>*)userdata;
+	Device d;
+	d.type = d.TYPE_INPUT;
+	d.name = i->description;
+	d.internal_name = i->name;
+	d.channels = i->channel_map.channels;
+	d.present = true;
+	d.hidden = false;
+	foreach(Device &dd, *devices){
+		if (dd.name == d.name){
+			dd.present = true;
+			//dd = d;
+			return;
+		}
+	}
+	devices->add(d);
+}
+
+Array<string> DeviceManager::getDevices()
 {
 	Array<string> devices;
 
-	pa_operation *op = pa_context_get_sink_info_list(context, pa_sink_info_callback, &devices);
+	update_devices();
+
+	foreach(Device &d, output_devices)
+		devices.add(d.name);
+
+	return devices;
+}
+
+void DeviceManager::update_devices()
+{
+	if (!dirty)
+		return;
+
+	foreach(Device &d, output_devices)
+		d.present = false;
+
+	pa_operation *op = pa_context_get_sink_info_list(context, pa_sink_info_callback, &output_devices);
 	if (!testError("pa_context_get_sink_info_list"))
 		pa_wait_op(op);
 
-	return devices;
+	foreach(Device &d, input_devices)
+		d.present = false;
+
+	op = pa_context_get_source_info_list(context, pa_source_info_callback, &input_devices);
+	if (!testError("pa_context_get_source_info_list"))
+		pa_wait_op(op);
+
+	dirty = false;
+
+	HuiConfig.setStr("Output.Devices", devs2str(output_devices));
+	HuiConfig.setStr("Input.Devices", devs2str(input_devices));
+}
+
+Array<Device> DeviceManager::getOutputDevices()
+{
+	update_devices();
+	return output_devices;
+}
+
+Array<Device> DeviceManager::getInputDevices()
+{
+	update_devices();
+	return input_devices;
 }
 
 
@@ -129,7 +247,7 @@ bool pa_wait_context_ready(pa_context *c)
 	return true;
 }
 
-void AudioOutput::init()
+void DeviceManager::init()
 {
 	if (initialized)
 		return;
@@ -172,9 +290,11 @@ void AudioOutput::init()
 	testError("pa_context_subscribe");
 
 	initialized = true;
+
+	update_devices();
 }
 
-void AudioOutput::kill()
+void DeviceManager::kill()
 {
 	if (!initialized)
 		return;
@@ -190,30 +310,30 @@ void AudioOutput::kill()
 }
 
 
-float AudioOutput::getVolume()
+float DeviceManager::getOutputVolume()
 {
-	return volume;
+	return output_volume;
 }
 
-void AudioOutput::setVolume(float _volume)
+void DeviceManager::setOutputVolume(float _volume)
 {
-	volume = _volume;
+	output_volume = _volume;
 	notify(MESSAGE_CHANGE);
 }
 
-void AudioOutput::addStream(AudioStream* s)
+void DeviceManager::addStream(AudioStream* s)
 {
 	streams.add(s);
 }
 
-void AudioOutput::removeStream(AudioStream* s)
+void DeviceManager::removeStream(AudioStream* s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)
 			streams.erase(i);
 }
 
-bool AudioOutput::streamExists(AudioStream* s)
+bool DeviceManager::streamExists(AudioStream* s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)
@@ -221,7 +341,12 @@ bool AudioOutput::streamExists(AudioStream* s)
 	return false;
 }
 
-bool AudioOutput::testError(const string &msg)
+void DeviceManager::SendDeviceChange()
+{
+	notify(MESSAGE_CHANGE_DEVICES);
+}
+
+bool DeviceManager::testError(const string &msg)
 {
 	int e = pa_context_errno(context);
 	if (e != 0)

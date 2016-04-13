@@ -19,7 +19,7 @@ class PluginManager;
 class Slider;
 class Log;
 class AudioInput;
-class AudioOutput;
+class DeviceManager;
 class AudioView;
 class Storage;
 class Clipboard;
@@ -53,7 +53,7 @@ public:
 
 	Log *log;
 
-	AudioOutput *output;
+	DeviceManager *device_manager;
 
 	PluginManager *plugin_manager;
 	Clipboard *clipboard;

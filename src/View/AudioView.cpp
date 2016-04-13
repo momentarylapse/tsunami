@@ -88,7 +88,7 @@ Image *ExpandImage(Image *im, float d)
 	return r;
 }
 
-AudioView::AudioView(TsunamiWindow *parent, Song *_song, AudioOutput *_output) :
+AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output) :
 	Observable("AudioView"),
 	Observer("AudioView"),
 	midi_scale(Scale::TYPE_MAJOR, 0),

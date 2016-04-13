@@ -9,7 +9,6 @@
 #include "../../TsunamiWindow.h"
 #include "../../Audio/AudioInputAny.h"
 #include "../../Audio/AudioInputAudio.h"
-#include "../../Audio/AudioOutput.h"
 #include "../../Audio/AudioStream.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
@@ -19,6 +18,7 @@
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "CaptureConsole.h"
+#include "../../Audio/DeviceManager.h"
 
 CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	SideBarConsole(_("Aufnahme")),

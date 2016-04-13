@@ -17,7 +17,7 @@
 #include "Selection.h"
 #include "ColorScheme.h"
 
-class AudioOutput;
+class DeviceManager;
 class AudioStream;
 class AudioInputAny;
 class SongRenderer;
@@ -34,7 +34,7 @@ class ViewModeCapture;
 class AudioView : public Observable, public Observer
 {
 public:
-	AudioView(TsunamiWindow *parent, Song *audio, AudioOutput *output);
+	AudioView(TsunamiWindow *parent, Song *audio, DeviceManager *output);
 	virtual ~AudioView();
 
 	void checkConsistency();

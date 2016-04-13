@@ -6,11 +6,12 @@
  */
 
 #include "Tsunami.h"
+
+#include "Audio/DeviceManager.h"
 #include "TsunamiWindow.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
-#include "Audio/AudioOutput.h"
 #include "Plugins/PluginManager.h"
 
 #include "lib/image/ImagePainter.h"
@@ -26,7 +27,7 @@ Tsunami::Tsunami() :
 {
 	song = NULL;
 	_view = NULL;
-	output = NULL;
+	device_manager = NULL;
 	log = NULL;
 	_win = NULL;
 	clipboard = NULL;
@@ -45,7 +46,7 @@ Tsunami::Tsunami() :
 Tsunami::~Tsunami()
 {
 	delete(storage);
-	delete(output);
+	delete(device_manager);
 	delete(song);
 	delete(plugin_manager);
 }
@@ -64,7 +65,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 
 	clipboard = new Clipboard;
 
-	output = new AudioOutput;
+	device_manager = new DeviceManager;
 
 	song = new Song;
 	song->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);

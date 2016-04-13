@@ -25,7 +25,8 @@ public:
 	friend class AudioStream;
 	friend class AudioInputAudio;
 
-	static const string MESSAGE_CHANGE_DEVICES;
+	static const string MESSAGE_ADD_DEVICE;
+	static const string MESSAGE_REMOVE_DEVICE;
 
 	DeviceManager();
 	virtual ~DeviceManager();
@@ -49,13 +50,14 @@ public:
 	void removeStream(AudioStream *s);
 	bool streamExists(AudioStream *s);
 
-	void send_device_change();
+	void add_device(Device &d);
+	void remove_device(int type, int index);
 
 	void setDeviceConfig(Device &d);
 
 	Device *getDevice(int type, const string &internal_name);
 
-private:
+//private:
 	bool testError(const string &msg);
 
 	bool initialized;
@@ -69,8 +71,10 @@ private:
 	Array<Device> output_devices;
 	Array<Device> input_devices;
 
+	void write_config();
+
 public:
-	bool dirty;
+	int msg_type, msg_index;
 };
 
 #endif /* DEVICEMANAGER_H_ */

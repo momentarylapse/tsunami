@@ -30,7 +30,7 @@ public:
 
 	int type;
 	int channels;
-	bool hidden;
+	bool visible;
 	bool present;
 	float latency;
 };

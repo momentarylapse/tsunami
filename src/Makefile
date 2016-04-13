@@ -76,6 +76,7 @@ OBJ = \
  Audio/AudioInputAudio.o\
  Audio/AudioInputMidi.o\
  Audio/AudioStream.o\
+ Audio/Device.o\
  Audio/DeviceManager.o\
  Data/BufferBox.o\
  Data/Clef.o\
@@ -510,6 +511,9 @@ Audio/AudioStream.o : Audio/AudioStream.cpp
 
 Audio/DeviceManager.o : Audio/DeviceManager.cpp
 	$(CPP) -c Audio/DeviceManager.cpp -o $@ $(CXXFLAGS)
+
+Audio/Device.o : Audio/Device.cpp
+	$(CPP) -c Audio/Device.cpp -o $@ $(CXXFLAGS)
 
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)

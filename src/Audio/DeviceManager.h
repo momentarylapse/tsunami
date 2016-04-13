@@ -12,28 +12,12 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 
+
 class AudioStream;
 class AudioInputAudio;
+class Device;
+
 struct pa_context;
-
-
-class Device
-{
-public:
-
-	string name;
-	string internal_name;
-
-	enum{
-		TYPE_OUTPUT,
-		TYPE_INPUT
-	};
-
-	int type;
-	int channels;
-	bool hidden;
-	bool present;
-};
 
 class DeviceManager : public Observable
 {
@@ -65,7 +49,11 @@ public:
 	void removeStream(AudioStream *s);
 	bool streamExists(AudioStream *s);
 
-	void SendDeviceChange();
+	void send_device_change();
+
+	void setDeviceConfig(Device &d);
+
+	Device *getDevice(int type, const string &internal_name);
 
 private:
 	bool testError(const string &msg);

@@ -8,6 +8,7 @@
 #include "AudioStream.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
+#include "Device.h"
 
 #include <pulse/pulseaudio.h>
 #include "DeviceManager.h"
@@ -36,34 +37,25 @@ void pa_wait_op(pa_operation *op)
 
 void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata)
 {
-	printf("----change   %d\n", idx);
-	DeviceManager *out = (DeviceManager*)userdata;
-	out->dirty = true;
+	//msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
 
-	HuiRunLaterM(0.1f, out, &DeviceManager::SendDeviceChange);
-	msg_write(format("event  %d  %d", (t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK), (t & PA_SUBSCRIPTION_EVENT_TYPE_MASK)));
-	/*if ((t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK) == PA_SUBSCRIPTION_EVENT_SOURCE) {
-		if ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) {
-		}
-	}*/
+	DeviceManager *out = (DeviceManager*)userdata;
+
+	if (((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_NEW) or ((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_REMOVE)){
+		//printf("----change   %d\n", idx);
+
+		out->dirty = true;
+		HuiRunLaterM(0.1f, out, &DeviceManager::send_device_change);
+	}
 }
+
 
 Array<Device> str2devs(const string &s, int type)
 {
 	Array<Device> devices;
 	Array<string> a = s.explode("||");
-	foreach(string &b, a){
-		Array<string> c = b.explode("|");
-		if (c.num < 4)
-			continue;
-		Device d;
-		d.type = type;
-		d.name = c[0];
-		d.internal_name = c[1];
-		d.channels = c[2]._int();
-		d.hidden = c[3]._bool();
-		devices.add(d);
-	}
+	foreach(string &b, a)
+		devices.add(Device(type, b));
 	return devices;
 }
 
@@ -73,13 +65,11 @@ string devs2str(Array<Device> devices)
 	foreachi(Device &d, devices, i){
 		if (i > 0)
 			r += "||";
-		r += d.name + "|";
-		r += d.internal_name + "|";
-		r += i2s(d.channels) + "|";
-		r += b2s(d.hidden);
+		r += d.to_config();
 	}
 	return r;
 }
+
 
 DeviceManager::DeviceManager() :
 	Observable("AudioOutput")
@@ -138,15 +128,10 @@ void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *
 	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	Array<Device> *devices = (Array<Device>*)userdata;
-	Device d;
-	d.type = d.TYPE_OUTPUT;
-	d.name = i->description;
-	d.internal_name = i->name;
-	d.channels = i->channel_map.channels;
+	Device d = Device(d.TYPE_OUTPUT, i->description, i->name, i->channel_map.channels);
 	d.present = true;
-	d.hidden = false;
 	foreach(Device &dd, *devices){
-		if (dd.name == d.name){
+		if (dd.internal_name == d.internal_name){
 			dd.present = true;
 			//dd = d;
 			return;
@@ -163,15 +148,10 @@ void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, vo
 	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	Array<Device> *devices = (Array<Device>*)userdata;
-	Device d;
-	d.type = d.TYPE_INPUT;
-	d.name = i->description;
-	d.internal_name = i->name;
-	d.channels = i->channel_map.channels;
+	Device d = Device(d.TYPE_INPUT, i->description, i->name, i->channel_map.channels);
 	d.present = true;
-	d.hidden = false;
 	foreach(Device &dd, *devices){
-		if (dd.name == d.name){
+		if (dd.internal_name == d.internal_name){
 			dd.present = true;
 			//dd = d;
 			return;
@@ -341,9 +321,33 @@ bool DeviceManager::streamExists(AudioStream* s)
 	return false;
 }
 
-void DeviceManager::SendDeviceChange()
+void DeviceManager::send_device_change()
 {
 	notify(MESSAGE_CHANGE_DEVICES);
+}
+
+Device* DeviceManager::getDevice(int type, const string &internal_name)
+{
+	if (type == Device::TYPE_OUTPUT){
+		foreach(Device &d, output_devices)
+			if (d.internal_name == internal_name)
+				return &d;
+	}
+	if (type == Device::TYPE_INPUT){
+		foreach(Device &d, input_devices)
+			if (d.internal_name == internal_name)
+				return &d;
+	}
+	return NULL;
+}
+
+void DeviceManager::setDeviceConfig(Device &d)
+{
+	Device *dd = getDevice(d.type, d.internal_name);
+	if (dd){
+		dd->hidden = d.hidden;
+		dd->latency = d.latency;
+	}
 }
 
 bool DeviceManager::testError(const string &msg)

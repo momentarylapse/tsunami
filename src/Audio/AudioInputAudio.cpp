@@ -15,6 +15,7 @@
 
 #include <pulse/pulseaudio.h>
 #include "DeviceManager.h"
+#include "Device.h"
 
 
 string AudioInputAudio::temp_filename;

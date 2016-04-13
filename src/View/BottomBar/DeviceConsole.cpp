@@ -7,6 +7,7 @@
 
 #include "DeviceConsole.h"
 #include "../../Audio/DeviceManager.h"
+#include "../../Audio/Device.h"
 
 DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 	BottomBarConsole(_("Ger&ate")),
@@ -22,7 +23,7 @@ DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 	//setTarget("grid", 0);
 	addListView(_("!format=tttCc\\Name\\Interner Name\\Kan&ale\\anzeigen\\pr&asent"), 0, 0, 0, 0, "output_list");
 	setTarget("dev_tab", 1);
-	addListView(_("!format=tttCc\\Name\\Interner Name\\Kan&ale\\anzeigen\\pr&asent"), 0, 0, 0, 0, "input_list");
+	addListView(_("!format=tttCcT\\Name\\Interner Name\\Kan&ale\\anzeigen\\pr&asent\\Latenz (ms)"), 0, 0, 0, 0, "input_list");
 
 	subscribe(device_manager, device_manager->MESSAGE_CHANGE_DEVICES);
 
@@ -49,7 +50,7 @@ void DeviceConsole::update()
 	reset("input_list");
 	devices = device_manager->getInputDevices();
 	foreach(Device &d, devices)
-		addString("input_list", format("%s\\%s\\%d\\%s\\%s", d.name.c_str(), d.internal_name.c_str(), d.channels, d.hidden ? "false" : "true", d.present ? "true" : "false"));
+		addString("input_list", format("%s\\%s\\%d\\%s\\%s\\%.1f", d.name.c_str(), d.internal_name.c_str(), d.channels, d.hidden ? "false" : "true", d.present ? "true" : "false", d.latency));
 
 }
 

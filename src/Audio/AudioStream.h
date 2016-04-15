@@ -92,7 +92,7 @@ private:
 	int dev_sample_rate;
 	long long cur_pos;
 
-	DeviceManager *manager;
+	DeviceManager *device_manager;
 	bool killed;
 
 	Thread *thread;

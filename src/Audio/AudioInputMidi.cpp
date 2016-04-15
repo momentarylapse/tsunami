@@ -247,7 +247,8 @@ int AudioInputMidi::doCapturing()
 		snd_seq_free_event(ev);
 	}
 
-	preview_renderer->feed(current_midi);
+	if (current_midi.num > 0)
+		preview_renderer->feed(current_midi);
 	if ((current_midi.num > 0) and (!preview_stream->isPlaying()))
 		preview_stream->play();
 

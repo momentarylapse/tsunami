@@ -12,8 +12,8 @@
 
 SynthesizerRenderer::SynthesizerRenderer(Synthesizer *_s)
 {
+	auto_stop = true;
 	setSynthesizer(_s);
-	setAutoStop(true);
 }
 
 SynthesizerRenderer::~SynthesizerRenderer()
@@ -32,6 +32,8 @@ void SynthesizerRenderer::__delete__()
 void SynthesizerRenderer::setSynthesizer(Synthesizer *_s)
 {
 	s = _s;
+	if (s)
+		s->auto_stop = auto_stop;
 }
 
 int SynthesizerRenderer::getSampleRate()
@@ -72,9 +74,10 @@ void SynthesizerRenderer::resetMidiData()
 		s->resetMidiData();
 }
 
-void SynthesizerRenderer::setAutoStop(bool auto_stop)
+void SynthesizerRenderer::setAutoStop(bool _auto_stop)
 {
+	auto_stop = _auto_stop;
 	if (s)
-		s->auto_stop = auto_stop;
+		s->auto_stop = _auto_stop;
 }
 

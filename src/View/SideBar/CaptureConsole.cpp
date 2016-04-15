@@ -176,10 +176,11 @@ void CaptureConsole::setTarget(int index)
 
 void CaptureConsole::onSource()
 {
-	int n = HuiCurWindow->getInt("");
+	int n = getInt("");
 	if (type == Track::TYPE_MIDI){
-		if (n >= 0)
+		if (n >= 0){
 			input->connectMidiPort(midi_ports[n]);
+		}
 	}else if (type == Track::TYPE_AUDIO){
 		if ((n >= 0) and (n < audio_sources.num)){
 			selected_audio_source = audio_sources[n];

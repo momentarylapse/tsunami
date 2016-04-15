@@ -73,6 +73,8 @@ public:
 	AudioInputAudio *input_audio;
 	AudioInputMidi *input_midi;
 	bool save_mode;
+
+	Synthesizer *preview_synth;
 };
 
 #endif /* SRC_AUDIO_AUDIOINPUTANY_H_ */

@@ -40,6 +40,7 @@ public:
 
 private:
 	Synthesizer *s;
+	bool auto_stop;
 };
 
 #endif /* SRC_AUDIO_SYNTH_SYNTHESIZERRENDERER_H_ */

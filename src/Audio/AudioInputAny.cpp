@@ -26,6 +26,7 @@ AudioInputAny::AudioInputAny(int _sample_rate) :
 	current_buffer = NULL;
 	midi = NULL;
 	current_midi = NULL;
+	preview_synth = NULL;
 	save_mode = false;
 }
 
@@ -61,6 +62,7 @@ void AudioInputAny::setType(int _type)
 	}
 	if (type == Track::TYPE_MIDI){
 		input_midi = new AudioInputMidi(sample_rate);
+		input_midi->setPreviewSynthesizer(preview_synth);
 		midi = &input_midi->midi;
 		current_midi = &input_midi->current_midi;
 		subscribe(input_midi);
@@ -180,8 +182,9 @@ bool AudioInputAny::connectMidiPort(AudioInputMidi::MidiPort& p)
 
 void AudioInputAny::setPreviewSynthesizer(Synthesizer* s)
 {
+	preview_synth = s;
 	if (type == Track::TYPE_MIDI)
-		input_midi->setPreviewSynthesizer(s);
+		input_midi->setPreviewSynthesizer(preview_synth);
 }
 
 void AudioInputAny::setChunkSize(int size)

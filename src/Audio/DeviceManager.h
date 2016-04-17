@@ -50,12 +50,13 @@ public:
 	void removeStream(AudioStream *s);
 	bool streamExists(AudioStream *s);
 
-	void add_device(Device &d);
 	void remove_device(int type, int index);
 
-	void setDeviceConfig(Device &d);
+	void setDeviceConfig(const Device &d);
+	void makeDeviceTopPriority(const Device &d);
 
 	Device *getDevice(int type, const string &internal_name);
+	Array<Device> &getDeviceList(int type);
 
 //private:
 	bool testError(const string &msg);
@@ -70,6 +71,7 @@ public:
 	void update_devices();
 	Array<Device> output_devices;
 	Array<Device> input_devices;
+	Array<Device> midi_input_devices;
 
 	void write_config();
 

@@ -40,24 +40,24 @@ class MetronomeRenderer : AudioRenderer
 		buf.r = 0
 		buf.l = 0
 		MidiRawData midi
-		midi.samples = buf.num
+		midi.samples = buf.length
 	
 		// render clicks
-		while offset < buf.num
+		while offset < buf.length
 			if cur_beat == 0
 				midi.addMetronomeClick(offset, 0, volume)
 			else
 				midi.addMetronomeClick(offset, 1, volume)
 			cur_beat = loopi(cur_beat + 1, 0, num_beats - 1)
 			offset += sm_m
-		offset -= buf.num
+		offset -= buf.length
 		
 		fraction = 1 - i2f(offset) / i2f(sm_m)
 		
 		synth.feed(midi)
 		synth.read(buf)
 		win.redraw("area")
-		return buf.num
+		return buf.length
 	
 	void setBpm(float bpm_new)
 		bpm = bpm_new

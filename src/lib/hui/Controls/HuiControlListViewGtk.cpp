@@ -127,6 +127,8 @@ HuiControlListView::HuiControlListView(const string &title, const string &id, Hu
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&OnGtkListSelect), this);
 
+	//gtk_tree_view_set_reorderable(GTK_TREE_VIEW(view), true);
+
 	// frame
 	frame = sw;
 	if (panel->border_width > 0){

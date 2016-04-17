@@ -19,13 +19,17 @@ public:
 	Device(int type, const string &s);
 
 	string to_config();
+	string get_name() const;
+	bool is_default() const;
 
 	string name;
 	string internal_name;
 
 	enum{
-		TYPE_OUTPUT,
-		TYPE_INPUT
+		TYPE_AUDIO_OUTPUT,
+		TYPE_AUDIO_INPUT,
+		TYPE_MIDI_OUTPUT,
+		TYPE_MIDI_INPUT
 	};
 
 	int type;
@@ -33,6 +37,7 @@ public:
 	bool visible;
 	bool present;
 	float latency;
+	int client, port;
 };
 
 #endif /* SRC_AUDIO_DEVICE_H_ */

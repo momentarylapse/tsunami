@@ -136,7 +136,7 @@ void DeviceConsole::add_device()
 		input_devices = devices;
 		Device *d = input_devices.back();
 		addString("input-list", to_format(devices.num - 1, d));
-	}else if (device_manager->msg_type == Device::TYPE_AUDIO_INPUT){
+	}else if (device_manager->msg_type == Device::TYPE_MIDI_INPUT){
 		midi_input_devices = devices;
 		Device *d = midi_input_devices.back();
 		addString("midi-input-list", to_format(devices.num - 1, d));

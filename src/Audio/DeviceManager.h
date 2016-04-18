@@ -60,6 +60,8 @@ public:
 	bool testError(const string &msg);
 
 	bool initialized;
+	int hui_rep_id;
+
 	pa_context *context;
 
 	_snd_seq *handle;
@@ -69,11 +71,13 @@ public:
 
 	Array<AudioStream*> streams;
 
+	void update_midi_devices();
 	void update_devices();
 	Array<Device*> empty_device_list;
 	Array<Device*> output_devices;
 	Array<Device*> input_devices;
 	Array<Device*> midi_input_devices;
+	Device* default_devices[4];
 
 	void write_config();
 

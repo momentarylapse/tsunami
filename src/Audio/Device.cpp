@@ -14,6 +14,7 @@ Device::Device()
 	type = -1;
 	channels = 0;
 	present = false;
+	present_old = false;
 	visible = true;
 	latency = 0;
 	client = port = -1;
@@ -26,6 +27,7 @@ Device::Device(int _type, const string &_name, const string &_internal_name, int
 	internal_name = _internal_name;
 	channels = _channels;
 	present = false;
+	present_old = false;
 	visible = true;
 	latency = 0;
 	client = port = -1;
@@ -37,6 +39,7 @@ Device::Device(int _type, const string &s)
 	type = _type;
 	channels = 0;
 	present = false;
+	present_old = false;
 	visible = true;
 	latency = 0;
 	client = port = -1;

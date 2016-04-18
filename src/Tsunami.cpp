@@ -18,7 +18,7 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.37.1";
+string AppVersion = "0.6.38.0";
 
 Tsunami *tsunami = NULL;
 

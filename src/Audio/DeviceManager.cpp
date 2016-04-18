@@ -89,18 +89,21 @@ DeviceManager::DeviceManager() :
 	handle = NULL;
 
 	// system defaults
-	Device *d;
-	d = get_device_create(Device::TYPE_AUDIO_OUTPUT, ":default:");
-	d->channels = 2;
-	d = get_device_create(Device::TYPE_AUDIO_INPUT, ":default:");
-	d->channels = 2;
-	d = get_device_create(Device::TYPE_MIDI_INPUT, ":default:");
+	default_devices[Device::TYPE_AUDIO_OUTPUT] = get_device_create(Device::TYPE_AUDIO_OUTPUT, ":default:");
+	default_devices[Device::TYPE_AUDIO_OUTPUT]->channels = 2;
+	default_devices[Device::TYPE_AUDIO_INPUT] = get_device_create(Device::TYPE_AUDIO_INPUT, ":default:");
+	default_devices[Device::TYPE_AUDIO_INPUT]->channels = 2;
+	default_devices[Device::TYPE_MIDI_INPUT] = get_device_create(Device::TYPE_MIDI_INPUT, ":default:");
 
 	init();
+
+	hui_rep_id = HuiRunRepeatedM(2.0f, this, &DeviceManager::update_midi_devices);
 }
 
 DeviceManager::~DeviceManager()
 {
+	HuiCancelRunner(hui_rep_id);
+
 	write_config();
 	kill();
 
@@ -178,9 +181,7 @@ void DeviceManager::update_devices()
 	if (!testError("pa_context_get_sink_info_list"))
 		pa_wait_op(op);
 
-	foreach(Device *d, output_devices)
-		if (d->is_default())
-			d->present = true;
+	default_devices[Device::TYPE_AUDIO_OUTPUT]->present = true;
 
 
 	foreach(Device *d, input_devices)
@@ -190,13 +191,22 @@ void DeviceManager::update_devices()
 	if (!testError("pa_context_get_source_info_list"))
 		pa_wait_op(op);
 
-	foreach(Device *d, input_devices)
-		if (d->is_default())
-			d->present = true;
+
+	default_devices[Device::TYPE_AUDIO_INPUT]->present = true;
 
 
-	foreach(Device *d, midi_input_devices)
+	update_midi_devices();
+
+	notify(MESSAGE_CHANGE);
+	write_config();
+}
+
+void DeviceManager::update_midi_devices()
+{
+	foreach(Device *d, midi_input_devices){
+		d->present_old = d->present;
 		d->present = false;
+	}
 
 	snd_seq_client_info_t *cinfo;
 	snd_seq_port_info_t *pinfo;
@@ -220,12 +230,15 @@ void DeviceManager::update_devices()
 		}
 	}
 
-	foreach(Device *d, midi_input_devices)
-		if (d->is_default())
-			d->present = true;
+	default_devices[Device::TYPE_MIDI_INPUT]->present = true;
 
-	notify(MESSAGE_CHANGE);
-	write_config();
+
+	bool changed = false;
+	foreach(Device *d, midi_input_devices)
+		if (d->present_old != d->present)
+			changed = true;
+	if (changed)
+		notify(MESSAGE_CHANGE);
 }
 
 
@@ -380,7 +393,9 @@ Device* DeviceManager::get_device_create(int type, const string &internal_name)
 			return d;
 	Device *d = new Device(type, "", internal_name, 0);
 	devices.add(d);
-	// don't notify()... do later via setDeviceConfig()
+	msg_type = type;
+	msg_index = devices.num - 1;
+	notify(MESSAGE_ADD_DEVICE);
 	return d;
 }
 

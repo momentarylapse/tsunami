@@ -38,6 +38,8 @@ public:
 	bool present;
 	float latency;
 	int client, port;
+
+	bool present_old;
 };
 
 #endif /* SRC_AUDIO_DEVICE_H_ */

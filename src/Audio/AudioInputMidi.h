@@ -13,12 +13,12 @@
 #include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
 
-struct _snd_seq;
 struct _snd_seq_port_subscribe;
 class AudioStream;
 class SynthesizerRenderer;
 class Synthesizer;
 class Device;
+class DeviceManager;
 
 class AudioInputMidi : public PeakMeterSource
 {
@@ -84,12 +84,11 @@ private:
 
 	void clearInputQueue();
 
-	_snd_seq *handle;
 	_snd_seq_port_subscribe *subs;
 	MidiPort cur_midi_port;
 	MidiPort no_midi_port;
+	DeviceManager *device_manager;
 	Device *device;
-	int portid;
 	int npfd;
 	struct pollfd *pfd;
 	HuiTimer timer;

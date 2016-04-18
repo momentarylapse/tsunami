@@ -12,6 +12,8 @@
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include <alsa/asoundlib.h>
+#include "Device.h"
+#include "DeviceManager.h"
 
 
 static const float DEFAULT_UPDATE_TIME = 0.005f;
@@ -27,13 +29,14 @@ AudioInputMidi::MidiPort::MidiPort()
 AudioInputMidi::AudioInputMidi(int _sample_rate) :
 	PeakMeterSource("AudioInputMidi")
 {
-	handle = NULL;
 	subs = NULL;
 	sample_rate = _sample_rate;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = 512;
 
 	running = false;
+
+	device_manager = tsunami->device_manager;
 
 	init();
 
@@ -48,27 +51,12 @@ AudioInputMidi::~AudioInputMidi()
 	stop();
 	if (subs)
 		unconnect();
-	if (handle)
-		snd_seq_close(handle);
 	delete(preview_renderer);
 	delete(preview_stream);
 }
 
 void AudioInputMidi::init()
 {
-	int r = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
-	if (r < 0){
-		tsunami->log->error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
-		return;
-	}
-	snd_seq_set_client_name(handle, "Tsunami");
-	portid = snd_seq_create_simple_port(handle, "Tsunami MIDI in",
-				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
-				SND_SEQ_PORT_TYPE_APPLICATION);
-	if (portid < 0){
-		tsunami->log->error(string("Error creating sequencer port: ") + snd_strerror(portid));
-		return;
-	}
 }
 
 void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
@@ -90,14 +78,14 @@ bool AudioInputMidi::connectMidiPort(AudioInputMidi::MidiPort &p)
 	snd_seq_addr_t sender, dest;
 	sender.client = p.client;
 	sender.port = p.port;
-	dest.client = snd_seq_client_id(handle);
-	dest.port = portid;
+	dest.client = snd_seq_client_id(device_manager->handle);
+	dest.port = device_manager->portid;
 	cur_midi_port = p;
 
 	snd_seq_port_subscribe_malloc(&subs);
 	snd_seq_port_subscribe_set_sender(subs, &sender);
 	snd_seq_port_subscribe_set_dest(subs, &dest);
-	int r = snd_seq_subscribe_port(handle, subs);
+	int r = snd_seq_subscribe_port(device_manager->handle, subs);
 	if (r != 0){
 		tsunami->log->error(string("Error connecting to midi port: ") + snd_strerror(r));
 		snd_seq_port_subscribe_free(subs);
@@ -117,7 +105,7 @@ bool AudioInputMidi::unconnect()
 {
 	if (!subs)
 		return true;
-	int r = snd_seq_unsubscribe_port(handle, subs);
+	int r = snd_seq_unsubscribe_port(device_manager->handle, subs);
 	if (r != 0)
 		tsunami->log->error(string("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
@@ -141,10 +129,10 @@ Array<AudioInputMidi::MidiPort> AudioInputMidi::findMidiPorts()
 	snd_seq_client_info_alloca(&cinfo);
 	snd_seq_port_info_alloca(&pinfo);
 	snd_seq_client_info_set_client(cinfo, -1);
-	while (snd_seq_query_next_client(handle, cinfo) >= 0){
+	while (snd_seq_query_next_client(device_manager->handle, cinfo) >= 0){
 		snd_seq_port_info_set_client(pinfo, snd_seq_client_info_get_client(cinfo));
 		snd_seq_port_info_set_port(pinfo, -1);
-		while (snd_seq_query_next_port(handle, pinfo) >= 0){
+		while (snd_seq_query_next_port(device_manager->handle, pinfo) >= 0){
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_READ) == 0)
 				continue;
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
@@ -191,7 +179,7 @@ void AudioInputMidi::clearInputQueue()
 {
 	while (true){
 		snd_seq_event_t *ev;
-		int r = snd_seq_event_input(handle, &ev);
+		int r = snd_seq_event_input(device_manager->handle, &ev);
 		if (r < 0)
 			break;
 		snd_seq_free_event(ev);
@@ -200,7 +188,7 @@ void AudioInputMidi::clearInputQueue()
 
 bool AudioInputMidi::start()
 {
-	if (!handle)
+	if (!device_manager->handle)
 		return false;
 	accumulating = false;
 	offset = 0;
@@ -242,7 +230,7 @@ int AudioInputMidi::doCapturing()
 
 	while (true){
 		snd_seq_event_t *ev;
-		int r = snd_seq_event_input(handle, &ev);
+		int r = snd_seq_event_input(device_manager->handle, &ev);
 		if (r < 0)
 			break;
 		int pitch = ev->data.note.note;

@@ -11,6 +11,8 @@
 #include "Device.h"
 
 #include <pulse/pulseaudio.h>
+#include <alsa/asoundlib.h>
+
 #include "DeviceManager.h"
 
 const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
@@ -82,6 +84,9 @@ DeviceManager::DeviceManager() :
 
 	output_volume = HuiConfig.getFloat("Output.Volume", 1.0f);
 
+
+	context = NULL;
+	handle = NULL;
 
 	// system defaults
 	Device *d;
@@ -191,6 +196,31 @@ void DeviceManager::update_devices()
 
 
 	foreach(Device *d, midi_input_devices)
+		d->present = false;
+
+	snd_seq_client_info_t *cinfo;
+	snd_seq_port_info_t *pinfo;
+
+	snd_seq_client_info_alloca(&cinfo);
+	snd_seq_port_info_alloca(&pinfo);
+	snd_seq_client_info_set_client(cinfo, -1);
+	while (snd_seq_query_next_client(handle, cinfo) >= 0){
+		snd_seq_port_info_set_client(pinfo, snd_seq_client_info_get_client(cinfo));
+		snd_seq_port_info_set_port(pinfo, -1);
+		while (snd_seq_query_next_port(handle, pinfo) >= 0){
+			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_READ) == 0)
+				continue;
+			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
+				continue;
+			Device *d = get_device_create(Device::TYPE_MIDI_INPUT, format("%s/%s", snd_seq_client_info_get_name(cinfo), snd_seq_port_info_get_name(pinfo)));
+			d->name = d->internal_name;
+			d->client = snd_seq_client_info_get_client(cinfo);
+			d->port = snd_seq_port_info_get_port(pinfo);
+			d->present = true;
+		}
+	}
+
+	foreach(Device *d, midi_input_devices)
 		if (d->is_default())
 			d->present = true;
 
@@ -222,6 +252,7 @@ void DeviceManager::init()
 		return;
 	msg_db_f("Output.init", 1);
 
+	// audio
 	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
 	if (!m){
 		tsunami->log->error("pa_threaded_mainloop_new failed");
@@ -256,6 +287,23 @@ void DeviceManager::init()
 	pa_context_subscribe(context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
 	testError("pa_context_subscribe");
 
+
+
+	// midi
+	int r = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
+	if (r < 0){
+		tsunami->log->error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
+		return;
+	}
+	snd_seq_set_client_name(handle, "Tsunami");
+	portid = snd_seq_create_simple_port(handle, "Tsunami MIDI in",
+				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
+				SND_SEQ_PORT_TYPE_APPLICATION);
+	if (portid < 0){
+		tsunami->log->error(string("Error creating sequencer port: ") + snd_strerror(portid));
+		return;
+	}
+
 	update_devices();
 
 	initialized = true;
@@ -270,8 +318,15 @@ void DeviceManager::kill()
 	foreach(AudioStream *s, streams)
 		s->kill();
 
-	pa_context_disconnect(context);
-	testError("pa_context_disconnect");
+	// audio
+	if (context){
+		pa_context_disconnect(context);
+		testError("pa_context_disconnect");
+	}
+
+	// midi
+	if (handle)
+		snd_seq_close(handle);
 
 	initialized = false;
 }

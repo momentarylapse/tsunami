@@ -84,26 +84,26 @@ void DeviceConsole::change_data()
 		changeString("input-list", i, to_format(i, d));
 
 	midi_input_devices = device_manager->getDeviceList(Device::TYPE_MIDI_INPUT);
-	foreachi(Device *d, input_devices, i)
-		changeString("input-list", i, to_format(i, d));
+	foreachi(Device *d, midi_input_devices, i)
+		changeString("midi-input-list", i, to_format(i, d));
 }
 
 void DeviceConsole::update_full()
 {
-	string sel_out, sel_in, sel_midi_in;
+	Device *sel_out, *sel_in, *sel_midi_in;
 
 	if (getInt("output-list") >= 0)
-		sel_out = output_devices[getInt("output-list")]->internal_name;
+		sel_out = output_devices[getInt("output-list")];
 	if (getInt("input-list") >= 0)
-		sel_in = input_devices[getInt("input-list")]->internal_name;
+		sel_in = input_devices[getInt("input-list")];
 	if (getInt("midi-input-list") >= 0)
-		sel_midi_in = midi_input_devices[getInt("midi-input-list")]->internal_name;
+		sel_midi_in = midi_input_devices[getInt("midi-input-list")];
 
 	reset("output-list");
 	output_devices = device_manager->getDeviceList(Device::TYPE_AUDIO_OUTPUT);
 	foreachi(Device *d, output_devices, i){
 		addString("output-list", to_format(i, d));
-		if (d->internal_name == sel_out)
+		if (d == sel_out)
 			setInt("output-list", i);
 	}
 
@@ -111,7 +111,7 @@ void DeviceConsole::update_full()
 	input_devices = device_manager->getDeviceList(Device::TYPE_AUDIO_INPUT);
 	foreachi(Device *d, input_devices, i){
 		addString("input-list", to_format(i, d));
-		if (d->internal_name == sel_in)
+		if (d == sel_in)
 			setInt("input-list", i);
 	}
 
@@ -119,7 +119,7 @@ void DeviceConsole::update_full()
 	midi_input_devices = device_manager->getDeviceList(Device::TYPE_MIDI_INPUT);
 	foreachi(Device *d, midi_input_devices, i){
 		addString("midi-input-list", to_format(i, d));
-		if (d->internal_name == sel_midi_in)
+		if (d == sel_midi_in)
 			setInt("midi-input-list", i);
 	}
 

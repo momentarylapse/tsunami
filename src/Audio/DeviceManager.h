@@ -18,12 +18,14 @@ class AudioInputAudio;
 class Device;
 
 struct pa_context;
+struct _snd_seq;
 
 class DeviceManager : public Observable
 {
 public:
 	friend class AudioStream;
 	friend class AudioInputAudio;
+	friend class AudioInputMidi;
 
 	static const string MESSAGE_ADD_DEVICE;
 	static const string MESSAGE_REMOVE_DEVICE;
@@ -59,6 +61,9 @@ public:
 
 	bool initialized;
 	pa_context *context;
+
+	_snd_seq *handle;
+	int portid;
 
 	float output_volume;
 

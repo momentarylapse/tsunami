@@ -31,12 +31,12 @@ public:
 
 	virtual void onUpdate(Observable *o, const string &message);
 
-	string to_format(int i, const Device &d);
+	string to_format(int i, const Device *d);
 
 	DeviceManager *device_manager;
-	Array<Device> output_devices;
-	Array<Device> input_devices;
-	Array<Device> midi_input_devices;
+	Array<Device*> output_devices;
+	Array<Device*> input_devices;
+	Array<Device*> midi_input_devices;
 };
 
 #endif /* SRC_VIEW_BOTTOMBAR_DEVICECONSOLE_H_ */

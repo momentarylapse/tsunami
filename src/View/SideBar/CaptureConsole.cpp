@@ -19,6 +19,7 @@
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "CaptureConsole.h"
 #include "../../Audio/DeviceManager.h"
+#include "../../Audio/Device.h"
 
 CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	SideBarConsole(_("Aufnahme")),
@@ -36,7 +37,8 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 
 	temp_synth = CreateSynthesizer("", s);
 
-	selected_audio_source = AudioInputAudio::getFavoriteDevice();
+	device_manager = tsunami->device_manager;
+	chosen_device = device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 
 
 	// dialog
@@ -62,6 +64,13 @@ CaptureConsole::~CaptureConsole()
 	delete(temp_synth);
 }
 
+inline int dev_type(int type)
+{
+	if (type == Track::TYPE_AUDIO)
+		return Device::TYPE_AUDIO_INPUT;
+	return Device::TYPE_MIDI_INPUT;
+}
+
 void CaptureConsole::onEnter()
 {
 	type = -1;
@@ -72,10 +81,6 @@ void CaptureConsole::onEnter()
 	subscribe(input);
 	view->setInput(input);
 	peak_meter->setSource(input);
-
-
-
-	selected_audio_source = AudioInputAudio::getFavoriteDevice();
 
 
 	// dialog
@@ -97,6 +102,8 @@ void CaptureConsole::onEnter()
 		setType(Track::TYPE_AUDIO);
 	}
 
+
+	chosen_device = device_manager->chooseDevice(dev_type(type));
 
 	view->setMode(view->mode_capture);
 
@@ -183,8 +190,8 @@ void CaptureConsole::onSource()
 		}
 	}else if (type == Track::TYPE_AUDIO){
 		if ((n >= 0) and (n < audio_sources.num)){
-			selected_audio_source = audio_sources[n];
-			input->setDevice(selected_audio_source);
+			chosen_device = audio_sources[n];
+			input->setDevice(chosen_device);
 		}
 	}
 }
@@ -209,20 +216,16 @@ void CaptureConsole::updateMidiPortList()
 
 void CaptureConsole::updateAudioSourceList()
 {
-	audio_sources = AudioInputAudio::getDevices();
+	audio_sources = device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
 
 	// add all
 	reset("capture_source");
-	foreach(string &d, audio_sources)
-		setString("capture_source", d);
-
-	// add "default"
-	audio_sources.add("");
-	setString("capture_source", _("        - Standard -"));
+	foreach(Device *d, audio_sources)
+		setString("capture_source", d->get_name());
 
 	// select current
-	foreachi(string &d, audio_sources, i)
-		if (d == selected_audio_source)
+	foreachi(Device *d, audio_sources, i)
+		if (d == chosen_device)
 			setInt("capture_source", i);
 
 	enable("capture_source", true);

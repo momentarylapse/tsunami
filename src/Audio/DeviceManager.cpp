@@ -50,22 +50,22 @@ void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uin
 }
 
 
-Array<Device> str2devs(const string &s, int type)
+Array<Device*> str2devs(const string &s, int type)
 {
-	Array<Device> devices;
+	Array<Device*> devices;
 	Array<string> a = s.explode("|");
 	foreach(string &b, a)
-		devices.add(Device(type, b));
+		devices.add(new Device(type, b));
 	return devices;
 }
 
-string devs2str(Array<Device> devices)
+string devs2str(Array<Device*> devices)
 {
 	string r;
-	foreachi(Device &d, devices, i){
+	foreachi(Device *d, devices, i){
 		if (i > 0)
 			r += "|";
-		r += d.to_config();
+		r += d->to_config();
 	}
 	return r;
 }
@@ -80,13 +80,16 @@ DeviceManager::DeviceManager() :
 	input_devices = str2devs(HuiConfig.getStr("Input.Devices", ""), Device::TYPE_AUDIO_INPUT);
 	midi_input_devices = str2devs(HuiConfig.getStr("MidiInput.Devices", ""), Device::TYPE_MIDI_INPUT);
 
-	chosen_device = HuiConfig.getStr("Output.ChosenDevice", "");
 	output_volume = HuiConfig.getFloat("Output.Volume", 1.0f);
-	//msg_write("chosen: " + chosen_device);
 
-	setDeviceConfig(Device(Device::TYPE_AUDIO_OUTPUT, "", "", 2));
-	setDeviceConfig(Device(Device::TYPE_AUDIO_INPUT, "", "", 2));
-	setDeviceConfig(Device(Device::TYPE_MIDI_INPUT, "", "", 0));
+
+	// system defaults
+	Device *d;
+	d = get_device_create(Device::TYPE_AUDIO_OUTPUT, ":default:");
+	d->channels = 2;
+	d = get_device_create(Device::TYPE_AUDIO_INPUT, ":default:");
+	d->channels = 2;
+	d = get_device_create(Device::TYPE_MIDI_INPUT, ":default:");
 
 	init();
 }
@@ -95,37 +98,38 @@ DeviceManager::~DeviceManager()
 {
 	write_config();
 	kill();
+
+	foreach(Device *d, output_devices)
+		delete(d);
+	foreach(Device *d, input_devices)
+		delete(d);
+	foreach(Device *d, midi_input_devices)
+		delete(d);
+}
+
+void DeviceManager::remove_device(int type, int index)
+{
+	Array<Device*> &devices = getDeviceList(type);
+	if ((index < 0) or (index >= devices.num))
+		return;
+	if (devices[index]->present)
+		return;
+	delete(devices[index]);
+	devices.erase(index);
+
+	write_config();
+	msg_type = type;
+	msg_index = index;
+	notify(MESSAGE_REMOVE_DEVICE);
 }
 
 void DeviceManager::write_config()
 {
-	HuiConfig.setStr("Output.ChosenDevice", chosen_device);
+	//HuiConfig.setStr("Output.ChosenDevice", chosen_device);
 	HuiConfig.setFloat("Output.Volume", output_volume);
 	HuiConfig.setStr("Output.Devices", devs2str(output_devices));
 	HuiConfig.setStr("Input.Devices", devs2str(input_devices));
-}
-
-void DeviceManager::setDevice(const string &device)
-{
-	HuiConfig.setStr("Output.ChosenDevice", device);
-
-	Array<string> devs = getDevices();
-
-	// valid?
-	bool valid = (device == "");
-	foreach(string &d, devs)
-		if (d == device)
-			valid = true;
-
-
-	if (valid){
-		chosen_device = device;
-	}else{
-		tsunami->log->error(format("output device '%s' not found. Using default.", device.c_str()));
-		chosen_device = "";
-	}
-
-	//tsunami->log->info(format("output device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
+	HuiConfig.setStr("MidiInput.Devices", devs2str(midi_input_devices));
 }
 
 
@@ -138,8 +142,10 @@ void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *
 	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	DeviceManager *dm = (DeviceManager*)userdata;
-	Device d = Device(d.TYPE_AUDIO_OUTPUT, i->description, i->name, i->channel_map.channels);
-	d.present = true;
+	Device *d = dm->get_device_create(Device::TYPE_AUDIO_OUTPUT, i->name);
+	d->name = i->description;
+	d->channels = i->channel_map.channels;
+	d->present = true;
 	dm->setDeviceConfig(d);
 }
 
@@ -151,63 +157,45 @@ void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, vo
 	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	DeviceManager *dm = (DeviceManager*)userdata;
-	Device d = Device(d.TYPE_AUDIO_INPUT, i->description, i->name, i->channel_map.channels);
-	d.present = true;
+	Device *d = dm->get_device_create(Device::TYPE_AUDIO_INPUT, i->name);
+	d->name = i->description;
+	d->channels = i->channel_map.channels;
+	d->present = true;
 	dm->setDeviceConfig(d);
-}
-
-Array<string> DeviceManager::getDevices()
-{
-	Array<string> devices;
-
-	foreach(Device &d, output_devices)
-		devices.add(d.name);
-
-	return devices;
 }
 
 void DeviceManager::update_devices()
 {
-	foreach(Device &d, output_devices)
-		d.present = false;
+	foreach(Device *d, output_devices)
+		d->present = false;
 
 	pa_operation *op = pa_context_get_sink_info_list(context, pa_sink_info_callback, this);
 	if (!testError("pa_context_get_sink_info_list"))
 		pa_wait_op(op);
 
-	foreach(Device &d, output_devices)
-		if (d.is_default())
-			d.present = true;
+	foreach(Device *d, output_devices)
+		if (d->is_default())
+			d->present = true;
 
 
-	foreach(Device &d, input_devices)
-		d.present = false;
+	foreach(Device *d, input_devices)
+		d->present = false;
 
 	op = pa_context_get_source_info_list(context, pa_source_info_callback, this);
 	if (!testError("pa_context_get_source_info_list"))
 		pa_wait_op(op);
 
-	foreach(Device &d, input_devices)
-		if (d.is_default())
-			d.present = true;
+	foreach(Device *d, input_devices)
+		if (d->is_default())
+			d->present = true;
 
 
-	foreach(Device &d, midi_input_devices)
-		if (d.is_default())
-			d.present = true;
+	foreach(Device *d, midi_input_devices)
+		if (d->is_default())
+			d->present = true;
 
 	notify(MESSAGE_CHANGE);
 	write_config();
-}
-
-Array<Device> DeviceManager::getOutputDevices()
-{
-	return output_devices;
-}
-
-Array<Device> DeviceManager::getInputDevices()
-{
-	return input_devices;
 }
 
 
@@ -262,8 +250,6 @@ void DeviceManager::init()
 		tsunami->log->error("pulse audio context does not turn 'ready'");
 		return;
 	}
-
-	setDevice(chosen_device);
 
 	pa_context_set_subscribe_callback(context, &pa_subscription_callback, this);
 	testError("pa_context_set_subscribe_callback");
@@ -322,16 +308,28 @@ bool DeviceManager::streamExists(AudioStream* s)
 	return false;
 }
 
-Device* DeviceManager::getDevice(int type, const string &internal_name)
+Device* DeviceManager::get_device(int type, const string &internal_name)
 {
-	Array<Device> &devices = getDeviceList(type);
-	foreach(Device &d, devices)
-		if (d.internal_name == internal_name)
-			return &d;
+	Array<Device*> &devices = getDeviceList(type);
+	foreach(Device *d, devices)
+		if (d->internal_name == internal_name)
+			return d;
 	return NULL;
 }
 
-Array<Device> &DeviceManager::getDeviceList(int type)
+Device* DeviceManager::get_device_create(int type, const string &internal_name)
+{
+	Array<Device*> &devices = getDeviceList(type);
+	foreach(Device *d, devices)
+		if (d->internal_name == internal_name)
+			return d;
+	Device *d = new Device(type, "", internal_name, 0);
+	devices.add(d);
+	// don't notify()... do later via setDeviceConfig()
+	return d;
+}
+
+Array<Device*> &DeviceManager::getDeviceList(int type)
 {
 	if (type == Device::TYPE_AUDIO_OUTPUT)
 		return output_devices;
@@ -339,12 +337,31 @@ Array<Device> &DeviceManager::getDeviceList(int type)
 		return input_devices;
 	if (type == Device::TYPE_MIDI_INPUT)
 		return midi_input_devices;
-	return output_devices;
+	return empty_device_list;
 }
 
-void DeviceManager::setDeviceConfig(const Device &d)
+Array<Device*> DeviceManager::getGoodDeviceList(int type)
 {
-	Device *dd = getDevice(d.type, d.internal_name);
+	Array<Device*> &all = getDeviceList(type);
+	Array<Device*> list;
+	foreach(Device *d, all)
+		if (d->visible and d->present)
+			list.add(d);
+	return list;
+}
+
+Device *DeviceManager::chooseDevice(int type)
+{
+	Array<Device*> &devices = getDeviceList(type);
+	foreach(Device *d, devices)
+		if (d->present and d->visible)
+			return d;
+	return NULL;
+}
+
+void DeviceManager::setDeviceConfig(Device *d)
+{
+	/*Device *dd = get_device(d.type, d.internal_name);
 	if (dd){
 		dd->name = d.name;
 		dd->present = d.present;
@@ -355,17 +372,16 @@ void DeviceManager::setDeviceConfig(const Device &d)
 		dd->channels = d.channels;
 	}else{
 		getDeviceList(d.type).add(d);
-
-	}
+	}*/
 	write_config();
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::makeDeviceTopPriority(const Device &d)
+void DeviceManager::makeDeviceTopPriority(Device *d)
 {
-	Array<Device> &devices = getDeviceList(d.type);
+	Array<Device*> &devices = getDeviceList(d->type);
 	for (int i=0; i<devices.num; i++)
-		if (devices[i].internal_name == d.internal_name){
+		if (devices[i] == d){
 			devices.insert(d, 0);
 			devices.erase(i + 1);
 			break;

@@ -64,7 +64,7 @@ string Device::get_name() const
 
 bool Device::is_default() const
 {
-	return (internal_name == "");
+	return (internal_name == ":default:");
 }
 
 string Device::to_config()

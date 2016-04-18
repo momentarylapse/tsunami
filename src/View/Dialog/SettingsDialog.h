@@ -23,9 +23,6 @@ public:
 	void onColorScheme();
 	void onOggBitrate();
 	void onDefaultArtist();
-	void onPreviewDevice();
-	void onCaptureDevice();
-	void onCaptureDelay();
 	void onCaptureFilename();
 	void onCaptureFind();
 	void onClose();
@@ -41,8 +38,6 @@ private:
 	};
 
 	Array<OggQuality> ogg_quality;
-	Array<string> output_devices;
-	Array<string> capture_devices;
 };
 
 #endif /* SETTINGSDIALOG_H_ */

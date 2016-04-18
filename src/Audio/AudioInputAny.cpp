@@ -137,17 +137,21 @@ int AudioInputAny::getState()
 	return -1;
 }
 
-void AudioInputAny::setDevice(const string& dev)
+void AudioInputAny::setDevice(Device *dev)
 {
 	if (type == Track::TYPE_AUDIO)
 		input_audio->setDevice(dev);
+	if (type == Track::TYPE_MIDI)
+		input_midi->setDevice(dev);
 }
 
-string AudioInputAny::getChosenDevice()
+Device *AudioInputAny::getDevice()
 {
 	if (type == Track::TYPE_AUDIO)
-		return input_audio->getChosenDevice();
-	return "";
+		return input_audio->getDevice();
+	if (type == Track::TYPE_MIDI)
+		return input_midi->getDevice();
+	return NULL;
 }
 
 void AudioInputAny::setSaveMode(bool enabled)

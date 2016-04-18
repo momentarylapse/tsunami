@@ -12,6 +12,7 @@
 #include <pulse/pulseaudio.h>
 #include "../lib/threads/Thread.h"
 #include "DeviceManager.h"
+#include "Device.h"
 
 //const int DEFAULT_BUFFER_SIZE = 131072;
 const int DEFAULT_BUFFER_SIZE = 32768;
@@ -22,8 +23,6 @@ const float DEFAULT_UPDATE_DT = 0.050f;
 
 const string AudioStream::MESSAGE_STATE_CHANGE = "StateChange";
 const string AudioStream::MESSAGE_UPDATE = "Update";
-
-bool AudioStream::JUST_FAKING_IT = false;
 
 
 
@@ -165,6 +164,7 @@ AudioStream::AudioStream(AudioRenderer *r) :
 	hui_runner_id = -1;
 
 	device_manager = tsunami->device_manager;
+	device = device_manager->chooseDevice(Device::TYPE_AUDIO_OUTPUT);
 
 	data_samples = 0;
 	buffer_size = DEFAULT_BUFFER_SIZE;
@@ -176,9 +176,6 @@ AudioStream::AudioStream(AudioRenderer *r) :
 	cpu_usage = 0;
 	end_of_data = false;
 	cur_pos = 0;
-
-	if (JUST_FAKING_IT)
-		return;
 
 	device_manager->addStream(this);
 }
@@ -339,6 +336,11 @@ void AudioStream::setSource(AudioRenderer *r)
 	renderer = r;
 }
 
+void AudioStream::setDevice(Device *d)
+{
+	device = d;
+}
+
 void AudioStream::play()
 {
 	msg_db_f("Stream.play", 1);
@@ -390,8 +392,8 @@ void AudioStream::play()
 	attr_out.tlength = -1;
 	attr_out.prebuf = -1;
 	const char *dev = NULL;
-	if (device_manager->chosen_device != "")
-		dev = device_manager->chosen_device.c_str();
+	if (!device->is_default())
+		dev = device->internal_name.c_str();
 	pa_stream_connect_playback(_stream, dev, &attr_out, (pa_stream_flags)0, NULL, NULL);
 	testError("connect");
 

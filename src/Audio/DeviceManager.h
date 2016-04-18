@@ -31,14 +31,6 @@ public:
 	DeviceManager();
 	virtual ~DeviceManager();
 
-
-	Array<Device> getOutputDevices();
-	Array<Device> getInputDevices();
-
-	Array<string> getDevices();
-	string chosen_device;
-	void setDevice(const string &device);
-
 	void init();
 	void kill();
 
@@ -52,11 +44,15 @@ public:
 
 	void remove_device(int type, int index);
 
-	void setDeviceConfig(const Device &d);
-	void makeDeviceTopPriority(const Device &d);
+	void setDeviceConfig(Device *d);
+	void makeDeviceTopPriority(Device *d);
 
-	Device *getDevice(int type, const string &internal_name);
-	Array<Device> &getDeviceList(int type);
+	Device *get_device(int type, const string &internal_name);
+	Device *get_device_create(int type, const string &internal_name);
+	Array<Device*> &getDeviceList(int type);
+	Array<Device*> getGoodDeviceList(int type);
+
+	Device *chooseDevice(int type);
 
 //private:
 	bool testError(const string &msg);
@@ -69,9 +65,10 @@ public:
 	Array<AudioStream*> streams;
 
 	void update_devices();
-	Array<Device> output_devices;
-	Array<Device> input_devices;
-	Array<Device> midi_input_devices;
+	Array<Device*> empty_device_list;
+	Array<Device*> output_devices;
+	Array<Device*> input_devices;
+	Array<Device*> midi_input_devices;
 
 	void write_config();
 

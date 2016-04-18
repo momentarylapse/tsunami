@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-304
+297
 // Data (ID,Text)
 about
 Info
@@ -73,12 +73,8 @@ bpm
 !expandx\\0\\0\\1000\\0.1
 cancel
 Cancel
-capture_delay
-\\\\\\0.1
 capture_delete
 !flat\\Dump
-capture_device
-!expandx\\
 capture_level
 !height=25\\
 capture_pause
@@ -403,20 +399,12 @@ pause
 Pause
 pdp_capture
 Recording
-pdp_capturedevice
-Device
 pdp_colorscheme
 Color scheme
 pdp_general
 General
 pdp_language
 Language
-pdp_preview
-Output
-pdp_previewdevice
-Device
-pdt_capturedelay
-Playback delay
 pdt_capturetempfile
 Backup file
 pdt_defaultartist
@@ -437,8 +425,6 @@ plugin_on_file
 On audio buffer
 preview
 Preview
-preview_device
-!expandx\\
 preview_sample
 !flat\\
 progress_bar
@@ -451,9 +437,9 @@ progress_dialog
 in progress
 properties_dialog_buttonbar
 !buttonbar\\
-rand_id_191830
+rand_id_25902
 
-rand_id_452311
+rand_id_682108
 
 rd_g_data
 !noexpandy\\
@@ -612,7 +598,7 @@ Zoom in
 zoom_out
 Zoom out
 // Num Language Strings
-179
+183
 // Data (ID,Text)
 
 
@@ -638,6 +624,12 @@ has crashed!\t\tLast lines from file message.txt:
 !bold$Name:
 !bold,center\\Ausgabe
 !bold,center\\Output
+!format=tttCc\\#\\Name\\Interner Name\\anzeigen\\präsent
+!format=tttCc\\#\\name\\internal name\\visible\\present
+!format=ttttCcT\\#\\Name\\Interner Name\\Kanäle\\anzeigen\\präsent\\Latenz (ms)
+!format=ttttCcT\\#\\name\\internal name\\channels\\visible\\present\\latency (ms)
+!format=ttttCc\\#\\Name\\Interner Name\\Kanäle\\anzeigen\\präsent
+!format=ttttCc\\#\\name\\internal name\\channels\\visible\\present
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 %d Saiten: 
@@ -654,8 +646,6 @@ has crashed!\t\tLast lines from file message.txt:
 (anonymous)
 * entweder eine Quelle wählen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen überlassen, eine Verbindung herzustellen
 * either select a source (recommended) or\n* \"don't connect\" to have external programs manage the connections
-- Standard -
-- Default -
 -Standard Parameter-
 -Default  Parameters-
 ...done
@@ -762,6 +752,8 @@ Frage
 Question
 Geige
 Violin
+Geräte
+Devices
 Gesang
 Voice
 Gitarre
@@ -836,6 +828,8 @@ Ok
 Ok
 Orgel
 Organ
+Output\\Input\\Midi Input
+Output\\Input\\Midi Input
 Parameter laden
 Load parameter
 Parameter speichern

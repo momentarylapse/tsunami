@@ -17,6 +17,8 @@
 
 class AudioView;
 class AudioInputAny;
+class DeviceManager;
+class Device;
 
 class CaptureConsole : public SideBarConsole, public Observer
 {
@@ -42,11 +44,13 @@ public:
 
 	void fillTrackList();
 
+	DeviceManager *device_manager;
+
 	void updateMidiPortList();
 	Array<AudioInputMidi::MidiPort> midi_ports;
 	void updateAudioSourceList();
-	Array<string> audio_sources;
-	string selected_audio_source;
+	Array<Device*> audio_sources;
+	Device *chosen_device;
 	void updateTime();
 
 	void onUpdate(Observable *o, const string &message);

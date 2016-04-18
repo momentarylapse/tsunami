@@ -19,7 +19,6 @@
 
 
 string AudioInputAudio::temp_filename;
-string AudioInputAudio::favorite_device;
 string AudioInputAudio::cur_temp_filename;
 float AudioInputAudio::playback_delay_const;
 
@@ -118,9 +117,8 @@ AudioInputAudio::AudioInputAudio(int _sample_rate) :
 	capturing = false;
 	_stream = NULL;
 
-	favorite_device = HuiConfig.getStr("Input.ChosenDevice", "");
-	chosen_device = favorite_device;
-	playback_delay_const = HuiConfig.getFloat("Input.PlaybackDelay", 0.0f);
+	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
+	playback_delay_const = device->latency;
 	temp_filename = HuiConfig.getStr("Input.TempFilename", "");
 	temp_file = NULL;
 	save_mode = false;
@@ -148,60 +146,16 @@ void AudioInputAudio::__delete__()
 	stop();
 	current_buffer.clear();
 	buffer.clear();
-	chosen_device.clear();
 }
 
-
-Array<string> AudioInputAudio::getDevices()
+Device *AudioInputAudio::getDevice()
 {
-	Array<string> devices;
-
-	Array<Device> input_dev = tsunami->device_manager->getInputDevices();
-	foreach(Device &d, input_dev)
-		devices.add(d.name);
-
-	return devices;
+	return device;
 }
 
-string AudioInputAudio::getFavoriteDevice()
+void AudioInputAudio::setDevice(Device *_device)
 {
-	return favorite_device;
-}
-
-string AudioInputAudio::getChosenDevice()
-{
-	/*if (pa_device_no >= 0)
-		if (pa_device_no == Pa_GetDefaultInputDevice())
-			return "";*/
-	return chosen_device;
-}
-
-void AudioInputAudio::setFavoriteDevice(const string &device)
-{
-	favorite_device = device;
-}
-
-void AudioInputAudio::setDevice(const string &device)
-{
-	HuiConfig.setStr("Input.ChosenDevice", device);
-
-
-	Array<string> devs = getDevices();
-
-	// valid?
-	bool valid = (device == "");
-	foreach(string &d, devs)
-		if (d == device)
-			valid = true;
-
-
-	if (valid){
-		chosen_device = device;
-	}else{
-		tsunami->log->error(format("input device '%s' not found. Using default.", device.c_str()));
-		chosen_device = "";
-	}
-	setFavoriteDevice(chosen_device);
+	device = _device;
 
 	if (capturing){
 		stop();
@@ -246,8 +200,6 @@ bool AudioInputAudio::start()
 	if (capturing)
 		stop();
 
-	setDevice(chosen_device);
-
 	accumulating = false;
 	num_channels = 2;
 
@@ -270,8 +222,8 @@ bool AudioInputAudio::start()
 	attr_in.tlength = -1;
 	attr_in.prebuf = -1;
 	const char *dev = NULL;
-	if (chosen_device != "")
-		dev = chosen_device.c_str();
+	if (!device->is_default())
+		dev = device->internal_name.c_str();
 	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
 	// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
 	testError("pa_stream_connect_record");

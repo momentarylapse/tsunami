@@ -17,6 +17,7 @@
 
 class AudioInputAudio;
 class AudioInputMidi;
+class Device;
 
 class AudioInputAny : public PeakMeterSource, public Observer
 {
@@ -44,8 +45,8 @@ public:
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 	virtual int getState();
 
-	void setDevice(const string &dev);
-	string getChosenDevice();
+	void setDevice(Device *d);
+	Device *getDevice();
 
 	void setSaveMode(bool enabled);
 

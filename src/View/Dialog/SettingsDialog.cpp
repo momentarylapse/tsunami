@@ -20,9 +20,6 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	event("color_scheme", this, &SettingsDialog::onColorScheme);
 	event("ogg_bitrate", this, &SettingsDialog::onOggBitrate);
 	event("default_artist", this, &SettingsDialog::onDefaultArtist);
-	event("preview_device", this, &SettingsDialog::onPreviewDevice);
-	event("capture_device", this, &SettingsDialog::onCaptureDevice);
-	event("capture_delay", this, &SettingsDialog::onCaptureDelay);
 	event("capture_filename", this, &SettingsDialog::onCaptureFilename);
 	event("capture_find", this, &SettingsDialog::onCaptureFind);
 	event("hui:close", this, &SettingsDialog::onClose);
@@ -82,32 +79,6 @@ void SettingsDialog::loadData()
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
-	setString("preview_device", _("- Standard -"));
-	setInt("preview_device", 0);
-	output_devices = tsunami->device_manager->getDevices();
-	output_devices.insert("", 0);
-	foreachi(string &d, output_devices, i){
-		if (i == 0)
-			continue;
-		addString("preview_device", d);
-		if (d == tsunami->device_manager->chosen_device)
-			setInt("preview_device", i);
-	}
-
-	addString("capture_device", _("- Standard -"));
-	setInt("capture_device", 0);
-	capture_devices = AudioInputAudio::getDevices();
-	capture_devices.insert("", 0);
-	foreachi(string &d, capture_devices, i){
-		if (i == 0)
-			continue;
-		addString("capture_device", d);
-		if (d == AudioInputAudio::getFavoriteDevice())
-			setInt("capture_device", i);
-	}
-
-	setFloat("capture_delay", AudioInputAudio::getPlaybackDelayConst());
-
 	setString("capture_filename", AudioInputAudio::temp_filename);
 }
 
@@ -138,25 +109,6 @@ void SettingsDialog::onOggBitrate()
 void SettingsDialog::onDefaultArtist()
 {
 	HuiConfig.setStr("DefaultArtist", getString(""));
-}
-
-void SettingsDialog::onCaptureDevice()
-{
-	int dev = getInt("");
-	if (dev >= 0)
-		AudioInputAudio::setFavoriteDevice(capture_devices[dev]);
-}
-
-void SettingsDialog::onPreviewDevice()
-{
-	int dev = getInt("");
-	if (dev >= 0)
-		tsunami->device_manager->setDevice(output_devices[dev]);
-}
-
-void SettingsDialog::onCaptureDelay()
-{
-	AudioInputAudio::setPlaybackDelayConst(getFloat(""));
 }
 
 void SettingsDialog::onCaptureFilename()

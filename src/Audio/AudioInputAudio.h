@@ -16,6 +16,7 @@
 
 struct pa_stream;
 class PluginManager;
+class Device;
 
 class AudioInputAudio : public PeakMeterSource
 {
@@ -33,11 +34,8 @@ public:
 	void _stopUpdate();
 	void update();
 
-	static Array<string> getDevices();
-	static void setFavoriteDevice(const string &device);
-	static string getFavoriteDevice();
-	void _cdecl setDevice(const string &device);
-	string _cdecl getChosenDevice();
+	void _cdecl setDevice(Device *device);
+	Device* _cdecl getDevice();
 
 	bool _cdecl start();
 	void _cdecl stop();
@@ -89,8 +87,7 @@ private:
 
 	int num_channels;
 
-	static string favorite_device;
-	string chosen_device;
+	Device *device;
 
 	pa_stream *_stream;
 

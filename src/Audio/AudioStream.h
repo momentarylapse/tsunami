@@ -18,6 +18,7 @@
 
 class AudioRenderer;
 class DeviceManager;
+class Device;
 class Thread;
 class StreamThread;
 struct pa_stream;
@@ -26,7 +27,7 @@ class AudioStream : public PeakMeterSource
 {
 	friend StreamThread;
 public:
-	AudioStream();
+	//AudioStream();
 	AudioStream(AudioRenderer *r);
 	virtual ~AudioStream();
 
@@ -52,6 +53,7 @@ public:
 	int _cdecl getState();
 	void _cdecl setSource(AudioRenderer *r);
 	AudioRenderer *getSource(){ return renderer; }
+	void _cdecl setDevice(Device *d);
 	int getPos();
 	bool getPosSafe(int &pos);
 	void flushBuffers();
@@ -64,8 +66,6 @@ public:
 	void setVolume(float _volume);
 
 	void setBufferSize(int _size){ buffer_size = _size; }
-
-	static bool JUST_FAKING_IT;
 
 private:
 	bool testError(const string &msg);
@@ -93,6 +93,7 @@ private:
 	long long cur_pos;
 
 	DeviceManager *device_manager;
+	Device *device;
 	bool killed;
 
 	Thread *thread;

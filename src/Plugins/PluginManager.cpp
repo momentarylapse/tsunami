@@ -373,7 +373,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("InputStreamAudio", "getState", Script::mf(&AudioInputAudio::getState), &input);
 	}
 
-	AudioStream::JUST_FAKING_IT = true;
 	{
 	AudioStream stream(NULL);
 	Script::DeclareClassSize("OutputStream", sizeof(AudioStream));
@@ -390,7 +389,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("OutputStream.setVolume", Script::mf(&AudioStream::setVolume));
 	Script::LinkExternal("OutputStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));
 	}
-	AudioStream::JUST_FAKING_IT = false;
 
 	{
 	/*AudioInputAudio stream(NULL);

@@ -18,6 +18,7 @@ struct _snd_seq_port_subscribe;
 class AudioStream;
 class SynthesizerRenderer;
 class Synthesizer;
+class Device;
 
 class AudioInputMidi : public PeakMeterSource
 {
@@ -63,6 +64,8 @@ public:
 	MidiPort getCurMidiPort();
 	bool connectMidiPort(MidiPort &p);
 	bool unconnect();
+	void _cdecl setDevice(Device *d);
+	Device *_cdecl getDevice();
 
 	void setPreviewSynthesizer(Synthesizer *s);
 
@@ -85,6 +88,7 @@ private:
 	_snd_seq_port_subscribe *subs;
 	MidiPort cur_midi_port;
 	MidiPort no_midi_port;
+	Device *device;
 	int portid;
 	int npfd;
 	struct pollfd *pfd;

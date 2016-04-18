@@ -160,6 +160,16 @@ Array<AudioInputMidi::MidiPort> AudioInputMidi::findMidiPorts()
 	return ports;
 }
 
+void AudioInputMidi::setDevice(Device *d)
+{
+	device = d;
+}
+
+Device *AudioInputMidi::getDevice()
+{
+	return device;
+}
+
 void AudioInputMidi::accumulate(bool enable)
 {
 	accumulating = enable;

@@ -30,13 +30,6 @@ public:
 
 	static const string MESSAGE_CAPTURE;
 
-	struct MidiPort
-	{
-		int client, port;
-		string client_name, port_name;
-		MidiPort();
-	};
-
 	void init();
 
 	bool start();
@@ -60,9 +53,6 @@ public:
 	virtual void getSomeSamples(BufferBox &buf, int num_samples);
 	virtual int getState();
 
-	Array<MidiPort> findMidiPorts();
-	MidiPort getCurMidiPort();
-	bool connectMidiPort(MidiPort &p);
 	bool unconnect();
 	void _cdecl setDevice(Device *d);
 	Device *_cdecl getDevice();
@@ -85,8 +75,6 @@ private:
 	void clearInputQueue();
 
 	_snd_seq_port_subscribe *subs;
-	MidiPort cur_midi_port;
-	MidiPort no_midi_port;
 	DeviceManager *device_manager;
 	Device *device;
 	int npfd;

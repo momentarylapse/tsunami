@@ -46,10 +46,8 @@ public:
 
 	DeviceManager *device_manager;
 
-	void updateMidiPortList();
-	Array<AudioInputMidi::MidiPort> midi_ports;
-	void updateAudioSourceList();
-	Array<Device*> audio_sources;
+	void updateSourceList();
+	Array<Device*> sources;
 	Device *chosen_device;
 	void updateTime();
 

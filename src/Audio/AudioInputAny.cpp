@@ -161,28 +161,6 @@ void AudioInputAny::setSaveMode(bool enabled)
 		input_audio->setSaveMode(enabled);
 }
 
-AudioInputMidi::MidiPort AudioInputAny::getCurMidiPort()
-{
-	if (type == Track::TYPE_MIDI)
-		return input_midi->getCurMidiPort();
-	AudioInputMidi::MidiPort p;
-	return p;
-}
-
-Array<AudioInputMidi::MidiPort> AudioInputAny::findMidiPorts()
-{
-	if (type == Track::TYPE_MIDI)
-		return input_midi->findMidiPorts();
-	Array<AudioInputMidi::MidiPort> a;
-	return a;
-}
-
-bool AudioInputAny::connectMidiPort(AudioInputMidi::MidiPort& p)
-{
-	if (type == Track::TYPE_MIDI)
-		return input_midi->connectMidiPort(p);
-	return false;
-}
 
 void AudioInputAny::setPreviewSynthesizer(Synthesizer* s)
 {

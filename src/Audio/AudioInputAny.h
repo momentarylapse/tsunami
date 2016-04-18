@@ -50,9 +50,6 @@ public:
 
 	void setSaveMode(bool enabled);
 
-	AudioInputMidi::MidiPort getCurMidiPort();
-	Array<AudioInputMidi::MidiPort> findMidiPorts();
-	bool connectMidiPort(AudioInputMidi::MidiPort &p);
 	void setPreviewSynthesizer(Synthesizer *s);
 
 	virtual void onUpdate(Observable *o, const string &message);

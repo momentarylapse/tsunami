@@ -38,7 +38,7 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	temp_synth = CreateSynthesizer("", s);
 
 	device_manager = tsunami->device_manager;
-	chosen_device = device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
+	chosen_device = NULL;
 
 
 	// dialog
@@ -103,7 +103,7 @@ void CaptureConsole::onEnter()
 	}
 
 
-	chosen_device = device_manager->chooseDevice(dev_type(type));
+	chosen_device = input->getDevice();//device_manager->chooseDevice(dev_type(type));
 
 	view->setMode(view->mode_capture);
 
@@ -184,47 +184,23 @@ void CaptureConsole::setTarget(int index)
 void CaptureConsole::onSource()
 {
 	int n = getInt("");
-	if (type == Track::TYPE_MIDI){
-		if (n >= 0){
-			input->connectMidiPort(midi_ports[n]);
-		}
-	}else if (type == Track::TYPE_AUDIO){
-		if ((n >= 0) and (n < audio_sources.num)){
-			chosen_device = audio_sources[n];
-			input->setDevice(chosen_device);
-		}
+	if ((n >= 0) and (n < sources.num)){
+		chosen_device = sources[n];
+		input->setDevice(chosen_device);
 	}
 }
 
-void CaptureConsole::updateMidiPortList()
+void CaptureConsole::updateSourceList()
 {
-	midi_ports = input->findMidiPorts();
-	AudioInputMidi::MidiPort cur = input->getCurMidiPort();
-
-	reset("capture_source");
-	foreachi(AudioInputMidi::MidiPort &p, midi_ports, i){
-		setString("capture_source", p.client_name + " : " + p.port_name);
-		if ((p.client == cur.client) and (p.port == cur.port))
-			setInt("capture_source", i);
-	}
-	setString("capture_source", _("        - nicht verbinden -"));
-	if ((cur.client < 0) or (cur.port < 0))
-		setInt("capture_source", midi_ports.num);
-	enable("capture_source", true);
-
-}
-
-void CaptureConsole::updateAudioSourceList()
-{
-	audio_sources = device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
+	sources = device_manager->getGoodDeviceList(dev_type(type));
 
 	// add all
 	reset("capture_source");
-	foreach(Device *d, audio_sources)
+	foreach(Device *d, sources)
 		setString("capture_source", d->get_name());
 
 	// select current
-	foreachi(Device *d, audio_sources, i)
+	foreachi(Device *d, sources, i)
 		if (d == chosen_device)
 			setInt("capture_source", i);
 
@@ -236,6 +212,7 @@ void CaptureConsole::setType(int _type)
 {
 	if (type == _type)
 		return;
+
 	type = _type;
 
 	// consistency test: ...
@@ -245,14 +222,14 @@ void CaptureConsole::setType(int _type)
 			setInt("capture_target", song->tracks.num);
 
 	input->setType(type);
+	chosen_device = input->getDevice();
 
 	reset("capture_source");
 	enable("capture_source", false);
+	updateSourceList();
 	if (type == Track::TYPE_MIDI){
-		updateMidiPortList();
 		check("capture_type:midi", true);
 	}else if (type == Track::TYPE_AUDIO){
-		updateAudioSourceList();
 		check("capture_type:audio", true);
 	}else{
 	}

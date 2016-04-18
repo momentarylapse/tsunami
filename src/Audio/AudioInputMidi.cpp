@@ -20,12 +20,6 @@ static const float DEFAULT_UPDATE_TIME = 0.005f;
 const string AudioInputMidi::MESSAGE_CAPTURE = "Capture";
 
 
-AudioInputMidi::MidiPort::MidiPort()
-{
-	client = port = -1;
-}
-
-
 AudioInputMidi::AudioInputMidi(int _sample_rate) :
 	PeakMeterSource("AudioInputMidi")
 {
@@ -57,6 +51,7 @@ AudioInputMidi::~AudioInputMidi()
 
 void AudioInputMidi::init()
 {
+	setDevice(device_manager->chooseDevice(Device::TYPE_MIDI_INPUT));
 }
 
 void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
@@ -65,40 +60,6 @@ void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 	/*preview_renderer->setAutoStop(false);
 	if (s and capturing)
 		preview_stream->play();*/
-}
-
-bool AudioInputMidi::connectMidiPort(AudioInputMidi::MidiPort &p)
-{
-	if (subs)
-		unconnect();
-
-	if ((p.client < 0) or (p.port < 0))
-		return true;
-
-	snd_seq_addr_t sender, dest;
-	sender.client = p.client;
-	sender.port = p.port;
-	dest.client = snd_seq_client_id(device_manager->handle);
-	dest.port = device_manager->portid;
-	cur_midi_port = p;
-
-	snd_seq_port_subscribe_malloc(&subs);
-	snd_seq_port_subscribe_set_sender(subs, &sender);
-	snd_seq_port_subscribe_set_dest(subs, &dest);
-	int r = snd_seq_subscribe_port(device_manager->handle, subs);
-	if (r != 0){
-		tsunami->log->error(string("Error connecting to midi port: ") + snd_strerror(r));
-		snd_seq_port_subscribe_free(subs);
-		subs = NULL;
-		cur_midi_port = no_midi_port;
-	}
-	return r == 0;
-
-	// simple version raises "no permission" error...?!?
-	/*int r = snd_seq_connect_to(handle, portid, p.client, p.port);
-	if (r != 0)
-		tsunami->log->Error(string("Error connecting to midi port: ") + snd_strerror(r));
-	return r == 0;*/
 }
 
 bool AudioInputMidi::unconnect()
@@ -110,47 +71,42 @@ bool AudioInputMidi::unconnect()
 		tsunami->log->error(string("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
 	subs = NULL;
-	cur_midi_port = no_midi_port;
 	return r == 0;
-}
-
-AudioInputMidi::MidiPort AudioInputMidi::getCurMidiPort()
-{
-	return cur_midi_port;
-}
-
-
-Array<AudioInputMidi::MidiPort> AudioInputMidi::findMidiPorts()
-{
-	Array<MidiPort> ports;
-	snd_seq_client_info_t *cinfo;
-	snd_seq_port_info_t *pinfo;
-
-	snd_seq_client_info_alloca(&cinfo);
-	snd_seq_port_info_alloca(&pinfo);
-	snd_seq_client_info_set_client(cinfo, -1);
-	while (snd_seq_query_next_client(device_manager->handle, cinfo) >= 0){
-		snd_seq_port_info_set_client(pinfo, snd_seq_client_info_get_client(cinfo));
-		snd_seq_port_info_set_port(pinfo, -1);
-		while (snd_seq_query_next_port(device_manager->handle, pinfo) >= 0){
-			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_READ) == 0)
-				continue;
-			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
-				continue;
-			MidiPort p;
-			p.client = snd_seq_client_info_get_client(cinfo);
-			p.client_name = snd_seq_client_info_get_name(cinfo);
-			p.port = snd_seq_port_info_get_port(pinfo);
-			p.port_name = snd_seq_port_info_get_name(pinfo);
-			ports.add(p);
-		}
-	}
-	return ports;
 }
 
 void AudioInputMidi::setDevice(Device *d)
 {
 	device = d;
+
+
+	if (subs)
+		unconnect();
+
+	if ((device->client < 0) or (device->port < 0))
+		return;// true;
+
+	snd_seq_addr_t sender, dest;
+	sender.client = device->client;
+	sender.port = device->port;
+	dest.client = snd_seq_client_id(device_manager->handle);
+	dest.port = device_manager->portid;
+
+	snd_seq_port_subscribe_malloc(&subs);
+	snd_seq_port_subscribe_set_sender(subs, &sender);
+	snd_seq_port_subscribe_set_dest(subs, &dest);
+	int r = snd_seq_subscribe_port(device_manager->handle, subs);
+	if (r != 0){
+		tsunami->log->error(string("Error connecting to midi port: ") + snd_strerror(r));
+		snd_seq_port_subscribe_free(subs);
+		subs = NULL;
+	}
+	return;// r == 0;
+
+	// simple version raises "no permission" error...?!?
+	/*int r = snd_seq_connect_to(handle, portid, p.client, p.port);
+	if (r != 0)
+		tsunami->log->Error(string("Error connecting to midi port: ") + snd_strerror(r));
+	return r == 0;*/
 }
 
 Device *AudioInputMidi::getDevice()

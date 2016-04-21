@@ -177,7 +177,7 @@ bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 
 	od.renderer = r;
 	f->saveViaRenderer(&od);
-	delete(d);
+	delete(f);
 	return true;
 }
 

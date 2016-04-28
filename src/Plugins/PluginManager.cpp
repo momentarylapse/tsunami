@@ -15,9 +15,9 @@
 #include "../Audio/AudioInputMidi.h"
 #include "../Audio/AudioStream.h"
 #include "../Audio/DeviceManager.h"
+#include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
-#include "../Audio/Renderer/SynthesizerRenderer.h"
 #include "../Audio/Renderer/SongRenderer.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
@@ -206,17 +206,17 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.setSampleRate", Script::mf(&Synthesizer::setSampleRate));
 	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
 
-	SynthesizerRenderer synthren(NULL);
-	Script::DeclareClassSize("SynthesizerRenderer", sizeof(SynthesizerRenderer));
-	Script::LinkExternal("SynthesizerRenderer.__init__", Script::mf(&SynthesizerRenderer::__init__));
-	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "__delete__", Script::mf(&SynthesizerRenderer::__delete__), &synthren);
-	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
-	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "reset", Script::mf(&SynthesizerRenderer::reset), &synthren);
-	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "getSampleRate", Script::mf(&SynthesizerRenderer::getSampleRate), &synthren);
-	Script::LinkExternal("SynthesizerRenderer.feed", Script::mf(&SynthesizerRenderer::feed));
-	Script::LinkExternal("SynthesizerRenderer.resetMidiData", Script::mf(&SynthesizerRenderer::resetMidiData));
-	Script::LinkExternal("SynthesizerRenderer.setAutoStop", Script::mf(&SynthesizerRenderer::setAutoStop));
-	Script::LinkExternal("SynthesizerRenderer.setSynthesizer", Script::mf(&SynthesizerRenderer::setSynthesizer));
+	MidiRenderer midiren(NULL);
+	Script::DeclareClassSize("MidiRenderer", sizeof(MidiRenderer));
+	Script::LinkExternal("MidiRenderer.__init__", Script::mf(&MidiRenderer::__init__));
+	Script::DeclareClassVirtualIndex("MidiRenderer", "__delete__", Script::mf(&MidiRenderer::__delete__), &midiren);
+	Script::DeclareClassVirtualIndex("MidiRenderer", "read", Script::mf(&MidiRenderer::read), &midiren);
+	Script::DeclareClassVirtualIndex("MidiRenderer", "reset", Script::mf(&MidiRenderer::reset), &midiren);
+	Script::DeclareClassVirtualIndex("MidiRenderer", "getSampleRate", Script::mf(&MidiRenderer::getSampleRate), &midiren);
+	Script::LinkExternal("MidiRenderer.feed", Script::mf(&MidiRenderer::feed));
+	Script::LinkExternal("MidiRenderer.resetMidiData", Script::mf(&MidiRenderer::resetMidiData));
+	Script::LinkExternal("MidiRenderer.setAutoStop", Script::mf(&MidiRenderer::setAutoStop));
+	Script::LinkExternal("MidiRenderer.setSynthesizer", Script::mf(&MidiRenderer::setSynthesizer));
 
 
 	DummySynthesizer dsynth;

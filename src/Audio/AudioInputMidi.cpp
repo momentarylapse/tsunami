@@ -8,12 +8,12 @@
 #include "AudioInputMidi.h"
 #include "AudioStream.h"
 #include "Synth/Synthesizer.h"
-#include "Renderer/SynthesizerRenderer.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include <alsa/asoundlib.h>
 #include "Device.h"
 #include "DeviceManager.h"
+#include "Renderer/MidiRenderer.h"
 
 
 static const float DEFAULT_UPDATE_TIME = 0.005f;
@@ -35,7 +35,7 @@ AudioInputMidi::AudioInputMidi(int _sample_rate) :
 	init();
 
 
-	preview_renderer = new SynthesizerRenderer(NULL);
+	preview_renderer = new MidiRenderer(NULL);
 	preview_stream = new AudioStream(preview_renderer);
 	preview_stream->setBufferSize(2048);
 }

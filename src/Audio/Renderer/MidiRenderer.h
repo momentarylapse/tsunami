@@ -1,12 +1,12 @@
 /*
- * SynthesizerRenderer.h
+ * MidiRenderer.h
  *
  *  Created on: 02.11.2014
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_SYNTH_SYNTHESIZERRENDERER_H_
-#define SRC_AUDIO_SYNTH_SYNTHESIZERRENDERER_H_
+#ifndef SRC_AUDIO_RENDERER_MIDIRENDERER_H_
+#define SRC_AUDIO_RENDERER_MIDIRENDERER_H_
 
 
 #include "AudioRenderer.h"
@@ -15,11 +15,11 @@ class Synthesizer;
 class MidiEvent;
 class MidiSource;
 
-class SynthesizerRenderer : public AudioRenderer
+class MidiRenderer : public AudioRenderer
 {
 public:
-	SynthesizerRenderer(Synthesizer *s);
-	virtual ~SynthesizerRenderer();
+	MidiRenderer(Synthesizer *s);
+	virtual ~MidiRenderer();
 
 	void __init__(Synthesizer *s);
 	virtual void __delete__();
@@ -43,4 +43,4 @@ private:
 	bool auto_stop;
 };
 
-#endif /* SRC_AUDIO_SYNTH_SYNTHESIZERRENDERER_H_ */
+#endif /* SRC_AUDIO_RENDERER_MIDIRENDERER_H_ */

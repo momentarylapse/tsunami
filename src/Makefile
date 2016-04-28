@@ -67,8 +67,8 @@ OBJ = \
  Audio/Renderer/AudioRenderer.o\
  Audio/Renderer/BufferRenderer.o\
  Audio/Renderer/EffectRenderer.o\
+ Audio/Renderer/MidiRenderer.o\
  Audio/Renderer/SongRenderer.o\
- Audio/Renderer/SynthesizerRenderer.o\
  Audio/Synth/DummySynthesizer.o\
  Audio/Synth/EnvelopeADSR.o\
  Audio/Synth/SampleSynthesizer.o\
@@ -474,9 +474,6 @@ Action/ActionManager.o : Action/ActionManager.cpp
 Action/ActionMergable.o : Action/ActionMergable.cpp
 	$(CPP) -c Action/ActionMergable.cpp -o $@ $(CXXFLAGS)
 
-Audio/Renderer/SynthesizerRenderer.o : Audio/Renderer/SynthesizerRenderer.cpp
-	$(CPP) -c Audio/Renderer/SynthesizerRenderer.cpp -o $@ $(CXXFLAGS)
-
 Audio/Renderer/AudioRenderer.o : Audio/Renderer/AudioRenderer.cpp
 	$(CPP) -c Audio/Renderer/AudioRenderer.cpp -o $@ $(CXXFLAGS)
 
@@ -485,6 +482,9 @@ Audio/Renderer/BufferRenderer.o : Audio/Renderer/BufferRenderer.cpp
 
 Audio/Renderer/EffectRenderer.o : Audio/Renderer/EffectRenderer.cpp
 	$(CPP) -c Audio/Renderer/EffectRenderer.cpp -o $@ $(CXXFLAGS)
+
+Audio/Renderer/MidiRenderer.o : Audio/Renderer/MidiRenderer.cpp
+	$(CPP) -c Audio/Renderer/MidiRenderer.cpp -o $@ $(CXXFLAGS)
 
 Audio/Renderer/SongRenderer.o : Audio/Renderer/SongRenderer.cpp
 	$(CPP) -c Audio/Renderer/SongRenderer.cpp -o $@ $(CXXFLAGS)

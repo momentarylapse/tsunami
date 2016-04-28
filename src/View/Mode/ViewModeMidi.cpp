@@ -9,9 +9,9 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../../Audio/AudioStream.h"
+#include "../../Audio/Renderer/MidiRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
-#include "../../Audio/Renderer/SynthesizerRenderer.h"
 #include "../../Data/Clef.h"
 #include "../../TsunamiWindow.h"
 
@@ -39,7 +39,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	track_rect = rect(0, 0, 0, 0);
 
 
-	preview_renderer = new SynthesizerRenderer(NULL);
+	preview_renderer = new MidiRenderer(NULL);
 	preview_renderer->setAutoStop(true);
 	preview_stream = new AudioStream(preview_renderer);
 	preview_stream->setBufferSize(2048);

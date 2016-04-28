@@ -15,7 +15,7 @@
 
 struct _snd_seq_port_subscribe;
 class AudioStream;
-class SynthesizerRenderer;
+class MidiRenderer;
 class Synthesizer;
 class Device;
 class DeviceManager;
@@ -88,7 +88,7 @@ private:
 	int hui_runner_id;
 
 	AudioStream *preview_stream;
-	SynthesizerRenderer *preview_renderer;
+	MidiRenderer *preview_renderer;
 };
 
 #endif /* AUDIOINPUTMIDI_H_ */

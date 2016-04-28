@@ -184,7 +184,7 @@ class DummySynthesizer : Synthesizer
 	//extern virtual void __delete__()
 	extern overwrite void render(BufferBox buf)
 
-class SynthesizerRenderer
+class MidiRenderer
 	extern void __init__(Synthesizer *s)
 	extern virtual void __delete__()
 	extern void setSynthesizer(Synthesizer *s)

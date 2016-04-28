@@ -37,7 +37,7 @@ class ClickCounter : Dialog
 		input.addObserver(self, &onInput)
 	
 		synth = CreateSynthesizer("")
-		renderer = new SynthesizerRenderer(synth)
+		renderer = new MidiRenderer(synth)
 		renderer.setAutoStop(false)
 		stream = new OutputStream(renderer)
 		stream.setBufferSize(2048)
@@ -46,7 +46,7 @@ class ClickCounter : Dialog
 	InputStreamAudio *input
 	OutputStream *stream
 	Synthesizer *synth
-	SynthesizerRenderer *renderer
+	MidiRenderer *renderer
 
 	float Volume
 	int counter

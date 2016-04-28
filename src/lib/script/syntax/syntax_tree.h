@@ -88,6 +88,7 @@ struct Block
 	Array<int> vars;
 	Function *function;
 	Block *parent;
+	int level;
 	void add(Command *c);
 	void set(int index, Command *c);
 

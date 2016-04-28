@@ -10,123 +10,128 @@ const float THRESHOLD = 0.1
 
 
 const int BUFFER_SIZE = 32768
-BufferBox buf
-InputStreamAudio *input
 
-Window *win
 
-float get_freq(float i)
-	return i / (BUFFER_SIZE / 2) * DEFAULT_SAMPLE_RATE / 2
+class PitchRecognitionDialog : Dialog
+	
+	void __init__(Window *parent)
+		super.__init__("Tonerkennung", 300, 175, parent, false)
+		addGrid("", 0, 0, 1, 2, "grid")
+		setTarget("grid", 0)
+		addDrawingArea("", 5, 5, 290, 135, "drawing")
+		addButton("Schließen", 5, 145, 290, 25, "close")
+		setImage("close", "hui:close")
+	
+		//eventX("drawing", "hui:draw", &Draw)
+		event("hui:close", &onClose)
+		event("close", &onClose)
+	
+		input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
+		input.start()
+		input.addObserver(self, &updateInput)
+		
+	InputStreamAudio *input
 
-float Frequency, Volume, Error
-bool LoudEnough
+	float get_freq(float i)
+		return i / (BUFFER_SIZE / 2) * DEFAULT_SAMPLE_RATE / 2
 
-float error
-string get_note(float f)
-	float pitch = log(f / 440.0) / log(2.0) * 12 + 69
-	int rel = f2i(pitch + 0.5) % 12
-	error = loop(pitch, -0.5, 0.5)
-	return rel_pitch_name(rel)
-	//loopf(fl, 0, 1)
-	//note = i2s(n)
+	float Frequency, Volume, Error
+	bool LoudEnough
 
-void DrawVolume(Painter *c)
-	c.setColor(color(1, 0.8, 0.8, 0.8))
-	float y0 = 30
-	float y1 = c.height - 5
-	float h = y1 - y0
-	c.drawRect(5, y0 + h * (1 - Volume), 5, h)
-	c.setColor(color(1, 0.6, 0.6, 0.6))
-	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+	float error
+	string get_note(float f)
+		float pitch = log(f / 440.0) / log(2.0) * 12 + 69
+		int rel = f2i(pitch + 0.5) % 12
+		error = loop(pitch, -0.5, 0.5)
+		return rel_pitch_name(rel)
+		//loopf(fl, 0, 1)
+		//note = i2s(n)
 
-void Draw(Painter *c)
-	c.setColor(White)
-	c.setFontSize(12)
-	c.drawRect(0, 0, c.width, c.height)
-	
-	DrawVolume(c)
-	
-	float r = 95
-	float r1 = 90
-	float r2 = 100
-	float x = c.width / 2
-	float y = c.height - 10
-	
-	c.setColor(color(1, 0.4, 0.4, 0.4))
-	for i in 0:9
-		float w = i * 0.125 * pi - pi / 2
-		c.drawLine(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
-	
-	c.setColor(Black)
-	if LoudEnough
-		c.drawStr(x - 8, y - r2 - 22, get_note(Frequency))
-		c.drawStr(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
-		c.drawStr(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
-		c.drawStr(5, 5, Frequency.str2(1) + " Hz")
-		c.drawLine(x, y, x + r * sin(Error * pi), y - r * cos(Error * pi))
-	else
-		c.drawStr(x - 30, y - 20, "zu leise")
+	void drawVolume(Painter *c)
+		c.setColor(color(1, 0.8, 0.8, 0.8))
+		float y0 = 30
+		float y1 = c.height - 5
+		float h = y1 - y0
+		c.drawRect(5, y0 + h * (1 - Volume), 5, h)
+		c.setColor(color(1, 0.6, 0.6, 0.6))
+		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-void OnClose()
-	delete input
-	delete win
-	win = nil
-
-void UpdateInput()
-	int available = input.current_buffer.available()
+	overwrite void onDraw(Painter *c)
+		c.setColor(White)
+		c.setFontSize(12)
+		c.drawRect(0, 0, c.width, c.height)
 	
-	if available > BUFFER_SIZE
-		input.current_buffer.moveReadPos(available - BUFFER_SIZE)
-	int num = clampi(available, 0, BUFFER_SIZE)
+		drawVolume(c)
 	
-	input.current_buffer.peekRef(buf, num)
+		float r = min(c.width / 2 - 40, c.height - 40)
+		float r1 = r - 5
+		float r2 = r + 5
+		float x = c.width / 2
+		float y = c.height - 10
 	
-	float[] temp
-	temp = buf.r + buf.l
+		c.setColor(color(1, 0.4, 0.4, 0.4))
+		for i in 0:9
+			float w = i * 0.125 * pi - pi / 2
+			c.drawLine(x + r1 * sin(w), y - r1 * cos(w), x + r2 * sin(w), y - r2 * cos(w))
 	
-	complex[] bufc
-	bufc.resize(buf.length / 2 + 1)
-	fft_r2c(temp, bufc)
-	float max = 0
-	float fmax = 0, fmax2 = 0
-	for b,i in bufc
-		float f = get_freq(i)
-		if f > F_MIN and f < F_MAX
-			float amp = abs(b.x)
-			//floatout f
-			if (amp > max * 2.5) or (amp > max and f < fmax2)
-				max = amp
-				fmax = f
-				fmax2 = f * 1.5
-	max /= sqrt(buf.length) * 2 * pi
-	Volume = clamp(max / THRESHOLD / 2, 0, 1)
-	if max > THRESHOLD
-		LoudEnough = true
-		if abs(log(fmax / Frequency)) < 0.1
-			Frequency *= 1 + log(fmax / Frequency) * 0.1
+		c.setColor(Black)
+		if LoudEnough
+			c.drawStr(x - 8, y - r2 - 22, get_note(Frequency))
+			c.drawStr(x + r2 * 0.7 + 6, y - r2 * 0.7 - 22, "#")
+			c.drawStr(x - r2 * 0.7 - 10, y - r2 * 0.7 - 22, "b")
+			c.drawStr(5, 5, Frequency.str2(1) + " Hz")
+			c.drawLine(x, y, x + r * sin(Error * pi), y - r * cos(Error * pi))
 		else
-			Frequency = fmax
-		//Frequency = fmax
-		Error = error
-	else
-		LoudEnough = false
-	win.redraw("drawing")
+			c.drawStr(x - 30, y - 20, "zu leise")
+
+	void onClose()
+		input.removeObserver(self)
+		input.stop()
+		delete input
+		delete self
+
+	void updateInput()
+		int available = input.current_buffer.available()
+	
+		if available > BUFFER_SIZE
+			input.current_buffer.moveReadPos(available - BUFFER_SIZE)
+		int num = clampi(available, 0, BUFFER_SIZE)
+	
+		BufferBox buf
+		input.current_buffer.peekRef(buf, num)
+	
+		float[] temp
+		temp = buf.r + buf.l
+	
+		complex[] bufc
+		bufc.resize(buf.length / 2 + 1)
+		fft_r2c(temp, bufc)
+		float max = 0
+		float fmax = 0, fmax2 = 0
+		for b,i in bufc
+			float f = get_freq(i)
+			if f > F_MIN and f < F_MAX
+				float amp = abs(b.x)
+				//floatout f
+				if (amp > max * 2.5) or (amp > max and f < fmax2)
+					max = amp
+					fmax = f
+					fmax2 = f * 1.5
+		max /= sqrt(buf.length) * 2 * pi
+		Volume = clamp(max / THRESHOLD / 2, 0, 1)
+		if max > THRESHOLD
+			LoudEnough = true
+			if abs(log(fmax / Frequency)) < 0.1
+				Frequency *= 1 + log(fmax / Frequency) * 0.1
+			else
+				Frequency = fmax
+			//Frequency = fmax
+			Error = error
+		else
+			LoudEnough = false
+		redraw("drawing")
 
 void main()
-	win = new FixedDialog("Tonerkennung", 300, 175, MainWin, false)
-	win.addDrawingArea("", 5, 5, 290, 135, "drawing")
-	win.addButton("Schließen", 5, 145, 290, 25, "close")
-	win.setImage("close", "hui:close")
-	
-	win.eventSX("drawing", "hui:draw", &Draw)
-	win.eventS("hui:close", &OnClose)
-	win.eventS("close", &OnClose)
-	
-	input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
-	input.start()
-	input.addObserver(nil, &UpdateInput)
-	
+	Dialog *win = new PitchRecognitionDialog(MainWin)
 	win.run()
 	
-	input.removeObserver(nil)
-	input.stop()

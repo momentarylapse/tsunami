@@ -19,7 +19,7 @@ int SerializerX86::fc_begin()
 	SerialCommandParam ret_ref;
 	if (type->UsesReturnByMemory()){
 		//add_temp(type, ret_temp);
-		ret_ref = AddReference(/*ret_temp*/ CompilerFunctionReturn, TypePointer);
+		ret_ref = AddReference(/*ret_temp*/ CompilerFunctionReturn);
 		//add_ref();
 		//add_cmd(Asm::inst_lea, KindRegister, (char*)RegEaxCompilerFunctionReturn.kind, CompilerFunctionReturn.param);
 	}
@@ -122,7 +122,7 @@ void SerializerX86::add_virtual_function_call(int virtual_index)
 
 // create data for a (function) parameter
 //   and compile its command if the parameter is executable itself
-SerialCommandParam SerializerX86::SerializeParameter(Command *link, int level, int index)
+SerialCommandParam SerializerX86::SerializeParameter(Command *link, Block *block, int index)
 {
 	msg_db_f("SerializeParameter", 4);
 	SerialCommandParam p;
@@ -168,13 +168,13 @@ SerialCommandParam SerializerX86::SerializeParameter(Command *link, int level, i
 			p.kind = KIND_REF_TO_CONST;
 		p.p = (long)link->script->cnst[link->link_no];
 	}else if ((link->kind==KIND_OPERATOR) or (link->kind==KIND_FUNCTION) or (link->kind==KIND_VIRTUAL_FUNCTION) or (link->kind==KIND_COMPILER_FUNCTION) or (link->kind==KIND_ARRAY_BUILDER)){
-		p = SerializeCommand(link, level, index);
+		p = SerializeCommand(link, block, index);
 	}else if (link->kind == KIND_REFERENCE){
-		SerialCommandParam param = SerializeParameter(link->param[0], level, index);
+		SerialCommandParam param = SerializeParameter(link->param[0], block, index);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
 		return AddReference(param, link->type);
 	}else if (link->kind == KIND_DEREFERENCE){
-		SerialCommandParam param = SerializeParameter(link->param[0], level, index);
+		SerialCommandParam param = SerializeParameter(link->param[0], block, index);
 		/*if ((param.kind == KindVarLocal) || (param.kind == KindVarGlobal)){
 			p.type = param.type->sub_type;
 			if (param.kind == KindVarLocal)		p.kind = KindRefToLocal;
@@ -693,7 +693,7 @@ void SerializerX86::SerializeOperator(Command *com, Array<SerialCommandParam> &p
 	}
 }
 
-void SerializerX86::SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, int level, int index, int marker_before_params)
+void SerializerX86::SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, Block *block, int index, int marker_before_params)
 {
 	switch(com->link_no){
 		/*case CommandSine:
@@ -701,34 +701,34 @@ void SerializerX86::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 		case COMMAND_IF:{
 			// cmp;  jz m;  -block-  m;
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int m_after_true = add_marker_after_command(level, index + 1);
+			int m_after_true = add_marker_after_command(block->level, index + 1);
 			add_cmd(Asm::INST_JZ, param_marker(m_after_true));
 			}break;
 		case COMMAND_IF_ELSE:{
 			// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int m_after_true = add_marker_after_command(level, index + 1);
-			int m_after_false = add_marker_after_command(level, index + 2);
+			int m_after_true = add_marker_after_command(block->level, index + 1);
+			int m_after_false = add_marker_after_command(block->level, index + 2);
 			add_cmd(Asm::INST_JZ, param_marker(m_after_true)); // jz ...
-			add_jump_after_command(level, index + 1, m_after_false); // insert before <m_after_true> is inserted!
+			add_jump_after_command(block->level, index + 1, m_after_false); // insert before <m_after_true> is inserted!
 			}break;
 		case COMMAND_WHILE:
 		case COMMAND_FOR:{
 			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int marker_after_while = add_marker_after_command(level, index + 1);
+			int marker_after_while = add_marker_after_command(block->level, index + 1);
 			add_cmd(Asm::INST_JZ, param_marker(marker_after_while));
-			add_jump_after_command(level, index + 1, marker_before_params); // insert before <marker_after_while> is inserted!
+			add_jump_after_command(block->level, index + 1, marker_before_params); // insert before <marker_after_while> is inserted!
 
 			int marker_continue = marker_before_params;
 			if (com->link_no == COMMAND_FOR){
 				// NextCommand is a block!
 				if (next_command->kind != KIND_BLOCK)
 					DoError("command block in \"for\" loop missing");
-				marker_continue = add_marker_after_command(level + 1, next_command->as_block()->commands.num - 2);
+				marker_continue = add_marker_after_command(block->level + 1, next_command->as_block()->commands.num - 2);
 			}
-			LoopData l = {marker_continue, marker_after_while, level, index};
+			LoopData l = {marker_continue, marker_after_while, block->level, index};
 			loop.add(l);
 			}break;
 		case COMMAND_BREAK:
@@ -740,7 +740,7 @@ void SerializerX86::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 		case COMMAND_RETURN:
 			if (com->param.num > 0){
 				if (cur_func->return_type->UsesReturnByMemory()){ // we already got a return address in [ebp+0x08] (> 4 byte)
-					FillInDestructors(false);
+					FillInDestructorsBlock(block, true);
 					// internally handled...
 #if 0
 					int s = mem_align(cur_func->return_type->size);
@@ -774,10 +774,9 @@ void SerializerX86::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 
 					AddFunctionOutro(cur_func);
 				}else{ // store return directly in eax / fpu stack (4 byte)
-					SerialCommandParam t;
-					add_temp(cur_func->return_type, t);
+					SerialCommandParam t = add_temp(cur_func->return_type);
 					add_cmd(Asm::INST_MOV, t, param[0]);
-					FillInDestructors(false);
+					FillInDestructorsBlock(block, true);
 					if (cur_func->return_type == TypeFloat32){
 						if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os))
 							add_cmd(Asm::INST_MOVSS, p_xmm0, t);
@@ -796,7 +795,7 @@ void SerializerX86::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 					AddFunctionOutro(cur_func);
 				}
 			}else{
-				FillInDestructors(false);
+				FillInDestructorsBlock(block, true);
 				AddFunctionOutro(cur_func);
 			}
 			break;
@@ -811,7 +810,7 @@ void SerializerX86::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 				Command sub = *com->param[0];
 				Command c_ret(KIND_VAR_TEMP, (long)ret.p, script, ret.type);
 				sub.instance = &c_ret;
-				SerializeCommand(&sub, level, index);
+				SerializeCommand(&sub, block, index);
 			}else
 				add_cmd_constructor(ret, -1);
 			break;
@@ -1024,15 +1023,17 @@ void SerializerX86::CorrectUnallowedParamCombis()
 		// correct
 //		msg_write(format("correcting param combi  cmd=%d", i));
 		bool mov_first_param = (cmd[i].p[1].kind < 0) || (cmd[i].p[0].kind == KIND_REF_TO_CONST) || (cmd[i].p[0].kind == KIND_CONSTANT);
-		SerialCommandParam *pp = mov_first_param ? &cmd[i].p[0] : &cmd[i].p[1];
-		SerialCommandParam p = *pp;
+		int p_index = mov_first_param ? 0 : 1;
+		SerialCommandParam p = cmd[i].p[p_index];
+		SerialCommandParam p2 = p;
 
 		//msg_error("correct");
 		//msg_write(p.type->name);
 		int reg = find_unused_reg(i, i, p.type->size);
-		*pp = param_vreg(p.type, reg);
-		add_cmd(Asm::INST_MOV, *pp, p);
-		move_last_cmd(i);
+		p2 = param_vreg(p.type, reg);
+		next_cmd_target(i);
+		add_cmd(Asm::INST_MOV, p2, p);
+		set_cmd_param(cmd[i+1], p_index, p2);
 		set_virtual_reg(reg, i, i + 1);
 	}
 	ScanTempVarUsage();
@@ -1072,17 +1073,17 @@ void SerializerX86::ProcessReferences()
 
 				if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64){
 					int r = add_virtual_reg(Asm::REG_RAX);
+					next_cmd_target(i);
 					add_cmd(Asm::INST_LEA, param_vreg(TypeReg64, r), p1);
-					move_last_cmd(i);
+					next_cmd_target(i+1);
 					add_cmd(Asm::INST_MOV, p0, param_vreg(TypeReg64, r));
-					move_last_cmd(i+1);
 					set_virtual_reg(r, i, i+1);
 				}else{
 					int r = add_virtual_reg(Asm::REG_EAX);
+					next_cmd_target(i);
 					add_cmd(Asm::INST_LEA, param_vreg(TypeReg32, r), p1);
-					move_last_cmd(i);
+					next_cmd_target(i+1);
 					add_cmd(Asm::INST_MOV, p0, param_vreg(TypeReg32, r));
-					move_last_cmd(i+1);
 					set_virtual_reg(r, i, i+1);
 				}
 			}else{

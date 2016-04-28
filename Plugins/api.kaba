@@ -124,6 +124,8 @@ class BufferBox
 	int channels
 	float[] r, l
 	string[] peaks
+	extern void __init__()
+	extern void __delete__()
 	extern void __assign__(BufferBox other)
 	extern void clear()
 	extern Range range()
@@ -186,6 +188,7 @@ class SynthesizerRenderer
 	extern void __init__(Synthesizer *s)
 	extern virtual void __delete__()
 	extern void setSynthesizer(Synthesizer *s)
+	extern void feed(MidiRawData midi)
 	extern void resetMidiData()
 	extern virtual int read(BufferBox buf)
 	extern virtual void reset()

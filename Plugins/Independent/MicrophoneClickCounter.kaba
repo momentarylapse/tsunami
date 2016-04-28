@@ -8,129 +8,130 @@ const float THRESHOLD2 = 0.15
 const float RECOVER_TIME = 0.40
 
 
-InputStreamAudio *input
-OutputStream *stream
-Synthesizer *synth
-SynthesizerRenderer *renderer
-
-Window *win
-
-float Volume
-int counter
-
-bool active
-int active_ttl
-
-
-void DrawVolume(Painter *c)
-	c.setColor(color(1, 0.8, 0.8, 0.8))
-	float y0 = 30
-	float y1 = c.height - 5
-	float h = y1 - y0
-	c.drawRect(5, y0 + h * (1 - Volume), 5, h)
-	c.setColor(color(1, 0.6, 0.6, 0.6))
-	c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
-
-void Draw(Painter *c)
-	c.setColor(White)
-	c.setFontSize(12)
-	c.drawRect(0, 0, c.width, c.height)
+class ClickCounter : Dialog
+	void __init__(Window *parent)
+		super.__init__("Click Counter", 300, 175, parent, false)
+		addGrid("", 0, 0, 1, 2, "grid")
+		setTarget("grid", 0)
+		addDrawingArea("", 0, 0, 0, 0, "drawing")
+		addGrid("", 0, 1, 3, 1, "grid2")
+		setTarget("grid2", 0)
+		addButton("+", 0, 0, 0, 0, "inc")
+		addButton("-", 1, 0, 0, 0, "dec")
+		addButton("Close", 2, 0, 0, 0, "close")
+		setImage("close", "hui:close")
 	
-	DrawVolume(c)
-	
-	c.setColor(Black)
-	c.drawStr(100, 100, counter.str())
+		//eventX("drawing", "hui:draw", &onDraw)
+		event("inc", &onIncrease)
+		event("dec", &onDecrease)
+		event("hui:close", &onClose)
+		event("close", &onClose)
 
-void OnClose()
-	delete input
-	delete win
-	win = nil
+		counter = 2265
+		active = false
+		active_ttl = -1
+	
+	
+		input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
+		input.start()
+		input.addObserver(self, &onInput)
+	
+		synth = CreateSynthesizer("")
+		renderer = new SynthesizerRenderer(synth)
+		renderer.setAutoStop(false)
+		stream = new OutputStream(renderer)
+		stream.setBufferSize(2048)
+		stream.play()
 
-void UpdateInput()
-	int available = input.current_buffer.available()
-	
-	BufferBox buf
-	input.current_buffer.readRef(buf, available)
-	
-	float[] temp
-	temp = buf.r + buf.l
-	
-	int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
-	
-	Volume = 0
-	for f,i in temp
-		if f > Volume
-			Volume = f
-		if f > THRESHOLD1
-			if !active
-				print "start"
-				active = true
-				renderer.add(_MidiEvent(0, 80, 1))
-				renderer.add(_MidiEvent(1, 80, 0))
-				if !stream.isPlaying()
-					stream.play()
-				counter ++
-				print counter
-				active_ttl = recover_samples
-		if active and (active_ttl > 0)
-			if f > THRESHOLD2
-				active_ttl = recover_samples
-			else
-				active_ttl --
-		if active and (active_ttl <= 0)
-			print "end"
-			active = false
-			active_ttl = -1
-	
-	win.redraw("drawing")
+	InputStreamAudio *input
+	OutputStream *stream
+	Synthesizer *synth
+	SynthesizerRenderer *renderer
 
-void OnIncrease()
-	counter ++
-	win.redraw("drawing")
+	float Volume
+	int counter
 
-void OnDecrease()
-	counter --
-	win.redraw("drawing")
+	bool active
+	int active_ttl
+
+
+	void drawVolume(Painter *c)
+		c.setColor(color(1, 0.8, 0.8, 0.8))
+		float y0 = 30
+		float y1 = c.height - 5
+		float h = y1 - y0
+		c.drawRect(5, y0 + h * (1 - Volume), 5, h)
+		c.setColor(color(1, 0.6, 0.6, 0.6))
+		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
+
+	overwrite void onDraw(Painter *c)
+		c.setColor(White)
+		c.setFontSize(12)
+		c.drawRect(0, 0, c.width, c.height)
+	
+		drawVolume(c)
+	
+		c.setColor(Black)
+		c.drawStr(100, 100, counter.str())
+
+	void onClose()
+		input.removeObserver(self)
+		input.stop()
+		delete input
+	
+		delete stream
+		delete renderer
+		delete synth
+		delete self
+
+	void onInput()
+		int available = input.current_buffer.available()
+	
+		BufferBox buf
+		input.current_buffer.readRef(buf, available)
+	
+		float[] temp
+		temp = buf.r + buf.l
+	
+		int recover_samples = DEFAULT_SAMPLE_RATE * RECOVER_TIME
+	
+		Volume = 0
+		for f,i in temp
+			if f > Volume
+				Volume = f
+			if f > THRESHOLD1
+				if !active
+					print "start"
+					active = true
+					MidiRawData midi
+					midi.add(_MidiEvent(0, 80, 1))
+					midi.add(_MidiEvent(1, 80, 0))
+					renderer.feed(midi)
+					if !stream.isPlaying()
+						stream.play()
+					counter ++
+					print counter
+					active_ttl = recover_samples
+			if active and (active_ttl > 0)
+				if f > THRESHOLD2
+					active_ttl = recover_samples
+				else
+					active_ttl --
+			if active and (active_ttl <= 0)
+				print "end"
+				active = false
+				active_ttl = -1
+	
+		redraw("drawing")
+
+	void onIncrease()
+		counter ++
+		redraw("drawing")
+
+	void onDecrease()
+		counter --
+		redraw("drawing")
 
 void main()
-	win = new Dialog("Click Counter", 300, 175, MainWin, false)
-	win.addGrid("", 0, 0, 1, 2, "grid")
-	win.setTarget("grid", 0)
-	win.addDrawingArea("", 0, 0, 0, 0, "drawing")
-	win.addGrid("", 0, 1, 3, 1, "grid2")
-	win.setTarget("grid2", 0)
-	win.addButton("+", 0, 0, 0, 0, "inc")
-	win.addButton("-", 1, 0, 0, 0, "dec")
-	win.addButton("Close", 2, 0, 0, 0, "close")
-	win.setImage("close", "hui:close")
-	
-	win.eventSX("drawing", "hui:draw", &Draw)
-	win.eventS("inc", &OnIncrease)
-	win.eventS("dec", &OnDecrease)
-	win.eventS("hui:close", &OnClose)
-	win.eventS("close", &OnClose)
-
-	counter = 2265
-	active = false
-	active_ttl = -1
-	
-	
-	input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
-	input.start()
-	input.addObserver(nil, &UpdateInput)
-	
-	synth = CreateSynthesizer("")
-	renderer = new SynthesizerRenderer(synth)
-	renderer.setAutoStop(false)
-	stream = new OutputStream(renderer)
-	stream.setBufferSize(2048)
-	stream.play()
-	
+	Dialog *win = new ClickCounter(MainWin)
 	win.run()
-	
-	input.removeObserver(nil)
-	input.stop()
-	
-	delete stream
-	delete renderer
-	delete synth

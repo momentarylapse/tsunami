@@ -140,6 +140,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, c[0]));
 	Script::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, c[1]));
 	Script::DeclareClassOffset("BufferBox", "peaks", _offsetof(BufferBox, peaks));
+	Script::LinkExternal("BufferBox.__init__", Script::mf(&BufferBox::__init__));
+	Script::LinkExternal("BufferBox.__delete__", Script::mf(&BufferBox::__delete__));
 	Script::LinkExternal("BufferBox.clear", Script::mf(&BufferBox::clear));
 	Script::LinkExternal("BufferBox.__assign__", Script::mf(&BufferBox::__assign__));
 	Script::LinkExternal("BufferBox.range", Script::mf(&BufferBox::range));
@@ -208,6 +210,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "read", Script::mf(&SynthesizerRenderer::read), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "reset", Script::mf(&SynthesizerRenderer::reset), &synthren);
 	Script::DeclareClassVirtualIndex("SynthesizerRenderer", "getSampleRate", Script::mf(&SynthesizerRenderer::getSampleRate), &synthren);
+	Script::LinkExternal("SynthesizerRenderer.feed", Script::mf(&SynthesizerRenderer::feed));
 	Script::LinkExternal("SynthesizerRenderer.resetMidiData", Script::mf(&SynthesizerRenderer::resetMidiData));
 	Script::LinkExternal("SynthesizerRenderer.setAutoStop", Script::mf(&SynthesizerRenderer::setAutoStop));
 	Script::LinkExternal("SynthesizerRenderer.setSynthesizer", Script::mf(&SynthesizerRenderer::setSynthesizer));

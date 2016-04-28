@@ -15,7 +15,7 @@ int SerializerAMD64::fc_begin()
 	SerialCommandParam ret_ref;
 	if (type->UsesReturnByMemory()){
 		//add_temp(type, ret_temp);
-		ret_ref = AddReference(/*ret_temp*/ CompilerFunctionReturn, TypePointer);
+		ret_ref = AddReference(/*ret_temp*/ CompilerFunctionReturn);
 		//add_ref();
 		//add_cmd(Asm::inst_lea, KindRegister, (char*)RegEaxCompilerFunctionReturn.kind, CompilerFunctionReturn.param);
 	}
@@ -32,7 +32,7 @@ int SerializerAMD64::fc_begin()
 	// return as _very_ first parameter
 	if (type->UsesReturnByMemory()){
 		//add_temp(type, ret_temp);
-		ret_ref = AddReference(/*ret_temp*/ CompilerFunctionReturn, TypePointer);
+		ret_ref = AddReference(/*ret_temp*/ CompilerFunctionReturn);
 		CompilerFunctionParam.insert(ret_ref, 0);
 	}
 

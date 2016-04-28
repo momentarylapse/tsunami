@@ -19,14 +19,15 @@ public:
 	virtual void fc_end(int push_size);
 	virtual void AddFunctionIntro(Function *f);
 	virtual void AddFunctionOutro(Function *f);
-	virtual SerialCommandParam SerializeParameter(Command *link, int level, int index);
-	virtual void SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, int level, int index, int marker_before_params);
+	virtual SerialCommandParam SerializeParameter(Command *link, Block *block, int index);
+	virtual void SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, Block *block, int index, int marker_before_params);
 	virtual void SerializeOperator(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret);
 
 	virtual void DoMapping();
 	void ConvertGlobalLookups();
 	void CorrectUnallowedParamCombis();
 	void ConvertMemMovsToLdrStr(SerialCommand &c);
+	void ConvertGlobalRefs();
 	void ProcessReferences();
 	void ProcessDereferences();
 	virtual void CorrectReturn();

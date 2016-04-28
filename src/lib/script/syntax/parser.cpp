@@ -18,8 +18,6 @@ extern bool next_const;
 
 const int TYPE_CAST_OWN_STRING = 4096;
 
-#define is_variable(kind)	(((kind) == KindVarLocal) or ((kind) == KindVarGlobal))
-
 inline bool type_match(Type *type, bool is_class, Type *wanted);
 inline bool direct_type_match(Type *a, Type *b)
 {

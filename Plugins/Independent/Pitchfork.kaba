@@ -13,11 +13,11 @@ class ForkRenderer : AudioRenderer
 		volume = 0.8
 	overwrite int read(BufferBox buf)
 		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * freq * 2.0 * pi
-		for i in 0:buf.num
+		for i in 0:buf.length
 			buf.r[i] = sin((i + offset) * w_f) * volume
 			buf.l[i] = sin((i + offset) * w_f) * volume
-		offset += buf.num
-		return buf.num
+		offset += buf.length
+		return buf.length
 
 class PitchFork : Dialog
 	OutputStream *stream

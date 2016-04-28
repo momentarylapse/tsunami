@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.14.3.-1";
+string Version = "0.14.4.-1";
 
 //#define ScriptDebug
 
@@ -201,7 +201,7 @@ void Script::DoError(const string &str, int overwrite_line)
 
 void Script::DoErrorInternal(const string &str)
 {
-	DoError("internal compiler error (Call Michi!): " + str, 0);
+	DoError("internal compiler error: " + str, 0);
 }
 
 void Script::DoErrorLink(const string &str)

@@ -312,11 +312,12 @@ int SyntaxTree::AddConstant(Type *type)
 Block *SyntaxTree::AddBlock(Function *f, Block *parent)
 {
 	Block *b = new Block;
+	b->level = 0;
 	b->index = blocks.num;
 	b->function = f;
 	b->parent = parent;
 	if (parent)
-		b->vars = parent->vars;
+		b->level = parent->level + 1;
 	blocks.add(b);
 	return b;
 }
@@ -369,6 +370,8 @@ int Block::get_var(const string &name)
 	foreach(int i, vars)
 		if (function->var[i].name == name)
 			return i;
+	if (parent)
+		return parent->get_var(name);
 	return -1;
 }
 

@@ -74,6 +74,16 @@ BufferBox::BufferBox(const BufferBox &b)
 		c[i] = b.c[i];
 }
 
+void BufferBox::__init__()
+{
+	new(this) BufferBox;
+}
+
+void BufferBox::__delete__()
+{
+	clear();
+}
+
 void BufferBox::operator=(const BufferBox &b)
 {
 	offset = b.offset;
@@ -142,6 +152,11 @@ void BufferBox::swap_ref(BufferBox &b)
 	t = offset;
 	offset = b.offset;
 	b.offset = t;
+
+	// channels
+	t = channels;
+	channels = b.channels;
+	b.channels = t;
 }
 
 void BufferBox::append(BufferBox &b)
@@ -239,6 +254,7 @@ void BufferBox::set_as_ref(const BufferBox &b, int _offset, int _length)
 	clear();
 	length = _length;
 	offset = _offset + b.offset;
+	channels = b.channels;
 	for (int i=0; i<channels; i++)
 		c[i].set_ref(b.c[i].sub(_offset, _length));
 }

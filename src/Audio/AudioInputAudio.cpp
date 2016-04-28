@@ -156,6 +156,7 @@ Device *AudioInputAudio::getDevice()
 void AudioInputAudio::setDevice(Device *_device)
 {
 	device = _device;
+	playback_delay_const = device->latency;
 
 	if (capturing){
 		stop();

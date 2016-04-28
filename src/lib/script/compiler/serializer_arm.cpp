@@ -26,7 +26,7 @@ int SerializerARM::fc_begin()
 
 	// return as _very_ first parameter
 	if (type->UsesReturnByMemory()){
-		SerialCommandParam ret_ref = AddReference(CompilerFunctionReturn, TypePointer);
+		SerialCommandParam ret_ref = AddReference(CompilerFunctionReturn);
 		CompilerFunctionParam.insert(ret_ref, 0);
 	}
 
@@ -138,41 +138,41 @@ void SerializerARM::add_function_call(Script *script, int func_no)
 
 void SerializerARM::add_virtual_function_call(int virtual_index){}
 
-void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, int level, int index, int marker_before_params)
+void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret, Block *block, int index, int marker_before_params)
 {
 
 	switch(com->link_no){
 		case COMMAND_IF:{
 			// cmp;  jz m;  -block-  m;
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int m_after_true = add_marker_after_command(level, index + 1);
+			int m_after_true = add_marker_after_command(block->level, index + 1);
 			add_cmd(Asm::ARM_COND_EQUAL, Asm::INST_B, param_marker(m_after_true), p_none, p_none);
 			}break;
 		case COMMAND_IF_ELSE:{
 			// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int m_after_true = add_marker_after_command(level, index + 1);
-			int m_after_false = add_marker_after_command(level, index + 2);
+			int m_after_true = add_marker_after_command(block->level, index + 1);
+			int m_after_false = add_marker_after_command(block->level, index + 2);
 			add_cmd(Asm::ARM_COND_EQUAL, Asm::INST_B, param_marker(m_after_true), p_none, p_none); // jz ...
-			add_jump_after_command(level, index + 1, m_after_false); // insert before <m_after_true> is inserted!
+			add_jump_after_command(block->level, index + 1, m_after_false); // insert before <m_after_true> is inserted!
 			}break;
 		case COMMAND_WHILE:
 		case COMMAND_FOR:{
 			// m1;  cmp;  jz m2;  -block-             jmp m1;  m2;     (while)
 			// m1;  cmp;  jz m2;  -block-  m3;  i++;  jmp m1;  m2;     (for)
 			add_cmd(Asm::INST_CMP, param[0], param_const(TypeBool, 0x0));
-			int marker_after_while = add_marker_after_command(level, index + 1);
+			int marker_after_while = add_marker_after_command(block->level, index + 1);
 			add_cmd(Asm::ARM_COND_EQUAL, Asm::INST_B, param_marker(marker_after_while), p_none, p_none);
-			add_jump_after_command(level, index + 1, marker_before_params); // insert before <marker_after_while> is inserted!
+			add_jump_after_command(block->level, index + 1, marker_before_params); // insert before <marker_after_while> is inserted!
 
 			int marker_continue = marker_before_params;
 			if (com->link_no == COMMAND_FOR){
 				// NextCommand is a block!
 				if (next_command->kind != KIND_BLOCK)
 					DoError("command block in \"for\" loop missing");
-				marker_continue = add_marker_after_command(level + 1, next_command->as_block()->commands.num - 2);
+				marker_continue = add_marker_after_command(block->level + 1, next_command->as_block()->commands.num - 2);
 			}
-			LoopData l = {marker_continue, marker_after_while, level, index};
+			LoopData l = {marker_continue, marker_after_while, block->level, index};
 			loop.add(l);
 			}break;
 		case COMMAND_BREAK:
@@ -184,14 +184,13 @@ void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 		case COMMAND_RETURN:
 			if (com->param.num > 0){
 				if (cur_func->return_type->UsesReturnByMemory()){ // we already got a return address in [ebp+0x08] (> 4 byte)
-					FillInDestructors(false);
+					FillInDestructorsBlock(block, true);
 					// internally handled...
 
 					AddFunctionOutro(cur_func);
 				}else{ // store return directly in eax / fpu stack (4 byte)
-					SerialCommandParam t;
-					add_temp(cur_func->return_type, t);
-					FillInDestructors(false);
+					SerialCommandParam t = add_temp(cur_func->return_type);
+					FillInDestructorsBlock(block, true);
 					if ((cur_func->return_type == TypeInt) or (cur_func->return_type->size == 1)){
 						int v = add_virtual_reg(Asm::REG_R0);
 						add_cmd(Asm::INST_MOV, param_vreg(cur_func->return_type, v), param[0]);
@@ -202,7 +201,7 @@ void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 					AddFunctionOutro(cur_func);
 				}
 			}else{
-				FillInDestructors(false);
+				FillInDestructorsBlock(block, true);
 				AddFunctionOutro(cur_func);
 			}
 			break;
@@ -217,7 +216,7 @@ void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 				Command sub = *com->param[0];
 				Command c_ret(KIND_VAR_TEMP, (long)ret.p, script, ret.type);
 				sub.instance = &c_ret;
-				SerializeCommand(&sub, level, index);
+				SerializeCommand(&sub, block, index);
 			}else
 				add_cmd_constructor(ret, -1);
 			break;
@@ -391,7 +390,7 @@ bool const_is_arm_representable(int value)
 
 // create data for a (function) parameter
 //   and compile its command if the parameter is executable itself
-SerialCommandParam SerializerARM::SerializeParameter(Command *link, int level, int index)
+SerialCommandParam SerializerARM::SerializeParameter(Command *link, Block *block, int index)
 {
 	msg_db_f("SerializeParameter", 4);
 	SerialCommandParam p;
@@ -439,13 +438,13 @@ SerialCommandParam SerializerARM::SerializeParameter(Command *link, int level, i
 			return param_lookup(p.type, add_global_ref(*(int**)pp));
 		}
 	}else if ((link->kind==KIND_OPERATOR) || (link->kind==KIND_FUNCTION) || (link->kind==KIND_VIRTUAL_FUNCTION) || (link->kind==KIND_COMPILER_FUNCTION) || (link->kind==KIND_ARRAY_BUILDER)){
-		return SerializeCommand(link, level, index);
+		return SerializeCommand(link, block, index);
 	}else if (link->kind == KIND_REFERENCE){
-		SerialCommandParam param = SerializeParameter(link->param[0], level, index);
+		SerialCommandParam param = SerializeParameter(link->param[0], block, index);
 		//printf("%d  -  %s\n",pk,Kind2Str(pk));
 		return AddReference(param, link->type);
 	}else if (link->kind == KIND_DEREFERENCE){
-		SerialCommandParam param = SerializeParameter(link->param[0], level, index);
+		SerialCommandParam param = SerializeParameter(link->param[0], block, index);
 		/*if ((param.kind == KindVarLocal) || (param.kind == KindVarGlobal)){
 			p.type = param.type->sub_type;
 			if (param.kind == KindVarLocal)		p.kind = KindRefToLocal;
@@ -473,10 +472,10 @@ void SerializerARM::ProcessReferences()
 				SerialCommandParam p1 = cmd[i].p[1];
 				int r = find_unused_reg(i, i, 4);
 				remove_cmd(i);
+				next_cmd_target(i);
 				add_cmd(Asm::INST_ADD, param_vreg(TypePointer, r), param_preg(TypePointer, Asm::REG_R13), param_const(TypeInt, p1.p));
-				move_last_cmd(i);
+				next_cmd_target(i + 1);
 				add_cmd(Asm::INST_MOV, p0, param_vreg(TypePointer, r));
-				move_last_cmd(i+1);
 				set_virtual_reg(r, i, i+1);
 			}else{
 				DoError("reference in ARM: " + cmd[i].p[1].str());
@@ -498,9 +497,9 @@ void SerializerARM::ProcessDereferences()
 					rp.kind = KIND_VAR_TEMP;
 				rp.type = p.type->GetPointer();
 				int r = find_unused_reg(i, i, 4);
+				next_cmd_target(i);
 				add_cmd(Asm::INST_MOV, param_vreg(TypePointer, r), rp);
-				cmd[i].p[j] = param_deref_vreg(p.type, r);
-				move_last_cmd(i);
+				set_cmd_param(cmd[i+1], j, param_deref_vreg(p.type, r));
 				set_virtual_reg(r, i, i+1);
 			}
 }
@@ -523,9 +522,9 @@ void SerializerARM::transfer_by_reg_in(SerialCommand &c, int &i, int pno)
 	int r = find_unused_reg(i, i, /*p.type->size*/ 4);
 	SerialCommandParam pr = param_vreg(p.type, r);
 	set_virtual_reg(r, i, cmd.num);
-	cmd[i].p[pno]  = pr;
+	set_cmd_param(cmd[i], pno, pr);
+	next_cmd_target(i);
 	add_cmd(c.cond, Asm::INST_MOV, pr, p, p_none);
-	move_last_cmd(i);
 	i ++;
 }
 
@@ -535,9 +534,9 @@ void SerializerARM::transfer_by_reg_out(SerialCommand &c, int &i, int pno)
 	int r = find_unused_reg(i, i, 4);//p.type->size);
 	SerialCommandParam pr = param_vreg(p.type, r);
 	set_virtual_reg(r, i, cmd.num);
-	c.p[pno]  = pr;
+	set_cmd_param(c, pno, pr);
+	next_cmd_target(i+1);
 	add_cmd(c.cond, Asm::INST_MOV, p, pr, p_none);
-	move_last_cmd(i+1);
 }
 
 void SerializerARM::gr_transfer_by_reg_in(SerialCommand &c, int &i, int pno)
@@ -554,14 +553,14 @@ void SerializerARM::gr_transfer_by_reg_in(SerialCommand &c, int &i, int pno)
 
 
 		int r2 = find_unused_reg(i, i, 4);
+		next_cmd_target(i);
 		add_cmd(c.cond, Asm::INST_MOV, param_vreg(TypePointer, r2), param_deref_marker(TypePointer, global_refs[p.p].label), p_none);
-		move_last_cmd(i);
 
 		int r1 = find_unused_reg(i+1, i+1, 4/*p.type->size*/, virtual_reg[r2].reg_root);
+		next_cmd_target(i+1);
 		add_cmd(c.cond, Asm::INST_LDR, param_vreg(p.type, r1), param_deref_vreg(TypePointer, r2), p_none);
-		move_last_cmd(i+1);
 
-		cmd[i+2].p[pno] = param_vreg(p.type, r1);
+		set_cmd_param(cmd[i+2], pno, param_vreg(p.type, r1));
 
 		set_virtual_reg(r2, i, i + 1);
 		set_virtual_reg(r1, i + 1, i + 2);
@@ -575,11 +574,11 @@ void SerializerARM::gr_transfer_by_reg_in(SerialCommand &c, int &i, int pno)
 
 
 		int r1 = find_unused_reg(i, i, 4);
+		next_cmd_target(i);
 		add_cmd(c.cond, Asm::INST_MOV, param_vreg(TypePointer, r1), param_deref_marker(TypePointer, global_refs[p.p].label), p_none);
-		move_last_cmd(i);
 		set_virtual_reg(r1, i, i + 1);
 
-		cmd[i+1].p[pno] = param_vreg(p.type, r1);
+		set_cmd_param(cmd[i+1], pno, param_vreg(p.type, r1));
 
 		i += 1;
 	}
@@ -599,14 +598,14 @@ void SerializerARM::gr_transfer_by_reg_out(SerialCommand &c, int &i, int pno)
 
 
 		int r2 = find_unused_reg(i, i, 4);
+		next_cmd_target(i+1);
 		add_cmd(c.cond, Asm::INST_MOV, param_vreg(TypePointer, r2), param_deref_marker(TypePointer, global_refs[p.p].label), p_none);
-		move_last_cmd(i+1);
 
 		int r1 = find_unused_reg(i, i+1, 4 /*p.type->size*/, virtual_reg[r2].reg_root);
+		next_cmd_target(i+2);
 		add_cmd(c.cond, Asm::INST_STR, param_vreg(p.type, r1), param_deref_vreg(TypePointer, r2), p_none);
-		move_last_cmd(i+2);
 
-		cmd[i].p[pno] = param_vreg(p.type, r1);
+		set_cmd_param(cmd[i], pno, param_vreg(p.type, r1));
 
 		set_virtual_reg(r1, i, i + 2);
 		set_virtual_reg(r2, i+1, i+2);
@@ -618,11 +617,11 @@ void SerializerARM::gr_transfer_by_reg_out(SerialCommand &c, int &i, int pno)
 
 
 		int r1 = find_unused_reg(i, i, 4);
+		next_cmd_target(i+2);
 		add_cmd(c.cond, Asm::INST_STR, param_vreg(TypePointer, r1), param_deref_marker(TypePointer, global_refs[p.p].label), p_none);
-		move_last_cmd(i+1);
 		set_virtual_reg(r1, i, i+1);
 
-		cmd[i].p[pno] = param_vreg(p.type, r1);
+		set_cmd_param(cmd[i], pno, param_vreg(p.type, r1));
 	}
 }
 
@@ -821,8 +820,38 @@ void SerializerARM::DoMapping()
 	for (int i=0; i<cmd.num; i++)
 		ConvertMemMovsToLdrStr(cmd[i]);
 
+	ConvertGlobalRefs();
+
 	if (config.verbose)
 		cmd_list_out("end");
+}
+
+void SerializerARM::ConvertGlobalRefs()
+{
+	for (int i=0; i<cmd.num; i++){
+		if ((cmd[i].inst == Asm::INST_LDR) and (cmd[i].p[0].kind == KIND_REGISTER) and (cmd[i].p[1].kind == KIND_DEREF_MARKER)){
+			bool found = false;
+			long data;
+			foreach(GlobalRef &r, global_refs){
+				if (r.label == cmd[i].p[1].p){
+					data = (long)r.p;
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+				continue;
+			cmd[i].inst = Asm::INST_MOV;
+			set_cmd_param(cmd[i], 1, param_const(TypeInt, data & 0x000000ff));
+			next_cmd_target(i + 1);
+			add_cmd(Asm::INST_ADD, cmd[i].p[0], cmd[i].p[0], param_const(TypeInt, data & 0x0000ff00));
+			next_cmd_target(i + 2);
+			add_cmd(Asm::INST_ADD, cmd[i].p[0], cmd[i].p[0], param_const(TypeInt, data & 0x00ff0000));
+			next_cmd_target(i + 3);
+			add_cmd(Asm::INST_ADD, cmd[i].p[0], cmd[i].p[0], param_const(TypeInt, data & 0xff000000));
+			i += 3;
+		}
+	}
 }
 
 void SerializerARM::ConvertMemMovsToLdrStr(SerialCommand &c)
@@ -834,8 +863,8 @@ void SerializerARM::ConvertMemMovsToLdrStr(SerialCommand &c)
 			else
 				c.inst = Asm::INST_STR;
 			SerialCommandParam p = c.p[0];
-			c.p[0] = c.p[1];
-			c.p[1] = p;
+			set_cmd_param(c, 0, c.p[1]);
+			set_cmd_param(c, 1, p);
 		}else if ((c.p[1].kind == KIND_VAR_LOCAL) or (c.p[1].kind == KIND_DEREF_REGISTER)){
 			if (c.p[1].type->size == 1)
 				c.inst = Asm::INST_LDRB;
@@ -853,11 +882,11 @@ void SerializerARM::CorrectReturn()
 		if (cmd[i].inst == Asm::INST_RET){
 			remove_cmd(i);
 			if (stack_max_size > 0){
+				next_cmd_target(i ++);
 				add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_R13), param_preg(TypePointer, Asm::REG_R13), param_const(TypeInt, stack_max_size));
-				move_last_cmd(i ++);
 			}
+			next_cmd_target(i);
 			add_cmd(Asm::INST_LDMIA, param_preg(TypePointer, Asm::REG_R13), param_const(TypeInt, 0x8ff0));
-			move_last_cmd(i);
 		}
 }
 

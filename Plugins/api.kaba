@@ -471,6 +471,7 @@ class Log
 	extern void info(string message)
 
 class PluginContext
+	Song *song
 	Track *track
 	int track_no
 	int level

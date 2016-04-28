@@ -12,7 +12,7 @@ class Delay : MidiEffect
 	Config config
 	
 	overwrite void process(MidiData midi)
-		Song *a = plugin_context.track.song
+		Song *a = plugin_context.song
 		int dt = a.sample_rate * config.delay
 		for n in midi
 			n.pos += dt

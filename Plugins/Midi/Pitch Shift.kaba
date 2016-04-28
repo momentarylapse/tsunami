@@ -12,6 +12,6 @@ class PitchShift : MidiEffect
 	Config config
 	
 	overwrite void process(MidiData midi)
-		Song *a = plugin_context.track.song
+		Song *a = plugin_context.song
 		for n in midi
 			n.pitch += config.Pitch

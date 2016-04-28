@@ -36,6 +36,9 @@
 
 void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
 {
+	song = NULL;
+	if (t)
+		song = t->song;
 	track = t;
 	level = l;
 	range = r;
@@ -438,6 +441,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
 
 	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
+	Script::DeclareClassOffset("PluginContext", "song", _offsetof(PluginManager::PluginContext, song));
 	Script::DeclareClassOffset("PluginContext", "track", _offsetof(PluginManager::PluginContext, track));
 	Script::DeclareClassOffset("PluginContext", "track_no", _offsetof(PluginManager::PluginContext, track_no));
 	Script::DeclareClassOffset("PluginContext", "range", _offsetof(PluginManager::PluginContext, range));

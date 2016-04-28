@@ -70,6 +70,7 @@ public:
 	struct PluginContext
 	{
 		Range range;
+		Song *song;
 		Track *track;
 		int track_no;
 		int level;

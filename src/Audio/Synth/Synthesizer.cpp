@@ -41,6 +41,9 @@ void Synthesizer::__init__()
 
 void Synthesizer::__delete__()
 {
+	events.clear();
+	active_pitch.clear();
+	delete_me.clear();
 	this->Configurable::~Configurable();
 }
 
@@ -53,7 +56,7 @@ void Synthesizer::Tuning::set_default()
 bool Synthesizer::Tuning::is_default()
 {
 	for (int p=0; p<MAX_PITCH; p++)
-		if (fabs(freq[p] - pitch_to_freq(p)) > 0.1f)
+		if (fabs(freq[p] - pitch_to_freq(p)) > 0.01f)
 			return false;
 	return true;
 }

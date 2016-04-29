@@ -10,9 +10,8 @@
 #include "../AudioViewTrack.h"
 #include "../SideBar/SideBar.h"
 #include "../../TsunamiWindow.h"
-#include "../../Audio/AudioStream.h"
+#include "../../Device/OutputStream.h"
 #include "../../Action/Track/Sample/ActionTrackMoveSample.h"
-#include "../../Audio/AudioStream.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "math.h"
 

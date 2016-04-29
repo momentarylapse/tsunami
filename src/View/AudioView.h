@@ -18,8 +18,8 @@
 #include "ColorScheme.h"
 
 class DeviceManager;
-class AudioStream;
-class AudioInputAny;
+class OutputStream;
+class InputStreamAny;
 class SongRenderer;
 class TsunamiWindow;
 class AudioViewTrack;
@@ -157,10 +157,10 @@ public:
 
 	Song *song;
 
-	AudioStream *stream;
+	OutputStream *stream;
 	SongRenderer *renderer;
-	AudioInputAny *input;
-	void setInput(AudioInputAny *input);
+	InputStreamAny *input;
+	void setInput(InputStreamAny *input);
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);

@@ -1,12 +1,10 @@
 /*
- * AudioInputAudio.cpp
+ * InputStreamAudio.cpp
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#include "AudioInputAudio.h"
-#include "AudioStream.h"
 #include "../lib/hui/hui.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
@@ -16,16 +14,18 @@
 #include <pulse/pulseaudio.h>
 #include "DeviceManager.h"
 #include "Device.h"
+#include "InputStreamAudio.h"
+#include "OutputStream.h"
 
 
-string AudioInputAudio::temp_filename;
-string AudioInputAudio::cur_temp_filename;
-float AudioInputAudio::playback_delay_const;
+string InputStreamAudio::temp_filename;
+string InputStreamAudio::cur_temp_filename;
+float InputStreamAudio::playback_delay_const;
 
 
 static const int DEFAULT_CHUNK_SIZE = 512;
 static const float DEFAULT_UPDATE_TIME = 0.005f;
-const string AudioInputAudio::MESSAGE_CAPTURE = "Capture";
+const string InputStreamAudio::MESSAGE_CAPTURE = "Capture";
 
 
 extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
@@ -33,10 +33,10 @@ extern bool pa_wait_stream_ready(pa_stream *s); // -> AudioStream.cpp
 
 
 
-void AudioInputAudio::input_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+void InputStreamAudio::input_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
 	//printf("read %d\n", (int)nbytes);
-	AudioInputAudio *input = (AudioInputAudio*)userdata;
+	InputStreamAudio *input = (InputStreamAudio*)userdata;
 	if (!input->isCapturing())
 		return;
 
@@ -83,7 +83,7 @@ void input_success_callback(pa_stream *s, int success, void *userdata)
 	msg_write("--success");
 }
 
-void AudioInputAudio::SyncData::reset()
+void InputStreamAudio::SyncData::reset()
 {
 	num_points = 0;
 	delay_sum = 0;
@@ -92,7 +92,7 @@ void AudioInputAudio::SyncData::reset()
 		offset_out = tsunami->output->GetRange().offset;*/ // TODO
 }
 
-void AudioInputAudio::SyncData::add(int samples)
+void InputStreamAudio::SyncData::add(int samples)
 {
 	if (tsunami->win->view->stream->isPlaying()){
 		samples_in += samples;
@@ -101,7 +101,7 @@ void AudioInputAudio::SyncData::add(int samples)
 	}
 }
 
-int AudioInputAudio::SyncData::getDelay()
+int InputStreamAudio::SyncData::getDelay()
 {
 	if (num_points > 0)
 		return (delay_sum / num_points);
@@ -109,8 +109,8 @@ int AudioInputAudio::SyncData::getDelay()
 }
 
 
-AudioInputAudio::AudioInputAudio(int _sample_rate) :
-	PeakMeterSource("AudioInputAudio"),
+InputStreamAudio::InputStreamAudio(int _sample_rate) :
+	PeakMeterSource("InputStreamAudio"),
 	current_buffer(1048576)
 {
 	sample_rate = _sample_rate;
@@ -131,29 +131,29 @@ AudioInputAudio::AudioInputAudio(int _sample_rate) :
 		tsunami->log->warn(_("alte Aufnahmedaten gefunden: ") + getTempFilename());
 }
 
-AudioInputAudio::~AudioInputAudio()
+InputStreamAudio::~InputStreamAudio()
 {
 	stop();
 }
 
-void AudioInputAudio::__init__(int _sample_rate)
+void InputStreamAudio::__init__(int _sample_rate)
 {
-	new(this) AudioInputAudio(_sample_rate);
+	new(this) InputStreamAudio(_sample_rate);
 }
 
-void AudioInputAudio::__delete__()
+void InputStreamAudio::__delete__()
 {
 	stop();
 	current_buffer.clear();
 	buffer.clear();
 }
 
-Device *AudioInputAudio::getDevice()
+Device *InputStreamAudio::getDevice()
 {
 	return device;
 }
 
-void AudioInputAudio::setDevice(Device *_device)
+void InputStreamAudio::setDevice(Device *_device)
 {
 	device = _device;
 	playback_delay_const = device->latency;
@@ -166,7 +166,7 @@ void AudioInputAudio::setDevice(Device *_device)
 	//tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
 }
 
-void AudioInputAudio::stop()
+void InputStreamAudio::stop()
 {
 	msg_db_f("AudioInputAudio.stop", 1);
 	if (!capturing)
@@ -195,7 +195,7 @@ void AudioInputAudio::stop()
 	}
 }
 
-bool AudioInputAudio::start()
+bool InputStreamAudio::start()
 {
 	msg_db_f("AudioInputAudio.start", 1);
 	if (capturing)
@@ -248,7 +248,7 @@ bool AudioInputAudio::start()
 	return capturing;
 }
 
-bool AudioInputAudio::testError(const string &msg)
+bool InputStreamAudio::testError(const string &msg)
 {
 	int e = pa_context_errno(tsunami->device_manager->context);
 	if (e != 0)
@@ -256,35 +256,35 @@ bool AudioInputAudio::testError(const string &msg)
 	return (e != 0);
 }
 
-float AudioInputAudio::getPlaybackDelayConst()
+float InputStreamAudio::getPlaybackDelayConst()
 {
 	return playback_delay_const;
 }
 
-void AudioInputAudio::accumulate(bool enable)
+void InputStreamAudio::accumulate(bool enable)
 {
 	//resetAccumulation();
 	current_buffer.clear();
 	accumulating = enable;
 }
 
-void AudioInputAudio::resetAccumulation()
+void InputStreamAudio::resetAccumulation()
 {
 	buffer.clear();
 }
 
-int AudioInputAudio::getSampleCount()
+int InputStreamAudio::getSampleCount()
 {
 	return buffer.length;
 }
 
-void AudioInputAudio::setPlaybackDelayConst(float f)
+void InputStreamAudio::setPlaybackDelayConst(float f)
 {
 	playback_delay_const = f;
 	HuiConfig.setFloat("Input.PlaybackDelay", playback_delay_const);
 }
 
-void AudioInputAudio::setChunkSize(int size)
+void InputStreamAudio::setChunkSize(int size)
 {
 	if (size > 0)
 		chunk_size = size;
@@ -292,7 +292,7 @@ void AudioInputAudio::setChunkSize(int size)
 		chunk_size = DEFAULT_CHUNK_SIZE;
 }
 
-void AudioInputAudio::setUpdateDt(float dt)
+void InputStreamAudio::setUpdateDt(float dt)
 {
 	if (dt > 0)
 		update_dt = dt;
@@ -300,7 +300,7 @@ void AudioInputAudio::setUpdateDt(float dt)
 		update_dt = DEFAULT_UPDATE_TIME;
 }
 
-int AudioInputAudio::doCapturing()
+int InputStreamAudio::doCapturing()
 {
 	if (!capturing)
 		return 0;
@@ -328,39 +328,39 @@ int AudioInputAudio::doCapturing()
 	return avail;
 }
 
-void AudioInputAudio::resetSync()
+void InputStreamAudio::resetSync()
 {
 	sync.reset();
 }
 
-void AudioInputAudio::getSomeSamples(BufferBox &buf, int num_samples)
+void InputStreamAudio::getSomeSamples(BufferBox &buf, int num_samples)
 {
 	current_buffer.peekRef(buf, -num_samples);
 }
 
-float AudioInputAudio::getSampleRate()
+float InputStreamAudio::getSampleRate()
 {
 	return sample_rate;
 }
 
-bool AudioInputAudio::isCapturing()
+bool InputStreamAudio::isCapturing()
 {
 	return capturing;
 }
 
-int AudioInputAudio::getState()
+int InputStreamAudio::getState()
 {
 	if (isCapturing())
 		return STATE_PLAYING;
 	return STATE_STOPPED;
 }
 
-int AudioInputAudio::getDelay()
+int InputStreamAudio::getDelay()
 {
 	return sync.getDelay() - playback_delay_const * (float)sample_rate / 1000.0f;
 }
 
-string AudioInputAudio::getDefaultTempFilename()
+string InputStreamAudio::getDefaultTempFilename()
 {
 #ifdef OS_WINDOWS
 	return "c:\\tsunami-input.raw";
@@ -369,33 +369,33 @@ string AudioInputAudio::getDefaultTempFilename()
 #endif
 }
 
-string AudioInputAudio::getTempFilename()
+string InputStreamAudio::getTempFilename()
 {
 	if (temp_filename.num > 0)
 		return temp_filename;
 	return getDefaultTempFilename();
 }
 
-void AudioInputAudio::setTempFilename(const string &filename)
+void InputStreamAudio::setTempFilename(const string &filename)
 {
 	temp_filename = filename;
 	HuiConfig.setStr("Input.TempFilename", temp_filename);
 }
 
-void AudioInputAudio::setSaveMode(bool enabled)
+void InputStreamAudio::setSaveMode(bool enabled)
 {
 	save_mode = enabled;
 }
 
-void AudioInputAudio::_startUpdate()
+void InputStreamAudio::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeatedM(update_dt, this, &AudioInputAudio::update);
+	hui_runner_id = HuiRunRepeatedM(update_dt, this, &InputStreamAudio::update);
 	running = true;
 }
 
-void AudioInputAudio::_stopUpdate()
+void InputStreamAudio::_stopUpdate()
 {
 	if (!running)
 		return;
@@ -404,7 +404,7 @@ void AudioInputAudio::_stopUpdate()
 	running = false;
 }
 
-void AudioInputAudio::update()
+void InputStreamAudio::update()
 {
 	if (doCapturing() > 0)
 		notify(MESSAGE_CAPTURE);

@@ -13,8 +13,8 @@
 #include "../lib/hui/hui.h"
 
 
-class AudioStream;
-class AudioInputAudio;
+class OutputStream;
+class InputStreamAudio;
 class Device;
 
 struct pa_context;
@@ -23,9 +23,9 @@ struct _snd_seq;
 class DeviceManager : public Observable
 {
 public:
-	friend class AudioStream;
-	friend class AudioInputAudio;
-	friend class AudioInputMidi;
+	friend class OutputStream;
+	friend class InputStreamAudio;
+	friend class InputStreamMidi;
 
 	static const string MESSAGE_ADD_DEVICE;
 	static const string MESSAGE_REMOVE_DEVICE;
@@ -40,9 +40,9 @@ public:
 	float getOutputVolume();
 	void setOutputVolume(float volume);
 
-	void addStream(AudioStream *s);
-	void removeStream(AudioStream *s);
-	bool streamExists(AudioStream *s);
+	void addStream(OutputStream *s);
+	void removeStream(OutputStream *s);
+	bool streamExists(OutputStream *s);
 
 	void remove_device(int type, int index);
 
@@ -69,7 +69,7 @@ public:
 
 	float output_volume;
 
-	Array<AudioStream*> streams;
+	Array<OutputStream*> streams;
 
 	void update_midi_devices();
 	void update_devices();

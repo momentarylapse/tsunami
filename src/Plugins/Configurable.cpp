@@ -18,7 +18,7 @@
 #include "../View/AudioView.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Audio/Renderer/SongRenderer.h"
-#include "../Audio/AudioStream.h"
+#include "../Device/OutputStream.h"
 
 const string Configurable::MESSAGE_CHANGE_BY_ACTION = "ChangeByAction";
 

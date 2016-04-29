@@ -7,8 +7,8 @@
 
 #include "SettingsDialog.h"
 #include "../../Tsunami.h"
-#include "../../Audio/AudioInputAudio.h"
-#include "../../Audio/DeviceManager.h"
+#include "../../Device/InputStreamAudio.h"
+#include "../../Device/DeviceManager.h"
 #include "../../Stuff/Log.h"
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
@@ -25,7 +25,7 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
 	event("hui:close", this, &SettingsDialog::onClose);
 	event("close", this, &SettingsDialog::onClose);
 
-	setOptions("capture_filename", "placeholder=" + AudioInputAudio::getDefaultTempFilename());
+	setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultTempFilename());
 	setOptions("default_artist", "placeholder=" + AppName);
 
 	setTooltip("default_artist", _("wird als Tag artist=... in neue Dateien eingetragen"));
@@ -79,7 +79,7 @@ void SettingsDialog::loadData()
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
-	setString("capture_filename", AudioInputAudio::temp_filename);
+	setString("capture_filename", InputStreamAudio::temp_filename);
 }
 
 void SettingsDialog::applyData()
@@ -113,14 +113,14 @@ void SettingsDialog::onDefaultArtist()
 
 void SettingsDialog::onCaptureFilename()
 {
-	AudioInputAudio::setTempFilename(getString(""));
+	InputStreamAudio::setTempFilename(getString(""));
 }
 
 void SettingsDialog::onCaptureFind()
 {
-	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), AudioInputAudio::temp_filename.basename(), "*.raw", "*.raw"))
+	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), InputStreamAudio::temp_filename.basename(), "*.raw", "*.raw"))
 		setString("capture_filename", HuiFilename);
-	AudioInputAudio::setTempFilename(HuiFilename);
+	InputStreamAudio::setTempFilename(HuiFilename);
 }
 
 void SettingsDialog::onClose()

@@ -7,9 +7,9 @@
 
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
-#include "../../Audio/AudioInputAny.h"
-#include "../../Audio/AudioInputAudio.h"
-#include "../../Audio/AudioStream.h"
+#include "../../Device/InputStreamAny.h"
+#include "../../Device/InputStreamAudio.h"
+#include "../../Device/OutputStream.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
@@ -18,8 +18,8 @@
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "CaptureConsole.h"
-#include "../../Audio/DeviceManager.h"
-#include "../../Audio/Device.h"
+#include "../../Device/DeviceManager.h"
+#include "../../Device/Device.h"
 
 CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	SideBarConsole(_("Aufnahme")),
@@ -74,7 +74,7 @@ inline int dev_type(int type)
 void CaptureConsole::onEnter()
 {
 	type = -1;
-	input = new AudioInputAny(song->sample_rate);
+	input = new InputStreamAny(song->sample_rate);
 	input->setSaveMode(true);
 	input->setChunkSize(4096);
 	input->setUpdateDt(0.03f);

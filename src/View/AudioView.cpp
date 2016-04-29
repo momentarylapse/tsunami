@@ -14,8 +14,8 @@
 #include "Mode/ViewModeCapture.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
-#include "../Audio/AudioInputAny.h"
-#include "../Audio/AudioStream.h"
+#include "../Device/InputStreamAny.h"
+#include "../Device/OutputStream.h"
 #include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Renderer/SongRenderer.h"
@@ -166,7 +166,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	is_updating_peaks = false;
 
 	renderer = new SongRenderer(song, &sel);
-	stream = new AudioStream(renderer);
+	stream = new OutputStream(renderer);
 
 	area = rect(0, 0, 0, 0);
 	mx = my = 0;
@@ -888,7 +888,7 @@ void AudioView::setCurLevel(int l)
 	notify(MESSAGE_CUR_LEVEL_CHANGE);
 }
 
-void AudioView::setInput(AudioInputAny *_input)
+void AudioView::setInput(InputStreamAny *_input)
 {
 	if (input)
 		unsubscribe(input);

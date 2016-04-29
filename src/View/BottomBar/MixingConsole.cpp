@@ -6,11 +6,11 @@
  */
 
 #include "MixingConsole.h"
-#include "../../Audio/AudioStream.h"
+#include "../../Device/OutputStream.h"
 #include "../Helper/PeakMeter.h"
 #include <math.h>
 
-#include "../../Audio/DeviceManager.h"
+#include "../../Device/DeviceManager.h"
 #include "../../Data/Song.h"
 
 const float TrackMixer::DB_MIN = -1000000;
@@ -106,7 +106,7 @@ void TrackMixer::update()
 }
 
 
-MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, AudioStream *stream) :
+MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, OutputStream *stream) :
 	BottomBarConsole(_("Mischpult")),
 	Observer("MixingConsole")
 {

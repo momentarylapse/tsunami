@@ -5,7 +5,6 @@
  *      Author: michi
  */
 
-#include "AudioStream.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include "Device.h"
@@ -14,6 +13,7 @@
 #include <alsa/asoundlib.h>
 
 #include "DeviceManager.h"
+#include "OutputStream.h"
 
 const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
 const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
@@ -328,7 +328,7 @@ void DeviceManager::kill()
 		return;
 	msg_db_f("Output.kill",1);
 
-	foreach(AudioStream *s, streams)
+	foreach(OutputStream *s, streams)
 		s->kill();
 
 	// audio
@@ -356,19 +356,19 @@ void DeviceManager::setOutputVolume(float _volume)
 	notify(MESSAGE_CHANGE);
 }
 
-void DeviceManager::addStream(AudioStream* s)
+void DeviceManager::addStream(OutputStream* s)
 {
 	streams.add(s);
 }
 
-void DeviceManager::removeStream(AudioStream* s)
+void DeviceManager::removeStream(OutputStream* s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)
 			streams.erase(i);
 }
 
-bool DeviceManager::streamExists(AudioStream* s)
+bool DeviceManager::streamExists(OutputStream* s)
 {
 	for (int i=streams.num-1; i>=0; i--)
 		if (streams[i] == s)

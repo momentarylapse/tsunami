@@ -1,27 +1,27 @@
 /*
- * AudioInputMidi.cpp
+ * InputStreamMidi.cpp
  *
  *  Created on: 19.02.2013
  *      Author: michi
  */
 
-#include "AudioInputMidi.h"
-#include "AudioStream.h"
-#include "Synth/Synthesizer.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include <alsa/asoundlib.h>
 #include "Device.h"
 #include "DeviceManager.h"
-#include "Renderer/MidiRenderer.h"
+#include "InputStreamMidi.h"
+#include "OutputStream.h"
+#include "../Audio/Renderer/MidiRenderer.h"
+#include "../Audio/Synth/Synthesizer.h"
 
 
 static const float DEFAULT_UPDATE_TIME = 0.005f;
-const string AudioInputMidi::MESSAGE_CAPTURE = "Capture";
+const string InputStreamMidi::MESSAGE_CAPTURE = "Capture";
 
 
-AudioInputMidi::AudioInputMidi(int _sample_rate) :
-	PeakMeterSource("AudioInputMidi")
+InputStreamMidi::InputStreamMidi(int _sample_rate) :
+	PeakMeterSource("InputStreamMidi")
 {
 	subs = NULL;
 	sample_rate = _sample_rate;
@@ -36,11 +36,11 @@ AudioInputMidi::AudioInputMidi(int _sample_rate) :
 
 
 	preview_renderer = new MidiRenderer(NULL);
-	preview_stream = new AudioStream(preview_renderer);
+	preview_stream = new OutputStream(preview_renderer);
 	preview_stream->setBufferSize(2048);
 }
 
-AudioInputMidi::~AudioInputMidi()
+InputStreamMidi::~InputStreamMidi()
 {
 	stop();
 	if (subs)
@@ -49,12 +49,12 @@ AudioInputMidi::~AudioInputMidi()
 	delete(preview_stream);
 }
 
-void AudioInputMidi::init()
+void InputStreamMidi::init()
 {
 	setDevice(device_manager->chooseDevice(Device::TYPE_MIDI_INPUT));
 }
 
-void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
+void InputStreamMidi::setPreviewSynthesizer(Synthesizer *s)
 {
 	preview_renderer->setSynthesizer(s);
 	/*preview_renderer->setAutoStop(false);
@@ -62,7 +62,7 @@ void AudioInputMidi::setPreviewSynthesizer(Synthesizer *s)
 		preview_stream->play();*/
 }
 
-bool AudioInputMidi::unconnect()
+bool InputStreamMidi::unconnect()
 {
 	if (!subs)
 		return true;
@@ -74,7 +74,7 @@ bool AudioInputMidi::unconnect()
 	return r == 0;
 }
 
-void AudioInputMidi::setDevice(Device *d)
+void InputStreamMidi::setDevice(Device *d)
 {
 	device = d;
 
@@ -109,29 +109,29 @@ void AudioInputMidi::setDevice(Device *d)
 	return r == 0;*/
 }
 
-Device *AudioInputMidi::getDevice()
+Device *InputStreamMidi::getDevice()
 {
 	return device;
 }
 
-void AudioInputMidi::accumulate(bool enable)
+void InputStreamMidi::accumulate(bool enable)
 {
 	accumulating = enable;
 }
 
-void AudioInputMidi::resetAccumulation()
+void InputStreamMidi::resetAccumulation()
 {
 	midi.clear();
 	midi.samples = 0;
 	offset = 0;
 }
 
-int AudioInputMidi::getSampleCount()
+int InputStreamMidi::getSampleCount()
 {
 	return offset * (double)sample_rate;
 }
 
-void AudioInputMidi::clearInputQueue()
+void InputStreamMidi::clearInputQueue()
 {
 	while (true){
 		snd_seq_event_t *ev;
@@ -142,7 +142,7 @@ void AudioInputMidi::clearInputQueue()
 	}
 }
 
-bool AudioInputMidi::start()
+bool InputStreamMidi::start()
 {
 	if (!device_manager->handle)
 		return false;
@@ -162,7 +162,7 @@ bool AudioInputMidi::start()
 	return true;
 }
 
-void AudioInputMidi::stop()
+void InputStreamMidi::stop()
 {
 	_stopUpdate();
 	capturing = false;
@@ -173,7 +173,7 @@ void AudioInputMidi::stop()
 	midi.sanify(Range(0, midi.samples));
 }
 
-int AudioInputMidi::doCapturing()
+int InputStreamMidi::doCapturing()
 {
 	double dt = timer.get();
 	double offset_new = offset + dt;
@@ -212,42 +212,42 @@ int AudioInputMidi::doCapturing()
 	return current_midi.samples;
 }
 
-bool AudioInputMidi::isCapturing()
+bool InputStreamMidi::isCapturing()
 {
 	return capturing;
 }
 
-int AudioInputMidi::getState()
+int InputStreamMidi::getState()
 {
 	if (isCapturing())
 		return STATE_PLAYING;
 	return STATE_STOPPED;
 }
 
-void AudioInputMidi::getSomeSamples(BufferBox &buf, int num_samples)
+void InputStreamMidi::getSomeSamples(BufferBox &buf, int num_samples)
 {
 	preview_stream->getSomeSamples(buf, num_samples);
 }
 
 
-int AudioInputMidi::getDelay()
+int InputStreamMidi::getDelay()
 {
 	return 0;
 }
 
-void AudioInputMidi::resetSync()
+void InputStreamMidi::resetSync()
 {
 }
 
-void AudioInputMidi::_startUpdate()
+void InputStreamMidi::_startUpdate()
 {
 	if (running)
 		return;
-	hui_runner_id = HuiRunRepeatedM(update_dt, this, &AudioInputMidi::update);
+	hui_runner_id = HuiRunRepeatedM(update_dt, this, &InputStreamMidi::update);
 	running = true;
 }
 
-void AudioInputMidi::_stopUpdate()
+void InputStreamMidi::_stopUpdate()
 {
 	if (!running)
 		return;
@@ -256,7 +256,7 @@ void AudioInputMidi::_stopUpdate()
 	running = false;
 }
 
-void AudioInputMidi::update()
+void InputStreamMidi::update()
 {
 	if (doCapturing() > 0)
 		notify(MESSAGE_CAPTURE);
@@ -264,12 +264,12 @@ void AudioInputMidi::update()
 	running = isCapturing();
 }
 
-float AudioInputMidi::getSampleRate()
+float InputStreamMidi::getSampleRate()
 {
 	return sample_rate;
 }
 
-void AudioInputMidi::setUpdateDt(float dt)
+void InputStreamMidi::setUpdateDt(float dt)
 {
 	if (dt > 0)
 		update_dt = dt;
@@ -277,7 +277,7 @@ void AudioInputMidi::setUpdateDt(float dt)
 		update_dt = DEFAULT_UPDATE_TIME;
 }
 
-void AudioInputMidi::setChunkSize(int size)
+void InputStreamMidi::setChunkSize(int size)
 {
 	if (size > 0)
 		chunk_size = size;

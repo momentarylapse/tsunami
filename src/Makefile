@@ -73,12 +73,6 @@ OBJ = \
  Audio/Synth/EnvelopeADSR.o\
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
- Audio/AudioInputAny.o\
- Audio/AudioInputAudio.o\
- Audio/AudioInputMidi.o\
- Audio/AudioStream.o\
- Audio/Device.o\
- Audio/DeviceManager.o\
  Data/BufferBox.o\
  Data/Clef.o\
  Data/Curve.o\
@@ -96,6 +90,12 @@ OBJ = \
  Data/Song.o\
  Data/SongSelection.o\
  Data/Track.o\
+ Device/Device.o\
+ Device/DeviceManager.o\
+ Device/InputStreamAny.o\
+ Device/InputStreamAudio.o\
+ Device/InputStreamMidi.o\
+ Device/OutputStream.o\
  lib/base/array.o\
  lib/base/strings.o\
  lib/file/file.o\
@@ -501,24 +501,6 @@ Audio/Synth/SampleSynthesizer.o : Audio/Synth/SampleSynthesizer.cpp
 Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 	$(CPP) -c Audio/Synth/Synthesizer.cpp -o $@ $(CXXFLAGS)
 
-Audio/AudioInputAny.o : Audio/AudioInputAny.cpp
-	$(CPP) -c Audio/AudioInputAny.cpp -o $@ $(CXXFLAGS)
-
-Audio/AudioInputAudio.o : Audio/AudioInputAudio.cpp
-	$(CPP) -c Audio/AudioInputAudio.cpp -o $@ $(CXXFLAGS)
-
-Audio/AudioInputMidi.o : Audio/AudioInputMidi.cpp
-	$(CPP) -c Audio/AudioInputMidi.cpp -o $@ $(CXXFLAGS)
-
-Audio/AudioStream.o : Audio/AudioStream.cpp
-	$(CPP) -c Audio/AudioStream.cpp -o $@ $(CXXFLAGS)
-
-Audio/DeviceManager.o : Audio/DeviceManager.cpp
-	$(CPP) -c Audio/DeviceManager.cpp -o $@ $(CXXFLAGS)
-
-Audio/Device.o : Audio/Device.cpp
-	$(CPP) -c Audio/Device.cpp -o $@ $(CXXFLAGS)
-
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)
 
@@ -569,6 +551,24 @@ Data/SongSelection.o : Data/SongSelection.cpp
 
 Data/Track.o : Data/Track.cpp
 	$(CPP) -c Data/Track.cpp -o $@ $(CXXFLAGS)
+
+Device/DeviceManager.o : Device/DeviceManager.cpp
+	$(CPP) -c Device/DeviceManager.cpp -o $@ $(CXXFLAGS)
+
+Device/Device.o : Device/Device.cpp
+	$(CPP) -c Device/Device.cpp -o $@ $(CXXFLAGS)
+
+Device/InputStreamAny.o : Device/InputStreamAny.cpp
+	$(CPP) -c Device/InputStreamAny.cpp -o $@ $(CXXFLAGS)
+
+Device/InputStreamAudio.o : Device/InputStreamAudio.cpp
+	$(CPP) -c Device/InputStreamAudio.cpp -o $@ $(CXXFLAGS)
+
+Device/InputStreamMidi.o : Device/InputStreamMidi.cpp
+	$(CPP) -c Device/InputStreamMidi.cpp -o $@ $(CXXFLAGS)
+
+Device/OutputStream.o : Device/OutputStream.cpp
+	$(CPP) -c Device/OutputStream.cpp -o $@ $(CXXFLAGS)
 
 lib/base/array.o : lib/base/array.cpp
 	$(CPP) -c lib/base/array.cpp -o $@ $(CXXFLAGS)

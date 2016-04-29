@@ -8,7 +8,7 @@
 #include "ViewModeMidi.h"
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
-#include "../../Audio/AudioStream.h"
+#include "../../Device/OutputStream.h"
 #include "../../Audio/Renderer/MidiRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
@@ -41,7 +41,7 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 	preview_renderer = new MidiRenderer(NULL);
 	preview_renderer->setAutoStop(true);
-	preview_stream = new AudioStream(preview_renderer);
+	preview_stream = new OutputStream(preview_renderer);
 	preview_stream->setBufferSize(2048);
 }
 

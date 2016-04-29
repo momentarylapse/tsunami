@@ -7,7 +7,7 @@
 
 #include "Tsunami.h"
 
-#include "Audio/DeviceManager.h"
+#include "Device/DeviceManager.h"
 #include "TsunamiWindow.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
@@ -18,7 +18,7 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.38.0";
+string AppVersion = "0.6.38.1";
 
 Tsunami *tsunami = NULL;
 

@@ -12,11 +12,10 @@
 #include "SideBar.h"
 #include "../Helper/PeakMeter.h"
 #include "../../Stuff/Observer.h"
-#include "../../Audio/AudioInputMidi.h"
 #include "../../Data/Song.h"
 
 class AudioView;
-class AudioInputAny;
+class InputStreamAny;
 class DeviceManager;
 class Device;
 
@@ -58,7 +57,7 @@ public:
 
 	Song *song;
 	AudioView *view;
-	AudioInputAny *input;
+	InputStreamAny *input;
 	PeakMeter *peak_meter;
 	Synthesizer *temp_synth;
 	int type;

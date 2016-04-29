@@ -1,12 +1,12 @@
 /*
- * AudioInputMidi.h
+ * InputStreamMidi.h
  *
  *  Created on: 19.02.2013
  *      Author: michi
  */
 
-#ifndef AUDIOINPUTMIDI_H_
-#define AUDIOINPUTMIDI_H_
+#ifndef INPUTSTREAMMIDI_H_
+#define INPUTSTREAMMIDI_H_
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
@@ -14,18 +14,18 @@
 #include "../View/Helper/PeakMeter.h"
 
 struct _snd_seq_port_subscribe;
-class AudioStream;
+class OutputStream;
 class MidiRenderer;
 class Synthesizer;
 class Device;
 class DeviceManager;
 
-class AudioInputMidi : public PeakMeterSource
+class InputStreamMidi : public PeakMeterSource
 {
 public:
 
-	AudioInputMidi(int sample_rate);
-	virtual ~AudioInputMidi();
+	InputStreamMidi(int sample_rate);
+	virtual ~InputStreamMidi();
 
 
 	static const string MESSAGE_CAPTURE;
@@ -87,8 +87,8 @@ private:
 	bool running;
 	int hui_runner_id;
 
-	AudioStream *preview_stream;
+	OutputStream *preview_stream;
 	MidiRenderer *preview_renderer;
 };
 
-#endif /* AUDIOINPUTMIDI_H_ */
+#endif /* INPUTSTREAMMIDI_H_ */

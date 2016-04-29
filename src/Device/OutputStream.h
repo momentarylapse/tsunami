@@ -1,12 +1,12 @@
 /*
- * AudioStream.h
+ * OutputStream.h
  *
  *  Created on: 01.11.2014
  *      Author: michi
  */
 
-#ifndef SRC_AUDIO_AUDIOSTREAM_H_
-#define SRC_AUDIO_AUDIOSTREAM_H_
+#ifndef SRC_DEVICE_OUTPUTSTREAM_H_
+#define SRC_DEVICE_OUTPUTSTREAM_H_
 
 
 
@@ -23,13 +23,13 @@ class Thread;
 class StreamThread;
 struct pa_stream;
 
-class AudioStream : public PeakMeterSource
+class OutputStream : public PeakMeterSource
 {
 	friend StreamThread;
 public:
 	//AudioStream();
-	AudioStream(AudioRenderer *r);
-	virtual ~AudioStream();
+	OutputStream(AudioRenderer *r);
+	virtual ~OutputStream();
 
 	void _cdecl __init__(AudioRenderer *r);
 	virtual void _cdecl __delete__();
@@ -104,4 +104,4 @@ private:
 	static void stream_success_callback(pa_stream *s, int success, void *userdata);
 };
 
-#endif /* SRC_AUDIO_AUDIOSTREAM_H_ */
+#endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

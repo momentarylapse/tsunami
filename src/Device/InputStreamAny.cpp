@@ -1,20 +1,20 @@
 /*
- * AudioInputAny.cpp
+ * InputStreamAny.cpp
  *
  *  Created on: 16.08.2015
  *      Author: michi
  */
 
-#include "AudioInputAny.h"
 #include "../Data/Track.h"
-#include "AudioInputAudio.h"
+#include "InputStreamAny.h"
+#include "InputStreamAudio.h"
 
 
-const string AudioInputAny::MESSAGE_CAPTURE = "Capture";
+const string InputStreamAny::MESSAGE_CAPTURE = "Capture";
 
-AudioInputAny::AudioInputAny(int _sample_rate) :
-	PeakMeterSource("AudioInputAny"),
-	Observer("AudioInputAny")
+InputStreamAny::InputStreamAny(int _sample_rate) :
+	PeakMeterSource("InputStreamAny"),
+	Observer("InputStreamAny")
 {
 	sample_rate = _sample_rate;
 	chunk_size = -1;
@@ -30,12 +30,12 @@ AudioInputAny::AudioInputAny(int _sample_rate) :
 	save_mode = false;
 }
 
-AudioInputAny::~AudioInputAny()
+InputStreamAny::~InputStreamAny()
 {
 	setType(-1);
 }
 
-void AudioInputAny::setType(int _type)
+void InputStreamAny::setType(int _type)
 {
 	if (type == _type)
 		return;
@@ -52,7 +52,7 @@ void AudioInputAny::setType(int _type)
 	type = _type;
 
 	if (type == Track::TYPE_AUDIO){
-		input_audio = new AudioInputAudio(sample_rate);
+		input_audio = new InputStreamAudio(sample_rate);
 		buffer = &input_audio->buffer;
 		current_buffer = &input_audio->current_buffer;
 		input_audio->setSaveMode(save_mode);
@@ -61,7 +61,7 @@ void AudioInputAny::setType(int _type)
 		subscribe(input_audio);
 	}
 	if (type == Track::TYPE_MIDI){
-		input_midi = new AudioInputMidi(sample_rate);
+		input_midi = new InputStreamMidi(sample_rate);
 		input_midi->setPreviewSynthesizer(preview_synth);
 		midi = &input_midi->midi;
 		current_midi = &input_midi->current_midi;
@@ -69,7 +69,7 @@ void AudioInputAny::setType(int _type)
 	}
 }
 
-bool AudioInputAny::start()
+bool InputStreamAny::start()
 {
 	if (type == Track::TYPE_AUDIO)
 		return input_audio->start();
@@ -78,7 +78,7 @@ bool AudioInputAny::start()
 	return false;
 }
 
-void AudioInputAny::stop()
+void InputStreamAny::stop()
 {
 	if (type == Track::TYPE_AUDIO)
 		input_audio->stop();
@@ -86,7 +86,7 @@ void AudioInputAny::stop()
 		input_midi->stop();
 }
 
-bool AudioInputAny::isCapturing()
+bool InputStreamAny::isCapturing()
 {
 	if (type == Track::TYPE_AUDIO)
 		return input_audio->isCapturing();
@@ -95,7 +95,7 @@ bool AudioInputAny::isCapturing()
 	return false;
 }
 
-void AudioInputAny::accumulate(bool enable)
+void InputStreamAny::accumulate(bool enable)
 {
 	if (type == Track::TYPE_AUDIO)
 		input_audio->accumulate(enable);
@@ -103,7 +103,7 @@ void AudioInputAny::accumulate(bool enable)
 		input_midi->accumulate(enable);
 }
 
-void AudioInputAny::resetAccumulation()
+void InputStreamAny::resetAccumulation()
 {
 	if (type == Track::TYPE_AUDIO)
 		input_audio->resetAccumulation();
@@ -111,7 +111,7 @@ void AudioInputAny::resetAccumulation()
 		input_midi->resetAccumulation();
 }
 
-int AudioInputAny::getSampleCount()
+int InputStreamAny::getSampleCount()
 {
 	if (type == Track::TYPE_AUDIO)
 		return input_audio->getSampleCount();
@@ -120,7 +120,7 @@ int AudioInputAny::getSampleCount()
 	return 0;
 }
 
-void AudioInputAny::getSomeSamples(BufferBox& buf, int num_samples)
+void InputStreamAny::getSomeSamples(BufferBox& buf, int num_samples)
 {
 	if (type == Track::TYPE_AUDIO)
 		input_audio->getSomeSamples(buf, num_samples);
@@ -128,7 +128,7 @@ void AudioInputAny::getSomeSamples(BufferBox& buf, int num_samples)
 		input_midi->getSomeSamples(buf, num_samples);
 }
 
-int AudioInputAny::getState()
+int InputStreamAny::getState()
 {
 	if (type == Track::TYPE_AUDIO)
 		return input_audio->getState();
@@ -137,7 +137,7 @@ int AudioInputAny::getState()
 	return -1;
 }
 
-void AudioInputAny::setDevice(Device *dev)
+void InputStreamAny::setDevice(Device *dev)
 {
 	if (type == Track::TYPE_AUDIO)
 		input_audio->setDevice(dev);
@@ -145,7 +145,7 @@ void AudioInputAny::setDevice(Device *dev)
 		input_midi->setDevice(dev);
 }
 
-Device *AudioInputAny::getDevice()
+Device *InputStreamAny::getDevice()
 {
 	if (type == Track::TYPE_AUDIO)
 		return input_audio->getDevice();
@@ -154,7 +154,7 @@ Device *AudioInputAny::getDevice()
 	return NULL;
 }
 
-void AudioInputAny::setSaveMode(bool enabled)
+void InputStreamAny::setSaveMode(bool enabled)
 {
 	save_mode = enabled;
 	if (type == Track::TYPE_AUDIO)
@@ -162,14 +162,14 @@ void AudioInputAny::setSaveMode(bool enabled)
 }
 
 
-void AudioInputAny::setPreviewSynthesizer(Synthesizer* s)
+void InputStreamAny::setPreviewSynthesizer(Synthesizer* s)
 {
 	preview_synth = s;
 	if (type == Track::TYPE_MIDI)
 		input_midi->setPreviewSynthesizer(preview_synth);
 }
 
-void AudioInputAny::setChunkSize(int size)
+void InputStreamAny::setChunkSize(int size)
 {
 	chunk_size = size;
 	if (type == Track::TYPE_AUDIO)
@@ -178,7 +178,7 @@ void AudioInputAny::setChunkSize(int size)
 		input_midi->setChunkSize(size);
 }
 
-void AudioInputAny::setUpdateDt(float dt)
+void InputStreamAny::setUpdateDt(float dt)
 {
 	update_dt = dt;
 	if (type == Track::TYPE_AUDIO)
@@ -187,7 +187,7 @@ void AudioInputAny::setUpdateDt(float dt)
 		input_midi->setUpdateDt(dt);
 }
 
-void AudioInputAny::onUpdate(Observable *o, const string &message)
+void InputStreamAny::onUpdate(Observable *o, const string &message)
 {
 	// just forward the message
 	notify(MESSAGE_CAPTURE);

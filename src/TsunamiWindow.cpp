@@ -22,8 +22,8 @@
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
-#include "Audio/AudioStream.h"
-#include "Audio/DeviceManager.h"
+#include "Device/OutputStream.h"
+#include "Device/DeviceManager.h"
 #include "Audio/Renderer/SongRenderer.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
@@ -153,7 +153,7 @@ TsunamiWindow::TsunamiWindow() :
 
 	subscribe(view);
 	subscribe(song);
-	subscribe(view->stream, AudioStream::MESSAGE_STATE_CHANGE);
+	subscribe(view->stream, OutputStream::MESSAGE_STATE_CHANGE);
 	subscribe(tsunami->clipboard);
 	subscribe(bottom_bar);
 	subscribe(side_bar);

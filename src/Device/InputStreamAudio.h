@@ -1,12 +1,12 @@
 /*
- * AudioInputAudio.h
+ * InputStreamAudio.h
  *
  *  Created on: 26.03.2012
  *      Author: michi
  */
 
-#ifndef AUDIOINPUTAUDIO_H_
-#define AUDIOINPUTAUDIO_H_
+#ifndef INPUTSTREAMAUDIO_H_
+#define INPUTSTREAMAUDIO_H_
 
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
@@ -18,12 +18,12 @@ struct pa_stream;
 class PluginManager;
 class Device;
 
-class AudioInputAudio : public PeakMeterSource
+class InputStreamAudio : public PeakMeterSource
 {
 	friend class PluginManager;
 public:
-	AudioInputAudio(int sample_rate);
-	virtual ~AudioInputAudio();
+	InputStreamAudio(int sample_rate);
+	virtual ~InputStreamAudio();
 
 	void _cdecl __init__(int sample_rate);
 	virtual void _cdecl __delete__();
@@ -114,4 +114,4 @@ private:
 	static void input_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 };
 
-#endif /* AUDIOINPUTAUDIO_H_ */
+#endif /* INPUTSTREAMAUDIO_H_ */

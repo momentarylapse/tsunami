@@ -1,5 +1,5 @@
 /*
- * AudioInputAny.h
+ * InputStreamAny.h
  *
  *  Created on: 16.08.2015
  *      Author: michi
@@ -13,18 +13,18 @@
 #include "../Data/RingBuffer.h"
 #include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
-#include "AudioInputMidi.h"
+#include "InputStreamMidi.h"
 
-class AudioInputAudio;
-class AudioInputMidi;
+class InputStreamAudio;
+class InputStreamMidi;
 class Device;
 
-class AudioInputAny : public PeakMeterSource, public Observer
+class InputStreamAny : public PeakMeterSource, public Observer
 {
 public:
 
-	AudioInputAny(int sample_rate);
-	virtual ~AudioInputAny();
+	InputStreamAny(int sample_rate);
+	virtual ~InputStreamAny();
 
 	static const string MESSAGE_CAPTURE;
 
@@ -68,8 +68,8 @@ public:
 	MidiRawData *current_midi;
 
 	int type;
-	AudioInputAudio *input_audio;
-	AudioInputMidi *input_midi;
+	InputStreamAudio *input_audio;
+	InputStreamMidi *input_midi;
 	bool save_mode;
 
 	Synthesizer *preview_synth;

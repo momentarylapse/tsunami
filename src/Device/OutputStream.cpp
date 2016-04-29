@@ -1,18 +1,18 @@
 /*
- * AudioStream.cpp
+ * OutputStream.cpp
  *
  *  Created on: 01.11.2014
  *      Author: michi
  */
 
-#include "AudioStream.h"
 #include "../Tsunami.h"
-#include "Renderer/AudioRenderer.h"
+#include "../Audio/Renderer/AudioRenderer.h"
 #include "../Stuff/Log.h"
 #include <pulse/pulseaudio.h>
 #include "../lib/threads/Thread.h"
 #include "DeviceManager.h"
 #include "Device.h"
+#include "OutputStream.h"
 
 //const int DEFAULT_BUFFER_SIZE = 131072;
 const int DEFAULT_BUFFER_SIZE = 32768;
@@ -21,8 +21,8 @@ const int DEFAULT_BUFFER_SIZE = 32768;
 const float DEFAULT_UPDATE_DT = 0.050f;
 
 
-const string AudioStream::MESSAGE_STATE_CHANGE = "StateChange";
-const string AudioStream::MESSAGE_UPDATE = "Update";
+const string OutputStream::MESSAGE_STATE_CHANGE = "StateChange";
+const string OutputStream::MESSAGE_UPDATE = "Update";
 
 
 
@@ -46,10 +46,10 @@ bool pa_wait_stream_ready(pa_stream *s)
 }
 
 
-void AudioStream::stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
+void OutputStream::stream_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
 	//printf("request %d\n", (int)nbytes);
-	AudioStream *stream = (AudioStream*)userdata;
+	OutputStream *stream = (OutputStream*)userdata;
 
 	void *data;
 	int r = pa_stream_begin_write(p, &data, &nbytes);
@@ -101,18 +101,18 @@ void AudioStream::stream_request_callback(pa_stream *p, size_t nbytes, void *use
 
 	if (available <= frames and stream->end_of_data){
 		//printf("end\n");
-		HuiRunLaterM(0.001f, stream, &AudioStream::stop); // TODO prevent abort before playback really finished
+		HuiRunLaterM(0.001f, stream, &OutputStream::stop); // TODO prevent abort before playback really finished
 	}
 }
 
-void AudioStream::stream_success_callback(pa_stream *s, int success, void *userdata)
+void OutputStream::stream_success_callback(pa_stream *s, int success, void *userdata)
 {
 	//msg_write("--success");
 }
 
-void AudioStream::stream_underflow_callback(pa_stream *s, void *userdata)
+void OutputStream::stream_underflow_callback(pa_stream *s, void *userdata)
 {
-	AudioStream *stream = (AudioStream*)userdata;
+	OutputStream *stream = (OutputStream*)userdata;
 	if (stream->playing)
 		printf("pulse: underflow\n");
 }
@@ -120,11 +120,11 @@ void AudioStream::stream_underflow_callback(pa_stream *s, void *userdata)
 class StreamThread : public Thread
 {
 public:
-	AudioStream *stream;
+	OutputStream *stream;
 	HuiTimer timer;
 	float t_idle;
 
-	StreamThread(AudioStream *s)
+	StreamThread(OutputStream *s)
 	{
 		stream = s;
 		t_idle = 0;
@@ -150,8 +150,8 @@ public:
 	}
 };
 
-AudioStream::AudioStream(AudioRenderer *r) :
-	PeakMeterSource("AudioStream"),
+OutputStream::OutputStream(AudioRenderer *r) :
+	PeakMeterSource("OutputStream"),
 	ring_buf(1048576)
 {
 	renderer = r;
@@ -180,22 +180,22 @@ AudioStream::AudioStream(AudioRenderer *r) :
 	device_manager->addStream(this);
 }
 
-AudioStream::~AudioStream()
+OutputStream::~OutputStream()
 {
 	kill();
 }
 
-void AudioStream::__init__(AudioRenderer *r)
+void OutputStream::__init__(AudioRenderer *r)
 {
-	new(this) AudioStream(r);
+	new(this) OutputStream(r);
 }
 
-void AudioStream::__delete__()
+void OutputStream::__delete__()
 {
 	kill();
 }
 
-void AudioStream::create_dev()
+void OutputStream::create_dev()
 {
 	if (_stream)
 		return;
@@ -214,7 +214,7 @@ void AudioStream::create_dev()
 	pa_stream_set_underflow_callback(_stream, &stream_underflow_callback, this);
 }
 
-void AudioStream::kill_dev()
+void OutputStream::kill_dev()
 {
 	msg_db_f("Stream.kill_dev", 1);
 
@@ -228,7 +228,7 @@ void AudioStream::kill_dev()
 }
 
 // only used for clean up
-void AudioStream::kill()
+void OutputStream::kill()
 {
 	msg_db_f("Stream.kill", 1);
 
@@ -245,7 +245,7 @@ void AudioStream::kill()
 	}
 }
 
-void AudioStream::stop()
+void OutputStream::stop()
 {
 	if (!playing)
 		return;
@@ -285,7 +285,7 @@ void AudioStream::stop()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void AudioStream::pause()
+void OutputStream::pause()
 {
 	if (!playing)
 		return;
@@ -294,7 +294,7 @@ void AudioStream::pause()
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-void AudioStream::stream()
+void OutputStream::stream()
 {
 	reading = true;
 	read_more = false;
@@ -326,7 +326,7 @@ void AudioStream::stream()
 	reading = false;
 }
 
-void AudioStream::setSource(AudioRenderer *r)
+void OutputStream::setSource(AudioRenderer *r)
 {
 	msg_db_f("Stream.setSource", 1);
 
@@ -336,12 +336,12 @@ void AudioStream::setSource(AudioRenderer *r)
 	renderer = r;
 }
 
-void AudioStream::setDevice(Device *d)
+void OutputStream::setDevice(Device *d)
 {
 	device = d;
 }
 
-void AudioStream::play()
+void OutputStream::play()
 {
 	msg_db_f("Stream.play", 1);
 
@@ -410,17 +410,17 @@ void AudioStream::play()
 	testError("trigger");
 	pa_wait_op(op);
 
-	hui_runner_id = HuiRunRepeatedM(update_dt, this, &AudioStream::update);
+	hui_runner_id = HuiRunRepeatedM(update_dt, this, &OutputStream::update);
 
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-bool AudioStream::isPlaying()
+bool OutputStream::isPlaying()
 {
 	return playing;
 }
 
-int AudioStream::getState()
+int OutputStream::getState()
 {
 	if (playing and paused)
 		return STATE_PAUSED;
@@ -429,7 +429,7 @@ int AudioStream::getState()
 	return STATE_STOPPED;
 }
 
-int AudioStream::getPos()
+int OutputStream::getPos()
 {
 	int pos;
 	if (getPosSafe(pos))
@@ -437,7 +437,7 @@ int AudioStream::getPos()
 	return 0;
 }
 
-bool AudioStream::getPosSafe(int &pos)
+bool OutputStream::getPosSafe(int &pos)
 {
 	if (!playing)
 		return false;
@@ -451,30 +451,30 @@ bool AudioStream::getPosSafe(int &pos)
 	return true;
 }
 
-void AudioStream::seek(int pos)
+void OutputStream::seek(int pos)
 {
 	renderer->seek(pos);
 	play();
 	cur_pos = pos;
 }
 
-float AudioStream::getVolume()
+float OutputStream::getVolume()
 {
 	return volume;
 }
 
-void AudioStream::setVolume(float _volume)
+void OutputStream::setVolume(float _volume)
 {
 	volume = _volume;
 	notify(MESSAGE_STATE_CHANGE);
 }
 
-float AudioStream::getSampleRate()
+float OutputStream::getSampleRate()
 {
 	return renderer->getSampleRate();
 }
 
-void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
+void OutputStream::getSomeSamples(BufferBox &buf, int num_samples)
 {
 	if (!playing)
 		return;
@@ -482,7 +482,7 @@ void AudioStream::getSomeSamples(BufferBox &buf, int num_samples)
 	ring_buf.peekRef(buf, num_samples);
 }
 
-bool AudioStream::testError(const string &msg)
+bool OutputStream::testError(const string &msg)
 {
 	int e = pa_context_errno(device_manager->context);
 	if (e != 0)
@@ -490,7 +490,7 @@ bool AudioStream::testError(const string &msg)
 	return (e != 0);
 }
 
-void AudioStream::update()
+void OutputStream::update()
 {
 	msg_db_f("Stream.update", 1);
 	testError("idle");

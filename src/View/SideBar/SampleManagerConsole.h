@@ -12,7 +12,7 @@
 
 class Song;
 class Sample;
-class AudioStream;
+class OutputStream;
 class SongRenderer;
 class SampleManagerItem;
 class Progress;
@@ -50,7 +50,7 @@ public:
 	int getIndex(Sample *s);
 	int selected_uid;
 
-	AudioStream *preview_stream;
+	OutputStream *preview_stream;
 	SongRenderer *preview_renderer;
 	Song *preview_audio;
 	Sample *preview_sample;

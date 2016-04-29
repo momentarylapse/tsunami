@@ -14,7 +14,7 @@
 class MidiData;
 class MidiNote;
 class MidiEvent;
-class AudioStream;
+class OutputStream;
 class MidiRenderer;
 
 class ViewModeMidi : public ViewModeDefault
@@ -69,7 +69,7 @@ public:
 		MIDI_MODE_CHORD
 	};
 
-	AudioStream *preview_stream;
+	OutputStream *preview_stream;
 	MidiRenderer *preview_renderer;
 
 	rect scroll_bar;

@@ -12,14 +12,14 @@
 #include "../../Stuff/Observer.h"
 
 class PeakMeter;
-class AudioStream;
+class OutputStream;
 class DeviceManager;
 class BottomBar;
 
 class MiniBar : public HuiPanel, public Observer
 {
 public:
-	MiniBar(BottomBar *bottom_bar, AudioStream *stream, DeviceManager *output);
+	MiniBar(BottomBar *bottom_bar, OutputStream *stream, DeviceManager *output);
 	virtual ~MiniBar();
 
 	void onShowBottomBar();
@@ -30,7 +30,7 @@ public:
 
 	virtual void onUpdate(Observable *o, const string &message);
 
-	AudioStream *stream;
+	OutputStream *stream;
 	DeviceManager *output;
 	PeakMeter *peak_meter;
 	BottomBar *bottom_bar;

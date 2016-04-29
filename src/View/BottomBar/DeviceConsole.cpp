@@ -6,8 +6,8 @@
  */
 
 #include "DeviceConsole.h"
-#include "../../Audio/DeviceManager.h"
-#include "../../Audio/Device.h"
+#include "../../Device/DeviceManager.h"
+#include "../../Device/Device.h"
 
 DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 	BottomBarConsole(_("Ger&ate")),

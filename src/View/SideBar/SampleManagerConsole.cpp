@@ -8,7 +8,7 @@
 #include "../../Storage/Storage.h"
 #include "../../View/AudioView.h"
 #include "../../View/AudioViewTrack.h"
-#include "../../Audio/AudioStream.h"
+#include "../../Device/OutputStream.h"
 #include "../../Audio/Renderer/BufferRenderer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../Helper/Progress.h"
@@ -133,7 +133,7 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 
 	preview_audio = new Song;
 	preview_renderer = new SongRenderer(preview_audio, NULL);
-	preview_stream = new AudioStream(preview_renderer);
+	preview_stream = new OutputStream(preview_renderer);
 	preview_sample = NULL;
 
 	progress = NULL;

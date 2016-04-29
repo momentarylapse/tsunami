@@ -9,7 +9,7 @@
 #include "../AudioView.h"
 #include "../AudioViewTrack.h"
 #include "../../Data/Curve.h"
-#include "../../Audio/AudioStream.h"
+#include "../../Device/OutputStream.h"
 #include "../../TsunamiWindow.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :

@@ -7,11 +7,11 @@
 
 #include "BottomBar.h"
 #include "../Helper/PeakMeter.h"
-#include "../../Audio/AudioStream.h"
+#include "../../Device/OutputStream.h"
 #include "MiniBar.h"
-#include "../../Audio/DeviceManager.h"
+#include "../../Device/DeviceManager.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, AudioStream *_stream, DeviceManager *_output) :
+MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_output) :
 	Observer("MiniBar")
 {
 	stream = _stream;

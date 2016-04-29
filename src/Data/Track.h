@@ -10,9 +10,9 @@
 
 #include "Range.h"
 #include "BufferBox.h"
-#include "MidiData.h"
+#include "../Midi/MidiData.h"
 #include "Sample.h"
-#include "Instrument.h"
+#include "../Midi/Instrument.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
 #include "Song.h"

@@ -7,7 +7,7 @@
 
 #include "MidiFxConsole.h"
 #include "../../Data/Track.h"
-#include "../../Data/MidiData.h"
+#include "../../Midi/MidiData.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../AudioView.h"
 #include "../../Plugins/ConfigPanel.h"

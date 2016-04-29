@@ -9,7 +9,7 @@
 #define SAMPLE_H_
 
 #include "BufferBox.h"
-#include "MidiData.h"
+#include "../Midi/MidiData.h"
 #include "../lib/math/rect.h"
 #include "../Stuff/Observable.h"
 

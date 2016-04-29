@@ -74,19 +74,13 @@ OBJ = \
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
  Data/BufferBox.o\
- Data/Clef.o\
  Data/Curve.o\
  Data/Data.o\
- Data/Instrument.o\
- Data/MidiData.o\
- Data/MidiEvent.o\
- Data/MidiNote.o\
  Data/Range.o\
  Data/RingBuffer.o\
  Data/Rhythm.o\
  Data/Sample.o\
  Data/SampleRef.o\
- Data/Scale.o\
  Data/Song.o\
  Data/SongSelection.o\
  Data/Track.o\
@@ -209,6 +203,12 @@ OBJ = \
  lib/threads/Thread.o\
  lib/threads/ThreadedWork.o\
  lib/xfile/chunked.o\
+ Midi/Clef.o\
+ Midi/Instrument.o\
+ Midi/MidiData.o\
+ Midi/MidiEvent.o\
+ Midi/MidiNote.o\
+ Midi/Scale.o\
  Plugins/ConfigPanel.o\
  Plugins/Configurable.o\
  Plugins/Effect.o\
@@ -504,26 +504,11 @@ Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)
 
-Data/Clef.o : Data/Clef.cpp
-	$(CPP) -c Data/Clef.cpp -o $@ $(CXXFLAGS)
-
 Data/Curve.o : Data/Curve.cpp
 	$(CPP) -c Data/Curve.cpp -o $@ $(CXXFLAGS)
 
 Data/Data.o : Data/Data.cpp
 	$(CPP) -c Data/Data.cpp -o $@ $(CXXFLAGS)
-
-Data/Instrument.o : Data/Instrument.cpp
-	$(CPP) -c Data/Instrument.cpp -o $@ $(CXXFLAGS)
-
-Data/MidiData.o : Data/MidiData.cpp
-	$(CPP) -c Data/MidiData.cpp -o $@ $(CXXFLAGS)
-
-Data/MidiEvent.o : Data/MidiEvent.cpp
-	$(CPP) -c Data/MidiEvent.cpp -o $@ $(CXXFLAGS)
-
-Data/MidiNote.o : Data/MidiNote.cpp
-	$(CPP) -c Data/MidiNote.cpp -o $@ $(CXXFLAGS)
 
 Data/Range.o : Data/Range.cpp
 	$(CPP) -c Data/Range.cpp -o $@ $(CXXFLAGS)
@@ -539,9 +524,6 @@ Data/Sample.o : Data/Sample.cpp
 
 Data/SampleRef.o : Data/SampleRef.cpp
 	$(CPP) -c Data/SampleRef.cpp -o $@ $(CXXFLAGS)
-
-Data/Scale.o : Data/Scale.cpp
-	$(CPP) -c Data/Scale.cpp -o $@ $(CXXFLAGS)
 
 Data/Song.o : Data/Song.cpp
 	$(CPP) -c Data/Song.cpp -o $@ $(CXXFLAGS)
@@ -905,6 +887,24 @@ lib/threads/ThreadedWork.o : lib/threads/ThreadedWork.cpp
 
 lib/xfile/chunked.o : lib/xfile/chunked.cpp
 	$(CPP) -c lib/xfile/chunked.cpp -o $@ $(CXXFLAGS)
+
+Midi/Clef.o : Midi/Clef.cpp
+	$(CPP) -c Midi/Clef.cpp -o $@ $(CXXFLAGS)
+
+Midi/Instrument.o : Midi/Instrument.cpp
+	$(CPP) -c Midi/Instrument.cpp -o $@ $(CXXFLAGS)
+
+Midi/MidiData.o : Midi/MidiData.cpp
+	$(CPP) -c Midi/MidiData.cpp -o $@ $(CXXFLAGS)
+
+Midi/MidiEvent.o : Midi/MidiEvent.cpp
+	$(CPP) -c Midi/MidiEvent.cpp -o $@ $(CXXFLAGS)
+
+Midi/MidiNote.o : Midi/MidiNote.cpp
+	$(CPP) -c Midi/MidiNote.cpp -o $@ $(CXXFLAGS)
+
+Midi/Scale.o : Midi/Scale.cpp
+	$(CPP) -c Midi/Scale.cpp -o $@ $(CXXFLAGS)
 
 Plugins/Configurable.o : Plugins/Configurable.cpp
 	$(CPP) -c Plugins/Configurable.cpp -o $@ $(CXXFLAGS)

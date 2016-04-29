@@ -8,7 +8,7 @@
 #ifndef SRC_DATA_MIDINOTE_H_
 #define SRC_DATA_MIDINOTE_H_
 
-#include "Range.h"
+#include "../Data/Range.h"
 
 class Scale;
 class Instrument;

@@ -10,8 +10,8 @@
 
 #include "../../lib/base/base.h"
 #include "../../Plugins/Configurable.h"
-#include "../../Data/MidiData.h"
-#include "../../Data/Instrument.h"
+#include "../../Midi/MidiData.h"
+#include "../../Midi/Instrument.h"
 
 class Range;
 class BufferBox;

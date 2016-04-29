@@ -12,7 +12,7 @@
 #include "../../Audio/Renderer/MidiRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
-#include "../../Data/Clef.h"
+#include "../../Midi/Clef.h"
 #include "../../TsunamiWindow.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);

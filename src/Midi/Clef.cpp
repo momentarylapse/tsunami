@@ -6,6 +6,7 @@
  */
 
 #include "Clef.h"
+#include "Scale.h"
 #include "MidiData.h"
 
 const Clef Clef::TREBLE(Clef::TYPE_TREBLE, "𝄞", 5*7-5); // \uD834\uDD1E   "\u1d11e";

@@ -10,7 +10,7 @@
 
 #include "../../ActionMergable.h"
 class Track;
-#include "../../../Data/Instrument.h"
+#include "../../../Midi/Instrument.h"
 
 class ActionTrackSetInstrument: public ActionMergable<Instrument>
 {

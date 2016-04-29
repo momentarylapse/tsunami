@@ -10,8 +10,8 @@
 #include "Mode/ViewMode.h"
 #include "../Tsunami.h"
 #include "../Data/Song.h"
-#include "../Data/MidiData.h"
-#include "../Data/Clef.h"
+#include "../Midi/MidiData.h"
+#include "../Midi/Clef.h"
 #include "../Audio/Synth/Synthesizer.h"
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track)

@@ -10,6 +10,7 @@
 
 #include "../Data/Song.h"
 #include "../Data/SongSelection.h"
+#include "../Midi/Scale.h"
 #include "../lib/hui/hui.h"
 #include "../Stuff/Observer.h"
 #include "TrackHeightManager.h"

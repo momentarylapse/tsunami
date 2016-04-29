@@ -9,10 +9,9 @@
 #define MIDIDATA_H_
 
 #include "../lib/base/base.h"
-#include "Range.h"
+#include "../Data/Range.h"
 #include "MidiNote.h"
 #include "MidiEvent.h"
-#include "Scale.h"
 
 #define MAX_PITCH		128
 
@@ -20,6 +19,7 @@ class MidiDataRef;
 class MidiEffect;
 class Instrument;
 class Clef;
+class Scale;
 
 
 class MidiRawData : public Array<MidiEvent>

@@ -11,7 +11,7 @@
 #include "hui.h"
 
 class HuiMenu;
-class HuiResourceNew;
+class HuiResource;
 class HuiPainter;
 class HuiEvent;
 class HuiEventListener;
@@ -64,6 +64,7 @@ public:
 	// creating controls
 
 	void _cdecl addControl(const string &type, const string &title, int x, int y, int width, int height, const string &id);
+	void _cdecl _addControl(HuiResource &cmd, const string &parent_id);
 	void _cdecl addButton(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addDefButton(const string &title,int x,int y,int width,int height,const string &id);
 	void _cdecl addColorButton(const string &title,int x,int y,int width,int height,const string &id);
@@ -95,7 +96,7 @@ public:
 
 	void _cdecl embedDialog(const string &id, int x, int y);
 	void _cdecl embedSource(const string &source, const string &parent_id, int x, int y);
-	void embedResource(HuiResourceNew &c, const string &parent_id, int x, int y);
+	void embedResource(HuiResource &c, const string &parent_id, int x, int y);
 	void _cdecl embed(HuiPanel *panel, const string &parent_id, int x, int y);
 
 // using controls

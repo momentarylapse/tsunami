@@ -306,6 +306,28 @@ void HuiPanel::addControl(const string &type, const string &title, int x, int y,
 		msg_error("unknown hui control: " + type);
 }
 
+void HuiPanel::_addControl(HuiResource &cmd, const string &parent_id)
+{
+	//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
+	setTarget(parent_id, cmd.page);
+	addControl(cmd.type, HuiGetLanguageR(cmd),
+				cmd.x, cmd.y,
+				cmd.w, cmd.h,
+				cmd.id);
+
+	enable(cmd.id, cmd.enabled);
+
+	if (cmd.image.num > 0)
+		setImage(cmd.id, cmd.image);
+
+	string tooltip = HuiGetLanguageT(cmd.id);
+	if (tooltip.num > 0)
+		setTooltip(cmd.id, tooltip);
+
+	foreach(HuiResource &c, cmd.children)
+		_addControl(c, cmd.id);
+}
+
 void HuiPanel::fromResource(const string &id)
 {
 	msg_db_f("Window.FromResource",1);
@@ -319,7 +341,7 @@ void HuiPanel::fromResource(const string &id)
 
 	// size
 	if (win)
-		win->setSize(res->i_param[0], res->i_param[1]);
+		win->setSize(res->w, res->h);
 
 
 	// dialog
@@ -329,42 +351,28 @@ void HuiPanel::fromResource(const string &id)
 	else
 		dlg = HuiCreateDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);*/
 
-	// menu?
-	if ((win) && (res->s_param[0].num > 0))
-		win->setMenu(HuiCreateResourceMenu(res->s_param[0]));
 
-	// toolbar?
-	if ((win) && (res->s_param[1].num > 0))
-		win->toolbar[HuiToolbarTop]->setByID(res->s_param[1]);
+	// menu/toolbar?
+	if (win){
+		foreach(string &o, res->options){
+			if (o.find("menu=") == 0)
+				win->setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
+			if (o.find("toolbar=") == 0)
+				win->toolbar[HuiToolbarTop]->setByID(o.substr(8, -1));
+		}
+	}
 
 	// controls
-	foreach(HuiResource &cmd, res->children){
-		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
-		if (res->type == "Dialog"){
-			setTarget(cmd.s_param[0], cmd.i_param[4]);
-			addControl( cmd.type, HuiGetLanguage(cmd.id),
-						cmd.i_param[0], cmd.i_param[1],
-						cmd.i_param[2], cmd.i_param[3],
-						cmd.id);
-		}else if (res->type == "SizableDialog"){
-			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			setTarget(cmd.s_param[0], cmd.i_param[4]);
-			addControl( cmd.type, HuiGetLanguage(cmd.id),
-						cmd.i_param[0], cmd.i_param[1],
-						cmd.i_param[2], cmd.i_param[3],
-						cmd.id);
-		}
-		enable(cmd.id, cmd.enabled);
-		if (cmd.image.num > 0)
-			setImage(cmd.id, cmd.image);
-	}
+	foreach(HuiResource &cmd, res->children)
+		_addControl(cmd, "");
+
 	msg_db_m("  \\(^_^)/",1);
 }
 
 void HuiPanel::fromSource(const string &buffer)
 {
 	msg_db_f("FromSource",1);
-	HuiResourceNew res;
+	HuiResource res;
 	res.load(buffer);
 	if (res.type == "Dialog"){
 		if (win)
@@ -379,7 +387,7 @@ void HuiPanel::fromSource(const string &buffer)
 }
 
 
-void HuiPanel::embedResource(HuiResourceNew &c, const string &parent_id, int x, int y)
+void HuiPanel::embedResource(HuiResource &c, const string &parent_id, int x, int y)
 {
 	setTarget(parent_id, x);
 	string title = c.title;
@@ -391,13 +399,17 @@ void HuiPanel::embedResource(HuiResourceNew &c, const string &parent_id, int x, 
 	if (c.image.num > 0)
 		setImage(c.id, c.image);
 
-	foreach(HuiResourceNew &child, c.children)
+	string tooltip = HuiGetLanguageT(c.id);
+	if (tooltip.num > 0)
+		setTooltip(c.id, tooltip);
+
+	foreach(HuiResource &child, c.children)
 		embedResource(child, c.id, child.x, child.y);
 }
 
 void HuiPanel::embedSource(const string &buffer, const string &parent_id, int x, int y)
 {
-	HuiResourceNew res;
+	HuiResource res;
 	res.load(buffer);
 	embedResource(res, parent_id, x, y);
 }

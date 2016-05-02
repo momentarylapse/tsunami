@@ -66,7 +66,7 @@ void HuiWindow::__init_ext__(const string& title, int x, int y, int width, int h
 }
 
 
-HuiWindow::HuiWindow(const string &id, HuiWindow *parent, bool allow_parent)
+HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 {
 	HuiResource *res = HuiGetResource(id);
 	if (!res){
@@ -76,37 +76,24 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent, bool allow_parent)
 	int mode = HuiWinModeControls;
 	if (res->type == "SizableDialog")
 		mode = HuiWinModeControls | HuiWinModeResizable;
-	_init_(HuiGetLanguage(id), -1, -1, res->i_param[0], res->i_param[1], parent, allow_parent, mode);
+	bool allow_parent = false;
+	foreach(string &o, res->options)
+		if ((o == "allow-root") or (o == "allow-parent"))
+			allow_parent = true;
+	_init_(HuiGetLanguage(id), -1, -1, res->w, res->h, parent, allow_parent, mode);
 
-	// menu?
-	if (res->s_param[0].num > 0)
-		setMenu(HuiCreateResourceMenu(res->s_param[0]));
-
-	// toolbar?
-	if (res->s_param[1].num > 0)
-		toolbar[HuiToolbarTop]->setByID(res->s_param[1]);
+	// menu/toolbar?
+	foreach(string &o, res->options){
+		if (o.head(5) == "menu=")
+			setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
+		if (o.head(8) == "toolbar=")
+			toolbar[HuiToolbarTop]->setByID(o.substr(8, -1));
+	}
 
 	// controls
-	foreach(HuiResource &cmd, res->children){
-		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
-		if (res->type == "Dialog"){
-			setTarget(cmd.s_param[0], cmd.i_param[4]);
-			addControl(	cmd.type, HuiGetLanguage(cmd.id),
-						cmd.i_param[0], cmd.i_param[1],
-						cmd.i_param[2], cmd.i_param[3],
-						cmd.id);
-		}else if (res->type == "SizableDialog"){
-			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			setTarget(cmd.s_param[0], cmd.i_param[4]);
-			addControl( cmd.type, HuiGetLanguage(cmd.id),
-						cmd.i_param[0], cmd.i_param[1],
-						cmd.i_param[2], cmd.i_param[3],
-						cmd.id);
-		}
-		enable(cmd.id, cmd.enabled);
-		if (cmd.image.num > 0)
-			setImage(cmd.id, cmd.image);
-	}
+	foreach(HuiResource &cmd, res->children)
+		_addControl(cmd, "");
+
 	msg_db_m("  \\(^_^)/",1);
 }
 

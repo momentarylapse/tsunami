@@ -13,7 +13,7 @@
 class SettingsDialog: public HuiWindow
 {
 public:
-	SettingsDialog(HuiWindow *_parent, bool _allow_parent);
+	SettingsDialog(HuiWindow *parent);
 	virtual ~SettingsDialog();
 
 	void loadData();

@@ -1,14 +1,14 @@
 // Language
-English
+Deutsch
 // Num IDs
 239
 // Data (ID,Text)
 about
-About
+Info
 ad_t_data
-Data
+Daten
 ad_t_edit
-Edit
+Bearbeiten
 ad_t_format
 Format
 ad_t_samplerate
@@ -16,39 +16,39 @@ Samplerate
 ad_t_tags
 Tags
 add_bar
-Bar
+Takt
 add_bar_pause
 Pause
 add_midi_track
-Add midi track
+Midi Spur hinzufügen
 add_time_track
-Add rhythm track
+Rhythmus Spur hinzufügen
 add_track
-Add empty track
+Leere Spur hinzufügen
 all_octaves
-all octaves
+alle Oktaven
 bad_t_beats
-Beats
+Schläge
 bad_t_bpm
 Bpm
 bad_t_count
-Number
+Anzahl
 bar_add_dialog
-new bars
+neue Takte
 bar_edit_dialog
-edit bars
+Takte bearbeiten
 bar_list
-#\\Beats\\Bpm\\Duration
+#\\Schläge\\Bpm\\Dauer
 bars_dialog
-Bars
+Takte
 bars_manager
-Manage...
+Verwalten...
 bbd_t_edit
-Edit
+Bearbeiten
 bbd_t_no_time_track
-no rhythm track found
+keine Rhythmus-Spur vorhanden
 bbd_t_no_time_track_comment
-This track is not necessary for editing.\nBut it makes the metronome audible.
+Diese Spur ist nicht notwendig zum Editieren.\nSie macht aber das Metronom hörbar.
 beat_partition
 4\\1\\256
 beats
@@ -60,9 +60,9 @@ beats_per_minute
 bpm
 0\\0\\1000\\0.1
 cancel
-Cancel
+Abbrechen
 capture_delete
-Dump
+Verwerfen
 capture_time
 0:00
 capture_type:audio
@@ -70,21 +70,21 @@ Audio
 capture_type:midi
 Midi
 cc_group_edit
-Edit
+Bearbeiten
 close
-Close
+Schließen
 comment_no_fx
-- no effects active here (yet) -
+- hier sind (noch) keine Effekte aktiv -
 compress
-Compression
+Kompression
 copy
-Copy
+Kopieren
 count
 1\\1\\10000\\1
 create_time_track
-create
+anlegen
 curve_console
-Curves
+Kurven
 curves
 name\\min\\max\\target
 data_list
@@ -92,183 +92,183 @@ key\\value
 db
 dB
 delete
-Delete
+Löschen
 delete_marker
-Delete
+Löschen
 delete_track
-Delete
+Löschen
 detune_synthesizer_dialog
-Detune
+Verstimmung
 dummy_favorite_dialog
-Effect
+Effekt
 edit_bars
-Bars
+Takte
 edit_beats
-Beats
+Schläge
 edit_bpm
 Bpm
 edit_curves
-Curves
+Kurven
 edit_fx
 Fx
 edit_levels
-Levels
+Ebenen
 edit_marker
-Edit
+Bearbeiten
 edit_midi
 Midi
 edit_midi_fx
 Midi-Fx
 edit_multi
-Apply to all selected tracks
+Auf alle ausgewählten Spuren anwenden
 edit_samples
 Samples
 edit_song
-File
+Datei
 edit_synth
 Synth
 edit_track
-Track
+Spur
 exit
-Exit
+Beenden
 export_selection
-Export selection...
+Auswahl Exportieren...
 favorite_list
-- Default -
+- Standard -
 fe_g_edit
-Edit
+Bearbeiten
 fx_editor
 Effects
 help
-Help
+Hilfe
 insert:after
-after
+danach
 insert:before
-before
+davor
 insert_sample
-Insert statically
+Fest einfügen
 interval
 0\\-99\\99
 ld_t_chord
-Type
+Typ
 ld_t_edit
-Edit
+Bearbeiten
 ld_t_interval
-Interval
+Intervall
 ld_t_inversion
-Inversion
+Umkehrung
 ld_t_name
 Name
 ld_t_no_midi
-No midi track selected
+keine Midi-Spur ausgewählt
 ld_t_partition
-Partitioning
+Unterteilung
 ld_t_repdelay
-Delay
+Abstand:
 ld_t_repetition
-Repetitions
+Wiederholungen
 ld_t_repnum
-Count
+Anzahl:
 ld_t_scale
-Scale
+Tonleiter
 ld_t_track
-Track
+Spur
 ld_t_volume
-Volume
+Lautstärke
 ld_tt_panning
 Balance
 ld_tt_volume
-Volume
+Lautstärke
 level_add
-Add
+Hinzufügen
 level_delete
-Delete
+Löschen
 level_dialog
-Levels
+Ebenen
 level_down
-Down
+Runter
 level_manager
-Manage...
+Verwalten...
 level_up
-Up
+Hoch
 levels
 #\\Name
 link_to_midi
-Edit midi
+Midi mitbearbeiten
 log_clear
-Clear
+Leeren
 log_close
-Close
+Schließen
 lvld_t_edit
-Edit
+Bearbeiten
 marker_dialog
 Marker
 marker_menu_header
 Marker
 me_group_edit
-Edit
+Bearbeiten
 me_group_modifier
-Modifier
+Modifizierer
 me_group_reference
-Reference tracks
+Referenz-Spuren
 me_group_view
-View
+Ansicht
 menu_bars
-Bars
+Takte
 menu_edit
-Edit
+Bearbeiten
 menu_file
-File
+Datei
 menu_help
 ?
 menu_level
-Levels
+Ebenen
 menu_level_target
-Go to
+Gehe zu
 menu_plugins
 Plugins
 menu_plugins_channels
-Channels
+Kanäle
 menu_plugins_dynamics
-Dynamics
+Dynamik
 menu_plugins_echo
 Echo
 menu_plugins_on_all
-On all
+Auf Alles
 menu_plugins_on_midi
-On midi
+Auf Midi
 menu_plugins_other
-Independent
+Eigenständig
 menu_plugins_pitch
-Pitch
+Tonhöhe
 menu_plugins_repair
-Repair
+Reparieren
 menu_plugins_sound
-Sound
+Klang
 menu_plugins_synthesizer
-Synthesizer
+Synthese
 menu_sound
 Sound
 menu_sub
 Samples
 menu_track
-Track
+Spur
 menu_view
-View
+Ansicht
 menu_view_channels
-Channels
+Kanäle
 menu_view_midi
 Midi
 menu_view_peaks
 Peaks
 metronome
-add
+einfügen
 mfe_g_edit
-Edit
+Bearbeiten
 mfx_t_no_midi
-no midi track selected
+keine Midi-Spur ausgewählt
 midi_edit_mode
-Single tone\\Interval\\Chord
+Einzelton\\Intervall\\Akkord
 midi_editor
 Midi
 midi_fx_editor
@@ -278,29 +278,29 @@ modifier:flat
 modifier:natural
 ♮
 modifier:none
-none
+nichts
 modifier:sharp
 ♯
 ms
 ms
 mute
-Muted
+Stumm
 nd_g_frequency
 Samplerate
 nd_g_metronome
-Metronome
+Metronom
 nd_g_track
-First track
+erster Track
 nd_t_bars
-Bars
+Takte
 nd_t_beats
-Beats per bar
+Schläge pro Takt
 nd_t_bpm
-Speed
+Geschwindigkeit
 new
-New...
+Neu...
 new_dialog
-New file
+Neue Datei
 new_track_type:audio
 Audio
 new_track_type:midi
@@ -312,27 +312,27 @@ ogg_bitrate
 ok
 OK
 open
-Open...
+Öffnen...
 panning
 0\\-100\\100\\1
 paste
-Paste
+Einfügen
 pause
 Pause
 pdp_capture
-Recording
+Aufnahme
 pdp_colorscheme
-Color scheme
+Farbschema
 pdp_general
-General
+Generell
 pdp_language
-Language
+Sprache
 pdt_capturetempfile
-Backup file
+Sicherungsdatei
 pdt_defaultartist
-Default artist
+Standard Artist
 pdt_oggrate
-OGG bitrate
+OGG-Bitrate
 per_minute
 /min
 per_second
@@ -340,514 +340,514 @@ per_second
 percent
 %
 play
-Play
+Abspielen
 play_loop
-Loop
+Schleife
 plugin_on_file
-On audio buffer
+Auf Audiopuffer
 preview
-Preview
+Vorschau
 progress_cancelable_dialog
-in progress
+in Arbeit
 progress_dialog
-in progress
+in Arbeit
 rdt_capture
-Recording
+Aufnahme
 rdt_source
-Source
+Quelle
 rdt_target
-Target
+Ziel
 record
-Record
+Aufnehmen
 record_dialog
-Record
+Aufnahme
 redo
-Redo
+Wiederherstellen
 remove_sample
-Delete
+Löschen
 repdelay
 0\\0\\\\0.1
 repnum
 1\\1
 run_plugin
-Execute script...
+Script ausführen...
 sample_from_selection
-Cut out from selection
+Aus Auswahl herauslösen
 sample_list
-Preview\\Name\\Duration\\Usage\\Temporary
+Vorschau\\Name\\Dauer\\Benutzung\\Temporär
 sample_manager
-Manage...
+Verwalten...
 sample_manager_dialog
-Sample manager
+Sample Manager
 sample_menu_header
-Samples
+Sample
 sample_properties
-Properties
+Eigenschaften
 sample_ref_dialog
 Sub Track
 sample_selection_dialog
-Select sample
+Sample wählen
 sample_selection_list
-Preview\\Name\\Duration
+Vorschau\\Name\\Dauer
 save
-Save
+Speichern
 save_as
-Save as...
+Speichern unter...
 select_all
-Select all
+Alles auswählen
 select_nothing
-Clear selection
+Nichts auswählen
 settings
-Settings
+Einstellungen
 settings_dialog
-Settings
+Einstellungen
 show_fx_console
-Effects
+Effekte
 show_log
-Messages
+Meldungen
 show_mixing_console
-Mixing
+Mischpult
 smd_group_edit
-Edit
+Bearbeiten
 song_dialog
-Audio file
+Sound-Datei
 song_edit_bars
-Edit bars
+Takte bearbeiten
 song_edit_samples
-Manage samples
+Samples verwalten
 song_menu_header
-File
+Datei
 song_properties
-Properties
+Eigenschaften
 stop
-Stop
+Stopp
 tags
-Tag\\Value
+Tag\\Wert
 target
 Parameter
 td_t_edit
-Edit
+Bearbeiten
 td_t_instrument
 Instrument
 td_t_name
 Name
 td_t_volume
-Volume
+Lautstärke
 track_add_marker
-Add marker
+Marker setzen
 track_dialog
-Track
+Spur
 track_edit_fx
-Edit effects
+Effekte bearbeiten
 track_edit_midi
-Edit midi
+Midi bearbeiten
 track_import
-Import from file...
+Aus Datei importieren...
 track_list
-Track
+Spur
 track_menu_header
-Track
+Spur
 track_properties
-Properties
+Eigenschaften
 trackdest_dialog
-Destination track
+Ziel-Spur für die Ebenen
 tuning_dialog
-Tuning
+Stimmung
 undo
-Undo
+Rückgängig
 view_midi_default
-Default
+Standard
 view_midi_score
-Score
+Klassisch
 view_midi_tab
-Tabulature
+Tabulatur
 view_mono
 Mono
 view_optimal
 Optimal
 view_peaks_both
-Both
+Beides
 view_peaks_max
 Maximum
 view_peaks_mean
-Square mean
+Quadratisches Mittel
 view_samples
-Samples
+Sample-Ebene
 view_stereo
 Stereo
 volume
 0\\-10000\\10\\0.1
 zoom_in
-Zoon in
+Vergrößern
 zoom_out
-Zoom out
+Verkleinern
 // Num Language Strings
 183
 // Data (ID,Text)
 
 
                   Close dialog box to exit program.
-                  Close dialog box to exit program.
+
         - Standard -
-        - Default -
+
         - nicht verbinden -
-        - don't connect -
+
   - keins -
-  - none -
+
   - neue Spur anlegen -
-  - create new track -
+
   ...keine Sorge, das wird schon!
-...don't worry. Everything will be fine!
+
  - keine Saiten -
- - no strings -
+
  ist abgestürzt!\t\tDie letzten Zeilen der Datei message.txt:
-has crashed!\t\tLast lines from file message.txt:
+
 !bold$Kommentar/Geschehnisse:
-!bold$Comment/What happend:
+
 !bold$Name:
-!bold$Name:
+
 !bold,center\\Ausgabe
-!bold,center\\Output
+
 !format=tttCc\\#\\Name\\Interner Name\\anzeigen\\präsent
-!format=tttCc\\#\\name\\internal name\\visible\\present
+
 !format=ttttCcT\\#\\Name\\Interner Name\\Kanäle\\anzeigen\\präsent\\Latenz (ms)
-!format=ttttCcT\\#\\name\\internal name\\channels\\visible\\present\\latency (ms)
+
 !format=ttttCc\\#\\Name\\Interner Name\\Kanäle\\anzeigen\\präsent
-!format=ttttCc\\#\\name\\internal name\\channels\\visible\\present
+
 !wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
-!wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
+
 %d Saiten: 
-%d strings: 
+
 %d Spuren zum Einfügen markiert (ohne Metronom gezählt), aber %d Spuren in der Zwischenablage
-%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard
+
 %d mal
-%d times
+
 '%s'\nDatei speichern?
-'%s'\nSave file?
+
 (Pause)\\-\\-\\%.3f
-(Pause)\\-\\-\\%.3f
+
 (anonym)
-(anonymous)
+
 * entweder eine Quelle wählen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen überlassen, eine Verbindung herzustellen
-* either select a source (recommended) or\n* \"don't connect\" to have external programs manage the connections
+
 -Standard Parameter-
--Default  Parameters-
+
 ...done
-...done
+
 1. Umkehrung
-1st inversion
+
 2. Umkehrung
-2nd inversion
+
 Abbrechen
-Cancel
+
 Abtastrate\\
-Sample rate\\
+
 Amplitude zu groß, Signal übersteuert.
-Amplitude too large, signal distorted.
+
 Anfang\\
-Start\\
+
 Anwendung ohne Netzwerk-Unterstützung compiliert...
-Program was compiled without network abilities...
+
 Audio
-Audio
+
 Aufnahme
-Recording
+
 Aufnahme abbrechen?
-Cancel recording?
+
 Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
-Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
+
 Aufruf: tsunami --export <Datei> <Exportdatei>
-Call: tsunami --export <File> <Exportfile>
+
 Aufruf: tsunami --info <Datei>
-Call: tsunami --info <File>
+
 Ausgabelautstärke
-Output volume
+
 Ausgabepegel
-Output level
+
 Bearbeiten
-Edit
+
 Beim Anwenden eines Effekts: 
-While applying an effect:
+
 Beim Anwenden eines MidiEffekts: 
-While applying a midi effect:
+
 Beschreibung
-Description
+
 Cello
-Cello
+
 Datei
-File
+
 Datei Eigenschaften
-File properties
+
 Datei exportieren
-Export file
+
 Datei importieren
-Import file
+
 Datei speichern
-Save file
+
 Datei öffnen
-Open file
+
 Datenverlust!
-Data loss!
+
 Dauer\\
-Length\\
+
 Dorisch
-Dorian
+
 Dur
-Major
+
 E-Bass
-Electric Bass
+
 E-Gitarre
-Electric Guitar
+
 Ebene %d
-Level %d
+
 Ebene löschen: noch nicht implementiert...
-Delete level: not implemented yet...
+
 Ebenen
-Levels
+
 Editor für Audio Dateien
-Editor for audio files
+
 Effekt löschen
-Delete effect
+
 Effekt nicht ladbar: \"%s\"
-Can't load effect: \"%s\"
+
 Effekte
-Effect
+
 Ende\\
-End\\
+
 Es existiert schon eine Rhythmus-Spur.
-There already is one rhythm track.
+
 Es muss mindestens eine Spur existieren
-There has to be at least one track.
+
 Failed writing header to output stream\n
-Failed writing header to output stream\n
+
 Fehler
-Error
+
 Fehler in  Script-Datei: \"%s\"\n%s
-Error in script file: \"%s\"\n%s
+
 Fehlerbericht
-Error message
+
 Fehlerbericht an Michi senden
-Send error message to Michi
+
 Flöte
-Flute
+
 Format
-Format
+
 Frage
-Question
+
 Geige
-Violin
+
 Geräte
-Devices
+
 Gesang
-Voice
+
 Gitarre
-Guitar
+
 Grundform
-Basic form
+
 Hapsichord
-Hapsichord
+
 Horn
-Horn
+
 Ist halt irgendwie passiert...
-Just happened somehow...
+
 Kann Effekt nicht laden: %s
-Can't load effect: %s
+
 Kann MidiEffekt nicht laden: %s
-Can't load midi effect: %s
+
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
-Can't insert recorded data (%s) into target (%s).
+
 Kann nur Samples löschen, die nicht benutzt werden!
-Can only delete samples which are unused.
+
 Kanäle
-Channels
+
 Kein Marker ausgewählt
-No marker selected
+
 Kein Sample ausgewählt
-No sample selected
+
 Keine Spur ausgewählt
-No track selected
+
 Keyboard
-Keyboard
+
 Klarinette
-Clarinette
+
 Konnte Aufnahmegerät nicht öffnen
-Could not open recording device
+
 Kontra-Bass
-Double Bass
+
 Kurven
-Curves
+
 Lautstärke in dB
-Volume in dB
+
 Leiste aufklappen
-Expand
+
 Locrisch
-Locrian
+
 Lydisch
-Lydian
+
 MIDI Quelle auswählen
-Select MIDI source
+
 MIDI Quellen
-MIDI source
+
 Metronom
-Metronome
+
 Midi
-Midi
+
 Midi Fx
-Midi Fx
+
 MidiEffekt nicht ladbar: \"%s\"
-Can not load MidiEffect: \"%s\"
+
 Mischpult
-Mixing console
+
 Mixolydisch
-Mixolydian
+
 Moll
-Minor
+
 Nachrichten
-Messages
+
 OK
-OK
+
 Offset
-Offset
+
 Ok
-Ok
+
 Orgel
-Organ
+
 Output\\Input\\Midi Input
-Output\\Input\\Midi Input
+
 Parameter laden
-Load parameter
+
 Parameter speichern
-Save parameter
+
 Pause einfügen
-add pause
+
 Phrygisch
-Phrygian
+
 Piano
-Piano
+
 Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'
-Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'
+
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
-Can't execute plugin on an empty audio file
+
 Plugin-Script wählen
-Select plugin script
+
 Posaune
-Trombone
+
 Raw Daten
-Raw data
+
 Samplerate
-Samplerate
+
 Samples
-Samples
+
 Samples\\
-Samples\\
+
 Saxophon
-Saxophone
+
 Schlagzeug
-Drums
+
 Script (*.kaba)
-Script (*.kaba)
+
 Selektierung ziehen zum Skalieren
-move selection to scale
+
 Sicherungsdatei für Aufnahmen wählen
-Select backup file for recordings
+
 Spur
-Track
+
 Spur %d
-Track %d
+
 Spur Eigenschaften
-Track properties
+
 Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingefügt werden soll (%s)
-Track types in clipboard (%s) don't match those you want to paste into (%s)
+
 Synthesizer
-Synthesizer
+
 Synthesizer wählen
-Select synthesizer
+
 Takte
-Bars
+
 Trompete
-Trumpet
+
 Tuba
-Tuba
+
 Unbenannt
-No name
+
 Vermindert
-Diminished
+
 Verstimmen
-Detune
+
 Vorschau
-Preview
+
 Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
-Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
+
 \\- keines -\\
-\\- none -\\
+
 aktiv?
-active?
+
 alle Dateien
-all files
+
 alle Nachrichten löschen
-delete all messages
+
 alles mögliche
-all known files
+
 alte Aufnahmedaten gefunden: 
-found old recording: 
+
 aus Auswahl erzeugen
-create from selection
+
 aus Datei importieren
-import from file
+
 beim Speichern
-while saving
+
 die Regler aller Spuren gemeinsam ändern
-change the sliders of all tracks simultaniously
+
 exportiere
-exporting
+
 exportiere 
-exporting
+
 fügt am Cursor der aktuellen Spur ein
-paste at the cursor into the current track
+
 i'm now going to clean up...
-i'm now going to clean up...
+
 in Datei exportieren
-export into file
+
 inkompatibles Dateiformat für diese Aktion: 
-file format is incompatible for this action
+
 keine Sample gewählt
-no sample selected
+
 koppeln
-couple
+
 lade 
-loading
+
 löschen
-delete
+
 markierte Takte editieren
-edit selected bars
+
 markierte Takte löschen
-delete selected bars
+
 markierte Takte skalieren (durch Ziehen der Markierung links)
-scale selected bars (by moving the selection on the left)
+
 message.txt öffnen
-open message.txt
+
 neue Audiodatei
-new audio file
+
 neue Takte einfügen
-add new bars
+
 neuen Effekt hinzufügen
-add new effect
+
 neuen Namen eingeben
-enter new name
+
 nicht konfigurierbar
-not configurable
+
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
-program has crashed, error handler has been called... maybe SegFault... m(-_-)m
+
 speichere 
-saving
+
 target
-target
+
 unbekannte Dateiendung: 
-unknown file extension
+
 unbekannter Synthesizer: 
-unknown synthesizer: 
+
 wird als Tag artist=... in neue Dateien eingetragen
-will be added as tag artist=... into new files
+
 Übermäßig
-Augmented
+
 #

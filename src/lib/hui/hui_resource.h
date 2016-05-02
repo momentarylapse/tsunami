@@ -26,42 +26,21 @@ class HuiResource
 public:
 	string type;
 	string id;
+	string title;
+	string tooltip;
+	Array<string> options;
 	bool enabled;
-	bool b_param[2];
-	int i_param[6];
-	string s_param[2];
+	int x, y, w, h;
+	int page;
 	string image;
 	Array<HuiResource> children;
-	void reset()
-	{
-		type = "";
-		id = "";
-		s_param[0] = "";
-		s_param[1] = "";
-		image = "";
-		enabled = true;
-		children.clear();
-		memset(i_param, 0, sizeof(i_param));
-		memset(b_param, 0, sizeof(b_param));
-	}
-};
-
-
-
-class HuiResourceNew
-{
-public:
-	string type;
-	string id;
-	string title;
-	bool enabled;
-	Array<string> options;
-	int x, y, w, h;
-	string image;
-	Array<HuiResourceNew> children;
+	void reset();
+	HuiResource* get_node(const string &id) const;
 	void load(const string &buffer);
 	void show(int indent = 0);
 };
+
+
 
 // resources
 void _cdecl HuiLoadResource(const string &filename);

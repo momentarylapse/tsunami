@@ -436,24 +436,16 @@ void HuiPanel::embedDialog(const string &id, int x, int y)
 	if (res){
 		if (res->type != "SizableDialog")
 			return;
-		foreachi(HuiResource &cmd, res->children, i){
-			//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
-			//if ((cmd->type & 1023)==HuiCmdDialogAddControl){
+		if (res->children.num == 0)
+			return;
+		HuiResource rr = res->children[0];
+		rr.x = x;
+		rr.y = y;
 
-			string target_id = cmd.s_param[0];
-			int target_page = cmd.i_param[4];
-			if (i > 0)
-				setTarget(target_id, target_page);
-			int _x = (i == 0) ? x : cmd.i_param[0];
-			int _y = (i == 0) ? y : cmd.i_param[1];
-			addControl( cmd.type, HuiGetLanguage(cmd.id),
-						_x, _y,
-						cmd.i_param[2], cmd.i_param[3],
-						cmd.id);
-			enable(cmd.id, cmd.enabled);
-			if (cmd.image.num > 0)
-				setImage(cmd.id, cmd.image);
-		}
+		string parent_id;
+		if (cur_control)
+			parent_id = cur_control->id;
+		_addControl(rr, parent_id);
 	}
 }
 

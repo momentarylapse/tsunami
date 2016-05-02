@@ -73,7 +73,7 @@ public:
 	HuiWindow();
 	HuiWindow(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
 	HuiWindow(const string &title, int x, int y, int width, int height);
-	HuiWindow(const string &id, HuiWindow *parent, bool allow_parent);
+	HuiWindow(const string &id, HuiWindow *parent);
 	void _cdecl __init_ext__(const string &title, int x, int y, int width, int height);
 	virtual ~HuiWindow();
 	virtual void _cdecl __delete__();

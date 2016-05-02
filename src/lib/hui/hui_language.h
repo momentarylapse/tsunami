@@ -11,6 +11,8 @@
 #ifndef _HUI_LANG_EXISTS_
 #define _HUI_LANG_EXISTS_
 
+class HuiResource;
+
 
 //----------------------------------------------------------------------------------
 // string conversion
@@ -58,6 +60,8 @@ void _cdecl HuiSetLanguage(const string &language);
 extern bool HuiLanguaged;
 
 string _cdecl HuiGetLanguage(const string &id);
+string _cdecl HuiGetLanguageR(HuiResource &cmd);
+string _cdecl HuiGetLanguageT(const string &id);
 string _cdecl HuiGetLanguageS(const string &str);
 #define L(id)	HuiGetLanguage(id)
 #define _(str)	HuiGetLanguageS(str_m_to_utf8(str))
@@ -72,7 +76,7 @@ struct HuiLanguageTranslation
 
 struct HuiLanguageCommand
 {
-	string id, text;
+	string id, text, tooltip;
 };
 
 struct HuiLanguage

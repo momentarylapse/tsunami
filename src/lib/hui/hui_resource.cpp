@@ -10,19 +10,19 @@ string str_unescape(const string &str)
 {
 	string r;
 	for (int i=0;i<str.num;i++){
-		if ((str[i]=='\\')&&(str[i+1]=='n')){
+		if ((str[i]=='\\')and(str[i+1]=='n')){
 			r += "\n";
 			i ++;
-		}else if ((str[i]=='\\')&&(str[i+1]=='\\')){
+		}else if ((str[i]=='\\')and(str[i+1]=='\\')){
 			r += "\\";
 			i++;
-		}else if ((str[i]=='\\')&&(str[i+1]=='?')){
+		}else if ((str[i]=='\\')and(str[i+1]=='?')){
 			r += "?";
 			i++;
-		}else if ((str[i]=='\\')&&(str[i+1]=='t')){
+		}else if ((str[i]=='\\')and(str[i+1]=='t')){
 			r += "\t";
 			i++;
-		}else if ((str[i]=='\\')&&(str[i+1]=='"')){
+		}else if ((str[i]=='\\')and(str[i+1]=='"')){
 			r += "\"";
 			i++;
 		}else
@@ -53,26 +53,53 @@ string str_escape(const string &str)
 extern Array<HuiLanguage> _HuiLanguage_;
 Array<HuiResource> _HuiResource_;
 
-void LoadResourceCommand(File *f, HuiResource *c)
+void HuiResource::reset()
+{
+	type = "";
+	id = "";
+	options.clear();
+	image = "";
+	enabled = true;
+	page = 0;
+	children.clear();
+	x = y = w = h = 0;
+}
+
+HuiResource *HuiResource::get_node(const string &id) const
+{
+	foreach(HuiResource &c, const_cast<HuiResource*>(this)->children){
+		if (c.id == id)
+			return &c;
+		HuiResource *ret = c.get_node(id);
+		if (ret)
+			return ret;
+	}
+	return NULL;
+}
+
+void LoadResourceCommand5(File *f, HuiResource *c)
 {
 	c->type = f->ReadStr();
 	c->id = f->ReadStr();
+	c->options = f->ReadStr().explode(",");
 	c->image = f->ReadStr();
 	c->enabled = f->ReadBool();
-	c->i_param[0] = f->ReadInt();
-	c->i_param[1] = f->ReadInt();
-	c->i_param[2] = f->ReadInt();
-	c->i_param[3] = f->ReadInt();
-	c->i_param[4] = f->ReadInt();
-	c->b_param[0] = f->ReadBool();
-	c->b_param[1] = f->ReadBool();
-	c->s_param[0] = f->ReadStr();
-	c->s_param[1] = f->ReadStr();
+	c->x = f->ReadInt();
+	c->y = f->ReadInt();
+	c->w = f->ReadInt();
+	c->h = f->ReadInt();
+	c->page = f->ReadInt();
+	int n = f->ReadInt();
+	for (int i=0; i<n; i++){
+		HuiResource child;
+		LoadResourceCommand5(f, &child);
+		c->children.add(child);
+	}
 }
 
 void HuiLoadResource(const string &filename)
 {
-	msg_db_r("HuiLoadResource", 1);
+	msg_db_f("HuiLoadResource", 1);
 	// dirty...
 	_HuiResource_.clear();
 	_HuiLanguage_.clear();
@@ -80,19 +107,19 @@ void HuiLoadResource(const string &filename)
 	File *f = FileOpen(filename);
 	if (f){
 		int ffv = f->ReadFileFormatVersion();
+		if (ffv != 5){
+			FileClose(f);
+			msg_error("hui resource version is " + i2s(ffv) + " (5 expected)");
+			return;
+		}
+
 		f->ReadComment();
 		int nres = f->ReadInt();
 		for (int i=0;i<nres;i++){
 			HuiResource res;
 			res.children.clear();
 			f->ReadComment();
-			LoadResourceCommand(f, &res);
-			int n = f->ReadInt();
-			for (int j=0;j<n;j++){
-				HuiResource child;
-				LoadResourceCommand(f, &child);
-				res.children.add(child);
-			}
+			LoadResourceCommand5(f, &res);
 			_HuiResource_.add(res);
 		}
 
@@ -114,6 +141,7 @@ void HuiLoadResource(const string &filename)
 				HuiLanguageCommand c;
 				c.id = f->ReadStr();
 				c.text = str_unescape(f->ReadStr());
+				c.tooltip = str_unescape(f->ReadStr());
 				hl.cmd.add(c);
 			}
 			// Num Language Strings
@@ -154,45 +182,37 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 	}
 	
 	msg_db_m("HuiResDialog",2);
-	msg_db_m(i2s(res->i_param[0]).c_str(),2);
-	msg_db_m(i2s(res->i_param[1]).c_str(),2);
+
+	string menu_id, toolbar_id;
+	bool allow_parent = false;
+	foreach(string &o, res->options){
+		if ((o == "allow-root") or (o == "allow-parent"))
+			allow_parent = true;
+		if (o.head(5) == "menu=")
+			menu_id = o.substr(5, -1);
+		if (o.head(8) == "toolbar=")
+			toolbar_id = o.substr(8, -1);
+	}
 
 	// dialog
 	HuiWindow *dlg;
 	if (res->type == "SizableDialog")
-		dlg = new HuiDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);
+		dlg = new HuiDialog(HuiGetLanguageR(*res), res->w, res->h, root, allow_parent);
 	else
-		dlg = new HuiFixedDialog(HuiGetLanguage(res->id), res->i_param[0], res->i_param[1], root, res->b_param[0]);
+		dlg = new HuiFixedDialog(HuiGetLanguageR(*res), res->w, res->h, root, allow_parent);
 
 	// menu?
-	if (res->s_param[0].num > 0)
-		dlg->setMenu(HuiCreateResourceMenu(res->s_param[0]));
+	if (menu_id.num > 0)
+		dlg->setMenu(HuiCreateResourceMenu(menu_id));
 
 	// toolbar?
-	if (res->s_param[1].num > 0)
-		dlg->toolbar[HuiToolbarTop]->setByID(res->s_param[1]);
+	if (toolbar_id.num > 0)
+		dlg->toolbar[HuiToolbarTop]->setByID(toolbar_id);
 
 	// controls
-	foreach(HuiResource &cmd, res->children){
-		//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
-		if (res->type == "Dialog"){
-			dlg->setTarget(cmd.s_param[0], cmd.i_param[4]);
-			dlg->addControl(cmd.type, HuiGetLanguage(cmd.id),
-							cmd.i_param[0], cmd.i_param[1],
-							cmd.i_param[2], cmd.i_param[3],
-							cmd.id);
-		}else if (res->type == "SizableDialog"){
-			//msg_write("insert " + cmd.id + " (" + cmd.type + ") into " + cmd.s_param[0]);
-			dlg->setTarget(cmd.s_param[0], cmd.i_param[4]);
-			dlg->addControl(cmd.type, HuiGetLanguage(cmd.id),
-							cmd.i_param[0], cmd.i_param[1],
-							cmd.i_param[2], cmd.i_param[3],
-							cmd.id);
-		}
-		dlg->enable(cmd.id, cmd.enabled);
-		if (cmd.image.num > 0)
-			dlg->setImage(cmd.id, cmd.image);
-	}
+	foreach(HuiResource &cmd, res->children)
+		dlg->_addControl(cmd, "");
+
 	msg_db_m("  \\(^_^)/",1);
 	return dlg;
 	
@@ -201,31 +221,27 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 	return d;*/
 }
 
-HuiMenu *_create_res_menu_(HuiResource *res, int &index, int num)
+HuiMenu *_create_res_menu_(HuiResource *res)
 {
 	msg_db_f("_create_res_menu_",2);
 	HuiMenu *menu = new HuiMenu();
 
 	//msg_db_out(2,i2s(n));
-	for (int i=0;i<num;i++){
+	foreach(HuiResource &c, res->children){
 		//msg_db_out(2,i2s(j));
-		HuiResource *cmd = &res->children[index];
-		if (cmd->type == "Item")
-			menu->addItem(get_lang(cmd->id, "", true), cmd->id);
-		if (cmd->type == "ItemImage")
-			menu->addItemImage(get_lang(cmd->id, "", true), cmd->image, cmd->id);
-		if (cmd->type == "ItemCheckable")
-			menu->addItemCheckable(get_lang(cmd->id, "", true), cmd->id);
-		if (cmd->type == "ItemSeparator")
+		if (c.type == "Item")
+			menu->addItem(get_lang(c.id, "", true), c.id);
+		if (c.type == "ItemImage")
+			menu->addItemImage(get_lang(c.id, "", true), c.image, c.id);
+		if (c.type == "ItemCheckable")
+			menu->addItemCheckable(get_lang(c.id, "", true), c.id);
+		if (c.type == "ItemSeparator")
 			menu->addSeparator();
-		if (cmd->type == "ItemPopup"){
-			index ++;
-			HuiMenu *sub = _create_res_menu_(res, index, cmd->i_param[0]);
-			menu->addSubMenu(get_lang(cmd->id, "", true), cmd->id, sub);
-			index --;
+		if (c.type == "ItemPopup"){
+			HuiMenu *sub = _create_res_menu_(&c);
+			menu->addSubMenu(get_lang(c.id, "", true), c.id, sub);
 		}
-		menu->item.back()->enable(cmd->enabled);
-		index ++;
+		menu->item.back()->enable(c.enabled);
 	}
 	return menu;
 }
@@ -241,9 +257,8 @@ HuiMenu *HuiCreateResourceMenu(const string &id)
 		return NULL;
 	}
 
-	int i = 0;
 	msg_db_m("  \\(^_^)/",1);
-	HuiMenu *m = _create_res_menu_(res, i, res->i_param[0]);
+	HuiMenu *m = _create_res_menu_(res);
 	return m;
 }
 
@@ -251,17 +266,17 @@ HuiMenu *HuiCreateResourceMenu(const string &id)
 
 inline bool res_is_letter(char c)
 {
-	return ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'z'));
+	return ((c >= 'a') and (c <= 'z')) or ((c >= 'A') and (c <= 'z'));
 }
 
 inline bool res_is_number(char c)
 {
-	return (c >= '0') && (c <= '9');
+	return (c >= '0') and (c <= '9');
 }
 
 inline bool res_is_alphanum(char c)
 {
-	return res_is_letter(c) || res_is_number(c);
+	return res_is_letter(c) or res_is_number(c);
 }
 
 Array<string> res_tokenize(const string &s)
@@ -269,16 +284,16 @@ Array<string> res_tokenize(const string &s)
 	Array<string> a;
 	for (int i=0;i<s.num;i++){
 		// ignore whitespace
-		if ((s[i] == ' ') || (s[i] == '\t'))
+		if ((s[i] == ' ') or (s[i] == '\t'))
 			continue;
 
 		// read token
 		string token;
-		if ((s[i] == '\"') || (s[i] == '\'')){
+		if ((s[i] == '\"') or (s[i] == '\'')){
 			// string
 			i ++;
 			for (;i<s.num;i++){
-				if ((s[i] == '\"') || (s[i] == '\''))
+				if ((s[i] == '\"') or (s[i] == '\''))
 					break;
 				token.add(s[i]);
 			}
@@ -290,18 +305,18 @@ Array<string> res_tokenize(const string &s)
 					if (!res_is_alphanum(s[i + 1]))
 						break;
 			}
-		}else if ((res_is_number(s[i])) || ((s[i] == '-') && (res_is_number(s[i + 1])))){
+		}else if ((res_is_number(s[i])) or ((s[i] == '-') and (res_is_number(s[i + 1])))){
 			// number
 			for (;i<s.num;i++){
 				token.add(s[i]);
 				if (i < s.num - 1)
-					if ((!res_is_number(s[i + 1])) && (s[i + 1] != '.'))
+					if ((!res_is_number(s[i + 1])) and (s[i + 1] != '.'))
 						break;
 			}
 		}else{
 			// operator etc
 			token.add(s[i]);
-			if ((s[i] == '-') && (s[i + 1] == '>'))
+			if ((s[i] == '-') and (s[i + 1] == '>'))
 				token.add(s[++ i]);
 		}
 		a.add(token);
@@ -337,13 +352,13 @@ void res_parse_new(const string &line, Array<string> &tokens)
 			if (temp.num > 0)
 				tokens.add(temp);
 			temp = "";
-		}else if ((temp.num == 0) && ((line[i] == '\"') || (line[i] == '\''))){
+		}else if ((temp.num == 0) and ((line[i] == '\"') or (line[i] == '\''))){
 			// string
 			for (int j=i+1;j<line.num;j++){
 				if (line[j] == '\\'){
 					temp.add(line[j ++]);
 					temp.add(line[j]);
-				}else if ((line[j] == '\"') || (line[j] == '\'')){
+				}else if ((line[j] == '\"') or (line[j] == '\'')){
 					i = j;
 					tokens.add(str_unescape(temp));
 					temp = "";
@@ -358,7 +373,7 @@ void res_parse_new(const string &line, Array<string> &tokens)
 		tokens.add(temp);
 }
 
-void res_add_option(HuiResourceNew &c, const string &option)
+void res_add_option(HuiResource &c, const string &option)
 {
 	if (option.head(6) == "image="){
 		c.image = option.substr(6, -1);
@@ -371,7 +386,7 @@ void res_add_option(HuiResourceNew &c, const string &option)
 	c.options.add(option);
 }
 
-bool res_load_line(string &l, HuiResourceNew &c)
+bool res_load_line(string &l, HuiResource &c)
 {
 	// parse line
 	Array<string> tokens;
@@ -404,7 +419,7 @@ bool res_load_line(string &l, HuiResourceNew &c)
 	c.id = id;
 	c.title = tokens[2];
 	int n_used = 3;
-	if ((c.type == "Grid") || (c.type == "Dialog")){
+	if ((c.type == "Grid") or (c.type == "Dialog")){
 		c.w = tokens[3]._int();
 		c.h = tokens[4]._int();
 		n_used = 5;
@@ -414,7 +429,7 @@ bool res_load_line(string &l, HuiResourceNew &c)
 	return true;
 }
 
-bool res_load_rec(Array<string> &lines, int &cur_line, HuiResourceNew &c)
+bool res_load_rec(Array<string> &lines, int &cur_line, HuiResource &c)
 {
 	int cur_indent = res_get_indent(lines[cur_line]);
 	bool r = res_load_line(lines[cur_line], c);
@@ -426,7 +441,7 @@ bool res_load_rec(Array<string> &lines, int &cur_line, HuiResourceNew &c)
 		int indent = res_get_indent(lines[cur_line]);
 		if (indent <= cur_indent)
 			break;
-		HuiResourceNew child;
+		HuiResource child;
 		if (res_load_rec(lines, cur_line, child)){
 			if (c.type == "Grid"){
 				if (c.w > 0){
@@ -444,17 +459,17 @@ bool res_load_rec(Array<string> &lines, int &cur_line, HuiResourceNew &c)
 	return r;
 }
 
-void HuiResourceNew::show(int indent)
+void HuiResource::show(int indent)
 {
 	string nn;
 	for (int i=0;i<indent;i++)
 		nn += "    ";
 	msg_write(nn + type + " - " + id + format(" - %d %d %d %d - ", x, y, w, h) + sa2s(options));
-	foreach(HuiResourceNew &child, children)
+	foreach(HuiResource &child, children)
 		child.show(indent + 1);
 }
 
-void HuiResourceNew::load(const string &buffer)
+void HuiResource::load(const string &buffer)
 {
 	Array<string> lines = buffer.explode("\n");
 	for (int i=lines.num-1; i>=0; i--)

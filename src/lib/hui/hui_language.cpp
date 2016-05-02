@@ -201,7 +201,7 @@ HuiLanguage *cur_lang = NULL;
 
 void HuiSetLanguage(const string &language)
 {
-	msg_db_r("HuiSetLang", 1);
+	msg_db_f("HuiSetLang", 1);
 	cur_lang = NULL;
 	HuiLanguaged = false;
 	foreach(HuiLanguage &l, _HuiLanguage_)
@@ -213,7 +213,6 @@ void HuiSetLanguage(const string &language)
 		msg_error("HuiSetLanguage: language not found: " + language);
 
 	HuiUpdateAll();
-	msg_db_l(1);
 }
 
 string HuiGetLanguage(const string &id)
@@ -225,6 +224,31 @@ string HuiGetLanguage(const string &id)
 			return c.text;
 	/*if (cur_lang->cmd[id].num == 0)
 		return "???";*/
+	return "";
+}
+
+string HuiGetLanguageR(HuiResource &cmd)
+{
+	if ((!HuiLanguaged) || (cmd.id.num == 0))
+		return "";
+	foreach(HuiLanguageCommand &c, cur_lang->cmd)
+		if (cmd.id == c.id){
+			if (cmd.options.num > 0)
+				return "!" + implode(cmd.options, ",") + "\\" + c.text;
+			return c.text;
+		}
+	if (cmd.options.num > 0)
+		return "!" + implode(cmd.options, ",") + "\\";
+	return "";
+}
+
+string HuiGetLanguageT(const string &id)
+{
+	if ((!HuiLanguaged) || (id.num == 0))
+		return "";
+	foreach(HuiLanguageCommand &c, cur_lang->cmd)
+		if (id == c.id)
+			return c.tooltip;
 	return "";
 }
 
@@ -274,7 +298,7 @@ string get_lang(const string &id, const string &text, bool allow_keys)
 
 void HuiUpdateAll()
 {
-	msg_db_r("HuiUpdateAll", 1);
+	msg_db_f("HuiUpdateAll", 1);
 /*	// update windows
 	for (int i=0;i<HuiWindow.num;i++){
 		for (int j=0;j<HuiWindow[i]->Control.num;j++){
@@ -287,7 +311,6 @@ void HuiUpdateAll()
 		if (HuiWindow[i]->Menu)
 			UpdateMenuLanguage(HuiWindow[i]->Menu);
 	}*/
-	msg_db_l(1);
 }
 
 Array<string> HuiGetLanguages()

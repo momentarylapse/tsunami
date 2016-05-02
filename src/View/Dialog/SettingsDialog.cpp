@@ -13,8 +13,8 @@
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
 
-SettingsDialog::SettingsDialog(HuiWindow *_parent, bool _allow_parent):
-	HuiWindow("settings_dialog", _parent, _allow_parent)
+SettingsDialog::SettingsDialog(HuiWindow *_parent):
+	HuiWindow("settings_dialog", _parent)
 {
 	event("language", this, &SettingsDialog::onLanguage);
 	event("color_scheme", this, &SettingsDialog::onColorScheme);

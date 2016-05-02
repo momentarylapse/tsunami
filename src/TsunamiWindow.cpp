@@ -247,7 +247,7 @@ void TsunamiWindow::onTrackEditFX()
 void TsunamiWindow::onTrackAddMarker()
 {
 	if (view->cur_track){
-		MarkerDialog *d = new MarkerDialog(this, false, view->cur_track, view->hover.pos, -1);
+		MarkerDialog *d = new MarkerDialog(this, view->cur_track, view->hover.pos, -1);
 		d->run();
 	}else
 		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
@@ -285,7 +285,7 @@ void TsunamiWindow::onDeleteMarker()
 void TsunamiWindow::onEditMarker()
 {
 	if (view->selection.type == Selection::TYPE_MARKER){
-		MarkerDialog *d = new MarkerDialog(this, false, view->cur_track, -1, view->selection.index);
+		MarkerDialog *d = new MarkerDialog(this, view->cur_track, -1, view->selection.index);
 		d->run();
 	}else
 		tsunami->log->error(_("Kein Marker ausgew&ahlt"));
@@ -392,7 +392,7 @@ void TsunamiWindow::onCommand(const string & id)
 
 void TsunamiWindow::onSettings()
 {
-	SettingsDialog *dlg = new SettingsDialog(this, false);
+	SettingsDialog *dlg = new SettingsDialog(this);
 	dlg->run();
 }
 

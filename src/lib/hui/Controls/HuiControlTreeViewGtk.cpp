@@ -23,7 +23,7 @@ void *get_gtk_image_pixbuf(const string &image); // -> hui_menu_gtk.cpp
 HuiControlTreeView::HuiControlTreeView(const string &title, const string &id, HuiPanel *panel) :
 	HuiControl(HUI_KIND_TREEVIEW, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 
 	GtkWidget *sw = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -103,7 +103,7 @@ string tree_get_cell(GtkTreeModel *store, GtkTreeIter &_iter, int column)
 void HuiControlTreeView::__addString(const string& str)
 {
 	GtkTreeIter iter;
-	GetPartStrings("", str);
+	GetPartStrings(str);
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_tree_store_append(store, &iter, NULL);
 	for (int j=0;j<PartString.num;j++)
@@ -135,7 +135,7 @@ int HuiControlTreeView::getInt()
 void HuiControlTreeView::__addChildString(int parent_row, const string& str)
 {
 	GtkTreeIter iter;
-	GetPartStrings("", str);
+	GetPartStrings(str);
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_tree_store_append(store, &iter, &_item_[parent_row]);
 	for (int j=0;j<PartString.num;j++)
@@ -145,7 +145,7 @@ void HuiControlTreeView::__addChildString(int parent_row, const string& str)
 
 void HuiControlTreeView::__changeString(int row, const string& str)
 {
-	GetPartStrings("", str);
+	GetPartStrings(str);
 	GtkTreeStore *store = GTK_TREE_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	/*for (int j=0;j<PartString.num;j++)
 		gtk_tree_store_set(store, &c->_item_[row], j, sys_str(PartString[j]), -1);*/

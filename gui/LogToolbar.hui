@@ -1,17 +1,4 @@
-// IDs
-enum{
-	HMM_LOG_TOOLBAR,
-	HMM_LOG_CLEAR,
-	HMM_LOG_CLOSE
-};
-
-
-
-	// toolbar
-	MainWin->ToolBarSetID(HMM_LOG_TOOLBAR);
-	MainWin->ToolBarAddItem("Leeren","",HuiImageClear,HMM_LOG_CLEAR);
-	MainWin->ToolBarAddItem("Schlie&sen","",HuiImageClose,HMM_LOG_CLOSE);
-	MainWin->EnableToolBar(true);
-
-
+Toolbar log_toolbar ""
+	Item log_clear "Leeren"
+	Item log_close "Schließen"
 

@@ -17,7 +17,7 @@ void OnGtkEditChange(GtkWidget *widget, gpointer data)
 HuiControlEdit::HuiControlEdit(const string &title, const string &id) :
 	HuiControl(HUI_KIND_EDIT, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	widget = gtk_entry_new();
 	gtk_entry_set_width_chars(GTK_ENTRY(widget), 3);
 	gtk_entry_set_text(GTK_ENTRY(widget), sys_str(PartString[0]));

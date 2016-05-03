@@ -205,7 +205,7 @@ gboolean OnGtkAreaKeyUp(GtkWidget *widget, GdkEventKey *event, gpointer user_dat
 HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &id) :
 	HuiControl(HUI_KIND_DRAWINGAREA, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	GtkWidget *da = gtk_drawing_area_new();
 	g_signal_connect(G_OBJECT(da), "draw", G_CALLBACK(OnGtkAreaDraw), this);
 	g_signal_connect(G_OBJECT(da), "key-press-event", G_CALLBACK(&OnGtkAreaKeyDown), this);

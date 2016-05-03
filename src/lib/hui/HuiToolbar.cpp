@@ -12,6 +12,9 @@
 #include "Controls/HuiToolItemSeparator.h"
 
 
+HuiMenu *_create_res_menu_(const string &ns, HuiResource *res);
+
+
 // add a default button
 void HuiToolbar::addItem(const string &title, const string &image, const string &id)
 {
@@ -29,6 +32,7 @@ void HuiToolbar::addItemMenu(const string &title, const string &image, HuiMenu *
 	if (!menu)
 		return;
 	add(new HuiToolItemMenuButton(title, menu, image, id));
+	menu->set_panel(win);
 }
 
 void HuiToolbar::addItemMenuByID(const string &title, const string &image, const string &menu_id, const string &id)
@@ -64,20 +68,29 @@ void HuiToolbar::setByID(const string &id)
 	//Configure(res->b_param[0], res->b_param[1]);
 	foreach(HuiResource &cmd, res->children){
 		if (cmd.type == "Item"){
-			addItem(get_lang(cmd.id, "", false), cmd.image, cmd.id);
-			item.back()->setTooltip(HuiGetLanguageT(cmd.id));
+			if (sa_contains(cmd.options, "checkable"))
+				addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image, cmd.id);
+			else
+				addItem(get_lang(id, cmd.id, "", false), cmd.image, cmd.id);
+			item.back()->setTooltip(HuiGetLanguageT(id, cmd.id));
 		}else if (cmd.type == "ItemCheckable"){
-			addItemCheckable(get_lang(cmd.id, "", false), cmd.image, cmd.id);
-			item.back()->setTooltip(HuiGetLanguageT(cmd.id));
-		}else if (cmd.type == "ItemSeparator"){
+			addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image, cmd.id);
+			item.back()->setTooltip(HuiGetLanguageT(id, cmd.id));
+		}else if ((cmd.type == "ItemSeparator") or (cmd.type == "Separator")){
 			addSeparator();
 		}else if (cmd.type == "ItemPopup"){
-			string title = get_lang(cmd.id, "", false);
+			string title = get_lang(id, cmd.id, "", false);
+			bool ok = false;
 			foreach(string &o, cmd.options)
 				if (o.find("menu=") == 0){
 					addItemMenuByID(title, cmd.image, o.substr(5, -1), cmd.id);
-					item.back()->setTooltip(HuiGetLanguageT(cmd.id));
+					item.back()->setTooltip(HuiGetLanguageT(id, cmd.id));
+					ok = true;
 				}
+			if ((!ok) and (cmd.children.num > 0)){
+				addItemMenu(title, cmd.image, _create_res_menu_(id, &cmd), cmd.id);
+				item.back()->setTooltip(HuiGetLanguageT(id, cmd.id));
+			}
 		}
 	}
 	enable(true);

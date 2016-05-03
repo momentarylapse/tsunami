@@ -20,9 +20,9 @@ HuiToolItemToggleButton::HuiToolItemToggleButton(const string &title, const stri
 	gtk_widget_show(im);
 	widget = GTK_WIDGET(gtk_toggle_tool_button_new());
 	gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(widget), true);
-	gtk_tool_button_set_label(GTK_TOOL_BUTTON(widget), sys_str(get_lang(id, title)));
+	gtk_tool_button_set_label(GTK_TOOL_BUTTON(widget), sys_str(title));
 	gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(widget), im);
-	gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
+	//gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkToolbarItemPress), this);
 }
 

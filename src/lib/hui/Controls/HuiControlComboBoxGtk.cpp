@@ -15,7 +15,7 @@ void OnGtkComboboxChange(GtkWidget *widget, gpointer data)
 HuiControlComboBox::HuiControlComboBox(const string &title, const string &id) :
 	HuiControl(HUI_KIND_COMBOBOX, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	editable = (OptionString.find("editable") >= 0);
 	if (editable){
 		widget = gtk_combo_box_text_new_with_entry();

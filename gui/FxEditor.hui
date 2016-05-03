@@ -28,10 +28,10 @@ Dialog fx_editor "Effects" 380 516
 			.
 			.
 			.
-			Button add "" expandx flat image=hui:add
-		Text fe_t_dummy "" expandy
+			Button add "" expandx flat image=hui:add tooltip="neuen Effekt hinzufügen"
+		Text ? "" expandy
 		Group fe_g_edit "Bearbeiten"
 			Grid ? "" 2 1
-				Button edit_song "Datei"
-				Button edit_track "Spur"
+				Button /edit_song "Datei"
+				Button /edit_track "Spur"
 

@@ -50,14 +50,13 @@ string OptionString, HuiFormatString;
 	return title2;
 }*/
 
-void GetPartStrings(const string &id, const string &title)
+void GetPartStrings(const string &title)
 {
 	PartString.clear();
 	OptionString = "";
 	HuiFormatString = "";
 
-	string title2 = get_lang(id, title);
-	PartString = title2.explode(HuiComboBoxSeparator);
+	PartString = title.explode(HuiComboBoxSeparator);
 //	msg_write(sa2s(PartString));
 	if (PartString.num > 0)
 		if (PartString[0].num > 0)

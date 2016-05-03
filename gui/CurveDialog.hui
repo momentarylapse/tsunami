@@ -7,6 +7,6 @@ Dialog curve_console "Kurven" 380 516
 			Button target "Parameter"
 		Group cc_group_edit "Bearbeiten"
 			Grid ? "" 3 1
-				Button edit_song "Datei"
-				Button edit_track "Spur"
-				Button edit_fx "Fx"
+				Button /edit_song "Datei"
+				Button /edit_track "Spur"
+				Button /edit_fx "Fx"

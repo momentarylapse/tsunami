@@ -1,39 +1,17 @@
-// IDs
-enum{
-	HMM_TOOLBAR,
-	HMM_NEW,
-	HMM_OPEN,
-	HMM_SAVE,
-	HMM_UNDO,
-	HMM_REDO,
-	HMM_COPY,
-	HMM_PASTE,
-	HMM_DELETE,
-	HMM_PLAY,
-	HMM_STOP,
-	HMM_RECORD
-};
-
-
-
-	// toolbar
-	MainWin->ToolBarSetID(HMM_TOOLBAR);
-	MainWin->ToolBarAddItem("Neu...","Neu...",HuiImageNew,HMM_NEW);
-	MainWin->ToolBarAddItem("&Offnen...","&Offnen...",HuiImageOpen,HMM_OPEN);
-	MainWin->ToolBarAddItem("Speichern","Speichern",HuiImageSave,HMM_SAVE);
-	MainWin->ToolBarAddSeparator();
-	MainWin->ToolBarAddItem("R&uckg&angig","R&uckg&angig",HuiImageUndo,HMM_UNDO);
-	MainWin->ToolBarAddItem("Wiederherstellen","Wiederherstellen",HuiImageRedo,HMM_REDO);
-	MainWin->ToolBarAddSeparator();
-	MainWin->ToolBarAddItem("Kopieren","Kopieren",HuiImageCopy,HMM_COPY);
-	MainWin->ToolBarAddItem("Einf&ugen","Einf&ugen",HuiImagePaste,HMM_PASTE);
-	MainWin->ToolBarAddItem("L&oschen","L&oschen",HuiImageDelete,HMM_DELETE);
-	MainWin->ToolBarAddSeparator();
-	MainWin->ToolBarAddItem("Abspielen","Abspielen",HuiImageMediaPlay,HMM_PLAY);
-	MainWin->ToolBarAddItem("Pause","Pause",HuiImageMediaPause,HMM_PAUSE);
-	MainWin->ToolBarAddItem("Stopp","Stopp",HuiImageMediaStop,HMM_STOP);
-	MainWin->ToolBarAddItem("Aufnehmen","Aufnehmen",HuiImageMediaRecord,HMM_RECORD);
-	MainWin->EnableToolBar(true);
-
-
+Toolbar toolbar ""
+	Item /new "Neu..." image=hui:new
+	Item /open "Öffnen..." image=hui:open
+	Item /save "Speichern" image=hui:save
+	Separator
+	Item /undo "Rückgängig" image=hui:undo
+	Item /redo "Wiederherstellen" image=hui:redo
+	Separator
+	Item /copy "Kopieren" image=hui:copy
+	Item /paste "Einfügen" image=hui:paste
+	Item /delete "Löschen" image=hui:delete
+	Separator
+	Item /play "Abspielen" image=hui:media-play
+	Item /pause "Pause" image=hui:media-pause
+	Item /stop "Stopp" image=hui:media-stop
+	Item /record "Aufnehmen" image=hui:media-record
 

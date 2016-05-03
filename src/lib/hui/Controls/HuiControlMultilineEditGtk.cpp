@@ -18,7 +18,7 @@ void OnGtkMultilineEditChange(GtkWidget *widget, gpointer data)
 HuiControlMultilineEdit::HuiControlMultilineEdit(const string &title, const string &id) :
 	HuiControl(HUI_KIND_MULTILINEEDIT, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	GtkTextBuffer *tb = gtk_text_buffer_new(NULL);
 	widget = gtk_text_view_new_with_buffer(tb);
 	GtkWidget *scroll = gtk_scrolled_window_new(NULL, NULL);

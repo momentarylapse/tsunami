@@ -12,7 +12,7 @@
 HuiControlRevealer::HuiControlRevealer(const string &title, const string &id) :
 	HuiControl(HUI_KIND_REVEALER, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	widget = gtk_revealer_new();
 	setOptions(OptionString);
 

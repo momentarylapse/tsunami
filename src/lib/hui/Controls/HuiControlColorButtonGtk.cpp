@@ -18,7 +18,7 @@ void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
 HuiControlColorButton::HuiControlColorButton(const string &title, const string &id) :
 	HuiControl(HUI_KIND_COLORBUTTON, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	widget = gtk_color_button_new();
 	if (OptionString.find("alpha") >= 0)
 		gtk_color_chooser_set_use_alpha(GTK_COLOR_CHOOSER(widget), true);

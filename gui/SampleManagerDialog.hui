@@ -10,4 +10,4 @@ Dialog sample_manager_dialog "Sample Manager" 400 400 allow-root
 			Button create_from_selection "" image=hui:copy flat
 		Group smd_group_edit "Bearbeiten"
 			Grid ? "" 1 1
-				Button edit_song "Datei"
+				Button /edit_song "Datei"

@@ -18,7 +18,7 @@ class HuiPanel;
 extern int allow_signal_level; // -> hui_window_control.cpp
 
 
-void GetPartStrings(const string &id, const string &title);
+void GetPartStrings(const string &title);
 //string ScanOptions(int id, const string &title);
 extern Array<string> PartString;
 extern string OptionString, HuiFormatString;

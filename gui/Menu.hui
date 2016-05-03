@@ -1,29 +1,29 @@
 Menu menu "" disabled
 	Menu menu_file "Datei"
-		Item new "Neu..." image=hui:new
-		Item open "Öffnen..." image=hui:open
+		Item /new "Neu..." image=hui:new
+		Item /open "Öffnen..." image=hui:open
 		Separator "" ""
-		Item save "Speichern" image=hui:save
-		Item save_as "Speichern unter..." image=hui:save-as
+		Item /save "Speichern" image=hui:save
+		Item /save_as "Speichern unter..." image=hui:save-as
 		Item export_selection "Auswahl Exportieren..." image=hui:save-as
 		Separator "" ""
 		Item song_properties "Eigenschaften" image=hui:properties
 		Separator "" ""
-		Item exit "Beenden" image=hui:quit
+		Item /exit "Beenden" image=hui:quit
 	Menu menu_edit "Bearbeiten"
-		Item undo "Rückgängig" image=hui:undo
-		Item redo "Wiederherstellen" image=hui:redo
+		Item /undo "Rückgängig" image=hui:undo
+		Item /redo "Wiederherstellen" image=hui:redo
 		Separator "" ""
 		Item select_all "Alles auswählen" image=hui:select-all
 		Item select_nothing "Nichts auswählen" image=hui:delete
 		Separator "" ""
 		Item edit_multi "Auf alle ausgewählten Spuren anwenden" checkable
 		Separator "" ""
-		Item copy "Kopieren" image=hui:copy
-		Item paste "Einfügen" image=hui:paste
-		Item delete "Löschen" image=hui:delete
+		Item /copy "Kopieren" image=hui:copy
+		Item /paste "Einfügen" image=hui:paste
+		Item /delete "Löschen" image=hui:delete
 		Separator "" ""
-		Item settings "Einstellungen" image=hui:preferences
+		Item /settings "Einstellungen" image=hui:preferences
 	Menu menu_track "Spur"
 		Item track_import "Aus Datei importieren..." image=hui:open
 		Separator "" ""

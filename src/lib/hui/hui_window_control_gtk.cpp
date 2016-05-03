@@ -410,43 +410,23 @@ void HuiPanel::addRevealer(const string &title,int x,int y,int width,int height,
 
 void HuiPanel::embedDialog(const string &id, int x, int y)
 {
-#if 0
-	HuiPanel *dlg = HuiCreateResourceDialog(id, NULL, NULL);
-	dlg->Update();
-
-	for (int i=0;i<dlg->control.num;i++)
-		control.add(dlg->control[i]);
-
-	gtk_widget_unparent(dlg->control[0]->widget);
-
-	//GtkWidget *b = gtk_button_new_with_label("test");
-
-	
-	_insert_control_(this, dlg->control[0]->widget, root, page, 10, 10, 86237, dlg->control[0]->type);
-	//_InsertControl_(this, b, root, page, 10, 10, 86237, dlg->control[0]->type);
-
-	/*GtkWidget *p = gtk_widget_get_parent(b);
-	gtk_widget_unparent(b);
-	gtk_widget_reparent(dlg->control[0]->widget, p);*/
-#endif
-
 	border_width = 8;
 
 	HuiResource *res = HuiGetResource(id);
-	if (res){
-		if (res->type != "SizableDialog")
-			return;
-		if (res->children.num == 0)
-			return;
-		HuiResource rr = res->children[0];
-		rr.x = x;
-		rr.y = y;
+	if (!res)
+		return;
+	if (res->type != "SizableDialog")
+		return;
+	if (res->children.num == 0)
+		return;
+	HuiResource rr = res->children[0];
+	rr.x = x;
+	rr.y = y;
 
-		string parent_id;
-		if (cur_control)
-			parent_id = cur_control->id;
-		_addControl(rr, parent_id);
-	}
+	string parent_id;
+	if (cur_control)
+		parent_id = cur_control->id;
+	_addControl(id, rr, parent_id);
 }
 
 void hui_rm_event(Array<HuiEventListener> &event, HuiControl *c)

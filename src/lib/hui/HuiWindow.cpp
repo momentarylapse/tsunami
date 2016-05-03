@@ -80,7 +80,7 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 	foreach(string &o, res->options)
 		if ((o == "allow-root") or (o == "allow-parent"))
 			allow_parent = true;
-	_init_(HuiGetLanguage(id), -1, -1, res->w, res->h, parent, allow_parent, mode);
+	_init_(HuiGetLanguage(id, id), -1, -1, res->w, res->h, parent, allow_parent, mode);
 
 	// menu/toolbar?
 	foreach(string &o, res->options){
@@ -92,7 +92,7 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 
 	// controls
 	foreach(HuiResource &cmd, res->children)
-		_addControl(cmd, "");
+		_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
 }
@@ -161,7 +161,7 @@ void HuiWindow::setID(const string &_id)
 {
 	id = _id;
 	if ((HuiLanguaged) && (id.num > 0))
-		setTitle(HuiGetLanguage(id));
+		setTitle(HuiGetLanguage(id, id));
 }
 
 // align window relative to another window (like..."top right corner")

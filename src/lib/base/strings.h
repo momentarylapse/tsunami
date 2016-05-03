@@ -140,6 +140,8 @@ string _cdecl h2d(const string &hex_str, int bytes);
 string _cdecl implode(const Array<string> &a, const string &glue);
 string _cdecl utf32_to_utf8(const Array<int> &s);
 
+bool _cdecl sa_contains(Array<string> &a, const string &s);
+
 //--------------------------------------------------------------
 // regular expressions
 

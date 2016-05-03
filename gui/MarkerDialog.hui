@@ -1,6 +1,6 @@
 Dialog marker_dialog "Marker" 250 80
 	Grid ? "" 1 2
 		Edit text "" expandx
-		Grid marker_dialog_buttonbar "" 2 1 buttonbar
-			Button cancel "Abbrechen" image=hui:cancel
-			DefButton ok "OK" image=hui:ok
+		Grid ? "" 2 1 buttonbar
+			Button /cancel "Abbrechen" image=hui:cancel
+			DefButton /ok "OK" image=hui:ok

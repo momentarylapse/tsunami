@@ -22,7 +22,7 @@ static void OnGtkExpanderExpand(GObject* object, GParamSpec *param_spec, gpointe
 HuiControlExpander::HuiControlExpander(const string &title, const string &id) :
 	HuiControl(HUI_KIND_EXPANDER, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	widget = gtk_expander_new(sys_str("<b>" + PartString[0] + "</b>"));
 	gtk_expander_set_use_markup(GTK_EXPANDER(widget), true);
 	g_signal_connect(widget, "notify::expanded", G_CALLBACK(OnGtkExpanderExpand), NULL);

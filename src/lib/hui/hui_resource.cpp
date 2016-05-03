@@ -139,7 +139,11 @@ void HuiLoadResource(const string &filename)
 			f->ReadComment(); // Text
 			for (int i=0;i<n;i++){
 				HuiLanguageCommand c;
-				c.id = f->ReadStr();
+				Array<string> ids = f->ReadStr().explode("/");
+				if (ids.num >= 2)
+					c._namespace = ids[0];
+				if (ids.num >= 1)
+					c.id = ids.back();
 				c.text = str_unescape(f->ReadStr());
 				c.tooltip = str_unescape(f->ReadStr());
 				hl.cmd.add(c);
@@ -197,9 +201,9 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 	// dialog
 	HuiWindow *dlg;
 	if (res->type == "SizableDialog")
-		dlg = new HuiDialog(HuiGetLanguageR(*res), res->w, res->h, root, allow_parent);
+		dlg = new HuiDialog(HuiGetLanguageR(res->id, *res), res->w, res->h, root, allow_parent);
 	else
-		dlg = new HuiFixedDialog(HuiGetLanguageR(*res), res->w, res->h, root, allow_parent);
+		dlg = new HuiFixedDialog(HuiGetLanguageR(res->id, *res), res->w, res->h, root, allow_parent);
 
 	// menu?
 	if (menu_id.num > 0)
@@ -211,7 +215,7 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 
 	// controls
 	foreach(HuiResource &cmd, res->children)
-		dlg->_addControl(cmd, "");
+		dlg->_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
 	return dlg;
@@ -221,7 +225,7 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 	return d;*/
 }
 
-HuiMenu *_create_res_menu_(HuiResource *res)
+HuiMenu *_create_res_menu_(const string &ns, HuiResource *res)
 {
 	msg_db_f("_create_res_menu_",2);
 	HuiMenu *menu = new HuiMenu();
@@ -229,17 +233,22 @@ HuiMenu *_create_res_menu_(HuiResource *res)
 	//msg_db_out(2,i2s(n));
 	foreach(HuiResource &c, res->children){
 		//msg_db_out(2,i2s(j));
-		if (c.type == "Item")
-			menu->addItem(get_lang(c.id, "", true), c.id);
-		if (c.type == "ItemImage")
-			menu->addItemImage(get_lang(c.id, "", true), c.image, c.id);
-		if (c.type == "ItemCheckable")
-			menu->addItemCheckable(get_lang(c.id, "", true), c.id);
-		if (c.type == "ItemSeparator")
+		if (c.type == "Item"){
+			if (sa_contains(c.options, "checkable"))
+				menu->addItemCheckable(get_lang(ns, c.id, "", true), c.id);
+			else if (c.image.num > 0)
+				menu->addItemImage(get_lang(ns, c.id, "", true), c.image, c.id);
+			else
+				menu->addItem(get_lang(ns, c.id, "", true), c.id);
+		}else if (c.type == "ItemImage")
+			menu->addItemImage(get_lang(ns, c.id, "", true), c.image, c.id);
+		else if (c.type == "ItemCheckable")
+			menu->addItemCheckable(get_lang(ns, c.id, "", true), c.id);
+		else if ((c.type == "ItemSeparator") or (c.type == "Separator"))
 			menu->addSeparator();
-		if (c.type == "ItemPopup"){
-			HuiMenu *sub = _create_res_menu_(&c);
-			menu->addSubMenu(get_lang(c.id, "", true), c.id, sub);
+		else if (c.type == "ItemPopup"){
+			HuiMenu *sub = _create_res_menu_(ns, &c);
+			menu->addSubMenu(get_lang(ns, c.id, "", true), c.id, sub);
 		}
 		menu->item.back()->enable(c.enabled);
 	}
@@ -258,7 +267,7 @@ HuiMenu *HuiCreateResourceMenu(const string &id)
 	}
 
 	msg_db_m("  \\(^_^)/",1);
-	HuiMenu *m = _create_res_menu_(res);
+	HuiMenu *m = _create_res_menu_(id, res);
 	return m;
 }
 
@@ -394,6 +403,12 @@ bool res_load_line(string &l, HuiResource &c)
 	if (tokens.num == 0)
 		return false;
 
+	c.x = 0;
+	c.y = 0;
+	c.w = 1;
+	c.h = 1;
+	c.enabled = true;
+
 	// id
 	string id;
 	if (tokens.num > 1)
@@ -404,15 +419,14 @@ bool res_load_line(string &l, HuiResource &c)
 	// dummy
 	if (tokens[0] == ".")
 		return false;
+	if (tokens[0] == "Separator"){
+		c.type = tokens[0];
+		return true;
+	}
 	if (tokens.num < 3)
 		return false;
 
 	// interpret tokens
-	c.x = 0;
-	c.y = 0;
-	c.w = 1;
-	c.h = 1;
-	c.enabled = true;
 	c.type = tokens[0];
 	/*if (cur_indent == 0)
 		c.type = "Dialog";*/

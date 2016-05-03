@@ -10,7 +10,7 @@
 HuiControlSeparator::HuiControlSeparator(const string &text, const string &_id) :
 	HuiControl(HUI_KIND_SEPARATOR, _id)
 {
-	GetPartStrings(id, text);
+	GetPartStrings(text);
 	if (OptionString.find("vertical") >= 0)
 		widget = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 	else

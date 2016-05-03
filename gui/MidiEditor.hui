@@ -32,10 +32,10 @@ Dialog midi_editor "Midi" 380 516
 					RadioButton modifier:natural "♮" expandx
 			Expander me_group_reference "Referenz-Spuren"
 				ListView reference_tracks "" height=200 noexpandy nobar select-multi
-		Text me_t_dummy "" expandy
+		Text ? "" expandy
 		Group me_group_edit "Bearbeiten"
 			Grid ? "" 3 1
-				Button edit_song "Datei"
-				Button edit_track "Spur"
-				Button edit_midi_fx "Midi-Fx"
+				Button /edit_song "Datei"
+				Button /edit_track "Spur"
+				Button /edit_midi_fx "Midi-Fx"
 

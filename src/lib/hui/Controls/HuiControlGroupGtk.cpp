@@ -13,7 +13,7 @@
 HuiControlGroup::HuiControlGroup(const string &title, const string &id) :
 	HuiControl(HUI_KIND_GROUP, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	widget = gtk_frame_new(sys_str(PartString[0]));
 	gtk_frame_set_shadow_type(GTK_FRAME(widget), GTK_SHADOW_NONE);
 	GtkWidget *label = gtk_frame_get_label_widget(GTK_FRAME(widget));

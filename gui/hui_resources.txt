@@ -3,7 +3,7 @@ t5
 31
 // Resource
 Menu
-
+menu_fake
 
 
 1
@@ -148,7 +148,7 @@ bar_add_dialog
 0
 1
 ControlTable
-rand_id_26114
+rand_id_300586
 
 
 1
@@ -159,7 +159,7 @@ rand_id_26114
 -1
 3
 ControlTable
-rand_id_960933
+rand_id_229990
 
 
 1
@@ -236,7 +236,7 @@ expandx
 -1
 0
 ControlTable
-rand_id_167239
+rand_id_840076
 
 
 1
@@ -269,7 +269,7 @@ insert:after
 -1
 0
 ControlTable
-bad_buttonbar
+rand_id_559629
 buttonbar
 
 1
@@ -314,7 +314,7 @@ bar_edit_dialog
 0
 1
 ControlTable
-rand_id_218022
+rand_id_22856
 
 
 1
@@ -325,7 +325,7 @@ rand_id_218022
 -1
 2
 ControlTable
-rand_id_881900
+rand_id_169323
 
 
 1
@@ -380,7 +380,7 @@ expandx
 -1
 0
 ControlTable
-bed_buttonbar
+rand_id_73637
 buttonbar
 
 1
@@ -447,7 +447,7 @@ bbd_g_no_time_track
 -1
 2
 ControlTable
-rand_id_326139
+rand_id_116433
 
 
 1
@@ -491,7 +491,7 @@ wrap
 -1
 0
 ControlTable
-rand_id_448133
+rand_id_168794
 
 
 1
@@ -513,7 +513,7 @@ format=tTTT,select-multi
 -1
 0
 ControlTable
-rand_id_148150
+rand_id_224864
 
 
 1
@@ -601,7 +601,7 @@ bbd_t_edit
 -1
 1
 ControlTable
-rand_id_763983
+rand_id_649944
 
 
 1
@@ -635,7 +635,7 @@ curve_console
 0
 1
 ControlTable
-rand_id_345707
+rand_id_672638
 
 
 1
@@ -712,7 +712,7 @@ cc_group_edit
 -1
 1
 ControlTable
-rand_id_700330
+rand_id_229536
 
 
 1
@@ -791,7 +791,7 @@ detune_synthesizer_dialog
 0
 1
 ControlTable
-rand_id_863799
+rand_id_190722
 
 
 1
@@ -813,7 +813,7 @@ expandx,expandy
 -1
 0
 ControlTable
-detune_synth_dialog_buttonbar
+rand_id_563743
 buttonbar
 
 1
@@ -858,7 +858,7 @@ fx_editor
 0
 1
 ControlTable
-rand_id_959471
+rand_id_857616
 
 
 1
@@ -902,7 +902,7 @@ hui:add
 -1
 0
 Text
-fe_t_dummy
+rand_id_863626
 expandy
 
 1
@@ -924,7 +924,7 @@ fe_g_edit
 -1
 1
 ControlTable
-rand_id_619064
+rand_id_787308
 
 
 1
@@ -991,7 +991,7 @@ format=tT,select-single
 -1
 0
 ControlTable
-rand_id_442222
+rand_id_894430
 
 
 1
@@ -1035,7 +1035,7 @@ lvld_t_edit
 -1
 1
 ControlTable
-rand_id_222359
+rand_id_143253
 
 
 1
@@ -1059,7 +1059,7 @@ edit_song
 // Resource
 Toolbar
 log_toolbar
-text=true,icons=large
+
 
 1
 0
@@ -1071,7 +1071,7 @@ text=true,icons=large
 Item
 log_clear
 
-hui:clear
+
 1
 0
 0
@@ -1082,7 +1082,7 @@ hui:clear
 Item
 log_close
 
-hui:close
+
 1
 0
 0
@@ -1103,7 +1103,7 @@ marker_dialog
 0
 1
 ControlTable
-rand_id_45636
+rand_id_726992
 
 
 1
@@ -1125,7 +1125,7 @@ expandx
 -1
 0
 ControlTable
-marker_dialog_buttonbar
+rand_id_683220
 buttonbar
 
 1
@@ -1180,7 +1180,7 @@ menu_file
 0
 0
 10
-ItemImage
+Item
 new
 
 hui:new
@@ -1191,7 +1191,7 @@ hui:new
 0
 0
 0
-ItemImage
+Item
 open
 
 hui:open
@@ -1202,7 +1202,7 @@ hui:open
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1213,7 +1213,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 save
 
 hui:save
@@ -1224,7 +1224,7 @@ hui:save
 0
 0
 0
-ItemImage
+Item
 save_as
 
 hui:save-as
@@ -1235,7 +1235,7 @@ hui:save-as
 0
 0
 0
-ItemImage
+Item
 export_selection
 
 hui:save-as
@@ -1246,7 +1246,7 @@ hui:save-as
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1257,7 +1257,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 song_properties
 
 hui:properties
@@ -1268,7 +1268,7 @@ hui:properties
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1279,7 +1279,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 exit
 
 hui:quit
@@ -1301,7 +1301,7 @@ menu_edit
 0
 0
 13
-ItemImage
+Item
 undo
 
 hui:undo
@@ -1312,7 +1312,7 @@ hui:undo
 0
 0
 0
-ItemImage
+Item
 redo
 
 hui:redo
@@ -1323,7 +1323,7 @@ hui:redo
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1334,7 +1334,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 select_all
 
 hui:select-all
@@ -1345,7 +1345,7 @@ hui:select-all
 0
 0
 0
-ItemImage
+Item
 select_nothing
 
 hui:delete
@@ -1356,7 +1356,7 @@ hui:delete
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1378,7 +1378,7 @@ edit_multi
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1389,7 +1389,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 copy
 
 hui:copy
@@ -1400,7 +1400,7 @@ hui:copy
 0
 0
 0
-ItemImage
+Item
 paste
 
 hui:paste
@@ -1411,7 +1411,7 @@ hui:paste
 0
 0
 0
-ItemImage
+Item
 delete
 
 hui:delete
@@ -1422,7 +1422,7 @@ hui:delete
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1433,7 +1433,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 settings
 
 hui:preferences
@@ -1455,7 +1455,7 @@ menu_track
 0
 0
 8
-ItemImage
+Item
 track_import
 
 hui:open
@@ -1466,7 +1466,7 @@ hui:open
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1477,7 +1477,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 add_track
 
 hui:add
@@ -1488,7 +1488,7 @@ hui:add
 0
 0
 0
-ItemImage
+Item
 add_time_track
 
 hui:add
@@ -1499,7 +1499,7 @@ hui:add
 0
 0
 0
-ItemImage
+Item
 add_midi_track
 
 hui:add
@@ -1510,7 +1510,7 @@ hui:add
 0
 0
 0
-ItemImage
+Item
 delete_track
 
 hui:delete
@@ -1521,7 +1521,7 @@ hui:delete
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1532,7 +1532,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 track_properties
 
 hui:properties
@@ -1554,7 +1554,7 @@ menu_level
 0
 0
 8
-ItemImage
+Item
 level_manager
 
 hui:properties
@@ -1565,7 +1565,7 @@ hui:properties
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1576,7 +1576,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 level_add
 
 hui:add
@@ -1587,7 +1587,7 @@ hui:add
 0
 0
 0
-ItemImage
+Item
 level_delete
 
 hui:delete
@@ -1598,7 +1598,7 @@ hui:delete
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1620,7 +1620,7 @@ menu_level_target
 0
 0
 0
-ItemImage
+Item
 level_up
 
 hui:up
@@ -1631,7 +1631,7 @@ hui:up
 0
 0
 0
-ItemImage
+Item
 level_down
 
 hui:down
@@ -1653,7 +1653,7 @@ menu_bars
 0
 0
 1
-ItemImage
+Item
 bars_manager
 
 hui:properties
@@ -1675,7 +1675,7 @@ menu_sub
 0
 0
 7
-ItemImage
+Item
 sample_manager
 
 hui:properties
@@ -1686,7 +1686,7 @@ hui:properties
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1697,7 +1697,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 sample_from_selection
 
 hui:cut
@@ -1708,7 +1708,7 @@ hui:cut
 0
 0
 0
-ItemImage
+Item
 insert_sample
 
 hui:add
@@ -1719,7 +1719,7 @@ hui:add
 0
 0
 0
-ItemImage
+Item
 remove_sample
 
 hui:delete
@@ -1730,7 +1730,7 @@ hui:delete
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1741,7 +1741,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 sample_properties
 
 hui:properties
@@ -1906,7 +1906,7 @@ show_fx_console
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -1917,7 +1917,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 zoom_in
 
 hui:zoom-in
@@ -1928,7 +1928,7 @@ hui:zoom-in
 0
 0
 0
-ItemImage
+Item
 zoom_out
 
 hui:zoom-out
@@ -1939,7 +1939,7 @@ hui:zoom-out
 0
 0
 0
-ItemImage
+Item
 view_optimal
 
 hui:zoom-fit
@@ -1950,7 +1950,7 @@ hui:zoom-fit
 0
 0
 0
-ItemImage
+Item
 view_samples
 
 hui:zoom-one
@@ -1972,7 +1972,7 @@ menu_sound
 0
 0
 6
-ItemImage
+Item
 play
 
 hui:media-play
@@ -1983,7 +1983,7 @@ hui:media-play
 0
 0
 0
-ItemImage
+Item
 pause
 
 hui:media-pause
@@ -1994,7 +1994,7 @@ hui:media-pause
 0
 0
 0
-ItemImage
+Item
 stop
 
 hui:media-stop
@@ -2016,7 +2016,7 @@ play_loop
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -2027,7 +2027,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 record
 
 hui:media-record
@@ -2049,7 +2049,7 @@ menu_plugins
 0
 0
 15
-ItemImage
+Item
 run_plugin
 
 hui:execute
@@ -2060,7 +2060,7 @@ hui:execute
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -2159,7 +2159,7 @@ menu_plugins_synthesizer
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -2181,7 +2181,7 @@ menu_plugins_on_midi
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -2225,7 +2225,7 @@ menu_help
 0
 0
 4
-ItemImage
+Item
 help
 
 hui:help
@@ -2236,7 +2236,7 @@ hui:help
 0
 0
 0
-ItemImage
+Item
 show_log
 
 hui:info
@@ -2247,7 +2247,7 @@ hui:info
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -2258,7 +2258,7 @@ ItemSeparator
 0
 0
 0
-ItemImage
+Item
 about
 
 hui:about
@@ -2282,7 +2282,7 @@ midi_editor
 0
 1
 ControlTable
-rand_id_662327
+rand_id_757282
 
 
 1
@@ -2337,7 +2337,7 @@ me_group_view
 -1
 1
 ControlTable
-rand_id_941171
+rand_id_207603
 
 
 1
@@ -2381,7 +2381,7 @@ ld_t_scale
 -1
 0
 ControlTable
-rand_id_893104
+rand_id_196594
 
 
 1
@@ -2425,7 +2425,7 @@ midi_edit_mode
 -1
 3
 ControlTable
-rand_id_97768
+rand_id_467452
 
 
 1
@@ -2469,7 +2469,7 @@ interval
 -1
 0
 ControlTable
-rand_id_161049
+rand_id_229968
 
 
 1
@@ -2546,7 +2546,7 @@ me_group_modifier
 -1
 1
 ControlTable
-rand_id_185794
+rand_id_326745
 
 
 1
@@ -2623,7 +2623,7 @@ height=200,noexpandy,nobar,select-multi
 -1
 0
 Text
-me_t_dummy
+rand_id_626543
 expandy
 
 1
@@ -2645,7 +2645,7 @@ me_group_edit
 -1
 1
 ControlTable
-rand_id_5546
+rand_id_886811
 
 
 1
@@ -2701,7 +2701,7 @@ midi_fx_editor
 0
 1
 ControlTable
-rand_id_327110
+rand_id_145847
 expandy
 
 1
@@ -2767,7 +2767,7 @@ hui:add
 -1
 0
 Text
-mfe_t_dummy
+rand_id_927130
 expandy
 
 1
@@ -2789,7 +2789,7 @@ mfe_g_edit
 -1
 1
 ControlTable
-rand_id_676211
+rand_id_116801
 
 
 1
@@ -2845,7 +2845,7 @@ new_dialog
 0
 1
 ControlTable
-rand_id_71640
+rand_id_985923
 
 
 1
@@ -2867,7 +2867,7 @@ nd_g_frequency
 -1
 1
 ControlTable
-rand_id_539011
+rand_id_486759
 
 
 1
@@ -2911,7 +2911,7 @@ nd_g_track
 -1
 1
 ControlTable
-rand_id_765274
+rand_id_139658
 
 
 1
@@ -2955,7 +2955,7 @@ nd_g_metronome
 -1
 1
 ControlTable
-rand_id_887459
+rand_id_155246
 
 
 1
@@ -3065,7 +3065,7 @@ beats_per_bar
 -1
 0
 ControlTable
-new_dialog_buttonbar
+rand_id_560397
 buttonbar
 
 1
@@ -3120,7 +3120,7 @@ marker_menu_header
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -3176,7 +3176,7 @@ song_menu_header
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -3265,7 +3265,7 @@ track_menu_header
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -3365,7 +3365,7 @@ sample_menu_header
 0
 0
 0
-ItemSeparator
+Separator
 
 
 
@@ -3490,7 +3490,7 @@ record_dialog
 0
 1
 ControlTable
-rand_id_646057
+rand_id_256091
 
 
 1
@@ -3512,7 +3512,7 @@ rdt_source
 -1
 1
 ControlTable
-rand_id_791389
+rand_id_324041
 
 
 1
@@ -3523,7 +3523,7 @@ rand_id_791389
 -1
 2
 ControlTable
-rand_id_848392
+rand_id_785261
 
 
 1
@@ -3578,7 +3578,7 @@ rdt_capture
 -1
 1
 ControlTable
-rand_id_813296
+rand_id_906036
 
 
 1
@@ -3589,7 +3589,7 @@ rand_id_813296
 -1
 2
 ControlTable
-rd_g_data
+rand_id_996679
 noexpandy
 
 1
@@ -3622,7 +3622,7 @@ height=25
 -1
 0
 ControlTable
-rand_id_9411
+rand_id_14797
 
 
 1
@@ -3688,7 +3688,7 @@ expandx
 -1
 0
 ControlTable
-record_dialog_buttonbar
+rand_id_96759
 buttonbar
 
 1
@@ -3721,7 +3721,7 @@ hui:ok
 -1
 0
 Text
-td_t_dummy
+rand_id_560422
 expandy
 
 1
@@ -3744,7 +3744,7 @@ allow-parent
 0
 1
 ControlTable
-rand_id_730292
+rand_id_872414
 
 
 1
@@ -3766,7 +3766,7 @@ format=iTttC
 -1
 0
 ControlTable
-rand_id_139435
+rand_id_960385
 
 
 1
@@ -3854,7 +3854,7 @@ smd_group_edit
 -1
 1
 ControlTable
-rand_id_457545
+rand_id_347730
 
 
 1
@@ -3888,7 +3888,7 @@ sample_ref_dialog
 0
 1
 ControlTable
-rand_id_878443
+rand_id_766844
 
 
 1
@@ -3954,7 +3954,7 @@ ld_t_volume
 -1
 1
 ControlTable
-rand_id_903419
+rand_id_103638
 
 
 1
@@ -4009,7 +4009,7 @@ ld_t_repetition
 -1
 1
 ControlTable
-rand_id_803252
+rand_id_74723
 
 
 1
@@ -4075,7 +4075,7 @@ ms
 -1
 0
 Text
-ld_t_dummy
+rand_id_450064
 expandy
 
 1
@@ -4097,7 +4097,7 @@ ld_t_edit
 -1
 1
 ControlTable
-rand_id_578773
+rand_id_860921
 
 
 1
@@ -4142,7 +4142,7 @@ sample_selection_dialog
 0
 1
 ControlTable
-rand_id_767218
+rand_id_282327
 
 
 1
@@ -4164,7 +4164,7 @@ format=itt
 -1
 0
 ControlTable
-samsel_buttonbar
+rand_id_646659
 buttonbar
 
 1
@@ -4209,7 +4209,7 @@ settings_dialog
 0
 1
 ControlTable
-rand_id_762723
+rand_id_328373
 
 
 1
@@ -4231,7 +4231,7 @@ pdp_general
 -1
 1
 ControlTable
-rand_id_197838
+rand_id_512295
 
 
 1
@@ -4341,7 +4341,7 @@ pdp_capture
 -1
 1
 ControlTable
-rand_id_209440
+rand_id_973404
 
 
 1
@@ -4385,7 +4385,7 @@ hui:open
 -1
 0
 ControlTable
-properties_dialog_buttonbar
+rand_id_954917
 buttonbar
 
 1
@@ -4419,7 +4419,7 @@ song_dialog
 0
 1
 ControlTable
-afd_grid_1
+rand_id_399106
 expandy
 
 1
@@ -4441,7 +4441,7 @@ ad_t_data
 -1
 1
 ControlTable
-rand_id_985082
+rand_id_119252
 
 
 1
@@ -4463,7 +4463,7 @@ nobar,height=110,noexpandy
 -1
 0
 ControlTable
-rand_id_243474
+rand_id_882047
 
 
 1
@@ -4540,7 +4540,7 @@ ad_t_tags
 -1
 1
 ControlTable
-rand_id_871768
+rand_id_515908
 
 
 1
@@ -4562,7 +4562,7 @@ format=TT
 -1
 0
 ControlTable
-rand_id_926254
+rand_id_105175
 
 
 1
@@ -4606,7 +4606,7 @@ ad_t_edit
 -1
 1
 ControlTable
-rand_id_136579
+rand_id_368807
 
 
 1
@@ -4663,7 +4663,7 @@ edit_fx
 // Resource
 Toolbar
 toolbar
-text=true,icons=large
+
 
 1
 0
@@ -4705,10 +4705,10 @@ hui:save
 0
 0
 0
-ItemSeparator
+Separator
 
 
-hui:about
+
 1
 0
 0
@@ -4738,10 +4738,10 @@ hui:redo
 0
 0
 0
-ItemSeparator
+Separator
 
 
-hui:about
+
 1
 0
 0
@@ -4782,10 +4782,10 @@ hui:delete
 0
 0
 0
-ItemSeparator
+Separator
 
 
-hui:about
+
 1
 0
 0
@@ -4850,7 +4850,7 @@ track_dialog
 0
 1
 ControlTable
-ttd_grid_0
+rand_id_655567
 
 
 1
@@ -4861,7 +4861,7 @@ ttd_grid_0
 -1
 5
 Group
-td_t_name
+g_name
 
 
 1
@@ -4883,7 +4883,7 @@ expandx
 -1
 0
 Group
-td_t_volume
+g_volume
 
 
 1
@@ -4894,7 +4894,7 @@ td_t_volume
 -1
 1
 ControlTable
-rand_id_969536
+rand_id_260421
 noexpandx
 
 1
@@ -4905,7 +4905,7 @@ noexpandx
 -1
 6
 Text
-ld_tt_volume
+t_volume
 
 
 1
@@ -4938,7 +4938,7 @@ db
 -1
 0
 Text
-ld_tt_panning
+t_panning
 
 
 1
@@ -4971,7 +4971,7 @@ percent
 -1
 0
 Group
-td_t_instrument
+g_instrument
 
 
 1
@@ -4982,7 +4982,7 @@ td_t_instrument
 -1
 1
 ControlTable
-rand_id_87304
+rand_id_929204
 
 
 1
@@ -5004,7 +5004,7 @@ expandx
 -1
 0
 ControlTable
-rand_id_322373
+rand_id_911659
 
 
 1
@@ -5037,7 +5037,7 @@ hui:properties
 -1
 0
 Text
-td_t_dummy
+rand_id_584462
 expandy
 
 1
@@ -5059,7 +5059,7 @@ td_t_edit
 -1
 1
 ControlTable
-rand_id_975083
+rand_id_714465
 
 
 1
@@ -5070,7 +5070,7 @@ rand_id_975083
 -1
 2
 ControlTable
-rand_id_414414
+rand_id_817696
 
 
 1
@@ -5125,7 +5125,7 @@ edit_curves
 -1
 0
 ControlTable
-rand_id_998585
+rand_id_581142
 
 
 1
@@ -5181,7 +5181,7 @@ tuning_dialog
 0
 1
 ControlTable
-rand_id_46724
+rand_id_729263
 
 
 1
@@ -5203,7 +5203,7 @@ td_g_tuning
 -1
 0
 ControlTable
-tuning_dialog_buttonbar
+rand_id_914455
 buttonbar
 
 1
@@ -5240,1138 +5240,1228 @@ hui:ok
 // Language
 Deutsch
 // Number Of IDs
-377
+407
 // Text
-about
-Info
-
-ad_t_data
-Daten
-
-ad_t_edit
-Bearbeiten
-
-ad_t_format
-Format
-
-ad_t_samplerate
-Samplerate
-
-ad_t_tags
-Tags
-
-add
-
-
-add_bar
-Takt
-
-add_bar_pause
-Pause
-
-add_level
-
-
-add_midi_track
-Midi Spur hinzufügen
-
-add_tag
-
-
-add_time_track
-Rhythmus Spur hinzufügen
-
-add_track
-Leere Spur hinzufügen
-
-afd_grid_1
-
-
-all_octaves
-alle Oktaven
-
-bad_buttonbar
-
-
-bad_t_beats
-Schläge
-
-bad_t_bpm
-Bpm
-
-bad_t_count
-Anzahl
-
-bar_add_dialog
-neue Takte
-
-bar_edit_dialog
-Takte bearbeiten
-
-bar_list
-#\\Schläge\\Bpm\\Dauer
-
-bars_dialog
-Takte
-
-bars_manager
-Verwalten...
-
-bbd_g_no_time_track
-
-
-bbd_grid_0
-
-
-bbd_t_edit
-Bearbeiten
-
-bbd_t_no_time_track
-keine Rhythmus-Spur vorhanden
-
-bbd_t_no_time_track_comment
-Diese Spur ist nicht notwendig zum Editieren.\nSie macht aber das Metronom hörbar.
-
-beat_partition
-4\\1\\256
-
-beats
-1\\1\\1000\\1
-
-beats_per_bar
-4\\1\\99
-
-beats_per_minute
-90\\0\\999\\0.1
-
-bed_buttonbar
-
-
-bpm
-0\\0\\1000\\0.1
-
-cancel
+/cancel
 Abbrechen
 
-capture_delete
-Verwerfen
-
-capture_filename
-
-
-capture_find
-
-
-capture_level
-
-
-capture_pause
-
-
-capture_source
-
-
-capture_start
-
-
-capture_target
-
-
-capture_time
-0:00
-
-capture_type:audio
-Audio
-
-capture_type:midi
-Midi
-
-cc_group_edit
-Bearbeiten
-
-chord_inversion
-
-
-chord_type
-
-
-close
+/close
 Schließen
 
-color_scheme
-
-
-comment_no_fx
-- hier sind (noch) keine Effekte aktiv -
-
-compress
-Kompression
-
-controller_buttons
-
-
-copy
+/copy
 Kopieren
 
-count
-1\\1\\10000\\1
-
-create_from_selection
-
-
-create_time_track
-anlegen
-
-curve_console
-Kurven
-
-curves
-name\\min\\max\\target
-
-data_list
-key\\value
-
-db
+/db
 dB
 
-default_artist
-
-
-delete
+/delete
 Löschen
 
-delete_bar
-
-
-delete_level
-
-
-delete_marker
-Löschen
-
-delete_sample
-
-
-delete_tag
-
-
-delete_track
-Löschen
-
-detune_area
-
-
-detune_synth_dialog_buttonbar
-
-
-detune_synthesizer_dialog
-Verstimmung
-
-dummy_favorite_dialog
-Effekt
-
-edit_bars
+/edit_bars
 Takte
 
-edit_beats
-Schläge
-
-edit_bpm
-Bpm
-
-edit_curves
+/edit_curves
 Kurven
 
-edit_fx
+/edit_fx
 Fx
 
-edit_levels
+/edit_levels
 Ebenen
 
-edit_marker
-Bearbeiten
-
-edit_midi
+/edit_midi
 Midi
 
-edit_midi_fx
+/edit_midi_fx
 Midi-Fx
 
-edit_multi
-Auf alle ausgewählten Spuren anwenden
-
-edit_samples
+/edit_samples
 Samples
 
-edit_selected_bars
-
-
-edit_song
+/edit_song
 Datei
 
-edit_synth
+/edit_synth
 Synth
 
-edit_track
+/edit_track
 Spur
 
-edit_tuning
-
-
-exit
+/exit
 Beenden
 
-export_sample
-
-
-export_selection
-Auswahl Exportieren...
-
-favorite_delete
-
-
-favorite_list
-- Standard -
-
-favorite_name
-
-
-favorite_save
-
-
-fe_g_edit
-Bearbeiten
-
-fe_t_dummy
-
-
-format
-
-
-fx_editor
-Effects
-
-fx_inner_table
-
-
-help
-Hilfe
-
-import_from_file
-
-
-insert:after
-danach
-
-insert:before
-davor
-
-insert_sample
-Fest einfügen
-
-instrument
-
-
-interval
-0\\-99\\99
-
-language
-
-
-ld_t_chord
-Typ
-
-ld_t_dummy
-
-
-ld_t_edit
-Bearbeiten
-
-ld_t_interval
-Intervall
-
-ld_t_inversion
-Umkehrung
-
-ld_t_name
-Name
-
-ld_t_no_midi
-keine Midi-Spur ausgewählt
-
-ld_t_partition
-Unterteilung
-
-ld_t_repdelay
-Abstand:
-
-ld_t_repetition
-Wiederholungen
-
-ld_t_repnum
-Anzahl:
-
-ld_t_scale
-Tonleiter
-
-ld_t_space
-
-
-ld_t_track
-Spur
-
-ld_t_volume
-Lautstärke
-
-ld_tt_panning
-Balance
-
-ld_tt_volume
-Lautstärke
-
-level_add
-Hinzufügen
-
-level_delete
-Löschen
-
-level_dialog
-Ebenen
-
-level_down
-Runter
-
-level_manager
-Verwalten...
-
-level_track
-
-
-level_up
-Hoch
-
-levels
-#\\Name
-
-link_to_midi
-Midi mitbearbeiten
-
-log_clear
-Leeren
-
-log_close
-Schließen
-
-log_toolbar
-
-
-lvld_grid_1
-
-
-lvld_t_edit
-Bearbeiten
-
-marker_dialog
-Marker
-
-marker_dialog_buttonbar
-
-
-marker_menu_header
-Marker
-
-me_grid_no
-
-
-me_grid_yes
-
-
-me_group_edit
-Bearbeiten
-
-me_group_interval
-
-
-me_group_modifier
-Modifizierer
-
-me_group_reference
-Referenz-Spuren
-
-me_group_view
-Ansicht
-
-me_t_dummy
-
-
-menu
-
-
-menu_bars
-Takte
-
-menu_edit
-Bearbeiten
-
-menu_file
-Datei
-
-menu_help
-?
-
-menu_level
-Ebenen
-
-menu_level_target
-Gehe zu
-
-menu_plugins
-Plugins
-
-menu_plugins_channels
-Kanäle
-
-menu_plugins_dynamics
-Dynamik
-
-menu_plugins_echo
-Echo
-
-menu_plugins_on_all
-Auf Alles
-
-menu_plugins_on_midi
-Auf Midi
-
-menu_plugins_other
-Eigenständig
-
-menu_plugins_pitch
-Tonhöhe
-
-menu_plugins_repair
-Reparieren
-
-menu_plugins_sound
-Klang
-
-menu_plugins_synthesizer
-Synthese
-
-menu_sound
-Sound
-
-menu_sub
-Samples
-
-menu_track
-Spur
-
-menu_view
-Ansicht
-
-menu_view_channels
-Kanäle
-
-menu_view_midi
-Midi
-
-menu_view_peaks
-Peaks
-
-metronome
-einfügen
-
-mfe_g_edit
-Bearbeiten
-
-mfe_t_dummy
-
-
-mfx_t_no_midi
-keine Midi-Spur ausgewählt
-
-midi_edit_mode
-Einzelton\\Intervall\\Akkord
-
-midi_editor
-Midi
-
-midi_fx_editor
-Midi Fx
-
-midi_fx_inner_table
-
-
-modifier:flat
-♭
-
-modifier:natural
-♮
-
-modifier:none
-nichts
-
-modifier:sharp
-♯
-
-ms
+/ms
 ms
 
-mute
-Stumm
-
-name
-
-
-nd_g_frequency
-Samplerate
-
-nd_g_metronome
-Metronom
-
-nd_g_metronome_params
-
-
-nd_g_track
-erster Track
-
-nd_t_bars
-Takte
-
-nd_t_beats
-Schläge pro Takt
-
-nd_t_bpm
-Geschwindigkeit
-
-new
+/new
 Neu...
 
-new_dialog
-Neue Datei
-
-new_dialog_buttonbar
-
-
-new_track_type:audio
-Audio
-
-new_track_type:midi
-Midi
-
-num_bars
-10\\0\\999
-
-ogg_bitrate
-64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
-
-ok
+/ok
 OK
 
-open
+/open
 Öffnen...
 
-panning
-0\\-100\\100\\1
-
-paste
+/paste
 Einfügen
 
-paste_sample
-
-
-pause
+/pause
 Pause
 
-pdp_capture
-Aufnahme
-
-pdp_colorscheme
-Farbschema
-
-pdp_general
-Generell
-
-pdp_language
-Sprache
-
-pdt_capturetempfile
-Sicherungsdatei
-
-pdt_defaultartist
-Standard Artist
-
-pdt_oggrate
-OGG-Bitrate
-
-per_minute
+/per_minute
 /min
 
-per_second
+/per_second
 /s
 
-percent
+/percent
 %
 
-play
+/play
 Abspielen
 
-play_loop
-Schleife
-
-plugin_on_file
-Auf Audiopuffer
-
-popup_marker_menu
-
-
-popup_sample_menu
-
-
-popup_song_menu
-
-
-popup_track_menu
-
-
-preview
-Vorschau
-
-preview_sample
-
-
-progress_bar
-
-
-progress_cancelable_dialog
-in Arbeit
-
-progress_cancelable_grid
-
-
-progress_dialog
-in Arbeit
-
-properties_dialog_buttonbar
-
-
-rand_id_107045
-
-
-rand_id_145114
-
-
-rand_id_158315
-
-
-rand_id_158899
-
-
-rand_id_166060
-
-
-rand_id_191907
-
-
-rand_id_197728
-
-
-rand_id_211901
-
-
-rand_id_215336
-
-
-rand_id_219878
-
-
-rand_id_220104
-
-
-rand_id_230111
-
-
-rand_id_262888
-
-
-rand_id_266249
-
-
-rand_id_278944
-
-
-rand_id_285930
-
-
-rand_id_292689
-
-
-rand_id_345282
-
-
-rand_id_366554
-
-
-rand_id_38203
-
-
-rand_id_420896
-
-
-rand_id_426571
-
-
-rand_id_435441
-
-
-rand_id_437844
-
-
-rand_id_445221
-
-
-rand_id_455924
-
-
-rand_id_45840
-
-
-rand_id_472337
-
-
-rand_id_478607
-
-
-rand_id_490417
-
-
-rand_id_501065
-
-
-rand_id_507837
-
-
-rand_id_552180
-
-
-rand_id_578423
-
-
-rand_id_598645
-
-
-rand_id_60193
-
-
-rand_id_613763
-
-
-rand_id_641681
-
-
-rand_id_649124
-
-
-rand_id_66093
-
-
-rand_id_661970
-
-
-rand_id_667462
-
-
-rand_id_716190
-
-
-rand_id_718812
-
-
-rand_id_749724
-
-
-rand_id_775853
-
-
-rand_id_815818
-
-
-rand_id_847468
-
-
-rand_id_89062
-
-
-rand_id_895144
-
-
-rand_id_897573
-
-
-rand_id_907778
-
-
-rand_id_918734
-
-
-rand_id_920967
-
-
-rand_id_937051
-
-
-rand_id_946182
-
-
-rand_id_98706
-
-
-rand_id_99815
-
-
-rd_g_data
-
-
-rdt_capture
-Aufnahme
-
-rdt_source
-Quelle
-
-rdt_target
-Ziel
-
-record
+/record
 Aufnehmen
 
-record_dialog
-Aufnahme
-
-record_dialog_buttonbar
-
-
-redo
+/redo
 Wiederherstellen
 
-reference_tracks
-
-
-remove_sample
-Löschen
-
-repdelay
-0\\0\\\\0.1
-
-repnum
-1\\1
-
-run_plugin
-Script ausführen...
-
-sample_from_selection
-Aus Auswahl herauslösen
-
-sample_list
-Vorschau\\Name\\Dauer\\Benutzung\\Temporär
-
-sample_manager
-Verwalten...
-
-sample_manager_dialog
-Sample Manager
-
-sample_menu_header
-Sample
-
-sample_properties
-Eigenschaften
-
-sample_rate
-
-
-sample_ref_dialog
-Sub Track
-
-sample_selection_dialog
-Sample wählen
-
-sample_selection_list
-Vorschau\\Name\\Dauer
-
-samplerate
-
-
-samsel_buttonbar
-
-
-save
+/save
 Speichern
 
-save_as
+/save_as
 Speichern unter...
 
-scale_root
-
-
-scale_selected_bars
-
-
-scale_type
-
-
-select_all
-Alles auswählen
-
-select_nothing
-Nichts auswählen
-
-settings
+/settings
 Einstellungen
 
-settings_dialog
-Einstellungen
-
-show_fx_console
-Effekte
-
-show_log
-Meldungen
-
-show_mixing_console
-Mischpult
-
-smd_group_edit
-Bearbeiten
-
-song_dialog
-Sound-Datei
-
-song_edit_bars
-Takte bearbeiten
-
-song_edit_samples
-Samples verwalten
-
-song_menu_header
-Datei
-
-song_properties
-Eigenschaften
-
-stop
+/stop
 Stopp
 
-tags
-Tag\\Wert
-
-target
-Parameter
-
-td_g_tuning
-
-
-td_t_dummy
-
-
-td_t_edit
-Bearbeiten
-
-td_t_instrument
-Instrument
-
-td_t_name
-Name
-
-td_t_volume
-Lautstärke
-
-text
-
-
-toolbar
-
-
-track_add_marker
-Marker setzen
-
-track_dialog
-Spur
-
-track_edit_fx
-Effekte bearbeiten
-
-track_edit_midi
-Midi bearbeiten
-
-track_import
-Aus Datei importieren...
-
-track_list
-Spur
-
-track_menu_header
-Spur
-
-track_properties
-Eigenschaften
-
-trackdest_dialog
-Ziel-Spur für die Ebenen
-
-ttd_grid_0
-
-
-tuning
-
-
-tuning_dialog
-Stimmung
-
-tuning_dialog_buttonbar
-
-
-undo
+/undo
 Rückgängig
 
-view_midi_default
+bar_add_dialog/bad_t_beats
+Schläge
+
+bar_add_dialog/bad_t_bpm
+Bpm
+
+bar_add_dialog/bad_t_count
+Anzahl
+
+bar_add_dialog/bar_add_dialog
+neue Takte
+
+bar_add_dialog/beats
+1\\1\\1000\\1
+
+bar_add_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_add_dialog/count
+1\\1\\10000\\1
+
+bar_add_dialog/insert:after
+danach
+
+bar_add_dialog/insert:before
+davor
+
+bar_add_dialog/rand_id_383659
+
+
+bar_add_dialog/rand_id_474598
+
+
+bar_add_dialog/rand_id_785324
+
+
+bar_add_dialog/rand_id_945199
+
+
+bar_edit_dialog/bar_edit_dialog
+Takte bearbeiten
+
+bar_edit_dialog/beats
+1\\1\\1000\\1
+
+bar_edit_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_edit_dialog/edit_beats
+Schläge
+
+bar_edit_dialog/edit_bpm
+Bpm
+
+bar_edit_dialog/rand_id_343243
+
+
+bar_edit_dialog/rand_id_727677
+
+
+bar_edit_dialog/rand_id_824807
+
+
+bars_dialog/add_bar
+Takt
+
+bars_dialog/add_bar_pause
+Pause
+
+bars_dialog/bar_list
+#\\Schläge\\Bpm\\Dauer
+
+bars_dialog/bars_dialog
+Takte
+
+bars_dialog/bbd_g_no_time_track
+
+
+bars_dialog/bbd_grid_0
+
+
+bars_dialog/bbd_t_edit
+Bearbeiten
+
+bars_dialog/bbd_t_no_time_track
+keine Rhythmus-Spur vorhanden
+
+bars_dialog/bbd_t_no_time_track_comment
+Diese Spur ist nicht notwendig zum Editieren.\nSie macht aber das Metronom hörbar.
+
+bars_dialog/create_time_track
+anlegen
+
+bars_dialog/delete_bar
+
+
+bars_dialog/edit_selected_bars
+
+
+bars_dialog/link_to_midi
+Midi mitbearbeiten
+
+bars_dialog/rand_id_761740
+
+
+bars_dialog/rand_id_826
+
+
+bars_dialog/rand_id_892190
+
+
+bars_dialog/rand_id_972608
+
+
+bars_dialog/scale_selected_bars
+
+
+curve_console/add
+
+
+curve_console/cc_group_edit
+Bearbeiten
+
+curve_console/controller_buttons
+
+
+curve_console/curve_console
+Kurven
+
+curve_console/curves
+name\\min\\max\\target
+
+curve_console/delete
+
+
+curve_console/rand_id_352778
+
+
+curve_console/rand_id_92724
+
+
+curve_console/target
+Parameter
+
+detune_synthesizer_dialog/all_octaves
+alle Oktaven
+
+detune_synthesizer_dialog/detune_area
+
+
+detune_synthesizer_dialog/detune_synthesizer_dialog
+Verstimmung
+
+detune_synthesizer_dialog/rand_id_692575
+
+
+detune_synthesizer_dialog/rand_id_72175
+
+
+dummy_favorite_dialog/cancel
+Abbrechen
+
+dummy_favorite_dialog/delete
+Löschen
+
+dummy_favorite_dialog/dummy_favorite_dialog
+Effekt
+
+dummy_favorite_dialog/favorite_delete
+
+
+dummy_favorite_dialog/favorite_list
+- Standard -
+
+dummy_favorite_dialog/favorite_name
+
+
+dummy_favorite_dialog/favorite_save
+
+
+dummy_favorite_dialog/ok
+OK
+
+dummy_favorite_dialog/preview
+Vorschau
+
+fx_editor/add
+
+neuen Effekt hinzufügen
+fx_editor/comment_no_fx
+- hier sind (noch) keine Effekte aktiv -
+
+fx_editor/fe_g_edit
+Bearbeiten
+
+fx_editor/fx_editor
+Effects
+
+fx_editor/fx_inner_table
+
+
+fx_editor/rand_id_117546
+
+
+fx_editor/rand_id_332023
+
+
+fx_editor/rand_id_938670
+
+
+level_dialog/add_level
+
+
+level_dialog/delete_level
+
+
+level_dialog/level_dialog
+Ebenen
+
+level_dialog/levels
+#\\Name
+
+level_dialog/lvld_grid_1
+
+
+level_dialog/lvld_t_edit
+Bearbeiten
+
+level_dialog/rand_id_219717
+
+
+level_dialog/rand_id_308272
+
+
+log_toolbar/log_clear
+Leeren
+
+log_toolbar/log_close
+Schließen
+
+log_toolbar/log_toolbar
+
+
+marker_dialog/marker_dialog
+Marker
+
+marker_dialog/rand_id_254966
+
+
+marker_dialog/rand_id_300710
+
+
+marker_dialog/text
+
+
+menu/about
+Info
+
+menu/add_midi_track
+Midi Spur hinzufügen
+
+menu/add_time_track
+Rhythmus Spur hinzufügen
+
+menu/add_track
+Leere Spur hinzufügen
+
+menu/bars_manager
+Verwalten...
+
+menu/delete_track
+Löschen
+
+menu/edit_multi
+Auf alle ausgewählten Spuren anwenden
+
+menu/export_selection
+Auswahl Exportieren...
+
+menu/help
+Hilfe
+
+menu/insert_sample
+Fest einfügen
+
+menu/level_add
+Hinzufügen
+
+menu/level_delete
+Löschen
+
+menu/level_down
+Runter
+
+menu/level_manager
+Verwalten...
+
+menu/level_up
+Hoch
+
+menu/menu
+
+
+menu/menu_bars
+Takte
+
+menu/menu_edit
+Bearbeiten
+
+menu/menu_file
+Datei
+
+menu/menu_help
+?
+
+menu/menu_level
+Ebenen
+
+menu/menu_level_target
+Gehe zu
+
+menu/menu_plugins
+Plugins
+
+menu/menu_plugins_channels
+Kanäle
+
+menu/menu_plugins_dynamics
+Dynamik
+
+menu/menu_plugins_echo
+Echo
+
+menu/menu_plugins_on_all
+Auf Alles
+
+menu/menu_plugins_on_midi
+Auf Midi
+
+menu/menu_plugins_other
+Eigenständig
+
+menu/menu_plugins_pitch
+Tonhöhe
+
+menu/menu_plugins_repair
+Reparieren
+
+menu/menu_plugins_sound
+Klang
+
+menu/menu_plugins_synthesizer
+Synthese
+
+menu/menu_sound
+Sound
+
+menu/menu_sub
+Samples
+
+menu/menu_track
+Spur
+
+menu/menu_view
+Ansicht
+
+menu/menu_view_channels
+Kanäle
+
+menu/menu_view_midi
+Midi
+
+menu/menu_view_peaks
+Peaks
+
+menu/pause
+Pause
+
+menu/play
+Abspielen
+
+menu/play_loop
+Schleife
+
+menu/plugin_on_file
+Auf Audiopuffer
+
+menu/record
+Aufnehmen
+
+menu/remove_sample
+Löschen
+
+menu/run_plugin
+Script ausführen...
+
+menu/sample_from_selection
+Aus Auswahl herauslösen
+
+menu/sample_manager
+Verwalten...
+
+menu/sample_properties
+Eigenschaften
+
+menu/select_all
+Alles auswählen
+
+menu/select_nothing
+Nichts auswählen
+
+menu/show_fx_console
+Effekte
+
+menu/show_log
+Meldungen
+
+menu/show_mixing_console
+Mischpult
+
+menu/song_properties
+Eigenschaften
+
+menu/stop
+Stopp
+
+menu/track_import
+Aus Datei importieren...
+
+menu/track_properties
+Eigenschaften
+
+menu/view_midi_default
 Standard
 
-view_midi_score
+menu/view_midi_score
 Klassisch
 
-view_midi_tab
+menu/view_midi_tab
 Tabulatur
 
-view_mono
+menu/view_mono
 Mono
 
-view_optimal
+menu/view_optimal
 Optimal
 
-view_peaks_both
+menu/view_peaks_both
 Beides
 
-view_peaks_max
+menu/view_peaks_max
 Maximum
 
-view_peaks_mean
+menu/view_peaks_mean
 Quadratisches Mittel
 
-view_samples
+menu/view_samples
 Sample-Ebene
 
-view_stereo
+menu/view_stereo
 Stereo
 
-volume
-0\\-10000\\10\\0.1
-
-zoom_in
+menu/zoom_in
 Vergrößern
 
-zoom_out
+menu/zoom_out
 Verkleinern
+
+menu_fake/menu_fake
+
+
+menu_fake/play
+Abspielen
+
+menu_fake/stop
+Stopp
+
+midi_editor/beat_partition
+4\\1\\256
+
+midi_editor/chord_inversion
+
+
+midi_editor/chord_type
+
+
+midi_editor/interval
+0\\-99\\99
+
+midi_editor/ld_t_chord
+Typ
+
+midi_editor/ld_t_interval
+Intervall
+
+midi_editor/ld_t_inversion
+Umkehrung
+
+midi_editor/ld_t_no_midi
+keine Midi-Spur ausgewählt
+
+midi_editor/ld_t_partition
+Unterteilung
+
+midi_editor/ld_t_scale
+Tonleiter
+
+midi_editor/ld_t_space
+
+
+midi_editor/me_grid_no
+
+
+midi_editor/me_grid_yes
+
+
+midi_editor/me_group_edit
+Bearbeiten
+
+midi_editor/me_group_interval
+
+
+midi_editor/me_group_modifier
+Modifizierer
+
+midi_editor/me_group_reference
+Referenz-Spuren
+
+midi_editor/me_group_view
+Ansicht
+
+midi_editor/midi_edit_mode
+Einzelton\\Intervall\\Akkord
+
+midi_editor/midi_editor
+Midi
+
+midi_editor/modifier:flat
+♭
+
+midi_editor/modifier:natural
+♮
+
+midi_editor/modifier:none
+nichts
+
+midi_editor/modifier:sharp
+♯
+
+midi_editor/rand_id_387260
+
+
+midi_editor/rand_id_439935
+
+
+midi_editor/rand_id_504372
+
+
+midi_editor/rand_id_623408
+
+
+midi_editor/rand_id_637218
+
+
+midi_editor/rand_id_670224
+
+
+midi_editor/rand_id_7266
+
+
+midi_editor/rand_id_853445
+
+
+midi_editor/reference_tracks
+
+
+midi_editor/scale_root
+
+
+midi_editor/scale_type
+
+
+midi_fx_editor/add
+
+
+midi_fx_editor/comment_no_fx
+- hier sind (noch) keine Effekte aktiv -
+
+midi_fx_editor/me_grid_no
+
+
+midi_fx_editor/mfe_g_edit
+Bearbeiten
+
+midi_fx_editor/mfx_t_no_midi
+keine Midi-Spur ausgewählt
+
+midi_fx_editor/midi_fx_editor
+Midi Fx
+
+midi_fx_editor/midi_fx_inner_table
+
+
+midi_fx_editor/rand_id_132125
+
+
+midi_fx_editor/rand_id_332460
+
+
+midi_fx_editor/rand_id_408732
+
+
+new_dialog/beats_per_bar
+4\\1\\99
+
+new_dialog/beats_per_minute
+90\\0\\999\\0.1
+
+new_dialog/metronome
+einfügen
+
+new_dialog/nd_g_frequency
+Samplerate
+
+new_dialog/nd_g_metronome
+Metronom
+
+new_dialog/nd_g_metronome_params
+
+
+new_dialog/nd_g_track
+erster Track
+
+new_dialog/nd_t_bars
+Takte
+
+new_dialog/nd_t_beats
+Schläge pro Takt
+
+new_dialog/nd_t_bpm
+Geschwindigkeit
+
+new_dialog/new_dialog
+Neue Datei
+
+new_dialog/new_track_type:audio
+Audio
+
+new_dialog/new_track_type:midi
+Midi
+
+new_dialog/num_bars
+10\\0\\999
+
+new_dialog/rand_id_334401
+
+
+new_dialog/rand_id_540926
+
+
+new_dialog/rand_id_606724
+
+
+new_dialog/rand_id_716119
+
+
+new_dialog/rand_id_751976
+
+
+new_dialog/sample_rate
+
+
+popup_marker_menu/delete_marker
+Löschen
+
+popup_marker_menu/edit_marker
+Bearbeiten
+
+popup_marker_menu/marker_menu_header
+Marker
+
+popup_marker_menu/popup_marker_menu
+
+
+popup_sample_menu/insert_sample
+Fest einfügen
+
+popup_sample_menu/popup_sample_menu
+
+
+popup_sample_menu/remove_sample
+Löschen
+
+popup_sample_menu/sample_menu_header
+Sample
+
+popup_sample_menu/sample_properties
+Eigenschaften
+
+popup_song_menu/add_midi_track
+Midi Spur hinzufügen
+
+popup_song_menu/add_track
+Leere Spur hinzufügen
+
+popup_song_menu/popup_song_menu
+
+
+popup_song_menu/song_edit_bars
+Takte bearbeiten
+
+popup_song_menu/song_edit_samples
+Samples verwalten
+
+popup_song_menu/song_menu_header
+Datei
+
+popup_song_menu/song_properties
+Eigenschaften
+
+popup_track_menu/delete_track
+Löschen
+
+popup_track_menu/popup_track_menu
+
+
+popup_track_menu/song_edit_bars
+Takte bearbeiten
+
+popup_track_menu/track_add_marker
+Marker setzen
+
+popup_track_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_track_menu/track_edit_midi
+Midi bearbeiten
+
+popup_track_menu/track_menu_header
+Spur
+
+popup_track_menu/track_properties
+Eigenschaften
+
+progress_cancelable_dialog/progress_bar
+
+
+progress_cancelable_dialog/progress_cancelable_dialog
+in Arbeit
+
+progress_cancelable_dialog/progress_cancelable_grid
+
+
+progress_dialog/progress_bar
+
+
+progress_dialog/progress_dialog
+in Arbeit
+
+record_dialog/capture_delete
+Verwerfen
+
+record_dialog/capture_level
+
+
+record_dialog/capture_pause
+
+
+record_dialog/capture_source
+
+
+record_dialog/capture_start
+
+
+record_dialog/capture_target
+
+
+record_dialog/capture_time
+0:00
+
+record_dialog/capture_type:audio
+Audio
+
+record_dialog/capture_type:midi
+Midi
+
+record_dialog/rand_id_141495
+
+
+record_dialog/rand_id_448920
+
+
+record_dialog/rand_id_541753
+
+
+record_dialog/rand_id_616775
+
+
+record_dialog/rand_id_634478
+
+
+record_dialog/rand_id_688951
+
+
+record_dialog/rand_id_724585
+
+
+record_dialog/rand_id_96141
+
+
+record_dialog/rdt_capture
+Aufnahme
+
+record_dialog/rdt_source
+Quelle
+
+record_dialog/rdt_target
+Ziel
+
+record_dialog/record_dialog
+Aufnahme
+
+sample_manager_dialog/create_from_selection
+
+
+sample_manager_dialog/delete_sample
+
+
+sample_manager_dialog/export_sample
+
+
+sample_manager_dialog/import_from_file
+
+
+sample_manager_dialog/paste_sample
+
+
+sample_manager_dialog/preview_sample
+
+
+sample_manager_dialog/rand_id_20974
+
+
+sample_manager_dialog/rand_id_259042
+
+
+sample_manager_dialog/rand_id_573148
+
+
+sample_manager_dialog/sample_list
+Vorschau\\Name\\Dauer\\Benutzung\\Temporär
+
+sample_manager_dialog/sample_manager_dialog
+Sample Manager
+
+sample_manager_dialog/smd_group_edit
+Bearbeiten
+
+sample_ref_dialog/ld_t_edit
+Bearbeiten
+
+sample_ref_dialog/ld_t_name
+Name
+
+sample_ref_dialog/ld_t_repdelay
+Abstand:
+
+sample_ref_dialog/ld_t_repetition
+Wiederholungen
+
+sample_ref_dialog/ld_t_repnum
+Anzahl:
+
+sample_ref_dialog/ld_t_track
+Spur
+
+sample_ref_dialog/ld_t_volume
+Lautstärke
+
+sample_ref_dialog/level_track
+
+
+sample_ref_dialog/mute
+Stumm
+
+sample_ref_dialog/name
+
+
+sample_ref_dialog/rand_id_329247
+
+
+sample_ref_dialog/rand_id_514008
+
+
+sample_ref_dialog/rand_id_792866
+
+
+sample_ref_dialog/rand_id_93576
+
+
+sample_ref_dialog/rand_id_999471
+
+
+sample_ref_dialog/repdelay
+0\\0\\\\0.1
+
+sample_ref_dialog/repnum
+1\\1
+
+sample_ref_dialog/sample_ref_dialog
+Sub Track
+
+sample_ref_dialog/volume
+0\\-10000\\10\\0.1
+
+sample_selection_dialog/rand_id_151226
+
+
+sample_selection_dialog/rand_id_533511
+
+
+sample_selection_dialog/sample_selection_dialog
+Sample wählen
+
+sample_selection_dialog/sample_selection_list
+Vorschau\\Name\\Dauer
+
+settings_dialog/capture_filename
+
+
+settings_dialog/capture_find
+
+
+settings_dialog/color_scheme
+
+
+settings_dialog/default_artist
+
+
+settings_dialog/language
+
+
+settings_dialog/ogg_bitrate
+64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
+
+settings_dialog/pdp_capture
+Aufnahme
+
+settings_dialog/pdp_colorscheme
+Farbschema
+
+settings_dialog/pdp_general
+Generell
+
+settings_dialog/pdp_language
+Sprache
+
+settings_dialog/pdt_capturetempfile
+Sicherungsdatei
+
+settings_dialog/pdt_defaultartist
+Standard Artist
+
+settings_dialog/pdt_oggrate
+OGG-Bitrate
+
+settings_dialog/rand_id_4671
+
+
+settings_dialog/rand_id_503843
+
+
+settings_dialog/rand_id_540778
+
+
+settings_dialog/rand_id_891104
+
+
+settings_dialog/settings_dialog
+Einstellungen
+
+song_dialog/ad_t_data
+Daten
+
+song_dialog/ad_t_edit
+Bearbeiten
+
+song_dialog/ad_t_format
+Format
+
+song_dialog/ad_t_samplerate
+Samplerate
+
+song_dialog/ad_t_tags
+Tags
+
+song_dialog/add_tag
+
+
+song_dialog/compress
+Kompression
+
+song_dialog/data_list
+key\\value
+
+song_dialog/delete_tag
+
+
+song_dialog/format
+
+
+song_dialog/rand_id_223564
+
+
+song_dialog/rand_id_279627
+
+
+song_dialog/rand_id_36813
+
+
+song_dialog/rand_id_628080
+
+
+song_dialog/rand_id_672903
+
+
+song_dialog/rand_id_939684
+
+
+song_dialog/samplerate
+
+
+song_dialog/song_dialog
+Sound-Datei
+
+song_dialog/tags
+Tag\\Wert
+
+toolbar/toolbar
+
+
+track_dialog/edit_tuning
+
+
+track_dialog/g_instrument
+Instrument
+
+track_dialog/g_name
+Name
+
+track_dialog/g_volume
+Lautstärke
+
+track_dialog/instrument
+
+
+track_dialog/name
+
+
+track_dialog/panning
+0\\-100\\100\\1
+
+track_dialog/rand_id_130150
+
+
+track_dialog/rand_id_159090
+
+
+track_dialog/rand_id_22364
+
+
+track_dialog/rand_id_480611
+
+
+track_dialog/rand_id_513374
+
+
+track_dialog/rand_id_614028
+
+
+track_dialog/rand_id_710170
+
+
+track_dialog/rand_id_788789
+
+
+track_dialog/t_panning
+Balance
+
+track_dialog/t_volume
+Lautstärke
+
+track_dialog/td_t_edit
+Bearbeiten
+
+track_dialog/track_dialog
+Spur
+
+track_dialog/tuning
+
+
+track_dialog/volume
+0\\-10000\\10\\0.1
+
+trackdest_dialog/track_list
+Spur
+
+trackdest_dialog/trackdest_dialog
+Ziel-Spur für die Ebenen
+
+tuning_dialog/rand_id_656842
+
+
+tuning_dialog/rand_id_819101
+
+
+tuning_dialog/td_g_tuning
+
+
+tuning_dialog/tuning_dialog
+Stimmung
 
 // Num Language Strings
 0
@@ -6379,762 +6469,1229 @@ Verkleinern
 // Language
 English
 // Number Of IDs
-377
+407
 // Text
-about
-About
-ad_t_data
-Data
-ad_t_edit
-Edit
-ad_t_format
-Format
-ad_t_samplerate
-Samplerate
-ad_t_tags
-Tags
-add
-
-add_bar
-Bar
-add_bar_pause
-Pause
-add_level
-
-add_midi_track
-Add midi track
-add_tag
-
-add_time_track
-Add rhythm track
-add_track
-Add empty track
-afd_grid_1
-
-all_octaves
-all octaves
-bad_buttonbar
-
-bad_t_beats
-Beats
-bad_t_bpm
-Bpm
-bad_t_count
-Number
-bar_add_dialog
-new bars
-bar_edit_dialog
-edit bars
-bar_list
-#\\Beats\\Bpm\\Duration
-bars_dialog
-Bars
-bars_manager
-Manage...
-bbd_g_no_time_track
-
-bbd_grid_0
-
-bbd_t_edit
-Edit
-bbd_t_no_time_track
-no rhythm track found
-bbd_t_no_time_track_comment
-This track is not necessary for editing.\nBut it makes the metronome audible.
-beat_partition
-4\\1\\256
-beats
-1\\1\\1000\\1
-beats_per_bar
-4\\1\\99
-beats_per_minute
-90\\0\\999\\0.1
-bed_buttonbar
-
-bpm
-0\\0\\1000\\0.1
-cancel
+/cancel
 Cancel
-capture_delete
-Dump
-capture_filename
 
-capture_find
-
-capture_level
-
-capture_pause
-
-capture_source
-
-capture_start
-
-capture_target
-
-capture_time
-0:00
-capture_type:audio
-Audio
-capture_type:midi
-Midi
-cc_group_edit
-Edit
-chord_inversion
-
-chord_type
-
-close
+/close
 Close
-color_scheme
 
-comment_no_fx
-- no effects active here (yet) -
-compress
-Compression
-controller_buttons
-
-copy
+/copy
 Copy
-count
-1\\1\\10000\\1
-create_from_selection
 
-create_time_track
-create
-curve_console
-Curves
-curves
-name\\min\\max\\target
-data_list
-key\\value
-db
+/db
 dB
-default_artist
 
-delete
+/delete
 Delete
-delete_bar
 
-delete_level
-
-delete_marker
-Delete
-delete_sample
-
-delete_tag
-
-delete_track
-Delete
-detune_area
-
-detune_synth_dialog_buttonbar
-
-detune_synthesizer_dialog
-Detune
-dummy_favorite_dialog
-Effect
-edit_bars
+/edit_bars
 Bars
-edit_beats
-Beats
-edit_bpm
-Bpm
-edit_curves
+
+/edit_curves
 Curves
-edit_fx
+
+/edit_fx
 Fx
-edit_levels
+
+/edit_levels
 Levels
-edit_marker
-Edit
-edit_midi
+
+/edit_midi
 Midi
-edit_midi_fx
+
+/edit_midi_fx
 Midi-Fx
-edit_multi
-Apply to all selected tracks
-edit_samples
-Samples
-edit_selected_bars
 
-edit_song
+/edit_samples
+Samples
+
+/edit_song
 File
-edit_synth
+
+/edit_synth
 Synth
-edit_track
-Track
-edit_tuning
 
-exit
+/edit_track
+Track
+
+/exit
 Exit
-export_sample
 
-export_selection
-Export selection...
-favorite_delete
-
-favorite_list
-- Default -
-favorite_name
-
-favorite_save
-
-fe_g_edit
-Edit
-fe_t_dummy
-
-format
-
-fx_editor
-Effects
-fx_inner_table
-
-help
-Help
-import_from_file
-
-insert:after
-after
-insert:before
-before
-insert_sample
-Insert statically
-instrument
-
-interval
-0\\-99\\99
-language
-
-ld_t_chord
-Type
-ld_t_dummy
-
-ld_t_edit
-Edit
-ld_t_interval
-Interval
-ld_t_inversion
-Inversion
-ld_t_name
-Name
-ld_t_no_midi
-No midi track selected
-ld_t_partition
-Partitioning
-ld_t_repdelay
-Delay
-ld_t_repetition
-Repetitions
-ld_t_repnum
-Count
-ld_t_scale
-Scale
-ld_t_space
-
-ld_t_track
-Track
-ld_t_volume
-Volume
-ld_tt_panning
-Balance
-ld_tt_volume
-Volume
-level_add
-Add
-level_delete
-Delete
-level_dialog
-Levels
-level_down
-Down
-level_manager
-Manage...
-level_track
-
-level_up
-Up
-levels
-#\\Name
-link_to_midi
-Edit midi
-log_clear
-Clear
-log_close
-Close
-log_toolbar
-
-lvld_grid_1
-
-lvld_t_edit
-Edit
-marker_dialog
-Marker
-marker_dialog_buttonbar
-
-marker_menu_header
-Marker
-me_grid_no
-
-me_grid_yes
-
-me_group_edit
-Edit
-me_group_interval
-
-me_group_modifier
-Modifier
-me_group_reference
-Reference tracks
-me_group_view
-View
-me_t_dummy
-
-menu
-
-menu_bars
-Bars
-menu_edit
-Edit
-menu_file
-File
-menu_help
-?
-menu_level
-Levels
-menu_level_target
-Go to
-menu_plugins
-Plugins
-menu_plugins_channels
-Channels
-menu_plugins_dynamics
-Dynamics
-menu_plugins_echo
-Echo
-menu_plugins_on_all
-On all
-menu_plugins_on_midi
-On midi
-menu_plugins_other
-Independent
-menu_plugins_pitch
-Pitch
-menu_plugins_repair
-Repair
-menu_plugins_sound
-Sound
-menu_plugins_synthesizer
-Synthesizer
-menu_sound
-Sound
-menu_sub
-Samples
-menu_track
-Track
-menu_view
-View
-menu_view_channels
-Channels
-menu_view_midi
-Midi
-menu_view_peaks
-Peaks
-metronome
-add
-mfe_g_edit
-Edit
-mfe_t_dummy
-
-mfx_t_no_midi
-no midi track selected
-midi_edit_mode
-Single tone\\Interval\\Chord
-midi_editor
-Midi
-midi_fx_editor
-Midi Fx
-midi_fx_inner_table
-
-modifier:flat
-♭
-modifier:natural
-♮
-modifier:none
-none
-modifier:sharp
-♯
+/ms
 ms
-ms
-mute
-Muted
-name
 
-nd_g_frequency
-Samplerate
-nd_g_metronome
-Metronome
-nd_g_metronome_params
-
-nd_g_track
-First track
-nd_t_bars
-Bars
-nd_t_beats
-Beats per bar
-nd_t_bpm
-Speed
-new
+/new
 New...
-new_dialog
-New file
-new_dialog_buttonbar
 
-new_track_type:audio
-Audio
-new_track_type:midi
-Midi
-num_bars
-10\\0\\999
-ogg_bitrate
-64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
-ok
+/ok
 OK
-open
+
+/open
 Open...
-panning
-0\\-100\\100\\1
-paste
+
+/paste
 Paste
-paste_sample
 
-pause
+/pause
 Pause
-pdp_capture
-Recording
-pdp_colorscheme
-Color scheme
-pdp_general
-General
-pdp_language
-Language
-pdt_capturetempfile
-Backup file
-pdt_defaultartist
-Default artist
-pdt_oggrate
-OGG bitrate
-per_minute
+
+/per_minute
 /min
-per_second
+
+/per_second
 /s
-percent
+
+/percent
 %
-play
+
+/play
 Play
-play_loop
-Loop
-plugin_on_file
-On audio buffer
-popup_marker_menu
 
-popup_sample_menu
-
-popup_song_menu
-
-popup_track_menu
-
-preview
-Preview
-preview_sample
-
-progress_bar
-
-progress_cancelable_dialog
-in progress
-progress_cancelable_grid
-
-progress_dialog
-in progress
-properties_dialog_buttonbar
-
-rand_id_107045
-
-rand_id_145114
-
-rand_id_158315
-
-rand_id_158899
-
-rand_id_166060
-
-rand_id_191907
-
-rand_id_197728
-
-rand_id_211901
-
-rand_id_215336
-
-rand_id_219878
-
-rand_id_220104
-
-rand_id_230111
-
-rand_id_262888
-
-rand_id_266249
-
-rand_id_278944
-
-rand_id_285930
-
-rand_id_292689
-
-rand_id_345282
-
-rand_id_366554
-
-rand_id_38203
-
-rand_id_420896
-
-rand_id_426571
-
-rand_id_435441
-
-rand_id_437844
-
-rand_id_445221
-
-rand_id_455924
-
-rand_id_45840
-
-rand_id_472337
-
-rand_id_478607
-
-rand_id_490417
-
-rand_id_501065
-
-rand_id_507837
-
-rand_id_552180
-
-rand_id_578423
-
-rand_id_598645
-
-rand_id_60193
-
-rand_id_613763
-
-rand_id_641681
-
-rand_id_649124
-
-rand_id_66093
-
-rand_id_661970
-
-rand_id_667462
-
-rand_id_716190
-
-rand_id_718812
-
-rand_id_749724
-
-rand_id_775853
-
-rand_id_815818
-
-rand_id_847468
-
-rand_id_89062
-
-rand_id_895144
-
-rand_id_897573
-
-rand_id_907778
-
-rand_id_918734
-
-rand_id_920967
-
-rand_id_937051
-
-rand_id_946182
-
-rand_id_98706
-
-rand_id_99815
-
-rd_g_data
-
-rdt_capture
-Recording
-rdt_source
-Source
-rdt_target
-Target
-record
+/record
 Record
-record_dialog
-Record
-record_dialog_buttonbar
 
-redo
+/redo
 Redo
-reference_tracks
 
-remove_sample
-Delete
-repdelay
-0\\0\\\\0.1
-repnum
-1\\1
-run_plugin
-Execute script...
-sample_from_selection
-Cut out from selection
-sample_list
-Preview\\Name\\Duration\\Usage\\Temporary
-sample_manager
-Manage...
-sample_manager_dialog
-Sample manager
-sample_menu_header
-Samples
-sample_properties
-Properties
-sample_rate
-
-sample_ref_dialog
-Sub Track
-sample_selection_dialog
-Select sample
-sample_selection_list
-Preview\\Name\\Duration
-samplerate
-
-samsel_buttonbar
-
-save
+/save
 Save
-save_as
+
+/save_as
 Save as...
-scale_root
 
-scale_selected_bars
-
-scale_type
-
-select_all
-Select all
-select_nothing
-Clear selection
-settings
+/settings
 Settings
-settings_dialog
-Settings
-show_fx_console
-Effects
-show_log
-Messages
-show_mixing_console
-Mixing
-smd_group_edit
-Edit
-song_dialog
-Audio file
-song_edit_bars
-Edit bars
-song_edit_samples
-Manage samples
-song_menu_header
-File
-song_properties
-Properties
-stop
+
+/stop
 Stop
-tags
-Tag\\Value
-target
-Parameter
-td_g_tuning
 
-td_t_dummy
-
-td_t_edit
-Edit
-td_t_instrument
-Instrument
-td_t_name
-Name
-td_t_volume
-Volume
-text
-
-toolbar
-
-track_add_marker
-Add marker
-track_dialog
-Track
-track_edit_fx
-Edit effects
-track_edit_midi
-Edit midi
-track_import
-Import from file...
-track_list
-Track
-track_menu_header
-Track
-track_properties
-Properties
-trackdest_dialog
-Destination track
-ttd_grid_0
-
-tuning
-
-tuning_dialog
-Tuning
-tuning_dialog_buttonbar
-
-undo
+/undo
 Undo
-view_midi_default
-Default
-view_midi_score
-Score
-view_midi_tab
-Tabulature
-view_mono
-Mono
-view_optimal
-Optimal
-view_peaks_both
-Both
-view_peaks_max
-Maximum
-view_peaks_mean
-Square mean
-view_samples
+
+bar_add_dialog/bad_t_beats
+Beats
+
+bar_add_dialog/bad_t_bpm
+Bpm
+
+bar_add_dialog/bad_t_count
+Number
+
+bar_add_dialog/bar_add_dialog
+new bars
+
+bar_add_dialog/beats
+1\\1\\1000\\1
+
+bar_add_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_add_dialog/count
+1\\1\\10000\\1
+
+bar_add_dialog/insert:after
+after
+
+bar_add_dialog/insert:before
+before
+
+bar_add_dialog/rand_id_383659
+
+
+bar_add_dialog/rand_id_474598
+
+
+bar_add_dialog/rand_id_785324
+
+
+bar_add_dialog/rand_id_945199
+
+
+bar_edit_dialog/bar_edit_dialog
+edit bars
+
+bar_edit_dialog/beats
+1\\1\\1000\\1
+
+bar_edit_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_edit_dialog/edit_beats
+Beats
+
+bar_edit_dialog/edit_bpm
+Bpm
+
+bar_edit_dialog/rand_id_343243
+
+
+bar_edit_dialog/rand_id_727677
+
+
+bar_edit_dialog/rand_id_824807
+
+
+bars_dialog/add_bar
+Bar
+
+bars_dialog/add_bar_pause
+Pause
+
+bars_dialog/bar_list
+#\\Beats\\Bpm\\Duration
+
+bars_dialog/bars_dialog
+Bars
+
+bars_dialog/bbd_g_no_time_track
+
+
+bars_dialog/bbd_grid_0
+
+
+bars_dialog/bbd_t_edit
+Edit
+
+bars_dialog/bbd_t_no_time_track
+no rhythm track found
+
+bars_dialog/bbd_t_no_time_track_comment
+This track is not necessary for editing.\nBut it makes the metronome audible.
+
+bars_dialog/create_time_track
+create
+
+bars_dialog/delete_bar
+
+
+bars_dialog/edit_selected_bars
+
+
+bars_dialog/link_to_midi
+Edit midi
+
+bars_dialog/rand_id_761740
+
+
+bars_dialog/rand_id_826
+
+
+bars_dialog/rand_id_892190
+
+
+bars_dialog/rand_id_972608
+
+
+bars_dialog/scale_selected_bars
+
+
+curve_console/add
+
+
+curve_console/cc_group_edit
+Edit
+
+curve_console/controller_buttons
+
+
+curve_console/curve_console
+Curves
+
+curve_console/curves
+name\\min\\max\\target
+
+curve_console/delete
+
+
+curve_console/rand_id_352778
+
+
+curve_console/rand_id_92724
+
+
+curve_console/target
+Parameter
+
+detune_synthesizer_dialog/all_octaves
+all octaves
+
+detune_synthesizer_dialog/detune_area
+
+
+detune_synthesizer_dialog/detune_synthesizer_dialog
+Detune
+
+detune_synthesizer_dialog/rand_id_692575
+
+
+detune_synthesizer_dialog/rand_id_72175
+
+
+dummy_favorite_dialog/cancel
+Cancel
+
+dummy_favorite_dialog/delete
+Delete
+
+dummy_favorite_dialog/dummy_favorite_dialog
+Effect
+
+dummy_favorite_dialog/favorite_delete
+
+
+dummy_favorite_dialog/favorite_list
+- Default -
+
+dummy_favorite_dialog/favorite_name
+
+
+dummy_favorite_dialog/favorite_save
+
+
+dummy_favorite_dialog/ok
+OK
+
+dummy_favorite_dialog/preview
+Preview
+
+fx_editor/add
+
+add new effect
+fx_editor/comment_no_fx
+- no effects active here (yet) -
+
+fx_editor/fe_g_edit
+Edit
+
+fx_editor/fx_editor
+Effects
+
+fx_editor/fx_inner_table
+
+
+fx_editor/rand_id_117546
+
+
+fx_editor/rand_id_332023
+
+
+fx_editor/rand_id_938670
+
+
+level_dialog/add_level
+
+
+level_dialog/delete_level
+
+
+level_dialog/level_dialog
+Levels
+
+level_dialog/levels
+#\\Name
+
+level_dialog/lvld_grid_1
+
+
+level_dialog/lvld_t_edit
+Edit
+
+level_dialog/rand_id_219717
+
+
+level_dialog/rand_id_308272
+
+
+log_toolbar/log_clear
+Clear
+
+log_toolbar/log_close
+Close
+
+log_toolbar/log_toolbar
+
+
+marker_dialog/marker_dialog
+Marker
+
+marker_dialog/rand_id_254966
+
+
+marker_dialog/rand_id_300710
+
+
+marker_dialog/text
+
+
+menu/about
+About
+
+menu/add_midi_track
+Add midi track
+
+menu/add_time_track
+Add rhythm track
+
+menu/add_track
+Add empty track
+
+menu/bars_manager
+Manage...
+
+menu/delete_track
+Delete
+
+menu/edit_multi
+Apply to all selected tracks
+
+menu/export_selection
+Export selection...
+
+menu/help
+Help
+
+menu/insert_sample
+Insert statically
+
+menu/level_add
+Add
+
+menu/level_delete
+Delete
+
+menu/level_down
+Down
+
+menu/level_manager
+Manage...
+
+menu/level_up
+Up
+
+menu/menu
+
+
+menu/menu_bars
+Bars
+
+menu/menu_edit
+Edit
+
+menu/menu_file
+File
+
+menu/menu_help
+?
+
+menu/menu_level
+Levels
+
+menu/menu_level_target
+Go to
+
+menu/menu_plugins
+Plugins
+
+menu/menu_plugins_channels
+Channels
+
+menu/menu_plugins_dynamics
+Dynamics
+
+menu/menu_plugins_echo
+Echo
+
+menu/menu_plugins_on_all
+On all
+
+menu/menu_plugins_on_midi
+On midi
+
+menu/menu_plugins_other
+Independent
+
+menu/menu_plugins_pitch
+Pitch
+
+menu/menu_plugins_repair
+Repair
+
+menu/menu_plugins_sound
+Sound
+
+menu/menu_plugins_synthesizer
+Synthesizer
+
+menu/menu_sound
+Sound
+
+menu/menu_sub
 Samples
-view_stereo
+
+menu/menu_track
+Track
+
+menu/menu_view
+View
+
+menu/menu_view_channels
+Channels
+
+menu/menu_view_midi
+Midi
+
+menu/menu_view_peaks
+Peaks
+
+menu/pause
+Pause
+
+menu/play
+Play
+
+menu/play_loop
+Loop
+
+menu/plugin_on_file
+On audio buffer
+
+menu/record
+Record
+
+menu/remove_sample
+Delete
+
+menu/run_plugin
+Execute script...
+
+menu/sample_from_selection
+Cut out from selection
+
+menu/sample_manager
+Manage...
+
+menu/sample_properties
+Properties
+
+menu/select_all
+Select all
+
+menu/select_nothing
+Clear selection
+
+menu/show_fx_console
+Effects
+
+menu/show_log
+Messages
+
+menu/show_mixing_console
+Mixing
+
+menu/song_properties
+Properties
+
+menu/stop
+Stop
+
+menu/track_import
+Import from file...
+
+menu/track_properties
+Properties
+
+menu/view_midi_default
+Default
+
+menu/view_midi_score
+Score
+
+menu/view_midi_tab
+Tabulature
+
+menu/view_mono
+Mono
+
+menu/view_optimal
+Optimal
+
+menu/view_peaks_both
+Both
+
+menu/view_peaks_max
+Maximum
+
+menu/view_peaks_mean
+Square mean
+
+menu/view_samples
+Samples
+
+menu/view_stereo
 Stereo
-volume
-0\\-10000\\10\\0.1
-zoom_in
+
+menu/zoom_in
 Zoon in
-zoom_out
+
+menu/zoom_out
 Zoom out
+
+menu_fake/menu_fake
+
+
+menu_fake/play
+Play
+
+menu_fake/stop
+Stop
+
+midi_editor/beat_partition
+4\\1\\256
+
+midi_editor/chord_inversion
+
+
+midi_editor/chord_type
+
+
+midi_editor/interval
+0\\-99\\99
+
+midi_editor/ld_t_chord
+Type
+
+midi_editor/ld_t_interval
+Interval
+
+midi_editor/ld_t_inversion
+Inversion
+
+midi_editor/ld_t_no_midi
+No midi track selected
+
+midi_editor/ld_t_partition
+Partitioning
+
+midi_editor/ld_t_scale
+Scale
+
+midi_editor/ld_t_space
+
+
+midi_editor/me_grid_no
+
+
+midi_editor/me_grid_yes
+
+
+midi_editor/me_group_edit
+Edit
+
+midi_editor/me_group_interval
+
+
+midi_editor/me_group_modifier
+Modifier
+
+midi_editor/me_group_reference
+Reference tracks
+
+midi_editor/me_group_view
+View
+
+midi_editor/midi_edit_mode
+Single tone\\Interval\\Chord
+
+midi_editor/midi_editor
+Midi
+
+midi_editor/modifier:flat
+♭
+
+midi_editor/modifier:natural
+♮
+
+midi_editor/modifier:none
+none
+
+midi_editor/modifier:sharp
+♯
+
+midi_editor/rand_id_387260
+
+
+midi_editor/rand_id_439935
+
+
+midi_editor/rand_id_504372
+
+
+midi_editor/rand_id_623408
+
+
+midi_editor/rand_id_637218
+
+
+midi_editor/rand_id_670224
+
+
+midi_editor/rand_id_7266
+
+
+midi_editor/rand_id_853445
+
+
+midi_editor/reference_tracks
+
+
+midi_editor/scale_root
+
+
+midi_editor/scale_type
+
+
+midi_fx_editor/add
+
+
+midi_fx_editor/comment_no_fx
+- no effects active here (yet) -
+
+midi_fx_editor/me_grid_no
+
+
+midi_fx_editor/mfe_g_edit
+Edit
+
+midi_fx_editor/mfx_t_no_midi
+no midi track selected
+
+midi_fx_editor/midi_fx_editor
+Midi Fx
+
+midi_fx_editor/midi_fx_inner_table
+
+
+midi_fx_editor/rand_id_132125
+
+
+midi_fx_editor/rand_id_332460
+
+
+midi_fx_editor/rand_id_408732
+
+
+new_dialog/beats_per_bar
+4\\1\\99
+
+new_dialog/beats_per_minute
+90\\0\\999\\0.1
+
+new_dialog/metronome
+add
+
+new_dialog/nd_g_frequency
+Samplerate
+
+new_dialog/nd_g_metronome
+Metronome
+
+new_dialog/nd_g_metronome_params
+
+
+new_dialog/nd_g_track
+First track
+
+new_dialog/nd_t_bars
+Bars
+
+new_dialog/nd_t_beats
+Beats per bar
+
+new_dialog/nd_t_bpm
+Speed
+
+new_dialog/new_dialog
+New file
+
+new_dialog/new_track_type:audio
+Audio
+
+new_dialog/new_track_type:midi
+Midi
+
+new_dialog/num_bars
+10\\0\\999
+
+new_dialog/rand_id_334401
+
+
+new_dialog/rand_id_540926
+
+
+new_dialog/rand_id_606724
+
+
+new_dialog/rand_id_716119
+
+
+new_dialog/rand_id_751976
+
+
+new_dialog/sample_rate
+
+
+popup_marker_menu/delete_marker
+Delete
+
+popup_marker_menu/edit_marker
+Edit
+
+popup_marker_menu/marker_menu_header
+Marker
+
+popup_marker_menu/popup_marker_menu
+
+
+popup_sample_menu/insert_sample
+Insert statically
+
+popup_sample_menu/popup_sample_menu
+
+
+popup_sample_menu/remove_sample
+Delete
+
+popup_sample_menu/sample_menu_header
+Samples
+
+popup_sample_menu/sample_properties
+Properties
+
+popup_song_menu/add_midi_track
+Add midi track
+
+popup_song_menu/add_track
+Add empty track
+
+popup_song_menu/popup_song_menu
+
+
+popup_song_menu/song_edit_bars
+Edit bars
+
+popup_song_menu/song_edit_samples
+Manage samples
+
+popup_song_menu/song_menu_header
+File
+
+popup_song_menu/song_properties
+Properties
+
+popup_track_menu/delete_track
+Delete
+
+popup_track_menu/popup_track_menu
+
+
+popup_track_menu/song_edit_bars
+Edit bars
+
+popup_track_menu/track_add_marker
+Add marker
+
+popup_track_menu/track_edit_fx
+Edit effects
+
+popup_track_menu/track_edit_midi
+Edit midi
+
+popup_track_menu/track_menu_header
+Track
+
+popup_track_menu/track_properties
+Properties
+
+progress_cancelable_dialog/progress_bar
+
+
+progress_cancelable_dialog/progress_cancelable_dialog
+in progress
+
+progress_cancelable_dialog/progress_cancelable_grid
+
+
+progress_dialog/progress_bar
+
+
+progress_dialog/progress_dialog
+in progress
+
+record_dialog/capture_delete
+Dump
+
+record_dialog/capture_level
+
+
+record_dialog/capture_pause
+
+
+record_dialog/capture_source
+
+
+record_dialog/capture_start
+
+
+record_dialog/capture_target
+
+
+record_dialog/capture_time
+0:00
+
+record_dialog/capture_type:audio
+Audio
+
+record_dialog/capture_type:midi
+Midi
+
+record_dialog/rand_id_141495
+
+
+record_dialog/rand_id_448920
+
+
+record_dialog/rand_id_541753
+
+
+record_dialog/rand_id_616775
+
+
+record_dialog/rand_id_634478
+
+
+record_dialog/rand_id_688951
+
+
+record_dialog/rand_id_724585
+
+
+record_dialog/rand_id_96141
+
+
+record_dialog/rdt_capture
+Recording
+
+record_dialog/rdt_source
+Source
+
+record_dialog/rdt_target
+Target
+
+record_dialog/record_dialog
+Record
+
+sample_manager_dialog/create_from_selection
+
+
+sample_manager_dialog/delete_sample
+
+
+sample_manager_dialog/export_sample
+
+
+sample_manager_dialog/import_from_file
+
+
+sample_manager_dialog/paste_sample
+
+
+sample_manager_dialog/preview_sample
+
+
+sample_manager_dialog/rand_id_20974
+
+
+sample_manager_dialog/rand_id_259042
+
+
+sample_manager_dialog/rand_id_573148
+
+
+sample_manager_dialog/sample_list
+Preview\\Name\\Duration\\Usage\\Temporary
+
+sample_manager_dialog/sample_manager_dialog
+Sample manager
+
+sample_manager_dialog/smd_group_edit
+Edit
+
+sample_ref_dialog/ld_t_edit
+Edit
+
+sample_ref_dialog/ld_t_name
+Name
+
+sample_ref_dialog/ld_t_repdelay
+Delay
+
+sample_ref_dialog/ld_t_repetition
+Repetitions
+
+sample_ref_dialog/ld_t_repnum
+Count
+
+sample_ref_dialog/ld_t_track
+Track
+
+sample_ref_dialog/ld_t_volume
+Volume
+
+sample_ref_dialog/level_track
+
+
+sample_ref_dialog/mute
+Muted
+
+sample_ref_dialog/name
+
+
+sample_ref_dialog/rand_id_329247
+
+
+sample_ref_dialog/rand_id_514008
+
+
+sample_ref_dialog/rand_id_792866
+
+
+sample_ref_dialog/rand_id_93576
+
+
+sample_ref_dialog/rand_id_999471
+
+
+sample_ref_dialog/repdelay
+0\\0\\\\0.1
+
+sample_ref_dialog/repnum
+1\\1
+
+sample_ref_dialog/sample_ref_dialog
+Sub Track
+
+sample_ref_dialog/volume
+0\\-10000\\10\\0.1
+
+sample_selection_dialog/rand_id_151226
+
+
+sample_selection_dialog/rand_id_533511
+
+
+sample_selection_dialog/sample_selection_dialog
+Select sample
+
+sample_selection_dialog/sample_selection_list
+Preview\\Name\\Duration
+
+settings_dialog/capture_filename
+
+
+settings_dialog/capture_find
+
+
+settings_dialog/color_scheme
+
+
+settings_dialog/default_artist
+
+
+settings_dialog/language
+
+
+settings_dialog/ogg_bitrate
+64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
+
+settings_dialog/pdp_capture
+Recording
+
+settings_dialog/pdp_colorscheme
+Color scheme
+
+settings_dialog/pdp_general
+General
+
+settings_dialog/pdp_language
+Language
+
+settings_dialog/pdt_capturetempfile
+Backup file
+
+settings_dialog/pdt_defaultartist
+Default artist
+
+settings_dialog/pdt_oggrate
+OGG bitrate
+
+settings_dialog/rand_id_4671
+
+
+settings_dialog/rand_id_503843
+
+
+settings_dialog/rand_id_540778
+
+
+settings_dialog/rand_id_891104
+
+
+settings_dialog/settings_dialog
+Settings
+
+song_dialog/ad_t_data
+Data
+
+song_dialog/ad_t_edit
+Edit
+
+song_dialog/ad_t_format
+Format
+
+song_dialog/ad_t_samplerate
+Samplerate
+
+song_dialog/ad_t_tags
+Tags
+
+song_dialog/add_tag
+
+
+song_dialog/compress
+Compression
+
+song_dialog/data_list
+key\\value
+
+song_dialog/delete_tag
+
+
+song_dialog/format
+
+
+song_dialog/rand_id_223564
+
+
+song_dialog/rand_id_279627
+
+
+song_dialog/rand_id_36813
+
+
+song_dialog/rand_id_628080
+
+
+song_dialog/rand_id_672903
+
+
+song_dialog/rand_id_939684
+
+
+song_dialog/samplerate
+
+
+song_dialog/song_dialog
+Audio file
+
+song_dialog/tags
+Tag\\Value
+
+toolbar/toolbar
+
+
+track_dialog/edit_tuning
+
+
+track_dialog/g_instrument
+Instrument
+
+track_dialog/g_name
+Name
+
+track_dialog/g_volume
+Volume
+
+track_dialog/instrument
+
+
+track_dialog/name
+
+
+track_dialog/panning
+0\\-100\\100\\1
+
+track_dialog/rand_id_130150
+
+
+track_dialog/rand_id_159090
+
+
+track_dialog/rand_id_22364
+
+
+track_dialog/rand_id_480611
+
+
+track_dialog/rand_id_513374
+
+
+track_dialog/rand_id_614028
+
+
+track_dialog/rand_id_710170
+
+
+track_dialog/rand_id_788789
+
+
+track_dialog/t_panning
+Balance
+
+track_dialog/t_volume
+Volume
+
+track_dialog/td_t_edit
+Edit
+
+track_dialog/track_dialog
+Track
+
+track_dialog/tuning
+
+
+track_dialog/volume
+0\\-10000\\10\\0.1
+
+trackdest_dialog/track_list
+Track
+
+trackdest_dialog/trackdest_dialog
+Destination track
+
+tuning_dialog/rand_id_656842
+
+
+tuning_dialog/rand_id_819101
+
+
+tuning_dialog/td_g_tuning
+
+
+tuning_dialog/tuning_dialog
+Tuning
+
 // Num Language Strings
 182
 // Text
@@ -7505,762 +8062,1229 @@ Augmented
 // Language
 Deutsch
 // Number Of IDs
-377
+407
 // Text
-about
-Info
-ad_t_data
-Daten
-ad_t_edit
-Bearbeiten
-ad_t_format
-Format
-ad_t_samplerate
-Samplerate
-ad_t_tags
-Tags
-add
-
-add_bar
-Takt
-add_bar_pause
-Pause
-add_level
-
-add_midi_track
-Midi Spur hinzufügen
-add_tag
-
-add_time_track
-Rhythmus Spur hinzufügen
-add_track
-Leere Spur hinzufügen
-afd_grid_1
-
-all_octaves
-alle Oktaven
-bad_buttonbar
-
-bad_t_beats
-Schläge
-bad_t_bpm
-Bpm
-bad_t_count
-Anzahl
-bar_add_dialog
-neue Takte
-bar_edit_dialog
-Takte bearbeiten
-bar_list
-#\\Schläge\\Bpm\\Dauer
-bars_dialog
-Takte
-bars_manager
-Verwalten...
-bbd_g_no_time_track
-
-bbd_grid_0
-
-bbd_t_edit
-Bearbeiten
-bbd_t_no_time_track
-keine Rhythmus-Spur vorhanden
-bbd_t_no_time_track_comment
-Diese Spur ist nicht notwendig zum Editieren.\nSie macht aber das Metronom hörbar.
-beat_partition
-4\\1\\256
-beats
-1\\1\\1000\\1
-beats_per_bar
-4\\1\\99
-beats_per_minute
-90\\0\\999\\0.1
-bed_buttonbar
-
-bpm
-0\\0\\1000\\0.1
-cancel
+/cancel
 Abbrechen
-capture_delete
-Verwerfen
-capture_filename
 
-capture_find
-
-capture_level
-
-capture_pause
-
-capture_source
-
-capture_start
-
-capture_target
-
-capture_time
-0:00
-capture_type:audio
-Audio
-capture_type:midi
-Midi
-cc_group_edit
-Bearbeiten
-chord_inversion
-
-chord_type
-
-close
+/close
 Schließen
-color_scheme
 
-comment_no_fx
-- hier sind (noch) keine Effekte aktiv -
-compress
-Kompression
-controller_buttons
-
-copy
+/copy
 Kopieren
-count
-1\\1\\10000\\1
-create_from_selection
 
-create_time_track
-anlegen
-curve_console
-Kurven
-curves
-name\\min\\max\\target
-data_list
-key\\value
-db
+/db
 dB
-default_artist
 
-delete
+/delete
 Löschen
-delete_bar
 
-delete_level
-
-delete_marker
-Löschen
-delete_sample
-
-delete_tag
-
-delete_track
-Löschen
-detune_area
-
-detune_synth_dialog_buttonbar
-
-detune_synthesizer_dialog
-Verstimmung
-dummy_favorite_dialog
-Effekt
-edit_bars
+/edit_bars
 Takte
-edit_beats
-Schläge
-edit_bpm
-Bpm
-edit_curves
+
+/edit_curves
 Kurven
-edit_fx
+
+/edit_fx
 Fx
-edit_levels
+
+/edit_levels
 Ebenen
-edit_marker
-Bearbeiten
-edit_midi
+
+/edit_midi
 Midi
-edit_midi_fx
+
+/edit_midi_fx
 Midi-Fx
-edit_multi
-Auf alle ausgewählten Spuren anwenden
-edit_samples
-Samples
-edit_selected_bars
 
-edit_song
+/edit_samples
+Samples
+
+/edit_song
 Datei
-edit_synth
+
+/edit_synth
 Synth
-edit_track
-Spur
-edit_tuning
 
-exit
+/edit_track
+Spur
+
+/exit
 Beenden
-export_sample
 
-export_selection
-Auswahl Exportieren...
-favorite_delete
-
-favorite_list
-- Standard -
-favorite_name
-
-favorite_save
-
-fe_g_edit
-Bearbeiten
-fe_t_dummy
-
-format
-
-fx_editor
-Effects
-fx_inner_table
-
-help
-Hilfe
-import_from_file
-
-insert:after
-danach
-insert:before
-davor
-insert_sample
-Fest einfügen
-instrument
-
-interval
-0\\-99\\99
-language
-
-ld_t_chord
-Typ
-ld_t_dummy
-
-ld_t_edit
-Bearbeiten
-ld_t_interval
-Intervall
-ld_t_inversion
-Umkehrung
-ld_t_name
-Name
-ld_t_no_midi
-keine Midi-Spur ausgewählt
-ld_t_partition
-Unterteilung
-ld_t_repdelay
-Abstand:
-ld_t_repetition
-Wiederholungen
-ld_t_repnum
-Anzahl:
-ld_t_scale
-Tonleiter
-ld_t_space
-
-ld_t_track
-Spur
-ld_t_volume
-Lautstärke
-ld_tt_panning
-Balance
-ld_tt_volume
-Lautstärke
-level_add
-Hinzufügen
-level_delete
-Löschen
-level_dialog
-Ebenen
-level_down
-Runter
-level_manager
-Verwalten...
-level_track
-
-level_up
-Hoch
-levels
-#\\Name
-link_to_midi
-Midi mitbearbeiten
-log_clear
-Leeren
-log_close
-Schließen
-log_toolbar
-
-lvld_grid_1
-
-lvld_t_edit
-Bearbeiten
-marker_dialog
-Marker
-marker_dialog_buttonbar
-
-marker_menu_header
-Marker
-me_grid_no
-
-me_grid_yes
-
-me_group_edit
-Bearbeiten
-me_group_interval
-
-me_group_modifier
-Modifizierer
-me_group_reference
-Referenz-Spuren
-me_group_view
-Ansicht
-me_t_dummy
-
-menu
-
-menu_bars
-Takte
-menu_edit
-Bearbeiten
-menu_file
-Datei
-menu_help
-?
-menu_level
-Ebenen
-menu_level_target
-Gehe zu
-menu_plugins
-Plugins
-menu_plugins_channels
-Kanäle
-menu_plugins_dynamics
-Dynamik
-menu_plugins_echo
-Echo
-menu_plugins_on_all
-Auf Alles
-menu_plugins_on_midi
-Auf Midi
-menu_plugins_other
-Eigenständig
-menu_plugins_pitch
-Tonhöhe
-menu_plugins_repair
-Reparieren
-menu_plugins_sound
-Klang
-menu_plugins_synthesizer
-Synthese
-menu_sound
-Sound
-menu_sub
-Samples
-menu_track
-Spur
-menu_view
-Ansicht
-menu_view_channels
-Kanäle
-menu_view_midi
-Midi
-menu_view_peaks
-Peaks
-metronome
-einfügen
-mfe_g_edit
-Bearbeiten
-mfe_t_dummy
-
-mfx_t_no_midi
-keine Midi-Spur ausgewählt
-midi_edit_mode
-Einzelton\\Intervall\\Akkord
-midi_editor
-Midi
-midi_fx_editor
-Midi Fx
-midi_fx_inner_table
-
-modifier:flat
-♭
-modifier:natural
-♮
-modifier:none
-nichts
-modifier:sharp
-♯
+/ms
 ms
-ms
-mute
-Stumm
-name
 
-nd_g_frequency
-Samplerate
-nd_g_metronome
-Metronom
-nd_g_metronome_params
-
-nd_g_track
-erster Track
-nd_t_bars
-Takte
-nd_t_beats
-Schläge pro Takt
-nd_t_bpm
-Geschwindigkeit
-new
+/new
 Neu...
-new_dialog
-Neue Datei
-new_dialog_buttonbar
 
-new_track_type:audio
-Audio
-new_track_type:midi
-Midi
-num_bars
-10\\0\\999
-ogg_bitrate
-64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
-ok
+/ok
 OK
-open
+
+/open
 Öffnen...
-panning
-0\\-100\\100\\1
-paste
+
+/paste
 Einfügen
-paste_sample
 
-pause
+/pause
 Pause
-pdp_capture
-Aufnahme
-pdp_colorscheme
-Farbschema
-pdp_general
-Generell
-pdp_language
-Sprache
-pdt_capturetempfile
-Sicherungsdatei
-pdt_defaultartist
-Standard Artist
-pdt_oggrate
-OGG-Bitrate
-per_minute
+
+/per_minute
 /min
-per_second
+
+/per_second
 /s
-percent
+
+/percent
 %
-play
+
+/play
 Abspielen
-play_loop
-Schleife
-plugin_on_file
-Auf Audiopuffer
-popup_marker_menu
 
-popup_sample_menu
-
-popup_song_menu
-
-popup_track_menu
-
-preview
-Vorschau
-preview_sample
-
-progress_bar
-
-progress_cancelable_dialog
-in Arbeit
-progress_cancelable_grid
-
-progress_dialog
-in Arbeit
-properties_dialog_buttonbar
-
-rand_id_107045
-
-rand_id_145114
-
-rand_id_158315
-
-rand_id_158899
-
-rand_id_166060
-
-rand_id_191907
-
-rand_id_197728
-
-rand_id_211901
-
-rand_id_215336
-
-rand_id_219878
-
-rand_id_220104
-
-rand_id_230111
-
-rand_id_262888
-
-rand_id_266249
-
-rand_id_278944
-
-rand_id_285930
-
-rand_id_292689
-
-rand_id_345282
-
-rand_id_366554
-
-rand_id_38203
-
-rand_id_420896
-
-rand_id_426571
-
-rand_id_435441
-
-rand_id_437844
-
-rand_id_445221
-
-rand_id_455924
-
-rand_id_45840
-
-rand_id_472337
-
-rand_id_478607
-
-rand_id_490417
-
-rand_id_501065
-
-rand_id_507837
-
-rand_id_552180
-
-rand_id_578423
-
-rand_id_598645
-
-rand_id_60193
-
-rand_id_613763
-
-rand_id_641681
-
-rand_id_649124
-
-rand_id_66093
-
-rand_id_661970
-
-rand_id_667462
-
-rand_id_716190
-
-rand_id_718812
-
-rand_id_749724
-
-rand_id_775853
-
-rand_id_815818
-
-rand_id_847468
-
-rand_id_89062
-
-rand_id_895144
-
-rand_id_897573
-
-rand_id_907778
-
-rand_id_918734
-
-rand_id_920967
-
-rand_id_937051
-
-rand_id_946182
-
-rand_id_98706
-
-rand_id_99815
-
-rd_g_data
-
-rdt_capture
-Aufnahme
-rdt_source
-Quelle
-rdt_target
-Ziel
-record
+/record
 Aufnehmen
-record_dialog
-Aufnahme
-record_dialog_buttonbar
 
-redo
+/redo
 Wiederherstellen
-reference_tracks
 
-remove_sample
-Löschen
-repdelay
-0\\0\\\\0.1
-repnum
-1\\1
-run_plugin
-Script ausführen...
-sample_from_selection
-Aus Auswahl herauslösen
-sample_list
-Vorschau\\Name\\Dauer\\Benutzung\\Temporär
-sample_manager
-Verwalten...
-sample_manager_dialog
-Sample Manager
-sample_menu_header
-Sample
-sample_properties
-Eigenschaften
-sample_rate
-
-sample_ref_dialog
-Sub Track
-sample_selection_dialog
-Sample wählen
-sample_selection_list
-Vorschau\\Name\\Dauer
-samplerate
-
-samsel_buttonbar
-
-save
+/save
 Speichern
-save_as
+
+/save_as
 Speichern unter...
-scale_root
 
-scale_selected_bars
-
-scale_type
-
-select_all
-Alles auswählen
-select_nothing
-Nichts auswählen
-settings
+/settings
 Einstellungen
-settings_dialog
-Einstellungen
-show_fx_console
-Effekte
-show_log
-Meldungen
-show_mixing_console
-Mischpult
-smd_group_edit
-Bearbeiten
-song_dialog
-Sound-Datei
-song_edit_bars
-Takte bearbeiten
-song_edit_samples
-Samples verwalten
-song_menu_header
-Datei
-song_properties
-Eigenschaften
-stop
+
+/stop
 Stopp
-tags
-Tag\\Wert
-target
-Parameter
-td_g_tuning
 
-td_t_dummy
-
-td_t_edit
-Bearbeiten
-td_t_instrument
-Instrument
-td_t_name
-Name
-td_t_volume
-Lautstärke
-text
-
-toolbar
-
-track_add_marker
-Marker setzen
-track_dialog
-Spur
-track_edit_fx
-Effekte bearbeiten
-track_edit_midi
-Midi bearbeiten
-track_import
-Aus Datei importieren...
-track_list
-Spur
-track_menu_header
-Spur
-track_properties
-Eigenschaften
-trackdest_dialog
-Ziel-Spur für die Ebenen
-ttd_grid_0
-
-tuning
-
-tuning_dialog
-Stimmung
-tuning_dialog_buttonbar
-
-undo
+/undo
 Rückgängig
-view_midi_default
+
+bar_add_dialog/bad_t_beats
+Schläge
+
+bar_add_dialog/bad_t_bpm
+Bpm
+
+bar_add_dialog/bad_t_count
+Anzahl
+
+bar_add_dialog/bar_add_dialog
+neue Takte
+
+bar_add_dialog/beats
+1\\1\\1000\\1
+
+bar_add_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_add_dialog/count
+1\\1\\10000\\1
+
+bar_add_dialog/insert:after
+danach
+
+bar_add_dialog/insert:before
+davor
+
+bar_add_dialog/rand_id_383659
+
+
+bar_add_dialog/rand_id_474598
+
+
+bar_add_dialog/rand_id_785324
+
+
+bar_add_dialog/rand_id_945199
+
+
+bar_edit_dialog/bar_edit_dialog
+Takte bearbeiten
+
+bar_edit_dialog/beats
+1\\1\\1000\\1
+
+bar_edit_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_edit_dialog/edit_beats
+Schläge
+
+bar_edit_dialog/edit_bpm
+Bpm
+
+bar_edit_dialog/rand_id_343243
+
+
+bar_edit_dialog/rand_id_727677
+
+
+bar_edit_dialog/rand_id_824807
+
+
+bars_dialog/add_bar
+Takt
+
+bars_dialog/add_bar_pause
+Pause
+
+bars_dialog/bar_list
+#\\Schläge\\Bpm\\Dauer
+
+bars_dialog/bars_dialog
+Takte
+
+bars_dialog/bbd_g_no_time_track
+
+
+bars_dialog/bbd_grid_0
+
+
+bars_dialog/bbd_t_edit
+Bearbeiten
+
+bars_dialog/bbd_t_no_time_track
+keine Rhythmus-Spur vorhanden
+
+bars_dialog/bbd_t_no_time_track_comment
+Diese Spur ist nicht notwendig zum Editieren.\nSie macht aber das Metronom hörbar.
+
+bars_dialog/create_time_track
+anlegen
+
+bars_dialog/delete_bar
+
+
+bars_dialog/edit_selected_bars
+
+
+bars_dialog/link_to_midi
+Midi mitbearbeiten
+
+bars_dialog/rand_id_761740
+
+
+bars_dialog/rand_id_826
+
+
+bars_dialog/rand_id_892190
+
+
+bars_dialog/rand_id_972608
+
+
+bars_dialog/scale_selected_bars
+
+
+curve_console/add
+
+
+curve_console/cc_group_edit
+Bearbeiten
+
+curve_console/controller_buttons
+
+
+curve_console/curve_console
+Kurven
+
+curve_console/curves
+name\\min\\max\\target
+
+curve_console/delete
+
+
+curve_console/rand_id_352778
+
+
+curve_console/rand_id_92724
+
+
+curve_console/target
+Parameter
+
+detune_synthesizer_dialog/all_octaves
+alle Oktaven
+
+detune_synthesizer_dialog/detune_area
+
+
+detune_synthesizer_dialog/detune_synthesizer_dialog
+Verstimmung
+
+detune_synthesizer_dialog/rand_id_692575
+
+
+detune_synthesizer_dialog/rand_id_72175
+
+
+dummy_favorite_dialog/cancel
+Abbrechen
+
+dummy_favorite_dialog/delete
+Löschen
+
+dummy_favorite_dialog/dummy_favorite_dialog
+Effekt
+
+dummy_favorite_dialog/favorite_delete
+
+
+dummy_favorite_dialog/favorite_list
+- Standard -
+
+dummy_favorite_dialog/favorite_name
+
+
+dummy_favorite_dialog/favorite_save
+
+
+dummy_favorite_dialog/ok
+OK
+
+dummy_favorite_dialog/preview
+Vorschau
+
+fx_editor/add
+
+
+fx_editor/comment_no_fx
+- hier sind (noch) keine Effekte aktiv -
+
+fx_editor/fe_g_edit
+Bearbeiten
+
+fx_editor/fx_editor
+Effects
+
+fx_editor/fx_inner_table
+
+
+fx_editor/rand_id_117546
+
+
+fx_editor/rand_id_332023
+
+
+fx_editor/rand_id_938670
+
+
+level_dialog/add_level
+
+
+level_dialog/delete_level
+
+
+level_dialog/level_dialog
+Ebenen
+
+level_dialog/levels
+#\\Name
+
+level_dialog/lvld_grid_1
+
+
+level_dialog/lvld_t_edit
+Bearbeiten
+
+level_dialog/rand_id_219717
+
+
+level_dialog/rand_id_308272
+
+
+log_toolbar/log_clear
+Leeren
+
+log_toolbar/log_close
+Schließen
+
+log_toolbar/log_toolbar
+
+
+marker_dialog/marker_dialog
+Marker
+
+marker_dialog/rand_id_254966
+
+
+marker_dialog/rand_id_300710
+
+
+marker_dialog/text
+
+
+menu/about
+Info
+
+menu/add_midi_track
+Midi Spur hinzufügen
+
+menu/add_time_track
+Rhythmus Spur hinzufügen
+
+menu/add_track
+Leere Spur hinzufügen
+
+menu/bars_manager
+Verwalten...
+
+menu/delete_track
+Löschen
+
+menu/edit_multi
+Auf alle ausgewählten Spuren anwenden
+
+menu/export_selection
+Auswahl Exportieren...
+
+menu/help
+Hilfe
+
+menu/insert_sample
+Fest einfügen
+
+menu/level_add
+Hinzufügen
+
+menu/level_delete
+Löschen
+
+menu/level_down
+Runter
+
+menu/level_manager
+Verwalten...
+
+menu/level_up
+Hoch
+
+menu/menu
+
+
+menu/menu_bars
+Takte
+
+menu/menu_edit
+Bearbeiten
+
+menu/menu_file
+Datei
+
+menu/menu_help
+?
+
+menu/menu_level
+Ebenen
+
+menu/menu_level_target
+Gehe zu
+
+menu/menu_plugins
+Plugins
+
+menu/menu_plugins_channels
+Kanäle
+
+menu/menu_plugins_dynamics
+Dynamik
+
+menu/menu_plugins_echo
+Echo
+
+menu/menu_plugins_on_all
+Auf Alles
+
+menu/menu_plugins_on_midi
+Auf Midi
+
+menu/menu_plugins_other
+Eigenständig
+
+menu/menu_plugins_pitch
+Tonhöhe
+
+menu/menu_plugins_repair
+Reparieren
+
+menu/menu_plugins_sound
+Klang
+
+menu/menu_plugins_synthesizer
+Synthese
+
+menu/menu_sound
+Sound
+
+menu/menu_sub
+Samples
+
+menu/menu_track
+Spur
+
+menu/menu_view
+Ansicht
+
+menu/menu_view_channels
+Kanäle
+
+menu/menu_view_midi
+Midi
+
+menu/menu_view_peaks
+Peaks
+
+menu/pause
+Pause
+
+menu/play
+Abspielen
+
+menu/play_loop
+Schleife
+
+menu/plugin_on_file
+Auf Audiopuffer
+
+menu/record
+Aufnehmen
+
+menu/remove_sample
+Löschen
+
+menu/run_plugin
+Script ausführen...
+
+menu/sample_from_selection
+Aus Auswahl herauslösen
+
+menu/sample_manager
+Verwalten...
+
+menu/sample_properties
+Eigenschaften
+
+menu/select_all
+Alles auswählen
+
+menu/select_nothing
+Nichts auswählen
+
+menu/show_fx_console
+Effekte
+
+menu/show_log
+Meldungen
+
+menu/show_mixing_console
+Mischpult
+
+menu/song_properties
+Eigenschaften
+
+menu/stop
+Stopp
+
+menu/track_import
+Aus Datei importieren...
+
+menu/track_properties
+Eigenschaften
+
+menu/view_midi_default
 Standard
-view_midi_score
+
+menu/view_midi_score
 Klassisch
-view_midi_tab
+
+menu/view_midi_tab
 Tabulatur
-view_mono
+
+menu/view_mono
 Mono
-view_optimal
+
+menu/view_optimal
 Optimal
-view_peaks_both
+
+menu/view_peaks_both
 Beides
-view_peaks_max
+
+menu/view_peaks_max
 Maximum
-view_peaks_mean
+
+menu/view_peaks_mean
 Quadratisches Mittel
-view_samples
+
+menu/view_samples
 Sample-Ebene
-view_stereo
+
+menu/view_stereo
 Stereo
-volume
-0\\-10000\\10\\0.1
-zoom_in
+
+menu/zoom_in
 Vergrößern
-zoom_out
+
+menu/zoom_out
 Verkleinern
+
+menu_fake/menu_fake
+
+
+menu_fake/play
+Abspielen
+
+menu_fake/stop
+Stopp
+
+midi_editor/beat_partition
+4\\1\\256
+
+midi_editor/chord_inversion
+
+
+midi_editor/chord_type
+
+
+midi_editor/interval
+0\\-99\\99
+
+midi_editor/ld_t_chord
+Typ
+
+midi_editor/ld_t_interval
+Intervall
+
+midi_editor/ld_t_inversion
+Umkehrung
+
+midi_editor/ld_t_no_midi
+keine Midi-Spur ausgewählt
+
+midi_editor/ld_t_partition
+Unterteilung
+
+midi_editor/ld_t_scale
+Tonleiter
+
+midi_editor/ld_t_space
+
+
+midi_editor/me_grid_no
+
+
+midi_editor/me_grid_yes
+
+
+midi_editor/me_group_edit
+Bearbeiten
+
+midi_editor/me_group_interval
+
+
+midi_editor/me_group_modifier
+Modifizierer
+
+midi_editor/me_group_reference
+Referenz-Spuren
+
+midi_editor/me_group_view
+Ansicht
+
+midi_editor/midi_edit_mode
+Einzelton\\Intervall\\Akkord
+
+midi_editor/midi_editor
+Midi
+
+midi_editor/modifier:flat
+♭
+
+midi_editor/modifier:natural
+♮
+
+midi_editor/modifier:none
+nichts
+
+midi_editor/modifier:sharp
+♯
+
+midi_editor/rand_id_387260
+
+
+midi_editor/rand_id_439935
+
+
+midi_editor/rand_id_504372
+
+
+midi_editor/rand_id_623408
+
+
+midi_editor/rand_id_637218
+
+
+midi_editor/rand_id_670224
+
+
+midi_editor/rand_id_7266
+
+
+midi_editor/rand_id_853445
+
+
+midi_editor/reference_tracks
+
+
+midi_editor/scale_root
+
+
+midi_editor/scale_type
+
+
+midi_fx_editor/add
+
+
+midi_fx_editor/comment_no_fx
+- hier sind (noch) keine Effekte aktiv -
+
+midi_fx_editor/me_grid_no
+
+
+midi_fx_editor/mfe_g_edit
+Bearbeiten
+
+midi_fx_editor/mfx_t_no_midi
+keine Midi-Spur ausgewählt
+
+midi_fx_editor/midi_fx_editor
+Midi Fx
+
+midi_fx_editor/midi_fx_inner_table
+
+
+midi_fx_editor/rand_id_132125
+
+
+midi_fx_editor/rand_id_332460
+
+
+midi_fx_editor/rand_id_408732
+
+
+new_dialog/beats_per_bar
+4\\1\\99
+
+new_dialog/beats_per_minute
+90\\0\\999\\0.1
+
+new_dialog/metronome
+einfügen
+
+new_dialog/nd_g_frequency
+Samplerate
+
+new_dialog/nd_g_metronome
+Metronom
+
+new_dialog/nd_g_metronome_params
+
+
+new_dialog/nd_g_track
+erster Track
+
+new_dialog/nd_t_bars
+Takte
+
+new_dialog/nd_t_beats
+Schläge pro Takt
+
+new_dialog/nd_t_bpm
+Geschwindigkeit
+
+new_dialog/new_dialog
+Neue Datei
+
+new_dialog/new_track_type:audio
+Audio
+
+new_dialog/new_track_type:midi
+Midi
+
+new_dialog/num_bars
+10\\0\\999
+
+new_dialog/rand_id_334401
+
+
+new_dialog/rand_id_540926
+
+
+new_dialog/rand_id_606724
+
+
+new_dialog/rand_id_716119
+
+
+new_dialog/rand_id_751976
+
+
+new_dialog/sample_rate
+
+
+popup_marker_menu/delete_marker
+Löschen
+
+popup_marker_menu/edit_marker
+Bearbeiten
+
+popup_marker_menu/marker_menu_header
+Marker
+
+popup_marker_menu/popup_marker_menu
+
+
+popup_sample_menu/insert_sample
+Fest einfügen
+
+popup_sample_menu/popup_sample_menu
+
+
+popup_sample_menu/remove_sample
+Löschen
+
+popup_sample_menu/sample_menu_header
+Sample
+
+popup_sample_menu/sample_properties
+Eigenschaften
+
+popup_song_menu/add_midi_track
+Midi Spur hinzufügen
+
+popup_song_menu/add_track
+Leere Spur hinzufügen
+
+popup_song_menu/popup_song_menu
+
+
+popup_song_menu/song_edit_bars
+Takte bearbeiten
+
+popup_song_menu/song_edit_samples
+Samples verwalten
+
+popup_song_menu/song_menu_header
+Datei
+
+popup_song_menu/song_properties
+Eigenschaften
+
+popup_track_menu/delete_track
+Löschen
+
+popup_track_menu/popup_track_menu
+
+
+popup_track_menu/song_edit_bars
+Takte bearbeiten
+
+popup_track_menu/track_add_marker
+Marker setzen
+
+popup_track_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_track_menu/track_edit_midi
+Midi bearbeiten
+
+popup_track_menu/track_menu_header
+Spur
+
+popup_track_menu/track_properties
+Eigenschaften
+
+progress_cancelable_dialog/progress_bar
+
+
+progress_cancelable_dialog/progress_cancelable_dialog
+in Arbeit
+
+progress_cancelable_dialog/progress_cancelable_grid
+
+
+progress_dialog/progress_bar
+
+
+progress_dialog/progress_dialog
+in Arbeit
+
+record_dialog/capture_delete
+Verwerfen
+
+record_dialog/capture_level
+
+
+record_dialog/capture_pause
+
+
+record_dialog/capture_source
+
+
+record_dialog/capture_start
+
+
+record_dialog/capture_target
+
+
+record_dialog/capture_time
+0:00
+
+record_dialog/capture_type:audio
+Audio
+
+record_dialog/capture_type:midi
+Midi
+
+record_dialog/rand_id_141495
+
+
+record_dialog/rand_id_448920
+
+
+record_dialog/rand_id_541753
+
+
+record_dialog/rand_id_616775
+
+
+record_dialog/rand_id_634478
+
+
+record_dialog/rand_id_688951
+
+
+record_dialog/rand_id_724585
+
+
+record_dialog/rand_id_96141
+
+
+record_dialog/rdt_capture
+Aufnahme
+
+record_dialog/rdt_source
+Quelle
+
+record_dialog/rdt_target
+Ziel
+
+record_dialog/record_dialog
+Aufnahme
+
+sample_manager_dialog/create_from_selection
+
+
+sample_manager_dialog/delete_sample
+
+
+sample_manager_dialog/export_sample
+
+
+sample_manager_dialog/import_from_file
+
+
+sample_manager_dialog/paste_sample
+
+
+sample_manager_dialog/preview_sample
+
+
+sample_manager_dialog/rand_id_20974
+
+
+sample_manager_dialog/rand_id_259042
+
+
+sample_manager_dialog/rand_id_573148
+
+
+sample_manager_dialog/sample_list
+Vorschau\\Name\\Dauer\\Benutzung\\Temporär
+
+sample_manager_dialog/sample_manager_dialog
+Sample Manager
+
+sample_manager_dialog/smd_group_edit
+Bearbeiten
+
+sample_ref_dialog/ld_t_edit
+Bearbeiten
+
+sample_ref_dialog/ld_t_name
+Name
+
+sample_ref_dialog/ld_t_repdelay
+Abstand:
+
+sample_ref_dialog/ld_t_repetition
+Wiederholungen
+
+sample_ref_dialog/ld_t_repnum
+Anzahl:
+
+sample_ref_dialog/ld_t_track
+Spur
+
+sample_ref_dialog/ld_t_volume
+Lautstärke
+
+sample_ref_dialog/level_track
+
+
+sample_ref_dialog/mute
+Stumm
+
+sample_ref_dialog/name
+
+
+sample_ref_dialog/rand_id_329247
+
+
+sample_ref_dialog/rand_id_514008
+
+
+sample_ref_dialog/rand_id_792866
+
+
+sample_ref_dialog/rand_id_93576
+
+
+sample_ref_dialog/rand_id_999471
+
+
+sample_ref_dialog/repdelay
+0\\0\\\\0.1
+
+sample_ref_dialog/repnum
+1\\1
+
+sample_ref_dialog/sample_ref_dialog
+Sub Track
+
+sample_ref_dialog/volume
+0\\-10000\\10\\0.1
+
+sample_selection_dialog/rand_id_151226
+
+
+sample_selection_dialog/rand_id_533511
+
+
+sample_selection_dialog/sample_selection_dialog
+Sample wählen
+
+sample_selection_dialog/sample_selection_list
+Vorschau\\Name\\Dauer
+
+settings_dialog/capture_filename
+
+
+settings_dialog/capture_find
+
+
+settings_dialog/color_scheme
+
+
+settings_dialog/default_artist
+
+
+settings_dialog/language
+
+
+settings_dialog/ogg_bitrate
+64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
+
+settings_dialog/pdp_capture
+Aufnahme
+
+settings_dialog/pdp_colorscheme
+Farbschema
+
+settings_dialog/pdp_general
+Generell
+
+settings_dialog/pdp_language
+Sprache
+
+settings_dialog/pdt_capturetempfile
+Sicherungsdatei
+
+settings_dialog/pdt_defaultartist
+Standard Artist
+
+settings_dialog/pdt_oggrate
+OGG-Bitrate
+
+settings_dialog/rand_id_4671
+
+
+settings_dialog/rand_id_503843
+
+
+settings_dialog/rand_id_540778
+
+
+settings_dialog/rand_id_891104
+
+
+settings_dialog/settings_dialog
+Einstellungen
+
+song_dialog/ad_t_data
+Daten
+
+song_dialog/ad_t_edit
+Bearbeiten
+
+song_dialog/ad_t_format
+Format
+
+song_dialog/ad_t_samplerate
+Samplerate
+
+song_dialog/ad_t_tags
+Tags
+
+song_dialog/add_tag
+
+
+song_dialog/compress
+Kompression
+
+song_dialog/data_list
+key\\value
+
+song_dialog/delete_tag
+
+
+song_dialog/format
+
+
+song_dialog/rand_id_223564
+
+
+song_dialog/rand_id_279627
+
+
+song_dialog/rand_id_36813
+
+
+song_dialog/rand_id_628080
+
+
+song_dialog/rand_id_672903
+
+
+song_dialog/rand_id_939684
+
+
+song_dialog/samplerate
+
+
+song_dialog/song_dialog
+Sound-Datei
+
+song_dialog/tags
+Tag\\Wert
+
+toolbar/toolbar
+
+
+track_dialog/edit_tuning
+
+
+track_dialog/g_instrument
+
+
+track_dialog/g_name
+
+
+track_dialog/g_volume
+
+
+track_dialog/instrument
+
+
+track_dialog/name
+
+
+track_dialog/panning
+0\\-100\\100\\1
+
+track_dialog/rand_id_130150
+
+
+track_dialog/rand_id_159090
+
+
+track_dialog/rand_id_22364
+
+
+track_dialog/rand_id_480611
+
+
+track_dialog/rand_id_513374
+
+
+track_dialog/rand_id_614028
+
+
+track_dialog/rand_id_710170
+
+
+track_dialog/rand_id_788789
+
+
+track_dialog/t_panning
+
+
+track_dialog/t_volume
+
+
+track_dialog/td_t_edit
+Bearbeiten
+
+track_dialog/track_dialog
+Spur
+
+track_dialog/tuning
+
+
+track_dialog/volume
+0\\-10000\\10\\0.1
+
+trackdest_dialog/track_list
+Spur
+
+trackdest_dialog/trackdest_dialog
+Ziel-Spur für die Ebenen
+
+tuning_dialog/rand_id_656842
+
+
+tuning_dialog/rand_id_819101
+
+
+tuning_dialog/td_g_tuning
+
+
+tuning_dialog/tuning_dialog
+Stimmung
+
 // Num Language Strings
 0
 // Text

@@ -19,11 +19,11 @@ HuiToolItemButton::HuiToolItemButton(const string &title, const string &image, c
 {
 	GtkWidget *im = (GtkWidget*)get_gtk_image(image, true);
 	gtk_widget_show(im);
-	widget = GTK_WIDGET(gtk_tool_button_new(im, sys_str(get_lang(id, title))));
+	widget = GTK_WIDGET(gtk_tool_button_new(im, sys_str(title)));
 	gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(widget), true);
 	if ((image != "hui:redo") && (image != "hui:open") && (image != "hui:paste") && (image != "hui:media-stop"))
 		gtk_tool_item_set_is_important(GTK_TOOL_ITEM(widget), true);
-	gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
+	//gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
 	gtk_widget_show(widget);
 	g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkToolbarItemPress), this);
 

@@ -13,7 +13,7 @@
 HuiControlProgressBar::HuiControlProgressBar(const string &title, const string &id) :
 	HuiControl(HUI_KIND_PROGRESSBAR, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	widget = gtk_progress_bar_new();
 	gtk_progress_bar_set_text(GTK_PROGRESS_BAR(widget), sys_str(PartString[0]));
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);

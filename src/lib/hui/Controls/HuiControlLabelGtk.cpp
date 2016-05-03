@@ -13,7 +13,7 @@
 HuiControlLabel::HuiControlLabel(const string &title, const string &id) :
 	HuiControl(HUI_KIND_LABEL, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	widget = gtk_label_new("");
 #if GTK_CHECK_VERSION(3,16,0)
 	gtk_label_set_xalign(GTK_LABEL(widget), 0);
@@ -31,7 +31,7 @@ string HuiControlLabel::getString()
 
 void HuiControlLabel::__setString(const string &str)
 {
-	GetPartStrings(id, str);
+	GetPartStrings(str);
 	string s = sys_str(PartString[0]);
 	if (OptionString.find("bold") >= 0)
 		s = "<b>" + s + "</b>";

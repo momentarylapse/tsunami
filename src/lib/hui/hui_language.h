@@ -44,7 +44,7 @@ class HuiResource;
 	/*extern const char *str_ascii2m(const char *str);
 	extern const char *str_m2ascii(const char *str);*/
 
-	extern string get_lang(const string &id,const string &text,bool allow_keys=false);
+	extern string get_lang(const string &ns,const string &id,const string &text,bool allow_keys=false);
 #ifdef HUI_API_WIN
 	extern const TCHAR *get_lang_sys(const string &id,const string &text,bool allow_keys=false);
 #else
@@ -59,11 +59,11 @@ string HuiGetCurLanguage();
 void _cdecl HuiSetLanguage(const string &language);
 extern bool HuiLanguaged;
 
-string _cdecl HuiGetLanguage(const string &id);
-string _cdecl HuiGetLanguageR(HuiResource &cmd);
-string _cdecl HuiGetLanguageT(const string &id);
+string _cdecl HuiGetLanguage(const string &ns, const string &id);
+string _cdecl HuiGetLanguageR(const string &ns, HuiResource &cmd);
+string _cdecl HuiGetLanguageT(const string &ns, const string &id);
 string _cdecl HuiGetLanguageS(const string &str);
-#define L(id)	HuiGetLanguage(id)
+#define L(ns, id)	HuiGetLanguage(ns, id)
 #define _(str)	HuiGetLanguageS(str_m_to_utf8(str))
 void _cdecl HuiUpdateAll();
 
@@ -76,7 +76,8 @@ struct HuiLanguageTranslation
 
 struct HuiLanguageCommand
 {
-	string id, text, tooltip;
+	string _namespace, id, text, tooltip;
+	bool match(const string &_ns, const string &id);
 };
 
 struct HuiLanguage

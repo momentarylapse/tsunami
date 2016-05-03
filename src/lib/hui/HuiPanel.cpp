@@ -306,11 +306,11 @@ void HuiPanel::addControl(const string &type, const string &title, int x, int y,
 		msg_error("unknown hui control: " + type);
 }
 
-void HuiPanel::_addControl(HuiResource &cmd, const string &parent_id)
+void HuiPanel::_addControl(const string &ns, HuiResource &cmd, const string &parent_id)
 {
 	//msg_db_m(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 	setTarget(parent_id, cmd.page);
-	addControl(cmd.type, HuiGetLanguageR(cmd),
+	addControl(cmd.type, HuiGetLanguageR(ns, cmd),
 				cmd.x, cmd.y,
 				cmd.w, cmd.h,
 				cmd.id);
@@ -320,12 +320,12 @@ void HuiPanel::_addControl(HuiResource &cmd, const string &parent_id)
 	if (cmd.image.num > 0)
 		setImage(cmd.id, cmd.image);
 
-	string tooltip = HuiGetLanguageT(cmd.id);
+	string tooltip = HuiGetLanguageT(ns, cmd.id);
 	if (tooltip.num > 0)
 		setTooltip(cmd.id, tooltip);
 
 	foreach(HuiResource &c, cmd.children)
-		_addControl(c, cmd.id);
+		_addControl(ns, c, cmd.id);
 }
 
 void HuiPanel::fromResource(const string &id)
@@ -337,7 +337,7 @@ void HuiPanel::fromResource(const string &id)
 
 	// title
 	if (win)
-		win->setTitle(HuiGetLanguage(res->id));
+		win->setTitle(HuiGetLanguage(id, res->id));
 
 	// size
 	if (win)
@@ -364,7 +364,7 @@ void HuiPanel::fromResource(const string &id)
 
 	// controls
 	foreach(HuiResource &cmd, res->children)
-		_addControl(cmd, "");
+		_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
 }
@@ -389,8 +389,15 @@ void HuiPanel::fromSource(const string &buffer)
 
 void HuiPanel::embedResource(HuiResource &c, const string &parent_id, int x, int y)
 {
+	_embedResource(c.id, c, parent_id, x, y);
+}
+
+void HuiPanel::_embedResource(const string &ns, HuiResource &c, const string &parent_id, int x, int y)
+{
+	//_addControl(main_id, c, parent_id);
+
 	setTarget(parent_id, x);
-	string title = c.title;
+	string title = HuiGetLanguageR(ns, c);
 	if (c.options.num > 0)
 		title = "!" + implode(c.options, ",") + "\\" + title;
 	addControl(c.type, title, x, y, c.w, c.h, c.id);
@@ -399,12 +406,12 @@ void HuiPanel::embedResource(HuiResource &c, const string &parent_id, int x, int
 	if (c.image.num > 0)
 		setImage(c.id, c.image);
 
-	string tooltip = HuiGetLanguageT(c.id);
+	string tooltip = HuiGetLanguageT(ns, c.id);
 	if (tooltip.num > 0)
 		setTooltip(c.id, tooltip);
 
 	foreach(HuiResource &child, c.children)
-		embedResource(child, c.id, child.x, child.y);
+		_embedResource(ns, child, c.id, child.x, child.y);
 }
 
 void HuiPanel::embedSource(const string &buffer, const string &parent_id, int x, int y)

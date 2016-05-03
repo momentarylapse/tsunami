@@ -198,6 +198,13 @@ Array<HuiLanguage> _HuiLanguage_;
 HuiLanguage *cur_lang = NULL;
 
 
+bool HuiLanguageCommand::match(const string &_ns, const string &_id)
+{
+	if (this->id != _id)
+		return false;
+	return ((this->_namespace.num == 0) or (this->_namespace == _ns));
+}
+
 
 void HuiSetLanguage(const string &language)
 {
@@ -215,24 +222,24 @@ void HuiSetLanguage(const string &language)
 	HuiUpdateAll();
 }
 
-string HuiGetLanguage(const string &id)
+string HuiGetLanguage(const string &ns, const string &id)
 {
 	if ((!HuiLanguaged) || (id.num == 0))
 		return "";
 	foreach(HuiLanguageCommand &c, cur_lang->cmd)
-		if (id == c.id)
+		if (c.match(ns, id))
 			return c.text;
 	/*if (cur_lang->cmd[id].num == 0)
 		return "???";*/
 	return "";
 }
 
-string HuiGetLanguageR(HuiResource &cmd)
+string HuiGetLanguageR(const string &ns, HuiResource &cmd)
 {
 	if ((!HuiLanguaged) || (cmd.id.num == 0))
 		return "";
 	foreach(HuiLanguageCommand &c, cur_lang->cmd)
-		if (cmd.id == c.id){
+		if (c.match(ns, cmd.id)){
 			if (cmd.options.num > 0)
 				return "!" + implode(cmd.options, ",") + "\\" + c.text;
 			return c.text;
@@ -242,12 +249,12 @@ string HuiGetLanguageR(HuiResource &cmd)
 	return "";
 }
 
-string HuiGetLanguageT(const string &id)
+string HuiGetLanguageT(const string &ns, const string &id)
 {
 	if ((!HuiLanguaged) || (id.num == 0))
 		return "";
 	foreach(HuiLanguageCommand &c, cur_lang->cmd)
-		if (id == c.id)
+		if (c.match(ns, id))
 			return c.tooltip;
 	return "";
 }
@@ -265,7 +272,7 @@ string HuiGetLanguageS(const string &str)
 }
 
 
-string get_lang(const string &id, const string &text, bool allow_keys)
+string get_lang(const string &ns, const string &id, const string &text, bool allow_keys)
 {
 	if (text.num > 0)
 		return text;
@@ -273,7 +280,7 @@ string get_lang(const string &id, const string &text, bool allow_keys)
 		return text;
 	string r = "";
 	foreach(HuiLanguageCommand &c, cur_lang->cmd)
-		if (id == c.id)
+		if (c.match(ns, id))
 			r = c.text;
 	if (r.num == 0)
 		return text;
@@ -292,7 +299,7 @@ string get_lang(const string &id, const string &text, bool allow_keys)
 	const char *get_lang_sys(const string &id, const string &text, bool allow_keys)
 #endif
 {
-	return sys_str(get_lang(id, text, allow_keys));
+	return sys_str(get_lang("", id, text, allow_keys));
 }
 
 

@@ -16,7 +16,7 @@ HuiControlSlider::HuiControlSlider(const string &title, const string &id, bool _
 	HuiControl(HUI_KIND_SLIDER, id)
 {
 	vertical = _vertical;
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	if (OptionString.find("vertical") >= 0)
 		vertical = true;
 	if (vertical){

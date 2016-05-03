@@ -16,5 +16,5 @@ Dialog bars_dialog "Takte" 380 516
 			CheckBox link_to_midi "Midi mitbearbeiten"
 		Group bbd_t_edit "Bearbeiten"
 			Grid ? "" 3 1
-				Button edit_song "Datei"
+				Button /edit_song "Datei"
 

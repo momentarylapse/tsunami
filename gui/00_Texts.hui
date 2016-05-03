@@ -1,4 +1,4 @@
-Menu "" "" disabled
+Menu "menu_fake" "" disabled
 	Item play "Abspielen"
 	Item stop "Stopp"
 

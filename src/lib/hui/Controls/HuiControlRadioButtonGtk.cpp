@@ -17,7 +17,7 @@ void OnGtkRadioButtonToggle(GtkWidget *widget, gpointer data)
 HuiControlRadioButton::HuiControlRadioButton(const string &title, const string &id, HuiPanel *panel) :
 	HuiControl(HUI_KIND_RADIOBUTTON, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	string group_id = id.head(id.find(":"));
 	GSList *group = NULL;
 	foreach(HuiControl *c, panel->control)

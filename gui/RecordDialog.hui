@@ -8,7 +8,7 @@ Dialog record_dialog "Aufnahme" 300 200
 				ComboBox capture_source "" expandx
 		Group rdt_capture "Aufnahme"
 			Grid ? "" 1 2
-				Grid rd_g_data "" 2 1 noexpandy
+				Grid ? "" 2 1 noexpandy
 					Text capture_time "0:00" width=120
 					DrawingArea capture_level "" height=25
 				Grid ? "" 3 1
@@ -17,7 +17,7 @@ Dialog record_dialog "Aufnahme" 300 200
 					Button capture_delete "Verwerfen" image=hui:delete flat
 		Group rdt_target "Ziel"
 			ComboBox capture_target "" expandx
-		Grid record_dialog_buttonbar "" 2 1 buttonbar
-			Button cancel "Abbrechen" image=hui:cancel
-			DefButton ok "OK" image=hui:ok
-		Text td_t_dummy "" expandy
+		Grid ? "" 2 1 buttonbar
+			Button /cancel "Abbrechen" image=hui:cancel
+			DefButton /ok "OK" image=hui:ok
+		Text ? "" expandy

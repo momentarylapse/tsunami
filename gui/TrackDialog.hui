@@ -1,31 +1,31 @@
 Dialog track_dialog "Spur" 380 516
-	Grid ttd_grid_0 "" 1 5
-		Group td_t_name "Name"
+	Grid ? "" 1 5
+		Group g_name "Name"
 			Edit name "" expandx
-		Group td_t_volume "Lautstärke"
+		Group g_volume "Lautstärke"
 			Grid ? "" 3 2 noexpandx
-				Text ld_tt_volume "Lautstärke"
+				Text t_volume "Lautstärke"
 				SpinButton volume "0\\-10000\\10\\0.1" expandx
-				Text db "dB"
-				Text ld_tt_panning "Balance"
+				Text /db "dB"
+				Text t_panning "Balance"
 				SpinButton panning "0\\-100\\100\\1"
-				Text percent "%"
-		Group td_t_instrument "Instrument"
+				Text /percent "%"
+		Group g_instrument "Instrument"
 			Grid ? "" 1 2
 				ComboBox instrument "" expandx
 				Grid ? "" 2 1
 					Text tuning "" expandx
 					Button edit_tuning "" image=hui:properties
-		Text td_t_dummy "" expandy
+		Text ? "" expandy
 		Group td_t_edit "Bearbeiten"
 			Grid ? "" 1 2
 				Grid ? "" 4 1
-					Button edit_song "Datei"
-					Button edit_fx "Fx"
-					Button edit_midi "Midi"
-					Button edit_curves "Kurven"
+					Button /edit_song "Datei"
+					Button /edit_fx "Fx"
+					Button /edit_midi "Midi"
+					Button /edit_curves "Kurven"
 				Grid ? "" 3 1
-					Button edit_midi_fx "Midi-Fx"
-					Button edit_synth "Synth"
-					Button edit_bars "Takte"
+					Button /edit_midi_fx "Midi-Fx"
+					Button /edit_synth "Synth"
+					Button /edit_bars "Takte"
 

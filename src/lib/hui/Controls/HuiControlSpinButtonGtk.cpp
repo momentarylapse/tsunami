@@ -14,7 +14,7 @@ void OnGtkEditChange(GtkWidget *widget, gpointer data);
 HuiControlSpinButton::HuiControlSpinButton(const string &title, const string &id) :
 	HuiControl(HUI_KIND_SPINBUTTON, id)
 {
-	GetPartStrings(id, title);
+	GetPartStrings(title);
 	float vmin = -100000000000.0f;
 	float vmax = 100000000000.0f;
 	float step = 1;

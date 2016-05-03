@@ -10,6 +10,6 @@ Dialog bar_add_dialog "neue Takte" 250 80
 		Grid ? "" 2 1
 			RadioButton insert:before "davor"
 			RadioButton insert:after "danach"
-		Grid bad_buttonbar "" 2 1 buttonbar
-			Button cancel "Abbrechen" image=hui:cancel
-			DefButton ok "OK" image=hui:ok
+		Grid ? "" 2 1 buttonbar
+			Button /cancel "Abbrechen" image=hui:cancel
+			DefButton /ok "OK" image=hui:ok

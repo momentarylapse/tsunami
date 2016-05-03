@@ -15,5 +15,5 @@ Dialog settings_dialog "Einstellungen" 300 200
 				Text pdt_capturetempfile "Sicherungsdatei"
 				Edit capture_filename ""
 				Button capture_find "" image=hui:open
-		Grid properties_dialog_buttonbar "" 1 1 buttonbar
-			DefButton close "Schließen" image=hui:close
+		Grid ? "" 1 1 buttonbar
+			DefButton /close "Schließen" image=hui:close

@@ -128,8 +128,6 @@ FxConsole::FxConsole(AudioView *_view, Song *_song) :
 
 	fromResource("fx_editor");
 
-	setTooltip("add", _("neuen Effekt hinzuf&ugen"));
-
 	track = NULL;
 	//Enable("add", false);
 

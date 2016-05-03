@@ -8,12 +8,12 @@ Dialog settings_dialog "Einstellungen" 300 200
 				ComboBox color_scheme ""
 				Text pdt_oggrate "OGG-Bitrate"
 				ComboBox ogg_bitrate "64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500"
-				Text pdt_defaultartist "Standard Artist"
+				Text pdt_defaultartist "Standard Artist" tooltip="wird als Tag artist=... in neue Dateien eingetragen"
 				Edit default_artist ""
 		Group pdp_capture "Aufnahme"
 			Grid ? "" 3 1
 				Text pdt_capturetempfile "Sicherungsdatei"
-				Edit capture_filename ""
+				Edit capture_filename "" tooltip="Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt"
 				Button capture_find "" image=hui:open
 		Grid ? "" 1 1 buttonbar
 			DefButton /close "Schließen" image=hui:close

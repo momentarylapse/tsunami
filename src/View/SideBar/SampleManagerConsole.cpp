@@ -112,12 +112,6 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 	Observer("SampleManagerConsole")
 {
 	fromResource("sample_manager_dialog");
-	setTooltip("import_from_file", _("aus Datei importieren"));
-	setTooltip("export", _("in Datei exportieren"));
-	setTooltip("preview_sample", _("Vorschau"));
-	setTooltip("delete_sample", _("l&oschen"));
-	setTooltip("paste_sample", _("f&ugt am Cursor der aktuellen Spur ein"));
-	setTooltip("create_from_selection", _("aus Auswahl erzeugen"));
 
 	event("import_from_file", this, &SampleManagerConsole::onImport);
 	event("export_sample", this, &SampleManagerConsole::onExport);

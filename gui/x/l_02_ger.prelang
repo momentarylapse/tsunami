@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-502
+513
 // Data (ID,Text,Tooltip)
 about
 Info
@@ -1508,6 +1508,39 @@ Ziel-Spur für die Ebenen
 
 tuning_dialog/tuning_dialog
 Stimmung
+
+log_console/clear
+
+
+log_console/log_list
+
+
+settings_dialog/capture_filename
+
+
+log_console/log_console
+
+
+mini_bar/show_bottom_bar
+
+
+mini_bar/volume
+0\\-10000\\10\\0.1
+
+mini_bar/peaks
+
+
+mixing-console/link-volumes
+
+
+mixing-console/t_output
+
+
+mixing-console/output-peaks
+
+
+mixing-console/output-volume
+
 
 // Num Language Strings
 183

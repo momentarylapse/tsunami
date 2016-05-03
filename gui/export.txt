@@ -1,7 +1,7 @@
 // Target Directory
-../../Data/
+../Data/
 // Source Code Directory
-../
+../src/
 // Own Language
 Deutsch
 

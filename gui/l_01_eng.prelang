@@ -1,7 +1,7 @@
 // Language
 English
 // Num IDs
-502
+530
 // Data (ID,Text,Tooltip)
 about
 About
@@ -866,10 +866,10 @@ Bpm
 
 bars_dialog/add_bar
 Bar
-
+add new bars
 bars_dialog/add_bar_pause
 Pause
-
+add pause
 bars_dialog/bar_list
 #\\Beats\\Bpm\\Duration
 
@@ -1439,7 +1439,7 @@ Backup file
 
 settings_dialog/pdt_defaultartist
 Default artist
-
+will create an artist=... tag in new files
 settings_dialog/pdt_oggrate
 OGG bitrate
 
@@ -1463,7 +1463,7 @@ Tags
 
 song_dialog/compress
 Compression
-
+when saving
 song_dialog/data_list
 key\\value
 
@@ -1472,7 +1472,7 @@ Audio file
 
 song_dialog/tags
 Tag\\Value
-
+Suggestion:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
 track_dialog/g_instrument
 Instrument
 
@@ -1509,6 +1509,90 @@ Destination track
 tuning_dialog/tuning_dialog
 Tuning
 
+log_console/clear
+
+delete all messages
+log_console/log_list
+type\\msg
+
+settings_dialog/capture_filename
+
+Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
+log_console/log_console
+Messages
+
+mini_bar/show_bottom_bar
+
+Expand
+mini_bar/volume
+0\\-10000\\10\\0.1
+Output volume
+mini_bar/peaks
+
+Output level
+mixing-console/link-volumes
+couple
+change the sliders of all tracks simultaniously
+mixing-console/t_output
+Output
+
+mixing-console/output-peaks
+
+Output level
+mixing-console/output-volume
+
+Output volume
+bars_dialog/delete_bar
+
+delete selected bars
+bars_dialog/edit_selected_bars
+
+edit selected bars
+bars_dialog/scale_selected_bars
+
+scale selected bars (by moving the selection on the left)
+sample_manager_dialog/create_from_selection
+
+create from selection
+sample_manager_dialog/delete_sample
+
+delete
+sample_manager_dialog/export_sample
+
+export to file
+sample_manager_dialog/import_from_file
+
+import from file
+sample_manager_dialog/paste_sample
+
+paste at the cursor into the current track
+sample_manager_dialog/preview_sample
+
+preview
+song_dialog/format
+
+when saving
+midi_fx_editor/add
+
+add new effect
+synth_console/detune
+
+detune
+synth_console/sc_group_edit
+Edit
+
+synth_console/select
+
+Select synthesizer
+track-mixer/mute
+Muted
+
+track-mixer/panning
+0\\-100\\100\\1
+Balance
+track-mixer/volume
+0\\-10000\\10\\0.1
+Volume in dB
 // Num Language Strings
 183
 // Data (ID,Text)

@@ -19,21 +19,16 @@ const float TrackMixer::TAN_SCALE = 10.0f;
 
 TrackMixer::TrackMixer()
 {
-	string id_grid = "mixing-track-grid";
+	fromResource("track-mixer");
+
 	id_separator = "mixing-track-separator";
-	addGrid("", 0, 0, 1, 4, id_grid);
-	setTarget(id_grid, 0);
 	id_name = "name";
-	addLabel("!center\\...", 0, 0, 0, 0, id_name);
 	vol_slider_id = "volume";
 	pan_slider_id = "panning";
 	mute_id = "mute";
-	addSlider("!width=80,origin=no", 0, 1, 0, 0, pan_slider_id);
 	addString(pan_slider_id, "0\\L");
 	addString(pan_slider_id, "0.5\\");
 	addString(pan_slider_id, "1\\R");
-	setTooltip(pan_slider_id, "Balance");
-	addSlider("!vertical,expandy", 0, 2, 0, 0, vol_slider_id);
 	addString(vol_slider_id, format("%f\\%+d", db2slider(DB_MAX), (int)DB_MAX));
 	addString(vol_slider_id, format("%f\\%+d", db2slider(5), (int)5));
 	addString(vol_slider_id, format("%f\\%d", db2slider(0), 0));
@@ -41,8 +36,6 @@ TrackMixer::TrackMixer()
 	addString(vol_slider_id, format("%f\\%d", db2slider(-10), (int)-10));
 	addString(vol_slider_id, format("%f\\%d", db2slider(-20), (int)-20));
 	addString(vol_slider_id, format("%f\\-inf", db2slider(DB_MIN))); // \u221e
-	setTooltip(vol_slider_id, _("Lautst&arke in dB"));
-	addCheckBox("Stumm", 0, 3, 0, 0, mute_id);
 
 	event(vol_slider_id, this, &TrackMixer::onVolume);
 	event(pan_slider_id, this, &TrackMixer::onPanning);
@@ -114,26 +107,10 @@ MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, Output
 	device_manager = _device_manager;
 	id_inner = "inner-grid";
 
-
-	addGrid("", 0, 0, 4, 1, "outer-grid");
-	setTarget("outer-grid", 0);
-	addGrid("", 0, 0, 1, 5, "output");
-	addSeparator("!vertical", 1, 0, 0, 0, "");
-	addGrid("", 2, 0, 1, 20, id_inner);
-	addCheckBox(_("koppeln"), 3, 0, 0, 0, "link-volumes");
-	setTooltip("link-volumes", _("die Regler aller Spuren gemeinsam &andern"));
-
-
-	setTarget("output", 0);
-	addLabel(_("!bold,center\\Ausgabe"), 0, 0, 0, 0, "");
-	addDrawingArea("!width=100,height=30,noexpandx,noexpandy", 0, 1, 0, 0, "output-peaks");
-	addSlider("!vertical,expandy", 0, 2, 0, 0, "output-volume");
+	fromResource("mixing-console");
 
 	peak_meter = new PeakMeter(this, "output-peaks", stream);
 	setFloat("output-volume", device_manager->getOutputVolume());
-
-	setTooltip("output-volume", _("Ausgabelautst&arke"));
-	setTooltip("output-peaks", _("Ausgabepegel"));
 
 	event("output-volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);
 

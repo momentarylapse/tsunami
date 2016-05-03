@@ -171,7 +171,7 @@ HuiResource *HuiGetResource(const string &id)
 		if (r.id == id)
 			return &r;
 	if (id.num > 0)
-		msg_error("hui-id not found: " + id);
+		msg_error("hui resource not found: " + id);
 	return NULL;
 }
 

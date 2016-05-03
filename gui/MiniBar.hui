@@ -1,0 +1,8 @@
+Dialog mini_bar "" 400 40
+	Grid ? "" 1 2 expandx border=0
+		Separator ? "" horizontal
+		Grid ? "" 5 1 expandx border=8
+			Button show_bottom_bar "" flat image=hui:up tooltip="Leiste aufklappen"
+			DrawingArea peaks "" width=100 noexpandx noexpandy tooltip="Ausgabepegel"
+			Slider volume "" width=100 noexpandx noexpandy tooltip="Ausgabelautstärke"
+

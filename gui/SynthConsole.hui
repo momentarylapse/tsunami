@@ -1,0 +1,13 @@
+Dialog synth_console "" 300 200
+	Grid outer "" 1 2 expandy
+		Grid grid "" 1 3 expandy
+			.
+			.
+			Grid ? "" 2 1
+				Button select "" expandx flat image=hui:open tooltip="Synthesizer wählen"
+				Button detune "" noexpandx flat image=hui:properties tooltip="verstimmen"
+		Group sc_group_edit "Bearbeiten"
+			Grid ? "" 2 1
+				Button /edit_song "Datei"
+				Button /edit_track "Spur"
+

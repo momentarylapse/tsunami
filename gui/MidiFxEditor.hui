@@ -30,7 +30,7 @@ Dialog midi_fx_editor "Midi Fx" 380 516
 			.
 			.
 			.
-			Button add "" expandx flat image=hui:add
+			Button add "" expandx flat image=hui:add tooltip="neuen Effekt hinzufügen"
 		Text ? "" expandy
 		Group mfe_g_edit "Bearbeiten"
 			Grid ? "" 3 1

@@ -15,12 +15,7 @@ LogConsole::LogConsole(Log *_log) :
 {
 	log = _log;
 
-	addGrid("", 0, 0, 2, 1, "grid");
-	setTarget("grid", 0);
-	addListView("!nobar,format=it\\type\\msg", 0, 0, 0, 0, "log_list");
-	addButton("", 1, 0, 0, 0, "clear");
-	setImage("clear", "hui:clear");
-	setTooltip("clear", _("alle Nachrichten l&oschen"));
+	fromResource("log_console");
 
 	event("clear", this, &LogConsole::onClear);
 

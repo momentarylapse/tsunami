@@ -2,12 +2,13 @@ Dialog sample_manager_dialog "Sample Manager" 400 400 allow-root
 	Grid ? "" 1 3
 		ListView sample_list "Vorschau\\Name\\Dauer\\Benutzung\\Temporär" format=iTttC
 		Grid ? "" 6 1
-			Button import_from_file "" image=hui:open flat
-			Button export_sample "" image=hui:save flat
-			Button delete_sample "" image=hui:delete flat
-			Button preview_sample "" image=hui:media-play flat
-			Button paste_sample "" image=hui:paste flat
-			Button create_from_selection "" image=hui:copy flat
+			Button import_from_file "" image=hui:open flat tooltip="aus Datei importieren"
+			Button export_sample "" image=hui:save flat tooltip="in Datei exportieren"
+			Button delete_sample "" image=hui:delete flat tooltip="löschen"
+			Button preview_sample "" image=hui:media-play flat tooltip="Vorschau"
+			Button paste_sample "" image=hui:paste flat tooltip="am Cursor der aktuellen Spur einfügen"
+			Button create_from_selection "" image=hui:copy flat tooltip="aus Auswahl erzeugen"
 		Group smd_group_edit "Bearbeiten"
 			Grid ? "" 1 1
 				Button /edit_song "Datei"
+

@@ -30,12 +30,6 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	id_scale = "scale_selected_bars";
 	id_link = "link_to_midi";
 
-	setTooltip(id_add, _("neue Takte einf&ugen"));
-	setTooltip(id_add_pause, _("Pause einf&ugen"));
-	setTooltip(id_delete, _("markierte Takte l&oschen"));
-	setTooltip(id_edit, _("markierte Takte editieren"));
-	setTooltip(id_scale, _("markierte Takte skalieren (durch Ziehen der Markierung links)"));
-
 	view->mode_bars->modify_midi = true;
 	check(id_link, view->mode_bars->modify_midi);
 	enable(id, true);

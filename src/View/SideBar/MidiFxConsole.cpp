@@ -124,8 +124,6 @@ MidiFxConsole::MidiFxConsole(AudioView *_view, Song *_song) :
 
 	id_inner = "midi_fx_inner_table";
 
-	setTooltip("add", _("neuen Effekt hinzuf&ugen"));
-
 	track = NULL;
 	//Enable("add", false);
 	enable("track_name", false);

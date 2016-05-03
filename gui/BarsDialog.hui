@@ -8,11 +8,11 @@ Dialog bars_dialog "Takte" 380 516
 		Grid ? "" 1 2
 			ListView bar_list "#\\Schläge\\Bpm\\Dauer" format=tTTT,select-multi
 			Grid ? "" 5 1
-				Button add_bar "Takt" image=hui:add flat
-				Button add_bar_pause "Pause" image=hui:add flat
-				Button delete_bar "" image=hui:delete flat
-				Button edit_selected_bars "" image=hui:edit flat
-				Button scale_selected_bars "" image=hui:zoom-in flat
+				Button add_bar "Takt" image=hui:add flat tooltip="neue Takte einfügen"
+				Button add_bar_pause "Pause" image=hui:add flat tooltip="Pause einfügen"
+				Button delete_bar "" image=hui:delete flat tooltip="markierte Takte löschen"
+				Button edit_selected_bars "" image=hui:edit flat tooltip="markierte Takte editieren"
+				Button scale_selected_bars "" image=hui:zoom-in flat tooltip="markierte Takte skalieren (durch Ziehen der Markierung links)"
 			CheckBox link_to_midi "Midi mitbearbeiten"
 		Group bbd_t_edit "Bearbeiten"
 			Grid ? "" 3 1

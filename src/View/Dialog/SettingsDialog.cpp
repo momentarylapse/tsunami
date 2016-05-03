@@ -28,9 +28,6 @@ SettingsDialog::SettingsDialog(HuiWindow *_parent):
 	setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultTempFilename());
 	setOptions("default_artist", "placeholder=" + AppName);
 
-	setTooltip("default_artist", _("wird als Tag artist=... in neue Dateien eingetragen"));
-	setTooltip("capture_filename", _("Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und sp&ater gel&oscht), falls das Program w&ahrendher abst&urzt"));
-
 	ogg_quality.add(OggQuality(0.0f, 64));
 	ogg_quality.add(OggQuality(0.1f, 80));
 	ogg_quality.add(OggQuality(0.2f, 96));

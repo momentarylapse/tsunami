@@ -40,10 +40,6 @@ SongConsole::SongConsole(Song *a) :
 	addString("samplerate", "48000");
 	addString("samplerate", "96000");
 
-	setTooltip("tags", _("Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"));
-	setTooltip("format", _("beim Speichern"));
-	setTooltip("compress", _("beim Speichern"));
-
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)
 		addString("format", format_name(POSSIBLE_FORMATS[i]));
 

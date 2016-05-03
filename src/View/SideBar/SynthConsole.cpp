@@ -97,27 +97,7 @@ SynthConsole::SynthConsole(AudioView *_view) :
 	view = _view;
 	id_inner = "grid";
 
-	addGrid("!expandy", 0, 0, 1, 2, "outer");
-	setTarget("outer", 0);
-	addGroup(_("Bearbeiten"), 0, 1, 0, 0, "sc_group_edit");
-	addGrid("!expandy", 0, 0, 1, 3, id_inner);
-	setTarget(id_inner, 0);
-
-	addGrid("", 0, 2, 2, 1, "button_grid");
-	setTarget("button_grid", 0);
-	addButton("!expandx,flat", 0, 0, 0, 0, "select");
-	setImage("select", "hui:open");
-	setTooltip("select", _("Synthesizer w&ahlen"));
-
-	addButton("!noexpandx,flat", 1, 0, 0, 0, "detune");
-	setImage("detune", "hui:properties");
-	setTooltip("detune", _("Verstimmen"));
-
-	setTarget("sc_group_edit", 0);
-	addGrid("", 0, 0, 2, 1, "edit_button_grid");
-	setTarget("edit_button_grid", 0);
-	addButton(_("Datei"), 0, 0, 0, 0, "edit_song");
-	addButton(_("Spur"), 1, 0, 0, 0, "edit_track");
+	fromResource("synth_console");
 
 	event("select", this, &SynthConsole::onSelect);
 	event("detune", this, &SynthConsole::onDetune);

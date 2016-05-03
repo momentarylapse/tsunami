@@ -1,0 +1,7 @@
+Dialog track-mixer "" 80 200
+	Grid ? "" 1 4
+		Text name "" center
+		Slider panning "" width=80 origin=no tooltip="Balance"
+		Slider volume "" vertical expandy tooltip="Lautstärke in dB"
+		CheckBox mute "Stumm"
+

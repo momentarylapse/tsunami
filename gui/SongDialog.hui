@@ -7,12 +7,12 @@ Dialog song_dialog "Sound-Datei" 430 375
 					Text ad_t_samplerate "Samplerate"
 					ComboBox samplerate "" expandx,editable
 					Text ad_t_format "Format"
-					ComboBox format "" expandx
+					ComboBox format "" expandx tooltip="beim Speichern"
 					.
-					CheckBox compress "Kompression"
+					CheckBox compress "Kompression" tooltip="beim Speichern"
 		Group ad_t_tags "Tags"
 			Grid ? "" 1 2
-				ListView tags "Tag\\Wert" format=TT
+				ListView tags "Tag\\Wert" format=TT tooltip="Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre"
 				Grid ? "" 2 1
 					Button add_tag "" image=hui:add flat
 					Button delete_tag "" image=hui:delete flat
@@ -22,3 +22,4 @@ Dialog song_dialog "Sound-Datei" 430 375
 				Button /edit_samples "Samples"
 				Button /edit_bars "Takte"
 				Button /edit_fx "Fx"
+

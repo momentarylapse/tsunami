@@ -115,7 +115,7 @@ void SettingsDialog::onCaptureFilename()
 
 void SettingsDialog::onCaptureFind()
 {
-	if (HuiFileDialogSave(this, _("Sicherungsdatei f&ur Aufnahmen w&ahlen"), InputStreamAudio::temp_filename.basename(), "*.raw", "*.raw"))
+	if (HuiFileDialogSave(this, _("Select backup file for recordings"), InputStreamAudio::temp_filename.basename(), "*.raw", "*.raw"))
 		setString("capture_filename", HuiFilename);
 	InputStreamAudio::setTempFilename(HuiFilename);
 }

@@ -56,7 +56,7 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	while (r->readResize(buf) > 0){
 		string data;
 		if (!buf.exports(data, 2, SAMPLE_FORMAT_16))
-			od->warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
+			od->warn(_("Amplitude too large, signal distorted."));
 
 		od->set(float(done) / (float)samples);
 		f->WriteBuffer(data.data, data.num);

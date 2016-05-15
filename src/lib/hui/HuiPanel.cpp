@@ -343,6 +343,8 @@ void HuiPanel::fromResource(const string &id)
 	if (win)
 		win->setSize(res->w, res->h);
 
+	this->id = id;
+
 
 	// dialog
 	/*CHuiPanel *dlg

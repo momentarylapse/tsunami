@@ -14,7 +14,7 @@
 #include "BarsConsole.h"
 
 BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
-	SideBarConsole(_("Takte")),
+	SideBarConsole(_("Bars")),
 	Observer("BarsConsole")
 {
 	song = _song;

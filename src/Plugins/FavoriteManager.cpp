@@ -154,10 +154,10 @@ public:
 		addListView("Name", 0, 0, 0, 0, "list");
 		addGrid("", 0, 1, 2, 1, "grid2");
 		setTarget("grid2", 0);
-		addEdit("!expandx,placeholder=" + _("neuen Namen eingeben"), 0, 0, 0, 0, "name");
+		addEdit("!expandx,placeholder=" + _("enter new name"), 0, 0, 0, 0, "name");
 		addDefButton("Ok", 1, 0, 0, 0, "ok");
 		if (!save)
-			addString("list", _("-Standard Parameter-"));
+			addString("list", _("-Default  Parameters-"));
 		foreach(string &n, names)
 			addString("list", n);
 		if (!save)

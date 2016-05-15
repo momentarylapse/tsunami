@@ -15,7 +15,7 @@
 #include "TrackConsole.h"
 
 TrackConsole::TrackConsole(AudioView *_view) :
-	SideBarConsole(_("Spur Eigenschaften")),
+	SideBarConsole(_("Track properties")),
 	Observer("TrackConsole")
 {
 	view = _view;
@@ -75,14 +75,14 @@ void TrackConsole::loadData()
 				setInt("instrument", i);
 		}
 
-		string tuning = format(_("%d Saiten: "), track->instrument.tuning.num);
+		string tuning = format(_("%d strings: "), track->instrument.tuning.num);
 		for (int i=0; i<track->instrument.tuning.num; i++){
 			if (i > 0)
 				tuning += ", ";
 			tuning += pitch_name(track->instrument.tuning[i]);
 		}
 		if (track->instrument.tuning.num == 0)
-			tuning = _(" - keine Saiten -");
+			tuning = _(" - no strings -");
 		setString("tuning", tuning);
 	}else{
 		hideControl("td_t_bars", true);

@@ -410,13 +410,13 @@ MidiData midi_events_to_notes(const MidiRawData &events)
 string chord_type_name(int type)
 {
 	if (type == CHORD_TYPE_MINOR)
-		return _("Moll");
+		return _("Minor");
 	if (type == CHORD_TYPE_MAJOR)
-		return _("Dur");
+		return _("Major");
 	if (type == CHORD_TYPE_DIMINISHED)
-		return _("Vermindert");
+		return _("Diminished");
 	if (type == CHORD_TYPE_AUGMENTED)
-		return _("&Uberm&a&sig");
+		return _("Augmented");
 	return "???";
 }
 

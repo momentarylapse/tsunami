@@ -652,11 +652,11 @@ void PluginManager::ExecutePlugin(const string &filename)
 			if (a->used)
 				f_audio(a);
 			else
-				tsunami->log->error(_("Plugin kann nicht f&ur eine leere Audiodatei ausgef&uhrt werden"));
+				tsunami->log->error(_("Can't execute plugin on an empty audio file"));
 		}*/else if (f_main){
 			f_main();
 		}else{
-			tsunami->log->error(_("Plugin ist kein Effekt/MidiEffekt und enth&alt keine Funktion 'void main()'"));
+			tsunami->log->error(_("Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'"));
 		}
 	}else{
 		tsunami->log->error(p->GetError());
@@ -669,7 +669,7 @@ void PluginManager::FindAndExecutePlugin()
 	msg_db_f("ExecutePlugin", 1);
 
 
-	if (HuiFileDialogOpen(tsunami->win, _("Plugin-Script w&ahlen"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
+	if (HuiFileDialogOpen(tsunami->win, _("Select plugin script"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
 		ExecutePlugin(HuiFilename);
 	}
 }
@@ -696,7 +696,7 @@ Effect *PluginManager::LoadEffect(const string &name, Song *song)
 		}
 	}
 	if (!p){
-		tsunami->log->error(format(_("Kann Effekt nicht laden: %s"), name.c_str()));
+		tsunami->log->error(format(_("Can't load effect: %s"), name.c_str()));
 		return NULL;
 	}
 
@@ -724,7 +724,7 @@ MidiEffect *PluginManager::LoadMidiEffect(const string &name, Song *song)
 		}
 	}
 	if (!found){
-		tsunami->log->error(format(_("Kann MidiEffekt nicht laden: %s"), name.c_str()));
+		tsunami->log->error(format(_("Can't load midi effect: %s"), name.c_str()));
 		return NULL;
 	}
 

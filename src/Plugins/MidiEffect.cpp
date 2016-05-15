@@ -59,7 +59,7 @@ string MidiEffect::GetError()
 {
 	if (plugin)
 		return plugin->GetError();
-	return format(_("MidiEffekt nicht ladbar: \"%s\""), name.c_str());
+	return format(_("Can not load MidiEffect: \"%s\""), name.c_str());
 }
 
 void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
@@ -73,7 +73,7 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 	if (!usable){
 		msg_error("not usable... apply");
 		if (log_error)
-			tsunami->log->error(_("Beim Anwenden eines MidiEffekts: ") + GetError());
+			tsunami->log->error(_("While applying a midi effect: ") + GetError());
 	}
 }
 

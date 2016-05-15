@@ -23,29 +23,18 @@ public:
 		track = t;
 		fx = _fx;
 		index = _index;
-		addGrid("!expandx,noexpandy", 0, 0, 1, 2, "grid");
-		setTarget("grid", 0);
-		addGrid("", 0, 0, 5, 1, "header");
-		setTarget("header", 0);
-		addButton("!flat", 0, 0, 0, 0, "load_favorite");
-		setImage("load_favorite", "hui:open");
-		setTooltip("load_favorite", _("Parameter laden"));
-		addButton("!flat", 1, 0, 0, 0, "save_favorite");
-		setImage("save_favorite", "hui:save");
-		setTooltip("save_favorite", _("Parameter speichern"));
-		addLabel("!bold,center,expandx\\" + fx->name, 2, 0, 0, 0, "");
-		addCheckBox("", 3, 0, 0, 0, "enabled");
-		setTooltip("enabled", _("aktiv?"));
-		addButton("!flat", 4, 0, 0, 0, "delete");
-		setImage("delete", "hui:delete");
-		setTooltip("delete", _("Effekt l&oschen"));
+
+		fromResource("fx_panel");
+
+		setString("name", fx->name);
+
 		p = fx->createPanel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
 			setTarget("grid", 0);
-			addLabel(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
+			addLabel(_("not configurable"), 0, 1, 0, 0, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}
@@ -119,7 +108,7 @@ public:
 };
 
 FxConsole::FxConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Effekte")),
+	SideBarConsole(_("Effects")),
 	Observer("FxConsole")
 {
 	view = _view;

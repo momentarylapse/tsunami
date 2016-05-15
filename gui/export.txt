@@ -3,6 +3,6 @@
 // Source Code Directory
 ../src/
 // Own Language
-Deutsch
+English
 
 

@@ -218,14 +218,14 @@ void TsunamiWindow::onAddMidiTrack()
 void TsunamiWindow::onDeleteTrack()
 {
 	if (song->tracks.num < 2){
-		tsunami->log->error(_("Es muss mindestens eine Spur existieren"));
+		tsunami->log->error(_("There has to be at least one track."));
 		return;
 	}
 
 	if (view->cur_track)
 		song->deleteTrack(get_track_index(view->cur_track));
 	else
-		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
+		tsunami->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackEditMidi()
@@ -233,7 +233,7 @@ void TsunamiWindow::onTrackEditMidi()
 	if (view->cur_track)
 		side_bar->open(SideBar::MIDI_EDITOR_CONSOLE);
 	else
-		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
+		tsunami->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackEditFX()
@@ -241,7 +241,7 @@ void TsunamiWindow::onTrackEditFX()
 	if (view->cur_track)
 		side_bar->open(SideBar::FX_CONSOLE);
 	else
-		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
+		tsunami->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onTrackAddMarker()
@@ -250,7 +250,7 @@ void TsunamiWindow::onTrackAddMarker()
 		MarkerDialog *d = new MarkerDialog(this, view->cur_track, view->hover.pos, -1);
 		d->run();
 	}else
-		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
+		tsunami->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onSongProperties()
@@ -263,7 +263,7 @@ void TsunamiWindow::onTrackProperties()
 	if (view->cur_track)
 		side_bar->open(SideBar::TRACK_CONSOLE);
 	else
-		tsunami->log->error(_("Keine Spur ausgew&ahlt"));
+		tsunami->log->error(_("No track selected"));
 }
 
 void TsunamiWindow::onSampleProperties()
@@ -271,7 +271,7 @@ void TsunamiWindow::onSampleProperties()
 	if (view->cur_sample)
 		side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 	else
-		tsunami->log->error(_("Kein Sample ausgew&ahlt"));
+		tsunami->log->error(_("No sample selected"));
 }
 
 void TsunamiWindow::onDeleteMarker()
@@ -279,7 +279,7 @@ void TsunamiWindow::onDeleteMarker()
 	if (view->selection.type == Selection::TYPE_MARKER)
 		view->cur_track->deleteMarker(view->selection.index);
 	else
-		tsunami->log->error(_("Kein Marker ausgew&ahlt"));
+		tsunami->log->error(_("No marker selected"));
 }
 
 void TsunamiWindow::onEditMarker()
@@ -288,7 +288,7 @@ void TsunamiWindow::onEditMarker()
 		MarkerDialog *d = new MarkerDialog(this, view->cur_track, -1, view->selection.index);
 		d->run();
 	}else
-		tsunami->log->error(_("Kein Marker ausgew&ahlt"));
+		tsunami->log->error(_("No marker selected"));
 }
 
 void TsunamiWindow::onShowLog()
@@ -315,13 +315,13 @@ string title_filename(const string &filename)
 {
 	if (filename.num > 0)
 		return filename.basename();// + " (" + filename.dirname() + ")";
-	return _("Unbenannt");
+	return _("No name");
 }
 
 bool TsunamiWindow::allowTermination()
 {
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE)){
-		string answer = HuiQuestionBox(this, _("Frage"), _("Aufnahme abbrechen?"), true);
+		string answer = HuiQuestionBox(this, _("Question"), _("Cancel recording?"), true);
 		if (answer != "hui:yes")
 			return false;
 		side_bar->_hide();
@@ -329,7 +329,7 @@ bool TsunamiWindow::allowTermination()
 
 	if (song->action_manager->isSave())
 		return true;
-	string answer = HuiQuestionBox(this, _("Frage"), format(_("'%s'\nDatei speichern?"), title_filename(song->filename).c_str()), true);
+	string answer = HuiQuestionBox(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename).c_str()), true);
 	if (answer == "hui:yes"){
 		/*if (!OnSave())
 			return false;*/

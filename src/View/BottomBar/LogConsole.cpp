@@ -10,7 +10,7 @@
 #include "LogConsole.h"
 
 LogConsole::LogConsole(Log *_log) :
-	BottomBarConsole(_("Nachrichten")),
+	BottomBarConsole(_("Messages")),
 	Observer("LogConsole")
 {
 	log = _log;

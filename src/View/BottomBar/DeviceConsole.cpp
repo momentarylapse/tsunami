@@ -10,29 +10,13 @@
 #include "../../Device/Device.h"
 
 DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
-	BottomBarConsole(_("Ger&ate")),
+	BottomBarConsole(_("Devices")),
 	Observer("DeviceConsole")
 {
 	device_manager = _device_manager;
 
 
-
-	addGrid("", 0, 0, 2, 1, "grid1");
-	setTarget("grid1", 0);
-	addGrid("", 1, 0, 1, 2, "grid2");
-	addTabControl(_("Output\\Input\\Midi Input"), 0, 0, 0, 0, "dev-tab");
-	setTarget("dev-tab", 0);
-	addListView(_("!format=ttttCc\\#\\Name\\Interner Name\\Kan&ale\\anzeigen\\pr&asent"), 0, 0, 0, 0, "output-list");
-	setTarget("dev-tab", 1);
-	addListView(_("!format=ttttCcT\\#\\Name\\Interner Name\\Kan&ale\\anzeigen\\pr&asent\\Latenz (ms)"), 0, 0, 0, 0, "input-list");
-	setTarget("dev-tab", 2);
-	addListView(_("!format=tttCc\\#\\Name\\Interner Name\\anzeigen\\pr&asent"), 0, 0, 0, 0, "midi-input-list");
-
-	setTarget("grid2", 0);
-	addButton("!flat", 0, 0, 0, 0, "top-priority");
-	addButton("!flat", 0, 1, 0, 0, "erase");
-	setImage("top-priority", "hui:up");
-	setImage("erase", "hui:delete");
+	fromResource("device-manager");
 
 	eventX("output-list", "hui:change", this, &DeviceConsole::onOutputEdit);
 	eventX("input-list", "hui:change", this, &DeviceConsole::onInputEdit);

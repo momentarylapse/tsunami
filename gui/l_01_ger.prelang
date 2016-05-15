@@ -1,0 +1,1214 @@
+// Language
+Deutsch
+// Num IDs
+311
+// Data (ID,Text,Tooltip)
+/cancel
+Abbrechen
+
+/close
+Schließen
+
+/copy
+Kopieren
+
+/db
+dB
+
+/delete
+Löschen
+
+/edit_bars
+Takte
+
+/edit_curves
+Kurven
+
+/edit_fx
+Fx
+
+/edit_levels
+Ebenen
+
+/edit_midi
+Midi
+
+/edit_midi_fx
+Midi-Fx
+
+/edit_samples
+Samples
+
+/edit_song
+Datei
+
+/edit_synth
+Synth
+
+/edit_track
+Spur
+
+/exit
+Beenden
+
+/ms
+ms
+
+/new
+Neu...
+
+/ok
+OK
+
+/open
+Öffnen...
+
+/paste
+Einfügen
+
+/pause
+Pause
+
+/per_minute
+/min
+
+/per_second
+/s
+
+/percent
+%
+
+/play
+Abspielen
+
+/record
+Aufnehmen
+
+/redo
+Wiederherstellen
+
+/save
+Speichern
+
+/save_as
+Speichern unter...
+
+/settings
+Einstellungen
+
+/stop
+Stopp
+
+/undo
+Rückgängig
+
+bar_add_dialog/bad_t_beats
+Schläge
+
+bar_add_dialog/bad_t_bpm
+Bpm
+
+bar_add_dialog/bad_t_count
+Anzahl
+
+bar_add_dialog/bar_add_dialog
+neue Takte
+
+bar_add_dialog/beats
+1\\1\\1000\\1
+
+bar_add_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_add_dialog/count
+1\\1\\10000\\1
+
+bar_add_dialog/insert:after
+danach
+
+bar_add_dialog/insert:before
+davor
+
+bar_edit_dialog/bar_edit_dialog
+Takte bearbeiten
+
+bar_edit_dialog/beats
+1\\1\\1000\\1
+
+bar_edit_dialog/bpm
+0\\0\\1000\\0.1
+
+bar_edit_dialog/edit_beats
+Schläge
+
+bar_edit_dialog/edit_bpm
+Bpm
+
+bars_dialog/add_bar
+Takt
+neue Takte einfügen
+bars_dialog/add_bar_pause
+Pause
+Pause einfügen
+bars_dialog/bar_list
+#\\Schläge\\Bpm\\Dauer
+
+bars_dialog/bars_dialog
+Takte
+
+bars_dialog/bbd_t_no_time_track
+keine Rhythmus-Spur vorhanden
+
+bars_dialog/bbd_t_no_time_track_comment
+Diese Spur ist nicht notwendig zum Editieren.\nSie macht aber das Metronom hörbar.
+
+bars_dialog/create_time_track
+anlegen
+
+bars_dialog/delete_bar
+
+markierte Takte löschen
+bars_dialog/edit_selected_bars
+
+markierte Takte editieren
+bars_dialog/scale_selected_bars
+
+markierte Takte skalieren (durch Ziehen der Markierung links)
+configurable-selection-dialog/configurable-selection-dialog
+Auswahl
+
+configurable-selection-dialog/list
+Name
+
+configurable_dialog/load_favorite
+
+Parameter laden
+configurable_dialog/preview
+Vorschau
+
+configurable_dialog/save_favorite
+
+Parameter speichern
+curve-target-dialog/curve-target-dialog
+Ziel
+
+curve-target-dialog/list
+Name
+
+curve_console/cc_group_edit
+Bearbeiten
+
+curve_console/curve_console
+Kurven
+
+curve_console/curves
+name\\min\\max\\target
+
+curve_console/target
+Parameter
+
+detune_synthesizer_dialog/all_octaves
+alle Oktaven
+
+detune_synthesizer_dialog/detune_synthesizer_dialog
+Verstimmung
+
+device-manager/dev-tab
+Output\\Input\\Midi Input
+
+device-manager/input-list
+#\\Name\\Interner Name\\Kanäle\\anzeigen\\präsent\\Latenz (ms)
+
+device-manager/midi-input-list
+#\\Name\\Interner Name\\anzeigen\\präsent
+
+device-manager/output-list
+#\\Name\\Interner Name\\Kanäle\\anzeigen\\präsent
+
+device-manager/top-priority
+
+höchste Priorität
+dummy_favorite_dialog/cancel
+Abbrechen
+
+dummy_favorite_dialog/delete
+Löschen
+
+dummy_favorite_dialog/dummy_favorite_dialog
+Effekt
+
+dummy_favorite_dialog/favorite_list
+- Standard -
+
+dummy_favorite_dialog/ok
+OK
+
+dummy_favorite_dialog/preview
+Vorschau
+
+fx_editor/add
+
+neuen Effekt hinzufügen
+fx_editor/comment_no_fx
+- hier sind (noch) keine Effekte aktiv -
+
+fx_editor/fe_g_edit
+Bearbeiten
+
+fx_editor/fx_editor
+Effects
+
+fx_panel/delete
+Löschen
+Effekt löschen
+fx_panel/enabled
+
+aktiv?
+fx_panel/load_favorite
+
+Parameter laden
+fx_panel/save_favorite
+
+Parameter speichern
+level_dialog/level_dialog
+Ebenen
+
+level_dialog/levels
+#\\Name
+
+level_dialog/lvld_t_edit
+Bearbeiten
+
+log_console/clear
+
+alle Nachrichten löschen
+log_console/log_console
+Nachrichten
+
+log_console/log_list
+type\\msg
+
+log_toolbar/log_clear
+Leeren
+
+log_toolbar/log_close
+Schließen
+
+marker_dialog/marker_dialog
+Marker
+
+menu/about
+Info
+
+menu/add_midi_track
+Midi Spur hinzufügen
+
+menu/add_time_track
+Rhythmus Spur hinzufügen
+
+menu/add_track
+Leere Spur hinzufügen
+
+menu/bars_manager
+Verwalten...
+
+menu/delete_track
+Löschen
+
+menu/edit_multi
+Auf alle ausgewählten Spuren anwenden
+
+menu/export_selection
+Auswahl Exportieren...
+
+menu/help
+Hilfe
+
+menu/insert_sample
+Fest einfügen
+
+menu/level_add
+Hinzufügen
+
+menu/level_delete
+Löschen
+
+menu/level_down
+Runter
+
+menu/level_manager
+Verwalten...
+
+menu/level_up
+Hoch
+
+menu/menu_bars
+Takte
+
+menu/menu_edit
+Bearbeiten
+
+menu/menu_file
+Datei
+
+menu/menu_help
+?
+
+menu/menu_level
+Ebenen
+
+menu/menu_level_target
+Gehe zu
+
+menu/menu_plugins
+Plugins
+
+menu/menu_plugins_channels
+Kanäle
+
+menu/menu_plugins_dynamics
+Dynamik
+
+menu/menu_plugins_echo
+Echo
+
+menu/menu_plugins_on_all
+Auf Alles
+
+menu/menu_plugins_on_midi
+Auf Midi
+
+menu/menu_plugins_other
+Eigenständig
+
+menu/menu_plugins_pitch
+Tonhöhe
+
+menu/menu_plugins_repair
+Reparieren
+
+menu/menu_plugins_sound
+Klang
+
+menu/menu_plugins_synthesizer
+Synthese
+
+menu/menu_sound
+Sound
+
+menu/menu_sub
+Samples
+
+menu/menu_track
+Spur
+
+menu/menu_view
+Ansicht
+
+menu/menu_view_channels
+Kanäle
+
+menu/menu_view_midi
+Midi
+
+menu/menu_view_peaks
+Peaks
+
+menu/pause
+Pause
+
+menu/play
+Abspielen
+
+menu/play_loop
+Schleife
+
+menu/plugin_on_file
+Auf Audiopuffer
+
+menu/record
+Aufnehmen
+
+menu/remove_sample
+Löschen
+
+menu/run_plugin
+Script ausführen...
+
+menu/sample_from_selection
+Aus Auswahl herauslösen
+
+menu/sample_manager
+Verwalten...
+
+menu/sample_properties
+Eigenschaften
+
+menu/select_all
+Alles auswählen
+
+menu/select_nothing
+Nichts auswählen
+
+menu/show_fx_console
+Effekte
+
+menu/show_log
+Meldungen
+
+menu/show_mixing_console
+Mischpult
+
+menu/song_properties
+Eigenschaften
+
+menu/stop
+Stopp
+
+menu/track_import
+Aus Datei importieren...
+
+menu/track_properties
+Eigenschaften
+
+menu/view_midi_default
+Standard
+
+menu/view_midi_score
+Klassisch
+
+menu/view_midi_tab
+Tabulatur
+
+menu/view_mono
+Mono
+
+menu/view_optimal
+Optimal
+
+menu/view_peaks_both
+Beides
+
+menu/view_peaks_max
+Maximum
+
+menu/view_peaks_mean
+Quadratisches Mittel
+
+menu/view_samples
+Sample-Ebene
+
+menu/view_stereo
+Stereo
+
+menu/zoom_in
+Vergrößern
+
+menu/zoom_out
+Verkleinern
+
+menu_fake/play
+Abspielen
+
+menu_fake/stop
+Stopp
+
+midi_editor/beat_partition
+4\\1\\256
+
+midi_editor/interval
+0\\-99\\99
+
+midi_editor/ld_t_chord
+Typ
+
+midi_editor/ld_t_interval
+Intervall
+
+midi_editor/ld_t_inversion
+Umkehrung
+
+midi_editor/ld_t_no_midi
+keine Midi-Spur ausgewählt
+
+midi_editor/ld_t_partition
+Unterteilung
+
+midi_editor/ld_t_scale
+Tonleiter
+
+midi_editor/me_group_edit
+Bearbeiten
+
+midi_editor/me_group_modifier
+Modifizierer
+
+midi_editor/me_group_reference
+Referenz-Spuren
+
+midi_editor/me_group_view
+Ansicht
+
+midi_editor/midi_edit_mode
+Einzelton\\Intervall\\Akkord
+
+midi_editor/midi_editor
+Midi
+
+midi_editor/modifier:flat
+♭
+
+midi_editor/modifier:natural
+♮
+
+midi_editor/modifier:none
+nichts
+
+midi_editor/modifier:sharp
+♯
+
+midi_fx_editor/add
+
+neuen Effekt hinzufügen
+midi_fx_editor/comment_no_fx
+- hier sind (noch) keine Effekte aktiv -
+
+midi_fx_editor/mfe_g_edit
+Bearbeiten
+
+midi_fx_editor/mfx_t_no_midi
+keine Midi-Spur ausgewählt
+
+midi_fx_editor/midi_fx_editor
+Midi Fx
+
+mini_bar/peaks
+
+Ausgabepegel
+mini_bar/show_bottom_bar
+
+Leiste aufklappen
+mini_bar/volume
+0\\-10000\\10\\0.1
+Ausgabelautstärke
+mixing-console/link-volumes
+koppeln
+die Regler aller Spuren gemeinsam ändern
+mixing-console/output-peaks
+
+Ausgabepegel
+mixing-console/output-volume
+
+Ausgabelautstärke
+mixing-console/t_output
+Ausgabe
+
+new_dialog/beats_per_bar
+4\\1\\99
+
+new_dialog/beats_per_minute
+90\\0\\999\\0.1
+
+new_dialog/metronome
+einfügen
+
+new_dialog/nd_g_frequency
+Samplerate
+
+new_dialog/nd_g_metronome
+Metronom
+
+new_dialog/nd_g_track
+erster Track
+
+new_dialog/nd_t_bars
+Takte
+
+new_dialog/nd_t_beats
+Schläge pro Takt
+
+new_dialog/nd_t_bpm
+Geschwindigkeit
+
+new_dialog/new_dialog
+Neue Datei
+
+new_dialog/new_track_type:audio
+Audio
+
+new_dialog/new_track_type:midi
+Midi
+
+new_dialog/num_bars
+10\\0\\999
+
+popup_marker_menu/delete_marker
+Löschen
+
+popup_marker_menu/edit_marker
+Bearbeiten
+
+popup_marker_menu/marker_menu_header
+Marker
+
+popup_sample_menu/insert_sample
+Fest einfügen
+
+popup_sample_menu/remove_sample
+Löschen
+
+popup_sample_menu/sample_menu_header
+Sample
+
+popup_sample_menu/sample_properties
+Eigenschaften
+
+popup_song_menu/add_midi_track
+Midi Spur hinzufügen
+
+popup_song_menu/add_track
+Leere Spur hinzufügen
+
+popup_song_menu/song_edit_bars
+Takte bearbeiten
+
+popup_song_menu/song_edit_samples
+Samples verwalten
+
+popup_song_menu/song_menu_header
+Datei
+
+popup_song_menu/song_properties
+Eigenschaften
+
+popup_track_menu/delete_track
+Löschen
+
+popup_track_menu/song_edit_bars
+Takte bearbeiten
+
+popup_track_menu/track_add_marker
+Marker setzen
+
+popup_track_menu/track_edit_fx
+Effekte bearbeiten
+
+popup_track_menu/track_edit_midi
+Midi bearbeiten
+
+popup_track_menu/track_menu_header
+Spur
+
+popup_track_menu/track_properties
+Eigenschaften
+
+progress_cancelable_dialog/progress_cancelable_dialog
+in Arbeit
+
+progress_dialog/progress_dialog
+in Arbeit
+
+raw_config_dialog/channels
+Mono\\Stereo
+
+raw_config_dialog/raw_config_dialog
+Raw Datei
+
+raw_config_dialog/sample_rate
+44100\\1
+
+raw_config_dialog/t_channels
+Kanäle
+
+raw_config_dialog/t_format
+Format
+
+raw_config_dialog/t_samplerate
+Samplerate
+
+record_dialog/capture_delete
+Verwerfen
+
+record_dialog/capture_time
+0:00
+
+record_dialog/capture_type:audio
+Audio
+
+record_dialog/capture_type:midi
+Midi
+
+record_dialog/rdt_capture
+Aufnahme
+
+record_dialog/rdt_source
+Quelle
+
+record_dialog/rdt_target
+Ziel
+
+record_dialog/record_dialog
+Aufnahme
+
+sample_manager_dialog/create_from_selection
+
+aus Auswahl erzeugen
+sample_manager_dialog/delete_sample
+
+löschen
+sample_manager_dialog/export_sample
+
+in Datei exportieren
+sample_manager_dialog/import_from_file
+
+aus Datei importieren
+sample_manager_dialog/paste_sample
+
+am Cursor der aktuellen Spur einfügen
+sample_manager_dialog/preview_sample
+
+Vorschau
+sample_manager_dialog/sample_list
+Vorschau\\Name\\Dauer\\Benutzung\\Temporär
+
+sample_manager_dialog/sample_manager_dialog
+Sample Manager
+
+sample_manager_dialog/smd_group_edit
+Bearbeiten
+
+sample_ref_dialog/ld_t_name
+Name
+
+sample_ref_dialog/ld_t_repdelay
+Abstand:
+
+sample_ref_dialog/ld_t_repetition
+Wiederholungen
+
+sample_ref_dialog/ld_t_repnum
+Anzahl:
+
+sample_ref_dialog/ld_t_track
+Spur
+
+sample_ref_dialog/ld_t_volume
+Lautstärke
+
+sample_ref_dialog/mute
+Stumm
+
+sample_ref_dialog/repdelay
+0\\0\\\\0.1
+
+sample_ref_dialog/repnum
+1\\1
+
+sample_ref_dialog/sample_ref_dialog
+Sub Track
+
+sample_ref_dialog/volume
+0\\-10000\\10\\0.1
+
+sample_selection_dialog/sample_selection_dialog
+Sample wählen
+
+sample_selection_dialog/sample_selection_list
+Vorschau\\Name\\Dauer
+
+settings_dialog/capture_filename
+
+Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt
+settings_dialog/ogg_bitrate
+64\\80\\96\\112\\128\\160\\196\\224\\256\\320\\500
+
+settings_dialog/pdp_capture
+Aufnahme
+
+settings_dialog/pdp_colorscheme
+Farbschema
+
+settings_dialog/pdp_general
+Generell
+
+settings_dialog/pdp_language
+Sprache
+
+settings_dialog/pdt_capturetempfile
+Sicherungsdatei
+
+settings_dialog/pdt_defaultartist
+Standard Artist
+wird als Tag artist=... in neue Dateien eingetragen
+settings_dialog/pdt_oggrate
+OGG-Bitrate
+
+settings_dialog/settings_dialog
+Einstellungen
+
+song_dialog/ad_t_data
+Daten
+
+song_dialog/ad_t_edit
+Bearbeiten
+
+song_dialog/ad_t_format
+Format
+
+song_dialog/ad_t_samplerate
+Samplerate
+
+song_dialog/ad_t_tags
+Tags
+
+song_dialog/compress
+Kompression
+beim Speichern
+song_dialog/data_list
+key\\value
+
+song_dialog/format
+
+beim Speichern
+song_dialog/song_dialog
+Sound-Datei
+
+song_dialog/tags
+Tag\\Wert
+Vorschlag:\n* title\n* artist\n* album\n* tracknumber\n* year/date\n* genre
+synth_console/detune
+
+verstimmen
+synth_console/sc_group_edit
+Bearbeiten
+
+synth_console/select
+
+Synthesizer wählen
+synth_panel/load_favorite
+
+Parameter laden
+synth_panel/save_favorite
+
+Parameter speichern
+track-mixer/mute
+Stumm
+
+track-mixer/panning
+0\\-100\\100\\1
+Balance
+track-mixer/volume
+0\\-10000\\10\\0.1
+Lautstärke in dB
+track_dialog/g_instrument
+Instrument
+
+track_dialog/g_name
+Name
+
+track_dialog/g_volume
+Lautstärke
+
+track_dialog/panning
+0\\-100\\100\\1
+
+track_dialog/t_panning
+Balance
+
+track_dialog/t_volume
+Lautstärke
+
+track_dialog/td_t_edit
+Bearbeiten
+
+track_dialog/track_dialog
+Spur
+
+track_dialog/volume
+0\\-10000\\10\\0.1
+
+trackdest_dialog/track_list
+Spur
+
+trackdest_dialog/trackdest_dialog
+Ziel-Spur für die Ebenen
+
+tuning_dialog/tuning_dialog
+Stimmung
+
+// Num Language Strings
+136
+// Data (ID,Text)
+
+Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
+                  Close dialog box to exit program.
+                  Close dialog box to exit program.
+        - Default -
+        - Standard -
+        - don't connect -
+        - nicht verbinden -
+  - create new track -
+  - neue Spur anlegen -
+  - none -
+  - keins -
+  ...don't worry. Everything will be fine!
+  ...keine Sorge, das wird schon!
+ - no strings -
+ - keine Saiten -
+ has crashed.\t\tThe last lines of the file message.txt::
+ ist abgestürtzt.\t\tDie letzten Zeilen der Datei message.txt:
+%d strings: 
+%d Saiten: 
+%d times
+%d mal
+%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard
+%d Spuren zum Einfügen markiert (ohne Metronom gezählt), aber %d Spuren in der Zwischenablage
+'%s'\nSave file?
+'%s'\nDatei speichern?
+(Pause)\\-\\-\\%.3f
+(Pause)\\-\\-\\%.3f
+(anonymous)
+(anonym)
+-Default  Parameters-
+-Standard Parameter-
+...done
+...done
+1st inversion
+1. Umkehrung
+2nd inversion
+2. Umkehrung
+Amplitude too large, signal distorted.
+Amplitude zu groß, Signal übersteuert.
+Audio
+Audio
+Augmented
+Übermäßig
+Bars
+Takte
+Basic form
+Grundform
+Bug Report
+Fehlermeldung
+Call: tsunami --export <File> <Exportfile>
+Aufruf: tsunami --export <Datei> <Exportdatei>
+Call: tsunami --info <File>
+Aufruf: tsunami --info <Datei>
+Can not load MidiEffect: \"%s\"
+MidiEffekt nicht ladbar: \"%s\"
+Can only delete samples which are unused.
+Kann nur Samples löschen, die nicht benutzt werden!
+Can't execute plugin on an empty audio file
+Plugin kann nicht für eine leere Audiodatei ausgeführt werden
+Can't insert recorded data (%s) into target (%s).
+Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
+Can't load effect: \"%s\"
+Effekt nicht ladbar: \"%s\"
+Can't load effect: %s
+Kann Effekt nicht laden: %s
+Can't load midi effect: %s
+Kann MidiEffekt nicht laden: %s
+Cancel
+Abbrechen
+Cancel recording?
+Aufnahme abbrechen?
+Cello
+Cello
+Clarinette
+Klarinette
+Comment/what happened:
+Kommentar/Geschehnisse:
+Could not open recording device
+Konnte Aufnahmegerät nicht öffnen
+Curves
+Kurven
+Data loss!
+Datenverlust!
+Delete level: not implemented yet...
+Ebene löschen: noch nicht implementiert...
+Description
+Beschreibung
+Devices
+Geräte
+Diminished
+Vermindert
+Dorian
+Dorisch
+Double Bass
+Kontra-Bass
+Drums
+Schlagzeug
+Editor for audio files
+Editor für Audio Dateien
+Effects
+Effekte
+Electric Bass
+E-Bass
+Electric Guitar
+E-Gitarre
+End
+Ende
+Error
+Fehler
+Error in script file: \"%s\"\n%s
+Fehler in Script-Datei: \"%s\"\n%s
+Export file
+Datei exportieren
+Failed writing header to output stream\n
+Failed writing header to output stream\n
+File properties
+Datei Eigenschaften
+Flute
+Flöte
+Guitar
+Gitarre
+Hapsichord
+Hapsichord
+Horn
+Horn
+Import file
+Datei importieren
+Just happened somehow...
+Ist halt irgendwie passiert...
+Keyboard
+Keyboard
+Length
+Dauer
+Level %d
+Ebene %d
+Levels
+Ebenen
+Locrian
+Locrisch
+Lydian
+Lydisch
+Major
+Dur
+Messages
+Nachrichten
+Metronome
+Metronom
+Midi
+Midi
+Midi Fx
+Midi Fx
+Minor
+Moll
+Mixing console
+Mischpult
+Mixolydian
+Mixolydisch
+Name:
+Name:
+New Audio File
+New Audio File
+No marker selected
+Kein Marker ausgewählt
+No name
+Unbenannt
+No sample selected
+Kein Sample ausgewählt
+No track selected
+Keine Spur ausgewählt
+Ok
+Ok
+Open file
+Datei öffnen
+Organ
+Orgel
+Phrygian
+Phrygisch
+Piano
+Piano
+Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'
+Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'
+Preview
+Vorschau
+Program was compiled without network support...
+Anwendung wurde ohne Netzerk-Unterstützung compiliert...
+Question
+Frage
+Recording
+Aufnahme
+Samplerate
+Samplerate
+Samples
+Samples
+Save file
+Datei speichern
+Saxophone
+Saxophon
+Script (*.kaba)
+Script (*.kaba)
+Select backup file for recordings
+Sicherungsdatei für Aufnahmen wählen
+Select plugin script
+Plugin-Script wählen
+Send bug report to Michi
+Fehlermeldung an Michi senden
+Start
+Anfang
+Synthesizer
+Synthesizer
+There already is one rhythm track.
+Es existiert schon eine Rhythmus-Spur.
+There has to be at least one track.
+Es muss mindestens eine Spur existieren
+Track %d
+Spur %d
+Track properties
+Spur Eigenschaften
+Track types in clipboard (%s) don't match those you want to paste into (%s)
+Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingefügt werden soll (%s)
+Trombone
+Posaune
+Trumpet
+Trompete
+Tuba
+Tuba
+Violin
+Geige
+Vocals
+Gesang
+While applying a midi effect: 
+Beim Anwenden eines MidiEffekts: 
+While applying an effect: 
+Beim Anwenden eines Effekts: 
+Your comments and the contents of the file message.txt will be sent.
+Der Kommentar und der Inhalt der Datei message.txt werden versandt
+\\- none -\\
+\\- keines -\\
+all files
+alle Dateien
+all known files
+alles mögliche
+enter new name
+neuen Namen eingeben
+exporting
+exportiere 
+exporting 
+exportiere 
+file format is incompatible for this action: 
+inkompatibles Dateiformat für diese Aktion: 
+found old recording: 
+alte Aufnahmedaten gefunden: 
+i'm now going to clean up...
+i'm now going to clean up...
+loading 
+lade 
+move selection to scale
+Selektierung ziehen zum Skalieren
+no sample selected
+kein Sample gewählt
+not configurable
+nicht konfigurierbar
+open message.txt
+message.txt öffnen
+program has crashed, error handler has been called... maybe SegFault... m(-_-)m
+program has crashed, error handler has been called... maybe SegFault... m(-_-)m
+saving 
+speichere 
+unknown file extension: 
+unbekannte Dateiendung: 
+unknown synthesizer: 
+unbekannter Synthesizer: 
+#

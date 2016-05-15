@@ -119,13 +119,13 @@ void Clipboard::paste(AudioView *view)
 	}
 
 	if (dest_type.num != temp->tracks.num){
-		tsunami->log->error(format(_("%d Spuren zum Einf&ugen markiert (ohne Metronom gez&ahlt), aber %d Spuren in der Zwischenablage"), dest_type.num, temp->tracks.num));
+		tsunami->log->error(format(_("%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard"), dest_type.num, temp->tracks.num));
 		return;
 	}
 	string t1 = "[" + implode(temp_type, ", ") + "]";
 	string t2 = "[" + implode(dest_type, ", ") + "]";
 	if (t1 != t2){
-		tsunami->log->error(format(_("Spurtypen in der Zwischenablage (%s) passen nicht zu den Spuren, in die eingef&ugt werden soll (%s)"), t1.c_str(), t2.c_str()));
+		tsunami->log->error(format(_("Track types in clipboard (%s) don't match those you want to paste into (%s)"), t1.c_str(), t2.c_str()));
 		return;
 	}
 

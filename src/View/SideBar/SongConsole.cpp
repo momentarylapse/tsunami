@@ -23,7 +23,7 @@ const SampleFormat POSSIBLE_FORMATS[NUM_POSSIBLE_FORMATS] = {
 };
 
 SongConsole::SongConsole(Song *a) :
-	SideBarConsole(_("Datei Eigenschaften")),
+	SideBarConsole(_("File properties")),
 	Observer("AudioFileConsole")
 {
 	song = a;
@@ -77,11 +77,11 @@ void SongConsole::loadData()
 	// data
 	reset("data_list");
 	int samples = song->getRange().length;
-	addString("data_list", _("Anfang\\") + song->get_time_str_long(song->getRange().start()));
-	addString("data_list", _("Ende\\") + song->get_time_str_long(song->getRange().end()));
-	addString("data_list", _("Dauer\\") + song->get_time_str_long(samples));
-	addString("data_list", _("Samples\\") + i2s(samples));
-	//addString("data_list", _("Abtastrate\\") + i2s(audio->sample_rate) + " Hz");
+	addString("data_list", _("Start") + "\\" + song->get_time_str_long(song->getRange().start()));
+	addString("data_list", _("End") + "\\" + song->get_time_str_long(song->getRange().end()));
+	addString("data_list", _("Length") + "\\" + song->get_time_str_long(samples));
+	addString("data_list", _("Samples") + "\\" + i2s(samples));
+	//addString("data_list", _("Samplerate") + "\\ + i2s(audio->sample_rate) + " Hz");
 
 	setString("samplerate", i2s(song->sample_rate));
 	for (int i=0; i<NUM_POSSIBLE_FORMATS; i++)

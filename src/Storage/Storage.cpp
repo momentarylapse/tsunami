@@ -60,7 +60,7 @@ bool Storage::load(Song *a, const string &filename)
 		return false;
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("lade ") + d->description, tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("loading ") + d->description, tsunami->win);
 
 	a->reset();
 	a->action_manager->enable(false);
@@ -92,7 +92,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 
 	Format *f = d->create();
 	Song *a = t->song;
-	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("lade ") + d->description, tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, tsunami->win);
 	od.offset = offset;
 	od.level = level;
 
@@ -130,7 +130,7 @@ bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
 	if (!f)
 		return false;
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, buf, filename, _("exportiere ") + f->description, tsunami->_win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, buf, filename, _("exporting ") + f->description, tsunami->_win);
 
 	// save
 	return _saveBufferBox(&od);
@@ -148,10 +148,10 @@ bool Storage::save(Song *a, const string &filename)
 		return false;
 
 	if (!d->testFormatCompatibility(a))
-		tsunami->log->warn(_("Datenverlust!"));
+		tsunami->log->warn(_("Data loss!"));
 	Format *f = d->create();
 
-	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("speichere ") + d->description, tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, a, NULL, NULL, filename, _("saving ") + d->description, tsunami->win);
 
 	a->filename = filename;
 
@@ -173,7 +173,7 @@ bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 		return false;
 
 	Format *f = d->create();
-	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exportiere"), tsunami->win);
+	StorageOperationData od = StorageOperationData(this, f, NULL, NULL, NULL, filename, _("exporting"), tsunami->win);
 
 	od.renderer = r;
 	f->saveViaRenderer(&od);
@@ -184,7 +184,7 @@ bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 {
 	string filter, filter_show;
-	filter_show = _("alles m&ogliche");
+	filter_show = _("all known files");
 	bool first = true;
 	foreach(FormatDescriptor *f, formats)
 		if ((f->flags & flags) == flags){
@@ -198,7 +198,7 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 				first = false;
 			}
 		}
-	filter_show += "|" + _("alle Dateien");
+	filter_show += "|" + _("all files");
 	filter += "|*";
 	foreach(FormatDescriptor *f, formats)
 		if ((f->flags & flags) == flags){
@@ -222,22 +222,22 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 
 bool Storage::askOpen(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei &offnen"), FormatDescriptor::FLAG_READ);
+	return askByFlags(win, _("Open file"), FormatDescriptor::FLAG_READ);
 }
 
 bool Storage::askSave(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei speichern"), FormatDescriptor::FLAG_WRITE);
+	return askByFlags(win, _("Save file"), FormatDescriptor::FLAG_WRITE);
 }
 
 bool Storage::askOpenImport(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei importieren"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_READ);
+	return askByFlags(win, _("Import file"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_READ);
 }
 
 bool Storage::askSaveExport(HuiWindow *win)
 {
-	return askByFlags(win, _("Datei exportieren"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_WRITE);
+	return askByFlags(win, _("Export file"), FormatDescriptor::FLAG_SINGLE_TRACK | FormatDescriptor::FLAG_WRITE);
 }
 
 
@@ -253,8 +253,8 @@ FormatDescriptor *Storage::getFormat(const string &ext, int flags)
 	}
 
 	if (found)
-		tsunami->log->error(_("inkompatibles Dateiformat f&ur diese Aktion: ") + ext);
+		tsunami->log->error(_("file format is incompatible for this action: ") + ext);
 	else
-		tsunami->log->error(_("unbekannte Dateiendung: ") + ext);
+		tsunami->log->error(_("unknown file extension: ") + ext);
 	return NULL;
 }

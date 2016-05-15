@@ -26,24 +26,15 @@ public:
 	{
 		track = t;
 		synth = t->synth;
-		addGrid("!noexpandx,expandy", 0, 0, 1, 2, "grid");
-		setTarget("grid", 0);
-		addGrid("", 0, 0, 5, 1, "header");
-		setTarget("header", 0);
-		addButton("!flat", 0, 0, 0, 0, "load_favorite");
-		setImage("load_favorite", "hui:open");
-		setTooltip("load_favorite", _("Parameter laden"));
-		addButton("!flat", 1, 0, 0, 0, "save_favorite");
-		setImage("save_favorite", "hui:save");
-		setTooltip("save_favorite", _("Parameter speichern"));
-		addLabel("!bold,center,expandx\\" + synth->name, 2, 0, 0, 0, "");
+		fromResource("synth_panel");
+		setString("name", synth->name);
 		p = synth->createPanel();
 		if (p){
 			embed(p, "grid", 0, 1);
 			p->update();
 		}else{
 			setTarget("grid", 0);
-			addLabel(_("nicht konfigurierbar"), 0, 1, 0, 0, "");
+			addLabel(_("not configurable"), 0, 1, 0, 0, "");
 			hideControl("load_favorite", true);
 			hideControl("save_favorite", true);
 		}

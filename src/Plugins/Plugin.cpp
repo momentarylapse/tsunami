@@ -34,5 +34,5 @@ Plugin::Plugin(const string &_filename)
 
 string Plugin::GetError()
 {
-	return format(_("Fehler in  Script-Datei: \"%s\"\n%s"), filename.c_str(), error_message.c_str());
+	return format(_("Error in script file: \"%s\"\n%s"), filename.c_str(), error_message.c_str());
 }

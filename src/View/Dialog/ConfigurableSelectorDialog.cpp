@@ -15,16 +15,8 @@
 Configurable *ConfigurableSelectorDialog::_return;
 
 ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _type, Song *_song, const string &old_name) :
-	HuiDialog("Selector", 400, 500, _parent, false)
+	HuiWindow("configurable-selection-dialog", _parent)
 {
-	addGrid("", 0, 0, 1, 2, "root-grid");
-	setTarget("root-grid", 0);
-	addTreeView("Name", 0, 0, 0, 0, "list");
-	addGrid("!buttonbar", 0, 1, 1, 2, "button-bar");
-	setTarget("button-bar", 0);
-	addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
-	addButton(_("Ok"), 1, 0, 0, 0, "ok");
-
 	type = _type;
 	song = _song;
 	if (type == Configurable::TYPE_EFFECT){

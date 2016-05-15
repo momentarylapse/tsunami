@@ -376,46 +376,25 @@ ConfigPanel *Configurable::createPanel()
 	}
 }*/
 
-class ConfigurationDialog : public HuiDialog, public Observer
+class ConfigurationDialog : public HuiWindow, public Observer
 {
 public:
 	ConfigurationDialog(Configurable *c, PluginData *pd, ConfigPanel *p) :
-		HuiDialog(c->name, 300, 100, tsunami->win, false),
+		HuiWindow("configurable_dialog", tsunami->win),
 		Observer("")
 	{
 		config = c;
 		panel = p;
 		progress = NULL;
-		addGrid("", 0, 0, 1, 3, "root-table");
-		setTarget("root-table", 0);
-		embed(panel, "root-table", 0, 1);
 
-		// favorite grid
-		setTarget("root-table", 0);
-		addGrid("!noexpandy", 0, 0, 5, 1, "favorite_grid");
-		setTarget("favorite_grid", 0);
-		addButton("!flat", 0, 0, 0, 0, "load_favorite");
-		setImage("load_favorite", "hui:open");
-		setTooltip("load_favorite", _("Parameter laden"));
-		addButton("!flat", 1, 0, 0, 0, "save_favorite");
-		setImage("save_favorite", "hui:save");
-		setTooltip("save_favorite", _("Parameter speichern"));
+		setTitle(config->name);
+		embed(panel, "grid", 0, 1);
+
+		if (c->configurable_type != c->TYPE_EFFECT)
+			hideControl("preview", true);
+
 		event("load_favorite", this, &ConfigurationDialog::onLoad);
 		event("save_favorite", this, &ConfigurationDialog::onSave);
-
-		// command grid
-		setTarget("root-table", 0);
-		addGrid("!buttonbar", 0, 2, 4, 1, "command_grid");
-		setTarget("command_grid", 0);
-		if (c->configurable_type == c->TYPE_EFFECT){
-			addButton(_("Vorschau"), 0, 0, 0, 0, "preview");
-			setImage("preview", "hui:media-play");
-		}
-		addLabel("!width=30", 1, 0, 0, 0, "");
-		addButton(_("Abbrechen"), 2, 0, 0, 0, "cancel");
-		setImage("cancel", "hui:cancel");
-		addDefButton(_("OK"), 3, 0, 0, 0, "ok");
-		setImage("ok", "hui:ok");
 		event("ok", this, &ConfigurationDialog::onOk);
 		event("preview", this, &ConfigurationDialog::onPreview);
 		event("cancel", this, &ConfigurationDialog::onClose);
@@ -460,7 +439,7 @@ public:
 		tsunami->win->view->renderer->effect = (Effect*)config;
 
 
-		progress = new ProgressCancelable(_("Vorschau"), win);
+		progress = new ProgressCancelable(_("Preview"), win);
 		subscribe(progress);
 		subscribe(tsunami->win->view->stream);
 		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
@@ -475,7 +454,7 @@ public:
 		}else if (progress and (o == tsunami->win->view->stream)){
 			int pos = tsunami->win->view->stream->getPos();
 			Range r = tsunami->win->view->sel.range;
-			progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length);
+			progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 			if (!tsunami->win->view->stream->isPlaying())
 				previewEnd();
 		}
@@ -510,7 +489,7 @@ bool Configurable::configure()
 	ConfigPanel *panel = createPanel();
 	if (!panel)
 		return false;
-	HuiDialog *dlg = new ConfigurationDialog(this, config, panel);
+	HuiWindow *dlg = new ConfigurationDialog(this, config, panel);
 	return (dlg->run() == "ok");
 }
 

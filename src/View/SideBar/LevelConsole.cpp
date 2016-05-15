@@ -14,7 +14,7 @@
 
 
 LevelConsole::LevelConsole(Song *s, AudioView *v) :
-	SideBarConsole(_("Ebenen")),
+	SideBarConsole(_("Levels")),
 	Observer("LevelConsole")
 {
 	song = s;

@@ -194,7 +194,7 @@ Synthesizer *CreateSynthesizer(const string &name, Song *song)
 		s->name = name;
 		return s;
 	}
-	tsunami->log->error(_("unbekannter Synthesizer: ") + name);
+	tsunami->log->error(_("unknown synthesizer: ") + name);
 	s = new DummySynthesizer;
 	s->song = song;
 	s->name = name;

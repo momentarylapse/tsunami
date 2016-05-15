@@ -12,20 +12,13 @@
 #include "../../Data/Song.h"
 #include "../../Data/Curve.h"
 
-class CurveTargetDialog : public HuiDialog
+class CurveTargetDialog : public HuiWindow
 {
 public:
 	CurveTargetDialog(HuiPanel *parent, Song *song, Array<Curve::Target> &t) :
-		HuiDialog(_("target"), 300, 400, parent->win, false),
+		HuiWindow(("curve-target-dialog"), parent->win),
 		targets(t)
 	{
-		addGrid("", 0, 0, 1, 2, "grid");
-		setTarget("grid", 0);
-		addListView("!multiselection,nobar\\name", 0, 0, 0, 0, "list");
-		addGrid("!buttonbar", 0, 1, 2, 1, "buttonbar");
-		setTarget("buttonbar", 0);
-		addButton(_("Abbrechen"), 0, 0, 0, 0, "cancel");
-		addButton(_("Ok"), 1, 0, 0, 0, "ok");
 		all_targets = Curve::Target::enumerate(song);
 
 		Array<int> sel;
@@ -65,7 +58,7 @@ public:
 };
 
 CurveConsole::CurveConsole(AudioView *_view, Song *_song) :
-	SideBarConsole(_("Kurven")),
+	SideBarConsole(_("Curves")),
 	Observer("CurveConsole")
 {
 	view = _view;

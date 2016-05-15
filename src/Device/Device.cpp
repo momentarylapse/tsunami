@@ -56,11 +56,11 @@ string Device::get_name() const
 {
 	if (is_default()){
 		if (type == TYPE_AUDIO_OUTPUT)
-			return _("        - Standard -");
+			return _("        - Default -");
 		if (type == TYPE_AUDIO_INPUT)
-			return _("        - Standard -");
+			return _("        - Default -");
 		if (type == TYPE_MIDI_INPUT)
-			return _("        - nicht verbinden -");
+			return _("        - don't connect -");
 	}
 	return name;
 }

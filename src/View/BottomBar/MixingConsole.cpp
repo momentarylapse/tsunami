@@ -100,7 +100,7 @@ void TrackMixer::update()
 
 
 MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, OutputStream *stream) :
-	BottomBarConsole(_("Mischpult")),
+	BottomBarConsole(_("Mixing console")),
 	Observer("MixingConsole")
 {
 	song = _song;

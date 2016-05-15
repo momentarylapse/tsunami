@@ -111,7 +111,7 @@ void SampleRefConsole::loadData()
 	enable("repnum", sample);
 	enable("repdelay", sample);
 
-	setString("name", _("keine Sample gew&ahlt"));
+	setString("name", _("no sample selected"));
 
 	if (!sample)
 		return;

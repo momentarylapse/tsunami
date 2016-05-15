@@ -379,7 +379,7 @@ public:
 		string data;
 		if (song->compression == 0){
 			if (!me->exports(data, channels, song->default_format))
-				warn(_("Amplitude zu gro&s, Signal &ubersteuert."));
+				warn(_("Amplitude too large, signal distorted."));
 		}else{
 
 			int uncompressed_size = me->length * channels * format_get_bits(song->default_format) / 8;

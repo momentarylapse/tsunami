@@ -22,7 +22,7 @@
 #include "../../Device/Device.h"
 
 CaptureConsole::CaptureConsole(Song *s, AudioView *v):
-	SideBarConsole(_("Aufnahme")),
+	SideBarConsole(_("Recording")),
 	Observer("CaptureDialog")
 {
 	song = s;
@@ -93,7 +93,7 @@ void CaptureConsole::onEnter()
 	reset("capture_target");
 	foreach(Track *t, song->tracks)
 		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
-	addString("capture_target", _("  - neue Spur anlegen -"));
+	addString("capture_target", _("  - create new track -"));
 
 	if (view->cur_track){
 		setTarget(view->cur_track->get_index());
@@ -134,28 +134,6 @@ void CaptureConsole::onTypeAudio()
 {
 	setType(Track::TYPE_AUDIO);
 }
-
-/*void OnSelectPort()
-{
-	int n = HuiCurWindow->getInt("");
-	if (n < ports.num)
-		tsunami->input->in_midi->connectTo(ports[n]);
-	delete HuiCurWindow;
-}
-
-void SelectMidiPort(HuiWindow *parent)
-{
-	ports = tsunami->input->in_midi->findPorts();
-	HuiDialog *dlg = new HuiDialog(_("MIDI Quelle ausw&ahlen"), 400, 300, parent, false);
-	dlg->addListView(_("MIDI Quellen"), 0, 0, 0, 0, "port_list");
-	foreach(AudioInputMidi::MidiPort &p, ports)
-		dlg->setString("port_list", p.client_name + " : " + p.port_name);
-	dlg->setString("port_list", _("        - nicht verbinden -"));
-	dlg->setTooltip("port_list", _("* entweder eine Quelle w&ahlen (empfohlen) oder\n* \"nicht verbinden\" um es anderen Programmen &uberlassen, eine Verbindung herzustellen"));
-	dlg->setInt("port_list", 0);
-	dlg->eventS("port_list", &OnSelectPort);
-	dlg->run();
-}*/
 
 void CaptureConsole::onTypeMidi()
 {
@@ -235,7 +213,7 @@ void CaptureConsole::setType(int _type)
 	}
 
 	if (!input->start()){
-		/*HuiErrorBox(MainWin, _("Fehler"), _("Konnte Aufnahmeger&at nicht &offnen"));
+		/*HuiErrorBox(MainWin, _("Error"), _("Could not open recording device"));
 		CapturingByDialog = false;
 		msg_db_l(1);
 		return;*/
@@ -329,7 +307,7 @@ bool CaptureConsole::insert()
 	i0 = s_start + dpos;
 
 	if (t->type != type){
-		tsunami->log->error(format(_("Kann aufgenommene Daten (%s) nicht in Ziel (%s) einf&ugen."), track_type(type).c_str(), track_type(t->type).c_str()));
+		tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(type).c_str(), track_type(t->type).c_str()));
 		return false;
 	}
 

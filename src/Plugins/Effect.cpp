@@ -59,7 +59,7 @@ string Effect::getError()
 {
 	if (plugin)
 		return plugin->GetError();
-	return format(_("Effekt nicht ladbar: \"%s\""), name.c_str());
+	return format(_("Can't load effect: \"%s\""), name.c_str());
 }
 
 void Effect::apply(BufferBox &buf, Track *t, bool log_error)
@@ -73,7 +73,7 @@ void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 	if (!usable){
 		msg_error("not usable... apply");
 		if (log_error)
-			tsunami->log->error(_("Beim Anwenden eines Effekts: ") + getError());
+			tsunami->log->error(_("While applying an effect: ") + getError());
 	}
 }
 

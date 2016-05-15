@@ -1,0 +1,2 @@
+Dialog progress_dialog "in Arbeit" 210 30
+	ProgressBar progress_bar ""

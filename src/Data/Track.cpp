@@ -44,7 +44,7 @@ string track_type(int type)
 	if (type == Track::TYPE_MIDI)
 		return _("Midi");
 	if (type == Track::TYPE_TIME)
-		return _("Metronom");
+		return _("Metronome");
 	return "???";
 }
 
@@ -133,9 +133,9 @@ string Track::getNiceName()
 	if (name.num > 0)
 		return name;
 	if (type == TYPE_TIME)
-		return _("Metronom");
+		return _("Metronome");
 	int n = get_track_index(this);
-	return format(_("Spur %d"), n+1);
+	return format(_("Track %d"), n+1);
 }
 
 int Track::get_index()

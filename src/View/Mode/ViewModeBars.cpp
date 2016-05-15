@@ -35,7 +35,7 @@ void ViewModeBars::drawPost(Painter *c)
 		c->drawRect(sxx1, view->area.y1, 30, view->area.height());
 		c->drawRect(sxx2 - 30, view->area.y1, 30, view->area.height());
 		c->setColor(view->colors.text);
-		c->drawStr((sxx1 + sxx2) / 2, (view->area.y1 + view->area.y2) / 2, _("Selektierung ziehen zum Skalieren"));
+		c->drawStr((sxx1 + sxx2) / 2, (view->area.y1 + view->area.y2) / 2, _("move selection to scale"));
 	}
 }
 

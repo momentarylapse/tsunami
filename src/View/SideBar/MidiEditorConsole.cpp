@@ -37,9 +37,9 @@ MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
 	for (int i=0; i<NUM_CHORD_TYPES; i++)
 		addString("chord_type", chord_type_name(i));
 	setInt("chord_type", 0);
-	addString("chord_inversion", _("Grundform"));
-	addString("chord_inversion", _("1. Umkehrung"));
-	addString("chord_inversion", _("2. Umkehrung"));
+	addString("chord_inversion", _("Basic form"));
+	addString("chord_inversion", _("1st inversion"));
+	addString("chord_inversion", _("2nd inversion"));
 	setInt("chord_inversion", 0);
 
 	for (int i=0; i<12; i++)

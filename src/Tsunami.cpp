@@ -18,7 +18,7 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.38.1";
+string AppVersion = "0.6.38.3";
 
 Tsunami *tsunami = NULL;
 
@@ -37,7 +37,7 @@ Tsunami::Tsunami() :
 
 	HuiSetProperty("name", AppName);
 	HuiSetProperty("version", AppVersion);
-	HuiSetProperty("comment", _("Editor f&ur Audio Dateien"));
+	HuiSetProperty("comment", _("Editor for audio files"));
 	HuiSetProperty("website", "http://michi.is-a-geek.org/software");
 	HuiSetProperty("copyright", "© 2007-2016 by Michael Ankele");
 	HuiSetProperty("author", "Michael Ankele <michi@lupina.de>");
@@ -61,7 +61,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	log = new Log;
 
 	log->info(AppName + " " + AppVersion);
-	log->info(_("  ...keine Sorge, das wird schon!"));
+	log->info(_("  ...don't worry. Everything will be fine!"));
 
 	clipboard = new Clipboard;
 
@@ -97,7 +97,7 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		return true;
 	if (arg[1] == "--info"){
 		if (arg.num < 3){
-			log->error(_("Aufruf: tsunami --info <Datei>"));
+			log->error(_("Call: tsunami --info <File>"));
 		}else if (storage->load(song, arg[2])){
 			msg_write(format("sample-rate: %d", song->sample_rate));
 			msg_write(format("samples: %d", song->getRange().length));
@@ -109,7 +109,7 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 		return false;
 	}else if (arg[1] == "--export"){
 		if (arg.num < 4){
-			log->error(_("Aufruf: tsunami --export <Datei> <Exportdatei>"));
+			log->error(_("Call: tsunami --export <File> <Exportfile>"));
 		}else if (storage->load(song, arg[2])){
 			storage->save(song, arg[3]);
 		}

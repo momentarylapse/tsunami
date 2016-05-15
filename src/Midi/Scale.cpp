@@ -64,19 +64,19 @@ Scale::Scale(int _type, int _root)
 string Scale::get_type_name(int type)
 {
 	if (type == TYPE_MAJOR)
-		return _("Dur");
+		return _("Major");
 	if (type == TYPE_DORIAN)
-		return _("Dorisch");
+		return _("Dorian");
 	if (type == TYPE_PHRYGIAN)
-		return _("Phrygisch");
+		return _("Phrygian");
 	if (type == TYPE_LYDIAN)
-		return _("Lydisch");
+		return _("Lydian");
 	if (type == TYPE_MIXOLYDIAN)
-		return _("Mixolydisch");
+		return _("Mixolydian");
 	if (type == TYPE_MINOR)
-		return _("Moll");
+		return _("Minor");
 	if (type == TYPE_LOCRIAN)
-		return _("Locrisch");
+		return _("Locrian");
 	return "???";
 }
 

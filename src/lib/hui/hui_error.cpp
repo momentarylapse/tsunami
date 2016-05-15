@@ -65,19 +65,19 @@ void OnReportDialogClose()
 void HuiSendBugReport()
 {
 	// dialog
-	ReportDialog = new HuiFixedDialog(_("Fehlerbericht"),400,295,ErrorDialog,false);
-	ReportDialog->addLabel(_("!bold$Name:"),5,5,360,25,"brd_t_name");
+	ReportDialog = new HuiFixedDialog(_("Bug Report"),400,295,ErrorDialog,false);
+	ReportDialog->addLabel("!bold$" + _("Name:"),5,5,360,25,"brd_t_name");
 	ReportDialog->addEdit("",5,35,385,25,"report_sender");
-	ReportDialog->addDefButton(_("OK"),265,255,120,25,"ok");
+	ReportDialog->addDefButton(_("Ok"),265,255,120,25,"ok");
 	ReportDialog->setImage("ok", "hui:ok");
-	ReportDialog->addButton(_("Abbrechen"),140,255,120,25,"cancel");
+	ReportDialog->addButton(_("Cancel"),140,255,120,25,"cancel");
 	ReportDialog->setImage("cancel", "hui:cancel");
-	ReportDialog->addLabel(_("!bold$Kommentar/Geschehnisse:"),5,65,360,25,"brd_t_comment");
+	ReportDialog->addLabel("!bold$" + _("Comment/what happened:"),5,65,360,25,"brd_t_comment");
 	ReportDialog->addMultilineEdit("",5,95,385,110,"comment");
-	ReportDialog->addLabel(_("!wrap$Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt"),5,210,390,35,"brd_t_explanation");
+	ReportDialog->addLabel("!wrap$" + _("Your comments and the contents of the file message.txt will be sent."),5,210,390,35,"brd_t_explanation");
 
-	ReportDialog->setString("report_sender",_("(anonym)"));
-	ReportDialog->setString("comment",_("Ist halt irgendwie passiert..."));
+	ReportDialog->setString("report_sender",_("(anonymous)"));
+	ReportDialog->setString("comment",_("Just happened somehow..."));
 
 	ReportDialog->eventS("ok", &OnReportDialogOK);
 	ReportDialog->eventS("cancel", &OnReportDialogClose);
@@ -126,19 +126,19 @@ void hui_default_error_handler()
 	//HuiErrorBox(NULL,"Fehler","Fehler");
 
 	// dialog
-	ErrorDialog = new HuiFixedDialog(_("Fehler"),600,500,NULL,false);
-	ErrorDialog->addLabel(HuiGetProperty("name") + " " + HuiGetProperty("version") + _(" ist abgest&urzt!		Die letzten Zeilen der Datei message.txt:"),5,5,590,20,"error_header");
-	ErrorDialog->addListView(_("Nachrichten"),5,30,590,420,"message_list");
+	ErrorDialog = new HuiFixedDialog(_("Error"),600,500,NULL,false);
+	ErrorDialog->addLabel(HuiGetProperty("name") + " " + HuiGetProperty("version") + _(" has crashed.		The last lines of the file message.txt::"),5,5,590,20,"error_header");
+	ErrorDialog->addListView(_("Messages"),5,30,590,420,"message_list");
 	//ErrorDialog->AddEdit("",5,30,590,420,"message_list";
-	ErrorDialog->addButton(_("OK"),5,460,100,25,"ok");
+	ErrorDialog->addButton(_("Ok"),5,460,100,25,"ok");
 	ErrorDialog->setImage("ok", "hui:ok");
-	ErrorDialog->addButton(_("message.txt &offnen"),115,460,200,25,"show_log");
-	ErrorDialog->addButton(_("Fehlerbericht an Michi senden"),325,460,265,25,"send_report");
+	ErrorDialog->addButton(_("open message.txt"),115,460,200,25,"show_log");
+	ErrorDialog->addButton(_("Send bug report to Michi"),325,460,265,25,"send_report");
 #ifdef _X_USE_NET_
 	ErrorDialog->eventS("send_report", &HuiSendBugReport);
 #else
 	ErrorDialog->enable("send_report", false);
-	ErrorDialog->setTooltip("send_report", _("Anwendung ohne Netzwerk-Unterst&utzung compiliert..."));
+	ErrorDialog->setTooltip("send_report", _("Program was compiled without network support..."));
 #endif
 	for (int i=1023;i>=0;i--){
 		string temp = msg_get_str(i);

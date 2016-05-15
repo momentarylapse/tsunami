@@ -128,7 +128,7 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	chunk_size = DEFAULT_CHUNK_SIZE;
 
 	if (file_test_existence(getTempFilename()))
-		tsunami->log->warn(_("alte Aufnahmedaten gefunden: ") + getTempFilename());
+		tsunami->log->warn(_("found old recording: ") + getTempFilename());
 }
 
 InputStreamAudio::~InputStreamAudio()

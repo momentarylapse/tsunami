@@ -176,7 +176,7 @@ void Song::newEmpty(int _sample_rate)
 	sample_rate = _sample_rate;
 
 	// default tags
-	addTag("title", "New Audio File");//_("neue Audiodatei"));
+	addTag("title", "New Audio File");//_("New Audio File"));
 	addTag("album", AppName);
 	addTag("artist", HuiConfig.getStr("DefaultArtist", AppName));
 
@@ -350,7 +350,7 @@ Track *Song::addTrack(int type, int index)
 	if (type == Track::TYPE_TIME){
 		// force single time track
 		if (getTimeTrack()){
-			tsunami->log->error(_("Es existiert schon eine Rhythmus-Spur."));
+			tsunami->log->error(_("There already is one rhythm track."));
 			return NULL;
 		}
 	}
@@ -395,7 +395,7 @@ void Song::addLevel(const string &name)
 
 void Song::deleteLevel(int index, bool merge)
 {
-	tsunami->log->error(_("Ebene l&oschen: noch nicht implementiert..."));
+	tsunami->log->error(_("Delete level: not implemented yet..."));
 }
 
 void Song::renameLevel(int index, const string &name)
@@ -418,7 +418,7 @@ void Song::deleteSample(int index)
 	if (samples[index]->ref_count == 0)
 		execute(new ActionSongDeleteSample(index));
 	else
-		tsunami->log->error(_("Kann nur Samples l&oschen, die nicht benutzt werden!"));
+		tsunami->log->error(_("Can only delete samples which are unused."));
 }
 
 void Song::editSampleName(int index, const string &name)
@@ -594,7 +594,7 @@ string Song::getNiceLevelName(int index)
 {
 	if (level_names[index].num > 0)
 		return level_names[index];
-	return format(_("Ebene %d"), index + 1);
+	return format(_("Level %d"), index + 1);
 }
 
 string Song::getTag(const string &key)

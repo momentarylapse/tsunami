@@ -62,45 +62,45 @@ Array<int> Instrument::default_tuning() const
 string Instrument::name() const
 {
 	if (type == TYPE_NONE)
-		return _("  - keins -");
+		return _("  - none -");
 	if (type == TYPE_PIANO)
 		return _("Piano");
 	if (type == TYPE_ORGAN)
-		return _("Orgel");
+		return _("Organ");
 	if (type == TYPE_HAPSICHORD)
 		return _("Hapsichord");
 	if (type == TYPE_KEYBOARD)
 		return _("Keyboard");
 	if (type == TYPE_GUITAR)
-		return _("Gitarre");
+		return _("Guitar");
 	if (type == TYPE_ELECTRIC_GUITAR)
-		return _("E-Gitarre");
+		return _("Electric Guitar");
 	if (type == TYPE_ELECTRIC_BASS)
-		return _("E-Bass");
+		return _("Electric Bass");
 	if (type == TYPE_DRUMS)
-		return _("Schlagzeug");
+		return _("Drums");
 	if (type == TYPE_VOCALS)
-		return _("Gesang");
+		return _("Vocals");
 	if (type == TYPE_VIOLIN)
-		return _("Geige");
+		return _("Violin");
 	if (type == TYPE_CELLO)
 		return _("Cello");
 	if (type == TYPE_DOUBLE_BASS)
-		return _("Kontra-Bass");
+		return _("Double Bass");
 	if (type == TYPE_FLUTE)
-		return _("Fl&ote");
+		return _("Flute");
 	if (type == TYPE_TRUMPET)
-		return _("Trompete");
+		return _("Trumpet");
 	if (type == TYPE_TROMBONE)
-		return _("Posaune");
+		return _("Trombone");
 	if (type == TYPE_TUBA)
 		return _("Tuba");
 	if (type == TYPE_HORN)
 		return _("Horn");
 	if (type == TYPE_SAXOPHONE)
-		return _("Saxophon");
+		return _("Saxophone");
 	if (type == TYPE_CLARINET)
-		return _("Klarinette");
+		return _("Clarinette");
 	return "???";
 }
 

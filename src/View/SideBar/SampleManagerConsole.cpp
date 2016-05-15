@@ -100,7 +100,7 @@ public:
 
 	string str()
 	{
-		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->getRange().length) + "\\" + format(_("%d mal"), s->ref_count) + "\\" + b2s(s->auto_delete);
+		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->getRange().length) + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
 	}
 	string icon;
 	Sample *s;
@@ -286,7 +286,7 @@ void SampleManagerConsole::onUpdate(Observable *o, const string &message)
 	}else if (o == preview_stream){
 		int pos = preview_stream->getPos();
 		Range r = preview_sample->getRange();
-		progress->set(_("Vorschau"), (float)(pos - r.offset) / r.length);
+		progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 		if (!preview_stream->isPlaying())
 			endPreview();
 	}else if (o == song){
@@ -307,7 +307,7 @@ void SampleManagerConsole::onPreview()
 	preview_audio->tracks[0]->midi = preview_sample->midi;
 	preview_renderer->prepare(preview_audio->getRange(), false);
 
-	progress = new ProgressCancelable(_("Vorschau"), win);
+	progress = new ProgressCancelable(_("Preview"), win);
 	subscribe(progress);
 	subscribe(preview_stream);
 	preview_stream->play();
@@ -340,7 +340,7 @@ public:
 
 		list_id = "sample_selection_list";
 
-		setString(list_id, _("\\- keines -\\"));
+		setString(list_id, _("\\- none -\\"));
 		setInt(list_id, 0);
 		foreachi(Sample *s, song->samples, i){
 			icon_names.add(render_sample(s));

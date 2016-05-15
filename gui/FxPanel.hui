@@ -1,0 +1,9 @@
+Dialog fx_panel "" 200 200
+	Grid grid "" 1 2 expandx noexpandy
+		Grid ? "" 5 1
+			Button load_favorite "" flat image=hui:open tooltip="load parameter"
+			Button save_favorite "" flat image=hui:save tooltip="save parameter"
+			Text name "" bold center expandx
+			CheckBox enabled "" tooltip="active?"
+			Button delete "Delete" flat image=hui:delete tooltip="delete effect"
+		.

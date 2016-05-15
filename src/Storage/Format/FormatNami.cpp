@@ -403,19 +403,55 @@ public:
 		me->offset = f->ReadInt();
 		int num = f->ReadInt();
 		me->resize(num);
-		f->ReadInt(); // channels (2)
-		f->ReadInt(); // bit (16)
+		int channels = f->ReadInt(); // channels (2)
+		int bits = f->ReadInt(); // bit (16)
 
 		string data;
-		data.resize(num * 4);
-		f->ReadBuffer(data.data, data.num);
-		me->import(data.data, 2, SAMPLE_FORMAT_16, num);
 
-		notify();
+		int bytes = context->layers.back().size - 16;
+		data.resize(bytes);//num * (bits / 8) * channels);
+
+		// read chunk'ed
+		int offset = 0;
+		for (int n=0; n<data.num / CHUNK_SIZE; n++){
+			f->ReadBuffer(&data[offset], CHUNK_SIZE);
+			notify();
+			offset += CHUNK_SIZE;
+		}
+		f->ReadBuffer(&data[offset], data.num % CHUNK_SIZE);
+
+		// insert
+
+		Song *song = (Song*)root->base->get();
+		if (song->compression > 0){
+			//throw string("can't read compressed nami files yet");
+			uncompress_buffer(*me, data, this);
+
+		}else{
+			me->import(data.data, channels, format_for_bits(bits), num);
+		}
 	}
 	virtual void write(File *f)
 	{
-		throw string("write SampleBufferBox...");
+		Song *song = (Song*)root->base->get();
+
+		int channels = 2;
+		f->WriteInt(me->offset);
+		f->WriteInt(me->length);
+		f->WriteInt(channels);
+		f->WriteInt(format_get_bits(song->default_format));
+
+		string data;
+		if (song->compression == 0){
+			if (!me->exports(data, channels, song->default_format))
+				warn(_("Amplitude too large, signal distorted."));
+		}else{
+
+			int uncompressed_size = me->length * channels * format_get_bits(song->default_format) / 8;
+			data = compress_buffer(*me, song, this);
+			msg_write(format("compress:  %d  -> %d    %.1f%%", uncompressed_size, data.num, (float)data.num / (float)uncompressed_size * 100.0f));
+		}
+		f->WriteBuffer(data.data, data.num);
 	}
 };
 
@@ -713,8 +749,8 @@ public:
 		f->WriteStr(me->name);
 		f->WriteFloat(me->volume);
 		f->WriteInt(me->offset);
-		f->WriteInt(me->type); // reserved
-		f->WriteInt(0);
+		f->WriteInt(me->type);
+		f->WriteInt(0); // reserved
 	}
 	virtual void write_subs()
 	{

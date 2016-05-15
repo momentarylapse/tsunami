@@ -195,7 +195,7 @@ void FileChunkBasic::read_contents()
 	read(f);
 
 	// read nested chunks
-	while (f->GetPos() < context->end()){
+	while (f->GetPos() < context->end() - 8){
 
 		string cname = read_header();
 

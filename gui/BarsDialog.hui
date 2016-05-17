@@ -13,3 +13,7 @@ Dialog bars_dialog "Takte" 380 516
 				Button delete_bar "" flat image=hui:delete tooltip="delete selected bars"
 				Button edit_selected_bars "" flat image=hui:edit tooltip="edit selected bars"
 				Button scale_selected_bars "" flat image=hui:zoom-in tooltip="scale selected bars (by moving the selection on the left)"
+			CheckBox link_to_midi "Edit midi"
+		Group bbd_t_edit "Edit"
+			Grid ? "" 3 1
+				Button /edit_song "File"

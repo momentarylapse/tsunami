@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-311
+314
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -156,6 +156,9 @@ bars_dialog/bar_list
 bars_dialog/bars_dialog
 Takte
 
+bars_dialog/bbd_t_edit
+Bearbeiten
+
 bars_dialog/bbd_t_no_time_track
 keine Rhythmus-Spur vorhanden
 
@@ -171,6 +174,9 @@ markierte Takte löschen
 bars_dialog/edit_selected_bars
 
 markierte Takte editieren
+bars_dialog/link_to_midi
+Midi mitbearbeiten
+
 bars_dialog/scale_selected_bars
 
 markierte Takte skalieren (durch Ziehen der Markierung links)
@@ -776,6 +782,9 @@ Sample Manager
 
 sample_manager_dialog/smd_group_edit
 Bearbeiten
+
+sample_ref_dialog/ld_t_edit
+Edit
 
 sample_ref_dialog/ld_t_name
 Name

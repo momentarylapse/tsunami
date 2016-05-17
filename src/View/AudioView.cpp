@@ -305,6 +305,7 @@ void AudioView::updateSelection()
 		else
 			stream->stop();
 	}
+	forceRedraw();
 
 	notify(MESSAGE_SELECTION_CHANGE);
 }

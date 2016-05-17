@@ -28,8 +28,9 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	Track *getParent();
+	Track *getTrack();
 	Range getRange();
+	int getType();
 
 	int get_index();
 

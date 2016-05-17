@@ -50,7 +50,7 @@ void SampleRef::__delete__()
 
 int SampleRef::get_index()
 {
-	Track *t = getParent();
+	Track *t = getTrack();
 	if (t){
 		foreachi(SampleRef *s, t->samples, i)
 			if (this == s)
@@ -59,7 +59,7 @@ int SampleRef::get_index()
 	return -1;
 }
 
-Track *SampleRef::getParent()
+Track *SampleRef::getTrack()
 {
 	if (owner)
 		return owner->tracks[track_no];
@@ -69,4 +69,9 @@ Track *SampleRef::getParent()
 Range SampleRef::getRange()
 {
 	return origin->getRange() + pos;
+}
+
+int SampleRef::getType()
+{
+	return origin->type;
 }

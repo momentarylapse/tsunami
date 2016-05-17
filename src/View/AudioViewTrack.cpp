@@ -215,8 +215,9 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 		drawSampleFrame(c, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
-	if (s->midi)
+	if (s->getType() == Track::TYPE_AUDIO)
+		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
+	else if (s->getType() == Track::TYPE_MIDI)
 		drawMidi(c, *s->midi, s->pos);
 
 	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);

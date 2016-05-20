@@ -10,6 +10,7 @@
 #include "../../Data/Song.h"
 #include "DummySynthesizer.h"
 #include "SampleSynthesizer.h"
+#include "../../Midi/MidiSource.h"
 #include "../../Tsunami.h"
 #include "../../Stuff/Log.h"
 #include "../../Plugins/PluginManager.h"
@@ -21,7 +22,6 @@ Synthesizer::Synthesizer() :
 {
 	sample_rate = 0;
 	keep_notes = 0;
-	auto_stop = true;
 	locked = false;
 	instrument = Instrument(Instrument::TYPE_PIANO);
 
@@ -86,39 +86,16 @@ void Synthesizer::setInstrument(Instrument &i)
 void Synthesizer::lock()
 {
 	// really unsafe locking mechanism
+	printf("syn.lock\n");
 	while (locked){}
+	printf("...\n");
 	locked = true;
 }
 
 void Synthesizer::unlock()
 {
+	printf("syn.unlock\n");
 	locked = false;
-}
-
-
-// _events should be sorted...
-void Synthesizer::feed(const MidiRawData &_events)
-{
-	events.append(_events);
-}
-
-/*void Synthesizer::add(const MidiEvent &e)
-{
-	for (int i=events.num-1; i>=0; i--)
-		if (events[i].pos <= e.pos){
-			events.insert(e, i+1);
-			return;
-		}
-	events.add(e);
-}*/
-
-void Synthesizer::endAllNotes()
-{
-	MidiRawData midi;
-	foreach(int p, active_pitch)
-		midi.add(MidiEvent(0, p, 0));
-	if (midi.num > 0)
-		feed(midi);
 }
 
 void Synthesizer::enablePitch(int pitch, bool enable)
@@ -131,40 +108,29 @@ void Synthesizer::enablePitch(int pitch, bool enable)
 		//delete_me.add(pitch);
 }
 
-void Synthesizer::iterateEvents(int samples)
-{
-	for (int i=events.num-1; i>=0; i--)
-		if (events[i].pos >= samples)
-			events[i].pos -= samples;
-		else
-			events.erase(i);
-	events.samples = max(events.samples - samples, 0);
-}
-
-int Synthesizer::read(BufferBox &buf)
+int Synthesizer::read(BufferBox &buf, MidiSource *source)
 {
 	// get from source...
+	events.samples = buf.length;
+	int n = source->read(events);
+	if (n < buf.length)
+		source_run_out = true;
+
 	buf.scale(0);
 
-	if (auto_stop and hasEnded())
+	if (hasRunOutOfData())
 		return 0;
 
 	render(buf);
 
-	iterateEvents(buf.length);
+	events.clear();
 
 	return buf.length;
 }
 
-bool Synthesizer::hasEnded()
+bool Synthesizer::hasRunOutOfData()
 {
-	return (events.num == 0) and (events.samples == 0) and (active_pitch.num == 0);
-}
-
-void Synthesizer::resetMidiData()
-{
-	events.clear();
-	events.samples = 0;
+	return (events.num == 0) and (events.samples == 0) and (active_pitch.num == 0) and source_run_out;
 }
 
 void Synthesizer::reset()

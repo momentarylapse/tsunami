@@ -208,6 +208,7 @@ OBJ = \
  Midi/MidiData.o\
  Midi/MidiEvent.o\
  Midi/MidiNote.o\
+ Midi/MidiSource.o\
  Midi/Scale.o\
  Plugins/ConfigPanel.o\
  Plugins/Configurable.o\
@@ -902,6 +903,9 @@ Midi/MidiEvent.o : Midi/MidiEvent.cpp
 
 Midi/MidiNote.o : Midi/MidiNote.cpp
 	$(CPP) -c Midi/MidiNote.cpp -o $@ $(CXXFLAGS)
+
+Midi/MidiSource.o : Midi/MidiSource.cpp
+	$(CPP) -c Midi/MidiSource.cpp -o $@ $(CXXFLAGS)
 
 Midi/Scale.o : Midi/Scale.cpp
 	$(CPP) -c Midi/Scale.cpp -o $@ $(CXXFLAGS)

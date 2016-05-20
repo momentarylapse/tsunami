@@ -156,6 +156,11 @@ class AudioRenderer
 	extern virtual int seek()
 	extern virtual int getSampleRate()
 
+class MidiSource
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual int read(MidiRawData midi)
+
 class Synthesizer
 	string name
 	int sample_rate
@@ -171,9 +176,8 @@ class Synthesizer
 	extern void resetState()
 	extern void resetConfig()
 	extern void setSampleRate(int sample_rate)
-	extern virtual int read(BufferBox buf)
 	
-	extern void feed(MidiRawData midi)
+//	extern void feed(MidiRawData midi)
 	
 	extern void enablePitch(int pitch, bool enable)
 	//extern void notify()
@@ -185,15 +189,12 @@ class DummySynthesizer : Synthesizer
 	extern overwrite void render(BufferBox buf)
 
 class MidiRenderer
-	extern void __init__(Synthesizer *s)
+	extern void __init__(Synthesizer *s, MidiSource *source)
 	extern virtual void __delete__()
 	extern void setSynthesizer(Synthesizer *s)
-	extern void feed(MidiRawData midi)
-	extern void resetMidiData()
 	extern virtual int read(BufferBox buf)
 	extern virtual void reset()
 	extern virtual int getSampleRate()
-	extern void setAutoStop(bool active)
 
 class EnvelopeADSR
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)

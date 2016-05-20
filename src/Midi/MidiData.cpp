@@ -184,9 +184,10 @@ MidiRawData MidiRawData::getEvents(const Range &r) const
 	return a;
 }
 
+// needs to ignore the current this->samples... always set to r.length
 int MidiRawData::read(MidiRawData &data, const Range &r) const
 {
-	data.samples = min(r.length, samples - r.offset);
+	data.samples = r.length;//min(r.length, samples - r.offset);
 	foreach(MidiEvent &e, const_cast<MidiRawData&>(*this))
 		if (r.is_inside(e.pos))
 			data.add(MidiEvent(e.pos - r.offset, e.pitch, e.volume));
@@ -376,6 +377,7 @@ MidiRawData midi_notes_to_events(const MidiData &notes)
 		r.add(MidiEvent(n.range.offset, n.pitch, n.volume));
 		r.add(MidiEvent(n.range.end()-1, n.pitch, 0));
 	}
+	r.samples = notes.samples;
 	return r;
 }
 
@@ -403,6 +405,7 @@ MidiData midi_events_to_notes(const MidiRawData &events)
 				}
 		}
 	}
+	a.samples = events.samples;
 	return a;
 }
 

@@ -117,7 +117,7 @@ void AddRichTone(float sample_rate, BufferBox buf, int pos0, int pos1, float f, 
 /*class RichtSynthesizer : DummySynthesizer
 	virtual void AddToneFreq(BufferBox buf, Range r, float freq, float volume)*/
 
-void AddChord(Synthesizer s, Range r, Chord c, float volume)
+/*void AddChord(Synthesizer s, Range r, Chord c, float volume)
 	
 	float[] pitch
 	pitch.add(c.base_tone)
@@ -131,4 +131,4 @@ void AddChord(Synthesizer s, Range r, Chord c, float volume)
 	MidiRawData midi
 	for p in pitch
 		midi.addNote(_MidiNote(r, p, volume))
-	s.feed(midi)
+	s.feed(midi)*/

@@ -28,6 +28,7 @@ public:
 	virtual int getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
 	virtual int getNumSamples(){ return 0; }
 	virtual Array<Tag> getTags();
+	virtual bool needsReset(){ return false; }
 };
 
 #endif /* AUDIORENDERER_H_ */

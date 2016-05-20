@@ -10,9 +10,10 @@
 
 
 
-MidiRenderer::MidiRenderer(Synthesizer *_s)
+MidiRenderer::MidiRenderer(Synthesizer *_s, MidiSource *_source)
 {
-	auto_stop = true;
+	samples_remaining = -1;
+	source = _source;
 	setSynthesizer(_s);
 }
 
@@ -20,9 +21,9 @@ MidiRenderer::~MidiRenderer()
 {
 }
 
-void MidiRenderer::__init__(Synthesizer *s)
+void MidiRenderer::__init__(Synthesizer *s, MidiSource *source)
 {
-	new(this) MidiRenderer(s);
+	new(this) MidiRenderer(s, source);
 }
 
 void MidiRenderer::__delete__()
@@ -32,8 +33,6 @@ void MidiRenderer::__delete__()
 void MidiRenderer::setSynthesizer(Synthesizer *_s)
 {
 	s = _s;
-	if (s)
-		s->auto_stop = auto_stop;
 }
 
 int MidiRenderer::getSampleRate()
@@ -43,41 +42,16 @@ int MidiRenderer::getSampleRate()
 	return DEFAULT_SAMPLE_RATE;
 }
 
-void MidiRenderer::feed(const MidiRawData &data)
-{
-	if (s)
-		s->feed(data);
-}
-
-void MidiRenderer::endAllNotes()
-{
-	if (s)
-		s->endAllNotes();
-}
-
 int MidiRenderer::read(BufferBox &buf)
 {
-	if (!s)
+	if (!s or !source)
 		return 0;
-	return s->read(buf);
+	return s->read(buf, source);
 }
 
 void MidiRenderer::reset()
 {
 	if (s)
 		s->reset();
-}
-
-void MidiRenderer::resetMidiData()
-{
-	if (s)
-		s->resetMidiData();
-}
-
-void MidiRenderer::setAutoStop(bool _auto_stop)
-{
-	auto_stop = _auto_stop;
-	if (s)
-		s->auto_stop = _auto_stop;
 }
 

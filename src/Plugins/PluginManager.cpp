@@ -19,6 +19,7 @@
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Audio/Synth/DummySynthesizer.h"
 #include "../Audio/Renderer/SongRenderer.h"
+#include "../Midi/MidiSource.h"
 #include "../View/Helper/Progress.h"
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
@@ -184,6 +185,12 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("SampleRef.__init__", Script::mf(&SampleRef::__init__));
 	Script::DeclareClassVirtualIndex("SampleRef", "__delete__", Script::mf(&SampleRef::__delete__), &sampleref);
 
+	MidiSource midi_source;
+	Script::DeclareClassSize("MidiSource", sizeof(MidiSource));
+	Script::LinkExternal("MidiSource.__init__", Script::mf(&MidiSource::__init__));
+	Script::DeclareClassVirtualIndex("MidiSource", "__delete__", Script::mf(&MidiSource::__delete__), &midi_source);
+	Script::DeclareClassVirtualIndex("MidiSource", "read", Script::mf(&MidiSource::read), &midi_source);
+
 	Synthesizer synth;
 	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
 	Script::DeclareClassOffset("Synthesizer", "name", _offsetof(Synthesizer, name));
@@ -199,23 +206,23 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Synthesizer.resetConfig", Script::mf(&Synthesizer::resetConfig));
 	Script::LinkExternal("Synthesizer.resetState", Script::mf(&Synthesizer::resetState));
 	Script::LinkExternal("Synthesizer.enablePitch", Script::mf(&Synthesizer::enablePitch));
-	Script::DeclareClassVirtualIndex("Synthesizer", "read", Script::mf(&Synthesizer::read), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "onConfig", Script::mf(&Synthesizer::onConfig), &synth);
-	Script::LinkExternal("Synthesizer.feed", Script::mf(&Synthesizer::feed));
+//	Script::LinkExternal("Synthesizer.feed", Script::mf(&Synthesizer::feed));
 	Script::LinkExternal("Synthesizer.setSampleRate", Script::mf(&Synthesizer::setSampleRate));
 	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
 
-	MidiRenderer midiren(NULL);
+	MidiRenderer midiren(NULL, NULL);
 	Script::DeclareClassSize("MidiRenderer", sizeof(MidiRenderer));
 	Script::LinkExternal("MidiRenderer.__init__", Script::mf(&MidiRenderer::__init__));
 	Script::DeclareClassVirtualIndex("MidiRenderer", "__delete__", Script::mf(&MidiRenderer::__delete__), &midiren);
 	Script::DeclareClassVirtualIndex("MidiRenderer", "read", Script::mf(&MidiRenderer::read), &midiren);
 	Script::DeclareClassVirtualIndex("MidiRenderer", "reset", Script::mf(&MidiRenderer::reset), &midiren);
 	Script::DeclareClassVirtualIndex("MidiRenderer", "getSampleRate", Script::mf(&MidiRenderer::getSampleRate), &midiren);
-	Script::LinkExternal("MidiRenderer.feed", Script::mf(&MidiRenderer::feed));
-	Script::LinkExternal("MidiRenderer.resetMidiData", Script::mf(&MidiRenderer::resetMidiData));
-	Script::LinkExternal("MidiRenderer.setAutoStop", Script::mf(&MidiRenderer::setAutoStop));
+//	Script::LinkExternal("MidiRenderer.feed", Script::mf(&MidiRenderer::feed));
+//	Script::LinkExternal("MidiRenderer.resetMidiData", Script::mf(&MidiRenderer::resetMidiData));
+//	Script::LinkExternal("MidiRenderer.setAutoStop", Script::mf(&MidiRenderer::setAutoStop));
+//	Script::LinkExternal("MidiRenderer.setEnd", Script::mf(&MidiRenderer::setEnd));
 	Script::LinkExternal("MidiRenderer.setSynthesizer", Script::mf(&MidiRenderer::setSynthesizer));
 
 

@@ -18,10 +18,10 @@ class MidiSource;
 class MidiRenderer : public AudioRenderer
 {
 public:
-	MidiRenderer(Synthesizer *s);
+	MidiRenderer(Synthesizer *s, MidiSource *source);
 	virtual ~MidiRenderer();
 
-	void __init__(Synthesizer *s);
+	void __init__(Synthesizer *s, MidiSource *source);
 	virtual void __delete__();
 
 	Synthesizer *getSynthesizer(){ return s; }
@@ -30,17 +30,12 @@ public:
 	virtual int read(BufferBox &buf);
 	virtual void reset();
 
-	void feed(const MidiRawData &data);
-	void endAllNotes();
-	void resetMidiData();
-
-	void setAutoStop(bool auto_stop);
-
 	virtual int getSampleRate();
 
 private:
 	Synthesizer *s;
-	bool auto_stop;
+	MidiSource *source;
+	bool samples_remaining;
 };
 
 #endif /* SRC_AUDIO_RENDERER_MIDIRENDERER_H_ */

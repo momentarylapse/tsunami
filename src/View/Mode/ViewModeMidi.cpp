@@ -13,11 +13,59 @@
 #include "../../Audio/Synth/Synthesizer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Midi/Clef.h"
+#include "../../Midi/MidiSource.h"
 #include "../../TsunamiWindow.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
 const int PITCH_SHOW_COUNT = 30;
+
+class MidiPreviewSource : public MidiSource
+{
+public:
+	MidiPreviewSource()
+	{
+		started = ended = false;
+		end_of_stream = false;
+	}
+	virtual int read(MidiRawData &midi)
+	{
+		if (end_of_stream)
+			return 0;
+		if (started){
+			foreach(int p, pitch)
+				midi.add(MidiEvent(0, p, 1));
+			started = false;
+		}
+		if (ended){
+			foreach(int p, pitch)
+				midi.add(MidiEvent(0, p, 0));
+			ended = false;
+			end_of_stream = true;
+		}
+		return midi.samples;
+	}
+
+	void start(const Array<int> &_pitch)
+	{
+		if (ended)
+			return;
+		pitch = _pitch;
+		started = true;
+		end_of_stream = false;
+	}
+	void end()
+	{
+		ended = true;
+	}
+
+	bool started, ended;
+	bool end_of_stream;
+
+	Array<int> pitch;
+};
+
+static MidiPreviewSource *preview_source;
 
 ViewModeMidi::ViewModeMidi(AudioView *view) :
 	ViewModeDefault(view)
@@ -38,9 +86,9 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 	scroll_bar = rect(0, 0, 0, 0);
 	track_rect = rect(0, 0, 0, 0);
 
+	preview_source = new MidiPreviewSource;
 
-	preview_renderer = new MidiRenderer(NULL);
-	preview_renderer->setAutoStop(true);
+	preview_renderer = new MidiRenderer(NULL, preview_source);
 	preview_stream = new OutputStream(preview_renderer);
 	preview_stream->setBufferSize(2048);
 }
@@ -60,15 +108,11 @@ void ViewModeMidi::onLeftButtonDown()
 		hover->clear();
 		deleting = true;
 	}else if (selection->type == Selection::TYPE_MIDI_PITCH){
-		preview_renderer->resetMidiData();
 		preview_renderer->setSynthesizer(view->cur_track->synth);
 
-		Array<int> pitch = getCreationPitch();
-		MidiRawData midi;
-		foreach(int p, pitch)
-			midi.add(MidiEvent(0, p, 1));
-		preview_renderer->feed(midi);
-		preview_stream->play();
+		preview_source->start(getCreationPitch());
+		if (!preview_stream->isPlaying())
+			preview_stream->play();
 	}else if (selection->type == Selection::TYPE_SCROLL){
 		scroll_offset = view->my - scroll_bar.y1;
 	}
@@ -81,7 +125,7 @@ void ViewModeMidi::onLeftButtonUp()
 	if (selection->type == Selection::TYPE_MIDI_PITCH){
 		view->cur_track->addMidiNotes(getCreationNotes());
 
-		preview_renderer->endAllNotes();
+		preview_source->end();
 	}
 	deleting = false;
 }

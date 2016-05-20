@@ -10,30 +10,29 @@
 
 #include "MidiData.h"
 
-class MidiSource
+class MidiSource : public VirtualBase
 {
 public:
-	MidiSource(){}
+	MidiSource();
 	virtual ~MidiSource(){}
 
-	virtual int read(MidiRawData &midi) = 0;
-	virtual void reset() = 0;
-	virtual Range range() = 0;
-	virtual int getPos() = 0;
-	virtual void seek(int pos) = 0;
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
+
+	virtual int read(MidiRawData &midi){ return 0; };
 };
 
 class MidiDataSource : public MidiSource
 {
 public:
-	MidiDataSource(const MidiData &midi);
+	MidiDataSource(const MidiRawData &midi);
 	virtual ~MidiDataSource();
 
 	virtual int read(MidiRawData &midi);
-	virtual void reset();
-	virtual Range range();
-	virtual int getPos();
-	virtual void seek(int pos);
+
+	void setData(const MidiRawData &midi);
+
+	void seek(int pos);
 
 	MidiRawData midi;
 	int offset;

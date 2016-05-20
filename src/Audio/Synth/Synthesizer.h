@@ -46,25 +46,19 @@ public:
 
 	int keep_notes;
 
-	virtual int read(BufferBox &buf);
+	int read(BufferBox &buf, MidiSource *source);
 
-	void feed(const MidiRawData &events);
-	void endAllNotes();
-	void resetMidiData();
 	void reset();
 
-	void iterateEvents(int samples);
+	bool hasRunOutOfData();
 
-	bool hasEnded();
-	bool auto_stop;
+	bool source_run_out;
 
 	bool isDefault();
 
 protected:
 
 	Instrument instrument;
-
-	MidiSource *source;
 
 	MidiRawData events;
 

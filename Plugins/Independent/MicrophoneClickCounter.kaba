@@ -7,6 +7,18 @@ const float THRESHOLD1 = 0.20
 const float THRESHOLD2 = 0.15
 const float RECOVER_TIME = 0.40
 
+class ClickSource : MidiSource
+	bool emit_click
+	void __init__()
+		emit_click = false
+	overwrite int read(MidiRawData midi)
+		if emit_click
+			midi.add(_MidiEvent(0, 80, 1))
+			midi.add(_MidiEvent(1, 80, 0))
+			emit_click = false
+		return midi.samples
+	void click()
+		emit_click = true
 
 class ClickCounter : Dialog
 	void __init__(Window *parent)
@@ -36,9 +48,9 @@ class ClickCounter : Dialog
 		input.start()
 		input.addObserver(self, &onInput)
 	
+		source = new ClickSource
 		synth = CreateSynthesizer("")
-		renderer = new MidiRenderer(synth)
-		renderer.setAutoStop(false)
+		renderer = new MidiRenderer(synth, source)
 		stream = new OutputStream(renderer)
 		stream.setBufferSize(2048)
 		stream.play()
@@ -47,6 +59,7 @@ class ClickCounter : Dialog
 	OutputStream *stream
 	Synthesizer *synth
 	MidiRenderer *renderer
+	ClickSource *source
 
 	float Volume
 	int counter
@@ -103,10 +116,7 @@ class ClickCounter : Dialog
 				if !active
 					print "start"
 					active = true
-					MidiRawData midi
-					midi.add(_MidiEvent(0, 80, 1))
-					midi.add(_MidiEvent(1, 80, 0))
-					renderer.feed(midi)
+					source.click()
 					if !stream.isPlaying()
 						stream.play()
 					counter ++

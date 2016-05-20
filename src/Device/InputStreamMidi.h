@@ -19,6 +19,7 @@ class MidiRenderer;
 class Synthesizer;
 class Device;
 class DeviceManager;
+class MidiPreviewFeedSource;
 
 class InputStreamMidi : public PeakMeterSource
 {
@@ -87,6 +88,7 @@ private:
 	bool running;
 	int hui_runner_id;
 
+	MidiPreviewFeedSource *preview_source;
 	OutputStream *preview_stream;
 	MidiRenderer *preview_renderer;
 };

@@ -12,12 +12,15 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Data/Curve.h"
 #include "../../Data/SongSelection.h"
+#include "../../Midi/MidiSource.h"
 #include "../../Tsunami.h"
 
 #include "../../lib/math/math.h"
 
 SongRenderer::SongRenderer(Song *s, SongSelection *_sel)
 {
+	MidiRawData no_midi;
+	midi_streamer = new MidiDataSource(no_midi);
 	song = s;
 	sel = _sel;
 	sel_own = false;
@@ -38,6 +41,7 @@ SongRenderer::~SongRenderer()
 {
 	if (sel_own)
 		delete sel;
+	delete(midi_streamer);
 }
 
 void SongRenderer::__init__(Song *s, SongSelection *sel)
@@ -121,8 +125,8 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	foreach(Beat &b, beats)
 		raw.addMetronomeClick(b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
 
-	t->synth->feed(raw);
-	t->synth->read(buf);
+	midi_streamer->setData(raw);
+	t->synth->read(buf, midi_streamer);
 }
 
 void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
@@ -141,8 +145,8 @@ void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 	MidiRawData events;
 	raw.read(events, range_cur);
 
-	t->synth->feed(events);
-	t->synth->read(buf);
+	midi_streamer->setData(events);
+	t->synth->read(buf, midi_streamer);
 }
 
 void SongRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)

@@ -14,10 +14,39 @@
 #include "OutputStream.h"
 #include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
+#include "../Midi/MidiSource.h"
 
 
 static const float DEFAULT_UPDATE_TIME = 0.005f;
 const string InputStreamMidi::MESSAGE_CAPTURE = "Capture";
+
+class MidiPreviewFeedSource : public MidiSource
+{
+public:
+	virtual int read(MidiRawData &midi)
+	{
+		msg_write("mpfs.read");
+		for (int i=events.num-1; i>=0; i--){
+			if (events[i].pos < midi.samples){
+				msg_write("add " + format("%d  %f", events[i].pitch, events[i].volume));
+				midi.add(events[i]);
+				events.erase(i);
+			}else
+				events[i].pos -= midi.samples;
+		}
+
+		events.samples = 0;
+		return midi.samples;
+	}
+
+	void feed(const MidiRawData &midi)
+	{
+		events.append(midi);
+		msg_write("feed " + i2s(midi.num));
+	}
+
+	MidiRawData events;
+};
 
 
 InputStreamMidi::InputStreamMidi(int _sample_rate) :
@@ -35,7 +64,9 @@ InputStreamMidi::InputStreamMidi(int _sample_rate) :
 	init();
 
 
-	preview_renderer = new MidiRenderer(NULL);
+	preview_source = new MidiPreviewFeedSource;
+	msg_error(p2s(preview_source));
+	preview_renderer = new MidiRenderer(NULL, preview_source);
 	preview_stream = new OutputStream(preview_renderer);
 	preview_stream->setBufferSize(2048);
 }
@@ -45,8 +76,9 @@ InputStreamMidi::~InputStreamMidi()
 	stop();
 	if (subs)
 		unconnect();
-	delete(preview_renderer);
 	delete(preview_stream);
+	delete(preview_renderer);
+	delete(preview_source);
 }
 
 void InputStreamMidi::init()
@@ -167,7 +199,7 @@ void InputStreamMidi::stop()
 	_stopUpdate();
 	capturing = false;
 	//preview_renderer->setAutoStop(true);
-	preview_renderer->endAllNotes();
+//	preview_renderer->endAllNotes();
 	//preview_stream->stop();
 
 	midi.sanify(Range(0, midi.samples));
@@ -202,7 +234,7 @@ int InputStreamMidi::doCapturing()
 	}
 
 	if (current_midi.num > 0)
-		preview_renderer->feed(current_midi);
+		preview_source->feed(current_midi);
 	if ((current_midi.num > 0) and (!preview_stream->isPlaying()))
 		preview_stream->play();
 

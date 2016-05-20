@@ -11,6 +11,7 @@
 #include "AudioRenderer.h"
 
 class SongSelection;
+class MidiDataSource;
 
 class SongRenderer : public AudioRenderer
 {
@@ -53,6 +54,8 @@ private:
 	Range range_cur;
 	int pos;
 	Array<MidiData> midi;
+
+	MidiDataSource *midi_streamer;
 
 	SongSelection *sel;
 	bool sel_own;

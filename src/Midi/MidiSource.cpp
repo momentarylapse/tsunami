@@ -6,10 +6,25 @@
  */
 
 #include "MidiSource.h"
+#include "../lib/file/msg.h"
 
-MidiDataSource::MidiDataSource(const MidiData& _midi)
+
+MidiSource::MidiSource()
 {
-	midi = midi_notes_to_events(_midi);
+}
+
+void MidiSource::__init__()
+{
+	new(this) MidiSource;
+}
+
+void MidiSource::__delete__()
+{
+}
+
+MidiDataSource::MidiDataSource(const MidiRawData& _midi)
+{
+	midi = _midi;
 	offset = 0;
 }
 
@@ -21,6 +36,7 @@ int MidiDataSource::read(MidiRawData& _midi)
 {
 	int n = min(midi.samples - offset, _midi.samples);
 	Range r = Range(offset, n);
+	//midi.read(_midi, r);
 	foreach(MidiEvent &e, midi)
 		if (r.is_inside(e.pos))
 			_midi.add(MidiEvent(e.pos - offset, e.pitch, e.volume));
@@ -28,12 +44,13 @@ int MidiDataSource::read(MidiRawData& _midi)
 	return n;
 }
 
-void MidiDataSource::reset()
+void MidiDataSource::setData(const MidiRawData &_midi)
 {
+	midi = _midi;
 	offset = 0;
 }
 
-Range MidiDataSource::range()
+/*Range MidiDataSource::range()
 {
 	return midi.getRange(0);
 }
@@ -41,7 +58,7 @@ Range MidiDataSource::range()
 int MidiDataSource::getPos()
 {
 	return offset;
-}
+}*/
 
 void MidiDataSource::seek(int pos)
 {

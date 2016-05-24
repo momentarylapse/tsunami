@@ -32,7 +32,7 @@ BottomBar::BottomBar(AudioView *view, Song *song, DeviceManager *device_manager,
 	addListView("!nobar\\name", 0, 1, 0, 0, "choose");
 
 	log_console = new LogConsole(log);
-	mixing_console = new MixingConsole(song, device_manager, view->stream);
+	mixing_console = new MixingConsole(song, device_manager, view->stream, view);
 	device_console = new DeviceConsole(device_manager);
 	addConsole(log_console, "");
 	addConsole(mixing_console, "");

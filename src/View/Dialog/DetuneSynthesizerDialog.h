@@ -12,11 +12,12 @@
 
 class Synthesizer;
 class Track;
+class AudioView;
 
 class DetuneSynthesizerDialog : public HuiDialog
 {
 public:
-	DetuneSynthesizerDialog(Synthesizer *s, Track *t, HuiWindow *parent);
+	DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *view, HuiWindow *parent);
 	virtual ~DetuneSynthesizerDialog();
 
 	virtual void onDraw(Painter *p);
@@ -33,6 +34,7 @@ public:
 
 	Synthesizer *synth;
 	Track *track;
+	AudioView *view;
 	float width, height;
 
 	int hover;

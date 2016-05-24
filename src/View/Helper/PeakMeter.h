@@ -13,6 +13,8 @@
 #include "../../Stuff/Observable.h"
 #include "../../Data/BufferBox.h"
 
+class AudioView;
+
 class PeakMeterSource : public Observable
 {
 public:
@@ -30,7 +32,7 @@ public:
 class PeakMeter : public HuiEventHandler, public Observer
 {
 public:
-	PeakMeter(HuiPanel *panel, const string &id, PeakMeterSource *source);
+	PeakMeter(HuiPanel *panel, const string &id, PeakMeterSource *source, AudioView *view);
 	virtual ~PeakMeter();
 
 	void onDraw(Painter *p);
@@ -52,6 +54,7 @@ private:
 	float i_to_freq(int i);
 
 	HuiPanel *panel;
+	AudioView *view;
 	string id;
 	PeakMeterSource *source;
 	int mode;

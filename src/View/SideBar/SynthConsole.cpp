@@ -116,14 +116,14 @@ void SynthConsole::onSelect()
 {
 	if (!track)
 		return;
-	Synthesizer *s = ChooseSynthesizer(tsunami->win, track->song, track->synth->name);
+	Synthesizer *s = ChooseSynthesizer(win, track->song, track->synth->name);
 	if (s)
 		track->setSynthesizer(s);
 }
 
 void SynthConsole::onDetune()
 {
-	HuiDialog *dlg = new DetuneSynthesizerDialog(track->synth, track, win);
+	HuiDialog *dlg = new DetuneSynthesizerDialog(track->synth, track, view, win);
 	dlg->show();
 }
 

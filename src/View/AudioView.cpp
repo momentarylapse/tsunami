@@ -31,10 +31,10 @@ const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 60;
 const int AudioView::BARRIER_DIST = 8;
 
-int get_track_index_save(Track *t)
+int get_track_index_save(Song *song, Track *t)
 {
 	if (t){
-		foreachi(Track *tt, tsunami->song->tracks, i)
+		foreachi(Track *tt, song->tracks, i)
 			if (t == tt)
 				return i;
 	}
@@ -66,7 +66,8 @@ public:
 	}
 };
 
-Image *ExpandImage(Image *im, float d)
+// make shadows thicker
+Image *ExpandImageMask(Image *im, float d)
 {
 	Image *r = new Image(im->width, im->height, Black);
 	for (int x=0; x<r->width; x++)
@@ -145,17 +146,17 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	antialiasing = HuiConfig.getBool("View.Antialiasing", false);
 
 	images.speaker = LoadImage(HuiAppDirectoryStatic + "Data/volume.tga");
-	images.speaker_bg = ExpandImage(images.speaker, 1.5f);
+	images.speaker_bg = ExpandImageMask(images.speaker, 1.5f);
 	images.x = LoadImage(HuiAppDirectoryStatic + "Data/x.tga");
-	images.x_bg = ExpandImage(images.x, 1.5f);
+	images.x_bg = ExpandImageMask(images.x, 1.5f);
 	images.solo = LoadImage(HuiAppDirectoryStatic + "Data/solo.tga");
-	images.solo_bg = ExpandImage(images.solo, 1.5f);
+	images.solo_bg = ExpandImageMask(images.solo, 1.5f);
 	images.track_audio = LoadImage(HuiAppDirectoryStatic + "Data/track-audio.tga");
-	images.track_audio_bg = ExpandImage(images.track_audio, 1.5f);
+	images.track_audio_bg = ExpandImageMask(images.track_audio, 1.5f);
 	images.track_time = LoadImage(HuiAppDirectoryStatic + "Data/track-time.tga");
-	images.track_time_bg = ExpandImage(images.track_time, 1.5f);
+	images.track_time_bg = ExpandImageMask(images.track_time, 1.5f);
 	images.track_midi = LoadImage(HuiAppDirectoryStatic + "Data/track-midi.tga");
-	images.track_midi_bg = ExpandImage(images.track_midi, 1.5f);
+	images.track_midi_bg = ExpandImageMask(images.track_midi, 1.5f);
 
 	cur_track = NULL;
 	cur_sample = NULL;
@@ -511,8 +512,8 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool sh
 void AudioView::checkConsistency()
 {
 	// check cur_track consistency
-	int n = get_track_index_save(cur_track);
-	if ((cur_track) and (n < 0))
+	int n = get_track_index_save(song, cur_track);
+	if (cur_track and (n < 0))
 		if (song->tracks.num > 0)
 			setCurTrack(song->tracks[0]);
 

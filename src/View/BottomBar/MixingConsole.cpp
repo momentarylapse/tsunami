@@ -99,7 +99,7 @@ void TrackMixer::update()
 }
 
 
-MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, OutputStream *stream) :
+MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, OutputStream *stream, AudioView *view) :
 	BottomBarConsole(_("Mixing console")),
 	Observer("MixingConsole")
 {
@@ -109,7 +109,7 @@ MixingConsole::MixingConsole(Song *_song, DeviceManager *_device_manager, Output
 
 	fromResource("mixing-console");
 
-	peak_meter = new PeakMeter(this, "output-peaks", stream);
+	peak_meter = new PeakMeter(this, "output-peaks", stream, view);
 	setFloat("output-volume", device_manager->getOutputVolume());
 
 	event("output-volume", (HuiPanel*)this, (void(HuiPanel::*)())&MixingConsole::onOutputVolume);

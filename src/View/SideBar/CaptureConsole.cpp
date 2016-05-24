@@ -42,7 +42,7 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 
 
 	// dialog
-	peak_meter = new PeakMeter(this, "capture_level", input);
+	peak_meter = new PeakMeter(this, "capture_level", input, view);
 
 
 

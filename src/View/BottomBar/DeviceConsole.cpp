@@ -74,7 +74,7 @@ void DeviceConsole::change_data()
 
 void DeviceConsole::update_full()
 {
-	Device *sel_out, *sel_in, *sel_midi_in;
+	Device *sel_out = NULL, *sel_in = NULL, *sel_midi_in = NULL;
 
 	if (getInt("output-list") >= 0)
 		sel_out = output_devices[getInt("output-list")];

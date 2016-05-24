@@ -13,9 +13,10 @@
 #include "../Helper/Slider.h"
 #include "../AudioView.h"
 
-SettingsDialog::SettingsDialog(HuiWindow *_parent):
+SettingsDialog::SettingsDialog(AudioView *_view, HuiWindow *_parent):
 	HuiWindow("settings_dialog", _parent)
 {
+	view = _view;
 	event("language", this, &SettingsDialog::onLanguage);
 	event("color_scheme", this, &SettingsDialog::onColorScheme);
 	event("ogg_bitrate", this, &SettingsDialog::onOggBitrate);
@@ -59,9 +60,9 @@ void SettingsDialog::loadData()
 	}
 
 	// color scheme
-	foreachi(ColorSchemeBasic &b, tsunami->_view->basic_schemes, i){
+	foreachi(ColorSchemeBasic &b, view->basic_schemes, i){
 		addString("color_scheme", b.name);
-		if (b.name == tsunami->_view->colors.name)
+		if (b.name == view->colors.name)
 			setInt("color_scheme", i);
 	}
 
@@ -94,8 +95,8 @@ void SettingsDialog::onLanguage()
 void SettingsDialog::onColorScheme()
 {
 	int i = getInt("");
-	if ((i >= 0) and (i < tsunami->_view->basic_schemes.num))
-		tsunami->_view->setColorScheme(tsunami->_view->basic_schemes[i].name);
+	if ((i >= 0) and (i < view->basic_schemes.num))
+		view->setColorScheme(view->basic_schemes[i].name);
 }
 
 void SettingsDialog::onOggBitrate()

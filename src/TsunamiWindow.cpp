@@ -131,12 +131,16 @@ TsunamiWindow::TsunamiWindow() :
 	//ToolBarConfigure(true, true);
 	setMaximized(maximized);
 
+
+	tsunami->plugin_manager->AddPluginsToMenu(this);
+
 	// events
 	event("hui:close", this, &TsunamiWindow::onExit);
 	for (int i=0;i<256;i++)
 		event(format("jump_to_level_%d", i), this, &TsunamiWindow::onCurLevel);
 
-	song = tsunami->song;
+
+	song = new Song;
 
 
 	view = new AudioView(this, song, tsunami->device_manager);
@@ -148,7 +152,7 @@ TsunamiWindow::TsunamiWindow() :
 	// bottom bar
 	bottom_bar = new BottomBar(view, song, tsunami->device_manager, tsunami->log);
 	embed(bottom_bar, "main_table", 0, 1);
-	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->device_manager);
+	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->device_manager, view);
 	embed(mini_bar, "main_table", 0, 2);
 
 	subscribe(view);
@@ -158,6 +162,9 @@ TsunamiWindow::TsunamiWindow() :
 	subscribe(bottom_bar);
 	subscribe(side_bar);
 
+
+
+	song->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
 
 	if (song->tracks.num > 0)
 		view->setCurTrack(song->tracks[0]);
@@ -184,6 +191,7 @@ TsunamiWindow::~TsunamiWindow()
 	delete(mini_bar);
 	delete(bottom_bar);
 	delete(view);
+	delete(song);
 	HuiEnd();
 }
 
@@ -392,7 +400,7 @@ void TsunamiWindow::onCommand(const string & id)
 
 void TsunamiWindow::onSettings()
 {
-	SettingsDialog *dlg = new SettingsDialog(this);
+	SettingsDialog *dlg = new SettingsDialog(view, this);
 	dlg->run();
 }
 

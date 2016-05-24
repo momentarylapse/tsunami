@@ -47,7 +47,6 @@ Tsunami::~Tsunami()
 {
 	delete(storage);
 	delete(device_manager);
-	delete(song);
 	delete(plugin_manager);
 }
 
@@ -57,45 +56,43 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	win = NULL;
 	_win = NULL;
 	_view = NULL;
+	song = NULL;
 
 	log = new Log;
-
-	log->info(AppName + " " + AppVersion);
-	log->info(_("  ...don't worry. Everything will be fine!"));
 
 	clipboard = new Clipboard;
 
 	device_manager = new DeviceManager;
-
-	song = new Song;
-	song->newWithOneTrack(Track::TYPE_AUDIO, DEFAULT_SAMPLE_RATE);
 
 	storage = new Storage;
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
 
-	if (!HandleArguments(arg))
+	if (HandleCLIArguments(arg))
 		return false;
 
-	CreateWindow();
-	_arg = arg;
-	HuiRunLaterM(0.01f, this, &Tsunami::_HandleArguments);
+	// ok, full window mode
+
+	log->info(AppName + " " + AppVersion);
+	log->info(_("  ...don't worry. Everything will be fine!"));
+
+	CreateWindow(arg);
 	return true;
 }
 
-void Tsunami::_HandleArguments()
-{
-	if (_arg.num >= 2)
-		storage->load(song, _arg[1]);
-	song->notify(song->MESSAGE_NEW);
-}
-
-bool Tsunami::HandleArguments(const Array<string> &arg)
+bool Tsunami::HandleCLIArguments(const Array<string> &arg)
 {
 	if (arg.num < 2)
+		return false;
+	if (arg[1] == "--help"){
+		log->info(AppName + " " + AppVersion);
+		log->info("--help");
+		log->info("--info <FILE>");
+		log->info("--export <FILE_IN> <FILE_OUT>");
 		return true;
-	if (arg[1] == "--info"){
+	}else if (arg[1] == "--info"){
+		song = new Song;
 		if (arg.num < 3){
 			log->error(_("Call: tsunami --info <File>"));
 		}else if (storage->load(song, arg[2])){
@@ -106,27 +103,33 @@ bool Tsunami::HandleArguments(const Array<string> &arg)
 			foreach(Tag &t, song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
-		return false;
+		delete(song);
+		return true;
 	}else if (arg[1] == "--export"){
+		song = new Song;
 		if (arg.num < 4){
 			log->error(_("Call: tsunami --export <File> <Exportfile>"));
 		}else if (storage->load(song, arg[2])){
 			storage->save(song, arg[3]);
 		}
-		return false;
+		delete(song);
+		return true;
 	}
-	return true;
+	return false;
 }
 
-void Tsunami::CreateWindow()
+void Tsunami::CreateWindow(const Array<string> &arg)
 {
 	win = new TsunamiWindow;
 	_win = dynamic_cast<HuiWindow*>(win);
 	_view = win->view;
-	plugin_manager->AddPluginsToMenu(win);
+	song = win->song;
 
 	win->show();
-	//HuiRunLaterM(0.01f, win, &TsunamiWindow::OnViewOptimal);
+
+
+	if (arg.num >= 2)
+		tsunami->storage->load(win->song, arg[1]);
 }
 
 void Tsunami::LoadKeyCodes()

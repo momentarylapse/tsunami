@@ -10,10 +10,12 @@
 
 #include "../../lib/hui/hui.h"
 
+class AudioView;
+
 class SettingsDialog: public HuiWindow
 {
 public:
-	SettingsDialog(HuiWindow *parent);
+	SettingsDialog(AudioView *view, HuiWindow *parent);
 	virtual ~SettingsDialog();
 
 	void loadData();
@@ -38,6 +40,7 @@ private:
 	};
 
 	Array<OggQuality> ogg_quality;
+	AudioView *view;
 };
 
 #endif /* SETTINGSDIALOG_H_ */

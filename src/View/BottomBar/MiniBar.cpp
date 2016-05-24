@@ -11,7 +11,7 @@
 #include "MiniBar.h"
 #include "../../Device/DeviceManager.h"
 
-MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_output) :
+MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_output, AudioView *view) :
 	Observer("MiniBar")
 {
 	stream = _stream;
@@ -20,7 +20,7 @@ MiniBar::MiniBar(BottomBar *_bottom_bar, OutputStream *_stream, DeviceManager *_
 
 	fromResource("mini_bar");
 
-	peak_meter = new PeakMeter(this, "peaks", stream);
+	peak_meter = new PeakMeter(this, "peaks", stream, view);
 	setFloat("volume", output->getOutputVolume());
 
 	event("show_bottom_bar", this, &MiniBar::onShowBottomBar);

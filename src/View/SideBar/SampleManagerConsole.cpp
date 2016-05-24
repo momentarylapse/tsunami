@@ -21,7 +21,7 @@
 #include "SampleManagerConsole.h"
 
 
-void render_bufbox(Image &im, BufferBox &b)
+void render_bufbox(Image &im, BufferBox &b, AudioView *view)
 {
 	int w = im.width;
 	int h = im.height;
@@ -32,7 +32,7 @@ void render_bufbox(Image &im, BufferBox &b)
 		for (int i=i0; i<i1; i++)
 			m = max(m, fabs(b.c[0][i]));
 		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
-			im.setPixel(x, y, tsunami->_view->colors.text);
+			im.setPixel(x, y, view->colors.text);
 	}
 }
 
@@ -52,12 +52,12 @@ void render_midi(Image &im, MidiData &m)
 	}
 }
 
-string render_sample(Sample *s)
+string render_sample(Sample *s, AudioView *view)
 {
 	Image im;
 	im.create(150, 32, color(0, 0, 0, 0));
 	if (s->type == Track::TYPE_AUDIO)
-		render_bufbox(im, s->buf);
+		render_bufbox(im, s->buf, view);
 	else if (s->type == Track::TYPE_MIDI)
 		render_midi(im, s->midi);
 	return HuiSetImage(im);
@@ -66,11 +66,12 @@ string render_sample(Sample *s)
 class SampleManagerItem : public Observer
 {
 public:
-	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s) : Observer("SampleManagerItem")
+	SampleManagerItem(SampleManagerConsole *_manager, Sample *_s, AudioView *view) :
+		Observer("SampleManagerItem")
 	{
 		manager = _manager;
 		s = _s;
-		icon = render_sample(s);
+		icon = render_sample(s, view);
 		subscribe(s);
 	}
 	virtual ~SampleManagerItem()
@@ -167,7 +168,7 @@ void SampleManagerConsole::updateList()
 	// new samples?
 	foreach(Sample *s, song->samples)
 		if (getIndex(s) < 0)
-			add(new SampleManagerItem(this, s));
+			add(new SampleManagerItem(this, s, view));
 
 	if ((selected_uid < 0) and (song->samples.num > 0))
 		selected_uid = song->samples.back()->uid;
@@ -329,7 +330,7 @@ void SampleManagerConsole::endPreview()
 class SampleSelector : public HuiDialog
 {
 public:
-	SampleSelector(HuiPanel *root, Song *a, Sample *old) :
+	SampleSelector(HuiPanel *root, Song *a, Sample *old, AudioView *view) :
 		HuiDialog("", 300, 400, root->win, false)
 	{
 		song = a;
@@ -343,7 +344,7 @@ public:
 		setString(list_id, _("\\- none -\\"));
 		setInt(list_id, 0);
 		foreachi(Sample *s, song->samples, i){
-			icon_names.add(render_sample(s));
+			icon_names.add(render_sample(s, view));
 			setString(list_id, icon_names[i] + "\\" + s->name + "\\" + song->get_time_str_long(s->buf.length));
 			if (s == old)
 				setInt(list_id, i + 1);
@@ -404,7 +405,7 @@ Sample *SampleSelector::ret;
 
 Sample *SampleManagerConsole::select(HuiPanel *root, Song *a, Sample *old)
 {
-	SampleSelector *s = new SampleSelector(root, a, old);
+	SampleSelector *s = new SampleSelector(root, a, old, tsunami->_view);
 	s->run();
 	return SampleSelector::ret;
 }

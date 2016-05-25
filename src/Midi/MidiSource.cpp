@@ -20,6 +20,7 @@ void MidiSource::__init__()
 
 void MidiSource::__delete__()
 {
+	this->MidiSource::~MidiSource();
 }
 
 MidiDataSource::MidiDataSource(const MidiRawData& _midi)

@@ -37,6 +37,9 @@ private:
 	void notifyEnqueue(const string &message);
 	void notifySend();
 
+protected:
+	void _observable_destruct_();
+
 private:
 	string observable_name;
 

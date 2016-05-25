@@ -44,7 +44,7 @@ void MidiEffect::__init__()
 
 void MidiEffect::__delete__()
 {
-	this->Configurable::~Configurable();
+	this->MidiEffect::~MidiEffect();
 }
 
 void MidiEffect::Prepare()

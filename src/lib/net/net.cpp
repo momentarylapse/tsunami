@@ -82,7 +82,7 @@ void NetAddress::__init__()
 
 void NetAddress::__delete__()
 {
-	this->~NetAddress();
+	this->NetAddress::~NetAddress();
 }
 
 
@@ -108,7 +108,7 @@ void Socket::__init__()
 
 void Socket::__delete__()
 {
-	this->~Socket();
+	this->Socket::~Socket();
 }
 
 

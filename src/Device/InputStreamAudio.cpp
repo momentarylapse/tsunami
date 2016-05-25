@@ -143,9 +143,7 @@ void InputStreamAudio::__init__(int _sample_rate)
 
 void InputStreamAudio::__delete__()
 {
-	stop();
-	current_buffer.clear();
-	buffer.clear();
+	this->InputStreamAudio::~InputStreamAudio();
 }
 
 Device *InputStreamAudio::getDevice()

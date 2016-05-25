@@ -41,10 +41,7 @@ void Synthesizer::__init__()
 
 void Synthesizer::__delete__()
 {
-	events.clear();
-	active_pitch.clear();
-	delete_me.clear();
-	this->Configurable::~Configurable();
+	this->Synthesizer::~Synthesizer();
 }
 
 void Synthesizer::Tuning::set_default()

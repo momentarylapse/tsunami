@@ -170,7 +170,7 @@ class GridData
 	color col_line
 	color col_text
 	
-	void __init__()
+	void __init__(AudioView *view)
 		col_grid = view.colors.grid
 		col_text = view.colors.text
 		col_line = view.colors.text_soft1

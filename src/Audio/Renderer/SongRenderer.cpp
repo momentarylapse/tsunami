@@ -51,9 +51,7 @@ void SongRenderer::__init__(Song *s, SongSelection *sel)
 
 void SongRenderer::__delete__()
 {
-	midi.clear();
-	if (sel_own)
-		delete sel;
+	this->SongRenderer::~SongRenderer();
 }
 
 bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)

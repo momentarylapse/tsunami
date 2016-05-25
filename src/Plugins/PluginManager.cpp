@@ -30,6 +30,8 @@
 #include "Effect.h"
 #include "ConfigPanel.h"
 #include "MidiEffect.h"
+#include "SongPlugin.h"
+#include "TsunamiPlugin.h"
 #include "FavoriteManager.h"
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
@@ -462,14 +464,25 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("Slider", "__delete__", Script::mf(&Slider::__delete__), &slider);
 	Script::LinkExternal("Slider.get", Script::mf(&Slider::get));
 	Script::LinkExternal("Slider.set", Script::mf(&Slider::set));
-}
 
-void PluginManager::OnMenuExecutePlugin()
-{
-	int n = s2i(HuiGetEvent()->id.substr(strlen("execute_plugin_"), -1));
+	SongPlugin song_plugin;
+	Script::DeclareClassSize("SongPlugin", sizeof(SongPlugin));
+	Script::DeclareClassOffset("SongPlugin", "win", _offsetof(SongPlugin, win));
+	Script::DeclareClassOffset("SongPlugin", "view", _offsetof(SongPlugin, view));
+	Script::LinkExternal("SongPlugin.__init__", Script::mf(&SongPlugin::__init__));
+	Script::DeclareClassVirtualIndex("SongPlugin", "__delete__", Script::mf(&SongPlugin::__delete__), &song_plugin);
+	Script::DeclareClassVirtualIndex("SongPlugin", "apply", Script::mf(&SongPlugin::apply), &song_plugin);
 
-	if ((n >= 0) and (n < plugin_files.num))
-		ExecutePlugin(plugin_files[n].filename);
+	TsunamiPlugin tsunami_plugin;
+	Script::DeclareClassSize("TsunamiPlugin", sizeof(TsunamiPlugin));
+	Script::DeclareClassOffset("TsunamiPlugin", "win", _offsetof(TsunamiPlugin, win));
+	Script::DeclareClassOffset("TsunamiPlugin", "view", _offsetof(TsunamiPlugin, view));
+	Script::LinkExternal("TsunamiPlugin.__init__", Script::mf(&TsunamiPlugin::__init__));
+	Script::DeclareClassVirtualIndex("TsunamiPlugin", "__delete__", Script::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
+	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStart", Script::mf(&TsunamiPlugin::onStart), &tsunami_plugin);
+	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onEnd", Script::mf(&TsunamiPlugin::onEnd), &tsunami_plugin);
+	Script::LinkExternal("TsunamiPlugin.end", Script::mf(&TsunamiPlugin::end));
+
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf)
@@ -528,7 +541,7 @@ void PluginManager::FindPlugins()
 	find_plugins_in_dir("Independent/", this);
 }
 
-void PluginManager::AddPluginsToMenu(HuiWindow *win)
+void PluginManager::AddPluginsToMenu(HuiWindow *win, void (TsunamiWindow::*function)())
 {
 	msg_db_f("AddPluginsToMenu", 2);
 
@@ -554,7 +567,7 @@ void PluginManager::AddPluginsToMenu(HuiWindow *win)
 
 	// Events
 	for (int i=0;i<plugin_files.num;i++)
-		win->event(format("execute_plugin_%d", i), this, &PluginManager::OnMenuExecutePlugin);
+		win->event(format("execute_plugin_%d", i), win, function);
 }
 
 void PluginManager::ApplyFavorite(Configurable *c, const string &name)
@@ -593,10 +606,10 @@ Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 
 	return p;
 }
-typedef void main_audiofile_func(Song*);
+
 typedef void main_void_func();
 
-void PluginManager::ExecutePlugin(const string &filename)
+void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 {
 	msg_db_f("ExecutePlugin", 1);
 
@@ -608,6 +621,8 @@ void PluginManager::ExecutePlugin(const string &filename)
 
 		Effect *fx = NULL;
 		MidiEffect *mfx = NULL;
+		SongPlugin *spl = NULL;
+		TsunamiPlugin *tpl = NULL;
 		foreach(Script::Type *t, s->syntax->types){
 			Script::Type *r = t->GetRoot();
 			if (r->name == "AudioEffect"){
@@ -618,6 +633,14 @@ void PluginManager::ExecutePlugin(const string &filename)
 				mfx = (MidiEffect*)t->CreateInstance();
 				mfx->name = p->filename.basename();
 				mfx->name = mfx->name.head(mfx->name.num - 5);
+			}else if (r->name == "SongPlugin"){
+				spl = (SongPlugin*)t->CreateInstance();
+				//spl->name = p->filename.basename();
+				//spl->name = spl->name.head(spl->name.num - 5);
+			}else if (r->name == "TsunamiPlugin"){
+				tpl = (TsunamiPlugin*)t->CreateInstance();
+				//tpl->observable_name = p->filename.basename();
+				//tpl->observable_name = tpl->observable_name.head(tpl->observable_name.num - 5);
 			}else
 				continue;
 			break;
@@ -628,15 +651,13 @@ void PluginManager::ExecutePlugin(const string &filename)
 		if (fx){
 			fx->resetConfig();
 			if (fx->configure()){
-			//	main_audiofile_func *f_audio = (main_audiofile_func*)s->MatchFunction("main", "void", 1, "AudioFile*");
-			//	main_void_func *f_void = (main_void_func*)s->MatchFunction("main", "void", 0);
-				Range range = tsunami->win->view->getPlaybackSelection();
-				SongSelection sel = tsunami->win->view->getEditSeletion();
+				Range range = win->view->getPlaybackSelection();
+				SongSelection sel = win->view->getEditSeletion();
 				a->action_manager->beginActionGroup();
 				foreach(Track *t, sel.tracks)
 					if (t->type == t->TYPE_AUDIO){
 						fx->resetState();
-						fx->doProcessTrack(t, tsunami->win->view->cur_level, range);
+						fx->doProcessTrack(t, win->view->cur_level, range);
 					}
 				a->action_manager->endActionGroup();
 			}
@@ -644,8 +665,8 @@ void PluginManager::ExecutePlugin(const string &filename)
 		}else if (mfx){
 			mfx->resetConfig();
 			if (mfx->configure()){
-				Range range = tsunami->win->view->getPlaybackSelection();
-				SongSelection sel = tsunami->win->view->getEditSeletion();
+				Range range = win->view->getPlaybackSelection();
+				SongSelection sel = win->view->getEditSeletion();
 				a->action_manager->beginActionGroup();
 				foreach(Track *t, sel.tracks)
 					if (t->type == t->TYPE_MIDI){
@@ -655,12 +676,19 @@ void PluginManager::ExecutePlugin(const string &filename)
 				a->action_manager->endActionGroup();
 			}
 			delete(mfx);
-		}/*else if (f_audio){
-			if (a->used)
-				f_audio(a);
-			else
-				tsunami->log->error(_("Can't execute plugin on an empty audio file"));
-		}*/else if (f_main){
+		}else if (spl){
+			spl->win = win;
+			spl->view = win->view;
+			spl->apply(win->song);
+			delete(spl);
+		}else if (tpl){
+			tpl->win = win;
+			tpl->view = win->view;
+			tpl->song = win->song;
+			win->active_plugins.add(tpl);
+			win->subscribe(tpl, tpl->MESSAGE_END);
+			tpl->onStart();
+		}else if (f_main){
 			f_main();
 		}else{
 			tsunami->log->error(_("Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'"));
@@ -671,13 +699,13 @@ void PluginManager::ExecutePlugin(const string &filename)
 }
 
 
-void PluginManager::FindAndExecutePlugin()
+void PluginManager::FindAndExecutePlugin(TsunamiWindow *win)
 {
 	msg_db_f("ExecutePlugin", 1);
 
 
-	if (HuiFileDialogOpen(tsunami->win, _("Select plugin script"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
-		ExecutePlugin(HuiFilename);
+	if (HuiFileDialogOpen(win, _("Select plugin script"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
+		ExecutePlugin(win, HuiFilename);
 	}
 }
 

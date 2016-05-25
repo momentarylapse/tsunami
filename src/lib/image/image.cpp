@@ -34,7 +34,7 @@ void Image::__init_ext__(int _width, int _height, const color &c)
 
 void Image::__delete__()
 {
-	this->~Image();
+	this->Image::~Image();
 }
 
 // mode: rgba

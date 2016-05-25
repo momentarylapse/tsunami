@@ -84,7 +84,7 @@ void Song::__init__()
 
 void Song::__delete__()
 {
-	reset();
+	this->Song::~Song();
 }
 
 

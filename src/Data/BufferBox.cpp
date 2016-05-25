@@ -81,7 +81,7 @@ void BufferBox::__init__()
 
 void BufferBox::__delete__()
 {
-	clear();
+	this->BufferBox::~BufferBox();
 }
 
 void BufferBox::operator=(const BufferBox &b)

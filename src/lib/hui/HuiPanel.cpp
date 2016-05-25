@@ -42,13 +42,7 @@ void HuiPanel::__init__()
 
 void HuiPanel::__delete__()
 {
-	_ClearPanel_();
-	control.clear();
-	events.clear();
-
-	id.clear();
-	cur_id.clear();
-	children.clear();
+	this->HuiPanel::~HuiPanel();
 }
 
 // might be executed repeatedly

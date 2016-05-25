@@ -30,6 +30,7 @@ void PluginData::__init__()
 
 void PluginData::__delete__()
 {
+	this->PluginData::~PluginData();
 }
 
 

@@ -15,6 +15,7 @@ ClassFunction::ClassFunction()
 {
 	nr = -1;
 	virtual_index = -1;
+	needs_overwriting = false;
 }
 
 ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s, int no)
@@ -24,6 +25,7 @@ ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s,
 	script = s;
 	nr = no;
 	virtual_index = -1;
+	needs_overwriting = false;
 }
 
 Function* ClassFunction::GetFunc()
@@ -51,10 +53,10 @@ Type::~Type()
 }
 
 bool Type::UsesCallByReference()
-{	return ((!force_call_by_value) && (!is_pointer)) || (is_array);	}
+{	return ((!force_call_by_value) and (!is_pointer)) or (is_array);	}
 
 bool Type::UsesReturnByMemory()
-{	return ((!force_call_by_value) && (!is_pointer)) || (is_array);	}
+{	return ((!force_call_by_value) and (!is_pointer)) or (is_array);	}
 
 
 
@@ -163,7 +165,7 @@ bool Type::IsDerivedFrom(Type *root) const
 {
 	if (this == root)
 		return true;
-	if ((is_super_array) || (is_array) || (is_pointer))
+	if ((is_super_array) or (is_array) or (is_pointer))
 		return false;
 	if (!parent)
 		return false;
@@ -173,7 +175,7 @@ bool Type::IsDerivedFrom(Type *root) const
 ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_params)
 {
 	foreachi(ClassFunction &f, function, i)
-		if ((f.name == _name) && (f.return_type == return_type) && (f.param_type.num == num_params))
+		if ((f.name == _name) and (f.return_type == return_type) and (f.param_type.num == num_params))
 			return &f;
 	return NULL;
 }
@@ -186,7 +188,7 @@ ClassFunction *Type::GetDefaultConstructor()
 ClassFunction *Type::GetComplexConstructor()
 {
 	foreach(ClassFunction &f, function)
-		if ((f.name == "__init__") && (f.return_type == TypeVoid) && (f.param_type.num > 0))
+		if ((f.name == "__init__") and (f.return_type == TypeVoid) and (f.param_type.num > 0))
 			return &f;
 	return NULL;
 }
@@ -196,9 +198,18 @@ ClassFunction *Type::GetDestructor()
 	return GetFunc("__delete__", TypeVoid, 0);
 }
 
+inline ClassFunction *check_param(ClassFunction *cf, Type *t)
+{
+	if (!cf)
+		return NULL;
+	if (cf->param_type[0] != t)
+		return NULL;
+	return cf;
+}
+
 ClassFunction *Type::GetAssign()
 {
-	return GetFunc("__assign__", TypeVoid, 1);
+	return check_param(GetFunc("__assign__", TypeVoid, 1), this);
 }
 
 ClassFunction *Type::GetGet(Type *index)
@@ -239,16 +250,20 @@ void Type::LinkVirtualTable()
 		vtable[1] = mf(&VirtualBase::__delete_external__);
 
 	// link virtual functions into vtable
-	foreach(ClassFunction &cf, function)
+	foreach(ClassFunction &cf, function){
 		if (cf.virtual_index >= 0){
 			if (cf.nr >= 0){
-				//msg_write(i2s(cf.virtual_index) + ": " + cf.script->syntax->Functions[cf.nr]->name);
+				//msg_write(i2s(cf.virtual_index) + ": " + cf.GetFunc()->name);
 				if (cf.virtual_index >= vtable.num)
 					owner->DoError("LinkVirtualTable");
 					//vtable.resize(cf.virtual_index + 1);
 				vtable[cf.virtual_index] = (void*)cf.script->func[cf.nr];
 			}
 		}
+		if (cf.needs_overwriting){
+			msg_error("needs overwriting: " + name + " : " + cf.name);
+		}
+	}
 }
 
 void Type::LinkExternalVirtualTable(void *p)
@@ -271,7 +286,7 @@ void Type::LinkExternalVirtualTable(void *p)
 	for (int i=0;i<vtable.num;i++)
 		vtable[i] = t[i];
 	// this should also link the "real" c++ destructor
-	if ((config.abi == ABI_WINDOWS_32) || (config.abi == ABI_WINDOWS_64))
+	if ((config.abi == ABI_WINDOWS_32) or (config.abi == ABI_WINDOWS_64))
 		vtable[0] = mf(&VirtualBase::__delete_external__);
 	else
 		vtable[1] = mf(&VirtualBase::__delete_external__);
@@ -284,6 +299,8 @@ bool class_func_match(ClassFunction &a, ClassFunction &b)
 		return false;
 	if (a.return_type != b.return_type)
 		return false;
+	if ((a.name == "__init__") and (a.param_type.num > 0) and (b.param_type.num))
+		return true;
 	if (a.param_type.num != b.param_type.num)
 		return false;
 	for (int i=0;i<a.param_type.num;i++)
@@ -342,13 +359,13 @@ void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overwri
 			orig = &_cf;
 	if (overwrite and !orig)
 		s->DoError(format("can not overwrite function '%s', no previous definition", func_signature(f).c_str()));
-	if (!overwrite and orig){
-		msg_write(orig->param_type.num);
+	if (!overwrite and orig)
 		s->DoError(format("function '%s' is already defined, use 'overwrite' to overwrite", func_signature(f).c_str()));
-	}
 	if (overwrite){
 		orig->script = cf.script;
 		orig->nr = cf.nr;
+		orig->needs_overwriting = false;
+		orig->param_type = cf.param_type;
 	}else
 		function.add(cf);
 }
@@ -365,8 +382,9 @@ bool Type::DeriveFrom(Type* root, bool increase_size)
 	if (parent->function.num > 0){
 		// inheritance of functions
 		foreach(ClassFunction &f, parent->function){
-			if ((f.name != "__init__") && (f.name != "__delete__") && (f.name != "__assign__"))
-				function.add(f);
+			ClassFunction ff = f;
+			ff.needs_overwriting = (f.name == "__init__") or (f.name == "__delete__") or (f.name == "__assign__");
+			function.add(ff);
 		}
 		found = true;
 	}

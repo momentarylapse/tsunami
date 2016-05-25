@@ -13,14 +13,17 @@ const int BUFFER_SIZE = 32768
 
 
 class PitchRecognitionDialog : Dialog
+	TsunamiPlugin* plugin
 	
-	void __init__(Window *parent)
-		super.__init__("Tonerkennung", 300, 175, parent, false)
+	void __init__(TsunamiPlugin* _plugin)
+		super.__init__("Tonerkennung", 300, 175, _plugin.win, false)
 		addGrid("", 0, 0, 1, 2, "grid")
 		setTarget("grid", 0)
 		addDrawingArea("", 5, 5, 290, 135, "drawing")
 		addButton("Schließen", 5, 145, 290, 25, "close")
 		setImage("close", "hui:close")
+		
+		plugin = _plugin
 	
 		//eventX("drawing", "hui:draw", &Draw)
 		event("hui:close", &onClose)
@@ -88,7 +91,7 @@ class PitchRecognitionDialog : Dialog
 		input.removeObserver(self)
 		input.stop()
 		delete input
-		delete self
+		plugin.end()
 
 	void updateInput()
 		int available = input.current_buffer.available()
@@ -131,7 +134,11 @@ class PitchRecognitionDialog : Dialog
 			LoudEnough = false
 		redraw("drawing")
 
-void main()
-	Dialog *win = new PitchRecognitionDialog(MainWin)
-	win.run()
+class PitchRecognition : TsunamiPlugin
+	Dialog* dlg
+	overwrite void onStart()
+		dlg = new PitchRecognitionDialog(self)
+		dlg.show()
+	overwrite void onEnd()
+		delete dlg
 	

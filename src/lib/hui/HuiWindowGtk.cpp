@@ -270,18 +270,7 @@ HuiWindow::~HuiWindow()
 
 void HuiWindow::__delete__()
 {
-	msg_db_f("HuiWindow.del", 1);
-
-	if (!window)
-		return;
-
-	// quick'n'dirty fix (gtk destroys its widgets recursively)
-	foreach(HuiControl *c, control)
-		c->widget = NULL;
-
-	_clean_up_();
-
-	gtk_widget_destroy(window);
+	this->HuiWindow::~HuiWindow();
 }
 
 // should be called after creating (and filling) the window to actually show it

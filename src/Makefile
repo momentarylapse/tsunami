@@ -220,6 +220,8 @@ OBJ = \
  Plugins/MidiEffect.o\
  Plugins/Plugin.o\
  Plugins/PluginManager.o\
+ Plugins/SongPlugin.o\
+ Plugins/TsunamiPlugin.o\
  Storage/Dialog/RawConfigDialog.o\
  Storage/Format/Format.o\
  Storage/Format/FormatFlac.o\
@@ -936,6 +938,12 @@ Plugins/MidiEffect.o : Plugins/MidiEffect.cpp
 
 Plugins/Plugin.o : Plugins/Plugin.cpp
 	$(CPP) -c Plugins/Plugin.cpp -o $@ $(CXXFLAGS)
+
+Plugins/SongPlugin.o : Plugins/SongPlugin.cpp
+	$(CPP) -c Plugins/SongPlugin.cpp -o $@ $(CXXFLAGS)
+
+Plugins/TsunamiPlugin.o : Plugins/TsunamiPlugin.cpp
+	$(CPP) -c Plugins/TsunamiPlugin.cpp -o $@ $(CXXFLAGS)
 
 Plugins/PluginManager.o : Plugins/PluginManager.cpp
 	$(CPP) -c Plugins/PluginManager.cpp -o $@ $(CXXFLAGS)

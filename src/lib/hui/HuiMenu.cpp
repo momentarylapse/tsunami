@@ -19,7 +19,7 @@ void HuiMenu::__init__()
 
 void HuiMenu::__delete__()
 {
-	this->~HuiMenu();
+	this->HuiMenu::~HuiMenu();
 }
 
 void HuiMenu::clear()

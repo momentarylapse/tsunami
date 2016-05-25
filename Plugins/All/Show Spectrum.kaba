@@ -62,8 +62,8 @@ class SpecGrid : Grid
 
 class SpectrumDialog : Dialog
 	SpecGrid grid
-	void __init__()
-		super.__init__("Spectrum", 600, 460, MainWin, true)
+	void __init__(Window *parent)
+		super.__init__("Spectrum", 600, 460, parent, true)
 		fromSource("
 Grid table1 '' 1 2
 	DrawingArea drawing_area ''
@@ -87,60 +87,61 @@ Grid table1 '' 1 2
 	void onClose()
 		delete self
 
-void show_spec()
-	dlg = new SpectrumDialog
+class ShowSpectrum : SongPlugin
+	void show_spec(Song *song)
+		dlg = new SpectrumDialog(win)
 	
-	BufferBox buf
-	SongRenderer* renderer = new SongRenderer(song, &view.sel)
-	renderer.render(view.sel.range, buf)
-	delete renderer
+		BufferBox buf
+		SongRenderer* renderer = new SongRenderer(song, &view.sel)
+		renderer.render(view.sel.range, buf)
+		delete renderer
 	
-	complex[] fr, fl
+		complex[] fr, fl
 	
-	int len2 = buf.r.num / 2 + 1
-	fr.resize(len2)
-	fl.resize(len2)
-	//ff.clear()
-	//fft_r2c(buf.r, fr)
-	//fft_r2c(buf.l, fl)
-	buf.get_spectrum(fr, fl, 4096)
+		int len2 = buf.r.num / 2 + 1
+		fr.resize(len2)
+		fl.resize(len2)
+		//ff.clear()
+		//fft_r2c(buf.r, fr)
+		//fft_r2c(buf.l, fl)
+		buf.get_spectrum(fr, fl, 4096)
 	
-	float ww = i2f(buf.r.num) / song.sample_rate
-	for i in 0:N
-		float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
-		float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
-		int j0 = fmin * ww
-		int j1 = fmax * ww + 1
-		j0 = clamp(j0, 0, len2)
-		j1 = clamp(j1, 0, len2)
-		float bmaxr = 0
-		float bmaxl = 0
-		for j in j0:j1
-			float amp = fr[j].x * fr[j].x + fr[j].y * fr[j].y
-			if bmaxr < amp
-				bmaxr = amp
-			amp = fl[j].x * fl[j].x + fl[j].y * fl[j].y
-			if bmaxl < amp
-				bmaxl = amp
-		ffr.add(bmaxr)
-		ffl.add(bmaxl)
+		float ww = i2f(buf.r.num) / song.sample_rate
+		for i in 0:N
+			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * i)
+			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (N - 1) * (i + 1))
+			int j0 = fmin * ww
+			int j1 = fmax * ww + 1
+			j0 = clamp(j0, 0, len2)
+			j1 = clamp(j1, 0, len2)
+			float bmaxr = 0
+			float bmaxl = 0
+			for j in j0:j1
+				float amp = fr[j].x * fr[j].x + fr[j].y * fr[j].y
+				if bmaxr < amp
+					bmaxr = amp
+				amp = fl[j].x * fl[j].x + fl[j].y * fl[j].y
+				if bmaxl < amp
+					bmaxl = amp
+			ffr.add(bmaxr)
+			ffl.add(bmaxl)
 
-	peak_max = max(ffr.max(), ffl.max())
-	float mmax = sqr(buf.length) / 4
-	if mmax > 0
-		ffr /= mmax
-		ffl /= mmax
-	peak_max /= mmax
+		peak_max = max(ffr.max(), ffl.max())
+		float mmax = sqr(buf.length) / 4
+		if mmax > 0
+			ffr /= mmax
+			ffl /= mmax
+		peak_max /= mmax
 
-	dlg.onType()
+		dlg.onType()
 
-	dlg.run()
+		dlg.run()
 	
-	ffr.clear()
-	ffl.clear()
+		ffr.clear()
+		ffl.clear()
 
-void main()
-	if view.sel.range.length > 0
-		show_spec()
-	else
-		logging.error("'Show Spectrum.kaba': Needs some selection!")
+	overwrite void apply(Song *song)
+		if view.sel.range.length > 0
+			show_spec(song)
+		else
+			logging.error("'Show Spectrum.kaba': Needs some selection!")

@@ -436,6 +436,10 @@ void Command::set_num_params(int n)
 
 void Command::set_param(int index, Command *p)
 {
+	/*if ((index < 0) or (index >= param.num)){
+		this->script->syntax->ShowCommand(this);
+		script->DoErrorInternal(format("Command.set_param...  %d %d", index, param.num));
+	}*/
 	set_command(param[index], p);
 }
 

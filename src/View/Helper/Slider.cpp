@@ -74,8 +74,7 @@ void Slider::__init_ext__(HuiPanel *_panel, const string &_id_slider, const stri
 
 void Slider::__delete__()
 {
-	id_slider.clear();
-	id_edit.clear();
+	this->Slider::~Slider();
 }
 
 void Slider::set(float value)

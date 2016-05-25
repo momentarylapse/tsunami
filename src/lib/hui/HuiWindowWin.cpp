@@ -6,7 +6,7 @@
 
 void HuiWindow::__delete__()
 {
-	msg_db_f("HuiWindow.del",0);
+	this->HuiWindow::~HuiWindow();
 }
 
 #if 0

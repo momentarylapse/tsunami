@@ -192,7 +192,7 @@ void OutputStream::__init__(AudioRenderer *r)
 
 void OutputStream::__delete__()
 {
-	kill();
+	this->OutputStream::~OutputStream();
 }
 
 void OutputStream::create_dev()

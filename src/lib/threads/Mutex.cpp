@@ -28,12 +28,13 @@ Mutex::Mutex()
 	__init__();
 }
 
+#ifdef OS_WINDOWS
+
 Mutex::~Mutex()
 {
-	__delete__();
+	CloseHandle(&internal->mutex);
+	delete(internal);
 }
-
-#ifdef OS_WINDOWS
 
 void Mutex::__init__()
 {
@@ -51,14 +52,14 @@ void Mutex::unlock()
 	ReleaseMutex(internal->mutex);
 }
 
-void Mutex::__delete__()
-{
-	CloseHandle(&internal->mutex);
-	delete(internal);
-}
-
 #endif
 #ifdef OS_LINUX
+
+Mutex::~Mutex()
+{
+	pthread_mutex_destroy(&internal->mutex);
+	delete(internal);
+}
 
 void Mutex::__init__()
 {
@@ -75,11 +76,11 @@ void Mutex::unlock()
 {
 	pthread_mutex_unlock(&internal->mutex);
 }
+#endif
+
 
 void Mutex::__delete__()
 {
-	pthread_mutex_destroy(&internal->mutex);
-	delete(internal);
+	this->Mutex::~Mutex();
 }
-#endif
 

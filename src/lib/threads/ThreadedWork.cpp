@@ -43,17 +43,10 @@ public:
 
 ThreadedWork::ThreadedWork()
 {
-	__init__();
-}
+	partition_size = 1;
+	work_given = 0;
+	total_size = 0;
 
-ThreadedWork::~ThreadedWork()
-{
-	__delete__();
-}
-
-void ThreadedWork::__init__()
-{
-	thread.__init__();
 	mx_list = NULL;
 	// use max. number of cores?
 	int num_threads = Thread::getNumCores();
@@ -64,10 +57,20 @@ void ThreadedWork::__init__()
 		thread.add(new WorkerThread(i, this));
 }
 
-void ThreadedWork::__delete__()
+ThreadedWork::~ThreadedWork()
 {
 	foreach(Thread *t, thread)
 		delete(t);
+}
+
+void ThreadedWork::__init__()
+{
+	new(this) ThreadedWork;
+}
+
+void ThreadedWork::__delete__()
+{
+	this->ThreadedWork::~ThreadedWork();
 }
 
 bool ThreadedWork::run(int _total_size, int _partition_size)

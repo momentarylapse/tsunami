@@ -18,6 +18,7 @@ class MidiEffect;
 class Synthesizer;
 class Configurable;
 class FavoriteManager;
+class TsunamiWindow;
 
 class PluginManager : public HuiEventHandler
 {
@@ -27,11 +28,10 @@ public:
 
 	void LinkAppScriptData();
 	void FindPlugins();
-	void AddPluginsToMenu(HuiWindow *win);
-	void FindAndExecutePlugin();
+	void AddPluginsToMenu(HuiWindow *win, void (TsunamiWindow::*function)());
+	void FindAndExecutePlugin(TsunamiWindow *win);
 
-	void OnMenuExecutePlugin();
-	void ExecutePlugin(const string &filename);
+	void ExecutePlugin(TsunamiWindow *win, const string &filename);
 
 	Plugin *GetPlugin(const string &name);
 

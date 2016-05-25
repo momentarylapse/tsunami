@@ -44,7 +44,7 @@ void Effect::__init__()
 
 void Effect::__delete__()
 {
-	this->Configurable::~Configurable();
+	this->Effect::~Effect();
 }
 
 void Effect::prepare()

@@ -19,6 +19,7 @@
 #include "View/Helper/PeakMeter.h"
 #include "View/AudioView.h"
 #include "Plugins/PluginManager.h"
+#include "Plugins/TsunamiPlugin.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
@@ -132,7 +133,7 @@ TsunamiWindow::TsunamiWindow() :
 	setMaximized(maximized);
 
 
-	tsunami->plugin_manager->AddPluginsToMenu(this);
+	tsunami->plugin_manager->AddPluginsToMenu(this, &TsunamiWindow::onMenuExecutePlugin);
 
 	// events
 	event("hui:close", this, &TsunamiWindow::onExit);
@@ -367,7 +368,16 @@ void TsunamiWindow::onEditMulti()
 
 void TsunamiWindow::onFindAndExecutePlugin()
 {
-	tsunami->plugin_manager->FindAndExecutePlugin();
+	tsunami->plugin_manager->FindAndExecutePlugin(this);
+}
+
+void TsunamiWindow::onMenuExecutePlugin()
+{
+	int n = s2i(HuiGetEvent()->id.substr(strlen("execute_plugin_"), -1));
+	PluginManager *plugin_manager = tsunami->plugin_manager;
+
+	if ((n >= 0) and (n < plugin_manager->plugin_files.num))
+		plugin_manager->ExecutePlugin(this, plugin_manager->plugin_files[n].filename);
 }
 
 void TsunamiWindow::onDelete()
@@ -615,8 +625,19 @@ void TsunamiWindow::updateMenu()
 
 void TsunamiWindow::onUpdate(Observable *o, const string &message)
 {
-	// "Clipboard", "AudioFile" or "AudioView"
-	updateMenu();
+	if (message == TsunamiPlugin::MESSAGE_END){
+		TsunamiPlugin *tpl = (TsunamiPlugin*)o;
+		tpl->onEnd();
+		for (int i=0; i<active_plugins.num; i++)
+			if (active_plugins[i] == tpl){
+				active_plugins.erase(i);
+				break;
+			}
+		delete(tpl);
+	}else{
+		// "Clipboard", "AudioFile" or "AudioView"
+		updateMenu();
+	}
 }
 
 

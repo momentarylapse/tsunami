@@ -40,6 +40,13 @@ Observable::~Observable()
 	notify(MESSAGE_DELETE);
 }
 
+void Observable::_observable_destruct_()
+{
+	observable_name.clear();
+	requests.clear();
+	message_queue.clear();
+}
+
 void Observable::addObserver(Observer *o, const string &message)
 {
 	requests.add(ObserverRequest(o, message));

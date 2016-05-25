@@ -18,6 +18,7 @@ class AudioView;
 class SideBar;
 class BottomBar;
 class MiniBar;
+class TsunamiPlugin;
 
 class TsunamiWindow : public Observer, public HuiWindow
 {
@@ -94,6 +95,7 @@ public:
 	void onSelectAll();
 	void onShowLog();
 	void onFindAndExecutePlugin();
+	void onMenuExecutePlugin();
 	void onExit();
 
 	//bool FileDialog(int kind, bool save, bool force_in_root_dir);
@@ -109,6 +111,8 @@ public:
 	SideBar *side_bar;
 	BottomBar *bottom_bar;
 	MiniBar *mini_bar;
+
+	Array<TsunamiPlugin*> active_plugins;
 };
 
 #endif /* TSUNAMIWINDOW_H_ */

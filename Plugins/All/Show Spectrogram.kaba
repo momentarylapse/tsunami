@@ -14,8 +14,6 @@ const float MAX_FREQ = 10000.0
 const float MIN_VOL = 0.0 - 60.0
 const float MAX_VOL = 0.0
 
-SpectrumDialog *dlg
-
 float[NT][NF] sg
 Image im0
 
@@ -45,8 +43,8 @@ class SpecGrid : Grid
 
 class SpectrumDialog : Dialog
 	SpecGrid grid
-	void __init__()
-		super.__init__("Spectrum", 600, 460, MainWin, true)
+	void __init__(Song *song, AudioView *view, Window *parent)
+		super.__init__("Spectrum", 600, 460, parent, true)
 		fromSource("
 Grid ? '' 1 2
 	DrawingArea drawing_area ''
@@ -72,58 +70,62 @@ color f2col(float f)
 		return color(1, f * 3 - 1, 0, 2 - f * 3)
 	return color(1, 1, f * 3 - 2, 0)
 
-void show_spec()
-	dlg = new SpectrumDialog
+class ShowSpectrogram : SongPlugin
+
+	SpectrumDialog *dlg
+
+	void show_spec(Song *song)
+		dlg = new SpectrumDialog(song, view, win)
 	
-	BufferBox buf
-	SongRenderer* renderer = new SongRenderer(song, &view.sel)
-	renderer.render(view.sel.range, buf)
-	delete renderer
+		BufferBox buf
+		SongRenderer* renderer = new SongRenderer(song, &view.sel)
+		renderer.render(view.sel.range, buf)
+		delete renderer
 	
-	complex[] f
-	float[] sub
-	sub.resize(N)
+		complex[] f
+		float[] sub
+		sub.resize(N)
 	
-	float _max = 0
+		float _max = 0
 	
-	float log_max_min = log(MAX_FREQ / MIN_FREQ)
+		float log_max_min = log(MAX_FREQ / MIN_FREQ)
 	
-	for t in 0:NT
-		int offset = (buf.length - N) * t / NT
+		for t in 0:NT
+			int offset = (buf.length - N) * t / NT
 		
-		for j in 0:N
-			sub[j] = buf.r[offset + j]
-		fft_r2c(sub, f)
-		float ww = i2f(N) / song.sample_rate
-		for i in 0:NF
-			float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
-			float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
-			int j0 = fmin * ww
-			int j1 = fmax * ww + 1
-			j0 = clamp(j0, 0, f.num)
-			j1 = clamp(j1, 0, f.num)
-			float bmaxr = 0
-			for j in j0:j1
-				float amp = f[j].x * f[j].x + f[j].y * f[j].y
-				if bmaxr < amp
-					bmaxr = amp
-			_max = max(_max, bmaxr)
-			sg[t][i] = bmaxr
+			for j in 0:N
+				sub[j] = buf.r[offset + j]
+			fft_r2c(sub, f)
+			float ww = i2f(N) / song.sample_rate
+			for i in 0:NF
+				float fmin = MIN_FREQ * exp( log_max_min / (NF - 1) * i)
+				float fmax = MIN_FREQ * exp( log_max_min / (NF - 1) * (i + 1))
+				int j0 = fmin * ww
+				int j1 = fmax * ww + 1
+				j0 = clamp(j0, 0, f.num)
+				j1 = clamp(j1, 0, f.num)
+				float bmaxr = 0
+				for j in j0:j1
+					float amp = f[j].x * f[j].x + f[j].y * f[j].y
+					if bmaxr < amp
+						bmaxr = amp
+				_max = max(_max, bmaxr)
+				sg[t][i] = bmaxr
 	
-	im0.create(NT, NF, Black)
-	for t in 0:NT
-		for i in 0:NF
-			float ff = sg[t][i] / _max
-			im0.setPixel(t, NF - i - 1, f2col(ff))
+		im0.create(NT, NF, Black)
+		for t in 0:NT
+			for i in 0:NF
+				float ff = sg[t][i] / _max
+				im0.setPixel(t, NF - i - 1, f2col(ff))
 	
 
-	dlg.redraw("drawing_area")
+		dlg.redraw("drawing_area")
 
-	dlg.run()
+		dlg.run()
 
-void main()
+	overwrite void apply(Song *song)
 	
-	if view.sel.range.length > 0
-		show_spec()
-	else
-		logging.error("'Show Spectrogram.kaba': Needs some selection!")
+		if view.sel.range.length > 0
+			show_spec(song)
+		else
+			logging.error("'Show Spectrogram.kaba': Needs some selection!")

@@ -25,6 +25,7 @@ struct ClassFunction{
 	Array<Type*> param_type;
 	Type *return_type;
 	int virtual_index;
+	bool needs_overwriting;
 	ClassFunction();
 	ClassFunction(const string &name, Type *return_type, Script *s, int no);
 	Function *GetFunc();

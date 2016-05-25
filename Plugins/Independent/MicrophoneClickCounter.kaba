@@ -21,8 +21,8 @@ class ClickSource : MidiSource
 		emit_click = true
 
 class ClickCounter : Dialog
-	void __init__(Window *parent)
-		super.__init__("Click Counter", 300, 175, parent, false)
+	void __init__(TsunamiPlugin *plugin)
+		super.__init__("Click Counter", 300, 175, plugin.win, false)
 		addGrid("", 0, 0, 1, 2, "grid")
 		setTarget("grid", 0)
 		addDrawingArea("", 0, 0, 0, 0, "drawing")
@@ -142,6 +142,10 @@ class ClickCounter : Dialog
 		counter --
 		redraw("drawing")
 
-void main()
-	Dialog *win = new ClickCounter(MainWin)
-	win.run()
+class MicrophoneClickCounter : TsunamiPlugin
+	Dialog *dlg
+	overwrite void onStart()
+		dlg = new ClickCounter(self)
+		dlg.show()
+	overwrite void onEnd()
+		delete dlg

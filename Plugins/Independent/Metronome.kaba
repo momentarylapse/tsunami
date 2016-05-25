@@ -65,9 +65,11 @@ class MetronomeDialog : Dialog
 	MidiRenderer *renderer
 	MetronomeSource *source
 	DummySynthesizer synth
+	AudioView *view
+	TsunamiPlugin *plugin
 	
-	void __init__(Window *parent)
-		super.__init__("Metronome", 300, 250, parent, false)
+	overwrite void __init__(TsunamiPlugin *_plugin)
+		super.__init__("Metronome", 300, 250, _plugin.win, false)
 		fromSource("
 Grid ? '' 1 3
 	DrawingArea area ''
@@ -80,6 +82,9 @@ Grid ? '' 1 3
 		.
 	Grid ? '' 2 1 buttonbar
 		Button close 'Close' image=hui:close")
+		
+		plugin = _plugin
+		view = plugin.view
 	
 		source = new MetronomeSource(self, 90, 4, synth.sample_rate)
 		renderer = new MidiRenderer(&synth, source)
@@ -95,7 +100,7 @@ Grid ? '' 1 3
 		stream.setBufferSize(1024)
 		stream.play()
 	
-	virtual void __delete__()
+	overwrite void __delete__()
 		delete stream
 		delete renderer
 		delete source
@@ -140,8 +145,12 @@ Grid ? '' 1 3
 		//source.offset = 0
 
 	void onClose()
-		delete self
+		plugin.end()
 
-void main()
-	Dialog *dlg = new MetronomeDialog(MainWin)
-	dlg.run()
+class Metronome : TsunamiPlugin
+	Dialog *dlg
+	overwrite void onStart()
+		dlg = new MetronomeDialog(self)
+		dlg.show()
+	overwrite void onEnd()
+		delete dlg

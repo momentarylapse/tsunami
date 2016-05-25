@@ -45,7 +45,7 @@ void SampleRef::__init__(Sample *sam)
 
 void SampleRef::__delete__()
 {
-	this->~SampleRef();
+	this->SampleRef::~SampleRef();
 }
 
 int SampleRef::get_index()

@@ -26,7 +26,7 @@ void EffectRenderer::__init__(AudioRenderer *_child, const Array<Effect*> _fx)
 
 void EffectRenderer::__delete__()
 {
-	fx.clear();
+	this->EffectRenderer::~EffectRenderer();
 }
 
 int EffectRenderer::read(BufferBox& buf)

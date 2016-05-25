@@ -27,10 +27,7 @@ void SampleSynthesizer::__init__()
 
 void SampleSynthesizer::__delete__()
 {
-	foreach(SampleRef *s, samples)
-		if (s)
-			delete(s);
-	samples.clear();
+	this->SampleSynthesizer::~SampleSynthesizer();
 }
 
 void SampleSynthesizer::renderNote(BufferBox& buf, const Range& range, float pitch, float volume)

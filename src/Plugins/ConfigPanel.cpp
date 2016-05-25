@@ -30,7 +30,7 @@ void ConfigPanel::__init__(Configurable *_c)
 
 void ConfigPanel::__delete__()
 {
-	this->~ConfigPanel();
+	this->ConfigPanel::~ConfigPanel();
 }
 
 void ConfigPanel::notify()

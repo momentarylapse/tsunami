@@ -61,7 +61,7 @@ MidiEvent _MidiEvent(int pos, float pitch, float volume)
 
 class MidiRawData : MidiEvent[]
 	int samples
-	extern void __init__()
+	extern overwrite void __init__()
 	extern MidiNote[] getNotes(Range r)
 	extern MidiEvent[] getEvents(Range r)
 	extern Range getRange()
@@ -72,7 +72,7 @@ class MidiRawData : MidiEvent[]
 
 class MidiData : MidiNote[]
 	int samples
-	extern void __init__()
+	extern overwrite void __init__()
 	extern MidiNote[] getNotes(Range r)
 	extern MidiEvent[] getEvents(Range r)
 	extern Range getRange()
@@ -84,7 +84,7 @@ class PluginData
 
 class ConfigPanel : Panel
 	extern void __init__(void *c)
-	extern virtual void __delete__()
+	extern overwrite void __delete__()
 	extern virtual void update()
 	extern void notify()
 	void *c
@@ -184,8 +184,8 @@ class Synthesizer
 	extern virtual void onConfig()
 
 class DummySynthesizer : Synthesizer
-	extern void __init__()
-	//extern virtual void __delete__()
+	extern overwrite void __init__()
+	//extern overwrite void __delete__()
 	extern overwrite void render(BufferBox buf)
 
 class MidiRenderer
@@ -471,12 +471,12 @@ class Log
 	extern void warn(string message)
 	extern void info(string message)
 
-class PluginContext
+/*class PluginContext
 	Song *song
 	Track *track
 	int track_no
 	int level
-	Range range
+	Range range*/
 
 class Slider
 	extern void __init__(Panel *panel, string id_slider, string id_edit, float v_min, float v_max, float factor, void *func, float value)
@@ -484,11 +484,25 @@ class Slider
 	extern float get()
 	extern void set(float f)
 
-extern Window *MainWin
-extern Song *song
-extern AudioView *view
+class TsunamiPlugin
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual void onStart()
+	extern virtual void onEnd()
+	extern void end()
+	Window *win
+	AudioView *view
+	Song *song
+
+class SongPlugin
+	extern void __init__()
+	extern virtual void __delete__()
+	extern virtual void apply(Song *song)
+	Window *win
+	AudioView *view
+
 extern Log *logging
-extern PluginContext plugin_context
+//extern PluginContext plugin_context
 extern Storage *storage
 
 

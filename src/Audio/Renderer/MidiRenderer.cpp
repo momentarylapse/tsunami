@@ -28,6 +28,7 @@ void MidiRenderer::__init__(Synthesizer *s, MidiSource *source)
 
 void MidiRenderer::__delete__()
 {
+	this->MidiRenderer::~MidiRenderer();
 }
 
 void MidiRenderer::setSynthesizer(Synthesizer *_s)

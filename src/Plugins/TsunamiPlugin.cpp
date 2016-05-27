@@ -15,6 +15,7 @@ TsunamiPlugin::TsunamiPlugin() :
 	win = NULL;
 	view = NULL;
 	song = NULL;
+	active = false;
 }
 
 TsunamiPlugin::~TsunamiPlugin()
@@ -31,7 +32,23 @@ void TsunamiPlugin::__delete__()
 	this->TsunamiPlugin::~TsunamiPlugin();
 }
 
-void TsunamiPlugin::end()
+void TsunamiPlugin::wish_to_stop()
 {
 	notify(MESSAGE_END);
+}
+
+void TsunamiPlugin::start()
+{
+	if (active)
+		return;
+	onStart();
+	active = true;
+}
+
+void TsunamiPlugin::stop()
+{
+	if (!active)
+		return;
+	onStop();
+	active = false;
 }

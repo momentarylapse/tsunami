@@ -20,9 +20,6 @@ class Type;
 class Plugin
 {
 public:
-	typedef void void_func();
-	typedef void process_track_func(BufferBox*);
-
 	Plugin(const string &_filename);
 
 	string filename;
@@ -36,8 +33,6 @@ public:
 		TYPE_OTHER
 	};
 	string error_message;
-
-	void ProcessTrack(Track *t, int level_no, const Range &r);
 
 	string GetError();
 };

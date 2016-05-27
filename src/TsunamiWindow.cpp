@@ -627,13 +627,7 @@ void TsunamiWindow::onUpdate(Observable *o, const string &message)
 {
 	if (message == TsunamiPlugin::MESSAGE_END){
 		TsunamiPlugin *tpl = (TsunamiPlugin*)o;
-		tpl->onEnd();
-		for (int i=0; i<active_plugins.num; i++)
-			if (active_plugins[i] == tpl){
-				active_plugins.erase(i);
-				break;
-			}
-		delete(tpl);
+		tpl->stop();
 	}else{
 		// "Clipboard", "AudioFile" or "AudioView"
 		updateMenu();

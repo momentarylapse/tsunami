@@ -464,8 +464,8 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("TsunamiPlugin.__init__", Script::mf(&TsunamiPlugin::__init__));
 	Script::DeclareClassVirtualIndex("TsunamiPlugin", "__delete__", Script::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
 	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStart", Script::mf(&TsunamiPlugin::onStart), &tsunami_plugin);
-	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onEnd", Script::mf(&TsunamiPlugin::onEnd), &tsunami_plugin);
-	Script::LinkExternal("TsunamiPlugin.end", Script::mf(&TsunamiPlugin::end));
+	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStop", Script::mf(&TsunamiPlugin::onStop), &tsunami_plugin);
+	Script::LinkExternal("TsunamiPlugin.stop_request", Script::mf(&TsunamiPlugin::stop_request));
 
 }
 
@@ -670,7 +670,7 @@ void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 			tpl->view = win->view;
 			tpl->song = win->song;
 			win->active_plugins.add(tpl);
-			win->subscribe(tpl, tpl->MESSAGE_END);
+			win->subscribe(tpl, tpl->MESSAGE_STOP_REQUEST);
 			tpl->onStart();
 		}else if (f_main){
 			f_main();

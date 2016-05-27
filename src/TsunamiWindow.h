@@ -112,7 +112,7 @@ public:
 	BottomBar *bottom_bar;
 	MiniBar *mini_bar;
 
-	Array<TsunamiPlugin*> active_plugins;
+	Array<TsunamiPlugin*> plugins;
 };
 
 #endif /* TSUNAMIWINDOW_H_ */

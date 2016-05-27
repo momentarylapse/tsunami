@@ -19,11 +19,8 @@ extern bool next_const;
 const int TYPE_CAST_OWN_STRING = 4096;
 
 inline bool type_match(Type *type, bool is_class, Type *wanted);
-inline bool direct_type_match(Type *a, Type *b)
-{
-	return ( (a==b) or ( (a->is_pointer) and (b->is_pointer) ) or (a->IsDerivedFrom(b)) );
-}
-inline bool type_match_with_cast(Type *type, bool is_class, bool is_modifiable, Type *wanted, int &penalty, int &cast);
+bool direct_type_match(Type *a, Type *b);
+bool type_match_with_cast(Type *type, bool is_class, bool is_modifiable, Type *wanted, int &penalty, int &cast);
 
 
 long long s2i2(const string &str)
@@ -151,23 +148,19 @@ string SyntaxTree::GetConstantValue()
 }
 
 
-Command *SyntaxTree::DoClassFunction(Command *ob, ClassFunction &cf, Block *block)
+Command *SyntaxTree::DoClassFunction(Command *ob, Array<ClassFunction> &cfs, Block *block)
 {
 	msg_db_f("DoClassFunc", 4);
 
 	// the function
-	Function *ff = cf.script->syntax->functions[cf.nr];
-	/*if (cf.virtual_index >= 0){
-		Command *cmd = AddCommand(KindVirtualFunction, cf.virtual_index, ff->literal_return_type);
-		cmd->set_num_params(ff->num_params);
-		cmd->script = cf.script;
-		cmd->set_instance(ob);
-		return GetFunctionCall("(virtual)." + cf.name, cmd, f);
-	}*/
+	Function *ff = cfs[0].GetFunc();
 
-	Command *cmd = add_command_classfunc(&cf, ob);
-	cmd = GetFunctionCall(ff->name, cmd, block);
-	return cmd;
+	Array<Command> links;
+	foreach(ClassFunction &cf, cfs){
+		Command *cmd = add_command_classfunc(&cf, ob);
+		links.add(*cmd);
+	}
+	return GetFunctionCall(ff->name, links, block);
 }
 
 Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
@@ -200,14 +193,22 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 			return shift_command(Operand, deref, type->element[e].offset, type->element[e].type);
 		}
 
+
+	if (!deref)
+		Operand = ref_command(Operand);
+
+	string f_name = Exp.cur;
+	Exp.next();
+
 	// class function?
+	Array<Command> links;
 	foreach(ClassFunction &cf, type->function)
-		if (Exp.cur == cf.name){
-			if (!deref)
-				Operand = ref_command(Operand);
-			Exp.next();
-			return DoClassFunction(Operand, cf, block);
+		if (f_name == cf.name){
+			Command *cmd = add_command_classfunc(&cf, Operand);
+			links.add(*cmd);
 		}
+	if (links.num > 0)
+		return GetFunctionCall(f_name, links, block);
 
 	DoError("unknown element of " + type->name);
 	return NULL;
@@ -314,12 +315,12 @@ Command *SyntaxTree::GetOperandExtension(Command *Operand, Block *block)
 	return GetOperandExtension(Operand, block);
 }
 
-Command *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Command *Operand, Block *block)
+Command *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Command &link, Block *block)
 {
 	msg_db_f("GetSpecialFuncCall", 4);
 
 	// sizeof
-	if ((Operand->kind != KIND_COMPILER_FUNCTION) or (Operand->link_no != COMMAND_SIZEOF))
+	if ((link.kind != KIND_COMPILER_FUNCTION) or (link.link_no != COMMAND_SIZEOF))
 		DoError("evil special function");
 
 	Exp.next();
@@ -328,10 +329,11 @@ Command *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Command *Opera
 
 
 	Type *type = FindType(Exp.cur);
+	Array<Command> links = GetExistence(Exp.cur, block);
 	if (type){
 		constants[nc].setInt(type->size);
-	}else if ((GetExistence(Exp.cur, block)) and ((GetExistenceLink.kind == KIND_VAR_GLOBAL) or (GetExistenceLink.kind == KIND_VAR_LOCAL))){
-		constants[nc].setInt(GetExistenceLink.type->size);
+	}else if ((links.num > 0) and ((links[0].kind == KIND_VAR_GLOBAL) or (links[0].kind == KIND_VAR_LOCAL))){
+		constants[nc].setInt(links[0].type->size);
 	}else{
 		type = GetConstantType();
 		if (type)
@@ -348,47 +350,44 @@ Command *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Command *Opera
 }
 
 
-// cmd needs to have Param[]'s existing with correct Type!
-void SyntaxTree::FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, Command *cmd)
+Array<Type*> SyntaxTree::GetFunctionWantedParams(Command &link)
 {
-	msg_db_f("FindFuncSingleParam", 4);
-	Command *param = GetCommand(block);
-
-	wanted_type[p] = TypeUnknown;
-	if (cmd->kind == KIND_FUNCTION){
-		Function *ff = cmd->script->syntax->functions[cmd->link_no];
-		if (p < ff->num_params)
-			wanted_type[p] = ff->literal_param_type[p];
-	}else if (cmd->kind == KIND_VIRTUAL_FUNCTION){
-		ClassFunction *cf = cmd->instance->type->parent->GetVirtualFunction(cmd->link_no);
+	if (link.kind == KIND_FUNCTION){
+		Function *ff = link.script->syntax->functions[link.link_no];
+		return ff->literal_param_type;
+	}else if (link.kind == KIND_VIRTUAL_FUNCTION){
+		ClassFunction *cf = link.instance->type->parent->GetVirtualFunction(link.link_no);
 		if (!cf)
 			DoError("FindFunctionSingleParameter: can't find virtual function...?!?");
-		if (p < cf->param_type.num)
-			wanted_type[p] = cf->param_type[p];
-	}else if (cmd->kind == KIND_COMPILER_FUNCTION){
-		if (p < PreCommands[cmd->link_no].param.num)
-			wanted_type[p] = PreCommands[cmd->link_no].param[p].type;
+		return cf->param_type;
+	}else if (link.kind == KIND_COMPILER_FUNCTION){
+		Array<Type*> wanted_types;
+		for (int p=0; p<PreCommands[link.link_no].param.num; p++)
+			wanted_types.add(PreCommands[link.link_no].param[p].type);
+		return wanted_types;
 	}else
 		DoError("evil function...");
-	// link parameters
-	cmd->set_param(p, param);
+
+	Array<Type*> dummy_types;
+	return dummy_types;
 }
 
-void SyntaxTree::FindFunctionParameters(Array<Type*> &wanted_type, Block *block, Command *cmd)
+Array<Command*> SyntaxTree::FindFunctionParameters(Block *block)
 {
 	if (Exp.cur != "(")
 		DoError("\"(\" expected in front of function parameter list");
 	msg_db_f("FindFunctionParameters", 4);
 	Exp.next();
 
+	Array<Command*> params;
+
 	// list of parameters
 	for (int p=0;;p++){
 		if (Exp.cur == ")")
 			break;
-		wanted_type.add(TypeUnknown);
-		// find parameter
 
-		FindFunctionSingleParameter(p, wanted_type, block, cmd);
+		// find parameter
+		params.add(GetCommand(block));
 
 		if (Exp.cur != ","){
 			if (Exp.cur == ")")
@@ -398,6 +397,7 @@ void SyntaxTree::FindFunctionParameters(Array<Type*> &wanted_type, Block *block,
 		Exp.next();
 	}
 	Exp.next(); // ')'
+	return params;
 }
 
 Command *apply_type_cast(SyntaxTree *ps, int tc, Command *param);
@@ -444,16 +444,16 @@ Command *SyntaxTree::CheckParamLink(Command *link, Type *type, const string &f_n
 
 // creates <Operand> to be the function call
 //  on entry <Operand> only contains information from GetExistence (Kind, Nr, Type, NumParams)
-Command *SyntaxTree::GetFunctionCall(const string &f_name, Command *Operand, Block *block)
+Command *SyntaxTree::GetFunctionCall(const string &f_name, Array<Command> &links, Block *block)
 {
 	msg_db_f("GetFunctionCall", 4);
 
 	// function as a variable?
 	if (Exp.cur_exp >= 2)
 	if ((Exp.get_name(Exp.cur_exp - 2) == "&") and (Exp.cur != "(")){
-		if (Operand->kind == KIND_FUNCTION){
-			Command *c = AddCommand(KIND_VAR_FUNCTION, Operand->link_no, TypePointer);
-			c->script = Operand->script;
+		if (links[0].kind == KIND_FUNCTION){
+			Command *c = AddCommand(KIND_VAR_FUNCTION, links[0].link_no, TypePointer);
+			c->script = links[0].script;
 			return c;
 		}else{
 			Exp.rewind();
@@ -464,26 +464,109 @@ Command *SyntaxTree::GetFunctionCall(const string &f_name, Command *Operand, Blo
 
 
 	// "special" functions
-    if (Operand->kind == KIND_COMPILER_FUNCTION)
-	    if (Operand->link_no == COMMAND_SIZEOF){
-			return GetSpecialFunctionCall(f_name, Operand, block);
+    if (links[0].kind == KIND_COMPILER_FUNCTION)
+	    if (links[0].link_no == COMMAND_SIZEOF){
+			return GetSpecialFunctionCall(f_name, links[0], block);
 	    }
 
-	// link operand onto this command
+
+    // parse all parameters
+    Array<Command*> params = FindFunctionParameters(block);
 
 
 	// find (and provisional link) the parameters in the source
-	Array<Type*> wanted_type;
 
-	bool needs_brackets = ((Operand->type != TypeVoid) or (Operand->param.num != 1));
+	/*bool needs_brackets = ((Operand->type != TypeVoid) or (Operand->param.num != 1));
 	if (needs_brackets){
 		FindFunctionParameters(wanted_type, block, Operand);
 
 	}else{
 		wanted_type.add(TypeUnknown);
 		FindFunctionSingleParameter(0, wanted_type, block, Operand);
+	}*/
+
+	// direct match...
+	foreach(Command &link, links){
+		Array<Type*> wanted_types = GetFunctionWantedParams(link);
+		if (wanted_types.num != params.num)
+			continue;
+		bool ok = true;
+		for (int p=0; p<params.num; p++){
+			if (!direct_type_match(wanted_types[p], params[p]->type)){
+				ok = false;
+				break;
+			}
+		}
+		if (!ok)
+			continue;
+
+	    Command *operand = cp_command(&link);
+		for (int p=0; p<params.num; p++)
+			operand->set_param(p, params[p]);
+		return operand;
 	}
 
+
+	// advanced match...
+	foreach(Command &link, links){
+		Array<Type*> wanted_types = GetFunctionWantedParams(link);
+		if (wanted_types.num != params.num)
+			continue;
+		bool ok = true;
+		Array<int> casts;
+		casts.resize(params.num);
+		for (int p=0; p<params.num; p++){
+			int penalty;
+			if (!type_match_with_cast(params[p]->type, false, false, wanted_types[p], penalty, casts[p])){
+				ok = false;
+				break;
+			}
+		}
+		if (!ok)
+			continue;
+
+	    Command *operand = cp_command(&link);
+		for (int p=0; p<params.num; p++){
+			if (casts[p] >= 0)
+				params[p] = apply_type_cast(this, casts[p], params[p]);
+			operand->set_param(p, params[p]);
+		}
+		return operand;
+	}
+
+
+	// error message
+
+	string found = "(";
+	foreachi(Command *p, params, i){
+		if (i > 0)
+			found += ", ";
+		found += p->type->name;
+	}
+	found += ")";
+	string available;
+	foreachi(Command &link, links, li){
+		if (li > 0)
+			available += "\n";
+		Array<Type*> wanted_types = GetFunctionWantedParams(link);
+		available += f_name + "(";
+		foreachi(Type *p, wanted_types, i){
+			if (i > 0)
+				available += ", ";
+			available += p->name;
+		}
+		available += ")";
+	}
+	DoError("invalid function parameters: " + found + ", valid:\n" + available);
+
+	/*if (links.num > 1){
+
+	}else{
+	DoError("...wrong function params...");
+	}*/
+
+
+/*
 	// test compatibility
 	if (wanted_type.num != Operand->param.num){
 		Exp.rewind();
@@ -492,7 +575,7 @@ Command *SyntaxTree::GetFunctionCall(const string &f_name, Command *Operand, Blo
 	for (int p=0;p<wanted_type.num;p++){
 		Operand->set_param(p, CheckParamLink(Operand->param[p], wanted_type[p], f_name, p));
 	}
-	return Operand;
+	return Operand;*/
 }
 
 Command *build_list(SyntaxTree *ps, Array<Command*> &el)
@@ -554,11 +637,14 @@ Command *SyntaxTree::GetOperand(Block *block)
 		Operand = add_command_compilerfunc(COMMAND_NEW);
 		Operand->type = t->GetPointer();
 		if (Exp.cur == "("){
-			ClassFunction *cf = t->GetComplexConstructor();
-			if (!cf)
+			Array<ClassFunction> cfs;
+			foreach(ClassFunction &cf, t->function)
+				if (cf.name == "__init__" and cf.param_type.num > 0)
+					cfs.add(cf);
+			if (cfs.num == 0)
 				DoError(format("class \"%s\" does not have a constructor with parameters", t->name.c_str()));
 			Operand->set_num_params(1);
-			Operand->set_param(0, DoClassFunction(NULL, *cf, block));
+			Operand->set_param(0, DoClassFunction(NULL, cfs, block));
 		}
 	}else if (Exp.cur == "delete"){ // delete operator
 		Exp.next();
@@ -568,20 +654,20 @@ Command *SyntaxTree::GetOperand(Block *block)
 			DoError("pointer expected after delete");
 	}else{
 		// direct operand
-		if (GetExistence(Exp.cur, block)){
-			Operand = cp_command(&GetExistenceLink);
+		Array<Command> links = GetExistence(Exp.cur, block);
+		if (links.num > 0){
 			string f_name =  Exp.cur;
 			Exp.next();
 			// variables get linked directly...
 
 			// operand is executable
-			if ((Operand->kind == KIND_FUNCTION) or (Operand->kind == KIND_VIRTUAL_FUNCTION) or (Operand->kind == KIND_COMPILER_FUNCTION)){
-				Operand = GetFunctionCall(f_name, Operand, block);
+			if ((links[0].kind == KIND_FUNCTION) or (links[0].kind == KIND_VIRTUAL_FUNCTION) or (links[0].kind == KIND_COMPILER_FUNCTION)){
+				Operand = GetFunctionCall(f_name, links, block);
 
-			}else if (Operand->kind == KIND_PRIMITIVE_OPERATOR){
+			}else if (links[0].kind == KIND_PRIMITIVE_OPERATOR){
 				// unary operator
 				int _ie=Exp.cur_exp-1;
-				int po = Operand->link_no, o=-1;
+				int po = links[0].link_no, o=-1;
 				Command *sub_command = GetOperand(block);
 				Type *r = TypeVoid;
 				Type *p2 = sub_command->type;
@@ -626,6 +712,10 @@ Command *SyntaxTree::GetOperand(Block *block)
 					DoError("unknown unitary operator " + PrimitiveOperators[po].name + " " + p2->name);
 				}
 				return add_command_operator(sub_command, NULL, o);
+			}else{
+
+				// variables etc...
+				Operand = cp_command(&links[0]);
 			}
 		}else{
 			Type *t = GetConstantType();
@@ -674,23 +764,7 @@ Command *SyntaxTree::GetPrimitiveOperator(Block *block)
 	return 0;
 }*/
 
-// both operand types have to match the operator's types
-//   (operator wants a pointer -> all pointers are allowed!!!)
-//   (same for classes of same type...)
-inline bool type_match(Type *type, bool is_class, Type *wanted)
-{
-	if (type == wanted)
-		return true;
-	if ((type->is_pointer) and (wanted == TypePointer))
-		return true;
-	if ((is_class) and (wanted == TypeClass))
-		return true;
-	if (type->IsDerivedFrom(wanted))
-		return true;
-	return false;
-}
-
-inline bool type_match_with_cast(Type *type, bool is_class, bool is_modifiable, Type *wanted, int &penalty, int &cast)
+bool type_match_with_cast(Type *type, bool is_class, bool is_modifiable, Type *wanted, int &penalty, int &cast)
 {
 	penalty = 0;
 	cast = -1;
@@ -958,8 +1032,7 @@ void SyntaxTree::ParseSpecialCommandFor(Block *block)
 	// variable
 	Command *for_var;
 	int var_no = block->add_var(var_name, t);
-	exlink_make_var_local(this, t, var_no);
-	for_var = cp_command(&GetExistenceLink);
+	for_var = add_command_local_var(var_no, t);
 
 	// implement
 	// for_var = val0
@@ -1022,8 +1095,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block)
 
 	// for index
 	int var_no_index = block->add_var(index_name, TypeInt);
-	exlink_make_var_local(this, TypeInt, var_no_index);
-		Command *for_index = cp_command(&GetExistenceLink);
+	Command *for_index = add_command_local_var(var_no_index, TypeInt);
 
 	// super array
 	if (Exp.cur != "in")
@@ -1037,8 +1109,7 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block)
 	// variable...
 	Type *var_type = for_array->type->GetArrayElement();
 	int var_no = block->add_var(var_name, var_type);
-	exlink_make_var_local(this, var_type, var_no);
-	Command *for_var = cp_command(&GetExistenceLink);
+	Command *for_var = add_command_local_var(var_no, var_type);
 
 	// 0
 	int nc = AddConstant(TypeInt);
@@ -1399,7 +1470,7 @@ void SyntaxTree::ParseEnum()
 	Exp.cur_line --;
 }
 
-void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtual, bool overwrite)
+void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtual, bool override)
 {
 	Function *f = ParseFunctionHeader(t, as_extern);
 	int n = -1;
@@ -1407,7 +1478,7 @@ void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtu
 		if (f == g)
 			n = i;
 
-	t->AddFunction(this, n, as_virtual, overwrite);
+	t->AddFunction(this, n, as_virtual, override);
 }
 
 inline bool type_needs_alignment(Type *t)
@@ -1474,12 +1545,12 @@ void SyntaxTree::ParseClass()
 
 		// virtual?
 		bool next_virtual = false;
-		bool overwrite = false;
+		bool override = false;
 		if (Exp.cur == "virtual"){
 			next_virtual = true;
 			Exp.next();
-		}else if (Exp.cur == "overwrite"){
-			overwrite = true;
+		}else if (Exp.cur == "override"){
+			override = true;
 			Exp.next();
 		}
 		int ie = Exp.cur_exp;
@@ -1500,25 +1571,25 @@ void SyntaxTree::ParseClass()
 			if (is_function){
 				Exp.cur_exp = ie;
 				Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
-				ParseClassFunctionHeader(_class, next_extern, next_virtual, overwrite);
+				ParseClassFunctionHeader(_class, next_extern, next_virtual, override);
 
 				break;
 			}
 
-			// overwrite?
+			// override?
 			ClassElement *orig = NULL;
 			foreachi(ClassElement &e, _class->element, i)
 				if (e.name == el.name) //and e.type->is_pointer and el.type->is_pointer)
 						orig = &e;
-			if (overwrite and ! orig)
-				DoError(format("can not overwrite element '%s', no previous definition", el.name.c_str()));
-			if (!overwrite and orig)
-				DoError(format("element '%s' is already defined, use 'overwrite' to overwrite", el.name.c_str()));
-			if (overwrite){
+			if (override and ! orig)
+				DoError(format("can not override element '%s', no previous definition", el.name.c_str()));
+			if (!override and orig)
+				DoError(format("element '%s' is already defined, use 'override' to override", el.name.c_str()));
+			if (override){
 				if (orig->type->is_pointer and el.type->is_pointer)
 					orig->type = el.type;
 				else
-					DoError("can only overwrite pointer elements with other pointer type");
+					DoError("can only override pointer elements with other pointer type");
 				continue;
 			}
 

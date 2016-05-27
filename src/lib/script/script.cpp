@@ -24,7 +24,7 @@
 
 namespace Script{
 
-string Version = "0.14.5.0";
+string Version = "0.14.6.0";
 
 //#define ScriptDebug
 
@@ -194,9 +194,9 @@ void Script::Load(const string &_filename, bool _just_analyse)
 	loading_script_stack.pop();
 }
 
-void Script::DoError(const string &str, int overwrite_line)
+void Script::DoError(const string &str, int override_line)
 {
-	syntax->DoError(str, overwrite_line);
+	syntax->DoError(str, override_line);
 }
 
 void Script::DoErrorInternal(const string &str)

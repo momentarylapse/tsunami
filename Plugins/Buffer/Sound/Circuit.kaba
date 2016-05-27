@@ -16,7 +16,7 @@ class Matrix
 		return e[i * m + j]
 	void _print()
 		for i in 0:n
-			print e.subarray(i*m,m)
+			print(e.subarray(i*m,m))
 	void diagonalize(float[] b)
 		for i in 0:n
 			float f = get(i,i)
@@ -135,4 +135,4 @@ void main()
 	float Uin = x[1] - x[0]
 	float Uout = x[c.out] - x[0]
 	float factor = Uout / Uin
-	print factor
+	print(factor)

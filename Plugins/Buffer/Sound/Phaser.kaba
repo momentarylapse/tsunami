@@ -13,7 +13,7 @@ class PluginConfig : PluginData
 	float Angle
 	float Speed
 	float Depth
-	overwrite void reset()
+	override void reset()
 		Depth = 0.5
 		Speed = 0.3
 		Angle = pi / 2
@@ -28,7 +28,7 @@ class PhaserChannelParams
 
 class PluginState : PluginData
 	PhaserChannelParams r, l
-	overwrite void reset()
+	override void reset()
 		r.reset()
 		l.reset()
 
@@ -52,7 +52,7 @@ class Phaser : AudioEffect
 			
 			b[i] = y
 	
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		Song *a = song
 	
 		doPhaser(buf.r, state.r, a.sample_rate)

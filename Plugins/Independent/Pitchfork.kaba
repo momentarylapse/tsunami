@@ -7,11 +7,11 @@ class ForkRenderer : AudioRenderer
 	int offset
 	float freq
 	float volume
-	void __init__()
+	override void __init__()
 		offset = 0
 		freq = 880
 		volume = 0.8
-	overwrite int read(BufferBox buf)
+	override int read(BufferBox buf)
 		float w_f = 1.0 / i2f(DEFAULT_SAMPLE_RATE) * freq * 2.0 * pi
 		for i in 0:buf.length
 			buf.r[i] = sin((i + offset) * w_f) * volume
@@ -19,36 +19,45 @@ class ForkRenderer : AudioRenderer
 		offset += buf.length
 		return buf.length
 
-class PitchFork : Dialog
-	OutputStream *stream
-	ForkRenderer *renderer
+class PitchForkDialog : Dialog
+	PitchFork *fork
 	
-	void __init__(Window *parent)
-		super.__init__("Pitchfork", 200, 80, parent, false)
+	void __init__(PitchFork *pf)
+		super.__init__("Pitchfork", 200, 80, pf.win, false)
 		addGrid("", 0, 0, 1, 2, "table")
 		setTarget("table", 0)
 		addSpinButton("", 0, 0, 0, 0, "frequency")
 		addButton("Close", 0, 1, 0, 0, "close")
 		setImage("close", "hui:close")
+		
+		fork = pf
 	
 		event("hui:close", &onClose)
 		event("close", &onClose)
 		event("frequency", &onFrequency)
 	
-		renderer = new ForkRenderer
-		stream = new OutputStream(renderer)
-		stream.play()
-	
-		setFloat("frequency", renderer.freq)
+		setFloat("frequency", fork.renderer.freq)
 
 	void onFrequency()
-		renderer.freq = getFloat("")
+		fork.renderer.freq = getFloat("")
 
 	void onClose()
+		fork.end()
+
+class PitchFork : TsunamiPlugin
+	OutputStream *stream
+	ForkRenderer *renderer
+	PitchForkDialog *dlg
+	override void onStart()
+	
+		renderer = new ForkRenderer
+		stream = new OutputStream(renderer)
+		
+		dlg = new PitchForkDialog(self)
+		dlg.show()
+		
+		stream.play()
+	override void onEnd()
+		delete dlg
 		delete stream
 		delete renderer
-		delete self
-
-void main()
-	PitchFork *p = new PitchFork(MainWin)
-	p.run()

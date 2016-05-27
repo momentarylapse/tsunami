@@ -4,7 +4,7 @@ use "../tone.kaba"
 class SinusState : PluginData
 	float[MAX_PITCH] volume
 	float[MAX_PITCH] phase
-	overwrite void reset()
+	override void reset()
 		for p in 0:MAX_PITCH
 			volume[p] = 0
 			phase[p] = 0
@@ -13,7 +13,7 @@ class SinusState : PluginData
 class SinusSynthesizer : Synthesizer
 	SinusState state
 
-	overwrite void render(BufferBox buf)
+	override void render(BufferBox buf)
 		for i in 0:buf.length
 			for e in events
 				if e.pos == i

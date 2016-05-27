@@ -18,7 +18,7 @@ float[NT][NF] sg
 Image im0
 
 class SpecGrid : Grid
-	overwrite void onDraw(Painter *c)
+	override void onDraw(Painter *c)
 		rect r = plot_rect
 		int w = r.width()
 		int h = r.height()
@@ -123,7 +123,7 @@ class ShowSpectrogram : SongPlugin
 
 		dlg.run()
 
-	overwrite void apply(Song *song)
+	override void apply(Song *song)
 	
 		if view.sel.range.length > 0
 			show_spec(song)

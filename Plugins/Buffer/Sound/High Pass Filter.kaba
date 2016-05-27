@@ -6,13 +6,13 @@ const string AutoConfigFrequency = "0:5000:0.1:1:Hz"
 
 class Config : PluginData
 	float Frequency
-	overwrite void reset()
+	override void reset()
 		Frequency = 1000
 
 class State : PluginData
 	float in_r, in_l, out_r, out_l
 	bool used
-	overwrite void reset()
+	override void reset()
 		used = false
 
 class LowPassFilter : AudioEffect
@@ -20,7 +20,7 @@ class LowPassFilter : AudioEffect
 	State state
 
 	// y[i] := α * (y[i-1] + x[i] - x[i-1])
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		float RC = 1 / (2 * pi * config.Frequency)
 		float dt = 1.0 / song.sample_rate
 		float a = RC / (RC + dt)

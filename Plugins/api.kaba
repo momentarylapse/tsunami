@@ -61,7 +61,7 @@ MidiEvent _MidiEvent(int pos, float pitch, float volume)
 
 class MidiRawData : MidiEvent[]
 	int samples
-	extern overwrite void __init__()
+	extern override void __init__()
 	extern MidiNote[] getNotes(Range r)
 	extern MidiEvent[] getEvents(Range r)
 	extern Range getRange()
@@ -72,7 +72,7 @@ class MidiRawData : MidiEvent[]
 
 class MidiData : MidiNote[]
 	int samples
-	extern overwrite void __init__()
+	extern override void __init__()
 	extern MidiNote[] getNotes(Range r)
 	extern MidiEvent[] getEvents(Range r)
 	extern Range getRange()
@@ -84,7 +84,7 @@ class PluginData
 
 class ConfigPanel : Panel
 	extern void __init__(void *c)
-	extern overwrite void __delete__()
+	extern override void __delete__()
 	extern virtual void update()
 	extern void notify()
 	void *c
@@ -94,6 +94,9 @@ class AudioEffect
 	bool only_on_selection
 	Range range
 	bool usable
+	Song *song
+	Track *track
+	int level_no
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(BufferBox buf)
@@ -109,6 +112,7 @@ class MidiEffect
 	bool only_on_selection
 	Range range
 	bool usable
+	Song *song
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(MidiData midi)
@@ -184,9 +188,9 @@ class Synthesizer
 	extern virtual void onConfig()
 
 class DummySynthesizer : Synthesizer
-	extern overwrite void __init__()
+	extern override void __init__()
 	//extern overwrite void __delete__()
-	extern overwrite void render(BufferBox buf)
+	extern override void render(BufferBox buf)
 
 class MidiRenderer
 	extern void __init__(Synthesizer *s, MidiSource *source)
@@ -348,7 +352,6 @@ class AudioView
 	SongSelection sel
 	OutputStream *stream
 	AudioRenderer *renderer
-	ColorScheme colors
 
 class SongRenderer
 	extern void __init__(Song *s, SongSelection *sel)
@@ -504,6 +507,7 @@ class SongPlugin
 extern Log *logging
 //extern PluginContext plugin_context
 extern Storage *storage
+extern ColorScheme colors
 
 
 extern void fft_c2c(complex[] in, complex[] out, bool inverse)

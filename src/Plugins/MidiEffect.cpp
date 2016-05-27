@@ -67,7 +67,6 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 	msg_db_f("MidiEffect.Apply", 1);
 
 	// run
-	tsunami->plugin_manager->context.set(t, 0, t->getRange());
 	process(&midi);
 
 	if (!usable){
@@ -82,8 +81,6 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 {
 	msg_db_f("MidiEffect.DoProcessTrack", 1);
-
-	tsunami->plugin_manager->context.set(t, 0, r);
 
 	MidiData midi = t->midi.getNotesSafe(r);
 

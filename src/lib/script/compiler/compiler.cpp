@@ -141,7 +141,7 @@ void Script::AllocateOpcode()
 		msg_error(string("Script:  could not allocate executable memory: ") + strerror(errno));
 		opcode = new char[max_opcode];
 	}
-	if (config.overwrite_code_origin)
+	if (config.override_code_origin)
 		syntax->asm_meta_info->code_origin = config.code_origin;
 	else
 		syntax->asm_meta_info->code_origin = (long)opcode;
@@ -180,7 +180,7 @@ void Script::MapGlobalVariablesToMemory()
 			if (!g_var[i])
 				DoErrorLink("external variable " + v.name + " was not linked");
 		}else{
-			if (config.overwrite_variables_offset)
+			if (config.override_variables_offset)
 				g_var[i] = (char*)(long)(memory_size + config.variables_offset);
 			else
 				g_var[i] = &memory[memory_size];

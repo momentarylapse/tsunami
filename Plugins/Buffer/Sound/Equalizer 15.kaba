@@ -13,7 +13,7 @@ const float MAX_FREQ = 20000.0
 class Config : PluginData
 	float[NUM_BANDS] Factor
 
-	overwrite void reset()
+	override void reset()
 		for f in Factor
 			f = 1
 
@@ -25,7 +25,7 @@ class Equalizer15 : AudioEffect
 
 	complex[] f
 
-	void __init__()
+	override void __init__()
 
 		for i in 0:NUM_BANDS
 			FreqMin[i] = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (NUM_BANDS - 1) * (i - 0.5))
@@ -53,18 +53,18 @@ class Equalizer15 : AudioEffect
 		// transform back
 		fft_c2r_inv(f, b)
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		equalize(buf.r)
 		equalize(buf.l)
 		f.clear()
 	
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new ConfigPanel(self)
 
 class Equalizer15Panel : ConfigPanel
-	overwrite Equalizer15 *c
+	override Equalizer15 *c
 
-	void __init__(Equalizer15 *_eq)
+	override void __init__(Equalizer15 *_eq)
 		super.__init__(_eq)
 		addGrid("", 0, 1, NUM_BANDS, 2, "grid")
 		setTarget("grid", 0)
@@ -91,7 +91,7 @@ class Equalizer15Panel : ConfigPanel
 				c.config.Factor[i] = getFloat("") * 2
 				notify()
 		
-	overwrite void update()
+	override void update()
 		for i in 0:NUM_BANDS
 			setFloat("slider_" + i, c.config.Factor[i] / 2)
 	

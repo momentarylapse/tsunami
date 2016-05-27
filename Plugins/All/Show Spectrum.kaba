@@ -56,16 +56,16 @@ class SpecGrid : Grid
 			y_axis.set(vol_min, vol_max, false, "db")
 		createLines()
 
-	overwrite void onDraw(Painter *c)
+	override void onDraw(Painter *c)
 		drawCurveB(c, pr, true, Red)
 		drawCurveB(c, pl, true, Blue)
 
 class SpectrumDialog : Dialog
 	SpecGrid grid
-	void __init__(Window *parent)
-		super.__init__("Spectrum", 600, 460, parent, true)
+	void __init__(SongPlugin *plugin)
+		super.__init__("Spectrum", 600, 460, plugin.win, true)
 		fromSource("
-Grid table1 '' 1 2
+Grid ? '' 1 2
 	DrawingArea drawing_area ''
 	Grid ? 2 1 !noexpandy
 		ComboBox type 'Linear\\Logarithm'
@@ -140,7 +140,7 @@ class ShowSpectrum : SongPlugin
 		ffr.clear()
 		ffl.clear()
 
-	overwrite void apply(Song *song)
+	override void apply(Song *song)
 		if view.sel.range.length > 0
 			show_spec(song)
 		else

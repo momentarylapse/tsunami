@@ -15,6 +15,7 @@
 class Plugin;
 class Track;
 class BufferBox;
+class Song;
 
 namespace Script{
 class Script;
@@ -37,9 +38,14 @@ public:
 	bool usable;
 	bool enabled;
 
+	// context
+	Song *song;
+	Track *track;
+	int level;
+
 	virtual void _cdecl processTrack(BufferBox *buf){};
 
-	void doProcessTrack(Track *t, int level_no, const Range &r);
+	void doProcessTrack(Track *t, int level, const Range &r);
 
 	void prepare();
 	void apply(BufferBox &buf, Track *t, bool log_error);

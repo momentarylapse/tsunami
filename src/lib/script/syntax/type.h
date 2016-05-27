@@ -25,7 +25,7 @@ struct ClassFunction{
 	Array<Type*> param_type;
 	Type *return_type;
 	int virtual_index;
-	bool needs_overwriting;
+	bool needs_overriding;
 	ClassFunction();
 	ClassFunction(const string &name, Type *return_type, Script *s, int no);
 	Function *GetFunc();
@@ -65,8 +65,8 @@ public:
 	bool DeriveFrom(Type *root, bool increase_size);
 	Type *GetPointer();
 	Type *GetRoot();
-	void AddFunction(SyntaxTree *s, int func_no, bool as_virtual = false, bool overwrite = false);
-	ClassFunction *GetFunc(const string &name, Type *return_type, int num_params);
+	void AddFunction(SyntaxTree *s, int func_no, bool as_virtual = false, bool override = false);
+	ClassFunction *GetFunc(const string &name, Type *return_type, int num_params, Type *param0 = NULL);
 	ClassFunction *GetDefaultConstructor();
 	ClassFunction *GetComplexConstructor();
 	ClassFunction *GetDestructor();

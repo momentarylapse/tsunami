@@ -37,16 +37,6 @@
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 
-void PluginManager::PluginContext::set(Track *t, int l, const Range &r)
-{
-	song = NULL;
-	if (t)
-		song = t->song;
-	track = t;
-	level = l;
-	range = r;
-	track_no = get_track_index(t);
-}
 
 PluginManager::PluginManager()
 {
@@ -73,12 +63,10 @@ void PluginManager::LinkAppScriptData()
 	Script::config.directory = "";
 
 	// api definition
-	Script::LinkExternal("MainWin", &tsunami->_win);
-	Script::LinkExternal("song", &tsunami->song);
-	Script::LinkExternal("output", &tsunami->device_manager);
+	Script::LinkExternal("device_manager", &tsunami->device_manager);
 	Script::LinkExternal("storage", &tsunami->storage);
 	Script::LinkExternal("logging", &tsunami->log);
-	Script::LinkExternal("view", &tsunami->_view);
+	Script::LinkExternal("colors", &AudioView::colors);
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
@@ -113,6 +101,10 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioEffect", "only_on_selection", _offsetof(Effect, only_on_selection));
 	Script::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
 	Script::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
+	Script::DeclareClassOffset("AudioEffect", "song", _offsetof(Effect, song));
+	Script::DeclareClassOffset("AudioEffect", "track", _offsetof(Effect, track));
+	Script::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
+	Script::DeclareClassOffset("AudioEffect", "level", _offsetof(Effect, level));
 	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
 	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "process", Script::mf(&Effect::processTrack), &effect);
@@ -129,6 +121,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("MidiEffect", "only_on_selection", _offsetof(MidiEffect, only_on_selection));
 	Script::DeclareClassOffset("MidiEffect", "range", _offsetof(MidiEffect, range));
 	Script::DeclareClassOffset("MidiEffect", "usable", _offsetof(MidiEffect, usable));
+	Script::DeclareClassOffset("MidiEffect", "song", _offsetof(MidiEffect, song));
 	Script::LinkExternal("MidiEffect.__init__", Script::mf(&MidiEffect::__init__));
 	Script::DeclareClassVirtualIndex("MidiEffect", "__delete__", Script::mf(&MidiEffect::__delete__), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "process", Script::mf(&MidiEffect::process), &midieffect);
@@ -427,7 +420,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Script::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
-	Script::DeclareClassOffset("AudioView", "colors", _offsetof(AudioView, colors));
 
 	Script::DeclareClassSize("ColorScheme", sizeof(ColorScheme));
 	Script::DeclareClassOffset("ColorScheme", "background", _offsetof(ColorScheme, background));
@@ -448,14 +440,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Storage.load", Script::mf(&Storage::load));
 	Script::LinkExternal("Storage.save", Script::mf(&Storage::save));
 	Script::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
-
-	Script::DeclareClassSize("PluginContext", sizeof(PluginManager::PluginContext));
-	Script::DeclareClassOffset("PluginContext", "song", _offsetof(PluginManager::PluginContext, song));
-	Script::DeclareClassOffset("PluginContext", "track", _offsetof(PluginManager::PluginContext, track));
-	Script::DeclareClassOffset("PluginContext", "track_no", _offsetof(PluginManager::PluginContext, track_no));
-	Script::DeclareClassOffset("PluginContext", "range", _offsetof(PluginManager::PluginContext, range));
-	Script::DeclareClassOffset("PluginContext", "level", _offsetof(PluginManager::PluginContext, level));
-	Script::LinkExternal("plugin_context",	(void*)&context);
 
 
 	Slider slider;

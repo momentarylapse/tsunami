@@ -9,7 +9,7 @@ class Config : PluginData
 	int Pitch
 	float Frequency
 	float Volume
-	overwrite void reset()
+	override void reset()
 		Pitch = 81
 		Volume = 0.3
 		Frequency = pitch_to_freq(Pitch)
@@ -18,7 +18,7 @@ class ToneGenerator : AudioEffect
 	Config config
 	DummySynthesizer synth
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		Song *a = song
 		synth.setSampleRate(a.sample_rate)
 		
@@ -30,13 +30,13 @@ class ToneGenerator : AudioEffect
 		synth.read(buf)
 	
 
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new TonePanel(self)
 
 class TonePanel : ConfigPanel
-	overwrite ToneGenerator *c
+	override ToneGenerator *c
 	Slider *vol_slider
-	void __init__(ToneGenerator *_t)
+	override void __init__(ToneGenerator *_t)
 		super.__init__(_t)
 		addGrid("!width=350", 0, 0, 3, 3, "table2")
 		setTarget("table2", 0)
@@ -68,7 +68,7 @@ class TonePanel : ConfigPanel
 
 		update()
 	
-	virtual void __delete__()
+	override void __delete__()
 		delete vol_slider
 
 	void onFrequency()
@@ -90,7 +90,7 @@ class TonePanel : ConfigPanel
 		c.config.Volume = vol_slider.get()
 		notify()
 
-	overwrite void update()
+	override void update()
 		bool by_pitch = c.config.Pitch >= 0
 		if by_pitch
 			setInt("pitch_rel", c.config.Pitch % 12)

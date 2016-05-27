@@ -41,23 +41,23 @@ Command *SyntaxTree::cp_command(Command *c)
 	return cmd;
 }
 
-Command *SyntaxTree::ref_command(Command *sub, Type *overwrite_type)
+Command *SyntaxTree::ref_command(Command *sub, Type *override_type)
 {
-	Type *t = overwrite_type ? overwrite_type : sub->type->GetPointer();
+	Type *t = override_type ? override_type : sub->type->GetPointer();
 	Command *c = AddCommand(KIND_REFERENCE, 0, t);
 	c->set_num_params(1);
 	c->set_param(0, sub);
 	return c;
 }
 
-Command *SyntaxTree::deref_command(Command *sub, Type *overwrite_type)
+Command *SyntaxTree::deref_command(Command *sub, Type *override_type)
 {
 	Command *c = AddCommand(KIND_UNKNOWN, 0, TypeVoid);
 	c->kind = KIND_DEREFERENCE;
 	c->set_num_params(1);
 	c->set_param(0, sub);
-	if (overwrite_type)
-		c->type = overwrite_type;
+	if (override_type)
+		c->type = override_type;
 	else
 		c->type = sub->type->parent;
 	return c;
@@ -145,7 +145,6 @@ Command *SyntaxTree::add_command_block(Block *b)
 }
 
 SyntaxTree::SyntaxTree(Script *_script) :
-	GetExistenceLink(KIND_UNKNOWN, 0, NULL, TypeVoid),
 	root_of_all_evil(this, "RootOfAllEvil", TypeVoid)
 {
 	root_of_all_evil.block = AddBlock(&root_of_all_evil, NULL);
@@ -261,7 +260,7 @@ string LinkNr2Str(SyntaxTree *s,int kind,int nr)
 	return i2s(nr);
 }
 
-void SyntaxTree::DoError(const string &str, int overwrite_line)
+void SyntaxTree::DoError(const string &str, int override_line)
 {
 	// what data do we have?
 	int line = -1;
@@ -274,8 +273,8 @@ void SyntaxTree::DoError(const string &str, int overwrite_line)
 			pos = Exp.cur_line->exp[Exp.cur_exp].pos;
 		}
 	}
-	if (overwrite_line >= 0){
-		line = overwrite_line;
+	if (override_line >= 0){
+		line = override_line;
 		pos = 0;
 	}
 
@@ -409,6 +408,10 @@ Function *SyntaxTree::AddFunction(const string &name, Type *type)
 	return f;
 }
 
+Command::Command()
+{
+}
+
 Command::Command(int _kind, long long _link_no, Script *_script, Type *_type)
 {
 	type = _type;
@@ -436,10 +439,10 @@ void Command::set_num_params(int n)
 
 void Command::set_param(int index, Command *p)
 {
-	/*if ((index < 0) or (index >= param.num)){
+	if ((index < 0) or (index >= param.num)){
 		this->script->syntax->ShowCommand(this);
 		script->DoErrorInternal(format("Command.set_param...  %d %d", index, param.num));
-	}*/
+	}
 	set_command(param[index], p);
 }
 
@@ -494,96 +497,104 @@ int SyntaxTree::WhichCompilerFunction(const string &name)
 	return -1;
 }
 
-void exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no)
+Command exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no)
 {
-	ps->GetExistenceLink.type = t;
-	ps->GetExistenceLink.link_no = var_no;
-	ps->GetExistenceLink.kind = KIND_VAR_LOCAL;
-	ps->GetExistenceLink.set_num_params(0);
-	ps->GetExistenceLink.script = ps->script;
-	ps->GetExistenceLink.instance = NULL;
+	Command link;
+	link.type = t;
+	link.link_no = var_no;
+	link.kind = KIND_VAR_LOCAL;
+	link.set_num_params(0);
+	link.script = ps->script;
+	link.instance = NULL;
+	return link;
 }
 
-void exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
+Command exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 {
+	Command link;
 	Command *self = ps->add_command_local_var(f->__get_var("self"), f->_class->GetPointer());
-	ps->GetExistenceLink.type = e.type;
-	ps->GetExistenceLink.link_no = e.offset;
-	ps->GetExistenceLink.kind = KIND_DEREF_ADDRESS_SHIFT;
-	ps->GetExistenceLink.set_num_params(1);
-	ps->GetExistenceLink.param[0] = self;
-	ps->GetExistenceLink.script = ps->script;
-	ps->GetExistenceLink.instance = NULL;
+	link.type = e.type;
+	link.link_no = e.offset;
+	link.kind = KIND_DEREF_ADDRESS_SHIFT;
+	link.set_num_params(1);
+	link.param[0] = self;
+	link.script = ps->script;
+	link.instance = NULL;
+	return link;
 }
 
-void exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
+Command exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
+	Command link;
 	Command *self = ps->add_command_local_var(f->__get_var("self"), f->_class->GetPointer());
 	if (cf.virtual_index >= 0){
-		ps->GetExistenceLink.kind = KIND_VIRTUAL_FUNCTION;
-		ps->GetExistenceLink.link_no = cf.virtual_index;
+		link.kind = KIND_VIRTUAL_FUNCTION;
+		link.link_no = cf.virtual_index;
 	}else{
-		ps->GetExistenceLink.kind = KIND_FUNCTION;
-		ps->GetExistenceLink.link_no = cf.nr;
+		link.kind = KIND_FUNCTION;
+		link.link_no = cf.nr;
 	}
-	ps->GetExistenceLink.script = cf.script;
-	ps->GetExistenceLink.type = cf.return_type;
-	ps->GetExistenceLink.set_num_params(cf.param_type.num);
-	ps->GetExistenceLink.instance = self;
+	link.script = cf.script;
+	link.type = cf.return_type;
+	link.set_num_params(cf.param_type.num);
+	link.instance = self;
+	return link;
 }
 
-bool SyntaxTree::GetExistenceShared(const string &name)
+Array<Command> SyntaxTree::GetExistenceShared(const string &name)
 {
 	msg_db_f("GetExistenceShared", 3);
-	MultipleFunctionList.clear();
-	GetExistenceLink.type = TypeUnknown;
-	GetExistenceLink.param.clear();
-	GetExistenceLink.script = script;
-	GetExistenceLink.instance = NULL;
+	Array<Command> links;
+	Command link;
+	link.type = TypeUnknown;
+	link.param.clear();
+	link.script = script;
+	link.instance = NULL;
 
 	// global variables (=local variables in "RootOfAllEvil")
 	foreachi(Variable &v, root_of_all_evil.var, i)
 		if (v.name == name){
-			GetExistenceLink.type = v.type;
-			GetExistenceLink.link_no = i;
-			GetExistenceLink.kind = KIND_VAR_GLOBAL;
-			return true;
+			link.type = v.type;
+			link.link_no = i;
+			link.kind = KIND_VAR_GLOBAL;
+			links.add(link);
+			return links;
 		}
 
 	// then the (real) functions
 	foreachi(Function *f, functions, i)
 		if (f->name == name){
-			GetExistenceLink.kind = KIND_FUNCTION;
-			GetExistenceLink.link_no = i;
-			GetExistenceLink.type = f->literal_return_type;
-			GetExistenceLink.set_num_params(f->num_params);
-			return true;
+			link.kind = KIND_FUNCTION;
+			link.link_no = i;
+			link.type = f->literal_return_type;
+			link.set_num_params(f->num_params);
+			links.add(link);
 		}
+	if (links.num > 0)
+		return links;
 
 	// types
 	int w = WhichType(name);
 	if (w >= 0){
-		GetExistenceLink.kind = KIND_TYPE;
-		GetExistenceLink.link_no = w;
-		return true;
+		link.kind = KIND_TYPE;
+		link.link_no = w;
+		links.add(link);
+		return links;
 	}
 
 	// ...unknown
-	GetExistenceLink.type = TypeUnknown;
-	GetExistenceLink.kind = KIND_UNKNOWN;
-	GetExistenceLink.link_no = 0;
-	return false;
+	return links;
 }
 
-bool SyntaxTree::GetExistence(const string &name, Block *block)
+Array<Command> SyntaxTree::GetExistence(const string &name, Block *block)
 {
 	msg_db_f("GetExistence", 3);
-	MultipleFunctionList.clear();
-	GetExistenceLink.ref_count = 0;
-	GetExistenceLink.type = TypeUnknown;
-	GetExistenceLink.param.clear();
-	GetExistenceLink.script = script;
-	GetExistenceLink.instance = NULL;
+	Array<Command> links;
+	Command link;
+	link.type = TypeUnknown;
+	link.param.clear();
+	link.script = script;
+	link.instance = NULL;
 
 	if (block){
 		Function *f = block->function;
@@ -591,64 +602,58 @@ bool SyntaxTree::GetExistence(const string &name, Block *block)
 		// first test local variables
 		int n = block->get_var(name);
 		if (n >= 0){
-			exlink_make_var_local(this, f->var[n].type, n);
-			return true;
+			links.add(exlink_make_var_local(this, f->var[n].type, n));
+			return links;
 		}
 		if (f->_class){
 			if ((name == "super") and (f->_class->parent)){
-				exlink_make_var_local(this, f->_class->parent->GetPointer(), f->__get_var("self"));
-				return true;
+				links.add(exlink_make_var_local(this, f->_class->parent->GetPointer(), f->__get_var("self")));
+				return links;
 			}
 			// class elements (within a class function)
 			foreach(ClassElement &e, f->_class->element)
 				if (e.name == name){
-					exlink_make_var_element(this, f, e);
-					return true;
+					links.add(exlink_make_var_element(this, f, e));
+					return links;
 				}
 			foreach(ClassFunction &cf, f->_class->function)
 				if (cf.name == name){
-					exlink_make_func_class(this, f, cf);
-					return true;
+					links.add(exlink_make_func_class(this, f, cf));
+					return links;
 				}
 		}
 	}
 
 	// shared stuff (global variables, functions)
-	if (GetExistenceShared(name))
-		return true;
+	links = GetExistenceShared(name);
+	if (links.num > 0)
+		return links;
 
 	// then the compiler functions
 	int w = WhichCompilerFunction(name);
 	if (w >= 0){
-		GetExistenceLink.kind = KIND_COMPILER_FUNCTION;
-		GetExistenceLink.link_no = w;
-		GetExistenceLink.type = PreCommands[w].return_type;
-		GetExistenceLink.set_num_params(PreCommands[w].param.num);
-		return true;
+		link.kind = KIND_COMPILER_FUNCTION;
+		link.link_no = w;
+		link.type = PreCommands[w].return_type;
+		link.set_num_params(PreCommands[w].param.num);
+		links.add(link);
+		return links;
 	}
 
 	// operators
 	w = WhichPrimitiveOperator(name);
 	if (w >= 0){
-		GetExistenceLink.kind = KIND_PRIMITIVE_OPERATOR;
-		GetExistenceLink.link_no = w;
-		return true;
+		link.kind = KIND_PRIMITIVE_OPERATOR;
+		link.link_no = w;
+		return link;
 	}
 
 	// in include files (only global)...
 	foreach(Script *i, includes)
-		if (i->syntax->GetExistenceShared(name)){
-			GetExistenceLink = i->syntax->GetExistenceLink;
-			GetExistenceLink.script = i;
-			//msg_error(string2("\"%s\" in Include gefunden!  %s", name, GetExistenceLink.Type->Name));
-			return true;
-		}
+		links.append(i->syntax->GetExistenceShared(name));
 
 	// ...unknown
-	GetExistenceLink.type = TypeUnknown;
-	GetExistenceLink.kind = KIND_UNKNOWN;
-	GetExistenceLink.link_no = 0;
-	return false;
+	return links;
 }
 
 // expression naming a type

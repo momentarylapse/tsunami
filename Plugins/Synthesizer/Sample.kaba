@@ -4,9 +4,9 @@ use "../tone.kaba"
 
 class SampleConfig : PluginData
 	SampleRef*[] samples
-	virtual void __delete__()
+	override void __delete__()
 		reset()
-	overwrite void reset()
+	override void reset()
 		for s in samples
 			if s
 				delete s
@@ -19,7 +19,7 @@ class SampleState : PluginData
 class SampleSynthesizer : Synthesizer
 	SampleConfig config
 	SampleState state
-	overwrite void render(BufferBox buf)
+	override void render(BufferBox buf)
 		for e in events
 			if e.volume > 0
 				state.events.add(e)
@@ -44,19 +44,19 @@ class SampleSynthesizer : Synthesizer
 				i --
 			
 	
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new SamplePanel(self)
 
 class SamplePanel : ConfigPanel
 	SampleConfig *sc
-	overwrite SampleSynthesizer *c
-	void __init__(SampleSynthesizer *_s)
+	override SampleSynthesizer *c
+	override void __init__(SampleSynthesizer *_s)
 		super.__init__(_s)
 		sc = &c.config
 		addListView("!width=300\\Note\\Sample", 0, 0, 0, 0, "list")
 		event("list", &onSelect)
 
-	overwrite void update()
+	override void update()
 		reset("list")
 		for i in 0:MAX_PITCH
 			string name = ""

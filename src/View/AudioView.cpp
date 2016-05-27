@@ -30,6 +30,7 @@ const int AudioView::SAMPLE_FRAME_HEIGHT = 20;
 const int AudioView::TIME_SCALE_HEIGHT = 20;
 const int AudioView::TRACK_HANDLE_WIDTH = 60;
 const int AudioView::BARRIER_DIST = 8;
+ColorScheme AudioView::colors;
 
 int get_track_index_save(Song *song, Track *t)
 {

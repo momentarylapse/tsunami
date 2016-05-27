@@ -262,13 +262,13 @@ void class_add_element(const string &name, Type *type, int offset, ScriptFlag fl
 
 ClassFunction *_class_add_func(Type *c, const ClassFunction &f, ScriptFlag flag)
 {
-	if ((flag & FLAG_OVERWRITE) > 0){
+	if ((flag & FLAG_OVERRIDE) > 0){
 		foreachi(ClassFunction &ff, c->function, i)
 			if (ff.name == f.name){
 				ff = f;
 				return &ff;
 			}
-		msg_error("could not overwrite " + c->name + "." + f.name);
+		msg_error("could not override " + c->name + "." + f.name);
 	}
 	c->function.add(f);
 	return &c->function.back();
@@ -278,7 +278,7 @@ void _class_add_func_virtual(const string &tname, const string &name, Type *retu
 {
 	//msg_write("virtual: " + tname + "." + name);
 	//msg_write(index);
-	int cmd = add_func(tname + "." + name + "[virtual]", return_type, NULL, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERWRITE));
+	int cmd = add_func(tname + "." + name + "[virtual]", return_type, NULL, ScriptFlag((flag | FLAG_CLASS) & ~FLAG_OVERRIDE));
 	cur_func->_class = cur_class;
 	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cmd), flag);
 	cur_class_func->virtual_index = index;
@@ -1317,9 +1317,9 @@ void Init(int instruction_set, int abi, bool allow_std_lib)
 	config.show_compiler_stats = true;
 
 	config.compile_os = false;
-	config.overwrite_variables_offset = false;
+	config.override_variables_offset = false;
 	config.variables_offset = 0;
-	config.overwrite_code_origin = false;
+	config.override_code_origin = false;
 	config.code_origin = 0;
 	config.add_entry_point = false;
 	config.no_function_frame = false;

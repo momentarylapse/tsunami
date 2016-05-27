@@ -29,7 +29,7 @@ int[] find_clicks(float[] b)
 			clicks.remove(i+2)
 			clicks.remove(i+1)
 			i -= 2
-	print clicks
+	print(clicks)
 	return clicks
 
 class RemoveClicks : AudioEffect
@@ -48,6 +48,6 @@ class RemoveClicks : AudioEffect
 		for i in 0:clicks.num:2
 			unclick(b, clicks[i], clicks[i+1])
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		repair(buf.r)
 		repair(buf.l)

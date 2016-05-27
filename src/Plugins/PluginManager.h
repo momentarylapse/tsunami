@@ -67,17 +67,6 @@ public:
 
 	Array<Plugin*> plugins;
 
-	struct PluginContext
-	{
-		Range range;
-		Song *song;
-		Track *track;
-		int track_no;
-		int level;
-		void set(Track *t, int l, const Range &r);
-	};
-	PluginContext context;
-
 	FavoriteManager *favorites;
 };
 

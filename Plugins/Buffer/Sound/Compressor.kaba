@@ -17,7 +17,7 @@ class CompressorConfig : PluginData
 			fi.add(curve[i].y, curve[i].x - curve[i - 1].x)
 		fi.normalize()
 
-	overwrite void reset()
+	override void reset()
 		curve.clear()
 		curve.add(complex(MIN_DB, MIN_DB))
 		curve.add(complex(0, 0))
@@ -30,7 +30,7 @@ class CompressorState : PluginData
 	float gain_r, gain_l
 	float[] squares_r
 	float[] squares_l
-	overwrite void reset()
+	override void reset()
 		gain_r = 1
 		gain_l = 1
 		squares_r.clear()
@@ -81,10 +81,10 @@ class Compressor : AudioEffect
 			// apply gain
 			b[i] *= pow(10, *gain / 20)
 
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new CompressorPanel(self)
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		Song *a = song
 		
 		dgain_attack = 10 / (config.attack * a.sample_rate)
@@ -98,7 +98,7 @@ class CompressorGrid : Grid
 	CompressorConfig *config
 	ConfigPanel *cp
 
-	overwrite void onDraw(Painter *p)
+	override void onDraw(Painter *p)
 		FloatInterpolator fi
 		config.fill_inter(fi)
 	
@@ -108,12 +108,12 @@ class CompressorGrid : Grid
 			drawPoint2(p, config.curve[i], i == Selected, i == MouseOver)
 
 	// left button down -> select
-	overwrite void onLeftButtonDown()
+	override void onLeftButtonDown()
 		Selected = MouseOver
 		redraw()
 
 	// right button down -> new point
-	overwrite void onRightButtonDown()
+	override void onRightButtonDown()
 		complex m = getMouse2()
 		for i in 1:config.curve.num
 			complex q = config.curve[i - 1]
@@ -125,7 +125,7 @@ class CompressorGrid : Grid
 				redraw()
 				break
 
-	overwrite void onMouseMove()
+	override void onMouseMove()
 		// move
 		if HuiGetEvent().button_l and (Selected > 0)
 			config.curve[Selected] = getMouse2()
@@ -145,7 +145,7 @@ class CompressorGrid : Grid
 					MouseOver = i
 		redraw()
 
-	overwrite void onKeyDown()
+	override void onKeyDown()
 		int k = HuiGetEvent().key
 
 		// [Delete] -> remove point
@@ -157,7 +157,7 @@ class CompressorGrid : Grid
 
 class CompressorPanel : ConfigPanel
 	CompressorGrid grid
-	void __init__(Compressor *_fx)
+	override void __init__(Compressor *_fx)
 		super.__init__(_fx)
 		addGrid("", 0, 0, 1, 2, "table1")
 		setTarget("table1", 0)
@@ -183,7 +183,7 @@ class CompressorPanel : ConfigPanel
 	
 		update()
 	
-	overwrite void update()
+	override void update()
 		grid.redraw()
 		setFloat("attack", grid.config.attack * 1000)
 		setFloat("release", grid.config.release * 1000)

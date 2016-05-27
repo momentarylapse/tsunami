@@ -29,7 +29,7 @@ int[] find_clicks(float[] b)
 			clicks.remove(i+2)
 			clicks.remove(i+1)
 			i -= 2
-	print clicks
+	print(clicks)
 	return clicks
 
 void unclick(float[] b, Track *t, int offset)
@@ -40,7 +40,7 @@ void unclick(float[] b, Track *t, int offset)
 
 class FindClicks : SongPlugin
 
-	overwrite void apply(Song *song)
+	override void apply(Song *song)
 		for t in song.tracks
 			for l in t.levels
 				for b in l.buffers

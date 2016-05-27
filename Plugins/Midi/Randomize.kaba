@@ -9,7 +9,7 @@ class Config : PluginData
 	float TimeVariation
 	float Volume
 	
-	overwrite void reset()
+	override void reset()
 		TimeDelay = 0
 		TimeVariation = 0.01
 		Volume = 0
@@ -17,10 +17,9 @@ class Config : PluginData
 class Randomize : MidiEffect
 	Config config
 	
-	overwrite void process(MidiData midi)
-		Song *a = plugin_context.song
-		float delay = a.sample_rate * config.TimeDelay
-		float var = a.sample_rate * config.TimeVariation
+	override void process(MidiData midi)
+		float delay = song.sample_rate * config.TimeDelay
+		float var = song.sample_rate * config.TimeVariation
 		for n in midi
 			int dt = randi(var*2) - var + delay
 			n.range.offset += dt

@@ -66,8 +66,12 @@ void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 {
 	msg_db_f("Effect.Apply", 1);
 
+	track = t;
+	song = t->song;
+	level = 0;
+	range = buf.range();
+
 	// run
-	tsunami->plugin_manager->context.set(t, 0, buf.range());
 	processTrack(&buf);
 
 	if (!usable){
@@ -79,16 +83,19 @@ void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 
 
 
-void Effect::doProcessTrack(Track *t, int level_no, const Range &r)
+void Effect::doProcessTrack(Track *t, int _level, const Range &r)
 {
 	msg_db_f("Effect.DoProcessTrack", 1);
 
-	tsunami->plugin_manager->context.set(t, level_no, r);
+	track = t;
+	song = t->song;
+	level = _level;
+	range = r;
 
-	BufferBox buf = t->getBuffers(level_no, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, level_no, r);
+	BufferBox buf = t->getBuffers(level, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(track, level, r);
 	processTrack(&buf);
-	t->song->execute(a);
+	song->execute(a);
 }
 
 

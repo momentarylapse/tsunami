@@ -81,7 +81,7 @@ public:
 	void updateMenu();
 
 	Array<ColorSchemeBasic> basic_schemes;
-	ColorScheme colors;
+	static ColorScheme colors;
 	void setColorScheme(const string &name);
 
 	static const int SAMPLE_FRAME_HEIGHT;

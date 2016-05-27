@@ -15,7 +15,7 @@ ClassFunction::ClassFunction()
 {
 	nr = -1;
 	virtual_index = -1;
-	needs_overwriting = false;
+	needs_overriding = false;
 }
 
 ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s, int no)
@@ -25,12 +25,33 @@ ClassFunction::ClassFunction(const string &_name, Type *_return_type, Script *s,
 	script = s;
 	nr = no;
 	virtual_index = -1;
-	needs_overwriting = false;
+	needs_overriding = false;
 }
 
 Function* ClassFunction::GetFunc()
 {
 	return script->syntax->functions[nr];
+}
+
+bool direct_type_match(Type *a, Type *b)
+{
+	return ( (a==b) or ( (a->is_pointer) and (b->is_pointer) ) or (a->IsDerivedFrom(b)) );
+}
+
+// both operand types have to match the operator's types
+//   (operator wants a pointer -> all pointers are allowed!!!)
+//   (same for classes of same type...)
+bool type_match(Type *type, bool is_class, Type *wanted)
+{
+	if (type == wanted)
+		return true;
+	if ((type->is_pointer) and (wanted == TypePointer))
+		return true;
+	if ((is_class) and (wanted == TypeClass))
+		return true;
+	if (type->IsDerivedFrom(wanted))
+		return true;
+	return false;
 }
 
 Type::Type()//const string &_name, int _size, SyntaxTree *_owner)
@@ -172,11 +193,16 @@ bool Type::IsDerivedFrom(Type *root) const
 	return parent->IsDerivedFrom(root);
 }
 
-ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_params)
+ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_params, Type *param0)
 {
 	foreachi(ClassFunction &f, function, i)
-		if ((f.name == _name) and (f.return_type == return_type) and (f.param_type.num == num_params))
-			return &f;
+		if ((f.name == _name) and (f.return_type == return_type) and (f.param_type.num == num_params)){
+			if ((param0) and (num_params > 0)){
+				if (f.param_type[0] == param0)
+					return &f;
+			}else
+				return &f;
+		}
 	return NULL;
 }
 
@@ -198,18 +224,9 @@ ClassFunction *Type::GetDestructor()
 	return GetFunc("__delete__", TypeVoid, 0);
 }
 
-inline ClassFunction *check_param(ClassFunction *cf, Type *t)
-{
-	if (!cf)
-		return NULL;
-	if (cf->param_type[0] != t)
-		return NULL;
-	return cf;
-}
-
 ClassFunction *Type::GetAssign()
 {
-	return check_param(GetFunc("__assign__", TypeVoid, 1), this);
+	return GetFunc("__assign__", TypeVoid, 1, this);
 }
 
 ClassFunction *Type::GetGet(Type *index)
@@ -260,7 +277,7 @@ void Type::LinkVirtualTable()
 				vtable[cf.virtual_index] = (void*)cf.script->func[cf.nr];
 			}
 		}
-		if (cf.needs_overwriting){
+		if (cf.needs_overriding){
 			msg_error("needs overwriting: " + name + " : " + cf.name);
 		}
 	}
@@ -299,12 +316,10 @@ bool class_func_match(ClassFunction &a, ClassFunction &b)
 		return false;
 	if (a.return_type != b.return_type)
 		return false;
-	if ((a.name == "__init__") and (a.param_type.num > 0) and (b.param_type.num))
-		return true;
 	if (a.param_type.num != b.param_type.num)
 		return false;
-	for (int i=0;i<a.param_type.num;i++)
-		if (a.param_type[i] != b.param_type[i])
+	for (int i=0; i<a.param_type.num; i++)
+		if (!direct_type_match(b.param_type[i], a.param_type[i]))
 			return false;
 	return true;
 }
@@ -334,7 +349,15 @@ Type *Type::GetRoot()
 	return r;
 }
 
-void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overwrite)
+void class_func_out(Type *c, ClassFunction *f)
+{
+	string ps;
+	foreach(Type *p, f->param_type)
+		ps += "  " + p->name;
+	msg_write(c->name + "." + f->name + ps);
+}
+
+void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool override)
 {
 	Function *f = s->functions[func_no];
 	ClassFunction cf;
@@ -352,19 +375,19 @@ void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overwri
 		_vtable_location_target_ = vtable.data;
 	}
 
-	// overwrite?
+	// override?
 	ClassFunction *orig = NULL;
-	foreach(ClassFunction &_cf, function)
-		if (class_func_match(_cf, cf))
-			orig = &_cf;
-	if (overwrite and !orig)
-		s->DoError(format("can not overwrite function '%s', no previous definition", func_signature(f).c_str()));
-	if (!overwrite and orig)
-		s->DoError(format("function '%s' is already defined, use 'overwrite' to overwrite", func_signature(f).c_str()));
-	if (overwrite){
+	foreach(ClassFunction &ocf, function)
+		if (class_func_match(ocf, cf))
+			orig = &ocf;
+	if (override and !orig)
+		s->DoError(format("can not override function '%s', no previous definition", func_signature(f).c_str()));
+	if (!override and orig)
+		s->DoError(format("function '%s' is already defined, use 'override' to override", func_signature(f).c_str()));
+	if (override){
 		orig->script = cf.script;
 		orig->nr = cf.nr;
-		orig->needs_overwriting = false;
+		orig->needs_overriding = false;
 		orig->param_type = cf.param_type;
 	}else
 		function.add(cf);
@@ -382,8 +405,10 @@ bool Type::DeriveFrom(Type* root, bool increase_size)
 	if (parent->function.num > 0){
 		// inheritance of functions
 		foreach(ClassFunction &f, parent->function){
+			if (f.name == "__assign__")
+				continue;
 			ClassFunction ff = f;
-			ff.needs_overwriting = (f.name == "__init__") or (f.name == "__delete__") or (f.name == "__assign__");
+			ff.needs_overriding = (f.name == "__init__") or (f.name == "__delete__") or (f.name == "__assign__");
 			function.add(ff);
 		}
 		found = true;

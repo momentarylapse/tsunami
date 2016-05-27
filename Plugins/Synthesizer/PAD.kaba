@@ -11,10 +11,10 @@ class PitchState
 
 class PADState : PluginData
 	PitchState[MAX_PITCH] pitch
-	void __init__()
+	override void __init__()
 		for p in pitch
 			p.buf.__init__()
-	overwrite void reset()
+	override void reset()
 		for p in pitch
 			p.buf.clear()
 			p.pos = 0
@@ -24,7 +24,7 @@ class PADConfig : PluginData
 	float bw
 	float bwscale
 	float detune
-	overwrite void reset()
+	override void reset()
 		A = [1.0, 0.4, 0.2, 0.1, 0.05]
 		bw = 0.5
 		bwscale = 0.7
@@ -48,7 +48,7 @@ class PADSynthesizer : Synthesizer
 	PADState state
 	PADConfig config
 	
-	overwrite void onConfig()
+	override void onConfig()
 		state.reset()
 		for p in state.pitch
 			p.env.set(0.02, 0.02, 0.7, 0.5, sample_rate)
@@ -83,7 +83,7 @@ class PADSynthesizer : Synthesizer
 			m = max(b, m)
 		p.buf /= (m * 1.2)
 
-	overwrite void render(BufferBox buf)
+	override void render(BufferBox buf)
 			
 		for i in 0:buf.length
 			for e in events
@@ -113,7 +113,7 @@ class PADSynthesizer : Synthesizer
 			for ip in to_del
 				enablePitch(ip, false)
 	
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new PADPanel(self)
 
 class PADGrid : Grid
@@ -121,11 +121,11 @@ class PADGrid : Grid
 	ConfigPanel *p
 	int Selected, Hover
 	
-	void __init__()
+	override void __init__()
 		Selected = -1
 		Hover = -1
 
-	overwrite void onDraw(Painter *c)
+	override void onDraw(Painter *c)
 		pc.A.resize(8)
 	
 		// curve + area below
@@ -139,11 +139,11 @@ class PADGrid : Grid
 			drawPoint2(c, complex(i+1, a), i == Selected, i == Hover)
 			
 	// left button down -> select
-	overwrite void onLeftButtonDown()
+	override void onLeftButtonDown()
 		Selected = Hover
 		redraw()
 
-	overwrite void onMouseMove()
+	override void onMouseMove()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
 			pc.A[Selected] = clamp(getMouse2().y, 0, 1)
@@ -160,8 +160,8 @@ class PADGrid : Grid
 class PADPanel : ConfigPanel
 	PADConfig *pc
 	PADGrid grid
-	overwrite PADSynthesizer* c
-	void __init__(PADSynthesizer* _s)
+	override PADSynthesizer* c
+	override void __init__(PADSynthesizer* _s)
 		super.__init__(_s)
 		pc = &c.config
 		fromSource("
@@ -191,7 +191,7 @@ Grid ? '' 1 2
 		grid.redraw()
 		notify()
 	
-	overwrite void update()
+	override void update()
 		setFloat("bw", pc.bw)
 		setFloat("bwscale", pc.bwscale)
 		setFloat("detune", pc.detune)

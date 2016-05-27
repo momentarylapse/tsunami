@@ -59,7 +59,7 @@ class PitchRecognitionDialog : Dialog
 		c.setColor(color(1, 0.6, 0.6, 0.6))
 		c.drawLine(2, (y0 + y1) / 2, 13, (y0 + y1) / 2)
 
-	overwrite void onDraw(Painter *c)
+	override void onDraw(Painter *c)
 		c.setColor(White)
 		c.setFontSize(12)
 		c.drawRect(0, 0, c.width, c.height)
@@ -136,9 +136,9 @@ class PitchRecognitionDialog : Dialog
 
 class PitchRecognition : TsunamiPlugin
 	Dialog* dlg
-	overwrite void onStart()
+	override void onStart()
 		dlg = new PitchRecognitionDialog(self)
 		dlg.show()
-	overwrite void onEnd()
+	override void onEnd()
 		delete dlg
 	

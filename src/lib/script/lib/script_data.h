@@ -328,9 +328,9 @@ struct CompilerConfiguration
 	bool compile_os;
 	bool no_function_frame;
 	bool add_entry_point;
-	bool overwrite_variables_offset;
+	bool override_variables_offset;
 	long long variables_offset;
-	bool overwrite_code_origin;
+	bool override_code_origin;
 	long long code_origin;
 
 	int stack_mem_align;

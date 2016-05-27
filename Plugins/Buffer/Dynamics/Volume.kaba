@@ -8,16 +8,16 @@ class Config : PluginData
 	float Volume
 	bool Maximize
 	
-	overwrite void reset()
+	override void reset()
 		self.Volume = 1
 
 class Volume : AudioEffect
 	Config config
 
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new VolumePanel(self)
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		float factor = config.Volume
 		if config.Maximize
 			float max = 0
@@ -32,9 +32,9 @@ class Volume : AudioEffect
 			buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
 	
 class VolumePanel : ConfigPanel
-	overwrite Volume *c
+	override Volume *c
 	Slider *slider
-	void __init__(Volume *_v)
+	override void __init__(Volume *_v)
 		super.__init__(_v)
 		addGrid("!width=400", 0, 0, 1, 2, "table1")
 		setTarget("table1", 0)
@@ -49,10 +49,10 @@ class VolumePanel : ConfigPanel
 	
 		event("max", &onMax)
 	
-	virtual void __delete__()
+	override void __delete__()
 		delete(slider)
 
-	overwrite void update()
+	override void update()
 		slider.set(c.config.Volume)
 		check("max", c.config.Maximize)
 		enable("volume", !c.config.Maximize)

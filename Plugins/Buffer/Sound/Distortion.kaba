@@ -6,14 +6,14 @@ const string AutoConfigGain = "0:1:0.1:100:%"
 
 class Config : PluginData
 	float Gain
-	overwrite void reset()
+	override void reset()
 		Gain = 0.1
 
 class Distortion : AudioEffect
 	Config config
 
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		float a = max(10000 * pow(config.Gain, 2), 0.01)
 		float b = 1 / atan(a)
 	

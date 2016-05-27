@@ -5,13 +5,12 @@ const string AutoConfigPitch = "-50:50:1:1:"
 class Config : PluginData
 	float Pitch
 	
-	overwrite void reset()
+	override void reset()
 		Pitch = 0
 
 class PitchShift : MidiEffect
 	Config config
 	
-	overwrite void process(MidiData midi)
-		Song *a = plugin_context.song
+	override void process(MidiData midi)
 		for n in midi
 			n.pitch += config.Pitch

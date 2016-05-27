@@ -5,14 +5,13 @@ const string AutoConfigdelay = "-2:2:1:1000:ms"
 class Config : PluginData
 	float delay
 	
-	overwrite void reset()
+	override void reset()
 		delay = 0
 
 class Delay : MidiEffect
 	Config config
 	
-	overwrite void process(MidiData midi)
-		Song *a = plugin_context.song
-		int dt = a.sample_rate * config.delay
+	override void process(MidiData midi)
+		int dt = song.sample_rate * config.delay
 		for n in midi
-			n.pos += dt
+			n.range.offset += dt

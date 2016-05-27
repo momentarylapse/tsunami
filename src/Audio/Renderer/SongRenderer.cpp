@@ -318,7 +318,6 @@ void SongRenderer::reset()
 			fx->prepare();
 		foreach(MidiEffect *fx, t->midi.fx){
 			fx->Prepare();
-			tsunami->plugin_manager->context.set(t, 0, _range);
 			fx->process(&midi[i]);
 		}
 	}

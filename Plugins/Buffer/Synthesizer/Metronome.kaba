@@ -8,7 +8,7 @@ class Config : PluginData
 	float BeatsPerMinute
 	float Volume
 	int BeatsPerMeasure
-	overwrite void reset()
+	override void reset()
 		Volume = 0.3
 		BeatsPerMinute = 90
 		BeatsPerMeasure = 4
@@ -17,7 +17,7 @@ class Config : PluginData
 class PluginState : PluginData
 	int beat
 	int dpos
-	overwrite void reset()
+	override void reset()
 		beat = 0
 		dpos = 0
 
@@ -28,7 +28,7 @@ class Metronome : AudioEffect
 	Config config
 	DummySynthesizer synth
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		Song *a = song
 
 		float dt_m = 60.0 / config.BeatsPerMinute
@@ -55,13 +55,13 @@ class Metronome : AudioEffect
 		synth.feed(midi)
 		synth.read(buf)
 		
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new MetronomePanel(self)
 
 	
 class MetronomePanel : ConfigPanel
-	overwrite Metronome *c
-	void __init__(Metronome *_m)
+	override Metronome *c
+	override void __init__(Metronome *_m)
 		super.__init__(_m)
 		addGrid("!width=300", 0, 0, 2, 3, "table2")
 		setTarget("table2", 0)
@@ -80,7 +80,7 @@ class MetronomePanel : ConfigPanel
 	
 		update()
 
-	overwrite void update()
+	override void update()
 		setFloat("beats_per_minute", c.config.BeatsPerMinute)
 		setInt("beats_per_measure", c.config.BeatsPerMeasure)
 		setFloat("volume", c.config.Volume * 100)

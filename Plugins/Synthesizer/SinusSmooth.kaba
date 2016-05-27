@@ -5,13 +5,13 @@ const string AutoConfigrelease = "0:0.4:1:1000:ms"
 
 class Config : PluginData
 	float release
-	overwrite void reset()
+	override void reset()
 		release = 0.02
 
 class SinusSmoothSynthesizer : Synthesizer
 	Config config
 
-	overwrite void renderNote(BufferBox buf, Range r, float pitch, float volume)
+	override void renderNote(BufferBox buf, Range r, float pitch, float volume)
 		float freq = pitch_to_freq(pitch)
 		float f_w = 1.0 / sample_rate * freq * 2.0 * pi
 		float sm_d = config.release * sample_rate

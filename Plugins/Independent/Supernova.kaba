@@ -78,7 +78,7 @@ class SuperNovaWindow : Window
 		event("cancel", &onCancel)
 		setFullscreen(true)
 	
-	void __delete__()
+	override void __delete__()
 		if Mode == ModeLesson
 			StopLesson()
 	
@@ -168,7 +168,7 @@ class SuperNovaWindow : Window
 		c.setFontSize(24)
 		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
 
-	overwrite void onDraw(Painter *p)
+	override void onDraw(Painter *p)
 		c = p
 		c.setColor(White)
 		c.setFontSize(12)
@@ -181,7 +181,7 @@ class SuperNovaWindow : Window
 		else if Mode == ModeLesson
 			drawLesson()
 		
-	overwrite void onMouseMove()
+	override void onMouseMove()
 		if Mode != ModeConfig
 			return
 		hover = -1
@@ -191,7 +191,7 @@ class SuperNovaWindow : Window
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
 		redraw("drawing")
-	overwrite void onLeftButtonDown()
+	override void onLeftButtonDown()
 		if Mode != ModeConfig
 			return
 		if hover >= 0

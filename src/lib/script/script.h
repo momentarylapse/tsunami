@@ -67,7 +67,7 @@ public:
 	void CompileTaskEntryPoint();
 
 	// error messages
-	void DoError(const string &msg, int overwrite_line = -1);
+	void DoError(const string &msg, int override_line = -1);
 	void DoErrorLink(const string &msg);
 	void DoErrorInternal(const string &msg);
 

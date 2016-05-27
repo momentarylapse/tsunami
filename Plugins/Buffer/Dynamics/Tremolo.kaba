@@ -9,7 +9,7 @@ class Config : PluginData
 	float Speed
 	float Depth
 
-	overwrite void reset()
+	override void reset()
 		Depth = 0.5
 		Speed = 6
 
@@ -27,6 +27,6 @@ class Tremolo : AudioEffect
 			// old value
 			bb *= f
 	
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		doTremolo(buf.r)
 		doTremolo(buf.l)

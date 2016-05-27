@@ -1,13 +1,22 @@
+use "../api.kaba"
 
 class MyDialog : Dialog
-	void __init__()
-		super.__init__("", 300, 200, nil, false)
+	TsunamiPlugin* plugin
+	void __init__(TsunamiPlugin* _plugin)
+		super.__init__("", 300, 200, _plugin.win, false)
+		plugin = _plugin
 		addEdit("", 0, 0, 0, 0, "edit")
 		event("edit", &onChange)
+		event("hui:close", &onClose)
 	void onChange()
-		print "ssss"
+		print("ssss")
+	void onClose()
+		plugin.end()
 
-void main()
-	//HuiInfoBox(nil, "", "hallo")
-	Dialog *d = new MyDialog
-	d.run()
+class Test : TsunamiPlugin
+	Dialog *dlg
+	override void onStart()
+		dlg = new MyDialog(self)
+		dlg.show()
+	override void onEnd()
+		delete dlg

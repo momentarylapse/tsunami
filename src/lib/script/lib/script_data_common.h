@@ -8,7 +8,7 @@ enum ScriptFlag
 	FLAG_CLASS = 4,
 	FLAG_PURE = 8,
 	FLAG_HIDDEN = 16,
-	FLAG_OVERWRITE = 32
+	FLAG_OVERRIDE = 32
 };
 
 void add_package(const string &name, bool used_by_default);

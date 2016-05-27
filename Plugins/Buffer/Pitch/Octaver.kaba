@@ -7,7 +7,7 @@ const string AutoConfigLevel = "0:1:0.1:100:%"
 class Config : PluginData
 	float Level
 
-	overwrite void reset()
+	override void reset()
 		Level = 0.5
 
 class Octaver : AudioEffect
@@ -17,6 +17,6 @@ class Octaver : AudioEffect
 		for bb in b
 			bb = (bb * bb) * config.Level + bb * (1 - config.Level)
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		doOctaver(buf.r)
 		doOctaver(buf.l)

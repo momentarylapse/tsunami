@@ -16,8 +16,8 @@ class MetronomeSource : MidiSource
 	int sm_m
 	float sample_rate
 	
-	void __init__(Window* _win, float _bpm, int _beats, int _sample_rate)
-		win = _win
+	void __init__(float _bpm, int _beats, int _sample_rate)
+		win = nil
 		sample_rate = _sample_rate
 		
 		freq = 880.0
@@ -32,7 +32,7 @@ class MetronomeSource : MidiSource
 		float dt_m = 60.0 / bpm
 //		sm_m = dt_m * sample_rate
 		
-	overwrite int read(MidiRawData midi)
+	override int read(MidiRawData midi)
 		float dt_m = 60.0 / bpm
 		sm_m = dt_m * sample_rate
 	
@@ -48,7 +48,8 @@ class MetronomeSource : MidiSource
 		
 		fraction = 1 - i2f(offset) / i2f(sm_m)
 		
-		win.redraw("area")
+		if win
+			win.redraw("area")
 		return midi.samples
 	
 	void setBpm(float bpm_new)
@@ -61,15 +62,10 @@ class MetronomeSource : MidiSource
 
 
 class MetronomeDialog : Dialog
-	OutputStream *stream
-	MidiRenderer *renderer
-	MetronomeSource *source
-	DummySynthesizer synth
-	AudioView *view
-	TsunamiPlugin *plugin
+	Metronome *metro
 	
-	overwrite void __init__(TsunamiPlugin *_plugin)
-		super.__init__("Metronome", 300, 250, _plugin.win, false)
+	void __init__(Metronome *_metro)
+		super.__init__("Metronome", 300, 250, _metro.win, false)
 		fromSource("
 Grid ? '' 1 3
 	DrawingArea area ''
@@ -83,29 +79,16 @@ Grid ? '' 1 3
 	Grid ? '' 2 1 buttonbar
 		Button close 'Close' image=hui:close")
 		
-		plugin = _plugin
-		view = plugin.view
+		metro = _metro
 	
-		source = new MetronomeSource(self, 90, 4, synth.sample_rate)
-		renderer = new MidiRenderer(&synth, source)
-	
-		setFloat("bpm", source.bpm)
+		setFloat("bpm", metro.source.bpm)
 	
 		event("hui:close", &onClose)
 		event("close", &onClose)
 		event("bpm", &onBpm)
 		event("num_beats", &onNumBeats)
 	
-		stream = new OutputStream(renderer)
-		stream.setBufferSize(1024)
-		stream.play()
-	
-	overwrite void __delete__()
-		delete stream
-		delete renderer
-		delete source
-	
-	overwrite void onDraw(Painter *p)
+	override void onDraw(Painter *p)
 		float w = p.width
 		float h = p.height
 		float x0 = w / 2
@@ -113,44 +96,62 @@ Grid ? '' 1 3
 		float r = min(x0, y0) * 0.9
 		
 		// background
-		p.setColor(view.colors.background)
+		p.setColor(colors.background)
 		p.drawRect(0, 0, w, h)
 		
 		// circle
-		p.setColor(ColorInterpolate(view.colors.grid, view.colors.background, 0.5))
+		p.setColor(ColorInterpolate(colors.grid, colors.background, 0.5))
 		p.setFill(false)
 		p.drawCircle(x0, y0, r)
 		
 		// top point
 		p.setFill(true)
-		p.setColor(view.colors.text_soft3)
+		p.setColor(colors.text_soft3)
 		p.drawCircle(x0, y0 - r, 3)
 		
 		// moving point
-		p.setColor(view.colors.text)
-		float t = source.fraction - 0.5
+		p.setColor(colors.text)
+		float t = metro.source.fraction - 0.5
 		float phi = 2 *pi * (2*t*t*t + t/2)
 		p.drawCircle(x0 - sin(phi) * r, y0 + cos(phi) * r, 5)
 		
 		// beat number
-		int n = loopi(source.cur_beat - 1, 0, source.num_beats - 1) + 1
+		int n = loopi(metro.source.cur_beat - 1, 0, metro.source.num_beats - 1) + 1
 		p.drawStr(x0-7, y0-11, n)
 
 	void onBpm()
-		source.setBpm(getFloat(""))
+		metro.source.setBpm(getFloat(""))
 
 	void onNumBeats()
-		source.num_beats = getInt("")
-		//source.cur_beat = 0
-		//source.offset = 0
+		metro.source.num_beats = getInt("")
+		//metro.source.cur_beat = 0
+		//metro.source.offset = 0
 
 	void onClose()
-		plugin.end()
+		metro.end()
 
 class Metronome : TsunamiPlugin
+	OutputStream *stream
+	MidiRenderer *renderer
+	MetronomeSource *source
+	DummySynthesizer synth
 	Dialog *dlg
-	overwrite void onStart()
+	
+	override void onStart()
+		source = new MetronomeSource(90, 4, synth.sample_rate)
+		renderer = new MidiRenderer(&synth, source)
+		
 		dlg = new MetronomeDialog(self)
 		dlg.show()
-	overwrite void onEnd()
+		source.win = dlg
+	
+		stream = new OutputStream(renderer)
+		stream.setBufferSize(1024)
+		stream.play()
+		
+	override void onEnd()
+		source.win = nil
 		delete dlg
+		delete stream
+		delete renderer
+		delete source

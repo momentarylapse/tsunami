@@ -11,7 +11,7 @@ class PitchState
 
 class HarminocState : PluginData
 	PitchState[MAX_PITCH] pitch
-	overwrite void reset()
+	override void reset()
 		for p in pitch
 			p.volume = 0
 			p.phi = 0
@@ -20,7 +20,7 @@ class HarminocState : PluginData
 class HarmonicConfig : PluginData
 	float[NUM_HARMONICS] intensity
 	float release
-	overwrite void reset()
+	override void reset()
 		intensity[0] = 0.3
 		intensity[1] = 0.1
 		for i in 2:NUM_HARMONICS
@@ -32,7 +32,7 @@ class HarmonicGrid : Grid
 	HarmonicPanel *p
 	int Selected, Hover
 
-	overwrite void onDraw(Painter *c)
+	override void onDraw(Painter *c)
 	
 		// points
 		for i,n in hc.intensity
@@ -43,11 +43,11 @@ class HarmonicGrid : Grid
 			drawPoint2(c, z1, n == Selected, n == Hover)
 			
 	// left button down -> select
-	overwrite void onLeftButtonDown()
+	override void onLeftButtonDown()
 		Selected = Hover
 		redraw()
 
-	overwrite void onMouseMove()
+	override void onMouseMove()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
 			hc.intensity[Selected] = clamp(getMouse2().y, 0, 1)
@@ -62,10 +62,10 @@ class HarmonicGrid : Grid
 		redraw()
 
 class HarmonicPanel : ConfigPanel
-	overwrite HarmonicSynthesizer *c
+	override HarmonicSynthesizer *c
 	HarmonicConfig *hc
 	HarmonicGrid grid
-	void __init__(HarmonicSynthesizer *_s)
+	override void __init__(HarmonicSynthesizer *_s)
 		super.__init__(_s)
 		addGrid("", 0, 0, 1, 2, "main_table")
 		setTarget("main_table", 0)
@@ -88,7 +88,7 @@ class HarmonicPanel : ConfigPanel
 		hc.release = getFloat("release") / 1000
 		notify()
 	
-	overwrite void update()
+	override void update()
 		redraw("drawing")
 		setFloat("release", hc.release * 1000)
 		
@@ -97,14 +97,14 @@ class HarmonicSynthesizer : Synthesizer
 	HarmonicConfig config
 	HarminocState state
 
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new HarmonicPanel(self)
 	
-	overwrite void onConfig()
+	override void onConfig()
 		for p in state.pitch
 			p.env.set(0.01, 0.01, 0.7, config.release, sample_rate)
 		
-	overwrite void render(BufferBox buf)
+	override void render(BufferBox buf)
 		for i in 0:buf.length
 
 			// current events?

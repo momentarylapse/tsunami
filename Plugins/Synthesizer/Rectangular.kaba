@@ -7,7 +7,7 @@ class PitchState
 
 class RectangularState : PluginData
 	PitchState[MAX_PITCH] pitch
-	overwrite void reset()
+	override void reset()
 		for p in pitch
 			p.volume = 0
 			p.phase = 0
@@ -16,7 +16,7 @@ class RectangularState : PluginData
 class RectangularSynthesizer : Synthesizer
 	RectangularState state
 
-	overwrite void render(BufferBox buf)
+	override void render(BufferBox buf)
 		for i in 0:buf.length
 			for e in events
 				if e.pos == i

@@ -36,7 +36,7 @@ class OscillatorLink
 class FMConfig : PluginData
 	OscillatorConfig[NUM_OSCILLATORS] osc
 	//OscillatorLink[] link
-	overwrite void reset()
+	override void reset()
 		//link.clear()
 		for o in osc
 			o.type = TYPE_SINE
@@ -78,13 +78,13 @@ class FMConfig : PluginData
 		l.source = 4
 		l.dest = 3
 		link.add(l)*/
-	void __init__()
+	override void __init__()
 		reset()
 	void __assign__(FMConfig o)
 
 class FMState : PluginData
 	PitchState[MAX_PITCH] pitch
-	overwrite void reset()
+	override void reset()
 		for p in pitch
 			p.num_osc_active = 0
 			for o in p.osc
@@ -93,14 +93,14 @@ class FMState : PluginData
 				o.output = 0
 				o.phi = 0
 				o.env.reset()
-	void __init__()
+	override void __init__()
 		reset()
 
 class FMPanel : ConfigPanel
 	FMConfig *fc
 	int chosen
-	overwrite FMSynthesizer *c
-	void __init__(FMSynthesizer *_s)
+	override FMSynthesizer *c
+	override void __init__(FMSynthesizer *_s)
 		super.__init__(_s)
 		fc = &c.config
 		addGrid("", 0, 0, 1, 3, "outer_table")
@@ -174,7 +174,7 @@ class FMPanel : ConfigPanel
 		
 		notify()
 	
-	overwrite void update()
+	override void update()
 		for o,j in fc.osc
 			setFloat("factor_" + j, o.factor)
 			setFloat("amplitude_" + j, o.amplitude)
@@ -201,17 +201,17 @@ class FMSynthesizer : Synthesizer
 	FMConfig config
 	FMState state
 
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new FMPanel(self)
 	
-	overwrite void onConfig()
+	override void onConfig()
 		for p in state.pitch
 			for o,i in p.osc
 				OscillatorConfig *c = &config.osc[i]
 				o.env.set(c.attack, c.decay, c.sustain, c.release, sample_rate)
 				o.env.set2(c.initial, c.peak)
 
-	overwrite void render(BufferBox buf)
+	override void render(BufferBox buf)
 
 		for i in 0:buf.length
 

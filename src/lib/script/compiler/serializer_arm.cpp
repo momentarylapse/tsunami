@@ -205,12 +205,13 @@ void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 				AddFunctionOutro(cur_func);
 			}
 			break;
-		case COMMAND_NEW:
+		case COMMAND_NEW:{
 			AddFuncParam(param_const(TypeInt, ret.type->parent->size));
 			AddFuncReturn(ret);
-			if (!syntax_tree->GetExistence("@malloc", NULL))
+			Array<Command> links = syntax_tree->GetExistence("@malloc", NULL);
+			if (links.num == 0)
 				DoError("@malloc not found????");
-			AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_no);
+			AddFunctionCall(links[0].script, links[0].link_no);
 			if (com->param.num > 0){
 				// copy + edit command
 				Command sub = *com->param[0];
@@ -219,14 +220,15 @@ void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 				SerializeCommand(&sub, block, index);
 			}else
 				add_cmd_constructor(ret, -1);
-			break;
-		case COMMAND_DELETE:
+			break;}
+		case COMMAND_DELETE:{
 			add_cmd_destructor(param[0], false);
 			AddFuncParam(param[0]);
-			if (!syntax_tree->GetExistence("@free", NULL))
+			Array<Command> links = syntax_tree->GetExistence("@free", NULL);
+			if (links.num == 0)
 				DoError("@free not found????");
-			AddFunctionCall(syntax_tree->GetExistenceLink.script, syntax_tree->GetExistenceLink.link_no);
-			break;
+			AddFunctionCall(links[0].script, links[0].link_no);
+			break;}
 		case COMMAND_ASM:
 			add_cmd(INST_ASM);
 			break;

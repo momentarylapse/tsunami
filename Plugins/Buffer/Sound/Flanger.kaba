@@ -12,7 +12,7 @@ class PluginConfig : PluginData
 	float Delay
 	float Speed
 	float Depth
-	overwrite void reset()
+	override void reset()
 		Depth = 0.5
 		Speed = 0.3
 		Delay = 0.01
@@ -21,7 +21,7 @@ class PluginState : PluginData
 	float[] temp_r
 	float[] temp_l
 	int offset
-	overwrite void reset()
+	override void reset()
 		temp_r.clear()
 		temp_l.clear()
 		offset = 0
@@ -57,7 +57,7 @@ class Flanger : AudioEffect
 				p = 0
 
 	
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		Song *a = song
 		int delay_samples = a.sample_rate * config.Delay + 1
 		state.temp_r.resize(delay_samples)

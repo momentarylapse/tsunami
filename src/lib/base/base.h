@@ -95,12 +95,12 @@ public:
 };
 
 // implement Derived.~Derived()  AND  Derived.__delete__()
-//    make sure element destructors may be called twice without causing errors
+//    Derived.__delete__() should call this->Derived::~Derived()
 
 // instances in the main program can be delete()ed
 
-// classes derived by kaba overwrite __delete__()
-//    they also overwrite ~() with __delete_external__()
+// classes derived by kaba override __delete__()
+//    they also override ~() with __delete_external__()
 
 
 #endif

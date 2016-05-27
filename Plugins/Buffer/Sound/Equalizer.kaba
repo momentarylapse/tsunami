@@ -21,7 +21,7 @@ class Config : PluginData
 			fi.add3(curve[i].y, 0.0, exp(curve[i].z), log(curve[i].x / curve[i - 1].x))
 		fi.normalize()
 
-	overwrite void reset()
+	override void reset()
 		curve.clear()
 		curve.add(vector(MIN_FREQ, 0, 0))
 		curve.add(vector(MAX_FREQ, 0, 0))
@@ -56,11 +56,11 @@ class Equalizer : AudioEffect
 		// transform back
 		fft_c2r_inv(f, b)
 
-	overwrite void process(BufferBox buf)
+	override void process(BufferBox buf)
 		equalize(buf.r)
 		equalize(buf.l)
 
-	overwrite ConfigPanel *createPanel()
+	override ConfigPanel *createPanel()
 		return new EqualizerPanel(self)
 
 
@@ -68,7 +68,7 @@ class EqualizerGrid : Grid
 	Config *c
 	ConfigPanel *cp
 	int MouseOver, Selected
-	overwrite void onDraw(Painter *p)
+	override void onDraw(Painter *p)
 		// curve + area below
 		FloatInterpolator fi
 		c.fill_inter(fi)
@@ -80,11 +80,11 @@ class EqualizerGrid : Grid
 			
 
 	// left button down -> select
-	overwrite void onLeftButtonDown()
+	override void onLeftButtonDown()
 		Selected = MouseOver
 		redraw()
 
-	overwrite void onMouseWheel()
+	override void onMouseWheel()
 		if MouseOver >= 0
 			if HuiGetEvent().wheel > 0
 				c.curve[MouseOver].z += 0.2
@@ -94,7 +94,7 @@ class EqualizerGrid : Grid
 			redraw()
 
 	// right button down -> new point
-	overwrite void onRightButtonDown()
+	override void onRightButtonDown()
 		vector m = getMouse3(0)
 		for i in 1:c.curve.num
 			if (m.x > c.curve[i - 1].x) and (m.x < c.curve[i].x)
@@ -105,7 +105,7 @@ class EqualizerGrid : Grid
 				redraw()
 				break
 
-	overwrite void onMouseMove()
+	override void onMouseMove()
 		// move
 		if HuiGetEvent().button_l and (Selected >= 0)
 			c.curve[Selected] = getMouse3(c.curve[Selected].z)
@@ -131,7 +131,7 @@ class EqualizerGrid : Grid
 		redraw()
 
 	// [Delete] -> remove point
-	overwrite void onKeyDown()
+	override void onKeyDown()
 		if HuiGetEvent().key_code == KeyDelete
 			if Selected > 0 and Selected < c.curve.num-1
 				c.curve.remove(Selected)
@@ -141,7 +141,7 @@ class EqualizerGrid : Grid
 
 class EqualizerPanel : ConfigPanel
 	EqualizerGrid grid
-	void __init__(Equalizer *e)
+	override void __init__(Equalizer *e)
 		super.__init__(e)
 		addDrawingArea("!grabfocus,height=250", 0, 0, 0, 0, "drawing")
 	
@@ -154,6 +154,6 @@ class EqualizerPanel : ConfigPanel
 	
 		grid.redraw()
 		
-	overwrite void update()
+	override void update()
 		grid.redraw()
 

@@ -7,8 +7,6 @@
 
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
-#ifndef OS_WINDOWS
-#include <alsa/asoundlib.h>
 #include "Device.h"
 #include "DeviceManager.h"
 #include "InputStreamMidi.h"
@@ -16,6 +14,10 @@
 #include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Midi/MidiSource.h"
+
+#ifdef DEVICE_MIDI_ALSA
+#include <alsa/asoundlib.h>
+#endif
 
 
 static const float DEFAULT_UPDATE_TIME = 0.005f;
@@ -75,8 +77,7 @@ InputStreamMidi::InputStreamMidi(int _sample_rate) :
 InputStreamMidi::~InputStreamMidi()
 {
 	stop();
-	if (subs)
-		unconnect();
+	unconnect();
 	delete(preview_stream);
 	delete(preview_renderer);
 	delete(preview_source);
@@ -97,6 +98,7 @@ void InputStreamMidi::setPreviewSynthesizer(Synthesizer *s)
 
 bool InputStreamMidi::unconnect()
 {
+#ifdef DEVICE_MIDI_ALSA
 	if (!subs)
 		return true;
 	int r = snd_seq_unsubscribe_port(device_manager->handle, subs);
@@ -105,15 +107,14 @@ bool InputStreamMidi::unconnect()
 	snd_seq_port_subscribe_free(subs);
 	subs = NULL;
 	return r == 0;
+#endif
 }
 
 void InputStreamMidi::setDevice(Device *d)
 {
 	device = d;
 
-
-	if (subs)
-		unconnect();
+	unconnect();
 
 	if ((device->client < 0) or (device->port < 0))
 		return;// true;
@@ -166,6 +167,7 @@ int InputStreamMidi::getSampleCount()
 
 void InputStreamMidi::clearInputQueue()
 {
+#ifdef DEVICE_MIDI_ALSA
 	while (true){
 		snd_seq_event_t *ev;
 		int r = snd_seq_event_input(device_manager->handle, &ev);
@@ -173,12 +175,16 @@ void InputStreamMidi::clearInputQueue()
 			break;
 		snd_seq_free_event(ev);
 	}
+#endif
 }
 
 bool InputStreamMidi::start()
 {
+#ifdef DEVICE_MIDI_ALSA
 	if (!device_manager->handle)
 		return false;
+#endif
+
 	accumulating = false;
 	offset = 0;
 	resetAccumulation();
@@ -217,6 +223,7 @@ int InputStreamMidi::doCapturing()
 	if (accumulating)
 		offset = offset_new;
 
+#ifdef DEVICE_MIDI_ALSA
 	while (true){
 		snd_seq_event_t *ev;
 		int r = snd_seq_event_input(device_manager->handle, &ev);
@@ -233,6 +240,7 @@ int InputStreamMidi::doCapturing()
 		}
 		snd_seq_free_event(ev);
 	}
+#endif
 
 	if (current_midi.num > 0)
 		preview_source->feed(current_midi);
@@ -317,4 +325,4 @@ void InputStreamMidi::setChunkSize(int size)
 	else
 		chunk_size = 512;
 }
-#endif
+

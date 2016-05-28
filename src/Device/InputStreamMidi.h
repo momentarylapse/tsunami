@@ -12,14 +12,18 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
+#include "config.h"
 
-struct _snd_seq_port_subscribe;
 class OutputStream;
 class MidiRenderer;
 class Synthesizer;
 class Device;
 class DeviceManager;
 class MidiPreviewFeedSource;
+
+#ifdef DEVICE_MIDI_ALSA
+struct _snd_seq_port_subscribe;
+#endif
 
 class InputStreamMidi : public PeakMeterSource
 {
@@ -75,7 +79,10 @@ private:
 
 	void clearInputQueue();
 
+#ifdef DEVICE_MIDI_ALSA
 	_snd_seq_port_subscribe *subs;
+#endif
+
 	DeviceManager *device_manager;
 	Device *device;
 	int npfd;

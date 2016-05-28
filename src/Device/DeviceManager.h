@@ -8,6 +8,7 @@
 #ifndef DEVICEMANAGER_H_
 #define DEVICEMANAGER_H_
 
+#include "config.h"
 #include "../Data/Song.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
@@ -17,8 +18,13 @@ class OutputStream;
 class InputStreamAudio;
 class Device;
 
+#ifdef DEVICE_PULSEAUDIO
 struct pa_context;
+#endif
+
+#ifdef DEVICE_MIDI_ALSA
 struct _snd_seq;
+#endif
 
 class DeviceManager : public Observable
 {
@@ -62,9 +68,13 @@ public:
 	bool initialized;
 	int hui_rep_id;
 
+#ifdef DEVICE_PULSEAUDIO
 	pa_context *context;
+#endif
 
+#ifdef DEVICE_MIDI_ALSA
 	_snd_seq *handle;
+#endif
 	int portid;
 
 	float output_volume;

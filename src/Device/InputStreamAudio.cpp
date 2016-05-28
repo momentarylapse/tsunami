@@ -11,12 +11,14 @@
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 
-#ifndef OS_WINDOWS
-#include <pulse/pulseaudio.h>
 #include "DeviceManager.h"
 #include "Device.h"
 #include "InputStreamAudio.h"
 #include "OutputStream.h"
+
+#ifdef DEVICE_PULSEAUDIO
+#include <pulse/pulseaudio.h>
+#endif
 
 
 string InputStreamAudio::temp_filename;
@@ -29,10 +31,12 @@ static const float DEFAULT_UPDATE_TIME = 0.005f;
 const string InputStreamAudio::MESSAGE_CAPTURE = "Capture";
 
 
+#ifdef DEVICE_PULSEAUDIO
 extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
 extern bool pa_wait_stream_ready(pa_stream *s); // -> AudioStream.cpp
+#endif
 
-
+#ifdef DEVICE_PULSEAUDIO
 
 void InputStreamAudio::input_request_callback(pa_stream *p, size_t nbytes, void *userdata)
 {
@@ -83,6 +87,8 @@ void input_success_callback(pa_stream *s, int success, void *userdata)
 {
 	msg_write("--success");
 }
+#endif
+
 
 void InputStreamAudio::SyncData::reset()
 {
@@ -116,7 +122,9 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 {
 	sample_rate = _sample_rate;
 	capturing = false;
+#ifdef DEVICE_PULSEAUDIO
 	_stream = NULL;
+#endif
 
 	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
 	playback_delay_const = device->latency;
@@ -172,6 +180,7 @@ void InputStreamAudio::stop()
 		return;
 	_stopUpdate();
 
+#ifdef DEVICE_PULSEAUDIO
 	pa_stream_disconnect(_stream);
 	testError("disconnect");
 
@@ -183,6 +192,7 @@ void InputStreamAudio::stop()
 
 	pa_stream_unref(_stream);
 	testError("unref");
+#endif
 
 	capturing = false;
 	accumulating = false;
@@ -203,6 +213,7 @@ bool InputStreamAudio::start()
 	accumulating = false;
 	num_channels = 2;
 
+#ifdef DEVICE_PULSEAUDIO
 	pa_sample_spec ss;
 	ss.rate = sample_rate;
 	ss.channels = 2;
@@ -232,6 +243,7 @@ bool InputStreamAudio::start()
 		tsunami->log->error("pa_wait_for_stream_ready");
 		return false;
 	}
+#endif
 
 	capturing = true;
 
@@ -249,10 +261,12 @@ bool InputStreamAudio::start()
 
 bool InputStreamAudio::testError(const string &msg)
 {
+#ifdef DEVICE_PULSEAUDIO
 	int e = pa_context_errno(tsunami->device_manager->context);
 	if (e != 0)
 		tsunami->log->error(msg + " (input): " + pa_strerror(e));
 	return (e != 0);
+#endif
 }
 
 float InputStreamAudio::getPlaybackDelayConst()
@@ -410,4 +424,3 @@ void InputStreamAudio::update()
 
 	running = isCapturing();
 }
-#endif

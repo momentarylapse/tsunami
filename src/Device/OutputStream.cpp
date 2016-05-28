@@ -6,14 +6,16 @@
  */
 
 #include "../Tsunami.h"
-#ifndef OS_WINDOWS
 #include "../Audio/Renderer/AudioRenderer.h"
 #include "../Stuff/Log.h"
-#include <pulse/pulseaudio.h>
 #include "../lib/threads/Thread.h"
 #include "DeviceManager.h"
 #include "Device.h"
 #include "OutputStream.h"
+
+#ifdef DEVICE_PULSEAUDIO
+#include <pulse/pulseaudio.h>
+#endif
 
 //const int DEFAULT_BUFFER_SIZE = 131072;
 const int DEFAULT_BUFFER_SIZE = 32768;
@@ -26,6 +28,7 @@ const string OutputStream::MESSAGE_STATE_CHANGE = "StateChange";
 const string OutputStream::MESSAGE_UPDATE = "Update";
 
 
+#ifdef DEVICE_PULSEAUDIO
 
 extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
 
@@ -118,6 +121,8 @@ void OutputStream::stream_underflow_callback(pa_stream *s, void *userdata)
 		printf("pulse: underflow\n");
 }
 
+#endif
+
 class StreamThread : public Thread
 {
 public:
@@ -172,7 +177,9 @@ OutputStream::OutputStream(AudioRenderer *r) :
 	update_dt = DEFAULT_UPDATE_DT;
 	killed = false;
 	thread = NULL;
+#ifdef DEVICE_PULSEAUDIO
 	_stream = NULL;
+#endif
 	dev_sample_rate = -1;
 	cpu_usage = 0;
 	end_of_data = false;
@@ -198,6 +205,7 @@ void OutputStream::__delete__()
 
 void OutputStream::create_dev()
 {
+#ifdef DEVICE_PULSEAUDIO
 	if (_stream)
 		return;
 
@@ -213,11 +221,13 @@ void OutputStream::create_dev()
 
 	pa_stream_set_write_callback(_stream, &stream_request_callback, this);
 	pa_stream_set_underflow_callback(_stream, &stream_underflow_callback, this);
+#endif
 }
 
 void OutputStream::kill_dev()
 {
 	msg_db_f("Stream.kill_dev", 1);
+#ifdef DEVICE_PULSEAUDIO
 
 	if (_stream){
 		stop();
@@ -226,6 +236,7 @@ void OutputStream::kill_dev()
 		testError("unref");*/
 		_stream = NULL;
 	}
+#endif
 }
 
 // only used for clean up
@@ -233,8 +244,9 @@ void OutputStream::kill()
 {
 	msg_db_f("Stream.kill", 1);
 
-	if (_stream)
-		kill_dev();
+#ifdef DEVICE_PULSEAUDIO
+	kill_dev();
+#endif
 
 	device_manager->removeStream(this);
 	killed = true;
@@ -257,6 +269,7 @@ void OutputStream::stop()
 	HuiCancelRunner(hui_runner_id);
 	hui_runner_id = -1;
 
+#ifdef DEVICE_PULSEAUDIO
 	if (_stream){
 
 		pa_operation *op = pa_stream_drain(_stream, NULL, NULL);
@@ -271,6 +284,7 @@ void OutputStream::stop()
 
 		kill_dev();
 	}
+#endif
 
 	// stop thread
 	thread->join();
@@ -382,6 +396,7 @@ void OutputStream::play()
 	//}
 
 
+#ifdef DEVICE_PULSEAUDIO
 	create_dev();
 	if (!_stream)
 		return;
@@ -410,6 +425,7 @@ void OutputStream::play()
 	pa_operation *op = pa_stream_trigger(_stream, &stream_success_callback, NULL);
 	testError("trigger");
 	pa_wait_op(op);
+#endif
 
 	hui_runner_id = HuiRunRepeatedM(update_dt, this, &OutputStream::update);
 
@@ -485,10 +501,12 @@ void OutputStream::getSomeSamples(BufferBox &buf, int num_samples)
 
 bool OutputStream::testError(const string &msg)
 {
+#ifdef DEVICE_PULSEAUDIO
 	int e = pa_context_errno(device_manager->context);
 	if (e != 0)
 		msg_error(msg + ": " + pa_strerror(e));
 	return (e != 0);
+#endif
 }
 
 void OutputStream::update()
@@ -501,5 +519,3 @@ void OutputStream::update()
 	if (!paused)
 		notify(MESSAGE_UPDATE);
 }
-
-#endif

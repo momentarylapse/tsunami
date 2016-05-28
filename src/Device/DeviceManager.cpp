@@ -8,17 +8,21 @@
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include "Device.h"
-#ifndef OS_WINDOWS
-
-#include <pulse/pulseaudio.h>
-#include <alsa/asoundlib.h>
-
 #include "DeviceManager.h"
 #include "OutputStream.h"
+
+#ifdef DEVICE_PULSEAUDIO
+#include <pulse/pulseaudio.h>
+#endif
+
+#ifdef DEVICE_MIDI_ALSA
+#include <alsa/asoundlib.h>
+#endif
 
 const string DeviceManager::MESSAGE_ADD_DEVICE = "AddDevice";
 const string DeviceManager::MESSAGE_REMOVE_DEVICE = "RemoveDevice";
 
+#ifdef DEVICE_PULSEAUDIO
 
 void pa_wait_op(pa_operation *op)
 {
@@ -51,6 +55,57 @@ void pa_subscription_callback(pa_context *c, pa_subscription_event_type_t t, uin
 		HuiRunLaterM(0.1f, out, &DeviceManager::update_devices);
 	}
 }
+
+
+bool pa_wait_context_ready(pa_context *c)
+{
+	//msg_write("wait stream ready");
+	int n = 0;
+	while (pa_context_get_state(c) != PA_CONTEXT_READY){
+		//pa_mainloop_iterate(m, 1, NULL);
+		HuiSleep(0.01f);
+		n ++;
+		if (n >= 500)
+			return false;
+		if (pa_context_get_state(c) == PA_CONTEXT_FAILED)
+			return false;
+	}
+	//msg_write("ok");
+	return true;
+}
+
+
+void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata)
+{
+	if (eol > 0 or !i or !userdata)
+		return;
+
+	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
+
+	DeviceManager *dm = (DeviceManager*)userdata;
+	Device *d = dm->get_device_create(Device::TYPE_AUDIO_OUTPUT, i->name);
+	d->name = i->description;
+	d->channels = i->channel_map.channels;
+	d->present = true;
+	dm->setDeviceConfig(d);
+}
+
+void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
+{
+	if (eol > 0 or !i or !userdata)
+		return;
+
+	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
+
+	DeviceManager *dm = (DeviceManager*)userdata;
+	Device *d = dm->get_device_create(Device::TYPE_AUDIO_INPUT, i->name);
+	d->name = i->description;
+	d->channels = i->channel_map.channels;
+	d->present = true;
+	dm->setDeviceConfig(d);
+}
+
+#endif
 
 
 Array<Device*> str2devs(const string &s, int type)
@@ -86,8 +141,13 @@ DeviceManager::DeviceManager() :
 	output_volume = HuiConfig.getFloat("Output.Volume", 1.0f);
 
 
+#ifdef DEVICE_PULSEAUDIO
 	context = NULL;
+#endif
+
+#ifdef DEVICE_MIDI_ALSA
 	handle = NULL;
+#endif
 
 	// system defaults
 	default_devices[Device::TYPE_AUDIO_OUTPUT] = get_device_create(Device::TYPE_AUDIO_OUTPUT, ":default:");
@@ -142,39 +202,9 @@ void DeviceManager::write_config()
 }
 
 
-
-void pa_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata)
-{
-	if (eol > 0 or !i or !userdata)
-		return;
-
-	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
-
-	DeviceManager *dm = (DeviceManager*)userdata;
-	Device *d = dm->get_device_create(Device::TYPE_AUDIO_OUTPUT, i->name);
-	d->name = i->description;
-	d->channels = i->channel_map.channels;
-	d->present = true;
-	dm->setDeviceConfig(d);
-}
-
-void pa_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata)
-{
-	if (eol > 0 or !i or !userdata)
-		return;
-
-	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
-
-	DeviceManager *dm = (DeviceManager*)userdata;
-	Device *d = dm->get_device_create(Device::TYPE_AUDIO_INPUT, i->name);
-	d->name = i->description;
-	d->channels = i->channel_map.channels;
-	d->present = true;
-	dm->setDeviceConfig(d);
-}
-
 void DeviceManager::update_devices()
 {
+#ifdef DEVICE_PULSEAUDIO
 	foreach(Device *d, output_devices)
 		d->present = false;
 
@@ -200,10 +230,12 @@ void DeviceManager::update_devices()
 
 	notify(MESSAGE_CHANGE);
 	write_config();
+#endif
 }
 
 void DeviceManager::update_midi_devices()
 {
+#ifdef DEVICE_MIDI_ALSA
 	foreach(Device *d, midi_input_devices){
 		d->present_old = d->present;
 		d->present = false;
@@ -240,24 +272,7 @@ void DeviceManager::update_midi_devices()
 			changed = true;
 	if (changed)
 		notify(MESSAGE_CHANGE);
-}
-
-
-bool pa_wait_context_ready(pa_context *c)
-{
-	//msg_write("wait stream ready");
-	int n = 0;
-	while (pa_context_get_state(c) != PA_CONTEXT_READY){
-		//pa_mainloop_iterate(m, 1, NULL);
-		HuiSleep(0.01f);
-		n ++;
-		if (n >= 500)
-			return false;
-		if (pa_context_get_state(c) == PA_CONTEXT_FAILED)
-			return false;
-	}
-	//msg_write("ok");
-	return true;
+#endif
 }
 
 void DeviceManager::init()
@@ -267,6 +282,7 @@ void DeviceManager::init()
 	msg_db_f("Output.init", 1);
 
 	// audio
+#ifdef DEVICE_PULSEAUDIO
 	pa_threaded_mainloop* m = pa_threaded_mainloop_new();
 	if (!m){
 		tsunami->log->error("pa_threaded_mainloop_new failed");
@@ -300,10 +316,11 @@ void DeviceManager::init()
 	testError("pa_context_set_subscribe_callback");
 	pa_context_subscribe(context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), NULL, this);
 	testError("pa_context_subscribe");
-
+#endif
 
 
 	// midi
+#ifdef DEVICE_MIDI_ALSA
 	int r = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0){
 		tsunami->log->error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
@@ -317,6 +334,7 @@ void DeviceManager::init()
 		tsunami->log->error(string("Error creating sequencer port: ") + snd_strerror(portid));
 		return;
 	}
+#endif
 
 	update_devices();
 
@@ -333,14 +351,18 @@ void DeviceManager::kill()
 		s->kill();
 
 	// audio
+#ifdef DEVICE_PULSEAUDIO
 	if (context){
 		pa_context_disconnect(context);
 		testError("pa_context_disconnect");
 	}
+#endif
 
 	// midi
+#ifdef DEVICE_MIDI_ALSA
 	if (handle)
 		snd_seq_close(handle);
+#endif
 
 	initialized = false;
 }
@@ -463,10 +485,10 @@ void DeviceManager::makeDeviceTopPriority(Device *d)
 
 bool DeviceManager::testError(const string &msg)
 {
+#ifdef DEVICE_PULSEAUDIO
 	int e = pa_context_errno(context);
 	if (e != 0)
 		tsunami->log->error(msg + ": " + pa_strerror(e));
 	return (e != 0);
-}
-
 #endif
+}

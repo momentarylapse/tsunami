@@ -13,10 +13,14 @@
 #include "../Data/Song.h"
 #include "../Data/RingBuffer.h"
 #include "../View/Helper/PeakMeter.h"
+#include "config.h"
 
-struct pa_stream;
 class PluginManager;
 class Device;
+
+#ifdef DEVICE_PULSEAUDIO
+struct pa_stream;
+#endif
 
 class InputStreamAudio : public PeakMeterSource
 {
@@ -89,7 +93,9 @@ private:
 
 	Device *device;
 
+#ifdef DEVICE_PULSEAUDIO
 	pa_stream *_stream;
+#endif
 
 	static bool testError(const string &msg);
 
@@ -111,7 +117,9 @@ private:
 
 	static float playback_delay_const;
 
+#ifdef DEVICE_PULSEAUDIO
 	static void input_request_callback(pa_stream *p, size_t nbytes, void *userdata);
+#endif
 };
 
 #endif /* INPUTSTREAMAUDIO_H_ */

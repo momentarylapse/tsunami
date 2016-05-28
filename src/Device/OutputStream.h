@@ -10,6 +10,7 @@
 
 
 
+#include "config.h"
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
@@ -21,7 +22,10 @@ class DeviceManager;
 class Device;
 class Thread;
 class StreamThread;
+
+#ifdef DEVICE_PULSEAUDIO
 struct pa_stream;
+#endif
 
 class OutputStream : public PeakMeterSource
 {
@@ -87,7 +91,10 @@ private:
 
 	int data_samples;
 
+#ifdef DEVICE_PULSEAUDIO
 	pa_stream *_stream;
+#endif
+
 	int dev_sample_rate;
 	long long cur_pos;
 
@@ -98,9 +105,11 @@ private:
 	Thread *thread;
 	float cpu_usage;
 
+#ifdef DEVICE_PULSEAUDIO
 	static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 	static void stream_underflow_callback(pa_stream *s, void *userdata);
 	static void stream_success_callback(pa_stream *s, int success, void *userdata);
+#endif
 };
 
 #endif /* SRC_DEVICE_OUTPUTSTREAM_H_ */

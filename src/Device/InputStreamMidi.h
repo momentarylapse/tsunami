@@ -31,34 +31,34 @@ public:
 
 	static const string MESSAGE_CAPTURE;
 
-	void init();
+	void _cdecl init();
 
-	bool start();
-	void stop();
+	bool _cdecl start();
+	void _cdecl stop();
 
 	void _startUpdate();
 	void _stopUpdate();
 	void update();
 	int doCapturing();
 
-	bool isCapturing();
+	bool _cdecl isCapturing();
 
-	int getDelay();
-	void resetSync();
+	int _cdecl getDelay();
+	void _cdecl resetSync();
 
-	void accumulate(bool enable);
-	void resetAccumulation();
-	int getSampleCount();
+	void _cdecl accumulate(bool enable);
+	void _cdecl resetAccumulation();
+	int _cdecl getSampleCount();
 
-	virtual float getSampleRate();
-	virtual void getSomeSamples(BufferBox &buf, int num_samples);
-	virtual int getState();
+	virtual float _cdecl getSampleRate();
+	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
+	virtual int _cdecl getState();
 
-	bool unconnect();
+	bool _cdecl unconnect();
 	void _cdecl setDevice(Device *d);
 	Device *_cdecl getDevice();
 
-	void setPreviewSynthesizer(Synthesizer *s);
+	void _cdecl setPreviewSynthesizer(Synthesizer *s);
 
 	void _cdecl setChunkSize(int size);
 	void _cdecl setUpdateDt(float dt);

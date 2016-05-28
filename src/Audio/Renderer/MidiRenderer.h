@@ -21,16 +21,16 @@ public:
 	MidiRenderer(Synthesizer *s, MidiSource *source);
 	virtual ~MidiRenderer();
 
-	void __init__(Synthesizer *s, MidiSource *source);
-	virtual void __delete__();
+	void _cdecl __init__(Synthesizer *s, MidiSource *source);
+	virtual void _cdecl __delete__();
 
-	Synthesizer *getSynthesizer(){ return s; }
-	void setSynthesizer(Synthesizer *s);
+	Synthesizer *_cdecl getSynthesizer(){ return s; }
+	void _cdecl setSynthesizer(Synthesizer *s);
 
-	virtual int read(BufferBox &buf);
-	virtual void reset();
+	virtual int _cdecl read(BufferBox &buf);
+	virtual void _cdecl reset();
 
-	virtual int getSampleRate();
+	virtual int _cdecl getSampleRate();
 
 private:
 	Synthesizer *s;

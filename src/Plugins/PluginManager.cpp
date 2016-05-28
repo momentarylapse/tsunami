@@ -54,7 +54,7 @@ PluginManager::~PluginManager()
 
 bool GlobalAllowTermination()
 {
-	return tsunami->AllowTermination();
+	return tsunami->allowTermination();
 }
 
 void PluginManager::LinkAppScriptData()
@@ -669,7 +669,7 @@ void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 			tpl->win = win;
 			tpl->view = win->view;
 			tpl->song = win->song;
-			win->active_plugins.add(tpl);
+			win->plugins.add(tpl);
 			win->subscribe(tpl, tpl->MESSAGE_STOP_REQUEST);
 			tpl->onStart();
 		}else if (f_main){

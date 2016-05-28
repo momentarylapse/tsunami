@@ -26,8 +26,8 @@ public:
 	void onShowBottomBar();
 	void onVolume();
 
-	virtual void onShow();
-	virtual void onHide();
+	virtual void _cdecl onShow();
+	virtual void _cdecl onHide();
 
 	virtual void onUpdate(Observable *o, const string &message);
 

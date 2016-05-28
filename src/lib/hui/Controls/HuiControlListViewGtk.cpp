@@ -22,7 +22,7 @@ void list_toggle_callback(GtkCellRendererToggle *cell, gchar *path_string, gpoin
 	GtkTreeIter iter;
 	gint column = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
 	gtk_tree_model_get_iter(model, &iter, path);
-	bool state = gtk_cell_renderer_toggle_get_active(cell);
+	bool state = (bool)gtk_cell_renderer_toggle_get_active(cell);
 	state = !state;
 	if (c->type == HUI_KIND_LISTVIEW)
 		gtk_list_store_set(GTK_LIST_STORE(model), &iter, column, state, -1);

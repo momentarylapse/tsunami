@@ -125,6 +125,11 @@ void HuiPanel::_eventX(const string &id, const string &msg, HuiEventHandler *han
 	events.add(HuiEventListener(id, msg, HuiCallback(handler, function)));
 }
 
+void HuiPanel::_eventXP(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)(Painter*))
+{
+	events.add(HuiEventListener(id, msg, HuiCallback(handler, (void(HuiEventHandler::*)())function)));
+}
+
 void HuiPanel::_eventK(const string &id, hui_kaba_callback *function)
 {
 	events.add(HuiEventListener(id, ":def:", HuiCallback(this, function)));

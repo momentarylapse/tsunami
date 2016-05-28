@@ -22,21 +22,21 @@ public:
 	void _cdecl __init__(Song *s, SongSelection *sel);
 	virtual void _cdecl __delete__();
 
-	void render(const Range &range, BufferBox &buf);
-	virtual int read(BufferBox &buf);
-	virtual void reset();
-	void prepare(const Range &range, bool alllow_loop);
-	void applySelection(SongSelection &sel);
+	void _cdecl render(const Range &range, BufferBox &buf);
+	virtual int _cdecl read(BufferBox &buf);
+	virtual void _cdecl reset();
+	void _cdecl prepare(const Range &range, bool alllow_loop);
+	void _cdecl applySelection(SongSelection &sel);
 
-	virtual void seek(int pos);
+	virtual void _cdecl seek(int pos);
 
-	void setRange(const Range &r){ _range = r; }
-	virtual Range range(){ return _range; }
-	virtual int getPos(){ return pos; }
+	void _cdecl setRange(const Range &r){ _range = r; }
+	virtual Range _cdecl range(){ return _range; }
+	virtual int _cdecl getPos(){ return pos; }
 
-	virtual int getSampleRate();
-	virtual int getNumSamples();
-	virtual Array<Tag> getTags();
+	virtual int _cdecl getSampleRate();
+	virtual int _cdecl getNumSamples();
+	virtual Array<Tag> _cdecl getTags();
 
 private:
 	void read_basic(BufferBox &buf, int pos, int size);

@@ -78,7 +78,7 @@ void SIAddPackageImage()
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 		class_add_func("clear",			TypeVoid,	image_p(mf(&Image::clear)));
-		class_add_func("__assign__",			TypeVoid,	image_p(mf(&Image::operator=)));
+		class_add_func("__assign__",			TypeVoid,	image_p(mf(&Image::__assign__)));
 			func_add_param("other",		TypeImage);
 
 	add_func("LoadImage", TypeImageP, image_p(&LoadImage));

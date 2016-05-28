@@ -25,7 +25,7 @@ public:
 	class State : public PluginData
 	{
 	public:
-		virtual void reset();
+		virtual void _cdecl reset();
 		struct PitchState{
 			float volume;
 			float phi;

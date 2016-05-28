@@ -570,7 +570,7 @@ bool HuiPanel::isActive(const string &control_id)
 				return control[i]->hasFocus();
 		return false;
 	}
-	return gtk_widget_has_focus(win->window);
+	return (bool)gtk_widget_has_focus(win->window);
 }
 
 

@@ -20,11 +20,11 @@ public:
 	DetuneSynthesizerDialog(Synthesizer *s, Track *t, AudioView *view, HuiWindow *parent);
 	virtual ~DetuneSynthesizerDialog();
 
-	virtual void onDraw(Painter *p);
-	virtual void onLeftButtonDown();
-	virtual void onLeftButtonUp();
-	virtual void onMouseMove();
-	virtual void onMouseWheel();
+	virtual void _cdecl onDraw(Painter *p);
+	virtual void _cdecl onLeftButtonDown();
+	virtual void _cdecl onLeftButtonUp();
+	virtual void _cdecl onMouseMove();
+	virtual void _cdecl onMouseWheel();
 
 	void onClose();
 	float pitch2x(float p);

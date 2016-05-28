@@ -10,7 +10,9 @@
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Audio/Synth/Synthesizer.h"
+#ifndef OS_WINDOWS
 #include <FLAC/all.h>
+#endif
 #include <math.h>
 #include "../../lib/xfile/chunked.h"
 
@@ -149,6 +151,18 @@ public:
 	}
 };
 
+#ifdef OS_WINDOWS
+
+string compress_buffer(BufferBox &b, Song *song, FileChunkBasic *p)
+{
+	return "";
+}
+
+void uncompress_buffer(BufferBox &b, string &data, FileChunkBasic *p)
+{
+}
+
+#else
 static FLAC__int32 flac_pcm[CHUNK_SIZE/*samples*/ * 2/*channels*/];
 
 FLAC__StreamEncoderWriteStatus FlacCompressWriteCallback(const FLAC__StreamEncoder *encoder, const FLAC__byte buffer[], size_t bytes, unsigned samples, unsigned current_frame, void *client_data)
@@ -322,6 +336,7 @@ void uncompress_buffer(BufferBox &b, string &data, FileChunkBasic *p)
 	}
 	FLAC__stream_decoder_delete(decoder);
 }
+#endif
 
 class FileChunkBufferBox : public FileChunk<TrackLevel,BufferBox>
 {

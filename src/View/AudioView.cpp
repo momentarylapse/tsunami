@@ -60,7 +60,7 @@ public:
 	{
 		view = _view;
 	}
-	virtual void onRun()
+	virtual void _cdecl onRun()
 	{
 		view->song->updatePeaks();
 		view->is_updating_peaks = false;
@@ -178,7 +178,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 
 
 	// events
-	parent->eventX("area", "hui:draw", this, &AudioView::onDraw);
+	parent->eventXP("area", "hui:draw", this, &AudioView::onDraw);
 	parent->eventX("area", "hui:mouse-move", this, &AudioView::onMouseMove);
 	parent->eventX("area", "hui:left-button-down", this, &AudioView::onLeftButtonDown);
 	parent->eventX("area", "hui:left-double-click", this, &AudioView::onLeftDoubleClick);

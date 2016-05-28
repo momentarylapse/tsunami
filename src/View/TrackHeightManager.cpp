@@ -99,17 +99,17 @@ void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 	}
 
 	// available
-	int h_available = v->area.height() - v->TIME_SCALE_HEIGHT;
+	int h_available = (int)v->area.height() - v->TIME_SCALE_HEIGHT;
 	float f = 1.0f;
 	if (h_wish > h_min)
 		f = clampf((float)(h_available - h_min) / (float)(h_wish - h_min), 0, 1);
 
 	// distribute
-	int y0 = r.y1 + v->TIME_SCALE_HEIGHT;
+	int y0 = (int)r.y1 + v->TIME_SCALE_HEIGHT;
 	foreachi(AudioViewTrack *t, v->vtrack, i){
 		float h = t->height_min + (t->height_wish - t->height_min) * f;
 		t->area_target = rect(r.x1, r.x2, y0, y0 + h);
-		y0 += h;
+		y0 += (int)h;
 	}
 }
 

@@ -32,23 +32,23 @@ class Synthesizer : public Configurable
 public:
 	Synthesizer();
 	virtual ~Synthesizer();
-	void __init__();
-	virtual void __delete__();
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
 
-	virtual void render(BufferBox &buf){}
+	virtual void _cdecl render(BufferBox &buf){}
 
 	int sample_rate;
-	void setSampleRate(int sample_rate);
+	void _cdecl setSampleRate(int sample_rate);
 
-	void update_delta_phi();
+	void _cdecl update_delta_phi();
 
-	void setInstrument(Instrument &i);
+	void _cdecl setInstrument(Instrument &i);
 
 	int keep_notes;
 
-	int read(BufferBox &buf, MidiSource *source);
+	int _cdecl read(BufferBox &buf, MidiSource *source);
 
-	void reset();
+	void _cdecl reset();
 
 	bool hasRunOutOfData();
 

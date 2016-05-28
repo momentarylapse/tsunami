@@ -38,6 +38,8 @@ class Image
 	void _cdecl __init_ext__(int width, int height, const color &c);
 	void _cdecl __delete__();
 
+	void _cdecl __assign__(const Image &other){ *this = other; }
+
 	bool _cdecl isEmpty(){	return (data.num == 0);	}
 
 	void _cdecl load(const string &filename);

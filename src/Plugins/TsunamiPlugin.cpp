@@ -7,7 +7,7 @@
 
 #include "TsunamiPlugin.h"
 
-const string TsunamiPlugin::MESSAGE_END = "End";
+const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
 
 TsunamiPlugin::TsunamiPlugin() :
 	Observable("TsunamiPlugin")
@@ -32,9 +32,9 @@ void TsunamiPlugin::__delete__()
 	this->TsunamiPlugin::~TsunamiPlugin();
 }
 
-void TsunamiPlugin::wish_to_stop()
+void TsunamiPlugin::stop_request()
 {
-	notify(MESSAGE_END);
+	notify(MESSAGE_STOP_REQUEST);
 }
 
 void TsunamiPlugin::start()

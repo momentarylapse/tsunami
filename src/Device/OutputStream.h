@@ -52,20 +52,19 @@ public:
 	bool _cdecl isPaused();
 	int _cdecl getState();
 	void _cdecl setSource(AudioRenderer *r);
-	AudioRenderer *getSource(){ return renderer; }
+	AudioRenderer *_cdecl getSource(){ return renderer; }
 	void _cdecl setDevice(Device *d);
-	int getPos();
-	bool getPosSafe(int &pos);
-	void flushBuffers();
-	void seek(int pos);
+	int _cdecl getPos();
+	bool _cdecl getPosSafe(int &pos);
+	void _cdecl seek(int pos);
 
-	float getSampleRate();
-	void getSomeSamples(BufferBox &buf, int num_samples);
+	virtual float _cdecl getSampleRate();
+	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
 
-	float getVolume();
-	void setVolume(float _volume);
+	float _cdecl getVolume();
+	void _cdecl setVolume(float _volume);
 
-	void setBufferSize(int _size){ buffer_size = _size; }
+	void _cdecl setBufferSize(int _size){ buffer_size = _size; }
 
 private:
 	bool testError(const string &msg);

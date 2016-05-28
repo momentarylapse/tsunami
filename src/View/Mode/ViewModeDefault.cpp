@@ -372,7 +372,7 @@ void ViewModeDefault::applyBarriers(int &pos)
 	bool found = false;
 	int new_pos;
 	foreach(int b, selection->barrier){
-		int dist = abs(cam->sample2screen(b) - cam->sample2screen(pos));
+		int dist = fabs(cam->sample2screen(b) - cam->sample2screen(pos));
 		if (dist < dmin){
 			//msg_write(format("barrier:  %d  ->  %d", pos, b));
 			new_pos = b;

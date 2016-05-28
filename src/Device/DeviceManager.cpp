@@ -8,6 +8,7 @@
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
 #include "Device.h"
+#ifndef OS_WINDOWS
 
 #include <pulse/pulseaudio.h>
 #include <alsa/asoundlib.h>
@@ -468,4 +469,4 @@ bool DeviceManager::testError(const string &msg)
 	return (e != 0);
 }
 
-
+#endif

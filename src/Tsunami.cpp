@@ -69,7 +69,7 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
 
-	if (HandleCLIArguments(arg))
+	if (handleCLIArguments(arg))
 		return false;
 
 	// ok, full window mode
@@ -77,11 +77,11 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	log->info(AppName + " " + AppVersion);
 	log->info(_("  ...don't worry. Everything will be fine!"));
 
-	CreateWindow(arg);
+	createWindow(arg);
 	return true;
 }
 
-bool Tsunami::HandleCLIArguments(const Array<string> &arg)
+bool Tsunami::handleCLIArguments(const Array<string> &arg)
 {
 	if (arg.num < 2)
 		return false;
@@ -118,7 +118,7 @@ bool Tsunami::HandleCLIArguments(const Array<string> &arg)
 	return false;
 }
 
-void Tsunami::CreateWindow(const Array<string> &arg)
+void Tsunami::createWindow(const Array<string> &arg)
 {
 	win = new TsunamiWindow;
 	_win = dynamic_cast<HuiWindow*>(win);
@@ -132,11 +132,11 @@ void Tsunami::CreateWindow(const Array<string> &arg)
 		tsunami->storage->load(win->song, arg[1]);
 }
 
-void Tsunami::LoadKeyCodes()
+void Tsunami::loadKeyCodes()
 {
 }
 
-bool Tsunami::AllowTermination()
+bool Tsunami::allowTermination()
 {
 	if (win)
 		return win->allowTermination();

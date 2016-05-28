@@ -5,9 +5,12 @@
  *      Author: michi
  */
 
+
+
 #include "FormatOgg.h"
 #include "../../Audio/Renderer/AudioRenderer.h"
 
+#ifndef OS_WINDOWS
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #include <vorbis/vorbisenc.h>
@@ -239,4 +242,4 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 	ov_clear(&vf);
 }
 
-
+#endif

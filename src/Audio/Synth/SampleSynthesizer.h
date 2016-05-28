@@ -16,10 +16,10 @@ class SampleSynthesizer : public Synthesizer
 public:
 	SampleSynthesizer();
 	virtual ~SampleSynthesizer();
-	void __init__();
-	virtual void __delete__();
+	void _cdecl __init__();
+	virtual void _cdecl __delete__();
 
-	virtual void renderNote(BufferBox &buf, const Range &range, float pitch, float volume);
+	virtual void _cdecl renderNote(BufferBox &buf, const Range &range, float pitch, float volume);
 
 	Array<SampleRef*> samples;
 };

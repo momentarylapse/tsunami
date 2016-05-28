@@ -49,7 +49,7 @@ float amplitude2db(float amp)
 
 float db2amplitude(float db)
 {
-	return pow10(db * 0.05);
+	return pow(10, db * 0.05);
 }
 
 

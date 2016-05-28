@@ -7,7 +7,9 @@
 
 #include "FastFourierTransform.h"
 
+#ifndef OS_WINDOWS
 #include <fftw3.h>
+#endif
 
 namespace FastFourierTransform
 {
@@ -131,7 +133,7 @@ void _init_fft_(int n)
 
 void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 {
-	msg_db_r("fft_c2c_michi", 1);
+	msg_db_f("fft_c2c_michi", 1);
 	out.resize(in.num);
 
 	int n2 = in.num;
@@ -154,8 +156,6 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 		fft_c2c_2n(&in[0], &out[0], n, n2, 1, inverse);
 	}else
 		msg_error("fft_c2c_michi: no power of two... in.num = " + i2s(in.num));
-
-	msg_db_l(1);
 }
 
 #if defined(__x86_64__)
@@ -202,39 +202,42 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 
 void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 {
-	msg_db_r("fft_c2c", 1);
+	msg_db_f("fft_c2c", 1);
 	out.resize(in.num);
 	align_stack
+#ifndef OS_WINDOWS
 	fftwf_plan plan = fftwf_plan_dft_1d(in.num, (float(*)[2])in.data, (float(*)[2])out.data, inverse ? FFTW_BACKWARD : FFTW_FORWARD, FFTW_ESTIMATE);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
-	msg_db_l(1);
+#endif
 }
 
 void fft_r2c(Array<float> &in, Array<complex> &out)
 {
 	if (in.num == 0)
 		return;
-	msg_db_r("fft_r2c", 1);
+	msg_db_f("fft_r2c", 1);
 	out.resize(in.num / 2 + 1);
 	align_stack
+#ifndef OS_WINDOWS
 	fftwf_plan plan = fftwf_plan_dft_r2c_1d(in.num, (float*)in.data, (float(*)[2])out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
-	msg_db_l(1);
+#endif
 }
 
 void fft_c2r_inv(Array<complex> &in, Array<float> &out)
 {
 	if (out.num == 0)
 		return;
-	msg_db_r("fft_c2r_inv", 1);
+	msg_db_f("fft_c2r_inv", 1);
 	align_stack
 	out.resize(in.num * 2 - 2);
+#ifndef OS_WINDOWS
 	fftwf_plan plan = fftwf_plan_dft_c2r_1d(out.num, (float(*)[2])in.data, (float*)out.data, FFTW_ESTIMATE | FFTW_PRESERVE_INPUT);
 	fftwf_execute(plan);
 	fftwf_destroy_plan(plan);
-	msg_db_l(1);
+#endif
 }
 
 

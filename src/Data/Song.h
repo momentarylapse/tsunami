@@ -65,11 +65,11 @@ public:
 	string _cdecl get_time_str_fuzzy(int t, float dt);
 	string _cdecl get_time_str_long(int t);
 
-	void _cdecl reset();
+	virtual void _cdecl reset();
 	void _cdecl newEmpty(int _sample_rate);
 	void _cdecl newWithOneTrack(int track_type, int _sample_rate);
-	bool _cdecl load(const string &filename, bool deep);
-	bool _cdecl save(const string &filename);
+	virtual bool _cdecl load(const string &filename, bool deep);
+	virtual bool _cdecl save(const string &filename);
 
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();

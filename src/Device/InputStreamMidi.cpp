@@ -7,6 +7,7 @@
 
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
+#ifndef OS_WINDOWS
 #include <alsa/asoundlib.h>
 #include "Device.h"
 #include "DeviceManager.h"
@@ -316,3 +317,4 @@ void InputStreamMidi::setChunkSize(int size)
 	else
 		chunk_size = 512;
 }
+#endif

@@ -6,6 +6,7 @@
  */
 
 #include "../Tsunami.h"
+#ifndef OS_WINDOWS
 #include "../Audio/Renderer/AudioRenderer.h"
 #include "../Stuff/Log.h"
 #include <pulse/pulseaudio.h>
@@ -501,4 +502,4 @@ void OutputStream::update()
 		notify(MESSAGE_UPDATE);
 }
 
-
+#endif

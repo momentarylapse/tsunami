@@ -10,7 +10,7 @@
 
 #ifdef HUI_API_GTK
 
-static void OnGtkExpanderExpand(GObject* object, GParamSpec *param_spec, gpointer user_data)
+void OnGtkExpanderExpand(GObject* object, GParamSpec *param_spec, gpointer user_data)
 {
 	if (gtk_expander_get_expanded(GTK_EXPANDER(object))){
 		gtk_widget_set_vexpand_set(GTK_WIDGET(object), false);
@@ -43,7 +43,7 @@ void HuiControlExpander::expandAll(bool expand)
 
 bool HuiControlExpander::isExpanded(int row)
 {
-	return gtk_expander_get_expanded(GTK_EXPANDER(widget));
+	return (bool)gtk_expander_get_expanded(GTK_EXPANDER(widget));
 }
 
 void HuiControlExpander::add(HuiControl *child, int x, int y)

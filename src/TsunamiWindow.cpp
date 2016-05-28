@@ -625,7 +625,7 @@ void TsunamiWindow::updateMenu()
 
 void TsunamiWindow::onUpdate(Observable *o, const string &message)
 {
-	if (message == TsunamiPlugin::MESSAGE_END){
+	if (message == TsunamiPlugin::MESSAGE_STOP_REQUEST){
 		TsunamiPlugin *tpl = (TsunamiPlugin*)o;
 		tpl->stop();
 	}else{

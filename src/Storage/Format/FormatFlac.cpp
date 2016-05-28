@@ -8,7 +8,7 @@
 #include "FormatFlac.h"
 #include <math.h>
 #include "../../Audio/Renderer/AudioRenderer.h"
-
+#ifndef OS_WINDOWS
 #include <FLAC/all.h>
 
 bool flac_tells_samples;
@@ -241,4 +241,4 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 	FLAC__stream_encoder_delete(encoder);
 }
 
-
+#endif

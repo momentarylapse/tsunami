@@ -19,13 +19,13 @@ public:
 	void _cdecl __init__(BufferBox *buf);
 	virtual void _cdecl __delete__();
 
-	virtual int read(BufferBox &buf);
-	virtual void reset();
-	virtual Range range();
-	virtual int getPos(){ return offset; }
-	virtual void seek(int pos);
-	//virtual int getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
-	virtual int getNumSamples();
+	virtual int _cdecl read(BufferBox &buf);
+	virtual void _cdecl reset();
+	virtual Range _cdecl range();
+	virtual int _cdecl getPos(){ return offset; }
+	virtual void _cdecl seek(int pos);
+	//virtual int _cdecl getSampleRate(){ return DEFAULT_SAMPLE_RATE; }
+	virtual int _cdecl getNumSamples();
 
 	BufferBox *buf;
 	int offset;

@@ -41,9 +41,9 @@ public:
 	void resetAccumulation();
 	int getSampleCount();
 
-	virtual float getSampleRate(){ return sample_rate; }
-	virtual void getSomeSamples(BufferBox &buf, int num_samples);
-	virtual int getState();
+	virtual float _cdecl getSampleRate(){ return sample_rate; }
+	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
+	virtual int _cdecl getState();
 
 	void setDevice(Device *d);
 	Device *getDevice();

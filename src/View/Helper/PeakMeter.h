@@ -19,9 +19,9 @@ class PeakMeterSource : public Observable
 {
 public:
 	PeakMeterSource(const string &name) : Observable(name){}
-	virtual float getSampleRate() = 0;
-	virtual void getSomeSamples(BufferBox &buf, int num_samples) = 0;
-	virtual int getState() = 0;
+	virtual float _cdecl getSampleRate() = 0;
+	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples) = 0;
+	virtual int _cdecl getState() = 0;
 	enum{
 		STATE_PLAYING,
 		STATE_PAUSED,

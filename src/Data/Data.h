@@ -23,14 +23,14 @@ public:
 	Data(const string &name);
 	virtual ~Data();
 
-	virtual void reset() = 0;
-	virtual bool load(const string &_filename, bool deep = true) = 0;
-	virtual bool save(const string &_filename) = 0;
+	virtual void _cdecl reset() = 0;
+	virtual bool _cdecl load(const string &_filename, bool deep = true) = 0;
+	virtual bool _cdecl save(const string &_filename) = 0;
 
 	void resetHistory();
 	void *execute(Action *a);
-	void undo();
-	void redo();
+	void _cdecl undo();
+	void _cdecl redo();
 
 	string filename;
 	int file_time;

@@ -61,8 +61,8 @@ public:
 
 	virtual void onUpdate(Observable *o, const string &message);
 
-	virtual void onShow();
-	virtual void onHide();
+	virtual void _cdecl onShow();
+	virtual void _cdecl onHide();
 
 	Song *song;
 	DeviceManager *device_manager;

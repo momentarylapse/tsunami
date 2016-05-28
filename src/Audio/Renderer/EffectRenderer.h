@@ -22,14 +22,14 @@ public:
 	void _cdecl __init__(AudioRenderer *child, const Array<Effect*> fx);
 	virtual void _cdecl __delete__();
 
-	virtual int read(BufferBox &buf);
-	virtual void reset();
-	virtual Range range();
-	virtual int getPos();
-	virtual void seek(int pos);
-	virtual int getSampleRate();
-	virtual int getNumSamples();
-	virtual Array<Tag> getTags();
+	virtual int _cdecl read(BufferBox &buf);
+	virtual void _cdecl reset();
+	virtual Range _cdecl range();
+	virtual int _cdecl getPos();
+	virtual void _cdecl seek(int pos);
+	virtual int _cdecl getSampleRate();
+	virtual int _cdecl getNumSamples();
+	virtual Array<Tag> _cdecl getTags();
 
 	void setTrack(Track *t);
 

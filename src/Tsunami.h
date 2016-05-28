@@ -33,11 +33,11 @@ public:
 
 	virtual bool onStartup(const Array<string> &arg);
 
-	bool HandleCLIArguments(const Array<string> &arg);
-	void LoadKeyCodes();
+	bool handleCLIArguments(const Array<string> &arg);
+	void loadKeyCodes();
 
-	void CreateWindow(const Array<string> &arg);
-	bool AllowTermination();
+	void createWindow(const Array<string> &arg);
+	bool allowTermination();
 
 	TsunamiWindow *win;
 	HuiWindow *_win;

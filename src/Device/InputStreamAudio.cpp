@@ -11,6 +11,7 @@
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
 
+#ifndef OS_WINDOWS
 #include <pulse/pulseaudio.h>
 #include "DeviceManager.h"
 #include "Device.h"
@@ -409,3 +410,4 @@ void InputStreamAudio::update()
 
 	running = isCapturing();
 }
+#endif

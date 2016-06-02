@@ -1,14 +1,14 @@
 /*
- * ActionTrack__CutBufferBox.cpp
+ * ActionTrack__SplitBufferBox.cpp
  *
  *  Created on: 09.04.2012
  *      Author: michi
  */
 
-#include "ActionTrack__CutBufferBox.h"
 #include <assert.h>
+#include "ActionTrack__SplitBufferBox.h"
 
-ActionTrack__CutBufferBox::ActionTrack__CutBufferBox(Track *t, int _level_no, int _index, int _offset)
+ActionTrack__SplitBufferBox::ActionTrack__SplitBufferBox(Track *t, int _level_no, int _index, int _offset)
 {
 	track_no = get_track_index(t);
 	index = _index;
@@ -16,13 +16,9 @@ ActionTrack__CutBufferBox::ActionTrack__CutBufferBox(Track *t, int _level_no, in
 	level_no = _level_no;
 }
 
-ActionTrack__CutBufferBox::~ActionTrack__CutBufferBox()
-{
-}
 
 
-
-void ActionTrack__CutBufferBox::undo(Data *d)
+void ActionTrack__SplitBufferBox::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
@@ -39,14 +35,15 @@ void ActionTrack__CutBufferBox::undo(Data *d)
 
 
 
-void *ActionTrack__CutBufferBox::execute(Data *d)
+void *ActionTrack__SplitBufferBox::execute(Data *d)
 {
 	//msg_write(format("cut %d   at %d", index, offset));
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	TrackLevel &l = t->levels[level_no];
 
-	assert(offset > 0 && offset < (l.buffers[index].length - 1));
+	assert(offset > 0);
+	assert(offset < (l.buffers[index].length - 1));
 
 	// create new
 	BufferBox dummy;

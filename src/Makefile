@@ -21,7 +21,7 @@ OBJ = \
  Action/Song/ActionSongDeleteSelection.o\
  Action/Track/Buffer/ActionTrack__AbsorbBufferBox.o\
  Action/Track/Buffer/ActionTrack__AddBufferBox.o\
- Action/Track/Buffer/ActionTrack__CutBufferBox.o\
+ Action/Track/Buffer/ActionTrack__SplitBufferBox.o\
  Action/Track/Buffer/ActionTrack__DeleteBufferBox.o\
  Action/Track/Buffer/ActionTrack__GrowBufferBox.o\
  Action/Track/Buffer/ActionTrack__ShrinkBufferBox.o\
@@ -348,8 +348,8 @@ Action/Track/Buffer/ActionTrack__AbsorbBufferBox.o : Action/Track/Buffer/ActionT
 Action/Track/Buffer/ActionTrack__AddBufferBox.o : Action/Track/Buffer/ActionTrack__AddBufferBox.cpp
 	$(CPP) -c Action/Track/Buffer/ActionTrack__AddBufferBox.cpp -o $@ $(CXXFLAGS)
 
-Action/Track/Buffer/ActionTrack__CutBufferBox.o : Action/Track/Buffer/ActionTrack__CutBufferBox.cpp
-	$(CPP) -c Action/Track/Buffer/ActionTrack__CutBufferBox.cpp -o $@ $(CXXFLAGS)
+Action/Track/Buffer/ActionTrack__SplitBufferBox.o : Action/Track/Buffer/ActionTrack__SplitBufferBox.cpp
+	$(CPP) -c Action/Track/Buffer/ActionTrack__SplitBufferBox.cpp -o $@ $(CXXFLAGS)
 
 Action/Track/Buffer/ActionTrack__DeleteBufferBox.o : Action/Track/Buffer/ActionTrack__DeleteBufferBox.cpp
 	$(CPP) -c Action/Track/Buffer/ActionTrack__DeleteBufferBox.cpp -o $@ $(CXXFLAGS)

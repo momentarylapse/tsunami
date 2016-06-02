@@ -5,7 +5,7 @@
  *      Author: michi
  */
 
-#include "../Track/Buffer/ActionTrack__CutBufferBox.h"
+#include "../Track/Buffer/ActionTrack__SplitBufferBox.h"
 #include "../Track/Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../Track/Buffer/ActionTrack__ShrinkBufferBox.h"
 #include "../Track/Sample/ActionTrackDeleteSample.h"
@@ -67,13 +67,13 @@ void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, T
 
 		}else if ((i0 <= bi0) and (i1 < bi1) and (i1 > bi0)){
 			// overlapping beginning of b?
-			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__SplitBufferBox(t, level_no, n, i1 - bi0), a);
 			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
 
 		}else if (b.range().covers(sel.range)){
 			// inside b?
-			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i1 - bi0), a);
-			addSubAction(new ActionTrack__CutBufferBox(t, level_no, n, i0 - bi0), a);
+			addSubAction(new ActionTrack__SplitBufferBox(t, level_no, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__SplitBufferBox(t, level_no, n, i0 - bi0), a);
 			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n + 1), a);
 
 		}

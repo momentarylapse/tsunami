@@ -9,8 +9,8 @@
 #define SRC_DEVICE_CONFIG_H_
 
 
-//#define DEVICE_PULSEAUDIO 1
-#define DEVICE_PORTAUDIO  1
+#define DEVICE_PULSEAUDIO 1
+//#define DEVICE_PORTAUDIO  1
 
 #define DEVICE_MIDI_ALSA 1
 

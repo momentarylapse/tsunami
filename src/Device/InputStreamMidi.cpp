@@ -26,7 +26,7 @@ const string InputStreamMidi::MESSAGE_CAPTURE = "Capture";
 class MidiPreviewFeedSource : public MidiSource
 {
 public:
-	virtual int read(MidiRawData &midi)
+	virtual int _cdecl read(MidiRawData &midi)
 	{
 		msg_write("mpfs.read");
 		for (int i=events.num-1; i>=0; i--){
@@ -42,7 +42,7 @@ public:
 		return midi.samples;
 	}
 
-	void feed(const MidiRawData &midi)
+	void _cdecl feed(const MidiRawData &midi)
 	{
 		events.append(midi);
 		msg_write("feed " + i2s(midi.num));
@@ -55,7 +55,10 @@ public:
 InputStreamMidi::InputStreamMidi(int _sample_rate) :
 	PeakMeterSource("InputStreamMidi")
 {
+#ifdef DEVICE_MIDI_ALSA
 	subs = NULL;
+#endif
+
 	sample_rate = _sample_rate;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = 512;
@@ -108,6 +111,7 @@ bool InputStreamMidi::unconnect()
 	subs = NULL;
 	return r == 0;
 #endif
+	return true;
 }
 
 void InputStreamMidi::setDevice(Device *d)
@@ -119,6 +123,7 @@ void InputStreamMidi::setDevice(Device *d)
 	if ((device->client < 0) or (device->port < 0))
 		return;// true;
 
+#ifdef DEVICE_MIDI_ALSA
 	snd_seq_addr_t sender, dest;
 	sender.client = device->client;
 	sender.port = device->port;
@@ -141,6 +146,7 @@ void InputStreamMidi::setDevice(Device *d)
 	if (r != 0)
 		tsunami->log->Error(string("Error connecting to midi port: ") + snd_strerror(r));
 	return r == 0;*/
+#endif
 }
 
 Device *InputStreamMidi::getDevice()

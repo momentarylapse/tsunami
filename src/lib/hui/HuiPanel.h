@@ -51,15 +51,15 @@ public:
 	void _cdecl _eventX(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)());
 	void _cdecl _eventXP(const string &id, const string &msg, HuiEventHandler *handler, void (HuiEventHandler::*function)(Painter*));
 	template<typename T>
-	void _cdecl event(const string &id, HuiEventHandler* handler, T fun)
-	{	_event(id, handler, (void (HuiEventHandler::*)())fun);	}
+	void _cdecl event(const string &id, void* handler, T fun)
+	{	_event(id, (HuiEventHandler*)handler, (void (HuiEventHandler::*)())fun);	}
 	template<typename T>
-	void _cdecl eventX(const string &id, const string &msg, HuiEventHandler* handler, T fun)
-	{	_eventX(id, msg, handler, (void(HuiEventHandler::*)())fun);	}
+	void _cdecl eventX(const string &id, const string &msg, void* handler, T fun)
+	{	_eventX(id, msg, (HuiEventHandler*)handler, (void(HuiEventHandler::*)())fun);	}
 	template<typename T>
-	void _cdecl eventXP(const string &id, const string &msg, HuiEventHandler* handler, T fun)
+	void _cdecl eventXP(const string &id, const string &msg, void* handler, T fun)
 	{
-		_eventXP(id, msg, handler, (void(HuiEventHandler::*)(Painter*))fun);
+		_eventXP(id, msg, (HuiEventHandler*)handler, (void(HuiEventHandler::*)(Painter*))fun);
 	}
 	void _cdecl _eventK(const string &id, hui_kaba_callback *function);
 	void _cdecl _eventKO(const string &id, HuiEventHandler* handler, hui_kaba_callback *function);

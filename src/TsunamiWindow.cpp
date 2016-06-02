@@ -35,8 +35,22 @@ extern string AppName;
 
 HuiTimer debug_timer;
 
+class TsunamiWindowObserver : public Observer
+{
+public:
+	TsunamiWindow *win;
+	TsunamiWindowObserver(TsunamiWindow *_win) : Observer("TsunamiWindow")
+	{
+		win = _win;
+	}
+
+	void onUpdate(Observable *o, const string &message)
+	{
+		win->onUpdate(o, message);
+	}
+};
+
 TsunamiWindow::TsunamiWindow() :
-	Observer("Tsunami"),
 	HuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls)
 {
 
@@ -156,12 +170,13 @@ TsunamiWindow::TsunamiWindow() :
 	mini_bar = new MiniBar(bottom_bar, view->stream, tsunami->device_manager, view);
 	embed(mini_bar, "main_table", 0, 2);
 
-	subscribe(view);
-	subscribe(song);
-	subscribe(view->stream, OutputStream::MESSAGE_STATE_CHANGE);
-	subscribe(tsunami->clipboard);
-	subscribe(bottom_bar);
-	subscribe(side_bar);
+	observer = new TsunamiWindowObserver(this);
+	observer->subscribe(view);
+	observer->subscribe(song);
+	observer->subscribe(view->stream, OutputStream::MESSAGE_STATE_CHANGE);
+	observer->subscribe(tsunami->clipboard);
+	observer->subscribe(bottom_bar);
+	observer->subscribe(side_bar);
 
 
 
@@ -177,11 +192,13 @@ TsunamiWindow::TsunamiWindow() :
 
 TsunamiWindow::~TsunamiWindow()
 {
-	unsubscribe(view);
-	unsubscribe(song);
-	unsubscribe(view->stream);
-	unsubscribe(tsunami->clipboard);
-	unsubscribe(bottom_bar);
+	observer->unsubscribe(view);
+	observer->unsubscribe(song);
+	observer->unsubscribe(view->stream);
+	observer->unsubscribe(tsunami->clipboard);
+	observer->unsubscribe(bottom_bar);
+	observer->unsubscribe(side_bar);
+	delete(observer);
 
 	int w, h;
 	getSizeDesired(w, h);

@@ -553,5 +553,6 @@
     <ClInclude Include="src\lib\image\image_tga.h" />
     <ClInclude Include="src\lib\image\ImagePainter.h" />
     <ClInclude Include="src\lib\image\Painter.h" />
+    <ClInclude Include="src\Device\config.h" />
   </ItemGroup>
 </Project>

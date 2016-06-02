@@ -350,13 +350,16 @@ void* mf(T tmf)
 	union{
 		T f;
 		struct{
-			long p;
-			long i;
+			long a;
+			long b;
 		};
 	}pp;
+	pp.a = 0;
+	pp.b = 0;
 	pp.f = tmf;
-	// on ARM the "virtual bit" is in i, on x86 it is in p
-	return (void*)(pp.p | (pp.i & 1));
+
+	// on ARM the "virtual bit" is in <b>, on x86 it is in <a>
+	return (void*)(pp.a | (pp.b & 1));
 }
 
 

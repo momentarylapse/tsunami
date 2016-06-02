@@ -57,6 +57,11 @@ class Image
 	color _cdecl getPixelInterpolated(float x, float y) const;
 };
 
+// windows.h hack...
+#ifdef LoadImage
+#undef LoadImage
+#endif
+
 Image* _cdecl LoadImage(const string &filename);
 
 #endif

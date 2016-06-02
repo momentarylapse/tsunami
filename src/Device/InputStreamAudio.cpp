@@ -127,7 +127,9 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 #endif
 
 	device = tsunami->device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
-	playback_delay_const = device->latency;
+	playback_delay_const = 0;
+	if (device)
+		playback_delay_const = device->latency;
 	temp_filename = HuiConfig.getStr("Input.TempFilename", "");
 	temp_file = NULL;
 	save_mode = false;
@@ -267,6 +269,7 @@ bool InputStreamAudio::testError(const string &msg)
 		tsunami->log->error(msg + " (input): " + pa_strerror(e));
 	return (e != 0);
 #endif
+	return false;
 }
 
 float InputStreamAudio::getPlaybackDelayConst()

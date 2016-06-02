@@ -28,7 +28,7 @@ public:
 		started = ended = false;
 		end_of_stream = false;
 	}
-	virtual int read(MidiRawData &midi)
+	virtual int _cdecl read(MidiRawData &midi)
 	{
 		if (end_of_stream)
 			return 0;

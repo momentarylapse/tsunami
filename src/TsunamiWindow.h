@@ -20,7 +20,7 @@ class BottomBar;
 class MiniBar;
 class TsunamiPlugin;
 
-class TsunamiWindow : public Observer, public HuiWindow
+class TsunamiWindow : public HuiWindow
 {
 public:
 	TsunamiWindow();
@@ -29,7 +29,6 @@ public:
 	void onAbout();
 	void onSendBugReport();
 
-	void onUpdate(Observable *o, const string &message);
 	void onCommand(const string &id);
 
 	void onEvent();
@@ -103,6 +102,9 @@ public:
 	bool save();
 
 	void updateMenu();
+
+	Observer *observer;
+	void onUpdate(Observable *o, const string &message);
 
 	AudioView *view;
 

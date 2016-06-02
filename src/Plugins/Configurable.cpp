@@ -342,7 +342,7 @@ public:
 		foreach(Slider *s, slider)
 			delete(s);
 	}
-	void onChange()
+	void _cdecl onChange()
 	{
 		foreachi(AutoConfigData &a, aa, i){
 			*a.value = slider[i]->get();
@@ -350,7 +350,7 @@ public:
 		notify();
 
 	}
-	virtual void update()
+	virtual void _cdecl update()
 	{
 		foreachi(AutoConfigData &a, aa, i){
 			slider[i]->set(*a.value);

@@ -89,11 +89,11 @@ void HuiAddCommandToggle(const string &id, const string &image, int default_key_
 void _HuiAddCommandM(const string &id, const string &image, int default_key_code, HuiEventHandler *object, void (HuiEventHandler::*function)());
 void _HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, HuiEventHandler *object, void (HuiEventHandler::*function)());
 template<typename T>
-void HuiAddCommandM(const string &id, const string &image, int default_key_code, HuiEventHandler *object, T fun)
-{	_HuiAddCommandM(id, image, default_key_code, object, (void(HuiEventHandler::*)())fun);	}
+void HuiAddCommandM(const string &id, const string &image, int default_key_code, void *object, T fun)
+{	_HuiAddCommandM(id, image, default_key_code, (HuiEventHandler*)object, (void(HuiEventHandler::*)())fun);	}
 template<typename T>
-void HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, HuiEventHandler *object, T fun)
-{	_HuiAddCommandMToggle(id, image, default_key_code, object, (void(HuiEventHandler::*)())fun);	}
+void HuiAddCommandMToggle(const string &id, const string &image, int default_key_code, void *object, T fun)
+{	_HuiAddCommandMToggle(id, image, default_key_code, (HuiEventHandler*)object, (void(HuiEventHandler::*)())fun);	}
 
 void HuiLoadKeyCodes(const string &filename);
 void HuiSaveKeyCodes(const string &filename);

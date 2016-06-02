@@ -30,12 +30,16 @@ Storage::Storage()
 	formats.add(new FormatDescriptorNami());
 	formats.add(new FormatDescriptorWave());
 	formats.add(new FormatDescriptorRaw());
+#ifndef OS_WINDOWS
 	formats.add(new FormatDescriptorOgg());
 	formats.add(new FormatDescriptorFlac());
+#endif
 	formats.add(new FormatDescriptorGuitarPro());
 	formats.add(new FormatDescriptorSoundFont2());
+#ifndef OS_WINDOWS
 	formats.add(new FormatDescriptorMp3());
 	formats.add(new FormatDescriptorM4a());
+#endif
 	formats.add(new FormatDescriptorMidi());
 
 	current_directory = HuiConfig.getStr("CurrentDirectory", "");

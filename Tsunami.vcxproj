@@ -37,13 +37,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\all;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\portaudio-r1891-build\include;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\all;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\portaudio-r1891-build\lib\Win32\Release;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\all;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\portaudio-r1891-build\include;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\include\all;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\portaudio-r1891-build\lib\Win32\Release;C:\Program Files %28x86%29\GTK+-Bundle-3.6.1\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -439,6 +439,7 @@
     <ClInclude Include="src\Data\Song.h" />
     <ClInclude Include="src\Data\SongSelection.h" />
     <ClInclude Include="src\data\Track.h" />
+    <ClInclude Include="src\Device\config.h" />
     <ClInclude Include="src\Device\Device.h" />
     <ClInclude Include="src\Device\DeviceManager.h" />
     <ClInclude Include="src\Device\InputStreamAny.h" />

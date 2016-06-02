@@ -17,6 +17,10 @@
 #include <pulse/pulseaudio.h>
 #endif
 
+#ifdef DEVICE_PORTAUDIO
+#include <portaudio.h>
+#endif
+
 //const int DEFAULT_BUFFER_SIZE = 131072;
 const int DEFAULT_BUFFER_SIZE = 32768;
 //const int DEFAULT_BUFFER_SIZE = 16384;
@@ -136,7 +140,7 @@ public:
 		t_idle = 0;
 	}
 
-	virtual void onRun()
+	virtual void _cdecl onRun()
 	{
 		timer.reset();
 		//msg_write("thread run");
@@ -507,6 +511,7 @@ bool OutputStream::testError(const string &msg)
 		msg_error(msg + ": " + pa_strerror(e));
 	return (e != 0);
 #endif
+	return true;
 }
 
 void OutputStream::update()

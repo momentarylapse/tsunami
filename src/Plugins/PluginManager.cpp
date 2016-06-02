@@ -670,7 +670,7 @@ void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 			tpl->view = win->view;
 			tpl->song = win->song;
 			win->plugins.add(tpl);
-			win->subscribe(tpl, tpl->MESSAGE_STOP_REQUEST);
+			win->observer->subscribe(tpl, tpl->MESSAGE_STOP_REQUEST);
 			tpl->onStart();
 		}else if (f_main){
 			f_main();

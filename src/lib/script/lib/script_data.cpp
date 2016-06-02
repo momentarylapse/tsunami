@@ -302,6 +302,51 @@ void class_add_func(const string &name, Type *return_type, void *func, ScriptFla
 	cur_class_func = _class_add_func(cur_class, ClassFunction(name, return_type, cur_package_script, cmd), flag);
 }
 
+int get_virtual_index(void *func, const string &tname, const string &name)
+{
+
+	if (config.abi == ABI_WINDOWS_32){
+		if (!func)
+			return 0;
+		unsigned char *pp = (unsigned char*)func;
+		try {
+			//if ((cur_class->vtable) and (pp[0] == 0x8b) and (pp[1] == 0x01) and (pp[2] == 0xff) and (pp[3] == 0x60)){
+			if ((pp[0] == 0x8b) and (pp[1] == 0x44) and (pp[2] == 0x24) and (pp[4] == 0x8b) and (pp[5] == 0x00) and (pp[6] == 0xff) and (pp[7] == 0x60)) {
+				// 8b.44.24.**    8b.00     ff.60.10
+				// virtual function
+				return (int)pp[8] / 4;
+			}else if (pp[0] == 0xe9){
+				// jmp
+				//msg_write(Asm::Disassemble(func, 16));
+				pp = &pp[5] + *(int*)&pp[1];
+				//msg_write(Asm::Disassemble(pp, 16));
+				if ((pp[0] == 0x8b) and (pp[1] == 0x44) and (pp[2] == 0x24) and (pp[4] == 0x8b) and (pp[5] == 0x00) and (pp[6] == 0xff) and (pp[7] == 0x60)) {
+					// 8b.44.24.**    8b.00     ff.60.10
+					// virtual function
+					return (int)pp[8] / 4;
+				}else
+					throw(1);
+			}else
+				throw(1);
+		}catch (...){
+			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+			msg_write(string((char*)pp, 4).hex());
+			msg_write(Asm::Disassemble(func, 16));
+		}
+	}else{
+
+		long p = (long)func;
+		if ((p & 1) > 0){
+			// virtual function
+			return p / sizeof(void*);
+		}else if (!func){
+			return 0;
+		}else{
+			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+		}
+	}
+}
+
 void class_add_func_virtual(const string &name, Type *return_type, void *func, ScriptFlag flag)
 {
 	msg_db_f("add_class_func_virtual", 4);
@@ -311,52 +356,8 @@ void class_add_func_virtual(const string &name, Type *return_type, void *func, S
 			if ((t->is_pointer) and (t->parent == cur_class))
 				tname = t->name;
 	}
-	if (config.abi == ABI_WINDOWS_32){
-		if (!func){
-			_class_add_func_virtual(tname, name, return_type, 0, flag);
-			return;
-		}
-		unsigned char *pp = (unsigned char*)func;
-		try{
-			//if ((cur_class->vtable) and (pp[0] == 0x8b) and (pp[1] == 0x01) and (pp[2] == 0xff) and (pp[3] == 0x60)){
-			if ((pp[0] == 0x8b) and (pp[1] == 0x44) and (pp[2] == 0x24) and (pp[4] == 0x8b) and (pp[5] == 0x00) and (pp[6] == 0xff) and (pp[7] == 0x60)){
-				// 8b.44.24.**    8b.00     ff.60.10
-				// virtual function
-				int index = (int)pp[8] / 4;
-				_class_add_func_virtual(tname, name, return_type, index, flag);
-			}else if (pp[0] == 0xe9){
-				// jmp
-				//msg_write(Asm::Disassemble(func, 16));
-				pp = &pp[5] + *(int*)&pp[1];
-				//msg_write(Asm::Disassemble(pp, 16));
-				if ((pp[0] == 0x8b) and (pp[1] == 0x44) and (pp[2] == 0x24) and (pp[4] == 0x8b) and (pp[5] == 0x00) and (pp[6] == 0xff) and (pp[7] == 0x60)){
-					// 8b.44.24.**    8b.00     ff.60.10
-					// virtual function
-					int index = (int)pp[8] / 4;
-					_class_add_func_virtual(tname, name, return_type, index, flag);
-				}else
-					throw(1);
-			}else
-				throw(1);
-		}catch(...){
-			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
-			msg_write(string((char*)pp, 4).hex());
-			msg_write(Asm::Disassemble(func, 16));
-		}
-	}else{
-	
-		long p = (long)func;
-		if ((p & 1) > 0){
-			// virtual function
-			int index = p / sizeof(void*);
-			_class_add_func_virtual(tname, name, return_type, index, flag);
-		}else if (!func){
-			_class_add_func_virtual(tname, name, return_type, 0, flag);
-		}else{
-			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
-		}
-
-	}
+	int index = get_virtual_index(func, tname, name);
+	_class_add_func_virtual(tname, name, return_type, index, flag);
 }
 
 void class_link_vtable(void *p)
@@ -1436,14 +1437,15 @@ void DeclareClassOffset(const string &class_name, const string &element, int off
 
 void DeclareClassVirtualIndex(const string &class_name, const string &func, void *p, void *instance)
 {
+	VirtualTable *v = *(VirtualTable**)instance;
+
 	ClassOffsetData d;
 	d.class_name = class_name;
 	d.element = func;
-	d.offset = (int)(long)p / sizeof(void*);
+	d.offset = get_virtual_index(p, class_name, func);
 	d.is_virtual = true;
 	ClassOffsets.add(d);
 
-	VirtualTable *v = *(VirtualTable**)instance;
 	LinkExternal(class_name + "." + func, v[d.offset]);
 }
 

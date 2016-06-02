@@ -15,6 +15,11 @@
 #include <pulse/pulseaudio.h>
 #endif
 
+#ifdef DEVICE_PORTAUDIO
+#include <portaudio.h>
+#pragma comment(lib,"portaudio_x86.lib")
+#endif
+
 #ifdef DEVICE_MIDI_ALSA
 #include <alsa/asoundlib.h>
 #endif
@@ -318,6 +323,10 @@ void DeviceManager::init()
 	testError("pa_context_subscribe");
 #endif
 
+#ifdef DEVICE_PORTAUDIO
+	Pa_Initialize();
+#endif
+
 
 	// midi
 #ifdef DEVICE_MIDI_ALSA
@@ -356,6 +365,10 @@ void DeviceManager::kill()
 		pa_context_disconnect(context);
 		testError("pa_context_disconnect");
 	}
+#endif
+
+#ifdef DEVICE_PORTAUDIO
+	Pa_Terminate();
 #endif
 
 	// midi
@@ -491,4 +504,5 @@ bool DeviceManager::testError(const string &msg)
 		tsunami->log->error(msg + ": " + pa_strerror(e));
 	return (e != 0);
 #endif
+	return false;
 }

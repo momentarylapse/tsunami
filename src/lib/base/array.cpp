@@ -34,7 +34,7 @@ void DynamicArray::reserve(int size)
 			posix_memalign(&data, ALIGNMENT, (size_t)allocated * (size_t)element_size);
 	#endif
 #else
-			data = malloc(allocated);
+			data = malloc((size_t)allocated * (size_t)element_size);
 #endif
 //			printf("          new  %p  ", data);
 		}
@@ -58,8 +58,6 @@ void DynamicArray::resize(int size)
 	if (size > num){
 		reserve(size);
 		memset((char*)data + num * element_size, 0, (size - num) * element_size);
-		/*for (int i=num;i<size;i++)
-			init_sub_super_array(NULL, NULL, */
 	}
 	num = size;
 //	printf("        /resize\n");
@@ -315,7 +313,7 @@ DynamicArray DynamicArray::ref_subarray(int start, int num_elements)
 
 
 // Array<char>
-template <> void Array<char>::add(char item)
+template <> void Array<char>::add(const char item)
 {	((DynamicArray*)this)->append_1_single(item);	}
 template <> void Array<char>::erase(int index)
 {	((DynamicArray*)this)->delete_single(index);	}
@@ -325,7 +323,7 @@ template <> void Array<char>::operator += (const Array<char> &a)
 {	((DynamicArray*)this)->append(&a);	}
 
 // Array<bool>
-template <> void Array<bool>::add(bool item)
+template <> void Array<bool>::add(const bool item)
 {	((DynamicArray*)this)->append_1_single(item);	}
 template <> void Array<bool>::erase(int index)
 {	((DynamicArray*)this)->delete_single(index);	}
@@ -335,7 +333,7 @@ template <> void Array<bool>::operator += (const Array<bool> &a)
 {	((DynamicArray*)this)->append(&a);	}
 
 // Array<int>
-template <> void Array<int>::add(int item)
+template <> void Array<int>::add(const int item)
 {	((DynamicArray*)this)->append_4_single(item);	}
 template <> void Array<int>::erase(int index)
 {	((DynamicArray*)this)->delete_single(index);	}
@@ -345,7 +343,7 @@ template <> void Array<int>::operator += (const Array<int> &a)
 {	((DynamicArray*)this)->append(&a);	}
 
 // Array<float>
-template <> void Array<float>::add(float item)
+template <> void Array<float>::add(const float item)
 {	((DynamicArray*)this)->append_4_single(*(int*)&item);	}
 template <> void Array<float>::erase(int index)
 {	((DynamicArray*)this)->delete_single(index);	}

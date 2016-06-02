@@ -21,8 +21,8 @@ public:
 	void _cdecl __init__(Configurable *c);
 	virtual void _cdecl __delete__();
 
-	void notify();
-	virtual void update(){}
+	void _cdecl notify();
+	virtual void _cdecl update(){}
 
 	Configurable *c;
 };

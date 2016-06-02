@@ -86,7 +86,8 @@ class Array : public DynamicArray
 		{
 			T r;
 			if (num > 0){
-				memcpy(&r, &back(), element_size);
+				//memcpy(&r, &back(), element_size);
+				r = back();
 				((DynamicArray*)this)->resize(num - 1);
 			}
 			return r;

@@ -87,7 +87,7 @@ void BarsConsole::fillList()
 	reset(id);
 	int sample_rate = song->sample_rate;
 	int n = 1;
-	foreach(BarPattern &b, song->bars){
+	for (BarPattern &b : song->bars){
 		float duration = (float)b.length / (float)sample_rate;
 		if (b.type == b.TYPE_BAR){
 			addString(id, format("%d\\%d\\%.1f\\%.3f", n, b.num_beats, sample_rate * 60.0f / (b.length / b.num_beats), duration));
@@ -199,7 +199,7 @@ void BarsConsole::onDelete()
 		int l0 = b.length;
 		Range r = Range(pos, l0);
 		if (isChecked(id_link)){
-			foreach(Track *t, song->tracks){
+			for (Track *t : song->tracks){
 				/*if (t->type != t->TYPE_MIDI)
 					continue;*/
 				Set<int> del;

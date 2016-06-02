@@ -246,7 +246,7 @@ void AudioView::setColorScheme(const string &name)
 {
 	HuiConfig.setStr("View.ColorScheme", name);
 	colors.create(basic_schemes[0]);
-	foreach(ColorSchemeBasic &b, basic_schemes)
+	for (ColorSchemeBasic &b : basic_schemes)
 		if (b.name == name)
 			colors.create(b);
 	forceRedraw();
@@ -347,7 +347,7 @@ void AudioView::onLeftButtonDown()
 void align_to_beats(Song *s, Range &r, int beat_partition)
 {
 	Array<Beat> beats = s->bars.getBeats(Range::ALL);//audio->getRange());
-	foreach(Beat &b, beats){
+	for (Beat &b : beats){
 		/*for (int i=0; i<beat_partition; i++){
 			Range sr = b.sub(i, beat_partition);
 			if (sr.overlaps(sr))
@@ -584,7 +584,7 @@ void AudioView::updateTracks()
 			sel.add(t);
 		}
 	}
-	foreach(AudioViewTrack *v, vtrack)
+	for (AudioViewTrack *v : vtrack)
 		if (v){
 			delete(v);
 			changed = true;
@@ -675,7 +675,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 	drawBackground(c, r);
 
 	// tracks
-	foreach(AudioViewTrack *t, vtrack)
+	for (AudioViewTrack *t : vtrack)
 		t->draw(c);
 
 	// capturing preview
@@ -843,14 +843,14 @@ void AudioView::selectTrack(Track *t, bool diff)
 		return;
 	if (diff){
 		bool is_only_selected = true;
-		foreach(Track *tt, t->song->tracks)
+		for (Track *tt : t->song->tracks)
 			if (sel.has(tt) and (tt != t))
 				is_only_selected = false;
 		sel.set(t, !sel.has(t) or is_only_selected);
 	}else{
 		if (!sel.has(t)){
 			// unselect all tracks
-			foreach(Track *tt, t->song->tracks)
+			for (Track *tt : t->song->tracks)
 				sel.set(tt, false);
 		}
 
@@ -925,7 +925,7 @@ SongSelection AudioView::getEditSeletion()
 	SongSelection s;
 	s.range = sel.range;
 	s.add(cur_track);
-	foreach(SampleRef *sample, cur_track->samples)
+	for (SampleRef *sample : cur_track->samples)
 		if (sel.has(sample))
 			s.add(sample);
 	return s;

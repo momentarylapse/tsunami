@@ -78,7 +78,7 @@ void SongRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 	buf.swap_ref(buf0);
 
 	// subs
-	foreach(SampleRef *s, t->samples){
+	for (SampleRef *s : t->samples){
 		if (s->muted)
 			continue;
 
@@ -120,7 +120,7 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	MidiRawData raw;
 	raw.samples = buf.length;
 
-	foreach(Beat &b, beats)
+	for (Beat &b : beats)
 		raw.addMetronomeClick(b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
 
 	midi_streamer->setData(raw);
@@ -182,7 +182,7 @@ void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list
 		effect->apply(buf, &fake_track, false);
 
 	// apply fx
-	foreach(Effect *fx, fx_list)
+	for (Effect *fx : fx_list)
 		if (fx->enabled)
 			fx->apply(buf, &fake_track, false);
 }
@@ -237,13 +237,13 @@ void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 
 void apply_curves(Song *audio, int pos)
 {
-	foreach(Curve *c, audio->curves)
+	for (Curve *c : audio->curves)
 		c->apply(pos);
 }
 
 void unapply_curves(Song *audio)
 {
-	foreach(Curve *c, audio->curves)
+	for (Curve *c : audio->curves)
 		c->unapply();
 }
 
@@ -306,7 +306,7 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 
 void SongRenderer::reset()
 {
-	foreach(Effect *fx, song->fx)
+	for (Effect *fx : song->fx)
 		fx->prepare();
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
@@ -314,9 +314,9 @@ void SongRenderer::reset()
 		t->synth->setSampleRate(song->sample_rate);
 		t->synth->setInstrument(t->instrument);
 		t->synth->reset();
-		foreach(Effect *fx, t->fx)
+		for (Effect *fx : t->fx)
 			fx->prepare();
-		foreach(MidiEffect *fx, t->midi.fx){
+		for (MidiEffect *fx : t->midi.fx){
 			fx->Prepare();
 			fx->process(&midi[i]);
 		}
@@ -345,7 +345,7 @@ Array<Tag> SongRenderer::getTags()
 void SongRenderer::seek(int _pos)
 {
 	pos = _pos;
-	foreach(Track *t, song->tracks)
+	for (Track *t : song->tracks)
 		t->synth->reset();//endAllNotes();
 }
 

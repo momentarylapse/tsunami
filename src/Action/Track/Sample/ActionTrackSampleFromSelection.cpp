@@ -13,7 +13,7 @@
 
 ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(Song *a, const SongSelection &sel, int level_no)
 {
-	foreach(Track *t, a->tracks)
+	for (Track *t : a->tracks)
 		if (sel.has(t))
 			CreateSubsFromTrack(t, sel, level_no);
 }

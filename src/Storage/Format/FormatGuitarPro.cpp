@@ -105,7 +105,7 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 		write_str1c(f, "FICHIER GUITAR PRO v5.00", 30);
 
 	//Array<Track*> tracks;
-	foreach(Track *t, a->tracks)
+	for (Track *t : a->tracks)
 		if (t->type == t->TYPE_MIDI){
 			GpTrack tt;
 			tt.is_drum = (t->instrument.type == Instrument::TYPE_DRUMS);
@@ -156,7 +156,7 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 
 	f->WriteInt(bars.num);
 	f->WriteInt(tracks.num);
-	foreach(Bar &b, bars)
+	for (Bar &b : bars)
 		write_measure_header(b);
 	foreachi(GpTrack &t, tracks, i)
 		write_track(&t, i);
@@ -164,8 +164,8 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 	if (version >= 500)
 		f->WriteByte(0);
 
-	foreach(Bar &b, bars){
-		foreach(GpTrack &t, tracks)
+	for (Bar &b : bars){
+		for (GpTrack &t : tracks)
 			write_measure(&t, b);
 	}
 	delete(f);
@@ -653,7 +653,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 	Array<MidiNote> notes = t->t->midi.getNotes(b.range);
 	Array<GuitarNote> gnotes;
 
-	foreach(MidiNote &n, notes){
+	for (MidiNote &n : notes){
 		Range r = n.range and b.range;
 		GuitarNote gn;
 		gn.offset = int((float)(r.offset - b.range.offset) / spu + 0.5f);
@@ -704,7 +704,7 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 		offset = gnotes[i].offset + gnotes[i].length;
 	}
 
-	foreach(GuitarNote &n, gnotes)
+	for (GuitarNote &n : gnotes)
 		n.detune(t->tuning);
 
 	return gnotes;

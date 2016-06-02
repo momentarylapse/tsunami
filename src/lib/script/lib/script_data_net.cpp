@@ -50,13 +50,13 @@ void SIAddPackageNet()
 	add_class(TypeNetAddress);
 		class_add_element("host", TypeString, GetDAAddress(host));
 		class_add_element("port", TypeInt, GetDAAddress(port));
-		class_add_func("__init__", TypeVoid, net_p(mf(&NetAddress::__init__)));
-		class_add_func("__delete__", TypeVoid, net_p(mf(&NetAddress::__delete__)));
+		class_add_func(NAME_FUNC_INIT, TypeVoid, net_p(mf(&NetAddress::__init__)));
+		class_add_func(NAME_FUNC_DELETE, TypeVoid, net_p(mf(&NetAddress::__delete__)));
 
 	add_class(TypeSocket);
 		class_add_element("uid", TypeInt,0);
-		class_add_func("__init__",		TypeVoid,	net_p(mf(&Socket::__init__)));
-		class_add_func("__delete__",		TypeVoid,	net_p(mf(&Socket::__delete__)));
+		class_add_func(NAME_FUNC_INIT,		TypeVoid,	net_p(mf(&Socket::__init__)));
+		class_add_func(NAME_FUNC_DELETE,		TypeVoid,	net_p(mf(&Socket::__delete__)));
 		class_add_func("accept",		TypeSocketP,	net_p(mf(&Socket::accept)));
 		class_add_func("close",		TypeVoid,	net_p(mf(&Socket::close)));
 		class_add_func("setBlocking",		TypeVoid,	net_p(mf(&Socket::setBlocking)));

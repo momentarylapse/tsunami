@@ -80,7 +80,7 @@ void Track::reset()
 	volume = 1;
 	muted = false;
 	panning = 0;
-	foreach(Effect *f, fx)
+	for (Effect *f : fx)
 		delete(f);
 	fx.clear();
 	samples.clear();
@@ -100,12 +100,12 @@ Range Track::getRangeUnsafe()
 {
 	int min =  1073741824;
 	int max = -1073741824;
-	foreach(TrackLevel &l, levels)
+	for (TrackLevel &l : levels)
 		if (l.buffers.num > 0){
 			min = min(l.buffers[0].offset, min);
 			max = max(l.buffers.back().range().end(), max);
 		}
-	foreach(SampleRef *s, samples){
+	for (SampleRef *s : samples){
 		if (s->pos < min)
 			min = s->pos;
 		int smax = s->pos + s->buf->length + s->rep_num * s->rep_delay;
@@ -154,7 +154,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	msg_db_f("Track.ReadBuffers", 1);
 
 	// is <r> inside a buffer?
-	foreach(BufferBox &b, levels[level_no].buffers){
+	for (BufferBox &b : levels[level_no].buffers){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.length;
 		if ((p0 >= 0) and (p1 <= b.length)){
@@ -168,7 +168,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlapp
-	foreach(BufferBox &b, levels[level_no].buffers)
+	for (BufferBox &b : levels[level_no].buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
 	return buf;
@@ -205,8 +205,8 @@ BufferBox Track::readBuffersCol(const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlapp
-	foreach(TrackLevel &l, levels)
-		foreach(BufferBox &b, l.buffers)
+	for (TrackLevel &l : levels)
+		for (BufferBox &b : l.buffers)
 			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
 
 	return buf;
@@ -220,15 +220,15 @@ BufferBox Track::getBuffers(int level_no, const Range &r)
 
 void Track::updatePeaks()
 {
-	foreach(TrackLevel &l, levels)
-		foreach(BufferBox &b, l.buffers)
+	for (TrackLevel &l : levels)
+		for (BufferBox &b : l.buffers)
 			b.update_peaks();
 }
 
 void Track::invalidateAllPeaks()
 {
-	foreach(TrackLevel &l, levels)
-		foreach(BufferBox &b, l.buffers)
+	for (TrackLevel &l : levels)
+		for (BufferBox &b : l.buffers)
 			b.invalidate_peaks(b.range());
 }
 
@@ -255,7 +255,7 @@ void Track::addMidiNote(const MidiNote &n)
 void Track::addMidiNotes(const MidiData &midi)
 {
 	song->action_manager->beginActionGroup();
-	foreach(MidiNote &n, const_cast<MidiData&>(midi))
+	for (MidiNote &n : const_cast<MidiData&>(midi))
 		addMidiNote(n);
 	song->action_manager->endActionGroup();
 }

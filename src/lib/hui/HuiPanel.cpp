@@ -206,7 +206,7 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 		}
 
 		// window closed by callback?
-		foreach(HuiClosedPanel &cp, HuiClosedPanels)
+		for (HuiClosedPanel &cp : HuiClosedPanels)
 			if (cp.panel == this)
 				return sent;
 	}
@@ -323,7 +323,7 @@ void HuiPanel::_addControl(const string &ns, HuiResource &cmd, const string &par
 	if (tooltip.num > 0)
 		setTooltip(cmd.id, tooltip);
 
-	foreach(HuiResource &c, cmd.children)
+	for (HuiResource &c : cmd.children)
 		_addControl(ns, c, cmd.id);
 }
 
@@ -355,7 +355,7 @@ void HuiPanel::fromResource(const string &id)
 
 	// menu/toolbar?
 	if (win){
-		foreach(string &o, res->options){
+		for (string &o : res->options){
 			if (o.find("menu=") == 0)
 				win->setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
 			if (o.find("toolbar=") == 0)
@@ -364,7 +364,7 @@ void HuiPanel::fromResource(const string &id)
 	}
 
 	// controls
-	foreach(HuiResource &cmd, res->children)
+	for (HuiResource &cmd : res->children)
 		_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
@@ -411,7 +411,7 @@ void HuiPanel::_embedResource(const string &ns, HuiResource &c, const string &pa
 	if (tooltip.num > 0)
 		setTooltip(c.id, tooltip);
 
-	foreach(HuiResource &child, c.children)
+	for (HuiResource &child : c.children)
 		_embedResource(ns, child, c.id, child.x, child.y);
 }
 
@@ -441,7 +441,7 @@ void HuiPanel::embed(HuiPanel *panel, const string &parent_id, int x, int y)
 void HuiPanel::set_win(HuiWindow *_win)
 {
 	win = _win;
-	foreach(HuiPanel *p, children)
+	for (HuiPanel *p : children)
 		p->set_win(win);
 }
 
@@ -452,7 +452,7 @@ void HuiPanel::set_win(HuiWindow *_win)
 
 #define test_controls(_id, c)	\
 	string tid = (_id.num == 0) ? cur_id : _id; \
-	foreach(HuiControl *c, control) \
+	for (HuiControl *c : control) \
 		if (c->id == tid)
 
 // replace all the text

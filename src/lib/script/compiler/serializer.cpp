@@ -285,7 +285,7 @@ void Serializer::cmd_list_out(const string &message)
 void Serializer::vr_list_out()
 {
 	msg_write("---------- vr");
-	foreach(VirtualRegister &r, virtual_reg)
+	for (VirtualRegister &r : virtual_reg)
 		msg_write(Asm::GetRegName(r.reg) + format("  (%d)   %d -> %d", r.reg_root, r.first, r.last));
 }
 
@@ -331,7 +331,7 @@ void Serializer::add_cmd(int cond, int inst, const SerialCommandParam &p1, const
 		cmd.insert(c, next_cmd_index);
 
 		// adjust temp vars
-		foreach(TempVar &v, temp_var){
+		for (TempVar &v : temp_var){
 			if (v.first >= next_cmd_index)
 				v.first ++;
 			if (v.last >= next_cmd_index)
@@ -339,7 +339,7 @@ void Serializer::add_cmd(int cond, int inst, const SerialCommandParam &p1, const
 		}
 
 		// adjust reg channels
-		foreach(VirtualRegister &r, virtual_reg){
+		for (VirtualRegister &r : virtual_reg){
 			if (r.first >= next_cmd_index)
 				r.first ++;
 			if (r.last >= next_cmd_index)
@@ -391,7 +391,7 @@ void Serializer::remove_cmd(int index)
 	cmd.erase(index);
 
 	// adjust temp vars
-	foreach(TempVar &v, temp_var){
+	for (TempVar &v : temp_var){
 		if (v.first >= index)
 			v.first --;
 		if (v.last >= index)
@@ -399,7 +399,7 @@ void Serializer::remove_cmd(int index)
 	}
 
 	// adjust reg channels
-	foreach(VirtualRegister &r, virtual_reg){
+	for (VirtualRegister &r : virtual_reg){
 		if (r.first >= index)
 			r.first --;
 		if (r.last >= index)
@@ -409,7 +409,7 @@ void Serializer::remove_cmd(int index)
 
 void Serializer::remove_temp_var(int v)
 {
-	foreach(SerialCommand &c, cmd){
+	for (SerialCommand &c : cmd){
 		for (int i=0; i<SERIAL_COMMAND_NUM_PARAMS; i++)
 			if ((c.p[i].kind == KIND_VAR_TEMP) or (c.p[i].kind == KIND_DEREF_VAR_TEMP))
 				if (c.p[i].p > v)
@@ -431,7 +431,7 @@ void Serializer::move_param(SerialCommandParam &p, int from, int to)
 		// move_param reg
 		long r = Asm::RegRoot[p.p];
 		bool found = false;
-		foreach(VirtualRegister &rc, virtual_reg)
+		for (VirtualRegister &rc : virtual_reg)
 			if ((r == rc.reg_root) and (from >= rc.first) and (from >= rc.first)){
 				if (rc.last < max(from, to))
 					rc.last = max(from, to);
@@ -814,16 +814,16 @@ void Serializer::add_cmd_destructor(SerialCommandParam &param, bool needs_ref)
 
 void Serializer::FillInConstructorsBlock(Block *b)
 {
-	foreach(int i, b->vars){
+	for (int i : b->vars){
 		Variable &v = cur_func->var[i];
 		SerialCommandParam param = param_local(v.type, v._offset);
-		add_cmd_constructor(param, (v.name == "-return-") ? -1 : KIND_VAR_LOCAL);
+		add_cmd_constructor(param, (v.name == NAME_RETURN_VAR) ? -1 : KIND_VAR_LOCAL);
 	}
 }
 
 void Serializer::FillInDestructorsBlock(Block *b, bool recursive)
 {
-	foreach(int i, b->vars){
+	for (int i : b->vars){
 		Variable &v = cur_func->var[i];
 		SerialCommandParam p = param_local(v.type, v._offset);
 		add_cmd_destructor(p);
@@ -832,7 +832,7 @@ void Serializer::FillInDestructorsBlock(Block *b, bool recursive)
 
 void Serializer::FillInDestructorsTemp()
 {
-	foreach(SerialCommandParam &p, inserted_temp)
+	for (SerialCommandParam &p : inserted_temp)
 		add_cmd_destructor(p);
 	inserted_temp.clear();
 }
@@ -918,7 +918,7 @@ inline bool param_combi_allowed(int inst, SerialCommandParam &p1, SerialCommandP
 int Serializer::find_unused_reg(int first, int last, int size, int exclude)
 {
 	//vr_list_out();
-	foreach(int r, map_reg_root)
+	for (int r : map_reg_root)
 		if (r != exclude)
 			if (!is_reg_root_used_in_interval(r, first, last)){
 				return add_virtual_reg(get_reg(r, size));
@@ -1356,7 +1356,7 @@ struct StackOccupation
 		x.clear();
 		this->down = down;
 		this->reserved = reserved;
-		foreach(TempVar &v, s->temp_var) {
+		for (TempVar &v : s->temp_var) {
 			if (!v.mapped)
 				continue;
 			if ((v.first > first and v.last > last) or (v.first < first and v.last < last))
@@ -1879,7 +1879,7 @@ void Serializer::SimplifyFloatStore()
 void Serializer::MapReferencedTempVarsToStack()
 {
 	msg_db_f("MapRemainingTempVarsToStack", 3);
-	foreach(SerialCommand &c, cmd)
+	for (SerialCommand &c : cmd)
 		if (c.inst == Asm::INST_LEA)
 			if (c.p[1].kind == KIND_VAR_TEMP){
 				int v = (long)c.p[1].p;

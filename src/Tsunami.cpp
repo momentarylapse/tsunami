@@ -100,7 +100,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &arg)
 			msg_write(format("samples: %d", song->getRange().length));
 			msg_write("length: " + song->get_time_str(song->getRange().length));
 			msg_write(format("tracks: %d", song->tracks.num));
-			foreach(Tag &t, song->tags)
+			for (Tag &t : song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
 		delete(song);

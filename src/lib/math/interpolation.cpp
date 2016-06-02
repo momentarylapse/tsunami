@@ -167,7 +167,7 @@ void Interpolator<T>::update()
 template<class T>
 void Interpolator<T>::normalize()
 {
-	foreach(Part &p, part){
+	for (Part &p : part){
 		p.t0 /= t_sum;
 		p.dt /= t_sum;
 		p.vel0 *= t_sum;
@@ -290,7 +290,7 @@ inline void Interpolator<float>::print()
 	if (!ready)
 		update();
 	msg_write("---");
-	foreach(Part &p, part)
+	for (Part &p : part)
 		msg_write(format("t0=%f dt=%f (%f  %f) -> (%f  %f)", p.t0, p.dt, p.pos0, p.vel0, p.pos1, p.vel1));
 }
 

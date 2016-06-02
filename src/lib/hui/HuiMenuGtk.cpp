@@ -30,8 +30,8 @@ GtkAccelGroup *accel_group = NULL;
 
 void try_add_accel(GtkWidget *item, const string &id)
 {
-	foreach(HuiCommand &c, _HuiCommand_)
-		if ((id == c.id) && (c.key_code >= 0)){
+	for (HuiCommand &c : _HuiCommand_)
+		if ((id == c.id) and (c.key_code >= 0)){
 			int k = c.key_code;
 			int mod = (((k&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((k&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0);
 			gtk_widget_add_accelerator(item, "activate", accel_group, HuiKeyID[k & 255], (GdkModifierType)mod, GTK_ACCEL_VISIBLE);
@@ -171,7 +171,7 @@ const char *get_gtk_icon_name(const string image)
 
 sHuiImage *get_image(const string &image)
 {
-	foreach(sHuiImage &m, HuiImage)
+	for (sHuiImage &m : HuiImage)
 		if (m.filename == image)
 			return &m;
 	sHuiImage img = {0, image};
@@ -192,7 +192,7 @@ void *get_gtk_image(const string &image, bool large)
 		if (!img)
 			return NULL;
 		// absolute path?
-		if ((img->filename[0] == '/') || (img->filename[1] == ':'))
+		if ((img->filename[0] == '/') or (img->filename[1] == ':'))
 			return gtk_image_new_from_file(sys_str_f(img->filename));
 		// relative
 		return gtk_image_new_from_file(sys_str_f(HuiAppDirectory + img->filename));

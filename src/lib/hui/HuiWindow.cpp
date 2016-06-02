@@ -77,13 +77,13 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 	if (res->type == "SizableDialog")
 		mode = HuiWinModeControls | HuiWinModeResizable;
 	bool allow_parent = false;
-	foreach(string &o, res->options)
+	for (string &o : res->options)
 		if ((o == "allow-root") or (o == "allow-parent"))
 			allow_parent = true;
 	_init_(HuiGetLanguage(id, id), -1, -1, res->w, res->h, parent, allow_parent, mode);
 
 	// menu/toolbar?
-	foreach(string &o, res->options){
+	for (string &o : res->options){
 		if (o.head(5) == "menu=")
 			setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
 		if (o.head(8) == "toolbar=")
@@ -91,7 +91,7 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 	}
 
 	// controls
-	foreach(HuiResource &cmd, res->children)
+	for (HuiResource &cmd : res->children)
 		_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
@@ -149,7 +149,7 @@ void HuiWindow::onCloseRequest()
 	
 	// no message function (and last window in this main level): end program
 	// ...or at least end nested main level
-	foreach(HuiWindow *w, HuiWindows)
+	for (HuiWindow *w : HuiWindows)
 		if (w->_get_main_level_() >= level)
 			return;
 	HuiEnd();

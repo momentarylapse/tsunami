@@ -19,7 +19,7 @@ FormatDescriptor::FormatDescriptor(const string &_description, const string &_ex
 
 bool FormatDescriptor::canHandle(const string & _extension)
 {
-	foreach(string e, extensions)
+	for (string &e : extensions)
 		if (e == _extension)
 			return true;
 	return false;
@@ -31,7 +31,7 @@ bool FormatDescriptor::testFormatCompatibility(Song *a)
 	int num_fx = a->fx.num;
 	int num_audio = 0;
 	int num_midi = 0;
-	foreach(Track *t, a->tracks){
+	for (Track *t : a->tracks){
 		num_fx += t->fx.num;
 		if (t->type == t->TYPE_AUDIO)
 			num_audio ++;

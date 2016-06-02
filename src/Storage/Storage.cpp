@@ -49,7 +49,7 @@ Storage::~Storage()
 {
 	HuiConfig.setStr("CurrentDirectory", current_directory);
 
-	foreach(FormatDescriptor *d, formats)
+	for (FormatDescriptor *d : formats)
 		delete(d);
 	formats.clear();
 }
@@ -190,9 +190,9 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 	string filter, filter_show;
 	filter_show = _("all known files");
 	bool first = true;
-	foreach(FormatDescriptor *f, formats)
+	for (FormatDescriptor *f : formats)
 		if ((f->flags & flags) == flags){
-			foreach(string &e, f->extensions){
+			for (string &e : f->extensions){
 				if (!first)
 					filter += ";";
 				filter += "*." + e;
@@ -204,7 +204,7 @@ bool Storage::askByFlags(HuiWindow *win, const string &title, int flags)
 		}
 	filter_show += "|" + _("all files");
 	filter += "|*";
-	foreach(FormatDescriptor *f, formats)
+	for (FormatDescriptor *f : formats)
 		if ((f->flags & flags) == flags){
 			filter += "|";
 			filter_show += "|" + f->description + " (";
@@ -248,7 +248,7 @@ bool Storage::askSaveExport(HuiWindow *win)
 FormatDescriptor *Storage::getFormat(const string &ext, int flags)
 {
 	bool found = false;
-	foreach(FormatDescriptor *d, formats){
+	for (FormatDescriptor *d : formats){
 		if (d->canHandle(ext)){
 			found = true;
 			if ((d->flags & flags) == flags)

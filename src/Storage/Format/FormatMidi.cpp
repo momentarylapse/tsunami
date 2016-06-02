@@ -183,7 +183,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 
 			if ((events.num > 0) or (i > 0)){
 				Array<int> keys = events.keys();
-				foreach(int k, keys){
+				for (int k : keys){
 					Track *t = od->song->addTrack(Track::TYPE_MIDI);
 					t->midi = midi_events_to_notes(events[k]);
 					t->name = track_name;

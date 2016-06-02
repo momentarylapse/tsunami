@@ -12,7 +12,7 @@
 #define _TYPES_INCLUDED_
 
 
-#include <math.h>
+#include <cmath>
 
 class color;
 class vector;
@@ -65,7 +65,7 @@ inline bool inf_f(float f)
 #ifdef OS_WINDOWS
 	return false;
 #else
-	return !isfinite(f);
+	return !std::isfinite(f);
 #endif
 }
 

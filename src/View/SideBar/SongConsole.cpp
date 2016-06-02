@@ -70,7 +70,7 @@ void SongConsole::loadData()
 {
 	// tags
 	reset("tags");
-	foreach(Tag &t, song->tags)
+	for (Tag &t : song->tags)
 		addString("tags", t.key + "\\" + t.value);
 	enable("delete_tag", false);
 

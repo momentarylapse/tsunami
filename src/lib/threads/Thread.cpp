@@ -181,7 +181,7 @@ void Thread::exit()
 Thread *Thread::getSelf()
 {
 	pthread_t s = pthread_self();
-	foreach(Thread *t, _Thread_List_)
+	for (Thread *t : _Thread_List_)
 		if (t->internal->thread == s)
 			return t;
 	return NULL;

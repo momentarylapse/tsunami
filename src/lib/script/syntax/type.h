@@ -10,6 +10,7 @@ class SyntaxTree;
 class Type;
 struct Function;
 
+
 struct ClassElement{
 	string name;
 	Type *type;

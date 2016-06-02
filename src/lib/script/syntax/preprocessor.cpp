@@ -370,7 +370,7 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 void SyntaxTree::PreProcessor()
 {
 	msg_db_f("PreProcessor", 4);
-	foreach(Function *f, functions){
+	for (Function *f : functions){
 		cur_func = f;
 		foreachi(Command *c, f->block->commands, i)
 			f->block->commands[i] = PreProcessCommand(c);
@@ -381,7 +381,7 @@ void SyntaxTree::PreProcessor()
 void SyntaxTree::PreProcessorAddresses()
 {
 	msg_db_f("PreProcessorAddr", 4);
-	foreach(Function *f, functions){
+	for (Function *f : functions){
 		cur_func = f;
 		foreachi(Command *c, f->block->commands, i)
 			f->block->commands[i] = PreProcessCommandAddresses(c);

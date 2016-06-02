@@ -26,7 +26,7 @@ public:
 		foreachi(Curve::Target &t, all_targets, i){
 			addString("list", t.niceStr(song));
 
-			foreach(Curve::Target &tt, targets)
+			for (auto &tt : targets)
 				if (t.p == tt.p){
 					sel.add(i);
 					break;
@@ -46,7 +46,7 @@ public:
 	{
 		Array<int> sel = getSelection("list");
 		targets.clear();
-		foreach(int i, sel)
+		for (int i : sel)
 			targets.add(all_targets[i]);
 		delete(this);
 	}

@@ -21,7 +21,7 @@ void SongSelection::clear()
 
 void SongSelection::all(Song* s)
 {
-	foreach(Track *t, s->tracks)
+	for (Track *t : s->tracks)
 		add(t);
 }
 
@@ -31,8 +31,8 @@ void SongSelection::fromRange(Song* s, const Range &r)
 	range = r;
 
 	// subs
-	foreach(Track *t, s->tracks)
-		foreach(SampleRef *s, t->samples)
+	for (Track *t : s->tracks)
+		for (SampleRef *s : t->samples)
 			set(s, has(t) and range.overlaps(s->getRange()));
 }
 

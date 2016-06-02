@@ -38,7 +38,7 @@ int MidiDataSource::read(MidiRawData& _midi)
 	int n = min(midi.samples - offset, _midi.samples);
 	Range r = Range(offset, n);
 	//midi.read(_midi, r);
-	foreach(MidiEvent &e, midi)
+	for (MidiEvent &e : midi)
 		if (r.is_inside(e.pos))
 			_midi.add(MidiEvent(e.pos - offset, e.pitch, e.volume));
 	offset -= n;

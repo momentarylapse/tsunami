@@ -99,7 +99,7 @@ void SIAddPackageFile()
 		class_add_func("str",				TypeString,		mf(&Date::str));
 	
 	add_class(TypeFile);
-		class_add_func("__delete__",		TypeVoid,		mf(&KabaFile::__delete__));
+		class_add_func(NAME_FUNC_DELETE,		TypeVoid,		mf(&KabaFile::__delete__));
 		class_add_func("getCDate",		TypeDate,		mf(&File::GetDateCreation));
 		class_add_func("getMDate",		TypeDate,		mf(&File::GetDateModification));
 		class_add_func("getADate",		TypeDate,		mf(&File::GetDateAccess));
@@ -141,14 +141,14 @@ void SIAddPackageFile()
 		class_add_element("name",			TypeString,		GetDADirEntry(name));
 		class_add_element("size",			TypeInt,		GetDADirEntry(size));
 		class_add_element("is_dir",			TypeBool,		GetDADirEntry(is_dir));
-		class_add_func("__init__",		TypeVoid,			mf(&DirEntry::__init__));
-		class_add_func("__assign__",		TypeVoid,			mf(&DirEntry::__assign__));
+		class_add_func(NAME_FUNC_INIT,		TypeVoid,			mf(&DirEntry::__init__));
+		class_add_func(NAME_FUNC_ASSIGN,		TypeVoid,			mf(&DirEntry::__assign__));
 			func_add_param("other",		TypeDirEntry);
 		class_add_func("str",		TypeString,			mf(&DirEntry::str));
 	
 	add_class(TypeDirEntryList);
-		class_add_func("__init__",		TypeVoid,			mf(&DirEntryList::__init__));
-		class_add_func("__assign__",		TypeVoid,			mf(&DirEntryList::__assign__));
+		class_add_func(NAME_FUNC_INIT,		TypeVoid,			mf(&DirEntryList::__init__));
+		class_add_func(NAME_FUNC_ASSIGN,		TypeVoid,			mf(&DirEntryList::__assign__));
 			func_add_param("other",		TypeDirEntryList);
 		class_add_func("str",		TypeString,			mf(&DirEntryList::str));
 

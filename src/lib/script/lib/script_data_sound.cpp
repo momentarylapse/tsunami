@@ -43,7 +43,7 @@ void SIAddPackageSound()
 		class_add_func("stop",							TypeVoid,	sound_p(mf(&Sound::Stop)));
 		class_add_func("pause",							TypeVoid,	sound_p(mf(&Sound::Pause)));
 			func_add_param("pause",		TypeBool);
-		class_add_func("__delete__",									TypeVoid,	sound_p(mf(&Sound::__delete__)));
+		class_add_func(NAME_FUNC_DELETE,									TypeVoid,	sound_p(mf(&Sound::__delete__)));
 
 	add_class(TypeMusic);
 		class_add_func("play",									TypeVoid,	sound_p(mf(&Music::Play)));

@@ -34,14 +34,14 @@ int SerializerARM::fc_begin()
 	Array<SerialCommandParam> reg_param;
 	Array<SerialCommandParam> stack_param;
 	Array<SerialCommandParam> xmm_param;
-	foreach(SerialCommandParam &p, CompilerFunctionParam){
-		if ((p.type == TypeInt) || (p.type == TypeInt64) || (p.type == TypeChar) || (p.type == TypeBool) || (p.type->is_pointer)){
+	for (SerialCommandParam &p : CompilerFunctionParam){
+		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 4){
 				reg_param.add(p);
 			}else{
 				stack_param.add(p);
 			}
-		}else if ((p.type == TypeFloat32) || (p.type == TypeFloat64)){
+		}else if ((p.type == TypeFloat32) or (p.type == TypeFloat64)){
 			if (xmm_param.num < 8){
 				xmm_param.add(p);
 			}else{
@@ -78,7 +78,7 @@ int SerializerARM::fc_begin()
 	}
 
 	// extend reg channels to call
-	foreach(VirtualRegister &r, virtual_reg)
+	for (VirtualRegister &r : virtual_reg)
 		if (r.last == -100)
 			r.last = cmd.num;
 
@@ -90,7 +90,7 @@ void SerializerARM::fc_end(int push_size)
 	Type *type = CompilerFunctionReturn.type;
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) && (!type->UsesReturnByMemory())){
+	if ((type != TypeVoid) and (!type->UsesReturnByMemory())){
 		if (type == TypeFloat32)
 			add_cmd(Asm::INST_MOVSS, CompilerFunctionReturn, param_preg(TypeReg128, Asm::REG_XMM0));
 		else if (type == TypeFloat64)
@@ -335,9 +335,9 @@ void SerializerARM::SerializeOperator(Command *com, Array<SerialCommandParam> &p
 		case OperatorBoolSmaller:
 		case OperatorBoolSmallerEqual:
 			add_cmd(Asm::INST_CMP, param[0], param[1]);
-			if ((com->link_no == OperatorCharEqual) || (com->link_no == OperatorBoolEqual))
+			if ((com->link_no == OperatorCharEqual) or (com->link_no == OperatorBoolEqual))
 				add_cmd(Asm::INST_SETZ, ret);
-			else if ((com->link_no ==OperatorCharNotEqual) || (com->link_no == OperatorBoolNotEqual))
+			else if ((com->link_no ==OperatorCharNotEqual) or (com->link_no == OperatorBoolNotEqual))
 				add_cmd(Asm::INST_SETNZ, ret);
 			else if (com->link_no == OperatorBoolGreater)		add_cmd(Asm::INST_SETNLE, ret);
 			else if (com->link_no == OperatorBoolGreaterEqual)	add_cmd(Asm::INST_SETNL, ret);
@@ -439,7 +439,7 @@ SerialCommandParam SerializerARM::SerializeParameter(Command *link, Block *block
 		}else{
 			return param_lookup(p.type, add_global_ref(*(int**)pp));
 		}
-	}else if ((link->kind==KIND_OPERATOR) || (link->kind==KIND_FUNCTION) || (link->kind==KIND_VIRTUAL_FUNCTION) || (link->kind==KIND_COMPILER_FUNCTION) || (link->kind==KIND_ARRAY_BUILDER)){
+	}else if ((link->kind==KIND_OPERATOR) or (link->kind==KIND_FUNCTION) or (link->kind==KIND_VIRTUAL_FUNCTION) or (link->kind==KIND_COMPILER_FUNCTION) or (link->kind==KIND_ARRAY_BUILDER)){
 		return SerializeCommand(link, block, index);
 	}else if (link->kind == KIND_REFERENCE){
 		SerialCommandParam param = SerializeParameter(link->param[0], block, index);
@@ -447,7 +447,7 @@ SerialCommandParam SerializerARM::SerializeParameter(Command *link, Block *block
 		return AddReference(param, link->type);
 	}else if (link->kind == KIND_DEREFERENCE){
 		SerialCommandParam param = SerializeParameter(link->param[0], block, index);
-		/*if ((param.kind == KindVarLocal) || (param.kind == KindVarGlobal)){
+		/*if ((param.kind == KindVarLocal) or (param.kind == KindVarGlobal)){
 			p.type = param.type->sub_type;
 			if (param.kind == KindVarLocal)		p.kind = KindRefToLocal;
 			if (param.kind == KindVarGlobal)	p.kind = KindRefToGlobal;
@@ -717,15 +717,15 @@ void SerializerARM::AddFunctionIntro(Function *f)
 	// return, instance, params
 	Array<Variable> param;
 	if (f->return_type->UsesReturnByMemory()){
-		foreach(Variable &v, f->var)
-			if (v.name == "-return-"){
+		for (Variable &v : f->var)
+			if (v.name == NAME_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (f->_class){
-		foreach(Variable &v, f->var)
-			if (v.name == "self"){
+		for (Variable &v : f->var)
+			if (v.name == NAME_SELF){
 				param.add(v);
 				break;
 			}
@@ -737,8 +737,8 @@ void SerializerARM::AddFunctionIntro(Function *f)
 	Array<Variable> reg_param;
 	Array<Variable> stack_param;
 	Array<Variable> xmm_param;
-	foreach(Variable &p, param){
-		if ((p.type == TypeInt) || (p.type == TypeChar) || (p.type == TypeBool) || (p.type->is_pointer)){
+	for (Variable &p : param){
+		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 4){
 				reg_param.add(p);
 			}else{
@@ -834,7 +834,7 @@ void SerializerARM::ConvertGlobalRefs()
 		if ((cmd[i].inst == Asm::INST_LDR) and (cmd[i].p[0].kind == KIND_REGISTER) and (cmd[i].p[1].kind == KIND_DEREF_MARKER)){
 			bool found = false;
 			long data;
-			foreach(GlobalRef &r, global_refs){
+			for (GlobalRef &r : global_refs){
 				if (r.label == cmd[i].p[1].p){
 					data = (long)r.p;
 					found = true;

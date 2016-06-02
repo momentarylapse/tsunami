@@ -168,7 +168,7 @@ void add_reg(const string &name, int id, int group, int size, int root = -1)
 
 string GetRegName(int reg)
 {
-	if ((reg < 0) || (reg >= NUM_REGISTERS))
+	if ((reg < 0) or (reg >= NUM_REGISTERS))
 		return "INVALID REG: " + i2s(reg);
 	return RegisterByID[reg]->name;
 }
@@ -531,7 +531,7 @@ InstructionParam param_deref_reg_shift(int reg, int shift, int size)
 	p.size = size;
 	p.deref = true;
 	p.value = shift;
-	p.disp = ((shift < 120) && (shift > -120)) ? DISP_MODE_8 : DISP_MODE_32;
+	p.disp = ((shift < 120) and (shift > -120)) ? DISP_MODE_8 : DISP_MODE_32;
 	return p;
 }
 
@@ -619,7 +619,7 @@ void InstructionWithParamsList::show()
 	msg_write("--------------");
 	state.reset(this);
 	foreachi(Asm::InstructionWithParams &i, *this, n){
-		foreach(Label &l, label)
+		for (Label &l : label)
 			if (l.inst_no == n)
 				msg_write("    " + l.name + ":");
 		msg_write(i.str());
@@ -665,7 +665,7 @@ int InstructionWithParamsList::get_label(const string &name)
 
 void *InstructionWithParamsList::get_label_value(const string &name)
 {
-	foreach(Label &l, label)
+	for (Label &l : label)
 		if (l.name == name)
 			return (void*)l.value;
 	return NULL;
@@ -822,8 +822,8 @@ bool CPUInstruction::match(InstructionWithParams &iwp)
 	if (inst != iwp.inst)
 		return false;
 
-	//return (param1.match(iwp.p[0])) && (param2.match(iwp.p[1]));
-	bool b = (param1.match(iwp.p[0])) && (param2.match(iwp.p[1]));
+	//return (param1.match(iwp.p[0])) and (param2.match(iwp.p[1]));
+	bool b = (param1.match(iwp.p[0])) and (param2.match(iwp.p[1]));
 	/*if (b){
 		msg_write("source: " + iwp.p[0].str() + " " + iwp.p[1].str());
 		print();
@@ -859,7 +859,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 			return false;
 		}
 	// general reg / mem
-	if ((param == Eb) || (param == Eq) || (param == Ew) || (param == Ed) || (param == E48)){
+	if ((param == Eb) or (param == Eq) or (param == Ew) or (param == Ed) or (param == E48)){
 		ip._type_ = PARAMT_INVALID;//ParamTRegisterOrMem;
 		ip.allow_register = true;
 		ip.allow_memory_address = true;
@@ -874,7 +874,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return true;
 	}
 	// xmm reg / mem
-	if ((param == XMd) || (param == XMq) || (param == XMdq)){
+	if ((param == XMd) or (param == XMq) or (param == XMdq)){
 		ip._type_ = PARAMT_INVALID;//ParamTRegisterOrMem;
 		ip.allow_register = true;
 		ip.allow_memory_address = true;
@@ -887,7 +887,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return true;
 	}
 	// general reg (reg)
-	if ((param == Gb) || (param == Gq) || (param == Gw) || (param == Gd)){
+	if ((param == Gb) or (param == Gq) or (param == Gw) or (param == Gd)){
 		ip._type_ = PARAMT_REGISTER;
 		ip.allow_register = true;
 		ip.reg_group = REG_GROUP_GENERAL;
@@ -899,7 +899,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return true;
 	}
 	// general reg (mod)
-	if ((param == Rb) || (param == Rq) || (param == Rw) || (param == Rd)){
+	if ((param == Rb) or (param == Rq) or (param == Rw) or (param == Rd)){
 		ip._type_ = PARAMT_REGISTER;
 		ip.allow_register = true;
 		ip.reg_group = REG_GROUP_GENERAL;
@@ -911,7 +911,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return true;
 	}
 	// immediate
-	if ((param == Ib) || (param == Iq) || (param == Iw) || (param == Id) || (param == I48)){
+	if ((param == Ib) or (param == Iq) or (param == Iw) or (param == Id) or (param == I48)){
 		ip._type_ = PARAMT_IMMEDIATE;
 		ip.allow_immediate = true;
 		if (param == Ib)	ip.size = SIZE_8;
@@ -922,7 +922,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return false;
 	}
 	// immediate (relative)
-	if ((param == Jb) || (param == Jq) || (param == Jw) || (param == Jd)){
+	if ((param == Jb) or (param == Jq) or (param == Jw) or (param == Jd)){
 		ip._type_ = PARAMT_IMMEDIATE;
 		ip.allow_immediate = true;
 		ip.immediate_is_relative = true;
@@ -933,7 +933,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return false;
 	}
 	// mem
-	if ((param == Ob) || (param == Oq) || (param == Ow) || (param == Od)){
+	if ((param == Ob) or (param == Oq) or (param == Ow) or (param == Od)){
 		ip._type_ = PARAMT_MEMORY;
 		ip.allow_memory_address = true;
 		if (param == Ob)	ip.size = SIZE_8;
@@ -943,7 +943,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return false;
 	}
 	// mem
-	if ((param == Mb) || (param == Mq) || (param == Mw) || (param == Md)){
+	if ((param == Mb) or (param == Mq) or (param == Mw) or (param == Md)){
 		ip._type_ = PARAMT_INVALID; // ...
 		ip.allow_memory_address = true;
 		ip.allow_memory_indirect = true;
@@ -956,7 +956,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip)
 		return true;
 	}
 	// control reg
-	if ((param == Cb) || (param == Cd) || (param == Cw) || (param == Cd)){
+	if ((param == Cb) or (param == Cd) or (param == Cw) or (param == Cd)){
 		ip._type_ = PARAMT_REGISTER;
 		ip.allow_register = true;
 		ip.reg_group = REG_GROUP_CONTROL;
@@ -1012,13 +1012,13 @@ void add_inst(int inst, int code, int code_size, int cap, int param1, int param2
 	i.ignore = ignore;
 	bool m1 = _get_inst_param_(param1, i.param1);
 	bool m2 = _get_inst_param_(param2, i.param2);
-	i.has_modrm  = m1 || m2 || (cap >= 0);
+	i.has_modrm  = m1 or m2 or (cap >= 0);
 	i.has_small_param = (opt == OPT_SMALL_PARAM);
 	i.has_small_addr = (opt == OPT_SMALL_ADDR);
 	i.has_big_param = (opt == OPT_BIG_PARAM);
 	i.has_big_addr = (opt == OPT_BIG_ADDR);
-	i.has_fixed_param = (opt != OPT_SMALL_PARAM) && (opt != OPT_MEDIUM_PARAM) && (opt != OPT_BIG_PARAM);
-	if ((i.has_big_param) && (InstructionSet.set != INSTRUCTION_SET_AMD64))
+	i.has_fixed_param = (opt != OPT_SMALL_PARAM) and (opt != OPT_MEDIUM_PARAM) and (opt != OPT_BIG_PARAM);
+	if ((i.has_big_param) and (InstructionSet.set != INSTRUCTION_SET_AMD64))
 		return;
 
 	if (inst == INST_LEA)
@@ -1985,8 +1985,8 @@ inline void UnfuzzyParam(InstructionParam &p, InstructionParamFuzzy &pf)
 	p.reg2 = NULL;
 	p.disp = DISP_MODE_NONE;
 	p.reg = pf.reg;
-	if ((p.reg) && (state.ExtendModRMBase)){
-		if ((p.reg->id >= REG_RAX) && (p.reg->id <= REG_RBP))
+	if ((p.reg) and (state.ExtendModRMBase)){
+		if ((p.reg->id >= REG_RAX) and (p.reg->id <= REG_RBP))
 			p.reg = RegisterByID[p.reg->id + REG_R8 - REG_RAX];
 	}
 	p.size = pf.size;
@@ -2111,7 +2111,7 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 				else
 					p.reg = RegisterByID[GetModRMRegister(rm, SIZE_32, REG_GROUP_GENERAL)];
 			}
-		}else if ((mod == 0x40) || (mod == 0x80)){
+		}else if ((mod == 0x40) or (mod == 0x80)){
 			if (state.AddrSize == SIZE_16){
 				p.type = PARAMT_REGISTER;
 				p.deref = true;
@@ -2143,7 +2143,7 @@ inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigne
 
 inline void TryGetSIB(InstructionParam &p, char *&cur)
 {
-	if ((p.disp == DISP_MODE_SIB) || (p.disp == DISP_MODE_8_SIB)){
+	if ((p.disp == DISP_MODE_SIB) or (p.disp == DISP_MODE_8_SIB)){
 		bool disp8 = (p.disp == DISP_MODE_8_SIB);
 		char sib = *cur;
 		cur++;
@@ -2200,7 +2200,7 @@ inline void ReadParamData(char *&cur, InstructionParam &p, bool has_modrm)
 			memcpy(&p.value, cur, 6);		cur += 6;
 		}*/
 	}else if (p.type == PARAMT_REGISTER){
-		if ((p.disp == DISP_MODE_8) || (p.disp == DISP_MODE_8_REG2) || (p.disp == DISP_MODE_8_SIB)){
+		if ((p.disp == DISP_MODE_8) or (p.disp == DISP_MODE_8_REG2) or (p.disp == DISP_MODE_8_SIB)){
 			*(char*)&p.value = *cur;		cur ++;
 		}else if (p.disp == DISP_MODE_16){
 			*(short*)&p.value = *(short*)cur;		cur += 2;
@@ -2638,7 +2638,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 
 		// instruction
 		CPUInstruction *inst = NULL;
-		foreach(CPUInstruction &ci, CPUInstructions){
+		for (CPUInstruction &ci : CPUInstructions){
 			if (ci.code_size == 0)
 				continue;
 			if (!ci.has_fixed_param){
@@ -2655,7 +2655,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 			// cap correct?
 			if (ci.cap >= 0)
 				ok &= ((unsigned char)ci.cap == (((unsigned)cur[ci.code_size] >> 3) & 0x07));
-			if ((ok) && (ci.has_modrm)){
+			if ((ok) and (ci.has_modrm)){
 				InstructionParam p1, p2;
 				UnfuzzyParam(p1, ci.param1);
 				UnfuzzyParam(p2, ci.param2);
@@ -2664,9 +2664,9 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 				char modrm = cur[ci.code_size];
 				GetFromModRM(p1, ci.param1, modrm);
 				GetFromModRM(p2, ci.param2, modrm);
-				if ((p1.type == PARAMT_REGISTER) && (!p1.deref) && (!ci.param1.allow_register))
+				if ((p1.type == PARAMT_REGISTER) and (!p1.deref) and (!ci.param1.allow_register))
 					continue;
-				if ((p2.type == PARAMT_REGISTER) && (!p2.deref) && (!ci.param2.allow_register))
+				if ((p2.type == PARAMT_REGISTER) and (!p2.deref) and (!ci.param2.allow_register))
 					continue;
 			}
 			if (ok){
@@ -2712,7 +2712,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 			str += inst->name;
 
 			// parameters
-			if ((state.ParamSize != state.DefaultSize) && ((p1.type != PARAMT_REGISTER) || (p1.deref)) && ((p2.type != PARAMT_REGISTER) || p2.deref)){
+			if ((state.ParamSize != state.DefaultSize) and ((p1.type != PARAMT_REGISTER) or (p1.deref)) and ((p2.type != PARAMT_REGISTER) or p2.deref)){
 				if (state.ParamSize == SIZE_16)
 					str += " word";
 				else if (state.ParamSize == SIZE_32)
@@ -2746,7 +2746,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 		}
 
 		// done?
-		if ((length < 0) && (((unsigned char)opcode[0] == 0xc3) || ((unsigned char)opcode[0] == 0xc2)))
+		if ((length < 0) and (((unsigned char)opcode[0] == 0xc3) or ((unsigned char)opcode[0] == 0xc2)))
 			break;
 	}
 	return bufstr;
@@ -2784,13 +2784,13 @@ bool IgnoreUnimportant(int &pos)
 			CommentLine = false;
 		}
 		// "white space"
-		if ((code_buffer[pos] == '\n') || (code_buffer[pos] == ' ') || (code_buffer[pos] == '\t')){
+		if ((code_buffer[pos] == '\n') or (code_buffer[pos] == ' ') or (code_buffer[pos] == '\t')){
 			pos ++;
 			state.ColumnNo ++;
 			continue;
 		}
 		// comments
-		if ((code_buffer[pos] == ';') || ((code_buffer[pos] == '/') && (code_buffer[pos] == '/'))){
+		if ((code_buffer[pos] == ';') or ((code_buffer[pos] == '/') and (code_buffer[pos] == '/'))){
 			CommentLine = true;
 			pos ++;
 			state.ColumnNo ++;
@@ -2821,7 +2821,7 @@ string FindMnemonic(int &pos)
 		mne[i + 1] = 0;
 		
 		// string like stuff
-		if ((mne[i] == '\'') || (mne[i] == '\"'))
+		if ((mne[i] == '\'') or (mne[i] == '\"'))
 			in_string =! in_string;
 		// end of code
 		if (code_buffer[pos] == 0){
@@ -2838,15 +2838,15 @@ string FindMnemonic(int &pos)
 		}
 		if (!in_string){
 			// "white space" -> complete
-			if ((code_buffer[pos] == ' ') || (code_buffer[pos] == '\t') || (code_buffer[pos] == ',')){
+			if ((code_buffer[pos] == ' ') or (code_buffer[pos] == '\t') or (code_buffer[pos] == ',')){
 				mne[i] = 0;
 				// end of line?
 				for (int j=0;j<128;j++){
-					if ((code_buffer[pos+j] != ' ') && (code_buffer[pos+j] != '\t') && (code_buffer[pos+j] != ',')){
-						if ((code_buffer[pos + j] == 0) || (code_buffer[pos + j] == '\n'))
+					if ((code_buffer[pos+j] != ' ') and (code_buffer[pos+j] != '\t') and (code_buffer[pos+j] != ',')){
+						if ((code_buffer[pos + j] == 0) or (code_buffer[pos + j] == '\n'))
 							state.EndOfLine = true;
 						// comment ending the line
-						if ((code_buffer[pos + j] == ';') || ((code_buffer[pos + j] == '/') && (code_buffer[pos + j + 1] == '/')))
+						if ((code_buffer[pos + j] == ';') or ((code_buffer[pos + j] == '/') and (code_buffer[pos + j + 1] == '/')))
 							state.EndOfLine = true;
 						pos += j;
 						state.ColumnNo += j;
@@ -2884,7 +2884,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		p.type = PARAMT_NONE;
 
 	// deref
-	}else if ((param[0] == '[') && (param[param.num-1] == ']')){
+	}else if ((param[0] == '[') and (param[param.num-1] == ']')){
 		if (DebugAsm)
 			printf("deref:   ");
 		so("Deref:");
@@ -2895,7 +2895,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		//use_mode16 = u16;
 
 	// string
-	}else if ((param[0] == '\"') && (param[param.num-1] == '\"')){
+	}else if ((param[0] == '\"') and (param[param.num-1] == '\"')){
 		if (DebugAsm)
 			printf("String:   ");
 		char *ps = new char[param.num - 1];
@@ -2912,7 +2912,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		// first part (must be a register)
 		string part;
 		for (int i=0;i<param.num;i++)
-			if ((param[i] == ' ') || (param[i] == '+'))
+			if ((param[i] == ' ') or (param[i] == '+'))
 				break;
 			else
 				part.add(param[i]);
@@ -2928,7 +2928,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 
 		// second part (...up till now only hex)
 		for (int i=offset;i<param.num;i++)
-			if ((param[i] != ' ') && (param[i] != '+')){
+			if ((param[i] != ' ') and (param[i] != '+')){
 				offset = i;
 				break;
 			}
@@ -2947,18 +2947,18 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		
 
 	// hex const
-	}else if ((param[0] == '0') && (param[1] == 'x')){
+	}else if ((param[0] == '0') and (param[1] == 'x')){
 		p.type = PARAMT_IMMEDIATE;
 		long long v = 0;
 		for (int i=2;i<param.num;i++){
 			if (param[i] == '.'){
-			}else if ((param[i] >= 'a') && (param[i] <= 'f')){
+			}else if ((param[i] >= 'a') and (param[i] <= 'f')){
 				v *= 16;
 				v += param[i] - 'a' + 10;
-			}else if ((param[i] >= 'A') && (param[i] <= 'F')){
+			}else if ((param[i] >= 'A') and (param[i] <= 'F')){
 				v *= 16;
 				v += param[i]-'A'+10;
-			}else if ((param[i]>='0')&&(param[i]<='9')){
+			}else if ((param[i]>='0')and(param[i]<='9')){
 				v*=16;
 				v+=param[i]-'0';
 			/*}else if (param[i]==':'){
@@ -2996,7 +2996,7 @@ void GetParam(InstructionParam &p, const string &param, InstructionWithParamsLis
 		}
 
 	// char const
-	}else if ((param[0] == '\'') && (param[param.num - 1] == '\'')){
+	}else if ((param[0] == '\'') and (param[param.num - 1] == '\'')){
 		p = param_imm((long)param[1], SIZE_8);
 		if (DebugAsm)
 			printf("hex const:  %s\n",d2h((char*)&p.value,1).c_str());
@@ -3090,7 +3090,7 @@ void OpcodeAddImmideate(char *oc, int &ocs, InstructionParam &p, CPUInstruction 
 	}else
 		return;
 
-	bool rel = ((inst.name[0] == 'j') /*&& (inst.param1._type_ != ParamTImmediateDouble)*/) || (inst.name == "call") || (inst.name.find("loop") >= 0);
+	bool rel = ((inst.name[0] == 'j') /*and (inst.param1._type_ != ParamTImmediateDouble)*/) or (inst.name == "call") or (inst.name.find("loop") >= 0);
 	if (inst.inst == INST_JMP_FAR)
 		rel = false;
 	if (p.is_label){
@@ -3192,7 +3192,7 @@ void InstructionWithParamsList::AppendFromSource(const string &_code)
 		// find parameters
 		if (!state.EndOfLine){
 			param1 = FindMnemonic(pos);
-			if ((param1 == "dword") || (param1 == "word") || (param1 == "qword")){
+			if ((param1 == "dword") or (param1 == "word") or (param1 == "qword")){
 				if (param1 == "word")
 					state.ParamSize = SIZE_16;
 				else if (param1 == "dword")
@@ -3221,7 +3221,7 @@ void InstructionWithParamsList::AppendFromSource(const string &_code)
 		GetParam(p1, param1, *this, 0);
 		GetParam(p2, param2, *this, 1);
 		GetParam(p3, param3, *this, 1);
-		if ((p1.type == PARAMT_INVALID) || (p2.type == PARAMT_INVALID) || (p3.type == PARAMT_INVALID))
+		if ((p1.type == PARAMT_INVALID) or (p2.type == PARAMT_INVALID) or (p3.type == PARAMT_INVALID))
 			return;
 
 	// special stuff
@@ -3259,7 +3259,7 @@ void InstructionWithParamsList::AppendFromSource(const string &_code)
 		}else if (cmd == "dd"){
 			so("Daten:   4 byte");
 			add_data_inst(this, 4);
-		}/*else if ((cmd == "ds") || (cmd == "dz")){
+		}/*else if ((cmd == "ds") or (cmd == "dz")){
 			so("Daten:   String");
 			char *s = (char*)p1.value;
 			int l=strlen(s);
@@ -3353,9 +3353,9 @@ inline bool _size_match_(InstructionParamFuzzy &inst_p, InstructionParam &wanted
 	if (wanted_p.reg)
 		if ((inst_p.reg_group == REG_GROUP_XMM) and (wanted_p.reg->group == REG_GROUP_XMM))
 			return true;
-	if ((inst_p.size == SIZE_UNKNOWN) || (wanted_p.size == SIZE_UNKNOWN))
+	if ((inst_p.size == SIZE_UNKNOWN) or (wanted_p.size == SIZE_UNKNOWN))
 		return true;
-/*	if ((inst_p.size == SizeVariable) && ((wanted_p.size == Size16) || (wanted_p.size == Size32)))
+/*	if ((inst_p.size == SizeVariable) and ((wanted_p.size == Size16) or (wanted_p.size == Size32)))
 		return true;*/
 	return false;
 }
@@ -3363,7 +3363,7 @@ inline bool _size_match_(InstructionParamFuzzy &inst_p, InstructionParam &wanted
 inline bool _deref_match_(InstructionParamFuzzy &inst_p, InstructionParam &wanted_p)
 {
 	if (wanted_p.deref)
-		return (inst_p.allow_memory_address) || (inst_p.allow_memory_indirect);
+		return (inst_p.allow_memory_address) or (inst_p.allow_memory_indirect);
 	return true;
 }
 
@@ -3372,8 +3372,8 @@ bool InstructionParamFuzzy::match(InstructionParam &wanted_p)
 	//ParamFuzzyOut(&inst_p);
 	
 	// none
-	if ((wanted_p.type == PARAMT_NONE) || (!used))
-		return (wanted_p.type == PARAMT_NONE) && (!used);
+	if ((wanted_p.type == PARAMT_NONE) or (!used))
+		return (wanted_p.type == PARAMT_NONE) and (!used);
 
 	// xmm register...
 	if ((allow_register) and (wanted_p.type == PARAMT_REGISTER) and (wanted_p.reg)){
@@ -3382,15 +3382,15 @@ bool InstructionParamFuzzy::match(InstructionParam &wanted_p)
 	}
 
 	// size mismatch?
-	if ((size != SIZE_UNKNOWN) && (wanted_p.size != SIZE_UNKNOWN))
+	if ((size != SIZE_UNKNOWN) and (wanted_p.size != SIZE_UNKNOWN))
 		if (size != wanted_p.size)
 			return false;
 
 	// immediate
 	if (wanted_p.type == PARAMT_IMMEDIATE){
-		if ((allow_memory_address) && (wanted_p.deref))
+		if ((allow_memory_address) and (wanted_p.deref))
 			return true;
-		if ((allow_immediate) && (!wanted_p.deref)){
+		if ((allow_immediate) and (!wanted_p.deref)){
 			//msg_write("imm " + SizeOut(inst_p.size) + " " + SizeOut(wanted_p.size));
 			return (size == wanted_p.size);
 		}
@@ -3407,26 +3407,26 @@ bool InstructionParamFuzzy::match(InstructionParam &wanted_p)
 	// reg
 	if (wanted_p.type == PARAMT_REGISTER){
 		// direct match
-		if ((allow_register) && (reg)){
+		if ((allow_register) and (reg)){
 			if (wanted_p.reg){
-				if ((reg->id >= REG_RAX) && (reg->id <= REG_RBP) && (wanted_p.reg->id == reg->id + REG_R8 - REG_RAX))
+				if ((reg->id >= REG_RAX) and (reg->id <= REG_RBP) and (wanted_p.reg->id == reg->id + REG_R8 - REG_RAX))
 					return true;
 			}
-			return ((reg == wanted_p.reg) && (_deref_match_(*this, wanted_p)));
+			return ((reg == wanted_p.reg) and (_deref_match_(*this, wanted_p)));
 		}
 		// fuzzy match
 		/*if (inst_p.allow_register){
 			msg_write("r2");
 			
-			return ((inst_p.reg_group == wanted_p.reg->group) && (_size_match_(inst_p, wanted_p)) && (_deref_match_(inst_p, wanted_p)));
+			return ((inst_p.reg_group == wanted_p.reg->group) and (_size_match_(inst_p, wanted_p)) and (_deref_match_(inst_p, wanted_p)));
 		}*/
 		// very fuzzy match
-		if ((allow_register) || (allow_memory_indirect)){
+		if ((allow_register) or (allow_memory_indirect)){
 			if (wanted_p.deref){
 				if (allow_memory_indirect)
-					return ((REG_GROUP_GENERAL == wanted_p.reg->group) && (_deref_match_(*this, wanted_p)));
+					return ((REG_GROUP_GENERAL == wanted_p.reg->group) and (_deref_match_(*this, wanted_p)));
 			}else if (allow_register)
-				return ((reg_group == wanted_p.reg->group) && (_size_match_(*this, wanted_p))); // FIXME (correct?)
+				return ((reg_group == wanted_p.reg->group) and (_size_match_(*this, wanted_p))); // FIXME (correct?)
 		}
 	}
 
@@ -3437,15 +3437,15 @@ bool InstructionParamFuzzy::match(InstructionParam &wanted_p)
 int GetModRMReg(Register *r)
 {
 	int id = r->id;
-	if ((id == REG_R8)  || (id == REG_R8D)  || (id == REG_RAX) || (id == REG_EAX) || (id == REG_AX) || (id == REG_AL))	return 0x00;
-	if ((id == REG_R9)  || (id == REG_R9D)  || (id == REG_RCX) || (id == REG_ECX) || (id == REG_CX) || (id == REG_CL))	return 0x01;
-	if ((id == REG_R10) || (id == REG_R10D) || (id == REG_RDX) || (id == REG_EDX) || (id == REG_DX) || (id == REG_DL))	return 0x02;
-	if ((id == REG_R11) || (id == REG_R11D) || (id == REG_RBX) || (id == REG_EBX) || (id == REG_BX) || (id == REG_BL))	return 0x03;
-	if ((id == REG_R12) || (id == REG_R12D) || (id == REG_RSP) || (id == REG_ESP) || (id == REG_SP) || (id == REG_AH))	return 0x04;
-	if ((id == REG_R13) || (id == REG_R13D) || (id == REG_RBP) || (id == REG_EBP) || (id == REG_BP) || (id == REG_CH))	return 0x05;
-	if ((id == REG_R14) || (id == REG_R14D) || (id == REG_RSI) || (id == REG_ESI) || (id == REG_SI) || (id == REG_DH))	return 0x06;
-	if ((id == REG_R15) || (id == REG_R15D) || (id == REG_RDI) || (id == REG_EDI) || (id == REG_DI) || (id == REG_BH))	return 0x07;
-	if ((id >= REG_XMM0) && (id <= REG_XMM7))	return (id - REG_XMM0);
+	if ((id == REG_R8)  or (id == REG_R8D)  or (id == REG_RAX) or (id == REG_EAX) or (id == REG_AX) or (id == REG_AL))	return 0x00;
+	if ((id == REG_R9)  or (id == REG_R9D)  or (id == REG_RCX) or (id == REG_ECX) or (id == REG_CX) or (id == REG_CL))	return 0x01;
+	if ((id == REG_R10) or (id == REG_R10D) or (id == REG_RDX) or (id == REG_EDX) or (id == REG_DX) or (id == REG_DL))	return 0x02;
+	if ((id == REG_R11) or (id == REG_R11D) or (id == REG_RBX) or (id == REG_EBX) or (id == REG_BX) or (id == REG_BL))	return 0x03;
+	if ((id == REG_R12) or (id == REG_R12D) or (id == REG_RSP) or (id == REG_ESP) or (id == REG_SP) or (id == REG_AH))	return 0x04;
+	if ((id == REG_R13) or (id == REG_R13D) or (id == REG_RBP) or (id == REG_EBP) or (id == REG_BP) or (id == REG_CH))	return 0x05;
+	if ((id == REG_R14) or (id == REG_R14D) or (id == REG_RSI) or (id == REG_ESI) or (id == REG_SI) or (id == REG_DH))	return 0x06;
+	if ((id == REG_R15) or (id == REG_R15D) or (id == REG_RDI) or (id == REG_EDI) or (id == REG_DI) or (id == REG_BH))	return 0x07;
+	if ((id >= REG_XMM0) and (id <= REG_XMM7))	return (id - REG_XMM0);
 	SetError("GetModRMReg: register not allowed: " + r->name);
 	return 0;
 }
@@ -3474,18 +3474,18 @@ inline int CreatePartialModRMByte(InstructionParamFuzzy &pf, InstructionParam &p
 	}else if (pf.mrm_mode == MRM_MOD_RM){
 		if (p.deref){
 			if (state.AddrSize == SIZE_16){
-				if ((p.type == PARAMT_IMMEDIATE) && (p.deref))	return 0x06;
+				if ((p.type == PARAMT_IMMEDIATE) and (p.deref))	return 0x06;
 			}else{
-				if ((r == REG_EAX) || (r == REG_RAX))	return (p.disp == DISP_MODE_NONE) ? 0x00 : ((p.disp == DISP_MODE_8) ? 0x40 : 0x80); // default = DispMode32
-				if ((r == REG_ECX) || (r == REG_RCX))	return (p.disp == DISP_MODE_NONE) ? 0x01 : ((p.disp == DISP_MODE_8) ? 0x41 : 0x81);
-				if ((r == REG_EDX) || (r == REG_RDX))	return (p.disp == DISP_MODE_NONE) ? 0x02 : ((p.disp == DISP_MODE_8) ? 0x42 : 0x82);
-				if ((r == REG_EBX) || (r == REG_RBX))	return (p.disp == DISP_MODE_NONE) ? 0x03 : ((p.disp == DISP_MODE_8) ? 0x43 : 0x83);
+				if ((r == REG_EAX) or (r == REG_RAX))	return (p.disp == DISP_MODE_NONE) ? 0x00 : ((p.disp == DISP_MODE_8) ? 0x40 : 0x80); // default = DispMode32
+				if ((r == REG_ECX) or (r == REG_RCX))	return (p.disp == DISP_MODE_NONE) ? 0x01 : ((p.disp == DISP_MODE_8) ? 0x41 : 0x81);
+				if ((r == REG_EDX) or (r == REG_RDX))	return (p.disp == DISP_MODE_NONE) ? 0x02 : ((p.disp == DISP_MODE_8) ? 0x42 : 0x82);
+				if ((r == REG_EBX) or (r == REG_RBX))	return (p.disp == DISP_MODE_NONE) ? 0x03 : ((p.disp == DISP_MODE_8) ? 0x43 : 0x83);
 				// sib			return 4;
 				// disp32		return 5;
-				if ((p.type == PARAMT_IMMEDIATE) && (p.deref))	return 0x05;
-				if ((r == REG_EBP) || (r == REG_RBP))	return (p.disp == DISP_MODE_8) ? 0x45 : 0x85;
-				if ((r == REG_ESI) || (r == REG_RSI))	return (p.disp == DISP_MODE_NONE) ? 0x06 : ((p.disp == DISP_MODE_8) ? 0x46 : 0x86);
-				if ((r == REG_EDI) || (r == REG_RDI))	return (p.disp == DISP_MODE_NONE) ? 0x07 : ((p.disp == DISP_MODE_8) ? 0x47 : 0x87);
+				if ((p.type == PARAMT_IMMEDIATE) and (p.deref))	return 0x05;
+				if ((r == REG_EBP) or (r == REG_RBP))	return (p.disp == DISP_MODE_8) ? 0x45 : 0x85;
+				if ((r == REG_ESI) or (r == REG_RSI))	return (p.disp == DISP_MODE_NONE) ? 0x06 : ((p.disp == DISP_MODE_8) ? 0x46 : 0x86);
+				if ((r == REG_EDI) or (r == REG_RDI))	return (p.disp == DISP_MODE_NONE) ? 0x07 : ((p.disp == DISP_MODE_8) ? 0x47 : 0x87);
 			}
 		}else{
 			int mrm = GetModRMReg(p.reg) | 0xc0;
@@ -3513,7 +3513,7 @@ void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionP
 	//---msg_write("add inst " + inst.name);
 
 	// 16/32 bit toggle prefix
-	if ((!inst.has_fixed_param) && (inst.has_small_param != (state.DefaultSize == SIZE_16)))
+	if ((!inst.has_fixed_param) and (inst.has_small_param != (state.DefaultSize == SIZE_16)))
 		append_val(oc, ocs, 0x66, 1);
 
 	int mod_rm = 0;
@@ -3522,8 +3522,8 @@ void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionP
 
 	// REX prefix
 	char rex = mod_rm >> 8;
-	if ((inst.param1.reg) && (p1.reg))
-		if ((inst.param1.reg->id >= REG_RAX) && (inst.param1.reg->id <= REG_RBP) && (inst.param1.reg->id == p1.reg->id + REG_RAX - REG_R8))
+	if ((inst.param1.reg) and (p1.reg))
+		if ((inst.param1.reg->id >= REG_RAX) and (inst.param1.reg->id <= REG_RBP) and (inst.param1.reg->id == p1.reg->id + REG_RAX - REG_R8))
 			rex = 0x01;
 	if (inst.has_big_param)//state.ParamSize == Size64)
 		rex |= 0x08;
@@ -3561,8 +3561,8 @@ void InstructionWithParamsList::AddInstruction(char *oc, int &ocs, int n)
 	int ninst = -1;
 	bool has_mod_rm = false;
 	foreachi(CPUInstruction &c, CPUInstructions, i)
-		if ((!c.ignore) && (c.match(iwp))){
-			if (((!c.has_modrm) && (has_mod_rm)) || (ninst < 0)){
+		if ((!c.ignore) and (c.match(iwp))){
+			if (((!c.has_modrm) and (has_mod_rm)) or (ninst < 0)){
 				has_mod_rm = c.has_modrm;
 				ninst = i;
 			}
@@ -3570,12 +3570,12 @@ void InstructionWithParamsList::AddInstruction(char *oc, int &ocs, int n)
 
 /*	// try again with REX prefix?
  // now done automatically...!
-	if ((ninst < 0) && (InstructionSet.set == InstructionSetAMD64)){
+	if ((ninst < 0) and (InstructionSet.set == InstructionSetAMD64)){
 		state.ParamSize = Size64;
 
 		for (int i=0;i<CPUInstructions.num;i++)
 			if (CPUInstructions[i].match(iwp)){
-				if (((!CPUInstructions[i].has_modrm) && (has_mod_rm)) || (ninst < 0)){
+				if (((!CPUInstructions[i].has_modrm) and (has_mod_rm)) or (ninst < 0)){
 					has_mod_rm = CPUInstructions[i].has_modrm;
 					ninst = i;
 				}
@@ -3909,7 +3909,7 @@ void InstructionWithParamsList::ShrinkJumps(void *oc, int ocs)
 
 	// try shrinking
 	foreachi(InstructionWithParams &iwp, *this, i){
-		if ((iwp.inst == INST_JMP) || (iwp.inst == INST_JZ) || (iwp.inst == INST_JNZ) || (iwp.inst == INST_JL) || (iwp.inst == INST_JNL) || (iwp.inst == INST_JLE) || (iwp.inst == INST_JNLE)){
+		if ((iwp.inst == INST_JMP) or (iwp.inst == INST_JZ) or (iwp.inst == INST_JNZ) or (iwp.inst == INST_JL) or (iwp.inst == INST_JNL) or (iwp.inst == INST_JLE) or (iwp.inst == INST_JNLE)){
 			if (iwp.p[0].is_label){
 				int target = label[(int)iwp.p[0].value].inst_no;
 
@@ -3947,7 +3947,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 
 	for (int i=0;i<num+1;i++){
 		// bit change
-		foreach(BitChange &b, CurrentMetaInfo->bit_change)
+		for (BitChange &b : CurrentMetaInfo->bit_change)
 			if (b.cmd_pos == i){
 				state.DefaultSize = SIZE_32;
 				if (b.bits == 16)
@@ -3957,7 +3957,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 			}
 
 		// data?
-		foreach(AsmData &d, CurrentMetaInfo->data)
+		for (AsmData &d : CurrentMetaInfo->data)
 			if (d.cmd_pos == i)
 				d.offset = ocs;
 
@@ -3979,7 +3979,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 
 	LinkWantedLabels(oc);
 
-	foreach(WantedLabel &l, wanted_label){
+	for (WantedLabel &l : wanted_label){
 		state.LineNo = (*this)[l.inst_no].line;
 		state.ColumnNo = (*this)[l.inst_no].col;
 		SetError("undeclared label used: " + l.name);
@@ -4014,7 +4014,7 @@ bool ImmediateAllowed(int inst)
 {
 	for (int i=0;i<CPUInstructions.num;i++)
 		if (CPUInstructions[i].inst == inst)
-			if ((CPUInstructions[i].param1.allow_immediate) || (CPUInstructions[i].param2.allow_immediate))
+			if ((CPUInstructions[i].param1.allow_immediate) or (CPUInstructions[i].param2.allow_immediate))
 				return true;
 	return false;
 }

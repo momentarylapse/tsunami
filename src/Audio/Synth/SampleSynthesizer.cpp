@@ -15,7 +15,7 @@ SampleSynthesizer::SampleSynthesizer()
 
 SampleSynthesizer::~SampleSynthesizer()
 {
-	foreach(SampleRef *s, samples)
+	for (SampleRef *s : samples)
 		if (s)
 			delete(s);
 }
@@ -32,7 +32,7 @@ void SampleSynthesizer::__delete__()
 
 void SampleSynthesizer::renderNote(BufferBox& buf, const Range& range, float pitch, float volume)
 {
-	if ((pitch < 0) || (pitch >= samples.num))
+	if ((pitch < 0) or (pitch >= samples.num))
 		return;
 	SampleRef *s = samples[pitch];
 	if (!s)

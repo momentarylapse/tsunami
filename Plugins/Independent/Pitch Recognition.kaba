@@ -91,7 +91,7 @@ class PitchRecognitionDialog : Dialog
 		input.removeObserver(self)
 		input.stop()
 		delete input
-		plugin.end()
+		plugin.stop()
 
 	void updateInput()
 		int available = input.current_buffer.available()
@@ -139,6 +139,6 @@ class PitchRecognition : TsunamiPlugin
 	override void onStart()
 		dlg = new PitchRecognitionDialog(self)
 		dlg.show()
-	override void onEnd()
+	override void onStop()
 		delete dlg
 	

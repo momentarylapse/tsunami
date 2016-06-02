@@ -81,15 +81,15 @@ void PluginManager::LinkAppScriptData()
 
 	PluginData plugin_data;
 	Script::DeclareClassSize("PluginData", sizeof(PluginData));
-	Script::LinkExternal("PluginData.__init__", Script::mf(&PluginData::__init__));
-	Script::DeclareClassVirtualIndex("PluginData", "__delete__", Script::mf(&PluginData::__delete__), &plugin_data);
+	Script::LinkExternal("PluginData." + Script::NAME_FUNC_INIT, Script::mf(&PluginData::__init__));
+	Script::DeclareClassVirtualIndex("PluginData", Script::NAME_FUNC_DELETE, Script::mf(&PluginData::__delete__), &plugin_data);
 	Script::DeclareClassVirtualIndex("PluginData", "reset", Script::mf(&PluginData::reset), &plugin_data);
 
 
 	ConfigPanel config_panel;
 	Script::DeclareClassSize("ConfigPanel", sizeof(ConfigPanel));
-	Script::LinkExternal("ConfigPanel.__init__", Script::mf(&ConfigPanel::__init__));
-	Script::DeclareClassVirtualIndex("ConfigPanel", "__delete__", Script::mf(&ConfigPanel::__delete__), &config_panel);
+	Script::LinkExternal("ConfigPanel." + Script::NAME_FUNC_INIT, Script::mf(&ConfigPanel::__init__));
+	Script::DeclareClassVirtualIndex("ConfigPanel", Script::NAME_FUNC_DELETE, Script::mf(&ConfigPanel::__delete__), &config_panel);
 	Script::DeclareClassVirtualIndex("ConfigPanel", "update", Script::mf(&ConfigPanel::update), &config_panel);
 	Script::LinkExternal("ConfigPanel.notify", Script::mf(&ConfigPanel::notify));
 	Script::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
@@ -105,8 +105,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioEffect", "track", _offsetof(Effect, track));
 	Script::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
 	Script::DeclareClassOffset("AudioEffect", "level", _offsetof(Effect, level));
-	Script::LinkExternal("AudioEffect.__init__", Script::mf(&Effect::__init__));
-	Script::DeclareClassVirtualIndex("AudioEffect", "__delete__", Script::mf(&Effect::__delete__), &effect);
+	Script::LinkExternal("AudioEffect." + Script::NAME_FUNC_INIT, Script::mf(&Effect::__init__));
+	Script::DeclareClassVirtualIndex("AudioEffect", Script::NAME_FUNC_DELETE, Script::mf(&Effect::__delete__), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "process", Script::mf(&Effect::processTrack), &effect);
 	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::createPanel), &effect);
 	Script::LinkExternal("AudioEffect.resetConfig", Script::mf(&Effect::resetConfig));
@@ -122,8 +122,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("MidiEffect", "range", _offsetof(MidiEffect, range));
 	Script::DeclareClassOffset("MidiEffect", "usable", _offsetof(MidiEffect, usable));
 	Script::DeclareClassOffset("MidiEffect", "song", _offsetof(MidiEffect, song));
-	Script::LinkExternal("MidiEffect.__init__", Script::mf(&MidiEffect::__init__));
-	Script::DeclareClassVirtualIndex("MidiEffect", "__delete__", Script::mf(&MidiEffect::__delete__), &midieffect);
+	Script::LinkExternal("MidiEffect." + Script::NAME_FUNC_INIT, Script::mf(&MidiEffect::__init__));
+	Script::DeclareClassVirtualIndex("MidiEffect", Script::NAME_FUNC_DELETE, Script::mf(&MidiEffect::__delete__), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "process", Script::mf(&MidiEffect::process), &midieffect);
 	Script::DeclareClassVirtualIndex("MidiEffect", "createPanel", Script::mf(&MidiEffect::createPanel), &midieffect);
 	Script::LinkExternal("MidiEffect.resetConfig", Script::mf(&MidiEffect::resetConfig));
@@ -139,10 +139,10 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, c[0]));
 	Script::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, c[1]));
 	Script::DeclareClassOffset("BufferBox", "peaks", _offsetof(BufferBox, peaks));
-	Script::LinkExternal("BufferBox.__init__", Script::mf(&BufferBox::__init__));
-	Script::LinkExternal("BufferBox.__delete__", Script::mf(&BufferBox::__delete__));
+	Script::LinkExternal("BufferBox." + Script::NAME_FUNC_INIT, Script::mf(&BufferBox::__init__));
+	Script::LinkExternal("BufferBox." + Script::NAME_FUNC_DELETE, Script::mf(&BufferBox::__delete__));
 	Script::LinkExternal("BufferBox.clear", Script::mf(&BufferBox::clear));
-	Script::LinkExternal("BufferBox.__assign__", Script::mf(&BufferBox::__assign__));
+	Script::LinkExternal("BufferBox." + Script::NAME_FUNC_ASSIGN, Script::mf(&BufferBox::__assign__));
 	Script::LinkExternal("BufferBox.range", Script::mf(&BufferBox::range));
 	Script::LinkExternal("BufferBox.add", Script::mf(&BufferBox::add));
 	Script::LinkExternal("BufferBox.set", Script::mf(&BufferBox::set));
@@ -150,7 +150,7 @@ void PluginManager::LinkAppScriptData()
 
 
 	Script::DeclareClassSize("RingBuffer", sizeof(RingBuffer));
-	//Script::LinkExternal("RingBuffer.__init__", Script::mf(&RingBuffer::__init__));
+	//Script::LinkExternal("RingBuffer." + Script::NAME_FUNC_INIT, Script::mf(&RingBuffer::__init__));
 	Script::LinkExternal("RingBuffer.available", Script::mf(&RingBuffer::available));
 	Script::LinkExternal("RingBuffer.read", Script::mf(&RingBuffer::read));
 	Script::LinkExternal("RingBuffer.write", Script::mf(&RingBuffer::write));
@@ -177,13 +177,13 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
 	Script::DeclareClassOffset("SampleRef", "midi", _offsetof(SampleRef, midi));
 	Script::DeclareClassOffset("SampleRef", "origin", _offsetof(SampleRef, origin));
-	Script::LinkExternal("SampleRef.__init__", Script::mf(&SampleRef::__init__));
-	Script::DeclareClassVirtualIndex("SampleRef", "__delete__", Script::mf(&SampleRef::__delete__), &sampleref);
+	Script::LinkExternal("SampleRef." + Script::NAME_FUNC_INIT, Script::mf(&SampleRef::__init__));
+	Script::DeclareClassVirtualIndex("SampleRef", Script::NAME_FUNC_DELETE, Script::mf(&SampleRef::__delete__), &sampleref);
 
 	MidiSource midi_source;
 	Script::DeclareClassSize("MidiSource", sizeof(MidiSource));
-	Script::LinkExternal("MidiSource.__init__", Script::mf(&MidiSource::__init__));
-	Script::DeclareClassVirtualIndex("MidiSource", "__delete__", Script::mf(&MidiSource::__delete__), &midi_source);
+	Script::LinkExternal("MidiSource." + Script::NAME_FUNC_INIT, Script::mf(&MidiSource::__init__));
+	Script::DeclareClassVirtualIndex("MidiSource", Script::NAME_FUNC_DELETE, Script::mf(&MidiSource::__delete__), &midi_source);
 	Script::DeclareClassVirtualIndex("MidiSource", "read", Script::mf(&MidiSource::read), &midi_source);
 
 	Synthesizer synth;
@@ -195,8 +195,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Synthesizer", "active_pitch", _offsetof(Synthesizer, active_pitch));
 	Script::DeclareClassOffset("Synthesizer", "freq", _offsetof(Synthesizer, tuning.freq));
 	Script::DeclareClassOffset("Synthesizer", "delta_phi", _offsetof(Synthesizer, delta_phi));
-	Script::LinkExternal("Synthesizer.__init__", Script::mf(&Synthesizer::__init__));
-	Script::DeclareClassVirtualIndex("Synthesizer", "__delete__", Script::mf(&Synthesizer::__delete__), &synth);
+	Script::LinkExternal("Synthesizer." + Script::NAME_FUNC_INIT, Script::mf(&Synthesizer::__init__));
+	Script::DeclareClassVirtualIndex("Synthesizer", Script::NAME_FUNC_DELETE, Script::mf(&Synthesizer::__delete__), &synth);
 	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::createPanel), &synth);
 	Script::LinkExternal("Synthesizer.resetConfig", Script::mf(&Synthesizer::resetConfig));
 	Script::LinkExternal("Synthesizer.resetState", Script::mf(&Synthesizer::resetState));
@@ -209,8 +209,8 @@ void PluginManager::LinkAppScriptData()
 
 	MidiRenderer midiren(NULL, NULL);
 	Script::DeclareClassSize("MidiRenderer", sizeof(MidiRenderer));
-	Script::LinkExternal("MidiRenderer.__init__", Script::mf(&MidiRenderer::__init__));
-	Script::DeclareClassVirtualIndex("MidiRenderer", "__delete__", Script::mf(&MidiRenderer::__delete__), &midiren);
+	Script::LinkExternal("MidiRenderer." + Script::NAME_FUNC_INIT, Script::mf(&MidiRenderer::__init__));
+	Script::DeclareClassVirtualIndex("MidiRenderer", Script::NAME_FUNC_DELETE, Script::mf(&MidiRenderer::__delete__), &midiren);
 	Script::DeclareClassVirtualIndex("MidiRenderer", "read", Script::mf(&MidiRenderer::read), &midiren);
 	Script::DeclareClassVirtualIndex("MidiRenderer", "reset", Script::mf(&MidiRenderer::reset), &midiren);
 	Script::DeclareClassVirtualIndex("MidiRenderer", "getSampleRate", Script::mf(&MidiRenderer::getSampleRate), &midiren);
@@ -223,8 +223,8 @@ void PluginManager::LinkAppScriptData()
 
 	DummySynthesizer dsynth;
 	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
-	Script::LinkExternal("DummySynthesizer.__init__", Script::mf(&DummySynthesizer::__init__));
-	Script::DeclareClassVirtualIndex("DummySynthesizer", "__delete__", Script::mf(&DummySynthesizer::__delete__), &dsynth);
+	Script::LinkExternal("DummySynthesizer." + Script::NAME_FUNC_INIT, Script::mf(&DummySynthesizer::__init__));
+	Script::DeclareClassVirtualIndex("DummySynthesizer", Script::NAME_FUNC_DELETE, Script::mf(&DummySynthesizer::__delete__), &dsynth);
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "render", Script::mf(&DummySynthesizer::render), &dsynth);
 	Script::DeclareClassVirtualIndex("DummySynthesizer", "onConfig", Script::mf(&DummySynthesizer::onConfig), &dsynth);
 
@@ -251,7 +251,7 @@ void PluginManager::LinkAppScriptData()
 
 	Script::DeclareClassSize("MidiRawData", sizeof(MidiRawData));
 	Script::DeclareClassOffset("MidiRawData", "samples", _offsetof(MidiRawData, samples));
-	Script::LinkExternal("MidiRawData.__init__", Script::mf(&MidiRawData::__init__));
+	Script::LinkExternal("MidiRawData." + Script::NAME_FUNC_INIT, Script::mf(&MidiRawData::__init__));
 	Script::LinkExternal("MidiRawData.getEvents", Script::mf(&MidiRawData::getEvents));
 	Script::LinkExternal("MidiRawData.getNotes", Script::mf(&MidiRawData::getNotes));
 	Script::LinkExternal("MidiRawData.getRange", Script::mf(&MidiRawData::getRange));
@@ -259,7 +259,7 @@ void PluginManager::LinkAppScriptData()
 
 	Script::DeclareClassSize("MidiData", sizeof(MidiData));
 	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
-	Script::LinkExternal("MidiData.__init__", Script::mf(&MidiData::__init__));
+	Script::LinkExternal("MidiData." + Script::NAME_FUNC_INIT, Script::mf(&MidiData::__init__));
 	Script::LinkExternal("MidiData.getEvents", Script::mf(&MidiData::getEvents));
 	Script::LinkExternal("MidiData.getNotes", Script::mf(&MidiData::getNotes));
 	Script::LinkExternal("MidiData.getRange", Script::mf(&MidiData::getRange));
@@ -318,8 +318,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
 	Script::DeclareClassOffset("Song", "level_names", _offsetof(Song, level_names));
 	Script::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
-	Script::LinkExternal("Song.__init__", Script::mf(&Song::__init__));
-	Script::DeclareClassVirtualIndex("Song", "__delete__", Script::mf(&Song::__delete__), &af);
+	Script::LinkExternal("Song." + Script::NAME_FUNC_INIT, Script::mf(&Song::__init__));
+	Script::DeclareClassVirtualIndex("Song", Script::NAME_FUNC_DELETE, Script::mf(&Song::__delete__), &af);
 	Script::LinkExternal("Song.newEmpty", Script::mf(&Song::newEmpty));
 	Script::LinkExternal("Song.addTrack", Script::mf(&Song::addTrack));
 	Script::LinkExternal("Song.deleteTrack", Script::mf(&Song::deleteTrack));
@@ -333,8 +333,8 @@ void PluginManager::LinkAppScriptData()
 	AudioRenderer ar;
 	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
 	//Script::DeclareClassOffset("AudioRenderer", "sample_rate", _offsetof(AudioRenderer, sample_rate));
-	Script::LinkExternal("AudioRenderer.__init__", Script::mf(&AudioRenderer::__init__));
-	Script::DeclareClassVirtualIndex("AudioRenderer", "__delete__", Script::mf(&AudioRenderer::__delete__), &ar);
+	Script::LinkExternal("AudioRenderer." + Script::NAME_FUNC_INIT, Script::mf(&AudioRenderer::__init__));
+	Script::DeclareClassVirtualIndex("AudioRenderer", Script::NAME_FUNC_DELETE, Script::mf(&AudioRenderer::__delete__), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "read", Script::mf(&AudioRenderer::read), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "reset", Script::mf(&AudioRenderer::reset), &ar);
 	Script::DeclareClassVirtualIndex("AudioRenderer", "range", Script::mf(&AudioRenderer::range), &ar);
@@ -346,8 +346,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
 	Script::LinkExternal("SongRenderer.prepare", Script::mf(&SongRenderer::prepare));
 	Script::LinkExternal("SongRenderer.render", Script::mf(&SongRenderer::render));
-	Script::LinkExternal("SongRenderer.__init__", Script::mf(&SongRenderer::__init__));
-	Script::DeclareClassVirtualIndex("SongRenderer", "__delete__", Script::mf(&SongRenderer::__delete__), &sr);
+	Script::LinkExternal("SongRenderer." + Script::NAME_FUNC_INIT, Script::mf(&SongRenderer::__init__));
+	Script::DeclareClassVirtualIndex("SongRenderer", Script::NAME_FUNC_DELETE, Script::mf(&SongRenderer::__delete__), &sr);
 	Script::DeclareClassVirtualIndex("SongRenderer", "read", Script::mf(&SongRenderer::read), &sr);
 	Script::DeclareClassVirtualIndex("SongRenderer", "reset", Script::mf(&SongRenderer::reset), &sr);
 	Script::DeclareClassVirtualIndex("SongRenderer", "range", Script::mf(&SongRenderer::range), &sr);
@@ -363,8 +363,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("InputStreamAudio", "sample_rate", _offsetof(InputStreamAudio, sample_rate));
 	Script::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(InputStreamAudio, accumulating));
 	Script::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
-	Script::LinkExternal("InputStreamAudio.__init__", Script::mf(&InputStreamAudio::__init__));
-	Script::DeclareClassVirtualIndex("InputStreamAudio", "__delete__", Script::mf(&InputStreamAudio::__delete__), &input);
+	Script::LinkExternal("InputStreamAudio." + Script::NAME_FUNC_INIT, Script::mf(&InputStreamAudio::__init__));
+	Script::DeclareClassVirtualIndex("InputStreamAudio", Script::NAME_FUNC_DELETE, Script::mf(&InputStreamAudio::__delete__), &input);
 	Script::LinkExternal("InputStreamAudio.start", Script::mf(&InputStreamAudio::start));
 	//Script::LinkExternal("InputStreamAudio.resetSync", Script::mf(&AudioInputAudio::resetSync));
 	Script::LinkExternal("InputStreamAudio.stop",	 Script::mf(&InputStreamAudio::stop));
@@ -384,8 +384,8 @@ void PluginManager::LinkAppScriptData()
 	{
 	OutputStream stream(NULL);
 	Script::DeclareClassSize("OutputStream", sizeof(OutputStream));
-	Script::LinkExternal("OutputStream.__init__", Script::mf(&OutputStream::__init__));
-	Script::DeclareClassVirtualIndex("OutputStream", "__delete__", Script::mf(&OutputStream::__delete__), &stream);
+	Script::LinkExternal("OutputStream." + Script::NAME_FUNC_INIT, Script::mf(&OutputStream::__init__));
+	Script::DeclareClassVirtualIndex("OutputStream", Script::NAME_FUNC_DELETE, Script::mf(&OutputStream::__delete__), &stream);
 	//Script::LinkExternal("OutputStream.setSource", Script::mf(&AudioStream::setSource));
 	Script::LinkExternal("OutputStream.play", Script::mf(&OutputStream::play));
 	Script::LinkExternal("OutputStream.stop", Script::mf(&OutputStream::stop));
@@ -396,23 +396,6 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("OutputStream.getVolume", Script::mf(&OutputStream::getVolume));
 	Script::LinkExternal("OutputStream.setVolume", Script::mf(&OutputStream::setVolume));
 	Script::LinkExternal("OutputStream.setBufferSize", Script::mf(&OutputStream::setBufferSize));
-	}
-
-	{
-	/*AudioInputAudio stream(NULL);
-	Script::DeclareClassSize("InputStreamAudio", sizeof(AudioStream));
-	Script::LinkExternal("AudioStream.__init__", Script::mf(&AudioStream::__init__));
-	Script::DeclareClassVirtualIndex("AudioStream", "__delete__", Script::mf(&AudioStream::__delete__), &stream);
-	//Script::LinkExternal("AudioStream.setSource", Script::mf(&AudioStream::setSource));
-	Script::LinkExternal("AudioStream.play", Script::mf(&AudioStream::play));
-	Script::LinkExternal("AudioStream.stop", Script::mf(&AudioStream::stop));
-	Script::LinkExternal("AudioStream.pause", Script::mf(&AudioStream::pause));
-	Script::LinkExternal("AudioStream.isPlaying", Script::mf(&AudioStream::isPlaying));
-	Script::LinkExternal("AudioStream.getPos", Script::mf(&AudioStream::getPos));
-	Script::LinkExternal("AudioStream.getSampleRate", Script::mf(&AudioStream::getSampleRate));
-	Script::LinkExternal("AudioStream.getVolume", Script::mf(&AudioStream::getVolume));
-	Script::LinkExternal("AudioStream.setVolume", Script::mf(&AudioStream::setVolume));
-	Script::LinkExternal("AudioStream.setBufferSize", Script::mf(&AudioStream::setBufferSize));*/
 	}
 
 	Script::DeclareClassSize("AudioView", sizeof(AudioView));
@@ -444,8 +427,8 @@ void PluginManager::LinkAppScriptData()
 
 	Slider slider;
 	Script::DeclareClassSize("Slider", sizeof(Slider));
-	Script::LinkExternal("Slider.__init__", Script::mf(&Slider::__init_ext__));
-	Script::DeclareClassVirtualIndex("Slider", "__delete__", Script::mf(&Slider::__delete__), &slider);
+	Script::LinkExternal("Slider." + Script::NAME_FUNC_INIT, Script::mf(&Slider::__init_ext__));
+	Script::DeclareClassVirtualIndex("Slider", Script::NAME_FUNC_DELETE, Script::mf(&Slider::__delete__), &slider);
 	Script::LinkExternal("Slider.get", Script::mf(&Slider::get));
 	Script::LinkExternal("Slider.set", Script::mf(&Slider::set));
 
@@ -453,19 +436,19 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("SongPlugin", sizeof(SongPlugin));
 	Script::DeclareClassOffset("SongPlugin", "win", _offsetof(SongPlugin, win));
 	Script::DeclareClassOffset("SongPlugin", "view", _offsetof(SongPlugin, view));
-	Script::LinkExternal("SongPlugin.__init__", Script::mf(&SongPlugin::__init__));
-	Script::DeclareClassVirtualIndex("SongPlugin", "__delete__", Script::mf(&SongPlugin::__delete__), &song_plugin);
+	Script::LinkExternal("SongPlugin." + Script::NAME_FUNC_INIT, Script::mf(&SongPlugin::__init__));
+	Script::DeclareClassVirtualIndex("SongPlugin", Script::NAME_FUNC_DELETE, Script::mf(&SongPlugin::__delete__), &song_plugin);
 	Script::DeclareClassVirtualIndex("SongPlugin", "apply", Script::mf(&SongPlugin::apply), &song_plugin);
 
 	TsunamiPlugin tsunami_plugin;
 	Script::DeclareClassSize("TsunamiPlugin", sizeof(TsunamiPlugin));
 	Script::DeclareClassOffset("TsunamiPlugin", "win", _offsetof(TsunamiPlugin, win));
 	Script::DeclareClassOffset("TsunamiPlugin", "view", _offsetof(TsunamiPlugin, view));
-	Script::LinkExternal("TsunamiPlugin.__init__", Script::mf(&TsunamiPlugin::__init__));
-	Script::DeclareClassVirtualIndex("TsunamiPlugin", "__delete__", Script::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
+	Script::LinkExternal("TsunamiPlugin." + Script::NAME_FUNC_INIT, Script::mf(&TsunamiPlugin::__init__));
+	Script::DeclareClassVirtualIndex("TsunamiPlugin", Script::NAME_FUNC_DELETE, Script::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
 	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStart", Script::mf(&TsunamiPlugin::onStart), &tsunami_plugin);
 	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStop", Script::mf(&TsunamiPlugin::onStop), &tsunami_plugin);
-	Script::LinkExternal("TsunamiPlugin.stop_request", Script::mf(&TsunamiPlugin::stop_request));
+	Script::LinkExternal("TsunamiPlugin.stop", Script::mf(&TsunamiPlugin::stop_request));
 
 }
 
@@ -483,7 +466,7 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 void find_plugins_in_dir(const string &dir, PluginManager *pm)
 {
 	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
-	foreach(DirEntry &e, list){
+	for (DirEntry &e : list){
 		PluginManager::PluginFile pf;
 		pf.name = e.name.replace(".kaba", "");
 		pf.filename = HuiAppDirectoryStatic + "Plugins/" + dir + e.name;
@@ -575,11 +558,9 @@ Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 {
 	msg_db_f("LoadAndCompilePlugin", 1);
 
-	foreach(Plugin *p, plugins){
-		if (filename == p->filename){
+	for (Plugin *p : plugins)
+		if (filename == p->filename)
 			return p;
-		}
-	}
 
 	//InitPluginData();
 
@@ -607,7 +588,7 @@ void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 		MidiEffect *mfx = NULL;
 		SongPlugin *spl = NULL;
 		TsunamiPlugin *tpl = NULL;
-		foreach(Script::Type *t, s->syntax->types){
+		for (auto *t : s->syntax->types){
 			Script::Type *r = t->GetRoot();
 			if (r->name == "AudioEffect"){
 				fx = (Effect*)t->CreateInstance();
@@ -638,7 +619,7 @@ void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 				Range range = win->view->getPlaybackSelection();
 				SongSelection sel = win->view->getEditSeletion();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, sel.tracks)
+				for (Track *t : sel.tracks)
 					if (t->type == t->TYPE_AUDIO){
 						fx->resetState();
 						fx->doProcessTrack(t, win->view->cur_level, range);
@@ -652,7 +633,7 @@ void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 				Range range = win->view->getPlaybackSelection();
 				SongSelection sel = win->view->getEditSeletion();
 				a->action_manager->beginActionGroup();
-				foreach(Track *t, sel.tracks)
+				for (Track *t : sel.tracks)
 					if (t->type == t->TYPE_MIDI){
 						mfx->resetState();
 						mfx->DoProcessTrack(t, range);
@@ -671,7 +652,7 @@ void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
 			tpl->song = win->song;
 			win->plugins.add(tpl);
 			win->observer->subscribe(tpl, tpl->MESSAGE_STOP_REQUEST);
-			tpl->onStart();
+			tpl->start();
 		}else if (f_main){
 			f_main();
 		}else{
@@ -696,17 +677,16 @@ void PluginManager::FindAndExecutePlugin(TsunamiWindow *win)
 
 Plugin *PluginManager::GetPlugin(const string &name)
 {
-	foreach(PluginFile &pf, plugin_files)
-		if (name == pf.name){
+	for (PluginFile &pf : plugin_files)
+		if (name == pf.name)
 			return LoadAndCompilePlugin(pf.filename);
-		}
 	return NULL;
 }
 
 Effect *PluginManager::LoadEffect(const string &name, Song *song)
 {
 	Plugin *p = NULL;
-	foreach(PluginFile &pf, plugin_files){
+	for (PluginFile &pf : plugin_files){
 		if ((pf.name == name) and (pf.filename.find("/Buffer/") >= 0)){
 			p = LoadAndCompilePlugin(pf.filename);
 			if (!p->usable)
@@ -720,7 +700,7 @@ Effect *PluginManager::LoadEffect(const string &name, Song *song)
 	}
 
 	Script::Script *s = p->s;
-	foreach(Script::Type *t, s->syntax->types){
+	for (auto *t : s->syntax->types){
 		if (t->GetRoot()->name != "AudioEffect")
 			continue;
 		Effect *fx = (Effect*)t->CreateInstance();
@@ -734,7 +714,7 @@ MidiEffect *PluginManager::LoadMidiEffect(const string &name, Song *song)
 {
 	bool found = false;
 	Plugin *p = NULL;
-	foreach(PluginFile &pf, plugin_files){
+	for (PluginFile &pf : plugin_files){
 		if ((pf.name == name) and (pf.filename.find("/Midi/") >= 0)){
 			found = true;
 			p = LoadAndCompilePlugin(pf.filename);
@@ -748,7 +728,7 @@ MidiEffect *PluginManager::LoadMidiEffect(const string &name, Song *song)
 	}
 
 	Script::Script *s = p->s;
-	foreach(Script::Type *t, s->syntax->types){
+	for (auto *t : s->syntax->types){
 		if (t->GetRoot()->name != "MidiEffect")
 			continue;
 		MidiEffect *m = (MidiEffect*)t->CreateInstance();
@@ -763,7 +743,7 @@ Array<string> PluginManager::FindSynthesizers()
 {
 	Array<string> names;
 	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/Synthesizer/", "*.kaba", false);
-	foreach(DirEntry &e, list)
+	for (DirEntry &e : list)
 		names.add(e.name.replace(".kaba", ""));
 	return names;
 }
@@ -780,7 +760,7 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 		tsunami->log->error(e.message);
 		return NULL;
 	}
-	foreach(Script::Type *t, s->syntax->types){
+	for (auto *t : s->syntax->types){
 		if (t->GetRoot()->name != "Synthesizer")
 			continue;
 		Synthesizer *synth = (Synthesizer*)t->CreateInstance();

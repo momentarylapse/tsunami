@@ -93,7 +93,7 @@ void DummySynthesizer::render(BufferBox& buf)
 	for (int i=0; i<buf.length; i++){
 
 		// current events?
-		foreach(MidiEvent &e, events)
+		for (MidiEvent &e : events)
 			if (e.pos == i){
 				int p = e.pitch;
 				State::PitchState &s = state.pitch[p];

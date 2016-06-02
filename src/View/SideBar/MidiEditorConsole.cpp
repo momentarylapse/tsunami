@@ -108,7 +108,7 @@ void MidiEditorConsole::onUpdate(Observable* o, const string &message)
 
 		reset("reference_tracks");
 		if (song){
-			foreach(Track *t, song->tracks)
+			for (Track *t : song->tracks)
 				addString("reference_tracks", t->getNiceName());
 		}
 

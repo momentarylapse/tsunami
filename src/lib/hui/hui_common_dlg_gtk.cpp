@@ -36,7 +36,7 @@ void add_filters(GtkWidget *dlg, const string &show_filter, const string &filter
 		GtkFileFilter *gtk_filter = gtk_file_filter_new();
 		gtk_file_filter_set_name(gtk_filter, sys_str(show_filter_list[i]));
 		Array<string> filters = filter_list[i].explode(";");
-		foreach(string &f, filters)
+		for (string &f : filters)
 			gtk_file_filter_add_pattern(gtk_filter, sys_str(f));
 		gtk_file_chooser_add_filter(GTK_FILE_CHOOSER(dlg), gtk_filter);
 	}
@@ -192,7 +192,7 @@ void HuiAboutBox(HuiWindow *win)
 
 	// author list
 	Array<char*> _a_;
-	foreach(string &author, HuiPropAuthors){
+	for (string &author : HuiPropAuthors){
 		char *p = new char[author.num + 1];
 		strcpy(p, author.c_str());
 		_a_.add(p);
@@ -212,7 +212,7 @@ void HuiAboutBox(HuiWindow *win)
 		"copyright", HuiGetProperty("copyright").c_str(),
 		NULL);
 
-	foreach(char *aa, _a_)
+	for (char *aa : _a_)
 		delete(aa);
 }
 

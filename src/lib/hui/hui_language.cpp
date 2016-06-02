@@ -75,7 +75,7 @@
 	{
 		string r;
 		for (int i=0;i<str.num;i++){
-			if ((str[i] == '&') && (i < str.num - 1)){
+			if ((str[i] == '&') and (i < str.num - 1)){
 				if (str[i+1]=='a'){
 					r.add(0xc3);
 					r.add(0xa4);
@@ -117,25 +117,25 @@
 		const unsigned char *us = (const unsigned char*)str.c_str();
 
 		for (int i=0;i<str.num;i++){
-			if ((us[i]==0xc3) && (us[i+1]==0xa4)){
+			if ((us[i]==0xc3) and (us[i+1]==0xa4)){
 				r += "&a";
 				i ++;
-			}else if ((us[i]==0xc3) && (us[i+1]==0xb6)){
+			}else if ((us[i]==0xc3) and (us[i+1]==0xb6)){
 				r += "&o";
 				i ++;
-			}else if ((us[i]==0xc3) && (us[i+1]==0xbc)){
+			}else if ((us[i]==0xc3) and (us[i+1]==0xbc)){
 				r += "&u";
 				i ++;
-			}else if ((us[i]==0xc3) && (us[i+1]==0x9f)){
+			}else if ((us[i]==0xc3) and (us[i+1]==0x9f)){
 				r += "&s";
 				i ++;
-			}else if ((us[i]==0xc3) && (us[i+1]==0x84)){
+			}else if ((us[i]==0xc3) and (us[i+1]==0x84)){
 				r += "&A";
 				i ++;
-			}else if ((us[i]==0xc3) && (us[i+1]==0x96)){
+			}else if ((us[i]==0xc3) and (us[i+1]==0x96)){
 				r += "&O";
 				i ++;
-			}else if ((us[i]==0xc3) && (us[i+1]==0x9c)){
+			}else if ((us[i]==0xc3) and (us[i+1]==0x9c)){
 				r += "&U";
 				i ++;
 			}else if (us[i]=='&'){
@@ -211,7 +211,7 @@ void HuiSetLanguage(const string &language)
 	msg_db_f("HuiSetLang", 1);
 	cur_lang = NULL;
 	HuiLanguaged = false;
-	foreach(HuiLanguage &l, _HuiLanguage_)
+	for (HuiLanguage &l : _HuiLanguage_)
 		if (l.name == language){
 			cur_lang = &l;
 			HuiLanguaged = true;
@@ -224,9 +224,9 @@ void HuiSetLanguage(const string &language)
 
 string HuiGetLanguage(const string &ns, const string &id)
 {
-	if ((!HuiLanguaged) || (id.num == 0))
+	if ((!HuiLanguaged) or (id.num == 0))
 		return "";
-	foreach(HuiLanguageCommand &c, cur_lang->cmd)
+	for (HuiLanguageCommand &c : cur_lang->cmd)
 		if (c.match(ns, id))
 			return c.text;
 	/*if (cur_lang->cmd[id].num == 0)
@@ -236,9 +236,9 @@ string HuiGetLanguage(const string &ns, const string &id)
 
 string HuiGetLanguageR(const string &ns, HuiResource &cmd)
 {
-	if ((!HuiLanguaged) || (cmd.id.num == 0))
+	if ((!HuiLanguaged) or (cmd.id.num == 0))
 		return "";
-	foreach(HuiLanguageCommand &c, cur_lang->cmd)
+	for (HuiLanguageCommand &c : cur_lang->cmd)
 		if (c.match(ns, cmd.id)){
 			if (cmd.options.num > 0)
 				return "!" + implode(cmd.options, ",") + "\\" + c.text;
@@ -251,9 +251,9 @@ string HuiGetLanguageR(const string &ns, HuiResource &cmd)
 
 string HuiGetLanguageT(const string &ns, const string &id)
 {
-	if ((!HuiLanguaged) || (id.num == 0))
+	if ((!HuiLanguaged) or (id.num == 0))
 		return "";
-	foreach(HuiLanguageCommand &c, cur_lang->cmd)
+	for (HuiLanguageCommand &c : cur_lang->cmd)
 		if (c.match(ns, id))
 			return c.tooltip;
 	return "";
@@ -264,7 +264,7 @@ string HuiGetLanguageS(const string &str)
 {
 	if (!HuiLanguaged)
 		return str;
-	foreach(HuiLanguageTranslation &t, cur_lang->trans){
+	for (HuiLanguageTranslation &t : cur_lang->trans){
 		if (str == t.orig)
 			return t.trans;
 	}
@@ -276,10 +276,10 @@ string get_lang(const string &ns, const string &id, const string &text, bool all
 {
 	if (text.num > 0)
 		return text;
-	if ((!HuiLanguaged) || (id.num == 0))
+	if ((!HuiLanguaged) or (id.num == 0))
 		return text;
 	string r = "";
-	foreach(HuiLanguageCommand &c, cur_lang->cmd)
+	for (HuiLanguageCommand &c : cur_lang->cmd)
 		if (c.match(ns, id))
 			r = c.text;
 	if (r.num == 0)
@@ -323,7 +323,7 @@ void HuiUpdateAll()
 Array<string> HuiGetLanguages()
 {
 	Array<string> n;
-	foreach(HuiLanguage &l, _HuiLanguage_)
+	for (HuiLanguage &l : _HuiLanguage_)
 		n.add(l.name);
 	return n;
 }

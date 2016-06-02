@@ -25,7 +25,7 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	setDecimals(1);
 
 	Array<Instrument> instruments = Instrument::enumerate();
-	foreach(Instrument &i, instruments)
+	for (Instrument &i : instruments)
 		setString("instrument", i.name());
 
 	loadData();

@@ -34,8 +34,8 @@ void SIAddPackageThread()
 	Type *TypeThreadedWork = add_type  ("ThreadedWork", sizeof(ThreadedWork));
 
 	add_class(TypeThread);
-		class_add_func("__init__",		TypeVoid,	thread_p(mf(&Thread::__init__)));
-		class_add_func_virtual("__delete__",		TypeVoid,	thread_p(mf(&Thread::__delete__)));
+		class_add_func(NAME_FUNC_INIT,		TypeVoid,	thread_p(mf(&Thread::__init__)));
+		class_add_func_virtual(NAME_FUNC_DELETE,		TypeVoid,	thread_p(mf(&Thread::__delete__)));
 		class_add_func("run",		TypeVoid,	thread_p(mf(&Thread::Run)));
 		class_add_func_virtual("onRun",		TypeVoid,	thread_p(mf(&Thread::OnRun)));
 		class_add_func("isDone",		TypeBool,	thread_p(mf(&Thread::IsDone)));
@@ -46,14 +46,14 @@ void SIAddPackageThread()
 #endif
 
 	add_class(TypeMutex);
-		class_add_func("__init__",		TypeVoid,	thread_p(mf(&Mutex::__init__)));
-		class_add_func("__delete__",		TypeVoid,	thread_p(mf(&Mutex::__delete__)));
+		class_add_func(NAME_FUNC_INIT,		TypeVoid,	thread_p(mf(&Mutex::__init__)));
+		class_add_func(NAME_FUNC_DELETE,		TypeVoid,	thread_p(mf(&Mutex::__delete__)));
 		class_add_func("lock",		TypeVoid,	thread_p(mf(&Mutex::Lock)));
 		class_add_func("unlock",	TypeVoid,	thread_p(mf(&Mutex::Unlock)));
 
 	add_class(TypeThreadedWork);
-		class_add_func("__init__",		TypeVoid,	thread_p(mf(&ThreadedWork::__init__)));
-		class_add_func_virtual("__delete__",		TypeVoid,	thread_p(mf(&ThreadedWork::__delete__)));
+		class_add_func(NAME_FUNC_INIT,		TypeVoid,	thread_p(mf(&ThreadedWork::__init__)));
+		class_add_func_virtual(NAME_FUNC_DELETE,		TypeVoid,	thread_p(mf(&ThreadedWork::__delete__)));
 		class_add_func("run",		TypeBool,	thread_p(mf(&ThreadedWork::Run)));
 			func_add_param("total_size", TypeInt);
 			func_add_param("partition_size", TypeInt);

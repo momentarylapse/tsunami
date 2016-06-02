@@ -20,7 +20,7 @@ HuiControlRadioButton::HuiControlRadioButton(const string &title, const string &
 	GetPartStrings(title);
 	string group_id = id.head(id.find(":"));
 	GSList *group = NULL;
-	foreach(HuiControl *c, panel->control)
+	for (HuiControl *c : panel->control)
 		if (c->type == HUI_KIND_RADIOBUTTON)
 			if (c->id.find(":"))
 				if (c->id.head(c->id.find(":")) == group_id)

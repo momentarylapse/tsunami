@@ -40,14 +40,14 @@ int SerializerAMD64::fc_begin()
 	Array<SerialCommandParam> reg_param;
 	Array<SerialCommandParam> stack_param;
 	Array<SerialCommandParam> xmm_param;
-	foreach(SerialCommandParam &p, CompilerFunctionParam){
-		if ((p.type == TypeInt) || (p.type == TypeInt64) || (p.type == TypeChar) || (p.type == TypeBool) || (p.type->is_pointer)){
+	for (SerialCommandParam &p : CompilerFunctionParam){
+		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 6){
 				reg_param.add(p);
 			}else{
 				stack_param.add(p);
 			}
-		}else if ((p.type == TypeFloat32) || (p.type == TypeFloat64)){
+		}else if ((p.type == TypeFloat32) or (p.type == TypeFloat64)){
 			if (xmm_param.num < 8){
 				xmm_param.add(p);
 			}else{
@@ -98,7 +98,7 @@ int SerializerAMD64::fc_begin()
 	}
 
 	// extend reg channels to call
-	foreach(int v, virts)
+	for (int v : virts)
 		use_virtual_reg(v, cmd.num, cmd.num);
 
 	return push_size;
@@ -109,7 +109,7 @@ void SerializerAMD64::fc_end(int push_size)
 	Type *type = CompilerFunctionReturn.type;
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) && (!type->UsesReturnByMemory())){
+	if ((type != TypeVoid) and (!type->UsesReturnByMemory())){
 		if (type == TypeFloat32)
 			add_cmd(Asm::INST_MOVSS, CompilerFunctionReturn, p_xmm0);
 		else if (type == TypeFloat64)
@@ -171,15 +171,15 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	// return, instance, params
 	Array<Variable> param;
 	if (f->return_type->UsesReturnByMemory()){
-		foreach(Variable &v, f->var)
-			if (v.name == "-return-"){
+		for (Variable &v : f->var)
+			if (v.name == NAME_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (f->_class){
-		foreach(Variable &v, f->var)
-			if (v.name == "self"){
+		for (Variable &v : f->var)
+			if (v.name == NAME_SELF){
 				param.add(v);
 				break;
 			}
@@ -191,8 +191,8 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	Array<Variable> reg_param;
 	Array<Variable> stack_param;
 	Array<Variable> xmm_param;
-	foreach(Variable &p, param){
-		if ((p.type == TypeInt) || (p.type == TypeChar) || (p.type == TypeBool) || (p.type->is_pointer)){
+	for (Variable &p : param){
+		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 6){
 				reg_param.add(p);
 			}else{
@@ -260,8 +260,8 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialCommand &c)
 	// FIXME
 	// evil hack to allow inconsistent param types (in address shifts)
 	if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64){
-		if ((c.inst == Asm::INST_ADD) || (c.inst == Asm::INST_MOV)){
-			if ((c.p[0].kind == KIND_REGISTER) && (c.p[1].kind == KIND_REF_TO_CONST)){
+		if ((c.inst == Asm::INST_ADD) or (c.inst == Asm::INST_MOV)){
+			if ((c.p[0].kind == KIND_REGISTER) and (c.p[1].kind == KIND_REF_TO_CONST)){
 				if (c.p[0].type->is_pointer){
 #ifdef debug_evil_corrections
 					msg_write("----evil resize a");
@@ -274,8 +274,8 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialCommand &c)
 #endif
 				}
 			}
-			if ((c.p[0].type->size == 8) && (c.p[1].type->size == 4)){
-				/*if ((c.p[0].kind == KindRegister) && ((c.p[1].kind == KindRegister) || (c.p[1].kind == KindConstant) || (c.p[1].kind == KindRefToConst))){
+			if ((c.p[0].type->size == 8) and (c.p[1].type->size == 4)){
+				/*if ((c.p[0].kind == KindRegister) and ((c.p[1].kind == KindRegister) or (c.p[1].kind == KindConstant) or (c.p[1].kind == KindRefToConst))){
 #ifdef debug_evil_corrections
 					msg_write("----evil resize b");
 					msg_write(cmd2str(c));
@@ -297,8 +297,8 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialCommand &c)
 #endif
 				}
 			}
-			if ((c.p[0].type->size < 8) && (c.p[1].type->size == 8)){
-				if ((c.p[0].kind == KIND_REGISTER) && ((c.p[1].kind == KIND_REGISTER) || (c.p[1].kind == KIND_DEREF_REGISTER))){
+			if ((c.p[0].type->size < 8) and (c.p[1].type->size == 8)){
+				if ((c.p[0].kind == KIND_REGISTER) and ((c.p[1].kind == KIND_REGISTER) or (c.p[1].kind == KIND_DEREF_REGISTER))){
 #ifdef debug_evil_corrections
 					msg_write("----evil resize d");
 					msg_write(cmd2str(c));
@@ -312,7 +312,7 @@ void SerializerAMD64::CorrectUnallowedParamCombis2(SerialCommand &c)
 			}
 			/*if (c.p[0].type->size > c.p[1].type->size){
 				msg_write("size ok");
-				if ((c.p[0].kind == KindRegister) && ((c.p[1].kind == KindRegister) || (c.p[1].kind == KindConstant) || (c.p[1].kind == KindRefToConst))){
+				if ((c.p[0].kind == KindRegister) and ((c.p[1].kind == KindRegister) or (c.p[1].kind == KindConstant) or (c.p[1].kind == KindRefToConst))){
 					msg_error("----evil resize");
 					c.p[0].type = c.p[1].type;
 					c.p[0].p = (char*)(long)Asm::RegResize[Asm::RegRoot[(long)c.p[0].p]][c.p[1].type->size];

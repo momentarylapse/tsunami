@@ -63,7 +63,7 @@ class ClickCounterDialog : Dialog
 		c.drawStr(100, 100, counter.counter.str())
 
 	void onClose()
-		counter.end()
+		counter.stop()
 
 	void onIncrease()
 		counter.counter ++
@@ -108,7 +108,7 @@ class MicrophoneClickCounter : TsunamiPlugin
 		input.start()
 		input.addObserver(self, &onInput)
 		
-	override void onEnd()
+	override void onStop()
 		input.removeObserver(self)
 		input.stop()
 		

@@ -491,8 +491,8 @@ class TsunamiPlugin
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void onStart()
-	extern virtual void onEnd()
-	extern void end()
+	extern virtual void onStop()
+	extern void stop()
 	Window *win
 	AudioView *view
 	Song *song

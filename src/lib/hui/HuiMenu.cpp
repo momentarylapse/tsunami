@@ -24,7 +24,7 @@ void HuiMenu::__delete__()
 
 void HuiMenu::clear()
 {
-	foreach(HuiControl *c, item)
+	for (HuiControl *c : item)
 		delete(c);
 	item.clear();
 }
@@ -59,7 +59,7 @@ void HuiMenu::addSubMenu(const string &name, const string &id, HuiMenu *menu)
 void HuiMenu::set_panel(HuiPanel *_panel)
 {
 	panel = _panel;
-	foreach(HuiControl *c, item){
+	for (HuiControl *c : item){
 		c->panel = panel;
 		HuiMenuItemSubmenu *s = dynamic_cast<HuiMenuItemSubmenu*>(c);
 		if (s)
@@ -77,7 +77,7 @@ void HuiMenu::setID(const string &id)
 
 HuiMenu *HuiMenu::getSubMenuByID(const string &id)
 {
-	foreach(HuiControl *c, item){
+	for (HuiControl *c : item){
 		HuiMenuItemSubmenu *s = dynamic_cast<HuiMenuItemSubmenu*>(c);
 		if (s){
 			if (s->id == id)
@@ -122,7 +122,7 @@ void HuiMenu::updateLanguage()
 Array<HuiControl*> HuiMenu::get_all_controls()
 {
 	Array<HuiControl*> list = item;
-	foreach(HuiControl *c, item){
+	for (HuiControl *c : item){
 		HuiMenuItemSubmenu *s = dynamic_cast<HuiMenuItemSubmenu*>(c);
 		if (s)
 			list.append(s->sub_menu->get_all_controls());
@@ -133,7 +133,7 @@ Array<HuiControl*> HuiMenu::get_all_controls()
 
 void HuiMenu::enable(const string &id, bool enabled)
 {
-	foreach(HuiControl *c, item){
+	for (HuiControl *c : item){
 		if (c->id == id)
 			c->enable(enabled);
 		if (c->type == HUI_KIND_MENU_SUBMENU)

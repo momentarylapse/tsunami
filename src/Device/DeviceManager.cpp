@@ -117,7 +117,7 @@ Array<Device*> str2devs(const string &s, int type)
 {
 	Array<Device*> devices;
 	Array<string> a = s.explode("|");
-	foreach(string &b, a)
+	for (string &b : a)
 		devices.add(new Device(type, b));
 	return devices;
 }
@@ -173,11 +173,11 @@ DeviceManager::~DeviceManager()
 	write_config();
 	kill();
 
-	foreach(Device *d, output_devices)
+	for (Device *d : output_devices)
 		delete(d);
-	foreach(Device *d, input_devices)
+	for (Device *d : input_devices)
 		delete(d);
-	foreach(Device *d, midi_input_devices)
+	for (Device *d : midi_input_devices)
 		delete(d);
 }
 
@@ -210,7 +210,7 @@ void DeviceManager::write_config()
 void DeviceManager::update_devices()
 {
 #ifdef DEVICE_PULSEAUDIO
-	foreach(Device *d, output_devices)
+	for (Device *d : output_devices)
 		d->present = false;
 
 	pa_operation *op = pa_context_get_sink_info_list(context, pa_sink_info_callback, this);
@@ -220,7 +220,7 @@ void DeviceManager::update_devices()
 	default_devices[Device::TYPE_AUDIO_OUTPUT]->present = true;
 
 
-	foreach(Device *d, input_devices)
+	for (Device *d : input_devices)
 		d->present = false;
 
 	op = pa_context_get_source_info_list(context, pa_source_info_callback, this);
@@ -241,7 +241,7 @@ void DeviceManager::update_devices()
 void DeviceManager::update_midi_devices()
 {
 #ifdef DEVICE_MIDI_ALSA
-	foreach(Device *d, midi_input_devices){
+	for (Device *d : midi_input_devices){
 		d->present_old = d->present;
 		d->present = false;
 	}
@@ -272,7 +272,7 @@ void DeviceManager::update_midi_devices()
 
 
 	bool changed = false;
-	foreach(Device *d, midi_input_devices)
+	for (Device *d : midi_input_devices)
 		if (d->present_old != d->present)
 			changed = true;
 	if (changed)
@@ -356,7 +356,7 @@ void DeviceManager::kill()
 		return;
 	msg_db_f("Output.kill",1);
 
-	foreach(OutputStream *s, streams)
+	for (OutputStream *s : streams)
 		s->kill();
 
 	// audio
@@ -415,7 +415,7 @@ bool DeviceManager::streamExists(OutputStream* s)
 Device* DeviceManager::get_device(int type, const string &internal_name)
 {
 	Array<Device*> &devices = getDeviceList(type);
-	foreach(Device *d, devices)
+	for (Device *d : devices)
 		if (d->internal_name == internal_name)
 			return d;
 	return NULL;
@@ -424,7 +424,7 @@ Device* DeviceManager::get_device(int type, const string &internal_name)
 Device* DeviceManager::get_device_create(int type, const string &internal_name)
 {
 	Array<Device*> &devices = getDeviceList(type);
-	foreach(Device *d, devices)
+	for (Device *d : devices)
 		if (d->internal_name == internal_name)
 			return d;
 	Device *d = new Device(type, "", internal_name, 0);
@@ -450,7 +450,7 @@ Array<Device*> DeviceManager::getGoodDeviceList(int type)
 {
 	Array<Device*> &all = getDeviceList(type);
 	Array<Device*> list;
-	foreach(Device *d, all)
+	for (Device *d : all)
 		if (d->visible and d->present)
 			list.add(d);
 	return list;
@@ -459,7 +459,7 @@ Array<Device*> DeviceManager::getGoodDeviceList(int type)
 Device *DeviceManager::chooseDevice(int type)
 {
 	Array<Device*> &devices = getDeviceList(type);
-	foreach(Device *d, devices)
+	for (Device *d : devices)
 		if (d->present and d->visible)
 			return d;
 	return NULL;

@@ -79,7 +79,7 @@ void WinTrySendByKeyCode(HuiWindow *win, int key_code)
 {
 	if (key_code <= 0)
 		return;
-	foreach(HuiCommand &c, _HuiCommand_)
+	for (HuiCommand &c : _HuiCommand_)
 		if (key_code == c.key_code){
 			//msg_write("---------------------------------");
 			//msg_write(c.id);
@@ -260,7 +260,7 @@ HuiWindow::~HuiWindow()
 		return;
 
 	// quick'n'dirty fix (gtk destroys its widgets recursively)
-	foreach(HuiControl *c, control)
+	for (HuiControl *c : control)
 		c->widget = NULL;
 
 	_clean_up_();
@@ -330,7 +330,7 @@ string HuiWindow::run()
 		bool killed = false;
 		while(!killed){
 			HuiDoSingleMainLoop();
-			foreach(HuiClosedPanel &cp, HuiClosedPanels)
+			for (HuiClosedPanel &cp : HuiClosedPanels)
 				if (cp.unique_id == uid)
 					killed = true;
 		}

@@ -160,7 +160,7 @@ Selection ViewModeCurve::getHover()
 		}
 
 		// TODO: prefer selected subs
-		foreach(SampleRef *ss, s.track->samples){
+		for (SampleRef *ss : s.track->samples){
 			int offset = view->mouseOverSample(ss);
 			if (offset >= 0){
 				s.sample = ss;

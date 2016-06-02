@@ -21,7 +21,7 @@ void SetImmortal(SyntaxTree *ps)
 // import data from an included script file
 void SyntaxTree::AddIncludeData(Script *s)
 {
-	foreach(Script *i, includes)
+	for (Script *i : includes)
 		if (i == s)
 			return;
 

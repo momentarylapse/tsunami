@@ -49,7 +49,7 @@ void Clipboard::append_track(Track *t, AudioView *view)
 		tt->midi = t->midi.getNotesSafe(view->sel.range);
 		tt->midi.samples = view->sel.range.length;
 		tt->midi.sanify(view->sel.range);
-		foreach(MidiNote &n, tt->midi)
+		for (MidiNote &n : tt->midi)
 			n.range.offset -= view->sel.range.offset;
 	}
 
@@ -67,7 +67,7 @@ void Clipboard::copy(AudioView *view)
 	temp->sample_rate = s->sample_rate;
 
 	SongSelection sel = view->getEditSeletion();
-	foreach(Track *t, s->tracks)
+	for (Track *t : s->tracks)
 		if (sel.has(t))
 			append_track(t, view);
 
@@ -100,7 +100,7 @@ void Clipboard::paste(AudioView *view)
 	Song *a = view->song;
 
 	Array<string> temp_type, dest_type;
-	foreach(Track *t, a->tracks){
+	for (Track *t : a->tracks){
 		if (!view->sel.has(t))
 			continue;
 		if (t->type == Track::TYPE_TIME)
@@ -108,7 +108,7 @@ void Clipboard::paste(AudioView *view)
 		dest_type.add(track_type(t->type));
 	}
 
-	foreach(Track *t, temp->tracks)
+	for (Track *t : temp->tracks)
 		temp_type.add(track_type(t->type));
 
 	// only 1 track in clipboard => paste into current
@@ -136,7 +136,7 @@ void Clipboard::paste(AudioView *view)
 		paste_track(0, view->cur_track, view);
 	}else{
 		int ti = 0;
-		foreach(Track *t, a->tracks){
+		for (Track *t : a->tracks){
 			if (!view->sel.has(t))
 				continue;
 			if (t->type == Track::TYPE_TIME)

@@ -28,7 +28,7 @@ ActionTrackInsertSample::ActionTrackInsertSample(Song *s, int track_no, int inde
 		buf.set(*sub->buf, 0, sub->volume);
 		addSubAction(action, s);
 	}else if (t->type == t->TYPE_MIDI){
-		foreach(MidiNote &n, *sub->midi){
+		for (MidiNote &n : *sub->midi){
 			MidiNote nn = n;
 			nn.range.offset += sub->pos;
 			addSubAction(new ActionTrackAddMidiNote(t, nn), s);

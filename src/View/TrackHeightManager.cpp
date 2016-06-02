@@ -41,32 +41,32 @@ float smooth_parametrization(float t)
 	return -2*t*t+4*t-1;
 }
 
-bool TrackHeightManager::update(AudioView *v, Song *a, const rect &r)
+bool TrackHeightManager::update(AudioView *view, Song *a, const rect &r)
 {
 	// start animation?
 	if (dirty){
-		plan(v, a, r);
+		plan(view, a, r);
 		t = 0;
 		animating = true;
 		dirty = false;
 
-		foreach(AudioViewTrack *v, v->vtrack)
+		for (AudioViewTrack *v : view->vtrack)
 			v->area_last = v->area;
 	}
 
 	if (render_area != r){
 		render_area = r;
-		plan(v, a, r);
+		plan(view, a, r);
 
 		// instant change?
 		if (!animating){
-			foreach(AudioViewTrack *v, v->vtrack)
+			for (AudioViewTrack *v : view->vtrack)
 				v->area = v->area_target;
 		}
 	}
 
 	// force instant changes on x-axis
-	foreach(AudioViewTrack *v, v->vtrack){
+	for (AudioViewTrack *v : view->vtrack){
 		v->area.x1 = v->area_target.x1 = v->area_last.x1 = r.x1;
 		v->area.x2 = v->area_target.x2 = v->area_last.x2 = r.x2;
 	}
@@ -80,7 +80,7 @@ bool TrackHeightManager::update(AudioView *v, Song *a, const rect &r)
 		t = 1;
 		animating = false;
 	}
-	foreach(AudioViewTrack *v, v->vtrack)
+	for (AudioViewTrack *v : view->vtrack)
 		v->area = rect_inter(v->area_last, v->area_target, smooth_parametrization(t));
 
 	return animating;
@@ -93,7 +93,7 @@ void TrackHeightManager::plan(AudioView *v, Song *a, const rect &r)
 	// wanted space
 	int h_wish = 0;
 	int h_min = 0;
-	foreach(AudioViewTrack *t, v->vtrack){
+	for (AudioViewTrack *t : v->vtrack){
 		h_wish += t->height_wish;
 		h_min += t->height_min;
 	}

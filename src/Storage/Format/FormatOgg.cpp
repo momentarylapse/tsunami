@@ -69,7 +69,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 	vorbis_comment vc;
 	vorbis_comment_init(&vc);
 	Array<Tag> tags = r->getTags();
-	foreach(Tag &tag, tags)
+	for (Tag &tag : tags)
 		vorbis_comment_add_tag(&vc, tag.key.c_str(), tag.value.c_str());
 	ogg_packet header_main;
 	ogg_packet header_comments;

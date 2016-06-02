@@ -158,7 +158,7 @@ SyntaxTree::SyntaxTree(Script *_script) :
 	Exp.cur_line = NULL;
 
 	// "include" default stuff
-	foreach(Package &p, Packages)
+	for (Package &p : Packages)
 		if (p.used_by_default)
 			AddIncludeData(p.script);
 }
@@ -366,7 +366,7 @@ int Block::add_var(const string &name, Type *type)
 
 int Block::get_var(const string &name)
 {
-	foreach(int i, vars)
+	for (int i : vars)
 		if (function->var[i].name == name)
 			return i;
 	if (parent)
@@ -512,7 +512,7 @@ Command exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no)
 Command exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 {
 	Command link;
-	Command *self = ps->add_command_local_var(f->__get_var("self"), f->_class->GetPointer());
+	Command *self = ps->add_command_local_var(f->__get_var(NAME_SELF), f->_class->GetPointer());
 	link.type = e.type;
 	link.link_no = e.offset;
 	link.kind = KIND_DEREF_ADDRESS_SHIFT;
@@ -526,7 +526,7 @@ Command exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 Command exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
 	Command link;
-	Command *self = ps->add_command_local_var(f->__get_var("self"), f->_class->GetPointer());
+	Command *self = ps->add_command_local_var(f->__get_var(NAME_SELF), f->_class->GetPointer());
 	if (cf.virtual_index >= 0){
 		link.kind = KIND_VIRTUAL_FUNCTION;
 		link.link_no = cf.virtual_index;
@@ -606,17 +606,17 @@ Array<Command> SyntaxTree::GetExistence(const string &name, Block *block)
 			return links;
 		}
 		if (f->_class){
-			if ((name == "super") and (f->_class->parent)){
-				links.add(exlink_make_var_local(this, f->_class->parent->GetPointer(), f->__get_var("self")));
+			if ((name == NAME_SUPER) and (f->_class->parent)){
+				links.add(exlink_make_var_local(this, f->_class->parent->GetPointer(), f->__get_var(NAME_SELF)));
 				return links;
 			}
 			// class elements (within a class function)
-			foreach(ClassElement &e, f->_class->element)
+			for (ClassElement &e : f->_class->element)
 				if (e.name == name){
 					links.add(exlink_make_var_element(this, f, e));
 					return links;
 				}
-			foreach(ClassFunction &cf, f->_class->function)
+			for (ClassFunction &cf : f->_class->function)
 				if (cf.name == name){
 					links.add(exlink_make_func_class(this, f, cf));
 					return links;
@@ -649,7 +649,7 @@ Array<Command> SyntaxTree::GetExistence(const string &name, Block *block)
 	}
 
 	// in include files (only global)...
-	foreach(Script *i, includes)
+	for (Script *i : includes)
 		links.append(i->syntax->GetExistenceShared(name));
 
 	// ...unknown
@@ -662,7 +662,7 @@ Type *SyntaxTree::FindType(const string &name)
 	for (int i=0;i<types.num;i++)
 		if (name == types[i]->name)
 			return types[i];
-	foreach(Script *inc, includes)
+	for (Script *inc : includes)
 		for (int i=0;i<inc->syntax->types.num;i++)
 			if (name == inc->syntax->types[i]->name)
 				return inc->syntax->types[i];
@@ -672,11 +672,11 @@ Type *SyntaxTree::FindType(const string &name)
 // create a new type?
 Type *SyntaxTree::AddType(Type *type)
 {
-	foreach(Type *t, types)
+	for (Type *t : types)
 		if (type->name == t->name)
 			return t;
-	foreach(Script *inc, includes)
-		foreach(Type *t, inc->syntax->types)
+	for (Script *inc : includes)
+		for (Type *t : inc->syntax->types)
 			if (type->name == t->name)
 				return t;
 	Type *t = new Type;
@@ -860,7 +860,7 @@ void convert_return_by_memory(SyntaxTree *ps, Block *b, Function *f)
 		// convert into   *-return- = param
 		Command *p_ret = NULL;
 		foreachi(Variable &v, f->var, i)
-			if (v.name == "-return-"){
+			if (v.name == NAME_RETURN_VAR){
 				p_ret = ps->AddCommand(KIND_VAR_LOCAL, i, v.type);
 			}
 		if (!p_ret)
@@ -886,7 +886,7 @@ void SyntaxTree::ConvertCallByReference()
 
 
 	// convert functions
-	foreach(Function *f, functions){
+	for (Function *f : functions){
 		
 		// parameter: array/class as reference
 		for (int j=0;j<f->num_params;j++)
@@ -913,12 +913,12 @@ void SyntaxTree::ConvertCallByReference()
 
 
 	// convert return...
-	foreach(Function *f, functions)
+	for (Function *f : functions)
 		if (f->return_type->UsesReturnByMemory())
 			convert_return_by_memory(this, f->block, f);
 
 	// convert function calls
-	foreach(Function *f, functions)
+	for (Function *f : functions)
 		foreachi(Command *c, f->block->commands, i)
 			f->block->commands[i] = conv_calls(this, c, 0);
 }
@@ -929,7 +929,7 @@ void SyntaxTree::Simplify()
 	msg_db_f("Simplify", 2);
 	
 	// remove &*
-	foreach(Function *f, functions)
+	for (Function *f : functions)
 		foreachi(Command *c, f->block->commands, i)
 			f->block->commands[i] = easyfy(this, c, 0);
 }
@@ -1047,7 +1047,7 @@ void SyntaxTree::BreakDownComplicatedCommands()
 {
 	msg_db_f("BreakDownComplicatedCommands", 4);
 
-	foreach(Function *f, functions){
+	for (Function *f : functions){
 		foreachi(Command *c, f->block->commands, i)
 			f->block->commands[i] = BreakDownComplicatedCommand(c);
 	}
@@ -1057,7 +1057,7 @@ void MapLVSX86Return(Function *f)
 {
 	if (f->return_type->UsesReturnByMemory()){
 		foreachi(Variable &v, f->var, i)
-			if (v.name == "-return-"){
+			if (v.name == NAME_RETURN_VAR){
 				v._offset = f->_param_size;
 				f->_param_size += 4;
 			}
@@ -1068,7 +1068,7 @@ void MapLVSX86Self(Function *f)
 {
 	if (f->_class){
 		foreachi(Variable &v, f->var, i)
-			if (v.name == "self"){
+			if (v.name == NAME_SELF){
 				v._offset = f->_param_size;
 				f->_param_size += 4;
 			}
@@ -1078,7 +1078,7 @@ void MapLVSX86Self(Function *f)
 void SyntaxTree::MapLocalVariablesToStack()
 {
 	msg_db_f("MapLocalVariablesToStack", 1);
-	foreach(Function *f, functions){
+	for (Function *f : functions){
 		f->_param_size = 2 * config.pointer_size; // space for return value and eBP
 		if (config.instruction_set == Asm::INSTRUCTION_SET_X86){
 			f->_var_size = 0;
@@ -1098,9 +1098,9 @@ void SyntaxTree::MapLocalVariablesToStack()
 			}
 
 			foreachi(Variable &v, f->var, i){
-				if ((f->_class) and (v.name == "self"))
+				if ((f->_class) and (v.name == NAME_SELF))
 					continue;
-				if (v.name == "-return-")
+				if (v.name == NAME_RETURN_VAR)
 					continue;
 				int s = mem_align(v.type->size, 4);
 				if (i < f->num_params){
@@ -1142,20 +1142,20 @@ SyntaxTree::~SyntaxTree()
 	Exp.clear();
 
 	// delete all types created by this script
-	foreach(Type *t, types)
+	for (Type *t : types)
 		if (t->owner == this)
 			delete(t);
 
 	if (asm_meta_info)
 		delete(asm_meta_info);
 
-	foreach(Command *c, commands)
+	for (Command *c : commands)
 		delete(c);
 
-	foreach(Block *b, blocks)
+	for (Block *b : blocks)
 		delete(b);
 	
-	foreach(Function *f, functions)
+	for (Function *f : functions)
 		delete(f);
 }
 
@@ -1180,7 +1180,7 @@ void SyntaxTree::ShowBlock(Block *b)
 {
 	msg_write("block");
 	msg_right();
-	foreach(Command *c, b->commands){
+	for (Command *c : b->commands){
 		if (c->kind == KIND_BLOCK)
 			ShowBlock(c->as_block());
 		else
@@ -1201,7 +1201,7 @@ void SyntaxTree::Show()
 {
 	msg_write("--------- Syntax of " + script->filename + " ---------");
 	msg_right();
-	foreach(Function *f, functions)
+	for (Function *f : functions)
 		if (!f->is_extern)
 			ShowFunction(f);
 	msg_left();

@@ -37,7 +37,7 @@ void PluginData::__delete__()
 Array<Script::ClassElement> get_unique_elements(Script::Type *t)
 {
 	Array<Script::ClassElement> r;
-	foreach(Script::ClassElement &e, t->element)
+	for (auto &e : t->element)
 		if (!e.hidden){
 			r.add(e);
 		}
@@ -197,7 +197,7 @@ PluginData *Configurable::get_config()
 	Script::Type *type = Script::GetDynamicType(this);
 	if (!type)
 		return NULL;
-	foreach(Script::ClassElement &e, type->element)
+	for (auto &e : type->element)
 		if ((e.name == "config") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *config = (PluginData*)((char*)this + e.offset);
 			config->type = e.type;
@@ -215,7 +215,7 @@ PluginData *Configurable::get_state()
 			return &ds->state;
 		return NULL;
 	}
-	foreach(Script::ClassElement &e, type->element)
+	for (auto &e : type->element)
 		if ((e.name == "state") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *state = (PluginData*)((char*)this + e.offset);
 			state->type = e.type;
@@ -280,6 +280,7 @@ struct AutoConfigData
 	string name, unit;
 	float min, max, step, factor;
 	float *value;
+	Slider *slider;
 	AutoConfigData()
 	{
 		min = -100000000;
@@ -287,6 +288,7 @@ struct AutoConfigData
 		step = 1;
 		factor = 1;
 		value = NULL;
+		slider = NULL;
 	}
 };
 
@@ -294,12 +296,12 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 {
 	Script::SyntaxTree *ps = config->type->owner;
 	Array<AutoConfigData> r;
-	foreach(Script::ClassElement &e, config->type->element)
+	for (auto &e : config->type->element)
 		if (e.type == Script::TypeFloat32){
 			AutoConfigData a;
 			a.name = e.name;
 			a.value = (float*)((char*)config + e.offset);
-			foreach(Script::Constant &c, ps->constants){
+			for (auto &c : ps->constants){
 				if (c.name == "AutoConfig" + e.name){
 					Array<string> p = c.value.explode(":");
 					if (p.num == 5){
@@ -319,7 +321,6 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 class AutoConfigPanel : public ConfigPanel
 {
 public:
-	Array<Slider*> slider;
 	Array<AutoConfigData> aa;
 	AutoConfigPanel(Array<AutoConfigData> &_aa, Configurable *_c) :
 		ConfigPanel(_c)
@@ -334,27 +335,25 @@ public:
 			addSlider("!width=150", 1, i, 0, 0, "slider-" + i);
 			addSpinButton(format("%f\\%f\\%f\\%f", *a.value, a.min*a.factor, a.max*a.factor, a.step), 2, i, 0, 0, "spin-" + i);
 			addLabel(a.unit, 3, i, 0, 0, "");
-			slider.add(new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::onChange, *a.value, this));
+			a.slider = new Slider(this, "slider-" + i, "spin-" + i, a.min, a.max, a.factor, (void(HuiEventHandler::*)())&AutoConfigPanel::onChange, *a.value, this);
 		}
 	}
 	~AutoConfigPanel()
 	{
-		foreach(Slider *s, slider)
-			delete(s);
+		for (auto &a : aa)
+			delete(a.slider);
 	}
 	void _cdecl onChange()
 	{
-		foreachi(AutoConfigData &a, aa, i){
-			*a.value = slider[i]->get();
-		}
+		for (auto &a : aa)
+			*a.value = a.slider->get();
 		notify();
 
 	}
 	virtual void _cdecl update()
 	{
-		foreachi(AutoConfigData &a, aa, i){
-			slider[i]->set(*a.value);
-		}
+		for (auto &a : aa)
+			a.slider->set(*a.value);
 	}
 };
 

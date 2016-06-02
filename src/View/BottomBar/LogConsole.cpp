@@ -37,7 +37,7 @@ void LogConsole::onClear()
 void LogConsole::reload()
 {
 	reset("log_list");
-	foreach(Log::Message &m, log->messages){
+	for (auto &m : log->messages){
 		if (m.type == Log::TYPE_ERROR){
 			addString("log_list", "hui:error\\" + m.text);
 			((BottomBar*)parent)->open(BottomBar::LOG_CONSOLE);

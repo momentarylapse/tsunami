@@ -41,7 +41,7 @@ Array<Beat> BarCollection::getBeats(const Range &r)
 
 	int pos0 = 0;
 	int bar_no = 0;
-	foreach(BarPattern &b, *this)
+	for (BarPattern &b : *this)
 		if (b.type == b.TYPE_BAR){
 			int beat_length = b.length / b.num_beats;
 			for (int i=0;i<b.num_beats;i++){
@@ -63,7 +63,7 @@ Array<Bar> BarCollection::getBars(const Range &r)
 
 	int pos0 = 0;
 	int bar_no = 0;
-	foreach(BarPattern &b, *this)
+	for (BarPattern &b : *this)
 		if (b.type == b.TYPE_BAR){
 			Range rr = Range(pos0, b.length);
 			if (rr.overlaps(r))
@@ -81,7 +81,7 @@ int BarCollection::getNextBeat(int pos)
 	int p0 = 0;
 	if (p0 > pos)
 		return p0;
-	foreach(BarPattern &b, *this){
+	for (BarPattern &b : *this){
 		if (b.type == b.TYPE_BAR){
 			int pp = p0;
 			for (int j=0;j<b.num_beats;j++){
@@ -102,7 +102,7 @@ int BarCollection::getNextBeat(int pos)
 Range BarCollection::getRange()
 {
 	int pos0 = 0;
-	foreach(BarPattern &b, *this)
+	for (BarPattern &b : *this)
 		pos0 += b.length;
 	return Range(0, pos0);
 }

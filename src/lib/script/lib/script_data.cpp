@@ -26,7 +26,29 @@
 
 namespace Script{
 
-string DataVersion = "0.13.12.0";
+string DataVersion = "0.13.13.0";
+
+
+const string NAME_CLASS = "class";
+const string NAME_FUNC_INIT = "__init__";
+const string NAME_FUNC_DELETE = "__delete__";
+const string NAME_FUNC_ASSIGN = "__assign__";
+const string NAME_SUPER = "super";
+const string NAME_SELF = "self";
+const string NAME_RETURN_VAR = "-return-";
+const string NAME_ENUM = "enum";
+const string NAME_CONST = "const";
+const string NAME_OVERRIDE = "override";
+const string NAME_VIRTUAL = "virtual";
+const string NAME_EXTERN = "extern";
+const string NAME_USE = "use";
+const string NAME_RETURN = "return";
+const string NAME_IF = "if";
+const string NAME_ELSE = "else";
+const string NAME_WHILE = "while";
+const string NAME_FOR = "for";
+const string NAME_BREAK = "break";
+const string NAME_CONTINUE = "continue";
 
 CompilerConfiguration config;
 
@@ -293,7 +315,7 @@ void class_add_func(const string &name, Type *return_type, void *func, ScriptFla
 	msg_db_f("add_class_func", 4);
 	string tname = cur_class->name;
 	if (tname[0] == '-'){
-		foreach(Type *t, cur_package_script->syntax->types)
+		for (Type *t : cur_package_script->syntax->types)
 			if ((t->is_pointer) and (t->parent == cur_class))
 				tname = t->name;
 	}
@@ -345,6 +367,7 @@ int get_virtual_index(void *func, const string &tname, const string &name)
 			msg_error("Script class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		}
 	}
+	return -1;
 }
 
 void class_add_func_virtual(const string &name, Type *return_type, void *func, ScriptFlag flag)
@@ -352,7 +375,7 @@ void class_add_func_virtual(const string &name, Type *return_type, void *func, S
 	msg_db_f("add_class_func_virtual", 4);
 	string tname = cur_class->name;
 	if (tname[0] == '-'){
-		foreach(Type *t, cur_package_script->syntax->types)
+		for (Type *t : cur_package_script->syntax->types)
 			if ((t->is_pointer) and (t->parent == cur_class))
 				tname = t->name;
 	}
@@ -480,55 +503,6 @@ void func_add_param(const string &name, Type *type)
 	}
 }
 
-/*void script_make_super_array_func_headers(Type *t, SyntaxTree *ps, bool pre_define_funcs)
-{
-	add_class(t);
-		class_add_element("num", TypeInt, config.PointerSize);
-
-		// always usable operations
-		class_add_func("swap", TypeVoid, mf(&DynamicArray::swap));
-			func_add_param("i1",		TypeInt);
-			func_add_param("i2",		TypeInt);
-		class_add_func("iterate", TypeBool, mf(&DynamicArray::iterate));
-			func_add_param("pointer",		TypePointerPs);
-		class_add_func("iterate_back", TypeBool, mf(&DynamicArray::iterate_back));
-			func_add_param("pointer",		TypePointerPs);
-		class_add_func("index", TypeInt, mf(&DynamicArray::index));
-			func_add_param("pointer",		TypePointer);
-		class_add_func("subarray", t, mf(&DynamicArray::ref_subarray));
-			func_add_param("start",		TypeInt);
-			func_add_param("num",		TypeInt);
-
-		// define later...
-		if (pre_define_funcs){
-		class_add_func("__init__",	TypeVoid, NULL);
-		class_add_func("add", TypeVoid, NULL);
-			func_add_param("x",		t->parent);
-		class_add_func("insert", TypeVoid, NULL);
-			func_add_param("x",		t->parent);
-			func_add_param("index",		TypeInt);
-		class_add_func("__delete__",	TypeVoid, NULL);
-		class_add_func("clear", TypeVoid, NULL);
-		class_add_func("__assign__", TypeVoid, NULL);
-			func_add_param("other",		t);
-		class_add_func("remove", TypeVoid, NULL);
-			func_add_param("index",		TypeInt);
-		class_add_func("resize", TypeVoid, NULL);
-			func_add_param("num",		TypeInt);
-		class_add_func("ensure_size", TypeVoid, NULL);
-			func_add_param("num",		TypeInt);
-		}
-
-		// low level operations
-		class_add_func("__mem_init__", TypeVoid, mf(&DynamicArray::init));
-			func_add_param("element_size",		TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, mf(&DynamicArray::clear));
-		class_add_func("__mem_resize__", TypeVoid, mf(&DynamicArray::resize));
-			func_add_param("size",		TypeInt);
-		class_add_func("__mem_remove__", TypeVoid, mf(&DynamicArray::delete_single));
-			func_add_param("index",		TypeInt);
-}*/
-
 void script_make_super_array(Type *t, SyntaxTree *ps)
 {
 	msg_db_f("make_super_array", 4);
@@ -545,35 +519,35 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 		if (t->parent->is_simple_class()){
 			if (!t->parent->UsesCallByReference()){
 				if (t->parent->is_pointer){
-					class_add_func("__init__",	TypeVoid, mf(&Array<void*>::__init__));
+					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<void*>::__init__));
 					class_add_func("add", TypeVoid, mf(&Array<void*>::add));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&Array<void*>::insert));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent == TypeFloat32){
-					class_add_func("__init__",	TypeVoid, mf(&Array<float>::__init__));
+					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<float>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_f_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_f_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent == TypeFloat64){
-					class_add_func("__init__",	TypeVoid, mf(&Array<double>::__init__));
+					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<double>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_d_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_d_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 4){
-					class_add_func("__init__",	TypeVoid, mf(&Array<int>::__init__));
+					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<int>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_4_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_4_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 1){
-					class_add_func("__init__",	TypeVoid, mf(&Array<char>::__init__));
+					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<char>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_1_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_1_single));
@@ -588,9 +562,9 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 					func_add_param("x",		t->parent);
 					func_add_param("index",		TypeInt);
 			}
-			class_add_func("__delete__",	TypeVoid, mf(&DynamicArray::clear));
+			class_add_func(NAME_FUNC_DELETE,	TypeVoid, mf(&DynamicArray::clear));
 			class_add_func("clear", TypeVoid, mf(&DynamicArray::clear));
-			class_add_func("__assign__", TypeVoid, mf(&DynamicArray::assign));
+			class_add_func(NAME_FUNC_ASSIGN, TypeVoid, mf(&DynamicArray::assign));
 				func_add_param("other",		t);
 			class_add_func("remove", TypeVoid, mf(&DynamicArray::delete_single));
 				func_add_param("index",		TypeInt);
@@ -947,8 +921,8 @@ void SIAddPackageBase()
 		class_add_func("extension", TypeString, mf(&string::extension), FLAG_PURE);
 
 	add_class(TypeStringList);
-		class_add_func("__init__",	TypeVoid, mf(&StringList::__init__));
-		class_add_func("__delete__",	TypeVoid, mf(&StringList::clear));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&StringList::__init__));
+		class_add_func(NAME_FUNC_DELETE,	TypeVoid, mf(&StringList::clear));
 		class_add_func("add", TypeVoid, mf(&StringList::add));
 			func_add_param("x",		TypeString);
 		class_add_func("clear", TypeVoid, mf(&StringList::clear));
@@ -956,7 +930,7 @@ void SIAddPackageBase()
 			func_add_param("index",		TypeInt);
 		class_add_func("resize", TypeVoid, mf(&StringList::resize));
 			func_add_param("num",		TypeInt);
-		class_add_func("__assign__",	TypeVoid, mf(&StringList::assign));
+		class_add_func(NAME_FUNC_ASSIGN,	TypeVoid, mf(&StringList::assign));
 			func_add_param("other",		TypeStringList);
 		class_add_func("join", TypeString, mf(&StringList::join), FLAG_PURE);
 			func_add_param("glue",		TypeString);
@@ -1402,7 +1376,7 @@ void LinkExternal(const string &name, void *pointer)
 	ExternalLinks.add(l);
 	if (name.head(5) == "lib__"){
 		string sname = name.substr(5, -1).replace("@list", "[]").replace("@@", ".");
-		foreach(Package &p, Packages)
+		for (Package &p : Packages)
 			foreachi(Function *f, p.script->syntax->functions, i)
 				if (f->name == sname)
 					p.script->func[i] = (void(*)())pointer;
@@ -1411,7 +1385,7 @@ void LinkExternal(const string &name, void *pointer)
 
 void *GetExternalLink(const string &name)
 {
-	foreach(ExternalLinkData &l, ExternalLinks)
+	for (ExternalLinkData &l : ExternalLinks)
 		if (l.name == name)
 			return l.pointer;
 	return NULL;
@@ -1451,14 +1425,14 @@ void DeclareClassVirtualIndex(const string &class_name, const string &func, void
 
 int ProcessClassOffset(const string &class_name, const string &element, int offset)
 {
-	foreach(ClassOffsetData &d, ClassOffsets)
+	for (ClassOffsetData &d : ClassOffsets)
 		if ((d.class_name == class_name) and (d.element == element))
 			return d.offset;
 	return offset;
 }
 int ProcessClassSize(const string &class_name, int size)
 {
-	foreach(ClassSizeData &d, ClassSizes)
+	for (ClassSizeData &d : ClassSizes)
 		if (d.class_name == class_name)
 			return d.size;
 	return size;
@@ -1466,7 +1440,7 @@ int ProcessClassSize(const string &class_name, int size)
 
 int ProcessClassNumVirtuals(const string &class_name, int num_virtual)
 {
-	foreach(ClassOffsetData &d, ClassOffsets)
+	for (ClassOffsetData &d : ClassOffsets)
 		if ((d.class_name == class_name) and (d.is_virtual))
 			num_virtual = max(num_virtual, d.offset + 1);
 	return num_virtual;

@@ -42,7 +42,7 @@ class PitchForkDialog : Dialog
 		fork.renderer.freq = getFloat("")
 
 	void onClose()
-		fork.end()
+		fork.stop()
 
 class PitchFork : TsunamiPlugin
 	OutputStream *stream
@@ -57,7 +57,7 @@ class PitchFork : TsunamiPlugin
 		dlg.show()
 		
 		stream.play()
-	override void onEnd()
+	override void onStop()
 		delete dlg
 		delete stream
 		delete renderer

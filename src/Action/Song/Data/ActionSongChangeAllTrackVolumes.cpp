@@ -13,7 +13,7 @@ ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track 
 	track_no = t->get_index();
 	new_value = _volume;
 	old_value = t->volume;
-	foreach(Track *tt, t->song->tracks)
+	for (Track *tt : t->song->tracks)
 		old_volumes.add(tt->volume);
 }
 

@@ -29,6 +29,26 @@ class Type;
 void script_make_super_array(Type *t, SyntaxTree *ps = NULL);
 
 
+extern const string NAME_CLASS;
+extern const string NAME_FUNC_INIT;
+extern const string NAME_FUNC_DELETE;
+extern const string NAME_FUNC_ASSIGN;
+extern const string NAME_SUPER;
+extern const string NAME_SELF;
+extern const string NAME_RETURN_VAR;
+extern const string NAME_ENUM;
+extern const string NAME_CONST;
+extern const string NAME_OVERRIDE;
+extern const string NAME_VIRTUAL;
+extern const string NAME_EXTERN;
+extern const string NAME_USE;
+extern const string NAME_RETURN;
+extern const string NAME_IF;
+extern const string NAME_ELSE;
+extern const string NAME_WHILE;
+extern const string NAME_FOR;
+extern const string NAME_BREAK;
+extern const string NAME_CONTINUE;
 
 
 //--------------------------------------------------------------------------------------------------

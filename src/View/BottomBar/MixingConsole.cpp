@@ -123,7 +123,7 @@ MixingConsole::~MixingConsole()
 {
 	unsubscribe(song);
 	unsubscribe(device_manager);
-	foreach(TrackMixer *m, mixer)
+	for (TrackMixer *m : mixer)
 		delete(m);
 	delete(peak_meter);
 }

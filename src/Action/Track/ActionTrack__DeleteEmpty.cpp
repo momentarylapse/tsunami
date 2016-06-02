@@ -24,7 +24,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d)
 	assert(index >= 0 && index < a->tracks.num);
 	Track *t = a->tracks[index];
 	int num_buf = 0;
-	foreach(TrackLevel &l, t->levels)
+	for (TrackLevel &l : t->levels)
 		num_buf += l.buffers.num;
 	assert(num_buf == 0);
 	assert(t->samples.num == 0);

@@ -67,7 +67,7 @@ void HuiResource::reset()
 
 HuiResource *HuiResource::get_node(const string &id) const
 {
-	foreach(HuiResource &c, const_cast<HuiResource*>(this)->children){
+	for (HuiResource &c : children){
 		if (c.id == id)
 			return &c;
 		HuiResource *ret = c.get_node(id);
@@ -167,7 +167,7 @@ void HuiLoadResource(const string &filename)
 
 HuiResource *HuiGetResource(const string &id)
 {
-	foreach(HuiResource &r, _HuiResource_)
+	for (HuiResource &r : _HuiResource_)
 		if (r.id == id)
 			return &r;
 	if (id.num > 0)
@@ -189,7 +189,7 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 
 	string menu_id, toolbar_id;
 	bool allow_parent = false;
-	foreach(string &o, res->options){
+	for (string &o : res->options){
 		if ((o == "allow-root") or (o == "allow-parent"))
 			allow_parent = true;
 		if (o.head(5) == "menu=")
@@ -214,7 +214,7 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 		dlg->toolbar[HuiToolbarTop]->setByID(toolbar_id);
 
 	// controls
-	foreach(HuiResource &cmd, res->children)
+	for (HuiResource &cmd : res->children)
 		dlg->_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
@@ -231,7 +231,7 @@ HuiMenu *_create_res_menu_(const string &ns, HuiResource *res)
 	HuiMenu *menu = new HuiMenu();
 
 	//msg_db_out(2,i2s(n));
-	foreach(HuiResource &c, res->children){
+	for (HuiResource &c : res->children){
 		//msg_db_out(2,i2s(j));
 		if (c.type == "Item"){
 			if (sa_contains(c.options, "checkable"))
@@ -335,7 +335,7 @@ Array<string> res_tokenize(const string &s)
 
 bool res_sa_contains(Array<string> &a, const string &s)
 {
-	foreach(string &aa, a)
+	for (string &aa : a)
 		if (aa == s)
 			return true;
 	return false;
@@ -479,7 +479,7 @@ void HuiResource::show(int indent)
 	for (int i=0;i<indent;i++)
 		nn += "    ";
 	msg_write(nn + type + " - " + id + format(" - %d %d %d %d - ", x, y, w, h) + sa2s(options));
-	foreach(HuiResource &child, children)
+	for (HuiResource &child : children)
 		child.show(indent + 1);
 }
 

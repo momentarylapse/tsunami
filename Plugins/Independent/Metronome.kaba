@@ -128,7 +128,7 @@ Grid ? '' 1 3
 		//metro.source.offset = 0
 
 	void onClose()
-		metro.end()
+		metro.stop()
 
 class Metronome : TsunamiPlugin
 	OutputStream *stream
@@ -149,7 +149,7 @@ class Metronome : TsunamiPlugin
 		stream.setBufferSize(1024)
 		stream.play()
 		
-	override void onEnd()
+	override void onStop()
 		source.win = nil
 		delete dlg
 		delete stream

@@ -662,7 +662,7 @@ public:
 
 		f->WriteInt(me->num);
 		f->WriteInt(3); // stringno + clef_position
-		foreach(MidiNote &n, *me){
+		for (MidiNote &n : *me){
 			f->WriteInt(n.range.offset);
 			f->WriteInt(n.range.length);
 			f->WriteInt(n.pitch);
@@ -721,7 +721,7 @@ public:
 
 		f->WriteInt(me->num);
 		f->WriteInt(3); // stringno + clef_position
-		foreach(MidiNote &n, *me){
+		for (MidiNote &n : *me){
 			f->WriteInt(n.range.offset);
 			f->WriteInt(n.range.length);
 			f->WriteInt(n.pitch);
@@ -1115,7 +1115,7 @@ void check_empty_subs(Song *a)
 
 void FormatNami::make_consistent(Song *a)
 {
-	foreach(Sample *s, a->samples){
+	for (Sample *s : a->samples){
 		if (s->type == Track::TYPE_MIDI){
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
 				s->midi.samples = s->midi.back().range.end();

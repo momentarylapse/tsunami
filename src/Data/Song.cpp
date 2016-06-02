@@ -209,18 +209,18 @@ void Song::reset()
 	default_format = SAMPLE_FORMAT_16;
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
-	foreach(Effect *f, fx)
+	for (Effect *f : fx)
 		delete(f);
 	fx.clear();
-	foreach(Track *t, tracks)
+	for (Track *t : tracks)
 		delete(t);
 	tracks.clear();
 
-	foreach(Sample *s, samples)
+	for (Sample *s : samples)
 		delete(s);
 	samples.clear();
 
-	foreach(Curve *c, curves)
+	for (Curve *c : curves)
 		delete(c);
 	curves.clear();
 
@@ -255,7 +255,7 @@ Range Song::getRange()
 	int max = -1073741824;
 	Range r = Range(min, max - min);
 
-	foreach(Track *t, tracks)
+	for (Track *t : tracks)
 		r = r or t->getRangeUnsafe();
 
 	if (r.length < 0)
@@ -272,7 +272,7 @@ Range Song::getRangeWithTime()
 	if (bars.num > 0)
 		r = r or bars.getRange();
 
-	foreach(Track *t, tracks)
+	for (Track *t : tracks)
 		r = r or t->getRangeUnsafe();
 
 	if (r.length < 0)
@@ -364,9 +364,9 @@ extern HuiTimer debug_timer;
 void Song::updatePeaks()
 {
 	debug_timer.reset();
-	foreach(Track *t, tracks)
+	for (Track *t : tracks)
 		t->updatePeaks();
-	foreach(Sample *s, samples)
+	for (Sample *s : samples)
 		s->buf.update_peaks();
 	//msg_write(format("up %f", debug_timer.get()));
 }
@@ -489,7 +489,7 @@ int __shift_data_shift(const Range &source, int new_length, int pos)
 void Song::__shift_data(const Range &source, int new_length)
 {
 	int pos0 = source.offset;
-	foreach(Track *t, tracks){
+	for (Track *t : tracks){
 
 		// midi
 		foreachi(MidiNote &n, t->midi, j){
@@ -502,18 +502,18 @@ void Song::__shift_data(const Range &source, int new_length)
 		}
 
 		// marker
-		foreach(TrackMarker &m, t->markers)
+		for (TrackMarker &m : t->markers)
 			if (m.pos >= pos0)
 				m.pos = __shift_data_shift(source, new_length, m.pos);
 
 		// buffer
-		foreach(TrackLevel &l, t->levels)
-			foreach(BufferBox &b, l.buffers)
+		for (TrackLevel &l : t->levels)
+			for (BufferBox &b : l.buffers)
 				if (b.offset >= pos0)
 					b.offset = __shift_data_shift(source, new_length, b.offset);
 
 		// marker
-		foreach(SampleRef *s, t->samples)
+		for (SampleRef *s : t->samples)
 			if (s->pos >= pos0)
 				s->pos = __shift_data_shift(source, new_length, s->pos);
 	}
@@ -521,9 +521,9 @@ void Song::__shift_data(const Range &source, int new_length)
 
 void Song::invalidateAllPeaks()
 {
-	foreach(Track *t, tracks)
+	for (Track *t : tracks)
 		t->invalidateAllPeaks();
-	foreach(Sample *s, samples)
+	for (Sample *s : samples)
 		s->buf.invalidate_peaks(s->buf.range());
 }
 
@@ -579,7 +579,7 @@ MidiEffect *Song::get_midi_fx(int track_no, int index)
 
 Track *Song::getTimeTrack()
 {
-	foreach(Track *t, tracks)
+	for (Track *t : tracks)
 		if (t->type == t->TYPE_TIME)
 			return t;
 	return NULL;
@@ -599,7 +599,7 @@ string Song::getNiceLevelName(int index)
 
 string Song::getTag(const string &key)
 {
-	foreach(Tag &t, tags)
+	for (Tag &t : tags)
 		if (t.key == key)
 			return t.value;
 	return "";

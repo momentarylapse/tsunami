@@ -32,7 +32,7 @@ void EffectRenderer::__delete__()
 int EffectRenderer::read(BufferBox& buf)
 {
 	int r = child->read(buf);
-	foreach(Effect *f, fx){
+	for (Effect *f : fx){
 		if (!f->enabled)
 			continue;
 		f->apply(buf, track, false);

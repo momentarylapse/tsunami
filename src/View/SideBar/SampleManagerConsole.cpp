@@ -42,7 +42,7 @@ void render_midi(Image &im, MidiData &m)
 	int h = im.height;
 	Range r = Range(0, m.samples);
 	MidiDataRef notes = m.getNotes(r);
-	foreach(MidiNote &n, notes){
+	for (MidiNote &n : notes){
 		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n.range.offset / (float)r.length, 0, 1);
 		float x1 = w * clampf((float)n.range.end() / (float)r.length, 0, 1);
@@ -145,7 +145,7 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 
 SampleManagerConsole::~SampleManagerConsole()
 {
-	foreach(SampleManagerItem *si, items)
+	for (SampleManagerItem *si : items)
 		delete(si);
 	items.clear();
 
@@ -166,7 +166,7 @@ int SampleManagerConsole::getIndex(Sample *s)
 void SampleManagerConsole::updateList()
 {
 	// new samples?
-	foreach(Sample *s, song->samples)
+	for (Sample *s : song->samples)
 		if (getIndex(s) < 0)
 			add(new SampleManagerItem(this, s, view));
 
@@ -281,7 +281,7 @@ void SampleManagerConsole::onEditSong()
 
 void SampleManagerConsole::onUpdate(Observable *o, const string &message)
 {
-	if ((progress) and (o == progress)){
+	if (progress and (o == progress)){
 		if (message == progress->MESSAGE_CANCEL)
 			endPreview();
 	}else if (o == preview_stream){
@@ -358,7 +358,7 @@ public:
 	}
 	virtual ~SampleSelector()
 	{
-		foreach(string &name, icon_names)
+		for (string &name : icon_names)
 			HuiDeleteImage(name);
 	}
 

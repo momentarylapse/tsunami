@@ -16,7 +16,7 @@
 ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, const SongSelection &sel, bool all_levels)
 {
 	Set<Track*> tracks = sel.tracks;
-	foreach(Track *t, tracks){
+	for (Track *t : tracks){
 		// buffer boxes
 		if (all_levels){
 			foreachi(TrackLevel &l, t->levels, li)
@@ -25,21 +25,25 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, cons
 			DeleteBuffersFromTrackLevel(a, t, t->levels[level_no], sel, level_no);
 		}
 
+
+
 		// subs
+		Set<int> to_delete;
 		foreachib(SampleRef *s, t->samples, i)
-			if (sel.has(s)){
-				addSubAction(new ActionTrackDeleteSample(t, i), a);
-				_foreach_it_.update(); // TODO...
-			}
+			if (sel.has(s))
+				to_delete.add(i);
+
+		for (int i : to_delete)
+			addSubAction(new ActionTrackDeleteSample(t, i), a);
 
 		// midi
-		Set<int> to_delete;
-		foreachi(MidiNote &n, t->midi, i){
+		to_delete.clear();
+		foreachib(MidiNote &n, t->midi, i){
 			if (sel.range.is_inside(n.range.center()))
 				to_delete.add(i);
 		}
 
-		foreachb(int i, to_delete)
+		for (int i : to_delete)
 			addSubAction(new ActionTrackDeleteMidiNote(t, i), a);
 	}
 }

@@ -963,7 +963,7 @@ string utf32_to_utf8(const Array<int> &s)
 
 bool sa_contains(Array<string> &a, const string &s)
 {
-	foreach(string &aa, a)
+	for (string &aa : a)
 		if (aa == s)
 			return true;
 	return false;

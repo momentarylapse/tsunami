@@ -164,12 +164,12 @@ void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 	foreachi(TrackLevel &lev, track->levels, level_no){
 		if (level_no == view->cur_level)
 			continue;
-		foreach(BufferBox &b, lev.buffers)
+		for (BufferBox &b : lev.buffers)
 			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current
-	foreach(BufferBox &b, track->levels[view->cur_level].buffers)
+	for (BufferBox &b : track->levels[view->cur_level].buffers)
 		drawBuffer(c, b, view_pos_rel, view->colors.text);
 }
 
@@ -257,7 +257,7 @@ void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, int shift
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
-	foreach(MidiNote &n, notes){
+	for (MidiNote &n : notes){
 		c->setColor(getPitchColor(n.pitch));
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
@@ -294,7 +294,7 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
 	float r = min(dy/2, 8);
 	c->setFontSize(r * 1.6f);
 
-	foreach(MidiNote &n, notes){
+	for (MidiNote &n : notes){
 
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
@@ -426,7 +426,7 @@ void AudioViewTrack::drawMidiScore(Painter *c, const MidiData &midi, int shift)
 
 	c->setAntialiasing(true);
 
-	foreach(MidiNote &n, notes)
+	for (MidiNote &n : notes)
 		drawMidiNoteScore(c, n, shift, STATE_DEFAULT, clef);
 
 	c->setFontSize(view->FONT_SIZE);

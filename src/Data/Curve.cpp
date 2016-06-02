@@ -31,7 +31,7 @@ Curve::Target::Target(float *_p, const string &name, const string &name_nice)
 string Curve::Target::str(Song *a)
 {
 	Array<Target> list = enumerate(a);
-	foreach(Target &t, list)
+	for (Target &t : list)
 		if (t.p == p)
 			return t.temp_name;
 	return "";
@@ -40,7 +40,7 @@ string Curve::Target::str(Song *a)
 string Curve::Target::niceStr(Song *a)
 {
 	Array<Target> list = enumerate(a);
-	foreach(Target &t, list)
+	for (Target &t : list)
 		if (t.p == p)
 			return t.temp_name_nice;
 	return "";
@@ -82,7 +82,7 @@ void Curve::Target::enumerateType(char *pp, Script::Type *t, Array<Target> &list
 			enumerateType(pp + da->element_size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
 		}
 	}else{
-		foreach(Script::ClassElement &e, t->element)
+		for (auto &e : t->element)
 			if (!e.hidden)
 				enumerateType(pp + e.offset, e.type, list, prefix + ":" + e.name, prefix_nice + "." + e.name);
 	}

@@ -11,12 +11,12 @@ class MyDialog : Dialog
 	void onChange()
 		print("ssss")
 	void onClose()
-		plugin.end()
+		plugin.stop()
 
 class Test : TsunamiPlugin
 	Dialog *dlg
 	override void onStart()
 		dlg = new MyDialog(self)
 		dlg.show()
-	override void onEnd()
+	override void onStop()
 		delete dlg

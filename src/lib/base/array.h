@@ -193,9 +193,9 @@ class Array : public DynamicArray
 			a += item;
 			return a;
 		}*/
-		T operator[] (int index) const
-		{	return ((T*)data)[index];	}
-		T &operator[] (int index)
+	//	T operator[] (int index) const
+	//	{	return ((T*)data)[index];	}
+		T &operator[] (int index) const
 		{	return ((T*)data)[index];	}
 		T &back()
 		{	return ((T*)data)[num - 1];	}
@@ -233,19 +233,22 @@ class Array : public DynamicArray
 			operator bool() const
 		    {	return false;	}
 		//private:
-			Iterator(Array<T> &a, int n) : array(a), num(a.num)
-			{	p = &a[n];	index = n;	}
+			Iterator(const Array<T> &a, int n) : array(a), num(a.num)
+			{
+				p = &array[n];
+				index = n;
+			}
 		private:
-			Array<T> &array;
+			const Array<T> &array;
 			T *p;
 			int index;
-			int &num;
+			const int &num;
 		};
-		Iterator begin()
+		Iterator begin() const
 		{	return Iterator(*this, 0);	}
-		Iterator end()
+		Iterator end() const
 		{	return Iterator(*this, num);	}
-		Iterator begin_down()
+		Iterator begin_down() const
 		{	return Iterator(*this, num - 1);	}
 		/*void erase(Iterator &it)
 		{	erase(it.get_index());	}*/
@@ -257,8 +260,6 @@ class Array : public DynamicArray
 inline bool _foreach_set_false_(bool &b)
 {	b = false;	return false;	}
 
-#if _MSC_VER >= 1600
-	// Visual C++ 2010 or later
 
 #define foreach(_var_, _array_) \
 	if (auto _foreach_it_ = (_array_).begin()) {} else \
@@ -295,59 +296,5 @@ inline bool _foreach_set_false_(bool &b)
 	if  (_foreach_set_false_(_foreach_continue)) {} else \
 	for (int _i_ = _foreach_it_.get_index(); _i_ >= 0; _i_ = -1) \
 	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
-#else
-	// g++
-
-#define foreach(_var_, _array_) \
-	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin()) {} else \
-	for (bool _foreach_continue = true; \
-		_foreach_continue && _foreach_it_.valid(); \
-		_foreach_continue ? (_foreach_it_ ++) : (void)0) \
-	if  (_foreach_set_false_(_foreach_continue)) {} else \
-	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
-
-#define foreachi(_var_, _array_, _i_) \
-	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin()) {} else \
-	for (bool _foreach_continue = true; \
-		_foreach_continue && _foreach_it_.valid(); \
-		_foreach_continue ? (_foreach_it_ ++) : (void)0) \
-	if  (_foreach_set_false_(_foreach_continue)) {} else \
-	for (int _i_ = _foreach_it_.get_index(); _i_ >= 0; _i_ = -1) \
-	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
-
-
-
-#define foreachb(_var_, _array_) \
-	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin_down()) {} else \
-	for (bool _foreach_continue = true; \
-		_foreach_continue && _foreach_it_.valid_down(); \
-		_foreach_continue ? (_foreach_it_ --) : (void)0) \
-	if  (_foreach_set_false_(_foreach_continue)) {} else \
-	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
-
-#define foreachib(_var_, _array_, _i_) \
-	if (typeof((_array_).begin()) _foreach_it_ = (_array_).begin_down()) {} else \
-	for (bool _foreach_continue = true; \
-		_foreach_continue && _foreach_it_.valid_down(); \
-		_foreach_continue ? (_foreach_it_ --) : (void)0) \
-	if  (_foreach_set_false_(_foreach_continue)) {} else \
-	for (int _i_ = _foreach_it_.get_index(); _i_ >= 0; _i_ = -1) \
-	for (_var_ = *_foreach_it_; !_foreach_continue; _foreach_continue = true)
-#endif
-
-
-/*#define foreach(_array_, _v_)           for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
-                                        	for (typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
-#define foreachi(_array_, _v_, _vi_)    for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
-                                        	for (typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
-#define foreachb(_array_, _v_)          for (int _vi_ = (_array_).num - 1; _vi_ >= 0; _vi_--) \
-                                        	for (typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
-#define foreachbi(_array_, _v_, _vi_)   for (int _vi_ = (_array_).num - 1; _vi_ >= 0; _vi_--) \
-                                        	for (typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
-#define foreachc(_array_, _v_)          for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
-                                        	for (const typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))
-#define foreachci(_array_, _v_, _vi_)   for (int _vi_ = 0; _vi_ < (_array_).num; _vi_++) \
-                                        	for (const typeof((_array_)[0]) &_v_ = (_array_)[_vi_]; ;__extension__({break;}))*/
-
 
 #endif

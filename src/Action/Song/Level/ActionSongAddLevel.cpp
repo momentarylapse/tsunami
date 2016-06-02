@@ -23,7 +23,7 @@ void* ActionSongAddLevel::execute(Data* d)
 	a->level_names.add(name);
 
 	TrackLevel new_level;
-	foreach(Track *t, a->tracks)
+	for (Track *t : a->tracks)
 		t->levels.add(new_level);
 	a->notify(a->MESSAGE_ADD_LEVEL);
 
@@ -36,7 +36,7 @@ void ActionSongAddLevel::undo(Data* d)
 
 	a->level_names.pop();
 
-	foreach(Track *t, a->tracks)
+	for (Track *t : a->tracks)
 		t->levels.pop();
 
 	a->notify(a->MESSAGE_DELETE_LEVEL);

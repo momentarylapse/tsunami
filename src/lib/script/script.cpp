@@ -149,8 +149,8 @@ extern Array<Script*> PublicScript;
 Type *GetDynamicType(void *p)
 {
 	VirtualTable *pp = *(VirtualTable**)p;
-	foreach(Script *s, PublicScript){
-		foreach(Type *t, s->syntax->types){
+	for (Script *s : PublicScript){
+		for (Type *t : s->syntax->types){
 			if (t->vtable.data == pp)
 				return t;
 		}

@@ -119,7 +119,7 @@ void HuiPanel::_insert_control_(HuiControl *c, int x, int y, int width, int heig
 			}
 		}
 	}else{
-		if ((c->type == HUI_KIND_BUTTON) || (c->type == HUI_KIND_COLORBUTTON) || (c->type == HUI_KIND_COMBOBOX)){
+		if ((c->type == HUI_KIND_BUTTON) or (c->type == HUI_KIND_COLORBUTTON) or (c->type == HUI_KIND_COMBOBOX)){
 			x -= 1;
 			y -= 1;
 			width += 2;
@@ -152,7 +152,7 @@ void HuiPanel::_insert_control_(HuiControl *c, int x, int y, int width, int heig
 
 HuiControl *HuiPanel ::_get_control_(const string &id)
 {
-	if ((id.num == 0) && (cur_id.num > 0))
+	if ((id.num == 0) and (cur_id.num > 0))
 		return _get_control_(cur_id);
 
 	// search backwards -> multiple AddText()s with identical ids
@@ -203,11 +203,11 @@ void NotifyWindowByWidget(HuiPanel *panel, GtkWidget *widget, const string &mess
 
 void SetImageById(HuiPanel *panel, const string &id)
 {
-	if ((id == "ok") || (id == "cancel") || (id == "apply"))
+	if ((id == "ok") or (id == "cancel") or (id == "apply"))
 		panel->setImage(id, "hui:" + id);
 	else if (id != ""){
-		foreach(HuiCommand &c, _HuiCommand_)
-			if ((c.id == id) && (c.image != ""))
+		for (HuiCommand &c : _HuiCommand_)
+			if ((c.id == id) and (c.image != ""))
 				panel->setImage(id, c.image);
 	}
 }
@@ -258,7 +258,7 @@ void HuiPanel::addMultilineEdit(const string &title,int x,int y,int width,int he
 {
 	_insert_control_(new HuiControlMultilineEdit(title, id), x, y, width, height);
 	if (win)
-		if ((!win->main_input_control) && ((HuiControlMultilineEdit*)control.back())->handle_keys)
+		if ((!win->main_input_control) and ((HuiControlMultilineEdit*)control.back())->handle_keys)
 			win->main_input_control = control.back();
 }
 
@@ -373,7 +373,7 @@ void HuiPanel::addImage(const string &title,int x,int y,int width,int height,con
 void HuiPanel::addDrawingArea(const string &title,int x,int y,int width,int height,const string &id)
 {
 	_insert_control_(new HuiControlDrawingArea(title, id), x, y, width, height);
-	if ((win) && (!win->main_input_control))
+	if (win and (!win->main_input_control))
 		win->main_input_control = control.back();
 }
 
@@ -437,7 +437,7 @@ void hui_rm_event(Array<HuiEventListener> &event, HuiControl *c)
 			event.erase(i);
 			i --;
 		}
-	foreach(HuiControl *cc, c->children)
+	for (HuiControl *cc : c->children)
 		hui_rm_event(event, cc);
 }
 

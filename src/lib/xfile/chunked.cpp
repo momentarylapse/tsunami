@@ -46,7 +46,7 @@ int ChunkedFileParser::Context::end()
 string ChunkedFileParser::Context::str()
 {
 	string s;
-	foreach(Layer &l, layers){
+	for (Layer &l : layers){
 		if (s.num > 0)
 			s += "/";
 		s += l.name;
@@ -62,7 +62,7 @@ FileChunkBasic::FileChunkBasic(const string &_name)
 }
 FileChunkBasic::~FileChunkBasic()
 {
-	foreach(FileChunkBasic *c, children)
+	for (FileChunkBasic *c : children)
 		delete(c);
 }
 void FileChunkBasic::create()
@@ -98,13 +98,13 @@ void FileChunkBasic::set_root(ChunkedFileParser *r)
 {
 	root = r;
 	context = &r->context;
-	foreach(FileChunkBasic *c, children)
+	for (FileChunkBasic *c : children)
 		c->set_root(r);
 }
 
 FileChunkBasic *FileChunkBasic::get_sub(const string &name)
 {
-	foreach(FileChunkBasic *c, children)
+	for (FileChunkBasic *c : children)
 		if (c->name == name){
 			c->context = context;
 			c->set_parent(get());
@@ -200,7 +200,7 @@ void FileChunkBasic::read_contents()
 		string cname = read_header();
 
 		bool ok = false;
-		foreach(FileChunkBasic *c, children)
+		for (FileChunkBasic *c : children)
 			if (c->name == cname){
 				c->set_parent(get());
 				c->create();

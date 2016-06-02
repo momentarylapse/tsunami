@@ -91,7 +91,7 @@ void CaptureConsole::onEnter()
 
 	// target list
 	reset("capture_target");
-	foreach(Track *t, song->tracks)
+	for (Track *t : song->tracks)
 		addString("capture_target", t->getNiceName() + "     (" + track_type(t->type) + ")");
 	addString("capture_target", _("  - create new track -"));
 
@@ -174,7 +174,7 @@ void CaptureConsole::updateSourceList()
 
 	// add all
 	reset("capture_source");
-	foreach(Device *d, sources)
+	for (Device *d : sources)
 		setString("capture_source", d->get_name());
 
 	// select current

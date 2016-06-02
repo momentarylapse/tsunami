@@ -189,7 +189,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		metadata[0] = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
 		if (metadata[0]){
 			Array<Tag> tags = r->getTags();
-			foreach(Tag &t, tags){
+			for (Tag &t : tags){
 				FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, t.key.upper().c_str(), t.value.c_str());
 				FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, true);
 			}

@@ -12,7 +12,7 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, const MidiDa
 	track_no = get_track_index(t);
 	offset = _offset;
 	midi = _midi;
-	foreach(MidiNote &n, midi)
+	for (MidiNote &n : midi)
 		n.range.offset += offset;
 	midi.sort();
 }

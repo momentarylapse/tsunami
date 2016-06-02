@@ -31,13 +31,13 @@ inline void notify_pop()
 }
 inline void notify_set_del(HuiControl *c)
 {
-	foreach(_HuiNotifyStackElement &e, _notify_stack_)
+	for (_HuiNotifyStackElement &e : _notify_stack_)
 		if (e.c == c)
 			e.deleted = true;
 }
 inline bool notify_is_deleted(HuiControl *c)
 {
-	foreach(_HuiNotifyStackElement &e, _notify_stack_)
+	for (_HuiNotifyStackElement &e : _notify_stack_)
 		if (e.c == c)
 			return e.deleted;
 	return false;
@@ -147,7 +147,7 @@ void HuiControl::setOptions(const string &options)
 	Array<string> a = options.explode(",");
 	int width = -1;
 	int height = -1;
-	foreach(string &aa, a){
+	for (string &aa : a){
 		int eq = aa.find("=");
 		if (aa == "expandx")
 			gtk_widget_set_hexpand(widget, true);

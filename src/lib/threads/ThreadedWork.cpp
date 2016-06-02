@@ -59,7 +59,7 @@ ThreadedWork::ThreadedWork()
 
 ThreadedWork::~ThreadedWork()
 {
-	foreach(Thread *t, thread)
+	for (Thread *t : thread)
 		delete(t);
 }
 

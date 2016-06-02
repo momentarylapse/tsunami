@@ -437,7 +437,7 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeIntList);
 		class_add_func("__div__", TypeIntList, mf(&IntList::div), FLAG_PURE);
 			func_add_param("other",	TypeIntList);
-		class_add_func("__assign__", TypeVoid, mf(&IntList::assign_int));
+		class_add_func(NAME_FUNC_ASSIGN, TypeVoid, mf(&IntList::assign_int));
 			func_add_param("other",	TypeInt);
 
 	add_class(TypeFloatList);
@@ -470,11 +470,11 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeFloat32);
 		class_add_func("__idiv__", TypeVoid, mf(&FloatList::idiv2));
 			func_add_param("other",	TypeFloat32);
-		class_add_func("__assign__", TypeVoid, mf(&FloatList::assign_float));
+		class_add_func(NAME_FUNC_ASSIGN, TypeVoid, mf(&FloatList::assign_float));
 			func_add_param("other",	TypeFloat32);
 
 	add_class(TypeComplexList);
-		class_add_func("__init__",	TypeVoid, mf(&ComplexList::__init__));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&ComplexList::__init__));
 		class_add_func("sum",	TypeComplex, amd64_wrap(mf(&ComplexList::sum), &amd64_comlist_sum), FLAG_PURE);
 		class_add_func("sum2",	TypeFloat32, mf(&ComplexList::sum2), FLAG_PURE);
 		class_add_func("__iadd__", TypeVoid, mf(&ComplexList::iadd));
@@ -509,9 +509,9 @@ void SIAddPackageMath()
 			func_add_param("other",	TypeComplex);
 	
 	add_class(TypeVectorList);
-		class_add_func("__init__",	TypeVoid, mf(&Array<vector>::__init__));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<vector>::__init__));
 	add_class(TypePlaneList);
-		class_add_func("__init__",	TypeVoid, mf(&Array<plane>::__init__));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<plane>::__init__));
 
 	
 	add_class(TypeComplex);
@@ -660,13 +660,13 @@ void SIAddPackageMath()
 	add_class(TypeVli);
 		class_add_element("sign",	TypeBool,	0);
 		class_add_element("data",	TypeIntList,	4);
-		class_add_func("__init__",	TypeVoid, algebra_p(mf(&vli::__init__)));
-		class_add_func("__delete__",	TypeVoid, algebra_p(mf(&vli::__delete__)));
-		class_add_func("__assign__",			TypeVoid,			algebra_p(mf(&vli::set_vli)));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, algebra_p(mf(&vli::__init__)));
+		class_add_func(NAME_FUNC_DELETE,	TypeVoid, algebra_p(mf(&vli::__delete__)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			algebra_p(mf(&vli::set_vli)));
 			func_add_param("v",			TypeVli);
-		class_add_func("__assign__",			TypeVoid,			algebra_p(mf(&vli::set_str)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			algebra_p(mf(&vli::set_str)));
 			func_add_param("s",			TypeString);
-		class_add_func("__assign__",			TypeVoid,			algebra_p(mf(&vli::set_int)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			algebra_p(mf(&vli::set_int)));
 			func_add_param("i",			TypeInt);
 		class_add_func("str",		TypeString,			algebra_p(mf(&vli::to_string)), FLAG_PURE);
 		class_add_func("compare",			TypeInt,			algebra_p(mf(&vli::compare)), FLAG_PURE);
@@ -712,17 +712,17 @@ void SIAddPackageMath()
 	add_class(TypeAny);
 		class_add_element("type",	TypeInt, 0);
 		class_add_element("data",	TypePointer, 4);
-		class_add_func("__init__",	TypeVoid, any_p(mf(&Any::__init__)));
-		class_add_func("__delete__",	TypeVoid, any_p(mf(&Any::clear)));
-		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set)));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, any_p(mf(&Any::__init__)));
+		class_add_func(NAME_FUNC_DELETE,	TypeVoid, any_p(mf(&Any::clear)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			any_p(mf(&Any::set)));
 			func_add_param("a",			TypeAny);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_str)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			any_p(mf(&Any::set_str)));
 			func_add_param("s",			TypeString);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_int)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			any_p(mf(&Any::set_int)));
 			func_add_param("i",			TypeInt);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_float)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			any_p(mf(&Any::set_float)));
 			func_add_param("f",			TypeFloat32);
-		class_add_func("__assign__",			TypeVoid,			any_p(mf(&Any::set_bool)));
+		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,			any_p(mf(&Any::set_bool)));
 			func_add_param("b",			TypeBool);
 		class_add_func("__iadd__",			TypeVoid,			any_p(mf(&Any::_add)));
 			func_add_param("a",			TypeAny);
@@ -748,7 +748,7 @@ void SIAddPackageMath()
 	add_class(TypeCrypto);
 		class_add_element("n",	TypeVli, 0);
 		class_add_element("k",	TypeVli, sizeof(vli));
-		class_add_func("__init__",	TypeVoid, algebra_p(mf(&Crypto::__init__)));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, algebra_p(mf(&Crypto::__init__)));
 		class_add_func("str",		TypeString, algebra_p(mf(&Crypto::str)));
 		class_add_func("fromStr",	TypeVoid, algebra_p(mf(&Crypto::from_str)));
 			func_add_param("str",		TypeString);
@@ -786,7 +786,7 @@ void SIAddPackageMath()
 	
 	add_class(TypeFloatInterpolator);
 		class_add_element("type",	TypeInt, 0);
-		class_add_func("__init__",	TypeVoid, mf(&Interpolator<float>::__init__));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Interpolator<float>::__init__));
 		class_add_func("clear",	TypeVoid, mf(&Interpolator<float>::clear));
 		class_add_func("setType",	TypeVoid, mf(&Interpolator<float>::setType));
 			func_add_param("type",	TypeString);
@@ -816,7 +816,7 @@ void SIAddPackageMath()
 	
 	add_class(TypeVectorInterpolator);
 		class_add_element("type",	TypeInt, 0);
-		class_add_func("__init__",	TypeVoid, mf(&Interpolator<vector>::__init__));
+		class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Interpolator<vector>::__init__));
 		class_add_func("clear",	TypeVoid, mf(&Interpolator<vector>::clear));
 		class_add_func("setType",	TypeVoid, mf(&Interpolator<vector>::setType));
 			func_add_param("type",	TypeString);

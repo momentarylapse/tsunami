@@ -102,7 +102,7 @@ bool Type::is_simple_class()
 		return false;
 	if (GetAssign())
 		return false;
-	foreach(ClassElement &e, element)
+	for (ClassElement &e : element)
 		if (!e.type->is_simple_class())
 			return false;
 	return true;
@@ -143,7 +143,7 @@ bool Type::needs_constructor()
 	if (parent)
 		if (parent->needs_constructor())
 			return true;
-	foreach(ClassElement &e, element)
+	for (ClassElement &e : element)
 		if (e.type->needs_constructor())
 			return true;
 	return false;
@@ -155,7 +155,7 @@ bool Type::is_size_known()
 		return false;
 	if ((is_super_array) or (is_pointer))
 		return true;
-	foreach(ClassElement &e, element)
+	for (ClassElement &e : element)
 		if (!e.type->is_size_known())
 			return false;
 	return true;
@@ -173,7 +173,7 @@ bool Type::needs_destructor()
 		if (parent->needs_destructor())
 			return true;
 	}
-	foreach(ClassElement &e, element){
+	for (ClassElement &e : element){
 		if (e.type->GetDestructor())
 			return true;
 		if (e.type->needs_destructor())
@@ -208,30 +208,30 @@ ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_par
 
 ClassFunction *Type::GetDefaultConstructor()
 {
-	return GetFunc("__init__", TypeVoid, 0);
+	return GetFunc(NAME_FUNC_INIT, TypeVoid, 0);
 }
 
 ClassFunction *Type::GetComplexConstructor()
 {
-	foreach(ClassFunction &f, function)
-		if ((f.name == "__init__") and (f.return_type == TypeVoid) and (f.param_type.num > 0))
+	for (ClassFunction &f : function)
+		if ((f.name == NAME_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_type.num > 0))
 			return &f;
 	return NULL;
 }
 
 ClassFunction *Type::GetDestructor()
 {
-	return GetFunc("__delete__", TypeVoid, 0);
+	return GetFunc(NAME_FUNC_DELETE, TypeVoid, 0);
 }
 
 ClassFunction *Type::GetAssign()
 {
-	return GetFunc("__assign__", TypeVoid, 1, this);
+	return GetFunc(NAME_FUNC_ASSIGN, TypeVoid, 1, this);
 }
 
 ClassFunction *Type::GetGet(Type *index)
 {
-	foreach(ClassFunction &cf, function){
+	for (ClassFunction &cf : function){
 		if (cf.name != "__get__")
 			continue;
 		if (cf.param_type.num != 1)
@@ -245,7 +245,7 @@ ClassFunction *Type::GetGet(Type *index)
 
 ClassFunction *Type::GetVirtualFunction(int virtual_index)
 {
-	foreach(ClassFunction &f, function)
+	for (ClassFunction &f : function)
 		if (f.virtual_index == virtual_index)
 			return &f;
 	return NULL;
@@ -267,7 +267,7 @@ void Type::LinkVirtualTable()
 		vtable[1] = mf(&VirtualBase::__delete_external__);
 
 	// link virtual functions into vtable
-	foreach(ClassFunction &cf, function){
+	for (ClassFunction &cf : function){
 		if (cf.virtual_index >= 0){
 			if (cf.nr >= 0){
 				//msg_write(i2s(cf.virtual_index) + ": " + cf.GetFunc()->name);
@@ -289,7 +289,7 @@ void Type::LinkExternalVirtualTable(void *p)
 	VirtualTable *t = (VirtualTable*)p;
 	vtable.clear();
 	int max_vindex = 1;
-	foreach(ClassFunction &cf, function)
+	for (ClassFunction &cf : function)
 		if (cf.virtual_index >= 0){
 			if (cf.nr >= 0)
 				cf.script->func[cf.nr] = (t_func*)t[cf.virtual_index];
@@ -352,7 +352,7 @@ Type *Type::GetRoot()
 void class_func_out(Type *c, ClassFunction *f)
 {
 	string ps;
-	foreach(Type *p, f->param_type)
+	for (Type *p : f->param_type)
 		ps += "  " + p->name;
 	msg_write(c->name + "." + f->name + ps);
 }
@@ -377,7 +377,7 @@ void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overrid
 
 	// override?
 	ClassFunction *orig = NULL;
-	foreach(ClassFunction &ocf, function)
+	for (ClassFunction &ocf : function)
 		if (class_func_match(ocf, cf))
 			orig = &ocf;
 	if (override and !orig)
@@ -404,11 +404,11 @@ bool Type::DeriveFrom(Type* root, bool increase_size)
 	}
 	if (parent->function.num > 0){
 		// inheritance of functions
-		foreach(ClassFunction &f, parent->function){
+		for (ClassFunction &f : parent->function){
 			if (f.name == "__assign__")
 				continue;
 			ClassFunction ff = f;
-			ff.needs_overriding = (f.name == "__init__") or (f.name == "__delete__") or (f.name == "__assign__");
+			ff.needs_overriding = (f.name == NAME_FUNC_INIT) or (f.name == NAME_FUNC_DELETE) or (f.name == NAME_FUNC_ASSIGN);
 			function.add(ff);
 		}
 		found = true;

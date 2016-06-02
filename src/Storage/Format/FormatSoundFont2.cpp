@@ -118,9 +118,9 @@ void FormatSoundFont2::read_samples(File *f)
 {
 	int samples_all = 0;
 	int samples_read = 0;
-	foreach(sfSample &s, samples)
+	for (sfSample &s : samples)
 		samples_all += s.end - s.start;
-	foreach(sfSample &s, samples){
+	for (sfSample &s : samples){
 		//s.print();
 		if ((s.sample_type & 0x8000) != 0){
 			msg_write("rom");

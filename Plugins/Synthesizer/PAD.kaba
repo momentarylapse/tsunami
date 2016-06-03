@@ -9,7 +9,7 @@ class PitchState
 	float[] buf
 	EnvelopeADSR env
 
-class PADState : PluginData
+class PADState extends PluginData
 	PitchState[MAX_PITCH] pitch
 	override void __init__()
 		for p in pitch
@@ -19,7 +19,7 @@ class PADState : PluginData
 			p.buf.clear()
 			p.pos = 0
 
-class PADConfig : PluginData
+class PADConfig extends PluginData
 	float[] A
 	float bw
 	float bwscale
@@ -44,7 +44,7 @@ float gauss(float f, float bw)
 	float x = f / bw
 	return exp(- x*x) / bw
 
-class PADSynthesizer : Synthesizer
+class PADSynthesizer extends Synthesizer
 	PADState state
 	PADConfig config
 	
@@ -116,7 +116,7 @@ class PADSynthesizer : Synthesizer
 	override ConfigPanel *createPanel()
 		return new PADPanel(self)
 
-class PADGrid : Grid
+class PADGrid extends Grid
 	PADConfig *pc
 	ConfigPanel *p
 	int Selected, Hover
@@ -157,7 +157,7 @@ class PADGrid : Grid
 					Hover = i
 		redraw()
 
-class PADPanel : ConfigPanel
+class PADPanel extends ConfigPanel
 	PADConfig *pc
 	PADGrid grid
 	override PADSynthesizer* c

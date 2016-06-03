@@ -59,7 +59,7 @@ class Matrix
 class Edge
 	int a, b
 
-class Resistor : Edge
+class Resistor extends Edge
 	float value
 Resistor _Resistor(int a, int b, float v)
 	Resistor r
@@ -68,7 +68,7 @@ Resistor _Resistor(int a, int b, float v)
 	r.value = v
 	return r
 
-class Capacitor : Edge
+class Capacitor extends Edge
 	float value
 Capacitor _Capacitor(int a, int b, float v)
 	Capacitor c

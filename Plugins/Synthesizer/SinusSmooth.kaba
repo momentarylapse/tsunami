@@ -3,12 +3,12 @@ use "../tone.kaba"
 
 const string AutoConfigrelease = "0:0.4:1:1000:ms"
 
-class Config : PluginData
+class Config extends PluginData
 	float release
 	override void reset()
 		release = 0.02
 
-class SinusSmoothSynthesizer : Synthesizer
+class SinusSmoothSynthesizer extends Synthesizer
 	Config config
 
 	override void renderNote(BufferBox buf, Range r, float pitch, float volume)

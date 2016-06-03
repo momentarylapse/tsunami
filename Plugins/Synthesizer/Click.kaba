@@ -2,7 +2,7 @@ use "../api.kaba"
 use "../tone.kaba"
 
 
-class ClickSynthesizer : Synthesizer
+class ClickSynthesizer extends Synthesizer
 	override void renderNote(BufferBox buf, Range r, float pitch, float volume)
 		float freq = pitch_to_freq(pitch)
 		float f_w = 1.0 / sample_rate * freq * 2.0 * pi

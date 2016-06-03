@@ -32,7 +32,7 @@ int[] find_clicks(float[] b)
 	print(clicks)
 	return clicks
 
-class RemoveClicks : AudioEffect
+class RemoveClicks extends AudioEffect
 	void unclick(float[] b, int start, int end)
 		int i0 = start - 1
 		int i1 = end + 1

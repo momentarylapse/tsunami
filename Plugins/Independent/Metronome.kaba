@@ -1,67 +1,9 @@
 // Image = hui:media-play
 // Title[Deutsch] = Metronom
 use "../api.kaba"
+use "../Midi/Source/Metronome.kaba"
 
-class MetronomeSource : MidiSource
-	float length
-	float freq
-	float bpm
-	int num_beats
-	float volume
-
-	int offset
-	int cur_beat
-	Window* win
-	float fraction
-	int sm_m
-	float sample_rate
-	
-	void __init__(float _bpm, int _beats, int _sample_rate)
-		win = nil
-		sample_rate = _sample_rate
-		
-		freq = 880.0
-		length = 0.02
-		volume = 1
-		bpm = _bpm
-		num_beats = _beats
-
-		offset = 0
-		cur_beat = 0
-		fraction = 0
-		float dt_m = 60.0 / bpm
-//		sm_m = dt_m * sample_rate
-		
-	override int read(MidiRawData midi)
-		float dt_m = 60.0 / bpm
-		sm_m = dt_m * sample_rate
-	
-		// render clicks
-		while offset < midi.samples
-			if cur_beat == 0
-				midi.addMetronomeClick(offset, 0, volume)
-			else
-				midi.addMetronomeClick(offset, 1, volume)
-			cur_beat = loopi(cur_beat + 1, 0, num_beats - 1)
-			offset += sm_m
-		offset -= midi.samples
-		
-		fraction = 1 - i2f(offset) / i2f(sm_m)
-		
-		if win
-			win.redraw("area")
-		return midi.samples
-	
-	void setBpm(float bpm_new)
-		bpm = bpm_new
-		
-		float dt_m = 60.0 / bpm
-		sm_m = dt_m * sample_rate
-		
-		offset = (1 - fraction) * sm_m
-
-
-class MetronomeDialog : Dialog
+class MetronomeDialog extends Dialog
 	Metronome *metro
 	
 	void __init__(Metronome *_metro)
@@ -130,7 +72,7 @@ Grid ? '' 1 3
 	void onClose()
 		metro.stop()
 
-class Metronome : TsunamiPlugin
+class Metronome extends TsunamiPlugin
 	OutputStream *stream
 	MidiRenderer *renderer
 	MetronomeSource *source

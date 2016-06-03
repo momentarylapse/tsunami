@@ -2,13 +2,13 @@ use "../api.kaba"
 
 const string AutoConfigdelay = "-2:2:1:1000:ms"
 
-class Config : PluginData
+class Config extends PluginData
 	float delay
 	
 	override void reset()
 		delay = 0
 
-class Delay : MidiEffect
+class Delay extends MidiEffect
 	Config config
 	
 	override void process(MidiData midi)

@@ -2,9 +2,9 @@
 // Title[Deutsch] = Metronom
 
 use "../../api.kaba"
+use "../../Midi/Source/Metronome.kaba"
 
-
-class Config : PluginData
+class Config extends PluginData
 	float BeatsPerMinute
 	float Volume
 	int BeatsPerMeasure
@@ -14,52 +14,35 @@ class Config : PluginData
 		BeatsPerMeasure = 4
 
 
-class PluginState : PluginData
-	int beat
-	int dpos
-	override void reset()
-		beat = 0
-		dpos = 0
 
-
-
-class Metronome : AudioEffect
-	PluginState state
+class Metronome extends AudioEffect
 	Config config
-	DummySynthesizer synth
+	Synthesizer *synth
+	MetronomeSource *source
+	MidiRenderer *renderer
+	
+	override void __init__()
+		synth = new DummySynthesizer
+		source = new MetronomeSource(90, 4, DEFAULT_SAMPLE_RATE)
+		renderer = new MidiRenderer(synth, source)
+	
+	override void __delete__()
+		delete renderer
+		delete source
+		delete synth
 
 	override void process(BufferBox buf)
-		Song *a = song
-
-		float dt_m = 60.0 / config.BeatsPerMinute
-		int sm_m = dt_m * a.sample_rate
-	
-		synth.setSampleRate(a.sample_rate)
-		
-		MidiRawData midi
-		midi.samples = buf.length
-
-		while true
-			if state.beat == 0
-				midi.addMetronomeClick(state.dpos, 0, config.Volume)
-			else
-				midi.addMetronomeClick(state.dpos, 1, config.Volume)
-		
-			state.beat ++
-			if state.beat >= config.BeatsPerMeasure
-				state.beat = 0
-			state.dpos += sm_m
-			if state.dpos >= buf.length
-				state.dpos -= buf.length
-				break
-		synth.feed(midi)
-		synth.read(buf)
+		source.sample_rate = song.sample_rate
+		source.volume = config.Volume
+		source.num_beats = config.BeatsPerMeasure
+		source.setBpm(config.BeatsPerMinute)
+		renderer.read(buf)
 		
 	override ConfigPanel *createPanel()
 		return new MetronomePanel(self)
 
 	
-class MetronomePanel : ConfigPanel
+class MetronomePanel extends ConfigPanel
 	override Metronome *c
 	override void __init__(Metronome *_m)
 		super.__init__(_m)

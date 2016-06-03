@@ -3,7 +3,7 @@
 use "../api.kaba"
 
 
-class ForkRenderer : AudioRenderer
+class ForkRenderer extends AudioRenderer
 	int offset
 	float freq
 	float volume
@@ -19,7 +19,7 @@ class ForkRenderer : AudioRenderer
 		offset += buf.length
 		return buf.length
 
-class PitchForkDialog : Dialog
+class PitchForkDialog extends Dialog
 	PitchFork *fork
 	
 	void __init__(PitchFork *pf)
@@ -44,7 +44,7 @@ class PitchForkDialog : Dialog
 	void onClose()
 		fork.stop()
 
-class PitchFork : TsunamiPlugin
+class PitchFork extends TsunamiPlugin
 	OutputStream *stream
 	ForkRenderer *renderer
 	PitchForkDialog *dlg

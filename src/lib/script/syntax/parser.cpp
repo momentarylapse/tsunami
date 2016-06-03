@@ -177,7 +177,7 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 	}
 
 	// super
-	if ((type->parent) and (Exp.cur == NAME_SUPER)){
+	if ((type->parent) and (Exp.cur == IDENTIFIER_SUPER)){
 		Exp.next();
 		if (deref){
 			Operand->type = type->parent->GetPointer();
@@ -198,7 +198,6 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 		Operand = ref_command(Operand);
 
 	string f_name = Exp.cur;
-	Exp.next();
 
 	// class function?
 	Array<Command> links;
@@ -207,8 +206,10 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 			Command *cmd = add_command_classfunc(&cf, Operand);
 			links.add(*cmd);
 		}
-	if (links.num > 0)
+	if (links.num > 0){
+		Exp.next();
 		return GetFunctionCall(f_name, links, block);
+	}
 
 	DoError("unknown element of " + type->name);
 	return NULL;
@@ -639,7 +640,7 @@ Command *SyntaxTree::GetOperand(Block *block)
 		if (Exp.cur == "("){
 			Array<ClassFunction> cfs;
 			for (ClassFunction &cf : t->function)
-				if (cf.name == NAME_FUNC_INIT and cf.param_type.num > 0)
+				if (cf.name == IDENTIFIER_FUNC_INIT and cf.param_type.num > 0)
 					cfs.add(cf);
 			if (cfs.num == 0)
 				DoError(format("class \"%s\" does not have a constructor with parameters", t->name.c_str()));
@@ -707,10 +708,8 @@ Command *SyntaxTree::GetOperand(Block *block)
 				}
 
 
-				if (!ok){
-					Exp.cur_exp = _ie;
-					DoError("unknown unitary operator " + PrimitiveOperators[po].name + " " + p2->name);
-				}
+				if (!ok)
+					DoError("unknown unitary operator " + PrimitiveOperators[po].name + " " + p2->name, _ie);
 				return add_command_operator(sub_command, NULL, o);
 			}else{
 
@@ -943,10 +942,8 @@ void SyntaxTree::LinkMostImportantOperator(Array<Command*> &Operand, Array<Comma
 	Command *param2 = Operand[mio + 1];
 	int op_no = Operator[mio]->link_no;
 	Operator[mio] = LinkOperator(op_no, param1, param2);
-	if (!Operator[mio]){
-		Exp.cur_exp = op_exp[mio];
-		DoError(format("no operator found: (%s) %s (%s)", param1->type->name.c_str(), PrimitiveOperators[op_no].name.c_str(), param2->type->name.c_str()));
-	}
+	if (!Operator[mio])
+		DoError(format("no operator found: (%s) %s (%s)", param1->type->name.c_str(), PrimitiveOperators[op_no].name.c_str(), param2->type->name.c_str()), op_exp[mio]);
 
 // remove from list
 	Operand[mio] = Operator[mio];
@@ -1222,7 +1219,7 @@ void SyntaxTree::ParseSpecialCommandReturn(Block *block)
 	if (block->function->return_type == TypeVoid){
 		cmd->set_num_params(0);
 	}else{
-		Command *cmd_value = CheckParamLink(GetCommand(block), block->function->return_type, "return", 0);
+		Command *cmd_value = CheckParamLink(GetCommand(block), block->function->return_type, IDENTIFIER_RETURN, 0);
 		cmd->set_num_params(1);
 		cmd->set_param(0, cmd_value);
 	}
@@ -1234,7 +1231,7 @@ void SyntaxTree::ParseSpecialCommandIf(Block *block)
 	msg_db_f("ParseSpecialCommandIf", 4);
 	int ind = Exp.cur_line->indent;
 	Exp.next();
-	Command *cmd_cmp = CheckParamLink(GetCommand(block), TypeBool, "if", 0);
+	Command *cmd_cmp = CheckParamLink(GetCommand(block), TypeBool, IDENTIFIER_IF, 0);
 	ExpectNewline();
 
 	Command *cmd_if = add_command_compilerfunc(COMMAND_IF);
@@ -1247,11 +1244,11 @@ void SyntaxTree::ParseSpecialCommandIf(Block *block)
 	Exp.next_line();
 
 	// else?
-	if ((!Exp.end_of_file()) and (Exp.cur == "else") and (Exp.cur_line->indent >= ind)){
+	if ((!Exp.end_of_file()) and (Exp.cur == IDENTIFIER_ELSE) and (Exp.cur_line->indent >= ind)){
 		cmd_if->link_no = COMMAND_IF_ELSE;
 		Exp.next();
 		// iterative if
-		if (Exp.cur == "if"){
+		if (Exp.cur == IDENTIFIER_IF){
 			// sub-if's in a new block
 			Block *new_block = AddBlock(block->function, block);
 			// parse the next if
@@ -1269,9 +1266,8 @@ void SyntaxTree::ParseSpecialCommandIf(Block *block)
 		ParseCompleteCommand(block);
 		//Exp.next_line();
 	}else{
-		Exp.cur_line --;
-		Exp.cur_exp = Exp.cur_line->exp.num - 1;
-		Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
+		int line = Exp.get_line_no() - 1;
+		Exp.set(Exp.line[line].exp.num - 1, line);
 	}
 }
 
@@ -1283,19 +1279,19 @@ void SyntaxTree::ParseSpecialCommand(Block *block)
 			has_colon = true;
 
 	// special commands...
-	if (Exp.cur == "for" and !has_colon){
+	if (Exp.cur == IDENTIFIER_FOR and !has_colon){
 		ParseSpecialCommandForall(block);
-	}else if (Exp.cur == "for"){
+	}else if (Exp.cur == IDENTIFIER_FOR){
 		ParseSpecialCommandFor(block);
-	}else if (Exp.cur == "while"){
+	}else if (Exp.cur == IDENTIFIER_WHILE){
 		ParseSpecialCommandWhile(block);
- 	}else if (Exp.cur == "break"){
+ 	}else if (Exp.cur == IDENTIFIER_BREAK){
 		ParseSpecialCommandBreak(block);
-	}else if (Exp.cur == "continue"){
+	}else if (Exp.cur == IDENTIFIER_CONTINUE){
 		ParseSpecialCommandContinue(block);
-	}else if (Exp.cur == "return"){
+	}else if (Exp.cur == IDENTIFIER_RETURN){
 		ParseSpecialCommandReturn(block);
-	}else if (Exp.cur == "if"){
+	}else if (Exp.cur == IDENTIFIER_IF){
 		ParseSpecialCommandIf(block);
 	}
 }
@@ -1316,8 +1312,7 @@ void SyntaxTree::ParseCompleteCommand(Block *block)
 	// block?  <- indent
 	if (Exp.indented){
 		Exp.indented = false;
-		Exp.cur_exp = 0; // bad hack...
-		Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
+		Exp.set(0); // bad hack...
 		msg_db_f("Block", 4);
 		Block *new_block = AddBlock(block->function, block);
 
@@ -1370,7 +1365,7 @@ void SyntaxTree::ParseCompleteCommand(Block *block)
 
 
 	// commands (the actual code!)
-		if ((Exp.cur == "for") or (Exp.cur == "while") or (Exp.cur == "break") or (Exp.cur == "continue") or (Exp.cur == "return") or (Exp.cur == "if")){
+		if ((Exp.cur == IDENTIFIER_FOR) or (Exp.cur == IDENTIFIER_WHILE) or (Exp.cur == IDENTIFIER_BREAK) or (Exp.cur == IDENTIFIER_CONTINUE) or (Exp.cur == IDENTIFIER_RETURN) or (Exp.cur == IDENTIFIER_IF)){
 			ParseSpecialCommand(block);
 
 		}else{
@@ -1479,6 +1474,8 @@ void SyntaxTree::ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtu
 			n = i;
 
 	t->AddFunction(this, n, as_virtual, override);
+
+	SkipParsingFunctionBody();
 }
 
 inline bool type_needs_alignment(Type *t)
@@ -1496,9 +1493,9 @@ int class_count_virtual_functions(SyntaxTree *ps)
 	while(l != &ps->Exp.line[ps->Exp.line.num - 1]){
 		if (l->indent == 0)
 			break;
-		if ((l->indent == 1) and (l->exp[0].name == "virtual"))
+		if ((l->indent == 1) and (l->exp[0].name == IDENTIFIER_VIRTUAL))
 			count ++;
-		else if ((l->indent == 1) and (l->exp[0].name == "extern") and (l->exp[1].name == "virtual"))
+		else if ((l->indent == 1) and (l->exp[0].name == IDENTIFIER_EXTERN) and (l->exp[1].name == IDENTIFIER_VIRTUAL))
 			count ++;
 		l ++;
 	}
@@ -1519,17 +1516,17 @@ void SyntaxTree::ParseClass()
 	Type *_class = CreateNewType(name, 0, false, false, false, 0, NULL);
 
 	// parent class
-	if (Exp.cur == ":"){
+	if (Exp.cur == IDENTIFIER_EXTENDS){
 		Exp.next();
 		Type *parent = ParseType(); // force
 		if (!_class->DeriveFrom(parent, true))
-			DoError(format("parental type in class definition after \":\" has to be a class, but (%s) is not", parent->name.c_str()));
+			DoError(format("parental type in class definition after \"%s\" has to be a class, but (%s) is not", IDENTIFIER_EXTENDS.c_str(), parent->name.c_str()));
 		_offset = parent->size;
 	}
 	ExpectNewline();
 
 	// elements
-	for (int num=0; !Exp.end_of_file(); num++){
+	while(!Exp.end_of_file()){
 		Exp.next_line();
 		if (Exp.cur_line->indent <= indent0) //(unindented)
 			break;
@@ -1538,7 +1535,7 @@ void SyntaxTree::ParseClass()
 
 		// extern?
 		next_extern = false;
-		if (Exp.cur == "extern"){
+		if (Exp.cur == IDENTIFIER_EXTERN){
 			next_extern = true;
 			Exp.next();
 		}
@@ -1546,17 +1543,17 @@ void SyntaxTree::ParseClass()
 		// virtual?
 		bool next_virtual = false;
 		bool override = false;
-		if (Exp.cur == "virtual"){
+		if (Exp.cur == IDENTIFIER_VIRTUAL){
 			next_virtual = true;
 			Exp.next();
-		}else if (Exp.cur == "override"){
+		}else if (Exp.cur == IDENTIFIER_OVERRIDE){
 			override = true;
 			Exp.next();
 		}
 		int ie = Exp.cur_exp;
 
 		Type *type = ParseType(); // force
-		for (int j=0;!Exp.end_of_line();j++){
+		while(!Exp.end_of_line()){
 			//int indent = Exp.cur_line->indent;
 
 			ClassElement el;
@@ -1569,8 +1566,7 @@ void SyntaxTree::ParseClass()
 			if (Exp.cur == "(")
 			    is_function = true;
 			if (is_function){
-				Exp.cur_exp = ie;
-				Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
+				Exp.set(ie);
 				ParseClassFunctionHeader(_class, next_extern, next_virtual, override);
 
 				break;
@@ -1580,11 +1576,11 @@ void SyntaxTree::ParseClass()
 			ClassElement *orig = NULL;
 			foreachi(ClassElement &e, _class->element, i)
 				if (e.name == el.name) //and e.type->is_pointer and el.type->is_pointer)
-						orig = &e;
+					orig = &e;
 			if (override and ! orig)
 				DoError(format("can not override element '%s', no previous definition", el.name.c_str()));
 			if (!override and orig)
-				DoError(format("element '%s' is already defined, use 'override' to override", el.name.c_str()));
+				DoError(format("element '%s' is already defined, use '%s' to override", el.name.c_str(), IDENTIFIER_OVERRIDE.c_str()));
 			if (override){
 				if (orig->type->is_pointer and el.type->is_pointer)
 					orig->type = el.type;
@@ -1629,7 +1625,7 @@ void SyntaxTree::ParseClass()
 				e.offset = ProcessClassOffset(_class->name, e.name, e.offset + config.pointer_size);
 
 			ClassElement el;
-			el.name = "-vtable-";
+			el.name = IDENTIFIER_VTABLE_VAR;
 			el.type = TypePointer;
 			el.offset = 0;
 			el.hidden = true;
@@ -1719,7 +1715,7 @@ bool peek_commands_super(ExpressionBuffer &Exp)
 	ExpressionBuffer::Line *l = Exp.cur_line + 1;
 	if (l->exp.num < 3)
 		return false;
-	if ((l->exp[0].name == NAME_SUPER) and (l->exp[1].name == ".") and (l->exp[2].name == NAME_FUNC_INIT))
+	if ((l->exp[0].name == IDENTIFIER_SUPER) and (l->exp[1].name == ".") and (l->exp[2].name == IDENTIFIER_FUNC_INIT))
 		return true;
 	return false;
 }
@@ -1751,13 +1747,13 @@ void Function::Update(Type *class_type)
 
 	// return by memory
 	if (return_type->UsesReturnByMemory())
-		block->add_var(NAME_RETURN_VAR, return_type->GetPointer());
+		block->add_var(IDENTIFIER_RETURN_VAR, return_type->GetPointer());
 
 	// class function
 	_class = class_type;
 	if (class_type){
-		if (__get_var(NAME_SELF) < 0)
-			block->add_var(NAME_SELF, class_type->GetPointer());
+		if (__get_var(IDENTIFIER_SELF) < 0)
+			block->add_var(IDENTIFIER_SELF, class_type->GetPointer());
 
 		// convert name to Class.Function
 		name = class_type->name + "." +  name;
@@ -1835,6 +1831,8 @@ Function *SyntaxTree::ParseFunctionHeader(Type *class_type, bool as_extern)
 	Type *return_type = ParseType(); // force...
 
 	Function *f = AddFunction(Exp.cur, return_type);
+	f->_logical_line_no = Exp.get_line_no();
+	f->_exp_no = Exp.cur_exp;
 	cur_func = f;
 	next_extern = false;
 
@@ -1868,17 +1866,19 @@ Function *SyntaxTree::ParseFunctionHeader(Type *class_type, bool as_extern)
 	f->Update(class_type);
 
 	f->is_extern = as_extern;
-	f->_logical_line_no = Exp.get_line_no();
 	cur_func = NULL;
 
-	// skip function body
+	return f;
+}
+
+void SyntaxTree::SkipParsingFunctionBody()
+{
 	int indent0 = Exp.cur_line->indent;
 	while (!Exp.end_of_file()){
 		if (Exp.cur_line[1].indent <= indent0)
 			break;
 		Exp.next_line();
 	}
-	return f;
 }
 
 void SyntaxTree::ParseFunctionBody(Function *f)
@@ -1889,7 +1889,7 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 	bool more_to_parse = true;
 
 	// auto implement constructor?
-	if (f->name.tail(9) == ".__init__"){
+	if (f->name.tail(9) == "." + IDENTIFIER_FUNC_INIT){
 		if (peek_commands_super(Exp)){
 			more_to_parse = ParseFunctionCommand(f, this_line);
 
@@ -1905,7 +1905,7 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 	}
 
 	// auto implement destructor?
-	if (f->name.tail(11) == ".__delete__")
+	if (f->name.tail(11) == "." + IDENTIFIER_FUNC_DELETE)
 		AutoImplementDestructor(f, f->_class);
 	cur_func = NULL;
 
@@ -1919,7 +1919,7 @@ void SyntaxTree::ParseAllClassNames()
 	Exp.reset_parser();
 	while (!Exp.end_of_file()){
 		if ((Exp.cur_line->indent == 0) and (Exp.cur_line->exp.num >= 2)){
-			if (Exp.cur == "class"){
+			if (Exp.cur == IDENTIFIER_CLASS){
 				Exp.next();
 				int nt0 = types.num;
 				Type *t = CreateNewType(Exp.cur, 0, false, false, false, 0, NULL);
@@ -1961,13 +1961,13 @@ void SyntaxTree::Parser()
 		next_const = false;
 
 		// extern?
-		if (Exp.cur == "extern"){
+		if (Exp.cur == IDENTIFIER_EXTERN){
 			next_extern = true;
 			Exp.next();
 		}
 
 		// const?
-		if (Exp.cur == "const"){
+		if (Exp.cur == IDENTIFIER_CONST){
 			next_const = true;
 			Exp.next();
 		}
@@ -1977,11 +1977,11 @@ void SyntaxTree::Parser()
 			ParseImport();
 
 		// enum
-		}else*/ if (Exp.cur == "enum"){
+		}else*/ if (Exp.cur == IDENTIFIER_ENUM){
 			ParseEnum();
 
 		// class
-		}else if (Exp.cur == "class"){
+		}else if (Exp.cur == IDENTIFIER_CLASS){
 			ParseClass();
 
 		}else{
@@ -1995,6 +1995,7 @@ void SyntaxTree::Parser()
 			// function?
 			if (is_function){
 				ParseFunctionHeader(NULL, next_extern);
+				SkipParsingFunctionBody();
 
 			// global variables
 			}else{

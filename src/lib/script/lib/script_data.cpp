@@ -26,29 +26,40 @@
 
 namespace Script{
 
-string DataVersion = "0.13.13.0";
+string DataVersion = "0.14.7.0";
 
-
-const string NAME_CLASS = "class";
-const string NAME_FUNC_INIT = "__init__";
-const string NAME_FUNC_DELETE = "__delete__";
-const string NAME_FUNC_ASSIGN = "__assign__";
-const string NAME_SUPER = "super";
-const string NAME_SELF = "self";
-const string NAME_RETURN_VAR = "-return-";
-const string NAME_ENUM = "enum";
-const string NAME_CONST = "const";
-const string NAME_OVERRIDE = "override";
-const string NAME_VIRTUAL = "virtual";
-const string NAME_EXTERN = "extern";
-const string NAME_USE = "use";
-const string NAME_RETURN = "return";
-const string NAME_IF = "if";
-const string NAME_ELSE = "else";
-const string NAME_WHILE = "while";
-const string NAME_FOR = "for";
-const string NAME_BREAK = "break";
-const string NAME_CONTINUE = "continue";
+const string IDENTIFIER_CLASS = "class";
+const string IDENTIFIER_FUNC_INIT = "__init__";
+const string IDENTIFIER_FUNC_DELETE = "__delete__";
+const string IDENTIFIER_FUNC_ASSIGN = "__assign__";
+const string IDENTIFIER_SUPER = "super";
+const string IDENTIFIER_SELF = "self";
+const string IDENTIFIER_EXTENDS = "extends";
+const string IDENTIFIER_STATIC = "static";
+const string IDENTIFIER_NEW = "new";
+const string IDENTIFIER_DELETE = "delete";
+const string IDENTIFIER_NAMESPACE = "namespace";
+const string IDENTIFIER_RETURN_VAR = "-return-";
+const string IDENTIFIER_VTABLE_VAR = "-vtable-";
+const string IDENTIFIER_ENUM = "enum";
+const string IDENTIFIER_CONST = "const";
+const string IDENTIFIER_OVERRIDE = "override";
+const string IDENTIFIER_VIRTUAL = "virtual";
+const string IDENTIFIER_EXTERN = "extern";
+const string IDENTIFIER_USE = "use";
+const string IDENTIFIER_RETURN = "return";
+const string IDENTIFIER_IF = "if";
+const string IDENTIFIER_ELSE = "else";
+const string IDENTIFIER_WHILE = "while";
+const string IDENTIFIER_FOR = "for";
+const string IDENTIFIER_IN = "in";
+const string IDENTIFIER_BREAK = "break";
+const string IDENTIFIER_CONTINUE = "continue";
+const string IDENTIFIER_AND = "and";
+const string IDENTIFIER_OR = "or";
+const string IDENTIFIER_XOR = "xor";
+const string IDENTIFIER_NOT = "not";
+const string IDENTIFIER_ASM = "asm";
 
 CompilerConfiguration config;
 
@@ -203,7 +214,7 @@ Type *add_type_a(const string &name, Type *sub_type, int array_length)
 int NumPrimitiveOperators = NUM_PRIMITIVE_OPERATORS;
 
 PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
-	{"=",	OPERATOR_ASSIGN,			true,	1,	"__assign__"},
+	{"=",	OPERATOR_ASSIGN,			true,	1,	IDENTIFIER_FUNC_ASSIGN},
 	{"+",	OPERATOR_ADD,			false,	11,	"__add__"},
 	{"-",	OPERATOR_SUBTRACT,		false,	11,	"__sub__"},
 	{"*",	OPERATOR_MULTIPLY,		false,	12,	"__mul__"},
@@ -219,8 +230,8 @@ PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
 	{">",	OPERATOR_GREATER,		false,	9,	"__gt__"},
 	{"<=",	OPERATOR_SMALLER_EQUAL,	false,	9,	"__le__"},
 	{">=",	OPERATOR_GREATER_EQUAL,	false,	9,	"__ge__"},
-	{"and",	OPERATOR_AND,			false,	4,	"__and__"},
-	{"or",	OPERATOR_OR,				false,	3,	"__or__"},
+	{IDENTIFIER_AND,	OPERATOR_AND,			false,	4,	"__and__"},
+	{IDENTIFIER_OR,	OPERATOR_OR,				false,	3,	"__or__"},
 	{"%",	OPERATOR_MODULO,			false,	12,	"__mod__"},
 	{"&",	OPERATOR_BIT_AND,			false,	7,	"__bitand__"},
 	{"|",	OPERATOR_BIT_OR,			false,	5,	"__bitor__"},
@@ -461,12 +472,13 @@ int add_func(const string &name, Type *return_type, void *func, ScriptFlag flag)
 	return cur_package_script->syntax->functions.num - 1;
 }
 
-int add_compiler_func(const string &name, Type *return_type, int index)
+int add_compiler_func(const string &name, Type *return_type, int index, bool hide_docu)
 {
 	PreCommand c;
 	c.name = name;
 	c.return_type = return_type;
 	c.package = cur_package_index;
+	c.hide_docu = hide_docu;
 	if (PreCommands.num < NUM_INTERN_PRE_COMMANDS)
 		PreCommands.resize(NUM_INTERN_PRE_COMMANDS);
 	PreCommands[index] = c;
@@ -519,35 +531,35 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 		if (t->parent->is_simple_class()){
 			if (!t->parent->UsesCallByReference()){
 				if (t->parent->is_pointer){
-					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<void*>::__init__));
+					class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&Array<void*>::__init__));
 					class_add_func("add", TypeVoid, mf(&Array<void*>::add));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&Array<void*>::insert));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent == TypeFloat32){
-					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<float>::__init__));
+					class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&Array<float>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_f_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_f_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent == TypeFloat64){
-					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<double>::__init__));
+					class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&Array<double>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_d_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_d_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 4){
-					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<int>::__init__));
+					class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&Array<int>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_4_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_4_single));
 						func_add_param("x",		t->parent);
 						func_add_param("index",		TypeInt);
 				}else if (t->parent->size == 1){
-					class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&Array<char>::__init__));
+					class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&Array<char>::__init__));
 					class_add_func("add", TypeVoid, mf(&DynamicArray::append_1_single));
 						func_add_param("x",		t->parent);
 					class_add_func("insert", TypeVoid, mf(&DynamicArray::insert_1_single));
@@ -562,9 +574,9 @@ void script_make_super_array(Type *t, SyntaxTree *ps)
 					func_add_param("x",		t->parent);
 					func_add_param("index",		TypeInt);
 			}
-			class_add_func(NAME_FUNC_DELETE,	TypeVoid, mf(&DynamicArray::clear));
+			class_add_func(IDENTIFIER_FUNC_DELETE,	TypeVoid, mf(&DynamicArray::clear));
 			class_add_func("clear", TypeVoid, mf(&DynamicArray::clear));
-			class_add_func(NAME_FUNC_ASSIGN, TypeVoid, mf(&DynamicArray::assign));
+			class_add_func(IDENTIFIER_FUNC_ASSIGN, TypeVoid, mf(&DynamicArray::assign));
 				func_add_param("other",		t);
 			class_add_func("remove", TypeVoid, mf(&DynamicArray::delete_single));
 				func_add_param("index",		TypeInt);
@@ -921,8 +933,8 @@ void SIAddPackageBase()
 		class_add_func("extension", TypeString, mf(&string::extension), FLAG_PURE);
 
 	add_class(TypeStringList);
-		class_add_func(NAME_FUNC_INIT,	TypeVoid, mf(&StringList::__init__));
-		class_add_func(NAME_FUNC_DELETE,	TypeVoid, mf(&StringList::clear));
+		class_add_func(IDENTIFIER_FUNC_INIT,	TypeVoid, mf(&StringList::__init__));
+		class_add_func(IDENTIFIER_FUNC_DELETE,	TypeVoid, mf(&StringList::clear));
 		class_add_func("add", TypeVoid, mf(&StringList::add));
 			func_add_param("x",		TypeString);
 		class_add_func("clear", TypeVoid, mf(&StringList::clear));
@@ -930,7 +942,7 @@ void SIAddPackageBase()
 			func_add_param("index",		TypeInt);
 		class_add_func("resize", TypeVoid, mf(&StringList::resize));
 			func_add_param("num",		TypeInt);
-		class_add_func(NAME_FUNC_ASSIGN,	TypeVoid, mf(&StringList::assign));
+		class_add_func(IDENTIFIER_FUNC_ASSIGN,	TypeVoid, mf(&StringList::assign));
 			func_add_param("other",		TypeStringList);
 		class_add_func("join", TypeString, mf(&StringList::join), FLAG_PURE);
 			func_add_param("glue",		TypeString);
@@ -975,30 +987,30 @@ void SIAddBasicCommands()
 
 
 // "intern" functions
-	add_compiler_func("-return-",		TypeVoid,	COMMAND_RETURN);
+	add_compiler_func(IDENTIFIER_RETURN,		TypeVoid,	COMMAND_RETURN);
 		func_add_param("return_value",	TypeVoid); // return: ParamType will be defined by the parser!
-	add_compiler_func("-if-",		TypeVoid,	COMMAND_IF);
+	add_compiler_func(IDENTIFIER_IF,		TypeVoid,	COMMAND_IF);
 		func_add_param("b",	TypeBool);
 	add_compiler_func("-if/else-",	TypeVoid,	COMMAND_IF_ELSE);
 		func_add_param("b",	TypeBool);
-	add_compiler_func("-while-",		TypeVoid,	COMMAND_WHILE);
+	add_compiler_func(IDENTIFIER_WHILE,		TypeVoid,	COMMAND_WHILE);
 		func_add_param("b",	TypeBool);
-	add_compiler_func("-for-",		TypeVoid,	COMMAND_FOR);
+	add_compiler_func(IDENTIFIER_FOR,		TypeVoid,	COMMAND_FOR);
 		func_add_param("b",	TypeBool); // internally like a while-loop... but a bit different...
-	add_compiler_func("-break-",		TypeVoid,	COMMAND_BREAK);
-	add_compiler_func("-continue-",	TypeVoid,	COMMAND_CONTINUE);
-	add_compiler_func("-new-",	TypePointer,	COMMAND_NEW);
-	add_compiler_func("-delete-",	TypeVoid,	COMMAND_DELETE);
+	add_compiler_func(IDENTIFIER_BREAK,		TypeVoid,	COMMAND_BREAK);
+	add_compiler_func(IDENTIFIER_CONTINUE,	TypeVoid,	COMMAND_CONTINUE);
+	add_compiler_func(IDENTIFIER_NEW,	TypePointer,	COMMAND_NEW);
+	add_compiler_func(IDENTIFIER_DELETE,	TypeVoid,	COMMAND_DELETE);
 		func_add_param("p",	TypePointer);
-	add_compiler_func("sizeof",		TypeInt,	COMMAND_SIZEOF);
+	add_compiler_func("sizeof",		TypeInt,	COMMAND_SIZEOF, false);
 		func_add_param("type",	TypeVoid);
 	
-	add_compiler_func("wait",		TypeVoid,	COMMAND_WAIT);
+	add_compiler_func("wait",		TypeVoid,	COMMAND_WAIT, false);
 		func_add_param("time",	TypeFloat32);
-	add_compiler_func("wait_rt",		TypeVoid,	COMMAND_WAIT_RT);
+	add_compiler_func("wait_rt",		TypeVoid,	COMMAND_WAIT_RT, false);
 		func_add_param("time",	TypeFloat32);
-	add_compiler_func("wait_of",		TypeVoid,	COMMAND_WAIT_ONE_FRAME);
-	add_compiler_func("-asm-",		TypeVoid,	COMMAND_ASM);
+	add_compiler_func("wait_of",		TypeVoid,	COMMAND_WAIT_ONE_FRAME, false);
+	add_compiler_func(IDENTIFIER_ASM,		TypeVoid,	COMMAND_ASM);
 }
 
 

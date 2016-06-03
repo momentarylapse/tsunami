@@ -2,7 +2,7 @@ use "../api.kaba"
 
 Window *dlg
 
-class SetFreqDialog : Dialog
+class SetFreqDialog extends Dialog
 void OnOk()
 	song.sample_rate = dlg.getInt("freq")
 	delete dlg

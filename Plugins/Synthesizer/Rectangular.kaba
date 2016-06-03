@@ -5,7 +5,7 @@ class PitchState
 	float volume
 	float phase
 
-class RectangularState : PluginData
+class RectangularState extends PluginData
 	PitchState[MAX_PITCH] pitch
 	override void reset()
 		for p in pitch
@@ -13,7 +13,7 @@ class RectangularState : PluginData
 			p.phase = 0
 
 
-class RectangularSynthesizer : Synthesizer
+class RectangularSynthesizer extends Synthesizer
 	RectangularState state
 
 	override void render(BufferBox buf)

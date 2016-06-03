@@ -2,7 +2,7 @@
 // Title[Deutsch] = Rückwärts
 use "../../api.kaba"
 
-class Reverse : AudioEffect
+class Reverse extends AudioEffect
 	override void process(BufferBox buf)
 		int n = buf.length / 2
 		for i in 0:n

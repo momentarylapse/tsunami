@@ -16,7 +16,7 @@ Type *add_type(const string &name, int size, ScriptFlag = FLAG_NONE);
 Type *add_type_p(const string &name, Type *sub_type, ScriptFlag = FLAG_NONE);
 Type *add_type_a(const string &name, Type *sub_type, int array_length);
 int add_func(const string &name, Type *return_type, void *func, ScriptFlag = FLAG_NONE);
-int add_compiler_func(const string &name, Type *return_type, int index);
+int add_compiler_func(const string &name, Type *return_type, int index, bool hide_docu = true);
 void func_set_inline(int index);
 void func_add_param(const string &name, Type *type);
 void add_class(Type *root_type);

@@ -5,14 +5,14 @@ use "../../api.kaba"
 
 const string AutoConfigPitch = "0:2:0.1:100:%"
 
-class Config : PluginData
+class Config extends PluginData
 	float Pitch
 
 	override void reset()
 		Pitch = 1
 
 
-class PitchShift : AudioEffect
+class PitchShift extends AudioEffect
 	Config config
 
 	complex[] buf1

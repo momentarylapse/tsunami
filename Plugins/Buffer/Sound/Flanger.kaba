@@ -8,7 +8,7 @@ const string AutoConfigSpeed = "0:2:0.01:1:Hz"
 const string AutoConfigDepth = "0:1:0.1:100:%"
 
 
-class PluginConfig : PluginData
+class PluginConfig extends PluginData
 	float Delay
 	float Speed
 	float Depth
@@ -17,7 +17,7 @@ class PluginConfig : PluginData
 		Speed = 0.3
 		Delay = 0.01
 
-class PluginState : PluginData
+class PluginState extends PluginData
 	float[] temp_r
 	float[] temp_l
 	int offset
@@ -26,7 +26,7 @@ class PluginState : PluginData
 		temp_l.clear()
 		offset = 0
 
-class Flanger : AudioEffect
+class Flanger extends AudioEffect
 	PluginConfig config
 	PluginState state
 

@@ -5,7 +5,7 @@ use "../../api.kaba"
 use "../../tone.kaba"
 
 
-class Config : PluginData
+class Config extends PluginData
 	int Pitch
 	float Frequency
 	float Volume
@@ -14,7 +14,7 @@ class Config : PluginData
 		Volume = 0.3
 		Frequency = pitch_to_freq(Pitch)
 
-class ToneGenerator : AudioEffect
+class ToneGenerator extends AudioEffect
 	Config config
 	DummySynthesizer synth
 
@@ -33,7 +33,7 @@ class ToneGenerator : AudioEffect
 	override ConfigPanel *createPanel()
 		return new TonePanel(self)
 
-class TonePanel : ConfigPanel
+class TonePanel extends ConfigPanel
 	override ToneGenerator *c
 	Slider *vol_slider
 	override void __init__(ToneGenerator *_t)

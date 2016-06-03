@@ -1,7 +1,7 @@
 use "../api.kaba"
 
 
-class InverseSynthesizer : Synthesizer
+class InverseSynthesizer extends Synthesizer
 	DummySynthesizer sub
 	override void render(BufferBox buf)
 		sub.setSampleRate(sample_rate)

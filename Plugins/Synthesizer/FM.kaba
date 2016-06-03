@@ -33,7 +33,7 @@ class OscillatorConfig
 class OscillatorLink
 	int source, dest
 
-class FMConfig : PluginData
+class FMConfig extends PluginData
 	OscillatorConfig[NUM_OSCILLATORS] osc
 	//OscillatorLink[] link
 	override void reset()
@@ -82,7 +82,7 @@ class FMConfig : PluginData
 		reset()
 	void __assign__(FMConfig o)
 
-class FMState : PluginData
+class FMState extends PluginData
 	PitchState[MAX_PITCH] pitch
 	override void reset()
 		for p in pitch
@@ -96,7 +96,7 @@ class FMState : PluginData
 	override void __init__()
 		reset()
 
-class FMPanel : ConfigPanel
+class FMPanel extends ConfigPanel
 	FMConfig *fc
 	int chosen
 	override FMSynthesizer *c
@@ -197,7 +197,7 @@ class FMPanel : ConfigPanel
 					check("link_" + l.dest, true)*/
 		
 
-class FMSynthesizer : Synthesizer
+class FMSynthesizer extends Synthesizer
 	FMConfig config
 	FMState state
 

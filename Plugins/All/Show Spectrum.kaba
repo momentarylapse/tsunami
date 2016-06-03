@@ -27,7 +27,7 @@ float todb(float v)
 
 float peak_max
 
-class SpecGrid : Grid
+class SpecGrid extends Grid
 	int type
 	complex[] pr, pl
 
@@ -60,7 +60,7 @@ class SpecGrid : Grid
 		drawCurveB(c, pr, true, Red)
 		drawCurveB(c, pl, true, Blue)
 
-class SpectrumDialog : Dialog
+class SpectrumDialog extends Dialog
 	SpecGrid grid
 	void __init__(SongPlugin *plugin)
 		super.__init__("Spectrum", 600, 460, plugin.win, true)
@@ -87,7 +87,7 @@ Grid ? '' 1 2
 	void onClose()
 		delete self
 
-class ShowSpectrum : SongPlugin
+class ShowSpectrum extends SongPlugin
 	void show_spec(Song *song)
 		dlg = new SpectrumDialog(win)
 	

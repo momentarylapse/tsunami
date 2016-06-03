@@ -41,6 +41,7 @@ struct ExpressionBuffer
 	bool past_end_of_line();
 	void next_line();
 	bool end_of_file();
+	void set(int exp_no, int line = -1);
 
 	void clear();
 	void reset_parser();

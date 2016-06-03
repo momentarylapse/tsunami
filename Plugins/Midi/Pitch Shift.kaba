@@ -2,13 +2,13 @@ use "../api.kaba"
 
 const string AutoConfigPitch = "-50:50:1:1:"
 
-class Config : PluginData
+class Config extends PluginData
 	float Pitch
 	
 	override void reset()
 		Pitch = 0
 
-class PitchShift : MidiEffect
+class PitchShift extends MidiEffect
 	Config config
 	
 	override void process(MidiData midi)

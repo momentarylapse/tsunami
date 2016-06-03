@@ -4,14 +4,14 @@
 use "../../api.kaba"
 
 
-class Config : PluginData
+class Config extends PluginData
 	float Volume
 	bool Maximize
 	
 	override void reset()
 		self.Volume = 1
 
-class Volume : AudioEffect
+class Volume extends AudioEffect
 	Config config
 
 	override ConfigPanel *createPanel()
@@ -31,7 +31,7 @@ class Volume : AudioEffect
 			buf.r[i] = clamp(buf.r[i] * factor, -1, 1)
 			buf.l[i] = clamp(buf.l[i] * factor, -1, 1)
 	
-class VolumePanel : ConfigPanel
+class VolumePanel extends ConfigPanel
 	override Volume *c
 	Slider *slider
 	override void __init__(Volume *_v)

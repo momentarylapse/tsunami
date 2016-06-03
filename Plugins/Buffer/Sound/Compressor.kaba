@@ -6,7 +6,7 @@ use "../../grid.kaba"
 
 const float MIN_DB = 0.0 - 60.0
 
-class CompressorConfig : PluginData
+class CompressorConfig extends PluginData
 	complex[] curve
 	float attack, release
 
@@ -26,7 +26,7 @@ class CompressorConfig : PluginData
 		//MouseOver = -1
 		//Selected = -1
 
-class CompressorState : PluginData
+class CompressorState extends PluginData
 	float gain_r, gain_l
 	float[] squares_r
 	float[] squares_l
@@ -39,7 +39,7 @@ class CompressorState : PluginData
 		squares_l.resize(70)
 
 
-class Compressor : AudioEffect
+class Compressor extends AudioEffect
 	CompressorConfig config
 	CompressorState state
 
@@ -93,7 +93,7 @@ class Compressor : AudioEffect
 		compress(buf.r, state.squares_r, &state.gain_r)
 		compress(buf.l, state.squares_l, &state.gain_l)
 
-class CompressorGrid : Grid
+class CompressorGrid extends Grid
 	int MouseOver, Selected
 	CompressorConfig *config
 	ConfigPanel *cp
@@ -155,7 +155,7 @@ class CompressorGrid : Grid
 			Selected = -1
 			redraw()
 
-class CompressorPanel : ConfigPanel
+class CompressorPanel extends ConfigPanel
 	CompressorGrid grid
 	override void __init__(Compressor *_fx)
 		super.__init__(_fx)

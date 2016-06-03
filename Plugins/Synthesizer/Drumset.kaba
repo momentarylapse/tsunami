@@ -58,17 +58,17 @@ class DrumList
 
 DrumList drumlist
 
-class DrumsetConfig : PluginData
+class DrumsetConfig extends PluginData
 	string name
 	override void reset()
 		name = ""
 
-class DrumsetState : PluginData
+class DrumsetState extends PluginData
 	Song *a
 	Synthesizer *s
 	
 
-class DrumsetSynthesizer : Synthesizer
+class DrumsetSynthesizer extends Synthesizer
 	DrumsetConfig config
 	DrumsetState state
 	override void __init__()
@@ -92,7 +92,7 @@ class DrumsetSynthesizer : Synthesizer
 	override ConfigPanel *createPanel()
 		return new DrumsetPanel(self)
 
-class DrumsetPanel : ConfigPanel
+class DrumsetPanel extends ConfigPanel
 	DrumsetConfig *sc
 	override DrumsetSynthesizer *c
 	override void __init__(DrumsetSynthesizer *_s)

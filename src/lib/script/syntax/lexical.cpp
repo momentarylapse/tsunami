@@ -74,6 +74,15 @@ void ExpressionBuffer::next_line()
 	cur = cur_line->exp[cur_exp].name;
 }
 
+void ExpressionBuffer::set(int exp_no, int line_no)
+{
+	if (line_no < 0)
+		line_no = get_line_no();
+	cur_line = &line[line_no];
+	cur_exp = exp_no;
+	cur = cur_line->exp[cur_exp].name;
+}
+
 bool ExpressionBuffer::end_of_file()
 {
 	return ((long)cur_line >= (long)&line[line.num - 1]); // last line = "-eol-"*/

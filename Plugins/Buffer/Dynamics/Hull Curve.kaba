@@ -9,7 +9,7 @@ use "../../grid.kaba"
 const int MIN_VOL = 0-55
 const int MAX_VOL = 35
 
-class Config : PluginData
+class Config extends PluginData
 	complex[] curve
 
 	void fill_inter(FloatInterpolator fi)
@@ -27,7 +27,7 @@ class Config : PluginData
 		//Selected = -1
 
 
-class HullCurve : AudioEffect
+class HullCurve extends AudioEffect
 
 	Config config
 
@@ -49,7 +49,7 @@ class HullCurve : AudioEffect
 	override ConfigPanel *createPanel()
 		return new HullCurvePanel(self)
 
-class HullGrid : Grid
+class HullGrid extends Grid
 	Config *config
 	ConfigPanel *cp
 	int MouseOver, Selected
@@ -118,7 +118,7 @@ class HullGrid : Grid
 					MouseOver = i
 		redraw()
 
-class HullCurvePanel : ConfigPanel
+class HullCurvePanel extends ConfigPanel
 	HullGrid grid
 	override void __init__(HullCurve *_h)
 		super.__init__(_h)

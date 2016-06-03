@@ -208,25 +208,25 @@ ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_par
 
 ClassFunction *Type::GetDefaultConstructor()
 {
-	return GetFunc(NAME_FUNC_INIT, TypeVoid, 0);
+	return GetFunc(IDENTIFIER_FUNC_INIT, TypeVoid, 0);
 }
 
 ClassFunction *Type::GetComplexConstructor()
 {
 	for (ClassFunction &f : function)
-		if ((f.name == NAME_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_type.num > 0))
+		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_type.num > 0))
 			return &f;
 	return NULL;
 }
 
 ClassFunction *Type::GetDestructor()
 {
-	return GetFunc(NAME_FUNC_DELETE, TypeVoid, 0);
+	return GetFunc(IDENTIFIER_FUNC_DELETE, TypeVoid, 0);
 }
 
 ClassFunction *Type::GetAssign()
 {
-	return GetFunc(NAME_FUNC_ASSIGN, TypeVoid, 1, this);
+	return GetFunc(IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1, this);
 }
 
 ClassFunction *Type::GetGet(Type *index)
@@ -381,9 +381,9 @@ void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overrid
 		if (class_func_match(ocf, cf))
 			orig = &ocf;
 	if (override and !orig)
-		s->DoError(format("can not override function '%s', no previous definition", func_signature(f).c_str()));
+		s->DoError(format("can not override function '%s', no previous definition", func_signature(f).c_str()), f->_exp_no, f->_logical_line_no);
 	if (!override and orig)
-		s->DoError(format("function '%s' is already defined, use 'override' to override", func_signature(f).c_str()));
+		s->DoError(format("function '%s' is already defined, use '%s' to override", func_signature(f).c_str(), IDENTIFIER_OVERRIDE.c_str()), f->_exp_no, f->_logical_line_no);
 	if (override){
 		orig->script = cf.script;
 		orig->nr = cf.nr;
@@ -405,10 +405,10 @@ bool Type::DeriveFrom(Type* root, bool increase_size)
 	if (parent->function.num > 0){
 		// inheritance of functions
 		for (ClassFunction &f : parent->function){
-			if (f.name == "__assign__")
+			if (f.name == IDENTIFIER_FUNC_ASSIGN)
 				continue;
 			ClassFunction ff = f;
-			ff.needs_overriding = (f.name == NAME_FUNC_INIT) or (f.name == NAME_FUNC_DELETE) or (f.name == NAME_FUNC_ASSIGN);
+			ff.needs_overriding = (f.name == IDENTIFIER_FUNC_INIT) or (f.name == IDENTIFIER_FUNC_DELETE) or (f.name == IDENTIFIER_FUNC_ASSIGN);
 			function.add(ff);
 		}
 		found = true;

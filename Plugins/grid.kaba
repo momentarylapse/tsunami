@@ -342,7 +342,7 @@ class GridData
 		nil
 		
 
-class Grid : GridData
+class Grid extends GridData
 	Panel *panel
 	string id
 	float mx, my

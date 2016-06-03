@@ -2,7 +2,7 @@
 // Title[Deutsch] = Kanäle L -> R
 use "../../api.kaba"
 
-class LToR : AudioEffect
+class LToR extends AudioEffect
 	override void process(BufferBox buf)
 		buf.r = buf.l
 

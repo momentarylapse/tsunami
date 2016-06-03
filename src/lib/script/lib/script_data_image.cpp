@@ -53,12 +53,12 @@ void SIAddPackageImage()
 		class_add_element("data",			TypeIntList,	GetDAImage(data));
 		class_add_element("error",			TypeBool,		GetDAImage(error));
 		class_add_element("alpha_used",		TypeBool,		GetDAImage(alpha_used));
-		class_add_func(NAME_FUNC_INIT,			TypeVoid,	image_p(mf(&Image::__init_ext__)));
+		class_add_func(IDENTIFIER_FUNC_INIT,			TypeVoid,	image_p(mf(&Image::__init_ext__)));
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
 			func_add_param("c",			TypeColor);
-		class_add_func(NAME_FUNC_INIT,			TypeVoid,	image_p(mf(&Image::__init__)));
-		class_add_func(NAME_FUNC_DELETE,		TypeVoid,	image_p(mf(&Image::__delete__)));
+		class_add_func(IDENTIFIER_FUNC_INIT,			TypeVoid,	image_p(mf(&Image::__init__)));
+		class_add_func(IDENTIFIER_FUNC_DELETE,		TypeVoid,	image_p(mf(&Image::__delete__)));
 		class_add_func("create",			TypeVoid,	image_p(mf(&Image::create)));
 			func_add_param("width",		TypeInt);
 			func_add_param("height",	TypeInt);
@@ -78,7 +78,7 @@ void SIAddPackageImage()
 			func_add_param("x",			TypeInt);
 			func_add_param("y",			TypeInt);
 		class_add_func("clear",			TypeVoid,	image_p(mf(&Image::clear)));
-		class_add_func(NAME_FUNC_ASSIGN,			TypeVoid,	image_p(mf(&Image::__assign__)));
+		class_add_func(IDENTIFIER_FUNC_ASSIGN,			TypeVoid,	image_p(mf(&Image::__assign__)));
 			func_add_param("other",		TypeImage);
 
 	add_func("LoadImage", TypeImageP, image_p(&LoadImage));

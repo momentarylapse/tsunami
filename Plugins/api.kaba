@@ -59,7 +59,7 @@ MidiEvent _MidiEvent(int pos, float pitch, float volume)
 	e.volume = volume
 	return e
 
-class MidiRawData : MidiEvent[]
+class MidiRawData extends MidiEvent[]
 	int samples
 	extern override void __init__()
 	extern MidiNote[] getNotes(Range r)
@@ -70,7 +70,7 @@ class MidiRawData : MidiEvent[]
 		add(_MidiEvent(n.range.end(), n.pitch, 0))
 	extern void addMetronomeClick(int pos, int level, float volume)
 
-class MidiData : MidiNote[]
+class MidiData extends MidiNote[]
 	int samples
 	extern override void __init__()
 	extern MidiNote[] getNotes(Range r)
@@ -82,7 +82,7 @@ class PluginData
 	extern virtual void __delete__()
 	extern virtual void reset()
 
-class ConfigPanel : Panel
+class ConfigPanel extends Panel
 	extern void __init__(void *c)
 	extern override void __delete__()
 	extern virtual void update()
@@ -187,7 +187,7 @@ class Synthesizer
 	//extern void notify()
 	extern virtual void onConfig()
 
-class DummySynthesizer : Synthesizer
+class DummySynthesizer extends Synthesizer
 	extern override void __init__()
 	//extern overwrite void __delete__()
 	extern override void render(BufferBox buf)

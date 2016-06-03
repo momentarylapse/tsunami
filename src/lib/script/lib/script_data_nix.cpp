@@ -56,9 +56,9 @@ void SIAddPackageNix()
 	TypeShaderP			= add_type_p("Shader*",	TypeShader);
 	
 	add_class(TypeVertexBuffer);
-		class_add_func(NAME_FUNC_INIT, TypeVoid, nix_p(mf(&NixVertexBuffer::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&NixVertexBuffer::__init__)));
 			func_add_param("num_textures", TypeInt);
-		class_add_func(NAME_FUNC_DELETE, TypeVoid, nix_p(mf(&NixVertexBuffer::__delete__)));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&NixVertexBuffer::__delete__)));
 		class_add_func("clear", TypeVoid, nix_p(mf(&NixVertexBuffer::clear)));
 		class_add_func("addTria",							TypeVoid,	nix_p(mf(&NixVertexBuffer::addTria)));
 			func_add_param("p1",		TypeVector);
@@ -82,21 +82,21 @@ void SIAddPackageNix()
 
 
 	add_class(TypeTexture);
-		class_add_func(NAME_FUNC_INIT, TypeVoid, nix_p(mf(&NixTexture::__init__)));
-		class_add_func(NAME_FUNC_DELETE, TypeVoid, nix_p(mf(&NixTexture::__delete__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&NixTexture::__init__)));
+		class_add_func(IDENTIFIER_FUNC_DELETE, TypeVoid, nix_p(mf(&NixTexture::__delete__)));
 		class_add_func("overwrite",	TypeVoid,	nix_p(mf(&NixTexture::overwrite)));
 			func_add_param("image", TypeImage);
 		class_add_func("startRender", TypeBool, nix_p(mf(&NixTexture::start_render)));
 
 	add_class(TypeDynamicTexture);
 		TypeDynamicTexture->DeriveFrom(TypeTexture, false);
-		class_add_func(NAME_FUNC_INIT, TypeVoid, nix_p(mf(&NixDynamicTexture::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&NixDynamicTexture::__init__)));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
 
 	add_class(TypeCubeMap);
 		TypeCubeMap->DeriveFrom(TypeTexture, false);
-		class_add_func(NAME_FUNC_INIT, TypeVoid, nix_p(mf(&NixCubeMap::__init__)));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, nix_p(mf(&NixCubeMap::__init__)));
 			func_add_param("size", TypeInt);
 
 	add_class(TypeShader);

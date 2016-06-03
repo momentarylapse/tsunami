@@ -4,13 +4,13 @@ use "../../api.kaba"
 
 const string AutoConfigLevel = "0:1:0.1:100:%"
 
-class Config : PluginData
+class Config extends PluginData
 	float Level
 
 	override void reset()
 		Level = 0.5
 
-class Octaver : AudioEffect
+class Octaver extends AudioEffect
 	Config config
 
 	void doOctaver(float[] b)

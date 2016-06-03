@@ -8,7 +8,7 @@ const string AutoConfigVolume = "0:2:0.1:100:%"
 const string AutoConfigFeedback = "0:1:0.1:100:%"
 
 
-class Config : PluginData
+class Config extends PluginData
 	float Delay
 	float Volume
 	float Feedback
@@ -19,7 +19,7 @@ class Config : PluginData
 		Delay = 0.15
 
 
-class PluginState : PluginData
+class PluginState extends PluginData
 	float[] buf_r, buf_l
 	int offset
 
@@ -28,7 +28,7 @@ class PluginState : PluginData
 		buf_l.clear()
 		offset = 0
 
-class Echo : AudioEffect
+class Echo extends AudioEffect
 	Config config
 	PluginState state
 

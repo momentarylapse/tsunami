@@ -10,14 +10,14 @@ const int NUM_BANDS = 31
 const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
 
-class Config : PluginData
+class Config extends PluginData
 	float[NUM_BANDS] Factor
 
 	override void reset()
 		for f in Factor
 			f = 1
 
-class Equalizer31 : AudioEffect
+class Equalizer31 extends AudioEffect
 
 	Config config
 
@@ -68,7 +68,7 @@ class Equalizer31 : AudioEffect
 
 const int dx = 30
 
-class ConfigDialog : FixedDialog
+class ConfigDialog extends FixedDialog
 	Equalizer31 *eq
 
 

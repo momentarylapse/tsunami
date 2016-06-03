@@ -2,6 +2,6 @@
 // Title[Deutsch] = Kanal Löschen L
 use "../../api.kaba"
 
-class ClearL : AudioEffect
+class ClearL extends AudioEffect
 	override void process(BufferBox buf)
 		buf.l = 0

@@ -172,14 +172,14 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	Array<Variable> param;
 	if (f->return_type->UsesReturnByMemory()){
 		for (Variable &v : f->var)
-			if (v.name == NAME_RETURN_VAR){
+			if (v.name == IDENTIFIER_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (f->_class){
 		for (Variable &v : f->var)
-			if (v.name == NAME_SELF){
+			if (v.name == IDENTIFIER_SELF){
 				param.add(v);
 				break;
 			}

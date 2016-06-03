@@ -17,7 +17,7 @@ const float MAX_VOL = 0.0
 float[NT][NF] sg
 Image im0
 
-class SpecGrid : Grid
+class SpecGrid extends Grid
 	override void onDraw(Painter *c)
 		rect r = plot_rect
 		int w = r.width()
@@ -41,7 +41,7 @@ class SpecGrid : Grid
 		c.DrawImage(r.x1, r.y1, *im)
 		delete(im)*/
 
-class SpectrumDialog : Dialog
+class SpectrumDialog extends Dialog
 	SpecGrid grid
 	void __init__(Song *song, AudioView *view, Window *parent)
 		super.__init__("Spectrum", 600, 460, parent, true)
@@ -70,7 +70,7 @@ color f2col(float f)
 		return color(1, f * 3 - 1, 0, 2 - f * 3)
 	return color(1, 1, f * 3 - 2, 0)
 
-class ShowSpectrogram : SongPlugin
+class ShowSpectrogram extends SongPlugin
 
 	SpectrumDialog *dlg
 

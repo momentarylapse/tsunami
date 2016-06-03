@@ -10,14 +10,14 @@ const int NUM_BANDS = 15
 const float MIN_FREQ = 20.0
 const float MAX_FREQ = 20000.0
 
-class Config : PluginData
+class Config extends PluginData
 	float[NUM_BANDS] Factor
 
 	override void reset()
 		for f in Factor
 			f = 1
 
-class Equalizer15 : AudioEffect
+class Equalizer15 extends AudioEffect
 
 	Config config
 
@@ -61,7 +61,7 @@ class Equalizer15 : AudioEffect
 	override ConfigPanel *createPanel()
 		return new ConfigPanel(self)
 
-class Equalizer15Panel : ConfigPanel
+class Equalizer15Panel extends ConfigPanel
 	override Equalizer15 *c
 
 	override void __init__(Equalizer15 *_eq)

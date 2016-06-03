@@ -1,7 +1,7 @@
 use "../api.kaba"
 use "../tone.kaba"
 
-class SinusState : PluginData
+class SinusState extends PluginData
 	float[MAX_PITCH] volume
 	float[MAX_PITCH] phase
 	override void reset()
@@ -10,7 +10,7 @@ class SinusState : PluginData
 			phase[p] = 0
 
 
-class SinusSynthesizer : Synthesizer
+class SinusSynthesizer extends Synthesizer
 	SinusState state
 
 	override void render(BufferBox buf)

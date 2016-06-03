@@ -9,7 +9,7 @@ class PitchState
 	float phi
 	EnvelopeADSR env
 
-class HarminocState : PluginData
+class HarminocState extends PluginData
 	PitchState[MAX_PITCH] pitch
 	override void reset()
 		for p in pitch
@@ -17,7 +17,7 @@ class HarminocState : PluginData
 			p.phi = 0
 			p.env.reset()
 
-class HarmonicConfig : PluginData
+class HarmonicConfig extends PluginData
 	float[NUM_HARMONICS] intensity
 	float release
 	override void reset()
@@ -27,7 +27,7 @@ class HarmonicConfig : PluginData
 			intensity[i] = 0
 		release = 0.02
 
-class HarmonicGrid : Grid
+class HarmonicGrid extends Grid
 	HarmonicConfig *hc
 	HarmonicPanel *p
 	int Selected, Hover
@@ -61,7 +61,7 @@ class HarmonicGrid : Grid
 					Hover = n
 		redraw()
 
-class HarmonicPanel : ConfigPanel
+class HarmonicPanel extends ConfigPanel
 	override HarmonicSynthesizer *c
 	HarmonicConfig *hc
 	HarmonicGrid grid
@@ -93,7 +93,7 @@ class HarmonicPanel : ConfigPanel
 		setFloat("release", hc.release * 1000)
 		
 
-class HarmonicSynthesizer : Synthesizer
+class HarmonicSynthesizer extends Synthesizer
 	HarmonicConfig config
 	HarminocState state
 

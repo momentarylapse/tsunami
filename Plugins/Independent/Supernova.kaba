@@ -55,7 +55,7 @@ string get_note(float f)
 	//loopf(fl, 0, 1)
 	//note = i2s(n)
 
-class SuperNovaWindow : Window
+class SuperNovaWindow extends Window
 	int hover
 	float w, h
 	Painter *c

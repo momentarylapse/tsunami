@@ -4,7 +4,7 @@ const string AutoConfigTimeDelay = "-2:2:1:1000:ms"
 const string AutoConfigTimeVariation = "0:1:1:1000:ms"
 const string AutoConfigVolume = "0:1:1:100:%"
 
-class Config : PluginData
+class Config extends PluginData
 	float TimeDelay
 	float TimeVariation
 	float Volume
@@ -14,7 +14,7 @@ class Config : PluginData
 		TimeVariation = 0.01
 		Volume = 0
 
-class Randomize : MidiEffect
+class Randomize extends MidiEffect
 	Config config
 	
 	override void process(MidiData midi)

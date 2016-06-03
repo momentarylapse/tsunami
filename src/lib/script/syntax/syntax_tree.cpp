@@ -260,25 +260,32 @@ string LinkNr2Str(SyntaxTree *s,int kind,int nr)
 	return i2s(nr);
 }
 
-void SyntaxTree::DoError(const string &str, int override_line)
+// override_line is logical! not physical
+void SyntaxTree::DoError(const string &str, int override_exp_no, int override_line)
 {
 	// what data do we have?
-	int line = -1;
+	int logical_line = Exp.get_line_no();
+	int exp_no = Exp.cur_exp;
+	int physical_line = 0;
 	int pos = 0;
 	string expr;
-	if (Exp.cur_line){
-		line = Exp.cur_line->physical_line;
-		if (Exp.cur_exp >= 0){
-			expr = Exp.cur;
-			pos = Exp.cur_line->exp[Exp.cur_exp].pos;
-		}
-	}
+
+	// override?
 	if (override_line >= 0){
-		line = override_line;
-		pos = 0;
+		logical_line = override_line;
+		exp_no = 0;
+	}
+	if (override_exp_no >= 0)
+		exp_no = override_exp_no;
+
+	// logical -> physical
+	if ((logical_line >= 0) and (logical_line < Exp.line.num)){
+		physical_line = Exp.line[logical_line].physical_line;
+		pos = Exp.line[logical_line].exp[exp_no].pos;
+		expr = Exp.line[logical_line].exp[exp_no].name;
 	}
 
-	throw Exception(str, expr, line, pos, script);
+	throw Exception(str, expr, physical_line, pos, script);
 }
 
 void SyntaxTree::CreateAsmMetaInfo()
@@ -392,6 +399,7 @@ Function::Function(SyntaxTree *_tree, const string &_name, Type *_return_type)
 	_param_size = 0;
 	_var_size = 0;
 	_logical_line_no = -1;
+	_exp_no = -1;
 	inline_no = -1;
 }
 
@@ -512,7 +520,7 @@ Command exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no)
 Command exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 {
 	Command link;
-	Command *self = ps->add_command_local_var(f->__get_var(NAME_SELF), f->_class->GetPointer());
+	Command *self = ps->add_command_local_var(f->__get_var(IDENTIFIER_SELF), f->_class->GetPointer());
 	link.type = e.type;
 	link.link_no = e.offset;
 	link.kind = KIND_DEREF_ADDRESS_SHIFT;
@@ -526,7 +534,7 @@ Command exlink_make_var_element(SyntaxTree *ps, Function *f, ClassElement &e)
 Command exlink_make_func_class(SyntaxTree *ps, Function *f, ClassFunction &cf)
 {
 	Command link;
-	Command *self = ps->add_command_local_var(f->__get_var(NAME_SELF), f->_class->GetPointer());
+	Command *self = ps->add_command_local_var(f->__get_var(IDENTIFIER_SELF), f->_class->GetPointer());
 	if (cf.virtual_index >= 0){
 		link.kind = KIND_VIRTUAL_FUNCTION;
 		link.link_no = cf.virtual_index;
@@ -606,8 +614,8 @@ Array<Command> SyntaxTree::GetExistence(const string &name, Block *block)
 			return links;
 		}
 		if (f->_class){
-			if ((name == NAME_SUPER) and (f->_class->parent)){
-				links.add(exlink_make_var_local(this, f->_class->parent->GetPointer(), f->__get_var(NAME_SELF)));
+			if ((name == IDENTIFIER_SUPER) and (f->_class->parent)){
+				links.add(exlink_make_var_local(this, f->_class->parent->GetPointer(), f->__get_var(IDENTIFIER_SELF)));
 				return links;
 			}
 			// class elements (within a class function)
@@ -860,7 +868,7 @@ void convert_return_by_memory(SyntaxTree *ps, Block *b, Function *f)
 		// convert into   *-return- = param
 		Command *p_ret = NULL;
 		foreachi(Variable &v, f->var, i)
-			if (v.name == NAME_RETURN_VAR){
+			if (v.name == IDENTIFIER_RETURN_VAR){
 				p_ret = ps->AddCommand(KIND_VAR_LOCAL, i, v.type);
 			}
 		if (!p_ret)
@@ -1057,7 +1065,7 @@ void MapLVSX86Return(Function *f)
 {
 	if (f->return_type->UsesReturnByMemory()){
 		foreachi(Variable &v, f->var, i)
-			if (v.name == NAME_RETURN_VAR){
+			if (v.name == IDENTIFIER_RETURN_VAR){
 				v._offset = f->_param_size;
 				f->_param_size += 4;
 			}
@@ -1068,7 +1076,7 @@ void MapLVSX86Self(Function *f)
 {
 	if (f->_class){
 		foreachi(Variable &v, f->var, i)
-			if (v.name == NAME_SELF){
+			if (v.name == IDENTIFIER_SELF){
 				v._offset = f->_param_size;
 				f->_param_size += 4;
 			}
@@ -1098,9 +1106,9 @@ void SyntaxTree::MapLocalVariablesToStack()
 			}
 
 			foreachi(Variable &v, f->var, i){
-				if ((f->_class) and (v.name == NAME_SELF))
+				if ((f->_class) and (v.name == IDENTIFIER_SELF))
 					continue;
-				if (v.name == NAME_RETURN_VAR)
+				if (v.name == IDENTIFIER_RETURN_VAR)
 					continue;
 				int s = mem_align(v.type->size, 4);
 				if (i < f->num_params){

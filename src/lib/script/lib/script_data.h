@@ -29,26 +29,38 @@ class Type;
 void script_make_super_array(Type *t, SyntaxTree *ps = NULL);
 
 
-extern const string NAME_CLASS;
-extern const string NAME_FUNC_INIT;
-extern const string NAME_FUNC_DELETE;
-extern const string NAME_FUNC_ASSIGN;
-extern const string NAME_SUPER;
-extern const string NAME_SELF;
-extern const string NAME_RETURN_VAR;
-extern const string NAME_ENUM;
-extern const string NAME_CONST;
-extern const string NAME_OVERRIDE;
-extern const string NAME_VIRTUAL;
-extern const string NAME_EXTERN;
-extern const string NAME_USE;
-extern const string NAME_RETURN;
-extern const string NAME_IF;
-extern const string NAME_ELSE;
-extern const string NAME_WHILE;
-extern const string NAME_FOR;
-extern const string NAME_BREAK;
-extern const string NAME_CONTINUE;
+extern const string IDENTIFIER_CLASS;
+extern const string IDENTIFIER_FUNC_INIT;
+extern const string IDENTIFIER_FUNC_DELETE;
+extern const string IDENTIFIER_FUNC_ASSIGN;
+extern const string IDENTIFIER_SUPER;
+extern const string IDENTIFIER_SELF;
+extern const string IDENTIFIER_EXTENDS;
+extern const string IDENTIFIER_STATIC;
+extern const string IDENTIFIER_NEW;
+extern const string IDENTIFIER_DELETE;
+extern const string IDENTIFIER_NAMESPACE;
+extern const string IDENTIFIER_RETURN_VAR;
+extern const string IDENTIFIER_VTABLE_VAR;
+extern const string IDENTIFIER_ENUM;
+extern const string IDENTIFIER_CONST;
+extern const string IDENTIFIER_OVERRIDE;
+extern const string IDENTIFIER_VIRTUAL;
+extern const string IDENTIFIER_EXTERN;
+extern const string IDENTIFIER_USE;
+extern const string IDENTIFIER_RETURN;
+extern const string IDENTIFIER_IF;
+extern const string IDENTIFIER_ELSE;
+extern const string IDENTIFIER_WHILE;
+extern const string IDENTIFIER_FOR;
+extern const string IDENTIFIER_IN;
+extern const string IDENTIFIER_BREAK;
+extern const string IDENTIFIER_CONTINUE;
+extern const string IDENTIFIER_AND;
+extern const string IDENTIFIER_OR;
+extern const string IDENTIFIER_XOR;
+extern const string IDENTIFIER_NOT;
+extern const string IDENTIFIER_ASM;
 
 
 //--------------------------------------------------------------------------------------------------
@@ -257,6 +269,7 @@ struct PreCommand
 	Type *return_type;
 	Array<PreCommandParam> param;
 	int package;
+	bool hide_docu;
 };
 extern Array<PreCommand> PreCommands;
 

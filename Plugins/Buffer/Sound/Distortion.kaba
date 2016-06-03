@@ -4,12 +4,12 @@ use "../../api.kaba"
 
 const string AutoConfigGain = "0:1:0.1:100:%"
 
-class Config : PluginData
+class Config extends PluginData
 	float Gain
 	override void reset()
 		Gain = 0.1
 
-class Distortion : AudioEffect
+class Distortion extends AudioEffect
 	Config config
 
 

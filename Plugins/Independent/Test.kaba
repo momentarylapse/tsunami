@@ -1,6 +1,6 @@
 use "../api.kaba"
 
-class MyDialog : Dialog
+class MyDialog extends Dialog
 	TsunamiPlugin* plugin
 	void __init__(TsunamiPlugin* _plugin)
 		super.__init__("", 300, 200, _plugin.win, false)
@@ -13,7 +13,7 @@ class MyDialog : Dialog
 	void onClose()
 		plugin.stop()
 
-class Test : TsunamiPlugin
+class Test extends TsunamiPlugin
 	Dialog *dlg
 	override void onStart()
 		dlg = new MyDialog(self)

@@ -74,12 +74,9 @@ string MacroName[NumMacroNames] =
 	"#immortal",
 };
 
-void SyntaxTree::HandleMacro(ExpressionBuffer::Line *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
+void SyntaxTree::HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
 {
 	msg_db_f("HandleMacro", 4);
-	Exp.cur_line = l;
-	Exp.cur_exp = 0;
-	Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
 	string filename;
 	Define d;
 
@@ -146,10 +143,9 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 	bool IfDefed[1024];
 	
 	for (int i=0;i<Exp.line.num-1;i++){
-		Exp.cur_exp = 0;
-		Exp.cur_line = &Exp.line[i];
-		if (Exp.line[i].exp[0].name[0] == '#'){
-			HandleMacro(Exp.cur_line, i, NumIfDefs, IfDefed, just_analyse);
+		Exp.set(0, i);
+		if (Exp.cur[0] == '#'){
+			HandleMacro(i, NumIfDefs, IfDefed, just_analyse);
 		}else if (Exp.line[i].exp[0].name == "use"){
 			ParseImport();
 			Exp.line.erase(i);
@@ -168,8 +164,7 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 							Exp.insert(d.dest[k].c_str(), pos, Exp.cur_exp);
 							Exp.next();
 						}
-						Exp.cur_exp -= d.dest.num;
-						Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
+						Exp.set(Exp.cur_exp - d.dest.num);
 						num_defs_inserted ++;
 						if (num_defs_inserted > SCRIPT_MAX_DEFINE_RECURSIONS)
 							DoError("recursion in #define macros");
@@ -180,8 +175,7 @@ void SyntaxTree::PreCompiler(bool just_analyse)
 			}
 
 			// "-" in front of numbers (after ( , : [ = < >)
-			Exp.cur_exp = 1;
-			Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;
+			Exp.set(1);
 			while(!Exp.end_of_line()){
 				if (Exp.cur == "-"){
 					string last = Exp.get_name(Exp.cur_exp - 1);

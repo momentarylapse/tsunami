@@ -9,7 +9,7 @@ const string AutoConfigSpeed = "0:2:0.01:1:Hz"
 const string AutoConfigDepth = "0:1:0.1:100:%"
 
 
-class PluginConfig : PluginData
+class PluginConfig extends PluginData
 	float Angle
 	float Speed
 	float Depth
@@ -26,13 +26,13 @@ class PhaserChannelParams
 		y1 = 0
 		y2 = 0
 
-class PluginState : PluginData
+class PluginState extends PluginData
 	PhaserChannelParams r, l
 	override void reset()
 		r.reset()
 		l.reset()
 
-class Phaser : AudioEffect
+class Phaser extends AudioEffect
 	PluginConfig config
 	PluginState state
 

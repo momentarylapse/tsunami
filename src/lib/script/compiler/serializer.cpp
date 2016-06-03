@@ -817,7 +817,7 @@ void Serializer::FillInConstructorsBlock(Block *b)
 	for (int i : b->vars){
 		Variable &v = cur_func->var[i];
 		SerialCommandParam param = param_local(v.type, v._offset);
-		add_cmd_constructor(param, (v.name == NAME_RETURN_VAR) ? -1 : KIND_VAR_LOCAL);
+		add_cmd_constructor(param, (v.name == IDENTIFIER_RETURN_VAR) ? -1 : KIND_VAR_LOCAL);
 	}
 }
 

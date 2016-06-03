@@ -12,7 +12,7 @@ const float THRESHOLD = 0.1
 const int BUFFER_SIZE = 32768
 
 
-class PitchRecognitionDialog : Dialog
+class PitchRecognitionDialog extends Dialog
 	TsunamiPlugin* plugin
 	
 	void __init__(TsunamiPlugin* _plugin)
@@ -134,7 +134,7 @@ class PitchRecognitionDialog : Dialog
 			LoudEnough = false
 		redraw("drawing")
 
-class PitchRecognition : TsunamiPlugin
+class PitchRecognition extends TsunamiPlugin
 	Dialog* dlg
 	override void onStart()
 		dlg = new PitchRecognitionDialog(self)

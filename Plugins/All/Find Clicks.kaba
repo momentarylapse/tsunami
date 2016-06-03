@@ -38,7 +38,7 @@ void unclick(float[] b, Track *t, int offset)
 		t.addMarker(clicks[i  ] + offset, "[click")
 		t.addMarker(clicks[i+1] + offset, "]")
 
-class FindClicks : SongPlugin
+class FindClicks extends SongPlugin
 
 	override void apply(Song *song)
 		for t in song.tracks

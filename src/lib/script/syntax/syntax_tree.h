@@ -126,6 +126,7 @@ struct Function
 	// for compilation...
 	int _var_size, _param_size;
 	int _logical_line_no;
+	int _exp_no;
 	Function(SyntaxTree *tree, const string &name, Type *return_type);
 	int __get_var(const string &name);
 	void Update(Type *class_type);
@@ -171,7 +172,7 @@ public:
 	void ParseBuffer(const string &buffer, bool just_analyse);
 	void AddIncludeData(Script *s);
 
-	void DoError(const string &msg, int override_line = -1);
+	void DoError(const string &msg, int override_exp_no = -1, int override_line = -1);
 	void ExpectNoNewline();
 	void ExpectNewline();
 	void ExpectIndent();
@@ -184,6 +185,7 @@ public:
 	void ParseEnum();
 	void ParseClass();
 	Function *ParseFunctionHeader(Type *class_type, bool as_extern);
+	void SkipParsingFunctionBody();
 	void ParseFunctionBody(Function *f);
 	void ParseClassFunctionHeader(Type *t, bool as_extern, bool as_virtual, bool override);
 	bool ParseFunctionCommand(Function *f, ExpressionBuffer::Line *this_line);
@@ -198,7 +200,7 @@ public:
 
 	// pre compiler
 	void PreCompiler(bool just_analyse);
-	void HandleMacro(ExpressionBuffer::Line *l, int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
+	void HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
 	void AutoImplementAddVirtualTable(Command *self, Function *f, Type *t);
 	void AutoImplementAddChildConstructors(Command *self, Function *f, Type *t);
 	void AutoImplementDefaultConstructor(Function *f, Type *t, bool allow_parent_constructor);

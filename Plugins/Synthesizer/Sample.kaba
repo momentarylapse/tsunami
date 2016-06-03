@@ -2,7 +2,7 @@ use "../api.kaba"
 use "../tone.kaba"
 
 
-class SampleConfig : PluginData
+class SampleConfig extends PluginData
 	SampleRef*[] samples
 	override void __delete__()
 		reset()
@@ -12,11 +12,11 @@ class SampleConfig : PluginData
 				delete s
 		samples.clear()
 
-class SampleState : PluginData
+class SampleState extends PluginData
 	MidiEvent[] events
 	
 
-class SampleSynthesizer : Synthesizer
+class SampleSynthesizer extends Synthesizer
 	SampleConfig config
 	SampleState state
 	override void render(BufferBox buf)
@@ -47,7 +47,7 @@ class SampleSynthesizer : Synthesizer
 	override ConfigPanel *createPanel()
 		return new SamplePanel(self)
 
-class SamplePanel : ConfigPanel
+class SamplePanel extends ConfigPanel
 	SampleConfig *sc
 	override SampleSynthesizer *c
 	override void __init__(SampleSynthesizer *_s)

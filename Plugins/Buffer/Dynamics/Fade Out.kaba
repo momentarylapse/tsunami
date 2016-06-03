@@ -3,7 +3,7 @@
 
 use "../../api.kaba"
 
-class FadeOut : AudioEffect
+class FadeOut extends AudioEffect
 	override void process(BufferBox buf)
 		for i in 0:buf.length
 			float vol = 1 - i2f(i) / buf.length

@@ -1,0 +1,14 @@
+use "../../api.kaba"
+
+class ClickSource extends MidiSource
+	bool emit_click
+	override void __init__()
+		emit_click = false
+	override int read(MidiRawData midi)
+		if emit_click
+			midi.add(_MidiEvent(0, 80, 1))
+			midi.add(_MidiEvent(1, 80, 0))
+			emit_click = false
+		return midi.samples
+	void click()
+		emit_click = true

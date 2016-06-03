@@ -76,7 +76,7 @@ void SIAddPackageHui()
 		func_add_param("id",		TypeInt);
 
 	add_class(TypeHuiMenu);
-		class_add_func(NAME_FUNC_INIT,		TypeVoid,		mf(&HuiMenu::__init__));
+		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&HuiMenu::__init__));
 		class_add_func("popup",	TypeVoid,		mf(&HuiMenu::openPopup));
 			func_add_param("w",			TypeHuiWindowP);
 			func_add_param("x",			TypeInt);
@@ -98,8 +98,8 @@ void SIAddPackageHui()
 			func_add_param("sub_menu",	TypeHuiMenuP);
 
 		add_class(TypeHuiPanel);
-			class_add_func(NAME_FUNC_INIT,		TypeVoid,		mf(&HuiPanel::__init__));
-			class_add_func_virtual(NAME_FUNC_DELETE,		TypeVoid,		mf(&HuiPanel::__delete__));
+			class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&HuiPanel::__init__));
+			class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,		mf(&HuiPanel::__delete__));
 			class_add_func("setBorderWidth",			TypeVoid,		mf(&HuiPanel::setBorderWidth));
 				func_add_param("width",		TypeInt);
 			class_add_func("setDecimals",			TypeVoid,		mf(&HuiPanel::setDecimals));
@@ -351,13 +351,13 @@ void SIAddPackageHui()
 	add_class(TypeHuiWindow);
 		TypeHuiWindow->DeriveFrom(TypeHuiPanel, false);
 		TypeHuiWindow->vtable = TypeHuiPanel->vtable;
-		class_add_func(NAME_FUNC_INIT,		TypeVoid,		mf(&HuiWindow::__init_ext__), FLAG_OVERRIDE);
+		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&HuiWindow::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);
 			func_add_param("x",		TypeInt);
 			func_add_param("y",		TypeInt);
 			func_add_param("width",		TypeInt);
 			func_add_param("height",		TypeInt);
-		class_add_func_virtual(NAME_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
+		class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
 		class_add_func("run",			TypeString,		mf(&HuiWindow::run));
 		class_add_func("show",			TypeVoid,		mf(&HuiWindow::show));
 		class_add_func("hide",			TypeVoid,		mf(&HuiWindow::hide));
@@ -412,37 +412,37 @@ void SIAddPackageHui()
 	add_class(TypeHuiNixWindow);
 		TypeHuiNixWindow->DeriveFrom(TypeHuiWindow, false);
 		TypeHuiNixWindow->vtable = TypeHuiWindow->vtable;
-		class_add_func(NAME_FUNC_INIT,		TypeVoid,		mf(&HuiNixWindow::__init_ext__), FLAG_OVERRIDE);
+		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&HuiNixWindow::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);
 			func_add_param("x",		TypeInt);
 			func_add_param("y",		TypeInt);
 			func_add_param("width",		TypeInt);
 			func_add_param("height",		TypeInt);
-		class_add_func_virtual(NAME_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
+		class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
 		class_set_vtable(HuiWindow);
 
 	add_class(TypeHuiDialog);
 		TypeHuiDialog->DeriveFrom(TypeHuiWindow, false);
 		TypeHuiDialog->vtable = TypeHuiWindow->vtable;
-		class_add_func(NAME_FUNC_INIT,		TypeVoid,		mf(&HuiDialog::__init_ext__), FLAG_OVERRIDE);
+		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&HuiDialog::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);
 			func_add_param("width",		TypeInt);
 			func_add_param("height",		TypeInt);
 			func_add_param("root",		TypeHuiWindowP);
 			func_add_param("allow_root",TypeBool);
-		class_add_func_virtual(NAME_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
+		class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
 		class_set_vtable(HuiWindow);
 
 	add_class(TypeHuiFixedDialog);
 		TypeHuiFixedDialog->DeriveFrom(TypeHuiWindow, false);
 		TypeHuiFixedDialog->vtable = TypeHuiWindow->vtable;
-		class_add_func(NAME_FUNC_INIT,		TypeVoid,		mf(&HuiFixedDialog::__init_ext__), FLAG_OVERRIDE);
+		class_add_func(IDENTIFIER_FUNC_INIT,		TypeVoid,		mf(&HuiFixedDialog::__init_ext__), FLAG_OVERRIDE);
 			func_add_param("title",		TypeString);
 			func_add_param("width",		TypeInt);
 			func_add_param("height",		TypeInt);
 			func_add_param("root",		TypeHuiWindowP);
 			func_add_param("allow_root",TypeBool);
-		class_add_func_virtual(NAME_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
+		class_add_func_virtual(IDENTIFIER_FUNC_DELETE,		TypeVoid,		mf(&HuiWindow::__delete__), FLAG_OVERRIDE);
 		class_set_vtable(HuiWindow);
 	
 	add_class(TypeHuiPainter);
@@ -494,7 +494,7 @@ void SIAddPackageHui()
 
 
 	add_class(TypeHuiTimer);
-		class_add_func(NAME_FUNC_INIT, TypeVoid, mf(&HuiTimer::reset));
+		class_add_func(IDENTIFIER_FUNC_INIT, TypeVoid, mf(&HuiTimer::reset));
 		class_add_func("get", TypeFloat32, mf(&HuiTimer::get));
 		class_add_func("reset", TypeVoid, mf(&HuiTimer::reset));
 		class_add_func("peek", TypeFloat32, mf(&HuiTimer::peek));

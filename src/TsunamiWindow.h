@@ -94,7 +94,10 @@ public:
 	void onSelectAll();
 	void onShowLog();
 	void onFindAndExecutePlugin();
-	void onMenuExecutePlugin();
+	void onMenuExecuteEffect();
+	void onMenuExecuteMidiEffect();
+	void onMenuExecuteSongPlugin();
+	void onMenuExecuteTsunamiPlugin();
 	void onExit();
 
 	//bool FileDialog(int kind, bool save, bool force_in_root_dir);

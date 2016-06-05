@@ -6,6 +6,9 @@
  */
 
 #include "TsunamiPlugin.h"
+#include "../Tsunami.h"
+#include "../TsunamiWindow.h"
+#include "PluginManager.h"
 
 const string TsunamiPlugin::MESSAGE_STOP_REQUEST = "StopRequest";
 
@@ -51,4 +54,16 @@ void TsunamiPlugin::stop()
 		return;
 	onStop();
 	active = false;
+}
+
+
+
+TsunamiPlugin *CreateTsunamiPlugin(const string &name, TsunamiWindow *win)
+{
+	TsunamiPlugin *p = tsunami->plugin_manager->LoadTsunamiPlugin(name);
+	p->name = name;
+	p->win = win;
+	p->song = win->song;
+	p->view = win->view;
+	return p;
 }

@@ -34,7 +34,9 @@ public:
 	};
 	string error_message;
 
-	string GetError();
+	string getError();
+
+	void *createInstance(const string &root_type);
 };
 
 #endif /* PLUGIN_H_ */

@@ -22,6 +22,9 @@ Effect::Effect() :
 	plugin = NULL;
 	only_on_selection = false;
 	enabled = true;
+	song = NULL;
+	track = NULL;
+	level = 0;
 }
 
 Effect::Effect(Plugin *p) :
@@ -31,6 +34,9 @@ Effect::Effect(Plugin *p) :
 	plugin = p;
 	only_on_selection = false;
 	enabled = true;
+	song = NULL;
+	track = NULL;
+	level = 0;
 }
 
 Effect::~Effect()
@@ -51,14 +57,12 @@ void Effect::prepare()
 {
 	msg_db_f("Effect.Prepare", 1);
 	resetState();
-	if (!usable)
-		tsunami->log->error(getError());
 }
 
 string Effect::getError()
 {
 	if (plugin)
-		return plugin->GetError();
+		return plugin->getError();
 	return format(_("Can't load effect: \"%s\""), name.c_str());
 }
 
@@ -73,12 +77,6 @@ void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 
 	// run
 	processTrack(&buf);
-
-	if (!usable){
-		msg_error("not usable... apply");
-		if (log_error)
-			tsunami->log->error(_("While applying an effect: ") + getError());
-	}
 }
 
 
@@ -101,18 +99,8 @@ void Effect::doProcessTrack(Track *t, int _level, const Range &r)
 
 Effect *CreateEffect(const string &name, Song *song)
 {
-	Effect *f = tsunami->plugin_manager->LoadEffect(name, song);
-	if (f){
-		f->name = name;
-		f->resetConfig();
-		return f;
-	}
-	f = new Effect;
+	Effect *f = tsunami->plugin_manager->LoadEffect(name);
 	f->song = song;
-	f->name = name;
-	f->plugin = tsunami->plugin_manager->GetPlugin(name);
-	if (f->plugin){
-		f->usable = f->plugin->usable;
-	}
+	f->resetConfig();
 	return f;
 }

@@ -1,7 +1,7 @@
 // Title[Deutsch] = Rauschen
 use "../../api.kaba"
 
-class Noise : AudioEffect
+class Noise extends AudioEffect
 	override void process(BufferBox buf)
 		for i in 0:buf.length
 			buf.r[i] = rand(2.0) - 1.0

@@ -11,6 +11,7 @@
 #include "../lib/base/base.h"
 
 class HuiWindow;
+class TsunamiWindow;
 class AudioView;
 class Song;
 
@@ -28,5 +29,7 @@ public:
 	HuiWindow *win;
 	AudioView *view;
 };
+
+SongPlugin *CreateSongPlugin(const string &name, TsunamiWindow *win);
 
 #endif /* SRC_PLUGINS_SONGPLUGIN_H_ */

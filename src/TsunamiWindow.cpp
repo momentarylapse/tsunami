@@ -20,6 +20,9 @@
 #include "View/AudioView.h"
 #include "Plugins/PluginManager.h"
 #include "Plugins/TsunamiPlugin.h"
+#include "Plugins/Effect.h"
+#include "Plugins/MidiEffect.h"
+#include "Plugins/SongPlugin.h"
 #include "Storage/Storage.h"
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
@@ -147,7 +150,7 @@ TsunamiWindow::TsunamiWindow() :
 	setMaximized(maximized);
 
 
-	tsunami->plugin_manager->AddPluginsToMenu(this, &TsunamiWindow::onMenuExecutePlugin);
+	tsunami->plugin_manager->AddPluginsToMenu(this);
 
 	// events
 	event("hui:close", this, &TsunamiWindow::onExit);
@@ -385,16 +388,81 @@ void TsunamiWindow::onEditMulti()
 
 void TsunamiWindow::onFindAndExecutePlugin()
 {
-	tsunami->plugin_manager->FindAndExecutePlugin(this);
+	if (HuiFileDialogOpen(win, _("Select plugin script"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba"))
+		tsunami->plugin_manager->_ExecutePlugin(this, HuiFilename);
 }
 
-void TsunamiWindow::onMenuExecutePlugin()
+void TsunamiWindow::onMenuExecuteEffect()
 {
-	int n = s2i(HuiGetEvent()->id.substr(strlen("execute_plugin_"), -1));
-	PluginManager *plugin_manager = tsunami->plugin_manager;
+	string name = HuiGetEvent()->id.explode("--")[1];
+	msg_write("fx:" + name + ":");
 
-	if ((n >= 0) and (n < plugin_manager->plugin_files.num))
-		plugin_manager->ExecutePlugin(this, plugin_manager->plugin_files[n].filename);
+	Effect *fx = CreateEffect(name, song);
+
+	fx->resetConfig();
+	if (fx->configure()){
+		Range range = view->getPlaybackSelection();
+		SongSelection sel = view->getEditSeletion();
+		song->action_manager->beginActionGroup();
+		for (Track *t : sel.tracks)
+			if (t->type == t->TYPE_AUDIO){
+				fx->resetState();
+				fx->doProcessTrack(t, view->cur_level, range);
+			}
+		song->action_manager->endActionGroup();
+	}
+	delete(fx);
+}
+
+void TsunamiWindow::onMenuExecuteMidiEffect()
+{
+	string name = HuiGetEvent()->id.explode("--")[1];
+
+	MidiEffect *fx = CreateMidiEffect(name, song);
+
+	fx->resetConfig();
+	if (fx->configure()){
+		Range range = view->getPlaybackSelection();
+		SongSelection sel = view->getEditSeletion();
+		song->action_manager->beginActionGroup();
+		for (Track *t : sel.tracks)
+			if (t->type == t->TYPE_MIDI){
+				fx->resetState();
+				fx->DoProcessTrack(t, range);
+			}
+		song->action_manager->endActionGroup();
+	}
+	delete(fx);
+}
+
+void TsunamiWindow::onMenuExecuteSongPlugin()
+{
+	string name = HuiGetEvent()->id.explode("--")[1];
+
+	SongPlugin *p = CreateSongPlugin(name, this);
+
+	p->apply(song);
+	delete(p);
+}
+
+void TsunamiWindow::onMenuExecuteTsunamiPlugin()
+{
+	string name = HuiGetEvent()->id.explode("--")[1];
+
+	for (TsunamiPlugin *p : plugins)
+		if (p->name == name){
+			if (p->active)
+				p->stop();
+			else
+				p->start();
+			return;
+		}
+
+	TsunamiPlugin *p = CreateTsunamiPlugin(name, this);
+
+	plugins.add(p);
+	observer->subscribe(p, p->MESSAGE_STOP_REQUEST);
+	p->start();
 }
 
 void TsunamiWindow::onDelete()

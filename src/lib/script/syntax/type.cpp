@@ -73,15 +73,15 @@ Type::~Type()
 {
 }
 
-bool Type::UsesCallByReference()
+bool Type::UsesCallByReference() const
 {	return ((!force_call_by_value) and (!is_pointer)) or (is_array);	}
 
-bool Type::UsesReturnByMemory()
+bool Type::UsesReturnByMemory() const
 {	return ((!force_call_by_value) and (!is_pointer)) or (is_array);	}
 
 
 
-bool Type::is_simple_class()
+bool Type::is_simple_class() const
 {
 	if (!UsesCallByReference())
 		return true;
@@ -108,7 +108,7 @@ bool Type::is_simple_class()
 	return true;
 }
 
-bool Type::usable_as_super_array()
+bool Type::usable_as_super_array() const
 {
 	if (is_super_array)
 		return true;
@@ -121,7 +121,7 @@ bool Type::usable_as_super_array()
 	return false;
 }
 
-Type *Type::GetArrayElement()
+Type *Type::GetArrayElement() const
 {
 	if ((is_array) or (is_super_array))
 		return parent;
@@ -132,7 +132,7 @@ Type *Type::GetArrayElement()
 	return NULL;
 }
 
-bool Type::needs_constructor()
+bool Type::needs_constructor() const
 {
 	if (!UsesCallByReference())
 		return false;
@@ -149,7 +149,7 @@ bool Type::needs_constructor()
 	return false;
 }
 
-bool Type::is_size_known()
+bool Type::is_size_known() const
 {
 	if (!fully_parsed)
 		return false;
@@ -161,7 +161,7 @@ bool Type::is_size_known()
 	return true;
 }
 
-bool Type::needs_destructor()
+bool Type::needs_destructor() const
 {
 	if (!UsesCallByReference())
 		return false;
@@ -182,7 +182,7 @@ bool Type::needs_destructor()
 	return false;
 }
 
-bool Type::IsDerivedFrom(Type *root) const
+bool Type::IsDerivedFrom(const Type *root) const
 {
 	if (this == root)
 		return true;
@@ -193,7 +193,18 @@ bool Type::IsDerivedFrom(Type *root) const
 	return parent->IsDerivedFrom(root);
 }
 
-ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_params, Type *param0)
+bool Type::IsDerivedFrom(const string &root) const
+{
+	if (name == root)
+		return true;
+	if ((is_super_array) or (is_array) or (is_pointer))
+		return false;
+	if (!parent)
+		return false;
+	return parent->IsDerivedFrom(root);
+}
+
+ClassFunction *Type::GetFunc(const string &_name, const Type *return_type, int num_params, const Type *param0) const
 {
 	foreachi(ClassFunction &f, function, i)
 		if ((f.name == _name) and (f.return_type == return_type) and (f.param_type.num == num_params)){
@@ -206,12 +217,12 @@ ClassFunction *Type::GetFunc(const string &_name, Type *return_type, int num_par
 	return NULL;
 }
 
-ClassFunction *Type::GetDefaultConstructor()
+ClassFunction *Type::GetDefaultConstructor() const
 {
 	return GetFunc(IDENTIFIER_FUNC_INIT, TypeVoid, 0);
 }
 
-ClassFunction *Type::GetComplexConstructor()
+ClassFunction *Type::GetComplexConstructor() const
 {
 	for (ClassFunction &f : function)
 		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_type.num > 0))
@@ -219,17 +230,17 @@ ClassFunction *Type::GetComplexConstructor()
 	return NULL;
 }
 
-ClassFunction *Type::GetDestructor()
+ClassFunction *Type::GetDestructor() const
 {
 	return GetFunc(IDENTIFIER_FUNC_DELETE, TypeVoid, 0);
 }
 
-ClassFunction *Type::GetAssign()
+ClassFunction *Type::GetAssign() const
 {
 	return GetFunc(IDENTIFIER_FUNC_ASSIGN, TypeVoid, 1, this);
 }
 
-ClassFunction *Type::GetGet(Type *index)
+ClassFunction *Type::GetGet(const Type *index) const
 {
 	for (ClassFunction &cf : function){
 		if (cf.name != "__get__")
@@ -243,7 +254,7 @@ ClassFunction *Type::GetGet(Type *index)
 	return NULL;
 }
 
-ClassFunction *Type::GetVirtualFunction(int virtual_index)
+ClassFunction *Type::GetVirtualFunction(int virtual_index) const
 {
 	for (ClassFunction &f : function)
 		if (f.virtual_index == virtual_index)
@@ -336,14 +347,14 @@ string func_signature(Function *f)
 }
 
 
-Type *Type::GetPointer()
+Type *Type::GetPointer() const
 {
-	return owner->CreateNewType(name + "*", config.pointer_size, true, false, false, 0, this);
+	return owner->CreateNewType(name + "*", config.pointer_size, true, false, false, 0, const_cast<Type*>(this));
 }
 
-Type *Type::GetRoot()
+Type *Type::GetRoot() const
 {
-	Type *r = this;
+	Type *r = const_cast<Type*>(this);
 	while (r->parent)
 		r = r->parent;
 	return r;
@@ -393,9 +404,9 @@ void Type::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overrid
 		function.add(cf);
 }
 
-bool Type::DeriveFrom(Type* root, bool increase_size)
+bool Type::DeriveFrom(const Type* root, bool increase_size)
 {
-	parent = root;
+	parent = const_cast<Type*>(root);
 	bool found = false;
 	if (parent->element.num > 0){
 		// inheritance of elements
@@ -421,7 +432,7 @@ bool Type::DeriveFrom(Type* root, bool increase_size)
 	return found;
 }
 
-void *Type::CreateInstance()
+void *Type::CreateInstance() const
 {
 	void *p = malloc(size);
 	ClassFunction *c = GetDefaultConstructor();
@@ -434,7 +445,7 @@ void *Type::CreateInstance()
 	return p;
 }
 
-string Type::var2str(void *p)
+string Type::var2str(void *p) const
 {
 	if (this == TypeInt)
 		return i2s(*(int*)p);

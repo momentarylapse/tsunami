@@ -470,11 +470,13 @@ void find_plugins_in_dir(const string &dir, PluginManager *pm)
 	}
 }
 
-void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m)
+void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)())
 {
 	foreachi(PluginManager::PluginFile &f, pm->plugin_files, i){
 		if (f.filename.find(dir) >= 0){
-            m->addItemImage(f.name, f.image, format("execute_plugin_%d", i));
+			string id = "execute-" + name_space + "--" + f.name;
+            m->addItemImage(f.name, f.image, id);
+            win->event(id, win, function);
 		}
 	}
 }
@@ -503,33 +505,29 @@ void PluginManager::FindPlugins()
 	find_plugins_in_dir("Independent/", this);
 }
 
-void PluginManager::AddPluginsToMenu(HuiWindow *win, void (TsunamiWindow::*function)())
+void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
 {
 	msg_db_f("AddPluginsToMenu", 2);
 
 	HuiMenu *m = win->getMenu();
 
 	// "Buffer"
-	add_plugins_in_dir("Buffer/Channels/", this, m->getSubMenuByID("menu_plugins_channels"));
-	add_plugins_in_dir("Buffer/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"));
-	add_plugins_in_dir("Buffer/Echo/", this, m->getSubMenuByID("menu_plugins_echo"));
-	add_plugins_in_dir("Buffer/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"));
-	add_plugins_in_dir("Buffer/Repair/", this, m->getSubMenuByID("menu_plugins_repair"));
-	add_plugins_in_dir("Buffer/Sound/", this, m->getSubMenuByID("menu_plugins_sound"));
-	add_plugins_in_dir("Buffer/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"));
+	add_plugins_in_dir("Buffer/Channels/", this, m->getSubMenuByID("menu_plugins_channels"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("Buffer/Dynamics/", this, m->getSubMenuByID("menu_plugins_dynamics"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("Buffer/Echo/", this, m->getSubMenuByID("menu_plugins_echo"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("Buffer/Pitch/", this, m->getSubMenuByID("menu_plugins_pitch"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("Buffer/Repair/", this, m->getSubMenuByID("menu_plugins_repair"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("Buffer/Sound/", this, m->getSubMenuByID("menu_plugins_sound"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
+	add_plugins_in_dir("Buffer/Synthesizer/", this, m->getSubMenuByID("menu_plugins_synthesizer"), "effect", win, &TsunamiWindow::onMenuExecuteEffect);
 
 	// "Midi"
-	add_plugins_in_dir("Midi/", this, m->getSubMenuByID("menu_plugins_on_midi"));
+	add_plugins_in_dir("Midi/", this, m->getSubMenuByID("menu_plugins_on_midi"), "midi-effect", win, &TsunamiWindow::onMenuExecuteMidiEffect);
 
 	// "All"
-	add_plugins_in_dir("All/", this, m->getSubMenuByID("menu_plugins_on_all"));
+	add_plugins_in_dir("All/", this, m->getSubMenuByID("menu_plugins_on_all"), "song", win, &TsunamiWindow::onMenuExecuteSongPlugin);
 
 	// rest
-	add_plugins_in_dir("Independent/", this, m->getSubMenuByID("menu_plugins_other"));
-
-	// Events
-	for (int i=0;i<plugin_files.num;i++)
-		win->event(format("execute_plugin_%d", i), win, function);
+	add_plugins_in_dir("Independent/", this, m->getSubMenuByID("menu_plugins_other"), "tsunami", win, &TsunamiWindow::onMenuExecuteTsunamiPlugin);
 }
 
 void PluginManager::ApplyFavorite(Configurable *c, const string &name)
@@ -549,6 +547,7 @@ string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool s
 }
 
 // always push the script... even if an error occurred
+//   don't log error...
 Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 {
 	msg_db_f("LoadAndCompilePlugin", 1);
@@ -569,168 +568,65 @@ Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 
 typedef void main_void_func();
 
-void PluginManager::ExecutePlugin(TsunamiWindow *win, const string &filename)
+void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
 {
 	msg_db_f("ExecutePlugin", 1);
 
 	Plugin *p = LoadAndCompilePlugin(filename);
-	if (p->usable){
-		Script::Script *s = p->s;
+	if (!p->usable){
+		tsunami->log->error(p->getError());
+		return;
+	}
 
-		Song *a = tsunami->song;
+	Script::Script *s = p->s;
 
-		Effect *fx = NULL;
-		MidiEffect *mfx = NULL;
-		SongPlugin *spl = NULL;
-		TsunamiPlugin *tpl = NULL;
-		for (auto *t : s->syntax->types){
-			Script::Type *r = t->GetRoot();
-			if (r->name == "AudioEffect"){
-				fx = (Effect*)t->CreateInstance();
-				fx->name = p->filename.basename();
-				fx->name = fx->name.head(fx->name.num - 5);
-			}else if (r->name == "MidiEffect"){
-				mfx = (MidiEffect*)t->CreateInstance();
-				mfx->name = p->filename.basename();
-				mfx->name = mfx->name.head(mfx->name.num - 5);
-			}else if (r->name == "SongPlugin"){
-				spl = (SongPlugin*)t->CreateInstance();
-				//spl->name = p->filename.basename();
-				//spl->name = spl->name.head(spl->name.num - 5);
-			}else if (r->name == "TsunamiPlugin"){
-				tpl = (TsunamiPlugin*)t->CreateInstance();
-				//tpl->observable_name = p->filename.basename();
-				//tpl->observable_name = tpl->observable_name.head(tpl->observable_name.num - 5);
-			}else
-				continue;
-			break;
-		}
-		main_void_func *f_main = (main_void_func*)s->MatchFunction("main", "void", 0);
-
-		// run
-		if (fx){
-			fx->resetConfig();
-			if (fx->configure()){
-				Range range = win->view->getPlaybackSelection();
-				SongSelection sel = win->view->getEditSeletion();
-				a->action_manager->beginActionGroup();
-				for (Track *t : sel.tracks)
-					if (t->type == t->TYPE_AUDIO){
-						fx->resetState();
-						fx->doProcessTrack(t, win->view->cur_level, range);
-					}
-				a->action_manager->endActionGroup();
-			}
-			delete(fx);
-		}else if (mfx){
-			mfx->resetConfig();
-			if (mfx->configure()){
-				Range range = win->view->getPlaybackSelection();
-				SongSelection sel = win->view->getEditSeletion();
-				a->action_manager->beginActionGroup();
-				for (Track *t : sel.tracks)
-					if (t->type == t->TYPE_MIDI){
-						mfx->resetState();
-						mfx->DoProcessTrack(t, range);
-					}
-				a->action_manager->endActionGroup();
-			}
-			delete(mfx);
-		}else if (spl){
-			spl->win = win;
-			spl->view = win->view;
-			spl->apply(win->song);
-			delete(spl);
-		}else if (tpl){
-			tpl->win = win;
-			tpl->view = win->view;
-			tpl->song = win->song;
-			win->plugins.add(tpl);
-			win->observer->subscribe(tpl, tpl->MESSAGE_STOP_REQUEST);
-			tpl->start();
-		}else if (f_main){
-			f_main();
-		}else{
-			tsunami->log->error(_("Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'"));
-		}
+	main_void_func *f_main = (main_void_func*)s->MatchFunction("main", "void", 0);
+	if (f_main){
+		f_main();
 	}else{
-		tsunami->log->error(p->GetError());
+		tsunami->log->error(_("Plugin does not contain a function 'void main()'"));
 	}
 }
 
 
-void PluginManager::FindAndExecutePlugin(TsunamiWindow *win)
+Plugin *PluginManager::GetPlugin(const string &name, const string &sub_dir)
 {
-	msg_db_f("ExecutePlugin", 1);
-
-
-	if (HuiFileDialogOpen(win, _("Select plugin script"), HuiAppDirectoryStatic + "Plugins/", _("Script (*.kaba)"), "*.kaba")){
-		ExecutePlugin(win, HuiFilename);
-	}
-}
-
-
-Plugin *PluginManager::GetPlugin(const string &name)
-{
-	for (PluginFile &pf : plugin_files)
-		if (name == pf.name)
-			return LoadAndCompilePlugin(pf.filename);
-	return NULL;
-}
-
-Effect *PluginManager::LoadEffect(const string &name, Song *song)
-{
-	Plugin *p = NULL;
 	for (PluginFile &pf : plugin_files){
-		if ((pf.name == name) and (pf.filename.find("/Buffer/") >= 0)){
-			p = LoadAndCompilePlugin(pf.filename);
+		if ((pf.name == name) and (pf.filename.find(sub_dir) >= 0)){
+			Plugin *p = LoadAndCompilePlugin(pf.filename);
 			if (!p->usable)
-				return NULL;
-			break;
+				tsunami->log->error(p->getError());
+			return p;
 		}
 	}
-	if (!p){
-		tsunami->log->error(format(_("Can't load effect: %s"), name.c_str()));
-		return NULL;
-	}
-
-	Script::Script *s = p->s;
-	for (auto *t : s->syntax->types){
-		if (t->GetRoot()->name != "AudioEffect")
-			continue;
-		Effect *fx = (Effect*)t->CreateInstance();
-		fx->song = song;
-		return fx;
-	}
+	tsunami->log->error(format(_("Can't find plugin: %s in Plugins/*/%s"), name.c_str(), sub_dir.c_str()));
 	return NULL;
 }
 
-MidiEffect *PluginManager::LoadMidiEffect(const string &name, Song *song)
+Effect *PluginManager::LoadEffect(const string &name)
 {
-	bool found = false;
-	Plugin *p = NULL;
-	for (PluginFile &pf : plugin_files){
-		if ((pf.name == name) and (pf.filename.find("/Midi/") >= 0)){
-			found = true;
-			p = LoadAndCompilePlugin(pf.filename);
-			if (!p->usable)
-				return NULL;
-		}
-	}
-	if (!found){
-		tsunami->log->error(format(_("Can't load midi effect: %s"), name.c_str()));
-		return NULL;
+	Plugin *p = GetPlugin(name, "/Buffer/");
+	if (p->usable){
+		Effect *fx = (Effect*)p->createInstance("AudioEffect");
+		if (fx)
+			return fx;
 	}
 
-	Script::Script *s = p->s;
-	for (auto *t : s->syntax->types){
-		if (t->GetRoot()->name != "MidiEffect")
-			continue;
-		MidiEffect *m = (MidiEffect*)t->CreateInstance();
-		m->song = song;
-		return m;
-	}
-	return NULL;
+	// dummy
+	Effect *f = new Effect;
+	f->name = name;
+	f->plugin = p;
+	f->usable = p->usable;
+	return f;
+}
+
+MidiEffect *PluginManager::LoadMidiEffect(const string &name)
+{
+	Plugin *p = GetPlugin(name, "/Midi/");
+	if (!p)
+		return NULL;
+
+	return (MidiEffect*)p->createInstance("MidiEffect");
 }
 
 
@@ -763,6 +659,25 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 		return synth;
 	}
 	return NULL;
+}
+
+
+SongPlugin *PluginManager::LoadSongPlugin(const string &name)
+{
+	Plugin *p = GetPlugin(name, "/Song/");
+	if (!p)
+		return NULL;
+
+	return (SongPlugin*)p->createInstance("SongPlugin");
+}
+
+TsunamiPlugin *PluginManager::LoadTsunamiPlugin(const string &name)
+{
+	Plugin *p = GetPlugin(name, "/Independent/");
+	if (!p)
+		return NULL;
+
+	return (TsunamiPlugin*)p->createInstance("TsunamiPlugin");
 }
 
 Effect* PluginManager::ChooseEffect(HuiPanel *parent, Song *song)

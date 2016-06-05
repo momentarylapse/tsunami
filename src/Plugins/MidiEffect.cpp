@@ -58,7 +58,7 @@ void MidiEffect::Prepare()
 string MidiEffect::GetError()
 {
 	if (plugin)
-		return plugin->GetError();
+		return plugin->getError();
 	return format(_("Can not load MidiEffect: \"%s\""), name.c_str());
 }
 
@@ -99,16 +99,19 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 
 MidiEffect *CreateMidiEffect(const string &name, Song *song)
 {
-	MidiEffect *f = tsunami->plugin_manager->LoadMidiEffect(name, song);
+	MidiEffect *f = tsunami->plugin_manager->LoadMidiEffect(name);
 	if (f){
+		f->song = song;
 		f->name = name;
 		f->resetConfig();
 		return f;
 	}
+
+	// dummy
 	f = new MidiEffect;
 	f->name = name;
 	f->song = song;
-	f->plugin = tsunami->plugin_manager->GetPlugin(name);
+	f->plugin = tsunami->plugin_manager->GetPlugin(name, "/Midi/");
 	if (f->plugin){
 		f->usable = f->plugin->usable;
 	}

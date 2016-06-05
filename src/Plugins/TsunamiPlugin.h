@@ -10,6 +10,7 @@
 
 #include "../Stuff/Observable.h"
 
+class TsunamiWindow;
 class HuiWindow;
 class AudioView;
 class Song;
@@ -42,5 +43,7 @@ public:
 	string name;
 	bool active;
 };
+
+TsunamiPlugin *CreateTsunamiPlugin(const string &name, TsunamiWindow *win);
 
 #endif /* SRC_PLUGINS_TSUNAMIPLUGIN_H_ */

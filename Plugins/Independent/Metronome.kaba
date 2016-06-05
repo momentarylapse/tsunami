@@ -7,7 +7,7 @@ class MetronomeDialog extends Dialog
 	Metronome *metro
 	
 	void __init__(Metronome *_metro)
-		super.__init__("Metronome", 300, 250, _metro.win, false)
+		super.__init__("Metronome", 300, 250, _metro.win, true)
 		fromSource("
 Grid ? '' 1 3
 	DrawingArea area ''

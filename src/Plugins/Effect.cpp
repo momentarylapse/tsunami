@@ -99,8 +99,19 @@ void Effect::doProcessTrack(Track *t, int _level, const Range &r)
 
 Effect *CreateEffect(const string &name, Song *song)
 {
-	Effect *f = tsunami->plugin_manager->LoadEffect(name);
-	f->song = song;
-	f->resetConfig();
-	return f;
+	Plugin *p = tsunami->plugin_manager->GetPlugin(Plugin::TYPE_EFFECT, name);
+	Effect *fx = NULL;
+	if (p->usable)
+		fx = (Effect*)p->createInstance("AudioEffect");
+
+	// dummy?
+	if (!fx)
+		fx = new Effect;
+
+	fx->name = name;
+	fx->plugin = p;
+	fx->usable = p->usable;
+	fx->song = song;
+	fx->resetConfig();
+	return fx;
 }

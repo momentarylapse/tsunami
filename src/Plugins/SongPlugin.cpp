@@ -9,6 +9,7 @@
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "PluginManager.h"
+#include "Plugin.h"
 
 SongPlugin::SongPlugin()
 {
@@ -34,11 +35,21 @@ void SongPlugin::__delete__()
 
 SongPlugin *CreateSongPlugin(const string &name, TsunamiWindow *win)
 {
-	SongPlugin *p = tsunami->plugin_manager->LoadSongPlugin(name);
-	if (!p)
-		return NULL;
+	Plugin *p = tsunami->plugin_manager->GetPlugin(Plugin::TYPE_SONG_PLUGIN, name);
+	SongPlugin *sp = NULL;
+	if (p->usable)
+		sp = (SongPlugin*)p->createInstance("SongPlugin");
 
-	p->win = win;
-	p->view = win->view;
-	return p;
+	// dummy?
+	if (!sp)
+		sp = new SongPlugin;
+
+	sp->win = win;
+	sp->view = win->view;
+	/*sp->name = name;
+	sp->plugin = p;
+	sp->usable = p->usable;
+	sp->song = song;
+	sp->resetConfig();*/
+	return sp;
 }

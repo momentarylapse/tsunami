@@ -20,7 +20,7 @@ class Type;
 class Plugin
 {
 public:
-	Plugin(const string &_filename);
+	Plugin(const string &_filename, int type);
 
 	string filename;
 	int index;
@@ -30,6 +30,10 @@ public:
 	int type;
 	enum{
 		TYPE_EFFECT,
+		TYPE_MIDI_EFFECT,
+		TYPE_SONG_PLUGIN,
+		TYPE_TSUNAMI_PLUGIN,
+		TYPE_SYNTHESIZER,
 		TYPE_OTHER
 	};
 	string error_message;

@@ -458,11 +458,12 @@ void get_plugin_file_data(PluginManager::PluginFile &pf)
 	SilentFiles = false;
 }
 
-void find_plugins_in_dir(const string &dir, PluginManager *pm)
+void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
 {
 	Array<DirEntry> list = dir_search(HuiAppDirectoryStatic + "Plugins/" + dir, "*.kaba", false);
 	for (DirEntry &e : list){
 		PluginManager::PluginFile pf;
+		pf.type = type;
 		pf.name = e.name.replace(".kaba", "");
 		pf.filename = HuiAppDirectoryStatic + "Plugins/" + dir + e.name;
 		get_plugin_file_data(pf);
@@ -487,22 +488,25 @@ void PluginManager::FindPlugins()
 	Script::Init();
 
 	// "Buffer"
-	find_plugins_in_dir("Buffer/Channels/", this);
-	find_plugins_in_dir("Buffer/Dynamics/", this);
-	find_plugins_in_dir("Buffer/Echo/", this);
-	find_plugins_in_dir("Buffer/Pitch/", this);
-	find_plugins_in_dir("Buffer/Repair/", this);
-	find_plugins_in_dir("Buffer/Sound/", this);
-	find_plugins_in_dir("Buffer/Synthesizer/", this);
+	find_plugins_in_dir("Buffer/Channels/", Plugin::TYPE_EFFECT, this);
+	find_plugins_in_dir("Buffer/Dynamics/", Plugin::TYPE_EFFECT, this);
+	find_plugins_in_dir("Buffer/Echo/", Plugin::TYPE_EFFECT, this);
+	find_plugins_in_dir("Buffer/Pitch/", Plugin::TYPE_EFFECT, this);
+	find_plugins_in_dir("Buffer/Repair/", Plugin::TYPE_EFFECT, this);
+	find_plugins_in_dir("Buffer/Sound/", Plugin::TYPE_EFFECT, this);
+	find_plugins_in_dir("Buffer/Synthesizer/", Plugin::TYPE_EFFECT, this);
 
 	// "Midi"
-	find_plugins_in_dir("Midi/", this);
+	find_plugins_in_dir("Midi/", Plugin::TYPE_MIDI_EFFECT, this);
 
 	// "All"
-	find_plugins_in_dir("All/", this);
+	find_plugins_in_dir("All/", Plugin::TYPE_SONG_PLUGIN, this);
 
 	// rest
-	find_plugins_in_dir("Independent/", this);
+	find_plugins_in_dir("Independent/", Plugin::TYPE_TSUNAMI_PLUGIN, this);
+
+	// "Synthesizer"
+	find_plugins_in_dir("Synthesizer/", Plugin::TYPE_SYNTHESIZER, this);
 }
 
 void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
@@ -548,7 +552,7 @@ string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool s
 
 // always push the script... even if an error occurred
 //   don't log error...
-Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
+Plugin *PluginManager::LoadAndCompilePlugin(int type, const string &filename)
 {
 	msg_db_f("LoadAndCompilePlugin", 1);
 
@@ -558,7 +562,7 @@ Plugin *PluginManager::LoadAndCompilePlugin(const string &filename)
 
 	//InitPluginData();
 
-	Plugin *p = new Plugin(filename);
+	Plugin *p = new Plugin(filename, type);
 	p->index = plugins.num;
 
 	plugins.add(p);
@@ -572,7 +576,7 @@ void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
 {
 	msg_db_f("ExecutePlugin", 1);
 
-	Plugin *p = LoadAndCompilePlugin(filename);
+	Plugin *p = LoadAndCompilePlugin(Plugin::TYPE_OTHER, filename);
 	if (!p->usable){
 		tsunami->log->error(p->getError());
 		return;
@@ -589,44 +593,18 @@ void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
 }
 
 
-Plugin *PluginManager::GetPlugin(const string &name, const string &sub_dir)
+Plugin *PluginManager::GetPlugin(int type, const string &name)
 {
 	for (PluginFile &pf : plugin_files){
-		if ((pf.name == name) and (pf.filename.find(sub_dir) >= 0)){
-			Plugin *p = LoadAndCompilePlugin(pf.filename);
+		if ((pf.name == name) and (pf.type == type)){
+			Plugin *p = LoadAndCompilePlugin(type, pf.filename);
 			if (!p->usable)
 				tsunami->log->error(p->getError());
 			return p;
 		}
 	}
-	tsunami->log->error(format(_("Can't find plugin: %s in Plugins/*/%s"), name.c_str(), sub_dir.c_str()));
+	tsunami->log->error(format(_("Can't find plugin: %s ..."), name.c_str()));
 	return NULL;
-}
-
-Effect *PluginManager::LoadEffect(const string &name)
-{
-	Plugin *p = GetPlugin(name, "/Buffer/");
-	if (p->usable){
-		Effect *fx = (Effect*)p->createInstance("AudioEffect");
-		if (fx)
-			return fx;
-	}
-
-	// dummy
-	Effect *f = new Effect;
-	f->name = name;
-	f->plugin = p;
-	f->usable = p->usable;
-	return f;
-}
-
-MidiEffect *PluginManager::LoadMidiEffect(const string &name)
-{
-	Plugin *p = GetPlugin(name, "/Midi/");
-	if (!p)
-		return NULL;
-
-	return (MidiEffect*)p->createInstance("MidiEffect");
 }
 
 
@@ -656,28 +634,10 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 			continue;
 		Synthesizer *synth = (Synthesizer*)t->CreateInstance();
 		synth->song = song;
+		synth->setSampleRate(song->sample_rate);
 		return synth;
 	}
 	return NULL;
-}
-
-
-SongPlugin *PluginManager::LoadSongPlugin(const string &name)
-{
-	Plugin *p = GetPlugin(name, "/Song/");
-	if (!p)
-		return NULL;
-
-	return (SongPlugin*)p->createInstance("SongPlugin");
-}
-
-TsunamiPlugin *PluginManager::LoadTsunamiPlugin(const string &name)
-{
-	Plugin *p = GetPlugin(name, "/Independent/");
-	if (!p)
-		return NULL;
-
-	return (TsunamiPlugin*)p->createInstance("TsunamiPlugin");
 }
 
 Effect* PluginManager::ChooseEffect(HuiPanel *parent, Song *song)

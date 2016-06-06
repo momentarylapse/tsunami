@@ -13,9 +13,10 @@
 #include "../Stuff/Log.h"
 
 
-Plugin::Plugin(const string &_filename)
+Plugin::Plugin(const string &_filename, int _type)
 {
 	s = NULL;
+	type = _type;
 	filename = _filename;
 	index = -1;
 	usable = false;
@@ -25,8 +26,6 @@ Plugin::Plugin(const string &_filename)
 		s = Script::Load(filename);
 
 		usable = true;
-
-		type = TYPE_OTHER;//f_process_track ? TYPE_EFFECT : TYPE_OTHER;
 	}catch(Script::Exception &e){
 		error_message = e.message;
 	}

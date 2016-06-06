@@ -34,21 +34,15 @@ public:
 
 	void _ExecutePlugin(TsunamiWindow *win, const string &filename);
 
-	Plugin *LoadAndCompilePlugin(const string &filename);
-	Plugin *GetPlugin(const string &name, const string &sub_dir);
+	Plugin *LoadAndCompilePlugin(int type, const string &filename);
+	Plugin *GetPlugin(int type, const string &name);
 
 	void ApplyFavorite(Configurable *c, const string &name);
 	void SaveFavorite(Configurable *c, const string &name);
 	string SelectFavoriteName(HuiWindow *win, Configurable *c, bool save);
 
-	Effect *LoadEffect(const string &name);
-	MidiEffect *LoadMidiEffect(const string &name);
-
 	Array<string> FindSynthesizers();
 	Synthesizer *LoadSynthesizer(const string &name, Song *song);
-
-	SongPlugin *LoadSongPlugin(const string &name);
-	TsunamiPlugin *LoadTsunamiPlugin(const string &name);
 
 	Effect *ChooseEffect(HuiPanel *parent, Song *song);
 	MidiEffect *ChooseMidiEffect(HuiPanel *parent, Song *song);
@@ -61,6 +55,7 @@ public:
 		string name;
 		string filename;
 		string image;
+		int type;
 		Array<string> title;
 	};
 

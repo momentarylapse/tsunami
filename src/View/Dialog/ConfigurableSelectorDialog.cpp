@@ -11,6 +11,7 @@
 #include "../../Plugins/Effect.h"
 #include "../../Plugins/MidiEffect.h"
 #include "../../Plugins/PluginManager.h"
+#include "../../Plugins/Plugin.h"
 
 Configurable *ConfigurableSelectorDialog::_return;
 
@@ -31,7 +32,7 @@ ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _
 		}
 	}else if (type == Configurable::TYPE_MIDI_EFFECT){
 		for (auto &pf : tsunami->plugin_manager->plugin_files){
-			if (pf.filename.match(HuiAppDirectoryStatic + "Plugins/Midi/*"))
+			if (pf.type == Plugin::TYPE_MIDI_EFFECT)
 				names.add(pf.name);
 		}
 	}else if (type == Configurable::TYPE_SYNTHESIZER){

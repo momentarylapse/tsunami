@@ -946,7 +946,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-136
+139
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1008,6 +1008,8 @@ Can only delete samples which are unused.
 Kann nur Samples löschen, die nicht benutzt werden!
 Can't execute plugin on an empty audio file
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
+Can't find plugin: %s ...
+
 Can't insert recorded data (%s) into target (%s).
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 Can't load effect: \"%s\"
@@ -1128,6 +1130,8 @@ Phrygian
 Phrygisch
 Piano
 Piano
+Plugin does not contain a function 'void main()'
+Plugin enthält keine Funktion 'void main()'
 Plugin is not an Effect/MidiEffect and does not contain a function 'void main()'
 Plugin ist kein Effekt/MidiEffekt und enthält keine Funktion 'void main()'
 Preview
@@ -1148,6 +1152,8 @@ Saxophone
 Saxophon
 Script (*.kaba)
 Script (*.kaba)
+Script file \"%s\" does not define a class derived from %s
+Scriptdatei \"%s\" definiert keine Klasse, die von %s abgeleitet wurde
 Select backup file for recordings
 Sicherungsdatei für Aufnahmen wählen
 Select plugin script

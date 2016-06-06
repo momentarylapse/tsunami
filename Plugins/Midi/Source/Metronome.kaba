@@ -26,7 +26,7 @@ class MetronomeSource extends MidiSource
 
 		offset = 0
 		cur_beat = 0
-		fraction = 0
+		fraction = 1
 		float dt_m = 60.0 / bpm
 //		sm_m = dt_m * sample_rate
 		

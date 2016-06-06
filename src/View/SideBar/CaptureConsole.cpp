@@ -113,6 +113,9 @@ void CaptureConsole::onEnter()
 
 void CaptureConsole::onLeave()
 {
+	if (input->isCapturing())
+		insert();
+
 	peak_meter->setSource(NULL);
 	view->stream->stop();
 

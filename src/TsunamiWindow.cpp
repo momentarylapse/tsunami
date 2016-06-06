@@ -14,6 +14,7 @@
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
+#include "View/SideBar/CaptureConsole.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -28,6 +29,7 @@
 #include "Stuff/Clipboard.h"
 #include "Device/OutputStream.h"
 #include "Device/DeviceManager.h"
+#include "Device/InputStreamAny.h"
 #include "Audio/Renderer/SongRenderer.h"
 #include "Data/Song.h"
 #include "Data/SongSelection.h"
@@ -350,10 +352,13 @@ string title_filename(const string &filename)
 bool TsunamiWindow::allowTermination()
 {
 	if (side_bar->isActive(SideBar::CAPTURE_CONSOLE)){
-		string answer = HuiQuestionBox(this, _("Question"), _("Cancel recording?"), true);
-		if (answer != "hui:yes")
-			return false;
-		side_bar->_hide();
+		if (side_bar->capture_console->input->isCapturing()){
+			string answer = HuiQuestionBox(this, _("Question"), _("Cancel recording?"), true);
+			if (answer != "hui:yes")
+				return false;
+			side_bar->capture_console->onDelete();
+			side_bar->_hide();
+		}
 	}
 
 	if (song->action_manager->isSave())

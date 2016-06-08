@@ -42,8 +42,8 @@ static Array<complex> tt;
 inline void draw_line_buffer(Painter *c, int width, double view_pos, double zoom, float hf, float x, float y0, const Array<float> &buf, int offset)
 {
 	int nl = 0;
-	int i0 = max((double) x          / zoom + view_pos - offset    , 0);
-	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, buf.num);
+	int i0 = max((double) x          / zoom + view_pos - offset    , 0.0);
+	int i1 = min((double)(x + width) / zoom + view_pos - offset + 2, (double)buf.num);
 	if (i1 < i0)
 		return;
 
@@ -291,7 +291,7 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
 
 	c->setFontSize(h / 6);
 	c->drawStr(10, area.y1 + area.height() * 0.22f, "T\nA\nB");
-	float r = min(dy/2, 8);
+	float r = min(dy/2, 8.0f);
 	c->setFontSize(r * 1.6f);
 
 	for (MidiNote &n : notes){
@@ -395,7 +395,7 @@ void AudioViewTrack::drawMidiNoteScore(Painter *c, const MidiNote &n, int shift,
 void AudioViewTrack::drawMidiScoreClef(Painter *c, const Clef &clef, const Scale &scale)
 {
 	// clef lines
-	float dy = min(area.height() / 13, 30);
+	float dy = min(area.height() / 13, 30.0f);
 	clef_dy = dy;
 	c->setColor(view->colors.text);
 	for (int i=0; i<10; i+=2){

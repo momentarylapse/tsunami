@@ -4,6 +4,7 @@
 #include "ThreadedWork.h"
 
 
+
 static int OverwriteThreadNum = -1;
 
 class WorkerThread : public Thread

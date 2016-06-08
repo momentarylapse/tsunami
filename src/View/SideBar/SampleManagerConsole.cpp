@@ -30,7 +30,7 @@ void render_bufbox(Image &im, BufferBox &b, AudioView *view)
 		int i0 = (b.length * x) / w;
 		int i1 = (b.length * (x + 1)) / w;
 		for (int i=i0; i<i1; i++)
-			m = max(m, fabs(b.c[0][i]));
+			m = max(m, (float)fabs(b.c[0][i]));
 		for (int y=h*(1-m)/2; y<h*(1+m)/2; y++)
 			im.setPixel(x, y, view->colors.text);
 	}

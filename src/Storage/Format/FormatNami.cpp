@@ -268,7 +268,7 @@ FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDec
 	BufferBox *buf = d->buf;
 	float scale = pow(2.0f, d->bits-1);
 	int offset = d->sample_offset;
-	int n = min(frame->header.blocksize, buf->length - offset);
+	int n = min((int)frame->header.blocksize, buf->length - offset);
 	//msg_write(format("write %d  offset=%d  buf=%d", n, offset, buf->num));
 	for (int i=0; i<n; i++)
 		for (int j=0;j<d->channels;j++)
@@ -282,7 +282,7 @@ FLAC__StreamDecoderWriteStatus FlacUncompressWriteCallback(const FLAC__StreamDec
 FLAC__StreamDecoderReadStatus FlacUncompressReadCallback(const FLAC__StreamDecoder *decoder, FLAC__byte buffer[], size_t *bytes, void *client_data)
 {
 	UncompressData *d = (UncompressData*)client_data;
-	*bytes = min(*bytes, d->data->num - d->byte_offset);
+	*bytes = min((int)*bytes, d->data->num - d->byte_offset);
 	//msg_write(format("read %d", *bytes));
 	if (*bytes <= 0)
 		return FLAC__STREAM_DECODER_READ_STATUS_END_OF_STREAM;

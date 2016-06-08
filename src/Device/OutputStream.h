@@ -27,6 +27,13 @@ class StreamThread;
 struct pa_stream;
 #endif
 
+#ifdef DEVICE_PORTAUDIO
+typedef void PaStream;
+struct PaStreamCallbackTimeInfo;
+typedef unsigned long PaStreamCallbackFlags;
+typedef int PaError;
+#endif
+
 class OutputStream : public PeakMeterSource
 {
 	friend StreamThread;
@@ -95,6 +102,11 @@ private:
 	pa_stream *_stream;
 #endif
 
+#ifdef DEVICE_PORTAUDIO
+	PaStream *_stream;
+	PaError err;
+#endif
+
 	int dev_sample_rate;
 	long long cur_pos;
 
@@ -109,6 +121,14 @@ private:
 	static void stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
 	static void stream_underflow_callback(pa_stream *s, void *userdata);
 	static void stream_success_callback(pa_stream *s, int success, void *userdata);
+#endif
+
+#ifdef DEVICE_PORTAUDIO
+	static int stream_request_callback(const void *inputBuffer, void *outputBuffer,
+	                                   unsigned long frames,
+	                                   const PaStreamCallbackTimeInfo* timeInfo,
+	                                   PaStreamCallbackFlags statusFlags,
+	                                   void *userData);
 #endif
 };
 

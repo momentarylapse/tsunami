@@ -65,7 +65,7 @@ int SerializerAMD64::fc_begin()
 		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_const(TypeChar, push_size));
 	foreachb(SerialCommandParam &p, stack_param)
 		add_cmd(Asm::INST_PUSH, p);
-	max_push_size = max(max_push_size, push_size);
+	max_push_size = max(max_push_size, (int)push_size);
 
 	// xmm0-7
 	foreachib(SerialCommandParam &p, xmm_param, i){

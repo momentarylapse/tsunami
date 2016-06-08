@@ -356,7 +356,8 @@ void DeviceManager::kill()
 		return;
 	msg_db_f("Output.kill",1);
 
-	for (OutputStream *s : streams)
+	Array<OutputStream*> to_del = streams;
+	for (OutputStream *s : to_del)
 		s->kill();
 
 	// audio

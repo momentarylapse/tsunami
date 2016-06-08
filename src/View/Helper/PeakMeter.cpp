@@ -26,7 +26,7 @@ void PeakMeter::Data::reset()
 
 float PeakMeter::Data::get_sp()
 {
-	return max(super_peak * (1 - pow(super_peak_t, 3)*0.2f), 0.0001f);
+	return max(super_peak * (1 - (float)pow(super_peak_t, 3)*0.2f), 0.0001f);
 }
 
 void PeakMeter::Data::update(Array<float> &buf, float dt)
@@ -107,7 +107,7 @@ color peak_color(float peak, float a = 1)
 
 inline float nice_peak(float p)
 {
-	return min(pow(p, 0.8f), 1);
+	return min((float)pow(p, 0.8f), 1.0f);
 }
 
 void PeakMeter::drawPeak(Painter *c, const rect &r, Data &d)
@@ -197,7 +197,7 @@ void PeakMeter::findSpectrum()
 		float f0 = i_to_freq(i);
 		float f1 = i_to_freq(i + 1);
 		int n0 = f0 * buf.length / sample_rate;
-		int n1 = max(f1 * buf.length / sample_rate, n0 + 1);
+		int n1 = max((int)(f1 * buf.length / sample_rate), n0 + 1);
 		float s = 0;
 		for (int n=n0;n<n1;n++)
 			if (n < cr.num){

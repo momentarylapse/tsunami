@@ -40,7 +40,7 @@ float HuiControlProgressBar::getFloat()
 
 void HuiControlProgressBar::__setFloat(float f)
 {
-	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(widget), min(max(f, 0), 1));
+	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(widget), min(max(f, 0.0f), 1.0f));
 }
 
 #endif

@@ -98,21 +98,21 @@ Track::~Track()
 
 Range Track::getRangeUnsafe()
 {
-	int min =  1073741824;
-	int max = -1073741824;
+	int _min =  1073741824;
+	int _max = -1073741824;
 	for (TrackLevel &l : levels)
 		if (l.buffers.num > 0){
-			min = min(l.buffers[0].offset, min);
-			max = max(l.buffers.back().range().end(), max);
+			_min = min(l.buffers[0].offset, _min);
+			_max = max(l.buffers.back().range().end(), _max);
 		}
 	for (SampleRef *s : samples){
-		if (s->pos < min)
-			min = s->pos;
+		if (s->pos < _min)
+			_min = s->pos;
 		int smax = s->pos + s->buf->length + s->rep_num * s->rep_delay;
-		if (smax > max)
-			max = smax;
+		if (smax > _max)
+			_max = smax;
 	}
-	Range r = Range(min, max - min);
+	Range r = Range(_min, _max - _min);
 
 	if ((type == TYPE_MIDI) and (midi.num > 0))
 		r = r or midi.getRange(synth->keep_notes);

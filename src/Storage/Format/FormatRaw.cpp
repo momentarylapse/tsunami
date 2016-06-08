@@ -78,7 +78,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 		int nn = 0;
 		int nice_buffer_size = WAVE_BUFFER_SIZE - (WAVE_BUFFER_SIZE % byte_per_sample);
 		while (read < size){
-			int toread = min(nice_buffer_size, size - read);
+			int toread = min(nice_buffer_size, (int)(size - read));
 			int r = f->ReadBuffer(data, toread);
 			nn ++;
 			if (nn > 16){

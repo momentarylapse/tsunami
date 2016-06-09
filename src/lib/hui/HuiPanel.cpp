@@ -399,8 +399,8 @@ void HuiPanel::_embedResource(const string &ns, HuiResource &c, const string &pa
 
 	setTarget(parent_id, x);
 	string title = HuiGetLanguageR(ns, c);
-	if (c.options.num > 0)
-		title = "!" + implode(c.options, ",") + "\\" + title;
+	/*if (c.options.num > 0)
+		title = "!" + implode(c.options, ",") + "\\" + title;*/
 	addControl(c.type, title, x, y, c.w, c.h, c.id);
 
 	enable(c.id, c.enabled);

@@ -24,6 +24,7 @@ Grid ? '' 1 3
 		metro = _metro
 	
 		setFloat("bpm", metro.source.bpm)
+		setInt("num_beats", metro.source.num_beats)
 	
 		event("hui:close", &onClose)
 		event("close", &onClose)

@@ -237,16 +237,20 @@ string HuiGetLanguage(const string &ns, const string &id)
 string HuiGetLanguageR(const string &ns, HuiResource &cmd)
 {
 	if ((!HuiLanguaged) or (cmd.id.num == 0))
-		return "";
+		return cmd.title;
 	for (HuiLanguageCommand &c : cur_lang->cmd)
 		if (c.match(ns, cmd.id)){
 			if (cmd.options.num > 0)
 				return "!" + implode(cmd.options, ",") + "\\" + c.text;
 			return c.text;
 		}
-	if (cmd.options.num > 0)
-		return "!" + implode(cmd.options, ",") + "\\";
-	return "";
+	if (cmd.options.num > 0){
+		if (cmd.title.head(1) == "!")
+			return "!" + implode(cmd.options, ",") + "," + cmd.title.substr(1, -1);
+		else
+			return "!" + implode(cmd.options, ",") + "\\" + cmd.title;
+	}
+	return cmd.title;
 }
 
 string HuiGetLanguageT(const string &ns, const string &id)

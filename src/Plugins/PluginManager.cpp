@@ -243,6 +243,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("MidiNote", "range", _offsetof(MidiNote, range));
 	Script::DeclareClassOffset("MidiNote", "pitch", _offsetof(MidiNote, pitch));
 	Script::DeclareClassOffset("MidiNote", "volume", _offsetof(MidiNote, volume));
+	Script::DeclareClassOffset("MidiNote", "stringno", _offsetof(MidiNote, stringno));
+	Script::DeclareClassOffset("MidiNote", "clef_position", _offsetof(MidiNote, clef_position));
+	Script::DeclareClassOffset("MidiNote", "modifier", _offsetof(MidiNote, modifier));
 
 	Script::DeclareClassSize("MidiRawData", sizeof(MidiRawData));
 	Script::DeclareClassOffset("MidiRawData", "samples", _offsetof(MidiRawData, samples));

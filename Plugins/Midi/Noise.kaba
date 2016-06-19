@@ -1,0 +1,13 @@
+use "../api.kaba"
+
+class Delay extends MidiEffect
+	
+	override void process(MidiData midi)
+		int length = 1000000//midi.getRange().length
+		int num = length / 20
+		for i in 0:num
+			int start = randi(length)
+			int _length = randi(20000)
+			Range r = _Range(start, _length)
+			MidiNote n = _MidiNote(r, 20+randi(80), 0.1*pow(rand(1), 6))
+			midi.add(n)

@@ -95,7 +95,7 @@ void ViewModeDefault::onRightButtonDown()
 		view->menu_sample->openPopup(view->win, 0, 0);
 	else if (selection->type == Selection::TYPE_MARKER)
 		view->menu_marker->openPopup(view->win, 0, 0);
-	else if ((selection->type == Selection::TYPE_TRACK) or (selection->type == Selection::TYPE_TRACK_HANDLE)){
+	else if ((selection->type == Selection::TYPE_TRACK) or (selection->type == Selection::TYPE_TRACK_HANDLE) or (selection->type == Selection::TYPE_SELECTION_START) or (selection->type == Selection::TYPE_SELECTION_END)){
 		view->menu_track->enable("track_edit_midi", view->cur_track->type == Track::TYPE_MIDI);
 		view->menu_track->openPopup(view->win, 0, 0);
 	}else if (!selection->track)

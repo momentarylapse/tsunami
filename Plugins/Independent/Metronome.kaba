@@ -11,12 +11,15 @@ class MetronomeDialog extends Dialog
 		fromSource("
 Grid ? '' 1 3
 	DrawingArea area ''
-	Grid ? '' 3 2
+	Grid ? '' 3 3
 		Text ? 'Speed'
 		SpinButton bpm '0\\1' expandx
 		Text ? '/min'
 		Text ? 'Beats'
 		SpinButton num_beats '4\\1\\99'
+		.
+		Text ? 'Sub Beats'
+		SpinButton num_sub_beats '1\\1\\99'
 		.
 	Grid ? '' 2 1 buttonbar
 		Button close 'Close' image=hui:close")
@@ -30,6 +33,7 @@ Grid ? '' 1 3
 		event("close", &onClose)
 		event("bpm", &onBpm)
 		event("num_beats", &onNumBeats)
+		event("num_sub_beats", &onNumBeats)
 	
 	override void onDraw(Painter *p)
 		float w = p.width
@@ -54,21 +58,21 @@ Grid ? '' 1 3
 		
 		// moving point
 		p.setColor(colors.text)
-		float t = metro.source.fraction - 0.5
+		float t = metro.source.fraction_beat - 0.5
 		float phi = 2 *pi * (2*t*t*t + t/2)
 		p.drawCircle(x0 - sin(phi) * r, y0 + cos(phi) * r, 5)
 		
 		// beat number
-		int n = loopi(metro.source.cur_beat - 1, 0, metro.source.num_beats - 1) + 1
+		int n = metro.source.cur_beat + 1
 		p.drawStr(x0-7, y0-11, n)
 
 	void onBpm()
 		metro.source.setBpm(getFloat(""))
 
 	void onNumBeats()
-		metro.source.num_beats = getInt("")
-		//metro.source.cur_beat = 0
-		//metro.source.offset = 0
+		int beats = getInt("num_beats")
+		int sub_beats = getInt("num_sub_beats")
+		metro.source.setBeats(beats, sub_beats)
 
 	void onClose()
 		metro.stop()

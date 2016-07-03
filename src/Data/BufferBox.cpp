@@ -562,7 +562,7 @@ void BufferBox::update_peaks()
 	peaks[1].resize(n);
 	peaks[2].resize(n);
 	peaks[3].resize(n);
-	//msg_write(format("  %d %d", i0, i1));
+	//msg_write(format("  %d %d   %d  %d", i0, i1, channels, peaks.num));
 	for (int i=i0;i<i1;i++){
 		for (int j=0; j<channels; j++)
 			peaks[j][i] = fabsmax(c[j][i * 4], c[j][i * 4 + 1], c[j][i * 4 + 2], c[j][i * 4 + 3]) * 254;
@@ -573,7 +573,7 @@ void BufferBox::update_peaks()
 	// higher levels
 	int level = 4;
 	while (n > 4){
-		n /= 2;
+		n = n / 2 - 1;
 		i0 /= 2;
 		i1 = min((i1 + 1) / 2, n);
 		if (peaks.num < level + 4)

@@ -56,13 +56,20 @@ class PeakThread : public Thread
 {
 public:
 	AudioView *view;
+	bool recheck;
 	PeakThread(AudioView *_view)
 	{
 		view = _view;
+		recheck = false;
 	}
 	virtual void _cdecl onRun()
 	{
 		view->song->updatePeaks();
+		while(recheck){
+			printf("----recheck!!!!!\n");
+			recheck = false;
+			view->song->updatePeaks();
+		}
 		view->is_updating_peaks = false;
 	}
 };
@@ -759,6 +766,10 @@ void AudioView::updateMenu()
 
 void AudioView::updatePeaks()
 {
+	if (is_updating_peaks){
+		peak_thread->recheck = true;
+		return;
+	}
 	is_updating_peaks = true;
 	peak_thread->run();
 	for (int i=0; i<10; i++){

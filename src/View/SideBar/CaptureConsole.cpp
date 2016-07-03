@@ -270,6 +270,7 @@ void CaptureConsole::onPause()
 
 void CaptureConsole::onOk()
 {
+	input->stop();
 	if (insert())
 		((SideBar*)parent)->_hide();
 }
@@ -292,6 +293,7 @@ void CaptureConsole::onUpdate(Observable *o, const string &message)
 bool CaptureConsole::insert()
 {
 	msg_db_f("CaptureInsert", 1);
+
 	Track *t;
 	int target = getInt("capture_target");
 	int i0;

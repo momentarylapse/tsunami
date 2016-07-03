@@ -11,7 +11,6 @@
 #include "ActionGroup.h"
 #include "../Data/Data.h"
 #include <assert.h>
-//#include <typeinfo>
 
 ActionManager::ActionManager(Data *_data)
 {
@@ -56,6 +55,7 @@ void ActionManager::add(Action *a)
 	if (timer.get() < 2.0f)
 		if (merge(a))
 			return;
+
 	action.add(a);
 	cur_pos ++;
 }
@@ -64,14 +64,15 @@ bool ActionManager::merge(Action *a)
 {
 	if (action.num < 1)
 		return false;
-	/*if (typeid(*a) != typeid(*action.back()))
-		return false;*/
+
 	ActionMergableBase *aa = dynamic_cast<ActionMergableBase*>(a);
 	ActionMergableBase *bb = dynamic_cast<ActionMergableBase*>(action.back());
-	if ((!aa) || (!bb))
+	if (!aa or !bb)
 		return false;
+
 	if (!bb->absorb(aa))
 		return false;
+
 	delete(a);
 	return true;
 }
@@ -82,8 +83,10 @@ void *ActionManager::execute(Action *a)
 	if (enabled){
 		if (a->is_trivial())
 			return NULL;
+
 		if (cur_group)
 			return cur_group->addSubAction(a, data);
+
 		add(a);
 		return action.back()->execute_and_notify(data);
 	}else
@@ -96,6 +99,7 @@ void ActionManager::undo()
 {
 	if (!enabled)
 		return;
+
 	if (undoable())
 		action[-- cur_pos]->undo_and_notify(data);
 }
@@ -106,6 +110,7 @@ void ActionManager::redo()
 {
 	if (!enabled)
 		return;
+
 	if (redoable())
 		action[cur_pos ++]->redo_and_notify(data);
 }

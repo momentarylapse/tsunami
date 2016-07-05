@@ -1,0 +1,43 @@
+use "../api.kaba"
+use "../Synthesizer/Sample.kaba"
+use "../Buffer/Pitch/Pitch Shift.kaba"
+
+class XXX extends SongPlugin
+	override void apply(Song* song)
+		print("aaaa1")
+		Track *track = song.addTrack(TYPE_MIDI, 0)
+		print("aaaa2")
+		track.synth = CreateSynthesizer("Sample")
+		print("aaaa3")
+		SampleSynthesizer* synth = track.synth
+		print("aaaa")
+		for s in song.samples
+			int pitch = s.getValue("pitch").int()
+			if pitch >= synth.config.samples.num
+				synth.config.samples.resize(pitch+1)
+			if synth.config.samples[pitch] == nil
+				synth.config.samples[pitch] = s.createRef()
+
+		print("aaaa")
+		for s,i in synth.config.samples
+			if s
+				for d in 1:8
+					if !synth.config.samples[i-d]
+						shift(song, synth, i, i-d)
+					else
+						break
+		print("aaaa")
+	
+	void shift(Song* song, SampleSynthesizer* synth, int from, int to)
+		print("shift " + from + " -> " + to)
+		SampleRef* source = synth.config.samples[from]
+		Sample* t = song.addSample("new", *source.buf)
+		
+		PitchShift* ps = CreateAudioEffect("Pitch Shift", song)
+		ps.config.Pitch = pow(2, (to - from)/12.0)
+		ps.process(t.buf)
+		
+		synth.config.samples[to] = t.createRef()
+		
+		delete ps
+		

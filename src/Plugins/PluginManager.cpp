@@ -57,6 +57,11 @@ bool GlobalAllowTermination()
 	return tsunami->allowTermination();
 }
 
+Song* getCurSong()
+{
+	return tsunami->song;
+}
+
 void PluginManager::LinkAppScriptData()
 {
 	msg_db_f("LinkAppScriptData", 2);
@@ -70,7 +75,10 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
 	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
 	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
+	Script::LinkExternal("getCurSong", (void*)&getCurSong);
 	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
+	Script::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
+	Script::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
 	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
 	Script::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 
@@ -168,7 +176,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("Sample", "midi", _offsetof(Sample, midi));
 	Script::DeclareClassOffset("Sample", "volume", _offsetof(Sample, volume));
 	Script::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
+	Script::DeclareClassOffset("Sample", "tags", _offsetof(Sample, tags));
 	Script::LinkExternal("Sample.createRef", Script::mf(&Sample::create_ref));
+	Script::LinkExternal("Sample.getValue", Script::mf(&Sample::getValue));
 
 	Sample sample(0);
 	sample.owner = tsunami->song;
@@ -327,6 +337,8 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Song.addPause", Script::mf(&Song::addPause));
 	Script::LinkExternal("Song.editBar", Script::mf(&Song::editBar));
 	Script::LinkExternal("Song.deleteBar", Script::mf(&Song::deleteBar));
+	Script::LinkExternal("Song.addSample", Script::mf(&Song::addSample));
+	Script::LinkExternal("Song.deleteSample", Script::mf(&Song::deleteSample));
 
 	AudioRenderer ar;
 	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));

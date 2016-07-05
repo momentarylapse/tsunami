@@ -34,7 +34,7 @@ Sample::~Sample()
 }
 
 
-int Sample::get_index()
+int Sample::get_index() const
 {
 	if (!owner)
 		return -1;
@@ -44,7 +44,7 @@ int Sample::get_index()
 	return -1;
 }
 
-Range Sample::getRange()
+Range Sample::getRange() const
 {
 	if (type == Track::TYPE_MIDI)
 		return Range(0, midi.samples);
@@ -66,5 +66,13 @@ void Sample::unref()
 SampleRef *Sample::create_ref()
 {
 	return new SampleRef(this);
+}
+
+string Sample::getValue(const string &key) const
+{
+	for (Tag &t : tags)
+		if (t.key == key)
+			return t.value;
+	return "";
 }
 

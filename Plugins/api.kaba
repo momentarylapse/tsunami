@@ -239,7 +239,9 @@ class Sample // TODO
 	MidiData midi
 	float volume
 	int uid
+	Tag[] tags
 	extern SampleRef *createRef()
+	extern string getValue(string key)
 
 class SampleRef // TODO
 	Sample *origin
@@ -331,6 +333,8 @@ class Song
 	extern void addPause(int index, float time, bool affect_midi)
 	extern void editBar(int index, BarPattern p, bool affect_midi)
 	extern void deleteBar(int index, bool affect_midi)
+	extern Sample* addSample(string name, BufferBox buf)
+	extern void deleteSample(int index)
 
 class SongSelection
 	Range range
@@ -494,18 +498,18 @@ class TsunamiPlugin
 	extern virtual void onStart()
 	extern virtual void onStop()
 	extern void stop()
-	Window *win
-	AudioView *view
-	Song *song
+	Window* win
+	AudioView* view
+	Song* song
 
 class SongPlugin
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void apply(Song *song)
-	Window *win
-	AudioView *view
+	Window* win
+	AudioView* view
 
-extern Log *logging
+extern Log* logging
 //extern PluginContext plugin_context
 extern Storage *storage
 extern ColorScheme colors
@@ -515,6 +519,9 @@ extern void fft_c2c(complex[] in, complex[] out, bool inverse)
 extern void fft_r2c(float[] in, complex[] out)
 extern void fft_c2r_inv(complex[] in, float[] out)
 
+extern Song* getCurSong()
 extern bool AllowTermination()
-extern Synthesizer *CreateSynthesizer(string name)
-extern Sample *SelectSample(Panel *panel, Song *s, Sample *old)
+extern Synthesizer* CreateSynthesizer(string name)
+extern AudioEffect* CreateAudioEffect(string name, Song* s)
+extern MidiEffect* CreateMidiEffect(string name, Song* s)
+extern Sample* SelectSample(Panel* panel, Song* s, Sample* old)

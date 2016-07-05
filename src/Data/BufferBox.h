@@ -46,12 +46,12 @@ public:
 
 	Array<string> peaks;
 
-	Range _cdecl range();
-	Range _cdecl range0();
+	Range _cdecl range() const;
+	Range _cdecl range0() const;
 
 	void _cdecl clear();
 	void _cdecl resize(int length);
-	bool _cdecl is_ref();
+	bool _cdecl is_ref() const;
 	void _cdecl make_own();
 	void _cdecl scale(float volume, float panning = 0);
 	void _cdecl swap_ref(BufferBox &b);
@@ -62,9 +62,9 @@ public:
 	void _cdecl set_as_ref(const BufferBox &b, int offset, int length);
 	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 
-	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32);
-	bool _cdecl exports(string &data, int channels, SampleFormat format);
-	void _cdecl interleave(float *p, float volume);
+	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32) const;
+	bool _cdecl exports(string &data, int channels, SampleFormat format) const;
+	void _cdecl interleave(float *p, float volume) const;
 	void _cdecl deinterleave(float *p, int num_channels);
 
 	enum PeakMode

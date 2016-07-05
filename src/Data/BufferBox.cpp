@@ -116,7 +116,7 @@ void BufferBox::resize(int _length)
 	length = _length;
 }
 
-bool BufferBox::is_ref()
+bool BufferBox::is_ref() const
 {	return ((length > 0) and (c[0].allocated == 0));	}
 
 void fa_make_own(Array<float> &a)
@@ -389,7 +389,7 @@ inline void set_data_24(int *data, float value)
 	*data = set_data(value, 8388608.0f, VAL_MAX_24, VAL_ALERT_24) & 0x00ffffff;
 }
 
-bool BufferBox::_export(void *data, int _channels, SampleFormat format, bool align32)
+bool BufferBox::_export(void *data, int _channels, SampleFormat format, bool align32) const
 {
 	wtb_overflow = false;
 
@@ -425,7 +425,7 @@ bool BufferBox::_export(void *data, int _channels, SampleFormat format, bool ali
 	return !wtb_overflow;
 }
 
-bool BufferBox::exports(string &data, int _channels, SampleFormat format)
+bool BufferBox::exports(string &data, int _channels, SampleFormat format) const
 {
 	data.resize(length * _channels * (format_get_bits(format) / 8));
 	return _export(data.data, _channels, format, false);
@@ -440,7 +440,7 @@ inline float _clamp_(float f)
 	return f;
 }
 
-void BufferBox::interleave(float *p, float volume)
+void BufferBox::interleave(float *p, float volume) const
 {
 	float *pr = &c[0][0];
 	float *pl = &c[1][0];
@@ -474,12 +474,12 @@ void BufferBox::deinterleave(float *p, int num_channels)
 	}
 }
 
-Range BufferBox::range()
+Range BufferBox::range() const
 {
 	return Range(offset, length);
 }
 
-Range BufferBox::range0()
+Range BufferBox::range0() const
 {
 	return Range(0, length);
 }

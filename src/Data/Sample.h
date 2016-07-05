@@ -16,6 +16,7 @@
 class Song;
 class Track;
 class SampleRef;
+struct Tag;
 
 class Sample : public Observable
 {
@@ -27,8 +28,8 @@ public:
 	static const string MESSAGE_REFERENCE;
 	static const string MESSAGE_UNREFERENCE;
 
-	int get_index();
-	Range getRange();
+	int get_index() const;
+	Range getRange() const;
 
 	Song *owner;
 
@@ -42,6 +43,9 @@ public:
 	int uid;
 	int ref_count;
 	bool auto_delete;
+
+	Array<Tag> tags;
+	string getValue(const string &key) const;
 
 	void ref();
 	void unref();

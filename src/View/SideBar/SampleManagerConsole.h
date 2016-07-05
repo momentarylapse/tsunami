@@ -13,7 +13,7 @@
 class Song;
 class Sample;
 class OutputStream;
-class SongRenderer;
+class BufferRenderer;
 class SampleManagerItem;
 class Progress;
 class AudioView;
@@ -51,8 +51,7 @@ public:
 	int selected_uid;
 
 	OutputStream *preview_stream;
-	SongRenderer *preview_renderer;
-	Song *preview_audio;
+	BufferRenderer *preview_renderer;
 	Sample *preview_sample;
 
 	Progress *progress;

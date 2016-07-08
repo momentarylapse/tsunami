@@ -123,7 +123,6 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 	int l = min(view->prefered_buffer_level - 1, b.peaks.num / 4);
 	if (l >= 1){//f < MIN_MAX_FACTOR){
 
-
 		if ((view->peak_mode == BufferBox::PEAK_MAXIMUM) or (view->peak_mode == BufferBox::PEAK_BOTH)){
 			double bzf = view->buffer_zoom_factor;
 			int ll = l;

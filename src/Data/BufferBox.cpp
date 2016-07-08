@@ -63,6 +63,7 @@ BufferBox::BufferBox()
 	offset = 0;
 	length = 0;
 	channels = 2;
+	peaks_dirty = false;
 }
 
 BufferBox::BufferBox(const BufferBox &b)
@@ -72,6 +73,7 @@ BufferBox::BufferBox(const BufferBox &b)
 	channels = b.channels;
 	for (int i=0; i<channels; i++)
 		c[i] = b.c[i];
+	peaks_dirty = true;
 }
 
 void BufferBox::__init__()
@@ -91,7 +93,8 @@ void BufferBox::operator=(const BufferBox &b)
 	channels = b.channels;
 	for (int i=0; i<channels; i++)
 		c[i] = b.c[i];
-	peaks.clear();
+	peaks = b.peaks;
+	peaks_dirty = b.peaks_dirty;
 }
 
 BufferBox::~BufferBox()
@@ -104,6 +107,7 @@ void BufferBox::clear()
 		c[i].clear();
 	length = 0;
 	peaks.clear();
+	peaks_dirty = false;
 }
 
 void BufferBox::resize(int _length)
@@ -503,34 +507,36 @@ void BufferBox::invalidate_peaks(const Range &_range)
 	//msg_write(format("inval %d  %d-%d", n, i0, i1));
 
 	for (int k=0;k<2;k++)
-		if (peaks[k].num < n){
+		if (peaks[k].num < i1){
 			int n0 = peaks[k].num;
-			peaks[k].resize(n);
-			peaks[k][n0] = 255;
+			peaks[k].resize(i1);
+			for (int i=n0; i<i0; i++)
+				peaks[k][i] = 255;
 		}
-	for (int i=i0;i<i1;i++){
+	for (int i=i0; i<i1; i++){
 		peaks[0][i] = 255;
 		peaks[1][i] = 255;
 	}
+	peaks_dirty = true;
 }
 
 inline void find_update_peak_range(string &p0, string &p1, int &i0, int &i1, int n)
 {
-	i0 = 0;
+	i0 = p0.num;
 	i1 = n;
-	if ((p0.num < n) or (p1.num < n))
-		return;
 	//msg_write("t");
 	bool found = false;
-	for (int i=0;i<n;i++)
+	for (int i=0;i<p0.num;i++)
 		if (p0[i] == 255){
 			//msg_write(format("i0: %d (%d)", i, p0[i]));
 			i0 = i;
 			found = true;
 			break;
 		}
-	if (!found)
-		i0 = n;
+
+	if (!found or (p0.num < n))
+		return;
+
 	for (int i=n-1;i>i0;i--)
 		if (p0[i] == 255){
 			//msg_write(format("i1: %d (%d)", i, p0[i]));
@@ -554,10 +560,11 @@ void BufferBox::update_peaks()
 	if (peaks.num < 4)
 		peaks.resize(4);
 	int n = length / 4;
-	int i0 = 0;
+	int i0 = peaks[0].num;
 	int i1 = n;
-	if ((peaks[0].num >= n) and (peaks[1].num >= n))
+	if (peaks_dirty){
 		find_update_peak_range(peaks[0], peaks[1], i0, i1, n);
+	}
 	peaks[0].resize(n);
 	peaks[1].resize(n);
 	peaks[2].resize(n);
@@ -573,8 +580,8 @@ void BufferBox::update_peaks()
 	// higher levels
 	int level = 4;
 	while (n > 4){
-		n = n / 2 - 1;
-		i0 /= 2;
+		n = (n - 1) / 2;
+		i0 = max((i0 - 1) / 2, 0);
 		i1 = min((i1 + 1) / 2, n);
 		if (peaks.num < level + 4)
 			peaks.resize(level + 4);
@@ -591,4 +598,5 @@ void BufferBox::update_peaks()
 
 		level += 4;
 	}
+	peaks_dirty = false;
 }

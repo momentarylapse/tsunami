@@ -45,6 +45,7 @@ public:
 	Array<float> c[2];
 
 	Array<string> peaks;
+	bool peaks_dirty;
 
 	Range _cdecl range() const;
 	Range _cdecl range0() const;

@@ -46,7 +46,7 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 
 
 
-	event("cancel", this, &CaptureConsole::onClose);
+	event("cancel", this, &CaptureConsole::onCancel);
 	//event("hui:close", this, &CaptureConsole::onClose);
 	event("ok", this, &CaptureConsole::onOk);
 	event("capture_type:audio", this, &CaptureConsole::onTypeAudio);
@@ -273,6 +273,12 @@ void CaptureConsole::onOk()
 	input->stop();
 	if (insert())
 		((SideBar*)parent)->_hide();
+}
+
+void CaptureConsole::onCancel()
+{
+	input->stop();
+	((SideBar*)parent)->_hide();
 }
 
 void CaptureConsole::onClose()

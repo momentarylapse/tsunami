@@ -38,6 +38,7 @@ public:
 	void onDelete();
 	void onPause();
 	void onOk();
+	void onCancel();
 	void onClose();
 	bool insert();
 

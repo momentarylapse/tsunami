@@ -138,7 +138,9 @@ extern File *_cdecl FileCreateSilent(const string &filename);
 extern File *_cdecl FileAppend(const string &filename);
 extern void _cdecl FileClose(File *f);
 extern string _cdecl FileRead(const string &filename);
+extern string _cdecl FileReadBinary(const string &filename);
 extern void _cdecl FileWrite(const string &filename, const string &str);
+extern void _cdecl FileWriteBinary(const string &filename, const string &str);
 
 
 

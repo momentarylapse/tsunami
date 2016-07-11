@@ -32,12 +32,9 @@ class DynamicArray
 	void _cdecl insert_1_single(char x, int index);
 	void _cdecl insert_single(const void *d, int index);
 	void _cdecl delete_single(int index);
-	void _cdecl delete_single_by_pointer(const void *p);
 	void _cdecl swap(int i1, int i2);
 	void _cdecl reverse();
 	DynamicArray _cdecl ref_subarray(int start, int num_elements);
-	bool _cdecl iterate(void *&p);
-	bool _cdecl iterate_back(void *&p);
 	int _cdecl index(const void *p);
 	void _cdecl clear();
 	void *data;
@@ -246,7 +243,7 @@ inline bool _foreach_set_false_(bool &b)
 {	b = false;	return false;	}
 
 
-#define foreach(_var_, _array_) \
+#define ___foreach(_var_, _array_) \
 	if (auto _foreach_it_ = (_array_).begin()) {} else \
 	for (bool _foreach_continue = true; \
 		_foreach_continue && _foreach_it_.valid(); \

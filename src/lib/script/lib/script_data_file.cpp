@@ -162,6 +162,9 @@ void SIAddPackageFile()
 		func_add_param("filename",		TypeString);
 	add_func("FileExists",			TypeBool,		(void*)&file_test_existence);
 		func_add_param("filename",		TypeString);
+	add_func("FileHash",			TypeString,		(void*)&file_hash);
+		func_add_param("filename",		TypeString);
+		func_add_param("type",		TypeString);
 	add_func("FileRename",			TypeBool,			(void*)&file_rename);
 		func_add_param("source",		TypeString);
 		func_add_param("dest",		TypeString);

@@ -148,6 +148,14 @@ bool file_delete(const string &filename)
 	return (_unlink(filename.sys_filename().c_str())==0);
 }
 
+string file_hash(const string &filename, const string &type)
+{
+	if (type == "md5"){
+		return FileReadBinary(filename).md5();
+	}
+	return "";
+}
+
 string shell_execute(const string &cmd)
 {
 	system(cmd.c_str());

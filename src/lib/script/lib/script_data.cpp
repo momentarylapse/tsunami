@@ -918,6 +918,7 @@ void SIAddPackageBase()
 		class_add_func("upper", TypeString, mf(&string::upper), FLAG_PURE);
 		class_add_func("reverse", TypeString, mf(&string::reverse), FLAG_PURE);
 		class_add_func("hash", TypeInt, mf(&string::hash), FLAG_PURE);
+		class_add_func("md5", TypeString, mf(&string::md5), FLAG_PURE);
 		class_add_func("hex", TypeString, mf(&string::hex), FLAG_PURE);
 			func_add_param("inverted",		TypeBool);
 		class_add_func("unhex", TypeString, mf(&string::unhex), FLAG_PURE);

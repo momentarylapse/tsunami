@@ -423,11 +423,32 @@ string FileRead(const string &filename)
 	return r;
 }
 
+string FileReadBinary(const string &filename)
+{
+	File *f = FileOpen(filename);
+	if (!f)
+		return "";
+	f->SetBinaryMode(true);
+	string r = f->ReadComplete();
+	FileClose(f);
+	return r;
+}
+
 void FileWrite(const string &filename, const string &str)
 {
 	File *f = FileCreate(filename);
 	if (!f)
 		return;
+	f->WriteBuffer(str.data, str.num);
+	FileClose(f);
+}
+
+void FileWriteBinary(const string &filename, const string &str)
+{
+	File *f = FileCreate(filename);
+	if (!f)
+		return;
+	f->SetBinaryMode(true);
 	f->WriteBuffer(str.data, str.num);
 	FileClose(f);
 }

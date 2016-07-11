@@ -13,6 +13,7 @@ bool _cdecl file_rename(const string &source,const string &target);
 bool _cdecl file_copy(const string &source,const string &target);
 bool _cdecl file_delete(const string &filename);
 bool _cdecl file_test_existence(const string &filename);
+string _cdecl file_hash(const string &filename, const string &type);
 
 
 string _cdecl shell_execute(const string &cmd);

@@ -253,48 +253,8 @@ void DynamicArray::delete_single(int index)
 	num --;
 }
 
-void DynamicArray::delete_single_by_pointer(const void *p)
-{	delete_single(index(p));	}
-
 int DynamicArray::index(const void *p)
 {	return ((long)p - (long)data) / element_size;	}
-
-string dummy_summy;
-
-bool DynamicArray::iterate(void *&p)
-{
-	if (p == NULL)
-		p = data;
-	else
-		*(long*)&p += element_size;
-
-	// still within list?
-	//msg_write(format("%p  %p  %d  %d", p, data, element_size, num));
-	dummy_summy = format("%p  %p  %d  %d", p, data, element_size, num);
-	if ((long)p < (long)data + element_size * num)
-		return true;
-	//msg_write("f");
-
-	// too far -> start at the beginning...
-	p = data;
-	return false;
-}
-
-bool DynamicArray::iterate_back(void *&p)
-{
-	if (p == NULL)
-		p = (char*)data + (num - 1) * element_size;
-	else
-		*(long*)&p -= element_size;
-
-	// still within list?
-	if ((long)p >= (long)data)
-		return true;
-
-	// too far -> start at the ending...
-	p = (char*)data + (num - 1) * element_size;
-	return false;
-}
 
 
 DynamicArray DynamicArray::ref_subarray(int start, int num_elements)

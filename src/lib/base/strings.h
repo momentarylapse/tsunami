@@ -51,6 +51,7 @@ class string : public DynamicArray
 	Array<int> utf8_to_utf32() const;
 	Array<int> utf16_to_utf32() const;
 	int _cdecl hash() const;
+	string _cdecl md5() const;
 	int _cdecl _int() const;
 	long long _cdecl i64() const;
 	float _cdecl _float() const;

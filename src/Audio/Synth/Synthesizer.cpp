@@ -127,7 +127,7 @@ int Synthesizer::read(BufferBox &buf, MidiSource *source)
 
 bool Synthesizer::hasRunOutOfData()
 {
-	return (events.num == 0) and (events.samples == 0) and (active_pitch.num == 0) and source_run_out;
+	return (events.num == 0) and (active_pitch.num == 0) and source_run_out;
 }
 
 void Synthesizer::reset()

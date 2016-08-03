@@ -48,9 +48,9 @@ void SampleRef::__delete__()
 	this->SampleRef::~SampleRef();
 }
 
-int SampleRef::get_index()
+int SampleRef::get_index() const
 {
-	Track *t = getTrack();
+	Track *t = track();
 	if (t){
 		foreachi(SampleRef *s, t->samples, i)
 			if (this == s)
@@ -59,19 +59,19 @@ int SampleRef::get_index()
 	return -1;
 }
 
-Track *SampleRef::getTrack()
+Track *SampleRef::track() const
 {
 	if (owner)
 		return owner->tracks[track_no];
 	return NULL;
 }
 
-Range SampleRef::getRange()
+Range SampleRef::range() const
 {
-	return origin->getRange() + pos;
+	return origin->range() + pos;
 }
 
-int SampleRef::getType()
+int SampleRef::type() const
 {
 	return origin->type;
 }

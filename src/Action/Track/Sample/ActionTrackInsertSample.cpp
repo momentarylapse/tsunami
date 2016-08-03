@@ -19,7 +19,7 @@ ActionTrackInsertSample::ActionTrackInsertSample(Song *s, int track_no, int inde
 	if (t->type == t->TYPE_AUDIO){
 
 		// get target buffer
-		Range r = sub->getRange();
+		Range r = sub->range();
 		addSubAction(new ActionTrackCreateBuffers(t, level_no, r), s);
 		BufferBox buf = t->readBuffers(level_no, r);
 

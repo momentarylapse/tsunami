@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-314
+316
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -450,8 +450,14 @@ Verwalten...
 menu/sample_properties
 Eigenschaften
 
+menu/scale_sample
+Skalieren
+
 menu/select_all
 Alles auswählen
+
+menu/select_expand
+Auswahl ausbreiten
 
 menu/select_nothing
 Nichts auswählen
@@ -1009,7 +1015,7 @@ Kann nur Samples löschen, die nicht benutzt werden!
 Can't execute plugin on an empty audio file
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 Can't find plugin: %s ...
-
+Kann Pluin nicht finden: %s ...
 Can't insert recorded data (%s) into target (%s).
 Kann aufgenommene Daten (%s) nicht in Ziel (%s) einfügen.
 Can't load effect: \"%s\"

@@ -109,6 +109,7 @@ public:
 
 	void selectNone();
 	void selectAll();
+	void selectExpand();
 	void updateSelection();
 	Range getPlaybackSelection();
 

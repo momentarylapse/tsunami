@@ -101,7 +101,7 @@ public:
 
 	string str()
 	{
-		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->getRange().length) + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
+		return icon + "\\" + /*track_type(s->type) + "\\" +*/ s->name + "\\" + s->owner->get_time_str_long(s->range().length) + "\\" + format(_("%d times"), s->ref_count) + "\\" + b2s(s->auto_delete);
 	}
 	string icon;
 	Sample *s;
@@ -282,7 +282,7 @@ void SampleManagerConsole::onUpdate(Observable *o, const string &message)
 			endPreview();
 	}else if (o == preview_stream){
 		int pos = preview_stream->getPos();
-		Range r = preview_sample->getRange();
+		Range r = preview_sample->range();
 		progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
 		if (!preview_stream->isPlaying())
 			endPreview();

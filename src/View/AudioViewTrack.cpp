@@ -175,7 +175,7 @@ void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 void AudioViewTrack::drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay)
 {
 	// frame
-	Range rr = s->getRange() + delay;
+	Range rr = s->range() + delay;
 	int asx = clampi(view->cam.sample2screen(rr.start()), area.x1, area.x2);
 	int aex = clampi(view->cam.sample2screen(rr.end()), area.x1, area.x2);
 
@@ -214,9 +214,9 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 		drawSampleFrame(c, s, col2, (i + 1) * s->rep_delay);
 
 	// buffer
-	if (s->getType() == Track::TYPE_AUDIO)
+	if (s->type() == Track::TYPE_AUDIO)
 		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
-	else if (s->getType() == Track::TYPE_MIDI)
+	else if (s->type() == Track::TYPE_MIDI)
 		drawMidi(c, *s->midi, s->pos);
 
 	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);

@@ -29,7 +29,7 @@ public:
 	static const string MESSAGE_UNREFERENCE;
 
 	int get_index() const;
-	Range getRange() const;
+	Range _cdecl range() const;
 
 	Song *owner;
 
@@ -45,12 +45,12 @@ public:
 	bool auto_delete;
 
 	Array<Tag> tags;
-	string getValue(const string &key) const;
+	string _cdecl getValue(const string &key) const;
 
-	void ref();
-	void unref();
+	void _cdecl ref();
+	void _cdecl unref();
 
-	SampleRef *create_ref();
+	SampleRef *_cdecl create_ref();
 };
 
 

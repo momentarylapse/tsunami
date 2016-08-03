@@ -33,7 +33,7 @@ void SongSelection::fromRange(Song* s, const Range &r)
 	// subs
 	for (Track *t : s->tracks)
 		for (SampleRef *s : t->samples)
-			set(s, has(t) and range.overlaps(s->getRange()));
+			set(s, has(t) and range.overlaps(s->range()));
 }
 
 void SongSelection::add(Track* t)

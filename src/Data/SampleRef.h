@@ -28,11 +28,11 @@ public:
 
 	static const string MESSAGE_CHANGE_BY_ACTION;
 
-	Track *getTrack();
-	Range getRange();
-	int getType();
+	Track *_cdecl track() const;
+	Range _cdecl range() const;
+	int _cdecl type() const;
 
-	int get_index();
+	int _cdecl get_index() const;
 
 	int pos;
 	Sample *origin;

@@ -16,6 +16,7 @@ Menu menu "" disabled
 		Separator
 		Item select_all "Select all" image=hui:select-all
 		Item select_nothing "Clear selection" image=hui:delete
+		Item select_expand "Expand selection"
 		Separator
 		Item edit_multi "Apply to all selected tracks" checkable
 		Separator
@@ -50,6 +51,7 @@ Menu menu "" disabled
 		Item sample_from_selection "Cut out from selection" image=hui:cut
 		Item insert_sample "Insert statically" image=hui:add
 		Item remove_sample "Delete" image=hui:delete
+		Item scale_sample "Scale"
 		Separator
 		Item sample_properties "Properties" image=hui:properties
 	Menu menu_view "View"

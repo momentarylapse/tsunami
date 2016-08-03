@@ -106,6 +106,11 @@ bool Range::is_inside(int pos) const
 	return ((pos >= start()) and (pos < end()));
 }
 
+bool Range::is_more_inside(int pos) const
+{
+	return ((pos > start()) and (pos < end() - 1));
+}
+
 Range Range::intersect(const Range &r) const
 {
 	int i0 = max(start(), r.start());

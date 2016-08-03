@@ -38,6 +38,7 @@ public:
 	bool empty() const;
 
 	bool is_inside(int pos) const;
+	bool is_more_inside(int pos) const;
 	bool overlaps(const Range &r) const;
 	bool covers(const Range &r) const;
 	Range intersect(const Range &r) const;

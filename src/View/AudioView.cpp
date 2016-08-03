@@ -831,6 +831,45 @@ void AudioView::selectNone()
 	setCurSample(NULL);
 }
 
+inline void test_range(const Range &r, Range &sel, bool &update)
+{
+	if (r.is_more_inside(sel.start())){
+		sel.set_start(r.start());
+		update = true;
+	}
+	if (r.is_more_inside(sel.end())){
+		sel.set_end(r.end());
+		update = true;
+	}
+}
+
+void AudioView::selectExpand()
+{
+	bool update = true;
+	while(update){
+		update = false;
+		for (Track *t: song->tracks){
+			if (!sel.has(t))
+				continue;
+
+			// midi
+			for (MidiNote &n: t->midi)
+				test_range(n.range, sel_raw, update);
+
+			// buffers
+			for (TrackLevel &l: t->levels)
+				for (BufferBox &b: l.buffers)
+					test_range(b.range(), sel_raw, update);
+
+			// samples
+			for (SampleRef *s: t->samples)
+				test_range(s->range(), sel_raw, update);
+		}
+	}
+
+	updateSelection();
+}
+
 
 
 void AudioView::selectSample(SampleRef *s, bool diff)

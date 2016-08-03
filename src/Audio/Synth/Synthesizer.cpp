@@ -47,7 +47,7 @@ void Synthesizer::__delete__()
 void Synthesizer::Tuning::set_default()
 {
 	for (int p=0; p<MAX_PITCH; p++)
-		freq[p] = pitch_to_freq(p);
+		freq[p] = pitch_to_freq((float)p);
 }
 
 bool Synthesizer::Tuning::is_default()

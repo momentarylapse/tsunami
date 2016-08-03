@@ -73,7 +73,7 @@ void ViewModeBars::performScale()
 	song->action_manager->beginActionGroup();
 	foreachb(int i, scaling_sel){
 		BarPattern b = song->bars[i];
-		b.length *= factor;
+		b.length = (int)((float)b.length * factor);
 		song->editBar(i, b, modify_midi);
 	}
 	song->action_manager->endActionGroup();

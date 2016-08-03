@@ -196,8 +196,8 @@ void BufferBox::scale(float volume, float panning)
 
 	float f[2];
 	if (channels == 2){
-		f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
-		f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
+		f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
+		f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
 	}else{
 		f[0] = volume;
 	}
@@ -222,8 +222,8 @@ void BufferBox::add(const BufferBox &b, int _offset, float volume, float panning
 	}else{
 		float f[2];
 		if (channels == 2){
-			f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2);
-			f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2);
+			f[0] = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
+			f[1] = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
 		}else{
 			f[0] = volume;
 		}

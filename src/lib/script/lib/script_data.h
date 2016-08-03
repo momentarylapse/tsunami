@@ -314,7 +314,7 @@ enum
 //--------------------------------------------------------------------------------------------------
 // type casting
 
-typedef string t_cast_func(string);
+typedef string t_cast_func(string&);
 struct TypeCast
 {
 	int penalty;

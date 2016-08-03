@@ -5,6 +5,13 @@
 #include "array.h"
 #include "strings.h"
 
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
 
 template<class T>
 inline const T& max(const T &a, const T &b)

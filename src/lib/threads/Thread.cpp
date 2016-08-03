@@ -124,7 +124,7 @@ void Thread::exit()
 Thread *Thread::getSelf()
 {
 	HANDLE h = GetCurrentThread();
-	foreach(Thread *t, _Thread_List_)
+	for (Thread *t : _Thread_List_)
 		if (h == t->internal->thread)
 			return t;
 	return NULL;

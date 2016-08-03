@@ -24,6 +24,7 @@ Synthesizer::Synthesizer() :
 	keep_notes = 0;
 	locked = false;
 	instrument = Instrument(Instrument::TYPE_PIANO);
+	source_run_out = false;
 
 	tuning.set_default();
 
@@ -134,6 +135,7 @@ void Synthesizer::reset()
 {
 	resetState();
 	active_pitch.clear();
+	source_run_out = false;
 	//resetMidiData();
 }
 

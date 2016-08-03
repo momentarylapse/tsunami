@@ -28,7 +28,7 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *a, int level_no, cons
 
 
 		// subs
-		Set<int> to_delete;
+		Array<int> to_delete;
 		foreachib(SampleRef *s, t->samples, i)
 			if (sel.has(s))
 				to_delete.add(i);

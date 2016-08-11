@@ -1388,11 +1388,16 @@ void LinkExternal(const string &name, void *pointer)
 	l.pointer = pointer;
 	ExternalLinks.add(l);
 	if (name.head(5) == "lib__"){
-		string sname = name.substr(5, -1).replace("@list", "[]").replace("@@", ".");
+		Array<string> names = name.explode(":");
+		string sname = names[0].substr(5, -1).replace("@list", "[]").replace("@@", ".");
 		for (Package &p : Packages)
 			foreachi(Function *f, p.script->syntax->functions, i)
-				if (f->name == sname)
+				if (f->name == sname){
+					if (names.num > 0)
+						if (f->num_params != names[1]._int())
+							continue;
 					p.script->func[i] = (void(*)())pointer;
+				}
 	}
 }
 

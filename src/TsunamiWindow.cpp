@@ -13,6 +13,7 @@
 #include "View/Dialog/MarkerDialog.h"
 #include "View/Dialog/BarAddDialog.h"
 #include "View/Dialog/BarEditDialog.h"
+#include "View/Dialog/PauseAddDialog.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
@@ -801,11 +802,8 @@ void TsunamiWindow::onAddBars()
 
 void TsunamiWindow::onAddPause()
 {
-	int s = view->sel.bars.start();
-	if (view->sel.bars.empty())
-		s = 0;
-
-	song->addPause(s, 2.0f, view->bars_edit_data);
+	HuiDialog *dlg = new PauseAddDialog(win, song, view->sel.bars, view->bars_edit_data);
+	dlg->show();
 }
 
 void TsunamiWindow::onDeleteBars()

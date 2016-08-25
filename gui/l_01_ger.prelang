@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-327
+334
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -686,6 +686,27 @@ Midi
 
 new_dialog/num_bars
 10\\0\\999
+
+pause_add_dialog/count
+
+
+pause_add_dialog/duration
+1.0\\0\\10000\\0.001
+
+pause_add_dialog/insert:after
+danach
+
+pause_add_dialog/insert:before
+davor
+
+pause_add_dialog/pause_add_dialog
+neue Pause
+
+pause_add_dialog/t_duration
+Länge
+
+pause_add_dialog/t_s
+s
 
 popup_marker_menu/delete_marker
 Löschen

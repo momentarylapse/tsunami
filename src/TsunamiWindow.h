@@ -79,7 +79,12 @@ public:
 	void onCurLevelUp();
 	void onCurLevelDown();
 	void onLevelManager();
-	void onBarsManager();
+	void onAddBars();
+	void onAddPause();
+	void onDeleteBars();
+	void onEditBars();
+	void onScaleBars();
+	void onBarsModifyMidi();
 	void onViewPeaksMax();
 	void onViewPeaksMean();
 	void onViewPeaksBoth();

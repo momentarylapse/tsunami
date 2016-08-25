@@ -11,6 +11,8 @@
 #include "View/Dialog/NewDialog.h"
 #include "View/Dialog/SettingsDialog.h"
 #include "View/Dialog/MarkerDialog.h"
+#include "View/Dialog/BarAddDialog.h"
+#include "View/Dialog/BarEditDialog.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
@@ -91,8 +93,12 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &TsunamiWindow::onDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &TsunamiWindow::onCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &TsunamiWindow::onCurLevelDown);
-	HuiAddCommandM("bars_manager", "hui:settings", -1, this, &TsunamiWindow::onBarsManager);
-	HuiAddCommandM("song_edit_bars", "hui:settings", -1, this, &TsunamiWindow::onBarsManager);
+	HuiAddCommandM("add_bar", "hui:add", -1, this, &TsunamiWindow::onAddBars);
+	HuiAddCommandM("add_pause", "hui:add", -1, this, &TsunamiWindow::onAddPause);
+	HuiAddCommandM("delete_bar", "hui:delete", -1, this, &TsunamiWindow::onDeleteBars);
+	HuiAddCommandM("edit_selected_bars", "hui:edit", -1, this, &TsunamiWindow::onEditBars);
+	HuiAddCommandM("scale_selected_bars", "hui:scale", -1, this, &TsunamiWindow::onScaleBars);
+	HuiAddCommandM("bar_link_to_data", "", -1, this, &TsunamiWindow::onBarsModifyMidi);
 	HuiAddCommandM("sample_manager", "", -1, this, &TsunamiWindow::onSampleManager);
 	HuiAddCommandM("song_edit_samples", "", -1, this, &TsunamiWindow::onSampleManager);
 	HuiAddCommandM("show_mixing_console", "", -1, this, &TsunamiWindow::onMixingConsole);
@@ -592,11 +598,6 @@ void TsunamiWindow::onLevelManager()
 	side_bar->open(SideBar::LEVEL_CONSOLE);
 }
 
-void TsunamiWindow::onBarsManager()
-{
-	side_bar->open(SideBar::BARS_CONSOLE);
-}
-
 void TsunamiWindow::onSampleFromSelection()
 {
 	song->createSamplesFromSelection(view->getEditSeletion(), view->cur_level);
@@ -693,7 +694,12 @@ void TsunamiWindow::updateMenu()
 	enable("level_delete", song->level_names.num > 1);
 	enable("level_up", view->cur_level < song->level_names.num -1);
 	enable("level_down", view->cur_level > 0);
-	// sub
+	// bars
+	enable("delete_bar", !view->sel.bars.empty());
+	enable("edit_selected_bars", !view->sel.bars.empty());
+	enable("scale_selected_bars", !view->sel.bars.empty());
+	check("bar_link_to_data", view->bars_edit_data);
+	// sample
 	enable("sample_from_selection", selected);
 	enable("insert_sample", view->sel.getNumSamples() > 0);
 	enable("remove_sample", view->sel.getNumSamples() > 0);
@@ -783,4 +789,83 @@ void TsunamiWindow::onExport()
 		rr.prepare(view->getPlaybackSelection(), false);
 		tsunami->storage->saveViaRenderer(&rr, HuiFilename);
 	}
+}
+
+void TsunamiWindow::onAddBars()
+{
+	HuiDialog *dlg = new BarAddDialog(win, song, view->sel.bars, view->bars_edit_data);
+	dlg->show();
+}
+
+void TsunamiWindow::onAddPause()
+{
+	int s = getInt(id);
+
+	song->addPause(s, 2.0f, view->bars_edit_data);
+}
+
+void TsunamiWindow::onDeleteBars()
+{
+	//Array<int> s = getSelection(id);
+	song->action_manager->beginActionGroup();
+
+	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
+
+		int pos = 0;
+		for (int j=0; j<i; j++)
+			pos += song->bars[j].length;
+
+		BarPattern b = song->bars[i];
+		int l0 = b.length;
+		Range r = Range(pos, l0);
+		if (view->bars_edit_data){
+			for (Track *t : song->tracks){
+				/*if (t->type != t->TYPE_MIDI)
+					continue;*/
+				Set<int> del;
+				Array<MidiNote> add;
+				Set<int> del_marker;
+				foreachi(MidiNote &n, t->midi, j){
+					if (n.range.end() <= pos){
+					}else if (n.range.offset >= pos + l0){
+						/*MidiNote n2 = n;
+						n2.range.offset -= l0;
+						add.add(n2);
+						del.add(j);*/
+					}else{
+						del.add(j);
+					}
+				}
+				foreachi(TrackMarker &m, t->markers, i)
+					if (r.is_inside(m.pos))
+						del_marker.add(i);
+
+				foreachb(int j, del)
+					t->deleteMidiNote(j);
+				/*foreach(MidiNote &n, add)
+					t->addMidiNote(n);*/
+				foreachb(int j, del_marker)
+					t->deleteMarker(j);
+			}
+		}
+		song->deleteBar(i, view->bars_edit_data);
+	}
+	song->action_manager->endActionGroup();
+}
+
+void TsunamiWindow::onEditBars()
+{
+	HuiDialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
+	dlg->show();
+}
+
+void TsunamiWindow::onScaleBars()
+{
+	//view->mode_bars->startScaling(getSelection(id));
+}
+
+void TsunamiWindow::onBarsModifyMidi()
+{
+	view->bars_edit_data = ! view->bars_edit_data;
+	updateMenu();
 }

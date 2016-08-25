@@ -171,6 +171,8 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	cur_level = 0;
 	capturing_track = 0;
 
+	bars_edit_data = true;
+
 	peak_thread = new PeakThread(this);
 	is_updating_peaks = false;
 
@@ -305,6 +307,9 @@ void AudioView::updateSelection()
 	sel.range = sel_raw;
 	if (sel.range.length < 0)
 		sel.range.invert();
+
+
+	sel.update_bars(song);
 
 
 	renderer->setRange(getPlaybackSelection());
@@ -669,6 +674,19 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 	drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
 	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);
+
+
+
+	sx1 = cam.sample2screen(sel.bar_range.start());
+	sx2 = cam.sample2screen(sel.bar_range.end());
+	sxx1 = clampi(sx1, r.x1, r.x2);
+	sxx2 = clampi(sx2, r.x1, r.x2);
+	c->setColor(colors.selection_internal);
+	foreachi(AudioViewTrack *t, vtrack, i)
+		if (t->track->type == Track::TYPE_TIME)
+			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
+	/*drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
+	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);*/
 }
 
 void AudioView::drawAudioFile(Painter *c, const rect &r)
@@ -730,7 +748,7 @@ void AudioView::onDraw(Painter *c)
 	//c->setColor(ColorWaveCur);
 
 	if (enabled)
-		drawAudioFile(c, rect(0, c->width, 0, c->height));
+		drawAudioFile(c, drawing_rect);
 
 	//c->DrawStr(100, 100, i2s(frame++));
 }

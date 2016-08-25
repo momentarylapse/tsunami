@@ -14,6 +14,8 @@ SongSelection::SongSelection()
 
 void SongSelection::clear()
 {
+	bars.clear();
+	bar_range.clear();
 	tracks.clear();
 	samples.clear();
 	markers.clear();
@@ -34,6 +36,26 @@ void SongSelection::fromRange(Song* s, const Range &r)
 	for (Track *t : s->tracks)
 		for (SampleRef *s : t->samples)
 			set(s, has(t) and range.overlaps(s->range()));
+}
+
+void SongSelection::update_bars(Song* s)
+{
+
+	int pos = 0;
+	bool first = true;
+	foreachi(BarPattern &b, s->bars, i){
+		Range r = Range(pos + 1, b.length - 2);
+		if (r.overlaps(range)){
+			if (first){
+				bars = Range(i, 1);
+				bar_range = Range(pos, b.length);
+			}
+			bars.set_end(i+1);
+			bar_range.set_end(r.end() + 1);
+			first = false;
+		}
+		pos += b.length;
+	}
 }
 
 void SongSelection::add(Track* t)

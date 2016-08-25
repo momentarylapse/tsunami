@@ -24,7 +24,6 @@ Dialog track_dialog "Spur" 380 516
 					Button /edit_fx "Fx"
 					Button /edit_midi "Midi"
 					Button /edit_curves "Curves"
-				Grid ? "" 3 1
+				Grid ? "" 2 1
 					Button /edit_midi_fx "Midi-Fx"
 					Button /edit_synth "Synth"
-					Button /edit_bars "Bars"

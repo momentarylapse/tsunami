@@ -176,6 +176,8 @@ public:
 	void setScale(const Scale &s);
 	Scale midi_scale;
 
+	bool bars_edit_data;
+
 	rect area;
 	TrackHeightManager thm;
 

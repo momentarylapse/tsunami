@@ -33,7 +33,6 @@ public:
 	void onEditLevels();
 	void onEditSamples();
 	void onEditFx();
-	void onEditBars();
 
 	virtual void onUpdate(Observable *o, const string &message);
 

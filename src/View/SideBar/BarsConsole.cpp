@@ -235,10 +235,6 @@ void BarsConsole::onDelete()
 
 void BarsConsole::onEdit()
 {
-	Array<int> s = getSelection(id);
-
-	HuiDialog *dlg = new BarEditDialog(win, song, s, isChecked(id_link));
-	dlg->show();
 }
 
 void BarsConsole::onScale()
@@ -253,11 +249,6 @@ void BarsConsole::onModifyMidi()
 
 void BarsConsole::addNewBar()
 {
-	int s = getInt(id);
-
-
-	HuiDialog *dlg = new BarAddDialog(win, song, s, isChecked(id_link));
-	dlg->show();
 }
 
 void BarsConsole::selectFromView()

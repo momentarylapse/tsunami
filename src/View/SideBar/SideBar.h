@@ -22,7 +22,6 @@ class FxConsole;
 class CurveConsole;
 class SynthConsole;
 class MidiFxConsole;
-class BarsConsole;
 class CaptureConsole;
 class AudioView;
 
@@ -53,7 +52,6 @@ public:
 	{
 		SONG_CONSOLE,
 		LEVEL_CONSOLE,
-		BARS_CONSOLE,
 		SAMPLE_CONSOLE,
 		GLOBAL_FX_CONSOLE,
 		TRACK_CONSOLE,
@@ -75,7 +73,6 @@ public:
 
 	SongConsole *song_console;
 	LevelConsole *level_console;
-	BarsConsole *bars_console;
 	FxConsole *global_fx_console;
 	TrackConsole *track_console;
 	MidiEditorConsole *midi_editor_console;

@@ -3,6 +3,5 @@ Menu popup_song_menu ""
 	Separator
 	Item add_track "Add empty track"
 	Item add_midi_track "Add midi track"
-	Item song_edit_bars "Edit bars"
 	Item song_edit_samples "Manage samples"
 	Item song_properties "Properties"

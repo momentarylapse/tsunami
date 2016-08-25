@@ -56,7 +56,6 @@ SongConsole::SongConsole(Song *a) :
 	event("edit_levels", this, &SongConsole::onEditLevels);
 	event("edit_samples", this, &SongConsole::onEditSamples);
 	event("edit_fx", this, &SongConsole::onEditFx);
-	event("edit_bars", this, &SongConsole::onEditBars);
 
 	subscribe(song);
 }
@@ -151,11 +150,6 @@ void SongConsole::onEditSamples()
 void SongConsole::onEditFx()
 {
 	((SideBar*)parent)->open(SideBar::GLOBAL_FX_CONSOLE);
-}
-
-void SongConsole::onEditBars()
-{
-	((SideBar*)parent)->open(SideBar::BARS_CONSOLE);
 }
 
 void SongConsole::onUpdate(Observable *o, const string &message)

@@ -8,16 +8,16 @@
 #include "BarAddDialog.h"
 #include "../../Data/Song.h"
 
-BarAddDialog::BarAddDialog(HuiWindow *root, Song *_s, int _index, bool _apply_to_midi):
+BarAddDialog::BarAddDialog(HuiWindow *root, Song *_s, const Range &_bars, bool _apply_to_midi):
 	HuiDialog("", 100, 100, root, false)
 {
 	fromResource("bar_add_dialog");
 	song = _s;
-	index = _index;
+	bars = _bars;
 	apply_to_midi = _apply_to_midi;
 
 	// no reference bar selected -> use last bar
-	int ref = index;
+	int ref = bars.start();
 	if (ref < 0)
 		ref = song->bars.num;
 
@@ -51,12 +51,13 @@ void BarAddDialog::onOk()
 	bool after = isChecked("insert:after");
 	song->action_manager->beginActionGroup();
 
+	int index = 0;
 	if (after){
-		if (index >= 0)
-			index ++;
+		if (bars.length > 0)
+			index = bars.end();
 	}else{
-		if (index < 0)
-			index = 0;
+		if (bars.length > 0)
+			index = bars.start();
 	}
 
 	for (int i=0; i<count; i++)

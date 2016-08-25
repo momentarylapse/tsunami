@@ -36,7 +36,6 @@ public:
 	void onEditMidi();
 	void onEditMidiFx();
 	void onEditSynth();
-	void onEditBars();
 
 	void setTrack(Track *t);
 

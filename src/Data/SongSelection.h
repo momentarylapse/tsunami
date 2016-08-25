@@ -25,8 +25,12 @@ public:
 	void clear();
 	void all(Song *s);
 	void fromRange(Song *s, const Range &r);
+	void update_bars(Song *s);
 
 	Range range;
+
+	Range bars;
+	Range bar_range;
 
 	Set<Track*> tracks;
 	Set<SampleRef*> samples;

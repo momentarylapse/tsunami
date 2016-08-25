@@ -17,8 +17,7 @@ Dialog song_dialog "Sound-Datei" 430 375
 					Button add_tag "" flat image=hui:add
 					Button delete_tag "" flat image=hui:delete
 		Group ad_t_edit "Edit"
-			Grid ? "" 4 1
+			Grid ? "" 3 1
 				Button /edit_levels "Levels"
 				Button /edit_samples "Samples"
-				Button /edit_bars "Bars"
 				Button /edit_fx "Fx"

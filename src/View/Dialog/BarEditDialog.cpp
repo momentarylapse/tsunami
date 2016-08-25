@@ -8,12 +8,13 @@
 #include "BarEditDialog.h"
 #include "../../Data/Song.h"
 
-BarEditDialog::BarEditDialog(HuiWindow *root, Song *_song, Array<int> &_s, bool _apply_to_midi):
+BarEditDialog::BarEditDialog(HuiWindow *root, Song *_song, const Range &_bars, bool _apply_to_midi):
 	HuiDialog("", 100, 100, root, false)
 {
 	fromResource("bar_edit_dialog");
 	song = _song;
-	sel = _s;
+	for (int i=_bars.start(); i<_bars.end(); i++)
+		sel.add(i);
 	apply_to_midi = _apply_to_midi;
 
 	BarPattern &b = song->bars[sel[0]];

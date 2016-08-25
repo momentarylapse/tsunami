@@ -43,7 +43,6 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("edit_midi", this, &TrackConsole::onEditMidi);
 	event("edit_midi_fx", this, &TrackConsole::onEditMidiFx);
 	event("edit_synth", this, &TrackConsole::onEditSynth);
-	event("edit_bars", this, &TrackConsole::onEditBars);
 }
 
 TrackConsole::~TrackConsole()
@@ -161,11 +160,6 @@ void TrackConsole::onEditMidiFx()
 void TrackConsole::onEditSynth()
 {
 	((SideBar*)parent)->open(SideBar::SYNTH_CONSOLE);
-}
-
-void TrackConsole::onEditBars()
-{
-	((SideBar*)parent)->open(SideBar::BARS_CONSOLE);
 }
 
 void TrackConsole::onUpdate(Observable *o, const string &message)

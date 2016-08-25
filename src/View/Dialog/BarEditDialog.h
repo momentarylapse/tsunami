@@ -11,6 +11,7 @@
 #include "../../lib/hui/hui.h"
 
 class Song;
+class Range;
 
 class BarEditDialog : public HuiDialog
 {
@@ -19,7 +20,7 @@ public:
 	Array<int> sel;
 	bool apply_to_midi;
 
-	BarEditDialog(HuiWindow *root, Song *song, Array<int> &s, bool apply_to_midi);
+	BarEditDialog(HuiWindow *root, Song *song, const Range &bars, bool apply_to_midi);
 	void onOk();
 	void onClose();
 	void onBeats();

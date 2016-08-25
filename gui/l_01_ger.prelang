@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-322
+327
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -312,8 +312,14 @@ Neue Takte einfügen
 menu/add_bar_pause
 Pause einfügen
 
+menu/add_bars
+Neue Takte einfügen
+
 menu/add_midi_track
 Midi Spur hinzufügen
+
+menu/add_pause
+Pause einfügen
 
 menu/add_time_track
 Rhythmus Spur hinzufügen
@@ -330,8 +336,14 @@ Verwalten...
 menu/delete_bar
 Takte löschen
 
+menu/delete_bars
+Löschen
+
 menu/delete_track
 Löschen
+
+menu/edit_bars
+Bearbeiten
 
 menu/edit_multi
 Auf alle ausgewählten Spuren anwenden
@@ -464,6 +476,9 @@ Verwalten...
 
 menu/sample_properties
 Eigenschaften
+
+menu/scale_bars
+Skalieren
 
 menu/scale_sample
 Skalieren

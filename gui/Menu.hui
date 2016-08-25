@@ -44,11 +44,11 @@ Menu menu "" disabled
 		Item level_up "Up" image=hui:up
 		Item level_down "Down" image=hui:down
 	Menu menu_bars "Bars"
-		Item add_bar "Add new bars" flat image=hui:add
-		Item add_bar_pause "Add pause" image=hui:add
-		Item delete_bar "Delete bars" image=hui:delete
-		Item edit_selected_bars "Edit selected bars" image=hui:edit
-		Item scale_selected_bars "Scale" image=hui:zoom-in tooltip="scale selected bars (by moving the selection on the left)"
+		Item add_bars "Add bars" flat image=hui:add
+		Item add_pause "Add pause" image=hui:add
+		Item delete_bars "Delete" image=hui:delete
+		Item edit_bars "Edit" image=hui:edit
+		Item scale_bars "Scale" image=hui:zoom-in tooltip="scale selected bars (by moving the selection on the left)"
 		Item bar_link_to_data "Edit data" checkable
 	Menu menu_sub "Samples"
 		Item sample_manager "Manage..." image=hui:properties

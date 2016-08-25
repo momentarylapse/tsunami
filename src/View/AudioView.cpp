@@ -9,7 +9,6 @@
 #include "AudioViewTrack.h"
 #include "Mode/ViewModeDefault.h"
 #include "Mode/ViewModeMidi.h"
-#include "Mode/ViewModeBars.h"
 #include "Mode/ViewModeCurve.h"
 #include "Mode/ViewModeCapture.h"
 #include "../Tsunami.h"
@@ -22,6 +21,7 @@
 #include "../Stuff/Log.h"
 #include "../lib/math/math.h"
 #include "../lib/threads/Thread.h"
+#include "Mode/ViewModeScaleBars.h"
 
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;
@@ -135,7 +135,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	mode = NULL;
 	mode_default = new ViewModeDefault(this);
 	mode_midi = new ViewModeMidi(this);
-	mode_bars = new ViewModeBars(this);
+	mode_scale_bars = new ViewModeScaleBars(this);
 	mode_curve = new ViewModeCurve(this);
 	mode_capture = new ViewModeCapture(this);
 	setMode(mode_default);
@@ -219,7 +219,7 @@ AudioView::~AudioView()
 	setInput(NULL);
 
 	delete(mode_curve);
-	delete(mode_bars);
+	delete(mode_scale_bars);
 	delete(mode_midi);
 	delete(mode_capture);
 	delete(mode_default);
@@ -265,6 +265,7 @@ void AudioView::setMode(ViewMode *m)
 {
 	mode = m;
 	thm.dirty = true;
+	forceRedraw();
 }
 
 void AudioView::setScale(const Scale &s)

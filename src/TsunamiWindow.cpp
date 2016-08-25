@@ -17,6 +17,8 @@
 #include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
 #include "View/SideBar/CaptureConsole.h"
+#include "View/Mode/ViewModeDefault.h"
+#include "View/Mode/ViewModeScaleBars.h"
 #include "View/Helper/Slider.h"
 #include "View/Helper/Progress.h"
 #include "View/Helper/PeakMeter.h"
@@ -93,11 +95,11 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("level_delete", "hui:delete", -1, this, &TsunamiWindow::onDeleteLevel);
 	HuiAddCommandM("level_up", "hui:up", -1, this, &TsunamiWindow::onCurLevelUp);
 	HuiAddCommandM("level_down", "hui:down", -1, this, &TsunamiWindow::onCurLevelDown);
-	HuiAddCommandM("add_bar", "hui:add", -1, this, &TsunamiWindow::onAddBars);
+	HuiAddCommandM("add_bars", "hui:add", -1, this, &TsunamiWindow::onAddBars);
 	HuiAddCommandM("add_pause", "hui:add", -1, this, &TsunamiWindow::onAddPause);
-	HuiAddCommandM("delete_bar", "hui:delete", -1, this, &TsunamiWindow::onDeleteBars);
-	HuiAddCommandM("edit_selected_bars", "hui:edit", -1, this, &TsunamiWindow::onEditBars);
-	HuiAddCommandM("scale_selected_bars", "hui:scale", -1, this, &TsunamiWindow::onScaleBars);
+	HuiAddCommandM("delete_bars", "hui:delete", -1, this, &TsunamiWindow::onDeleteBars);
+	HuiAddCommandM("edit_bars", "hui:edit", -1, this, &TsunamiWindow::onEditBars);
+	HuiAddCommandM("scale_bars", "hui:scale", -1, this, &TsunamiWindow::onScaleBars);
 	HuiAddCommandM("bar_link_to_data", "", -1, this, &TsunamiWindow::onBarsModifyMidi);
 	HuiAddCommandM("sample_manager", "", -1, this, &TsunamiWindow::onSampleManager);
 	HuiAddCommandM("song_edit_samples", "", -1, this, &TsunamiWindow::onSampleManager);
@@ -695,9 +697,9 @@ void TsunamiWindow::updateMenu()
 	enable("level_up", view->cur_level < song->level_names.num -1);
 	enable("level_down", view->cur_level > 0);
 	// bars
-	enable("delete_bar", !view->sel.bars.empty());
-	enable("edit_selected_bars", !view->sel.bars.empty());
-	enable("scale_selected_bars", !view->sel.bars.empty());
+	enable("delete_bars", !view->sel.bars.empty());
+	enable("edit_bars", !view->sel.bars.empty());
+	enable("scale_bars", !view->sel.bars.empty());
 	check("bar_link_to_data", view->bars_edit_data);
 	// sample
 	enable("sample_from_selection", selected);
@@ -799,7 +801,9 @@ void TsunamiWindow::onAddBars()
 
 void TsunamiWindow::onAddPause()
 {
-	int s = getInt(id);
+	int s = view->sel.bars.start();
+	if (view->sel.bars.empty())
+		s = 0;
 
 	song->addPause(s, 2.0f, view->bars_edit_data);
 }
@@ -861,7 +865,11 @@ void TsunamiWindow::onEditBars()
 
 void TsunamiWindow::onScaleBars()
 {
-	//view->mode_bars->startScaling(getSelection(id));
+	view->setMode(view->mode_scale_bars);
+	Set<int> s;
+	for (int i=view->sel.bars.start(); i<view->sel.bars.end(); i++)
+		s.add(i);
+	view->mode_scale_bars->startScaling(s);
 }
 
 void TsunamiWindow::onBarsModifyMidi()

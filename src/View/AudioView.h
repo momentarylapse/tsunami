@@ -28,7 +28,7 @@ class PeakThread;
 class ViewMode;
 class ViewModeDefault;
 class ViewModeMidi;
-class ViewModeBars;
+class ViewModeScaleBars;
 class ViewModeCurve;
 class ViewModeCapture;
 
@@ -151,7 +151,7 @@ public:
 	void setMode(ViewMode *m);
 	ViewModeDefault *mode_default;
 	ViewModeMidi *mode_midi;
-	ViewModeBars *mode_bars;
+	ViewModeScaleBars *mode_scale_bars;
 	ViewModeCurve *mode_curve;
 	ViewModeCapture *mode_capture;
 

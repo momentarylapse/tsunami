@@ -7,11 +7,11 @@
 
 #include "../../Data/Song.h"
 #include "../AudioView.h"
-#include "../Mode/ViewModeBars.h"
 #include "../Mode/ViewModeDefault.h"
 #include "../Dialog/BarAddDialog.h"
 #include "../Dialog/BarEditDialog.h"
 #include "BarsConsole.h"
+#include "../Mode/ViewModeScaleBars.h"
 
 BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	SideBarConsole(_("Bars")),
@@ -30,8 +30,6 @@ BarsConsole::BarsConsole(Song *_song, AudioView *_view) :
 	id_scale = "scale_selected_bars";
 	id_link = "link_to_midi";
 
-	view->mode_bars->modify_midi = true;
-	check(id_link, view->mode_bars->modify_midi);
 	enable(id, true);
 	enable(id_add, true);
 	enable(id_add_pause, true);
@@ -172,65 +170,16 @@ void BarsConsole::onListEdit()
 
 void BarsConsole::onAdd()
 {
-	addNewBar();
 }
 
 
 void BarsConsole::onAddPause()
 {
-	int s = getInt(id);
-
-	song->addPause(s, 2.0f, isChecked(id_link));
 }
 
 
 void BarsConsole::onDelete()
 {
-	Array<int> s = getSelection(id);
-	song->action_manager->beginActionGroup();
-
-	foreachb(int i, s){
-
-		int pos = 0;
-		for (int j=0; j<i; j++)
-			pos += song->bars[j].length;
-
-		BarPattern b = song->bars[i];
-		int l0 = b.length;
-		Range r = Range(pos, l0);
-		if (isChecked(id_link)){
-			for (Track *t : song->tracks){
-				/*if (t->type != t->TYPE_MIDI)
-					continue;*/
-				Set<int> del;
-				Array<MidiNote> add;
-				Set<int> del_marker;
-				foreachi(MidiNote &n, t->midi, j){
-					if (n.range.end() <= pos){
-					}else if (n.range.offset >= pos + l0){
-						/*MidiNote n2 = n;
-						n2.range.offset -= l0;
-						add.add(n2);
-						del.add(j);*/
-					}else{
-						del.add(j);
-					}
-				}
-				foreachi(TrackMarker &m, t->markers, i)
-					if (r.is_inside(m.pos))
-						del_marker.add(i);
-
-				foreachb(int j, del)
-					t->deleteMidiNote(j);
-				/*foreach(MidiNote &n, add)
-					t->addMidiNote(n);*/
-				foreachb(int j, del_marker)
-					t->deleteMarker(j);
-			}
-		}
-		song->deleteBar(i, isChecked(id_link));
-	}
-	song->action_manager->endActionGroup();
 }
 
 void BarsConsole::onEdit()
@@ -239,12 +188,10 @@ void BarsConsole::onEdit()
 
 void BarsConsole::onScale()
 {
-	view->mode_bars->startScaling(getSelection(id));
 }
 
 void BarsConsole::onModifyMidi()
 {
-	view->mode_bars->modify_midi = isChecked(id_link);
 }
 
 void BarsConsole::addNewBar()
@@ -269,21 +216,12 @@ void BarsConsole::selectFromView()
 
 void BarsConsole::onEnter()
 {
-	view->setMode(view->mode_bars);
 }
 
 void BarsConsole::onLeave()
 {
-	view->setMode(view->mode_default);
 }
 
 void BarsConsole::onUpdate(Observable *o, const string &message)
 {
-	if (o == view){
-		if (!view->mode_bars->scaling)
-			selectFromView();
-	}else if (o == song){
-		fillList();
-	}
-	updateMessage();
 }

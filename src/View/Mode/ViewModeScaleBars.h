@@ -1,36 +1,36 @@
 /*
- * ViewModeBars.h
+ * ViewModeScaleBars.h
  *
  *  Created on: 13.11.2015
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_MODE_VIEWMODEBARS_H_
-#define SRC_VIEW_MODE_VIEWMODEBARS_H_
+#ifndef SRC_VIEW_MODE_VIEWMODESCALEBARS_H_
+#define SRC_VIEW_MODE_VIEWMODESCALEBARS_H_
 
 #include "ViewModeDefault.h"
 #include "../../Data/Range.h"
 #include "../../lib/base/base.h"
 
-class ViewModeBars : public ViewModeDefault
+class ViewModeScaleBars : public ViewModeDefault
 {
 public:
-	ViewModeBars(AudioView *view);
-	virtual ~ViewModeBars();
+	ViewModeScaleBars(AudioView *view);
+	virtual ~ViewModeScaleBars();
 
 	virtual void onLeftButtonUp();
+	virtual void onRightButtonDown();
 	virtual void onMouseMove();
+	virtual void onKeyDown(int k);
 
 	virtual void drawPost(Painter *c);
 
 	void startScaling(const Array<int> &sel);
 	void performScale();
 
-	bool scaling;
 	bool scaling_change;
-	bool modify_midi;
 	Array<int> scaling_sel;
 	Range scaling_range_orig;
 };
 
-#endif /* SRC_VIEW_MODE_VIEWMODEBARS_H_ */
+#endif /* SRC_VIEW_MODE_VIEWMODESCALEBARS_H_ */

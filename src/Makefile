@@ -258,12 +258,11 @@ OBJ = \
  View/Helper/Progress.o\
  View/Helper/Slider.o\
  View/Mode/ViewMode.o\
- View/Mode/ViewModeBars.o\
  View/Mode/ViewModeCapture.o\
  View/Mode/ViewModeCurve.o\
  View/Mode/ViewModeDefault.o\
  View/Mode/ViewModeMidi.o\
- View/SideBar/BarsConsole.o\
+ View/Mode/ViewModeScaleBars.o\
  View/SideBar/CaptureConsole.o\
  View/SideBar/CurveConsole.o\
  View/SideBar/FxConsole.o\
@@ -1056,9 +1055,6 @@ View/Helper/Slider.o : View/Helper/Slider.cpp
 View/Mode/ViewMode.o : View/Mode/ViewMode.cpp
 	$(CPP) -c View/Mode/ViewMode.cpp -o $@ $(CXXFLAGS)
 
-View/Mode/ViewModeBars.o : View/Mode/ViewModeBars.cpp
-	$(CPP) -c View/Mode/ViewModeBars.cpp -o $@ $(CXXFLAGS)
-
 View/Mode/ViewModeCapture.o : View/Mode/ViewModeCapture.cpp
 	$(CPP) -c View/Mode/ViewModeCapture.cpp -o $@ $(CXXFLAGS)
 
@@ -1071,8 +1067,8 @@ View/Mode/ViewModeDefault.o : View/Mode/ViewModeDefault.cpp
 View/Mode/ViewModeMidi.o : View/Mode/ViewModeMidi.cpp
 	$(CPP) -c View/Mode/ViewModeMidi.cpp -o $@ $(CXXFLAGS)
 
-View/SideBar/BarsConsole.o : View/SideBar/BarsConsole.cpp
-	$(CPP) -c View/SideBar/BarsConsole.cpp -o $@ $(CXXFLAGS)
+View/Mode/ViewModeScaleBars.o : View/Mode/ViewModeScaleBars.cpp
+	$(CPP) -c View/Mode/ViewModeScaleBars.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/CurveCapture.o : View/SideBar/CurveCapture.cpp
 	$(CPP) -c View/SideBar/CurveCapture.cpp -o $@ $(CXXFLAGS)

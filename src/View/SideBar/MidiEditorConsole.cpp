@@ -19,6 +19,7 @@
 #include "../BottomBar/BottomBar.h"
 #include "MidiEditorConsole.h"
 
+int get_track_index_save(Song *song, Track *t);
 
 
 MidiEditorConsole::MidiEditorConsole(AudioView *_view, Song *_song) :
@@ -87,7 +88,8 @@ void MidiEditorConsole::update()
 {
 	bool allow = false;
 	if (view->cur_track)
-		allow = (view->cur_track->type == Track::TYPE_MIDI);
+		if (get_track_index_save(view->song, view->cur_track) >= 0)
+			allow = (view->cur_track->type == Track::TYPE_MIDI);
 	hideControl("me_grid_yes", !allow);
 	hideControl("me_grid_no", allow);
 	hideControl(id_inner, !allow);

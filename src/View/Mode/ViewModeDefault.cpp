@@ -353,7 +353,7 @@ void ViewModeDefault::setBarriers(Selection *s)
 		}
 
 		// time bar...
-		Array<Beat> beats = song->bars.getBeats(cam->range());
+		Array<Beat> beats = song->bars.getBeats(cam->range(), true);
 		for (Beat &b : beats)
 			s->barrier.add(b.range.offset);
 	}

@@ -19,8 +19,6 @@ PauseAddDialog::PauseAddDialog(HuiWindow *root, Song *s, AudioView *v):
 
 	setFloat("duration", 1.0f);
 
-	check("insert:after", true);
-
 	event("ok", this, &PauseAddDialog::onOk);
 	event("cancel", this, &PauseAddDialog::onClose);
 	event("hui:close", this, &PauseAddDialog::onClose);
@@ -29,28 +27,15 @@ PauseAddDialog::PauseAddDialog(HuiWindow *root, Song *s, AudioView *v):
 void PauseAddDialog::onOk()
 {
 	float duration = getFloat("duration");
-	bool after = isChecked("insert:after");
 	song->action_manager->beginActionGroup();
 
 	if (!song->getTimeTrack())
 		song->addTrack(Track::TYPE_TIME, 0);
 
-	int index = 0;
-	if (after){
-		if (bars.length > 0)
-			index = bars.end();
-	}else{
-		if (bars.length > 0)
-			index = bars.start();
-	}
+	int index = max(0, bars.end());
 
 	song->addPause(index, duration, view->bars_edit_data);
 	song->action_manager->endActionGroup();
-
-	if (!after){
-		view->sel_raw.offset += song->bars[index].length;
-		view->updateSelection();
-	}
 
 	delete(this);
 }

@@ -35,7 +35,7 @@ float Bar::bpm(float sample_rate)
 	return 60.0f / (float)range.length * (float)num_beats * sample_rate;
 }
 
-Array<Beat> BarCollection::getBeats(const Range &r)
+Array<Beat> BarCollection::getBeats(const Range &r, bool include_hidden)
 {
 	Array<Beat> beats;
 
@@ -52,8 +52,12 @@ Array<Beat> BarCollection::getBeats(const Range &r)
 			pos0 += b.length;
 			bar_no ++;
 		}else if (b.type == b.TYPE_PAUSE){
+			if (include_hidden)
+				beats.add(Beat(Range(pos0, b.length), -1, 0));
 			pos0 += b.length;
 		}
+	if (include_hidden and (num > 0))
+		beats.add(Beat(Range(pos0, 0), -1, 0));
 	return beats;
 }
 

@@ -49,7 +49,7 @@ public:
 class BarCollection : public Array<BarPattern>
 {
 public:
-	Array<Beat> getBeats(const Range &r);
+	Array<Beat> getBeats(const Range &r, bool include_hidden = false);
 	Array<Bar> getBars(const Range &r);
 	int getNextBeat(int pos);
 	Range getRange();

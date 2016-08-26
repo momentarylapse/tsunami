@@ -62,6 +62,8 @@ void SongSelection::fromRange(Song* s, const Range &r)
 
 void SongSelection::update_bars(Song* s)
 {
+	bars.clear();
+	bar_range.clear();
 
 	int pos = 0;
 	bool first = true;
@@ -75,8 +77,15 @@ void SongSelection::update_bars(Song* s)
 			bars.set_end(i+1);
 			bar_range.set_end(r.end() + 1);
 			first = false;
+		}else if (range.length == 0 and (range.offset == pos)){
+			bars = Range(i, 0);
+			bar_range = Range(pos, 0);
 		}
 		pos += b.length;
+	}
+	if (range.start() >= pos){
+		bars = Range(s->bars.num, 0);
+		bar_range = Range(pos, 0);
 	}
 }
 

@@ -681,8 +681,10 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(colors.selection_internal);
 	foreachi(AudioViewTrack *t, vtrack, i)
-		if (t->track->type == Track::TYPE_TIME)
+		if (t->track->type == Track::TYPE_TIME){
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
+			c->drawRect(rect(sxx2 - 5, sxx2 + 5, t->area.y1, t->area.y2));
+		}
 	/*drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
 	drawTimeLine(c, sel_raw.end(), Selection::TYPE_SELECTION_END, colors.selection_boundary);*/
 }

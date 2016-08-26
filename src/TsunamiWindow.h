@@ -41,6 +41,7 @@ public:
 
 	void onCopy();
 	void onPaste();
+	void onPasteAsSamples();
 	void onDelete();
 	void onEditMulti();
 	void onExport();

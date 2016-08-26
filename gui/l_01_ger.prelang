@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-338
+339
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -65,6 +65,9 @@ OK
 
 /paste
 Einfügen
+
+/paste_as_samples
+Als Samples einfügen
 
 /pause
 Pause
@@ -1018,7 +1021,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-139
+140
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1078,6 +1081,8 @@ Can not load MidiEffect: \"%s\"
 MidiEffekt nicht ladbar: \"%s\"
 Can only delete samples which are unused.
 Kann nur Samples löschen, die nicht benutzt werden!
+Can only edit bars or a single pause at a time.
+Kann entweder Takte oder eine einzelne Pause editieren.
 Can't execute plugin on an empty audio file
 Plugin kann nicht für eine leere Audiodatei ausgeführt werden
 Can't find plugin: %s ...

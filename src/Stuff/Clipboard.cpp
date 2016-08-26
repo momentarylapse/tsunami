@@ -8,11 +8,12 @@
 #include "Clipboard.h"
 #include "../View/AudioView.h"
 #include "../Action/Track/Sample/ActionTrackPasteAsSample.h"
+#include "../Action/Track/Buffer/ActionTrackEditBuffer.h"
 #include "../Tsunami.h"
 #include "../Stuff/Log.h"
-#include <assert.h>
 #include "../Data/Song.h"
 #include "../Data/SongSelection.h"
+#include <assert.h>
 
 Clipboard::Clipboard() :
 	Observable("Clipboard")
@@ -79,6 +80,25 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 	Song *s = target->song;
 	Track *source = temp->tracks[source_index];
 
+	if (target->type == Track::TYPE_AUDIO){
+		Range r = Range(view->sel.range.start(), source->levels[0].buffers[0].length);
+		BufferBox buf = target->getBuffers(view->cur_level, r);
+		Action *a = new ActionTrackEditBuffer(target, view->cur_level, r);
+		buf.set(source->levels[0].buffers[0], 0, 1.0f);
+		s->execute(a);
+	}else if (target->type == Track::TYPE_MIDI){
+		for (MidiNote &n : source->midi){
+			n.range.offset += view->sel.range.start();
+			target->addMidiNote(n);
+		}
+	}
+}
+
+void Clipboard::paste_track_as_samples(int source_index, Track *target, AudioView *view)
+{
+	Song *s = target->song;
+	Track *source = temp->tracks[source_index];
+
 	int ref_index = s->get_sample_by_uid(ref_uid[source_index]);
 	if (ref_index >= 0){
 		target->addSample(view->sel.range.start(), ref_index);
@@ -93,14 +113,10 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 	}
 }
 
-void Clipboard::paste(AudioView *view)
+bool Clipboard::test_compatibility(AudioView *view, bool *paste_single)
 {
-	if (!hasData())
-		return;
-	Song *a = view->song;
-
 	Array<string> temp_type, dest_type;
-	for (Track *t : a->tracks){
+	for (Track *t : view->song->tracks){
 		if (!view->sel.has(t))
 			continue;
 		if (t->type == Track::TYPE_TIME)
@@ -112,31 +128,43 @@ void Clipboard::paste(AudioView *view)
 		temp_type.add(track_type(t->type));
 
 	// only 1 track in clipboard => paste into current
-	bool paste_single = (temp->tracks.num == 1);
-	if (paste_single){
+	*paste_single = (temp->tracks.num == 1);
+	if (*paste_single){
 		dest_type.clear();
 		dest_type.add(track_type(view->cur_track->type));
 	}
 
 	if (dest_type.num != temp->tracks.num){
 		tsunami->log->error(format(_("%d tracks selected for pasting (ignoring the metronome), but %d tracks in clipboard"), dest_type.num, temp->tracks.num));
-		return;
+		return false;
 	}
 	string t1 = "[" + implode(temp_type, ", ") + "]";
 	string t2 = "[" + implode(dest_type, ", ") + "]";
 	if (t1 != t2){
 		tsunami->log->error(format(_("Track types in clipboard (%s) don't match those you want to paste into (%s)"), t1.c_str(), t2.c_str()));
-		return;
+		return false;
 	}
+	return true;
+}
+
+void Clipboard::paste(AudioView *view)
+{
+	if (!hasData())
+		return;
+	Song *s = view->song;
+
+	bool paste_single;
+	if (!test_compatibility(view, &paste_single))
+		return;
 
 
-	a->action_manager->beginActionGroup();
+	s->action_manager->beginActionGroup();
 
 	if (paste_single){
 		paste_track(0, view->cur_track, view);
 	}else{
 		int ti = 0;
-		for (Track *t : a->tracks){
+		for (Track *t : s->tracks){
 			if (!view->sel.has(t))
 				continue;
 			if (t->type == Track::TYPE_TIME)
@@ -146,7 +174,37 @@ void Clipboard::paste(AudioView *view)
 			ti ++;
 		}
 	}
-	a->action_manager->endActionGroup();
+	s->action_manager->endActionGroup();
+}
+
+void Clipboard::pasteAsSamples(AudioView *view)
+{
+	if (!hasData())
+		return;
+	Song *s = view->song;
+
+	bool paste_single;
+	if (!test_compatibility(view, &paste_single))
+		return;
+
+
+	s->action_manager->beginActionGroup();
+
+	if (paste_single){
+		paste_track_as_samples(0, view->cur_track, view);
+	}else{
+		int ti = 0;
+		for (Track *t : s->tracks){
+			if (!view->sel.has(t))
+				continue;
+			if (t->type == Track::TYPE_TIME)
+				continue;
+
+			paste_track_as_samples(ti, t, view);
+			ti ++;
+		}
+	}
+	s->action_manager->endActionGroup();
 }
 
 bool Clipboard::hasData()

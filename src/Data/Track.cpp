@@ -204,7 +204,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 	// create own...
 	buf.resize(r.length);
 
-	// fill with overlapp
+	// fill with overlap
 	for (TrackLevel &l : levels)
 		for (BufferBox &b : l.buffers)
 			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);

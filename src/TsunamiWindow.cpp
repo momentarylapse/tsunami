@@ -80,6 +80,7 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("save_as", "hui:save-as", KEY_S + KEY_CONTROL + KEY_SHIFT, this, &TsunamiWindow::onSaveAs);
 	HuiAddCommandM("copy", "hui:copy", KEY_C + KEY_CONTROL, this, &TsunamiWindow::onCopy);
 	HuiAddCommandM("paste", "hui:paste", KEY_V + KEY_CONTROL, this, &TsunamiWindow::onPaste);
+	HuiAddCommandM("paste_as_samples", "hui:paste", KEY_V + KEY_CONTROL + KEY_SHIFT, this, &TsunamiWindow::onPasteAsSamples);
 	HuiAddCommandM("delete", "hui:delete", -1, this, &TsunamiWindow::onDelete);
 	HuiAddCommandM("edit_multi", "", -1, this, &TsunamiWindow::onEditMulti);
 	HuiAddCommandM("export_selection", "", KEY_X + KEY_CONTROL, this, &TsunamiWindow::onExport);
@@ -396,6 +397,11 @@ void TsunamiWindow::onCopy()
 void TsunamiWindow::onPaste()
 {
 	tsunami->clipboard->paste(view);
+}
+
+void TsunamiWindow::onPasteAsSamples()
+{
+	tsunami->clipboard->pasteAsSamples(view);
 }
 
 void TsunamiWindow::onEditMulti()

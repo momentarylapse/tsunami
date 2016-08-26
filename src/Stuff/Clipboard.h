@@ -21,10 +21,14 @@ public:
 
 	void copy(AudioView *view);
 	void paste(AudioView *view);
+	void pasteAsSamples(AudioView *view);
+
+	bool test_compatibility(AudioView *view, bool *paste_single);
 
 	void clear();
 	void append_track(Track *t, AudioView *view);
 	void paste_track(int source_index, Track *target, AudioView *view);
+	void paste_track_as_samples(int source_index, Track *target, AudioView *view);
 	bool hasData();
 	bool canCopy(AudioView *view);
 

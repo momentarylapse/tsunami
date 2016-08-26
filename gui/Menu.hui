@@ -22,6 +22,7 @@ Menu menu "" disabled
 		Separator
 		Item /copy "Copy" image=hui:copy
 		Item /paste "Paste" image=hui:paste
+		Item /paste_as_samples "Paste as samples" image=hui:paste
 		Item /delete "Delete" image=hui:delete
 		Separator
 		Item /settings "Settings" image=hui:preferences

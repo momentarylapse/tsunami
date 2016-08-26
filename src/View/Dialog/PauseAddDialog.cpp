@@ -7,14 +7,15 @@
 
 #include "PauseAddDialog.h"
 #include "../../Data/Song.h"
+#include "../AudioView.h"
 
-PauseAddDialog::PauseAddDialog(HuiWindow *root, Song *_s, const Range &_bars, bool _apply_to_midi):
+PauseAddDialog::PauseAddDialog(HuiWindow *root, Song *s, AudioView *v):
 	HuiDialog("", 100, 100, root, false)
 {
 	fromResource("pause_add_dialog");
-	song = _s;
-	bars = _bars;
-	apply_to_midi = _apply_to_midi;
+	song = s;
+	view = v;
+	bars = view->sel.bars;
 
 	setFloat("duration", 1.0f);
 
@@ -31,6 +32,9 @@ void PauseAddDialog::onOk()
 	bool after = isChecked("insert:after");
 	song->action_manager->beginActionGroup();
 
+	if (!song->getTimeTrack())
+		song->addTrack(Track::TYPE_TIME, 0);
+
 	int index = 0;
 	if (after){
 		if (bars.length > 0)
@@ -40,8 +44,13 @@ void PauseAddDialog::onOk()
 			index = bars.start();
 	}
 
-	song->addPause(index, duration, apply_to_midi);
+	song->addPause(index, duration, view->bars_edit_data);
 	song->action_manager->endActionGroup();
+
+	if (!after){
+		view->sel_raw.offset += song->bars[index].length;
+		view->updateSelection();
+	}
 
 	delete(this);
 }

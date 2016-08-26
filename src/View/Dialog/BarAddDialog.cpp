@@ -7,14 +7,15 @@
 
 #include "BarAddDialog.h"
 #include "../../Data/Song.h"
+#include "../AudioView.h"
 
-BarAddDialog::BarAddDialog(HuiWindow *root, Song *_s, const Range &_bars, bool _apply_to_midi):
+BarAddDialog::BarAddDialog(HuiWindow *root, Song *s, AudioView *v):
 	HuiDialog("", 100, 100, root, false)
 {
 	fromResource("bar_add_dialog");
-	song = _s;
-	bars = _bars;
-	apply_to_midi = _apply_to_midi;
+	song = s;
+	view = v;
+	bars = view->sel.bars;
 
 	// no reference bar selected -> use last bar
 	int ref = bars.start();
@@ -51,6 +52,9 @@ void BarAddDialog::onOk()
 	bool after = isChecked("insert:after");
 	song->action_manager->beginActionGroup();
 
+	if (!song->getTimeTrack())
+		song->addTrack(Track::TYPE_TIME, 0);
+
 	int index = 0;
 	if (after){
 		if (bars.length > 0)
@@ -61,8 +65,13 @@ void BarAddDialog::onOk()
 	}
 
 	for (int i=0; i<count; i++)
-		song->addBar(index, bpm, beats, apply_to_midi);
+		song->addBar(index, bpm, beats, view->bars_edit_data);
 	song->action_manager->endActionGroup();
+
+	if (!after){
+		view->sel_raw.offset += song->bars[index].length * count;
+		view->updateSelection();
+	}
 
 	delete(this);
 }

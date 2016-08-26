@@ -796,14 +796,14 @@ void TsunamiWindow::onExport()
 
 void TsunamiWindow::onAddBars()
 {
-	HuiDialog *dlg = new BarAddDialog(win, song, view->sel.bars, view->bars_edit_data);
-	dlg->show();
+	HuiDialog *dlg = new BarAddDialog(win, song, view);
+	dlg->run();
 }
 
 void TsunamiWindow::onAddPause()
 {
-	HuiDialog *dlg = new PauseAddDialog(win, song, view->sel.bars, view->bars_edit_data);
-	dlg->show();
+	HuiDialog *dlg = new PauseAddDialog(win, song, view);
+	dlg->run();
 }
 
 void TsunamiWindow::onDeleteBars()

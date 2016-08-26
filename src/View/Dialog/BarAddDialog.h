@@ -12,15 +12,16 @@
 #include "../../Data/Range.h"
 
 class Song;
+class AudioView;
 
 class BarAddDialog : public HuiDialog
 {
 public:
 	Song *song;
+	AudioView *view;
 	Range bars;
-	bool apply_to_midi;
 
-	BarAddDialog(HuiWindow *root, Song *s, const Range &bars, bool apply_to_midi);
+	BarAddDialog(HuiWindow *root, Song *s, AudioView *v);
 	void onOk();
 	void onClose();
 };

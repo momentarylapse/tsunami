@@ -115,13 +115,13 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 	make_silence(buf, range_cur.length);
 
-	Array<Beat> beats = song->bars.getBeats(range_cur);
+	Array<Beat> beats = song->bars.getBeats(range_cur, false, true);
 
 	MidiRawData raw;
 	raw.samples = buf.length;
 
 	for (Beat &b : beats)
-		raw.addMetronomeClick(b.range.offset - range_cur.offset, (b.beat_no == 0) ? 0 : 1, 0.8f);
+		raw.addMetronomeClick(b.range.offset - range_cur.offset, b.level, 0.8f);
 
 	midi_streamer->setData(raw);
 	t->synth->read(buf, midi_streamer);

@@ -19,27 +19,32 @@ BarEditDialog::BarEditDialog(HuiWindow *root, Song *_song, const Range &_bars, b
 
 	BarPattern &b = song->bars[sel[0]];
 	setInt("beats", b.num_beats);
+	setInt("sub_beats", b.sub_beats);
 	setFloat("bpm", song->sample_rate * 60.0f / (b.length / b.num_beats));
-	//check("edit_bpm", true);
 
 	event("ok", this, &BarEditDialog::onOk);
 	event("cancel", this, &BarEditDialog::onClose);
 	event("hui:close", this, &BarEditDialog::onClose);
 	event("beats", this, &BarEditDialog::onBeats);
+	event("sub_beats", this, &BarEditDialog::onSubBeats);
 	event("bpm", this, &BarEditDialog::onBpm);
 }
 
 void BarEditDialog::onOk()
 {
 	int beats = getInt("beats");
+	int sub_beats = getInt("sub_beats");
 	float bpm = getFloat("bpm");
 	bool edit_beats = isChecked("edit_beats");
+	bool edit_sub_beats = isChecked("edit_sub_beats");
 	bool edit_bpm = isChecked("edit_bpm");
 	song->action_manager->beginActionGroup();
 	foreachb(int i, sel){
 		BarPattern b = song->bars[i];
 		if (edit_beats)
 			b.num_beats = beats;
+		if (edit_sub_beats)
+			b.sub_beats = sub_beats;
 		if (edit_bpm)
 			b.length = song->sample_rate * 60.0f * b.num_beats / bpm;
 		song->editBar(i, b, apply_to_midi);
@@ -57,6 +62,11 @@ void BarEditDialog::onClose()
 void BarEditDialog::onBeats()
 {
 	check("edit_beats", true);
+}
+
+void BarEditDialog::onSubBeats()
+{
+	check("edit_sub_beats", true);
 }
 
 void BarEditDialog::onBpm()

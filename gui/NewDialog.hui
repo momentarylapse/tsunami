@@ -1,4 +1,4 @@
-Dialog new_dialog "Neue Datei" 250 80
+Dialog new_dialog "New file" 250 80
 	Grid ? "" 1 4
 		Group nd_g_frequency "Samplerate"
 			Grid ? "" 2 1
@@ -20,6 +20,9 @@ Dialog new_dialog "Neue Datei" 250 80
 					.
 					Text nd_t_beats "Beats per bar"
 					SpinButton beats_per_bar "4\\1\\99"
+					.
+					Text t_sub_beats "Sub beats per beat"
+					SpinButton sub_beats "4\\1\\24"
 					.
 		Grid ? "" 2 1 buttonbar
 			Button /cancel "Cancel" image=hui:cancel

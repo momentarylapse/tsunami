@@ -250,7 +250,7 @@ void TsunamiWindow::onAddTimeTrack()
 	song->addTrack(Track::TYPE_TIME);
 	// some default data
 	for (int i=0; i<10; i++)
-		song->addBar(-1, 90, 4, false);
+		song->addBar(-1, 90, 4, 1, false);
 	song->action_manager->endActionGroup();
 }
 

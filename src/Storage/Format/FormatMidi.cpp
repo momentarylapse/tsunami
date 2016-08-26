@@ -109,7 +109,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 				int dt = (double)v * (double)mpqn / 1000000.0 * (double)od->song->sample_rate / (double)ticks_per_beat;
 				offset += dt;
 				while (offset > last_bar){
-					od->song->addBar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, false);
+					od->song->addBar(-1, 60000000.0f / (float)mpqn / 4 * (float)denominator, numerator, 1, false);
 					last_bar = od->song->bars.getRange().end();
 				}
 				int c0 = f->ReadByte();

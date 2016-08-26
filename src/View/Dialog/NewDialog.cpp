@@ -20,6 +20,8 @@ NewDialog::NewDialog(HuiWindow *_parent, Song *s):
 	hideControl("nd_g_metronome_params", true);
 
 	setInt("num_bars", 32);
+	setInt("beats_per_bar", 4);
+	setInt("sub_beats", 1);
 
 	event("cancel", this, &NewDialog::onClose);
 	event("hui:close", this, &NewDialog::onClose);
@@ -47,7 +49,7 @@ void NewDialog::onOk()
 		Track *t = song->addTrack(Track::TYPE_TIME, 0);
 		int count = getInt("num_bars");
 		for (int i=0; i<count; i++)
-			song->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), false);
+			song->addBar(-1, getFloat("beats_per_minute"), getInt("beats_per_bar"), getInt("sub_beats"), false);
 	}
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);

@@ -438,10 +438,11 @@ void Song::createSamplesFromSelection(const SongSelection &sel, int level_no)
 		execute(new ActionTrackSampleFromSelection(this, sel, level_no));
 }
 
-void Song::addBar(int index, float bpm, int beats, bool affect_midi)
+void Song::addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi)
 {
 	BarPattern b;
 	b.num_beats = beats;
+	b.sub_beats = sub_beats;
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
@@ -454,6 +455,7 @@ void Song::addPause(int index, float time, bool affect_midi)
 {
 	BarPattern b;
 	b.num_beats = 0;
+	b.sub_beats = 1;
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)sample_rate * time);
 	if (index >= 0)

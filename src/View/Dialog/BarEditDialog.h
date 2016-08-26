@@ -24,6 +24,7 @@ public:
 	void onOk();
 	void onClose();
 	void onBeats();
+	void onSubBeats();
 	void onBpm();
 };
 

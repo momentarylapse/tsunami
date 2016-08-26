@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-339
+345
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -132,6 +132,12 @@ danach
 bar_add_dialog/insert:before
 davor
 
+bar_add_dialog/sub_beats
+1\\1\\24\\1
+
+bar_add_dialog/t_sub_beats
+Teil-Schläge
+
 bar_edit_dialog/bar_edit_dialog
 Takte bearbeiten
 
@@ -146,6 +152,12 @@ Schläge
 
 bar_edit_dialog/edit_bpm
 Bpm
+
+bar_edit_dialog/edit_sub_beats
+Teil-Schläge
+
+bar_edit_dialog/sub_beats
+1\\1\\24\\1
 
 bars_dialog/add_bar
 Takt
@@ -689,6 +701,12 @@ Midi
 
 new_dialog/num_bars
 10\\0\\999
+
+new_dialog/sub_beats
+4\\1\\24
+
+new_dialog/t_sub_beats
+Teil-Schläge pro Schlag
 
 pause_add_dialog/count
 

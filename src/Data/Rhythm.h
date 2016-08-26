@@ -15,6 +15,7 @@ class BarPattern
 {
 public:
 	int num_beats;
+	int sub_beats;
 	int length;
 	int type;
 
@@ -39,17 +40,18 @@ class Beat
 {
 public:
 	Beat(){}
-	Beat(const Range &r, int bar, int beat);
+	Beat(const Range &r, int bar, int beat, int level);
 	Range range;
 	int bar_no;
 	int beat_no;
+	int level;
 	Range sub(int index, int parts);
 };
 
 class BarCollection : public Array<BarPattern>
 {
 public:
-	Array<Beat> getBeats(const Range &r, bool include_hidden = false);
+	Array<Beat> getBeats(const Range &r, bool include_hidden = false, bool include_sub_beats = false);
 	Array<Bar> getBars(const Range &r);
 	int getNextBeat(int pos);
 	Range getRange();

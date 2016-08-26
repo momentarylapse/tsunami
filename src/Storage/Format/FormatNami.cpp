@@ -868,7 +868,9 @@ public:
 		if (b.type == BarPattern::TYPE_PAUSE)
 			b.num_beats = 0;
 		int count = f->ReadInt();
-		f->ReadInt(); // reserved
+		b.sub_beats = f->ReadInt();
+		if (b.sub_beats <= 0)
+			b.sub_beats = 1;
 		for (int i=0; i<count; i++)
 			parent->bars.add(b);
 	}
@@ -878,7 +880,7 @@ public:
 		f->WriteInt(me->length);
 		f->WriteInt(me->num_beats);
 		f->WriteInt(1);
-		f->WriteInt(0); // reserved
+		f->WriteInt(me->sub_beats);
 	}
 };
 

@@ -102,7 +102,7 @@ public:
 	void _cdecl addLevel(const string &name);
 	void _cdecl deleteLevel(int index, bool merge);
 	void _cdecl renameLevel(int index, const string &name);
-	void _cdecl addBar(int index, float bpm, int beats, bool affect_midi);
+	void _cdecl addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi);
 	void _cdecl addPause(int index, float time, bool affect_midi);
 	void _cdecl editBar(int index, BarPattern &p, bool affect_midi);
 	void _cdecl deleteBar(int index, bool affect_midi);

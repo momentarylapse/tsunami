@@ -257,7 +257,10 @@ void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, int shift
 	MidiDataRef notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
 	for (MidiNote &n : notes){
-		c->setColor(getPitchColor(n.pitch));
+		if (view->sel.has(&n))
+			c->setColor(Red);
+		else
+			c->setColor(getPitchColor(n.pitch));
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
 		x2 = max(x2, x1 + 4);
@@ -302,6 +305,8 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
 		float y = y0 - n.stringno * dy;
 
 		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
+		if (view->sel.has(&n))
+			col = Red;
 
 		// "shadow" to indicate length
 		if (x2 - x1 > r*2){
@@ -339,7 +344,7 @@ int AudioViewTrack::screen_to_clef_pos(float y)
 	return (int)floor((area.y2 - y - area.height() / 2) * 2.0f / clef_dy + 0.5f) + 4;
 }
 
-void AudioViewTrack::drawMidiNoteScore(Painter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef)
+void AudioViewTrack::drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiNoteState state, const Clef &clef)
 {
 	float r = clef_dy/2;
 
@@ -367,6 +372,8 @@ void AudioViewTrack::drawMidiNoteScore(Painter *c, const MidiNote &n, int shift,
 
 
 	color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
+	if (view->sel.has(&n))
+		col = Red;
 	if ((state == STATE_HOVER) or (state == STATE_REFERENCE))
 		col.a = 0.33f;
 

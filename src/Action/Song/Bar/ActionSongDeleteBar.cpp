@@ -6,46 +6,28 @@
  */
 
 #include "ActionSongDeleteBar.h"
+#include "ActionSong__DeleteBar.h"
+#include "ActionSong__ShiftData.h"
+#include "../ActionSongDeleteSelection.h"
 
-#include "../../../Data/Track.h"
+#include "../../../Data/Song.h"
+#include "../../../Data/SongSelection.h"
 #include <assert.h>
 
-ActionSongDeleteBar::ActionSongDeleteBar(int _index, bool _affect_midi)
+ActionSongDeleteBar::ActionSongDeleteBar(Song *s, int index, bool affect_midi)
 {
-	index = _index;
-	affect_midi = _affect_midi;
-}
+	assert(index >= 0 and index < s->bars.num);
 
-void *ActionSongDeleteBar::execute(Data *d)
-{
-	Song *s = dynamic_cast<Song*>(d);
-	assert(index >= 0);
-	assert(index < s->bars.num);
+	Range r = Range(s->barOffset(index), s->bars[index].length);
+	addSubAction(new ActionSong__DeleteBar(index), s);
 
 	if (affect_midi){
-		int pos0 = s->barOffset(index);
-		s->__shift_data(Range(pos0, s->bars[index].length), 0);
+		SongSelection sel;
+		sel.all_tracks(s);
+		sel.fromRange(s, r);
+		addSubAction(new ActionSongDeleteSelection(s, -1, sel, true), s);
+
+		addSubAction(new ActionSong__ShiftData(r.end(), - r.length), s);
+
 	}
-
-	bar = s->bars[index];
-	s->bars.erase(index);
-	s->notify(s->MESSAGE_EDIT_BARS);
-
-	return NULL;
 }
-
-void ActionSongDeleteBar::undo(Data *d)
-{
-	Song *s = dynamic_cast<Song*>(d);
-	assert(index >= 0);
-	assert(index <= s->bars.num);
-
-	if (affect_midi){
-		int pos0 = s->barOffset(index);
-		s->__shift_data(Range(pos0, 0), bar.length);
-	}
-
-	s->bars.insert(bar, index);
-	s->notify(s->MESSAGE_EDIT_BARS);
-}
-

@@ -19,9 +19,15 @@ void SongSelection::clear()
 	tracks.clear();
 	samples.clear();
 	markers.clear();
+	notes.clear();
 }
 
 void SongSelection::all(Song* s)
+{
+	all_tracks(s);
+}
+
+void SongSelection::all_tracks(Song* s)
 {
 	for (Track *t : s->tracks)
 		add(t);
@@ -31,11 +37,27 @@ void SongSelection::all(Song* s)
 void SongSelection::fromRange(Song* s, const Range &r)
 {
 	range = r;
+	if (range.length < 0)
+		range.invert();
+	markers.clear();
+	notes.clear();
+	samples.clear();
 
-	// subs
-	for (Track *t : s->tracks)
+	for (Track *t : s->tracks){
+		if (!has(t))
+			continue;
+		// subs
 		for (SampleRef *s : t->samples)
-			set(s, has(t) and range.overlaps(s->range()));
+			set(s, range.overlaps(s->range()));
+
+		// markers
+		for (TrackMarker &m : t->markers)
+			set(&m, range.is_inside(m.pos));
+
+		// midi
+		for (MidiNote &n : t->midi)
+			set(&n, range.is_inside(n.range.center()));
+	}
 }
 
 void SongSelection::update_bars(Song* s)
@@ -112,7 +134,41 @@ bool SongSelection::has(TrackMarker* m) const
 	return markers.contains(m);
 }
 
+void SongSelection::add(MidiNote* n)
+{
+	notes.add(n);
+}
+
+void SongSelection::set(MidiNote* n, bool selected)
+{
+	if (selected)
+		notes.add(n);
+	else
+		notes.erase(n);
+}
+
+bool SongSelection::has(MidiNote* n) const
+{
+	return notes.contains(n);
+}
+
 int SongSelection::getNumSamples() const
 {
 	return samples.num;
+}
+
+SongSelection SongSelection::restrict_to_track(Track *t) const
+{
+	SongSelection sel;
+	sel.range = range;
+	sel.bars = bars;
+	sel.bar_range = bar_range;
+	sel.set(t, true);
+	for (MidiNote &n : t->midi)
+		sel.set(&n, has(&n));
+	for (TrackMarker &m : t->markers)
+		sel.set(&m, has(&m));
+	for (SampleRef *r : t->samples)
+		sel.set(r, has(r));
+	return sel;
 }

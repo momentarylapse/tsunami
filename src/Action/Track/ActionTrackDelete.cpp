@@ -29,7 +29,3 @@ ActionTrackDelete::ActionTrackDelete(Song *a, int index)
 	// delete the track itself
 	addSubAction(new ActionTrack__DeleteEmpty(index), a);
 }
-
-ActionTrackDelete::~ActionTrackDelete()
-{
-}

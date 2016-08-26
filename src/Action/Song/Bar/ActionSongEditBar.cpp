@@ -6,39 +6,19 @@
  */
 
 #include "ActionSongEditBar.h"
+#include "ActionSong__EditBar.h"
+#include "ActionSong__ScaleData.h"
 
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionSongEditBar::ActionSongEditBar(int _index, BarPattern &_bar, bool _affect_midi)
+ActionSongEditBar::ActionSongEditBar(Song *s, int index, BarPattern &bar, bool affect_data)
 {
-	index = _index;
-	bar = _bar;
-	affect_midi = _affect_midi;
-}
+	Range r = Range(s->barOffset(index), s->bars[index].length);
+	addSubAction(new ActionSong__EditBar(index, bar), s);
+	if (affect_data){
+		addSubAction(new ActionSong__ScaleData(r, bar.length), s);
 
-void *ActionSongEditBar::execute(Data *d)
-{
-	Song *s = dynamic_cast<Song*>(d);
-	assert(index >= 0);
-	assert(index < s->bars.num);
-
-	if (affect_midi){
-		int pos = s->barOffset(index);
-		int l0 = s->bars[index].length;
-		s->__shift_data(Range(pos, l0), bar.length);
 	}
-
-	BarPattern temp = bar;
-	bar = s->bars[index];
-	s->bars[index] = temp;
-	s->notify(s->MESSAGE_EDIT_BARS);
-
-	return NULL;
-}
-
-void ActionSongEditBar::undo(Data *d)
-{
-	execute(d);
 }
 

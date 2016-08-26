@@ -247,7 +247,6 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));
 	Script::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
 	//Script::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));
-	Script::DeclareClassOffset("BarPattern", "is_selected", _offsetof(BarPattern, is_selected));
 
 	Script::DeclareClassSize("MidiNote", sizeof(MidiNote));
 	Script::DeclareClassOffset("MidiNote", "range", _offsetof(MidiNote, range));

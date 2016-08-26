@@ -14,8 +14,7 @@
 class ActionTrackDelete : public ActionGroup
 {
 public:
-	ActionTrackDelete(Song *a, int index);
-	virtual ~ActionTrackDelete();
+	ActionTrackDelete(Song *s, int index);
 };
 
 #endif /* ACTIONTRACKDELETET_H_ */

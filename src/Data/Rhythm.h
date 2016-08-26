@@ -22,10 +22,6 @@ public:
 		TYPE_BAR,
 		TYPE_PAUSE
 	};
-
-	// editing
-	bool is_selected;
-	int x, width;
 };
 
 class Bar

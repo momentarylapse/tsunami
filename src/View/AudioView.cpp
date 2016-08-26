@@ -305,10 +305,7 @@ void AudioView::selectionUpdatePos(Selection &s)
 
 void AudioView::updateSelection()
 {
-	sel.range = sel_raw;
-	if (sel.range.length < 0)
-		sel.range.invert();
-
+	sel.fromRange(song, sel_raw);
 
 	sel.update_bars(song);
 
@@ -991,11 +988,5 @@ SongSelection AudioView::getEditSeletion()
 	if (edit_multi)
 		return sel;
 
-	SongSelection s;
-	s.range = sel.range;
-	s.add(cur_track);
-	for (SampleRef *sample : cur_track->samples)
-		if (sel.has(sample))
-			s.add(sample);
-	return s;
+	return sel.restrict_to_track(cur_track);
 }

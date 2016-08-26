@@ -6,44 +6,28 @@
  */
 
 #include "ActionSongAddBar.h"
+#include "ActionSong__AddBar.h"
+#include "ActionSong__ShiftData.h"
+#include "../../Track/Buffer/ActionTrack__SplitBufferBox.h"
 
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionSongAddBar::ActionSongAddBar(int _index, BarPattern &_bar, bool _affect_midi)
+ActionSongAddBar::ActionSongAddBar(Song *s, int index, BarPattern &bar, bool affect_midi)
 {
-	index = _index;
-	bar = _bar;
-	affect_midi = _affect_midi;
-}
-
-void *ActionSongAddBar::execute(Data *d)
-{
-	Song *s = dynamic_cast<Song*>(d);
-	assert(index >= 0);
-	assert(index <= s->bars.num);
+	addSubAction(new ActionSong__AddBar(index, bar), s);
 
 	if (affect_midi){
 		int pos0 = s->barOffset(index);
-		s->__shift_data(Range(pos0, 0), bar.length);
+
+		for (Track *t : s->tracks)
+			for (int l=0; l<t->levels.num; l++)
+				for (int i=t->levels[l].buffers.num-1; i>=0; i--)
+					if (t->levels[l].buffers[i].range().is_more_inside(pos0))
+						addSubAction(new ActionTrack__SplitBufferBox(t, l, i, pos0 - t->levels[l].buffers[i].offset), s);
+
+		addSubAction(new ActionSong__ShiftData(pos0, bar.length), s);
+
 	}
-
-	s->bars.insert(bar, index);
-	s->notify(s->MESSAGE_EDIT_BARS);
-
-	return NULL;
-}
-
-void ActionSongAddBar::undo(Data *d)
-{
-	Song *s = dynamic_cast<Song*>(d);
-
-	if (affect_midi){
-		int pos0 = s->barOffset(index);
-		s->__shift_data(Range(pos0, bar.length), 0);
-	}
-
-	s->bars.erase(index);
-	s->notify(s->MESSAGE_EDIT_BARS);
 }
 

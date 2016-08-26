@@ -51,7 +51,7 @@ public:
 	void drawMidiTab(Painter *c, const MidiData &midi, int shift);
 	void drawMidiScore(Painter *c, const MidiData &midi, int shift);
 	void drawMidiScoreClef(Painter *c, const Clef &clef, const Scale &scale);
-	void drawMidiNoteScore(Painter *c, const MidiNote &n, int shift, MidiNoteState state, const Clef &clef);
+	void drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiNoteState state, const Clef &clef);
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 

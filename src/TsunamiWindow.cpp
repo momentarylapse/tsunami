@@ -808,48 +808,9 @@ void TsunamiWindow::onAddPause()
 
 void TsunamiWindow::onDeleteBars()
 {
-	//Array<int> s = getSelection(id);
 	song->action_manager->beginActionGroup();
 
 	for (int i=view->sel.bars.end()-1; i>=view->sel.bars.start(); i--){
-
-		int pos = 0;
-		for (int j=0; j<i; j++)
-			pos += song->bars[j].length;
-
-		BarPattern b = song->bars[i];
-		int l0 = b.length;
-		Range r = Range(pos, l0);
-		if (view->bars_edit_data){
-			for (Track *t : song->tracks){
-				/*if (t->type != t->TYPE_MIDI)
-					continue;*/
-				Set<int> del;
-				Array<MidiNote> add;
-				Set<int> del_marker;
-				foreachi(MidiNote &n, t->midi, j){
-					if (n.range.end() <= pos){
-					}else if (n.range.offset >= pos + l0){
-						/*MidiNote n2 = n;
-						n2.range.offset -= l0;
-						add.add(n2);
-						del.add(j);*/
-					}else{
-						del.add(j);
-					}
-				}
-				foreachi(TrackMarker &m, t->markers, i)
-					if (r.is_inside(m.pos))
-						del_marker.add(i);
-
-				foreachb(int j, del)
-					t->deleteMidiNote(j);
-				/*foreach(MidiNote &n, add)
-					t->addMidiNote(n);*/
-				foreachb(int j, del_marker)
-					t->deleteMarker(j);
-			}
-		}
 		song->deleteBar(i, view->bars_edit_data);
 	}
 	song->action_manager->endActionGroup();

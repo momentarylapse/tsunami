@@ -16,6 +16,7 @@ class Song;
 class Track;
 class SampleRef;
 class TrackMarker;
+class MidiNote;
 
 class SongSelection
 {
@@ -24,6 +25,7 @@ public:
 
 	void clear();
 	void all(Song *s);
+	void all_tracks(Song *s);
 	void fromRange(Song *s, const Range &r);
 	void update_bars(Song *s);
 
@@ -35,6 +37,7 @@ public:
 	Set<Track*> tracks;
 	Set<SampleRef*> samples;
 	Set<TrackMarker*> markers;
+	Set<MidiNote*> notes;
 
 	void add(Track *t);
 	void set(Track *t, bool selected);
@@ -48,7 +51,13 @@ public:
 	void set(TrackMarker *m, bool selected);
 	bool has(TrackMarker *m) const;
 
+	void add(MidiNote *n);
+	void set(MidiNote *n, bool selected);
+	bool has(MidiNote *n) const;
+
 	int getNumSamples() const;
+
+	SongSelection restrict_to_track(Track *t) const;
 };
 
 #endif /* SRC_DATA_SONGSELECTION_H_ */

@@ -3,6 +3,11 @@
 BIN = ../tsunami
 all : $(BIN)
 OBJ = \
+ Action/Song/Bar/ActionSong__AddBar.o\
+ Action/Song/Bar/ActionSong__DeleteBar.o\
+ Action/Song/Bar/ActionSong__EditBar.o\
+ Action/Song/Bar/ActionSong__ScaleData.o\
+ Action/Song/Bar/ActionSong__ShiftData.o\
  Action/Song/Bar/ActionSongAddBar.o\
  Action/Song/Bar/ActionSongDeleteBar.o\
  Action/Song/Bar/ActionSongEditBar.o\
@@ -293,6 +298,21 @@ CXXFLAGSLINKING = -std=c++11 `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lp
 
 $(BIN) : $(OBJ)
 	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
+
+Action/Song/Bar/ActionSong__AddBar.o : Action/Song/Bar/ActionSong__AddBar.cpp
+	$(CPP) -c Action/Song/Bar/ActionSong__AddBar.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Bar/ActionSong__DeleteBar.o : Action/Song/Bar/ActionSong__DeleteBar.cpp
+	$(CPP) -c Action/Song/Bar/ActionSong__DeleteBar.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Bar/ActionSong__EditBar.o : Action/Song/Bar/ActionSong__EditBar.cpp
+	$(CPP) -c Action/Song/Bar/ActionSong__EditBar.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Bar/ActionSong__ScaleData.o : Action/Song/Bar/ActionSong__ScaleData.cpp
+	$(CPP) -c Action/Song/Bar/ActionSong__ScaleData.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Bar/ActionSong__ShiftData.o : Action/Song/Bar/ActionSong__ShiftData.cpp
+	$(CPP) -c Action/Song/Bar/ActionSong__ShiftData.cpp -o $@ $(CXXFLAGS)
 
 Action/Song/Bar/ActionSongAddBar.o : Action/Song/Bar/ActionSongAddBar.cpp
 	$(CPP) -c Action/Song/Bar/ActionSongAddBar.cpp -o $@ $(CXXFLAGS)

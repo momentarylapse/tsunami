@@ -445,9 +445,9 @@ void Song::addBar(int index, float bpm, int beats, bool affect_midi)
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		execute(new ActionSongAddBar(index, b, affect_midi));
+		execute(new ActionSongAddBar(this, index, b, affect_midi));
 	else
-		execute(new ActionSongAddBar(bars.num, b, affect_midi));
+		execute(new ActionSongAddBar(this, bars.num, b, affect_midi));
 }
 
 void Song::addPause(int index, float time, bool affect_midi)
@@ -457,66 +457,19 @@ void Song::addPause(int index, float time, bool affect_midi)
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)sample_rate * time);
 	if (index >= 0)
-		execute(new ActionSongAddBar(index, b, affect_midi));
+		execute(new ActionSongAddBar(this, index, b, affect_midi));
 	else
-		execute(new ActionSongAddBar(bars.num, b, affect_midi));
+		execute(new ActionSongAddBar(this, bars.num, b, affect_midi));
 }
 
 void Song::editBar(int index, BarPattern &p, bool affect_midi)
 {
-	execute(new ActionSongEditBar(index, p, affect_midi));
+	execute(new ActionSongEditBar(this, index, p, affect_midi));
 }
 
 void Song::deleteBar(int index, bool affect_midi)
 {
-	execute(new ActionSongDeleteBar(index, affect_midi));
-}
-
-int __shift_data_shift(const Range &source, int new_length, int pos)
-{
-	if (pos >= source.end())
-		// after source
-		return pos + new_length - source.length;
-	if (pos >= source.offset){
-		// inside source
-		if (source.length == 0)
-			return pos - new_length;
-		return source.offset + (float)(pos - source.offset) * (float)new_length / (float)source.length;
-	}
-	return pos;
-}
-
-void Song::__shift_data(const Range &source, int new_length)
-{
-	int pos0 = source.offset;
-	for (Track *t : tracks){
-
-		// midi
-		foreachi(MidiNote &n, t->midi, j){
-			// note start
-			if (n.range.start() >= pos0)
-				n.range.set_start(__shift_data_shift(source, new_length, n.range.start()));
-			// note end
-			if (n.range.end() >= pos0)
-				n.range.set_end(__shift_data_shift(source, new_length, n.range.end()));
-		}
-
-		// marker
-		for (TrackMarker &m : t->markers)
-			if (m.pos >= pos0)
-				m.pos = __shift_data_shift(source, new_length, m.pos);
-
-		// buffer
-		for (TrackLevel &l : t->levels)
-			for (BufferBox &b : l.buffers)
-				if (b.offset >= pos0)
-					b.offset = __shift_data_shift(source, new_length, b.offset);
-
-		// marker
-		for (SampleRef *s : t->samples)
-			if (s->pos >= pos0)
-				s->pos = __shift_data_shift(source, new_length, s->pos);
-	}
+	execute(new ActionSongDeleteBar(this, index, affect_midi));
 }
 
 void Song::invalidateAllPeaks()

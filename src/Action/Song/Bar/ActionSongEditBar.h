@@ -8,21 +8,15 @@
 #ifndef ACTIONSONGEDITBAR_H_
 #define ACTIONSONGEDITBAR_H_
 
-#include "../../Action.h"
-#include "../../../Data/Song.h"
+#include "../../ActionGroup.h"
 
-class ActionSongEditBar: public Action
+class BarPattern;
+class Song;
+
+class ActionSongEditBar: public ActionGroup
 {
 public:
-	ActionSongEditBar(int index, BarPattern &bar, bool affect_midi);
-
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
-
-private:
-	BarPattern bar;
-	int index;
-	bool affect_midi;
+	ActionSongEditBar(Song *s, int index, BarPattern &bar, bool affect_data);
 };
 
 #endif /* ACTIONSONGEDITBAR_H_ */

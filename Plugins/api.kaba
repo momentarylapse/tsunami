@@ -221,8 +221,6 @@ class BarPattern
 	int num_beats
 	int length
 	int type
-	
-	bool is_selected
 
 enum
 	TRACK_TYPE_AUDIO

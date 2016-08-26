@@ -1,4 +1,4 @@
-Dialog bar_edit_dialog "Takte bearbeiten" 250 80
+Dialog bar_edit_dialog "Edit bars" 250 80
 	Grid ? "" 1 2
 		Grid ? "" 2 2
 			CheckBox edit_beats "Beats"

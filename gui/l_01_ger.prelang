@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-334
+338
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -700,12 +700,24 @@ pause_add_dialog/insert:before
 davor
 
 pause_add_dialog/pause_add_dialog
-neue Pause
+Neue Pause
 
 pause_add_dialog/t_duration
 Länge
 
 pause_add_dialog/t_s
+s
+
+pause_edit_dialog/duration
+1.0\\0\\10000\\0.001
+
+pause_edit_dialog/pause_edit_dialog
+Pause bearbeiten
+
+pause_edit_dialog/t_duration
+Dauer
+
+pause_edit_dialog/t_s
 s
 
 popup_marker_menu/delete_marker

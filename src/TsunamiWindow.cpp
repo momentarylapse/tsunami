@@ -14,6 +14,7 @@
 #include "View/Dialog/BarAddDialog.h"
 #include "View/Dialog/BarEditDialog.h"
 #include "View/Dialog/PauseAddDialog.h"
+#include "View/Dialog/PauseEditDialog.h"
 #include "View/BottomBar/BottomBar.h"
 #include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
@@ -818,8 +819,25 @@ void TsunamiWindow::onDeleteBars()
 
 void TsunamiWindow::onEditBars()
 {
-	HuiDialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
-	dlg->show();
+	if (view->sel.bars.length == 0){
+		return;
+	}
+	int num_bars = 0;
+	int num_pauses = 0;
+	for (int i=view->sel.bars.offset; i<view->sel.bars.end(); i++)
+		if (song->bars[i].type == BarPattern::TYPE_BAR)
+			num_bars ++;
+		else if (song->bars[i].type == BarPattern::TYPE_PAUSE)
+			num_pauses ++;
+	if (num_bars > 0 and num_pauses == 0){
+		HuiDialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
+		dlg->run();
+	}else if (num_bars == 0 and num_pauses == 1){
+		HuiDialog *dlg = new PauseEditDialog(win, song, view->sel.bars.start(), view->bars_edit_data);
+		dlg->run();
+	}else{
+		HuiErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
+	}
 }
 
 void TsunamiWindow::onScaleBars()

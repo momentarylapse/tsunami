@@ -257,6 +257,7 @@ OBJ = \
  View/Dialog/MarkerDialog.o\
  View/Dialog/NewDialog.o\
  View/Dialog/PauseAddDialog.o\
+ View/Dialog/PauseEditDialog.o\
  View/Dialog/RecordDialog.o\
  View/Dialog/SettingsDialog.o\
  View/Dialog/TuningDialog.o\
@@ -1057,6 +1058,9 @@ View/Dialog/NewDialog.o : View/Dialog/NewDialog.cpp
 
 View/Dialog/PauseAddDialog.o : View/Dialog/PauseAddDialog.cpp
 	$(CPP) -c View/Dialog/PauseAddDialog.cpp -o $@ $(CXXFLAGS)
+
+View/Dialog/PauseEditDialog.o : View/Dialog/PauseEditDialog.cpp
+	$(CPP) -c View/Dialog/PauseEditDialog.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/RecordDialog.o : View/Dialog/RecordDialog.cpp
 	$(CPP) -c View/Dialog/RecordDialog.cpp -o $@ $(CXXFLAGS)

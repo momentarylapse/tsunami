@@ -383,7 +383,7 @@ void Song::deleteSelectedSamples(const SongSelection &sel)
 	foreachi(Track *t, tracks, i){
 		for (int j=t->samples.num-1;j>=0;j--)
 			if (sel.has(t->samples[j]))
-				t->deleteSample(j);
+				t->deleteSampleRef(j);
 	}
 	action_manager->endActionGroup();
 }
@@ -498,12 +498,12 @@ SampleRef *Song::get_sample_ref(int track_no, int index)
 	return t->samples[index];
 }
 
-int Song::get_sample_by_uid(int uid)
+Sample* Song::get_sample_by_uid(int uid)
 {
-	foreachi(Sample *s, samples, i)
+	for (Sample *s : samples)
 		if (s->uid == uid)
-			return i;
-	return -1;
+			return s;
+	return NULL;
 }
 
 Effect *Song::get_fx(int track_no, int index)

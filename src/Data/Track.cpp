@@ -232,17 +232,17 @@ void Track::invalidateAllPeaks()
 			b.invalidate_peaks(b.range());
 }
 
-SampleRef *Track::addSample(int pos, int index)
+SampleRef *Track::addSampleRef(int pos, Sample* sample)
 {
-	return (SampleRef*)song->execute(new ActionTrackAddSample(this, pos, index));
+	return (SampleRef*)song->execute(new ActionTrackAddSample(this, pos, sample));
 }
 
-void Track::deleteSample(int index)
+void Track::deleteSampleRef(int index)
 {
 	song->execute(new ActionTrackDeleteSample(this, index));
 }
 
-void Track::editSample(int index, float volume, bool mute, int rep_num, int rep_delay)
+void Track::editSampleRef(int index, float volume, bool mute, int rep_num, int rep_delay)
 {
 	song->execute(new ActionTrackEditSample(this, index, volume, mute, rep_num, rep_delay));
 }

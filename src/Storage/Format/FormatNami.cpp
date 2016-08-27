@@ -481,7 +481,7 @@ public:
 		string name = f->ReadStr();
 		int pos = f->ReadInt();
 		int index = f->ReadInt();
-		me = parent->addSample(pos, index);
+		me = parent->addSampleRef(pos, parent->song->samples[index]);
 		me->volume = f->ReadFloat();
 		me->muted = f->ReadBool();
 		me->rep_num = f->ReadInt();

@@ -13,13 +13,13 @@
 
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf)
 {
-	addSubAction(new ActionSongAddSample("-paste-", *buf), t->song);
-	addSubAction(new ActionTrackAddSample(t, pos, t->song->samples.num - 1), t->song);
+	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *buf), t->song);
+	addSubAction(new ActionTrackAddSample(t, pos, sample), t->song);
 }
 
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, MidiData *midi)
 {
-	addSubAction(new ActionSongAddSample("-paste-", *midi), t->song);
-	addSubAction(new ActionTrackAddSample(t, pos, t->song->samples.num - 1), t->song);
+	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *midi), t->song);
+	addSubAction(new ActionTrackAddSample(t, pos, sample), t->song);
 }
 

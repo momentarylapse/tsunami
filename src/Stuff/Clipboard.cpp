@@ -99,9 +99,9 @@ void Clipboard::paste_track_as_samples(int source_index, Track *target, AudioVie
 	Song *s = target->song;
 	Track *source = temp->tracks[source_index];
 
-	int ref_index = s->get_sample_by_uid(ref_uid[source_index]);
-	if (ref_index >= 0){
-		target->addSample(view->sel.range.start(), ref_index);
+	Sample* ref = s->get_sample_by_uid(ref_uid[source_index]);
+	if (ref){
+		target->addSampleRef(view->sel.range.start(), ref);
 	}else{
 		if (target->type == Track::TYPE_AUDIO){
 			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), &source->levels[0].buffers[0]));

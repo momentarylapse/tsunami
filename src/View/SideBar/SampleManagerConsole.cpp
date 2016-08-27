@@ -215,9 +215,9 @@ void SampleManagerConsole::onExport()
 
 void SampleManagerConsole::onInsert()
 {
-	int n = getInt("sample_list");
-	if (n >= 0)
-		view->cur_track->addSample(view->sel.range.start(), n);
+	Array<Sample*> sel = getSelected();
+	for (Sample* s : sel)
+		view->cur_track->addSampleRef(view->sel.range.start(), s);
 }
 
 void SampleManagerConsole::onCreateFromSelection()
@@ -233,12 +233,15 @@ void SampleManagerConsole::onCreateFromSelection()
 
 void SampleManagerConsole::onDelete()
 {
-	Array<int> sel = getSelection("sample_list");
+	Array<Sample*> sel = getSelected();
 
 	song->action_manager->beginActionGroup();
-	foreachb(int s, sel)
-		song->deleteSample(items[s]->s);
+	for (Sample* s : sel)
+		song->deleteSample(s);
 	song->action_manager->endActionGroup();
+
+	// hui bug
+	setInt("sample_list", -1);
 }
 
 void SampleManagerConsole::add(SampleManagerItem *item)

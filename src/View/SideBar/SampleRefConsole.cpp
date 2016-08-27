@@ -51,7 +51,7 @@ void SampleRefConsole::onMute()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->editSample(index, sample->volume, isChecked(""), sample->rep_num, sample->rep_delay);
+	track->editSampleRef(index, sample->volume, isChecked(""), sample->rep_num, sample->rep_delay);
 
 	enable("volume", !sample->muted);
 	subscribe(sample);
@@ -68,7 +68,7 @@ void SampleRefConsole::onVolume()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->editSample(index, db2amplitude(getFloat("")), sample->muted, sample->rep_num, sample->rep_delay);
+	track->editSampleRef(index, db2amplitude(getFloat("")), sample->muted, sample->rep_num, sample->rep_delay);
 	subscribe(sample);
 }
 
@@ -78,7 +78,7 @@ void SampleRefConsole::onRepNum()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->editSample(index, sample->volume, sample->muted, getInt("repnum") - 1, sample->rep_delay);
+	track->editSampleRef(index, sample->volume, sample->muted, getInt("repnum") - 1, sample->rep_delay);
 	enable("repdelay", sample->rep_num > 0);
 	subscribe(sample);
 }
@@ -89,7 +89,7 @@ void SampleRefConsole::onRepDelay()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->editSample(index, sample->volume, sample->muted, sample->rep_num, (int)(getFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
+	track->editSampleRef(index, sample->volume, sample->muted, sample->rep_num, (int)(getFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
 	subscribe(sample);
 }
 

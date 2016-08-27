@@ -114,7 +114,7 @@ public:
 	// helper
 	Track *_cdecl get_track(int track_no);
 	SampleRef *_cdecl get_sample_ref(int track_no, int index);
-	int _cdecl get_sample_by_uid(int uid);
+	Sample* _cdecl get_sample_by_uid(int uid);
 	Effect *_cdecl get_fx(int track_no, int index);
 	MidiEffect *_cdecl get_midi_fx(int track_no, int index);
 

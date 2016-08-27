@@ -97,8 +97,8 @@ public:
 	Track *_cdecl addTrack(int type, int index = -1);
 	void _cdecl deleteTrack(int index);
 	Sample *_cdecl addSample(const string &name, BufferBox &buf);
-	void _cdecl deleteSample(int index);
-	void _cdecl editSampleName(int index, const string &name);
+	void _cdecl deleteSample(Sample *s);
+	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl addLevel(const string &name);
 	void _cdecl deleteLevel(int index, bool merge);
 	void _cdecl renameLevel(int index, const string &name);

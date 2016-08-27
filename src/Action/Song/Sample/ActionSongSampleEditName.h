@@ -11,11 +11,12 @@
 #include "../../ActionMergable.h"
 
 class Song;
+class Sample;
 
 class ActionSongSampleEditName: public ActionMergable<string>
 {
 public:
-	ActionSongSampleEditName(Song *a, int index, const string &name);
+	ActionSongSampleEditName(Song *a, Sample *s, const string &name);
 	virtual ~ActionSongSampleEditName();
 
 	virtual void *execute(Data *d);
@@ -24,7 +25,7 @@ public:
 	virtual bool mergable(Action *a);
 
 private:
-	int index;
+	Sample *sample;
 };
 
 #endif /* ACTIONSONGSAMPLEEDITNAME_H_ */

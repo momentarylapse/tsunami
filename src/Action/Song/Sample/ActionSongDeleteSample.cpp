@@ -10,26 +10,27 @@
 #include <assert.h>
 #include "../../../Data/Song.h"
 
-ActionSongDeleteSample::ActionSongDeleteSample(int _index)
+ActionSongDeleteSample::ActionSongDeleteSample(Sample *s)
 {
-	index = _index;
-	sample = NULL;
+	sample = s;
+	index = -1;
 }
 
 ActionSongDeleteSample::~ActionSongDeleteSample()
 {
-	if (sample)
-		if (!sample->owner)
-			delete(sample);
+	if (!sample->owner)
+		delete(sample);
 }
 
 void *ActionSongDeleteSample::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	assert(index >= 0);
-	assert(index < a->samples.num);
-	sample = a->samples[index];
 	assert(sample->ref_count == 0);
+	index = -1;
+	for (int i=0; i<a->samples.num; i++)
+		if (a->samples[i] == sample)
+			index = i;
+	assert(index >= 0);
 
 	sample->notify(sample->MESSAGE_DELETE);
 	a->samples.erase(index);

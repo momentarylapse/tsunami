@@ -15,7 +15,7 @@ class Sample;
 class ActionSongDeleteSample : public Action
 {
 public:
-	ActionSongDeleteSample(int index);
+	ActionSongDeleteSample(Sample *s);
 	virtual ~ActionSongDeleteSample();
 
 	virtual void *execute(Data *d);

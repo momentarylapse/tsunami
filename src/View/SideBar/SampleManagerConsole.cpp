@@ -134,7 +134,6 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 
 	song = s;
 	view = _view;
-	selected_uid = -1;
 	updateList();
 
 	subscribe(song, song->MESSAGE_ADD_SAMPLE);
@@ -166,27 +165,17 @@ void SampleManagerConsole::updateList()
 		if (getIndex(s) < 0)
 			add(new SampleManagerItem(this, s, view));
 
-	if ((selected_uid < 0) and (song->samples.num > 0))
-		selected_uid = song->samples.back()->uid;
-
-	int sel = song->get_sample_by_uid(selected_uid);
-	setInt("sample_list", sel);
-	enable("export_sample", sel >= 0);
-	enable("preview_sample", sel >= 0);
-	enable("delete_sample", sel >= 0);
-	enable("paste_sample", sel >= 0);
+	onListSelect();
 }
 
 void SampleManagerConsole::onListSelect()
 {
-	int sel = getInt("");
-	selected_uid = -1;
-	if (sel >= 0)
-		selected_uid = song->samples[sel]->uid;
-	enable("export_sample", sel >= 0);
-	enable("preview_sample", sel >= 0);
-	enable("delete_sample", sel >= 0);
-	enable("paste_sample", sel >= 0);
+	Array<Sample*> sel = getSelected();
+
+	enable("export_sample", sel.num == 1);
+	enable("preview_sample", sel.num == 1);
+	enable("delete_sample", sel.num > 0);
+	enable("paste_sample", sel.num == 1);
 }
 
 void SampleManagerConsole::onListEdit()
@@ -194,9 +183,9 @@ void SampleManagerConsole::onListEdit()
 	int sel = HuiGetEvent()->row;
 	int col = HuiGetEvent()->column;
 	if (col == 1)
-		song->editSampleName(sel, getCell("sample_list", sel, 1));
+		song->editSampleName(items[sel]->s, getCell("sample_list", sel, 1));
 	else if (col == 4)
-		song->samples[sel]->auto_delete = getCell("sample_list", sel, 4)._bool();
+		items[sel]->s->auto_delete = getCell("sample_list", sel, 4)._bool();
 }
 
 void SampleManagerConsole::onImport()
@@ -204,21 +193,21 @@ void SampleManagerConsole::onImport()
 	if (tsunami->storage->askOpenImport(win)){
 		BufferBox buf;
 		tsunami->storage->loadBufferBox(song, &buf, HuiFilename);
-		Sample *s = song->addSample(HuiFilename.basename(), buf);
-		selected_uid = s->uid;
-		setInt("sample_list", song->samples.num - 1);
-		enable("delete_sample", true);
-		enable("paste_sample", true);
+		song->addSample(HuiFilename.basename(), buf);
+		//setInt("sample_list", items.num - 1);
+		onListSelect();
 	}
 }
 
 void SampleManagerConsole::onExport()
 {
+	Array<Sample*> sel = getSelected();
+	if (sel.num != 1)
+		return;
+
 	if (tsunami->storage->askSaveExport(win)){
-		int sel = getInt("sample_list");
-		Sample *s = song->samples[sel];
-		if (s->type == Track::TYPE_AUDIO){
-			BufferRenderer rr(&s->buf);
+		if (sel[0]->type == Track::TYPE_AUDIO){
+			BufferRenderer rr(&sel[0]->buf);
 			tsunami->storage->saveViaRenderer(&rr, HuiFilename);
 		}
 	}
@@ -234,33 +223,34 @@ void SampleManagerConsole::onInsert()
 void SampleManagerConsole::onCreateFromSelection()
 {
 	song->createSamplesFromSelection(view->sel, view->cur_level);
-	if (song->samples.num > 0){
-		selected_uid = song->samples.back()->uid;
+	/*if (song->samples.num > 0){
+		selected_uids.clear();
+		selected_uids.add(song->samples.back()->uid);
 		enable("delete_sample", true);
 		enable("paste_sample", true);
-	}
+	}*/
 }
 
 void SampleManagerConsole::onDelete()
 {
-	int n = getInt("sample_list");
-	if (n >= 0)
-		song->deleteSample(n);
+	Array<int> sel = getSelection("sample_list");
+
+	song->action_manager->beginActionGroup();
+	foreachb(int s, sel)
+		song->deleteSample(items[s]->s);
+	song->action_manager->endActionGroup();
 }
 
 void SampleManagerConsole::add(SampleManagerItem *item)
 {
-	//msg_write("add");
 	items.add(item);
 	addString("sample_list", item->str());
 }
 
 void SampleManagerConsole::remove(SampleManagerItem *item)
 {
-	//msg_write("remove");
 	foreachi(SampleManagerItem *si, items, i)
 		if (si == item){
-			//msg_write(i);
 			items.erase(i);
 			removeString("sample_list", i);
 
@@ -268,6 +258,15 @@ void SampleManagerConsole::remove(SampleManagerItem *item)
 			item->zombify();
 			old_items.add(item);
 		}
+}
+
+Array<Sample*> SampleManagerConsole::getSelected()
+{
+	Array<int> indices = getSelection("sample_list");
+	Array<Sample*> sel;
+	for (int i : indices)
+		sel.add(items[i]->s);
+	return sel;
 }
 
 void SampleManagerConsole::onEditSong()
@@ -297,7 +296,7 @@ void SampleManagerConsole::onPreview()
 	if (progress)
 		endPreview();
 	int sel = getInt("sample_list");
-	preview_sample = song->samples[sel];
+	preview_sample = items[sel]->s;
 	preview_renderer = new BufferRenderer(&preview_sample->buf);
 	preview_stream = new OutputStream(preview_renderer);
 

@@ -1,6 +1,6 @@
 Dialog sample_manager_dialog "Sample Manager" 400 400 allow-parent
 	Grid ? "" 1 3
-		ListView sample_list "Preview\\Name\\Duration\\Usage\\Temporary" format=iTttC
+		ListView sample_list "Preview\\Name\\Duration\\Usage\\Temporary" format=iTttC select-multi
 		Grid ? "" 6 1
 			Button import_from_file "" flat image=hui:open tooltip="import from file"
 			Button export_sample "" flat image=hui:save tooltip="export to file"

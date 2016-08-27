@@ -325,14 +325,14 @@ class Song
 	extern int getNextBeat(int pos)
 	
 	extern void newEmpty(int sample_rate)
-	extern Track *addTrack(int type, int index)
+	extern Track* addTrack(int type, int index)
 	extern void deleteTrack(int index)
 	extern void addBar(int index, float bpm, int beats, bool affect_midi)
 	extern void addPause(int index, float time, bool affect_midi)
 	extern void editBar(int index, BarPattern p, bool affect_midi)
 	extern void deleteBar(int index, bool affect_midi)
 	extern Sample* addSample(string name, BufferBox buf)
-	extern void deleteSample(int index)
+	extern void deleteSample(Sample* sample)
 
 class SongSelection
 	Range range

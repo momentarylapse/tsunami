@@ -8,11 +8,11 @@
 #include "../../Song/Sample/ActionSongSampleEditName.h"
 #include "../../../Data/Song.h"
 
-ActionSongSampleEditName::ActionSongSampleEditName(Song *a, int _index, const string &name)
+ActionSongSampleEditName::ActionSongSampleEditName(Song *a, Sample *s, const string &name)
 {
-	index = _index;
+	sample = s;
 	new_value = name;
-	old_value = a->samples[index]->name;
+	old_value = s->name;
 }
 
 ActionSongSampleEditName::~ActionSongSampleEditName()
@@ -22,10 +22,9 @@ ActionSongSampleEditName::~ActionSongSampleEditName()
 void *ActionSongSampleEditName::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	Sample *s = a->samples[index];
 
-	s->name = new_value;
-	s->notify(s->MESSAGE_CHANGE_BY_ACTION);
+	sample->name = new_value;
+	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
 
 	return NULL;
 }
@@ -33,9 +32,9 @@ void *ActionSongSampleEditName::execute(Data *d)
 void ActionSongSampleEditName::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	Sample *s = a->samples[index];
 
-	s->name = old_value;
+	sample->name = old_value;
+	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
 }
 
 
@@ -44,7 +43,7 @@ bool ActionSongSampleEditName::mergable(Action *a)
 	ActionSongSampleEditName *aa = dynamic_cast<ActionSongSampleEditName*>(a);
 	if (!aa)
 		return false;
-	return (aa->index == index);
+	return (aa->sample == sample);
 }
 
 

@@ -495,6 +495,7 @@ void OutputStream::play()
 	attr_out.minreq = -1;
 	attr_out.tlength = -1;
 	attr_out.prebuf = -1;
+
 	const char *dev = NULL;
 	if (!device->is_default())
 		dev = device->internal_name.c_str();
@@ -503,9 +504,18 @@ void OutputStream::play()
 
 
 	if (!pa_wait_stream_ready(_stream)){
-		tsunami->log->error("pa_wait_for_stream_ready");
-		stop();
-		return;
+		msg_write("retry");
+
+		// retry with default device
+		pa_stream_connect_playback(_stream, NULL, &attr_out, (pa_stream_flags)0, NULL, NULL);
+		testError("pa_stream_connect_playback");
+
+		if (!pa_wait_stream_ready(_stream)){
+			// still no luck... give up
+			tsunami->log->error("pa_wait_for_stream_ready");
+			stop();
+			return;
+		}
 	}
 
 	//stream_request_callback(_stream, ring_buf.available(), this);

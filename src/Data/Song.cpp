@@ -413,17 +413,17 @@ Sample *Song::addSample(const string &name, BufferBox &buf)
 	return (Sample*)execute(new ActionSongAddSample(name, buf));
 }
 
-void Song::deleteSample(int index)
+void Song::deleteSample(Sample *s)
 {
-	if (samples[index]->ref_count == 0)
-		execute(new ActionSongDeleteSample(index));
+	if (s->ref_count == 0)
+		execute(new ActionSongDeleteSample(s));
 	else
 		tsunami->log->error(_("Can only delete samples which are unused."));
 }
 
-void Song::editSampleName(int index, const string &name)
+void Song::editSampleName(Sample *s, const string &name)
 {
-	execute(new ActionSongSampleEditName(this, index, name));
+	execute(new ActionSongSampleEditName(this, s, name));
 }
 
 void Song::deleteSelection(const SongSelection &sel, int level_no, bool all_levels)

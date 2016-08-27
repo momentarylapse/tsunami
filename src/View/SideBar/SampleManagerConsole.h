@@ -48,7 +48,7 @@ public:
 	void add(SampleManagerItem *item);
 	void remove(SampleManagerItem *item);
 	int getIndex(Sample *s);
-	int selected_uid;
+	Array<Sample*> getSelected();
 
 	OutputStream *preview_stream;
 	BufferRenderer *preview_renderer;

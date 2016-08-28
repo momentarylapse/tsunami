@@ -247,10 +247,14 @@ void TsunamiWindow::onAddTrack()
 void TsunamiWindow::onAddTimeTrack()
 {
 	song->action_manager->beginActionGroup();
-	song->addTrack(Track::TYPE_TIME);
-	// some default data
-	for (int i=0; i<10; i++)
-		song->addBar(-1, 90, 4, 1, false);
+	try{
+		song->addTrack(Track::TYPE_TIME);
+		// some default data
+		for (int i=0; i<10; i++)
+			song->addBar(-1, 90, 4, 1, false);
+	}catch(SongException &e){
+		tsunami->log->error(e.message);
+	}
 	song->action_manager->endActionGroup();
 }
 
@@ -261,14 +265,13 @@ void TsunamiWindow::onAddMidiTrack()
 
 void TsunamiWindow::onDeleteTrack()
 {
-	if (song->tracks.num < 2){
-		tsunami->log->error(_("There has to be at least one track."));
-		return;
-	}
-
-	if (view->cur_track)
-		song->deleteTrack(get_track_index(view->cur_track));
-	else
+	if (view->cur_track){
+		try{
+			song->deleteTrack(get_track_index(view->cur_track));
+		}catch(SongException &e){
+			tsunami->log->error(e.message);
+		}
+	}else
 		tsunami->log->error(_("No track selected"));
 }
 
@@ -585,7 +588,11 @@ void TsunamiWindow::onAddLevel()
 
 void TsunamiWindow::onDeleteLevel()
 {
-	song->deleteLevel(view->cur_level, true);
+	try{
+		song->deleteLevel(view->cur_level);
+	}catch(SongException &e){
+		tsunami->log->error(e.message);
+	}
 }
 
 void TsunamiWindow::onCurLevel()

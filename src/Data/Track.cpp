@@ -167,7 +167,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	// create own...
 	buf.resize(r.length);
 
-	// fill with overlapp
+	// fill with overlap
 	for (BufferBox &b : levels[level_no].buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
 

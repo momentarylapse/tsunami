@@ -25,6 +25,7 @@ public:
 	void onEdit();
 	void onAdd();
 	void onDelete();
+	void onMerge();
 
 	void onEditSong();
 

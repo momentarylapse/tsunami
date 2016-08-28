@@ -13,10 +13,6 @@ ActionSongAddLevel::ActionSongAddLevel(const string &_name)
 	name = _name;
 }
 
-ActionSongAddLevel::~ActionSongAddLevel()
-{
-}
-
 void* ActionSongAddLevel::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);

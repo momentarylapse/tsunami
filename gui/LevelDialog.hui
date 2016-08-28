@@ -1,9 +1,10 @@
 Dialog level_dialog "Ebenen" 430 375
 	Grid lvld_grid_1 "" 1 3 expandy
-		ListView levels "#\\Name" format=tT select-single
-		Grid ? "" 2 1
-			Button add_level "" flat image=hui:add
-			Button delete_level "" flat image=hui:delete
+		ListView levels "#\\Name" format=tT select-single tooltip="Each level can contain its own audio buffers"
+		Grid ? "" 3 1
+			Button add_level "" flat image=hui:add tooltip="Add a new empty level at the top"
+			Button delete_level "" flat image=hui:delete tooltip="Delete the selected level and all its audio buffers"
+			Button merge_level "" flat image=hui:paste tooltip="Merge the selected level with the one below it"
 		Group lvld_t_edit "Edit"
 			Grid ? "" 2 1
 				Button /edit_song "File"

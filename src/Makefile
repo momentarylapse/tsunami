@@ -15,7 +15,10 @@ OBJ = \
  Action/Song/Data/ActionSongSetDefaultFormat.o\
  Action/Song/Data/ActionSongSetSampleRate.o\
  Action/Song/Data/ActionSongSetVolume.o\
+ Action/Song/Level/ActionSong__DeleteLevel.o\
  Action/Song/Level/ActionSongAddLevel.o\
+ Action/Song/Level/ActionSongDeleteLevel.o\
+ Action/Song/Level/ActionSongMergeLevels.o\
  Action/Song/Level/ActionSongRenameLevel.o\
  Action/Song/Sample/ActionSongAddSample.o\
  Action/Song/Sample/ActionSongDeleteSample.o\
@@ -336,8 +339,17 @@ Action/Song/Data/ActionSongSetSampleRate.o : Action/Song/Data/ActionSongSetSampl
 Action/Song/Data/ActionSongSetVolume.o : Action/Song/Data/ActionSongSetVolume.cpp
 	$(CPP) -c Action/Song/Data/ActionSongSetVolume.cpp -o $@ $(CXXFLAGS)
 
+Action/Song/Level/ActionSong__DeleteLevel.o : Action/Song/Level/ActionSong__DeleteLevel.cpp
+	$(CPP) -c Action/Song/Level/ActionSong__DeleteLevel.cpp -o $@ $(CXXFLAGS)
+
 Action/Song/Level/ActionSongAddLevel.o : Action/Song/Level/ActionSongAddLevel.cpp
 	$(CPP) -c Action/Song/Level/ActionSongAddLevel.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Level/ActionSongDeleteLevel.o : Action/Song/Level/ActionSongDeleteLevel.cpp
+	$(CPP) -c Action/Song/Level/ActionSongDeleteLevel.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Level/ActionSongMergeLevels.o : Action/Song/Level/ActionSongMergeLevels.cpp
+	$(CPP) -c Action/Song/Level/ActionSongMergeLevels.cpp -o $@ $(CXXFLAGS)
 
 Action/Song/Level/ActionSongRenameLevel.o : Action/Song/Level/ActionSongRenameLevel.cpp
 	$(CPP) -c Action/Song/Level/ActionSongRenameLevel.cpp -o $@ $(CXXFLAGS)

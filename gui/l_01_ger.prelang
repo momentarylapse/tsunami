@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-345
+348
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -291,15 +291,24 @@ Parameter laden
 fx_panel/save_favorite
 
 Parameter speichern
+level_dialog/add_level
+
+Eine neue Ebene hinzufügen
+level_dialog/delete_level
+
+Die ausgewählte Ebene und alle zugehörigen Audio-Puffer löschen
 level_dialog/level_dialog
 Ebenen
 
 level_dialog/levels
 #\\Name
-
+Jede Ebene kann ihre eigenen Audio-Puffer enthalten
 level_dialog/lvld_t_edit
 Bearbeiten
 
+level_dialog/merge_level
+
+Die ausgewählte Ebene mit der darunter liegenden vereinen
 log_console/clear
 
 alle Nachrichten löschen
@@ -1039,7 +1048,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-140
+141
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1081,6 +1090,8 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 2. Umkehrung
 Amplitude too large, signal distorted.
 Amplitude zu groß, Signal übersteuert.
+At least one level has to exist.
+Es muss mindestens eine Ebene existieren.
 Audio
 Audio
 Augmented

@@ -35,6 +35,13 @@ struct Tag
 	}
 };
 
+class SongException
+{
+public:
+	SongException(const string &message);
+	string message;
+};
+
 class Song : public Data
 {
 public:
@@ -100,7 +107,9 @@ public:
 	void _cdecl deleteSample(Sample *s);
 	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl addLevel(const string &name);
-	void _cdecl deleteLevel(int index, bool merge);
+	void _cdecl deleteLevel(int index);
+	void _cdecl mergeLevels(int source, int target);
+	void _cdecl moveLevel(int source, int target);
 	void _cdecl renameLevel(int index, const string &name);
 	void _cdecl addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi);
 	void _cdecl addPause(int index, float time, bool affect_midi);

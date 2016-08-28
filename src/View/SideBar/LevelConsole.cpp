@@ -11,6 +11,7 @@
 #include "../../View/AudioView.h"
 #include "LevelConsole.h"
 #include "../../Data/Song.h"
+#include "../../Stuff/Log.h"
 
 
 LevelConsole::LevelConsole(Song *s, AudioView *v) :
@@ -31,6 +32,8 @@ LevelConsole::LevelConsole(Song *s, AudioView *v) :
 	eventX("levels", "hui:change", this, &LevelConsole::onEdit);
 	event("add_level", this, &LevelConsole::onAdd);
 	event("delete_level", this, &LevelConsole::onDelete);
+	event("merge_level", this, &LevelConsole::onMerge);
+
 	event("edit_song", this, &LevelConsole::onEditSong);
 
 	subscribe(song);
@@ -50,6 +53,9 @@ void LevelConsole::loadData()
 		addString("levels", i2s(i + 1) + "\\" + n);
 	if (song->level_names.num > 0)
 		setInt("levels", view->cur_level);
+
+	enable("delete_level", song->level_names.num > 1);
+	enable("merge_level", view->cur_level > 0);
 }
 
 
@@ -76,7 +82,14 @@ void LevelConsole::onDelete()
 {
 	int s = getInt("levels");
 	if (s >= 0)
-		song->deleteLevel(s, false);
+		song->deleteLevel(s);
+}
+
+void LevelConsole::onMerge()
+{
+	int s = getInt("levels");
+	if (s >= 1)
+		song->mergeLevels(s, s - 1);
 }
 
 void LevelConsole::onEditSong()

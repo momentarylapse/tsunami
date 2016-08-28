@@ -34,7 +34,9 @@
 #include "../Action/Song/Data/ActionSongSetSampleRate.h"
 #include "../Action/Song/Data/ActionSongSetVolume.h"
 #include "../Action/Song/Level/ActionSongAddLevel.h"
+#include "../Action/Song/Level/ActionSongDeleteLevel.h"
 #include "../Action/Song/Level/ActionSongRenameLevel.h"
+#include "../Action/Song/Level/ActionSongMergeLevels.h"
 #include "../Action/Song/Sample/ActionSongAddSample.h"
 #include "../Action/Song/Sample/ActionSongDeleteSample.h"
 #include "../Action/Song/Sample/ActionSongSampleEditName.h"
@@ -65,6 +67,11 @@ int get_sample_ref_index(SampleRef *s)
 	if (s)
 		return s->get_index();
 	return -1;
+}
+
+SongException::SongException(const string &_message)
+{
+	message = _message;
 }
 
 Song::Song() :
@@ -349,10 +356,8 @@ Track *Song::addTrack(int type, int index)
 {
 	if (type == Track::TYPE_TIME){
 		// force single time track
-		if (getTimeTrack()){
-			tsunami->log->error(_("There already is one rhythm track."));
-			return NULL;
-		}
+		if (getTimeTrack())
+			throw SongException(_("There already is one rhythm track."));
 	}
 	if (index < 0)
 		index = tracks.num;
@@ -393,9 +398,20 @@ void Song::addLevel(const string &name)
 	execute(new ActionSongAddLevel(name));
 }
 
-void Song::deleteLevel(int index, bool merge)
+void Song::deleteLevel(int index)
 {
-	tsunami->log->error(_("Delete level: not implemented yet..."));
+	if (level_names.num < 2)
+		throw SongException(_("At least one level has to exist."));
+	execute(new ActionSongDeleteLevel(this, index));
+}
+
+void Song::mergeLevels(int source, int target)
+{
+	if (level_names.num < 2)
+		throw SongException(_("At least one level has to exist."));
+	if (source == target)
+		throw SongException(_("Can't merge a level with itself."));
+	execute(new ActionSongMergeLevels(this, source, target));
 }
 
 void Song::renameLevel(int index, const string &name)
@@ -405,6 +421,8 @@ void Song::renameLevel(int index, const string &name)
 
 void Song::deleteTrack(int index)
 {
+	if (tracks.num < 2)
+		throw SongException(_("At least one level has to exist."));
 	execute(new ActionTrackDelete(this, index));
 }
 
@@ -415,10 +433,9 @@ Sample *Song::addSample(const string &name, BufferBox &buf)
 
 void Song::deleteSample(Sample *s)
 {
-	if (s->ref_count == 0)
-		execute(new ActionSongDeleteSample(s));
-	else
-		tsunami->log->error(_("Can only delete samples which are unused."));
+	if (s->ref_count > 0)
+		throw SongException(_("Can only delete samples which are unused."));
+	execute(new ActionSongDeleteSample(s));
 }
 
 void Song::editSampleName(Sample *s, const string &name)

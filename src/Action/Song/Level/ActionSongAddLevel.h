@@ -14,7 +14,6 @@ class ActionSongAddLevel : public Action
 {
 public:
 	ActionSongAddLevel(const string &name);
-	virtual ~ActionSongAddLevel();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

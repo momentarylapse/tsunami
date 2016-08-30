@@ -110,9 +110,9 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 			GpTrack tt;
 			tt.is_drum = (t->instrument.type == Instrument::TYPE_DRUMS);
 			tt.midi_instrument = t->instrument.midi_no();
-			tt.tuning = t->instrument.tuning;
+			tt.tuning = t->instrument.string_pitch;
 			if (tt.tuning.num == 0)
-				tt.tuning = Instrument(Instrument::TYPE_ELECTRIC_GUITAR).tuning;
+				tt.tuning = Instrument(Instrument::TYPE_ELECTRIC_GUITAR).string_pitch;
 			tt.t = t;
 			tracks.add(tt);
 		}
@@ -492,11 +492,11 @@ void FormatGuitarPro::read_track()
 	if (channel != 10)
 		instrument.set_midi_no(channels[(port-1) * 16 + (channel-1)].instrument);
 
-	instrument.tuning = tt.tuning;
-	instrument.tuning.reverse();
-	for (int i=instrument.tuning.num-1; i>=0; i--)
-		if (instrument.tuning[i] <= 0)
-			instrument.tuning.erase(i);
+	instrument.string_pitch = tt.tuning;
+	instrument.string_pitch.reverse();
+	for (int i=instrument.string_pitch.num-1; i>=0; i--)
+		if (instrument.string_pitch[i] <= 0)
+			instrument.string_pitch.erase(i);
 	tt.t->setInstrument(instrument);
 
 	f->ReadInt();

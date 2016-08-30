@@ -945,15 +945,15 @@ public:
 	}
 	virtual void read(File *f)
 	{
-		me->tuning.resize(f->ReadInt());
-		for (int i=0; i<me->tuning.num; i++)
-			me->tuning[i] = f->ReadInt();
+		me->string_pitch.resize(f->ReadInt());
+		for (int i=0; i<me->string_pitch.num; i++)
+			me->string_pitch[i] = f->ReadInt();
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->tuning.num);
-		for (int i=0; i<me->tuning.num; i++)
-			f->WriteInt(me->tuning[i]);
+		f->WriteInt(me->string_pitch.num);
+		for (int i=0; i<me->string_pitch.num; i++)
+			f->WriteInt(me->string_pitch[i]);
 	}
 };
 

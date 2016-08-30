@@ -42,7 +42,7 @@ public:
 	};
 
 	int type;
-	Array<int> tuning;
+	Array<int> string_pitch;
 
 	Array<int> default_tuning() const;
 	string name() const;

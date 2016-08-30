@@ -74,13 +74,13 @@ void TrackConsole::loadData()
 				setInt("instrument", i);
 		}
 
-		string tuning = format(_("%d strings: "), track->instrument.tuning.num);
-		for (int i=0; i<track->instrument.tuning.num; i++){
+		string tuning = format(_("%d strings: "), track->instrument.string_pitch.num);
+		for (int i=0; i<track->instrument.string_pitch.num; i++){
 			if (i > 0)
 				tuning += ", ";
-			tuning += pitch_name(track->instrument.tuning[i]);
+			tuning += pitch_name(track->instrument.string_pitch[i]);
 		}
-		if (track->instrument.tuning.num == 0)
+		if (track->instrument.string_pitch.num == 0)
 			tuning = _(" - no strings -");
 		setString("tuning", tuning);
 	}else{

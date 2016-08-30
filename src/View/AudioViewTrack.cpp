@@ -226,7 +226,12 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 
 void AudioViewTrack::drawMarker(Painter *c, const TrackMarker &marker, int index, bool hover)
 {
-	float w = c->getStrWidth(marker.text);
+	string text = marker.text;
+	if (text.match(":pos *:"))
+		text = "🖐 " + text.substr(5, -2);
+
+
+	float w = c->getStrWidth(text);
 	int x = view->cam.sample2screen(marker.pos);
 
 	c->setColor(view->colors.background_track);
@@ -237,7 +242,7 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker &marker, int index
 	c->setColor(view->colors.text);
 	if (hover)
 		c->setColor(view->colors.text_soft2);
-	c->drawStr(x, area.y1, marker.text);
+	c->drawStr(x, area.y1, text);
 }
 
 
@@ -245,7 +250,7 @@ void AudioViewTrack::drawMidi(Painter *c, const MidiData &midi, int shift)
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
 		drawMidiDefault(c, midi, shift);
-	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->instrument.tuning.num > 0))
+	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->instrument.string_pitch.num > 0))
 		drawMidiTab(c, midi, shift);
 	else // if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
 		drawMidiScore(c, midi, shift);
@@ -275,7 +280,7 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
-	notes.update_meta(track->instrument, view->midi_scale);
+	notes.update_meta(track, view->midi_scale);
 
 
 
@@ -283,9 +288,9 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
 
 	// clef lines
 	float h = area.height() * 0.7f;
-	float dy = h / track->instrument.tuning.num;
+	float dy = h / track->instrument.string_pitch.num;
 	float y0 = area.y2 - (area.height() - h) / 2 - dy/2;
-	for (int i=0; i<track->instrument.tuning.num; i++){
+	for (int i=0; i<track->instrument.string_pitch.num; i++){
 		float y = y0 - i*dy;
 		c->drawLine(area.x1, y, area.x2, y);
 	}
@@ -326,7 +331,7 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
 			c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
 		if (x2 - x1 > r/2){
 			c->setColor(view->colors.text);
-			c->drawStr(x1 + r/3, y - r * 1.20f, i2s(n.pitch - track->instrument.tuning[n.stringno]));
+			c->drawStr(x1 + r/3, y - r * 1.20f, i2s(n.pitch - track->instrument.string_pitch[n.stringno]));
 		}
 
 	}
@@ -352,8 +357,9 @@ void AudioViewTrack::drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiN
 	float x2 = view->cam.sample2screen(n.range.end() + shift);
 	float x = x1 + r;
 
-	if (n.clef_position < 0)
-		n.update_meta(track->instrument, view->midi_scale);
+	// checked before...
+//	if (n.clef_position < 0)
+//		n.update_meta(track->instrument, view->midi_scale, 0);
 
 	int p = n.clef_position;
 	float y = clef_pos_to_screen(p);
@@ -424,7 +430,7 @@ void AudioViewTrack::drawMidiScore(Painter *c, const MidiData &midi, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
-	notes.update_meta(track->instrument, view->midi_scale);
+	notes.update_meta(track, view->midi_scale);
 
 	const Clef& clef = track->instrument.get_clef();
 

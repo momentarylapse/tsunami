@@ -37,7 +37,7 @@ float MidiNote::getFrequency()
 }
 
 
-void MidiNote::update_meta(const Instrument &instrument, const Scale& scale) const
+void MidiNote::update_meta(const Instrument &instrument, const Scale& scale, int hand_position) const
 {
 	if (clef_position < 0){
 		const Clef& clef = instrument.get_clef();
@@ -46,8 +46,8 @@ void MidiNote::update_meta(const Instrument &instrument, const Scale& scale) con
 
 	if (stringno < 0){
 		stringno = 0;
-		for (int i=0; i<instrument.tuning.num; i++)
-			if (pitch >= instrument.tuning[i]){
+		for (int i=0; i<instrument.string_pitch.num; i++)
+			if (pitch >= instrument.string_pitch[i] + hand_position){
 				stringno = i;
 			}
 	}

@@ -7,6 +7,7 @@
 
 #include "MidiData.h"
 #include "Instrument.h"
+#include "../Data/Track.h"
 #include <math.h>
 #include "../lib/hui/hui.h"
 
@@ -452,11 +453,47 @@ Array<int> chord_notes(int type, int inversion, int pitch)
 	return r;
 }
 
-
-void MidiData::update_meta(const Instrument &instrument, const Scale& scale) const
+struct HandPosition
 {
-	for (MidiNote &n : *this)
-		n.update_meta(instrument, scale);
+	HandPosition()
+	{
+		offset = 0;
+		value = 0;
+	}
+	HandPosition(int _offset, int _value)
+	{
+		offset = _offset;
+		value = _value;
+	}
+	bool operator>(const HandPosition &o) const
+	{ return offset > o.offset; }
+	bool operator==(const HandPosition &o) const
+	{ return offset == o.offset; }
+	int offset, value;
+};
+
+
+void MidiData::update_meta(Track *t, const Scale& scale) const
+{
+	Set<HandPosition> hands;
+	for (TrackMarker &m : t->markers)
+		if (m.text.match(":pos *:"))
+			hands.add(HandPosition(m.pos, m.text.substr(4, -2)._int()));
+
+
+	int hand_position = 0;
+	int next = 0;
+
+	for (MidiNote &n : *this){
+		while(next < hands.num){
+			if (n.range.offset >= hands[next].offset)
+				hand_position = hands[next ++].value;
+			else
+				break;
+		}
+
+		n.update_meta(t->instrument, scale, hand_position);
+	}
 }
 
 void MidiData::clear_meta() const

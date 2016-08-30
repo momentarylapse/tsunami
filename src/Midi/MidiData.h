@@ -20,6 +20,7 @@ class MidiEffect;
 class Instrument;
 class Clef;
 class Scale;
+class Track;
 
 
 class MidiRawData : public Array<MidiEvent>
@@ -57,7 +58,8 @@ public:
 	void sort();
 	void sanify(const Range &r);
 
-	void update_meta(const Instrument &i, const Scale &s) const;
+	//void update_meta(const Instrument &i, const Scale &s) const;
+	void update_meta(Track *t, const Scale &s) const;
 	void clear_meta() const;
 
 	Array<MidiEffect*> fx;

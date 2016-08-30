@@ -12,7 +12,7 @@ TuningDialog::TuningDialog(HuiWindow *_parent, Track *t) :
 	HuiWindow("tuning_dialog", _parent)
 {
 	track = t;
-	tuning = track->instrument.tuning;
+	tuning = track->instrument.string_pitch;
 
 	gui_num_strings = 0;
 
@@ -70,7 +70,7 @@ void TuningDialog::update()
 void TuningDialog::onOk()
 {
 	Instrument i = track->instrument;
-	i.tuning = tuning;
+	i.string_pitch = tuning;
 	track->setInstrument(i);
 	delete(this);
 }

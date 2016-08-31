@@ -7,6 +7,7 @@ class MetronomeSource extends MidiSource
 	int num_beats
 	int num_sub_beats
 	float volume
+	bool pause
 
 	int offset_sub_beat
 	int cur_beat
@@ -35,9 +36,13 @@ class MetronomeSource extends MidiSource
 		fraction_beat = 0
 		fraction_sub_beat = 0
 		
+		pause = false
+		
 		update()
 		
 	override int read(MidiRawData midi)
+		if pause
+			return midi.samples
 	
 		// render clicks
 		while offset_sub_beat < midi.samples
@@ -72,6 +77,9 @@ class MetronomeSource extends MidiSource
 		num_beats = _beats
 		num_sub_beats = _sub_beats
 		update()
+	
+	void setPause(bool _pause)
+		pause = _pause
 	
 	void update()
 		float dt_b = 60.0 / bpm

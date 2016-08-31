@@ -32,7 +32,7 @@ void *ActionTrack__AddBufferBox::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	assert(t && "AddBufferBox.execute");
+	assert(t and "AddBufferBox.execute");
 
 	BufferBox dummy;
 	t->levels[level_no].buffers.insert(dummy, index);

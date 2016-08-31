@@ -139,7 +139,7 @@ void SampleRefConsole::onUpdate(Observable *o, const string &message)
 		if (sample)
 			subscribe(sample);
 		loadData();
-	}else if ((o == sample) && (message == o->MESSAGE_DELETE)){
+	}else if ((o == sample) and (message == o->MESSAGE_DELETE)){
 		unsubscribe(sample);
 		sample = NULL;
 		loadData();

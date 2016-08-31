@@ -45,6 +45,6 @@ bool ActionTrackEditEffect::mergable(Action *a)
 	ActionTrackEditEffect *aa = dynamic_cast<ActionTrackEditEffect*>(a);
 	if (!aa)
 		return false;
-	return ((aa->track_no == track_no) && (aa->index == index));
+	return ((aa->track_no == track_no) and (aa->index == index));
 }
 

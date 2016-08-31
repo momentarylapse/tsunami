@@ -21,7 +21,7 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(Track *t, int level_no, const
 	int n_pos = -1;
 	int n_before = -1;
 	foreachi(BufferBox &b, l.buffers, i){
-		if ((r.offset >= b.offset) && (r.offset <= b.offset + b.length))
+		if ((r.offset >= b.offset) and (r.offset <= b.offset + b.length))
 			n_pos = i;
 		if (r.offset >= b.offset)
 			n_before = i;

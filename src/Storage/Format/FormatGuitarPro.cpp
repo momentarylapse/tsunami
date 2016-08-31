@@ -770,7 +770,7 @@ int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 	int stringFlags = f->ReadByte();
 	//msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
 	for (int i = 6; i >= 0; i--)
-		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.tuning.num)
+		if ((stringFlags & (1 << i)) != 0 and (6 - i) < t.tuning.num)
 			read_note(t, (6 - i), start, duration);
 
 	if (version >= 500){
@@ -850,7 +850,7 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 	}
 	/*msg_write(format("0x%x  0x%x  %d   %d", flags, stringFlags, duration, t.stringCount));
 	for (int i = 6; i >= 0; i--) {
-		if ((stringFlags & (1 << i)) != 0 && (6 - i) < t.stringCount) {
+		if ((stringFlags & (1 << i)) != 0 and (6 - i) < t.stringCount) {
 			//TGString string = track.getString( (6 - i) + 1 ).clone(getFactory());
 			read_note(t, (6 - i), start, duration);
 			//TGNote note = readNote(string, track,effect.clone(getFactory()));
@@ -913,7 +913,7 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 	if ((flags & 0x20) != 0) {
 		int fret = f->ReadByte();
 		int value = fret;
-		if ((string_no >= 0) && (string_no < t.tuning.num))
+		if ((string_no >= 0) and (string_no < t.tuning.num))
 			value = fret + t.tuning[string_no];
 		//msg_write(format("%d/%d -> %d", string_no, fret, value));
 		n.pitch = value;

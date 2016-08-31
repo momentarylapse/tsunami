@@ -44,7 +44,7 @@ void *ActionTrack__DeleteBufferBox::execute(Data *d)
 	assert(level_no < t->levels.num);
 	BufferBox &b = t->levels[level_no].buffers[index];
 
-	assert(index >= 0 && index < t->levels[level_no].buffers.num);
+	assert(index >= 0 and index < t->levels[level_no].buffers.num);
 
 	// save data
 	buf = b;

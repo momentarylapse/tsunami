@@ -171,11 +171,11 @@ void SynthConsole::setTrack(Track *t)
 
 void SynthConsole::onUpdate(Observable* o, const string &message)
 {
-	if ((o->getName() == "Synthesizer") && (message == o->MESSAGE_DELETE)){
+	if ((o->getName() == "Synthesizer") and (message == o->MESSAGE_DELETE)){
 		clear();
-	}else if ((o == track) && (message == track->MESSAGE_DELETE)){
+	}else if ((o == track) and (message == track->MESSAGE_DELETE)){
 		setTrack(NULL);
-	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE))
+	}else if ((o == view) and (message == view->MESSAGE_CUR_TRACK_CHANGE))
 		setTrack(view->cur_track);
 	else
 		setTrack(track);

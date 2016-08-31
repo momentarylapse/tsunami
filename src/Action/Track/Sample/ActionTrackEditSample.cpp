@@ -62,6 +62,6 @@ bool ActionTrackEditSample::mergable(Action *a)
 	ActionTrackEditSample *aa = dynamic_cast<ActionTrackEditSample*>(a);
 	if (!aa)
 		return false;
-	return (aa->track_no == track_no) && (aa->index == index);
+	return (aa->track_no == track_no) and (aa->index == index);
 }
 

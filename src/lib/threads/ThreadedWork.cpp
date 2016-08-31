@@ -90,7 +90,7 @@ bool ThreadedWork::run(int _total_size, int _partition_size)
 	// main program: update gui
 	bool all_done = false;
 	bool thread_abort = false;
-	while((!all_done) && (!thread_abort)){
+	while((!all_done) and (!thread_abort)){
 
 		thread_abort = !onStatus();
 		all_done = true;

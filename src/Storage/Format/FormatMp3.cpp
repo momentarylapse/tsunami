@@ -49,7 +49,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 		while(true){
 			int pos0 = f->GetPos();
 			f->ReadBuffer(data, 4);
-			if ((data[0] == 0xff) && ((data[1] & 0xfe) == 0xfa)){
+			if ((data[0] == 0xff) and ((data[1] & 0xfe) == 0xfa)){
 				msg_write("== mp3-header ==");
 				int BIT_RATES[] = {0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0};
 				int FREQS[] = {44100, 48000, 32000, 0};
@@ -74,7 +74,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 				}
 				//f->SetPos(pos0 + size + 10, true);
 				break;
-			}else if ((data[0] == 'I') && (data[1] == 'D') && (data[2] == '3')){
+			}else if ((data[0] == 'I') and (data[1] == 'D') and (data[2] == '3')){
 				msg_write("== ID3-Tags ==");
 				int version = data[3];
 				int v_min = f->ReadByte();
@@ -99,7 +99,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 							f->SetPos(_size, false);
 						}
 
-					}else if ((version == 3) || (version == 4)){
+					}else if ((version == 3) or (version == 4)){
 						f->ReadBuffer(data, 4);
 						string key = string(data, 4);
 						//if (key[0] != 0)
@@ -112,19 +112,21 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 						f->ReadBuffer(data, 2); // flags
 						//msg_write(_size);
 						r += 12 + _size;
-						if ((_size < 1024) && (_size > 0)){
+						if ((_size < 1024) and (_size > 0)){
 							f->ReadBuffer(data, _size);
 							string val = string(data+1, _size-1);
 							int type = data[0];
 							if (key == "COMM")
 								val = val.substr(3, -1);
-							if ((type == 1) || (type == 2))
+							if ((type == 1) or (type == 2))
 								val = val.utf16_to_utf8();
 							else if (type == 0)
 								val = val.latin_to_utf8();
 							val = val.replace(string("\0", 1), "");
 							//msg_write(val);
-							if (key == "TALB")
+
+							// will be added by wave loading...
+/*							if (key == "TALB")
 								t->song->addTag("album", val);
 							else if (key == "TPE1")
 								t->song->addTag("artist", val);
@@ -132,10 +134,10 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 								t->song->addTag("title", val);
 							else if (key == "TRCK")
 								t->song->addTag("track", i2s(val._int()));
-							else if ((key == "TYER") || (key == "TDRC"))
+							else if ((key == "TYER") or (key == "TDRC"))
 								t->song->addTag("year", val);
 							else if (key == "COMM")
-								t->song->addTag("comment", val);
+								t->song->addTag("comment", val);*/
 						}else{
 							f->SetPos(_size, false);
 						}

@@ -202,14 +202,11 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 	// tags
 	t->song->tags.clear();
 	char **ptr = ov_comment(&vf,-1)->user_comments;
-	while(*ptr){
+	while (*ptr){
 		string s = *ptr;
-		if (s.find("=") > 0){
-			Tag tag;
-			tag.key = s.substr(0, s.find("=")).lower();
-			tag.value = s.substr(s.find("=") + 1, -1);
-			t->song->tags.add(tag);
-		}
+		int offset = s.find("=");
+		if (offset > 0)
+			t->song->tags.add(Tag(s.head(offset).lower(), s.substr(offset + 1, -1)));
 		++ptr;
     }
 

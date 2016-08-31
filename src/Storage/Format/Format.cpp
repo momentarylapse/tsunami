@@ -39,17 +39,17 @@ bool FormatDescriptor::testFormatCompatibility(Song *a)
 			num_midi ++;
 	}
 
-	if ((a->tracks.num > 1) && ((flags & FLAG_MULTITRACK) == 0))
+	if ((a->tracks.num > 1) and ((flags & FLAG_MULTITRACK) == 0))
 		return false;
-	/*if ((a->tag.num > 0) && ((flags & FLAG_TAGS) == 0))
+	/*if ((a->tag.num > 0) and ((flags & FLAG_TAGS) == 0))
 		return false;*/
-	if ((num_fx > 0) && ((flags & FLAG_FX) == 0))
+	if ((num_fx > 0) and ((flags & FLAG_FX) == 0))
 		return false;
-	if ((num_subs > 0) && ((flags & FLAG_SUBS) == 0))
+	if ((num_subs > 0) and ((flags & FLAG_SUBS) == 0))
 		return false;
-	if ((num_audio > 0) && ((flags & FLAG_AUDIO) == 0))
+	if ((num_audio > 0) and ((flags & FLAG_AUDIO) == 0))
 		return false;
-	if ((num_midi > 0) && ((flags & FLAG_MIDI) == 0))
+	if ((num_midi > 0) and ((flags & FLAG_MIDI) == 0))
 		return false;
 	return true;
 }

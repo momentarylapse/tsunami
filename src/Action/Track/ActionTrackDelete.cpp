@@ -13,7 +13,7 @@
 
 ActionTrackDelete::ActionTrackDelete(Song *a, int index)
 {
-	assert(index >= 0 && index < a->tracks.num);
+	assert(index >= 0 and index < a->tracks.num);
 
 	Track *t = a->tracks[index];
 

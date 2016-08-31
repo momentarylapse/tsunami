@@ -21,7 +21,7 @@ ActionTrack__DeleteEmpty::~ActionTrack__DeleteEmpty()
 void *ActionTrack__DeleteEmpty::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	assert(index >= 0 && index < a->tracks.num);
+	assert(index >= 0 and index < a->tracks.num);
 	Track *t = a->tracks[index];
 	int num_buf = 0;
 	for (TrackLevel &l : t->levels)

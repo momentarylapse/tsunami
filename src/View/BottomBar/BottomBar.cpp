@@ -110,6 +110,6 @@ void BottomBar::open(int console)
 
 bool BottomBar::isActive(int console)
 {
-	return (active_console == console) && visible;
+	return (active_console == console) and visible;
 }
 

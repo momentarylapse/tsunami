@@ -102,11 +102,11 @@ void MidiEditorConsole::update()
 void MidiEditorConsole::onUpdate(Observable* o, const string &message)
 {
 	update();
-	if ((o == track) && (message == track->MESSAGE_DELETE)){
+	if ((o == track) and (message == track->MESSAGE_DELETE)){
 		setTrack(NULL);
-	}else if ((o == view) && (message == view->MESSAGE_CUR_TRACK_CHANGE)){
+	}else if ((o == view) and (message == view->MESSAGE_CUR_TRACK_CHANGE)){
 		setTrack(view->cur_track);
-	}else if ((o == view) && (message == view->MESSAGE_VTRACK_CHANGE)){
+	}else if ((o == view) and (message == view->MESSAGE_VTRACK_CHANGE)){
 
 		reset("reference_tracks");
 		if (song){

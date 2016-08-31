@@ -109,7 +109,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 		int chunk_size = f->ReadInt();
 
 		if (chunk_name == "fmt "){
-			if ((chunk_size != 16) && (chunk_size != 18) && (chunk_size != 40))
+			if ((chunk_size != 16) and (chunk_size != 18) and (chunk_size != 40))
 				throw ::format("wave file gives header size %d (16, 18 or 40 expected)", chunk_size);
 			char header[16];
 			f->ReadBuffer(header, 16);
@@ -117,7 +117,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 				f->ReadByte();
 
 			format_code = *(short*)&header[0];
-			if ((format_code != 1) && (format_code != 3))
+			if ((format_code != 1) and (format_code != 3))
 				throw ::format("wave file has format %d (1 or 3 expected)", format_code);
 			channels = *(short*)&header[2];
 			freq = *(int*)&header[4];
@@ -167,6 +167,46 @@ void FormatWave::loadTrack(StorageOperationData *od)
 				}
 			}
 			break;
+		}else if (chunk_name == "LIST"){
+
+			// tags...
+			string buf;
+			buf.resize(chunk_size);
+			f->ReadBuffer(buf.data, buf.num);
+			//msg_write(buf.hex());
+
+			if (buf.head(4) == "INFO"){
+				int offset = 4;
+				while (offset + 8 < buf.num){
+					if (buf[offset] == 0){
+						offset ++;
+						continue;
+					}
+					string key = buf.substr(offset, 4);
+					int length = *(int*)buf.substr(offset + 4, 4).data;
+					if (offset + 8 + length > buf.num)
+						break;
+					string value = buf.substr(offset + 8, length - 1);
+					//msg_write(key + " : " + value.hex() + " - " + value);
+					offset += 8 + length;
+
+					if (key == "IART")
+						t->song->tags.add(Tag("artist", value));
+					else if (key == "INAM")
+						t->song->tags.add(Tag("title", value));
+					else if (key == "ICRD")
+						t->song->tags.add(Tag("year", value));
+					else if (key == "ICMT")
+						t->song->tags.add(Tag("comment", value));
+					else if (key == "IGNR")
+						t->song->tags.add(Tag("genre", value));
+					else if (key == "IPRD")
+						t->song->tags.add(Tag("album", value));
+					else if (key == "IPRT")
+						t->song->tags.add(Tag("track", value));
+				}
+			}
+
 		}else{
 			od->warn("unhandled wave chunk: " + chunk_name);
 

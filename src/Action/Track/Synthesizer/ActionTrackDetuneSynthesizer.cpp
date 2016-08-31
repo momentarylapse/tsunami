@@ -26,7 +26,7 @@ void *ActionTrackDetuneSynthesizer::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
-	assert((track_no >= 0) && (track_no <= a->tracks.num));
+	assert((track_no >= 0) and (track_no <= a->tracks.num));
 
 	Track *t = a->tracks[track_no];
 

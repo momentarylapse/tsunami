@@ -16,9 +16,23 @@
 #include <vorbis/vorbisenc.h>
 
 
-#define _error(msg, level)	{msg_error(msg); msg_db_l(level); return;}
-
 const int CHUNK_SIZE = 1 << 15;
+
+
+
+string tag_from_vorbis(const string &key)
+{
+	if (key == "TRACKNUMBER")
+		return "track";
+	/*if (key == "DATE")
+		return "year";*/
+	return key.lower();
+}
+
+string tag_to_vorbis(const string &key)
+{
+	return key.upper();
+}
 
 
 OggVorbis_File vf;
@@ -52,19 +66,27 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 	vorbis_info vi;
 	vorbis_info_init(&vi);
-	if (vorbis_encode_setup_vbr(&vi, 2, r->getSampleRate(), OggQuality))
-		_error("vorbis_encode_setup_vbr", 1);
+	if (vorbis_encode_setup_vbr(&vi, 2, r->getSampleRate(), OggQuality)){
+		od->error("vorbis_encode_setup_vbr");
+		return;
+	}
 	vorbis_encode_setup_init(&vi); // ?
 
 	vorbis_dsp_state vd;
 	vorbis_block vb;
 	ogg_stream_state os;
-	if (vorbis_analysis_init(&vd, &vi))
-		_error("vorbis_analysis_init", 1);
-	if (vorbis_block_init(&vd, &vb))
-		_error("vorbis_block_init", 1);
-	if (ogg_stream_init(&os, 0))
-		_error("ogg_stream_init", 1);
+	if (vorbis_analysis_init(&vd, &vi)){
+		od->error("vorbis_analysis_init");
+		return;
+	}
+	if (vorbis_block_init(&vd, &vb)){
+		od->error("vorbis_block_init");
+		return;
+	}
+	if (ogg_stream_init(&os, 0)){
+		od->error("ogg_stream_init");
+		return;
+	}
 
 	vorbis_comment vc;
 	vorbis_comment_init(&vc);
@@ -155,7 +177,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
                     int ret = oe_write_page(&og, f);
                     if (ret != og.header_len + og.body_len){
-                        msg_error("Failed writing data to output stream");
+                        od->error("Failed writing data to output stream");
                         ret = 1;
                         return;
                     }
@@ -177,15 +199,13 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 }
 
 
-
-
 void FormatOgg::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("Ogg.LoadTrack", 1);
 	Track *t = od->track;
 
 	if (ov_fopen((char*)od->filename.c_str(), &vf)){
-		msg_error("ogg: ov_fopen failed");
+		od->error("ogg: ov_fopen failed");
 		return;
 	}
 	vorbis_info *vi = ov_info(&vf, -1);
@@ -206,7 +226,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 		string s = *ptr;
 		int offset = s.find("=");
 		if (offset > 0)
-			t->song->tags.add(Tag(s.head(offset).lower(), s.substr(offset + 1, -1)));
+			t->song->tags.add(Tag(tag_from_vorbis(s.head(offset)), s.substr(offset + 1, -1)));
 		++ptr;
     }
 
@@ -221,7 +241,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 		if (r == 0)
 			break;
 		else if (r < 0){
-			msg_error("ogg: ov_read failed");
+			od->error("ogg: ov_read failed");
 			break;
 		}else{
 			int dsamples = r / 4;

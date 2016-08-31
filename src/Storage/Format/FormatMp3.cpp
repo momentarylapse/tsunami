@@ -31,6 +31,23 @@ static int read_32bit_be(File *f)
 	return d[3] | (d[2] << 8) | (d[1] << 16) | (d[0] << 24);
 }
 
+static string tag_from_mp3(const string &key)
+{
+	if (key == "TALB")
+		return "album";
+	if (key == "TPE1")
+		return "artist";
+	if (key == "TIT2")
+		return "title";
+	if (key == "TRCK")
+		return "track";
+	if ((key == "TYER") or (key == "TDRC"))
+		return "year";
+	if (key == "COMM")
+		return "comment";
+	return key;
+}
+
 void FormatMp3::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_mp3_file", 1);
@@ -126,18 +143,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 							//msg_write(val);
 
 							// will be added by wave loading...
-/*							if (key == "TALB")
-								t->song->addTag("album", val);
-							else if (key == "TPE1")
-								t->song->addTag("artist", val);
-							else if (key == "TIT2")
-								t->song->addTag("title", val);
-							else if (key == "TRCK")
-								t->song->addTag("track", i2s(val._int()));
-							else if ((key == "TYER") or (key == "TDRC"))
-								t->song->addTag("year", val);
-							else if (key == "COMM")
-								t->song->addTag("comment", val);*/
+//							t->song->addTag(tag_from_mp3(key), val);
 						}else{
 							f->SetPos(_size, false);
 						}

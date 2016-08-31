@@ -20,6 +20,10 @@ Track *flac_track;
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
+// -> FormatOgg.cpp
+string tag_from_vorbis(const string &key);
+string tag_to_vorbis(const string &key);
+
 
 FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *decoder, const FLAC__Frame *frame, const FLAC__int32 * const buffer[], void *client_data)
 {
@@ -63,7 +67,7 @@ void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stre
 			string s = (char*)metadata->data.vorbis_comment.comments[i].entry;
 			int pos = s.find("=");
 			if (pos >= 0)
-				flac_track->song->addTag(s.head(pos).lower(), s.tail(s.num - pos - 1));
+				flac_track->song->addTag(tag_from_vorbis(s.head(pos)), s.tail(s.num - pos - 1));
 		}
 	}else{
 		StorageOperationData *od = (StorageOperationData*)client_data;
@@ -190,7 +194,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 		if (metadata[0]){
 			Array<Tag> tags = r->getTags();
 			for (Tag &t : tags){
-				FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, t.key.upper().c_str(), t.value.c_str());
+				FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, tag_to_vorbis(t.key).c_str(), t.value.c_str());
 				FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, true);
 			}
 		}else{

@@ -75,6 +75,29 @@ static string read_chunk_name(File *f)
 	return s;
 }
 
+static string tag_from_wave(const string &key)
+{
+	if (key == "IART")
+		return "artist";
+	if (key == "INAM")
+		return "title";
+	if (key == "ICRD")
+		return "year";
+	if (key == "ICMT")
+		return "comment";
+	if (key == "IGNR")
+		return "genre";
+	if (key == "IPRD")
+		return "album";
+	if (key == "IPRT")
+		return "track";
+	if (key == "ICOP")
+		return "copyright";
+	if (key == "ISFT")
+		return "software";
+	return key;
+}
+
 void FormatWave::loadTrack(StorageOperationData *od)
 {
 	msg_db_f("load_wave_file", 1);
@@ -190,20 +213,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 					//msg_write(key + " : " + value.hex() + " - " + value);
 					offset += 8 + length;
 
-					if (key == "IART")
-						t->song->tags.add(Tag("artist", value));
-					else if (key == "INAM")
-						t->song->tags.add(Tag("title", value));
-					else if (key == "ICRD")
-						t->song->tags.add(Tag("year", value));
-					else if (key == "ICMT")
-						t->song->tags.add(Tag("comment", value));
-					else if (key == "IGNR")
-						t->song->tags.add(Tag("genre", value));
-					else if (key == "IPRD")
-						t->song->tags.add(Tag("album", value));
-					else if (key == "IPRT")
-						t->song->tags.add(Tag("track", value));
+					t->song->tags.add(Tag(tag_from_wave(key), value));
 				}
 			}
 

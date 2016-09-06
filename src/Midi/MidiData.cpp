@@ -502,6 +502,6 @@ void MidiData::clear_meta() const
 		n.stringno = -1;
 	for (MidiNote &n : *this){
 		n.clef_position = -1;
-		n.modifier = MODIFIER_NONE;
+		n.modifier = MODIFIER_UNKNOWN;
 	}
 }

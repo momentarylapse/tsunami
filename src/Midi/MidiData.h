@@ -136,17 +136,20 @@ enum{
 	MODIFIER_SHARP,
 	MODIFIER_FLAT,
 	MODIFIER_NATURAL,
+	MODIFIER_UNKNOWN = -1,
 };
 
 inline string modifier_symbol(int mod)
 {
+	if (mod == MODIFIER_NONE)
+		return "";
 	if (mod == MODIFIER_SHARP)
 		return "\u266f";
 	if (mod == MODIFIER_FLAT)
 		return "\u266d";
 	if (mod == MODIFIER_NATURAL)
 		return "\u266e";
-	return "";
+	return "?";
 }
 
 

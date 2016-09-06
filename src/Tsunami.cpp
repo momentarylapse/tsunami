@@ -14,8 +14,6 @@
 #include "Stuff/Clipboard.h"
 #include "Plugins/PluginManager.h"
 
-#include "lib/image/ImagePainter.h"
-
 
 string AppName = "Tsunami";
 string AppVersion = "0.6.42.4";
@@ -94,7 +92,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &arg)
 	}else if (arg[1] == "--info"){
 		song = new Song;
 		if (arg.num < 3){
-			log->error(_("Call: tsunami --info <File>"));
+			log->error(_("call: tsunami --info <File>"));
 		}else if (storage->load(song, arg[2])){
 			msg_write(format("sample-rate: %d", song->sample_rate));
 			msg_write(format("samples: %d", song->getRange().length));
@@ -108,7 +106,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &arg)
 	}else if (arg[1] == "--export"){
 		song = new Song;
 		if (arg.num < 4){
-			log->error(_("Call: tsunami --export <File> <Exportfile>"));
+			log->error(_("call: tsunami --export <File> <Exportfile>"));
 		}else if (storage->load(song, arg[2])){
 			storage->save(song, arg[3]);
 		}

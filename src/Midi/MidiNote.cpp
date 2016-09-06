@@ -18,7 +18,7 @@ MidiNote::MidiNote()
 	volume = 0;
 	stringno = -1;
 	clef_position = -1;
-	modifier = MODIFIER_NONE;
+	modifier = MODIFIER_UNKNOWN;
 }
 
 MidiNote::MidiNote(const Range &_range, float _pitch, float _volume)
@@ -28,7 +28,7 @@ MidiNote::MidiNote(const Range &_range, float _pitch, float _volume)
 	volume = _volume;
 	stringno = -1;
 	clef_position = -1;
-	modifier = MODIFIER_NONE;
+	modifier = MODIFIER_UNKNOWN;
 }
 
 float MidiNote::getFrequency()
@@ -39,7 +39,7 @@ float MidiNote::getFrequency()
 
 void MidiNote::update_meta(const Instrument &instrument, const Scale& scale, int hand_position) const
 {
-	if (clef_position < 0){
+	if ((clef_position < 0) or (modifier == MODIFIER_UNKNOWN)){
 		const Clef& clef = instrument.get_clef();
 		clef_position = clef.pitch_to_position(pitch, scale, modifier);
 	}

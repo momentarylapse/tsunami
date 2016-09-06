@@ -31,7 +31,7 @@ void Selection::clear()
 	show_track_controls = NULL;
 	pitch = -1;
 	clef_position = -1;
-	modifier = MODIFIER_NONE;
+	modifier = MODIFIER_UNKNOWN;
 }
 
 bool hover_changed(Selection &hover, Selection &hover_old)

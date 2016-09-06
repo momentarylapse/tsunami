@@ -266,7 +266,7 @@ int ViewModeMidi::y2clef(int y, int &mod)
 	int ti = view->cur_track->get_index();
 	AudioViewTrack *t = view->vtrack[ti];
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
-		mod = MODIFIER_NONE;
+		mod = modifier;
 		return t->screen_to_clef_pos(y);
 	}
 	int pitch = pitch_min + ((t->area.y2 - y) * (pitch_max - pitch_min) / t->area.height());
@@ -495,8 +495,9 @@ Selection ViewModeMidi::getHover()
 		if (midi_mode != MIDI_MODE_SELECT){
 			s.pitch = y2pitch(my);
 			s.clef_position = y2clef(my, s.modifier);
+			//s.modifier = modifier;
 			s.type = Selection::TYPE_MIDI_PITCH;
-			s.index = randi(1000); // quick'n'dirty fix to force view update every time the mouse moves
+			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
 			Array<MidiNote> notes = s.track->midi;
 			foreachi(MidiNote &n, notes, i)
 				if (hover_note(n, s, view)){
@@ -554,6 +555,8 @@ void ViewModeMidi::drawMidiEvent(Painter *c, const MidiEvent &e)
 
 void ViewModeMidi::drawMidiEditable(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
+	t->drawMidiScore(c, midi, 0);
+	return;
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
 		drawMidiEditableScore(c, t, midi, as_reference, track, area);
 	else
@@ -620,9 +623,11 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
 	if ((view->cur_track == t->track) and (t->track->type == Track::TYPE_MIDI)){
+
 		for (int n : t->reference_tracks)
 			if ((n >= 0) and (n < song->tracks.num) and (n != t->track->get_index()))
 				drawMidiEditable(c, t, song->tracks[n]->midi, true, t->track, t->area);
+
 		drawMidiEditable(c, t, t->track->midi, false, t->track, t->area);
 
 

@@ -555,7 +555,7 @@ void ViewModeMidi::drawMidiEvent(Painter *c, const MidiEvent &e)
 
 void ViewModeMidi::drawMidiEditable(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
-	t->drawMidiScore(c, midi, 0);
+	t->drawMidiScore(c, midi, as_reference, 0);
 	return;
 	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
 		drawMidiEditableScore(c, t, midi, as_reference, track, area);
@@ -700,7 +700,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 		}
 	}else{
 		if ((t->track->type == Track::TYPE_MIDI) or (t->track->midi.num > 0))
-			t->drawMidi(c, t->track->midi, 0);
+			t->drawMidi(c, t->track->midi, false, 0);
 	}
 
 	// audio buffer

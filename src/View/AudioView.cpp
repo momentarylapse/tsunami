@@ -711,7 +711,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 			if (input->type == Track::TYPE_AUDIO)
 				vtrack[capturing_track]->drawBuffer(c, *input->buffer, cam.pos - sel.range.offset, colors.capture_marker);
 			if (input->type == Track::TYPE_MIDI)
-				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(*input->midi), sel.range.start());
+				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(*input->midi), true, sel.range.start());
 		}
 	}
 

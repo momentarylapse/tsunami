@@ -321,7 +321,7 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 {
 	// midi
 	if ((t->track->type == Track::TYPE_MIDI) or (t->track->midi.num > 0))
-		t->drawMidi(c, t->track->midi, 0);
+		t->drawMidi(c, t->track->midi, false, 0);
 
 	// audio buffer
 	t->drawTrackBuffers(c, view->cam.pos);

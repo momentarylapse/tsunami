@@ -217,7 +217,7 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 	if (s->type() == Track::TYPE_AUDIO)
 		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);
 	else if (s->type() == Track::TYPE_MIDI)
-		drawMidi(c, *s->midi, s->pos);
+		drawMidi(c, *s->midi, true, s->pos);
 
 	int asx = clampi(view->cam.sample2screen(s->pos), area.x1, area.x2);
 	if (view->sel.has(s))//((is_cur) or (a->sub_mouse_over == s))
@@ -246,17 +246,17 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker &marker, int index
 }
 
 
-void AudioViewTrack::drawMidi(Painter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidi(Painter *c, const MidiData &midi, bool as_reference, int shift)
 {
 	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
-		drawMidiDefault(c, midi, shift);
+		drawMidiDefault(c, midi, as_reference, shift);
 	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->instrument.string_pitch.num > 0))
-		drawMidiTab(c, midi, shift);
+		drawMidiTab(c, midi, as_reference, shift);
 	else // if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
-		drawMidiScore(c, midi, shift);
+		drawMidiScore(c, midi, as_reference, shift);
 }
 
-void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
@@ -282,7 +282,7 @@ void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, int shift
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
-void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
@@ -404,8 +404,10 @@ void AudioViewTrack::drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiN
 		color col1 = view->colors.selection;
 		draw_score_note(c, x, y, x1, x2, r, 2, col1, col1, false);
 	}
-	if ((state == STATE_HOVER) or (state == STATE_REFERENCE))
-		col = ColorInterpolate(col, view->colors.background_track, 0.333f);
+	if (state == STATE_HOVER)
+		col = ColorInterpolate(col, view->colors.hover, 0.333f);
+	else if (state == STATE_REFERENCE)
+		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 
 	if (n.modifier != MODIFIER_NONE){
 		c->setColor(col);
@@ -439,7 +441,7 @@ void AudioViewTrack::drawMidiScoreClef(Painter *c, const Clef &clef, const Scale
 	c->setFontSize(view->FONT_SIZE);
 }
 
-void AudioViewTrack::drawMidiScore(Painter *c, const MidiData &midi, int shift)
+void AudioViewTrack::drawMidiScore(Painter *c, const MidiData &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
@@ -452,7 +454,7 @@ void AudioViewTrack::drawMidiScore(Painter *c, const MidiData &midi, int shift)
 	c->setAntialiasing(true);
 
 	for (MidiNote &n : notes)
-		drawMidiNoteScore(c, n, shift, STATE_DEFAULT, clef);
+		drawMidiNoteScore(c, n, shift, as_reference ? STATE_REFERENCE : STATE_DEFAULT, clef);
 
 	c->setFontSize(view->FONT_SIZE);
 	c->setAntialiasing(false);

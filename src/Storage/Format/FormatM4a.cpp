@@ -23,6 +23,6 @@ void FormatM4a::loadTrack(StorageOperationData *od)
 		od->storage->current_directory = od->filename.dirname();
 		file_delete(tmp);
 	}else
-		od->error("mp3: need external program 'avconv' to decode");
+		od->error("need external program 'avconv' to decode");
 }
 

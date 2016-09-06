@@ -31,6 +31,10 @@ void FormatRaw::saveViaRenderer(StorageOperationData *od)
 	AudioRenderer *r = od->renderer;
 
 	File *f = FileCreate(od->filename);
+	if (!f){
+		od->error("can not create file");
+		return;
+	}
 	f->SetBinaryMode(true);
 
 	for (int i=0; i<config.offset; i++)
@@ -64,7 +68,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 	try{
 
 		if (!f)
-			throw string("can't open file");
+			throw string("can not open file");
 		f->SetBinaryMode(true);
 		int byte_per_sample = (format_get_bits(config.format) / 8) * config.channels;
 		long long size = f->GetSize64() - config.offset;

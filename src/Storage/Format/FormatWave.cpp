@@ -35,6 +35,8 @@ void FormatWave::saveViaRenderer(StorageOperationData *od)
 	int samples = r->getNumSamples();
 
 	File *f = FileCreate(od->filename);
+	if (!f)
+		throw string("can not create file");
 	f->SetBinaryMode(true);
 
 	f->WriteBuffer("RIFF", 4);
@@ -109,7 +111,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 	try{
 
 	if (!f)
-		throw string("can't open file");
+		throw string("can not open file");
 	f->SetBinaryMode(true);
 	if (read_chunk_name(f) != "RIFF")
 		throw string("wave file does not start with \"RIFF\"");

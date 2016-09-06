@@ -63,6 +63,10 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
 
 	FILE *f = fopen(od->filename.c_str(), "wb");
+	if (!f){
+		od->error("can not create file");
+		return;
+	}
 
 	vorbis_info vi;
 	vorbis_info_init(&vi);
@@ -205,7 +209,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 	Track *t = od->track;
 
 	if (ov_fopen((char*)od->filename.c_str(), &vf)){
-		od->error("ogg: ov_fopen failed");
+		od->error("can not open file");
 		return;
 	}
 	vorbis_info *vi = ov_info(&vf, -1);
@@ -241,7 +245,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 		if (r == 0)
 			break;
 		else if (r < 0){
-			od->error("ogg: ov_read failed");
+			od->error("ov_read failed");
 			break;
 		}else{
 			int dsamples = r / 4;

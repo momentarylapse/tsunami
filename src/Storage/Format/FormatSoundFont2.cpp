@@ -24,6 +24,8 @@ void FormatSoundFont2::loadSong(StorageOperationData *_od)
 	song = od->song;
 
 	File *f = FileOpen(od->filename);
+	if (!f)
+		throw string("can not open file");
 	f->SetBinaryMode(true);
 
 	sample_offset = -1;

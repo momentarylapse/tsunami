@@ -56,7 +56,7 @@ void FormatMidi::loadSong(StorageOperationData *od)
 	try{
 		f = FileOpen(od->filename);
 		if (!f)
-			throw string("can't open file");
+			throw string("can not open file");
 		f->SetBinaryMode(true);
 
 		string hn = read_chunk_name(f);

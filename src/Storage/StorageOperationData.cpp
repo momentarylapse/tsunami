@@ -34,17 +34,17 @@ StorageOperationData::~StorageOperationData()
 
 void StorageOperationData::info(const string& message)
 {
-	tsunami->log->info(message);
+	tsunami->log->info(filename + ": " + message);
 }
 
 void StorageOperationData::warn(const string& message)
 {
-	tsunami->log->warn(message);
+	tsunami->log->warn(filename + ": " + message);
 }
 
 void StorageOperationData::error(const string& message)
 {
-	tsunami->log->error(message);
+	tsunami->log->error(filename + ": " + message);
 }
 
 void StorageOperationData::set(float t)

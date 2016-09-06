@@ -91,53 +91,54 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 	msg_db_f("load_flac_file", 1);
 	Track *t = od->track;
 	t->song->action_manager->beginActionGroup();
-	bool ok = true;
 
-	flac_file_size = 1000000000;
-	File *f = FileOpen(od->filename);
-	if (f){
+	FLAC__StreamDecoder *decoder = NULL;
+
+	try{
+
+		File *f = FileOpen(od->filename);
+		if (!f)
+			throw string("can not open file");
 		flac_file_size = f->GetSize();
 		FileClose(f);
-	}
 
-	flac_level = od->level;
-	flac_offset = od->offset;
-	flac_read_samples = 0;
-	flac_track = t;
-	//bits = channels = samples = freq = 0;
+		flac_level = od->level;
+		flac_offset = od->offset;
+		flac_read_samples = 0;
+		flac_track = t;
+		//bits = channels = samples = freq = 0;
 
-	FLAC__StreamDecoder *decoder = FLAC__stream_decoder_new();
-	if (!decoder){
-		od->error("flac: decoder_new()");
-	}
+		decoder = FLAC__stream_decoder_new();
+		if (!decoder)
+			throw string("could not create decoder");
 
-	FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO | FLAC__METADATA_TYPE_VORBIS_COMMENT));
+		FLAC__stream_decoder_set_metadata_respond(decoder, (FLAC__MetadataType)(FLAC__METADATA_TYPE_STREAMINFO | FLAC__METADATA_TYPE_VORBIS_COMMENT));
 
-	FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_file(
-							decoder,
-							od->filename.c_str(),
-							flac_write_callback,
-							flac_metadata_callback,
-							flac_error_callback, od);
-	if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK){
-		od->error(string("flac: initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status]);
-		ok = false;
-	}
+		FLAC__StreamDecoderInitStatus init_status = FLAC__stream_decoder_init_file(
+								decoder,
+								od->filename.c_str(),
+								flac_write_callback,
+								flac_metadata_callback,
+								flac_error_callback, od);
+		if (init_status != FLAC__STREAM_DECODER_INIT_STATUS_OK)
+			throw string("initializing decoder: ") + FLAC__StreamDecoderInitStatusString[init_status];
 
-	if (ok){
-		ok = FLAC__stream_decoder_process_until_end_of_stream(decoder);
-		if (!ok){
-			od->error("flac: decoding FAILED");
-			od->error(string("   state: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)]);
+		if (!FLAC__stream_decoder_process_until_end_of_stream(decoder))
+			throw string("decoding failed. State: ") + FLAC__StreamDecoderStateString[FLAC__stream_decoder_get_state(decoder)];
+
+
+		if (t->get_index() == 0){
+			t->song->setSampleRate(flac_freq);
+			t->song->setDefaultFormat(format_for_bits(flac_bits));
 		}
-	}
-	FLAC__stream_decoder_delete(decoder);
 
-
-	if (t->get_index() == 0){
-		t->song->setSampleRate(flac_freq);
-		t->song->setDefaultFormat(format_for_bits(flac_bits));
+	}catch(string &s){
+		od->error(s);
 	}
+
+	if (decoder)
+		FLAC__stream_decoder_delete(decoder);
+
 	t->song->action_manager->endActionGroup();
 }
 
@@ -161,61 +162,58 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 {
 	AudioRenderer *r = od->renderer;
 
-	bool ok = true;
-	FLAC__StreamEncoderInitStatus init_status;
-	FLAC__StreamMetadata *metadata[1];
-	FLAC__StreamMetadata_VorbisComment_Entry entry;
+	FLAC__StreamEncoder *encoder = NULL;
+	FLAC__StreamMetadata *metadata = NULL;
 
-	int channels = 2;
-	SampleFormat format = SAMPLE_FORMAT_16;
-	if (od->song)
-		format = od->song->default_format;
-	int bits = format_get_bits(format);
-	if (bits > 24)
-		bits = 24;
+	try{
+		FLAC__StreamEncoderInitStatus init_status;
+		FLAC__StreamMetadata_VorbisComment_Entry entry;
 
-	// allocate the encoder
-	FLAC__StreamEncoder *encoder = FLAC__stream_encoder_new();
-	if (!encoder){
-		od->error("flac: allocating encoder");
-		return;
-	}
+		int channels = 2;
+		SampleFormat format = SAMPLE_FORMAT_16;
+		if (od->song)
+			format = od->song->default_format;
+		int bits = format_get_bits(format);
+		if (bits > 24)
+			bits = 24;
 
-	ok &= FLAC__stream_encoder_set_verify(encoder, true);
-	ok &= FLAC__stream_encoder_set_compression_level(encoder, 5);
-	ok &= FLAC__stream_encoder_set_channels(encoder, channels);
-	ok &= FLAC__stream_encoder_set_bits_per_sample(encoder, bits);
-	ok &= FLAC__stream_encoder_set_sample_rate(encoder, r->getSampleRate());
-	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, r->getNumSamples());
+		// allocate the encoder
+		encoder = FLAC__stream_encoder_new();
+		if (!encoder)
+			throw string("allocating encoder");
 
-	// metadata
-	if (ok){
-		metadata[0] = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
-		if (metadata[0]){
-			Array<Tag> tags = r->getTags();
-			for (Tag &t : tags){
-				FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, tag_to_vorbis(t.key).c_str(), t.value.c_str());
-				FLAC__metadata_object_vorbiscomment_append_comment(metadata[0], entry, true);
-			}
-		}else{
-			od->error("flac: could not add metadata");
-			ok = false;
+//		if (!FLAC__stream_encoder_set_verify(encoder, true))
+//			throw string("FLAC__stream_encoder_set_verify");
+		if (!FLAC__stream_encoder_set_compression_level(encoder, 5))
+			throw string("could not set compression level");
+		if (!FLAC__stream_encoder_set_channels(encoder, channels))
+			throw string("could not set channels");
+		if (!FLAC__stream_encoder_set_bits_per_sample(encoder, bits))
+			throw string("could not set bits per sample");
+		if (!FLAC__stream_encoder_set_sample_rate(encoder, r->getSampleRate()))
+			throw string("could not set sample rate");
+		if (!FLAC__stream_encoder_set_total_samples_estimate(encoder, r->getNumSamples()))
+			throw string("could not set total samples estimate");
+
+		// metadata
+		metadata = FLAC__metadata_object_new(FLAC__METADATA_TYPE_VORBIS_COMMENT);
+		if (!metadata)
+			throw string("could not add meta data");
+		Array<Tag> tags = r->getTags();
+		for (Tag &t : tags){
+			FLAC__metadata_object_vorbiscomment_entry_from_name_value_pair(&entry, tag_to_vorbis(t.key).c_str(), t.value.c_str());
+			FLAC__metadata_object_vorbiscomment_append_comment(metadata, entry, true);
 		}
 
-		ok = FLAC__stream_encoder_set_metadata(encoder, metadata, 1);
-	}
+		if (!FLAC__stream_encoder_set_metadata(encoder, &metadata, 1))
+			throw string("could not set meta data");
 
-	// initialize encoder
-	if (ok){
+		// initialize encoder
 		init_status = FLAC__stream_encoder_init_file(encoder, od->filename.c_str(), flac_progress_callback, od);
-		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
-			od->error(string("flac: initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status]);
-			ok = false;
-		}
-	}
+		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK)
+			throw string("initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status];
 
-	// read blocks of samples from WAVE file and feed to encoder
-	if (ok){
+		// read blocks of samples from WAVE file and feed to encoder
 		float scale = pow(2.0f, bits-1);
 		BufferBox buf;
 		buf.resize(FLAC_READSIZE);
@@ -226,23 +224,23 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 				flac_pcm[i * 2 + 1] = (int)(buf.c[1][i] * scale);
 			}
 			/* feed samples to encoder */
-			ok = FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, buf.length);
-			if (!ok)
-				break;
+			if (!FLAC__stream_encoder_process_interleaved(encoder, flac_pcm, buf.length))
+				throw string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)];
 		}
-	}
 
-	ok &= FLAC__stream_encoder_finish(encoder);
+		if (!FLAC__stream_encoder_finish(encoder))
+			throw string("error while encoding. State: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)];
 
-	if (!ok){
-		od->error("flac: encoding: FAILED");
-		od->error(string("   state: ") + FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
+	}catch(string &s){
+		od->error(s);
 	}
 
 	// now that encoding is finished, the metadata can be freed
-	FLAC__metadata_object_delete(metadata[0]);
+	if (metadata)
+		FLAC__metadata_object_delete(metadata);
 
-	FLAC__stream_encoder_delete(encoder);
+	if (encoder)
+		FLAC__stream_encoder_delete(encoder);
 }
 
 #endif

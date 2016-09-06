@@ -88,6 +88,10 @@ void FormatGuitarPro::saveSong(StorageOperationData *_od)
 	char data[16];
 
 	f = FileCreate(od->filename);
+	if (!f){
+		od->error("can not create file");
+		return;
+	}
 	f->SetBinaryMode(true);
 	string ext = od->filename.extension();
 	if (ext == "gp3")
@@ -183,7 +187,7 @@ void FormatGuitarPro::loadSong(StorageOperationData *_od)
 	try{
 
 		if (!f)
-			throw string("can't open file");
+			throw string("can not open file");
 		f->SetBinaryMode(true);
 		string s;
 		s = read_str1c(f, 30);

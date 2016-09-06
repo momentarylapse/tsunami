@@ -59,7 +59,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 	try{
 
 		if (!f)
-			throw string("can't open file");
+			throw string("can not open file");
 		f->SetBinaryMode(true);
 
 
@@ -149,7 +149,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 						}
 
 					}else{
-						od->error(format("mp3: unsupported ID3 version: v2.%d.%d", version, v_min));
+						od->error(format("unsupported ID3 version: v2.%d.%d", version, v_min));
 						break;
 					}
 				}
@@ -169,7 +169,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 			od->storage->current_directory = od->filename.dirname();
 			file_delete(tmp);
 		}else
-			od->error("mp3: need external program 'avconv' to decode");
+			od->error("need external program 'avconv' to decode");
 
 
 	}catch(const string &s){

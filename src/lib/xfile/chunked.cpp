@@ -229,6 +229,8 @@ ChunkedFileParser::~ChunkedFileParser()
 bool ChunkedFileParser::read(const string &filename, void *p)
 {
 	File *f = FileOpen(filename);
+	if (!f)
+		throw string("can not open file");
 	f->SetBinaryMode(true);
 	context.f = f;
 	//context.push(Context::Layer(name, 0, f->GetSize()));
@@ -248,6 +250,8 @@ bool ChunkedFileParser::read(const string &filename, void *p)
 bool ChunkedFileParser::write(const string &filename, void *p)
 {
 	File *f = FileCreate(filename);
+	if (!f)
+		throw string("can not create file");
 	f->SetBinaryMode(true);
 	context.f = f;
 	//context->push(Context::Layer(name, 0, 0));

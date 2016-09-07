@@ -55,6 +55,10 @@ public:
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 
+	int which_midi_mode(bool editing);
+
+	static void draw_score_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle);
+
 	Track *track;
 	rect area;
 	rect area_last, area_target;

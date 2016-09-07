@@ -89,12 +89,12 @@ void SongSelection::update_bars(Song* s)
 	}
 }
 
-void SongSelection::add(Track* t)
+void SongSelection::add(const Track* t)
 {
 	tracks.add(t);
 }
 
-void SongSelection::set(Track* t, bool selected)
+void SongSelection::set(const Track* t, bool selected)
 {
 	if (selected)
 		tracks.add(t);
@@ -102,17 +102,17 @@ void SongSelection::set(Track* t, bool selected)
 		tracks.erase(t);
 }
 
-bool SongSelection::has(Track* t) const
+bool SongSelection::has(const Track* t) const
 {
 	return tracks.contains(t);
 }
 
-void SongSelection::add(SampleRef* s)
+void SongSelection::add(const SampleRef* s)
 {
 	samples.add(s);
 }
 
-void SongSelection::set(SampleRef* s, bool selected)
+void SongSelection::set(const SampleRef* s, bool selected)
 {
 	if (selected)
 		samples.add(s);
@@ -120,17 +120,17 @@ void SongSelection::set(SampleRef* s, bool selected)
 		samples.erase(s);
 }
 
-bool SongSelection::has(SampleRef* s) const
+bool SongSelection::has(const SampleRef* s) const
 {
 	return samples.contains(s);
 }
 
-void SongSelection::add(TrackMarker* m)
+void SongSelection::add(const TrackMarker* m)
 {
 	markers.add(m);
 }
 
-void SongSelection::set(TrackMarker* m, bool selected)
+void SongSelection::set(const TrackMarker* m, bool selected)
 {
 	if (selected)
 		markers.add(m);
@@ -138,17 +138,17 @@ void SongSelection::set(TrackMarker* m, bool selected)
 		markers.erase(m);
 }
 
-bool SongSelection::has(TrackMarker* m) const
+bool SongSelection::has(const TrackMarker* m) const
 {
 	return markers.contains(m);
 }
 
-void SongSelection::add(MidiNote* n)
+void SongSelection::add(const MidiNote* n)
 {
 	notes.add(n);
 }
 
-void SongSelection::set(MidiNote* n, bool selected)
+void SongSelection::set(const MidiNote* n, bool selected)
 {
 	if (selected)
 		notes.add(n);
@@ -156,7 +156,7 @@ void SongSelection::set(MidiNote* n, bool selected)
 		notes.erase(n);
 }
 
-bool SongSelection::has(MidiNote* n) const
+bool SongSelection::has(const MidiNote* n) const
 {
 	return notes.contains(n);
 }

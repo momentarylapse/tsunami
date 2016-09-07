@@ -248,11 +248,12 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker &marker, int index
 
 void AudioViewTrack::drawMidi(Painter *c, const MidiData &midi, bool as_reference, int shift)
 {
-	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
+	int mode = which_midi_mode(false);
+	if (mode == view->MIDI_MODE_MIDI)
 		drawMidiDefault(c, midi, as_reference, shift);
-	else if ((view->midi_view_mode == view->VIEW_MIDI_TAB) and (track->instrument.string_pitch.num > 0))
+	else if (mode == view->MIDI_MODE_TAB)
 		drawMidiTab(c, midi, as_reference, shift);
-	else // if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+	else // if (mode == view->VIEW_MIDI_SCORE)
 		drawMidiScore(c, midi, as_reference, shift);
 }
 
@@ -282,6 +283,24 @@ void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, bool as_r
 	c->setLineWidth(view->LINE_WIDTH);
 }
 
+void AudioViewTrack::draw_score_note(Painter *c, float x1, float x2, float y, float r, float rx, const color &col, const color &col_shadow, bool force_circle)
+{
+	float x = x1 + r;
+
+	// "shadow" to indicate length
+	if (x2 - x1 > r*2){
+		c->setColor(col_shadow);
+		c->drawRect(x, y - r - rx, x2 - x + rx, r*2 + rx*2);
+	}
+
+	// the note circle
+	c->setColor(col);
+	if ((x2 - x1 > 6) or force_circle)
+		c->drawCircle(x, y, r+rx);
+	else
+		c->drawRect(x - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
+}
+
 void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift)
 {
 	Range range = view->cam.range() - shift;
@@ -304,40 +323,32 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, bool as_refer
 
 	c->setFontSize(h / 6);
 	c->drawStr(10, area.y1 + area.height() * 0.22f, "T\nA\nB");
-	float r = min(dy/2, 8.0f);
-	c->setFontSize(r * 1.6f);
+	float r = dy/2;//min(dy/2, 8.0f);
+	float font_size = r * 1.4f;
+	c->setFontSize(font_size);
 
 	for (MidiNote &n : notes){
 
 		float x1 = view->cam.sample2screen(n.range.offset + shift);
 		float x2 = view->cam.sample2screen(n.range.end() + shift);
-		float x = x1 + r;
 
 		float y = y0 - n.stringno * dy;
 
-		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.3f);
-		if (view->sel.has(&n))
-			col = ColorInterpolate(col, Red, 0.3f);
 
-		// "shadow" to indicate length
-		if (x2 - x1 > r*2){
-			color col2 = col;
-			col2.a *= 0.4f;
-			c->setColor(col2);
-			c->drawRect(x, y - r, x2 - x, r*2);
+		if (view->sel.has(&n)){
+			//col = ColorInterpolate(col, Red, 0.3f);
+			color col2 = view->colors.selection;
+			draw_score_note(c, x1, x2, y, r, 2, col2, col2, false);
 		}
 
-		// the note circle
-		col = ColorInterpolate(col, view->colors.background_track, 0.5f);
-		//col.a *= 0.4f;
-		c->setColor(col);
-		if (x2 - x1 > 6)
-			c->drawCircle(x, y, r);
-		else
-			c->drawRect(x - r*0.8f, y - r*0.8f, r*1.6f, r*1.6f);
+		color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.2f);
+		col = ColorInterpolate(col, view->colors.background_track, 0.3f);
+
+		draw_score_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.3f), false);
+
 		if (x2 - x1 > r/2){
 			c->setColor(view->colors.text);
-			c->drawStr(x1 + r/3, y - r * 1.20f, i2s(n.pitch - track->instrument.string_pitch[n.stringno]));
+			c->drawStr(x1 + font_size*0.2f, y - font_size*0.75f, i2s(n.pitch - track->instrument.string_pitch[n.stringno]));
 		}
 
 	}
@@ -353,22 +364,6 @@ float AudioViewTrack::clef_pos_to_screen(int pos)
 int AudioViewTrack::screen_to_clef_pos(float y)
 {
 	return (int)floor((area.y2 - y - area.height() / 2) * 2.0f / clef_dy + 0.5f) + 4;
-}
-
-inline void draw_score_note(Painter *c, float x, float y, float x1, float x2, float r, float rx, const color &col, const color &col_shadow, bool force_circle)
-{
-	// "shadow" to indicate length
-	if (x2 - x1 > r*2){
-		c->setColor(col_shadow);
-		c->drawRect(x, y - r - rx, x2 - x + rx, r*2 + rx*2);
-	}
-
-	// the note circle
-	c->setColor(col);
-	if ((x2 - x1 > 6) or force_circle)
-		c->drawCircle(x, y, r+rx);
-	else
-		c->drawRect(x - r*0.8f - rx, y - r*0.8f - rx, r*1.6f + rx*2, r*1.6f + rx*2);
 }
 
 void AudioViewTrack::drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiNoteState state, const Clef &clef)
@@ -402,7 +397,7 @@ void AudioViewTrack::drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiN
 	color col = ColorInterpolate(getPitchColor(n.pitch), view->colors.text, 0.2f);
 	if (view->sel.has(&n)){
 		color col1 = view->colors.selection;
-		draw_score_note(c, x, y, x1, x2, r, 2, col1, col1, false);
+		draw_score_note(c, x1, x2, y, r, 2, col1, col1, false);
 	}
 	if (state == STATE_HOVER)
 		col = ColorInterpolate(col, view->colors.hover, 0.333f);
@@ -410,13 +405,13 @@ void AudioViewTrack::drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiN
 		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 
 	if (n.modifier != MODIFIER_NONE){
-		c->setColor(col);
+		c->setColor(ColorInterpolate(col, view->colors.text, 0.5f));
 		float size = r*2.8f;
 		c->setFontSize(size);
 		c->drawStr(x1 - size*0.7f, y - size*0.8f , modifier_symbol(n.modifier));
 	}
 
-	draw_score_note(c, x, y, x1, x2, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), (state == STATE_HOVER));
+	draw_score_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), (state == STATE_HOVER));
 }
 
 void AudioViewTrack::drawMidiScoreClef(Painter *c, const Clef &clef, const Scale &scale)
@@ -527,4 +522,15 @@ void AudioViewTrack::drawHeader(Painter *c)
 	}
 }
 
+
+int AudioViewTrack::which_midi_mode(bool editing)
+{
+	if (view->midi_view_mode == view->MIDI_MODE_SCORE)
+		return view->MIDI_MODE_SCORE;
+	if (view->midi_view_mode == view->MIDI_MODE_MIDI)
+		return editing ? view->MIDI_MODE_MIDI : view->MIDI_MODE_SCORE;
+	if ((view->midi_view_mode == view->MIDI_MODE_TAB) and (track->instrument.string_pitch.num > 0))
+		return view->MIDI_MODE_TAB;
+	return view->MIDI_MODE_SCORE;
+}
 

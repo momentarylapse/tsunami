@@ -34,26 +34,26 @@ public:
 	Range bars;
 	Range bar_range;
 
-	Set<Track*> tracks;
-	Set<SampleRef*> samples;
-	Set<TrackMarker*> markers;
-	Set<MidiNote*> notes;
+	Set<const Track*> tracks;
+	Set<const SampleRef*> samples;
+	Set<const TrackMarker*> markers;
+	Set<const MidiNote*> notes;
 
-	void add(Track *t);
-	void set(Track *t, bool selected);
-	bool has(Track *t) const;
+	void add(const Track *t);
+	void set(const Track *t, bool selected);
+	bool has(const Track *t) const;
 
-	void add(SampleRef *s);
-	void set(SampleRef *s, bool selected);
-	bool has(SampleRef *s) const;
+	void add(const SampleRef *s);
+	void set(const SampleRef *s, bool selected);
+	bool has(const SampleRef *s) const;
 
-	void add(TrackMarker *m);
-	void set(TrackMarker *m, bool selected);
-	bool has(TrackMarker *m) const;
+	void add(const TrackMarker *m);
+	void set(const TrackMarker *m, bool selected);
+	bool has(const TrackMarker *m) const;
 
-	void add(MidiNote *n);
-	void set(MidiNote *n, bool selected);
-	bool has(MidiNote *n) const;
+	void add(const MidiNote *n);
+	void set(const MidiNote *n, bool selected);
+	bool has(const MidiNote *n) const;
 
 	int getNumSamples() const;
 

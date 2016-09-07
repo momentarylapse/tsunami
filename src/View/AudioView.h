@@ -135,9 +135,9 @@ public:
 
 	int midi_view_mode;
 	enum{
-		VIEW_MIDI_DEFAULT,
-		VIEW_MIDI_TAB,
-		VIEW_MIDI_SCORE,
+		MIDI_MODE_MIDI,
+		MIDI_MODE_TAB,
+		MIDI_MODE_SCORE,
 	};
 
 	bool edit_multi;

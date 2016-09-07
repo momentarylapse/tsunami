@@ -14,6 +14,7 @@
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Midi/Clef.h"
 #include "../../Midi/MidiSource.h"
+#include "../../Data/SongSelection.h"
 #include "../../TsunamiWindow.h"
 
 void align_to_beats(Song *s, Range &r, int beat_partition);
@@ -178,7 +179,7 @@ void ViewModeMidi::updateTrackHeights()
 			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
 		}else if (t->track->type == Track::TYPE_MIDI){
 			if (t->track == view->cur_track){
-				if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+				if (view->midi_view_mode == view->MIDI_MODE_SCORE)
 					t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT * 4;
 				else
 					t->height_wish = 5000;
@@ -265,7 +266,7 @@ int ViewModeMidi::y2clef(int y, int &mod)
 {
 	int ti = view->cur_track->get_index();
 	AudioViewTrack *t = view->vtrack[ti];
-	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
+	if (view->midi_view_mode == view->MIDI_MODE_SCORE){
 		mod = modifier;
 		return t->screen_to_clef_pos(y);
 	}
@@ -278,7 +279,7 @@ int ViewModeMidi::y2pitch(int y)
 {
 	int ti = view->cur_track->get_index();
 	AudioViewTrack *t = view->vtrack[ti];
-	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
+	if (view->midi_view_mode == view->MIDI_MODE_SCORE){
 		const Clef& clef = t->track->instrument.get_clef();
 		int pos = t->screen_to_clef_pos(y);
 		return clef.position_to_pitch(pos, view->midi_scale, modifier);
@@ -291,7 +292,7 @@ float ViewModeMidi::pitch2y(int pitch)
 	int ti = view->cur_track->get_index();
 	AudioViewTrack *t = view->vtrack[ti];
 
-	if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
+	if (view->midi_view_mode == view->MIDI_MODE_SCORE){
 		int mod;
 		const Clef& clef = t->track->instrument.get_clef();
 		int p = clef.pitch_to_position(pitch, view->midi_scale, mod);
@@ -373,7 +374,7 @@ void ViewModeMidi::drawGridBars(Painter *c, const rect &r, const color &bg, bool
 
 void ViewModeMidi::drawTrackBackground(Painter *c, AudioViewTrack *t)
 {
-	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+	if (view->midi_view_mode == view->MIDI_MODE_SCORE)
 		ViewModeDefault::drawTrackBackground(c, t);
 	else
 		drawTrackBackgroundDefault(c, t);
@@ -404,10 +405,10 @@ void ViewModeMidi::drawTrackBackgroundDefault(Painter *c, AudioViewTrack *t)
 
 inline bool hover_note(const MidiNote &n, Selection &s, AudioView *view)
 {
-	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+	if (view->midi_view_mode == view->MIDI_MODE_SCORE)
 		if (n.clef_position != s.clef_position)
 			return false;
-	if (view->midi_view_mode == view->VIEW_MIDI_DEFAULT)
+	if (view->midi_view_mode == view->MIDI_MODE_MIDI)
 		if (n.pitch != s.pitch)
 			return false;
 
@@ -531,15 +532,22 @@ void ViewModeMidi::drawMidiNote(Painter *c, const MidiNote &n, int state)
 	float x2 = cam->sample2screen(n.range.end());
 	float y1 = pitch2y(n.pitch + 1);
 	float y2 = pitch2y(n.pitch);
-	color col = AudioViewTrack::getPitchColor(n.pitch);
+
+	float y = (y1 + y2) / 2;
+	float r = (y2 - y1) / 2;
+
+	color col = ColorInterpolate(AudioViewTrack::getPitchColor(n.pitch), view->colors.text, 0.2f);
 	if (state == AudioViewTrack::STATE_HOVER){
-		col.a = 0.5f;
+		col = ColorInterpolate(col, view->colors.hover, 0.333f);
 	}else if (state == AudioViewTrack::STATE_REFERENCE){
-		col = ColorInterpolate(col, view->colors.text_soft2, 0.7f);
-		col.a = 0.5f;
+		col = ColorInterpolate(col, view->colors.background_track, 0.65f);
 	}
-	c->setColor(col);
-	c->drawRect(rect(x1, x2, y1, y2));
+	if (view->sel.has(&n)){
+		color col1 = view->colors.selection;
+		AudioViewTrack::draw_score_note(c, x1, x2, y, r, 2, col1, col1, false);
+	}
+
+	AudioViewTrack::draw_score_note(c, x1, x2, y, r, 0, col, ColorInterpolate(col, view->colors.background_track, 0.4f), false);
 }
 
 void ViewModeMidi::drawMidiEvent(Painter *c, const MidiEvent &e)
@@ -555,23 +563,19 @@ void ViewModeMidi::drawMidiEvent(Painter *c, const MidiEvent &e)
 
 void ViewModeMidi::drawMidiEditable(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
-	t->drawMidiScore(c, midi, as_reference, 0);
-	return;
-	if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
-		drawMidiEditableScore(c, t, midi, as_reference, track, area);
+	int mode = t->which_midi_mode(true);
+	if (mode == view->MIDI_MODE_SCORE)
+		t->drawMidiScore(c, midi, as_reference, 0);
 	else
 		drawMidiEditableDefault(c, t, midi, as_reference, track, area);
 }
 
 void ViewModeMidi::drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
-	Array<MidiEvent> events = midi.getEvents(view->cam.range());
-	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
-
 	track_rect = area;
 
 	// draw notes
-	foreachi(MidiNote &n, notes, i){
+	foreachi(MidiNote &n, midi, i){
 		if ((n.pitch < pitch_min) or (n.pitch >= pitch_max))
 			continue;
 		bool _hover = ((hover->type == Selection::TYPE_MIDI_NOTE) and (i == hover->index));
@@ -581,13 +585,6 @@ void ViewModeMidi::drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const 
 			drawMidiNote(c, n, _hover ? AudioViewTrack::STATE_HOVER : AudioViewTrack::STATE_DEFAULT);
 		}
 	}
-	if (as_reference)
-		return;
-
-	// draw events
-	for (MidiEvent &e : events)
-		if ((e.pitch >= pitch_min) and (e.pitch < pitch_max))
-			drawMidiEvent(c, e);
 }
 
 void ViewModeMidi::drawMidiEditableScore(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
@@ -630,12 +627,13 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 		drawMidiEditable(c, t, t->track->midi, false, t->track, t->area);
 
+		int mode = t->which_midi_mode(true);
 
 		// current creation
 		if ((HuiGetEvent()->lbut) and (selection->type == Selection::TYPE_MIDI_PITCH)){
 			Array<MidiNote> notes = getCreationNotes();
 			for (MidiNote &n : notes){
-				if (view->midi_view_mode == view->VIEW_MIDI_SCORE)
+				if (mode == view->MIDI_MODE_SCORE)
 					t->drawMidiNoteScore(c, n, 0, AudioViewTrack::STATE_HOVER, t->track->instrument.get_clef());
 				else
 					drawMidiNote(c, n, AudioViewTrack::STATE_HOVER);
@@ -644,7 +642,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 		}
 
 
-		if (view->midi_view_mode == view->VIEW_MIDI_SCORE){
+		if (mode == view->MIDI_MODE_SCORE){
 			if ((!HuiGetEvent()->lbut) and (hover->type == Selection::TYPE_MIDI_PITCH)){
 				Range r = Range(hover->pos, 0);
 				align_to_beats(song, r, beat_partition);
@@ -664,39 +662,39 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 			}
 
 		}else{
-		// pitch names
-		color cc = view->colors.text;
-		cc.a = 0.4f;
-		Array<SampleRef*> *p = NULL;
-		if ((t->track->synth) and (t->track->synth->name == "Sample")){
-			PluginData *c = t->track->synth->get_config();
-			p = (Array<SampleRef*> *)&c[1];
-		}
-		bool is_drum = (t->track->instrument.type == Instrument::TYPE_DRUMS);
-		for (int i=pitch_min; i<pitch_max; i++){
-			c->setColor(cc);
-			if (((hover->type == Selection::TYPE_MIDI_PITCH) or (hover->type == Selection::TYPE_MIDI_NOTE)) and (i == hover->pitch))
-				c->setColor(view->colors.text);
-
-			string name = pitch_name(i);
-			if (is_drum){
-				name = drum_pitch_name(i);
-			}else if (p){
-				if (i < p->num)
-					if ((*p)[i])
-						name = (*p)[i]->origin->name;
+			// pitch names
+			color cc = view->colors.text;
+			cc.a = 0.4f;
+			Array<SampleRef*> *p = NULL;
+			if ((t->track->synth) and (t->track->synth->name == "Sample")){
+				PluginData *c = t->track->synth->get_config();
+				p = (Array<SampleRef*> *)&c[1];
 			}
-			c->drawStr(20, t->area.y1 + t->area.height() * (pitch_max - i - 1) / PITCH_SHOW_COUNT, name);
-		}
+			bool is_drum = (t->track->instrument.type == Instrument::TYPE_DRUMS);
+			for (int i=pitch_min; i<pitch_max; i++){
+				c->setColor(cc);
+				if (((hover->type == Selection::TYPE_MIDI_PITCH) or (hover->type == Selection::TYPE_MIDI_NOTE)) and (i == hover->pitch))
+					c->setColor(view->colors.text);
+
+				string name = pitch_name(i);
+				if (is_drum){
+					name = drum_pitch_name(i);
+				}else if (p){
+					if (i < p->num)
+						if ((*p)[i])
+							name = (*p)[i]->origin->name;
+				}
+				c->drawStr(20, t->area.y1 + t->area.height() * (pitch_max - i - 1) / PITCH_SHOW_COUNT, name);
+			}
 
 
-		// scrollbar
-		if (hover->type == Selection::TYPE_SCROLL)
-			c->setColor(view->colors.text);
-		else
-			c->setColor(view->colors.text_soft1);
-		scroll_bar = rect(t->area.x2 - 40, t->area.x2 - 20, t->area.y2 - t->area.height() * pitch_max / (MAX_PITCH - 1.0f), t->area.y2 - t->area.height() * pitch_min / (MAX_PITCH - 1.0f));
-		c->drawRect(scroll_bar);
+			// scrollbar
+			if (hover->type == Selection::TYPE_SCROLL)
+				c->setColor(view->colors.text);
+			else
+				c->setColor(view->colors.text_soft1);
+			scroll_bar = rect(t->area.x2 - 40, t->area.x2 - 20, t->area.y2 - t->area.height() * pitch_max / (MAX_PITCH - 1.0f), t->area.y2 - t->area.height() * pitch_min / (MAX_PITCH - 1.0f));
+			c->drawRect(scroll_bar);
 		}
 	}else{
 		if ((t->track->type == Track::TYPE_MIDI) or (t->track->midi.num > 0))

@@ -421,7 +421,6 @@ void TsunamiWindow::onFindAndExecutePlugin()
 void TsunamiWindow::onMenuExecuteEffect()
 {
 	string name = HuiGetEvent()->id.explode("--")[1];
-	msg_write("fx:" + name + ":");
 
 	Effect *fx = CreateEffect(name, song);
 
@@ -430,8 +429,8 @@ void TsunamiWindow::onMenuExecuteEffect()
 		Range range = view->getPlaybackSelection();
 		SongSelection sel = view->getEditSeletion();
 		song->action_manager->beginActionGroup();
-		for (Track *t : sel.tracks)
-			if (t->type == t->TYPE_AUDIO){
+		for (Track *t : song->tracks)
+			if (sel.has(t) and (t->type == t->TYPE_AUDIO)){
 				fx->resetState();
 				fx->doProcessTrack(t, view->cur_level, range);
 			}
@@ -451,8 +450,8 @@ void TsunamiWindow::onMenuExecuteMidiEffect()
 		Range range = view->getPlaybackSelection();
 		SongSelection sel = view->getEditSeletion();
 		song->action_manager->beginActionGroup();
-		for (Track *t : sel.tracks)
-			if (t->type == t->TYPE_MIDI){
+		for (Track *t : song->tracks)
+			if (sel.has(t) and (t->type == t->TYPE_MIDI)){
 				fx->resetState();
 				fx->DoProcessTrack(t, range);
 			}
@@ -667,17 +666,17 @@ void TsunamiWindow::onViewStereo()
 
 void TsunamiWindow::onViewMidiDefault()
 {
-	view->setMidiViewMode(view->VIEW_MIDI_DEFAULT);
+	view->setMidiViewMode(view->MIDI_MODE_MIDI);
 }
 
 void TsunamiWindow::onViewMidiTab()
 {
-	view->setMidiViewMode(view->VIEW_MIDI_TAB);
+	view->setMidiViewMode(view->MIDI_MODE_TAB);
 }
 
 void TsunamiWindow::onViewMidiScore()
 {
-	view->setMidiViewMode(view->VIEW_MIDI_SCORE);
+	view->setMidiViewMode(view->MIDI_MODE_SCORE);
 }
 
 void TsunamiWindow::onZoomIn()

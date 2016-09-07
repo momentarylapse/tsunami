@@ -129,7 +129,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	input = NULL;
 
 	edit_multi = false;
-	midi_view_mode = HuiConfig.getInt("View.MidiMode", VIEW_MIDI_SCORE);
+	midi_view_mode = HuiConfig.getInt("View.MidiMode", MIDI_MODE_SCORE);
 
 	// modes
 	mode = NULL;
@@ -776,9 +776,9 @@ void AudioView::updateMenu()
 	win->check("view_peaks_max", peak_mode == BufferBox::PEAK_MAXIMUM);
 	win->check("view_peaks_mean", peak_mode == BufferBox::PEAK_SQUAREMEAN);
 	win->check("view_peaks_both", peak_mode == BufferBox::PEAK_BOTH);
-	win->check("view_midi_default", midi_view_mode == VIEW_MIDI_DEFAULT);
-	win->check("view_midi_tab", midi_view_mode == VIEW_MIDI_TAB);
-	win->check("view_midi_score", midi_view_mode == VIEW_MIDI_SCORE);
+	win->check("view_midi_default", midi_view_mode == MIDI_MODE_MIDI);
+	win->check("view_midi_tab", midi_view_mode == MIDI_MODE_TAB);
+	win->check("view_midi_score", midi_view_mode == MIDI_MODE_SCORE);
 	win->enable("view_samples", false);
 }
 

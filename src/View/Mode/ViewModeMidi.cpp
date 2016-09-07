@@ -534,7 +534,7 @@ void ViewModeMidi::drawMidiNote(Painter *c, const MidiNote &n, int state)
 	float y2 = pitch2y(n.pitch);
 
 	float y = (y1 + y2) / 2;
-	float r = (y2 - y1) / 2;
+	float r = (y2 - y1) / 2.5f;
 
 	color col = ColorInterpolate(AudioViewTrack::getPitchColor(n.pitch), view->colors.text, 0.2f);
 	if (state == AudioViewTrack::STATE_HOVER){

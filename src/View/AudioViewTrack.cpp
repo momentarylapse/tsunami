@@ -230,19 +230,38 @@ void AudioViewTrack::drawMarker(Painter *c, const TrackMarker &marker, int index
 	if (text.match(":pos *:"))
 		text = "🖐 " + text.substr(5, -2);
 
+	bool sel = view->sel.has(&marker);
+
+	if (sel)
+		c->setFont("", -1, true, false);
 
 	float w = c->getStrWidth(text);
-	int x = view->cam.sample2screen(marker.pos);
+	float x = view->cam.sample2screen(marker.pos);
+	float y = area.y1;
 
-	c->setColor(view->colors.background_track);
-	rect bg = rect(x-2, x+w+2, area.y1, area.y1+18);
-	c->drawRect(bg);
-	marker_areas[index] = bg;
+	c->setFill(false);
+	c->setLineWidth(3);
+	if (sel)
+		c->setColor(ColorInterpolate(view->colors.background_track, view->colors.selection, 0.2f));
+	else
+		c->setColor(view->colors.background_track);
 
-	c->setColor(view->colors.text);
-	if (hover)
-		c->setColor(view->colors.text_soft2);
 	c->drawStr(x, area.y1, text);
+	c->setFill(true);
+	c->setLineWidth(1);
+
+	marker_areas[index] = rect(x, x + w, y, y + 16);
+
+	color col = view->colors.text;
+	if (sel)
+		col = view->colors.selection;
+	if (hover)
+		col = ColorInterpolate(col, view->colors.hover, 0.3f);
+
+	c->setColor(col);
+	c->drawStr(x, y, text);
+
+	c->setFont("", -1, false, false);
 }
 
 
@@ -383,12 +402,12 @@ void AudioViewTrack::drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiN
 
 	// auxiliary lines
 	for (int i=10; i<=p; i+=2){
-		c->setColor(view->colors.text_soft1);
+		c->setColor(view->colors.text_soft2);
 		float y = clef_pos_to_screen(i);
 		c->drawLine(x - clef_dy, y, x + clef_dy, y);
 	}
 	for (int i=-2; i>=p; i-=2){
-		c->setColor(view->colors.text_soft1);
+		c->setColor(view->colors.text_soft2);
 		float y = clef_pos_to_screen(i);
 		c->drawLine(x - clef_dy, y, x + clef_dy, y);
 	}

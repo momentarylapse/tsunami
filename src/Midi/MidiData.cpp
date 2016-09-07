@@ -189,7 +189,7 @@ MidiRawData MidiRawData::getEvents(const Range &r) const
 int MidiRawData::read(MidiRawData &data, const Range &r) const
 {
 	data.samples = r.length;//min(r.length, samples - r.offset);
-	for (MidiEvent &e : *this)
+	for (MidiEvent &e: *this)
 		if (r.is_inside(e.pos))
 			data.add(MidiEvent(e.pos - r.offset, e.pitch, e.volume));
 	return data.samples;
@@ -199,9 +199,9 @@ Array<MidiNote> MidiRawData::getNotes(const Range &r) const
 {
 	MidiData a = midi_events_to_notes(*this);
 	Array<MidiNote> b;
-	for (MidiNote &n : a)
-		if (r.overlaps(n.range))
-			b.add(n);
+	for (MidiNote *n: a)
+		if (r.overlaps(n->range))
+			b.add(*n);
 	return b;
 }
 
@@ -266,7 +266,7 @@ void MidiRawData::sanify(const Range &r)
 //		samples = max_pos;
 
 	// end active notes
-	for (int p : active)
+	for (int p: active)
 		add(MidiEvent(r.end(), p, 0));
 }
 
@@ -286,7 +286,7 @@ void MidiRawData::addMetronomeClick(int pos, int level, float volume)
 
 void MidiRawData::append(const MidiRawData &data)
 {
-	for (MidiEvent &e : data)
+	for (MidiEvent &e: data)
 		add(MidiEvent(e.pos + samples, e.pitch, e.volume));
 	samples += data.samples;
 }
@@ -296,9 +296,29 @@ MidiData::MidiData()
 	samples = 0;
 }
 
+MidiData::~MidiData()
+{
+	msg_write("~MidiData " + i2s(num));
+	deep_clear();
+}
+
 void MidiData::__init__()
 {
 	new(this) MidiData;
+}
+
+void MidiData::__delete__()
+{
+	this->~MidiData();
+}
+
+void MidiData::deep_clear()
+{
+	for (MidiNote *n: *this){
+		msg_write("  del " + p2s(n));
+		delete(n);
+	}
+	clear();
 }
 
 MidiRawData MidiData::getEvents(const Range &r) const
@@ -309,50 +329,41 @@ MidiRawData MidiData::getEvents(const Range &r) const
 
 MidiDataRef MidiData::getNotes(const Range &r) const
 {
-	MidiData b;
-	int first = -1;
-	int last = -1;
-	foreachi(MidiNote &n, *this, i)
-		if (r.overlaps(n.range)){
-			first = i;
-			break;
-		}
-	foreachib(MidiNote &n, *this, i)
-		if (r.overlaps(n.range)){
-			last = i;
-			break;
-		}
-	if (first >= 0)
-		b.set_ref(sub(first, last - first + 1));
+	MidiDataRef b;
+	for (MidiNote *n: *this)
+		if (r.overlaps(n->range))
+			b.add(n);
 	return b;
 }
 
-MidiDataRef MidiData::getNotesSafe(const Range &r) const
+MidiData MidiData::duplicate() const
 {
 	MidiData b;
-	int first = -1;
-	int last = -1;
-	foreachi(MidiNote &n, *this, i)
-		if (r.is_inside(n.range.center())){
-			first = i;
-			break;
-		}
-	foreachib(MidiNote &n, *this, i)
-		if (r.is_inside(n.range.center())){
-			last = i;
-			break;
-		}
-	if (first >= 0)
-		b.set_ref(sub(first, last - first + 1));
+	for (MidiNote *n: *this){
+		MidiNote *nn = new MidiNote;
+		*nn = *n;
+		b.add(nn);
+	}
 	return b;
+}
+
+void MidiData::operator=(const MidiData &midi)
+{
+	deep_clear();
+
+	for (MidiNote *n: midi){
+		MidiNote *nn = new MidiNote;
+		*nn = *n;
+		add(nn);
+	}
 }
 
 Range MidiData::getRange(int elongation) const
 {
 	if (num == 0)
 		return Range::EMPTY;
-	int i0 = (*this)[0].range.offset;
-	int i1 = back().range.end(); // FIXME...
+	int i0 = (*this)[0]->range.offset;
+	int i1 = back()->range.end(); // FIXME...
 	return Range(i0, i1 - i0 + elongation);
 }
 
@@ -360,7 +371,7 @@ void MidiData::sort()
 {
 	for (int i=0;i<num;i++)
 		for (int j=i+1;j<num;j++)
-			if ((*this)[i].range.offset > (*this)[j].range.offset)
+			if ((*this)[i]->range.offset > (*this)[j]->range.offset)
 				swap(i, j);
 }
 
@@ -369,17 +380,21 @@ void MidiData::sanify(const Range &r)
 	sort();
 }
 
-MidiDataRef::MidiDataRef(const MidiData &midi)
+MidiDataRef::MidiDataRef()
 {
-	set_ref(midi);
+}
+
+MidiDataRef::~MidiDataRef()
+{
+	clear();
 }
 
 MidiRawData midi_notes_to_events(const MidiData &notes)
 {
 	MidiRawData r;
-	for (MidiNote &n : notes){
-		r.add(MidiEvent(n.range.offset, n.pitch, n.volume));
-		r.add(MidiEvent(n.range.end()-1, n.pitch, 0));
+	for (MidiNote *n: notes){
+		r.add(MidiEvent(n->range.offset, n->pitch, n->volume));
+		r.add(MidiEvent(n->range.end()-1, n->pitch, 0));
 	}
 	r.samples = notes.samples;
 	return r;
@@ -389,10 +404,10 @@ MidiData midi_events_to_notes(const MidiRawData &events)
 {
 	MidiData a;
 	MidiRawData b;
-	for (MidiEvent &e : events){
+	for (MidiEvent &e: events){
 		if (e.volume > 0){
 			bool exists = false;
-			for (MidiEvent &bb : b)
+			for (MidiEvent &bb: b)
 				if ((int)bb.pitch == (int)e.pitch){
 					exists = true;
 					break;
@@ -402,7 +417,7 @@ MidiData midi_events_to_notes(const MidiRawData &events)
 		}else{
 			foreachi(MidiEvent &bb, b, i)
 				if ((int)bb.pitch == (int)e.pitch){
-					MidiNote n = MidiNote(Range(bb.pos, e.pos - bb.pos), bb.pitch, bb.volume);
+					MidiNote *n = new MidiNote(Range(bb.pos, e.pos - bb.pos), bb.pitch, bb.volume);
 					a.add(n);
 					b.erase(i);
 					break;
@@ -476,32 +491,32 @@ struct HandPosition
 void MidiData::update_meta(Track *t, const Scale& scale) const
 {
 	Set<HandPosition> hands;
-	for (TrackMarker &m : t->markers)
-		if (m.text.match(":pos *:"))
-			hands.add(HandPosition(m.pos, m.text.substr(4, -2)._int()));
+	for (TrackMarker *m: t->markers)
+		if (m->text.match(":pos *:"))
+			hands.add(HandPosition(m->pos, m->text.substr(4, -2)._int()));
 
 
 	int hand_position = 0;
 	int next = 0;
 
-	for (MidiNote &n : *this){
+	for (MidiNote *n: *this){
 		while(next < hands.num){
-			if (n.range.offset >= hands[next].offset)
+			if (n->range.offset >= hands[next].offset)
 				hand_position = hands[next ++].value;
 			else
 				break;
 		}
 
-		n.update_meta(t->instrument, scale, hand_position);
+		n->update_meta(t->instrument, scale, hand_position);
 	}
 }
 
 void MidiData::clear_meta() const
 {
-	for (MidiNote &n : *this)
-		n.stringno = -1;
-	for (MidiNote &n : *this){
-		n.clef_position = -1;
-		n.modifier = MODIFIER_UNKNOWN;
+	for (MidiNote *n: *this)
+		n->stringno = -1;
+	for (MidiNote *n: *this){
+		n->clef_position = -1;
+		n->modifier = MODIFIER_UNKNOWN;
 	}
 }

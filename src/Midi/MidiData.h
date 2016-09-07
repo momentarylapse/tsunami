@@ -43,20 +43,25 @@ public:
 	void append(const MidiRawData &data);
 };
 
-class MidiData : public Array<MidiNote>
+class MidiData : public Array<MidiNote*>
 {
 public:
 	MidiData();
+	~MidiData();
 	void _cdecl __init__();
+	void _cdecl __delete__();
+	void deep_clear();
 	MidiRawData getEvents(const Range &r) const;
 	MidiDataRef getNotes(const Range &r) const;
-	MidiDataRef getNotesSafe(const Range &r) const;
+	MidiData duplicate() const;
 
 	Range getRange(int elongation) const;
 	int samples;
 
 	void sort();
 	void sanify(const Range &r);
+
+	void operator=(const MidiData &midi);
 
 	//void update_meta(const Instrument &i, const Scale &s) const;
 	void update_meta(Track *t, const Scale &s) const;
@@ -68,7 +73,8 @@ public:
 class MidiDataRef : public MidiData
 {
 public:
-	MidiDataRef(const MidiData &m);
+	MidiDataRef();
+	~MidiDataRef();
 };
 
 MidiRawData midi_notes_to_events(const MidiData &notes);

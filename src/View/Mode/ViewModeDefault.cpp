@@ -332,7 +332,7 @@ void ViewModeDefault::drawTrackData(Painter *c, AudioViewTrack *t)
 
 	// marker
 	t->marker_areas.resize(t->track->markers.num);
-	foreachi(TrackMarker &m, t->track->markers, i)
+	foreachi(TrackMarker *m, t->track->markers, i)
 		t->drawMarker(c, m, i, (view->hover.type == Selection::TYPE_MARKER) and (view->hover.track == t->track) and (view->hover.index == i));
 }
 

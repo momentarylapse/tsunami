@@ -34,27 +34,27 @@ void ActionSong__ShiftData::undo(Data *d)
 
 void ActionSong__ShiftData::do_shift(Song *s, int delta)
 {
-	for (Track *t : s->tracks){
+	for (Track *t: s->tracks){
 
 		// midi
-		foreachi(MidiNote &n, t->midi, j){
-			if (n.range.start() >= offset)
-				n.range.offset += delta;
+		for (MidiNote *n: t->midi){
+			if (n->range.start() >= offset)
+				n->range.offset += delta;
 		}
 
 		// marker
-		for (TrackMarker &m : t->markers)
-			if (m.pos >= offset)
-				m.pos += delta;
+		for (TrackMarker *m: t->markers)
+			if (m->pos >= offset)
+				m->pos += delta;
 
 		// buffer
-		for (TrackLevel &l : t->levels)
+		for (TrackLevel &l: t->levels)
 			for (BufferBox &b : l.buffers)
 				if (b.offset >= offset)
 					b.offset += delta;
 
 		// marker
-		for (SampleRef *s : t->samples)
+		for (SampleRef *s: t->samples)
 			if (s->pos >= offset)
 				s->pos += delta;
 	}

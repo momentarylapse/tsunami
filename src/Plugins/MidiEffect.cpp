@@ -82,15 +82,14 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 {
 	msg_db_f("MidiEffect.DoProcessTrack", 1);
 
-	MidiData midi = t->midi.getNotesSafe(r);
+	MidiData midi = t->midi.getNotes(r);
 
 	t->song->action_manager->beginActionGroup();
 
-	foreachib(MidiNote &n, t->midi, i)
-		if (r.is_inside(n.range.center())){
+	for (int i=t->midi.num-1; i>=0; i--)
+		if (r.is_inside(t->midi[i]->range.center()))
 			t->deleteMidiNote(i);
-			_foreach_it_.update(); // TODO...
-		}
+
 	process(&midi);
 	t->insertMidiData(0, midi);
 	t->song->action_manager->endActionGroup();

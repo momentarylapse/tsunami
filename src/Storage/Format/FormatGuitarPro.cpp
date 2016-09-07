@@ -654,15 +654,15 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 	// samples per 16th / 3
 	float spu = (float)b.range.length / (float)b.num_beats / (float)BEAT_PARTITION;
 
-	Array<MidiNote> notes = t->t->midi.getNotes(b.range);
+	MidiDataRef notes = t->t->midi.getNotes(b.range);
 	Array<GuitarNote> gnotes;
 
-	for (MidiNote &n : notes){
-		Range r = n.range and b.range;
+	for (MidiNote *n : notes){
+		Range r = n->range and b.range;
 		GuitarNote gn;
 		gn.offset = int((float)(r.offset - b.range.offset) / spu + 0.5f);
 		gn.length = int((float)(r.end() - b.range.offset) / spu + 0.5f) - gn.offset;
-		gn.pitch.add(n.pitch);
+		gn.pitch.add(n->pitch);
 		if (gn.length == 0)
 			continue;
 		if (gn.offset < b.num_beats * BEAT_PARTITION)

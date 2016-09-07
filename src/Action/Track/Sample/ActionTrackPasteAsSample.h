@@ -18,8 +18,8 @@ class MidiData;
 class ActionTrackPasteAsSample : public ActionGroup
 {
 public:
-	ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf);
-	ActionTrackPasteAsSample(Track *t, int pos, MidiData *midi);
+	ActionTrackPasteAsSample(Track *t, int pos, const BufferBox &buf);
+	ActionTrackPasteAsSample(Track *t, int pos, const MidiData &midi);
 };
 
 #endif /* ACTIONTRACKPASTEASSAMPLE_H_ */

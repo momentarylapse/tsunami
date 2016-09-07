@@ -541,14 +541,14 @@ public:
 		f->ReadInt(); // reserved
 
 		int unended = -1;
-		foreachi(MidiNote &n, *parent, i)
-			if ((n.pitch == e.pitch) and (n.range.length == -1))
+		foreachi(MidiNote *n, *parent, i)
+			if ((n->pitch == e.pitch) and (n->range.length == -1))
 				unended = i;
 
 		if ((unended >= 0) and (e.volume == 0)){
-			(*parent)[unended].range.set_end(e.pos);
+			(*parent)[unended]->range.set_end(e.pos);
 		}else if ((unended < 0) and (e.volume > 0)){
-			parent->add(MidiNote(Range(e.pos, -1), e.pitch, e.volume));
+			parent->add(new MidiNote(Range(e.pos, -1), e.pitch, e.volume));
 		}else if (unended >= 0){
 			error("nami/midi: starting new note without ending old one");
 		}else{
@@ -602,11 +602,11 @@ public:
 	virtual void create(){}
 	virtual void read(File *f)
 	{
-		MidiNote n;
-		n.range.offset = f->ReadInt();
-		n.range.length = f->ReadInt();
-		n.pitch = f->ReadInt();
-		n.volume = f->ReadFloat();
+		MidiNote *n = new MidiNote;
+		n->range.offset = f->ReadInt();
+		n->range.length = f->ReadInt();
+		n->pitch = f->ReadInt();
+		n->volume = f->ReadFloat();
 		f->ReadInt(); // reserved
 		parent->add(n);
 	}
@@ -641,15 +641,15 @@ public:
 		int num = f->ReadInt();
 		int meta = f->ReadInt();
 		for (int i=0; i<num; i++){
-			MidiNote n;
-			n.range.offset = f->ReadInt();
-			n.range.length = f->ReadInt();
-			n.pitch = f->ReadInt();
-			n.volume = f->ReadFloat();
+			MidiNote *n = new MidiNote;
+			n->range.offset = f->ReadInt();
+			n->range.length = f->ReadInt();
+			n->pitch = f->ReadInt();
+			n->volume = f->ReadFloat();
 			if (meta & 1)
-				n.stringno = f->ReadInt();
+				n->stringno = f->ReadInt();
 			if (meta & 2)
-				n.clef_position = f->ReadInt();
+				n->clef_position = f->ReadInt();
 			me->add(n);
 		}
 	}
@@ -662,13 +662,13 @@ public:
 
 		f->WriteInt(me->num);
 		f->WriteInt(3); // stringno + clef_position
-		for (MidiNote &n : *me){
-			f->WriteInt(n.range.offset);
-			f->WriteInt(n.range.length);
-			f->WriteInt(n.pitch);
-			f->WriteFloat(n.volume);
-			f->WriteInt(n.stringno);
-			f->WriteInt(n.clef_position);
+		for (MidiNote *n : *me){
+			f->WriteInt(n->range.offset);
+			f->WriteInt(n->range.length);
+			f->WriteInt(n->pitch);
+			f->WriteFloat(n->volume);
+			f->WriteInt(n->stringno);
+			f->WriteInt(n->clef_position);
 		}
 		f->WriteInt(0); // reserved
 	}
@@ -699,15 +699,15 @@ public:
 		int num = f->ReadInt();
 		int meta = f->ReadInt();
 		for (int i=0; i<num; i++){
-			MidiNote n;
-			n.range.offset = f->ReadInt();
-			n.range.length = f->ReadInt();
-			n.pitch = f->ReadInt();
-			n.volume = f->ReadFloat();
+			MidiNote *n = new MidiNote;
+			n->range.offset = f->ReadInt();
+			n->range.length = f->ReadInt();
+			n->pitch = f->ReadInt();
+			n->volume = f->ReadFloat();
 			if (meta & 1)
-				n.stringno = f->ReadInt();
+				n->stringno = f->ReadInt();
 			if (meta & 2)
-				n.clef_position = f->ReadInt();
+				n->clef_position = f->ReadInt();
 			me->add(n);
 		}
 		f->ReadInt(); // reserved
@@ -721,13 +721,13 @@ public:
 
 		f->WriteInt(me->num);
 		f->WriteInt(3); // stringno + clef_position
-		for (MidiNote &n : *me){
-			f->WriteInt(n.range.offset);
-			f->WriteInt(n.range.length);
-			f->WriteInt(n.pitch);
-			f->WriteFloat(n.volume);
-			f->WriteInt(n.stringno);
-			f->WriteInt(n.clef_position);
+		for (MidiNote *n : *me){
+			f->WriteInt(n->range.offset);
+			f->WriteInt(n->range.length);
+			f->WriteInt(n->pitch);
+			f->WriteFloat(n->volume);
+			f->WriteInt(n->stringno);
+			f->WriteInt(n->clef_position);
 		}
 		f->WriteInt(0); // reserved
 	}
@@ -918,8 +918,8 @@ public:
 	FileChunkMarker() : FileChunk<Track,TrackMarker>("marker"){}
 	virtual void create()
 	{
-		parent->markers.add(TrackMarker());
-		me = &parent->markers.back();
+		me = new TrackMarker();
+		parent->markers.add(me);
 	}
 	virtual void read(File *f)
 	{
@@ -1120,7 +1120,7 @@ void FormatNami::make_consistent(Song *a)
 	for (Sample *s : a->samples){
 		if (s->type == Track::TYPE_MIDI){
 			if ((s->midi.samples == 0) and (s->midi.num > 0)){
-				s->midi.samples = s->midi.back().range.end();
+				s->midi.samples = s->midi.back()->range.end();
 			}
 		}
 	}

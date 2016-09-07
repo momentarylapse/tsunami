@@ -37,12 +37,12 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *s, int level_no, cons
 
 		// midi
 		for (int i=t->midi.num-1; i>=0; i--)
-			if (sel.has(&t->midi[i]))
+			if (sel.has(t->midi[i]))
 				addSubAction(new ActionTrackDeleteMidiNote(t, i), s);
 
 		// marker
 		for (int i=t->markers.num-1; i>=0; i--)
-			if (sel.has(&t->markers[i]))
+			if (sel.has(t->markers[i]))
 				addSubAction(new ActionTrackDeleteMarker(t, i), s);
 	}
 }

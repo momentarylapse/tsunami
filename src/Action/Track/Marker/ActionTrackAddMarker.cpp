@@ -8,11 +8,12 @@
 #include "ActionTrackAddMarker.h"
 #include "../../../Data/Track.h"
 
-ActionTrackAddMarker::ActionTrackAddMarker(Track *t, int _pos, const string &_text)
+ActionTrackAddMarker::ActionTrackAddMarker(Track *t, int pos, const string &text)
 {
 	track_no = get_track_index(t);
-	pos = _pos;
-	text = _text;
+	marker = new TrackMarker;
+	marker->pos = pos;
+	marker->text = text;
 }
 
 void *ActionTrackAddMarker::execute(Data *d)
@@ -20,10 +21,7 @@ void *ActionTrackAddMarker::execute(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 
 	Track *t = a->get_track(track_no);
-	TrackMarker m;
-	m.pos = pos;
-	m.text = text;
-	t->markers.add(m);
+	t->markers.add(marker);
 
 	return NULL;
 }

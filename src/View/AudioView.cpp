@@ -871,8 +871,8 @@ void AudioView::selectExpand()
 				continue;
 
 			// midi
-			for (MidiNote &n: t->midi)
-				test_range(n.range, sel_raw, update);
+			for (MidiNote *n: t->midi)
+				test_range(n->range, sel_raw, update);
 
 			// buffers
 			for (TrackLevel &l: t->levels)

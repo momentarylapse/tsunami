@@ -87,7 +87,7 @@ public:
 	void _cdecl deleteSampleRef(int index);
 	void _cdecl editSampleRef(int index, float volume, bool mute, int rep_num, int rep_delay);
 	void _cdecl addMidiNote(const MidiNote &n);
-	void _cdecl addMidiNotes(const MidiData &notes);
+	//void _cdecl addMidiNotes(const MidiData &notes);
 	void _cdecl deleteMidiNote(int index);
 	void _cdecl setSynthesizer(Synthesizer *synth);
 	void _cdecl editSynthesizer(const string &param_old);
@@ -122,7 +122,7 @@ public:
 	MidiData midi;
 	Synthesizer *synth;
 
-	Array<TrackMarker> markers;
+	Array<TrackMarker*> markers;
 
 	Song *song;
 };

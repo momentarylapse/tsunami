@@ -9,7 +9,9 @@
 #define ACTIONTRACKDELETEMIDINOTE_H_
 
 #include "../../Action.h"
-#include "../../../Data/Track.h"
+
+class Track;
+class MidiNote;
 
 class ActionTrackDeleteMidiNote: public Action
 {
@@ -21,7 +23,7 @@ public:
 
 private:
 	int track_no;
-	MidiNote note;
+	MidiNote *note;
 	int index;
 };
 

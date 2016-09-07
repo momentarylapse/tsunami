@@ -307,7 +307,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("Track.deleteSampleRef", Script::mf(&Track::deleteSampleRef));
 	Script::LinkExternal("Track.editSampleRef", Script::mf(&Track::editSampleRef));
 	Script::LinkExternal("Track.addMidiNote", Script::mf(&Track::addMidiNote));
-	Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::addMidiNotes));
+	//Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::addMidiNotes));
 	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::deleteMidiNote));
 	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::setSynthesizer));
 	Script::LinkExternal("Track.addMarker", Script::mf(&Track::addMarker));

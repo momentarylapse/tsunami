@@ -10,7 +10,7 @@
 #include <assert.h>
 #include "../../../Data/Song.h"
 
-ActionSongAddSample::ActionSongAddSample(const string &name, BufferBox &buf)
+ActionSongAddSample::ActionSongAddSample(const string &name, const BufferBox &buf)
 {
 	sample = new Sample(Track::TYPE_AUDIO);
 	sample->buf = buf;
@@ -18,12 +18,16 @@ ActionSongAddSample::ActionSongAddSample(const string &name, BufferBox &buf)
 	sample->name = name;
 }
 
-ActionSongAddSample::ActionSongAddSample(const string &name, MidiData &midi)
+ActionSongAddSample::ActionSongAddSample(const string &name, const MidiData &midi)
 {
+	msg_write("sa");
 	sample = new Sample(Track::TYPE_MIDI);
+	msg_write("sb");
 	sample->midi = midi;
+	msg_write("sc");
 	sample->midi.sort();
 	sample->name = name;
+	msg_write("sd");
 }
 
 ActionSongAddSample::~ActionSongAddSample()
@@ -34,10 +38,12 @@ ActionSongAddSample::~ActionSongAddSample()
 
 void *ActionSongAddSample::execute(Data *d)
 {
+	msg_write("sxa");
 	Song *a = dynamic_cast<Song*>(d);
 	sample->owner = a;
 	a->samples.add(sample);
 	a->notify(a->MESSAGE_ADD_SAMPLE);
+	msg_write("sxz");
 	return sample;
 }
 

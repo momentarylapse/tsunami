@@ -51,12 +51,12 @@ void SongSelection::fromRange(Song* s, const Range &r)
 			set(s, range.overlaps(s->range()));
 
 		// markers
-		for (TrackMarker &m : t->markers)
-			set(&m, range.is_inside(m.pos));
+		for (TrackMarker *m : t->markers)
+			set(m, range.is_inside(m->pos));
 
 		// midi
-		for (MidiNote &n : t->midi)
-			set(&n, range.is_inside(n.range.center()));
+		for (MidiNote *n : t->midi)
+			set(n, range.is_inside(n->range.center()));
 	}
 }
 
@@ -173,10 +173,10 @@ SongSelection SongSelection::restrict_to_track(Track *t) const
 	sel.bars = bars;
 	sel.bar_range = bar_range;
 	sel.set(t, true);
-	for (MidiNote &n : t->midi)
-		sel.set(&n, has(&n));
-	for (TrackMarker &m : t->markers)
-		sel.set(&m, has(&m));
+	for (MidiNote *n : t->midi)
+		sel.set(n, has(n));
+	for (TrackMarker *m : t->markers)
+		sel.set(m, has(m));
 	for (SampleRef *r : t->samples)
 		sel.set(r, has(r));
 	return sel;

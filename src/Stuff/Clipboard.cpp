@@ -47,11 +47,11 @@ void Clipboard::append_track(Track *t, AudioView *view)
 		tt->levels[0].buffers.add(t->readBuffers(view->cur_level, view->sel.range));
 		tt->levels[0].buffers[0].make_own();
 	}else if (t->type == Track::TYPE_MIDI){
-		tt->midi = t->midi.getNotesSafe(view->sel.range);
+		tt->midi = t->midi.getNotes(view->sel.range);
 		tt->midi.samples = view->sel.range.length;
 		tt->midi.sanify(view->sel.range);
-		for (MidiNote &n : tt->midi)
-			n.range.offset -= view->sel.range.offset;
+		for (MidiNote *n : tt->midi)
+			n->range.offset -= view->sel.range.offset;
 	}
 
 	ref_uid.add(-1);
@@ -87,8 +87,8 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 		buf.set(source->levels[0].buffers[0], 0, 1.0f);
 		s->execute(a);
 	}else if (target->type == Track::TYPE_MIDI){
-		for (MidiNote &n : source->midi){
-			MidiNote nn = n;
+		for (MidiNote *n : source->midi){
+			MidiNote nn = *n;
 			nn.range.offset += view->sel.range.start();
 			target->addMidiNote(nn);
 		}
@@ -105,10 +105,10 @@ void Clipboard::paste_track_as_samples(int source_index, Track *target, AudioVie
 		target->addSampleRef(view->sel.range.start(), ref);
 	}else{
 		if (target->type == Track::TYPE_AUDIO){
-			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), &source->levels[0].buffers[0]));
+			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->levels[0].buffers[0]));
 			ref_uid[source_index] = s->samples.back()->uid;
 		}else if (target->type == Track::TYPE_MIDI){
-			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), &source->midi));
+			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->midi));
 			ref_uid[source_index] = s->samples.back()->uid;
 		}
 	}

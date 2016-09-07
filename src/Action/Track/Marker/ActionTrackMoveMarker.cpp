@@ -26,8 +26,8 @@ void *ActionTrackMoveMarker::execute(Data *d)
 	assert(index < t->markers.num);
 
 	int temp = pos;
-	pos = t->markers[index].pos;
-	t->markers[index].pos = temp;
+	pos = t->markers[index]->pos;
+	t->markers[index]->pos = temp;
 
 	return NULL;
 }

@@ -42,11 +42,11 @@ void render_midi(Image &im, MidiData &m)
 	int h = im.height;
 	Range r = Range(0, m.samples);
 	MidiDataRef notes = m.getNotes(r);
-	for (MidiNote &n : notes){
-		float y = h * clampf((80 - n.pitch) / 50.0f, 0, 1);
-		float x0 = w * clampf((float)n.range.offset / (float)r.length, 0, 1);
-		float x1 = w * clampf((float)n.range.end() / (float)r.length, 0, 1);
-		color c = AudioViewTrack::getPitchColor(n.pitch);
+	for (MidiNote *n : notes){
+		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
+		float x0 = w * clampf((float)n->range.offset / (float)r.length, 0, 1);
+		float x1 = w * clampf((float)n->range.end() / (float)r.length, 0, 1);
+		color c = AudioViewTrack::getPitchColor(n->pitch);
 		for (int x=x0; x<=x1; x++)
 			im.setPixel(x, y, c);
 	}

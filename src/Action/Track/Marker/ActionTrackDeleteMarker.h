@@ -10,6 +10,7 @@
 
 #include "../../Action.h"
 class Track;
+class TrackMarker;
 
 class ActionTrackDeleteMarker: public Action
 {
@@ -22,8 +23,7 @@ public:
 
 private:
 	int index;
-	int pos;
-	string text;
+	TrackMarker *marker;
 	int track_no;
 };
 

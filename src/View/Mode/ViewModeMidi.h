@@ -43,7 +43,7 @@ public:
 
 	virtual Selection getHover();
 
-	MidiData getCreationNotes();
+	Array<MidiNote> getCreationNotes();
 	int y2clef(int y, int &mod);
 	int y2pitch(int y);
 	float pitch2y(int p);

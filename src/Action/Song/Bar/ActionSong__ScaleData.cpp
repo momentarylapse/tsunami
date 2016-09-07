@@ -52,19 +52,19 @@ void ActionSong__ScaleData::do_scale(Song *s, const Range &r, int new_length)
 	for (Track *t : s->tracks){
 
 		// midi
-		foreachi(MidiNote &n, t->midi, j){
+		foreachi(MidiNote *n, t->midi, j){
 			// note start
-			if (n.range.start() >= pos0)
-				n.range.set_start(__shift_data_shift(r, new_length, n.range.start()));
+			if (n->range.start() >= pos0)
+				n->range.set_start(__shift_data_shift(r, new_length, n->range.start()));
 			// note end
-			if (n.range.end() >= pos0)
-				n.range.set_end(__shift_data_shift(r, new_length, n.range.end()));
+			if (n->range.end() >= pos0)
+				n->range.set_end(__shift_data_shift(r, new_length, n->range.end()));
 		}
 
 		// marker
-		for (TrackMarker &m : t->markers)
-			if (m.pos >= pos0)
-				m.pos = __shift_data_shift(r, new_length, m.pos);
+		for (TrackMarker *m : t->markers)
+			if (m->pos >= pos0)
+				m->pos = __shift_data_shift(r, new_length, m->pos);
 
 		// buffer
 		for (TrackLevel &l : t->levels)

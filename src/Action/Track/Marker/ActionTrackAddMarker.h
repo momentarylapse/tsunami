@@ -10,6 +10,7 @@
 
 #include "../../Action.h"
 class Track;
+class TrackMarker;
 
 class ActionTrackAddMarker: public Action
 {
@@ -21,8 +22,7 @@ public:
 	virtual void undo(Data *d);
 
 private:
-	int pos;
-	string text;
+	TrackMarker *marker;
 	int track_no;
 };
 

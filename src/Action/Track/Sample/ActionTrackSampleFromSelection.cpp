@@ -25,7 +25,7 @@ void ActionTrackSampleFromSelection::CreateSubsFromTrack(Track *t, const SongSel
 	TrackLevel &l = t->levels[level_no];
 	foreachib(BufferBox &b, l.buffers, bi)
 		if (sel.range.covers(b.range())){
-			addSubAction(new ActionTrackPasteAsSample(t, b.offset, &b), a);
+			addSubAction(new ActionTrackPasteAsSample(t, b.offset, b), a);
 
 			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, bi), a);
 		}

@@ -45,13 +45,13 @@ public:
 	void drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col);
 	void drawSampleFrame(Painter *c, SampleRef *s, const color &col, int delay);
 	void drawSample(Painter *c, SampleRef *s);
-	void drawMarker(Painter *c, const TrackMarker &marker, int index, bool hover);
+	void drawMarker(Painter *c, const TrackMarker *marker, int index, bool hover);
 	void drawMidi(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiDefault(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiTab(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiScore(Painter *c, const MidiData &midi, bool as_reference, int shift);
 	void drawMidiScoreClef(Painter *c, const Clef &clef, const Scale &scale);
-	void drawMidiNoteScore(Painter *c, MidiNote &n, int shift, MidiNoteState state, const Clef &clef);
+	void drawMidiNoteScore(Painter *c, MidiNote *n, int shift, MidiNoteState state, const Clef &clef);
 	void drawHeader(Painter *c);
 	void draw(Painter *c);
 

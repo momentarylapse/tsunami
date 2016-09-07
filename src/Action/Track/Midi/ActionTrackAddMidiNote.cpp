@@ -6,15 +6,17 @@
  */
 
 #include "ActionTrackAddMidiNote.h"
+#include "../../../Data/Track.h"
 
 ActionTrackAddMidiNote::ActionTrackAddMidiNote(Track* t, const MidiNote& n)
 {
 	track_no = get_track_index(t);
-	note = n;
+	note = new MidiNote;
+	*note = n;
 
 	insert_index = 0;
-	foreachi(MidiNote &nn, t->midi, i)
-		if (note.range.offset > nn.range.offset)
+	foreachi(MidiNote *nn, t->midi, i)
+		if (note->range.offset > nn->range.offset)
 			insert_index = i + 1;
 }
 

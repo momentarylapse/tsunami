@@ -124,7 +124,11 @@ void ViewModeMidi::onLeftButtonUp()
 	ViewModeDefault::onLeftButtonUp();
 
 	if (selection->type == Selection::TYPE_MIDI_PITCH){
-		view->cur_track->addMidiNotes(getCreationNotes());
+		view->song->action_manager->beginActionGroup();
+		Array<MidiNote> notes = getCreationNotes();
+		for (MidiNote &n : notes)
+			view->cur_track->addMidiNote(n);
+		view->song->action_manager->endActionGroup();
 
 		preview_source->end();
 	}
@@ -201,10 +205,10 @@ void ViewModeMidi::onCurTrackChange()
 Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 {
 	Range allowed = Range::ALL;
-	for (MidiNote &n : t->midi){
+	for (MidiNote *n : t->midi){
 		for (int p : pitch)
-			if (n.pitch == p){
-				if (n.range.is_inside(start))
+			if (n->pitch == p){
+				if (n->range.is_inside(start))
 					return Range::EMPTY;
 			}
 	}
@@ -236,7 +240,7 @@ Array<int> ViewModeMidi::getCreationPitch()
 	return pitch;
 }
 
-MidiData ViewModeMidi::getCreationNotes()
+Array<MidiNote> ViewModeMidi::getCreationNotes()
 {
 	int start = min(mouse_possibly_selecting_start, selection->pos);
 	int end = max(mouse_possibly_selecting_start, selection->pos);
@@ -252,7 +256,7 @@ MidiData ViewModeMidi::getCreationNotes()
 	Range allowed = get_allowed_midi_range(view->cur_track, pitch, mouse_possibly_selecting_start);
 
 	// create notes
-	MidiData notes;
+	Array<MidiNote> notes;
 	if (allowed.empty())
 		return notes;
 	for (int p : pitch)
@@ -499,9 +503,8 @@ Selection ViewModeMidi::getHover()
 			//s.modifier = modifier;
 			s.type = Selection::TYPE_MIDI_PITCH;
 			s.index = randi(100000); // quick'n'dirty fix to force view update every time the mouse moves
-			Array<MidiNote> notes = s.track->midi;
-			foreachi(MidiNote &n, notes, i)
-				if (hover_note(n, s, view)){
+			foreachi(MidiNote *n, s.track->midi, i)
+				if (hover_note(*n, s, view)){
 					s.index = i;
 					s.type = Selection::TYPE_MIDI_NOTE;
 					return s;
@@ -575,22 +578,20 @@ void ViewModeMidi::drawMidiEditableDefault(Painter *c, AudioViewTrack *t, const 
 	track_rect = area;
 
 	// draw notes
-	foreachi(MidiNote &n, midi, i){
-		if ((n.pitch < pitch_min) or (n.pitch >= pitch_max))
+	foreachi(MidiNote *n, midi, i){
+		if ((n->pitch < pitch_min) or (n->pitch >= pitch_max))
 			continue;
 		bool _hover = ((hover->type == Selection::TYPE_MIDI_NOTE) and (i == hover->index));
 		if (as_reference){
-			drawMidiNote(c, n, AudioViewTrack::STATE_REFERENCE);
+			drawMidiNote(c, *n, AudioViewTrack::STATE_REFERENCE);
 		}else{
-			drawMidiNote(c, n, _hover ? AudioViewTrack::STATE_HOVER : AudioViewTrack::STATE_DEFAULT);
+			drawMidiNote(c, *n, _hover ? AudioViewTrack::STATE_HOVER : AudioViewTrack::STATE_DEFAULT);
 		}
 	}
 }
 
 void ViewModeMidi::drawMidiEditableScore(Painter *c, AudioViewTrack *t, const MidiData &midi, bool as_reference, Track *track, const rect &area)
 {
-	Array<MidiNote> notes = midi;//.getNotes(view->cam.range());
-
 	const Clef& clef = track->instrument.get_clef();
 
 	t->drawMidiScoreClef(c, clef, view->midi_scale);
@@ -603,7 +604,7 @@ void ViewModeMidi::drawMidiEditableScore(Painter *c, AudioViewTrack *t, const Mi
 			c->drawStr(100, t->clef_pos_to_screen(i), modifier_symbol(mod[i]));*/
 
 	// draw notes
-	foreachi(MidiNote &n, notes, i){
+	foreachi(MidiNote *n, midi, i){
 		bool _hover = ((hover->type == Selection::TYPE_MIDI_NOTE) and (i == hover->index));
 		if (as_reference){
 			t->drawMidiNoteScore(c, n, 0, AudioViewTrack::STATE_REFERENCE, clef);
@@ -634,7 +635,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 			Array<MidiNote> notes = getCreationNotes();
 			for (MidiNote &n : notes){
 				if (mode == view->MIDI_MODE_SCORE)
-					t->drawMidiNoteScore(c, n, 0, AudioViewTrack::STATE_HOVER, t->track->instrument.get_clef());
+					t->drawMidiNoteScore(c, &n, 0, AudioViewTrack::STATE_HOVER, t->track->instrument.get_clef());
 				else
 					drawMidiNote(c, n, AudioViewTrack::STATE_HOVER);
 			}
@@ -650,7 +651,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 				MidiNote n = MidiNote(r, hover->pitch, 1);
 				n.clef_position = hover->clef_position;
 				n.modifier = hover->modifier;
-				t->drawMidiNoteScore(c, n, 0, t->STATE_HOVER, clef);
+				t->drawMidiNoteScore(c, &n, 0, t->STATE_HOVER, clef);
 
 				float x = view->cam.sample2screen(r.offset);
 				int mod;
@@ -710,7 +711,6 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 
 	// marker
 	t->marker_areas.resize(t->track->markers.num);
-	foreachi(TrackMarker &m, t->track->markers, i)
-		if (!m.text.match(":*:"))
-			t->drawMarker(c, m, i, (view->hover.type == Selection::TYPE_MARKER) and (view->hover.track == t->track) and (view->hover.index == i));
+	foreachi(TrackMarker *m, t->track->markers, i)
+		t->drawMarker(c, m, i, (view->hover.type == Selection::TYPE_MARKER) and (view->hover.track == t->track) and (view->hover.index == i));
 }

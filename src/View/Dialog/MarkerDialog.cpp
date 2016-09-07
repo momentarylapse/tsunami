@@ -15,8 +15,8 @@ MarkerDialog::MarkerDialog(HuiWindow* _parent, Track* _t, int _pos, int _index):
 	index = _index;
 
 	if (index >= 0){
-		setString("text", track->markers[index].text);
-		pos = track->markers[index].pos;
+		setString("text", track->markers[index]->text);
+		pos = track->markers[index]->pos;
 
 		enable("ok", true);
 	}else{

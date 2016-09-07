@@ -11,15 +11,18 @@
 #include "../../Song/Sample/ActionSongAddSample.h"
 #include "ActionTrackAddSample.h"
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, BufferBox *buf)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, const BufferBox &buf)
 {
-	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *buf), t->song);
+	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", buf), t->song);
 	addSubAction(new ActionTrackAddSample(t, pos, sample), t->song);
 }
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, MidiData *midi)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, const MidiData &midi)
 {
-	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *midi), t->song);
+	msg_write("a");
+	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", midi), t->song);
+	msg_write("b");
 	addSubAction(new ActionTrackAddSample(t, pos, sample), t->song);
+	msg_write("c");
 }
 

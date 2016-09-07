@@ -6,11 +6,13 @@
  */
 
 #include "ActionTrackDeleteMidiNote.h"
+#include "../../../Data/Track.h"
 
 ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(Track* t, int _index)
 {
 	track_no = get_track_index(t);
 	index = _index;
+	note = NULL;
 }
 
 void* ActionTrackDeleteMidiNote::execute(Data* d)

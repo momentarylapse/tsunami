@@ -252,14 +252,6 @@ void Track::addMidiNote(const MidiNote &n)
 	song->execute(new ActionTrackAddMidiNote(this, n));
 }
 
-void Track::addMidiNotes(const MidiData &midi)
-{
-	song->action_manager->beginActionGroup();
-	for (MidiNote &n : const_cast<MidiData&>(midi))
-		addMidiNote(n);
-	song->action_manager->endActionGroup();
-}
-
 void Track::deleteMidiNote(int index)
 {
 	song->execute(new ActionTrackDeleteMidiNote(this, index));

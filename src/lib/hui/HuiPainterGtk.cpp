@@ -20,6 +20,10 @@ HuiPainter::HuiPainter()
 	width = 0;
 	height = 0;
 	mode_fill = true;
+	cur_font_bold = false;
+	cur_font_italic = false;
+	cur_font_size = -1;
+	cur_font = "";
 }
 
 HuiPainter::HuiPainter(HuiPanel *panel, const string &_id)
@@ -277,6 +281,7 @@ void HuiPainter::drawMaskImage(float x, float y, const Image &image)
 	    image.width * 4);
 
 	cairo_mask_surface(cr, img, x, y);
+	cairo_surface_destroy(img);
 #endif
 }
 

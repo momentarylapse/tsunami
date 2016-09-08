@@ -71,10 +71,10 @@ class MidiRawData extends MidiEvent[]
 		add(_MidiEvent(n.range.end(), n.pitch, 0))
 	extern void addMetronomeClick(int pos, int level, float volume)
 
-class MidiData extends MidiNote[]
+class MidiData extends MidiNote*[]
 	int samples
 	extern override void __init__()
-	extern MidiNote[] getNotes(Range r)
+	extern MidiNote*[] getNotes(Range r)
 	extern MidiEvent[] getEvents(Range r)
 	extern Range getRange()
 
@@ -293,7 +293,7 @@ class Track
 	extern void deleteSampleRef(int index)
 	extern void editSampleRef(int index, float volume, bool mute, int rep_num, int rep_delay)
 	extern void addMidiNote(MidiNote n)
-	extern void addMidiNotes(MidiData midi)
+	//extern void addMidiNotes(MidiData midi)
 	extern void deleteMidiNote(int index)
 	extern void setSynthesizer(Synthesizer *synth)
 	extern void addMarker(int pos, string text)

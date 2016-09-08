@@ -20,14 +20,10 @@ ActionSongAddSample::ActionSongAddSample(const string &name, const BufferBox &bu
 
 ActionSongAddSample::ActionSongAddSample(const string &name, const MidiData &midi)
 {
-	msg_write("sa");
 	sample = new Sample(Track::TYPE_MIDI);
-	msg_write("sb");
 	sample->midi = midi;
-	msg_write("sc");
 	sample->midi.sort();
 	sample->name = name;
-	msg_write("sd");
 }
 
 ActionSongAddSample::~ActionSongAddSample()
@@ -38,12 +34,10 @@ ActionSongAddSample::~ActionSongAddSample()
 
 void *ActionSongAddSample::execute(Data *d)
 {
-	msg_write("sxa");
 	Song *a = dynamic_cast<Song*>(d);
 	sample->owner = a;
 	a->samples.add(sample);
 	a->notify(a->MESSAGE_ADD_SAMPLE);
-	msg_write("sxz");
 	return sample;
 }
 

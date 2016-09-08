@@ -19,10 +19,7 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, const Buff
 
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, const MidiData &midi)
 {
-	msg_write("a");
 	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", midi), t->song);
-	msg_write("b");
 	addSubAction(new ActionTrackAddSample(t, pos, sample), t->song);
-	msg_write("c");
 }
 

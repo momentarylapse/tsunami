@@ -46,6 +46,8 @@ Tsunami::~Tsunami()
 	delete(storage);
 	delete(device_manager);
 	delete(plugin_manager);
+	delete(clipboard);
+	delete(log);
 }
 
 bool Tsunami::onStartup(const Array<string> &arg)

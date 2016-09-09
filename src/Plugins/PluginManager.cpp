@@ -49,6 +49,7 @@ PluginManager::PluginManager()
 PluginManager::~PluginManager()
 {
 	delete(favorites);
+	Script::End();
 }
 
 
@@ -487,7 +488,7 @@ void find_plugins_in_dir(const string &dir, int type, PluginManager *pm)
 
 void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m, const string &name_space, TsunamiWindow *win, void (TsunamiWindow::*function)())
 {
-	foreachi(PluginManager::PluginFile &f, pm->plugin_files, i){
+	for (PluginManager::PluginFile &f: pm->plugin_files){
 		if (f.filename.find(dir) >= 0){
 			string id = "execute-" + name_space + "--" + f.name;
             m->addItemImage(f.name, f.image, id);

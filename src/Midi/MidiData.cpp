@@ -338,8 +338,8 @@ void backtrace() {
 
 MidiData::~MidiData()
 {
-	if (num > 0)
-		backtrace();
+	/*if (num > 0)
+		backtrace();*/
 	deep_clear();
 }
 
@@ -355,10 +355,8 @@ void MidiData::__delete__()
 
 void MidiData::deep_clear()
 {
-	for (MidiNote *n: *this){
-		msg_write("  del " + p2s(n));
+	for (MidiNote *n: *this)
 		delete(n);
-	}
 	clear();
 }
 
@@ -385,6 +383,8 @@ MidiData MidiData::duplicate() const
 		*nn = *n;
 		b.add(nn);
 	}
+	b.samples = samples;
+	b.fx = fx;
 	return b;
 }
 
@@ -397,6 +397,8 @@ void MidiData::operator=(const MidiData &midi)
 		*nn = *n;
 		add(nn);
 	}
+	samples = midi.samples;
+	fx = midi.fx;
 }
 
 Range MidiData::getRange(int elongation) const

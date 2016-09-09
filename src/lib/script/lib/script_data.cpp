@@ -1443,14 +1443,14 @@ void DeclareClassVirtualIndex(const string &class_name, const string &func, void
 
 int ProcessClassOffset(const string &class_name, const string &element, int offset)
 {
-	for (ClassOffsetData &d : ClassOffsets)
+	for (ClassOffsetData &d: ClassOffsets)
 		if ((d.class_name == class_name) and (d.element == element))
 			return d.offset;
 	return offset;
 }
 int ProcessClassSize(const string &class_name, int size)
 {
-	for (ClassSizeData &d : ClassSizes)
+	for (ClassSizeData &d: ClassSizes)
 		if (d.class_name == class_name)
 			return d.size;
 	return size;
@@ -1458,7 +1458,7 @@ int ProcessClassSize(const string &class_name, int size)
 
 int ProcessClassNumVirtuals(const string &class_name, int num_virtual)
 {
-	for (ClassOffsetData &d : ClassOffsets)
+	for (ClassOffsetData &d: ClassOffsets)
 		if ((d.class_name == class_name) and (d.is_virtual))
 			num_virtual = max(num_virtual, d.offset + 1);
 	return num_virtual;
@@ -1469,16 +1469,11 @@ void End()
 	msg_db_f("ScriptEnd", 1);
 	DeleteAllScripts(true, true);
 
-	//ResetSemiExternalData();
-
 	PreOperators.clear();
 
-	/*for (int i=0;i<PreTypes.num;i++)
-		delete(PreTypes[i]);
-	PreTypes.clear();
+	Packages.clear();
 
-	PreConstants.clear();
-	PreExternalVars.clear();*/
+	ResetExternalLinkData();
 }
 
 };

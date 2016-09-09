@@ -60,9 +60,9 @@ Script *Load(const string &filename, bool just_analyse)
 	Script *s = NULL;
 
 	// already loaded?
-	for (int i=0;i<PublicScript.num;i++)
-		if (PublicScript[i]->filename == filename.sys_filename())
-			return PublicScript[i];
+	for (Script *ps: PublicScript)
+		if (ps->filename == filename.sys_filename())
+			return ps;
 	
 	// load
 	s = new Script();
@@ -123,7 +123,7 @@ void DeleteAllScripts(bool even_immortal, bool force)
 
 	// try to erase them...
 	foreachb(Script *s, PublicScript)
-		if ((!s->syntax->flag_immortal) || (even_immortal))
+		if ((!s->syntax->flag_immortal) or even_immortal)
 			Remove(s);
 
 	// undead... really KILL!
@@ -236,6 +236,12 @@ Script::Script()
 	__time_to_wait = 0;
 	show_compiler_stats = !config.compile_silently;
 
+	__thread_opcode = NULL;
+	__thread_opcode_size = 0;
+
+	__continue_execution = NULL;
+	just_analyse = false;
+
 	opcode = NULL;
 	opcode_size = 0;
 	memory = NULL;
@@ -249,7 +255,7 @@ Script::Script()
 Script::~Script()
 {
 	msg_db_f("~CScript", 4);
-	if ((memory) && (!just_analyse)){
+	if (memory and (!just_analyse)){
 		//delete[](Memory);
 		#ifdef OS_WINDOWS
 			VirtualFree(memory, 0, memory_size);
@@ -381,7 +387,7 @@ void *Script::MatchClassFunction(const string &_class, bool allow_derived, const
 			continue;
 		if (!f->_class->IsDerivedFrom(root_type))
 			continue;
-		if ((f->name.match("*." + name)) && (f->literal_return_type->name == return_type) && (num_params == f->num_params)){
+		if ((f->name.match("*." + name)) and (f->literal_return_type->name == return_type) and (num_params == f->num_params)){
 
 			bool params_ok = true;
 			for (int j=0;j<num_params;j++)

@@ -216,18 +216,20 @@ void Song::reset()
 	default_format = SAMPLE_FORMAT_16;
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
-	for (Effect *f : fx)
+
+	for (Effect *f: fx)
 		delete(f);
 	fx.clear();
-	for (Track *t : tracks)
+
+	for (Track *t: tracks)
 		delete(t);
 	tracks.clear();
 
-	for (Sample *s : samples)
+	for (Sample *s: samples)
 		delete(s);
 	samples.clear();
 
-	for (Curve *c : curves)
+	for (Curve *c: curves)
 		delete(c);
 	curves.clear();
 
@@ -262,7 +264,7 @@ Range Song::getRange()
 	int max = -1073741824;
 	Range r = Range(min, max - min);
 
-	for (Track *t : tracks)
+	for (Track *t: tracks)
 		r = r or t->getRangeUnsafe();
 
 	if (r.length < 0)
@@ -279,7 +281,7 @@ Range Song::getRangeWithTime()
 	if (bars.num > 0)
 		r = r or bars.getRange();
 
-	for (Track *t : tracks)
+	for (Track *t: tracks)
 		r = r or t->getRangeUnsafe();
 
 	if (r.length < 0)

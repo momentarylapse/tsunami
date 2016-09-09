@@ -10,7 +10,6 @@ static int FoundConstantNr;
 static Script *FoundConstantScript;
 
 
-void exlink_make_var_local(SyntaxTree *ps, Type *t, int var_no);
 Command *conv_cbr(SyntaxTree *ps, Command *c, int var);
 
 extern bool next_extern;
@@ -1574,7 +1573,7 @@ void SyntaxTree::ParseClass()
 
 			// override?
 			ClassElement *orig = NULL;
-			foreachi(ClassElement &e, _class->element, i)
+			for (ClassElement &e: _class->element)
 				if (e.name == el.name) //and e.type->is_pointer and el.type->is_pointer)
 					orig = &e;
 			if (override and ! orig)
@@ -1621,7 +1620,7 @@ void SyntaxTree::ParseClass()
 				DoError("no virtual functions allowed when inheriting from class without virtual functions");
 			// element "-vtable-" being derived
 		}else{
-			for (ClassElement &e : _class->element)
+			for (ClassElement &e: _class->element)
 				e.offset = ProcessClassOffset(_class->name, e.name, e.offset + config.pointer_size);
 
 			ClassElement el;
@@ -1634,7 +1633,7 @@ void SyntaxTree::ParseClass()
 		}
 	}
 
-	for (ClassElement &e : _class->element)
+	for (ClassElement &e: _class->element)
 		if (type_needs_alignment(e.type))
 			_offset = mem_align(_offset, 4);
 	_class->size = ProcessClassSize(_class->name, _offset);

@@ -80,10 +80,15 @@ void Track::reset()
 	volume = 1;
 	muted = false;
 	panning = 0;
-	for (Effect *f : fx)
+
+	for (Effect *f: fx)
 		delete(f);
 	fx.clear();
+
+	for (SampleRef *r: samples)
+		delete(r);
 	samples.clear();
+
 	if (synth)
 		delete(synth);
 	synth = CreateSynthesizer("Dummy", song);

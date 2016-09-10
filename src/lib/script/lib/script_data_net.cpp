@@ -37,8 +37,6 @@ Type *TypeSocketPList;
 
 void SIAddPackageNet()
 {
-	msg_db_f("SIAddPackageNet", 3);
-
 	add_package("net", false);
 
 	TypeNetAddress = add_type  ("NetAddress",	sizeof(NetAddress));

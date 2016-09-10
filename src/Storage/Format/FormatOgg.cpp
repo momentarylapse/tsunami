@@ -57,7 +57,6 @@ int oe_write_page(ogg_page *page, FILE *fp)
 
 void FormatOgg::saveViaRenderer(StorageOperationData *od)
 {
-	msg_db_f("write_ogg_file", 1);
 	AudioRenderer *r = od->renderer;
 
 	float OggQuality = HuiConfig.getFloat("OggQuality", 0.5f);
@@ -205,7 +204,6 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
 void FormatOgg::loadTrack(StorageOperationData *od)
 {
-	msg_db_f("Ogg.LoadTrack", 1);
 	Track *t = od->track;
 
 	if (ov_fopen((char*)od->filename.c_str(), &vf)){

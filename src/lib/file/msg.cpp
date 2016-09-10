@@ -16,6 +16,11 @@
 	#include <windows.h>
 #endif
 
+#define UNW_LOCAL_ONLY
+#include <cxxabi.h>
+#include <libunwind.h>
+
+
 
 
 // choose the level of debugging here
@@ -55,7 +60,6 @@ static string ErrorMsg;
 	static char TraceStr[MSG_NUM_TRACES_SAVED][MSG_MAX_TRACE_LENGTH];
 #endif
 static int CurrentTraceLevel=0;
-
 
 
 // call only once!
@@ -333,22 +337,45 @@ void msg_trace_l(int level)
 	}
 }
 
+
 string msg_get_trace()
 {
-	string str;
-	for (int i=0;i<CurrentTraceLevel;i++){
-		str += string(TraceStr[i]);
-		if (i<CurrentTraceLevel-1)
-			str += "  ->  ";
+	Array<string> trace;
+
+	unw_cursor_t cursor;
+	unw_context_t context;
+
+	unw_getcontext(&context);
+	unw_init_local(&cursor, &context);
+
+	while (unw_step(&cursor) > 0) {
+		unw_word_t offset, pc;
+		unw_get_reg(&cursor, UNW_REG_IP, &pc);
+		if (pc == 0)
+			break;
+
+		// why before...?!?
+		if (unw_is_signal_frame(&cursor) > 0)
+			trace.clear();
+
+		string t = format("0x%lx:", pc);
+
+		char sym[256];
+		if (unw_get_proc_name(&cursor, sym, sizeof(sym), &offset) == 0) {
+			char* nameptr = sym;
+			int status;
+			char* demangled = abi::__cxa_demangle(sym, nullptr, nullptr, &status);
+			if (status == 0)
+				nameptr = demangled;
+			t += format(" (%s + 0x%lx)", nameptr, offset);
+			free(demangled);
+		} else {
+			t += " (\?\?\?)";
+		}
+		trace.add(t);
 	}
-#ifdef MSG_TRACE_REF
-	if (TraceStr[CurrentTraceLevel])
-		str += string(" ( ->  ") + TraceStr[CurrentTraceLevel] + ")";
-#else
-	if (strlen(TraceStr[CurrentTraceLevel])>0)
-		str += string(" ( ->  ") + TraceStr[CurrentTraceLevel] + ")";
-#endif
-	return str;
+
+	return implode(trace, "\n");
 }
 
 int msg_get_trace_depth()

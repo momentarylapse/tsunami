@@ -37,10 +37,9 @@ void PluginData::__delete__()
 Array<Script::ClassElement> get_unique_elements(Script::Type *t)
 {
 	Array<Script::ClassElement> r;
-	for (auto &e : t->element)
-		if (!e.hidden){
+	for (auto &e: t->element)
+		if (!e.hidden)
 			r.add(e);
-		}
 	return r;
 }
 
@@ -59,7 +58,7 @@ string var_to_string(Script::Type *type, char *v)
 		r += "\"" + str_escape(*(string*)v) + "\"";
 	}else if (type->is_array){
 		r += "[";
-		for (int i=0;i<type->array_length;i++){
+		for (int i=0; i<type->array_length; i++){
 			if (i > 0)
 				r += " ";
 			r += var_to_string(type->parent, &v[i * type->parent->size]);
@@ -68,7 +67,7 @@ string var_to_string(Script::Type *type, char *v)
 	}else if (type->is_super_array){
 		DynamicArray *a = (DynamicArray*)v;
 		r += "[";
-		for (int i=0;i<a->num;i++){
+		for (int i=0; i<a->num; i++){
 			if (i > 0)
 				r += " ";
 			r += var_to_string(type->parent, &(((char*)a->data)[i * type->parent->size]));
@@ -83,7 +82,7 @@ string var_to_string(Script::Type *type, char *v)
 	}else{
 		Array<Script::ClassElement> e = get_unique_elements(type);
 		r += "(";
-		for(int i=0;i<e.num;i++){
+		for (int i=0; i<e.num; i++){
 			if (i > 0)
 				r += " ";
 			r += var_to_string(e[i].type, &v[e[i].offset]);
@@ -162,7 +161,7 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos, Son
 	}else{
 		Array<Script::ClassElement> e = get_unique_elements(type);
 		pos ++; // '('
-		for(int i=0;i<e.num;i++){
+		for (int i=0; i<e.num; i++){
 			if (i > 0)
 				pos ++; // ' '
 			var_from_string(e[i].type, &v[e[i].offset], s, pos, song);
@@ -197,7 +196,7 @@ PluginData *Configurable::get_config()
 	Script::Type *type = Script::GetDynamicType(this);
 	if (!type)
 		return NULL;
-	for (auto &e : type->element)
+	for (auto &e: type->element)
 		if ((e.name == "config") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *config = (PluginData*)((char*)this + e.offset);
 			config->type = e.type;
@@ -215,7 +214,7 @@ PluginData *Configurable::get_state()
 			return &ds->state;
 		return NULL;
 	}
-	for (auto &e : type->element)
+	for (auto &e: type->element)
 		if ((e.name == "state") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *state = (PluginData*)((char*)this + e.offset);
 			state->type = e.type;
@@ -226,8 +225,6 @@ PluginData *Configurable::get_state()
 
 string Configurable::configToString()
 {
-	msg_db_f("Configurable.configToString", 1);
-
 	PluginData *config = get_config();
 	if (!config)
 		return "";
@@ -238,8 +235,6 @@ string Configurable::configToString()
 
 void Configurable::configFromString(const string &param)
 {
-	msg_db_f("Configurable.configFromString", 1);
-
 	PluginData *config = get_config();
 	if (!config)
 		return;
@@ -255,8 +250,6 @@ void Configurable::configFromString(const string &param)
 //   try to execute   Configurable.config.reset()
 void Configurable::resetConfig()
 {
-	msg_db_f("Configurable.resetConfig", 1);
-
 	PluginData *config = get_config();
 	if (config)
 		config->reset();
@@ -267,8 +260,6 @@ void Configurable::resetConfig()
 //   try to execute   Configurable.state.reset()
 void Configurable::resetState()
 {
-	msg_db_f("Configurable.resetState", 1);
-
 	PluginData *state = get_state();
 	if (state)
 		state->reset();
@@ -296,12 +287,12 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 {
 	Script::SyntaxTree *ps = config->type->owner;
 	Array<AutoConfigData> r;
-	for (auto &e : config->type->element)
+	for (auto &e: config->type->element)
 		if (e.type == Script::TypeFloat32){
 			AutoConfigData a;
 			a.name = e.name;
 			a.value = (float*)((char*)config + e.offset);
-			for (auto &c : ps->constants){
+			for (auto &c: ps->constants){
 				if (c.name == "AutoConfig" + e.name){
 					Array<string> p = c.value.explode(":");
 					if (p.num == 5){
@@ -340,19 +331,19 @@ public:
 	}
 	~AutoConfigPanel()
 	{
-		for (auto &a : aa)
+		for (auto &a: aa)
 			delete(a.slider);
 	}
 	void _cdecl onChange()
 	{
-		for (auto &a : aa)
+		for (auto &a: aa)
 			*a.value = a.slider->get();
 		notify();
 
 	}
 	virtual void _cdecl update()
 	{
-		for (auto &a : aa)
+		for (auto &a: aa)
 			a.slider->set(*a.value);
 	}
 };

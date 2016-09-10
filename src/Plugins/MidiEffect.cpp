@@ -49,7 +49,6 @@ void MidiEffect::__delete__()
 
 void MidiEffect::Prepare()
 {
-	msg_db_f("MidiEffect.Prepare", 1);
 	resetState();
 	if (!usable)
 		tsunami->log->error(GetError());
@@ -64,8 +63,6 @@ string MidiEffect::GetError()
 
 void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 {
-	msg_db_f("MidiEffect.Apply", 1);
-
 	// run
 	process(&midi);
 
@@ -80,8 +77,6 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 
 void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 {
-	msg_db_f("MidiEffect.DoProcessTrack", 1);
-
 	MidiData midi = t->midi.getNotes(r);
 
 	t->song->action_manager->beginActionGroup();

@@ -34,7 +34,7 @@ int SerializerARM::fc_begin()
 	Array<SerialCommandParam> reg_param;
 	Array<SerialCommandParam> stack_param;
 	Array<SerialCommandParam> xmm_param;
-	for (SerialCommandParam &p : CompilerFunctionParam){
+	for (SerialCommandParam &p: CompilerFunctionParam){
 		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 4){
 				reg_param.add(p);
@@ -78,7 +78,7 @@ int SerializerARM::fc_begin()
 	}
 
 	// extend reg channels to call
-	for (VirtualRegister &r : virtual_reg)
+	for (VirtualRegister &r: virtual_reg)
 		if (r.last == -100)
 			r.last = cmd.num;
 
@@ -239,7 +239,6 @@ void SerializerARM::SerializeCompilerFunction(Command *com, Array<SerialCommandP
 
 void SerializerARM::SerializeOperator(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret)
 {
-	msg_db_f("SerializeOperatorARM", 4);
 	switch(com->link_no){
 		case OperatorIntAssign:
 		case OperatorInt64Assign:
@@ -394,7 +393,6 @@ bool const_is_arm_representable(int value)
 //   and compile its command if the parameter is executable itself
 SerialCommandParam SerializerARM::SerializeParameter(Command *link, Block *block, int index)
 {
-	msg_db_f("SerializeParameter", 4);
 	SerialCommandParam p;
 	p.kind = link->kind;
 	p.type = link->type;
@@ -466,7 +464,6 @@ SerialCommandParam SerializerARM::SerializeParameter(Command *link, Block *block
 
 void SerializerARM::ProcessReferences()
 {
-	msg_db_f("ProcessReferences", 3);
 	for (int i=0;i<cmd.num;i++)
 		if (cmd[i].inst == Asm::INST_LEA){
 			if (cmd[i].p[1].kind == KIND_VAR_LOCAL){
@@ -487,7 +484,6 @@ void SerializerARM::ProcessReferences()
 
 void SerializerARM::ProcessDereferences()
 {
-	msg_db_f("ProcessDereeferences", 3);
 	for (int i=0;i<cmd.num;i++)
 		for (int j=0;j<SERIAL_COMMAND_NUM_PARAMS;j++)
 			if ((cmd[i].p[j].kind == KIND_DEREF_VAR_LOCAL) or (cmd[i].p[j].kind == KIND_DEREF_VAR_TEMP)){
@@ -662,7 +658,6 @@ inline bool is_global_lookup(SerialCommandParam &p)
 // create global lookup accesses
 void SerializerARM::ConvertGlobalLookups()
 {
-	msg_db_f("CorrectCombis", 3);
 	for (int i=cmd.num-1;i>=0;i--){
 		if (cmd[i].inst == Asm::INST_MOV){
 			if (is_global_lookup(cmd[i].p[1]))
@@ -689,7 +684,6 @@ void SerializerARM::ConvertGlobalLookups()
 // create local variable accesses
 void SerializerARM::CorrectUnallowedParamCombis()
 {
-	msg_db_f("CorrectCombis", 3);
 	for (int i=cmd.num-1;i>=0;i--){
 		if (cmd[i].inst == Asm::INST_MOV){
 			if ((cmd[i].p[0].kind != KIND_REGISTER) and (cmd[i].p[1].kind != KIND_REGISTER))
@@ -713,18 +707,17 @@ void SerializerARM::CorrectUnallowedParamCombis()
 
 void SerializerARM::AddFunctionIntro(Function *f)
 {
-
 	// return, instance, params
 	Array<Variable> param;
 	if (f->return_type->UsesReturnByMemory()){
-		for (Variable &v : f->var)
+		for (Variable &v: f->var)
 			if (v.name == IDENTIFIER_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (f->_class){
-		for (Variable &v : f->var)
+		for (Variable &v: f->var)
 			if (v.name == IDENTIFIER_SELF){
 				param.add(v);
 				break;
@@ -737,7 +730,7 @@ void SerializerARM::AddFunctionIntro(Function *f)
 	Array<Variable> reg_param;
 	Array<Variable> stack_param;
 	Array<Variable> xmm_param;
-	for (Variable &p : param){
+	for (Variable &p: param){
 		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 4){
 				reg_param.add(p);
@@ -834,7 +827,7 @@ void SerializerARM::ConvertGlobalRefs()
 		if ((cmd[i].inst == Asm::INST_LDR) and (cmd[i].p[0].kind == KIND_REGISTER) and (cmd[i].p[1].kind == KIND_DEREF_MARKER)){
 			bool found = false;
 			long data;
-			for (GlobalRef &r : global_refs){
+			for (GlobalRef &r: global_refs){
 				if (r.label == cmd[i].p[1].p){
 					data = (long)r.p;
 					found = true;

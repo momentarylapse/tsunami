@@ -123,8 +123,6 @@ gboolean OnGtkWindowFocus(GtkWidget *widget, GdkEventFocus *event, gpointer user
 
 void HuiWindow::_init_(const string &title, int x, int y, int width, int height, HuiWindow *root, bool allow_root, int mode)
 {
-	msg_db_f("HuiWindow()",1);
-
 	window = NULL;
 	win = this;
 	if ((mode & HuiWinModeDummy) > 0)
@@ -254,13 +252,11 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 
 HuiWindow::~HuiWindow()
 {
-	msg_db_f("HuiWindow.~", 1);
-
 	if (!window)
 		return;
 
 	// quick'n'dirty fix (gtk destroys its widgets recursively)
-	for (HuiControl *c : control)
+	for (HuiControl *c: control)
 		c->widget = NULL;
 
 	_clean_up_();
@@ -286,7 +282,6 @@ void HuiWindow::show()
 
 string HuiWindow::run()
 {
-	msg_db_f("HuiWindow.Run",1);
 	show();
 	int uid = unique_id;
 	/*msg_write((int)win);
@@ -330,7 +325,7 @@ string HuiWindow::run()
 		bool killed = false;
 		while(!killed){
 			HuiDoSingleMainLoop();
-			for (HuiClosedPanel &cp : HuiClosedPanels)
+			for (HuiClosedPanel &cp: HuiClosedPanels)
 				if (cp.unique_id == uid)
 					killed = true;
 		}
@@ -350,7 +345,6 @@ string HuiWindow::run()
 
 void HuiWindow::setMenu(HuiMenu *_menu)
 {
-	msg_db_f("SetMenu", 1);
 	// remove old menu...
 	if (menu){
 		Array<HuiControl*> list = menu->get_all_controls();

@@ -133,8 +133,6 @@ void PreProcessFunction(SyntaxTree *ps, Command *c)
 
 Command *SyntaxTree::PreProcessCommand(Command *c)
 {
-	msg_db_f("PreProcessCommand", 4);
-
 	// recursion
 	if (c->kind == KIND_BLOCK){
 		for (int i=0;i<c->as_block()->commands.num;i++)
@@ -294,7 +292,6 @@ string LinkNr2Str(SyntaxTree *s,int kind,int nr);
 // may not use AddConstant()!!!
 Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 {
-	msg_db_f("PreProcessCommandAddr", 4);
 	/*msg_write(Kind2Str(c->Kind));
 	if (c->script)
 		msg_write(LinkNr2Str(c->script->pre_script, c->Kind, c->LinkNr));
@@ -369,8 +366,7 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 
 void SyntaxTree::PreProcessor()
 {
-	msg_db_f("PreProcessor", 4);
-	for (Function *f : functions){
+	for (Function *f: functions){
 		cur_func = f;
 		foreachi(Command *c, f->block->commands, i)
 			f->block->commands[i] = PreProcessCommand(c);
@@ -380,8 +376,7 @@ void SyntaxTree::PreProcessor()
 
 void SyntaxTree::PreProcessorAddresses()
 {
-	msg_db_f("PreProcessorAddr", 4);
-	for (Function *f : functions){
+	for (Function *f: functions){
 		cur_func = f;
 		foreachi(Command *c, f->block->commands, i)
 			f->block->commands[i] = PreProcessCommandAddresses(c);

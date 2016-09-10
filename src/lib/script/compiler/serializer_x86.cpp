@@ -88,8 +88,6 @@ void SerializerX86::fc_end(int push_size)
 
 void SerializerX86::add_function_call(Script *script, int func_no)
 {
-	msg_db_f("AddFunctionCallX86", 4);
-
 	int push_size = fc_begin();
 
 	if ((script == this->script) and (!script->syntax->functions[func_no]->is_extern)){
@@ -107,8 +105,6 @@ void SerializerX86::add_function_call(Script *script, int func_no)
 
 void SerializerX86::add_virtual_function_call(int virtual_index)
 {
-	msg_db_f("AddFunctionCallX86", 4);
-
 	int push_size = fc_begin();
 
 	add_cmd(Asm::INST_MOV, p_eax, CompilerFunctionInstance);
@@ -124,7 +120,6 @@ void SerializerX86::add_virtual_function_call(int virtual_index)
 //   and compile its command if the parameter is executable itself
 SerialCommandParam SerializerX86::SerializeParameter(Command *link, Block *block, int index)
 {
-	msg_db_f("SerializeParameter", 4);
 	SerialCommandParam p;
 	p.kind = link->kind;
 	p.type = link->type;
@@ -194,7 +189,6 @@ SerialCommandParam SerializerX86::SerializeParameter(Command *link, Block *block
 
 void SerializerX86::SerializeOperator(Command *com, Array<SerialCommandParam> &param, SerialCommandParam &ret)
 {
-	msg_db_f("SerializeOperator", 4);
 	switch(com->link_no){
 		case OperatorIntAssign:
 		case OperatorInt64Assign:
@@ -1013,7 +1007,6 @@ inline bool param_combi_allowed(int inst, SerialCommandParam &p1, SerialCommandP
 // mov [0x..] [0x...]  ->  mov eax, [0x..]   mov [0x..] eax    (etc)
 void SerializerX86::CorrectUnallowedParamCombis()
 {
-	msg_db_f("CorrectCombis", 3);
 	for (int i=cmd.num-1;i>=0;i--){
 		if (cmd[i].inst >= INST_MARKER)
 			continue;
@@ -1065,7 +1058,6 @@ void SerializerX86::AddFunctionOutro(Function *f)
 
 void SerializerX86::ProcessReferences()
 {
-	msg_db_f("ProcessReferences", 3);
 	for (int i=0;i<cmd.num;i++)
 		if (cmd[i].inst == Asm::INST_LEA){
 			if (cmd[i].p[1].kind == KIND_VAR_LOCAL){

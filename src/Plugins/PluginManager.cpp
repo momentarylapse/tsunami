@@ -65,7 +65,6 @@ Song* getCurSong()
 
 void PluginManager::LinkAppScriptData()
 {
-	msg_db_f("LinkAppScriptData", 2);
 	Script::config.directory = "";
 
 	// api definition
@@ -499,7 +498,6 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m, const 
 
 void PluginManager::FindPlugins()
 {
-	msg_db_f("FindPlugins", 2);
 	Script::Init();
 
 	// "Buffer"
@@ -526,8 +524,6 @@ void PluginManager::FindPlugins()
 
 void PluginManager::AddPluginsToMenu(TsunamiWindow *win)
 {
-	msg_db_f("AddPluginsToMenu", 2);
-
 	HuiMenu *m = win->getMenu();
 
 	// "Buffer"
@@ -569,9 +565,7 @@ string PluginManager::SelectFavoriteName(HuiWindow *win, Configurable *c, bool s
 //   don't log error...
 Plugin *PluginManager::LoadAndCompilePlugin(int type, const string &filename)
 {
-	msg_db_f("LoadAndCompilePlugin", 1);
-
-	for (Plugin *p : plugins)
+	for (Plugin *p: plugins)
 		if (filename == p->filename)
 			return p;
 
@@ -589,8 +583,6 @@ typedef void main_void_func();
 
 void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
 {
-	msg_db_f("ExecutePlugin", 1);
-
 	Plugin *p = LoadAndCompilePlugin(Plugin::TYPE_OTHER, filename);
 	if (!p->usable){
 		tsunami->log->error(p->getError());
@@ -610,7 +602,7 @@ void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
 
 Plugin *PluginManager::GetPlugin(int type, const string &name)
 {
-	for (PluginFile &pf : plugin_files){
+	for (PluginFile &pf: plugin_files){
 		if ((pf.name == name) and (pf.type == type)){
 			Plugin *p = LoadAndCompilePlugin(type, pf.filename);
 			if (!p->usable)

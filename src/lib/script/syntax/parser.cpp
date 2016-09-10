@@ -44,7 +44,6 @@ long long s2i2(const string &str)
 //  "1.2" -> float
 Type *SyntaxTree::GetConstantType()
 {
-	msg_db_f("GetConstantType", 4);
 	FoundConstantNr = -1;
 	FoundConstantScript = NULL;
 
@@ -58,7 +57,7 @@ Type *SyntaxTree::GetConstantType()
 
 
 	// included named constants
-	for (Script *inc : includes)
+	for (Script *inc: includes)
 		foreachi(Constant &c, inc->syntax->constants, i)
 			if (Exp.cur == c.name){
 				FoundConstantNr = i;
@@ -149,13 +148,11 @@ string SyntaxTree::GetConstantValue()
 
 Command *SyntaxTree::DoClassFunction(Command *ob, Array<ClassFunction> &cfs, Block *block)
 {
-	msg_db_f("DoClassFunc", 4);
-
 	// the function
 	Function *ff = cfs[0].GetFunc();
 
 	Array<Command> links;
-	for (ClassFunction &cf : cfs){
+	for (ClassFunction &cf: cfs){
 		Command *cmd = add_command_classfunc(&cf, ob);
 		links.add(*cmd);
 	}
@@ -164,7 +161,6 @@ Command *SyntaxTree::DoClassFunction(Command *ob, Array<ClassFunction> &cfs, Blo
 
 Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 {
-	msg_db_f("GetOperandExtensionElement", 4);
 	Exp.next();
 	Type *type = Operand->type;
 
@@ -186,10 +182,10 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 	}
 
 	// find element
-	for (int e=0;e<type->element.num;e++)
-		if (Exp.cur == type->element[e].name){
+	for (ClassElement &e: type->element)
+		if (Exp.cur == e.name){
 			Exp.next();
-			return shift_command(Operand, deref, type->element[e].offset, type->element[e].type);
+			return shift_command(Operand, deref, e.offset, e.type);
 		}
 
 
@@ -200,7 +196,7 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 
 	// class function?
 	Array<Command> links;
-	for (ClassFunction &cf : type->function)
+	for (ClassFunction &cf: type->function)
 		if (f_name == cf.name){
 			Command *cmd = add_command_classfunc(&cf, Operand);
 			links.add(*cmd);
@@ -216,8 +212,6 @@ Command *SyntaxTree::GetOperandExtensionElement(Command *Operand, Block *block)
 
 Command *SyntaxTree::GetOperandExtensionArray(Command *Operand, Block *block)
 {
-	msg_db_f("GetOperandExtensionArray", 4);
-
 	// array index...
 	Exp.next();
 	Command *index = GetCommand(block);
@@ -278,8 +272,6 @@ Command *SyntaxTree::GetOperandExtensionArray(Command *Operand, Block *block)
 // find any ".", "->", or "[...]"'s    or operators?
 Command *SyntaxTree::GetOperandExtension(Command *Operand, Block *block)
 {
-	msg_db_f("GetOperandExtension", 4);
-
 	// nothing?
 	int op = WhichPrimitiveOperator(Exp.cur);
 	if ((Exp.cur != ".") and (Exp.cur != "[") and (Exp.cur != "->") and (op < 0))
@@ -317,8 +309,6 @@ Command *SyntaxTree::GetOperandExtension(Command *Operand, Block *block)
 
 Command *SyntaxTree::GetSpecialFunctionCall(const string &f_name, Command &link, Block *block)
 {
-	msg_db_f("GetSpecialFuncCall", 4);
-
 	// sizeof
 	if ((link.kind != KIND_COMPILER_FUNCTION) or (link.link_no != COMMAND_SIZEOF))
 		DoError("evil special function");
@@ -362,8 +352,8 @@ Array<Type*> SyntaxTree::GetFunctionWantedParams(Command &link)
 		return cf->param_type;
 	}else if (link.kind == KIND_COMPILER_FUNCTION){
 		Array<Type*> wanted_types;
-		for (int p=0; p<PreCommands[link.link_no].param.num; p++)
-			wanted_types.add(PreCommands[link.link_no].param[p].type);
+		for (PreCommandParam &p: PreCommands[link.link_no].param)
+			wanted_types.add(p.type);
 		return wanted_types;
 	}else
 		DoError("evil function...");
@@ -376,7 +366,7 @@ Array<Command*> SyntaxTree::FindFunctionParameters(Block *block)
 {
 	if (Exp.cur != "(")
 		DoError("\"(\" expected in front of function parameter list");
-	msg_db_f("FindFunctionParameters", 4);
+
 	Exp.next();
 
 	Array<Command*> params;
@@ -407,7 +397,6 @@ Command *apply_type_cast(SyntaxTree *ps, int tc, Command *param);
 //   ...and try to cast, if not
 Command *SyntaxTree::CheckParamLink(Command *link, Type *type, const string &f_name, int param_no)
 {
-	msg_db_f("CheckParamLink", 4);
 	// type cast needed and possible?
 	Type *pt = link->type;
 	Type *wt = type;
@@ -446,8 +435,6 @@ Command *SyntaxTree::CheckParamLink(Command *link, Type *type, const string &f_n
 //  on entry <Operand> only contains information from GetExistence (Kind, Nr, Type, NumParams)
 Command *SyntaxTree::GetFunctionCall(const string &f_name, Array<Command> &links, Block *block)
 {
-	msg_db_f("GetFunctionCall", 4);
-
 	// function as a variable?
 	if (Exp.cur_exp >= 2)
 	if ((Exp.get_name(Exp.cur_exp - 2) == "&") and (Exp.cur != "(")){
@@ -486,7 +473,7 @@ Command *SyntaxTree::GetFunctionCall(const string &f_name, Array<Command> &links
 	}*/
 
 	// direct match...
-	for (Command &link : links){
+	for (Command &link: links){
 		Array<Type*> wanted_types = GetFunctionWantedParams(link);
 		if (wanted_types.num != params.num)
 			continue;
@@ -508,7 +495,7 @@ Command *SyntaxTree::GetFunctionCall(const string &f_name, Array<Command> &links
 
 
 	// advanced match...
-	for (Command &link : links){
+	for (Command &link: links){
 		Array<Type*> wanted_types = GetFunctionWantedParams(link);
 		if (wanted_types.num != params.num)
 			continue;
@@ -597,7 +584,6 @@ Command *build_list(SyntaxTree *ps, Array<Command*> &el)
 
 Command *SyntaxTree::GetOperand(Block *block)
 {
-	msg_db_f("GetOperand", 4);
 	Command *operand = NULL;
 
 	// ( -> one level down and combine commands
@@ -638,7 +624,7 @@ Command *SyntaxTree::GetOperand(Block *block)
 		operand->type = t->GetPointer();
 		if (Exp.cur == "("){
 			Array<ClassFunction> cfs;
-			for (ClassFunction &cf : t->function)
+			for (ClassFunction &cf: t->function)
 				if (cf.name == IDENTIFIER_FUNC_INIT and cf.param_type.num > 0)
 					cfs.add(cf);
 			if (cfs.num == 0)
@@ -739,7 +725,6 @@ Command *SyntaxTree::GetOperand(Block *block)
 // only "primitive" operator -> no type information
 Command *SyntaxTree::GetPrimitiveOperator(Block *block)
 {
-	msg_db_f("GetOperator",4);
 	int op = WhichPrimitiveOperator(Exp.cur);
 	if (op < 0)
 		return NULL;
@@ -831,7 +816,6 @@ Command *apply_type_cast(SyntaxTree *ps, int tc, Command *param)
 
 Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 {
-	msg_db_f("LinkOp",4);
 	bool left_modifiable = PrimitiveOperators[op_no].left_modifiable;
 	string op_func_name = PrimitiveOperators[op_no].function_name;
 	Command *op = NULL;
@@ -849,7 +833,7 @@ Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 		pp1 = p1->parent;
 
 	// exact match as class function?
-	for (ClassFunction &f : pp1->function)
+	for (ClassFunction &f: pp1->function)
 		if (f.name == op_func_name){
 			// exact match as class function but missing a "&"?
 			if (f.param_type[0]->is_pointer and f.param_type[0]->is_silent){
@@ -928,7 +912,6 @@ Command *SyntaxTree::LinkOperator(int op_no, Command *param1, Command *param2)
 
 void SyntaxTree::LinkMostImportantOperator(Array<Command*> &Operand, Array<Command*> &Operator, Array<int> &op_exp)
 {
-	msg_db_f("LinkMostImpOp",4);
 // find the most important operator (mio)
 	int mio = 0;
 	for (int i=0;i<Operator.num;i++){
@@ -953,7 +936,6 @@ void SyntaxTree::LinkMostImportantOperator(Array<Command*> &Operand, Array<Comma
 
 Command *SyntaxTree::GetCommand(Block *block)
 {
-	msg_db_f("GetCommand", 4);
 	Array<Command*> Operand;
 	Array<Command*> Operator;
 	Array<int> op_exp;
@@ -986,8 +968,6 @@ Command *SyntaxTree::GetCommand(Block *block)
 
 void SyntaxTree::ParseSpecialCommandFor(Block *block)
 {
-	msg_db_f("ParseSpecialCommandFor", 4);
-
 	// variable name
 	Exp.next();
 	string var_name = Exp.cur;
@@ -1074,8 +1054,6 @@ void SyntaxTree::ParseSpecialCommandFor(Block *block)
 
 void SyntaxTree::ParseSpecialCommandForall(Block *block)
 {
-	msg_db_f("ParseSpecialCommandForall", 4);
-
 	// variable
 	Exp.next();
 	string var_name = Exp.cur;
@@ -1179,7 +1157,6 @@ void SyntaxTree::ParseSpecialCommandForall(Block *block)
 
 void SyntaxTree::ParseSpecialCommandWhile(Block *block)
 {
-	msg_db_f("ParseSpecialCommandWhile", 4);
 	Exp.next();
 	Command *cmd_cmp = CheckParamLink(GetCommand(block), TypeBool, "while", 0);
 	ExpectNewline();
@@ -1195,7 +1172,6 @@ void SyntaxTree::ParseSpecialCommandWhile(Block *block)
 
 void SyntaxTree::ParseSpecialCommandBreak(Block *block)
 {
-	msg_db_f("ParseSpecialCommandBreak", 4);
 	Exp.next();
 	Command *cmd = add_command_compilerfunc(COMMAND_BREAK);
 	block->commands.add(cmd);
@@ -1203,7 +1179,6 @@ void SyntaxTree::ParseSpecialCommandBreak(Block *block)
 
 void SyntaxTree::ParseSpecialCommandContinue(Block *block)
 {
-	msg_db_f("ParseSpecialCommandContinue", 4);
 	Exp.next();
 	Command *cmd = add_command_compilerfunc(COMMAND_CONTINUE);
 	block->commands.add(cmd);
@@ -1211,7 +1186,6 @@ void SyntaxTree::ParseSpecialCommandContinue(Block *block)
 
 void SyntaxTree::ParseSpecialCommandReturn(Block *block)
 {
-	msg_db_f("ParseSpecialCommandReturn", 4);
 	Exp.next();
 	Command *cmd = add_command_compilerfunc(COMMAND_RETURN);
 	block->commands.add(cmd);
@@ -1227,7 +1201,6 @@ void SyntaxTree::ParseSpecialCommandReturn(Block *block)
 
 void SyntaxTree::ParseSpecialCommandIf(Block *block)
 {
-	msg_db_f("ParseSpecialCommandIf", 4);
 	int ind = Exp.cur_line->indent;
 	Exp.next();
 	Command *cmd_cmp = CheckParamLink(GetCommand(block), TypeBool, IDENTIFIER_IF, 0);
@@ -1273,7 +1246,7 @@ void SyntaxTree::ParseSpecialCommandIf(Block *block)
 void SyntaxTree::ParseSpecialCommand(Block *block)
 {
 	bool has_colon = false;
-	for (auto &e : Exp.cur_line->exp)
+	for (auto &e: Exp.cur_line->exp)
 		if (e.name == ":")
 			has_colon = true;
 
@@ -1302,7 +1275,6 @@ void SyntaxTree::ParseSpecialCommand(Block *block)
 // we already are in the line to analyse ...indentation for a new block should compare to the last line
 void SyntaxTree::ParseCompleteCommand(Block *block)
 {
-	msg_db_f("GetCompleteCommand", 4);
 	// cur_exp = 0!
 
 	bool is_type = FindType(Exp.cur);
@@ -1312,7 +1284,7 @@ void SyntaxTree::ParseCompleteCommand(Block *block)
 	if (Exp.indented){
 		Exp.indented = false;
 		Exp.set(0); // bad hack...
-		msg_db_f("Block", 4);
+
 		Block *new_block = AddBlock(block->function, block);
 
 		Command *c = add_command_block(new_block);
@@ -1384,7 +1356,6 @@ extern Array<Script*> loading_script_stack;
 
 void SyntaxTree::ParseImport()
 {
-	msg_db_f("ParseImport", 4);
 	Exp.next(); // 'use' / 'import'
 
 	string name = Exp.cur;
@@ -1395,7 +1366,7 @@ void SyntaxTree::ParseImport()
 
 
 
-		for (Script *ss : loading_script_stack)
+		for (Script *ss: loading_script_stack)
 			if (ss->filename == filename.sys_filename())
 				DoError("recursive include");
 
@@ -1412,7 +1383,7 @@ void SyntaxTree::ParseImport()
 		msg_left();
 		AddIncludeData(include);
 	}else{
-		for (Package &p : Packages)
+		for (Package &p: Packages)
 			if (p.name == name){
 				AddIncludeData(p.script);
 				return;
@@ -1424,7 +1395,6 @@ void SyntaxTree::ParseImport()
 
 void SyntaxTree::ParseEnum()
 {
-	msg_db_f("ParseEnum", 4);
 	Exp.next(); // 'enum'
 	ExpectNewline();
 	int value = 0;
@@ -1503,8 +1473,6 @@ int class_count_virtual_functions(SyntaxTree *ps)
 
 void SyntaxTree::ParseClass()
 {
-	msg_db_f("ParseClass", 4);
-
 	int indent0 = Exp.cur_line->indent;
 	int _offset = 0;
 	Exp.next(); // 'class'
@@ -1665,7 +1633,6 @@ void SyntaxTree::ExpectIndent()
 
 void SyntaxTree::ParseGlobalConst(const string &name, Type *type)
 {
-	msg_db_f("ParseGlobalConst", 6);
 	if (Exp.cur != "=")
 		DoError("\"=\" expected after const name");
 	Exp.next();
@@ -1683,7 +1650,6 @@ void SyntaxTree::ParseGlobalConst(const string &name, Type *type)
 
 void SyntaxTree::ParseVariableDef(bool single, Block *block)
 {
-	msg_db_f("ParseVariableDef", 4);
 	Type *type = ParseType(); // force
 
 	for (int j=0;true;j++){
@@ -1824,8 +1790,6 @@ Type *SyntaxTree::ParseType()
 
 Function *SyntaxTree::ParseFunctionHeader(Type *class_type, bool as_extern)
 {
-	msg_db_f("ParseFunctionHeader", 4);
-
 // return type
 	Type *return_type = ParseType(); // force...
 
@@ -1913,8 +1877,6 @@ void SyntaxTree::ParseFunctionBody(Function *f)
 
 void SyntaxTree::ParseAllClassNames()
 {
-	msg_db_f("ParseAllClassNames", 4);
-
 	Exp.reset_parser();
 	while (!Exp.end_of_file()){
 		if ((Exp.cur_line->indent == 0) and (Exp.cur_line->exp.num >= 2)){
@@ -1943,8 +1905,6 @@ void SyntaxTree::ParseAllFunctionBodies()
 // convert text into script data
 void SyntaxTree::Parser()
 {
-	msg_db_f("Parser", 4);
-
 	root_of_all_evil.name = "RootOfAllEvil";
 	cur_func = NULL;
 

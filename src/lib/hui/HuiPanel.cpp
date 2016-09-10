@@ -163,7 +163,7 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 		return false;
 	if (!win->allow_input)
 		return false;
-	msg_db_f("SendEvent", 1);
+
 	//msg_write(e->id);
 	//msg_write(e->message);
 	HuiCurWindow = win;
@@ -206,7 +206,7 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 		}
 
 		// window closed by callback?
-		for (HuiClosedPanel &cp : HuiClosedPanels)
+		for (HuiClosedPanel &cp: HuiClosedPanels)
 			if (cp.panel == this)
 				return sent;
 	}
@@ -323,13 +323,12 @@ void HuiPanel::_addControl(const string &ns, HuiResource &cmd, const string &par
 	if (tooltip.num > 0)
 		setTooltip(cmd.id, tooltip);
 
-	for (HuiResource &c : cmd.children)
+	for (HuiResource &c: cmd.children)
 		_addControl(ns, c, cmd.id);
 }
 
 void HuiPanel::fromResource(const string &id)
 {
-	msg_db_f("Window.FromResource",1);
 	HuiResource *res = HuiGetResource(id);
 	if (!res)
 		return;
@@ -355,7 +354,7 @@ void HuiPanel::fromResource(const string &id)
 
 	// menu/toolbar?
 	if (win){
-		for (string &o : res->options){
+		for (string &o: res->options){
 			if (o.find("menu=") == 0)
 				win->setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
 			if (o.find("toolbar=") == 0)
@@ -364,7 +363,7 @@ void HuiPanel::fromResource(const string &id)
 	}
 
 	// controls
-	for (HuiResource &cmd : res->children)
+	for (HuiResource &cmd: res->children)
 		_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
@@ -372,7 +371,6 @@ void HuiPanel::fromResource(const string &id)
 
 void HuiPanel::fromSource(const string &buffer)
 {
-	msg_db_f("FromSource",1);
 	HuiResource res;
 	res.load(buffer);
 	if (res.type == "Dialog"){
@@ -441,7 +439,7 @@ void HuiPanel::embed(HuiPanel *panel, const string &parent_id, int x, int y)
 void HuiPanel::set_win(HuiWindow *_win)
 {
 	win = _win;
-	for (HuiPanel *p : children)
+	for (HuiPanel *p: children)
 		p->set_win(win);
 }
 
@@ -452,14 +450,14 @@ void HuiPanel::set_win(HuiWindow *_win)
 
 #define test_controls(_id, c)	\
 	string tid = (_id.num == 0) ? cur_id : _id; \
-	for (HuiControl *c : control) \
+	for (HuiControl *c: control) \
 		if (c->id == tid)
 
 // replace all the text
 //    for all
 void HuiPanel::setString(const string &_id, const string &str)
 {
-	if (win && (id == _id))
+	if (win and (id == _id))
 		win->setTitle(str);
 	test_controls(_id, c)
 		c->setString(str);

@@ -691,7 +691,6 @@ void TsunamiWindow::onZoomOut()
 
 void TsunamiWindow::updateMenu()
 {
-	msg_db_f("UpdateMenu", 1);
 	bool selected = !view->sel.range.empty();
 // menu / toolbar
 	// edit

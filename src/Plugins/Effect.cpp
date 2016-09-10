@@ -55,7 +55,6 @@ void Effect::__delete__()
 
 void Effect::prepare()
 {
-	msg_db_f("Effect.Prepare", 1);
 	resetState();
 }
 
@@ -68,8 +67,6 @@ string Effect::getError()
 
 void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 {
-	msg_db_f("Effect.Apply", 1);
-
 	track = t;
 	song = t->song;
 	level = 0;
@@ -83,8 +80,6 @@ void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 
 void Effect::doProcessTrack(Track *t, int _level, const Range &r)
 {
-	msg_db_f("Effect.DoProcessTrack", 1);
-
 	track = t;
 	song = t->song;
 	level = _level;

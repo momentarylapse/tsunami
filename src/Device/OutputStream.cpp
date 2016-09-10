@@ -300,7 +300,6 @@ void OutputStream::create_dev()
 
 void OutputStream::kill_dev()
 {
-	msg_db_f("Stream.kill_dev", 1);
 #ifdef DEVICE_PULSEAUDIO
 
 	if (_stream){
@@ -324,8 +323,6 @@ void OutputStream::kill_dev()
 // only used for clean up
 void OutputStream::kill()
 {
-	msg_db_f("Stream.kill", 1);
-
 	if (hui_runner_id >= 0){
 		HuiCancelRunner(hui_runner_id);
 		hui_runner_id = -1;
@@ -347,7 +344,6 @@ void OutputStream::stop()
 {
 	if (!playing)
 		return;
-	msg_db_f("Stream.stop", 1);
 
 	playing = false;
 	read_more = false;
@@ -401,7 +397,6 @@ void OutputStream::stream()
 {
 	reading = true;
 	read_more = false;
-	msg_db_f("stream", 1);
 
 	int size = 0;
 	BufferBox b;
@@ -431,8 +426,6 @@ void OutputStream::stream()
 
 void OutputStream::setSource(AudioRenderer *r)
 {
-	msg_db_f("Stream.setSource", 1);
-
 	if (playing)
 		stop();
 
@@ -446,8 +439,6 @@ void OutputStream::setDevice(Device *d)
 
 void OutputStream::play()
 {
-	msg_db_f("Stream.play", 1);
-
 	/*if (dev_sample_rate != renderer->getSampleRate())
 		kill_dev();
 	if (!_stream)
@@ -621,7 +612,6 @@ bool OutputStream::testError(const string &msg)
 
 void OutputStream::update()
 {
-	msg_db_f("Stream.update", 1);
 	testError("idle");
 	if (!playing)
 		return;

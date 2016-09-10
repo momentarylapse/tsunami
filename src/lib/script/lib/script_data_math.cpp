@@ -375,8 +375,6 @@ void __rect_set(rect &r, float x1, float x2, float y1, float y2)
 
 void SIAddPackageMath()
 {
-	msg_db_f("SIAddPackageMath", 3);
-
 	add_package("math", false);
 
 	// types

@@ -75,7 +75,7 @@ void FavoriteManager::Save()
 	if (!f)
 		return;
 	f->WriteInt(favorites.num);
-	for (Favorite &ff : favorites){
+	for (Favorite &ff: favorites){
 		f->WriteStr(type2str(ff.type));
 		f->WriteStr(ff.config_name);
 		f->WriteStr(ff.name);
@@ -89,7 +89,7 @@ Array<string> FavoriteManager::GetList(Configurable *c)
 	if (!loaded)
 		Load();
 	Array<string> r;
-	for (Favorite &f : favorites){
+	for (Favorite &f: favorites){
 		if ((f.type == c->configurable_type) and (f.config_name == c->name))
 			r.add(f.name);
 	}
@@ -101,10 +101,9 @@ void FavoriteManager::Apply(Configurable *c, const string &name)
 	c->resetConfig();
 	if (name == ":def:")
 		return;
-	msg_db_f("ApplyFavorite", 1);
 	if (!loaded)
 		Load();
-	for (Favorite &f : favorites){
+	for (Favorite &f: favorites){
 		if ((f.type == c->configurable_type) and (f.config_name == c->name) and (f.name == name))
 			c->configFromString(f.options);
 	}
@@ -112,7 +111,6 @@ void FavoriteManager::Apply(Configurable *c, const string &name)
 
 void FavoriteManager::Save(Configurable *c, const string &name)
 {
-	msg_db_f("SaveFavorite", 1);
 	if (!loaded)
 		Load();
 	Favorite f;
@@ -127,7 +125,7 @@ void FavoriteManager::Save(Configurable *c, const string &name)
 
 void FavoriteManager::set(const Favorite &ff)
 {
-	for (Favorite &f : favorites){
+	for (Favorite &f: favorites){
 		if ((f.type == ff.type) and (f.config_name == ff.config_name) and (f.name == ff.name)){
 			f.options = ff.options;
 			return;
@@ -158,7 +156,7 @@ public:
 		addDefButton("Ok", 1, 0, 0, 0, "ok");
 		if (!save)
 			addString("list", _("-Default  Parameters-"));
-		for (string &n : names)
+		for (string &n: names)
 			addString("list", n);
 		if (!save)
 			names.insert(":def:", 0);

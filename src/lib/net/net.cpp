@@ -206,7 +206,6 @@ Socket *NetListen(int port, bool block)
 // host
 Socket *Socket::accept()
 {
-	msg_db_f("sock.accept", 1);
 	Socket *con = new Socket(type);
 //	so(1,"accept...");
 	struct sockaddr_in remote_addr;
@@ -357,7 +356,7 @@ string Socket::read()
 {
 	if (s < 0)
 		return "";
-	msg_db_f("sock.read", 2);
+
 	int r;
 	sockaddr_in addr;
 #ifdef OS_WINDOWS
@@ -387,7 +386,7 @@ bool Socket::write(const string &buf)
 {
 	if (s < 0)
 		return false;
-	msg_db_f("sock.write", 2);
+
 	sockaddr_in addr;
 	int sent = 0;
 	char *b = (char*)buf.data;

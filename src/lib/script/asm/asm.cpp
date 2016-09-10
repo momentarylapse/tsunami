@@ -107,9 +107,6 @@ static void so(int i)
 		printf("%d\n",i);
 }
 
-// penalty:  0 -> max output
-#define ASM_DB_LEVEL	10
-
 
 
 MetaInfo::MetaInfo()
@@ -619,7 +616,7 @@ void InstructionWithParamsList::show()
 	msg_write("--------------");
 	state.reset(this);
 	foreachi(Asm::InstructionWithParams &i, *this, n){
-		for (Label &l : label)
+		for (Label &l: label)
 			if (l.inst_no == n)
 				msg_write("    " + l.name + ":");
 		msg_write(i.str());
@@ -665,7 +662,7 @@ int InstructionWithParamsList::get_label(const string &name)
 
 void *InstructionWithParamsList::get_label_value(const string &name)
 {
-	for (Label &l : label)
+	for (Label &l: label)
 		if (l.name == name)
 			return (void*)l.value;
 	return NULL;
@@ -1980,7 +1977,6 @@ string InstructionWithParams::str(bool hide_size)
 
 inline void UnfuzzyParam(InstructionParam &p, InstructionParamFuzzy &pf)
 {
-	msg_db_f("UnfuzzyParam", 2+ASM_DB_LEVEL);
 	p.type = pf._type_;
 	p.reg2 = NULL;
 	p.disp = DISP_MODE_NONE;
@@ -2062,7 +2058,6 @@ int GetModRMRegister(int reg, int size, int group)
 
 inline void GetFromModRM(InstructionParam &p, InstructionParamFuzzy &pf, unsigned char modrm)
 {
-	msg_db_f("GetFromModRM", 2+ASM_DB_LEVEL);
 	if (pf.mrm_mode == MRM_REG){
 		unsigned char reg = modrm & 0x38; // bits 5, 4, 3
 		p.type = PARAMT_REGISTER;
@@ -2181,7 +2176,6 @@ inline void TryGetSIB(InstructionParam &p, char *&cur)
 
 inline void ReadParamData(char *&cur, InstructionParam &p, bool has_modrm)
 {
-	msg_db_f("ReadParamData", 2+ASM_DB_LEVEL);
 	//char *o = cur;
 	p.value = 0;
 	if (p.type == PARAMT_IMMEDIATE){
@@ -2638,7 +2632,7 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 
 		// instruction
 		CPUInstruction *inst = NULL;
-		for (CPUInstruction &ci : CPUInstructions){
+		for (CPUInstruction &ci: CPUInstructions){
 			if (ci.code_size == 0)
 				continue;
 			if (!ci.has_fixed_param){
@@ -2757,8 +2751,6 @@ string DisassembleX86(void *_code_,int length,bool allow_comments)
 // convert some opcode into (human readable) assembler language
 string Disassemble(void *code, int length, bool allow_comments)
 {
-	msg_db_f("Disassemble", 1+ASM_DB_LEVEL);
-
 	if (InstructionSet.set == INSTRUCTION_SET_ARM)
 		return DisassembleARM(code, length, allow_comments);
 	return DisassembleX86(code, length, allow_comments);
@@ -2768,7 +2760,6 @@ string Disassemble(void *code, int length, bool allow_comments)
 //    returns true if end of code
 bool IgnoreUnimportant(int &pos)
 {
-	msg_db_f("IgnoreUnimportant", 4+ASM_DB_LEVEL);
 	bool CommentLine = false;
 	
 	// ignore comments and "white space"
@@ -2807,7 +2798,6 @@ bool IgnoreUnimportant(int &pos)
 // returns one "word" in the source code
 string FindMnemonic(int &pos)
 {
-	msg_db_f("GetMne", 1+ASM_DB_LEVEL);
 	state.EndOfLine = false;
 	char mne[128];
 	strcpy(mne, "");
@@ -2870,7 +2860,6 @@ string FindMnemonic(int &pos)
 // interpret an expression from source code as an assembler parameter
 void GetParam(InstructionParam &p, const string &param, InstructionWithParamsList &list, int pn)
 {
-	msg_db_f("GetParam", 1+ASM_DB_LEVEL);
 	p.type = PARAMT_INVALID;
 	p.reg = NULL;
 	p.deref = false;
@@ -3153,8 +3142,6 @@ void add_data_inst(InstructionWithParamsList *l, int size)
 
 void InstructionWithParamsList::AppendFromSource(const string &_code)
 {
-	msg_db_f("AppendFromSource", 1+ASM_DB_LEVEL);
-
 	const char *code = _code.c_str();
 
 	if (!CurrentMetaInfo)
@@ -3330,7 +3317,6 @@ void InstructionWithParamsList::AppendFromSource(const string &_code)
 // convert human readable asm code into opcode
 bool Assemble(const char *code, char *oc, int &ocs)
 {
-	msg_db_f("Assemble", 1+ASM_DB_LEVEL);
 	/*if (!Instruction)
 		SetInstructionSet(InstructionSetDefault);*/
 
@@ -3509,7 +3495,6 @@ int CreateModRMByte(CPUInstruction &inst, InstructionParam &p1, InstructionParam
 
 void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionParam &p1, InstructionParam &p2, InstructionWithParamsList &list)
 {
-	msg_db_f("OpcodeAddInstruction", 1+ASM_DB_LEVEL);
 	//---msg_write("add inst " + inst.name);
 
 	// 16/32 bit toggle prefix
@@ -3550,8 +3535,6 @@ void OpcodeAddInstruction(char *oc, int &ocs, CPUInstruction &inst, InstructionP
 
 void InstructionWithParamsList::AddInstruction(char *oc, int &ocs, int n)
 {
-	msg_db_f("AsmAddInstructionLow", 1+ASM_DB_LEVEL);
-
 	int ocs0 = ocs;
 	InstructionWithParams &iwp = (*this)[n];
 	current_inst = n;
@@ -3698,8 +3681,6 @@ inline bool label_after_now(InstructionWithParamsList *list, int label_no, int n
 
 void InstructionWithParamsList::AddInstructionARM(char *oc, int &ocs, int n)
 {
-	msg_db_f("AsmAddInstructionLowARM", 1+ASM_DB_LEVEL);
-
 	InstructionWithParams &iwp = (*this)[n];
 	current_inst = n;
 	state.reset(this);
@@ -3947,7 +3928,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 
 	for (int i=0;i<num+1;i++){
 		// bit change
-		for (BitChange &b : CurrentMetaInfo->bit_change)
+		for (BitChange &b: CurrentMetaInfo->bit_change)
 			if (b.cmd_pos == i){
 				state.DefaultSize = SIZE_32;
 				if (b.bits == 16)
@@ -3957,7 +3938,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 			}
 
 		// data?
-		for (AsmData &d : CurrentMetaInfo->data)
+		for (AsmData &d: CurrentMetaInfo->data)
 			if (d.cmd_pos == i)
 				d.offset = ocs;
 
@@ -3979,7 +3960,7 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 
 	LinkWantedLabels(oc);
 
-	for (WantedLabel &l : wanted_label){
+	for (WantedLabel &l: wanted_label){
 		state.LineNo = (*this)[l.inst_no].line;
 		state.ColumnNo = (*this)[l.inst_no].col;
 		SetError("undeclared label used: " + l.name);
@@ -3988,7 +3969,6 @@ void InstructionWithParamsList::Compile(void *oc, int &ocs)
 
 void AddInstruction(char *oc, int &ocs, int inst, const InstructionParam &p1, const InstructionParam &p2, const InstructionParam &p3)
 {
-	msg_db_f("AsmAddInstruction", 1+ASM_DB_LEVEL);
 	/*if (!CPUInstructions)
 		SetInstructionSet(InstructionSetDefault);*/
 	state.DefaultSize = SIZE_32;
@@ -4012,9 +3992,9 @@ void AddInstruction(char *oc, int &ocs, int inst, const InstructionParam &p1, co
 
 bool ImmediateAllowed(int inst)
 {
-	for (int i=0;i<CPUInstructions.num;i++)
-		if (CPUInstructions[i].inst == inst)
-			if ((CPUInstructions[i].param1.allow_immediate) or (CPUInstructions[i].param2.allow_immediate))
+	for (CPUInstruction &i: CPUInstructions)
+		if (i.inst == inst)
+			if ((i.param1.allow_immediate) or (i.param2.allow_immediate))
 				return true;
 	return false;
 }

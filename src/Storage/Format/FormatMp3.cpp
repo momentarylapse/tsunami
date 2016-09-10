@@ -50,7 +50,6 @@ static string tag_from_mp3(const string &key)
 
 void FormatMp3::loadTrack(StorageOperationData *od)
 {
-	msg_db_f("load_mp3_file", 1);
 	Track *t = od->track;
 
 	unsigned char *data = new unsigned char[4096];

@@ -63,8 +63,6 @@ Format::Format()
 
 void Format::importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level)
 {
-	msg_db_f("ImportData", 1);
-
 	BufferBox buf = t->getBuffers(level, Range(offset, samples));
 
 	Action *a;

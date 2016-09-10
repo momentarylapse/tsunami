@@ -39,8 +39,6 @@ Type *TypeHuiWindowP;
 
 void SIAddPackageHui()
 {
-	msg_db_f("SIAddPackageHui", 3);
-
 	add_package("hui", false);
 	
 	Type*

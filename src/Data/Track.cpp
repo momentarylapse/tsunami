@@ -73,13 +73,14 @@ Track::Track() :
 // destructor...
 void Track::reset()
 {
-	msg_db_f("Track.Reset",1);
 	levels.clear();
 	name.clear();
 	instrument = Instrument(Instrument::TYPE_NONE);
 	volume = 1;
 	muted = false;
 	panning = 0;
+
+	midi.deep_clear();
 
 	for (Effect *f: fx)
 		delete(f);
@@ -105,12 +106,12 @@ Range Track::getRangeUnsafe()
 {
 	int _min =  1073741824;
 	int _max = -1073741824;
-	for (TrackLevel &l : levels)
+	for (TrackLevel &l: levels)
 		if (l.buffers.num > 0){
 			_min = min(l.buffers[0].offset, _min);
 			_max = max(l.buffers.back().range().end(), _max);
 		}
-	for (SampleRef *s : samples){
+	for (SampleRef *s: samples){
 		if (s->pos < _min)
 			_min = s->pos;
 		int smax = s->pos + s->buf->length + s->rep_num * s->rep_delay;
@@ -156,10 +157,9 @@ int Track::get_index()
 BufferBox Track::readBuffers(int level_no, const Range &r)
 {
 	BufferBox buf;
-	msg_db_f("Track.ReadBuffers", 1);
 
 	// is <r> inside a buffer?
-	for (BufferBox &b : levels[level_no].buffers){
+	for (BufferBox &b: levels[level_no].buffers){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.length;
 		if ((p0 >= 0) and (p1 <= b.length)){
@@ -173,7 +173,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlap
-	for (BufferBox &b : levels[level_no].buffers)
+	for (BufferBox &b: levels[level_no].buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
 	return buf;
@@ -182,7 +182,6 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 BufferBox Track::readBuffersCol(const Range &r)
 {
 	BufferBox buf;
-	msg_db_f("Track.ReadBuffersCol", 1);
 
 	// is <r> inside a single buffer?
 	int num_inside = 0;
@@ -210,8 +209,8 @@ BufferBox Track::readBuffersCol(const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlap
-	for (TrackLevel &l : levels)
-		for (BufferBox &b : l.buffers)
+	for (TrackLevel &l: levels)
+		for (BufferBox &b: l.buffers)
 			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
 
 	return buf;
@@ -225,15 +224,15 @@ BufferBox Track::getBuffers(int level_no, const Range &r)
 
 void Track::updatePeaks()
 {
-	for (TrackLevel &l : levels)
-		for (BufferBox &b : l.buffers)
+	for (TrackLevel &l: levels)
+		for (BufferBox &b: l.buffers)
 			b.update_peaks();
 }
 
 void Track::invalidateAllPeaks()
 {
-	for (TrackLevel &l : levels)
-		for (BufferBox &b : l.buffers)
+	for (TrackLevel &l: levels)
+		for (BufferBox &b: l.buffers)
 			b.invalidate_peaks(b.range());
 }
 

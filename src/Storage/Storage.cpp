@@ -56,8 +56,6 @@ Storage::~Storage()
 
 bool Storage::load(Song *a, const string &filename)
 {
-	msg_db_f("Storage.Load", 1);
-
 	current_directory = filename.dirname();
 	FormatDescriptor *d = getFormat(filename.extension(), 0);
 	if (!d)
@@ -87,8 +85,6 @@ bool Storage::load(Song *a, const string &filename)
 
 bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 {
-	msg_db_f("Storage.LoadTrack", 1);
-
 	current_directory = filename.dirname();
 	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
 	if (!d)
@@ -111,7 +107,6 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 
 bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 {
-	msg_db_f("Storage.LoadBufferBox", 1);
 	Song *aa = new Song;
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->tracks[0];
@@ -127,8 +122,6 @@ bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 #if 0
 bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
 {
-	msg_db_f("Storage.saveBuf", 1);
-
 	current_directory = filename.dirname();
 	Format *f = getFormat(filename.extension(), Format::FLAG_AUDIO);
 	if (!f)
@@ -143,8 +136,6 @@ bool Storage::saveBufferBox(Song *a, BufferBox *buf, const string &filename)
 
 bool Storage::save(Song *a, const string &filename)
 {
-	msg_db_f("Storage.Save", 1);
-
 	current_directory = filename.dirname();
 
 	FormatDescriptor *d = getFormat(filename.extension(), 0);
@@ -171,7 +162,6 @@ bool Storage::save(Song *a, const string &filename)
 
 bool Storage::saveViaRenderer(AudioRenderer *r, const string &filename)
 {
-	msg_db_f("Storage.saveViaRenderer", 1);
 	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
 	if (!d)
 		return false;

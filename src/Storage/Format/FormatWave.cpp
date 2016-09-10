@@ -102,7 +102,6 @@ static string tag_from_wave(const string &key)
 
 void FormatWave::loadTrack(StorageOperationData *od)
 {
-	msg_db_f("load_wave_file", 1);
 	Track *t = od->track;
 
 	char *data = new char[WAVE_BUFFER_SIZE];

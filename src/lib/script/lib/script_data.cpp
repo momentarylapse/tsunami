@@ -160,7 +160,6 @@ void add_package(const string &name, bool used_by_default)
 
 Type *add_type(const string &name, int size, ScriptFlag flag)
 {
-	msg_db_f("add_type", 4);
 	Type *t = new Type;
 	t->owner = cur_package_script->syntax;
 	t->name = name;
@@ -172,7 +171,6 @@ Type *add_type(const string &name, int size, ScriptFlag flag)
 }
 Type *add_type_p(const string &name, Type *sub_type, ScriptFlag flag)
 {
-	msg_db_f("add_type_p", 4);
 	Type *t = new Type;
 	t->owner = cur_package_script->syntax;
 	t->name = name;
@@ -186,7 +184,6 @@ Type *add_type_p(const string &name, Type *sub_type, ScriptFlag flag)
 }
 Type *add_type_a(const string &name, Type *sub_type, int array_length)
 {
-	msg_db_f("add_type_a", 4);
 	Type *t = new Type;
 	t->owner = cur_package_script->syntax;
 	t->name = name;
@@ -248,7 +245,6 @@ PrimitiveOperator PrimitiveOperators[NUM_PRIMITIVE_OPERATORS]={
 Array<PreOperator> PreOperators;
 int add_operator(int primitive_op, Type *return_type, Type *param_type1, Type *param_type2, void *func = NULL)
 {
-	msg_db_f("add_op", 4);
 	PreOperator o;
 	o.primitive_id = primitive_op;
 	o.return_type = return_type;
@@ -278,13 +274,11 @@ static ClassFunction *cur_class_func = NULL;
 
 void add_class(Type *root_type)//, PreScript *ps = NULL)
 {
-	msg_db_f("add_class", 4);
 	cur_class = root_type;
 }
 
 void class_add_element(const string &name, Type *type, int offset, ScriptFlag flag)
 {
-	msg_db_f("add_class_el", 4);
 	ClassElement e;
 	e.name = name;
 	e.type = type;
@@ -323,10 +317,9 @@ void _class_add_func_virtual(const string &tname, const string &name, Type *retu
 
 void class_add_func(const string &name, Type *return_type, void *func, ScriptFlag flag)
 {
-	msg_db_f("add_class_func", 4);
 	string tname = cur_class->name;
 	if (tname[0] == '-'){
-		for (Type *t : cur_package_script->syntax->types)
+		for (Type *t: cur_package_script->syntax->types)
 			if ((t->is_pointer) and (t->parent == cur_class))
 				tname = t->name;
 	}
@@ -337,7 +330,6 @@ void class_add_func(const string &name, Type *return_type, void *func, ScriptFla
 
 int get_virtual_index(void *func, const string &tname, const string &name)
 {
-
 	if (config.abi == ABI_WINDOWS_32){
 		if (!func)
 			return 0;
@@ -383,10 +375,9 @@ int get_virtual_index(void *func, const string &tname, const string &name)
 
 void class_add_func_virtual(const string &name, Type *return_type, void *func, ScriptFlag flag)
 {
-	msg_db_f("add_class_func_virtual", 4);
 	string tname = cur_class->name;
 	if (tname[0] == '-'){
-		for (Type *t : cur_package_script->syntax->types)
+		for (Type *t: cur_package_script->syntax->types)
 			if ((t->is_pointer) and (t->parent == cur_class))
 				tname = t->name;
 	}
@@ -406,7 +397,6 @@ void class_link_vtable(void *p)
 
 void add_const(const string &name, Type *type, void *value)
 {
-	msg_db_f("add_const", 4);
 	Constant c;
 	c.name = name;
 	c.type = type;
@@ -517,8 +507,6 @@ void func_add_param(const string &name, Type *type)
 
 void script_make_super_array(Type *t, SyntaxTree *ps)
 {
-	msg_db_f("make_super_array", 4);
-
 	Type *parent = t->parent;
 	t->DeriveFrom(TypeDynamicArray, false);
 	t->parent = parent;
@@ -757,8 +745,6 @@ public:
 
 void SIAddPackageBase()
 {
-	msg_db_f("SIAddPackageBase", 3);
-
 	add_package("base", true);
 
 	// internal
@@ -958,8 +944,6 @@ void SIAddPackageBase()
 
 void SIAddBasicCommands()
 {
-	msg_db_f("SIAddBasicCommands", 3);
-
 /*
 	CommandReturn,
 	CommandIf,
@@ -1064,9 +1048,6 @@ void op_float64_div(string &r, string &a, string &b)
 
 void SIAddOperators()
 {
-	msg_db_f("SIAddOperators", 3);
-	
-
 	// same order as in .h file...
 	add_operator(OPERATOR_ASSIGN,		TypeVoid,		TypePointer,	TypePointer);
 	add_operator(OPERATOR_EQUAL,			TypeBool,		TypePointer,	TypePointer);
@@ -1204,8 +1185,6 @@ void SIAddOperators()
 
 void SIAddCommands()
 {
-	msg_db_f("SIAddCommands", 3);
-	
 	// type casting
 	add_func("@s2i",				TypeInt,		(void*)&s2i);
 		func_add_param("s",		TypeString);
@@ -1265,8 +1244,6 @@ void SIAddPackageX();
 
 void Init(int instruction_set, int abi, bool allow_std_lib)
 {
-	msg_db_f("ScriptInit", 1);
-
 	Asm::Init(instruction_set);
 	config.instruction_set = Asm::InstructionSet.set;
 	if (abi < 0){
@@ -1390,7 +1367,7 @@ void LinkExternal(const string &name, void *pointer)
 	if (name.head(5) == "lib__"){
 		Array<string> names = name.explode(":");
 		string sname = names[0].substr(5, -1).replace("@list", "[]").replace("@@", ".");
-		for (Package &p : Packages)
+		for (Package &p: Packages)
 			foreachi(Function *f, p.script->syntax->functions, i)
 				if (f->name == sname){
 					if (names.num > 0)
@@ -1403,7 +1380,7 @@ void LinkExternal(const string &name, void *pointer)
 
 void *GetExternalLink(const string &name)
 {
-	for (ExternalLinkData &l : ExternalLinks)
+	for (ExternalLinkData &l: ExternalLinks)
 		if (l.name == name)
 			return l.pointer;
 	return NULL;
@@ -1466,7 +1443,6 @@ int ProcessClassNumVirtuals(const string &class_name, int num_virtual)
 
 void End()
 {
-	msg_db_f("ScriptEnd", 1);
 	DeleteAllScripts(true, true);
 
 	PreOperators.clear();

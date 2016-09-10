@@ -24,8 +24,6 @@ namespace Script{
 
 void SIAddPackageThread()
 {
-	msg_db_f("SIAddThread", 3);
-
 	add_package("thread", false);
 
 	Type *TypeThread       = add_type  ("Thread",       sizeof(Thread));

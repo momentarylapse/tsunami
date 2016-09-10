@@ -40,7 +40,7 @@ int SerializerAMD64::fc_begin()
 	Array<SerialCommandParam> reg_param;
 	Array<SerialCommandParam> stack_param;
 	Array<SerialCommandParam> xmm_param;
-	for (SerialCommandParam &p : CompilerFunctionParam){
+	for (SerialCommandParam &p: CompilerFunctionParam){
 		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 6){
 				reg_param.add(p);
@@ -98,7 +98,7 @@ int SerializerAMD64::fc_begin()
 	}
 
 	// extend reg channels to call
-	for (int v : virts)
+	for (int v: virts)
 		use_virtual_reg(v, cmd.num, cmd.num);
 
 	return push_size;
@@ -132,8 +132,6 @@ void SerializerAMD64::fc_end(int push_size)
 
 void SerializerAMD64::add_function_call(Script *script, int func_no)
 {
-	msg_db_f("AddFunctionCallAMD64", 4);
-
 	int push_size = fc_begin();
 
 	if ((script == this->script) and (!script->syntax->functions[func_no]->is_extern)){
@@ -152,7 +150,6 @@ void SerializerAMD64::add_function_call(Script *script, int func_no)
 void SerializerAMD64::add_virtual_function_call(int virtual_index)
 {
 	//DoError("virtual function call on amd64 not yet implemented!");
-	msg_db_f("AddFunctionCallAmd64", 4);
 
 	int push_size = fc_begin();
 
@@ -171,14 +168,14 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	// return, instance, params
 	Array<Variable> param;
 	if (f->return_type->UsesReturnByMemory()){
-		for (Variable &v : f->var)
+		for (Variable &v: f->var)
 			if (v.name == IDENTIFIER_RETURN_VAR){
 				param.add(v);
 				break;
 			}
 	}
 	if (f->_class){
-		for (Variable &v : f->var)
+		for (Variable &v: f->var)
 			if (v.name == IDENTIFIER_SELF){
 				param.add(v);
 				break;
@@ -191,7 +188,7 @@ void SerializerAMD64::AddFunctionIntro(Function *f)
 	Array<Variable> reg_param;
 	Array<Variable> stack_param;
 	Array<Variable> xmm_param;
-	for (Variable &p : param){
+	for (Variable &p: param){
 		if ((p.type == TypeInt) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 6){
 				reg_param.add(p);

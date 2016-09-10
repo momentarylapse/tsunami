@@ -34,12 +34,12 @@ public:
 		if (end_of_stream)
 			return 0;
 		if (started){
-			for (int p : pitch)
+			for (int p: pitch)
 				midi.add(MidiEvent(0, p, 1));
 			started = false;
 		}
 		if (ended){
-			for (int p : pitch)
+			for (int p: pitch)
 				midi.add(MidiEvent(0, p, 0));
 			ended = false;
 			end_of_stream = true;
@@ -126,7 +126,7 @@ void ViewModeMidi::onLeftButtonUp()
 	if (selection->type == Selection::TYPE_MIDI_PITCH){
 		view->song->action_manager->beginActionGroup();
 		Array<MidiNote> notes = getCreationNotes();
-		for (MidiNote &n : notes)
+		for (MidiNote &n: notes)
 			view->cur_track->addMidiNote(n);
 		view->song->action_manager->endActionGroup();
 
@@ -177,7 +177,7 @@ void ViewModeMidi::onKeyDown(int k)
 
 void ViewModeMidi::updateTrackHeights()
 {
-	for (AudioViewTrack *t : view->vtrack){
+	for (AudioViewTrack *t: view->vtrack){
 		t->height_min = view->TIME_SCALE_HEIGHT;
 		if (t->track->type == Track::TYPE_AUDIO){
 			t->height_wish = view->MAX_TRACK_CHANNEL_HEIGHT;
@@ -205,8 +205,8 @@ void ViewModeMidi::onCurTrackChange()
 Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 {
 	Range allowed = Range::ALL;
-	for (MidiNote *n : t->midi){
-		for (int p : pitch)
+	for (MidiNote *n: t->midi){
+		for (int p: pitch)
 			if (n->pitch == p){
 				if (n->range.is_inside(start))
 					return Range::EMPTY;
@@ -214,8 +214,8 @@ Range get_allowed_midi_range(Track *t, Array<int> pitch, int start)
 	}
 
 	MidiRawData midi = midi_notes_to_events(t->midi);
-	for (MidiEvent &e : midi)
-		for (int p : pitch)
+	for (MidiEvent &e: midi)
+		for (int p: pitch)
 			if (e.pitch == p){
 				if ((e.pos >= start) and (e.pos < allowed.end()))
 					allowed.set_end(e.pos);
@@ -259,7 +259,7 @@ Array<MidiNote> ViewModeMidi::getCreationNotes()
 	Array<MidiNote> notes;
 	if (allowed.empty())
 		return notes;
-	for (int p : pitch)
+	for (int p: pitch)
 		notes.add(MidiNote(r and allowed, p, 1));
 	notes[0].clef_position = selection->clef_position;
 	notes[0].modifier = selection->modifier;
@@ -331,7 +331,7 @@ void ViewModeMidi::drawGridBars(Painter *c, const rect &r, const color &bg, bool
 	dash.add(4);
 	//Array<Beat> beats = t->bar.GetBeats(Range(s0, s1 - s0));
 	Array<Bar> bars = song->bars.getBars(Range(s0, s1 - s0));
-	for (Bar &b : bars){
+	for (Bar &b: bars){
 		int xx = cam->sample2screen(b.range.offset);
 
 		float dx_bar = cam->dsample2screen(b.range.length);
@@ -480,7 +480,7 @@ Selection ViewModeMidi::getHover()
 		}
 
 		// TODO: prefer selected subs
-		for (SampleRef *ss : s.track->samples){
+		for (SampleRef *ss: s.track->samples){
 			int offset = view->mouseOverSample(ss);
 			if (offset >= 0){
 				s.sample = ss;
@@ -622,7 +622,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 	// midi
 	if ((view->cur_track == t->track) and (t->track->type == Track::TYPE_MIDI)){
 
-		for (int n : t->reference_tracks)
+		for (int n: t->reference_tracks)
 			if ((n >= 0) and (n < song->tracks.num) and (n != t->track->get_index()))
 				drawMidiEditable(c, t, song->tracks[n]->midi, true, t->track, t->area);
 
@@ -633,7 +633,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 		// current creation
 		if ((HuiGetEvent()->lbut) and (selection->type == Selection::TYPE_MIDI_PITCH)){
 			Array<MidiNote> notes = getCreationNotes();
-			for (MidiNote &n : notes){
+			for (MidiNote &n: notes){
 				if (mode == view->MIDI_MODE_SCORE)
 					t->drawMidiNoteScore(c, &n, 0, AudioViewTrack::STATE_HOVER, t->track->instrument.get_clef());
 				else
@@ -706,7 +706,7 @@ void ViewModeMidi::drawTrackData(Painter *c, AudioViewTrack *t)
 	t->drawTrackBuffers(c, view->cam.pos);
 
 	// samples
-	for (SampleRef *s : t->track->samples)
+	for (SampleRef *s: t->track->samples)
 		t->drawSample(c, s);
 
 	// marker

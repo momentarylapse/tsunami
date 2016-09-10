@@ -93,8 +93,6 @@ inline void draw_peak_buffer(Painter *c, int width, int di, double view_pos_rel,
 
 void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col)
 {
-	msg_db_f("DrawBuffer", 1);
-
 	float w = area.width();
 	float h = area.height();
 	float hf = h / 4;
@@ -157,18 +155,16 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 
 void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 {
-	msg_db_f("DrawTrackBuffers", 1);
-
 	// non-current levels
 	foreachi(TrackLevel &lev, track->levels, level_no){
 		if (level_no == view->cur_level)
 			continue;
-		for (BufferBox &b : lev.buffers)
+		for (BufferBox &b: lev.buffers)
 			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current
-	for (BufferBox &b : track->levels[view->cur_level].buffers)
+	for (BufferBox &b: track->levels[view->cur_level].buffers)
 		drawBuffer(c, b, view_pos_rel, view->colors.text);
 }
 
@@ -281,7 +277,7 @@ void AudioViewTrack::drawMidiDefault(Painter *c, const MidiData &midi, bool as_r
 	Range range = view->cam.range() - shift;
 	MidiDataRef notes = midi.getNotes(range);
 	c->setLineWidth(3.0f);
-	for (MidiNote *n : notes){
+	for (MidiNote *n: notes){
 		float x1 = view->cam.sample2screen(n->range.offset + shift);
 		float x2 = view->cam.sample2screen(n->range.end() + shift);
 		x2 = max(x2, x1 + 4);
@@ -346,7 +342,7 @@ void AudioViewTrack::drawMidiTab(Painter *c, const MidiData &midi, bool as_refer
 	float font_size = r * 1.4f;
 	c->setFontSize(font_size);
 
-	for (MidiNote *n : notes){
+	for (MidiNote *n: notes){
 
 		float x1 = view->cam.sample2screen(n->range.offset + shift);
 		float x2 = view->cam.sample2screen(n->range.end() + shift);
@@ -466,7 +462,7 @@ void AudioViewTrack::drawMidiScore(Painter *c, const MidiData &midi, bool as_ref
 
 	c->setAntialiasing(true);
 
-	for (MidiNote *n : notes)
+	for (MidiNote *n: notes)
 		drawMidiNoteScore(c, n, shift, as_reference ? STATE_REFERENCE : STATE_DEFAULT, clef);
 
 	c->setFontSize(view->FONT_SIZE);

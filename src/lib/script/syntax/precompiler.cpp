@@ -8,24 +8,21 @@ namespace Script{
 
 //#define ScriptDebug
 
-extern long long s2i2(const string &str);
-
 
 void SetImmortal(SyntaxTree *ps)
 {
 	ps->flag_immortal = true;
-	for (int i=0;i<ps->includes.num;i++)
-		SetImmortal(ps->includes[i]->syntax);
+	for (Script *i: ps->includes)
+		SetImmortal(i->syntax);
 }
 
 // import data from an included script file
 void SyntaxTree::AddIncludeData(Script *s)
 {
-	for (Script *i : includes)
+	for (Script *i: includes)
 		if (i == s)
 			return;
 
-	msg_db_f("AddIncludeData",5);
 	SyntaxTree *ps = s->syntax;
 	if (flag_immortal)
 		SetImmortal(ps);
@@ -76,7 +73,6 @@ string MacroName[NumMacroNames] =
 
 void SyntaxTree::HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse)
 {
-	msg_db_f("HandleMacro", 4);
 	string filename;
 	Define d;
 
@@ -137,8 +133,6 @@ void SyntaxTree::HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool j
 // ... maybe some time later
 void SyntaxTree::PreCompiler(bool just_analyse)
 {
-	msg_db_f("PreCompiler", 4);
-
 	int NumIfDefs = 0;
 	bool IfDefed[1024];
 	

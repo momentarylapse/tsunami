@@ -88,7 +88,6 @@ FormatDescriptorFlac::FormatDescriptorFlac() :
 
 void FormatFlac::loadTrack(StorageOperationData *od)
 {
-	msg_db_f("load_flac_file", 1);
 	Track *t = od->track;
 	t->song->action_manager->beginActionGroup();
 

@@ -268,7 +268,6 @@ string SerialCommand::str() const
 
 void Serializer::cmd_list_out(const string &message)
 {
-	msg_db_f("cmd_list_out", 4);
 	msg_write("-------------------------------- " + message);
 	for (int i=0;i<cmd.num;i++)
 		msg_write(format("%3d: ", i) + cmd[i].str());
@@ -536,7 +535,6 @@ void Serializer::AddClassFunctionCall(ClassFunction *cf)
 // creates res...
 SerialCommandParam Serializer::AddReference(SerialCommandParam &param, Type *type)
 {
-	msg_db_f("AddReference", 3);
 	SerialCommandParam ret;
 	if (!type)
 		type = param.type->GetPointer();
@@ -581,7 +579,6 @@ SerialCommandParam Serializer::AddReference(SerialCommandParam &param, Type *typ
 
 SerialCommandParam Serializer::AddDereference(SerialCommandParam &param, Type *force_type)
 {
-	msg_db_f("AddDereference", 4);
 	SerialCommandParam ret;
 	/*add_temp(TypePointer, ret);
 	SerialCommandParam temp;
@@ -632,8 +629,6 @@ int Serializer::add_global_ref(void *p)
 
 SerialCommandParam Serializer::SerializeCommand(Command *com, Block *block, int index)
 {
-	msg_db_f("SerializeCommand", 4);
-
 	// for/while need a marker to this point
 	int marker_before_params = -1;
 	if ((com->kind == KIND_COMPILER_FUNCTION) and ((com->link_no == COMMAND_WHILE) or (com->link_no == COMMAND_FOR)))
@@ -728,7 +723,6 @@ SerialCommandParam Serializer::SerializeCommand(Command *com, Block *block, int 
 
 void Serializer::SerializeBlock(Block *block)
 {
-	msg_db_f("SerializeBlock", 4);
 	FillInConstructorsBlock(block);
 
 	InsertAddedStuffIfNeeded(block, -1);
@@ -1035,7 +1029,6 @@ void ResolveDerefLocal()
 
 void Serializer::ResolveDerefTempAndLocal()
 {
-	msg_db_f("ResolveDerefTempAndLocal", 3);
 	for (int i=cmd.num-1;i>=0;i--){
 		if (cmd[i].inst >= INST_MARKER)
 			continue;
@@ -1159,8 +1152,6 @@ bool Serializer::ParamUntouchedInInterval(SerialCommandParam &p, int first, int 
 
 void Serializer::SimplifyFPUStack()
 {
-	msg_db_f("SimplifyFPUStack", 3);
-
 // fstp temp
 // fld temp
 	for (int vi=temp_var.num-1;vi>=0;vi--){
@@ -1241,7 +1232,6 @@ void Serializer::SimplifyMovs()
 	// TODO: count > 2 .... first == input and all_other == output?  (only if first == mov (!=eax?)... else count == 2)
 	// should take care of fpu simplification (b)...
 
-	msg_db_f("SimplifyMovs", 3);
 	for (int vi=temp_var.num-1;vi>=0;vi--){
 		TempVar &v = temp_var[vi];
 		if (v.first < 0)
@@ -1320,7 +1310,6 @@ void Serializer::RemoveUnusedTempVars()
 
 void Serializer::MapTempVarToReg(int vi, int reg)
 {
-	msg_db_f("reg", 4);
 	TempVar &v = temp_var[vi];
 //	msg_write(format("temp=reg:  %d - %d:   tv %d := reg %d", v.first, v.last, vi, reg));
 	
@@ -1477,7 +1466,6 @@ void Serializer::add_stack_var(TempVar &v, SerialCommandParam &p)
 
 void Serializer::MapTempVarToStack(int vi)
 {
-	msg_db_f("stack", 4);
 	TempVar &v = temp_var[vi];
 //	msg_write(format("temp=stack: %d   (%d - %d)", vi, v.first, v.last));
 
@@ -1596,7 +1584,6 @@ bool Serializer::is_reg_root_used_in_interval(int reg_root, int first, int last)
 
 void Serializer::MapTempVar(int vi)
 {
-	msg_db_f("MapTempVar", 4);
 	TempVar &v = temp_var[vi];
 	int first = v.first;
 	int last = v.last;
@@ -1636,8 +1623,6 @@ void Serializer::MapTempVar(int vi)
 
 void Serializer::MapTempVars()
 {
-	msg_db_f("MapTempVars", 3);
-
 	for (int i=0;i<temp_var.num;i++)
 		MapTempVar(i);
 	
@@ -1658,7 +1643,6 @@ inline void try_map_param_to_stack(SerialCommandParam &p, int v, SerialCommandPa
 // break large (unreferenced) temp vars into small (register sized) temp vars
 void Serializer::DisentangleShiftedTempVars()
 {
-	msg_db_f("DisentangleShiftedTempVars", 3);
 	for (int i=0;i<cmd.num;i++){
 		if ((cmd[i].p[0].kind == KIND_VAR_TEMP) and (cmd[i].p[0].shift > 0)){
 			temp_var[(long)cmd[i].p[0].p].entangled = max(temp_var[(long)cmd[i].p[0].p].entangled, cmd[i].p[0].shift);
@@ -1667,6 +1651,7 @@ void Serializer::DisentangleShiftedTempVars()
 			temp_var[(long)cmd[i].p[1].p].entangled = max(temp_var[(long)cmd[i].p[1].p].entangled, cmd[i].p[1].shift);
 		}
 	}
+
 	for (int i=temp_var.num-1;i>=0;i--)
 		if (temp_var[i].entangled > 0){
 			if (temp_var[i].referenced)
@@ -1717,7 +1702,6 @@ void Serializer::_resolve_deref_reg_shift_(SerialCommandParam &p, int i)
 // TODO....
 void Serializer::ResolveDerefRegShift()
 {
-	msg_db_f("ResolveDerefRegShift", 3);
 	for (int i=cmd.num-1;i>=0;i--){
 		if ((cmd[i].p[0].kind == KIND_DEREF_REGISTER) and (cmd[i].p[0].shift > 0)){
 			_resolve_deref_reg_shift_(cmd[i].p[0], i);
@@ -1732,8 +1716,6 @@ void Serializer::ResolveDerefRegShift()
 
 void Serializer::SerializeFunction(Function *f)
 {
-	msg_db_f("SerializeFunction", 2);
-
 	syntax_tree->CreateAsmMetaInfo();
 	syntax_tree->asm_meta_info->line_offset = 0;
 	Asm::CurrentMetaInfo = syntax_tree->asm_meta_info;
@@ -1878,7 +1860,6 @@ void Serializer::SimplifyFloatStore()
 
 void Serializer::MapReferencedTempVarsToStack()
 {
-	msg_db_f("MapRemainingTempVarsToStack", 3);
 	for (SerialCommand &c : cmd)
 		if (c.inst == Asm::INST_LEA)
 			if (c.p[1].kind == KIND_VAR_TEMP){
@@ -1903,7 +1884,6 @@ void Serializer::MapReferencedTempVarsToStack()
 
 void Serializer::TryMapTempVarsRegisters()
 {
-	msg_db_f("TryMapTempVarsRegisters", 3);
 	for (int i=temp_var.num-1;i>=0;i--){
 		if (temp_var[i].force_stack)
 			continue;
@@ -1912,7 +1892,6 @@ void Serializer::TryMapTempVarsRegisters()
 
 void Serializer::MapRemainingTempVarsToStack()
 {
-	msg_db_f("MapRemainingTempVarsToStack", 3);
 	for (int i=temp_var.num-1;i>=0;i--){
 		SerialCommandParam stackvar;
 		add_stack_var(temp_var[i], stackvar);
@@ -2004,7 +1983,6 @@ void Serializer::assemble_cmd_arm(SerialCommand &c)
 
 void AddAsmBlock(Asm::InstructionWithParamsList *list, Script *s)
 {
-	msg_db_f("AddAsmBlock", 4);
 	//msg_write(".------------------------------- asm");
 	SyntaxTree *ps = s->syntax;
 	if (ps->asm_blocks.num == 0)
@@ -2016,8 +1994,6 @@ void AddAsmBlock(Asm::InstructionWithParamsList *list, Script *s)
 
 void Serializer::Assemble()
 {
-	msg_db_f("Serializer.Assemble", 2);
-
 	// intro + allocate stack memory
 	if (config.instruction_set != Asm::INSTRUCTION_SET_ARM)
 		stack_max_size += max_push_size;
@@ -2115,8 +2091,6 @@ Serializer *CreateSerializer(Script *s, Asm::InstructionWithParamsList *list)
 
 void Script::AssembleFunction(int index, Function *f, Asm::InstructionWithParamsList *list)
 {
-	msg_db_f("Compile Function", 2);
-
 	if (config.verbose)
 		msg_write("serializing " + f->name + " -------------------");
 

@@ -177,7 +177,6 @@ void InputStreamAudio::setDevice(Device *_device)
 
 void InputStreamAudio::stop()
 {
-	msg_db_f("AudioInputAudio.stop", 1);
 	if (!capturing)
 		return;
 	_stopUpdate();
@@ -208,7 +207,6 @@ void InputStreamAudio::stop()
 
 bool InputStreamAudio::start()
 {
-	msg_db_f("AudioInputAudio.start", 1);
 	if (capturing)
 		stop();
 
@@ -320,8 +318,6 @@ int InputStreamAudio::doCapturing()
 {
 	if (!capturing)
 		return 0;
-
-	msg_db_f("DoCapturing", 1);
 
 	int avail = current_buffer.available();
 	sync.add(avail);

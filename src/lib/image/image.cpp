@@ -15,6 +15,9 @@ string ImageVersion = "0.2.5.0";
 Image::Image()
 {
 	width = height = 0;
+	error = false;
+	mode = ModeRGBA;
+	alpha_used = false;
 }
 
 Image::Image(int _width, int _height, const color &c)
@@ -41,8 +44,6 @@ void Image::__delete__()
 //    = r + g<<8 + b<<16 + a<<24
 void Image::loadFlipped(const string &filename)
 {
-	msg_db_f("Image.LoadFlipped", 1);
-
 	// reset image
 	width = 0;
 	height = 0;
@@ -107,8 +108,6 @@ inline color image_uncolor_bgra(unsigned int i)
 
 void Image::create(int _width, int _height, const color &c)
 {
-	msg_db_f("Image.Create", 1);
-
 	// create
 	width = _width;
 	height = _height;
@@ -125,8 +124,6 @@ void Image::create(int _width, int _height, const color &c)
 
 void Image::save(const string &filename) const
 {
-	msg_db_f("Image.Save", 1);
-	
 	string ext = filename.extension();
 	if (ext == "tga")
 		image_save_tga(filename, *this);
@@ -138,13 +135,11 @@ void Image::save(const string &filename) const
 
 void Image::clear()
 {
-	msg_db_f("Image.Delete", 1);
 	data.clear();
 }
 
 Image* Image::scale(int _width, int _height) const
 {
-	msg_db_f("Image.Scale", 1);
 	Image *r = new Image(_width, _height, Black);
 
 	for (int x=0;x<_width;x++)
@@ -159,8 +154,6 @@ Image* Image::scale(int _width, int _height) const
 
 void Image::flipV()
 {
-	msg_db_f("Image.FlipV", 1);
-	
 	unsigned int t;
 	unsigned int *d = &data[0];
 	for (int y=0;y<height/2;y++)
@@ -199,7 +192,6 @@ void Image::setMode(int _mode) const
 {
 	if (_mode == mode)
 		return;
-	msg_db_f("Image.SetMode", 1);
 
 	unsigned int *c = (unsigned int*)data.data;
 	if (mode == ModeRGBA){

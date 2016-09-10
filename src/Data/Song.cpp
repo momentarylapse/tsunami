@@ -176,8 +176,6 @@ void Song::setCompression(int _compression)
 
 void Song::newEmpty(int _sample_rate)
 {
-	msg_db_f("AudioFile.NewEmpty",1);
-
 	reset();
 	action_manager->enable(false);
 	sample_rate = _sample_rate;
@@ -193,8 +191,6 @@ void Song::newEmpty(int _sample_rate)
 
 void Song::newWithOneTrack(int track_type, int _sample_rate)
 {
-	msg_db_f("AudioFile.NewWithOneTrack",1);
-
 	notifyBegin();
 	newEmpty(_sample_rate);
 	action_manager->enable(false);
@@ -206,7 +202,6 @@ void Song::newWithOneTrack(int track_type, int _sample_rate)
 // delete all data
 void Song::reset()
 {
-	msg_db_f("AudioFile.Reset",1);
 	action_manager->reset();
 
 	filename = "";
@@ -371,9 +366,9 @@ extern HuiTimer debug_timer;
 void Song::updatePeaks()
 {
 	debug_timer.reset();
-	for (Track *t : tracks)
+	for (Track *t: tracks)
 		t->updatePeaks();
-	for (Sample *s : samples)
+	for (Sample *s: samples)
 		s->buf.update_peaks();
 	//msg_write(format("up %f", debug_timer.get()));
 }
@@ -495,9 +490,9 @@ void Song::deleteBar(int index, bool affect_midi)
 
 void Song::invalidateAllPeaks()
 {
-	for (Track *t : tracks)
+	for (Track *t: tracks)
 		t->invalidateAllPeaks();
-	for (Sample *s : samples)
+	for (Sample *s: samples)
 		s->buf.invalidate_peaks(s->buf.range());
 }
 
@@ -519,7 +514,7 @@ SampleRef *Song::get_sample_ref(int track_no, int index)
 
 Sample* Song::get_sample_by_uid(int uid)
 {
-	for (Sample *s : samples)
+	for (Sample *s: samples)
 		if (s->uid == uid)
 			return s;
 	return NULL;
@@ -553,7 +548,7 @@ MidiEffect *Song::get_midi_fx(int track_no, int index)
 
 Track *Song::getTimeTrack()
 {
-	for (Track *t : tracks)
+	for (Track *t: tracks)
 		if (t->type == t->TYPE_TIME)
 			return t;
 	return NULL;
@@ -573,7 +568,7 @@ string Song::getNiceLevelName(int index)
 
 string Song::getTag(const string &key)
 {
-	for (Tag &t : tags)
+	for (Tag &t: tags)
 		if (t.key == key)
 			return t.value;
 	return "";

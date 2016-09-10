@@ -57,7 +57,6 @@ void HuiToolbar::reset()
 // create and apply a toolbar bar resource id
 void HuiToolbar::setByID(const string &id)
 {
-	msg_db_f("Toolbar.SetByID",1);
 	msg_db_m(id.c_str(),1);
 	HuiResource *res = HuiGetResource(id);
 	if (!res){
@@ -66,7 +65,7 @@ void HuiToolbar::setByID(const string &id)
 	}
 	reset();
 	//Configure(res->b_param[0], res->b_param[1]);
-	for (HuiResource &cmd : res->children){
+	for (HuiResource &cmd: res->children){
 		if (cmd.type == "Item"){
 			if (sa_contains(cmd.options, "checkable"))
 				addItemCheckable(get_lang(id, cmd.id, "", false), cmd.image, cmd.id);
@@ -81,7 +80,7 @@ void HuiToolbar::setByID(const string &id)
 		}else if (cmd.type == "ItemPopup"){
 			string title = get_lang(id, cmd.id, "", false);
 			bool ok = false;
-			for (string &o : cmd.options)
+			for (string &o: cmd.options)
 				if (o.find("menu=") == 0){
 					addItemMenuByID(title, cmd.image, o.substr(5, -1), cmd.id);
 					item.back()->setTooltip(HuiGetLanguageT(id, cmd.id));

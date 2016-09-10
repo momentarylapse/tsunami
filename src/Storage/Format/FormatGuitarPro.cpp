@@ -420,7 +420,6 @@ void FormatGuitarPro::write_page_setup()
 
 void FormatGuitarPro::read_measure_header()
 {
-	msg_db_f("bar", 1);
 	GpMeasure m;
 	if (measures.num > 0){
 		m = measures.back();
@@ -461,7 +460,6 @@ void FormatGuitarPro::read_measure_header()
 
 void FormatGuitarPro::write_measure_header(Bar &b)
 {
-	msg_db_f("bar", 1);
 	f->WriteByte(0x03);
 	f->WriteByte(b.num_beats);
 	f->WriteByte(4);
@@ -477,7 +475,6 @@ void FormatGuitarPro::write_measure_header(Bar &b)
 
 void FormatGuitarPro::read_track()
 {
-	msg_db_f("track", 1);
 	f->ReadByte();
 	GpTrack tt;
 	tt.t = a->addTrack(Track::TYPE_MIDI);
@@ -517,7 +514,6 @@ void FormatGuitarPro::read_track()
 
 void FormatGuitarPro::write_track(GpTrack *t, int index)
 {
-	msg_db_f("track", 1);
 	f->WriteByte(0);
 	GpTrack tt;
 	write_str1c(f, t->t->name, 40);
@@ -552,7 +548,6 @@ void FormatGuitarPro::write_track(GpTrack *t, int index)
 
 void FormatGuitarPro::read_measure(GpMeasure &m, GpTrack &t, int offset)
 {
-	msg_db_f("measure", 1);
 	//msg_write(format("m %x", f->GetPos()));
 
 	int num_voices = 1;
@@ -716,7 +711,6 @@ Array<GuitarNote> create_guitar_notes(FormatGuitarPro::GpTrack *t, Bar &b)
 
 void FormatGuitarPro::write_measure(GpTrack *t, Bar &b)
 {
-	msg_db_f("measure", 1);
 	//msg_write(format("m %x", f->GetPos()));
 
 	int bpm = (b.bpm(t->t->song->sample_rate) + 0.5f);
@@ -753,7 +747,6 @@ void FormatGuitarPro::write_measure(GpTrack *t, Bar &b)
 
 int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 {
-	msg_db_f("beat", 2);
 	int flags = f->ReadByte();
 	if ((flags & 0x40) != 0)
 		f->ReadByte();
@@ -788,8 +781,6 @@ int FormatGuitarPro::read_beat(GpTrack &t, GpMeasure &m, int start)
 
 void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &string, int length, bool update_tempo)
 {
-	msg_db_f("beat", 2);
-
 	if (length <= 1){
 		od->error("write_beat: evil length: " + i2s(length));
 		length = 3; // quick and dirty fix :P
@@ -869,7 +860,6 @@ void FormatGuitarPro::write_beat(GpTrack *t, Array<int> &pitch, Array<int> &stri
 
 void FormatGuitarPro::read_chord()
 {
-	msg_db_f("chord", 0);
 	int type = f->ReadByte();
 	if (((type & 0x01) == 0) and (version < 500)){
 		string name = read_str41(f);
@@ -901,7 +891,6 @@ void FormatGuitarPro::read_chord()
 
 void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length)
 {
-	msg_db_f("note", 2);
 	MidiNote n;
 	n.range = Range(start, length);
 	n.volume = 1;
@@ -940,7 +929,6 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 
 void FormatGuitarPro::read_note_fx()
 {
-	msg_db_f("note fx", 3);
 	int flags1 = f->ReadByte();
 	int flags2 = 0;
 	if (version >= 400)
@@ -981,7 +969,6 @@ void FormatGuitarPro::read_note_fx()
 
 int FormatGuitarPro::read_duration(int flags, GpMeasure &m)
 {
-	msg_db_f("duration", 1);
 	int v = (signed char)f->ReadByte();
 	float value = 16.0f / (float)(int)(1 << (v + 4));
 	bool dotted = ((flags & 0x01) != 0);
@@ -1023,7 +1010,6 @@ int FormatGuitarPro::read_duration(int flags, GpMeasure &m)
 
 void FormatGuitarPro::read_mix_change()
 {
-	msg_db_f("mix", 1);
 	f->ReadByte(); // instrument
 	if (version >= 500){
 		for (int i=0; i<4; i++)
@@ -1069,7 +1055,6 @@ void FormatGuitarPro::read_mix_change()
 
 void FormatGuitarPro::write_mix_change_tempo()
 {
-	msg_db_f("mix", 1);
 	f->WriteByte(0xff);
 	if (version >= 500){
 		for (int i=0; i<4; i++)
@@ -1101,7 +1086,6 @@ void FormatGuitarPro::write_mix_change_tempo()
 
 void FormatGuitarPro::read_beat_fx()
 {
-	msg_db_f("beat fx", 2);
 	int flags1 = f->ReadByte();
 	int flags2 = 0;
 	if (version >= 400)

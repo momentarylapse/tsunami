@@ -133,7 +133,6 @@ void _init_fft_(int n)
 
 void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 {
-	msg_db_f("fft_c2c_michi", 1);
 	out.resize(in.num);
 
 	int n2 = in.num;
@@ -202,7 +201,6 @@ void fft_c2c_michi(Array<complex> &in, Array<complex> &out, bool inverse)
 
 void fft_c2c(Array<complex> &in, Array<complex> &out, bool inverse)
 {
-	msg_db_f("fft_c2c", 1);
 	out.resize(in.num);
 	align_stack
 #ifndef OS_WINDOWS
@@ -216,7 +214,7 @@ void fft_r2c(Array<float> &in, Array<complex> &out)
 {
 	if (in.num == 0)
 		return;
-	msg_db_f("fft_r2c", 1);
+
 	out.resize(in.num / 2 + 1);
 	align_stack
 #ifndef OS_WINDOWS
@@ -230,7 +228,7 @@ void fft_c2r_inv(Array<complex> &in, Array<float> &out)
 {
 	if (out.num == 0)
 		return;
-	msg_db_f("fft_c2r_inv", 1);
+
 	align_stack
 	out.resize(in.num * 2 - 2);
 #ifndef OS_WINDOWS

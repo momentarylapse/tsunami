@@ -67,8 +67,6 @@ public:
 
 void SIAddPackageFile()
 {
-	msg_db_f("SIAddPackageFile", 3);
-
 	add_package("file", false);
 
 	Type*

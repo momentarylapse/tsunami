@@ -77,13 +77,13 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 	if (res->type == "SizableDialog")
 		mode = HuiWinModeControls | HuiWinModeResizable;
 	bool allow_parent = false;
-	for (string &o : res->options)
+	for (string &o: res->options)
 		if ((o == "allow-root") or (o == "allow-parent"))
 			allow_parent = true;
 	_init_(HuiGetLanguage(id, id), -1, -1, res->w, res->h, parent, allow_parent, mode);
 
 	// menu/toolbar?
-	for (string &o : res->options){
+	for (string &o: res->options){
 		if (o.head(5) == "menu=")
 			setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
 		if (o.head(8) == "toolbar=")
@@ -91,7 +91,7 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 	}
 
 	// controls
-	for (HuiResource &cmd : res->children)
+	for (HuiResource &cmd: res->children)
 		_addControl(id, cmd, "");
 
 	msg_db_m("  \\(^_^)/",1);
@@ -99,7 +99,6 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 
 void HuiWindow::_init_generic_(HuiWindow *_root, bool _allow_root, int _mode)
 {
-	msg_db_f("Window::_InitGeneric_", 2);
 	_HuiMakeUsable_();
 	HuiWindows.add(this);
 
@@ -125,8 +124,6 @@ void HuiWindow::_init_generic_(HuiWindow *_root, bool _allow_root, int _mode)
 
 void HuiWindow::_clean_up_()
 {
-	msg_db_f("Window::_CleanUp_", 2);
-
 	for (int i=0;i<4;i++)
 		delete(toolbar[i]);
 
@@ -149,7 +146,7 @@ void HuiWindow::onCloseRequest()
 	
 	// no message function (and last window in this main level): end program
 	// ...or at least end nested main level
-	for (HuiWindow *w : HuiWindows)
+	for (HuiWindow *w: HuiWindows)
 		if (w->_get_main_level_() >= level)
 			return;
 	HuiEnd();

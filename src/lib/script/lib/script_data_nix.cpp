@@ -39,8 +39,6 @@ Type *TypeShaderP;
 
 void SIAddPackageNix()
 {
-	msg_db_f("SIAddPackageNix", 3);
-	
 	add_package("nix", false);
 	
 	TypeVectorArray		= add_type_a("vector[?]",	TypeVector, 1);

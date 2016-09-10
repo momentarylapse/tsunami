@@ -92,7 +92,7 @@ void Script::AllocateMemory()
 		}
 		memory_size += mem_align(s, 4);
 	}
-	for (Type *t : syntax->types)
+	for (Type *t: syntax->types)
 		if (t->vtable.num > 0)
 			memory_size += config.pointer_size;
 
@@ -116,7 +116,7 @@ void Script::AllocateStack()
 	// use your own stack if needed
 	//   wait() used -> needs to switch stacks ("tasks")
 	__stack = NULL;
-	for (Command *cmd : syntax->commands){
+	for (Command *cmd: syntax->commands){
 		if (cmd->kind == KIND_COMPILER_FUNCTION)
 			if ((cmd->link_no == COMMAND_WAIT) or (cmd->link_no == COMMAND_WAIT_RT) or (cmd->link_no == COMMAND_WAIT_ONE_FRAME)){
 				__stack = new char[config.stack_size];
@@ -217,12 +217,12 @@ void Script::MapConstantsToOpcode()
 	cnst.resize(syntax->constants.num);
 
 	// vtables -> no data yet...
-	for (Type *t : syntax->types)
+	for (Type *t: syntax->types)
 		if (t->vtable.num > 0){
 			t->_vtable_location_compiler_ = &opcode[opcode_size];
 			t->_vtable_location_target_ = (void*)(opcode_size + syntax->asm_meta_info->code_origin);
 			opcode_size += config.pointer_size * t->vtable.num;
-			for (Constant &c : syntax->constants)
+			for (Constant &c: syntax->constants)
 				if ((c.type == TypePointer) and (*(int*)c.value.data == (int)(long)t->vtable.data))
 					memcpy(c.value.data, &t->_vtable_location_target_, config.pointer_size);
 		}
@@ -367,7 +367,7 @@ struct IncludeTranslationData
 
 void relink_calls(Script *s, Script *a, IncludeTranslationData &d)
 {
-	for (Command *c : s->syntax->commands){
+	for (Command *c: s->syntax->commands){
 		// keep commands... just redirect var/const/func
 		//msg_write(p2s(c->script));
 		if (c->script != d.source)
@@ -385,8 +385,8 @@ void relink_calls(Script *s, Script *a, IncludeTranslationData &d)
 	}
 
 	// we might need some constructors later on...
-	for (Type *t : s->syntax->types)
-		for (ClassFunction &f : t->function)
+	for (Type *t: s->syntax->types)
+		for (ClassFunction &f: t->function)
 			if (f.script == d.source){
 				f.script = a;
 				f.nr += d.func_off;
@@ -405,7 +405,7 @@ IncludeTranslationData import_deep(SyntaxTree *a, SyntaxTree *b)
 
 	a->root_of_all_evil.var.append(b->root_of_all_evil.var);
 
-	for (Function *f : b->functions){
+	for (Function *f: b->functions){
 		Function *ff = a->AddFunction(f->name, f->return_type);
 		*ff = *f;
 		// keep block pointing to include file...
@@ -413,7 +413,7 @@ IncludeTranslationData import_deep(SyntaxTree *a, SyntaxTree *b)
 	a->types.append(b->types);
 
 	//int asm_off = a->AsmBlocks.num;
-	for (AsmBlock &ab : b->asm_blocks){
+	for (AsmBlock &ab: b->asm_blocks){
 		a->asm_blocks.add(ab);
 	}
 
@@ -422,7 +422,7 @@ IncludeTranslationData import_deep(SyntaxTree *a, SyntaxTree *b)
 
 void find_all_includes_rec(Script *s, Set<Script*> &includes)
 {
-	for (Script *i : s->syntax->includes){
+	for (Script *i: s->syntax->includes){
 		if (i->filename.find(".kaba") < 0)
 			continue;
 		includes.add(i);
@@ -435,12 +435,12 @@ void import_includes(Script *s)
 	Set<Script*> includes;
 	find_all_includes_rec(s, includes);
 	Array<IncludeTranslationData> da;
-	for (Script *i : includes)
+	for (Script *i: includes)
 		da.add(import_deep(s->syntax, i->syntax));
 
 	// we need to also correct the includes, since we kept the blocks/commands there
-	for (Script *i : includes){
-		for (IncludeTranslationData &d : da){
+	for (Script *i: includes){
+		for (IncludeTranslationData &d: da){
 			relink_calls(s, s, d);
 			relink_calls(i, s, d);
 		}
@@ -450,7 +450,6 @@ void import_includes(Script *s)
 // generate opcode
 void Script::Compiler()
 {
-	msg_db_f("Compiler",2);
 	Asm::CurrentMetaInfo = syntax->asm_meta_info;
 
 	if (config.compile_os)
@@ -501,7 +500,7 @@ void Script::Compiler()
 	CompileFunctions(opcode, opcode_size);
 
 // link functions
-	for (Asm::WantedLabel &l : functions_to_link){
+	for (Asm::WantedLabel &l: functions_to_link){
 		string name = l.name.substr(10, -1);
 		bool found = false;
 		foreachi(Function *f, syntax->functions, i)
@@ -513,7 +512,7 @@ void Script::Compiler()
 		if (!found)
 			DoErrorLink("could not link function: " + name);
 	}
-	for (int n : function_vars_to_link){
+	for (int n: function_vars_to_link){
 		long p = (n + 0xefef0000);
 		long q = (long)func[n];
 		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
@@ -521,7 +520,7 @@ void Script::Compiler()
 	}
 
 // link virtual functions into vtables
-	for (Type *t : syntax->types){
+	for (Type *t: syntax->types){
 		t->LinkVirtualTable();
 
 		if (config.compile_os){

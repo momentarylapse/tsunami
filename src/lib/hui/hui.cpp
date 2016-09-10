@@ -15,7 +15,7 @@
 #include "../file/file.h"
 
 
-string HuiVersion = "0.5.16.0";
+string HuiVersion = "0.5.16.1";
 
 #include <stdio.h>
 #include <signal.h>
@@ -344,8 +344,6 @@ void HuiInit(const string &program, bool load_res, const string &def_lang)
 		dir_create(HuiAppDirectory);
 		msg_init(HuiAppDirectory + "message.txt", true);
 	}
-	msg_db_f("Hui",1);
-	//msg_db_m(format("[%s]", HuiVersion),1);
 
 	//msg_write("HuiAppDirectory " + HuiAppDirectory);
 
@@ -400,7 +398,6 @@ void HuiInit(const string &program, bool load_res, const string &def_lang)
 
 int HuiRun()
 {
-	msg_db_f("HuiRun",1);
 	HuiRunning = true;
 	HuiMainLevelRunning[HuiMainLevel] = true;
 	//HuiPushMainLevel();
@@ -437,7 +434,6 @@ int HuiRun()
 
 void HuiDoSingleMainLoop()
 {
-	msg_db_f("HuiDoSingleMainLoop",1);
 #ifdef HUI_API_WIN
 	MSG messages;
 	messages.message=0;
@@ -478,14 +474,12 @@ void HuiDoSingleMainLoop()
 
 void HuiPushMainLevel()
 {
-	msg_db_f("HuiPushMainLevel",2);
 	HuiMainLevel ++;
 	HuiMainLevelRunning.add(false);
 }
 
 void HuiCleanUpMainLevel()
 {
-	msg_db_f("HuiCleanUpMainLevel",2);
 	foreachb(HuiWindow *w, HuiWindows)
 		if (w->_get_main_level_() >= HuiMainLevel){
 			delete(w);
@@ -495,7 +489,6 @@ void HuiCleanUpMainLevel()
 
 void HuiPopMainLevel()
 {
-	msg_db_f("HuiPopMainLevel",2);
 	HuiCleanUpMainLevel();
 	HuiMainLevel --;
 	
@@ -509,8 +502,6 @@ void HuiPopMainLevel()
 // ends the system loop of the HuiRun() command
 void HuiEnd()
 {
-	msg_db_r("HuiEnd", 1);
-
 	if (HuiMainLevel > 0)
 		HuiCleanUpMainLevel();
 

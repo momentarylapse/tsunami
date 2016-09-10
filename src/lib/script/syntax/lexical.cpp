@@ -161,7 +161,6 @@ int GetKind(char c)
 
 void ExpressionBuffer::Analyse(SyntaxTree *ps, const string &source)
 {
-	msg_db_f("Analyse", 4);
 	syntax = ps;
 	clear();
 
@@ -217,7 +216,6 @@ void ExpressionBuffer::show()
 //   true -> end of file
 bool ExpressionBuffer::AnalyseLine(const char *source, ExpressionBuffer::Line *l, int &line_no)
 {
-	msg_db_f("AnalyseLine", 4);
 	int pos = 0;
 	l->indent = 0;
 	l->length = 0;
@@ -301,7 +299,6 @@ void ExpressionBuffer::DoAsmBlock(const char *source, int &pos, int &line_no)
 //   true -> end of line (<pos> is on newline)
 bool ExpressionBuffer::AnalyseExpression(const char *source, int &pos, ExpressionBuffer::Line *l, int &line_no)
 {
-	msg_db_f("AnalyseExpression", 4);
 	// skip whitespace and other "invisible" stuff to find the first interesting character
 	if (comment_level > 0)
 		if (DoMultiLineComment(source, pos))

@@ -71,14 +71,12 @@ bool intersect_sub(SampleRef *s, const Range &r, Range &ir, int &bpos)
 
 void SongRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 {
-	msg_db_f("bb_render_audio_track_no_fx", 1);
-
 	// track buffer
 	BufferBox buf0 = t->readBuffersCol(range_cur);
 	buf.swap_ref(buf0);
 
 	// subs
-	for (SampleRef *s : t->samples){
+	for (SampleRef *s: t->samples){
 		if (s->muted)
 			continue;
 
@@ -111,8 +109,6 @@ void make_silence(BufferBox &buf, int size)
 
 void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 {
-	msg_db_f("bb_render_time_track_no_fx", 1);
-
 	make_silence(buf, range_cur.length);
 
 	Array<Beat> beats = song->bars.getBeats(range_cur, false, true);
@@ -120,7 +116,7 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 	MidiRawData raw;
 	raw.samples = buf.length;
 
-	for (Beat &b : beats)
+	for (Beat &b: beats)
 		raw.addMetronomeClick(b.range.offset - range_cur.offset, b.level, 0.8f);
 
 	midi_streamer->setData(raw);
@@ -129,8 +125,6 @@ void SongRenderer::bb_render_time_track_no_fx(BufferBox &buf, Track *t)
 
 void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 {
-	msg_db_f("bb_render_midi_track_no_fx", 1);
-
 	make_silence(buf, range_cur.length);
 
 	MidiData *m = &t->midi;
@@ -149,8 +143,6 @@ void SongRenderer::bb_render_midi_track_no_fx(BufferBox &buf, Track *t, int ti)
 
 void SongRenderer::bb_render_track_no_fx(BufferBox &buf, Track *t, int ti)
 {
-	msg_db_f("bb_render_track_no_fx", 1);
-
 	if (t->type == Track::TYPE_AUDIO)
 		bb_render_audio_track_no_fx(buf, t);
 	else if (t->type == Track::TYPE_TIME)
@@ -170,8 +162,6 @@ void SongRenderer::make_fake_track(Track *t, BufferBox &buf)
 
 void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)
 {
-	msg_db_f("bb_apply_fx", 1);
-
 	buf.make_own();
 
 	Track fake_track;
@@ -182,15 +172,13 @@ void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list
 		effect->apply(buf, &fake_track, false);
 
 	// apply fx
-	for (Effect *fx : fx_list)
+	for (Effect *fx: fx_list)
 		if (fx->enabled)
 			fx->apply(buf, &fake_track, false);
 }
 
 void SongRenderer::bb_render_track_fx(BufferBox &buf, Track *t, int ti)
 {
-	msg_db_f("bb_render_track_fx", 1);
-
 	bb_render_track_no_fx(buf, t, ti);
 
 	if ((t->fx.num > 0) or (effect))
@@ -207,8 +195,6 @@ int get_first_usable_track(Song *a, SongSelection *sel)
 
 void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 {
-	msg_db_f("bb_render_audio_no_fx", 1);
-
 	// any un-muted track?
 	int i0 = get_first_usable_track(song, sel);
 	if (i0 < 0){
@@ -237,13 +223,13 @@ void SongRenderer::bb_render_song_no_fx(BufferBox &buf)
 
 void apply_curves(Song *audio, int pos)
 {
-	for (Curve *c : audio->curves)
+	for (Curve *c: audio->curves)
 		c->apply(pos);
 }
 
 void unapply_curves(Song *audio)
 {
-	for (Curve *c : audio->curves)
+	for (Curve *c: audio->curves)
 		c->unapply();
 }
 
@@ -265,7 +251,6 @@ void SongRenderer::read_basic(BufferBox &buf, int pos, int size)
 
 int SongRenderer::read(BufferBox &buf)
 {
-	msg_db_f("AudioRenderer.read", 1);
 	int size = max(min(buf.length, _range.end() - pos), 0);
 
 	if (song->curves.num >= 0){
@@ -295,7 +280,6 @@ void SongRenderer::render(const Range &range, BufferBox &buf)
 
 void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 {
-	msg_db_f("Renderer.Prepare", 2);
 	_range = __range;
 	allow_loop = _allow_loop;
 	pos = _range.offset;
@@ -306,7 +290,7 @@ void SongRenderer::prepare(const Range &__range, bool _allow_loop)
 
 void SongRenderer::reset()
 {
-	for (Effect *fx : song->fx)
+	for (Effect *fx: song->fx)
 		fx->prepare();
 	foreachi(Track *t, song->tracks, i){
 		//midi.add(t, t->midi);
@@ -314,9 +298,9 @@ void SongRenderer::reset()
 		t->synth->setSampleRate(song->sample_rate);
 		t->synth->setInstrument(t->instrument);
 		t->synth->reset();
-		for (Effect *fx : t->fx)
+		for (Effect *fx: t->fx)
 			fx->prepare();
-		for (MidiEffect *fx : t->midi.fx){
+		for (MidiEffect *fx: t->midi.fx){
 			fx->Prepare();
 			fx->process(&midi[i]);
 		}
@@ -345,7 +329,7 @@ Array<Tag> SongRenderer::getTags()
 void SongRenderer::seek(int _pos)
 {
 	pos = _pos;
-	for (Track *t : song->tracks)
+	for (Track *t: song->tracks)
 		t->synth->reset();//endAllNotes();
 }
 

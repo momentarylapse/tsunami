@@ -77,6 +77,7 @@ void MidiEffect::Apply(MidiData &midi, Track *t, bool log_error)
 
 void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 {
+	MidiDataRef midi_ref = t->midi.getNotes(r);
 	MidiData midi = t->midi.getNotes(r);
 
 	t->song->action_manager->beginActionGroup();
@@ -86,6 +87,9 @@ void MidiEffect::DoProcessTrack(Track *t, const Range &r)
 			t->deleteMidiNote(i);
 
 	process(&midi);
+	for (MidiNote *n: midi)
+		n->reset_meta();
+
 	t->insertMidiData(0, midi);
 	t->song->action_manager->endActionGroup();
 }

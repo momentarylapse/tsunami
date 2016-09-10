@@ -17,6 +17,7 @@ class ActionTrackDeleteMidiNote: public Action
 {
 public:
 	ActionTrackDeleteMidiNote(Track *t, int index);
+	~ActionTrackDeleteMidiNote();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

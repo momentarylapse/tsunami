@@ -15,6 +15,12 @@ ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(Track* t, int _index)
 	note = NULL;
 }
 
+ActionTrackDeleteMidiNote::~ActionTrackDeleteMidiNote()
+{
+	if (note)
+		delete(note);
+}
+
 void* ActionTrackDeleteMidiNote::execute(Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
@@ -31,4 +37,5 @@ void ActionTrackDeleteMidiNote::undo(Data* d)
 	Track *t = a->get_track(track_no);
 
 	t->midi.insert(note, index);
+	note = NULL;
 }

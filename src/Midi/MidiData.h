@@ -47,6 +47,7 @@ class MidiData : public Array<MidiNote*>
 {
 public:
 	MidiData();
+	MidiData(const MidiData &midi);
 	~MidiData();
 	void _cdecl __init__();
 	void _cdecl __delete__();
@@ -62,6 +63,7 @@ public:
 	void sanify(const Range &r);
 
 	void operator=(const MidiData &midi);
+	void operator=(const MidiDataRef &midi);
 
 	//void update_meta(const Instrument &i, const Scale &s) const;
 	void update_meta(Track *t, const Scale &s) const;

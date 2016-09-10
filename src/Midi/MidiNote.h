@@ -18,12 +18,14 @@ class MidiNote
 public:
 	MidiNote();
 	MidiNote(const Range &range, float pitch, float volume);
+	MidiNote *copy() const;
 	float getFrequency();
 	Range range;
 	float pitch;
 	float volume;
 	mutable int stringno, clef_position, modifier;
 
+	void reset_meta();
 	void update_meta(const Instrument &i, const Scale &s, int hand_position) const;
 };
 

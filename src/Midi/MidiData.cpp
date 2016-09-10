@@ -296,6 +296,11 @@ MidiData::MidiData()
 	samples = 0;
 }
 
+MidiData::MidiData(const MidiData &midi)
+{
+	*this = midi;
+}
+
 MidiData::~MidiData()
 {
 	deep_clear();
@@ -335,14 +340,7 @@ MidiDataRef MidiData::getNotes(const Range &r) const
 
 MidiData MidiData::duplicate() const
 {
-	MidiData b;
-	for (MidiNote *n: *this){
-		MidiNote *nn = new MidiNote;
-		*nn = *n;
-		b.add(nn);
-	}
-	b.samples = samples;
-	b.fx = fx;
+	MidiData b = *this;
 	return b;
 }
 
@@ -350,11 +348,20 @@ void MidiData::operator=(const MidiData &midi)
 {
 	deep_clear();
 
-	for (MidiNote *n: midi){
-		MidiNote *nn = new MidiNote;
-		*nn = *n;
-		add(nn);
-	}
+	for (MidiNote *n: midi)
+		add(n->copy());
+
+	samples = midi.samples;
+	fx = midi.fx;
+}
+
+void MidiData::operator=(const MidiDataRef &midi)
+{
+	deep_clear();
+
+	for (MidiNote *n: midi)
+		add(n->copy());
+
 	samples = midi.samples;
 	fx = midi.fx;
 }

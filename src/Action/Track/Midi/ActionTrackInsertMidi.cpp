@@ -15,6 +15,13 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(Track *t, int _offset, const MidiDa
 	for (MidiNote *n: midi)
 		n->range.offset += offset;
 	midi.sort();
+	applied = false;
+}
+
+ActionTrackInsertMidi::~ActionTrackInsertMidi()
+{
+	if (applied)
+		midi.clear();
 }
 
 
@@ -35,6 +42,7 @@ void *ActionTrackInsertMidi::execute(Data *d)
 		t->midi.insert(n, index);
 		inserted_at.add(index);
 	}
+	applied = true;
 
 	return NULL;
 }
@@ -46,5 +54,7 @@ void ActionTrackInsertMidi::undo(Data *d)
 
 	foreachb(int i, inserted_at)
 		t->midi.erase(i);
+
+	applied = false;
 }
 

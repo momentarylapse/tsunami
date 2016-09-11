@@ -144,7 +144,7 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	a.add("-dummy-");
 	string s = lpCmdLine;
 	if (s.num > 0){
-		if ((s[0] == '\"') && (s.back() == '\"'))
+		if ((s[0] == '\"') and (s.back() == '\"'))
 			s = s.substr(1, -2);
 		a.add(s);
 	}
@@ -207,9 +207,9 @@ void _HuiSetIdleFunction(HuiCallback c)
 #ifdef HUI_API_GTK
 	bool old_idle = HuiIdleFunction.is_set();
 	bool new_idle = c.is_set();
-	if ((new_idle) && (!old_idle))
+	if (new_idle and !old_idle)
 		idle_id = g_idle_add_full(300, GtkIdleFunction, NULL, NULL);
-	if ((!new_idle) && (old_idle) && (idle_id >= 0)){
+	if (!new_idle and old_idle and (idle_id >= 0)){
 		g_source_remove(idle_id);
 		idle_id = -1;
 	}
@@ -406,7 +406,7 @@ int HuiRun()
 	messages.message = 0;
 	HuiHaveToExit = false;
 	bool got_message;
-	while ((!HuiHaveToExit)&&(WM_QUIT!=messages.message)){
+	while ((!HuiHaveToExit) and (WM_QUIT!=messages.message)){
 		bool allow=true;
 		if (HuiIdleFunction.is_set())
 			got_message=(PeekMessage(&messages,NULL,0U,0U,PM_REMOVE)!=0);
@@ -422,7 +422,7 @@ int HuiRun()
 					break;
 				}
 		}
-		if ((HuiIdleFunction.is_set()) && (allow))
+		if (HuiIdleFunction.is_set() and allow)
 			HuiIdleFunction.call();
 	}
 #endif
@@ -455,7 +455,7 @@ void HuiDoSingleMainLoop()
 				return;
 			}
 	}
-	/*if ((HuiIdleFunction)&&(allow))
+	/*if (HuiIdleFunction and allow)
 		HuiIdleFunction();*/
 #endif
 #ifdef HUI_API_GTK
@@ -530,8 +530,7 @@ void HuiEnd()
 		if (HuiConfig.changed)
 			HuiConfig.save();
 	}
-	msg_db_l(1);
-	if ((msg_inited) && (!HuiEndKeepMsgAlive) && (HuiMainLevel == 0))
+	if ((msg_inited) and (!HuiEndKeepMsgAlive) and (HuiMainLevel == 0))
 		msg_end();
 }
 

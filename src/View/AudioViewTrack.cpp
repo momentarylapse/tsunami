@@ -118,11 +118,21 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 		return;
 	}
 
-	int l = min(view->prefered_buffer_level - 1, b.peaks.num / 4);
-	if (l >= 1){//f < MIN_MAX_FACTOR){
+	//int l = min(view->prefered_buffer_level - 1, b.peaks.num / 4);
+	int l = view->prefered_buffer_level - 1;
+	if (l >= 1){
+		if (l*4 >= b.peaks.num){
+			c->setColor(Red);
+			float x1 = max((float)view->cam.sample2screen(b.range().start()), 0.0f);
+			float x2 = min((float)view->cam.sample2screen(b.range().end()), w);
+			c->drawRect(x1, y1, x2 - x1, h);
+			return;
+		}
+
+		double bzf = view->buffer_zoom_factor;
 
 		if ((view->peak_mode == BufferBox::PEAK_MAXIMUM) or (view->peak_mode == BufferBox::PEAK_BOTH)){
-			double bzf = view->buffer_zoom_factor;
+			double _bzf = bzf;
 			int ll = l;
 			if (view->peak_mode == BufferBox::PEAK_BOTH){
 				color cc = col;
@@ -130,21 +140,21 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 				c->setColor(cc);
 				if (ll < b.peaks.num / 4){
 					ll ++;
-					bzf *= 2;
+					_bzf *= 2;
 				}
 			}else{
 				c->setColor(col);
 			}
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0r, b.peaks[ll*4-4], b.offset);
+			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0r, b.peaks[ll*4-4], b.offset);
 			if (!view->show_mono)
-				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0l, b.peaks[ll*4-3], b.offset);
+				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0l, b.peaks[ll*4-3], b.offset);
 		}
 
 		if ((view->peak_mode == BufferBox::PEAK_SQUAREMEAN) or (view->peak_mode == BufferBox::PEAK_BOTH)){
 			c->setColor(col);
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, view->buffer_zoom_factor, hf, x1, y0r, b.peaks[l*4-2], b.offset);
+			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0r, b.peaks[l*4-2], b.offset);
 			if (!view->show_mono)
-				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, view->buffer_zoom_factor, hf, x1, y0l, b.peaks[l*4-1], b.offset);
+				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0l, b.peaks[l*4-1], b.offset);
 		}
 	}else{
 		draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0r, b.c[0], b.offset);

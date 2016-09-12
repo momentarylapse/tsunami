@@ -15,7 +15,6 @@ class ActionTrack__GrowBufferBox : public Action
 {
 public:
 	ActionTrack__GrowBufferBox(Track *t, int _level_no, int _index, int _new_length);
-	virtual ~ActionTrack__GrowBufferBox();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

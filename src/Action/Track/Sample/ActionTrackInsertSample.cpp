@@ -12,8 +12,17 @@
 #include "../../../Data/Song.h"
 #include "../Midi/ActionTrackAddMidiNote.h"
 
-ActionTrackInsertSample::ActionTrackInsertSample(Song *s, int track_no, int index, int level_no)
+ActionTrackInsertSample::ActionTrackInsertSample(int _track_no, int _index, int _level_no)
 {
+	track_no = _track_no;
+	index = _index;
+	level_no = _level_no;
+}
+
+void ActionTrackInsertSample::build(Data *d)
+{
+	Song *s = dynamic_cast<Song*>(d);
+
 	Track *t = s->tracks[track_no];
 	SampleRef *sub = t->samples[index];
 	if (t->type == t->TYPE_AUDIO){

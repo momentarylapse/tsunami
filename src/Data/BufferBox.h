@@ -75,6 +75,10 @@ public:
 		PEAK_BOTH = 3,
 	};
 
+	static const int PEAK_CHUNK_EXP;
+	static const int PEAK_CHUNK_SIZE;
+	static const int PEAK_MAGIC_LEVEL4;
+
 	void _cdecl invalidate_peaks(const Range &r);
 	void _cdecl update_peaks();
 };

@@ -23,6 +23,8 @@ public:
 
 	virtual string name(){	return "-group-";	}
 
+	virtual void build(Data *d) = 0;
+
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 	virtual void redo(Data *d);

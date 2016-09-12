@@ -6,16 +6,21 @@
  */
 
 #include "Data.h"
+#include "../lib/threads/Mutex.h"
 
 Data::Data(const string &name) :
 	Observable(name)
 {
+	mutex = new Mutex;
 	action_manager = new ActionManager(this);
+	binary_file_format = true;
+	file_time = 0;
 }
 
 Data::~Data()
 {
 	delete(action_manager);
+	delete(mutex);
 }
 
 

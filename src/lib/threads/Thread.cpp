@@ -55,7 +55,14 @@ Thread::Thread()
 
 Thread::~Thread()
 {
-	__delete__();
+	kill();
+	for (int i=0;i<_Thread_List_.num;i++)
+		if (_Thread_List_[i] == this)
+			_Thread_List_.erase(i);
+	if (internal)
+		delete(internal);
+
+	//__delete__();
 }
 
 
@@ -68,12 +75,7 @@ void Thread::__init__()
 
 void Thread::__delete__()
 {
-	kill();
-	for (int i=0;i<_Thread_List_.num;i++)
-		if (_Thread_List_[i] == this)
-			_Thread_List_.erase(i);
-	if (internal)
-		delete(internal);
+	this->~Thread();
 }
 
 #ifdef OS_WINDOWS
@@ -183,8 +185,9 @@ Thread *Thread::getSelf()
 {
 	pthread_t s = pthread_self();
 	for (Thread *t : _Thread_List_)
-		if (t->internal->thread == s)
-			return t;
+		if (t->internal)
+			if (t->internal->thread == s)
+				return t;
 	return NULL;
 }
 

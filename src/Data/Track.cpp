@@ -10,6 +10,7 @@
 #include "../Audio/Synth/Synthesizer.h"
 #include "../Action/Track/Buffer/ActionTrackCreateBuffers.h"
 #include "../lib/hui/hui.h"
+#include "../lib/threads/Mutex.h"
 #include "../Action/Track/Data/ActionTrackEditName.h"
 #include "../Action/Track/Data/ActionTrackEditMuted.h"
 #include "../Action/Track/Data/ActionTrackEditVolume.h"
@@ -224,9 +225,12 @@ BufferBox Track::getBuffers(int level_no, const Range &r)
 
 void Track::updatePeaks()
 {
+	song->mutex->lock();
+	msg_write("Track.updatePeaks");
 	for (TrackLevel &l: levels)
 		for (BufferBox &b: l.buffers)
 			b.update_peaks();
+	song->mutex->unlock();
 }
 
 void Track::invalidateAllPeaks()

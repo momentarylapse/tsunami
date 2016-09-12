@@ -10,13 +10,20 @@
 
 #include "../../ActionGroup.h"
 
+#include "../../../Data/Rhythm.h"
+
 class Song;
-class BarPattern;
 
 class ActionSongAddBar : public ActionGroup
 {
 public:
-	ActionSongAddBar(Song *s, int index, BarPattern &Bar, bool affect_data);
+	ActionSongAddBar(int index, BarPattern &bar, bool affect_data);
+
+	virtual void build(Data *d);
+
+	int index;
+	BarPattern bar;
+	bool affect_data;
 };
 
 #endif /* ACTIONSONGADDBAR_H_ */

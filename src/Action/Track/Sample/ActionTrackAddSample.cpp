@@ -9,7 +9,7 @@
 
 #include "../../../Data/Song.h"
 
-ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, Sample* _sample)
+ActionTrackAddSample::ActionTrackAddSample(Track *t, int _pos, Sample *_sample)
 {
 	track_no = get_track_index(t);
 	pos = _pos;

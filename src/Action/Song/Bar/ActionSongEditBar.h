@@ -16,7 +16,13 @@ class Song;
 class ActionSongEditBar: public ActionGroup
 {
 public:
-	ActionSongEditBar(Song *s, int index, BarPattern &bar, bool affect_data);
+	ActionSongEditBar(int index, BarPattern &bar, bool affect_data);
+
+	virtual void build(Data *d);
+
+	int index;
+	BarPattern &bar;
+	bool affect_data;
 };
 
 #endif /* ACTIONSONGEDITBAR_H_ */

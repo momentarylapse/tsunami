@@ -16,6 +16,7 @@
 class ActionManager;
 class Action;
 class Observable;
+class Mutex;
 
 class Data : public Observable
 {
@@ -37,6 +38,8 @@ public:
 	bool binary_file_format;
 
 	ActionManager *action_manager;
+
+	Mutex *mutex;
 };
 
 #endif /* DATA_H_ */

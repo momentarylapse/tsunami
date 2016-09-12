@@ -11,9 +11,16 @@
 #include "../Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../../../Data/SongSelection.h"
 
-ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(Song *a, const SongSelection &sel, int level_no)
+ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelection &_sel, int _level_no) :
+	sel(_sel)
 {
-	for (Track *t : a->tracks)
+	level_no = _level_no;
+}
+
+void ActionTrackSampleFromSelection::build(Data *d)
+{
+	Song *s = dynamic_cast<Song*>(d);
+	for (Track *t: s->tracks)
 		if (sel.has(t))
 			CreateSubsFromTrack(t, sel, level_no);
 }
@@ -21,12 +28,11 @@ ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(Song *a, const So
 
 void ActionTrackSampleFromSelection::CreateSubsFromTrack(Track *t, const SongSelection &sel, int level_no)
 {
-	Song *a = t->song;
 	TrackLevel &l = t->levels[level_no];
 	foreachib(BufferBox &b, l.buffers, bi)
 		if (sel.range.covers(b.range())){
-			addSubAction(new ActionTrackPasteAsSample(t, b.offset, b), a);
+			addSubAction(new ActionTrackPasteAsSample(t, b.offset, b), t->song);
 
-			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, bi), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, bi), t->song);
 		}
 }

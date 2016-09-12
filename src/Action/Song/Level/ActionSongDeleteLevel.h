@@ -15,7 +15,11 @@ class Song;
 class ActionSongDeleteLevel : public ActionGroup
 {
 public:
-	ActionSongDeleteLevel(Song *s, int index);
+	ActionSongDeleteLevel(int index);
+
+	virtual void build(Data *d);
+
+	int index;
 };
 
 #endif /* SRC_ACTION_SONG_LEVEL_ACTIONSONGDELETELEVEL_H_ */

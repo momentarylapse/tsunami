@@ -10,6 +10,14 @@
 //#include <math.h>
 #include <assert.h>
 
+// peaks:
+// ...
+
+
+const int BufferBox::PEAK_CHUNK_EXP = 16;
+const int BufferBox::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
+const int BufferBox::PEAK_MAGIC_LEVEL4 = PEAK_CHUNK_EXP*4 - 8;
+
 SampleFormat format_for_bits(int bits)
 {
 	if (bits == 8)
@@ -494,7 +502,7 @@ Range BufferBox::range0() const
 void BufferBox::invalidate_peaks(const Range &_range)
 {
 	assert(range().covers(_range));
-	int i0 = _range.start() - offset;
+	/*int i0 = _range.start() - offset;
 	int i1 = _range.end() - offset;
 	int n = length;
 
@@ -516,7 +524,8 @@ void BufferBox::invalidate_peaks(const Range &_range)
 	for (int i=i0; i<i1; i++){
 		peaks[0][i] = 255;
 		peaks[1][i] = 255;
-	}
+	}*/
+	peaks.clear();
 	peaks_dirty = true;
 }
 
@@ -554,10 +563,76 @@ inline float fabsmax(float a, float b, float c, float d)
 	return max(max(a, b), max(c, d));
 }
 
-void BufferBox::update_peaks()
+void ensure_peak_size(BufferBox &buf, int level4, int n)
+{
+	if (buf.peaks.num < level4 + 4)
+		buf.peaks.resize(level4 + 4);
+	if (buf.peaks[level4].num < n){
+		//int n0 = buf.peaks[level4].num;
+		buf.peaks[level4    ].resize(n);
+		buf.peaks[level4 + 1].resize(n);
+		buf.peaks[level4 + 2].resize(n);
+		buf.peaks[level4 + 3].resize(n);
+		/*for (int i=n0; i<n; i++)
+			buf.peaks[level4][i] = buf.peaks[level4 + 1][i] = 255;*/
+	}
+}
+
+void update_peaks_chunk(BufferBox &buf, int index)
 {
 	// first level
-	if (peaks.num < 4)
+	int i0 = index * buf.PEAK_CHUNK_SIZE / 4;
+	int i1 = min(i0 + buf.PEAK_CHUNK_SIZE / 4, buf.length / 4);
+	int n = i1 - i0;
+
+	ensure_peak_size(buf, 0, i1);
+
+	msg_write(format("lvl0:  %d  %d     %d", i0, n, buf.peaks[0].num));
+
+	for (int i=i0; i<i1; i++){
+		for (int j=0; j<buf.channels; j++)
+			buf.peaks[j][i] = fabsmax(buf.c[j][i * 4], buf.c[j][i * 4 + 1], buf.c[j][i * 4 + 2], buf.c[j][i * 4 + 3]) * 254;
+		buf.peaks[2][i] = buf.peaks[0][i];
+		buf.peaks[3][i] = buf.peaks[1][i];
+	}
+
+	// higher levels
+	int level4 = 0;
+	while (n >= 2){
+		level4 += 4;
+		n = n / 2;
+		i0 = i0 / 2;
+		i1 = i0 + n;
+		ensure_peak_size(buf, level4, i1);
+
+		for (int i=i0; i<i1; i++){
+			buf.peaks[level4    ][i] = shrink_max(buf.peaks[level4 - 4][i * 2], buf.peaks[level4 - 4][i * 2 + 1]);
+			buf.peaks[level4 + 1][i] = shrink_max(buf.peaks[level4 - 3][i * 2], buf.peaks[level4 - 3][i * 2 + 1]);
+			buf.peaks[level4 + 2][i] = shrink_mean(buf.peaks[level4 - 2][i * 2], buf.peaks[level4 - 2][i * 2 + 1]);
+			buf.peaks[level4 + 3][i] = shrink_mean(buf.peaks[level4 - 1][i * 2], buf.peaks[level4 - 1][i * 2 + 1]);
+		}
+	}
+//	msg_write(format("%d  %d  %d", level4 / 4, buf.peaks.num / 4 - 1, n));
+}
+
+void BufferBox::update_peaks()
+{
+	int n = length / PEAK_CHUNK_SIZE;
+
+	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n);
+
+	for (int i=0; i<n; i++)
+		peaks[PEAK_MAGIC_LEVEL4][i] = 255;
+
+	for (int i=0; i<n; i++)
+		update_peaks_chunk(*this, i);
+
+
+	//for (int i=0; i<peaks.num; i+=4)
+	//	msg_write(format("%d   %d", i/4, peaks[i].num));
+
+	// first level
+/*	if (peaks.num < 4)
 		peaks.resize(4);
 	int n = length / 4;
 	int i0 = peaks[0].num;
@@ -597,6 +672,6 @@ void BufferBox::update_peaks()
 		}
 
 		level += 4;
-	}
+	}*/
 	peaks_dirty = false;
 }

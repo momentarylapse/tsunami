@@ -11,21 +11,27 @@
 #include "ActionTrack__DeleteEmpty.h"
 #include <assert.h>
 
-ActionTrackDelete::ActionTrackDelete(Song *a, int index)
+ActionTrackDelete::ActionTrackDelete(int _index)
 {
-	assert(index >= 0 and index < a->tracks.num);
+	index = _index;
+}
 
-	Track *t = a->tracks[index];
+void ActionTrackDelete::build(Data *d)
+{
+	Song *s = dynamic_cast<Song*>(d);
+	assert(index >= 0 and index < s->tracks.num);
+
+	Track *t = s->tracks[index];
 
 	// delete buffers
 	foreachi(TrackLevel &l, t->levels, li)
 		for (int i=l.buffers.num-1;i>=0;i--)
-			addSubAction(new ActionTrack__DeleteBufferBox(t, li, i), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, li, i), d);
 
 	// delete samples
 	for (int i=t->samples.num-1;i>=0;i--)
-		addSubAction(new ActionTrackDeleteSample(t, i), a);
+		addSubAction(new ActionTrackDeleteSample(t, i), d);
 
 	// delete the track itself
-	addSubAction(new ActionTrack__DeleteEmpty(index), a);
+	addSubAction(new ActionTrack__DeleteEmpty(index), d);
 }

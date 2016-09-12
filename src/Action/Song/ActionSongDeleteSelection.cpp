@@ -14,9 +14,18 @@
 #include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../../Data/SongSelection.h"
 
-ActionSongDeleteSelection::ActionSongDeleteSelection(Song *s, int level_no, const SongSelection &sel, bool all_levels)
+ActionSongDeleteSelection::ActionSongDeleteSelection(int _level_no, const SongSelection &_sel, bool _all_levels) :
+	sel(_sel)
 {
-	for (Track *t : s->tracks){
+	level_no = _level_no;
+	all_levels = _all_levels;
+}
+
+void ActionSongDeleteSelection::build(Data *d)
+{
+	msg_write("del sel.build");
+	Song *s = dynamic_cast<Song*>(d);
+	for (Track *t: s->tracks){
 		if (!sel.has(t))
 			continue;
 
@@ -33,17 +42,17 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(Song *s, int level_no, cons
 		// subs
 		for (int i=t->samples.num-1; i>=0; i--)
 			if (sel.has(t->samples[i]))
-				addSubAction(new ActionTrackDeleteSample(t, i), s);
+				addSubAction(new ActionTrackDeleteSample(t, i), d);
 
 		// midi
 		for (int i=t->midi.num-1; i>=0; i--)
 			if (sel.has(t->midi[i]))
-				addSubAction(new ActionTrackDeleteMidiNote(t, i), s);
+				addSubAction(new ActionTrackDeleteMidiNote(t, i), d);
 
 		// marker
 		for (int i=t->markers.num-1; i>=0; i--)
 			if (sel.has(t->markers[i]))
-				addSubAction(new ActionTrackDeleteMarker(t, i), s);
+				addSubAction(new ActionTrackDeleteMarker(t, i), d);
 	}
 }
 

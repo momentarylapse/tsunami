@@ -11,15 +11,30 @@
 #include "../../Song/Sample/ActionSongAddSample.h"
 #include "ActionTrackAddSample.h"
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, const BufferBox &buf)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const BufferBox &_buf)
 {
-	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", buf), t->song);
-	addSubAction(new ActionTrackAddSample(t, pos, sample), t->song);
+	t = _t;
+	pos = _pos;
+	buf = &_buf;
+	midi = NULL;
 }
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *t, int pos, const MidiData &midi)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const MidiData &_midi)
 {
-	Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", midi), t->song);
-	addSubAction(new ActionTrackAddSample(t, pos, sample), t->song);
+	t = _t;
+	pos = _pos;
+	buf = NULL;
+	midi = &_midi;
+}
+
+void ActionTrackPasteAsSample::build(Data *d)
+{
+	if (buf){
+		Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *buf), d);
+		addSubAction(new ActionTrackAddSample(t, pos, sample), d);
+	}else if (midi){
+		Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *midi), d);
+		addSubAction(new ActionTrackAddSample(t, pos, sample), d);
+	}
 }
 

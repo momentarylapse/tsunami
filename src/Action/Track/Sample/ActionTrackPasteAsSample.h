@@ -20,6 +20,13 @@ class ActionTrackPasteAsSample : public ActionGroup
 public:
 	ActionTrackPasteAsSample(Track *t, int pos, const BufferBox &buf);
 	ActionTrackPasteAsSample(Track *t, int pos, const MidiData &midi);
+
+	virtual void build(Data *d);
+
+	Track *t;
+	int pos;
+	const BufferBox *buf;
+	const MidiData *midi;
 };
 
 #endif /* ACTIONTRACKPASTEASSAMPLE_H_ */

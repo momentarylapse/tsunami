@@ -14,7 +14,6 @@ class ActionTrackAdd : public Action
 {
 public:
 	ActionTrackAdd(int _index, int _type);
-	virtual ~ActionTrackAdd();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

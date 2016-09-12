@@ -21,6 +21,7 @@
 #include "../Storage/Storage.h"
 #include "../Stuff/Log.h"
 #include "../View/AudioView.h"
+#include "../lib/threads/Mutex.h"
 #include <assert.h>
 #include <math.h>
 #include "Song.h"
@@ -368,15 +369,18 @@ void Song::updatePeaks()
 	debug_timer.reset();
 	for (Track *t: tracks)
 		t->updatePeaks();
-	for (Sample *s: samples)
+	for (Sample *s: samples){
+		mutex->lock();
 		s->buf.update_peaks();
+		mutex->unlock();
+	}
 	//msg_write(format("up %f", debug_timer.get()));
 }
 
 void Song::insertSelectedSamples(const SongSelection &sel, int level_no)
 {
 	if (sel.getNumSamples() > 0)
-		execute(new ActionTrackInsertSelectedSamples(this, sel, level_no));
+		execute(new ActionTrackInsertSelectedSamples(sel, level_no));
 }
 
 void Song::deleteSelectedSamples(const SongSelection &sel)
@@ -399,7 +403,7 @@ void Song::deleteLevel(int index)
 {
 	if (level_names.num < 2)
 		throw SongException(_("At least one level has to exist."));
-	execute(new ActionSongDeleteLevel(this, index));
+	execute(new ActionSongDeleteLevel(index));
 }
 
 void Song::mergeLevels(int source, int target)
@@ -408,7 +412,7 @@ void Song::mergeLevels(int source, int target)
 		throw SongException(_("At least one level has to exist."));
 	if (source == target)
 		throw SongException(_("Can't merge a level with itself."));
-	execute(new ActionSongMergeLevels(this, source, target));
+	execute(new ActionSongMergeLevels(source, target));
 }
 
 void Song::renameLevel(int index, const string &name)
@@ -420,7 +424,7 @@ void Song::deleteTrack(int index)
 {
 	if (tracks.num < 2)
 		throw SongException(_("At least one level has to exist."));
-	execute(new ActionTrackDelete(this, index));
+	execute(new ActionTrackDelete(index));
 }
 
 Sample *Song::addSample(const string &name, BufferBox &buf)
@@ -443,13 +447,13 @@ void Song::editSampleName(Sample *s, const string &name)
 void Song::deleteSelection(const SongSelection &sel, int level_no, bool all_levels)
 {
 	if (!sel.range.empty())
-		execute(new ActionSongDeleteSelection(this, level_no, sel, all_levels));
+		execute(new ActionSongDeleteSelection(level_no, sel, all_levels));
 }
 
 void Song::createSamplesFromSelection(const SongSelection &sel, int level_no)
 {
 	if (!sel.range.empty())
-		execute(new ActionTrackSampleFromSelection(this, sel, level_no));
+		execute(new ActionTrackSampleFromSelection(sel, level_no));
 }
 
 void Song::addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi)
@@ -460,9 +464,9 @@ void Song::addBar(int index, float bpm, int beats, int sub_beats, bool affect_mi
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		execute(new ActionSongAddBar(this, index, b, affect_midi));
+		execute(new ActionSongAddBar(index, b, affect_midi));
 	else
-		execute(new ActionSongAddBar(this, bars.num, b, affect_midi));
+		execute(new ActionSongAddBar(bars.num, b, affect_midi));
 }
 
 void Song::addPause(int index, float time, bool affect_midi)
@@ -473,19 +477,19 @@ void Song::addPause(int index, float time, bool affect_midi)
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)sample_rate * time);
 	if (index >= 0)
-		execute(new ActionSongAddBar(this, index, b, affect_midi));
+		execute(new ActionSongAddBar(index, b, affect_midi));
 	else
-		execute(new ActionSongAddBar(this, bars.num, b, affect_midi));
+		execute(new ActionSongAddBar(bars.num, b, affect_midi));
 }
 
 void Song::editBar(int index, BarPattern &p, bool affect_midi)
 {
-	execute(new ActionSongEditBar(this, index, p, affect_midi));
+	execute(new ActionSongEditBar(index, p, affect_midi));
 }
 
 void Song::deleteBar(int index, bool affect_midi)
 {
-	execute(new ActionSongDeleteBar(this, index, affect_midi));
+	execute(new ActionSongDeleteBar(index, affect_midi));
 }
 
 void Song::invalidateAllPeaks()

@@ -20,8 +20,10 @@ ActionGroup::~ActionGroup()
 
 void *ActionGroup::addSubAction(Action *a, Data *d)
 {
-	action.add(a);
-	return a->execute(d);
+	void *r = a->execute(d);
+	if (!a->is_trivial())
+		action.add(a);
+	return r;
 }
 
 // to be overwritten by subclasses
@@ -31,8 +33,7 @@ void *ActionGroup::execute_return(Data *d)
 
 void *ActionGroup::execute(Data *d)
 {
-	/*foreach(Action *a, action)
-		a->execute(d);*/
+	build(d);
 	return execute_return(d);
 }
 

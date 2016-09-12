@@ -12,13 +12,19 @@
 #include "../../../Data/Track.h"
 #include <assert.h>
 
-ActionSongEditBar::ActionSongEditBar(Song *s, int index, BarPattern &bar, bool affect_data)
+ActionSongEditBar::ActionSongEditBar(int _index, BarPattern &_bar, bool _affect_data) :
+	bar(_bar)
 {
-	Range r = Range(s->barOffset(index), s->bars[index].length);
-	addSubAction(new ActionSong__EditBar(index, bar), s);
-	if (affect_data){
-		addSubAction(new ActionSong__ScaleData(r, bar.length), s);
+	index = _index;
+	affect_data = _affect_data;
+}
 
-	}
+void ActionSongEditBar::build(Data *d)
+{
+	Song *s = dynamic_cast<Song*>(d);
+	Range r = Range(s->barOffset(index), s->bars[index].length);
+	addSubAction(new ActionSong__EditBar(index, bar), d);
+	if (affect_data)
+		addSubAction(new ActionSong__ScaleData(r, bar.length), d);
 }
 

@@ -15,7 +15,12 @@ class Song;
 class ActionSongDeleteBar: public ActionGroup
 {
 public:
-	ActionSongDeleteBar(Song *s, int index, bool affect_midi);
+	ActionSongDeleteBar(int index, bool affect_data);
+
+	virtual void build(Data *d);
+
+	int index;
+	bool affect_data;
 };
 
 #endif /* ACTIONSONGDELETEBAR_H_ */

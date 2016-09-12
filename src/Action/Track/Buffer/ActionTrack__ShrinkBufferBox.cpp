@@ -14,10 +14,7 @@ ActionTrack__ShrinkBufferBox::ActionTrack__ShrinkBufferBox(Track *t, int _level_
 	level_no = _level_no;
 	index = _index;
 	new_length = _length;
-}
-
-ActionTrack__ShrinkBufferBox::~ActionTrack__ShrinkBufferBox()
-{
+	old_length = 0;
 }
 
 void ActionTrack__ShrinkBufferBox::undo(Data *d)
@@ -54,7 +51,7 @@ void *ActionTrack__ShrinkBufferBox::execute(Data *d)
 	// shrink
 	b.resize(new_length);
 
-	return &t->levels[level_no].buffers[index];
+	return NULL;
 }
 
 

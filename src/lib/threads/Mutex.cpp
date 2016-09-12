@@ -1,5 +1,6 @@
 #include "../file/file.h"
 #include "Mutex.h"
+#include "Thread.h".h"
 
 #ifdef OS_WINDOWS
 	#include <windows.h>
@@ -69,12 +70,15 @@ void Mutex::__init__()
 
 void Mutex::lock()
 {
+	msg_write("lock...." + p2s(this) + "  " + p2s(Thread::getSelf()));
 	pthread_mutex_lock(&internal->mutex);
+	msg_write("  ok " + p2s(this) + "  " + p2s(Thread::getSelf()));
 }
 
 void Mutex::unlock()
 {
 	pthread_mutex_unlock(&internal->mutex);
+	msg_write("unlock " + p2s(this) + "  " + p2s(Thread::getSelf()));
 }
 #endif
 

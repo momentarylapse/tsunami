@@ -14,10 +14,7 @@ ActionTrack__GrowBufferBox::ActionTrack__GrowBufferBox(Track *t, int _level_no, 
 	level_no = _level_no;
 	index = _index;
 	new_length = _new_length;
-}
-
-ActionTrack__GrowBufferBox::~ActionTrack__GrowBufferBox()
-{
+	old_length = 0;
 }
 
 void *ActionTrack__GrowBufferBox::execute(Data *d)

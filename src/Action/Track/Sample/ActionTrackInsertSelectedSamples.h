@@ -15,7 +15,12 @@ class SongSelection;
 class ActionTrackInsertSelectedSamples : public ActionGroup
 {
 public:
-	ActionTrackInsertSelectedSamples(Song *a, const SongSelection &sel, int level_no);
+	ActionTrackInsertSelectedSamples(const SongSelection &sel, int level_no);
+
+	virtual void build(Data *d);
+
+	const SongSelection &sel;
+	int level_no;
 };
 
 #endif /* ACTIONTRACKINSERTSELECTEDSAMPLES_H_ */

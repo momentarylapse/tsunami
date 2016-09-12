@@ -11,11 +11,19 @@
 #include "../../../Data/SongSelection.h"
 #include "ActionTrackInsertSample.h"
 
-ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(Song *a, const SongSelection &sel, int level_no)
+ActionTrackInsertSelectedSamples::ActionTrackInsertSelectedSamples(const SongSelection &_sel, int _level_no) :
+	sel(_sel)
 {
-	foreachi(Track *t, a->tracks, ti)
-		foreachib(SampleRef *s, t->samples, si)
-			if (sel.has(s))
-				addSubAction(new ActionTrackInsertSample(a, ti, si, level_no), a);
+	level_no = _level_no;
+}
+
+void ActionTrackInsertSelectedSamples::build(Data *d)
+{
+	Song *s = dynamic_cast<Song*>(d);
+
+	foreachi(Track *t, s->tracks, ti)
+		foreachib(SampleRef *ss, t->samples, si)
+			if (sel.has(ss))
+				addSubAction(new ActionTrackInsertSample(ti, si, level_no), d);
 }
 

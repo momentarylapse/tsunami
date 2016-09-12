@@ -15,7 +15,11 @@ class Song;
 class ActionSongMergeLevels : public ActionGroup
 {
 public:
-	ActionSongMergeLevels(Song *s, int source, int target);
+	ActionSongMergeLevels(int source, int target);
+
+	virtual void build(Data *d);
+
+	int source, target;
 };
 
 #endif /* SRC_ACTION_SONG_LEVEL_ACTIONSONGMERGELEVELS_H_ */

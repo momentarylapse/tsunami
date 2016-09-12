@@ -17,10 +17,6 @@ ActionTrackAdd::ActionTrackAdd(int _index, int _type)
 	type = _type;
 }
 
-ActionTrackAdd::~ActionTrackAdd()
-{
-}
-
 void ActionTrackAdd::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);

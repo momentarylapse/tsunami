@@ -10,6 +10,7 @@
 #include "ActionMergable.h"
 #include "ActionGroup.h"
 #include "../Data/Data.h"
+#include "../lib/threads/Mutex.h"
 #include <assert.h>
 
 ActionManager::ActionManager(Data *_data)
@@ -26,7 +27,7 @@ ActionManager::~ActionManager()
 
 void ActionManager::reset()
 {
-	for (Action *a : action)
+	for (Action *a: action)
 		delete(a);
 	action.clear();
 	cur_pos = 0;
@@ -81,16 +82,16 @@ bool ActionManager::merge(Action *a)
 void *ActionManager::execute(Action *a)
 {
 	if (enabled){
-		if (a->is_trivial())
-			return NULL;
-
 		if (cur_group)
 			return cur_group->addSubAction(a, data);
 
-		add(a);
-		return action.back()->execute_and_notify(data);
-	}else
-		return a->execute(data);
+		void *r = a->execute_and_notify(data);
+		if (!a->is_trivial())
+			add(a);
+		return r;
+	}else{
+		return a->execute_and_notify(data);
+	}
 }
 
 
@@ -151,11 +152,16 @@ bool ActionManager::isEnabled()
 	return enabled;
 }
 
+class DummyActionGroup : public ActionGroup
+{
+	virtual void build(Data *d){}
+};
 
 void ActionManager::beginActionGroup()
 {
 	if (!cur_group){
-		cur_group = new ActionGroup;
+		cur_group = new DummyActionGroup;
+		data->mutex->lock();
 	}
 	cur_group_level ++;
 }
@@ -168,7 +174,10 @@ void ActionManager::endActionGroup()
 	if (cur_group_level == 0){
 		ActionGroup *g = cur_group;
 		cur_group = NULL;
-		execute(g);
+		//execute(g);
+		add(g);
+		data->notify();
+		data->mutex->unlock();
 	}
 }
 

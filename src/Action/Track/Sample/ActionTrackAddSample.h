@@ -17,14 +17,14 @@ class Track;
 class ActionTrackAddSample: public Action
 {
 public:
-	ActionTrackAddSample(Track *t, int pos, Sample* sample);
+	ActionTrackAddSample(Track *t, int pos, Sample *sample);
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);
 
 private:
 	int track_no;
-	Sample* sample;
+	Sample *sample;
 	int pos;
 };
 

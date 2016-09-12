@@ -29,7 +29,7 @@ ActionTrackMoveSample::ActionTrackMoveSample(Song *a, SongSelection &sel)
 void *ActionTrackMoveSample::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	for (SubSaveData &d : sub)
+	for (SubSaveData &d: sub)
 		a->get_sample_ref(d.track_no, d.sub_no)->pos = d.pos_old + param;
 	return NULL;
 }
@@ -46,7 +46,7 @@ void ActionTrackMoveSample::abort(Data *d)
 void ActionTrackMoveSample::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	for (SubSaveData &d : sub)
+	for (SubSaveData &d: sub)
 		a->get_sample_ref(d.track_no, d.sub_no)->pos = d.pos_old;
 }
 

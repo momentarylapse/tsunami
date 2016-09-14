@@ -16,7 +16,7 @@
 #include <vorbis/vorbisenc.h>
 
 
-const int CHUNK_SIZE = 1 << 15;
+const int CHUNK_SIZE = 1 << 16;
 
 
 
@@ -36,7 +36,6 @@ string tag_to_vorbis(const string &key)
 
 
 OggVorbis_File vf;
-char ogg_buffer[4096];
 
 FormatDescriptorOgg::FormatDescriptorOgg() :
 	FormatDescriptor("Ogg vorbis", "ogg", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_TAGS | FLAG_READ | FLAG_WRITE)
@@ -154,8 +153,7 @@ void FormatOgg::saveViaRenderer(StorageOperationData *od)
 
         /* While we can get enough data from the library to analyse, one
            block at a time... */
-        while(vorbis_analysis_blockout(&vd,&vb)==1)
-        {
+        while (vorbis_analysis_blockout(&vd,&vb) == 1){
 				//msg_write("b");
 
             /* Do the main analysis, creating a packet */
@@ -237,24 +235,39 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 	int current_section;
 	int read = 0;
 	int nn = 0;
-	while(true){
-		int toread = CHUNK_SIZE;
-		int r = ov_read(&vf, data, toread, 0, 2, 1, &current_section); // 0,2,1 = little endian, 16bit, signed
-		if (r == 0)
-			break;
-		else if (r < 0){
-			od->error("ov_read failed");
-			break;
-		}else{
-			int dsamples = r / 4;
-			int _offset = read / 4 + od->offset;
-			importData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, od->level);
-			read += r;
-			nn ++;
-			if (nn > 256){
-				od->set((float)read / (float)(samples * 4));
-				nn = 0;
+
+	while (true){
+
+		int chunk_read = 0;
+		bool error = false;
+		while (true){
+			int toread = CHUNK_SIZE - chunk_read;
+			int r = ov_read(&vf, &data[chunk_read], toread, 0, 2, 1, &current_section); // 0,2,1 = little endian, 16bit, signed
+			//msg_write(r);
+
+			if (r == 0){
+				break;
+			}else if (r < 0){
+				od->error("ov_read failed");
+				error = true;
+				break;
 			}
+			chunk_read += r;
+			if (chunk_read >= CHUNK_SIZE - 1024)
+				break;
+		}
+
+		if ((error) or (chunk_read == 0))
+			break;
+
+		int dsamples = chunk_read / 4;
+		int _offset = read / 4 + od->offset;
+		importData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, od->level);
+		read += chunk_read;
+		nn ++;
+		if (nn > 8){
+			od->set((float)read / (float)(samples * 4));
+			nn = 0;
 		}
 	}
 	delete[](data);

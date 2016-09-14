@@ -16,7 +16,6 @@ int flac_offset, flac_level;
 int flac_channels, flac_bits, flac_samples, flac_freq, flac_file_size;
 SampleFormat flac_format;
 int flac_read_samples;
-Track *flac_track;
 
 #include "../../Action/Track/Buffer/ActionTrackEditBuffer.h"
 
@@ -31,7 +30,7 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 		flac_read_samples = 0;
 	StorageOperationData *od = (StorageOperationData*)client_data;
 
-	if (frame->header.number.sample_number % 1024 == 0){
+	if (frame->header.number.sample_number % (1<<14) == 0){
 		if (flac_tells_samples)
 			od->set((float)(flac_read_samples / flac_channels) / (float)(flac_samples));
 		else // estimate... via increasingly compressed size
@@ -40,13 +39,19 @@ FLAC__StreamDecoderWriteStatus flac_write_callback(const FLAC__StreamDecoder *de
 
 	// read decoded PCM samples
 	Range range = Range(flac_read_samples + flac_offset, frame->header.blocksize);
-	BufferBox buf = flac_track->getBuffers(flac_level, range);
-	Action *a = new ActionTrackEditBuffer(flac_track, 0, range);
+	BufferBox buf = od->track->getBuffers(flac_level, range);
+
+	Action *a;
+	if (od->song->action_manager->isEnabled())
+		a = new ActionTrackEditBuffer(od->track, 0, range);
+
 	float scale = pow(2.0f, flac_bits-1);
 	for (int i=0;i<(int)frame->header.blocksize;i++)
 		for (int j=0;j<flac_channels;j++)
 			buf.c[j][i] = buffer[j][i] / scale;
-	flac_track->song->execute(a);
+
+	if (od->song->action_manager->isEnabled())
+		od->song->execute(a);
 
 	flac_read_samples += frame->header.blocksize;
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
@@ -63,11 +68,12 @@ void flac_metadata_callback(const FLAC__StreamDecoder *decoder, const FLAC__Stre
 		flac_channels = metadata->data.stream_info.channels;
 		//printf("%d %d %d %d\n", flac_channels, flac_bits, (int)flac_samples, flac_freq);
 	}else if (metadata->type == FLAC__METADATA_TYPE_VORBIS_COMMENT){
+		StorageOperationData *od = (StorageOperationData*)client_data;
 		for (int i=0;i<(int)metadata->data.vorbis_comment.num_comments;i++){
 			string s = (char*)metadata->data.vorbis_comment.comments[i].entry;
 			int pos = s.find("=");
 			if (pos >= 0)
-				flac_track->song->addTag(tag_from_vorbis(s.head(pos)), s.tail(s.num - pos - 1));
+				od->song->addTag(tag_from_vorbis(s.head(pos)), s.tail(s.num - pos - 1));
 		}
 	}else{
 		StorageOperationData *od = (StorageOperationData*)client_data;
@@ -104,7 +110,6 @@ void FormatFlac::loadTrack(StorageOperationData *od)
 		flac_level = od->level;
 		flac_offset = od->offset;
 		flac_read_samples = 0;
-		flac_track = t;
 		//bits = channels = samples = freq = 0;
 
 		decoder = FLAC__stream_decoder_new();

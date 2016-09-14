@@ -226,7 +226,6 @@ BufferBox Track::getBuffers(int level_no, const Range &r)
 void Track::updatePeaks()
 {
 	//song->mutex->lock();
-	msg_write("Track.updatePeaks");
 	for (TrackLevel &l: levels)
 		for (BufferBox &b: l.buffers)
 			b.update_peaks();

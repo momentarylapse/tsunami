@@ -64,6 +64,8 @@ public:
 	}
 	virtual void _cdecl onRun()
 	{
+		msg_write("  run");
+		//HuiSleep(0.1f);
 		view->song->updatePeaks();
 		while(recheck){
 			printf("----recheck!!!!!\n");
@@ -448,6 +450,7 @@ void AudioView::onMouseWheel()
 
 void AudioView::forceRedraw()
 {
+	msg_write("force redraw");
 	force_redraw = true;
 	win->redraw("area");
 }
@@ -522,6 +525,7 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool sh
 
 void AudioView::checkConsistency()
 {
+	msg_write("check");
 	// check cur_track consistency
 	int n = get_track_index_save(song, cur_track);
 	if (cur_track and (n < 0))
@@ -533,11 +537,12 @@ void AudioView::checkConsistency()
 		cur_level = 0;
 		forceRedraw();
 	}
+	msg_write("/check");
 }
 
 void AudioView::onUpdate(Observable *o, const string &message)
 {
-	//msg_write("AudioView: " + o->getName() + " / " + message);
+	msg_write("AudioView: " + o->getName() + " / " + message);
 	checkConsistency();
 
 	if (o == song){
@@ -551,12 +556,13 @@ void AudioView::onUpdate(Observable *o, const string &message)
 		}else{
 			if ((message == song->MESSAGE_ADD_TRACK) or (message == song->MESSAGE_DELETE_TRACK))
 				updateTracks();
-			forceRedraw();
-			updateMenu();
+			//forceRedraw();
+			//updateMenu();
 		}
 
 		if (message == song->MESSAGE_CHANGE)
-			updatePeaks();
+			if (song->action_manager->isEnabled())
+				updatePeaks();
 	}else if (o == stream){
 		if (stream->isPlaying())
 			cam.makeSampleVisible(stream->getPos());
@@ -568,6 +574,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 	}else{
 		forceRedraw();
 	}
+	msg_write("/notify");
 }
 
 void AudioView::updateTracks()
@@ -693,6 +700,7 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 void AudioView::drawAudioFile(Painter *c, const rect &r)
 {
 	area = r;
+	msg_write("draw");
 
 	bool repeat = thm.update(this, song, r);
 	updateBufferZoom();
@@ -792,13 +800,13 @@ void AudioView::updatePeaks()
 	is_updating_peaks = true;
 	peak_thread->run();
 	for (int i=0; i<1; i++){
-		if (peak_thread->isDone())
+		if (peak_thread->isDone()){
+			msg_write("   done!");
+			forceRedraw();
 			break;
-		else
+		}else
 			HuiSleep(0.001f);
 	}
-
-	forceRedraw();
 }
 
 void AudioView::setPeaksMode(int mode)

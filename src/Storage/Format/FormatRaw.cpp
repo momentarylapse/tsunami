@@ -73,7 +73,6 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 		int byte_per_sample = (format_get_bits(config.format) / 8) * config.channels;
 		long long size = f->GetSize64() - config.offset;
 		//int samples = size / byte_per_sample;
-		od->set(0.1f);
 
 		if (config.offset > 0)
 			f->ReadBuffer(data, config.offset);
@@ -86,9 +85,7 @@ void FormatRaw::loadTrack(StorageOperationData *od)
 			int r = f->ReadBuffer(data, toread);
 			nn ++;
 			if (nn > 16){
-				float perc_read = 0.1f;
-				float dperc_read = 0.9f;
-				od->set(perc_read + dperc_read * (float)read / (float)size);
+				od->set((float)read / (float)size);
 				nn = 0;
 			}
 			if (r > 0){

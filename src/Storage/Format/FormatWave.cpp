@@ -10,7 +10,7 @@
 #include "../../Audio/Renderer/AudioRenderer.h"
 
 
-const int WAVE_BUFFER_SIZE = 1 << 15;
+const int WAVE_BUFFER_SIZE = 1 << 16;
 
 FormatDescriptorWave::FormatDescriptorWave() :
 	FormatDescriptor("Wave", "wav,wave", FLAG_AUDIO | FLAG_SINGLE_TRACK | FLAG_READ | FLAG_WRITE)

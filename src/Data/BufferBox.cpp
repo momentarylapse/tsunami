@@ -135,8 +135,6 @@ void BufferBox::resize(int _length)
 {
 	if (_length < length)
 		truncate_peaks(*this, _length);
-		//peak.clear();
-		//invalidate_peaks(Range(offset + _length, length - _length));
 	for (int i=0; i<channels; i++)
 		c[i].resize(_length);
 	length = _length;
@@ -228,6 +226,8 @@ void BufferBox::scale(float volume, float panning)
 	for (int j=0; j<channels; j++)
 		for (int i=0;i<length;i++)
 			c[j][i] *= f[j];
+
+	peaks.clear();
 }
 
 void BufferBox::add(const BufferBox &b, int _offset, float volume, float panning)
@@ -253,6 +253,7 @@ void BufferBox::add(const BufferBox &b, int _offset, float volume, float panning
 			for (int i=i0;i<i1;i++)
 				c[j][i + _offset] += b.c[j][i] * f[j];
 	}
+	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
 }
 
 void BufferBox::set(const BufferBox &b, int _offset, float volume)
@@ -562,7 +563,7 @@ void update_peaks_chunk(BufferBox &buf, int index)
 
 	ensure_peak_size(buf, 0, i1);
 
-	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, buf.peaks[0].num, index));
+	msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, buf.peaks[0].num, index));
 
 	for (int i=i0; i<i1; i++){
 		for (int j=0; j<buf.channels; j++)

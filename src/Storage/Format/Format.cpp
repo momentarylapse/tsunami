@@ -63,14 +63,25 @@ Format::Format()
 
 void Format::importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level)
 {
-	BufferBox buf = t->getBuffers(level, Range(offset, samples));
+	if (t->song->action_manager->isEnabled()){
+		BufferBox buf = t->getBuffers(level, Range(offset, samples));
 
-	Action *a;
-	if (t->song->action_manager->isEnabled())
-		a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
-	buf.import(data, channels, format, samples);
-	if (t->song->action_manager->isEnabled())
+		Action *a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
+		buf.import(data, channels, format, samples);
 		t->song->action_manager->execute(a);
+	}else{
+		if (t->levels[0].buffers.num == 0){
+			BufferBox dummy;
+			t->levels[0].buffers.add(dummy);
+		}
+
+		if (t->levels[0].buffers[0].length < offset + samples)
+			t->levels[0].buffers[0].resize(offset + samples);
+		BufferBox buf;
+		buf.set_as_ref(t->levels[0].buffers[0], offset, samples);
+
+		buf.import(data, channels, format, samples);
+	}
 }
 
 /*void Format::exportAsTrack(StorageOperationData *od)

@@ -118,11 +118,25 @@ void BufferBox::clear()
 	peaks_dirty = false;
 }
 
+void truncate_peaks(BufferBox &buf, int length)
+{
+	int level4 = 0;
+	length /= 4;
+	while(level4 < buf.peaks.num){
+		for (int k=0; k<4; k++)
+			buf.peaks[level4 + k].resize(length);
+		level4 += 4;
+		length /= 2;
+	}
+
+}
+
 void BufferBox::resize(int _length)
 {
 	if (_length < length)
+		truncate_peaks(*this, _length);
 		//peak.clear();
-		invalidate_peaks(Range(offset + _length, length - _length));
+		//invalidate_peaks(Range(offset + _length, length - _length));
 	for (int i=0; i<channels; i++)
 		c[i].resize(_length);
 	length = _length;
@@ -502,56 +516,16 @@ Range BufferBox::range0() const
 void BufferBox::invalidate_peaks(const Range &_range)
 {
 	assert(range().covers(_range));
-	/*int i0 = _range.start() - offset;
-	int i1 = _range.end() - offset;
-	int n = length;
 
-	if (peaks.num < 4)
-		peaks.resize(4);
-
-	n /= 4;
-	i0 /= 4;
-	i1 = min(i1 / 4 + 1, n);
-	//msg_write(format("inval %d  %d-%d", n, i0, i1));
-
-	for (int k=0;k<2;k++)
-		if (peaks[k].num < i1){
-			int n0 = peaks[k].num;
-			peaks[k].resize(i1);
-			for (int i=n0; i<i0; i++)
-				peaks[k][i] = 255;
-		}
-	for (int i=i0; i<i1; i++){
-		peaks[0][i] = 255;
-		peaks[1][i] = 255;
-	}*/
-	peaks.clear();
 	peaks_dirty = true;
-}
-
-inline void find_update_peak_range(string &p0, string &p1, int &i0, int &i1, int n)
-{
-	i0 = p0.num;
-	i1 = n;
-	//msg_write("t");
-	bool found = false;
-	for (int i=0;i<p0.num;i++)
-		if (p0[i] == 255){
-			//msg_write(format("i0: %d (%d)", i, p0[i]));
-			i0 = i;
-			found = true;
-			break;
-		}
-
-	if (!found or (p0.num < n))
+	if (peaks.num < PEAK_MAGIC_LEVEL4)
 		return;
 
-	for (int i=n-1;i>i0;i--)
-		if (p0[i] == 255){
-			//msg_write(format("i1: %d (%d)", i, p0[i]));
-			i1 = i + 1;
-			break;
-		}
+	int i0 = (_range.start() - offset) / 4;
+	int i1 = min((_range.end() - offset + 1) / 4, peaks[PEAK_MAGIC_LEVEL4].num);
+
+	for (int i=i0; i<i1; i++)
+		peaks[PEAK_MAGIC_LEVEL4][i] = 255;
 }
 
 inline float fabsmax(float a, float b, float c, float d)
@@ -563,18 +537,19 @@ inline float fabsmax(float a, float b, float c, float d)
 	return max(max(a, b), max(c, d));
 }
 
-void ensure_peak_size(BufferBox &buf, int level4, int n)
+void ensure_peak_size(BufferBox &buf, int level4, int n, bool set_invalid = false)
 {
 	if (buf.peaks.num < level4 + 4)
 		buf.peaks.resize(level4 + 4);
 	if (buf.peaks[level4].num < n){
-		//int n0 = buf.peaks[level4].num;
+		int n0 = buf.peaks[level4].num;
 		buf.peaks[level4    ].resize(n);
 		buf.peaks[level4 + 1].resize(n);
 		buf.peaks[level4 + 2].resize(n);
 		buf.peaks[level4 + 3].resize(n);
-		/*for (int i=n0; i<n; i++)
-			buf.peaks[level4][i] = buf.peaks[level4 + 1][i] = 255;*/
+		if (set_invalid)
+			for (int i=n0; i<n; i++)
+				buf.peaks[level4][i] = buf.peaks[level4 + 1][i] = 255;
 	}
 }
 
@@ -587,7 +562,7 @@ void update_peaks_chunk(BufferBox &buf, int index)
 
 	ensure_peak_size(buf, 0, i1);
 
-	msg_write(format("lvl0:  %d  %d     %d", i0, n, buf.peaks[0].num));
+	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, buf.peaks[0].num, index));
 
 	for (int i=i0; i<i1; i++){
 		for (int j=0; j<buf.channels; j++)
@@ -596,7 +571,7 @@ void update_peaks_chunk(BufferBox &buf, int index)
 		buf.peaks[3][i] = buf.peaks[1][i];
 	}
 
-	// higher levels
+	// medium levels
 	int level4 = 0;
 	while (n >= 2){
 		level4 += 4;
@@ -612,66 +587,36 @@ void update_peaks_chunk(BufferBox &buf, int index)
 			buf.peaks[level4 + 3][i] = shrink_mean(buf.peaks[level4 - 1][i * 2], buf.peaks[level4 - 1][i * 2 + 1]);
 		}
 	}
-//	msg_write(format("%d  %d  %d", level4 / 4, buf.peaks.num / 4 - 1, n));
+	//	msg_write(format("%d  %d  %d", level4 / 4, buf.peaks.num / 4 - 1, n));
+	if (n == 0)
+		return;
+
+	// high levels
+	for (int k=0; k<32; k++){
+		if ((index & (1<<k)) == 0)
+			break;
+
+		level4 += 4;
+		i0 = i0 / 2;
+		ensure_peak_size(buf, level4, i0 + 1);
+
+		buf.peaks[level4    ][i0] = shrink_max(buf.peaks[level4 - 4][i0 * 2], buf.peaks[level4 - 4][i0 * 2 + 1]);
+		buf.peaks[level4 + 1][i0] = shrink_max(buf.peaks[level4 - 3][i0 * 2], buf.peaks[level4 - 3][i0 * 2 + 1]);
+		buf.peaks[level4 + 2][i0] = shrink_mean(buf.peaks[level4 - 2][i0 * 2], buf.peaks[level4 - 2][i0 * 2 + 1]);
+		buf.peaks[level4 + 3][i0] = shrink_mean(buf.peaks[level4 - 1][i0 * 2], buf.peaks[level4 - 1][i0 * 2 + 1]);
+	}
 }
 
 void BufferBox::update_peaks()
 {
 	int n = length / PEAK_CHUNK_SIZE;
 
-	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n);
+	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n, true);
 
 	for (int i=0; i<n; i++)
-		peaks[PEAK_MAGIC_LEVEL4][i] = 255;
-
-	for (int i=0; i<n; i++)
-		update_peaks_chunk(*this, i);
+		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255)
+			update_peaks_chunk(*this, i);
 
 
-	//for (int i=0; i<peaks.num; i+=4)
-	//	msg_write(format("%d   %d", i/4, peaks[i].num));
-
-	// first level
-/*	if (peaks.num < 4)
-		peaks.resize(4);
-	int n = length / 4;
-	int i0 = peaks[0].num;
-	int i1 = n;
-	if (peaks_dirty){
-		find_update_peak_range(peaks[0], peaks[1], i0, i1, n);
-	}
-	peaks[0].resize(n);
-	peaks[1].resize(n);
-	peaks[2].resize(n);
-	peaks[3].resize(n);
-	//msg_write(format("  %d %d   %d  %d", i0, i1, channels, peaks.num));
-	for (int i=i0;i<i1;i++){
-		for (int j=0; j<channels; j++)
-			peaks[j][i] = fabsmax(c[j][i * 4], c[j][i * 4 + 1], c[j][i * 4 + 2], c[j][i * 4 + 3]) * 254;
-		peaks[2][i] = peaks[0][i];
-		peaks[3][i] = peaks[1][i];
-	}
-
-	// higher levels
-	int level = 4;
-	while (n > 4){
-		n = (n - 1) / 2;
-		i0 = max((i0 - 1) / 2, 0);
-		i1 = min((i1 + 1) / 2, n);
-		if (peaks.num < level + 4)
-			peaks.resize(level + 4);
-		peaks[level    ].resize(n);
-		peaks[level + 1].resize(n);
-		peaks[level + 2].resize(n);
-		peaks[level + 3].resize(n);
-		for (int i=i0;i<i1;i++){
-			peaks[level    ][i] = shrink_max(peaks[level - 4][i * 2], peaks[level - 4][i * 2 + 1]);
-			peaks[level + 1][i] = shrink_max(peaks[level - 3][i * 2], peaks[level - 3][i * 2 + 1]);
-			peaks[level + 2][i] = shrink_mean(peaks[level - 2][i * 2], peaks[level - 2][i * 2 + 1]);
-			peaks[level + 3][i] = shrink_mean(peaks[level - 1][i * 2], peaks[level - 1][i * 2 + 1]);
-		}
-
-		level += 4;
-	}*/
 	peaks_dirty = false;
 }

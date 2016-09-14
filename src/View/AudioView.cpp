@@ -537,6 +537,7 @@ void AudioView::checkConsistency()
 
 void AudioView::onUpdate(Observable *o, const string &message)
 {
+	//msg_write("AudioView: " + o->getName() + " / " + message);
 	checkConsistency();
 
 	if (o == song){
@@ -790,7 +791,7 @@ void AudioView::updatePeaks()
 	}
 	is_updating_peaks = true;
 	peak_thread->run();
-	for (int i=0; i<10; i++){
+	for (int i=0; i<1; i++){
 		if (peak_thread->isDone())
 			break;
 		else

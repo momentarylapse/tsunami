@@ -370,9 +370,9 @@ void Song::updatePeaks()
 	for (Track *t: tracks)
 		t->updatePeaks();
 	for (Sample *s: samples){
-		mutex->lock();
+		//mutex->lock();
 		s->buf.update_peaks();
-		mutex->unlock();
+		//mutex->unlock();
 	}
 	//msg_write(format("up %f", debug_timer.get()));
 }

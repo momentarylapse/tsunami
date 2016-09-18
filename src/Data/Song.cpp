@@ -372,7 +372,7 @@ void Song::updatePeaks()
 	for (Sample *s: samples){
 		//s->buf.update_peaks();
 	}
-	msg_write(format("up %f", debug_timer.get()));
+	//msg_write(format("up %f", debug_timer.get()));
 }
 
 void Song::insertSelectedSamples(const SongSelection &sel, int level_no)

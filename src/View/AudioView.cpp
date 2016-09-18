@@ -58,28 +58,21 @@ class PeakThread : public Thread
 {
 public:
 	AudioView *view;
-	bool recheck;
 	PeakThread(AudioView *_view)
 	{
 		view = _view;
-		recheck = false;
 	}
 	virtual void _cdecl onRun()
 	{
-		msg_write("  run");
+		//msg_write("  run");
 		//HuiSleep(0.1f);
 		view->song->updatePeaks();
-		while(recheck){
-			printf("----recheck!!!!!\n");
-			recheck = false;
-			view->song->updatePeaks();
-		}
 		view->is_updating_peaks = false;
 	}
-	virtual void _cdecl onCancel()
+	/*virtual void _cdecl onCancel()
 	{
 		msg_error("onCancel!!!");
-	}
+	}*/
 };
 
 // make shadows thicker
@@ -456,7 +449,7 @@ void AudioView::onMouseWheel()
 
 void AudioView::forceRedraw()
 {
-	msg_write("force redraw");
+	//msg_write("force redraw");
 	force_redraw = true;
 	win->redraw("area");
 }
@@ -546,7 +539,7 @@ void AudioView::checkConsistency()
 
 void AudioView::onUpdate(Observable *o, const string &message)
 {
-	msg_write("AudioView: " + o->getName() + " / " + message);
+	//msg_write("AudioView: " + o->getName() + " / " + message);
 	checkConsistency();
 
 	if (o == song){
@@ -705,7 +698,7 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 void AudioView::drawAudioFile(Painter *c, const rect &r)
 {
 	area = r;
-	msg_write("draw");
+	//msg_write("draw");
 
 	bool repeat = thm.update(this, song, r);
 	bool repeat_fast = repeat;
@@ -799,9 +792,9 @@ void AudioView::updateMenu()
 
 void AudioView::updatePeaks()
 {
-	msg_write("-------------------- view update peaks");
+	//msg_write("-------------------- view update peaks");
 	if (is_updating_peaks){
-		msg_error("   already updating peaks...");
+		//msg_error("   already updating peaks...");
 		delete(peak_thread);
 		peak_thread = new PeakThread(this);
 	}
@@ -809,7 +802,6 @@ void AudioView::updatePeaks()
 	peak_thread->run();
 	for (int i=0; i<5; i++){
 		if (peak_thread->isDone()){
-			msg_write("   done!");
 			forceRedraw();
 			break;
 		}else

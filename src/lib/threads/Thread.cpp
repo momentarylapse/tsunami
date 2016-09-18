@@ -172,11 +172,8 @@ void Thread::run()
 void Thread::kill()
 {
 	if (running){
-		msg_write("-------cancel");
 		pthread_cancel(internal->thread);
-		msg_write("-------join");
 		pthread_join(internal->thread, NULL);
-		msg_write("-------ok");
 		//pthread_detach(internal->thread);
 	}
 	running = false;

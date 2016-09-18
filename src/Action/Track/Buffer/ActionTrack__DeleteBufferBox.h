@@ -15,7 +15,6 @@ class ActionTrack__DeleteBufferBox : public Action
 {
 public:
 	ActionTrack__DeleteBufferBox(Track *t, int level_no, int _index);
-	virtual ~ActionTrack__DeleteBufferBox();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

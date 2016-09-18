@@ -15,10 +15,6 @@ ActionTrack__DeleteBufferBox::ActionTrack__DeleteBufferBox(Track *t, int _level_
 	level_no = _level_no;
 }
 
-ActionTrack__DeleteBufferBox::~ActionTrack__DeleteBufferBox()
-{
-}
-
 
 
 void ActionTrack__DeleteBufferBox::undo(Data *d)

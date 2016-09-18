@@ -70,16 +70,16 @@ void Mutex::__init__()
 
 void Mutex::lock()
 {
-	msg_write("lock " + p2s(Thread::getSelf()));
+	//msg_write("lock " + p2s(Thread::getSelf()));
 	pthread_mutex_lock(&internal->mutex);
-	msg_write("   ok " + p2s(Thread::getSelf()));
+	//msg_write("   ok " + p2s(Thread::getSelf()));
 }
 
 bool Mutex::tryLock()
 {
 	if (pthread_mutex_trylock(&internal->mutex) == 0){
-		msg_write("lock " + p2s(Thread::getSelf()));
-		msg_write("   ok " + p2s(Thread::getSelf()));
+		//msg_write("lock " + p2s(Thread::getSelf()));
+		//msg_write("   ok " + p2s(Thread::getSelf()));
 		return true;
 	}
 	return false;
@@ -87,7 +87,7 @@ bool Mutex::tryLock()
 
 void Mutex::unlock()
 {
-	msg_write("unlock " + p2s(Thread::getSelf()));
+	//msg_write("unlock " + p2s(Thread::getSelf()));
 	pthread_mutex_unlock(&internal->mutex);
 }
 #endif

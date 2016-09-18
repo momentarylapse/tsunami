@@ -10,6 +10,13 @@
 //#include <math.h>
 #include <assert.h>
 
+
+
+#include "../Tsunami.h"
+#include "Song.h"
+#include "../lib/threads/Thread.h"
+#include "../lib/threads/Mutex.h"
+
 // peaks:
 // ...
 
@@ -73,7 +80,6 @@ BufferBox::BufferBox()
 	offset = 0;
 	length = 0;
 	channels = 2;
-	peaks_dirty = false;
 }
 
 BufferBox::BufferBox(const BufferBox &b)
@@ -83,7 +89,6 @@ BufferBox::BufferBox(const BufferBox &b)
 	channels = b.channels;
 	for (int i=0; i<channels; i++)
 		c[i] = b.c[i];
-	peaks_dirty = true;
 }
 
 void BufferBox::__init__()
@@ -104,7 +109,6 @@ void BufferBox::operator=(const BufferBox &b)
 	for (int i=0; i<channels; i++)
 		c[i] = b.c[i];
 	peaks = b.peaks;
-	peaks_dirty = b.peaks_dirty;
 }
 
 BufferBox::~BufferBox()
@@ -117,7 +121,6 @@ void BufferBox::clear()
 		c[i].clear();
 	length = 0;
 	peaks.clear();
-	peaks_dirty = false;
 }
 
 void truncate_peaks(BufferBox &buf, int length)
@@ -537,7 +540,6 @@ void BufferBox::invalidate_peaks(const Range &_range)
 {
 	assert(range().covers(_range));
 
-	peaks_dirty = true;
 	if (peaks.num < PEAK_MAGIC_LEVEL4)
 		return;
 
@@ -634,11 +636,6 @@ void update_peaks_chunk(BufferBox &buf, int index)
 	}
 }
 
-#include "../Tsunami.h"
-#include "Song.h"
-#include "../lib/threads/Thread.h"
-#include "../lib/threads/Mutex.h"
-
 void BufferBox::update_peaks()
 {
 	if (!_shrink_table_created)
@@ -647,7 +644,6 @@ void BufferBox::update_peaks()
 	int n = length / PEAK_CHUNK_SIZE;
 
 	tsunami->song->mutex->lock();
-	peaks_dirty = false;
 	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP; i++)
 		ensure_peak_size(*this, (i - PEAK_OFFSET_EXP) * 4, length >> i, false);
 	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n, true);
@@ -657,20 +653,13 @@ void BufferBox::update_peaks()
 
 	for (int i=0; i<n; i++)
 		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255){
-			msg_write("a");
 			while (!tsunami->song->mutex->tryLock()){
-				msg_write("...");
 				Thread::cancelationPoint();
 				HuiSleep(0.01f);
-			}
-			if (peaks_dirty){
-				tsunami->song->mutex->unlock();
-				throw string("peaks...");
 			}
 			update_peaks_chunk(*this, i);
 			tsunami->song->mutex->unlock();
 
-			msg_write("b");
 			Thread::cancelationPoint();
 		}
 }

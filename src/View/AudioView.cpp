@@ -462,13 +462,13 @@ void AudioView::unselectAllSamples()
 
 void AudioView::updateBufferZoom()
 {
-	prefered_buffer_level = 0;
+	prefered_buffer_level = -1;
 	buffer_zoom_factor = 1.0;
 
 	// which level of detail?
-	if (cam.scale < 0.8f)
+	if (cam.scale < 0.2f)
 		for (int i=24-1;i>=0;i--){
-			double _f = pow(2, (double)i);
+			double _f = (double)(1 << (i + BufferBox::PEAK_OFFSET_EXP));
 			if (_f > 1.0 / cam.scale){
 				prefered_buffer_level = i;
 				buffer_zoom_factor = _f;
@@ -525,7 +525,6 @@ void AudioView::drawGridTime(Painter *c, const rect &r, const color &bg, bool sh
 
 void AudioView::checkConsistency()
 {
-	msg_write("check");
 	// check cur_track consistency
 	int n = get_track_index_save(song, cur_track);
 	if (cur_track and (n < 0))
@@ -537,15 +536,15 @@ void AudioView::checkConsistency()
 		cur_level = 0;
 		forceRedraw();
 	}
-	msg_write("/check");
 }
 
 void AudioView::onUpdate(Observable *o, const string &message)
 {
-	msg_write("AudioView: " + o->getName() + " / " + message);
+	//msg_write("AudioView: " + o->getName() + " / " + message);
 	checkConsistency();
 
 	if (o == song){
+
 		if (message == song->MESSAGE_NEW){
 			updateTracks();
 			sel.range = sel_raw = Range(0, 0);
@@ -556,8 +555,8 @@ void AudioView::onUpdate(Observable *o, const string &message)
 		}else{
 			if ((message == song->MESSAGE_ADD_TRACK) or (message == song->MESSAGE_DELETE_TRACK))
 				updateTracks();
-			//forceRedraw();
-			//updateMenu();
+			forceRedraw();
+			updateMenu();
 		}
 
 		if (message == song->MESSAGE_CHANGE)
@@ -574,7 +573,7 @@ void AudioView::onUpdate(Observable *o, const string &message)
 	}else{
 		forceRedraw();
 	}
-	msg_write("/notify");
+	//msg_write("/notify");
 }
 
 void AudioView::updateTracks()
@@ -703,13 +702,14 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 	msg_write("draw");
 
 	bool repeat = thm.update(this, song, r);
+	bool repeat_fast = repeat;
 	updateBufferZoom();
 
 	// background
 	drawBackground(c, r);
 
 	// tracks
-	for (AudioViewTrack *t : vtrack)
+	for (AudioViewTrack *t: vtrack)
 		t->draw(c);
 
 	// capturing preview
@@ -740,7 +740,7 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 	repeat |= is_updating_peaks;
 
 	if (repeat)
-		HuiRunLaterM(0.03f, this, &AudioView::forceRedraw);
+		HuiRunLaterM(repeat_fast ? 0.03f : 0.2f, this, &AudioView::forceRedraw);
 }
 
 int frame=0;
@@ -794,6 +794,7 @@ void AudioView::updateMenu()
 void AudioView::updatePeaks()
 {
 	if (is_updating_peaks){
+		msg_error("   already updating peaks...");
 		peak_thread->recheck = true;
 		return;
 	}

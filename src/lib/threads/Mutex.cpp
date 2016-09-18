@@ -70,11 +70,14 @@ void Mutex::__init__()
 
 void Mutex::lock()
 {
+	msg_write("lock " + p2s(Thread::getSelf()));
 	pthread_mutex_lock(&internal->mutex);
+	msg_write("   ok " + p2s(Thread::getSelf()));
 }
 
 void Mutex::unlock()
 {
+	msg_write("unlock " + p2s(Thread::getSelf()));
 	pthread_mutex_unlock(&internal->mutex);
 }
 #endif

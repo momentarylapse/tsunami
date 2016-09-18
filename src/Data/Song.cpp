@@ -370,11 +370,9 @@ void Song::updatePeaks()
 	for (Track *t: tracks)
 		t->updatePeaks();
 	for (Sample *s: samples){
-		//mutex->lock();
-		s->buf.update_peaks();
-		//mutex->unlock();
+		//s->buf.update_peaks();
 	}
-	//msg_write(format("up %f", debug_timer.get()));
+	msg_write(format("up %f", debug_timer.get()));
 }
 
 void Song::insertSelectedSamples(const SongSelection &sel, int level_no)
@@ -497,7 +495,7 @@ void Song::invalidateAllPeaks()
 	for (Track *t: tracks)
 		t->invalidateAllPeaks();
 	for (Sample *s: samples)
-		s->buf.invalidate_peaks(s->buf.range());
+		s->buf.peaks.clear();
 }
 
 Track *Song::get_track(int track_no)

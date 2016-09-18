@@ -30,12 +30,12 @@ void Action::undo_and_notify(Data *d)
 
 void *Action::execute_and_notify(Data *d)
 {
-//	d->mutex->lock();
+	d->mutex->lock();
 	//d->notifyBegin();
 	void *r = execute(d);
 	d->notify(d->MESSAGE_CHANGE);
 	//d->notifyEnd();
-//	d->mutex->unlock();
+	d->mutex->unlock();
 	return r;
 }
 

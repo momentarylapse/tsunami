@@ -225,18 +225,16 @@ BufferBox Track::getBuffers(int level_no, const Range &r)
 
 void Track::updatePeaks()
 {
-	//song->mutex->lock();
 	for (TrackLevel &l: levels)
 		for (BufferBox &b: l.buffers)
 			b.update_peaks();
-	//song->mutex->unlock();
 }
 
 void Track::invalidateAllPeaks()
 {
 	for (TrackLevel &l: levels)
 		for (BufferBox &b: l.buffers)
-			b.invalidate_peaks(b.range());
+			b.peaks.clear();
 }
 
 SampleRef *Track::addSampleRef(int pos, Sample* sample)

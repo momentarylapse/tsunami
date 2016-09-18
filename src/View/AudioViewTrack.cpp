@@ -91,9 +91,6 @@ inline void draw_peak_buffer(Painter *c, int width, int di, double view_pos_rel,
 	c->drawPolygon(tt);
 }
 
-extern const int PEAK_CHUNK_SIZE;
-extern const int PEAK_MAGIC_LEVEL4;
-
 void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, const color &col)
 {
 	float w = area.width();
@@ -116,14 +113,14 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 	c->setColor(col);
 
 	//int l = min(view->prefered_buffer_level - 1, b.peaks.num / 4);
-	int l = view->prefered_buffer_level - 1;
-	if (l >= 1){
+	int l = view->prefered_buffer_level * 4;
+	if (l >= 0){
 		double bzf = view->buffer_zoom_factor;
 
 
 		// no peaks yet? -> show dummy
-		if (b.peaks.num < l*4){
-			c->setColor(Red);
+		if (b.peaks.num < l){
+			c->setColor(ColorInterpolate(col, Red, 0.3f));
 			c->drawRect((b.offset - view_pos_rel) * view->cam.scale, y1, b.length * view->cam.scale, h);
 			return;
 		}
@@ -136,24 +133,24 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 				color cc = col;
 				cc.a *= 0.3f;
 				c->setColor(cc);
-				if (ll < b.peaks.num / 4){
-					ll ++;
+				if (ll + 4 < b.peaks.num){
+					ll += 4;
 					_bzf *= 2;
 				}
 			}else{
 				c->setColor(col);
 			}
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0r, b.peaks[ll*4-4], b.offset);
+			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0r, b.peaks[ll], b.offset);
 			if (!view->show_mono)
-				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0l, b.peaks[ll*4-3], b.offset);
+				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0l, b.peaks[ll+1], b.offset);
 		}
 
 		// mean square
 		if ((view->peak_mode == BufferBox::PEAK_SQUAREMEAN) or (view->peak_mode == BufferBox::PEAK_BOTH)){
 			c->setColor(col);
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0r, b.peaks[l*4-2], b.offset);
+			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0r, b.peaks[l+2], b.offset);
 			if (!view->show_mono)
-				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0l, b.peaks[l*4-1], b.offset);
+				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0l, b.peaks[l+3], b.offset);
 		}
 
 
@@ -161,8 +158,7 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 		int nn = b.length / b.PEAK_CHUNK_SIZE;
 		for (int i=0; i<nn; i++){
 			if (b.peaks[b.PEAK_MAGIC_LEVEL4][i] == 255){
-				c->setColor(col);
-				c->setColor(Red);
+				c->setColor(ColorInterpolate(col, Red, 0.3f));
 				float x1 = max((float)view->cam.sample2screen(b.offset + i*b.PEAK_CHUNK_SIZE), 0.0f);
 				float x2 = min((float)view->cam.sample2screen(b.offset + (i+1)*b.PEAK_CHUNK_SIZE), w);
 				c->drawRect(x1, y1, x2 - x1, h);

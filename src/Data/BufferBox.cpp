@@ -16,7 +16,9 @@
 
 const int BufferBox::PEAK_CHUNK_EXP = 16;
 const int BufferBox::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
-const int BufferBox::PEAK_MAGIC_LEVEL4 = PEAK_CHUNK_EXP*4 - 8;
+const int BufferBox::PEAK_OFFSET_EXP = 3;
+const int BufferBox::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
+const int BufferBox::PEAK_MAGIC_LEVEL4 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP)*4;
 
 SampleFormat format_for_bits(int bits)
 {
@@ -121,7 +123,7 @@ void BufferBox::clear()
 void truncate_peaks(BufferBox &buf, int length)
 {
 	int level4 = 0;
-	length /= 4;
+	length /= buf.PEAK_FINEST_SIZE;
 	while(level4 < buf.peaks.num){
 		for (int k=0; k<4; k++)
 			buf.peaks[level4 + k].resize(length);
@@ -511,8 +513,25 @@ Range BufferBox::range0() const
 	return Range(0, length);
 }
 
+unsigned char inline _shrink_mean(unsigned char a, unsigned char b)
+{
+	return (unsigned char)(sqrt(((float)a * (float)a + (float)b * (float)b) / 2));
+}
+
+static bool _shrink_table_created = false;
+static unsigned char _shrink_mean_table[256][256];
+
+static void update_shrink_table()
+{
+	for (int a=0; a<256; a++)
+		for (int b=0; b<256; b++)
+			_shrink_mean_table[a][b] = _shrink_mean(a, b);
+			_shrink_table_created = true;
+}
+
 #define shrink_max(a, b)	max((a), (b))
-#define shrink_mean(a, b)	(unsigned char)(sqrt(((float)(a) * (float)(a) + (float)(b) * (float)(b)) / 2))
+unsigned char inline shrink_mean(unsigned char a, unsigned char b)
+{	return _shrink_mean_table[a][b];	}
 
 void BufferBox::invalidate_peaks(const Range &_range)
 {
@@ -529,13 +548,17 @@ void BufferBox::invalidate_peaks(const Range &_range)
 		peaks[PEAK_MAGIC_LEVEL4][i] = 255;
 }
 
-inline float fabsmax(float a, float b, float c, float d)
+inline float fabsmax(float *p)
 {
-	a = fabs(a);
-	b = fabs(b);
-	c = fabs(c);
-	d = fabs(d);
-	return max(max(a, b), max(c, d));
+	float a = fabs(*p ++);
+	float b = fabs(*p ++);
+	float c = fabs(*p ++);
+	float d = fabs(*p ++);
+	float e = fabs(*p ++);
+	float f = fabs(*p ++);
+	float g = fabs(*p ++);
+	float h = fabs(*p ++);
+	return max(max(max(a, b), max(c, d)), max(max(e, f), max(g, h)));
 }
 
 void ensure_peak_size(BufferBox &buf, int level4, int n, bool set_invalid = false)
@@ -557,8 +580,8 @@ void ensure_peak_size(BufferBox &buf, int level4, int n, bool set_invalid = fals
 void update_peaks_chunk(BufferBox &buf, int index)
 {
 	// first level
-	int i0 = index * buf.PEAK_CHUNK_SIZE / 4;
-	int i1 = min(i0 + buf.PEAK_CHUNK_SIZE / 4, buf.length / 4);
+	int i0 = index * buf.PEAK_CHUNK_SIZE / buf.PEAK_FINEST_SIZE;
+	int i1 = min(i0 + buf.PEAK_CHUNK_SIZE / buf.PEAK_FINEST_SIZE, buf.length / buf.PEAK_FINEST_SIZE);
 	int n = i1 - i0;
 
 	ensure_peak_size(buf, 0, i1);
@@ -567,7 +590,7 @@ void update_peaks_chunk(BufferBox &buf, int index)
 
 	for (int i=i0; i<i1; i++){
 		for (int j=0; j<buf.channels; j++)
-			buf.peaks[j][i] = fabsmax(buf.c[j][i * 4], buf.c[j][i * 4 + 1], buf.c[j][i * 4 + 2], buf.c[j][i * 4 + 3]) * 254;
+			buf.peaks[j][i] = fabsmax(&buf.c[j][i * buf.PEAK_FINEST_SIZE]) * 254;
 		buf.peaks[2][i] = buf.peaks[0][i];
 		buf.peaks[3][i] = buf.peaks[1][i];
 	}
@@ -608,15 +631,30 @@ void update_peaks_chunk(BufferBox &buf, int index)
 	}
 }
 
+#include "../Tsunami.h"
+#include "Song.h"
+#include "../lib/threads/Mutex.h"
+
 void BufferBox::update_peaks()
 {
+	if (!_shrink_table_created)
+		update_shrink_table();
+
 	int n = length / PEAK_CHUNK_SIZE;
 
+//	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP-1; i++)
+//		ensure_peak_size(*this, (i - PEAK_OFFSET_EXP) * 4, length >> i, false);
 	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n, true);
 
 	for (int i=0; i<n; i++)
-		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255)
+		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255){
+			tsunami->song->mutex->lock();
 			update_peaks_chunk(*this, i);
+			tsunami->song->mutex->unlock();
+		}
+
+	for (int i=0; i<peaks.num; i+=4)
+		msg_write(format("--- %d  %d", i, peaks[i].num));
 
 
 	peaks_dirty = false;

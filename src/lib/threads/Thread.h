@@ -22,6 +22,7 @@ public:
 	void _cdecl join();
 
 	virtual void _cdecl onRun(){}// = 0;
+	virtual void _cdecl onCancel(){}
 
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
@@ -35,6 +36,7 @@ public:
 
 	static void _cdecl exit();
 	static Thread *_cdecl getSelf();
+	static void cancelationPoint();
 };
 
 

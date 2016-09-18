@@ -136,12 +136,22 @@ Thread *Thread::getSelf()
 #endif
 #ifdef OS_LINUX
 
-
-static void *thread_start_func(void *p)
+static void __thread_cleanup_func(void *p)
 {
 	Thread *t = (Thread*)p;
+	t->onCancel();
+}
+
+static void *__thread_start_func(void *p)
+{
+	Thread *t = (Thread*)p;
+
+	pthread_cleanup_push(&__thread_cleanup_func, p);
+
 	t->onRun();
 	t->running = false;
+
+    pthread_cleanup_pop(0);
 	return NULL;
 }
 
@@ -152,7 +162,7 @@ void Thread::run()
 	if (!internal)
 		internal = new ThreadInternal;
 	running = true;
-	int ret = pthread_create(&internal->thread, NULL, &thread_start_func, (void*)this);
+	int ret = pthread_create(&internal->thread, NULL, &__thread_start_func, (void*)this);
 
 	if (ret != 0)
 		running = false;
@@ -162,9 +172,12 @@ void Thread::run()
 void Thread::kill()
 {
 	if (running){
+		msg_write("-------cancel");
 		pthread_cancel(internal->thread);
-		//pthread_join(internal->thread, NULL);
-		pthread_detach(internal->thread);
+		msg_write("-------join");
+		pthread_join(internal->thread, NULL);
+		msg_write("-------ok");
+		//pthread_detach(internal->thread);
 	}
 	running = false;
 }
@@ -189,6 +202,11 @@ Thread *Thread::getSelf()
 			if (t->internal->thread == s)
 				return t;
 	return NULL;
+}
+
+void Thread::cancelationPoint()
+{
+	pthread_testcancel();
 }
 
 

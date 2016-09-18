@@ -16,6 +16,7 @@ public:
 	Mutex();
 	~Mutex();
 	void _cdecl lock();
+	bool _cdecl tryLock();
 	void _cdecl unlock();
 
 	void _cdecl __init__();

@@ -23,6 +23,8 @@
 #include "../lib/threads/Thread.h"
 #include "Mode/ViewModeScaleBars.h"
 
+#include "../lib/threads/Mutex.h"
+
 const int AudioView::FONT_SIZE = 10;
 const int AudioView::MAX_TRACK_CHANNEL_HEIGHT = 125;
 const float AudioView::LINE_WIDTH = 1.0f;
@@ -73,6 +75,10 @@ public:
 			view->song->updatePeaks();
 		}
 		view->is_updating_peaks = false;
+	}
+	virtual void _cdecl onCancel()
+	{
+		msg_error("onCancel!!!");
 	}
 };
 
@@ -540,7 +546,7 @@ void AudioView::checkConsistency()
 
 void AudioView::onUpdate(Observable *o, const string &message)
 {
-	//msg_write("AudioView: " + o->getName() + " / " + message);
+	msg_write("AudioView: " + o->getName() + " / " + message);
 	checkConsistency();
 
 	if (o == song){
@@ -793,14 +799,15 @@ void AudioView::updateMenu()
 
 void AudioView::updatePeaks()
 {
+	msg_write("-------------------- view update peaks");
 	if (is_updating_peaks){
 		msg_error("   already updating peaks...");
-		peak_thread->recheck = true;
-		return;
+		delete(peak_thread);
+		peak_thread = new PeakThread(this);
 	}
 	is_updating_peaks = true;
 	peak_thread->run();
-	for (int i=0; i<1; i++){
+	for (int i=0; i<5; i++){
 		if (peak_thread->isDone()){
 			msg_write("   done!");
 			forceRedraw();

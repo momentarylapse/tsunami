@@ -384,8 +384,8 @@ void Song::insertSelectedSamples(const SongSelection &sel, int level_no)
 void Song::deleteSelectedSamples(const SongSelection &sel)
 {
 	action_manager->beginActionGroup();
-	foreachi(Track *t, tracks, i){
-		for (int j=t->samples.num-1;j>=0;j--)
+	for(Track *t: tracks){
+		for (int j=t->samples.num-1; j>=0; j--)
 			if (sel.has(t->samples[j]))
 				t->deleteSampleRef(j);
 	}

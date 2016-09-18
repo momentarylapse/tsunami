@@ -14,7 +14,7 @@
 // ...
 
 
-const int BufferBox::PEAK_CHUNK_EXP = 16;
+const int BufferBox::PEAK_CHUNK_EXP = 18;
 const int BufferBox::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
 const int BufferBox::PEAK_OFFSET_EXP = 3;
 const int BufferBox::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
@@ -586,14 +586,14 @@ void update_peaks_chunk(BufferBox &buf, int index)
 
 	ensure_peak_size(buf, 0, i1);
 
-	msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, buf.peaks[0].num, index));
+	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, buf.peaks[0].num, index));
 
-	for (int i=i0; i<i1; i++){
-		for (int j=0; j<buf.channels; j++)
+	for (int j=0; j<buf.channels; j++){
+		for (int i=i0; i<i1; i++)
 			buf.peaks[j][i] = fabsmax(&buf.c[j][i * buf.PEAK_FINEST_SIZE]) * 254;
-		buf.peaks[2][i] = buf.peaks[0][i];
-		buf.peaks[3][i] = buf.peaks[1][i];
 	}
+	memcpy(&buf.peaks[2][i0], &buf.peaks[0][i0], n);
+	memcpy(&buf.peaks[3][i0], &buf.peaks[1][i0], n);
 
 	// medium levels
 	int level4 = 0;
@@ -604,13 +604,16 @@ void update_peaks_chunk(BufferBox &buf, int index)
 		i1 = i0 + n;
 		ensure_peak_size(buf, level4, i1);
 
-		for (int i=i0; i<i1; i++){
+		for (int i=i0; i<i1; i++)
 			buf.peaks[level4    ][i] = shrink_max(buf.peaks[level4 - 4][i * 2], buf.peaks[level4 - 4][i * 2 + 1]);
+		for (int i=i0; i<i1; i++)
 			buf.peaks[level4 + 1][i] = shrink_max(buf.peaks[level4 - 3][i * 2], buf.peaks[level4 - 3][i * 2 + 1]);
+		for (int i=i0; i<i1; i++)
 			buf.peaks[level4 + 2][i] = shrink_mean(buf.peaks[level4 - 2][i * 2], buf.peaks[level4 - 2][i * 2 + 1]);
+		for (int i=i0; i<i1; i++)
 			buf.peaks[level4 + 3][i] = shrink_mean(buf.peaks[level4 - 1][i * 2], buf.peaks[level4 - 1][i * 2 + 1]);
-		}
 	}
+
 	//	msg_write(format("%d  %d  %d", level4 / 4, buf.peaks.num / 4 - 1, n));
 	if (n == 0)
 		return;
@@ -633,6 +636,7 @@ void update_peaks_chunk(BufferBox &buf, int index)
 
 #include "../Tsunami.h"
 #include "Song.h"
+#include "../lib/threads/Thread.h"
 #include "../lib/threads/Mutex.h"
 
 void BufferBox::update_peaks()
@@ -642,20 +646,31 @@ void BufferBox::update_peaks()
 
 	int n = length / PEAK_CHUNK_SIZE;
 
-//	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP-1; i++)
-//		ensure_peak_size(*this, (i - PEAK_OFFSET_EXP) * 4, length >> i, false);
+	tsunami->song->mutex->lock();
+	peaks_dirty = false;
+	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP; i++)
+		ensure_peak_size(*this, (i - PEAK_OFFSET_EXP) * 4, length >> i, false);
 	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n, true);
+	tsunami->song->mutex->unlock();
+
+	Thread::cancelationPoint();
 
 	for (int i=0; i<n; i++)
 		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255){
-			tsunami->song->mutex->lock();
+			msg_write("a");
+			while (!tsunami->song->mutex->tryLock()){
+				msg_write("...");
+				Thread::cancelationPoint();
+				HuiSleep(0.01f);
+			}
+			if (peaks_dirty){
+				tsunami->song->mutex->unlock();
+				throw string("peaks...");
+			}
 			update_peaks_chunk(*this, i);
 			tsunami->song->mutex->unlock();
+
+			msg_write("b");
+			Thread::cancelationPoint();
 		}
-
-	for (int i=0; i<peaks.num; i+=4)
-		msg_write(format("--- %d  %d", i, peaks[i].num));
-
-
-	peaks_dirty = false;
 }

@@ -15,7 +15,6 @@ class ActionTrackEditBuffer : public Action
 {
 public:
 	ActionTrackEditBuffer(Track *t, int _level_no, Range _range);
-	virtual ~ActionTrackEditBuffer();
 
 	virtual void *execute(Data *d);
 	virtual void undo(Data *d);

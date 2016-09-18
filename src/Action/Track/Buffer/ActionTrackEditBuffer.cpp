@@ -27,10 +27,6 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(Track *t, int _level_no, Range _ran
 	box.set(b, 0, 1.0f);
 }
 
-ActionTrackEditBuffer::~ActionTrackEditBuffer()
-{
-}
-
 
 
 void ActionTrackEditBuffer::undo(Data *d)

@@ -88,9 +88,12 @@ void *ActionManager::execute(Action *a)
 		void *r = a->execute_and_notify(data);
 		if (!a->is_trivial())
 			add(a);
+		data->notify();
 		return r;
 	}else{
-		return a->execute_and_notify(data);
+		void *r = a->execute_and_notify(data);
+		data->notify();
+		return r;
 	}
 }
 
@@ -101,8 +104,10 @@ void ActionManager::undo()
 	if (!enabled)
 		return;
 
-	if (undoable())
+	if (undoable()){
 		action[-- cur_pos]->undo_and_notify(data);
+		data->notify();
+	}
 }
 
 
@@ -112,8 +117,10 @@ void ActionManager::redo()
 	if (!enabled)
 		return;
 
-	if (redoable())
+	if (redoable()){
 		action[cur_pos ++]->redo_and_notify(data);
+		data->notify();
+	}
 }
 
 bool ActionManager::undoable()

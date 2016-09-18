@@ -572,7 +572,6 @@ void AudioView::onUpdate(Observable *o, const string &message)
 	}else{
 		forceRedraw();
 	}
-	//msg_write("/notify");
 }
 
 void AudioView::updateTracks()

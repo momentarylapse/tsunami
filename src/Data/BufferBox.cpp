@@ -21,7 +21,7 @@
 // ...
 
 
-const int BufferBox::PEAK_CHUNK_EXP = 18;
+const int BufferBox::PEAK_CHUNK_EXP = 15;
 const int BufferBox::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
 const int BufferBox::PEAK_OFFSET_EXP = 3;
 const int BufferBox::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;

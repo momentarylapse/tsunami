@@ -11,7 +11,6 @@
 Data::Data(const string &name) :
 	Observable(name)
 {
-	mutex = new Mutex;
 	action_manager = new ActionManager(this);
 	binary_file_format = true;
 	file_time = 0;
@@ -20,7 +19,6 @@ Data::Data(const string &name) :
 Data::~Data()
 {
 	delete(action_manager);
-	delete(mutex);
 }
 
 
@@ -49,6 +47,22 @@ void *Data::execute(Action *a)
 void Data::resetHistory()
 {
 	action_manager->reset();
+}
+
+// "low level" -> don't use ActionManager.lock()!
+void Data::lock()
+{
+	action_manager->mutex->lock();
+}
+
+bool Data::try_lock()
+{
+	return action_manager->mutex->tryLock();
+}
+
+void Data::unlock()
+{
+	action_manager->mutex->unlock();
 }
 
 

@@ -15,7 +15,6 @@
 #include "../Tsunami.h"
 #include "Song.h"
 #include "../lib/threads/Thread.h"
-#include "../lib/threads/Mutex.h"
 
 // peaks:
 // ...
@@ -643,22 +642,22 @@ void BufferBox::update_peaks()
 
 	int n = length / PEAK_CHUNK_SIZE;
 
-	tsunami->song->mutex->lock();
+	tsunami->song->lock();
 	for (int i=PEAK_OFFSET_EXP; i<PEAK_CHUNK_EXP; i++)
 		ensure_peak_size(*this, (i - PEAK_OFFSET_EXP) * 4, length >> i, false);
 	ensure_peak_size(*this, PEAK_MAGIC_LEVEL4, n, true);
-	tsunami->song->mutex->unlock();
+	tsunami->song->unlock();
 
 	Thread::cancelationPoint();
 
 	for (int i=0; i<n; i++)
 		if (peaks[PEAK_MAGIC_LEVEL4][i] == 255){
-			while (!tsunami->song->mutex->tryLock()){
+			while (!tsunami->song->try_lock()){
 				Thread::cancelationPoint();
 				HuiSleep(0.01f);
 			}
 			update_peaks_chunk(*this, i);
-			tsunami->song->mutex->unlock();
+			tsunami->song->unlock();
 
 			Thread::cancelationPoint();
 		}

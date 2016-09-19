@@ -17,12 +17,15 @@ ActionManager::ActionManager(Data *_data)
 {
 	data = _data;
 	cur_group = NULL;
+	lock_level = 0;
+	mutex = new Mutex;
 	reset();
 }
 
 ActionManager::~ActionManager()
 {
 	reset();
+	delete(mutex);
 }
 
 void ActionManager::reset()
@@ -81,58 +84,58 @@ bool ActionManager::merge(Action *a)
 
 void *ActionManager::execute(Action *a)
 {
-	if (enabled){
-		if (cur_group)
-			return cur_group->addSubAction(a, data);
+	if (cur_group)
+		return cur_group->addSubAction(a, data);
 
-		void *r = a->execute_and_notify(data);
-		if (!a->is_trivial())
-			add(a);
-		data->notify();
-		return r;
-	}else{
-		void *r = a->execute_and_notify(data);
-		data->notify();
-		return r;
-	}
+	lock();
+	void *r = a->execute(data);
+	unlock();
+
+	if (enabled and !a->is_trivial())
+		add(a);
+
+	data->notify();
+	return r;
 }
 
 
 
 void ActionManager::undo()
 {
-	if (!enabled)
+	if (!undoable())
 		return;
 
-	if (undoable()){
-		action[-- cur_pos]->undo_and_notify(data);
-		data->notify();
-	}
+	lock();
+	action[-- cur_pos]->undo(data);
+	unlock();
+
+	data->notify();
 }
 
 
 
 void ActionManager::redo()
 {
-	if (!enabled)
+	if (!redoable())
 		return;
 
-	if (redoable()){
-		action[cur_pos ++]->redo_and_notify(data);
-		data->notify();
-	}
+	lock();
+	action[cur_pos ++]->redo(data);
+	unlock();
+
+	data->notify();
 }
 
 bool ActionManager::undoable()
 {
-	return (cur_pos > 0);
+	return enabled and (cur_pos > 0);
 }
 
 
 
 bool ActionManager::redoable()
 {
-	return (cur_pos < action.num);
+	return enabled and (cur_pos < action.num);
 }
 
 
@@ -168,7 +171,7 @@ void ActionManager::beginActionGroup()
 {
 	if (!cur_group){
 		cur_group = new DummyActionGroup;
-		data->mutex->lock();
+		lock();
 	}
 	cur_group_level ++;
 }
@@ -184,7 +187,21 @@ void ActionManager::endActionGroup()
 		//execute(g);
 		add(g);
 		data->notify();
-		data->mutex->unlock();
+		unlock();
 	}
+}
+
+void ActionManager::lock()
+{
+	if (lock_level == 0)
+		mutex->lock();
+	lock_level ++;
+}
+
+void ActionManager::unlock()
+{
+	lock_level --;
+	if (lock_level == 0)
+		mutex->unlock();
 }
 

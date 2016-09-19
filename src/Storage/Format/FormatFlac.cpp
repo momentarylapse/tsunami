@@ -218,7 +218,7 @@ void FormatFlac::saveViaRenderer(StorageOperationData *od)
 			throw string("initializing encoder: ") + FLAC__StreamEncoderInitStatusString[init_status];
 
 		// read blocks of samples from WAVE file and feed to encoder
-		float scale = pow(2.0f, bits-1);
+		float scale = (float)(1 << (bits-1));
 		BufferBox buf;
 		buf.resize(FLAC_READSIZE);
 		while (r->readResize(buf)){

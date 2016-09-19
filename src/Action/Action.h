@@ -15,18 +15,14 @@ class Data;
 class Action
 {
 public:
-	Action();
-	virtual ~Action();
+	Action(){}
+	virtual ~Action(){}
 
 	virtual void *execute(Data *d) = 0;
 	virtual void undo(Data *d) = 0;
 	virtual void redo(Data *d);
 
 	virtual bool is_trivial(){ return false; }
-
-	void *execute_and_notify(Data *d);
-	void undo_and_notify(Data *d);
-	void redo_and_notify(Data *d);
 };
 
 #endif /* ACTION_H_ */

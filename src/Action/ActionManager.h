@@ -16,9 +16,11 @@
 class Data;
 class Action;
 class ActionGroup;
+class Mutex;
 
 class ActionManager
 {
+	friend class Data;
 public:
 	ActionManager(Data *_data);
 	virtual ~ActionManager();
@@ -50,11 +52,19 @@ private:
 	int cur_level;
 	bool enabled;
 
+	// mutex
+	void lock();
+	void unlock();
+	int lock_level;
+
 	// group
 	int cur_group_level;
 	ActionGroup *cur_group;
 
+	// for merging
 	HuiTimer timer;
+
+	Mutex *mutex;
 };
 
 #endif /* ACTIONMANAGER_H_ */

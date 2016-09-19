@@ -16,7 +16,6 @@
 class ActionManager;
 class Action;
 class Observable;
-class Mutex;
 
 class Data : public Observable
 {
@@ -39,7 +38,9 @@ public:
 
 	ActionManager *action_manager;
 
-	Mutex *mutex;
+	void lock();
+	bool try_lock();
+	void unlock();
 };
 
 #endif /* DATA_H_ */

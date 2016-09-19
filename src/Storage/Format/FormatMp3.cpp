@@ -163,7 +163,7 @@ void FormatMp3::loadTrack(StorageOperationData *od)
 
 		if (system("which avconv") == 0){
 			string tmp = "/tmp/tsunami_mp3_out.wav";
-			system(("avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
+			system(("yes | avconv -i \"" + od->filename + "\" \"" + tmp + "\"").c_str());
 			od->storage->loadTrack(t, tmp, od->offset, od->level);
 			od->storage->current_directory = od->filename.dirname();
 			file_delete(tmp);

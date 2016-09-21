@@ -124,6 +124,9 @@ void InputStreamMidi::setDevice(Device *d)
 		return;// true;
 
 #ifdef DEVICE_MIDI_ALSA
+	if (!device_manager->handle)
+		return;
+
 	snd_seq_addr_t sender, dest;
 	sender.client = device->client;
 	sender.port = device->port;

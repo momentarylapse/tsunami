@@ -241,6 +241,10 @@ void DeviceManager::update_devices()
 void DeviceManager::update_midi_devices()
 {
 #ifdef DEVICE_MIDI_ALSA
+
+	if (!handle)
+		return;
+
 	for (Device *d: midi_input_devices){
 		d->present_old = d->present;
 		d->present = false;

@@ -369,9 +369,8 @@ void Song::updatePeaks()
 	debug_timer.reset();
 	for (Track *t: tracks)
 		t->updatePeaks();
-	for (Sample *s: samples){
-		//s->buf.update_peaks();
-	}
+	for (Sample *s: samples)
+		s->buf.update_peaks();
 	//msg_write(format("up %f", debug_timer.get()));
 }
 
@@ -384,7 +383,7 @@ void Song::insertSelectedSamples(const SongSelection &sel, int level_no)
 void Song::deleteSelectedSamples(const SongSelection &sel)
 {
 	action_manager->beginActionGroup();
-	for(Track *t: tracks){
+	for (Track *t: tracks){
 		for (int j=t->samples.num-1; j>=0; j--)
 			if (sel.has(t->samples[j]))
 				t->deleteSampleRef(j);

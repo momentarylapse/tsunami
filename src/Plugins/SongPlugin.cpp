@@ -44,7 +44,7 @@ SongPlugin *CreateSongPlugin(const string &name, TsunamiWindow *win)
 	if (!sp)
 		sp = new SongPlugin;
 
-	sp->win = win;
+	sp->win = dynamic_cast<HuiWindow*>(win);
 	sp->view = win->view;
 	/*sp->name = name;
 	sp->plugin = p;

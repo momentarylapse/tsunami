@@ -43,14 +43,16 @@ class SpecGrid extends Grid
 
 class SpectrumDialog extends Dialog
 	SpecGrid grid
-	void __init__(Song *song, AudioView *view, Window *parent)
-		super.__init__("Spectrum", 600, 460, parent, true)
+	void __init__(ShowSpectrogram* plugin, Song* song)
+		super.__init__("Spectrum", 600, 460, plugin.win, true)
 		fromSource("
 Grid ? '' 1 2
 	DrawingArea drawing_area ''
 	Grid ? '' 2 1 noexpandy
 		Text ? ''
 		Button close 'Close' width=120 image=hui:close")
+		
+		AudioView* view = plugin.view
 		
 		grid.init(self, "drawing_area")
 		grid.x_axis.set(view.sel.range.offset / i2f(song.sample_rate), view.sel.range.end() / i2f(song.sample_rate), false, "s")
@@ -75,7 +77,7 @@ class ShowSpectrogram extends SongPlugin
 	SpectrumDialog *dlg
 
 	void show_spec(Song *song)
-		dlg = new SpectrumDialog(song, view, win)
+		dlg = new SpectrumDialog(self, song)
 	
 		BufferBox buf
 		SongRenderer* renderer = new SongRenderer(song, &view.sel)

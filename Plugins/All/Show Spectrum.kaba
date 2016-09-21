@@ -89,7 +89,7 @@ Grid ? '' 1 2
 
 class ShowSpectrum extends SongPlugin
 	void show_spec(Song *song)
-		dlg = new SpectrumDialog(win)
+		dlg = new SpectrumDialog(self)
 	
 		BufferBox buf
 		SongRenderer* renderer = new SongRenderer(song, &view.sel)

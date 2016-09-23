@@ -898,7 +898,9 @@ public:
 		if (b.type == BarPattern::TYPE_PAUSE)
 			b.num_beats = 0;
 		int count = f->ReadInt();
-		f->ReadInt(); // reserved
+		b.sub_beats = f->ReadInt();
+		if (b.sub_beats <= 0)
+			b.sub_beats = 1;
 		for (int i=0; i<count; i++)
 			parent->song->bars.add(b);
 	}

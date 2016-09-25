@@ -138,8 +138,8 @@ int OutputStream::stream_request_callback(const void *inputBuffer, void *outputB
 	printf("request %d\n", (int)frames);
 	OutputStream *stream = (OutputStream*)userData;
 
-    float *out = (float*)outputBuffer;
-    (void) inputBuffer; /* Prevent unused variable warning. */
+	float *out = (float*)outputBuffer;
+	(void) inputBuffer; /* Prevent unused variable warning. */
 
 
 	if (!stream->playing){
@@ -181,7 +181,7 @@ int OutputStream::stream_request_callback(const void *inputBuffer, void *outputB
 		//printf("end\n");
 		HuiRunLaterM(0.001f, stream, &OutputStream::stop); // TODO prevent abort before playback really finished
 	}
-    return 0;
+	return 0;
 }
 
 #endif

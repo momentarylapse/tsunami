@@ -336,15 +336,16 @@ void DeviceManager::init()
 	int r = snd_seq_open(&handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0){
 		tsunami->log->error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
-		return;
-	}
+		//return;
+	}else{
 	snd_seq_set_client_name(handle, "Tsunami");
 	portid = snd_seq_create_simple_port(handle, "Tsunami MIDI in",
 				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
 				SND_SEQ_PORT_TYPE_APPLICATION);
 	if (portid < 0){
 		tsunami->log->error(string("Error creating sequencer port: ") + snd_strerror(portid));
-		return;
+		//return;
+	}
 	}
 #endif
 
@@ -465,7 +466,9 @@ Device *DeviceManager::chooseDevice(int type)
 	for (Device *d: devices)
 		if (d->present and d->visible)
 			return d;
-	return NULL;
+
+	// unusable ...but not NULL
+	return default_devices[type];
 }
 
 void DeviceManager::setDeviceConfig(Device *d)

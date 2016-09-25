@@ -16,10 +16,13 @@
 	#include <windows.h>
 #endif
 
+//#define USE_UNWIND
+
+#ifdef USE_UNWIND
 #define UNW_LOCAL_ONLY
 #include <cxxabi.h>
 #include <libunwind.h>
-
+#endif
 
 
 
@@ -342,6 +345,7 @@ string msg_get_trace()
 {
 	Array<string> trace;
 
+#ifdef USE_UNWIND
 	unw_cursor_t cursor;
 	unw_context_t context;
 
@@ -374,6 +378,7 @@ string msg_get_trace()
 		}
 		trace.add(t);
 	}
+#endif
 
 	return implode(trace, "\n");
 }

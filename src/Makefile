@@ -297,7 +297,7 @@ CPP = g++
 GLOBALFLAGS = -O2 -g
 #GLOBALFLAGS = -O1 -g
 LIB_DIR = lib
-CXXFLAGS = -std=c++11 `pkg-config --cflags gtk+-3.0` $(GLOBALFLAGS)
+CXXFLAGS = -std=c++11 `pkg-config --cflags gtk+-3.0` -DUSE_UNWIND=1 $(GLOBALFLAGS)
 CXXFLAGSLINKING = -std=c++11 `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lunwind -lpulse -lasound -lfftw3f -lFLAC -logg -lvorbis -lvorbisfile -lvorbisenc $(GLOBALFLAGS)
 
 $(BIN) : $(OBJ)

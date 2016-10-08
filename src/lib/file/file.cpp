@@ -1038,12 +1038,16 @@ void _cdecl File::WriteBool(bool b)
 //   binary mode: length word, then string
 void File::WriteStr(const string &str)
 {
-	if (Binary)
-		WriteWord(str.num);
-	if (str.num > 0)
-		int r = _write(handle, str.data, str.num);
-	if (!Binary)
+	if (Binary){
+		int num = min(str.num, 65535);
+		WriteWord(num);
+		if (num > 0)
+			int r = _write(handle, str.data, num);
+	}else{
+		if (str.num > 0)
+			int r = _write(handle, str.data, str.num);
 		int r = _write(handle, "\n", 1);
+	}
 }
 
 // write a comment line

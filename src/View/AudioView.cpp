@@ -973,6 +973,7 @@ void AudioView::setInput(InputStreamAny *_input)
 		unsubscribe(input);
 
 	input = _input;
+	notify("SetInput");
 
 	if (input)
 		subscribe(input);

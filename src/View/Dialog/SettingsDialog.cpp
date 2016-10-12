@@ -26,7 +26,7 @@ SettingsDialog::SettingsDialog(AudioView *_view, HuiWindow *_parent):
 	event("hui:close", this, &SettingsDialog::onClose);
 	event("close", this, &SettingsDialog::onClose);
 
-	setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultTempFilename());
+	setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	setOptions("default_artist", "placeholder=" + AppName);
 
 	ogg_quality.add(OggQuality(0.0f, 64));
@@ -77,7 +77,7 @@ void SettingsDialog::loadData()
 
 	//SetInt("preview_sleep", PreviewSleepTime);
 
-	setString("capture_filename", InputStreamAudio::temp_filename);
+	setString("capture_filename", InputStreamAudio::backup_filename);
 }
 
 void SettingsDialog::applyData()
@@ -111,14 +111,14 @@ void SettingsDialog::onDefaultArtist()
 
 void SettingsDialog::onCaptureFilename()
 {
-	InputStreamAudio::setTempFilename(getString(""));
+	InputStreamAudio::setBackupFilename(getString(""));
 }
 
 void SettingsDialog::onCaptureFind()
 {
-	if (HuiFileDialogSave(this, _("Select backup file for recordings"), InputStreamAudio::temp_filename.basename(), "*.raw", "*.raw"))
+	if (HuiFileDialogSave(this, _("Select backup file for recordings"), InputStreamAudio::backup_filename.basename(), "*.raw", "*.raw"))
 		setString("capture_filename", HuiFilename);
-	InputStreamAudio::setTempFilename(HuiFilename);
+	InputStreamAudio::setBackupFilename(HuiFilename);
 }
 
 void SettingsDialog::onClose()

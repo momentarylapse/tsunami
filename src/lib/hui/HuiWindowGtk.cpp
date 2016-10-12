@@ -125,12 +125,12 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 {
 	window = NULL;
 	win = this;
-	if ((mode & HuiWinModeDummy) > 0)
+	if ((mode & HUI_WIN_MODE_DUMMY) > 0)
 		return;
 
 	_init_generic_(root, allow_root, mode);
 	
-	bool ControlMode = ((mode & HuiWinModeControls) > 0);
+	bool ControlMode = ((mode & HUI_WIN_MODE_CONTROLS) > 0);
 
 	// creation
 	if (parent){
@@ -207,9 +207,9 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 
 	// tool bars
 #if GTK_CHECK_VERSION(3,0,0)
-	gtk_style_context_add_class(gtk_widget_get_style_context(toolbar[HuiToolbarTop]->widget), "primary-toolbar");
+	gtk_style_context_add_class(gtk_widget_get_style_context(toolbar[HUI_TOOLBAR_TOP]->widget), "primary-toolbar");
 #endif
-	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarTop]->widget, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HUI_TOOLBAR_TOP]->widget, FALSE, FALSE, 0);
 
 
 	hbox = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 0);
@@ -217,7 +217,7 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 	//gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 0);
 	gtk_widget_show(hbox);
 
-	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HuiToolbarLeft]->widget, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HUI_TOOLBAR_LEFT]->widget, FALSE, FALSE, 0);
 
 	plugable = NULL;
 	cur_control = NULL;
@@ -238,8 +238,8 @@ void HuiWindow::_init_(const string &title, int x, int y, int width, int height,
 		}
 	}
 
-	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HuiToolbarRight]->widget, FALSE, FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HuiToolbarBottom]->widget, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), toolbar[HUI_TOOLBAR_RIGHT]->widget, FALSE, FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), toolbar[HUI_TOOLBAR_BOTTOM]->widget, FALSE, FALSE, 0);
 
 	// status bar
 	statusbar = gtk_statusbar_new();
@@ -255,6 +255,17 @@ HuiWindow::~HuiWindow()
 	if (!window)
 		return;
 
+	destroy();
+}
+
+void HuiWindow::__delete__()
+{
+	this->HuiWindow::~HuiWindow();
+}
+
+void HuiWindow::destroy()
+{
+	msg_write("destroy....");
 	// quick'n'dirty fix (gtk destroys its widgets recursively)
 	for (HuiControl *c: control)
 		c->widget = NULL;
@@ -262,11 +273,6 @@ HuiWindow::~HuiWindow()
 	_clean_up_();
 
 	gtk_widget_destroy(window);
-}
-
-void HuiWindow::__delete__()
-{
-	this->HuiWindow::~HuiWindow();
 }
 
 // should be called after creating (and filling) the window to actually show it

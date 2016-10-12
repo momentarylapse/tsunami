@@ -55,13 +55,13 @@ ObserverWrapper::~ObserverWrapper()
 void ObserverWrapper::onUpdate(Observable *o, const string &message)
 {
 	if (handler){
-		typedef void mfunct(void *);
+		typedef void mfunct(void *, const string&);
 		mfunct *f = (mfunct*)func;
-		f(handler);
+		f(handler, message);
 	}else{
-		typedef void funct();
+		typedef void funct(const string&);
 		funct *f = (funct*)func;
-		f();
+		f(message);
 	}
 }
 

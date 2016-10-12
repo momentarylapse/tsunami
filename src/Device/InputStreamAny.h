@@ -13,7 +13,6 @@
 #include "../Data/RingBuffer.h"
 #include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
-#include "InputStreamMidi.h"
 
 class InputStreamAudio;
 class InputStreamMidi;
@@ -48,7 +47,7 @@ public:
 	void setDevice(Device *d);
 	Device *getDevice();
 
-	void setSaveMode(bool enabled);
+	void setBackupMode(int mode);
 
 	void setPreviewSynthesizer(Synthesizer *s);
 
@@ -70,7 +69,7 @@ public:
 	int type;
 	InputStreamAudio *input_audio;
 	InputStreamMidi *input_midi;
-	bool save_mode;
+	int backup_mode;
 
 	Synthesizer *preview_synth;
 };

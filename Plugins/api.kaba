@@ -353,11 +353,14 @@ class ColorScheme
 class AudioView
 	//Range sel_raw
 	SongSelection sel
-	OutputStream *stream
-	AudioRenderer *renderer
+	OutputStream* stream
+	AudioRenderer* renderer
+	InputStreamAny* input
+	extern void addObserver(void* handler, void* func)
+	extern void removeObserver(void* handler)
 
 class SongRenderer
-	extern void __init__(Song *s, SongSelection *sel)
+	extern void __init__(Song* s, SongSelection* sel)
 	extern virtual void __delete__()
 	extern void render(Range r, BufferBox buf)
 	extern void prepare(Range r, bool allow_loop)
@@ -370,7 +373,7 @@ class SongRenderer
 
 
 class OutputStream
-	extern void __init__(AudioRenderer *r)
+	extern void __init__(AudioRenderer* r)
 	extern void __delete__()
 	extern void stop()
 	extern void play()
@@ -417,8 +420,11 @@ class InputStreamAudio
 	extern virtual float getSampleRate()
 	extern virtual void getSomeSamples(BufferBox buf, int num)
 	extern virtual int getState()
-	extern void addObserver(void *handler, void *func)
-	extern void removeObserver(void *handler)
+	extern void addObserver(void* handler, void* func)
+	extern void removeObserver(void* handler)
+
+class InputStreamAny
+	extern void setBackupMode(int mode)
 	
 /*class InputStream
 	extern virtual void __delete__()
@@ -499,6 +505,7 @@ class TsunamiPlugin
 	Window* win
 	AudioView* view
 	Song* song
+	string[] args
 
 class SongPlugin
 	extern void __init__()
@@ -523,3 +530,4 @@ extern Synthesizer* CreateSynthesizer(string name)
 extern AudioEffect* CreateAudioEffect(string name, Song* s)
 extern MidiEffect* CreateMidiEffect(string name, Song* s)
 extern Sample* SelectSample(Panel* panel, Song* s, Sample* old)
+extern void SetTempBackupFilename(string filename)

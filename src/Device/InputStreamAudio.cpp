@@ -21,8 +21,9 @@
 #endif
 
 
-string InputStreamAudio::temp_filename;
-string InputStreamAudio::cur_temp_filename;
+string InputStreamAudio::backup_filename;
+string InputStreamAudio::temp_backup_filename;
+string InputStreamAudio::cur_backup_filename;
 float InputStreamAudio::playback_delay_const;
 
 
@@ -130,16 +131,16 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	playback_delay_const = 0;
 	if (device)
 		playback_delay_const = device->latency;
-	temp_filename = HuiConfig.getStr("Input.TempFilename", "");
-	temp_file = NULL;
-	save_mode = false;
+	backup_filename = HuiConfig.getStr("Input.TempFilename", "");
+	backup_file = NULL;
+	backup_mode = BACKUP_MODE_NONE;
 
 	running = false;
 	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = DEFAULT_CHUNK_SIZE;
 
-	if (file_test_existence(getTempFilename()))
-		tsunami->log->warn(_("found old recording: ") + getTempFilename());
+	if (file_test_existence(getBackupFilename()))
+		tsunami->log->warn(_("found old recording: ") + getBackupFilename());
 }
 
 InputStreamAudio::~InputStreamAudio()
@@ -198,10 +199,11 @@ void InputStreamAudio::stop()
 	capturing = false;
 	accumulating = false;
 	current_buffer.clear();
-	if (temp_file){
-		delete(temp_file);
-		temp_file = NULL;
-		file_delete(cur_temp_filename);
+	if (backup_file){
+		delete(backup_file);
+		backup_file = NULL;
+		if (backup_mode != BACKUP_MODE_KEEP)
+			file_delete(cur_backup_filename);
 	}
 }
 
@@ -247,10 +249,10 @@ bool InputStreamAudio::start()
 
 	capturing = true;
 
-	if (save_mode){
-		cur_temp_filename = getTempFilename();
-		temp_file = FileCreate(getTempFilename());
-		temp_file->SetBinaryMode(true);
+	if (backup_mode != BACKUP_MODE_NONE){
+		cur_backup_filename = getBackupFilename();
+		backup_file = FileCreate(getBackupFilename());
+		backup_file->SetBinaryMode(true);
 	}
 
 	_startUpdate();
@@ -329,12 +331,12 @@ int InputStreamAudio::doCapturing()
 	current_buffer.readRef(b, avail);
 	buffer.append(b);
 
-	if (temp_file){
+	if (backup_file){
 		// write to file
 		string data;
 		b.exports(data, 2, SAMPLE_FORMAT_32_FLOAT);
 
-		temp_file->WriteBuffer(&data[0], data.num);
+		backup_file->WriteBuffer(&data[0], data.num);
 	}
 
 	return avail;
@@ -372,7 +374,7 @@ int InputStreamAudio::getDelay()
 	return sync.getDelay() - playback_delay_const * (float)sample_rate / 1000.0f;
 }
 
-string InputStreamAudio::getDefaultTempFilename()
+string InputStreamAudio::getDefaultBackupFilename()
 {
 #ifdef OS_WINDOWS
 	return "c:\\tsunami-input.raw";
@@ -381,22 +383,29 @@ string InputStreamAudio::getDefaultTempFilename()
 #endif
 }
 
-string InputStreamAudio::getTempFilename()
+string InputStreamAudio::getBackupFilename()
 {
-	if (temp_filename.num > 0)
-		return temp_filename;
-	return getDefaultTempFilename();
+	if (temp_backup_filename.num > 0)
+		return temp_backup_filename;
+	if (backup_filename.num > 0)
+		return backup_filename;
+	return getDefaultBackupFilename();
 }
 
-void InputStreamAudio::setTempFilename(const string &filename)
+void InputStreamAudio::setBackupFilename(const string &filename)
 {
-	temp_filename = filename;
-	HuiConfig.setStr("Input.TempFilename", temp_filename);
+	backup_filename = filename;
+	HuiConfig.setStr("Input.TempFilename", backup_filename);
 }
 
-void InputStreamAudio::setSaveMode(bool enabled)
+void InputStreamAudio::setTempBackupFilename(const string &filename)
 {
-	save_mode = enabled;
+	temp_backup_filename = filename;
+}
+
+void InputStreamAudio::setBackupMode(int mode)
+{
+	backup_mode = mode;
 }
 
 void InputStreamAudio::_startUpdate()

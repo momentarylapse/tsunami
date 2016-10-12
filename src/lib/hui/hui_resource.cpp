@@ -209,7 +209,7 @@ HuiWindow *HuiCreateResourceDialog(const string &id, HuiWindow *root)
 
 	// toolbar?
 	if (toolbar_id.num > 0)
-		dlg->toolbar[HuiToolbarTop]->setByID(toolbar_id);
+		dlg->toolbar[HUI_TOOLBAR_TOP]->setByID(toolbar_id);
 
 	// controls
 	for (HuiResource &cmd: res->children)

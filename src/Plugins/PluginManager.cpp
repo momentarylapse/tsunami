@@ -13,6 +13,7 @@
 #include "../View/Helper/Slider.h"
 #include "../Device/InputStreamAudio.h"
 #include "../Device/InputStreamMidi.h"
+#include "../Device/InputStreamAny.h"
 #include "../Device/OutputStream.h"
 #include "../Device/DeviceManager.h"
 #include "../Audio/Renderer/MidiRenderer.h"
@@ -63,6 +64,12 @@ Song* getCurSong()
 	return tsunami->song;
 }
 
+
+void GlobalSetTempBackupFilename(const string &filename)
+{
+	InputStreamAudio::setTempBackupFilename(filename);
+}
+
 void PluginManager::LinkAppScriptData()
 {
 	Script::config.directory = "";
@@ -80,6 +87,7 @@ void PluginManager::LinkAppScriptData()
 	Script::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
 	Script::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
 	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
+	Script::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
 	Script::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 
 	Script::DeclareClassSize("Range", sizeof(Range));
@@ -390,6 +398,8 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassVirtualIndex("InputStreamAudio", "getState", Script::mf(&InputStreamAudio::getState), &input);
 	}
 
+	Script::LinkExternal("InputStreamAny.setBackupMode", Script::mf(&InputStreamAny::setBackupMode));
+
 	{
 	OutputStream stream(NULL);
 	Script::DeclareClassSize("OutputStream", sizeof(OutputStream));
@@ -412,6 +422,9 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
 	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
 	Script::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
+	Script::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));
+	Script::LinkExternal("AudioView.addObserver", Script::mf(&AudioView::addWrappedObserver));
+	Script::LinkExternal("AudioView.removeObserver", Script::mf(&AudioView::removeWrappedObserver));
 
 	Script::DeclareClassSize("ColorScheme", sizeof(ColorScheme));
 	Script::DeclareClassOffset("ColorScheme", "background", _offsetof(ColorScheme, background));
@@ -453,6 +466,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("TsunamiPlugin", sizeof(TsunamiPlugin));
 	Script::DeclareClassOffset("TsunamiPlugin", "win", _offsetof(TsunamiPlugin, win));
 	Script::DeclareClassOffset("TsunamiPlugin", "view", _offsetof(TsunamiPlugin, view));
+	Script::DeclareClassOffset("TsunamiPlugin", "args", _offsetof(TsunamiPlugin, args));
 	Script::LinkExternal("TsunamiPlugin." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&TsunamiPlugin::__init__));
 	Script::DeclareClassVirtualIndex("TsunamiPlugin", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
 	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStart", Script::mf(&TsunamiPlugin::onStart), &tsunami_plugin);

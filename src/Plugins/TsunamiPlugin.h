@@ -42,6 +42,7 @@ public:
 
 	string name;
 	bool active;
+	Array<string> args;
 };
 
 TsunamiPlugin *CreateTsunamiPlugin(const string &name, TsunamiWindow *win);

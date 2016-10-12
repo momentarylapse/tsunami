@@ -36,7 +36,7 @@ public:
 	bool handleCLIArguments(const Array<string> &arg);
 	void loadKeyCodes();
 
-	void createWindow(const Array<string> &arg);
+	void createWindow();
 	bool allowTermination();
 
 	TsunamiWindow *win;

@@ -126,6 +126,7 @@ public:
 	MiniBar *mini_bar;
 
 	Array<TsunamiPlugin*> plugins;
+	bool die_on_plugin_stop;
 };
 
 #endif /* TSUNAMIWINDOW_H_ */

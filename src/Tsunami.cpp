@@ -13,10 +13,11 @@
 #include "Stuff/Log.h"
 #include "Stuff/Clipboard.h"
 #include "Plugins/PluginManager.h"
+#include "Plugins/TsunamiPlugin.h"
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.90.1";
+string AppVersion = "0.6.90.2";
 
 Tsunami *tsunami = NULL;
 
@@ -77,25 +78,34 @@ bool Tsunami::onStartup(const Array<string> &arg)
 	log->info(AppName + " " + AppVersion);
 	log->info(_("  ...don't worry. Everything will be fine!"));
 
-	createWindow(arg);
+
+	// create a window and load file
+	if (!win){
+		createWindow();
+		win->show();
+
+		if (arg.num >= 2)
+			tsunami->storage->load(win->song, arg[1]);
+	}
 	return true;
 }
 
-bool Tsunami::handleCLIArguments(const Array<string> &arg)
+bool Tsunami::handleCLIArguments(const Array<string> &args)
 {
-	if (arg.num < 2)
+	if (args.num < 2)
 		return false;
-	if (arg[1] == "--help"){
+	if (args[1] == "--help"){
 		log->info(AppName + " " + AppVersion);
 		log->info("--help");
 		log->info("--info <FILE>");
 		log->info("--export <FILE_IN> <FILE_OUT>");
+		log->info("--execute <PLUGIN_NAME> [ARGUMENTS]");
 		return true;
-	}else if (arg[1] == "--info"){
+	}else if (args[1] == "--info"){
 		song = new Song;
-		if (arg.num < 3){
+		if (args.num < 3){
 			log->error(_("call: tsunami --info <File>"));
-		}else if (storage->load(song, arg[2])){
+		}else if (storage->load(song, args[2])){
 			msg_write(format("sample-rate: %d", song->sample_rate));
 			msg_write(format("samples: %d", song->getRange().length));
 			msg_write("length: " + song->get_time_str(song->getRange().length));
@@ -105,31 +115,42 @@ bool Tsunami::handleCLIArguments(const Array<string> &arg)
 		}
 		delete(song);
 		return true;
-	}else if (arg[1] == "--export"){
+	}else if (args[1] == "--export"){
 		song = new Song;
-		if (arg.num < 4){
+		if (args.num < 4){
 			log->error(_("call: tsunami --export <File> <Exportfile>"));
-		}else if (storage->load(song, arg[2])){
-			storage->save(song, arg[3]);
+		}else if (storage->load(song, args[2])){
+			storage->save(song, args[3]);
 		}
 		delete(song);
+		return true;
+	}else if (args[1] == "--execute"){
+		if (args.num < 3){
+			log->error(_("call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]"));
+			return true;
+		}
+		createWindow();
+		win->hide();
+		win->die_on_plugin_stop = true;
+		TsunamiPlugin *p = CreateTsunamiPlugin(args[2], win);
+		p->args = args.sub(3, -1);
+		win->plugins.add(p);
+		win->observer->subscribe(p, p->MESSAGE_STOP_REQUEST);
+		p->start();
+		return false;
+	}else if (args[1].head(2) == "--"){
+		log->error(_("unknown command: ") + args[1]);
 		return true;
 	}
 	return false;
 }
 
-void Tsunami::createWindow(const Array<string> &arg)
+void Tsunami::createWindow()
 {
 	win = new TsunamiWindow;
 	_win = dynamic_cast<HuiWindow*>(win);
 	_view = win->view;
 	song = win->song;
-
-	win->show();
-
-
-	if (arg.num >= 2)
-		tsunami->storage->load(win->song, arg[1]);
 }
 
 void Tsunami::loadKeyCodes()

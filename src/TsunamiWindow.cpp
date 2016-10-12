@@ -62,7 +62,7 @@ public:
 };
 
 TsunamiWindow::TsunamiWindow() :
-	HuiWindow(AppName, -1, -1, 800, 600, NULL, false, HuiWinModeResizable | HuiWinModeControls)
+	HuiWindow(AppName, -1, -1, 800, 600, NULL, false, HUI_WIN_MODE_RESIZABLE | HUI_WIN_MODE_CONTROLS)
 {
 
 	tsunami->win = this;
@@ -173,6 +173,8 @@ TsunamiWindow::TsunamiWindow() :
 		event(format("jump_to_level_%d", i), this, &TsunamiWindow::onCurLevel);
 
 
+	die_on_plugin_stop = false;
+
 	song = new Song;
 
 
@@ -228,6 +230,8 @@ TsunamiWindow::~TsunamiWindow()
 	delete(bottom_bar);
 	delete(view);
 	delete(song);
+
+	// FIXME argh...
 	HuiEnd();
 }
 
@@ -474,7 +478,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 {
 	string name = HuiGetEvent()->id.explode("--")[1];
 
-	for (TsunamiPlugin *p : plugins)
+	for (TsunamiPlugin *p: plugins)
 		if (p->name == name){
 			if (p->active)
 				p->stop();
@@ -750,6 +754,9 @@ void TsunamiWindow::onUpdate(Observable *o, const string &message)
 	if (message == TsunamiPlugin::MESSAGE_STOP_REQUEST){
 		TsunamiPlugin *tpl = (TsunamiPlugin*)o;
 		tpl->stop();
+
+		if (die_on_plugin_stop)
+			HuiEnd();//HuiRunLaterM(0.01f, this, &TsunamiWindow::destroy);
 	}else{
 		// "Clipboard", "AudioFile" or "AudioView"
 		updateMenu();
@@ -761,6 +768,7 @@ void TsunamiWindow::onExit()
 {
 	if (allowTermination())
 		delete(this);
+		//destroy();
 }
 
 

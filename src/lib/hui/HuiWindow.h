@@ -36,15 +36,13 @@ struct HuiInputData
 	// mouse
 	float x, y, dx, dy, dz;	// position, change
 	bool inside, inside_smart;
-	bool lb,mb,rb;				// buttons
+	bool lb, mb, rb; // buttons
 	int row, column;
 	// keyboard
 	bool key[256];
 	int key_code;
-	int KeyBufferDepth;
-	int KeyBuffer[HUI_MAX_KEYBUFFER_DEPTH];
-	void reset()
-	{	memset(this, 0, sizeof(HuiInputData));	}
+	Array<int> key_buffer;
+	void reset();
 };
 
 class HuiToolbar;
@@ -81,6 +79,8 @@ public:
 	void _init_(const string &title, int x, int y, int width, int height, HuiWindow *parent, bool allow_parent, int mode);
 	void _init_generic_(HuiWindow *parent, bool allow_parent, int mode);
 	void _clean_up_();
+
+	void _cdecl destroy();
 
 	// the window
 	string _cdecl run();
@@ -214,26 +214,28 @@ void HuiFuncIgnore();
 void HuiFuncClose();
 
 enum{
-	HuiWinModeResizable = 1,
-	HuiWinModeNoFrame = 2,
-	HuiWinModeNoTitle = 4,
-	HuiWinModeControls = 8,
-	HuiWinModeDummy = 16,
+	HUI_WIN_MODE_RESIZABLE = 1,
+	HUI_WIN_MODE_NO_FRAME = 2,
+	HUI_WIN_MODE_NO_TITLE = 4,
+	HUI_WIN_MODE_CONTROLS = 8,
+	HUI_WIN_MODE_DUMMY = 16,
 };
 
-#define HuiLeft		1
-#define HuiRight	2
-#define HuiTop		4
-#define HuiBottom	8
+enum{
+	HUI_LEFT = 1,
+	HUI_RIGHT = 2,
+	HUI_TOP = 4,
+	HUI_BOTTOM = 8
+};
 
 
 
 // which one of the toolbars?
 enum{
-	HuiToolbarTop,
-	HuiToolbarBottom,
-	HuiToolbarLeft,
-	HuiToolbarRight
+	HUI_TOOLBAR_TOP,
+	HUI_TOOLBAR_BOTTOM,
+	HUI_TOOLBAR_LEFT,
+	HUI_TOOLBAR_RIGHT
 };
 
 

@@ -358,7 +358,7 @@ void HuiPanel::fromResource(const string &id)
 			if (o.find("menu=") == 0)
 				win->setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
 			if (o.find("toolbar=") == 0)
-				win->toolbar[HuiToolbarTop]->setByID(o.substr(8, -1));
+				win->toolbar[HUI_TOOLBAR_TOP]->setByID(o.substr(8, -1));
 		}
 	}
 

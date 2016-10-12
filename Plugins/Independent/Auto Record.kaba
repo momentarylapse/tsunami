@@ -1,0 +1,37 @@
+// Image = hui:media-record
+use "../api.kaba"
+
+class AutoRecord extends TsunamiPlugin
+	
+	override void onStart()
+		win.show()
+		view.addObserver(self, &onUpdate)
+		
+	override void onStop()
+		view.removeObserver(self)
+		
+	string get_fn()
+		string base = "/home/michi/backup-"
+		if args.num > 0
+			base = args[0]
+		Date d = GetCurDate()
+		base += "" + d.year + "-" + d.month + "-" + d.day
+		
+		string alpha = "abcdefghijklmnopqrstuvwxyz"
+		
+		for n in 0:26
+			string fn = base + alpha[n] + ".raw"
+			if !FileExists(fn)
+				return fn
+				
+		for n in 1:1000
+			string fn = base + "-" + n + ".raw"
+			if !FileExists(fn)
+				return fn
+	
+	void onUpdate(string message)
+		//print("------------- " + message)
+		if message == "SetInput"
+			if view.input
+				SetTempBackupFilename(get_fn())
+				view.input.setBackupMode(2)

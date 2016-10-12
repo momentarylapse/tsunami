@@ -33,15 +33,13 @@ HuiWindow *HuiCurWindow = NULL;
 	return false;
 }*/
 
-void add_key_to_buffer(HuiInputData *d, int key)
+
+void HuiInputData::reset()
 {
-	// full -> remove the first key
-	if (d->KeyBufferDepth >= HUI_MAX_KEYBUFFER_DEPTH - 1){
-		for (int k=0;k<d->KeyBufferDepth-2;k++)
-			d->KeyBuffer[k] = d->KeyBuffer[k+1];
-		d->KeyBufferDepth --;
-	}
-	d->KeyBuffer[d->KeyBufferDepth ++] = key;
+	x = y = dx = dy = dz = 0;
+	lb = mb = rb = false;
+	memset(key, 0, sizeof(key));
+	key_buffer.clear();
 }
 
 
@@ -52,12 +50,12 @@ HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height, H
 
 HuiWindow::HuiWindow()
 {
-	_init_("", -1, -1, 0, 0, NULL, true, HuiWinModeDummy);
+	_init_("", -1, -1, 0, 0, NULL, true, HUI_WIN_MODE_DUMMY);
 }
 
 HuiWindow::HuiWindow(const string &title, int x, int y, int width, int height)
 {
-	_init_(title, x, y, width, height, NULL, true, HuiWinModeResizable | HuiWinModeControls);
+	_init_(title, x, y, width, height, NULL, true, HUI_WIN_MODE_RESIZABLE | HUI_WIN_MODE_CONTROLS);
 }
 
 void HuiWindow::__init_ext__(const string& title, int x, int y, int width, int height)
@@ -73,9 +71,9 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 		msg_error("HuiWindow: undefined resource id: " + id);
 	}
 
-	int mode = HuiWinModeControls;
+	int mode = HUI_WIN_MODE_CONTROLS;
 	if (res->type == "SizableDialog")
-		mode = HuiWinModeControls | HuiWinModeResizable;
+		mode = HUI_WIN_MODE_CONTROLS | HUI_WIN_MODE_RESIZABLE;
 	bool allow_parent = false;
 	for (string &o: res->options)
 		if ((o == "allow-root") or (o == "allow-parent"))
@@ -87,7 +85,7 @@ HuiWindow::HuiWindow(const string &id, HuiWindow *parent)
 		if (o.head(5) == "menu=")
 			setMenu(HuiCreateResourceMenu(o.substr(5, -1)));
 		if (o.head(8) == "toolbar=")
-			toolbar[HuiToolbarTop]->setByID(o.substr(8, -1));
+			toolbar[HUI_TOOLBAR_TOP]->setByID(o.substr(8, -1));
 	}
 
 	// controls
@@ -102,7 +100,7 @@ void HuiWindow::_init_generic_(HuiWindow *_root, bool _allow_root, int _mode)
 	_HuiMakeUsable_();
 	HuiWindows.add(this);
 
-	is_resizable = ((_mode & HuiWinModeResizable) > 0);
+	is_resizable = ((_mode & HUI_WIN_MODE_RESIZABLE) > 0);
 	allowed = true;
 	allow_keys = true;
 	parent = _root;
@@ -112,10 +110,10 @@ void HuiWindow::_init_generic_(HuiWindow *_root, bool _allow_root, int _mode)
 	}
 	menu = popup = NULL;
 	statusbar_enabled = false;
-	toolbar[HuiToolbarTop] = new HuiToolbar(this);
-	toolbar[HuiToolbarLeft] = new HuiToolbar(this, true);
-	toolbar[HuiToolbarRight] = new HuiToolbar(this, true);
-	toolbar[HuiToolbarBottom] = new HuiToolbar(this);
+	toolbar[HUI_TOOLBAR_TOP] = new HuiToolbar(this);
+	toolbar[HUI_TOOLBAR_LEFT] = new HuiToolbar(this, true);
+	toolbar[HUI_TOOLBAR_RIGHT] = new HuiToolbar(this, true);
+	toolbar[HUI_TOOLBAR_BOTTOM] = new HuiToolbar(this);
 	input.reset();
 
 	allow_input = false; // allow only if ->Show() was called
@@ -124,7 +122,7 @@ void HuiWindow::_init_generic_(HuiWindow *_root, bool _allow_root, int _mode)
 
 void HuiWindow::_clean_up_()
 {
-	for (int i=0;i<4;i++)
+	for (int i=0; i<4; i++)
 		delete(toolbar[i]);
 
 	_ClearPanel_();
@@ -142,7 +140,7 @@ void HuiWindow::_clean_up_()
 void HuiWindow::onCloseRequest()
 {
 	int level = _get_main_level_();
-	delete(this);
+	destroy();
 	
 	// no message function (and last window in this main level): end program
 	// ...or at least end nested main level
@@ -157,7 +155,7 @@ void HuiWindow::onCloseRequest()
 void HuiWindow::setID(const string &_id)
 {
 	id = _id;
-	if ((HuiLanguaged) && (id.num > 0))
+	if (HuiLanguaged and (id.num > 0))
 		setTitle(HuiGetLanguage(id, id));
 }
 
@@ -169,13 +167,13 @@ void HuiWindow::setPositionSpecial(HuiWindow *win,int mode)
 	win->getPosition(px, py);
 	getSize(cw, ch);
 	getPosition(cx, cy);
-	if ((mode & HuiLeft)>0)
+	if ((mode & HUI_LEFT) > 0)
 		cx = px + 2;
-	if ((mode & HuiRight)>0)
+	if ((mode & HUI_RIGHT) > 0)
 		cx = px + pw - cw - 2;
-	if ((mode & HuiTop)>0)
+	if ((mode & HUI_TOP) > 0)
 		cy = py + 20;
-	if ((mode & HuiBottom)>0)
+	if ((mode & HUI_BOTTOM) > 0)
 		cy = py + ph - ch - 2;
 	setPosition(cx, cy);
 }
@@ -198,9 +196,9 @@ HuiWindow *HuiWindow::getParent()
 bool HuiWindow::getKey(int k)
 {
 	if (k == KEY_CONTROL)
-		return (input.key[KEY_RCONTROL] || input.key[KEY_LCONTROL]);
+		return (input.key[KEY_RCONTROL] or input.key[KEY_LCONTROL]);
 	else if (k == KEY_SHIFT)
-		return (input.key[KEY_RSHIFT] || input.key[KEY_LSHIFT]);
+		return (input.key[KEY_RSHIFT] or input.key[KEY_LSHIFT]);
 	else
 		return input.key[k];
 }
@@ -238,11 +236,11 @@ void HuiFuncIgnore()
 
 void HuiFuncClose()
 {
-	delete(HuiGetEvent()->win);
+	HuiGetEvent()->win->destroy();
 }
 
 HuiNixWindow::HuiNixWindow(const string& title, int x, int y, int width, int height) :
-	HuiWindow(title, x, y, width, height, NULL, true, HuiWinModeResizable)
+	HuiWindow(title, x, y, width, height, NULL, true, HUI_WIN_MODE_RESIZABLE)
 {
 	addDrawingArea("", 0, 0, 0, 0, "nix-area");
 }
@@ -253,7 +251,7 @@ void HuiNixWindow::__init_ext__(const string& title, int x, int y, int width, in
 }
 
 HuiDialog::HuiDialog(const string& title, int width, int height, HuiWindow* root, bool allow_root) :
-	HuiWindow(title, -1, -1, width, height, root, allow_root, HuiWinModeControls | HuiWinModeResizable)
+	HuiWindow(title, -1, -1, width, height, root, allow_root, HUI_WIN_MODE_CONTROLS | HUI_WIN_MODE_RESIZABLE)
 {
 }
 
@@ -263,7 +261,7 @@ void HuiDialog::__init_ext__(const string& title, int width, int height, HuiWind
 }
 
 HuiFixedDialog::HuiFixedDialog(const string& title, int width, int height, HuiWindow* root, bool allow_root) :
-	HuiWindow(title, -1, -1, width, height, root, allow_root, HuiWinModeControls)
+	HuiWindow(title, -1, -1, width, height, root, allow_root, HUI_WIN_MODE_CONTROLS)
 {
 }
 
@@ -275,7 +273,7 @@ void HuiFixedDialog::__init_ext__(const string& title, int width, int height, Hu
 
 
 HuiSourceDialog::HuiSourceDialog(const string &buffer, HuiWindow *root) :
-	HuiWindow("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, HuiWinModeControls | HuiWinModeResizable)
+	HuiWindow("", -1, -1, 300, 200, root, buffer.find("allow-parent") > 0, HUI_WIN_MODE_CONTROLS | HUI_WIN_MODE_RESIZABLE)
 {
 	fromSource(buffer);
 }

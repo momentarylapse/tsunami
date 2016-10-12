@@ -61,15 +61,19 @@ public:
 	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
 	virtual int _cdecl getState();
 
+	// delay/sync
 	static float getPlaybackDelayConst();
 	static void setPlaybackDelayConst(float f);
 
-	static string getDefaultTempFilename();
-	static string getTempFilename();
-	static void setTempFilename(const string &filename);
-	void setSaveMode(bool enable);
+	// backup
+	static string getDefaultBackupFilename();
+	static string getBackupFilename();
+	static void setBackupFilename(const string &filename);
+	static void setTempBackupFilename(const string &filename);
+	void setBackupMode(int mode);
+	static string temp_backup_filename;
+	static string backup_filename;
 
-	static string temp_filename;
 
 	void _cdecl setChunkSize(int size);
 	int chunk_size;
@@ -99,9 +103,9 @@ private:
 
 	static bool testError(const string &msg);
 
-	File *temp_file;
-	static string cur_temp_filename;
-	bool save_mode;
+	File *backup_file;
+	static string cur_backup_filename;
+	int backup_mode;
 
 	struct SyncData
 	{

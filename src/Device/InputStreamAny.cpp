@@ -8,6 +8,8 @@
 #include "../Data/Track.h"
 #include "InputStreamAny.h"
 #include "InputStreamAudio.h"
+#include "InputStreamMidi.h"
+#include "DeviceManager.h"
 
 
 const string InputStreamAny::MESSAGE_CAPTURE = "Capture";
@@ -27,7 +29,7 @@ InputStreamAny::InputStreamAny(int _sample_rate) :
 	midi = NULL;
 	current_midi = NULL;
 	preview_synth = NULL;
-	save_mode = false;
+	backup_mode = BACKUP_MODE_NONE;
 }
 
 InputStreamAny::~InputStreamAny()
@@ -55,7 +57,7 @@ void InputStreamAny::setType(int _type)
 		input_audio = new InputStreamAudio(sample_rate);
 		buffer = &input_audio->buffer;
 		current_buffer = &input_audio->current_buffer;
-		input_audio->setSaveMode(save_mode);
+		input_audio->setBackupMode(backup_mode);
 		input_audio->setChunkSize(chunk_size);
 		input_audio->setUpdateDt(update_dt);
 		subscribe(input_audio);
@@ -154,11 +156,11 @@ Device *InputStreamAny::getDevice()
 	return NULL;
 }
 
-void InputStreamAny::setSaveMode(bool enabled)
+void InputStreamAny::setBackupMode(int mode)
 {
-	save_mode = enabled;
+	backup_mode = mode;
 	if (type == Track::TYPE_AUDIO)
-		input_audio->setSaveMode(enabled);
+		input_audio->setBackupMode(mode);
 }
 
 

@@ -75,7 +75,7 @@ void CaptureConsole::onEnter()
 {
 	type = -1;
 	input = new InputStreamAny(song->sample_rate);
-	input->setSaveMode(true);
+	input->setBackupMode(BACKUP_MODE_TEMP);
 	input->setChunkSize(4096);
 	input->setUpdateDt(0.03f);
 	subscribe(input);

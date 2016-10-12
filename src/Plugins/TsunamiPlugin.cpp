@@ -72,8 +72,12 @@ TsunamiPlugin *CreateTsunamiPlugin(const string &name, TsunamiWindow *win)
 
 	t->name = name;
 	t->win = win;
-	t->song = win->song;
-	t->view = win->view;
+	t->song = NULL;
+	t->view = NULL;
+	if (win){
+		t->song = win->song;
+		t->view = win->view;
+	}
 	/*t->plugin = p;
 	t->usable = p->usable;
 	t->resetConfig();*/

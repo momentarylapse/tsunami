@@ -13,9 +13,8 @@ class AutoRecord extends TsunamiPlugin
 	string get_fn()
 		string base = "/home/michi/backup-"
 		if args.num > 0
-			base = args[0]
-		Date d = GetCurDate()
-		base += "" + d.year + "-" + d.month + "-" + d.day
+			base = args[0] 
+		base += GetCurDate().format("%Y-%m-%d")
 		
 		string alpha = "abcdefghijklmnopqrstuvwxyz"
 		

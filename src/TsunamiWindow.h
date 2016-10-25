@@ -25,6 +25,7 @@ class TsunamiWindow : public HuiWindow
 public:
 	TsunamiWindow();
 	virtual ~TsunamiWindow();
+	virtual void onDestroy();
 
 	void onAbout();
 	void onSendBugReport();
@@ -127,6 +128,7 @@ public:
 
 	Array<TsunamiPlugin*> plugins;
 	bool die_on_plugin_stop;
+	bool auto_delete;
 };
 
 #endif /* TSUNAMIWINDOW_H_ */

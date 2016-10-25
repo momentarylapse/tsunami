@@ -49,10 +49,10 @@ void MarkerDialog::onOk()
 	}else{
 		track->addMarker(pos, getString("text"));
 	}
-	delete(this);
+	destroy();
 }
 
 void MarkerDialog::onClose()
 {
-	delete(this);
+	destroy();
 }

@@ -265,7 +265,8 @@ void HuiWindow::__delete__()
 
 void HuiWindow::destroy()
 {
-	msg_write("destroy....");
+	onDestroy();
+
 	// quick'n'dirty fix (gtk destroys its widgets recursively)
 	for (HuiControl *c: control)
 		c->widget = NULL;
@@ -273,6 +274,12 @@ void HuiWindow::destroy()
 	_clean_up_();
 
 	gtk_widget_destroy(window);
+	window = NULL;
+}
+
+bool HuiWindow::gotDestroyed()
+{
+	return window == NULL;
 }
 
 // should be called after creating (and filling) the window to actually show it
@@ -286,7 +293,7 @@ void HuiWindow::show()
 	allow_input = true;
 }
 
-string HuiWindow::run()
+void HuiWindow::run()
 {
 	show();
 	int uid = unique_id;
@@ -328,25 +335,11 @@ string HuiWindow::run()
 	if (getParent()){
 		gtk_dialog_run(GTK_DIALOG(window));
 	}else{
-		bool killed = false;
-		while(!killed){
+		while(!gotDestroyed()){
 			HuiDoSingleMainLoop();
-			for (HuiClosedPanel &cp: HuiClosedPanels)
-				if (cp.unique_id == uid)
-					killed = true;
 		}
 	}
 #endif
-	//msg_write("cleanup");
-
-	// clean up
-	foreachi(HuiClosedPanel &cp, HuiClosedPanels, i)
-		if (cp.unique_id == uid){
-			if (cp.last_id.num > 0)
-				last_id = cp.last_id;
-			HuiClosedPanels.erase(i);
-		}
-	return last_id;
 }
 
 void HuiWindow::setMenu(HuiMenu *_menu)

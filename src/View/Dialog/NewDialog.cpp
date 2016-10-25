@@ -23,20 +23,11 @@ NewDialog::NewDialog(HuiWindow *_parent, Song *s):
 	setInt("beats_per_bar", 4);
 	setInt("sub_beats", 1);
 
-	event("cancel", this, &NewDialog::onClose);
-	event("hui:close", this, &NewDialog::onClose);
+	event("cancel", this, &NewDialog::destroy);
+	event("hui:close", this, &NewDialog::destroy);
 	event("ok", this, &NewDialog::onOk);
 	event("metronome", this, &NewDialog::onMetronome);
 	event("new_track_type:midi", this, &NewDialog::onTypeMidi);
-}
-
-NewDialog::~NewDialog()
-{
-}
-
-void NewDialog::onClose()
-{
-	delete(this);
 }
 
 void NewDialog::onOk()
@@ -53,7 +44,7 @@ void NewDialog::onOk()
 	}
 	song->action_manager->enable(true);
 	song->notify(song->MESSAGE_NEW);
-	onClose();
+	destroy();
 }
 
 void NewDialog::onMetronome()

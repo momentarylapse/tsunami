@@ -22,7 +22,6 @@ public:
 
 	PauseEditDialog(HuiWindow *root, Song *song, int index, bool apply_to_midi);
 	void onOk();
-	void onClose();
 };
 
 #endif /* SRC_VIEW_DIALOG_PAUSEEDITDIALOG_H_ */

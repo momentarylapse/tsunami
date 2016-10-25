@@ -20,8 +20,8 @@ PauseEditDialog::PauseEditDialog(HuiWindow *root, Song *_song, int _index, bool 
 	setFloat("duration", (float)b.length / (float)song->sample_rate);
 
 	event("ok", this, &PauseEditDialog::onOk);
-	event("cancel", this, &PauseEditDialog::onClose);
-	event("hui:close", this, &PauseEditDialog::onClose);
+	event("cancel", this, &PauseEditDialog::destroy);
+	event("hui:close", this, &PauseEditDialog::destroy);
 }
 
 void PauseEditDialog::onOk()
@@ -31,10 +31,5 @@ void PauseEditDialog::onOk()
 	b.length = (float)song->sample_rate * duration;
 	song->editBar(index, b, apply_to_midi);
 
-	delete(this);
-}
-
-void PauseEditDialog::onClose()
-{
-	delete(this);
+	destroy();
 }

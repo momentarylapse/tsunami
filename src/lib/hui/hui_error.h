@@ -14,7 +14,7 @@
 void HuiSetErrorFunction(hui_callback *error_function);
 void HuiSetDefaultErrorHandler(hui_callback *error_cleanup_function);
 void HuiRaiseError(const string &message);
-void HuiSendBugReport();
+void HuiSendBugReport(HuiWindow *parent);
 
 
 #endif /* HUI_ERROR_H_ */

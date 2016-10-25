@@ -377,6 +377,7 @@ public:
 		config = c;
 		panel = p;
 		progress = NULL;
+		ok = false;
 
 		setTitle(config->name);
 		embed(panel, "grid", 0, 1);
@@ -396,11 +397,12 @@ public:
 	}
 	void onOk()
 	{
-		delete(this);
+		ok = true;
+		destroy();
 	}
 	void onClose()
 	{
-		delete(this);
+		destroy();
 	}
 	void onPreview()
 	{
@@ -468,6 +470,7 @@ public:
 	Configurable *config;
 	ConfigPanel *panel;
 	Progress *progress;
+	bool ok;
 };
 
 bool Configurable::configure()
@@ -480,8 +483,11 @@ bool Configurable::configure()
 	ConfigPanel *panel = createPanel();
 	if (!panel)
 		return false;
-	HuiWindow *dlg = new ConfigurationDialog(this, config, panel);
-	return (dlg->run() == "ok");
+	ConfigurationDialog *dlg = new ConfigurationDialog(this, config, panel);
+	dlg->run();
+	bool ok = dlg->ok;
+	delete(dlg);
+	return ok;
 }
 
 void Configurable::notify()

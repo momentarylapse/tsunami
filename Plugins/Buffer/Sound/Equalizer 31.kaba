@@ -65,6 +65,7 @@ class Equalizer31 extends AudioEffect
 	void configure()
 		dlg = new ConfigDialog(self)
 		dlg.run()
+		delete dlg
 
 const int dx = 30
 

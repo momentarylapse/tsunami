@@ -136,8 +136,6 @@ void FavoriteManager::set(const Favorite &ff)
 }
 
 
-static string FavoriteSelectionDialogReturn;
-
 class FavoriteSelectionDialog : public HuiDialog
 {
 public:
@@ -145,7 +143,6 @@ public:
 		HuiDialog(_(""), 300, 200, win, false)
 	{
 		save = _save;
-		FavoriteSelectionDialogReturn = "";
 		names = _names;
 		addGrid("", 0, 0, 1, 2, "grid");
 		setTarget("grid", 0);
@@ -170,12 +167,12 @@ public:
 	void onList()
 	{
 		int n = getInt("list");
-		FavoriteSelectionDialogReturn = "";
+		selection = "";
 		if (n >= 0){
-			FavoriteSelectionDialogReturn = names[n];
+			selection = names[n];
 			setString("name", names[n]);
 		}
-		delete(this);
+		destroy();
 	}
 	void onListSelect()
 	{
@@ -189,17 +186,20 @@ public:
 	}
 	void onOk()
 	{
-		FavoriteSelectionDialogReturn = getString("name");
-		delete(this);
+		selection = getString("name");
+		destroy();
 	}
 
 	bool save;
 	Array<string> names;
+	string selection;
 };
 
 string FavoriteManager::SelectName(HuiWindow *win, Configurable *c, bool save)
 {
 	FavoriteSelectionDialog *dlg = new FavoriteSelectionDialog(win, GetList(c), save);
 	dlg->run();
-	return FavoriteSelectionDialogReturn;
+	string sel = dlg->selection;
+	delete(dlg);
+	return sel;
 }

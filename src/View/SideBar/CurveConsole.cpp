@@ -34,8 +34,8 @@ public:
 		}
 		setSelection("list", sel);
 
-		event("hui:close", this, &CurveTargetDialog::onClose);
-		event("cancel", this, &CurveTargetDialog::onClose);
+		event("hui:close", this, &CurveTargetDialog::destroy);
+		event("cancel", this, &CurveTargetDialog::destroy);
 		event("ok", this, &CurveTargetDialog::onOk);
 	}
 
@@ -46,14 +46,9 @@ public:
 	{
 		Array<int> sel = getSelection("list");
 		targets.clear();
-		for (int i : sel)
+		for (int i: sel)
 			targets.add(all_targets[i]);
-		delete(this);
-	}
-
-	void onClose()
-	{
-		delete(this);
+		destroy();
 	}
 };
 
@@ -142,6 +137,7 @@ void CurveConsole::onTarget()
 		return;
 	CurveTargetDialog *dlg = new CurveTargetDialog(this, song, curve->targets);
 	dlg->run();
+	delete(dlg);
 	updateList();
 }
 

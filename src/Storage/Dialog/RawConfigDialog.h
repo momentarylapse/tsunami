@@ -29,6 +29,7 @@ public:
 	void onOk();
 
 	RawConfigData *data;
+	bool ok;
 };
 
 #endif /* RAWCONFIGDIALOG_H_ */

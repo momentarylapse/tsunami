@@ -37,10 +37,10 @@ void PauseAddDialog::onOk()
 	song->addPause(index, duration, view->bars_edit_data);
 	song->action_manager->endActionGroup();
 
-	delete(this);
+	destroy();
 }
 
 void PauseAddDialog::onClose()
 {
-	delete(this);
+	destroy();
 }

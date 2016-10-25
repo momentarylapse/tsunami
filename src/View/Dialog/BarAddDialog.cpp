@@ -62,10 +62,10 @@ void BarAddDialog::onOk()
 		song->addBar(index, bpm, beats, sub_beats, view->bars_edit_data);
 	song->action_manager->endActionGroup();
 
-	delete(this);
+	destroy();
 }
 
 void BarAddDialog::onClose()
 {
-	delete(this);
+	destroy();
 }

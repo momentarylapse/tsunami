@@ -13,8 +13,6 @@
 #include "../../Plugins/PluginManager.h"
 #include "../../Plugins/Plugin.h"
 
-Configurable *ConfigurableSelectorDialog::_return;
-
 ConfigurableSelectorDialog::ConfigurableSelectorDialog(HuiWindow* _parent, int _type, Song *_song, const string &old_name) :
 	HuiWindow("configurable-selection-dialog", _parent)
 {
@@ -75,7 +73,9 @@ void ConfigurableSelectorDialog::onListSelect()
 
 void ConfigurableSelectorDialog::onSelect()
 {
+	msg_write("onsel");
 	int n = getInt("list") - ugroups.num;
+	msg_write(n);
 	if (n < 0)
 		return;
 	if (type == Configurable::TYPE_EFFECT)
@@ -84,21 +84,25 @@ void ConfigurableSelectorDialog::onSelect()
 		_return = CreateMidiEffect(names[n], song);
 	else if (type == Configurable::TYPE_SYNTHESIZER)
 		_return = CreateSynthesizer(names[n], song);
-	delete(this);
+	msg_write(p2s(_return));
+	destroy();
 }
 
 void ConfigurableSelectorDialog::onClose()
 {
-	delete(this);
+	msg_write("onclose");
+	destroy();
 }
 
 void ConfigurableSelectorDialog::onCancel()
 {
-	delete(this);
+	msg_write("oncan");
+	destroy();
 }
 
 void ConfigurableSelectorDialog::onOk()
 {
+	msg_write("onok");
 	onSelect();
 }
 
@@ -106,5 +110,8 @@ Synthesizer *ChooseSynthesizer(HuiWindow *parent, Song *song, const string &old_
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent, Configurable::TYPE_SYNTHESIZER, song, old_name);
 	dlg->run();
-	return (Synthesizer*)ConfigurableSelectorDialog::_return;
+	Synthesizer *s = (Synthesizer*)dlg->_return;
+	msg_write(p2s(s));
+	delete(dlg);
+	return s;
 }

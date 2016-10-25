@@ -5,10 +5,10 @@ Window *dlg
 class SetFreqDialog extends Dialog
 void OnOk()
 	song.sample_rate = dlg.getInt("freq")
-	delete dlg
+	dlg.destroy()
 
 void OnClose()
-	delete dlg
+	dlg.destroy()
 
 void main()
 	dlg = new FixedDialog("Frequenz", 210, 65, MainWin, false)
@@ -23,3 +23,4 @@ void main()
 	dlg.setInt("freq", song.sample_rate)
 	
 	dlg.run()
+	delete dlg

@@ -85,7 +85,7 @@ Grid ? '' 1 2
 		grid.redraw()
 
 	void onClose()
-		delete self
+		destroy()
 
 class ShowSpectrum extends SongPlugin
 	void show_spec(Song *song)
@@ -136,6 +136,7 @@ class ShowSpectrum extends SongPlugin
 		dlg.onType()
 
 		dlg.run()
+		delete dlg
 	
 		ffr.clear()
 		ffl.clear()

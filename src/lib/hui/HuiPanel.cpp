@@ -48,12 +48,6 @@ void HuiPanel::__delete__()
 // might be executed repeatedly
 void HuiPanel::_ClearPanel_()
 {
-	HuiClosedPanel c;
-	c.unique_id = unique_id;
-	c.panel = this;
-	c.last_id = cur_id;
-	HuiClosedPanels.add(c);
-
 	if (parent){
 		// disconnect
 		for (int i=0; i<parent->children.num; i++)
@@ -206,9 +200,8 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 		}
 
 		// window closed by callback?
-		for (HuiClosedPanel &cp: HuiClosedPanels)
-			if (cp.panel == this)
-				return sent;
+		if (win->gotDestroyed())
+			return sent;
 	}
 
 	// reset

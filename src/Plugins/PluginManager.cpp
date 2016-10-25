@@ -666,14 +666,18 @@ Effect* PluginManager::ChooseEffect(HuiPanel *parent, Song *song)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_EFFECT, song);
 	dlg->run();
-	return (Effect*)ConfigurableSelectorDialog::_return;
+	Effect *e = (Effect*)dlg->_return;
+	delete(dlg);
+	return e;
 }
 
 MidiEffect* PluginManager::ChooseMidiEffect(HuiPanel *parent, Song *song)
 {
 	ConfigurableSelectorDialog *dlg = new ConfigurableSelectorDialog(parent->win, Configurable::TYPE_MIDI_EFFECT, song);
 	dlg->run();
-	return (MidiEffect*)ConfigurableSelectorDialog::_return;
+	MidiEffect *e = (MidiEffect*)dlg->_return;
+	delete(dlg);
+	return e;
 }
 
 /*Synthesizer* PluginManager::ChooseSynthesizer(HuiPanel *parent)

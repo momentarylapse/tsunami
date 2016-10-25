@@ -148,6 +148,7 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 void Tsunami::createWindow()
 {
 	win = new TsunamiWindow;
+	win->auto_delete = true;
 	_win = dynamic_cast<HuiWindow*>(win);
 	_view = win->view;
 	song = win->song;

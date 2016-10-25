@@ -81,9 +81,11 @@ public:
 	void _clean_up_();
 
 	void _cdecl destroy();
+	bool _cdecl gotDestroyed();
+	virtual void _cdecl onDestroy(){}
 
 	// the window
-	string _cdecl run();
+	void _cdecl run();
 	void _cdecl show();
 	void _cdecl hide();
 	void _cdecl setMaximized(bool maximized);

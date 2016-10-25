@@ -39,68 +39,107 @@ void HuiSetErrorFunction(hui_callback *error_function)
 	}
 }
 
-static HuiWindow *ErrorDialog,*ReportDialog;
 static hui_callback *_eh_cleanup_function_;
 
 
 #ifdef _X_USE_NET_
 
-void OnReportDialogOK()
+class ReportDialog : public HuiFixedDialog
 {
-	string sender = ReportDialog->getString("report_sender");
-	string comment = ReportDialog->getString("comment");
-	string return_msg;
-	if (NetSendBugReport(sender, HuiGetProperty("name"), HuiGetProperty("version"), comment, return_msg))
-		HuiInfoBox(NULL, "ok", return_msg);
-	else
-		HuiErrorBox(NULL, "error", return_msg);
-	delete(ReportDialog);
+public:
+	ReportDialog(HuiWindow *parent) :
+		HuiFixedDialog(_("Bug Report"), 400, 295, parent, false)
+	{
+		addLabel("!bold$" + _("Name:"),5,5,360,25,"brd_t_name");
+		addEdit("",5,35,385,25,"report_sender");
+		addDefButton(_("Ok"),265,255,120,25,"ok");
+		setImage("ok", "hui:ok");
+		addButton(_("Cancel"),140,255,120,25,"cancel");
+		setImage("cancel", "hui:cancel");
+		addLabel("!bold$" + _("Comment/what happened:"),5,65,360,25,"brd_t_comment");
+		addMultilineEdit("",5,95,385,110,"comment");
+		addLabel("!wrap$" + _("Your comments and the contents of the file message.txt will be sent."),5,210,390,35,"brd_t_explanation");
+
+		setString("report_sender",_("(anonymous)"));
+		setString("comment",_("Just happened somehow..."));
+
+		event("ok", this, &ReportDialog::onOk);
+		event("cancel", this, &ReportDialog::destroy);
+		event("hui:close", this, &ReportDialog::destroy);
+	}
+
+	void onOk()
+	{
+		string sender = getString("report_sender");
+		string comment = getString("comment");
+		string return_msg;
+		if (NetSendBugReport(sender, HuiGetProperty("name"), HuiGetProperty("version"), comment, return_msg))
+			HuiInfoBox(NULL, "ok", return_msg);
+		else
+			HuiErrorBox(NULL, "error", return_msg);
+		destroy();
+	}
+};
+
+void HuiSendBugReport(HuiWindow *parent)
+{
+	ReportDialog *dlg = new ReportDialog(parent);
+	dlg->run();
+	delete(dlg);
 }
 
-void OnReportDialogClose()
-{
-	delete(ReportDialog);
-}
-
-void HuiSendBugReport()
-{
-	// dialog
-	ReportDialog = new HuiFixedDialog(_("Bug Report"),400,295,ErrorDialog,false);
-	ReportDialog->addLabel("!bold$" + _("Name:"),5,5,360,25,"brd_t_name");
-	ReportDialog->addEdit("",5,35,385,25,"report_sender");
-	ReportDialog->addDefButton(_("Ok"),265,255,120,25,"ok");
-	ReportDialog->setImage("ok", "hui:ok");
-	ReportDialog->addButton(_("Cancel"),140,255,120,25,"cancel");
-	ReportDialog->setImage("cancel", "hui:cancel");
-	ReportDialog->addLabel("!bold$" + _("Comment/what happened:"),5,65,360,25,"brd_t_comment");
-	ReportDialog->addMultilineEdit("",5,95,385,110,"comment");
-	ReportDialog->addLabel("!wrap$" + _("Your comments and the contents of the file message.txt will be sent."),5,210,390,35,"brd_t_explanation");
-
-	ReportDialog->setString("report_sender",_("(anonymous)"));
-	ReportDialog->setString("comment",_("Just happened somehow..."));
-
-	ReportDialog->eventS("ok", &OnReportDialogOK);
-	ReportDialog->eventS("cancel", &OnReportDialogClose);
-	ReportDialog->eventS("hui:close", &OnReportDialogClose);
-
-	ReportDialog->run();
-}
 #endif
 
-void OnErrorDialogShowLog()
+class ErrorDialog : public HuiFixedDialog
 {
-	HuiOpenDocument("message.txt");
-}
+public:
+	ErrorDialog() :
+		HuiFixedDialog(_("Error"), 600, 500, NULL, false)
+	{
+		addLabel(HuiGetProperty("name") + " " + HuiGetProperty("version") + _(" has crashed.		The last lines of the file message.txt::"),5,5,590,20,"error_header");
+		addListView(_("Messages"),5,30,590,420,"message_list");
+		//addEdit("",5,30,590,420,"message_list";
+		addButton(_("Ok"),5,460,100,25,"ok");
+		setImage("ok", "hui:ok");
+		addButton(_("open message.txt"),115,460,200,25,"show_log");
+		addButton(_("Send bug report to Michi"),325,460,265,25,"send_report");
+	#ifdef _X_USE_NET_
+		event("send_report", this, &ErrorDialog::onSendBugReport);
+	#else
+		enable("send_report", false);
+		setTooltip("send_report", _("Program was compiled without network support..."));
+	#endif
+		for (int i=1023;i>=0;i--){
+			string temp = msg_get_str(i);
+			if (temp.num > 0)
+				addString("message_list", temp);
+		}
+		event("show_log", this, &ErrorDialog::onShowLog);
+		event("cancel", this, &ErrorDialog::onClose);
+		event("hui:win_close", this, &ErrorDialog::onClose);
+		event("ok", this, &ErrorDialog::onClose);
+	}
 
-void OnErrorDialogClose()
-{
-	msg_write("real close");
-	exit(0);
-}
+	void onShowLog()
+	{
+		HuiOpenDocument("message.txt");
+	}
+
+	void onSendBugReport()
+	{
+		HuiSendBugReport(this);
+	}
+
+	void onClose()
+	{
+		msg_write("real close");
+		exit(0);
+	}
+};
 
 void hui_default_error_handler()
 {
-	HuiIdleFunction=NULL;
+	HuiIdleFunction = NULL;
 
 	msg_reset_shift();
 	msg_write("");
@@ -126,30 +165,8 @@ void hui_default_error_handler()
 	//HuiErrorBox(NULL,"Fehler","Fehler");
 
 	// dialog
-	ErrorDialog = new HuiFixedDialog(_("Error"),600,500,NULL,false);
-	ErrorDialog->addLabel(HuiGetProperty("name") + " " + HuiGetProperty("version") + _(" has crashed.		The last lines of the file message.txt::"),5,5,590,20,"error_header");
-	ErrorDialog->addListView(_("Messages"),5,30,590,420,"message_list");
-	//ErrorDialog->AddEdit("",5,30,590,420,"message_list";
-	ErrorDialog->addButton(_("Ok"),5,460,100,25,"ok");
-	ErrorDialog->setImage("ok", "hui:ok");
-	ErrorDialog->addButton(_("open message.txt"),115,460,200,25,"show_log");
-	ErrorDialog->addButton(_("Send bug report to Michi"),325,460,265,25,"send_report");
-#ifdef _X_USE_NET_
-	ErrorDialog->eventS("send_report", &HuiSendBugReport);
-#else
-	ErrorDialog->enable("send_report", false);
-	ErrorDialog->setTooltip("send_report", _("Program was compiled without network support..."));
-#endif
-	for (int i=1023;i>=0;i--){
-		string temp = msg_get_str(i);
-		if (temp.num > 0)
-			ErrorDialog->addString("message_list", temp);
-	}
-	ErrorDialog->eventS("show_log", &OnErrorDialogShowLog);
-	ErrorDialog->eventS("cancel", &OnErrorDialogClose);
-	ErrorDialog->eventS("hui:win_close", &OnErrorDialogClose);
-	ErrorDialog->eventS("ok", &OnErrorDialogClose);
-	ErrorDialog->run();
+	ErrorDialog *dlg = new ErrorDialog;
+	dlg->run();
 
 	//HuiEnd();
 	exit(0);

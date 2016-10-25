@@ -16,12 +16,10 @@ class TuningDialog : public HuiWindow
 {
 public:
 	TuningDialog(HuiWindow *parent, Track *t);
-	virtual ~TuningDialog();
 
 	void update();
 
 	void onOk();
-	void onClose();
 
 	void onAddFirst();
 	void onAdd();

@@ -32,7 +32,7 @@ public:
 	Set<string> ugroups;
 	Array<string> groups;
 
-	static Configurable *_return;
+	Configurable *_return;
 };
 
 Synthesizer *ChooseSynthesizer(HuiWindow *parent, Song *song, const string &old_name = "");

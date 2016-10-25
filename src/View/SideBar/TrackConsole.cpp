@@ -126,6 +126,7 @@ void TrackConsole::onEditTuning()
 {
 	TuningDialog *dlg = new TuningDialog(win, track);
 	dlg->run();
+	delete(dlg);
 }
 
 void TrackConsole::applyData()

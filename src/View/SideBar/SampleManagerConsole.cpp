@@ -355,7 +355,7 @@ public:
 	}
 	virtual ~SampleSelector()
 	{
-		for (string &name : icon_names)
+		for (string &name: icon_names)
 			HuiDeleteImage(name);
 	}
 
@@ -373,36 +373,36 @@ public:
 		int n = getInt("");
 		if (n == 0){
 			ret = NULL;
-			delete(this);
+			destroy();
 		}else if (n >= 1){
 			ret = song->samples[n - 1];
-			delete(this);
+			destroy();
 		}
 	}
 
 	void onOk()
 	{
-		delete(this);
+		destroy();
 	}
 
 	void onCancel()
 	{
 		ret = _old;
-		delete(this);
+		destroy();
 	}
 
-	static Sample *ret;
+	Sample *ret;
 	Sample *_old;
 	Array<string> icon_names;
 	Song *song;
 	string list_id;
 };
 
-Sample *SampleSelector::ret;
-
 Sample *SampleManagerConsole::select(HuiPanel *root, Song *a, Sample *old)
 {
 	SampleSelector *s = new SampleSelector(root, a, old, tsunami->_view);
 	s->run();
-	return SampleSelector::ret;
+	Sample *r = s->ret;
+	delete(s);
+	return r;
 }

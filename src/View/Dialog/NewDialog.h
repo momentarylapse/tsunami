@@ -16,13 +16,11 @@ class NewDialog: public HuiWindow
 {
 public:
 	NewDialog(HuiWindow *_parent, Song *a);
-	virtual ~NewDialog();
 
 	void loadData();
 	void applyData();
 
 	void onOk();
-	void onClose();
 	void onMetronome();
 	void onTypeMidi();
 

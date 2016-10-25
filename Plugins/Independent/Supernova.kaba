@@ -83,7 +83,7 @@ class SuperNovaWindow extends Window
 			StopLesson()
 	
 	void onClose()
-		delete self
+		destroy()
 	
 	void onCancel()
 		StopLesson()
@@ -341,4 +341,5 @@ void main()
 	
 	MainWin.hide()
 	win.run()
+	delete win
 	MainWin.show()

@@ -16,6 +16,7 @@ RawConfigDialog::RawConfigDialog(RawConfigData *_data, HuiWindow *parent) :
 	data->format = SAMPLE_FORMAT_8;
 	data->sample_rate = DEFAULT_SAMPLE_RATE;
 	data->offset = 0;
+	ok = false;
 
 	for (int i=1;i<NUM_SAMPLE_FORMATS;i++)
 		addString("format", format_name((SampleFormat)i));
@@ -33,7 +34,7 @@ RawConfigDialog::~RawConfigDialog()
 
 void RawConfigDialog::onClose()
 {
-	delete(this);
+	destroy();
 }
 
 void RawConfigDialog::onOk()
@@ -42,5 +43,6 @@ void RawConfigDialog::onOk()
 	data->channels = getInt("channels") + 1;
 	data->sample_rate = getInt("sample_rate");
 	data->offset = getInt("offset");
-	delete(this);
+	ok = true;
+	destroy();
 }

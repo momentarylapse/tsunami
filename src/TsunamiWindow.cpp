@@ -46,6 +46,8 @@ extern string AppName;
 
 HuiTimer debug_timer;
 
+static Array<TsunamiWindow*> TsunamiWindows;
+
 class TsunamiWindowObserver : public Observer
 {
 public:
@@ -174,6 +176,7 @@ TsunamiWindow::TsunamiWindow() :
 
 
 	die_on_plugin_stop = false;
+	auto_delete = false;
 
 	song = new Song;
 
@@ -208,10 +211,39 @@ TsunamiWindow::TsunamiWindow() :
 	HuiRunLaterM(0.5f, view, &AudioView::optimizeView);
 
 	updateMenu();
+	TsunamiWindows.add(this);
 }
 
 TsunamiWindow::~TsunamiWindow()
 {
+}
+
+void TsunamiCleanUp()
+{
+	bool again = false;
+	do{
+		again = false;
+		foreachi(TsunamiWindow *w, TsunamiWindows, i)
+			if (w->gotDestroyed() and w->auto_delete){
+				delete(w);
+				TsunamiWindows.erase(i);
+				again = true;
+				break;
+			}
+	}while(again);
+
+	if (TsunamiWindows.num == 0)
+		HuiEnd();
+}
+
+void TsunamiWindow::onDestroy()
+{
+	int w, h;
+	getSizeDesired(w, h);
+	HuiConfig.setInt("Window.Width", w);
+	HuiConfig.setInt("Window.Height", h);
+	HuiConfig.setBool("Window.Maximized", isMaximized());
+
 	observer->unsubscribe(view);
 	observer->unsubscribe(song);
 	observer->unsubscribe(view->stream);
@@ -220,19 +252,13 @@ TsunamiWindow::~TsunamiWindow()
 	observer->unsubscribe(side_bar);
 	delete(observer);
 
-	int w, h;
-	getSizeDesired(w, h);
-	HuiConfig.setInt("Window.Width", w);
-	HuiConfig.setInt("Window.Height", h);
-	HuiConfig.setBool("Window.Maximized", isMaximized());
 	delete(side_bar);
 	delete(mini_bar);
 	delete(bottom_bar);
 	delete(view);
 	delete(song);
 
-	// FIXME argh...
-	HuiEnd();
+	HuiRunLater(0.010f, &TsunamiCleanUp);
 }
 
 
@@ -298,10 +324,12 @@ void TsunamiWindow::onTrackEditFX()
 void TsunamiWindow::onTrackAddMarker()
 {
 	if (view->cur_track){
-		MarkerDialog *d = new MarkerDialog(this, view->cur_track, view->hover.pos, -1);
-		d->run();
-	}else
+		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, view->hover.pos, -1);
+		dlg->run();
+		delete(dlg);
+	}else{
 		tsunami->log->error(_("No track selected"));
+	}
 }
 
 void TsunamiWindow::onSongProperties()
@@ -336,8 +364,9 @@ void TsunamiWindow::onDeleteMarker()
 void TsunamiWindow::onEditMarker()
 {
 	if (view->selection.type == Selection::TYPE_MARKER){
-		MarkerDialog *d = new MarkerDialog(this, view->cur_track, -1, view->selection.index);
-		d->run();
+		MarkerDialog *dlg = new MarkerDialog(this, view->cur_track, -1, view->selection.index);
+		dlg->run();
+		delete(dlg);
 	}else
 		tsunami->log->error(_("No marker selected"));
 }
@@ -526,6 +555,7 @@ void TsunamiWindow::onSettings()
 {
 	SettingsDialog *dlg = new SettingsDialog(view, this);
 	dlg->run();
+	delete(dlg);
 }
 
 void TsunamiWindow::onTrackImport()
@@ -767,8 +797,7 @@ void TsunamiWindow::onUpdate(Observable *o, const string &message)
 void TsunamiWindow::onExit()
 {
 	if (allowTermination())
-		delete(this);
-		//destroy();
+		destroy();
 }
 
 
@@ -776,8 +805,9 @@ void TsunamiWindow::onNew()
 {
 	if (!allowTermination())
 		return;
-	NewDialog *d = new NewDialog(this, song);
-	d->run();
+	NewDialog *dlg = new NewDialog(this, song);
+	dlg->run();
+	delete(dlg);
 }
 
 
@@ -818,12 +848,14 @@ void TsunamiWindow::onAddBars()
 {
 	HuiDialog *dlg = new BarAddDialog(win, song, view);
 	dlg->run();
+	delete(dlg);
 }
 
 void TsunamiWindow::onAddPause()
 {
 	HuiDialog *dlg = new PauseAddDialog(win, song, view);
 	dlg->run();
+	delete(dlg);
 }
 
 void TsunamiWindow::onDeleteBars()
@@ -851,9 +883,11 @@ void TsunamiWindow::onEditBars()
 	if (num_bars > 0 and num_pauses == 0){
 		HuiDialog *dlg = new BarEditDialog(win, song, view->sel.bars, view->bars_edit_data);
 		dlg->run();
+		delete(dlg);
 	}else if (num_bars == 0 and num_pauses == 1){
 		HuiDialog *dlg = new PauseEditDialog(win, song, view->sel.bars.start(), view->bars_edit_data);
 		dlg->run();
+		delete(dlg);
 	}else{
 		HuiErrorBox(this, _("Error"), _("Can only edit bars or a single pause at a time."));
 	}

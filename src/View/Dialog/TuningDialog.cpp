@@ -19,13 +19,9 @@ TuningDialog::TuningDialog(HuiWindow *_parent, Track *t) :
 	update();
 
 	event("ok", this, &TuningDialog::onOk);
-	event("cancel", this, &TuningDialog::onClose);
-	event("hui:close", this, &TuningDialog::onClose);
+	event("cancel", this, &TuningDialog::destroy);
+	event("hui:close", this, &TuningDialog::destroy);
 	event("add_first", this, &TuningDialog::onAddFirst);
-}
-
-TuningDialog::~TuningDialog()
-{
 }
 
 void TuningDialog::update()
@@ -72,12 +68,7 @@ void TuningDialog::onOk()
 	Instrument i = track->instrument;
 	i.string_pitch = tuning;
 	track->setInstrument(i);
-	delete(this);
-}
-
-void TuningDialog::onClose()
-{
-	delete(this);
+	destroy();
 }
 
 void TuningDialog::onEdit()

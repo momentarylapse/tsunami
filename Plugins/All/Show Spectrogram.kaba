@@ -62,7 +62,7 @@ Grid ? '' 1 2
 		event("close", &onClose)
 
 	void onClose()
-		delete self
+		destroy()
 
 color f2col(float f)
 	f = sqrt(f)
@@ -124,6 +124,7 @@ class ShowSpectrogram extends SongPlugin
 		dlg.redraw("drawing_area")
 
 		dlg.run()
+		delete dlg
 
 	override void apply(Song *song)
 	

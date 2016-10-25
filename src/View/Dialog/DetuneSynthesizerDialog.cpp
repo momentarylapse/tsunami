@@ -127,5 +127,5 @@ void DetuneSynthesizerDialog::onMouseWheel()
 
 void DetuneSynthesizerDialog::onClose()
 {
-	delete(this);
+	destroy();
 }

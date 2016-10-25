@@ -51,12 +51,12 @@ void BarEditDialog::onOk()
 	}
 	song->action_manager->endActionGroup();
 
-	delete(this);
+	destroy();
 }
 
 void BarEditDialog::onClose()
 {
-	delete(this);
+	destroy();
 }
 
 void BarEditDialog::onBeats()

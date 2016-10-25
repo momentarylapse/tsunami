@@ -16,7 +16,6 @@ class SettingsDialog: public HuiWindow
 {
 public:
 	SettingsDialog(AudioView *view, HuiWindow *parent);
-	virtual ~SettingsDialog();
 
 	void loadData();
 	void applyData();
@@ -27,7 +26,6 @@ public:
 	void onDefaultArtist();
 	void onCaptureFilename();
 	void onCaptureFind();
-	void onClose();
 
 
 private:

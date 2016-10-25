@@ -23,8 +23,8 @@ SettingsDialog::SettingsDialog(AudioView *_view, HuiWindow *_parent):
 	event("default_artist", this, &SettingsDialog::onDefaultArtist);
 	event("capture_filename", this, &SettingsDialog::onCaptureFilename);
 	event("capture_find", this, &SettingsDialog::onCaptureFind);
-	event("hui:close", this, &SettingsDialog::onClose);
-	event("close", this, &SettingsDialog::onClose);
+	event("hui:close", this, &SettingsDialog::destroy);
+	event("close", this, &SettingsDialog::destroy);
 
 	setOptions("capture_filename", "placeholder=" + InputStreamAudio::getDefaultBackupFilename());
 	setOptions("default_artist", "placeholder=" + AppName);
@@ -43,10 +43,6 @@ SettingsDialog::SettingsDialog(AudioView *_view, HuiWindow *_parent):
 
 	loadData();
 
-}
-
-SettingsDialog::~SettingsDialog()
-{
 }
 
 void SettingsDialog::loadData()
@@ -119,10 +115,5 @@ void SettingsDialog::onCaptureFind()
 	if (HuiFileDialogSave(this, _("Select backup file for recordings"), InputStreamAudio::backup_filename.basename(), "*.raw", "*.raw"))
 		setString("capture_filename", HuiFilename);
 	InputStreamAudio::setBackupFilename(HuiFilename);
-}
-
-void SettingsDialog::onClose()
-{
-	delete(this);
 }
 

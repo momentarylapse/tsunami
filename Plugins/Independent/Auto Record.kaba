@@ -32,5 +32,7 @@ class AutoRecord extends TsunamiPlugin
 		//print("------------- " + message)
 		if message == "SetInput"
 			if view.input
-				SetTempBackupFilename(get_fn())
+				string fn = get_fn()
+				SetTempBackupFilename(fn)
 				view.input.setBackupMode(2)
+				song.filename = fn.replace(".raw", ".ogg")

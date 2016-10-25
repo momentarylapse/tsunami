@@ -466,6 +466,7 @@ void PluginManager::LinkAppScriptData()
 	Script::DeclareClassSize("TsunamiPlugin", sizeof(TsunamiPlugin));
 	Script::DeclareClassOffset("TsunamiPlugin", "win", _offsetof(TsunamiPlugin, win));
 	Script::DeclareClassOffset("TsunamiPlugin", "view", _offsetof(TsunamiPlugin, view));
+	Script::DeclareClassOffset("TsunamiPlugin", "song", _offsetof(TsunamiPlugin, song));
 	Script::DeclareClassOffset("TsunamiPlugin", "args", _offsetof(TsunamiPlugin, args));
 	Script::LinkExternal("TsunamiPlugin." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&TsunamiPlugin::__init__));
 	Script::DeclareClassVirtualIndex("TsunamiPlugin", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);

@@ -29,7 +29,7 @@ void SongSelection::all(Song* s)
 
 void SongSelection::all_tracks(Song* s)
 {
-	for (Track *t : s->tracks)
+	for (Track *t: s->tracks)
 		add(t);
 }
 
@@ -43,19 +43,20 @@ void SongSelection::fromRange(Song* s, const Range &r)
 	notes.clear();
 	samples.clear();
 
-	for (Track *t : s->tracks){
+	for (Track *t: s->tracks){
 		if (!has(t))
 			continue;
+
 		// subs
-		for (SampleRef *s : t->samples)
+		for (SampleRef *s: t->samples)
 			set(s, range.overlaps(s->range()));
 
 		// markers
-		for (TrackMarker *m : t->markers)
+		for (TrackMarker *m: t->markers)
 			set(m, range.is_inside(m->pos));
 
 		// midi
-		for (MidiNote *n : t->midi)
+		for (MidiNote *n: t->midi)
 			set(n, range.is_inside(n->range.center()));
 	}
 }
@@ -173,11 +174,11 @@ SongSelection SongSelection::restrict_to_track(Track *t) const
 	sel.bars = bars;
 	sel.bar_range = bar_range;
 	sel.set(t, true);
-	for (MidiNote *n : t->midi)
+	for (MidiNote *n: t->midi)
 		sel.set(n, has(n));
-	for (TrackMarker *m : t->markers)
+	for (TrackMarker *m: t->markers)
 		sel.set(m, has(m));
-	for (SampleRef *r : t->samples)
+	for (SampleRef *r: t->samples)
 		sel.set(r, has(r));
 	return sel;
 }

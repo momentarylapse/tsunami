@@ -21,6 +21,7 @@ class Instrument;
 class Clef;
 class Scale;
 class Track;
+class SongSelection;
 
 
 class MidiRawData : public Array<MidiEvent>
@@ -54,6 +55,7 @@ public:
 	void deep_clear();
 	MidiRawData getEvents(const Range &r) const;
 	MidiDataRef getNotes(const Range &r) const;
+	MidiDataRef getNotesBySelection(const SongSelection &s) const;
 	MidiData duplicate() const;
 
 	Range getRange(int elongation) const;

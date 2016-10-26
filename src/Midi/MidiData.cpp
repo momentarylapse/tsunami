@@ -8,6 +8,7 @@
 #include "MidiData.h"
 #include "Instrument.h"
 #include "../Data/Track.h"
+#include "../Data/SongSelection.h"
 #include <math.h>
 #include "../lib/hui/hui.h"
 
@@ -334,6 +335,15 @@ MidiDataRef MidiData::getNotes(const Range &r) const
 	MidiDataRef b;
 	for (MidiNote *n: *this)
 		if (r.overlaps(n->range))
+			b.add(n);
+	return b;
+}
+
+MidiDataRef MidiData::getNotesBySelection(const SongSelection &s) const
+{
+	MidiDataRef b;
+	for (MidiNote *n: *this)
+		if (s.has(n))
 			b.add(n);
 	return b;
 }

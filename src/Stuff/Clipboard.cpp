@@ -47,10 +47,10 @@ void Clipboard::append_track(Track *t, AudioView *view)
 		tt->levels[0].buffers.add(t->readBuffers(view->cur_level, view->sel.range));
 		tt->levels[0].buffers[0].make_own();
 	}else if (t->type == Track::TYPE_MIDI){
-		tt->midi = t->midi.getNotes(view->sel.range);
+		tt->midi = t->midi.getNotesBySelection(view->sel);
 		tt->midi.samples = view->sel.range.length;
 		tt->midi.sanify(view->sel.range);
-		for (MidiNote *n : tt->midi)
+		for (MidiNote *n: tt->midi)
 			n->range.offset -= view->sel.range.offset;
 	}
 
@@ -68,7 +68,7 @@ void Clipboard::copy(AudioView *view)
 	temp->sample_rate = s->sample_rate;
 
 	SongSelection sel = view->getEditSeletion();
-	for (Track *t : s->tracks)
+	for (Track *t: s->tracks)
 		if (sel.has(t))
 			append_track(t, view);
 
@@ -87,7 +87,7 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 		buf.set(source->levels[0].buffers[0], 0, 1.0f);
 		s->execute(a);
 	}else if (target->type == Track::TYPE_MIDI){
-		for (MidiNote *n : source->midi){
+		for (MidiNote *n: source->midi){
 			MidiNote nn = *n;
 			nn.range.offset += view->sel.range.start();
 			target->addMidiNote(nn);
@@ -117,7 +117,7 @@ void Clipboard::paste_track_as_samples(int source_index, Track *target, AudioVie
 bool Clipboard::test_compatibility(AudioView *view, bool *paste_single)
 {
 	Array<string> temp_type, dest_type;
-	for (Track *t : view->song->tracks){
+	for (Track *t: view->song->tracks){
 		if (!view->sel.has(t))
 			continue;
 		if (t->type == Track::TYPE_TIME)
@@ -125,7 +125,7 @@ bool Clipboard::test_compatibility(AudioView *view, bool *paste_single)
 		dest_type.add(track_type(t->type));
 	}
 
-	for (Track *t : temp->tracks)
+	for (Track *t: temp->tracks)
 		temp_type.add(track_type(t->type));
 
 	// only 1 track in clipboard => paste into current
@@ -165,7 +165,7 @@ void Clipboard::paste(AudioView *view)
 		paste_track(0, view->cur_track, view);
 	}else{
 		int ti = 0;
-		for (Track *t : s->tracks){
+		for (Track *t: s->tracks){
 			if (!view->sel.has(t))
 				continue;
 			if (t->type == Track::TYPE_TIME)
@@ -195,7 +195,7 @@ void Clipboard::pasteAsSamples(AudioView *view)
 		paste_track_as_samples(0, view->cur_track, view);
 	}else{
 		int ti = 0;
-		for (Track *t : s->tracks){
+		for (Track *t: s->tracks){
 			if (!view->sel.has(t))
 				continue;
 			if (t->type == Track::TYPE_TIME)

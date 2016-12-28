@@ -140,8 +140,18 @@ void SerializerAMD64::add_function_call(Script *script, int func_no)
 		void *func = (void*)script->func[func_no];
 		if (!func)
 			DoErrorLink("could not link function " + script->syntax->functions[func_no]->name);
-		add_cmd(Asm::INST_CALL, param_const(TypeReg32, (long)func)); // the actual call
-		// function pointer will be shifted later...
+		long d = (long)func - (long)this->script->opcode;
+		if (d < 0)
+			d = -d;
+		if (d < 0x70000000){
+			// 32bit call distance
+			add_cmd(Asm::INST_CALL, param_const(TypeReg32, (long)func)); // the actual call
+			// function pointer will be shifted later...(asm translates to RIP-relative)
+		}else{
+			// 64bit call distance
+			add_cmd(Asm::INST_MOV, p_rax, param_const(TypeReg64, (long)func));
+			add_cmd(Asm::INST_CALL, p_rax);
+		}
 	}
 
 	fc_end(push_size);

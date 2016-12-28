@@ -75,6 +75,57 @@ void init_all_global_objects(SyntaxTree *ps, Array<char*> &g_var)
 		try_init_global_var(v.type, g_var[i]);
 }
 
+static long _opcode_rand_state_ = 10000;
+
+void* get_nice_random_addr()
+{
+	long p = ((long)&Init) & 0xfffffffffffff000;
+	_opcode_rand_state_ = (_opcode_rand_state_ * 1664525 + 1013904223);
+	p += (long)(_opcode_rand_state_ & 0x3fff) * 4096;
+	return (void*)p;
+
+}
+
+void* get_nice_memory(long size, bool executable)
+{
+	void *mem = NULL;
+	size = mem_align(size, 4096);
+	msg_write("get nice...");
+
+#ifdef OS_WINDOWS
+	mem = (char*)VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+#else
+
+	// try in 32bit distance from current opcode
+	for (int i=0; i<100; i++){
+		void *addr0 = get_nice_random_addr();
+		//opcode = (char*)mmap(addr0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
+		mem = (char*)mmap(addr0, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_EXECUTABLE, -1, 0);
+		printf("%d  %p  ->  %p\n", i, addr0, mem);
+		if ((long)mem != -1){
+			if (labs((long)mem - (long)addr0) < 1000000000)
+				return mem;
+			else
+				munmap(mem, size);
+			msg_write("...try again");
+		}
+	}
+
+	// no?...ok, try anywhere
+	mem = (char*)mmap(NULL, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_EXECUTABLE, -1, 0);
+	if ((long)mem == -1)
+		mem = NULL;
+#endif
+
+	// failed...
+	if (!mem){
+		msg_error(string("Script:  could not allocate executable memory: ") + strerror(errno));
+		mem = new char[size];
+	}
+
+	return mem;
+}
+
 void Script::AllocateMemory()
 {
 	// get memory size needed
@@ -98,16 +149,8 @@ void Script::AllocateMemory()
 
 	// allocate
 	if (memory_size > 0){
-#ifdef OS_WINDOWS
-		memory = (char*)VirtualAlloc(NULL, memory_size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-#else
-		//Memory = (char*)mmap(0, MemorySize, PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS /*| MAP_EXECUTABLE*/ | MAP_32BIT, -1, 0);
-		memory = (char*)mmap(0, mem_align(memory_size, 4096), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS /*| MAP_EXECUTABLE*/ | MAP_32BIT, -1, 0);
-		if (memory == (char*)-1)
-			memory = new char[memory_size];
-			//DoErrorInternal(format("can not allocate memory, (%d) ", errno) + strerror(errno));
-#endif
-		//Memory = new char[MemorySize];
+		memory = (char*)get_nice_memory(memory_size, false);
+		msg_write("memory:  " + p2s(memory));
 	}
 }
 
@@ -130,17 +173,9 @@ void Script::AllocateOpcode()
 	int max_opcode = SCRIPT_MAX_OPCODE;
 	if (config.compile_os)
 		max_opcode *= 10;
-	// allocate some memory for the opcode......    has to be executable!!!   (important on amd64)
-#ifdef OS_WINDOWS
-	opcode=(char*)VirtualAlloc(NULL,max_opcode,MEM_COMMIT | MEM_RESERVE,PAGE_EXECUTE_READWRITE);
-#else
-	opcode = (char*)mmap(0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
-#endif
-	if ((long)opcode == -1){
-		//DoErrorInternal(string("Script:  could not allocate executable memory: ") + strerror(errno));
-		msg_error(string("Script:  could not allocate executable memory: ") + strerror(errno));
-		opcode = new char[max_opcode];
-	}
+
+	opcode = (char*)get_nice_memory(max_opcode, true);
+	msg_write("opcode:  " + p2s(opcode));
 	if (config.override_code_origin)
 		syntax->asm_meta_info->code_origin = config.code_origin;
 	else

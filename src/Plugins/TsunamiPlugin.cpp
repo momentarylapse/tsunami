@@ -63,6 +63,11 @@ TsunamiPlugin *CreateTsunamiPlugin(const string &name, TsunamiWindow *win)
 {
 	Plugin *p = tsunami->plugin_manager->GetPlugin(Plugin::TYPE_TSUNAMI_PLUGIN, name);
 	TsunamiPlugin *t = NULL;
+
+	msg_write(p2s((void*)&CreateTsunamiPlugin));
+	msg_write(p2s((void*)p->s->opcode));
+	msg_write(p2s((void*)p->s->memory));
+
 	if (p->usable)
 		t = (TsunamiPlugin*)p->createInstance("TsunamiPlugin");
 

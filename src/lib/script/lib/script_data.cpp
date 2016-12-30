@@ -1025,6 +1025,10 @@ void op_float_div(string &r, string &a, string &b)
 
 void op_int64_add(string &r, string &a, string &b)
 {	*(long long*)r.data = *(long long*)a.data + *(long long*)b.data;	}
+void op_int64_add_int(string &r, string &a, string &b)
+{
+	*(long long*)r.data = *(long long*)a.data + *(int*)b.data;
+}
 void op_int64_sub(string &r, string &a, string &b)
 {	*(long long*)r.data = *(long long*)a.data - *(long long*)b.data;	}
 void op_int64_mul(string &r, string &a, string &b)
@@ -1097,6 +1101,7 @@ void SIAddOperators()
 	add_operator(OPERATOR_DECREASE,		TypeVoid,		TypeInt,		TypeVoid);
 	add_operator(OPERATOR_ASSIGN,		TypeVoid,		TypeInt64,		TypeInt64);
 	add_operator(OPERATOR_ADD,			TypeInt64,		TypeInt64,		TypeInt64,	(void*)op_int64_add);
+	add_operator(OPERATOR_ADD,			TypeInt64,		TypeInt64,		TypeInt,	(void*)op_int64_add_int);
 	add_operator(OPERATOR_SUBTRACT,		TypeInt64,		TypeInt64,		TypeInt64,	(void*)op_int64_sub);
 	add_operator(OPERATOR_MULTIPLY,		TypeInt64,		TypeInt64,		TypeInt64,	(void*)op_int64_mul);
 	add_operator(OPERATOR_DIVIDE,		TypeInt64,		TypeInt64,		TypeInt64,	(void*)op_int64_div);

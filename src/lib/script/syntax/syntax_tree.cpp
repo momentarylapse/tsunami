@@ -231,7 +231,7 @@ string Kind2Str(int kind)
 	return format("UNKNOWN KIND: %d", kind);
 }
 
-string LinkNr2Str(SyntaxTree *s,int kind,int nr)
+string LinkNr2Str(SyntaxTree *s, int kind, long long nr)
 {
 	if (kind == KIND_VAR_LOCAL)			return i2s(nr);//s->cur_func->var[nr].name;
 	if (kind == KIND_VAR_GLOBAL)			return s->root_of_all_evil.var[nr].name;
@@ -925,6 +925,13 @@ void SyntaxTree::Simplify()
 			f->block->commands[i] = easyfy(this, c, 0);
 }
 
+int __get_pointer_add_int()
+{
+	if (config.abi == Asm::INSTRUCTION_SET_AMD64)
+		return OperatorInt64AddInt;
+	return OperatorIntAdd;
+}
+
 Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 {
 	// recursion...
@@ -959,7 +966,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		Command *c_offset = add_command_operator(c_index, c_size, OperatorIntMultiply);
 		c_offset->type = TypeInt;//TypePointer;
 		// address = &array + offset
-		Command *c_address = add_command_operator(c_ref_array, c_offset, OperatorIntAdd);
+		Command *c_address = add_command_operator(c_ref_array, c_offset, __get_pointer_add_int());
 		c_address->type = el_type->GetPointer();//TypePointer;
 		// * address
 		return deref_command(c_address);
@@ -984,7 +991,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		Command *c_offset = add_command_operator(c_index, c_size, OperatorIntMultiply);
 		c_offset->type = TypeInt;
 		// address = &array + offset
-		Command *c_address = add_command_operator(c_ref_array, c_offset, OperatorIntAdd);
+		Command *c_address = add_command_operator(c_ref_array, c_offset, __get_pointer_add_int());
 		c_address->type = el_type->GetPointer();//TypePointer;
 		// * address
 		return deref_command(c_address);
@@ -1005,7 +1012,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		constants[nc].setInt(c->link_no);
 		Command *c_shift = add_command_const(nc);
 		// address = &struct + shift
-		Command *c_address = add_command_operator(c_ref_struct, c_shift, OperatorIntAdd);
+		Command *c_address = add_command_operator(c_ref_struct, c_shift, __get_pointer_add_int());
 		c_address->type = el_type->GetPointer();//TypePointer;
 		// * address
 		return deref_command(c_address);
@@ -1025,7 +1032,7 @@ Command *SyntaxTree::BreakDownComplicatedCommand(Command *c)
 		constants[nc].setInt(c->link_no);
 		Command *c_shift = add_command_const(nc);
 		// address = &struct + shift
-		Command *c_address = add_command_operator(c_ref_struct, c_shift, OperatorIntAdd);
+		Command *c_address = add_command_operator(c_ref_struct, c_shift, __get_pointer_add_int());
 		c_address->type = el_type->GetPointer();//TypePointer;
 		// * address
 		return deref_command(c_address);

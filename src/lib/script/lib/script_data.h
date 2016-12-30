@@ -166,6 +166,7 @@ enum
 	OperatorIntDecrease,
 	OperatorInt64Assign,
 	OperatorInt64Add,
+	OperatorInt64AddInt,
 	OperatorInt64Subtract,
 	OperatorInt64Multiply,
 	OperatorInt64Divide,

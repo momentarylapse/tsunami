@@ -243,6 +243,13 @@ void SerializerX86::SerializeOperator(Command *com, Array<SerialCommandParam> &p
 			add_cmd(Asm::INST_MOV, ret, param[0]);
 			add_cmd(Asm::INST_ADD, ret, param[1]);
 			break;
+		case OperatorInt64AddInt:{
+			int veax = add_virtual_reg(Asm::REG_EAX);
+			int vrax = add_virtual_reg(Asm::REG_RAX);
+			add_cmd(Asm::INST_MOV, param_vreg(TypeInt, veax), param[1]);
+			add_cmd(Asm::INST_MOV, ret, param_vreg(TypeInt64, vrax));
+			add_cmd(Asm::INST_ADD, ret, param[0]);
+			}break;
 		case OperatorIntSubtract:
 		case OperatorInt64Subtract:
 			add_cmd(Asm::INST_MOV, ret, param[0]);

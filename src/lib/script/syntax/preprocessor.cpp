@@ -287,7 +287,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 	return c;
 }
 
-string LinkNr2Str(SyntaxTree *s,int kind,int nr);
+string LinkNr2Str(SyntaxTree *s, int kind, long long nr);
 
 // may not use AddConstant()!!!
 Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
@@ -327,15 +327,15 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 				op_func *f = (op_func*)o->func;
 				if (is_address){
 					// pre process address
-					string d1 = string((char*)&c->param[0]->link_no, 4);
-					string d2 = string((char*)&c->param[1]->link_no, 4);
+					string d1 = string((char*)&c->param[0]->link_no, c->param[0]->type->size);
+					string d2 = string((char*)&c->param[1]->link_no, c->param[1]->type->size);
 					if (c->param[0]->kind == KIND_CONSTANT)
 					    d1 = constants[c->param[0]->link_no].value;
 					if (c->param[1]->kind == KIND_CONSTANT)
 					    d2 = constants[c->param[1]->link_no].value;
 					string r = "--------";
 					f(r, d1, d2);
-					return AddCommand(is_local ? KIND_LOCAL_ADDRESS : KIND_ADDRESS, *(int*)r.data, c->type);
+					return AddCommand(is_local ? KIND_LOCAL_ADDRESS : KIND_ADDRESS, *(long*)r.data, c->type);
 				}
 			}
 		}

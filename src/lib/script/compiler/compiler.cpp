@@ -90,7 +90,8 @@ void* get_nice_memory(long size, bool executable)
 {
 	void *mem = NULL;
 	size = mem_align(size, 4096);
-	msg_write("get nice...");
+	if (config.verbose)
+		msg_write("get nice...");
 
 #ifdef OS_WINDOWS
 	mem = (char*)VirtualAlloc(NULL, size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
@@ -101,13 +102,15 @@ void* get_nice_memory(long size, bool executable)
 		void *addr0 = get_nice_random_addr();
 		//opcode = (char*)mmap(addr0, max_opcode, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_SHARED | MAP_ANONYMOUS | MAP_EXECUTABLE | MAP_32BIT, -1, 0);
 		mem = (char*)mmap(addr0, size, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS | MAP_EXECUTABLE, -1, 0);
-		printf("%d  %p  ->  %p\n", i, addr0, mem);
+		if (config.verbose)
+			printf("%d  %p  ->  %p\n", i, addr0, mem);
 		if ((long)mem != -1){
 			if (labs((long)mem - (long)addr0) < 1000000000)
 				return mem;
 			else
 				munmap(mem, size);
-			msg_write("...try again");
+			if (config.verbose)
+				msg_write("...try again");
 		}
 	}
 
@@ -150,7 +153,8 @@ void Script::AllocateMemory()
 	// allocate
 	if (memory_size > 0){
 		memory = (char*)get_nice_memory(memory_size, false);
-		msg_write("memory:  " + p2s(memory));
+		if (config.verbose)
+			msg_write("memory:  " + p2s(memory));
 	}
 }
 
@@ -175,7 +179,9 @@ void Script::AllocateOpcode()
 		max_opcode *= 10;
 
 	opcode = (char*)get_nice_memory(max_opcode, true);
-	msg_write("opcode:  " + p2s(opcode));
+	if (config.verbose)
+		msg_write("opcode:  " + p2s(opcode));
+
 	if (config.override_code_origin)
 		syntax->asm_meta_info->code_origin = config.code_origin;
 	else

@@ -47,7 +47,7 @@ void SyntaxTree::AutoImplementDefaultConstructor(Function *f, Type *t, bool allo
 	}else{
 
 		// parent constructor
-		if ((t->parent) && (allow_parent_constructor)){
+		if ((t->parent) and (allow_parent_constructor)){
 			ClassFunction *ff = t->parent->GetDefaultConstructor();
 			if (ff){
 				Command *c = add_command_classfunc(ff, cp_command(self));

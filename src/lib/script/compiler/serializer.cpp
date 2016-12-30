@@ -1940,7 +1940,7 @@ Asm::InstructionParam Serializer::get_param(int inst, SerialCommandParam &p)
 	}else if (p.kind == KIND_REF_TO_CONST){
 		bool imm_allowed = Asm::GetInstructionAllowConst(inst);
 		if ((imm_allowed) and (p.type->is_pointer)){
-			return Asm::param_imm(*(int*)(p.p + p.shift), 4);
+			return Asm::param_imm(*(long*)(p.p + p.shift), p.type->size);
 		}else if ((p.type->size <= 4) and (imm_allowed)){
 			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);
 		}else{

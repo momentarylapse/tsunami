@@ -12,9 +12,9 @@
 #include "../lib/base/base.h"
 #include "../Stuff/Observable.h"
 
-namespace Script{
+namespace Kaba{
 class Script;
-class Type;
+class Class;
 };
 
 class HuiPanel;
@@ -27,7 +27,7 @@ public:
 	void _cdecl __init__();
 	virtual void _cdecl __delete__();
 	virtual void _cdecl reset(){}
-	Script::Type *type;
+	Kaba::Class *_class;
 };
 
 //class AutoConfigPanel;

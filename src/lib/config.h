@@ -8,7 +8,7 @@
 #define _X_USE_NET_
 #define _X_USE_IMAGE_
 #define _X_USE_THREADS_
-#define _X_USE_SCRIPT_
+#define _X_USE_KABA_
 
 //#####################################################################
 // Hui-API

@@ -10,7 +10,7 @@
 
 #include "../Data/Song.h"
 #include "../lib/hui/hui.h"
-#include "../lib/script/script.h"
+#include "../lib/kaba/kaba.h"
 
 class Plugin;
 class Effect;

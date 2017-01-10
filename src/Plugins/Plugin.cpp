@@ -7,7 +7,7 @@
 
 #include "Plugin.h"
 #include "../Tsunami.h"
-#include "../lib/script/script.h"
+#include "../lib/kaba/kaba.h"
 #include "PluginManager.h"
 #include "Effect.h"
 #include "../Stuff/Log.h"
@@ -23,10 +23,10 @@ Plugin::Plugin(const string &_filename, int _type)
 
 	// load + compile
 	try{
-		s = Script::Load(filename);
+		s = Kaba::Load(filename);
 
 		usable = true;
-	}catch(Script::Exception &e){
+	}catch(Kaba::Exception &e){
 		error_message = e.message;
 	}
 }
@@ -41,7 +41,7 @@ void *Plugin::createInstance(const string &root_type)
 	if (!usable)
 		return NULL;
 
-	for (auto *t : s->syntax->types){
+	for (auto *t : s->syntax->classes){
 		if (t->IsDerivedFrom(root_type))
 			return t->CreateInstance();
 	}

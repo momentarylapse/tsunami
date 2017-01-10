@@ -50,7 +50,7 @@ PluginManager::PluginManager()
 PluginManager::~PluginManager()
 {
 	delete(favorites);
-	Script::End();
+	Kaba::End();
 }
 
 
@@ -72,407 +72,407 @@ void GlobalSetTempBackupFilename(const string &filename)
 
 void PluginManager::LinkAppScriptData()
 {
-	Script::config.directory = "";
+	Kaba::config.directory = "";
 
 	// api definition
-	Script::LinkExternal("device_manager", &tsunami->device_manager);
-	Script::LinkExternal("storage", &tsunami->storage);
-	Script::LinkExternal("logging", &tsunami->log);
-	Script::LinkExternal("colors", &AudioView::colors);
-	Script::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
-	Script::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
-	Script::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
-	Script::LinkExternal("getCurSong", (void*)&getCurSong);
-	Script::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
-	Script::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
-	Script::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
-	Script::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
-	Script::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
-	Script::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
+	Kaba::LinkExternal("device_manager", &tsunami->device_manager);
+	Kaba::LinkExternal("storage", &tsunami->storage);
+	Kaba::LinkExternal("logging", &tsunami->log);
+	Kaba::LinkExternal("colors", &AudioView::colors);
+	Kaba::LinkExternal("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
+	Kaba::LinkExternal("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
+	Kaba::LinkExternal("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);
+	Kaba::LinkExternal("getCurSong", (void*)&getCurSong);
+	Kaba::LinkExternal("CreateSynthesizer", (void*)&CreateSynthesizer);
+	Kaba::LinkExternal("CreateAudioEffect", (void*)&CreateEffect);
+	Kaba::LinkExternal("CreateMidiEffect", (void*)&CreateMidiEffect);
+	Kaba::LinkExternal("AllowTermination", (void*)&GlobalAllowTermination);
+	Kaba::LinkExternal("SetTempBackupFilename", (void*)&GlobalSetTempBackupFilename);
+	Kaba::LinkExternal("SelectSample", (void*)&SampleManagerConsole::select);
 
-	Script::DeclareClassSize("Range", sizeof(Range));
-	Script::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
-	Script::DeclareClassOffset("Range", "length", _offsetof(Range, length));
+	Kaba::DeclareClassSize("Range", sizeof(Range));
+	Kaba::DeclareClassOffset("Range", "offset", _offsetof(Range, offset));
+	Kaba::DeclareClassOffset("Range", "length", _offsetof(Range, length));
 
 
 	PluginData plugin_data;
-	Script::DeclareClassSize("PluginData", sizeof(PluginData));
-	Script::LinkExternal("PluginData." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&PluginData::__init__));
-	Script::DeclareClassVirtualIndex("PluginData", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&PluginData::__delete__), &plugin_data);
-	Script::DeclareClassVirtualIndex("PluginData", "reset", Script::mf(&PluginData::reset), &plugin_data);
+	Kaba::DeclareClassSize("PluginData", sizeof(PluginData));
+	Kaba::LinkExternal("PluginData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&PluginData::__init__));
+	Kaba::DeclareClassVirtualIndex("PluginData", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&PluginData::__delete__), &plugin_data);
+	Kaba::DeclareClassVirtualIndex("PluginData", "reset", Kaba::mf(&PluginData::reset), &plugin_data);
 
 
 	ConfigPanel config_panel;
-	Script::DeclareClassSize("ConfigPanel", sizeof(ConfigPanel));
-	Script::LinkExternal("ConfigPanel." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&ConfigPanel::__init__));
-	Script::DeclareClassVirtualIndex("ConfigPanel", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&ConfigPanel::__delete__), &config_panel);
-	Script::DeclareClassVirtualIndex("ConfigPanel", "update", Script::mf(&ConfigPanel::update), &config_panel);
-	Script::LinkExternal("ConfigPanel.notify", Script::mf(&ConfigPanel::notify));
-	Script::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
+	Kaba::DeclareClassSize("ConfigPanel", sizeof(ConfigPanel));
+	Kaba::LinkExternal("ConfigPanel." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&ConfigPanel::__init__));
+	Kaba::DeclareClassVirtualIndex("ConfigPanel", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&ConfigPanel::__delete__), &config_panel);
+	Kaba::DeclareClassVirtualIndex("ConfigPanel", "update", Kaba::mf(&ConfigPanel::update), &config_panel);
+	Kaba::LinkExternal("ConfigPanel.notify", Kaba::mf(&ConfigPanel::notify));
+	Kaba::DeclareClassOffset("ConfigPanel", "c", _offsetof(ConfigPanel, c));
 
 
 	Effect effect;
-	Script::DeclareClassSize("AudioEffect", sizeof(Effect));
-	Script::DeclareClassOffset("AudioEffect", "name", _offsetof(Effect, name));
-	Script::DeclareClassOffset("AudioEffect", "only_on_selection", _offsetof(Effect, only_on_selection));
-	Script::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
-	Script::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
-	Script::DeclareClassOffset("AudioEffect", "song", _offsetof(Effect, song));
-	Script::DeclareClassOffset("AudioEffect", "track", _offsetof(Effect, track));
-	Script::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
-	Script::DeclareClassOffset("AudioEffect", "level", _offsetof(Effect, level));
-	Script::LinkExternal("AudioEffect." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&Effect::__init__));
-	Script::DeclareClassVirtualIndex("AudioEffect", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&Effect::__delete__), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "process", Script::mf(&Effect::processTrack), &effect);
-	Script::DeclareClassVirtualIndex("AudioEffect", "createPanel", Script::mf(&Effect::createPanel), &effect);
-	Script::LinkExternal("AudioEffect.resetConfig", Script::mf(&Effect::resetConfig));
-	Script::LinkExternal("AudioEffect.resetState", Script::mf(&Effect::resetState));
-	//Script::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Script::mf(&Effect::UpdateDialog), &effect);
-	Script::LinkExternal("AudioEffect.notify", Script::mf(&Effect::notify));
-	Script::DeclareClassVirtualIndex("AudioEffect", "onConfig", Script::mf(&Effect::onConfig), &effect);
+	Kaba::DeclareClassSize("AudioEffect", sizeof(Effect));
+	Kaba::DeclareClassOffset("AudioEffect", "name", _offsetof(Effect, name));
+	Kaba::DeclareClassOffset("AudioEffect", "only_on_selection", _offsetof(Effect, only_on_selection));
+	Kaba::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
+	Kaba::DeclareClassOffset("AudioEffect", "usable", _offsetof(Effect, usable));
+	Kaba::DeclareClassOffset("AudioEffect", "song", _offsetof(Effect, song));
+	Kaba::DeclareClassOffset("AudioEffect", "track", _offsetof(Effect, track));
+	Kaba::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
+	Kaba::DeclareClassOffset("AudioEffect", "level", _offsetof(Effect, level));
+	Kaba::LinkExternal("AudioEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Effect::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Effect::__delete__), &effect);
+	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&Effect::processTrack), &effect);
+	Kaba::DeclareClassVirtualIndex("AudioEffect", "createPanel", Kaba::mf(&Effect::createPanel), &effect);
+	Kaba::LinkExternal("AudioEffect.resetConfig", Kaba::mf(&Effect::resetConfig));
+	Kaba::LinkExternal("AudioEffect.resetState", Kaba::mf(&Effect::resetState));
+	//Kaba::DeclareClassVirtualIndex("AudioEffect", "updateDialog", Kaba::mf(&Effect::UpdateDialog), &effect);
+	Kaba::LinkExternal("AudioEffect.notify", Kaba::mf(&Effect::notify));
+	Kaba::DeclareClassVirtualIndex("AudioEffect", "onConfig", Kaba::mf(&Effect::onConfig), &effect);
 
 	MidiEffect midieffect;
-	Script::DeclareClassSize("MidiEffect", sizeof(MidiEffect));
-	Script::DeclareClassOffset("MidiEffect", "name", _offsetof(MidiEffect, name));
-	Script::DeclareClassOffset("MidiEffect", "only_on_selection", _offsetof(MidiEffect, only_on_selection));
-	Script::DeclareClassOffset("MidiEffect", "range", _offsetof(MidiEffect, range));
-	Script::DeclareClassOffset("MidiEffect", "usable", _offsetof(MidiEffect, usable));
-	Script::DeclareClassOffset("MidiEffect", "song", _offsetof(MidiEffect, song));
-	Script::LinkExternal("MidiEffect." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&MidiEffect::__init__));
-	Script::DeclareClassVirtualIndex("MidiEffect", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&MidiEffect::__delete__), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "process", Script::mf(&MidiEffect::process), &midieffect);
-	Script::DeclareClassVirtualIndex("MidiEffect", "createPanel", Script::mf(&MidiEffect::createPanel), &midieffect);
-	Script::LinkExternal("MidiEffect.resetConfig", Script::mf(&MidiEffect::resetConfig));
-	Script::LinkExternal("MidiEffect.resetState", Script::mf(&MidiEffect::resetState));
-	//Script::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Script::mf(&MidiEffect::UpdateDialog), &midieffect);
-	Script::LinkExternal("MidiEffect.notify", Script::mf(&MidiEffect::notify));
-	Script::DeclareClassVirtualIndex("MidiEffect", "onConfig", Script::mf(&MidiEffect::onConfig), &midieffect);
+	Kaba::DeclareClassSize("MidiEffect", sizeof(MidiEffect));
+	Kaba::DeclareClassOffset("MidiEffect", "name", _offsetof(MidiEffect, name));
+	Kaba::DeclareClassOffset("MidiEffect", "only_on_selection", _offsetof(MidiEffect, only_on_selection));
+	Kaba::DeclareClassOffset("MidiEffect", "range", _offsetof(MidiEffect, range));
+	Kaba::DeclareClassOffset("MidiEffect", "usable", _offsetof(MidiEffect, usable));
+	Kaba::DeclareClassOffset("MidiEffect", "song", _offsetof(MidiEffect, song));
+	Kaba::LinkExternal("MidiEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiEffect::__init__));
+	Kaba::DeclareClassVirtualIndex("MidiEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiEffect::__delete__), &midieffect);
+	Kaba::DeclareClassVirtualIndex("MidiEffect", "process", Kaba::mf(&MidiEffect::process), &midieffect);
+	Kaba::DeclareClassVirtualIndex("MidiEffect", "createPanel", Kaba::mf(&MidiEffect::createPanel), &midieffect);
+	Kaba::LinkExternal("MidiEffect.resetConfig", Kaba::mf(&MidiEffect::resetConfig));
+	Kaba::LinkExternal("MidiEffect.resetState", Kaba::mf(&MidiEffect::resetState));
+	//Kaba::DeclareClassVirtualIndex("MidiEffect", "updateDialog", Kaba::mf(&MidiEffect::UpdateDialog), &midieffect);
+	Kaba::LinkExternal("MidiEffect.notify", Kaba::mf(&MidiEffect::notify));
+	Kaba::DeclareClassVirtualIndex("MidiEffect", "onConfig", Kaba::mf(&MidiEffect::onConfig), &midieffect);
 
-	Script::DeclareClassSize("BufferBox", sizeof(BufferBox));
-	Script::DeclareClassOffset("BufferBox", "offset", _offsetof(BufferBox, offset));
-	Script::DeclareClassOffset("BufferBox", "length", _offsetof(BufferBox, length));
-	Script::DeclareClassOffset("BufferBox", "channels", _offsetof(BufferBox, channels));
-	Script::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, c[0]));
-	Script::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, c[1]));
-	Script::DeclareClassOffset("BufferBox", "peaks", _offsetof(BufferBox, peaks));
-	Script::LinkExternal("BufferBox." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&BufferBox::__init__));
-	Script::LinkExternal("BufferBox." + Script::IDENTIFIER_FUNC_DELETE, Script::mf(&BufferBox::__delete__));
-	Script::LinkExternal("BufferBox.clear", Script::mf(&BufferBox::clear));
-	Script::LinkExternal("BufferBox." + Script::IDENTIFIER_FUNC_ASSIGN, Script::mf(&BufferBox::__assign__));
-	Script::LinkExternal("BufferBox.range", Script::mf(&BufferBox::range));
-	Script::LinkExternal("BufferBox.add", Script::mf(&BufferBox::add));
-	Script::LinkExternal("BufferBox.set", Script::mf(&BufferBox::set));
-	Script::LinkExternal("BufferBox.get_spectrum", Script::mf(&ExtendedBufferBox::get_spectrum));
+	Kaba::DeclareClassSize("BufferBox", sizeof(BufferBox));
+	Kaba::DeclareClassOffset("BufferBox", "offset", _offsetof(BufferBox, offset));
+	Kaba::DeclareClassOffset("BufferBox", "length", _offsetof(BufferBox, length));
+	Kaba::DeclareClassOffset("BufferBox", "channels", _offsetof(BufferBox, channels));
+	Kaba::DeclareClassOffset("BufferBox", "r", _offsetof(BufferBox, c[0]));
+	Kaba::DeclareClassOffset("BufferBox", "l", _offsetof(BufferBox, c[1]));
+	Kaba::DeclareClassOffset("BufferBox", "peaks", _offsetof(BufferBox, peaks));
+	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&BufferBox::__init__));
+	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&BufferBox::__delete__));
+	Kaba::LinkExternal("BufferBox.clear", Kaba::mf(&BufferBox::clear));
+	Kaba::LinkExternal("BufferBox." + Kaba::IDENTIFIER_FUNC_ASSIGN, Kaba::mf(&BufferBox::__assign__));
+	Kaba::LinkExternal("BufferBox.range", Kaba::mf(&BufferBox::range));
+	Kaba::LinkExternal("BufferBox.add", Kaba::mf(&BufferBox::add));
+	Kaba::LinkExternal("BufferBox.set", Kaba::mf(&BufferBox::set));
+	Kaba::LinkExternal("BufferBox.get_spectrum", Kaba::mf(&ExtendedBufferBox::get_spectrum));
 
 
-	Script::DeclareClassSize("RingBuffer", sizeof(RingBuffer));
-	//Script::LinkExternal("RingBuffer." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&RingBuffer::__init__));
-	Script::LinkExternal("RingBuffer.available", Script::mf(&RingBuffer::available));
-	Script::LinkExternal("RingBuffer.read", Script::mf(&RingBuffer::read));
-	Script::LinkExternal("RingBuffer.write", Script::mf(&RingBuffer::write));
-	Script::LinkExternal("RingBuffer.readRef", Script::mf(&RingBuffer::readRef));
-	Script::LinkExternal("RingBuffer.peekRef", Script::mf(&RingBuffer::peekRef));
-	Script::LinkExternal("RingBuffer.writeRef", Script::mf(&RingBuffer::writeRef));
-	Script::LinkExternal("RingBuffer.moveReadPos", Script::mf(&RingBuffer::moveReadPos));
-	Script::LinkExternal("RingBuffer.moveWritePos", Script::mf(&RingBuffer::moveWritePos));
-	Script::LinkExternal("RingBuffer.clear", Script::mf(&RingBuffer::clear));
+	Kaba::DeclareClassSize("RingBuffer", sizeof(RingBuffer));
+	//Kaba::LinkExternal("RingBuffer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&RingBuffer::__init__));
+	Kaba::LinkExternal("RingBuffer.available", Kaba::mf(&RingBuffer::available));
+	Kaba::LinkExternal("RingBuffer.read", Kaba::mf(&RingBuffer::read));
+	Kaba::LinkExternal("RingBuffer.write", Kaba::mf(&RingBuffer::write));
+	Kaba::LinkExternal("RingBuffer.readRef", Kaba::mf(&RingBuffer::readRef));
+	Kaba::LinkExternal("RingBuffer.peekRef", Kaba::mf(&RingBuffer::peekRef));
+	Kaba::LinkExternal("RingBuffer.writeRef", Kaba::mf(&RingBuffer::writeRef));
+	Kaba::LinkExternal("RingBuffer.moveReadPos", Kaba::mf(&RingBuffer::moveReadPos));
+	Kaba::LinkExternal("RingBuffer.moveWritePos", Kaba::mf(&RingBuffer::moveWritePos));
+	Kaba::LinkExternal("RingBuffer.clear", Kaba::mf(&RingBuffer::clear));
 
-	Script::DeclareClassSize("Sample", sizeof(Sample));
-	Script::DeclareClassOffset("Sample", "name", _offsetof(Sample, name));
-	Script::DeclareClassOffset("Sample", "type", _offsetof(Sample, type));
-	Script::DeclareClassOffset("Sample", "buf", _offsetof(Sample, buf));
-	Script::DeclareClassOffset("Sample", "midi", _offsetof(Sample, midi));
-	Script::DeclareClassOffset("Sample", "volume", _offsetof(Sample, volume));
-	Script::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
-	Script::DeclareClassOffset("Sample", "tags", _offsetof(Sample, tags));
-	Script::LinkExternal("Sample.createRef", Script::mf(&Sample::create_ref));
-	Script::LinkExternal("Sample.getValue", Script::mf(&Sample::getValue));
+	Kaba::DeclareClassSize("Sample", sizeof(Sample));
+	Kaba::DeclareClassOffset("Sample", "name", _offsetof(Sample, name));
+	Kaba::DeclareClassOffset("Sample", "type", _offsetof(Sample, type));
+	Kaba::DeclareClassOffset("Sample", "buf", _offsetof(Sample, buf));
+	Kaba::DeclareClassOffset("Sample", "midi", _offsetof(Sample, midi));
+	Kaba::DeclareClassOffset("Sample", "volume", _offsetof(Sample, volume));
+	Kaba::DeclareClassOffset("Sample", "uid", _offsetof(Sample, uid));
+	Kaba::DeclareClassOffset("Sample", "tags", _offsetof(Sample, tags));
+	Kaba::LinkExternal("Sample.createRef", Kaba::mf(&Sample::create_ref));
+	Kaba::LinkExternal("Sample.getValue", Kaba::mf(&Sample::getValue));
 
 	Sample sample(0);
 	sample.owner = tsunami->song;
 	SampleRef sampleref(&sample);
-	Script::DeclareClassSize("SampleRef", sizeof(SampleRef));
-	Script::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
-	Script::DeclareClassOffset("SampleRef", "midi", _offsetof(SampleRef, midi));
-	Script::DeclareClassOffset("SampleRef", "origin", _offsetof(SampleRef, origin));
-	Script::LinkExternal("SampleRef." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&SampleRef::__init__));
-	Script::DeclareClassVirtualIndex("SampleRef", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&SampleRef::__delete__), &sampleref);
+	Kaba::DeclareClassSize("SampleRef", sizeof(SampleRef));
+	Kaba::DeclareClassOffset("SampleRef", "buf", _offsetof(SampleRef, buf));
+	Kaba::DeclareClassOffset("SampleRef", "midi", _offsetof(SampleRef, midi));
+	Kaba::DeclareClassOffset("SampleRef", "origin", _offsetof(SampleRef, origin));
+	Kaba::LinkExternal("SampleRef." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SampleRef::__init__));
+	Kaba::DeclareClassVirtualIndex("SampleRef", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SampleRef::__delete__), &sampleref);
 
 	MidiSource midi_source;
-	Script::DeclareClassSize("MidiSource", sizeof(MidiSource));
-	Script::LinkExternal("MidiSource." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&MidiSource::__init__));
-	Script::DeclareClassVirtualIndex("MidiSource", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&MidiSource::__delete__), &midi_source);
-	Script::DeclareClassVirtualIndex("MidiSource", "read", Script::mf(&MidiSource::read), &midi_source);
+	Kaba::DeclareClassSize("MidiSource", sizeof(MidiSource));
+	Kaba::LinkExternal("MidiSource." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiSource::__init__));
+	Kaba::DeclareClassVirtualIndex("MidiSource", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiSource::__delete__), &midi_source);
+	Kaba::DeclareClassVirtualIndex("MidiSource", "read", Kaba::mf(&MidiSource::read), &midi_source);
 
 	Synthesizer synth;
-	Script::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
-	Script::DeclareClassOffset("Synthesizer", "name", _offsetof(Synthesizer, name));
-	Script::DeclareClassOffset("Synthesizer", "sample_rate", _offsetof(Synthesizer, sample_rate));
-	Script::DeclareClassOffset("Synthesizer", "events", _offsetof(Synthesizer, events));
-	Script::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
-	Script::DeclareClassOffset("Synthesizer", "active_pitch", _offsetof(Synthesizer, active_pitch));
-	Script::DeclareClassOffset("Synthesizer", "freq", _offsetof(Synthesizer, tuning.freq));
-	Script::DeclareClassOffset("Synthesizer", "delta_phi", _offsetof(Synthesizer, delta_phi));
-	Script::LinkExternal("Synthesizer." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&Synthesizer::__init__));
-	Script::DeclareClassVirtualIndex("Synthesizer", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&Synthesizer::__delete__), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "createPanel", Script::mf(&Synthesizer::createPanel), &synth);
-	Script::LinkExternal("Synthesizer.resetConfig", Script::mf(&Synthesizer::resetConfig));
-	Script::LinkExternal("Synthesizer.resetState", Script::mf(&Synthesizer::resetState));
-	Script::LinkExternal("Synthesizer.enablePitch", Script::mf(&Synthesizer::enablePitch));
-	Script::DeclareClassVirtualIndex("Synthesizer", "render", Script::mf(&Synthesizer::render), &synth);
-	Script::DeclareClassVirtualIndex("Synthesizer", "onConfig", Script::mf(&Synthesizer::onConfig), &synth);
-	Script::LinkExternal("Synthesizer.setSampleRate", Script::mf(&Synthesizer::setSampleRate));
-	Script::LinkExternal("Synthesizer.notify", Script::mf(&Synthesizer::notify));
+	Kaba::DeclareClassSize("Synthesizer", sizeof(Synthesizer));
+	Kaba::DeclareClassOffset("Synthesizer", "name", _offsetof(Synthesizer, name));
+	Kaba::DeclareClassOffset("Synthesizer", "sample_rate", _offsetof(Synthesizer, sample_rate));
+	Kaba::DeclareClassOffset("Synthesizer", "events", _offsetof(Synthesizer, events));
+	Kaba::DeclareClassOffset("Synthesizer", "keep_notes", _offsetof(Synthesizer, keep_notes));
+	Kaba::DeclareClassOffset("Synthesizer", "active_pitch", _offsetof(Synthesizer, active_pitch));
+	Kaba::DeclareClassOffset("Synthesizer", "freq", _offsetof(Synthesizer, tuning.freq));
+	Kaba::DeclareClassOffset("Synthesizer", "delta_phi", _offsetof(Synthesizer, delta_phi));
+	Kaba::LinkExternal("Synthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Synthesizer::__init__));
+	Kaba::DeclareClassVirtualIndex("Synthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Synthesizer::__delete__), &synth);
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "createPanel", Kaba::mf(&Synthesizer::createPanel), &synth);
+	Kaba::LinkExternal("Synthesizer.resetConfig", Kaba::mf(&Synthesizer::resetConfig));
+	Kaba::LinkExternal("Synthesizer.resetState", Kaba::mf(&Synthesizer::resetState));
+	Kaba::LinkExternal("Synthesizer.enablePitch", Kaba::mf(&Synthesizer::enablePitch));
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "render", Kaba::mf(&Synthesizer::render), &synth);
+	Kaba::DeclareClassVirtualIndex("Synthesizer", "onConfig", Kaba::mf(&Synthesizer::onConfig), &synth);
+	Kaba::LinkExternal("Synthesizer.setSampleRate", Kaba::mf(&Synthesizer::setSampleRate));
+	Kaba::LinkExternal("Synthesizer.notify", Kaba::mf(&Synthesizer::notify));
 
 	MidiRenderer midiren(NULL, NULL);
-	Script::DeclareClassSize("MidiRenderer", sizeof(MidiRenderer));
-	Script::LinkExternal("MidiRenderer." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&MidiRenderer::__init__));
-	Script::DeclareClassVirtualIndex("MidiRenderer", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&MidiRenderer::__delete__), &midiren);
-	Script::DeclareClassVirtualIndex("MidiRenderer", "read", Script::mf(&MidiRenderer::read), &midiren);
-	Script::DeclareClassVirtualIndex("MidiRenderer", "reset", Script::mf(&MidiRenderer::reset), &midiren);
-	Script::DeclareClassVirtualIndex("MidiRenderer", "getSampleRate", Script::mf(&MidiRenderer::getSampleRate), &midiren);
-	Script::LinkExternal("MidiRenderer.setSynthesizer", Script::mf(&MidiRenderer::setSynthesizer));
+	Kaba::DeclareClassSize("MidiRenderer", sizeof(MidiRenderer));
+	Kaba::LinkExternal("MidiRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiRenderer::__init__));
+	Kaba::DeclareClassVirtualIndex("MidiRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&MidiRenderer::__delete__), &midiren);
+	Kaba::DeclareClassVirtualIndex("MidiRenderer", "read", Kaba::mf(&MidiRenderer::read), &midiren);
+	Kaba::DeclareClassVirtualIndex("MidiRenderer", "reset", Kaba::mf(&MidiRenderer::reset), &midiren);
+	Kaba::DeclareClassVirtualIndex("MidiRenderer", "getSampleRate", Kaba::mf(&MidiRenderer::getSampleRate), &midiren);
+	Kaba::LinkExternal("MidiRenderer.setSynthesizer", Kaba::mf(&MidiRenderer::setSynthesizer));
 
 
 	DummySynthesizer dsynth;
-	Script::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
-	Script::LinkExternal("DummySynthesizer." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&DummySynthesizer::__init__));
-	Script::DeclareClassVirtualIndex("DummySynthesizer", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&DummySynthesizer::__delete__), &dsynth);
-	Script::DeclareClassVirtualIndex("DummySynthesizer", "render", Script::mf(&DummySynthesizer::render), &dsynth);
-	Script::DeclareClassVirtualIndex("DummySynthesizer", "onConfig", Script::mf(&DummySynthesizer::onConfig), &dsynth);
+	Kaba::DeclareClassSize("DummySynthesizer", sizeof(DummySynthesizer));
+	Kaba::LinkExternal("DummySynthesizer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&DummySynthesizer::__init__));
+	Kaba::DeclareClassVirtualIndex("DummySynthesizer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&DummySynthesizer::__delete__), &dsynth);
+	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "render", Kaba::mf(&DummySynthesizer::render), &dsynth);
+	Kaba::DeclareClassVirtualIndex("DummySynthesizer", "onConfig", Kaba::mf(&DummySynthesizer::onConfig), &dsynth);
 
-	Script::DeclareClassSize("EnvelopeADSR", sizeof(EnvelopeADSR));
-	Script::LinkExternal("EnvelopeADSR.set", Script::mf(&EnvelopeADSR::set));
-	Script::LinkExternal("EnvelopeADSR.set2", Script::mf(&EnvelopeADSR::set2));
-	Script::LinkExternal("EnvelopeADSR.reset", Script::mf(&EnvelopeADSR::reset));
-	Script::LinkExternal("EnvelopeADSR.start", Script::mf(&EnvelopeADSR::start));
-	Script::LinkExternal("EnvelopeADSR.end", Script::mf(&EnvelopeADSR::end));
-	Script::LinkExternal("EnvelopeADSR.get", Script::mf(&EnvelopeADSR::get));
-	Script::DeclareClassOffset("EnvelopeADSR", "just_killed", _offsetof(EnvelopeADSR, just_killed));
+	Kaba::DeclareClassSize("EnvelopeADSR", sizeof(EnvelopeADSR));
+	Kaba::LinkExternal("EnvelopeADSR.set", Kaba::mf(&EnvelopeADSR::set));
+	Kaba::LinkExternal("EnvelopeADSR.set2", Kaba::mf(&EnvelopeADSR::set2));
+	Kaba::LinkExternal("EnvelopeADSR.reset", Kaba::mf(&EnvelopeADSR::reset));
+	Kaba::LinkExternal("EnvelopeADSR.start", Kaba::mf(&EnvelopeADSR::start));
+	Kaba::LinkExternal("EnvelopeADSR.end", Kaba::mf(&EnvelopeADSR::end));
+	Kaba::LinkExternal("EnvelopeADSR.get", Kaba::mf(&EnvelopeADSR::get));
+	Kaba::DeclareClassOffset("EnvelopeADSR", "just_killed", _offsetof(EnvelopeADSR, just_killed));
 
-	Script::DeclareClassSize("BarPattern", sizeof(BarPattern));
-	Script::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));
-	Script::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));
-	Script::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
-	//Script::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));
+	Kaba::DeclareClassSize("BarPattern", sizeof(BarPattern));
+	Kaba::DeclareClassOffset("BarPattern", "num_beats", _offsetof(BarPattern, num_beats));
+	Kaba::DeclareClassOffset("BarPattern", "length", _offsetof(BarPattern, length));
+	Kaba::DeclareClassOffset("BarPattern", "type", _offsetof(BarPattern, type));
+	//Kaba::DeclareClassOffset("BarPattern", "count", _offsetof(BarPattern, count));
 
-	Script::DeclareClassSize("MidiNote", sizeof(MidiNote));
-	Script::DeclareClassOffset("MidiNote", "range", _offsetof(MidiNote, range));
-	Script::DeclareClassOffset("MidiNote", "pitch", _offsetof(MidiNote, pitch));
-	Script::DeclareClassOffset("MidiNote", "volume", _offsetof(MidiNote, volume));
-	Script::DeclareClassOffset("MidiNote", "stringno", _offsetof(MidiNote, stringno));
-	Script::DeclareClassOffset("MidiNote", "clef_position", _offsetof(MidiNote, clef_position));
-	Script::DeclareClassOffset("MidiNote", "modifier", _offsetof(MidiNote, modifier));
+	Kaba::DeclareClassSize("MidiNote", sizeof(MidiNote));
+	Kaba::DeclareClassOffset("MidiNote", "range", _offsetof(MidiNote, range));
+	Kaba::DeclareClassOffset("MidiNote", "pitch", _offsetof(MidiNote, pitch));
+	Kaba::DeclareClassOffset("MidiNote", "volume", _offsetof(MidiNote, volume));
+	Kaba::DeclareClassOffset("MidiNote", "stringno", _offsetof(MidiNote, stringno));
+	Kaba::DeclareClassOffset("MidiNote", "clef_position", _offsetof(MidiNote, clef_position));
+	Kaba::DeclareClassOffset("MidiNote", "modifier", _offsetof(MidiNote, modifier));
 
-	Script::DeclareClassSize("MidiRawData", sizeof(MidiRawData));
-	Script::DeclareClassOffset("MidiRawData", "samples", _offsetof(MidiRawData, samples));
-	Script::LinkExternal("MidiRawData." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&MidiRawData::__init__));
-	Script::LinkExternal("MidiRawData.getEvents", Script::mf(&MidiRawData::getEvents));
-	Script::LinkExternal("MidiRawData.getNotes", Script::mf(&MidiRawData::getNotes));
-	Script::LinkExternal("MidiRawData.getRange", Script::mf(&MidiRawData::getRange));
-	Script::LinkExternal("MidiRawData.addMetronomeClick", Script::mf(&MidiRawData::addMetronomeClick));
+	Kaba::DeclareClassSize("MidiRawData", sizeof(MidiRawData));
+	Kaba::DeclareClassOffset("MidiRawData", "samples", _offsetof(MidiRawData, samples));
+	Kaba::LinkExternal("MidiRawData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiRawData::__init__));
+	Kaba::LinkExternal("MidiRawData.getEvents", Kaba::mf(&MidiRawData::getEvents));
+	Kaba::LinkExternal("MidiRawData.getNotes", Kaba::mf(&MidiRawData::getNotes));
+	Kaba::LinkExternal("MidiRawData.getRange", Kaba::mf(&MidiRawData::getRange));
+	Kaba::LinkExternal("MidiRawData.addMetronomeClick", Kaba::mf(&MidiRawData::addMetronomeClick));
 
-	Script::DeclareClassSize("MidiData", sizeof(MidiData));
-	Script::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
-	Script::LinkExternal("MidiData." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&MidiData::__init__));
-	Script::LinkExternal("MidiData.getEvents", Script::mf(&MidiData::getEvents));
-	Script::LinkExternal("MidiData.getNotes", Script::mf(&MidiData::getNotes));
-	Script::LinkExternal("MidiData.getRange", Script::mf(&MidiData::getRange));
+	Kaba::DeclareClassSize("MidiData", sizeof(MidiData));
+	Kaba::DeclareClassOffset("MidiData", "samples", _offsetof(MidiData, samples));
+	Kaba::LinkExternal("MidiData." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&MidiData::__init__));
+	Kaba::LinkExternal("MidiData.getEvents", Kaba::mf(&MidiData::getEvents));
+	Kaba::LinkExternal("MidiData.getNotes", Kaba::mf(&MidiData::getNotes));
+	Kaba::LinkExternal("MidiData.getRange", Kaba::mf(&MidiData::getRange));
 
-	Script::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
-	Script::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));
-	Script::DeclareClassOffset("TrackMarker", "pos", _offsetof(TrackMarker, text));
+	Kaba::DeclareClassSize("TrackMarker", sizeof(TrackMarker));
+	Kaba::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));
+	Kaba::DeclareClassOffset("TrackMarker", "pos", _offsetof(TrackMarker, text));
 
-	Script::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
-	Script::DeclareClassOffset("TrackLevel", "buffers", _offsetof(TrackLevel, buffers));
+	Kaba::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
+	Kaba::DeclareClassOffset("TrackLevel", "buffers", _offsetof(TrackLevel, buffers));
 
-	Script::DeclareClassSize("Track", sizeof(Track));
-	Script::DeclareClassOffset("Track", "type", _offsetof(Track, type));
-	Script::DeclareClassOffset("Track", "name", _offsetof(Track, name));
-	Script::DeclareClassOffset("Track", "levels", _offsetof(Track, levels));
-	Script::DeclareClassOffset("Track", "volume", _offsetof(Track, volume));
-	Script::DeclareClassOffset("Track", "panning", _offsetof(Track, panning));
-	Script::DeclareClassOffset("Track", "muted", _offsetof(Track, muted));
-	Script::DeclareClassOffset("Track", "fx", _offsetof(Track, fx));
-	Script::DeclareClassOffset("Track", "midi", _offsetof(Track, midi));
-	Script::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
-	Script::DeclareClassOffset("Track", "samples", _offsetof(Track, samples));
-	Script::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
-	Script::DeclareClassOffset("Track", "root", _offsetof(Track, song));
-	//Script::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
-	Script::LinkExternal("Track.getBuffers", Script::mf(&Track::getBuffers));
-	Script::LinkExternal("Track.readBuffers", Script::mf(&Track::readBuffers));
-	Script::LinkExternal("Track.setName", Script::mf(&Track::setName));
-	Script::LinkExternal("Track.setMuted", Script::mf(&Track::setMuted));
-	Script::LinkExternal("Track.setVolume", Script::mf(&Track::setVolume));
-	Script::LinkExternal("Track.setPanning", Script::mf(&Track::setPanning));
-	Script::LinkExternal("Track.insertMidiData", Script::mf(&Track::insertMidiData));
-	Script::LinkExternal("Track.addEffect", Script::mf(&Track::addEffect));
-	Script::LinkExternal("Track.deleteEffect", Script::mf(&Track::deleteEffect));
-	Script::LinkExternal("Track.editEffect", Script::mf(&Track::editEffect));
-	Script::LinkExternal("Track.enableEffect", Script::mf(&Track::enableEffect));
-	Script::LinkExternal("Track.addSampleRef", Script::mf(&Track::addSampleRef));
-	Script::LinkExternal("Track.deleteSampleRef", Script::mf(&Track::deleteSampleRef));
-	Script::LinkExternal("Track.editSampleRef", Script::mf(&Track::editSampleRef));
-	Script::LinkExternal("Track.addMidiNote", Script::mf(&Track::addMidiNote));
-	//Script::LinkExternal("Track.addMidiNotes", Script::mf(&Track::addMidiNotes));
-	Script::LinkExternal("Track.deleteMidiNote", Script::mf(&Track::deleteMidiNote));
-	Script::LinkExternal("Track.setSynthesizer", Script::mf(&Track::setSynthesizer));
-	Script::LinkExternal("Track.addMarker", Script::mf(&Track::addMarker));
-	Script::LinkExternal("Track.deleteMarker", Script::mf(&Track::deleteMarker));
-	Script::LinkExternal("Track.moveMarker", Script::mf(&Track::moveMarker));
+	Kaba::DeclareClassSize("Track", sizeof(Track));
+	Kaba::DeclareClassOffset("Track", "type", _offsetof(Track, type));
+	Kaba::DeclareClassOffset("Track", "name", _offsetof(Track, name));
+	Kaba::DeclareClassOffset("Track", "levels", _offsetof(Track, levels));
+	Kaba::DeclareClassOffset("Track", "volume", _offsetof(Track, volume));
+	Kaba::DeclareClassOffset("Track", "panning", _offsetof(Track, panning));
+	Kaba::DeclareClassOffset("Track", "muted", _offsetof(Track, muted));
+	Kaba::DeclareClassOffset("Track", "fx", _offsetof(Track, fx));
+	Kaba::DeclareClassOffset("Track", "midi", _offsetof(Track, midi));
+	Kaba::DeclareClassOffset("Track", "synth", _offsetof(Track, synth));
+	Kaba::DeclareClassOffset("Track", "samples", _offsetof(Track, samples));
+	Kaba::DeclareClassOffset("Track", "markers", _offsetof(Track, markers));
+	Kaba::DeclareClassOffset("Track", "root", _offsetof(Track, song));
+	//Kaba::DeclareClassOffset("Track", "is_selected", _offsetof(Track, is_selected));
+	Kaba::LinkExternal("Track.getBuffers", Kaba::mf(&Track::getBuffers));
+	Kaba::LinkExternal("Track.readBuffers", Kaba::mf(&Track::readBuffers));
+	Kaba::LinkExternal("Track.setName", Kaba::mf(&Track::setName));
+	Kaba::LinkExternal("Track.setMuted", Kaba::mf(&Track::setMuted));
+	Kaba::LinkExternal("Track.setVolume", Kaba::mf(&Track::setVolume));
+	Kaba::LinkExternal("Track.setPanning", Kaba::mf(&Track::setPanning));
+	Kaba::LinkExternal("Track.insertMidiData", Kaba::mf(&Track::insertMidiData));
+	Kaba::LinkExternal("Track.addEffect", Kaba::mf(&Track::addEffect));
+	Kaba::LinkExternal("Track.deleteEffect", Kaba::mf(&Track::deleteEffect));
+	Kaba::LinkExternal("Track.editEffect", Kaba::mf(&Track::editEffect));
+	Kaba::LinkExternal("Track.enableEffect", Kaba::mf(&Track::enableEffect));
+	Kaba::LinkExternal("Track.addSampleRef", Kaba::mf(&Track::addSampleRef));
+	Kaba::LinkExternal("Track.deleteSampleRef", Kaba::mf(&Track::deleteSampleRef));
+	Kaba::LinkExternal("Track.editSampleRef", Kaba::mf(&Track::editSampleRef));
+	Kaba::LinkExternal("Track.addMidiNote", Kaba::mf(&Track::addMidiNote));
+	//Kaba::LinkExternal("Track.addMidiNotes", Kaba::mf(&Track::addMidiNotes));
+	Kaba::LinkExternal("Track.deleteMidiNote", Kaba::mf(&Track::deleteMidiNote));
+	Kaba::LinkExternal("Track.setSynthesizer", Kaba::mf(&Track::setSynthesizer));
+	Kaba::LinkExternal("Track.addMarker", Kaba::mf(&Track::addMarker));
+	Kaba::LinkExternal("Track.deleteMarker", Kaba::mf(&Track::deleteMarker));
+	Kaba::LinkExternal("Track.moveMarker", Kaba::mf(&Track::moveMarker));
 
 	Song af;
-	Script::DeclareClassSize("Song", sizeof(Song));
-	Script::DeclareClassOffset("Song", "filename", _offsetof(Song, filename));
-	Script::DeclareClassOffset("Song", "tag", _offsetof(Song, tags));
-	Script::DeclareClassOffset("Song", "sample_rate", _offsetof(Song, sample_rate));
-	Script::DeclareClassOffset("Song", "volume", _offsetof(Song, volume));
-	Script::DeclareClassOffset("Song", "fx", _offsetof(Song, fx));
-	Script::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
-	Script::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
-	Script::DeclareClassOffset("Song", "level_names", _offsetof(Song, level_names));
-	Script::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
-	Script::LinkExternal("Song." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&Song::__init__));
-	Script::DeclareClassVirtualIndex("Song", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&Song::__delete__), &af);
-	Script::LinkExternal("Song.newEmpty", Script::mf(&Song::newEmpty));
-	Script::LinkExternal("Song.addTrack", Script::mf(&Song::addTrack));
-	Script::LinkExternal("Song.deleteTrack", Script::mf(&Song::deleteTrack));
-	Script::LinkExternal("Song.getRange", Script::mf(&Song::getRange));
-	Script::LinkExternal("Song.getNextBeat", Script::mf(&Song::getNextBeat));
-	Script::LinkExternal("Song.addBar", Script::mf(&Song::addBar));
-	Script::LinkExternal("Song.addPause", Script::mf(&Song::addPause));
-	Script::LinkExternal("Song.editBar", Script::mf(&Song::editBar));
-	Script::LinkExternal("Song.deleteBar", Script::mf(&Song::deleteBar));
-	Script::LinkExternal("Song.addSample", Script::mf(&Song::addSample));
-	Script::LinkExternal("Song.deleteSample", Script::mf(&Song::deleteSample));
+	Kaba::DeclareClassSize("Song", sizeof(Song));
+	Kaba::DeclareClassOffset("Song", "filename", _offsetof(Song, filename));
+	Kaba::DeclareClassOffset("Song", "tag", _offsetof(Song, tags));
+	Kaba::DeclareClassOffset("Song", "sample_rate", _offsetof(Song, sample_rate));
+	Kaba::DeclareClassOffset("Song", "volume", _offsetof(Song, volume));
+	Kaba::DeclareClassOffset("Song", "fx", _offsetof(Song, fx));
+	Kaba::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
+	Kaba::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
+	Kaba::DeclareClassOffset("Song", "level_names", _offsetof(Song, level_names));
+	Kaba::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
+	Kaba::LinkExternal("Song." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Song::__init__));
+	Kaba::DeclareClassVirtualIndex("Song", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Song::__delete__), &af);
+	Kaba::LinkExternal("Song.newEmpty", Kaba::mf(&Song::newEmpty));
+	Kaba::LinkExternal("Song.addTrack", Kaba::mf(&Song::addTrack));
+	Kaba::LinkExternal("Song.deleteTrack", Kaba::mf(&Song::deleteTrack));
+	Kaba::LinkExternal("Song.getRange", Kaba::mf(&Song::getRange));
+	Kaba::LinkExternal("Song.getNextBeat", Kaba::mf(&Song::getNextBeat));
+	Kaba::LinkExternal("Song.addBar", Kaba::mf(&Song::addBar));
+	Kaba::LinkExternal("Song.addPause", Kaba::mf(&Song::addPause));
+	Kaba::LinkExternal("Song.editBar", Kaba::mf(&Song::editBar));
+	Kaba::LinkExternal("Song.deleteBar", Kaba::mf(&Song::deleteBar));
+	Kaba::LinkExternal("Song.addSample", Kaba::mf(&Song::addSample));
+	Kaba::LinkExternal("Song.deleteSample", Kaba::mf(&Song::deleteSample));
 
 	AudioRenderer ar;
-	Script::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
-	//Script::DeclareClassOffset("AudioRenderer", "sample_rate", _offsetof(AudioRenderer, sample_rate));
-	Script::LinkExternal("AudioRenderer." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&AudioRenderer::__init__));
-	Script::DeclareClassVirtualIndex("AudioRenderer", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&AudioRenderer::__delete__), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "read", Script::mf(&AudioRenderer::read), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "reset", Script::mf(&AudioRenderer::reset), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "range", Script::mf(&AudioRenderer::range), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "getPos", Script::mf(&AudioRenderer::getPos), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "seek", Script::mf(&AudioRenderer::seek), &ar);
-	Script::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Script::mf(&AudioRenderer::getSampleRate), &ar);
+	Kaba::DeclareClassSize("AudioRenderer", sizeof(AudioRenderer));
+	//Kaba::DeclareClassOffset("AudioRenderer", "sample_rate", _offsetof(AudioRenderer, sample_rate));
+	Kaba::LinkExternal("AudioRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&AudioRenderer::__init__));
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&AudioRenderer::__delete__), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "read", Kaba::mf(&AudioRenderer::read), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "reset", Kaba::mf(&AudioRenderer::reset), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "range", Kaba::mf(&AudioRenderer::range), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getPos", Kaba::mf(&AudioRenderer::getPos), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "seek", Kaba::mf(&AudioRenderer::seek), &ar);
+	Kaba::DeclareClassVirtualIndex("AudioRenderer", "getSampleRate", Kaba::mf(&AudioRenderer::getSampleRate), &ar);
 
 	SongRenderer sr(&af, NULL);
-	Script::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
-	Script::LinkExternal("SongRenderer.prepare", Script::mf(&SongRenderer::prepare));
-	Script::LinkExternal("SongRenderer.render", Script::mf(&SongRenderer::render));
-	Script::LinkExternal("SongRenderer." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&SongRenderer::__init__));
-	Script::DeclareClassVirtualIndex("SongRenderer", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&SongRenderer::__delete__), &sr);
-	Script::DeclareClassVirtualIndex("SongRenderer", "read", Script::mf(&SongRenderer::read), &sr);
-	Script::DeclareClassVirtualIndex("SongRenderer", "reset", Script::mf(&SongRenderer::reset), &sr);
-	Script::DeclareClassVirtualIndex("SongRenderer", "range", Script::mf(&SongRenderer::range), &sr);
-	Script::DeclareClassVirtualIndex("SongRenderer", "getPos", Script::mf(&SongRenderer::getPos), &sr);
-	Script::DeclareClassVirtualIndex("SongRenderer", "seek", Script::mf(&SongRenderer::seek), &sr);
-	Script::DeclareClassVirtualIndex("SongRenderer", "getSampleRate", Script::mf(&SongRenderer::getSampleRate), &sr);
+	Kaba::DeclareClassSize("SongRenderer", sizeof(SongRenderer));
+	Kaba::LinkExternal("SongRenderer.prepare", Kaba::mf(&SongRenderer::prepare));
+	Kaba::LinkExternal("SongRenderer.render", Kaba::mf(&SongRenderer::render));
+	Kaba::LinkExternal("SongRenderer." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SongRenderer::__init__));
+	Kaba::DeclareClassVirtualIndex("SongRenderer", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SongRenderer::__delete__), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "read", Kaba::mf(&SongRenderer::read), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "reset", Kaba::mf(&SongRenderer::reset), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "range", Kaba::mf(&SongRenderer::range), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "getPos", Kaba::mf(&SongRenderer::getPos), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "seek", Kaba::mf(&SongRenderer::seek), &sr);
+	Kaba::DeclareClassVirtualIndex("SongRenderer", "getSampleRate", Kaba::mf(&SongRenderer::getSampleRate), &sr);
 
 	{
 	InputStreamAudio input(0);
-	Script::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
-	Script::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, current_buffer));
-	Script::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(InputStreamAudio, buffer));
-	Script::DeclareClassOffset("InputStreamAudio", "sample_rate", _offsetof(InputStreamAudio, sample_rate));
-	Script::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(InputStreamAudio, accumulating));
-	Script::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
-	Script::LinkExternal("InputStreamAudio." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&InputStreamAudio::__init__));
-	Script::DeclareClassVirtualIndex("InputStreamAudio", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&InputStreamAudio::__delete__), &input);
-	Script::LinkExternal("InputStreamAudio.start", Script::mf(&InputStreamAudio::start));
-	//Script::LinkExternal("InputStreamAudio.resetSync", Script::mf(&AudioInputAudio::resetSync));
-	Script::LinkExternal("InputStreamAudio.stop",	 Script::mf(&InputStreamAudio::stop));
-	Script::LinkExternal("InputStreamAudio.isCapturing", Script::mf(&InputStreamAudio::isCapturing));
-	Script::LinkExternal("InputStreamAudio.getSampleCount", Script::mf(&InputStreamAudio::getSampleCount));
-	Script::LinkExternal("InputStreamAudio.accumulate", Script::mf(&InputStreamAudio::accumulate));
-	Script::LinkExternal("InputStreamAudio.resetAccumulation", Script::mf(&InputStreamAudio::resetAccumulation));
-	//Script::LinkExternal("InputStreamAudio.getDelay", Script::mf(&AudioInputAudio::getDelay));
-	Script::LinkExternal("InputStreamAudio.addObserver", Script::mf(&InputStreamAudio::addWrappedObserver));
-	Script::LinkExternal("InputStreamAudio.removeObserver", Script::mf(&InputStreamAudio::removeWrappedObserver));
-	//Script::LinkExternal("Observable.addObserver", Script::mf(&Observable::AddWrappedObserver);
-	Script::DeclareClassVirtualIndex("InputStreamAudio", "getSampleRate", Script::mf(&InputStreamAudio::getSampleRate), &input);
-	Script::DeclareClassVirtualIndex("InputStreamAudio", "getSomeSamples", Script::mf(&InputStreamAudio::getSomeSamples), &input);
-	Script::DeclareClassVirtualIndex("InputStreamAudio", "getState", Script::mf(&InputStreamAudio::getState), &input);
+	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
+	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, current_buffer));
+	Kaba::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(InputStreamAudio, buffer));
+	Kaba::DeclareClassOffset("InputStreamAudio", "sample_rate", _offsetof(InputStreamAudio, sample_rate));
+	Kaba::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(InputStreamAudio, accumulating));
+	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
+	Kaba::LinkExternal("InputStreamAudio." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&InputStreamAudio::__init__));
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&InputStreamAudio::__delete__), &input);
+	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&InputStreamAudio::start));
+	//Kaba::LinkExternal("InputStreamAudio.resetSync", Kaba::mf(&AudioInputAudio::resetSync));
+	Kaba::LinkExternal("InputStreamAudio.stop",	 Kaba::mf(&InputStreamAudio::stop));
+	Kaba::LinkExternal("InputStreamAudio.isCapturing", Kaba::mf(&InputStreamAudio::isCapturing));
+	Kaba::LinkExternal("InputStreamAudio.getSampleCount", Kaba::mf(&InputStreamAudio::getSampleCount));
+	Kaba::LinkExternal("InputStreamAudio.accumulate", Kaba::mf(&InputStreamAudio::accumulate));
+	Kaba::LinkExternal("InputStreamAudio.resetAccumulation", Kaba::mf(&InputStreamAudio::resetAccumulation));
+	//Kaba::LinkExternal("InputStreamAudio.getDelay", Kaba::mf(&AudioInputAudio::getDelay));
+	Kaba::LinkExternal("InputStreamAudio.addObserver", Kaba::mf(&InputStreamAudio::addWrappedObserver));
+	Kaba::LinkExternal("InputStreamAudio.removeObserver", Kaba::mf(&InputStreamAudio::removeWrappedObserver));
+	//Kaba::LinkExternal("Observable.addObserver", Kaba::mf(&Observable::AddWrappedObserver);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSampleRate", Kaba::mf(&InputStreamAudio::getSampleRate), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSomeSamples", Kaba::mf(&InputStreamAudio::getSomeSamples), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getState", Kaba::mf(&InputStreamAudio::getState), &input);
 	}
 
-	Script::LinkExternal("InputStreamAny.setBackupMode", Script::mf(&InputStreamAny::setBackupMode));
+	Kaba::LinkExternal("InputStreamAny.setBackupMode", Kaba::mf(&InputStreamAny::setBackupMode));
 
 	{
 	OutputStream stream(NULL);
-	Script::DeclareClassSize("OutputStream", sizeof(OutputStream));
-	Script::LinkExternal("OutputStream." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&OutputStream::__init__));
-	Script::DeclareClassVirtualIndex("OutputStream", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&OutputStream::__delete__), &stream);
-	//Script::LinkExternal("OutputStream.setSource", Script::mf(&AudioStream::setSource));
-	Script::LinkExternal("OutputStream.play", Script::mf(&OutputStream::play));
-	Script::LinkExternal("OutputStream.stop", Script::mf(&OutputStream::stop));
-	Script::LinkExternal("OutputStream.pause", Script::mf(&OutputStream::pause));
-	Script::LinkExternal("OutputStream.isPlaying", Script::mf(&OutputStream::isPlaying));
-	Script::LinkExternal("OutputStream.getPos", Script::mf(&OutputStream::getPos));
-	Script::LinkExternal("OutputStream.getSampleRate", Script::mf(&OutputStream::getSampleRate));
-	Script::LinkExternal("OutputStream.getVolume", Script::mf(&OutputStream::getVolume));
-	Script::LinkExternal("OutputStream.setVolume", Script::mf(&OutputStream::setVolume));
-	Script::LinkExternal("OutputStream.setBufferSize", Script::mf(&OutputStream::setBufferSize));
+	Kaba::DeclareClassSize("OutputStream", sizeof(OutputStream));
+	Kaba::LinkExternal("OutputStream." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&OutputStream::__init__));
+	Kaba::DeclareClassVirtualIndex("OutputStream", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&OutputStream::__delete__), &stream);
+	//Kaba::LinkExternal("OutputStream.setSource", Kaba::mf(&AudioStream::setSource));
+	Kaba::LinkExternal("OutputStream.play", Kaba::mf(&OutputStream::play));
+	Kaba::LinkExternal("OutputStream.stop", Kaba::mf(&OutputStream::stop));
+	Kaba::LinkExternal("OutputStream.pause", Kaba::mf(&OutputStream::pause));
+	Kaba::LinkExternal("OutputStream.isPlaying", Kaba::mf(&OutputStream::isPlaying));
+	Kaba::LinkExternal("OutputStream.getPos", Kaba::mf(&OutputStream::getPos));
+	Kaba::LinkExternal("OutputStream.getSampleRate", Kaba::mf(&OutputStream::getSampleRate));
+	Kaba::LinkExternal("OutputStream.getVolume", Kaba::mf(&OutputStream::getVolume));
+	Kaba::LinkExternal("OutputStream.setVolume", Kaba::mf(&OutputStream::setVolume));
+	Kaba::LinkExternal("OutputStream.setBufferSize", Kaba::mf(&OutputStream::setBufferSize));
 	}
 
-	Script::DeclareClassSize("AudioView", sizeof(AudioView));
-	Script::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));
-	Script::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
-	Script::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
-	Script::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
-	Script::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));
-	Script::LinkExternal("AudioView.addObserver", Script::mf(&AudioView::addWrappedObserver));
-	Script::LinkExternal("AudioView.removeObserver", Script::mf(&AudioView::removeWrappedObserver));
+	Kaba::DeclareClassSize("AudioView", sizeof(AudioView));
+	Kaba::DeclareClassOffset("AudioView", "sel", _offsetof(AudioView, sel));
+	Kaba::DeclareClassOffset("AudioView", "sel_raw", _offsetof(AudioView, sel_raw));
+	Kaba::DeclareClassOffset("AudioView", "stream", _offsetof(AudioView, stream));
+	Kaba::DeclareClassOffset("AudioView", "renderer", _offsetof(AudioView, renderer));
+	Kaba::DeclareClassOffset("AudioView", "input", _offsetof(AudioView, input));
+	Kaba::LinkExternal("AudioView.addObserver", Kaba::mf(&AudioView::addWrappedObserver));
+	Kaba::LinkExternal("AudioView.removeObserver", Kaba::mf(&AudioView::removeWrappedObserver));
 
-	Script::DeclareClassSize("ColorScheme", sizeof(ColorScheme));
-	Script::DeclareClassOffset("ColorScheme", "background", _offsetof(ColorScheme, background));
-	Script::DeclareClassOffset("ColorScheme", "background_track", _offsetof(ColorScheme, background_track));
-	Script::DeclareClassOffset("ColorScheme", "background_track_selected", _offsetof(ColorScheme, background_track_selected));
-	Script::DeclareClassOffset("ColorScheme", "text", _offsetof(ColorScheme, text));
-	Script::DeclareClassOffset("ColorScheme", "text_soft1", _offsetof(ColorScheme, text_soft1));
-	Script::DeclareClassOffset("ColorScheme", "text_soft2", _offsetof(ColorScheme, text_soft2));
-	Script::DeclareClassOffset("ColorScheme", "text_soft3", _offsetof(ColorScheme, text_soft3));
-	Script::DeclareClassOffset("ColorScheme", "grid", _offsetof(ColorScheme, grid));
-	Script::DeclareClassOffset("ColorScheme", "selection", _offsetof(ColorScheme, selection));
-	Script::DeclareClassOffset("ColorScheme", "hover", _offsetof(ColorScheme, hover));
+	Kaba::DeclareClassSize("ColorScheme", sizeof(ColorScheme));
+	Kaba::DeclareClassOffset("ColorScheme", "background", _offsetof(ColorScheme, background));
+	Kaba::DeclareClassOffset("ColorScheme", "background_track", _offsetof(ColorScheme, background_track));
+	Kaba::DeclareClassOffset("ColorScheme", "background_track_selected", _offsetof(ColorScheme, background_track_selected));
+	Kaba::DeclareClassOffset("ColorScheme", "text", _offsetof(ColorScheme, text));
+	Kaba::DeclareClassOffset("ColorScheme", "text_soft1", _offsetof(ColorScheme, text_soft1));
+	Kaba::DeclareClassOffset("ColorScheme", "text_soft2", _offsetof(ColorScheme, text_soft2));
+	Kaba::DeclareClassOffset("ColorScheme", "text_soft3", _offsetof(ColorScheme, text_soft3));
+	Kaba::DeclareClassOffset("ColorScheme", "grid", _offsetof(ColorScheme, grid));
+	Kaba::DeclareClassOffset("ColorScheme", "selection", _offsetof(ColorScheme, selection));
+	Kaba::DeclareClassOffset("ColorScheme", "hover", _offsetof(ColorScheme, hover));
 
-	Script::LinkExternal("Log.error", Script::mf(&Log::error));
-	Script::LinkExternal("Log.warn", Script::mf(&Log::warn));
-	Script::LinkExternal("Log.info", Script::mf(&Log::info));
+	Kaba::LinkExternal("Log.error", Kaba::mf(&Log::error));
+	Kaba::LinkExternal("Log.warn", Kaba::mf(&Log::warn));
+	Kaba::LinkExternal("Log.info", Kaba::mf(&Log::info));
 
-	Script::LinkExternal("Storage.load", Script::mf(&Storage::load));
-	Script::LinkExternal("Storage.save", Script::mf(&Storage::save));
-	Script::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
+	Kaba::LinkExternal("Storage.load", Kaba::mf(&Storage::load));
+	Kaba::LinkExternal("Storage.save", Kaba::mf(&Storage::save));
+	Kaba::DeclareClassOffset("Storage", "current_directory", _offsetof(Storage, current_directory));
 
 
 	Slider slider;
-	Script::DeclareClassSize("Slider", sizeof(Slider));
-	Script::LinkExternal("Slider." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&Slider::__init_ext__));
-	Script::DeclareClassVirtualIndex("Slider", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&Slider::__delete__), &slider);
-	Script::LinkExternal("Slider.get", Script::mf(&Slider::get));
-	Script::LinkExternal("Slider.set", Script::mf(&Slider::set));
+	Kaba::DeclareClassSize("Slider", sizeof(Slider));
+	Kaba::LinkExternal("Slider." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Slider::__init_ext__));
+	Kaba::DeclareClassVirtualIndex("Slider", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Slider::__delete__), &slider);
+	Kaba::LinkExternal("Slider.get", Kaba::mf(&Slider::get));
+	Kaba::LinkExternal("Slider.set", Kaba::mf(&Slider::set));
 
 	SongPlugin song_plugin;
-	Script::DeclareClassSize("SongPlugin", sizeof(SongPlugin));
-	Script::DeclareClassOffset("SongPlugin", "win", _offsetof(SongPlugin, win));
-	Script::DeclareClassOffset("SongPlugin", "view", _offsetof(SongPlugin, view));
-	Script::LinkExternal("SongPlugin." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&SongPlugin::__init__));
-	Script::DeclareClassVirtualIndex("SongPlugin", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&SongPlugin::__delete__), &song_plugin);
-	Script::DeclareClassVirtualIndex("SongPlugin", "apply", Script::mf(&SongPlugin::apply), &song_plugin);
+	Kaba::DeclareClassSize("SongPlugin", sizeof(SongPlugin));
+	Kaba::DeclareClassOffset("SongPlugin", "win", _offsetof(SongPlugin, win));
+	Kaba::DeclareClassOffset("SongPlugin", "view", _offsetof(SongPlugin, view));
+	Kaba::LinkExternal("SongPlugin." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&SongPlugin::__init__));
+	Kaba::DeclareClassVirtualIndex("SongPlugin", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&SongPlugin::__delete__), &song_plugin);
+	Kaba::DeclareClassVirtualIndex("SongPlugin", "apply", Kaba::mf(&SongPlugin::apply), &song_plugin);
 
 	TsunamiPlugin tsunami_plugin;
-	Script::DeclareClassSize("TsunamiPlugin", sizeof(TsunamiPlugin));
-	Script::DeclareClassOffset("TsunamiPlugin", "win", _offsetof(TsunamiPlugin, win));
-	Script::DeclareClassOffset("TsunamiPlugin", "view", _offsetof(TsunamiPlugin, view));
-	Script::DeclareClassOffset("TsunamiPlugin", "song", _offsetof(TsunamiPlugin, song));
-	Script::DeclareClassOffset("TsunamiPlugin", "args", _offsetof(TsunamiPlugin, args));
-	Script::LinkExternal("TsunamiPlugin." + Script::IDENTIFIER_FUNC_INIT, Script::mf(&TsunamiPlugin::__init__));
-	Script::DeclareClassVirtualIndex("TsunamiPlugin", Script::IDENTIFIER_FUNC_DELETE, Script::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
-	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStart", Script::mf(&TsunamiPlugin::onStart), &tsunami_plugin);
-	Script::DeclareClassVirtualIndex("TsunamiPlugin", "onStop", Script::mf(&TsunamiPlugin::onStop), &tsunami_plugin);
-	Script::LinkExternal("TsunamiPlugin.stop", Script::mf(&TsunamiPlugin::stop_request));
+	Kaba::DeclareClassSize("TsunamiPlugin", sizeof(TsunamiPlugin));
+	Kaba::DeclareClassOffset("TsunamiPlugin", "win", _offsetof(TsunamiPlugin, win));
+	Kaba::DeclareClassOffset("TsunamiPlugin", "view", _offsetof(TsunamiPlugin, view));
+	Kaba::DeclareClassOffset("TsunamiPlugin", "song", _offsetof(TsunamiPlugin, song));
+	Kaba::DeclareClassOffset("TsunamiPlugin", "args", _offsetof(TsunamiPlugin, args));
+	Kaba::LinkExternal("TsunamiPlugin." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&TsunamiPlugin::__init__));
+	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&TsunamiPlugin::__delete__), &tsunami_plugin);
+	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "onStart", Kaba::mf(&TsunamiPlugin::onStart), &tsunami_plugin);
+	Kaba::DeclareClassVirtualIndex("TsunamiPlugin", "onStop", Kaba::mf(&TsunamiPlugin::onStop), &tsunami_plugin);
+	Kaba::LinkExternal("TsunamiPlugin.stop", Kaba::mf(&TsunamiPlugin::stop_request));
 
 }
 
@@ -513,7 +513,7 @@ void add_plugins_in_dir(const string &dir, PluginManager *pm, HuiMenu *m, const 
 
 void PluginManager::FindPlugins()
 {
-	Script::Init();
+	Kaba::Init();
 
 	// "Buffer"
 	find_plugins_in_dir("Buffer/Channels/", Plugin::TYPE_EFFECT, this);
@@ -604,7 +604,7 @@ void PluginManager::_ExecutePlugin(TsunamiWindow *win, const string &filename)
 		return;
 	}
 
-	Script::Script *s = p->s;
+	Kaba::Script *s = p->s;
 
 	main_void_func *f_main = (main_void_func*)s->MatchFunction("main", "void", 0);
 	if (f_main){
@@ -644,14 +644,14 @@ Synthesizer *PluginManager::LoadSynthesizer(const string &name, Song *song)
 	string filename = HuiAppDirectoryStatic + "Plugins/Synthesizer/" + name + ".kaba";
 	if (!file_test_existence(filename))
 		return NULL;
-	Script::Script *s;
+	Kaba::Script *s;
 	try{
-		s = Script::Load(filename);
-	}catch(Script::Exception &e){
+		s = Kaba::Load(filename);
+	}catch(Kaba::Exception &e){
 		tsunami->log->error(e.message);
 		return NULL;
 	}
-	for (auto *t : s->syntax->types){
+	for (auto *t : s->syntax->classes){
 		if (t->GetRoot()->name != "Synthesizer")
 			continue;
 		Synthesizer *synth = (Synthesizer*)t->CreateInstance();

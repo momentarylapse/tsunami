@@ -11,9 +11,9 @@
 #include "../Data/Song.h"
 #include "../lib/base/base.h"
 
-namespace Script{
+namespace Kaba{
 class Script;
-class Type;
+class Class;
 };
 
 // represents a compiled script
@@ -24,7 +24,7 @@ public:
 
 	string filename;
 	int index;
-	Script::Script *s;
+	Kaba::Script *s;
 
 	bool usable;
 	int type;

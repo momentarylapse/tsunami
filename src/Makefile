@@ -171,6 +171,30 @@ OBJ = \
  lib/image/image_png.o\
  lib/image/image_tga.o\
  lib/image/ImagePainter.o\
+ lib/kaba/asm/asm.o\
+ lib/kaba/compiler/compiler.o\
+ lib/kaba/compiler/serializer.o\
+ lib/kaba/compiler/serializer_amd64.o\
+ lib/kaba/compiler/serializer_arm.o\
+ lib/kaba/compiler/serializer_x86.o\
+ lib/kaba/lib/lib.o\
+ lib/kaba/lib/lib_file.o\
+ lib/kaba/lib/lib_hui.o\
+ lib/kaba/lib/lib_image.o\
+ lib/kaba/lib/lib_math.o\
+ lib/kaba/lib/lib_net.o\
+ lib/kaba/lib/lib_nix.o\
+ lib/kaba/lib/lib_sound.o\
+ lib/kaba/lib/lib_threads.o\
+ lib/kaba/lib/lib_x.o\
+ lib/kaba/syntax/class.o\
+ lib/kaba/syntax/implicit.o\
+ lib/kaba/syntax/lexical.o\
+ lib/kaba/syntax/parser.o\
+ lib/kaba/syntax/precompiler.o\
+ lib/kaba/syntax/preprocessor.o\
+ lib/kaba/syntax/syntax_tree.o\
+ lib/kaba/kaba.o\
  lib/math/complex.o\
  lib/math/interpolation.o\
  lib/math/math.o\
@@ -183,30 +207,6 @@ OBJ = \
  lib/math/rect.o\
  lib/math/vector.o\
  lib/net/net.o\
- lib/script/asm/asm.o\
- lib/script/compiler/compiler.o\
- lib/script/compiler/serializer.o\
- lib/script/compiler/serializer_amd64.o\
- lib/script/compiler/serializer_arm.o\
- lib/script/compiler/serializer_x86.o\
- lib/script/lib/script_data.o\
- lib/script/lib/script_data_file.o\
- lib/script/lib/script_data_hui.o\
- lib/script/lib/script_data_image.o\
- lib/script/lib/script_data_math.o\
- lib/script/lib/script_data_net.o\
- lib/script/lib/script_data_nix.o\
- lib/script/lib/script_data_sound.o\
- lib/script/lib/script_data_threads.o\
- lib/script/lib/script_data_x.o\
- lib/script/syntax/implicit.o\
- lib/script/syntax/lexical.o\
- lib/script/syntax/parser.o\
- lib/script/syntax/precompiler.o\
- lib/script/syntax/preprocessor.o\
- lib/script/syntax/syntax_tree.o\
- lib/script/syntax/type.o\
- lib/script/script.o\
  lib/threads/Mutex.o\
  lib/threads/Thread.o\
  lib/threads/ThreadedWork.o\
@@ -804,6 +804,78 @@ lib/image/image_tga.o : lib/image/image_tga.cpp
 lib/image/ImagePainter.o : lib/image/ImagePainter.cpp
 	$(CPP) -c lib/image/ImagePainter.cpp -o $@ $(CXXFLAGS)
 
+lib/kaba/asm/asm.o : lib/kaba/asm/asm.cpp
+	$(CPP) -c lib/kaba/asm/asm.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/compiler/compiler.o : lib/kaba/compiler/compiler.cpp
+	$(CPP) -c lib/kaba/compiler/compiler.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/compiler/serializer.o : lib/kaba/compiler/serializer.cpp
+	$(CPP) -c lib/kaba/compiler/serializer.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/compiler/serializer_amd64.o : lib/kaba/compiler/serializer_amd64.cpp
+	$(CPP) -c lib/kaba/compiler/serializer_amd64.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/compiler/serializer_arm.o : lib/kaba/compiler/serializer_arm.cpp
+	$(CPP) -c lib/kaba/compiler/serializer_arm.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/compiler/serializer_x86.o : lib/kaba/compiler/serializer_x86.cpp
+	$(CPP) -c lib/kaba/compiler/serializer_x86.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib.o : lib/kaba/lib/lib.cpp
+	$(CPP) -c lib/kaba/lib/lib.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_file.o : lib/kaba/lib/lib_file.cpp
+	$(CPP) -c lib/kaba/lib/lib_file.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_hui.o : lib/kaba/lib/lib_hui.cpp
+	$(CPP) -c lib/kaba/lib/lib_hui.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_image.o : lib/kaba/lib/lib_image.cpp
+	$(CPP) -c lib/kaba/lib/lib_image.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_math.o : lib/kaba/lib/lib_math.cpp
+	$(CPP) -c lib/kaba/lib/lib_math.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_net.o : lib/kaba/lib/lib_net.cpp
+	$(CPP) -c lib/kaba/lib/lib_net.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_nix.o : lib/kaba/lib/lib_nix.cpp
+	$(CPP) -c lib/kaba/lib/lib_nix.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_sound.o : lib/kaba/lib/lib_sound.cpp
+	$(CPP) -c lib/kaba/lib/lib_sound.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_threads.o : lib/kaba/lib/lib_threads.cpp
+	$(CPP) -c lib/kaba/lib/lib_threads.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/lib/lib_x.o : lib/kaba/lib/lib_x.cpp
+	$(CPP) -c lib/kaba/lib/lib_x.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/syntax/class.o : lib/kaba/syntax/class.cpp
+	$(CPP) -c lib/kaba/syntax/class.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/syntax/implicit.o : lib/kaba/syntax/implicit.cpp
+	$(CPP) -c lib/kaba/syntax/implicit.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/syntax/lexical.o : lib/kaba/syntax/lexical.cpp
+	$(CPP) -c lib/kaba/syntax/lexical.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/syntax/parser.o : lib/kaba/syntax/parser.cpp
+	$(CPP) -c lib/kaba/syntax/parser.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/syntax/precompiler.o : lib/kaba/syntax/precompiler.cpp
+	$(CPP) -c lib/kaba/syntax/precompiler.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/syntax/preprocessor.o : lib/kaba/syntax/preprocessor.cpp
+	$(CPP) -c lib/kaba/syntax/preprocessor.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/syntax/syntax_tree.o : lib/kaba/syntax/syntax_tree.cpp
+	$(CPP) -c lib/kaba/syntax/syntax_tree.cpp -o $@ $(CXXFLAGS)
+
+lib/kaba/kaba.o : lib/kaba/kaba.cpp
+	$(CPP) -c lib/kaba/kaba.cpp -o $@ $(CXXFLAGS)
+
 lib/math/complex.o : lib/math/complex.cpp
 	$(CPP) -c lib/math/complex.cpp -o $@ $(CXXFLAGS)
 
@@ -839,78 +911,6 @@ lib/math/vector.o : lib/math/vector.cpp
 
 lib/net/net.o : lib/net/net.cpp
 	$(CPP) -c lib/net/net.cpp -o $@ $(CXXFLAGS)
-
-lib/script/asm/asm.o : lib/script/asm/asm.cpp
-	$(CPP) -c lib/script/asm/asm.cpp -o $@ $(CXXFLAGS)
-
-lib/script/compiler/compiler.o : lib/script/compiler/compiler.cpp
-	$(CPP) -c lib/script/compiler/compiler.cpp -o $@ $(CXXFLAGS)
-
-lib/script/compiler/serializer.o : lib/script/compiler/serializer.cpp
-	$(CPP) -c lib/script/compiler/serializer.cpp -o $@ $(CXXFLAGS)
-
-lib/script/compiler/serializer_amd64.o : lib/script/compiler/serializer_amd64.cpp
-	$(CPP) -c lib/script/compiler/serializer_amd64.cpp -o $@ $(CXXFLAGS)
-
-lib/script/compiler/serializer_arm.o : lib/script/compiler/serializer_arm.cpp
-	$(CPP) -c lib/script/compiler/serializer_arm.cpp -o $@ $(CXXFLAGS)
-
-lib/script/compiler/serializer_x86.o : lib/script/compiler/serializer_x86.cpp
-	$(CPP) -c lib/script/compiler/serializer_x86.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data.o : lib/script/lib/script_data.cpp
-	$(CPP) -c lib/script/lib/script_data.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_file.o : lib/script/lib/script_data_file.cpp
-	$(CPP) -c lib/script/lib/script_data_file.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_hui.o : lib/script/lib/script_data_hui.cpp
-	$(CPP) -c lib/script/lib/script_data_hui.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_image.o : lib/script/lib/script_data_image.cpp
-	$(CPP) -c lib/script/lib/script_data_image.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_math.o : lib/script/lib/script_data_math.cpp
-	$(CPP) -c lib/script/lib/script_data_math.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_net.o : lib/script/lib/script_data_net.cpp
-	$(CPP) -c lib/script/lib/script_data_net.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_nix.o : lib/script/lib/script_data_nix.cpp
-	$(CPP) -c lib/script/lib/script_data_nix.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_sound.o : lib/script/lib/script_data_sound.cpp
-	$(CPP) -c lib/script/lib/script_data_sound.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_threads.o : lib/script/lib/script_data_threads.cpp
-	$(CPP) -c lib/script/lib/script_data_threads.cpp -o $@ $(CXXFLAGS)
-
-lib/script/lib/script_data_x.o : lib/script/lib/script_data_x.cpp
-	$(CPP) -c lib/script/lib/script_data_x.cpp -o $@ $(CXXFLAGS)
-
-lib/script/syntax/implicit.o : lib/script/syntax/implicit.cpp
-	$(CPP) -c lib/script/syntax/implicit.cpp -o $@ $(CXXFLAGS)
-
-lib/script/syntax/lexical.o : lib/script/syntax/lexical.cpp
-	$(CPP) -c lib/script/syntax/lexical.cpp -o $@ $(CXXFLAGS)
-
-lib/script/syntax/parser.o : lib/script/syntax/parser.cpp
-	$(CPP) -c lib/script/syntax/parser.cpp -o $@ $(CXXFLAGS)
-
-lib/script/syntax/precompiler.o : lib/script/syntax/precompiler.cpp
-	$(CPP) -c lib/script/syntax/precompiler.cpp -o $@ $(CXXFLAGS)
-
-lib/script/syntax/preprocessor.o : lib/script/syntax/preprocessor.cpp
-	$(CPP) -c lib/script/syntax/preprocessor.cpp -o $@ $(CXXFLAGS)
-
-lib/script/syntax/syntax_tree.o : lib/script/syntax/syntax_tree.cpp
-	$(CPP) -c lib/script/syntax/syntax_tree.cpp -o $@ $(CXXFLAGS)
-
-lib/script/syntax/type.o : lib/script/syntax/type.cpp
-	$(CPP) -c lib/script/syntax/type.cpp -o $@ $(CXXFLAGS)
-
-lib/script/script.o : lib/script/script.cpp
-	$(CPP) -c lib/script/script.cpp -o $@ $(CXXFLAGS)
 
 lib/threads/Mutex.o : lib/threads/Mutex.cpp
 	$(CPP) -c lib/threads/Mutex.cpp -o $@ $(CXXFLAGS)

@@ -8,7 +8,7 @@
 #include "Curve.h"
 #include "../Plugins/Effect.h"
 #include "../Audio/Synth/Synthesizer.h"
-#include "../lib/script/script.h"
+#include "../lib/kaba/kaba.h"
 #include "Song.h"
 
 Curve::Target::Target()
@@ -65,10 +65,10 @@ void Curve::Target::enumerateConfigurable(Configurable *c, Array<Target> &list, 
 {
 	PluginData *pd = c->get_config();
 	if (pd)
-		enumerateType((char*)pd, pd->type, list, prefix, prefix_nice);
+		enumerateType((char*)pd, pd->_class, list, prefix, prefix_nice);
 }
 
-void Curve::Target::enumerateType(char *pp, Script::Type *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
+void Curve::Target::enumerateType(char *pp, Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice)
 {
 	if (t->name == "float"){
 		list.add(Target((float*)pp, prefix, prefix_nice));
@@ -82,7 +82,7 @@ void Curve::Target::enumerateType(char *pp, Script::Type *t, Array<Target> &list
 			enumerateType(pp + da->element_size * i, t->parent, list, prefix + format(":%d", i), prefix_nice + format("[%d]", i));
 		}
 	}else{
-		for (auto &e : t->element)
+		for (auto &e : t->elements)
 			if (!e.hidden)
 				enumerateType(pp + e.offset, e.type, list, prefix + ":" + e.name, prefix_nice + "." + e.name);
 	}

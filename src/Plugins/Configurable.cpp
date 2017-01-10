@@ -10,7 +10,7 @@
 #include "ConfigPanel.h"
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
-#include "../lib/script/script.h"
+#include "../lib/kaba/kaba.h"
 #include "PluginManager.h"
 #include "../Stuff/Log.h"
 #include "../View/Helper/Slider.h"
@@ -34,53 +34,53 @@ void PluginData::__delete__()
 }
 
 
-Array<Script::ClassElement> get_unique_elements(Script::Type *t)
+Array<Kaba::ClassElement> get_unique_elements(Kaba::Class *c)
 {
-	Array<Script::ClassElement> r;
-	for (auto &e: t->element)
+	Array<Kaba::ClassElement> r;
+	for (auto &e: c->elements)
 		if (!e.hidden)
 			r.add(e);
 	return r;
 }
 
-string var_to_string(Script::Type *type, char *v)
+string var_to_string(Kaba::Class *c, char *v)
 {
 	string r;
-	if (type == Script::TypeInt){
+	if (c == Kaba::TypeInt){
 		r += i2s(*(int*)v);
-	}else if (type == Script::TypeChar){
+	}else if (c == Kaba::TypeChar){
 		r += i2s(*(char*)v);
-	}else if (type == Script::TypeFloat32){
+	}else if (c == Kaba::TypeFloat32){
 		r += f2s(*(float*)v, 6);
-	}else if (type == Script::TypeBool){
+	}else if (c == Kaba::TypeBool){
 		r += (*(bool*)v) ? "true" : "false";
-	}else if (type == Script::TypeString){
+	}else if (c == Kaba::TypeString){
 		r += "\"" + str_escape(*(string*)v) + "\"";
-	}else if (type->is_array){
+	}else if (c->is_array){
 		r += "[";
-		for (int i=0; i<type->array_length; i++){
+		for (int i=0; i<c->array_length; i++){
 			if (i > 0)
 				r += " ";
-			r += var_to_string(type->parent, &v[i * type->parent->size]);
+			r += var_to_string(c->parent, &v[i * c->parent->size]);
 		}
 		r += "]";
-	}else if (type->is_super_array){
+	}else if (c->is_super_array){
 		DynamicArray *a = (DynamicArray*)v;
 		r += "[";
 		for (int i=0; i<a->num; i++){
 			if (i > 0)
 				r += " ";
-			r += var_to_string(type->parent, &(((char*)a->data)[i * type->parent->size]));
+			r += var_to_string(c->parent, &(((char*)a->data)[i * c->parent->size]));
 		}
 		r += "]";
-	}else if (type->name == "SampleRef*"){
+	}else if (c->name == "SampleRef*"){
 		SampleRef *sr = *(SampleRef**)v;
 		if (sr)
 			r += i2s(sr->origin->get_index());
 		else
 			r += "nil";
 	}else{
-		Array<Script::ClassElement> e = get_unique_elements(type);
+		Array<Kaba::ClassElement> e = get_unique_elements(c);
 		r += "(";
 		for (int i=0; i<e.num; i++){
 			if (i > 0)
@@ -114,19 +114,19 @@ string get_next(const string &var_temp, int &pos)
 	return var_temp.substr(start, -1);
 }
 
-void var_from_string(Script::Type *type, char *v, const string &s, int &pos, Song *song)
+void var_from_string(Kaba::Class *type, char *v, const string &s, int &pos, Song *song)
 {
 	if (pos >= s.num)
 		return;
-	if (type == Script::TypeInt){
+	if (type == Kaba::TypeInt){
 		*(int*)v = get_next(s, pos)._int();
-	}else if (type == Script::TypeChar){
+	}else if (type == Kaba::TypeChar){
 		*(char*)v = get_next(s, pos)._int();
-	}else if (type == Script::TypeFloat32){
+	}else if (type == Kaba::TypeFloat32){
 		*(float*)v = get_next(s, pos)._float();
-	}else if (type == Script::TypeBool){
+	}else if (type == Kaba::TypeBool){
 		*(bool*)v = (get_next(s, pos) == "true");
-	}else if (type == Script::TypeString){
+	}else if (type == Kaba::TypeString){
 		*(string*)v = get_next(s, pos);
 	}else if (type->is_array){
 		pos ++; // '['
@@ -159,7 +159,7 @@ void var_from_string(Script::Type *type, char *v, const string &s, int &pos, Son
 			}
 		}
 	}else{
-		Array<Script::ClassElement> e = get_unique_elements(type);
+		Array<Kaba::ClassElement> e = get_unique_elements(type);
 		pos ++; // '('
 		for (int i=0; i<e.num; i++){
 			if (i > 0)
@@ -193,13 +193,13 @@ void Configurable::__delete__()
 
 PluginData *Configurable::get_config()
 {
-	Script::Type *type = Script::GetDynamicType(this);
-	if (!type)
+	Kaba::Class *c = Kaba::GetDynamicType(this);
+	if (!c)
 		return NULL;
-	for (auto &e: type->element)
+	for (auto &e: c->elements)
 		if ((e.name == "config") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *config = (PluginData*)((char*)this + e.offset);
-			config->type = e.type;
+			config->_class = e.type;
 			return config;
 		}
 	return NULL;
@@ -207,17 +207,17 @@ PluginData *Configurable::get_config()
 
 PluginData *Configurable::get_state()
 {
-	Script::Type *type = Script::GetDynamicType(this);
-	if (!type){
+	Kaba::Class *c = Kaba::GetDynamicType(this);
+	if (!c){
 		DummySynthesizer *ds = dynamic_cast<DummySynthesizer*>(this);
 		if (ds)
 			return &ds->state;
 		return NULL;
 	}
-	for (auto &e: type->element)
+	for (auto &e: c->elements)
 		if ((e.name == "state") and (e.type->GetRoot()->name == "PluginData")){
 			PluginData *state = (PluginData*)((char*)this + e.offset);
-			state->type = e.type;
+			state->_class = e.type;
 			return state;
 		}
 	return NULL;
@@ -229,7 +229,7 @@ string Configurable::configToString()
 	if (!config)
 		return "";
 
-	string s = var_to_string(config->type, (char*)config);
+	string s = var_to_string(config->_class, (char*)config);
 	return s;
 }
 
@@ -241,7 +241,7 @@ void Configurable::configFromString(const string &param)
 
 	config->reset();
 	int pos = 0;
-	var_from_string(config->type, (char*)config, param, pos, song);
+	var_from_string(config->_class, (char*)config, param, pos, song);
 	onConfig();
 }
 
@@ -285,10 +285,10 @@ struct AutoConfigData
 
 Array<AutoConfigData> get_auto_conf(PluginData *config)
 {
-	Script::SyntaxTree *ps = config->type->owner;
+	Kaba::SyntaxTree *ps = config->_class->owner;
 	Array<AutoConfigData> r;
-	for (auto &e: config->type->element)
-		if (e.type == Script::TypeFloat32){
+	for (auto &e: config->_class->elements)
+		if (e.type == Kaba::TypeFloat32){
 			AutoConfigData a;
 			a.name = e.name;
 			a.value = (float*)((char*)config + e.offset);

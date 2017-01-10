@@ -277,11 +277,11 @@ void MidiRawData::addMetronomeClick(int pos, int level, float volume)
 		add(MidiEvent(pos, 81, volume));
 		add(MidiEvent(pos, 81, 0));
 	}else if (level == 1){
-		add(MidiEvent(pos, 74, volume * 0.5f));
+		add(MidiEvent(pos, 74, volume * 0.7f));
 		add(MidiEvent(pos, 74, 0));
 	}else{
-		add(MidiEvent(pos, 66, volume * 0.1f));
-		add(MidiEvent(pos, 66, 0));
+		add(MidiEvent(pos, 71, volume * 0.5f));
+		add(MidiEvent(pos, 71, 0));
 	}
 }
 

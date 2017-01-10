@@ -14,9 +14,9 @@ class Song;
 class Track;
 class Effect;
 class Configurable;
-namespace Script
+namespace Kaba
 {
-	class Type;
+	class Class;
 };
 
 class Curve : public Observable
@@ -46,7 +46,7 @@ public:
 		static Array<Target> enumerate(Song *a);
 		static void enumerateTrack(Track *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
 		static void enumerateConfigurable(Configurable *c, Array<Target> &list, const string &prefix, const string &prefix_nice);
-		static void enumerateType(char *p, Script::Type *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
+		static void enumerateType(char *p, Kaba::Class *t, Array<Target> &list, const string &prefix, const string &prefix_nice);
 	};
 
 	string name;

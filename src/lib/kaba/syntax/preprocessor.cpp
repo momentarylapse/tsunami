@@ -4,7 +4,7 @@
 
 namespace Kaba{
 
-typedef void op_func(string &r, string &a, string &b);
+typedef void op_func(Value &r, Value &a, Value &b);
 
 //static Function *cur_func;
 
@@ -87,17 +87,17 @@ bool call_function(Function *f, void *ff, void *ret, void *inst, Array<void*> pa
 
 
 #if 0
-void PreProcessFunction(SyntaxTree *ps, Command *c)
+void PreProcessFunction(SyntaxTree *ps, Node *c)
 {
 	bool all_const = true;
 	bool is_address = false;
 	bool is_local = false;
 	for (int i=0;i<c->num_params;i++)
-		if (c->param[i]->kind == KIND_ADDRESS)
+		if (c->params[i]->kind == KIND_ADDRESS)
 			is_address = true;
-		else if (c->param[i]->kind == KIND_LOCAL_ADDRESS)
+		else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
 			is_address = is_local = true;
-		else if (c->param[i]->kind != KIND_CONSTANT)
+		else if (c->params[i]->kind != KIND_CONSTANT)
 			all_const = false;
 	if (!all_const)
 		return;
@@ -117,10 +117,10 @@ void PreProcessFunction(SyntaxTree *ps, Command *c)
 					}else{
 						// pre process operator
 						int nc = ps->AddConstant(o->return_type);
-						string d1 = ps->constants[c->param[0]->link_no].value;
+						string d1 = ps->constants[c->params[0]->link_no].value;
 						string d2;
 						if (c->num_params > 1)
-							d2 = ps->constants[c->param[1]->link_no].value;
+							d2 = ps->constants[c->params[1]->link_no].value;
 						f(ps->constants[nc].value, d1, d2);
 						c->script = ps->script;
 						c->kind = KIND_CONSTANT;
@@ -131,22 +131,22 @@ void PreProcessFunction(SyntaxTree *ps, Command *c)
 #endif
 
 
-Command *SyntaxTree::PreProcessCommand(Command *c)
+Node *SyntaxTree::PreProcessNode(Node *c)
 {
 	// recursion
 	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->as_block()->commands.num;i++)
-			c->as_block()->commands[i] = PreProcessCommand(c->as_block()->commands[i]);
+		for (int i=0;i<c->as_block()->nodes.num;i++)
+			c->as_block()->nodes[i] = PreProcessNode(c->as_block()->nodes[i]);
 	}
-	for (int i=0;i<c->param.num;i++)
-		c->set_param(i, PreProcessCommand(c->param[i]));
+	for (int i=0;i<c->params.num;i++)
+		c->set_param(i, PreProcessNode(c->params[i]));
 	if (c->instance)
-		c->set_instance(PreProcessCommand(c->instance));
+		c->set_instance(PreProcessNode(c->instance));
 	
 
 	// process...
 	if (c->kind == KIND_OPERATOR){
-		PreOperator *o = &PreOperators[c->link_no];
+		Operator *o = &operators[c->link_no];
 		/*if (c->link_nr == OperatorIntAdd){
 			if (c->param[1]->kind == KindConstant){
 				int v = *(int*)Constants[c->param[1]->link_nr].data;
@@ -159,12 +159,12 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 			bool all_const = true;
 			bool is_address = false;
 			bool is_local = false;
-			for (int i=0;i<c->param.num;i++)
-				if (c->param[i]->kind == KIND_ADDRESS)
+			for (int i=0;i<c->params.num;i++)
+				if (c->params[i]->kind == KIND_ADDRESS)
 					is_address = true;
-				else if (c->param[i]->kind == KIND_LOCAL_ADDRESS)
+				else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
 					is_address = is_local = true;
-				else if (c->param[i]->kind != KIND_CONSTANT)
+				else if (c->params[i]->kind != KIND_CONSTANT)
 					all_const = false;
 			if (all_const){
 				op_func *f = (op_func*)o->func;
@@ -183,12 +183,13 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 				}else{
 					// pre process operator
 					int nc = AddConstant(o->return_type);
-					string d1 = constants[c->param[0]->link_no].value;
-					string d2;
-					if (c->param.num > 1)
-						d2 = constants[c->param[1]->link_no].value;
-					f(constants[nc].value, d1, d2);
-					return add_command_const(nc);
+					if (c->params.num > 1){
+						f(*constants[nc], *constants[c->params[0]->link_no], *constants[c->params[1]->link_no]);
+					}else{
+						Value dummy;
+						f(*constants[nc], *constants[c->params[0]->link_no], dummy);
+					}
+					return add_node_const(nc);
 				}
 			}
 		}
@@ -205,12 +206,12 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 		bool all_const = true;
 		bool is_address = false;
 		bool is_local = false;
-		for (int i=0;i<c->param.num;i++){
-			if (c->param[i]->kind == KIND_ADDRESS)
+		for (int i=0;i<c->params.num;i++){
+			if (c->params[i]->kind == KIND_ADDRESS)
 				is_address = true;
-			else if (c->param[i]->kind == KIND_LOCAL_ADDRESS)
+			else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
 				is_address = is_local = true;
-			else if (c->param[i]->kind != KIND_CONSTANT)
+			else if (c->params[i]->kind != KIND_CONSTANT)
 				all_const = false;
 		}
 		void *inst = NULL;
@@ -218,37 +219,38 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 			return c;
 			if (c->instance->kind != KIND_CONSTANT)
 				all_const = false;
-			inst = constants[c->instance->link_no].value.data;
+			inst = constants[c->instance->link_no]->value.data;
 		}
 		if (!all_const)
 			return c;
 		if (is_address)
 			return c;
-		string temp;
-		temp.resize(f->return_type->size);
+		Value temp;
+		temp.init(f->return_type);
 		Array<void*> p;
-		for (int i=0; i<c->param.num; i++)
-			p.add(constants[c->param[i]->link_no].value.data);
-		if (!call_function(f, ff, temp.data, inst, p))
+		for (int i=0; i<c->params.num; i++)
+			p.add(constants[c->params[i]->link_no]->p());
+		if (!call_function(f, ff, temp.p(), inst, p))
 			return c;
 		int nc = AddConstant(f->return_type);
-		constants[nc].value = temp;
-		return add_command_const(nc);
+		constants[nc]->set(temp);
+		//DoError("...pure function evaluation?!?....TODO");
+		return add_node_const(nc);
 #endif
 	}else if (c->kind == KIND_ARRAY_BUILDER){
 		bool all_consts = true;
-		for (int i=0; i<c->param.num; i++)
-			if (c->param[i]->kind != KIND_CONSTANT)
+		for (int i=0; i<c->params.num; i++)
+			if (c->params[i]->kind != KIND_CONSTANT)
 				all_consts = false;
 		if (all_consts){
 			int nc = AddConstant(c->type);
 			int el_size = c->type->parent->size;
-			DynamicArray *da = (DynamicArray*)constants[nc].value.data;
+			DynamicArray *da = &constants[nc]->as_array();
 			da->init(el_size);
-			da->resize(c->param.num);
-			for (int i=0; i<c->param.num; i++)
-				memcpy((char*)da->data + el_size * i, constants[c->param[i]->link_no].value.data, el_size);
-			return add_command_const(nc);
+			da->resize(c->params.num);
+			for (int i=0; i<c->params.num; i++)
+				memcpy((char*)da->data + el_size * i, constants[c->params[i]->link_no]->p(), el_size);
+			return add_node_const(nc);
 		}
 	}/*else if (c->kind == KindReference){
 	// no... we don't know the addresses of globals/constants yet...
@@ -290,7 +292,7 @@ Command *SyntaxTree::PreProcessCommand(Command *c)
 string LinkNr2Str(SyntaxTree *s, int kind, long long nr);
 
 // may not use AddConstant()!!!
-Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
+Node *SyntaxTree::PreProcessNodeAddresses(Node *c)
 {
 	/*msg_write(Kind2Str(c->Kind));
 	if (c->script)
@@ -300,65 +302,69 @@ Command *SyntaxTree::PreProcessCommandAddresses(Command *c)
 
 	// recursion
 	if (c->kind == KIND_BLOCK){
-		for (int i=0;i<c->as_block()->commands.num;i++)
-			c->as_block()->set(i, PreProcessCommandAddresses(c->as_block()->commands[i]));
+		for (int i=0;i<c->as_block()->nodes.num;i++)
+			c->as_block()->set(i, PreProcessNodeAddresses(c->as_block()->nodes[i]));
 	}
-	for (int i=0;i<c->param.num;i++)
-		c->set_param(i, PreProcessCommandAddresses(c->param[i]));
+	for (int i=0;i<c->params.num;i++)
+		c->set_param(i, PreProcessNodeAddresses(c->params[i]));
 	if (c->instance)
-		c->set_instance(PreProcessCommandAddresses(c->instance));
+		c->set_instance(PreProcessNodeAddresses(c->instance));
 	
 
 	// process...
 	if (c->kind == KIND_OPERATOR){
-		PreOperator *o = &PreOperators[c->link_no];
+		Operator *o = &operators[c->link_no];
 		if (o->func){
 			bool all_const = true;
 			bool is_address = false;
 			bool is_local = false;
-			for (int i=0;i<c->param.num;i++)
-				if (c->param[i]->kind == KIND_ADDRESS)
+			for (int i=0;i<c->params.num;i++)
+				if (c->params[i]->kind == KIND_ADDRESS)
 					is_address = true;
-				else if (c->param[i]->kind == KIND_LOCAL_ADDRESS)
+				else if (c->params[i]->kind == KIND_LOCAL_ADDRESS)
 					is_address = is_local = true;
-				else if (c->param[i]->kind != KIND_CONSTANT)
+				else if (c->params[i]->kind != KIND_CONSTANT)
 					all_const = false;
 			if (all_const){
 				op_func *f = (op_func*)o->func;
 				if (is_address){
 					// pre process address
-					string d1 = string((char*)&c->param[0]->link_no, c->param[0]->type->size);
-					string d2 = string((char*)&c->param[1]->link_no, c->param[1]->type->size);
-					if (c->param[0]->kind == KIND_CONSTANT)
-					    d1 = constants[c->param[0]->link_no].value;
-					if (c->param[1]->kind == KIND_CONSTANT)
-					    d2 = constants[c->param[1]->link_no].value;
-					string r = "--------";
+					Value d1, d2;
+					d1.init(c->params[0]->type);
+					d2.init(c->params[1]->type);
+					*(void**)d1.p() = (void*)c->params[0]->link_no;
+					*(void**)d2.p() = (void*)c->params[1]->link_no;
+					if (c->params[0]->kind == KIND_CONSTANT)
+					    d1.set(*constants[c->params[0]->link_no]);
+					if (c->params[1]->kind == KIND_CONSTANT)
+					    d2.set(*constants[c->params[1]->link_no]);
+					Value r;
+					r.init(c->type);
 					f(r, d1, d2);
-					return AddCommand(is_local ? KIND_LOCAL_ADDRESS : KIND_ADDRESS, *(long*)r.data, c->type);
+					return AddNode(is_local ? KIND_LOCAL_ADDRESS : KIND_ADDRESS, *(long*)r.p(), c->type);
 				}
 			}
 		}
 	}else if (c->kind == KIND_REFERENCE){
 		if (c->script){
-			if ((c->param[0]->kind == KIND_VAR_GLOBAL) or (c->param[0]->kind == KIND_VAR_LOCAL) or (c->param[0]->kind == KIND_CONSTANT)){
+			if ((c->params[0]->kind == KIND_VAR_GLOBAL) or (c->params[0]->kind == KIND_VAR_LOCAL) or (c->params[0]->kind == KIND_CONSTANT)){
 				// pre process ref var
-				if (c->param[0]->kind == KIND_VAR_GLOBAL){
-					return AddCommand(KIND_ADDRESS, (long)c->param[0]->script->g_var[c->param[0]->link_no], c->type, c->param[0]->script);
-				}else if (c->param[0]->kind == KIND_VAR_LOCAL){
-					return AddCommand(KIND_LOCAL_ADDRESS, (long)cur_func->var[c->param[0]->link_no]._offset, c->type);
+				if (c->params[0]->kind == KIND_VAR_GLOBAL){
+					return AddNode(KIND_ADDRESS, (long)c->params[0]->script->g_var[c->params[0]->link_no], c->type, c->params[0]->script);
+				}else if (c->params[0]->kind == KIND_VAR_LOCAL){
+					return AddNode(KIND_LOCAL_ADDRESS, (long)cur_func->var[c->params[0]->link_no]._offset, c->type);
 				}else /*if (c->param[0]->kind == KindConstant)*/{
-					return AddCommand(KIND_ADDRESS, (long)c->param[0]->script->cnst[c->param[0]->link_no], c->type, c->param[0]->script);
+					return AddNode(KIND_ADDRESS, (long)c->params[0]->script->cnst[c->params[0]->link_no], c->type, c->params[0]->script);
 				}
 			}
 		}
 	}else if (c->kind == KIND_DEREFERENCE){
-		if (c->param[0]->kind == KIND_ADDRESS){
+		if (c->params[0]->kind == KIND_ADDRESS){
 			// pre process deref address
-			return AddCommand(KIND_MEMORY, c->param[0]->link_no, c->type);
-		}else if (c->param[0]->kind == KIND_LOCAL_ADDRESS){
+			return AddNode(KIND_MEMORY, c->params[0]->link_no, c->type);
+		}else if (c->params[0]->kind == KIND_LOCAL_ADDRESS){
 			// pre process deref local address
-			return AddCommand(KIND_LOCAL_MEMORY, c->param[0]->link_no, c->type);
+			return AddNode(KIND_LOCAL_MEMORY, c->params[0]->link_no, c->type);
 		}
 	}
 	return c;
@@ -368,8 +374,8 @@ void SyntaxTree::PreProcessor()
 {
 	for (Function *f: functions){
 		cur_func = f;
-		foreachi(Command *c, f->block->commands, i)
-			f->block->commands[i] = PreProcessCommand(c);
+		foreachi(Node *c, f->block->nodes, i)
+			f->block->nodes[i] = PreProcessNode(c);
 	}
 	//Show();
 }
@@ -378,8 +384,8 @@ void SyntaxTree::PreProcessorAddresses()
 {
 	for (Function *f: functions){
 		cur_func = f;
-		foreachi(Command *c, f->block->commands, i)
-			f->block->commands[i] = PreProcessCommandAddresses(c);
+		foreachi(Node *c, f->block->nodes, i)
+			f->block->nodes[i] = PreProcessNodeAddresses(c);
 	}
 	//Show();
 }

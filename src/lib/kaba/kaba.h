@@ -65,6 +65,7 @@ public:
 	void CompileOsEntryPoint();
 	void LinkOsEntryPoint();
 	void CompileTaskEntryPoint();
+	void LinkFunctions();
 
 	// error messages
 	void DoError(const string &msg, int override_line = -1);

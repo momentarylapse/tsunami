@@ -23,14 +23,37 @@ struct Define
 	Array<string> dest;
 };
 
-// for any type of constant used in the script
-struct Constant
+struct Value
 {
-	string name;
 	string value;
 	Class *type;
-	void setInt(int i);
-	int getInt();
+
+	Value();
+	~Value();
+
+	void init(Class *type);
+	void clear();
+	void set(const Value &v);
+
+	void* p() const;
+	int& as_int() const;
+	long long& as_int64() const;
+	float& as_float() const;
+	double& as_float64() const;
+	string& as_string() const;
+	DynamicArray& as_array() const;
+
+	int mapping_size() const;
+	void map_into(char *mem, char *addr) const;
+	string str() const;
+};
+
+// for any type of constant used in the script
+struct Constant : Value
+{
+	Constant(Class *type);
+	string name;
+	string str() const;
 };
 
 enum
@@ -79,19 +102,19 @@ enum
 	KIND_DEREF_GLOBAL_LOOKUP, // ARM
 };
 
-struct Command;
+struct Node;
 
 // {...}-block
 struct Block
 {
 	int index;
-	Array<Command*> commands;
+	Array<Node*> nodes;
 	Array<int> vars;
 	Function *function;
 	Block *parent;
 	int level;
-	void add(Command *c);
-	void set(int index, Command *c);
+	void add(Node *c);
+	void set(int index, Node *c);
 
 	int get_var(const string &name);
 	int add_var(const string &name, Class *type);
@@ -134,26 +157,44 @@ struct Function
 };
 
 // single operand/command
-struct Command
+struct Node
 {
 	int kind;
 	long long link_no;
 	Script *script;
 	int ref_count;
 	// parameters
-	Array<Command*> param;
+	Array<Node*> params;
 	// linking of class function instances
-	Command *instance;
+	Node *instance;
 	// return value
 	Class *type;
-	Command();
-	Command(int kind, long long link_no, Script *script, Class *type);
+	Node();
+	Node(int kind, long long link_no, Script *script, Class *type);
 	Block *as_block() const;
 	Function *as_func() const;
+	Constant *as_const() const;
 	void set_num_params(int n);
-	void set_param(int index, Command *p);
-	void set_instance(Command *p);
+	void set_param(int index, Node *p);
+	void set_instance(Node *p);
 };
+
+
+struct Operator
+{
+	int primitive_id;
+	Class *return_type, *param_type_1, *param_type_2;
+
+	SyntaxTree *owner;
+	int func_index;
+	int class_func_index;
+	int inline_index;
+
+	void *func; // temporary...!
+
+	string str() const;
+};
+
 
 struct AsmBlock
 {
@@ -202,8 +243,8 @@ public:
 	// pre compiler
 	void PreCompiler(bool just_analyse);
 	void HandleMacro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
-	void AutoImplementAddVirtualTable(Command *self, Function *f, Class *t);
-	void AutoImplementAddChildConstructors(Command *self, Function *f, Class *t);
+	void AutoImplementAddVirtualTable(Node *self, Function *f, Class *t);
+	void AutoImplementAddChildConstructors(Node *self, Function *f, Class *t);
 	void AutoImplementDefaultConstructor(Function *f, Class *t, bool allow_parent_constructor);
 	void AutoImplementComplexConstructor(Function *f, Class *t);
 	void AutoImplementDestructor(Function *f, Class *t);
@@ -217,29 +258,29 @@ public:
 
 	// syntax analysis
 	Class *GetConstantType(const string &str);
-	string GetConstantValue(const string &str);
+	void GetConstantValue(const string &str, Value &value);
 	Class *FindType(const string &name);
 	Class *AddType(Class *type);
 	Class *CreateNewType(const string &name, int size, bool is_pointer, bool is_silent, bool is_array, int array_size, Class *sub);
 	Class *CreateArrayType(Class *element_type, int num_elements, const string &name_pre = "", const string &suffix = "");
-	Array<Command> GetExistence(const string &name, Block *block);
-	Array<Command> GetExistenceShared(const string &name);
-	void LinkMostImportantOperator(Array<Command*> &operand, Array<Command*> &_operator, Array<int> &op_exp);
-	Command *LinkOperator(int op_no, Command *param1, Command *param2);
-	Command *GetOperandExtension(Command *operand, Block *block);
-	Command *GetOperandExtensionElement(Command *operand, Block *block);
-	Command *GetOperandExtensionArray(Command *operand, Block *block);
-	Command *GetCommand(Block *block);
+	Array<Node> GetExistence(const string &name, Block *block);
+	Array<Node> GetExistenceShared(const string &name);
+	void LinkMostImportantOperator(Array<Node*> &operand, Array<Node*> &_operator, Array<int> &op_exp);
+	Node *LinkOperator(int op_no, Node *param1, Node *param2);
+	Node *GetOperandExtension(Node *operand, Block *block);
+	Node *GetOperandExtensionElement(Node *operand, Block *block);
+	Node *GetOperandExtensionArray(Node *operand, Block *block);
+	Node *GetCommand(Block *block);
 	void ParseCompleteCommand(Block *block);
-	Command *GetOperand(Block *block);
-	Command *GetPrimitiveOperator(Block *block);
-	Array<Command*> FindFunctionParameters(Block *block);
-	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, Command *cmd);
-	Array<Class*> GetFunctionWantedParams(Command &link);
-	Command *GetFunctionCall(const string &f_name, Array<Command> &links, Block *block);
-	Command *DoClassFunction(Command *ob, Array<ClassFunction> &cfs, Block *block);
-	Command *GetSpecialFunctionCall(const string &f_name, Command &link, Block *block);
-	Command *CheckParamLink(Command *link, Class *type, const string &f_name = "", int param_no = -1);
+	Node *GetOperand(Block *block);
+	Node *GetPrimitiveOperator(Block *block);
+	Array<Node*> FindFunctionParameters(Block *block);
+	//void FindFunctionSingleParameter(int p, Array<Type*> &wanted_type, Block *block, Node *cmd);
+	Array<Class*> GetFunctionWantedParams(Node &link);
+	Node *GetFunctionCall(const string &f_name, Array<Node> &links, Block *block);
+	Node *DoClassFunction(Node *ob, Array<ClassFunction> &cfs, Block *block);
+	Node *GetSpecialFunctionCall(const string &f_name, Node &link, Block *block);
+	Node *CheckParamLink(Node *link, Class *type, const string &f_name = "", int param_no = -1);
 	void ParseStatement(Block *block);
 	void ParseStatementFor(Block *block);
 	void ParseStatementForall(Block *block);
@@ -253,8 +294,9 @@ public:
 
 	// neccessary conversions
 	void ConvertCallByReference();
+	void ConvertInline();
 	void BreakDownComplicatedCommands();
-	Command *BreakDownComplicatedCommand(Command *c);
+	Node *BreakDownComplicatedCommand(Node *c);
 	void MapLocalVariablesToStack();
 
 	// data creation
@@ -262,31 +304,33 @@ public:
 	Block *AddBlock(Function *f, Block *parent);
 	Function *AddFunction(const string &name, Class *type);
 
-	// command
-	Command *AddCommand(int kind, long long link_no, Class *type);
-	Command *AddCommand(int kind, long long link_no, Class *type, Script *s);
-	Command *add_command_statement(int index);
-	Command *add_command_classfunc(ClassFunction *f, Command *inst, bool force_non_virtual = false);
-	Command *add_command_func(Script *script, int no, Class *return_type);
-	Command *add_command_const(int nc);
-	Command *add_command_operator(Command *p1, Command *p2, int op);
-	Command *add_command_local_var(int no, Class *type);
-	Command *add_command_parray(Command *p, Command *index, Class *type);
-	Command *add_command_block(Block *b);
-	Command *cp_command(Command *c);
-	Command *ref_command(Command *sub, Class *override_type = NULL);
-	Command *deref_command(Command *sub, Class *override_type = NULL);
-	Command *shift_command(Command *sub, bool deref, int shift, Class *type);
+	// nodes
+	Node *AddNode(int kind, long long link_no, Class *type);
+	Node *AddNode(int kind, long long link_no, Class *type, Script *s);
+	Node *add_node_statement(int index);
+	Node *add_node_classfunc(ClassFunction *f, Node *inst, bool force_non_virtual = false);
+	Node *add_node_func(Script *script, int no, Class *return_type);
+	Node *add_node_const(int nc);
+	Node *add_node_operator_by_index(Node *p1, Node *p2, int op);
+	Node *add_node_operator_by_inline(Node *p1, Node *p2, int inline_index);
+	Node *add_node_local_var(int no, Class *type);
+	Node *add_node_parray(Node *p, Node *index, Class *type);
+	Node *add_node_block(Block *b);
+	Node *cp_node(Node *c);
+	Node *ref_node(Node *sub, Class *override_type = NULL);
+	Node *deref_node(Node *sub, Class *override_type = NULL);
+	Node *shift_node(Node *sub, bool deref, int shift, Class *type);
 
 	// pre processor
-	Command *PreProcessCommand(Command *c);
+	Node *PreProcessNode(Node *c);
 	void PreProcessor();
-	Command *PreProcessCommandAddresses(Command *c);
+	Node *PreProcessNodeAddresses(Node *c);
 	void PreProcessorAddresses();
-	void Simplify();
+	void SimplifyRefDeref();
+	void SimplifyShiftDeref();
 
 	// debug displaying
-	void ShowCommand(Command *c, Function *f);
+	void ShowNode(Node *c, Function *f);
 	void ShowFunction(Function *f);
 	void ShowBlock(Block *b);
 	void Show();
@@ -304,10 +348,11 @@ public:
 	Array<Define> defines;
 	Asm::MetaInfo *asm_meta_info;
 	Array<AsmBlock> asm_blocks;
-	Array<Constant> constants;
+	Array<Constant*> constants;
+	Array<Operator> operators;
 	Array<Block*> blocks;
 	Array<Function*> functions;
-	Array<Command*> commands;
+	Array<Node*> nodes;
 
 	Function root_of_all_evil;
 

@@ -30,7 +30,7 @@ struct LoopData
 };
 
 
-struct SerialCommandParam
+struct SerialNodeParam
 {
 	int kind;
 	long long p;
@@ -38,20 +38,20 @@ struct SerialCommandParam
 	Class *type;
 	int shift;
 	//int c_id, v_id;
-	bool operator == (const SerialCommandParam &param) const
+	bool operator == (const SerialNodeParam &param) const
 	{	return (kind == param.kind) && (p == param.p) && (type == param.type) && (shift == param.shift);	}
 	string str() const;
 	Class* get_type_save() const
 	{	return type ? type : TypeVoid;	}
 };
 
-#define SERIAL_COMMAND_NUM_PARAMS	3
+#define SERIAL_NODE_NUM_PARAMS	3
 
-struct SerialCommand
+struct SerialNode
 {
 	int inst;
 	int cond;
-	SerialCommandParam p[SERIAL_COMMAND_NUM_PARAMS];
+	SerialNodeParam p[SERIAL_NODE_NUM_PARAMS];
 	int index;
 	string str() const;
 };
@@ -85,14 +85,14 @@ public:
 	Serializer(Script *script, Asm::InstructionWithParamsList *list);
 	virtual ~Serializer();
 
-	Array<SerialCommand> cmd;
+	Array<SerialNode> cmd;
 	int num_markers;
 	Script *script;
 	SyntaxTree *syntax_tree;
 	Function *cur_func;
 	int cur_func_index;
 	bool call_used;
-	Command *next_command;
+	Node *next_node;
 	int next_cmd_index;
 
 	Array<int> map_reg_root;
@@ -120,17 +120,16 @@ public:
 	void DoErrorLink(const string &msg);
 
 	void Assemble();
-	void assemble_cmd(SerialCommand &c);
-	void assemble_cmd_arm(SerialCommand &c);
-	Asm::InstructionParam get_param(int inst, SerialCommandParam &p);
+	void assemble_cmd(SerialNode &c);
+	void assemble_cmd_arm(SerialNode &c);
+	Asm::InstructionParam get_param(int inst, SerialNodeParam &p);
 
 	void SerializeFunction(Function *f);
 	void SerializeBlock(Block *block);
-	virtual SerialCommandParam SerializeParameter(Command *link, Block *block, int index) = 0;
-	SerialCommandParam SerializeCommand(Command *com, Block *block, int index);
-	virtual void SerializeStatement(Command *com, const Array<SerialCommandParam> &param, const SerialCommandParam &ret, Block *block, int index, int marker_before_params) = 0;
-	virtual void SerializeInlineFunction(Command *com, const Array<SerialCommandParam> &param, const SerialCommandParam &ret) = 0;
-	virtual void SerializeOperator(Command *com, const Array<SerialCommandParam> &param, const SerialCommandParam &ret) = 0;
+	virtual SerialNodeParam SerializeParameter(Node *link, Block *block, int index) = 0;
+	SerialNodeParam SerializeNode(Node *com, Block *block, int index);
+	virtual void SerializeStatement(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret, Block *block, int index, int marker_before_params) = 0;
+	virtual void SerializeInlineFunction(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) = 0;
 	virtual void AddFunctionIntro(Function *f) = 0;
 	virtual void AddFunctionOutro(Function *f) = 0;
 	virtual void CorrectReturn(){};
@@ -146,25 +145,25 @@ public:
 	int add_virtual_reg(int reg);
 	void set_virtual_reg(int v, int first, int last);
 	void use_virtual_reg(int v, int first, int last);
-	SerialCommandParam add_temp(Class *t, bool add_constructor = true);
-	void add_cmd(int cond, int inst, const SerialCommandParam &p1, const SerialCommandParam &p2, const SerialCommandParam &p3);
-	void add_cmd(int inst, const SerialCommandParam &p1, const SerialCommandParam &p2, const SerialCommandParam &p3);
-	void add_cmd(int inst, const SerialCommandParam &p1, const SerialCommandParam &p2);
-	void add_cmd(int inst, const SerialCommandParam &p);
+	SerialNodeParam add_temp(Class *t, bool add_constructor = true);
+	void add_cmd(int cond, int inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
+	void add_cmd(int inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3);
+	void add_cmd(int inst, const SerialNodeParam &p1, const SerialNodeParam &p2);
+	void add_cmd(int inst, const SerialNodeParam &p);
 	void add_cmd(int inst);
-	void set_cmd_param(SerialCommand &c, int param_index, const SerialCommandParam &p);
+	void set_cmd_param(SerialNode &c, int param_index, const SerialNodeParam &p);
 	void next_cmd_target(int index);
 	void remove_cmd(int index);
 	void remove_temp_var(int v);
-	void move_param(SerialCommandParam &p, int from, int to);
+	void move_param(SerialNodeParam &p, int from, int to);
 	int add_marker(int m = -1);
 	int add_marker_after_command(int level, int index);
 	void add_jump_after_command(int level, int index, int marker);
 
 
-	Array<SerialCommandParam> inserted_temp;
-	void add_cmd_constructor(const SerialCommandParam &param, int modus);
-	void add_cmd_destructor(const SerialCommandParam &param, bool needs_ref = true);
+	Array<SerialNodeParam> inserted_temp;
+	void add_cmd_constructor(const SerialNodeParam &param, int modus);
+	void add_cmd_destructor(const SerialNodeParam &param, bool needs_ref = true);
 
 	virtual void DoMapping() = 0;
 	void MapReferencedTempVarsToStack();
@@ -183,22 +182,22 @@ public:
 	int find_unused_reg(int first, int last, int size, int exclude = -1);
 	void solve_deref_temp_local(int c, int np, bool is_local);
 	void ResolveDerefTempAndLocal();
-	bool ParamUntouchedInInterval(SerialCommandParam &p, int first, int last);
+	bool ParamUntouchedInInterval(SerialNodeParam &p, int first, int last);
 	void SimplifyFPUStack();
 	void SimplifyMovs();
 	void RemoveUnusedTempVars();
 
-	void AddFunctionCall(Script *script, int func_no, const SerialCommandParam &instance, const Array<SerialCommandParam> &param, const SerialCommandParam &ret);
-	void AddClassFunctionCall(ClassFunction *cf, const SerialCommandParam &instance, const Array<SerialCommandParam> &param, const SerialCommandParam &ret);
-	virtual void add_function_call(Script *script, int func_no, const SerialCommandParam &instance, const Array<SerialCommandParam> &param, const SerialCommandParam &ret) = 0;
-	virtual void add_virtual_function_call(int virtual_index, const SerialCommandParam &instance, const Array<SerialCommandParam> &param, const SerialCommandParam &ret) = 0;
-	virtual int fc_begin(const SerialCommandParam &instance, const Array<SerialCommandParam> &param, const SerialCommandParam &ret) = 0;
-	virtual void fc_end(int push_size, const SerialCommandParam &ret) = 0;
-	SerialCommandParam AddReference(const SerialCommandParam &param, Class *force_type = NULL);
-	SerialCommandParam AddDereference(const SerialCommandParam &param, Class *force_type = NULL);
+	void AddFunctionCall(Script *script, int func_no, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret);
+	void AddClassFunctionCall(ClassFunction *cf, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret);
+	virtual void add_function_call(Script *script, int func_no, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) = 0;
+	virtual void add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) = 0;
+	virtual int fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) = 0;
+	virtual void fc_end(int push_size, const SerialNodeParam &ret) = 0;
+	SerialNodeParam AddReference(const SerialNodeParam &param, Class *force_type = NULL);
+	SerialNodeParam AddDereference(const SerialNodeParam &param, Class *force_type = NULL);
 
 	void MapTempVarToReg(int vi, int reg);
-	void add_stack_var(TempVar &v, SerialCommandParam &p);
+	void add_stack_var(TempVar &v, SerialNodeParam &p);
 	void MapTempVarToStack(int vi);
 
 
@@ -210,28 +209,28 @@ public:
 
 
 
-	SerialCommandParam p_eax, p_eax_int, p_deref_eax;
-	SerialCommandParam p_rax;
-	SerialCommandParam p_ax, p_al, p_al_bool, p_al_char;
-	SerialCommandParam p_st0, p_st1, p_xmm0, p_xmm1;
-	static const SerialCommandParam p_none;
+	SerialNodeParam p_eax, p_eax_int, p_deref_eax;
+	SerialNodeParam p_rax;
+	SerialNodeParam p_ax, p_al, p_al_bool, p_al_char;
+	SerialNodeParam p_st0, p_st1, p_xmm0, p_xmm1;
+	static const SerialNodeParam p_none;
 
 
-	static SerialCommandParam param_shift(const SerialCommandParam &param, int shift, Class *t);
-	static SerialCommandParam param_global(Class *type, void *v);
-	static SerialCommandParam param_local(Class *type, int offset);
-	static SerialCommandParam param_const(Class *type, long c);
-	static SerialCommandParam param_marker(int m);
-	static SerialCommandParam param_deref_marker(Class *type, int m);
-	SerialCommandParam param_vreg(Class *type, int vreg, int preg = -1);
-	static SerialCommandParam param_preg(Class *type, int reg);
-	SerialCommandParam param_deref_vreg(Class *type, int vreg, int preg = -1);
-	static SerialCommandParam param_deref_preg(Class *type, int reg);
-	static SerialCommandParam param_lookup(Class *type, int ref);
-	static SerialCommandParam param_deref_lookup(Class *type, int ref);
+	static SerialNodeParam param_shift(const SerialNodeParam &param, int shift, Class *t);
+	static SerialNodeParam param_global(Class *type, void *v);
+	static SerialNodeParam param_local(Class *type, int offset);
+	static SerialNodeParam param_const(Class *type, long c);
+	static SerialNodeParam param_marker(int m);
+	static SerialNodeParam param_deref_marker(Class *type, int m);
+	SerialNodeParam param_vreg(Class *type, int vreg, int preg = -1);
+	static SerialNodeParam param_preg(Class *type, int reg);
+	SerialNodeParam param_deref_vreg(Class *type, int vreg, int preg = -1);
+	static SerialNodeParam param_deref_preg(Class *type, int reg);
+	static SerialNodeParam param_lookup(Class *type, int ref);
+	static SerialNodeParam param_deref_lookup(Class *type, int ref);
 
 	static int reg_resize(int reg, int size);
-	void _resolve_deref_reg_shift_(SerialCommandParam &p, int i);
+	void _resolve_deref_reg_shift_(SerialNodeParam &p, int i);
 
 	static int get_reg(int root, int size);
 };

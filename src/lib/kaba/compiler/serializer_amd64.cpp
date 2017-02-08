@@ -7,12 +7,12 @@
 namespace Kaba{
 
 
-int SerializerAMD64::fc_begin(const SerialCommandParam &instance, const Array<SerialCommandParam> &_params, const SerialCommandParam &ret)
+int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<SerialNodeParam> &_params, const SerialNodeParam &ret)
 {
 	Class *type = ret.get_type_save();
 
 	// return data too big... push address
-	SerialCommandParam ret_ref;
+	SerialNodeParam ret_ref;
 	if (type->UsesReturnByMemory()){
 		//add_temp(type, ret_temp);
 		ret_ref = AddReference(/*ret_temp*/ ret);
@@ -24,7 +24,7 @@ int SerializerAMD64::fc_begin(const SerialCommandParam &instance, const Array<Se
 //	add_cmd(- cur_func->_VarSize - LocalOffset - 8);
 	long push_size = 0;
 
-	Array<SerialCommandParam> params = _params;
+	Array<SerialNodeParam> params = _params;
 		
 	// instance as first parameter
 	if (instance.type)
@@ -38,10 +38,10 @@ int SerializerAMD64::fc_begin(const SerialCommandParam &instance, const Array<Se
 	}
 
 	// map params...
-	Array<SerialCommandParam> reg_param;
-	Array<SerialCommandParam> stack_param;
-	Array<SerialCommandParam> xmm_param;
-	for (SerialCommandParam &p: params){
+	Array<SerialNodeParam> reg_param;
+	Array<SerialNodeParam> stack_param;
+	Array<SerialNodeParam> xmm_param;
+	for (SerialNodeParam &p: params){
 		if ((p.type == TypeInt) or (p.type == TypeInt64) or (p.type == TypeChar) or (p.type == TypeBool) or (p.type->is_pointer)){
 			if (reg_param.num < 6){
 				reg_param.add(p);
@@ -64,12 +64,12 @@ int SerializerAMD64::fc_begin(const SerialCommandParam &instance, const Array<Se
 		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_const(TypeInt, push_size));
 	else if (push_size > 0)
 		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_const(TypeChar, push_size));
-	foreachb(SerialCommandParam &p, stack_param)
+	foreachb(SerialNodeParam &p, stack_param)
 		add_cmd(Asm::INST_PUSH, p);
 	max_push_size = max(max_push_size, (int)push_size);
 
 	// xmm0-7
-	foreachib(SerialCommandParam &p, xmm_param, i){
+	foreachib(SerialNodeParam &p, xmm_param, i){
 		int reg = Asm::REG_XMM0 + i;
 		if (p.type == TypeFloat64)
 			add_cmd(Asm::INST_MOVSD, param_preg(TypeReg128, reg), p);
@@ -81,7 +81,7 @@ int SerializerAMD64::fc_begin(const SerialCommandParam &instance, const Array<Se
 
 	// rdi, rsi,rdx, rcx, r8, r9 
 	int param_regs_root[6] = {7, 6, 2, 1, 8, 9};
-	foreachib(SerialCommandParam &p, reg_param, i){
+	foreachib(SerialNodeParam &p, reg_param, i){
 		int root = param_regs_root[i];
 		int preg = get_reg(root, p.type->size);
 		if (preg >= 0){
@@ -105,7 +105,7 @@ int SerializerAMD64::fc_begin(const SerialCommandParam &instance, const Array<Se
 	return push_size;
 }
 
-void SerializerAMD64::fc_end(int push_size, const SerialCommandParam &instance, const Array<SerialCommandParam> &params, const SerialCommandParam &ret)
+void SerializerAMD64::fc_end(int push_size, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	Class *type = ret.get_type_save();
 
@@ -131,7 +131,7 @@ void SerializerAMD64::fc_end(int push_size, const SerialCommandParam &instance, 
 	}
 }
 
-void SerializerAMD64::add_function_call(Script *script, int func_no, const SerialCommandParam &instance, const Array<SerialCommandParam> &params, const SerialCommandParam &ret)
+void SerializerAMD64::add_function_call(Script *script, int func_no, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	int push_size = fc_begin(instance, params, ret);
 
@@ -158,7 +158,7 @@ void SerializerAMD64::add_function_call(Script *script, int func_no, const Seria
 	fc_end(push_size, instance, params, ret);
 }
 
-void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialCommandParam &instance, const Array<SerialCommandParam> &params, const SerialCommandParam &ret)
+void SerializerAMD64::add_virtual_function_call(int virtual_index, const SerialNodeParam &instance, const Array<SerialNodeParam> &params, const SerialNodeParam &ret)
 {
 	//DoError("virtual function call on amd64 not yet implemented!");
 
@@ -259,7 +259,7 @@ void SerializerAMD64::AddFunctionOutro(Function *f)
 
 //#define debug_evil_corrections
 
-void SerializerAMD64::CorrectUnallowedParamCombis2(SerialCommand &c)
+void SerializerAMD64::CorrectUnallowedParamCombis2(SerialNode &c)
 {
 	// push 8 bit -> push 32 bit
 	if (c.inst == Asm::INST_PUSH)

@@ -138,14 +138,10 @@ void Script::AllocateMemory()
 			memory_size += mem_align(syntax->root_of_all_evil.var[i].type->size, 4);
 
 	// constants
-	foreachi(Constant &c, syntax->constants, i){
-		int s = c.type->size;
-		if (c.type == TypeString){
-			// const string -> variable length   (+ super array frame)
-			s = c.value.num + config.super_array_size;
-		}
-		memory_size += mem_align(s, 4);
-	}
+	foreachi(Constant *c, syntax->constants, i)
+		memory_size += mem_align(c->mapping_size(), 4);
+
+	// vtables
 	for (Class *t: syntax->classes)
 		if (t->vtable.num > 0)
 			memory_size += config.pointer_size;
@@ -193,21 +189,10 @@ void Script::MapConstantsToMemory()
 {
 	// constants -> Memory
 	cnst.resize(syntax->constants.num);
-	foreachi(Constant &c, syntax->constants, i){
+	foreachi(Constant *c, syntax->constants, i){
 		cnst[i] = &memory[memory_size];
-		int s = c.type->size;
-		if (c.type == TypeString){
-			// const string -> variable length
-			s = syntax->constants[i].value.num;
-
-			*(void**)&memory[memory_size] = &memory[memory_size + config.super_array_size]; // .data
-			*(int*)&memory[memory_size + config.pointer_size    ] = s; // .num
-			*(int*)&memory[memory_size + config.pointer_size + 4] = 0; // .reserved
-			*(int*)&memory[memory_size + config.pointer_size + 8] = 1; // .item_size
-			memory_size += config.super_array_size;
-		}
-		memcpy(&memory[memory_size], (void*)c.value.data, s);
-		memory_size += mem_align(s, 4);
+		c->map_into(cnst[i], cnst[i]);
+		memory_size += mem_align(c->mapping_size(), 4);
 	}
 }
 
@@ -261,37 +246,17 @@ void Script::MapConstantsToOpcode()
 	for (Class *t: syntax->classes)
 		if (t->vtable.num > 0){
 			t->_vtable_location_compiler_ = &opcode[opcode_size];
-			t->_vtable_location_target_ = (void*)(opcode_size + syntax->asm_meta_info->code_origin);
+			t->_vtable_location_target_ = (void*)(syntax->asm_meta_info->code_origin + opcode_size);
 			opcode_size += config.pointer_size * t->vtable.num;
-			for (Constant &c: syntax->constants)
-				if ((c.type == TypePointer) and (*(int*)c.value.data == (int)(long)t->vtable.data))
-					memcpy(c.value.data, &t->_vtable_location_target_, config.pointer_size);
+			for (Constant *c: syntax->constants)
+				if ((c->type == TypePointer) and (*(int*)c->value.data == (int)(long)t->vtable.data))
+					memcpy(c->value.data, &t->_vtable_location_target_, config.pointer_size);
 		}
 
-	// put all constants into Opcode!
-	foreachi(Constant &c, syntax->constants, i){
-		if (config.compile_os){// && (c.type == TypeCString)){
-			cnst[i] = (char*)(opcode_size + syntax->asm_meta_info->code_origin);
-			int s = c.type->size;
-			if (c.type == TypeString){
-				// const string -> variable length
-				s = syntax->constants[i].value .num;
-
-				*(void**)&opcode[opcode_size] = (char*)(opcode_size + syntax->asm_meta_info->code_origin + config.super_array_size); // .data
-				*(int*)&opcode[opcode_size + config.pointer_size    ] = s; // .num
-				*(int*)&opcode[opcode_size + config.pointer_size + 4] = 0; // .reserved
-				*(int*)&opcode[opcode_size + config.pointer_size + 8] = 1; // .item_size
-				opcode_size += config.super_array_size;
-			}else if (c.type == TypeCString){
-				s = syntax->constants[i].value .num;
-			}
-			memcpy(&opcode[opcode_size], (void*)c.value.data, s);
-			opcode_size += s;
-
-			// cstring -> 0 terminated
-			if (c.type == TypeCString)
-				opcode[opcode_size ++] = 0;
-		}
+	foreachi(Constant *c, syntax->constants, i){
+		cnst[i] = (char*)(syntax->asm_meta_info->code_origin + opcode_size);
+		c->map_into(&opcode[opcode_size], cnst[i]);
+		opcode_size += mem_align(c->mapping_size(), 4);
 	}
 
 	AlignOpcode();
@@ -408,7 +373,7 @@ struct IncludeTranslationData
 
 void relink_calls(Script *s, Script *a, IncludeTranslationData &d)
 {
-	for (Command *c: s->syntax->commands){
+	for (Node *c: s->syntax->nodes){
 		// keep commands... just redirect var/const/func
 		//msg_write(p2s(c->script));
 		if (c->script != d.source)
@@ -442,7 +407,12 @@ IncludeTranslationData import_deep(SyntaxTree *a, SyntaxTree *b)
 	d.func_off = a->functions.num;
 	d.source = b->script;
 
-	a->constants.append(b->constants);
+	for (Constant *c: b->constants){
+		Constant *cc = new Constant(c->type);
+		cc->name = c->name;
+		cc->set(*c);
+		a->constants.add(cc);
+	}
 
 	a->root_of_all_evil.var.append(b->root_of_all_evil.var);
 
@@ -488,6 +458,39 @@ void import_includes(Script *s)
 	}
 }
 
+void Script::LinkFunctions()
+{
+	for (Asm::WantedLabel &l: functions_to_link){
+		string name = l.name.substr(10, -1);
+		bool found = false;
+		foreachi(Function *f, syntax->functions, i)
+			if (f->name == name){
+				*(int*)&opcode[l.pos] = (long)func[i] - (syntax->asm_meta_info->code_origin + l.pos + 4);
+				found = true;
+				break;
+			}
+		if (!found)
+			DoErrorLink("could not link function: " + name);
+	}
+	for (int n: function_vars_to_link){
+		long p = (n + 0xefef0000);
+		long q = (long)func[n];
+		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
+			DoErrorLink("could not link function as variable: " + syntax->functions[n]->name);
+	}
+
+
+	// link virtual functions into vtables
+	for (Class *t: syntax->classes){
+		t->LinkVirtualTable();
+
+		if (config.compile_os){
+			for (int i=0; i<t->vtable.num; i++)
+				memcpy((char*)t->_vtable_location_compiler_ + i*config.pointer_size, &t->vtable[i], config.pointer_size);
+		}
+	}
+}
+
 // generate opcode
 void Script::Compiler()
 {
@@ -503,7 +506,8 @@ void Script::Compiler()
 	syntax->Show();
 #endif
 
-	syntax->Simplify();
+	syntax->SimplifyRefDeref();
+	syntax->SimplifyShiftDeref();
 	syntax->PreProcessor();
 
 	if (config.verbose)
@@ -541,34 +545,7 @@ void Script::Compiler()
 	CompileFunctions(opcode, opcode_size);
 
 // link functions
-	for (Asm::WantedLabel &l: functions_to_link){
-		string name = l.name.substr(10, -1);
-		bool found = false;
-		foreachi(Function *f, syntax->functions, i)
-			if (f->name == name){
-				*(int*)&opcode[l.pos] = (long)func[i] - (syntax->asm_meta_info->code_origin + l.pos + 4);
-				found = true;
-				break;
-			}
-		if (!found)
-			DoErrorLink("could not link function: " + name);
-	}
-	for (int n: function_vars_to_link){
-		long p = (n + 0xefef0000);
-		long q = (long)func[n];
-		if (!find_and_replace(opcode, opcode_size, (char*)&p, config.pointer_size, (char*)&q))
-			DoErrorLink("could not link function as variable: " + syntax->functions[n]->name);
-	}
-
-// link virtual functions into vtables
-	for (Class *t: syntax->classes){
-		t->LinkVirtualTable();
-
-		if (config.compile_os){
-			for (int i=0; i<t->vtable.num; i++)
-				memcpy((char*)t->_vtable_location_compiler_ + i*config.pointer_size, &t->vtable[i], config.pointer_size);
-		}
-	}
+	LinkFunctions();
 
 
 // "task" for the first execution of main() -> ThreadOpcode

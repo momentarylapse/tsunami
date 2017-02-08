@@ -37,25 +37,35 @@ Function* ClassFunction::GetFunc()
 	return script->syntax->functions[nr];
 }
 
-bool direct_type_match(Class *a, Class *b)
+bool type_match(Class *given, Class *wanted)
 {
-	return ( (a==b) or ( (a->is_pointer) and (b->is_pointer) ) or (a->IsDerivedFrom(b)) );
+	// exact match?
+	if (given == wanted)
+		return true;
+
+	// allow any pointer?
+	if ((given->is_pointer) and (wanted == TypePointer))
+		return true;
+
+	// FIXME... quick'n'dirty hack to allow nil as parameter
+	if ((given == TypePointer) and wanted->is_pointer and !wanted->is_silent)
+		return true;
+
+	// compatible pointers (of same or derived class)
+	if (given->is_pointer and wanted->is_pointer)
+		return given->parent->IsDerivedFrom(wanted->parent);
+
+	return given->IsDerivedFrom(wanted);
 }
 
-// both operand types have to match the operator's types
-//   (operator wants a pointer -> all pointers are allowed!!!)
-//   (same for classes of same type...)
-bool type_match(Class *type, bool is_class, Class *wanted)
+
+// allow same classes... TODO deprecate...
+bool _type_match(Class *given, bool same_chunk, Class *wanted)
 {
-	if (type == wanted)
+	if ((same_chunk) and (wanted == TypeChunk))
 		return true;
-	if ((type->is_pointer) and (wanted == TypePointer))
-		return true;
-	if ((is_class) and (wanted == TypeClass))
-		return true;
-	if (type->IsDerivedFrom(wanted))
-		return true;
-	return false;
+
+	return type_match(given, wanted);
 }
 
 Class::Class()//const string &_name, int _size, SyntaxTree *_owner)
@@ -78,10 +88,14 @@ Class::~Class()
 }
 
 bool Class::UsesCallByReference() const
-{	return ((!force_call_by_value) and (!is_pointer)) or (is_array);	}
+{
+	return (!force_call_by_value and !is_pointer) or is_array;
+}
 
 bool Class::UsesReturnByMemory() const
-{	return ((!force_call_by_value) and (!is_pointer)) or (is_array);	}
+{
+	return (!force_call_by_value and !is_pointer) or is_array;
+}
 
 
 
@@ -106,7 +120,7 @@ bool Class::is_simple_class() const
 		return false;
 	if (GetAssign())
 		return false;
-	for (ClassElement &e : elements)
+	for (ClassElement &e: elements)
 		if (!e.type->is_simple_class())
 			return false;
 	return true;
@@ -127,7 +141,7 @@ bool Class::usable_as_super_array() const
 
 Class *Class::GetArrayElement() const
 {
-	if ((is_array) or (is_super_array))
+	if (is_array or is_super_array)
 		return parent;
 	if (is_pointer)
 		return NULL;
@@ -147,7 +161,7 @@ bool Class::needs_constructor() const
 	if (parent)
 		if (parent->needs_constructor())
 			return true;
-	for (ClassElement &e : elements)
+	for (ClassElement &e: elements)
 		if (e.type->needs_constructor())
 			return true;
 	return false;
@@ -157,9 +171,9 @@ bool Class::is_size_known() const
 {
 	if (!fully_parsed)
 		return false;
-	if ((is_super_array) or (is_pointer))
+	if (is_super_array or is_pointer)
 		return true;
-	for (ClassElement &e : elements)
+	for (ClassElement &e: elements)
 		if (!e.type->is_size_known())
 			return false;
 	return true;
@@ -177,7 +191,7 @@ bool Class::needs_destructor() const
 		if (parent->needs_destructor())
 			return true;
 	}
-	for (ClassElement &e : elements){
+	for (ClassElement &e: elements){
 		if (e.type->GetDestructor())
 			return true;
 		if (e.type->needs_destructor())
@@ -201,7 +215,7 @@ bool Class::IsDerivedFrom(const string &root) const
 {
 	if (name == root)
 		return true;
-	if ((is_super_array) or (is_array) or (is_pointer))
+	if (is_super_array or is_array or is_pointer)
 		return false;
 	if (!parent)
 		return false;
@@ -228,7 +242,7 @@ ClassFunction *Class::GetDefaultConstructor() const
 
 ClassFunction *Class::GetComplexConstructor() const
 {
-	for (ClassFunction &f : functions)
+	for (ClassFunction &f: functions)
 		if ((f.name == IDENTIFIER_FUNC_INIT) and (f.return_type == TypeVoid) and (f.param_types.num > 0))
 			return &f;
 	return NULL;
@@ -246,7 +260,7 @@ ClassFunction *Class::GetAssign() const
 
 ClassFunction *Class::GetGet(const Class *index) const
 {
-	for (ClassFunction &cf : functions){
+	for (ClassFunction &cf: functions){
 		if (cf.name != "__get__")
 			continue;
 		if (cf.param_types.num != 1)
@@ -260,7 +274,7 @@ ClassFunction *Class::GetGet(const Class *index) const
 
 ClassFunction *Class::GetVirtualFunction(int virtual_index) const
 {
-	for (ClassFunction &f : functions)
+	for (ClassFunction &f: functions)
 		if (f.virtual_index == virtual_index)
 			return &f;
 	return NULL;
@@ -274,7 +288,7 @@ void Class::LinkVirtualTable()
 	//msg_write("link vtable " + name);
 	// derive from parent
 	if (parent)
-		for (int i=0;i<parent->vtable.num;i++)
+		for (int i=0; i<parent->vtable.num; i++)
 			vtable[i] = parent->vtable[i];
 	if (config.abi == ABI_WINDOWS_32)
 		vtable[0] = mf(&VirtualBase::__delete_external__);
@@ -282,7 +296,7 @@ void Class::LinkVirtualTable()
 		vtable[1] = mf(&VirtualBase::__delete_external__);
 
 	// link virtual functions into vtable
-	for (ClassFunction &cf : functions){
+	for (ClassFunction &cf: functions){
 		if (cf.virtual_index >= 0){
 			if (cf.nr >= 0){
 				//msg_write(i2s(cf.virtual_index) + ": " + cf.GetFunc()->name);
@@ -304,7 +318,7 @@ void Class::LinkExternalVirtualTable(void *p)
 	VirtualTable *t = (VirtualTable*)p;
 	vtable.clear();
 	int max_vindex = 1;
-	for (ClassFunction &cf : functions)
+	for (ClassFunction &cf: functions)
 		if (cf.virtual_index >= 0){
 			if (cf.nr >= 0)
 				cf.script->func[cf.nr] = (t_func*)t[cf.virtual_index];
@@ -315,7 +329,7 @@ void Class::LinkExternalVirtualTable(void *p)
 	_vtable_location_compiler_ = vtable.data;
 	_vtable_location_target_ = vtable.data;
 
-	for (int i=0;i<vtable.num;i++)
+	for (int i=0; i<vtable.num; i++)
 		vtable[i] = t[i];
 	// this should also link the "real" c++ destructor
 	if ((config.abi == ABI_WINDOWS_32) or (config.abi == ABI_WINDOWS_64))
@@ -334,7 +348,7 @@ bool class_func_match(ClassFunction &a, ClassFunction &b)
 	if (a.param_types.num != b.param_types.num)
 		return false;
 	for (int i=0; i<a.param_types.num; i++)
-		if (!direct_type_match(b.param_types[i], a.param_types[i]))
+		if (!type_match(b.param_types[i], a.param_types[i]))
 			return false;
 	return true;
 }
@@ -342,7 +356,7 @@ bool class_func_match(ClassFunction &a, ClassFunction &b)
 string func_signature(Function *f)
 {
 	string r = f->literal_return_type->name + " " + f->name + "(";
-	for (int i=0;i<f->num_params;i++){
+	for (int i=0; i<f->num_params; i++){
 		if (i > 0)
 			r += ", ";
 		r += f->literal_param_type[i]->name;
@@ -367,7 +381,7 @@ Class *Class::GetRoot() const
 void class_func_out(Class *c, ClassFunction *f)
 {
 	string ps;
-	for (Class *p : f->param_types)
+	for (Class *p: f->param_types)
 		ps += "  " + p->name;
 	msg_write(c->name + "." + f->name + ps);
 }
@@ -380,7 +394,7 @@ void Class::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overri
 	cf.nr = func_no;
 	cf.script = s->script;
 	cf.return_type = f->return_type;
-	for (int i=0;i<f->num_params;i++)
+	for (int i=0; i<f->num_params; i++)
 		cf.param_types.add(f->var[i].type);
 	if (as_virtual){
 		cf.virtual_index = ProcessClassOffset(name, cf.name, max(vtable.num, 2));
@@ -392,8 +406,8 @@ void Class::AddFunction(SyntaxTree *s, int func_no, bool as_virtual, bool overri
 
 	// override?
 	ClassFunction *orig = NULL;
-	for (ClassFunction &ocf : functions)
-		if (class_func_match(ocf, cf))
+	for (ClassFunction &ocf: functions)
+		if (class_func_match(cf, ocf))
 			orig = &ocf;
 	if (override and !orig)
 		s->DoError(format("can not override function '%s', no previous definition", func_signature(f).c_str()), f->_exp_no, f->_logical_line_no);
@@ -419,7 +433,7 @@ bool Class::DeriveFrom(const Class* root, bool increase_size)
 	}
 	if (parent->functions.num > 0){
 		// inheritance of functions
-		for (ClassFunction &f : parent->functions){
+		for (ClassFunction &f: parent->functions){
 			if (f.name == IDENTIFIER_FUNC_ASSIGN)
 				continue;
 			ClassFunction ff = f;
@@ -461,6 +475,8 @@ string Class::var2str(void *p) const
 		return p2s(*(void**)p);
 	else if (this == TypeString)
 		return "\"" + *(string*)p + "\"";
+	else if (this == TypeCString)
+		return "\"" + string((char*)p) + "\"";
 	else if (is_super_array){
 		string s;
 		DynamicArray *da = (DynamicArray*)p;

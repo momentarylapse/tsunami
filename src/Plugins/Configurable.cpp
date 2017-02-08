@@ -292,9 +292,9 @@ Array<AutoConfigData> get_auto_conf(PluginData *config)
 			AutoConfigData a;
 			a.name = e.name;
 			a.value = (float*)((char*)config + e.offset);
-			for (auto &c: ps->constants){
-				if (c.name == "AutoConfig" + e.name){
-					Array<string> p = c.value.explode(":");
+			for (auto c: ps->constants){
+				if (c->name == "AutoConfig" + e.name){
+					Array<string> p = c->value.explode(":");
 					if (p.num == 5){
 						a.min = p[0]._float();
 						a.max = p[1]._float();

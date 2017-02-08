@@ -365,6 +365,12 @@ const InstructionName InstructionNames[NUM_INSTRUCTION_NAMES + 1] = {
 	{INST_UCOMISS,   "ucomiss",   64+3, 64+1},
 	{INST_UCOMISD,   "ucomisd",   64+3, 64+1},
 
+	// amd64
+	{INST_SYSCALL,	"syscall"},
+	{INST_SYSRET,	"sysret"},
+	{INST_SYSENTER,	"sysenter"},
+	{INST_SYSEXIT,	"sysexit"},
+
 	{INST_B,		"b"},
 	{INST_BL,		"bl"},
 	{INST_BLX,		"blx"},
@@ -1845,6 +1851,13 @@ void InitX86()
 	add_inst(INST_COMISD,    0x2f0f66, 3, -1, Xx, XMq);
 	add_inst(INST_UCOMISS,   0x2e0f,   2, -1, Xx, XMd);
 	add_inst(INST_UCOMISD,   0x2e0f66, 3, -1, Xx, XMq);
+
+	if (set == INSTRUCTION_SET_AMD64){
+		add_inst(INST_SYSCALL,	0x050f, 2, -1, -1, -1);
+		add_inst(INST_SYSRET,	0x070f, 2, -1, -1, -1);
+		add_inst(INST_SYSENTER,	0x340f, 2, -1, -1, -1);
+		add_inst(INST_SYSEXIT,	0x350f, 2, -1, -1, -1);
+	}
 }
 
 

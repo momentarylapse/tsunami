@@ -57,6 +57,10 @@ void SyntaxTree::AddIncludeData(Script *s)
 		if (c.name[0] != '-')
 			Constants.add(c);*/
 	// TODO... ownership of "big" constants
+
+	for (Operator &op: ps->operators)
+		if (op.owner == ps)
+			operators.add(op);
 }
 
 enum{

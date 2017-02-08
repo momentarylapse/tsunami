@@ -90,7 +90,7 @@ extern Class *TypeReg16; // dummy for compilation
 extern Class *TypeReg8; // dummy for compilation
 extern Class *TypeVoid;
 extern Class *TypePointer;
-extern Class *TypeClass;
+extern Class *TypeChunk;
 extern Class *TypeBool;
 extern Class *TypeInt;
 extern Class *TypeInt64;

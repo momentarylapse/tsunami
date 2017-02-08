@@ -64,8 +64,10 @@ int SerializerAMD64::fc_begin(const SerialNodeParam &instance, const Array<Seria
 		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_const(TypeInt, push_size));
 	else if (push_size > 0)
 		add_cmd(Asm::INST_ADD, param_preg(TypePointer, Asm::REG_RSP), param_const(TypeChar, push_size));
-	foreachb(SerialNodeParam &p, stack_param)
-		add_cmd(Asm::INST_PUSH, p);
+	foreachb(SerialNodeParam &p, stack_param){
+		add_cmd(Asm::INST_MOV, p_rax, p);
+		add_cmd(Asm::INST_PUSH, p_rax);
+	}
 	max_push_size = max(max_push_size, (int)push_size);
 
 	// xmm0-7

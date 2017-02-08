@@ -193,13 +193,13 @@ class DummySynthesizer extends Synthesizer
 	//extern overwrite void __delete__()
 	extern override void render(BufferBox buf)
 
-class MidiRenderer
+class MidiRenderer extends AudioRenderer
 	extern void __init__(Synthesizer *s, MidiSource *source)
-	extern virtual void __delete__()
+	extern override void __delete__()
 	extern void setSynthesizer(Synthesizer *s)
-	extern virtual int read(BufferBox buf)
-	extern virtual void reset()
-	extern virtual int getSampleRate()
+	extern override int read(BufferBox buf)
+	extern override void reset()
+	extern override int getSampleRate()
 
 class EnvelopeADSR
 	extern void set(float t_attack, float t_decay, float sustain, float t_release, int sample_rate)

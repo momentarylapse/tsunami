@@ -118,7 +118,7 @@ void ExecutePublicScripts();
 void DeleteAllScripts(bool even_immortal = false, bool force = false);
 void ExecuteSingleScriptCommand(const string &cmd);
 
-Class *GetDynamicType(void *p);
+Class *GetDynamicType(const void *p);
 
 };
 

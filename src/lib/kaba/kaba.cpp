@@ -143,7 +143,7 @@ void DeleteAllScripts(bool even_immortal, bool force)
 
 extern Array<Script*> PublicScript;
 
-Class *GetDynamicType(void *p)
+Class *GetDynamicType(const void *p)
 {
 	VirtualTable *pp = *(VirtualTable**)p;
 	for (Script *s: PublicScript){

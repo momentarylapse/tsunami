@@ -191,7 +191,7 @@ void Configurable::__delete__()
 	this->Observable::~Observable();
 }
 
-PluginData *Configurable::get_config()
+PluginData *Configurable::get_config() const
 {
 	Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c)
@@ -205,13 +205,13 @@ PluginData *Configurable::get_config()
 	return NULL;
 }
 
-PluginData *Configurable::get_state()
+PluginData *Configurable::get_state() const
 {
 	Kaba::Class *c = Kaba::GetDynamicType(this);
 	if (!c){
-		DummySynthesizer *ds = dynamic_cast<DummySynthesizer*>(this);
+		const DummySynthesizer *ds = dynamic_cast<const DummySynthesizer*>(this);
 		if (ds)
-			return &ds->state;
+			return (PluginData*)&ds->state;
 		return NULL;
 	}
 	for (auto &e: c->elements)
@@ -223,7 +223,7 @@ PluginData *Configurable::get_state()
 	return NULL;
 }
 
-string Configurable::configToString()
+string Configurable::configToString() const
 {
 	PluginData *config = get_config();
 	if (!config)
@@ -494,6 +494,23 @@ void Configurable::notify()
 {
 	onConfig();
 	Observable::notify();
+}
+
+Configurable *Configurable::copy() const
+{
+	Kaba::Class *c = Kaba::GetDynamicType(this);
+	if (!c){
+		if (this->configurable_type == TYPE_SYNTHESIZER)
+			return new DummySynthesizer;
+		return NULL;
+	}
+
+	Configurable *clone = (Configurable*)c->CreateInstance();
+
+	clone->configurable_type = configurable_type;
+	clone->configFromString(configToString());
+
+	return clone;
 }
 
 

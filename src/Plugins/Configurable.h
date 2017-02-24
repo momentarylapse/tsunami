@@ -51,11 +51,13 @@ public:
 	void _cdecl notify();
 	virtual void _cdecl onConfig(){}
 
-	PluginData *get_config();
-	PluginData *get_state();
+	PluginData *get_config() const;
+	PluginData *get_state() const;
 
-	string configToString();
+	string configToString() const;
 	void configFromString(const string &options);
+
+	Configurable *copy() const;
 
 	int configurable_type;
 	string name;

@@ -89,15 +89,18 @@ ViewModeMidi::ViewModeMidi(AudioView *view) :
 
 	preview_source = new MidiPreviewSource;
 
-	preview_renderer = new MidiRenderer(NULL, preview_source);
+	preview_synth = NULL;
+	preview_renderer = new MidiRenderer(preview_synth, preview_source);
 	preview_stream = new OutputStream(preview_renderer);
 	preview_stream->setBufferSize(2048);
 }
 
 ViewModeMidi::~ViewModeMidi()
 {
-	delete(preview_stream);
-	delete(preview_renderer);
+	delete preview_stream;
+	delete preview_renderer;
+	if (preview_synth)
+		delete preview_synth;
 }
 
 void ViewModeMidi::onLeftButtonDown()
@@ -109,7 +112,10 @@ void ViewModeMidi::onLeftButtonDown()
 		hover->clear();
 		deleting = true;
 	}else if (selection->type == Selection::TYPE_MIDI_PITCH){
-		preview_renderer->setSynthesizer(view->cur_track->synth);
+		if (preview_synth)
+			delete preview_synth;
+		preview_synth = (Synthesizer*)view->cur_track->synth->copy();
+		preview_renderer->setSynthesizer(preview_synth);
 
 		preview_source->start(getCreationPitch());
 		if (!preview_stream->isPlaying())

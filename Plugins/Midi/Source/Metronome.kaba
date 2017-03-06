@@ -1,21 +1,30 @@
 use "../../api.kaba"
 
 class MetronomeSource extends MidiSource
+
+	// sound
 	float length
 	float freq
+	float volume
+	
+	// rhythm
 	float bpm
 	int num_beats
 	int num_sub_beats
-	float volume
+	
 	bool pause
-
-	int offset_sub_beat
+	
+	// state/output
 	int cur_beat
 	int cur_sub_beat
+
+	int offset_sub_beat
 	float fraction_beat
-	float fraction_sub_beat
+	//float fraction_sub_beat
 	int samples_beat
 	int samples_sub_beat
+	
+	
 	float sample_rate
 	Window* win
 	
@@ -34,7 +43,7 @@ class MetronomeSource extends MidiSource
 		cur_beat = 0
 		cur_sub_beat = -1
 		fraction_beat = 0
-		fraction_sub_beat = 0
+//		fraction_sub_beat = 0
 		
 		pause = false
 		
@@ -52,7 +61,8 @@ class MetronomeSource extends MidiSource
 				cur_beat ++
 			if cur_beat >= num_beats
 				cur_beat = 0
-				
+			
+			// render
 			if cur_sub_beat == 0
 				if cur_beat == 0
 					midi.addMetronomeClick(offset_sub_beat, 0, volume)
@@ -60,9 +70,10 @@ class MetronomeSource extends MidiSource
 					midi.addMetronomeClick(offset_sub_beat, 1, volume)
 			else
 				midi.addMetronomeClick(offset_sub_beat, 2, volume)
+
 			offset_sub_beat += samples_sub_beat
 		offset_sub_beat -= midi.samples
-		fraction_sub_beat = 1 - i2f(offset_sub_beat) / i2f(samples_sub_beat)
+		float fraction_sub_beat = 1 - i2f(offset_sub_beat) / i2f(samples_sub_beat)
 		fraction_beat = (i2f(cur_sub_beat) + fraction_sub_beat) / i2f(num_sub_beats)
 		
 		if win

@@ -36,7 +36,7 @@ HuiWindow *HuiCurWindow = NULL;
 
 void HuiInputData::reset()
 {
-	x = y = dx = dy = dz = 0;
+	x = y = dx = dy = scroll_x = scroll_y = 0;
 	lb = mb = rb = false;
 	memset(key, 0, sizeof(key));
 	key_buffer.clear();

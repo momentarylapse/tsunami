@@ -185,7 +185,11 @@ void ViewModeDefault::onMouseMove()
 
 void ViewModeDefault::onMouseWheel()
 {
-	cam->zoom(exp(view->ZoomSpeed * HuiGetEvent()->dz));
+	HuiEvent *e = HuiGetEvent();
+	if (fabs(e->scroll_y) > 0.1f)
+		cam->zoom(exp(e->scroll_y * view->ZoomSpeed));
+	if (fabs(e->scroll_x) > 0.1f)
+		cam->move(e->scroll_x / cam->scale * view->ScrollSpeed * 0.15f);
 }
 
 void ViewModeDefault::onKeyDown(int k)

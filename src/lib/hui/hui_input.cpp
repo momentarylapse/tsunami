@@ -101,7 +101,8 @@ HuiEvent::HuiEvent(const string &_id, const string &_message)
 {
 	dx = 0;
 	dy = 0;
-	dz = 0;
+	scroll_x = 0;
+	scroll_y = 0;
 	id = _id;
 	message = _message;
 	is_default = true;

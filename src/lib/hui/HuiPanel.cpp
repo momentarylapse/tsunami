@@ -166,7 +166,8 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 	e->my = win->input.y;
 	e->dx = win->input.dx;
 	e->dy = win->input.dy;
-	e->dz = win->input.dz;
+	e->scroll_x = win->input.scroll_x;
+	e->scroll_y = win->input.scroll_y;
 	e->lbut = win->input.lb;
 	e->mbut = win->input.mb;
 	e->rbut = win->input.rb;
@@ -207,7 +208,8 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 	// reset
 	win->input.dx = 0;
 	win->input.dy = 0;
-	win->input.dz = 0;
+	win->input.scroll_x = 0;
+	win->input.scroll_y = 0;
 
 	return sent;
 }

@@ -34,7 +34,7 @@ struct HuiCompleteWindowMessage
 struct HuiInputData
 {
 	// mouse
-	float x, y, dx, dy, dz;	// position, change
+	float x, y, dx, dy, scroll_x, scroll_y;	// position, change
 	bool inside, inside_smart;
 	bool lb, mb, rb; // buttons
 	int row, column;

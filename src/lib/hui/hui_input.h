@@ -53,7 +53,8 @@ class HuiEvent
 	string message, id;
 	bool is_default;
 	float mx, my;
-	float dx, dy, dz;
+	float dx, dy;
+	float scroll_x, scroll_y;
 	int key, key_code;
 	string text;
 	int width, height;

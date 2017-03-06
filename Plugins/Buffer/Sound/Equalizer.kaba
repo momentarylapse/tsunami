@@ -86,7 +86,7 @@ class EqualizerGrid extends Grid
 
 	override void onMouseWheel()
 		if MouseOver >= 0
-			if HuiGetEvent().wheel > 0
+			if HuiGetEvent().scroll_y > 0
 				c.curve[MouseOver].z += 0.2
 			else
 				c.curve[MouseOver].z -= 0.2

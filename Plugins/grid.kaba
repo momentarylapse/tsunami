@@ -400,10 +400,10 @@ class Grid extends GridData
 		if plot_rect.inside(mx, my)
 			onMouseWheel()
 		if x_axis.rect.inside(mx, my)
-			x_axis.zoom(mx, HuiGetEvent().wheel)
+			x_axis.zoom(mx, HuiGetEvent().scroll_y)
 			redraw()
 		if y_axis.rect.inside(mx, my)
-			y_axis.zoom(my, HuiGetEvent().wheel)
+			y_axis.zoom(my, HuiGetEvent().scroll_y)
 			redraw()
 	
 	void onKeyDownAll()

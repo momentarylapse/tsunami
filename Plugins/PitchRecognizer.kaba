@@ -1,0 +1,84 @@
+use "api.kaba"
+
+const int F_MIN = 50
+const int F_MAX = 2000
+
+const float THRESHOLD = 0.1
+
+
+const int BUFFER_SIZE = 32768
+
+class PitchRecognizer
+		
+	InputStreamAudio* input
+
+	float get_freq(float i)
+		return i / BUFFER_SIZE * DEFAULT_SAMPLE_RATE
+	
+	int freq_to_index(float f)
+		return f*BUFFER_SIZE / DEFAULT_SAMPLE_RATE
+
+
+	float frequency, volume
+	bool loud_enough
+
+	void updateInput()
+		int available = input.current_buffer.available()
+	
+		if available > BUFFER_SIZE
+			input.current_buffer.moveReadPos(available - BUFFER_SIZE)
+		int num = clampi(available, 0, BUFFER_SIZE)
+	
+		BufferBox buf
+		input.current_buffer.peekRef(buf, num)
+	
+		float[] temp
+		temp = buf.r + buf.l
+	
+		// fft
+		complex[] bufc
+		bufc.resize(buf.length / 2 + 1)
+		fft_r2c(temp, bufc)
+		
+		int i0 = freq_to_index(F_MIN)
+		int i1 = freq_to_index(F_MAX)
+		
+		float max = 0
+		int imax = 0, imax2 = 0
+		for b,i in bufc
+			if i > i0 and i < i1
+				float amp = abs(b.x) * (1.0 - i2f(i) / bufc.num)
+				//floatout f
+				//if (amp > max * 2.5) or (amp > max and i < imax2)
+				if amp > max
+					max = amp
+					imax = i
+					imax2 = i * 1.5
+		max /= sqrt(buf.length) * 2 * pi
+		volume = clamp(max / THRESHOLD / 2, 0, 1)
+		loud_enough = (max > THRESHOLD)
+		float fmax = get_freq(imax)
+		
+		// update values with some inertia
+		if loud_enough
+			if abs(log(fmax / frequency)) < 0.1
+				frequency *= 1 + log(fmax / frequency) * 0.1
+			else
+				frequency = fmax
+			//frequency = fmax
+		
+		onUpdate()
+	
+	
+	void __init__()
+		input = new InputStreamAudio(DEFAULT_SAMPLE_RATE)
+		input.start()
+		input.addObserver(self, &updateInput)
+		
+	virtual void __delete__()
+		input.removeObserver(self)
+		input.stop()
+		delete input
+	
+	virtual void onUpdate()
+	

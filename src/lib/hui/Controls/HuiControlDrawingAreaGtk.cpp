@@ -36,7 +36,8 @@ void win_set_input(HuiWindow *win, T *event)
 	win->input.dx = event->x - win->input.x;
 	win->input.dy = event->y - win->input.y;
 	//msg_write(format("%.1f\t%.1f\t->\t%.1f\t%.1f\t(%.1f\t%.1f)", win->input.x, win->input.y, event->x, event->y, win->input.dx, win->input.dy));
-	win->input.dz = 0;
+	win->input.scroll_x = 0;
+	win->input.scroll_y = 0;
 	win->input.x = event->x;
 	win->input.y = event->y;
 	int mod = event->state;
@@ -130,9 +131,17 @@ gboolean OnGtkAreaMouseWheel(GtkWidget *widget, GdkEventScroll *event, gpointer 
 	HuiControl *c = (HuiControl*)user_data;
 	if (c->panel->win){
 		if (event->direction == GDK_SCROLL_UP)
-			c->panel->win->input.dz = 1;
+			c->panel->win->input.scroll_y = 1;
 		else if (event->direction == GDK_SCROLL_DOWN)
-			c->panel->win->input.dz = -1;
+			c->panel->win->input.scroll_y = -1;
+		else if (event->direction == GDK_SCROLL_LEFT)
+			c->panel->win->input.scroll_x = -1;
+		else if (event->direction == GDK_SCROLL_RIGHT)
+			c->panel->win->input.scroll_x = -1;
+		else if (event->direction == GDK_SCROLL_SMOOTH){
+			c->panel->win->input.scroll_x = event->delta_x;
+			c->panel->win->input.scroll_y = event->delta_y;
+		}
 		c->notify("hui:mouse-wheel", false);
 	}
 	return false;
@@ -225,6 +234,7 @@ HuiControlDrawingArea::HuiControlDrawingArea(const string &title, const string &
 	mask |= GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK; // GDK_POINTER_MOTION_HINT_MASK = "fewer motions"
 	mask |= GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK;
 	mask |= GDK_VISIBILITY_NOTIFY_MASK | GDK_SCROLL_MASK;
+	mask |= GDK_SMOOTH_SCROLL_MASK;// | GDK_TOUCHPAD_GESTURE_MASK;
 	//mask = GDK_ALL_EVENTS_MASK;
 	g_object_set(G_OBJECT(da), "events", mask, NULL);
 

@@ -117,10 +117,8 @@ void DetuneSynthesizerDialog::onMouseMove()
 void DetuneSynthesizerDialog::onMouseWheel()
 {
 	if (hover >= 0){
-		if (HuiGetEvent()->dz > 0)
-			track->detuneSynthesizer(hover, 0.1f, isChecked("all_octaves"));
-		else
-			track->detuneSynthesizer(hover, - 0.1f, isChecked("all_octaves"));
+		if (HuiGetEvent()->scroll_y != 0)
+			track->detuneSynthesizer(hover, 0.1f * HuiGetEvent()->scroll_y, isChecked("all_octaves"));
 		redraw("detune_area");
 	}
 }

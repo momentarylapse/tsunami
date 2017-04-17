@@ -408,18 +408,20 @@ Selection ViewModeDefault::getHover()
 
 	// selection boundaries?
 	view->selectionUpdatePos(s);
-	if (view->mouse_over_time(view->sel_raw.end())){
-		s.type = Selection::TYPE_SELECTION_END;
-		return s;
-	}
-	if (view->mouse_over_time(view->sel_raw.start())){
-		s.type = Selection::TYPE_SELECTION_START;
-		return s;
-	}
-	if (view->stream->isPlaying()){
-		if (view->mouse_over_time(view->stream->getPos())){
-			s.type = Selection::TYPE_PLAYBACK;
+	if ((my <= view->TIME_SCALE_HEIGHT) or (view->win->getKey(KEY_SHIFT))){
+		if (view->mouse_over_time(view->sel_raw.end())){
+			s.type = Selection::TYPE_SELECTION_END;
 			return s;
+		}
+		if (view->mouse_over_time(view->sel_raw.start())){
+			s.type = Selection::TYPE_SELECTION_START;
+			return s;
+		}
+		if (view->stream->isPlaying()){
+			if (view->mouse_over_time(view->stream->getPos())){
+				s.type = Selection::TYPE_PLAYBACK;
+				return s;
+			}
 		}
 	}
 

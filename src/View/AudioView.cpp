@@ -548,8 +548,12 @@ void AudioView::onUpdate(Observable *o, const string &message)
 			updateTracks();
 			sel.range = sel_raw = Range(0, 0);
 			setCurTrack(NULL);
-			if (song->tracks.num > 0)
-				setCurTrack(song->tracks[0]);
+			if (song->tracks.num > 0){
+				if ((song->tracks[0]->type == Track::TYPE_TIME) and song->tracks.num > 1)
+					setCurTrack(song->tracks[1]);
+				else
+					setCurTrack(song->tracks[0]);
+			}
 			optimizeView();
 		}else{
 			if ((message == song->MESSAGE_ADD_TRACK) or (message == song->MESSAGE_DELETE_TRACK))

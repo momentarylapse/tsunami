@@ -271,14 +271,14 @@ void TsunamiWindow::onAbout()
 
 void TsunamiWindow::onAddTrack()
 {
-	song->addTrack(Track::TYPE_AUDIO);
+	song->addTrack(Track::TYPE_AUDIO, view->cur_track->get_index() + 1);
 }
 
 void TsunamiWindow::onAddTimeTrack()
 {
 	song->action_manager->beginActionGroup();
 	try{
-		song->addTrack(Track::TYPE_TIME);
+		song->addTrack(Track::TYPE_TIME, 0);
 		// some default data
 		for (int i=0; i<10; i++)
 			song->addBar(-1, 90, 4, 1, false);
@@ -290,7 +290,7 @@ void TsunamiWindow::onAddTimeTrack()
 
 void TsunamiWindow::onAddMidiTrack()
 {
-	song->addTrack(Track::TYPE_MIDI);
+	song->addTrack(Track::TYPE_MIDI, view->cur_track->get_index() + 1);
 }
 
 void TsunamiWindow::onDeleteTrack()

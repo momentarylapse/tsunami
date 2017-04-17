@@ -72,7 +72,7 @@ void BarsConsole::updateMessage()
 
 void BarsConsole::onCreateTimeTrack()
 {
-	song->addTrack(Track::TYPE_TIME);
+	song->addTrack(Track::TYPE_TIME, 0);
 }
 
 void BarsConsole::onEditSong()

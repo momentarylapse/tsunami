@@ -36,13 +36,14 @@ TrackConsole::TrackConsole(AudioView *_view) :
 	event("panning", this, &TrackConsole::onPanning);
 	event("instrument", this, &TrackConsole::onInstrument);
 	event("edit_tuning", this, &TrackConsole::onEditTuning);
+	event("select_synth", this, &TrackConsole::onSelectSynth);
 
 	event("edit_song", this, &TrackConsole::onEditSong);
-	event("edit_fx", this, &TrackConsole::onEditFx);
+	event("_edit_fx", this, &TrackConsole::onEditFx);
 	event("edit_curves", this, &TrackConsole::onEditCurves);
-	event("edit_midi", this, &TrackConsole::onEditMidi);
-	event("edit_midi_fx", this, &TrackConsole::onEditMidiFx);
-	event("edit_synth", this, &TrackConsole::onEditSynth);
+	event("_edit_midi", this, &TrackConsole::onEditMidi);
+	event("_edit_midi_fx", this, &TrackConsole::onEditMidiFx);
+	event("_edit_synth", this, &TrackConsole::onEditSynth);
 }
 
 TrackConsole::~TrackConsole()
@@ -64,9 +65,10 @@ void TrackConsole::loadData()
 		setOptions("name", "placeholder=" + track->getNiceName());
 		setFloat("volume", amplitude2db(track->volume));
 		setFloat("panning", track->panning * 100.0f);
-		enable("edit_midi", track->type == Track::TYPE_MIDI);
-		enable("edit_midi_fx", track->type == Track::TYPE_MIDI);
-		enable("edit_synth", track->type != Track::TYPE_AUDIO);
+		enable("_edit_midi", track->type == Track::TYPE_MIDI);
+		enable("_edit_midi_fx", track->type == Track::TYPE_MIDI);
+		enable("_edit_synth", track->type != Track::TYPE_AUDIO);
+		enable("select_synth", track->type != Track::TYPE_AUDIO);
 
 		Array<Instrument> instruments = Instrument::enumerate();
 		foreachi(Instrument &ii, instruments, i){
@@ -83,6 +85,8 @@ void TrackConsole::loadData()
 		if (track->instrument.string_pitch.num == 0)
 			tuning = _(" - no strings -");
 		setString("tuning", tuning);
+
+		setString("select_synth", track->synth->name);
 	}else{
 		hideControl("td_t_bars", true);
 		setString("tuning", "");
@@ -127,6 +131,15 @@ void TrackConsole::onEditTuning()
 	TuningDialog *dlg = new TuningDialog(win, track);
 	dlg->run();
 	delete(dlg);
+}
+
+void TrackConsole::onSelectSynth()
+{
+	if (!track)
+		return;
+	Synthesizer *s = ChooseSynthesizer(win, track->song, track->synth->name);
+	if (s)
+		track->setSynthesizer(s);
 }
 
 void TrackConsole::applyData()

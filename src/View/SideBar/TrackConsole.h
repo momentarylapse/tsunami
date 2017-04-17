@@ -29,6 +29,7 @@ public:
 	void onPanning();
 	void onInstrument();
 	void onEditTuning();
+	void onSelectSynth();
 
 	void onEditSong();
 	void onEditFx();

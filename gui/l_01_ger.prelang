@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-348
+359
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1011,11 +1011,41 @@ Balance
 track-mixer/volume
 0\\-10000\\10\\0.1
 Lautstärke in dB
+track_dialog/_edit_midi
+Bearbeiten
+
+track_dialog/_edit_midi_fx
+Fx
+
+track_dialog/_edit_synth
+
+Synthesizer konfigurieren
+track_dialog/edit_fx
+Fx
+
+track_dialog/edit_midi
+Midi
+
+track_dialog/edit_midi_fx
+Midi-Fx
+
+track_dialog/edit_synth
+Synth
+Synthesizer konfigurieren
+track_dialog/g_effects
+Effekte
+
 track_dialog/g_instrument
 Instrument
 
+track_dialog/g_midi
+Midi
+
 track_dialog/g_name
 Name
+
+track_dialog/g_synth
+Synthesizer
 
 track_dialog/g_volume
 Lautstärke
@@ -1023,6 +1053,9 @@ Lautstärke
 track_dialog/panning
 0\\-100\\100\\1
 
+track_dialog/select_synth
+
+Synthesizer wählen
 track_dialog/t_panning
 Balance
 

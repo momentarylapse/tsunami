@@ -1,5 +1,5 @@
 Dialog track_dialog "Spur" 380 516
-	Grid ? "" 1 5
+	Grid ? "" 1 8
 		Group g_name "Name"
 			Edit name "" expandx
 		Group g_volume "Volume"
@@ -15,15 +15,19 @@ Dialog track_dialog "Spur" 380 516
 				ComboBox instrument "" expandx
 				Grid ? "" 2 1
 					Text tuning "" expandx
-					Button edit_tuning "" image=hui:properties
+					Button edit_tuning "" image=hui:properties flat
+		Group g_midi "Midi"
+			Grid ? "" 2 1
+				Button _edit_midi "Edit" flat expandx
+				Button _edit_midi_fx "Fx" flat
+		Group g_synth "Synthesizer"
+			Grid ? "" 2 1
+				Button select_synth "" expandx flat tooltip="Select synthesizer" flat
+				Button _edit_synth "" noexpandx flat image=hui:properties tooltip="Configure synthesizer" flat
+		Group g_effects "Effects"
+			Button edit_fx "Edit" expandx flat
 		Text ? "" expandy
 		Group td_t_edit "Edit"
-			Grid ? "" 1 2
-				Grid ? "" 4 1
-					Button /edit_song "File"
-					Button /edit_fx "Fx"
-					Button /edit_midi "Midi"
-					Button /edit_curves "Curves"
-				Grid ? "" 2 1
-					Button /edit_midi_fx "Midi-Fx"
-					Button /edit_synth "Synth"
+			Grid ? "" 4 1
+				Button /edit_song "File"
+				Button /edit_curves "Curves"

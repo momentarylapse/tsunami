@@ -7,10 +7,10 @@ menu_fake
 
 
 1
+32535
 0
-48
 0
-44182064
+0
 0
 2
 Item
@@ -41,8 +41,8 @@ dummy_favorite_dialog
 
 
 1
+32535
 0
-48
 400
 355
 0
@@ -141,8 +141,8 @@ bar_add_dialog
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -296,8 +296,8 @@ bar_edit_dialog
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -429,8 +429,8 @@ configurable_dialog
 
 
 1
+32535
 0
-48
 200
 100
 0
@@ -540,8 +540,8 @@ configurable-selection-dialog
 
 
 1
+32535
 0
-48
 400
 500
 0
@@ -607,8 +607,8 @@ curve_console
 
 
 1
+32535
 0
-48
 380
 516
 0
@@ -740,8 +740,8 @@ curve-target-dialog
 
 
 1
+32535
 0
-48
 300
 400
 0
@@ -807,8 +807,8 @@ trackdest_dialog
 
 
 1
+32535
 0
-48
 400
 300
 0
@@ -830,8 +830,8 @@ detune_synthesizer_dialog
 
 
 1
+32535
 0
-48
 400
 400
 0
@@ -897,8 +897,8 @@ device-manager
 
 
 1
+32535
 0
-48
 400
 200
 0
@@ -997,8 +997,8 @@ fx_editor
 
 
 1
+32535
 0
-48
 380
 516
 0
@@ -1108,8 +1108,8 @@ fx_panel
 
 
 1
+32535
 0
-48
 200
 200
 0
@@ -1197,8 +1197,8 @@ level_dialog
 
 
 1
+32535
 0
-48
 430
 375
 0
@@ -1308,8 +1308,8 @@ log_console
 
 
 1
+32535
 0
-48
 200
 100
 0
@@ -1353,8 +1353,8 @@ log_toolbar
 
 
 1
+32535
 0
-48
 200
 100
 0
@@ -1387,8 +1387,8 @@ marker_dialog
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -1454,8 +1454,8 @@ menu
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -2577,8 +2577,8 @@ midi_editor
 
 
 1
+32535
 0
-48
 380
 516
 0
@@ -2996,8 +2996,8 @@ midi_fx_editor
 
 
 1
+32535
 0
-48
 380
 516
 0
@@ -3140,8 +3140,8 @@ mini_bar
 
 
 1
+32535
 0
-48
 400
 40
 0
@@ -3218,8 +3218,8 @@ mixing-console
 
 
 1
+32535
 0
-48
 300
 200
 0
@@ -3318,8 +3318,8 @@ new_dialog
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -3605,8 +3605,8 @@ pause_add_dialog
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -3705,8 +3705,8 @@ pause_edit_dialog
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -3805,8 +3805,8 @@ popup_marker_menu
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -3861,8 +3861,8 @@ popup_song_menu
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -3939,8 +3939,8 @@ popup_track_menu
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -4028,8 +4028,8 @@ popup_sample_menu
 
 
 1
+32535
 0
-48
 250
 80
 0
@@ -4095,8 +4095,8 @@ progress_dialog
 
 
 1
+32535
 0
-48
 210
 30
 0
@@ -4118,8 +4118,8 @@ progress_cancelable_dialog
 
 
 1
+32535
 0
-48
 210
 30
 0
@@ -4163,8 +4163,8 @@ raw_config_dialog
 
 
 1
+32535
 0
-48
 300
 100
 0
@@ -4296,8 +4296,8 @@ record_dialog
 
 
 1
+32535
 0
-48
 300
 200
 0
@@ -4539,8 +4539,8 @@ sample_manager_dialog
 allow-parent
 
 1
+32535
 0
-48
 400
 400
 0
@@ -4683,8 +4683,8 @@ sample_ref_dialog
 
 
 1
+32535
 0
-48
 375
 230
 0
@@ -4937,8 +4937,8 @@ sample_selection_dialog
 
 
 1
+32535
 0
-48
 300
 400
 0
@@ -5004,8 +5004,8 @@ settings_dialog
 
 
 1
+32535
 0
-48
 300
 200
 0
@@ -5214,8 +5214,8 @@ song_dialog
 
 
 1
+32535
 0
-48
 430
 375
 0
@@ -5457,8 +5457,8 @@ synth_console
 
 
 1
+32535
 0
-48
 300
 200
 0
@@ -5568,8 +5568,8 @@ synth_panel
 
 
 1
+32535
 0
-48
 200
 200
 0
@@ -5635,8 +5635,8 @@ toolbar
 
 
 1
+32535
 0
-48
 200
 200
 0
@@ -5812,8 +5812,8 @@ track_dialog
 
 
 1
+32535
 0
-48
 380
 516
 0
@@ -6105,7 +6105,7 @@ g_effects
 -1
 1
 Button
-edit_fx
+_edit_fx
 expandx,flat
 
 1
@@ -6176,8 +6176,8 @@ track-mixer
 
 
 1
+32535
 0
-48
 80
 200
 0
@@ -6243,8 +6243,8 @@ tuning_dialog
 
 
 1
+32535
 0
-48
 120
 50
 0
@@ -7217,6 +7217,9 @@ Balance
 track-mixer/volume
 0\\-10000\\10\\0.1
 Volume in dB
+track_dialog/_edit_fx
+Edit
+
 track_dialog/_edit_midi
 Edit
 
@@ -7226,9 +7229,6 @@ Fx
 track_dialog/_edit_synth
 
 Configure synthesizer
-track_dialog/edit_fx
-Edit
-
 track_dialog/g_effects
 Effects
 
@@ -7283,7 +7283,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-358
+359
 // Text
 /cancel
 Abbrechen
@@ -8290,6 +8290,9 @@ Balance
 track-mixer/volume
 0\\-10000\\10\\0.1
 Lautstärke in dB
+track_dialog/_edit_fx
+Bearbeiten
+
 track_dialog/_edit_midi
 Bearbeiten
 

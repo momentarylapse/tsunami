@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-359
+360
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -1011,6 +1011,9 @@ Balance
 track-mixer/volume
 0\\-10000\\10\\0.1
 Lautstärke in dB
+track_dialog/_edit_fx
+Bearbeiten
+
 track_dialog/_edit_midi
 Bearbeiten
 

@@ -25,7 +25,7 @@ Dialog track_dialog "Spur" 380 516
 				Button select_synth "" expandx flat tooltip="Select synthesizer" flat
 				Button _edit_synth "" noexpandx flat image=hui:properties tooltip="Configure synthesizer" flat
 		Group g_effects "Effects"
-			Button edit_fx "Edit" expandx flat
+			Button _edit_fx "Edit" expandx flat
 		Text ? "" expandy
 		Group td_t_edit "Edit"
 			Grid ? "" 4 1

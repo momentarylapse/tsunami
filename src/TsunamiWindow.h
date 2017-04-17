@@ -87,16 +87,11 @@ public:
 	void onEditBars();
 	void onScaleBars();
 	void onBarsModifyMidi();
-	void onViewPeaksMax();
-	void onViewPeaksMean();
-	void onViewPeaksBoth();
 	void onViewMidiDefault();
 	void onViewMidiTab();
 	void onViewMidiScore();
 	void onZoomIn();
 	void onZoomOut();
-	void onViewMono();
-	void onViewStereo();
 	void onViewOptimal();
 	void onSelectNone();
 	void onSelectAll();

@@ -135,11 +135,6 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("select_all", "", KEY_A + KEY_CONTROL, this, &TsunamiWindow::onSelectAll);
 	HuiAddCommandM("select_nothing", "", -1, this, &TsunamiWindow::onSelectNone);
 	HuiAddCommandM("select_expand", "", -1, this, &TsunamiWindow::onSelectExpand);
-	HuiAddCommandM("view_mono", "", -1, this, &TsunamiWindow::onViewMono);
-	HuiAddCommandM("view_stereo", "", -1, this, &TsunamiWindow::onViewStereo);
-	HuiAddCommandM("view_peaks_max", "", -1, this, &TsunamiWindow::onViewPeaksMax);
-	HuiAddCommandM("view_peaks_mean", "", -1, this, &TsunamiWindow::onViewPeaksMean);
-	HuiAddCommandM("view_peaks_both", "", -1, this, &TsunamiWindow::onViewPeaksBoth);
 	HuiAddCommandM("view_midi_default", "", -1, this, &TsunamiWindow::onViewMidiDefault);
 	HuiAddCommandM("view_midi_tab", "", -1, this, &TsunamiWindow::onViewMidiTab);
 	HuiAddCommandM("view_midi_score", "", -1, this, &TsunamiWindow::onViewMidiScore);
@@ -671,31 +666,6 @@ void TsunamiWindow::onSelectAll()
 void TsunamiWindow::onSelectExpand()
 {
 	view->selectExpand();
-}
-
-void TsunamiWindow::onViewPeaksMax()
-{
-	view->setPeaksMode(BufferBox::PEAK_MAXIMUM);
-}
-
-void TsunamiWindow::onViewPeaksMean()
-{
-	view->setPeaksMode(BufferBox::PEAK_SQUAREMEAN);
-}
-
-void TsunamiWindow::onViewPeaksBoth()
-{
-	view->setPeaksMode(BufferBox::PEAK_BOTH);
-}
-
-void TsunamiWindow::onViewMono()
-{
-	view->setShowMono(true);
-}
-
-void TsunamiWindow::onViewStereo()
-{
-	view->setShowMono(false);
 }
 
 void TsunamiWindow::onViewMidiDefault()

@@ -103,11 +103,6 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 	float y0r = y1 + hf;
 	float y0l = y1 + hf * 3;
 
-	if (view->show_mono){
-		y0r = y1 + h / 2;
-		hf *= 2;
-	}
-
 
 	int di = view->detail_steps;
 	c->setColor(col);
@@ -126,32 +121,22 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 		}
 
 		// maximum
-		if ((view->peak_mode == BufferBox::PEAK_MAXIMUM) or (view->peak_mode == BufferBox::PEAK_BOTH)){
-			double _bzf = bzf;
-			int ll = l;
-			if (view->peak_mode == BufferBox::PEAK_BOTH){
-				color cc = col;
-				cc.a *= 0.3f;
-				c->setColor(cc);
-				if (ll + 4 < b.peaks.num){
-					ll += 4;
-					_bzf *= 2;
-				}
-			}else{
-				c->setColor(col);
-			}
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0r, b.peaks[ll], b.offset);
-			if (!view->show_mono)
-				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0l, b.peaks[ll+1], b.offset);
+		double _bzf = bzf;
+		int ll = l;
+		color cc = col;
+		cc.a *= 0.3f;
+		c->setColor(cc);
+		if (ll + 4 < b.peaks.num){
+			ll += 4;
+			_bzf *= 2;
 		}
+		draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0r, b.peaks[ll], b.offset);
+		draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, _bzf, hf, x1, y0l, b.peaks[ll+1], b.offset);
 
 		// mean square
-		if ((view->peak_mode == BufferBox::PEAK_SQUAREMEAN) or (view->peak_mode == BufferBox::PEAK_BOTH)){
-			c->setColor(col);
-			draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0r, b.peaks[l+2], b.offset);
-			if (!view->show_mono)
-				draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0l, b.peaks[l+3], b.offset);
-		}
+		c->setColor(col);
+		draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0r, b.peaks[l+2], b.offset);
+		draw_peak_buffer(c, w, di, view_pos_rel, view->cam.scale, bzf, hf, x1, y0l, b.peaks[l+3], b.offset);
 
 
 		// invalid peaks...
@@ -168,8 +153,7 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 
 		// directly show every sample
 		draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0r, b.c[0], b.offset);
-		if (!view->show_mono)
-			draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0l, b.c[1], b.offset);
+		draw_line_buffer(c, w, view_pos_rel, view->cam.scale, hf, x1, y0l, b.c[1], b.offset);
 	}
 }
 

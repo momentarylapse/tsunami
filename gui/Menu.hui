@@ -61,13 +61,6 @@ Menu menu "" disabled
 		Separator
 		Item sample_properties "Properties" image=hui:properties
 	Menu menu_view "View"
-		Menu menu_view_channels "Channels"
-			Item view_mono "Mono" checkable
-			Item view_stereo "Stereo" checkable
-		Menu menu_view_peaks "Peaks"
-			Item view_peaks_max "Maximum" checkable
-			Item view_peaks_mean "Square mean" checkable
-			Item view_peaks_both "Both" checkable
 		Menu menu_view_midi "Midi"
 			Item view_midi_default "Default" checkable
 			Item view_midi_tab "Tabulature" checkable

@@ -64,8 +64,6 @@ public:
 	static const string MESSAGE_VIEW_CHANGE;
 	static const string MESSAGE_VTRACK_CHANGE;
 
-	void setShowMono(bool mono);
-	void setPeaksMode(int mode);
 	void setMidiViewMode(int mode);
 	void updatePeaks();
 	void zoomIn();
@@ -125,13 +123,10 @@ public:
 
 	bool force_redraw;
 
-	bool show_mono;
 	int detail_steps;
 	int mouse_min_move_to_select;
 	int preview_sleep_time;
 	bool antialiasing;
-
-	int peak_mode;
 
 	int midi_view_mode;
 	enum{

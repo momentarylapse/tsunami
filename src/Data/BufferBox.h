@@ -67,12 +67,6 @@ public:
 	void _cdecl interleave(float *p, float volume) const;
 	void _cdecl deinterleave(float *p, int num_channels);
 
-	enum PeakMode
-	{
-		PEAK_MAXIMUM = 1,
-		PEAK_SQUAREMEAN = 2,
-		PEAK_BOTH = 3,
-	};
 
 	static const int PEAK_CHUNK_EXP;
 	static const int PEAK_CHUNK_SIZE;

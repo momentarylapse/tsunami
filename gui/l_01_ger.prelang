@@ -1048,7 +1048,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-141
+146
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1124,6 +1124,8 @@ Can't load effect: %s
 Kann Effekt nicht laden: %s
 Can't load midi effect: %s
 Kann MidiEffekt nicht laden: %s
+Can't merge a level with itself.
+Kann eine Ebene nicht mit sich selbst vereinen.
 Cancel
 Abbrechen
 Cancel recording?
@@ -1302,6 +1304,12 @@ all files
 alle Dateien
 all known files
 alles mögliche
+call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
+call: tsunami --execute <PLUGIN_NAME> [ARGUMENTS]
+call: tsunami --export <File> <Exportfile>
+call: tsunami --export <File> <Exportfile>
+call: tsunami --info <File>
+call: tsunami --info <File>
 enter new name
 neuen Namen eingeben
 exporting
@@ -1328,6 +1336,8 @@ program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 program has crashed, error handler has been called... maybe SegFault... m(-_-)m
 saving 
 speichere 
+unknown command: 
+unbekannter Befehl: 
 unknown file extension: 
 unbekannte Dateiendung: 
 unknown synthesizer: 

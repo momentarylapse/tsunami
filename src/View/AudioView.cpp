@@ -144,14 +144,12 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 	drawing_rect = rect(0, 1024, 0, 768);
 	enabled = true;
 
-	show_mono = HuiConfig.getBool("View.Mono", true);
 	detail_steps = HuiConfig.getInt("View.DetailSteps", 1);
 	mouse_min_move_to_select = HuiConfig.getInt("View.MouseMinMoveToSelect", 5);
 	preview_sleep_time = HuiConfig.getInt("PreviewSleepTime", 10);
 	ScrollSpeed = HuiConfig.getInt("View.ScrollSpeed", 300);
 	ScrollSpeedFast = HuiConfig.getInt("View.ScrollSpeedFast", 3000);
 	ZoomSpeed = HuiConfig.getFloat("View.ZoomSpeed", 0.1f);
-	peak_mode = HuiConfig.getInt("View.PeakMode", BufferBox::PEAK_BOTH);
 	antialiasing = HuiConfig.getBool("View.Antialiasing", false);
 
 	images.speaker = LoadImage(HuiAppDirectoryStatic + "Data/volume.tga");
@@ -242,7 +240,6 @@ AudioView::~AudioView()
 	delete(images.track_time);
 	delete(images.track_time_bg);
 
-	HuiConfig.setBool("View.Mono", show_mono);
 	HuiConfig.setInt("View.DetailSteps", detail_steps);
 	HuiConfig.setInt("View.MouseMinMoveToSelect", mouse_min_move_to_select);
 	HuiConfig.setInt("View.ScrollSpeed", ScrollSpeed);
@@ -648,7 +645,7 @@ void AudioView::drawBackground(Painter *c, const rect &r)
 	drawGridTime(c, rect(r.x1, r.x2, r.y1, r.y1 + TIME_SCALE_HEIGHT), colors.background_track, true);
 
 	// tracks
-	foreachi(AudioViewTrack *t, vtrack, i)
+	for (AudioViewTrack *t: vtrack)
 		mode->drawTrackBackground(c, t);
 
 	// free space below tracks
@@ -661,7 +658,7 @@ void AudioView::drawBackground(Painter *c, const rect &r)
 
 	// lines between tracks
 	c->setColor(colors.grid);
-	foreachi(AudioViewTrack *t, vtrack, i)
+	for (AudioViewTrack *t: vtrack)
 		c->drawLine(0, t->area.y1, r.width(), t->area.y1);
 	if (yy < r.y2)
 		c->drawLine(0, yy, r.width(), yy);
@@ -676,7 +673,7 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	int sxx1 = clampi(sx1, r.x1, r.x2);
 	int sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(colors.selection_internal);
-	foreachi(AudioViewTrack *t, vtrack, i)
+	for (AudioViewTrack *t: vtrack)
 		if (sel.has(t->track))
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 	drawTimeLine(c, sel_raw.start(), Selection::TYPE_SELECTION_START, colors.selection_boundary);
@@ -689,7 +686,7 @@ void AudioView::drawSelection(Painter *c, const rect &r)
 	sxx1 = clampi(sx1, r.x1, r.x2);
 	sxx2 = clampi(sx2, r.x1, r.x2);
 	c->setColor(colors.selection_internal);
-	foreachi(AudioViewTrack *t, vtrack, i)
+	for (AudioViewTrack *t: vtrack)
 		if (t->track->type == Track::TYPE_TIME){
 			c->drawRect(rect(sxx1, sxx2, t->area.y1, t->area.y2));
 			c->drawRect(rect(sxx2 - 5, sxx2 + 5, t->area.y1, t->area.y2));
@@ -782,11 +779,6 @@ void AudioView::updateMenu()
 	// edit
 	win->check("edit_multi", edit_multi);
 	// view
-	win->check("view_mono", show_mono);
-	win->check("view_stereo", !show_mono);
-	win->check("view_peaks_max", peak_mode == BufferBox::PEAK_MAXIMUM);
-	win->check("view_peaks_mean", peak_mode == BufferBox::PEAK_SQUAREMEAN);
-	win->check("view_peaks_both", peak_mode == BufferBox::PEAK_BOTH);
 	win->check("view_midi_default", midi_view_mode == MIDI_MODE_MIDI);
 	win->check("view_midi_tab", midi_view_mode == MIDI_MODE_TAB);
 	win->check("view_midi_score", midi_view_mode == MIDI_MODE_SCORE);
@@ -810,22 +802,6 @@ void AudioView::updatePeaks()
 		}else
 			HuiSleep(0.001f);
 	}
-}
-
-void AudioView::setPeaksMode(int mode)
-{
-	peak_mode = mode;
-	forceRedraw();
-	notify(MESSAGE_SETTINGS_CHANGE);
-	updateMenu();
-}
-
-void AudioView::setShowMono(bool mono)
-{
-	show_mono = mono;
-	forceRedraw();
-	notify(MESSAGE_SETTINGS_CHANGE);
-	updateMenu();
 }
 
 void AudioView::setMidiViewMode(int mode)

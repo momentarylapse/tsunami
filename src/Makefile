@@ -82,6 +82,7 @@ OBJ = \
  Audio/Synth/SampleSynthesizer.o\
  Audio/Synth/Synthesizer.o\
  Data/BufferBox.o\
+ Data/BufferInterpolator.o\
  Data/Curve.o\
  Data/Data.o\
  Data/Range.o\
@@ -539,6 +540,9 @@ Audio/Synth/Synthesizer.o : Audio/Synth/Synthesizer.cpp
 
 Data/BufferBox.o : Data/BufferBox.cpp
 	$(CPP) -c Data/BufferBox.cpp -o $@ $(CXXFLAGS)
+
+Data/BufferInterpolator.o : Data/BufferInterpolator.cpp
+	$(CPP) -c Data/BufferInterpolator.cpp -o $@ $(CXXFLAGS)
 
 Data/Curve.o : Data/Curve.cpp
 	$(CPP) -c Data/Curve.cpp -o $@ $(CXXFLAGS)

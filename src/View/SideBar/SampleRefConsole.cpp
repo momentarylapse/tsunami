@@ -9,6 +9,7 @@
 #include "../../Data/Track.h"
 #include "../Helper/Slider.h"
 #include "SampleRefConsole.h"
+#include "SampleManagerConsole.h"
 
 SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 	SideBarConsole("Sample-Eigenschaften"),
@@ -28,6 +29,7 @@ SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 
 	event("edit_song", this, &SampleRefConsole::onEditSong);
 	event("edit_track", this, &SampleRefConsole::onEditTrack);
+	event("edit_sample", this, &SampleRefConsole::onEditSample);
 
 	subscribe(view, view->MESSAGE_CUR_SAMPLE_CHANGE);
 }
@@ -101,6 +103,12 @@ void SampleRefConsole::onEditSong()
 void SampleRefConsole::onEditTrack()
 {
 	((SideBar*)parent)->open(SideBar::TRACK_CONSOLE);
+}
+
+void SampleRefConsole::onEditSample()
+{
+	((SideBar*)parent)->sample_manager->setSelection(sample->origin);
+	((SideBar*)parent)->open(SideBar::SAMPLE_CONSOLE);
 }
 
 void SampleRefConsole::loadData()

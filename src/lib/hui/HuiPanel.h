@@ -144,7 +144,7 @@ public:
 	void _cdecl setImage(const string &id, const string &image);
 	void _cdecl setTooltip(const string &id, const string &tip);
 	Array<int> _cdecl getSelection(const string &id);
-	void _cdecl setSelection(const string &id, Array<int> &sel);
+	void _cdecl setSelection(const string &id, const Array<int> &sel);
 	void _cdecl reset(const string &id);
 	void _cdecl removeControl(const string &id);
 	void _cdecl setOptions(const string &id, const string &options);

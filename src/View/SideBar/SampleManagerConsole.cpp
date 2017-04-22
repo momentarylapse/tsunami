@@ -17,6 +17,7 @@
 #include <math.h>
 
 #include "../../Data/Song.h"
+#include "../../Data/BufferInterpolator.h"
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"
 
@@ -42,7 +43,7 @@ void render_midi(Image &im, MidiData &m)
 	int h = im.height;
 	Range r = Range(0, m.samples);
 	MidiDataRef notes = m.getNotes(r);
-	for (MidiNote *n : notes){
+	for (MidiNote *n: notes){
 		float y = h * clampf((80 - n->pitch) / 50.0f, 0, 1);
 		float x0 = w * clampf((float)n->range.offset / (float)r.length, 0, 1);
 		float x1 = w * clampf((float)n->range.end() / (float)r.length, 0, 1);
@@ -120,6 +121,7 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 	event("paste_sample", this, &SampleManagerConsole::onInsert);
 	event("create_from_selection", this, &SampleManagerConsole::onCreateFromSelection);
 	event("delete_sample", this, &SampleManagerConsole::onDelete);
+	event("scale_sample", this, &SampleManagerConsole::onScale);
 	eventX("sample_list", "hui:change", this, &SampleManagerConsole::onListEdit);
 	eventX("sample_list", "hui:select", this, &SampleManagerConsole::onListSelect);
 	event("sample_list", this, &SampleManagerConsole::onPreview);
@@ -143,7 +145,7 @@ SampleManagerConsole::SampleManagerConsole(Song *s, AudioView *_view) :
 
 SampleManagerConsole::~SampleManagerConsole()
 {
-	for (SampleManagerItem *si : items)
+	for (SampleManagerItem *si: items)
 		delete(si);
 	items.clear();
 
@@ -161,7 +163,7 @@ int SampleManagerConsole::getIndex(Sample *s)
 void SampleManagerConsole::updateList()
 {
 	// new samples?
-	for (Sample *s : song->samples)
+	for (Sample *s: song->samples)
 		if (getIndex(s) < 0)
 			add(new SampleManagerItem(this, s, view));
 
@@ -176,6 +178,7 @@ void SampleManagerConsole::onListSelect()
 	enable("preview_sample", sel.num == 1);
 	enable("delete_sample", sel.num > 0);
 	enable("paste_sample", sel.num == 1);
+	enable("scale_sample", sel.num == 1);
 }
 
 void SampleManagerConsole::onListEdit()
@@ -216,19 +219,13 @@ void SampleManagerConsole::onExport()
 void SampleManagerConsole::onInsert()
 {
 	Array<Sample*> sel = getSelected();
-	for (Sample* s : sel)
+	for (Sample* s: sel)
 		view->cur_track->addSampleRef(view->sel.range.start(), s);
 }
 
 void SampleManagerConsole::onCreateFromSelection()
 {
 	song->createSamplesFromSelection(view->sel, view->cur_level);
-	/*if (song->samples.num > 0){
-		selected_uids.clear();
-		selected_uids.add(song->samples.back()->uid);
-		enable("delete_sample", true);
-		enable("paste_sample", true);
-	}*/
 }
 
 void SampleManagerConsole::onDelete()
@@ -236,12 +233,29 @@ void SampleManagerConsole::onDelete()
 	Array<Sample*> sel = getSelected();
 
 	song->action_manager->beginActionGroup();
-	for (Sample* s : sel)
+	for (Sample* s: sel)
 		song->deleteSample(s);
 	song->action_manager->endActionGroup();
 
 	// hui bug
 	setInt("sample_list", -1);
+}
+
+
+void SampleManagerConsole::onScale()
+{
+	Array<Sample*> sel = getSelected();
+	for (Sample* s: sel){
+		if (s->type != Track::TYPE_AUDIO)
+			continue;
+		BufferBox out;
+		int new_size = (int)(((long long)s->buf.length * (long long)44100) / (long long)48000);
+		msg_write(format("%d  ->  %d", s->buf.length, new_size));
+		BufferInterpolator::interpolate(s->buf, out, new_size, BufferInterpolator::METHOD_LINEAR);
+		msg_write("ok");
+		s->buf = out;
+		song->notify();
+	}
 }
 
 void SampleManagerConsole::add(SampleManagerItem *item)
@@ -267,9 +281,17 @@ Array<Sample*> SampleManagerConsole::getSelected()
 {
 	Array<int> indices = getSelection("sample_list");
 	Array<Sample*> sel;
-	for (int i : indices)
+	for (int i: indices)
 		sel.add(items[i]->s);
 	return sel;
+}
+
+void SampleManagerConsole::setSelection(const Array<Sample*> &samples)
+{
+	Array<int> indices;
+	for (Sample *s: samples)
+		indices.add(getIndex(s));
+	HuiPanel::setSelection("sample_list", indices);
 }
 
 void SampleManagerConsole::onEditSong()

@@ -13,7 +13,8 @@ Dialog settings_dialog "Einstellungen" 300 200
 		Group pdp_capture "Recording"
 			Grid ? "" 3 1
 				Text pdt_capturetempfile "Backup file"
-				Edit capture_filename "" tooltip="Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt"
+				Edit capture_filename "" tooltip="Aufnahmen werden automatisch im Format Raw (stereo, 32bit float) in diese Datei gespeichert (und später gelöscht), falls das Program währendher abstürzt" expandx
 				Button capture_find "" image=hui:open
 		Grid ? "" 1 1 buttonbar
 			DefButton /close "Close" image=hui:close
+

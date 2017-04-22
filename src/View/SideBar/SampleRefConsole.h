@@ -32,6 +32,7 @@ public:
 
 	void onEditSong();
 	void onEditTrack();
+	void onEditSample();
 
 	virtual void onUpdate(Observable *o, const string &message);
 

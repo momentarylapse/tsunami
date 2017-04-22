@@ -53,4 +53,5 @@ void BufferInterpolator::interpolate(BufferBox &in, BufferBox &out, int new_size
 	out.resize(new_size);
 	for (int i=0; i<in.channels; i++)
 		interpolate_channel(in.c[i], out.c[i], method);
+	out.offset = in.offset;
 }

@@ -58,7 +58,6 @@ public:
 	void onSampleFromSelection();
 	void onInsertSample();
 	void onRemoveSample();
-	void onScaleSample();
 	void onTrackImport();
 	void onAddLevel();
 	void onDeleteLevel();

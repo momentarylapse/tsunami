@@ -113,7 +113,6 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("sample_from_selection", "hui:cut", -1, this, &TsunamiWindow::onSampleFromSelection);
 	HuiAddCommandM("insert_sample", "", KEY_I + KEY_CONTROL, this, &TsunamiWindow::onInsertSample);
 	HuiAddCommandM("remove_sample", "", -1, this, &TsunamiWindow::onRemoveSample);
-	HuiAddCommandM("scale_sample", "", -1, this, &TsunamiWindow::onScaleSample);
 	HuiAddCommandM("delete_marker", "", -1, this, &TsunamiWindow::onDeleteMarker);
 	HuiAddCommandM("edit_marker", "", -1, this, &TsunamiWindow::onEditMarker);
 	HuiAddCommandM("track_import", "", -1, this, &TsunamiWindow::onTrackImport);
@@ -598,10 +597,6 @@ void TsunamiWindow::onStop()
 void TsunamiWindow::onInsertSample()
 {
 	song->insertSelectedSamples(view->getEditSeletion(), view->cur_level);
-}
-
-void TsunamiWindow::onScaleSample()
-{
 }
 
 void TsunamiWindow::onRecord()

@@ -22,3 +22,5 @@ Dialog sample_ref_dialog "Sub Track" 375 230
 			Grid ? "" 2 1
 				Button /edit_song "File"
 				Button /edit_track "Track"
+				Button edit_sample "Sample"
+

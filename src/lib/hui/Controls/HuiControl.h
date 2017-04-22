@@ -76,8 +76,8 @@ public:
 	virtual void __setCell(int row, int column, const string &str){}
 	void setCell(int row, int column, const string &str);
 	virtual Array<int> getMultiSelection(){ Array<int> r; return r; }
-	virtual void __setSelection(Array<int> &sel){}
-	void setSelection(Array<int> &sel);
+	virtual void __setSelection(const Array<int> &sel){}
+	void setSelection(const Array<int> &sel);
 	virtual void expand(int row, bool expand){}
 	virtual void expandAll(bool expand){}
 	virtual bool isExpanded(int row){ return false; }

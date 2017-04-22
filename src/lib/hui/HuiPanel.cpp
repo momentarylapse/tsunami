@@ -621,7 +621,7 @@ Array<int> HuiPanel::getSelection(const string &_id)
 	return sel;
 }
 
-void HuiPanel::setSelection(const string &_id, Array<int> &sel)
+void HuiPanel::setSelection(const string &_id, const Array<int> &sel)
 {
 	test_controls(_id, c)
 		c->setSelection(sel);

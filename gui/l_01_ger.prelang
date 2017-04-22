@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-360
+362
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -349,7 +349,7 @@ menu/add_time_track
 Rhythmus Spur hinzufügen
 
 menu/add_track
-Leere Spur hinzufügen
+Leere Audiospur hinzufügen
 
 menu/bar_link_to_data
 Daten mitbearbeiten
@@ -882,8 +882,14 @@ Vorschau\\Name\\Dauer\\Benutzung\\Temporär
 sample_manager_dialog/sample_manager_dialog
 Sample Manager
 
+sample_manager_dialog/scale_sample
+
+skalieren/Größe ändern
 sample_manager_dialog/smd_group_edit
 Bearbeiten
+
+sample_ref_dialog/edit_sample
+Sample
 
 sample_ref_dialog/ld_t_edit
 Edit

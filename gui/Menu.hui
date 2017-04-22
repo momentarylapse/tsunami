@@ -29,11 +29,11 @@ Menu menu "" disabled
 	Menu menu_track "Track"
 		Item track_import "Import from file..." image=hui:open
 		Separator
-		Item add_track "Add empty track" image=hui:add
-		Item add_time_track "Add rhythm track" image=hui:add
+		Item add_track "Add empty audio track" image=hui:add
 		Item add_midi_track "Add midi track" image=hui:add
-		Item delete_track "Delete" image=hui:delete
+		Item add_time_track "Add rhythm track" image=hui:add
 		Separator
+		Item delete_track "Delete" image=hui:delete
 		Item track_properties "Properties" image=hui:properties
 	Menu menu_level "Levels"
 		Item level_manager "Manage..." image=hui:properties
@@ -57,7 +57,6 @@ Menu menu "" disabled
 		Item sample_from_selection "Cut out from selection" image=hui:cut
 		Item insert_sample "Insert statically" image=hui:add
 		Item remove_sample "Delete" image=hui:delete
-		Item scale_sample "Scale"
 		Separator
 		Item sample_properties "Properties" image=hui:properties
 	Menu menu_view "View"

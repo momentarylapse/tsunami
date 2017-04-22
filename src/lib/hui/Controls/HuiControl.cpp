@@ -279,7 +279,7 @@ void HuiControl::setCell(int row, int column, const string& str)
 	allow_signal_level --;
 }
 
-void HuiControl::setSelection(Array<int>& sel)
+void HuiControl::setSelection(const Array<int>& sel)
 {
 	allow_signal_level ++;
 	__setSelection(sel);

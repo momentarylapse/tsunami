@@ -34,6 +34,7 @@ public:
 	void onInsert();
 	void onCreateFromSelection();
 	void onDelete();
+	void onScale();
 
 	void onEditSong();
 
@@ -49,6 +50,8 @@ public:
 	void remove(SampleManagerItem *item);
 	int getIndex(Sample *s);
 	Array<Sample*> getSelected();
+
+	void setSelection(const Array<Sample*> &samples);
 
 	OutputStream *preview_stream;
 	BufferRenderer *preview_renderer;

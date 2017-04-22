@@ -171,6 +171,9 @@ void BufferBox::swap_ref(BufferBox &b)
 	for (int i=0; i<channels; i++)
 		c[i].exchange(b.c[i]);
 
+	// peaks
+	peaks.exchange(b.peaks);
+
 	// num
 	int t = length;
 	length = b.length;

@@ -41,6 +41,7 @@
 #include "../Action/Song/Sample/ActionSongAddSample.h"
 #include "../Action/Song/Sample/ActionSongDeleteSample.h"
 #include "../Action/Song/Sample/ActionSongSampleEditName.h"
+#include "../Action/Song/Sample/ActionSampleScale.h"
 #include "../Action/Song/Tag/ActionSongEditTag.h"
 #include "../Action/Song/Tag/ActionSongAddTag.h"
 #include "../Action/Song/Tag/ActionSongDeleteTag.h"
@@ -438,7 +439,12 @@ void Song::deleteSample(Sample *s)
 
 void Song::editSampleName(Sample *s, const string &name)
 {
-	execute(new ActionSongSampleEditName(this, s, name));
+	execute(new ActionSongSampleEditName(s, name));
+}
+
+void Song::scaleSample(Sample *s, int new_size, int method)
+{
+	execute(new ActionSampleScale(s, new_size, method));
 }
 
 void Song::deleteSelection(const SongSelection &sel, int level_no, bool all_levels)

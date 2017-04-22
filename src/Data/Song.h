@@ -106,6 +106,7 @@ public:
 	Sample *_cdecl addSample(const string &name, BufferBox &buf);
 	void _cdecl deleteSample(Sample *s);
 	void _cdecl editSampleName(Sample *s, const string &name);
+	void _cdecl scaleSample(Sample *s, int new_size, int method);
 	void _cdecl addLevel(const string &name);
 	void _cdecl deleteLevel(int index);
 	void _cdecl mergeLevels(int source, int target);

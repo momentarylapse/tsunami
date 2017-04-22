@@ -23,6 +23,7 @@ OBJ = \
  Action/Song/Sample/ActionSongAddSample.o\
  Action/Song/Sample/ActionSongDeleteSample.o\
  Action/Song/Sample/ActionSongSampleEditName.o\
+ Action/Song/Sample/ActionSampleScale.o\
  Action/Song/Tag/ActionSongAddTag.o\
  Action/Song/Tag/ActionSongDeleteTag.o\
  Action/Song/Tag/ActionSongEditTag.o\
@@ -263,6 +264,7 @@ OBJ = \
  View/Dialog/PauseAddDialog.o\
  View/Dialog/PauseEditDialog.o\
  View/Dialog/RecordDialog.o\
+ View/Dialog/SampleScaleDialog.o\
  View/Dialog/SettingsDialog.o\
  View/Dialog/TuningDialog.o\
  View/Helper/PeakMeter.o\
@@ -363,6 +365,9 @@ Action/Song/Sample/ActionSongDeleteSample.o : Action/Song/Sample/ActionSongDelet
 
 Action/Song/Sample/ActionSongSampleEditName.o : Action/Song/Sample/ActionSongSampleEditName.cpp
 	$(CPP) -c Action/Song/Sample/ActionSongSampleEditName.cpp -o $@ $(CXXFLAGS)
+
+Action/Song/Sample/ActionSampleScale.o : Action/Song/Sample/ActionSampleScale.cpp
+	$(CPP) -c Action/Song/Sample/ActionSampleScale.cpp -o $@ $(CXXFLAGS)
 
 Action/Song/Tag/ActionSongAddTag.o : Action/Song/Tag/ActionSongAddTag.cpp
 	$(CPP) -c Action/Song/Tag/ActionSongAddTag.cpp -o $@ $(CXXFLAGS)
@@ -1080,6 +1085,9 @@ View/Dialog/PauseEditDialog.o : View/Dialog/PauseEditDialog.cpp
 
 View/Dialog/RecordDialog.o : View/Dialog/RecordDialog.cpp
 	$(CPP) -c View/Dialog/RecordDialog.cpp -o $@ $(CXXFLAGS)
+
+View/Dialog/SampleScaleDialog.o : View/Dialog/SampleScaleDialog.cpp
+	$(CPP) -c View/Dialog/SampleScaleDialog.cpp -o $@ $(CXXFLAGS)
 
 View/Dialog/SettingsDialog.o : View/Dialog/SettingsDialog.cpp
 	$(CPP) -c View/Dialog/SettingsDialog.cpp -o $@ $(CXXFLAGS)

@@ -10,13 +10,12 @@
 
 #include "../../ActionMergable.h"
 
-class Song;
 class Sample;
 
 class ActionSongSampleEditName: public ActionMergable<string>
 {
 public:
-	ActionSongSampleEditName(Song *a, Sample *s, const string &name);
+	ActionSongSampleEditName(Sample *s, const string &name);
 	virtual ~ActionSongSampleEditName();
 
 	virtual void *execute(Data *d);

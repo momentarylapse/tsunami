@@ -8,7 +8,7 @@
 #include "../../Song/Sample/ActionSongSampleEditName.h"
 #include "../../../Data/Song.h"
 
-ActionSongSampleEditName::ActionSongSampleEditName(Song *a, Sample *s, const string &name)
+ActionSongSampleEditName::ActionSongSampleEditName(Sample *s, const string &name)
 {
 	sample = s;
 	new_value = name;
@@ -21,8 +21,6 @@ ActionSongSampleEditName::~ActionSongSampleEditName()
 
 void *ActionSongSampleEditName::execute(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	sample->name = new_value;
 	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
 
@@ -31,8 +29,6 @@ void *ActionSongSampleEditName::execute(Data *d)
 
 void ActionSongSampleEditName::undo(Data *d)
 {
-	Song *a = dynamic_cast<Song*>(d);
-
 	sample->name = old_value;
 	sample->notify(sample->MESSAGE_CHANGE_BY_ACTION);
 }

@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-362
+378
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -926,6 +926,54 @@ Sub Track
 
 sample_ref_dialog/volume
 0\\-10000\\10\\0.1
+
+sample_scale_dialog/factor
+0\\0\\1000\\0.01
+
+sample_scale_dialog/method
+Linear\\Kubisch\\Sinc\\Fourier
+
+sample_scale_dialog/rate_inv_new
+1\\1\\\\1
+
+sample_scale_dialog/rate_inv_orig
+1\\1\\\\1
+
+sample_scale_dialog/rate_new
+1\\1\\\\1
+
+sample_scale_dialog/rate_orig
+1\\1\\\\1
+
+sample_scale_dialog/sample_scale_dialog
+Sample skalieren
+
+sample_scale_dialog/samples_new
+1\\1\\\\1
+
+sample_scale_dialog/samples_orig
+1\\1\\\\1
+
+sample_scale_dialog/ssd_t_factor
+Faktor %
+
+sample_scale_dialog/ssd_t_method
+Methode
+
+sample_scale_dialog/ssd_t_new
+Neu
+
+sample_scale_dialog/ssd_t_orig
+Original
+
+sample_scale_dialog/ssd_t_rate
+Sample rate
+
+sample_scale_dialog/ssd_t_rate_inv
+Sample rate
+
+sample_scale_dialog/ssd_t_samples
+Samples
 
 sample_selection_dialog/sample_selection_dialog
 Sample wählen

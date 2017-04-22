@@ -19,7 +19,7 @@ Dialog sample_ref_dialog "Sub Track" 375 230
 				Text /ms "ms"
 		Text ? "" expandy
 		Group ld_t_edit "Edit"
-			Grid ? "" 2 1
+			Grid ? "" 3 1
 				Button /edit_song "File"
 				Button /edit_track "Track"
 				Button edit_sample "Sample"

@@ -6,18 +6,18 @@
  */
 
 #include "../../Storage/Storage.h"
-#include "../../View/AudioView.h"
-#include "../../View/AudioViewTrack.h"
+#include "../AudioView.h"
+#include "../AudioViewTrack.h"
 #include "../../Device/OutputStream.h"
 #include "../../Audio/Renderer/BufferRenderer.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../Helper/Progress.h"
+#include "../Dialog/SampleScaleDialog.h"
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
 #include <math.h>
 
 #include "../../Data/Song.h"
-#include "../../Data/BufferInterpolator.h"
 #include "../../lib/math/math.h"
 #include "SampleManagerConsole.h"
 
@@ -248,13 +248,9 @@ void SampleManagerConsole::onScale()
 	for (Sample* s: sel){
 		if (s->type != Track::TYPE_AUDIO)
 			continue;
-		BufferBox out;
-		int new_size = (int)(((long long)s->buf.length * (long long)44100) / (long long)48000);
-		msg_write(format("%d  ->  %d", s->buf.length, new_size));
-		BufferInterpolator::interpolate(s->buf, out, new_size, BufferInterpolator::METHOD_LINEAR);
-		msg_write("ok");
-		s->buf = out;
-		song->notify();
+		SampleScaleDialog *dlg = new SampleScaleDialog(parent->win, s);
+		dlg->run();
+		delete(dlg);
 	}
 }
 

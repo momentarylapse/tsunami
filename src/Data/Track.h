@@ -85,7 +85,7 @@ public:
 	void _cdecl enableMidiEffect(int index, bool enabled);
 	SampleRef *_cdecl addSampleRef(int pos, Sample* sample);
 	void _cdecl deleteSampleRef(int index);
-	void _cdecl editSampleRef(int index, float volume, bool mute, int rep_num, int rep_delay);
+	void _cdecl editSampleRef(int index, float volume, bool mute);
 	void _cdecl addMidiNote(const MidiNote &n);
 	//void _cdecl addMidiNotes(const MidiData &notes);
 	void _cdecl deleteMidiNote(int index);

@@ -484,8 +484,8 @@ public:
 		me = parent->addSampleRef(pos, parent->song->samples[index]);
 		me->volume = f->ReadFloat();
 		me->muted = f->ReadBool();
-		me->rep_num = f->ReadInt();
-		me->rep_delay = f->ReadInt();
+		f->ReadInt();
+		f->ReadInt();
 		f->ReadInt(); // reserved
 		f->ReadInt();
 	}
@@ -496,8 +496,8 @@ public:
 		f->WriteInt(me->origin->get_index());
 		f->WriteFloat(me->volume);
 		f->WriteBool(me->muted);
-		f->WriteInt(me->rep_num);
-		f->WriteInt(me->rep_delay);
+		f->WriteInt(0);
+		f->WriteInt(0);
 		f->WriteInt(0); // reserved
 		f->WriteInt(0);
 	}

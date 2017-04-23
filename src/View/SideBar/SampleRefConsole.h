@@ -27,8 +27,6 @@ public:
 	void onMute();
 	void onTrack();
 	void onVolume();
-	void onRepNum();
-	void onRepDelay();
 
 	void onEditSong();
 	void onEditTrack();

@@ -115,7 +115,7 @@ Range Track::getRangeUnsafe()
 	for (SampleRef *s: samples){
 		if (s->pos < _min)
 			_min = s->pos;
-		int smax = s->pos + s->buf->length + s->rep_num * s->rep_delay;
+		int smax = s->pos + s->buf->length;
 		if (smax > _max)
 			_max = smax;
 	}
@@ -247,9 +247,9 @@ void Track::deleteSampleRef(int index)
 	song->execute(new ActionTrackDeleteSample(this, index));
 }
 
-void Track::editSampleRef(int index, float volume, bool mute, int rep_num, int rep_delay)
+void Track::editSampleRef(int index, float volume, bool mute)
 {
-	song->execute(new ActionTrackEditSample(this, index, volume, mute, rep_num, rep_delay));
+	song->execute(new ActionTrackEditSample(this, index, volume, mute));
 }
 
 void Track::addMidiNote(const MidiNote &n)

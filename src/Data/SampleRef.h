@@ -41,10 +41,6 @@ public:
 	bool muted;
 	float volume;
 
-	// repetition
-	int rep_num;
-	int rep_delay;
-
 	// editing
 	rect area;
 	int track_no;

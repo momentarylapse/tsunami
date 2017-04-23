@@ -9,14 +9,6 @@ Dialog sample_ref_dialog "Sample" 375 230
 				SpinButton volume "0\\-10000\\10\\0.1" expandx
 				Text /db "dB"
 				CheckBox mute "Muted"
-		Group ld_t_repetition "Repetitions"
-			Grid ? "" 3 2
-				Text ld_t_repnum "Count"
-				SpinButton repnum "1\\1" expandx
-				.
-				Text ld_t_repdelay "Delay"
-				SpinButton repdelay "0\\0\\\\0.1"
-				Text /ms "ms"
 		Text ? "" expandy
 		Group ld_t_edit "Edit"
 			Grid ? "" 3 1

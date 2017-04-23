@@ -10,7 +10,7 @@ menu_fake
 0
 48
 0
-21500208
+17262448
 0
 2
 Item
@@ -148,7 +148,7 @@ bar_add_dialog
 0
 1
 ControlTable
-rand_id_76994
+rand_id_649706
 
 
 1
@@ -159,7 +159,7 @@ rand_id_76994
 -1
 2
 ControlTable
-rand_id_649706
+rand_id_248044
 
 
 1
@@ -258,7 +258,7 @@ expandx
 -1
 0
 ControlTable
-rand_id_248044
+rand_id_629479
 buttonbar
 
 1
@@ -303,7 +303,7 @@ bar_edit_dialog
 0
 1
 ControlTable
-rand_id_629479
+rand_id_229136
 
 
 1
@@ -314,7 +314,7 @@ rand_id_629479
 -1
 2
 ControlTable
-rand_id_229136
+rand_id_700619
 
 
 1
@@ -391,7 +391,7 @@ expandx
 -1
 0
 ControlTable
-rand_id_700619
+rand_id_316867
 buttonbar
 
 1
@@ -447,7 +447,7 @@ grid
 -1
 2
 ControlTable
-rand_id_316867
+rand_id_328777
 
 
 1
@@ -480,7 +480,7 @@ hui:save
 -1
 0
 ControlTable
-rand_id_328777
+rand_id_231427
 buttonbar
 
 1
@@ -502,7 +502,7 @@ hui:media-play
 -1
 0
 Text
-rand_id_231427
+rand_id_74160
 width=30
 
 1
@@ -547,7 +547,7 @@ configurable-selection-dialog
 0
 1
 ControlTable
-rand_id_74160
+rand_id_633072
 
 
 1
@@ -569,7 +569,7 @@ list
 -1
 0
 ControlTable
-rand_id_633072
+rand_id_223656
 buttonbar
 
 1
@@ -614,7 +614,7 @@ curve_console
 0
 1
 ControlTable
-rand_id_223656
+rand_id_651132
 
 
 1
@@ -691,7 +691,7 @@ cc_group_edit
 -1
 1
 ControlTable
-rand_id_651132
+rand_id_510685
 
 
 1
@@ -747,7 +747,7 @@ curve-target-dialog
 0
 1
 ControlTable
-rand_id_510685
+rand_id_971465
 
 
 1
@@ -769,7 +769,7 @@ multiselection,nobar
 -1
 0
 ControlTable
-rand_id_971465
+rand_id_280042
 buttonbar
 
 1
@@ -837,7 +837,7 @@ detune_synthesizer_dialog
 0
 1
 ControlTable
-rand_id_280042
+rand_id_546106
 
 
 1
@@ -859,7 +859,7 @@ expandx,expandy
 -1
 0
 ControlTable
-rand_id_546106
+rand_id_719268
 buttonbar
 
 1
@@ -904,7 +904,7 @@ device-manager
 0
 1
 ControlTable
-rand_id_719268
+rand_id_113280
 
 
 1
@@ -959,7 +959,7 @@ format=tttCc
 2
 0
 ControlTable
-rand_id_113280
+rand_id_471483
 
 
 1
@@ -1004,7 +1004,7 @@ fx_editor
 0
 1
 ControlTable
-rand_id_471483
+rand_id_592539
 
 
 1
@@ -1048,7 +1048,7 @@ hui:add
 -1
 0
 Text
-rand_id_592539
+rand_id_944318
 expandy
 
 1
@@ -1070,7 +1070,7 @@ fe_g_edit
 -1
 1
 ControlTable
-rand_id_944318
+rand_id_450917
 
 
 1
@@ -1126,7 +1126,7 @@ expandx,noexpandy
 -1
 1
 ControlTable
-rand_id_450917
+rand_id_336351
 
 
 1
@@ -1226,7 +1226,7 @@ format=tT,select-single
 -1
 0
 ControlTable
-rand_id_336351
+rand_id_847684
 
 
 1
@@ -1281,7 +1281,7 @@ lvld_t_edit
 -1
 1
 ControlTable
-rand_id_847684
+rand_id_434513
 
 
 1
@@ -1315,7 +1315,7 @@ log_console
 0
 1
 ControlTable
-rand_id_434513
+rand_id_3231
 
 
 1
@@ -1394,7 +1394,7 @@ marker_dialog
 0
 1
 ControlTable
-rand_id_3231
+rand_id_344942
 
 
 1
@@ -1416,7 +1416,7 @@ expandx
 -1
 0
 ControlTable
-rand_id_344942
+rand_id_598481
 buttonbar
 
 1
@@ -2573,7 +2573,7 @@ midi_editor
 0
 1
 ControlTable
-rand_id_598481
+rand_id_833243
 
 
 1
@@ -2628,7 +2628,7 @@ me_group_view
 -1
 1
 ControlTable
-rand_id_833243
+rand_id_233891
 
 
 1
@@ -2672,7 +2672,7 @@ ld_t_scale
 -1
 0
 ControlTable
-rand_id_233891
+rand_id_675475
 
 
 1
@@ -2716,7 +2716,7 @@ midi_edit_mode
 -1
 3
 ControlTable
-rand_id_675475
+rand_id_482950
 
 
 1
@@ -2760,7 +2760,7 @@ interval
 -1
 0
 ControlTable
-rand_id_482950
+rand_id_481935
 
 
 1
@@ -2837,7 +2837,7 @@ me_group_modifier
 -1
 1
 ControlTable
-rand_id_481935
+rand_id_304955
 
 
 1
@@ -2914,7 +2914,7 @@ height=200,noexpandy,nobar,select-multi
 -1
 0
 Text
-rand_id_304955
+rand_id_712087
 expandy
 
 1
@@ -2936,7 +2936,7 @@ me_group_edit
 -1
 1
 ControlTable
-rand_id_712087
+rand_id_182555
 
 
 1
@@ -2992,7 +2992,7 @@ midi_fx_editor
 0
 1
 ControlTable
-rand_id_182555
+rand_id_621822
 expandy
 
 1
@@ -3058,7 +3058,7 @@ hui:add
 -1
 0
 Text
-rand_id_621822
+rand_id_40864
 expandy
 
 1
@@ -3080,7 +3080,7 @@ mfe_g_edit
 -1
 1
 ControlTable
-rand_id_40864
+rand_id_413983
 
 
 1
@@ -3136,7 +3136,7 @@ mini_bar
 0
 1
 ControlTable
-rand_id_413983
+rand_id_695983
 expandx,border=0
 
 1
@@ -3147,7 +3147,7 @@ expandx,border=0
 -1
 2
 Separator
-rand_id_695983
+rand_id_673936
 horizontal
 
 1
@@ -3158,7 +3158,7 @@ horizontal
 -1
 0
 ControlTable
-rand_id_673936
+rand_id_637640
 expandx,border=8
 
 1
@@ -3214,7 +3214,7 @@ mixing-console
 0
 1
 ControlTable
-rand_id_637640
+rand_id_347115
 
 
 1
@@ -3225,7 +3225,7 @@ rand_id_637640
 -1
 4
 ControlTable
-rand_id_347115
+rand_id_184622
 
 
 1
@@ -3269,7 +3269,7 @@ vertical,expandy
 -1
 0
 Separator
-rand_id_184622
+rand_id_609105
 vertical
 
 1
@@ -3314,7 +3314,7 @@ new_dialog
 0
 1
 ControlTable
-rand_id_609105
+rand_id_627157
 
 
 1
@@ -3336,7 +3336,7 @@ nd_g_frequency
 -1
 1
 ControlTable
-rand_id_627157
+rand_id_730729
 
 
 1
@@ -3380,7 +3380,7 @@ nd_g_track
 -1
 1
 ControlTable
-rand_id_730729
+rand_id_328374
 
 
 1
@@ -3424,7 +3424,7 @@ nd_g_metronome
 -1
 1
 ControlTable
-rand_id_328374
+rand_id_740438
 
 
 1
@@ -3556,7 +3556,7 @@ sub_beats
 -1
 0
 ControlTable
-rand_id_740438
+rand_id_202212
 buttonbar
 
 1
@@ -3601,7 +3601,7 @@ pause_add_dialog
 0
 1
 ControlTable
-rand_id_202212
+rand_id_920914
 
 
 1
@@ -3612,7 +3612,7 @@ rand_id_202212
 -1
 2
 ControlTable
-rand_id_920914
+rand_id_684756
 
 
 1
@@ -3656,7 +3656,7 @@ t_s
 -1
 0
 ControlTable
-rand_id_684756
+rand_id_653130
 buttonbar
 
 1
@@ -3701,7 +3701,7 @@ pause_edit_dialog
 0
 1
 ControlTable
-rand_id_653130
+rand_id_257265
 
 
 1
@@ -3712,7 +3712,7 @@ rand_id_653130
 -1
 2
 ControlTable
-rand_id_257265
+rand_id_532440
 
 
 1
@@ -3756,7 +3756,7 @@ t_s
 -1
 0
 ControlTable
-rand_id_532440
+rand_id_87643
 buttonbar
 
 1
@@ -4159,7 +4159,7 @@ raw_config_dialog
 0
 1
 ControlTable
-rand_id_87643
+rand_id_260496
 
 
 1
@@ -4170,7 +4170,7 @@ rand_id_87643
 -1
 2
 ControlTable
-rand_id_260496
+rand_id_877383
 
 
 1
@@ -4247,7 +4247,7 @@ sample_rate
 -1
 0
 ControlTable
-rand_id_877383
+rand_id_686124
 buttonbar
 
 1
@@ -4292,7 +4292,7 @@ record_dialog
 0
 1
 ControlTable
-rand_id_686124
+rand_id_93740
 
 
 1
@@ -4314,7 +4314,7 @@ rdt_source
 -1
 1
 ControlTable
-rand_id_93740
+rand_id_111275
 
 
 1
@@ -4325,7 +4325,7 @@ rand_id_93740
 -1
 2
 ControlTable
-rand_id_111275
+rand_id_361600
 
 
 1
@@ -4380,7 +4380,7 @@ rdt_capture
 -1
 1
 ControlTable
-rand_id_361600
+rand_id_576690
 
 
 1
@@ -4391,7 +4391,7 @@ rand_id_361600
 -1
 2
 ControlTable
-rand_id_576690
+rand_id_593211
 noexpandy
 
 1
@@ -4424,7 +4424,7 @@ height=25
 -1
 0
 ControlTable
-rand_id_593211
+rand_id_666556
 
 
 1
@@ -4490,7 +4490,7 @@ expandx
 -1
 0
 ControlTable
-rand_id_666556
+rand_id_288777
 buttonbar
 
 1
@@ -4535,7 +4535,7 @@ allow-parent
 0
 1
 ControlTable
-rand_id_288777
+rand_id_775767
 
 
 1
@@ -4557,7 +4557,7 @@ format=iTttC,select-multi
 -1
 0
 ControlTable
-rand_id_775767
+rand_id_288379
 
 
 1
@@ -4656,7 +4656,7 @@ smd_group_edit
 -1
 1
 ControlTable
-rand_id_288379
+rand_id_329642
 
 
 1
@@ -4690,7 +4690,7 @@ sample_ref_dialog
 0
 1
 ControlTable
-rand_id_329642
+rand_id_189750
 
 
 1
@@ -4699,7 +4699,7 @@ rand_id_329642
 1
 5
 -1
-6
+5
 Group
 ld_t_name
 
@@ -4756,7 +4756,7 @@ ld_t_volume
 -1
 1
 ControlTable
-rand_id_189750
+rand_id_984363
 
 
 1
@@ -4799,90 +4799,13 @@ mute
 1
 -1
 0
-Group
-ld_t_repetition
-
-
-1
-0
-3
-1
-1
--1
-1
-ControlTable
-rand_id_984363
-
-
-1
-0
-0
-3
-2
--1
-5
-Text
-ld_t_repnum
-
-
-1
-0
-0
-1
-1
--1
-0
-SpinButton
-repnum
-expandx
-
-1
-1
-0
-1
-1
--1
-0
-Text
-ld_t_repdelay
-
-
-1
-0
-1
-1
-1
--1
-0
-SpinButton
-repdelay
-
-
-1
-1
-1
-1
-1
--1
-0
-Text
-ms
-
-
-1
-2
-1
-1
-1
--1
-0
 Text
 rand_id_3578
 expandy
 
 1
 0
-4
+3
 1
 1
 -1
@@ -4893,7 +4816,7 @@ ld_t_edit
 
 1
 0
-5
+4
 1
 1
 -1
@@ -6563,7 +6486,7 @@ hui:ok
 // Language
 English
 // Number Of IDs
-339
+333
 // Text
 /cancel
 Cancel
@@ -6606,9 +6529,6 @@ Track
 
 /exit
 Exit
-
-/ms
-ms
 
 /new
 New...
@@ -7354,15 +7274,6 @@ Edit
 sample_ref_dialog/ld_t_name
 Name
 
-sample_ref_dialog/ld_t_repdelay
-Delay
-
-sample_ref_dialog/ld_t_repetition
-Repetitions
-
-sample_ref_dialog/ld_t_repnum
-Count
-
 sample_ref_dialog/ld_t_track
 Track
 
@@ -7371,12 +7282,6 @@ Volume
 
 sample_ref_dialog/mute
 Muted
-
-sample_ref_dialog/repdelay
-0\\0\\\\0.1
-
-sample_ref_dialog/repnum
-1\\1
 
 sample_ref_dialog/sample_ref_dialog
 Sample

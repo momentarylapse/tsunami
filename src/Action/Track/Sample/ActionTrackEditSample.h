@@ -15,14 +15,12 @@ struct EditSampleRefData
 {
 	float volume;
 	bool mute;
-	int rep_num;
-	int rep_delay;
 };
 
 class ActionTrackEditSample : public ActionMergable<EditSampleRefData>
 {
 public:
-	ActionTrackEditSample(Track *t, int index, float volume, bool mute, int rep_num, int rep_delay);
+	ActionTrackEditSample(Track *t, int index, float volume, bool mute);
 	virtual ~ActionTrackEditSample();
 
 	virtual void *execute(Data *d);

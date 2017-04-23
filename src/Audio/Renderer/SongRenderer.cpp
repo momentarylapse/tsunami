@@ -80,19 +80,14 @@ void SongRenderer::bb_render_audio_track_no_fx(BufferBox &buf, Track *t)
 		if (s->muted)
 			continue;
 
-		// can be repetitious!
-		for (int i=0;i<s->rep_num+1;i++){
-			Range rep_range = range_cur;
-			rep_range.move(-s->rep_delay * i);
-			Range intersect_range;
-			int bpos;
-			if (!intersect_sub(s, rep_range, intersect_range, bpos))
-				continue;
+		Range intersect_range;
+		int bpos;
+		if (!intersect_sub(s, range_cur, intersect_range, bpos))
+			continue;
 
-			buf.make_own();
-			bpos = s->pos + s->rep_delay * i - range_cur.start();
-			buf.add(*s->buf, bpos, s->volume * s->origin->volume, 0);
-		}
+		buf.make_own();
+		bpos = s->pos - range_cur.start();
+		buf.add(*s->buf, bpos, s->volume * s->origin->volume, 0);
 	}
 }
 

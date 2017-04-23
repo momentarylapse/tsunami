@@ -24,8 +24,6 @@ SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 	event("volume", this, &SampleRefConsole::onVolume);
 	event("mute", this, &SampleRefConsole::onMute);
 	event("level_track", this, &SampleRefConsole::onTrack);
-	event("repnum", this, &SampleRefConsole::onRepNum);
-	event("repdelay", this, &SampleRefConsole::onRepDelay);
 
 	event("edit_song", this, &SampleRefConsole::onEditSong);
 	event("edit_track", this, &SampleRefConsole::onEditTrack);
@@ -53,7 +51,7 @@ void SampleRefConsole::onMute()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->editSampleRef(index, sample->volume, isChecked(""), sample->rep_num, sample->rep_delay);
+	track->editSampleRef(index, sample->volume, isChecked(""));
 
 	enable("volume", !sample->muted);
 	subscribe(sample);
@@ -70,28 +68,7 @@ void SampleRefConsole::onVolume()
 		return;
 	unsubscribe(sample);
 	int index = sample->get_index();
-	track->editSampleRef(index, db2amplitude(getFloat("")), sample->muted, sample->rep_num, sample->rep_delay);
-	subscribe(sample);
-}
-
-void SampleRefConsole::onRepNum()
-{
-	if (!sample)
-		return;
-	unsubscribe(sample);
-	int index = sample->get_index();
-	track->editSampleRef(index, sample->volume, sample->muted, getInt("repnum") - 1, sample->rep_delay);
-	enable("repdelay", sample->rep_num > 0);
-	subscribe(sample);
-}
-
-void SampleRefConsole::onRepDelay()
-{
-	if (!sample)
-		return;
-	unsubscribe(sample);
-	int index = sample->get_index();
-	track->editSampleRef(index, sample->volume, sample->muted, sample->rep_num, (int)(getFloat("repdelay") * (float)sample->owner->sample_rate / 1000.0f));
+	track->editSampleRef(index, db2amplitude(getFloat("")), sample->muted);
 	subscribe(sample);
 }
 
@@ -128,13 +105,10 @@ void SampleRefConsole::loadData()
 	check("mute", sample->muted);
 	setFloat("volume", amplitude2db(sample->volume));
 	enable("volume", !sample->muted);
-	reset("level_track");
+	reset("track");
 	for (Track *t: song->tracks)
-		addString("level_track", t->getNiceName());
-	setInt("level_track", sample->track_no);
-	setInt("repnum", sample->rep_num + 1);
-	setFloat("repdelay", (float)sample->rep_delay / (float)sample->owner->sample_rate * 1000.0f);
-	enable("repdelay", sample->rep_num > 0);
+		addString("track", t->getNiceName());
+	setInt("track", sample->track_no);
 }
 
 void SampleRefConsole::onUpdate(Observable *o, const string &message)

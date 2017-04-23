@@ -17,7 +17,7 @@
 
 
 string AppName = "Tsunami";
-string AppVersion = "0.6.93.0";
+string AppVersion = "0.6.93.1";
 
 Tsunami *tsunami = NULL;
 
@@ -110,7 +110,11 @@ bool Tsunami::handleCLIArguments(const Array<string> &args)
 			msg_write(format("samples: %d", song->getRange().length));
 			msg_write("length: " + song->get_time_str(song->getRange().length));
 			msg_write(format("tracks: %d", song->tracks.num));
-			for (Tag &t : song->tags)
+			int n = 0;
+			for (Track *t: song->tracks)
+				n += t->samples.num;
+			msg_write(format("refs: %d / %d", n, song->samples.num));
+			for (Tag &t: song->tags)
 				msg_write("tag: " + t.key + " = " + t.value);
 		}
 		delete(song);

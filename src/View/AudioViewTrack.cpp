@@ -208,11 +208,6 @@ void AudioViewTrack::drawSample(Painter *c, SampleRef *s)
 
 	drawSampleFrame(c, s, col, 0);
 
-	color col2 = col;
-	col2.a *= 0.5f;
-	for (int i=0;i<s->rep_num;i++)
-		drawSampleFrame(c, s, col2, (i + 1) * s->rep_delay);
-
 	// buffer
 	if (s->type() == Track::TYPE_AUDIO)
 		drawBuffer(c, *s->buf, view->cam.pos - (double)s->pos, col);

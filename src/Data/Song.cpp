@@ -26,25 +26,25 @@
 #include <math.h>
 #include "Song.h"
 
+#include "../Action/Bar/ActionBarAdd.h"
+#include "../Action/Bar/ActionBarDelete.h"
+#include "../Action/Bar/ActionBarEdit.h"
+#include "../Action/Layer/ActionLayerAdd.h"
+#include "../Action/Layer/ActionLayerDelete.h"
+#include "../Action/Layer/ActionLayerMerge.h"
+#include "../Action/Layer/ActionLayerRename.h"
+#include "../Action/Sample/ActionSampleAdd.h"
+#include "../Action/Sample/ActionSampleDelete.h"
+#include "../Action/Sample/ActionSampleEditName.h"
+#include "../Action/Sample/ActionSampleScale.h"
 #include "../Action/Song/ActionSongDeleteSelection.h"
-#include "../Action/Song/Bar/ActionSongAddBar.h"
-#include "../Action/Song/Bar/ActionSongEditBar.h"
-#include "../Action/Song/Bar/ActionSongDeleteBar.h"
 #include "../Action/Song/Data/ActionSongChangeAllTrackVolumes.h"
 #include "../Action/Song/Data/ActionSongSetDefaultFormat.h"
 #include "../Action/Song/Data/ActionSongSetSampleRate.h"
 #include "../Action/Song/Data/ActionSongSetVolume.h"
-#include "../Action/Song/Level/ActionSongAddLevel.h"
-#include "../Action/Song/Level/ActionSongDeleteLevel.h"
-#include "../Action/Song/Level/ActionSongRenameLevel.h"
-#include "../Action/Song/Level/ActionSongMergeLevels.h"
-#include "../Action/Song/Sample/ActionSongAddSample.h"
-#include "../Action/Song/Sample/ActionSongDeleteSample.h"
-#include "../Action/Song/Sample/ActionSongSampleEditName.h"
-#include "../Action/Song/Sample/ActionSampleScale.h"
-#include "../Action/Song/Tag/ActionSongEditTag.h"
-#include "../Action/Song/Tag/ActionSongAddTag.h"
-#include "../Action/Song/Tag/ActionSongDeleteTag.h"
+#include "../Action/Tag/ActionTagAdd.h"
+#include "../Action/Tag/ActionTagDelete.h"
+#include "../Action/Tag/ActionTagEdit.h"
 
 float amplitude2db(float amp)
 {
@@ -83,7 +83,7 @@ Song::Song() :
 	default_format = SAMPLE_FORMAT_16;
 	compression = 0;
 	volume = 1;
-	level_names.add("");
+	layer_names.add("");
 }
 
 void Song::__init__()
@@ -106,26 +106,26 @@ const string Song::MESSAGE_ADD_CURVE = "AddCurve";
 const string Song::MESSAGE_DELETE_CURVE = "DeleteCurve";
 const string Song::MESSAGE_ADD_SAMPLE = "AddSample";
 const string Song::MESSAGE_DELETE_SAMPLE = "DeleteSample";
-const string Song::MESSAGE_ADD_LEVEL = "AddLevel";
-const string Song::MESSAGE_EDIT_LEVEL = "EditLevel";
-const string Song::MESSAGE_DELETE_LEVEL = "DeleteLevel";
+const string Song::MESSAGE_ADD_LAYER = "AddLayer";
+const string Song::MESSAGE_EDIT_LAYER = "EditLayer";
+const string Song::MESSAGE_DELETE_LAYER = "DeleteLayer";
 const string Song::MESSAGE_EDIT_BARS = "EditBars";
 
 
 void Song::addTag(const string &key, const string &value)
 {
 	if ((key != "") and (value != ""))
-		execute(new ActionSongAddTag(Tag(key, value)));
+		execute(new ActionTagAdd(Tag(key, value)));
 }
 
 void Song::editTag(int index, const string &key, const string &value)
 {
-	execute(new ActionSongEditTag(index, Tag(key, value)));
+	execute(new ActionTagEdit(index, Tag(key, value)));
 }
 
 void Song::deleteTag(int index)
 {
-	execute(new ActionSongDeleteTag(index));
+	execute(new ActionTagDelete(index));
 }
 
 void Song::addEffect(Effect *effect)
@@ -230,8 +230,8 @@ void Song::reset()
 		delete(c);
 	curves.clear();
 
-	level_names.clear();
-	level_names.add("");
+	layer_names.clear();
+	layer_names.add("");
 
 	action_manager->reset();
 
@@ -375,10 +375,10 @@ void Song::updatePeaks()
 	//msg_write(format("up %f", debug_timer.get()));
 }
 
-void Song::insertSelectedSamples(const SongSelection &sel, int level_no)
+void Song::insertSelectedSamples(const SongSelection &sel, int layer_no)
 {
 	if (sel.getNumSamples() > 0)
-		execute(new ActionTrackInsertSelectedSamples(sel, level_no));
+		execute(new ActionTrackInsertSelectedSamples(sel, layer_no));
 }
 
 void Song::deleteSelectedSamples(const SongSelection &sel)
@@ -392,54 +392,54 @@ void Song::deleteSelectedSamples(const SongSelection &sel)
 	action_manager->endActionGroup();
 }
 
-void Song::addLevel(const string &name)
+void Song::addLayer(const string &name)
 {
-	execute(new ActionSongAddLevel(name));
+	execute(new ActionLayerAdd(name));
 }
 
-void Song::deleteLevel(int index)
+void Song::deleteLayer(int index)
 {
-	if (level_names.num < 2)
-		throw SongException(_("At least one level has to exist."));
-	execute(new ActionSongDeleteLevel(index));
+	if (layer_names.num < 2)
+		throw SongException(_("At least one layer has to exist."));
+	execute(new ActionLayerDelete(index));
 }
 
-void Song::mergeLevels(int source, int target)
+void Song::mergeLayers(int source, int target)
 {
-	if (level_names.num < 2)
-		throw SongException(_("At least one level has to exist."));
+	if (layer_names.num < 2)
+		throw SongException(_("At least one layer has to exist."));
 	if (source == target)
-		throw SongException(_("Can't merge a level with itself."));
-	execute(new ActionSongMergeLevels(source, target));
+		throw SongException(_("Can't merge a layer with itself."));
+	execute(new ActionLayerMerge(source, target));
 }
 
-void Song::renameLevel(int index, const string &name)
+void Song::renameLayer(int index, const string &name)
 {
-	execute(new ActionSongRenameLevel(index, name));
+	execute(new ActionLayerRename(index, name));
 }
 
 void Song::deleteTrack(int index)
 {
 	if (tracks.num < 2)
-		throw SongException(_("At least one level has to exist."));
+		throw SongException(_("At least one layer has to exist."));
 	execute(new ActionTrackDelete(index));
 }
 
 Sample *Song::addSample(const string &name, BufferBox &buf)
 {
-	return (Sample*)execute(new ActionSongAddSample(name, buf));
+	return (Sample*)execute(new ActionSampleAdd(name, buf));
 }
 
 void Song::deleteSample(Sample *s)
 {
 	if (s->ref_count > 0)
 		throw SongException(_("Can only delete samples which are unused."));
-	execute(new ActionSongDeleteSample(s));
+	execute(new ActionSampleDelete(s));
 }
 
 void Song::editSampleName(Sample *s, const string &name)
 {
-	execute(new ActionSongSampleEditName(s, name));
+	execute(new ActionSampleEditName(s, name));
 }
 
 void Song::scaleSample(Sample *s, int new_size, int method)
@@ -447,16 +447,16 @@ void Song::scaleSample(Sample *s, int new_size, int method)
 	execute(new ActionSampleScale(s, new_size, method));
 }
 
-void Song::deleteSelection(const SongSelection &sel, int level_no, bool all_levels)
+void Song::deleteSelection(const SongSelection &sel, int layer_no, bool all_layers)
 {
 	if (!sel.range.empty())
-		execute(new ActionSongDeleteSelection(level_no, sel, all_levels));
+		execute(new ActionSongDeleteSelection(layer_no, sel, all_layers));
 }
 
-void Song::createSamplesFromSelection(const SongSelection &sel, int level_no)
+void Song::createSamplesFromSelection(const SongSelection &sel, int layer_no)
 {
 	if (!sel.range.empty())
-		execute(new ActionTrackSampleFromSelection(sel, level_no));
+		execute(new ActionTrackSampleFromSelection(sel, layer_no));
 }
 
 void Song::addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi)
@@ -467,9 +467,9 @@ void Song::addBar(int index, float bpm, int beats, int sub_beats, bool affect_mi
 	b.type = b.TYPE_BAR;
 	b.length = (int)((float)b.num_beats * (float)sample_rate * 60.0f / bpm);
 	if (index >= 0)
-		execute(new ActionSongAddBar(index, b, affect_midi));
+		execute(new ActionBarAdd(index, b, affect_midi));
 	else
-		execute(new ActionSongAddBar(bars.num, b, affect_midi));
+		execute(new ActionBarAdd(bars.num, b, affect_midi));
 }
 
 void Song::addPause(int index, float time, bool affect_midi)
@@ -480,19 +480,19 @@ void Song::addPause(int index, float time, bool affect_midi)
 	b.type = b.TYPE_PAUSE;
 	b.length = (int)((float)sample_rate * time);
 	if (index >= 0)
-		execute(new ActionSongAddBar(index, b, affect_midi));
+		execute(new ActionBarAdd(index, b, affect_midi));
 	else
-		execute(new ActionSongAddBar(bars.num, b, affect_midi));
+		execute(new ActionBarAdd(bars.num, b, affect_midi));
 }
 
 void Song::editBar(int index, BarPattern &p, bool affect_midi)
 {
-	execute(new ActionSongEditBar(index, p, affect_midi));
+	execute(new ActionBarEdit(index, p, affect_midi));
 }
 
 void Song::deleteBar(int index, bool affect_midi)
 {
-	execute(new ActionSongDeleteBar(index, affect_midi));
+	execute(new ActionBarDelete(index, affect_midi));
 }
 
 void Song::invalidateAllPeaks()
@@ -566,11 +566,11 @@ int Song::getNextBeat(int pos)
 	return bars.getNextBeat(pos);
 }
 
-string Song::getNiceLevelName(int index)
+string Song::getNiceLayerName(int index)
 {
-	if (level_names[index].num > 0)
-		return level_names[index];
-	return format(_("Level %d"), index + 1);
+	if (layer_names[index].num > 0)
+		return layer_names[index];
+	return format(_("Layer %d"), index + 1);
 }
 
 string Song::getTag(const string &key)

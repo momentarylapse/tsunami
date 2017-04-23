@@ -3,30 +3,30 @@
 BIN = ../tsunami
 all : $(BIN)
 OBJ = \
- Action/Song/Bar/ActionSong__AddBar.o\
- Action/Song/Bar/ActionSong__DeleteBar.o\
- Action/Song/Bar/ActionSong__EditBar.o\
- Action/Song/Bar/ActionSong__ScaleData.o\
- Action/Song/Bar/ActionSong__ShiftData.o\
- Action/Song/Bar/ActionSongAddBar.o\
- Action/Song/Bar/ActionSongDeleteBar.o\
- Action/Song/Bar/ActionSongEditBar.o\
+ Action/Bar/ActionBar__Add.o\
+ Action/Bar/ActionBar__Delete.o\
+ Action/Bar/ActionBar__Edit.o\
+ Action/Bar/Action__ScaleData.o\
+ Action/Bar/Action__ShiftData.o\
+ Action/Bar/ActionBarAdd.o\
+ Action/Bar/ActionBarDelete.o\
+ Action/Bar/ActionBarEdit.o\
  Action/Song/Data/ActionSongChangeAllTrackVolumes.o\
  Action/Song/Data/ActionSongSetDefaultFormat.o\
  Action/Song/Data/ActionSongSetSampleRate.o\
  Action/Song/Data/ActionSongSetVolume.o\
- Action/Song/Level/ActionSong__DeleteLevel.o\
- Action/Song/Level/ActionSongAddLevel.o\
- Action/Song/Level/ActionSongDeleteLevel.o\
- Action/Song/Level/ActionSongMergeLevels.o\
- Action/Song/Level/ActionSongRenameLevel.o\
- Action/Song/Sample/ActionSongAddSample.o\
- Action/Song/Sample/ActionSongDeleteSample.o\
- Action/Song/Sample/ActionSongSampleEditName.o\
- Action/Song/Sample/ActionSampleScale.o\
- Action/Song/Tag/ActionSongAddTag.o\
- Action/Song/Tag/ActionSongDeleteTag.o\
- Action/Song/Tag/ActionSongEditTag.o\
+ Action/Layer/ActionLayer__Delete.o\
+ Action/Layer/ActionLayerAdd.o\
+ Action/Layer/ActionLayerDelete.o\
+ Action/Layer/ActionLayerMerge.o\
+ Action/Layer/ActionLayerRename.o\
+ Action/Sample/ActionSampleAdd.o\
+ Action/Sample/ActionSampleDelete.o\
+ Action/Sample/ActionSampleEditName.o\
+ Action/Sample/ActionSampleScale.o\
+ Action/Tag/ActionTagAdd.o\
+ Action/Tag/ActionTagDelete.o\
+ Action/Tag/ActionTagEdit.o\
  Action/Song/ActionSongDeleteSelection.o\
  Action/Track/Buffer/ActionTrack__AbsorbBufferBox.o\
  Action/Track/Buffer/ActionTrack__AddBufferBox.o\
@@ -279,7 +279,7 @@ OBJ = \
  View/SideBar/CaptureConsole.o\
  View/SideBar/CurveConsole.o\
  View/SideBar/FxConsole.o\
- View/SideBar/LevelConsole.o\
+ View/SideBar/LayerConsole.o\
  View/SideBar/MidiEditorConsole.o\
  View/SideBar/MidiFxConsole.o\
  View/SideBar/SampleManagerConsole.o\
@@ -306,29 +306,29 @@ CXXFLAGSLINKING = -std=c++11 `pkg-config --cflags --libs gtk+-3.0` -lX11 -lz -lu
 $(BIN) : $(OBJ)
 	$(CPP) $(OBJ) -o $(BIN) $(CXXFLAGSLINKING)
 
-Action/Song/Bar/ActionSong__AddBar.o : Action/Song/Bar/ActionSong__AddBar.cpp
-	$(CPP) -c Action/Song/Bar/ActionSong__AddBar.cpp -o $@ $(CXXFLAGS)
+Action/Bar/ActionBar__Add.o : Action/Bar/ActionBar__Add.cpp
+	$(CPP) -c Action/Bar/ActionBar__Add.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Bar/ActionSong__DeleteBar.o : Action/Song/Bar/ActionSong__DeleteBar.cpp
-	$(CPP) -c Action/Song/Bar/ActionSong__DeleteBar.cpp -o $@ $(CXXFLAGS)
+Action/Bar/ActionBar__Delete.o : Action/Bar/ActionBar__Delete.cpp
+	$(CPP) -c Action/Bar/ActionBar__Delete.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Bar/ActionSong__EditBar.o : Action/Song/Bar/ActionSong__EditBar.cpp
-	$(CPP) -c Action/Song/Bar/ActionSong__EditBar.cpp -o $@ $(CXXFLAGS)
+Action/Bar/ActionBar__Edit.o : Action/Bar/ActionBar__Edit.cpp
+	$(CPP) -c Action/Bar/ActionBar__Edit.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Bar/ActionSong__ScaleData.o : Action/Song/Bar/ActionSong__ScaleData.cpp
-	$(CPP) -c Action/Song/Bar/ActionSong__ScaleData.cpp -o $@ $(CXXFLAGS)
+Action/Bar/Action__ScaleData.o : Action/Bar/Action__ScaleData.cpp
+	$(CPP) -c Action/Bar/Action__ScaleData.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Bar/ActionSong__ShiftData.o : Action/Song/Bar/ActionSong__ShiftData.cpp
-	$(CPP) -c Action/Song/Bar/ActionSong__ShiftData.cpp -o $@ $(CXXFLAGS)
+Action/Bar/Action__ShiftData.o : Action/Bar/Action__ShiftData.cpp
+	$(CPP) -c Action/Bar/Action__ShiftData.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Bar/ActionSongAddBar.o : Action/Song/Bar/ActionSongAddBar.cpp
-	$(CPP) -c Action/Song/Bar/ActionSongAddBar.cpp -o $@ $(CXXFLAGS)
+Action/Bar/ActionBarAdd.o : Action/Bar/ActionBarAdd.cpp
+	$(CPP) -c Action/Bar/ActionBarAdd.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Bar/ActionSongDeleteBar.o : Action/Song/Bar/ActionSongDeleteBar.cpp
-	$(CPP) -c Action/Song/Bar/ActionSongDeleteBar.cpp -o $@ $(CXXFLAGS)
+Action/Bar/ActionBarDelete.o : Action/Bar/ActionBarDelete.cpp
+	$(CPP) -c Action/Bar/ActionBarDelete.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Bar/ActionSongEditBar.o : Action/Song/Bar/ActionSongEditBar.cpp
-	$(CPP) -c Action/Song/Bar/ActionSongEditBar.cpp -o $@ $(CXXFLAGS)
+Action/Bar/ActionBarEdit.o : Action/Bar/ActionBarEdit.cpp
+	$(CPP) -c Action/Bar/ActionBarEdit.cpp -o $@ $(CXXFLAGS)
 
 Action/Song/Data/ActionSongChangeAllTrackVolumes.o : Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp
 	$(CPP) -c Action/Song/Data/ActionSongChangeAllTrackVolumes.cpp -o $@ $(CXXFLAGS)
@@ -342,41 +342,41 @@ Action/Song/Data/ActionSongSetSampleRate.o : Action/Song/Data/ActionSongSetSampl
 Action/Song/Data/ActionSongSetVolume.o : Action/Song/Data/ActionSongSetVolume.cpp
 	$(CPP) -c Action/Song/Data/ActionSongSetVolume.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Level/ActionSong__DeleteLevel.o : Action/Song/Level/ActionSong__DeleteLevel.cpp
-	$(CPP) -c Action/Song/Level/ActionSong__DeleteLevel.cpp -o $@ $(CXXFLAGS)
+Action/Layer/ActionLayer__Delete.o : Action/Layer/ActionLayer__Delete.cpp
+	$(CPP) -c Action/Layer/ActionLayer__Delete.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Level/ActionSongAddLevel.o : Action/Song/Level/ActionSongAddLevel.cpp
-	$(CPP) -c Action/Song/Level/ActionSongAddLevel.cpp -o $@ $(CXXFLAGS)
+Action/Layer/ActionLayerAdd.o : Action/Layer/ActionLayerAdd.cpp
+	$(CPP) -c Action/Layer/ActionLayerAdd.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Level/ActionSongDeleteLevel.o : Action/Song/Level/ActionSongDeleteLevel.cpp
-	$(CPP) -c Action/Song/Level/ActionSongDeleteLevel.cpp -o $@ $(CXXFLAGS)
+Action/Layer/ActionLayerDelete.o : Action/Layer/ActionLayerDelete.cpp
+	$(CPP) -c Action/Layer/ActionLayerDelete.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Level/ActionSongMergeLevels.o : Action/Song/Level/ActionSongMergeLevels.cpp
-	$(CPP) -c Action/Song/Level/ActionSongMergeLevels.cpp -o $@ $(CXXFLAGS)
+Action/Layer/ActionLayerMerge.o : Action/Layer/ActionLayerMerge.cpp
+	$(CPP) -c Action/Layer/ActionLayerMerge.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Level/ActionSongRenameLevel.o : Action/Song/Level/ActionSongRenameLevel.cpp
-	$(CPP) -c Action/Song/Level/ActionSongRenameLevel.cpp -o $@ $(CXXFLAGS)
+Action/Layer/ActionLayerRename.o : Action/Layer/ActionLayerRename.cpp
+	$(CPP) -c Action/Layer/ActionLayerRename.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Sample/ActionSongAddSample.o : Action/Song/Sample/ActionSongAddSample.cpp
-	$(CPP) -c Action/Song/Sample/ActionSongAddSample.cpp -o $@ $(CXXFLAGS)
+Action/Sample/ActionSampleAdd.o : Action/Sample/ActionSampleAdd.cpp
+	$(CPP) -c Action/Sample/ActionSampleAdd.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Sample/ActionSongDeleteSample.o : Action/Song/Sample/ActionSongDeleteSample.cpp
-	$(CPP) -c Action/Song/Sample/ActionSongDeleteSample.cpp -o $@ $(CXXFLAGS)
+Action/Sample/ActionSongSampleDelete.o : Action/Sample/ActionSampleDelete.cpp
+	$(CPP) -c Action/Sample/ActionSampleDelete.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Sample/ActionSongSampleEditName.o : Action/Song/Sample/ActionSongSampleEditName.cpp
-	$(CPP) -c Action/Song/Sample/ActionSongSampleEditName.cpp -o $@ $(CXXFLAGS)
+Action/Sample/ActionSongSampleEditName.o : Action/Sample/ActionSampleEditName.cpp
+	$(CPP) -c Action/Sample/ActionSongSampleEditName.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Sample/ActionSampleScale.o : Action/Song/Sample/ActionSampleScale.cpp
-	$(CPP) -c Action/Song/Sample/ActionSampleScale.cpp -o $@ $(CXXFLAGS)
+Action/Sample/ActionSampleScale.o : Action/Sample/ActionSampleScale.cpp
+	$(CPP) -c Action/Sample/ActionSampleScale.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Tag/ActionSongAddTag.o : Action/Song/Tag/ActionSongAddTag.cpp
-	$(CPP) -c Action/Song/Tag/ActionSongAddTag.cpp -o $@ $(CXXFLAGS)
+Action/Tag/ActionTagAdd.o : Action/Tag/ActionTagAdd.cpp
+	$(CPP) -c Action/Tag/ActionTagAdd.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Tag/ActionSongDeleteTag.o : Action/Song/Tag/ActionSongDeleteTag.cpp
-	$(CPP) -c Action/Song/Tag/ActionSongDeleteTag.cpp -o $@ $(CXXFLAGS)
+Action/Tag/ActionTagDelete.o : Action/Tag/ActionTagDelete.cpp
+	$(CPP) -c Action/Tag/ActionTagDelete.cpp -o $@ $(CXXFLAGS)
 
-Action/Song/Tag/ActionSongEditTag.o : Action/Song/Tag/ActionSongEditTag.cpp
-	$(CPP) -c Action/Song/Tag/ActionSongEditTag.cpp -o $@ $(CXXFLAGS)
+Action/Tag/ActionTagEdit.o : Action/Tag/ActionTagEdit.cpp
+	$(CPP) -c Action/Tag/ActionTagEdit.cpp -o $@ $(CXXFLAGS)
 
 Action/Song/ActionSongDeleteSelection.o : Action/Song/ActionSongDeleteSelection.cpp
 	$(CPP) -c Action/Song/ActionSongDeleteSelection.cpp -o $@ $(CXXFLAGS)
@@ -1131,8 +1131,8 @@ View/SideBar/CurveConsole.o : View/SideBar/CurveConsole.cpp
 View/SideBar/FxConsole.o : View/SideBar/FxConsole.cpp
 	$(CPP) -c View/SideBar/FxConsole.cpp -o $@ $(CXXFLAGS)
 
-View/SideBar/LevelConsole.o : View/SideBar/LevelConsole.cpp
-	$(CPP) -c View/SideBar/LevelConsole.cpp -o $@ $(CXXFLAGS)
+View/SideBar/LayerConsole.o : View/SideBar/LayerConsole.cpp
+	$(CPP) -c View/SideBar/LayerConsole.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/MidiEditorConsole.o : View/SideBar/MidiEditorConsole.cpp
 	$(CPP) -c View/SideBar/MidiEditorConsole.cpp -o $@ $(CXXFLAGS)

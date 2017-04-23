@@ -23,7 +23,7 @@ void ActionTrack__DeleteBufferBox::undo(Data *d)
 	Track *t = a->get_track(track_no);
 
 	// restore
-	t->levels[level_no].buffers.insert(buf, index);
+	t->layers[level_no].buffers.insert(buf, index);
 
 	// clean up
 	buf.clear();
@@ -37,16 +37,16 @@ void *ActionTrack__DeleteBufferBox::execute(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 	assert(level_no >= 0);
-	assert(level_no < t->levels.num);
-	BufferBox &b = t->levels[level_no].buffers[index];
+	assert(level_no < t->layers.num);
+	BufferBox &b = t->layers[level_no].buffers[index];
 
-	assert(index >= 0 and index < t->levels[level_no].buffers.num);
+	assert(index >= 0 and index < t->layers[level_no].buffers.num);
 
 	// save data
 	buf = b;
 
 	// delete
-	t->levels[level_no].buffers.erase(index);
+	t->layers[level_no].buffers.erase(index);
 	return NULL;
 }
 

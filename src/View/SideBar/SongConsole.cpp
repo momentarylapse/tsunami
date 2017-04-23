@@ -53,7 +53,7 @@ SongConsole::SongConsole(Song *a) :
 	event("add_tag", this, &SongConsole::onAddTag);
 	event("delete_tag", this, &SongConsole::onDeleteTag);
 
-	event("edit_levels", this, &SongConsole::onEditLevels);
+	event("edit_layers", this, &SongConsole::onEditLayers);
 	event("edit_samples", this, &SongConsole::onEditSamples);
 	event("edit_fx", this, &SongConsole::onEditFx);
 
@@ -137,9 +137,9 @@ void SongConsole::onDeleteTag()
 		song->deleteTag(s);
 }
 
-void SongConsole::onEditLevels()
+void SongConsole::onEditLayers()
 {
-	((SideBar*)parent)->open(SideBar::LEVEL_CONSOLE);
+	((SideBar*)parent)->open(SideBar::LAYER_CONSOLE);
 }
 
 void SongConsole::onEditSamples()

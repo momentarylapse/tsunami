@@ -6,7 +6,6 @@
  */
 
 #include "SideBar.h"
-#include "LevelConsole.h"
 #include "TrackConsole.h"
 #include "FxConsole.h"
 #include "CurveConsole.h"
@@ -18,6 +17,7 @@
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
 #include "CaptureConsole.h"
+#include "LayerConsole.h"
 
 SideBar::SideBar(AudioView *view, Song *song) :
 	Observable("SideBar")
@@ -38,7 +38,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	addLabel("!big,expandx,center\\...", 1, 0, 0, 0, "title");
 
 	song_console = new SongConsole(song);
-	level_console = new LevelConsole(song, view);
+	layer_console = new LayerConsole(song, view);
 	sample_manager = new SampleManagerConsole(song, view);
 	global_fx_console = new FxConsole(NULL, song);
 	track_console = new TrackConsole(view);
@@ -51,7 +51,7 @@ SideBar::SideBar(AudioView *view, Song *song) :
 	capture_console = new CaptureConsole(song, view);
 
 	addConsole(song_console);
-	addConsole(level_console);
+	addConsole(layer_console);
 	addConsole(sample_manager);
 	addConsole(global_fx_console);
 	addConsole(track_console);

@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef ACTIONSONGDELETESELECTION_H_
-#define ACTIONSONGDELETESELECTION_H_
+#ifndef SRC_ACTION_SONG_ACTIONSONGDELETESELECTION_H_
+#define SRC_ACTION_SONG_ACTIONSONGDELETESELECTION_H_
 
 #include "../../Data/Song.h"
 #include "../ActionGroup.h"
@@ -16,14 +16,14 @@ class SongSelection;
 class ActionSongDeleteSelection : public ActionGroup
 {
 public:
-	ActionSongDeleteSelection(int level_no, const SongSelection &sel, bool all_levels);
+	ActionSongDeleteSelection(int layer_no, const SongSelection &sel, bool all_layers);
 
 	virtual void build(Data *d);
-	void DeleteBuffersFromTrackLevel(Song *s, Track *t, TrackLevel &l, const SongSelection &sel, int level_no);
+	void DeleteBuffersFromTrackLayer(Song *s, Track *t, TrackLayer &l, const SongSelection &sel, int layer_no);
 
-	int level_no;
+	int layer_no;
 	const SongSelection &sel;
-	bool all_levels;
+	bool all_layers;
 };
 
-#endif /* ACTIONSONGDELETESELECTION_H_ */
+#endif /* SRC_ACTION_SONG_ACTIONSONGDELETESELECTION_H_ */

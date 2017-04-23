@@ -262,7 +262,7 @@ void FormatOgg::loadTrack(StorageOperationData *od)
 
 		int dsamples = chunk_read / 4;
 		int _offset = read / 4 + od->offset;
-		importData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, od->level);
+		importData(t, data, channels, SAMPLE_FORMAT_16, dsamples, _offset, od->layer);
 		read += chunk_read;
 		nn ++;
 		if (nn > 8){

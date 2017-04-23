@@ -155,9 +155,9 @@ void SongRenderer::make_fake_track(Track *t, BufferBox &buf)
 {
 	//msg_write("fake track");
 	t->song = song;
-	t->levels.resize(1);
-	t->levels[0].buffers.resize(1);
-	t->levels[0].buffers[0].set_as_ref(buf, 0, range_cur.length);
+	t->layers.resize(1);
+	t->layers[0].buffers.resize(1);
+	t->layers[0].buffers[0].set_as_ref(buf, 0, range_cur.length);
 }
 
 void SongRenderer::bb_apply_fx(BufferBox &buf, Track *t, Array<Effect*> &fx_list)

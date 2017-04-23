@@ -184,7 +184,7 @@ void FormatWave::loadTrack(StorageOperationData *od)
 				if (r > 0){
 					int dsamples = r / byte_per_sample;
 					int _offset = read / byte_per_sample + od->offset;
-					importData(t, data, channels, format, dsamples, _offset, od->level);
+					importData(t, data, channels, format, dsamples, _offset, od->layer);
 					read += r;
 				}else{
 					throw string("could not read in wave file...");

@@ -25,7 +25,7 @@ public:
 
 	void onName();
 	void onMute();
-	void onLevelTrack();
+	void onTrack();
 	void onVolume();
 	void onRepNum();
 	void onRepDelay();

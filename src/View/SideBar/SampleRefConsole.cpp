@@ -23,7 +23,7 @@ SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 
 	event("volume", this, &SampleRefConsole::onVolume);
 	event("mute", this, &SampleRefConsole::onMute);
-	event("level_track", this, &SampleRefConsole::onLevelTrack);
+	event("level_track", this, &SampleRefConsole::onTrack);
 	event("repnum", this, &SampleRefConsole::onRepNum);
 	event("repdelay", this, &SampleRefConsole::onRepDelay);
 
@@ -59,7 +59,7 @@ void SampleRefConsole::onMute()
 	subscribe(sample);
 }
 
-void SampleRefConsole::onLevelTrack()
+void SampleRefConsole::onTrack()
 {
 	int n = getInt("");
 }
@@ -129,7 +129,7 @@ void SampleRefConsole::loadData()
 	setFloat("volume", amplitude2db(sample->volume));
 	enable("volume", !sample->muted);
 	reset("level_track");
-	for (Track *t : song->tracks)
+	for (Track *t: song->tracks)
 		addString("level_track", t->getNiceName());
 	setInt("level_track", sample->track_no);
 	setInt("repnum", sample->rep_num + 1);

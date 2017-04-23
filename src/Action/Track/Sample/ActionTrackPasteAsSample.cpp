@@ -8,7 +8,7 @@
 #include "ActionTrackPasteAsSample.h"
 
 #include "../../../Data/Song.h"
-#include "../../Song/Sample/ActionSongAddSample.h"
+#include "../../Sample/ActionSampleAdd.h"
 #include "ActionTrackAddSample.h"
 
 ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const BufferBox &_buf)
@@ -30,10 +30,10 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const Mi
 void ActionTrackPasteAsSample::build(Data *d)
 {
 	if (buf){
-		Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *buf), d);
+		Sample* sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *buf), d);
 		addSubAction(new ActionTrackAddSample(t, pos, sample), d);
 	}else if (midi){
-		Sample* sample = (Sample*)addSubAction(new ActionSongAddSample("-paste-", *midi), d);
+		Sample* sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *midi), d);
 		addSubAction(new ActionTrackAddSample(t, pos, sample), d);
 	}
 }

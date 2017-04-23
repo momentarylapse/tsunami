@@ -27,7 +27,7 @@ public:
 	virtual ~Storage();
 
 	bool load(Song *a, const string &filename);
-	bool loadTrack(Track *t, const string &filename, int offset = 0, int level = 0);
+	bool loadTrack(Track *t, const string &filename, int offset = 0, int layer = 0);
 	bool loadBufferBox(Song *a, BufferBox *buf, const string &filename);
 	bool saveViaRenderer(AudioRenderer *r, const string &filename);
 	bool save(Song *a, const string &filename);

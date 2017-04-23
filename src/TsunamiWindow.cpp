@@ -95,11 +95,11 @@ TsunamiWindow::TsunamiWindow() :
 	HuiAddCommandM("track_edit_midi", "hui:edit", -1, this, &TsunamiWindow::onTrackEditMidi);
 	HuiAddCommandM("track_edit_fx", "hui:edit", -1, this, &TsunamiWindow::onTrackEditFX);
 	HuiAddCommandM("track_add_marker", "hui:add", -1, this, &TsunamiWindow::onTrackAddMarker);
-	HuiAddCommandM("level_manager", "hui:settings", -1, this, &TsunamiWindow::onLevelManager);
-	HuiAddCommandM("level_add", "hui:add", -1, this, &TsunamiWindow::onAddLevel);
-	HuiAddCommandM("level_delete", "hui:delete", -1, this, &TsunamiWindow::onDeleteLevel);
-	HuiAddCommandM("level_up", "hui:up", -1, this, &TsunamiWindow::onCurLevelUp);
-	HuiAddCommandM("level_down", "hui:down", -1, this, &TsunamiWindow::onCurLevelDown);
+	HuiAddCommandM("layer_manager", "hui:settings", -1, this, &TsunamiWindow::onLayerManager);
+	HuiAddCommandM("layer_add", "hui:add", -1, this, &TsunamiWindow::onAddLayer);
+	HuiAddCommandM("layer_delete", "hui:delete", -1, this, &TsunamiWindow::onDeleteLayer);
+	HuiAddCommandM("layer_up", "hui:up", -1, this, &TsunamiWindow::onCurLayerUp);
+	HuiAddCommandM("layer_down", "hui:down", -1, this, &TsunamiWindow::onCurLayerDown);
 	HuiAddCommandM("add_bars", "hui:add", -1, this, &TsunamiWindow::onAddBars);
 	HuiAddCommandM("add_pause", "hui:add", -1, this, &TsunamiWindow::onAddPause);
 	HuiAddCommandM("delete_bars", "hui:delete", -1, this, &TsunamiWindow::onDeleteBars);
@@ -166,7 +166,7 @@ TsunamiWindow::TsunamiWindow() :
 	// events
 	event("hui:close", this, &TsunamiWindow::onExit);
 	for (int i=0;i<256;i++)
-		event(format("jump_to_level_%d", i), this, &TsunamiWindow::onCurLevel);
+		event(format("jump_to_layer_%d", i), this, &TsunamiWindow::onCurLayer);
 
 
 	die_on_plugin_stop = false;
@@ -459,7 +459,7 @@ void TsunamiWindow::onMenuExecuteEffect()
 		for (Track *t : song->tracks)
 			if (sel.has(t) and (t->type == t->TYPE_AUDIO)){
 				fx->resetState();
-				fx->doProcessTrack(t, view->cur_level, range);
+				fx->doProcessTrack(t, view->cur_layer, range);
 			}
 		song->action_manager->endActionGroup();
 	}
@@ -519,7 +519,7 @@ void TsunamiWindow::onMenuExecuteTsunamiPlugin()
 
 void TsunamiWindow::onDelete()
 {
-	song->deleteSelection(view->getEditSeletion(), view->cur_level, false);
+	song->deleteSelection(view->getEditSeletion(), view->cur_layer, false);
 }
 
 void TsunamiWindow::onSampleManager()
@@ -556,7 +556,7 @@ void TsunamiWindow::onTrackImport()
 {
 	if (tsunami->storage->askOpenImport(this)){
 		Track *t = song->addTrack(Track::TYPE_AUDIO);
-		tsunami->storage->loadTrack(t, HuiFilename, view->sel.range.start(), view->cur_level);
+		tsunami->storage->loadTrack(t, HuiFilename, view->sel.range.start(), view->cur_layer);
 	}
 }
 
@@ -596,7 +596,7 @@ void TsunamiWindow::onStop()
 
 void TsunamiWindow::onInsertSample()
 {
-	song->insertSelectedSamples(view->getEditSeletion(), view->cur_level);
+	song->insertSelectedSamples(view->getEditSeletion(), view->cur_layer);
 }
 
 void TsunamiWindow::onRecord()
@@ -604,43 +604,43 @@ void TsunamiWindow::onRecord()
 	side_bar->open(SideBar::CAPTURE_CONSOLE);
 }
 
-void TsunamiWindow::onAddLevel()
+void TsunamiWindow::onAddLayer()
 {
-	song->addLevel("");
+	song->addLayer("");
 }
 
-void TsunamiWindow::onDeleteLevel()
+void TsunamiWindow::onDeleteLayer()
 {
 	try{
-		song->deleteLevel(view->cur_level);
+		song->deleteLayer(view->cur_layer);
 	}catch(SongException &e){
 		tsunami->log->error(e.message);
 	}
 }
 
-void TsunamiWindow::onCurLevel()
+void TsunamiWindow::onCurLayer()
 {
-	view->setCurLevel(HuiGetEvent()->id.substr(14, -1)._int());
+	view->setCurLayer(HuiGetEvent()->id.substr(14, -1)._int());
 }
 
-void TsunamiWindow::onCurLevelUp()
+void TsunamiWindow::onCurLayerUp()
 {
-	view->setCurLevel(view->cur_level + 1);
+	view->setCurLayer(view->cur_layer + 1);
 }
 
-void TsunamiWindow::onCurLevelDown()
+void TsunamiWindow::onCurLayerDown()
 {
-	view->setCurLevel(view->cur_level - 1);
+	view->setCurLayer(view->cur_layer - 1);
 }
 
-void TsunamiWindow::onLevelManager()
+void TsunamiWindow::onLayerManager()
 {
-	side_bar->open(SideBar::LEVEL_CONSOLE);
+	side_bar->open(SideBar::LAYER_CONSOLE);
 }
 
 void TsunamiWindow::onSampleFromSelection()
 {
-	song->createSamplesFromSelection(view->getEditSeletion(), view->cur_level);
+	song->createSamplesFromSelection(view->getEditSeletion(), view->cur_layer);
 }
 
 void TsunamiWindow::onViewOptimal()
@@ -704,10 +704,10 @@ void TsunamiWindow::updateMenu()
 	// track
 	enable("delete_track", view->cur_track);
 	enable("track_properties", view->cur_track);
-	// level
-	enable("level_delete", song->level_names.num > 1);
-	enable("level_up", view->cur_level < song->level_names.num -1);
-	enable("level_down", view->cur_level > 0);
+	// layer
+	enable("layer_delete", song->layer_names.num > 1);
+	enable("layer_up", view->cur_layer < song->layer_names.num -1);
+	enable("layer_down", view->cur_layer > 0);
 	// bars
 	enable("delete_bars", !view->sel.bars.empty());
 	enable("edit_bars", !view->sel.bars.empty());
@@ -729,12 +729,12 @@ void TsunamiWindow::updateMenu()
 	check("show_fx_console", side_bar->isActive(SideBar::FX_CONSOLE));
 	check("sample_manager", side_bar->isActive(SideBar::SAMPLE_CONSOLE));
 
-	HuiMenu *m = getMenu()->getSubMenuByID("menu_level_target");
+	HuiMenu *m = getMenu()->getSubMenuByID("menu_layer_target");
 	if (m){
 		m->clear();
-		for (int i=0; i<song->level_names.num; i++)
-			m->addItemCheckable(song->getNiceLevelName(i), format("jump_to_level_%d", i));
-		check(format("jump_to_level_%d", view->cur_level), true);
+		for (int i=0; i<song->layer_names.num; i++)
+			m->addItemCheckable(song->getNiceLayerName(i), format("jump_to_layer_%d", i));
+		check(format("jump_to_layer_%d", view->cur_layer), true);
 	}
 
 	string title = title_filename(song->filename) + " - " + AppName;

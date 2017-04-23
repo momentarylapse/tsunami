@@ -58,7 +58,7 @@ public:
 	void onUpdate(Observable *o, const string &message);
 	static const string MESSAGE_CUR_TRACK_CHANGE;
 	static const string MESSAGE_CUR_SAMPLE_CHANGE;
-	static const string MESSAGE_CUR_LEVEL_CHANGE;
+	static const string MESSAGE_CUR_LAYER_CHANGE;
 	static const string MESSAGE_SELECTION_CHANGE;
 	static const string MESSAGE_SETTINGS_CHANGE;
 	static const string MESSAGE_VIEW_CHANGE;
@@ -161,10 +161,10 @@ public:
 
 	void setCurSample(SampleRef *s);
 	void setCurTrack(Track *t);
-	void setCurLevel(int l);
+	void setCurLayer(int l);
 	Track *cur_track;
 	SampleRef *cur_sample;
-	int cur_level;
+	int cur_layer;
 	int capturing_track;
 
 
@@ -181,7 +181,7 @@ public:
 	Array<AudioViewTrack*> vtrack;
 	void updateTracks();
 
-	int prefered_buffer_level;
+	int prefered_buffer_layer;
 	double buffer_zoom_factor;
 	void updateBufferZoom();
 

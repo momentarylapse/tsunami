@@ -11,10 +11,10 @@
 #include "../Buffer/ActionTrack__DeleteBufferBox.h"
 #include "../../../Data/SongSelection.h"
 
-ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelection &_sel, int _level_no) :
+ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelection &_sel, int _layer_no) :
 	sel(_sel)
 {
-	level_no = _level_no;
+	layer_no = _layer_no;
 }
 
 void ActionTrackSampleFromSelection::build(Data *d)
@@ -22,17 +22,17 @@ void ActionTrackSampleFromSelection::build(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 	for (Track *t: s->tracks)
 		if (sel.has(t))
-			CreateSubsFromTrack(t, sel, level_no);
+			CreateSubsFromTrack(t, sel, layer_no);
 }
 
 
-void ActionTrackSampleFromSelection::CreateSubsFromTrack(Track *t, const SongSelection &sel, int level_no)
+void ActionTrackSampleFromSelection::CreateSubsFromTrack(Track *t, const SongSelection &sel, int layer_no)
 {
-	TrackLevel &l = t->levels[level_no];
+	TrackLayer &l = t->layers[layer_no];
 	foreachib(BufferBox &b, l.buffers, bi)
 		if (sel.range.covers(b.range())){
 			addSubAction(new ActionTrackPasteAsSample(t, b.offset, b), t->song);
 
-			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, bi), t->song);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, layer_no, bi), t->song);
 		}
 }

@@ -44,23 +44,23 @@ public:
 	}
 };
 
-class FileChunkLevelName : public FileChunk<Song,Song>
+class FileChunkLayerName : public FileChunk<Song,Song>
 {
 public:
-	FileChunkLevelName() : FileChunk<Song,Song>("lvlname"){}
+	FileChunkLayerName() : FileChunk<Song,Song>("lvlname"){}
 	virtual void create(){ me = parent; }
 	virtual void read(File *f)
 	{
 		int num = f->ReadInt();
-		me->level_names.clear();
+		me->layer_names.clear();
 		for (int i=0;i<num;i++)
-			me->level_names.add(f->ReadStr());
+			me->layer_names.add(f->ReadStr());
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(me->level_names.num);
-		for (int i=0; i<me->level_names.num; i++)
-			f->WriteStr(me->level_names[i]);
+		f->WriteInt(me->layer_names.num);
+		for (int i=0; i<me->layer_names.num; i++)
+			f->WriteStr(me->layer_names[i]);
 	}
 };
 
@@ -338,10 +338,10 @@ void uncompress_buffer(BufferBox &b, string &data, FileChunkBasic *p)
 }
 #endif
 
-class FileChunkBufferBox : public FileChunk<TrackLevel,BufferBox>
+class FileChunkBufferBox : public FileChunk<TrackLayer,BufferBox>
 {
 public:
-	FileChunkBufferBox() : FileChunk<TrackLevel,BufferBox>("bufbox"){}
+	FileChunkBufferBox() : FileChunk<TrackLayer,BufferBox>("bufbox"){}
 	virtual void create()
 	{
 		BufferBox dummy;
@@ -776,27 +776,27 @@ public:
 	}
 };
 
-class FileChunkTrackLevel : public FileChunk<Track,TrackLevel>
+class FileChunkTrackLayer : public FileChunk<Track,TrackLayer>
 {
 public:
 	int n;
-	FileChunkTrackLevel() : FileChunk<Track,TrackLevel>("level")
+	FileChunkTrackLayer() : FileChunk<Track,TrackLayer>("level")
 	{
 		n = 0;
 		add_child(new FileChunkBufferBox);
 	}
 	virtual void create()
 	{
-		//me = &parent->levels[n];
+		//me = &parent->layers[n];
 	}
 	virtual void read(File *f)
 	{
 		n = f->ReadInt();
-		me = &parent->levels[n];
+		me = &parent->layers[n];
 	}
 	virtual void write(File *f)
 	{
-		f->WriteInt(parent->levels.index(me));
+		f->WriteInt(parent->layers.index(me));
 	}
 	virtual void write_subs()
 	{
@@ -965,7 +965,7 @@ public:
 	FileChunkTrack() : FileChunk<Song,Track>("track")
 	{
 		add_child(new FileChunkTuning);
-		add_child(new FileChunkTrackLevel);
+		add_child(new FileChunkTrackLayer);
 		add_child(new FileChunkSynthesizer);
 		add_child(new FileChunkEffect);
 		add_child(new FileChunkTrackMidiData);
@@ -1006,7 +1006,7 @@ public:
 	{
 		if (!me->instrument.has_default_tuning())
 			write_sub("tuning", &me->instrument);
-		write_sub_array("level", me->levels);
+		write_sub_array("level", me->layers);
 		write_sub_parray("samref", me->samples);
 		write_sub_parray("effect", me->fx);
 		write_sub_array("marker", me->markers);
@@ -1026,7 +1026,7 @@ public:
 	{
 		add_child(new FileChunkFormat);
 		add_child(new FileChunkTag);
-		add_child(new FileChunkLevelName);
+		add_child(new FileChunkLayerName);
 		add_child(new FileChunkBar);
 		add_child(new FileChunkSample);
 		add_child(new FileChunkTrack);

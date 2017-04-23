@@ -22,7 +22,7 @@ void *ActionTrack__GrowBufferBox::execute(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
-	BufferBox &b = t->levels[level_no].buffers[index];
+	BufferBox &b = t->layers[level_no].buffers[index];
 	old_length = b.length;
 	b.resize(new_length);
 
@@ -36,7 +36,7 @@ void ActionTrack__GrowBufferBox::undo(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
-	BufferBox &b = t->levels[level_no].buffers[index];
+	BufferBox &b = t->layers[level_no].buffers[index];
 	b.resize(old_length);
 }
 

@@ -63,9 +63,9 @@ public:
 	static const string MESSAGE_DELETE_CURVE;
 	static const string MESSAGE_ADD_SAMPLE;
 	static const string MESSAGE_DELETE_SAMPLE;
-	static const string MESSAGE_ADD_LEVEL;
-	static const string MESSAGE_EDIT_LEVEL;
-	static const string MESSAGE_DELETE_LEVEL;
+	static const string MESSAGE_ADD_LAYER;
+	static const string MESSAGE_EDIT_LAYER;
+	static const string MESSAGE_DELETE_LAYER;
 	static const string MESSAGE_EDIT_BARS;
 
 	string _cdecl get_time_str(int t);
@@ -84,7 +84,7 @@ public:
 	Track *_cdecl getTimeTrack();
 	int _cdecl getNextBeat(int pos);
 	int _cdecl barOffset(int index);
-	string _cdecl getNiceLevelName(int index);
+	string _cdecl getNiceLayerName(int index);
 
 	string _cdecl getTag(const string &key);
 
@@ -107,19 +107,19 @@ public:
 	void _cdecl deleteSample(Sample *s);
 	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl scaleSample(Sample *s, int new_size, int method);
-	void _cdecl addLevel(const string &name);
-	void _cdecl deleteLevel(int index);
-	void _cdecl mergeLevels(int source, int target);
-	void _cdecl moveLevel(int source, int target);
-	void _cdecl renameLevel(int index, const string &name);
+	void _cdecl addLayer(const string &name);
+	void _cdecl deleteLayer(int index);
+	void _cdecl mergeLayers(int source, int target);
+	void _cdecl moveLayer(int source, int target);
+	void _cdecl renameLayer(int index, const string &name);
 	void _cdecl addBar(int index, float bpm, int beats, int sub_beats, bool affect_midi);
 	void _cdecl addPause(int index, float time, bool affect_midi);
 	void _cdecl editBar(int index, BarPattern &p, bool affect_midi);
 	void _cdecl deleteBar(int index, bool affect_midi);
-	void _cdecl insertSelectedSamples(const SongSelection &sel, int level_no);
+	void _cdecl insertSelectedSamples(const SongSelection &sel, int layer_no);
 	void _cdecl deleteSelectedSamples(const SongSelection &sel);
-	void _cdecl deleteSelection(const SongSelection &sel, int level_no, bool all_levels);
-	void _cdecl createSamplesFromSelection(const SongSelection &sel, int level_no);
+	void _cdecl deleteSelection(const SongSelection &sel, int layer_no, bool all_layers);
+	void _cdecl createSamplesFromSelection(const SongSelection &sel, int layer_no);
 
 	// helper
 	Track *_cdecl get_track(int track_no);
@@ -143,7 +143,7 @@ public:
 	Array<Curve*> curves;
 	BarCollection bars;
 
-	Array<string> level_names;
+	Array<string> layer_names;
 };
 
 

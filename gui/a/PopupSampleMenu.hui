@@ -1,6 +1,0 @@
-Menu popup_sample_menu ""
-	Item sample_menu_header "Samples" disabled
-	Separator
-	Item insert_sample "Insert statically"
-	Item remove_sample "Delete"
-	Item sample_properties "Properties"

@@ -1,3 +1,0 @@
-Menu menu_fake "" disabled
-	Item play "Play"
-	Item stop "Stop"

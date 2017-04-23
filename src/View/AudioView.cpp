@@ -47,7 +47,7 @@ int get_track_index_save(Song *song, Track *t)
 
 const string AudioView::MESSAGE_CUR_TRACK_CHANGE = "CurTrackChange";
 const string AudioView::MESSAGE_CUR_SAMPLE_CHANGE = "CurSampleChange";
-const string AudioView::MESSAGE_CUR_LEVEL_CHANGE = "CurLevelChange";
+const string AudioView::MESSAGE_CUR_LAYER_CHANGE = "CurLayerChange";
 const string AudioView::MESSAGE_SELECTION_CHANGE = "SelectionChange";
 const string AudioView::MESSAGE_SETTINGS_CHANGE = "SettingsChange";
 const string AudioView::MESSAGE_VIEW_CHANGE = "ViewChange";
@@ -167,7 +167,7 @@ AudioView::AudioView(TsunamiWindow *parent, Song *_song, DeviceManager *_output)
 
 	cur_track = NULL;
 	cur_sample = NULL;
-	cur_level = 0;
+	cur_layer = 0;
 	capturing_track = 0;
 
 	bars_edit_data = true;
@@ -458,7 +458,7 @@ void AudioView::unselectAllSamples()
 
 void AudioView::updateBufferZoom()
 {
-	prefered_buffer_level = -1;
+	prefered_buffer_layer = -1;
 	buffer_zoom_factor = 1.0;
 
 	// which level of detail?
@@ -466,7 +466,7 @@ void AudioView::updateBufferZoom()
 		for (int i=24-1;i>=0;i--){
 			double _f = (double)(1 << (i + BufferBox::PEAK_OFFSET_EXP));
 			if (_f > 1.0 / cam.scale){
-				prefered_buffer_level = i;
+				prefered_buffer_layer = i;
 				buffer_zoom_factor = _f;
 			}
 		}
@@ -527,9 +527,9 @@ void AudioView::checkConsistency()
 		if (song->tracks.num > 0)
 			setCurTrack(song->tracks[0]);
 
-	// check cur_level consistency
-	if ((cur_level < 0) or (cur_level >= song->level_names.num)){
-		cur_level = 0;
+	// check cur_layer consistency
+	if ((cur_layer < 0) or (cur_layer >= song->layer_names.num)){
+		cur_layer = 0;
 		forceRedraw();
 	}
 }
@@ -863,7 +863,7 @@ void AudioView::selectExpand()
 				test_range(n->range, sel_raw, update);
 
 			// buffers
-			for (TrackLevel &l: t->levels)
+			for (TrackLayer &l: t->layers)
 				for (BufferBox &b: l.buffers)
 					test_range(b.range(), sel_raw, update);
 
@@ -936,15 +936,15 @@ void AudioView::setCurTrack(Track *t)
 	notify(MESSAGE_CUR_TRACK_CHANGE);
 }
 
-void AudioView::setCurLevel(int l)
+void AudioView::setCurLayer(int l)
 {
-	if (cur_level == l)
+	if (cur_layer == l)
 		return;
-	if ((l < 0) or (l >= song->level_names.num))
+	if ((l < 0) or (l >= song->layer_names.num))
 		return;
-	cur_level = l;
+	cur_layer = l;
 	forceRedraw();
-	notify(MESSAGE_CUR_LEVEL_CHANGE);
+	notify(MESSAGE_CUR_LAYER_CHANGE);
 }
 
 void AudioView::setInput(InputStreamAny *_input)

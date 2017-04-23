@@ -16,15 +16,15 @@ class Track;
 class ActionTrackSampleFromSelection : public ActionGroup
 {
 public:
-	ActionTrackSampleFromSelection(const SongSelection &sel, int level_no);
+	ActionTrackSampleFromSelection(const SongSelection &sel, int layer_no);
 
 	virtual void build(Data *d);
 
 private:
-	void CreateSubsFromTrack(Track *t, const SongSelection &sel, int level_no);
+	void CreateSubsFromTrack(Track *t, const SongSelection &sel, int layer_no);
 
 	const SongSelection &sel;
-	int level_no;
+	int layer_no;
 };
 
 #endif /* ACTIONTRACKSAMPLEFROMSELECTION_H_ */

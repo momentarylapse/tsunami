@@ -15,7 +15,7 @@ void fold(float[] b, float[] k)
 	b = o
 
 class Folding extends AudioEffect
-	overwrite void process(BufferBox buf)
-		fold(buf.r, song.tracks[0].levels[0].buffers[0].r)
-		fold(buf.l, song.tracks[0].levels[0].buffers[0].l)
+	override void process(BufferBox buf)
+		fold(buf.r, song.tracks[0].layers[0].buffers[0].r)
+		fold(buf.l, song.tracks[0].layers[0].buffers[0].l)
 	

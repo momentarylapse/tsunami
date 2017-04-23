@@ -1,6 +1,0 @@
-Dialog marker_dialog "Marker" 250 80
-	Grid ? "" 1 2
-		Edit text "" expandx
-		Grid ? "" 2 1 buttonbar
-			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok

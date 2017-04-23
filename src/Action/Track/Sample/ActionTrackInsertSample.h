@@ -14,11 +14,11 @@ class Song;
 class ActionTrackInsertSample : public ActionGroup
 {
 public:
-	ActionTrackInsertSample(int track_no, int index, int level_no);
+	ActionTrackInsertSample(int track_no, int index, int layer_no);
 
 	virtual void build(Data *d);
 
-	int track_no, index, level_no;
+	int track_no, index, layer_no;
 };
 
 #endif /* ACTIONTRACKINSERTSAMPLE_H_ */

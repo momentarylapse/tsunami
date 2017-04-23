@@ -1,6 +1,0 @@
-Dialog configurable-selection-dialog "Auswahl" 400 500
-	Grid ? "" 1 2
-		TreeView list "Name"
-		Grid ? "" 1 2 buttonbar
-			Button /cancel "Cancel"
-			Button /ok "OK"

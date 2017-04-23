@@ -44,8 +44,8 @@ void Clipboard::append_track(Track *t, AudioView *view)
 	Track *tt = temp->addTrack(t->type);
 
 	if (t->type == Track::TYPE_AUDIO){
-		tt->levels[0].buffers.add(t->readBuffers(view->cur_level, view->sel.range));
-		tt->levels[0].buffers[0].make_own();
+		tt->layers[0].buffers.add(t->readBuffers(view->cur_layer, view->sel.range));
+		tt->layers[0].buffers[0].make_own();
 	}else if (t->type == Track::TYPE_MIDI){
 		tt->midi = t->midi.getNotesBySelection(view->sel);
 		tt->midi.samples = view->sel.range.length;
@@ -81,10 +81,10 @@ void Clipboard::paste_track(int source_index, Track *target, AudioView *view)
 	Track *source = temp->tracks[source_index];
 
 	if (target->type == Track::TYPE_AUDIO){
-		Range r = Range(view->sel.range.start(), source->levels[0].buffers[0].length);
-		BufferBox buf = target->getBuffers(view->cur_level, r);
-		Action *a = new ActionTrackEditBuffer(target, view->cur_level, r);
-		buf.set(source->levels[0].buffers[0], 0, 1.0f);
+		Range r = Range(view->sel.range.start(), source->layers[0].buffers[0].length);
+		BufferBox buf = target->getBuffers(view->cur_layer, r);
+		Action *a = new ActionTrackEditBuffer(target, view->cur_layer, r);
+		buf.set(source->layers[0].buffers[0], 0, 1.0f);
 		s->execute(a);
 	}else if (target->type == Track::TYPE_MIDI){
 		for (MidiNote *n: source->midi){
@@ -105,7 +105,7 @@ void Clipboard::paste_track_as_samples(int source_index, Track *target, AudioVie
 		target->addSampleRef(view->sel.range.start(), ref);
 	}else{
 		if (target->type == Track::TYPE_AUDIO){
-			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->levels[0].buffers[0]));
+			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0].buffers[0]));
 			ref_uid[source_index] = s->samples.back()->uid;
 		}else if (target->type == Track::TYPE_MIDI){
 			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->midi));

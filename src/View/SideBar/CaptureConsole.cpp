@@ -324,8 +324,8 @@ bool CaptureConsole::insert()
 	if (type == t->TYPE_AUDIO){
 		Range r = Range(i0, input->getSampleCount());
 		song->action_manager->beginActionGroup();
-		BufferBox tbuf = t->getBuffers(view->cur_level, r);
-		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_level, r);
+		BufferBox tbuf = t->getBuffers(view->cur_layer, r);
+		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
 		tbuf.set(*input->buffer, 0, 1.0f);
 		song->execute(a);
 		song->action_manager->endActionGroup();

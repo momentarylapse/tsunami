@@ -46,7 +46,7 @@ public:
 	Track *track;
 	AudioRenderer *renderer;
 	int offset;
-	int level;
+	int layer;
 };
 
 #endif /* SRC_STORAGE_STORAGEOPERATIONDATA_H_ */

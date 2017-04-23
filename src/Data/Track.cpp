@@ -74,7 +74,7 @@ Track::Track() :
 // destructor...
 void Track::reset()
 {
-	levels.clear();
+	layers.clear();
 	name.clear();
 	instrument = Instrument(Instrument::TYPE_NONE);
 	volume = 1;
@@ -107,7 +107,7 @@ Range Track::getRangeUnsafe()
 {
 	int _min =  1073741824;
 	int _max = -1073741824;
-	for (TrackLevel &l: levels)
+	for (TrackLayer &l: layers)
 		if (l.buffers.num > 0){
 			_min = min(l.buffers[0].offset, _min);
 			_max = max(l.buffers.back().range().end(), _max);
@@ -155,12 +155,12 @@ int Track::get_index()
 	return -1;
 }
 
-BufferBox Track::readBuffers(int level_no, const Range &r)
+BufferBox Track::readBuffers(int layer_no, const Range &r)
 {
 	BufferBox buf;
 
 	// is <r> inside a buffer?
-	for (BufferBox &b: levels[level_no].buffers){
+	for (BufferBox &b: layers[layer_no].buffers){
 		int p0 = r.offset - b.offset;
 		int p1 = r.offset - b.offset + r.length;
 		if ((p0 >= 0) and (p1 <= b.length)){
@@ -174,7 +174,7 @@ BufferBox Track::readBuffers(int level_no, const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlap
-	for (BufferBox &b: levels[level_no].buffers)
+	for (BufferBox &b: layers[layer_no].buffers)
 		buf.set(b, b.offset - r.offset, 1.0f);
 
 	return buf;
@@ -186,14 +186,14 @@ BufferBox Track::readBuffersCol(const Range &r)
 
 	// is <r> inside a single buffer?
 	int num_inside = 0;
-	int inside_level, inside_no;
+	int inside_layer, inside_no;
 	int inside_p0, inside_p1;
 	bool intersected = false;
-	foreachi(TrackLevel &l, levels, li)
+	foreachi(TrackLayer &l, layers, li)
 		foreachi(BufferBox &b, l.buffers, bi){
 			if (b.range().covers(r)){
 				num_inside ++;
-				inside_level = li;
+				inside_layer = li;
 				inside_no = bi;
 				inside_p0 = r.offset - b.offset;
 				inside_p1 = r.offset - b.offset + r.length;
@@ -202,7 +202,7 @@ BufferBox Track::readBuffersCol(const Range &r)
 		}
 	if ((num_inside == 1) and (!intersected)){
 		// set as reference to subarrays
-		buf.set_as_ref(levels[inside_level].buffers[inside_no], inside_p0, inside_p1 - inside_p0);
+		buf.set_as_ref(layers[inside_layer].buffers[inside_no], inside_p0, inside_p1 - inside_p0);
 		return buf;
 	}
 
@@ -210,29 +210,29 @@ BufferBox Track::readBuffersCol(const Range &r)
 	buf.resize(r.length);
 
 	// fill with overlap
-	for (TrackLevel &l: levels)
+	for (TrackLayer &l: layers)
 		for (BufferBox &b: l.buffers)
 			buf.add(b, b.offset - r.offset, 1.0f, 0.0f);
 
 	return buf;
 }
 
-BufferBox Track::getBuffers(int level_no, const Range &r)
+BufferBox Track::getBuffers(int layer_no, const Range &r)
 {
-	song->execute(new ActionTrackCreateBuffers(this, level_no, r));
-	return readBuffers(level_no, r);
+	song->execute(new ActionTrackCreateBuffers(this, layer_no, r));
+	return readBuffers(layer_no, r);
 }
 
 void Track::updatePeaks()
 {
-	for (TrackLevel &l: levels)
+	for (TrackLayer &l: layers)
 		for (BufferBox &b: l.buffers)
 			b.update_peaks();
 }
 
 void Track::invalidateAllPeaks()
 {
-	for (TrackLevel &l: levels)
+	for (TrackLayer &l: layers)
 		for (BufferBox &b: l.buffers)
 			b.peaks.clear();
 }

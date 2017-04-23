@@ -27,7 +27,7 @@ Kurven
 /edit_fx
 Fx
 
-/edit_levels
+/edit_layers
 Ebenen
 
 /edit_midi
@@ -291,22 +291,22 @@ Parameter laden
 fx_panel/save_favorite
 
 Parameter speichern
-level_dialog/add_level
+layer_dialog/add_layer
 
 Eine neue Ebene hinzufügen
-level_dialog/delete_level
+layer_dialog/delete_layer
 
 Die ausgewählte Ebene und alle zugehörigen Audio-Puffer löschen
-level_dialog/level_dialog
+layer_dialog/layer_dialog
 Ebenen
 
-level_dialog/levels
+layer_dialog/layers
 #\\Name
 Jede Ebene kann ihre eigenen Audio-Puffer enthalten
-level_dialog/lvld_t_edit
+layer_dialog/lvld_t_edit
 Bearbeiten
 
-level_dialog/merge_level
+layer_dialog/merge_layer
 
 Die ausgewählte Ebene mit der darunter liegenden vereinen
 log_console/clear
@@ -384,19 +384,19 @@ Hilfe
 menu/insert_sample
 Fest einfügen
 
-menu/level_add
+menu/layer_add
 Hinzufügen
 
-menu/level_delete
+menu/layer_delete
 Löschen
 
-menu/level_down
+menu/layer_down
 Runter
 
-menu/level_manager
+menu/layer_manager
 Verwalten...
 
-menu/level_up
+menu/layer_up
 Hoch
 
 menu/menu_bars
@@ -411,10 +411,10 @@ Datei
 menu/menu_help
 ?
 
-menu/menu_level
+menu/menu_layer
 Ebenen
 
-menu/menu_level_target
+menu/menu_layer_target
 Gehe zu
 
 menu/menu_plugins
@@ -1180,7 +1180,7 @@ Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
 2. Umkehrung
 Amplitude too large, signal distorted.
 Amplitude zu groß, Signal übersteuert.
-At least one level has to exist.
+At least one layer has to exist.
 Es muss mindestens eine Ebene existieren.
 Audio
 Audio
@@ -1214,7 +1214,7 @@ Can't load effect: %s
 Kann Effekt nicht laden: %s
 Can't load midi effect: %s
 Kann MidiEffekt nicht laden: %s
-Can't merge a level with itself.
+Can't merge a layer with itself.
 Kann eine Ebene nicht mit sich selbst vereinen.
 Cancel
 Abbrechen
@@ -1232,7 +1232,7 @@ Curves
 Kurven
 Data loss!
 Datenverlust!
-Delete level: not implemented yet...
+Delete layer: not implemented yet...
 Ebene löschen: noch nicht implementiert...
 Description
 Beschreibung
@@ -1280,12 +1280,12 @@ Just happened somehow...
 Ist halt irgendwie passiert...
 Keyboard
 Keyboard
+Layer %d
+Ebene %d
+Layers
+Ebenen
 Length
 Dauer
-Level %d
-Ebene %d
-Levels
-Ebenen
 Locrian
 Locrisch
 Lydian

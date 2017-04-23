@@ -14,11 +14,11 @@
 #include "../Track/Midi/ActionTrackDeleteMidiNote.h"
 #include "../../Data/SongSelection.h"
 
-ActionSongDeleteSelection::ActionSongDeleteSelection(int _level_no, const SongSelection &_sel, bool _all_levels) :
+ActionSongDeleteSelection::ActionSongDeleteSelection(int _layer_no, const SongSelection &_sel, bool _all_layers) :
 	sel(_sel)
 {
-	level_no = _level_no;
-	all_levels = _all_levels;
+	layer_no = _layer_no;
+	all_layers = _all_layers;
 }
 
 void ActionSongDeleteSelection::build(Data *d)
@@ -30,11 +30,11 @@ void ActionSongDeleteSelection::build(Data *d)
 			continue;
 
 		// buffer boxes
-		if (all_levels){
-			foreachi(TrackLevel &l, t->levels, li)
-				DeleteBuffersFromTrackLevel(s, t, l, sel, li);
+		if (all_layers){
+			foreachi(TrackLayer &l, t->layers, li)
+				DeleteBuffersFromTrackLayer(s, t, l, sel, li);
 		}else{
-			DeleteBuffersFromTrackLevel(s, t, t->levels[level_no], sel, level_no);
+			DeleteBuffersFromTrackLayer(s, t, t->layers[layer_no], sel, layer_no);
 		}
 
 
@@ -56,7 +56,7 @@ void ActionSongDeleteSelection::build(Data *d)
 	}
 }
 
-void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, TrackLevel& l, const SongSelection &sel, int level_no)
+void ActionSongDeleteSelection::DeleteBuffersFromTrackLayer(Song* a, Track *t, TrackLayer& l, const SongSelection &sel, int layer_no)
 {
 	int i0 = sel.range.start();
 	int i1 = sel.range.end();
@@ -67,22 +67,22 @@ void ActionSongDeleteSelection::DeleteBuffersFromTrackLevel(Song* a, Track *t, T
 
 		if (sel.range.covers(b.range())){
 			// b completely inside?
-			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, layer_no, n), a);
 
 		}else if (sel.range.is_inside(bi1-1)){//((i0 > bi0) and (i1 > bi1) and (i0 < bi1)){
 			// overlapping end of b?
-			addSubAction(new ActionTrack__ShrinkBufferBox(t, level_no, n, i0 - bi0), a);
+			addSubAction(new ActionTrack__ShrinkBufferBox(t, layer_no, n, i0 - bi0), a);
 
 		}else if (sel.range.is_inside(bi0)){//((i0 <= bi0) and (i1 < bi1) and (i1 > bi0)){
 			// overlapping beginning of b?
-			addSubAction(new ActionTrack__SplitBufferBox(t, level_no, n, i1 - bi0), a);
-			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n), a);
+			addSubAction(new ActionTrack__SplitBufferBox(t, layer_no, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, layer_no, n), a);
 
 		}else if (b.range().covers(sel.range)){
 			// inside b?
-			addSubAction(new ActionTrack__SplitBufferBox(t, level_no, n, i1 - bi0), a);
-			addSubAction(new ActionTrack__SplitBufferBox(t, level_no, n, i0 - bi0), a);
-			addSubAction(new ActionTrack__DeleteBufferBox(t, level_no, n + 1), a);
+			addSubAction(new ActionTrack__SplitBufferBox(t, layer_no, n, i1 - bi0), a);
+			addSubAction(new ActionTrack__SplitBufferBox(t, layer_no, n, i0 - bi0), a);
+			addSubAction(new ActionTrack__DeleteBufferBox(t, layer_no, n + 1), a);
 
 		}
 		_foreach_it_.update();

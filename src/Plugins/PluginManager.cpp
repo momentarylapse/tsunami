@@ -120,7 +120,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("AudioEffect", "song", _offsetof(Effect, song));
 	Kaba::DeclareClassOffset("AudioEffect", "track", _offsetof(Effect, track));
 	Kaba::DeclareClassOffset("AudioEffect", "range", _offsetof(Effect, range));
-	Kaba::DeclareClassOffset("AudioEffect", "level", _offsetof(Effect, level));
+	Kaba::DeclareClassOffset("AudioEffect", "layer", _offsetof(Effect, layer));
 	Kaba::LinkExternal("AudioEffect." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Effect::__init__));
 	Kaba::DeclareClassVirtualIndex("AudioEffect", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Effect::__delete__), &effect);
 	Kaba::DeclareClassVirtualIndex("AudioEffect", "process", Kaba::mf(&Effect::processTrack), &effect);
@@ -283,13 +283,13 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("TrackMarker", "text", _offsetof(TrackMarker, pos));
 	Kaba::DeclareClassOffset("TrackMarker", "pos", _offsetof(TrackMarker, text));
 
-	Kaba::DeclareClassSize("TrackLevel", sizeof(TrackLevel));
-	Kaba::DeclareClassOffset("TrackLevel", "buffers", _offsetof(TrackLevel, buffers));
+	Kaba::DeclareClassSize("TrackLayer", sizeof(TrackLayer));
+	Kaba::DeclareClassOffset("TrackLayer", "buffers", _offsetof(TrackLayer, buffers));
 
 	Kaba::DeclareClassSize("Track", sizeof(Track));
 	Kaba::DeclareClassOffset("Track", "type", _offsetof(Track, type));
 	Kaba::DeclareClassOffset("Track", "name", _offsetof(Track, name));
-	Kaba::DeclareClassOffset("Track", "levels", _offsetof(Track, levels));
+	Kaba::DeclareClassOffset("Track", "layers", _offsetof(Track, layers));
 	Kaba::DeclareClassOffset("Track", "volume", _offsetof(Track, volume));
 	Kaba::DeclareClassOffset("Track", "panning", _offsetof(Track, panning));
 	Kaba::DeclareClassOffset("Track", "muted", _offsetof(Track, muted));
@@ -331,7 +331,7 @@ void PluginManager::LinkAppScriptData()
 	Kaba::DeclareClassOffset("Song", "fx", _offsetof(Song, fx));
 	Kaba::DeclareClassOffset("Song", "tracks", _offsetof(Song, tracks));
 	Kaba::DeclareClassOffset("Song", "samples", _offsetof(Song, samples));
-	Kaba::DeclareClassOffset("Song", "level_names", _offsetof(Song, level_names));
+	Kaba::DeclareClassOffset("Song", "layer_names", _offsetof(Song, layer_names));
 	Kaba::DeclareClassOffset("Song", "bars", _offsetof(Song, bars));
 	Kaba::LinkExternal("Song." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&Song::__init__));
 	Kaba::DeclareClassVirtualIndex("Song", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&Song::__delete__), &af);

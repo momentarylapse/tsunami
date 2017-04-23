@@ -107,8 +107,8 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 	int di = view->detail_steps;
 	c->setColor(col);
 
-	//int l = min(view->prefered_buffer_level - 1, b.peaks.num / 4);
-	int l = view->prefered_buffer_level * 4;
+	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
+	int l = view->prefered_buffer_layer * 4;
 	if (l >= 0){
 		double bzf = view->buffer_zoom_factor;
 
@@ -159,16 +159,16 @@ void AudioViewTrack::drawBuffer(Painter *c, BufferBox &b, double view_pos_rel, c
 
 void AudioViewTrack::drawTrackBuffers(Painter *c, double view_pos_rel)
 {
-	// non-current levels
-	foreachi(TrackLevel &lev, track->levels, level_no){
-		if (level_no == view->cur_level)
+	// non-current layers
+	foreachi(TrackLayer &lev, track->layers, layer_no){
+		if (layer_no == view->cur_layer)
 			continue;
 		for (BufferBox &b: lev.buffers)
 			drawBuffer(c, b, view_pos_rel, view->colors.text_soft2);
 	}
 
 	// current
-	for (BufferBox &b: track->levels[view->cur_level].buffers)
+	for (BufferBox &b: track->layers[view->cur_layer].buffers)
 		drawBuffer(c, b, view_pos_rel, view->colors.text);
 }
 

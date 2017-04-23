@@ -97,7 +97,7 @@ class AudioEffect
 	bool usable
 	Song *song
 	Track *track
-	int level_no
+	int layer_no
 	extern void __init__()
 	extern virtual void __delete__()
 	extern virtual void process(BufferBox buf)
@@ -227,7 +227,7 @@ enum
 	TRACK_TYPE_TIME
 	TRACK_TYPE_MIDI
 
-class TrackLevel
+class TrackLayer
 	BufferBox[] buffers
 
 class Sample // TODO
@@ -256,7 +256,7 @@ enum
 class Track
 	int type
 	string name
-	TrackLevel[] levels
+	TrackLayer[] layers
 	int length, pos
 
 	float volume, panning
@@ -277,7 +277,7 @@ class Track
 
 	//TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
 	
-	extern BufferBox getBuffers(int level_no, Range r)
+	extern BufferBox getBuffers(int layer_no, Range r)
 	extern BufferBox readBuffers(Range r)
 	
 	extern void setName(string name)
@@ -316,7 +316,7 @@ class Song
 	
 	BarPattern[] bars
 	
-	string[] level_names
+	string[] layer_names
 	
 	extern void __init__()
 	extern virtual void __delete__()
@@ -487,7 +487,7 @@ class Log
 	Song *song
 	Track *track
 	int track_no
-	int level
+	int layer
 	Range range*/
 
 class Slider

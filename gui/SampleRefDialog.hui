@@ -1,9 +1,9 @@
-Dialog sample_ref_dialog "Sub Track" 375 230
+Dialog sample_ref_dialog "Sample" 375 230
 	Grid ? "" 1 5
 		Group ld_t_name "Name"
 			Edit name "" expandx
 		Group ld_t_track "Track"
-			ComboBox level_track ""
+			ComboBox track ""
 		Group ld_t_volume "Volume"
 			Grid ? "" 3 1
 				SpinButton volume "0\\-10000\\10\\0.1" expandx

@@ -22,15 +22,15 @@ void ActionTrack__SplitBufferBox::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	BufferBox &b = t->levels[level_no].buffers[index];
-	BufferBox &b2 = t->levels[level_no].buffers[index + 1];
+	BufferBox &b = t->layers[level_no].buffers[index];
+	BufferBox &b2 = t->layers[level_no].buffers[index + 1];
 
 	// transfer data
 	b.resize(b.length + b2.length);
 	b.set(b2, offset, 1.0f);
 
 	// delete
-	t->levels[level_no].buffers.erase(index + 1);
+	t->layers[level_no].buffers.erase(index + 1);
 }
 
 
@@ -40,7 +40,7 @@ void *ActionTrack__SplitBufferBox::execute(Data *d)
 	//msg_write(format("cut %d   at %d", index, offset));
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	TrackLevel &l = t->levels[level_no];
+	TrackLayer &l = t->layers[level_no];
 
 	assert(offset > 0);
 	assert(offset < (l.buffers[index].length - 1));

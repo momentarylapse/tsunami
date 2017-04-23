@@ -59,8 +59,8 @@ public:
 	void onInsertSample();
 	void onRemoveSample();
 	void onTrackImport();
-	void onAddLevel();
-	void onDeleteLevel();
+	void onAddLayer();
+	void onDeleteLayer();
 	void onSampleManager();
 	void onMixingConsole();
 	void onFxConsole();
@@ -76,10 +76,10 @@ public:
 	void onPause();
 	void onStop();
 	void onRecord();
-	void onCurLevel();
-	void onCurLevelUp();
-	void onCurLevelDown();
-	void onLevelManager();
+	void onCurLayer();
+	void onCurLayerUp();
+	void onCurLayerDown();
+	void onLayerManager();
 	void onAddBars();
 	void onAddPause();
 	void onDeleteBars();

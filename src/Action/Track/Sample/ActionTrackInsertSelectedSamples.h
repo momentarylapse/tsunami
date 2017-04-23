@@ -15,12 +15,12 @@ class SongSelection;
 class ActionTrackInsertSelectedSamples : public ActionGroup
 {
 public:
-	ActionTrackInsertSelectedSamples(const SongSelection &sel, int level_no);
+	ActionTrackInsertSelectedSamples(const SongSelection &sel, int layer_no);
 
 	virtual void build(Data *d);
 
 	const SongSelection &sel;
-	int level_no;
+	int layer_no;
 };
 
 #endif /* ACTIONTRACKINSERTSELECTEDSAMPLES_H_ */

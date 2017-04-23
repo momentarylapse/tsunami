@@ -35,15 +35,15 @@ Menu menu "" disabled
 		Separator
 		Item delete_track "Delete" image=hui:delete
 		Item track_properties "Properties" image=hui:properties
-	Menu menu_level "Levels"
-		Item level_manager "Manage..." image=hui:properties
+	Menu menu_layer "Layers"
+		Item layer_manager "Manage..." image=hui:properties
 		Separator
-		Item level_add "Add" image=hui:add
-		Item level_delete "Delete" image=hui:delete
+		Item layer_add "Add" image=hui:add
+		Item layer_delete "Delete" image=hui:delete
 		Separator
-		Menu menu_level_target "Go to"
-		Item level_up "Up" image=hui:up
-		Item level_down "Down" image=hui:down
+		Menu menu_layer_target "Go to"
+		Item layer_up "Up" image=hui:up
+		Item layer_down "Down" image=hui:down
 	Menu menu_bars "Bars"
 		Item add_bars "Add bars" flat image=hui:add
 		Item add_pause "Add pause" image=hui:add

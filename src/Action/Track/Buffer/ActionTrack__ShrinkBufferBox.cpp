@@ -21,7 +21,7 @@ void ActionTrack__ShrinkBufferBox::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	BufferBox &b = t->levels[level_no].buffers[index];
+	BufferBox &b = t->layers[level_no].buffers[index];
 
 	// restore
 	b.resize(old_length);
@@ -37,7 +37,7 @@ void *ActionTrack__ShrinkBufferBox::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	BufferBox &b = t->levels[level_no].buffers[index];
+	BufferBox &b = t->layers[level_no].buffers[index];
 
 	//msg_write(format("shrink %d   %d -> %d", index, b.num, new_length));
 

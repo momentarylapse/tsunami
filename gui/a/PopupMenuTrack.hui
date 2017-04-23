@@ -1,9 +1,0 @@
-Menu popup_track_menu ""
-	Item track_menu_header "Track" disabled
-	Separator
-	Item delete_track "Delete"
-	Item track_add_marker "Add marker"
-	Item track_edit_fx "Edit effects"
-	Item track_edit_midi "Edit midi"
-	Item song_edit_bars "Edit bars"
-	Item track_properties "Properties"

@@ -42,7 +42,7 @@ class FindClicks extends SongPlugin
 
 	override void apply(Song *song)
 		for t in song.tracks
-			for l in t.levels
+			for l in t.layers
 				for b in l.buffers
 					unclick(b.r, t, b.offset)
 					unclick(b.l, t, b.offset)

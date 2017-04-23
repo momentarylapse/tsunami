@@ -12,11 +12,11 @@
 #include "../../../Data/Song.h"
 #include "../Midi/ActionTrackAddMidiNote.h"
 
-ActionTrackInsertSample::ActionTrackInsertSample(int _track_no, int _index, int _level_no)
+ActionTrackInsertSample::ActionTrackInsertSample(int _track_no, int _index, int _layer_no)
 {
 	track_no = _track_no;
 	index = _index;
-	level_no = _level_no;
+	layer_no = _layer_no;
 }
 
 void ActionTrackInsertSample::build(Data *d)
@@ -29,11 +29,11 @@ void ActionTrackInsertSample::build(Data *d)
 
 		// get target buffer
 		Range r = sub->range();
-		addSubAction(new ActionTrackCreateBuffers(t, level_no, r), s);
-		BufferBox buf = t->readBuffers(level_no, r);
+		addSubAction(new ActionTrackCreateBuffers(t, layer_no, r), s);
+		BufferBox buf = t->readBuffers(layer_no, r);
 
 		// insert sub (ignore muted)
-		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(t, level_no, r);
+		ActionTrackEditBuffer *action = new ActionTrackEditBuffer(t, layer_no, r);
 		buf.set(*sub->buf, 0, sub->volume);
 		addSubAction(action, s);
 	}else if (t->type == t->TYPE_MIDI){

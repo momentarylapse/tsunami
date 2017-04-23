@@ -16,7 +16,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(Track *t, int _level_no, Range _ran
 	track_no = get_track_index(t);
 
 	index = -1;
-	foreachi(BufferBox &buf, t->levels[level_no].buffers, i)
+	foreachi(BufferBox &buf, t->layers[level_no].buffers, i)
 		if (buf.range().covers(range))
 			index = i;
 	assert(index >= 0);
@@ -34,7 +34,7 @@ void ActionTrackEditBuffer::undo(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
-	t->levels[level_no].buffers[index].invalidate_peaks(range);
+	t->layers[level_no].buffers[index].invalidate_peaks(range);
 
 	BufferBox b = t->readBuffers(level_no, range);
 	box.swap_value(b);
@@ -50,7 +50,7 @@ void *ActionTrackEditBuffer::execute(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
 
-	t->levels[level_no].buffers[index].invalidate_peaks(range);
+	t->layers[level_no].buffers[index].invalidate_peaks(range);
 
 	// nothing to do...
 	return NULL;

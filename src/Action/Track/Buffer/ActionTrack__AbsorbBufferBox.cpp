@@ -24,7 +24,7 @@ void *ActionTrack__AbsorbBufferBox::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	TrackLevel &l = t->levels[level_no];
+	TrackLayer &l = t->layers[level_no];
 
 
 	BufferBox &b_src  = l.buffers[src];
@@ -49,7 +49,7 @@ void ActionTrack__AbsorbBufferBox::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 	Track *t = a->get_track(track_no);
-	TrackLevel &l = t->levels[level_no];
+	TrackLayer &l = t->layers[level_no];
 
 	//msg_todo("absorb undo...");
 	BufferBox dummy;

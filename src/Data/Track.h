@@ -30,7 +30,7 @@ class Synthesizer;
 class Effect;
 
 
-class TrackLevel
+class TrackLayer
 {
 public:
 	Array<BufferBox> buffers;
@@ -61,7 +61,7 @@ public:
 	void _cdecl reset();
 	void _cdecl updatePeaks();
 	void _cdecl invalidateAllPeaks();
-	BufferBox _cdecl readBuffers(int level_no, const Range &r);
+	BufferBox _cdecl readBuffers(int layer_no, const Range &r);
 	BufferBox _cdecl readBuffersCol(const Range &r);
 
 	string _cdecl getNiceName();
@@ -73,7 +73,7 @@ public:
 	void _cdecl setMuted(bool muted);
 	void _cdecl setVolume(float volume);
 	void _cdecl setPanning(float panning);
-	BufferBox _cdecl getBuffers(int level_no, const Range &r);
+	BufferBox _cdecl getBuffers(int layer_no, const Range &r);
 	void _cdecl insertMidiData(int offset, const MidiData &midi);
 	void _cdecl addEffect(Effect *effect);
 	void _cdecl deleteEffect(int index);
@@ -110,7 +110,7 @@ public:
 
 	Instrument instrument;
 
-	Array<TrackLevel> levels;
+	Array<TrackLayer> layers;
 
 	float volume, panning;
 	bool muted;

@@ -1,2 +1,0 @@
-Dialog trackdest_dialog "Ziel-Spur für die Ebenen" 400 300
-	ListView track_list "Track"

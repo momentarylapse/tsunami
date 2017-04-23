@@ -83,7 +83,7 @@ bool Storage::load(Song *a, const string &filename)
 	return true;
 }
 
-bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
+bool Storage::loadTrack(Track *t, const string &filename, int offset, int layer)
 {
 	current_directory = filename.dirname();
 	FormatDescriptor *d = getFormat(filename.extension(), FormatDescriptor::FLAG_AUDIO);
@@ -94,7 +94,7 @@ bool Storage::loadTrack(Track *t, const string &filename, int offset, int level)
 	Song *a = t->song;
 	StorageOperationData od = StorageOperationData(this, f, a, t, NULL, filename, _("loading ") + d->description, tsunami->win);
 	od.offset = offset;
-	od.level = level;
+	od.layer = layer;
 
 	a->action_manager->beginActionGroup();
 
@@ -111,9 +111,9 @@ bool Storage::loadBufferBox(Song *a, BufferBox *buf, const string &filename)
 	aa->newWithOneTrack(Track::TYPE_AUDIO, a->sample_rate);
 	Track *t = aa->tracks[0];
 	bool ok = loadTrack(t, filename, 0, 0);
-	if (t->levels[0].buffers.num > 0){
-		buf->resize(t->levels[0].buffers[0].length);
-		buf->set(t->levels[0].buffers[0], 0, 1);
+	if (t->layers[0].buffers.num > 0){
+		buf->resize(t->layers[0].buffers[0].length);
+		buf->set(t->layers[0].buffers[0], 0, 1);
 	}
 	delete(aa);
 	return ok;

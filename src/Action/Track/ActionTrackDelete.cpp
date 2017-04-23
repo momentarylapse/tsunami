@@ -24,7 +24,7 @@ void ActionTrackDelete::build(Data *d)
 	Track *t = s->tracks[index];
 
 	// delete buffers
-	foreachi(TrackLevel &l, t->levels, li)
+	foreachi(TrackLayer &l, t->layers, li)
 		for (int i=l.buffers.num-1;i>=0;i--)
 			addSubAction(new ActionTrack__DeleteBufferBox(t, li, i), d);
 

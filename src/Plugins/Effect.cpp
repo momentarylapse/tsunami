@@ -23,7 +23,7 @@ Effect::Effect() :
 	enabled = true;
 	song = NULL;
 	track = NULL;
-	level = 0;
+	layer = 0;
 }
 
 Effect::Effect(Plugin *p) :
@@ -35,7 +35,7 @@ Effect::Effect(Plugin *p) :
 	enabled = true;
 	song = NULL;
 	track = NULL;
-	level = 0;
+	layer = 0;
 }
 
 Effect::~Effect()
@@ -68,7 +68,7 @@ void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 {
 	track = t;
 	song = t->song;
-	level = 0;
+	layer = 0;
 	range = buf.range();
 
 	// run
@@ -77,15 +77,15 @@ void Effect::apply(BufferBox &buf, Track *t, bool log_error)
 
 
 
-void Effect::doProcessTrack(Track *t, int _level, const Range &r)
+void Effect::doProcessTrack(Track *t, int _layer, const Range &r)
 {
 	track = t;
 	song = t->song;
-	level = _level;
+	layer = _layer;
 	range = r;
 
-	BufferBox buf = t->getBuffers(level, r);
-	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(track, level, r);
+	BufferBox buf = t->getBuffers(layer, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(track, layer, r);
 	processTrack(&buf);
 	song->execute(a);
 }

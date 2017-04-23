@@ -23,7 +23,7 @@ StorageOperationData::StorageOperationData(Storage *_storage, Format *_format, S
 	buf = b;
 	track = t;
 	offset = 0;
-	level = 0;
+	layer = 0;
 	renderer = NULL;
 }
 

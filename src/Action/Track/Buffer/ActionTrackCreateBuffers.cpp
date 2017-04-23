@@ -24,7 +24,7 @@ void ActionTrackCreateBuffers::build(Data *d)
 	Song *s = dynamic_cast<Song*>(d);
 	Track *t = s->tracks[track_no];
 
-	TrackLevel &l = t->levels[level_no];
+	TrackLayer &l = t->layers[level_no];
 
 	// is <pos> inside a buffer?
 	// last buffer before <pos>?

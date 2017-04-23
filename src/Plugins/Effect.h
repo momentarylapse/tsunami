@@ -41,11 +41,11 @@ public:
 	// context
 	Song *song;
 	Track *track;
-	int level;
+	int layer;
 
 	virtual void _cdecl processTrack(BufferBox *buf){};
 
-	void doProcessTrack(Track *t, int level, const Range &r);
+	void doProcessTrack(Track *t, int layer, const Range &r);
 
 	void prepare();
 	void apply(BufferBox &buf, Track *t, bool log_error);

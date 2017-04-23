@@ -61,24 +61,24 @@ Format::Format()
 	f = NULL;
 }
 
-void Format::importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int level)
+void Format::importData(Track *t, void *data, int channels, SampleFormat format, int samples, int offset, int layer)
 {
 	if (t->song->action_manager->isEnabled()){
-		BufferBox buf = t->getBuffers(level, Range(offset, samples));
+		BufferBox buf = t->getBuffers(layer, Range(offset, samples));
 
-		Action *a = new ActionTrackEditBuffer(t, level, Range(offset, samples));
+		Action *a = new ActionTrackEditBuffer(t, layer, Range(offset, samples));
 		buf.import(data, channels, format, samples);
 		t->song->action_manager->execute(a);
 	}else{
-		if (t->levels[0].buffers.num == 0){
+		if (t->layers[0].buffers.num == 0){
 			BufferBox dummy;
-			t->levels[0].buffers.add(dummy);
+			t->layers[0].buffers.add(dummy);
 		}
 
-		if (t->levels[0].buffers[0].length < offset + samples)
-			t->levels[0].buffers[0].resize(offset + samples);
+		if (t->layers[0].buffers[0].length < offset + samples)
+			t->layers[0].buffers[0].resize(offset + samples);
 		BufferBox buf;
-		buf.set_as_ref(t->levels[0].buffers[0], offset, samples);
+		buf.set_as_ref(t->layers[0].buffers[0], offset, samples);
 
 		buf.import(data, channels, format, samples);
 	}

@@ -1,3 +1,0 @@
-Toolbar log_toolbar ""
-	Item log_clear "Clear"
-	Item log_close "Close"

@@ -30,7 +30,7 @@ public:
 	void onAddTag();
 	void onDeleteTag();
 
-	void onEditLevels();
+	void onEditLayers();
 	void onEditSamples();
 	void onEditFx();
 

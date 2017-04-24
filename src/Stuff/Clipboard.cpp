@@ -105,11 +105,11 @@ void Clipboard::paste_track_as_samples(int source_index, Track *target, AudioVie
 		target->addSampleRef(view->sel.range.start(), ref);
 	}else{
 		if (target->type == Track::TYPE_AUDIO){
-			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0].buffers[0]));
-			ref_uid[source_index] = s->samples.back()->uid;
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->layers[0].buffers[0], true));
+			ref_uid[source_index] = sample->uid;
 		}else if (target->type == Track::TYPE_MIDI){
-			s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->midi));
-			ref_uid[source_index] = s->samples.back()->uid;
+			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, view->sel.range.start(), source->midi, true));
+			ref_uid[source_index] = sample->uid;
 		}
 	}
 }

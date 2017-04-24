@@ -10,20 +10,22 @@
 #include <assert.h>
 #include "../../Data/Song.h"
 
-ActionSampleAdd::ActionSampleAdd(const string &name, const BufferBox &buf)
+ActionSampleAdd::ActionSampleAdd(const string &name, const BufferBox &buf, bool auto_delete)
 {
 	sample = new Sample(Track::TYPE_AUDIO);
 	sample->buf = buf;
 	sample->buf.offset = 0;
 	sample->name = name;
+	sample->auto_delete = auto_delete;
 }
 
-ActionSampleAdd::ActionSampleAdd(const string &name, const MidiData &midi)
+ActionSampleAdd::ActionSampleAdd(const string &name, const MidiData &midi, bool auto_delete)
 {
 	sample = new Sample(Track::TYPE_MIDI);
 	sample->midi = midi;
 	sample->midi.sort();
 	sample->name = name;
+	sample->auto_delete = auto_delete;
 }
 
 ActionSampleAdd::~ActionSampleAdd()

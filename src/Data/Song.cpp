@@ -427,7 +427,7 @@ void Song::deleteTrack(int index)
 
 Sample *Song::addSample(const string &name, BufferBox &buf)
 {
-	return (Sample*)execute(new ActionSampleAdd(name, buf));
+	return (Sample*)execute(new ActionSampleAdd(name, buf, false));
 }
 
 void Song::deleteSample(Sample *s)

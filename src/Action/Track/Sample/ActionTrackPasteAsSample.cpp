@@ -11,30 +11,39 @@
 #include "../../Sample/ActionSampleAdd.h"
 #include "ActionTrackAddSample.h"
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const BufferBox &_buf)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const BufferBox &_buf, bool _auto_delete)
 {
 	t = _t;
 	pos = _pos;
 	buf = &_buf;
 	midi = NULL;
+	sample = NULL;
+	auto_delete = _auto_delete;
 }
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const MidiData &_midi)
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(Track *_t, int _pos, const MidiData &_midi, bool _auto_delete)
 {
 	t = _t;
 	pos = _pos;
 	buf = NULL;
 	midi = &_midi;
+	sample = NULL;
+	auto_delete = _auto_delete;
 }
 
 void ActionTrackPasteAsSample::build(Data *d)
 {
 	if (buf){
-		Sample* sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *buf), d);
+		sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *buf, auto_delete), d);
 		addSubAction(new ActionTrackAddSample(t, pos, sample), d);
 	}else if (midi){
-		Sample* sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *midi), d);
+		sample = (Sample*)addSubAction(new ActionSampleAdd("-paste-", *midi, auto_delete), d);
 		addSubAction(new ActionTrackAddSample(t, pos, sample), d);
 	}
+}
+
+void *ActionTrackPasteAsSample::execute_return(Data *d)
+{
+	return sample;
 }
 

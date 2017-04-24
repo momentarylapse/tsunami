@@ -17,8 +17,8 @@ class Sample;
 class ActionSampleAdd : public Action
 {
 public:
-	ActionSampleAdd(const string &name, const BufferBox &buf);
-	ActionSampleAdd(const string &name, const MidiData &midi);
+	ActionSampleAdd(const string &name, const BufferBox &buf, bool auto_delete);
+	ActionSampleAdd(const string &name, const MidiData &midi, bool auto_delete);
 	virtual ~ActionSampleAdd();
 
 	virtual void *execute(Data *d);

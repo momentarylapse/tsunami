@@ -23,7 +23,7 @@ SampleRefConsole::SampleRefConsole(AudioView *v, Song *s):
 
 	event("volume", this, &SampleRefConsole::onVolume);
 	event("mute", this, &SampleRefConsole::onMute);
-	event("level_track", this, &SampleRefConsole::onTrack);
+	event("track", this, &SampleRefConsole::onTrack);
 
 	event("edit_song", this, &SampleRefConsole::onEditSong);
 	event("edit_track", this, &SampleRefConsole::onEditTrack);

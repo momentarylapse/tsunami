@@ -26,6 +26,9 @@ Sample::Sample(int _type) :
 	auto_delete = false;
 
 	uid = randi(0x7fffffff);
+
+
+	_pointer_ref_count = 0;
 }
 
 Sample::~Sample()
@@ -70,9 +73,40 @@ SampleRef *Sample::create_ref()
 
 string Sample::getValue(const string &key) const
 {
-	for (Tag &t : tags)
+	for (Tag &t: tags)
 		if (t.key == key)
 			return t.value;
 	return "";
+}
+
+
+Sample *Sample::_pointer_ref()
+{
+	_pointer_ref_count ++;
+	return this;
+}
+
+void Sample::_pointer_unref()
+{
+	_pointer_ref_count --;
+	if (_pointer_ref_count == 0)
+		delete this;
+}
+
+void Sample::set_owner(Song *s)
+{
+	if (owner){
+		owner = s;
+	}else{
+		_pointer_ref();
+		owner = s;
+	}
+}
+
+void Sample::unset_owner()
+{
+	if (owner)
+		_pointer_unref();
+	owner = NULL;
 }
 

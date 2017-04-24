@@ -32,6 +32,8 @@ public:
 	Range _cdecl range() const;
 
 	Song *owner;
+	void set_owner(Song *s);
+	void unset_owner();
 
 	string name;
 	int type;
@@ -43,6 +45,10 @@ public:
 	int uid;
 	int ref_count;
 	bool auto_delete;
+
+	int _pointer_ref_count;
+	Sample *_pointer_ref();
+	void _pointer_unref();
 
 	Array<Tag> tags;
 	string _cdecl getValue(const string &key) const;

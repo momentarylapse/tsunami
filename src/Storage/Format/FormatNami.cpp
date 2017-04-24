@@ -748,7 +748,7 @@ public:
 	virtual void create()
 	{
 		me = new Sample(Track::TYPE_AUDIO);
-		me->owner = parent;
+		me->set_owner(parent);
 		parent->samples.add(me);
 	}
 	virtual void read(File *f)

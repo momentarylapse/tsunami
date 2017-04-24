@@ -12,14 +12,13 @@
 
 ActionSampleDelete::ActionSampleDelete(Sample *s)
 {
-	sample = s;
+	sample = s->_pointer_ref();
 	index = -1;
 }
 
 ActionSampleDelete::~ActionSampleDelete()
 {
-	if (!sample->owner)
-		delete(sample);
+	sample->_pointer_unref();
 }
 
 void *ActionSampleDelete::execute(Data *d)
@@ -34,7 +33,7 @@ void *ActionSampleDelete::execute(Data *d)
 
 	sample->notify(sample->MESSAGE_DELETE);
 	a->samples.erase(index);
-	sample->owner = NULL;
+	sample->unset_owner();
 
 	a->notify(a->MESSAGE_DELETE_SAMPLE);
 	return NULL;
@@ -43,7 +42,7 @@ void *ActionSampleDelete::execute(Data *d)
 void ActionSampleDelete::undo(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	sample->owner = a;
+	sample->set_owner(a);
 	a->samples.insert(sample, index);
 
 	a->notify(a->MESSAGE_ADD_SAMPLE);

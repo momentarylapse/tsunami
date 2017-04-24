@@ -17,6 +17,7 @@ ActionSampleAdd::ActionSampleAdd(const string &name, const BufferBox &buf, bool 
 	sample->buf.offset = 0;
 	sample->name = name;
 	sample->auto_delete = auto_delete;
+	sample->_pointer_ref();
 }
 
 ActionSampleAdd::ActionSampleAdd(const string &name, const MidiData &midi, bool auto_delete)
@@ -26,18 +27,18 @@ ActionSampleAdd::ActionSampleAdd(const string &name, const MidiData &midi, bool 
 	sample->midi.sort();
 	sample->name = name;
 	sample->auto_delete = auto_delete;
+	sample->_pointer_ref();
 }
 
 ActionSampleAdd::~ActionSampleAdd()
 {
-	if (!sample->owner)
-		delete(sample);
+	sample->_pointer_unref();
 }
 
 void *ActionSampleAdd::execute(Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
-	sample->owner = a;
+	sample->set_owner(a);
 	a->samples.add(sample);
 	a->notify(a->MESSAGE_ADD_SAMPLE);
 	return sample;
@@ -49,7 +50,7 @@ void ActionSampleAdd::undo(Data *d)
 	assert(sample->ref_count == 0);
 	sample->notify(sample->MESSAGE_DELETE);
 	a->samples.pop();
-	sample->owner = NULL;
+	sample->unset_owner();
 	a->notify(a->MESSAGE_DELETE_SAMPLE);
 }
 

@@ -1122,8 +1122,8 @@ View/Mode/ViewModeMidi.o : View/Mode/ViewModeMidi.cpp
 View/Mode/ViewModeScaleBars.o : View/Mode/ViewModeScaleBars.cpp
 	$(CPP) -c View/Mode/ViewModeScaleBars.cpp -o $@ $(CXXFLAGS)
 
-View/SideBar/CurveCapture.o : View/SideBar/CurveCapture.cpp
-	$(CPP) -c View/SideBar/CurveCapture.cpp -o $@ $(CXXFLAGS)
+View/SideBar/CaptureConsole.o : View/SideBar/CaptureConsole.cpp
+	$(CPP) -c View/SideBar/CaptureConsole.cpp -o $@ $(CXXFLAGS)
 
 View/SideBar/CurveConsole.o : View/SideBar/CurveConsole.cpp
 	$(CPP) -c View/SideBar/CurveConsole.cpp -o $@ $(CXXFLAGS)

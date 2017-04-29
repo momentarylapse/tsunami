@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef CAPTURECONSOLE_H_
-#define CAPTURECONSOLE_H_
+#ifndef SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_
+#define SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_
 
 
 #include "SideBar.h"
@@ -30,10 +30,22 @@ public:
 	virtual void onEnter();
 	virtual void onLeave();
 
-	void onTypeAudio();
-	void onTypeMidi();
-	void onSource();
-	void onTarget();
+	void beginAudio();
+	void beginMidi();
+	void beginMulti();
+	void beginMode(int type);
+	void endAudio();
+	void endMidi();
+	void endMulti();
+	void endMode(int type);
+
+	void onType();
+
+	void onSourceAudio();
+	void onTargetAudio();
+	void onSourceMidi();
+	void onTargetMidi();
+
 	void onStart();
 	void onDelete();
 	void onPause();
@@ -47,21 +59,25 @@ public:
 	DeviceManager *device_manager;
 
 	void updateSourceList();
-	Array<Device*> sources;
-	Device *chosen_device;
+	Array<Device*> sources_audio;
+	Device *chosen_device_audio;
+	Array<Device*> sources_midi;
+	Device *chosen_device_midi;
 	void updateTime();
 
 	void onUpdate(Observable *o, const string &message);
 
-	void setTarget(int index);
-	void setType(int type);
+	void setTargetAudio(int index);
+	void setTargetMidi(int index);
+	//void setType(int type);
 
 	Song *song;
 	AudioView *view;
 	InputStreamAny *input;
+	//InputStreamAny *input_midi;
 	PeakMeter *peak_meter;
 	Synthesizer *temp_synth;
 	int type;
 };
 
-#endif /* CAPTURECONSOLE_H_ */
+#endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_ */

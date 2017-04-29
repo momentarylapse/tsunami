@@ -1,11 +1,18 @@
 Dialog record_dialog "Aufnahme" 300 200
 	Grid ? "" 1 4
-		Group rdt_source "Source"
+		TabControl capture_type "Audio\\Midi\\Multi Track" noexpandy
+			Grid ? "" 1 4
+				Group rdt_audio_source "Source"
+					ComboBox capture_audio_source "" expandx
+				Group rdt_audio_target "Target"
+					ComboBox capture_audio_target "" expandx
+			Grid ? "" 1 4
+				Group rdt_midi_source "Source"
+					ComboBox capture_midi_source "" expandx
+				Group rdt_midi_target "Target"
+					ComboBox capture_midi_target "" expandx
 			Grid ? "" 1 2
-				Grid ? "" 2 1
-					RadioButton capture_type:audio "Audio"
-					RadioButton capture_type:midi "Midi"
-				ComboBox capture_source "" expandx
+				ListView capture_multi_list "Track\\Type\\Source" noexpandy
 		Group rdt_capture "Recording"
 			Grid ? "" 1 2
 				Grid ? "" 2 1 noexpandy
@@ -15,8 +22,8 @@ Dialog record_dialog "Aufnahme" 300 200
 					Button capture_start "" flat image=hui:media-record
 					Button capture_pause "" flat image=hui:media-pause
 					Button capture_delete "Dump" flat image=hui:delete
-		Group rdt_target "Target"
-			ComboBox capture_target "" expandx
 		Grid ? "" 2 1 buttonbar
 			Button /cancel "Cancel" image=hui:cancel
-			DefButton /ok "OK" image=hui:ok
+			DefButton /ok "OK" image=hui:ok		
+		Text ? "" expandy
+

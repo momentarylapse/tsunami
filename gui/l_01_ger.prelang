@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-378
+392
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -486,6 +486,9 @@ Auf Audiopuffer
 menu/record
 Aufnehmen
 
+menu/record_midi
+Midi aufnehmen
+
 menu/remove_sample
 Löschen
 
@@ -837,8 +840,17 @@ Samplerate
 record_dialog/capture_delete
 Verwerfen
 
+record_dialog/capture_mt_list
+Track\\Source
+
+record_dialog/capture_multi_list
+Track\\Typ\\Quelle
+
 record_dialog/capture_time
 0:00
+
+record_dialog/capture_type
+Audio\\Midi\\Multi Track
 
 record_dialog/capture_type:audio
 Audio
@@ -846,8 +858,20 @@ Audio
 record_dialog/capture_type:midi
 Midi
 
+record_dialog/rdt_audio_source
+Quelle
+
+record_dialog/rdt_audio_target
+Ziel
+
 record_dialog/rdt_capture
 Aufnahme
+
+record_dialog/rdt_midi_source
+Quelle
+
+record_dialog/rdt_midi_target
+Ziel
 
 record_dialog/rdt_source
 Quelle
@@ -857,6 +881,24 @@ Ziel
 
 record_dialog/record_dialog
 Aufnahme
+
+record_midi_dialog/capture_delete
+Verwerfen
+
+record_midi_dialog/capture_time
+0:00
+
+record_midi_dialog/rdt_capture
+Aufnahme
+
+record_midi_dialog/rdt_source
+Quelle
+
+record_midi_dialog/rdt_target
+Ziel
+
+record_midi_dialog/record_midi_dialog
+Midi Aufnahme
 
 sample_manager_dialog/create_from_selection
 
@@ -1138,7 +1180,7 @@ tuning_dialog/tuning_dialog
 Stimmung
 
 // Num Language Strings
-146
+147
 // Data (ID,Text)
 
 Neben diesen Angaben wird noch der Inhalt der Datei message.txt geschickt
@@ -1340,6 +1382,8 @@ Question
 Frage
 Recording
 Aufnahme
+Recording Midi
+Recording Midi
 Samplerate
 Samplerate
 Samples

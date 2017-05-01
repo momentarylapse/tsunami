@@ -20,9 +20,6 @@
 #endif
 
 
-static const float DEFAULT_UPDATE_TIME = 0.005f;
-const string InputStreamMidi::MESSAGE_CAPTURE = "Capture";
-
 class MidiPreviewFeedSource : public MidiSource
 {
 public:
@@ -53,14 +50,12 @@ public:
 
 
 InputStreamMidi::InputStreamMidi(int _sample_rate) :
-	PeakMeterSource("InputStreamMidi")
+	InputStreamAny("InputStreamMidi", _sample_rate)
 {
 #ifdef DEVICE_MIDI_ALSA
 	subs = NULL;
 #endif
 
-	sample_rate = _sample_rate;
-	update_dt = DEFAULT_UPDATE_TIME;
 	chunk_size = 512;
 
 	running = false;
@@ -312,26 +307,5 @@ void InputStreamMidi::update()
 		notify(MESSAGE_CAPTURE);
 
 	running = isCapturing();
-}
-
-float InputStreamMidi::getSampleRate()
-{
-	return sample_rate;
-}
-
-void InputStreamMidi::setUpdateDt(float dt)
-{
-	if (dt > 0)
-		update_dt = dt;
-	else
-		update_dt = DEFAULT_UPDATE_TIME;
-}
-
-void InputStreamMidi::setChunkSize(int size)
-{
-	if (size > 0)
-		chunk_size = size;
-	else
-		chunk_size = 512;
 }
 

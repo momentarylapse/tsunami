@@ -374,31 +374,45 @@ void PluginManager::LinkAppScriptData()
 
 	{
 	InputStreamAudio input(0);
+	Kaba::DeclareClassSize("InputStreamAny", sizeof(InputStreamAny));
+	Kaba::DeclareClassOffset("InputStreamAny", "sample_rate", _offsetof(InputStreamAny, sample_rate));
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&InputStreamAny::__delete__), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "start", Kaba::mf(&InputStreamAny::start), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "stop",	 Kaba::mf(&InputStreamAny::stop), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "isCapturing", Kaba::mf(&InputStreamAny::isCapturing), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSampleCount", Kaba::mf(&InputStreamAny::getSampleCount), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "accumulate", Kaba::mf(&InputStreamAny::accumulate), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "resetAccumulation", Kaba::mf(&InputStreamAny::resetAccumulation), &input);
+	Kaba::LinkExternal("InputStreamAny.addObserver", Kaba::mf(&InputStreamAny::addWrappedObserver));
+	Kaba::LinkExternal("InputStreamAny.removeObserver", Kaba::mf(&InputStreamAny::removeWrappedObserver));
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSampleRate", Kaba::mf(&InputStreamAny::getSampleRate), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getSomeSamples", Kaba::mf(&InputStreamAny::getSomeSamples), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "getState", Kaba::mf(&InputStreamAny::getState), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAny", "setBackupMode", Kaba::mf(&InputStreamAny::setBackupMode), &input);
+	}
+
+	{
+	InputStreamAudio input(0);
 	Kaba::DeclareClassSize("InputStreamAudio", sizeof(InputStreamAudio));
 	Kaba::DeclareClassOffset("InputStreamAudio", "current_buffer", _offsetof(InputStreamAudio, current_buffer));
 	Kaba::DeclareClassOffset("InputStreamAudio", "buffer", _offsetof(InputStreamAudio, buffer));
-	Kaba::DeclareClassOffset("InputStreamAudio", "sample_rate", _offsetof(InputStreamAudio, sample_rate));
 	Kaba::DeclareClassOffset("InputStreamAudio", "accumulating", _offsetof(InputStreamAudio, accumulating));
 	Kaba::DeclareClassOffset("InputStreamAudio", "capturing", _offsetof(InputStreamAudio, capturing));
 	Kaba::LinkExternal("InputStreamAudio." + Kaba::IDENTIFIER_FUNC_INIT, Kaba::mf(&InputStreamAudio::__init__));
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", Kaba::IDENTIFIER_FUNC_DELETE, Kaba::mf(&InputStreamAudio::__delete__), &input);
-	Kaba::LinkExternal("InputStreamAudio.start", Kaba::mf(&InputStreamAudio::start));
-	//Kaba::LinkExternal("InputStreamAudio.resetSync", Kaba::mf(&AudioInputAudio::resetSync));
-	Kaba::LinkExternal("InputStreamAudio.stop",	 Kaba::mf(&InputStreamAudio::stop));
-	Kaba::LinkExternal("InputStreamAudio.isCapturing", Kaba::mf(&InputStreamAudio::isCapturing));
-	Kaba::LinkExternal("InputStreamAudio.getSampleCount", Kaba::mf(&InputStreamAudio::getSampleCount));
-	Kaba::LinkExternal("InputStreamAudio.accumulate", Kaba::mf(&InputStreamAudio::accumulate));
-	Kaba::LinkExternal("InputStreamAudio.resetAccumulation", Kaba::mf(&InputStreamAudio::resetAccumulation));
-	//Kaba::LinkExternal("InputStreamAudio.getDelay", Kaba::mf(&AudioInputAudio::getDelay));
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "start", Kaba::mf(&InputStreamAudio::start), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "stop",	 Kaba::mf(&InputStreamAudio::stop), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "isCapturing", Kaba::mf(&InputStreamAudio::isCapturing), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSampleCount", Kaba::mf(&InputStreamAudio::getSampleCount), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "accumulate", Kaba::mf(&InputStreamAudio::accumulate), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "resetAccumulation", Kaba::mf(&InputStreamAudio::resetAccumulation), &input);
 	Kaba::LinkExternal("InputStreamAudio.addObserver", Kaba::mf(&InputStreamAudio::addWrappedObserver));
 	Kaba::LinkExternal("InputStreamAudio.removeObserver", Kaba::mf(&InputStreamAudio::removeWrappedObserver));
-	//Kaba::LinkExternal("Observable.addObserver", Kaba::mf(&Observable::AddWrappedObserver);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSampleRate", Kaba::mf(&InputStreamAudio::getSampleRate), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getSomeSamples", Kaba::mf(&InputStreamAudio::getSomeSamples), &input);
 	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "getState", Kaba::mf(&InputStreamAudio::getState), &input);
+	Kaba::DeclareClassVirtualIndex("InputStreamAudio", "setBackupMode", Kaba::mf(&InputStreamAudio::setBackupMode), &input);
 	}
-
-	Kaba::LinkExternal("InputStreamAny.setBackupMode", Kaba::mf(&InputStreamAny::setBackupMode));
 
 	{
 	OutputStream stream(NULL);

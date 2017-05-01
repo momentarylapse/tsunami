@@ -405,26 +405,36 @@ class MidiPort
 	int client, port
 	string client_name, port_name
 
-class InputStreamAudio
-	RingBuffer current_buffer
-	BufferBox buffer
+class InputStreamAny
 	int sample_rate
-	extern void __init__(int sample_rate)
 	extern virtual void __delete__()
-	extern bool start()
-	extern void stop()
-	extern bool isCapturing()
-	extern int getSampleCount()
-	extern void accumulate(bool enable)
-	extern void resetAccumulation()
+	extern virtual void setBackupMode(int mode)
+	extern virtual bool start()
+	extern virtual void stop()
+	extern virtual bool isCapturing()
+	extern virtual int getSampleCount()
+	extern virtual void accumulate(bool enable)
+	extern virtual void resetAccumulation()
 	extern virtual float getSampleRate()
 	extern virtual void getSomeSamples(BufferBox buf, int num)
 	extern virtual int getState()
 	extern void addObserver(void* handler, void* func)
 	extern void removeObserver(void* handler)
 
-class InputStreamAny
-	extern void setBackupMode(int mode)
+class InputStreamAudio extends InputStreamAny
+	RingBuffer current_buffer
+	BufferBox buffer
+	extern void __init__(int sample_rate)
+	extern override void __delete__()
+	extern override bool start()
+	extern override void stop()
+	extern override bool isCapturing()
+	extern override int getSampleCount()
+	extern override void accumulate(bool enable)
+	extern override void resetAccumulation()
+	extern override float getSampleRate()
+	extern override void getSomeSamples(BufferBox buf, int num)
+	extern override int getState()
 	
 /*class InputStream
 	extern virtual void __delete__()

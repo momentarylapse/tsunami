@@ -8,70 +8,49 @@
 #ifndef SRC_AUDIO_AUDIOINPUTANY_H_
 #define SRC_AUDIO_AUDIOINPUTANY_H_
 
-#include "../lib/base/base.h"
-#include "../lib/hui/hui.h"
-#include "../Data/RingBuffer.h"
-#include "../Data/Song.h"
 #include "../View/Helper/PeakMeter.h"
 
-class InputStreamAudio;
-class InputStreamMidi;
 class Device;
 
-class InputStreamAny : public PeakMeterSource, public Observer
+class InputStreamAny : public PeakMeterSource
 {
 public:
 
-	InputStreamAny(int sample_rate);
+	InputStreamAny(const string &name, int sample_rate);
 	virtual ~InputStreamAny();
 
 	static const string MESSAGE_CAPTURE;
 
-	void setType(int type);
+	virtual bool _cdecl start() = 0;
+	virtual void _cdecl stop() = 0;
 
-	bool start();
-	void stop();
+	virtual bool _cdecl isCapturing() = 0;
+	virtual int _cdecl getDelay() = 0;
+	virtual void _cdecl resetSync() = 0;
 
-	bool isCapturing();
-	int getDelay(){ return 0; }
-	void resetSync(){}
+	virtual void _cdecl accumulate(bool enable) = 0;
+	virtual void _cdecl resetAccumulation() = 0;
+	virtual int _cdecl getSampleCount() = 0;
 
-	void accumulate(bool enable);
-	void resetAccumulation();
-	int getSampleCount();
-
+	// PeakMeterSource
 	virtual float _cdecl getSampleRate(){ return sample_rate; }
-	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
-	virtual int _cdecl getState();
+	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples) = 0;
+	virtual int _cdecl getState() = 0;
 
-	void setDevice(Device *d);
-	Device *getDevice();
+	virtual void _cdecl setDevice(Device *d) = 0;
+	virtual Device *_cdecl getDevice() = 0;
 
-	void setBackupMode(int mode);
+	virtual void _cdecl setBackupMode(int mode);
+	int backup_mode;
 
-	void setPreviewSynthesizer(Synthesizer *s);
+	virtual int _cdecl getType() = 0;
 
-	virtual void onUpdate(Observable *o, const string &message);
-
-
-	void _cdecl setChunkSize(int size);
-	void _cdecl setUpdateDt(float dt);
+	virtual void _cdecl setChunkSize(int size);
+	virtual void _cdecl setUpdateDt(float dt);
 	int chunk_size;
 	float update_dt;
 
 	int sample_rate;
-
-	RingBuffer *current_buffer;
-	BufferBox *buffer;
-	MidiRawData *midi;
-	MidiRawData *current_midi;
-
-	int type;
-	InputStreamAudio *input_audio;
-	InputStreamMidi *input_midi;
-	int backup_mode;
-
-	Synthesizer *preview_synth;
 };
 
 #endif /* SRC_AUDIO_AUDIOINPUTANY_H_ */

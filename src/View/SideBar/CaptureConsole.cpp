@@ -7,8 +7,8 @@
 
 #include "../../Tsunami.h"
 #include "../../TsunamiWindow.h"
-#include "../../Device/InputStreamAny.h"
 #include "../../Device/InputStreamAudio.h"
+#include "../../Device/InputStreamMidi.h"
 #include "../../Device/OutputStream.h"
 #include "../../Audio/Renderer/SongRenderer.h"
 #include "../../Audio/Synth/Synthesizer.h"
@@ -76,13 +76,7 @@ inline int dev_type(int type)
 void CaptureConsole::onEnter()
 {
 	type = -1;
-	input = new InputStreamAny(song->sample_rate);
-	input->setBackupMode(BACKUP_MODE_TEMP);
-	input->setChunkSize(4096);
-	input->setUpdateDt(0.03f);
-	subscribe(input);
-	view->setInput(input);
-	peak_meter->setSource(input);
+	input = NULL;
 
 	chosen_device_audio = NULL;
 	chosen_device_midi = NULL;
@@ -190,10 +184,22 @@ void CaptureConsole::beginMode(int mode)
 
 void CaptureConsole::beginAudio()
 {
+	if (input){
+		delete(input);
+		input = NULL;
+	}
+
 	type = Track::TYPE_AUDIO;
 	setInt("capture_type", 0);
 
-	input->setType(type);
+	input = new InputStreamAudio(song->sample_rate);
+	input->setBackupMode(BACKUP_MODE_TEMP);
+	input->setChunkSize(4096);
+	input->setUpdateDt(0.03f);
+	subscribe(input);
+	view->setInput(input);
+	peak_meter->setSource(input);
+
 	input->setDevice(chosen_device_audio);
 
 	enable("capture_audio_source", false);
@@ -208,10 +214,22 @@ void CaptureConsole::beginAudio()
 
 void CaptureConsole::beginMidi()
 {
+	if (input){
+		delete(input);
+		input = NULL;
+	}
+
 	type = Track::TYPE_MIDI;
 	setInt("capture_type", 1);
 
-	input->setType(type);
+	input = new InputStreamMidi(song->sample_rate);
+	input->setBackupMode(BACKUP_MODE_TEMP);
+	input->setChunkSize(4096);
+	input->setUpdateDt(0.03f);
+	subscribe(input);
+	view->setInput(input);
+	peak_meter->setSource(input);
+
 	input->setDevice(chosen_device_midi);
 
 	enable("capture_midi_source", false);
@@ -232,6 +250,9 @@ void CaptureConsole::beginMulti()
 
 void CaptureConsole::setTargetAudio(int index)
 {
+	if (type != Track::TYPE_AUDIO)
+		return;
+
 	if (index < song->tracks.num){
 		Track *t = song->tracks[index];
 		if (t->type == t->TYPE_TIME){
@@ -244,16 +265,18 @@ void CaptureConsole::setTargetAudio(int index)
 
 void CaptureConsole::setTargetMidi(int index)
 {
+	if (type != Track::TYPE_MIDI)
+		return;
 	if (index < song->tracks.num){
 		Track *t = song->tracks[index];
 		if (t->type == t->TYPE_TIME){
 			index = song->tracks.num;
-			input->setPreviewSynthesizer(temp_synth);
+			((InputStreamMidi*)input)->setPreviewSynthesizer(temp_synth);
 		}else{
-			input->setPreviewSynthesizer(t->synth);
+			((InputStreamMidi*)input)->setPreviewSynthesizer(t->synth);
 		}
 	}else{
-		input->setPreviewSynthesizer(temp_synth);
+		((InputStreamMidi*)input)->setPreviewSynthesizer(temp_synth);
 	}
 	view->capturing_track = index;
 	setInt("capture_midi_target", index);
@@ -261,6 +284,8 @@ void CaptureConsole::setTargetMidi(int index)
 
 void CaptureConsole::onSourceAudio()
 {
+	if (type != Track::TYPE_AUDIO)
+		return;
 	int n = getInt("");
 	if ((n >= 0) and (n < sources_audio.num)){
 		chosen_device_audio = sources_audio[n];
@@ -270,6 +295,8 @@ void CaptureConsole::onSourceAudio()
 
 void CaptureConsole::onSourceMidi()
 {
+	if (type != Track::TYPE_MIDI)
+		return;
 	int n = getInt("");
 	if ((n >= 0) and (n < sources_midi.num)){
 		chosen_device_midi = sources_midi[n];
@@ -407,11 +434,11 @@ bool CaptureConsole::insert()
 		song->action_manager->beginActionGroup();
 		BufferBox tbuf = t->getBuffers(view->cur_layer, r);
 		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
-		tbuf.set(*input->buffer, 0, 1.0f);
+		tbuf.set(((InputStreamAudio*)input)->buffer, 0, 1.0f);
 		song->execute(a);
 		song->action_manager->endActionGroup();
 	}else if (type == t->TYPE_MIDI){
-		t->insertMidiData(i0, midi_events_to_notes(*input->midi));
+		t->insertMidiData(i0, midi_events_to_notes(((InputStreamMidi*)input)->midi));
 	}
 	input->resetAccumulation();
 	return true;

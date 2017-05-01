@@ -12,7 +12,7 @@
 #include "../lib/hui/hui.h"
 #include "../Data/Song.h"
 #include "../Data/RingBuffer.h"
-#include "../View/Helper/PeakMeter.h"
+#include "InputStreamAny.h"
 #include "config.h"
 
 class PluginManager;
@@ -22,7 +22,7 @@ class Device;
 struct pa_stream;
 #endif
 
-class InputStreamAudio : public PeakMeterSource
+class InputStreamAudio : public InputStreamAny
 {
 	friend class PluginManager;
 public:
@@ -32,17 +32,15 @@ public:
 	void _cdecl __init__(int sample_rate);
 	virtual void _cdecl __delete__();
 
-	static const string MESSAGE_CAPTURE;
-
 	void _startUpdate();
 	void _stopUpdate();
 	void update();
 
-	void _cdecl setDevice(Device *device);
-	Device* _cdecl getDevice();
+	virtual void _cdecl setDevice(Device *device);
+	virtual Device* _cdecl getDevice();
 
-	bool _cdecl start();
-	void _cdecl stop();
+	virtual bool _cdecl start();
+	virtual void _cdecl stop();
 
 	int _cdecl getDelay();
 	void _cdecl resetSync();
@@ -50,14 +48,13 @@ public:
 	int doCapturing();
 
 
-	bool _cdecl isCapturing();
+	virtual bool _cdecl isCapturing();
 
 
-	void _cdecl accumulate(bool enable);
-	void _cdecl resetAccumulation();
-	int _cdecl getSampleCount();
+	virtual void _cdecl accumulate(bool enable);
+	virtual void _cdecl resetAccumulation();
+	virtual int _cdecl getSampleCount();
 
-	virtual float _cdecl getSampleRate();
 	virtual void _cdecl getSomeSamples(BufferBox &buf, int num_samples);
 	virtual int _cdecl getState();
 
@@ -70,15 +67,11 @@ public:
 	static string getBackupFilename();
 	static void setBackupFilename(const string &filename);
 	static void setTempBackupFilename(const string &filename);
-	void setBackupMode(int mode);
 	static string temp_backup_filename;
 	static string backup_filename;
 
 
-	void _cdecl setChunkSize(int size);
-	int chunk_size;
-	void _cdecl setUpdateDt(float dt);
-	float update_dt;
+	virtual int _cdecl getType(){ return Track::TYPE_AUDIO; }
 
 
 	RingBuffer current_buffer;
@@ -86,7 +79,6 @@ public:
 
 private:
 
-	int sample_rate;
 	bool accumulating;
 	bool capturing;
 
@@ -105,7 +97,6 @@ private:
 
 	File *backup_file;
 	static string cur_backup_filename;
-	int backup_mode;
 
 	struct SyncData
 	{

@@ -14,6 +14,8 @@
 #include "../Tsunami.h"
 #include "../TsunamiWindow.h"
 #include "../Device/InputStreamAny.h"
+#include "../Device/InputStreamAudio.h"
+#include "../Device/InputStreamMidi.h"
 #include "../Device/OutputStream.h"
 #include "../Audio/Renderer/MidiRenderer.h"
 #include "../Audio/Synth/Synthesizer.h"
@@ -713,13 +715,14 @@ void AudioView::drawAudioFile(Painter *c, const rect &r)
 
 	// capturing preview
 	if (input and input->isCapturing()){
-		if (input->type == Track::TYPE_AUDIO)
-			input->buffer->update_peaks();
+		int type = input->getType();
+		if (type == Track::TYPE_AUDIO)
+			((InputStreamAudio*)input)->buffer.update_peaks();
 		if ((capturing_track >= 0) and (capturing_track < vtrack.num)){
-			if (input->type == Track::TYPE_AUDIO)
-				vtrack[capturing_track]->drawBuffer(c, *input->buffer, cam.pos - sel.range.offset, colors.capture_marker);
-			if (input->type == Track::TYPE_MIDI)
-				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(*input->midi), true, sel.range.start());
+			if (type == Track::TYPE_AUDIO)
+				vtrack[capturing_track]->drawBuffer(c, ((InputStreamAudio*)input)->buffer, cam.pos - sel.range.offset, colors.capture_marker);
+			if (type == Track::TYPE_MIDI)
+				vtrack[capturing_track]->drawMidi(c, midi_events_to_notes(((InputStreamMidi*)input)->midi), true, sel.range.start());
 		}
 	}
 

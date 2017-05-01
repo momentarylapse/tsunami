@@ -27,14 +27,10 @@ string InputStreamAudio::cur_backup_filename;
 float InputStreamAudio::playback_delay_const;
 
 
-static const int DEFAULT_CHUNK_SIZE = 512;
-static const float DEFAULT_UPDATE_TIME = 0.005f;
-const string InputStreamAudio::MESSAGE_CAPTURE = "Capture";
-
 
 #ifdef DEVICE_PULSEAUDIO
-extern void pa_wait_op(pa_operation *op); // -> AudioOutput.cpp
-extern bool pa_wait_stream_ready(pa_stream *s); // -> AudioStream.cpp
+extern void pa_wait_op(pa_operation *op); // -> DeviceManager.cpp
+extern bool pa_wait_stream_ready(pa_stream *s); // -> OutputStream.cpp
 #endif
 
 #ifdef DEVICE_PULSEAUDIO
@@ -118,10 +114,9 @@ int InputStreamAudio::SyncData::getDelay()
 
 
 InputStreamAudio::InputStreamAudio(int _sample_rate) :
-	PeakMeterSource("InputStreamAudio"),
+	InputStreamAny("InputStreamAudio", _sample_rate),
 	current_buffer(1048576)
 {
-	sample_rate = _sample_rate;
 	capturing = false;
 #ifdef DEVICE_PULSEAUDIO
 	_stream = NULL;
@@ -136,8 +131,6 @@ InputStreamAudio::InputStreamAudio(int _sample_rate) :
 	backup_mode = BACKUP_MODE_NONE;
 
 	running = false;
-	update_dt = DEFAULT_UPDATE_TIME;
-	chunk_size = DEFAULT_CHUNK_SIZE;
 
 	if (file_test_existence(getBackupFilename()))
 		tsunami->log->warn(_("found old recording: ") + getBackupFilename());
@@ -300,22 +293,6 @@ void InputStreamAudio::setPlaybackDelayConst(float f)
 	HuiConfig.setFloat("Input.PlaybackDelay", playback_delay_const);
 }
 
-void InputStreamAudio::setChunkSize(int size)
-{
-	if (size > 0)
-		chunk_size = size;
-	else
-		chunk_size = DEFAULT_CHUNK_SIZE;
-}
-
-void InputStreamAudio::setUpdateDt(float dt)
-{
-	if (dt > 0)
-		update_dt = dt;
-	else
-		update_dt = DEFAULT_UPDATE_TIME;
-}
-
 int InputStreamAudio::doCapturing()
 {
 	if (!capturing)
@@ -350,11 +327,6 @@ void InputStreamAudio::resetSync()
 void InputStreamAudio::getSomeSamples(BufferBox &buf, int num_samples)
 {
 	current_buffer.peekRef(buf, -num_samples);
-}
-
-float InputStreamAudio::getSampleRate()
-{
-	return sample_rate;
 }
 
 bool InputStreamAudio::isCapturing()
@@ -401,11 +373,6 @@ void InputStreamAudio::setBackupFilename(const string &filename)
 void InputStreamAudio::setTempBackupFilename(const string &filename)
 {
 	temp_backup_filename = filename;
-}
-
-void InputStreamAudio::setBackupMode(int mode)
-{
-	backup_mode = mode;
 }
 
 void InputStreamAudio::_startUpdate()

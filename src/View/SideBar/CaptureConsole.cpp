@@ -51,8 +51,8 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	//event("hui:close", this, &CaptureConsole::onClose);
 	event("ok", this, &CaptureConsole::onOk);
 	event("capture_type", this, &CaptureConsole::onType);
-	event("capture_source", this, &CaptureConsole::onSourceAudio);
-	event("capture_target", this, &CaptureConsole::onTargetAudio);
+	event("capture_audio_source", this, &CaptureConsole::onSourceAudio);
+	event("capture_audio_target", this, &CaptureConsole::onTargetAudio);
 	event("capture_midi_source", this, &CaptureConsole::onSourceMidi);
 	event("capture_midi_target", this, &CaptureConsole::onTargetMidi);
 	event("capture_start", this, &CaptureConsole::onStart);
@@ -81,8 +81,8 @@ void CaptureConsole::onEnter()
 	chosen_device_audio = NULL;
 	chosen_device_midi = NULL;
 
-	chosen_device_audio = device_manager->chooseDevice(Track::TYPE_AUDIO);
-	chosen_device_midi = device_manager->chooseDevice(Track::TYPE_MIDI);
+	chosen_device_audio = device_manager->chooseDevice(Device::TYPE_AUDIO_INPUT);
+	chosen_device_midi = device_manager->chooseDevice(Device::TYPE_MIDI_INPUT);
 
 	updateSourceList();
 
@@ -306,8 +306,8 @@ void CaptureConsole::onSourceMidi()
 
 void CaptureConsole::updateSourceList()
 {
-	sources_audio = device_manager->getGoodDeviceList(Track::TYPE_AUDIO);
-	sources_midi = device_manager->getGoodDeviceList(Track::TYPE_MIDI);
+	sources_audio = device_manager->getGoodDeviceList(Device::TYPE_AUDIO_INPUT);
+	sources_midi = device_manager->getGoodDeviceList(Device::TYPE_MIDI_INPUT);
 
 	// add all
 	reset("capture_audio_source");

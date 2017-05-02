@@ -230,17 +230,13 @@ bool InputStreamAudio::start()
 	const char *dev = NULL;
 	if (!device->is_default())
 		dev = device->internal_name.c_str();
-	msg_write("dev: " + device->internal_name);
 	pa_stream_connect_record(_stream, dev, &attr_in, (pa_stream_flags_t)PA_STREAM_ADJUST_LATENCY);
 	// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
-	msg_write(p2s(_stream));
 	testError("pa_stream_connect_record");
 
 	if (!pa_wait_stream_ready(_stream)){
 
-		msg_write("bbb input");
 		tsunami->log->error("pa_wait_for_stream_ready");
-		exit(1);
 		return false;
 	}
 #endif

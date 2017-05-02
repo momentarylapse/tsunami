@@ -107,6 +107,36 @@ void OnGtkListSelect(GtkTreeSelection *selection, gpointer data)
 {	((HuiControl*)data)->notify("hui:select", false);	}
 
 
+void OnGtkListRowDeleted(GtkTreeModel *tree_model, GtkTreePath *path, gpointer user_data)
+{
+	HuiControlListView *lv = (HuiControlListView*)user_data;
+	if (!lv->allow_change_messages)
+		return;
+
+	//msg_write("row del");
+	gint *indices = gtk_tree_path_get_indices(path);
+
+	if (indices[0] >= lv->row_target){
+		lv->panel->win->input.row = indices[0] - 1;
+		lv->panel->win->input.row_target = lv->row_target;
+	}else{
+		lv->panel->win->input.row = indices[0];
+		lv->panel->win->input.row_target = lv->row_target - 1;
+	}
+	lv->notify("hui:move", false);
+}
+
+void OnGtkListRowInserted(GtkTreeModel *tree_model, GtkTreePath *path, GtkTreeIter *iter, gpointer user_data)
+{
+	HuiControlListView *lv = (HuiControlListView*)user_data;
+	if (!lv->allow_change_messages)
+		return;
+	//msg_write("row insert");
+	gint *indices = gtk_tree_path_get_indices(path);
+	lv->row_target = indices[0];
+}
+
+
 HuiControlListView::HuiControlListView(const string &title, const string &id, HuiPanel *panel) :
 	HuiControl(HUI_KIND_LISTVIEW, id)
 {
@@ -127,7 +157,10 @@ HuiControlListView::HuiControlListView(const string &title, const string &id, Hu
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(view));
 	g_signal_connect(G_OBJECT(sel), "changed", G_CALLBACK(&OnGtkListSelect), this);
 
-	//gtk_tree_view_set_reorderable(GTK_TREE_VIEW(view), true);
+
+	g_signal_connect(G_OBJECT(store), "row-inserted", G_CALLBACK(&OnGtkListRowInserted), this);
+	g_signal_connect(G_OBJECT(store), "row-deleted", G_CALLBACK(&OnGtkListRowDeleted), this);
+	allow_change_messages = true;
 
 	// frame
 	frame = sw;
@@ -172,13 +205,14 @@ void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const str
 
 void HuiControlListView::__addString(const string& str)
 {
+	allow_change_messages = false;
 	GtkTreeIter iter;
 	GetPartStrings(str);
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_list_store_append(store, &iter);
 	for (int j=0;j<PartString.num;j++)
 		set_list_cell(store, iter, j, PartString[j]);
-	//_item_.add(iter);
+	allow_change_messages = true;
 }
 
 void HuiControlListView::__setInt(int i)
@@ -227,10 +261,12 @@ void HuiControlListView::__removeString(int row)
 {
 	if (row < 0)
 		return;
+	allow_change_messages = false;
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	GtkTreeIter iter;
 	if (gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, row))
 		gtk_list_store_remove(store, &iter);
+	allow_change_messages = true;
 }
 
 string HuiControlListView::getCell(int row, int column)
@@ -286,8 +322,10 @@ void HuiControlListView::__setSelection(Array<int>& selected)
 
 void HuiControlListView::__reset()
 {
+	allow_change_messages = false;
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_list_store_clear(store);
+	allow_change_messages = true;
 }
 
 void HuiControlListView::__setOption(const string &op, const string &value)

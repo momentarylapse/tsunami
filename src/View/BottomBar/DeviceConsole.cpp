@@ -21,6 +21,9 @@ DeviceConsole::DeviceConsole(DeviceManager *_device_manager) :
 	eventX("output-list", "hui:change", this, &DeviceConsole::onOutputEdit);
 	eventX("input-list", "hui:change", this, &DeviceConsole::onInputEdit);
 	eventX("midi-input-list", "hui:change", this, &DeviceConsole::onMidiInputEdit);
+	eventX("output-list", "hui:move", this, &DeviceConsole::onOutputMove);
+	eventX("input-list", "hui:move", this, &DeviceConsole::onInputMove);
+	eventX("midi-input-list", "hui:move", this, &DeviceConsole::onMidiInputMove);
 	event("top-priority", this, &DeviceConsole::onTopPriority);
 	event("erase", this, &DeviceConsole::onErase);
 
@@ -176,6 +179,32 @@ void DeviceConsole::onTopPriority()
 		if (n >= 0)
 			device_manager->makeDeviceTopPriority(midi_input_devices[n]);
 	}
+}
+
+
+void DeviceConsole::onOutputMove()
+{
+	int source = HuiGetEvent()->row;
+	int target = HuiGetEvent()->row_target;
+	//msg_write(format("  move  %d  ->  %d", source, target));
+	device_manager->moveDevicePriority(output_devices[source], target);
+	setInt("output-list", target);
+}
+
+void DeviceConsole::onInputMove()
+{
+	int source = HuiGetEvent()->row;
+	int target = HuiGetEvent()->row_target;
+	device_manager->moveDevicePriority(input_devices[source], target);
+	setInt("input-list", target);
+}
+
+void DeviceConsole::onMidiInputMove()
+{
+	int source = HuiGetEvent()->row;
+	int target = HuiGetEvent()->row_target;
+	device_manager->moveDevicePriority(midi_input_devices[source], target);
+	setInt("midi-input-list", target);
 }
 
 void DeviceConsole::onErase()

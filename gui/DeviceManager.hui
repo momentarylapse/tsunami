@@ -5,5 +5,4 @@ Dialog device-manager "" 400 200
 			ListView input-list "#\\name\\internal name\\channels\\show\\present\\latency (ms)" format=ttttCcT reorderable
 			ListView midi-input-list "#\\name\\internal name\\show\\present" format=tttCc reorderable
 		Grid ? "" 1 2
-			Button top-priority "" flat image=hui:up tooltip="highest priority"
-			Button erase "" flat image=hui:delete
+			Button erase "" flat image=hui:delete tooltip="Remove from list"

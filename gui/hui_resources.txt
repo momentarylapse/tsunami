@@ -10,7 +10,7 @@ menu_fake
 0
 48
 0
-17390192
+15065216
 0
 2
 Item
@@ -968,25 +968,14 @@ rand_id_944318
 1
 2
 -1
-2
-Button
-top-priority
-flat
-hui:up
 1
-0
-0
-1
-1
--1
-0
 Button
 erase
 flat
 hui:delete
 1
 0
-1
+0
 1
 1
 -1
@@ -6737,6 +6726,9 @@ Verstimmung
 device-manager/dev-tab
 Output\\Input\\Midi Input
 
+device-manager/erase
+
+Remove from list
 device-manager/input-list
 #\\name\\internal name\\channels\\show\\present\\latency (ms)
 
@@ -6746,9 +6738,6 @@ device-manager/midi-input-list
 device-manager/output-list
 #\\name\\internal name\\channels\\show\\present
 
-device-manager/top-priority
-
-highest priority
 dummy_favorite_dialog/cancel
 Cancel
 
@@ -7565,7 +7554,7 @@ Stimmung
 // Language
 Deutsch
 // Number Of IDs
-391
+392
 // Text
 /cancel
 Abbrechen
@@ -7801,6 +7790,9 @@ Verstimmung
 device-manager/dev-tab
 Output\\Input\\Midi Input
 
+device-manager/erase
+
+Aus Liste entfernen
 device-manager/input-list
 #\\Name\\Interner Name\\Kanäle\\anzeigen\\präsent\\Latenz (ms)
 

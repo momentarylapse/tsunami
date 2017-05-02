@@ -26,6 +26,9 @@ public:
 	void onOutputEdit();
 	void onInputEdit();
 	void onMidiInputEdit();
+	void onOutputMove();
+	void onInputMove();
+	void onMidiInputMove();
 	void onTopPriority();
 	void onErase();
 

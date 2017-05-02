@@ -61,6 +61,7 @@ public:
 
 	void setDeviceConfig(Device *d);
 	void makeDeviceTopPriority(Device *d);
+	void moveDevicePriority(Device *d, int new_prio);
 
 	Device *get_device(int type, const string &internal_name);
 	Device *get_device_create(int type, const string &internal_name);

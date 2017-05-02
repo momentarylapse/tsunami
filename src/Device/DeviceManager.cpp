@@ -502,6 +502,24 @@ void DeviceManager::makeDeviceTopPriority(Device *d)
 	notify(MESSAGE_CHANGE);
 }
 
+void DeviceManager::moveDevicePriority(Device *d, int new_prio)
+{
+	Array<Device*> &devices = getDeviceList(d->type);
+	for (int i=0; i<devices.num; i++)
+		if (devices[i] == d){
+			if (i > new_prio){
+				devices.insert(d, new_prio);
+				devices.erase(i + 1);
+			}else{
+				devices.insert(d, new_prio + 1);
+				devices.erase(i);
+			}
+			break;
+		}
+	write_config();
+	notify(MESSAGE_CHANGE);
+}
+
 bool DeviceManager::testError(const string &msg)
 {
 #ifdef DEVICE_PULSEAUDIO

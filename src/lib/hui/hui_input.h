@@ -59,7 +59,7 @@ class HuiEvent
 	string text;
 	int width, height;
 	bool lbut, mbut, rbut;
-	int row, column;
+	int row, column, row_target;
 	HuiEvent(){}
 	HuiEvent(const string &id, const string &message);
 };

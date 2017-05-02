@@ -28,6 +28,9 @@ public:
 	virtual void __setSelection(Array<int> &sel);
 	virtual void __reset();
 	virtual void __setOption(const string &op, const string &value);
+
+	bool allow_change_messages;
+	int row_target;
 };
 
 #endif /* HUICONTROLLISTVIEW_H_ */

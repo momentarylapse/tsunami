@@ -175,6 +175,7 @@ bool HuiPanel::_send_event_(HuiEvent *e)
 	e->key = (e->key_code % 256);
 	e->text = HuiGetKeyChar(e->key_code);
 	e->row = win->input.row;
+	e->row_target = win->input.row_target;
 	e->column = win->input.column;
 	_HuiEvent_ = *e;
 	if (e->id.num > 0)

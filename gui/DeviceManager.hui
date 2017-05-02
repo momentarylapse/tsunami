@@ -1,9 +1,9 @@
 Dialog device-manager "" 400 200
 	Grid ? "" 2 1
 		TabControl dev-tab "Output\\Input\\Midi Input"
-			ListView output-list "#\\name\\internal name\\channels\\show\\present" format=ttttCc
-			ListView input-list "#\\name\\internal name\\channels\\show\\present\\latency (ms)" format=ttttCcT
-			ListView midi-input-list "#\\name\\internal name\\show\\present" format=tttCc
+			ListView output-list "#\\name\\internal name\\channels\\show\\present" format=ttttCc reorderable
+			ListView input-list "#\\name\\internal name\\channels\\show\\present\\latency (ms)" format=ttttCcT reorderable
+			ListView midi-input-list "#\\name\\internal name\\show\\present" format=tttCc reorderable
 		Grid ? "" 1 2
 			Button top-priority "" flat image=hui:up tooltip="highest priority"
 			Button erase "" flat image=hui:delete

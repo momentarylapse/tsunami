@@ -301,7 +301,7 @@ layer_dialog/layer_dialog
 Ebenen
 
 layer_dialog/layers
-#\\Name
+#\\Name\\Aktiv
 Jede Ebene kann ihre eigenen Audio-Puffer enthalten
 layer_dialog/lvld_t_edit
 Bearbeiten

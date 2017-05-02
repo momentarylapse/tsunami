@@ -75,7 +75,7 @@ public:
 	virtual string getCell(int row, int column){ return ""; }
 	virtual void __setCell(int row, int column, const string &str){}
 	void setCell(int row, int column, const string &str);
-	virtual Array<int> getMultiSelection(){ Array<int> r; return r; }
+	virtual Array<int> getSelection(){ Array<int> r; return r; }
 	virtual void __setSelection(const Array<int> &sel){}
 	void setSelection(const Array<int> &sel);
 	virtual void expand(int row, bool expand){}

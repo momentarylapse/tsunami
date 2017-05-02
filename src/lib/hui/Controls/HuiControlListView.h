@@ -24,14 +24,10 @@ public:
 	virtual void __removeString(int row);
 	virtual string getCell(int row, int column);
 	virtual void __setCell(int row, int column, const string &str);
-	virtual Array<int> getMultiSelection();
+	virtual Array<int> getSelection();
 	virtual void __setSelection(Array<int> &sel);
 	virtual void __reset();
 	virtual void __setOption(const string &op, const string &value);
-
-#ifdef HUI_API_GTK
-	Array<GtkTreeIter> _item_;
-#endif
 };
 
 #endif /* HUICONTROLLISTVIEW_H_ */

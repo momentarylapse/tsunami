@@ -182,7 +182,7 @@ void HuiControlTreeView::__setCell(int row, int column, const string& str)
 		set_tree_cell(store, _item_[row], column, str);
 }
 
-Array<int> HuiControlTreeView::getMultiSelection()
+Array<int> HuiControlTreeView::getSelection()
 {
 	Array<int> sel;
 	GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));

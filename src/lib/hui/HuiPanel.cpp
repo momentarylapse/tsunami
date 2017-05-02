@@ -616,7 +616,7 @@ bool HuiPanel::isChecked(const string &_id)
 Array<int> HuiPanel::getSelection(const string &_id)
 {
 	test_controls(_id, c)
-		return c->getMultiSelection();
+		return c->getSelection();
 	Array<int> sel;
 	return sel;
 }

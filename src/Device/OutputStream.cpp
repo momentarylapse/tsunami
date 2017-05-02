@@ -503,6 +503,7 @@ void OutputStream::play()
 
 		if (!pa_wait_stream_ready(_stream)){
 			// still no luck... give up
+			msg_write("aaaaa");
 			tsunami->log->error("pa_wait_for_stream_ready");
 			stop();
 			return;

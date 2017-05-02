@@ -178,17 +178,20 @@ void HuiControlListView::__addString(const string& str)
 	gtk_list_store_append(store, &iter);
 	for (int j=0;j<PartString.num;j++)
 		set_list_cell(store, iter, j, PartString[j]);
-	_item_.add(iter);
+	//_item_.add(iter);
 }
 
 void HuiControlListView::__setInt(int i)
 {
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
 	if (i >= 0){
-		gtk_tree_selection_select_iter(sel, &_item_[i]);
-		GtkTreePath *path = gtk_tree_path_new_from_indices(i, -1);
-		gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(widget), path, NULL, false, 0, 0);
-		gtk_tree_path_free(path);
+		GtkTreeIter iter;
+		if (gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, i)){
+			gtk_tree_selection_select_iter(sel, &iter);
+			GtkTreePath *path = gtk_tree_path_new_from_indices(i, -1);
+			gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(widget), path, NULL, false, 0, 0);
+			gtk_tree_path_free(path);
+		}
 	}else
 		gtk_tree_selection_unselect_all(sel);
 }
@@ -196,77 +199,95 @@ void HuiControlListView::__setInt(int i)
 int HuiControlListView::getInt()
 {
 	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
-	for (int j=0;j<_item_.num;j++)
-		if (gtk_tree_selection_iter_is_selected(sel, &_item_[j]))
-			return j;
+
+	for (int i=0; ; i++){
+		GtkTreeIter iter;
+		if (!gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, i))
+			return -1;
+		if (gtk_tree_selection_iter_is_selected(sel, &iter))
+			return i;
+
+	}
 	return -1;
 }
 
 void HuiControlListView::__changeString(int row, const string& str)
 {
-	if ((row < 0) or (row >= _item_.num))
+	if (row < 0)
 		return;
 	GetPartStrings(str);
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
-	if (gtk_list_store_iter_is_valid(store, &_item_[row]))
+	GtkTreeIter iter;
+	if (gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, row))
 		for (int j=0;j<PartString.num;j++)
-			set_list_cell(store, _item_[row], j, PartString[j]);
+			set_list_cell(store, iter, j, PartString[j]);
 }
 
 void HuiControlListView::__removeString(int row)
 {
-	if ((row < 0) or (row >= _item_.num))
+	if (row < 0)
 		return;
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
-	if (gtk_list_store_iter_is_valid(store, &_item_[row])){
-		gtk_list_store_remove(store, &_item_[row]);
-		_item_.erase(row);
-	}
+	GtkTreeIter iter;
+	if (gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, row))
+		gtk_list_store_remove(store, &iter);
 }
 
 string HuiControlListView::getCell(int row, int column)
 {
-	if ((row < 0) or (row >= _item_.num))
+	if (row < 0)
 		return "";
 	GtkTreeModel *store = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	return tree_get_cell(store, _item_[row], column);
+	GtkTreeIter iter;
+	if (!gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, row))
+		return "";
+	return tree_get_cell(store, iter, column);
 }
 
 void HuiControlListView::__setCell(int row, int column, const string& str)
 {
-	if ((row < 0) or (row >= _item_.num))
+	if (row < 0)
 		return;
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
-	if (gtk_list_store_iter_is_valid(store, &_item_[row]))
-		set_list_cell(store, _item_[row], column, str);
+	GtkTreeIter iter;
+	if (gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, row))
+		set_list_cell(store, iter, column, str);
 }
 
-Array<int> HuiControlListView::getMultiSelection()
+Array<int> HuiControlListView::getSelection()
 {
-	Array<int> sel;
-	GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
-	gtk_tree_selection_set_mode(s, GTK_SELECTION_MULTIPLE);
-	for (int j=0;j<_item_.num;j++)
-		if (gtk_tree_selection_iter_is_selected(s, &_item_[j])){
-			sel.add(j);
-		}
-	return sel;
+	Array<int> selected;
+	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
+
+	for (int i=0; ; i++){
+		GtkTreeIter iter;
+		if (!gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, i))
+			return selected;
+		if (gtk_tree_selection_iter_is_selected(sel, &iter))
+			selected.add(i);
+
+	}
+	return selected;
 }
 
-void HuiControlListView::__setSelection(Array<int>& sel)
+void HuiControlListView::__setSelection(Array<int>& selected)
 {
-	GtkTreeSelection *s = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
-	gtk_tree_selection_set_mode(s, GTK_SELECTION_MULTIPLE);
-	gtk_tree_selection_unselect_all(s);
-	for (int j=0;j<sel.num;j++)
-		gtk_tree_selection_select_iter(s, &_item_[sel[j]]);
+	GtkTreeSelection *sel = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
+	gtk_tree_selection_set_mode(sel, GTK_SELECTION_MULTIPLE);
+	gtk_tree_selection_unselect_all(sel);
+	for (int i: selected){
+		GtkTreeIter iter;
+		if (!gtk_tree_model_iter_nth_child(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)), &iter, NULL, i))
+			continue;
+		gtk_tree_selection_select_iter(sel, &iter);
+
+	}
 }
 
 void HuiControlListView::__reset()
 {
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	gtk_list_store_clear(store);
-	_item_.clear();
 }
 
 void HuiControlListView::__setOption(const string &op, const string &value)
@@ -281,6 +302,8 @@ void HuiControlListView::__setOption(const string &op, const string &value)
 		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), false);
 	}else if (op == "bar"){
 		gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(widget), value._bool());
+	}else if (op == "reorderable"){
+		gtk_tree_view_set_reorderable(GTK_TREE_VIEW(widget), true);
 	}
 }
 

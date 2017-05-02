@@ -19,6 +19,7 @@
 #include "View/BottomBar/MiniBar.h"
 #include "View/SideBar/SideBar.h"
 #include "View/SideBar/CaptureConsole.h"
+#include "View/SideBar/LayerConsole.h"
 #include "View/Mode/ViewModeDefault.h"
 #include "View/Mode/ViewModeScaleBars.h"
 #include "View/Helper/Slider.h"
@@ -606,16 +607,12 @@ void TsunamiWindow::onRecord()
 
 void TsunamiWindow::onAddLayer()
 {
-	song->addLayer("");
+	side_bar->layer_console->onAdd();
 }
 
 void TsunamiWindow::onDeleteLayer()
 {
-	try{
-		song->deleteLayer(view->cur_layer);
-	}catch(SongException &e){
-		tsunami->log->error(e.message);
-	}
+	side_bar->layer_console->onDelete();
 }
 
 void TsunamiWindow::onCurLayer()

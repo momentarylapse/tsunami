@@ -107,7 +107,7 @@ public:
 	void _cdecl deleteSample(Sample *s);
 	void _cdecl editSampleName(Sample *s, const string &name);
 	void _cdecl scaleSample(Sample *s, int new_size, int method);
-	void _cdecl addLayer(const string &name);
+	void _cdecl addLayer(const string &name, int index);
 	void _cdecl deleteLayer(int index);
 	void _cdecl mergeLayers(int source, int target);
 	void _cdecl moveLayer(int source, int target);

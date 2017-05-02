@@ -76,14 +76,18 @@ void LayerConsole::onEdit()
 
 void LayerConsole::onAdd()
 {
-	song->addLayer("");
+	int cur_layer = view->cur_layer;
+	song->addLayer("", cur_layer + 1);
+	view->setCurLayer(cur_layer + 1);
 }
 
 void LayerConsole::onDelete()
 {
-	int s = getInt("layers");
-	if (s >= 0)
-		song->deleteLayer(s);
+	try{
+		song->deleteLayer(view->cur_layer);
+	}catch(SongException &e){
+		tsunami->log->error(e.message);
+	}
 }
 
 void LayerConsole::onMerge()

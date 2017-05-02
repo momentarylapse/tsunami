@@ -392,9 +392,9 @@ void Song::deleteSelectedSamples(const SongSelection &sel)
 	action_manager->endActionGroup();
 }
 
-void Song::addLayer(const string &name)
+void Song::addLayer(const string &name, int index)
 {
-	execute(new ActionLayerAdd(name));
+	execute(new ActionLayerAdd(name, index));
 }
 
 void Song::deleteLayer(int index)

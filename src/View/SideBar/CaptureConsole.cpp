@@ -420,13 +420,22 @@ void CaptureConsole::updateTime()
 
 void CaptureConsole::onUpdate(Observable *o, const string &message)
 {
-	msg_write(o->getName() + " / " + message);
 	if (&message == &Observable::MESSAGE_DELETE)
 		return;
 	updateTime();
 }
 
 bool CaptureConsole::insert()
+{
+	if (type == -1)
+		return insertMulti();
+	if (type == Track::TYPE_MIDI)
+		return insertMidi();
+	//if (type == Track::TYPE_AUDIO)
+	return insertAudio();
+}
+
+bool CaptureConsole::insertAudio()
 {
 	Track *t;
 	int target = getInt("capture_audio_target");
@@ -451,18 +460,51 @@ bool CaptureConsole::insert()
 	}
 
 	// insert data
-	if (type == t->TYPE_AUDIO){
-		Range r = Range(i0, input->getSampleCount());
-		song->action_manager->beginActionGroup();
-		BufferBox tbuf = t->getBuffers(view->cur_layer, r);
-		ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
-		tbuf.set(((InputStreamAudio*)input)->buffer, 0, 1.0f);
-		song->execute(a);
-		song->action_manager->endActionGroup();
-	}else if (type == t->TYPE_MIDI){
-		t->insertMidiData(i0, midi_events_to_notes(((InputStreamMidi*)input)->midi));
-	}
+	Range r = Range(i0, input->getSampleCount());
+	song->action_manager->beginActionGroup();
+	BufferBox tbuf = t->getBuffers(view->cur_layer, r);
+	ActionTrackEditBuffer *a = new ActionTrackEditBuffer(t, view->cur_layer, r);
+	tbuf.set(((InputStreamAudio*)input)->buffer, 0, 1.0f);
+	song->execute(a);
+	song->action_manager->endActionGroup();
+
 	input->resetAccumulation();
 	return true;
+}
+
+bool CaptureConsole::insertMidi()
+{
+	Track *t;
+	int target = getInt("capture_midi_target");
+	int i0;
+	int s_start = view->sel.range.start();
+
+	// insert recorded data with some delay
+	int dpos = input->getDelay();
+
+	if (target >= song->tracks.num){
+		// new track
+		t = song->addTrack(type, song->tracks.num);
+	}else{
+		// overwrite
+		t = song->tracks[target];
+	}
+	i0 = s_start + dpos;
+
+	if (t->type != type){
+		tsunami->log->error(format(_("Can't insert recorded data (%s) into target (%s)."), track_type(type).c_str(), track_type(t->type).c_str()));
+		return false;
+	}
+
+	// insert data
+	t->insertMidiData(i0, midi_events_to_notes(((InputStreamMidi*)input)->midi));
+
+	input->resetAccumulation();
+	return true;
+}
+
+bool CaptureConsole::insertMulti()
+{
+	return false;
 }
 

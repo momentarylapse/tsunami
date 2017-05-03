@@ -25,10 +25,10 @@ class MidiPreviewFeedSource : public MidiSource
 public:
 	virtual int _cdecl read(MidiRawData &midi)
 	{
-		msg_write("mpfs.read");
+		//msg_write("mpfs.read");
 		for (int i=events.num-1; i>=0; i--){
 			if (events[i].pos < midi.samples){
-				msg_write("add " + format("%d  %f", events[i].pitch, events[i].volume));
+				//msg_write("add " + format("%.0f  %f", events[i].pitch, events[i].volume));
 				midi.add(events[i]);
 				events.erase(i);
 			}else
@@ -42,7 +42,7 @@ public:
 	void _cdecl feed(const MidiRawData &midi)
 	{
 		events.append(midi);
-		msg_write("feed " + i2s(midi.num));
+		//msg_write("feed " + i2s(midi.num));
 	}
 
 	MidiRawData events;
@@ -66,7 +66,6 @@ InputStreamMidi::InputStreamMidi(int _sample_rate) :
 
 
 	preview_source = new MidiPreviewFeedSource;
-	msg_error(p2s(preview_source));
 	preview_renderer = new MidiRenderer(NULL, preview_source);
 	preview_stream = new OutputStream(preview_renderer);
 	preview_stream->setBufferSize(2048);

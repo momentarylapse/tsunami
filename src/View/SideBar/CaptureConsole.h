@@ -50,6 +50,9 @@ public:
 	void onCancel();
 	void onClose();
 	bool insert();
+	bool insertAudio();
+	bool insertMidi();
+	bool insertMulti();
 
 	void fillTrackList();
 

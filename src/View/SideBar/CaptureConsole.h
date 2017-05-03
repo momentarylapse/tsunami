@@ -34,10 +34,7 @@ public:
 	void beginMidi();
 	void beginMulti();
 	void beginMode(int type);
-	void endAudio();
-	void endMidi();
-	void endMulti();
-	void endMode(int type);
+	void endCapture();
 
 	void onType();
 
@@ -78,6 +75,8 @@ public:
 	PeakMeter *peak_meter;
 	Synthesizer *temp_synth;
 	int type;
+
+	int multi_size;
 };
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_ */

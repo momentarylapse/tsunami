@@ -41,6 +41,8 @@ CaptureConsole::CaptureConsole(Song *s, AudioView *v):
 	chosen_device_audio = NULL;
 	chosen_device_midi = NULL;
 
+	multi_size = 0;
+
 
 	// dialog
 	peak_meter = new PeakMeter(this, "capture_level", input, view);
@@ -106,9 +108,18 @@ void CaptureConsole::onEnter()
 	addString("capture_midi_target", _("  - create new track -"));
 
 	// target list multi
-	reset("capture_multi_list");
-	for (Track *t: song->tracks)
-		addString("capture_multi_list", t->getNiceName() + "\\" + track_type(t->type) + "\\ - none -");
+	//reset("capture_multi_list");
+	//for (Track *t: song->tracks)
+	//	addString("capture_multi_list", t->getNiceName() + "\\" + track_type(t->type) + "\\ - none -");
+	foreachi (Track *t, song->tracks, i){
+		setTarget("capture_multi_grid", -1);
+		addLabel(t->getNiceName(), 0, i+1, 0, 0, "capture-multi-target-" + i2s(i));
+		addLabel(track_type(t->type), 1, i+1, 0, 0, "capture-multi-type-" + i2s(i));
+		addComboBox(_("- none -"), 2, i+1, 0, 0, "capture-multi-source-" + i2s(i));
+		for (Device *d: sources_audio)
+			addString("capture-multi-source-" + i2s(i), d->get_name());
+	}
+	multi_size = song->tracks.num;
 
 
 	if (view->cur_track){
@@ -139,12 +150,15 @@ void CaptureConsole::onLeave()
 	if (input->isCapturing())
 		insert();
 
-	peak_meter->setSource(NULL);
 	view->stream->stop();
 
-	view->setInput(NULL);
-	unsubscribe(input);
-	delete(input);
+	endCapture();
+
+	for (int i=0; i<multi_size; i++){
+		removeControl("capture-multi-target-" + i2s(i));
+		removeControl("capture-multi-type-" + i2s(i));
+		removeControl("capture-multi-source-" + i2s(i));
+	}
 
 	view->setMode(view->mode_default);
 }
@@ -184,10 +198,7 @@ void CaptureConsole::beginMode(int mode)
 
 void CaptureConsole::beginAudio()
 {
-	if (input){
-		delete(input);
-		input = NULL;
-	}
+	endCapture();
 
 	type = Track::TYPE_AUDIO;
 	setInt("capture_type", 0);
@@ -214,10 +225,7 @@ void CaptureConsole::beginAudio()
 
 void CaptureConsole::beginMidi()
 {
-	if (input){
-		delete(input);
-		input = NULL;
-	}
+	endCapture();
 
 	type = Track::TYPE_MIDI;
 	setInt("capture_type", 1);
@@ -246,6 +254,17 @@ void CaptureConsole::beginMulti()
 {
 	type = -1;
 	setInt("capture_type", 2);
+}
+
+void CaptureConsole::endCapture()
+{
+	if (input){
+		peak_meter->setSource(NULL);
+		view->setInput(NULL);
+		unsubscribe(input);
+		delete(input);
+		input = NULL;
+	}
 }
 
 void CaptureConsole::setTargetAudio(int index)
@@ -401,6 +420,9 @@ void CaptureConsole::updateTime()
 
 void CaptureConsole::onUpdate(Observable *o, const string &message)
 {
+	msg_write(o->getName() + " / " + message);
+	if (&message == &Observable::MESSAGE_DELETE)
+		return;
 	updateTime();
 }
 

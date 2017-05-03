@@ -210,6 +210,11 @@ void PeakMeter::findSpectrum()
 
 void PeakMeter::onUpdate(Observable *o, const string &message)
 {
+	if (&message == &Observable::MESSAGE_DELETE){
+		setSource(NULL);
+		return;
+	}
+
 	int state = source->getState();
 
 	if (state == source->STATE_PLAYING){

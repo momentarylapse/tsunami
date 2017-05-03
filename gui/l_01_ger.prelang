@@ -1,7 +1,7 @@
 // Language
 Deutsch
 // Num IDs
-393
+396
 // Data (ID,Text,Tooltip)
 /cancel
 Abbrechen
@@ -875,6 +875,15 @@ Quelle
 
 record_dialog/rdt_midi_target
 Ziel
+
+record_dialog/rdt_multi_source
+Quelle
+
+record_dialog/rdt_multi_target
+Ziel
+
+record_dialog/rdt_multi_type
+Typ
 
 record_dialog/rdt_source
 Quelle
